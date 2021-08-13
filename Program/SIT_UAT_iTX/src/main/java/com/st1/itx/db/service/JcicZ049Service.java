@@ -1,0 +1,156 @@
+package com.st1.itx.db.service;
+
+import java.util.List;
+
+import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.JcicZ049;
+import org.springframework.data.domain.Slice;
+import com.st1.itx.db.domain.JcicZ049Id;
+
+/**
+ * Gen By Tool
+ * 
+ * @author AdamPan
+ * @version 1.0.0
+ */
+public interface JcicZ049Service {
+
+  /**
+   * findByPrimaryKey
+   *
+   * @param jcicZ049Id PK
+   * @param titaVo Variable-Length Argument
+   * @return JcicZ049 JcicZ049
+   */
+  public JcicZ049 findById(JcicZ049Id jcicZ049Id, TitaVo... titaVo);
+
+  /**
+   * findAll
+   *
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ049 JcicZ049 of List
+   */
+  public Slice<JcicZ049> findAll(int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustId=
+   *
+   * @param custId_0 custId_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ049 JcicZ049 of List
+   */
+  public Slice<JcicZ049> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * RcDate=
+   *
+   * @param rcDate_0 rcDate_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ049 JcicZ049 of List
+   */
+  public Slice<JcicZ049> RcDateEq(int rcDate_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustId= , AND RcDate=
+   *
+   * @param custId_0 custId_0
+   * @param rcDate_1 rcDate_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ049 JcicZ049 of List
+   */
+  public Slice<JcicZ049> CustRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * hold By JcicZ049
+   * 
+   * @param jcicZ049Id key
+   * @param titaVo Variable-Length Argument
+   * @return JcicZ049 JcicZ049
+   */
+  public JcicZ049 holdById(JcicZ049Id jcicZ049Id, TitaVo... titaVo);
+
+  /**
+   * hold By JcicZ049
+   * 
+   * @param jcicZ049 key
+   * @param titaVo Variable-Length Argument
+   * @return JcicZ049 JcicZ049
+   */
+  public JcicZ049 holdById(JcicZ049 jcicZ049, TitaVo... titaVo);
+
+  /**
+   * Insert
+   * 
+   * @param jcicZ049 Entity
+   * @param titaVo Variable-Length Argument
+   * @return JcicZ049 Entity
+   * @throws DBException exception
+   */
+  public JcicZ049 insert(JcicZ049 jcicZ049, TitaVo... titaVo) throws DBException;
+
+  /**
+   * Update
+   * 
+   * @param jcicZ049 Entity
+   * @param titaVo Variable-Length Argument
+   * @return JcicZ049 Entity
+   * @throws DBException exception
+   */
+  public JcicZ049 update(JcicZ049 jcicZ049, TitaVo... titaVo) throws DBException;
+
+  /**
+   * Update2
+   * 
+   * @param jcicZ049 Entity
+   * @param titaVo Variable-Length Argument
+   * @return JcicZ049 Entity
+   * @throws DBException exception
+   */
+  public JcicZ049 update2(JcicZ049 jcicZ049, TitaVo... titaVo) throws DBException;
+
+  /**
+   * Delete
+   * 
+   * @param jcicZ049 Entity
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void delete(JcicZ049 jcicZ049, TitaVo... titaVo) throws DBException;
+
+  /**
+   * Insert All For List
+   * 
+   * @param jcicZ049 Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void insertAll(List<JcicZ049> jcicZ049, TitaVo... titaVo) throws DBException;
+
+  /**
+   * Update All For List
+   * 
+   * @param jcicZ049 Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void updateAll(List<JcicZ049> jcicZ049, TitaVo... titaVo) throws DBException;
+
+  /**
+   * Delete All For List
+   * 
+   * @param jcicZ049 Entity of List
+   * @param titaVo Variable-Length Argument
+   * @throws DBException exception
+   */
+  public void deleteAll(List<JcicZ049> jcicZ049, TitaVo... titaVo) throws DBException;
+
+}

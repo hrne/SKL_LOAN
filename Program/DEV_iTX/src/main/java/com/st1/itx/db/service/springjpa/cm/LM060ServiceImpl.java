@@ -1,0 +1,118 @@
+package com.st1.itx.db.service.springjpa.cm;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.service.springjpa.ASpringJpaParm;
+import com.st1.itx.db.transaction.BaseEntityManager;
+
+@Service
+@Repository
+/* 逾期放款明細 */
+public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean {
+	private static final Logger logger = LoggerFactory.getLogger(LM060ServiceImpl.class);
+
+	@Autowired
+	private BaseEntityManager baseEntityManager;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+
+		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
+		String iYEAR = iENTDY.substring(0, 4);
+		String iMM = iENTDY.substring(4, 6);
+		String iYYMM = iENTDY.substring(0, 6);
+		String iLYYMM = "";
+		if (iMM.equals("1")) {
+			iLYYMM = String.valueOf(Integer.valueOf(iYEAR) - 1) + "12";
+		} else {
+			iLYYMM = iYEAR + String.format("%02d", Integer.valueOf(iMM) - 1);
+		}
+
+		logger.info("lM060.findAll YYMM=" + iYYMM + ",LYYMM=" + iLYYMM);
+
+//		F0 : 前期餘額               
+//		F1 : 借方暫付款項--法務費用   
+//		F2 : 借方催收款項--法務費用  
+//		F3 : 貸方暫付款項--法務費用  
+//		F4 : 貸方催收款項--法務費用  
+//		F5 : 本日餘額               
+//		F6 : 暫付款及待結轉帳__放款法務費用
+//		F7 : 催收款項__法務費用
+//		F8 : 餘額合計
+
+		String sql = "SELECT SUM(\"F0\") AS F0";
+		sql += "			,SUM(\"F1\") AS F1";
+		sql += "			,SUM(\"F2\") AS F2";
+		sql += "			,SUM(\"F3\") AS F3";
+		sql += "			,SUM(\"F4\") AS F4";
+		sql += "			,SUM(\"F5\") AS F5";
+		sql += "			,SUM(\"F6\") AS F6";
+		sql += "			,SUM(\"F7\") AS F7";
+		sql += "			,SUM(\"F8\") AS F8";
+		sql += "	  FROM(SELECT DECODE(A.\"MonthEndYm\",:yymm,A.\"YdBal\",0) F0";
+		sql += "				 ,DECODE(A.\"AcctCode\",'F07',A.\"DbAmt\" + A.\"CoreDbAmt\",0) F1";
+		sql += "				 ,DECODE(A.\"AcctCode\",'F24',A.\"DbAmt\" + A.\"CoreDbAmt\",0) F2";
+		sql += "				 ,DECODE(A.\"AcctCode\",'F07',A.\"CrAmt\" + A.\"CoreCrAmt\",0) F3";
+		sql += "				 ,DECODE(A.\"AcctCode\",'F24',A.\"CrAmt\" + A.\"CoreCrAmt\",0) F4";
+		sql += "				 ,DECODE(A.\"MonthEndYm\",:yymm,A.\"TdBal\",0) F5";
+		sql += "				 ,0 F6";
+		sql += "				 ,0 F7";
+		sql += "				 ,0 F8";
+		sql += "		   FROM \"AcMain\" A";
+		sql += "		   WHERE TRUNC(A.\"AcDate\" / 100) = :yymm";
+		sql += "		     AND A.\"AcctCode\" IN('F07','F24')";
+		sql += "		   UNION ALL";
+		sql += "		   SELECT 0 F0";
+		sql += "				 ,FO.\"Fee\" F1";
+		sql += "				 ,0 F2";
+		sql += "				 ,0 F3";
+		sql += "				 ,0 F4";
+		sql += "				 ,0 F5";
+		sql += "				 ,0 F6";
+		sql += "				 ,0 F7";
+		sql += "				 ,0 F8";
+		sql += "		   FROM \"ForeclosureFee\" FO";
+		sql += "		   WHERE TRUNC(FO.\"OpenAcDate\" / 100) = :yymm ";
+		sql += "			 AND FO.\"FeeCode\" NOT IN ('11','15')";
+		sql += "		   UNION ALL";
+		sql += "		   SELECT 0 F0"; 
+		sql += "				 ,0 F1";
+		sql += "				 ,0 F2";
+		sql += "				 ,0 F3";
+		sql += "				 ,0 F4";
+		sql += "				 ,0 F5";
+		sql += "				 ,DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,DECODE(TRUNC(F.\"OpenAcDate\" / 100),:yymm,F.\"Fee\",0),0),0) F6";
+		sql += "				 ,DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,0,F.\"Fee\"),0) F7";
+		sql += "				 ,DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,DECODE(TRUNC(F.\"OpenAcDate\" / 100),:yymm,F.\"Fee\",0),0),0)";
+		sql += "				 + DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,0,F.\"Fee\"),0) F8";
+		sql += "		   FROM \"ForeclosureFee\" F)";
+
+		logger.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", iYYMM);
+		query.setParameter("lyymm", iLYYMM);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+}

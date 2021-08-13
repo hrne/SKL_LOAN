@@ -1,0 +1,39 @@
+package com.st1.itx.trade.LD;
+
+import java.util.ArrayList;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+
+import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
+
+@Service("LD004")
+@Scope("prototype")
+/**
+ * 
+ * 
+ * @author ChihWei
+ * @version 1.0.0
+ */
+public class LD004 extends TradeBuffer {
+	private static final Logger logger = LoggerFactory.getLogger(LD004.class);
+	
+	String TXCD = "LD004";
+	
+	@Override
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		this.info("active "+ TXCD);
+		this.totaVo.init(titaVo);
+
+		MySpring.newTask(TXCD+"p", this.txBuffer, titaVo);
+
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+}

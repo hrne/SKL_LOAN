@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jee="http://www.springframework.org/schema/jee" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:repository="http://www.springframework.org/schema/data/repository"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+		http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc.xsd
+		http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/data/repository http://www.springframework.org/schema/data/repository/spring-repository.xsd">
+
+ 
+	<bean id="dataSourceDay" class="org.apache.tomcat.jdbc.pool.DataSource" destroy-method="close">
+		<property name="driverClassName" value="oracle.jdbc.OracleDriver" />
+		<property name="url" value="jdbc:oracle:thin:@192.168.10.8:1521:oracle19c" />
+		<property name="username" value="c##itxadmin" />
+		<property name="password" value="1qaz2wsx" />
+		<property name="maxActive" value="0" />
+		<property name="maxIdle" value="0" />
+		<property name="minIdle" value="0" />
+		<property name="defaultAutoCommit" value="false" />
+	</bean>
+
+	
+	<!-- <jee:jndi-lookup id="dataSource" jndi-name="JNDI/OracleDataForiTX" resource-ref="true" /> -->
+	
+	<bean id="emfDay" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">	
+	    <!-- <property name="persistenceXmlLocation" value="classpath:spring/persistence.xml" /> -->
+		<property name="persistenceUnitName" value="emfDay" />
+		<property name="dataSource" ref="dataSourceDay" />
+		<property name="jpaDialect">
+			<bean class="com.st1.itx.spring.dialect.CustomHibernateJpaDialect" />
+		</property>
+		<property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapterDay" />
+		<property name="packagesToScan" value="com.st1.itx.db.domain" />
+		<property name="jpaProperties">
+			<props>
+				<prop key="hibernate.ejb.naming_strategy">org.hibernate.cfg.ImprovedNamingStrategy</prop>
+				<prop key="hibernate.max_fetch_depth">3</prop>
+				<prop key="hibernate.jdbc.fetch_size">50</prop>
+				<prop key="hibernate.jdbc.batch_size">30</prop>
+				<prop key="hibernate.show_sql">false</prop>
+			</props>
+		</property>
+	</bean>
+
+	<bean id="transactionManagerDay" class="org.springframework.orm.jpa.JpaTransactionManager">
+		<property name="entityManagerFactory" ref="emfDay" />
+	</bean>
+	
+	<tx:annotation-driven transaction-manager="transactionManagerDay" proxy-target-class="true" />
+
+	<jpa:repositories base-package="com.st1.itx.db.repository.day" entity-manager-factory-ref="emfDay" transaction-manager-ref="transactionManagerDay" />	
+
+</beans>

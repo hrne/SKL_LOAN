@@ -1,0 +1,168 @@
+package com.st1.itx.db.service.springjpa.cm;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.repository.online.LoanBorMainRepository;
+import com.st1.itx.db.service.springjpa.ASpringJpaParm;
+import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.eum.ContentName;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
+
+@Service("L4042ServiceImpl")
+@Repository
+/* 逾期放款明細 */
+public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean {
+	private static final Logger logger = LoggerFactory.getLogger(L4042ServiceImpl.class);
+
+	@Autowired
+	private BaseEntityManager baseEntityManager;
+
+	@Autowired
+	private LoanBorMainRepository loanBorMainRepos;
+
+	@Autowired
+	private Parse parse;
+
+	@Autowired
+	private DateUtil dateUtil;
+
+	// *** 折返控制相關 ***
+	private int index;
+
+	// *** 折返控制相關 ***
+	private int limit;
+
+	// *** 折返控制相關 ***
+	private int cnt;
+
+	// *** 折返控制相關 ***
+	private int size;
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		org.junit.Assert.assertNotNull(loanBorMainRepos);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+
+		logger.info("L4920.findAll");
+
+		int iSearchFlag = parse.stringToInteger(titaVo.get("SearchFlag"));
+		int iDateFrom = parse.stringToInteger(titaVo.get("DateFrom")) + 19110000;
+		int iDateTo = parse.stringToInteger(titaVo.get("DateTo")) + 19110000;
+		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
+		String iRepayAcct = FormatUtil.pad9(titaVo.get("RepayAcct").trim(), 14);
+
+
+
+        String sql = "";
+		sql += " select * from (                                                             ";
+		sql += " select                                                                      ";
+		sql += "     act.\"CustNo\"            as F0                                         ";
+		sql += "    ,act.\"FacmNo\"            as F1                                         ";
+		sql += "    ,'0'                       as F2                                         ";
+		sql += "    ,act.\"RepayBank\"         as F3                                         ";
+		sql += "    ,act.\"RepayAcct\"         as F4                                         ";
+		sql += "    ,'0'                       as F5                                         ";
+		sql += "    ,act.\"LimitAmt\"          as F6                                         ";
+		sql += "    ,act.\"CreateFlag\"        as F7                                         ";
+		sql += "    ,act.\"AuthCreateDate\"    as F8                                         ";
+		sql += "    ,act.\"PropDate\"          as F9                                         ";
+		sql += "    ,act.\"RetrDate\"          as F10                                        ";
+		sql += "    ,act.\"AuthStatus\"        as F11                                        ";
+		sql += "    ,act.\"MediaCode\"         as F12                                        ";
+		sql += "    ,act.\"AmlRsp\"            as F13                                        ";
+		sql += "    ,his.\"RepayBank\"         as F14                                        ";
+		sql += "    ,his.\"RepayAcct\"         as F15                                        ";
+		sql += "    ,act.\"StampFinishDate\"   as F16                                        ";
+		sql += "    ,his.\"DeleteDate\"        as F17                                        ";
+		sql += "    ,case when row_number() over (partition by act.\"CustNo\",act.\"RepayBank\",act.\"RepayAcct\" order by act.\"CreateDate\" Desc) = 1 then 1 else 0 end as F18 ";
+		sql += "   from \"AchAuthLog\" act                                            ";
+		sql += "   left join (                                                             ";
+		sql += "       select                                                              ";
+		sql += "         \"AuthCreateDate\"                                                ";
+		sql += "        ,\"CustNo\"                                                        ";
+		sql += "        ,\"RepayBank\"                                                     ";
+		sql += "        ,\"RepayAcct\"                                                     ";
+		sql += "        ,\"CreateFlag\"                                                    ";
+		sql += "        ,\"CreateDate\"                                                    ";
+		sql += "        ,\"DeleteDate\"                                                    ";
+		sql += "       from \"AchAuthLogHistory\" ) his                                             ";
+		sql += "      on his.\"AuthCreateDate\" = act.\"AuthCreateDate\"                       ";
+		sql += "     and his.\"CustNo\"         = act.\"CustNo\"                               ";
+		sql += "     and his.\"RepayBank\"      = act.\"RepayBank\"                            ";
+		sql += "     and his.\"RepayAcct\"      = act.\"RepayAcct\"                            ";
+		sql += "     and his.\"CreateFlag\"     = act.\"CreateFlag\"                           ";
+		sql += "  where                                                                    ";
+		if (iSearchFlag == 1) {
+			sql += "            act.\"AuthCreateDate\" >= " + iDateFrom;
+			sql += "        and act.\"AuthCreateDate\" <= " + iDateTo;
+		}
+		if (iSearchFlag == 2) {
+			sql += "            act.\"PropDate\" >= " + iDateFrom;
+			sql += "        and act.\"PropDate\" <= " + iDateTo;
+		}
+		if (iSearchFlag == 3) {
+			sql += "            act.\"RetrDate\" >= " + iDateFrom;
+			sql += "        and act.\"RetrDate\" <= " + iDateTo;
+		}
+		if (iSearchFlag == 4) {
+			sql += "            act.\"CustNo\" = " + iCustNo;
+		}
+		if (iSearchFlag == 5) {
+			sql += "            act.\"RepayAcct\" = " + iRepayAcct;
+		}
+		sql += "  order by act.\"CustNo\",act.\"FacmNo\",act.\"CreateDate\" Desc  ";
+		sql += " ) a where a.\"F18\" = 1                                          ";
+
+		logger.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		query = em.createNativeQuery(sql);
+
+		cnt = query.getResultList().size();
+		logger.info("Total cnt ..." + cnt);
+
+		// *** 折返控制相關 ***
+		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+		query.setFirstResult(this.index * this.limit);
+
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(this.limit);
+
+		List<Object> result = query.getResultList();
+
+		size = result.size();
+		logger.info("Total size ..." + size);
+
+		return this.convertToMap(result);
+	}
+
+	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {
+		this.index = index;
+		this.limit = limit;
+
+		return findAll(titaVo);
+	}
+
+	public int getSize() {
+		return cnt;
+	}
+}

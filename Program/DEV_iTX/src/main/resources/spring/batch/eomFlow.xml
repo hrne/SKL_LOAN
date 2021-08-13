@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<!-- 作業名稱 -->
+	<job id="eomFlow" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<split id="split1" task-executor="taskExecutor" next="split2">
+			<flow>
+				<step id="l9MonthlyLoanBalUpd" parent="parentStep">
+					<tasklet ref="L9MonthlyLoanBalUpd" />
+				</step>
+			</flow>
+			<flow>
+				<step id="l9MonthlyFacBalUpd" parent="parentStep">
+					<tasklet ref="L9MonthlyFacBalUpd" />
+				</step>
+			</flow>
+		</split>
+		<split id="split2" task-executor="taskExecutor">
+			<flow>
+				<step id="l9MonthlyLM003Upd" parent="parentStep">
+					<tasklet ref="L9MonthlyLM003Upd" />
+				</step>
+			</flow>
+			<flow>
+				<step id="l9MonthlyLM028Upd" parent="parentStep">
+					<tasklet ref="L9MonthlyLM028Upd" />
+				</step>
+			</flow>
+			<flow>
+				<step id="l9MonthlyLM032Upd" parent="parentStep">
+					<tasklet ref="L9MonthlyLM032Upd" />
+				</step>
+			</flow>
+		</split>
+	</job>
+
+</beans>

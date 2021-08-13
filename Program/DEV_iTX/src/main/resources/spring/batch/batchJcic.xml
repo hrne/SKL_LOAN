@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd">
+
+	<!-- 日報 -->
+	<!-- L8401 -->
+	<!-- L8401  LB204 聯徵授信餘額日報檔 -->
+	<job id="jLB204" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB204" parent="parentStep">
+			<tasklet ref="LB204" />
+		</step>
+	</job>
+
+	<!-- L8401  LB211 聯徵每日授信餘額變動資料檔 -->
+	<job id="jLB211" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB211" parent="parentStep">
+			<tasklet ref="LB211" />
+		</step>
+	</job>
+
+
+	<!-- 週報 -->
+
+	<!-- 月報 -->
+	<!-- L7901 -->
+	<job id="jLNM34AP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM34AP" parent="parentStep">
+			<tasklet ref="LNM34AP" />
+		</step>
+	</job>
+
+	<!-- L7901 -->
+	<job id="jLNM34BP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM34BP" parent="parentStep">
+			<tasklet ref="LNM34BP" />
+		</step>
+	</job>
+
+	<!-- L7901 -->
+	<job id="jLNM34CP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM34CP" parent="parentStep">
+			<tasklet ref="LNM34CP" />
+		</step>
+	</job>
+
+	<!-- L7901 -->
+	<job id="jLNM34DP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM34DP" parent="parentStep">
+			<tasklet ref="LNM34DP" />
+		</step>
+	</job>
+
+	<!-- L7901 -->
+	<job id="jLNM34EP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM34EP" parent="parentStep">
+			<tasklet ref="LNM34EP" />
+		</step>
+	</job>
+
+	<!-- L7901 -->
+	<job id="jLNM34GP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM34GP" parent="parentStep">
+			<tasklet ref="LNM34GP" />
+		</step>
+	</job>
+
+    <!-- L7902 ************************************************************  -->
+	<!-- L7902  LNM39AP 清單1：表內放款與應收帳款-資產基本資料與計算原始有效利率用 -->
+	<job id="jLNM39AP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39AP" parent="parentStep">
+			<tasklet ref="LNM39AP" />
+		</step>
+	</job>
+
+	<!-- L7902  LNM39BP 清單2：台幣放款-計算原始有效利率用 -->
+	<job id="jLNM39BP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39BP" parent="parentStep">
+			<tasklet ref="LNM39BP" />
+		</step>
+	</job>
+	<!-- L7902  LNM002 清單2：台幣放款-計算原始有效利率用
+	<job id="jLNM002" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM002" parent="parentStep">
+			<tasklet ref="LNM002" />
+		</step>
+	</job>
+	-->
+
+	<!-- L7902  LNM39CP 清單3：台幣放款-計算原始有效利率用 -->
+	<job id="jLNM39CP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39CP" parent="parentStep">
+			<tasklet ref="LNM39CP" />
+		</step>
+	</job>
+
+	<!-- L7902  LNM39DP 清單4：放款與AR-估計回收率用 -->
+	<job id="jLNM39DP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39DP" parent="parentStep">
+			<tasklet ref="LNM39DP" />
+		</step>
+	</job>
+
+	<!-- L7902  LNM39EP 清單5：會計帳 --> 
+	<!--
+	<job id="jLNM39EP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39EP" parent="parentStep">
+			<tasklet ref="LNM39EP" />
+		</step>
+	</job>
+	-->
+
+	<!-- L7902  LNM39FP 清單6：放款與應收帳款-協商戶用 -->
+	<job id="jLNM39FP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39FP" parent="parentStep">
+			<tasklet ref="LNM39FP" />
+		</step>
+	</job>
+
+	<!-- L7902  LNM39GP 清單7：放款與應收帳款-stage轉換用 -->
+	<job id="jLNM39GP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39GP" parent="parentStep">
+			<tasklet ref="LNM39GP" />
+		</step>
+	</job>
+
+	<!-- L7902  LNM39HP 清單8：放款與應收帳款-風險參數用 -->
+	<job id="jLNM39HP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39HP" parent="parentStep">
+			<tasklet ref="LNM39HP" />
+		</step>
+	</job>
+
+	<!-- L7902  LNM39IP 清單9：表外放款與應收帳款-資產基本資料與計算原始有效利率用 -->
+	<job id="jLNM39IP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39IP" parent="parentStep">
+			<tasklet ref="LNM39IP" />
+		</step>
+	</job>
+
+	<!-- L7902  LNM39JP 清單10：借新還舊 -->
+	<job id="jLNM39JP" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLNM39JP" parent="parentStep">
+			<tasklet ref="LNM39JP" />
+		</step>
+	</job>
+
+    <!-- L8402 ***********************************************************  -->
+	<!-- L8402  B201 聯徵授信餘額月報檔 -->
+	<job id="jLB201" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB201" parent="parentStep">
+			<tasklet ref="LB201" />
+		</step>
+	</job>
+
+	<!-- L8402  B207 授信戶基本資料檔 -->
+	<job id="jLB207" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB207" parent="parentStep">
+			<tasklet ref="LB207" />
+		</step>
+	</job>
+
+	<!-- L8402  B080 授信額度資料檔 -->
+	<job id="jLB080" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB080" parent="parentStep">
+			<tasklet ref="LB080" />
+		</step>
+	</job>
+
+	<!-- L8402  B085 帳號轉換資料檔 -->
+	<job id="jLB085" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB085" parent="parentStep">
+			<tasklet ref="LB085" />
+		</step>
+	</job>
+
+	<!-- B087 尚無功能 -->
+	<!-- L8402  B087 聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔 -->
+	<job id="jLB087" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB087" parent="parentStep">
+			<tasklet ref="LB087" />
+		</step>
+	</job>
+
+	<!-- L8402  B090 擔保品關聯檔資料檔 -->
+	<job id="jLB090" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB090" parent="parentStep">
+			<tasklet ref="LB090" />
+		</step>
+	</job>
+
+	<!-- L8402  B092 不動產擔保品明細檔 -->
+	<job id="jLB092" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB092" parent="parentStep">
+			<tasklet ref="LB092" />
+		</step>
+	</job>
+
+	<!-- L8402  B093 動產及貴重物品擔保品明細檔 -->
+	<job id="jLB093" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB093" parent="parentStep">
+			<tasklet ref="LB093" />
+		</step>
+	</job>
+
+	<!-- L8402  B094 股票擔保品明細檔 -->
+	<job id="jLB094" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB094" parent="parentStep">
+			<tasklet ref="LB094" />
+		</step>
+	</job>
+
+	<!-- L8402  B095 不動產擔保品明細-建號附加檔 -->
+	<job id="jLB095" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB095" parent="parentStep">
+			<tasklet ref="LB095" />
+		</step>
+	</job>
+
+	<!-- L8402  B096 不動產擔保品明細-地號附加檔 -->
+	<job id="jLB096" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB096" parent="parentStep">
+			<tasklet ref="LB096" />
+		</step>
+	</job>
+
+	<!-- L8402  B680 「貸款餘額(擔保放款餘額加上部分擔保、副擔保貸款餘額)扣除擔保品鑑估值」之金額資料檔 -->
+	<job id="jLB680" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+		<step id="sLB680" parent="parentStep">
+			<tasklet ref="LB680" />
+		</step>
+	</job>
+
+
+	<!-- 季報 -->
+
+	<!-- 半年報 -->
+
+	<!-- 年報 -->
+
+</beans>

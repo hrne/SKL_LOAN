@@ -1,0 +1,43 @@
+package com.st1.itx.db.repository.mon;
+
+
+import java.util.Optional;
+
+import javax.persistence.LockModeType;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.domain.TxToDoDetailId;
+
+/**
+ * Gen By Tool
+ * 
+ * @author AdamPan
+ * @version 1.0.0
+ */
+public interface TxToDoDetailRepositoryMon extends JpaRepository<TxToDoDetail, TxToDoDetailId> {
+
+  // ItemCode = ,AND Status >= ,AND Status <=
+  public Slice<TxToDoDetail> findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(String itemCode_0, int status_1, int status_2, Pageable pageable);
+
+  // ItemCode = ,AND DtlValue >= ,AND DtlValue <=
+  public Slice<TxToDoDetail> findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(String itemCode_0, String dtlValue_1, String dtlValue_2, Pageable pageable);
+
+  // ItemCode = ,AND DtlValue = ,AND Status >= ,AND Status <=  ,AND DataDate >= ,AND DataDate <=
+  public Slice<TxToDoDetail> findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(String itemCode_0, String dtlValue_1, int status_2, int status_3, int dataDate_4, int dataDate_5, Pageable pageable);
+
+  // ItemCode = ,AND Status >= ,AND Status <=  ,AND DataDate >= ,AND DataDate <=
+  public Slice<TxToDoDetail> findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(String itemCode_0, int status_1, int status_2, int dataDate_3, int dataDate_4, Pageable pageable);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxToDoDetail> findByTxToDoDetailId(TxToDoDetailId txToDoDetailId);
+
+}
+

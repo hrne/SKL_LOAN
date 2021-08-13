@@ -1,0 +1,1237 @@
+package com.st1.itx.trade.L2;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
+import org.springframework.stereotype.Service;
+
+import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
+import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacCaseAppl;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.domain.FacProd;
+import com.st1.itx.db.domain.FacProdBreach;
+import com.st1.itx.db.domain.FacProdBreachId;
+import com.st1.itx.db.domain.FacProdStepRate;
+import com.st1.itx.db.domain.FacProdStepRateId;
+import com.st1.itx.db.domain.TxTemp;
+import com.st1.itx.db.domain.TxTempId;
+import com.st1.itx.db.service.CdGseqService;
+import com.st1.itx.db.service.ClFacService;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacCaseApplService;
+import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.FacProdBreachService;
+import com.st1.itx.db.service.FacProdService;
+import com.st1.itx.db.service.FacProdStepRateService;
+import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.TxTempService;
+import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.BankAuthActCom;
+import com.st1.itx.util.common.LoanCom;
+import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
+
+/*
+ * L2154 額度資料維護
+ * a.修改:
+ * a1.若已撥款則額度之核准額度須>=已貸金額
+ * a2.修改資料須刷主管卡之欄位:基本利率代碼,核准利率,利率調整週期,攤還額異動碼,動支期限,還本週期,循環動用期限,代繳所得稅,攤還方式,寬限期到期日,繳款方式,繳息週期,客戶別,核准額度
+ * b.刪除:額度尚未撥款前才可刪除額度資料
+ */
+/*
+ * Tita
+ * FuncCode=9,1
+ * CustNo=9,7
+ * FacmNo=9,3
+ * CustId=X,10
+ * ProdNo=X,5
+ * BaseRateCode=9,2
+ * RateIncr=+9,2.4
+ * IndividualIncr=+9,2.4
+ * ApproveRate=9,2.4
+ * RateCode=9,1
+ * FirstRateAdjFreq=9,2
+ * RateAdjFreq=9,2
+ * CurrencyCode=X,3
+ * TimApplAmt=9,14.2
+ * AcctCode=9,3
+ * LoanTermYy=9,2
+ * LoanTermMm=9,2
+ * LoanTermDd=9,3
+ * AmortizedCode=9,1
+ * FreqBase=9,1
+ * PayIntFreq=9,2
+ * RepayFreq=9,2
+ * UtilDeadline=9,7
+ * GracePeriod=9,3
+ * TimDuePayAmt=9,14.2
+ * TimDuePayLimit=9,14.2
+ * TimPayIntLimit=9,14.2
+ * TimAcctFee=9,14.2
+ * GuaranteeDate=9,7
+ * ExtraRepayCode=9,1
+ * CustomerCode=X,1
+ * RecycleCode=9,1
+ * RecycleDeadline=9,7
+ * UsageCode=9,1
+ * DepartmentCode=9,1
+ * IncomeTaxCode=9,1
+ * CompensateCode=9,1
+ * IrrevocableCode=9,1
+ * RateAdjNoticeCode=9,1
+ * PieceCode=X,1
+ * RepayCode=9,2
+ * RepayBank=9,3
+ * RepayAcctNo=9,14
+ * PostCode=X,1
+ * Introducer=X,6
+ * District=X,6
+ * FireOfficer=X,6
+ * Estimate=X,6
+ * CreditOfficer=X,6
+ * LoanOfficer=X,6
+ * BusinessOfficer=X,6
+ * Supervisor=X,6
+ * InvestigateOfficer=X,6
+ * EstimateReview=X,6
+ * Coorgnizer=X,6
+ * AdvanceCloseCode=9,1
+ * BreachCode=9,3
+ * BreachGetCode=9,1
+ * DecreaseCode=X,1
+ * CreditScore=9,3
+ * ContractNo=X,10
+ * AchAuthCode=X,1
+ * AchBank=9,4
+ * AchAuthNo=X,6
+ * CreditSysNo=9,7
+ * RelationCode=X,2
+ * RelationName=X,100
+ * RelationId=X,10
+ * RELACCTERR=X,1
+ * RelationBirthday=9,7
+ * RelationGender=X,1
+ * BreachaYyA1=9,1
+ * BreachaYyB1=9,1
+ * BreachaPercent1=9,1.2
+ * BreachaYyA2=9,1
+ * BreachaYyB2=9,1
+ * BreachaPercent2=9,1.2
+ * BreachaYyA3=9,1
+ * BreachaYyB3=9,1
+ * BreachaPercent3=9,1.2
+ * BreachaYyA4=9,1
+ * BreachaYyB4=9,1
+ * BreachaPercent4=9,1.2
+ * BreachaYyA5=9,1
+ * BreachaYyB5=9,1
+ * BreachaPercent5=9,1.2
+ * BreachaYyA6=9,1
+ * BreachaYyB6=9,1
+ * BreachaPercent6=9,1.2
+ * BreachaYyA7=9,1
+ * BreachaYyB7=9,1
+ * BreachaPercent7=9,1.2
+ * BreachaYyA8=9,1
+ * BreachaYyB8=9,1
+ * BreachaPercent8=9,1.2
+ * BreachaYyA9=9,1
+ * BreachaYyB9=9,1
+ * BreachaPercent9=9,1.2
+ * BreachaYyA10=9,1
+ * BreachaYyB10=9,1
+ * BreachaPercent10=9,1.2
+ * BreachbMmA1=9,2
+ * BreachbMmB1=9,2
+ * BreachbPercent1=9,1.2
+ * BreachbMmA2=9,2
+ * BreachbMmB2=9,2
+ * BreachbPercent2=9,1.2
+ * BreachbMmA3=9,2
+ * BreachbMmB3=9,2
+ * BreachbPercent3=9,1.2
+ * BreachbMmA4=9,2
+ * BreachbMmB4=9,2
+ * BreachbPercent4=9,1.2
+ * BreachbMmA5=9,2
+ * BreachbMmB5=9,2
+ * BreachbPercent5=9,1.2
+ * BreachbMmA6=9,2
+ * BreachbMmB6=9,2
+ * BreachbPercent6=9,1.2
+ * BreachbMmA7=9,2
+ * BreachbMmB7=9,2
+ * BreachbPercent7=9,1.2
+ * BreachbMmA8=9,2
+ * BreachbMmB8=9,2
+ * BreachbPercent8=9,1.2
+ * BreachbMmA9=9,2
+ * BreachbMmB9=9,2
+ * BreachbPercent9=9,1.2
+ * BreachbMmA10=9,2
+ * BreachbMmB10=9,2
+ * BreachbPercent10=9,1.2
+ */
+/**
+ * L2154 額度資料維護
+ * 
+ * @author iza
+ * @version 1.0.0
+ */
+@Service("L2154")
+@Scope("prototype")
+public class L2154 extends TradeBuffer {
+	// private static final Logger logger = LoggerFactory.getLogger(L2154.class);
+
+	/* DB服務注入 */
+	@Autowired
+	public FacProdService facProdService;
+	@Autowired
+	public FacProdBreachService facProdBreachService;
+	@Autowired
+	public FacProdStepRateService facProdStepRateService;
+	@Autowired
+	public FacMainService facMainService;
+	@Autowired
+	public FacCaseApplService facCaseApplService;
+	@Autowired
+	public CustMainService custMainService;
+	@Autowired
+	public LoanBorMainService loanBorMainService;
+	@Autowired
+	public CdGseqService cdGseqService;
+	@Autowired
+	public TxTempService txTempService;
+	@Autowired
+	public ClFacService sClFacService;
+
+	@Autowired
+	Parse parse;
+	@Autowired
+	LoanCom loanCom;
+	@Autowired
+	DateUtil dDateUtil;
+	@Autowired
+	DataLog datalog;
+	@Autowired
+	BankAuthActCom bankAuthActCom;
+
+	// input area
+	private TitaVo titaVo = new TitaVo();
+	private int iFuncCode;
+	private int iCustNo;
+	private int iFacmNo;
+	private String iProdNo;
+//	private String iBreachCode;
+
+	// work area
+	private int wkCustNo;
+	private int wkFacmNo;
+	private int wkApplNo;
+	private int wkIdx;
+	private String sProdNo = "";
+	private String sBreachNo = "";
+	private TempVo tTempVo = new TempVo();
+	private TxTemp tTxTemp;
+	private TxTempId tTxTempId;
+	private FacProd tFacProd;
+	private FacMain tFacMain;
+	private FacMain beforeFacMain;
+	private FacMainId tFacMainId;
+	private FacProdBreach tFacProdBreach;
+	private FacProdBreachId tFacProdBreachId;
+	private List<TxTemp> lTxTemp;
+	private List<FacProdBreach> lFacProdBreach;
+	private TitaVo txtitaVo;
+
+	@Override
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		this.info("active L2154 ");
+		this.info("   isActfgEntry   = " + titaVo.isActfgEntry());
+		this.info("   isActfgSuprele = " + titaVo.isActfgSuprele());
+		this.info("   isHcodeNormal  = " + titaVo.isHcodeNormal());
+		this.info("   isHcodeErase   = " + titaVo.isHcodeErase());
+		this.info("   isHcodeModify  = " + titaVo.isHcodeModify());
+		this.info("   EntdyI         = " + titaVo.getEntDyI());
+		this.info("   Kinbr          = " + titaVo.getKinbr());
+		this.info("   TlrNo          = " + titaVo.getTlrNo());
+		this.info("   Tno            = " + titaVo.getTxtNo());
+		this.info("   OrgEntdyI      = " + titaVo.getOrgEntdyI());
+		this.info("   OrgKin         = " + titaVo.getOrgKin());
+		this.info("   OrgTlr         = " + titaVo.getOrgTlr());
+		this.info("   OrgTno         = " + titaVo.getOrgTno());
+
+		this.totaVo.init(titaVo);
+		this.titaVo = titaVo;
+
+		bankAuthActCom.setTxBuffer(txBuffer);
+
+		// 取得輸入資料
+		iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
+		iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
+		iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
+		iProdNo = titaVo.getParam("ProdNo");
+//		iBreachCode = titaVo.getParam("BreachCode");
+		wkCustNo = iCustNo;
+		wkFacmNo = iFacmNo;
+
+		// 檢查輸入資料
+		if (!(iFuncCode == 2 || iFuncCode == 4 || iFuncCode == 5)) {
+			throw new LogicException(titaVo, "E2004", "功能"); // 功能選擇錯誤
+		}
+		if (iFuncCode == 5) {
+			this.addList(this.totaVo);
+			return this.sendList();
+		}
+
+		// 查詢商品參數檔
+		tFacProd = facProdService.findById(iProdNo);
+		if (tFacProd == null) {
+			throw new LogicException(titaVo, "E2003", "商品參數檔  商品代碼=" + iProdNo); // 查無資料
+		}
+
+		// 登錄
+		if (titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
+			EntryNormalRoutine();
+		}
+		// 登錄 修正
+		if (titaVo.isActfgEntry() && titaVo.isHcodeModify()) {
+			if (iFuncCode == 4) { // 刪除
+				throw new LogicException(titaVo, "E0020", "額度主檔 戶號=" + iCustNo + " 額度編號=" + iFacmNo); // 已刪除資料，不可做修正
+			}
+			EntryEraseRoutine();
+			EntryNormalRoutine();
+		}
+		// 登錄 訂正
+		if (titaVo.isActfgEntry() && titaVo.isHcodeErase()) {
+			EntryEraseRoutine();
+		}
+		// 放行及放行訂正
+		if (titaVo.isActfgSuprele()) {
+			if (iFuncCode == 4 & titaVo.isHcodeErase()) { // 刪除
+				throw new LogicException(titaVo, "E0010", "刪除後不可訂正"); // 功能選擇錯誤
+			}
+			ReleaseRoutine();
+		}
+
+		this.addList(this.totaVo);
+		return this.sendList();
+	}
+
+	// 登錄
+	private void EntryNormalRoutine() throws LogicException {
+		this.info("EntryNormalRoutine ... ");
+
+		tFacMain = facMainService.holdById(new FacMainId(wkCustNo, wkFacmNo));
+		if (tFacMain == null) {
+			throw new LogicException(titaVo, "E0003", "額度主檔 戶號=" + wkCustNo + " 額度編號=" + wkFacmNo); // 修改資料不存在
+		}
+
+		// 新增交易暫存檔
+		AddTxTempRoutine();
+
+		// 更新額度主檔
+		if (tFacMain.getActFg() == 1 && titaVo.isHcodeNormal()) {
+			throw new LogicException(titaVo, "E0021",
+					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+		}
+		switch (iFuncCode) {
+		case 2: // 修改
+			UpdateFacMainRoutine();
+			break;
+		case 4: // 刪除, 額度尚未撥款前才可刪除額度資料, 放行時才真正刪除檔案
+
+			if (tFacMain.getLastBormNo() > 0) {
+				throw new LogicException(titaVo, "E2071", "撥款序號=" + tFacMain.getLastBormNo()); // 額度已撥款後，禁止刪除
+			}
+			if (tFacMain.getLastBormRvNo() > 900) {
+				throw new LogicException(titaVo, "E2071", "預約撥款序號=" + tFacMain.getLastBormRvNo()); // 額度已撥款後，禁止刪除預約撥款
+			}
+			Slice<ClFac> slClFac = sClFacService.approveNoEq(tFacMain.getApplNo(), 0, Integer.MAX_VALUE, titaVo);
+			List<ClFac> lClFac = slClFac == null ? null : slClFac.getContent();
+//			該額度與擔保品關聯不可刪除,請先解除關聯
+			if (lClFac != null) {
+				throw new LogicException(titaVo, "E2073", "核准編號 =" + tFacMain.getApplNo()); // 該額度與擔保品關聯，不可刪除
+			}
+			tFacMain.setActFg(titaVo.getActFgI());
+			tFacMain.setLastAcctDate(titaVo.getEntDyI());
+			tFacMain.setLastKinbr(titaVo.getKinbr());
+			tFacMain.setLastTlrNo(titaVo.getTlrNo());
+			tFacMain.setLastTxtNo(titaVo.getTxtNo());
+			try {
+				facMainService.update(tFacMain);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E2010", "額度主檔"); // 更新資料時，發生錯誤
+			}
+			break;
+		}
+
+		// 更新清償金類型
+//		UpdateFacProdBreachRoutine();
+		// 更新階梯式利率
+		UpdateFacProdStepRateRoutine();
+	}
+
+	// 登錄 訂正
+	private void EntryEraseRoutine() throws LogicException {
+		this.info("EntryEraseRoutine ... ");
+
+		// 刪除清償金類型
+//		if (iFuncCode == 2) {
+//			sBreachNo = FormatUtil.pad9(String.valueOf(wkCustNo), 7) + FormatUtil.pad9(String.valueOf(wkFacmNo), 3);
+//			Slice<FacProdBreach> slFacProdBreach = facProdBreachService.breachNoEq(sBreachNo, "000", "999", this.index,
+//					Integer.MAX_VALUE);
+//			lFacProdBreach = slFacProdBreach == null ? null : slFacProdBreach.getContent();
+//			if (lFacProdBreach != null && lFacProdBreach.size() > 0) {
+//				try {
+//					facProdBreachService.deleteAll(lFacProdBreach);
+//				} catch (DBException e) {
+//					throw new LogicException(titaVo, "E2008", "清償金類型"); // 刪除資料時，發生錯誤
+//				}
+//			}
+//		}
+
+		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
+				titaVo.getOrgTlr(), titaVo.getOrgTno(), this.index, Integer.MAX_VALUE);
+		lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
+		if (lTxTemp == null || lTxTemp.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = "
+					+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+		}
+		for (TxTemp tx : lTxTemp) {
+			wkCustNo = this.parse.stringToInteger(tx.getSeqNo().substring(0, 7));
+			wkFacmNo = this.parse.stringToInteger(tx.getSeqNo().substring(7, 10));
+			wkIdx = this.parse.stringToInteger(tx.getSeqNo().substring(10, 13));
+			tTempVo = tTempVo.getVo(tx.getText());
+			this.info("   wkCustNo = " + wkCustNo);
+			this.info("   wkFacmNo = " + wkFacmNo);
+			switch (iFuncCode) {
+			case 2: // 修改
+				if (wkIdx == 0) {
+					// 還原額度檔
+					RestoredFacMainRoutine();
+				} else {
+					// 還原清償金類型
+//					RestoredFacProdBreachRoutine();
+				}
+				break;
+			case 4: // 刪除 還原交序號
+				tFacMain = facMainService.holdById(new FacMainId(wkCustNo, wkFacmNo));
+				if (tFacMain == null) {
+					throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 鎖定資料時，發生錯誤
+				}
+
+				tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
+				tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
+				tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
+				tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
+				tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
+				try {
+					tFacMain = facMainService.update(tFacMain);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007",
+							"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
+				break;
+			}
+		}
+	}
+
+	// 放行及放行訂正
+	private void ReleaseRoutine() throws LogicException {
+		this.info("ReleaseRoutine ... ");
+
+		// 刪除清償金類型
+//		if (iFuncCode == 4 && titaVo.isHcodeErase()) {
+//			sBreachNo = FormatUtil.pad9(String.valueOf(wkCustNo), 7) + FormatUtil.pad9(String.valueOf(wkFacmNo), 3);
+//			Slice<FacProdBreach> slFacProdBreach = facProdBreachService.breachNoEq(sBreachNo, "000", "999", this.index,
+//					Integer.MAX_VALUE);
+//			lFacProdBreach = slFacProdBreach == null ? null : slFacProdBreach.getContent();
+//			if (lFacProdBreach != null && lFacProdBreach.size() > 0) {
+//				try {
+//					facProdBreachService.deleteAll(lFacProdBreach);
+//				} catch (DBException e) {
+//					throw new LogicException(titaVo, "E2008", "清償金類型"); // 刪除資料時，發生錯誤
+//				}
+//			}
+//		}
+		Slice<TxTemp> slTxTemp = txTempService.txTempTxtNoEq(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
+				titaVo.getOrgTlr(), titaVo.getOrgTno(), this.index, Integer.MAX_VALUE);
+		lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
+		if (lTxTemp == null || lTxTemp.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "交易暫存檔 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = "
+					+ titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+		}
+		for (TxTemp tx : lTxTemp) {
+			wkCustNo = this.parse.stringToInteger(tx.getSeqNo().substring(0, 7));
+			wkFacmNo = this.parse.stringToInteger(tx.getSeqNo().substring(7, 10));
+			wkIdx = this.parse.stringToInteger(tx.getSeqNo().substring(10, 13));
+			tTempVo = tTempVo.getVo(tx.getText());
+			this.info("   wkCustNo = " + wkCustNo);
+			this.info("   wkFacmNo = " + wkFacmNo);
+			this.info("   wkIdx    = " + wkIdx);
+			if (titaVo.isHcodeNormal() && wkIdx > 0) {
+				continue;
+			}
+			tFacMain = facMainService.holdById(new FacMainId(wkCustNo, wkFacmNo));
+			if (tFacMain == null) {
+				throw new LogicException(titaVo, "E0006", "額度主檔"); // 鎖定資料時，發生錯誤
+			}
+			wkApplNo = tFacMain.getApplNo();
+			// 放行 一般
+			if (titaVo.isHcodeNormal()) {
+				if (tFacMain.getActFg() != 1) {
+					throw new LogicException(titaVo, "E0017", "額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo); // 該筆交易狀態非待放行，不可做交易放行
+				}
+				switch (iFuncCode) {
+				case 2: // 修改, 更新額度主檔
+					// 新增交易暫存檔
+					TxTemp tTxTemp = new TxTemp();
+					TxTempId tTxTempId = new TxTempId();
+					loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, 0, 0, titaVo);
+					tTempVo.clear();
+					tTempVo.putParam("ActFg", tFacMain.getActFg());
+					tTempVo.putParam("LastAcctDate", tFacMain.getLastAcctDate());
+					tTempVo.putParam("LastKinbr", tFacMain.getLastKinbr());
+					tTempVo.putParam("LastTlrNo", tFacMain.getLastTlrNo());
+					tTempVo.putParam("LastTxtNo", tFacMain.getLastTxtNo());
+					tTxTemp.setText(tTempVo.getJsonString());
+					try {
+						txTempService.insert(tTxTemp);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
+					}
+					// 更新額度主檔
+					tFacMain.setActFg(titaVo.getActFgI());
+					tFacMain.setLastAcctDate(titaVo.getEntDyI());
+					tFacMain.setLastKinbr(titaVo.getKinbr());
+					tFacMain.setLastTlrNo(titaVo.getTlrNo());
+					tFacMain.setLastTxtNo(titaVo.getTxtNo());
+					try {
+						tFacMain = facMainService.update(tFacMain);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008",
+								"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
+					}
+					break;
+				case 4: // 刪除, 刪除額度資料及清償金類型
+
+					// 刪除時更新案件申請檔
+					UpdateAppl();
+					// 新增交易暫存檔
+					AddTxTempRoutine();
+					// 刪除時檢查為該戶號最後一筆額度 客戶主檔該額度-1
+					CustMain tCustMain = null;
+					tCustMain = custMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
+					if (tCustMain == null) {
+						throw new LogicException(titaVo, "E2003", "客戶資料主檔 = " + tFacMain.getCustNo()); // 查無資料
+					}
+					String wkCustUKey = tCustMain.getCustUKey().trim();
+					tCustMain = custMainService.holdById(wkCustUKey, titaVo);
+					if (tCustMain == null) {
+						throw new LogicException(titaVo, "E2011", "客戶資料主檔"); // 鎖定資料時，發生錯誤
+					}
+					if (tFacMain.getFacmNo() == tCustMain.getLastFacmNo()) {
+						tCustMain.setLastFacmNo(tCustMain.getLastFacmNo() - 1);
+						try {
+							custMainService.update(tCustMain, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E2010", "客戶資料主檔"); // 更新資料時，發生錯誤
+						}
+					}
+					try {
+						facMainService.delete(tFacMain);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E2008", "額度主檔"); // 刪除資料時，發生錯誤
+					}
+					// 刪除清償金類型
+//					DeleteFacProdBreachRoutine();
+					// 刪除階梯式利率
+					DeleteFacProdStepRateRoutine();
+					break;
+				}
+			}
+			// 放行訂正
+			if (titaVo.isHcodeErase()) {
+				// 放款交易訂正交易須由最後一筆交易開始訂正
+				loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
+				// 查詢交易暫存檔
+				// String wkSeqNo = FormatUtil.pad9(String.valueOf(wkCustNo), 7) +
+				// FormatUtil.pad9(String.valueOf(wkFacmNo), 3) + "000000";
+				// TxTemp tTxTemp = txTempService.findById(new TxTempId(titaVo.getOrgEntdyI() +
+				// 19110000, titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(),
+				// wkSeqNo));
+				// if (tTxTemp == null) {
+				// throw new LogicException(titaVo, "E0001", "交易暫存檔"); // 查詢資料不存在
+				// }
+				tTempVo = tTempVo.getVo(tx.getText());
+				switch (iFuncCode) {
+				case 2: // 修改
+					tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
+					tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
+					tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
+					tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
+					tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
+					try {
+						tFacMain = facMainService.update(tFacMain);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008",
+								"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
+					}
+					break;
+				case 4: // 刪除
+					// 還原額度檔
+					RestoredDeletedFacMainRoutine();
+					// 還原清償金類型
+//					RestoredFacProdBreachRoutine();
+					break;
+				}
+			}
+		}
+//		// 銀扣授權帳號檔
+//		bankAuthActCom.acctCheck(titaVo);
+	}
+
+	// 刪除更新案件申請檔
+	private void UpdateAppl() throws LogicException {
+		this.info("UpdateAppl ...");
+		tTxTemp = new TxTemp();
+		tTxTempId = new TxTempId();
+
+		FacCaseAppl tfacCaseAppl = facCaseApplService.holdById(wkApplNo, titaVo);
+		tfacCaseAppl.setProcessCode("0");
+		try {
+			facCaseApplService.update(tfacCaseAppl, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "案件申請檔"); // 更新資料時，發生錯誤
+		}
+	}
+
+	// 新增交易暫存檔
+	private void AddTxTempRoutine() throws LogicException {
+		this.info("AddTxTempRoutine ...");
+
+		tTxTemp = new TxTemp();
+		tTxTempId = new TxTempId();
+		loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, 0, 0, titaVo);
+		tTempVo.clear();
+		tTempVo.putParam("LastBormNo", tFacMain.getLastBormNo());
+		tTempVo.putParam("LastBormRvNo", tFacMain.getLastBormRvNo());
+//		tTempVo.putParam("CustUKey", tFacMain.getCustUKey());
+		tTempVo.putParam("ApplNo", tFacMain.getApplNo());
+		tTempVo.putParam("ProdNo", tFacMain.getProdNo());
+		tTempVo.putParam("AnnualIncr", tFacMain.getAnnualIncr());
+		tTempVo.putParam("EmailIncr", tFacMain.getEmailIncr());
+		tTempVo.putParam("GraceIncr", tFacMain.getGraceIncr());
+		tTempVo.putParam("CurrencyCode", tFacMain.getCurrencyCode());
+		tTempVo.putParam("UtilAmt", tFacMain.getUtilAmt());
+		tTempVo.putParam("UtilBal", tFacMain.getUtilBal());
+		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
+		tTempVo.putParam("FirstDrawdownDate", tFacMain.getFirstDrawdownDate());
+		tTempVo.putParam("MaturityDate", tFacMain.getMaturityDate());
+//		tTempVo.putParam("CopyFlag", tFacMain.getCopyFlag());
+		tTempVo.putParam("CreditScore", tFacMain.getCreditScore());
+		tTempVo.putParam("GuaranteeDate", tFacMain.getGuaranteeDate());
+		tTempVo.putParam("ContractNo", tFacMain.getContractNo());
+		tTempVo.putParam("ColSetFlag", tFacMain.getColSetFlag());
+		tTempVo.putParam("L9110Flag", tFacMain.getL9110Flag());
+		// 以下為可維護項目
+		tTempVo.putParam("CreditSysNo", tFacMain.getCreditSysNo());
+		tTempVo.putParam("BaseRateCode", tFacMain.getBaseRateCode());
+		tTempVo.putParam("RateIncr", tFacMain.getRateIncr());
+		tTempVo.putParam("IndividualIncr", tFacMain.getIndividualIncr());
+		tTempVo.putParam("ApproveRate", tFacMain.getApproveRate());
+		tTempVo.putParam("RateCode", tFacMain.getRateCode());
+		tTempVo.putParam("FirstRateAdjFreq", tFacMain.getFirstRateAdjFreq());
+		tTempVo.putParam("RateAdjFreq", tFacMain.getRateAdjFreq());
+		tTempVo.putParam("LineAmt", tFacMain.getLineAmt());
+		tTempVo.putParam("LoanTermYy", tFacMain.getLoanTermYy());
+		tTempVo.putParam("LoanTermMm", tFacMain.getLoanTermMm());
+		tTempVo.putParam("LoanTermDd", tFacMain.getLoanTermDd());
+		tTempVo.putParam("AmortizedCode", tFacMain.getAmortizedCode());
+//		tTempVo.putParam("CancelCode", tFacMain.getCancelCode());
+		tTempVo.putParam("FreqBase", tFacMain.getFreqBase());
+		tTempVo.putParam("PayIntFreq", tFacMain.getPayIntFreq());
+		tTempVo.putParam("RepayFreq", tFacMain.getRepayFreq());
+		tTempVo.putParam("UtilDeadline", tFacMain.getUtilDeadline());
+		tTempVo.putParam("GracePeriod", tFacMain.getGracePeriod());
+//		tTempVo.putParam("DuePayAmt", tFacMain.getDuePayAmt());
+//		tTempVo.putParam("DuePayLimit", tFacMain.getDuePayLimit());
+//		tTempVo.putParam("PayIntLimit", tFacMain.getPayIntLimit());
+		tTempVo.putParam("AcctFee", tFacMain.getAcctFee());
+		tTempVo.putParam("GuaranteeDate", tFacMain.getGuaranteeDate());
+		tTempVo.putParam("ExtraRepayCode", tFacMain.getExtraRepayCode());
+		tTempVo.putParam("CustTypeCode", tFacMain.getCustTypeCode());
+		tTempVo.putParam("RuleCode", tFacMain.getRuleCode());
+		tTempVo.putParam("RecycleCode", tFacMain.getRecycleCode());
+		tTempVo.putParam("RecycleDeadline", tFacMain.getRecycleDeadline());
+		tTempVo.putParam("UsageCode", tFacMain.getUsageCode());
+		tTempVo.putParam("DepartmentCode", tFacMain.getDepartmentCode());
+		tTempVo.putParam("IncomeTaxFlag", tFacMain.getIncomeTaxFlag());
+		tTempVo.putParam("CompensateFlag", tFacMain.getCompensateFlag());
+		tTempVo.putParam("IrrevocableFlag", tFacMain.getIrrevocableFlag());
+		tTempVo.putParam("RateAdjNoticeCode", tFacMain.getRateAdjNoticeCode());
+		tTempVo.putParam("PieceCode", tFacMain.getPieceCode());
+		tTempVo.putParam("CreditScore", tFacMain.getCreditScore());
+		tTempVo.putParam("RepayCode", tFacMain.getRepayCode());
+		tTempVo.putParam("RepayBank", titaVo.getParam("RepayBank"));
+		tTempVo.putParam("RepayAcctNo", titaVo.getParam("RepayAcctNo"));
+		tTempVo.putParam("PostCode", titaVo.getParam("PostCode"));
+		tTempVo.putParam("RelationCode", titaVo.getParam("RelationCode"));
+		tTempVo.putParam("RelationName", titaVo.getParam("RelationName"));
+		tTempVo.putParam("RelationId", titaVo.getParam("RelationId"));
+		tTempVo.putParam("RelationBirthday", titaVo.getParam("RelationBirthday"));
+		tTempVo.putParam("RelationGender", titaVo.getParam("RelationGender"));
+//		tTempVo.putParam("AchAuthCode", tFacMain.getAchAuthCode());
+//		tTempVo.putParam("AchBank", tFacMain.getAchBank());
+//		tTempVo.putParam("AchAuthNo", tFacMain.getAchAuthNo());
+		tTempVo.putParam("Introducer", tFacMain.getIntroducer());
+//		tTempVo.putParam("Prohibityear", tFacMain.getProhibityear());
+		tTempVo.putParam("District", tFacMain.getDistrict());
+		tTempVo.putParam("FireOfficer", tFacMain.getFireOfficer());
+		tTempVo.putParam("Estimate", tFacMain.getEstimate());
+		tTempVo.putParam("CreditOfficer", tFacMain.getCreditOfficer());
+		tTempVo.putParam("LoanOfficer", tFacMain.getBusinessOfficer());
+		tTempVo.putParam("BusinessOfficer", tFacMain.getBusinessOfficer());
+		tTempVo.putParam("Supervisor", tFacMain.getSupervisor());
+		tTempVo.putParam("InvestigateOfficer", tFacMain.getInvestigateOfficer());
+		tTempVo.putParam("EstimateReview", tFacMain.getEstimateReview());
+		tTempVo.putParam("Coorgnizer", tFacMain.getCoorgnizer());
+		tTempVo.putParam("AdvanceCloseCode", tFacMain.getAdvanceCloseCode());
+//		tTempVo.putParam("BreachCode", tFacMain.getBreachCode());
+//		tTempVo.putParam("BreachGetCode", tFacMain.getBreachGetCode());
+//		tTempVo.putParam("DecreaseFlag", tFacMain.getDecreaseFlag());
+		tTempVo.putParam("ActFg", tFacMain.getActFg());
+		tTempVo.putParam("LastAcctDate", tFacMain.getLastAcctDate());
+		tTempVo.putParam("LastKinbr", tFacMain.getLastKinbr());
+		tTempVo.putParam("LastTlrNo", tFacMain.getLastTlrNo());
+		tTempVo.putParam("LastTxtNo", tFacMain.getLastTxtNo());
+		tTempVo.putParam("AcDate", tFacMain.getAcDate());
+		tTxTemp.setText(tTempVo.getJsonString());
+		try {
+			txTempService.insert(tTxTemp);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
+		}
+	}
+
+	private void UpdateFacMainRoutine() throws LogicException {
+		this.info("UpdateFacMainRoutine ...");
+
+		beforeFacMain = (FacMain) datalog.clone(tFacMain);
+		tFacMain.setCreditSysNo(this.parse.stringToInteger(titaVo.getParam("CreditSysNo")));
+		tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
+		tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
+		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(titaVo.getParam("IndividualIncr")));
+		tFacMain.setApproveRate(this.parse.stringToBigDecimal(titaVo.getParam("ApproveRate")));
+		tFacMain.setRateCode(titaVo.getParam("RateCode"));
+		tFacMain.setFirstRateAdjFreq(this.parse.stringToInteger(titaVo.getParam("FirstRateAdjFreq")));
+		tFacMain.setRateAdjFreq(this.parse.stringToInteger(titaVo.getParam("RateAdjFreq")));
+		tFacMain.setLineAmt(this.parse.stringToBigDecimal(titaVo.getParam("TimApplAmt")));
+		tFacMain.setLoanTermYy(this.parse.stringToInteger(titaVo.getParam("LoanTermYy")));
+		tFacMain.setLoanTermMm(this.parse.stringToInteger(titaVo.getParam("LoanTermMm")));
+		tFacMain.setLoanTermDd(this.parse.stringToInteger(titaVo.getParam("LoanTermDd")));
+		tFacMain.setAmortizedCode(titaVo.getParam("AmortizedCode"));
+//		tFacMain.setCancelCode(this.parse.stringToInteger(titaVo.getParam("CancelCode")));
+		tFacMain.setFreqBase(titaVo.getParam("FreqBase"));
+		tFacMain.setPayIntFreq(this.parse.stringToInteger(titaVo.getParam("PayIntFreq")));
+		tFacMain.setRepayFreq(this.parse.stringToInteger(titaVo.getParam("RepayFreq")));
+		tFacMain.setUtilDeadline(this.parse.stringToInteger(titaVo.getParam("UtilDeadline")));
+		tFacMain.setGracePeriod(this.parse.stringToInteger(titaVo.getParam("GracePeriod")));
+//		tFacMain.setDuePayAmt(this.parse.stringToBigDecimal(titaVo.getParam("TimDuePayAmt")));
+//		tFacMain.setDuePayLimit(this.parse.stringToBigDecimal(titaVo.getParam("TimDuePayLimit")));
+//		tFacMain.setPayIntLimit(this.parse.stringToBigDecimal(titaVo.getParam("TimPayIntLimit")));
+		tFacMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
+		tFacMain.setGuaranteeDate(this.parse.stringToInteger(titaVo.getParam("GuaranteeDate")));
+		tFacMain.setExtraRepayCode(titaVo.getParam("ExtraRepayCode"));
+		tFacMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));
+		tFacMain.setRuleCode(titaVo.getParam("RuleCode"));
+		tFacMain.setRecycleCode(titaVo.getParam("RecycleCode"));
+		tFacMain.setRecycleDeadline(this.parse.stringToInteger(titaVo.getParam("RecycleDeadline")));
+		tFacMain.setUsageCode(titaVo.getParam("UsageCode"));
+		tFacMain.setDepartmentCode(titaVo.getParam("DepartmentCode"));
+		tFacMain.setIncomeTaxFlag(titaVo.getParam("IncomeTaxFlag"));
+		tFacMain.setCompensateFlag(titaVo.getParam("CompensateFlag"));
+		tFacMain.setIrrevocableFlag(titaVo.getParam("IrrevocableFlag"));
+		tFacMain.setRateAdjNoticeCode(titaVo.getParam("RateAdjNoticeCode"));
+		tFacMain.setPieceCode(titaVo.getParam("PieceCode"));
+		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
+		tFacMain.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RepayCode")));
+//		tFacMain.setRepayBank(titaVo.getParam("RepayBank"));
+//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(titaVo.getParam("RepayAcctNo")));
+//		tFacMain.setPostCode(titaVo.getParam("PostCode"));
+//		tFacMain.setRelationCode(titaVo.getParam("RelationCode"));
+//		tFacMain.setRelationName(titaVo.getParam("RelationName"));
+//		tFacMain.setRelationId(titaVo.getParam("RelationId"));
+//		tFacMain.setRelationBirthday(this.parse.stringToInteger(titaVo.getParam("RelationBirthday")));
+//		tFacMain.setRelationGender(titaVo.getParam("RelationGender"));
+//		tFacMain.setAchAuthCode(titaVo.getParam("AchAuthCode"));
+//		tFacMain.setAchBank(this.parse.stringToInteger(titaVo.getParam("AchBank")));
+//		tFacMain.setAchAuthNo(titaVo.getParam("AchAuthNo"));
+		tFacMain.setIntroducer(titaVo.getParam("Introducer"));
+//		tFacMain.setProhibityear(parse.stringToInteger(titaVo.getParam("Prohibityear")));
+		tFacMain.setDistrict(titaVo.getParam("District"));
+		tFacMain.setFireOfficer(titaVo.getParam("FireOfficer"));
+		tFacMain.setEstimate(titaVo.getParam("Estimate"));
+		tFacMain.setCreditOfficer(titaVo.getParam("CreditOfficer"));
+		tFacMain.setLoanOfficer(titaVo.getParam("BusinessOfficer"));
+		tFacMain.setBusinessOfficer(titaVo.getParam("BusinessOfficer"));
+		tFacMain.setSupervisor(titaVo.getParam("Supervisor"));
+		tFacMain.setInvestigateOfficer("");
+		tFacMain.setEstimateReview("");
+		tFacMain.setCoorgnizer(titaVo.getParam("Coorgnizer"));
+//		tFacMain.setAdvanceCloseCode(titaVo.getParam("AdvanceCloseCode"));
+//		tFacMain.setBreachCode(titaVo.getParam("BreachCode"));
+//		tFacMain.setBreachGetCode(titaVo.getParam("BreachGetCode"));
+//		tFacMain.setDecreaseFlag(titaVo.getParam("DecreaseFlag"));
+		tFacMain.setActFg(titaVo.getActFgI());
+		tFacMain.setLastAcctDate(titaVo.getEntDyI());
+		tFacMain.setLastKinbr(titaVo.getKinbr());
+		tFacMain.setLastTlrNo(titaVo.getTlrNo());
+		tFacMain.setLastTxtNo(titaVo.getTxtNo());
+		tFacMain.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+
+		this.info("RepayCode = " + titaVo.getParam("RepayCode"));
+		if ("02".equals(titaVo.getParam("RepayCode")) || "2".equals(titaVo.getParam("RepayCode"))) {
+
+			bankAuthActCom.changeAcctNo(titaVo);
+
+		}
+
+		try {
+			facMainService.update(tFacMain);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E2010", "額度主檔"); // 更新資料時，發生錯誤
+		}
+		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
+		datalog.exec();
+
+	}
+
+	// 更新清償金類型
+	private void UpdateFacProdBreachRoutine() throws LogicException {
+		this.info("UpdateFacProdBreachRoutine ...");
+		this.info("   sBreachNo = " + sBreachNo);
+
+		DeleteFacProdBreachRoutine();
+//		if (tFacProd.getBreachCode().equals("999")) {
+//			if (iBreachCode.equals("001") || iBreachCode.equals("003") || iBreachCode.equals("004")
+//					|| iBreachCode.equals("005")) {
+//				for (int i = 1; i <= 10; i++) {
+//					if (this.parse.stringToInteger(titaVo.getParam("BreachaYyB" + i)) > 0) {
+//						tFacProdBreach = new FacProdBreach();
+//						tFacProdBreachId = new FacProdBreachId();
+//						tFacProdBreachId.setBreachNo(sBreachNo);
+//						tFacProdBreachId.setBreachCode(iBreachCode);
+//						tFacProdBreachId.setMonthStart(
+//								this.parse.stringToInteger(titaVo.getParam("BreachaYyA" + i).trim()) * 12);
+//						tFacProdBreach.setFacProdBreachId(tFacProdBreachId);
+//						tFacProdBreach.setBreachNo(iProdNo);
+//						tFacProdBreach.setBreachCode(iBreachCode);
+//						tFacProdBreach.setMonthStart(
+//								this.parse.stringToInteger(titaVo.getParam("BreachaYyA" + i).trim()) * 12);
+//						tFacProdBreach
+//								.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("BreachaYyB" + i).trim()) * 12);
+//						tFacProdBreach.setBreachPercent(
+//								this.parse.stringToBigDecimal(titaVo.getParam("BreachaPercent" + i).trim()));
+//						try {
+//							facProdBreachService.insert(tFacProdBreach);
+//						} catch (DBException e) {
+//							throw new LogicException(titaVo, "E2009", "清償金類型"); // 新增資料時，發生錯誤
+//						}
+//					} else {
+//						break;
+//					}
+//				}
+//			}
+//			if (iBreachCode.equals("002")) {
+//				for (int i = 1; i <= 10; i++) {
+//					if (this.parse.stringToInteger(titaVo.getParam("BreachbMmB" + i)) > 0) {
+//						tFacProdBreach = new FacProdBreach();
+//						tFacProdBreachId = new FacProdBreachId();
+//						tFacProdBreachId.setBreachNo(sBreachNo);
+//						tFacProdBreachId.setBreachCode(iBreachCode);
+//						tFacProdBreachId.setMonthStart(this.parse.stringToInteger(titaVo.getParam("BreachbMmA" + i)));
+//						tFacProdBreach.setFacProdBreachId(tFacProdBreachId);
+//						tFacProdBreach.setBreachNo(iProdNo);
+//						tFacProdBreach.setBreachCode(iBreachCode);
+//						tFacProdBreach.setMonthStart(this.parse.stringToInteger(titaVo.getParam("BreachbMmA" + i)));
+//						tFacProdBreach
+//								.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("BreachbMmB" + i).trim()));
+//						tFacProdBreach.setBreachPercent(
+//								this.parse.stringToBigDecimal(titaVo.getParam("BreachbPercent" + i).trim()));
+//						try {
+//							facProdBreachService.insert(tFacProdBreach);
+//						} catch (DBException e) {
+//							throw new LogicException(titaVo, "E2009", "清償金類型"); // 新增資料時，發生錯誤
+//						}
+//					} else {
+//						break;
+//					}
+//				}
+//			}
+//		}
+//
+	}
+
+	// 刪除清償金類型
+	private void DeleteFacProdBreachRoutine() throws LogicException {
+		this.info("DeleteFacProdBreachRoutine ...");
+
+		sBreachNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
+				+ FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
+		Slice<FacProdBreach> slFacProdBreach = facProdBreachService.breachNoEq(sBreachNo, "000", "999", this.index,
+				Integer.MAX_VALUE);
+		lFacProdBreach = slFacProdBreach == null ? null : slFacProdBreach.getContent();
+		if (lFacProdBreach == null || lFacProdBreach.size() == 0) {
+			return;
+		}
+		wkIdx = 1;
+		for (FacProdBreach fpb : lFacProdBreach) {
+			tTxTemp = new TxTemp();
+			tTxTempId = new TxTempId();
+			loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, wkIdx, 0, titaVo);
+			tTempVo.clear();
+			tTempVo.putParam("BreachNo", fpb.getBreachNo());
+			tTempVo.putParam("BreachCode", fpb.getBreachCode());
+			tTempVo.putParam("MonthStart", fpb.getMonthStart());
+			tTempVo.putParam("MonthEnd", fpb.getMonthEnd());
+			tTempVo.putParam("BreachPercent", fpb.getBreachPercent());
+			tTxTemp.setText(tTempVo.getJsonString());
+			try {
+				txTempService.insert(tTxTemp);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
+			}
+			wkIdx++;
+		}
+		try {
+			facProdBreachService.deleteAll(lFacProdBreach);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E2008", "清償金類型"); // 刪除資料時，發生錯誤
+		}
+	}
+
+	// 訂正時, 還原額度檔
+	private void RestoredFacMainRoutine() throws LogicException {
+		this.info("RestoredFacMainRoutine ... ");
+
+		tFacMain = facMainService.holdById(new FacMainId(wkCustNo, wkFacmNo));
+		if (tFacMain == null) {
+			throw new LogicException(titaVo, "E0006", "額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo); // 鎖定資料時，發生錯誤
+		}
+		// 放款交易訂正交易須由最後一筆交易開始訂正
+		loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
+		beforeFacMain = (FacMain) datalog.clone(tFacMain);
+		tFacMain.setCreditSysNo(this.parse.stringToInteger(tTempVo.getParam("CreditSysNo")));
+		tFacMain.setBaseRateCode(tTempVo.getParam("BaseRateCode"));
+		tFacMain.setRateIncr(this.parse.stringToBigDecimal(tTempVo.getParam("RateIncr")));
+		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("IndividualIncr")));
+		tFacMain.setApproveRate(this.parse.stringToBigDecimal(tTempVo.getParam("ApproveRate")));
+		tFacMain.setRateCode(tTempVo.getParam("RateCode"));
+		tFacMain.setFirstRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("FirstRateAdjFreq")));
+		tFacMain.setRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("RateAdjFreq")));
+		tFacMain.setLineAmt(this.parse.stringToBigDecimal(tTempVo.getParam("LineAmt")));
+		tFacMain.setLoanTermYy(this.parse.stringToInteger(tTempVo.getParam("LoanTermYy")));
+		tFacMain.setLoanTermMm(this.parse.stringToInteger(tTempVo.getParam("LoanTermMm")));
+		tFacMain.setLoanTermDd(this.parse.stringToInteger(tTempVo.getParam("LoanTermDd")));
+		tFacMain.setAmortizedCode(tTempVo.getParam("AmortizedCode"));
+//		tFacMain.setCancelCode(tTempVo.getParam("CancelCode"));
+		tFacMain.setFreqBase(tTempVo.getParam("FreqBase"));
+		tFacMain.setPayIntFreq(this.parse.stringToInteger(tTempVo.getParam("PayIntFreq")));
+		tFacMain.setRepayFreq(this.parse.stringToInteger(tTempVo.getParam("RepayFreq")));
+		tFacMain.setUtilDeadline(this.parse.stringToInteger(tTempVo.getParam("UtilDeadline")));
+		tFacMain.setGracePeriod(this.parse.stringToInteger(tTempVo.getParam("GracePeriod")));
+//		tFacMain.setDuePayAmt(this.parse.stringToBigDecimal(tTempVo.getParam("DuePayAmt")));
+//		tFacMain.setDuePayLimit(this.parse.stringToBigDecimal(tTempVo.getParam("DuePayLimit")));
+//		tFacMain.setPayIntLimit(this.parse.stringToBigDecimal(tTempVo.getParam("PayIntLimit")));
+		tFacMain.setAcctFee(this.parse.stringToBigDecimal(tTempVo.getParam("AcctFee")));
+		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
+		tFacMain.setExtraRepayCode(tTempVo.getParam("ExtraRepayCode"));
+		tFacMain.setCustTypeCode(tTempVo.getParam("CustTypeCode"));
+		tFacMain.setRuleCode(tTempVo.getParam("RuleCode"));
+		tFacMain.setRecycleCode(tTempVo.getParam("RecycleCode"));
+		tFacMain.setRecycleDeadline(this.parse.stringToInteger(tTempVo.getParam("RecycleDeadline")));
+		tFacMain.setUsageCode(tTempVo.getParam("UsageCode"));
+		tFacMain.setDepartmentCode(tTempVo.getParam("DepartmentCode"));
+		tFacMain.setIncomeTaxFlag(tTempVo.getParam("IncomeTaxFlag"));
+		tFacMain.setCompensateFlag(tTempVo.getParam("CompensateFlag"));
+		tFacMain.setIrrevocableFlag(tTempVo.getParam("IrrevocableFlag"));
+		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
+		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
+		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
+		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
+//		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
+//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(tTempVo.getParam("RepayAcctNo")));
+//		tFacMain.setPostCode(tTempVo.getParam("PostCode"));
+//		tFacMain.setRelationCode(tTempVo.getParam("RelationCode"));
+//		tFacMain.setRelationName(tTempVo.getParam("RelationName"));
+//		tFacMain.setRelationId(tTempVo.getParam("RelationId"));
+//		tFacMain.setRelationBirthday(this.parse.stringToInteger(tTempVo.getParam("RelationBirthday")));
+//		tFacMain.setRelationGender(tTempVo.getParam("RelationGender"));
+//		tFacMain.setAchAuthCode(tTempVo.getParam("AchAuthCode"));
+//		tFacMain.setAchBank(this.parse.stringToInteger(tTempVo.getParam("AchBank")));
+//		tFacMain.setAchAuthNo(tTempVo.getParam("AchAuthNo"));
+		tFacMain.setIntroducer(tTempVo.getParam("Introducer"));
+//		tFacMain.setProhibityear(this.parse.stringToInteger(tTempVo.getParam("Prohibityear")));
+		tFacMain.setDistrict(tTempVo.getParam("District"));
+		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
+		tFacMain.setEstimate(tTempVo.getParam("Estimate"));
+		tFacMain.setCreditOfficer(tTempVo.getParam("CreditOfficer"));
+		tFacMain.setLoanOfficer(tTempVo.getParam("BusinessOfficer"));
+		tFacMain.setBusinessOfficer(tTempVo.getParam("BusinessOfficer"));
+		tFacMain.setSupervisor(tTempVo.getParam("Supervisor"));
+		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
+		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
+		tFacMain.setCoorgnizer(tTempVo.getParam("Coorgnizer"));
+//		tFacMain.setAdvanceCloseCode(tTempVo.getParam("AdvanceCloseCode"));
+//		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
+//		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
+//		tFacMain.setDecreaseFlag(tTempVo.getParam("DecreaseFlag"));
+		tFacMain.setActFg(this.parse.stringToInteger(tTempVo.getParam("ActFg")));
+		tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
+		tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
+		tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
+		tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
+		tFacMain.setAcDate(this.parse.stringToInteger(tTempVo.getParam("AcDate")));
+
+		if ("02".equals(titaVo.getParam("RepayCode")) || "2".equals(titaVo.getParam("RepayCode"))) {
+			txtitaVo = new TitaVo();
+			txtitaVo = (TitaVo) titaVo.clone();
+			this.info("tTempVo = " + tTempVo);
+			this.info("txtitaVo" + txtitaVo);
+			txtitaVo.putParam("PostCode", tTempVo.getParam("PostCode"));
+			txtitaVo.putParam("RepayAcctNo", tTempVo.getParam("RepayAcctNo"));
+			txtitaVo.putParam("RelationCode", tTempVo.getParam("RelationCode"));
+			txtitaVo.putParam("RelationName", tTempVo.getParam("RelationName"));
+			txtitaVo.putParam("RelationBirthday", tTempVo.getParam("RelationBirthday"));
+			txtitaVo.putParam("RelationGender", tTempVo.getParam("RelationGender"));
+			txtitaVo.putParam("RelationId", tTempVo.getParam("RelationId"));
+			txtitaVo.putParam("RepayBank", tTempVo.getParam("RepayBank"));
+			txtitaVo.putParam("CustId", tTempVo.getParam("CustId"));
+			txtitaVo.putParam("CustNo", wkCustNo);
+			txtitaVo.putParam("FacmNo", wkFacmNo);
+
+			bankAuthActCom.changeAcctNo(txtitaVo);
+
+		}
+
+		try {
+			tFacMain = facMainService.update(tFacMain);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007",
+					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+		datalog.setEnv(titaVo, beforeFacMain, tFacMain);
+		datalog.exec();
+	}
+
+	// 放行訂正時, 還原被刪除的額度檔
+	private void RestoredDeletedFacMainRoutine() throws LogicException {
+		this.info("RestoredDeletedFacMainRoutine ... ");
+
+		tFacMain = new FacMain();
+		tFacMainId = new FacMainId();
+		tFacMainId.setCustNo(wkCustNo);
+		tFacMainId.setFacmNo(wkFacmNo);
+		tFacMain.setCustNo(wkCustNo);
+		tFacMain.setFacmNo(wkFacmNo);
+		tFacMain.setFacMainId(tFacMainId);
+		tFacMain.setLastBormNo(this.parse.stringToInteger(tTempVo.getParam("LastBormNo")));
+		tFacMain.setLastBormRvNo(this.parse.stringToInteger(tTempVo.getParam("LastBormRvNo")));
+//		tFacMain.setCustUKey(tTempVo.getParam("CustUKey"));
+		tFacMain.setApplNo(this.parse.stringToInteger(tTempVo.getParam("ApplNo")));
+		tFacMain.setProdNo(tTempVo.getParam("ProdNo"));
+		tFacMain.setAnnualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("AnnualIncr")));
+		tFacMain.setEmailIncr(this.parse.stringToBigDecimal(tTempVo.getParam("EmailIncr")));
+		tFacMain.setGraceIncr(this.parse.stringToBigDecimal(tTempVo.getParam("GraceIncr")));
+		tFacMain.setCurrencyCode(tTempVo.getParam("CurrencyCode"));
+		tFacMain.setUtilAmt(this.parse.stringToBigDecimal(tTempVo.getParam("UtilAmt")));
+		tFacMain.setUtilBal(this.parse.stringToBigDecimal(tTempVo.getParam("UtilBal")));
+		tFacMain.setAcctCode(tTempVo.getParam("AcctCode"));
+		tFacMain.setFirstDrawdownDate(this.parse.stringToInteger(tTempVo.getParam("FirstDrawdownDate")));
+		tFacMain.setMaturityDate(this.parse.stringToInteger(tTempVo.getParam("MaturityDate")));
+//		tFacMain.setCopyFlag(tTempVo.getParam("CopyFlag"));
+		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
+		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
+		tFacMain.setContractNo(tTempVo.getParam("ContractNo"));
+		tFacMain.setColSetFlag(tTempVo.getParam("ColSetFlag"));
+		tFacMain.setL9110Flag(tTempVo.getParam("L9110Flag"));
+		// 以下為可維護項目
+		tFacMain.setCreditSysNo(this.parse.stringToInteger(tTempVo.getParam("CreditSysNo")));
+		tFacMain.setBaseRateCode(tTempVo.getParam("BaseRateCode"));
+		tFacMain.setRateIncr(this.parse.stringToBigDecimal(tTempVo.getParam("RateIncr")));
+		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("IndividualIncr")));
+		tFacMain.setApproveRate(this.parse.stringToBigDecimal(tTempVo.getParam("ApproveRate")));
+		tFacMain.setRateCode(tTempVo.getParam("RateCode"));
+		tFacMain.setFirstRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("FirstRateAdjFreq")));
+		tFacMain.setRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("RateAdjFreq")));
+		tFacMain.setLineAmt(this.parse.stringToBigDecimal(tTempVo.getParam("TimApplAmt")));
+		tFacMain.setLoanTermYy(this.parse.stringToInteger(tTempVo.getParam("LoanTermYy")));
+		tFacMain.setLoanTermMm(this.parse.stringToInteger(tTempVo.getParam("LoanTermMm")));
+		tFacMain.setLoanTermDd(this.parse.stringToInteger(tTempVo.getParam("LoanTermDd")));
+		tFacMain.setAmortizedCode(tTempVo.getParam("AmortizedCode"));
+		tFacMain.setFreqBase(tTempVo.getParam("FreqBase"));
+		tFacMain.setPayIntFreq(this.parse.stringToInteger(tTempVo.getParam("PayIntFreq")));
+		tFacMain.setRepayFreq(this.parse.stringToInteger(tTempVo.getParam("RepayFreq")));
+		tFacMain.setUtilDeadline(this.parse.stringToInteger(tTempVo.getParam("UtilDeadline")));
+		tFacMain.setGracePeriod(this.parse.stringToInteger(tTempVo.getParam("GracePeriod")));
+		tFacMain.setAcctFee(this.parse.stringToBigDecimal(tTempVo.getParam("AcctFee")));
+		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
+		tFacMain.setExtraRepayCode(tTempVo.getParam("ExtraRepayCode"));
+		tFacMain.setCustTypeCode(tTempVo.getParam("CustTypeCode"));
+		tFacMain.setRuleCode(tTempVo.getParam("RuleCode"));
+		tFacMain.setRecycleCode(tTempVo.getParam("RecycleCode"));
+		tFacMain.setRecycleDeadline(this.parse.stringToInteger(tTempVo.getParam("RecycleDeadline")));
+		tFacMain.setUsageCode(tTempVo.getParam("UsageCode"));
+		tFacMain.setDepartmentCode(tTempVo.getParam("DepartmentCode"));
+		tFacMain.setIncomeTaxFlag(tTempVo.getParam("IncomeTaxFlag"));
+		tFacMain.setCompensateFlag(tTempVo.getParam("CompensateFlag"));
+		tFacMain.setIrrevocableFlag(tTempVo.getParam("IrrevocableFlag"));
+		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
+		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
+		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
+		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
+//		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
+//		tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(tTempVo.getParam("RepayAcctNo")));
+//		tFacMain.setPostCode(tTempVo.getParam("PostCode"));
+//		tFacMain.setRelationCode(tTempVo.getParam("RelationCode"));
+//		tFacMain.setRelationName(tTempVo.getParam("RelationName"));
+//		tFacMain.setRelationId(tTempVo.getParam("RelationId"));
+//		tFacMain.setRelationBirthday(this.parse.stringToInteger(tTempVo.getParam("RelationBirthday")));
+//		tFacMain.setRelationGender(tTempVo.getParam("RelationGender"));
+//		tFacMain.setAchAuthCode(tTempVo.getParam("AchAuthCode"));
+//		tFacMain.setAchBank(this.parse.stringToInteger(tTempVo.getParam("AchBank")));
+//		tFacMain.setAchAuthNo(tTempVo.getParam("AchAuthNo"));
+		tFacMain.setIntroducer(tTempVo.getParam("Introducer"));
+		tFacMain.setDistrict(tTempVo.getParam("District"));
+		tFacMain.setFireOfficer(tTempVo.getParam("FireOfficer"));
+		tFacMain.setEstimate(tTempVo.getParam("Estimate"));
+		tFacMain.setCreditOfficer(tTempVo.getParam("CreditOfficer"));
+		tFacMain.setLoanOfficer(tTempVo.getParam("BusinessOfficer"));
+		tFacMain.setBusinessOfficer(tTempVo.getParam("BusinessOfficer"));
+		tFacMain.setSupervisor(tTempVo.getParam("Supervisor"));
+		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
+		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
+		tFacMain.setCoorgnizer(tTempVo.getParam("Coorgnizer"));
+//		tFacMain.setAdvanceCloseCode(tTempVo.getParam("AdvanceCloseCode"));
+//		tFacMain.setBreachCode(tTempVo.getParam("BreachCode"));
+//		tFacMain.setBreachGetCode(tTempVo.getParam("BreachGetCode"));
+//		tFacMain.setDecreaseFlag(tTempVo.getParam("DecreaseFlag"));
+		tFacMain.setActFg(titaVo.getActFgI());
+		tFacMain.setLastAcctDate(this.parse.stringToInteger(tTempVo.getParam("LastAcctDate")));
+		tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
+		tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
+		tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
+		tFacMain.setAcDate(this.parse.stringToInteger(tTempVo.getParam("AcDate")));
+		try {
+			tFacMain = facMainService.insert(tFacMain);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005",
+					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 新增資料時，發生錯誤
+		}
+	}
+
+	// 訂正時, 還原清償金類型
+	private void RestoredFacProdBreachRoutine() throws LogicException {
+		this.info("RestoredFacProdBreachRoutine ... ");
+
+		tFacProdBreach = new FacProdBreach();
+		tFacProdBreachId = new FacProdBreachId();
+		tFacProdBreachId.setBreachNo(tTempVo.getParam("BreachNo"));
+		tFacProdBreachId.setBreachCode(tTempVo.getParam("BreachCode"));
+		tFacProdBreachId.setMonthStart(this.parse.stringToInteger(tTempVo.getParam("MonthStart")));
+		tFacProdBreach.setFacProdBreachId(tFacProdBreachId);
+		tFacProdBreach.setBreachNo(tTempVo.getParam("BreachNo"));
+		tFacProdBreach.setBreachCode(tTempVo.getParam("BreachCode"));
+		tFacProdBreach.setMonthStart(this.parse.stringToInteger(tTempVo.getParam("MonthStart")));
+		tFacProdBreach.setMonthEnd(this.parse.stringToInteger(tTempVo.getParam("MonthEnd")));
+		tFacProdBreach.setBreachPercent(this.parse.stringToBigDecimal(tTempVo.getParam("BreachPercent")));
+		try {
+			facProdBreachService.insert(tFacProdBreach);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "清償金類型"); // 新增資料時，發生錯誤
+		}
+	}
+
+	// 更新階梯式利率
+	private void UpdateFacProdStepRateRoutine() throws LogicException {
+		this.info("UpdateFacProdStepRateRoutine ...");
+
+		DeleteFacProdStepRateRoutine();
+		// 更新階梯式利率
+		FacProdStepRate tFacProdStepRate = new FacProdStepRate();
+
+//			if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
+		for (int i = 1; i <= 10; i++) {
+			if (this.parse.stringToDouble(titaVo.getParam("StepMonthE" + i)) > 0) {
+				tFacProdStepRate.setProdNo(sProdNo);
+				tFacProdStepRate.setMonthStart(this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i)));
+				tFacProdStepRate.setFacProdStepRateId(
+						new FacProdStepRateId(sProdNo, this.parse.stringToInteger(titaVo.getParam("StepMonthS" + i))));
+//				if (i == 10) {
+//					tFacProdStepRate.setMonthEnd(999);
+//				} else {
+//					if (this.parse.stringToInteger(titaVo.getParam("StepMonthS" + (i + 1))) == 0) {
+//						tFacProdStepRate.setMonthEnd(999);
+//					} else {
+				tFacProdStepRate.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("StepMonthE" + i)));
+//					}
+//				}
+				tFacProdStepRate.setRateType(titaVo.getParam("StepRateType" + i));
+				tFacProdStepRate.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("StepRateIncr" + i)));
+				tFacProdStepRate.setCreateDate(
+						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tFacProdStepRate.setCreateEmpNo(titaVo.getTlrNo());
+				tFacProdStepRate.setLastUpdate(
+						parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tFacProdStepRate.setLastUpdateEmpNo(titaVo.getTlrNo());
+
+				try {
+					facProdStepRateService.insert(tFacProdStepRate);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E2009", "階梯式利率"); // 新增資料時，發生錯誤
+				}
+			} else {
+				break;
+			}
+		}
+//			}
+
+	}
+
+	// 刪除階梯式利率
+	private void DeleteFacProdStepRateRoutine() throws LogicException {
+		this.info("DeleteFacProdStepRateRoutine ...");
+
+		sProdNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
+				+ FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
+
+		FacProdStepRate tFacProdStepRate = new FacProdStepRate();
+
+		Slice<FacProdStepRate> slFacProdStepRate = facProdStepRateService.stepRateProdNoEq(sProdNo, 0, 999, this.index,
+				Integer.MAX_VALUE);
+		List<FacProdStepRate> lFacProdStepRate = slFacProdStepRate == null ? null : slFacProdStepRate.getContent();
+		if (lFacProdStepRate != null && lFacProdStepRate.size() > 0) {
+			try {
+				facProdStepRateService.deleteAll(lFacProdStepRate);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E2008", "階梯式利率"); // 刪除資料時，發生錯誤
+			}
+		}
+
+	}
+
+}

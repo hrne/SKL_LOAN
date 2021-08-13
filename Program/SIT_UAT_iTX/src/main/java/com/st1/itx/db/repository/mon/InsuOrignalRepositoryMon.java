@@ -1,0 +1,40 @@
+package com.st1.itx.db.repository.mon;
+
+
+import java.util.Optional;
+
+import javax.persistence.LockModeType;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.st1.itx.db.domain.InsuOrignal;
+import com.st1.itx.db.domain.InsuOrignalId;
+
+/**
+ * Gen By Tool
+ * 
+ * @author AdamPan
+ * @version 1.0.0
+ */
+public interface InsuOrignalRepositoryMon extends JpaRepository<InsuOrignal, InsuOrignalId> {
+
+  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+  public Optional<InsuOrignal> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDesc(int clCode1_0, int clCode2_1, int clNo_2);
+
+  // InsuEndDate >= , AND InsuEndDate <=
+  public Slice<InsuOrignal> findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqual(int insuEndDate_0, int insuEndDate_1, Pageable pageable);
+
+  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+  public Slice<InsuOrignal> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<InsuOrignal> findByInsuOrignalId(InsuOrignalId insuOrignalId);
+
+}
+

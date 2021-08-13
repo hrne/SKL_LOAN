@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				
+				<!-- 
+				<value>classpath:spring/queue.properties</value>
+				<value>classpath:spring/Env.properties</value>
+				<value>classpath:spring/batch/batch.properties</value>
+				-->
+				
+				<!-- -->       
+				<value>file:${itx_Config}/spring/queue.properties</value>
+				<value>file:${itx_Config}/spring/Env.properties</value>
+				
+			</list>
+		</property>
+	</bean>
+
+
+	<import resource="classpath:spring/application-config.xml" />
+	
+
+    <!-- 
+    <import resource="classpath:spring/itx-database-Online.xml" />
+	<import resource="classpath:spring/itx-database-Day.xml" />
+	<import resource="classpath:spring/itx-database-Mon.xml" />
+	<import resource="classpath:spring/itx-database-Hist.xml" />
+	<import resource="classpath:spring/batch/batch-context.xml" />
+    -->
+    
+    <!-- --> 
+    <import resource="file:${itx_Config}/spring/batch/batch-context.xml" />      
+    <import resource="file:${itx_Config}/spring/itx-database-Online.xml" />
+	<import resource="file:${itx_Config}/spring/itx-database-Day.xml" />
+	<import resource="file:${itx_Config}/spring/itx-database-Mon.xml" />
+	<import resource="file:${itx_Config}/spring/itx-database-Hist.xml" />
+    
+     
+</beans>
