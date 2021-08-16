@@ -4,10 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/* log */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -56,7 +52,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5702 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5702.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegTransService sNegTransService;
@@ -91,14 +86,12 @@ public class L5702 extends TradeBuffer {
 		String TransTitaTxtNo = "";
 
 		String TransTxKind = "";
-		String TransReturnAmt = "";
 
 		String TrialFunc = titaVo.getParam("TrialFunc").trim();
-			TransAcDate = titaVo.getParam("TransAcDate").trim();
-			TransTitaTlrNo = titaVo.getParam("TransTitaTlrNo").trim();
-			TransTitaTxtNo = titaVo.getParam("TransTitaTxtNo").trim();
-			TransTxKind = titaVo.getParam("NewTransTxKind").trim();
-			TransReturnAmt = titaVo.getParam("NewTransReturnAmt").trim();
+		TransAcDate = titaVo.getParam("TransAcDate").trim();
+		TransTitaTlrNo = titaVo.getParam("TransTitaTlrNo").trim();
+		TransTitaTxtNo = titaVo.getParam("TransTitaTxtNo").trim();
+		TransTxKind = titaVo.getParam("NewTransTxKind").trim();
 
 		NegTransId tNegTransId = new NegTransId();
 		int AcDate = parse.stringToInteger(TransAcDate);
@@ -111,23 +104,22 @@ public class L5702 extends TradeBuffer {
 		}
 
 		// 入帳
-			// 正常
-			if (titaVo.isHcodeNormal()) {
-				sNegCom.NegTransTrial(titaVo, tNegTrans, TrialFunc, TransTxKind, TransReturnAmt);
-			}
-			// 訂正
-			else {
-				sNegCom.NegRepayEraseRoutine(titaVo);
-			}
-			// 會計帳 
-			if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
-				UpdAcDB(tNegTransId, titaVo);
-			}
+		// 正常
+		if (titaVo.isHcodeNormal()) {
+			sNegCom.trialNegtrans(tNegTrans, TrialFunc, TransTxKind, titaVo );
+		}
+		// 訂正
+		else {
+			sNegCom.NegRepayEraseRoutine(titaVo);
+		}
+		// 會計帳
+		if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
+			UpdAcDB(tNegTransId, titaVo);
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 
 	private void UpdAcDB(NegTransId tNegTransId, TitaVo titaVo) throws LogicException {
 		// 異動會計分錄檔

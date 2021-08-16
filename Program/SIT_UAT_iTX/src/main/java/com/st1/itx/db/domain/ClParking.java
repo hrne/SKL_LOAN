@@ -27,7 +27,7 @@ public class ClParking implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2562211962307177308L;
+	private static final long serialVersionUID = -900232226695219835L;
 
 @EmbeddedId
   private ClParkingId clParkingId;
@@ -49,7 +49,7 @@ public class ClParking implements Serializable {
   private int parkingSeqNo = 0;
 
   // 車位編號
-  /* 停車位編號備註 */
+  /* 停車位編號備註*資料轉換時預設"." */
   @Column(name = "`ParkingNo`", length = 20)
   private String parkingNo;
 
@@ -107,6 +107,10 @@ public class ClParking implements Serializable {
   // 車位面積(坪)
   @Column(name = "`ParkingArea`")
   private BigDecimal parkingArea = new BigDecimal("0");
+
+  // 價格(元)
+  @Column(name = "`Amount`")
+  private BigDecimal amount = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -214,6 +218,7 @@ public class ClParking implements Serializable {
 /**
 	* 車位編號<br>
 	* 停車位編號備註
+*資料轉換時預設"."
 	* @return String
 	*/
   public String getParkingNo() {
@@ -223,6 +228,7 @@ public class ClParking implements Serializable {
 /**
 	* 車位編號<br>
 	* 停車位編號備註
+*資料轉換時預設"."
   *
   * @param parkingNo 車位編號
 	*/
@@ -459,6 +465,25 @@ public class ClParking implements Serializable {
   }
 
 /**
+	* 價格(元)<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getAmount() {
+    return this.amount;
+  }
+
+/**
+	* 價格(元)<br>
+	* 
+  *
+  * @param amount 價格(元)
+	*/
+  public void setAmount(BigDecimal amount) {
+    this.amount = amount;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -539,7 +564,7 @@ public class ClParking implements Serializable {
   public String toString() {
     return "ClParking [clParkingId=" + clParkingId + ", parkingNo=" + parkingNo + ", parkingQty=" + parkingQty
            + ", parkingTypeCode=" + parkingTypeCode + ", ownerPart=" + ownerPart + ", ownerTotal=" + ownerTotal + ", cityCode=" + cityCode + ", areaCode=" + areaCode + ", irCode=" + irCode
-           + ", bdNo1=" + bdNo1 + ", bdNo2=" + bdNo2 + ", landNo1=" + landNo1 + ", landNo2=" + landNo2 + ", parkingArea=" + parkingArea + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", bdNo1=" + bdNo1 + ", bdNo2=" + bdNo2 + ", landNo1=" + landNo1 + ", landNo2=" + landNo2 + ", parkingArea=" + parkingArea + ", amount=" + amount
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

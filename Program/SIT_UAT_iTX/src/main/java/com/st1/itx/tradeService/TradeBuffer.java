@@ -84,18 +84,17 @@ public abstract class TradeBuffer implements TradeIn {
 	}
 
 	public void info(String msg) {
-		if (loggerFg)
+		if (ThreadVariable.isLogger())
 			logger.info(msg);
 	}
 
 	public void warn(String msg) {
-		if (loggerFg)
+		if (ThreadVariable.isLogger())
 			logger.warn(msg);
 	}
 
 	public void error(String msg) {
-		if (loggerFg)
-			logger.error(msg);
+		logger.error(msg);
 	}
 
 	public int setIndexNext() {

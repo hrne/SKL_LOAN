@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -59,7 +57,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R05")
 @Scope("prototype")
 public class L2R05 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R05.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -171,6 +168,12 @@ public class L2R05 extends TradeBuffer {
 					throw new LogicException(titaVo, "E3077", "L2R05 新核准號碼 戶號 = " + tFacMain.getCustNo()); // 新核准號碼與原核准號碼，非屬於同一人
 				}
 			}
+			// L2118新增時檢查 撥款後不可再建檔 TODO:測試期間暫不控管
+//			if (iTxCode.equals("L2118") & iFuncCode == 1) {
+//				if (tFacMain.getLastBormNo() > 0) {
+//					throw new LogicException(titaVo, "E2066", "L2R05 核准號碼  = " + tFacMain.getApplNo()); // 已撥款不可再建檔
+//				}
+//			}
 		} else {
 			if (iCustNo > 0) {
 				tFacMain = facMainService.findById(new FacMainId(iCustNo, iFacmNo), titaVo);
@@ -263,7 +266,8 @@ public class L2R05 extends TradeBuffer {
 			SetTotaBreach();
 		}
 		// 檢查是否未齊件
-		Slice<LoanNotYet> slLoanNotYet = sLoanNotYetService.notYetCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 99991231, 0, 99991231, this.index, this.limit,titaVo);
+		Slice<LoanNotYet> slLoanNotYet = sLoanNotYetService.notYetCustNoEq(iCustNo, iFacmNo, iFacmNo, 0, 99991231, 0,
+				99991231, this.index, this.limit, titaVo);
 		lLoanNotYet = slLoanNotYet == null ? null : slLoanNotYet.getContent();
 		if (lLoanNotYet != null) {
 			for (LoanNotYet tLoanNotYet : lLoanNotYet) {
@@ -275,11 +279,11 @@ public class L2R05 extends TradeBuffer {
 
 		// 預定撥款序號 (LoanBorMain戶況為99筆數)+(FacMain最後撥款序號)+1
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo, iFacmNo, iFacmNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		if (slLoanBorMain !=null) {
-			for (LoanBorMain rv :slLoanBorMain.getContent() ) {
-				wkRvCnt ++;
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo, iFacmNo, iFacmNo,
+				0, Integer.MAX_VALUE, titaVo);
+		if (slLoanBorMain != null) {
+			for (LoanBorMain rv : slLoanBorMain.getContent()) {
+				wkRvCnt++;
 				wkRvDrawdownAmt = wkRvDrawdownAmt.add(rv.getDrawdownAmt());
 			}
 		}
@@ -369,7 +373,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("OLoanTermDd", tFacMain.getLoanTermDd());
 		this.totaVo.putParam("OFirstDrawdownDate", tFacMain.getFirstDrawdownDate());
 		this.totaVo.putParam("OMaturityDate", tFacMain.getMaturityDate());
-		this.totaVo.putParam("OIntCalcCode", tFacMain.getIntCalcCode()); // TODO 計息方式
+		this.totaVo.putParam("OIntCalcCode", tFacMain.getIntCalcCode()); 
 		this.totaVo.putParam("OAmortizedCode", tFacMain.getAmortizedCode());
 		this.totaVo.putParam("OFreqBase", tFacMain.getFreqBase());
 		this.totaVo.putParam("OPayIntFreq", tFacMain.getPayIntFreq());
@@ -435,8 +439,8 @@ public class L2R05 extends TradeBuffer {
 //		this.totaVo.putParam("OCancelCode", tFacMain.getCancelCode());
 		// 可用額度=Min(共用額度「可用總額度/循環動用」,Min(額度核准金額,擔保品分配金額) -已動用額度餘額))
 		BigDecimal wkAvailableAmt = loanAvailableAmt.caculate(tFacMain, titaVo); // 可用額度
-		// 限額計算方式 F-額度, C-擔保品 S-共用額度 
-		String wkLimitFlag = loanAvailableAmt.getLimitFlag(); 
+		// 限額計算方式 F-額度, C-擔保品 S-共用額度
+		String wkLimitFlag = loanAvailableAmt.getLimitFlag();
 		this.totaVo.putParam("OAvailableAmt", wkAvailableAmt);
 		this.totaVo.putParam("OLimitFlag", wkLimitFlag);
 

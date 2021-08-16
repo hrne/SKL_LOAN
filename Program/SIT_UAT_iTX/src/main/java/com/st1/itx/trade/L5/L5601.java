@@ -14,8 +14,6 @@ import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.CollRemindService;
 import com.st1.itx.db.service.CollTelService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
-
 /* DB容器 */
 import com.st1.itx.db.domain.CollTel;
 import com.st1.itx.db.domain.CollTelId;
@@ -37,8 +35,6 @@ import com.st1.itx.db.domain.CollRemindId;
 
 public class L5601 extends TradeBuffer {
 	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
 	@Autowired
 	public CollTelService iCollTelService;
 	@Autowired

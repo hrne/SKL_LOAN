@@ -201,7 +201,7 @@ T(2,2+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
 #OOBUF_COPY=X,296,S
 T(2,3+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
 #OOBUF_DELETE=X,586,S
-T(2,3+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
+T(2,4+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
 #OOBUF_SEARCH=X,296,S
 T(2,5+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
 
@@ -210,7 +210,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5602; ntxbuf=#OOBUF_EDIT})
 #OOBTN_COPY=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5602; ntxbuf=#OOBUF_COPY})
 #OOBTN_DELETE=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L5604; ntxbuf=#OOBUF_DELETE})
+BIND(grid,{ cmd=CHAIN; ntxcd=L5602; ntxbuf=#OOBUF_DELETE})
 #OOBTN_SEARCH=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5602; ntxbuf=#OOBUF_SEARCH})
 

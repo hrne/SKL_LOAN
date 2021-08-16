@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -29,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R11")
 @Scope("prototype")
 public class L2R11 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R11.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -48,8 +48,12 @@ public class L2R11 extends TradeBuffer {
 		// 取得輸入資料
 		int iApplNo = this.parse.stringToInteger(titaVo.getParam("RimApplNo"));
 
-		for (int i = 1; i <= 10; i++) {
+		for (int i = 1; i <= 20; i++) {
 			this.totaVo.putParam("OClKey" + i, "");
+			this.totaVo.putParam("OApplNo" + i, 0); //核准號碼
+			this.totaVo.putParam("OCustNo" + i, 0); //戶號
+			this.totaVo.putParam("OFacmNo" + i, 0); //額度編號
+			this.totaVo.putParam("OMainFlag" + i, ""); //主要擔保品記號
 			this.totaVo.putParam("OEvaAmt" + i, 0);
 		}
 
@@ -57,7 +61,7 @@ public class L2R11 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 10;
+		this.limit = 20;
 
 		Slice<ClFac> lClFac = clFacService.approveNoEq(iApplNo, this.index, this.limit, titaVo);
 		if (!(lClFac == null || lClFac.isEmpty())) {
@@ -69,7 +73,11 @@ public class L2R11 extends TradeBuffer {
 					this.totaVo.putParam("OClKey" + i,
 							cl.getClCode1() + "-" + this.parse.IntegerToString(cl.getClCode2(), 2) + "-"
 									+ this.parse.IntegerToString(cl.getClNo(), 7));
-					this.totaVo.putParam("OEvaAmt" + i, tClMain.getEvaAmt());
+					this.totaVo.putParam("OApplNo" + i, cl.getApproveNo()); //核准號碼
+					this.totaVo.putParam("OCustNo" + i, cl.getCustNo()); //戶號
+					this.totaVo.putParam("OFacmNo" + i, cl.getFacmNo()); //額度編號
+					this.totaVo.putParam("OMainFlag" + i, cl.getMainFlag()); //主要擔保品記號
+					this.totaVo.putParam("OEvaAmt" + i, tClMain.getEvaAmt()); //鑑價總值
 					i++;
 				}
 			}

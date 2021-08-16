@@ -20,7 +20,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM041Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM041Report.class);
 
 	@Autowired
 	LM041ServiceImpl lM041ServiceImpl;
@@ -68,11 +67,6 @@ public class LM041Report extends MakeReport {
 					total = total.add(tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)));
 					makeExcel.setValue(row, col, tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "#,##0", "R");
 					break;
-				case 8://等欄位LGFAMTWK抓到職後要變為case 9
-				case 9://等欄位LGFAMTWK抓到職後要變為case 10
-					// 金額
-					makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "0");
-					break;
 				default:
 					makeExcel.setValue(row, col, tLDVo.get(ad));
 					break;
@@ -82,9 +76,9 @@ public class LM041Report extends MakeReport {
 			row++;
 		} // for
 		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) / 100));
-		String year = entdy.substring(0,3);
-		int month = Integer.parseInt(entdy.substring(3,5));
-		makeExcel.setValue(row + 3, 1, "一、擬 " + year + "年" + String.valueOf(month) + "月份呆帳戶之暫收款項金額共計 $" + total +  "元入呆帳回收。", "#,##0");
+		String year = entdy.substring(0, 3);
+		int month = Integer.parseInt(entdy.substring(3, 5));
+		makeExcel.setValue(row + 3, 1, "一、擬 " + year + "年" + String.valueOf(month) + "月份呆帳戶之暫收款項金額共計 $" + total + "元入呆帳回收。", "#,##0");
 		makeExcel.setValue(row + 4, 1, "二、陳核。");
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);

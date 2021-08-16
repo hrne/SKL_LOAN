@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("clStockService")
 @Repository
-public class ClStockServiceImpl implements ClStockService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(ClStockServiceImpl.class);
-
+public class ClStockServiceImpl extends ASpringJpaParm implements ClStockService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class ClStockServiceImpl implements ClStockService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + clStockId);
+    this.info("findById " + dbName + " " + clStockId);
     Optional<ClStock> clStock = null;
     if (dbName.equals(ContentName.onDay))
       clStock = clStockReposDay.findById(clStockId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = clStockReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findClCode1 " + dbName + " : " + "clCode1_0 : " + clCode1_0);
+    this.info("findClCode1 " + dbName + " : " + "clCode1_0 : " + clCode1_0);
     if (dbName.equals(ContentName.onDay))
       slice = clStockReposDay.findAllByClCode1Is(clCode1_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -153,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findClCode2 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1);
+    this.info("findClCode2 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1);
     if (dbName.equals(ContentName.onDay))
       slice = clStockReposDay.findAllByClCode1IsAndClCode2Is(clCode1_0, clCode2_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findUnique " + dbName + " : " + "stockCode_0 : " + stockCode_0 + " ownerId_1 : " +  ownerId_1);
+    this.info("findUnique " + dbName + " : " + "stockCode_0 : " + stockCode_0 + " ownerId_1 : " +  ownerId_1);
     if (dbName.equals(ContentName.onDay))
       slice = clStockReposDay.findAllByStockCodeIsAndOwnerIdIs(stockCode_0, ownerId_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -202,7 +198,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clStockId);
+    this.info("Hold " + dbName + " " + clStockId);
     Optional<ClStock> clStock = null;
     if (dbName.equals(ContentName.onDay))
       clStock = clStockReposDay.findByClStockId(clStockId);
@@ -220,7 +216,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clStock.getClStockId());
+    this.info("Hold " + dbName + " " + clStock.getClStockId());
     Optional<ClStock> clStockT = null;
     if (dbName.equals(ContentName.onDay))
       clStockT = clStockReposDay.findByClStockId(clStock.getClStockId());
@@ -242,7 +238,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + clStock.getClStockId());
+    this.info("Insert..." + dbName + " " + clStock.getClStockId());
     if (this.findById(clStock.getClStockId()) != null)
       throw new DBException(2);
 
@@ -271,7 +267,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clStock.getClStockId());
+    this.info("Update..." + dbName + " " + clStock.getClStockId());
     if (!empNot.isEmpty())
       clStock.setLastUpdateEmpNo(empNot);
 
@@ -294,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clStock.getClStockId());
+    this.info("Update..." + dbName + " " + clStock.getClStockId());
     if (!empNot.isEmpty())
       clStock.setLastUpdateEmpNo(empNot);
 
@@ -314,7 +310,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + clStock.getClStockId());
+    this.info("Delete..." + dbName + " " + clStock.getClStockId());
     if (dbName.equals(ContentName.onDay)) {
       clStockReposDay.delete(clStock);	
       clStockReposDay.flush();
@@ -343,7 +339,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (ClStock t : clStock){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -378,7 +374,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (clStock == null || clStock.size() == 0)
       throw new DBException(6);
 
@@ -407,7 +403,7 @@ em = null;
 
   @Override
   public void deleteAll(List<ClStock> clStock, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

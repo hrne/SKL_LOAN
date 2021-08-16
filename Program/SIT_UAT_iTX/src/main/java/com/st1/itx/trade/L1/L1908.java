@@ -3,8 +3,7 @@ package com.st1.itx.trade.L1;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -14,9 +13,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustNotice;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
@@ -34,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1908 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1908.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -43,12 +43,15 @@ public class L1908 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public FacMainService sFacMainService;
-	
+
 	@Autowired
 	public CustMainService iCustMainService;
-	
+
 	@Autowired
 	public CdReportService iCdReportService;
+	
+	@Autowired
+	public CdEmpService iCdEmpService;
 
 	/* 日期工具 */
 	@Autowired
@@ -69,14 +72,14 @@ public class L1908 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500; // 25 * 500 = 12500
+		this.limit = 300; // 25 * 500 = 12500
 
 		// 取tita戶號
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 
 		// FacmNo額度編號
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
-		
+
 		String iCustId = titaVo.getParam("CustId");
 
 		// 宣告new list
@@ -94,13 +97,13 @@ public class L1908 extends TradeBuffer {
 			slCustNotice = sCustNoticeService.facmNoEq(iCustNo, iFacmNo, iFacmNo, this.index, this.limit, titaVo);
 			lCustNotice = slCustNotice == null ? null : slCustNotice.getContent();
 
-		}  else {
+		} else {
 			// 使用者輸入統編查詢，將iCustNo替換為查詢結果
-			if (!iCustId.equals("")){
+			if (!iCustId.equals("")) {
 				CustMain iCustMain = new CustMain();
 				iCustMain = iCustMainService.custIdFirst(iCustId, titaVo);
-				if(iCustMain == null ) {
-					throw new LogicException("E0001", "客戶檔查無此統一編號:"+iCustId); // 查無資料
+				if (iCustMain == null) {
+					throw new LogicException("E0001", "客戶檔查無此統一編號:" + iCustId); // 查無資料
 				}
 				iCustNo = iCustMain.getCustNo();
 			}
@@ -125,6 +128,7 @@ public class L1908 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 			String iFormNo = tCustNotice.getFormNo();
 			CdReport iCdReport = new CdReport();
+			CdEmp iCdEmp = new CdEmp();
 			iCdReport = iCdReportService.findById(iFormNo, titaVo);
 //			if(iCdReport.getSendCode()!=0) {
 //				//CdReport 報送記號不為0才報送
@@ -145,14 +149,27 @@ public class L1908 extends TradeBuffer {
 			occursList.putParam("OOMsg", tCustNotice.getMsgNotice());
 			occursList.putParam("OOEMail", tCustNotice.getEmailNotice());
 			occursList.putParam("OOFormNo", iFormNo);
-			if(iCdReport == null) {
+			if (iCdReport == null) {
 				occursList.putParam("OOFormName", "");
-			}else {
+			} else {
 				occursList.putParam("OOFormName", iCdReport.getFormName());
 			}
 			occursList.putParam("OOApplyDt", tCustNotice.getApplyDate());
-			
-			
+			occursList.putParam("OOLastUpdateEmpNo", tCustNotice.getLastUpdateEmpNo());
+			iCdEmp = iCdEmpService.findAgentIdFirst(tCustNotice.getLastUpdateEmpNo(), titaVo);
+			if (tCustNotice.getLastUpdateEmpNo().equals("")) {
+				occursList.putParam("OOLastUpdateEmpNoName", "");
+			}else {
+				if (iCdEmp == null) {
+					occursList.putParam("OOLastUpdateEmpNoName", "");
+				}else {
+					occursList.putParam("OOLastUpdateEmpNoName", iCdEmp.getFullname());
+				}
+			}
+			String taU = tCustNotice.getLastUpdate().toString();
+			String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
+			occursList.putParam("OOLastUpdate", uaDate);
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM045ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM045ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -37,8 +34,10 @@ public class LM045ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iYEAR = iENTDY.substring(0, 4);
 		String iLYEAR = String.valueOf(Integer.valueOf(iYEAR) - 1);
 		String iSYYMM = iLYEAR + "12";
+		
+		String entYearMonth = iENTDY.substring(0, 6);
 
-		logger.info("lM045.findAll SYYMM=" + iSYYMM + ",LYEAR=" + iLYEAR);
+		this.info("lM045.findAll SYYMM=" + iSYYMM + ",LYEAR=" + iLYEAR);
 
 		String sql = "SELECT NVL(E.\"Fullname\", d.\"AccCollPsn\") F0 "; // 串不到姓名時顯示員編
 		sql += "            ,D.\"YearMonth\" F1 ";
@@ -80,13 +79,14 @@ public class LM045ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ON M.\"AccCollPsn\" = D.\"AccCollPsn\"";
 		sql += "     AND M.\"YearMonth\"  = D.\"YearMonth\"";
 		sql += "     LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = D.\"AccCollPsn\"";
+		sql += "     WHERE NVL(d.\"YearMonth\", 999999) <= :entYearMonth ";
 		sql += "     GROUP BY D.\"CityCode\"";
 		sql += "             ,D.\"AccCollPsn\"";
 		sql += "             ,E.\"Fullname\"";
 		sql += "             ,D.\"YearMonth\"";
 		sql += "     ORDER BY D.\"CityCode\", D.\"YearMonth\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -94,6 +94,7 @@ public class LM045ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("lyyyy", iLYEAR);
 		query.setParameter("yyyy", iYEAR);
 		query.setParameter("syymm", iSYYMM);
+		query.setParameter("entYearMonth", entYearMonth);
 		return this.convertToMap(query.getResultList());
 	}
 

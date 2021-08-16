@@ -13,7 +13,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.CollRemindService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.CollList;
 import com.st1.itx.db.domain.CollListId;
 /* DB容器 */
@@ -32,9 +31,6 @@ import com.st1.itx.db.domain.CollRemindId;
 
 public class L5605 extends TradeBuffer {
 	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
-
 	@Autowired
 	public CollRemindService collremindservice;
 	@Autowired

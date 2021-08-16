@@ -16,8 +16,6 @@ import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L5R21")
 @Scope("prototype")
@@ -44,14 +42,6 @@ public class L5R21 extends TradeBuffer {
 
 	@Autowired
 	public CollLawService iCollLawService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

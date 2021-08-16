@@ -1,0 +1,508 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L1001)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,233)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#BUF2=X,11,S
+T(2,1+          )
+
+
+#button=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF2})ASGN(BTN_NEW1$)
+!T(2,{ cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF2; noclose=true})ASGN(BTN_NEW1$)
+C(3,#CHAIN,0,K(MODIFYBUTTON,1,新增自然人),$)
+K(MODIFYBUTTON,查詢)
+
+#button2=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L1102; ntxbuf=#BUF2})ASGN(BTN_NEW2$)
+C(3,#CHAIN,0,K(MODIFYBUTTON,2,新增法人),$)
+
+! #ERIM=X,1,S
+! T(6,XXR22+1+#CustNo+#Mobile)ASGN(ESCRIM$)
+
+!用callSend也可
+!#ERIM=x,100,S
+!T(2,{cmd=CALLSEND;DOCODE=RP_RIM_XCR2B})ASGN(ESCRIM$)
+
+
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,850];printer.width=[20,20];">
+[
+["[L1001]                                 顧客明細資料查詢"],
+["#FdMain+查詢條件","@(借款人戶號、統一編號、戶名、手機號碼，需擇一輸入)"],
+["#FdCustNoSt+借款人戶號",#CustNoSt,"~",#CustNoEd],
+["#FdCustId+統一編號",#CustId],
+["#FdCustName+戶名",#CustName],
+["#FdMobile+手機號碼",#Mobile],
+["#FdIdKind+身份別",#IdKind,#IdKindX],
+]
+
+#FdMain=X,2,L
+T(3,*)
+#FdCustNoSt=X,2,L
+#FdCustId=X,2,L
+#FdCustName=X,2,L
+#FdMobile=X,2,L
+#FdIdKind=X,2,L
+T(3,*)
+
+
+
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BUF1=X,42,S
+!ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+!---------- AP TEXT AREA Variables ----------
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!CustTypeCode 客戶別
+#CDDEF0001=x,20,S
+T(3,CdCode.CustTypeCode)
+#CODEF0002=x,20,S
+T(3,CdCode.IdKind)
+
+#CustTypeCodeHelpRim=X,1,S
+RESET_RIM(#CustTypeCodeHelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CODEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CustTypeCodeHelp,#HelpDesc1)
+T(2,@IdKindHelp,#HelpDesc2)
+#CustTypeCodeHelp=x,1024,S
+#IdKindHelp=x,1024,S
+T(2,0:全部;+#IdKindHelp)
+
+
+
+#NTXBUF=X,142,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNoSt,#NTXBUF,1,7)
+T(1,@CustNoEd,#NTXBUF,1,7)
+T(1,@CustId,#NTXBUF,8,10)
+T(1,@CustName,#NTXBUF,19,100)
+T(1,@Mobile,#NTXBUF,119,15)
+T(1,@IdKind,#NTXBUF,134,1)
+
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+
+#RPTFG=A,1,S
+E(0,0)
+
+!#RPTFG2=A,1,S
+!C(3,#CHAIN,0,T(3,1),T(3,2))
+
+
+#RPTFG2=A,1,S
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+!借款人戶號
+
+#CustNoSt=A,7,I
+
+#CustNoEd=A,7,I
+!INVOKEJS(SHOW,p1,1,4,1)
+E(0,#CustNoSt)
+@
+V(5,#CustNoSt,9999999)
+!IF(#CustNoEd == 0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,4,0))
+C(3,#CustNoSt,0,s,$)
+
+!統一編號
+#CustId=X,10,I
+!C(3,#CustNoEd,0,INVOKEJS(SHOW,p1,2,2,1),$)
+C(3,#CustNoEd,0,$,S)
+@C(4,#CustId,$,A(ID_UNINO,0,#CustId))
+!C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
+
+!戶名
+#CustName=c,100,I
+C(3,#CustNoEd,0,$,S)
+C(4,#CustId,$,S)
+!C(4,#CustId,INVOKEJS(SHOW,p1,3,4,1),$)
+@
+!C(4,#CustName,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
+
+#T1=X,1,S
+!T(3,@FdMobile,)
+
+!手機號碼
+#Mobile=X,10,I
+!T(3,@FdMobile,*)
+C(3,#CustNoEd,0,$,S)
+C(4,#CustId,$,S)
+C(4,#CustName,$,S)
+@C(4,#Mobile,V(P,需擇一輸入查詢條件),V(9))
+
+
+
+
+#IdKind=A,1,I
+HELP(#IdKindHelp)
+@V(H,#IdKindHelp)
+T(H,@IdKindX,#IdKind,#IdKindHelp)
+
+#IdKindX=X,6,L
+T(H,#IdKind,#IdKindHelp)
+
+#RETURN=A,1,S
+E(0,0)
+
+![折返KEY]
+#RTNTXT=X,9,S
+
+!#NTXCD=X,5,S
+!T(2,L3111)
+!ASGN(NTXCD$)
+!K(NEXTNOCLOSE,true)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L1001 ----------
+<sub type="FORM" name="L1001">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L1001,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L1001] 顧客明細資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+#OCustNoSt=X,7,L
+IF(#CustNoSt>0,T(2,#CustNoSt),T(2,無))
+#OCustNoEd=X,7,L
+IF(#OCustNoEd>0,T(2,#OCustNoEd),T(2,無))
+#OCustId=X,10,L
+IF(#CustId!="",T(2,#CustId),T(2,無))
+
+#OCustName=X,40,L
+IF(#CustName!="",T(2,#CustName),T(2,無))
+
+#OMobile=X,15,L
+IF(#Mobile>0,T(2,#Mobile),T(2,無))
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+!顧客
+#OOCustMainBTNFg=A,1,S
+!財報
+#OOCustFinBTNFg=A,1,S
+!放款
+#OOFacMainBTNFg=A,1,S
+!案件
+#OOFacCaseApplBTNFg=A,1,S
+!未齊件
+#OOLoanNotYetBTNFg=A,1,S
+!保證人
+#OOGuarantorBTNFg=A,1,S
+!擔保品
+#OOClMainBTNFg1=A,1,S
+!共同借款人
+#OOFacShareApplBTNFg=A,1,S
+!關聯戶
+#OOCustRelBTNFg=A,1,S
+!交互運用
+#OOCustCrossBTNFg=A,1,S
+!顧客電話
+#OOCustTelNoBTNFg=A,1,S
+
+#OOCustId=X,10,L
+#OOCustNo=A,7,L
+#OOCustTypeCode=A,2,S
+#OOCustTypeItem=X,10,S
+T(H,#OOCustTypeCode,#CustTypeCodeHelp)
+#OOCustName=x,200,L
+
+#custidlen=X,2,S
+P(1,#OOCustId)
+
+#CUSTTXCD=X,5,S
+IF(#custidlen==8,T(3,L1102),T(3,L1101))
+
+#CUSTCHANGE=X,5,S
+IF(#custidlen==8,T(3,L1104),T(3,L1103))
+
+!顧客
+#OO_FUNCD=X,1,S
+T(3,5)
+
+#OOBUF1=X,11,S
+T(2,#OO_FUNCD+#OOCustId)
+
+#OOBTN1=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTTXCD; ntxbuf=#OOBUF1})
+IF(#OOCustMainBTNFg==0,BIND(grid,cancel),$)
+
+
+!財報
+#OOBUF2=X,11,S
+T(2,#OO_FUNCD+#OOCustId)
+
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1907; ntxbuf=#OOBUF2})
+IF(#OOCustFinBTNFg==0,BIND(grid,cancel),$)
+
+#7Aspc=A,7,S
+!放款
+#OOBUF3=X,31,S
+T(2,#7Aspc+#7Aspc+#OOCustId+0000000)
+
+#OOBTN3=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L3001; ntxbuf=#OOBUF3})
+IF(#OOFacMainBTNFg==0,BIND(grid,cancel),$)
+
+!案件
+#OOBUF4=X,18,S
+T(2,0000000+#OOCustId+9)
+
+#OOBTN4=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2010; ntxbuf=#OOBUF4})
+IF(#OOFacCaseApplBTNFg==0,BIND(grid,cancel),$)
+
+!未齊件
+#OOBUF5=X,41,S
+T(2,#7Aspc+#7Aspc+#OOCustId+#7Aspc+      +000+0)
+
+#OOBTN5=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2921; ntxbuf=#OOBUF5})
+IF(#OOLoanNotYetBTNFg==0,BIND(grid,cancel),$)
+
+!保證人
+#OOBUF6=X,24,S
+T(2,0000000+0000000+#OOCustId)
+
+#OOBTN6=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2020; ntxbuf=#OOBUF6})
+IF(#OOGuarantorBTNFg==0,BIND(grid,cancel),$)
+
+!擔保品
+#OOBUF7=X,49,S
+! T(2,1+   +       +   +       +#OOCustId)
+IF(#OOCustNo == 0,T(2, + +  +       +   +       +#OOCustId+0000000+          + + ),
+                  T(2, + +  +       +   +       +          +#OOCustNo+          + +  )) 
+!T(2,#OOCustNo+0000000000000+ )
+#OOBTN7=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2038; ntxbuf=#OOBUF7})
+IF(#OOClMainBTNFg1==0,BIND(grid,cancel),$)
+
+!共同借款人
+#OOBUF8=X,49,S
+T(2,#OOCustNo+0000000)
+
+#OOBTN8=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2018; ntxbuf=#OOBUF8})
+IF(#OOFacShareApplBTNFg==0,BIND(grid,cancel),$)
+
+
+
+
+
+
+!關聯戶
+#OOBUF11=X,10,S
+T(2,#OOCustId)
+
+#OOBTN11=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1906; ntxbuf=#OOBUF11})
+IF(#OOCustRelBTNFg==0,BIND(grid,cancel),$)
+
+!交互運用
+#OOBUF12=X,11,S
+T(2,2+#OOCustId)
+
+#OOBTN12=X,1,S
+IF(#OOCustCrossBTNFg==0,BIND(grid,{ cmd=CHAIN; ntxcd=L1109; text=未設定; ntxbuf=#OOBUF12}),
+BIND(grid,{ cmd=CHAIN; ntxcd=L1109;text=已設定; ntxbuf=#OOBUF12}))
+
+!顧客電話
+#OOBUF14=X,18,S
+T(2,1+#OOCustId+0000000)
+
+#OOBTN14=X,1,S
+IF(#OOCustTelNoBTNFg==0,BIND(grid,{ cmd=CHAIN; ntxcd=L1905; text=未設定; ntxbuf=#OOBUF14}),
+BIND(grid,{ cmd=CHAIN; ntxcd=L1905;text=已設定; ntxbuf=#OOBUF14}))
+
+!變更修改
+
+#OOBUF13=X,11,S
+T(2,#OOCustId)
+
+#OOBTN13=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; ntxbuf=#OOBUF13})
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustNoSt
+#CustNoEd
+#CustId
+#CustName
+#Mobile
+#IdKind
+#RETURN
+#END
+#RTNTXT
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L1001
+#OOCustMainBTNFg
+#OOCustFinBTNFg
+#OOFacMainBTNFg
+#OOFacCaseApplBTNFg
+#OOLoanNotYetBTNFg
+#OOGuarantorBTNFg
+#OOClMainBTNFg1
+#OOFacShareApplBTNFg
+#OOCustRelBTNFg
+#OOCustCrossBTNFg
+#OOCustTelNoBTNFg
+#OOCustId
+#OOCustNo
+#OOCustTypeCode
+#OOCustName
+^
+
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="L1001" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
+[
+["[L1001]                                 顧客明細資料查詢                                                                                                                         "],
+]
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L1001
+#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN1=顧客
+{width:50,search:false,formatter:'cust:bind-button:顧客',align:'center',canExport:false}
+
+#OOBTN2=財報
+{width:50,search:false,formatter:'cust:bind-button:財報',align:'center',canExport:false}
+
+#OOBTN3=放款
+{width:50,search:false,formatter:'cust:bind-button:放款',align:'center',canExport:false}
+
+#OOBTN4=案件
+{width:50,search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false}
+
+#OOBTN5=未齊件
+{width:55,search:false,formatter:'cust:bind-button:未齊件',align:'center',canExport:false}
+
+#OOBTN6=保證人
+{width:55,search:false,formatter:'cust:bind-button:保證人',align:'center',canExport:false}
+
+#OOBTN7=擔保品
+{width:55,search:false,formatter:'cust:bind-button:擔保品',align:'center',canExport:false}
+
+#OOBTN8=共同</br>借款人
+{width:55,search:false,formatter:'cust:bind-button:額度;L2018 共同借款人資料查詢',align:'center',canExport:false}
+
+#OOBTN11=關聯戶
+{width:55,search:false,formatter:'cust:bind-button:關聯戶',align:'center',canExport:false}
+
+#OOBTN12=交互運用
+{width:85,search:false,formatter:'cust:bind-button:#OOBTN12',align:'center',canExport:false}
+
+#OOBTN14=客戶電話
+{width:85,search:false,formatter:'cust:bind-button:#OOBTN14',align:'center',canExport:false}
+
+#OOCustId=統一編號
+{width:80,align:'center'}
+
+#OOCustNo=戶號
+{width:80,align:'center'}
+
+#OOCustName=戶名
+{width:300,align:'left'}
+
+#OOBTN13=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+^
+
+
+#RPTFG2=2,QUERY.GRID,L1001
+#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60]}
+
+#OOCustId=統一編號
+{width:80,align:'center'}
+
+#OOCustNo=戶號
+{width:80,align:'center'}
+
+#OOCustName=戶名
+{width:300,align:'left'}
+
+^
+
+<include src="PRT.icf::INQ01.sel" map="i=L1001;cpi=15"/>
+#OCustNoSt#OCustNoEd#OCustId#OCustName#OMobile#OTLR_TYPE
+%
+#OOCustId#OOCustNo#OOCASENO#OOFACMNO#OOAPPLNO#OOCustType#OOCustName
+@^
+</sub>

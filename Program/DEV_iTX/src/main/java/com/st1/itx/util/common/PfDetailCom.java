@@ -267,46 +267,39 @@ public class PfDetailCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E0015", "已提前還款，不可變更計件代碼"); // 檢查錯誤
 			}
 		}
-		// 訂正交易，抓原交易，金額相反
+
+		// 業績日期
+		perfDate = iPf.getPerfDate();
+		perfDateF = perfDate + 19110000;
+
+		// 訂正交易
 		if (titaVo.isHcodeErase()) {
 			// 撥款訂定刪除
-			if (titaVo.isHcodeErase()) {
+			if (iPf.getRepayType() == 0) {
 				deleteDetail(iPf);
 				return null;
 			} else {
-				for (PfDetail pf : lPfDetail) {
-					if (iPf.getFacmNo() == pf.getFacmNo() && iPf.getBormNo() == pf.getBormNo()) {
-						if (pf.getBorxNo() == iPf.getBorxNo()) {
-							pfDetail = procPfDetail(iPf, pf.getPieceCode(),
-									BigDecimal.ZERO.subtract(pf.getDrawdownAmt()));
-						}
-					}
-				}
+				// 訂正交易
+				processErase(iPf);
 			}
 		}
 		// 正常交易
 		else {
 			switch (iPf.getRepayType()) {
+
 			case 0:// 撥款
 				processDrawDown(iPf);
+				break;
 
-				break;
 			case 1:// 計件代碼變更
-					// 沖原計件代碼
-				for (PfDetail pf : lPfDetail) {
-					if (iPf.getFacmNo() == pf.getFacmNo() && iPf.getBormNo() == pf.getBormNo()) {
-						if (pf.getDrawdownAmt().compareTo(BigDecimal.ZERO) > 0) {
-							pfDetail = procPfDetail(iPf, pf.getPieceCode(),
-									BigDecimal.ZERO.subtract(pf.getDrawdownAmt()));
-						}
-					}
-				}
-				// 入新計件代碼金額
-				processDrawDown(iPf);
+				processReverse(iPf); // 沖原計件代碼
+				processDrawDown(iPf); // 入新計件代碼金額
 				break;
+
 			case 2:// 部分償還
 			case 3:// 提前結案
-				processExtraRepay(iPf);
+				processExtraRepay(iPf); // 提前還款
+				break;
 			}
 
 		}
@@ -323,6 +316,48 @@ public class PfDetailCom extends TradeBuffer {
 		if (iPf.getPieceCodeSecondAmt().compareTo(iPf.getDrawdownAmt()) < 0) {
 			pfDetail = procPfDetail(iPf, iPf.getPieceCode(),
 					iPf.getDrawdownAmt().subtract(iPf.getPieceCodeSecondAmt()));
+		}
+	}
+
+	// 訂正交易
+	private void processErase(PfDetailVo iPf) throws LogicException {
+		List<PfDetail> lReverse = new ArrayList<PfDetail>(lPfDetail);
+		// 排序 (後進先沖)
+		Collections.sort(lReverse, new Comparator<PfDetail>() {
+			public int compare(PfDetail c1, PfDetail c2) {
+				if (c1.getLogNo() != c2.getLogNo()) {
+					return (c1.getLogNo() > c2.getLogNo() ? -1 : 1);
+				}
+				return 0;
+			}
+		});
+		for (PfDetail pf : lReverse) {
+			if (iPf.getFacmNo() == pf.getFacmNo() && iPf.getBormNo() == pf.getBormNo()) {
+				if (pf.getBorxNo() == iPf.getBorxNo()) {
+					pfDetail = procPfDetail(iPf, pf.getPieceCode(), BigDecimal.ZERO.subtract(pf.getDrawdownAmt()));
+				}
+			}
+		}
+	}
+
+	// 沖回交易
+	private void processReverse(PfDetailVo iPf) throws LogicException {
+		List<PfDetail> lReverse = new ArrayList<PfDetail>(lPfDetail);
+		// 排序 (後進先沖)
+		Collections.sort(lReverse, new Comparator<PfDetail>() {
+			public int compare(PfDetail c1, PfDetail c2) {
+				if (c1.getLogNo() != c2.getLogNo()) {
+					return (c1.getLogNo() > c2.getLogNo() ? -1 : 1);
+				}
+				return 0;
+			}
+		});
+		for (PfDetail pf : lReverse) {
+			if (iPf.getFacmNo() == pf.getFacmNo() && iPf.getBormNo() == pf.getBormNo()) {
+				if (pf.getDrawdownAmt().compareTo(BigDecimal.ZERO) != 0) {
+					pfDetail = procPfDetail(iPf, pf.getPieceCode(), BigDecimal.ZERO.subtract(pf.getDrawdownAmt()));
+				}
+			}
 		}
 	}
 
@@ -417,10 +452,10 @@ public class PfDetailCom extends TradeBuffer {
 
 		// 寫入介紹、協辦獎金發放檔
 		updReward(pf);
-		
+
 		// add to List
 		lPfDetail.add(pf);
-		
+
 		return pf;
 	}
 
@@ -650,7 +685,7 @@ public class PfDetailCom extends TradeBuffer {
 		// 累計原先同額度之累計撥款金額、累計提前償還金額
 		if (lPfDetail != null) {
 			for (PfDetail it : lPfDetail) {
-				if (it.getFacmNo() == pf.getFacmNo() && it.getPieceCode().equals(it.getPieceCode())) {
+				if (it.getFacmNo() == pf.getFacmNo() && it.getPieceCode().equals(pf.getPieceCode())) {
 					if (it.getRepayType() == 0) {
 						drawDownAmtFac = drawDownAmtFac.add(it.getDrawdownAmt());
 					}
@@ -709,24 +744,20 @@ public class PfDetailCom extends TradeBuffer {
 // ConditionCode	條件記號
 //  1.篩選條件-計件代碼
 //	       以計件代碼為篩選條件，可選擇多筆計件代碼；
-//  2.排除條件-商品代號
-//      以商品代碼為排除條件，可選擇多商品代碼。
 //  3.金額級距 
 //	       勵津貼發放條件為新貸案件及撥貸金額達到一定級距時可領取該級距的津貼：		
 //		撥貸金額60萬以上 ~ 500(含)萬，津貼200元
 //		撥貸金額500萬以上~1000(含)萬，津貼500元
 //		撥貸金額1000萬以上          ，津貼1200元
-//  
+// 同一額度、同一撥款工作月累計計算  
 // 撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件，依還款金額追回各級人員介紹獎金和協辦津貼等各項獎勵。
 		BigDecimal drawDownAmtFac = BigDecimal.ZERO;
 		BigDecimal preRepayAmtFac = BigDecimal.ZERO;
 		BigDecimal addBonusFac = BigDecimal.ZERO;
-		// 累計原先同一案件累計撥款金額、累計提前償還金額(繳期數=0)、協辦獎金
 		if (lPfDetail != null) {
 			for (PfDetail it : lPfDetail) {
 				if (isAddBonus(it.getPieceCode(), lCdBonus)) {
-					if ((pf.getCreditSysNo() > 0 && it.getCreditSysNo() == pf.getCreditSysNo())
-							|| (pf.getCreditSysNo() == 0 && it.getFacmNo() == pf.getFacmNo())) {
+					if (it.getFacmNo() == pf.getFacmNo() && it.getWorkMonth() == workMonthDrawdown) {
 						addBonusFac = addBonusFac.add(it.getItAddBonus());
 						if (it.getRepayType() == 0) {
 							drawDownAmtFac = drawDownAmtFac.add(it.getDrawdownAmt());
@@ -740,19 +771,28 @@ public class PfDetailCom extends TradeBuffer {
 				}
 			}
 		}
+		BigDecimal computeAddBonusAmt = BigDecimal.ZERO;
+		// 額度累計計算金額
 		// 累計本次撥款金額、提前償還金額
 		if (pf.getRepayType() == 0) {
 			drawDownAmtFac = drawDownAmtFac.add(pf.getDrawdownAmt());
+			computeAddBonusAmt = drawDownAmtFac;
 		}
 		if (pf.getRepaidPeriod() == 0) {
 			if (pf.getRepayType() == 2 || pf.getRepayType() == 3) {
 				preRepayAmtFac = preRepayAmtFac.add(pf.getDrawdownAmt());
 			}
+			if (drawDownAmtFac.add(preRepayAmtFac).compareTo(BigDecimal.ZERO) <= 0) {
+				computeAddBonusAmt = BigDecimal.ZERO;
+			} else if (preRepayAmtFac.add(this.txBuffer.getSystemParas().getPerfBackRepayAmt())
+					.compareTo(BigDecimal.ZERO) <= 0) {
+				computeAddBonusAmt = drawDownAmtFac.add(preRepayAmtFac);
+			} else {
+				computeAddBonusAmt = drawDownAmtFac;
+			}
 		}
 
-		BigDecimal computeAddBonusAmt = BigDecimal.ZERO;
-		// 同一案件編號撥款累計扣除未逾一個月即結清(含部分還款達60萬元)
-		// 額度累計計算金額
+		// 同一額度撥款累計扣除未逾一個月即結清(含部分還款達60萬元)
 		if (drawDownAmtFac.add(preRepayAmtFac).compareTo(BigDecimal.ZERO) <= 0) {
 			computeAddBonusAmt = BigDecimal.ZERO;
 		} else if (preRepayAmtFac.add(this.txBuffer.getSystemParas().getPerfBackRepayAmt())
@@ -834,8 +874,9 @@ public class PfDetailCom extends TradeBuffer {
 // 獎勵津貼-初階授信通過	classPassBonus		
 //   初級   900中級 1,100高級 1,300 		
 
+// 同一額度、同一撥款工作月累計計算
 // 撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件，依還款金額追回各級人員介紹獎金和協辦津貼等各項獎勵
-// 依同一案件編號累計計算，追回未逾一個月即結清(含部分還款達60萬元)
+// 依同一額度累計計算，追回未逾一個月即結清(含部分還款達60萬元)
 
 		BigDecimal drawDownAmtFac = BigDecimal.ZERO;
 		BigDecimal preRepayAmtFac = BigDecimal.ZERO;
@@ -844,8 +885,7 @@ public class PfDetailCom extends TradeBuffer {
 		if (lPfDetail != null) {
 			for (PfDetail it : lPfDetail) {
 				if (isCoBonus(it.getPieceCode(), lCdBonusCo)) {
-					if ((pf.getCreditSysNo() > 0 && it.getCreditSysNo() == pf.getCreditSysNo())
-							|| (pf.getCreditSysNo() == 0 && it.getFacmNo() == pf.getFacmNo())) {
+					if (it.getFacmNo() == pf.getFacmNo() && it.getWorkMonth() == workMonthDrawdown) {
 						coBonusFac = coBonusFac.add(it.getCoorgnizerBonus());
 						if (it.getRepayType() == 0) {
 							drawDownAmtFac = drawDownAmtFac.add(it.getDrawdownAmt());
@@ -870,7 +910,7 @@ public class PfDetailCom extends TradeBuffer {
 		}
 
 		BigDecimal computeCoBonusAmt = BigDecimal.ZERO;
-		// 同一案件編號撥款累計扣除未逾一個月即結清(含部分還款達60萬元)
+		// 同一額度撥款累計扣除未逾一個月即結清(含部分還款達60萬元)
 		// 額度累計計算金額
 		if (drawDownAmtFac.add(preRepayAmtFac).compareTo(BigDecimal.ZERO) <= 0) {
 			computeCoBonusAmt = BigDecimal.ZERO;
@@ -991,12 +1031,15 @@ public class PfDetailCom extends TradeBuffer {
 				}
 			}
 		}
-		// 介紹人是否為15日薪(Y/Null)
+		// 介紹人是否為15日薪(Y/Null)，單位代號(介紹人)
 		if (!"".equals(pf.getIntroducer())) {
 			CdEmp tCdEmp = cdEmpService.findById(pf.getIntroducer(), titaVo);
 			if (tCdEmp != null) {
 				if (employeeCom.isDay15Salary(tCdEmp, titaVo)) {
 					pf.setIsIntroducerDay15("Y");
+				}
+				if ("".equals(pf.getUnitCode())) {
+					pf.setUnitCode(tCdEmp.getCenterCode());
 				}
 			}
 		}
@@ -1012,7 +1055,7 @@ public class PfDetailCom extends TradeBuffer {
 		}
 
 		// 區部、部室及處經理代號、區經理代號、部經理代號
-		if (pf.getUnitCode().trim().length() > 0 && pf.getDistCode().trim().length() == 0) {
+		if (!"".equals(pf.getUnitCode()) && "".equals(pf.getDistCode())) {
 			// 分公司資料檔
 			CdBcm tCdBcm = cdBcmService.findById(pf.getUnitCode(), titaVo);
 			if (tCdBcm != null) {
@@ -1034,7 +1077,7 @@ public class PfDetailCom extends TradeBuffer {
 			}
 		}
 		// 部室代號找該月份房貸專員業績目標檔
-		if (pf.getBsOfficer().trim().length() > 0 && pf.getBsDeptCode().trim().length() == 0) {
+		if (!"".equals(pf.getBsOfficer()) && "".equals(pf.getBsDeptCode())) {
 			PfBsOfficer tPfBsOfficer = pfBsOfficerService
 					.findById(new PfBsOfficerId(workMonthDrawdown, pf.getBsOfficer()), titaVo);
 			if (tPfBsOfficer != null) {
@@ -1071,7 +1114,7 @@ public class PfDetailCom extends TradeBuffer {
 		this.info("PfDetailCom updItDetail .....");
 		boolean isInsert = true;
 		PfItDetail tPfItDetail = pfItDetailService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
-				pf.getPerfDate(), pf.getRepayType(), pf.getPieceCode(), titaVo);
+				perfDateF, pf.getRepayType(), pf.getPieceCode(), titaVo);
 		if (tPfItDetail != null) {
 			isInsert = false;
 			tPfItDetail = pfItDetailService.holdById(tPfItDetail, titaVo);
@@ -1141,7 +1184,7 @@ public class PfDetailCom extends TradeBuffer {
 		this.info("PfDetailCom updBsDetail .....");
 		boolean isInsert = true;
 		PfBsDetail tPfBsDetail = pfBsDetailService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
-				pf.getPerfDate(), pf.getRepayType(), pf.getPieceCode(), titaVo);
+				perfDateF, pf.getRepayType(), pf.getPieceCode(), titaVo);
 		if (tPfBsDetail != null) {
 			isInsert = false;
 			tPfBsDetail = pfBsDetailService.holdById(tPfBsDetail, titaVo);
@@ -1184,10 +1227,10 @@ public class PfDetailCom extends TradeBuffer {
 
 	// 寫入介紹、協辦獎金發放檔
 	private void updReward(PfDetail pf) throws LogicException {
-		this.info("PfDetailCom updReward .....");
 		boolean isInsert = true;
-		PfReward tPfReward = pfRewardService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(),
-				pf.getPerfDate(), pf.getRepayType(), pf.getPieceCode(), titaVo);
+		PfReward tPfReward = pfRewardService.findByTxFirst(pf.getCustNo(), pf.getFacmNo(), pf.getBormNo(), perfDateF,
+				pf.getRepayType(), pf.getPieceCode(), titaVo);
+
 		if (tPfReward != null) {
 			isInsert = false;
 			tPfReward = pfRewardService.holdById(tPfReward, titaVo);
@@ -1200,6 +1243,7 @@ public class PfDetailCom extends TradeBuffer {
 			tPfReward.setRepayType(pf.getRepayType()); // 還款類別
 			tPfReward.setPieceCode(pf.getPieceCode()); // 計件代碼
 		}
+		this.info("PfDetailCom isInsert " + isInsert);
 		tPfReward.setProdCode(pf.getProdCode()); // 商品代碼
 		tPfReward.setCoorgnizer(pf.getCoorgnizer()); // 協辦人員編
 		tPfReward.setInterviewerA(pf.getInterviewerA()); // 晤談一員編

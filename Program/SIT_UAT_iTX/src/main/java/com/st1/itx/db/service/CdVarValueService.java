@@ -47,6 +47,15 @@ public interface CdVarValueService {
   public Slice<CdVarValue> findYearMonth(int yearMonth_0, int yearMonth_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * YearMonth &lt;= 
+   *
+   * @param yearMonth_0 yearMonth_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdVarValue CdVarValue of List
+   */
+  public CdVarValue findYearMonthFirst(int yearMonth_0, TitaVo... titaVo);
+
+  /**
    * hold By CdVarValue
    * 
    * @param yearMonth key

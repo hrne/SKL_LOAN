@@ -24,6 +24,9 @@ public interface CdVarValueRepository extends JpaRepository<CdVarValue, Integer>
   // YearMonth >= ,AND YearMonth <= 
   public Slice<CdVarValue> findAllByYearMonthGreaterThanEqualAndYearMonthLessThanEqualOrderByYearMonthAsc(int yearMonth_0, int yearMonth_1, Pageable pageable);
 
+  // YearMonth <= 
+  public Optional<CdVarValue> findTopByYearMonthLessThanEqualOrderByYearMonthDesc(int yearMonth_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -27,7 +27,7 @@
 !    L2R13 : 尋找員工檔是否為協辦人員
 !    L2R14 : 以戶號額度尋找主要擔保品
 !    L2R15 : 尋找關係人明細資料
-!    L2R16 : 尋找利害關係人親屬檔資料
+!    L2R16 : 尋找交易關係人資料
 !    L2R17 : 尋找利害關係人相關事業檔資料
 !    L2R18 : 尋找(準)利害關係人主檔資料
 !    L2R19 : 尋找(準)利害關係人親屬檔資料
@@ -2033,16 +2033,24 @@ TXFORM=L2R10
 
 !以以核准編號尋找擔保品
 <L2R11.dec>
-##loop {times:10,i:1}
+##loop {times:20,i:1}
 #L2r11ClKey{i}=X,12,S
+#L2r11ApplNo{i}=A,7,S
+#L2r11CustNo{i}=A,7,S
+#L2r11FacmNo{i}=A,3,S
+#L2r11MainFlag{i}=X,1,S
 #L2r11EvaAmt{i}=m,14.2,S
 ##end
 </L2R11.dec>
 
 <L2R11.tom>
 TXFORM=L2R11
-##loop {times:10,i:1}
+##loop {times:20,i:1}
 #L2r11ClKey{i}
+#L2r11ApplNo{i}
+#L2r11CustNo{i}
+#L2r11FacmNo{i}
+#L2r11MainFlag{i}
 #L2r11EvaAmt{i}
 ##end
 ^
@@ -2112,22 +2120,18 @@ TXFORM=L2R15
 </L2R15.tom>
 
 
-!以統一編號序號尋找利害關係人親屬檔資料
+!尋找交易關係人資料
 <L2R16.dec>
-#L2r16ReltSeq=A,2,S
-#L2r16BloodInd=A,1,S
-#L2r16FamilyInd=A,2,S
-#L2r16FamilyId=X,10,S
-#L2r16FamilyName=c,100,S
+#L2r16DataStatus=A,1,S
+#L2r16CustName=X,100,S
+#L2r16FacRelationCode=A,2,S
 </L2R16.dec>
 
 <L2R16.tom>
 TXFORM=L2R16
-#L2r16ReltSeq
-#L2r16BloodInd
-#L2r16FamilyInd
-#L2r16FamilyId
-#L2r16FamilyName
+#L2r16DataStatus
+#L2r16CustName
+#L2r16FacRelationCode
 ^
 </L2R16.tom>
 
@@ -2630,9 +2634,12 @@ TXFORM=L2R26
 #L2r27ParkingTypeCode{i}=x,1,S
 #L2r27ParkingOwnerPart{i}=m,10,S
 #L2r27ParkingOwnerTotal{i}=m,10,S
+#L2r27ParkingBdNoA{i}=X,5,S
+#L2r27ParkingBdNoB{i}=X,3,S
 #L2r27ParkingLandNoA{i}=X,4,S
 #L2r27ParkingLandNoB{i}=X,4,S
 #L2r27ParkingArea{i}=m,14.2,S
+#L2r27ParkingAmount{i}=m,14.2,S
 ##end
 </L2R27.dec>
 
@@ -2698,9 +2705,12 @@ TXFORM=L2R27
 #L2r27ParkingTypeCode{i}
 #L2r27ParkingOwnerPart{i}
 #L2r27ParkingOwnerTotal{i}
+#L2r27ParkingBdNoA{i}
+#L2r27ParkingBdNoB{i}
 #L2r27ParkingLandNoA{i}
 #L2r27ParkingLandNoB{i}
 #L2r27ParkingArea{i}
+#L2r27ParkingAmount{i}
 ##end
 ^
 </L2R27.tom>
@@ -3450,6 +3460,8 @@ TXFORM=L3R01
 #L3r02NotYetFlag=X,1,S
 #L3r02RenewFlag=X,1,S
 #L3r02PieceCode=X,1,S
+#L3r02PieceCodeSecond=X,1,S
+#L3r02PieceCodeSecondAmt=m,14.2,S
 #L3r02UsageCode=A,2,S
 #L3r02SyndNo=A,3,S
 #L3r02RelationCode=X,2,S
@@ -3518,6 +3530,8 @@ TXFORM=L3R02
 #L3r02NotYetFlag
 #L3r02RenewFlag
 #L3r02PieceCode
+#L3r02PieceCodeSecond
+#L3r02PieceCodeSecondAmt
 #L3r02UsageCode
 #L3r02SyndNo
 #L3r02RelationCode
@@ -4311,12 +4325,14 @@ TXFORM=L1R12
 </L1R12Rim.dec>
 
 <L1R13.dec>
+#L1R13CustName=X,100,S
 #L1R13MsgFg=X,1,S
 #L1R13EmailFg=X,1,S
 </L1R13.dec>
 
 <L1R13.tom>
 TXFORM=L1R13
+#L1R13CustName
 #L1R13MsgFg
 #L1R13EmailFg
 ^
@@ -6539,7 +6555,6 @@ TXFORM=L8R26
 #L8r27TranKey=X,1,S
 #L8r27CustId=X,10,S
 #L8r27SubmitKey=X,3,S
-#L8r27SubmitKeyX=X,80,S
 #L8r27CaseStatus=X,1,S
 #L8r27ClaimDate=D,7,S
 #L8r27CourtCode=X,3,S
@@ -6566,7 +6581,6 @@ TXFORM=L8R27
 #L8r27TranKey
 #L8r27CustId
 #L8r27SubmitKey
-#L8r27SubmitKeyX
 #L8r27CaseStatus
 #L8r27ClaimDate
 #L8r27CourtCode

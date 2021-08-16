@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,7 +19,7 @@ import com.st1.itx.db.service.springjpa.cm.L5511ServiceImpl;
 @Scope("prototype")
 
 public class L5511Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L5511Report.class);
+	private static final Logger logger = LoggerFactory.getLogger(L5511Report.class);
 
 	@Autowired
 	public L5511ServiceImpl l5511ServiceImpl;
@@ -83,7 +85,7 @@ public class L5511Report extends MakeReport {
 		this.setFont(1, 10);
 		this.setCharSpaces(0);
 
-		this.setLineSpaces(2);
+	//	this.setLineSpaces(2);
 		
 		this.setBeginRow(12);
 		this.setMaxRows(50);
@@ -121,8 +123,8 @@ public class L5511Report extends MakeReport {
 			DecimalFormat df = new DecimalFormat("###,###,###");
 
 			for (Map<String, String> mapL5511 : L5511List) {
-				this.info("L5511Reort L5511List count =" + ++rCnt);
-				this.info(rCnt + "=" + mapL5511.get("F0") + "/" + mapL5511.get("F1") + "/" + mapL5511.get("F2") + "/" + mapL5511.get("F3"));
+				logger.info("L5511Reort L5511List count =" + ++rCnt);
+				logger.info(rCnt + "=" + mapL5511.get("F0") + "/" + mapL5511.get("F1") + "/" + mapL5511.get("F2") + "/" + mapL5511.get("F3"));
 
 				if (!"".equals(employeeNo) && !employeeNo.equals(mapL5511.get("F2"))) {
 

@@ -136,7 +136,7 @@ public class L2111 extends TradeBuffer {
 			tFacCaseAppl.setApplNo(wkApplNo);
 			FacCaseApplRoutine();
 			try {
-				facCaseApplService.insert(tFacCaseAppl);
+				facCaseApplService.insert(tFacCaseAppl,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E2009", e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
@@ -158,7 +158,7 @@ public class L2111 extends TradeBuffer {
 				FacCaseApplRoutine();
 			}
 			try {
-				facCaseApplService.update(tFacCaseAppl);
+				facCaseApplService.update(tFacCaseAppl,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E2010", "案件申請檔"); // 更新資料時，發生錯誤
 			}

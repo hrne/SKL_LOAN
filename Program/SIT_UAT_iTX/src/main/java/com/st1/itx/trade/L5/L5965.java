@@ -15,7 +15,6 @@ import com.st1.itx.db.domain.CollRemind;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CollRemindService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
 
 @Component("L5965")
 @Scope("prototype")
@@ -29,9 +28,6 @@ import com.st1.itx.util.parse.Parse;
 
 public class L5965 extends TradeBuffer {
 	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
-
 	@Autowired
 	public CollRemindService collremindservice;
 

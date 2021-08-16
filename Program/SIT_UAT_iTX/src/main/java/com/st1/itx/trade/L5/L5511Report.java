@@ -85,7 +85,7 @@ public class L5511Report extends MakeReport {
 		this.setFont(1, 10);
 		this.setCharSpaces(0);
 
-		this.setLineSpaces(2);
+	//	this.setLineSpaces(2);
 		
 		this.setBeginRow(12);
 		this.setMaxRows(50);
@@ -123,8 +123,8 @@ public class L5511Report extends MakeReport {
 			DecimalFormat df = new DecimalFormat("###,###,###");
 
 			for (Map<String, String> mapL5511 : L5511List) {
-				this.info("L5511Reort L5511List count =" + ++rCnt);
-				this.info(rCnt + "=" + mapL5511.get("F0") + "/" + mapL5511.get("F1") + "/" + mapL5511.get("F2") + "/" + mapL5511.get("F3"));
+				logger.info("L5511Reort L5511List count =" + ++rCnt);
+				logger.info(rCnt + "=" + mapL5511.get("F0") + "/" + mapL5511.get("F1") + "/" + mapL5511.get("F2") + "/" + mapL5511.get("F3"));
 
 				if (!"".equals(employeeNo) && !employeeNo.equals(mapL5511.get("F2"))) {
 

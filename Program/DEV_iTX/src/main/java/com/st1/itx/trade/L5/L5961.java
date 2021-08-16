@@ -16,7 +16,6 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CollTelService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Component("L5961")
 @Scope("prototype")
@@ -31,13 +30,10 @@ import com.st1.itx.util.parse.Parse;
 public class L5961 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
-
-	@Autowired
 	public CollTelService iCollTelService;
 
 	@Autowired
-	public DateUtil dateUtil;
+	public DateUtil iDateUtil;
 
 	@Autowired
 	public CdEmpService iCdEmpService;
@@ -133,11 +129,11 @@ public class L5961 extends TradeBuffer {
 
 	private int Dealdate(int txDate, int iMonth) throws LogicException {
 		int retxdate = 0;
-		dateUtil.init();
-		dateUtil.setDate_1(txDate);
-		dateUtil.setMons(iMonth);
+		iDateUtil.init();
+		iDateUtil.setDate_1(txDate);
+		iDateUtil.setMons(iMonth);
 
-		retxdate = dateUtil.getCalenderDay();
+		retxdate = iDateUtil.getCalenderDay();
 
 		return retxdate;
 	}

@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -109,7 +107,6 @@ import com.st1.itx.util.common.data.PfDetailVo;
 @Service("L3100")
 @Scope("prototype")
 public class L3100 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3100.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -828,20 +825,21 @@ public class L3100 extends TradeBuffer {
 	// 業績處理
 	private void PfDetailRoutine() throws LogicException {
 		this.info("   PfDetailRoutine ...");
-
+		pfDetailCom.setTxBuffer(this.getTxBuffer());
 		PfDetailVo pf = new PfDetailVo();
 		pf.setCustNo(iCustNo); // 借款人戶號
 		pf.setFacmNo(iFacmNo); // 額度編號
 		pf.setBormNo(wkBormNo); // 撥款序號
 		pf.setBorxNo(tLoanBorMain.getLastBorxNo()); // 交易內容檔序號
-		pf.setPieceCode(tLoanBorMain.getPieceCode()); // 計件代碼
-		pf.setRepayType(0); // 還款類別 0.撥款 2.部分償還 3.提前結案
+		pf.setRepayType(0); // 還款類別 0.撥款
 		pf.setDrawdownAmt(tLoanBorMain.getDrawdownAmt());// 撥款金額/追回金額
+		pf.setPieceCode(tLoanBorMain.getPieceCode()); // 計件代碼
+		pf.setPieceCodeSecond(tLoanBorMain.getPieceCodeSecond()); // 計件代碼2
+		pf.setPieceCodeSecondAmt(tLoanBorMain.getPieceCodeSecondAmt());// 計件代碼2金額
 		pf.setDrawdownDate(tLoanBorMain.getDrawdownDate());// 撥款日期
 		pf.setRepaidPeriod(0); // 已攤還期數
+		pfDetailCom.addDetail(pf, titaVo);
 
-		pfDetailCom.setTxBuffer(this.getTxBuffer());
-		pfDetailCom.addDetail(pf, titaVo); // 產生業績明細
 	}
 
 	// -------------------------------------------------------------------------------
@@ -898,6 +896,8 @@ public class L3100 extends TradeBuffer {
 		tLoanBorMain.setNotYetFlag(titaVo.getParam("NotYetFlag"));
 		tLoanBorMain.setRenewFlag(titaVo.getParam("RenewFlag"));
 		tLoanBorMain.setPieceCode(titaVo.getParam("PieceCode"));
+		tLoanBorMain.setPieceCodeSecond(titaVo.getParam("PieceCodeSecond"));
+		tLoanBorMain.setPieceCodeSecondAmt(parse.stringToBigDecimal(titaVo.getParam("TimPieceCodeSecondAmt")));
 		tLoanBorMain.setUsageCode(titaVo.getParam("UsageCode"));
 		tLoanBorMain.setSyndNo(this.parse.stringToInteger(titaVo.getParam("SyndNo")));
 

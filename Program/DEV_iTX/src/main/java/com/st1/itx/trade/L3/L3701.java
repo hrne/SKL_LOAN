@@ -132,7 +132,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3701")
 @Scope("prototype")
 public class L3701 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3701.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -188,6 +187,8 @@ public class L3701 extends TradeBuffer {
 	private String iSpecificDdY;
 	private String iAcctFeeY;
 	private String iPieceCodeY;
+	private String iPieceCodeSecondY;
+	private String iPieceCodeSecondAmtY;
 	private String iRemarkY;
 	private String iProcessDateY;
 	private String iIntCalcCodeY;
@@ -271,6 +272,8 @@ public class L3701 extends TradeBuffer {
 		iSpecificDdY = titaVo.getParam("SpecificDdY");
 		iAcctFeeY = titaVo.getParam("AcctFeeY");
 		iPieceCodeY = titaVo.getParam("PieceCodeY");
+		iPieceCodeSecondY = titaVo.getParam("PieceCodeSecondY");
+		iPieceCodeSecondAmtY = titaVo.getParam("PieceCodeSecondAmtY");
 		iRemarkY = titaVo.getParam("RemarkY");
 		iProcessDateY = titaVo.getParam("ProcessDateY");
 		iIntCalcCodeY = titaVo.getParam("IntCalcCodeY");
@@ -323,8 +326,8 @@ public class L3701 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		if (iPieceCodeY.equals("X") && iBormNo == 0) {
-			throw new LogicException(titaVo, "E0019", "變更計件代碼需輸入撥款序號"); // E0019 輸入資料錯誤
+		if (iPieceCodeY.equals("X")||iPieceCodeSecondY.equals("X")||(iPieceCodeSecondAmtY.equals("X")) && iBormNo == 0) {
+			throw new LogicException(titaVo, "E0019", "變更計件代碼相關欄位需輸入撥款序號"); // E0019 輸入資料錯誤
 		}
 
 		if (iAcctCodeY.equals("X") && iBormNo != 0) {
@@ -477,6 +480,10 @@ public class L3701 extends TradeBuffer {
 				datalog.exec(iRemark);
 			}
 			wkTotaCount++;
+			// 計件代碼、計件代碼2或計件代碼2金額變更，新增業績處理明細
+			if (iPieceCodeY.equals("X") || iPieceCodeSecondY.equals("X") || iPieceCodeSecondAmtY.equals("X")) {
+				PfDetailRoutine();
+			}
 		}
 	}
 
@@ -657,8 +664,8 @@ public class L3701 extends TradeBuffer {
 					"撥款主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + wkBormNo + e.getErrorMsg()); // 新增資料時，發生錯誤
 		}
 
-		// 計件代碼變更，新增業績處理明細
-		if (iPieceCodeY.equals("X")) {
+		// 計件代碼、計件代碼2或計件代碼2金額變更，新增業績處理明細
+		if (iPieceCodeY.equals("X") || iPieceCodeSecondY.equals("X") || iPieceCodeSecondAmtY.equals("X")) {
 			PfDetailRoutine();
 		}
 
@@ -1046,6 +1053,8 @@ public class L3701 extends TradeBuffer {
 		tTemp1Vo.putParam("RelBirdy1", tLoanBorMain.getRelationBirthday());
 		tTemp1Vo.putParam("RelGender1", tLoanBorMain.getRelationGender());
 		tTemp1Vo.putParam("PieceCode1", tLoanBorMain.getPieceCode());
+		tTemp1Vo.putParam("PieceCodeSecond1", tLoanBorMain.getPieceCodeSecond());
+		tTemp1Vo.putParam("PieceCodeSecondAmt1", tLoanBorMain.getPieceCodeSecondAmt());
 		tTemp1Vo.putParam("IntCalcCode1", tLoanBorMain.getIntCalcCode());
 
 		//
@@ -1069,6 +1078,8 @@ public class L3701 extends TradeBuffer {
 		tTemp2Vo.putParam("RelBirdy1", tLoanBorMain.getRelationBirthday());
 		tTemp2Vo.putParam("RelGender1", tLoanBorMain.getRelationGender());
 		tTemp2Vo.putParam("PieceCode1", tLoanBorMain.getPieceCode());
+		tTemp2Vo.putParam("PieceCodeSecond1", tLoanBorMain.getPieceCodeSecond());
+		tTemp2Vo.putParam("PieceCodeSecondAmt1", tLoanBorMain.getPieceCodeSecondAmt());
 		tTemp2Vo.putParam("IntCalcCode1", tLoanBorMain.getIntCalcCode());
 		//
 		tTemp2Vo.putParam("LnTmYy1", tLoanBorMain.getLoanTermYy());
@@ -1418,6 +1429,25 @@ public class L3701 extends TradeBuffer {
 			tTemp1Vo.putParam("PieceCode2", titaVo.getParam("PieceCode2"));
 			tLoanBorMain.setPieceCode(titaVo.getParam("PieceCode2"));
 		}
+
+		// 計件代碼2
+		if (iPieceCodeSecondY.equals("X")) {
+			updLoanBorMain = true;
+			tTemp2Vo.putParam("PieceCodeSecondY", iPieceCodeSecondY);
+			tTemp1Vo.putParam("PieceCodeSecondY", iPieceCodeSecondY);
+			tTemp1Vo.putParam("PieceCodeSecond2", titaVo.getParam("PieceCodeSecond2"));
+			tLoanBorMain.setPieceCodeSecond(titaVo.getParam("PieceCodeSecond2"));
+		}
+
+		// 計件代碼2金額
+		if (iPieceCodeSecondAmtY.equals("X")) {
+			updLoanBorMain = true;
+			tTemp2Vo.putParam("PieceCodeSecondAmtY", iPieceCodeSecondAmtY);
+			tTemp1Vo.putParam("PieceCodeSecondAmtY", iPieceCodeSecondAmtY);
+			tTemp1Vo.putParam("PieceCodeSecondAmt2", titaVo.getParam("PieceCodeSecondAmt2"));
+			tLoanBorMain.setPieceCodeSecondAmt(parse.stringToBigDecimal(titaVo.getParam("PieceCodeSecondAmt2")));
+		}
+
 		// 計息方式
 		if (iIntCalcCodeY.equals("X")) {
 			updLoanBorMain = true;
@@ -1844,6 +1874,15 @@ public class L3701 extends TradeBuffer {
 		if (tTemp1Vo.getParam("PieceCodeY").equals("X")) {
 			tLoanBorMain.setPieceCode(tTemp1Vo.getParam("PieceCode1"));
 		}
+		// 計件代碼2
+		if (tTemp1Vo.getParam("PieceCodeSecondY").equals("X")) {
+			tLoanBorMain.setPieceCodeSecond(tTemp1Vo.getParam("PieceCodeSecond1"));
+		}
+		// 計件代碼2金額
+		if (tTemp1Vo.getParam("PieceCodeSecondAmtY").equals("X")) {
+			tLoanBorMain.setPieceCodeSecondAmt(parse.stringToBigDecimal(tTemp1Vo.getParam("PieceCodeSecondAmt1")));
+		}
+
 		// 計息方式
 		if (tTemp1Vo.getParam("IntCalcCodeY").equals("X")) {
 			tLoanBorMain.setIntCalcCode(tTemp1Vo.getParam("IntCalcCode1"));
@@ -1926,17 +1965,20 @@ public class L3701 extends TradeBuffer {
 	// 新增業績處理明細
 	private void PfDetailRoutine() throws LogicException {
 		this.info("PfDetailRoutine ...");
+		pfDetailCom.setTxBuffer(this.getTxBuffer());
 		PfDetailVo pf = new PfDetailVo();
 		pf.setCustNo(tLoanBorMain.getCustNo()); // 借款人戶號
 		pf.setFacmNo(tLoanBorMain.getFacmNo()); // 額度編號
 		pf.setBormNo(tLoanBorMain.getBormNo()); // 撥款序號
-		pf.setBorxNo(tLoanBorMain.getLastBorxNo()); // 交易內容檔序號
+		pf.setBorxNo(wkBorxNo); // 交易內容檔序號
+		pf.setRepayType(1); // 還款類別 1.計件代碼變更
+		pf.setDrawdownAmt(tLoanBorMain.getDrawdownAmt());// 撥款金額/追回金額
 		pf.setPieceCode(tLoanBorMain.getPieceCode()); // 計件代碼
-		pf.setRepayType(9); // 還款類別 0.撥款 2.部分償還 3.提前結案 9.計件代碼變更
-		pf.setDrawdownAmt(BigDecimal.ZERO);// 撥款金額/追回金額
+		pf.setPieceCodeSecond(tLoanBorMain.getPieceCodeSecond()); // 計件代碼2
+		pf.setPieceCodeSecondAmt(tLoanBorMain.getPieceCodeSecondAmt());// 計件代碼2金額
 		pf.setDrawdownDate(tLoanBorMain.getDrawdownDate());// 撥款日期
 		pf.setRepaidPeriod(tLoanBorMain.getRepaidPeriod()); // 已攤還期數
-		pfDetailCom.setTxBuffer(this.getTxBuffer());
 		pfDetailCom.addDetail(pf, titaVo);
 	}
+
 }

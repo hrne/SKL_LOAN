@@ -64,7 +64,7 @@ public class L2072 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L2072 ");
+		logger.info("active L2072 ");
 		this.totaVo.init(titaVo);
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -72,7 +72,7 @@ public class L2072 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 100; // 29 * 500 = 14500
+		this.limit = 500; // 29 * 500 = 14500
 
 		// tita
 		// 戶號
@@ -85,17 +85,6 @@ public class L2072 extends TradeBuffer {
 		// new ArrayList
 		List<CustRmk> lCustRmk = new ArrayList<CustRmk>();
 		Slice<CustRmk> slCustRmk = null;
-		// 調所有經辦號碼跟名稱
-		List<CdEmp> lCdEmp = new ArrayList<CdEmp>();
-		Slice<CdEmp> slCdEmp = null;
-		
-		slCdEmp = sCdEmpService.findAll(this.index, this.limit, titaVo);
-		lCdEmp = slCdEmp == null ? null : slCdEmp.getContent();
-		
-		if (lCdEmp == null) {
-			throw new LogicException(titaVo, "", "不存在使用者資料。");
-		}
-		
 		
 		// PK
 //		CustRmkId CustRmkId = new CustRmkId();
@@ -118,9 +107,10 @@ public class L2072 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();
 		}
 		
-		Boolean checkno = false;
+		CdEmp tCdEmp = new CdEmp();
+		
 		for (CustRmk tCustRmk : lCustRmk) {
-			this.info("tCustRmk---->" + tCustRmk);
+			logger.info("tCustRmk---->" + tCustRmk);
 			// new occurs
 			OccursList occurslist = new OccursList();
 
@@ -134,43 +124,30 @@ public class L2072 extends TradeBuffer {
 			
 
 			occurslist.putParam("OOEmpNo",tempEmpNo);
-			this.info("OOEmpNo---->" + tempEmpNo);
-			for(CdEmp tCdEmp: lCdEmp) {
-				if(tCdEmp.getEmployeeNo().equals(tempEmpNo)) {
-					occurslist.putParam("OOEmpName",tCdEmp.getFullname());
-					this.info("OOEmpName---->" + tCdEmp.getFullname());
-					checkno = true;
-				}
-			} // for
 			
-			if(checkno) {
-				checkno = false;
-			} else {
-				occurslist.putParam("OOEmpName","          ");				
+			occurslist.putParam("OOEmpName", ""); // 建檔人員姓名
+			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);	
+		
+			if( tCdEmp != null) {
+				occurslist.putParam("OOEmpName", tCdEmp.getFullname()); // 建檔人員姓名
 			}
+			
 			
 			
 			occurslist.putParam("OOUpdateEmpNo",updateEmpNo);
-			this.info("OOUpdateEmpNo---->" + updateEmpNo);
-			for(CdEmp tCdEmp: lCdEmp) {
-				if(tCdEmp.getEmployeeNo().equals(updateEmpNo)) {
-					occurslist.putParam("OOUpdateEmpName",tCdEmp.getFullname());
-					this.info("OOUpdateEmpName---->" + tCdEmp.getFullname());
-					checkno = true;
-				}
-			}
-
-			if(checkno) {
-				checkno = false;
-			} else {
-				occurslist.putParam("OOUpdateEmpName","          ");				
+			
+			occurslist.putParam("OOUpdateEmpName", ""); // 更新人員姓名
+			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);	
+			
+			if( tCdEmp != null) {
+				occurslist.putParam("OOUpdateEmpName", tCdEmp.getFullname()); // 更新人員姓名
 			}
 			
 			// 宣告
 			ts = tCustRmk.getCreateDate();
 			uts = tCustRmk.getLastUpdate();
-			this.info("ts = " + ts);
-			this.info("uts = " + uts);
+			logger.info("ts = " + ts);
+			logger.info("uts = " + uts);
 			DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
 
 			createDate = sdfdate.format(ts);
@@ -178,8 +155,8 @@ public class L2072 extends TradeBuffer {
 			
 			createDate = parse.IntegerToString(parse.stringToInteger(createDate) - 19110000, 8);
 			updateDate = parse.IntegerToString(parse.stringToInteger(updateDate) - 19110000, 8);
-			this.info("createDate = " + createDate);
-			this.info("updateDate = " + updateDate);
+			logger.info("createDate = " + createDate);
+			logger.info("updateDate = " + updateDate);
 			
 			occurslist.putParam("OOCreateDate",createDate);
 			occurslist.putParam("OOLastUpdate",updateDate);

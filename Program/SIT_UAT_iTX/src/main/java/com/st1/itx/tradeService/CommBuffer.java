@@ -83,17 +83,21 @@ public abstract class CommBuffer {
 	}
 
 	public void info(String msg) {
-		if (loggerFg)
+		if (ThreadVariable.isLogger())
 			logger.info(msg);
 	}
 
 	public void warn(String msg) {
-		if (loggerFg)
+		if (ThreadVariable.isLogger())
 			logger.warn(msg);
 	}
 
 	public void error(String msg) {
 		logger.error(msg);
+	}
+
+	public void mustInfo(String msg) {
+		logger.info(msg);
 	}
 
 	public abstract void exec() throws LogicException;

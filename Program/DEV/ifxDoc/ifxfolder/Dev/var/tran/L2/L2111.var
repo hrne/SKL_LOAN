@@ -165,7 +165,7 @@ IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
 C(2,#FuncCode,S,T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
 
 #WkFdName=X,1,S
-T(3,@FdCustId,*)
+T(2,@FdCustId,#WkStar)
 IF(#FuncCode==1 || #FuncCode==3,T(3,@FdApplNo, ),T(2,@FdApplNo,#WkStar))
 T(2,@FdCreditSysNo,#WkStar)
 T(2,@FdApplDate,#WkStar)
@@ -492,6 +492,8 @@ C(3,#L2r02ProcessCode,0,E(0,0),E(0,1))
 
 #WkAdjFd1=X,1,S
 C(3,#ApproveFlag,1,$,S)
+T(3,@FdCustId, )
+T(3,@FdCreditSysNo, )
 T(3,@FdApplDate, )
 T(3,@FdProdNo, )
 T(3,@FdApplAmt, )
@@ -521,6 +523,7 @@ C(3,#UpdateCode,1,
    HIDE(#ApplDate,#TwApplAmt,#UsApplAmt,#ProcessCode))
 
 #TextOnOff=X,1,S
+T(F,#CreditSysNo,1)
 T(F,#ApplDate,1)
 T(F,#Estimate,1)
 T(F,#CreditOfficer,1)
@@ -528,6 +531,7 @@ T(F,#GroupId,1)
 C(3,#ApproveFlag,1,$,S)
 HIDE(#BTN3,#BTN4,#BTN5,#BTN10)
 T(F,#PieceCode,0)
+T(F,#CreditSysNo,0)
 T(F,#ApplDate,0)
 T(F,#ProdNo,0)
 T(F,#Estimate,0)
@@ -537,6 +541,7 @@ T(F,#GroupId,0)
 #TextOnOff2=X,1,S
 C(3,#UpdateCode,1,S,$)
 T(F,#PieceCode,0)
+T(F,#CreditSysNo,0)
 T(F,#ProdNo,0)
 T(F,#Estimate,0)
 T(F,#CreditOfficer,0)
@@ -551,12 +556,11 @@ T(F,#GroupId,0)
 #FdCreditSysNo=X,2,L
 
 #CreditSysNo=A,7,I
+C(3,#ApproveFlag,1,s,$)
 C(2,#FuncCode,S,$,$,$,s,s,S)
 @
 ! IF(#CreditSysNo==#L2r02CreditSysNo,s,$)
 V(2,0)
-
-
 
 ![@申請日期]
 #FdApplDate=X,2,L

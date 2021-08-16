@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM041ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -32,37 +29,42 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("lM041.findAll ");
+		this.info("lM041.findAll ");
 
 		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000));
-                String yearMonth = entdy.substring(0,6);
+		String yearMonth = entdy.substring(0, 6);
 
-		String sql = "SELECT CT.\"CityItem\"";
-		sql += "            ,M.\"CityCode\"";
-		sql += "            ,A.\"CustNo\"";
-		sql += "            ,A.\"FacmNo\"";
-		sql += "            ,M.\"Status\"";
-		sql += "            ,C.\"CustName\"";
-		sql += "            ,A.\"RvBal\"";
-		sql += "            ,M.\"LawFee\"";
-		sql += "            ,M.\"AcctFee\"";
-		sql += "      FROM \"AcReceivable\" A";
-		sql += "      LEFT JOIN \"MonthlyFacBal\" M ON M.\"YearMonth\" = :yearMonth";
-		sql += "                                   AND M.\"CustNo\"    =  A.\"CustNo\"";
-		sql += "                                   AND M.\"FacmNo\"    =  A.\"FacmNo\"";
-		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\"";
-		sql += "      LEFT JOIN \"CdCity\" CT ON CT.\"CityCode\" = M.\"CityCode\"";
-		sql += "      WHERE A.\"AcctCode\" = 'TAV'";
-		sql += "          AND A.\"RvBal\" > 0";
-		sql += "          AND M.\"AcctCode\" = '990'";
-                sql += "          AND A.\"OpenAcDate\" = :entdy";
-		logger.info("sql=" + sql);
+		String sql = "";
+		sql += " SELECT CT.\"CityItem\" ";
+		sql += "       ,ViableCusts.\"CityCode\" ";
+		sql += "       ,ViableCusts.\"CustNo\" ";
+		sql += "       ,ViableCusts.\"FacmNo\" ";
+		sql += "       ,ViableCusts.\"Status\" ";
+		sql += "       ,C.\"CustName\" ";
+		sql += "       ,A.\"RvBal\" ";
+		sql += " FROM ( SELECT \"CityCode\" ";
+		sql += "              ,MAX(\"Status\") \"Status\" ";
+		sql += "              ,\"CustNo\" ";
+		sql += "              ,MIN(\"FacmNo\") \"FacmNo\" ";
+		sql += "        FROM \"MonthlyFacBal\" ";
+		sql += "        WHERE \"YearMonth\" = :yearMonth ";
+		sql += "          AND \"Status\" IN (2,6) ";
+		sql += "        GROUP BY \"CityCode\" ";
+		sql += "                ,\"CustNo\" ) ViableCusts ";
+		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                   ,SUM(\"RvBal\") \"RvBal\" ";
+		sql += "             FROM \"AcReceivable\" ";
+		sql += "             WHERE \"AcctCode\" = 'TAV' ";
+		sql += "             GROUP BY \"CustNo\" ) A ON A.\"CustNo\" = ViableCusts.\"CustNo\" ";
+		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = ViableCusts.\"CustNo\" ";
+		sql += " LEFT JOIN \"CdCity\" CT  ON CT.\"CityCode\" = ViableCusts.\"CityCode\" ";
+		sql += " WHERE NVL(A.\"RvBal\", 0) > 0 ";
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entdy", entdy);
-                query.setParameter("yearMonth", yearMonth);
+		query.setParameter("yearMonth", yearMonth);
 		return this.convertToMap(query.getResultList());
 	}
 

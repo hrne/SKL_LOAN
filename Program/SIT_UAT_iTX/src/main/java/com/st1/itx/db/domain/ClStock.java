@@ -49,7 +49,7 @@ public class ClStock implements Serializable {
   private int clNo = 0;
 
   // 股票代號
-  @Column(name = "`StockCode`", length = 4)
+  @Column(name = "`StockCode`", length = 10)
   private String stockCode;
 
   // 掛牌別

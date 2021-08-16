@@ -69,7 +69,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L5706 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5706.class);
 	@Autowired
 	public NegFinShareService sNegFinShareService;
 	@Autowired
@@ -770,7 +769,7 @@ public class L5706 extends TradeBuffer {
 			NegMainVo.setPrincipalBal(NegMainVo.getPrincipalBal());// 總本金餘額
 
 			NegMainVo.setNextPayDate(NegMainVo.getFirstDueDate());// 下次應繳日
-			int LastDueDate = negCom.AdjMonth(NegMainVo.getFirstDueDate(), NegMainVo.getTotalPeriod(), 0);
+			int LastDueDate = negCom.getRepayDate(NegMainVo.getFirstDueDate(), NegMainVo.getTotalPeriod() - 1 , titaVo);
 			NegMainVo.setLastDueDate(LastDueDate);// 還款結束日
 			String IsMainFin = "";
 			if (("458").equals(MAIN_CODE)) {
@@ -1226,7 +1225,7 @@ public class L5706 extends TradeBuffer {
 			InsertNegMainVO.setIntRate(parse.stringToBigDecimal(FIRST_RATE)); // 計息條件%
 			InsertNegMainVO.setDueAmt(parse.stringToBigDecimal(PAY_AMOUNT));// 月付金
 			InsertNegMainVO.setFirstDueDate(FirstDueDate);// 首次應繳日
-			int LastDueDate = negCom.AdjMonth(FirstDueDate, InsertNegMainVO.getTotalPeriod(), 0);
+			int LastDueDate = negCom.getRepayDate(FirstDueDate, InsertNegMainVO.getTotalPeriod() - 1 , titaVo);
 			InsertNegMainVO.setLastDueDate(LastDueDate);// 還款結束日
 
 			InsertNegMainVO.setNextPayDate(FirstDueDate);// 下次應繳日

@@ -1666,6 +1666,29 @@ public class MakeReport extends CommBuffer {
 		return result;
 	}
 
+	/**
+	 * 傳入字串,回傳BigDecimal,無法轉換為BigDecimal時給零
+	 * 
+	 * @param inputString 傳入字串
+	 * @return BigDecimal
+	 */
+	public BigDecimal getBigDecimal(String inputString) {
+		BigDecimal result = BigDecimal.ZERO;
+
+		if (inputString == null || inputString.isEmpty()) {
+			this.warn("getBigDecimal inputString is null or empty");
+		} else {
+			try {
+				result = new BigDecimal(inputString);
+			} catch (NumberFormatException e) {
+				this.error("getBigDecimal inputString : \"" + inputString
+						+ "\" parse to BigDecimal has NumberFormatException.");
+				result = BigDecimal.ZERO;
+			}
+		}
+		return result;
+	}
+
 	private boolean haveChinese(String string) {
 		for (int i = 0; i < string.length(); i++) {
 			String c = string.substring(i, i + 1);

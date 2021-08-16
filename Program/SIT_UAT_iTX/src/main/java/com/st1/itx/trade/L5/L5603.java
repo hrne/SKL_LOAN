@@ -14,8 +14,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.CollLetterService;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
-
 /* DB容器 */
 import com.st1.itx.db.domain.CollLetter;
 import com.st1.itx.db.domain.CollLetterId;
@@ -34,9 +32,6 @@ import com.st1.itx.db.domain.CollListId;
 
 public class L5603 extends TradeBuffer {
 	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
-
 	@Autowired
 	public CollLetterService iCollLetterService;
 	@Autowired

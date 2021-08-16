@@ -101,7 +101,7 @@ public class LM051Report extends MakeReport {
 				}
 
 				// F5 科目；7
-				makeExcel.setValue(row, 7, Integer.valueOf(tLDVo.get("F5")), "C", "L");
+				makeExcel.setValue(row, 7, Integer.valueOf(tLDVo.get("F5")), "L");
 				// F6 逾期數；8
 //				putTerm(row, tLDVo);
 				

@@ -54,7 +54,10 @@ public abstract class BatchBase {
 			else
 				logger = LoggerFactory.getLogger(getClass().getName());
 
-			loggerFg = ThreadVariable.isLogger();
+			if ("true".equals(this.getLogFg())) {
+				ThreadVariable.setObject(ContentName.loggerFg, true);
+				loggerFg = ThreadVariable.isLogger();
+			}
 
 			this.titaVo = new TitaVo();
 			this.titaVo.init();
@@ -75,7 +78,7 @@ public abstract class BatchBase {
 			this.txBuffer.init(this.titaVo);
 			this.titaVo.putParam(ContentName.entdy, "0" + this.txBuffer.getTxCom().getTbsdy());
 		} catch (LogicException e) {
-			logger.error(e.getErrorMsgId() + " " + e.getErrorMsg());
+			this.error(e.getErrorMsgId() + " " + e.getErrorMsg());
 		}
 	}
 
@@ -108,7 +111,7 @@ public abstract class BatchBase {
 
 	public void warn(String msg) {
 		if (loggerFg)
-			this.warn(msg);
+			logger.warn(msg);
 	}
 
 	public void error(String msg) {
@@ -180,13 +183,8 @@ public abstract class BatchBase {
 	 * @return RepeatStatus...
 	 */
 	public RepeatStatus exec(StepContribution sc, String md) {
-		if ("true".equals(this.getLogFg())) {
-			ThreadVariable.setObject(ContentName.loggerFg, true);
-			loggerFg = true;
-		}
-
-		logger.info("batch run...." + md);
-		logger.info(this.titaVo.toString());
+		this.info("batch run...." + md);
+		this.info(this.titaVo.toString());
 
 		try {
 			this.run();

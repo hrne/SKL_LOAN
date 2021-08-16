@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -11,129 +9,88 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.PfInsCheck;
 import com.st1.itx.db.domain.PfInsCheckId;
 import com.st1.itx.db.service.PfInsCheckService;
-import com.st1.itx.util.common.CheckInsurance;
-import com.st1.itx.util.common.data.CheckInsuranceVo;
-import com.st1.itx.util.parse.Parse;;
+import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.PfCheckInsuranceCom;
+import com.st1.itx.util.common.data.PfInsDetailVo;
+import com.st1.itx.util.parse.Parse;
 
+/**
+ * Tita 
+ * Kind=9,1 
+ * CustNo=9,7 
+ * FacmNo=9,3  
+ * END=X,1
+ */
+/**
+ * 房貸獎勵保費檢核檔查詢
+ * 
+ * @author st1
+ *
+ */
 @Service("L5959")
 @Scope("prototype")
-/**
- * 
- * 
- * @author eric chang
- * @version 1.0.0
- */
 public class L5959 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5959.class);
 
+	/* DB服務注入 */
 	@Autowired
 	public PfInsCheckService pfInsCheckService;
-	
+
 	@Autowired
-	public CheckInsurance checkInsurance;
-	
+	Parse parse;
+
 	@Autowired
-	public Parse parse;
-	
+	public PfCheckInsuranceCom pfCheckInsuranceCom;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L5959 ");
+		this.info("active L5905 ");
 		this.totaVo.init(titaVo);
 
-		PfInsCheckId pfInsCheckId =new PfInsCheckId();
-		
-		int iKind = parse.stringToInteger(titaVo.getParam("Kind"));
-		int iCustNo= parse.stringToInteger(titaVo.getParam("CustNo"));
-		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
-		
-		pfInsCheckId.setKind(iKind);
-		pfInsCheckId.setCustNo(iCustNo);
-		pfInsCheckId.setFacmNo(iFacmNo);
-		
-		PfInsCheck pfInsCheck = pfInsCheckService.findById(pfInsCheckId, titaVo);
-		CheckInsuranceVo checkVo = new CheckInsuranceVo();
-		if (pfInsCheck == null) {
-			throw new LogicException(titaVo, "E0001", "房貸獎勵保費檢核檔");
-		} else {
-			if (!"Y".equals(pfInsCheck.getCheckResult())) {				
-				checkVo.setCustId(pfInsCheck.getCustId());
-				
-				//very importance
-				checkInsurance.setTxBuffer(this.txBuffer);
-				checkInsurance.checkInsurance(titaVo, checkVo);
-			} else {
-				checkVo.setSuccess(true);
-				checkVo.setMsgRs(pfInsCheck.getReturnMsg());
-				checkInsurance.parseXml(checkVo);
-			}
+		// 取得輸入資料
+		int iKind = this.parse.stringToInteger(titaVo.getParam("Kind"));
+		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
+		PfInsCheck tPfInsCheck = pfInsCheckService.findById(new PfInsCheckId(iKind, iCustNo, iFacmNo), titaVo);
+		if (tPfInsCheck == null) {
+			throw new LogicException(titaVo, "E0001", "房貸獎勵保費檢核檔"); // 查無資料
 		}
-//		! eLoan案件編號  
-//		#oCreditSysNo=A,7,S
-//
-//		! 借款人身份證字號
-//		#oCustId=X,10,S
-//
-//		! 借款書申請日
-//		#oApplDate=D,7,S
-//
-//		! 承保日 
-//		#oInsDate=D,7,S
-//
-//		! 保單號碼    
-//		#oInsNo=X,15,S
-//
-//		! 檢核結果
-//		#oCheckResult=X,1,S
-//
-//		! 檢核工作月 
-//		#oCheckWorkMonth=A,5,S
-		
-		this.totaVo.putParam("oCreditSysNo", pfInsCheck.getCreditSysNo());
-		this.totaVo.putParam("oCustId", pfInsCheck.getCustId());
-		this.totaVo.putParam("oApplDate", pfInsCheck.getApplDate());
-		this.totaVo.putParam("oInsDate", pfInsCheck.getInsDate());
-		this.totaVo.putParam("oInsNo", pfInsCheck.getInsNo());
-		this.totaVo.putParam("oCheckResult", pfInsCheck.getCheckResult());
-		if (pfInsCheck.getCheckWorkMonth() > 0) {
-			this.totaVo.putParam("oCheckWorkMonth", pfInsCheck.getCheckWorkMonth() - 191100);
-		} else {
-			this.totaVo.putParam("oCheckWorkMonth", 0);
-		}
-		
-		if (checkVo.isSuccess() && checkVo.getDetail().size()>0) {
-			
-			for (int i = 0; i < checkVo.getDetail().size() - 1; i++) {
-				// if (highest_loan == null) -> 0 else -> [loan_amt] + [highest_loan]
-				HashMap<String, String> map = checkVo.getDetail().get(i);
 
+		this.totaVo.putParam("OCreditSysNo", tPfInsCheck.getCreditSysNo());// 徵審系統案號(eLoan案件編號)
+		this.totaVo.putParam("OCustId", tPfInsCheck.getCustId()); // 借款人身份證字號
+		this.totaVo.putParam("OApplDate", tPfInsCheck.getApplDate()); // 借款書申請日
+		this.totaVo.putParam("OInsDate", tPfInsCheck.getInsDate()); // 承保日
+		this.totaVo.putParam("OInsNo", tPfInsCheck.getInsNo()); // 保單號碼
+		this.totaVo.putParam("OCheckResul", tPfInsCheck.getCheckResult());// 檢核結果(Y/N)
+		this.totaVo.putParam("OCheckWorkMonth", tPfInsCheck.getCheckWorkMonth()); // 檢核工作月
+		// 拆解回應訊息為保單明細資料
+		ArrayList<PfInsDetailVo> lPfInsDetailVo = pfCheckInsuranceCom.getInsDetailList(tPfInsCheck.getReturnMsg(),
+				titaVo);
+		if (lPfInsDetailVo != null && lPfInsDetailVo.size() > 0) {
+			for (PfInsDetailVo detailVo : lPfInsDetailVo) {
 				OccursList occursList = new OccursList();
-				
-				
-				occursList.putParam("oPolicyNo", map.get("policy_no"));
-				occursList.putParam("oApplicationDate", map.get("application_date")); //date
-				occursList.putParam("oPoStatusCode", map.get("po_status_code")); 
-				occursList.putParam("oNamesO", map.get("names_o")); 
-				occursList.putParam("oIssueDate", map.get("issue_date")); //date
-				occursList.putParam("oFaceAmt", map.get("face_amt")); 
-				occursList.putParam("oHighestLoan", map.get("highest_loan")); 
-				occursList.putParam("oLoanBal", map.get("loan_bal")); 
-				occursList.putParam("oExchageVal", map.get("exchage_val")); 
-				occursList.putParam("oModePremYear", map.get("mode_prem_year")); 
-				occursList.putParam("oInsuranceType", map.get("insurance_type_3")); 
-				occursList.putParam("oRvlValues", map.get("rvl_values")); 
-				occursList.putParam("oCurrency", map.get("currency_1")); 
-				occursList.putParam("oNamesI", map.get("names_i")); 
-				
+				occursList.putParam("OOApplication_date", detailVo.getApplication_date());// 承保日
+				occursList.putParam("OOPolicy_no", detailVo.getPolicy_no());// 保單號碼
+				occursList.putParam("OOPo_status_code", detailVo.getPo_status_code());// 狀況
+				occursList.putParam("OOCustName", detailVo.getCustName());// 要保人
+				occursList.putParam("OOBeginDate", detailVo.getBeginDate());// 始期
+				occursList.putParam("OOFace_amt", detailVo.getFace_amt());// 保額
+				occursList.putParam("OOHighest_loan", detailVo.getHighest_loan());// 已貸金額
+				occursList.putParam("OOLoan_amt", detailVo.getLoan_amt());// 可貸金額
+				occursList.putParam("OOExchage_val", detailVo.getExchage_val());// 匯率
+				occursList.putParam("OOMode_prem_year", detailVo.getMode_prem_year());// 年繳化保費(NTD)
+				occursList.putParam("OOInsurance_type_3", detailVo.getInsurance_type_3()); // 保險型態
+				occursList.putParam("OORvl_values", detailVo.getRvl_values());// 帳戶價值
+				occursList.putParam("OOCurrency_1", detailVo.getCurrency_1());// 幣別
+				occursList.putParam("OONames_i", detailVo.getNames_i());// 被保人
+
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
 
 		}
-		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

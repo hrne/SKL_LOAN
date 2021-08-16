@@ -3,6 +3,7 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -20,7 +21,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM045Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM045Report.class);
 
 	@Autowired
 	LM045ServiceImpl lM045ServiceImpl;
@@ -33,30 +33,18 @@ public class LM045Report extends MakeReport {
 
 	}
 
-	BigDecimal toverbal = new BigDecimal("0");
-	BigDecimal tbadbal = new BigDecimal("0");
-	BigDecimal totbal = new BigDecimal("0");
-	String tmp = "";
-	String yymm = "";
-	String lF0 = "";
-	int row = 4;
-	int startRow = 5;
-	int nameCol = 2;
-	int nameRow = 2;
-	int totalRow = 19;
+	private int yyymm = 0;
+
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM045", "年度催收逾放總額明細表_內部控管", "LM045_年度催收逾放總額明細表_內部控管", "LM045年度催收逾放總額明細表_內部控管.xlsx", "108年逾放工作表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM045", "年度催收逾放總額明細表_內部控管",
+				"LM045_年度催收逾放總額明細表_內部控管", "LM045年度催收逾放總額明細表_內部控管.xlsx", "YYY年逾放總表");
 
-		yymm = titaVo.get("ENTDY").substring(1, 6);
-		tmp = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) - 10000);
+		yyymm = Integer.valueOf(titaVo.get("ENTDY").substring(0, 6));
 		makeExcel.setSize(36);
-		makeExcel.setValue(1, 1, yymm.substring(0, 3) + "年度催收逾放總額明細表");
-		makeExcel.setSheet("108年逾放工作表", yymm.substring(0, 3) + "年逾放總表");
-		tmp = "與" + tmp.substring(0, 3) + "年底相較";
+		makeExcel.setValue(1, 1, (yyymm / 100) + "年度催收逾放總額明細表");
+		makeExcel.setSheet("YYY年逾放總表", (yyymm / 100) + "年逾放總表");
 
-		
-		
 		List<Map<String, String>> LM045List = null;
 		try {
 			LM045List = lM045ServiceImpl.findAll(titaVo);
@@ -67,131 +55,124 @@ public class LM045Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM045ServiceImpl.testExcel error = " + errors.toString());
 		}
+		
 		exportExcel(LM045List);
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
 	}
 
 	private void exportExcel(List<Map<String, String>> LDList) throws LogicException {
-		this.info("LM045Report exportExcel yymm=" + yymm); // yyymm
-		String ad = "";
-		int ym = 0;
-		int fg = 0;
-		BigDecimal[] total = new BigDecimal[13];//用來計算最右邊的，第一欄合計為各月逾放總額加總，第二欄月報猜是去年年底逾放總額，第三欄為第二欄減第一欄
-		for(int i = 0 ; i < 13 ; i++) {
-			total[i] = BigDecimal.ZERO;
-		}
-		if (LDList.size() == 0) {
-			makeExcel.setValue(2, 1, "本日無資料");
-		}
-		int count = 0;
-		for (Map<String, String> tLDVo : LDList) {
-			row++;
-			
-			// F0 is edited by a later editor.
-			// Originally it's only e.fullname, but count will go above 12 if at least two collectors fullname are null.
-			// I added NVL() so it gives AccCollPsn in that case.
-			// If both fullname and AccCollPsn are null... I think it's better if we skip that input?
-			
-			// this method will fail under supposedly rare situations,
-			// such as when a collector has two data input on one single month.
-			// in that case, i guess that's the input-interface's problem?
-			
-			if (tLDVo.get("F0") != null)
-			{
-				if (!tLDVo.get("F0").equals(lF0)) {
-					count = 0;
-					if (row > 5) {
-						totExcel();
-						nameCol += 3;
-						if(nameCol > 14) {
-							nameCol = 2;
-							nameRow = 20;
-							startRow = 23;
-							totalRow = 37;
-						}
-						row = startRow;
-					}
-					toverbal =tLDVo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
-					tbadbal = tLDVo.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3"));
-					totbal = tLDVo.get("F4") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F4"));
-				}
-	
-				ym = Integer.valueOf(tLDVo.get("F1")) - 191100;
-				if (ym < Integer.valueOf(yymm)) {
-					fg = 1;
-				} else if (ym == Integer.valueOf(yymm)) {
-					fg = 2;
-				} else {
-					fg = 0;
-				}
-	
-				for (int i = 0; i < tLDVo.size(); i++) {
-					ad = "F" + String.valueOf(i);
-					switch (i) {
-					case 0:
-						makeExcel.setSize(30);
-						makeExcel.setValue(nameRow, nameCol, tLDVo.get(ad));
-						break;
-					case 1:
-						makeExcel.setSize(20);
-						makeExcel.setValue(row, 1, String.valueOf(ym));
-						break;
-					default:
-						// 金額
-						if (fg > 0) {
-							makeExcel.setSize(18);
-							if (tLDVo.get(ad).equals("")) {
-								makeExcel.setValue(row, nameCol + i - 2, 0, "#,##0");
-							} else {
-								makeExcel.setValue(row, nameCol + i - 2, new BigDecimal(tLDVo.get(ad)), "#,##0");
-							}
-						}
-						if(i == 4) {
-							total[count] = total[count].add(new BigDecimal(tLDVo.get(ad)) ==null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)));
-							count++;
-						}
-						break;
-					}
-				}
-				lF0 = tLDVo.get("F0");
-				if (fg == 2) {
-					toverbal = tLDVo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2")).subtract(toverbal);
-					tbadbal = tLDVo.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F3")).subtract(tbadbal);
-					totbal = tLDVo.get("F4") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F4")).subtract(totbal);
-					this.info("LM030Report exportExcel" + ym + ",bal" + toverbal);
-				}
-		}
-			
-		totExcel();
-		for(int i = 0 ; i < count ; i++) {//最右邊三欄(合計、月報、...)
-			makeExcel.setValue(i + 5, 17, total[i], "#,##0");
-			makeExcel.setValue(i + 5, 18, total[0], "#,##0");
-			makeExcel.setValue(i + 5, 19, total[0].subtract(total[i]), "#,##0");
-		}
+		this.info("LM045Report exportExcel yyymm=" + yyymm); // yyymm
 		
-		}
+		String lastCollPsn = "";
+		int collPsnCount = -1;
 		
-	}
+		int colShift = 0;
+		
+		BigDecimal[] lastYearAmounts = new BigDecimal[3];
+		BigDecimal[] thisMonthAmounts = new BigDecimal[3];
+		
+		for (Map<String, String> tLDVo : LDList)
+		{
 
-	private void totExcel() throws LogicException {
-		makeExcel.setSize(15);
-		makeExcel.setValue(totalRow, 1, tmp);
-		if(toverbal.compareTo(BigDecimal.ZERO) == -1) {
-			makeExcel.setColor("red");
+			// F0 : 姓名/員編
+			// F1 : 資料年月 YYYYMM
+			// F2 : 超過清償期三個月
+			// F3 : 催收款
+			// F4 : 催收總額
+			
+			// Already ordered by CityCode, YearMonth in SQL query.
+			
+			// 第一筆輸出或是姓名/員編有變時，
+			// 為新一大欄輸出所有年月和姓名/員編
+			
+			if (collPsnCount == -1 || !tLDVo.get("F0").equals(lastCollPsn))
+			{
+				
+				lastCollPsn = tLDVo.get("F0");
+				collPsnCount++;
+				
+				// 輸出年月 去年12月 - 今年12月
+				
+				for (int i = 0; i < 13; i++)
+				{
+					makeExcel.setValue(3 + collPsnCount * 5, 3 + i, i == 0 ? yyymm-(yyymm%100)-100+12 : yyymm-(yyymm%100)+i);
+				}
+				
+				// 輸出 "與yyy年底相較"
+				
+				makeExcel.setValue(3 + collPsnCount * 5, 16, "與" + (yyymm-100)/100 + "年底相較");
+				
+				// 輸出姓名 / 員編
+				
+				makeExcel.setValue(4 + collPsnCount * 5, 1, lastCollPsn);
+				
+				// 重置 thisMonthAmounts, lastYearAmounts
+				Arrays.fill(lastYearAmounts, BigDecimal.ZERO);
+				Arrays.fill(thisMonthAmounts, BigDecimal.ZERO);
+			}
+			
+			// 此筆資料年月餘額輸出
+			
+			colShift = (yyymm-(yyymm%100)+12) - (Integer.valueOf(tLDVo.get("F1"))-191100);
+			this.info("LM045Report yyymm=" + yyymm);
+			this.info("LM045Report dataYearMonth=" + tLDVo.get("F1"));
+			this.info("LM045Report colShift=" + colShift);
+			
+			// YYY12 - dataYYYMM
+			
+			// 0 : 今年 12 月
+			// 1 : 今年 11 月
+			// ...
+			// 11 : 今年 1 月
+			
+			// 100 : 去年 12 月
+			
+			makeExcel.setValue(4 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, new BigDecimal(tLDVo.get("F2").isEmpty() ? "0" : tLDVo.get("F2")), "#,##0");
+			makeExcel.setValue(5 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, new BigDecimal(tLDVo.get("F3").isEmpty() ? "0" : tLDVo.get("F3")), "#,##0");
+			makeExcel.setValue(6 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, new BigDecimal(tLDVo.get("F4").isEmpty() ? "0" : tLDVo.get("F4")), "#,##0");
+			
+			// 登錄 lastYearAmounts, thisYearAmounts
+			
+			if (colShift == 100)
+			{
+				// 去年12月
+				for (int i = 2; i < 5; i++)
+				{
+					lastYearAmounts[i-2] = new BigDecimal(tLDVo.get("F"+i).isEmpty() ? "0" : tLDVo.get("F"+i));
+				}
+			}
+			else if (Integer.valueOf(tLDVo.get("F1")) == yyymm + 191100)
+			{
+				// 營業日當月
+				
+				for (int i = 2; i < 5; i++)
+				{
+					thisMonthAmounts[i-2] = new BigDecimal(tLDVo.get("F"+i).isEmpty() ? "0" : tLDVo.get("F"+i));
+				}
+				
+				// 因為 query ordered by "YearMonth", 這裡直接算 " 與yyy年相較 " 的金額
+				// query 排除營業日當月之後的所有月份，以及無資料的月份
+				// 所以若本月無資料時, 這裡不會輸出
+				
+				for (int i = 0; i < 3; i++)
+				{
+					makeExcel.setValue(4 + collPsnCount * 5 + i, 16, thisMonthAmounts[i].subtract(lastYearAmounts[i]), "#,##0");
+				}
+			}
 		}
-		makeExcel.setSize(18);
-		makeExcel.setValue(totalRow, nameCol, toverbal, "#,##0", "R");
-		if(tbadbal.compareTo(BigDecimal.ZERO) == -1) {
-			makeExcel.setColor("red");
+		
+		// 設定所有行高 per collPsn
+		
+		for (int i = 0; i < collPsnCount+1; i++)
+		{
+			for (int j = 0; j < 4; j++)
+			{
+				makeExcel.setHeight(3 + i * 5 + j, 40);
+			}
 		}
-		makeExcel.setSize(18);
-		makeExcel.setValue(totalRow, nameCol + 1, tbadbal, "#,##0", "R");
-		if(totbal.compareTo(BigDecimal.ZERO) == -1) {
-			makeExcel.setColor("red");
-		}
-		makeExcel.setSize(18);
-		makeExcel.setValue(totalRow, nameCol + 2, totbal, "#,##0", "R");
+		
+		long sno = makeExcel.close();
+		makeExcel.toExcel(sno);
+
 	}
 
 }

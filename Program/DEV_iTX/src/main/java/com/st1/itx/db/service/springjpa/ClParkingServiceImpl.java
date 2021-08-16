@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("clParkingService")
 @Repository
-public class ClParkingServiceImpl implements ClParkingService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(ClParkingServiceImpl.class);
-
+public class ClParkingServiceImpl extends ASpringJpaParm implements ClParkingService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class ClParkingServiceImpl implements ClParkingService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + clParkingId);
+    this.info("findById " + dbName + " " + clParkingId);
     Optional<ClParking> clParking = null;
     if (dbName.equals(ContentName.onDay))
       clParking = clParkingReposDay.findById(clParkingId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "ParkingSeqNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = clParkingReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("clNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("clNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = clParkingReposDay.findAllByClCode1IsAndClCode2IsAndClNoIs(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -146,7 +142,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clParkingId);
+    this.info("Hold " + dbName + " " + clParkingId);
     Optional<ClParking> clParking = null;
     if (dbName.equals(ContentName.onDay))
       clParking = clParkingReposDay.findByClParkingId(clParkingId);
@@ -164,7 +160,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clParking.getClParkingId());
+    this.info("Hold " + dbName + " " + clParking.getClParkingId());
     Optional<ClParking> clParkingT = null;
     if (dbName.equals(ContentName.onDay))
       clParkingT = clParkingReposDay.findByClParkingId(clParking.getClParkingId());
@@ -186,7 +182,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + clParking.getClParkingId());
+    this.info("Insert..." + dbName + " " + clParking.getClParkingId());
     if (this.findById(clParking.getClParkingId()) != null)
       throw new DBException(2);
 
@@ -215,7 +211,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clParking.getClParkingId());
+    this.info("Update..." + dbName + " " + clParking.getClParkingId());
     if (!empNot.isEmpty())
       clParking.setLastUpdateEmpNo(empNot);
 
@@ -238,7 +234,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clParking.getClParkingId());
+    this.info("Update..." + dbName + " " + clParking.getClParkingId());
     if (!empNot.isEmpty())
       clParking.setLastUpdateEmpNo(empNot);
 
@@ -258,7 +254,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + clParking.getClParkingId());
+    this.info("Delete..." + dbName + " " + clParking.getClParkingId());
     if (dbName.equals(ContentName.onDay)) {
       clParkingReposDay.delete(clParking);	
       clParkingReposDay.flush();
@@ -287,7 +283,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (ClParking t : clParking){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -322,7 +318,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (clParking == null || clParking.size() == 0)
       throw new DBException(6);
 
@@ -351,7 +347,7 @@ em = null;
 
   @Override
   public void deleteAll(List<ClParking> clParking, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

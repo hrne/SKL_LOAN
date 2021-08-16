@@ -31,7 +31,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L5512 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5512.class);
 	@Autowired
 	public PfItDetailService sPfItDetailService;
 

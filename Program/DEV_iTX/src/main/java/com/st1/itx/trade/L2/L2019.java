@@ -96,7 +96,7 @@ public class L2019 extends TradeBuffer {
 				throw new LogicException("E0001", "合併額度");// E0001 查無資料
 			}
 			for (FacShareLimit t : l) {
-				if (t.getKeyinSeq() == 0) {
+				if (t.getKeyinSeq() == 1) {
 					lFacShareLimit.add(t);
 				}
 			}

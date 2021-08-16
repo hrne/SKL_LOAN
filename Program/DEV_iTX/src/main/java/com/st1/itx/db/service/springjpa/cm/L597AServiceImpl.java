@@ -198,7 +198,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegTran.\"RepayPeriod\" AS \"繳期數\",";
 			sqlSelect += "NegAp02.\"TxAmt\" AS \"還款金額\",";
 			sqlSelect += "NegTran.\"ShouldPayPeriod\" AS \"應還期數\",";
-			sqlSelect += "NegTran.\"DueAmt\" AS \"應還金額\",";
+			sqlSelect += "(NegTran.\"DueAmt\" * NegTran.\"ShouldPayPeriod\") AS \"應還金額\",";
 			sqlSelect += "NegTran.\"AccuOverAmt\" AS \"累溢短收\",";
 			sqlSelect += "NegTran.\"SklShareAmt\" AS \"新壽攤分\",";
 			sqlSelect += "NegTran.\"ApprAmt\" AS \"撥付金額\",";
@@ -261,7 +261,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegTran.\"RepayPeriod\" AS \"繳期數\",";
 			sqlSelect += "(NVL(NegTran.\"PrincipalAmt\",0)+NVL(NegTran.\"InterestAmt\",0)) AS \"還款金額\",";
 			sqlSelect += "NegTran.\"ShouldPayPeriod\" AS \"應還期數\",";
-			sqlSelect += "NegTran.\"DueAmt\" AS \"應還金額\",";
+			sqlSelect += "(NegTran.\"DueAmt\" * NegTran.\"ShouldPayPeriod\") AS \"應還金額\",";
 			sqlSelect += "NegTran.\"AccuOverAmt\" AS \"累溢短收\",";
 			sqlSelect += "NegTran.\"SklShareAmt\" AS \"新壽攤分\",";
 			sqlSelect += "NegTran.\"ApprAmt\" AS \"撥付金額\",";

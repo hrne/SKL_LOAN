@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -43,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R27 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R27.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -327,16 +324,19 @@ public class L2R27 extends TradeBuffer {
 //					this.totaVo.putParam("L2r27ParkingLandNoA" + j, tClParking.getLandNo1());
 //					this.totaVo.putParam("L2r27ParkingLandNoB" + j, tClParking.getLandNo2());
 //					this.totaVo.putParam("L2r27ParkingArea" + j, tClParking.getParkingArea());
-					
+
 					occursList.putParam("L2r27ParkingNo", tClParking.getParkingNo());
 					occursList.putParam("L2r27ParkingQty", tClParking.getParkingQty());
 					occursList.putParam("L2r27ParkingTypeCode", tClParking.getParkingTypeCode());
 					occursList.putParam("L2r27ParkingOwnerPart", tClParking.getOwnerPart());
 					occursList.putParam("L2r27ParkingOwnerTotal", tClParking.getOwnerTotal());
+					occursList.putParam("L2r27ParkingBdNoA", tClParking.getBdNo1());
+					occursList.putParam("L2r27ParkingBdNoB", tClParking.getBdNo2());
 					occursList.putParam("L2r27ParkingLandNoA", tClParking.getLandNo1());
 					occursList.putParam("L2r27ParkingLandNoB", tClParking.getLandNo2());
 					occursList.putParam("L2r27ParkingArea", tClParking.getParkingArea());
-					
+					occursList.putParam("L2r27ParkingAmount", tClParking.getAmount());
+
 					this.totaVo.addOccursList(occursList);
 					j++;
 				}

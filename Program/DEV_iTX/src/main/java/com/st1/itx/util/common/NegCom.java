@@ -3,11 +3,7 @@ package com.st1.itx.util.common;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -151,50 +147,143 @@ public class NegCom extends CommBuffer {
 	@Autowired
 	public DataLog dataLog;
 
-	String ConnectWord = ",";// Key值區分字串
-	String CombineWord = ";";// 連接字串
-	String UseDbNegTrans = "NegTrans";
-	String UseDbAcReceivable = "AcReceivable";
-	String UseDbNegAppr02 = "NegAppr02";
+	private String ConnectWord = ",";// Key值區分字串
+	private int ChekUpdDB = 0;// 0:不異動 1:異動
+	private String status = "";
+	private String isMainFin = "";
+	private String mainFinCode = "";
+	private BigDecimal mainDueAmt = BigDecimal.ZERO;// 期金
+	private String caseKindCode = "";
+	private int mainTotalPeriod = 0;// 總期數
+	private int mainRepaidPeriod = 0;// 已繳期數
+	private BigDecimal mainAccuTempAmt = BigDecimal.ZERO;;// 累繳金額
+	private BigDecimal mainAccuOverAmt = BigDecimal.ZERO;// 累溢收金額
+	private BigDecimal mainAccuDueAmt = BigDecimal.ZERO;// 累應還金額
+	private BigDecimal mainAccuSklShareAmt = BigDecimal.ZERO;;// 累計新壽攤分
+	private BigDecimal mainIntRate = BigDecimal.ZERO;;// 利率
+	private int remainPeriod = 0;// 剩餘期數
 
-	BigDecimal BigDecimalZero = BigDecimal.ZERO;
+	private int mainFirstDueDate = 0;// 首次應繳日
+	private int mainNextPayDate = 0;// 下次應繳日
+	private int mainPayIntDate = 0;// 繳息迄日
+	private int newStatusDate = 0;// 戶況日期
+
+	private BigDecimal mainPrincipalBal = BigDecimal.ZERO;// 總本金餘額
+	private BigDecimal mainRepayPrincipal = BigDecimal.ZERO;// 累償還本金
+	private BigDecimal mainRepayInterest = BigDecimal.ZERO;// 累償還利息
+
+	// NegTrans
+	private int transTxStatus = 0;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
+
+	private String transTxKind = "";// 交易別 0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
+	private BigDecimal transTxAmt = BigDecimal.ZERO;// 交易金額
+	private BigDecimal orgTransPrincipalBal = BigDecimal.ZERO;// 本金餘額
+	private BigDecimal transPrincipalBal = BigDecimal.ZERO;
+	private BigDecimal transReturnAmt = BigDecimal.ZERO;// 退還金額
+	private BigDecimal transSklShareAmt = BigDecimal.ZERO;// 新壽攤分
+	private BigDecimal transApprAmt = BigDecimal.ZERO;// 撥付金額
+	private int transExportDate = 0;// 撥付製檔日
+	private int transExportAcDate = 0;// 撥付出帳日
+	BigDecimal transTempRepayAmt = BigDecimal.ZERO;// 暫收抵繳金額
+	BigDecimal transOverRepayAmt = BigDecimal.ZERO;// 溢收抵繳金額
+	BigDecimal transPrincipalAmt = BigDecimal.ZERO;// 本金金額
+	BigDecimal transInterestAmt = BigDecimal.ZERO;// 利息金額
+	BigDecimal transOverAmt = BigDecimal.ZERO;// 轉入溢收金額
+	private int transIntStartDate = 0;// 繳息起日
+	private int transIntEndDate = 0;// 繳息迄日
+	private int transRepayPeriod = 0;// 還款期數
+	private int transRepayDate = 0;// 入帳還款日期
+
+	private BigDecimal transOrgAccuOverAmt = BigDecimal.ZERO;// 累溢繳款(交易前)
+	private BigDecimal transAccuOverAmt = BigDecimal.ZERO;// 累溢繳款(交易後)
+	private int transShouldPayPeriod = 0;// 本次應還期數
+	private BigDecimal transDueAmt = BigDecimal.ZERO;// 期金
+	private BigDecimal newTransDueAmt = BigDecimal.ZERO;// 本次應還金額
+	private int custNo = 0;
+	private int caseSeq = 0;
+	private String custId = "";
+	private Map<String, String> mapNeg = new HashMap<String, String>();
+	private CustMain tCustMain;
+	NegTrans tNegTransUpd = new NegTrans();
+	NegMain tNegMainUpd = new NegMain();
 
 	private String Data[][] = {
 			// RIM對應名稱,Map對應名稱,中文名稱,特殊規則
-			{ "L5r03CustId", "CustId", "身份證字號", "" }, { "L5r03CaseSeq", "CaseSeq", "案件序號", "" }, { "L5r03CustNo", "CustNo", "戶號", "" }, { "L5r03CustName", "CustName", "戶名", "" },
-			{ "L5r03Status", "Status", "戶況(舊)", "" }, { "L5r03NewStatus", "NewStatus", "戶況(新)", "" }, { "L5r03CustLoanKind", "CustLoanKind", "債權戶別", "" }, { "L5r03ApplDate", "ApplDate", "協商申請日", "" },
-			{ "L5r03MainDueAmt", "MainDueAmt", "每期期款", "" }, { "L5r03TotalPeriod", "TotalPeriod", "總期數", "" }, { "L5r03IntRate", "IntRate", "每期利率", "" },
-			{ "L5r03RepaidPeriod", "RepaidPeriod", "已繳期數(前)", "" }, { "L5r03NewRepaidPeriod", "NewRepaidPeriod", "已繳期數(後)", "" }, { "L5r03IsMainFin", "IsMainFin", "是否最大債權", "" },
-			{ "L5r03MainFinCode", "MainFinCode", "最大債權機構", "" }, { "L5r03OrgPrincipalBal", "OrgPrincipalBal", "總本金餘額(前)", "" }, { "L5r03NewPrincipalBal", "NewPrincipalBal", "總本金餘額(後)", "" },
-			{ "L5r03OrgAccuTempAmt", "OrgAccuTempAmt", "累繳金額(前)", "" }, { "L5r03NewAccuTempAmt", "NewAccuTempAmt", "累繳金額(後)", "" }, { "L5r03OrgAccuOverAmt", "OrgAccuOverAmt", "累溢收金額(前)", "" },
-			{ "L5r03NewAccuOverAmt", "NewAccuOverAmt", "累溢收金額(後)", "" }, { "L5r03OrgAccuDueAmt", "OrgAccuDueAmt", "累應還金額(前)", "" }, { "L5r03NewAccuDueAmt", "NewAccuDueAmt", "累應還金額(後)", "" },
-			{ "L5r03OrgAccuSklShareAmt", "OrgAccuSklShareAmt", "累新壽分攤金額(前)", "" }, { "L5r03NewAccuSklShareAmt", "NewAccuSklShareAmt", "累新壽分攤金額(後)", "" },
-			{ "L5r03OrgNextPayDate", "OrgNextPayDate", "下次應繳日(前)", "" }, { "L5r03NewNextPayDate", "NewNextPayDate", "下次應繳日(後)", "" }, { "L5r03OrgRepayPrincipal", "OrgRepayPrincipal", "還本本金(前)", "" },
-			{ "L5r03NewRepayPrincipal", "NewRepayPrincipal", "還本本金(後)", "" }, { "L5r03OrgRepayInterest", "OrgRepayInterest", "還本利息(前)", "" },
-			{ "L5r03NewRepayInterest", "NewRepayInterest", "還本利息(後)", "" }, { "L5r03TwoStepCode", "TwoStepCode", "二階段註記", "" }, { "L5r03ChgCondDate", "ChgCondDate", "申請變更還款條件日", "" },
-			{ "L5r03PayIntDate", "PayIntDate", "繳息迄日(前)", "" }, { "L5r03NewPayIntDate", "NewPayIntDate", "繳息迄日(後)", "" }, { "L5r03OrgStatusDate", "OrgStatusDate", "戶況日期(前)", "" },
-			{ "L5r03NewStatusDate", "NewStatusDate", "戶況日期(後)", "" }, { "L5r03TransAcDate", "TransAcDate", "會計日期", "" }, { "L5r03TransTitaTlrNo", "TransTitaTlrNo", "經辦", "" },
-			{ "L5r03TransTitaTxtNo", "TransTitaTxtNo", "交易序號", "" }, { "L5r03TransCustNo", "TransCustNo", "戶號", "" }, { "L5r03TransCaseSeq", "TransCaseSeq", "案件序號", "" },
-			{ "L5r03TransEntryDate", "TransEntryDate", "入帳日期", "" }, { "L5r03TransTxStatus", "TransTxStatus", "交易狀態(前)", "" }, { "L5r03NewTransTxStatus", "NewTransTxStatus", "交易狀態(後)", "" },
-			{ "L5r03TransTxKind", "TransTxKind", "交易別(前)", "" }, { "L5r03NewTransTxKind", "NewTransTxKind", "交易別(後)", "" }, { "L5r03TransTxAmt", "TransTxAmt", "交易金額(前)", "" },
-			{ "L5r03NewTransTxAmt", "NewTransTxAmt", "交易金額(後)", "" }, { "L5r03TransPrincipalBal", "TransPrincipalBal", "本金餘額(前)", "" },
-			{ "L5r03NewTransPrincipalBal", "NewTransPrincipalBal", "本金餘額(後)", "" }, { "L5r03TransReturnAmt", "TransReturnAmt", "退還金額(前)", "" },
-			{ "L5r03NewTransReturnAmt", "NewTransReturnAmt", "退還金額(後)", "" }, { "L5r03TransSklShareAmt", "TransSklShareAmt", "攤分金額(前)", "" },
-			{ "L5r03NewTransSklShareAmt", "NewTransSklShareAmt", "攤分金額(後)", "" }, { "L5r03TransApprAmt", "TransApprAmt", "撥付金額(前)", "" }, { "L5r03NewTransApprAmt", "NewTransApprAmt", "撥付金額(後)", "" },
-			{ "L5r03TransExportDate", "TransExportDate", "撥付製檔日", "" }, { "L5r03TransExportAcDate", "TransExportAcDate", "撥付出帳日", "" },
-			{ "L5r03TransTempRepayAmt", "TransTempRepayAmt", "暫收抵繳金額(前)", "" }, { "L5r03NewTransTempRepayAmt", "NewTransTempRepayAmt", "暫收抵繳金額(後)", "" },
-			{ "L5r03TransOverRepayAmt", "TransOverRepayAmt", "溢收抵繳金額(前)", "" }, { "L5r03NewTransOverRepayAmt", "NewTransOverRepayAmt", "溢收抵繳金額(後)", "" },
-			{ "L5r03TransPrincipalAmt", "TransPrincipalAmt", "沖銷本金(前)", "" }, { "L5r03NewTransPrincipalAmt", "NewTransPrincipalAmt", "沖銷本金(後)", "" },
-			{ "L5r03TransInterestAmt", "TransInterestAmt", "沖銷利息(前)", "" }, { "L5r03NewTransInterestAmt", "NewTransInterestAmt", "沖銷利息(後)", "" },
-			{ "L5r03TransOverAmt", "TransOverAmt", "轉入溢收金額(前)", "" }, { "L5r03NewTransOverAmt", "NewTransOverAmt", "轉入溢收金額(後)", "" }, { "L5r03TransIntStartDate", "TransIntStartDate", "繳息起日(前)", "" },
-			{ "L5r03NewTransIntStartDate", "NewTransIntStartDate", "繳息起日(後)", "" }, { "L5r03TransIntEndDate", "TransIntEndDate", "繳息迄日(前)", "" },
-			{ "L5r03NewTransIntEndDate", "NewTransIntEndDate", "繳息迄日(後)", "" }, { "L5r03TransRepayPeriod", "TransRepayPeriod", "還款期數(前)", "" },
-			{ "L5r03NewTransRepayPeriod", "NewTransRepayPeriod", "還款期數(後)", "" }, { "L5r03TransShouldPayPeriod", "TransShouldPayPeriod", "本次應還期數(前)", "" },
-			{ "L5r03NewTransShouldPayPeriod", "NewTransShouldPayPeriod", "本次應還期數(後)", "" }, { "L5r03TransDueAmt", "TransDueAmt", "本次應還金額(前)", "" },
-			{ "L5r03NewTransDueAmt", "NewTransDueAmt", "本次應還金額(後)", "" }, { "L5r03TransRepayDate", "TransRepayDate", "入帳還款日期(前)", "" }, // DateRocToAc
+			{ "L5r03CustId", "CustId", "身份證字號", "" }, { "L5r03CaseSeq", "CaseSeq", "案件序號", "" },
+			{ "L5r03CustNo", "CustNo", "戶號", "" }, { "L5r03CustName", "CustName", "戶名", "" },
+			{ "L5r03Status", "Status", "戶況(舊)", "" }, { "L5r03NewStatus", "NewStatus", "戶況(新)", "" },
+			{ "L5r03CustLoanKind", "CustLoanKind", "債權戶別", "" }, { "L5r03ApplDate", "ApplDate", "協商申請日", "" },
+			{ "L5r03MainDueAmt", "MainDueAmt", "每期期款", "" }, { "L5r03TotalPeriod", "TotalPeriod", "總期數", "" },
+			{ "L5r03IntRate", "IntRate", "每期利率", "" }, { "L5r03RepaidPeriod", "RepaidPeriod", "已繳期數(前)", "" },
+			{ "L5r03NewRepaidPeriod", "NewRepaidPeriod", "已繳期數(後)", "" },
+			{ "L5r03IsMainFin", "IsMainFin", "是否最大債權", "" }, { "L5r03MainFinCode", "MainFinCode", "最大債權機構", "" },
+			{ "L5r03OrgPrincipalBal", "OrgPrincipalBal", "總本金餘額(前)", "" },
+			{ "L5r03NewPrincipalBal", "NewPrincipalBal", "總本金餘額(後)", "" },
+			{ "L5r03OrgAccuTempAmt", "OrgAccuTempAmt", "累繳金額(前)", "" },
+			{ "L5r03NewAccuTempAmt", "NewAccuTempAmt", "累繳金額(後)", "" },
+			{ "L5r03OrgAccuOverAmt", "OrgAccuOverAmt", "累溢收金額(前)", "" },
+			{ "L5r03NewAccuOverAmt", "NewAccuOverAmt", "累溢收金額(後)", "" },
+			{ "L5r03OrgAccuDueAmt", "OrgAccuDueAmt", "累應還金額(前)", "" },
+			{ "L5r03NewAccuDueAmt", "NewAccuDueAmt", "累應還金額(後)", "" },
+			{ "L5r03OrgAccuSklShareAmt", "OrgAccuSklShareAmt", "累新壽分攤金額(前)", "" },
+			{ "L5r03NewAccuSklShareAmt", "NewAccuSklShareAmt", "累新壽分攤金額(後)", "" },
+			{ "L5r03OrgNextPayDate", "OrgNextPayDate", "下次應繳日(前)", "" },
+			{ "L5r03NewNextPayDate", "NewNextPayDate", "下次應繳日(後)", "" },
+			{ "L5r03OrgRepayPrincipal", "OrgRepayPrincipal", "還本本金(前)", "" },
+			{ "L5r03NewRepayPrincipal", "NewRepayPrincipal", "還本本金(後)", "" },
+			{ "L5r03OrgRepayInterest", "OrgRepayInterest", "還本利息(前)", "" },
+			{ "L5r03NewRepayInterest", "NewRepayInterest", "還本利息(後)", "" },
+			{ "L5r03TwoStepCode", "TwoStepCode", "二階段註記", "" }, { "L5r03ChgCondDate", "ChgCondDate", "申請變更還款條件日", "" },
+			{ "L5r03PayIntDate", "PayIntDate", "繳息迄日(前)", "" },
+			{ "L5r03NewPayIntDate", "NewPayIntDate", "繳息迄日(後)", "" },
+			{ "L5r03OrgStatusDate", "OrgStatusDate", "戶況日期(前)", "" },
+			{ "L5r03NewStatusDate", "NewStatusDate", "戶況日期(後)", "" }, { "L5r03TransAcDate", "TransAcDate", "會計日期", "" },
+			{ "L5r03TransTitaTlrNo", "transTitaTlrNo", "經辦", "" },
+			{ "L5r03TransTitaTxtNo", "transTitaTxtNo", "交易序號", "" }, { "L5r03TransCustNo", "TransCustNo", "戶號", "" },
+			{ "L5r03TransCaseSeq", "TransCaseSeq", "案件序號", "" },
+			{ "L5r03TransEntryDate", "transEntryDate", "入帳日期", "" },
+			{ "L5r03TransTxStatus", "transTxStatus", "交易狀態(前)", "" },
+			{ "L5r03NewTransTxStatus", "NewtransTxStatus", "交易狀態(後)", "" },
+			{ "L5r03TransTxKind", "transTxKind", "交易別(前)", "" },
+			{ "L5r03NewTransTxKind", "NewtransTxKind", "交易別(後)", "" },
+			{ "L5r03TransTxAmt", "transTxAmt", "交易金額(前)", "" },
+			{ "L5r03NewTransTxAmt", "NewtransTxAmt", "交易金額(後)", "" },
+			{ "L5r03TransPrincipalBal", "TransPrincipalBal", "本金餘額(前)", "" },
+			{ "L5r03NewTransPrincipalBal", "NewTransPrincipalBal", "本金餘額(後)", "" },
+			{ "L5r03TransReturnAmt", "TransReturnAmt", "退還金額(前)", "" },
+			{ "L5r03NewTransReturnAmt", "NewTransReturnAmt", "退還金額(後)", "" },
+			{ "L5r03TransSklShareAmt", "TransSklShareAmt", "攤分金額(前)", "" },
+			{ "L5r03NewTransSklShareAmt", "NewTransSklShareAmt", "攤分金額(後)", "" },
+			{ "L5r03TransApprAmt", "TransApprAmt", "撥付金額(前)", "" },
+			{ "L5r03NewTransApprAmt", "NewTransApprAmt", "撥付金額(後)", "" },
+			{ "L5r03TransExportDate", "transExportDate", "撥付製檔日", "" },
+			{ "L5r03TransExportAcDate", "transExportAcDate", "撥付出帳日", "" },
+			{ "L5r03TransTempRepayAmt", "transTempRepayAmt", "暫收抵繳金額(前)", "" },
+			{ "L5r03NewTransTempRepayAmt", "NewtransTempRepayAmt", "暫收抵繳金額(後)", "" },
+			{ "L5r03TransOverRepayAmt", "TransOverRepayAmt", "溢收抵繳金額(前)", "" },
+			{ "L5r03NewTransOverRepayAmt", "NewTransOverRepayAmt", "溢收抵繳金額(後)", "" },
+			{ "L5r03TransPrincipalAmt", "TransPrincipalAmt", "沖銷本金(前)", "" },
+			{ "L5r03NewTransPrincipalAmt", "NewTransPrincipalAmt", "沖銷本金(後)", "" },
+			{ "L5r03TransInterestAmt", "TransInterestAmt", "沖銷利息(前)", "" },
+			{ "L5r03NewTransInterestAmt", "NewTransInterestAmt", "沖銷利息(後)", "" },
+			{ "L5r03TransOverAmt", "TransOverAmt", "轉入溢收金額(前)", "" },
+			{ "L5r03NewTransOverAmt", "NewTransOverAmt", "轉入溢收金額(後)", "" },
+			{ "L5r03TransIntStartDate", "TransIntStartDate", "繳息起日(前)", "" },
+			{ "L5r03NewTransIntStartDate", "NewTransIntStartDate", "繳息起日(後)", "" },
+			{ "L5r03TransIntEndDate", "TransIntEndDate", "繳息迄日(前)", "" },
+			{ "L5r03NewTransIntEndDate", "NewTransIntEndDate", "繳息迄日(後)", "" },
+			{ "L5r03TransRepayPeriod", "TransRepayPeriod", "還款期數(前)", "" },
+			{ "L5r03NewTransRepayPeriod", "NewTransRepayPeriod", "還款期數(後)", "" },
+			{ "L5r03TransShouldPayPeriod", "TransShouldPayPeriod", "本次應還期數(前)", "" },
+			{ "L5r03NewTransShouldPayPeriod", "NewTransShouldPayPeriod", "本次應還期數(後)", "" },
+			{ "L5r03TransDueAmt", "TransDueAmt", "本次應還金額(前)", "" },
+			{ "L5r03NewTransDueAmt", "NewTransDueAmt", "本次應還金額(後)", "" },
+			{ "L5r03TransRepayDate", "TransRepayDate", "入帳還款日期(前)", "" }, // DateRocToAc
 			{ "L5r03NewTransRepayDate", "NewTransRepayDate", "入帳還款日期(後)", "" }, // DateRocToAc
-			{ "L5r03TransOrgAccuOverAmt", "TransOrgAccuOverAmt", "累溢繳款(交易後)(前)", "" }, { "L5r03NewTransOrgAccuOverAmt", "NewTransOrgAccuOverAmt", "累溢繳款(交易後)(後)", "" },
-			{ "L5r03TransAccuOverAmt", "TransAccuOverAmt", "累溢繳款(交易後)(前)", "" }, { "L5r03NewTransAccuOverAmt", "NewTransAccuOverAmt", "累溢繳款(交易後)(後)", "" },
+			{ "L5r03TransOrgAccuOverAmt", "TransOrgAccuOverAmt", "累溢繳款(交易後)(前)", "" },
+			{ "L5r03NewTransOrgAccuOverAmt", "NewTransOrgAccuOverAmt", "累溢繳款(交易後)(後)", "" },
+			{ "L5r03TransAccuOverAmt", "TransAccuOverAmt", "累溢繳款(交易後)(前)", "" },
+			{ "L5r03NewTransAccuOverAmt", "NewTransAccuOverAmt", "累溢繳款(交易後)(後)", "" },
 			{ "L5r03TrialFunc", "TrialFunc", "程式功能內部用代號", "" } };
 
 	public NegCom() {
@@ -211,904 +300,673 @@ public class NegCom extends CommBuffer {
 	private Integer limit = Integer.MAX_VALUE;// 查全部
 
 	/**
-	 * NegTrans試算專用
 	 * 
-	 * @param titaVo       titaVo
-	 * @param tNegTrans    NegTrans的一筆資料
-	 * @param TrialFunc    試算是否為一開始的,還是後面修改後的調Rim 0:一開始試算 1:異動後 試算 2:UPDATE
-	 * @param NewTxKind    異動後交易別
-	 * @param NewReturnAmt 異動後退還金額
-	 * @return MapNeg注意:NegTrans開頭會註記Trans,NegMain開投註記Main
-	 * @throws LogicException 交易程式需承接LogicException
-	 * @author Jacky Lu
+	 * @param tNegTrans    債務協商交易檔
+	 * @param iTrialFunc   試算是否為一開始的,還是後面修改後的調Rim 0:一開始試算 1:異動後 試算 2:UPDATE
+	 * @param iNewTxKind 異動後交易別
+	 * @param titaVo       TitaVo
+	 * @return MapNeg
+	 * @throws LogicException ..
 	 */
-	public Map<String, String> NegTransTrial(TitaVo titaVo, NegTrans tNegTrans, String TrialFunc, String NewTxKind, String NewReturnAmt) throws LogicException {
-		int ChekUpdDB = 0;// 0:不異動 1:異動
-		if (("2").equals(TrialFunc)) {
-			// 更新資料庫
+	public Map<String, String> trialNegtrans(NegTrans tNegTrans, String iTrialFunc, String iNewTxKind, TitaVo titaVo)
+			throws LogicException {
+		ChekUpdDB = 0;// 0:不異動 1:異動
+		if (("2").equals(iTrialFunc)) {
 			ChekUpdDB = 1;
-		}
-
-		if (NewReturnAmt != null && NewReturnAmt.length() != 0) {
-
-		} else {
-			NewReturnAmt = "0.0";
 		}
 
 		// int Today=dateUtil.getNowIntegerForBC();
 		int Today = titaVo.getOrgEntdyI();// 會計日期
-		this.info("NegTransTrial Today=[" + Today + "]");
-		Map<String, String> MapNeg = new HashMap<String, String>();
+		this.info("NegtransTrial Today=[" + Today + "]");
+//		Map<String, String> mapNeg = new HashMap<String, String>();
 		// 1.得到NegTrans資料取用NegMains資料
-		if (tNegTrans != null) {
-			int ThisCustNo = tNegTrans.getCustNo();
-			int ThisCaseSeq = tNegTrans.getCaseSeq();
-			NegMainId tNegMainId = new NegMainId();
-			tNegMainId.setCaseSeq(ThisCaseSeq);
-			tNegMainId.setCustNo(ThisCustNo);
 
-			NegMain tNegMain = new NegMain();
-			tNegMain = sNegMainService.findById(tNegMainId, titaVo);
-
-			String custId = "";
-			String custNo = "";
-			String custName = "";
-
-			Map<String, String> CustData = FindCustMain(custId, String.valueOf(ThisCustNo), titaVo);
-			custId = CustData.get("CustId");
-			custNo = CustData.get("CustNo");
-			custName = CustData.get("CustName");
-			// 2.得到Main的資料
-			if (tNegMain != null) {
-				// 3.單筆試算
-
-				// NegMain
-				String status = tNegMain.getStatus();
-				String IsMainFin = tNegMain.getIsMainFin();
-				String mainFinCode = tNegMain.getMainFinCode();
-				BigDecimal mainDueAmt = tNegMain.getDueAmt();// 期金
-				String caseKindCode = tNegMain.getCaseKindCode();
-				int mainTotalPeriod = tNegMain.getTotalPeriod();// 總期數
-				int mainRepaidPeriod = tNegMain.getRepaidPeriod();// 已繳期數
-				BigDecimal mainAccuTempAmt = tNegMain.getAccuTempAmt();// 累繳金額
-				BigDecimal mainAccuOverAmt = tNegMain.getAccuOverAmt();// 累溢收金額
-				BigDecimal mainAccuDueAmt = tNegMain.getAccuDueAmt();// 累應還金額
-				BigDecimal mainAccuSklShareAmt = tNegMain.getAccuSklShareAmt();// 累計新壽攤分
-				BigDecimal mainIntRate = tNegMain.getIntRate();// 利率\
-				int remainPeriod = mainTotalPeriod - mainRepaidPeriod;// 剩餘期數
-
-				int mainFirstDueDate = tNegMain.getFirstDueDate();// 首次應繳日
-				int mainNextPayDate = tNegMain.getNextPayDate();// 下次應繳日
-				int mainPayIntDate = tNegMain.getPayIntDate();// 繳息迄日
-				int newStatusDate = tNegMain.getStatusDate();// 戶況日期
-				int newPayIntDate = 0;// 繳息迄日
-
-				BigDecimal mainPrincipalBal = tNegMain.getPrincipalBal();// 總本金餘額
-				if (mainPrincipalBal.compareTo(BigDecimalZero) == 0) {
-					mainPrincipalBal = tNegMain.getTotalContrAmt();
-				}
-				BigDecimal mainRepayPrincipal = tNegMain.getRepayPrincipal();// 累償還本金
-				BigDecimal mainRepayInterest = tNegMain.getRepayInterest();// 累償還利息
-
-				// NegTrans
-				int TransTxStatus = tNegTrans.getTxStatus();// 交易狀態 0:未入帳;1:待處理;2:已入帳;
-
-				String transTxKind = tNegTrans.getTxKind();// 交易別 0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
-				BigDecimal transTxAmt = tNegTrans.getTxAmt();// 交易金額
-				BigDecimal orgTransPrincipalBal = tNegTrans.getPrincipalBal();// 本金餘額
-				if (orgTransPrincipalBal.compareTo(BigDecimalZero) == 0) {
-					orgTransPrincipalBal = mainPrincipalBal;
-				}
-				BigDecimal TransPrincipalBal = BigDecimal.ZERO;
-				BigDecimal TransReturnAmt = tNegTrans.getReturnAmt();// 退還金額
-				BigDecimal TransSklShareAmt = tNegTrans.getSklShareAmt();// 新壽攤分
-				BigDecimal TransApprAmt = tNegTrans.getApprAmt();// 撥付金額
-				int TransExportDate = tNegTrans.getExportDate();// 撥付製檔日
-				int TransExportAcDate = tNegTrans.getExportAcDate();// 撥付出帳日
-				BigDecimal TransTempRepayAmt = tNegTrans.getTempRepayAmt();// 暫收抵繳金額
-				BigDecimal TransOverRepayAmt = tNegTrans.getOverRepayAmt();// 溢收抵繳金額
-				BigDecimal TransPrincipalAmt = tNegTrans.getPrincipalAmt();// 本金金額
-				BigDecimal TransInterestAmt = tNegTrans.getInterestAmt();// 利息金額
-				BigDecimal TransOverAmt = tNegTrans.getOverAmt();// 轉入溢收金額
-				int TransIntStartDate = tNegTrans.getIntStartDate();// 繳息起日
-				int TransIntEndDate = tNegTrans.getIntEndDate();// 繳息迄日
-				int TransRepayPeriod = tNegTrans.getRepayPeriod();// 還款期數
-				int TransRepayDate = tNegTrans.getRepayDate();// 入帳還款日期
-
-				BigDecimal TransOrgAccuOverAmt = tNegMain.getAccuOverAmt();// 累溢繳款(交易前)
-				BigDecimal TransAccuOverAmt = tNegTrans.getAccuOverAmt();// 累溢繳款(交易後)
-				int TransShouldPayPeriod = tNegTrans.getShouldPayPeriod();// 本次應還期數
-				BigDecimal TransDueAmt = tNegTrans.getDueAmt();// 期金
-				BigDecimal NewTransDueAmt = BigDecimal.ZERO;// 本次應還金額
-				if (mainDueAmt.compareTo(BigDecimalZero) == 0) {
-					// E5009 資料檢核錯誤
-					throw new LogicException(titaVo, "E5009", "[期金]為0");
-				}
-
-				if (TransDueAmt.compareTo(BigDecimalZero) == 0) {
-					// 期金
-					TransDueAmt = mainDueAmt;
-
-				}
-
-				// 用日期去算到今天這戶頭應該還幾期
-				// NextPayDate 下次應繳日 與本次會計日相比差了多少個月
-				if (mainNextPayDate == 0) {
-					// E5009 資料檢核錯誤
-					throw new LogicException(titaVo, "E5009", "[下次應繳日]未填寫.請至L5071查詢後維護.");
-				} else {
-					TransShouldPayPeriod = DiffMonth(1, mainNextPayDate, Today) + 1;// 月份差異
-				}
-				// -----
-				if (TransShouldPayPeriod != 0) {
-					NewTransDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(TransShouldPayPeriod));// Trans 本次應還金額
-				}
-
-				int DiffMonth = DiffMonth(1, mainFirstDueDate, Today) + 1;// 月份差異=首次應繳日 與 會計日的月份差+1
-				mainAccuDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(DiffMonth));// Main累應還金額=Main期金*Trans本次應還期數
-
-				// TransTxKind 0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
-				// 0:正常-匯入款＋溢收款 >= 期款
-				// 1:溢繳(預收多期)-匯入款 > 期款
-				// 2:短繳-匯入款＋溢收款 < 期款
-				// 3:提前還本-匯入款 >= 5期期款
-				// 4:結清-匯入款＋溢收款 >=最後一期期款
-				// 5:提前清償-匯入款＋溢收款 >= 剩餘期款
-				// 6:待處理
-				// ※入帳訂正需在撥付產擋前，依反向順序訂正
-
-				// String OringnalTxKind=TransTxKind;
-				transTxKind = "";
-
-				// 剩餘本利和=總本金餘額(1+年利率/12/100)
-				BigDecimal SumPrincipalAndIntRate = mainPrincipalBal.add(mainPrincipalBal.multiply(mainIntRate).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP));//
-
-				// 可分配金額=交易金額+累繳金額+累溢收-(累償還本金+累償還利息)
-				BigDecimal CanCountAmt = transTxAmt.add(mainAccuTempAmt).add(mainAccuOverAmt).subtract((mainRepayPrincipal.add(mainRepayInterest)));
-
-				// 剩餘本利和<=可分配金額
-				if (SumPrincipalAndIntRate.compareTo(CanCountAmt) <= 0) {
-					// 5:提前清償
-					// 4:結清
-					TransRepayPeriod = remainPeriod;
-
-					// 剩餘期數>1
-					if (remainPeriod > 1) {
-						// 5:提前清償
-						transTxKind = "5";
-					} else {
-						// 4:結清
-						transTxKind = "4";
-					}
-				} else {
-					// 還款期數
-					TransRepayPeriod = Integer.parseInt(String.valueOf(CanCountAmt.divide(mainDueAmt, 2, RoundingMode.DOWN).setScale(0, RoundingMode.DOWN)));
-
-					// 3:提前還本-匯入款 >= 5期期款
-					if (transTxAmt.compareTo(mainDueAmt.multiply(new BigDecimal(5)).setScale(0, RoundingMode.UP)) >= 0) {
-						transTxKind = "3";
-					}
-					// 1:溢繳(預收多期)-匯入款 > 期款
-					else if (transTxAmt.compareTo(mainDueAmt) > 0) {
-						transTxKind = "1";
-
-					}
-					// 0:正常-匯入款＋溢收款 >= 期款
-					else if (CanCountAmt.compareTo(mainDueAmt) >= 0) {
-						transTxKind = "0";
-					}
-					// 2:短繳-匯入款＋溢收款 < 期款
-					else {
-						transTxKind = "2";
-					}
-
-				}
-
-				this.info("NegCom TransTxKind=[" + transTxKind + "],NewTxKind=[" + NewTxKind + "]");
-				// 0:一開始試算 1:異動後 試算 2:UPDATE
-				// USER 自己輸入 交易別(提前還本可改為溢繳)
-				if (("1").equals(TrialFunc) || ("2").equals(TrialFunc)) {
-					if (!NewTxKind.equals(transTxKind)) {
-						transTxKind = NewTxKind;
-					}
-				}
-				this.info("NegCom TransTxKind After Trial=[" + transTxKind + "]");
-				BigDecimal DueAmtMultiTransRepayPeriod = BigDecimalZero;
-
-				if (("0").equals(transTxKind)) {
-					TransTxStatus = 2;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
-					// 正常
-					// 0:正常->可分配金額 = 期款
-
-					// 還款期數
-					TransRepayPeriod = 1;
-					TransReturnAmt = BigDecimalZero;// 退還金額
-
-					int CompareTransTxAmtMainDueAmt = transTxAmt.compareTo(mainDueAmt);
-					if (CompareTransTxAmtMainDueAmt >= 0) {
-						// 交易金額>=期金
-						TransTempRepayAmt = mainDueAmt;// Trans暫收抵繳金額=期金
-						TransOverRepayAmt = BigDecimalZero;// 溢收抵繳金額
-						TransOverAmt = transTxAmt.subtract(mainDueAmt);// 轉入溢收金額
-					} else {
-						// 交易金額<期金
-
-						// 可分配金額=交易金額+累繳金額+累溢收-(累償還本金+累償還利息)
-						// CanCountAmt =
-						// TransTxAmt.add(MainAccuTempAmt).add(MainAccuOverAmt).subtract((MainRepayPrincipal.add(MainRepayInterest)));
-
-						TransTempRepayAmt = mainDueAmt;// Trans暫收抵繳金額=繳交金額
-						TransOverRepayAmt = mainDueAmt.subtract(transTxAmt);// 溢收抵繳金額
-						TransOverAmt = CanCountAmt.subtract(mainDueAmt);// 轉入溢收金額
-					}
-
-					mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt);// Main累繳金額
-					mainAccuOverAmt = mainAccuOverAmt.add(TransOverAmt); // Main累溢收金額=Main累溢收金額+轉入溢收金額-溢收抵繳金額
-					mainRepaidPeriod = mainRepaidPeriod + TransRepayPeriod;// 已繳期數
-					TransRepayDate = Today; // 入帳還款日
-				} else if (("2").equals(transTxKind)) {
-					// 2:短繳-匯入款＋溢收款 < 期款
-					TransTxStatus = 2;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
-					TransRepayPeriod = 0;
-					TransReturnAmt = BigDecimalZero;// 退還金額
-					TransTempRepayAmt = BigDecimalZero;// Trans暫收抵繳金額
-					TransOverRepayAmt = BigDecimalZero;// 溢收抵繳金額
-					TransOverAmt = transTxAmt;// 轉入溢收金額
-
-					mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt);// Main累繳金額
-					// MainAccuOverAmt=MainAccuOverAmt.add(TransOverAmt).subtract(TransOverRepayAmt);
-					// //Main累溢收金額+轉入溢收金額-溢收抵繳金額
-					mainRepaidPeriod = mainRepaidPeriod + TransRepayPeriod;// 已繳期數
-					TransPrincipalAmt = BigDecimal.ZERO;// 還本本金-沖銷本金
-					TransInterestAmt = BigDecimal.ZERO;// 還本利息-沖銷利息
-					TransRepayDate = Today; // 入帳還款日
-				} else if (("1").equals(transTxKind)) {
-					// 1:溢繳(預收多期)-匯入款 > 期款
-					TransTxStatus = 2;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
-					TransReturnAmt = BigDecimalZero;// 退還金額
-					// 繳交期數
-					// TransRepayPeriod =
-					// Integer.parseInt(String.valueOf(CanCountAmt.divide(MainDueAmt, 2,
-					// RoundingMode.DOWN).setScale(0, RoundingMode.DOWN)));
-
-					TransTempRepayAmt = mainDueAmt.multiply(new BigDecimal(TransRepayPeriod));// Trans暫收抵繳金額
-					TransOverAmt = CanCountAmt.subtract(TransTempRepayAmt);// 轉入溢收金額
-					if (TransOverAmt.compareTo(BigDecimalZero) >= 0) {
-						TransOverRepayAmt = BigDecimalZero;// 溢收抵繳金額
-					} else {
-						TransOverRepayAmt = TransOverAmt.multiply(new BigDecimal(-1));// 溢收抵繳金額
-						TransOverAmt = BigDecimalZero;
-					}
-
-					this.info("NegService Case 1 TransTxKind=[" + transTxKind + "],TransRepayPeriod=[" + TransRepayPeriod + "]");
-
-					mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt);// Main累繳金額
-					mainAccuOverAmt = mainAccuOverAmt.add(TransOverAmt); // Main累溢收金額+轉入溢收金額-溢收抵繳金額
-					mainRepaidPeriod = mainRepaidPeriod + TransRepayPeriod;// 已繳期數
-					TransRepayDate = Today; // 入帳還款日
-				} else if (("3").equals(transTxKind)) {
-					// 3:提前還本-匯入款 >= 5期期款
-					// 只繳一期,其他的全部算繳交本金
-					TransTxStatus = 2;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
-					TransReturnAmt = BigDecimalZero;// 退還金額
-					// 繳交期數
-					TransRepayPeriod = 1;
-
-					this.info("NegService Case 3 TransTxKind=[" + transTxKind + "],TransRepayPeriod=[" + TransRepayPeriod + "]");
-					// 不用用到 累溢收金額
-					TransTempRepayAmt = transTxAmt;// Trans暫收抵繳金額
-					TransOverRepayAmt = BigDecimalZero;// 溢收抵繳金額
-
-					if (TransTempRepayAmt.compareTo(transTxAmt) <= 0) {
-						// TransOverAmt = TransTxAmt.subtract(TransTempRepayAmt);// 轉入溢收金額
-						TransOverAmt = BigDecimalZero;// 轉入溢收金額
-					} else {
-						throw new LogicException(titaVo, "E5006", "發生未預期的錯誤");
-					}
-					mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt);// Main累繳金額
-					mainAccuOverAmt = mainAccuOverAmt.add(TransOverAmt).subtract(TransOverRepayAmt); // Main累溢收金額+轉入溢收金額-溢收抵繳金額
-					mainRepaidPeriod = mainRepaidPeriod + TransRepayPeriod;// 已繳期數
-					TransRepayDate = Today; // 入帳還款日
-				} else if (("4").equals(transTxKind) || ("5").equals(transTxKind)) {
-					// 4:結清-匯入款＋溢收款 >=最後一期期款
-					// 5:提前清償-匯入款＋溢收款 >= 剩餘期款
-					// 繳交期數
-					TransTxStatus = 2;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
-
-					// 結清
-					status = "3";
-					newStatusDate = Today;
-
-					DueAmtMultiTransRepayPeriod = mainDueAmt.multiply(BigDecimal.valueOf(TransRepayPeriod));
-					if (DueAmtMultiTransRepayPeriod.compareTo(transTxAmt) > 0) {
-						// 用到 累溢收金額
-						TransTempRepayAmt = transTxAmt;// Trans暫收抵繳金額
-						TransOverRepayAmt = DueAmtMultiTransRepayPeriod.subtract(TransTempRepayAmt);// 溢收抵繳金額
-						TransOverAmt = BigDecimalZero;// 轉入溢收金額
-					} else {
-						// 不用用到 累溢收金額
-						TransTempRepayAmt = DueAmtMultiTransRepayPeriod;// Trans暫收抵繳金額
-						TransOverRepayAmt = BigDecimalZero;// 溢收抵繳金額
-
-						if (TransTempRepayAmt.compareTo(transTxAmt) <= 0) {
-							TransOverAmt = transTxAmt.subtract(TransTempRepayAmt);// 轉入溢收金額
-						} else {
-							throw new LogicException(titaVo, "E5006", "發生未預期的錯誤");
-						}
-						// TransOverAmt=;//轉入溢收金額
-					}
-					// BigDecimal TransOrgAccuOverAmt=tNegMain.getAccuOverAmt();//累溢繳款(交易前)
-					mainAccuOverAmt = mainAccuOverAmt.add(TransOverAmt).subtract(TransOverRepayAmt); // Main累溢收金額+轉入溢收金額-溢收抵繳金額
-					TransReturnAmt = TransReturnAmt.add(mainAccuOverAmt);
-					mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt).subtract(mainAccuOverAmt);// Main累繳金額
-					mainAccuOverAmt = BigDecimalZero;
-					TransOverAmt = BigDecimalZero;
-					mainRepaidPeriod = mainRepaidPeriod + TransRepayPeriod;// 已繳期數
-					TransRepayDate = Today; // 入帳還款日
-
-				} else if (("6").equals(transTxKind)) {
-					// 6:待處理
-					TransRepayPeriod = 0;
-					TransTxStatus = 1;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
-				} else {
-					TransRepayPeriod = 0;
-					transTxKind = "9";
-					TransTxStatus = 1;// 待處理
-				}
-
-				// 新壽攤分
-				// 此處由L5702入帳時寫入,L5707只是把撥付日期給壓上
-				if (transTxKind != null && transTxKind.length() != 0 && !("6").equals(transTxKind)) {
-					Slice<NegFinShare> slNegFinShare = sNegFinShareService.FindAllFinCode(ThisCustNo, ThisCaseSeq, this.index, this.limit, titaVo);
-					List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
-					if (lNegFinShare != null && lNegFinShare.size() != 0) {
-						int lNegFinShareS = lNegFinShare.size();
-						int lNegFinShareS1 = lNegFinShareS - 1;
-						BigDecimal SumShareAmt = BigDecimal.ZERO;
-						for (int i = 0; i < lNegFinShareS; i++) {
-							NegFinShare tNegFinShare = lNegFinShare.get(i);
-							String FinCode = tNegFinShare.getFinCode();// 債權機構
-							if (FinCode != null && FinCode.length() != 0) {
-
-								BigDecimal AmtRatio = tNegFinShare.getAmtRatio();// 債權比例%
-								BigDecimal ShareAmt = BigDecimal.ZERO;// 依債權比例分配金額
-								if (i == lNegFinShareS1) {
-									// 最後一筆資料要用減的
-									ShareAmt = transTxAmt.subtract(SumShareAmt);
-								} else {
-									ShareAmt = transTxAmt.multiply(AmtRatio, MathContext.DECIMAL128).divide(new BigDecimal(100), 0, RoundingMode.HALF_UP);
-									SumShareAmt = SumShareAmt.add(ShareAmt);
-								}
-								if (("458").equals(FinCode)) {
-									TransSklShareAmt = ShareAmt;
-									// 458 不寫入NegAppr01
-									continue;
-								}
-								// NegAppr01 撥款時寫入 L5707 只把撥款日期壓上
-								if (ChekUpdDB == 1) {
-									// 檢查是否已有入帳還款日
-									if (tNegTrans.getRepayDate() != 0) {
-										this.info("NegCom 入帳還款日 tNegTransId=[" + tNegTrans.getNegTransId().toString() + "]");
-										// E5009 資料檢核錯誤
-										throw new LogicException(titaVo, "E5009", "[入帳還款日]已有資料,不可異動交易別! 戶號=[" + tNegTrans.getCustNo() + "]");
-									}
-									// 異動資料庫
-									switch (IsMainFin) {
-									case "Y":
-										// 最大債權
-										// 寫入NegAppr01
-										NegAppr01Id tNegAppr01Id = new NegAppr01Id();
-										tNegAppr01Id.setFinCode(FinCode);
-										tNegAppr01Id.setAcDate(tNegTrans.getAcDate());
-										tNegAppr01Id.setTitaTlrNo(tNegTrans.getTitaTlrNo());
-										tNegAppr01Id.setTitaTxtNo(tNegTrans.getTitaTxtNo());
-										NegAppr01 tNegAppr01 = sNegAppr01Service.findById(tNegAppr01Id, titaVo);
-
-										NegFinAcct tNegFinAcct = sNegFinAcctService.findById(FinCode, titaVo);
-										if (tNegFinAcct != null) {
-											BigDecimal SumCustNoFinCode = SumCustNoFinCode(tNegTrans.getCustNo(), tNegTrans.getCaseSeq(), FinCode, titaVo);
-											NegAppr01 tNegAppr01Upd = new NegAppr01();
-											tNegAppr01Upd.setNegAppr01Id(tNegAppr01Id);
-											tNegAppr01Upd.setCustNo(ThisCustNo);// 戶號
-											tNegAppr01Upd.setCaseSeq(ThisCaseSeq);// 案件序號
-											tNegAppr01Upd.setCaseKindCode(caseKindCode);// 案件種類
-											tNegAppr01Upd.setApprAmt(ShareAmt);// 撥付金額
-											SumCustNoFinCode = SumCustNoFinCode.add(ShareAmt);
-											tNegAppr01Upd.setAccuApprAmt(SumCustNoFinCode);// 累計撥付金額
-											tNegAppr01Upd.setAmtRatio(AmtRatio);// 撥付比例
-											tNegAppr01Upd.setExportDate(0);// 製檔日期
-											tNegAppr01Upd.setApprDate(0);// 撥付日期
-											tNegAppr01Upd.setBringUpDate(0);// 提兌日
-											tNegAppr01Upd.setRemitBank(FinCode);// 匯款銀行
-											tNegAppr01Upd.setRemitAcct(tNegFinAcct.getRemitAcct());// 匯款帳號
-											tNegAppr01Upd.setDataSendUnit(tNegFinAcct.getDataSendSection());// 資料傳送單位
-											tNegAppr01Upd.setApprAcDate(0);// 撥付傳票日
-											tNegAppr01Upd.setReplyCode("");// 回應代碼
-											if (tNegAppr01 != null) {
-												// E0013 程式邏輯有誤
-												throw new LogicException(titaVo, "E0013", "最大債權撥付資料檔資料已存在");
-											} else {
-												// Insert
-												try {
-													sNegAppr01Service.insert(tNegAppr01Upd, titaVo);
-												} catch (DBException e) {
-													// E0005 新增資料時，發生錯誤
-													throw new LogicException(titaVo, "E0005", "最大債權撥付資料檔");
-												}
-											}
-
-										} else {
-											// E5009 資料檢核錯誤
-											throw new LogicException(titaVo, "E5009", "債務協商債權機構帳戶檔(未找到銀行代碼[" + FinCode + "]請至L5703登錄)");
-										}
-										break;
-									case "N":
-										// 一般債權
-										// 不用考慮
-										break;
-									default:
-
-									}
-								}
-							} else {
-								// E5009 資料檢核錯誤
-								throw new LogicException(titaVo, "E5009", "[提兌日]為空值");
-							}
-						}
-					}
-					TransApprAmt = transTxAmt.subtract(TransSklShareAmt);// 撥付金額
-				}
-
-//				// User 自行輸入的資料 退還金額專用
-//				if (("1").equals(Trial) || ("2").equals(Trial)) {
-////					if (TransReturnAmt.compareTo(BigDecimal.valueOf(Double.parseDouble(NewReturnAmt))) != 0) {
-////						TransReturnAmt = BigDecimal.valueOf(Double.parseDouble(NewReturnAmt));
-////					}
-//				} else if (("3").equals(Trial)) {
-//
-//				}
-
-				List<String> NotDo = new ArrayList<String>();
-				NotDo.add("2");// 短繳
-				NotDo.add("6");// 待處理
-				if (!NotDo.contains(transTxKind)) {
-					// 參考L5970的公式
-					int iLoanTerm = nper(mainPrincipalBal, mainDueAmt, mainIntRate);// 期數 (剩餘本金,期金,利率)
-					this.info("NegCom iLoanTerm=[" + iLoanTerm + "]");
-					BigDecimal OBalance = mainPrincipalBal;// 剩餘本金
-					this.info("NegCom OBalance=[" + mainPrincipalBal + "]");
-					int Count = 0;
-					for (int i = 0; i <= iLoanTerm; i++) {
-						Count++;
-						if (OBalance.compareTo(BigDecimal.ZERO) <= 0) {
-							break;
-						}
-						// iDueAmt 期金
-						BigDecimal OInterest = (OBalance.multiply(mainIntRate)).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP);// 應繳利息
-						BigDecimal OPrincipal = BigDecimal.ZERO;// 應繳本金
-						int UseAdjPrincipal[] = { 0, 0, 0, 0 };// 是否使用到調整應繳本金
-						if (OBalance.compareTo(mainDueAmt) <= 0) {
-							// 剩餘本金<期金 => 應繳本金=剩餘本金
-							OPrincipal = OBalance;
-							this.info("NegCom 1 OPrincipal=[" + OPrincipal + "]");
-							UseAdjPrincipal[0] = 1;
-						} else {
-							// 剩餘本金>=期金
-							OPrincipal = mainDueAmt.subtract(OInterest);// 應繳本金
-							UseAdjPrincipal[1] = 1;
-							this.info("NegCom 2 OPrincipal=[" + OPrincipal + "]");
-						}
-						BigDecimal Osum = OInterest.add(OPrincipal);// 本利合計
-						if (Osum.compareTo(mainDueAmt) == 0) {
-							// 本利和=期金
-							OBalance = OBalance.subtract(OPrincipal);
-							this.info("NegCom 4 OPrincipal=[" + OPrincipal + "]");
-							UseAdjPrincipal[2] = 1;
-						} else {
-							if (Osum.compareTo(mainDueAmt) < 0) {
-								// 本利和<期金
-								OPrincipal = OBalance;
-								OBalance = BigDecimal.ZERO;
-								Osum = OPrincipal.add(OInterest);
-								this.info("NegCom 3 OPrincipal=[" + OPrincipal + "]");
-								UseAdjPrincipal[3] = 1;
-							} else if (Osum.compareTo(mainDueAmt) > 0) {
-								// 本利和>期金
-								// E5009 資料檢核錯誤
-								throw new LogicException(titaVo, "E5009", "[本利和]>[期金]");
-							}
-						}
-
-						if (("3").equals(transTxKind)) {
-							// 提前還本-期數只有一
-							this.info("NegCom 本次沖銷本金 期金-應繳利息 OPrincipal=[" + OPrincipal + "]");
-							if (UseAdjPrincipal[2] != 0 && UseAdjPrincipal[1] != 0) {
-								// 剩餘本金==期金 || 剩餘本金>=期金
-								OPrincipal = OPrincipal.add(transTxAmt).subtract(mainDueAmt);
-							} else {
-								if (UseAdjPrincipal[0] != 0 || UseAdjPrincipal[3] != 0) {
-									// 剩餘本金<期金 || 本利和<期金
-
-									// OPrincipal = OPrincipal.add(TransTxAmt).subtract(OInterest);
-								}
-							}
-						}
-						TransPrincipalAmt = TransPrincipalAmt.add(OPrincipal);// 本金金額=應繳本金
-						TransInterestAmt = TransInterestAmt.add(OInterest);// 利息金額=應繳利息
-
-						this.info("NegCom Count=[" + Count + "],OPrincipal=[" + OPrincipal + "],OInterest=[" + OInterest + "]");
-						this.info("NegCom TransPrincipalAmt=[" + TransPrincipalAmt + "],TransInterestAmt=[" + TransInterestAmt + "]");
-						if (i >= TransRepayPeriod - 1) {
-							break;
-						}
-
-					}
-				}
-
-				mainRepayPrincipal = mainRepayPrincipal.add(TransPrincipalAmt);// 還本本金
-				mainRepayInterest = mainRepayInterest.add(TransInterestAmt); // 還本利息
-				this.info("NegCom MainPrincipalBal=[" + mainPrincipalBal + "],MainRepayPrincipal=[" + mainRepayPrincipal + "]-3");
-				mainPrincipalBal = mainPrincipalBal.subtract(TransPrincipalAmt);
-				// 這裡可能會產生負值
-				if (mainPrincipalBal.compareTo(BigDecimalZero) < 0) {
-					// E5009 資料檢核錯誤
-					throw new LogicException(titaVo, "E5009", "[本金餘額]不可為負值.");
-				}
-				this.info("NegCom MainPrincipalBal=[" + mainPrincipalBal + "]-4");
-				mainAccuSklShareAmt = mainAccuSklShareAmt.add(TransSklShareAmt);
-				TransPrincipalBal = mainPrincipalBal;// 本金餘額
-				TransAccuOverAmt = mainAccuOverAmt;// 累溢繳款(交易後)
-
-				if (TransTxStatus == 2) {
-					// 已入帳
-					if (mainFirstDueDate != 0) {
-						if (mainNextPayDate == 0) {
-							// 下次應繳日
-							mainNextPayDate = mainFirstDueDate;
-						}
-
-					} else {
-						// E5009 資料檢核錯誤
-						throw new LogicException(titaVo, "E5009", "[首次應繳日]未填寫,請至L5701查詢後修改.");
-					}
-
-					if (TransRepayPeriod == 0) { // 短繳
-						TransIntStartDate = 0;
-						TransIntEndDate = 0;
-						newPayIntDate = mainPayIntDate;
-					} else {
-						TransIntStartDate = mainNextPayDate;
-						TransIntEndDate = AdjMonth(TransIntStartDate, TransRepayPeriod - 1, 0);
-						newPayIntDate = TransIntEndDate;
-					}
-					// 下次應繳日+本次還款期數
-					mainNextPayDate = AdjMonth(mainNextPayDate, TransRepayPeriod, 0);
-
-					/*
-					 * Main-FirstDueDate 首次應繳日 Main-LastDueDate 還款結束日 MainNextPayDate 下次應繳日
-					 * Main-PayIntDate 繳息迄日 Tran-IntStartDate 繳息起日 Tran-IntEndDate 繳息迄日
-					 */
-					// MainNextPayDate
-				}
-
-				if (("4").equals(transTxKind) || ("5").equals(transTxKind)) {
-					// 交易別 4:結清;5:提前清償
-					// 下次應繳日 歸零
-					mainNextPayDate = 0;
-				}
-				if (ChekUpdDB == 1) {
-					if (("6").equals(transTxKind)) {
-						transTxKind = tNegTrans.getTxKind();// 保留原始資料
-					}
-					// 更新資料庫
-					// getEntityManager
-
-					NegMain tNegMainUpd = new NegMain();
-					tNegMainUpd = sNegMainService.holdById(tNegMainId, titaVo);
-
-					NegMain tNegMainOrg = (NegMain) dataLog.clone(tNegMainUpd);// 資料異動前
-
-					tNegMainUpd.setPrincipalBal(mainPrincipalBal);// 總本金餘額
-					tNegMainUpd.setRepaidPeriod(mainRepaidPeriod);// 已繳期數
-					tNegMainUpd.setAccuTempAmt(mainAccuTempAmt);// 累繳金額
-					tNegMainUpd.setAccuOverAmt(mainAccuOverAmt);// 累溢收金額
-					tNegMainUpd.setAccuDueAmt(mainAccuDueAmt);// 累應還金額
-					tNegMainUpd.setNextPayDate(mainNextPayDate);// 下次應繳日
-					tNegMainUpd.setPayIntDate(mainPayIntDate);// 繳息迄日
-					tNegMainUpd.setRepayPrincipal(mainRepayPrincipal);// 還本本金
-					tNegMainUpd.setRepayInterest(mainRepayInterest);// 還本利息
-					tNegMainUpd.setAccuSklShareAmt(mainAccuSklShareAmt);// 累新壽攤分
-					tNegMainUpd.setStatus(status);// 戶況
-
-					NegTrans tNegTransUpd = new NegTrans();
-					tNegTransUpd = sNegTransService.findById(tNegTrans.getNegTransId(), titaVo);
-
-					int TrialUpdOrIns = 0;// 0:Insert 1:Update
-					if (tNegTransUpd != null) {
-						TrialUpdOrIns = 1;
-					} else {
-						tNegTransUpd = tNegTrans;
-						TrialUpdOrIns = 0;
-					}
-					tNegTransUpd.setTxStatus(TransTxStatus);// 交易狀態0:未入帳;1:待處理;2:已入帳;
-					tNegTransUpd.setTxKind(transTxKind);// 交易別0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
-					tNegTransUpd.setTxAmt(transTxAmt);// 交易金額
-					tNegTransUpd.setPrincipalBal(TransPrincipalBal);// 本金餘額
-					tNegTransUpd.setReturnAmt(TransReturnAmt);// 退還金額
-					tNegTransUpd.setSklShareAmt(TransSklShareAmt);// 新壽攤分
-					tNegTransUpd.setApprAmt(TransApprAmt);// 撥付金額
-					tNegTransUpd.setExportDate(TransExportDate);// 撥付製檔日
-					tNegTransUpd.setExportAcDate(TransExportAcDate);// 撥付出帳日
-					tNegTransUpd.setTempRepayAmt(TransTempRepayAmt);// 暫收抵繳金額
-					tNegTransUpd.setOverRepayAmt(TransOverRepayAmt);// 溢收抵繳金額
-					tNegTransUpd.setPrincipalAmt(TransPrincipalAmt);// 本金金額
-					tNegTransUpd.setInterestAmt(TransInterestAmt);// 利息金額
-					tNegTransUpd.setOverAmt(TransOverAmt);// 轉入溢收金額
-					tNegTransUpd.setIntStartDate(TransIntStartDate);// 繳息起日
-					tNegTransUpd.setIntEndDate(TransIntEndDate);// 繳息迄日
-					tNegTransUpd.setRepayPeriod(TransRepayPeriod);// 還款期數
-					tNegTransUpd.setRepayDate(TransRepayDate);// 入帳還款日期
-					tNegTransUpd.setOrgAccuOverAmt(TransOrgAccuOverAmt);// 累溢繳款(交易前)
-					tNegTransUpd.setAccuOverAmt(TransAccuOverAmt);// 累溢繳款(交易後)
-					tNegTransUpd.setShouldPayPeriod(TransShouldPayPeriod);// 本次應還期數
-					tNegTransUpd.setDueAmt(TransDueAmt);// 期金
-
-					String ThisSeqNo = tNegTransUpd.getThisSeqNo().trim();
-					String ThisSeqNoAdd = "";
-					if (ThisSeqNo != null && ThisSeqNo.length() != 0) {
-						// Update
-						ThisSeqNoAdd = String.valueOf(Integer.parseInt(ThisSeqNo) + 1);
-					} else {
-						// Insert
-						ThisSeqNo = "0";
-						ThisSeqNoAdd = "0";
-					}
-
-					tNegTransUpd.setThisEntdy(titaVo.getEntDyI());// 本次交易日
-					tNegTransUpd.setThisKinbr(titaVo.getKinbr());// 本次分行別
-					tNegTransUpd.setThisTlrNo(titaVo.getTlrNo());// 本次交易員代號
-					tNegTransUpd.setThisTxtNo(titaVo.getTxtNo());// 本次交易序號
-					tNegTransUpd.setThisSeqNo(ThisSeqNoAdd);// 本次序號
-					try {
-						// Key
-						tNegMainUpd.setCaseSeq(tNegMainId.getCaseSeq());
-						tNegMainUpd.setCustNo(tNegMainId.getCustNo());
-
-						tNegMainUpd.setThisAcDate(tNegTrans.getNegTransId().getAcDate());// AcDate 本次會計日期
-						tNegMainUpd.setThisTitaTlrNo(tNegTrans.getNegTransId().getTitaTlrNo());// TitaTlrNo 本次經辦
-						tNegMainUpd.setThisTitaTxtNo(tNegTrans.getNegTransId().getTitaTxtNo());// TitaTxtNo 本次交易序號
-
-						tNegMainUpd.setLastAcDate(tNegMainOrg.getThisAcDate());// LastAcDate 上次會計日期
-						tNegMainUpd.setLastTitaTlrNo(tNegMainOrg.getThisTitaTlrNo());// LastTitaTlrNo 上次經辦
-						tNegMainUpd.setLastTitaTxtNo(tNegMainOrg.getThisTitaTxtNo());// LastTitaTxtNo 上次交易序號
-
-						tNegMainUpd.setCreateDate(tNegMainOrg.getCreateDate());
-						tNegMainUpd.setCreateEmpNo(tNegMainOrg.getCreateEmpNo());
-						sNegMainService.update2(tNegMainUpd, titaVo);// 資料異動後-1
-						dataLog.setEnv(titaVo, tNegMainOrg, tNegMainUpd);// 資料異動後-2
-						dataLog.exec();// 資料異動後-3
-						if (TrialUpdOrIns == 1) {
-							NegTrans OrgtNegTrans = sNegTransService.holdById(tNegTrans.getNegTransId(), titaVo);
-							// Key
-							tNegTransUpd.setAcDate(tNegTrans.getNegTransId().getAcDate());
-							tNegTransUpd.setTitaTlrNo(tNegTrans.getNegTransId().getTitaTlrNo());
-							tNegTransUpd.setTitaTxtNo(tNegTrans.getNegTransId().getTitaTxtNo());
-
-							tNegTransUpd.setLastEntdy(tNegTransUpd.getThisEntdy());// 上次交易日
-							tNegTransUpd.setLastKinbr(tNegTransUpd.getThisKinbr());// 上次分行別
-							tNegTransUpd.setLastTlrNo(tNegTransUpd.getThisTlrNo());// 上次交易員代號
-							tNegTransUpd.setLastTxtNo(tNegTransUpd.getThisTxtNo());// 上次交易序號
-							tNegTransUpd.setLastSeqNo(ThisSeqNo);// 上次序號
-
-							tNegTransUpd.setCreateDate(tNegTransUpd.getCreateDate());
-							tNegTransUpd.setCreateEmpNo(tNegTransUpd.getCreateEmpNo());
-							sNegTransService.holdById(tNegTransUpd.getNegTransId(), titaVo);
-							sNegTransService.update2(tNegTransUpd, titaVo);// 資料異動後-1
-							dataLog.setEnv(titaVo, OrgtNegTrans, tNegTransUpd);// 資料異動後-2
-							dataLog.exec();// 資料異動後-3
-						} else {
-							sNegTransService.insert(tNegTransUpd, titaVo);
-						}
-						// Insert 的時候寫入Temp
-						NegMainInsertTxTemp(titaVo, tNegMainOrg, tNegTrans);
-
-					} catch (DBException e) {
-						// E0007 更新資料時，發生錯誤
-						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-					}
-				}
-
-				// 4.丟資料回去
-				MapNeg.put("CustId", custId);
-				MapNeg.put("CaseSeq", String.valueOf(tNegMainId.getCaseSeq()));
-				MapNeg.put("CustNo", custNo);
-				MapNeg.put("CustName", custName);
-				MapNeg.put("Status", status);
-				MapNeg.put("NewStatus", status);
-				MapNeg.put("CustLoanKind", tNegMain.getCustLoanKind());
-				MapNeg.put("ApplDate", String.valueOf(tNegMain.getApplDate()));// 協商申請日
-				MapNeg.put("MainDueAmt", String.valueOf(tNegMain.getDueAmt()));
-				MapNeg.put("TotalPeriod", String.valueOf(tNegMain.getTotalPeriod()));
-				MapNeg.put("IntRate", String.valueOf(mainIntRate));
-				MapNeg.put("RepaidPeriod", String.valueOf(tNegMain.getRepaidPeriod()));// 已繳期數
-				MapNeg.put("NewRepaidPeriod", String.valueOf(mainRepaidPeriod));// 已繳期數
-
-				MapNeg.put("IsMainFin", IsMainFin);
-				MapNeg.put("MainFinCode", mainFinCode);
-
-				MapNeg.put("OrgPrincipalBal", String.valueOf(tNegMain.getPrincipalBal()));// 總本金餘額(舊)
-				MapNeg.put("NewPrincipalBal", String.valueOf(mainPrincipalBal));// 總本金餘額(新)
-				this.info("NegCom MainPrincipalBal=[" + mainPrincipalBal + "]-5");
-				MapNeg.put("OrgAccuTempAmt", String.valueOf(tNegMain.getAccuTempAmt()));// 累繳金額
-				MapNeg.put("NewAccuTempAmt", String.valueOf(mainAccuTempAmt));
-
-				MapNeg.put("OrgAccuOverAmt", String.valueOf(tNegMain.getAccuOverAmt()));// 累溢收金額
-				MapNeg.put("NewAccuOverAmt", String.valueOf(mainAccuOverAmt));
-
-				MapNeg.put("OrgAccuDueAmt", String.valueOf(tNegMain.getAccuDueAmt()));// 累應還金額
-				MapNeg.put("NewAccuDueAmt", String.valueOf(mainAccuDueAmt));
-
-				MapNeg.put("OrgAccuSklShareAmt", String.valueOf(tNegMain.getAccuSklShareAmt()));// 新壽攤分
-				MapNeg.put("NewAccuSklShareAmt", String.valueOf(mainAccuSklShareAmt));
-
-				MapNeg.put("OrgNextPayDate", String.valueOf(tNegMain.getNextPayDate()));// 下期應繳日
-				MapNeg.put("NewNextPayDate", String.valueOf(DcToRoc(mainNextPayDate)));//
-
-				MapNeg.put("OrgRepayPrincipal", String.valueOf(tNegMain.getRepayPrincipal()));// 還本本金
-				MapNeg.put("NewRepayPrincipal", String.valueOf(mainRepayPrincipal));
-
-				MapNeg.put("OrgRepayInterest", String.valueOf(tNegMain.getRepayInterest()));// 還本利息
-				MapNeg.put("NewRepayInterest", String.valueOf(mainRepayInterest));
-
-				MapNeg.put("TwoStepCode", String.valueOf(tNegMain.getTwoStepCode()));
-				MapNeg.put("ChgCondDate", String.valueOf(tNegMain.getChgCondDate()));
-
-				MapNeg.put("PayIntDate", String.valueOf(tNegMain.getPayIntDate()));// 繳息迄日
-				MapNeg.put("NewPayIntDate", String.valueOf(DcToRoc(newPayIntDate)));// 繳息迄日
-
-				// MapNeg.put("MainPayIntDate", String.valueOf(MainPayIntDate));//繳息迄日
-
-				MapNeg.put("OrgStatusDate", String.valueOf(tNegMain.getStatusDate()));// 戶況日期
-				MapNeg.put("NewStatusDate", String.valueOf(DcToRoc(newStatusDate)));
-
-				MapNeg.put("TransAcDate", String.valueOf(tNegTrans.getAcDate()));
-				MapNeg.put("TransTitaTlrNo", String.valueOf(tNegTrans.getTitaTlrNo()));
-				MapNeg.put("TransTitaTxtNo", String.valueOf(tNegTrans.getTitaTxtNo()));
-				MapNeg.put("TransCustNo", custNo);
-				MapNeg.put("TransCaseSeq", String.valueOf(tNegTrans.getCaseSeq()));
-				MapNeg.put("TransEntryDate", String.valueOf(tNegTrans.getEntryDate()));// 入帳日期
-
-				MapNeg.put("TransTxStatus", String.valueOf(tNegTrans.getTxStatus()));// 交易狀態
-				MapNeg.put("NewTransTxStatus", String.valueOf(TransTxStatus));// 交易狀態0:未入帳;1:待處理;2:已入帳;
-
-				MapNeg.put("TransTxKind", String.valueOf(tNegTrans.getTxKind()));// 交易別0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
-				MapNeg.put("NewTransTxKind", String.valueOf(transTxKind));
-
-				MapNeg.put("TransTxAmt", String.valueOf(tNegTrans.getTxAmt()));// 交易金額
-				MapNeg.put("NewTransTxAmt", String.valueOf(transTxAmt));
-
-				MapNeg.put("TransPrincipalBal", String.valueOf(orgTransPrincipalBal));// 本金餘額
-				MapNeg.put("NewTransPrincipalBal", String.valueOf(TransPrincipalBal));
-
-				MapNeg.put("TransReturnAmt", String.valueOf(tNegTrans.getReturnAmt()));// 退還金額
-				MapNeg.put("NewTransReturnAmt", String.valueOf(TransReturnAmt));
-
-				MapNeg.put("TransSklShareAmt", String.valueOf(tNegTrans.getSklShareAmt()));// 新壽攤分
-				MapNeg.put("NewTransSklShareAmt", String.valueOf(TransSklShareAmt));
-
-				MapNeg.put("TransApprAmt", String.valueOf(tNegTrans.getApprAmt()));// 撥付金額
-				MapNeg.put("NewTransApprAmt", String.valueOf(TransApprAmt));
-
-				MapNeg.put("TransExportDate", String.valueOf(tNegTrans.getExportDate()));// 撥付製檔日
-				// MapNeg.put("NewTransExportDate",String.valueOf(DcToRoc(TransExportDate)));--
-
-				MapNeg.put("TransExportAcDate", String.valueOf(tNegTrans.getExportAcDate()));// 撥付出帳日
-				// MapNeg.put("NewTransExportAcDate",String.valueOf(DcToRoc(TransExportAcDate)));
-
-				MapNeg.put("TransTempRepayAmt", String.valueOf(tNegTrans.getTempRepayAmt()));// 暫收抵繳金額
-				MapNeg.put("NewTransTempRepayAmt", String.valueOf(TransTempRepayAmt));
-
-				MapNeg.put("TransOverRepayAmt", String.valueOf(tNegTrans.getOverRepayAmt()));// 溢收抵繳金額
-				MapNeg.put("NewTransOverRepayAmt", String.valueOf(TransOverRepayAmt));
-
-				MapNeg.put("TransPrincipalAmt", String.valueOf(tNegTrans.getPrincipalAmt()));// 本金金額
-				MapNeg.put("NewTransPrincipalAmt", String.valueOf(TransPrincipalAmt));
-
-				MapNeg.put("TransInterestAmt", String.valueOf(tNegTrans.getInterestAmt()));// 利息金額
-				MapNeg.put("NewTransInterestAmt", String.valueOf(TransInterestAmt));
-
-				MapNeg.put("TransOverAmt", String.valueOf(tNegTrans.getOverAmt()));// 轉入溢收金額
-				MapNeg.put("NewTransOverAmt", String.valueOf(TransOverAmt));
-
-				MapNeg.put("TransIntStartDate", String.valueOf(tNegTrans.getIntStartDate()));// 繳息起日
-				MapNeg.put("NewTransIntStartDate", String.valueOf(DcToRoc(TransIntStartDate)));
-
-				MapNeg.put("TransIntEndDate", String.valueOf(tNegTrans.getIntEndDate()));// 繳息迄日
-				MapNeg.put("NewTransIntEndDate", String.valueOf(DcToRoc(TransIntEndDate)));
-
-				MapNeg.put("TransRepayPeriod", String.valueOf(tNegTrans.getRepayPeriod()));// 還款期數
-				MapNeg.put("NewTransRepayPeriod", String.valueOf(TransRepayPeriod));
-
-				MapNeg.put("TransShouldPayPeriod", String.valueOf(tNegTrans.getShouldPayPeriod()));// 本次應還期數
-				MapNeg.put("NewTransShouldPayPeriod", String.valueOf(TransShouldPayPeriod));
-
-				MapNeg.put("TransDueAmt", String.valueOf(tNegTrans.getDueAmt()));// 期金
-				MapNeg.put("NewTransDueAmt", String.valueOf(NewTransDueAmt));
-
-				MapNeg.put("TransRepayDate", String.valueOf(tNegTrans.getRepayDate()));// 入帳還款日期
-				MapNeg.put("NewTransRepayDate", String.valueOf(TransRepayDate));
-
-				MapNeg.put("TransOrgAccuOverAmt", String.valueOf(tNegMain.getAccuOverAmt()));// 累溢繳款(交易前)(前)
-				MapNeg.put("NewTransOrgAccuOverAmt", String.valueOf(TransOrgAccuOverAmt));// 累溢繳款(交易前)(後)
-				MapNeg.put("TransAccuOverAmt", String.valueOf(tNegTrans.getAccuOverAmt()));// 累溢繳款(交易後)(前)
-				MapNeg.put("NewTransAccuOverAmt", String.valueOf(TransAccuOverAmt));// 累溢繳款(交易後)(後)
-
-				MapNeg.put("Trial", TrialFunc);
-				if (ChekUpdDB == 1) {
-					// CaseKindCode 1:協商 2:調解 3:更生 4:清算
-					switch (caseKindCode) {
-					case "1":
-						// 協商->JcicZ050
-
-						Map<String, String> JcicZ050Map = new HashMap<String, String>();
-						JcicZ050Map.put("CustId", custId);
-						JcicZ050Map.put("PayDate", String.valueOf(tNegTrans.getEntryDate()));// 繳款日期-NegTrans入帳日
-						JcicZ050Map.put("RcDate", String.valueOf(tNegMain.getApplDate()));// 協商申請日-NegMain協商申請日
-						JcicZ050Map.put("SubmitKey", mainFinCode);// 報送單位代號-最大債權
-						JcicZ050Map.put("TranKey", "A");// 交易代碼 A:新增;C:異動;D:刪除
-						JcicZ050Map.put("PayAmt", String.valueOf(transTxAmt));// 本次繳款金額
-						JcicZ050Map.put("SumRepayActualAmt", String.valueOf(mainAccuTempAmt));// 累計實際還款金額
-						JcicZ050Map.put("SumRepayShouldAmt", String.valueOf(mainAccuDueAmt));// 累應還款金額
-						String JcicZ050Status = "";
-						if (("4").equals(transTxKind) || ("5").equals(transTxKind)) {
-							// 4:結清-匯入款＋溢收款 >=最後一期期款
-							// 5:提前清償-匯入款＋溢收款 >= 剩餘期款
-							// Status="";//債權結案註記-0:請選擇;Y:債務全數清償;N:債務尚未全數清償
-							JcicZ050Status = "Y";
-						} else {
-							JcicZ050Status = "N";
-						}
-						JcicZ050Map.put("Status", JcicZ050Status);// 債權結案註記-0:請選擇;Y:債務全數清償;N:債務尚未全數清償
-						String SecondRepayYM = String.valueOf(tNegMain.getDeferYMStart());
-						if (SecondRepayYM != null && SecondRepayYM.length() >= 6) {
-							SecondRepayYM = SecondRepayYM.substring(0, 6);
-						} else {
-							SecondRepayYM = "";
-						}
-						JcicZ050Map.put("SecondRepayYM", SecondRepayYM);// 進入第二階梯還款年月-延期繳款年月(起)
-						JcicZ050Map.put("OutJcicTxtDate", "0");// 轉出JCIC文字檔日期-預設為0
-						DbJcicZ050(titaVo, JcicZ050Map);
-						break;
-					case "2":
-						// 調解->Jcic450
-
-						DbJcicZ450(titaVo, custId, tNegMain, tNegTrans);
-//						無JCIC報送日期 才可更正
-//						債協->JCICZ050 債務人繳款資料檔案 ->結案時報送 JCICZ046
-					case "3":
-						// 更生->JcicZ067 ->變更為JcicZ573
-						DbJcicZ573(titaVo, custId, tNegMain, tNegTrans);
-						break;
-					case "4":
-						// 清算->Jcic
-
-						break;
-					}
-
-				}
-			} else {
-				throw new LogicException(titaVo, "E0001", "查無債務協商案件主檔的資料請查驗");
-			}
-		} else
-
-		{
-			throw new LogicException(titaVo, "E0001", "查無債務協商交易檔的資料請查驗");
+		this.custNo = tNegTrans.getCustNo();
+		this.caseSeq = tNegTrans.getCaseSeq();
+		NegMainId tNegMainId = new NegMainId();
+		tNegMainId.setCaseSeq(this.caseSeq);
+		tNegMainId.setCustNo(this.custNo);
+
+		NegMain tNegMain = new NegMain();
+		tNegMain = sNegMainService.findById(tNegMainId, titaVo);
+		tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
+		if (tCustMain == null) {
+			throw new LogicException(titaVo, "E0001", "客戶資料主檔");
 		}
 
-		return MapNeg;
+		// 2.得到Main的資料
+		if (tNegMain == null) {
+			throw new LogicException(titaVo, "E0001", "債務協商案件主檔");
+		}
+
+		// NegMain
+		status = tNegMain.getStatus();
+		isMainFin = tNegMain.getIsMainFin();
+		mainFinCode = tNegMain.getMainFinCode();
+		mainDueAmt = tNegMain.getDueAmt();// 期金
+		caseKindCode = tNegMain.getCaseKindCode();
+		mainTotalPeriod = tNegMain.getTotalPeriod();// 總期數
+		mainRepaidPeriod = tNegMain.getRepaidPeriod();// 已繳期數
+		mainAccuTempAmt = tNegMain.getAccuTempAmt();// 累繳金額
+		mainAccuOverAmt = tNegMain.getAccuOverAmt();// 累溢收金額
+		mainAccuDueAmt = tNegMain.getAccuDueAmt();// 累應還金額
+		mainAccuSklShareAmt = tNegMain.getAccuSklShareAmt();// 累計新壽攤分
+		mainIntRate = tNegMain.getIntRate();// 利率\
+		remainPeriod = mainTotalPeriod - mainRepaidPeriod;// 剩餘期數
+
+		mainFirstDueDate = tNegMain.getFirstDueDate();// 首次應繳日
+		mainNextPayDate = tNegMain.getNextPayDate();// 下次應繳日
+		mainPayIntDate = tNegMain.getPayIntDate();// 繳息迄日
+		newStatusDate = tNegMain.getStatusDate();// 戶況日期
+
+		mainPrincipalBal = tNegMain.getPrincipalBal();// 總本金餘額
+		if (mainPrincipalBal.compareTo(BigDecimal.ZERO) == 0) {
+			mainPrincipalBal = tNegMain.getTotalContrAmt();
+		}
+		mainRepayPrincipal = tNegMain.getRepayPrincipal();// 累償還本金
+		mainRepayInterest = tNegMain.getRepayInterest();// 累償還利息
+
+		// NegTrans
+		transTxStatus = tNegTrans.getTxStatus();// 交易狀態 0:未入帳;1:待處理;2:已入帳;
+
+		transTxKind = tNegTrans.getTxKind();// 交易別 0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
+		transTxAmt = tNegTrans.getTxAmt();// 交易金額
+		orgTransPrincipalBal = tNegTrans.getPrincipalBal();// 本金餘額
+		if (orgTransPrincipalBal.compareTo(BigDecimal.ZERO) == 0) {
+			orgTransPrincipalBal = mainPrincipalBal;
+		}
+		transPrincipalBal = BigDecimal.ZERO;
+		transReturnAmt = tNegTrans.getReturnAmt();// 退還金額
+		transSklShareAmt = tNegTrans.getSklShareAmt();// 新壽攤分
+		transApprAmt = tNegTrans.getApprAmt();// 撥付金額
+		transExportDate = tNegTrans.getExportDate();// 撥付製檔日
+		transExportAcDate = tNegTrans.getExportAcDate();// 撥付出帳日
+		transTempRepayAmt = tNegTrans.getTempRepayAmt();// 暫收抵繳金額
+		transOverRepayAmt = tNegTrans.getOverRepayAmt();// 溢收抵繳金額
+		transPrincipalAmt = tNegTrans.getPrincipalAmt();// 本金金額
+		transInterestAmt = tNegTrans.getInterestAmt();// 利息金額
+		transOverAmt = tNegTrans.getOverAmt();// 轉入溢收金額
+		transIntStartDate = tNegTrans.getIntStartDate();// 繳息起日
+		transIntEndDate = tNegTrans.getIntEndDate();// 繳息迄日
+		transRepayPeriod = tNegTrans.getRepayPeriod();// 還款期數
+		transRepayDate = tNegTrans.getRepayDate();// 入帳還款日期
+
+		transOrgAccuOverAmt = tNegMain.getAccuOverAmt();// 累溢繳款(交易前)
+		transAccuOverAmt = tNegTrans.getAccuOverAmt();// 累溢繳款(交易後)
+		transShouldPayPeriod = tNegTrans.getShouldPayPeriod();// 本次應還期數
+		transDueAmt = tNegTrans.getDueAmt();// 期金
+		newTransDueAmt = BigDecimal.ZERO;// 本次應還金額
+		if (mainDueAmt.compareTo(BigDecimal.ZERO) == 0) {
+			// E5009 資料檢核錯誤
+			throw new LogicException(titaVo, "E5009", "[期金]為0");
+		}
+
+		if (transDueAmt.compareTo(BigDecimal.ZERO) == 0) {
+			// 期金
+			transDueAmt = mainDueAmt;
+
+		}
+
+		// 用日期去算到今天這戶頭應該還幾期
+		// NextPayDate 下次應繳日 與本次會計日相比差了多少個月
+		if (mainNextPayDate == 0) {
+			// E5009 資料檢核錯誤
+			throw new LogicException(titaVo, "E5009", "[下次應繳日]未填寫.請至L5071查詢後維護.");
+		} else {
+			transShouldPayPeriod = DiffMonth(1, mainNextPayDate, Today) + 1;// 月份差異
+		}
+		// -----
+		if (transShouldPayPeriod != 0) {
+			newTransDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(transShouldPayPeriod));// Trans 本次應還金額
+		}
+
+		int DiffMonth = DiffMonth(1, mainFirstDueDate, Today) + 1;// 月份差異=首次應繳日 與 會計日的月份差+1
+		mainAccuDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(DiffMonth));// Main累應還金額=Main期金*Trans本次應還期數
+
+		// transTxKind 0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
+		// 0:正常-匯入款＋溢收款 >= 期款
+		// 1:溢繳(預收多期)-匯入款 > 期款
+		// 2:短繳-匯入款＋溢收款 < 期款
+		// 3:提前還本-匯入款 >= 5期期款
+		// 4:結清-匯入款＋溢收款 >=最後一期期款
+		// 5:提前清償-匯入款＋溢收款 >= 剩餘期款
+		// 6:待處理
+		// ※入帳訂正需在撥付產擋前，依反向順序訂正
+
+		// String OringnalTxKind=transTxKind;
+		transTxKind = "";
+
+		// 剩餘本利和=總本金餘額(1+年利率/12/100)
+		BigDecimal CloseAmt = mainPrincipalBal
+				.add(mainPrincipalBal.multiply(mainIntRate).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP));//
+
+		// 可抵繳金額=交易金額+累溢收
+		BigDecimal CanCountAmt = transTxAmt.add(mainAccuOverAmt);
+
+		// 剩餘本利和<=可分配金額
+		if (CloseAmt.compareTo(CanCountAmt) <= 0) {
+			// 5:提前清償
+			// 4:結清
+			transRepayPeriod = remainPeriod;
+
+			// 剩餘期數>1
+			if (remainPeriod > 1) {
+				// 5:提前清償
+				transTxKind = "5";
+			} else {
+				// 4:結清
+				transTxKind = "4";
+			}
+		} else {
+			// 還款期數
+			transRepayPeriod = Integer.parseInt(String
+					.valueOf(CanCountAmt.divide(mainDueAmt, 2, RoundingMode.DOWN).setScale(0, RoundingMode.DOWN)));
+
+			// 3:提前還本-匯入款 >= 5期期款
+			if (transTxAmt.compareTo(mainDueAmt.multiply(new BigDecimal(5)).setScale(0, RoundingMode.UP)) >= 0) {
+				transTxKind = "3";
+			}
+			// 1:溢繳(預收多期)-匯入款 > 期款
+			else if (transTxAmt.compareTo(mainDueAmt) > 0) {
+				transTxKind = "1";
+
+			}
+			// 0:正常-匯入款＋溢收款 >= 期款
+			else if (CanCountAmt.compareTo(mainDueAmt) >= 0) {
+				transTxKind = "0";
+			}
+			// 2:短繳-匯入款＋溢收款 < 期款
+			else {
+				transTxKind = "2";
+			}
+
+		}
+
+		this.info("NegCom transTxKind=[" + transTxKind + "],NewTxKind=[" + iNewTxKind + "]");
+		// 0:一開始試算 1:異動後 試算 2:UPDATE
+		// USER 自己輸入 交易別(提前還本可改為溢繳)
+		if (("1").equals(iTrialFunc) || ("2").equals(iTrialFunc)) {
+			if (!iNewTxKind.equals(transTxKind)) {
+				transTxKind = iNewTxKind;
+			}
+		}
+		this.info("NegCom transTxKind After Trial=[" + transTxKind + "]");
+
+		// 還本息金額 = 本金+利息
+		BigDecimal rePayAmt = BigDecimal.ZERO;
+		transReturnAmt = BigDecimal.ZERO;// 退還金額
+		switch (transTxKind) {
+		case "0": // 0:正常
+			rePayAmt = mainDueAmt;
+			transRepayPeriod = 1;// 還款期數
+			break;
+		case "1": // 1:溢繳(預收多期)
+			rePayAmt = mainDueAmt.multiply(new BigDecimal(transRepayPeriod));
+			break;
+		case "2": // 2:短繳
+			rePayAmt = BigDecimal.ZERO;
+			transRepayPeriod = 0;// 還款期數
+			break;
+		case "3": // 3:提前還本
+			rePayAmt = mainDueAmt.multiply(new BigDecimal(transRepayPeriod));
+			transRepayPeriod = 1;
+			break;
+
+		case "4": // 4:結清-匯入款＋溢收款 >=最後一期期款
+		case "5": // 5:提前清償-匯入款＋溢收款 >= 剩餘期款
+			status = "3";
+			newStatusDate = Today;
+			rePayAmt = CloseAmt;
+			transReturnAmt = CanCountAmt.subtract(CloseAmt); // 退還金額
+			transRepayPeriod = 1;
+			mainNextPayDate = 0; 
+			break;
+		}
+		transTxStatus = 2;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
+		transRepayDate = Today; // 入帳還款日
+
+		// 交易金額 > 還款金額
+		if (transTxAmt.compareTo(rePayAmt) > 0) {
+			transTempRepayAmt = rePayAmt;// 暫收抵繳金額 = 還款金額
+			transOverRepayAmt = BigDecimal.ZERO;// 溢收抵繳金額
+			transOverAmt = transTxAmt.subtract(rePayAmt);// 轉入溢收金額= 暫收金額減還款金額，為正時
+		} else {
+			transTempRepayAmt = transTxAmt;// 暫收抵繳金額 = 暫收金額
+			transOverRepayAmt = rePayAmt.subtract(transTxAmt); // 溢收抵繳金額 = 暫收金額減還款金額，為負時
+			transOverAmt = BigDecimal.ZERO;// 轉入溢收金額
+		}
+
+		mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt);// Main累繳金額
+		mainRepaidPeriod = mainRepaidPeriod + transRepayPeriod;// 已繳期數
+		mainAccuOverAmt = mainAccuOverAmt.add(transOverAmt).subtract(transOverRepayAmt); // Main累溢收金額=Main累溢收金額+轉入溢收金額-溢收抵繳金額
+		mainAccuOverAmt = mainAccuOverAmt.subtract(transReturnAmt); // 累溢收金額減退還金額
+		transSklShareAmt = BigDecimal.ZERO; // 新壽攤分
+		transApprAmt = BigDecimal.ZERO;// 撥付金額
+		// 最大債權分配
+		if ("Y".equals(tNegMain.getIsMainFin())) {
+			updNegFinShare(tNegTrans, tNegMain, transTxAmt.subtract(transReturnAmt), titaVo);
+		} else {
+			tNegTrans.setSklShareAmt(transTxAmt);
+		}
+
+		// 計算本利(非短繳)
+		if (!"2".equals(transTxKind)) {
+			calInterestAmt(rePayAmt, transRepayPeriod , titaVo);
+		}
+
+		mainRepayPrincipal = mainRepayPrincipal.add(transPrincipalAmt);// 還本本金
+		mainRepayInterest = mainRepayInterest.add(transInterestAmt); // 還本利息
+		mainPrincipalBal = mainPrincipalBal.subtract(transPrincipalAmt);
+		if (mainPrincipalBal.compareTo(BigDecimal.ZERO) < 0) {
+			throw new LogicException(titaVo, "E5009", "[本金餘額]不可為負值.");// E5009 資料檢核錯誤
+		}
+		mainAccuSklShareAmt = mainAccuSklShareAmt.add(transSklShareAmt);
+		transPrincipalBal = mainPrincipalBal;// 本金餘額
+		transAccuOverAmt = mainAccuOverAmt;// 累溢繳款(交易後)
+		
+		if (mainPayIntDate == 0) {
+			mainPayIntDate = getRepayDate(mainFirstDueDate, -1, titaVo);
+		}
+		if (transRepayPeriod > 0) {
+			transIntStartDate = mainPayIntDate; // 繳息起日 = 繳息迄日(主檔)
+			transIntEndDate = getRepayDate(mainPayIntDate, transRepayPeriod, titaVo);
+			mainPayIntDate = transIntEndDate; // 新繳息起日
+			mainNextPayDate = getRepayDate(mainPayIntDate, 1, titaVo); // 計算新下次繳款日
+		}
+
+		if ("3".equals(status)) {	//結案
+			transRepayPeriod = remainPeriod;
+			transIntEndDate = tNegMain.getLastDueDate();
+			mainPayIntDate = transIntEndDate;
+			mainNextPayDate = 0;	// 下次應繳日 歸零
+		}
+		
+		
+		// 更新資料庫
+		if (ChekUpdDB == 1) {
+			updateDB(tNegMain, tNegTrans, titaVo);
+			this.info("ChekUpdDB 1");
+		}
+
+		// 4.更新jcic報送檔
+		if (ChekUpdDB == 1) {
+			updateJcic(tNegMainUpd, tNegTransUpd, titaVo);
+			this.info("ChekUpdDB 2");
+		}
+		// put map
+		mapNegPut(iTrialFunc, tNegTrans, tNegMain, titaVo);
+		this.info("mapNegPut Done");
+		// end
+		return mapNeg;
 	}
 
-	public void DbJcicZ573(TitaVo titaVo, String CustId, NegMain tNegMain, NegTrans tNegTrans) throws LogicException {
+	// 計算本利
+	public void calInterestAmt(BigDecimal rePayAmt, int iLoanTerm, TitaVo titaVo) throws LogicException {
+		this.info("NegCom iLoanTerm=[" + iLoanTerm + "]");
+		BigDecimal balance = mainPrincipalBal;// 剩餘本金
+		BigDecimal interest = BigDecimal.ZERO;
+		BigDecimal principal = BigDecimal.ZERO;
+
+		int count = 0;
+		for (int i = 0; i < iLoanTerm; i++) {
+			count++;
+			if (balance.compareTo(BigDecimal.ZERO) <= 0) {
+				break;
+			}
+			// iDueAmt 期金
+			interest = (balance.multiply(mainIntRate)).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP);// 應繳利息
+			principal = mainDueAmt.subtract(interest);
+			balance = balance.subtract(principal);
+			transInterestAmt = transInterestAmt.add(interest);// 利息金額=應繳利息
+			this.info("NegCom Count=" + count + " ,principal=" + principal + " ,interest=" + interest + " , balance=" + balance);
+		}
+
+		if (rePayAmt.compareTo(transPrincipalAmt.add(transInterestAmt)) < 0) {
+			throw new LogicException(titaVo, "E0013",
+					"還款金額計算有誤" + rePayAmt + "," + transPrincipalAmt + "," + transInterestAmt);// 程式邏輯有誤
+		}
+
+		// 本金金額 = 還本息金額 - 利息金額
+		transPrincipalAmt = rePayAmt.subtract(transInterestAmt);
+
+	}
+
+	// 更新DB
+	public void updateDB(NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
+
+		tNegTransUpd = sNegTransService.holdById(tNegTrans, titaVo);
+		if (tNegTransUpd == null) {
+			throw new LogicException(titaVo, "E0007", "債務協商交易檔");// 發生錯誤
+		}
+		NegTrans tNegTransOrg = (NegTrans) dataLog.clone(tNegTransUpd);// 資料異動前
+		tNegTransUpd.setTxStatus(transTxStatus);// 交易狀態0:未入帳;1:待處理;2:已入帳;
+		tNegTransUpd.setTxKind(transTxKind);// 交易別0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
+		tNegTransUpd.setTxAmt(transTxAmt);// 交易金額
+		tNegTransUpd.setPrincipalBal(transPrincipalBal);// 本金餘額
+		tNegTransUpd.setReturnAmt(transReturnAmt);// 退還金額
+		tNegTransUpd.setSklShareAmt(transSklShareAmt);// 新壽攤分
+		tNegTransUpd.setApprAmt(transApprAmt);// 撥付金額
+		tNegTransUpd.setExportDate(transExportDate);// 撥付製檔日
+		tNegTransUpd.setExportAcDate(transExportAcDate);// 撥付出帳日
+		tNegTransUpd.setTempRepayAmt(transTempRepayAmt);// 暫收抵繳金額
+		tNegTransUpd.setOverRepayAmt(transOverRepayAmt);// 溢收抵繳金額
+		tNegTransUpd.setPrincipalAmt(transPrincipalAmt);// 本金金額
+		tNegTransUpd.setInterestAmt(transInterestAmt);// 利息金額
+		tNegTransUpd.setOverAmt(transOverAmt);// 轉入溢收金額
+		tNegTransUpd.setIntStartDate(transIntStartDate);// 繳息起日
+		tNegTransUpd.setIntEndDate(transIntEndDate);// 繳息迄日
+		tNegTransUpd.setRepayPeriod(transRepayPeriod);// 還款期數
+		tNegTransUpd.setRepayDate(transRepayDate);// 入帳還款日期
+		tNegTransUpd.setOrgAccuOverAmt(transOrgAccuOverAmt);// 累溢繳款(交易前)
+		tNegTransUpd.setAccuOverAmt(transAccuOverAmt);// 累溢繳款(交易後)
+		tNegTransUpd.setShouldPayPeriod(transShouldPayPeriod);// 本次應還期數
+		tNegTransUpd.setDueAmt(transDueAmt);// 期金
+		String thisSeqNo = tNegTransUpd.getThisSeqNo();
+		String thisSeqNoAdd = "";
+		if (thisSeqNo != null && thisSeqNo.length() != 0) {
+			thisSeqNoAdd = String.valueOf(Integer.parseInt(thisSeqNo) + 1);
+		} else {
+			// Insert
+			thisSeqNo = "0";
+			thisSeqNoAdd = "0";
+		}
+		tNegTransUpd.setLastEntdy(tNegTransUpd.getThisEntdy());// 上次交易日
+		tNegTransUpd.setLastKinbr(tNegTransUpd.getThisKinbr());// 上次分行別
+		tNegTransUpd.setLastTlrNo(tNegTransUpd.getThisTlrNo());// 上次交易員代號
+		tNegTransUpd.setLastTxtNo(tNegTransUpd.getThisTxtNo());// 上次交易序號
+		tNegTransUpd.setLastSeqNo(thisSeqNo);// 上次序號
+
+		tNegTransUpd.setThisEntdy(titaVo.getEntDyI());// 本次交易日
+		tNegTransUpd.setThisKinbr(titaVo.getKinbr());// 本次分行別
+		tNegTransUpd.setThisTlrNo(titaVo.getTlrNo());// 本次交易員代號
+		tNegTransUpd.setThisTxtNo(titaVo.getTxtNo());// 本次交易序號
+		tNegTransUpd.setThisSeqNo(thisSeqNoAdd);// 本次序號
+		try {
+			sNegTransService.update2(tNegTransUpd, titaVo);// 資料異動後-1
+			dataLog.setEnv(titaVo, tNegTransOrg, tNegTransUpd);// 資料異動後-2
+			dataLog.exec();// 資料異動後-3
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+
+		tNegMainUpd = sNegMainService.holdById(tNegMain, titaVo);
+		NegMain tNegMainOrg = (NegMain) dataLog.clone(tNegMainUpd);// 資料異動前
+		tNegMainUpd.setPrincipalBal(mainPrincipalBal);// 總本金餘額
+		tNegMainUpd.setRepaidPeriod(mainRepaidPeriod);// 已繳期數
+		tNegMainUpd.setAccuTempAmt(mainAccuTempAmt);// 累繳金額
+		tNegMainUpd.setAccuOverAmt(mainAccuOverAmt);// 累溢收金額
+		tNegMainUpd.setAccuDueAmt(mainAccuDueAmt);// 累應還金額
+		tNegMainUpd.setNextPayDate(mainNextPayDate);// 下次應繳日
+		tNegMainUpd.setPayIntDate(mainPayIntDate);// 繳息迄日
+		tNegMainUpd.setRepayPrincipal(mainRepayPrincipal);// 還本本金
+		tNegMainUpd.setRepayInterest(mainRepayInterest);// 還本利息
+		tNegMainUpd.setAccuSklShareAmt(mainAccuSklShareAmt);// 累新壽攤分
+		tNegMainUpd.setStatus(status);// 戶況
+		tNegMainUpd.setThisAcDate(titaVo.getEntDyI());// AcDate 本次會計日期
+		tNegMainUpd.setThisTitaTlrNo(titaVo.getTlrNo());// TitaTlrNo 本次經辦
+		tNegMainUpd.setThisTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));// TitaTxtNo 本次交易序號
+		tNegMainUpd.setLastAcDate(tNegMainOrg.getThisAcDate());// LastAcDate 上次會計日期
+		tNegMainUpd.setLastTitaTlrNo(tNegMainOrg.getThisTitaTlrNo());// LastTitaTlrNo 上次經辦
+		tNegMainUpd.setLastTitaTxtNo(tNegMainOrg.getThisTitaTxtNo());// LastTitaTxtNo 上次交易序號
+		try {
+			sNegMainService.update(tNegMainUpd, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+
+		// Insert Temp
+		insertTxTemp(titaVo, tNegMainOrg, tNegTransOrg);
+
+	}
+
+	public void mapNegPut(String iTrialFunc, NegTrans tNegTrans, NegMain tNegMain, TitaVo titaVo)
+			throws LogicException {
+		mapNeg.put("CustId", tCustMain.getCustId());
+		mapNeg.put("CaseSeq", String.valueOf(tNegMain.getCaseSeq()));
+		mapNeg.put("CustNo", String.valueOf(custNo));
+		mapNeg.put("CustName", tCustMain.getCustName());
+		mapNeg.put("Status", status);
+		mapNeg.put("NewStatus", status);
+		mapNeg.put("CustLoanKind", tNegMain.getCustLoanKind());
+		mapNeg.put("ApplDate", String.valueOf(tNegMain.getApplDate()));// 協商申請日
+		mapNeg.put("MainDueAmt", String.valueOf(tNegMain.getDueAmt()));
+		mapNeg.put("TotalPeriod", String.valueOf(tNegMain.getTotalPeriod()));
+		mapNeg.put("IntRate", String.valueOf(mainIntRate));
+		mapNeg.put("RepaidPeriod", String.valueOf(tNegMain.getRepaidPeriod()));// 已繳期數
+		mapNeg.put("NewRepaidPeriod", String.valueOf(mainRepaidPeriod));// 已繳期數
+
+		mapNeg.put("IsMainFin", isMainFin);
+		mapNeg.put("MainFinCode", mainFinCode);
+
+		mapNeg.put("OrgPrincipalBal", String.valueOf(tNegMain.getPrincipalBal()));// 總本金餘額(舊)
+		mapNeg.put("NewPrincipalBal", String.valueOf(mainPrincipalBal));// 總本金餘額(新)
+		this.info("NegCom MainPrincipalBal=[" + mainPrincipalBal + "]-5");
+		mapNeg.put("OrgAccuTempAmt", String.valueOf(tNegMain.getAccuTempAmt()));// 累繳金額
+		mapNeg.put("NewAccuTempAmt", String.valueOf(mainAccuTempAmt));
+
+		mapNeg.put("OrgAccuOverAmt", String.valueOf(tNegMain.getAccuOverAmt()));// 累溢收金額
+		mapNeg.put("NewAccuOverAmt", String.valueOf(mainAccuOverAmt));
+
+		mapNeg.put("OrgAccuDueAmt", String.valueOf(tNegMain.getAccuDueAmt()));// 累應還金額
+		mapNeg.put("NewAccuDueAmt", String.valueOf(mainAccuDueAmt));
+
+		mapNeg.put("OrgAccuSklShareAmt", String.valueOf(tNegMain.getAccuSklShareAmt()));// 新壽攤分
+		mapNeg.put("NewAccuSklShareAmt", String.valueOf(mainAccuSklShareAmt));
+
+		mapNeg.put("OrgNextPayDate", String.valueOf(tNegMain.getNextPayDate()));// 下期應繳日
+		mapNeg.put("NewNextPayDate", String.valueOf(DcToRoc(mainNextPayDate)));//
+
+		mapNeg.put("OrgRepayPrincipal", String.valueOf(tNegMain.getRepayPrincipal()));// 還本本金
+		mapNeg.put("NewRepayPrincipal", String.valueOf(mainRepayPrincipal));
+
+		mapNeg.put("OrgRepayInterest", String.valueOf(tNegMain.getRepayInterest()));// 還本利息
+		mapNeg.put("NewRepayInterest", String.valueOf(mainRepayInterest));
+
+		mapNeg.put("TwoStepCode", String.valueOf(tNegMain.getTwoStepCode()));
+		mapNeg.put("ChgCondDate", String.valueOf(tNegMain.getChgCondDate()));
+
+		mapNeg.put("PayIntDate", String.valueOf(tNegMain.getPayIntDate()));// 繳息迄日
+		mapNeg.put("NewPayIntDate", String.valueOf(DcToRoc(mainPayIntDate)));// 繳息迄日
+
+		mapNeg.put("OrgStatusDate", String.valueOf(tNegMain.getStatusDate()));// 戶況日期
+		mapNeg.put("NewStatusDate", String.valueOf(DcToRoc(newStatusDate)));
+		mapNeg.put("TransAcDate", String.valueOf(tNegTrans.getAcDate()));
+		mapNeg.put("transTitaTlrNo", String.valueOf(tNegTrans.getTitaTlrNo()));
+		mapNeg.put("transTitaTxtNo", String.valueOf(tNegTrans.getTitaTxtNo()));
+		mapNeg.put("TransCustNo", String.valueOf(custNo));
+		mapNeg.put("TransCaseSeq", String.valueOf(tNegTrans.getCaseSeq()));
+		mapNeg.put("transEntryDate", String.valueOf(tNegTrans.getEntryDate()));// 入帳日期
+
+		mapNeg.put("transTxStatus", String.valueOf(tNegTrans.getTxStatus()));// 交易狀態
+		mapNeg.put("NewtransTxStatus", String.valueOf(transTxStatus));// 交易狀態0:未入帳;1:待處理;2:已入帳;
+
+		mapNeg.put("transTxKind", String.valueOf(tNegTrans.getTxKind()));// 交易別0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
+		mapNeg.put("NewtransTxKind", String.valueOf(transTxKind));
+
+		mapNeg.put("transTxAmt", String.valueOf(tNegTrans.getTxAmt()));// 交易金額
+		mapNeg.put("NewtransTxAmt", String.valueOf(transTxAmt));
+
+		mapNeg.put("TransPrincipalBal", String.valueOf(orgTransPrincipalBal));// 本金餘額
+		mapNeg.put("NewTransPrincipalBal", String.valueOf(transPrincipalBal));
+
+		mapNeg.put("TransReturnAmt", String.valueOf(tNegTrans.getReturnAmt()));// 退還金額
+		mapNeg.put("NewTransReturnAmt", String.valueOf(transReturnAmt));
+
+		mapNeg.put("TransSklShareAmt", String.valueOf(tNegTrans.getSklShareAmt()));// 新壽攤分
+		mapNeg.put("NewTransSklShareAmt", String.valueOf(transSklShareAmt));
+
+		mapNeg.put("TransApprAmt", String.valueOf(tNegTrans.getApprAmt()));// 撥付金額
+		mapNeg.put("NewTransApprAmt", String.valueOf(transApprAmt));
+
+		mapNeg.put("transExportDate", String.valueOf(tNegTrans.getExportDate()));// 撥付製檔日
+		// MapNeg.put("NewtransExportDate",String.valueOf(DcToRoc(transExportDate)));--
+
+		mapNeg.put("transExportAcDate", String.valueOf(tNegTrans.getExportAcDate()));// 撥付出帳日
+		// MapNeg.put("NewtransExportAcDate",String.valueOf(DcToRoc(transExportAcDate)));
+
+		mapNeg.put("transTempRepayAmt", String.valueOf(tNegTrans.getTempRepayAmt()));// 暫收抵繳金額
+		mapNeg.put("NewtransTempRepayAmt", String.valueOf(transTempRepayAmt));
+
+		mapNeg.put("TransOverRepayAmt", String.valueOf(tNegTrans.getOverRepayAmt()));// 溢收抵繳金額
+		mapNeg.put("NewTransOverRepayAmt", String.valueOf(transOverRepayAmt));
+
+		mapNeg.put("TransPrincipalAmt", String.valueOf(tNegTrans.getPrincipalAmt()));// 本金金額
+		mapNeg.put("NewTransPrincipalAmt", String.valueOf(transPrincipalAmt));
+
+		mapNeg.put("TransInterestAmt", String.valueOf(tNegTrans.getInterestAmt()));// 利息金額
+		mapNeg.put("NewTransInterestAmt", String.valueOf(transInterestAmt));
+
+		mapNeg.put("TransOverAmt", String.valueOf(tNegTrans.getOverAmt()));// 轉入溢收金額
+		mapNeg.put("NewTransOverAmt", String.valueOf(transOverAmt));
+
+		mapNeg.put("TransIntStartDate", String.valueOf(tNegTrans.getIntStartDate()));// 繳息起日
+		mapNeg.put("NewTransIntStartDate", String.valueOf(DcToRoc(transIntStartDate)));
+
+		mapNeg.put("TransIntEndDate", String.valueOf(tNegTrans.getIntEndDate()));// 繳息迄日
+		mapNeg.put("NewTransIntEndDate", String.valueOf(DcToRoc(transIntEndDate)));
+
+		mapNeg.put("TransRepayPeriod", String.valueOf(tNegTrans.getRepayPeriod()));// 還款期數
+		mapNeg.put("NewTransRepayPeriod", String.valueOf(transRepayPeriod));
+
+		mapNeg.put("TransShouldPayPeriod", String.valueOf(tNegTrans.getShouldPayPeriod()));// 本次應還期數
+		mapNeg.put("NewTransShouldPayPeriod", String.valueOf(transShouldPayPeriod));
+
+		mapNeg.put("TransDueAmt", String.valueOf(tNegTrans.getDueAmt()));// 期金
+		mapNeg.put("NewTransDueAmt", String.valueOf(newTransDueAmt));
+
+		mapNeg.put("TransRepayDate", String.valueOf(tNegTrans.getRepayDate()));// 入帳還款日期
+		mapNeg.put("NewTransRepayDate", String.valueOf(transRepayDate));
+
+		mapNeg.put("TransOrgAccuOverAmt", String.valueOf(tNegMain.getAccuOverAmt()));// 累溢繳款(交易前)(前)
+		mapNeg.put("NewTransOrgAccuOverAmt", String.valueOf(transOrgAccuOverAmt));// 累溢繳款(交易前)(後)
+		mapNeg.put("TransAccuOverAmt", String.valueOf(tNegTrans.getAccuOverAmt()));// 累溢繳款(交易後)(前)
+		mapNeg.put("NewTransAccuOverAmt", String.valueOf(transAccuOverAmt));// 累溢繳款(交易後)(後)
+
+		mapNeg.put("Trial", iTrialFunc);
+
+	}
+
+	// 最大債權分配
+	public void updNegFinShare(NegTrans tNegTrans, NegMain tNegMain, BigDecimal shareAmSum, TitaVo titaVo)
+			throws LogicException {
+		Slice<NegFinShare> slNegFinShare = sNegFinShareService.FindAllFinCode(tNegTrans.getCustNo(),
+				tNegTrans.getCaseSeq(), this.index, this.limit, titaVo);
+		if (slNegFinShare == null) {
+			throw new LogicException(titaVo, "E0001", "債務協商債權分攤檔"); // 查詢資料不存在
+		}
+
+		List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
+		BigDecimal shareAmtRemaind = shareAmSum;
+		BigDecimal shareAmt = BigDecimal.ZERO;
+		NegFinShare tNegFinShare = new NegFinShare();
+		this.info("lNegFinShare==" + lNegFinShare);
+		if (titaVo.isHcodeNormal()) {
+			for (int i = 0; i < lNegFinShare.size(); i++) {
+				tNegFinShare = lNegFinShare.get(i);
+				if (i == lNegFinShare.size() - 1) {
+					// 最後一筆資料要用減的
+					shareAmt = shareAmtRemaind;
+				} else {
+					shareAmt = shareAmSum.multiply(tNegFinShare.getAmtRatio(), MathContext.DECIMAL128)
+							.divide(new BigDecimal(100), 0, RoundingMode.HALF_UP);
+					shareAmtRemaind = shareAmtRemaind.subtract(shareAmt);
+				}
+				if (("458").equals(tNegFinShare.getFinCode())) {// 458 不寫入NegAppr01
+					transSklShareAmt = transSklShareAmt.add(shareAmt);
+				} else {
+					transApprAmt = transApprAmt.add(shareAmt);
+					if (ChekUpdDB == 1) {
+						updAppr01(tNegFinShare, tNegTrans, tNegMain, shareAmt, titaVo);
+					}
+				}
+			}
+		} else {
+			for (int i = 0; i < lNegFinShare.size(); i++) {
+				tNegFinShare = lNegFinShare.get(i);
+				if (("458").equals(tNegFinShare.getFinCode())) {// 458跳過-458不會寫入NgeAppr01
+					continue;
+				}
+				NegAppr01Id tNegAppr01Id = new NegAppr01Id();
+				tNegAppr01Id.setFinCode(tNegFinShare.getFinCode());
+				tNegAppr01Id.setAcDate(tNegTrans.getAcDate());
+				tNegAppr01Id.setTitaTlrNo(tNegTrans.getTitaTlrNo());
+				tNegAppr01Id.setTitaTxtNo(tNegTrans.getTitaTxtNo());
+				NegAppr01 tNegAppr01 = sNegAppr01Service.holdById(tNegAppr01Id, titaVo);
+				if (tNegAppr01 != null) {
+					try {
+						sNegAppr01Service.delete(tNegAppr01, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008", "最大債權撥付資料檔"); // E0008 刪除資料時，發生錯誤
+					}
+				}
+			}
+		}
+	}
+
+	public void updAppr01(NegFinShare tNegFinShare, NegTrans tNegTrans, NegMain tNegMain, BigDecimal shareAmt,
+			TitaVo titaVo) throws LogicException {
+		NegAppr01Id tNegAppr01Id = new NegAppr01Id();
+		tNegAppr01Id.setFinCode(tNegFinShare.getFinCode());
+		tNegAppr01Id.setAcDate(tNegTrans.getAcDate());
+		tNegAppr01Id.setTitaTlrNo(tNegTrans.getTitaTlrNo());
+		tNegAppr01Id.setTitaTxtNo(tNegTrans.getTitaTxtNo());
+		NegFinAcct tNegFinAcct = sNegFinAcctService.findById(tNegFinShare.getFinCode(), titaVo);
+		if (tNegFinAcct == null) {
+			throw new LogicException(titaVo, "E0001", "債務協商債權機構帳戶檔");// 查詢資料不存在
+		}
+		NegAppr01 tNegAppr01 = sNegAppr01Service.findById(tNegAppr01Id, titaVo);
+		if (tNegAppr01 != null) {
+			throw new LogicException(titaVo, "E0013", "最大債權撥付資料檔資料已存在");// 程式邏輯有誤
+		}
+		BigDecimal SumCustNoFinCode = SumCustNoFinCode(tNegTrans.getCustNo(), tNegTrans.getCaseSeq(),
+				tNegFinShare.getFinCode(), titaVo);
+		NegAppr01 tNegAppr01Upd = new NegAppr01();
+		tNegAppr01Upd.setNegAppr01Id(tNegAppr01Id);
+		tNegAppr01Upd.setCustNo(tNegTrans.getCustNo());// 戶號
+		tNegAppr01Upd.setCaseSeq(tNegTrans.getCaseSeq());// 案件序號
+		tNegAppr01Upd.setCaseKindCode(tNegMain.getCaseKindCode());// 案件種類
+		tNegAppr01Upd.setApprAmt(shareAmt);// 撥付金額
+		tNegAppr01Upd.setAccuApprAmt(SumCustNoFinCode.add(shareAmt));// 累計撥付金額
+		tNegAppr01Upd.setAmtRatio(tNegFinShare.getAmtRatio());// 撥付比例
+		tNegAppr01Upd.setExportDate(0);// 製檔日期
+		tNegAppr01Upd.setApprDate(0);// 撥付日期
+		tNegAppr01Upd.setBringUpDate(0);// 提兌日
+		tNegAppr01Upd.setRemitBank(tNegFinShare.getFinCode());// 匯款銀行
+		tNegAppr01Upd.setRemitAcct(tNegFinAcct.getRemitAcct());// 匯款帳號
+		tNegAppr01Upd.setDataSendUnit(tNegFinAcct.getDataSendSection());// 資料傳送單位
+		tNegAppr01Upd.setApprAcDate(0);// 撥付傳票日
+		tNegAppr01Upd.setReplyCode("");// 回應代碼
+		try {
+			sNegAppr01Service.insert(tNegAppr01Upd, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "最大債權撥付資料檔");// E0005 新增資料時，發生錯誤
+		}
+
+	}
+
+	// 更新jcic報送檔
+	public void updateJcic(NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
+		// CaseKindCode 1:協商 2:調解 3:更生 4:清算 ; 無JCIC報送日期 才可更正
+		switch (caseKindCode) {
+		case "1":
+			// 協商->JcicZ050 ->結案時報送 JCICZ046
+			DbJcicZ050(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+			break;
+		case "2":
+			// 調解->Jcic450
+			DbJcicZ450(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+		case "3":
+			// 更生->JcicZ573
+			DbJcicZ573(tCustMain.getCustId(), tNegMain, tNegTrans, titaVo);
+			break;
+		case "4":
+			// 清算->Jcic
+
+			break;
+		}
+	}
+
+	public void DbJcicZ573(String CustId, NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
 		JcicZ573Id tJcicZ573Id = new JcicZ573Id();
 		tJcicZ573Id.setApplyDate(tNegMain.getApplDate());
 		tJcicZ573Id.setCustId(CustId);
@@ -1122,8 +980,8 @@ public class NegCom extends CommBuffer {
 			}
 		}
 		String tranKey = "";
-		BigDecimal payAmt = tNegTrans.getTxAmt();
-		BigDecimal totalPayAmt = tNegMain.getAccuTempAmt();
+		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
+		BigDecimal totalPayAmt = tNegMain.getAccuTempAmt().subtract(transReturnAmt);// 累計實際還款金額:累繳金額減退還金額
 		if (titaVo.isHcodeNormal()) {
 			// 正向
 			if (tJcicZ573 != null) {
@@ -1185,15 +1043,15 @@ public class NegCom extends CommBuffer {
 		}
 	}
 
-	public void DbJcicZ046(TitaVo titaVo, JcicZ046Id tJcicZ046Id) throws LogicException {
-		// 已報送過毀諾結案,則不再自動報送毀諾後清償,改由人工建檔
-		Slice<JcicZ046> slJcicZ046 = sJcicZ046Service.HadZ046(tJcicZ046Id.getCustId(), tJcicZ046Id.getRcDate(), tJcicZ046Id.getSubmitKey(), 0, Integer.MAX_VALUE, titaVo);
+	public void DbJcicZ046(JcicZ046Id tJcicZ046Id, TitaVo titaVo) throws LogicException {
+		// 已報送過結案,則不再自動報送,改由人工建檔
+		Slice<JcicZ046> slJcicZ046 = sJcicZ046Service.HadZ046(tJcicZ046Id.getCustId(), tJcicZ046Id.getRcDate(),
+				tJcicZ046Id.getSubmitKey(), 0, Integer.MAX_VALUE, titaVo);
 		List<JcicZ046> lJcicZ046 = slJcicZ046 == null ? null : slJcicZ046.getContent();
 		if (lJcicZ046 != null) {
 			for (JcicZ046 sJcicZ046 : lJcicZ046) {
-				this.info("***DbJcicZ046***getBreakCode=" + sJcicZ046.getBreakCode());
-				if (("00").equals(sJcicZ046.getBreakCode())) {
-					return;
+				if (!("99").equals(sJcicZ046.getCloseCode())) { // 99:依債務清償方案履行完畢
+					break;
 				}
 			}
 		}
@@ -1248,7 +1106,7 @@ public class NegCom extends CommBuffer {
 
 	}
 
-	public void DbJcicZ450(TitaVo titaVo, String CustId, NegMain tNegMain, NegTrans tNegTrans) throws LogicException {
+	public void DbJcicZ450(String CustId, NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
 		JcicZ450Id tJcicZ450Id = new JcicZ450Id();
 		tJcicZ450Id.setApplyDate(tNegMain.getApplDate());
 		tJcicZ450Id.setCourtCode(tNegMain.getCourCode());
@@ -1263,9 +1121,9 @@ public class NegCom extends CommBuffer {
 				throw new LogicException(titaVo, "E5009", "已有JCICZ450文字檔日期");
 			}
 		}
-		BigDecimal payAmt = tNegTrans.getTxAmt();// 本次繳款金額
-		String payStatus = "";// 債權結案註記 Y N
-		BigDecimal sumRepayActualAmt = tNegMain.getAccuTempAmt();// 累計實際還款金額-累繳金額
+		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
+		String payStatus = ""; // 債權結案註記 Y N
+		BigDecimal sumRepayActualAmt = tNegMain.getAccuTempAmt().subtract(transReturnAmt);// 累計實際還款金額:累繳金額減退還金額
 		BigDecimal sumRepayShouldAmt = tNegMain.getAccuDueAmt();// 截至目前累計應還款金額-累期款金額
 		String tranKey = "";// 交易代碼
 		if (("3").equals(tNegMain.getStatus())) {
@@ -1312,18 +1170,6 @@ public class NegCom extends CommBuffer {
 				}
 			}
 
-//			TranKey	交易代碼
-//			CustId	債務人IDN *
-//			SubmitKey	報送單位代號*
-//			ApplyDate	款項統一收付申請日*
-//			BankId	異動債權金機構代號*
-//			PayDate	繳款日期
-//			PayAmt	本次繳款金額
-//			SumRepayActualAmt	累計實際還款金額
-//			SumRepayShouldAmt	截至目前累計應還款金額
-//			PayStatus	債權結案註記
-//			OutJcicTxtDate	轉JCIC文字檔日期
-
 		} else {
 			// 訂正
 			if (tJcicZ450 == null) {
@@ -1357,30 +1203,12 @@ public class NegCom extends CommBuffer {
 		return;
 	}
 
-	public void DbJcicZ050(TitaVo titaVo, Map<String, String> JcicZ050Map) throws LogicException {
-		// Func 1:正向 0:訂正
-		// int Today = titaVo.getOrgEntdyI();// 會計日期
-		int CloseDate = 0;// 結案日期
-
-		String CustId = JcicZ050Map.get("CustId");
-		int PayDate = Integer.parseInt(JcicZ050Map.get("PayDate"));// 繳款日期
-		int RcDate = Integer.parseInt(JcicZ050Map.get("RcDate"));// 協商申請日
-		String SubmitKey = JcicZ050Map.get("SubmitKey");// 報送單位代號-最大債權
-		String TranKey = JcicZ050Map.get("TranKey");// 交易代碼 A:新增;C:異動;D:刪除
-		int PayAmt = parse.stringToInteger(JcicZ050Map.get("PayAmt"));// 本次繳款金額
-		int SumRepayActualAmt = parse.stringToInteger(JcicZ050Map.get("SumRepayActualAmt"));// 累計實際還款金額
-		int SumRepayShouldAmt = parse.stringToInteger(JcicZ050Map.get("SumRepayShouldAmt"));// 累應還款金額
-		String Status = JcicZ050Map.get("Status");// 債權結案註記-0:請選擇;Y:債務全數清償;N:債務尚未全數清償
-		int SecondRepayYM = parse.stringToInteger(JcicZ050Map.get("SecondRepayYM"));// 進入第二階梯還款年月
-		int OutJcicTxtDate = Integer.parseInt(JcicZ050Map.get("OutJcicTxtDate"));// 轉出JCIC文字檔日期
-
-		CloseDate = PayDate;
-
+	public void DbJcicZ050(String CustId, NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
 		JcicZ050Id tJcicZ050Id = new JcicZ050Id();
 		tJcicZ050Id.setCustId(CustId);
-		tJcicZ050Id.setPayDate(PayDate);
-		tJcicZ050Id.setRcDate(RcDate);
-		tJcicZ050Id.setSubmitKey(SubmitKey);
+		tJcicZ050Id.setPayDate(tNegTrans.getEntryDate()); // 繳款日期-NegTrans入帳日
+		tJcicZ050Id.setRcDate(tNegMain.getApplDate()); // 協商申請日-NegMain協商申請日
+		tJcicZ050Id.setSubmitKey(tNegMain.getMainFinCode());
 		JcicZ050 tJcicZ050 = sJcicZ050Service.holdById(tJcicZ050Id, titaVo);
 		if (tJcicZ050 != null) {
 			// Status = tJcicZ050.getStatus();
@@ -1390,12 +1218,34 @@ public class NegCom extends CommBuffer {
 			}
 		}
 
+		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
+		String payStatus = ""; // 債權結案註記 Y N
+		BigDecimal sumRepayActualAmt = tNegMain.getAccuTempAmt().subtract(transReturnAmt);// 累計實際還款金額:累繳金額減退還金額
+		BigDecimal sumRepayShouldAmt = tNegMain.getAccuDueAmt();// 截至目前累計應還款金額-累期款金額
+		String tranKey = ""; // 交易代碼
+		int CloseDate = tNegTrans.getEntryDate(); // 結案日期
+
+		if (("3").equals(tNegMain.getStatus())) {
+			// 結案
+			payStatus = "Y";
+		} else {
+			payStatus = "N";
+		}
+
+		// String SecondRepayYM = String.valueOf(tNegMain.getDeferYMStart());
+		// if (SecondRepayYM != null && SecondRepayYM.length() >= 6) {
+		// SecondRepayYM = SecondRepayYM.substring(0, 6);
+		// } else {
+		// SecondRepayYM = "";
+		// }
+		// JcicZ050Map.put("SecondRepayYM", SecondRepayYM);// 進入第二階梯還款年月-延期繳款年月(起)
+
 		if (titaVo.isHcodeNormal()) {
 			// 正向
 			if (tJcicZ050 != null) {
-				tJcicZ050.setPayAmt(tJcicZ050.getPayAmt() + PayAmt);
-				tJcicZ050.setSumRepayActualAmt(tJcicZ050.getSumRepayActualAmt() + PayAmt);
-				tJcicZ050.setStatus(Status);
+				tJcicZ050.setPayAmt(tJcicZ050.getPayAmt() + payAmt.intValue());
+				tJcicZ050.setSumRepayActualAmt(tJcicZ050.getSumRepayActualAmt() + payAmt.intValue());
+				tJcicZ050.setStatus(payStatus);
 				try {
 					sJcicZ050Service.update(tJcicZ050, titaVo);
 				} catch (DBException e) {
@@ -1404,17 +1254,17 @@ public class NegCom extends CommBuffer {
 				}
 			} else {
 				// Insert
-				TranKey = "A";// 交易代碼 A:新增;C:異動;D:刪除
+				tranKey = "A";// 交易代碼 A:新增;C:異動;D:刪除
 				tJcicZ050 = new JcicZ050();
 				tJcicZ050.setJcicZ050Id(tJcicZ050Id);
 
-				tJcicZ050.setTranKey(TranKey);
-				tJcicZ050.setPayAmt(PayAmt);
-				tJcicZ050.setSumRepayActualAmt(SumRepayActualAmt);
-				tJcicZ050.setSumRepayShouldAmt(SumRepayShouldAmt);
-				tJcicZ050.setStatus(Status);
-				tJcicZ050.setSecondRepayYM(SecondRepayYM);
-				tJcicZ050.setOutJcicTxtDate(OutJcicTxtDate);
+				tJcicZ050.setTranKey(tranKey);
+				tJcicZ050.setPayAmt(payAmt.intValue());
+				tJcicZ050.setSumRepayActualAmt(sumRepayActualAmt.intValue());
+				tJcicZ050.setSumRepayShouldAmt(sumRepayShouldAmt.intValue());
+				tJcicZ050.setStatus(payStatus);
+				// tJcicZ050.setSecondRepayYM(SecondRepayYM);
+				tJcicZ050.setOutJcicTxtDate(0);
 				String iKey = "";
 				iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
 				tJcicZ050.setUkey(iKey);
@@ -1431,9 +1281,9 @@ public class NegCom extends CommBuffer {
 			if (tJcicZ050 == null) {
 				throw new LogicException(titaVo, "E0003", "JcicZ050處理時發生錯誤");
 			}
-			Status = tJcicZ050.getStatus(); // 訂正前交易別
+			payStatus = tJcicZ050.getStatus(); // 訂正前交易別
 			// 訂正最後一筆
-			if (tJcicZ050.getPayAmt() == PayAmt) {
+			if (tJcicZ050.getPayAmt() == payAmt.intValue()) {
 				try {
 					sJcicZ050Service.delete(tJcicZ050, titaVo);
 				} catch (DBException e) {
@@ -1443,8 +1293,8 @@ public class NegCom extends CommBuffer {
 
 				// 訂正非最後一筆
 			} else {
-				tJcicZ050.setPayAmt(tJcicZ050.getPayAmt() - PayAmt);
-				tJcicZ050.setSumRepayActualAmt(tJcicZ050.getSumRepayActualAmt() - PayAmt);
+				tJcicZ050.setPayAmt(tJcicZ050.getPayAmt() - payAmt.intValue());
+				tJcicZ050.setSumRepayActualAmt(tJcicZ050.getSumRepayActualAmt() - payAmt.intValue());
 				tJcicZ050.setStatus("N");
 				try {
 					sJcicZ050Service.update(tJcicZ050, titaVo);
@@ -1456,13 +1306,13 @@ public class NegCom extends CommBuffer {
 		}
 
 		// 債務全數清償
-		if (("Y").equals(Status)) {
+		if (("Y").equals(payStatus)) {
 			JcicZ046Id tJcicZ046Id = new JcicZ046Id();
 			tJcicZ046Id.setCloseDate(CloseDate);
 			tJcicZ046Id.setCustId(CustId);
-			tJcicZ046Id.setRcDate(RcDate);
-			tJcicZ046Id.setSubmitKey(SubmitKey);
-			DbJcicZ046(titaVo, tJcicZ046Id);
+			tJcicZ046Id.setRcDate(tNegMain.getApplDate());
+			tJcicZ046Id.setSubmitKey(tNegMain.getMainFinCode());
+			DbJcicZ046(tJcicZ046Id, titaVo);
 		}
 
 		return;
@@ -1472,11 +1322,13 @@ public class NegCom extends CommBuffer {
 	public void NegRepayEraseRoutine(TitaVo titaVo) throws LogicException {
 		this.info("NegRepayEraseRoutine ...");
 
-		int EntDyI = Integer.parseInt(l5051ServiceImpl.RocToDc(String.valueOf(titaVo.getEntDyI())));
-		Slice<TxTemp> slTxTemp = sTxTempService.txTempTxtNoEq(EntDyI, titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), this.index, this.limit, titaVo);
+		int EntDyI = Integer.parseInt(l5051ServiceImpl.RocToDc(String.valueOf(titaVo.getOrgEntdyI())));
+		Slice<TxTemp> slTxTemp = sTxTempService.txTempTxtNoEq(EntDyI, titaVo.getOrgKin(), titaVo.getOrgTlr(),
+				titaVo.getOrgTno(), this.index, this.limit, titaVo);
 		List<TxTemp> lTxTemp = slTxTemp == null ? null : slTxTemp.getContent();
 		if (lTxTemp == null || lTxTemp.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "交易暫存檔 日期=" + EntDyI + " 分行別 = " + titaVo.getOrgKin() + " 交易員代號 = " + titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "交易暫存檔 日期=" + EntDyI + " 分行別 = " + titaVo.getOrgKin()
+					+ " 交易員代號 = " + titaVo.getOrgTlr() + " 交易序號 = " + titaVo.getOrgTno()); // 查詢資料不存在
 		}
 		for (TxTemp tx : lTxTemp) {
 			String SeqNo = tx.getSeqNo();
@@ -1484,320 +1336,149 @@ public class NegCom extends CommBuffer {
 			TempVo tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tx.getText());
 
-			String CustNo = tTempVo.get("CustNo");// 戶號
-			String CaseSeq = tTempVo.get("CaseSeq");// 案件序號
-			String CaseKindCode = tTempVo.get("CaseKindCode");// 案件種類
-			String Status = tTempVo.get("Status");// 戶況
-			String CustLoanKind = tTempVo.get("CustLoanKind");// 債權戶別
-			String DeferYMStart = tTempVo.get("DeferYMStart");// 延期繳款年月(起)
-			String DeferYMEnd = tTempVo.get("DeferYMEnd");// 延期繳款年月(訖)
-			String ApplDate = tTempVo.get("ApplDate");// 協商申請日
-			String DueAmt = tTempVo.get("DueAmt");// 月付金(期款)
-			String TotalPeriod = tTempVo.get("TotalPeriod");// 期數
-			String IntRate = tTempVo.get("IntRate");// 計息條件(利率)
-			String FirstDueDate = tTempVo.get("FirstDueDate");// 首次應繳日
-			String LastDueDate = tTempVo.get("LastDueDate");// 還款結束日
-			String IsMainFin = tTempVo.get("IsMainFin");// 是否最大債權
-			String TotalContrAmt = tTempVo.get("TotalContrAmt");// 簽約總金額
-			String MainFinCode = tTempVo.get("MainFinCode");// 最大債權機構
-			String PrincipalBal = tTempVo.get("PrincipalBal");// 總本金餘額
-			String AccuTempAmt = tTempVo.get("AccuTempAmt");// 累繳金額
-			String AccuOverAmt = tTempVo.get("AccuOverAmt");// 累溢收金額
-			String AccuDueAmt = tTempVo.get("AccuDueAmt");// 累應還金額
-			String AccuSklShareAmt = tTempVo.get("AccuSklShareAmt");// 累新壽分攤金額
-			String RepaidPeriod = tTempVo.get("RepaidPeriod");// 已繳期數
-			String TwoStepCode = tTempVo.get("TwoStepCode");// 二階段註記
-			String ChgCondDate = tTempVo.get("ChgCondDate");// 申請變更還款條件日
-			String NextPayDate = tTempVo.get("NextPayDate");// 下次應繳日
-			String PayIntDate = tTempVo.get("PayIntDate");// 繳息迄日
-			String RepayPrincipal = tTempVo.get("RepayPrincipal");// 還本本金
-			String RepayInterest = tTempVo.get("RepayInterest");// 還本利息
-			String StatusDate = tTempVo.get("StatusDate");// 戶況日期
-			String ThisAcDate = tTempVo.get("ThisAcDate");// 本次會計日期
-			String ThisTitaTlrNo = tTempVo.get("ThisTitaTlrNo");// 本次經辦
-			String ThisTitaTxtNo = tTempVo.get("ThisTitaTxtNo");// 本次交易序號
-			String LastAcDate = tTempVo.get("LastAcDate");// 上次會計日期
-			String LastTitaTlrNo = tTempVo.get("LastTitaTlrNo");// 上次經辦
-			String LastTitaTxtNo = tTempVo.get("LastTitaTxtNo");// 上次交易序號
-//			String CreateDate = tTempVo.get("CreateDate");//建檔日期時間
-//			String CreateEmpNo = tTempVo.get("CreateEmpNo");//建檔人員
-//			String LastUpdate = tTempVo.get("LastUpdate");//最後更新日期時間
-//			String LastUpdateEmpNo = tTempVo.get("LastUpdateEmpNo");//最後更新人員
-
-			String TranAcDate = tTempVo.get("TranAcDate");// 會計日期
-			String TranTitaTlrNo = tTempVo.get("TranTitaTlrNo");// 經辦
-			String TranTitaTxtNo = tTempVo.get("TranTitaTxtNo");// 交易序號
-			String TranCustNo = tTempVo.get("TranCustNo");// 戶號
-			String TranCaseSeq = tTempVo.get("TranCaseSeq");// 案件序號
-			String TranEntryDate = tTempVo.get("TranEntryDate");// 入帳日期
-			String TranTxStatus = tTempVo.get("TranTxStatus");// 交易狀態
-			String TranTxKind = tTempVo.get("TranTxKind");// 交易別
-			String TranTxAmt = tTempVo.get("TranTxAmt");// 交易金額
-			String TranPrincipalBal = tTempVo.get("TranPrincipalBal");// 本金餘額
-			String TranReturnAmt = tTempVo.get("TranReturnAmt");// 退還金額
-			String TranSklShareAmt = tTempVo.get("TranSklShareAmt");// 新壽攤分
-			String TranApprAmt = tTempVo.get("TranApprAmt");// 撥付金額
-			String TranExportDate = tTempVo.get("TranExportDate");// 撥付製檔日
-			String TranExportAcDate = tTempVo.get("TranExportAcDate");// 撥付出帳日
-			String TranTempRepayAmt = tTempVo.get("TranTempRepayAmt");// 暫收抵繳金額
-			String TranOverRepayAmt = tTempVo.get("TranOverRepayAmt");// 溢收抵繳金額
-			String TranPrincipalAmt = tTempVo.get("TranPrincipalAmt");// 本金金額
-			String TranInterestAmt = tTempVo.get("TranInterestAmt");// 利息金額
-			String TranOverAmt = tTempVo.get("TranOverAmt");// 轉入溢收金額
-			String TranIntStartDate = tTempVo.get("TranIntStartDate");// 繳息起日
-			String TranIntEndDate = tTempVo.get("TranIntEndDate");// 繳息迄日
-			String TranRepayPeriod = tTempVo.get("TranRepayPeriod");// 還款期數
-			String TranRepayDate = tTempVo.get("TranRepayDate");// 入帳還款日期
-			String TranOrgAccuOverAmt = tTempVo.get("TranOrgAccuOverAmt");// 累溢繳款(交易前)
-			String TranAccuOverAmt = tTempVo.get("TranAccuOverAmt");// 累溢繳款(交易後)
-			String TranShouldPayPeriod = tTempVo.get("TranShouldPayPeriod");// 本次應還期數
-			String TranDueAmt = tTempVo.get("TranDueAmt");// 期金
-			String TranThisEntdy = tTempVo.get("TranThisEntdy");// 本次交易日
-			String TranThisKinbr = tTempVo.get("TranThisKinbr");// 本次分行別
-			String TranThisTlrNo = tTempVo.get("TranThisTlrNo");// 本次交易員代號
-			String TranThisTxtNo = tTempVo.get("TranThisTxtNo");// 本次交易序號
-			String TranThisSeqNo = tTempVo.get("TranThisSeqNo");// 本次序號
-			String TranLastEntdy = tTempVo.get("TranLastEntdy");// 上次交易日
-			String TranLastKinbr = tTempVo.get("TranLastKinbr");// 上次分行別
-			String TranLastTlrNo = tTempVo.get("TranLastTlrNo");// 上次交易員代號
-			String TranLastTxtNo = tTempVo.get("TranLastTxtNo");// 上次交易序號
-			String TranLastSeqNo = tTempVo.get("TranLastSeqNo");// 上次序號
-
-			int IntCustNo = parse.stringToInteger(CustNo);
-			int IntCaseSeq = parse.stringToInteger(CaseSeq);
+			int custNo = parse.stringToInteger(tTempVo.get("CustNo"));// 戶號
+			int caseSeq = parse.stringToInteger(tTempVo.get("CaseSeq"));// 案件序號
 			NegMainId tNegMainId = new NegMainId();
-			tNegMainId.setCustNo(IntCustNo);
-			tNegMainId.setCaseSeq(IntCaseSeq);
-
+			tNegMainId.setCustNo(custNo);
+			tNegMainId.setCaseSeq(caseSeq);
 			NegMain tNegMain = sNegMainService.holdById(tNegMainId, titaVo);
-			if (tNegMain != null) {
-				this.info("NegCom NegRepayEraseRoutine tNegMain!=null ");
-				NegMain tNegMainOrg = (NegMain) dataLog.clone(tNegMain);// 資料異動前
-				tNegMain.setCustNo(IntCustNo);// 戶號
-				tNegMain.setCaseSeq(IntCaseSeq);// 案件序號
-				tNegMain.setCaseKindCode(CaseKindCode);// 案件種類
-				tNegMain.setStatus(Status);// 戶況
-				tNegMain.setCustLoanKind(CustLoanKind);// 債權戶別
-				tNegMain.setDeferYMStart(parse.stringToInteger(DeferYMStart));// 延期繳款年月(起)
-				tNegMain.setDeferYMEnd(parse.stringToInteger(DeferYMEnd));// 延期繳款年月(訖)
-				tNegMain.setApplDate(parse.stringToInteger(ApplDate));// 協商申請日
-				tNegMain.setDueAmt(parse.stringToBigDecimal(DueAmt));// 月付金(期款)
-				tNegMain.setTotalPeriod(parse.stringToInteger(TotalPeriod));// 期數
-				tNegMain.setIntRate(parse.stringToBigDecimal(IntRate));// 計息條件(利率)
-				tNegMain.setFirstDueDate(parse.stringToInteger(FirstDueDate));// 首次應繳日
-				tNegMain.setLastDueDate(parse.stringToInteger(LastDueDate));// 還款結束日
-				tNegMain.setIsMainFin(IsMainFin);// 是否最大債權
-				tNegMain.setTotalContrAmt(parse.stringToBigDecimal(TotalContrAmt));// 簽約總金額
-				tNegMain.setMainFinCode(MainFinCode);// 最大債權機構
-				tNegMain.setPrincipalBal(parse.stringToBigDecimal(PrincipalBal));// 總本金餘額
-				tNegMain.setAccuTempAmt(parse.stringToBigDecimal(AccuTempAmt));// 累繳金額
-				tNegMain.setAccuOverAmt(parse.stringToBigDecimal(AccuOverAmt));// 累溢收金額
-				tNegMain.setAccuDueAmt(parse.stringToBigDecimal(AccuDueAmt));// 累應還金額
-				tNegMain.setAccuSklShareAmt(parse.stringToBigDecimal(AccuSklShareAmt));// 累新壽分攤金額
-				tNegMain.setRepaidPeriod(parse.stringToInteger(RepaidPeriod));// 已繳期數
-				tNegMain.setTwoStepCode(TwoStepCode);// 二階段註記
-				tNegMain.setChgCondDate(parse.stringToInteger(ChgCondDate));// 申請變更還款條件日
-				tNegMain.setNextPayDate(parse.stringToInteger(NextPayDate));// 下次應繳日
-				tNegMain.setPayIntDate(parse.stringToInteger(PayIntDate));// 繳息迄日
-				tNegMain.setRepayPrincipal(parse.stringToBigDecimal(RepayPrincipal));// 還本本金
-				tNegMain.setRepayInterest(parse.stringToBigDecimal(RepayInterest));// 還本利息
-				tNegMain.setStatusDate(parse.stringToInteger(StatusDate));// 戶況日期
-				tNegMain.setThisAcDate(parse.stringToInteger(ThisAcDate));// 本次會計日期
-				tNegMain.setThisTitaTlrNo(ThisTitaTlrNo);// 本次經辦
-				tNegMain.setThisTitaTxtNo(parse.stringToInteger(ThisTitaTxtNo));// 本次交易序號
-				tNegMain.setLastAcDate(parse.stringToInteger(LastAcDate));// 上次會計日期
-				tNegMain.setLastTitaTlrNo(LastTitaTlrNo);// 上次經辦
-				tNegMain.setLastTitaTxtNo(parse.stringToInteger(LastTitaTxtNo));// 上次交易序號
-				// sNegMainService.update(tNegMain,titaVo);
-				try {
-					sNegMainService.update2(tNegMain, titaVo);
-				} catch (DBException e) {
-					// E0007 更新資料時，發生錯誤
-					throw new LogicException(titaVo, "E0007", "債務協商案件主檔");
-				} // 資料異動後-1
-				dataLog.setEnv(titaVo, tNegMainOrg, tNegMain);// 資料異動後-2
-				dataLog.exec();// 資料異動後-3
-				this.info("NegCom NegRepayEraseRoutine tNegMain Update Safe ");
-			} else {
-				this.info("NegCom NegRepayEraseRoutine tNegMain==null ");
-				// E0006 鎖定資料時，發生錯誤
-				throw new LogicException(titaVo, "E0006", "債務協商案件主檔");
+			if (tNegMain == null) {
+				throw new LogicException(titaVo, "E0006", "債務協商案件主檔");// E0006 鎖定資料時，發生錯誤
 			}
-			int IntTranAcDate = parse.stringToInteger(TranAcDate);
-			int IntTranTitaTxtNo = parse.stringToInteger(TranTitaTxtNo);
+			this.info("NegCom NegRepayEraseRoutine tNegMain!=null ");
+			if (tNegMain.getThisAcDate() != titaVo.getOrgEntdyI()
+					|| !tNegMain.getThisTitaTlrNo().equals(titaVo.getOrgTlr())
+					|| tNegMain.getThisTitaTxtNo() != parse.stringToInteger(titaVo.getOrgTno())) {
+				throw new LogicException(titaVo, "E0019", "最近一筆交易序號 = " + tNegMain.getThisAcDate() + "-"
+						+ tNegMain.getThisTitaTlrNo() + "-" + tNegMain.getThisTitaTxtNo());
+			} // 輸入資料錯誤
+			int tranAcDate = parse.stringToInteger(tTempVo.get("TranAcDate"));
+			String tranTitaTlrNo = tTempVo.get("TranTitaTlrNo");// 經辦
+			int tranTitaTxtNo = parse.stringToInteger(tTempVo.get("TranTitaTxtNo"));
 
 			NegTransId tNegTransId = new NegTransId();
-			tNegTransId.setAcDate(IntTranAcDate);// 會計日期
-			tNegTransId.setTitaTlrNo(TranTitaTlrNo);// 經辦
-			tNegTransId.setTitaTxtNo(IntTranTitaTxtNo);// 交易序號
+			tNegTransId.setAcDate(tranAcDate);// 會計日期
+			tNegTransId.setTitaTlrNo(tranTitaTlrNo);// 經辦
+			tNegTransId.setTitaTxtNo(tranTitaTxtNo);// 交易序號
 			NegTrans tNegTrans = sNegTransService.holdById(tNegTransId, titaVo);
-			if (tNegTrans != null) {
-				this.info("NegCom NegRepayEraseRoutine tNegTrans !=null ");
-				NegTrans OrgNegTrans = (NegTrans) dataLog.clone(tNegTrans);// 資料異動前
-				tNegTrans.setAcDate(IntTranAcDate);// 會計日期
-				tNegTrans.setTitaTlrNo(TranTitaTlrNo);// 經辦
-				tNegTrans.setTitaTxtNo(IntTranTitaTxtNo);// 交易序號
-				tNegTrans.setCustNo(parse.stringToInteger(TranCustNo));// 戶號
-				tNegTrans.setCaseSeq(parse.stringToInteger(TranCaseSeq));// 案件序號
-				tNegTrans.setEntryDate(parse.stringToInteger(TranEntryDate));// 入帳日期
-				tNegTrans.setTxStatus(parse.stringToInteger(TranTxStatus));// 交易狀態
-				tNegTrans.setTxKind(TranTxKind);// 交易別
-				tNegTrans.setTxAmt(parse.stringToBigDecimal(TranTxAmt));// 交易金額
-				tNegTrans.setPrincipalBal(parse.stringToBigDecimal(TranPrincipalBal));// 本金餘額
-				tNegTrans.setReturnAmt(parse.stringToBigDecimal(TranReturnAmt));// 退還金額
-				tNegTrans.setSklShareAmt(parse.stringToBigDecimal(TranSklShareAmt));// 新壽攤分
-				tNegTrans.setApprAmt(parse.stringToBigDecimal(TranApprAmt));// 撥付金額
-				tNegTrans.setExportDate(parse.stringToInteger(TranExportDate));// 撥付製檔日
-				tNegTrans.setExportAcDate(parse.stringToInteger(TranExportAcDate));// 撥付出帳日
-				tNegTrans.setTempRepayAmt(parse.stringToBigDecimal(TranTempRepayAmt));// 暫收抵繳金額
-				tNegTrans.setOverRepayAmt(parse.stringToBigDecimal(TranOverRepayAmt));// 溢收抵繳金額
-				tNegTrans.setPrincipalAmt(parse.stringToBigDecimal(TranPrincipalAmt));// 本金金額
-				tNegTrans.setInterestAmt(parse.stringToBigDecimal(TranInterestAmt));// 利息金額
-				tNegTrans.setOverAmt(parse.stringToBigDecimal(TranOverAmt));// 轉入溢收金額
-				tNegTrans.setIntStartDate(parse.stringToInteger(TranIntStartDate));// 繳息起日
-				tNegTrans.setIntEndDate(parse.stringToInteger(TranIntEndDate));// 繳息迄日
-				tNegTrans.setRepayPeriod(parse.stringToInteger(TranRepayPeriod));// 還款期數
-				tNegTrans.setRepayDate(parse.stringToInteger(TranRepayDate));// 入帳還款日期
-				tNegTrans.setOrgAccuOverAmt(parse.stringToBigDecimal(TranOrgAccuOverAmt));// 累溢繳款(交易前)
-				tNegTrans.setAccuOverAmt(parse.stringToBigDecimal(TranAccuOverAmt));// 累溢繳款(交易後)
-				tNegTrans.setShouldPayPeriod(parse.stringToInteger(TranShouldPayPeriod));// 本次應還期數
-				tNegTrans.setDueAmt(parse.stringToBigDecimal(TranDueAmt));// 期金
-				tNegTrans.setThisEntdy(parse.stringToInteger(TranThisEntdy));// 本次交易日
-				tNegTrans.setThisKinbr(TranThisKinbr);// 本次分行別
-				tNegTrans.setThisTlrNo(TranThisTlrNo);// 本次交易員代號
-				tNegTrans.setThisTxtNo(TranThisTxtNo);// 本次交易序號
-				tNegTrans.setThisSeqNo(TranThisSeqNo);// 本次序號
-				tNegTrans.setLastEntdy(parse.stringToInteger(TranLastEntdy));// 上次交易日
-				tNegTrans.setLastKinbr(TranLastKinbr);// 上次分行別
-				tNegTrans.setLastTlrNo(TranLastTlrNo);// 上次交易員代號
-				tNegTrans.setLastTxtNo(TranLastTxtNo);// 上次交易序號
-				tNegTrans.setLastSeqNo(TranLastSeqNo);// 上次序號
-				// sNegTransService.update(tNegTrans,titaVo);
-				try {
-					sNegTransService.update2(tNegTrans, titaVo);
-				} catch (DBException e) {
-					// E0007 更新資料時，發生錯誤
-					throw new LogicException(titaVo, "E0007", "債務協商案件主檔");
-				} // 資料異動後-1
-				dataLog.setEnv(titaVo, OrgNegTrans, tNegTrans);// 資料異動後-2
-				dataLog.exec();// 資料異動後-3
-				this.info("NegCom NegRepayEraseRoutine tNegTrans Update Safe ");
-			} else {
-				this.info("NegCom NegRepayEraseRoutine tNegTrans ==null ");
-				// E0006 鎖定資料時，發生錯誤
+			if (tNegTrans == null) {
 				throw new LogicException(titaVo, "E0006", "債務協商交易檔");
 			}
-			this.info("NegCom 訂正 tNegMain != null (" + String.valueOf(tNegMain != null) + ") && tNegTrans != null(" + String.valueOf(tNegTrans != null) + ")");
-			if (tNegMain != null && tNegTrans != null) {
-				String CustId = "";
-				CustMain tCustMain = sCustMainService.custNoFirst(tNegTrans.getCustNo(), tNegTrans.getCustNo(), titaVo);
-				if (tCustMain != null) {
-					CustId = tCustMain.getCustId();
-				} else {
-					// E0001 查詢資料不存在
-					throw new LogicException(titaVo, "E0001", "客戶資料主檔處理時發生錯誤 CustNo[" + IntCustNo + "]");
-				}
-
-				// NegAppr01 處理
-
-				Slice<NegFinShare> slNegFinShare = sNegFinShareService.FindAllFinCode(tNegTrans.getCustNo(), tNegTrans.getCaseSeq(), this.index, this.limit, titaVo);
-				List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
-				if (lNegFinShare != null && lNegFinShare.size() != 0) {
-					List<NegAppr01> lNegAppr01 = new ArrayList<NegAppr01>();
-					for (NegFinShare tNegFinShare : lNegFinShare) {
-						String FinCode = tNegFinShare.getFinCode();
-//						if(("458").equals(FinCode)) {
-//							//458跳過-458不會寫入NgeAppr01
-//							continue;
-//						}
-						NegAppr01Id tNegAppr01Id = new NegAppr01Id();
-						tNegAppr01Id.setAcDate(tNegTrans.getAcDate());
-						tNegAppr01Id.setFinCode(FinCode);
-						tNegAppr01Id.setTitaTlrNo(tNegTrans.getTitaTlrNo());
-						tNegAppr01Id.setTitaTxtNo(tNegTrans.getTitaTxtNo());
-						NegAppr01 tNegAppr01 = sNegAppr01Service.findById(tNegAppr01Id, titaVo);
-						if (tNegAppr01 != null) {
-							tNegAppr01 = sNegAppr01Service.holdById(tNegAppr01Id, titaVo);
-							lNegAppr01.add(tNegAppr01);
-						}
-						this.info("NegCom 訂正 NegAppr01 (" + tNegAppr01Id.toString() + ")");
-					}
-					if (lNegAppr01 != null && lNegAppr01.size() != 0) {
-						try {
-							sNegAppr01Service.deleteAll(lNegAppr01, titaVo);
-						} catch (DBException e) {
-							// E0008 刪除資料時，發生錯誤
-							throw new LogicException(titaVo, "E0001", "最大債權撥付資料檔");
-						}
-					}
-				}
-				// CaseKindCode 1:協商 2:調解 3:更生 4:清算
-				// 協商->JcicZ050 債務人繳款資料
-				// 調解->JCICZ450 前置調解債務人繳款資料
-				// 更生->JCICZ573 更生債務人繳款資料
-				// 清算-> x
-				switch (CaseKindCode) {
-				case "1":
-					// 協商->JcicZ050
-					Map<String, String> JcicZ050Map = new HashMap<String, String>();
-					String TranKey = "";
-					if (tNegTrans.getRepayDate() > 0) {
-						TranKey = "C";
-					} else {
-						// 刪除
-						TranKey = "D";
-					}
-					JcicZ050Map.put("CustId", CustId);
-					JcicZ050Map.put("PayDate", String.valueOf(tNegTrans.getEntryDate()));// 繳款日期-NegTrans入帳日
-					JcicZ050Map.put("RcDate", String.valueOf(tNegMain.getApplDate()));// 協商申請日-NegMain協商申請日
-					JcicZ050Map.put("SubmitKey", tNegMain.getMainFinCode());// 報送單位代號-最大債權
-					JcicZ050Map.put("TranKey", TranKey);// 交易代碼 A:新增;C:異動;D:刪除
-					JcicZ050Map.put("PayAmt", String.valueOf(tNegTrans.getTxAmt()));// 本次繳款金額
-					JcicZ050Map.put("SumRepayActualAmt", String.valueOf(tNegMain.getAccuTempAmt()));// 累計實際還款金額
-					JcicZ050Map.put("SumRepayShouldAmt", String.valueOf(tNegMain.getAccuDueAmt()));// 累應還款金額
-					String JcicZ050Status = "";
-					String TransTxKind = tNegTrans.getTxKind();
-					if (("4").equals(TransTxKind) || ("5").equals(TransTxKind)) {
-						// 4:結清-匯入款＋溢收款 >=最後一期期款
-						// 5:提前清償-匯入款＋溢收款 >= 剩餘期款
-						// Status="";//債權結案註記-0:請選擇;Y:債務全數清償;N:債務尚未全數清償
-						JcicZ050Status = "Y";
-					} else {
-						JcicZ050Status = "N";
-					}
-					JcicZ050Map.put("Status", JcicZ050Status);// 債權結案註記-0:請選擇;Y:債務全數清償;N:債務尚未全數清償
-					String SecondRepayYM = String.valueOf(tNegMain.getDeferYMStart());
-					if (SecondRepayYM != null && SecondRepayYM.length() >= 6) {
-						SecondRepayYM = SecondRepayYM.substring(0, 6);
-					} else {
-						SecondRepayYM = "0";
-					}
-					JcicZ050Map.put("SecondRepayYM", SecondRepayYM);// 進入第二階梯還款年月-延期繳款年月(起)
-					JcicZ050Map.put("OutJcicTxtDate", "0");// 轉出JCIC文字檔日期-預設為0
-					DbJcicZ050(titaVo, JcicZ050Map);
-					break;
-				case "2":
-					// 調解->Jcic (結清需增加JcicZ446)
-					DbJcicZ450(titaVo, CustId, tNegMain, tNegTrans);
-					break;
-				case "3":
-					// 更生->JcicZ067 ->變更為JcicZ573
-					DbJcicZ573(titaVo, CustId, tNegMain, tNegTrans);
-					break;
-				case "4":
-					// 清算->Jcic
-
-					break;
-				}
-
+			if (tNegTrans.getIntEndDate() > 0) {
+				throw new LogicException(titaVo, "E0015", "已撥付製檔不可訂正");
 			}
+			
+			custId = "";
+			tCustMain = sCustMainService.custNoFirst(custNo, custNo, titaVo);
+			if (tCustMain != null) {
+				custId = tCustMain.getCustId();
+			} else {
+				throw new LogicException(titaVo, "E0001", "客戶資料主檔處理時發生錯誤 戶號[" + custNo + "]");// E0001 查詢資料不存在
+			}
+			// 刪除最大債權分配
+			if ("Y".equals(tNegMain.getIsMainFin())) {
+				updNegFinShare(tNegTrans, tNegMain, transTxAmt.subtract(transReturnAmt), titaVo);
+			}
+
+			// 還原主檔、明細檔
+			updateDbReverse(tTempVo, tNegMain, tNegTrans, titaVo);
+
+			// 更新jcic報送檔
+			caseKindCode = tTempVo.get("CaseKindCode");
+			updateJcic(tNegMain, tNegTrans, titaVo);
 
 		}
 		return;
+
+	}
+
+	public void updateDbReverse(TempVo tTempVo, NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo)
+			throws LogicException {
+		tNegMain.setCaseKindCode(tTempVo.get("CaseKindCode"));// 案件種類
+		tNegMain.setStatus(tTempVo.get("Status"));// 戶況
+		tNegMain.setCustLoanKind(tTempVo.get("CustLoanKind"));// 債權戶別
+		tNegMain.setDeferYMStart(parse.stringToInteger(tTempVo.get("DeferYMStart")));// 延期繳款年月(起)
+		tNegMain.setDeferYMEnd(parse.stringToInteger(tTempVo.get("DeferYMEnd")));// 延期繳款年月(訖)
+		tNegMain.setApplDate(parse.stringToInteger(tTempVo.get("ApplDate")));// 協商申請日
+		tNegMain.setDueAmt(parse.stringToBigDecimal(tTempVo.get("DueAmt")));// 月付金(期款)
+		tNegMain.setTotalPeriod(parse.stringToInteger(tTempVo.get("TotalPeriod")));// 期數
+		tNegMain.setIntRate(parse.stringToBigDecimal(tTempVo.get("IntRate")));// 計息條件(利率)
+		tNegMain.setFirstDueDate(parse.stringToInteger(tTempVo.get("FirstDueDate")));// 首次應繳日
+		tNegMain.setLastDueDate(parse.stringToInteger(tTempVo.get("LastDueDate")));// 還款結束日
+		tNegMain.setIsMainFin(tTempVo.get("IsMainFin"));// 是否最大債權
+		tNegMain.setTotalContrAmt(parse.stringToBigDecimal(tTempVo.get("TotalContrAmt")));// 簽約總金額
+		tNegMain.setMainFinCode(tTempVo.get("MainFinCode"));// 最大債權機構
+		tNegMain.setPrincipalBal(parse.stringToBigDecimal(tTempVo.get("PrincipalBal")));// 總本金餘額
+		tNegMain.setAccuTempAmt(parse.stringToBigDecimal(tTempVo.get("AccuTempAmt")));// 累繳金額
+		tNegMain.setAccuOverAmt(parse.stringToBigDecimal(tTempVo.get("AccuOverAmt")));// 累溢收金額
+		tNegMain.setAccuDueAmt(parse.stringToBigDecimal(tTempVo.get("AccuDueAmt")));// 累應還金額
+		tNegMain.setAccuSklShareAmt(parse.stringToBigDecimal(tTempVo.get("AccuSklShareAmt")));// 累新壽分攤金額
+		tNegMain.setRepaidPeriod(parse.stringToInteger(tTempVo.get("RepaidPeriod")));// 已繳期數
+		tNegMain.setTwoStepCode(tTempVo.get("TwoStepCode"));// 二階段註記
+		tNegMain.setChgCondDate(parse.stringToInteger(tTempVo.get("ChgCondDate")));// 申請變更還款條件日
+		tNegMain.setNextPayDate(parse.stringToInteger(tTempVo.get("NextPayDate")));// 下次應繳日
+		tNegMain.setPayIntDate(parse.stringToInteger(tTempVo.get("PayIntDate")));// 繳息迄日
+		tNegMain.setRepayPrincipal(parse.stringToBigDecimal(tTempVo.get("RepayPrincipal")));// 還本本金
+		tNegMain.setRepayInterest(parse.stringToBigDecimal(tTempVo.get("RepayInterest")));// 還本利息
+		tNegMain.setStatusDate(parse.stringToInteger(tTempVo.get("StatusDate")));// 戶況日期
+		tNegMain.setThisAcDate(parse.stringToInteger(tTempVo.get("ThisAcDate")));// 本次會計日期
+		tNegMain.setThisTitaTlrNo(tTempVo.get("ThisTitaTlrNo"));// 本次經辦
+		tNegMain.setThisTitaTxtNo(parse.stringToInteger(tTempVo.get("ThisTitaTxtNo")));// 本次交易序號
+		tNegMain.setLastAcDate(parse.stringToInteger(tTempVo.get("LastAcDate")));// 上次會計日期
+		tNegMain.setLastTitaTlrNo(tTempVo.get("LastTitaTlrNo"));// 上次經辦
+		tNegMain.setLastTitaTxtNo(parse.stringToInteger(tTempVo.get("LastTitaTxtNo")));// 上次交易序號
+		try {
+			sNegMainService.update(tNegMain, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "債務協商案件主檔");// 更新資料時，發生錯誤
+		}
+
+		tNegTrans.setCustNo(parse.stringToInteger(tTempVo.get("TranCustNo")));// 戶號
+		tNegTrans.setCaseSeq(parse.stringToInteger(tTempVo.get("TranCaseSeq")));// 案件序號
+		tNegTrans.setEntryDate(parse.stringToInteger(tTempVo.get("TranEntryDate")));// 入帳日期
+		tNegTrans.setTxStatus(parse.stringToInteger(tTempVo.get("TranTxStatus")));// 交易狀態
+		tNegTrans.setTxKind(tTempVo.get("TranTxKind"));// 交易別
+		tNegTrans.setTxAmt(parse.stringToBigDecimal(tTempVo.get("TranTxAmt")));// 交易金額
+		tNegTrans.setPrincipalBal(parse.stringToBigDecimal(tTempVo.get("TranPrincipalBal")));// 本金餘額
+		transReturnAmt = tNegTrans.getReturnAmt();	// FOR JCIC更正使用
+		tNegTrans.setReturnAmt(parse.stringToBigDecimal(tTempVo.get("TranReturnAmt")));// 退還金額
+		tNegTrans.setSklShareAmt(parse.stringToBigDecimal(tTempVo.get("TranSklShareAmt")));// 新壽攤分
+		tNegTrans.setApprAmt(parse.stringToBigDecimal(tTempVo.get("TranApprAmt")));// 撥付金額
+		tNegTrans.setExportDate(parse.stringToInteger(tTempVo.get("TranExportDate")));// 撥付製檔日
+		tNegTrans.setExportAcDate(parse.stringToInteger(tTempVo.get("TranExportAcDate")));// 撥付出帳日
+		tNegTrans.setTempRepayAmt(parse.stringToBigDecimal(tTempVo.get("TranTempRepayAmt")));// 暫收抵繳金額
+		tNegTrans.setOverRepayAmt(parse.stringToBigDecimal(tTempVo.get("TranOverRepayAmt")));// 溢收抵繳金額
+		tNegTrans.setPrincipalAmt(parse.stringToBigDecimal(tTempVo.get("TranPrincipalAmt")));// 本金金額
+		tNegTrans.setInterestAmt(parse.stringToBigDecimal(tTempVo.get("TranInterestAmt")));// 利息金額
+		tNegTrans.setOverAmt(parse.stringToBigDecimal(tTempVo.get("TranOverAmt")));// 轉入溢收金額
+		tNegTrans.setIntStartDate(parse.stringToInteger(tTempVo.get("TranIntStartDate")));// 繳息起日
+		tNegTrans.setIntEndDate(parse.stringToInteger(tTempVo.get("TranIntEndDate")));// 繳息迄日
+		tNegTrans.setRepayPeriod(parse.stringToInteger(tTempVo.get("TranRepayPeriod")));// 還款期數
+		tNegTrans.setRepayDate(parse.stringToInteger(tTempVo.get("TranRepayDate")));// 入帳還款日期
+		tNegTrans.setOrgAccuOverAmt(parse.stringToBigDecimal(tTempVo.get("TranOrgAccuOverAmt")));// 累溢繳款(交易前)
+		tNegTrans.setAccuOverAmt(parse.stringToBigDecimal(tTempVo.get("TranAccuOverAmt")));// 累溢繳款(交易後)
+		tNegTrans.setShouldPayPeriod(parse.stringToInteger(tTempVo.get("TranShouldPayPeriod")));// 本次應還期數
+		tNegTrans.setDueAmt(parse.stringToBigDecimal(tTempVo.get("TranDueAmt")));// 期金
+		tNegTrans.setThisEntdy(parse.stringToInteger(tTempVo.get("TranThisEntdy")));// 本次交易日
+		tNegTrans.setThisKinbr(tTempVo.get("TranThisKinbr"));// 本次分行別
+		tNegTrans.setThisTlrNo(tTempVo.get("TranThisTlrNo"));// 本次交易員代號
+		tNegTrans.setThisTxtNo(tTempVo.get("TranThisTxtNo"));// 本次交易序號
+		tNegTrans.setThisSeqNo(tTempVo.get("TranThisSeqNo"));// 本次序號
+		tNegTrans.setLastEntdy(parse.stringToInteger(tTempVo.get("TranLastEntdy")));// 上次交易日
+		tNegTrans.setLastKinbr(tTempVo.get("TranLastKinbr"));// 上次分行別
+		tNegTrans.setLastTlrNo(tTempVo.get("TranLastTlrNo"));// 上次交易員代號
+		tNegTrans.setLastTxtNo(tTempVo.get("TranLastTxtNo"));// 上次交易序號
+		tNegTrans.setLastSeqNo(tTempVo.get("TranLastSeqNo"));// 上次序號
+		// sNegTransService.update(tNegTrans,titaVo);
+		try {
+			sNegTransService.update(tNegTrans, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "債務協商交易檔");// E0007 更新資料時，發生錯誤
+		}
 	}
 
 	// 正向
-	public void NegMainInsertTxTemp(TitaVo titaVo, NegMain tNegMainOrg, NegTrans tNegTrans) throws LogicException {
+	public void insertTxTemp(TitaVo titaVo, NegMain tNegMainOrg, NegTrans tNegTrans) throws LogicException {
 		TxTemp tTxTemp = new TxTemp();
 		TxTempId tTxTempId = new TxTempId();
 		String wkSeqNo = tNegTrans.getThisSeqNo().trim();
@@ -1912,9 +1593,11 @@ public class NegCom extends CommBuffer {
 		return;
 	}
 
-	public String[] NegServiceList1(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn, TitaVo titaVo) throws LogicException {
+	public String[] NegServiceList1(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn,
+			TitaVo titaVo) throws LogicException {
 		checkData(AcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn);
-		this.info("NegService AcDate=[" + AcDate + "],IsMainFin=[" + IsMainFin + "],State=[" + State + "],Detail=[" + Detail + "],ExportDateYN=[" + ExportDateYN + "],IsBtn=[" + IsBtn + "]");
+		this.info("NegService AcDate=[" + AcDate + "],IsMainFin=[" + IsMainFin + "],State=[" + State + "],Detail=["
+				+ Detail + "],ExportDateYN=[" + ExportDateYN + "],IsBtn=[" + IsBtn + "]");
 		String data[] = new String[2];// 筆數,總金額
 
 		String sql = "";
@@ -1928,7 +1611,8 @@ public class NegCom extends CommBuffer {
 			throw new LogicException(titaVo, "E5003", "");
 		}
 		try {
-			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, AcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn), "L5074");
+			Data = l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, AcDate,
+					IsMainFin, State, Detail, ExportDateYN, IsBtn), "L5074");
 		} catch (Exception e) {
 			// E5004 讀取DB時發生問題
 			this.info("L5051 ErrorForDB=" + e);
@@ -1962,7 +1646,8 @@ public class NegCom extends CommBuffer {
 	 * @throws LogicException 交易程式需承接LogicException
 	 * @author Jacky Lu
 	 */
-	public void checkData(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn) throws LogicException {
+	public void checkData(int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn)
+			throws LogicException {
 		if (AcDate >= 0) {
 
 		} else {
@@ -2003,33 +1688,27 @@ public class NegCom extends CommBuffer {
 		}
 	}
 
-	public int AdjMonth(Integer Ymd, int AddMonth, int AddDay) throws LogicException {
-		if (Ymd != null && Ymd != 0) {
-			if (String.valueOf(Ymd).length() == 7 || String.valueOf(Ymd).length() == 6) {
-				Ymd = Ymd + 19110000;
-			}
+	/**
+	 * 計算應繳日
+	 * 
+	 * @param payIntDate   繳息迄日
+	 * @param repaidPeriod 繳期數
+	 * @return 應繳日
+	 * @throws LogicException
+	 */
+	public int getRepayDate(int payIntDate, int repaidPeriod, TitaVo titaVo) throws LogicException {
+		if (payIntDate == 0) {
+			throw new LogicException(titaVo, "E5009", "繳息迄日=0");// E5009 資料檢核錯誤
 		}
-		this.info("NegCom AddMonth(Integer Ymd=[" + Ymd + "],int AddMonth=[" + AddMonth + "],int AddDay[" + AddDay + "])");
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		Date dt = null;
-		try {
-			dt = sdf.parse(String.valueOf(Ymd));
-		} catch (ParseException e) {
-			// E5009 資料檢核錯誤
-			throw new LogicException(titaVo, "E5009", "日期轉換發生錯誤");
+		int repayDate = payIntDate;
+		if (repaidPeriod != 0) {
+			dateUtil.init();
+			dateUtil.setDate_1(payIntDate);
+			dateUtil.setMons(repaidPeriod);
+			repayDate = dateUtil.getCalenderDay();
 		}
-		Calendar rightNow = Calendar.getInstance();
-		rightNow.setTime(dt);
-		if (AddMonth != 0) {
-			rightNow.add(Calendar.MONTH, AddMonth);
-		}
-		if (AddDay != 0) {
-			rightNow.add(Calendar.DAY_OF_MONTH, AddDay);
-		}
-		Date dt1 = rightNow.getTime();
-		String reStr = sdf.format(dt1);
-		Ymd = Integer.parseInt(reStr);
-		return Ymd;
+		return repayDate;
+
 	}
 
 	/**
@@ -2162,7 +1841,8 @@ public class NegCom extends CommBuffer {
 		int CustNo = tAcReceivable.getCustNo();
 		int FacmNo = tAcReceivable.getFacmNo();
 		String RvNo = tAcReceivable.getRvNo();
-		Key = AcctCode + ConnectWord + String.valueOf(CustNo) + ConnectWord + String.valueOf(FacmNo) + ConnectWord + RvNo;
+		Key = AcctCode + ConnectWord + String.valueOf(CustNo) + ConnectWord + String.valueOf(FacmNo) + ConnectWord
+				+ RvNo;
 		return Key;
 	}
 
@@ -2218,13 +1898,15 @@ public class NegCom extends CommBuffer {
 	 *                                       the period. (是否在期初付款)
 	 * @return payment
 	 */
-	public BigDecimal pmt(BigDecimal interestRate, int numberOfPayments, BigDecimal principal, BigDecimal futureValue, boolean paymentsDueAtBeginningOfPeriod) {
+	public BigDecimal pmt(BigDecimal interestRate, int numberOfPayments, BigDecimal principal, BigDecimal futureValue,
+			boolean paymentsDueAtBeginningOfPeriod) {
 		final BigDecimal n = new BigDecimal(numberOfPayments);
 		if (BigDecimal.ZERO.compareTo(interestRate) == 0) {
 			return (futureValue.add(principal)).divide(n, MathContext.DECIMAL128).negate();
 		} else {
 			if (numberOfPayments == 1) {
-				return (futureValue.add(principal).add(principal.multiply(interestRate))).divide(n, MathContext.DECIMAL128).negate();
+				return (futureValue.add(principal).add(principal.multiply(interestRate)))
+						.divide(n, MathContext.DECIMAL128).negate();
 			}
 			final BigDecimal r1 = interestRate.add(BigDecimal.ONE);
 			final BigDecimal pow = r1.pow(numberOfPayments);
@@ -2235,7 +1917,8 @@ public class NegCom extends CommBuffer {
 			} else {
 				divisor = BigDecimal.ONE.subtract(pow);
 			}
-			return (principal.multiply(pow).add(futureValue)).multiply(interestRate).divide(divisor, MathContext.DECIMAL128);
+			return (principal.multiply(pow).add(futureValue)).multiply(interestRate).divide(divisor,
+					MathContext.DECIMAL128);
 		}
 	}
 
@@ -2259,7 +1942,8 @@ public class NegCom extends CommBuffer {
 			} else {
 				while (LoanAmt.compareTo(BigDecimal.ZERO) > 0) {
 					// LoanAmt-(DueAmt-LoanAmt*Rate)
-					LoanAmt = LoanAmt.subtract(DueAmt.subtract(LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 5, RoundingMode.HALF_UP)));
+					LoanAmt = LoanAmt.subtract(DueAmt
+							.subtract(LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 5, RoundingMode.HALF_UP)));
 					Period++;
 				}
 			}
@@ -2337,17 +2021,6 @@ public class NegCom extends CommBuffer {
 
 		return str;
 	}
-
-//	private int AvoidPeriodOver(int TransRepayPeriod, int RemainPeriod) {
-//		// 避免期數大於剩餘期數
-//		// MainTotalPeriod 總期數
-//		// MainRepaidPeriod 已繳期數
-//		if (TransRepayPeriod > RemainPeriod) {
-//			TransRepayPeriod = RemainPeriod;
-
-//		}
-//		return TransRepayPeriod;
-//	}
 
 	public String checkLengthAneThrowError(String str, int len, String CaseType, int reError) throws LogicException {
 
@@ -2427,7 +2100,8 @@ public class NegCom extends CommBuffer {
 
 	private BigDecimal SumCustNoFinCode(int CustNo, int CaseSeq, String FinCode, TitaVo titaVo) {
 		BigDecimal AccuApprAmt = BigDecimal.ZERO;
-		Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.SumCustNoFinCode(CustNo, CaseSeq, FinCode, 0, Integer.MAX_VALUE, titaVo);
+		Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.SumCustNoFinCode(CustNo, CaseSeq, FinCode, 0, Integer.MAX_VALUE,
+				titaVo);
 		List<NegAppr01> lsNegAppr01 = sNegAppr01 == null ? null : sNegAppr01.getContent();
 		if (lsNegAppr01 != null) {
 			for (NegAppr01 tNegAppr01 : lsNegAppr01) {

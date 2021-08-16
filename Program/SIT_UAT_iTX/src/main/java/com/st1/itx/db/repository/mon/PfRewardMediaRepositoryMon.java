@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.mon;
 
+
 import java.util.Optional;
 
 import java.util.List;
@@ -21,12 +22,16 @@ import com.st1.itx.db.domain.PfRewardMedia;
  */
 public interface PfRewardMediaRepositoryMon extends JpaRepository<PfRewardMedia, Long> {
 
-	// WorkMonth = ,AND BonusType ^i ,AND MediaFg =
-	public Slice<PfRewardMedia> findAllByWorkMonthIsAndBonusTypeInAndMediaFgIs(int workMonth_0, List<Integer> bonusType_1, int mediaFg_2, Pageable pageable);
+  // WorkMonth = ,AND BonusType ^i ,AND MediaFg = 
+  public Slice<PfRewardMedia> findAllByWorkMonthIsAndBonusTypeInAndMediaFgIs(int workMonth_0, List<Integer> bonusType_1, int mediaFg_2, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<PfRewardMedia> findByBonusNo(Long bonusNo);
+  // CustNo = ,AND FacmNo =
+  public Slice<PfRewardMedia> findAllByCustNoIsAndFacmNoIsOrderByPerfDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<PfRewardMedia> findByBonusNo(Long bonusNo);
 
 }
+

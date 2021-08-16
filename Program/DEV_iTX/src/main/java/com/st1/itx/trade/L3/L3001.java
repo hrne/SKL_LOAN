@@ -15,9 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacShareAppl;
 import com.st1.itx.db.service.FacMainService;
-import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustRmkCom;
@@ -57,8 +55,6 @@ public class L3001 extends TradeBuffer {
 	public FacMainService facMainService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
-	@Autowired
-	public FacShareApplService facShareApplService;
 	
 	@Autowired
 	Parse parse;
@@ -191,13 +187,6 @@ public class L3001 extends TradeBuffer {
 			occursList.putParam("OOAvailable", wkAvailable); // 可用額度
 			occursList.putParam("OOShareFacFg", wkFacShareFg); // 合併額度控管記號
 			occursList.putParam("OOClShareFg", wkClShareFg); // 擔保品配額記號
-			// 共同借款人
-			FacShareAppl tFacShareAppl = facShareApplService.findById(tFacMain.getApplNo(), titaVo);
-			if(tFacShareAppl!=null) {
-				occursList.putParam("OOShareFacmNoFg", "Y");
-			} else {
-				occursList.putParam("OOShareFacmNoFg", "");
-			}
 
 			this.totaVo.addOccursList(occursList);
 		}

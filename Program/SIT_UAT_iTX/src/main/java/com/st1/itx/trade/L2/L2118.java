@@ -91,6 +91,10 @@ public class L2118 extends TradeBuffer {
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E0010", "iFuncCode = " + iFuncCode); // 功能選擇錯誤
 		}
+		// 交易需主管核可
+		if (!titaVo.getHsupCode().equals("1")) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");  //交易需主管核可
+		}
 
 		switch (iFuncCode) {
 		case 1: // 新增

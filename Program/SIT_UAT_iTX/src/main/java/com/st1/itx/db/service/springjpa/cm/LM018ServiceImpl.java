@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM018ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,37 +30,65 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("lM018.findAll ");
+		this.info("lM018.findAll ");
+
 		String entdy = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
-		String sql = "SELECT \"F1\"";
-		sql += "              , \"F2\"";
-		sql += "              , SUM(F3)";
-		sql += "              , SUM(F4)";
-		sql += "        FROM ( SELECT DECODE(M.\"ProdNo\", 'IE', 'ID', 'IG', 'IF', 'II', 'IH', '81'";
-		sql += "                                         , 'ZZ', '82', 'ZZ', '83', 'ZZ', M.\"ProdNo\") AS F1";
-		sql += "                    , M.\"YearMonth\" AS F2";
-		sql += "                    , M.\"LoanBalance\" AS F3";
-		sql += "                    , M.\"IntAmtRcv\" AS F4";
-		sql += "               FROM \"MonthlyLoanBal\" M WHERE M.\"YearMonth\" = :entdy";
-		sql += "                                           AND M.\"AcctCode\" IN ('310', '320', '330')";
-		sql += "                                           AND M.\"ProdNo\"   IN ('IA', 'IB', 'IC', 'ID', 'IE', 'IF'";
-		sql += "                                                                , 'IG', 'IH', 'II', '81', '82', '83')";
-		sql += "               UNION ALL";
-		sql += "               SELECT 'AA' AS F1";
-		sql += "                     , M.\"YearMonth\" AS F2";
-		sql += "                     , M.\"LoanBalance\" AS F3";
-		sql += "                     , M.\"IntAmtRcv\" AS F4";
-		sql += "               FROM \"MonthlyLoanBal\" M";
-		sql += "               WHERE M.\"YearMonth\" = :entdy";
-		sql += "                 AND  M.\"AcctCode\" = '340')";
-		sql += "        GROUP BY \"F1\", \"F2\"";
-		sql += "        ORDER BY \"F1\", \"F2\"";
-		logger.info("sql=" + sql);
+
+		String sql = "";
+		sql += " SELECT amt.\"ProdNo\" ";
+		sql += "       ,VM.\"ViableMonth\" ";
+		sql += "       ,MAX(amt.\"BalSum\") \"BalSum\" ";
+		sql += "       ,SUM(int.\"IntSum\") \"IntSum\" ";
+		sql += " FROM ( SELECT UNIQUE \"YearMonth\" ";
+		sql += "                     ,CASE WHEN :entYear * 100 + CEIL(MOD(\"YearMonth\", 100) / 3) * 3 < TO_NUMBER(:entdy) ";
+		sql += "                           THEN :entYear * 100 + CEIL(MOD(\"YearMonth\", 100) / 3) * 3 ";
+		sql += "                      ELSE TO_NUMBER(:entdy) END \"ViableMonth\" ";
+		sql += "                     ,:entYear * 100 + CEIL(MOD(\"YearMonth\",100) / 3) * 3 \"ActualSeason\" ";
+		sql += "        FROM \"MonthlyLoanBal\" ";
+		sql += "        WHERE \"YearMonth\" BETWEEN :entYear || '01' AND :entdy ";
+		sql += "      ) VM ";
+		sql += " LEFT JOIN ( SELECT \"YearMonth\" ";
+		sql += "                   ,CASE WHEN \"AcctCode\" = '340' ";
+		sql += "                         THEN 'AA' ";
+		sql += "                    ELSE DECODE(\"ProdNo\", 'IE', 'ID', 'IG', 'IF', 'II', 'IH', '81', 'ZZ', '82', 'ZZ', '83', 'ZZ', \"ProdNo\") END \"ProdNo\" ";
+		sql += "                   ,SUM(\"LoanBalance\") \"BalSum\" ";
+		sql += "             FROM \"MonthlyLoanBal\" ";
+		sql += "             WHERE ( (     \"ProdNo\"   IN ('IA','IB','IC','ID','IE','ID','IG','IF','II','IH','81','ZZ','82','ZZ','83','ZZ') ";
+		sql += "                       AND \"AcctCode\" IN ('310','320','330') ) ";
+		sql += "                     OR ";
+		sql += "                     ( \"AcctCode\" = '340') ";
+		sql += "                   ) ";
+		sql += "             GROUP BY \"YearMonth\" ";
+		sql += "                     ,CASE WHEN \"AcctCode\" = '340' ";
+		sql += "                           THEN 'AA' ";
+		sql += "                      ELSE DECODE(\"ProdNo\", 'IE', 'ID', 'IG', 'IF', 'II', 'IH', '81', 'ZZ', '82', 'ZZ', '83', 'ZZ', \"ProdNo\") END ";
+		sql += "           ) amt ON amt.\"YearMonth\" = VM.\"YearMonth\" ";
+		sql += "                AND amt.\"YearMonth\" = VM.\"ViableMonth\" ";
+		sql += " LEFT JOIN ( SELECT \"YearMonth\" ";
+		sql += "                   ,CASE WHEN \"AcctCode\" = '340' ";
+		sql += "                         THEN 'AA' ";
+		sql += "                    ELSE DECODE(\"ProdNo\", 'IE', 'ID', 'IG', 'IF', 'II', 'IH', '81', 'ZZ', '82', 'ZZ', '83', 'ZZ', \"ProdNo\") END \"ProdNo\" ";
+		sql += "                   ,SUM(\"IntAmtRcv\") \"IntSum\" ";
+		sql += "             FROM \"MonthlyLoanBal\" ";
+		sql += "             WHERE \"YearMonth\" LIKE :entYear || '%' ";
+		sql += "             GROUP BY \"YearMonth\" ";
+		sql += "                     ,CASE WHEN \"AcctCode\" = '340' ";
+		sql += "                           THEN 'AA' ";
+		sql += "                      ELSE DECODE(\"ProdNo\", 'IE', 'ID', 'IG', 'IF', 'II', 'IH', '81', 'ZZ', '82', 'ZZ', '83', 'ZZ', \"ProdNo\") END ";
+		sql += "           ) int ON FLOOR(int.\"YearMonth\" / 100) * 100 + CEIL(MOD(int.\"YearMonth\", 100) / 3) * 3 <= VM.\"ActualSeason\" ";
+		sql += "                AND int.\"ProdNo\" = amt.\"ProdNo\" ";
+		sql += " WHERE amt.\"ProdNo\" is not null ";
+		sql += " GROUP BY vm.\"ViableMonth\" ";
+		sql += "         ,amt.\"ProdNo\" ";
+		sql += " ORDER BY vm.\"ViableMonth\" ";
+		sql += "         ,amt.\"ProdNo\" ";
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("entdy", entdy);
+		query.setParameter("entYear", entdy.substring(0,4));
 		return this.convertToMap(query.getResultList());
 	}
 

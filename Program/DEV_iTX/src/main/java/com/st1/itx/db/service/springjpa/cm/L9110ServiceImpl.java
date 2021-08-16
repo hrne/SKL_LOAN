@@ -289,7 +289,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , CITY.\"CityItem\"                  "; // -- 縣市
 		sql += "     , AREA.\"AreaItem\"                  "; // -- 鄉鎮區
 		sql += "     , CDLS.\"IrItem\"                    "; // -- 段小段
-		sql += "     , L.\"LandNo1\" + '-' + L.\"LandNo2\"";
+		sql += "     , L.\"LandNo1\" || '-' || L.\"LandNo2\"";
 		sql += "                           AS \"LandNo\"  "; // -- 地號
 		sql += "     , L.\"Area\"                         "; // -- 面積
 		sql += "     , L.\"TransferedYear\"               "; // -- 年度
@@ -297,25 +297,25 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     , L.\"EvaUnitPrice\"                 "; // -- 鑑定單價
 		sql += "     , 0                   AS \"ApplyAmt\""; // -- 核貸 ???
 		sql += "     , CLI.\"SettingAmt\"                 "; // -- 設定
-		sql += "FROM \"ClFac\" CF ";
-		sql += "LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += " FROM \"ClFac\" CF ";
+		sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                    AND L.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                    AND L.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "LEFT JOIN \"ClLandOwner\" LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                          AND LO.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                          AND LO.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "                          AND LO.\"LandSeq\" <= 1"; // -- 房地從1開始編,土地固定0 ??? 房地只取一筆?
-		sql += "LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = L.\"CityCode\"";
-		sql += "LEFT JOIN \"CdArea\" AREA ON AREA.\"CityCode\" = L.\"CityCode\"";
-		sql += "                       AND AREA.\"AreaCode\" = L.\"AreaCode\"";
-		sql += "LEFT JOIN \"CdLandSection\" CDLS ON CDLS.\"CityCode\" = L.\"CityCode\"";
-		sql += "                              AND CDLS.\"AreaCode\" = L.\"AreaCode\"";
-		sql += "                              AND CDLS.\"IrCode\"   = L.\"IrCode\"";
-		sql += "LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                     AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                     AND CLI.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "WHERE CF.\"ApproveNo\" = :applNo";
-		sql += "  AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
+		sql += " LEFT JOIN \"ClLandOwner\" LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                             AND LO.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                             AND LO.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "                            AND LO.\"LandSeq\" <= 1"; // -- 房地從1開始編,土地固定0 ??? 房地只取一筆?
+		sql += " LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = L.\"CityCode\"";
+		sql += " LEFT JOIN \"CdArea\" AREA ON AREA.\"CityCode\" = L.\"CityCode\"";
+		sql += "                          AND AREA.\"AreaCode\" = L.\"AreaCode\"";
+		sql += " LEFT JOIN \"CdLandSection\" CDLS ON CDLS.\"CityCode\" = L.\"CityCode\"";
+		sql += "                                 AND CDLS.\"AreaCode\" = L.\"AreaCode\"";
+		sql += "                                 AND CDLS.\"IrCode\"   = L.\"IrCode\"";
+		sql += " LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                        AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                        AND CLI.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " WHERE CF.\"ApproveNo\" = :applNo";
+		sql += "   AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
 
 		this.info("sql=" + sql);
 		Query query;

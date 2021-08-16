@@ -59,7 +59,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2415 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2415.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -91,7 +90,7 @@ public class L2415 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClParkingService sClParkingService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingOwnerService sClBuildingOwnerService;
@@ -199,8 +198,8 @@ public class L2415 extends TradeBuffer {
 			insertClBuildingPublic(titaVo);
 
 			// insert ClBuildingParking 獨立產權車位
-			//insertClBuildingParking(titaVo);
-			
+			// insertClBuildingParking(titaVo);
+
 			//// insert ClParking 車位
 			insertClParking(titaVo);
 
@@ -234,10 +233,10 @@ public class L2415 extends TradeBuffer {
 			insertClBuildingPublic(titaVo);
 
 			// delete ClBuildingParking 獨立產權車位
-			//deleteClBuildingParking(titaVo);
+			// deleteClBuildingParking(titaVo);
 			deleteClParking(titaVo);
 			// insert ClBuildingParking 獨立產權車位
-			//insertClBuildingParking(titaVo);
+			// insertClBuildingParking(titaVo);
 			insertClParking(titaVo);
 
 			// delete 擔保品不動產建物修改原因檔
@@ -260,7 +259,7 @@ public class L2415 extends TradeBuffer {
 			deleteClBuildingPublic(titaVo);
 
 			// delete ClBuildingParking 獨立產權車位
-			//deleteClBuildingParking(titaVo);
+			// deleteClBuildingParking(titaVo);
 			deleteClParking(titaVo);
 
 			// delete 擔保品不動產建物修改原因檔
@@ -365,8 +364,7 @@ public class L2415 extends TradeBuffer {
 
 	// 先刪除資料後新增
 	private void deleteClBuildingPublic(TitaVo titaVo) throws LogicException {
-		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE);
+		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		lClBuildingPublic = slClBuildingPublic == null ? null : slClBuildingPublic.getContent();
 		if (lClBuildingPublic != null) {
 			try {
@@ -422,11 +420,11 @@ public class L2415 extends TradeBuffer {
 			}
 		}
 	}
+
 	// delete 獨立產權車位
 	private void deleteClBuildingParking(TitaVo titaVo) throws LogicException {
 		this.info("L2415 deleteClBuildingParking");
-		Slice<ClBuildingParking> slClBuildingParking = sClBuildingParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE);
+		Slice<ClBuildingParking> slClBuildingParking = sClBuildingParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		lClBuildingParking = slClBuildingParking == null ? null : slClBuildingParking.getContent();
 		if (lClBuildingParking != null) {
 			try {
@@ -470,6 +468,9 @@ public class L2415 extends TradeBuffer {
 			tClParking.setParkingArea(parse.stringToBigDecimal(titaVo.getParam("ParkingArea" + i)));
 			tClParking.setLandNo1(titaVo.getParam("ParkingLandNoA" + i));
 			tClParking.setLandNo2(titaVo.getParam("ParkingLandNoB" + i));
+			tClParking.setBdNo1(titaVo.getParam("ParkingBdNoA" + i));
+			tClParking.setBdNo2(titaVo.getParam("ParkingBdNoB" + i));
+			tClParking.setAmount(parse.stringToBigDecimal(titaVo.getParam("ParkingAmount" + i)));
 
 			this.info("tClParking L2415" + tClParking);
 			try {
@@ -483,8 +484,7 @@ public class L2415 extends TradeBuffer {
 	// delete 車位
 	private void deleteClParking(TitaVo titaVo) throws LogicException {
 		this.info("L2415 deleteClParking");
-		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE);
+		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		List<ClParking> lClParking = slClParking == null ? null : slClParking.getContent();
 		if (lClParking != null) {
 			try {
@@ -538,8 +538,7 @@ public class L2415 extends TradeBuffer {
 
 	// delete 擔保品不動產建物修改原因檔
 	private void deleteClBuildingReason(TitaVo titaVo) throws LogicException {
-		Slice<ClBuildingReason> slClBuildingReason = sClBuildingReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE);
+		Slice<ClBuildingReason> slClBuildingReason = sClBuildingReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		lClBuildingReason = slClBuildingReason == null ? null : slClBuildingReason.getContent();
 		if (lClBuildingReason != null) {
 			try {

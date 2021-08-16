@@ -37,7 +37,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R02")
 @Scope("prototype")
 public class L3R02 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3R02.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -71,8 +70,7 @@ public class L3R02 extends TradeBuffer {
 
 		// 查詢放款主檔
 		if (iBormNo == 0) {
-			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900,
-					this.index, this.limit, titaVo);
+			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, iFacmNo, iFacmNo, 1, 900, this.index, this.limit, titaVo);
 			if (lLoanBorMain != null) {
 				for (LoanBorMain ln : lLoanBorMain.getContent()) {
 					if (ln.getStatus() == 0 || ln.getStatus() == 4) { // 0: 正常戶 4: 逾期戶
@@ -85,16 +83,13 @@ public class L3R02 extends TradeBuffer {
 		LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(iCustNo, iFacmNo, iBormNo), titaVo);
 		if (tLoanBorMain == null) {
 			if (iBormNo > 900) {
-				throw new LogicException(titaVo, "E0001",
-						"L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 查詢資料不存在
 			} else {
-				throw new LogicException(titaVo, "E0001",
-						"L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 查詢資料不存在
 			}
 		}
 		if (tLoanBorMain.getActFg() == 1 && iFKey == 0) {
-			throw new LogicException(titaVo, "E0021",
-					"L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 該筆資料待放行中
+			throw new LogicException(titaVo, "E0021", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 該筆資料待放行中
 		}
 		wkPrevPayIntDate = tLoanBorMain.getPrevPayIntDate();
 		wkPrevRepaidDate = tLoanBorMain.getPrevRepaidDate();
@@ -108,16 +103,13 @@ public class L3R02 extends TradeBuffer {
 		case "L3120": // 預約撥款刪除
 			if (iFuncCode.equals("4")) {
 				if (tLoanBorMain.getStatus() == 97) {
-					throw new LogicException(titaVo, "E0011",
-							"L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料已被刪除
+					throw new LogicException(titaVo, "E0011", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料已被刪除
 				}
 				if (tLoanBorMain.getStatus() == 98) {
-					throw new LogicException(titaVo, "E3054",
-							"L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆預約撥款資料已撥款
+					throw new LogicException(titaVo, "E3054", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆預約撥款資料已撥款
 				}
 				if (tLoanBorMain.getStatus() != 99) {
-					throw new LogicException(titaVo, "E3055",
-							"L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料非預約撥款
+					throw new LogicException(titaVo, "E3055", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 預約序號 = " + iBormNo); // 該筆資料非預約撥款
 				}
 			}
 			break;
@@ -190,6 +182,8 @@ public class L3R02 extends TradeBuffer {
 		this.totaVo.putParam("ONotYetFlag", tLoanBorMain.getNotYetFlag());
 		this.totaVo.putParam("ORenewFlag", tLoanBorMain.getRenewFlag());
 		this.totaVo.putParam("OPieceCode", tLoanBorMain.getPieceCode());
+		this.totaVo.putParam("OPieceCodeSecond", tLoanBorMain.getPieceCodeSecond());
+		this.totaVo.putParam("OPieceCodeSecondAmt", tLoanBorMain.getPieceCodeSecondAmt());
 		this.totaVo.putParam("OUsageCode", tLoanBorMain.getUsageCode());
 		this.totaVo.putParam("OSyndNo", tLoanBorMain.getSyndNo());
 		this.totaVo.putParam("ORelationCode", tLoanBorMain.getRelationCode());

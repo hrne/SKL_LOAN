@@ -2,10 +2,6 @@ package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
 import java.util.Map;
-/* log */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -38,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R03 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5R03.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegTransService sNegTransService;
@@ -65,7 +60,6 @@ public class L5R03 extends TradeBuffer {
 		String RimTitaTxtNo = titaVo.getParam("RimTitaTxtNo").trim();// 交易序號NegTrans-Key
 		String RimTrialFunc = titaVo.getParam("RimTrialFunc").trim();// 測試是否為一開始的,還是後面修改後的調Rim 0:一開始試算 1:異動後 試算 2:UPDATE
 		String RimTxKind = titaVo.getParam("RimTxKind").trim();// 交易別
-		String RimReturnAmt = titaVo.getParam("RimReturnAmt").trim();// 退還金額
 
 		// 1.得到NegTrans資料取用NegMains資料
 		NegTransId NegTransIdVO = new NegTransId();
@@ -81,7 +75,7 @@ public class L5R03 extends TradeBuffer {
 			// 2.得到Main的資料
 			// 3.單筆試算
 
-			Map<String, String> Map = sNegCom.NegTransTrial(titaVo, NegTransVO, RimTrialFunc, RimTxKind, RimReturnAmt);
+			Map<String, String> Map = sNegCom.trialNegtrans(NegTransVO, RimTrialFunc, RimTxKind, titaVo);
 			// 4.丟資料回去
 
 			// 資料
@@ -90,7 +84,7 @@ public class L5R03 extends TradeBuffer {
 			if (Data != null && Data.length != 0) {
 
 			} else {
-				throw new LogicException(titaVo, "XXXX", "未從NegCom得到相關資料");
+				throw new LogicException(titaVo, "E0001", "未從NegCom得到相關資料");
 			}
 
 			for (int i = 0; i < Data.length; i++) {
@@ -232,7 +226,7 @@ public class L5R03 extends TradeBuffer {
 			 */
 		} else {
 			// E0001 查詢資料不存在
-			throw new LogicException(titaVo, "E0001", "查無NegTrans的資料請查驗");
+			throw new LogicException(titaVo, "E0001", "債務協商交易檔");
 		}
 
 		this.addList(this.totaVo);

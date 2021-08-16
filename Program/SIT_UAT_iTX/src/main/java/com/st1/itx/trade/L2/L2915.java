@@ -6,8 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -53,7 +51,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2915 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2915.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -70,16 +67,15 @@ public class L2915 extends TradeBuffer {
 	/* DB服務注入 */
 //	@Autowired
 //	public ClBuildingParkingService sClBuildingParkingService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public ClParkingService sClParkingService;
 
-	
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingOwnerService sClBuildingOwnerService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingReasonService sClBuildingReasonService;
@@ -166,10 +162,8 @@ public class L2915 extends TradeBuffer {
 		this.totaVo.putParam("ClStatus", tClMain.getClStatus());
 
 		// tita擔保品編號取建物公設建號檔資料list
-		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		lClBuildingPublic = slClBuildingPublic == null ? null
-				: new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
+		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		lClBuildingPublic = slClBuildingPublic == null ? null : new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
 		// 資料筆數
 		if (lClBuildingPublic == null) {
 			lClBuildingPublic = new ArrayList<ClBuildingPublic>();
@@ -246,10 +240,8 @@ public class L2915 extends TradeBuffer {
 //		}
 
 		// tita擔保品編號取建物所有權人檔資料list
-		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		lClBuildingOwner = slClBuildingOwner == null ? null
-				: new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
+		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		lClBuildingOwner = slClBuildingOwner == null ? null : new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
 		if (lClBuildingOwner == null) {
 			lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 			// 資料筆數
@@ -285,10 +277,8 @@ public class L2915 extends TradeBuffer {
 			k++;
 		}
 		// tita擔保品編號取建物修改原因檔資料list
-		Slice<ClBuildingReason> slClBuildingReason = sClBuildingReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
-		lClBuildingReason = slClBuildingReason == null ? null
-				: new ArrayList<ClBuildingReason>(slClBuildingReason.getContent());
+		Slice<ClBuildingReason> slClBuildingReason = sClBuildingReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		lClBuildingReason = slClBuildingReason == null ? null : new ArrayList<ClBuildingReason>(slClBuildingReason.getContent());
 		// 資料筆數
 		if (lClBuildingReason == null) {
 			lClBuildingReason = new ArrayList<ClBuildingReason>();
@@ -346,15 +336,12 @@ public class L2915 extends TradeBuffer {
 			l++;
 
 		}
-		
-		//車位
-		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-		Integer.MAX_VALUE, titaVo);
+
+		// 車位
+		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		List<ClParking> lClParking = slClParking == null ? null : new ArrayList<ClParking>(slClParking.getContent());
 
-		
-		
-		int j=1;
+		int j = 1;
 		if (lClParking != null) {
 			for (ClParking tClParking : lClParking) {
 				this.info("tClParkingL2416 " + tClParking);
@@ -362,40 +349,48 @@ public class L2915 extends TradeBuffer {
 					break;
 				}
 //				OccursList occursList = new OccursList();
-//
-//				occursList.putParam("ParkingNo"+j, tClParking.getParkingNo());
-//				occursList.putParam("ParkingQty"+j, tClParking.getParkingQty());
-//				occursList.putParam("ParkingTypeCode"+j, tClParking.getParkingTypeCode());
-//				occursList.putParam("ParkingOwnerPart"+j, tClParking.getOwnerPart());
-//				occursList.putParam("ParkingOwnerTotal"+j, tClParking.getOwnerTotal());
-//				occursList.putParam("ParkingLandNo1"+j, tClParking.getLandNo1());
-//				occursList.putParam("ParkingLandNo2"+j, tClParking.getLandNo2());
-//				occursList.putParam("ParkingArea"+j, tClParking.getParkingArea());
-				
-				
-				this.totaVo.putParam("ParkingNo"+j, tClParking.getParkingNo());
-				this.totaVo.putParam("ParkingQty"+j, tClParking.getParkingQty());
-				this.totaVo.putParam("ParkingTypeCode"+j, tClParking.getParkingTypeCode());
-				this.totaVo.putParam("ParkingOwnerPart"+j, tClParking.getOwnerPart());
-				this.totaVo.putParam("ParkingOwnerTotal"+j, tClParking.getOwnerTotal());
-				this.totaVo.putParam("ParkingLandNoA"+j, tClParking.getLandNo1());
-				this.totaVo.putParam("ParkingLandNoB"+j, tClParking.getLandNo2());
-				this.totaVo.putParam("ParkingArea"+j, tClParking.getParkingArea());
-				
+
+				this.totaVo.putParam("ParkingNo" + j, tClParking.getParkingNo());
+				this.totaVo.putParam("ParkingQty" + j, tClParking.getParkingQty());
+				this.totaVo.putParam("ParkingTypeCode" + j, tClParking.getParkingTypeCode());
+				this.totaVo.putParam("ParkingOwnerPart" + j, tClParking.getOwnerPart());
+				this.totaVo.putParam("ParkingOwnerTotal" + j, tClParking.getOwnerTotal());
+				this.totaVo.putParam("ParkingBdNoA" + j, tClParking.getBdNo1());
+				this.totaVo.putParam("ParkingBdNoB" + j, tClParking.getBdNo2());
+				this.totaVo.putParam("ParkingLandNoA" + j, tClParking.getLandNo1());
+				this.totaVo.putParam("ParkingLandNoB" + j, tClParking.getLandNo2());
+				this.totaVo.putParam("ParkingArea" + j, tClParking.getParkingArea());
+				this.totaVo.putParam("ParkingAmount" + j, tClParking.getAmount());
+
+//				occursList.putParam("ParkingNo", tClParking.getParkingNo());
+//				occursList.putParam("ParkingQty", tClParking.getParkingQty());
+//				occursList.putParam("ParkingTypeCode", tClParking.getParkingTypeCode());
+//				occursList.putParam("ParkingOwnerPart", tClParking.getOwnerPart());
+//				occursList.putParam("ParkingOwnerTotal", tClParking.getOwnerTotal());
+//				occursList.putParam("ParkingBdNoA", tClParking.getBdNo1());
+//				occursList.putParam("ParkingBdNoB", tClParking.getBdNo2());
+//				occursList.putParam("ParkingLandNoA", tClParking.getLandNo1());
+//				occursList.putParam("ParkingLandNoB", tClParking.getLandNo2());
+//				occursList.putParam("ParkingArea", tClParking.getParkingArea());
+//				occursList.putParam("ParkingAmount", tClParking.getAmount());
+
 //				this.totaVo.addOccursList(occursList);
 				j++;
 			}
 		}
-		
-		for(int m = j; m<=100 ; m++) {
-			this.totaVo.putParam("ParkingNo"+m, "");
-			this.totaVo.putParam("ParkingQty"+m, "");
-			this.totaVo.putParam("ParkingTypeCode"+m, "");
-			this.totaVo.putParam("ParkingOwnerPart"+m, "");
-			this.totaVo.putParam("ParkingOwnerTotal"+m, "");
-			this.totaVo.putParam("ParkingLandNoA"+m, "");
-			this.totaVo.putParam("ParkingLandNoB"+m, "");
-			this.totaVo.putParam("ParkingArea"+m, "");
+
+		for (int m = j; m <= 100; m++) {
+			this.totaVo.putParam("ParkingNo" + m, "");
+			this.totaVo.putParam("ParkingQty" + m, "");
+			this.totaVo.putParam("ParkingTypeCode" + m, "");
+			this.totaVo.putParam("ParkingOwnerPart" + m, "");
+			this.totaVo.putParam("ParkingOwnerTotal" + m, "");
+			this.totaVo.putParam("ParkingBdNoA" + m, "");
+			this.totaVo.putParam("ParkingBdNoB" + m, "");
+			this.totaVo.putParam("ParkingLandNoA" + m, "");
+			this.totaVo.putParam("ParkingLandNoB" + m, "");
+			this.totaVo.putParam("ParkingArea" + m, 0);
+			this.totaVo.putParam("ParkingAmount" + m, 0);
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
