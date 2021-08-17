@@ -49,7 +49,7 @@ public class L9724Report extends MakeReport {
 			lL9724 = l9724ServiceImpl.findAll(titaVo, 1);
 			exportExcel(titaVo, lL9724, false, false, "一~三個月");
 			lL9724 = l9724ServiceImpl.findAll(titaVo, 2);
-			exportExcel(titaVo, lL9724, false, true, "三~六個月");
+			exportExcel(titaVo, lL9724, false, false, "三~六個月");
 			lL9724 = l9724ServiceImpl.findAll(titaVo, 3);
 			exportExcel(titaVo, lL9724, false, true, "六個月以上");
 		} catch (Exception e) {

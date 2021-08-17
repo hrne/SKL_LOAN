@@ -3,9 +3,8 @@ package com.st1.itx.trade.L2;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -23,6 +22,8 @@ import com.st1.itx.db.domain.ClLandReason;
 import com.st1.itx.db.domain.ClLandReasonId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandReasonService;
 import com.st1.itx.db.service.ClLandService;
@@ -49,7 +50,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2416 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2416.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -66,6 +66,9 @@ public class L2416 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClLandReasonService sClLandReasonService;
+	
+	@Autowired
+	public CustMainService sCustMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -376,15 +379,33 @@ public class L2416 extends TradeBuffer {
 			clLandOwnerId.setClCode2(iClCode2);
 			clLandOwnerId.setClNo(iClNo);
 			clLandOwnerId.setLandSeq(iLandSeq);
-			clLandOwnerId.setOwnerId(iOwnerId);
+			
+			CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
+			//ID不存在時,新增一筆資料在CustMain
+			if (custMain == null) {
+				String Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+	    		custMain = new CustMain();
+	    		custMain.setCustUKey(Ukey);
+	    		custMain.setCustId(iOwnerId);
+	    		custMain.setCustName(titaVo.getParam("OwnerName" + i));
+	    		custMain.setDataStatus(1);
+	    		
+	    		try {
+	    			sCustMainService.insert(custMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "客戶資料主檔");
+				}
+			}
+			
+			clLandOwnerId.setOwnerCustUKey(custMain.getCustUKey());
 
 			tClLandOwner.setClLandOwnerId(clLandOwnerId);
 			tClLandOwner.setClCode1(iClCode1);
 			tClLandOwner.setClCode2(iClCode2);
 			tClLandOwner.setClNo(iClNo);
 			tClLandOwner.setLandSeq(iLandSeq);
-			tClLandOwner.setOwnerId(iOwnerId);
-			tClLandOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
+//			tClLandOwner.setOwnerId(iOwnerId);
+//			tClLandOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
 			tClLandOwner.setOwnerRelCode(titaVo.getParam("OwnerRelCode" + i));
 			tClLandOwner.setOwnerPart(parse.stringToBigDecimal(titaVo.getParam("OwnerPart" + i)));
 			tClLandOwner.setOwnerTotal(parse.stringToBigDecimal(titaVo.getParam("OwnerTotal" + i)));
@@ -433,10 +454,10 @@ public class L2416 extends TradeBuffer {
 			tClLandReason.setReasonSeq(i);
 			tClLandReason.setReason(parse.stringToInteger(titaVo.getParam("Reason" + i)));
 			tClLandReason.setOtherReason(titaVo.getParam("OtherReason" + i));
-			
+
 			tClLandReason.setCreateEmpNo(titaVo.getParam("CreateEmpNo" + i));
 			tClLandReason.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo" + i));
-			
+
 			try {
 				sClLandReasonService.insert(tClLandReason, titaVo);
 			} catch (DBException e) {

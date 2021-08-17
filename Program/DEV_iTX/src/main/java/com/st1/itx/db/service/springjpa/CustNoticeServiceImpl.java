@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("custNoticeService")
 @Repository
-public class CustNoticeServiceImpl implements CustNoticeService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CustNoticeServiceImpl.class);
-
+public class CustNoticeServiceImpl extends ASpringJpaParm implements CustNoticeService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CustNoticeServiceImpl implements CustNoticeService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + custNoticeId);
+    this.info("findById " + dbName + " " + custNoticeId);
     Optional<CustNotice> custNotice = null;
     if (dbName.equals(ContentName.onDay))
       custNotice = custNoticeReposDay.findById(custNoticeId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo", "FormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = custNoticeReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = custNoticeReposHist.findAll(pageable);
     else 
       slice = custNoticeRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,15 +121,18 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = custNoticeReposDay.findAllByCustNoIs(custNo_0, pageable);
+      slice = custNoticeReposDay.findAllByCustNoIsOrderByFacmNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = custNoticeReposMon.findAllByCustNoIs(custNo_0, pageable);
+      slice = custNoticeReposMon.findAllByCustNoIsOrderByFacmNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = custNoticeReposHist.findAllByCustNoIs(custNo_0, pageable);
+      slice = custNoticeReposHist.findAllByCustNoIsOrderByFacmNoAsc(custNo_0, pageable);
     else 
-      slice = custNoticeRepos.findAllByCustNoIs(custNo_0, pageable);
+      slice = custNoticeRepos.findAllByCustNoIsOrderByFacmNoAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findFormNo " + dbName + " : " + "formNo_0 : " + formNo_0);
+    this.info("findFormNo " + dbName + " : " + "formNo_0 : " + formNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = custNoticeReposDay.findAllByFormNoIs(formNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = custNoticeReposHist.findAllByFormNoIs(formNo_0, pageable);
     else 
       slice = custNoticeRepos.findAllByFormNoIs(formNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("facmNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2);
+    this.info("facmNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = custNoticeReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByCustNoAscFacmNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -182,6 +187,9 @@ em = null;
     else 
       slice = custNoticeRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByCustNoAscFacmNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -190,7 +198,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + custNoticeId);
+    this.info("Hold " + dbName + " " + custNoticeId);
     Optional<CustNotice> custNotice = null;
     if (dbName.equals(ContentName.onDay))
       custNotice = custNoticeReposDay.findByCustNoticeId(custNoticeId);
@@ -208,7 +216,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + custNotice.getCustNoticeId());
+    this.info("Hold " + dbName + " " + custNotice.getCustNoticeId());
     Optional<CustNotice> custNoticeT = null;
     if (dbName.equals(ContentName.onDay))
       custNoticeT = custNoticeReposDay.findByCustNoticeId(custNotice.getCustNoticeId());
@@ -230,7 +238,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + custNotice.getCustNoticeId());
+    this.info("Insert..." + dbName + " " + custNotice.getCustNoticeId());
     if (this.findById(custNotice.getCustNoticeId()) != null)
       throw new DBException(2);
 
@@ -259,7 +267,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + custNotice.getCustNoticeId());
+    this.info("Update..." + dbName + " " + custNotice.getCustNoticeId());
     if (!empNot.isEmpty())
       custNotice.setLastUpdateEmpNo(empNot);
 
@@ -282,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + custNotice.getCustNoticeId());
+    this.info("Update..." + dbName + " " + custNotice.getCustNoticeId());
     if (!empNot.isEmpty())
       custNotice.setLastUpdateEmpNo(empNot);
 
@@ -302,7 +310,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + custNotice.getCustNoticeId());
+    this.info("Delete..." + dbName + " " + custNotice.getCustNoticeId());
     if (dbName.equals(ContentName.onDay)) {
       custNoticeReposDay.delete(custNotice);	
       custNoticeReposDay.flush();
@@ -331,7 +339,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CustNotice t : custNotice){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -366,7 +374,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (custNotice == null || custNotice.size() == 0)
       throw new DBException(6);
 
@@ -395,7 +403,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CustNotice> custNotice, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

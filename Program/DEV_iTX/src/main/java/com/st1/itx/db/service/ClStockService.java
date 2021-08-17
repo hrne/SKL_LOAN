@@ -59,16 +59,16 @@ public interface ClStockService {
   public Slice<ClStock> findClCode2(int clCode1_0, int clCode2_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * StockCode = ,AND OwnerId =
+   * StockCode = ,AND OwnerCustUKey =
    *
    * @param stockCode_0 stockCode_0
-   * @param ownerId_1 ownerId_1
+   * @param ownerCustUKey_1 ownerCustUKey_1
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClStock ClStock of List
    */
-  public Slice<ClStock> findUnique(String stockCode_0, String ownerId_1, int index, int limit, TitaVo... titaVo);
+  public Slice<ClStock> findUnique(String stockCode_0, String ownerCustUKey_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By ClStock

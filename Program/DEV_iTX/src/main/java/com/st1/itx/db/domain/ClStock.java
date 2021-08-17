@@ -29,7 +29,7 @@ public class ClStock implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2399006464865540470L;
+	private static final long serialVersionUID = 4535359742057207557L;
 
 @EmbeddedId
   private ClStockId clStockId;
@@ -103,13 +103,9 @@ public class ClStock implements Serializable {
   @Column(name = "`EvaUnitPrice`")
   private BigDecimal evaUnitPrice = new BigDecimal("0");
 
-  // 股票持有人統編
-  @Column(name = "`OwnerId`", length = 10)
-  private String ownerId;
-
-  // 股票持有人姓名
-  @Column(name = "`OwnerName`", length = 100)
-  private String ownerName;
+  // 客戶識別碼
+  @Column(name = "`OwnerCustUKey`", length = 32)
+  private String ownerCustUKey;
 
   // 公司內部人職稱
   /* 01:董事長02:副董事長03:常務董事04:董事05:監察人06:總經理07:副總經理08:經理人09:協理10:大股東(持股10%以上)11:其他 */
@@ -528,41 +524,22 @@ public class ClStock implements Serializable {
   }
 
 /**
-	* 股票持有人統編<br>
+	* 客戶識別碼<br>
 	* 
 	* @return String
 	*/
-  public String getOwnerId() {
-    return this.ownerId == null ? "" : this.ownerId;
+  public String getOwnerCustUKey() {
+    return this.ownerCustUKey == null ? "" : this.ownerCustUKey;
   }
 
 /**
-	* 股票持有人統編<br>
+	* 客戶識別碼<br>
 	* 
   *
-  * @param ownerId 股票持有人統編
+  * @param ownerCustUKey 客戶識別碼
 	*/
-  public void setOwnerId(String ownerId) {
-    this.ownerId = ownerId;
-  }
-
-/**
-	* 股票持有人姓名<br>
-	* 
-	* @return String
-	*/
-  public String getOwnerName() {
-    return this.ownerName == null ? "" : this.ownerName;
-  }
-
-/**
-	* 股票持有人姓名<br>
-	* 
-  *
-  * @param ownerName 股票持有人姓名
-	*/
-  public void setOwnerName(String ownerName) {
-    this.ownerName = ownerName;
+  public void setOwnerCustUKey(String ownerCustUKey) {
+    this.ownerCustUKey = ownerCustUKey;
   }
 
 /**
@@ -977,10 +954,10 @@ N:否
   public String toString() {
     return "ClStock [clStockId=" + clStockId + ", stockCode=" + stockCode + ", listingType=" + listingType + ", stockType=" + stockType
            + ", companyId=" + companyId + ", dataYear=" + dataYear + ", issuedShares=" + issuedShares + ", netWorth=" + netWorth + ", evaStandard=" + evaStandard + ", parValue=" + parValue
-           + ", monthlyAvg=" + monthlyAvg + ", ydClosingPrice=" + ydClosingPrice + ", threeMonthAvg=" + threeMonthAvg + ", evaUnitPrice=" + evaUnitPrice + ", ownerId=" + ownerId + ", ownerName=" + ownerName
-           + ", insiderJobTitle=" + insiderJobTitle + ", insiderPosition=" + insiderPosition + ", legalPersonId=" + legalPersonId + ", loanToValue=" + loanToValue + ", clMtr=" + clMtr + ", noticeMtr=" + noticeMtr
-           + ", implementMtr=" + implementMtr + ", pledgeNo=" + pledgeNo + ", computeMTR=" + computeMTR + ", settingStat=" + settingStat + ", clStat=" + clStat + ", settingDate=" + settingDate
-           + ", settingBalance=" + settingBalance + ", mtgDate=" + mtgDate + ", custodyNo=" + custodyNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", monthlyAvg=" + monthlyAvg + ", ydClosingPrice=" + ydClosingPrice + ", threeMonthAvg=" + threeMonthAvg + ", evaUnitPrice=" + evaUnitPrice + ", ownerCustUKey=" + ownerCustUKey + ", insiderJobTitle=" + insiderJobTitle
+           + ", insiderPosition=" + insiderPosition + ", legalPersonId=" + legalPersonId + ", loanToValue=" + loanToValue + ", clMtr=" + clMtr + ", noticeMtr=" + noticeMtr + ", implementMtr=" + implementMtr
+           + ", pledgeNo=" + pledgeNo + ", computeMTR=" + computeMTR + ", settingStat=" + settingStat + ", clStat=" + clStat + ", settingDate=" + settingDate + ", settingBalance=" + settingBalance
+           + ", mtgDate=" + mtgDate + ", custodyNo=" + custodyNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

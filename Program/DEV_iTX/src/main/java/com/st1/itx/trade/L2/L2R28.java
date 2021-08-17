@@ -17,6 +17,8 @@ import com.st1.itx.db.domain.ClLandOwner;
 import com.st1.itx.db.domain.ClLandReason;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandReasonService;
 import com.st1.itx.db.service.ClLandService;
@@ -34,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R28 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R28.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -51,6 +52,9 @@ public class L2R28 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClLandReasonService sClLandReasonService;
+
+	@Autowired
+	public CustMainService sCustMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -110,11 +114,9 @@ public class L2R28 extends TradeBuffer {
 		tClMain = sClMainService.findById(ClMainId, titaVo);
 		tClLand = sClLandService.findById(ClLandId, titaVo);
 
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : new ArrayList<ClLandOwner>(slClLandOwner.getContent());
-		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClLandReason = slClLandReason == null ? null : new ArrayList<ClLandReason>(slClLandReason.getContent());
 
 		this.totaVo.putParam("L2r28LandSeq", iLandSeq);
@@ -258,9 +260,15 @@ public class L2R28 extends TradeBuffer {
 					tClLandOwner = new ClLandOwner();
 
 				}
-				this.info("tClLandOwner2 L2r28 " + tClLandOwner);
-				this.totaVo.putParam("L2r28OwnerId" + i, tClLandOwner.getOwnerId());
-				this.totaVo.putParam("L2r28OwnerName" + i, tClLandOwner.getOwnerName());
+//				this.info("tClLandOwner2 L2r28 " + tClLandOwner);
+				CustMain custMain = sCustMainService.findById(tClLandOwner.getOwnerCustUKey(), titaVo);
+				if (custMain != null) {
+					this.totaVo.putParam("L2r28OwnerId" + i, custMain.getCustId());
+					this.totaVo.putParam("L2r28OwnerName" + i, custMain.getCustName());
+				} else {
+					this.totaVo.putParam("L2r28OwnerId" + i, "");
+					this.totaVo.putParam("L2r28OwnerName" + i, "");
+				}
 				this.totaVo.putParam("L2r28OwnerRelCode" + i, tClLandOwner.getOwnerRelCode());
 				this.totaVo.putParam("L2r28OwnerPart" + i, tClLandOwner.getOwnerPart());
 				this.totaVo.putParam("L2r28OwnerTotal" + i, tClLandOwner.getOwnerTotal());
@@ -300,8 +308,7 @@ public class L2R28 extends TradeBuffer {
 
 				} else {
 					String CreateDate = tClLandReason.getCreateDate().toString();
-					String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7)
-							+ CreateDate.substring(8, 10);
+					String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7) + CreateDate.substring(8, 10);
 					int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
 					CreateDate4 = String.valueOf(CreateDate3);
 				}

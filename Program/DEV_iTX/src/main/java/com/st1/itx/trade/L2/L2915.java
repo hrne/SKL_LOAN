@@ -23,6 +23,8 @@ import com.st1.itx.db.domain.ClBuildingReason;
 import com.st1.itx.db.domain.ClParking;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 //import com.st1.itx.db.service.ClBuildingParkingService;
 import com.st1.itx.db.service.ClBuildingPublicService;
@@ -79,6 +81,9 @@ public class L2915 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingReasonService sClBuildingReasonService;
+	
+	@Autowired
+	public CustMainService sCustMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -269,8 +274,9 @@ public class L2915 extends TradeBuffer {
 		int k = 1;
 		for (ClBuildingOwner tClBuildingOwner : lClBuildingOwner) {
 
-			this.totaVo.putParam("OwnerId" + k, tClBuildingOwner.getOwnerId());
-			this.totaVo.putParam("OwnerName" + k, tClBuildingOwner.getOwnerName());
+			CustMain custMain = sCustMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
+			this.totaVo.putParam("OwnerId" + k, custMain.getCustId());
+			this.totaVo.putParam("OwnerName" + k, custMain.getCustName());
 			this.totaVo.putParam("OwnerRelCode" + k, tClBuildingOwner.getOwnerRelCode());
 			this.totaVo.putParam("OwnerPart" + k, tClBuildingOwner.getOwnerPart());
 			this.totaVo.putParam("OwnerTotal" + k, tClBuildingOwner.getOwnerTotal());

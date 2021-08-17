@@ -3,6 +3,7 @@ package com.st1.itx.trade.L2;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -438,8 +439,25 @@ public class L2412 extends TradeBuffer {
 		tClMovables.setClCode1(iClCode1);
 		tClMovables.setClCode2(iClCode2);
 		tClMovables.setClNo(iClNo);
-		tClMovables.setOwnerId(titaVo.getParam("OwnerId"));
-		tClMovables.setOwnerName(titaVo.getParam("OwnerName"));
+//		tClMovables.setOwnerId(titaVo.getParam("OwnerId"));
+//		tClMovables.setOwnerName(titaVo.getParam("OwnerName"));
+		CustMain custMain = sCustMainService.custIdFirst(titaVo.getParam("OwnerId"), titaVo);
+		if (custMain == null) {
+			String Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+			custMain = new CustMain();
+			custMain.setCustUKey(Ukey);
+			custMain.setCustId(titaVo.getParam("OwnerId"));
+			custMain.setCustName(titaVo.getParam("OwnerName"));
+			custMain.setDataStatus(1);
+
+			try {
+				sCustMainService.insert(custMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "客戶資料主檔");
+			}
+		}
+		tClMovables.setOwnerCustUKey(custMain.getCustUKey());
+		
 		tClMovables.setServiceLife(parse.stringToInteger(titaVo.getParam("ServiceLife")));
 		tClMovables.setProductSpec(titaVo.getParam("ProductSpec"));
 		tClMovables.setProductType(titaVo.getParam("ProductType"));

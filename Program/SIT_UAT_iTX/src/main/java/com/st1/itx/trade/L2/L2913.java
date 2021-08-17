@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -17,6 +15,8 @@ import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClStockService;
@@ -41,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2913 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2913.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -54,6 +53,9 @@ public class L2913 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClStockService sClStockService;
+	
+	@Autowired
+	public CustMainService sCustMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -95,7 +97,6 @@ public class L2913 extends TradeBuffer {
 		ClStockId.setClCode1(iClCode1);
 		ClStockId.setClCode2(iClCode2);
 		ClStockId.setClNo(iClNo);
-		
 
 		// 測試該擔保品編號在擔保品股票檔是否有資料
 		tClStock = sClStockService.findById(ClStockId, titaVo);
@@ -110,13 +111,12 @@ public class L2913 extends TradeBuffer {
 		}
 
 		/* 取縣市名稱 */
-		if(tClMain.getCityCode()!=null) {
+		if (tClMain.getCityCode() != null) {
 			tCdCity = cdCityService.findById(tClMain.getCityCode(), titaVo);
 		}
 		if (tCdCity == null) {
 			tCdCity = new CdCity();
 		}
-
 
 		this.totaVo.putParam("OCityCode", tClMain.getCityCode());
 		this.totaVo.putParam("OCityCodeX", tCdCity.getCityItem());
@@ -134,8 +134,16 @@ public class L2913 extends TradeBuffer {
 		this.totaVo.putParam("OYdClosingPrice", tClStock.getYdClosingPrice());
 		this.totaVo.putParam("OThreeMonthAvg", tClStock.getThreeMonthAvg());
 		this.totaVo.putParam("OEvaUnitPrice", tClStock.getEvaUnitPrice());
-		this.totaVo.putParam("OOwnerId", tClStock.getOwnerId());
-		this.totaVo.putParam("OOwnerName", tClStock.getOwnerName());
+//		this.totaVo.putParam("OOwnerId", tClStock.getOwnerId());
+//		this.totaVo.putParam("OOwnerName", tClStock.getOwnerName());
+		CustMain custMain = sCustMainService.findById(tClStock.getOwnerCustUKey(), titaVo);
+		if (custMain != null) {
+			this.totaVo.putParam("OOwnerId", custMain.getCustId());
+			this.totaVo.putParam("OOwnerName", custMain.getCustName());
+		} else {
+			this.totaVo.putParam("OOwnerId", "");
+			this.totaVo.putParam("OOwnerName", "");
+		}
 		this.totaVo.putParam("OInsiderJobTitle", tClStock.getInsiderJobTitle());
 		this.totaVo.putParam("OInsiderPosition", tClStock.getInsiderPosition());
 		this.totaVo.putParam("OLegalPersonId", tClStock.getLegalPersonId());

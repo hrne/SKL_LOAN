@@ -4938,6 +4938,9 @@ TXFORM=L5R01
 #L5r02ExportDate{i}=D,7,S
 #L5r02ApprAcDate{i}=D,7,S
 #L5r02BringUpDate{i}=D,7,S
+#L5r02ExportMark{i}=9,1,S
+#L5r02ApprAcMark{i}=9,1,S
+#L5r02BringUpMark{i}=9,1,S
 ##end
 </L5R02.dec>
 
@@ -4947,6 +4950,9 @@ TXFORM=L5R02
 #L5r02ExportDate{i}
 #L5r02ApprAcDate{i}
 #L5r02BringUpDate{i}
+#L5r02ExportMark{i}
+#L5r02ApprAcMark{i}
+#L5r02BringUpMark{i}
 ##end
 ^
 </L5R02.tom>

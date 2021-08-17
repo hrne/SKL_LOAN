@@ -295,16 +295,16 @@ public class MakeExcel extends CommBuffer {
 
 			int sourceRow = targetRow - 1;
 
-			this.info("sourceRow = " + sourceRow);
+//			this.info("sourceRow = " + sourceRow);
 
-			Row tmpSourceRow = this.sheet.getRow(sourceRow);
+			Row tmpSourceRow = this.sheet.getRow(sourceRow - 1);
 
 			if (tmpSourceRow != null) {
 
-				Row tmpTargetRow = this.sheet.getRow(targetRow);
+				Row tmpTargetRow = this.sheet.getRow(targetRow - 1);
 
 				if (tmpTargetRow == null) {
-					tmpTargetRow = this.sheet.createRow(targetRow);
+					tmpTargetRow = this.sheet.createRow(targetRow - 1);
 				}
 
 				for (Cell tmpSourceCell : tmpSourceRow) {
@@ -321,9 +321,9 @@ public class MakeExcel extends CommBuffer {
 						if (tmpTargetColumn == null) {
 							tmpTargetColumn = tmpTargetRow.createCell(columnIndex);
 						}
-						this.info("targetRow = " + targetRow);
-						this.info("tmpTargetColumn columnIndex = " + columnIndex);
-						this.info("tmpSourceCellStyle cellStyleIndex = " + cellStyleIndex);
+//						this.info("targetRow = " + targetRow);
+//						this.info("tmpTargetColumn columnIndex = " + columnIndex);
+//						this.info("tmpSourceCellStyle cellStyleIndex = " + cellStyleIndex);
 						tmpTargetColumn.setCellStyle(this.wb.getCellStyleAt(cellStyleIndex));
 					}
 				}
@@ -572,9 +572,9 @@ public class MakeExcel extends CommBuffer {
 
 				int finalRow = this.sheet.getLastRowNum();
 
-				this.info("shiftRowFrom - 1 = " + (shiftRowFrom - 1));
+//				this.info("shiftRowFrom - 1 = " + (shiftRowFrom - 1));
 
-				this.info("finalRow = " + finalRow);
+//				this.info("finalRow = " + finalRow);
 
 				this.sheet.shiftRows(shiftRowFrom - 1, finalRow, shiftCounts);
 

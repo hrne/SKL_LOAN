@@ -14,6 +14,8 @@ import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClOther;
 import com.st1.itx.db.domain.ClOtherId;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClOtherService;
@@ -29,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2914 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2914.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -42,6 +43,9 @@ public class L2914 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClOtherService sClOtherService;
+	
+	@Autowired
+	public CustMainService sCustMainService;
 
 	/* 轉換工具 */
 	@Autowired
@@ -91,13 +95,12 @@ public class L2914 extends TradeBuffer {
 		if (tClOther == null) {
 			throw new LogicException("E0001", "擔保品其他檔"); // 查無資料
 		}
-		if(tClMain.getCityCode()!=null) {
+		if (tClMain.getCityCode() != null) {
 			tCdCity = cdCityService.findById(tClMain.getCityCode(), titaVo);
 		}
 		if (tCdCity == null) {
 			tCdCity = new CdCity();
 		}
-
 
 		if (tClMain.getClTypeCode().equals("101")) {
 			RPTFG = 3;
@@ -140,8 +143,16 @@ public class L2914 extends TradeBuffer {
 		this.totaVo.putParam("OPledgeEndDate", tClOther.getPledgeEndDate());
 		this.totaVo.putParam("OPledgeBankCode", tClOther.getPledgeBankCode());
 		this.totaVo.putParam("OPledgeNO", tClOther.getPledgeNO());
-		this.totaVo.putParam("OOwnerId", tClOther.getOwnerId());
-		this.totaVo.putParam("OOwnerName", tClOther.getOwnerName());
+//		this.totaVo.putParam("OOwnerId", tClOther.getOwnerId());
+//		this.totaVo.putParam("OOwnerName", tClOther.getOwnerName());
+		CustMain custMain = sCustMainService.findById(tClOther.getOwnerCustUKey(), titaVo);
+		if (custMain != null) {
+			this.totaVo.putParam("OOwnerId", custMain.getCustId());
+			this.totaVo.putParam("OOwnerName", custMain.getCustName());
+		} else {
+			this.totaVo.putParam("OOwnerId", "");
+			this.totaVo.putParam("OOwnerName", "");
+		}
 		this.totaVo.putParam("OIssuingId", tClOther.getIssuingId());
 		this.totaVo.putParam("OIssuingCounty", tClOther.getIssuingCounty());
 		this.totaVo.putParam("ODocNo", tClOther.getDocNo());
@@ -172,7 +183,6 @@ public class L2914 extends TradeBuffer {
 		this.totaVo.putParam("ODispDate", tClMain.getDispDate());
 		this.totaVo.putParam("OClStatus", tClMain.getClStatus());
 		this.totaVo.putParam("ORPTFG", RPTFG);
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

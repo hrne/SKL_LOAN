@@ -21,7 +21,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM054Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM054Report.class);
 
 	@Autowired
 	LM054ServiceImpl LM054ServiceImpl;
@@ -45,8 +44,8 @@ public class LM054Report extends MakeReport {
 
 		this.info("LM054Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表(大額、逾期、催收、國外)",
-				"LM054-A041重要放款餘額明細表(大額、逾期、催收、國外)_手搞", "LM054-A041重要放款餘額明細表(大額、逾期、催收、國外)_手搞.xlsx", "LNM34AP");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM054", "A041重要放款餘額明細表(大額、逾期、催收、國外)", "LM054-A041重要放款餘額明細表(大額、逾期、催收、國外)_手搞", "LM054_底稿_A041重要放款餘額明細表(大額、逾期、催收、國外)_手搞.xlsx",
+				"LNM34AP");
 		try {
 			ias34List = LM054ServiceImpl.ias34Ap(titaVo);
 		} catch (Exception e) {
@@ -54,10 +53,6 @@ public class LM054Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM054ServiceImpl.ias34Ap error = " + errors.toString());
 		}
-
-	
-
-
 
 		if (ias34List.size() > 0) {
 			tot = new BigDecimal("0");
@@ -92,7 +87,7 @@ public class LM054Report extends MakeReport {
 		} else {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}
-		
+
 		int yearMonth = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100;
 		makeExcel.setSheet("A041重要放款餘額明細表(大額、逾期、催收、國外)");
 		makeExcel.setValue(2, 3, yearMonth);

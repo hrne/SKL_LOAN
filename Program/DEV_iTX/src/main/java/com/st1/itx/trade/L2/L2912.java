@@ -41,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2912 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2912.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -139,8 +138,18 @@ public class L2912 extends TradeBuffer {
 		this.totaVo.putParam("OCityCode", tClMain.getCityCode());
 		this.totaVo.putParam("OCityCodeX", tCdCity.getCityItem());
 		this.totaVo.putParam("OClTypeCode", tClMain.getClTypeCode());
-		this.totaVo.putParam("OOwnerId", tClMovables.getOwnerId());
-		this.totaVo.putParam("OOwnerName", tClMovables.getOwnerName());
+		
+//		this.totaVo.putParam("OOwnerId", tClMovables.getOwnerId());
+//		this.totaVo.putParam("OOwnerName", tClMovables.getOwnerName());
+		CustMain custMain = sCustMainService.findById(tClMovables.getOwnerCustUKey(), titaVo);
+		if (custMain != null) {
+			this.totaVo.putParam("OOwnerId", custMain.getCustId());
+			this.totaVo.putParam("OOwnerName", custMain.getCustName());
+		} else {
+			this.totaVo.putParam("OOwnerId", "");
+			this.totaVo.putParam("OOwnerName", "");
+		}
+		
 		this.totaVo.putParam("OEvaDate", tClMain.getEvaDate());
 		this.totaVo.putParam("OEvaAmt", tClMain.getEvaAmt());
 		this.totaVo.putParam("OServiceLife", tClMovables.getServiceLife());

@@ -3,6 +3,7 @@ package com.st1.itx.trade.L2;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -252,8 +253,11 @@ public class L2413 extends TradeBuffer {
 			tClStock.setYdClosingPrice(parse.stringToBigDecimal(titaVo.getParam("YdClosingPrice")));
 			tClStock.setThreeMonthAvg(parse.stringToBigDecimal(titaVo.getParam("ThreeMonthAvg")));
 			tClStock.setEvaUnitPrice(parse.stringToBigDecimal(titaVo.getParam("EvaUnitPrice")));
-			tClStock.setOwnerId(titaVo.getParam("OwnerId"));
-			tClStock.setOwnerName(titaVo.getParam("OwnerName"));
+
+//			tClStock.setOwnerId(titaVo.getParam("OwnerId"));
+//			tClStock.setOwnerName(titaVo.getParam("OwnerName"));
+			tClStock = setOwnerCustUKey(tClStock, titaVo);
+
 			tClStock.setInsiderJobTitle(titaVo.getParam("InsiderJobTitle"));
 			tClStock.setInsiderPosition(titaVo.getParam("InsiderPosition"));
 			tClStock.setLegalPersonId(titaVo.getParam("LegalPersonId"));
@@ -341,18 +345,15 @@ public class L2413 extends TradeBuffer {
 				this.info("L2413 evaAmt = " + evaAmt.toString());
 				this.info("L2413 loanToValue = " + loanToValue.toString());
 
-
 //				"1.若""評估淨值""有值取""評估淨值""否則取""鑑估總值"")*貸放成數(四捨五入至個位數)
 //				2.若設定金額低於可分配金額則為設定金額
 //				3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)"
 
-				shareTotal = evaAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
-						BigDecimal.ROUND_HALF_UP);
+				shareTotal = evaAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
 				if (parse.stringToBigDecimal(titaVo.getParam("SettingAmt")).compareTo(shareTotal) < 0) {
 					shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingAmt"));
 				}
 
-				
 				if ("1".equals(titaVo.getParam("ClStat")) || "2".equals(titaVo.getParam("SettingStat"))) {
 					tClMain.setShareTotal(BigDecimal.ZERO);
 				} else {
@@ -372,8 +373,11 @@ public class L2413 extends TradeBuffer {
 				tClStock.setYdClosingPrice(parse.stringToBigDecimal(titaVo.getParam("YdClosingPrice")));
 				tClStock.setThreeMonthAvg(parse.stringToBigDecimal(titaVo.getParam("ThreeMonthAvg")));
 				tClStock.setEvaUnitPrice(parse.stringToBigDecimal(titaVo.getParam("EvaUnitPrice")));
-				tClStock.setOwnerId(titaVo.getParam("OwnerId"));
-				tClStock.setOwnerName(titaVo.getParam("OwnerName"));
+
+//				tClStock.setOwnerId(titaVo.getParam("OwnerId"));
+//				tClStock.setOwnerName(titaVo.getParam("OwnerName"));
+				tClStock = setOwnerCustUKey(tClStock, titaVo);
+
 				tClStock.setInsiderJobTitle(titaVo.getParam("InsiderJobTitle"));
 				tClStock.setInsiderPosition(titaVo.getParam("InsiderPosition"));
 				tClStock.setLegalPersonId(titaVo.getParam("LegalPersonId"));
@@ -441,6 +445,28 @@ public class L2413 extends TradeBuffer {
 		return this.sendList();
 	}
 
+	private ClStock setOwnerCustUKey(ClStock clStock, TitaVo titaVo) throws LogicException {
+
+		CustMain custMain = sCustMainService.custIdFirst(titaVo.getParam("OwnerId"), titaVo);
+		if (custMain == null) {
+			String Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+			custMain = new CustMain();
+			custMain.setCustUKey(Ukey);
+			custMain.setCustId(titaVo.getParam("OwnerId"));
+			custMain.setCustName(titaVo.getParam("OwnerName"));
+			custMain.setDataStatus(1);
+
+			try {
+				sCustMainService.insert(custMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "客戶資料主檔");
+			}
+		}
+		clStock.setOwnerCustUKey(custMain.getCustUKey());
+
+		return clStock;
+	}
+
 	// 股票判斷同一擔保品規則：股票代號+股票持有人統編
 	private int uniqueCheck(TitaVo titaVo) throws LogicException {
 		int clNo = 0;
@@ -448,16 +474,20 @@ public class L2413 extends TradeBuffer {
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 
-		Slice<ClStock> sClStock = sClStockService.findUnique(titaVo.getParam("StockCode"), titaVo.getParam("OwnerId"), 0, Integer.MAX_VALUE);
-		List<ClStock> lClStock = sClStock == null ? null : sClStock.getContent();
-		if (lClStock != null) {
-			for (ClStock clStock : lClStock) {
-				if (clStock.getClCode1() == iClCode1 && clStock.getClCode2() == iClCode2) {
-					clNo = clStock.getClNo();
-				} else {
-					throw new LogicException("E0012", "股票同一擔保品規則 =>股票代號+股票持有人統編");
-				}
+		CustMain custMain = sCustMainService.custIdFirst(titaVo.getParam("OwnerId"), titaVo);
+		if (custMain != null) {
+//		Slice<ClStock> sClStock = sClStockService.findUnique(titaVo.getParam("StockCode"), titaVo.getParam("OwnerId"), 0, Integer.MAX_VALUE);
+			Slice<ClStock> sClStock = sClStockService.findUnique(titaVo.getParam("StockCode"), custMain.getCustId(), 0, Integer.MAX_VALUE);
+			List<ClStock> lClStock = sClStock == null ? null : sClStock.getContent();
+			if (lClStock != null) {
+				for (ClStock clStock : lClStock) {
+					if (clStock.getClCode1() == iClCode1 && clStock.getClCode2() == iClCode2) {
+						clNo = clStock.getClNo();
+					} else {
+						throw new LogicException("E0012", "股票同一擔保品規則 =>股票代號+股票持有人統編");
+					}
 
+				}
 			}
 		}
 		return clNo;

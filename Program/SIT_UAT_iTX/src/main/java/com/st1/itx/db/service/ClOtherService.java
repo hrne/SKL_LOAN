@@ -59,17 +59,17 @@ public interface ClOtherService {
   public Slice<ClOther> findClCode2(int clCode1_0, int clCode2_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * IssuingId = ,AND DocNo = ,AND OwnerId =
+   * IssuingId = ,AND DocNo = ,AND OwnerCustUKey =
    *
    * @param issuingId_0 issuingId_0
    * @param docNo_1 docNo_1
-   * @param ownerId_2 ownerId_2
+   * @param ownerCustUKey_2 ownerCustUKey_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClOther ClOther of List
    */
-  public Slice<ClOther> findUnique(String issuingId_0, String docNo_1, String ownerId_2, int index, int limit, TitaVo... titaVo);
+  public Slice<ClOther> findUnique(String issuingId_0, String docNo_1, String ownerCustUKey_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By ClOther

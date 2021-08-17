@@ -3,8 +3,6 @@ package com.st1.itx.trade.L5;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L5073 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5073.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -49,10 +46,10 @@ public class L5073 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		String iYear= titaVo.getParam("Year");
+		String iYear = titaVo.getParam("Year");
 		int iMonth = Integer.parseInt(titaVo.getParam("Month"));
-		int YearMonth =Integer.parseInt(titaVo.getParam("Year")+titaVo.getParam("Month"))+191100;
-		
+		int YearMonth = Integer.parseInt(titaVo.getParam("Year") + titaVo.getParam("Month")) + 191100;
+
 		int YMStart = 0;
 		int YMEnd = 0;
 
@@ -65,17 +62,16 @@ public class L5073 extends TradeBuffer {
 		}
 		YMStart = YYYY * 100 + 1;
 		YMEnd = YYYY * 100 + 12;
-		
+
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200; // 85 * 200 = 17,000
 
-	
 		Slice<NegAppr> sNegAppr;
-		if (iMonth==0) {
-			sNegAppr = sNegApprService.YyyyMmBetween(YMStart,YMEnd, this.index, this.limit, titaVo);
+		if (iMonth == 0) {
+			sNegAppr = sNegApprService.YyyyMmBetween(YMStart, YMEnd, this.index, this.limit, titaVo);
 		} else {
 			sNegAppr = sNegApprService.YyyyMmEq(YearMonth, this.index, this.limit, titaVo);
 		}
@@ -87,13 +83,15 @@ public class L5073 extends TradeBuffer {
 		// 如有找到資料
 		for (NegAppr tNegAppr : lNegAppr) {
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOYyyyMm", tNegAppr.getYyyyMm()-191100);
+			occursList.putParam("OOYyyyMm", tNegAppr.getYyyyMm() - 191100);
 			occursList.putParam("OOKindCode", tNegAppr.getKindCode());
 			occursList.putParam("OOExportDate", tNegAppr.getExportDate());
 			occursList.putParam("OOApprAcDate", tNegAppr.getApprAcDate());
 			occursList.putParam("OOBringUpDate", tNegAppr.getBringUpDate());
-			
-		
+			occursList.putParam("OOExportMark", tNegAppr.getExportMark());
+			occursList.putParam("OOApprAcMark", tNegAppr.getApprAcMark());
+			occursList.putParam("OOBringUpMark", tNegAppr.getBringUpMark());
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

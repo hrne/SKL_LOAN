@@ -140,6 +140,9 @@ C(3,#FunctionCode,1,s,$)
 T(2,@ExportDate{i},#L5r02ExportDate{i})
 T(2,@ApprAcDate{i},#L5r02ApprAcDate{i})
 T(2,@BringUpDate{i},#L5r02BringUpDate{i})
+T(2,@ExportMark{i},#L5r02ExportMark{i})
+T(2,@ApprAcMark{i},#L5r02ApprAcMark{i})
+T(2,@BringUpMark{i},#L5r02BringUpMark{i})
 ##end
 
 ! 調Rim相關 結束
@@ -147,10 +150,20 @@ T(2,@BringUpDate{i},#L5r02BringUpDate{i})
 !顯示框線
 #WKTF=A,1,S
 C(2,#FunctionCode,s,E(0,1),E(0,1),s,E(0,0))
+
 ##loop{times:4,i:1}
+
+#WKTFM{i}=X,1,S
 T(F,@ExportDate{i},#WKTF)
 T(F,@ApprAcDate{i},#WKTF)
 T(F,@BringUpDate{i},#WKTF)
+
+#ExportMark{i}=A,1,S
+C(3,#ExportMark{i},1,T(F,@ExportDate{i},0)T(F,@ApprAcDate{i},0)T(F,@BringUpDate{i},0),s)
+
+#ApprAcMark{i}=A,1,S
+#BringUpMark{i}=A,1,S
+
 ##end
 
 #La!leValue=A,1,S
@@ -165,6 +178,7 @@ T(2,@Lable4,清算)
 
 #ExportDate{i}=D,7,I
 C(3,#FunctionCode,4,s,$)
+C(3,#L5r02ExportMark{i},1,s,$)
 D(8)
 @
 C(3,#ExportDate{i},0,S,$)
@@ -172,12 +186,14 @@ V(7)A(DATE,0,#ExportDate{i})
 
 #ApprAcDate{i}=D,7,I
 C(3,#FunctionCode,4,s,$)
+C(3,#L5r02ExportMark{i},1,s,$)
 C(3,#ExportDate{i},0,S,$)
 D(8)
 @V(7)A(DATE,0,#ApprAcDate{i})
 
 #BringUpDate{i}=D,7,I
 C(3,#FunctionCode,4,s,$)
+C(3,#L5r02ExportMark{i},1,s,$)
 C(3,#ExportDate{i},0,S,$)
 D(8)
 @V(7)A(DATE,0,#BringUpDate{i})

@@ -40,7 +40,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R43 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R43.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -73,6 +72,7 @@ public class L2R43 extends TradeBuffer {
 	private int iClCode2;
 	private int clNo;
 	private String bdLocation;
+	private CustMain tCustMain;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -85,7 +85,7 @@ public class L2R43 extends TradeBuffer {
 		clNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 		// 功能
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
-		CustMain tCustMain = new CustMain();
+		tCustMain = new CustMain();
 		this.totaVo.putParam("L2r43CustName", "");
 		tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 
@@ -128,15 +128,14 @@ public class L2R43 extends TradeBuffer {
 //	  2. 土地擔保品：
 //		  土地座落+土地所有權人(多)
 		int clNo = 0;
-		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(bdLocation, this.index, Integer.MAX_VALUE,
-				titaVo);
+		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(bdLocation, this.index, Integer.MAX_VALUE, titaVo);
 		List<ClBuilding> lClBuilding = slClBuilding == null ? null : slClBuilding.getContent();
 		if (lClBuilding != null) {
 			for (ClBuilding cl : lClBuilding) {
-				this.info("ClCode1 ="+iClCode1);
-				this.info("cl.getClCode1() ="+cl.getClCode1());
-				this.info("iClCode2 ="+iClCode2);
-				this.info("cl.getClCode2() ="+cl.getClCode2());
+				this.info("ClCode1 =" + iClCode1);
+				this.info("cl.getClCode1() =" + cl.getClCode1());
+				this.info("iClCode2 =" + iClCode2);
+				this.info("cl.getClCode2() =" + cl.getClCode2());
 				if (cl.getClCode1() == iClCode1 && cl.getClCode2() == iClCode2) {
 					if (checkBuildingOwner(cl.getClNo(), titaVo)) {
 						clNo = cl.getClNo();
@@ -152,8 +151,8 @@ public class L2R43 extends TradeBuffer {
 	private boolean checkBuildingOwner(int clNo, TitaVo titaVo) throws LogicException {
 // 有一個有權人相同即視為相同
 		boolean isSameOwner = false;
-		ClBuildingOwner tClBuildingOwner = sClBuildingOwnerService
-				.findById(new ClBuildingOwnerId(iClCode1, iClCode2, clNo, iCustId), titaVo);
+//		ClBuildingOwner tClBuildingOwner = sClBuildingOwnerService.findById(new ClBuildingOwnerId(iClCode1, iClCode2, clNo, iCustId), titaVo);
+		ClBuildingOwner tClBuildingOwner = sClBuildingOwnerService.findById(new ClBuildingOwnerId(iClCode1, iClCode2, clNo, tCustMain.getCustUKey()), titaVo);
 		if (tClBuildingOwner != null) {
 			isSameOwner = true;
 		}
@@ -163,8 +162,7 @@ public class L2R43 extends TradeBuffer {
 	// 土地擔保品編號
 	private int getLandClNo(TitaVo titaVo) throws LogicException {
 		int clNo = 0;
-		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("LandLocation"), this.index,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("LandLocation"), this.index, Integer.MAX_VALUE, titaVo);
 		List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
 		if (lClLand != null) {
 			for (ClLand cl : lClLand) {
@@ -183,8 +181,8 @@ public class L2R43 extends TradeBuffer {
 	private boolean checkLandOwner(int clNo, TitaVo titaVo) throws LogicException {
 // 有一個有權人相同即視為相同
 		boolean isSameOwner = false;
-		ClLandOwner tClLandOwner = sClLandOwnerService.findById(new ClLandOwnerId(iClCode1, iClCode2, clNo, 0, iCustId),
-				titaVo);
+//		ClLandOwner tClLandOwner = sClLandOwnerService.findById(new ClLandOwnerId(iClCode1, iClCode2, clNo, 0, iCustId), titaVo);
+		ClLandOwner tClLandOwner = sClLandOwnerService.findById(new ClLandOwnerId(iClCode1, iClCode2, clNo, 0, tCustMain.getCustUKey()), titaVo);
 		if (tClLandOwner != null) {
 			isSameOwner = true;
 		}

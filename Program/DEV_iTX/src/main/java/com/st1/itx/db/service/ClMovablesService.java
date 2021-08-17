@@ -73,17 +73,17 @@ public interface ClMovablesService {
   public Slice<ClMovables> selectL2047(int clCode1_0, int clCode2_1, int clCode2_2, int clNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
-   * ProductBrand = ,AND ProductSpec = ,AND OwnerId =
+   * ProductBrand = ,AND ProductSpec = ,AND OwnerCustUKey =
    *
    * @param productBrand_0 productBrand_0
    * @param productSpec_1 productSpec_1
-   * @param ownerId_2 ownerId_2
+   * @param ownerCustUKey_2 ownerCustUKey_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClMovables ClMovables of List
    */
-  public Slice<ClMovables> findUnique1(String productBrand_0, String productSpec_1, String ownerId_2, int index, int limit, TitaVo... titaVo);
+  public Slice<ClMovables> findUnique1(String productBrand_0, String productSpec_1, String ownerCustUKey_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * ProductBrand =

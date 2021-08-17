@@ -37,6 +37,7 @@ public class L9724ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,MAX(ali.\"PayIntDate\") AS F4 ";
 		sql += "      FROM \"AcLoanInt\" ali ";
 		sql += "      WHERE ali.\"YearMonth\" = :inputYearMonth ";
+		sql += "        AND ali.\"IntStartDate\" > 0 ";
 		if (aging != 9)
 		{
 			sql += "        AND ali.\"Aging\" = :aging ";

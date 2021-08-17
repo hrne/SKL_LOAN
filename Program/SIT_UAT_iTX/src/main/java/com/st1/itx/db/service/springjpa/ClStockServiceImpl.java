@@ -166,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<ClStock> findUnique(String stockCode_0, String ownerId_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClStock> findUnique(String stockCode_0, String ownerCustUKey_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClStock> slice = null;
     if (titaVo.length != 0)
@@ -177,15 +177,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findUnique " + dbName + " : " + "stockCode_0 : " + stockCode_0 + " ownerId_1 : " +  ownerId_1);
+    this.info("findUnique " + dbName + " : " + "stockCode_0 : " + stockCode_0 + " ownerCustUKey_1 : " +  ownerCustUKey_1);
     if (dbName.equals(ContentName.onDay))
-      slice = clStockReposDay.findAllByStockCodeIsAndOwnerIdIs(stockCode_0, ownerId_1, pageable);
+      slice = clStockReposDay.findAllByStockCodeIsAndOwnerCustUKeyIs(stockCode_0, ownerCustUKey_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clStockReposMon.findAllByStockCodeIsAndOwnerIdIs(stockCode_0, ownerId_1, pageable);
+      slice = clStockReposMon.findAllByStockCodeIsAndOwnerCustUKeyIs(stockCode_0, ownerCustUKey_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clStockReposHist.findAllByStockCodeIsAndOwnerIdIs(stockCode_0, ownerId_1, pageable);
+      slice = clStockReposHist.findAllByStockCodeIsAndOwnerCustUKeyIs(stockCode_0, ownerCustUKey_1, pageable);
     else 
-      slice = clStockRepos.findAllByStockCodeIsAndOwnerIdIs(stockCode_0, ownerId_1, pageable);
+      slice = clStockRepos.findAllByStockCodeIsAndOwnerCustUKeyIs(stockCode_0, ownerCustUKey_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

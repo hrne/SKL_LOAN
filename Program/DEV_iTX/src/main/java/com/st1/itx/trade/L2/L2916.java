@@ -15,6 +15,8 @@ import com.st1.itx.db.domain.ClLand;
 import com.st1.itx.db.domain.ClLandId;
 import com.st1.itx.db.domain.ClLandOwner;
 import com.st1.itx.db.domain.ClLandReason;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandReasonService;
 import com.st1.itx.db.service.ClLandService;
@@ -39,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2916 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2916.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -56,6 +57,9 @@ public class L2916 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClLandReasonService sClLandReasonService;
+
+	@Autowired
+	public CustMainService sCustMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -137,8 +141,7 @@ public class L2916 extends TradeBuffer {
 //		this.totaVo.putParam("LandOwnedArea", tClLand.getLandOwnedArea());
 
 		// tita擔保品編號取建物所有權人檔資料list
-		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClLandOwner> slClLandOwner = sClLandOwnerService.LandSeqEq(iClCode1, iClCode2, iClNo, iLandSeq, 0, Integer.MAX_VALUE, titaVo);
 		lClLandOwner = slClLandOwner == null ? null : new ArrayList<ClLandOwner>(slClLandOwner.getContent());
 
 		if (lClLandOwner == null || lClLandOwner.size() == 0) {
@@ -164,8 +167,14 @@ public class L2916 extends TradeBuffer {
 		int k = 1;
 		for (ClLandOwner tClLandOwner : lClLandOwner) {
 
-			this.totaVo.putParam("OwnerId" + k, tClLandOwner.getOwnerId());
-			this.totaVo.putParam("OwnerName" + k, tClLandOwner.getOwnerName());
+			CustMain custMain = sCustMainService.findById(tClLandOwner.getOwnerCustUKey(), titaVo);
+			if (custMain != null) {
+				this.totaVo.putParam("OwnerId" + k, custMain.getCustId());
+				this.totaVo.putParam("OwnerName" + k, custMain.getCustName());
+			} else {
+				this.totaVo.putParam("OwnerId" + k, "");
+				this.totaVo.putParam("OwnerName" + k, "");
+			}
 			this.totaVo.putParam("OwnerRelCode" + k, tClLandOwner.getOwnerRelCode());
 			this.totaVo.putParam("OwnerPart" + k, tClLandOwner.getOwnerPart());
 			this.totaVo.putParam("OwnerTotal" + k, tClLandOwner.getOwnerTotal());
@@ -174,8 +183,7 @@ public class L2916 extends TradeBuffer {
 		}
 
 		// tita擔保品編號取建物修改原因檔資料list
-		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClLandReason> slClLandReason = sClLandReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClLandReason = slClLandReason == null ? null : new ArrayList<ClLandReason>(slClLandReason.getContent());
 		// 資料筆數
 		if (lClLandReason == null || lClLandReason.size() == 0) {
@@ -205,12 +213,10 @@ public class L2916 extends TradeBuffer {
 				tClLandReason = new ClLandReason();
 
 			} else {
-				this.info(
-						"tClLandReason.getCreateDate().toString()L2915 " + tClLandReason.getCreateDate().toString());
+				this.info("tClLandReason.getCreateDate().toString()L2915 " + tClLandReason.getCreateDate().toString());
 				String CreateDate = tClLandReason.getCreateDate().toString();
 				this.info("CreateDate L2915 " + CreateDate);
-				String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7)
-						+ CreateDate.substring(8, 10);
+				String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7) + CreateDate.substring(8, 10);
 				int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
 				CreateDate4 = String.valueOf(CreateDate3);
 			}

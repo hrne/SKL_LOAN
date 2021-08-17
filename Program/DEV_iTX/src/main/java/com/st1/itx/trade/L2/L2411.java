@@ -3,6 +3,7 @@ package com.st1.itx.trade.L2;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,6 +137,7 @@ public class L2411 extends TradeBuffer {
 	public FacMainService sFacMainService;
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
+
 
 	/* 自動取號 */
 	@Autowired
@@ -616,7 +618,8 @@ public class L2411 extends TradeBuffer {
 					if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
 						break;
 					}
-					if (o.getOwnerId().equals(titaVo.getParam("OwnerId" + i))) {
+					CustMain custMain = sCustMainService.findById(o.getOwnerCustUKey(), titaVo);
+					if (custMain != null && custMain.getCustId().equals(titaVo.getParam("OwnerId" + i))) {
 						isSameOwner = true;
 					}
 				}
@@ -659,7 +662,8 @@ public class L2411 extends TradeBuffer {
 					if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
 						break;
 					}
-					if (o.getOwnerId().equals(titaVo.getParam("OwnerId" + i))) {
+					CustMain custMain = sCustMainService.findById(o.getOwnerCustUKey(), titaVo);
+					if (custMain != null && custMain.getCustId().equals(titaVo.getParam("OwnerId" + i))) {
 						isSameOwner = true;
 						break;
 					}
@@ -818,13 +822,31 @@ public class L2411 extends TradeBuffer {
 			clBuildingOwnerId.setClCode1(iClCode1);
 			clBuildingOwnerId.setClCode2(iClCode2);
 			clBuildingOwnerId.setClNo(iClNo);
-			clBuildingOwnerId.setOwnerId(iOwnerId);
+			
+			CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
+			//ID不存在時,新增一筆資料在CustMain
+			if (custMain == null) {
+				String Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+	    		custMain = new CustMain();
+	    		custMain.setCustUKey(Ukey);
+	    		custMain.setCustId(iOwnerId);
+	    		custMain.setCustName(titaVo.getParam("OwnerName" + i));
+	    		custMain.setDataStatus(1);
+	    		
+	    		try {
+	    			sCustMainService.insert(tCustMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "客戶資料主檔");
+				}
+			}
+			clBuildingOwnerId.setOwnerCustUKey(custMain.getCustUKey());
+			
 			tClBuildingOwner.setClBuildingOwnerId(clBuildingOwnerId);
 			tClBuildingOwner.setClCode1(iClCode1);
 			tClBuildingOwner.setClCode2(iClCode2);
 			tClBuildingOwner.setClNo(iClNo);
-			tClBuildingOwner.setOwnerId(iOwnerId);
-			tClBuildingOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
+//			tClBuildingOwner.setOwnerId(iOwnerId);
+//			tClBuildingOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
 			tClBuildingOwner.setOwnerRelCode(titaVo.getParam("OwnerRelCode" + i));
 			tClBuildingOwner.setOwnerPart(parse.stringToBigDecimal(titaVo.getParam("OwnerPart" + i)));
 			tClBuildingOwner.setOwnerTotal(parse.stringToBigDecimal(titaVo.getParam("OwnerTotal" + i)));
@@ -863,15 +885,32 @@ public class L2411 extends TradeBuffer {
 			clLandOwnerId.setClCode2(iClCode2);
 			clLandOwnerId.setClNo(iClNo);
 			clLandOwnerId.setLandSeq(0);
-			clLandOwnerId.setOwnerId(iOwnerId);
+			
+			CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
+			//ID不存在時,新增一筆資料在CustMain
+			if (custMain == null) {
+				String Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+	    		custMain = new CustMain();
+	    		custMain.setCustUKey(Ukey);
+	    		custMain.setCustId(iOwnerId);
+	    		custMain.setCustName(titaVo.getParam("OwnerName" + i));
+	    		custMain.setDataStatus(1);
+	    		
+	    		try {
+	    			sCustMainService.insert(tCustMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "客戶資料主檔");
+				}
+			}
+			clLandOwnerId.setOwnerCustUKey(custMain.getCustUKey());
 
 			tClLandOwner.setClLandOwnerId(clLandOwnerId);
 			tClLandOwner.setClCode1(iClCode1);
 			tClLandOwner.setClCode2(iClCode2);
 			tClLandOwner.setClNo(iClNo);
 			tClLandOwner.setLandSeq(0);
-			tClLandOwner.setOwnerId(iOwnerId);
-			tClLandOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
+//			tClLandOwner.setOwnerId(iOwnerId);
+//			tClLandOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
 			tClLandOwner.setOwnerRelCode(titaVo.getParam("OwnerRelCode" + i));
 			tClLandOwner.setOwnerPart(parse.stringToBigDecimal(titaVo.getParam("OwnerPart" + i)));
 			tClLandOwner.setOwnerTotal(parse.stringToBigDecimal(titaVo.getParam("OwnerTotal" + i)));

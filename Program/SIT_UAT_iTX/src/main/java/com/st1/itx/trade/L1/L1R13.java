@@ -2,8 +2,6 @@ package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -32,7 +30,6 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class L1R13 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1R13.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -60,39 +57,40 @@ public class L1R13 extends TradeBuffer {
 		FacMain iFacMain = new FacMain();
 		iCustNotice = iCustNoticeService.facmNoEq(iRimCustNo, iRimFacmNo, iRimFacmNo, this.index, this.limit, titaVo);
 		iCustMain = iCustMainService.custNoFirst(iRimCustNo, iRimCustNo, titaVo);
-		if(iCustMain == null) {
+		if (iCustMain == null) {
 			throw new LogicException(titaVo, "E0001", "此戶號不存在。");
 		}
-		iCustTelNo = iCustTelNoService.findCustUKey(iCustMain.getCustUKey(), this.index, this.limit,titaVo);
-		if(iRimFacmNo != 0) {
+		iCustTelNo = iCustTelNoService.findCustUKey(iCustMain.getCustUKey(), this.index, this.limit, titaVo);
+		if (iRimFacmNo != 0) {
 			iFacMain = iFacMainService.findById(iFacMainId, titaVo);
 		}
 		String iMsgFg = "0";
 		String iEmailFg = "0";
-		if(iRimFunc == 1) {
-			if(iCustNotice!=null) {
+		if (iRimFunc == 1) {
+			if (iCustNotice != null) {
 				throw new LogicException(titaVo, "E0005", "該戶號額度已存在於客戶通知設定檔。");
 			}
-		}else {
-			if(iCustNotice==null) {
+		} else {
+			if (iCustNotice == null) {
 				throw new LogicException(titaVo, "E0001", "該戶號額度不存在於客戶通知設定檔。");
 			}
 		}
-		if(iFacMain==null && iRimFacmNo != 0) {
+		if (iFacMain == null && iRimFacmNo != 0) {
 			throw new LogicException(titaVo, "E0005", "該額度不存在");
 		}
-		if(iCustMain!=null) {
-			if(!iCustMain.getEmail().equals("")) {
+		if (iCustMain != null) {
+			if (!iCustMain.getEmail().equals("")) {
 				iEmailFg = "1";
 			}
 		}
-		if(iCustTelNo!=null) {
-			for (CustTelNo xCustTelNo:iCustTelNo) {
-				if(xCustTelNo.getTelTypeCode().equals("05")) {
+		if (iCustTelNo != null) {
+			for (CustTelNo xCustTelNo : iCustTelNo) {
+				if (xCustTelNo.getTelTypeCode().equals("05")) {
 					iMsgFg = "1";
 				}
 			}
 		}
+		this.totaVo.putParam("L1R13CustName", iCustMain.getCustName());
 		this.totaVo.putParam("L1R13MsgFg", iMsgFg);
 		this.totaVo.putParam("L1R13EmailFg", iEmailFg);
 		this.addList(this.totaVo);

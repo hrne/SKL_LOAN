@@ -25,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6402 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6402.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -102,6 +101,7 @@ public class L6402 extends TradeBuffer {
 		tTxTranCode.setStatus(Integer.valueOf(titaVo.get("Status")));
 		tTxTranCode.setMenuFg(Integer.valueOf(titaVo.get("MenuFg")));
 		tTxTranCode.setSubmitFg(Integer.valueOf(titaVo.get("SubmitFg")));
+		tTxTranCode.setCustDataCtrlFg(Integer.valueOf(titaVo.getParam("CustDataCtrlFg")));
 
 		return tTxTranCode;
 

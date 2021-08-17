@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -18,6 +16,7 @@ import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
@@ -36,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2042 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2042.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -57,6 +55,9 @@ public class L2042 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingOwnerService sClBuildingOwnerService;
+	
+	@Autowired
+	public CustMainService custMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -136,14 +137,21 @@ public class L2042 extends TradeBuffer {
 			int clcode1 = tClBuilding.getClCode1();
 			int clcode2 = tClBuilding.getClCode2();
 			int clno = tClBuilding.getClNo();
-			Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(clcode1, clcode2, clno,
-					this.index, this.limit, titaVo);
+			Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(clcode1, clcode2, clno, this.index, this.limit, titaVo);
 
 			List<ClBuildingOwner> lClBuildingOwner = slClBuildingOwner == null ? null : slClBuildingOwner.getContent();
 			if (lClBuildingOwner != null) {
 //				lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 //				lClBuildingOwner.add(tClBuildingOwner);
 				tClBuildingOwner = lClBuildingOwner.get(0);
+				CustMain custMain = custMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
+				if (custMain != null) {
+					occurslist.putParam("OOCustId", custMain.getCustId());
+				} else {
+					occurslist.putParam("OOCustId", "");
+				}
+			} else {
+				occurslist.putParam("OOCustId", "");
 			}
 
 			// 拿擔保品編號取ClImm設定金額
@@ -158,7 +166,6 @@ public class L2042 extends TradeBuffer {
 			occurslist.putParam("OOClCode1", tClBuilding.getClCode1());
 			occurslist.putParam("OOClCode2", tClBuilding.getClCode2());
 			occurslist.putParam("OOClNo", tClBuilding.getClNo());
-			occurslist.putParam("OOCustId", tClBuildingOwner.getOwnerId());
 			occurslist.putParam("OOBdNo1", tClBuilding.getBdNo1());
 			occurslist.putParam("OOBdNo2", tClBuilding.getBdNo2());
 			occurslist.putParam("OOSettingAmt", tClImm.getSettingAmt());

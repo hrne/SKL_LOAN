@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -59,7 +57,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4602 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4602.class);
 
 	@Autowired
 	public Parse parse;
@@ -219,8 +216,7 @@ public class L4602 extends TradeBuffer {
 		// 轉換資料格式
 		ArrayList<String> file = insuRenewFileVo.toFile();
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔",
-				"LNM01P.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -331,16 +327,22 @@ public class L4602 extends TradeBuffer {
 				tClBuilding = clBuildingService.findById(tClBuildingId);
 
 				ClBuildingOwner tClBuildingOwner = new ClBuildingOwner();
-				tClBuildingOwner = clBuildingOwnerService.clNoFirst(tInsuRenew.getInsuRenewId().getClCode1(),
-						tInsuRenew.getInsuRenewId().getClCode2(), tInsuRenew.getInsuRenewId().getClNo());
+				tClBuildingOwner = clBuildingOwnerService.clNoFirst(tInsuRenew.getInsuRenewId().getClCode1(), tInsuRenew.getInsuRenewId().getClCode2(), tInsuRenew.getInsuRenewId().getClNo());
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("FireInsuMonth", FormatUtil.padX("" + (tInsuRenew.getInsuYearMonth()), 6));
 				occursList.putParam("ReturnCode", FormatUtil.pad9("99", 2));
 				occursList.putParam("InsuCampCode", FormatUtil.pad9("01", 2));
 				if (tClBuildingOwner != null) {
-					occursList.putParam("InsuCustId", FormatUtil.padX(tClBuildingOwner.getOwnerId(), 10));
-					occursList.putParam("InsuCustName", FormatUtil.padX(tClBuildingOwner.getOwnerName(), 12));
+					CustMain custMain = custMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
+					if (custMain != null) {
+						occursList.putParam("InsuCustId", FormatUtil.padX(custMain.getCustId(), 10));
+						occursList.putParam("InsuCustName", FormatUtil.padX(custMain.getCustName(), 12));
+					} else {
+						occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
+						occursList.putParam("InsuCustName", FormatUtil.padX("", 12));
+					}
+					
 				} else {
 					occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
 					occursList.putParam("InsuCustName", FormatUtil.padX("", 12));
@@ -362,11 +364,10 @@ public class L4602 extends TradeBuffer {
 					List<ClBuildingParking> lClBuildingParking = new ArrayList<ClBuildingParking>();
 					List<ClBuildingPublic> lClBuildingPublic = new ArrayList<ClBuildingPublic>();
 
-					Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(
-							tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index,
-							this.limit, titaVo);
-					Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(),
-							tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit, titaVo);
+					Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit,
+							titaVo);
+					Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit,
+							titaVo);
 
 					lClBuildingParking = sClBuildingParking == null ? null : sClBuildingParking.getContent();
 					lClBuildingPublic = sClBuildingPublic == null ? null : sClBuildingPublic.getContent();
@@ -386,8 +387,7 @@ public class L4602 extends TradeBuffer {
 					subArea = tClBuilding.getBdSubArea();
 					occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain), 5));
 					occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 58));
-					occursList.putParam("BuildingSquare",
-							FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
+					occursList.putParam("BuildingSquare", FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
 					occursList.putParam("BuildingCode", FormatUtil.pad9("" + tClBuilding.getBdMtrlCode(), 2));
 
 					String bdYear = "";
@@ -396,7 +396,7 @@ public class L4602 extends TradeBuffer {
 						bdYear = FormatUtil.pad9(("" + tClBuilding.getBdDate()).substring(0, 3), 3);
 					}
 					occursList.putParam("BuildingYears", bdYear);
-					
+
 					occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getFloor(), 2));
 					occursList.putParam("RoofCode", FormatUtil.pad9("" + tClBuilding.getRoofStructureCode(), 2));
 					occursList.putParam("BusinessUnit", FormatUtil.pad9("" + tClBuilding.getBdMainUseCode(), 4));
@@ -448,20 +448,15 @@ public class L4602 extends TradeBuffer {
 //				L4602之後來回改抓取temp檔
 				if (tInsuRenewMediaTemp != null) {
 					occursList.putParam("NewInusNo", FormatUtil.padX("" + tInsuRenewMediaTemp.getNewInusNo(), 16));
-					occursList.putParam("NewInsuStartDate",
-							FormatUtil.padX("" + tInsuRenewMediaTemp.getNewInsuStartDate(), 10));
-					occursList.putParam("NewInsuEndDate",
-							FormatUtil.padX("" + tInsuRenewMediaTemp.getNewInsuEndDate(), 10));
-					occursList.putParam("NewFireInsuAmt",
-							FormatUtil.padX("" + tInsuRenewMediaTemp.getNewFireInsuAmt(), 11));
-					occursList.putParam("NewFireInsuFee",
-							FormatUtil.padX("" + tInsuRenewMediaTemp.getNewFireInsuFee(), 7));
+					occursList.putParam("NewInsuStartDate", FormatUtil.padX("" + tInsuRenewMediaTemp.getNewInsuStartDate(), 10));
+					occursList.putParam("NewInsuEndDate", FormatUtil.padX("" + tInsuRenewMediaTemp.getNewInsuEndDate(), 10));
+					occursList.putParam("NewFireInsuAmt", FormatUtil.padX("" + tInsuRenewMediaTemp.getNewFireInsuAmt(), 11));
+					occursList.putParam("NewFireInsuFee", FormatUtil.padX("" + tInsuRenewMediaTemp.getNewFireInsuFee(), 7));
 					occursList.putParam("NewEqInsuAmt", FormatUtil.padX("" + tInsuRenewMediaTemp.getNewEqInsuAmt(), 8));
 					occursList.putParam("NewEqInsuFee", FormatUtil.padX("" + tInsuRenewMediaTemp.getNewEqInsuFee(), 6));
 					occursList.putParam("NewTotalFee", FormatUtil.padX("" + tInsuRenewMediaTemp.getNewTotalFee(), 7));
 
-					occursList.putParam("SklSalesName",
-							FormatUtil.padX("" + tInsuRenewMediaTemp.getSklSalesName(), 20));
+					occursList.putParam("SklSalesName", FormatUtil.padX("" + tInsuRenewMediaTemp.getSklSalesName(), 20));
 					occursList.putParam("SklUnitCode", FormatUtil.padX("" + tInsuRenewMediaTemp.getSklUnitCode(), 6));
 					occursList.putParam("SklUnitName", FormatUtil.padX("" + tInsuRenewMediaTemp.getSklUnitName(), 20));
 					occursList.putParam("SklSalesCode", FormatUtil.padX("" + tInsuRenewMediaTemp.getSklSalesCode(), 6));
@@ -693,11 +688,8 @@ public class L4602 extends TradeBuffer {
 			tCdCity = cdCityService.findById(tCustMain.getCurrCityCode());
 
 			if (tCdArea != null && tCdArea != null) {
-				address = tCdCity.getCityItem().trim() + tCdArea.getAreaShort().trim() + tCustMain.getCurrRoad().trim()
-						+ tCustMain.getCurrSection().trim() + tCustMain.getCurrAlley().trim()
-						+ tCustMain.getCurrLane().trim() + tCustMain.getCurrNum().trim()
-						+ tCustMain.getCurrNumDash().trim() + tCustMain.getCurrFloor().trim()
-						+ tCustMain.getCurrFloorDash().trim();
+				address = tCdCity.getCityItem().trim() + tCdArea.getAreaShort().trim() + tCustMain.getCurrRoad().trim() + tCustMain.getCurrSection().trim() + tCustMain.getCurrAlley().trim()
+						+ tCustMain.getCurrLane().trim() + tCustMain.getCurrNum().trim() + tCustMain.getCurrNumDash().trim() + tCustMain.getCurrFloor().trim() + tCustMain.getCurrFloorDash().trim();
 			}
 		}
 		return address;

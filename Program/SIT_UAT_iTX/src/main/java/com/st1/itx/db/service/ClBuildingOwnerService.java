@@ -49,15 +49,15 @@ public interface ClBuildingOwnerService {
   public Slice<ClBuildingOwner> clNoEq(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * OwnerId = 
+   * OwnerCustUKey = 
    *
-   * @param ownerId_0 ownerId_0
+   * @param ownerCustUKey_0 ownerCustUKey_0
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClBuildingOwner ClBuildingOwner of List
    */
-  public Slice<ClBuildingOwner> ownerIdEq(String ownerId_0, int index, int limit, TitaVo... titaVo);
+  public Slice<ClBuildingOwner> OwnerCustUKeyEq(String ownerCustUKey_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * ClCode1 = ,AND ClCode2 = ,AND ClNo = 

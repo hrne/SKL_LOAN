@@ -28,8 +28,8 @@ public interface ClStockRepositoryMon extends JpaRepository<ClStock, ClStockId> 
   // ClCode1 = ,AND ClCode2 = 
   public Slice<ClStock> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
 
-  // StockCode = ,AND OwnerId =
-  public Slice<ClStock> findAllByStockCodeIsAndOwnerIdIs(String stockCode_0, String ownerId_1, Pageable pageable);
+  // StockCode = ,AND OwnerCustUKey =
+  public Slice<ClStock> findAllByStockCodeIsAndOwnerCustUKeyIs(String stockCode_0, String ownerCustUKey_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

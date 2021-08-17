@@ -29,7 +29,7 @@ public class ClMovables implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6314592044536252074L;
+	private static final long serialVersionUID = 2209232636274084282L;
 
 @EmbeddedId
   private ClMovablesId clMovablesId;
@@ -48,13 +48,9 @@ public class ClMovables implements Serializable {
   @Column(name = "`ClNo`", insertable = false, updatable = false)
   private int clNo = 0;
 
-  // 所有權人統編
-  @Column(name = "`OwnerId`", length = 10)
-  private String ownerId;
-
-  // 所有權人姓名
-  @Column(name = "`OwnerName`", length = 100)
-  private String ownerName;
+  // 客戶識別碼
+  @Column(name = "`OwnerCustUKey`", length = 32)
+  private String ownerCustUKey;
 
   // 耐用年限
   @Column(name = "`ServiceLife`")
@@ -290,41 +286,22 @@ public class ClMovables implements Serializable {
   }
 
 /**
-	* 所有權人統編<br>
+	* 客戶識別碼<br>
 	* 
 	* @return String
 	*/
-  public String getOwnerId() {
-    return this.ownerId == null ? "" : this.ownerId;
+  public String getOwnerCustUKey() {
+    return this.ownerCustUKey == null ? "" : this.ownerCustUKey;
   }
 
 /**
-	* 所有權人統編<br>
+	* 客戶識別碼<br>
 	* 
   *
-  * @param ownerId 所有權人統編
+  * @param ownerCustUKey 客戶識別碼
 	*/
-  public void setOwnerId(String ownerId) {
-    this.ownerId = ownerId;
-  }
-
-/**
-	* 所有權人姓名<br>
-	* 
-	* @return String
-	*/
-  public String getOwnerName() {
-    return this.ownerName == null ? "" : this.ownerName;
-  }
-
-/**
-	* 所有權人姓名<br>
-	* 
-  *
-  * @param ownerName 所有權人姓名
-	*/
-  public void setOwnerName(String ownerName) {
-    this.ownerName = ownerName;
+  public void setOwnerCustUKey(String ownerCustUKey) {
+    this.ownerCustUKey = ownerCustUKey;
   }
 
 /**
@@ -1280,13 +1257,13 @@ N:否
 
   @Override
   public String toString() {
-    return "ClMovables [clMovablesId=" + clMovablesId + ", ownerId=" + ownerId + ", ownerName=" + ownerName + ", serviceLife=" + serviceLife
-           + ", productSpec=" + productSpec + ", productType=" + productType + ", productBrand=" + productBrand + ", productCC=" + productCC + ", productColor=" + productColor + ", engineSN=" + engineSN
-           + ", licenseNo=" + licenseNo + ", licenseTypeCode=" + licenseTypeCode + ", licenseUsageCode=" + licenseUsageCode + ", liceneIssueDate=" + liceneIssueDate + ", mfgYearMonth=" + mfgYearMonth + ", vehicleTypeCode=" + vehicleTypeCode
-           + ", vehicleStyleCode=" + vehicleStyleCode + ", vehicleOfficeCode=" + vehicleOfficeCode + ", currency=" + currency + ", exchangeRate=" + exchangeRate + ", insurance=" + insurance + ", loanToValue=" + loanToValue
-           + ", scrapValue=" + scrapValue + ", mtgCode=" + mtgCode + ", mtgCheck=" + mtgCheck + ", mtgLoan=" + mtgLoan + ", mtgPledge=" + mtgPledge + ", settingStat=" + settingStat
-           + ", clStat=" + clStat + ", settingDate=" + settingDate + ", settingAmt=" + settingAmt + ", receiptNo=" + receiptNo + ", mtgNo=" + mtgNo + ", receivedDate=" + receivedDate
-           + ", mortgageIssueStartDate=" + mortgageIssueStartDate + ", mortgageIssueEndDate=" + mortgageIssueEndDate + ", remark=" + remark + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "ClMovables [clMovablesId=" + clMovablesId + ", ownerCustUKey=" + ownerCustUKey + ", serviceLife=" + serviceLife + ", productSpec=" + productSpec
+           + ", productType=" + productType + ", productBrand=" + productBrand + ", productCC=" + productCC + ", productColor=" + productColor + ", engineSN=" + engineSN + ", licenseNo=" + licenseNo
+           + ", licenseTypeCode=" + licenseTypeCode + ", licenseUsageCode=" + licenseUsageCode + ", liceneIssueDate=" + liceneIssueDate + ", mfgYearMonth=" + mfgYearMonth + ", vehicleTypeCode=" + vehicleTypeCode + ", vehicleStyleCode=" + vehicleStyleCode
+           + ", vehicleOfficeCode=" + vehicleOfficeCode + ", currency=" + currency + ", exchangeRate=" + exchangeRate + ", insurance=" + insurance + ", loanToValue=" + loanToValue + ", scrapValue=" + scrapValue
+           + ", mtgCode=" + mtgCode + ", mtgCheck=" + mtgCheck + ", mtgLoan=" + mtgLoan + ", mtgPledge=" + mtgPledge + ", settingStat=" + settingStat + ", clStat=" + clStat
+           + ", settingDate=" + settingDate + ", settingAmt=" + settingAmt + ", receiptNo=" + receiptNo + ", mtgNo=" + mtgNo + ", receivedDate=" + receivedDate + ", mortgageIssueStartDate=" + mortgageIssueStartDate
+           + ", mortgageIssueEndDate=" + mortgageIssueEndDate + ", remark=" + remark + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

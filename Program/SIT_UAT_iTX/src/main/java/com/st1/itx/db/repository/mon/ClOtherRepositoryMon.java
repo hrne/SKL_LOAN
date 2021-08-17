@@ -28,8 +28,8 @@ public interface ClOtherRepositoryMon extends JpaRepository<ClOther, ClOtherId> 
   // ClCode1 = ,AND ClCode2 = 
   public Slice<ClOther> findAllByClCode1IsAndClCode2Is(int clCode1_0, int clCode2_1, Pageable pageable);
 
-  // IssuingId = ,AND DocNo = ,AND OwnerId =
-  public Slice<ClOther> findAllByIssuingIdIsAndDocNoIsAndOwnerIdIs(String issuingId_0, String docNo_1, String ownerId_2, Pageable pageable);
+  // IssuingId = ,AND DocNo = ,AND OwnerCustUKey =
+  public Slice<ClOther> findAllByIssuingIdIsAndDocNoIsAndOwnerCustUKeyIs(String issuingId_0, String docNo_1, String ownerCustUKey_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

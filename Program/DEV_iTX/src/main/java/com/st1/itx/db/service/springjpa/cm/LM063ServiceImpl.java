@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,12 +14,11 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
- 
+
 @Service
 @Repository
 /* 逾期放款明細 */
 public class LM063ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM063ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -44,7 +41,7 @@ public class LM063ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMonth = iMonth - 1;
 		}
 
-		logger.info("lM063.findAll iYear=" + iYear + ",iMonth=" + iMonth);
+		this.info("lM063.findAll iYear=" + iYear + ",iMonth=" + iMonth);
 
 		String sql = "SELECT R.\"CustNo\" AS F0";
 		sql += "			,R.\"FacmNo\" AS F1";
@@ -78,12 +75,12 @@ public class LM063ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		AND R.\"LoanBal\" > 0 ";
 		sql += "	  ORDER BY R.\"CustNo\",R.\"FacmNo\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yyyymm", iYear+String.format("%02d",iMonth));
+		query.setParameter("yyyymm", iYear + String.format("%02d", iMonth));
 		return this.convertToMap(query.getResultList());
 	}
 }

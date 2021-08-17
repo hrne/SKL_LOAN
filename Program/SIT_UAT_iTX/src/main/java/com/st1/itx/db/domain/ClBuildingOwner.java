@@ -27,7 +27,7 @@ public class ClBuildingOwner implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7663708745131550696L;
+	private static final long serialVersionUID = -6500529093173553380L;
 
 @EmbeddedId
   private ClBuildingOwnerId clBuildingOwnerId;
@@ -44,13 +44,9 @@ public class ClBuildingOwner implements Serializable {
   @Column(name = "`ClNo`", insertable = false, updatable = false)
   private int clNo = 0;
 
-  // 所有權人統編
-  @Column(name = "`OwnerId`", length = 10, insertable = false, updatable = false)
-  private String ownerId;
-
-  // 所有權人姓名
-  @Column(name = "`OwnerName`", length = 100)
-  private String ownerName;
+  // 客戶識別碼
+  @Column(name = "`OwnerCustUKey`", length = 32, insertable = false, updatable = false)
+  private String ownerCustUKey;
 
   // 與授信戶關係
   /* 參考CdGuarantor */
@@ -150,41 +146,22 @@ public class ClBuildingOwner implements Serializable {
   }
 
 /**
-	* 所有權人統編<br>
+	* 客戶識別碼<br>
 	* 
 	* @return String
 	*/
-  public String getOwnerId() {
-    return this.ownerId == null ? "" : this.ownerId;
+  public String getOwnerCustUKey() {
+    return this.ownerCustUKey == null ? "" : this.ownerCustUKey;
   }
 
 /**
-	* 所有權人統編<br>
+	* 客戶識別碼<br>
 	* 
   *
-  * @param ownerId 所有權人統編
+  * @param ownerCustUKey 客戶識別碼
 	*/
-  public void setOwnerId(String ownerId) {
-    this.ownerId = ownerId;
-  }
-
-/**
-	* 所有權人姓名<br>
-	* 
-	* @return String
-	*/
-  public String getOwnerName() {
-    return this.ownerName == null ? "" : this.ownerName;
-  }
-
-/**
-	* 所有權人姓名<br>
-	* 
-  *
-  * @param ownerName 所有權人姓名
-	*/
-  public void setOwnerName(String ownerName) {
-    this.ownerName = ownerName;
+  public void setOwnerCustUKey(String ownerCustUKey) {
+    this.ownerCustUKey = ownerCustUKey;
   }
 
 /**
@@ -323,8 +300,7 @@ public class ClBuildingOwner implements Serializable {
 
   @Override
   public String toString() {
-    return "ClBuildingOwner [clBuildingOwnerId=" + clBuildingOwnerId + ", ownerName=" + ownerName + ", ownerRelCode=" + ownerRelCode
-           + ", ownerPart=" + ownerPart + ", ownerTotal=" + ownerTotal + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+    return "ClBuildingOwner [clBuildingOwnerId=" + clBuildingOwnerId + ", ownerRelCode=" + ownerRelCode + ", ownerPart=" + ownerPart
+           + ", ownerTotal=" + ownerTotal + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

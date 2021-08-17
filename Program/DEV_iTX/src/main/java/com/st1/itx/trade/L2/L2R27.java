@@ -21,6 +21,8 @@ import com.st1.itx.db.domain.ClBuildingReason;
 import com.st1.itx.db.domain.ClParking;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingParkingService;
 import com.st1.itx.db.service.ClBuildingPublicService;
@@ -70,6 +72,9 @@ public class L2R27 extends TradeBuffer {
 	@Autowired
 	public ClParkingService sClParkingService;
 
+	@Autowired
+	public CustMainService sCustMainService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -378,8 +383,9 @@ public class L2R27 extends TradeBuffer {
 			this.info("tClBuildingOwnerL2416 " + tClBuildingOwner);
 
 			// 判斷是否有資料 無資料new table給tota
-			this.totaVo.putParam("L2r27OwnerId" + k, tClBuildingOwner.getOwnerId());
-			this.totaVo.putParam("L2r27OwnerName" + k, tClBuildingOwner.getOwnerName());
+			CustMain custMain = sCustMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
+			this.totaVo.putParam("L2r27OwnerId" + k, custMain.getCustId());
+			this.totaVo.putParam("L2r27OwnerName" + k, custMain.getCustName());
 			this.totaVo.putParam("L2r27OwnerRelCode" + k, tClBuildingOwner.getOwnerRelCode());
 			this.totaVo.putParam("L2r27OwnerPart" + k, tClBuildingOwner.getOwnerPart());
 			this.totaVo.putParam("L2r27OwnerTotal" + k, tClBuildingOwner.getOwnerTotal());

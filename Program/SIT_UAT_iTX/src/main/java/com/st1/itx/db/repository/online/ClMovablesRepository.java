@@ -31,8 +31,8 @@ public interface ClMovablesRepository extends JpaRepository<ClMovables, ClMovabl
   // ClCode1 = ,AND ClCode2 >= ,AND ClCode2 <= ,AND ClNo = 
   public Slice<ClMovables> findAllByClCode1IsAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoIs(int clCode1_0, int clCode2_1, int clCode2_2, int clNo_3, Pageable pageable);
 
-  // ProductBrand = ,AND ProductSpec = ,AND OwnerId =
-  public Slice<ClMovables> findAllByProductBrandIsAndProductSpecIsAndOwnerIdIs(String productBrand_0, String productSpec_1, String ownerId_2, Pageable pageable);
+  // ProductBrand = ,AND ProductSpec = ,AND OwnerCustUKey =
+  public Slice<ClMovables> findAllByProductBrandIsAndProductSpecIsAndOwnerCustUKeyIs(String productBrand_0, String productSpec_1, String ownerCustUKey_2, Pageable pageable);
 
   // ProductBrand =
   public Slice<ClMovables> findAllByProductBrandIs(String productBrand_0, Pageable pageable);

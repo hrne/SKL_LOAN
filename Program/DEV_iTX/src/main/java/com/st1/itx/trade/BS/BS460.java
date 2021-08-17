@@ -68,7 +68,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS460 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS460.class);
 
 	/* 日期工具 */
 	@Autowired
@@ -161,11 +160,9 @@ public class BS460 extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-					"L4600 已產生火險到期檔", titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4600 已產生火險到期檔", titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -207,8 +204,7 @@ public class BS460 extends TradeBuffer {
 		// 轉換資料格式
 		ArrayList<String> file = insuRenewFileVo.toFile();
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔",
-				"LNM01P.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -306,8 +302,7 @@ public class BS460 extends TradeBuffer {
 				}
 
 //				戶號 抓取 擔保品關聯額度檔
-				sClFac = clFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(),
-						tInsuOrignal.getClNo(), this.index, this.limit);
+				sClFac = clFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(), tInsuOrignal.getClNo(), this.index, this.limit);
 
 				lClFac = sClFac == null ? null : sClFac.getContent();
 
@@ -452,8 +447,7 @@ public class BS460 extends TradeBuffer {
 				InsuRenew tempInsuRenew = new InsuRenew();
 
 				InsuOrignal tInsuOrignal = new InsuOrignal();
-				tInsuOrignal = insuOrignalService.clNoFirst(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(),
-						tInsuRenew.getClNo());
+				tInsuOrignal = insuOrignalService.clNoFirst(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(), tInsuRenew.getClNo());
 
 				tInsuRenewId.setClCode1(tInsuRenew.getInsuRenewId().getClCode1());
 				tInsuRenewId.setClCode2(tInsuRenew.getInsuRenewId().getClCode2());
@@ -520,8 +514,7 @@ public class BS460 extends TradeBuffer {
 
 				Slice<LoanBorMain> sLoanBorMain = null;
 
-				sLoanBorMain = loanBorMainService.bormCustNoEq(pClFac.getCustNo(), pClFac.getFacmNo(),
-						pClFac.getFacmNo(), 0, 999, this.index, this.limit);
+				sLoanBorMain = loanBorMainService.bormCustNoEq(pClFac.getCustNo(), pClFac.getFacmNo(), pClFac.getFacmNo(), 0, 999, this.index, this.limit);
 
 				lLoanBorMain = sLoanBorMain == null ? null : sLoanBorMain.getContent();
 
@@ -809,16 +802,23 @@ public class BS460 extends TradeBuffer {
 				tFacMain = facMainService.findById(tFacMainId);
 
 				ClBuildingOwner tClBuildingOwner = new ClBuildingOwner();
-				tClBuildingOwner = clBuildingOwnerService.clNoFirst(tInsuRenew.getInsuRenewId().getClCode1(),
-						tInsuRenew.getInsuRenewId().getClCode2(), tInsuRenew.getInsuRenewId().getClNo());
+				tClBuildingOwner = clBuildingOwnerService.clNoFirst(tInsuRenew.getInsuRenewId().getClCode1(), tInsuRenew.getInsuRenewId().getClCode2(), tInsuRenew.getInsuRenewId().getClNo());
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("FireInsuMonth", FormatUtil.padX("" + (tInsuRenew.getInsuYearMonth()), 6));
 				occursList.putParam("ReturnCode", FormatUtil.pad9("99", 2));
 				occursList.putParam("InsuCampCode", FormatUtil.pad9("01", 2));
 				if (tClBuildingOwner != null) {
-					occursList.putParam("InsuCustId", FormatUtil.padX(tClBuildingOwner.getOwnerId(), 10));
-					occursList.putParam("InsuCustName", FormatUtil.padX(tClBuildingOwner.getOwnerName(), 12));
+//					occursList.putParam("InsuCustId", FormatUtil.padX(tClBuildingOwner.getOwnerId(), 10));
+//					occursList.putParam("InsuCustName", FormatUtil.padX(tClBuildingOwner.getOwnerName(), 12));
+					CustMain custMain = custMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
+					if (custMain != null) {
+						occursList.putParam("InsuCustId", FormatUtil.padX(custMain.getCustId(), 10));
+						occursList.putParam("InsuCustName", FormatUtil.padX(custMain.getCustName(), 12));
+					} else {
+						occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
+						occursList.putParam("InsuCustName", FormatUtil.padX("", 12));
+					}
 				} else {
 					occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
 					occursList.putParam("InsuCustName", FormatUtil.padX("", 12));
@@ -840,11 +840,10 @@ public class BS460 extends TradeBuffer {
 					List<ClBuildingParking> lClBuildingParking = new ArrayList<ClBuildingParking>();
 					List<ClBuildingPublic> lClBuildingPublic = new ArrayList<ClBuildingPublic>();
 
-					Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(
-							tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index,
-							this.limit, titaVo);
-					Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(),
-							tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit, titaVo);
+					Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit,
+							titaVo);
+					Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit,
+							titaVo);
 
 					lClBuildingParking = sClBuildingParking == null ? null : sClBuildingParking.getContent();
 					lClBuildingPublic = sClBuildingPublic == null ? null : sClBuildingPublic.getContent();
@@ -864,11 +863,9 @@ public class BS460 extends TradeBuffer {
 					subArea = tClBuilding.getBdSubArea();
 					occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain), 5));
 					occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 58));
-					occursList.putParam("BuildingSquare",
-							FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
+					occursList.putParam("BuildingSquare", FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
 					occursList.putParam("BuildingCode", FormatUtil.pad9("" + tClBuilding.getBdMtrlCode(), 2));
-					occursList.putParam("BuildingYears",
-							FormatUtil.pad9(("" + tClBuilding.getBdDate()), 7).substring(0, 3));
+					occursList.putParam("BuildingYears", FormatUtil.pad9(("" + tClBuilding.getBdDate()), 7).substring(0, 3));
 					occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getFloor(), 2));
 					occursList.putParam("RoofCode", FormatUtil.pad9("" + tClBuilding.getRoofStructureCode(), 2));
 					occursList.putParam("BusinessUnit", FormatUtil.pad9("" + tClBuilding.getBdMainUseCode(), 4));
@@ -915,8 +912,7 @@ public class BS460 extends TradeBuffer {
 				}
 //				2.續保檔 = 原保險單號碼(t)=目前保險單號碼(t2)
 				else {
-					InsuRenew t2InsuRenew = insuRenewService.findL4600AFirst(tInsuRenew.getInsuRenewId().getClCode1(),
-							tInsuRenew.getInsuRenewId().getClCode2(), tInsuRenew.getInsuRenewId().getClNo(),
+					InsuRenew t2InsuRenew = insuRenewService.findL4600AFirst(tInsuRenew.getInsuRenewId().getClCode1(), tInsuRenew.getInsuRenewId().getClCode2(), tInsuRenew.getInsuRenewId().getClNo(),
 							tInsuRenew.getInsuRenewId().getPrevInsuNo(), titaVo);
 					b4StartDate = t2InsuRenew.getInsuStartDate();
 					b4EndDate = t2InsuRenew.getInsuEndDate();
@@ -982,8 +978,7 @@ public class BS460 extends TradeBuffer {
 						occursList.putParam("RenewUnit", FormatUtil.padX("", 10));
 					}
 					occursList.putParam("Remark1", FormatUtil.padX("", 16));
-					occursList.putParam("MailingAddress",
-							FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain), 60));
+					occursList.putParam("MailingAddress", FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain), 60));
 					occursList.putParam("Remark2", FormatUtil.padX("", 39));
 					occursList.putParam("Space46", FormatUtil.padX("", 46));
 
@@ -1028,8 +1023,7 @@ public class BS460 extends TradeBuffer {
 
 		String sInsuEndMonth = iInsuEndMonth + "";
 
-		sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(sInsuEndMonth, sInsuEndMonth, this.index,
-				this.limit, titaVo);
+		sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(sInsuEndMonth, sInsuEndMonth, this.index, this.limit, titaVo);
 
 		lInsuRenewMediaTemp = sInsuRenewMediaTemp == null ? null : sInsuRenewMediaTemp.getContent();
 

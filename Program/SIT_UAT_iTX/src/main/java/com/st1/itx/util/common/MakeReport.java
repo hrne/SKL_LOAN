@@ -967,7 +967,7 @@ public class MakeReport extends CommBuffer {
 					// 報表啟始
 					String papersize = map.get("paper").toString();
 
-					int i = papersize.indexOf(',');
+//					int i = papersize.indexOf(',');
 					String[] ss = papersize.split(",");
 
 					Rectangle pagesize = PageSize.A4;

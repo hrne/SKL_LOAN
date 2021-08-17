@@ -23,7 +23,7 @@ import com.st1.itx.db.domain.CustNoticeId;
 public interface CustNoticeRepository extends JpaRepository<CustNotice, CustNoticeId> {
 
   // CustNo =
-  public Slice<CustNotice> findAllByCustNoIs(int custNo_0, Pageable pageable);
+  public Slice<CustNotice> findAllByCustNoIsOrderByFacmNoAsc(int custNo_0, Pageable pageable);
 
   // FormNo =
   public Slice<CustNotice> findAllByFormNoIs(String formNo_0, Pageable pageable);

@@ -15,6 +15,8 @@ import com.st1.itx.db.domain.ClOther;
 import com.st1.itx.db.domain.ClOtherId;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClOtherService;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -28,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R26 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R26.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -38,6 +39,9 @@ public class L2R26 extends TradeBuffer {
 	@Autowired
 	public ClMainService sClMainService;
 
+	@Autowired
+	public CustMainService sCustMainService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -117,28 +121,37 @@ public class L2R26 extends TradeBuffer {
 		this.totaVo.putParam("L2r26PledgeEndDate", tClOther.getPledgeEndDate());
 		this.totaVo.putParam("L2r26PledgeBankCode", tClOther.getPledgeBankCode());
 		this.totaVo.putParam("L2r26PledgeNO", tClOther.getPledgeNO());
-		this.totaVo.putParam("L2r26OwnerId", tClOther.getOwnerId());
-		this.totaVo.putParam("L2r26OwnerName", tClOther.getOwnerName());
+//		this.totaVo.putParam("L2r26OwnerId", tClOther.getOwnerId());
+//		this.totaVo.putParam("L2r26OwnerName", tClOther.getOwnerName());
+		CustMain custMain = sCustMainService.findById(tClOther.getOwnerCustUKey(), titaVo);
+		if (custMain != null) {
+			this.totaVo.putParam("L2r26OwnerId", custMain.getCustId());
+			this.totaVo.putParam("L2r26OwnerName", custMain.getCustName());
+		} else {
+			this.totaVo.putParam("L2r26OwnerId", "");
+			this.totaVo.putParam("L2r26OwnerName", "");
+		}
+		
 		this.totaVo.putParam("L2r26IssuingId", tClOther.getIssuingId());
 		this.totaVo.putParam("L2r26IssuingCounty", tClOther.getIssuingCounty());
 		this.totaVo.putParam("L2r26DocNo", tClOther.getDocNo());
 		this.totaVo.putParam("L2r26LoanToValue", tClOther.getLoanToValue());
-		
-		this.totaVo.putParam("L2r26SecuritiesType",tClOther.getSecuritiesType());
-		this.totaVo.putParam("L2r26Listed",tClOther.getListed());
-		this.totaVo.putParam("L2r26OfferingDate",tClOther.getOfferingDate());
-		this.totaVo.putParam("L2r26ExpirationDate",tClOther.getExpirationDate());
-		this.totaVo.putParam("L2r26TargetIssuer",tClOther.getTargetIssuer());
-		this.totaVo.putParam("L2r26SubTargetIssuer",tClOther.getSubTargetIssuer());
-		this.totaVo.putParam("L2r26CreditDate",tClOther.getCreditDate());
-		this.totaVo.putParam("L2r26Credit",tClOther.getCredit());
-		this.totaVo.putParam("L2r26ExternalCredit",tClOther.getExternalCredit());
-		this.totaVo.putParam("L2r26Index",tClOther.getIndex());
-		this.totaVo.putParam("L2r26TradingMethod",tClOther.getTradingMethod());
-		this.totaVo.putParam("L2r26Compensation",tClOther.getCompensation());
-		this.totaVo.putParam("L2r26Investment",tClOther.getInvestment());
-		this.totaVo.putParam("L2r26PublicValue",tClOther.getPublicValue());
-		
+
+		this.totaVo.putParam("L2r26SecuritiesType", tClOther.getSecuritiesType());
+		this.totaVo.putParam("L2r26Listed", tClOther.getListed());
+		this.totaVo.putParam("L2r26OfferingDate", tClOther.getOfferingDate());
+		this.totaVo.putParam("L2r26ExpirationDate", tClOther.getExpirationDate());
+		this.totaVo.putParam("L2r26TargetIssuer", tClOther.getTargetIssuer());
+		this.totaVo.putParam("L2r26SubTargetIssuer", tClOther.getSubTargetIssuer());
+		this.totaVo.putParam("L2r26CreditDate", tClOther.getCreditDate());
+		this.totaVo.putParam("L2r26Credit", tClOther.getCredit());
+		this.totaVo.putParam("L2r26ExternalCredit", tClOther.getExternalCredit());
+		this.totaVo.putParam("L2r26Index", tClOther.getIndex());
+		this.totaVo.putParam("L2r26TradingMethod", tClOther.getTradingMethod());
+		this.totaVo.putParam("L2r26Compensation", tClOther.getCompensation());
+		this.totaVo.putParam("L2r26Investment", tClOther.getInvestment());
+		this.totaVo.putParam("L2r26PublicValue", tClOther.getPublicValue());
+
 		this.totaVo.putParam("L2r26SettingStat", tClOther.getSettingStat());
 		this.totaVo.putParam("L2r26ClStat", tClOther.getClStat());
 		this.totaVo.putParam("L2r26SettingDate", tClOther.getSettingDate());

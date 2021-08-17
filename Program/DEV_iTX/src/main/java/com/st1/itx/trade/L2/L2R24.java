@@ -12,6 +12,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClMovables;
 import com.st1.itx.db.domain.ClMovablesId;
 import com.st1.itx.db.service.ClMovablesService;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -25,11 +27,13 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R24 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R24.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public ClMovablesService sClMovablesService;
+	
+	@Autowired
+	public CustMainService sCustMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -93,8 +97,17 @@ public class L2R24 extends TradeBuffer {
 		this.totaVo.putParam("L2r24ClCode1", tClMovables.getClCode1());
 		this.totaVo.putParam("L2r24ClCode2", tClMovables.getClCode2());
 		this.totaVo.putParam("L2r24ClNo", tClMovables.getClNo());
-		this.totaVo.putParam("L2r24OwnerId", tClMovables.getOwnerId());
-		this.totaVo.putParam("L2r24OwnerName", tClMovables.getOwnerName());
+//		this.totaVo.putParam("L2r24OwnerId", tClMovables.getOwnerId());
+//		this.totaVo.putParam("L2r24OwnerName", tClMovables.getOwnerName());
+		CustMain custMain = sCustMainService.findById(tClMovables.getOwnerCustUKey(), titaVo);
+		if (custMain != null) {
+			this.totaVo.putParam("L2r24OwnerId", custMain.getCustId());
+			this.totaVo.putParam("L2r24OwnerName", custMain.getCustName());
+		} else {
+			this.totaVo.putParam("L2r24OwnerId", "");
+			this.totaVo.putParam("L2r24OwnerName", "");
+		}
+		
 		this.totaVo.putParam("L2r24ServiceLife", tClMovables.getServiceLife());
 		this.totaVo.putParam("L2r24ProductSpec", tClMovables.getProductSpec());
 		this.totaVo.putParam("L2r24ProductType", tClMovables.getProductType());
@@ -106,7 +119,7 @@ public class L2R24 extends TradeBuffer {
 		this.totaVo.putParam("L2r24LicenseTypeCode", tClMovables.getLicenseTypeCode());
 		this.totaVo.putParam("L2r24LicenseUsageCode", tClMovables.getLicenseUsageCode());
 		this.totaVo.putParam("L2r24LiceneIssueDate", tClMovables.getLiceneIssueDate());
-		
+
 		if (tClMovables.getMfgYearMonth() > 0) {
 			if (tClMovables.getMfgYearMonth() > 191100) {
 				this.totaVo.putParam("L2r24MfgYearMonth", tClMovables.getMfgYearMonth() - 191100);
@@ -116,7 +129,7 @@ public class L2R24 extends TradeBuffer {
 		} else {
 			this.totaVo.putParam("L2r24MfgYearMonth", "");
 		}
-		
+
 		this.totaVo.putParam("L2r24VehicleTypeCode", tClMovables.getVehicleTypeCode());
 		this.totaVo.putParam("L2r24VehicleStyleCode", tClMovables.getVehicleStyleCode());
 		this.totaVo.putParam("L2r24VehicleOfficeCode", tClMovables.getVehicleOfficeCode());

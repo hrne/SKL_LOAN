@@ -25,8 +25,8 @@ public interface ClBuildingOwnerRepositoryMon extends JpaRepository<ClBuildingOw
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
   public Slice<ClBuildingOwner> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // OwnerId = 
-  public Slice<ClBuildingOwner> findAllByOwnerIdIs(String ownerId_0, Pageable pageable);
+  // OwnerCustUKey = 
+  public Slice<ClBuildingOwner> findAllByOwnerCustUKeyIsOrderByClCode1AscClCode2AscClNoAsc(String ownerCustUKey_0, Pageable pageable);
 
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
   public Optional<ClBuildingOwner> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByOwnerRelCodeAsc(int clCode1_0, int clCode2_1, int clNo_2);

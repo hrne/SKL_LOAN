@@ -19,6 +19,7 @@ import com.st1.itx.db.service.CdVarValueService;
 import com.st1.itx.db.service.springjpa.cm.LM049ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.ExcelFontStyleVo;
 import com.st1.itx.util.format.FormatUtil;
 
 @Component
@@ -51,7 +52,7 @@ public class LM049Report extends MakeReport {
 
 		int entdy = titaVo.getEntDyI() + 19110000;
 
-		entdy = entdy / 10000;
+		entdy = entdy / 100;
 
 		CdVarValue tCdVarValue = cdVarValueService.findYearMonthFirst(entdy, titaVo);
 
@@ -101,7 +102,7 @@ public class LM049Report extends MakeReport {
 			outputNetValueDataDate = outputNetValueDataDate.substring(0, 3) + "." + outputNetValueDataDate.substring(3);
 		}
 		makeExcel.setValue(2, 5, outputNetValueDataDate + " 淨值（核閱數）");
-		makeExcel.setValue(2, 6, divThousand(netValue), "#,##0");
+		makeExcel.setValue(2, 7, divThousand(netValue), "#,##0");
 
 		// 整理資料
 		// 根據CusType & CusSCD 區分大類 A B C D
@@ -120,8 +121,8 @@ public class LM049Report extends MakeReport {
 			String tCusType = tLM049.get("F0");
 			String tCusSCD = tLM049.get("F1");
 
-			this.info("tCusType = " + tCusType);
-			this.info("tCusSCD = " + tCusSCD);
+//			this.info("tCusType = " + tCusType);
+//			this.info("tCusSCD = " + tCusSCD);
 
 			switch (tCusType) {
 			case "1":
@@ -151,45 +152,68 @@ public class LM049Report extends MakeReport {
 
 		if (listA.size() > 1) {
 			// 將表格往下移，移出空間
-			makeExcel.setShiftRow(rowCursorA, listA.size());
+			makeExcel.setShiftRow(rowCursorA + 1, listA.size() - 1);
 			// 更新行數指標
 			rowCursorB += listA.size() - 1;
 			rowCursorC += listA.size() - 1;
 			rowCursorD += listA.size() - 1;
 			rowCursorTotal += listA.size() - 1;
+		}
+		if (listA.size() > 0) {
 			// 寫入資料
 			setValueToExcel(rowCursorA, listA);
 		}
 		if (listB.size() > 1) {
 			// 將表格往下移，移出空間
-			makeExcel.setShiftRow(rowCursorB, listB.size());
+			makeExcel.setShiftRow(rowCursorB + 1, listB.size() - 1);
 			// 更新行數指標
 			rowCursorC += listB.size() - 1;
 			rowCursorD += listB.size() - 1;
 			rowCursorTotal += listB.size() - 1;
+		}
+		if (listB.size() > 0) {
 			// 寫入資料
 			setValueToExcel(rowCursorB, listB);
 		}
 		if (listC.size() > 1) {
 			// 將表格往下移，移出空間
-			makeExcel.setShiftRow(rowCursorC, listC.size());
+			makeExcel.setShiftRow(rowCursorC + 1, listC.size() - 1);
 			// 更新行數指標
 			rowCursorD += listC.size() - 1;
 			rowCursorTotal += listC.size() - 1;
+		}
+		if (listC.size() > 0) {
 			// 寫入資料
 			setValueToExcel(rowCursorC, listC);
 		}
 		if (listD.size() > 1) {
 			// 將表格往下移，移出空間
-			makeExcel.setShiftRow(rowCursorD, listD.size());
+			makeExcel.setShiftRow(rowCursorD + 1, listD.size() - 1);
 			// 更新行數指標
 			rowCursorTotal += listD.size() - 1;
+		}
+		if (listD.size() > 0) {
 			// 寫入資料
 			setValueToExcel(rowCursorD, listD);
 		}
 
 		// 寫入合計資料
 		makeExcel.setValue(rowCursorTotal, 13, divThousand(totalOfLoanBal), "#,##0");
+
+		// 合計之佔淨值比
+		makeExcel.setValue(rowCursorTotal, 14, computeDivide(totalOfLoanBal, netValue, 8), "#,##0.00");
+
+		ExcelFontStyleVo efsVo = new ExcelFontStyleVo();
+
+		efsVo.setAlign("L");
+		efsVo.setBold(true);
+		efsVo.setFont((short) 1);
+		efsVo.setSize((short) 14);
+
+		// 寫簽核
+		makeExcel.setMergedRegion(rowCursorTotal + 2, rowCursorTotal + 2, 2, 16);
+		makeExcel.setValue(rowCursorTotal + 2, 2,
+				"經 辦：                      經理：                       風險管理人：                       協理：", efsVo);
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
@@ -244,6 +268,9 @@ public class LM049Report extends MakeReport {
 				computeLoanBal = computeLoanBal.add(clLoanBal.get(custNoClNo));
 			}
 
+			this.info("custNoClNo = " + custNoClNo);
+			this.info("computeLoanBal = " + computeLoanBal);
+
 			clLoanBal.put(custNoClNo, computeLoanBal);
 		}
 
@@ -259,7 +286,7 @@ public class LM049Report extends MakeReport {
 			makeExcel.setValue(rowCursor, 4, map.get("DrawdownDate"));
 			makeExcel.setValue(rowCursor, 5, map.get("MaturityDate"));
 			// 放款利率
-			makeExcel.setValue(rowCursor, 6, map.get("StoreRate"));
+			makeExcel.setValue(rowCursor, 6, getBigDecimal(map.get("StoreRate")), "#,##0.000");
 
 			// 貸放成數特殊邏輯
 			// 同擔保品時,先合計放款餘額再除以擔保品估價
@@ -267,7 +294,7 @@ public class LM049Report extends MakeReport {
 
 			BigDecimal evaAmt = clEvaAmt.get(custNoClNo);
 			BigDecimal loanBalGroupByCollateral = clLoanBal.get(custNoClNo);
-			BigDecimal loanToValue = computeDivide(loanBalGroupByCollateral.multiply(getBigDecimal("100")), evaAmt, 2);
+			BigDecimal loanToValue = computeDivide(loanBalGroupByCollateral, evaAmt, 2);
 
 			// 擔保品估價
 			makeExcel.setValue(rowCursor, 7, divThousand(evaAmt), "#,##0");
@@ -289,6 +316,8 @@ public class LM049Report extends MakeReport {
 
 			// 授信餘額
 			makeExcel.setValue(rowCursor, 13, divThousand(loanBalGroupByCollateral), "#,##0");
+			// 佔淨值比
+			makeExcel.setValue(rowCursor, 14, computeDivide(loanBalGroupByCollateral, netValue, 8), "#,##0.00");
 			// 額度
 			makeExcel.setValue(rowCursor, 15, map.get("FacmNo"));
 			// 備註說明
@@ -327,12 +356,15 @@ public class LM049Report extends MakeReport {
 		}
 
 		// 合併儲存格
-		if (sameCollateralRange != null && sameCollateralRange.isEmpty()) {
+		if (sameCollateralRange != null && !sameCollateralRange.isEmpty()) {
 			mergeColumns(sameCollateralRange);
 		}
 
 		// 印小計
 		makeExcel.setValue(rowCursor, 13, divThousand(loanBalTotal), "#,##0");
+
+		// 小計之佔淨值比
+		makeExcel.setValue(rowCursor, 14, computeDivide(loanBalTotal, netValue, 8), "#,##0.00");
 
 		// 計算總計
 		totalOfLoanBal = totalOfLoanBal.add(loanBalTotal);
@@ -346,22 +378,26 @@ public class LM049Report extends MakeReport {
 	private void mergeColumns(Map<String, int[]> sameCollateralRange) {
 
 		sameCollateralRange.forEach((k, v) -> {
-			this.info("mergeColumns k " + k);
-			this.info("mergeColumns v[0] " + v[0]);
-			this.info("mergeColumns v[1] " + v[1]);
+//			this.info("mergeColumns k " + k);
+//			this.info("mergeColumns v[0] " + v[0]);
+//			this.info("mergeColumns v[1] " + v[1]);
 
-			// 戶名
-			makeExcel.setMergedRegion(v[0], v[1], 2, 2);
-			// 金控公司負責人及大股東
-			makeExcel.setMergedRegion(v[0], v[1], 3, 3);
-			// 擔保品估價
-			makeExcel.setMergedRegion(v[0], v[1], 7, 7);
-			// 貸放成數
-			makeExcel.setMergedRegion(v[0], v[1], 8, 8);
-			// 授信餘額
-			makeExcel.setMergedRegion(v[0], v[1], 13, 13);
-			// 佔淨值比
-			makeExcel.setMergedRegion(v[0], v[1], 14, 14);
+			if (v[0] < v[1]) {
+				// 戶名
+				makeExcel.setMergedRegion(v[0], v[1], 2, 2);
+				// 金控公司負責人及大股東
+				makeExcel.setMergedRegion(v[0], v[1], 3, 3);
+				// 擔保品估價
+				makeExcel.setMergedRegion(v[0], v[1], 7, 7);
+				// 貸放成數
+				makeExcel.setMergedRegion(v[0], v[1], 8, 8);
+				// 授信餘額
+				makeExcel.setMergedRegion(v[0], v[1], 13, 13);
+				// 佔淨值比
+				makeExcel.setMergedRegion(v[0], v[1], 14, 14);
+				// 備註說明
+				makeExcel.setMergedRegion(v[0], v[1], 14, 16);
+			}
 		});
 
 	}
@@ -374,13 +410,15 @@ public class LM049Report extends MakeReport {
 	 */
 	private BigDecimal divThousand(BigDecimal input) {
 
-		this.info("divThousand input = " + input);
+//		this.info("divThousand input = " + input);
 
 		if (input == null) {
 			return BigDecimal.ZERO;
 		}
 
 		input = computeDivide(input, new BigDecimal("1000"), 3);
+
+//		this.info("divThousand return = " + input);
 
 		return input;
 	}

@@ -2,10 +2,6 @@ package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
 import java.util.List;
-/* log */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -35,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R02 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5R02.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegApprService sNegApprService;
@@ -59,44 +54,46 @@ public class L5R02 extends TradeBuffer {
 		this.limit = Integer.MAX_VALUE;// 查全部
 
 		String iYYY = titaVo.getParam("RimYYY").trim();// 民國年
-		String iMM = titaVo.getParam("RimMM").trim();//月
+		String iMM = titaVo.getParam("RimMM").trim();// 月
 		int iFunctionCode = Integer.parseInt(titaVo.getParam("RimFunctionCode").trim());
 
-		int YearMonth = Integer.parseInt(iYYY+iMM)+191100;
-		
-		Slice<NegAppr> slNegAppr;
-	
+		int YearMonth = Integer.parseInt(iYYY + iMM) + 191100;
 
-	    slNegAppr = sNegApprService.YyyyMmEq(YearMonth, this.index, this.limit, titaVo);
-	  
-	    if(iFunctionCode==1) {
-	    	if(slNegAppr!=null) {
-	    		throw new LogicException(titaVo, "E0002", iYYY + "/" + iMM);
-	    	}
-	    }
+		Slice<NegAppr> slNegAppr;
+
+		slNegAppr = sNegApprService.YyyyMmEq(YearMonth, this.index, this.limit, titaVo);
+
+		if (iFunctionCode == 1) {
+			if (slNegAppr != null) {
+				throw new LogicException(titaVo, "E0002", iYYY + "/" + iMM);
+			}
+		}
 
 		List<NegAppr> lNegAppr = slNegAppr == null ? null : slNegAppr.getContent();
 
-					
-		for(int i=1;i<=4;i++) {
-			totaVo.putParam("L5r02ExportDate"+i, 0);// 製檔日
-			totaVo.putParam("L5r02ApprAcDate"+ i, 0);// 傳票日
-			totaVo.putParam("L5r02BringUpDate"+i, 0);// 提兌日
+		for (int i = 1; i <= 4; i++) {
+			totaVo.putParam("L5r02ExportDate" + i, 0);// 製檔日
+			totaVo.putParam("L5r02ApprAcDate" + i, 0);// 傳票日
+			totaVo.putParam("L5r02BringUpDate" + i, 0);// 提兌日
+			totaVo.putParam("L5r02ExportMark" + i, 0);// 製檔日記號
+			totaVo.putParam("L5r02ApprAcMark" + i, 0);// 傳票日記號
+			totaVo.putParam("L5r02BringUpMark" + i, 0);// 提兌日記號
 		}
-		
-		
-		if(lNegAppr!=null) {
-			for(int i=1;i<=4;i++) {
-			  for (NegAppr NegApprVO : lNegAppr) {
-				if(NegApprVO.getKindCode()==i) {
-					totaVo.putParam("L5r02ExportDate"+i, NegApprVO.getExportDate());// 製檔日
-					totaVo.putParam("L5r02ApprAcDate"+i, NegApprVO.getApprAcDate());// 傳票日
-					totaVo.putParam("L5r02BringUpDate"+i, NegApprVO.getBringUpDate());// 提兌日
-					}	
+
+		if (lNegAppr != null) {
+			for (int i = 1; i <= 4; i++) {
+				for (NegAppr NegApprVO : lNegAppr) {
+					if (NegApprVO.getKindCode() == i) {
+						totaVo.putParam("L5r02ExportDate" + i, NegApprVO.getExportDate());// 製檔日
+						totaVo.putParam("L5r02ApprAcDate" + i, NegApprVO.getApprAcDate());// 傳票日
+						totaVo.putParam("L5r02BringUpDate" + i, NegApprVO.getBringUpDate());// 提兌日
+						totaVo.putParam("L5r02ExportMark" + i, NegApprVO.getExportMark());// 製檔日記號
+						totaVo.putParam("L5r02ApprAcMark" + i, NegApprVO.getApprAcMark());// 傳票日記號
+						totaVo.putParam("L5r02BringUpMark" + i, NegApprVO.getBringUpMark());// 提兌日記號
+					}
 				}
-				}	
 			}
-		
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

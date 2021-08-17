@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("clOtherService")
 @Repository
-public class ClOtherServiceImpl implements ClOtherService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(ClOtherServiceImpl.class);
-
+public class ClOtherServiceImpl extends ASpringJpaParm implements ClOtherService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class ClOtherServiceImpl implements ClOtherService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + clOtherId);
+    this.info("findById " + dbName + " " + clOtherId);
     Optional<ClOther> clOther = null;
     if (dbName.equals(ContentName.onDay))
       clOther = clOtherReposDay.findById(clOtherId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = clOtherReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findClCode1 " + dbName + " : " + "clCode1_0 : " + clCode1_0);
+    this.info("findClCode1 " + dbName + " : " + "clCode1_0 : " + clCode1_0);
     if (dbName.equals(ContentName.onDay))
       slice = clOtherReposDay.findAllByClCode1Is(clCode1_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -153,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findClCode2 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1);
+    this.info("findClCode2 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1);
     if (dbName.equals(ContentName.onDay))
       slice = clOtherReposDay.findAllByClCode1IsAndClCode2Is(clCode1_0, clCode2_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -170,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<ClOther> findUnique(String issuingId_0, String docNo_1, String ownerId_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClOther> findUnique(String issuingId_0, String docNo_1, String ownerCustUKey_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClOther> slice = null;
     if (titaVo.length != 0)
@@ -181,15 +177,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findUnique " + dbName + " : " + "issuingId_0 : " + issuingId_0 + " docNo_1 : " +  docNo_1 + " ownerId_2 : " +  ownerId_2);
+    this.info("findUnique " + dbName + " : " + "issuingId_0 : " + issuingId_0 + " docNo_1 : " +  docNo_1 + " ownerCustUKey_2 : " +  ownerCustUKey_2);
     if (dbName.equals(ContentName.onDay))
-      slice = clOtherReposDay.findAllByIssuingIdIsAndDocNoIsAndOwnerIdIs(issuingId_0, docNo_1, ownerId_2, pageable);
+      slice = clOtherReposDay.findAllByIssuingIdIsAndDocNoIsAndOwnerCustUKeyIs(issuingId_0, docNo_1, ownerCustUKey_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clOtherReposMon.findAllByIssuingIdIsAndDocNoIsAndOwnerIdIs(issuingId_0, docNo_1, ownerId_2, pageable);
+      slice = clOtherReposMon.findAllByIssuingIdIsAndDocNoIsAndOwnerCustUKeyIs(issuingId_0, docNo_1, ownerCustUKey_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clOtherReposHist.findAllByIssuingIdIsAndDocNoIsAndOwnerIdIs(issuingId_0, docNo_1, ownerId_2, pageable);
+      slice = clOtherReposHist.findAllByIssuingIdIsAndDocNoIsAndOwnerCustUKeyIs(issuingId_0, docNo_1, ownerCustUKey_2, pageable);
     else 
-      slice = clOtherRepos.findAllByIssuingIdIsAndDocNoIsAndOwnerIdIs(issuingId_0, docNo_1, ownerId_2, pageable);
+      slice = clOtherRepos.findAllByIssuingIdIsAndDocNoIsAndOwnerCustUKeyIs(issuingId_0, docNo_1, ownerCustUKey_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -202,7 +198,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clOtherId);
+    this.info("Hold " + dbName + " " + clOtherId);
     Optional<ClOther> clOther = null;
     if (dbName.equals(ContentName.onDay))
       clOther = clOtherReposDay.findByClOtherId(clOtherId);
@@ -220,7 +216,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clOther.getClOtherId());
+    this.info("Hold " + dbName + " " + clOther.getClOtherId());
     Optional<ClOther> clOtherT = null;
     if (dbName.equals(ContentName.onDay))
       clOtherT = clOtherReposDay.findByClOtherId(clOther.getClOtherId());
@@ -242,7 +238,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + clOther.getClOtherId());
+    this.info("Insert..." + dbName + " " + clOther.getClOtherId());
     if (this.findById(clOther.getClOtherId()) != null)
       throw new DBException(2);
 
@@ -271,7 +267,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clOther.getClOtherId());
+    this.info("Update..." + dbName + " " + clOther.getClOtherId());
     if (!empNot.isEmpty())
       clOther.setLastUpdateEmpNo(empNot);
 
@@ -294,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clOther.getClOtherId());
+    this.info("Update..." + dbName + " " + clOther.getClOtherId());
     if (!empNot.isEmpty())
       clOther.setLastUpdateEmpNo(empNot);
 
@@ -314,7 +310,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + clOther.getClOtherId());
+    this.info("Delete..." + dbName + " " + clOther.getClOtherId());
     if (dbName.equals(ContentName.onDay)) {
       clOtherReposDay.delete(clOther);	
       clOtherReposDay.flush();
@@ -343,7 +339,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (ClOther t : clOther){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -378,7 +374,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (clOther == null || clOther.size() == 0)
       throw new DBException(6);
 
@@ -407,7 +403,7 @@ em = null;
 
   @Override
   public void deleteAll(List<ClOther> clOther, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

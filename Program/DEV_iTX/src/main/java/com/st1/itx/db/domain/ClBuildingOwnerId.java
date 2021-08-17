@@ -19,7 +19,7 @@ public class ClBuildingOwnerId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7022847863421215108L;
+	private static final long serialVersionUID = 5996867312232338692L;
 
 // 擔保品-代號1
   @Column(name = "`ClCode1`")
@@ -33,18 +33,18 @@ public class ClBuildingOwnerId implements Serializable {
   @Column(name = "`ClNo`")
   private int clNo = 0;
 
-  // 所有權人統編
-  @Column(name = "`OwnerId`", length = 10)
-  private String ownerId = " ";
+  // 客戶識別碼
+  @Column(name = "`OwnerCustUKey`", length = 32)
+  private String ownerCustUKey = " ";
 
   public ClBuildingOwnerId() {
   }
 
-  public ClBuildingOwnerId(int clCode1, int clCode2, int clNo, String ownerId) {
+  public ClBuildingOwnerId(int clCode1, int clCode2, int clNo, String ownerCustUKey) {
     this.clCode1 = clCode1;
     this.clCode2 = clCode2;
     this.clNo = clNo;
-    this.ownerId = ownerId;
+    this.ownerCustUKey = ownerCustUKey;
   }
 
 /**
@@ -105,28 +105,28 @@ public class ClBuildingOwnerId implements Serializable {
   }
 
 /**
-	* 所有權人統編<br>
+	* 客戶識別碼<br>
 	* 
 	* @return String
 	*/
-  public String getOwnerId() {
-    return this.ownerId == null ? "" : this.ownerId;
+  public String getOwnerCustUKey() {
+    return this.ownerCustUKey == null ? "" : this.ownerCustUKey;
   }
 
 /**
-	* 所有權人統編<br>
+	* 客戶識別碼<br>
 	* 
   *
-  * @param ownerId 所有權人統編
+  * @param ownerCustUKey 客戶識別碼
 	*/
-  public void setOwnerId(String ownerId) {
-    this.ownerId = ownerId;
+  public void setOwnerCustUKey(String ownerCustUKey) {
+    this.ownerCustUKey = ownerCustUKey;
   }
 
 
   @Override
   public int hashCode() {
-    return Objects.hash(clCode1, clCode2, clNo, ownerId);
+    return Objects.hash(clCode1, clCode2, clNo, ownerCustUKey);
   }
 
   @Override
@@ -136,11 +136,11 @@ public class ClBuildingOwnerId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     ClBuildingOwnerId clBuildingOwnerId = (ClBuildingOwnerId) obj;
-    return clCode1 == clBuildingOwnerId.clCode1 && clCode2 == clBuildingOwnerId.clCode2 && clNo == clBuildingOwnerId.clNo && ownerId.equals(clBuildingOwnerId.ownerId);
+    return clCode1 == clBuildingOwnerId.clCode1 && clCode2 == clBuildingOwnerId.clCode2 && clNo == clBuildingOwnerId.clNo && ownerCustUKey.equals(clBuildingOwnerId.ownerCustUKey);
   }
 
   @Override
   public String toString() {
-    return "ClBuildingOwnerId [clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", ownerId=" + ownerId + "]";
+    return "ClBuildingOwnerId [clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", ownerCustUKey=" + ownerCustUKey + "]";
   }
 }

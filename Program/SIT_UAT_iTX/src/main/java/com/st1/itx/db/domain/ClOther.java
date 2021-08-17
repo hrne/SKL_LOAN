@@ -29,7 +29,7 @@ public class ClOther implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 9178487064717564219L;
+	private static final long serialVersionUID = -4342315285698689151L;
 
 @EmbeddedId
   private ClOtherId clOtherId;
@@ -65,13 +65,9 @@ public class ClOther implements Serializable {
   @Column(name = "`PledgeNO`", length = 30)
   private String pledgeNO;
 
-  // 所有權人統編
-  @Column(name = "`OwnerId`", length = 10)
-  private String ownerId;
-
-  // 所有權人姓名
-  @Column(name = "`OwnerName`", length = 100)
-  private String ownerName;
+  // 客戶識別碼
+  @Column(name = "`OwnerCustUKey`", length = 32)
+  private String ownerCustUKey;
 
   // 發行機構統編
   @Column(name = "`IssuingId`", length = 10)
@@ -505,41 +501,22 @@ public class ClOther implements Serializable {
   }
 
 /**
-	* 所有權人統編<br>
+	* 客戶識別碼<br>
 	* 
 	* @return String
 	*/
-  public String getOwnerId() {
-    return this.ownerId == null ? "" : this.ownerId;
+  public String getOwnerCustUKey() {
+    return this.ownerCustUKey == null ? "" : this.ownerCustUKey;
   }
 
 /**
-	* 所有權人統編<br>
+	* 客戶識別碼<br>
 	* 
   *
-  * @param ownerId 所有權人統編
+  * @param ownerCustUKey 客戶識別碼
 	*/
-  public void setOwnerId(String ownerId) {
-    this.ownerId = ownerId;
-  }
-
-/**
-	* 所有權人姓名<br>
-	* 
-	* @return String
-	*/
-  public String getOwnerName() {
-    return this.ownerName == null ? "" : this.ownerName;
-  }
-
-/**
-	* 所有權人姓名<br>
-	* 
-  *
-  * @param ownerName 所有權人姓名
-	*/
-  public void setOwnerName(String ownerName) {
-    this.ownerName = ownerName;
+  public void setOwnerCustUKey(String ownerCustUKey) {
+    this.ownerCustUKey = ownerCustUKey;
   }
 
 /**
@@ -1106,10 +1083,10 @@ public class ClOther implements Serializable {
   @Override
   public String toString() {
     return "ClOther [clOtherId=" + clOtherId + ", pledgeStartDate=" + pledgeStartDate + ", pledgeEndDate=" + pledgeEndDate + ", pledgeBankCode=" + pledgeBankCode
-           + ", pledgeNO=" + pledgeNO + ", ownerId=" + ownerId + ", ownerName=" + ownerName + ", issuingId=" + issuingId + ", issuingCounty=" + issuingCounty + ", docNo=" + docNo
-           + ", loanToValue=" + loanToValue + ", securitiesType=" + securitiesType + ", listed=" + listed + ", offeringDate=" + offeringDate + ", expirationDate=" + expirationDate + ", targetIssuer=" + targetIssuer
-           + ", subTargetIssuer=" + subTargetIssuer + ", creditDate=" + creditDate + ", credit=" + credit + ", externalCredit=" + externalCredit + ", index=" + index + ", tradingMethod=" + tradingMethod
-           + ", compensation=" + compensation + ", investment=" + investment + ", publicValue=" + publicValue + ", settingStat=" + settingStat + ", clStat=" + clStat + ", settingDate=" + settingDate
-           + ", settingAmt=" + settingAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", pledgeNO=" + pledgeNO + ", ownerCustUKey=" + ownerCustUKey + ", issuingId=" + issuingId + ", issuingCounty=" + issuingCounty + ", docNo=" + docNo + ", loanToValue=" + loanToValue
+           + ", securitiesType=" + securitiesType + ", listed=" + listed + ", offeringDate=" + offeringDate + ", expirationDate=" + expirationDate + ", targetIssuer=" + targetIssuer + ", subTargetIssuer=" + subTargetIssuer
+           + ", creditDate=" + creditDate + ", credit=" + credit + ", externalCredit=" + externalCredit + ", index=" + index + ", tradingMethod=" + tradingMethod + ", compensation=" + compensation
+           + ", investment=" + investment + ", publicValue=" + publicValue + ", settingStat=" + settingStat + ", clStat=" + clStat + ", settingDate=" + settingDate + ", settingAmt=" + settingAmt
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

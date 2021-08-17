@@ -2,8 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -14,6 +12,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
 import com.st1.itx.db.service.ClStockService;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -27,11 +27,13 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R25 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R25.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public ClStockService sClStockService;
+	
+	@Autowired
+	public CustMainService sCustMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -105,8 +107,19 @@ public class L2R25 extends TradeBuffer {
 		this.totaVo.putParam("L2r25YdClosingPrice", tClStock.getYdClosingPrice());
 		this.totaVo.putParam("L2r25ThreeMonthAvg", tClStock.getThreeMonthAvg());
 		this.totaVo.putParam("L2r25EvaUnitPrice", tClStock.getEvaUnitPrice());
-		this.totaVo.putParam("L2r25OwnerId", tClStock.getOwnerId());
-		this.totaVo.putParam("L2r25OwnerName", tClStock.getOwnerName());
+		
+//		this.totaVo.putParam("L2r25OwnerId", tClStock.getOwnerId());
+//		this.totaVo.putParam("L2r25OwnerName", tClStock.getOwnerName());
+		
+		CustMain custMain = sCustMainService.findById(tClStock.getOwnerCustUKey(), titaVo);
+		if (custMain != null) {
+			this.totaVo.putParam("L2r25OwnerId", custMain.getCustId());
+			this.totaVo.putParam("L2r25OwnerId", custMain.getCustName());
+		} else {
+			this.totaVo.putParam("L2r25OwnerId", "");
+			this.totaVo.putParam("L2r25OwnerId", "");
+		}
+		
 		this.totaVo.putParam("L2r25InsiderJobTitle", tClStock.getInsiderJobTitle());
 		this.totaVo.putParam("L2r25InsiderPosition", tClStock.getInsiderPosition());
 		this.totaVo.putParam("L2r25LegalPersonId", tClStock.getLegalPersonId());
