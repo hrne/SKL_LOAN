@@ -7,14 +7,14 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.util.parse.Parse;
@@ -22,11 +22,14 @@ import com.st1.itx.util.parse.Parse;
 @Service("l2038ServiceImpl")
 @Repository
 public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L2038ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
+	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
+	
 	/* 轉換工具 */
 	@Autowired
 	public Parse parse;
@@ -48,7 +51,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	private List<Map<String, String>> execSql(TitaVo titaVo) throws Exception {
-		logger.info("L2038ServiceImpl.find");
+		this.info("L2038ServiceImpl.find");
 
 		String sql = "";
 		sql += "     SELECT cf.\"F1\"                           AS \"ApproveNo\"";
@@ -60,16 +63,11 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ,cm.\"ClNo\"                         AS \"ClNo\"";
 		sql += "           ,cm.\"NewNote\"                      AS \"NewNote\"";
 		sql += "           ,cm.\"ClTypeCode\"                   AS \"ClTypeCode\"";
-		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN cblo.\"OwnerId\"";
-		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerId\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerId\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerId\"";
-		sql += "            ELSE NULL END                       AS \"OwnerId\"";
-		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN cblo.\"OwnerName\"";
-		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerName\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerName\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerName\"";
-		sql += "            ELSE NULL END                       AS \"OwnerName\"";
+		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN cblo.\"OwnerCustUKey\"";
+		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerCustUKey\"";
+		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerCustUKey\"";
+		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerCustUKey\"";
+		sql += "            ELSE NULL END                       AS \"OwnerCustUKey\"";
 		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN cblo.\"OwnerFlag\"";
 		sql += "            ELSE 'N' END                        AS \"OwnerFlag\"";
 		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"SettingStat\"";
@@ -105,64 +103,12 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         AND cf.\"ClCode2\" = cm.\"ClCode2\"";
 		sql += "                         AND cf.\"ClNo\"    = cm.\"ClNo\"";
 		
-		sql += "     LEFT JOIN \"CustMain\" cu ON cu.\"CustNo\" = cf.\"F3\"";
-		
-		
-		sql += "     LEFT JOIN (SELECT S1.\"ClCode1\"";
-		sql += "                      ,S1.\"ClCode2\"";
-		sql += "                      ,S1.\"ClNo\"";
-		sql += "                      ,S1.\"OwnerId\" AS \"OwnerId\"";
-		sql += "                      ,S1.\"OwnerName\"";
-		sql += "                      ,CASE WHEN S2.\"ClNo\" IS NOT NULL THEN 'Y'";
-		sql += "				          ELSE 'N' END AS \"OwnerFlag\"";
-		sql += "                      ,ROW_NUMBER() OVER (PARTITION BY S1.\"ClCode1\",S1.\"ClCode2\",S1.\"ClNo\" ORDER BY S1.\"OwnerPart\" DESC) AS \"Seq\"";
-		sql += "                FROM \"ClBuildingOwner\" S1";
-		sql += "                LEFT JOIN (SELECT \"ClCode1\"";
-		sql += "                                 ,\"ClCode2\"";
-		sql += "                                 ,\"ClNo\"";
-		sql += "                           FROM \"ClBuildingOwner\"";
-		sql += "                           GROUP BY \"ClCode1\",\"ClCode2\",\"ClNo\"";
-		sql += "                           HAVING COUNT(*) >= 2";
-		sql += "                          ) S2 ON S2.\"ClCode1\" = S1.\"ClCode1\"";
-		sql += "                              AND S2.\"ClCode2\" = S1.\"ClCode2\"";
-		sql += "                              AND S2.\"ClNo\"    = S1.\"ClNo\"";
-		sql += "               ) cbo ON cbo.\"ClCode1\" = cm.\"ClCode1\"";
-		sql += "                    AND cbo.\"ClCode2\" = cm.\"ClCode2\"";
-		sql += "                    AND cbo.\"ClNo\"    = cm.\"ClNo\"   ";
-		sql += "                    AND cm.\"ClCode1\" = 1";
-		sql += "                    AND cbo.\"Seq\" = 1";
-		
-		
-		sql += "     LEFT JOIN (SELECT S1.\"ClCode1\"";
-		sql += "                      ,S1.\"ClCode2\"";
-		sql += "                      ,S1.\"ClNo\"";
-		sql += "                      ,S1.\"OwnerId\" AS \"OwnerId\"";
-		sql += "                      ,S1.\"OwnerName\"";
-		sql += "                      ,CASE WHEN S2.\"ClNo\" IS NOT NULL THEN 'Y'";
-		sql += "				          ELSE 'N' END AS \"OwnerFlag\"";
-		sql += "                      ,ROW_NUMBER() OVER (PARTITION BY S1.\"ClCode1\",S1.\"ClCode2\",S1.\"ClNo\" ORDER BY S1.\"OwnerPart\" DESC) AS \"Seq\"";
-		sql += "                FROM \"ClLandOwner\" S1";
-		sql += "                LEFT JOIN (SELECT \"ClCode1\"";
-		sql += "                                 ,\"ClCode2\"";
-		sql += "                                 ,\"ClNo\"";
-		sql += "                           FROM \"ClLandOwner\"";
-		sql += "                           GROUP BY \"ClCode1\",\"ClCode2\",\"ClNo\"";
-		sql += "                           HAVING COUNT(*) >= 2";
-		sql += "                          ) S2 ON S2.\"ClCode1\" = S1.\"ClCode1\"";
-		sql += "                              AND S2.\"ClCode2\" = S1.\"ClCode2\"";
-		sql += "                              AND S2.\"ClNo\"    = S1.\"ClNo\"";
-		sql += "               ) clo ON clo.\"ClCode1\" = cm.\"ClCode1\"";
-		sql += "                    AND clo.\"ClCode2\" = cm.\"ClCode2\"";
-		sql += "                    AND clo.\"ClNo\"    = cm.\"ClNo\"";
-//		sql += "                    AND cm.\"ClCode1\" = 2";
-		sql += "                    AND clo.\"Seq\" = 1";
-		
+		sql += "     LEFT JOIN \"CustMain\" cu ON cu.\"CustNo\" = cf.\"F3\"";		
 		
 		sql += "     LEFT JOIN (SELECT \"ClCode1\"";
 		sql += "                      ,\"ClCode2\"";
 		sql += "                      ,\"ClNo\"";
-		sql += "                      ,\"OwnerId\"";
-		sql += "                      ,\"OwnerName\"";
+		sql += "                      ,\"OwnerCustUKey\"";
 		sql += "                      ,CASE WHEN \"ClNo\" IS NOT NULL THEN 'Y'"; 
 		sql += "                          ELSE 'N' END AS \"OwnerFlag\"" ;
 		sql	+= "                FROM \"ClBuildingOwner\"" ;
@@ -170,12 +116,11 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 	    sql	+= "                SELECT \"ClCode1\"";
 		sql += "                      ,\"ClCode2\"";
 		sql += "                      ,\"ClNo\"";
-		sql += "                      ,\"OwnerId\"";
-		sql += "                      ,\"OwnerName\"";
+		sql += "                      ,\"OwnerCustUKey\"";
 		sql += "                      ,CASE WHEN \"ClNo\" IS NOT NULL THEN 'Y'"; 
 		sql += "                          ELSE 'N' END AS \"OwnerFlag\"" ;
 		sql	+= "                FROM \"ClLandOwner\"" ;	    
-	    sql	+= "                GROUP BY \"ClCode1\", \"ClCode2\", \"ClNo\", \"OwnerId\", \"OwnerName\", "; 
+	    sql	+= "                GROUP BY \"ClCode1\", \"ClCode2\", \"ClNo\", \"OwnerCustUKey\", "; 
 	    sql	+= "                      CASE WHEN \"ClNo\" IS NOT NULL THEN 'Y' ELSE 'N' END "; 
 	    sql	+= "    ) cblo ON cblo.\"ClCode1\" = cm.\"ClCode1\""; 
 	    sql	+= "          AND cblo.\"ClCode2\" = cm.\"ClCode2\""; 
@@ -204,24 +149,38 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                AND cb.\"ClNo\"    = cm.\"ClNo\"";
 		sql += "                                AND cm.\"ClCode1\" = 1";
 		
-		sql += "    LEFT JOIN (SELECT \"ClCode1\"";
-		sql += "                     ,\"ClCode2\"";
-		sql += "                     ,\"ClNo\"";
-		sql += "                      FROM \"ClLand\"";			
-		sql += "                     GROUP BY \"ClCode1\",\"ClCode2\",\"ClNo\"";
-		sql += "                     ) cl ON cl.\"ClCode1\" = cm.\"ClCode1\"";
+		sql += "    LEFT JOIN \"ClLand\" cl ON cl.\"ClCode1\" = cm.\"ClCode1\"";			
 		sql += "                         AND cl.\"ClCode2\" = cm.\"ClCode2\"";
 		sql += "                         AND cl.\"ClNo\"    = cm.\"ClNo\"";
 		
+		sql += "     LEFT JOIN (SELECT \"ClCode1\"";
+		sql += "                      ,\"ClCode2\"";
+		sql += "                      ,\"ClNo\"";
+		sql += "                      ,\"CityCode\"";
+		sql += "                      ,\"AreaCode\"";
+		sql += "                      ,\"IrCode\"";
+		sql	+= "                FROM \"ClBuilding\"" ;
+	    sql	+= "                UNION" ; 
+	    sql	+= "                SELECT \"ClCode1\"";
+		sql += "                      ,\"ClCode2\"";
+		sql += "                      ,\"ClNo\"";
+		sql += "                      ,\"CityCode\"";
+		sql += "                      ,\"AreaCode\"";
+		sql += "                      ,\"IrCode\"";
+		sql	+= "                FROM \"ClLand\"" ;	    
+	    sql	+= "                GROUP BY \"ClCode1\", \"ClCode2\", \"ClNo\", \"CityCode\",\"AreaCode\",\"IrCode\""; 
+	    sql	+= "    ) cbl ON cbl.\"ClCode1\" = cm.\"ClCode1\""; 
+	    sql	+= "          AND cbl.\"ClCode2\" = cm.\"ClCode2\""; 
+	    sql	+= "          AND cbl.\"ClNo\"    = cm.\"ClNo\"";
 		
 		
 		sql += conditionSql;
 		sql += "     ORDER BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
 		sql += sqlRow;
-		logger.info("sql = " + sql);
+		this.info("sql = " + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		logger.info("LIMIT = " + this.limit + "INDEX = " + this.index) ;
+		this.info("LIMIT = " + this.limit + "INDEX = " + this.index) ;
 		
 		query = em.createNativeQuery(sql);
 
@@ -251,7 +210,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @throws Exception 錯誤
 	 */
 	public List<Map<String, String>> findByCondition(int index, int limit, TitaVo titaVo) throws Exception {
-		logger.info("L2038ServiceImpl.findByCondition");
+		this.info("L2038ServiceImpl.findByCondition");
 
 		// *** 折返控制相關 ***
 		this.index = index;
@@ -328,10 +287,16 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		// OwnerId 所有權人統編
 		String ownerId = titaVo.getParam("OwnerId");
-		if (ownerId != null && !ownerId.isEmpty()) {
+		
+		CustMain tCustMain = new CustMain();
+		
+		tCustMain = sCustMainService.custIdFirst(ownerId, titaVo);
+
+		
+		if (tCustMain != null ) {
 			conditionList.add(
-					" CASE WHEN cm.\"ClCode1\" IN (1,2)     THEN cblo.\"OwnerId\"" +   "      WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerId\""
-							+ "      WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerId\"" + "      WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerId\"" + " ELSE NULL END = :ownerId");
+					" CASE WHEN cm.\"ClCode1\" IN (1,2)     THEN cblo.\"OwnerCustUKey\"" +   "      WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerCustUKey\""
+							+ "      WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerCustUKey\"" + "      WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerCustUKey\"" + " ELSE NULL END = :OwnerCustUKey");
 		}
         // SettingStat 設定狀態
 		int settingStat = parse.stringToInteger(titaVo.getParam("SettingStat"));
@@ -357,29 +322,29 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// CityCode 縣市區域
 		String cityCode = titaVo.getParam("CityCode");
 		if (parse.stringToInteger(cityCode) > 0) {
-			if(ClCode1 == 1) {
-				conditionList.add(" cb.\"CityCode\" = :cityCode ");				
-			} else {
-				conditionList.add(" cl.\"CityCode\" = :cityCode ");				
-			}
+//			if(ClCode1 == 1) {
+				conditionList.add(" cbl.\"CityCode\" = :cityCode ");				
+//			} else {
+//				conditionList.add(" cl.\"CityCode\" = :cityCode ");				
+//			}
 		}
 		// AreaCode 鄉鎮市區
 		String areaCode = titaVo.getParam("AreaCode");
 		if (parse.stringToInteger(areaCode) > 0) {
-			if(ClCode1 == 1) {
-				conditionList.add(" cb.\"AreaCode\" = :areaCode ");				
-			} else {
-				conditionList.add(" cl.\"AreaCode\" = :areaCode ");				
-			}
+//			if(ClCode1 == 1) {
+				conditionList.add(" cbl.\"AreaCode\" = :areaCode ");				
+//			} else {
+//				conditionList.add(" cl.\"AreaCode\" = :areaCode ");				
+//			}
 		}
 		// IrCode 段小段
 		String irCode = titaVo.getParam("IrCode");
 		if (parse.stringToInteger(irCode) > 0) {
-			if(ClCode1 == 1) {
-				conditionList.add(" cb.\"IrCode\" = :irCode ");				
-			} else {
-				conditionList.add(" cl.\"IrCode\" = :irCode ");				
-			}
+//			if(ClCode1 == 1) {
+				conditionList.add(" cbl.\"IrCode\" = :irCode ");				
+//			} else {
+//				conditionList.add(" cl.\"IrCode\" = :irCode ");				
+//			}
 
 		}
 		// LandNo1 土地地號1
@@ -444,7 +409,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			conditionList.add(" cb.\"FloorDash\" = :floorDash ");
 		}
 		
-		logger.info("L2038ServiceImpl conditionList.size() = " + conditionList.size());
+		this.info("L2038ServiceImpl conditionList.size() = " + conditionList.size());
 
 		// 根據篩選條件語句數量,組成一句where語句,若無則維持空白
 		if (conditionList.size() > 0) {
@@ -458,13 +423,13 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 				conditionSql += tmpCondition;
 			}
 		}
-		logger.info("L2038ServiceImpl conditionSql = " + conditionSql);
+		this.info("L2038ServiceImpl conditionSql = " + conditionSql);
 
 		return execSql(titaVo);
 	}
 
 	public void setConditionValue(TitaVo titaVo) throws Exception {
-		logger.info("L2038ServiceImpl.setConditionValue");
+		this.info("L2038ServiceImpl.setConditionValue");
 		
 		int ClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		if (ClCode1 > 0) {
@@ -501,8 +466,14 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		
 		String ownerId = titaVo.getParam("OwnerId");
-		if (ownerId != null && !ownerId.isEmpty()) {
-			query.setParameter("ownerId", ownerId);
+		
+		CustMain tCustMain = new CustMain();
+		
+		tCustMain = sCustMainService.custIdFirst(ownerId, titaVo);
+		
+		if (tCustMain != null ) {
+			String UKey = tCustMain.getCustUKey();
+			query.setParameter("OwnerCustUKey", UKey);
 		}
 
 		int settingStat = parse.stringToInteger(titaVo.getParam("SettingStat"));

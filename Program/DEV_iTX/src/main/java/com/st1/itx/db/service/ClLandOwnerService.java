@@ -61,6 +61,19 @@ public interface ClLandOwnerService {
   public Slice<ClLandOwner> OwnerCustUKeyEq(String ownerCustUKey_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+   *
+   * @param clCode1_0 clCode1_0
+   * @param clCode2_1 clCode2_1
+   * @param clNo_2 clNo_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice ClLandOwner ClLandOwner of List
+   */
+  public Slice<ClLandOwner> clNoEq(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By ClLandOwner
    * 
    * @param clLandOwnerId key

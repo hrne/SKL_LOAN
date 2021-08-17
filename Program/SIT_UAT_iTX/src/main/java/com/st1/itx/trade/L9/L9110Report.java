@@ -16,8 +16,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.springjpa.cm.L9110ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
@@ -54,6 +56,9 @@ public class L9110Report extends MakeReport {
 
 	@Autowired
 	FacMainService sFacMainService;
+
+	@Autowired
+	FacCaseApplService sFacCaseApplService;
 
 	@Autowired
 	CustMainService sCustMainService;
@@ -148,16 +153,16 @@ public class L9110Report extends MakeReport {
 
 		}
 
-		Map<String, String> lL9110 = null;
+		Map<String, String> tL9110 = null;
 
-		if (listL9110 != null) {
-			lL9110 = listL9110.get(0);
+		if (listL9110 != null && !listL9110.isEmpty()) {
+			tL9110 = listL9110.get(0);
 		}
 
-		Map<String, String> lL9110Cl = null;
+		Map<String, String> tL9110Cl = null;
 
-		if (listClQuery != null) {
-			lL9110Cl = listClQuery.get(0);
+		if (listClQuery != null && !listClQuery.isEmpty()) {
+			tL9110Cl = listClQuery.get(0);
 		}
 
 		/**
@@ -168,112 +173,116 @@ public class L9110Report extends MakeReport {
 		this.print(-6, 1,
 				"戶號 .........            　戶名 ..........　　　　　　　　　　　　　　　　　　　　　　　　　　　 統一編號 ..... 　　　　　　　　　　　　核准號碼");
 
-		if (lL9110 != null && lL9110.size() != 0) {
+		if (tL9110 != null && tL9110.size() != 0) {
 			// header fill-in
-			this.print(-6, 16, lL9110.get("F0") + "-" + lL9110.get("F1"));
-			this.print(-6, 45, lL9110.get("F2"));
-			this.print(-6, 114, lL9110.get("F3"));
-			this.print(-6, 147, lL9110.get("F4"));
+			this.print(-6, 16, tL9110.get("F0") + "-" + tL9110.get("F1"));
+			this.print(-6, 45, tL9110.get("F2"));
+			this.print(-6, 114, tL9110.get("F3"));
+			this.print(-6, 147, tL9110.get("F4"));
 
 			// 1
 			this.print(1, 1, "    ");
 			this.print(1, 1, "一、基本資料：");
-			this.print(1, 5, "負責人姓名 ...　" + lL9110.get("F5"));
-			this.print(0, 50, "負責人身分證 . " + lL9110.get("F6"));
-			this.print(0, 99, "行業別 .......　" + lL9110.get("F7"));
-			this.print(1, 5, "客戶別 .......　" + lL9110.get("F8"));
-			this.print(0, 50, "設立日期 .....　　" + this.showRocDate(lL9110.get("F9"), 1));
-			this.print(1, 5, "公司地址 .....　" + lL9110.get("F10"));
-			this.print(0, 99, "郵遞區號 ..... " + lL9110.get("F11"));
-			this.print(0, 138, "公司電話 ..... " + lL9110.get("F12"));
-			this.print(1, 5, "通訊地址 .....　" + lL9110.get("F13"));
-			this.print(0, 99, "郵遞區號 ..... " + lL9110.get("F14"));
-			this.print(0, 138, "聯絡人姓名 ... " + lL9110.get("F15"));
-			this.print(1, 5, "聯絡電話 ..... " + lL9110.get("F16") + " " + lL9110.get("F17"));
-			this.print(0, 99, "傳真 ......... " + lL9110.get("F18"));
-			this.print(1, 5, "站別 ......... " + lL9110.get("F19"));
-			this.print(0, 99, "交互運用 ..... " + lL9110.get("F20"));
+			this.print(1, 5, "負責人姓名 ...　" + tL9110.get("F5"));
+			this.print(0, 50, "負責人身分證 . " + tL9110.get("F6"));
+			this.print(0, 99, "行業別 .......　" + tL9110.get("F7"));
+			this.print(1, 5, "客戶別 .......　" + tL9110.get("F8"));
+			this.print(0, 50, "設立日期 .....　　" + this.showRocDate(tL9110.get("F9"), 1));
+			this.print(1, 5, "公司地址 .....　" + tL9110.get("F10"));
+			this.print(0, 99, "郵遞區號 ..... " + tL9110.get("F11"));
+			this.print(0, 138, "公司電話 ..... " + tL9110.get("F12"));
+			this.print(1, 5, "通訊地址 .....　" + tL9110.get("F13"));
+			this.print(0, 99, "郵遞區號 ..... " + tL9110.get("F14"));
+			this.print(0, 138, "聯絡人姓名 ... " + tL9110.get("F15"));
+			this.print(1, 5, "聯絡電話 ..... " + tL9110.get("F16") + " " + tL9110.get("F17"));
+			this.print(0, 99, "傳真 ......... " + tL9110.get("F18"));
+			this.print(1, 5, "站別 ......... " + tL9110.get("F19"));
+			this.print(0, 99, "交互運用 ..... " + tL9110.get("F20"));
 
 			// 2
 			this.print(1, 1, "    ");
-			this.print(1, 1, "二、關聯戶戶名：" + lL9110.get("F21"));
+			this.print(1, 1, "二、關聯戶戶名：" + tL9110.get("F21"));
 
 			// 3
 			this.print(1, 1, "    ");
-			this.print(1, 1, "三、保証人資料：");
-			this.print(1, 5, "統一編號 ..... " + lL9110.get("F22"));
-			this.print(0, 33, "姓名 .........　" + lL9110.get("F23"));
-			this.print(0, 99, "關係 .........　" + lL9110.get("F24"));
-			this.print(1, 99, "保証金額 .....　　　" + formatAmtSafely(lL9110.get("F25"), 0));
-			this.print(1, 5, "通訊地址 .....　" + lL9110.get("F26"));
-			this.print(0, 99, "郵遞區號 ..... " + lL9110.get("F27"));
+			if (tL9110.get("F21") != null && !tL9110.get("F22").isEmpty()) {
+				this.print(1, 1, "三、保証人資料：");
+				this.print(1, 5, "統一編號 ..... " + tL9110.get("F22"));
+				this.print(0, 33, "姓名 .........　" + tL9110.get("F23"));
+				this.print(0, 99, "關係 .........　" + tL9110.get("F24"));
+				this.print(1, 99, "保証金額 .....　　　" + formatAmtSafely(tL9110.get("F25"), 0));
+				this.print(1, 5, "通訊地址 .....　" + tL9110.get("F26"));
+				this.print(0, 99, "郵遞區號 ..... " + tL9110.get("F27"));
+			} else {
+				this.print(1, 1, "三、保証人資料：  資料未建立");
+			}
 
 			// 4
 			this.print(1, 1, "    ");
 			this.print(1, 5, "四、核准資料");
-			this.print(1, 5, "鍵檔日期 .....　" + this.showRocDate(lL9110.get("F28"), 1));
+			this.print(1, 5, "鍵檔日期 .....　" + this.showRocDate(tL9110.get("F28"), 1));
 			this.print(0, 35, "核准額度 ....."); // amount is R-pined at 49
-			this.print(0, 50, formatAmtSafely(lL9110.get("F29"), 0));
-			this.print(0, 69, "核准科目 .....　" + lL9110.get("F30"));
+			this.print(0, 50, formatAmtSafely(tL9110.get("F29"), 0));
+			this.print(0, 69, "核准科目 .....　" + tL9110.get("F30"));
 			this.print(0, 105,
-					"貸款期間 ..... " + lL9110.get("F31") + " 年 " + lL9110.get("F32") + " 月 " + lL9110.get("F33") + " 日");
-			this.print(1, 5, "基本利率代碼 . " + lL9110.get("F34"));
-			this.print(0, 35, "核准利率 .....　" + formatDecimal(lL9110.get("F35"), 4));
-			this.print(0, 69, "利率調整週期 . " + lL9110.get("F36"));
-			this.print(0, 105, "利率調整不變攤還額 .　" + lL9110.get("F37"));
-			this.print(0, 141, "信用評分　.... " + lL9110.get("F38"));
-			this.print(1, 5, "動支期限 .....　" + this.showRocDate(lL9110.get("F39"), 1));
-			this.print(0, 35, "利率加減碼 ... " + formatDecimal(lL9110.get("F40"), 3));
-			this.print(0, 69, "用途別 .......　" + lL9110.get("F41"));
-			this.print(0, 105, "循環動用期限 .　" + this.showRocDate(lL9110.get("F42"), 1));
-			this.print(0, 135, "介紹人姓名 ...　" + lL9110.get("F43"));
-			this.print(1, 5, "代繳所得稅 ...　" + lL9110.get("F44"));
-			this.print(0, 35, "代償碼 ........　" + lL9110.get("F45"));
-			this.print(0, 69, "攤還方式 .....　" + lL9110.get("F46"));
-			this.print(0, 105, "寬限總月數 ...　" + lL9110.get("F47"));
-			this.print(0, 135, "首次調整週期 . " + lL9110.get("F48"));
-			this.print(1, 5, "繳款方式 .....　" + lL9110.get("F49"));
-			this.print(0, 35, "扣款銀行 .....　" + lL9110.get("F50"));
-			this.print(0, 69, "扣款帳號 ..... " + lL9110.get("F51"));
-			this.print(0, 105, "繳息週期 ..... " + lL9110.get("F52"));
-			this.print(0, 135, "利率區分 .....　" + lL9110.get("F53"));
-			this.print(1, 5, "違約適用方式 .　" + lL9110.get("F54"));
-			this.print(0, 35, "違約率－金額 .　" + formatDecimal(lL9110.get("F55"), 3));
-			this.print(0, 69, "違約率－月數 .　" + formatDecimal(lL9110.get("F56"), 3));
-			this.print(0, 105, "違約還款月數 . " + lL9110.get("F57"));
-			this.print(0, 135, "前段月數 ..... " + lL9110.get("F58"));
-			this.print(1, 35, "計件代碼 ..... " + lL9110.get("F59"));
-			this.print(0, 69, "火險服務姓名 .　" + lL9110.get("F60"));
-			this.print(0, 105, "放款專員 .....　" + lL9110.get("F61"));
-			this.print(0, 135, "督辦姓名 .....　" + lL9110.get("F62"));
-			this.print(1, 5, "限制.清償年限 .　" + lL9110.get("F63"));
-			this.print(0, 35, "帳管費 ....... 　" + formatAmtSafely(lL9110.get("F64"), 0));
-			this.print(0, 69, "估價覆核姓名 .　" + lL9110.get("F65"));
-			this.print(0, 105, "客戶別 ....... " + lL9110.get("F66"));
-			this.print(1, 5, "徵信姓名 .....　" + lL9110.get("F67"));
-			this.print(0, 35, "授信姓名 .....　" + lL9110.get("F68"));
-			this.print(0, 69, "協辦姓名 .....　" + lL9110.get("F69"));
+					"貸款期間 ..... " + tL9110.get("F31") + " 年 " + tL9110.get("F32") + " 月 " + tL9110.get("F33") + " 日");
+			this.print(1, 5, "基本利率代碼 . " + tL9110.get("F34"));
+			this.print(0, 35, "核准利率 .....　" + formatDecimal(tL9110.get("F35"), 4));
+			this.print(0, 69, "利率調整週期 . " + tL9110.get("F36"));
+			this.print(0, 105, "利率調整不變攤還額 .　" + tL9110.get("F37"));
+			this.print(0, 141, "信用評分　.... " + tL9110.get("F38"));
+			this.print(1, 5, "動支期限 .....　" + this.showRocDate(tL9110.get("F39"), 1));
+			this.print(0, 35, "利率加減碼 ... " + formatDecimal(tL9110.get("F40"), 3));
+			this.print(0, 69, "用途別 .......　" + tL9110.get("F41"));
+			this.print(0, 105, "循環動用期限 .　" + this.showRocDate(tL9110.get("F42"), 1));
+			this.print(0, 135, "介紹人姓名 ...　" + tL9110.get("F43"));
+			this.print(1, 5, "代繳所得稅 ...　" + tL9110.get("F44"));
+			this.print(0, 35, "代償碼 ........　" + tL9110.get("F45"));
+			this.print(0, 69, "攤還方式 .....　" + tL9110.get("F46"));
+			this.print(0, 105, "寬限總月數 ...　" + tL9110.get("F47"));
+			this.print(0, 135, "首次調整週期 . " + tL9110.get("F48"));
+			this.print(1, 5, "繳款方式 .....　" + tL9110.get("F49"));
+			this.print(0, 35, "扣款銀行 .....　" + tL9110.get("F50"));
+			this.print(0, 69, "扣款帳號 ..... " + tL9110.get("F51"));
+			this.print(0, 105, "繳息週期 ..... " + tL9110.get("F52"));
+			this.print(0, 135, "利率區分 .....　" + tL9110.get("F53"));
+			this.print(1, 5, "違約適用方式 .　" + tL9110.get("F54"));
+			this.print(0, 35, "違約率－金額 .　" + formatDecimal(tL9110.get("F55"), 3));
+			this.print(0, 69, "違約率－月數 .　" + formatDecimal(tL9110.get("F56"), 3));
+			this.print(0, 105, "違約還款月數 . " + tL9110.get("F57"));
+			this.print(0, 135, "前段月數 ..... " + tL9110.get("F58"));
+			this.print(1, 35, "計件代碼 ..... " + tL9110.get("F59"));
+			this.print(0, 69, "火險服務姓名 .　" + tL9110.get("F60"));
+			this.print(0, 105, "放款專員 .....　" + tL9110.get("F61"));
+			this.print(0, 135, "督辦姓名 .....　" + tL9110.get("F62"));
+			this.print(1, 5, "限制.清償年限 .　" + tL9110.get("F63"));
+			this.print(0, 35, "帳管費 ....... 　" + formatAmtSafely(tL9110.get("F64"), 0));
+			this.print(0, 69, "估價覆核姓名 .　" + tL9110.get("F65"));
+			this.print(0, 105, "客戶別 ....... " + tL9110.get("F66"));
+			this.print(1, 5, "徵信姓名 .....　" + tL9110.get("F67"));
+			this.print(0, 35, "授信姓名 .....　" + tL9110.get("F68"));
+			this.print(0, 69, "協辦姓名 .....　" + tL9110.get("F69"));
 
-			if (lL9110Cl != null) {
-				this.print(1, 1, "五、擔保品資料：　" + lL9110Cl.get("F0"));
+			if (tL9110Cl != null) {
+				this.print(1, 1, "五、擔保品資料：　" + tL9110Cl.get("F0"));
 
 				String clCode1 = "";
 				// 擔保品不同時格式不同
-				clCode1 = lL9110Cl.get("F11") == null ? "" : lL9110Cl.get("F11");
+				clCode1 = tL9110Cl.get("F11") == null ? "" : tL9110Cl.get("F11");
 				switch (clCode1) {
 				case "1": // 房地
 				case "2": // 土地
-					this.print(1, 5, "擔保品號碼 ... " + lL9110Cl.get("F1"));
-					this.print(0, 35, "擔保品別 .....　" + lL9110Cl.get("F2"));
-					this.print(0, 69, "鑑價日期 .....　" + this.showRocDate(lL9110Cl.get("F3"), 1));
-					this.print(0, 105, "他項存續期限 .　" + this.showRocDate(lL9110Cl.get("F4"), 1));
-					this.print(1, 5, "順位 ......... " + lL9110Cl.get("F5"));
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 .....　" + tL9110Cl.get("F2"));
+					this.print(0, 69, "鑑價日期 .....　" + this.showRocDate(tL9110Cl.get("F3"), 1));
+					this.print(0, 105, "他項存續期限 .　" + this.showRocDate(tL9110Cl.get("F4"), 1));
+					this.print(1, 5, "順位 ......... " + tL9110Cl.get("F5"));
 					this.print(0, 35, "前順位金額 ...");
-					this.print(0, 50, formatAmtSafely(lL9110Cl.get("F6"), 0), "R");
-					this.print(0, 69, "地區別 .......　" + lL9110Cl.get("F7"));
-					this.print(0, 105, "鑑定公司 .....　" + lL9110Cl.get("F8"));
-					this.print(1, 5, "建物標示備註 . " + lL9110Cl.get("F9"));
-					this.print(0, 105, "設定日期 .....　" + this.showRocDate(lL9110Cl.get("F10"), 1));
+					this.print(0, 50, formatAmtSafely(tL9110Cl.get("F6"), 0), "R");
+					this.print(0, 69, "地區別 .......　" + tL9110Cl.get("F7"));
+					this.print(0, 105, "鑑定公司 .....　" + tL9110Cl.get("F8"));
+					this.print(1, 5, "建物標示備註 . " + tL9110Cl.get("F9"));
+					this.print(0, 105, "設定日期 .....　" + this.showRocDate(tL9110Cl.get("F10"), 1));
 
 					this.print(1, 0, "    ");
 
@@ -293,28 +302,28 @@ public class L9110Report extends MakeReport {
 					break;
 				case "3": // 股票
 				case "4": // 有價證券
-					this.print(1, 5, "擔保品號碼 ... " + lL9110Cl.get("F1"));
-					this.print(0, 35, "擔保品別 .....　" + lL9110Cl.get("F2"));
-					this.print(0, 69, "地區別 .......　" + lL9110Cl.get("F7"));
-					this.print(0, 105, "有價證券代號 .　" + lL9110Cl.get("F12")); // F12 股票代號及股票名稱
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 .....　" + tL9110Cl.get("F2"));
+					this.print(0, 69, "地區別 .......　" + tL9110Cl.get("F7"));
+					this.print(0, 105, "有價證券代號 .　" + tL9110Cl.get("F12")); // F12 股票代號及股票名稱
 
-					this.print(1, 5, "質權設定書號 . " + lL9110Cl.get("F13")); // F13 質權設定書號
-					this.print(0, 35, "鑑價日期 ..... " + this.showRocDate(lL9110Cl.get("F3"), 1));
+					this.print(1, 5, "質權設定書號 . " + tL9110Cl.get("F13")); // F13 質權設定書號
+					this.print(0, 35, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
 					this.print(0, 69, "三個月平均價 .. ");
-					this.print(0, 100, formatAmt(lL9110Cl.get("F14"), 2), "R"); // F14 三個月平均價
+					this.print(0, 100, formatAmt(tL9110Cl.get("F14"), 2), "R"); // F14 三個月平均價
 					this.print(0, 105, "前日收盤價 ...　");
-					this.print(0, 130, formatAmt(lL9110Cl.get("F15"), 2), "R"); // F15 前日收盤價
+					this.print(0, 130, formatAmt(tL9110Cl.get("F15"), 2), "R"); // F15 前日收盤價
 
 					this.print(1, 5, "鑑定單價 ..... ");
-					this.print(0, 30, formatAmt(lL9110Cl.get("F16"), 2), "R"); // F16 鑑定單價
+					this.print(0, 30, formatAmt(tL9110Cl.get("F16"), 2), "R"); // F16 鑑定單價
 					this.print(0, 35, "鑑定總價 ..... ");
-					this.print(0, 64, formatAmt(lL9110Cl.get("F17"), 0), "R"); // F17 鑑定總價
+					this.print(0, 64, formatAmt(tL9110Cl.get("F17"), 0), "R"); // F17 鑑定總價
 					this.print(0, 69, "貸放成數 ..... ");
-					this.print(0, 100, formatAmt(lL9110Cl.get("F18"), 2) + "%", "R"); // F18 貸放成數
+					this.print(0, 100, formatAmt(tL9110Cl.get("F18"), 2) + "%", "R"); // F18 貸放成數
 					this.print(0, 105, "核准額度 .....　");
-					this.print(0, 130, formatAmt(lL9110Cl.get("F19"), 0), "R"); // F19 核准額度
+					this.print(0, 130, formatAmt(tL9110Cl.get("F19"), 0), "R"); // F19 核准額度
 
-					this.print(1, 5, "保管條號碼 ... " + lL9110Cl.get("F20")); // F20 保管條號碼
+					this.print(1, 5, "保管條號碼 ... " + tL9110Cl.get("F20")); // F20 保管條號碼
 
 					this.print(1, 0, "    ");
 
@@ -323,15 +332,15 @@ public class L9110Report extends MakeReport {
 					break;
 				case "5": // 其他
 					this.info("其他擔保品");
-					this.print(1, 5, "擔保品號碼 ... " + lL9110Cl.get("F1"));
-					this.print(0, 35, "擔保品別 .....　" + lL9110Cl.get("F2"));
-					this.print(0, 69, "地區別 .......　" + lL9110Cl.get("F7"));
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 .....　" + tL9110Cl.get("F2"));
+					this.print(0, 69, "地區別 .......　" + tL9110Cl.get("F7"));
 					break;
 				case "9": // 動產
 					this.info("動產擔保品");
-					this.print(1, 5, "擔保品號碼 ... " + lL9110Cl.get("F1"));
-					this.print(0, 35, "擔保品別 .....　" + lL9110Cl.get("F2"));
-					this.print(0, 69, "地區別 .......　" + lL9110Cl.get("F7"));
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 .....　" + tL9110Cl.get("F2"));
+					this.print(0, 69, "地區別 .......　" + tL9110Cl.get("F7"));
 					break;
 				default:
 					this.error("clCode1 is out of cases.");
@@ -345,7 +354,7 @@ public class L9110Report extends MakeReport {
 
 			// 7
 			this.print(1, 1, "    ");
-			this.print(1, 1, "七、本戶號目前總餘額：　" + formatAmtSafely(lL9110.get("F70"), 0) + "　元");
+			this.print(1, 1, "七、本戶號目前總餘額：　" + formatAmtSafely(tL9110.get("F70"), 0) + "　元");
 		} else {
 			print(1, 1, "核准號碼" + thisApplNo + "無資料");
 		}
@@ -385,8 +394,8 @@ public class L9110Report extends MakeReport {
 
 		}
 
-		Map<String, String> lL9110 = listL9110.size() > 0 ? listL9110.get(0) : null;
-		Map<String, String> lL9110Cl = listClQuery.size() > 0 ? listClQuery.get(0) : null;
+		Map<String, String> tL9110 = listL9110.size() > 0 ? listL9110.get(0) : null;
+		Map<String, String> tL9110Cl = listClQuery.size() > 0 ? listClQuery.get(0) : null;
 
 		/**
 		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
@@ -396,115 +405,119 @@ public class L9110Report extends MakeReport {
 		this.print(-6, 1,
 				"戶號 .........            　戶名 ..........　　　　　　　　　　　　　　　　　　　　　　　　　　　 統一編號 ..... 　　　　　　　　　　　　核准號碼 ..... ");
 
-		if (lL9110 != null && lL9110.size() != 0) {
+		if (tL9110 != null && tL9110.size() != 0) {
 			// header fill-in
-			this.print(-6, 16, lL9110.get("F0"));
-			this.print(-6, 45, lL9110.get("F1"));
-			this.print(-6, 114, lL9110.get("F2"));
-			this.print(-6, 153, lL9110.get("F3"));
+			this.print(-6, 16, tL9110.get("F0"));
+			this.print(-6, 45, tL9110.get("F1"));
+			this.print(-6, 114, tL9110.get("F2"));
+			this.print(-6, 153, tL9110.get("F3"));
 
 			// 1
 			this.print(1, 1, "    ");
 			this.print(1, 1, "一、基本資料：");
-			this.print(1, 5, "性別 .........　" + lL9110.get("F4"));
-			this.print(0, 50, "出生年月日 ... " + this.showRocDate(lL9110.get("F5"), 1));
-			this.print(0, 99, "客戶別 .......　" + lL9110.get("F6"));
-			this.print(0, 138, "員工代號 ..... " + lL9110.get("F7"));
-			this.print(1, 5, "15 日薪 ......　" + lL9110.get("F8"));
-			this.print(0, 50, "配偶姓名 .....　　" + lL9110.get("F9"));
-			this.print(0, 99, "配偶統一編號 .　" + lL9110.get("F10"));
-			this.print(0, 138, "(BBC)......... " + lL9110.get("F11"));
-			this.print(1, 5, "戶籍地址 ..... " + lL9110.get("F12"));
-			this.print(0, 99, "郵遞區號 .....　" + lL9110.get("F13"));
-			this.print(0, 138, "戶籍電話 ..... " + lL9110.get("F14"));
-			this.print(1, 5, "通訊地址 ..... " + lL9110.get("F15"));
-			this.print(0, 99, "郵遞區號 ..... " + lL9110.get("F16"));
-			this.print(0, 138, "聯絡人姓名 ...　" + lL9110.get("F17"));
-			this.print(1, 5, "聯絡電話 ..... " + lL9110.get("F18"));
-			this.print(0, 99, "交互運用 ..... " + lL9110.get("F19"));
-			this.print(0, 138, "傳真 ......... " + lL9110.get("F20"));
+			this.print(1, 5, "性別 .........　" + tL9110.get("F4"));
+			this.print(0, 50, "出生年月日 ... " + this.showRocDate(tL9110.get("F5"), 1));
+			this.print(0, 99, "客戶別 .......　" + tL9110.get("F6"));
+			this.print(0, 138, "員工代號 ..... " + tL9110.get("F7"));
+			this.print(1, 5, "15 日薪 ......　" + tL9110.get("F8"));
+			this.print(0, 50, "配偶姓名 .....　　" + tL9110.get("F9"));
+			this.print(0, 99, "配偶統一編號 .　" + tL9110.get("F10"));
+			this.print(0, 138, "(BBC)......... " + tL9110.get("F11"));
+			this.print(1, 5, "戶籍地址 ..... " + tL9110.get("F12"));
+			this.print(0, 99, "郵遞區號 .....　" + tL9110.get("F13"));
+			this.print(0, 138, "戶籍電話 ..... " + tL9110.get("F14"));
+			this.print(1, 5, "通訊地址 ..... " + tL9110.get("F15"));
+			this.print(0, 99, "郵遞區號 ..... " + tL9110.get("F16"));
+			this.print(0, 138, "聯絡人姓名 ...　" + tL9110.get("F17"));
+			this.print(1, 5, "聯絡電話 ..... " + tL9110.get("F18"));
+			this.print(0, 99, "交互運用 ..... " + tL9110.get("F19"));
+			this.print(0, 138, "傳真 ......... " + tL9110.get("F20"));
 
 			// 2
 			this.print(1, 1, "    ");
-			this.print(1, 1, "二、保証人資料：");
-			this.print(1, 5, "統一編號 ..... " + lL9110.get("F21"));
-			this.print(0, 33, "姓名 .........　" + lL9110.get("F22"));
-			this.print(0, 99, "關係 .........　" + lL9110.get("F23"));
-			this.print(1, 99, "保証金額 .....　　　" + formatAmtSafely(lL9110.get("F24"), 0));
-			this.print(1, 5, "通訊地址 .....　" + lL9110.get("F25"));
-			this.print(0, 99, "郵遞區號 ..... " + lL9110.get("F26"));
+			if (tL9110.get("F21") != null && !tL9110.get("F21").isEmpty()) {
+				this.print(1, 1, "二、保証人資料：");
+				this.print(1, 5, "統一編號 ..... " + tL9110.get("F21"));
+				this.print(0, 33, "姓名 .........　" + tL9110.get("F22"));
+				this.print(0, 99, "關係 .........　" + tL9110.get("F23"));
+				this.print(1, 99, "保証金額 .....　　　" + formatAmtSafely(tL9110.get("F24"), 0));
+				this.print(1, 5, "通訊地址 .....　" + tL9110.get("F25"));
+				this.print(0, 99, "郵遞區號 ..... " + tL9110.get("F26"));
+			} else {
+				this.print(1, 1, "二、保証人資料：  資料未建立");
+			}
 
 			// 3
 			this.print(1, 1, "    ");
 			this.print(1, 5, "三、核准資料");
-			this.print(1, 5, "鍵檔日期 .....　" + this.showRocDate(lL9110.get("F27"), 1));
+			this.print(1, 5, "鍵檔日期 .....　" + this.showRocDate(tL9110.get("F27"), 1));
 			this.print(0, 35, "核准額度 ....."); // amount is R-pined at 49
-			this.print(0, 50, formatAmtSafely(lL9110.get("F28"), 0));
-			this.print(0, 69, "核准科目 .....　" + lL9110.get("F29"));
+			this.print(0, 50, formatAmtSafely(tL9110.get("F28"), 0));
+			this.print(0, 69, "核准科目 .....　" + tL9110.get("F29"));
 			this.print(0, 105,
-					"貸款期間 ..... " + lL9110.get("F30") + " 年 " + lL9110.get("F31") + " 月 " + lL9110.get("F32") + " 日");
-			this.print(1, 5, "基本利率代碼 . " + lL9110.get("F33"));
-			this.print(0, 35, "核准利率 .....　" + formatDecimal(lL9110.get("F34"), 4));
-			this.print(0, 69, "利率調整週期 . " + lL9110.get("F35"));
-			this.print(0, 105, "利率調整不變攤還額 .　" + lL9110.get("F36"));
-			this.print(0, 141, "信用評分　.... " + lL9110.get("F37"));
-			this.print(1, 5, "動支期限 .....　" + this.showRocDate(lL9110.get("F38"), 1));
-			this.print(0, 35, "利率加減碼 ... " + formatDecimal(lL9110.get("F39"), 3));
-			this.print(0, 69, "用途別 .......　" + lL9110.get("F40"));
-			this.print(0, 105, "循環動用期限 .　" + this.showRocDate(lL9110.get("F41"), 1));
-			this.print(0, 135, "介紹人姓名 ...　" + lL9110.get("F42"));
-			this.print(1, 5, "代繳所得稅 ...　" + lL9110.get("F43"));
-			this.print(0, 35, "代償碼 ........　" + lL9110.get("F44"));
-			this.print(0, 69, "攤還方式 .....　" + lL9110.get("F45"));
-			this.print(0, 105, "寬限總月數 ...　" + lL9110.get("F46"));
-			this.print(0, 135, "首次調整週期 . " + lL9110.get("F47"));
-			this.print(1, 5, "繳款方式 .....　" + lL9110.get("F48"));
-			this.print(0, 35, "扣款銀行 .....　" + lL9110.get("F49"));
-			this.print(0, 69, "扣款帳號 ..... " + lL9110.get("F50"));
-			this.print(0, 105, "繳息週期 ..... " + lL9110.get("F51"));
-			this.print(0, 135, "利率區分 .....　" + lL9110.get("F52"));
-			this.print(1, 5, "違約適用方式 .　" + lL9110.get("F53"));
-			this.print(0, 35, "違約率－金額 .　" + formatDecimal(lL9110.get("F54"), 3));
-			this.print(0, 69, "違約率－月數 .　" + formatDecimal(lL9110.get("F55"), 3));
-			this.print(0, 105, "違約還款月數 . " + lL9110.get("F56"));
-			this.print(0, 135, "前段月數 ..... " + lL9110.get("F57"));
-			this.print(1, 5, "團體戶名 ..... " + lL9110.get("F58"));
-			this.print(0, 35, "計件代碼 ..... " + lL9110.get("F59"));
-			this.print(0, 69, "火險服務姓名 .　" + lL9110.get("F60"));
-			this.print(0, 105, "放款專員 .....　" + lL9110.get("F61"));
-			this.print(0, 135, "督辦姓名 .....　" + lL9110.get("F62"));
-			this.print(1, 5, "限制清償年限 .　" + lL9110.get("F63"));
-			this.print(0, 35, "帳管費 ....... 　" + formatAmtSafely(lL9110.get("F64"), 0));
-			this.print(0, 69, "估價覆核姓名 .　" + lL9110.get("F65"));
-			this.print(0, 105, "客戶別 ....... " + lL9110.get("F66"));
-			this.print(1, 5, "徵信姓名 .....　" + lL9110.get("F67"));
-			this.print(0, 35, "授信姓名 .....　" + lL9110.get("F68"));
-			this.print(0, 69, "協辦姓名 .....　" + lL9110.get("F69"));
+					"貸款期間 ..... " + tL9110.get("F30") + " 年 " + tL9110.get("F31") + " 月 " + tL9110.get("F32") + " 日");
+			this.print(1, 5, "基本利率代碼 . " + tL9110.get("F33"));
+			this.print(0, 35, "核准利率 .....　" + formatDecimal(tL9110.get("F34"), 4));
+			this.print(0, 69, "利率調整週期 . " + tL9110.get("F35"));
+			this.print(0, 105, "利率調整不變攤還額 .　" + tL9110.get("F36"));
+			this.print(0, 141, "信用評分　.... " + tL9110.get("F37"));
+			this.print(1, 5, "動支期限 .....　" + this.showRocDate(tL9110.get("F38"), 1));
+			this.print(0, 35, "利率加減碼 ... " + formatDecimal(tL9110.get("F39"), 3));
+			this.print(0, 69, "用途別 .......　" + tL9110.get("F40"));
+			this.print(0, 105, "循環動用期限 .　" + this.showRocDate(tL9110.get("F41"), 1));
+			this.print(0, 135, "介紹人姓名 ...　" + tL9110.get("F42"));
+			this.print(1, 5, "代繳所得稅 ...　" + tL9110.get("F43"));
+			this.print(0, 35, "代償碼 ........　" + tL9110.get("F44"));
+			this.print(0, 69, "攤還方式 .....　" + tL9110.get("F45"));
+			this.print(0, 105, "寬限總月數 ...　" + tL9110.get("F46"));
+			this.print(0, 135, "首次調整週期 . " + tL9110.get("F47"));
+			this.print(1, 5, "繳款方式 .....　" + tL9110.get("F48"));
+			this.print(0, 35, "扣款銀行 .....　" + tL9110.get("F49"));
+			this.print(0, 69, "扣款帳號 ..... " + tL9110.get("F50"));
+			this.print(0, 105, "繳息週期 ..... " + tL9110.get("F51"));
+			this.print(0, 135, "利率區分 .....　" + tL9110.get("F52"));
+			this.print(1, 5, "違約適用方式 .　" + tL9110.get("F53"));
+			this.print(0, 35, "違約率－金額 .　" + formatDecimal(tL9110.get("F54"), 3));
+			this.print(0, 69, "違約率－月數 .　" + formatDecimal(tL9110.get("F55"), 3));
+			this.print(0, 105, "違約還款月數 . " + tL9110.get("F56"));
+			this.print(0, 135, "前段月數 ..... " + tL9110.get("F57"));
+			this.print(1, 5, "團體戶名 ..... " + tL9110.get("F58"));
+			this.print(0, 35, "計件代碼 ..... " + tL9110.get("F59"));
+			this.print(0, 69, "火險服務姓名 .　" + tL9110.get("F60"));
+			this.print(0, 105, "放款專員 .....　" + tL9110.get("F61"));
+			this.print(0, 135, "督辦姓名 .....　" + tL9110.get("F62"));
+			this.print(1, 5, "限制清償年限 .　" + tL9110.get("F63"));
+			this.print(0, 35, "帳管費 ....... 　" + formatAmtSafely(tL9110.get("F64"), 0));
+			this.print(0, 69, "估價覆核姓名 .　" + tL9110.get("F65"));
+			this.print(0, 105, "客戶別 ....... " + tL9110.get("F66"));
+			this.print(1, 5, "徵信姓名 .....　" + tL9110.get("F67"));
+			this.print(0, 35, "授信姓名 .....　" + tL9110.get("F68"));
+			this.print(0, 69, "協辦姓名 .....　" + tL9110.get("F69"));
 
 			// 4
 			this.print(1, 1, "    ");
 
-			if (lL9110Cl != null) {
-				this.print(1, 1, "四、擔保品資料：　" + lL9110Cl.get("F0"));
+			if (tL9110Cl != null) {
+				this.print(1, 1, "四、擔保品資料：　" + tL9110Cl.get("F0"));
 
 				String clCode1 = "";
 
 				// 擔保品不同時格式不同
-				clCode1 = lL9110Cl.get("F11") == null ? "" : lL9110Cl.get("F11");
+				clCode1 = tL9110Cl.get("F11") == null ? "" : tL9110Cl.get("F11");
 				switch (clCode1) {
 				case "1": // 房地
 				case "2": // 土地
-					this.print(1, 5, "擔保品號碼 ... " + lL9110Cl.get("F1"));
-					this.print(0, 35, "擔保品別 .....　" + lL9110Cl.get("F2"));
-					this.print(0, 69, "鑑價日期 .....　" + this.showRocDate(lL9110Cl.get("F3"), 1));
-					this.print(0, 105, "他項存續期限 .　" + this.showRocDate(lL9110Cl.get("F4"), 1));
-					this.print(1, 5, "順位 ......... " + lL9110Cl.get("F5"));
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 .....　" + tL9110Cl.get("F2"));
+					this.print(0, 69, "鑑價日期 .....　" + this.showRocDate(tL9110Cl.get("F3"), 1));
+					this.print(0, 105, "他項存續期限 .　" + this.showRocDate(tL9110Cl.get("F4"), 1));
+					this.print(1, 5, "順位 ......... " + tL9110Cl.get("F5"));
 					this.print(0, 35, "前順位金額 ...");
-					this.print(0, 50, formatAmtSafely(lL9110Cl.get("F6"), 0), "R");
-					this.print(0, 69, "地區別 .......　" + lL9110Cl.get("F7"));
-					this.print(0, 105, "鑑定公司 .....　" + lL9110Cl.get("F8"));
-					this.print(1, 5, "建物標示備註 . " + lL9110Cl.get("F9"));
-					this.print(0, 105, "設定日期 .....　" + this.showRocDate(lL9110Cl.get("F10"), 1));
+					this.print(0, 50, formatAmtSafely(tL9110Cl.get("F6"), 0), "R");
+					this.print(0, 69, "地區別 .......　" + tL9110Cl.get("F7"));
+					this.print(0, 105, "鑑定公司 .....　" + tL9110Cl.get("F8"));
+					this.print(1, 5, "建物標示備註 . " + tL9110Cl.get("F9"));
+					this.print(0, 105, "設定日期 .....　" + this.showRocDate(tL9110Cl.get("F10"), 1));
 
 					this.print(1, 0, "    ");
 
@@ -524,28 +537,28 @@ public class L9110Report extends MakeReport {
 					break;
 				case "3": // 股票
 				case "4": // 有價證券
-					this.print(1, 5, "擔保品號碼 ... " + lL9110Cl.get("F1"));
-					this.print(0, 35, "擔保品別 .....　" + lL9110Cl.get("F2"));
-					this.print(0, 69, "地區別 .......　" + lL9110Cl.get("F7"));
-					this.print(0, 105, "有價證券代號 .　" + lL9110Cl.get("F12")); // F12 股票代號及股票名稱
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 .....　" + tL9110Cl.get("F2"));
+					this.print(0, 69, "地區別 .......　" + tL9110Cl.get("F7"));
+					this.print(0, 105, "有價證券代號 .　" + tL9110Cl.get("F12")); // F12 股票代號及股票名稱
 
-					this.print(1, 5, "質權設定書號 . " + lL9110Cl.get("F13")); // F13 質權設定書號
-					this.print(0, 35, "鑑價日期 ..... " + this.showRocDate(lL9110Cl.get("F3"), 1));
+					this.print(1, 5, "質權設定書號 . " + tL9110Cl.get("F13")); // F13 質權設定書號
+					this.print(0, 35, "鑑價日期 ..... " + this.showRocDate(tL9110Cl.get("F3"), 1));
 					this.print(0, 69, "三個月平均價 .. ");
-					this.print(0, 100, formatAmt(lL9110Cl.get("F14"), 2), "R"); // F14 三個月平均價
+					this.print(0, 100, formatAmt(tL9110Cl.get("F14"), 2), "R"); // F14 三個月平均價
 					this.print(0, 105, "前日收盤價 ...　");
-					this.print(0, 130, formatAmt(lL9110Cl.get("F15"), 2), "R"); // F15 前日收盤價
+					this.print(0, 130, formatAmt(tL9110Cl.get("F15"), 2), "R"); // F15 前日收盤價
 
 					this.print(1, 5, "鑑定單價 ..... ");
-					this.print(0, 30, formatAmt(lL9110Cl.get("F16"), 2), "R"); // F16 鑑定單價
+					this.print(0, 30, formatAmt(tL9110Cl.get("F16"), 2), "R"); // F16 鑑定單價
 					this.print(0, 35, "鑑定總價 ..... ");
-					this.print(0, 60, formatAmt(lL9110Cl.get("F17"), 0), "R"); // F17 鑑定總價
+					this.print(0, 60, formatAmt(tL9110Cl.get("F17"), 0), "R"); // F17 鑑定總價
 					this.print(0, 69, "貸放成數 ..... ");
-					this.print(0, 100, formatAmt(lL9110Cl.get("F18"), 2) + "%", "R"); // F18 貸放成數
+					this.print(0, 100, formatAmt(tL9110Cl.get("F18"), 2) + "%", "R"); // F18 貸放成數
 					this.print(0, 105, "核准額度 .....　");
-					this.print(0, 130, formatAmt(lL9110Cl.get("F19"), 0), "R"); // F19 核准額度
+					this.print(0, 130, formatAmt(tL9110Cl.get("F19"), 0), "R"); // F19 核准額度
 
-					this.print(1, 5, "保管條號碼 ... " + lL9110Cl.get("F20")); // F20 保管條號碼
+					this.print(1, 5, "保管條號碼 ... " + tL9110Cl.get("F20")); // F20 保管條號碼
 
 					this.print(1, 0, "    ");
 
@@ -554,15 +567,15 @@ public class L9110Report extends MakeReport {
 					break;
 				case "5": // 其他
 					this.info("其他擔保品");
-					this.print(1, 5, "擔保品號碼 ... " + lL9110Cl.get("F1"));
-					this.print(0, 35, "擔保品別 .....　" + lL9110Cl.get("F2"));
-					this.print(0, 69, "地區別 .......　" + lL9110Cl.get("F7"));
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 .....　" + tL9110Cl.get("F2"));
+					this.print(0, 69, "地區別 .......　" + tL9110Cl.get("F7"));
 					break;
 				case "9": // 動產
 					this.info("動產擔保品");
-					this.print(1, 5, "擔保品號碼 ... " + lL9110Cl.get("F1"));
-					this.print(0, 35, "擔保品別 .....　" + lL9110Cl.get("F2"));
-					this.print(0, 69, "地區別 .......　" + lL9110Cl.get("F7"));
+					this.print(1, 5, "擔保品號碼 ... " + tL9110Cl.get("F1"));
+					this.print(0, 35, "擔保品別 .....　" + tL9110Cl.get("F2"));
+					this.print(0, 69, "地區別 .......　" + tL9110Cl.get("F7"));
 					break;
 				default:
 					this.error("clCode1 is out of cases.");
@@ -577,7 +590,7 @@ public class L9110Report extends MakeReport {
 
 			// 7
 			this.print(1, 1, "    ");
-			this.print(1, 1, "六、本戶號目前總餘額：　" + formatAmtSafely(lL9110.get("F70"), 0) + "　元");
+			this.print(1, 1, "六、本戶號目前總餘額：　" + formatAmtSafely(tL9110.get("F70"), 0) + "　元");
 		} else {
 			print(1, 1, "核准號碼" + thisApplNo + "無資料");
 		}
@@ -694,9 +707,28 @@ public class L9110Report extends MakeReport {
 
 				// 每次查詢都須確定企金別以決定輸出方式
 				FacMain tFacMain = sFacMainService.facmApplNoFirst(Integer.parseInt(thisApplNo), titaVo);
-				CustMain tCustMain = sCustMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
 
-				custEntCode = tCustMain.getEntCode();
+				CustMain tCustMain = null;
+
+				if (tFacMain == null) {
+					this.warn("L9110Report thisApplNo(" + thisApplNo + ")  is not found in FacMain. ");
+					FacCaseAppl tFacCaseAppl = sFacCaseApplService.findById(Integer.parseInt(thisApplNo), titaVo);
+
+					if (tFacCaseAppl != null) {
+						tCustMain = sCustMainService.findById(tFacCaseAppl.getCustUKey(), titaVo);
+					} else {
+						this.warn("L9110Report thisApplNo(" + thisApplNo + ")  is not found in FacCaseAppl. ");
+					}
+				} else {
+					tCustMain = sCustMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
+				}
+
+				if (tCustMain != null) {
+					custEntCode = tCustMain.getEntCode();
+				} else {
+					this.warn("L9110Report thisApplNo(" + thisApplNo + ")'s CustUKey is not found in CustMain. ");
+					continue; // 跳下一圈
+				}
 
 				// 企金別無值時，預設為0:個金
 				if (custEntCode == null || custEntCode.isEmpty()) {
@@ -715,13 +747,15 @@ public class L9110Report extends MakeReport {
 
 				fillData(titaVo, custEntCode.equals("1"));
 
-				// 更新原DB
-				tFacMain = sFacMainService.holdById(tFacMain, titaVo);
-				tFacMain.setL9110Flag("Y");
-				try {
-					sFacMainService.update(tFacMain, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0007", "額度主檔" + thisApplNo);
+				if (tFacMain != null) {
+					// 更新原DB
+					tFacMain = sFacMainService.holdById(tFacMain, titaVo);
+					tFacMain.setL9110Flag("Y");
+					try {
+						sFacMainService.update(tFacMain, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0007", "額度主檔" + thisApplNo);
+					}
 				}
 			}
 		}

@@ -166,6 +166,34 @@ em = null;
   }
 
   @Override
+  public Slice<ClLandOwner> clNoEq(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<ClLandOwner> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("clNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = clLandOwnerReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = clLandOwnerReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = clLandOwnerReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+    else 
+      slice = clLandOwnerRepos.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscLandSeqAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public ClLandOwner holdById(ClLandOwnerId clLandOwnerId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

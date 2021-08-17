@@ -834,7 +834,7 @@ public class L2411 extends TradeBuffer {
 	    		custMain.setDataStatus(1);
 	    		
 	    		try {
-	    			sCustMainService.insert(tCustMain, titaVo);
+	    			sCustMainService.insert(custMain, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "客戶資料主檔");
 				}
@@ -897,7 +897,7 @@ public class L2411 extends TradeBuffer {
 	    		custMain.setDataStatus(1);
 	    		
 	    		try {
-	    			sCustMainService.insert(tCustMain, titaVo);
+	    			sCustMainService.insert(custMain, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "客戶資料主檔");
 				}

@@ -15,6 +15,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdPfParms;
+import com.st1.itx.db.domain.CdPfParmsId;
+import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
@@ -22,6 +26,8 @@ import com.st1.itx.db.domain.PfBsDetail;
 import com.st1.itx.db.domain.PfDetail;
 import com.st1.itx.db.domain.PfItDetail;
 import com.st1.itx.db.domain.PfReward;
+import com.st1.itx.db.service.CdPfParmsService;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.PfBsDetailService;
@@ -92,6 +98,12 @@ public class BS996 extends TradeBuffer {
 	public LoanBorMainService loanBorMainService;
 
 	@Autowired
+	public CdPfParmsService cdPfParmsService;
+
+	@Autowired
+	public CdWorkMonthService cdWorkMonthService;
+
+	@Autowired
 	LoanCom loanCom;
 
 	@Autowired
@@ -102,6 +114,11 @@ public class BS996 extends TradeBuffer {
 
 	private TempVo tTempVo = new TempVo();
 	private int commitCnt = 20;
+	private int iAcdate = 0;
+	private String iEmpResetFg = null;
+	private int iCustNoS = 0;
+	private int iCustNoE = 0;
+	private int cntTrans = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -115,20 +132,55 @@ public class BS996 extends TradeBuffer {
 		if (strList.size() != 4) {
 			throw new LogicException(titaVo, "E0000", "參數：EX.1090402,Y,1,9999999( 業績起日,是否更新員工資料欄Y/N, 起戶號, 止戶號)");
 		}
-		int iAcdate = this.parse.stringToInteger(strAr[0]); // 業績起日
-		String iEmpResetFg = strAr[1]; // 是否更新員工資料欄
-		int iCustNoS = this.parse.stringToInteger(strAr[2]); // 起戶號
-		int iCustNoE = this.parse.stringToInteger(strAr[3]); // 止戶號
+		iAcdate = this.parse.stringToInteger(strAr[0]); // 業績起日
+		iEmpResetFg = strAr[1]; // 是否更新員工資料欄
+		iCustNoS = this.parse.stringToInteger(strAr[2]); // 起戶號
+		iCustNoE = this.parse.stringToInteger(strAr[3]); // 止戶號
 		if (iCustNoS == 0 && iCustNoE == 0) {
 			iCustNoE = 9999999;
 		}
+		// 自動重算 Parm = 0,N,0,0
+		if (iAcdate == 0) {
+			CdPfParms tCdPfParms = cdPfParmsService.findById(new CdPfParmsId("R", " ", " "), titaVo);
+			if (tCdPfParms != null) {
+				if (tCdPfParms.getWorkMonthEnd() == 0) {
+					CdWorkMonth tCdWorkMonth = cdWorkMonthService.findById(new CdWorkMonthId(
+							tCdPfParms.getWorkMonthStart() / 100 , tCdPfParms.getWorkMonthStart() % 100), titaVo);
+					if (tCdWorkMonth != null) {
+						iAcdate = tCdWorkMonth.getStartDate();
+						updatePf(titaVo);
+						tCdPfParms = cdPfParmsService.holdById(tCdPfParms, titaVo);
+						tCdPfParms.setWorkMonthEnd(tCdPfParms.getWorkMonthStart());
+						try {
+							cdPfParmsService.update(tCdPfParms, titaVo);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", "tCdPfParms " + e.getErrorMsg());
+						}
+					}
+				}
+			}
+		} else {
+			updatePf(titaVo);
+			// 通知訊息
+			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "",
+					"更新業績明細檔，筆數 = " + cntTrans, titaVo);
+		}
+
+		this.batchTransaction.commit();
+
+		this.info(" BS996 END");
+
+		// end
+		return null;
+	}
+
+	private void updatePf(TitaVo titaVo) throws LogicException {
 		this.info("iAcdate=" + iAcdate + " , iEmpResetFg=" + iEmpResetFg + ", iCustNoS=" + iCustNoS + ", iCustNoE="
 				+ iCustNoE);
-		int cntTrans = 0;
 
 		// 清除業績明細檔的業績計算欄
 		clearPfDetail(iAcdate, iCustNoS, iCustNoE, titaVo);
-
+		cntTrans = 0;
 		// 重新計算業績，更新業績明細檔
 		Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findAcDateRange(iAcdate + 19110000, 99991231,
 				Arrays.asList(new String[] { "0" }), 0, Integer.MAX_VALUE, titaVo);
@@ -144,17 +196,6 @@ public class BS996 extends TradeBuffer {
 				}
 			}
 		}
-
-		this.batchTransaction.commit();
-
-		// 通知訊息
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "",
-				"更新業績明細檔，筆數 = " + cntTrans, titaVo);
-
-		this.info(" BS996 END");
-
-		// end
-		return null;
 	}
 
 	private boolean updatePfDetail(int iAcdate, String iEmpResetFg, LoanBorTx tx, TitaVo titaVo) throws LogicException {
@@ -162,6 +203,13 @@ public class BS996 extends TradeBuffer {
 
 		if ("L3100".equals(tx.getTitaTxCd())) {
 			repayType = 0; // 0.撥款
+		}
+		if ("L3701".equals(tx.getTitaTxCd())) {
+			tTempVo = tTempVo.getVo(tx.getOtherFields());
+			if ("X".equals(tTempVo.getParam("PieceCodeY")) || "X".equals(tTempVo.getParam("PieceCodeSecondY"))
+					|| "X".equals(tTempVo.getParam("PieceCodeSecondAmt"))) {
+				repayType = 1; // 1.計件代碼變更
+			}
 		}
 		if ("L3200".equals(tx.getTitaTxCd()) && tx.getExtraRepay().compareTo(BigDecimal.ZERO) > 0) {
 			repayType = 2; // 2.部分償還
@@ -178,6 +226,10 @@ public class BS996 extends TradeBuffer {
 				titaVo);
 		if (ln == null) {
 			this.info("LoanBorMain notfound " + tx.toString());
+			return false;
+		}
+		// 計件代碼變更，撥款日期在重算業績起日後的不處理(撥款已重算)
+		if ("L3701".equals(tx.getTitaTxCd()) && ln.getDrawdownDate() >= iAcdate) {
 			return false;
 		}
 

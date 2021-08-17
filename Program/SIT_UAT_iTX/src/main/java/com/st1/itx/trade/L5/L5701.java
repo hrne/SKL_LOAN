@@ -33,6 +33,7 @@ import com.st1.itx.db.service.NegFinShareService;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.NegCom;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -115,6 +116,9 @@ public class L5701 extends TradeBuffer {
 
 	@Autowired
 	public NegFinShareLogService sNegFinShareLogService;
+
+	@Autowired
+	public DataLog iDataLog;	
 
 	@Autowired
 	NegCom NegCom;
@@ -465,14 +469,15 @@ public class L5701 extends TradeBuffer {
 		}
 		if (NegMainVO != null) {
 			// UPDATE
+			NegMain sNegMsain = sNegMainService.holdById(NegMainVO.getNegMainId());
+			NegMain beforeNegMain = (NegMain) iDataLog.clone(sNegMsain);
 			try {
-				sNegMainService.holdById(NegMainVO.getNegMainId());
-				InputNegMain.setCreateDate(InputNegMain.getCreateDate());
-				InputNegMain.setCreateEmpNo(InputNegMain.getCreateEmpNo());
-				sNegMainService.update(InputNegMain);
+				sNegMsain = sNegMainService.update2(InputNegMain);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
+			iDataLog.setEnv(titaVo, beforeNegMain, sNegMsain);
+			iDataLog.exec();
 		} else {
 			// INSERT
 			try {

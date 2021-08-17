@@ -19,9 +19,11 @@ import com.st1.itx.db.domain.ClLand;
 import com.st1.itx.db.domain.ClLandId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.ClStockService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L2038ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -52,6 +54,11 @@ public class L2038 extends TradeBuffer {
 	
 	@Autowired
 	public ClStockService sClStockService;
+	
+	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -115,7 +122,7 @@ public class L2038 extends TradeBuffer {
 //						|| TempClNo != parse.stringToInteger(result.get("F6"))) { 				
 					occurslist.putParam("OOApproveNo", result.get("F0"));
 					occurslist.putParam("OOFacmNo", result.get("F1"));
-					occurslist.putParam("OOCustId", result.get("F2"));
+					occurslist.putParam("OOCustId", result.get("F2"));				
 					occurslist.putParam("OOCustNo", result.get("F3"));
 					occurslist.putParam("OOClCode1", result.get("F4"));
 					occurslist.putParam("OOClCode2", result.get("F5"));
@@ -127,13 +134,23 @@ public class L2038 extends TradeBuffer {
 					
 					occurslist.putParam("OONewNote", result.get("F7"));
 					occurslist.putParam("OOClTypeCode", result.get("F8"));
-					occurslist.putParam("OOOwnerId", result.get("F9"));
-					occurslist.putParam("OOOwnerName", result.get("F10"));
-					occurslist.putParam("OOOwnerFlag", result.get("F11"));
-					occurslist.putParam("OOSettingStat", result.get("F12"));
-					occurslist.putParam("OOSettingAmt", result.get("F13"));
-					occurslist.putParam("OOClStat", result.get("F14"));
-					occurslist.putParam("OOShareTotal", result.get("F15"));
+//					occurslist.putParam("OOOwnerId", result.get("F9"));
+					
+					occurslist.putParam("OOOwnerId", "");
+					occurslist.putParam("OOOwnerName", "");
+					
+					CustMain tCustMain = new CustMain();
+					tCustMain = sCustMainService.findById(result.get("F9"), titaVo);				
+					if(tCustMain != null) {						
+						occurslist.putParam("OOOwnerId", tCustMain.getCustId());
+						occurslist.putParam("OOOwnerName", tCustMain.getCustName());
+					}
+					
+					occurslist.putParam("OOOwnerFlag", result.get("F10"));
+					occurslist.putParam("OOSettingStat", result.get("F11"));
+					occurslist.putParam("OOSettingAmt", result.get("F12"));
+					occurslist.putParam("OOClStat", result.get("F13"));
+					occurslist.putParam("OOShareTotal", result.get("F14"));
 					occurslist.putParam("OOOther", " ");
 					if(TempClCode1 == 1) {
 						ClBuildingId clBuildingId = new ClBuildingId();

@@ -8,7 +8,7 @@
 	<!-- 作業名稱 -->
 	<job id="eodFlow" parent="parentJob"
 		xmlns="http://www.springframework.org/schema/batch">
-		<split id="split1" task-executor="taskExecutor" next="eodFinal">
+		<split id="split1" task-executor="taskExecutor" next="split2">
 			<flow>
 				<step id="l5CollListUpd" parent="parentStep">
 					<tasklet ref="L5CollListUpd" />
@@ -17,6 +17,25 @@
 			<flow>
 				<step id="l9DailyLoanBalUpd" parent="parentStep">
 					<tasklet ref="L9DailyLoanBalUpd" />
+				</step>
+			</flow>
+		</split>
+		<split id="split2" task-executor="taskExecutor" next="split3">
+			<flow>
+				<step id="l8JcicB204Upd" parent="parentStep">
+					<tasklet ref="L8JcicB204Upd" />
+				</step>
+			</flow>
+			<flow>
+				<step id="l8JcicB211Upd" parent="parentStep">
+					<tasklet ref="L8JcicB211Upd" />
+				</step>
+			</flow>
+		</split>
+		<split id="split3" task-executor="taskExecutor" next="eodFinal">
+			<flow>
+				<step id="startBS996" parent="parentStep">
+					<tasklet ref="StartBS996" />
 				</step>
 			</flow>
 		</split>

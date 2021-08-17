@@ -46,17 +46,23 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                AS \"CompanyAddr\"      "; // -- 公司地址 F10
 		sql += "           , NVL(CM.\"RegZip3\",'') || NVL(CM.\"RegZip2\",'')";
 		sql += "                                AS \"CompanyZip\"       "; // -- 郵遞區號(公司地址) F11
-		sql += "           , ''                 AS \"CompanyTel\"       "; // -- 公司電話 ??? 新系統有特別分類嗎? F12
+		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'01')      ";
+		sql += "                                AS \"CompanyTel\"       "; // -- 公司電話 ??? 新系統有特別分類嗎? F12
 		sql += "           , \"Fn_GetCustAddr\"(CM.\"CustUKey\",'1')    ";
 		sql += "                                AS \"ContactAddr\"      "; // -- 通訊地址 F13
 		sql += "           , NVL(CM.\"CurrZip3\",'') || NVL(CM.\"CurrZip2\",'')";
 		sql += "                                AS \"ContactZip\"       "; // -- 郵遞區號(通訊地址) F14
-		sql += "           , ''                 AS \"ContactName\"      "; // -- 聯絡人姓名 F15
-		sql += "           , ''                 AS \"ContactTel\"       "; // -- 聯絡電話(市話) F16
-		sql += "           , ''                 AS \"ContactCellPhone\" "; // -- 聯絡電話(手機) F17
-		sql += "           , ''                 AS \"Fax\"              "; // -- 傳真 F18
+		sql += "           , NVL(CTN.\"LiaisonName\",' ')               ";
+		sql += "                                AS \"ContactName\"      "; // -- 聯絡人姓名 F15
+		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'02')      ";
+		sql += "                                AS \"ContactTel\"       "; // -- 聯絡電話(市話) F16
+		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'03')      ";
+		sql += "                                AS \"ContactCellPhone\" "; // -- 聯絡電話(手機) F17
+		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'04')      ";
+		sql += "                                AS \"Fax\"              "; // -- 傳真 F18
 		sql += "           , ''                 AS \"Station\"          "; // -- 站別 ??? 待確認是否刪除? F19
-		sql += "           , ''                 AS \"CrossUse\"         "; // -- 交互運用 F20
+		sql += "           , NVL(CR.\"CrossUse\",'N')                   ";
+		sql += "                                AS \"CrossUse\"         "; // -- 交互運用 F20
 		sql += "           , ''                 AS \"RelName\"          "; // -- 關聯戶戶名 ??? 如何呈現? F21
 		sql += "           , GUA.\"GuaId\"                              "; // -- 保證人統編 F22
 		sql += "           , GUA.\"GuaName\"                            "; // -- 保證人姓名 F23
@@ -131,6 +137,19 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CdIndustry\" CI ON CI.\"IndustryCode\" = CM.\"IndustryCode\" "; // -- 行業別代碼檔
 		sql += "      LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'CustTypeCode' "; // -- 共用代碼檔(客戶別)
 		sql += "                             AND CDC1.\"Code\" = CM.\"CustTypeCode\" ";
+		sql += "      LEFT JOIN (SELECT tmpCTN.\"CustUKey\" ";
+		sql += "                      , CASE";
+		sql += "                          WHEN tmpCTN.\"RelationCode\" = '00'";
+		sql += "                          THEN tmpCM.\"CustName\" ";
+		sql += "                        ELSE tmpCTN.\"LiaisonName\" END AS \"LiaisonName\" ";
+		sql += "                      , ROW_NUMBER() OVER (PARTITION BY tmpCTN.\"CustUKey\" ";
+		sql += "                                           ORDER BY tmpCTN.\"RelationCode\" ";
+		sql += "                                     ) AS \"Seq\" ";
+		sql += "                 FROM \"CustTelNo\" tmpCTN ";
+		sql += "                 LEFT JOIN \"CustMain\" tmpCM ON tmpCM.\"CustUKey\" = tmpCTN.\"CustUKey\" ";
+		sql += "                 WHERE \"Enable\" = 'Y' ";
+		sql += "                ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\" ";
+		sql += "                     AND CTN.\"Seq\" = 1 ";
 		sql += "      LEFT JOIN (SELECT GUA.\"ApproveNo\"                         AS \"ApplNo\"  "; // -- *** ApproveNo
 																									// 將會統一改為 ApplNo
 		sql += "                      , GUACM.\"CustId\"                          AS \"GuaId\"   "; // -- 保證人統編
@@ -176,6 +195,12 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  FROM \"LoanBorMain\" ";
 		sql += "                  GROUP BY \"CustNo\"";
 		sql += "                ) LBM ON LBM.\"CustNo\" = CM.\"CustNo\""; // --總額
+		sql += "      LEFT JOIN ( SELECT \"CustUKey\" ";
+		sql += "                       , \"CrossUse\" ";
+		sql += "                  FROM \"CustCross\" ";
+		sql += "                  WHERE \"CrossUse\" = 'Y' ";
+		sql += "                  GROUP BY \"CustUKey\",\"CrossUse\" ";
+		sql += "                ) CR ON CR.\"CustUKey\" = CM.\"CustUKey\" ";
 		sql += "      WHERE FC.\"ApplNo\" = :applNo";
 
 		this.info("sql=" + sql);
@@ -301,10 +326,17 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                    AND L.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                    AND L.\"ClNo\"    = CF.\"ClNo\"";
-		sql += " LEFT JOIN \"ClLandOwner\" LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                             AND LO.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                             AND LO.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "                            AND LO.\"LandSeq\" <= 1"; // -- 房地從1開始編,土地固定0 ??? 房地只取一筆?
+		sql += " LEFT JOIN (SELECT NVL(CM.\"CustId\",' ') AS \"OwnerId\"";
+		sql += "                 , LO.\"ClCode1\"";
+		sql += "                 , LO.\"ClCode2\"";
+		sql += "                 , LO.\"ClNo\"";
+		sql += "                 , LO.\"LandSeq\"";
+		sql += "            FROM \"ClLandOwner\" LO ";
+		sql += "            LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = LO.\"OwnerCustUKey\"";
+		sql += "           ) LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "               AND LO.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "               AND LO.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "               AND LO.\"LandSeq\" <= 1"; // -- 房地從1開始編,土地固定0 ??? 房地只取一筆?
 		sql += " LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = L.\"CityCode\"";
 		sql += " LEFT JOIN \"CdArea\" AREA ON AREA.\"CityCode\" = L.\"CityCode\"";
 		sql += "                          AND AREA.\"AreaCode\" = L.\"AreaCode\"";
@@ -334,71 +366,78 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// -- L9110 法人Query(建物)
 		String sql = "";
-		sql += "SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\"";
+		sql += " SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\"";
 		sql += "                                     , CF.\"ClCode2\"";
 		sql += "                                     , CF.\"ClNo\"";
 		sql += "                          ORDER BY LO.\"OwnerPart\" DESC "; // -- ??? 待確認排序方式
 		sql += "                         )   AS \"Seq\"    "; // -- 序號 F0
-		sql += "     , LO.\"OwnerId\"                      "; // -- 提供人 F1
-		sql += "     , LPAD(L.\"BdNo1\",5,'0') AS \"BdNo\"   "; // -- 主建物建號 F2
-		sql += "     , LPAD(CBP1.\"PublicBdNo1\",5,'0') ";
-		sql += "                            AS \"PublicBdNo\"";
+		sql += "      , LO.\"OwnerId\"                      "; // -- 提供人 F1
+		sql += "      , LPAD(L.\"BdNo1\",5,'0') AS \"BdNo\"   "; // -- 主建物建號 F2
+		sql += "      , LPAD(CBP1.\"PublicBdNo1\",5,'0') ";
+		sql += "                             AS \"PublicBdNo\"";
 		sql += "                                         "; // -- 公設建號 F3
-		sql += "     , L.\"FloorArea\"                     "; // -- 主建物 F4
-		sql += "     , CBP2.\"PublicArea\"                 "; // -- 公設 F5
-		sql += "     , CBPK.\"ParkingArea\"                "; // -- 車位 F6
-		sql += "     , L.\"EvaUnitPrice\"                  "; // -- 鑑定單價 F7
-		sql += "     , 0                   AS \"ApplyAmt\" "; // -- 核貸 ??? F8
-		sql += "     , CLI.\"SettingAmt\"                  "; // -- 設定 F9
-		sql += "     , L.\"BdLocation\"                    "; // -- 門牌地址 F10
-		sql += "FROM \"ClFac\" CF ";
-		sql += "LEFT JOIN \"ClBuilding\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                        AND L.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                        AND L.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "LEFT JOIN \"ClBuildingOwner\" LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                              AND LO.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                              AND LO.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                     AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                     AND CLI.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "LEFT JOIN ( SELECT \"ClCode1\"";
-		sql += "                 , \"ClCode2\"";
-		sql += "                 , \"ClNo\"";
-		sql += "                 , \"PublicBdNo1\"";
-		sql += "                 , ROW_NUMBER() OVER (PARTITION BY \"ClCode1\"";
-		sql += "                                                 , \"ClCode2\"";
-		sql += "                                                 , \"ClNo\"";
-		sql += "                                      ORDER BY \"PublicBdNo1\"";
-		sql += "                                     ) AS \"Seq\"";
-		sql += "            FROM \"ClBuildingPublic\"";
-		sql += "          ) CBP1 ON CBP1.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                AND CBP1.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                AND CBP1.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "                AND CBP1.\"Seq\"     = 1 ";
-		sql += "LEFT JOIN ( SELECT \"ClCode1\"";
-		sql += "                 , \"ClCode2\"";
-		sql += "                 , \"ClNo\"";
-		sql += "                 , SUM(\"Area\") AS \"PublicArea\"";
-		sql += "            FROM \"ClBuildingPublic\"";
-		sql += "            GROUP BY \"ClCode1\"";
-		sql += "                   , \"ClCode2\"";
-		sql += "                   , \"ClNo\"";
-		sql += "          ) CBP2 ON CBP2.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                AND CBP2.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                AND CBP2.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "LEFT JOIN ( SELECT \"ClCode1\"";
-		sql += "                 , \"ClCode2\"";
-		sql += "                 , \"ClNo\"";
-		sql += "                 , SUM(\"Area\") AS \"ParkingArea\"";
-		sql += "            FROM \"ClBuildingParking\"";
-		sql += "            GROUP BY \"ClCode1\"";
-		sql += "                   , \"ClCode2\"";
-		sql += "                   , \"ClNo\"";
-		sql += "          ) CBPK ON CBPK.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                AND CBPK.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                AND CBPK.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "WHERE CF.\"ApproveNo\" = :applNo";
-		sql += "  AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
+		sql += "      , L.\"FloorArea\"                     "; // -- 主建物 F4
+		sql += "      , CBP2.\"PublicArea\"                 "; // -- 公設 F5
+		sql += "      , CBPK.\"ParkingArea\"                "; // -- 車位 F6
+		sql += "      , L.\"EvaUnitPrice\"                  "; // -- 鑑定單價 F7
+		sql += "      , 0                   AS \"ApplyAmt\" "; // -- 核貸 ??? F8
+		sql += "      , CLI.\"SettingAmt\"                  "; // -- 設定 F9
+		sql += "      , L.\"BdLocation\"                    "; // -- 門牌地址 F10
+		sql += " FROM \"ClFac\" CF ";
+		sql += " LEFT JOIN \"ClBuilding\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                           AND L.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                           AND L.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " LEFT JOIN (SELECT NVL(CM.\"CustId\",' ') AS \"OwnerId\"";
+		sql += "                 , LO.\"ClCode1\"";
+		sql += "                 , LO.\"ClCode2\"";
+		sql += "                 , LO.\"ClNo\"";
+		sql += "                 , LO.\"OwnerPart\"";
+		sql += "            FROM \"ClBuildingOwner\" LO ";
+		sql += "            LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = LO.\"OwnerCustUKey\"";
+		sql += "           ) LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "               AND LO.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "               AND LO.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                        AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                        AND CLI.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " LEFT JOIN ( SELECT \"ClCode1\"";
+		sql += "                  , \"ClCode2\"";
+		sql += "                  , \"ClNo\"";
+		sql += "                  , \"PublicBdNo1\"";
+		sql += "                  , ROW_NUMBER() OVER (PARTITION BY \"ClCode1\"";
+		sql += "                                                  , \"ClCode2\"";
+		sql += "                                                  , \"ClNo\"";
+		sql += "                                       ORDER BY \"PublicBdNo1\"";
+		sql += "                                      ) AS \"Seq\"";
+		sql += "             FROM \"ClBuildingPublic\"";
+		sql += "           ) CBP1 ON CBP1.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                 AND CBP1.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                 AND CBP1.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "                 AND CBP1.\"Seq\"     = 1 ";
+		sql += " LEFT JOIN ( SELECT \"ClCode1\"";
+		sql += "                  , \"ClCode2\"";
+		sql += "                  , \"ClNo\"";
+		sql += "                  , SUM(\"Area\") AS \"PublicArea\"";
+		sql += "             FROM \"ClBuildingPublic\"";
+		sql += "             GROUP BY \"ClCode1\"";
+		sql += "                    , \"ClCode2\"";
+		sql += "                    , \"ClNo\"";
+		sql += "           ) CBP2 ON CBP2.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                 AND CBP2.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                 AND CBP2.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " LEFT JOIN ( SELECT \"ClCode1\"";
+		sql += "                  , \"ClCode2\"";
+		sql += "                  , \"ClNo\"";
+		sql += "                  , SUM(\"ParkingArea\") AS \"ParkingArea\"";
+		sql += "             FROM \"ClParking\"";
+		sql += "             GROUP BY \"ClCode1\"";
+		sql += "                    , \"ClCode2\"";
+		sql += "                    , \"ClNo\"";
+		sql += "           ) CBPK ON CBPK.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                 AND CBPK.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                 AND CBPK.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " WHERE CF.\"ApproveNo\" = :applNo";
+		sql += "   AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
 
 		this.info("sql=" + sql);
 		Query query;
@@ -467,7 +506,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// -- L9110 Query(股票)
 		String sql = "";
-		sql += " SELECT CS.\"OwnerId\" "; // F0 股票持有人統編
+		sql += " SELECT NVL(CM.\"CustId\",' ') AS \"OwnerId\" "; // F0 股票持有人統編
 		sql += "      , CS.\"SettingBalance\" "; // F1 設質股數餘額
 		sql += "      , CS.\"SettingBalance\" ";
 		sql += "        * CS.\"ParValue\" AS \"TotalParValue\" "; // F2 面額合計
@@ -475,8 +514,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"ClStock\" CS ON CS.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                         AND CS.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                         AND CS.\"ClNo\" = CF.\"ClNo\" ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = CS.\"OwnerCustUKey\" ";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo ";
-		sql += "   AND CS.\"ClCode1\" = 3 "; // 串得到股票擔保品的資料才進表 
+		sql += "   AND CS.\"ClCode1\" = 3 "; // 串得到股票擔保品的資料才進表
 
 		this.info("sql=" + sql);
 		Query query;
@@ -511,19 +551,19 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ELSE '非十五日薪' END AS \"F8 十五日薪\""; // -- ??? 未確認邏輯
 		sql += "       ,CM.\"SpouseName\" AS \"F9 配偶姓名\" ";
 		sql += "       ,CM.\"SpouseId\" AS \"F10 配偶統一編號\" ";
-		sql += "       ,CTNCell.\"TelNo\" AS \"F11 BBC\"  "; // -- ?? 手機?
+		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'03') AS \"F11 BBC\"  "; // -- ?? 手機?
 		sql += "       ,\"Fn_GetCustAddr\"(CM.\"CustUKey\",'0') AS \"F12 戶籍地址\" ";
 		sql += "       ,CM.\"RegZip3\" || CM.\"RegZip2\" AS \"F13 戶籍-郵遞區號\" ";
-		sql += "       ,CTNHome.\"TelArea\" || CTNHome.\"TelNo\" || CTNHome.\"TelExt\" AS \"F14 戶籍電話\" ";
+		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'02') AS \"F14 戶籍電話\" ";
 		sql += "       ,\"Fn_GetCustAddr\"(CM.\"CustUKey\",'1') AS \"F15 通訊地址\" ";
 		sql += "       ,CM.\"CurrZip3\" || CM.\"CurrZip2\" AS \"F16 通訊-郵遞區號\" ";
-		sql += "       ,' ' AS \"F17 聯絡人姓名\"  "; // -- ??
+		sql += "       ,NVL(CTN.\"LiaisonName\",' ') AS \"F17 聯絡人姓名\"  "; // -- ??
 		sql += "       ,'(O) '  ";
-		sql += "       || RPAD(NVL(CTNWork.\"TelArea\" || CTNWork.\"TelNo\" || CTNWork.\"TelExt\", ' '),30) ";
+		sql += "       || RPAD(\"Fn_GetTelNo\"(CM.\"CustUKey\",'01'),30) ";
 		sql += "       || ' (H) '  ";
-		sql += "       || CTNHome.\"TelArea\" || CTNHome.\"TelNo\" || CTNHome.\"TelExt\" AS \"F18 聯絡電話\" ";
-		sql += "       ,' ' AS \"F19 交互運用\"  "; // -- ??
-		sql += "       ,CTNFax.\"TelArea\" || CTNFax.\"TelNo\" || CTNFax.\"TelExt\" AS \"F20 傳真\" ";
+		sql += "       || \"Fn_GetTelNo\"(CM.\"CustUKey\",'02') AS \"F18 聯絡電話\" ";
+		sql += "       ,NVL(CR.\"CrossUse\",'N') AS \"F19 交互運用\"  "; // -- ??
+		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'04') AS \"F20 傳真\" ";
 		sql += "       ,GUA.\"GuaId\" AS \"F21 保證人統編\" ";
 		sql += "       ,GUA.\"GuaName\" AS \"F22 保證人姓名\" ";
 		sql += "       ,GUA.\"GuaRelItem\" AS \"F23 保證人關係\" ";
@@ -587,14 +627,19 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         AND CdSex.\"Code\" = CM.\"Sex\" ";
 		sql += " LEFT JOIN \"CdCode\" CdCustType ON CdCustType.\"DefCode\" = 'CustTypeCode' ";
 		sql += "                              AND CdCustType.\"Code\" = CM.\"CustTypeCode\" ";
-		sql += " LEFT JOIN \"CustTelNo\" CTNHome ON CM.\"CustUKey\" = CTNHome.\"CustUKey\" ";
-		sql += "                              AND CTNHome.\"TelTypeCode\" = '01' ";
-		sql += " LEFT JOIN \"CustTelNo\" CTNWork ON CM.\"CustUKey\" = CTNWork.\"CustUKey\" ";
-		sql += "                              AND CTNWork.\"TelTypeCode\" = '02' ";
-		sql += " LEFT JOIN \"CustTelNo\" CTNCell ON CM.\"CustUKey\" = CTNCell.\"CustUKey\" ";
-		sql += "                              AND CTNCell.\"TelTypeCode\" = '03' ";
-		sql += " LEFT JOIN \"CustTelNo\" CTNFax  ON CM.\"CustUKey\" = CTNFax.\"CustUKey\" ";
-		sql += "                              AND CTNFax.\"TelTypeCode\" = '04' ";
+		sql += " LEFT JOIN (SELECT tmpCTN.\"CustUKey\" ";
+		sql += "                 , CASE";
+		sql += "                     WHEN tmpCTN.\"RelationCode\" = '00'";
+		sql += "                     THEN tmpCM.\"CustName\" ";
+		sql += "                   ELSE tmpCTN.\"LiaisonName\" END AS \"LiaisonName\" ";
+		sql += "                 , ROW_NUMBER() OVER (PARTITION BY tmpCTN.\"CustUKey\" ";
+		sql += "                                      ORDER BY tmpCTN.\"RelationCode\" ";
+		sql += "                                     ) AS \"Seq\" ";
+		sql += "            FROM \"CustTelNo\" tmpCTN ";
+		sql += "            LEFT JOIN \"CustMain\" tmpCM ON tmpCM.\"CustUKey\" = tmpCTN.\"CustUKey\" ";
+		sql += "            WHERE \"Enable\" = 'Y' ";
+		sql += "           ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\" ";
+		sql += "                AND CTN.\"Seq\" = 1 ";
 		sql += " LEFT JOIN (SELECT GUA.\"ApproveNo\"                         AS \"ApplNo\"  ";
 		sql += "                 , GUACM.\"CustId\"                          AS \"GuaId\"   ";
 		sql += "                 , GUACM.\"CustName\"                        AS \"GuaName\" ";
@@ -639,8 +684,14 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             FROM \"LoanBorMain\"  ";
 		sql += "             GROUP BY \"CustNo\" ";
 		sql += "           ) LBM ON LBM.\"CustNo\" = CM.\"CustNo\" ";
-		sql += "  LEFT JOIN \"CustMain\" GROUPCM ON GROUPCM.\"CustUKey\" = FCA.\"GroupUKey\" ";
-		sql += "  LEFT JOIN \"CdEmp\" CDE9 ON CDE9.\"EmployeeNo\" = CM.\"EmpNo\" ";
+		sql += " LEFT JOIN ( SELECT \"CustUKey\" ";
+		sql += "                  , \"CrossUse\" ";
+		sql += "             FROM \"CustCross\" ";
+		sql += "             WHERE \"CrossUse\" = 'Y' ";
+		sql += "             GROUP BY \"CustUKey\",\"CrossUse\" ";
+		sql += "           ) CR ON CR.\"CustUKey\" = CM.\"CustUKey\" ";
+		sql += " LEFT JOIN \"CustMain\" GROUPCM ON GROUPCM.\"CustUKey\" = FCA.\"GroupUKey\" ";
+		sql += " LEFT JOIN \"CdEmp\" CDE9 ON CDE9.\"EmployeeNo\" = CM.\"EmpNo\" ";
 		sql += " WHERE FCA.\"ApplNo\" = :applNo ";
 
 		this.info("sql=" + sql);

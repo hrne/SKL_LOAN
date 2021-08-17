@@ -7,8 +7,6 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,7 +21,6 @@ import com.st1.itx.util.date.DateUtil;
 @Component
 @Scope("prototype")
 public class LM030Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM030Report.class);
 
 	@Autowired
 	LM030ServiceImpl lM030ServiceImpl;
@@ -35,8 +32,8 @@ public class LM030Report extends MakeReport {
 	DateUtil dateUtil;
 
 	int row = 3;
-	public Boolean exec(TitaVo titaVo) throws LogicException {
 
+	public Boolean exec(TitaVo titaVo) throws LogicException {
 
 //		TxBizDate bizDate = new TxBizDate();
 //		dateUtil.init();
@@ -58,15 +55,14 @@ public class LM030Report extends MakeReport {
 			this.info("LM030ServiceImpl.testExcel error = " + errors.toString());
 			return false;
 		}
-		
+
 		return true;
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM030) throws LogicException {
 		this.info("LM030Report exportExcel");
-		
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM030", "轉催收明細總表", "LM030轉催收案件明細_核定總表",
-				"轉催收案件明細_核定總表.xlsx", "10804");
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM030", "轉催收明細總表", "LM030轉催收案件明細_核定總表", "LM030轉催收案件明細_核定總表.xlsx", "11005");
 		String yy = titaVo.get("ENTDY").substring(1, 4);
 		String mm = titaVo.get("ENTDY").substring(4, 6);
 		makeExcel.setSheet("10804", yy + mm);
@@ -74,10 +70,10 @@ public class LM030Report extends MakeReport {
 		BigDecimal total = BigDecimal.ZERO;
 		if (listLM030.size() == 0) {
 			makeExcel.setValue(3, 1, "本日無資料");
-		} 
-		
+		}
+
 		for (Map<String, String> tLDVo : listLM030) {
-			
+
 			String ad = "";
 			int col = 0;
 			for (int i = 0; i < tLDVo.size(); i++) {
@@ -89,33 +85,30 @@ public class LM030Report extends MakeReport {
 				case 11:
 				case 12:
 					int Cyear = (Integer.parseInt(tLDVo.get(ad)) - 19110000) / 10000;
-					makeExcel.setValue(row, col, tLDVo.get(ad) == null? " ": String.valueOf(Cyear) + tLDVo.get(ad).substring(4, 8));
+					makeExcel.setValue(row, col, tLDVo.get(ad) == null ? " " : String.valueOf(Cyear) + tLDVo.get(ad).substring(4, 8));
 					break;
 				case 7:
 				case 8:
 					// 金額
-					makeExcel.setValue(row, col,
-							tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "#,##0");
+					makeExcel.setValue(row, col, tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "#,##0");
 					total = total.add(tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)));
 					break;
 				case 9:
 					// 利率
-					makeExcel.setValue(row, col,
-							tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "#,##0.0000");
+					makeExcel.setValue(row, col, tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "#,##0.0000");
 					break;
 				case 10:
-					if(tLDVo.get(ad) != null) {
-						if(Integer.parseInt(tLDVo.get(ad)) != 0) {
-						    int year = Integer.parseInt(tLDVo.get(ad).substring(0, 4)) - 1911;
+					if (tLDVo.get(ad) != null) {
+						if (Integer.parseInt(tLDVo.get(ad)) != 0) {
+							int year = Integer.parseInt(tLDVo.get(ad).substring(0, 4)) - 1911;
 							makeExcel.setValue(row, col, year + tLDVo.get(ad).substring(4, 8));
-						}
-						else {
+						} else {
 							makeExcel.setValue(row, col, tLDVo.get(ad));
 						}
 					}
 					break;
 				default:
-					makeExcel.setValue(row, col, tLDVo.get(ad) == null? " ": tLDVo.get(ad));
+					makeExcel.setValue(row, col, tLDVo.get(ad) == null ? " " : tLDVo.get(ad));
 					break;
 				}
 			} // for
@@ -144,17 +137,11 @@ public class LM030Report extends MakeReport {
 		// makeExcel.setMergedRegion(row + 1, row + 1, 1, 5);
 		// makeExcel.setMergedRegion(row + 2, row + 2, 1, 5);
 		makeExcel.setFontType(1);
-		if(listLM030.size() == 0) {
-			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款，無清償期屆滿六個\r\n" + 
-					"    月需轉列催收款之案件。\r\n" + 
-					"二、陳核。 ");
-		}else {
-			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款清償期屆滿六個月案件\r\n" + 
-					"    ，依規將本金及應收利息轉列催收款項，\r\n" + 
-					"    金額共計 $" + df1.format(total) + "元。");
-			makeExcel.setValue(row + 2, 1, "二、本月轉入催收款案件未發生『撥款後繳款\r\n" + 
-					"    期數未滿18個月即轉入催收戶』之情事。\r\n" + 
-					"三、陳核。 ");
+		if (listLM030.size() == 0) {
+			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款，無清償期屆滿六個\r\n" + "    月需轉列催收款之案件。\r\n" + "二、陳核。 ");
+		} else {
+			makeExcel.setValue(row + 1, 1, "一、經查本月逾期放款清償期屆滿六個月案件\r\n" + "    ，依規將本金及應收利息轉列催收款項，\r\n" + "    金額共計 $" + df1.format(total) + "元。");
+			makeExcel.setValue(row + 2, 1, "二、本月轉入催收款案件未發生『撥款後繳款\r\n" + "    期數未滿18個月即轉入催收戶』之情事。\r\n" + "三、陳核。 ");
 		}
 //		makeExcel.setAddRengionBorder("A", row + 1, "E", row + 2, 2);
 		// makeExcel.setMergedRegion(row + 1, row + 2, 6, 9);
@@ -172,6 +159,7 @@ public class LM030Report extends MakeReport {
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
+
 //	private void setFinalPart(int row, int size, BigDecimal total) throws LogicException {
 //		row += 10;
 //		DecimalFormat df1 = new DecimalFormat("#,##0");

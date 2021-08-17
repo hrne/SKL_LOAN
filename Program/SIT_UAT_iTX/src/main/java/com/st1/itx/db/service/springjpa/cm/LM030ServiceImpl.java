@@ -50,7 +50,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       FROM (SELECT M.\"CustNo\" ";
 		sql += "                   ,M.\"FacmNo\" ";
 		sql += "                   ,MIN(M.\"DrawdownDate\") \"DrawdownDate\" ";
-		sql += "                   ,SUM(M.\"LoanBal\") \"LoanBal\" ";
+		sql += "                   ,MAX(M.\"LoanBal\") \"LoanBal\" ";
 		sql += "                   ,SUM(NVL(I.\"Interest\",0)) \"Interest\" ";
 		sql += "                   ,MAX(M.\"StoreRate\") \"StoreRate\" ";
 		sql += "                   ,MIN(M.\"PrevPayIntDate\") \"PrevPayIntDate\" ";

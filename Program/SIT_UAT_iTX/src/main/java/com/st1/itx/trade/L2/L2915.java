@@ -273,13 +273,22 @@ public class L2915 extends TradeBuffer {
 
 		int k = 1;
 		for (ClBuildingOwner tClBuildingOwner : lClBuildingOwner) {
-
+			
 			CustMain custMain = sCustMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
-			this.totaVo.putParam("OwnerId" + k, custMain.getCustId());
-			this.totaVo.putParam("OwnerName" + k, custMain.getCustName());
-			this.totaVo.putParam("OwnerRelCode" + k, tClBuildingOwner.getOwnerRelCode());
-			this.totaVo.putParam("OwnerPart" + k, tClBuildingOwner.getOwnerPart());
-			this.totaVo.putParam("OwnerTotal" + k, tClBuildingOwner.getOwnerTotal());
+			
+			if(custMain != null) {
+			  this.totaVo.putParam("OwnerId" + k, custMain.getCustId());
+			  this.totaVo.putParam("OwnerName" + k, custMain.getCustName());
+			  this.totaVo.putParam("OwnerRelCode" + k, tClBuildingOwner.getOwnerRelCode());
+			  this.totaVo.putParam("OwnerPart" + k, tClBuildingOwner.getOwnerPart());
+			  this.totaVo.putParam("OwnerTotal" + k, tClBuildingOwner.getOwnerTotal());
+			} else {
+			  this.totaVo.putParam("OwnerId" + k, "");
+		      this.totaVo.putParam("OwnerName" + k, "");
+			  this.totaVo.putParam("OwnerRelCode" + k, "");
+			  this.totaVo.putParam("OwnerPart" + k, "");
+			  this.totaVo.putParam("OwnerTotal" + k, "");
+			}
 			k++;
 		}
 		// tita擔保品編號取建物修改原因檔資料list

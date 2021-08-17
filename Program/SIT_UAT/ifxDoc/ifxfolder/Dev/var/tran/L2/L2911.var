@@ -1,0 +1,659 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+#Submit=A,1,S
+K(MODIFYBUTTON,查詢)
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2911)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,518)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,108)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+! 權限檢查
+<include src="COM.icf::BFHEAD2.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+[
+["[L2911]                                 不動產擔保品資料查詢"],
+["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
+["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
+["#FdClNo+擔保品編號",#ClNo],
+]
+
+#FdClCode1=X,2,L
+T(3,*)
+#FdClCode2=X,2,L
+T(3,*)
+#FdClNo=X,2,L
+T(3,*)
+
+#FdOCustId=X,2,L
+#FdOClCode1=X,2,L
+#FdOClTypeCode=X,2,L
+#FdOEvaDate=X,2,L
+#FdOEvaNetWorth=X,2,L
+#FdORentEvaValue=X,2,L
+#FdOEvaCompany=X,2,L
+#FdOEvaAmt=X,2,L
+#FdOLVITax=X,2,L
+#FdORentPrice=X,2,L
+#FdOEvaCompanyX=X,2,L
+
+#FdOOwnershipCode=X,2,L
+#FdOMtgCode=X,2,L
+#FdOMtgCheck=X,2,L
+#FdOMtgLoan=X,2,L
+#FdOMtgPledge=X,2,L
+#FdOClStatus=X,2,L
+#FdOClStat=X,2,L
+#FdOAgreement=X,2,L
+#FdOLimitCancelDate=X,2,L
+#FdOClCode=X,2,L
+#FdOLoanToValue=X,2,L
+#FdOOtherOwnerTotal=X,2,L
+#FdOCompensationCopy=X,2,L
+
+#FdOBdRmk=X,2,L
+#FdOSynd=X,2,L
+#FdOSyndCode=X,2,L
+#FdODispPrice=X,2,L
+#FdODispDate=X,2,L
+#FdOMtgReasonCode=X,2,L
+#FdOReceivedDate=X,2,L
+#FdOReceivedNo=X,2,L
+#FdOCancelDate=X,2,L
+#FdOCancelNo=X,2,L
+#FdOSettingDate=X,2,L
+#FdOSettingStat=X,2,L
+#FdOSettingAmt=X,2,L
+#FdOClaimDate=X,2,L
+#FdOSettingSeq=X,2,L
+#FdOFirstAmt=X,2,L
+#FdOSecondAmt=X,2,L
+#FdOThirdAmt=X,2,L
+#FdOFirstCreditor=X,2,L
+#FdOSecondCreditor=X,2,L
+#FdOThirdCreditor=X,2,L
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#ClCode1Help=x,20,S
+T(3,1:房地;2:土地)
+
+!ClCode21
+#CDDEF01=x,20,S
+T(3,CdCode.ClCode21)
+
+#ClCode21Help=x,1024,S
+
+!ClCode22
+#CDDEF02=x,30,S
+T(3,CdCode.ClCode22)
+
+#ClCode22Help=x,1024,S
+
+!EvaCompany 鑑價公司
+#CDDEF03=x,30,S
+T(3,CdCode.EvaCompanyCode)
+
+#EvaCompanyHelp=x,1024,S
+
+!OwnershipCode 權利種類
+#CDDEF04=x,30,S
+T(3,CdCode.OwnershipCode)
+
+#OwnershipCodeHelp=x,1024,S
+
+!MtgCode 抵押權註記
+#CDDEF05=x,30,S
+T(3,CdCode.MtgCode)
+
+#MtgCodeHelp=x,1024,S
+
+!ClStatus 擔保品狀況碼 
+#CDDEF06=x,30,S
+T(3,CdCode.ClStatus)
+
+#ClStatusHelp=x,1024,S
+
+!ClStat擔保品狀態
+#CDDEF07=x,30,S
+T(3,CdCode.ClStatCode)
+
+#ClStatHelp=x,1024,S
+
+!ClCode 擔保註記
+#CDDEF08=x,30,S
+T(3,CdCode.ClCode)
+
+#ClCodeHelp=x,1024,S
+
+!SyndCode 聯貸案類型
+#CDDEF09=x,30,S
+T(3,CdCode.SyndCode)
+
+#SyndCodeHelp=x,1024,S
+
+!MtgReasonCode 最高抵押權確定事由
+#CDDEF10=x,30,S
+T(3,CdCode.MtgReasonCode)
+
+#MtgReasonCodeHelp=x,1024,S
+
+!SettingStat 設定狀態
+#CDDEF11=x,30,S
+T(3,CdCode.SettingStatCode)
+
+#SettingStatHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClCode21Help,#HelpDesc1)
+T(2,@ClCode22Help,#HelpDesc2)
+T(2,@EvaCompanyHelp,#HelpDesc3)
+T(2,@OwnershipCodeHelp,#HelpDesc4)
+T(2,@MtgCodeHelp,#HelpDesc5)
+T(2,@ClStatusHelp,#HelpDesc6)
+T(2,@ClStatHelp,#HelpDesc7)
+T(2,@ClCodeHelp,#HelpDesc8)
+T(2,@SyndCodeHelp,#HelpDesc9)
+T(2,@MtgReasonCodeHelp,#HelpDesc10)
+
+#HelpRim2=X,1,S
+RESET_RIM(#HelpRim2,XXR99)
+S(XXR99,01,#CDDEF11)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@SettingStatHelp,#HelpDesc1)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#Init=X,1,S
+! INVOKEJS(SHOW,p1,4,4,0)
+! INVOKEJS(SHOW,p1,10,50,0)
+
+#NTXBUF=X,57,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@ClCode1,#NTXBUF,1,1)
+T(1,@ClCode2,#NTXBUF,2,2)
+T(1,@ClNo,#NTXBUF,4,7)
+
+!代號1
+#ClCode1=A,1,I
+C(3,#CHAIN,1,s,$)
+HELP(#ClCode1Help) 
+@V(H,#ClCode1Help)
+
+#ClCode1X=X,4,L
+! C(3,#ClCode1,1,INVOKEJS(SHOW,p1,4,4,1),INVOKEJS(SHOW,p1,4,4,0))
+C(4,#ClCode1,S,$)
+T(H,#ClCode1,#ClCode1Help)
+
+!代號2
+#ClCode2=A,2,I
+C(3,#CHAIN,1,s,$)
+C(2,#ClCode1,T(3,),
+             HELP(#ClCode21Help),
+             HELP(#ClCode22Help) 
+ )
+@C(2,#ClCode1,T(3,),V(H,#ClCode21Help),
+                    V(H,#ClCode22Help))
+
+#COLIND=A,3,S
+T(2,#ClCode1+#ClCode2)
+
+#ClCode2X=X,13,L
+C(2,#ClCode1,T(3,),T(H,#ClCode2,#ClCode21Help),
+                   T(H,#ClCode2,#ClCode22Help))
+
+!擔保品編號
+#ClNo=A,7,I
+C(3,#CHAIN,1,s,$)
+@V(2,0)
+
+! !土地序號
+! #LandSeq=A,3,I
+! C(3,#ClCode1,1,$,S)
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+#QuickXMT=A,1,S
+C(3,#CHAIN,1,$,s)
+XMT()
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+
+</sub>
+
+
+!---------- TXFORM = L2911 ----------
+<sub type="FORM" name="L2911">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2911,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2911] 不動產擔保品資料)
+
+
+
+#BUF2=X,14,S
+T(2,1+#ClCode1+#ClCode2+#ClNo+000)
+
+
+#button2=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L2416; ntxbuf=#BUF2})ASGN(BTN_NEW2$)
+C(3,#ClCode1,1,$,S)
+K(MODIFYBUTTON,2,不動產土地擔保品資料登錄)
+
+
+! #BUF3=X,14,S
+! T(2,1+#ClCode1+#ClCode2+#ClNo)
+
+
+! #button3=x,100,S
+! T(2,{ cmd=CHAIN; ntxcd=L2415; ntxbuf=#BUF3})ASGN(BTN_NEW3$)
+! C(3,#ClCode1,1,$,S)
+! K(MODIFYBUTTON,2,不動產建物擔保品資料登錄)
+
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!統一編號
+#OCustId=X,10,L
+
+#OCustName=x,100,L
+
+!擔保品編號
+#OClCode1=A,1,L
+T(2,#ClCode1)
+#OClCode2=A,2,L
+T(2,#ClCode2)
+#OClNo=A,7,L
+T(2,#ClNo)
+!擔保品類別
+#OClTypeCode=X,3,L
+
+!鑑估日期
+#OEvaDate=D,7,L
+!鑑估總值
+#OEvaAmt=m,14,L
+!評估淨值
+#OEvaNetWorth=m,14,L
+!土地增值稅
+#OLVITax=m,14,L
+!出租評估淨值
+#ORentEvaValue=m,14,L
+!押租金
+#ORentPrice=m,14,L
+!權利種類
+#OOwnershipCode=A,1,L
+
+#OOwnershipCodeX=X,15,L
+T(3,)T(H,#OOwnershipCode,#OwnershipCodeHelp)
+!抵押權註記
+#OMtgCode=A,1,L
+
+#OMtgCodeX=X,30,L
+T(3,)T(H,#OMtgCode,#MtgCodeHelp)
+
+!最高限額抵押權之擔保債權種類
+#OMtgCheck=X,1,L
+
+#OMtgLoan=X,1,L
+
+#OMtgPledge=X,1,L
+
+!擔保品狀況碼
+#OClStatus=A,1,L
+
+#OClStatusX=X,7,L
+T(3,)T(H,#OClStatus,#ClStatusHelp) 
+
+! 擔保品狀態
+#OClStat=X,1,L
+
+#OClStatX=X,10,L
+T(3,)T(H,#OClStat,#ClStatHelp)
+
+
+!檢附同意書
+#OAgreement=X,1,L
+!鑑價公司
+#OEvaCompany=X,2,L
+!鑑價公司名稱
+#OEvaCompanyX=X,40,L
+!T(3,)T(H,#OEvaCompany,#EvaCompanyHelp)
+
+!限制塗銷日期
+#OLimitCancelDate=D,7,L
+!擔保註記
+#OClCode=A,1,L
+
+#OClCodeX=X,6,L
+T(3,)T(H,#OClCode,#ClCodeHelp)
+               
+!貸放成數
+#OLoanToValue=m,3.2,L
+!其他債權人設定總額
+#OOtherOwnerTotal=m,14,L
+!代償後謄本
+#OCompensationCopy=A,1,L
+!建物標示備註
+#OBdRmk=X,60,L
+!聯貸案
+#OSynd=X,1,L
+!聯貸案類型
+#OSyndCode=A,1,L
+
+#OSyndCodeX=X,6,L
+T(3,)T(H,#OSyndCode,#SyndCodeHelp)
+!處分價格
+#ODispPrice=m,14,L
+!處分日期
+#ODispDate=D,7,L
+!最高抵押權確定事由
+#OMtgReasonCode=X,1,L
+
+#OMtgReasonCodeX=x,32,L
+T(3,)T(H,#OMtgReasonCode,#MtgReasonCodeHelp)
+! 收文日期
+#OReceivedDate=D,7,L
+!收文案號
+#OReceivedNo=X,20,L
+!撤銷日期
+#OCancelDate=D,7,L
+!撤銷案號
+#OCancelNo=X,20,L
+
+!設定日期
+#OSettingDate=D,7,L
+!設定狀態
+#OSettingStat=X,1,L
+
+#OSettingStatX=X,4,L
+T(3,)T(H,#OSettingStat,#SettingStatHelp)
+
+!設定金額
+#OSettingAmt=m,14,L
+!擔保債權確定日期
+#OClaimDate=D,7,L
+!設定順位
+#OSettingSeq=A,1,L
+!前一順位金額
+#OFirstAmt=m,14,L
+!前一順位債權人
+#OFirstCreditor=X,10,L
+!前二順位金額
+#OSecondAmt=m,14,L
+!前二順位債權人
+#OSecondCreditor=X,10,L
+!前三順位金額
+#OThirdAmt=m,14,L
+!前三順位債權人
+#OThirdCreditor=X,10,L
+
+
+! #OL2915Fg=X,1,S
+! #OL2916Fg=X,1,S
+
+! ! 連結L2915 查建物
+! #OBtn1=X,1,S
+! BIND(grid,{ cmd=CHAIN; ntxcd=L2915; ntxbuf=#OBuf})
+! IF(#OL2915Fg=="N",BIND(grid,cancel),$)
+
+! ! 連結L2916 查土地
+! #OBtn2=X,1,S
+! BIND(grid,{ cmd=CHAIN; ntxcd=L2916; ntxbuf=#OBuf})
+! IF(#OL2915Fg=="N",BIND(grid,cancel),$)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOtradecode=X,5,S
+
+!tradecode=2915時連2415,2916連2416
+#OOtradecode2=X,5,S
+IF(#OOtradecode=="L2915",T(3,L2415),T(3,L2416))
+
+#Cl1Type=X,4,S
+IF(#OOtradecode=="L2915",T(3,建物),$)
+IF(#OOtradecode=="L2916",T(3,土地),$)
+
+
+#OOLandSeq=X,3,S
+C(5,#OOtradecode,"L2915",S,$)
+
+#OOLandSeqXA=A,3,S
+E(0,#OOLandSeq)
+
+#OOLandSeqX=X,3,S
+C(5,#OOtradecode,"L2915",S,$)
+T(2,#OOLandSeqXA)
+
+#OOAddress=x,100,S
+
+
+#FUN2=X,1,S
+T(3,2)
+#FUN4=X,1,S
+T(3,4)
+!查詢
+#OBuf=X,13,S
+IF(#OOtradecode=="L2915",T(2,#OClCode1+#OClCode2+#OClNo),T(2,#OClCode1+#OClCode2+#OClNo+#OOLandSeqX))
+!修改
+#OBuf3=X,14,S
+IF(#OOtradecode=="L2915",T(2,#FUN2+#OClCode1+#OClCode2+#OClNo),T(2,#FUN2+#OClCode1+#OClCode2+#OClNo+#OOLandSeqX))
+!刪除
+#OBuf4=X,14,S
+IF(#OOtradecode=="L2915",T(2,#FUN4+#OClCode1+#OClCode2+#OClNo),T(2,#FUN4+#OClCode1+#OClCode2+#OClNo+#OOLandSeqX))
+
+
+
+! #OOBtnName=x,11,S
+! IF(#OOtradecode=="L2915",T(3,建物明細),T(3,土地明細))
+
+
+! 連結L2916 L2915 查詢
+#OBtn2=X,10,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#OOtradecode; ntxbuf=#OBuf})
+C(4,#OOAddress,BIND(grid,cancel),$)
+
+! 連結L2416 L2415 修改
+#OBtn3=X,10,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#OOtradecode2; ntxbuf=#OBuf3})
+C(4,#OOAddress,BIND(grid,cancel),$)
+
+! 連結L2416 L2415 刪除
+#OBtn4=X,10,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#OOtradecode2; ntxbuf=#OBuf4})
+C(4,#OOAddress,BIND(grid,cancel),$)
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#ClCode1
+#ClCode2
+#ClNo
+#END
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2911
+#OCustId
+#OCustName
+#OClCode1
+#OClCode2
+#OClNo
+#OClTypeCode
+#OEvaDate
+#OEvaAmt
+#OEvaNetWorth
+#OLVITax
+#ORentEvaValue
+#ORentPrice
+#OEvaCompany
+#OEvaCompanyX
+#OOwnershipCode
+#OMtgCode
+#OMtgCheck
+#OMtgLoan
+#OMtgPledge
+#OClStatus
+#OClStat
+#OAgreement
+#OLimitCancelDate
+#OClCode
+#OLoanToValue
+#OOtherOwnerTotal
+#OCompensationCopy
+#OBdRmk
+#OSynd
+#OSyndCode
+#ODispPrice
+#ODispDate
+#OMtgReasonCode
+#OReceivedDate
+#OReceivedNo
+#OCancelDate
+#OCancelNo
+#OSettingDate
+#OSettingStat
+#OSettingAmt
+#OClaimDate
+#OSettingSeq
+#OFirstAmt
+#OFirstCreditor
+#OSecondAmt
+#OSecondCreditor
+#OThirdAmt
+#OThirdCreditor
+#OOtradecode
+#OOLandSeq
+#OOAddress
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L2911" layout="cols=3;screen.width=[180,140,180,350];printer.width=[15,30,15,30];order=1">
+[
+["[L2911]                                 不動產擔保品資料查詢"],
+![#<->#,"#FdOCustId+借款戶統編",#OCustId,#OCustName],
+[#<->#,"#FdOClCode1+擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],
+[#<->#,"#FdOClTypeCode+擔保品類別",#OClTypeCode],
+[#<->#,"@@@@@<font color=red>@鑑價"],
+["#FdOEvaDate+鑑估日期",#OEvaDate],["#FdOEvaAmt+鑑估總值",#OEvaAmt],
+["#FdOEvaNetWorth+評估淨值",#OEvaNetWorth],["#FdOLVITax+土地增值稅",#OLVITax],
+["#FdORentEvaValue+出租評估淨值",#ORentEvaValue],["#FdORentPrice+押租金",#ORentPrice],
+["#FdOEvaCompany+鑑價公司",#OEvaCompany],["#FdOEvaCompanyX+鑑價公司名稱",#OEvaCompanyX],
+[#<->#,"@@@@@<font color=red>@抵押"],
+[#<->#,"#FdOOwnershipCode+權利種類",#OOwnershipCode,#OOwnershipCodeX],
+[#<->#,"#FdOMtgCode+抵押權註記",#OMtgCode,#OMtgCodeX],
+[#<->#,"","@@@@@@<font color=red>@最高限額抵押權之擔保債權種類"],
+["#FdOMtgCheck+票據",#OMtgCheck],
+["#FdOMtgLoan+借款",#OMtgLoan],
+["#FdOMtgPledge+保證債務",#OMtgPledge],
+["#FdOClStatus+擔保品狀況碼",#OClStatus,#OClStatusX],["#FdOClStat+擔保品狀態",#OClStat,#OClStatX],
+["#FdOAgreement+檢附同意書",#OAgreement],["#FdOLimitCancelDate+限制塗銷日期",#OLimitCancelDate],
+["#FdOClCode+擔保註記",#OClCode,#OClCodeX],["#FdOLoanToValue+貸放成數",#OLoanToValue,"@%@"],
+[#<->#,"#FdOOtherOwnerTotal+其他債權人設定總額",#OOtherOwnerTotal],
+[#<->#,"#FdOCompensationCopy+代償後謄本",#OCompensationCopy],
+[#<->#,"#FdOBdRmk+建物標示備註",#OBdRmk],
+["#FdOSynd+聯貸案",#OSynd],["#FdOSyndCode+聯貸案類型",#OSyndCode,#OSyndCodeX],
+[#<->#,"@@@@@<font color=red>@處分"],
+["#FdODispPrice+處分價格",#ODispPrice],["#FdODispDate+處分日期",#ODispDate],
+[#<->#,"#FdOMtgReasonCode+最高抵押權確定事由",#OMtgReasonCode,#OMtgReasonCodeX],
+["#FdOReceivedDate+收文日期",#OReceivedDate],["#FdOReceivedNo+收文案號",#OReceivedNo],
+["#FdOCancelDate+撤銷日期",#OCancelDate],["#FdOCancelNo+撤銷案號",#OCancelNo],
+[#<->#,"@@@@@<font color=red>@擔保設定"],
+["#FdOSettingDate+設定日期",#OSettingDate],["#FdOSettingStat+設定狀態",#OSettingStat,#OSettingStatX],
+["#FdOSettingAmt+設定金額",#OSettingAmt],["#FdOClaimDate+擔保債權確定日期",#OClaimDate],
+[#<->#,"#FdOSettingSeq+設定順位",#OSettingSeq],
+["#FdOFirstAmt+前一順位金額",#OFirstAmt],["#FdOFirstCreditor+前一順位債權人",#OFirstCreditor],
+["#FdOSecondAmt+前二順位金額",#OSecondAmt],["#FdOSecondCreditor+前二順位債權人",#OSecondCreditor],
+["#FdOThirdAmt+前三順位金額",#OThirdAmt],["#FdOThirdCreditor+前三順位債權人",#OThirdCreditor],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L2911
+#any={detail:true, header:'L2911.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+
+#Cl1Type=類別
+{width:80,align:'center'}
+
+#OBtn3=
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+#OBtn4=
+{width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
+#OBtn2=
+{width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+
+
+#OOLandSeqX=序號
+{width:80,align:'center'}
+
+#OOAddress=門牌/座落
+{width:450}
+
+
+^
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

@@ -546,7 +546,7 @@ public class NegCom extends CommBuffer {
 		if ("Y".equals(tNegMain.getIsMainFin())) {
 			updNegFinShare(tNegTrans, tNegMain, transTxAmt.subtract(transReturnAmt), titaVo);
 		} else {
-			tNegTrans.setSklShareAmt(transTxAmt);
+			transSklShareAmt = transTxAmt;
 		}
 
 		// 計算本利(非短繳)
@@ -589,7 +589,7 @@ public class NegCom extends CommBuffer {
 		}
 
 		// 4.更新jcic報送檔
-		if (ChekUpdDB == 1) {
+		if (ChekUpdDB == 1 && "Y".equals(tNegMain.getIsMainFin())) {
 			updateJcic(tNegMainUpd, tNegTransUpd, titaVo);
 			this.info("ChekUpdDB 2");
 		}
@@ -682,9 +682,7 @@ public class NegCom extends CommBuffer {
 		tNegTransUpd.setThisTxtNo(titaVo.getTxtNo());// 本次交易序號
 		tNegTransUpd.setThisSeqNo(thisSeqNoAdd);// 本次序號
 		try {
-			sNegTransService.update2(tNegTransUpd, titaVo);// 資料異動後-1
-			dataLog.setEnv(titaVo, tNegTransOrg, tNegTransUpd);// 資料異動後-2
-			dataLog.exec();// 資料異動後-3
+			sNegTransService.update(tNegTransUpd, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
@@ -1232,14 +1230,6 @@ public class NegCom extends CommBuffer {
 			payStatus = "N";
 		}
 
-		// String SecondRepayYM = String.valueOf(tNegMain.getDeferYMStart());
-		// if (SecondRepayYM != null && SecondRepayYM.length() >= 6) {
-		// SecondRepayYM = SecondRepayYM.substring(0, 6);
-		// } else {
-		// SecondRepayYM = "";
-		// }
-		// JcicZ050Map.put("SecondRepayYM", SecondRepayYM);// 進入第二階梯還款年月-延期繳款年月(起)
-
 		if (titaVo.isHcodeNormal()) {
 			// 正向
 			if (tJcicZ050 != null) {
@@ -1263,7 +1253,7 @@ public class NegCom extends CommBuffer {
 				tJcicZ050.setSumRepayActualAmt(sumRepayActualAmt.intValue());
 				tJcicZ050.setSumRepayShouldAmt(sumRepayShouldAmt.intValue());
 				tJcicZ050.setStatus(payStatus);
-				// tJcicZ050.setSecondRepayYM(SecondRepayYM);
+				tJcicZ050.setSecondRepayYM(0); // 進入第二階梯還款年月,目前不使用
 				tJcicZ050.setOutJcicTxtDate(0);
 				String iKey = "";
 				iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
@@ -1384,9 +1374,10 @@ public class NegCom extends CommBuffer {
 			updateDbReverse(tTempVo, tNegMain, tNegTrans, titaVo);
 
 			// 更新jcic報送檔
-			caseKindCode = tTempVo.get("CaseKindCode");
-			updateJcic(tNegMain, tNegTrans, titaVo);
-
+			if ("Y".equals(tNegMain.getIsMainFin())) {
+				caseKindCode = tTempVo.get("CaseKindCode");
+				updateJcic(tNegMain, tNegTrans, titaVo);
+			}
 		}
 		return;
 
@@ -1932,6 +1923,7 @@ public class NegCom extends CommBuffer {
 	 * @throws LogicException ..
 	 */
 	public int nper(BigDecimal LoanAmt, BigDecimal DueAmt, BigDecimal Rate) throws LogicException {
+		// L5970使用
 		this.info("NegCom nper LoanAmt=[" + LoanAmt + "] DueAmt=[" + DueAmt + "] Rate=[" + Rate + "]");
 		int Period = 0;// 應繳期數
 		if (Rate.compareTo(BigDecimal.ZERO) != 0) {

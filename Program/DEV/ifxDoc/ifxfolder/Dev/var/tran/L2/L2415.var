@@ -34,7 +34,7 @@ E(0,40)ASGN(INQPRT$)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[250,150,160,900];printer.width=[15,30,15,30];order=1">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,150,250,900];printer.width=[15,30,15,30];order=1">
 [
 ["[L2415]                                 不動產建物擔保品資料登錄"],
 [#<->#,"#FdFUNCD+功能",#FunCdX],
@@ -411,21 +411,25 @@ T(F,@PublicBdNoB{i},#LbCONTROL_FG)
 T(F,@Area{i},#LbCONTROL_FG)
 T(F,@PublicBdOwnerId{i},#LbCONTROL_FG)
 T(F,@PublicBdOwnerName{i},#LbCONTROL_FG)
-!!T(F,@ParkingBdNoA{i},#LbCONTROL_FG)
-!!T(F,@ParkingBdNoB{i},#LbCONTROL_FG)
-!!T(F,@ParkingArea{i},#LbCONTROL_FG)
-!!T(F,@ParkingAmt{i},#LbCONTROL_FG)
-! T(F,@OwnerId_{i},#LbCONTROL_FG)
-! T(F,@OwnerName_{i},#LbCONTROL_FG)
-! T(F,@OwnerRelCode_{i},#LbCONTROL_FG)
-! T(F,@OwnerRelCode_X_{i},#LbCONTROL_FG)
-! T(F,@OwnerPart_{i},#LbCONTROL_FG)
-! T(F,@OwnerTotal_{i},#LbCONTROL_FG)
 T(F,@Reason{i},#LbCONTROL_FG)
 T(F,@ReasonX{i},#LbCONTROL_FG)
 T(F,@OtherReason{i},#LbCONTROL_FG)
 T(F,@CreateEmpNo{i},#LbCONTROL_FG)
 T(F,@CreateDate{i},#LbCONTROL_FG)
+##end
+##loop{times:100,i:1}
+T(F,@ParkingNo{i},#LbCONTROL_FG)
+T(F,@ParkingQty{i},#LbCONTROL_FG)
+T(F,@ParkingTypeCode{i},#LbCONTROL_FG)
+T(F,@ParkingTypeCodeX{i},#LbCONTROL_FG)
+T(F,@ParkingOwnerPart{i},#LbCONTROL_FG)
+T(F,@ParkingOwnerTotal{i},#LbCONTROL_FG)
+T(F,@ParkingArea{i},#LbCONTROL_FG)
+T(F,@ParkingBdNoA{i},#LbCONTROL_FG)
+T(F,@ParkingBdNoB{i},#LbCONTROL_FG)
+T(F,@ParkingLandNoA{i},#LbCONTROL_FG)
+T(F,@ParkingLandNoB{i},#LbCONTROL_FG)
+T(F,@ParkingAmount{i},#LbCONTROL_FG)
 ##end
 
 #SET_REQUIRED=@,1,S
@@ -511,14 +515,21 @@ T(F,@OtherReason{i},#LbCONTROL_FG)
 T(F,@CreateEmpNo{i},#LbCONTROL_FG)
 T(F,@CreateDate{i},#LbCONTROL_FG)
 ##end
-!##loop{times:10,i:1}
-!T(F,@ParkingBdNoA{i},#LbCONTROL_FG)
-!T(F,@ParkingBdNoB{i},#LbCONTROL_FG)
-!T(F,@ParkingArea{i},#LbCONTROL_FG)
-!T(F,@ParkingAmt{i},#LbCONTROL_FG)
-!##end
+##loop{times:100,i:1}
+T(F,@ParkingNo{i},#LbCONTROL_FG)
+T(F,@ParkingQty{i},#LbCONTROL_FG)
+T(F,@ParkingTypeCode{i},#LbCONTROL_FG)
+T(F,@ParkingTypeCodeX{i},#LbCONTROL_FG)
+T(F,@ParkingOwnerPart{i},#LbCONTROL_FG)
+T(F,@ParkingOwnerTotal{i},#LbCONTROL_FG)
+T(F,@ParkingArea{i},#LbCONTROL_FG)
+T(F,@ParkingBdNoA{i},#LbCONTROL_FG)
+T(F,@ParkingBdNoB{i},#LbCONTROL_FG)
+T(F,@ParkingLandNoA{i},#LbCONTROL_FG)
+T(F,@ParkingLandNoB{i},#LbCONTROL_FG)
+T(F,@ParkingAmount{i},#LbCONTROL_FG)
+##end
 ,$)
-
 ! 權限檢查
 #FUNCIND=_,_,S
 E(0,#FunCd)

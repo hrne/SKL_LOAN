@@ -78,8 +78,12 @@ public class LM041Report extends MakeReport {
 		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) / 100));
 		String year = entdy.substring(0, 3);
 		int month = Integer.parseInt(entdy.substring(3, 5));
+		
+		makeExcel.setMergedRegion(row + 3, row + 3, 1, 7);
 		makeExcel.setValue(row + 3, 1, "一、擬 " + year + "年" + String.valueOf(month) + "月份呆帳戶之暫收款項金額共計 $" + total + "元入呆帳回收。", "#,##0");
+		makeExcel.setMergedRegion(row + 4, row + 4, 1, 7);
 		makeExcel.setValue(row + 4, 1, "二、陳核。");
+		
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
