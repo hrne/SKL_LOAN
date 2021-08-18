@@ -294,15 +294,15 @@ public class L2411 extends TradeBuffer {
 		if (tClMain == null) {
 			if (iFunCd == 1) {
 				// 依照使用者輸入之統編或戶號取得客戶識別碼
-				if (!iCustId.isEmpty()) {
-					tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
-				} else if (iCustNo > 0) {
-					tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
-				}
-				if (tCustMain == null) {
+//				if (!iCustId.isEmpty()) {
+//					tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+//				} else if (iCustNo > 0) {
+//					tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+//				}
+//				if (tCustMain == null) {
 					// 查無客戶資料
-					throw new LogicException("E0001", "CustId=" + iCustId + ", CustNo=" + iCustNo);
-				}
+//					throw new LogicException("E0001", "CustId=" + iCustId + ", CustNo=" + iCustNo);
+//				}
 				custUKey = tCustMain.getCustUKey();
 				// 擔保品主檔
 				this.info("ClMainId1 = " + ClMainId);
@@ -347,26 +347,27 @@ public class L2411 extends TradeBuffer {
 					InsertClLandOwner(titaVo);
 				}
 				// 依核准號碼建立一筆額度與擔保品關聯檔
-				ClFacId clFacId = new ClFacId();
-				clFacId.setClCode1(iClCode1);
-				clFacId.setClCode2(iClCode2);
-				clFacId.setClNo(iClNo);
-				clFacId.setApproveNo(iApplNo);
-				ClFac tClFac = sClFacService.findById(clFacId, titaVo);
+				if( iApplNo > 0 ) { // 核准編號大於0才去做
+				  ClFacId clFacId = new ClFacId();
+				  clFacId.setClCode1(iClCode1);
+				  clFacId.setClCode2(iClCode2);
+				  clFacId.setClNo(iClNo);
+				  clFacId.setApproveNo(iApplNo);
+				  ClFac tClFac = sClFacService.findById(clFacId, titaVo);
 
-				FacCaseAppl tFacCaseAppl = sFacCaseApplService.findById(iApplNo, titaVo);
-				if (tFacCaseAppl == null) {
+				  FacCaseAppl tFacCaseAppl = sFacCaseApplService.findById(iApplNo, titaVo);
+				  if (tFacCaseAppl == null) {
 					throw new LogicException("E2019", "申請號碼 = " + iApplNo); // 此申請號碼不存在案件申請檔
-				}
-				FacMain tFacMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
-				if (tFacMain == null) {
+				  }
+				  FacMain tFacMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
+				  if (tFacMain == null) {
 					tFacMain = new FacMain();
-				}
+				  }
 
-				// 新增資料重複
-				if (tClFac != null) {
+				  // 新增資料重複
+				  if (tClFac != null) {
 					throw new LogicException("E0005", "額度與擔保品關聯檔"); // 新增資料時，發生錯誤
-				} else {
+				  } else {
 					tClFac = new ClFac();
 					clFacId = new ClFacId();
 					clFacId.setClCode1(iClCode1);
@@ -394,7 +395,8 @@ public class L2411 extends TradeBuffer {
 
 					// 額度與擔保品關聯檔變動處理
 					clFacCom.changeClFac(iApplNo, titaVo);
-				}
+				  }
+				} // if
 
 			} else if (iFunCd == 2) {
 				throw new LogicException("E0003", "擔保品主檔"); // 修改資料不存在
@@ -680,7 +682,7 @@ public class L2411 extends TradeBuffer {
 		tClMain.setClCode1(iClCode1);
 		tClMain.setClCode2(iClCode2);
 		tClMain.setClNo(iClNo);
-		tClMain.setCustUKey(custUKey);
+//		tClMain.setCustUKey(custUKey);
 		tClMain.setClTypeCode(titaVo.getParam("ClTypeCode"));
 		tClMain.setCityCode(titaVo.getParam("CityCode"));
 		tClMain.setAreaCode(titaVo.getParam("AreaCode"));

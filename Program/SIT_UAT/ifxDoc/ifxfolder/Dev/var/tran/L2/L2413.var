@@ -1,0 +1,1142 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2413)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,7)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,0)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="COM.icf::BFHEAD2.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,300,190,400];printer.width=[15,30,15,30];order=1">
+[
+["[L2413]                                 股票擔保品資料登錄"],
+[#<->#,"#FdFUNCD+功能",#FunCdX],
+![#<->#,"#FdCustId+統一編號",#CustId],
+![#<->#,"#FdCustNo+戶號",#CustNo],
+[#<->#,"#FdApplNo+核准號碼",#ApplNo,#BTN1,#ApplNoX],
+["#FdCOL_IND1+擔保品代號1",#ClCode1,#ClCode1X],["#FdCOL_IND2+擔保品代號2",#ClCode2,#ClCode2X],
+[#<->#,"#FdCOL_NO+擔保品編號",#ClNo],
+["#FdCOL_TYPE+擔保品類別",#ClTypeCode,#ClTypeCodeX],
+[#<->#,"#FdCOL_AREA+地區別",#CityCode,#CityCodeX],
+[#<->#,"#FdSTOCK_CODE+股票代號",#StockCode,#StockCodeX],
+["#FdLIST_TYPE+掛牌別",#ListingType,#ListingTypeX],["#FdSTOCK_TYPE+股票種類",#StockType,#StockTypeX],
+["#FdSTOCK_ID+發行公司統一編號",#CompanyId],["#FdDATA_YEAR+資料年度",#DataYear],
+["#FdSHARES+發行股數",#IssuedShares,"股"],["#FdVALUE_STANDARD+每股單價鑑估標準",#EvaStandard,#EvaStandardX],
+["#FdSHARE_VALUE+非上市（櫃）每股淨值",#NetWorth,"元"],["#FdBVPS+每股面額",#ParValue,"元"],
+["#FdMONTHLY_AVG+一個月平均價",#MonthlyAvg,"元"],["#FdClosingPrice+前日收盤價",#YdClosingPrice,"元"],
+["#FdQUARTER_AVG+三個月平均價",#ThreeMonthAvg,"元"],["#FdVALUE_AMT+鑑定單價",#EvaUnitPrice,"元"],
+["#FdOWNER_ID+股票持有人統編",#OwnerId],["#FdOWNER_NAME+股票持有人姓名",#OwnerName],
+["#FdMEMB_POS+公司內部人職稱",#InsiderJobTitle,#InsiderJobTitleX],["#FdMEMB_IND+公司內部人身分註記",#InsiderPosition,#InsiderPositionX],
+["#FdLEGAL_REL+法定關係人統編",#LegalPersonId],["#FdLOAN_PER+貸放成數",#LoanToValue,"%"],
+["#FdCOL_MTR+擔保維持率",#ClMtr,"%"],["#FdNOTICE_MTR+通知追繳維持率",#NoticeMtr,"%"],
+["#FdIMPLEMENT_MTR+實行職權維持率",#ImplementMtr,"%"],["#FdPLEDGE_NO+質權設定書號",#PledgeNo],
+[#<->#,"#FdCOMPUTE_MTR+計算維持率",#ComputeMTR,#ComputeMTRX],
+["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
+["#FdSETTING_DT+股票設（解）質日期",#SettingDate],["#FdSETTING_AMT+設質股數餘額",#SettingBalance,"股"],
+["#FdVALUE_DT+鑑估日期",#EvaDate],["#FdESTVALUE_AMT+鑑估值",#EvaAmt,"元"],
+["#FdMORTGAGE_DT+擔保債權確定日期",#MtgDate],["#FdCUSTODY_NO+保管條號碼",#CustodyNo],
+["#FdINTERSYNDLOAN+聯貸案",#Synd,#SyndX],["#FdINTERSYND_TYPE+聯貸案類型",#SyndCode,#SyndCodeX],
+["#FdDISPOSITION_PRICE+處分價格",#DispPrice],["#FdDISPOSITION_DT+處分日期",#DispDate],
+[#<->#,"#FdCOL_STATUS+擔保品狀況碼",#ClStatus,#ClStatusX],
+]
+!---------- AP Button AREA ----------
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L1R09.dec"/>
+<include src="ROM.icf::L6R03.dec"/>
+<include src="ROM.icf::L6R11Rim.dec"/>
+<include src="ROM.icf::L2R22.dec"/>
+<include src="ROM.icf::L2R25.dec"/>
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#FunCdHelp=x,50,S
+T(3,1:新增;2:修改;4:刪除)
+
+#ClCode1Help=x,20,S
+T(3,3:股票;4:其他有價證券)
+
+#YNHelp=x,20,S
+T(3,Y:是;N:否)
+
+!ClTypeCode23
+#CDDEF0001=x,20,S
+T(3,CdCode.ClTypeCode23)
+
+#ClTypeCode23Help=x,1024,S
+
+!ClTypeCode24
+#CDDEF0002=x,20,S
+T(3,CdCode.ClTypeCode24)
+
+#ClTypeCode24Help=x,1024,S
+
+!ListingType
+#CDDEF0003=x,20,S
+T(3,CdCode.ListingType)
+
+#ListingTypeHelp=x,1024,S
+
+!StockType
+#CDDEF0004=x,20,S
+T(3,CdCode.StockType)
+
+#StockTypeHelp=x,1024,S
+
+!JobTitle
+#CDDEF0005=x,20,S
+T(3,CdCode.JobTitle)
+
+#JobTitleHelp=x,1024,S
+
+!Position
+#CDDEF0006=x,20,S
+T(3,CdCode.Position)
+
+#PositionHelp=x,1024,S
+
+!SettingStat
+#CDDEF0007=x,30,S
+T(3,CdCode.SettingStatCode)
+
+#SettingStatHelp=x,1024,S
+
+!ClStat
+#CDDEF0008=x,20,S
+T(3,CdCode.ClStatCode)
+
+#ClStatHelp=x,1024,S
+
+!SyndCode
+#CDDEF0009=x,20,S
+T(3,CdCode.SyndCode)
+
+#SyndCodeHelp=x,1024,S
+
+!EvaStandard
+#CDDEF0010=x,20,S
+T(3,CdCode.EvaStandard)
+
+#EvaStandardHelp=x,1024,S
+
+
+!StockCode
+#CDDEF0011=x,20,S
+T(3,CdCode.StockCode)
+
+#StockCodeHelp=x,1024,S 
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#CDDEF0008,#CDDEF0009,#CDDEF0010)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClTypeCode23Help,#HelpDesc1)
+T(2,@ClTypeCode24Help,#HelpDesc2)
+T(2,@ListingTypeHelp,#HelpDesc3)
+T(2,@StockTypeHelp,#HelpDesc4)
+T(2,@JobTitleHelp,#HelpDesc5)
+T(2,@PositionHelp,#HelpDesc6)
+T(2,@SettingStatHelp,#HelpDesc7)
+T(2,@ClStatHelp,#HelpDesc8)
+T(2,@SyndCodeHelp,#HelpDesc9)
+T(2,@EvaStandardHelp,#HelpDesc10)
+
+#CDDEF0012=x,20,S
+T(3,CdCode.ClTypeCode3)
+#ClTypeCode3Help=x,1024,S
+
+#Help2Rim=X,1,S
+RESET_RIM(#Help2Rim,XXR99)
+S(XXR99,01,#CDDEF0011,#CDDEF0012)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@StockCodeHelp,#HelpDesc1)
+T(2,@ClTypeCode3Help,#HelpDesc2)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2038進入),$)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,200,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCd,#NTXBUF,1,1)
+!T(1,@CustId,#NTXBUF,2,10)
+!T(1,@CustNo,#NTXBUF,12,7)
+T(1,@ClCode1,#NTXBUF,19,1)
+T(1,@ClCode2,#NTXBUF,21,2)
+T(1,@ClNo,#NTXBUF,24,7)
+!T(1,@ClTypeCode,#NTXBUF,33,3)
+
+![功能]
+#FunCd=X,1,S
+C(3,#CHAIN,1,s,$)
+HELP(#FunCdHelp)
+@V(H,#FunCdHelp)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+! 權限檢查
+#FUNCIND=_,_,S
+E(0,#FunCd)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+#FdFUNCD=X,2,L
+
+#FunCdX=X,4,L
+T(H,#FunCd,#FunCdHelp)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+
+#IF_FUNCD_1=X,1,S
+IF(#FunCd==1,$,S)
+!T(3,@FdCustId,)
+!T(3,@FdCustNo,)
+T(3,@FdSTOCK_CODE,*)
+T(3,@FdCOL_TYPE,*)
+T(3,@FdCOL_IND1,*)
+T(3,@FdVALUE_STANDARD,*)
+T(3,@FdOWNER_ID,*)
+T(3,@FdOWNER_NAME,*)
+T(3,@FdLOAN_PER,*)
+T(3,@FdCOMPUTE_MTR,*)
+T(3,@FdSettingStat,*)
+T(3,@FdClStat,*)
+T(3,@FdSETTING_DT,*)
+T(3,@FdSETTING_AMT,*)
+T(3,@FdVALUE_DT,*)
+T(3,@FdESTVALUE_AMT,*)
+T(3,@FdMORTGAGE_DT,*)
+T(3,@FdINTERSYNDLOAN,*)
+T(3,@FdINTERSYND_TYPE,*)
+T(F,@ClTypeCode,1)
+T(F,@ClCode1,1)
+T(F,@ClNo,1)
+C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
+
+#IF_FUNCD_4=X,1,S
+IF(#FunCd==4,$,S)
+T(F,@CustId,0)
+T(F,@CustNo,0)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@ClTypeCode,0)
+T(F,@CityCode,0)
+T(F,@StockCode,0)
+T(F,@ListingType,0)
+T(F,@StockType,0)
+T(F,@CompanyId,0)
+T(F,@DataYear,0)
+T(F,@IssuedShares,0)
+T(F,@NetWorth,0)
+T(F,@EvaStandard,0)
+T(F,@ParValue,0)
+T(F,@MonthlyAvg,0)
+T(F,@YdClosingPrice,0)
+T(F,@ThreeMonthAvg,0)
+T(F,@EvaUnitPrice,0)
+T(F,@OwnerId,0)
+T(F,@OwnerName,0)
+T(F,@InsiderJobTitle,0)
+T(F,@InsiderPosition,0)
+T(F,@LegalPersonId,0)
+T(F,@LoanToValue,0)
+T(F,@ClMtr,0)
+T(F,@NoticeMtr,0)
+T(F,@ImplementMtr,0)
+T(F,@PledgeNo,0)
+T(F,@ComputeMTR,0)
+T(F,@SettingStat,0)
+T(F,@ClStat,0)
+T(F,@SettingDate,0)
+T(F,@SettingBalance,0)
+T(F,@EvaDate,0)
+T(F,@EvaAmt,0)
+T(F,@MtgDate,0)
+T(F,@CustodyNo,0)
+T(F,@Synd,0)
+T(F,@SyndCode,0)
+T(F,@DispPrice,0)
+T(F,@DispDate,0)
+T(F,@ClStatus,0)
+C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
+
+#IF_FUNCD_2=X,1,S
+IF(#FunCd==2,$,S)
+T(3,@FdCOL_AREA, )
+T(3,@FdSTOCK_CODE,*)
+T(3,@FdOWNER_ID,*)
+T(3,@FdOWNER_NAME,*)
+T(3,@FdLOAN_PER,*)
+T(3,@FdCOMPUTE_MTR,*)
+T(3,@FdSETTING_DT,*)
+T(3,@FdSETTING_AMT,*)
+T(3,@FdVALUE_DT,*)
+T(3,@FdESTVALUE_AMT,*)
+T(3,@FdMORTGAGE_DT,*)
+T(3,@FdINTERSYNDLOAN,*)
+T(3,@FdSettingStat,*)
+T(3,@FdClStat,*)
+T(F,@CustId,0)
+T(F,@CustNo,0)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@ClTypeCode,0)
+T(F,@CityCode,0)
+T(F,@StockCode,1)
+T(F,@ListingType,1)
+T(F,@StockType,1)
+T(F,@CompanyId,1)
+T(F,@DataYear,1)
+T(F,@IssuedShares,1)
+T(F,@NetWorth,1)
+T(F,@EvaStandard,1)
+T(F,@ParValue,1)
+T(F,@MonthlyAvg,1)
+T(F,@YdClosingPrice,1)
+T(F,@ThreeMonthAvg,1)
+T(F,@EvaUnitPrice,1)
+T(F,@OwnerId,1)
+T(F,@OwnerName,1)
+T(F,@InsiderJobTitle,1)
+T(F,@InsiderPosition,1)
+T(F,@LegalPersonId,1)
+T(F,@LoanToValue,1)
+T(F,@ClMtr,1)
+T(F,@NoticeMtr,1)
+T(F,@ImplementMtr,1)
+T(F,@PledgeNo,1)
+T(F,@ComputeMTR,1)
+T(F,@SettingStat,1)
+T(F,@ClStat,1)
+T(F,@SettingDate,1)
+T(F,@SettingBalance,1)
+T(F,@EvaDate,1)
+T(F,@EvaAmt,1)
+T(F,@MtgDate,1)
+T(F,@CustodyNo,1)
+T(F,@Synd,1)
+T(F,@SyndCode,1)
+T(F,@DispPrice,1)
+T(F,@DispDate,1)
+T(F,@ClStatus,1)
+C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
+
+
+!Rim參數 L2R41
+#RimEvaAmt=m,14,S
+#RimLoanToValue=m,3.2,S
+#RimSettingAmt=m,14,S
+!修改時檢核鑑價總值or設定金額是否小於同一擔保品分配金額加總
+#RimL2r41=@,1,S
+RESET_RIM(#RimL2r41,L2R41)
+S(L2R41,1,#ClCode1,#ClCode2,#ClNo,#RimEvaAmt,#RimLoanToValue,#RimSettingAmt)
+R(1,L2R41)
+
+#SettingAmt=m,14,S
+E(0,#RimSettingAmt)
+
+#FdCustId=X,2,L
+
+! 統編
+#CustId=X,10,L
+
+
+#FdCustNo=X,2,L
+
+
+! 戶號
+#CustNo=A,7,L
+
+
+
+!#RimL1R09=X,1,S
+!IF(#FunCd==1,$,S)
+!T(2,@RimCustId,#CustId)
+!E(0,@RimCustNo,#CustNo)
+!E(0,@RimFunCd,1)
+!RESET_RIM(#RimL1R09,L1R09)
+!S(L1R09,1,#RimCustId,#RimCustNo,#RimFunCd)
+!R(1,L1R09)
+
+#BUF1=X,14,S
+T(2,00000019999999)
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+
+!申請號碼
+#FdApplNo=X,2,L
+T(3,*)
+
+#ApplNo=A,7,I
+C(3,#FunCd,1,$,S)
+@V(2,0)
+
+#RimFuncCode=A,1,S
+#RimTxCode=X,5,S
+#RimFKey=A,1,S
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+T(2,@CustId,#L2r05CustId)
+
+#SendL2r07D=X,1,S
+C(3,#ApplNo,0,S,$)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07D,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#ApplNoX=X,100,L
+T(2,#L2r07CustName)
+
+
+! [擔保品代號1]
+#ClCode1=X,1,I
+C(3,#FunCd,1,$,s)
+HELP(#ClCode1Help)
+@V(H,#ClCode1Help)
+
+#FdCOL_IND1=X,2,L
+
+#ClCode1X=X,12,L
+C(4,#ClCode1,S,$)
+T(H,#ClCode1,#ClCode1Help)
+
+! [擔保品代號2]
+#ClCode2=A,2,L
+E(0,1)
+
+#FdCOL_IND2=X,2,L
+
+#COL_IND=X,3,S
+T(2,#ClCode1+#ClCode2)
+
+#ClCode2X=X,30,L
+C(3,#ClCode1,3,T(3,股票),T(3,其他有價證券))
+
+#FdCOL_KIND_X=X,2,L
+
+! [擔保品編號]
+#ClNo=A,7,L
+
+#FdCOL_NO=X,2,L
+
+#RimClNo=A,7,L
+
+!RIM取擔保主檔
+#RimL2r22=X,1,S
+IF(#FunCd == 1,S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+RESET_RIM(#RimL2r22,L2R22)
+S(L2R22,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R22)
+
+#checkL2r22=X,1,S
+IF(#FunCd == 1,S,$)
+T(2,@ClTypeCode,#L2r22ClTypeCode)
+T(2,@CityCode,#L2r22CityCode)
+E(0,@ClStatus,#L2r22ClStatus)
+E(0,@EvaDate,#L2r22EvaDate)
+E(0,@EvaAmt,#L2r22EvaAmt)
+T(2,@Synd,#L2r22Synd)
+IF(#L2r22Synd == "Y",T(2,@SyndCode,#L2r22SyndCode),$)
+E(0,@DispPrice,#L2r22DispPrice)
+E(0,@DispDate,#L2r22DispDate)
+T(H,@CityCodeX,#CityCode,#L6r03ResultCity)
+
+
+!RIM取擔保品股票檔
+#RimL2r25=X,1,S
+IF(#FunCd == 1,S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,#FunCd)
+RESET_RIM(#RimL2r25,L2R25)
+S(L2R25,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R25)
+
+#checkL2r25=X,1,S
+IF(#FunCd == 1,S,$)
+T(2,@StockCode,#L2r25StockCode)
+T(2,@ListingType,#L2r25ListingType)
+T(2,@StockType,#L2r25StockType)
+T(2,@CompanyId,#L2r25CompanyId)
+E(0,@DataYear,#L2r25DataYear)
+E(0,@IssuedShares,#L2r25IssuedShares)
+E(0,@NetWorth,#L2r25NetWorth)
+T(2,@EvaStandard,#L2r25EvaStandard)
+E(0,@ParValue,#L2r25ParValue)
+E(0,@MonthlyAvg,#L2r25MonthlyAvg)
+E(0,@YdClosingPrice,#L2r25YdClosingPrice)
+E(0,@ThreeMonthAvg,#L2r25ThreeMonthAvg)
+E(0,@EvaUnitPrice,#L2r25EvaUnitPrice)
+T(2,@OwnerId,#L2r25OwnerId)
+T(2,@OwnerName,#L2r25OwnerName)
+T(2,@InsiderJobTitle,#L2r25InsiderJobTitle)
+T(2,@InsiderPosition,#L2r25InsiderPosition)
+T(2,@LegalPersonId,#L2r25LegalPersonId)
+E(0,@LoanToValue,#L2r25LoanToValue)
+E(0,@ClMtr,#L2r25ClMtr)
+E(0,@NoticeMtr,#L2r25NoticeMtr)
+E(0,@ImplementMtr,#L2r25ImplementMtr)
+T(2,@PledgeNo,#L2r25PledgeNo)
+T(2,@ComputeMTR,#L2r25ComputeMTR)
+E(0,@SettingStat,#L2r25SettingStat)
+E(0,@ClStat,#L2r25ClStat)
+E(0,@SettingDate,#L2r25SettingDate)
+E(0,@SettingBalance,#L2r25SettingBalance)
+E(0,@MtgDate,#L2r25MtgDate)
+T(2,@CustodyNo,#L2r25CustodyNo)
+T(H,@StockCodeX,#StockCode,#StockCodeHelp)
+T(H,@ListingTypeX,#ListingType,#ListingTypeHelp)
+T(H,@StockTypeX,#StockType,#StockTypeHelp)
+T(H,@EvaStandardX,#EvaStandard,#EvaStandardHelp)
+T(H,@InsiderPositionX,#InsiderPosition,#PositionHelp)
+T(H,@InsiderJobTitleX,#InsiderJobTitle,#JobTitleHelp)
+T(H,@SyndCodeX,#SyndCode,#SyndCodeHelp)
+T(H,@SyndX,#Synd,#YNHelp)
+T(H,@ClStatX,#ClStat,#ClStatHelp)
+T(H,@SettingStatX,#SettingStat,#SettingStatHelp)
+T(H,@ComputeMTRX,#ComputeMTR,#YNHelp)
+
+! [擔保品類別]
+#ClTypeCode=X,3,I
+C(3,#FunCd,1,$,s)
+HELP(#ClTypeCode3Help)
+@IF(#FunCd == 1,$,s)
+V(H,#ClTypeCode3Help)
+! IF(#ClCode1==3,V(H,#ClTypeCode23Help),V(H,#ClTypeCode24Help))
+
+#FdCOL_TYPE=X,2,L
+
+#ClTypeCodeX=X,30,L
+T(H,#ClTypeCode,#ClTypeCode3Help)
+! IF(#ClCode1==3,T(H,#ClTypeCode,#ClTypeCode23Help),
+!                T(H,#ClTypeCode,#ClTypeCode24Help))
+
+!調RIM參數
+
+! 調RIM取縣市代碼
+#RimL6r03City=X,1,S
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+E(0,@RimFunCd,1)
+T(3,@RimCityCode,)
+T(3,@RimAreaCode,)
+RESET_RIM(#RimL6r03City,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 縣市代碼的下拉選單
+#L6r03ResultCity=X,10000,S
+
+T(2,#L6r03Result)
+! [地區別]
+#CityCode=X,2,I
+IF(#FunCd==4,s,$)
+HELP(#L6r03ResultCity,cols:5)
+@C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
+
+#FdCOL_AREA=X,2,L
+
+#CityCodeX=X,8,L
+T(H,#CityCode,#L6r03ResultCity)
+
+! [股票代號]
+#StockCode=X,4,I
+IF(#FunCd==4,s,$)
+HELP(#StockCodeHelp)
+@V(H,#StockCodeHelp)
+
+#FdSTOCK_CODE=X,2,L
+
+#StockCodeX=X,10,L
+T(H,#StockCode,#StockCodeHelp)
+
+! [掛牌別]
+#ListingType=X,2,I
+IF(#FunCd==4,s,$)
+HELP(#ListingTypeHelp)
+SWITCH(#ClTypeCode,141,T(3,01),
+                 142,T(3,02),
+                 143,T(3,03),
+                 144,T(3,04),
+                 145,T(3,),
+                 146,T(3,05))
+@C(4,#ListingType,S,$)
+E(0,@TEMP_LIST_TYPE,#ListingType)
+T(2,#TEMP_LIST_TYPE)
+V(H,#ListingTypeHelp)
+
+#TEMP_LIST_TYPE=A,2,S
+
+#FdLIST_TYPE=X,2,L
+
+#ListingTypeX=X,6,L
+C(4,#ListingType,S,$)
+T(H,#ListingType,#ListingTypeHelp)
+
+! [股票種類]
+#StockType=X,1,I
+IF(#FunCd==4,s,$)
+HELP(#StockTypeHelp)
+@C(4,#StockType,S,$)
+E(0,@TEMP_STOCK_TYPE,#StockType)
+T(2,#TEMP_STOCK_TYPE)
+V(H,#StockTypeHelp)
+
+#TEMP_STOCK_TYPE=A,1,S
+
+#FdSTOCK_TYPE=X,2,L
+
+
+#StockTypeX=X,6,L
+C(4,#StockType,S,$)
+T(H,#StockType,#StockTypeHelp)
+
+! [發行公司統一編號]
+#CompanyId=X,10,I
+IF(#FunCd==4,s,$)
+@A(ID_UNINO,0,#CompanyId)
+
+#FdSTOCK_ID=X,2,L
+
+! [資料年度]
+#DataYear=A,3,I
+IF(#FunCd==4,s,$)
+@V(9)
+
+#FdDATA_YEAR=X,2,L
+
+
+! [發行股數]
+#IssuedShares=n,14,I
+IF(#FunCd==4,s,$)
+@V(9)
+
+#FdSHARES=X,2,L
+
+! [每股單價鑑估標準]
+#EvaStandard=X,2,I
+IF(#FunCd==4,s,$)
+HELP(#EvaStandardHelp)
+@V(H,#EvaStandardHelp)
+T(3,@FdSHARE_VALUE,)T(3,@FdBVPS,)T(3,@FdMONTHLY_AVG,)T(3,@FdClosingPrice,)T(3,@FdQUARTER_AVG,)
+IF(#EvaStandard==01,T(3,@FdSHARE_VALUE,*),$)
+IF(#EvaStandard==02,T(3,@FdBVPS,*),$)
+IF(#EvaStandard==03,T(3,@FdMONTHLY_AVG,*),$)
+IF(#EvaStandard==04,T(3,@FdClosingPrice,*),$)
+IF(#EvaStandard==05,T(3,@FdQUARTER_AVG,*),$)
+
+#EvaStandardX=X,30,L
+T(H,#EvaStandard,#EvaStandardHelp)
+
+#FdVALUE_STANDARD=X,2,L
+
+! [非上市(櫃)每股淨值]
+#NetWorth=n,14,I
+IF(#FunCd==4,s,$)
+@
+V(9)
+IF(#EvaStandard=="01",V(2,0),$)
+
+#FdSHARE_VALUE=X,2,L
+
+
+
+
+! [每股面額]
+#ParValue=m,14,I
+IF(#FunCd==4,s,$)
+@
+IF(#EvaStandard=="02",V(2,0),$)
+
+#FdBVPS=X,2,L
+
+
+! [一個月平均價]
+#MonthlyAvg=m,14,I
+IF(#FunCd==4,s,$)
+@
+IF(#EvaStandard=="04",V(2,0),$)
+
+#FdMONTHLY_AVG=X,2,L
+
+
+! [前日收盤價]
+#YdClosingPrice=m,14,I
+IF(#FunCd==4,s,$)
+@IF(#FunCd==4,s,$)
+IF(#ClTypeCode == 141 || #ClTypeCode == 142,$,S)
+V(7)
+
+IF(#EvaStandard=="03",V(2,0),$)
+
+#FdClosingPrice=X,2,L
+
+
+! [三個月平均價]
+#ThreeMonthAvg=m,14,I
+IF(#FunCd==4,s,$)
+@
+IF(#EvaStandard=="05",V(2,0),$)
+
+#FdQUARTER_AVG=X,2,L
+
+! [鑑定單價]
+#EvaUnitPrice=m,14,L
+IF(#EvaStandard=="01",E(0,#NetWorth),$)
+IF(#EvaStandard=="02",E(0,#ParValue),$)
+IF(#EvaStandard=="03",E(0,#YdClosingPrice),$)
+IF(#EvaStandard=="04",E(0,#MonthlyAvg),$)
+IF(#EvaStandard=="05",E(0,#ThreeMonthAvg),$)
+IF(#FunCd==4,s,$)
+
+
+#FdVALUE_AMT=X,2,L
+
+
+
+
+! [股票持有人統編]
+#OwnerId=X,10,I
+IF(#FunCd==4,s,$)
+@V(7)A(ID_UNINO,0,#OwnerId)
+
+#FdOWNER_ID=X,2,L
+
+
+#RimL1r09=X,1,S
+T(2,@L1r09CustName,)
+E(0,@RimFunCd,5)
+T(2,@RimCustId,#OwnerId)
+E(0,@RimCustNo,0)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+
+
+#CheckL1R09=X,1,S
+T(2,@OwnerName,#L1r09CustName)
+
+
+
+! [股票持有人姓名]
+#OwnerName=x,2.50,I
+IF(#FunCd==4,s,$)
+C(4,#L1r09CustName,$,s)
+@V(7)
+
+#FdOWNER_NAME=X,2,L
+
+
+! [公司內部人職稱]
+#InsiderJobTitle=X,2,I
+IF(#FunCd==4,s,$)
+HELP(#JobTitleHelp)
+@C(4,#InsiderJobTitle,S,$)
+E(0,@TEMP_MEMB_POS,#InsiderJobTitle)
+T(2,#TEMP_MEMB_POS)
+V(H,#JobTitleHelp)
+
+#TEMP_MEMB_POS=A,2,S
+
+#FdMEMB_POS=X,2,L
+
+
+#InsiderJobTitleX=X,30,L
+T(H,#InsiderJobTitle,#JobTitleHelp)
+
+! [公司內部人身分註記]
+#InsiderPosition=X,2,I
+IF(#FunCd==4,s,$)
+C(4,#InsiderJobTitle,S,$)
+HELP(#PositionHelp)
+@C(4,#InsiderPosition,S,$)
+E(0,@TEMP_MEMB_IND,#InsiderPosition)
+T(2,#TEMP_MEMB_IND)
+V(H,#PositionHelp)
+
+#TEMP_MEMB_IND=A,2,S
+
+#FdMEMB_IND=X,2,L
+
+
+#InsiderPositionX=X,20,L
+T(H,#InsiderPosition,#PositionHelp)
+
+! [法定關係人統編]
+#LegalPersonId=X,10,I
+C(4,#InsiderPosition,S,$)
+IF(#FunCd==4,s,$)
+@A(ID_UNINO,0,#LegalPersonId)
+
+#FdLEGAL_REL=X,2,L
+
+#RimL1r09A=X,1,S
+T(2,@L1r09CustName,)
+E(0,@RimFunCd,1)
+T(2,@RimCustId,#LegalPersonId)
+E(0,@RimCustNo,0)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+
+#LoanToValueHelp=X,1024,S
+T(3,:<font color=red>下列「擔保維持率」、「通知追繳維持率」、「實行質權維持率」與批示條件不同時請自行輸入。
+    ;50:％　擔保維持率：170％　通知追繳最低維持率：160％　實行質權維持率：140％
+    ;60:％　擔保維持率：140％　通知追繳最低維持率：135％　實行質權維持率：125％
+    ;70:％　擔保維持率：125％　通知追繳最低維持率：120％　實行質權維持率：115％
+    ;80:％　擔保維持率：110％　通知追繳最低維持率：105％　實行質權維持率：100％)
+! [貸放成數]
+#LoanToValue=m,3.2,I
+IF(#FunCd==4,s,$)
+HELP(#LoanToValueHelp)
+@V(7)V(2,0)
+IF(#LoanToValue==50,E(0,@ClMtr,170)E(0,@NoticeMtr,160)E(0,@ImplementMtr,140),$)
+IF(#LoanToValue==60,E(0,@ClMtr,140)E(0,@NoticeMtr,135)E(0,@ImplementMtr,125),$)
+IF(#LoanToValue==70,E(0,@ClMtr,125)E(0,@NoticeMtr,120)E(0,@ImplementMtr,115),$)
+IF(#LoanToValue==80,E(0,@ClMtr,110)E(0,@NoticeMtr,105)E(0,@ImplementMtr,100),$)
+
+#FdLOAN_PER=X,2,L
+
+
+! [擔保維持率]
+#ClMtr=m,3.2,I
+IF(#FunCd==4,s,$)
+
+#FdCOL_MTR=X,2,L
+
+
+! [通知追繳維持率]
+#NoticeMtr=m,3.2,I
+IF(#FunCd==4,s,$)
+
+#FdNOTICE_MTR=X,2,L
+
+
+! [實行職權維持率]
+#ImplementMtr=m,3.2,I
+IF(#FunCd==4,s,$)
+
+#FdIMPLEMENT_MTR=X,2,L
+
+
+! [質權設定書號]
+#PledgeNo=X,14,I
+IF(#FunCd==4,s,$)
+
+#FdPLEDGE_NO=X,2,L
+
+
+! [計算維持率]
+#ComputeMTR=X,1,I
+IF(#FunCd==4,s,$)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+
+#FdCOMPUTE_MTR=X,2,L
+
+
+#ComputeMTRX=X,2,L
+T(H,#ComputeMTR,#YNHelp)
+
+#FdSettingStat=X,2,L
+
+! [設定狀態]
+#SettingStat=A,1,I
+IF(#FunCd==4,s,$)
+HELP(#SettingStatHelp)
+@V(H,#SettingStatHelp)
+
+#SettingStatX=x,4,L
+T(H,#SettingStat,#SettingStatHelp)
+
+#FdClStat=X,2,L
+
+! [擔保品狀態]
+#ClStat=A,1,I
+IF(#FunCd==4,s,$)
+HELP(#ClStatHelp)
+@V(H,#ClStatHelp)
+
+#ClStatX=x,10,L
+T(H,#ClStat,#ClStatHelp)
+
+
+! [股票設(解)質日期]
+#SettingDate=D,7,I
+IF(#FunCd==4,s,$)
+@V(7)A(4,0,#SettingDate)
+
+#FdSETTING_DT=X,2,L
+
+
+! [設質股數餘額]
+#SettingBalance=m,14,I
+IF(#FunCd==4,s,$)
+@V(2,0)
+V(9)
+
+#FdSETTING_AMT=X,2,L
+
+#checkL2R41B=X,1,S
+C(3,#FunCd,2,$,S)
+E(0,@RimEvaAmt,0)
+E(0,@RimLoanToValue,0)
+E(0,@RimSettingAmt,#SettingBalance)
+CALL(#RimL2r41)
+
+! [鑑估日期]
+#EvaDate=D,7,I
+IF(#FunCd==4,s,$)
+@V(7)A(4,0,#EvaDate)
+
+#FdVALUE_DT=X,2,L
+
+
+! [鑑估值]
+#EvaAmt=m,14,I
+IF(#FunCd==4,s,$)
+@V(2,0)
+V(9)
+
+#checkL2R41A=X,1,S
+C(3,#FunCd,2,$,S)
+E(0,@RimEvaAmt,#EvaAmt)
+E(0,@RimLoanToValue,#LoanToValue)
+E(0,@RimSettingAmt,0)
+CALL(#RimL2r41)
+
+#FdESTVALUE_AMT=X,2,L
+
+
+! [擔保債權確定日期]
+#MtgDate=D,7,I
+IF(#FunCd==4,s,$)
+@V(7)A(4,0,#MtgDate)
+
+#FdMORTGAGE_DT=X,2,L
+
+
+! [保管條號碼]
+#CustodyNo=X,5,I
+IF(#FunCd==4,s,$)
+
+#FdCUSTODY_NO=X,2,L
+
+
+! [聯貸案]
+#Synd=X,1,I
+IF(#FunCd==4,s,$)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+IF(#FunCd == 1 || #FunCd == 2,$,s)
+IF(#Synd=="Y",T(3,@FdINTERSYND_TYPE,*),T(3,@FdINTERSYND_TYPE, ))
+
+#FdINTERSYNDLOAN=X,2,L
+
+#SyndX=X,2,L
+T(H,#Synd,#YNHelp)
+
+! [聯貸案類型]
+#SyndCode=X,1,I
+IF(#FunCd==4,s,$)
+IF(#Synd=="Y",$,S)
+HELP(#SyndCodeHelp)
+@IF(#Synd=="Y",$,S)
+V(H,#SyndCodeHelp)
+
+#FdINTERSYND_TYPE=X,2,L
+
+
+#SyndCodeX=X,6,L
+T(H,#SyndCode,#SyndCodeHelp)
+
+! [處分價格]
+#DispPrice=m,14,I
+IF(#FunCd==4,s,$)
+@V(9)
+
+#FdDISPOSITION_PRICE=X,2,L
+
+! [處分日期]
+#DispDate=D,7,I
+IF(#FunCd==4,s,$)
+@A(DATE,0,#DispDate)
+
+#FdDISPOSITION_DT=X,2,L
+
+! [擔保品狀況碼]
+#ClStatus=A,1,L
+IF(#FunCd==4,s,$)
+E(0,1)
+
+#FdCOL_STATUS=X,2,L
+
+#ClStatusX=X,7,L
+T(3,已抵押)
+#RPTFG=A,1,S
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+! #PRTSCRFG=_,_,S
+! E(0,2)
+
+</sub>
+
+
+!---------- TXFORM = L2413 ----------
+<sub type="FORM" name="L2413">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2413,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2413] 股票擔保品資料登錄)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+
+#OClNo=A,7,L
+IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd
+#CustId
+#CustNo
+#ApplNo
+#ClTypeCode
+#ClCode1
+#ClCode2
+#ClNo
+#CityCode
+#StockCode
+#ListingType
+#StockType
+#CompanyId
+#DataYear
+#IssuedShares
+#NetWorth
+#EvaStandard
+#ParValue
+#MonthlyAvg
+#YdClosingPrice
+#ThreeMonthAvg
+#EvaUnitPrice
+#OwnerId
+#OwnerName
+#InsiderJobTitle
+#InsiderPosition
+#LegalPersonId
+#LoanToValue
+#ClMtr
+#NoticeMtr
+#ImplementMtr
+#PledgeNo
+#ComputeMTR
+#SettingStat
+#ClStat
+#SettingDate
+#SettingBalance
+#SettingAmt
+#EvaDate
+#EvaAmt
+#MtgDate
+#CustodyNo
+#Synd
+#SyndCode
+#DispPrice
+#DispDate
+#ClStatus
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2413
+#OClNo
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R09.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R22.tom"/>
+<include src="ROM.icf::L6R03.tom"/>
+<include src="ROM.icf::L2R25.tom"/>
+<include src="ROM.icf::L2R41.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

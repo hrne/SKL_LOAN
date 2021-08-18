@@ -503,7 +503,7 @@ public class L2415 extends TradeBuffer {
 //			if (titaVo.getParam("Reason" + i) == null || titaVo.getParam("Reason" + i).trim().isEmpty()) {
 //				break;
 //			}
-			if (reason == null || "".equals(reason)) {
+			if (reason == null || "".equals(reason.trim())) {
 				break;
 			}
 

@@ -1195,7 +1195,7 @@ C(4,#L1r09CustName,$,T(2,@PublicBdOwnerName{i},#L1r09CustName))
 
 
 ! [公設建號-所有權人姓名]
-#PublicBdOwnerName{i}=c,100,I
+#PublicBdOwnerName{i}=x,2.50,I
 IF(#PageFg==3,$,CALL(#Show3))
 IF(#FunCd==4,s,$)
 C(3,#PublicBdNoA{i},0,S,$)

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
@@ -41,7 +40,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8336 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8336.class);
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ574Service sJcicZ574Service;
@@ -151,6 +149,7 @@ public class L8336 extends TradeBuffer {
 		default:
 			break;
 		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

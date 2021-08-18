@@ -65,7 +65,7 @@ public class LM030Report extends MakeReport {
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM030", "轉催收明細總表", "LM030轉催收案件明細_核定總表", "LM030轉催收案件明細_核定總表.xlsx", "11005");
 		String yy = titaVo.get("ENTDY").substring(1, 4);
 		String mm = titaVo.get("ENTDY").substring(4, 6);
-		makeExcel.setSheet("10804", yy + mm);
+		makeExcel.setSheet("11005", yy + mm);
 		makeExcel.setValue(1, 1, yy + "." + mm + "  轉催收明細總表");
 		BigDecimal total = BigDecimal.ZERO;
 		if (listLM030.size() == 0) {

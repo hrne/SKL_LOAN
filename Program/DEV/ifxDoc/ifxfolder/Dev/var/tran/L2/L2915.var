@@ -551,7 +551,7 @@ INVOKEJS(SHOW,grd2_{rowSeq},1)
 !車位編號
 #ParkingNo{i}=x,20,L
 IF(#PAGE_FG==4,$,CALL(#SHOW_4))
-C(4,#ParkingNo{j},CALL(#HIDE_PP_ROW_{i}),CALL(#SHOW_PP_ROW_{i}))
+C(4,#ParkingNo{i},CALL(#HIDE_PP_ROW_{i}),CALL(#SHOW_PP_ROW_{i}))
 
 !車位數量
 #ParkingQty{i}=m,5,L

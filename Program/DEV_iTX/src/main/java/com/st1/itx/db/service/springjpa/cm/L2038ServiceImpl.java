@@ -54,38 +54,38 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L2038ServiceImpl.find");
 
 		String sql = "";
-		sql += "     SELECT cf.\"F1\"                           AS \"ApproveNo\"";
-		sql += "           ,cf.\"F2\"                           AS \"FacmNo\"";
-		sql += "           ,cu.\"CustId\"                       AS \"CustId\"";
-		sql += "           ,cf.\"F3\"                           AS \"CustNo\"";
+		sql += "     SELECT MIN(cf.\"F1\")                           AS \"ApproveNo\"";
+		sql += "           ,MIN(cf.\"F2\")                           AS \"FacmNo\"";
+		sql += "           ,MIN(cu.\"CustId\")                       AS \"CustId\"";
+		sql += "           ,MIN(cf.\"F3\")                           AS \"CustNo\"";
 		sql += "           ,cm.\"ClCode1\"                      AS \"ClCode1\"";
 		sql += "           ,cm.\"ClCode2\"                      AS \"ClCode2\"";
 		sql += "           ,cm.\"ClNo\"                         AS \"ClNo\"";
-		sql += "           ,cm.\"NewNote\"                      AS \"NewNote\"";
-		sql += "           ,cm.\"ClTypeCode\"                   AS \"ClTypeCode\"";
-		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN cblo.\"OwnerCustUKey\"";
-		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"OwnerCustUKey\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN co.\"OwnerCustUKey\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN cmv.\"OwnerCustUKey\"";
+		sql += "           ,MIN(cm.\"NewNote\")                      AS \"NewNote\"";
+		sql += "           ,MIN(cm.\"ClTypeCode\")                   AS \"ClTypeCode\"";
+		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN MIN(cblo.\"OwnerCustUKey\")";
+		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN MIN(cs.\"OwnerCustUKey\")";
+		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN MIN(co.\"OwnerCustUKey\")";
+		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN MIN(cmv.\"OwnerCustUKey\")";
 		sql += "            ELSE NULL END                       AS \"OwnerCustUKey\"";
-		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN cblo.\"OwnerFlag\"";
+		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN MIN(cblo.\"OwnerFlag\")";
 		sql += "            ELSE 'N' END                        AS \"OwnerFlag\"";
-		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"SettingStat\"";
-		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"SettingStat\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN co.\"SettingStat\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN cmv.\"SettingStat\"";
+		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN MIN(ci.\"SettingStat\")";
+		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN MIN(cs.\"SettingStat\")";
+		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN MIN(co.\"SettingStat\")";
+		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN MIN(cmv.\"SettingStat\")";
 		sql += "            ELSE NULL END                       AS \"SettingStat\"";
-		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"SettingAmt\"";
-		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"SettingBalance\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN co.\"SettingAmt\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN cmv.\"SettingAmt\"";
+		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN MIN(ci.\"SettingAmt\")";
+		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN MIN(cs.\"SettingBalance\")";
+		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN MIN(co.\"SettingAmt\")";
+		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN MIN(cmv.\"SettingAmt\")";
 		sql += "            ELSE NULL END                       AS \"SettingAmt\"";
-		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN ci.\"ClStat\"";
-		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN cs.\"ClStat\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN co.\"ClStat\"";
-		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN cmv.\"ClStat\"";
+		sql += "           ,CASE WHEN cm.\"ClCode1\" IN (1,2) THEN MIN(ci.\"ClStat\")";
+		sql += "                 WHEN cm.\"ClCode1\" IN (3,4) THEN MIN(cs.\"ClStat\")";
+		sql += "                 WHEN cm.\"ClCode1\" = 5      THEN MIN(co.\"ClStat\")";
+		sql += "                 WHEN cm.\"ClCode1\" = 9      THEN MIN(cmv.\"ClStat\")";
 		sql += "            ELSE NULL END                       AS \"ClStat\"";
-		sql += "           ,cm.\"ShareTotal\"                   AS \"ShareTotal\"";
+		sql += "           ,MIN(cm.\"ShareTotal\")                   AS \"ShareTotal\"";
 		sql += "     FROM \"ClMain\" cm";
 		
 		
@@ -120,8 +120,6 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      ,CASE WHEN \"ClNo\" IS NOT NULL THEN 'Y'"; 
 		sql += "                          ELSE 'N' END AS \"OwnerFlag\"" ;
 		sql	+= "                FROM \"ClLandOwner\"" ;	    
-	    sql	+= "                GROUP BY \"ClCode1\", \"ClCode2\", \"ClNo\", \"OwnerCustUKey\", "; 
-	    sql	+= "                      CASE WHEN \"ClNo\" IS NOT NULL THEN 'Y' ELSE 'N' END "; 
 	    sql	+= "    ) cblo ON cblo.\"ClCode1\" = cm.\"ClCode1\""; 
 	    sql	+= "          AND cblo.\"ClCode2\" = cm.\"ClCode2\""; 
 	    sql	+= "          AND cblo.\"ClNo\"    = cm.\"ClNo\"";
@@ -168,13 +166,13 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                      ,\"AreaCode\"";
 		sql += "                      ,\"IrCode\"";
 		sql	+= "                FROM \"ClLand\"" ;	    
-	    sql	+= "                GROUP BY \"ClCode1\", \"ClCode2\", \"ClNo\", \"CityCode\",\"AreaCode\",\"IrCode\""; 
 	    sql	+= "    ) cbl ON cbl.\"ClCode1\" = cm.\"ClCode1\""; 
 	    sql	+= "          AND cbl.\"ClCode2\" = cm.\"ClCode2\""; 
 	    sql	+= "          AND cbl.\"ClNo\"    = cm.\"ClNo\"";
 		
 		
 		sql += conditionSql;
+		sql += "     GROUP BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
 		sql += "     ORDER BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
 		sql += sqlRow;
 		this.info("sql = " + sql);

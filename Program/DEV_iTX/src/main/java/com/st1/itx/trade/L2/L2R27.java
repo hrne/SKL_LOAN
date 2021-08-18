@@ -384,11 +384,19 @@ public class L2R27 extends TradeBuffer {
 
 			// 判斷是否有資料 無資料new table給tota
 			CustMain custMain = sCustMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
-			this.totaVo.putParam("L2r27OwnerId" + k, custMain.getCustId());
-			this.totaVo.putParam("L2r27OwnerName" + k, custMain.getCustName());
-			this.totaVo.putParam("L2r27OwnerRelCode" + k, tClBuildingOwner.getOwnerRelCode());
-			this.totaVo.putParam("L2r27OwnerPart" + k, tClBuildingOwner.getOwnerPart());
-			this.totaVo.putParam("L2r27OwnerTotal" + k, tClBuildingOwner.getOwnerTotal());
+			if(custMain!= null) {
+			  this.totaVo.putParam("L2r27OwnerId" + k, custMain.getCustId());
+			  this.totaVo.putParam("L2r27OwnerName" + k, custMain.getCustName());
+			  this.totaVo.putParam("L2r27OwnerRelCode" + k, tClBuildingOwner.getOwnerRelCode());
+			  this.totaVo.putParam("L2r27OwnerPart" + k, tClBuildingOwner.getOwnerPart());
+			  this.totaVo.putParam("L2r27OwnerTotal" + k, tClBuildingOwner.getOwnerTotal());
+			} else {
+			  this.totaVo.putParam("L2r27OwnerId" + k, "");
+			  this.totaVo.putParam("L2r27OwnerName" + k, "");
+			  this.totaVo.putParam("L2r27OwnerRelCode" + k, "");
+			  this.totaVo.putParam("L2r27OwnerPart" + k, "");
+			  this.totaVo.putParam("L2r27OwnerTotal" + k, "");
+			}
 			k++;
 		}
 		// 修改原因

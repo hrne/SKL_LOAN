@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -46,7 +44,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3924")
 @Scope("prototype")
 public class L3924 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3924.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -111,8 +108,7 @@ public class L3924 extends TradeBuffer {
 		List<Integer> lStatus = new ArrayList<Integer>(); // 1:催收 2:部分轉呆 3:呆帳 4:催收回復
 		lStatus.add(1);
 		lStatus.add(2);
-		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(iCustNo, iFacmNo, iFacmNo, 1, 900, 1, 999,
-				lStatus, this.index, this.limit, titaVo);
+		Slice<LoanOverdue> slLoanOverdue = loanOverdueService.ovduCustNoRange(iCustNo, iFacmNo, iFacmNo, 1, 900, 1, 999, lStatus, this.index, this.limit, titaVo);
 		lLoanOverdue = slLoanOverdue == null ? null : slLoanOverdue.getContent();
 		if (lLoanOverdue == null || lLoanOverdue.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "催收呆帳檔"); // 查詢資料不存在
@@ -125,15 +121,13 @@ public class L3924 extends TradeBuffer {
 			// oOvduLawFee = oOvduLawFee.add(od.getOvduLawBal());
 			tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(iCustNo, iFacmNo, od.getBormNo()), titaVo);
 			if (tLoanBorMain == null) {
-				throw new LogicException(titaVo, "E0001",
-						"放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + od.getBormNo()); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + od.getBormNo()); // 查詢資料不存在
 			}
 			// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
-			wkTerms = loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
-					tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(), iEntryDate);
-			if (tLoanBorMain.getPrevPayIntDate() > 0) {
-				wkTerms = wkTerms - loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(),
-						tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(), tLoanBorMain.getPrevPayIntDate());
+			wkTerms = loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(), iEntryDate);
+			if (tLoanBorMain.getPrevPayIntDate() > tLoanBorMain.getDrawdownDate()) {
+				wkTerms = wkTerms - loanCom.getTermNo(2, tLoanBorMain.getFreqBase(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
+						tLoanBorMain.getPrevPayIntDate());
 			}
 			if (wkTerms > 0) {
 				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(tLoanBorMain, wkTerms, 0, 0, iEntryDate, titaVo);

@@ -1781,6 +1781,8 @@ TXFORM=L2R04
 #L2r05AdvanceCloseCode=A,1,S
 #L2r05BreachCode=A,3,S
 #L2r05BreachGetCode=A,1,S
+#L2r05ProdBreachFlag=X,1,S
+#L2r05Breach=X,200,S
 #L2r05CreditScore=A,3,S
 #L2r05GuaranteeDate=D,7,S
 #L2r05ContractNo=X,10,S
@@ -1886,6 +1888,8 @@ TXFORM=L2R05
 #L2r05AdvanceCloseCode
 #L2r05BreachCode
 #L2r05BreachGetCode
+#L2r05ProdBreachFlag
+#L2r05Breach
 #L2r05CreditScore
 #L2r05GuaranteeDate
 #L2r05ContractNo
@@ -3373,6 +3377,33 @@ TXFORM=L2R51
 ##end
 ^
 </L2R51.tom>
+
+<L2R52.dec>
+#L2r52CustName=x,100,S
+##loop{times:20,i:1}
+#L2r52OwnerCustUKey{i}=x,32,S
+T(3,)
+#L2r52OwnerId{i}=X,10,S
+T(3,)
+#L2r52OwnerName{i}=x,100,S
+T(3,)
+#L2r52OwnerRelCode{i}=X,2,S
+T(3,)
+##end
+</L2R52.dec>
+
+<L2R52.tom>
+TXFORM=L2R52
+#L2r52CustName
+##loop{times:20,i:1}
+#L2r52OwnerCustUKey{i}
+#L2r52OwnerId{i}
+#L2r52OwnerName{i}
+#L2r52OwnerRelCode{i}
+##end
+^
+</L2R52.tom>
+
 
 
 

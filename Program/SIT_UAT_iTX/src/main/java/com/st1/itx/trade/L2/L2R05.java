@@ -417,6 +417,8 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("OBreachGetCode", tFacProd.getBreachGetCode());
 //		this.totaVo.putParam("ODecreaseFlag", tFacProd.getDecreaseFlag());
 //		this.totaVo.putParam("OCopyFlag", tFacMain.getCopyFlag());
+		this.totaVo.putParam("OProdBreachFlag", tFacMain.getProdBreachFlag());
+		this.totaVo.putParam("OBreach", tFacMain.getBreach());
 		this.totaVo.putParam("OCreditScore", tFacMain.getCreditScore());
 		this.totaVo.putParam("OGuaranteeDate", tFacMain.getGuaranteeDate());
 		this.totaVo.putParam("OContractNo", tFacMain.getContractNo());

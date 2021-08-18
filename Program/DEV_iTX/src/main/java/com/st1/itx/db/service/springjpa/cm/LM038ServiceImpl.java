@@ -90,7 +90,7 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,M.\"UnpaidInterest\"                         F12 ";
 		sql += "       ,M.\"UnpaidBreachAmt\" + M.\"UnpaidDelayInt\" F13 ";
 		sql += "       ,M.\"UnpaidPrincipal\" + M.\"UnpaidInterest\" + M.\"UnpaidBreachAmt\" + M.\"UnpaidDelayInt\" - M.\"TempAmt\" F14 ";
-		sql += "       ,F.\"CreditOfficer\"                          F15 ";
+		sql += "       ,F.\"BusinessOfficer\"                        F15 ";
 		sql += "       ,M.\"AccCollPsn\"                             F16 ";
 		sql += "       ,M.\"CityCode\"                               F17 ";
 		sql += "       ,M.\"ClCode1\"                                F18 ";

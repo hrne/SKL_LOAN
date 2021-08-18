@@ -34,15 +34,20 @@ public class L9724ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,MAX(ali.\"Aging\") AS F1 ";
 		sql += "            ,MIN(ali.\"IntStartDate\") AS F2 ";
 		sql += "            ,SUM(ali.\"Interest\") AS F3 ";
-		sql += "            ,MAX(ali.\"PayIntDate\") AS F4 ";
+		sql += "            ,MAX(lbm.\"NextPayIntDate\") AS F4 ";
 		sql += "      FROM \"AcLoanInt\" ali ";
+		sql += "      LEFT JOIN \"LoanBorMain\" lbm ON lbm.\"CustNo\" = ali.\"CustNo\" ";
+		sql += "                                   AND lbm.\"FacmNo\" = ali.\"FacmNo\" ";
+		sql += "                                   AND lbm.\"BormNo\" = ali.\"BormNo\" ";
 		sql += "      WHERE ali.\"YearMonth\" = :inputYearMonth ";
 		sql += "        AND ali.\"IntStartDate\" > 0 ";
 		if (aging != 9)
 		{
 			sql += "        AND ali.\"Aging\" = :aging ";
 		}
-		sql += "      GROUP BY ali.\"YearMonth\", ali.\"CustNo\" ";
+		sql += "      GROUP BY ali.\"YearMonth\" ";
+        sql += "              ,ali.\"CustNo\" ";
+        sql += "              ,ali.\"IntStartDate\" ";
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

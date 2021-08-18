@@ -25,11 +25,23 @@ import com.st1.itx.db.domain.JcicZ052;
 import com.st1.itx.db.domain.JcicZ053;
 import com.st1.itx.db.domain.JcicZ054;
 import com.st1.itx.db.domain.JcicZ055;
+import com.st1.itx.db.domain.JcicZ055Log;
+import com.st1.itx.db.domain.JcicZ055LogId;
 import com.st1.itx.db.domain.JcicZ056;
+import com.st1.itx.db.domain.JcicZ056Log;
+import com.st1.itx.db.domain.JcicZ056LogId;
 import com.st1.itx.db.domain.JcicZ060;
+import com.st1.itx.db.domain.JcicZ060Log;
+import com.st1.itx.db.domain.JcicZ060LogId;
 import com.st1.itx.db.domain.JcicZ061;
+import com.st1.itx.db.domain.JcicZ061Log;
+import com.st1.itx.db.domain.JcicZ061LogId;
 import com.st1.itx.db.domain.JcicZ062;
+import com.st1.itx.db.domain.JcicZ062Log;
+import com.st1.itx.db.domain.JcicZ062LogId;
 import com.st1.itx.db.domain.JcicZ063;
+import com.st1.itx.db.domain.JcicZ063Log;
+import com.st1.itx.db.domain.JcicZ063LogId;
 import com.st1.itx.db.domain.JcicZ570;
 import com.st1.itx.db.domain.JcicZ570Log;
 import com.st1.itx.db.domain.JcicZ570LogId;
@@ -49,15 +61,29 @@ import com.st1.itx.db.domain.JcicZ575;
 import com.st1.itx.db.domain.JcicZ575Log;
 import com.st1.itx.db.domain.JcicZ575LogId;
 import com.st1.itx.db.domain.JcicZ440;
+import com.st1.itx.db.domain.JcicZ440Log;
+import com.st1.itx.db.domain.JcicZ440LogId;
 import com.st1.itx.db.domain.JcicZ442;
 import com.st1.itx.db.domain.JcicZ443;
+import com.st1.itx.db.domain.JcicZ443Log;
+import com.st1.itx.db.domain.JcicZ443LogId;
 import com.st1.itx.db.domain.JcicZ444;
+import com.st1.itx.db.domain.JcicZ444Log;
+import com.st1.itx.db.domain.JcicZ444LogId;
 import com.st1.itx.db.domain.JcicZ446;
 import com.st1.itx.db.domain.JcicZ447;
+import com.st1.itx.db.domain.JcicZ447Log;
+import com.st1.itx.db.domain.JcicZ447LogId;
 import com.st1.itx.db.domain.JcicZ448;
+import com.st1.itx.db.domain.JcicZ448Log;
+import com.st1.itx.db.domain.JcicZ448LogId;
 import com.st1.itx.db.domain.JcicZ450;
 import com.st1.itx.db.domain.JcicZ451;
+import com.st1.itx.db.domain.JcicZ451Log;
+import com.st1.itx.db.domain.JcicZ451LogId;
 import com.st1.itx.db.domain.JcicZ454;
+import com.st1.itx.db.domain.JcicZ454Log;
+import com.st1.itx.db.domain.JcicZ454LogId;
 import com.st1.itx.db.service.JcicZ040Service;
 import com.st1.itx.db.service.JcicZ041Service;
 import com.st1.itx.db.service.JcicZ042Service;
@@ -73,12 +99,19 @@ import com.st1.itx.db.service.JcicZ051Service;
 import com.st1.itx.db.service.JcicZ052Service;
 import com.st1.itx.db.service.JcicZ053Service;
 import com.st1.itx.db.service.JcicZ054Service;
+import com.st1.itx.db.service.JcicZ055LogService;
 import com.st1.itx.db.service.JcicZ055Service;
+import com.st1.itx.db.service.JcicZ056LogService;
 import com.st1.itx.db.service.JcicZ056Service;
+import com.st1.itx.db.service.JcicZ060LogService;
 import com.st1.itx.db.service.JcicZ060Service;
+import com.st1.itx.db.service.JcicZ061LogService;
 import com.st1.itx.db.service.JcicZ061Service;
+import com.st1.itx.db.service.JcicZ062LogService;
 import com.st1.itx.db.service.JcicZ062Service;
+import com.st1.itx.db.service.JcicZ063LogService;
 import com.st1.itx.db.service.JcicZ063Service;
+import com.st1.itx.db.service.JcicZ440LogService;
 import com.st1.itx.db.service.JcicZ570Service;
 import com.st1.itx.db.service.JcicZ571LogService;
 import com.st1.itx.db.service.JcicZ571Service;
@@ -92,13 +125,19 @@ import com.st1.itx.db.service.JcicZ575LogService;
 import com.st1.itx.db.service.JcicZ575Service;
 import com.st1.itx.db.service.JcicZ440Service;
 import com.st1.itx.db.service.JcicZ442Service;
+import com.st1.itx.db.service.JcicZ443LogService;
 import com.st1.itx.db.service.JcicZ443Service;
 import com.st1.itx.db.service.JcicZ444Service;
+import com.st1.itx.db.service.JcicZ444LogService;
 import com.st1.itx.db.service.JcicZ446Service;
+import com.st1.itx.db.service.JcicZ447LogService;
 import com.st1.itx.db.service.JcicZ447Service;
+import com.st1.itx.db.service.JcicZ448LogService;
 import com.st1.itx.db.service.JcicZ448Service;
 import com.st1.itx.db.service.JcicZ450Service;
+import com.st1.itx.db.service.JcicZ451LogService;
 import com.st1.itx.db.service.JcicZ451Service;
+import com.st1.itx.db.service.JcicZ454LogService;
 import com.st1.itx.db.service.JcicZ454Service;
 import com.st1.itx.db.service.JcicZ570LogService;
 import com.st1.itx.util.common.MakeFile;
@@ -109,8 +148,8 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class L8403File extends MakeFile {
-	// private static final Logger logger = LoggerFactory.getLogger(L8403File.class);
 
+	
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ040Service sJcicZ040Service;
@@ -145,35 +184,61 @@ public class L8403File extends MakeFile {
 	@Autowired
 	public JcicZ055Service sJcicZ055Service;
 	@Autowired
+	public JcicZ055LogService sJcicZ055LogService;
+	@Autowired
 	public JcicZ056Service sJcicZ056Service;
+	@Autowired
+	public JcicZ056LogService sJcicZ056LogService;
 	@Autowired
 	public JcicZ060Service sJcicZ060Service;
 	@Autowired
+	public JcicZ060LogService sJcicZ060LogService;
+	@Autowired
 	public JcicZ061Service sJcicZ061Service;
+	@Autowired
+	public JcicZ061LogService sJcicZ061LogService;
 	@Autowired
 	public JcicZ062Service sJcicZ062Service;
 	@Autowired
+	public JcicZ062LogService sJcicZ062LogService;
+	@Autowired
 	public JcicZ063Service sJcicZ063Service;
 	@Autowired
+	public JcicZ063LogService sJcicZ063LogService;
+	@Autowired
 	public JcicZ440Service sJcicZ440Service;
+	@Autowired
+	public JcicZ440LogService sJcicZ440LogService;
 	@Autowired
 	public JcicZ442Service sJcicZ442Service;
 	@Autowired
 	public JcicZ443Service sJcicZ443Service; 
 	@Autowired
+	public JcicZ443LogService sJcicZ443LogService;
+	@Autowired
 	public JcicZ444Service sJcicZ444Service; 
+	@Autowired
+	public JcicZ444LogService sJcicZ444LogService;
 	@Autowired
 	public JcicZ446Service sJcicZ446Service; 
 	@Autowired
 	public JcicZ447Service sJcicZ447Service; 
 	@Autowired
+	public JcicZ447LogService sJcicZ447LogService;
+	@Autowired
 	public JcicZ448Service sJcicZ448Service; 
+	@Autowired
+	public JcicZ448LogService sJcicZ448LogService;
 	@Autowired
 	public JcicZ450Service sJcicZ450Service; 
 	@Autowired
 	public JcicZ451Service sJcicZ451Service; 
 	@Autowired
+	public JcicZ451LogService sJcicZ451LogService;
+	@Autowired
 	public JcicZ454Service sJcicZ454Service; 
+	@Autowired
+	public JcicZ454LogService sJcicZ454LogService;
 	@Autowired
 	public JcicZ570Service sJcicZ570Service;
 	@Autowired
@@ -218,7 +283,7 @@ public class L8403File extends MakeFile {
 		String iReportDate = titaVo.getParam("ReportDate");
 		String iTranCode = StringUtils.leftPad(titaVo.getParam("TranCode"), 3, '0');
 		//檔名
-		//BBBMMDDS.XXX 金融機構總行代號+月份+日期+次數.檔案類別
+		//金融機構總行代號+月份+日期+次數.檔案類別
 		String fileName = iSubmitKey+iReportDate.substring(3)+"."+iTranCode;
 		
 		int date = Integer.valueOf(titaVo.getEntDy());
@@ -234,6 +299,58 @@ public class L8403File extends MakeFile {
 		case "041":
 			fileCode = "L8403-041";
 			fileItem = "協商開始暨停催通知資料";
+		break;
+		case "055":
+			fileCode = "L8403-055";
+			fileItem = "消債條例更生案件資料報送";		
+		break;
+		case "056":
+			fileCode = "L8403-056";
+			fileItem = "消債條例清算案件資料報送";		
+		break;
+		case "060":
+			fileCode = "L8403-060";
+			fileItem = "前置協商受理變更還款條件申請暨請求回報剩餘債權通知資料";
+		break;
+		case "061":
+			fileCode = "L8403-061";
+			fileItem = "回報協商剩餘債權金額資料";
+		break;
+		case "062":
+			fileCode = "L8403-062";
+			fileItem = "金融機構無擔保債務變更還款條件協議資料";
+		break;
+		case "063":
+			fileCode = "L8403-063";
+			fileItem = "變更還款方案結案通知資料";
+		break;
+		case "440":
+			fileCode = "L8403-440";
+			fileItem = "前置調解受理申請暨請求回報債權通知資料";
+		break;
+		case "443":
+			fileCode = "L8403-443";
+			fileItem = "前置調解回報有擔保債權金額資料";
+		break;
+		case "444":
+			fileCode = "L8403-444";
+			fileItem = "前置調解債務人基本資料";
+		break;
+		case "447":
+			fileCode = "L8403-447";
+			fileItem = "前置調解金融機構無擔保債務協議資料";
+		break;
+		case "448":
+			fileCode = "L8403-448";
+			fileItem = "前置調解無擔保債務分配表資料";
+		break;
+		case "451":
+			fileCode = "L8403-451";
+			fileItem = "前置調解延期繳款資料";
+		break;
+		case "454":
+			fileCode = "L8403-454";
+			fileItem = "前置調解單獨全數受清償資料";
 		break;
 		case "570":
 			fileCode = "L8403-570";
@@ -267,7 +384,6 @@ public class L8403File extends MakeFile {
 		//頭筆資料
 		//JCIC-DAT-Z040-V01
 		String headText = "JCIC-DAT-Z"+iTranCode+"-V01-458     "+iReportDate+"01          02-28225252#1688資訊單位連絡人-王大中，審查單位聯絡人-林小華";
-		this.info("第一行="+headText);
 		this.put(headText);
 		
 		int iCount = 0; //總筆數
@@ -425,7 +541,6 @@ public class L8403File extends MakeFile {
 		//末筆資料
 		String sCount = String.valueOf(iCount);
 		String footText = "TRLR"+StringUtils.leftPad(sCount, 8, '0')+StringUtils.leftPad("", 129);
-		this.info("最後一行="+footText);
 		this.put(footText);
 		}
 	private int totalCount(String trancode) throws LogicException {
@@ -839,7 +954,6 @@ public class L8403File extends MakeFile {
 				}
 			break;
 		}
-		this.info("iTotalCount="+iTotalCount);
 		return iTotalCount;
 	}
 	public void doZ040File(TitaVo titaVo) throws LogicException{
@@ -898,7 +1012,6 @@ public class L8403File extends MakeFile {
 					String text ="41"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
 									 +StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)+StringUtils.leftPad(iNegoStartDate,7,'0')
 									 +StringUtils.leftPad(iNonFinClaimAmt, 9,'0')+StringUtils.leftPad(iScDate, 7,'0')+StringUtils.rightPad("", 29);
-					this.info("text="+text);
 					this.put(text);
 					
 					//回填JcicDate
@@ -961,7 +1074,6 @@ public class L8403File extends MakeFile {
 							 +StringUtils.leftPad(iCashCardPena, 9,'0')+StringUtils.leftPad(iCashCardOther, 9,'0')+StringUtils.leftPad(iCreditCardPrin, 9,'0')
 							 +StringUtils.leftPad(iCreditCardInte, 9,'0')+StringUtils.leftPad(iCreditCardPena, 9,'0')+StringUtils.leftPad(iCreditCardOther, 9,'0')
 							 +StringUtils.rightPad("",72);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1006,7 +1118,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.leftPad(iLastPayAmt, 10,'0')+StringUtils.leftPad(iLastPayDate, 7,'0')
 							+StringUtils.leftPad(iOutstandAmt, 10,'0')+StringUtils.leftPad(iRepayPerMonday, 2,'0')
 							+StringUtils.leftPad(iContractStartYM, 5,'0')+StringUtils.leftPad(iContractEndYM, 5,'0');
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1073,7 +1184,6 @@ public class L8403File extends MakeFile {
 				             +StringUtils.leftPad(iMouthCnt, 2,'0')+StringUtils.leftPad(iMouthRate, 5,'0')+StringUtils.rightPad(iGradeType, 1,"")
 				             +StringUtils.leftPad(iPayLastAmt, 9,'0')+StringUtils.rightPad(iPeriod2, 3,"")
 				             +StringUtils.leftPad(iRate2, 5,"")+StringUtils.leftPad(iMonthPayAmt2, 9,'0')+StringUtils.leftPad(iPayLastAmt2, 9,'0');
-				this.info("text="+text);
 				this.put(text);		
 				
 				//回填JcicDate
@@ -1104,7 +1214,6 @@ public class L8403File extends MakeFile {
 				String text = "45"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
 							+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
 							+StringUtils.rightPad(iMaxMainCode, 3,"")+StringUtils.rightPad(iAgreeCode, 1,"");
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1136,7 +1245,6 @@ public class L8403File extends MakeFile {
 								+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
 								+StringUtils.rightPad(iBreakCode, 2,"")+StringUtils.rightPad("", 3)
 								+StringUtils.leftPad(iCloseCode, 2,'0')+StringUtils.leftPad(iCloseDate, 7,'0')+StringUtils.rightPad("", 43);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1200,7 +1308,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.rightPad(iPeriod2, 3,"")+StringUtils.leftPad(iRate2, 5,"")
 							+StringUtils.leftPad(iMonthPayAmt2,9,'0')+StringUtils.leftPad(iPayLastAmt2, 9,'0')
 							+StringUtils.rightPad("", 14);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1236,8 +1343,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.rightPad(iCustRegAddr, 76,"")+StringUtils.rightPad(iCustComAddr, 76,"")
 							+StringUtils.rightPad(iCustRegTelNo, 16,"")+StringUtils.rightPad(iCustComTelNo, 16,"")
 							+StringUtils.rightPad(iCustMobilNo, 16,"")+StringUtils.rightPad("", 32);
-							
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1276,7 +1381,6 @@ public class L8403File extends MakeFile {
 							 +StringUtils.rightPad(iCourtCode, 3,"")+StringUtils.leftPad(iYear, 3,"")
 							 +StringUtils.rightPad(iCourtDiv, 4,"")+StringUtils.rightPad(iCourtCaseNo, 20,"")
 							 +StringUtils.rightPad(iApprove, 1,"")+StringUtils.leftPad(iClaimDate, 7,'0')+StringUtils.rightPad("", 46);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1313,7 +1417,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.leftPad(iSumRepayActualAmt, 9,'0')+StringUtils.leftPad(iSumRepayShouldAmt, 9,'0')
 							+StringUtils.rightPad(iStatus, 1,"")+StringUtils.leftPad(iSecondRepayYM, 5,'0')
 							+StringUtils.rightPad("", 32);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1345,7 +1448,6 @@ public class L8403File extends MakeFile {
 							  +StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
 				  			  +StringUtils.rightPad(iDelayCode, 1,"")+StringUtils.leftPad(iDelayYM, 5,'0')
 				  			  +StringUtils.rightPad(iDelayDesc, 40,"")+StringUtils.rightPad("", 46);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1389,7 +1491,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.rightPad(iBankCode4, 3,"")+StringUtils.rightPad(iDataCode4, 2,"")
 							+StringUtils.rightPad(iBankCode5, 3,"")+StringUtils.rightPad(iDataCode5, 2,"")
 							+StringUtils.leftPad(iChangePayDate, 7,'0')+StringUtils.rightPad("", 20);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1424,7 +1525,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.rightPad(iMaxMainCode, 3,"")+StringUtils.rightPad(iAgreeSend, 1,"")
 							+StringUtils.rightPad(iAgreeSendData1, 2,"")+StringUtils.rightPad(iAgreeSendData2, 2,"")
 							+StringUtils.leftPad(iChangePayDate, 7,'0')+StringUtils.rightPad("", 37);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1456,7 +1556,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
 							+StringUtils.rightPad(iMaxMainCode, 3,"")+StringUtils.rightPad(iPayOffResult, 1,"")
 							+StringUtils.leftPad(iPayOffDate, 7,'0')+StringUtils.rightPad("", 41);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1497,6 +1596,14 @@ public class L8403File extends MakeFile {
 				String iSaveEndDate = String.valueOf(sJcicZ055.getSaveEndDate());
 				String iIsImplement = sJcicZ055.getIsImplement();
 				String iInspectName = sJcicZ055.getInspectName();
+				int ixPayDate= Integer.valueOf(sJcicZ055.getPayDate());
+				int ixPayEndDate = Integer.valueOf(sJcicZ055.getPayEndDate());
+				int ixPeriod =  Integer.valueOf(sJcicZ055.getPeriod());
+				int ixOutstandAmt= Integer.valueOf(sJcicZ055.getOutstandAmt());
+				int ixSubAmt = Integer.valueOf(sJcicZ055.getSubAmt());
+				int ixSaveDate= Integer.valueOf(sJcicZ055.getSaveDate());
+				int ixSaveEndDate= Integer.valueOf(sJcicZ055.getSaveEndDate());	
+				String iUkey = sJcicZ055.getUkey();
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 				String text = "55"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
 							+StringUtils.rightPad(iCaseStatus, 1,"")+StringUtils.leftPad(iClaimDate, 7,'0')
@@ -1509,19 +1616,46 @@ public class L8403File extends MakeFile {
 							+StringUtils.leftPad(iSaveDate, 7,"")+StringUtils.rightPad(iClaimStatus2, 1,"")
 							+StringUtils.leftPad(iSaveEndDate, 7,"")+StringUtils.rightPad(iIsImplement, 1,"")
 							+StringUtils.rightPad(iInspectName, 10,"")+StringUtils.rightPad("", 54);
-				this.info("text="+text);
 				this.put(text);
 				
-				//回填JcicDate
+				//檔案產生後，回填JcicDate
 				sJcicZ055.setOutJcicTxtDate(iDate);
 				try {
 					sJcicZ055Service.update(sJcicZ055, titaVo);
 				}catch (Exception e){
 					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
 				}
+				//回填JcicDate後寫入Log檔
+				JcicZ055Log iJcicZ055Log = new JcicZ055Log();
+				JcicZ055LogId iJcicZ055LogId = new JcicZ055LogId();
+				iJcicZ055LogId.setTxSeq(titaVo.getTxSeq());
+				iJcicZ055LogId.setUkey(iUkey);
+				iJcicZ055Log.setJcicZ055LogId(iJcicZ055LogId);
+				iJcicZ055Log.setYear(iYear);
+				iJcicZ055Log.setCourtDiv(iCourtDiv);
+				iJcicZ055Log.setCourtCaseNo(iCourtCaseNo);
+				iJcicZ055Log.setPayDate(ixPayDate);
+				iJcicZ055Log.setPayEndDate(ixPayEndDate);
+				iJcicZ055Log.setPeriod(ixPeriod);
+				iJcicZ055Log.setOutstandAmt(ixOutstandAmt);
+				iJcicZ055Log.setSubAmt(ixSubAmt);
+				iJcicZ055Log.setClaimStatus1(iClaimStatus1);
+				iJcicZ055Log.setSaveDate(ixSaveDate);
+				iJcicZ055Log.setClaimStatus2(iClaimStatus2);
+				iJcicZ055Log.setSaveEndDate(ixSaveEndDate);
+				iJcicZ055Log.setIsImplement(iIsImplement);
+				iJcicZ055Log.setInspectName(iInspectName);
+				iJcicZ055Log.setTranKey(iTranKey);
+				iJcicZ055Log.setOutJcicTxtDate(iDate);
+				
+				try {
+					sJcicZ055LogService.insert(iJcicZ055Log, titaVo);
+				}catch (Exception e){
+					throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z056)");
+						}
+					}
+				}	
 			}
-		}
-	}
 	public void doZ056File(TitaVo titaVo) throws LogicException{
 		Slice<JcicZ056> rJcicZ056 = null;
 		rJcicZ056 = sJcicZ056Service.findAll(this.index, this.limit,titaVo);
@@ -1529,6 +1663,7 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ056 sJcicZ056:rJcicZ056) {
+				if(sJcicZ056.getOutJcicTxtDate()==0) {
 				String iTranKey = sJcicZ056.getTranKey();
 				String iSubmitKey = sJcicZ056.getSubmitKey();
 				String iCustId = sJcicZ056.getCustId();
@@ -1536,6 +1671,7 @@ public class L8403File extends MakeFile {
 				String iClaimDate = String.valueOf(sJcicZ056.getClaimDate());
 				String iCourtCode = sJcicZ056.getCourtCode();
 				String iYear = String.valueOf(sJcicZ056.getYear());
+				int ixYear = Integer.valueOf(sJcicZ056.getYear());
 				String iCourtDiv = sJcicZ056.getCourtDiv();
 				String iCourtCaseNo = sJcicZ056.getCourtCaseNo();
 				String iApprove = sJcicZ056.getApprove();
@@ -1546,6 +1682,11 @@ public class L8403File extends MakeFile {
 				String iSaveEndDate = String.valueOf(sJcicZ056.getSaveEndDate());
 				String iSubAmt = String.valueOf(sJcicZ056.getSubAmt());
 				String iAdminName = sJcicZ056.getAdminName();
+				String iUkey = sJcicZ056.getUkey();
+				int ixOutStandAmt = Integer.valueOf(sJcicZ056.getOutstandAmt()); 
+				int ixSubAmt = Integer.valueOf(sJcicZ056.getSubAmt());
+				int ixSaveDate = Integer.valueOf(sJcicZ056.getSaveDate());
+				int ixSaveEndDate = Integer.valueOf(sJcicZ056.getSaveEndDate());
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 				String text = "55"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
 							+StringUtils.rightPad(iCaseStatus, 1,"")+StringUtils.leftPad(iClaimDate, 7,'0')
@@ -1556,18 +1697,44 @@ public class L8403File extends MakeFile {
 							+StringUtils.rightPad(iClaimStatus1, 1,"")+StringUtils.leftPad(iSaveDate, 7,"")
 							+StringUtils.rightPad(iClaimStatus2, 1,"")+StringUtils.leftPad(iSaveEndDate, 7,"")
 							+StringUtils.rightPad(iAdminName, 10,"")+StringUtils.rightPad("", 76);
-				this.info("text="+text);
 				this.put(text);
 				
-				//回填JcicDate
+				//檔案產生後，回填JcicDate
 				sJcicZ056.setOutJcicTxtDate(iDate);
 				try {
 					sJcicZ056Service.update(sJcicZ056, titaVo);
 				}catch (Exception e){
 					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
 				}
+				
+				//回填JcicDate後寫入Log檔
+				JcicZ056Log iJcicZ056Log = new JcicZ056Log();
+				JcicZ056LogId iJcicZ056LogId = new JcicZ056LogId();
+				iJcicZ056LogId.setTxSeq(titaVo.getTxSeq());
+				iJcicZ056LogId.setUkey(iUkey);
+				iJcicZ056Log.setJcicZ056LogId(iJcicZ056LogId);
+				iJcicZ056Log.setYear(ixYear);
+				iJcicZ056Log.setCourtDiv(iCourtDiv);
+				iJcicZ056Log.setCourtCaseNo(iCourtCaseNo);
+				iJcicZ056Log.setApprove(iApprove);
+				iJcicZ056Log.setOutstandAmt(ixOutStandAmt);
+				iJcicZ056Log.setSubAmt(ixSubAmt);
+				iJcicZ056Log.setClaimStatus1(iClaimStatus1);
+				iJcicZ056Log.setSaveDate(ixSaveDate);
+				iJcicZ056Log.setClaimStatus2(iClaimStatus2);
+				iJcicZ056Log.setSaveEndDate(ixSaveEndDate);
+				iJcicZ056Log.setAdminName(iAdminName);
+				iJcicZ056Log.setTranKey(iTranKey);
+				iJcicZ056Log.setOutJcicTxtDate(iDate);
+
+				try {
+					sJcicZ056LogService.insert(iJcicZ056Log, titaVo);
+				}catch (Exception e){
+					throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z056)");
+				}
+			 }
 			}
-		}
+		}	
 	}
 	public void doZ060File(TitaVo titaVo) throws LogicException{
 		Slice<JcicZ060> rJcicZ060 = null;
@@ -1576,29 +1743,47 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ060 sJcicZ060:rJcicZ060) {
+				if(sJcicZ060.getOutJcicTxtDate()==0) {
 				String iTranKey = sJcicZ060.getTranKey();
 				String iSubmitKey = sJcicZ060.getSubmitKey();
 				String iCustId = sJcicZ060.getCustId();
 				String iRcDate = String.valueOf(sJcicZ060.getRcDate());
 				String iChangePayDate = String.valueOf(sJcicZ060.getChangePayDate());
-				int iYM = sJcicZ060.getYM();
+				int iYM = Integer.valueOf(sJcicZ060.getYM());
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+				String iUkey = sJcicZ060.getUkey();
 				String text = "60"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
 							+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
 							+StringUtils.leftPad(iChangePayDate, 7,'0')+StringUtils.leftPad(String.valueOf(iYM), 5,'0')
 							+StringUtils.rightPad("", 30);
-				this.info("text="+text);
 				this.put(text);
 				
-				//回填JcicDate
+				//檔案產生後，回填JcicDate
 				sJcicZ060.setOutJcicTxtDate(iDate);
 				try {
 					sJcicZ060Service.update(sJcicZ060, titaVo);
 				}catch (Exception e){
 					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
 				}
+				
+				//回填JcicDate後寫入Log檔
+				JcicZ060Log iJcicZ060Log = new JcicZ060Log();
+				JcicZ060LogId iJcicZ060LogId = new JcicZ060LogId();
+				iJcicZ060LogId.setTxSeq(titaVo.getTxSeq());
+				iJcicZ060LogId.setUkey(iUkey);
+				iJcicZ060Log.setJcicZ060LogId(iJcicZ060LogId);
+				iJcicZ060Log.setYM(iYM);
+				iJcicZ060Log.setTranKey(iTranKey);
+				iJcicZ060Log.setOutJcicTxtDate(iDate);
+
+				try {
+					sJcicZ060LogService.insert(iJcicZ060Log, titaVo);
+				}catch (Exception e){
+					throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z060)");
+				}
+				}
 			}
-		}
+		}	
 	}
 	public void doZ061File(TitaVo titaVo) throws LogicException{
 		Slice<JcicZ061> rJcicZ061 = null;
@@ -1607,6 +1792,7 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ061 sJcicZ061:rJcicZ061) {
+				if(sJcicZ061.getOutJcicTxtDate()==0) {
 				String iTranKey = sJcicZ061.getTranKey();
 				String iSubmitKey = sJcicZ061.getSubmitKey();
 				String iCustId = sJcicZ061.getCustId();
@@ -1616,10 +1802,14 @@ public class L8403File extends MakeFile {
 				String iExpBalanceAmt = String.valueOf(sJcicZ061.getExpBalanceAmt());
 				String iCashBalanceAmt = String.valueOf(sJcicZ061.getCashBalanceAmt());
 				String iCreditBalanceAmt = String.valueOf(sJcicZ061.getCreditBalanceAmt());
-				String iMaxMainNote = sJcicZ061.getMaxMainCode();
+				String iMaxMainNote = sJcicZ061.getMaxMainNote();
 				String iIsGuarantor = sJcicZ061.getIsGuarantor();
 				String iIsChangePayment = sJcicZ061.getIsChangePayment();
+				int ixExpBalanceAmt = Integer.valueOf(sJcicZ061.getExpBalanceAmt());
+				int ixCashBalanceAmt = Integer.valueOf(sJcicZ061.getCashBalanceAmt());
+				int ixCreditBalanceAmt = Integer.valueOf(sJcicZ061.getCreditBalanceAmt());
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+				String iUkey = sJcicZ061.getUkey();
 				String text = "61"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
 							+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
 							+StringUtils.leftPad(iChangePayDate, 7,'0')+StringUtils.rightPad(iMaxMainCode, 3,"")
@@ -1627,17 +1817,37 @@ public class L8403File extends MakeFile {
 							+StringUtils.leftPad(iCreditBalanceAmt, 9,'0')+StringUtils.rightPad(iMaxMainNote, 1,"")
 							+StringUtils.rightPad(iIsGuarantor, 1,"")+StringUtils.rightPad(iIsChangePayment, 1,"")
 							+StringUtils.rightPad("", 42);
-				this.info("text="+text);
-				this.put(text);
-				
-				//回填JcicDate
-				sJcicZ061.setOutJcicTxtDate(iDate);
-				try {
-					sJcicZ061Service.update(sJcicZ061, titaVo);
-				}catch (Exception e){
-					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					this.put(text);
+					
+					//檔案產生後，回填JcicDate
+					sJcicZ061.setOutJcicTxtDate(iDate);
+					try {
+						sJcicZ061Service.update(sJcicZ061, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					}
+					
+					//回填JcicDate後寫入Log檔
+					JcicZ061Log iJcicZ061Log = new JcicZ061Log();
+					JcicZ061LogId iJcicZ061LogId = new JcicZ061LogId();
+					iJcicZ061LogId.setTxSeq(titaVo.getTxSeq());
+					iJcicZ061LogId.setUkey(iUkey);
+					iJcicZ061Log.setJcicZ061LogId(iJcicZ061LogId);
+					iJcicZ061Log.setExpBalanceAmt(ixExpBalanceAmt);
+					iJcicZ061Log.setCashBalanceAmt(ixCashBalanceAmt);
+					iJcicZ061Log.setCreditBalanceAmt(ixCreditBalanceAmt);
+					iJcicZ061Log.setMaxMainNote(iMaxMainNote);
+					iJcicZ061Log.setIsGuarantor(iIsGuarantor);
+					iJcicZ061Log.setIsChangePayment(iIsChangePayment);
+					iJcicZ061Log.setTranKey(iTranKey);
+					iJcicZ061Log.setOutJcicTxtDate(iDate);		
+					try {
+						sJcicZ061LogService.insert(iJcicZ061Log, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z061)");
+					}
 				}
-			}
+			}	
 		}
 	}
 	public void doZ062File(TitaVo titaVo) throws LogicException{
@@ -1647,53 +1857,104 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ062 sJcicZ062:rJcicZ062) {
-				String iTranKey = sJcicZ062.getTranKey();
-				String iSubmitKey = sJcicZ062.getSubmitKey();
-				String iCustId = sJcicZ062.getCustId();
-				String iRcDate = String.valueOf(sJcicZ062.getRcDate());
-				String iChangePayDate = String.valueOf(sJcicZ062.getChangePayDate());
-				String iCompletePeriod = String.valueOf(sJcicZ062.getCompletePeriod());
-				String iPeriod = String.valueOf(sJcicZ062.getPeriod());
-				String iRate = String.valueOf(sJcicZ062.getRate());
-				String iExpBalanceAmt =String.valueOf(sJcicZ062.getExpBalanceAmt());
-				String iCashBalanceAmt = String.valueOf(sJcicZ062.getCashBalanceAmt());
-				String iCreditBalanceAmt = String.valueOf(sJcicZ062.getCreditBalanceAmt());
-				String iChaRepayAmt = String.valueOf(sJcicZ062.getChaRepayAmt());
-				String iChaRepayAgreeDate = String.valueOf(sJcicZ062.getChaRepayAgreeDate());
-				String iChaRepayViewDate = String.valueOf(sJcicZ062.getChaRepayViewDate());
-				String iChaRepayEndDate = String.valueOf(sJcicZ062.getChaRepayEndDate());
-				String iChaRepayFirstDate = String.valueOf(sJcicZ062.getChaRepayFirstDate());
-				String iPayAccount = String.valueOf(sJcicZ062.getPayAccount());
-				String iPostAddr = String.valueOf(sJcicZ062.getPostAddr());
-				String iMonthPayAmt = String.valueOf(sJcicZ062.getMonthPayAmt());
-				String iGradeType = String.valueOf(sJcicZ062.getGradeType());
-				String iPeriod2 = String.valueOf(sJcicZ062.getPeriod());
-				String iRate2 = String.valueOf(sJcicZ062.getRate2());
-				String iMonthPayAmt2 = String.valueOf(sJcicZ062.getMonthPayAmt2());
-				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-				String text = "62"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-							+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
-							+StringUtils.rightPad(iChangePayDate, 7,'0')+StringUtils.leftPad(iCompletePeriod, 3,'0')
-							+StringUtils.leftPad(iPeriod, 3,'0')+StringUtils.leftPad(iRate, 5,'0')
-							+StringUtils.leftPad(iExpBalanceAmt, 9,'0')+StringUtils.leftPad(iCashBalanceAmt, 9,'0')
-							+StringUtils.leftPad(iCreditBalanceAmt, 9,'0')+StringUtils.leftPad(iChaRepayAmt, 10,'0')
-							+StringUtils.leftPad(iChaRepayAgreeDate, 7,'0')+StringUtils.leftPad(iChaRepayViewDate, 7,"")
-							+StringUtils.leftPad(iChaRepayEndDate, 7,"")+StringUtils.leftPad(iChaRepayFirstDate, 7,'0')
-							+StringUtils.rightPad(iPayAccount, 20,"")+StringUtils.rightPad(iPostAddr,76,"")
-							+StringUtils.leftPad(iMonthPayAmt, 9,'0')+StringUtils.rightPad(iGradeType,1,"")
-							+StringUtils.leftPad(iPeriod2,3,'0')+StringUtils.leftPad(iRate2, 5,'0')
-							+StringUtils.leftPad(iMonthPayAmt2, 9,'0')+StringUtils.leftPad("",572);
-				this.info("text="+text);
-				this.put(text);
-				
-				//回填JcicDate
-				sJcicZ062.setOutJcicTxtDate(iDate);
-				try {
-					sJcicZ062Service.update(sJcicZ062, titaVo);
-				}catch (Exception e){
-					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+				if(sJcicZ062.getOutJcicTxtDate()==0) {
+					String iTranKey = sJcicZ062.getTranKey();
+					String iSubmitKey = sJcicZ062.getSubmitKey();
+					String iCustId = sJcicZ062.getCustId();
+					String iRcDate = String.valueOf(sJcicZ062.getRcDate());
+					String iChangePayDate = String.valueOf(sJcicZ062.getChangePayDate());
+					String iCompletePeriod = String.valueOf(sJcicZ062.getCompletePeriod());
+					int ixCompletePeriod = Integer.valueOf(sJcicZ062.getCompletePeriod());
+					String iPeriod = String.valueOf(sJcicZ062.getPeriod());
+					int ixPeriod = Integer.valueOf(sJcicZ062.getPeriod());
+					String iRate = String.valueOf(sJcicZ062.getRate());
+					BigDecimal ixRate = sJcicZ062.getRate();
+					String iExpBalanceAmt =String.valueOf(sJcicZ062.getExpBalanceAmt());
+					int ixExpBalanceAmt = Integer.valueOf(sJcicZ062.getExpBalanceAmt());
+					String iCashBalanceAmt = String.valueOf(sJcicZ062.getCashBalanceAmt());
+					int ixCashBalanceAmt = Integer.valueOf(sJcicZ062.getCashBalanceAmt());
+					String iCreditBalanceAmt = String.valueOf(sJcicZ062.getCreditBalanceAmt());
+					int ixCreditBalanceAmt = Integer.valueOf(sJcicZ062.getCreditBalanceAmt());
+					String iChaRepayAmt = String.valueOf(sJcicZ062.getChaRepayAmt());
+					BigDecimal ixChaRepayAmt = sJcicZ062.getChaRepayAmt();
+					String iChaRepayAgreeDate = String.valueOf(sJcicZ062.getChaRepayAgreeDate());
+					int ixChaRepayAgreeDate = Integer.valueOf(sJcicZ062.getChaRepayAgreeDate());
+					String iChaRepayViewDate = String.valueOf(sJcicZ062.getChaRepayViewDate());
+					int ixChaRepayViewDate = Integer.valueOf(sJcicZ062.getChaRepayViewDate());
+					String iChaRepayEndDate = String.valueOf(sJcicZ062.getChaRepayEndDate());
+					int ixChaRepayEndDate = Integer.valueOf(sJcicZ062.getChaRepayEndDate());
+					String iChaRepayFirstDate = String.valueOf(sJcicZ062.getChaRepayFirstDate());
+					int ixChaRepayFirstDate = Integer.valueOf(sJcicZ062.getChaRepayFirstDate());
+					String iPayAccount = String.valueOf(sJcicZ062.getPayAccount());
+					String iPostAddr = String.valueOf(sJcicZ062.getPostAddr());
+					String iMonthPayAmt = String.valueOf(sJcicZ062.getMonthPayAmt());
+					int ixMonthPayAmt = Integer.valueOf(sJcicZ062.getMonthPayAmt());
+					String iGradeType = String.valueOf(sJcicZ062.getGradeType());
+					String iPeriod2 = String.valueOf(sJcicZ062.getPeriod());
+					int ixPeriod2 = Integer.valueOf(sJcicZ062.getPeriod());
+					String iRate2 = String.valueOf(sJcicZ062.getRate2());
+					BigDecimal ixRate2 = sJcicZ062.getRate2();
+					String iMonthPayAmt2 = String.valueOf(sJcicZ062.getMonthPayAmt2());
+					int ixMonthPayAmt2 = Integer.valueOf(sJcicZ062.getMonthPayAmt2());
+					String iUkey = sJcicZ062.getUkey();
+					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+					//組成檔案內容，並產生檔案
+					String text = "62"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
+								+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
+								+StringUtils.rightPad(iChangePayDate, 7,'0')+StringUtils.leftPad(iCompletePeriod, 3,'0')
+								+StringUtils.leftPad(iPeriod, 3,'0')+StringUtils.leftPad(iRate, 5,'0')
+								+StringUtils.leftPad(iExpBalanceAmt, 9,'0')+StringUtils.leftPad(iCashBalanceAmt, 9,'0')
+								+StringUtils.leftPad(iCreditBalanceAmt, 9,'0')+StringUtils.leftPad(iChaRepayAmt, 10,'0')
+								+StringUtils.leftPad(iChaRepayAgreeDate, 7,'0')+StringUtils.leftPad(iChaRepayViewDate, 7,"")
+								+StringUtils.leftPad(iChaRepayEndDate, 7,"")+StringUtils.leftPad(iChaRepayFirstDate, 7,'0')
+								+StringUtils.rightPad(iPayAccount, 20,"")+StringUtils.rightPad(iPostAddr,76,"")
+								+StringUtils.leftPad(iMonthPayAmt, 9,'0')+StringUtils.rightPad(iGradeType,1,"")
+								+StringUtils.leftPad(iPeriod2,3,'0')+StringUtils.leftPad(iRate2, 5,'0')
+								+StringUtils.leftPad(iMonthPayAmt2, 9,'0')+StringUtils.leftPad("",572);
+					this.put(text);
+					
+					//檔案產生後，回填JcicDate
+					sJcicZ062.setOutJcicTxtDate(iDate);
+					try {
+						sJcicZ062Service.update(sJcicZ062, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					}
+					
+					//回填JcicDate後寫入Log檔
+					JcicZ062Log iJcicZ062Log = new JcicZ062Log();
+					JcicZ062LogId iJcicZ062LogId = new JcicZ062LogId();
+					iJcicZ062LogId.setTxSeq(titaVo.getTxSeq());
+					iJcicZ062LogId.setUkey(iUkey);
+					iJcicZ062Log.setJcicZ062LogId(iJcicZ062LogId);
+					iJcicZ062Log.setCompletePeriod(ixCompletePeriod);
+					iJcicZ062Log.setPeriod(ixPeriod);
+					iJcicZ062Log.setRate(ixRate);
+					iJcicZ062Log.setExpBalanceAmt(ixExpBalanceAmt);
+					iJcicZ062Log.setCashBalanceAmt(ixCashBalanceAmt);
+					iJcicZ062Log.setCreditBalanceAmt(ixCreditBalanceAmt);
+					iJcicZ062Log.setChaRepayAmt(ixChaRepayAmt);
+					iJcicZ062Log.setChaRepayAgreeDate(ixChaRepayAgreeDate);
+					iJcicZ062Log.setChaRepayViewDate(ixChaRepayViewDate);
+					iJcicZ062Log.setChaRepayEndDate(ixChaRepayEndDate);
+					iJcicZ062Log.setChaRepayFirstDate(ixChaRepayFirstDate);
+					iJcicZ062Log.setPayAccount(iPayAccount);
+					iJcicZ062Log.setPostAddr(iPostAddr);
+					iJcicZ062Log.setMonthPayAmt(ixMonthPayAmt);
+					iJcicZ062Log.setGradeType(iGradeType);
+					iJcicZ062Log.setPeriod2(ixPeriod2);
+					iJcicZ062Log.setRate2(ixRate2);
+					iJcicZ062Log.setMonthPayAmt2(ixMonthPayAmt2);
+					iJcicZ062Log.setTranKey(iTranKey);
+					iJcicZ062Log.setOutJcicTxtDate(iDate);
+
+					try {
+						sJcicZ062LogService.insert(iJcicZ062Log, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z062)");
+					}
 				}
-			}
+			}	
 		}
 	}
 	public void doZ063File(TitaVo titaVo) throws LogicException{
@@ -1703,27 +1964,48 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ063 sJcicZ063:rJcicZ063) {
-				String iTranKey = sJcicZ063.getTranKey();
-				String iSubmitKey = sJcicZ063.getSubmitKey();
-				String iCustId = sJcicZ063.getCustId();
-				String iRcDate = String.valueOf(sJcicZ063.getRcDate());
-				String iChangePayDate = String.valueOf(sJcicZ063.getChangePayDate());
-				String iCloseDate = String.valueOf(sJcicZ063.getClosedDate());
-				String iClosedResult = sJcicZ063.getClosedResult();
-				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-				String text = "63"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-							+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
-							+StringUtils.leftPad(iChangePayDate, 7,'0')+StringUtils.leftPad(iCloseDate, 7,'0')
-							+StringUtils.rightPad(iClosedResult, 1,"")+StringUtils.rightPad("",42);
-				this.info("text="+text);
-				this.put(text);
-				
-				//回填JcicDate
-				sJcicZ063.setOutJcicTxtDate(iDate);
-				try {
-					sJcicZ063Service.update(sJcicZ063, titaVo);
-				}catch (Exception e){
-					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+				if(sJcicZ063.getOutJcicTxtDate()==0) {
+					String iTranKey = sJcicZ063.getTranKey();
+					String iSubmitKey = sJcicZ063.getSubmitKey();
+					String iCustId = sJcicZ063.getCustId();
+					String iRcDate = String.valueOf(sJcicZ063.getRcDate());
+					String iChangePayDate = String.valueOf(sJcicZ063.getChangePayDate());
+					String iCloseDate = String.valueOf(sJcicZ063.getClosedDate());
+					int ixCloseDate = Integer.valueOf(sJcicZ063.getClosedDate());
+					String iClosedResult = sJcicZ063.getClosedResult();
+					String iUkey = sJcicZ063.getUkey();
+					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+					//組成檔案內容，並產生檔案
+					String text = "63"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
+								+StringUtils.leftPad(iRcDate, 7,'0')+StringUtils.rightPad("", 5)
+								+StringUtils.leftPad(iChangePayDate, 7,'0')+StringUtils.leftPad(iCloseDate, 7,'0')
+								+StringUtils.rightPad(iClosedResult, 1,"")+StringUtils.rightPad("",42);
+					this.put(text);
+					
+					//檔案產生後，回填JcicDate
+					sJcicZ063.setOutJcicTxtDate(iDate);
+					try {
+						sJcicZ063Service.update(sJcicZ063, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					}
+					
+					//回填JcicDate後寫入Log檔
+					JcicZ063Log iJcicZ063Log = new JcicZ063Log();
+					JcicZ063LogId iJcicZ063LogId = new JcicZ063LogId();
+					iJcicZ063LogId.setTxSeq(titaVo.getTxSeq());
+					iJcicZ063LogId.setUkey(iUkey);
+					iJcicZ063Log.setJcicZ063LogId(iJcicZ063LogId);
+					iJcicZ063Log.setClosedDate(ixCloseDate);
+					iJcicZ063Log.setClosedResult(iClosedResult);
+					iJcicZ063Log.setTranKey(iTranKey);
+					iJcicZ063Log.setOutJcicTxtDate(iDate);
+
+					try {
+						sJcicZ063LogService.insert(iJcicZ063Log, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z063)");
+					}
 				}
 			}	
 		}
@@ -1735,42 +2017,75 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ440 sJcicZ440:rJcicZ440) {
-				String iTranKey = sJcicZ440.getTranKey();
-				String iSubmitKey = sJcicZ440.getSubmitKey();
-				String iCustId = sJcicZ440.getCustId();
-//				String iApplyDate = String.valueOf(sJcicZ440.getApplyDate());
-////				String iBankId = sJcicZ440.getBankId();
-//				String iAgreeDate =  String.valueOf(sJcicZ440.getAgreeDate());
-//				String iStartDate = String.valueOf(sJcicZ440.getStartDate());
-//				String iRemindDate = String.valueOf(sJcicZ440.getRemindDate());
-//				String iApplyType = sJcicZ440.getApplyType();
-//				String iReportYn = sJcicZ440.getReportYn();
-//				String iNotBank1 = sJcicZ440.getNotBankId1();
-//				String iNotBank2 = sJcicZ440.getNotBankId2();
-//				String iNotBank3 = sJcicZ440.getNotBankId3();
-//				String iNotBank4 = sJcicZ440.getNotBankId4();
-//				String iNotBank5 = sJcicZ440.getNotBankId5();
-//				String iNotBank6 = sJcicZ440.getNotBankId6();
-//				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-//				String text = "440"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-//							+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iBankId, 3,"")
-//							+StringUtils.rightPad("", 5)+StringUtils.leftPad(iAgreeDate, 7,'0')
-//							+StringUtils.leftPad(iStartDate, 7,'0')+StringUtils.leftPad(iRemindDate, 7,'0')
-//							+StringUtils.rightPad(iApplyType, 1,"")+StringUtils.rightPad(iReportYn, 1,"")
-//							+StringUtils.rightPad(iNotBank1, 3,"")+StringUtils.rightPad(iNotBank2, 3,"")
-//							+StringUtils.rightPad(iNotBank3, 3,"")+StringUtils.rightPad(iNotBank4, 3,"")
-//							+StringUtils.rightPad(iNotBank5, 3,"")+StringUtils.rightPad(iNotBank6, 3,"")
-//							+StringUtils.rightPad("", 17);
-//				this.info("text="+text);
-//				this.put(text);
-//				
-//				//回填JcicDate
-//				sJcicZ440.setOutJcicTxtDate(iDate);
-//				try {
-//					sJcicZ440Service.update(sJcicZ440, titaVo);
-//				}catch (Exception e){
-//					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
-//				}
+				if(sJcicZ440.getOutJcicTxtDate()==0) {
+					String iTranKey = sJcicZ440.getTranKey();
+					String iSubmitKey = sJcicZ440.getSubmitKey();
+					String iCustId = sJcicZ440.getCustId();
+					String iApplyDate = String.valueOf(sJcicZ440.getApplyDate());
+					String iCourtCode = sJcicZ440.getCourtCode();
+					String iAgreeDate =  String.valueOf(sJcicZ440.getAgreeDate());
+					int ixAgreeDate = Integer.valueOf(sJcicZ440.getAgreeDate());
+					String iStartDate = String.valueOf(sJcicZ440.getStartDate());
+					int ixStartDate = Integer.valueOf(sJcicZ440.getStartDate());
+					String iRemindDate = String.valueOf(sJcicZ440.getRemindDate());
+					int ixRemindDate = Integer.valueOf(sJcicZ440.getRemindDate());
+					String iApplyType = sJcicZ440.getApplyType();
+					String iReportYn = sJcicZ440.getReportYn();
+					String iNotBankId1 = sJcicZ440.getNotBankId1();
+					String iNotBankId2 = sJcicZ440.getNotBankId2();
+					String iNotBankId3 = sJcicZ440.getNotBankId3();
+					String iNotBankId4 = sJcicZ440.getNotBankId4();
+					String iNotBankId5 = sJcicZ440.getNotBankId5();
+					String iNotBankId6 = sJcicZ440.getNotBankId6();
+					String iUkey = sJcicZ440.getUkey();
+					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+					//組成檔案內容，並產生檔案
+					String text = "440"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
+								+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iCourtCode, 3,"")
+								+StringUtils.rightPad("", 5)+StringUtils.leftPad(iAgreeDate, 7,'0')
+								+StringUtils.leftPad(iStartDate, 7,'0')+StringUtils.leftPad(iRemindDate, 7,'0')
+								+StringUtils.rightPad(iApplyType, 1,"")+StringUtils.rightPad(iReportYn, 1,"")
+								+StringUtils.rightPad(iNotBankId1, 3,"")+StringUtils.rightPad(iNotBankId2, 3,"")
+								+StringUtils.rightPad(iNotBankId3, 3,"")+StringUtils.rightPad(iNotBankId4, 3,"")
+								+StringUtils.rightPad(iNotBankId5, 3,"")+StringUtils.rightPad(iNotBankId6, 3,"")
+								+StringUtils.rightPad("", 17);
+				this.put(text);
+					this.put(text);
+					
+					//檔案產生後，回填JcicDate
+					sJcicZ440.setOutJcicTxtDate(iDate);
+					try {
+						sJcicZ440Service.update(sJcicZ440, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					}
+					
+					//回填JcicDate後寫入Log檔
+					JcicZ440Log iJcicZ440Log = new JcicZ440Log();
+					JcicZ440LogId iJcicZ440LogId = new JcicZ440LogId();
+					iJcicZ440LogId.setTxSeq(titaVo.getTxSeq());
+					iJcicZ440LogId.setUkey(iUkey);
+					iJcicZ440Log.setJcicZ440LogId(iJcicZ440LogId);
+					iJcicZ440Log.setAgreeDate(ixAgreeDate);
+					iJcicZ440Log.setStartDate(ixStartDate);
+					iJcicZ440Log.setRemindDate(ixRemindDate);
+					iJcicZ440Log.setApplyType(iApplyType);
+					iJcicZ440Log.setReportYn(iReportYn);
+					iJcicZ440Log.setNotBankId1(iNotBankId1);
+					iJcicZ440Log.setNotBankId2(iNotBankId2);
+					iJcicZ440Log.setNotBankId3(iNotBankId3);
+					iJcicZ440Log.setNotBankId4(iNotBankId4);
+					iJcicZ440Log.setNotBankId5(iNotBankId5);
+					iJcicZ440Log.setNotBankId6(iNotBankId6);
+					iJcicZ440Log.setTranKey(iTranKey);
+					iJcicZ440Log.setOutJcicTxtDate(iDate);
+
+					try {
+						sJcicZ440LogService.insert(iJcicZ440Log, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z440)");
+					}
+				}
 			}	
 		}
 	}
@@ -1827,7 +2142,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.leftPad(iGuarObliPrin, 9,'0')+StringUtils.leftPad(iGuarObliInte, 9,'0')
 							+StringUtils.leftPad(iGuarObliPena, 9,'0')+StringUtils.leftPad(iGuarObliOther, 9,'0')
 							+StringUtils.rightPad("", 56);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -1851,50 +2165,96 @@ public class L8403File extends MakeFile {
 				String iSubmitKey = sJcicZ443.getSubmitKey();
 				String iCustId = sJcicZ443.getCustId();
 				String iApplyDate = String.valueOf(sJcicZ443.getApplyDate());
-			//	String iBankId = sJcicZ443.getBankId();
+				String iCourtCode = sJcicZ443.getCourtCode();
 				String iMaxMainCode = sJcicZ443.getMaxMainCode();
 				String iIsMaxMain = sJcicZ443.getIsMaxMain();
 				String iAccount = sJcicZ443.getAccount();
-				String iGuarentType = sJcicZ443.getGuarantyType();
-				String iLoanAmt = String.valueOf(sJcicZ443.getLoanAmt());
-				String iCreditAmt = String.valueOf(sJcicZ443.getCreditAmt());
-				String iPrincipal = String.valueOf(sJcicZ443.getPrincipal());
-				String iInterest = String.valueOf(sJcicZ443.getInterest());
-				String iPenalty = String.valueOf(sJcicZ443.getPenalty());
-				String iOther = String.valueOf(sJcicZ443.getOther());
-				String iTerminalPayAmt = String.valueOf(sJcicZ443.getTerminalPayAmt());
-				String iLatestPayAmt = String.valueOf(sJcicZ443.getLatestPayAmt());
-				String iFinalPayDay = String.valueOf(sJcicZ443.getFinalPayDay());
-				String iNotyetaQuit  = String.valueOf(sJcicZ443.getNotyetacQuit());
-				String iMothPayDay = String.valueOf(sJcicZ443.getMothPayDay());
-				String iBeginDate = String.valueOf(sJcicZ443.getBeginDate());
-				String iEndDate = String.valueOf(sJcicZ443.getEndDate());
+				String iGuarantyType = sJcicZ443.getGuarantyType();
+				BigDecimal iLoanAmt =sJcicZ443.getLoanAmt();
+				String ixLoanAmt = String.valueOf(sJcicZ443.getLoanAmt());
+				BigDecimal iCreditAmt = sJcicZ443.getCreditAmt();
+				String ixCreditAmt = String.valueOf(sJcicZ443.getCreditAmt());
+				BigDecimal iPrincipal = sJcicZ443.getPrincipal();
+				String ixPrincipal = String.valueOf(sJcicZ443.getPrincipal());
+				BigDecimal iInterest = sJcicZ443.getInterest();
+				String ixInterest = String.valueOf(sJcicZ443.getInterest());
+				BigDecimal iPenalty = sJcicZ443.getPenalty();
+				String ixPenalty = String.valueOf(sJcicZ443.getPenalty());
+				BigDecimal iOther = sJcicZ443.getOther();
+				String ixOther = String.valueOf(sJcicZ443.getOther());
+				BigDecimal iTerminalPayAmt = sJcicZ443.getTerminalPayAmt();
+				String ixTerminalPayAmt = String.valueOf(sJcicZ443.getTerminalPayAmt());
+				BigDecimal iLatestPayAmt = sJcicZ443.getLatestPayAmt();
+				String ixLatestPayAmt = String.valueOf(sJcicZ443.getLatestPayAmt());
+				int iFinalPayDay = Integer.valueOf(sJcicZ443.getFinalPayDay());
+				String ixFinalPayDay = String.valueOf(sJcicZ443.getFinalPayDay());
+				BigDecimal iNotyetacQuit  = sJcicZ443.getNotyetacQuit();
+				String ixNotyetacQuit = String.valueOf(sJcicZ443.getNotyetacQuit());
+				int iMothPayDay = Integer.valueOf(sJcicZ443.getMothPayDay());
+				String ixMothPayDay = String.valueOf(sJcicZ443.getMothPayDay());
+				int iBeginDate = Integer.valueOf(sJcicZ443.getBeginDate());
+				String ixBeginDate = String.valueOf(sJcicZ443.getBeginDate());
+				int iEndDate = Integer.valueOf(sJcicZ443.getEndDate());
+				String ixEndDate = String.valueOf(sJcicZ443.getEndDate());
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+				String iUkey = sJcicZ443.getUkey();
 				String text = "443"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-			//				+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iBankId, 3,"")
+							+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iCourtCode, 3,"")
 							+StringUtils.rightPad("", 5)+StringUtils.rightPad(iMaxMainCode, 3,"")
 							+StringUtils.rightPad(iIsMaxMain, 1,"")+StringUtils.rightPad(iAccount,50,"")
-							+StringUtils.leftPad(iGuarentType, 2,"")+StringUtils.leftPad(iLoanAmt, 12,'0')
-							+StringUtils.leftPad(iCreditAmt, 12,'0')+StringUtils.leftPad(iPrincipal, 10,'0')
-							+StringUtils.leftPad(iInterest, 10,'0')+StringUtils.leftPad(iPenalty, 10,'0')
-							+StringUtils.leftPad(iOther, 10,'0')+StringUtils.leftPad(iTerminalPayAmt, 10,'0')
-							+StringUtils.leftPad(iLatestPayAmt, 10,'0')+StringUtils.rightPad(iFinalPayDay,7,"")
-							+StringUtils.leftPad(iNotyetaQuit, 10,'0')+StringUtils.rightPad(iMothPayDay, 2,"")
-							+StringUtils.rightPad(iBeginDate, 5,"")+StringUtils.rightPad(iEndDate, 5,"")
+							+StringUtils.leftPad(iGuarantyType, 2,"")+StringUtils.leftPad(ixLoanAmt, 12,'0')
+							+StringUtils.leftPad(ixCreditAmt, 12,'0')+StringUtils.leftPad(ixPrincipal, 10,'0')
+							+StringUtils.leftPad(ixInterest, 10,'0')+StringUtils.leftPad(ixPenalty, 10,'0')
+							+StringUtils.leftPad(ixOther, 10,'0')+StringUtils.leftPad(ixTerminalPayAmt, 10,'0')
+							+StringUtils.leftPad(ixLatestPayAmt, 10,'0')+StringUtils.rightPad(ixFinalPayDay,7,"")
+							+StringUtils.leftPad(ixNotyetacQuit, 10,'0')+StringUtils.rightPad(ixMothPayDay, 2,"")
+							+StringUtils.rightPad(ixBeginDate, 5,"")+StringUtils.rightPad(ixEndDate, 5,"")
 							+StringUtils.rightPad("", 49);
-				this.info("text="+text);
-				this.put(text);
-				
-				//回填JcicDate
-				sJcicZ443.setOutJcicTxtDate(iDate);
-				try {
-					sJcicZ443Service.update(sJcicZ443, titaVo);
-				}catch (Exception e){
-					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
-				}
-			}	
-		}
-	}
+				   this.info("text="+text);
+	               this.put(text);
+
+	                //檔案產生後，回填JcicDate
+	                sJcicZ443.setOutJcicTxtDate(iDate);
+	                try {
+	                    sJcicZ443Service.update(sJcicZ443, titaVo);
+	                }catch (Exception e){
+	                    throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+	                }
+
+	                //回填JcicDate後寫入Log檔
+	                JcicZ443Log iJcicZ443Log = new JcicZ443Log();
+	                JcicZ443LogId iJcicZ443LogId = new JcicZ443LogId();
+	                this.info("TxSeq==="+titaVo.getTxSeq());
+	                iJcicZ443LogId.setTxSeq(titaVo.getTxSeq());
+	                iJcicZ443LogId.setUkey(iUkey);
+	                iJcicZ443Log.setJcicZ443LogId(iJcicZ443LogId);
+	                iJcicZ443Log.setIsMaxMain(iIsMaxMain);
+	                iJcicZ443Log.setGuarantyType(iGuarantyType);
+	                iJcicZ443Log.setLoanAmt(iLoanAmt);
+	                iJcicZ443Log.setCreditAmt(iCreditAmt);
+	                iJcicZ443Log.setPrincipal(iPrincipal);
+	                iJcicZ443Log.setInterest(iInterest);
+	                iJcicZ443Log.setPenalty(iPenalty);
+	                iJcicZ443Log.setOther(iOther);
+	                iJcicZ443Log.setTerminalPayAmt(iTerminalPayAmt);
+	                iJcicZ443Log.setLatestPayAmt(iLatestPayAmt);
+	                iJcicZ443Log.setFinalPayDay(iFinalPayDay);
+	                iJcicZ443Log.setNotyetacQuit(iNotyetacQuit);
+	                iJcicZ443Log.setMothPayDay(iMothPayDay);
+	                iJcicZ443Log.setBeginDate(iBeginDate);
+	                iJcicZ443Log.setEndDate(iEndDate);
+	                iJcicZ443Log.setTranKey(iTranKey);
+	                iJcicZ443Log.setOutJcicTxtDate(iDate);
+	                
+	                try {
+	                    sJcicZ443LogService.insert(iJcicZ443Log, titaVo);
+	                }catch (Exception e){
+	                    throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z443)");
+	                }
+	            }
+	        }	
+	    }
+	
 	public void doZ444File(TitaVo titaVo) throws LogicException{
 		Slice<JcicZ444> rJcicZ444 = null;
 		rJcicZ444 = sJcicZ444Service.findAll(this.index, this.limit,titaVo);
@@ -1906,63 +2266,86 @@ public class L8403File extends MakeFile {
 				String iSubmitKey = sJcicZ444.getSubmitKey();
 				String iCustId = sJcicZ444.getCustId();
 				String iApplyDate = String.valueOf(sJcicZ444.getApplyDate());
-			//	String iBankId = sJcicZ444.getBankId();
+				String iCourtCode = sJcicZ444.getCourtCode();
 				String iCustRegAddr = sJcicZ444.getCustRegAddr();
 				String iCustComAddr = sJcicZ444.getCustComAddr();
 				String iCustRegTelNo = sJcicZ444.getCustRegTelNo();
 				String iCustComTelNo = sJcicZ444.getCustComTelNo();
 				String iCustMobilNo = sJcicZ444.getCustMobilNo();
+				String iUkey = sJcicZ444.getUkey();
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 				String text = "444"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-			//				+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iBankId, 3,"")
+							+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iCourtCode, 3,"")
 							+StringUtils.rightPad("", 5)+StringUtils.rightPad(iCustRegAddr, 76,"")
 							+StringUtils.rightPad(iCustComAddr, 76,"")+StringUtils.rightPad(iCustRegTelNo, 16,"")
 							+StringUtils.rightPad(iCustComTelNo,16,"")+StringUtils.rightPad(iCustMobilNo, 16,"")
 							+StringUtils.rightPad("", 18);
-				this.info("text="+text);
-				this.put(text);
-				
-				//回填JcicDate
-				sJcicZ444.setOutJcicTxtDate(iDate);
-				try {
-					sJcicZ444Service.update(sJcicZ444, titaVo);
-				}catch (Exception e){
-					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
-				}
-			}	
-		}
-	}
+				   this.info("text="+text);
+	                this.put(text);
+	                
+	                
+	                //檔案產生後，回填JcicDate
+	                sJcicZ444.setOutJcicTxtDate(iDate);
+	                try {
+	                    sJcicZ444Service.update(sJcicZ444, titaVo);
+	                }catch (Exception e){
+	                    throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+	                }
+	                
+	                //回填JcicDate後寫入Log檔
+	                JcicZ444Log iJcicZ444Log = new JcicZ444Log();
+	                JcicZ444LogId iJcicZ444LogId = new JcicZ444LogId();
+	                this.info("TxSeq==="+titaVo.getTxSeq());
+	                iJcicZ444LogId.setTxSeq(titaVo.getTxSeq());
+	                iJcicZ444LogId.setUkey(iUkey);
+	                iJcicZ444Log.setJcicZ444LogId(iJcicZ444LogId);
+	                iJcicZ444Log.setCustRegAddr(iCustRegAddr);
+	                iJcicZ444Log.setCustComAddr(iCustComAddr);
+	                iJcicZ444Log.setCustRegTelNo(iCustRegTelNo);
+	                iJcicZ444Log.setCustComTelNo(iCustComTelNo);
+	                iJcicZ444Log.setCustMobilNo(iCustMobilNo);
+	                iJcicZ444Log.setTranKey(iTranKey);
+	                iJcicZ444Log.setOutJcicTxtDate(iDate);
+	                
+	                try {
+	                    sJcicZ444LogService.insert(iJcicZ444Log, titaVo);
+	                }catch (Exception e){
+	                    throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z444)");
+	                }
+	            }
+	        }	
+	    }
+	
 	public void doZ446File(TitaVo titaVo) throws LogicException{
 		Slice<JcicZ446> rJcicZ446 = null;
 		rJcicZ446 = sJcicZ446Service.findAll(this.index, this.limit,titaVo);
 		if(rJcicZ446==null) {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
-//			for(JcicZ446 sJcicZ446:rJcicZ446) {
-//				String iTranKey = sJcicZ446.getTranKey();
-//				String iSubmitKey = sJcicZ446.getSubmitKey();
-//				String iCustId = sJcicZ446.getCustId();
-//				String iApplyDate = String.valueOf(sJcicZ446.getApplyDate());
-////				String iBankId = sJcicZ446.getBankId();
-//				String iCloseCode = sJcicZ446.getCloseCode();
-//				String iCloseDate = String.valueOf(sJcicZ446.getCloseDate());	
-//				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-//				String text = "446"+iTranKey+iSubmitKey
-//							+StringUtils.rightPad(iCustId, 10,"")+StringUtils.leftPad(iApplyDate, 7,'0')
-//							+StringUtils.rightPad(iBankId, 3,"")+StringUtils.rightPad("", 5)
-//							+StringUtils.leftPad(iCloseCode,2,'0')+StringUtils.leftPad(iCloseDate,7,'0')
-//							+StringUtils.rightPad("", 39);
-//				this.info("text="+text);
-//				this.put(text);
-//				
-//				//回填JcicDate
-//				sJcicZ446.setOutJcicTxtDate(iDate);
-//				try {
-//					sJcicZ446Service.update(sJcicZ446, titaVo);
-//				}catch (Exception e){
-//					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
-//				}
-//			}	
+			for(JcicZ446 sJcicZ446:rJcicZ446) {
+				String iTranKey = sJcicZ446.getTranKey();
+				String iSubmitKey = sJcicZ446.getSubmitKey();
+				String iCustId = sJcicZ446.getCustId();
+				String iApplyDate = String.valueOf(sJcicZ446.getApplyDate());
+	//			String iBankId = sJcicZ446.getBankId();
+				String iCloseCode = sJcicZ446.getCloseCode();
+				String iCloseDate = String.valueOf(sJcicZ446.getCloseDate());	
+				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+				String text = "446"+iTranKey+iSubmitKey
+							+StringUtils.rightPad(iCustId, 10,"")+StringUtils.leftPad(iApplyDate, 7,'0')
+			//				+StringUtils.rightPad(iBankId, 3,"")+StringUtils.rightPad("", 5)
+							+StringUtils.leftPad(iCloseCode,2,'0')+StringUtils.leftPad(iCloseDate,7,'0')
+							+StringUtils.rightPad("", 39);
+				this.put(text);
+				
+				//回填JcicDate
+				sJcicZ446.setOutJcicTxtDate(iDate);
+				try {
+					sJcicZ446Service.update(sJcicZ446, titaVo);
+				}catch (Exception e){
+					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+				}
+			}	
 		}
 	}
 	public void doZ447File(TitaVo titaVo) throws LogicException{
@@ -1972,40 +2355,76 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ447 sJcicZ447:rJcicZ447) {
-				String iTranKey = sJcicZ447.getTranKey();
-				String iSubmitKey = sJcicZ447.getSubmitKey();
-				String iCustId = sJcicZ447.getCustId();
-				String iApplyDate = String.valueOf(sJcicZ447.getApplyDate());
-			//	String iBankId = sJcicZ447.getBankId();
-				String iCivil323Amt = String.valueOf(sJcicZ447.getCivil323Amt());
-				String iTotalAmt = String.valueOf(sJcicZ447.getTotalAmt());
-				String iSignDate = String.valueOf(sJcicZ447.getSignDate());
-				String iFirstPayDate = String.valueOf(sJcicZ447.getFirstPayDate());
-				String iPeriod = String.valueOf(sJcicZ447.getPeriod());
-				String iRate = String.valueOf(sJcicZ447.getRate());
-				String iMonthPayAmt = String.valueOf(sJcicZ447.getMonthPayAmt());
-				String iPayAccount = sJcicZ447.getPayAccount();
-				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-				String text = "447"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-			//				+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iBankId, 3,"")
-							+StringUtils.rightPad("", 5)+StringUtils.leftPad(iCivil323Amt, 10,'0')
-							+StringUtils.leftPad(iTotalAmt, 10,'0')+StringUtils.leftPad(iSignDate, 7,"")
-							+StringUtils.leftPad(iFirstPayDate, 7,'0')+StringUtils.leftPad(iPeriod, 3,'0')
-							+StringUtils.leftPad(iRate, 5,'0')+StringUtils.leftPad(iMonthPayAmt, 9,'0')
-							+StringUtils.rightPad(iPayAccount, 20,"")+StringUtils.rightPad("",27);
-				this.info("text="+text);
-				this.put(text);
-				
-				//回填JcicDate
-				sJcicZ447.setOutJcicTxtDate(iDate);
-				try {
-					sJcicZ447Service.update(sJcicZ447, titaVo);
-				}catch (Exception e){
-					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+				if(sJcicZ447.getOutJcicTxtDate()==0) {
+                    String iTranKey = sJcicZ447.getTranKey();
+                    String iSubmitKey = sJcicZ447.getSubmitKey();
+                    String iCustId = sJcicZ447.getCustId();
+                    String iApplyDate = String.valueOf(sJcicZ447.getApplyDate());
+                    String iCourtCode = sJcicZ447.getCourtCode();
+                    BigDecimal iCivil323Amt = sJcicZ447.getCivil323Amt();
+                    String ixCivil323Amt = String.valueOf(sJcicZ447.getCivil323Amt());
+                    BigDecimal iTotalAmt = sJcicZ447.getTotalAmt();
+                    String ixTotalAmt = String.valueOf(sJcicZ447.getTotalAmt());
+                    int iSignDate = Integer.valueOf(sJcicZ447.getSignDate());
+                    String ixSignDate = String.valueOf(sJcicZ447.getSignDate());
+                    int iFirstPayDate = Integer.valueOf(sJcicZ447.getFirstPayDate());
+                    String ixFirstPayDate = String.valueOf(sJcicZ447.getFirstPayDate());
+                    int iPeriod = Integer.valueOf(sJcicZ447.getPeriod());
+                    String ixPeriod = String.valueOf(sJcicZ447.getPeriod());
+                    BigDecimal iRate = sJcicZ447.getRate();
+                    String ixRate = String.valueOf(sJcicZ447.getRate());
+                    int iMonthPayAmt = Integer.valueOf(sJcicZ447.getMonthPayAmt());
+                    String ixMonthPayAmt = String.valueOf(sJcicZ447.getMonthPayAmt());
+                    String iPayAccount = sJcicZ447.getPayAccount();
+                    String iUkey = sJcicZ447.getUkey();
+                    int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+                    String text = "447"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
+                                +StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iCourtCode, 3,"")
+                                +StringUtils.rightPad("", 5)+StringUtils.leftPad(ixCivil323Amt, 10,'0')
+                                +StringUtils.leftPad(ixTotalAmt, 10,'0')+StringUtils.leftPad(ixSignDate, 7,"")
+                                +StringUtils.leftPad(ixFirstPayDate, 7,'0')+StringUtils.leftPad(ixPeriod, 3,'0')
+                                +StringUtils.leftPad(ixRate, 5,'0')+StringUtils.leftPad(ixMonthPayAmt, 9,'0')
+                                +StringUtils.rightPad(iPayAccount, 20,"")+StringUtils.rightPad("",27);
+                    this.info("text="+text);
+                    this.put(text);
+                    
+					
+					//檔案產生後，回填JcicDate
+					sJcicZ447.setOutJcicTxtDate(iDate);
+					try {
+						sJcicZ447Service.update(sJcicZ447, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					}
+					
+					//回填JcicDate後寫入Log檔
+					JcicZ447Log iJcicZ447Log = new JcicZ447Log();
+					JcicZ447LogId iJcicZ447LogId = new JcicZ447LogId();
+					this.info("TxSeq==="+titaVo.getTxSeq());
+					iJcicZ447LogId.setTxSeq(titaVo.getTxSeq());
+					iJcicZ447LogId.setUkey(iUkey);
+					iJcicZ447Log.setJcicZ447LogId(iJcicZ447LogId);
+					iJcicZ447Log.setCivil323Amt(iCivil323Amt);
+					iJcicZ447Log.setTotalAmt(iTotalAmt);
+					iJcicZ447Log.setSignDate(iSignDate);
+					iJcicZ447Log.setFirstPayDate(iFirstPayDate);
+                    iJcicZ447Log.setPeriod(iPeriod);
+                    iJcicZ447Log.setRate(iRate);
+                    iJcicZ447Log.setMonthPayAmt(iMonthPayAmt);
+                    iJcicZ447Log.setPayAccount(iPayAccount);
+					iJcicZ447Log.setTranKey(iTranKey);
+					iJcicZ447Log.setOutJcicTxtDate(iDate);
+					
+					try {
+						sJcicZ447LogService.insert(iJcicZ447Log, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z447)");
+					}
 				}
 			}	
 		}
 	}
+
 	public void doZ448File(TitaVo titaVo) throws LogicException{
 		Slice<JcicZ448> rJcicZ448 = null;
 		rJcicZ448 = sJcicZ448Service.findAll(this.index, this.limit,titaVo);
@@ -2013,32 +2432,60 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ448 sJcicZ448:rJcicZ448) {
-				String iTranKey = sJcicZ448.getTranKey();
-				String iSubmitKey = sJcicZ448.getSubmitKey();
-				String iCustId = sJcicZ448.getCustId();
-				String iApplyDate = String.valueOf(sJcicZ448.getApplyDate());
-//				String iBankId = sJcicZ448.getBankId();
-				String iMaxMainCode = sJcicZ448.getMaxMainCode();
-				String iSignPrin = String.valueOf(sJcicZ448.getSignPrin());
-				String iSignOther = String.valueOf(sJcicZ448.getSignOther());
-				String iOwnPercentage = String.valueOf(sJcicZ448.getOwnPercentage());
-				String iAcQuitAmt = String.valueOf(sJcicZ448.getAcQuitAmt());
-				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-//				String text = "448"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-//							+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iBankId, 3,"")
-//							+StringUtils.rightPad("", 5)+StringUtils.rightPad(iMaxMainCode, 3,"")
-//							+StringUtils.leftPad(iSignPrin,9,'0')+StringUtils.leftPad(iSignOther,9,'0')
-//							+StringUtils.leftPad(iOwnPercentage,6,"")+StringUtils.leftPad(iAcQuitAmt,9,'0')
-//							+StringUtils.rightPad("",22);
-//				this.info("text="+text);
-//				this.put(text);
-				
-				//回填JcicDate
-				sJcicZ448.setOutJcicTxtDate(iDate);
-				try {
-					sJcicZ448Service.update(sJcicZ448, titaVo);
-				}catch (Exception e){
-					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+				if(sJcicZ448.getOutJcicTxtDate()==0) {
+					String iTranKey = sJcicZ448.getTranKey();
+					String iSubmitKey = sJcicZ448.getSubmitKey();
+					String iCustId = sJcicZ448.getCustId();
+					String iApplyDate = String.valueOf(sJcicZ448.getApplyDate());
+					String iCourtCode = sJcicZ448.getCourtCode();
+					String iMaxMainCode = sJcicZ448.getMaxMainCode();
+					String iSignPrin = String.valueOf(sJcicZ448.getSignPrin());
+					int ixSignPrin = Integer.valueOf(sJcicZ448.getSignPrin());
+					String iSignOther = String.valueOf(sJcicZ448.getSignOther());
+					int ixSignOther = Integer.valueOf(sJcicZ448.getSignOther());
+					String iOwnPercentage = String.valueOf(sJcicZ448.getOwnPercentage());
+					BigDecimal ixOwnPercentage = sJcicZ448.getOwnPercentage();
+					String iAcQuitAmt = String.valueOf(sJcicZ448.getAcQuitAmt());
+					int ixAcQuitAmt = Integer.valueOf(sJcicZ448.getAcQuitAmt());
+					String iUkey = sJcicZ448.getUkey();
+					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+					//組成檔案內容，並產生檔案
+					String text = "448"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
+								+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iCourtCode, 3,"")
+								+StringUtils.rightPad("", 5)+StringUtils.rightPad(iMaxMainCode, 3,"")
+								+StringUtils.leftPad(iSignPrin,9,'0')+StringUtils.leftPad(iSignOther,9,'0')
+								+StringUtils.leftPad(iOwnPercentage,6,"")+StringUtils.leftPad(iAcQuitAmt,9,'0')
+								+StringUtils.rightPad("",22);
+					this.info("text="+text);
+					this.put(text);
+					
+					//檔案產生後，回填JcicDate
+					sJcicZ448.setOutJcicTxtDate(iDate);
+					try {
+						sJcicZ448Service.update(sJcicZ448, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					}
+					
+					//回填JcicDate後寫入Log檔
+					JcicZ448Log iJcicZ448Log = new JcicZ448Log();
+					JcicZ448LogId iJcicZ448LogId = new JcicZ448LogId();
+					this.info("TxSeq==="+titaVo.getTxSeq());
+					iJcicZ448LogId.setTxSeq(titaVo.getTxSeq());
+					iJcicZ448LogId.setUkey(iUkey);
+					iJcicZ448Log.setJcicZ448LogId(iJcicZ448LogId);
+					iJcicZ448Log.setSignPrin(ixSignPrin);
+					iJcicZ448Log.setSignOther(ixSignOther);
+					iJcicZ448Log.setOwnPercentage(ixOwnPercentage);
+					iJcicZ448Log.setAcQuitAmt(ixAcQuitAmt);				
+					iJcicZ448Log.setTranKey(iTranKey);
+					iJcicZ448Log.setOutJcicTxtDate(iDate);
+					
+					try {
+						sJcicZ448LogService.insert(iJcicZ448Log, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z448)");
+					}
 				}
 			}	
 		}
@@ -2054,7 +2501,7 @@ public class L8403File extends MakeFile {
 				String iSubmitKey = sJcicZ450.getSubmitKey();
 				String iCustId = sJcicZ450.getCustId();
 				String iApplyDate = String.valueOf(sJcicZ450.getApplyDate());
-		//		String iBankId = sJcicZ450.getBankId();
+			//	String iBankId = sJcicZ450.getBankId();
 				String iPayDate = String.valueOf(sJcicZ450.getPayDate());
 				String iPayAmt = String.valueOf(sJcicZ450.getPayAmt());
 				String iSumRepayActualAmt = String.valueOf(sJcicZ450.getSumRepayActualAmt());
@@ -2067,7 +2514,6 @@ public class L8403File extends MakeFile {
 							+StringUtils.leftPad(iPayAmt, 9,'0')+StringUtils.leftPad(iSumRepayActualAmt, 9,'0')
 							+StringUtils.leftPad(iSumRepayShouldAmt, 9,'0')+StringUtils.rightPad(iPayStatus, 1,"")
 							+StringUtils.rightPad("", 23);
-				this.info("text="+text);
 				this.put(text);
 				
 				//回填JcicDate
@@ -2091,27 +2537,44 @@ public class L8403File extends MakeFile {
 				String iSubmitKey = sJcicZ451.getSubmitKey();
 				String iCustId = sJcicZ451.getCustId();
 				String iApplyDate = String.valueOf(sJcicZ451.getApplyDate());
-		//		String iBankId = sJcicZ451.getBankId();
+				String iCourtCode = sJcicZ451.getCourtCode();
 				String iDelayYM = String.valueOf(sJcicZ451.getDelayYM());
 				String iDelayCode = sJcicZ451.getDelayCode();
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+				String iUkey = sJcicZ451.getUkey();
 				String text = "451"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-		//					+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iBankId, 3,"")
+							+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iCourtCode, 3,"")
 							+StringUtils.rightPad("", 5)+StringUtils.rightPad(iDelayCode, 1,"")
 							+StringUtils.leftPad(iDelayYM, 5,'0')+StringUtils.rightPad("",12);
-				this.info("text="+text);
 				this.put(text);
 				
-				//回填JcicDate
+				//檔案產生後，回填JcicDate
 				sJcicZ451.setOutJcicTxtDate(iDate);
 				try {
 					sJcicZ451Service.update(sJcicZ451, titaVo);
 				}catch (Exception e){
 					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
 				}
-			}	
-		}
+				
+				//回填JcicDate後寫入Log檔
+				JcicZ451Log iJcicZ451Log = new JcicZ451Log();
+				JcicZ451LogId iJcicZ451LogId = new JcicZ451LogId();
+				iJcicZ451LogId.setTxSeq(titaVo.getTxSeq());
+				iJcicZ451LogId.setUkey(iUkey);
+				iJcicZ451Log.setJcicZ451LogId(iJcicZ451LogId);
+				iJcicZ451Log.setDelayCode(iDelayCode);
+				iJcicZ451Log.setTranKey(iTranKey);
+				iJcicZ451Log.setOutJcicTxtDate(iDate);
+
+				try {
+					sJcicZ451LogService.insert(iJcicZ451Log, titaVo);
+				}catch (Exception e){
+					throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z451)");
+				}
+			}
+		}	
 	}
+
 	public void doZ454File(TitaVo titaVo) throws LogicException{
 		Slice<JcicZ454> rJcicZ454 = null;
 		rJcicZ454 = sJcicZ454Service.findAll(this.index, this.limit,titaVo);
@@ -2119,33 +2582,55 @@ public class L8403File extends MakeFile {
 			throw new LogicException(titaVo,"E0001","");
 		}else {
 			for(JcicZ454 sJcicZ454:rJcicZ454) {
-				String iTranKey = sJcicZ454.getTranKey();
-				String iSubmitKey = sJcicZ454.getSubmitKey();
-				String iCustId = sJcicZ454.getCustId();
-				String iApplyDate = String.valueOf(sJcicZ454.getApplyDate());
-//				String iBankId = sJcicZ454.getBankId();
-				String iMaxMainCode = sJcicZ454.getMaxMainCode();
-				String iPayOffResult = sJcicZ454.getPayOffResult();
-				String iPayOffDate = String.valueOf(sJcicZ454.getPayOffDate());
-				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
-//				String text = "454"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
-//							+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iBankId, 3,"")
-//							+StringUtils.rightPad("", 5)+StringUtils.rightPad(iMaxMainCode, 3,"")
-//							+StringUtils.rightPad(iPayOffResult, 1,"")+StringUtils.leftPad(iPayOffDate, 7,'0')
-//							+StringUtils.rightPad("",37);
-//				this.info("text="+text);
-//				this.put(text);
-				
-				//回填JcicDate
-				sJcicZ454.setOutJcicTxtDate(iDate);
-				try {
-					sJcicZ454Service.update(sJcicZ454, titaVo);
-				}catch (Exception e){
-					throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+				if(sJcicZ454.getOutJcicTxtDate()==0) {
+					String iTranKey = sJcicZ454.getTranKey();
+					String iSubmitKey = sJcicZ454.getSubmitKey();
+					String iCustId = sJcicZ454.getCustId();
+					String iApplyDate = String.valueOf(sJcicZ454.getApplyDate());
+					String iCourtCode = sJcicZ454.getCourtCode();
+					String iMaxMainCode = sJcicZ454.getMaxMainCode();
+					String iPayOffResult = sJcicZ454.getPayOffResult();
+					String iPayOffDate = String.valueOf(sJcicZ454.getPayOffDate());
+					int ixPayOffDate = Integer.valueOf(sJcicZ454.getPayOffDate());
+					String iUkey = sJcicZ454.getUkey();
+					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
+					//組成檔案內容，並產生檔案
+					String text = "454"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
+								+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad(iCourtCode, 3,"")
+								+StringUtils.rightPad("", 5)+StringUtils.rightPad(iMaxMainCode, 3,"")
+								+StringUtils.rightPad(iPayOffResult, 1,"")+StringUtils.leftPad(iPayOffDate, 7,'0')
+								+StringUtils.rightPad("",37);
+					this.put(text);
+					
+					//檔案產生後，回填JcicDate
+					sJcicZ454.setOutJcicTxtDate(iDate);
+					try {
+						sJcicZ454Service.update(sJcicZ454, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0007", "回填Jcic報送日期時發生錯誤");
+					}
+					
+					//回填JcicDate後寫入Log檔
+					JcicZ454Log iJcicZ454Log = new JcicZ454Log();
+					JcicZ454LogId iJcicZ454LogId = new JcicZ454LogId();
+					iJcicZ454LogId.setTxSeq(titaVo.getTxSeq());
+					iJcicZ454LogId.setUkey(iUkey);
+					iJcicZ454Log.setJcicZ454LogId(iJcicZ454LogId);
+					iJcicZ454Log.setPayOffResult(iPayOffResult);
+					iJcicZ454Log.setPayOffDate(ixPayOffDate);
+					iJcicZ454Log.setTranKey(iTranKey);
+					iJcicZ454Log.setOutJcicTxtDate(iDate);
+
+					try {
+						sJcicZ454LogService.insert(iJcicZ454Log, titaVo);
+					}catch (Exception e){
+						throw new LogicException(titaVo, "E0005", "寫入記錄檔時發生錯誤(Z454)");
+					}
 				}
 			}	
 		}
 	}
+	
 	public void doZ570File(TitaVo titaVo) throws LogicException{
 	    Slice<JcicZ570> rJcicZ570 = null;
 	    rJcicZ570 = sJcicZ570Service.findAll(this.index, this.limit,titaVo);
@@ -2212,7 +2697,6 @@ public class L8403File extends MakeFile {
 	                            +StringUtils.rightPad(iBank25, 3,"")+StringUtils.rightPad(iBank26, 3,"")
 	                            +StringUtils.rightPad(iBank27, 3,"")+StringUtils.rightPad(iBank28, 3,"")
 	                            +StringUtils.rightPad(iBank29, 3,"")+StringUtils.rightPad(iBank30, 3,"");
-	                this.info("text="+text);
 	                this.put(text);
 	            
 	            //檔案產生後，回填JcicDate
@@ -2226,7 +2710,6 @@ public class L8403File extends MakeFile {
 	            //回填JcicDate後寫入Log檔
 	            JcicZ570Log iJcicZ570Log = new JcicZ570Log();
 	            JcicZ570LogId iJcicZ570LogId = new JcicZ570LogId();
-	            this.info("TxSeq==="+titaVo.getTxSeq());
 	            iJcicZ570LogId.setTxSeq(titaVo.getTxSeq());
 	            iJcicZ570LogId.setUkey(iUkey);
 	            iJcicZ570Log.setJcicZ570LogId(iJcicZ570LogId);
@@ -2302,7 +2785,6 @@ public class L8403File extends MakeFile {
 	                             +StringUtils.rightPad(iOwnerYn, 1,"")+StringUtils.rightPad(iPayYn, 1,"")
 	                             +StringUtils.leftPad(iXOwnerAmt, 9,'0')+StringUtils.leftPad(iXAllotAmt, 9,'0')
 	                             +StringUtils.leftPad(iXUnallotAmt, 9,'0')+StringUtils.rightPad("", 44);
-	                this.info("text="+text);
 	                this.put(text);
 	                
 	                //檔案產生後，回填JcicDate
@@ -2316,7 +2798,6 @@ public class L8403File extends MakeFile {
 	                //回填JcicDate後寫入Log檔
 	                JcicZ571Log iJcicZ571Log = new JcicZ571Log();
 	                JcicZ571LogId iJcicZ571LogId = new JcicZ571LogId();
-	                this.info("TxSeq==="+titaVo.getTxSeq());
 	                iJcicZ571LogId.setTxSeq(titaVo.getTxSeq());
 	                iJcicZ571LogId.setUkey(iUkey);
 	                iJcicZ571Log.setJcicZ571LogId(iJcicZ571LogId);
@@ -2364,7 +2845,6 @@ public class L8403File extends MakeFile {
 								+StringUtils.leftPad(iStartDate, 7,'0')+StringUtils.leftPad(iPayDate, 7,'0')
 								+StringUtils.rightPad(iBankId,3,"")+StringUtils.leftPad(iAllotAmt, 9,'0')
 							+	StringUtils.leftPad(iOwnPercentage, 6,'0')+StringUtils.rightPad("", 44);
-					this.info("text="+text);
 					this.put(text);
 					
 					//檔案產生後，回填JcicDate
@@ -2378,7 +2858,6 @@ public class L8403File extends MakeFile {
 					//回填JcicDate後寫入Log檔
 					JcicZ572Log iJcicZ572Log = new JcicZ572Log();
 					JcicZ572LogId iJcicZ572LogId = new JcicZ572LogId();
-					this.info("TxSeq==="+titaVo.getTxSeq());
 					iJcicZ572LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ572LogId.setUkey(iUkey);
 					iJcicZ572Log.setJcicZ572LogId(iJcicZ572LogId);
@@ -2421,7 +2900,6 @@ public class L8403File extends MakeFile {
 								+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad("", 5)
 								+StringUtils.leftPad(iPayDate, 7,'0')+StringUtils.leftPad(iPayAmt, 9,'0')
 								+StringUtils.leftPad(iTotalPayAmt, 9,'0')+StringUtils.rightPad("", 51);
-					this.info("text="+text);
 					this.put(text);
 					
 					//檔案產生後，回填JcicDate
@@ -2435,7 +2913,6 @@ public class L8403File extends MakeFile {
 					//回填JcicDate後寫入Log檔
 					JcicZ573Log iJcicZ573Log = new JcicZ573Log();
 					JcicZ573LogId iJcicZ573LogId = new JcicZ573LogId();
-					this.info("TxSeq==="+titaVo.getTxSeq());
 					iJcicZ573LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ573LogId.setUkey(iUkey);
 					iJcicZ573Log.setJcicZ573LogId(iJcicZ573LogId);
@@ -2476,7 +2953,6 @@ public class L8403File extends MakeFile {
 								+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.leftPad(iCloseDate, 7,'0')
 								+StringUtils.rightPad(iCloseMark, 2,"")+StringUtils.rightPad(iPhoneNo, 16,"")
 								+StringUtils.rightPad("", 31);
-					this.info("text="+text);
 					this.put(text);
 					
 					//檔案產生後，回填JcicDate
@@ -2490,7 +2966,6 @@ public class L8403File extends MakeFile {
 					//回填JcicDate後寫入Log檔
 					JcicZ574Log iJcicZ574Log = new JcicZ574Log();
 					JcicZ574LogId iJcicZ574LogId = new JcicZ574LogId();
-					this.info("TxSeq==="+titaVo.getTxSeq());
 					iJcicZ574LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ574LogId.setUkey(iUkey);
 					iJcicZ574Log.setJcicZ574LogId(iJcicZ574LogId);
@@ -2530,7 +3005,6 @@ public class L8403File extends MakeFile {
 								+StringUtils.leftPad(iApplyDate, 7,'0')+StringUtils.rightPad("", 5)
 							    +StringUtils.rightPad(iModifyType, 1,"")+StringUtils.rightPad(iBankId, 3,"")
 							    +StringUtils.rightPad("", 52);
-					this.info("text="+text);
 					this.put(text);
 					
 					//檔案產生後，回填JcicDate
@@ -2544,7 +3018,6 @@ public class L8403File extends MakeFile {
 					//回填JcicDate後寫入Log檔
 					JcicZ575Log iJcicZ575Log = new JcicZ575Log();
 					JcicZ575LogId iJcicZ575LogId = new JcicZ575LogId();
-					this.info("TxSeq==="+titaVo.getTxSeq());
 					iJcicZ575LogId.setTxSeq(titaVo.getTxSeq());
 					iJcicZ575LogId.setUkey(iUkey);
 					iJcicZ575Log.setJcicZ575LogId(iJcicZ575LogId);

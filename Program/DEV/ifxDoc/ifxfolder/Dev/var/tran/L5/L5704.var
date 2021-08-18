@@ -189,14 +189,19 @@ C(3,#FunctionCode,4,s,$)
 C(3,#L5r02ExportMark{i},1,s,$)
 C(3,#ExportDate{i},0,S,$)
 D(8)
-@V(7)A(DATE,0,#ApprAcDate{i})
+@V(7)
+IF(#ApprAcDate{i}<#ExportDate{i},V(P,傳票日不可小於製檔日),A(DATE,0,#ApprAcDate{i}))
+
+! #ApprAcDateCheck{i}=X,1,S
+
 
 #BringUpDate{i}=D,7,I
 C(3,#FunctionCode,4,s,$)
 C(3,#L5r02ExportMark{i},1,s,$)
 C(3,#ExportDate{i},0,S,$)
 D(8)
-@V(7)A(DATE,0,#BringUpDate{i})
+@V(7)
+IF(#BringUpDate{i}<#ApprAcDate{i},V(P,提兌日不可小於傳票日),A(DATE,0,#BringUpDate{i}))
 ##end
 
 

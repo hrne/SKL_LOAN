@@ -101,7 +101,7 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFA;ntxbuf5=type<-1:CustId<-
 ! INVOKEJS(SHOW,p1,1,2,1)
 C(3,#FirstIn,1,E(0,@CHAIN,1),$)
 C(3,#FirstIn,1,S,$)
-@C(3,#CustNo,0,$,T(2,@BTNADDBUF,1+#CustNo+000+          ))
+@C(3,#CustNo,0,T(2,@BTNADDBUF,1+0000000+000+          ),T(2,@BTNADDBUF,1+#CustNo+000+          ))
 !戶名
 #CustName=X,100,L
 
@@ -110,7 +110,7 @@ C(3,#FirstIn,1,S,$)
 C(3,#FirstIn,1,E(0,@CHAIN,1),$)
 C(3,#FirstIn,1,S,$)
 C(3,#CustNo,0,S,$)
-@C(3,#FacmNo,0,$,T(2,@BTNADDBUF,1+#CustNo+#FacmNo+          ))
+@C(3,#FacmNo,0,T(2,@BTNADDBUF,1+#CustNo+000+          ),T(2,@BTNADDBUF,1+#CustNo+#FacmNo+          ))
 ! 統編
 #CustId=X,10,I
 ! C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,2,0))
@@ -132,6 +132,8 @@ E(0,0)
 T(3,1)
 #FunCd2=A,1,S
 T(3,2)
+#FunCd3=A,1,S
+T(3,3)
 #FunCd4=A,1,S
 T(3,4)
 #FunCd5=A,1,S
@@ -222,9 +224,12 @@ T(2,#OOLastUpdateEmpNo+ +#OOLastUpdateEmpNoName)
 !修改
 #OOBUF1=X,11,S
 T(2,#FunCd2+#OOCustNo+#OOFacmNo)
+#OOBUF2=X,11,S
+T(2,#FunCd3+#OOCustNo+#OOFacmNo)
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L1108; ntxbuf=#OOBUF1})
-
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1108; ntxbuf=#OOBUF2})
 </sub>
 
 
@@ -269,8 +274,11 @@ TXFORM=L1908
 #RPTFG=0,QUERY.GRID,L1908
 #any={detail:true, header:'L1908.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN1=
+#OOBTN1=修改
 {width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+
+#OOBTN2=複製
+{width:50,search:false,formatter:'cust:bind-button:複製',align:'center',canExport:false}
 
 #OOCustNo=戶號
 {width:80,align:'center'}

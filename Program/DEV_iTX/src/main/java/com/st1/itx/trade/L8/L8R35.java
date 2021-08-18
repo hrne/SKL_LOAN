@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -11,29 +12,19 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ572;
 import com.st1.itx.db.service.JcicZ572Service;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L8R35")
 @Scope("prototype")
 /**
  * 
  * 
- * @author Luisito
+ * @author Luisito /Mata
  * @version 1.0.0
  */
 public class L8R35 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8R35.class);
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ572Service iJcicZ572Service;
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -56,7 +47,9 @@ public class L8R35 extends TradeBuffer {
 			totaVo.putParam("L8r35AllotAmt", iJcicZ572.getAllotAmt());// 參與分配債權金額
 			totaVo.putParam("L8r35OwnPercentage", iJcicZ572.getOwnPercentage());// 債權比例
 			totaVo.putParam("L8r35OutJcicTxtDate", iJcicZ572.getOutJcicTxtDate());		
-		}		
+		}
+
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

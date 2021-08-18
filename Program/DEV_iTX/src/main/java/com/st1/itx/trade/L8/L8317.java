@@ -1,8 +1,7 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.UUID;
 
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 
-
 /* Tita & Tota 資料物件 */
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
@@ -23,15 +21,13 @@ import com.st1.itx.dataVO.TotaVo;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ056;
 import com.st1.itx.db.domain.JcicZ056Id;
-
+import com.st1.itx.db.domain.JcicZ056Log;
+import com.st1.itx.db.service.JcicZ056LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ056Service;
 
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
-import com.st1.itx.util.common.JcicCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 /**
@@ -61,226 +57,157 @@ import com.st1.itx.util.data.DataLog;
 /**
  * 
  * 
- * @author Jacky
+ * @author Mata
  * @version 1.0.0
  */
 public class L8317 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8317.class);
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ056Service sJcicZ056Service;
 	@Autowired
-	public JcicCom jcicCom;
-	/* 日期工具 */
+	public JcicZ056LogService sJcicZ056LogService;
 	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉型共用工具 */
+	SendRsp iSendRsp;
 	@Autowired
-	public Parse parse;
-	@Autowired
-	public DataLog dataLog;
-	@Autowired
-	SendRsp sendRsp;
+	public DataLog iDataLog;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("Run L8317");
 		this.info("active L8317 ");
 		this.totaVo.init(titaVo);
-		String FunctionCd=titaVo.getParam("FunctionCd").trim(); //功能代碼:01:新增,02:修改,04:刪除,05:查詢
-		String TranKey=titaVo.getParam("TranKey").trim(); //交易代碼
-		String CustId=titaVo.getParam("CustId").trim();//債務人IDN
-		String SubmitKey=titaVo.getParam("SubmitKey").trim();//報送單位代號
 		
-		
-		String CaseStatus=titaVo.getParam("CaseStatus").trim();//案件狀態
-		String ClaimDate=titaVo.getParam("ClaimDate").trim();//裁定日期
-		String CourtCode=titaVo.getParam("CourtCode").trim();//承審法院代碼
-		String Year =titaVo.getParam("Year").trim();
-		String OutJcicTxtDate=titaVo.getParam("OutJcicTxtDate").trim();//轉出Jcic文字檔日期
-		
-		//int Today=dateUtil.getNowIntegerForBC();
-		/* DB資料容器WD */
-		//JcicMAaster
-		JcicZ056 tJcicZ056 = new JcicZ056();
-		JcicZ056Id tJcicZ056Id = new JcicZ056Id();
-		tJcicZ056Id.setCustId(CustId);//債務人IDN
-		tJcicZ056Id.setSubmitKey(SubmitKey);//報送單位代號
-		tJcicZ056Id.setCaseStatus(CaseStatus);//案件狀態
-		tJcicZ056Id.setClaimDate(Integer.parseInt(jcicCom.RocTurnDc(ClaimDate,0)));//裁定日期
-		tJcicZ056Id.setCourtCode(CourtCode);//承審法院代碼
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
+		String iTranKey=titaVo.getParam("TranKey").trim(); //交易代碼
+		String iCustId=titaVo.getParam("CustId").trim();//債務人IDN
+		String iSubmitKey=titaVo.getParam("SubmitKey").trim();//報送單位代號
+		String iCaseStatus=titaVo.getParam("CaseStatus").trim();//案件狀態
+		int iClaimDate= Integer.valueOf(titaVo.getParam("ClaimDate"));//裁定日期
+		String iCourtCode=titaVo.getParam("CourtCode").trim();//承審法院代碼
+		int iYear =  Integer.valueOf(titaVo.getParam("Year").trim());
+		String iCourtDiv = titaVo.getParam("CourtDiv").trim();
+		String iCourtCaseNo = titaVo.getParam("CourtCaseNo").trim();
+		String iApprove = titaVo.getParam("Approve").trim();
+		int iOutstandAmt = Integer.valueOf(titaVo.getParam("OutstandAmt"));
+		int iSubAmt = Integer.valueOf(titaVo.getParam("SubAmt"));
+		String iClaimStatus1 = titaVo.getParam("ClaimStatus1");
+		int iSaveDate = Integer.valueOf(titaVo.getParam("SaveDate"));
+		String iClaimStatus2 = titaVo.getParam("ClaimStatus2");
+		int iSaveEndDate = Integer.valueOf(titaVo.getParam("SaveEndDate"));
+		String iAdminName = titaVo.getParam("AdminName");
+		String iKey = "";
+		//JcicZ056
+		JcicZ056 iJcicZ056 = new JcicZ056();
+		JcicZ056Id iJcicZ056Id = new JcicZ056Id();
+		iJcicZ056Id.setCustId(iCustId);//債務人IDN
+		iJcicZ056Id.setSubmitKey(iSubmitKey);//報送單位代號
+		iJcicZ056Id.setCaseStatus(iCaseStatus);//案件狀態
+		iJcicZ056Id.setClaimDate(iClaimDate);//裁定日期
+		iJcicZ056Id.setCourtCode(iCourtCode);//承審法院代碼
+		JcicZ056 chJcicZ056 = new JcicZ056();
 
-		this.info("L8317 tJcicZ056Id=["+tJcicZ056Id.toString()+"]");
-		tJcicZ056.setJcicZ056Id(tJcicZ056Id);
-		
-		tJcicZ056.setTranKey(TranKey);//交易代號
-		
-		tJcicZ056.setYear(Integer.parseInt(jcicCom.RocTurnDc(Year,2)));//年度別
-		tJcicZ056.setCourtDiv(titaVo.getParam("CourtDiv").trim());//法院承審股別
-		tJcicZ056.setCourtCaseNo(titaVo.getParam("CourtCaseNo").trim());//法院案號
-		tJcicZ056.setApprove(titaVo.getParam("Approve").trim());//法院裁定免責確定
-		tJcicZ056.setOutstandAmt(parse.stringToInteger(titaVo.getParam("OutstandAmt").trim()));//原始債權金額
-		tJcicZ056.setClaimStatus1(titaVo.getParam("ClaimStatus1").trim());//法院裁定保全處分
-		tJcicZ056.setSaveDate(parse.stringToInteger(titaVo.getParam("SaveDate").trim()));//保全處分起始日
-		tJcicZ056.setClaimStatus2(titaVo.getParam("ClaimStatus2").trim());//法院裁定撤銷保全處分
-		tJcicZ056.setSaveEndDate(parse.stringToInteger(titaVo.getParam("SaveEndDate").trim()));//保全處分撤銷日
-		tJcicZ056.setSubAmt(parse.stringToInteger(titaVo.getParam("SubAmt").trim()));//清算損失金額
-		tJcicZ056.setAdminName(titaVo.getParam("AdminName").trim());//管理人姓名
-
-		//OutJcicTxtDate 可以刪除不可異動
-		if(jcicCom.JcicOutDateCanUpdByUser(titaVo)==true) {
-			tJcicZ056.setOutJcicTxtDate(Integer.parseInt(jcicCom.RocTurnDc(OutJcicTxtDate,0)));
-		}else {
-			tJcicZ056.setOutJcicTxtDate(0);
-		}
-		JcicZ056 tJcicZ056VO=sJcicZ056Service.holdById(tJcicZ056Id, titaVo);
-		JcicZ056 OrgJcicZ056 = null;
-		if(tJcicZ056VO!=null) {
-			OrgJcicZ056 = (JcicZ056) dataLog.clone(tJcicZ056VO);//資料異動前
-		}
-
-		this.info("tJcicZ056VO=["+tJcicZ056.toString()+"]");
-
-		if((jcicCom.getDeleteFunctionCode()).equals(FunctionCd)) {
-			boolean DeleteTF=jcicCom.DeleteLogic(titaVo,tJcicZ056VO,tJcicZ056VO.getOutJcicTxtDate());
-			if(DeleteTF) {
-				//刷主管卡後始可刪除
-				// 交易需主管核可
-				if(("A").equals(OrgJcicZ056.getTranKey())) {
-					
-				}else {
-					//刷主管卡後始可刪除
-					// 交易需主管核可
-					if (!titaVo.getHsupCode().equals("1")) {
-						//titaVo.getSupCode();
-						sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-					}
+		switch(iTranKey_Tmp) {
+		case "1":
+			//檢核是否重複，並寫入JcicZ056
+			chJcicZ056 = sJcicZ056Service.findById(iJcicZ056Id, titaVo);
+			if (chJcicZ056!=null) {
+				throw new LogicException("E0005", "已有相同資料");
+			}
+			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");          
+            iJcicZ056.setJcicZ056Id(iJcicZ056Id);
+			iJcicZ056.setTranKey(iTranKey);
+			iJcicZ056.setYear(iYear);
+			iJcicZ056.setCourtDiv(iCourtDiv);
+			iJcicZ056.setCourtCaseNo(iCourtCaseNo);
+			iJcicZ056.setApprove(iApprove);
+			iJcicZ056.setOutstandAmt(iOutstandAmt);
+			iJcicZ056.setSubAmt(iSubAmt);
+			iJcicZ056.setClaimStatus1(iClaimStatus1);
+			iJcicZ056.setSaveDate(iSaveDate);
+			iJcicZ056.setClaimStatus2(iClaimStatus2);
+			iJcicZ056.setSaveEndDate(iSaveEndDate);
+			iJcicZ056.setAdminName(iAdminName);
+			iJcicZ056.setUkey(iKey);
+			try {
+				sJcicZ056Service.insert(iJcicZ056, titaVo);
+			}catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+			break;
+		case "2":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ056 = sJcicZ056Service.ukeyFirst(iKey, titaVo);
+			JcicZ056 uJcicZ056 = new JcicZ056();
+			uJcicZ056 = sJcicZ056Service.holdById(iJcicZ056.getJcicZ056Id(), titaVo);
+			if (uJcicZ056 == null) {
+				throw new LogicException("E0007", "無此更新資料");
+			}			
+			uJcicZ056.setTranKey(iTranKey);
+			uJcicZ056.setYear(iYear);
+			uJcicZ056.setCourtDiv(iCourtDiv);
+			uJcicZ056.setCourtCaseNo(iCourtCaseNo);
+			uJcicZ056.setApprove(iApprove);
+			uJcicZ056.setOutstandAmt(iOutstandAmt);
+			uJcicZ056.setSubAmt(iSubAmt);
+			uJcicZ056.setClaimStatus1(iClaimStatus1);
+			uJcicZ056.setSaveDate(iSaveDate);
+			uJcicZ056.setClaimStatus2(iClaimStatus2);
+			uJcicZ056.setSaveEndDate(iSaveEndDate);
+			uJcicZ056.setAdminName(iAdminName);
+			uJcicZ056.setOutJcicTxtDate(0);
+			JcicZ056 oldJcicZ056 = (JcicZ056) iDataLog.clone(uJcicZ056);
+			try {
+				sJcicZ056Service.update(uJcicZ056, titaVo);
+			}catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+			iDataLog.setEnv(titaVo, oldJcicZ056, uJcicZ056);
+			iDataLog.exec();
+			break;
+		case "4": //需刷主管卡
+			iJcicZ056 = sJcicZ056Service.findById(iJcicZ056Id);
+			if (iJcicZ056 == null) {
+				throw new LogicException("E0008", "");
+			}
+			if (!titaVo.getHsupCode().equals("1")) {
+				iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
+			}
+			Slice<JcicZ056Log> dJcicLogZ056 = null;
+			dJcicLogZ056 = sJcicZ056LogService.ukeyEq(iJcicZ056.getUkey(), 0, Integer.MAX_VALUE, titaVo);
+			if (dJcicLogZ056 == null) {
+				//尚未開始寫入log檔之資料，主檔資料可刪除
+			try {
+				sJcicZ056Service.delete(iJcicZ056, titaVo);
+			}catch (DBException e) {
+				throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
-				//刪除
+			}else {//已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
+				//最近一筆之資料
+				JcicZ056Log iJcicZ056Log = dJcicLogZ056.getContent().get(0);
+				iJcicZ056.setYear(iJcicZ056Log.getYear());
+				iJcicZ056.setCourtDiv(iJcicZ056Log.getCourtDiv());
+				iJcicZ056.setCourtCaseNo(iJcicZ056Log.getCourtCaseNo());
+				iJcicZ056.setApprove(iJcicZ056Log.getApprove());
+				iJcicZ056.setOutstandAmt(iJcicZ056Log.getOutstandAmt());
+				iJcicZ056.setSubAmt(iJcicZ056Log.getSubAmt());
+				iJcicZ056.setClaimStatus1(iJcicZ056Log.getClaimStatus1());
+				iJcicZ056.setSaveDate(iJcicZ056Log.getSaveDate());
+				iJcicZ056.setClaimStatus2(iJcicZ056Log.getClaimStatus2());
+				iJcicZ056.setSaveEndDate(iJcicZ056Log.getSaveEndDate());
+				iJcicZ056.setAdminName(iJcicZ056Log.getAdminName());
+
+				iJcicZ056.setTranKey(iJcicZ056Log.getTranKey());
+				iJcicZ056.setOutJcicTxtDate(iJcicZ056Log.getOutJcicTxtDate());
 				try {
-					sJcicZ056Service.delete(tJcicZ056VO, titaVo);
-				} catch (DBException e) {
-					//E0008 刪除資料時，發生錯誤
-					throw new LogicException(titaVo, "E0008", "");
+					sJcicZ056Service.update(iJcicZ056, titaVo);
+				}catch (DBException e) {
+					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
-		}else {
-			CheckCaseStatus(tJcicZ056Id.getCustId(), tJcicZ056Id.getSubmitKey(), tJcicZ056Id.getCaseStatus(), tJcicZ056Id.getClaimDate(), tJcicZ056Id.getCourtCode(), titaVo);
-			if(tJcicZ056VO!=null ) {
-				if (TranKey.equals("A")) {
-					throw new LogicException(titaVo, "E0002", "");
-				}
-				//UPDATE
-				//KeyValue
-				tJcicZ056.setCreateDate(tJcicZ056VO.getCreateDate());
-				tJcicZ056.setCreateEmpNo(tJcicZ056VO.getCreateEmpNo());
-				if(OutJcicTxtDate!=null && OutJcicTxtDate.length()!=0) {
-					if(Integer.parseInt(OutJcicTxtDate)==0) {
-						tJcicZ056.setOutJcicTxtDate(0);
-					}
-				}else {
-					tJcicZ056.setOutJcicTxtDate(Integer.parseInt(jcicCom.RocTurnDc(OutJcicTxtDate,0)));
-				}
-
-				tJcicZ056.setCreateDate(OrgJcicZ056.getCreateDate());
-				tJcicZ056.setCreateEmpNo(OrgJcicZ056.getCreateEmpNo());
-				try {
-					tJcicZ056 = sJcicZ056Service.update2(tJcicZ056, titaVo);//資料異動後-1
-					dataLog.setEnv(titaVo, OrgJcicZ056, tJcicZ056);//資料異動後-2
-					dataLog.exec();//資料異動後-3
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "");
-				}
-			}else {
-				//INSERT
-				TranKey="A";
-				tJcicZ056.setTranKey(TranKey);
-				try {
-					sJcicZ056Service.insert(tJcicZ056, titaVo);
-				} catch (DBException e) {
-					//E0005	新增資料時，發生錯誤
-					throw new LogicException(titaVo, "E0005", "");
-				}
-				
-			}
+		default:
+			break;
 		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-	public void CheckCaseStatus(String CustId,String SubmitKey,String CaseStatus,int ClaimDate,String CourtCode,TitaVo titaVo) throws LogicException {
-		/*檢核 CaseStatus 案件狀態*/
-		//未曾報送「清算程序開始(A)」前，不能報送，「清算程序終止(結)(B)」。
-		//報送「清算撤銷免責確定(D)」之前，需曾報送「清算程序開始(A)」或「清算程序開始同時終止(C)」，且12欄原填報為Y。
-
-		//A:清算程序開始
-		//B:清算程序終止(結)
-		//C:清算程序開始同時終止
-		//D:清算撤消免責確定
-		//E:清算調查程序
-		//G:清算撤回
-		//H:清算復權
-		ClaimDate=Integer.parseInt(jcicCom.RocTurnDc(String.valueOf(ClaimDate),0));
-		if(CaseStatus!=null && CaseStatus.length()!=0) {
-			Vector<String> vStatus=new Vector<String>();
-			Vector<String> vApprove=new Vector<String>();
-			this.info("L8317 CheckCaseStatus SubmitKey=["+SubmitKey+"] CustId=["+CustId+"] ClaimDate=["+ClaimDate+"] CourtCode=["+CourtCode+"]");
-			Slice<JcicZ056> slJcicZ056=sJcicZ056Service.CheckCaseStatus(SubmitKey, CustId, ClaimDate, CourtCode, 0, Integer.MAX_VALUE, titaVo);
-			List<JcicZ056> lJcicZ056=slJcicZ056 == null ? null : slJcicZ056.getContent();
-			if(lJcicZ056!=null && lJcicZ056.size()!=0) {
-				int lJcicZ056S=lJcicZ056.size();
-				for(int i=0;i<lJcicZ056S;i++) {
-					String ThisStatus=lJcicZ056.get(i).getCaseStatus();
-					if(!vStatus.contains(ThisStatus)) {
-						vStatus.add(ThisStatus);
-						this.info("L8316 vStatus ThisStatus=["+ThisStatus+"]");
-					}else {
-						//有重複的資料
-						this.info("L8316 CheckCaseStatus SubmitKey=["+SubmitKey+"],CustId=["+CustId+"] 資料重複請查驗");
-					}
-					
-					if(ThisStatus.equals("A") || ThisStatus.equals("C")) {
-						String ThisApprove=lJcicZ056.get(i).getApprove();
-						vApprove.add(ThisApprove);
-					}
-				}
-			}
-			
-			//未曾報送「清算程序開始(A)」前，不能報送，「清算程序終止(結)(B)」。
-			//報送「清算撤銷免責確定(D)」之前，需曾報送「清算程序開始(A)」或「清算程序開始同時終止(C)」，且12欄[法院裁定免責]原填報為Y。
-			
-			//案件狀態未曾報送A或E狀態，不能報送其他狀態，請重新選擇
-			//案件狀態未曾報送A或C狀態，且法院裁定免責確定不為Y，不能報送D狀態，請重新選擇
-
-			//E8006 案件狀態未曾報送A(清算程序開始)或E(清算調查程序)狀態，不能報送其他狀態，請重新選擇
-//			if(!CaseStatus.equals("A") && !CaseStatus.equals("E")) {
-//				if(!vStatus.contains("A") && !vStatus.contains("E")) {
-//					throw new LogicException(titaVo, "E8006","");
-//				}
-//			}
-
-			if(!CaseStatus.equals("A") && !CaseStatus.equals("C")) {
-				if(!vStatus.contains("A") && !vStatus.contains("C")) {
-					//案件狀態未曾報送A(清算程序開始)或C(清算程序開始同時終止)狀態，不能報送其他狀態，請重新選擇
-					throw new LogicException(titaVo, "","案件狀態未曾報送A(清算程序開始)或C(清算程序開始同時終止)狀態，不能報送其他狀態，請重新選擇");
-				}
-			}
-			
-			//報送「清算撤銷免責確定(D)」之前，需曾報送「清算程序開始(A)」或「清算程序開始同時終止(C)」，且12欄原填報為Y。
-			
-			//E8007 案件狀態未曾報送A(清算程序開始)或C(清算程序開始同時終止)狀態，且法院裁定免責確定不為Y，不能報送D(清算撤消免責確定)狀態，請重新選擇
-			if(CaseStatus.equals("D")) {
-				if(!vStatus.contains("A") && !vStatus.contains("C")) {
-					throw new LogicException(titaVo, "E8007","");
-				}else {
-					
-				}
-				if(!vApprove.contains("Y")) {
-					throw new LogicException(titaVo, "E8007","");
-				}
-			}
-		}
-		
-		
-		return;
 	}
 }

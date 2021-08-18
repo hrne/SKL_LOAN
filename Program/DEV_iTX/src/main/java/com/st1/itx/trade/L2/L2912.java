@@ -163,15 +163,15 @@ public class L2912 extends TradeBuffer {
 		this.totaVo.putParam("OLicenseTypeCode", tClMovables.getLicenseTypeCode());
 		this.totaVo.putParam("OLicenseUsageCode", tClMovables.getLicenseUsageCode());
 		this.totaVo.putParam("OLiceneIssueDate", tClMovables.getLiceneIssueDate());
-		if (tClMovables.getMfgYearMonth() > 0) {
-			if (tClMovables.getMfgYearMonth() > 191100) {
-				this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth() - 191100);
-			} else {
-				this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth());
-			}
-		} else {
-			this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth());
-		}
+//		if (tClMovables.getMfgYearMonth() > 0) {
+//			if (tClMovables.getMfgYearMonth() > 191100) {
+		this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth() - 191100);
+//			} else {
+//				this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth());
+//			}
+//		} else {
+//			this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth());
+//		}
 		this.totaVo.putParam("OVehicleTypeCode", tClMovables.getVehicleTypeCode());
 		this.totaVo.putParam("OVehicleStyleCode", tClMovables.getVehicleStyleCode());
 		this.totaVo.putParam("OVehicleOfficeCode", tClMovables.getVehicleOfficeCode());

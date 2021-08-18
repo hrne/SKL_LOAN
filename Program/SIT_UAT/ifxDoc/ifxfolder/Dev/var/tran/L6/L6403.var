@@ -1,0 +1,1528 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+</sub>
+
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+#LevelHelp=X,100,S
+T(3,1:主管;3:經辦)
+
+</sub>
+
+<sub type="DC" name="p0" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30];order=1;">
+[
+["[L6403]                                 權限群組維護"],
+[#<->#,"#FunCodeFd+功能選項",#FunCodeX],
+[#<->#,"#AuthNoFd+權限群組",#AuthNo],
+[#<->#,"#AuthItemFd+權限名稱    ",#AuthItem],
+[#<->#,"#DescFd+權限說明    ",#Desc],
+[#<->#,"#StatusFd+權限狀態     ",#Status,#StatusX],
+[      "#BranchNoFd+使用單位     ",#BranchNo,#BranchX],
+[      "#BranchNoFd+權限等級     ",#LevelFg,#LevelFgX],
+[#<->#,"#FunCodeFd+業務大類     ",#Ap1,#Ap2,#Ap3,#Ap4,#Ap5,#Ap6,#Ap7,#Ap8,#Ap9],
+]
+
+!---------- AP Button AREA ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6043進入),$)
+C(2,#CHAIN,$,T(F,@FunCode,0))
+
+#NTXBUF=X,7,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCode,#NTXBUF,1,1)
+T(1,@AuthNo,#NTXBUF,2,6)
+T(2,@FKEY,7)
+
+!為了加快載入及處理速度,依業務大類訂定不同預設數
+!Ap1: 30
+!Ap2: 90
+!Ap3: 50
+!Ap4: 100
+!Ap5: 100
+!Ap6: 110
+!Ap7: 20
+!Ap8: 150
+!Ap9: 50
+
+#ApL=X,20000,S  
+
+##loop {times:9,i:1}
+#ApL{i}=X,10000,S  
+##end
+
+#Ap1=X,16,I,ui:button;value:L1.顧客管理作業;enable:1;tabbable:0
+#Ap2=X,16,I,ui:button;value:L2.業務作業;enable:1;tabbable:0
+#Ap3=X,16,I,ui:button;value:L3.帳務作業;enable:1;tabbable:0
+#Ap4=X,16,I,ui:button;value:L4.批次作業;enable:1;tabbable:0
+#Ap5=X,16,I,ui:button;value:L5.管理性作業;enable:1;tabbable:0
+#Ap6=X,16,I,ui:button;value:L6.共同作業;enable:1;tabbable:0
+#Ap7=X,16,I,ui:button;value:L7.介接外部系統;enable:1;tabbable:0
+#Ap8=X,16,I,ui:button;value:L8.遵循法令作業;enable:1;tabbable:0
+#Ap9=X,16,I,ui:button;value:L9.報表作業;enable:1;tabbable:0
+
+#ApInit=X,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+BIND(#Ap{i},click, {cmd=CALLSEND;DOCODE=ApProc{i}})
+##end
+##loop {times:30,i:1}
+INVOKEJS(SHOW,grd1_{i},0)
+##end
+##loop {times:90,i:1}
+INVOKEJS(SHOW,grd2_{i},0)
+##end
+##loop {times:50,i:1}
+INVOKEJS(SHOW,grd3_{i},0)
+##end
+##loop {times:100,i:1}
+INVOKEJS(SHOW,grd4_{i},0)
+##end
+##loop {times:100,i:1}
+INVOKEJS(SHOW,grd5_{i},0)
+##end
+##loop {times:110,i:1}
+INVOKEJS(SHOW,grd6_{i},0)
+##end
+##loop {times:20,i:1}
+INVOKEJS(SHOW,grd7_{i},0)
+##end
+##loop {times:150,i:1}
+INVOKEJS(SHOW,grd8_{i},0)
+##end
+##loop {times:50,i:1}
+INVOKEJS(SHOW,grd9_{i},0)
+##end
+
+#ApProc1=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p1,1)
+
+#ApProc2=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p2,1)
+
+#ApProc3=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p3,1)
+
+#ApProc4=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p4,1)
+
+#ApProc5=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p5,1)
+
+#ApProc6=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p6,1)
+
+#ApProc7=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p7,1)
+
+#ApProc8=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p8,1)
+
+#ApProc9=@,1,S
+##loop {times:9,i:1}
+INVOKEJS(SHOW,p{i},0)
+##end
+INVOKEJS(SHOW,p9,1)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2
+#CDCODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,100,S 
+
+!單位別
+#Help1=X,10,S
+T(3,CDBR)
+
+#BrHelp=X,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode2,#Help1)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+T(2,@BrHelp,#HelpDesc2)
+
+!YesNoHelp
+#StatusHelp=X,50,S
+T(3,0:正常;1:停用)
+
+!----
+
+#ApCount=A,3,S
+#ApIdx=A,6,S
+#ApLen=A,3,S
+#Ap0Len=A,4,S
+
+#Ap0Proc=@,1,S
+E(0,@ApIdx,1)
+##loop {times:9,i:1}
+T(1,@Ap0Len,#ApL,#ApIdx,4)
+E(0,@ApIdx,#ApIdx+4)
+T(1,@ApL{i},#ApL,#ApIdx,#Ap0Len)
+E(0,@ApIdx,#ApIdx+#Ap0Len)
+##end
+
+!-- p1 begin
+
+#Ap1ProcA=@,1,S
+T(1,@ApCount,#ApL1,1,3)
+E(0,@ApIdx,4)
+##loop {times:30,i:1,j:0}
+T(1,@ApaType{i},#ApL1,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@ApaSno{i},#ApL1,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@ApaCode{i},#ApL1,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL1,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@ApaDesc{i},#ApL1,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@ApaAuth{i},#ApL1,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap1ProcB=@,1,S
+##loop {times:30,i:1,j:0}
+C(2,#ApaAuth{i},T(3,@ApaBtn{i}, ),T(3,@ApaBtn{i},V),T(3,@ApaBtn{i},V))
+C(2,#ApaAuth{i},T(3,@OiaBtn{i}, ),T(3,@OiaBtn{i},V),T(3,@OiaBtn{i}, ))
+C(2,#ApaType{i},T(3,@ApaTypeX{i},子選單),T(3,@ApaTypeX{i},查詢交易),T(3,@ApaTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd1_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#ApaBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#ApaBIND0=X,1,S
+BIND(#ApaBtn0,click, {cmd=CALLSEND;DOCODE=ApaBtnProc0})
+
+#ApaBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApaBtn0,V,T(3,@ApaBtn0, ),T(3,@ApaBtn0,V))
+##loop {times:30,i:1}
+T(2,@ApaBtn{i},#ApaBtn0)
+C(5,#ApaBtn{i},V,C(3,#ApaType{i},1,T(3,@OiaBtn{i},V),$),T(3,@OiaBtn{i}, ))
+##end
+
+#OiaBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OiaBIND0=X,1,S
+BIND(#OiaBtn0,click, {cmd=CALLSEND;DOCODE=OiaBtnProc0})
+
+#OiaBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OiaBtn0,V,T(3,@OiaBtn0, ),T(3,@OiaBtn0,V))
+##loop {times:30,i:1}
+C(2,#ApaType{i},T(2,@OiaBtn{i},#OiaBtn0),$,C(5,#ApaBtn{i},V,T(2,@OiaBtn{i},#OiaBtn0),$)) 
+##end
+
+!
+##loop {times:30,i:1}
+!權限勾選按鈕
+#ApaBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OiaBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#ApaCode{i}=X,5,L
+!子選單/交易名稱
+#ApaDesc{i}=X,40,L
+!子選單代號
+#ApaSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#ApaType{i}=A,1,S
+#ApaTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#ApaAuth{i}=X,1,S
+
+#ApaBIND{i}=X,1,S
+BIND(#ApaBtn{i},click, {cmd=CALLSEND;DOCODE=ApaBtnProc{i}})
+
+!C(3,#ApaType{i},1,C(5,#ApaBtn{i},V,T(3,@OiaBtn{i},V),T(3,@OiaBtn{i}, )),$)
+#ApaBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApaBtn{i},V,T(3,@ApaBtn{i}, ),T(3,@ApaBtn{i},V))
+C(5,#ApaBtn{i},V,C(3,#ApaType{i},1,T(3,@OiaBtn{i},V),$),T(3,@OiaBtn{i}, ))
+C(3,#ApaType{i},0,CALL(#ApaSub,#ApaSno{i},#ApaBtn{i}),$)
+
+
+#OiaBIND{i}=X,1,S
+BIND(#OiaBtn{i},click, {cmd=CALLSEND;DOCODE=OiaBtnProc{i}})
+
+#OiaBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#ApaType{i},$,s,C(5,#ApaBtn{i}, ,s,$)) 
+C(5,#OiaBtn{i},V,T(3,@OiaBtn{i}, ),T(3,@OiaBtn{i},V))
+C(3,#ApaType{i},0,CALL(#OiaSub,#ApaSno{i},#OiaBtn{i}),$)
+
+##end
+
+#ApaSub=@,1,S
+##loop {times:30,i:1}
+C(3,#ApaSno{i},#it1,T(2,@ApaBtn{i},#it2),$)
+C(5,#ApaBtn{i},V,C(3,#ApaType{i},1,T(3,@OiaBtn{i},V),$),T(3,@OiaBtn{i}, ))
+##end
+
+#OiaSub=@,1,S
+##loop {times:30,i:1}
+C(2,#ApaType{i},$,$,C(5,#ApaBtn{i},V,C(3,#ApaSno{i},#it1,T(2,@OiaBtn{i},#it2),$),$)) 
+##end
+
+!-- p1 end
+
+!-- p2 begin
+
+#Ap2ProcA=@,1,S
+T(1,@ApCount,#ApL2,1,3)
+E(0,@ApIdx,4)
+##loop {times:90,i:1,j:0}
+T(1,@ApbType{i},#ApL2,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@ApbSno{i},#ApL2,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@ApbCode{i},#ApL2,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL2,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@ApbDesc{i},#ApL2,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@ApbAuth{i},#ApL2,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap2ProcB=@,1,S
+##loop {times:90,i:1,j:0}
+C(2,#ApbAuth{i},T(3,@ApbBtn{i}, ),T(3,@ApbBtn{i},V),T(3,@ApbBtn{i},V))
+C(2,#ApbAuth{i},T(3,@OibBtn{i}, ),T(3,@OibBtn{i},V),T(3,@OibBtn{i}, ))
+C(2,#ApbType{i},T(3,@ApbTypeX{i},子選單),T(3,@ApbTypeX{i},查詢交易),T(3,@ApbTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd2_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#ApbBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#ApbBIND0=X,1,S
+BIND(#ApbBtn0,click, {cmd=CALLSEND;DOCODE=ApbBtnProc0})
+
+#ApbBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApbBtn0,V,T(3,@ApbBtn0, ),T(3,@ApbBtn0,V))
+##loop {times:90,i:1}
+T(2,@ApbBtn{i},#ApbBtn0)
+C(5,#ApbBtn{i},V,C(3,#ApbType{i},1,T(3,@OibBtn{i},V),$),T(3,@OibBtn{i}, ))
+##end
+
+#OibBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OibBIND0=X,1,S
+BIND(#OibBtn0,click, {cmd=CALLSEND;DOCODE=OibBtnProc0})
+
+#OibBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OibBtn0,V,T(3,@OibBtn0, ),T(3,@OibBtn0,V))
+##loop {times:90,i:1}
+C(2,#ApbType{i},T(2,@OibBtn{i},#OibBtn0),$,C(5,#ApbBtn{i},V,T(2,@OibBtn{i},#OibBtn0),$)) 
+##end
+
+!
+##loop {times:90,i:1}
+!權限勾選按鈕
+#ApbBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OibBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#ApbCode{i}=X,5,L
+!子選單/交易名稱
+#ApbDesc{i}=X,40,L
+!子選單代號
+#ApbSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#ApbType{i}=A,1,S
+#ApbTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#ApbAuth{i}=X,1,S
+
+#ApbBIND{i}=X,1,S
+BIND(#ApbBtn{i},click, {cmd=CALLSEND;DOCODE=ApbBtnProc{i}})
+
+#ApbBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApbBtn{i},V,T(3,@ApbBtn{i}, ),T(3,@ApbBtn{i},V))
+C(5,#ApbBtn{i},V,C(3,#ApbType{i},1,T(3,@OibBtn{i},V),$),T(3,@OibBtn{i}, ))
+C(3,#ApbType{i},0,CALL(#ApbSub,#ApbSno{i},#ApbBtn{i}),$)
+
+
+#OibBIND{i}=X,1,S
+BIND(#OibBtn{i},click, {cmd=CALLSEND;DOCODE=OibBtnProc{i}})
+
+#OibBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#ApbType{i},$,s,C(5,#ApbBtn{i}, ,s,$)) 
+C(5,#OibBtn{i},V,T(3,@OibBtn{i}, ),T(3,@OibBtn{i},V))
+C(3,#ApbType{i},0,CALL(#OibSub,#ApbSno{i},#OibBtn{i}),$)
+
+##end
+
+#ApbSub=@,1,S
+##loop {times:90,i:1}
+C(3,#ApbSno{i},#it1,T(2,@ApbBtn{i},#it2),$)
+C(5,#ApbBtn{i},V,C(3,#ApbType{i},1,T(3,@OibBtn{i},V),$),T(3,@OibBtn{i}, ))
+##end
+
+#OibSub=@,1,S
+##loop {times:90,i:1}
+C(2,#ApbType{i},$,$,C(5,#ApbBtn{i},V,C(3,#ApbSno{i},#it1,T(2,@OibBtn{i},#it2),$),$)) 
+##end
+
+!-- p2 end
+
+!-- p3 begin
+
+#Ap3ProcA=@,1,S
+T(1,@ApCount,#ApL3,1,3)
+E(0,@ApIdx,4)
+##loop {times:50,i:1,j:0}
+T(1,@ApcType{i},#ApL3,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@ApcSno{i},#ApL3,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@ApcCode{i},#ApL3,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL3,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@ApcDesc{i},#ApL3,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@ApcAuth{i},#ApL3,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap3ProcB=@,1,S
+##loop {times:50,i:1,j:0}
+C(2,#ApcAuth{i},T(3,@ApcBtn{i}, ),T(3,@ApcBtn{i},V),T(3,@ApcBtn{i},V))
+C(2,#ApcAuth{i},T(3,@OicBtn{i}, ),T(3,@OicBtn{i},V),T(3,@OicBtn{i}, ))
+C(2,#ApcType{i},T(3,@ApcTypeX{i},子選單),T(3,@ApcTypeX{i},查詢交易),T(3,@ApcTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd3_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#ApcBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#ApcBIND0=X,1,S
+BIND(#ApcBtn0,click, {cmd=CALLSEND;DOCODE=ApcBtnProc0})
+
+#ApcBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApcBtn0,V,T(3,@ApcBtn0, ),T(3,@ApcBtn0,V))
+##loop {times:50,i:1}
+T(2,@ApcBtn{i},#ApcBtn0)
+C(5,#ApcBtn{i},V,C(3,#ApcType{i},1,T(3,@OicBtn{i},V),$),T(3,@OicBtn{i}, ))
+##end
+
+#OicBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OicBIND0=X,1,S
+BIND(#OicBtn0,click, {cmd=CALLSEND;DOCODE=OicBtnProc0})
+
+#OicBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OicBtn0,V,T(3,@OicBtn0, ),T(3,@OicBtn0,V))
+##loop {times:50,i:1}
+C(2,#ApcType{i},T(2,@OicBtn{i},#OicBtn0),$,C(5,#ApcBtn{i},V,T(2,@OicBtn{i},#OicBtn0),$)) 
+##end
+
+!
+##loop {times:50,i:1}
+!權限勾選按鈕
+#ApcBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OicBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#ApcCode{i}=X,5,L
+!子選單/交易名稱
+#ApcDesc{i}=X,40,L
+!子選單代號
+#ApcSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#ApcType{i}=A,1,S
+#ApcTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#ApcAuth{i}=X,1,S
+
+#ApcBIND{i}=X,1,S
+BIND(#ApcBtn{i},click, {cmd=CALLSEND;DOCODE=ApcBtnProc{i}})
+
+#ApcBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApcBtn{i},V,T(3,@ApcBtn{i}, ),T(3,@ApcBtn{i},V))
+C(5,#ApcBtn{i},V,C(3,#ApcType{i},1,T(3,@OicBtn{i},V),$),T(3,@OicBtn{i}, ))
+C(3,#ApcType{i},0,CALL(#ApcSub,#ApcSno{i},#ApcBtn{i}),$)
+
+
+#OicBIND{i}=X,1,S
+BIND(#OicBtn{i},click, {cmd=CALLSEND;DOCODE=OicBtnProc{i}})
+
+#OicBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#ApcType{i},$,s,C(5,#ApcBtn{i}, ,s,$)) 
+C(5,#OicBtn{i},V,T(3,@OicBtn{i}, ),T(3,@OicBtn{i},V))
+C(3,#ApcType{i},0,CALL(#OicSub,#ApcSno{i},#OicBtn{i}),$)
+
+##end
+
+#ApcSub=@,1,S
+##loop {times:50,i:1}
+C(3,#ApcSno{i},#it1,T(2,@ApcBtn{i},#it2),$)
+C(5,#ApcBtn{i},V,C(3,#ApcType{i},1,T(3,@OicBtn{i},V),$),T(3,@OicBtn{i}, ))
+##end
+
+#OicSub=@,1,S
+##loop {times:50,i:1}
+C(2,#ApcType{i},$,$,C(5,#ApcBtn{i},V,C(3,#ApcSno{i},#it1,T(2,@OicBtn{i},#it2),$),$)) 
+##end
+
+!-- p3 end
+
+!-- p4 begin
+
+#Ap4ProcA=@,1,S
+T(1,@ApCount,#ApL4,1,3)
+E(0,@ApIdx,4)
+##loop {times:100,i:1,j:0}
+T(1,@ApdType{i},#ApL4,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@ApdSno{i},#ApL4,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@ApdCode{i},#ApL4,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL4,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@ApdDesc{i},#ApL4,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@ApdAuth{i},#ApL4,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap4ProcB=@,1,S
+##loop {times:100,i:1,j:0}
+C(2,#ApdAuth{i},T(3,@ApdBtn{i}, ),T(3,@ApdBtn{i},V),T(3,@ApdBtn{i},V))
+C(2,#ApdAuth{i},T(3,@OidBtn{i}, ),T(3,@OidBtn{i},V),T(3,@OidBtn{i}, ))
+C(2,#ApdType{i},T(3,@ApdTypeX{i},子選單),T(3,@ApdTypeX{i},查詢交易),T(3,@ApdTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd4_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#ApdBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#ApdBIND0=X,1,S
+BIND(#ApdBtn0,click, {cmd=CALLSEND;DOCODE=ApdBtnProc0})
+
+#ApdBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApdBtn0,V,T(3,@ApdBtn0, ),T(3,@ApdBtn0,V))
+##loop {times:100,i:1}
+T(2,@ApdBtn{i},#ApdBtn0)
+C(5,#ApdBtn{i},V,C(3,#ApdType{i},1,T(3,@OidBtn{i},V),$),T(3,@OidBtn{i}, ))
+##end
+
+#OidBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OidBIND0=X,1,S
+BIND(#OidBtn0,click, {cmd=CALLSEND;DOCODE=OidBtnProc0})
+
+#OidBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OidBtn0,V,T(3,@OidBtn0, ),T(3,@OidBtn0,V))
+##loop {times:100,i:1}
+C(2,#ApdType{i},T(2,@OidBtn{i},#OidBtn0),$,C(5,#ApdBtn{i},V,T(2,@OidBtn{i},#OidBtn0),$)) 
+##end
+
+!
+##loop {times:100,i:1}
+!權限勾選按鈕
+#ApdBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OidBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#ApdCode{i}=X,5,L
+!子選單/交易名稱
+#ApdDesc{i}=X,40,L
+!子選單代號
+#ApdSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#ApdType{i}=A,1,S
+#ApdTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#ApdAuth{i}=X,1,S
+
+#ApdBIND{i}=X,1,S
+BIND(#ApdBtn{i},click, {cmd=CALLSEND;DOCODE=ApdBtnProc{i}})
+
+#ApdBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApdBtn{i},V,T(3,@ApdBtn{i}, ),T(3,@ApdBtn{i},V))
+C(5,#ApdBtn{i},V,C(3,#ApdType{i},1,T(3,@OidBtn{i},V),$),T(3,@OidBtn{i}, ))
+C(3,#ApdType{i},0,CALL(#ApdSub,#ApdSno{i},#ApdBtn{i}),$)
+
+
+#OidBIND{i}=X,1,S
+BIND(#OidBtn{i},click, {cmd=CALLSEND;DOCODE=OidBtnProc{i}})
+
+#OidBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#ApdType{i},$,s,C(5,#ApdBtn{i}, ,s,$)) 
+C(5,#OidBtn{i},V,T(3,@OidBtn{i}, ),T(3,@OidBtn{i},V))
+C(3,#ApdType{i},0,CALL(#OidSub,#ApdSno{i},#OidBtn{i}),$)
+
+##end
+
+#ApdSub=@,1,S
+##loop {times:100,i:1}
+C(3,#ApdSno{i},#it1,T(2,@ApdBtn{i},#it2),$)
+C(5,#ApdBtn{i},V,C(3,#ApdType{i},1,T(3,@OidBtn{i},V),$),T(3,@OidBtn{i}, ))
+##end
+
+#OidSub=@,1,S
+##loop {times:100,i:1}
+C(2,#ApdType{i},$,$,C(5,#ApdBtn{i},V,C(3,#ApdSno{i},#it1,T(2,@OidBtn{i},#it2),$),$)) 
+##end
+
+!-- p4 end
+
+!-- p5 begin
+
+#Ap5ProcA=@,1,S
+T(1,@ApCount,#ApL5,1,3)
+E(0,@ApIdx,4)
+##loop {times:100,i:1,j:0}
+T(1,@ApeType{i},#ApL5,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@ApeSno{i},#ApL5,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@ApeCode{i},#ApL5,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL5,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@ApeDesc{i},#ApL5,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@ApeAuth{i},#ApL5,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap5ProcB=@,1,S
+##loop {times:100,i:1,j:0}
+C(2,#ApeAuth{i},T(3,@ApeBtn{i}, ),T(3,@ApeBtn{i},V),T(3,@ApeBtn{i},V))
+C(2,#ApeAuth{i},T(3,@OieBtn{i}, ),T(3,@OieBtn{i},V),T(3,@OieBtn{i}, ))
+C(2,#ApeType{i},T(3,@ApeTypeX{i},子選單),T(3,@ApeTypeX{i},查詢交易),T(3,@ApeTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd5_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#ApeBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#ApeBIND0=X,1,S
+BIND(#ApeBtn0,click, {cmd=CALLSEND;DOCODE=ApeBtnProc0})
+
+#ApeBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApeBtn0,V,T(3,@ApeBtn0, ),T(3,@ApeBtn0,V))
+##loop {times:100,i:1}
+T(2,@ApeBtn{i},#ApeBtn0)
+C(5,#ApeBtn{i},V,C(3,#ApeType{i},1,T(3,@OieBtn{i},V),$),T(3,@OieBtn{i}, ))
+##end
+
+#OieBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OieBIND0=X,1,S
+BIND(#OieBtn0,click, {cmd=CALLSEND;DOCODE=OieBtnProc0})
+
+#OieBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OieBtn0,V,T(3,@OieBtn0, ),T(3,@OieBtn0,V))
+##loop {times:100,i:1}
+C(2,#ApeType{i},T(2,@OieBtn{i},#OieBtn0),$,C(5,#ApeBtn{i},V,T(2,@OieBtn{i},#OieBtn0),$)) 
+##end
+
+!
+##loop {times:100,i:1}
+!權限勾選按鈕
+#ApeBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OieBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#ApeCode{i}=X,5,L
+!子選單/交易名稱
+#ApeDesc{i}=X,40,L
+!子選單代號
+#ApeSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#ApeType{i}=A,1,S
+#ApeTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#ApeAuth{i}=X,1,S
+
+#ApeBIND{i}=X,1,S
+BIND(#ApeBtn{i},click, {cmd=CALLSEND;DOCODE=ApeBtnProc{i}})
+
+#ApeBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApeBtn{i},V,T(3,@ApeBtn{i}, ),T(3,@ApeBtn{i},V))
+C(5,#ApeBtn{i},V,C(3,#ApeType{i},1,T(3,@OieBtn{i},V),$),T(3,@OieBtn{i}, ))
+C(3,#ApeType{i},0,CALL(#ApeSub,#ApeSno{i},#ApeBtn{i}),$)
+
+
+#OieBIND{i}=X,1,S
+BIND(#OieBtn{i},click, {cmd=CALLSEND;DOCODE=OieBtnProc{i}})
+
+#OieBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#ApeType{i},$,s,C(5,#ApeBtn{i}, ,s,$)) 
+C(5,#OieBtn{i},V,T(3,@OieBtn{i}, ),T(3,@OieBtn{i},V))
+C(3,#ApeType{i},0,CALL(#OieSub,#ApeSno{i},#OieBtn{i}),$)
+
+##end
+
+#ApeSub=@,1,S
+##loop {times:100,i:1}
+C(3,#ApeSno{i},#it1,T(2,@ApeBtn{i},#it2),$)
+C(5,#ApeBtn{i},V,C(3,#ApeType{i},1,T(3,@OieBtn{i},V),$),T(3,@OieBtn{i}, ))
+##end
+
+#OieSub=@,1,S
+##loop {times:100,i:1}
+C(2,#ApeType{i},$,$,C(5,#ApeBtn{i},V,C(3,#ApeSno{i},#it1,T(2,@OieBtn{i},#it2),$),$)) 
+##end
+
+!-- p5 end
+
+!-- p6 begin
+
+#Ap6ProcA=@,1,S
+T(1,@ApCount,#ApL6,1,3)
+E(0,@ApIdx,4)
+##loop {times:110,i:1,j:0}
+T(1,@ApfType{i},#ApL6,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@ApfSno{i},#ApL6,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@ApfCode{i},#ApL6,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL6,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@ApfDesc{i},#ApL6,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@ApfAuth{i},#ApL6,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap6ProcB=@,1,S
+##loop {times:110,i:1,j:0}
+C(2,#ApfAuth{i},T(3,@ApfBtn{i}, ),T(3,@ApfBtn{i},V),T(3,@ApfBtn{i},V))
+C(2,#ApfAuth{i},T(3,@OifBtn{i}, ),T(3,@OifBtn{i},V),T(3,@OifBtn{i}, ))
+C(2,#ApfType{i},T(3,@ApfTypeX{i},子選單),T(3,@ApfTypeX{i},查詢交易),T(3,@ApfTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd6_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#ApfBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#ApfBIND0=X,1,S
+BIND(#ApfBtn0,click, {cmd=CALLSEND;DOCODE=ApfBtnProc0})
+
+#ApfBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApfBtn0,V,T(3,@ApfBtn0, ),T(3,@ApfBtn0,V))
+##loop {times:110,i:1}
+T(2,@ApfBtn{i},#ApfBtn0)
+C(5,#ApfBtn{i},V,C(3,#ApfType{i},1,T(3,@OifBtn{i},V),$),T(3,@OifBtn{i}, ))
+##end
+
+#OifBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OifBIND0=X,1,S
+BIND(#OifBtn0,click, {cmd=CALLSEND;DOCODE=OifBtnProc0})
+
+#OifBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OifBtn0,V,T(3,@OifBtn0, ),T(3,@OifBtn0,V))
+##loop {times:110,i:1}
+C(2,#ApfType{i},T(2,@OifBtn{i},#OifBtn0),$,C(5,#ApfBtn{i},V,T(2,@OifBtn{i},#OifBtn0),$)) 
+##end
+
+!
+##loop {times:110,i:1}
+!權限勾選按鈕
+#ApfBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OifBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#ApfCode{i}=X,5,L
+!子選單/交易名稱
+#ApfDesc{i}=X,40,L
+!子選單代號
+#ApfSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#ApfType{i}=A,1,S
+#ApfTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#ApfAuth{i}=X,1,S
+
+#ApfBIND{i}=X,1,S
+BIND(#ApfBtn{i},click, {cmd=CALLSEND;DOCODE=ApfBtnProc{i}})
+
+#ApfBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApfBtn{i},V,T(3,@ApfBtn{i}, ),T(3,@ApfBtn{i},V))
+C(5,#ApfBtn{i},V,C(3,#ApfType{i},1,T(3,@OifBtn{i},V),$),T(3,@OifBtn{i}, ))
+C(3,#ApfType{i},0,CALL(#ApfSub,#ApfSno{i},#ApfBtn{i}),$)
+
+
+#OifBIND{i}=X,1,S
+BIND(#OifBtn{i},click, {cmd=CALLSEND;DOCODE=OifBtnProc{i}})
+
+#OifBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#ApfType{i},$,s,C(5,#ApfBtn{i}, ,s,$)) 
+C(5,#OifBtn{i},V,T(3,@OifBtn{i}, ),T(3,@OifBtn{i},V))
+C(3,#ApfType{i},0,CALL(#OifSub,#ApfSno{i},#OifBtn{i}),$)
+
+##end
+
+#ApfSub=@,1,S
+##loop {times:110,i:1}
+C(3,#ApfSno{i},#it1,T(2,@ApfBtn{i},#it2),$)
+C(5,#ApfBtn{i},V,C(3,#ApfType{i},1,T(3,@OifBtn{i},V),$),T(3,@OifBtn{i}, ))
+##end
+
+#OifSub=@,1,S
+##loop {times:110,i:1}
+C(2,#ApfType{i},$,$,C(5,#ApfBtn{i},V,C(3,#ApfSno{i},#it1,T(2,@OifBtn{i},#it2),$),$)) 
+##end
+
+!-- p6 end
+
+!-- p7 begin
+
+#Ap7ProcA=@,1,S
+T(1,@ApCount,#ApL7,1,3)
+E(0,@ApIdx,4)
+##loop {times:20,i:1,j:0}
+T(1,@ApgType{i},#ApL7,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@ApgSno{i},#ApL7,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@ApgCode{i},#ApL7,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL7,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@ApgDesc{i},#ApL7,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@ApgAuth{i},#ApL7,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap7ProcB=@,1,S
+##loop {times:20,i:1,j:0}
+C(2,#ApgAuth{i},T(3,@ApgBtn{i}, ),T(3,@ApgBtn{i},V),T(3,@ApgBtn{i},V))
+C(2,#ApgAuth{i},T(3,@OigBtn{i}, ),T(3,@OigBtn{i},V),T(3,@OigBtn{i}, ))
+C(2,#ApgType{i},T(3,@ApgTypeX{i},子選單),T(3,@ApgTypeX{i},查詢交易),T(3,@ApgTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd7_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#ApgBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#ApgBIND0=X,1,S
+BIND(#ApgBtn0,click, {cmd=CALLSEND;DOCODE=ApgBtnProc0})
+
+#ApgBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApgBtn0,V,T(3,@ApgBtn0, ),T(3,@ApgBtn0,V))
+##loop {times:20,i:1}
+T(2,@ApgBtn{i},#ApgBtn0)
+C(5,#ApgBtn{i},V,C(3,#ApgType{i},1,T(3,@OigBtn{i},V),$),T(3,@OigBtn{i}, ))
+##end
+
+#OigBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OigBIND0=X,1,S
+BIND(#OigBtn0,click, {cmd=CALLSEND;DOCODE=OigBtnProc0})
+
+#OigBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OigBtn0,V,T(3,@OigBtn0, ),T(3,@OigBtn0,V))
+##loop {times:20,i:1}
+C(2,#ApgType{i},T(2,@OigBtn{i},#OigBtn0),$,C(5,#ApgBtn{i},V,T(2,@OigBtn{i},#OigBtn0),$)) 
+##end
+
+!
+##loop {times:20,i:1}
+!權限勾選按鈕
+#ApgBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OigBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#ApgCode{i}=X,5,L
+!子選單/交易名稱
+#ApgDesc{i}=X,40,L
+!子選單代號
+#ApgSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#ApgType{i}=A,1,S
+#ApgTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#ApgAuth{i}=X,1,S
+
+#ApgBIND{i}=X,1,S
+BIND(#ApgBtn{i},click, {cmd=CALLSEND;DOCODE=ApgBtnProc{i}})
+
+#ApgBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApgBtn{i},V,T(3,@ApgBtn{i}, ),T(3,@ApgBtn{i},V))
+C(5,#ApgBtn{i},V,C(3,#ApgType{i},1,T(3,@OigBtn{i},V),$),T(3,@OigBtn{i}, ))
+C(3,#ApgType{i},0,CALL(#ApgSub,#ApgSno{i},#ApgBtn{i}),$)
+
+
+#OigBIND{i}=X,1,S
+BIND(#OigBtn{i},click, {cmd=CALLSEND;DOCODE=OigBtnProc{i}})
+
+#OigBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#ApgType{i},$,s,C(5,#ApgBtn{i}, ,s,$)) 
+C(5,#OigBtn{i},V,T(3,@OigBtn{i}, ),T(3,@OigBtn{i},V))
+C(3,#ApgType{i},0,CALL(#OigSub,#ApgSno{i},#OigBtn{i}),$)
+
+##end
+
+#ApgSub=@,1,S
+##loop {times:20,i:1}
+C(3,#ApgSno{i},#it1,T(2,@ApgBtn{i},#it2),$)
+C(5,#ApgBtn{i},V,C(3,#ApgType{i},1,T(3,@OigBtn{i},V),$),T(3,@OigBtn{i}, ))
+##end
+
+#OigSub=@,1,S
+##loop {times:20,i:1}
+C(2,#ApgType{i},$,$,C(5,#ApgBtn{i},V,C(3,#ApgSno{i},#it1,T(2,@OigBtn{i},#it2),$),$)) 
+##end
+
+!-- p7 end
+
+!-- p8 begin
+
+#Ap8ProcA=@,1,S
+T(1,@ApCount,#ApL8,1,3)
+E(0,@ApIdx,4)
+##loop {times:150,i:1,j:0}
+T(1,@AphType{i},#ApL8,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@AphSno{i},#ApL8,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@AphCode{i},#ApL8,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL8,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@AphDesc{i},#ApL8,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@AphAuth{i},#ApL8,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap8ProcB=@,1,S
+##loop {times:150,i:1,j:0}
+C(2,#AphAuth{i},T(3,@AphBtn{i}, ),T(3,@AphBtn{i},V),T(3,@AphBtn{i},V))
+C(2,#AphAuth{i},T(3,@OihBtn{i}, ),T(3,@OihBtn{i},V),T(3,@OihBtn{i}, ))
+C(2,#AphType{i},T(3,@AphTypeX{i},子選單),T(3,@AphTypeX{i},查詢交易),T(3,@AphTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd8_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#AphBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#AphBIND0=X,1,S
+BIND(#AphBtn0,click, {cmd=CALLSEND;DOCODE=AphBtnProc0})
+
+#AphBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#AphBtn0,V,T(3,@AphBtn0, ),T(3,@AphBtn0,V))
+##loop {times:150,i:1}
+T(2,@AphBtn{i},#AphBtn0)
+C(5,#AphBtn{i},V,C(3,#AphType{i},1,T(3,@OihBtn{i},V),$),T(3,@OihBtn{i}, ))
+##end
+
+#OihBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OihBIND0=X,1,S
+BIND(#OihBtn0,click, {cmd=CALLSEND;DOCODE=OihBtnProc0})
+
+#OihBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OihBtn0,V,T(3,@OihBtn0, ),T(3,@OihBtn0,V))
+##loop {times:150,i:1}
+C(2,#AphType{i},T(2,@OihBtn{i},#OihBtn0),$,C(5,#AphBtn{i},V,T(2,@OihBtn{i},#OihBtn0),$)) 
+##end
+
+!
+##loop {times:150,i:1}
+!權限勾選按鈕
+#AphBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OihBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#AphCode{i}=X,5,L
+!子選單/交易名稱
+#AphDesc{i}=X,40,L
+!子選單代號
+#AphSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#AphType{i}=A,1,S
+#AphTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#AphAuth{i}=X,1,S
+
+#AphBIND{i}=X,1,S
+BIND(#AphBtn{i},click, {cmd=CALLSEND;DOCODE=AphBtnProc{i}})
+
+#AphBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#AphBtn{i},V,T(3,@AphBtn{i}, ),T(3,@AphBtn{i},V))
+C(5,#AphBtn{i},V,C(3,#AphType{i},1,T(3,@OihBtn{i},V),$),T(3,@OihBtn{i}, ))
+C(3,#AphType{i},0,CALL(#AphSub,#AphSno{i},#AphBtn{i}),$)
+
+
+#OihBIND{i}=X,1,S
+BIND(#OihBtn{i},click, {cmd=CALLSEND;DOCODE=OihBtnProc{i}})
+
+#OihBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#AphType{i},$,s,C(5,#AphBtn{i}, ,s,$)) 
+C(5,#OihBtn{i},V,T(3,@OihBtn{i}, ),T(3,@OihBtn{i},V))
+C(3,#AphType{i},0,CALL(#OihSub,#AphSno{i},#OihBtn{i}),$)
+
+##end
+
+#AphSub=@,1,S
+##loop {times:150,i:1}
+C(3,#AphSno{i},#it1,T(2,@AphBtn{i},#it2),$)
+C(5,#AphBtn{i},V,C(3,#AphType{i},1,T(3,@OihBtn{i},V),$),T(3,@OihBtn{i}, ))
+##end
+
+#OihSub=@,1,S
+##loop {times:150,i:1}
+C(2,#AphType{i},$,$,C(5,#AphBtn{i},V,C(3,#AphSno{i},#it1,T(2,@OihBtn{i},#it2),$),$)) 
+##end
+
+!-- p8 end
+
+!-- p9 begin
+
+#Ap9ProcA=@,1,S
+T(1,@ApCount,#ApL9,1,3)
+E(0,@ApIdx,4)
+##loop {times:50,i:1,j:0}
+T(1,@ApiType{i},#ApL9,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+T(1,@ApiSno{i},#ApL9,#ApIdx,2)
+E(0,@ApIdx,#ApIdx+2)
+T(1,@ApiCode{i},#ApL9,#ApIdx,5)
+E(0,@ApIdx,#ApIdx+5)
+T(1,@ApLen,#ApL9,#ApIdx,3)
+E(0,@ApIdx,#ApIdx+3)
+T(1,@ApiDesc{i},#ApL9,#ApIdx,#ApLen)
+E(0,@ApIdx,#ApIdx+#ApLen)
+T(1,@ApiAuth{i},#ApL9,#ApIdx,1)
+E(0,@ApIdx,#ApIdx+1)
+C(3,#ApCount,{i},s,$)
+##end
+
+#Ap9ProcB=@,1,S
+##loop {times:50,i:1,j:0}
+C(2,#ApiAuth{i},T(3,@ApiBtn{i}, ),T(3,@ApiBtn{i},V),T(3,@ApiBtn{i},V))
+C(2,#ApiAuth{i},T(3,@OiiBtn{i}, ),T(3,@OiiBtn{i},V),T(3,@OiiBtn{i}, ))
+C(2,#ApiType{i},T(3,@ApiTypeX{i},子選單),T(3,@ApiTypeX{i},查詢交易),T(3,@ApiTypeX{i},維護交易),$)
+INVOKEJS(SHOW,grd9_{j},1)
+C(3,#ApCount,{i},s,$)
+##end
+
+
+#ApiBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#ApiBIND0=X,1,S
+BIND(#ApiBtn0,click, {cmd=CALLSEND;DOCODE=ApiBtnProc0})
+
+#ApiBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApiBtn0,V,T(3,@ApiBtn0, ),T(3,@ApiBtn0,V))
+##loop {times:50,i:1}
+T(2,@ApiBtn{i},#ApiBtn0)
+C(5,#ApiBtn{i},V,C(3,#ApiType{i},1,T(3,@OiiBtn{i},V),$),T(3,@OiiBtn{i}, ))
+##end
+
+#OiiBtn0=X,1,I,ui:button;value: ;enable:1;tabbable:0
+
+#OiiBIND0=X,1,S
+BIND(#OiiBtn0,click, {cmd=CALLSEND;DOCODE=OiiBtnProc0})
+
+#OiiBtnProc0=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#OiiBtn0,V,T(3,@OiiBtn0, ),T(3,@OiiBtn0,V))
+##loop {times:50,i:1}
+C(2,#ApiType{i},T(2,@OiiBtn{i},#OiiBtn0),$,C(5,#ApiBtn{i},V,T(2,@OiiBtn{i},#OiiBtn0),$)) 
+##end
+
+!
+##loop {times:50,i:1}
+!權限勾選按鈕
+#ApiBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!限查詢按鈕
+#OiiBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
+!子選單/交易代號
+#ApiCode{i}=X,5,L
+!子選單/交易名稱
+#ApiDesc{i}=X,40,L
+!子選單代號
+#ApiSno{i}=X,2,S
+!類別:0.子選單 1.查詢交易 2.維護交易
+#ApiType{i}=A,1,S
+#ApiTypeX{i}=X,20,L
+!權限記號:0.無權限 1.有權限
+#ApiAuth{i}=X,1,S
+
+#ApiBIND{i}=X,1,S
+BIND(#ApiBtn{i},click, {cmd=CALLSEND;DOCODE=ApiBtnProc{i}})
+
+!C(3,#ApiType{i},1,C(5,#ApiBtn{i},V,T(3,@OiiBtn{i},V),T(3,@OiiBtn{i}, )),$)
+#ApiBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(5,#ApiBtn{i},V,T(3,@ApiBtn{i}, ),T(3,@ApiBtn{i},V))
+C(5,#ApiBtn{i},V,C(3,#ApiType{i},1,T(3,@OiiBtn{i},V),$),T(3,@OiiBtn{i}, ))
+C(3,#ApiType{i},0,CALL(#ApiSub,#ApiSno{i},#ApiBtn{i}),$)
+
+
+#OiiBIND{i}=X,1,S
+BIND(#OiiBtn{i},click, {cmd=CALLSEND;DOCODE=OiiBtnProc{i}})
+
+#OiiBtnProc{i}=@,1,S
+C(3,#FunCode,4,s,$)
+C(2,#ApiType{i},$,s,C(5,#ApiBtn{i}, ,s,$)) 
+C(5,#OiiBtn{i},V,T(3,@OiiBtn{i}, ),T(3,@OiiBtn{i},V))
+C(3,#ApiType{i},0,CALL(#OiiSub,#ApiSno{i},#OiiBtn{i}),$)
+
+##end
+
+#ApiSub=@,1,S
+##loop {times:50,i:1}
+C(3,#ApiSno{i},#it1,T(2,@ApiBtn{i},#it2),$)
+C(5,#ApiBtn{i},V,C(3,#ApiType{i},1,T(3,@OiiBtn{i},V),$),T(3,@OiiBtn{i}, ))
+##end
+
+#OiiSub=@,1,S
+##loop {times:50,i:1}
+C(2,#ApiType{i},$,$,C(5,#ApiBtn{i},V,C(3,#ApiSno{i},#it1,T(2,@OiiBtn{i},#it2),$),$)) 
+##end
+
+
+!-- p9 end
+
+!---------- AP TEXT AREA Variables ----------
+
+![功能選項]
+#FunCode=A,1,S
+C(2,#CHAIN,$,s)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FunCodeFd=X,2,L
+T(3, )
+
+![功能選項說明]
+#FunCodeX=X,4,L
+T(H,#FunCode,#FuncCode2Help)
+C(2,#FunCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+IF(#FunCode==4 || #FunCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FunCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+!顯示框線
+#ShowFrame2=A,1,S
+C(2,#FunCode,T(3,0),T(3,1),T(3,0),T(3,0),T(3,0),T(3,0))
+T(F,@AuthNo,#ShowFrame2)
+
+#ShowFrame=A,1,S
+C(2,#FunCode,T(3,0),T(3,1),T(3,1),T(3,1),T(3,0),T(3,0))
+T(F,@AuthItem,#ShowFrame)
+T(F,@Desc,#ShowFrame)
+T(F,@Status,#ShowFrame)
+T(F,@BranchNo,#ShowFrame)
+T(F,@LevelFg,#ShowFrame)
+
+#AuthNoFd=X,2,L
+C(2,#CHAIN,$,C(3,#FunCode,1,$,S))
+T(3,*)
+
+#AuthItemFd=X,2,L
+C(2,#FunCode,S,$,$,S,S)
+T(3,*)
+
+#DescFd=X,2,L
+T(3, )
+
+#StatusFd=X,2,L
+C(2,#FunCode,S,$,$,S,S)
+T(3,*)
+
+#BranchNoFd=X,2,L
+C(2,#FunCode,S,$,$,S,S)
+T(3,*)
+
+
+!
+			       
+![權限群組]
+#AuthNo=X,6,I
+C(2,#CHAIN,$,C(3,#FunCode,1,$,s))
+@V(7)
+
+#R1=A,1,S
+RESET_RIM(#R1,L6R25)
+S(L6R25,01,#FunCode,#AuthNo,#END)
+R(1,L6R25)
+T(H,@StatusX,#Status,#StatusHelp)
+T(H,@BranchX,#BranchNo,#BrHelp)
+T(H,@LevelFgX,#LevelFg,#LevelHelp)
+
+#R2=A,1,S
+T(3,@ApaBtn0, )
+T(3,@ApbBtn0, )
+T(3,@ApcBtn0, )
+T(3,@ApdBtn0, )
+T(3,@ApeBtn0, )
+T(3,@ApfBtn0, )
+T(3,@ApgBtn0, )
+T(3,@AphBtn0, )
+T(3,@ApiBtn0, )
+CALL(#Ap0Proc)
+CALL(#Ap1ProcA)
+CALL(#Ap1ProcB)
+CALL(#Ap2ProcA)
+CALL(#Ap2ProcB)
+CALL(#Ap3ProcA)
+CALL(#Ap3ProcB)
+CALL(#Ap4ProcA)
+CALL(#Ap4ProcB)
+CALL(#Ap5ProcA)
+CALL(#Ap5ProcB)
+CALL(#Ap6ProcA)
+CALL(#Ap6ProcB)
+CALL(#Ap7ProcA)
+CALL(#Ap7ProcB)
+CALL(#Ap8ProcA)
+CALL(#Ap8ProcB)
+CALL(#Ap9ProcA)
+CALL(#Ap9ProcB)
+
+
+#AuthItem=c,30,I
+C(2,#FunCode,s,$,$,s,s)
+@V(7)
+
+
+#Desc=c,60,I
+C(2,#FunCode,s,$,$,s,s)
+
+!-------------------
+#Status=A,1,I
+C(2,#FunCode,s,$,$,s,s)
+HELP(#StatusHelp)
+@V(H,#StatusHelp)
+
+#StatusX=X,4,L
+T(H,#Status,#StatusHelp)
+
+!使用單位
+
+#BranchNo=X,4,I
+C(2,#FunCode,s,$,$,s,s)
+HELP(#BrHelp)
+@V(H,#BrHelp)
+
+#BranchX=x,30,L
+T(H,#BranchNo,#BrHelp)
+
+#LevelFg=A,1,I
+C(2,#FunCode,s,$,$,s,s)
+HELP(#LevelHelp)
+@V(H,#LevelHelp)
+
+#LevelFgX=X,4,L
+T(H,#LevelFg,#LevelHelp)
+
+
+
+
+</sub>
+
+<sub type="DC" name="p1" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L1.顧客管理作業",],
+["#grid#,{id:1,expand:true,loop:30,row_height:1}","　",
+[[#ApaBtn0,"執行權限"],[#OiaBtn0,"限查詢"],"代號","名稱","類別"],
+[#ApaBtn1,#OiaBtn1,#ApaCode1,#ApaDesc1,#ApaTypeX1]
+],
+]
+
+!------------------
+
+
+
+</sub>
+
+<sub type="DC" name="p2" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L2.業務作業"],
+["#grid#,{id:2,expand:true,loop:90,row_height:1}","　",
+[[#ApbBtn0,"執行權限"],[#OibBtn0,"限查詢"],"代號","名稱","類別"],
+[#ApbBtn1,#OibBtn1,#ApbCode1,#ApbDesc1,#ApbTypeX1]
+],
+]
+
+!------------------
+
+
+</sub>
+
+<sub type="DC" name="p3" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L3.帳務作業"],
+["#grid#,{id:3,expand:true,loop:50,row_height:1}","　",
+[[#ApcBtn0,"執行權限"],[#OicBtn0,"限查詢"],"代號","名稱","類別"],
+[#ApcBtn1,#OicBtn1,#ApcCode1,#ApcDesc1,#ApcTypeX1]
+],
+]
+
+!------------------
+
+
+</sub>
+
+<sub type="DC" name="p4" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L4.批次作業"],
+["#grid#,{id:4,expand:true,loop:100,row_height:1}","　",
+[[#ApdBtn0,"執行權限"],[#OidBtn0,"限查詢"],"代號","名稱","類別"],
+[#ApdBtn1,#OidBtn1,#ApdCode1,#ApdDesc1,#ApdTypeX1]
+],
+]
+
+!------------------
+
+
+</sub>
+
+<sub type="DC" name="p5" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L5.管理性作業"],
+["#grid#,{id:5,expand:true,loop:100,row_height:1}","　",
+[[#ApeBtn0,"執行權限"],[#OieBtn0,"限查詢"],"代號","名稱","類別"],
+[#ApeBtn1,#OieBtn1,#ApeCode1,#ApeDesc1,#ApeTypeX1]
+],
+]
+
+!------------------
+
+
+</sub>
+
+<sub type="DC" name="p6" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L6.共同作業"],
+["#grid#,{id:6,expand:true,loop:110,row_height:1}","　",
+[[#ApfBtn0,"執行權限"],[#OifBtn0,"限查詢"],"代號","名稱","類別"],
+[#ApfBtn1,#OifBtn1,#ApfCode1,#ApfDesc1,#ApfTypeX1]
+],
+]
+
+!------------------
+
+
+</sub>
+
+<sub type="DC" name="p7" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L7.介接外部系統"],
+["#grid#,{id:7,expand:true,loop:20,row_height:1}","　",
+[[#ApgBtn0,"執行權限"],[#OigBtn0,"限查詢"],"代號","名稱","類別"],
+[#ApgBtn1,#OigBtn1,#ApgCode1,#ApgDesc1,#ApgTypeX1]
+],
+]
+
+!------------------
+
+
+</sub>
+
+<sub type="DC" name="p8" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L8.遵循法令作業"],
+["#grid#,{id:8,expand:true,loop:150,row_height:1}","　",
+[[#AphBtn0,"執行權限"],[#OihBtn0,"限查詢"],"代號","名稱","類別"],
+[#AphBtn1,#OihBtn1,#AphCode1,#AphDesc1,#AphTypeX1]
+],
+]
+
+!------------------
+
+
+</sub>
+
+<sub type="DC" name="p9" layout="cols=2;screen.width=[150,850];printer.width=[15,30];order=1;">
+[
+[],
+[#<->#,"L9.報表作業"],
+["#grid#,{id:9,expand:true,loop:50,row_height:1}","　",
+[[#ApiBtn0,"執行權限"],[#OiiBtn0,"限查詢"],"代號","名稱","類別"],
+[#ApiBtn1,#OiiBtn1,#ApiCode1,#ApiDesc1,#ApiTypeX1]
+],
+]
+
+!------------------
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#FunCode#AuthNo#AuthItem#Desc#Status#BranchNo#LevelFg
+##loop {times:30,i:1}
+#ApaCode{i}
+#ApaBtn{i}
+#OiaBtn{i}
+##end
+##loop {times:90,i:1}
+#ApbCode{i}
+#ApbBtn{i}
+#OibBtn{i}
+##end
+##loop {times:50,i:1}
+#ApcCode{i}
+#ApcBtn{i}
+#OicBtn{i}
+##end
+##loop {times:100,i:1}
+#ApdCode{i}
+#ApdBtn{i}
+#OidBtn{i}
+##end
+##loop {times:100,i:1}
+#ApeCode{i}
+#ApeBtn{i}
+#OieBtn{i}
+##end
+##loop {times:110,i:1}
+#ApfCode{i}
+#ApfBtn{i}
+#OifBtn{i}
+##end
+##loop {times:20,i:1}
+#ApgCode{i}
+#ApgBtn{i}
+#OigBtn{i}
+##end
+##loop {times:150,i:1}
+#AphCode{i}
+#AphBtn{i}
+#OihBtn{i}
+##end
+##loop {times:50,i:1}
+#ApiCode{i}
+#ApiBtn{i}
+#OiiBtn{i}
+##end
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L6403^
+
+TXFORM=L6R25
+#AuthItem
+#Desc
+#Status
+#BranchNo
+#LevelFg
+#ApL
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

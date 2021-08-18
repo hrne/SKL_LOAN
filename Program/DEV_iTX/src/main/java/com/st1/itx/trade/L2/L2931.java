@@ -45,7 +45,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2931 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2931.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -116,14 +115,13 @@ public class L2931 extends TradeBuffer {
 		// 撥款
 		iBormNo = parse.stringToInteger(titaVo.getParam("BormNo"));
 		// 查詢方式 0-清償違約明細 1-清償違約明細+部分償還試算 2-清償違約明細+結案試算
-		 iInqKind = this.parse.stringToInteger(titaVo.getParam("InqKind"));
+		iInqKind = this.parse.stringToInteger(titaVo.getParam("InqKind"));
 		// 入帳日期
-		 iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
+		iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
 		// 部分償還本金
-		 iExtraRepay =
-		 this.parse.stringToBigDecimal(titaVo.getParam("TimExtraRepay"));
+		iExtraRepay = this.parse.stringToBigDecimal(titaVo.getParam("TimExtraRepay"));
 		// 是否內含利息(Y/N)
-		 iExtraRepayFlag = titaVo.getParam("IncludeIntFlag");
+		iExtraRepayFlag = titaVo.getParam("IncludeIntFlag");
 
 		ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 
@@ -140,22 +138,21 @@ public class L2931 extends TradeBuffer {
 		for (LoanCloseBreachVo v : oListCloseBreach) {
 			if (v.getCloseBreachAmt().compareTo(BigDecimal.ZERO) > 0) {
 				OccursList occursList = new OccursList();
-				occursList.putParam("OOFacmNo", v.getFacmNo()); //額度	
-				occursList.putParam("OOBormNo", v.getBormNo()); //撥款
-				occursList.putParam("OOAcDate", v.getAcDate()); //會計日期
-				occursList.putParam("OOTitaTxtNo", v.getTitaTxtNo()); //交易序號
-				occursList.putParam("OOTitaTxCd", v.getTitaTxCd()); //交易摘要
-				occursList.putParam("OOEntryDate", v.getEndDate()); //入帳日期
-				occursList.putParam("OOExtraRepay", v.getExtraRepay()); //提前還款金額
-				occursList.putParam("OOCloseBreachAmt", v.getCloseBreachAmt()); //清償違約金
-				occursList.putParam("OOExtraRepayAcc", v.getExtraRepayAcc()); //提前還款金額累計
-				occursList.putParam("OOBreachStartAmt", v.getBreachStartAmt()); //違約起算金額
-				occursList.putParam("OOAmount", v.getAmount()); //計算金額
-				occursList.putParam("OOStartDate", v.getStartDate()); //首撥日期
-				occursList.putParam("OOMonIdx", v.getMonIdx()); //遞減段數
-				occursList.putParam("OOBreachRate", v.getBreachRate()); //計算百分比
-				occursList.putParam("OOBreachGetCode", v.getBreachGetCode()); //清償違約金收取方式 "1":即時收取 "2":領清償證明時收取
-			
+				occursList.putParam("OOFacmNo", v.getFacmNo()); // 額度
+				occursList.putParam("OOBormNo", v.getBormNo()); // 撥款
+				occursList.putParam("OOAcDate", v.getAcDate()); // 會計日期
+				occursList.putParam("OOTitaTxtNo", v.getTitaTxtNo()); // 交易序號
+				occursList.putParam("OOTitaTxCd", v.getTitaTxCd()); // 交易摘要
+				occursList.putParam("OOEntryDate", v.getEndDate()); // 入帳日期
+				occursList.putParam("OOExtraRepay", v.getExtraRepay()); // 提前還款金額
+				occursList.putParam("OOCloseBreachAmt", v.getCloseBreachAmt()); // 清償違約金
+				occursList.putParam("OOExtraRepayAcc", v.getExtraRepayAcc()); // 提前還款金額累計
+				occursList.putParam("OOBreachStartAmt", v.getBreachStartAmt()); // 違約起算金額
+				occursList.putParam("OOAmount", v.getAmount()); // 計算金額
+				occursList.putParam("OOStartDate", v.getStartDate()); // 首撥日期
+				occursList.putParam("OOMonIdx", v.getMonIdx()); // 遞減段數
+				occursList.putParam("OOBreachRate", v.getBreachRate()); // 計算百分比
+				occursList.putParam("OOBreachGetCode", v.getBreachGetCode()); // 清償違約金收取方式 "1":即時收取 "2":領清償證明時收取
 
 				this.info("occursList L2931" + occursList);
 				this.totaVo.addOccursList(occursList);
@@ -215,7 +212,9 @@ public class L2931 extends TradeBuffer {
 					// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
 					wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
 							ln.getSpecificDd(), iEntryDate);
-					if (ln.getPrevPayIntDate() > 0) {
+					if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+						wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
+								ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 						wkTerms = wkTerms - wkPreRepayTermNo;
 					}
 
@@ -242,7 +241,9 @@ public class L2931 extends TradeBuffer {
 		}
 		this.info("ExtraRepay= " + iExtraRepay + "," + wkExtraRepay);
 
-		for (LoanBorMain ln : lLoanBorMain) {
+		for (
+
+		LoanBorMain ln : lLoanBorMain) {
 			if (ln.getStatus() == 0 || ln.getStatus() == 4) {
 				if (iInqKind == 2 || wkExtraRepay.compareTo(BigDecimal.ZERO) >= 0) {
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);

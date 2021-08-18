@@ -66,7 +66,7 @@ public class L1R13 extends TradeBuffer {
 		}
 		String iMsgFg = "0";
 		String iEmailFg = "0";
-		if (iRimFunc == 1) {
+		if (iRimFunc == 1 || iRimFunc == 3) {
 			if (iCustNotice != null) {
 				throw new LogicException(titaVo, "E0005", "該戶號額度已存在於客戶通知設定檔。");
 			}

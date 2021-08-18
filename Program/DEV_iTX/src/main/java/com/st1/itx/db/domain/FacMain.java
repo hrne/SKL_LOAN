@@ -29,7 +29,7 @@ public class FacMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -1603378644037804261L;
+	private static final long serialVersionUID = -25361551668119904L;
 
 @EmbeddedId
   private FacMainId facMainId;
@@ -297,6 +297,15 @@ public class FacMain implements Serializable {
   /* 共用代碼檔00:無01:買賣02:自行還清03:軍功教勞工貸款轉貸04:利率過高轉貸05:增貸不准轉貸06:額度內動支不准轉貸07:內部代償08:借新還舊09:其他10:買回11:綁約期還款 */
   @Column(name = "`AdvanceCloseCode`")
   private int advanceCloseCode = 0;
+
+  // 違約適用方式是否按商品設定
+  /* Y:是N:否 */
+  @Column(name = "`ProdBreachFlag`", length = 1)
+  private String prodBreachFlag;
+
+  // 違約適用說明
+  @Column(name = "`Breach`", length = 100)
+  private String breach;
 
   // 信用評分
   @Column(name = "`CreditScore`")
@@ -1688,6 +1697,46 @@ E: 展期
   }
 
 /**
+	* 違約適用方式是否按商品設定<br>
+	* Y:是
+N:否
+	* @return String
+	*/
+  public String getProdBreachFlag() {
+    return this.prodBreachFlag == null ? "" : this.prodBreachFlag;
+  }
+
+/**
+	* 違約適用方式是否按商品設定<br>
+	* Y:是
+N:否
+  *
+  * @param prodBreachFlag 違約適用方式是否按商品設定
+	*/
+  public void setProdBreachFlag(String prodBreachFlag) {
+    this.prodBreachFlag = prodBreachFlag;
+  }
+
+/**
+	* 違約適用說明<br>
+	* 
+	* @return String
+	*/
+  public String getBreach() {
+    return this.breach == null ? "" : this.breach;
+  }
+
+/**
+	* 違約適用說明<br>
+	* 
+  *
+  * @param breach 違約適用說明
+	*/
+  public void setBreach(String breach) {
+    this.breach = breach;
+  }
+
+/**
 	* 信用評分<br>
 	* 
 	* @return Integer
@@ -2006,8 +2055,9 @@ E: 展期
            + ", incomeTaxFlag=" + incomeTaxFlag + ", compensateFlag=" + compensateFlag + ", irrevocableFlag=" + irrevocableFlag + ", rateAdjNoticeCode=" + rateAdjNoticeCode + ", pieceCode=" + pieceCode + ", repayCode=" + repayCode
            + ", introducer=" + introducer + ", district=" + district + ", fireOfficer=" + fireOfficer + ", estimate=" + estimate + ", creditOfficer=" + creditOfficer + ", loanOfficer=" + loanOfficer
            + ", businessOfficer=" + businessOfficer + ", supervisor=" + supervisor + ", investigateOfficer=" + investigateOfficer + ", estimateReview=" + estimateReview + ", coorgnizer=" + coorgnizer + ", advanceCloseCode=" + advanceCloseCode
-           + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo + ", colSetFlag=" + colSetFlag + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate
-           + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", prodBreachFlag=" + prodBreachFlag + ", breach=" + breach + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo + ", colSetFlag=" + colSetFlag
+           + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo + ", acDate=" + acDate
+           + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

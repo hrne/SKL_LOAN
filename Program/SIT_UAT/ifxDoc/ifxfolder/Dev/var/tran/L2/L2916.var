@@ -1,0 +1,521 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+#Submit=A,1,S
+K(MODIFYBUTTON,查詢)
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2916)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+! 權限檢查
+<include src="COM.icf::BFHEAD2.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[180,820];printer.width=[20,20];">
+[
+["[L2916]                                 不動產土地資料查詢"],
+["#FdClCode1+擔保品代號１",#ClCode1,#ClCode1X],
+["#FdClCode2+擔保品代號２",#ClCode2,#ClCodeX],
+["#FdClNo+擔保品號碼",#ClNo],
+["#FdLandSeq+土地序號",#LandSeq],
+["@",#BTN_1,#BTN_2,#BTN_3,#BTN_4,#BTNExpand],
+["#FdLandLocation+土地座落",#LandLocation],
+["#FdLandCode+地目",#LandCode,#LandCodeX],
+["#FdArea+面積",#Area,"坪"],
+["#FdLandZoningCode+使用區分",#LandZoningCode,#LandZoningCodeX],
+["#FdLandUsageType+使用地類別",#LandUsageType,#LandUsageTypeX],
+["#FdPostedLandValue+公告土地現值",#PostedLandValue,"元"],
+["#FdPostedLandValueYearMonth+公告土地現值年月",#PostedLandValueYearMonth],
+["#FdTransferedYear+移轉年度",#TransferedYear],
+["#FdLastTransferedAmt+前次移轉金額",#LastTransferedAmt,"元"],
+["#FdEvaUnitPrice+鑑價單價+／+坪",#EvaUnitPrice,"元"],
+["#FdLandUsageCode+土地使用別",#LandUsageCode,#LandUsageCodeX],
+["#FdLandRentStartDate+土地租約起日",#LandRentStartDate],
+["#FdLandRentEndDate+土地租約到期日",#LandRentEndDate],
+["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@土地所有權人","","",
+["統編","姓名","與授信戶關係","持份比例"],
+[[#OwnerId1],[#OwnerName1],[[#OwnerRelCode1],[#OwnerRelCodeX1]],[[#OwnerPart1],["/"],[#OwnerTotal1]]]],
+["#grid#,{id:2,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@土地修改原因","","",
+["原因","建立者","建立日期"],
+[[[#Reason1],[#ReasonX1],[#OtherReason1]],[#CreateEmpNo1],[#CreateDate1]]],
+]
+
+#FdClCode1=X,2,L
+T(3,*)
+#FdClCode2=X,2,L
+T(3,*)
+#FdClNo=X,2,L
+T(3,*)
+#FdLandSeq=X,2,L
+#FdLandLocation=X,2,L
+#FdLandCode=X,2,L
+#FdArea=X,2,L
+#FdLandZoningCode=X,2,L
+#FdLandUsageType=X,2,L
+#FdPostedLandValue=X,2,L
+#FdPostedLandValueYearMonth=X,2,L
+#FdTransferedYear=X,2,L
+#FdLastTransferedAmt=X,2,L
+#FdEvaUnitPrice=X,2,L
+#FdLandUsageCode=X,2,L
+#FdLandRentStartDate=X,2,L
+#FdLandRentEndDate=X,2,L
+
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+#BTN_1=X,4,I,ui:button;value:土地座落;enable:1;tabbable:0
+#BTN_2=X,4,I,ui:button;value:土地資料;enable:1;tabbable:0
+#BTN_3=X,4,I,ui:button;value:土地所有權人;enable:1;tabbable:0
+#BTN_4=X,4,I,ui:button;value:土地修改原因;enable:1;tabbable:0
+
+#BIND_1=X,1,S
+BIND(#BTN_1,click, {cmd=CALLSEND;DOCODE=SHOW_1})
+
+#BIND_2=X,1,S
+BIND(#BTN_2,click, {cmd=CALLSEND;DOCODE=SHOW_2})
+
+#BIND_3=X,1,S
+BIND(#BTN_3,click, {cmd=CALLSEND;DOCODE=SHOW_3})
+
+#BIND_4=X,1,S
+BIND(#BTN_4,click, {cmd=CALLSEND;DOCODE=SHOW_4})
+
+#PAGE_FG=A,1,S
+E(0,0)
+
+#SHOW_1=@,1,S
+IF(#PAGE_FG==1,E(0,@PAGE_FG,0),E(0,@PAGE_FG,1))
+CALL(#RESET_PAGES)
+
+#SHOW_2=@,1,S
+IF(#PAGE_FG==2,E(0,@PAGE_FG,0),E(0,@PAGE_FG,2))
+CALL(#RESET_PAGES)
+
+#SHOW_3=@,1,S
+IF(#PAGE_FG==3,E(0,@PAGE_FG,0),E(0,@PAGE_FG,3))
+CALL(#RESET_PAGES)
+
+#SHOW_4=@,1,S
+IF(#PAGE_FG==4,E(0,@PAGE_FG,0),E(0,@PAGE_FG,4))
+CALL(#RESET_PAGES)
+
+#Expand=@,1,S
+IF(#PAGE_FG==5,E(0,@PAGE_FG,0),E(0,@PAGE_FG,5))
+CALL(#RESET_PAGES)
+
+!控制按鈕變色
+#KLIGHT=@,1,S
+C(3,#PAGE_FG,1,K(LIGHT,#BTN_1,TXTRED,0),K(LIGHT,#BTN_1,TXTRED,-1))
+C(3,#PAGE_FG,2,K(LIGHT,#BTN_2,TXTRED,0),K(LIGHT,#BTN_2,TXTRED,-1))
+C(3,#PAGE_FG,3,K(LIGHT,#BTN_3,TXTRED,0),K(LIGHT,#BTN_3,TXTRED,-1))
+C(3,#PAGE_FG,4,K(LIGHT,#BTN_4,TXTRED,0),K(LIGHT,#BTN_4,TXTRED,-1))
+C(3,#PAGE_FG,5,K(LIGHT,#BTNExpand,TXTRED,0),K(LIGHT,#BTNExpand,TXTRED,-1))
+
+#RESET_PAGES=@,1,S
+INVOKEJS(SHOW,p1,6,20,0)
+INVOKEJS(SHOW,grd1,0)
+INVOKEJS(SHOW,grd2,0)
+CALL(#KLIGHT)
+SWITCH(#PAGE_FG,1,INVOKEJS(SHOW,p1,6,6,1),
+                2,INVOKEJS(SHOW,p1,7,18,1),
+                3,INVOKEJS(SHOW,p1,19,19,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd1_3,1),
+                4,INVOKEJS(SHOW,p1,20,20,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd2_3,1),
+                5,INVOKEJS(SHOW,p1,6,20,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd2,1),
+                $)
+!---------- AP TEXT Area Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!ClCode1 擔保品代號1
+#ClCode1Help=x,20,S
+T(3,1:房地;2:土地)
+
+!ClCode2 擔保品代號2
+#CDDEF01=x,20,S
+T(3,CdCode.ClCode21)
+
+#ClCode21Help=x,1024,S
+
+!ClCode2 擔保品代號2
+#CDDEF02=x,30,S
+T(3,CdCode.ClCode22)
+
+#ClCode22Help=x,1024,S
+
+!LandCode 地目
+#CDDEF03=x,30,S
+T(3,CdCode.LandCode)
+
+#LandCodeHelp=x,1024,S
+
+!LandZoningCode 使用區分
+#CDDEF04=x,30,S
+T(3,CdCode.LandZoningCode)
+
+#LandZoningCodeHelp=x,1024,S
+
+!LandUsageType 使用地類別
+#CDDEF05=x,30,S
+T(3,CdCode.LandUsageType)
+
+#LandUsageTypeHelp=x,1024,S
+
+!LandUsageCode 土地使用別
+#CDDEF06=x,30,S
+T(3,CdCode.LandUsageCode)
+
+#LandUsageCodeHelp=x,1024,S
+
+!Reason 土地修改原因-原因
+#CDDEF07=x,20,S
+T(3,CdCode.ModifyReason)
+
+#ReasonHelp=x,1024,S
+
+!RelationCode 土地所有權人-與授信戶關係
+#CDDEF08=x,20,S
+T(3,CdGuarantor)
+
+#RelationCodeHelp=x,3000,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClCode21Help,#HelpDesc1)
+T(2,@ClCode22Help,#HelpDesc2)
+T(2,@LandCodeHelp,#HelpDesc3)
+T(2,@LandZoningCodeHelp,#HelpDesc4)
+T(2,@LandUsageTypeHelp,#HelpDesc5)
+T(2,@LandUsageCodeHelp,#HelpDesc6)
+T(2,@ReasonHelp,#HelpDesc7)
+T(2,@RelationCodeHelp,#HelpDesc8)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2911進入),$)
+CALL(#Init)
+
+#NTXBUF=X,18,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#Init=@,1,S
+K(NOBUTTON,CLOSE)
+E(0,@ClCode1,0)
+E(0,@ClCode2,0)
+E(0,@ClNo,0)
+E(0,@LandSeq,0)
+E(0,@LandCode,0)
+E(0,@Area,0)
+E(0,@LandZoningCode,0)
+E(0,@LandUsageType,0)
+E(0,@PostedLandValue,0)
+E(0,@PostedLandValueYear,0)
+E(0,@PostedLandValueMonth,0)
+T(3,@TransferedYear,)
+E(0,@LastTransferedAmt,0)
+E(0,@EvaUnitPrice,0)
+E(0,@LandUsageCode,0)
+E(0,@LandRentStartDate,0)
+E(0,@LandRentEndDate,0)
+T(3,@OwnerId1,)
+T(3,@OwnerName1,)
+E(0,@OwnerRelCode1,0)
+E(0,@OwnerPart1,0)
+E(0,@OwnerTotal1,0)
+T(3,@Reason1,)
+T(3,@CreateEmpNo1,)
+E(0,@CreateDate1,0)
+##loop{times:10,i:1}
+CALL(#HIDE_ROW_{i})
+HIDE(#OtherReason{i})
+##end
+##loop{times:10,i:1}
+CALL(#HIDE_LAND_{i})
+##end
+
+![代號1]
+#ClCode1=A,1,L
+C(3,#CHAIN,1,T(1,#NTXBUF,1,1),$)
+C(3,#CHAIN,1,s,$)
+HELP(#ClCode1Help)
+@V(H,#ClCode1Help)
+
+#ClCode1X=X,4,L
+T(3,)T(H,#ClCode1,#ClCode1Help)
+
+![代號2]
+#ClCode2Help=x,1024,S
+IF (#ClCode1==1,T(2,#ClCode21Help),
+IF (#ClCode1==2,T(2,#ClCode22Help),))
+
+#ClCode2=A,2,L
+C(3,#CHAIN,1,T(1,#NTXBUF,2,2),$)
+C(3,#CHAIN,1,s,$)
+HELP(#ClCode2Help)
+@V(H,#ClCode2Help)
+
+#ClCode=A,3,S
+T(2,#ClCode1+#ClCode2)
+
+#ClCodeX=X,13,L
+T(3,)T(H,#ClCode2,#ClCode2Help)
+
+![擔保品編號]
+#ClNo=A,7,L
+C(3,#CHAIN,1,T(1,#NTXBUF,4,7),$)
+C(3,#CHAIN,1,s,$)
+@V(2,0)
+
+#LandSeq=A,3,L
+C(3,#CHAIN,1,T(1,#NTXBUF,11,3),$)
+C(3,#CHAIN,1,s,$)
+
+
+!調RIM參數
+#RimClCode1=A,1,S
+#RimClCode2=A,2,S
+#RimClNo=A,7,S
+#RimLandSeq=A,3,S
+
+!RIM取擔保品別
+#RimL2916=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimLandSeq,#LandSeq)
+RESET_RIM(#RimL2916,L2916)
+S(L2916,1,#RimClCode1,#RimClCode2,#RimClNo,#RimLandSeq)
+R(1,L2916)
+
+! [土地座落]
+#LandLocation=c,150,L
+
+! [地目]
+#LandCode=A,2,L
+IF(#PAGE_FG==2,$,CALL(#SHOW_2))
+
+#LandCodeX=X,8,L
+T(3,)T(H,#LandCode,#LandCodeHelp)
+
+! [面積]
+#Area=m,5.2,L
+
+! [使用區分]
+#LandZoningCode=A,2,L
+
+#LandZoningCodeX=X,20,L
+T(3,)T(H,#LandZoningCode,#LandZoningCodeHelp)
+
+! [使用地類別]
+#LandUsageType=A,2,L
+
+#LandUsageTypeX=X,20,L
+T(3,)T(H,#LandUsageType,#LandUsageTypeHelp)
+
+! [公告土地現值]
+#PostedLandValue=m,14,L
+
+! [公告土地現值年月]
+#PostedLandValueYear=A,3,L
+
+#PostedLandValueMonth=A,2,L
+
+#PostedLandValueYearMonth=X,7,L
+T(2,#PostedLandValueYear+/+#PostedLandValueMonth)
+
+! [移轉年度]
+#TransferedYear=X,3,L
+
+! [前次移轉金額]
+#LastTransferedAmt=m,14,L
+
+! [鑑價單價／坪]
+#EvaUnitPrice=m,14,L
+
+! [土地使用別]
+#LandUsageCode=A,2,L
+
+#LandUsageCodeX=X,15,L
+T(3,)T(H,#LandUsageCode,#LandUsageCodeHelp)
+
+! [土地租約起日]
+#LandRentStartDate=D,7,L
+IF(#PAGE_FG==2,$,CALL(#SHOW_2))
+
+! [土地租約到期日]
+#LandRentEndDate=D,7,L
+IF(#PAGE_FG==2,$,CALL(#SHOW_2))
+
+
+#OwnerId0=X,1,S
+T(3,X)
+
+##loop{times:10,i:1,j:0,rowSeq:2}
+
+#HIDE_LAND_{i}=@,1,S
+INVOKEJS(SHOW,grd1_{rowSeq},0)
+#SHOW_LAND_{i}=@,1,S
+INVOKEJS(SHOW,grd1_{rowSeq},1)
+
+! [土地所有權人-統編]
+#OwnerId{i}=X,10,L
+IF(#PAGE_FG==3,$,CALL(#SHOW_3))
+C(4,#OwnerId{i},CALL(#HIDE_LAND_{i}),CALL(#SHOW_LAND_{i}))
+
+! [土地所有權人-姓名]
+#OwnerName{i}=c,30,L
+
+! [土地所有權人-與授信戶關係]
+#OwnerRelCode{i}=X,2,L
+
+#OwnerRelCodeX{i}=X,4,L
+T(3,)T(H,#OwnerRelCode{i},#RelationCodeHelp)
+
+! [土地所有權人-持份比率(分子)]
+#OwnerPart{i}=m,10,L
+
+! [土地所有權人-持份比率(分母)]
+#OwnerTotal{i}=m,10,L
+
+##end
+
+#Reason0=X,1,S
+T(3,X)
+
+##loop{times:10,i:1,j:0,rowSeq:3}
+
+#HIDE_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd2_{rowSeq},0)
+#SHOW_ROW_{i}=@,1,S
+INVOKEJS(SHOW,grd2_{rowSeq},1)
+
+! [土地修改原因-原因]
+#Reason{i}=X,1,L
+IF(#PAGE_FG==4,$,CALL(#SHOW_4))
+C(3,#Reason{i},0,CALL(#HIDE_ROW_{i}),CALL(#SHOW_ROW_{i}))
+
+#ReasonX{i}=X,20,L
+T(3,)T(H,#Reason{i},#ReasonHelp)
+
+#OtherReason{i}=c,60,L
+IF(#Reason{i}==6,SHOW(#OtherReason{i}),HIDE(#OtherReason{i}))
+IF(#Reason{i}==6,$,S)
+
+
+! [土地修改原因-建立者]
+#CreateEmpNo{i}=X,6,L
+
+! [土地修改原因-建立日期]
+#CreateDate{i}=D,7,L
+##end
+
+
+#ShowAll=X,1,S
+ENABLE(#BTNExpand)
+E(0,@PAGE_FG,5)
+CALL(#RESET_PAGES)
+
+!---- Expand 展開
+#BINDExpand=X,1,S
+BIND(#BTNExpand,click, {cmd=CALLSEND;DOCODE=Expand})
+
+#BTNExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:1
+
+#RPTFG=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2916 ----------
+<sub type="FORM" name="L2916">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2916,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2916] 不動產土地資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#ClCode1
+#ClCode2
+#ClNo
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2916
+#LandLocation
+#LandCode
+#Area
+#LandZoningCode
+#LandUsageType
+#PostedLandValue
+#PostedLandValueYear
+#PostedLandValueMonth
+#TransferedYear
+#LastTransferedAmt
+#EvaUnitPrice
+#LandUsageCode
+#LandRentStartDate
+#LandRentEndDate
+##loop{times:10,i:1}
+#OwnerId{i}
+#OwnerName{i}
+#OwnerRelCode{i}
+#OwnerPart{i}
+#OwnerTotal{i}
+#Reason{i}
+#OtherReason{i}
+#CreateEmpNo{i}
+#CreateDate{i}
+##end
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

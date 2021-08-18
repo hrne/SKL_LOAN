@@ -13,6 +13,7 @@ import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -40,14 +41,21 @@ import com.st1.itx.tradeService.CommBuffer;
 @Scope("prototype")
 public class MailService extends CommBuffer {
 	@Value("${mailHost}")
-	private String mailHost = "";
+	private String mailHost = "smtp.office365.com";
 
 	@Value("${mailPort}")
-	private String mailPort = "";
+	private String mailPort = "587";
+
+	@Value("${mailAcc}")
+	private String username = "systemOne86995619@outlook.com"; // like yourname@outlook.com
+
+	@Value("${mailPWD}")
+	private final String password = "86995619@st1"; // password here
 
 	private String mailServer = "";
 
-	private String from = "";
+	@Value("${mailAcc}")
+	private String from = "systemOne86995619@outlook.com";
 
 	private String to = "";
 
@@ -84,20 +92,39 @@ public class MailService extends CommBuffer {
 		this.properties.setProperty("mail.smtp.host", this.mailHost);
 		this.properties.setProperty("mail.smtp.port", this.mailPort);
 
-//		this.properties.put("mail.smtp.auth", "true");// 需要驗證帳號密碼
+		this.properties.put("mail.smtp.auth", "true");// 需要驗證帳號密碼
 		// SSL authentication
-		this.properties.put("mail.smtp.ssl.enable", "true");
+//		this.properties.put("mail.smtp.ssl.enable", "true");
 		this.properties.put("mail.smtp.starttls.enable", "true");
 
 		properties.setProperty(mailServer, mailHost);
-//		this.session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
-//			protected PasswordAuthentication getPasswordAuthentication() {
-//				return new PasswordAuthentication("Acc", "Pwd");
-//			}
-//		});
-
-		this.session = Session.getDefaultInstance(properties);
+		this.session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
+			protected PasswordAuthentication getPasswordAuthentication() {
+				return new PasswordAuthentication(username, password);
+			}
+		});
+		this.session.setDebug(true);
+//		this.session = Session.getDefaultInstance(properties);
 		this.message = new MimeMessage(this.session);
+	}
+
+	/**
+	 * 
+	 * @param to       Rev Mail Address
+	 * @param subject  subject Text
+	 * @param bodyText body Text
+	 * @throws LogicException when params is null
+	 */
+	public void setParams(String to, String subject, String bodyText) throws LogicException {
+		if (from == null || to == null || subject == null || bodyText == null)
+			throw new LogicException("CE000", "Send Mail Missing parameters..Main");
+
+		this.from = "SKL<" + from + ">";
+		this.to = to;
+		this.subject = subject;
+		this.bodyText = bodyText;
+		this.toList = this.to.split(";");
+		this.ccList = this.cc.split(";");
 	}
 
 	/**
@@ -142,7 +169,7 @@ public class MailService extends CommBuffer {
 		this.attachedPathList = this.attachedPath.trim().split(";");
 	}
 
-	public void send() throws LogicException {
+	private void send() throws LogicException {
 		try {
 			this.message.setFrom(new InternetAddress(from));
 
@@ -186,8 +213,7 @@ public class MailService extends CommBuffer {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
-
-			throw new LogicException("CE000", "Send Mail Fail..");
+//			throw new LogicException("CE000", "Send Mail Fail..");
 		}
 	}
 

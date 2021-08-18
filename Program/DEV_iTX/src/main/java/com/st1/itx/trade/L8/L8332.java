@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
@@ -51,7 +50,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8332 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8332.class);
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ570Service sJcicZ570Service;
@@ -115,12 +113,6 @@ public class L8332 extends TradeBuffer {
 		case "1":
 			//檢核是否重複，並寫入JcicZ570
 			chJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
-			this.info("findById========="+iJcicZ570Id);
-			this.info("iKey========="+iKey);
-			this.info("iApplyDate========="+iApplyDate);
-			this.info("iTranKey========="+iJcicZ570Id);
-			this.info("iSubmitKey========="+iSubmitKey);
-			this.info("iCustId========="+iCustId);
 			if (chJcicZ570!=null) {
 				throw new LogicException("E0005", "已有相同資料");
 			}
@@ -280,6 +272,7 @@ public class L8332 extends TradeBuffer {
 		default:
 			break;
 		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

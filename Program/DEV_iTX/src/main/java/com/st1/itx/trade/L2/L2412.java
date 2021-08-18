@@ -15,15 +15,23 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClFac;
+import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClMovables;
 import com.st1.itx.db.domain.ClMovablesId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacCaseAppl;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClMovablesService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacCaseApplService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.ClFacCom;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
@@ -100,7 +108,13 @@ public class L2412 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService sCustMainService;
-
+	
+	@Autowired
+	public ClFacService sClFacService;
+	@Autowired
+	public FacMainService sFacMainService;
+	@Autowired
+	public FacCaseApplService sFacCaseApplService;
 	@Autowired
 	public DataLog dataLog;
 
@@ -108,6 +122,9 @@ public class L2412 extends TradeBuffer {
 	@Autowired
 	GSeqCom gGSeqCom;
 
+	@Autowired
+	public ClFacCom clFacCom;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -120,6 +137,8 @@ public class L2412 extends TradeBuffer {
 	private int iClCode1;
 	private int iClCode2;
 	private int iClNo;
+	// 核准號碼
+	private int iApplNo;
 	private String iCustId;
 	private int iCustNo;
 	private ClMainId clMainId = new ClMainId();
@@ -147,7 +166,7 @@ public class L2412 extends TradeBuffer {
 		iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
-
+		iApplNo = parse.stringToInteger(titaVo.getParam("ApplNo"));
 		// 統編
 		iCustId = titaVo.getParam("CustId");
 		// 戶號
@@ -188,14 +207,14 @@ public class L2412 extends TradeBuffer {
 			if (iFunCd == 1) {
 
 				// 依照使用者輸入之統編或戶號取得客戶識別碼
-				if (!iCustId.isEmpty()) {
-					tCustMain = sCustMainService.custIdFirst(iCustId);
-				} else if (iCustNo > 0) {
-					tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
-				} else {
+//				if (!iCustId.isEmpty()) {
+//					tCustMain = sCustMainService.custIdFirst(iCustId);
+//				} else if (iCustNo > 0) {
+//					tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
+//				} else {
 					// 查無客戶資料
-					throw new LogicException("E1001", "L2412");
-				}
+//					throw new LogicException("E1001", "L2412");
+//				}
 				// 取客戶識別碼
 				custUKey = tCustMain.getCustUKey();
 
@@ -217,7 +236,7 @@ public class L2412 extends TradeBuffer {
 				clMainId.setClNo(iClNo);
 				tClMain = new ClMain();
 				// 搬值
-				tClMain.setCustUKey(custUKey);
+//				tClMain.setCustUKey(custUKey);
 				setClMain(titaVo);
 				// 塞pk
 				clMovablesId.setClCode1(iClCode1);
@@ -237,6 +256,60 @@ public class L2412 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0005", "擔保品動產檔");
 				}
+				
+				
+				// 依核准號碼建立一筆額度與擔保品關聯檔
+				if( iApplNo > 0 ) { // 核准編號大於0才去做
+				  ClFacId clFacId = new ClFacId();
+				  clFacId.setClCode1(iClCode1);
+				  clFacId.setClCode2(iClCode2);
+				  clFacId.setClNo(iClNo);
+				  clFacId.setApproveNo(iApplNo);
+				  ClFac tClFac = sClFacService.findById(clFacId, titaVo);
+
+				  FacCaseAppl tFacCaseAppl = sFacCaseApplService.findById(iApplNo, titaVo);
+				  if (tFacCaseAppl == null) {
+					throw new LogicException("E2019", "申請號碼 = " + iApplNo); // 此申請號碼不存在案件申請檔
+				  }
+				  FacMain tFacMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
+				  if (tFacMain == null) {
+					tFacMain = new FacMain();
+				  }
+
+				  // 新增資料重複
+				  if (tClFac != null) {
+					throw new LogicException("E0005", "額度與擔保品關聯檔"); // 新增資料時，發生錯誤
+				  } else {
+					tClFac = new ClFac();
+					clFacId = new ClFacId();
+					clFacId.setClCode1(iClCode1);
+					clFacId.setClCode2(iClCode2);
+					clFacId.setClNo(iClNo);
+					clFacId.setApproveNo(iApplNo);
+					tClFac.setApproveNo(iApplNo);
+					tClFac.setClCode1(iClCode1);
+					tClFac.setClCode2(iClCode2);
+					tClFac.setClNo(iClNo);
+					tClFac.setClFacId(clFacId);
+					tClFac.setCustNo(tFacMain.getCustNo());
+					tClFac.setFacmNo(tFacMain.getFacmNo());
+					tClFac.setMainFlag("Y");
+					tClFac.setShareAmt(BigDecimal.ZERO);
+					tClFac.setFacShareFlag(0);
+					tClFac.setOriSettingAmt(parse.stringToBigDecimal(titaVo.getParam("SettingAmt")));
+
+					// insert
+					try {
+						sClFacService.insert(tClFac, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0005", "額度與擔保品關聯檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
+					}
+
+					// 額度與擔保品關聯檔變動處理
+					clFacCom.changeClFac(iApplNo, titaVo);
+				  }
+				} // if
+				
 			} else if (iFunCd == 2) {
 				throw new LogicException("E0003", "擔保品主檔");
 			} else if (iFunCd == 4) {
@@ -393,7 +466,7 @@ public class L2412 extends TradeBuffer {
 		tClMain.setClCode1(iClCode1);
 		tClMain.setClCode2(iClCode2);
 		tClMain.setClNo(iClNo);
-		tClMain.setCustUKey(custUKey);
+//		tClMain.setCustUKey(custUKey);
 		tClMain.setClTypeCode(titaVo.getParam("ClTypeCode"));
 		tClMain.setCityCode(titaVo.getParam("CityCode"));/* 地區別 */
 		tClMain.setClStatus(titaVo.getParam("ClStatus"));

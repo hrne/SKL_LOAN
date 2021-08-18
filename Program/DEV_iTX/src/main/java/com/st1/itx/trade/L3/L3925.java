@@ -53,7 +53,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3925")
 @Scope("prototype")
 public class L3925 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3925.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -136,8 +135,7 @@ public class L3925 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 400; // 183 + 138 * 400 = 55383
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -243,11 +241,8 @@ public class L3925 extends TradeBuffer {
 			oExtraRepay = oExtraRepay.add(loanCalcRepayIntCom.getExtraAmt());
 			wkTotalAmt = oPrincipal.add(oInterest).add(oDelayInt).add(oBreachAmt).add(oCloseBreachAmt);
 			oLeftTerms = oLeftTerms + ln.getTotalPeriod() - loanCalcRepayIntCom.getPaidTerms();
-			oNewDueAmt = loanDueAmtCom.getDueAmt(ln.getLoanBal().subtract(oPrincipal),
-					loanCalcRepayIntCom.getStoreRate(), ln.getAmortizedCode(), ln.getFreqBase(),
-					(loanCalcRepayIntCom.getPaidTerms() > ln.getGracePeriod()
-							? ln.getTotalPeriod() - loanCalcRepayIntCom.getPaidTerms()
-							: ln.getTotalPeriod() - ln.getGracePeriod()),
+			oNewDueAmt = loanDueAmtCom.getDueAmt(ln.getLoanBal().subtract(oPrincipal), loanCalcRepayIntCom.getStoreRate(), ln.getAmortizedCode(), ln.getFreqBase(),
+					(loanCalcRepayIntCom.getPaidTerms() > ln.getGracePeriod() ? ln.getTotalPeriod() - loanCalcRepayIntCom.getPaidTerms() : ln.getTotalPeriod() - ln.getGracePeriod()),
 					ln.getGracePeriod(), ln.getPayIntFreq(), ln.getFinalBal(), titaVo);
 			wkLoanBal = ln.getLoanBal();
 			this.info(" xx BormNo = " + ln.getBormNo());
@@ -291,20 +286,16 @@ public class L3925 extends TradeBuffer {
 				continue;
 			}
 			if (ln.getPrevPayIntDate() >= iEntryDate || ln.getDrawdownDate() == iEntryDate) {
-				this.info(" skip Borm = " + ln.getFacmNo() + "-" + ln.getBormNo() + ", PrevPayIntDate="
-						+ ln.getPrevPayIntDate());
+				this.info(" skip Borm = " + ln.getFacmNo() + "-" + ln.getBormNo() + ", PrevPayIntDate=" + ln.getPrevPayIntDate());
 				continue;
 			}
 			// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
-			wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-					ln.getSpecificDd(), iEntryDate);
-			if (ln.getPrevPayIntDate() > 0) {
-				wkTerms = wkTerms - loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-						ln.getSpecificDd(), ln.getPrevPayIntDate());
+			wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
+			if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+				wkTerms = wkTerms - loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 			}
 			if (wkTerms == 0) {
-				this.info(" wkTerms = 0, Borm = " + ln.getFacmNo() + "-" + ln.getBormNo() + ", NextPayIntDate="
-						+ ln.getNextPayIntDate());
+				this.info(" wkTerms = 0, Borm = " + ln.getFacmNo() + "-" + ln.getBormNo() + ", NextPayIntDate=" + ln.getNextPayIntDate());
 			} else {
 				// setCalculate
 				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);

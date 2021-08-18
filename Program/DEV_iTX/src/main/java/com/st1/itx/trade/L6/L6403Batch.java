@@ -31,7 +31,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L6403Batch extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6403Batch.class);
 
 	/* DB服務注入 */
 
@@ -195,7 +194,7 @@ public class L6403Batch extends TradeBuffer {
 			}
 		}
 		// L8
-		for (int i = 1; i <= 100; i++) {
+		for (int i = 1; i <= 150; i++) {
 			String iTranNo = titaVo.get("AphCode" + i).trim();
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {

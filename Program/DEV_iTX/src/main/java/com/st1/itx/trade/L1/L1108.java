@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1108 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1108.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -83,9 +82,9 @@ public class L1108 extends TradeBuffer {
 			}
 		}
 
-		if (funcd.equals("1")) {
+		if (funcd.equals("1") || funcd.equals("3")) {
 			for (int i = 1; i <= 40; i++) {
-				if (titaVo.getParam("FormNo"+i).equals("")) {
+				if (titaVo.getParam("FormNo" + i).equals("")) {
 					continue;
 				}
 				String VarPaper = "N";
@@ -95,7 +94,7 @@ public class L1108 extends TradeBuffer {
 				// FormNo報表代號
 				iFormNo = titaVo.getParam("FormNo" + i);
 				this.info("iFormNo" + i + " = " + iFormNo);
-				if(!iFormNo.equals("")) {
+				if (!iFormNo.equals("")) {
 					if ("".equals(titaVo.getParam("Paper" + i))) {
 						VarPaper = "Y";
 					}
@@ -105,32 +104,32 @@ public class L1108 extends TradeBuffer {
 					if ("".equals(titaVo.getParam("EMail" + i))) {
 						VarEMail = "Y";
 					}
-	
+
 					int ApplyDt = parse.stringToInteger(titaVo.getParam("ApplyDt"));
-	
+
 					CustNotice tCustNotice = new CustNotice();
 					CustNoticeId tCustNoticePK = new CustNoticeId();
-	
+
 					tCustNoticePK.setCustNo(iCustNo);
 					tCustNoticePK.setFacmNo(iFacmNo);
 					tCustNoticePK.setFormNo(iFormNo);
 					this.info("i = " + i);
 					this.info("tCustNoticePK = " + tCustNoticePK);
-	
+
 					tCustNotice.setCustNoticeId(tCustNoticePK);
-	
+
 					tCustNotice.setCustNo(iCustNo);
 					tCustNotice.setFacmNo(iFacmNo);
 					tCustNotice.setFormNo(iFormNo);
-	
+
 					tCustNotice.setPaperNotice(VarPaper);
 					tCustNotice.setMsgNotice(VarMsg);
 					tCustNotice.setEmailNotice(VarEMail);
 					tCustNotice.setApplyDate(ApplyDt);
 					this.info("tCustNotice = " + tCustNotice);
-	
+
 					try {
-						sCustNoticeService.insert(tCustNotice,titaVo);
+						sCustNoticeService.insert(tCustNotice, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0005", "客戶通知設定檔");
 					}
@@ -138,7 +137,7 @@ public class L1108 extends TradeBuffer {
 			}
 		} else if (funcd.equals("2")) {
 			for (int i = 1; i <= 40; i++) {
-				if (titaVo.getParam("FormNo"+i).equals("")) {
+				if (titaVo.getParam("FormNo" + i).equals("")) {
 					continue;
 				}
 				String VarPaper = "N";
@@ -168,11 +167,11 @@ public class L1108 extends TradeBuffer {
 				tCustNoticePK.setFormNo(iFormNo);
 
 				tCustNotice = sCustNoticeService.holdById(tCustNoticePK);
-				//維護時的新資料改為新增
-				if(tCustNotice == null) {
+				// 維護時的新資料改為新增
+				if (tCustNotice == null) {
 					CustNotice xCustNotice = new CustNotice();
 					CustNoticeId xCustNoticePK = new CustNoticeId();
-	
+
 					xCustNoticePK.setCustNo(iCustNo);
 					xCustNoticePK.setFacmNo(iFacmNo);
 					xCustNoticePK.setFormNo(iFormNo);
@@ -183,26 +182,26 @@ public class L1108 extends TradeBuffer {
 					xCustNotice.setMsgNotice(VarMsg);
 					xCustNotice.setEmailNotice(VarEMail);
 					xCustNotice.setApplyDate(ApplyDt);
-	
+
 					try {
-						sCustNoticeService.insert(xCustNotice,titaVo);
+						sCustNoticeService.insert(xCustNotice, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0005", "客戶通知設定檔");
 					}
-				}else {
-				// 變更前
+				} else {
+					// 變更前
 					CustNotice beforeCustNotice = (CustNotice) dataLog.clone(tCustNotice);
 					tCustNotice.setPaperNotice(VarPaper);
 					tCustNotice.setMsgNotice(VarMsg);
 					tCustNotice.setEmailNotice(VarEMail);
 					tCustNotice.setApplyDate(ApplyDt);
-	
+
 					try {
-						tCustNotice = sCustNoticeService.update2(tCustNotice,titaVo);
+						tCustNotice = sCustNoticeService.update2(tCustNotice, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0007", "客戶通知設定檔");
 					}
-	
+
 					// 紀錄變更前變更後
 					dataLog.setEnv(titaVo, beforeCustNotice, tCustNotice);
 					dataLog.exec();
