@@ -139,14 +139,10 @@ public class L2412 extends TradeBuffer {
 	private int iClNo;
 	// 核准號碼
 	private int iApplNo;
-	private String iCustId;
-	private int iCustNo;
 	private ClMainId clMainId = new ClMainId();
 	private ClMovablesId clMovablesId = new ClMovablesId();
-	private CustMain tCustMain = new CustMain();
 	private ClMain tClMain;
 	private ClMovables tClMovables;
-	private String custUKey = "";
 	private String finalClNo;
 
 	private boolean isEloan = false;
@@ -167,10 +163,6 @@ public class L2412 extends TradeBuffer {
 		iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		iApplNo = parse.stringToInteger(titaVo.getParam("ApplNo"));
-		// 統編
-		iCustId = titaVo.getParam("CustId");
-		// 戶號
-		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 
 		finalClNo = StringUtils.leftPad(String.valueOf(iClNo), 7, "0");
 
@@ -215,8 +207,7 @@ public class L2412 extends TradeBuffer {
 					// 查無客戶資料
 //					throw new LogicException("E1001", "L2412");
 //				}
-				// 取客戶識別碼
-				custUKey = tCustMain.getCustUKey();
+
 
 				this.info("新增時取號");
 

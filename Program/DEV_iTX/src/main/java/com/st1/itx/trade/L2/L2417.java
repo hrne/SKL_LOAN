@@ -2,8 +2,11 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -31,6 +34,9 @@ import com.st1.itx.db.service.ClOtherService;
 import com.st1.itx.db.service.ClStockService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.domain.ClOwnerRelation;
+import com.st1.itx.db.domain.ClOwnerRelationId;
+import com.st1.itx.db.service.ClOwnerRelationService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.ClFacCom;
 import com.st1.itx.util.data.DataLog;
@@ -55,7 +61,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2417 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2417.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -69,6 +74,9 @@ public class L2417 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClMainService sClMainService;
+
+	@Autowired
+	public ClOwnerRelationService sClOwnerRelationService;
 
 	@Autowired
 	public DataLog dataLog;
@@ -95,6 +103,12 @@ public class L2417 extends TradeBuffer {
 
 	private boolean isEloan = false;
 
+	int iFunCd;
+	int iClCode1;
+	int iClCode2;
+	int iClNo;
+	int iApplNo;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2417 ");
@@ -114,11 +128,11 @@ public class L2417 extends TradeBuffer {
 		}
 
 		// tita
-		int iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
-		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
-		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
-		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
-		int iApproveNo = parse.stringToInteger(titaVo.getParam("ApproveNo"));
+		iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
+		iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
+		iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
+		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
+		iApplNo = parse.stringToInteger(titaVo.getParam("ApproveNo"));
 
 		// 檢查該擔保品編號是否存在擔保品主檔
 		ClMain tClMain = new ClMain();
@@ -140,7 +154,7 @@ public class L2417 extends TradeBuffer {
 		clFacId.setClCode1(iClCode1);
 		clFacId.setClCode2(iClCode2);
 		clFacId.setClNo(iClNo);
-		clFacId.setApproveNo(iApproveNo);
+		clFacId.setApproveNo(iApplNo);
 		ClFac tClFac = new ClFac();
 
 		// eloan 唯一性
@@ -157,7 +171,7 @@ public class L2417 extends TradeBuffer {
 
 			FacCaseAppl tFacCaseAppl = new FacCaseAppl();
 			// 查該核准號碼是否存在案件申請檔
-			tFacCaseAppl = sFacCaseApplService.findById(iApproveNo, titaVo);
+			tFacCaseAppl = sFacCaseApplService.findById(iApplNo, titaVo);
 
 			// 該核准號碼不存在案件申請檔 拋錯
 			if (tFacCaseAppl == null) {
@@ -182,7 +196,7 @@ public class L2417 extends TradeBuffer {
 				tClFac.setClCode1(iClCode1);
 				tClFac.setClCode2(iClCode2);
 				tClFac.setClNo(iClNo);
-				tClFac.setApproveNo(iApproveNo);
+				tClFac.setApproveNo(iApplNo);
 				tClFac.setMainFlag("Y");
 				BigDecimal settingAmt = BigDecimal.ZERO;
 				// 依據擔保品代號1查不同Table
@@ -245,6 +259,8 @@ public class L2417 extends TradeBuffer {
 				}
 			}
 
+			insertClOwnerRelation(titaVo);
+			
 		} else if (iFunCd == 2) {// FunCd = 2 修改
 
 			// hold住資料
@@ -254,6 +270,9 @@ public class L2417 extends TradeBuffer {
 				throw new LogicException("E2003", "擔保品與額度關聯檔");
 			}
 
+			deleteClOwnerRelation(titaVo);
+			insertClOwnerRelation(titaVo);
+			
 		} else if (iFunCd == 4) {// FunCd = 4 刪除
 
 			tClFac = sClFacService.holdById(clFacId, titaVo);
@@ -266,15 +285,54 @@ public class L2417 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0008", "擔保品與額度關聯檔");// 刪除資料時，發生錯誤
 			}
+			
+			deleteClOwnerRelation(titaVo);
 		}
 
 		this.info("L2417 check MainFg ...");
 
 		// 額度與擔保品關聯檔變動處理
-		clFacCom.changeClFac(iApproveNo, titaVo);
+		clFacCom.changeClFac(iApplNo, titaVo);
 
 		// end
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void deleteClOwnerRelation(TitaVo titaVo) throws LogicException {
+
+		Slice<ClOwnerRelation> slClOwnerRelation = sClOwnerRelationService.ApplNoAll(iClCode1, iClCode2, iClNo, iApplNo, 0, Integer.MAX_VALUE, titaVo);
+		List<ClOwnerRelation> lClOwnerRelation = slClOwnerRelation == null ? null : slClOwnerRelation.getContent();
+		if (lClOwnerRelation != null && lClOwnerRelation.size() > 0) {
+			try {
+				sClOwnerRelationService.deleteAll(lClOwnerRelation, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0008", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+			}
+		}
+	}
+
+	private void insertClOwnerRelation(TitaVo titaVo) throws LogicException {
+		for (int i = 1; i <= 20; i++) {
+			String custUKey = titaVo.getParam("OwnerCustUKey" + i).trim();
+			String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
+			if (!"".equals(custUKey)) {
+				ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
+				clOwnerRelationId.setClCode1(iClCode1);
+				clOwnerRelationId.setClCode2(iClCode2);
+				clOwnerRelationId.setClNo(iClNo);
+				clOwnerRelationId.setApplNo(iApplNo);
+				clOwnerRelationId.setOwnerCustUKey(custUKey);
+				ClOwnerRelation clOwnerRelation = new ClOwnerRelation();
+				clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
+				clOwnerRelation.setOwnerRelCode(relCode);
+				try {
+					sClOwnerRelationService.insert(clOwnerRelation, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+				}
+			}
+			
+		}
 	}
 }

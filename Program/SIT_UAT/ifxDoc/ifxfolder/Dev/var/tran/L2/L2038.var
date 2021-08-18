@@ -719,7 +719,7 @@ X(#OOShareTotal)
 T(H,#OOOther,#StockCodeHelp)
 
 #OOStock=x,4,L
-IF(#OOClCode1 == 3,$,S)
+IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
 T(1,#OOOther,1,4)
 
 #OOOther1=x,100,L
@@ -731,7 +731,7 @@ IF(#OOClCode1 == 2,$,S)
 T(2,#OOOther)
 
 #OOOther3=x,110,L
-IF(#OOClCode1 == 3,$,S)
+IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
 T(2,#OOStock+#OOStockCodeX)
 
 #OOFlag=X,1,S
@@ -1060,6 +1060,15 @@ TXFORM=L2038
 
 #RPTFG=4,QUERY.GRID,L2038
 #any={detail:true, header:'L2038.part', caption:'', width:1100, rowNum:20, rowList:[20,40,60]}
+
+#OO_BTN1_COL=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+#OO_BTN2_COL=刪除
+{width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
+#OO_BTN3_COL=查詢
+{width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OO_BTN4_COL=額度關聯
+{width:70,search:false,formatter:'cust:bind-button:額度關聯',align:'center',canExport:false}
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}

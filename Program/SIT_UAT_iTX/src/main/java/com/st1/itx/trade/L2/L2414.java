@@ -108,15 +108,12 @@ public class L2414 extends TradeBuffer {
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
-		String iCustId = titaVo.getParam("CustId").trim();
-		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		iApplNo = parse.stringToInteger(titaVo.getParam("ApplNo"));
 		// new table PK
 		ClMainId tClMainId = new ClMainId();
 		ClOtherId tClOtherId = new ClOtherId();
 
 		// new table 裝tita
-		CustMain tCustMain = new CustMain();
 		ClMain tClMain = new ClMain();
 		ClOther tClOther = new ClOther();
 
@@ -130,8 +127,6 @@ public class L2414 extends TradeBuffer {
 		tClOtherId.setClCode2(iClCode2);
 		tClOtherId.setClNo(iClNo);
 
-		// 宣告
-		String custUKey = "";
 		String showNewClNo = "";
 
 		if (isEloan && iFunCd == 1) {
@@ -167,7 +162,6 @@ public class L2414 extends TradeBuffer {
 //				}
 //			}
 
-			custUKey = tCustMain.getCustUKey();
 
 			// 取號使用參數
 			String Colind4s = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
@@ -460,10 +454,6 @@ public class L2414 extends TradeBuffer {
 			/* 刪除 */
 
 			tClOther = sClOtherService.holdById(tClOtherId);
-
-			if (tClMain == null) {
-				throw new LogicException("E0006", "擔保品主檔");
-			}
 
 			// holde table修改
 			tClOther = sClOtherService.holdById(tClOtherId);

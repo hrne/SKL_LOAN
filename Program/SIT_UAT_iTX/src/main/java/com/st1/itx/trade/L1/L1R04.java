@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -30,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1R04 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1R04.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -68,9 +65,9 @@ public class L1R04 extends TradeBuffer {
 		int iCustNo = Integer.valueOf(titaVo.getParam("RimCustNo"));
 		int iFacmNo = Integer.valueOf(titaVo.getParam("RimFacmNo"));
 		Slice<CustNotice> iCustNotice = null;
-		
+
 		iCustNotice = sCustNoticeService.facmNoEq(iCustNo, iFacmNo, iFacmNo, this.index, this.limit, titaVo);
-		
+
 		Slice<CdReport> slCdReport1;
 		Slice<CdReport> slCdReport2;
 		ArrayList<CdReport> lCdReport1 = new ArrayList<CdReport>();
@@ -85,17 +82,17 @@ public class L1R04 extends TradeBuffer {
 				lCdReport2.add(tmpCdReport1);
 			}
 		}
-		for (CdReport xCdReport:lCdReport2) {
-			if(xCdReport.getSendCode()!=0) {
+		for (CdReport xCdReport : lCdReport2) {
+			if (xCdReport.getSendCode() != 0) {
 				cdFormNo.add(xCdReport.getFormNo());
 			}
 		}
-		this.info("全部的報表代號="+cdFormNo.toString());
+		this.info("全部的報表代號=" + cdFormNo.toString());
 		int j = 1;
 		this.totaVo.putParam("L1r04ApplyDt", iCustNotice.getContent().get(0).getApplyDate());
-		//回傳舊有資料
-		for (CustNotice sCustNotice :iCustNotice) {
-			if(j==41) {
+		// 回傳舊有資料
+		for (CustNotice sCustNotice : iCustNotice) {
+			if (j == 41) {
 				break;
 			}
 			CdReport iCdReport = new CdReport();
@@ -104,54 +101,57 @@ public class L1R04 extends TradeBuffer {
 			if (iCdReport == null) {
 				continue;
 			}
-			if(iCdReport.getSendCode()== 0) {
+			if (iCdReport.getSendCode() == 0) {
 				continue;
 			}
-			if(cdFormNo.contains(iFormNo)) {
+			if (cdFormNo.contains(iFormNo)) {
 				cdFormNo.remove(iFormNo);
 			}
-			
+
 			this.totaVo.putParam("L1r04FormNo" + j, iFormNo);
 			this.totaVo.putParam("L1r04FormName" + j, iCdReport.getFormName());
+			this.totaVo.putParam("L1r04SendCode" + j, iCdReport.getSendCode());
 			this.totaVo.putParam("L1r04Paper" + j, "Y");
 			this.totaVo.putParam("L1r04Msg" + j, "Y");
 			this.totaVo.putParam("L1r04EMail" + j, "Y");
-			if(!sCustNotice.getPaperNotice().equals("N")) {
+			if (!sCustNotice.getPaperNotice().equals("N")) {
 				this.totaVo.putParam("L1r04Paper" + j, " ");
 			}
-			if(!sCustNotice.getMsgNotice().equals("N")) {
+			if (!sCustNotice.getMsgNotice().equals("N")) {
 				this.totaVo.putParam("L1r04Msg" + j, " ");
 			}
-			if(!sCustNotice.getEmailNotice().equals("N")) {
+			if (!sCustNotice.getEmailNotice().equals("N")) {
 				this.totaVo.putParam("L1r04EMail" + j, " ");
 			}
-			j ++ ;
+			j++;
 		}
-		//回傳新符合報表
+		// 回傳新符合報表
 		if (cdFormNo != null) {
-			this.info("新符合報表="+cdFormNo.toString());
-			for (String rFormNo:cdFormNo) {
-				if(j==41) {
+			this.info("新符合報表=" + cdFormNo.toString());
+			for (String rFormNo : cdFormNo) {
+				if (j == 41) {
 					break;
 				}
 				CdReport cCdReport = new CdReport();
 				cCdReport = sCdReportService.findById(rFormNo, titaVo);
 				this.totaVo.putParam("L1r04FormNo" + j, rFormNo);
 				this.totaVo.putParam("L1r04FormName" + j, cCdReport.getFormName());
+				this.totaVo.putParam("L1r04SendCode" + j, cCdReport.getSendCode());
 				this.totaVo.putParam("L1r04Paper" + j, " ");
 				this.totaVo.putParam("L1r04Msg" + j, " ");
 				this.totaVo.putParam("L1r04EMail" + j, " ");
-				j ++ ;
+				j++;
 			}
 		}
-		//回傳報表
-		while(j<=40) {
+		// 回傳報表
+		while (j <= 40) {
 			this.totaVo.putParam("L1r04FormNo" + j, " ");
 			this.totaVo.putParam("L1r04FormName" + j, " ");
+			this.totaVo.putParam("L1r04SendCode" + j, " ");
 			this.totaVo.putParam("L1r04Paper" + j, " ");
 			this.totaVo.putParam("L1r04Msg" + j, " ");
 			this.totaVo.putParam("L1r04EMail" + j, " ");
-			j ++ ;
+			j++;
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

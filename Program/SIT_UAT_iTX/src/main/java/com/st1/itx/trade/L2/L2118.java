@@ -16,6 +16,9 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacShareAppl;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacShareApplService;
+import com.st1.itx.db.domain.FacShareRelation;
+import com.st1.itx.db.domain.FacShareRelationId;
+import com.st1.itx.db.service.FacShareRelationService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.ClFacCom;
 import com.st1.itx.util.common.SendRsp;
@@ -52,12 +55,16 @@ public class L2118 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public FacShareApplService facShareApplService;
+
+	@Autowired
+	public FacShareRelationService facShareRelationService;
+
 	@Autowired
 	public FacMainService facMainService;
 
 	@Autowired
 	public ClFacCom clFacCom;
-	
+
 	@Autowired
 	Parse parse;
 	@Autowired
@@ -85,7 +92,7 @@ public class L2118 extends TradeBuffer {
 
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
-		iMApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo"+1));
+		iMApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo" + 1));
 		iJcicMiainCustFlag = titaVo.getParam("JcicMergeFlag");
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
@@ -93,7 +100,7 @@ public class L2118 extends TradeBuffer {
 		}
 		// 交易需主管核可
 		if (!titaVo.getHsupCode().equals("1")) {
-			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");  //交易需主管核可
+			sendRsp.addvReason(this.txBuffer, titaVo, "0004", ""); // 交易需主管核可
 		}
 
 		switch (iFuncCode) {
@@ -101,11 +108,17 @@ public class L2118 extends TradeBuffer {
 			// insert 共同借款人資料檔
 			insertFacShareAppl(titaVo);
 
+			//共同借款人闗係檔
+			insertFacShareRelation(titaVo);
+			
 			this.info("funcd = " + iFuncCode);
 			break;
 
 		case 4: // 刪除
 
+			//共同借款人闗係檔
+			deleteFacShareRelation(titaVo);
+			
 			// delete 共同借款人資料檔
 			deleteFacShareAppl(titaVo);
 
@@ -116,7 +129,7 @@ public class L2118 extends TradeBuffer {
 
 		// 額度與擔保品關聯檔變動處理
 		clFacCom.changeClFac(iMApplNo, titaVo);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -166,15 +179,72 @@ public class L2118 extends TradeBuffer {
 		if (tFacShareAppl != null) {
 			throw new LogicException(titaVo, "E2007", "共同借款人 核准號碼 = " + iApplNo); // 刪除資料不存在
 		}
-		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
 		lFacShareAppl = slFacShareAppl == null ? null : slFacShareAppl.getContent();
 		try {
 			facShareApplService.deleteAll(lFacShareAppl, titaVo);
 		} catch (DBException e) {
-			throw new LogicException("E0005", "共同借款人" + e.getErrorMsg());
+			throw new LogicException("E0008", "共同借款人" + e.getErrorMsg());
 		}
 
 	}
 
+	// 新增共同借款人闗係檔
+	private void insertFacShareRelation(TitaVo titaVo) throws LogicException {
+		for (int i = 1; i <= 100; i++) {
+			int iApplNoA = parse.stringToInteger(titaVo.get("ApplNoA" + i));
+			// 若該筆無資料就離開迴圈
+			if (iApplNoA == 0) {
+				break;
+			}
+
+			int iApplNoB = parse.stringToInteger(titaVo.get("ApplNoB" + i));
+
+			String iRelCode = titaVo.get("RelCode" + i);
+
+			FacShareRelationId facShareRelationId = new FacShareRelationId();
+
+			facShareRelationId.setApplNo(iApplNoA);
+			facShareRelationId.setRelApplNo(iApplNoB);
+
+			FacShareRelation facShareRelation = new FacShareRelation();
+
+			facShareRelation.setFacShareRelationId(facShareRelationId);
+			facShareRelation.setRelCode(iRelCode);
+
+			try {
+				facShareRelationService.insert(facShareRelation, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "共同借款人闗係檔" + e.getErrorMsg());
+			}
+		}
+	}
+
+	// 刪除共同借款人闗係檔
+	private void deleteFacShareRelation(TitaVo titaVo) throws LogicException {
+
+		iApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo" + 1));
+
+		tFacShareAppl = facShareApplService.findById(iApplNo, titaVo);
+		if (tFacShareAppl != null) {
+			throw new LogicException(titaVo, "E2007", "共同借款人 核准號碼 = " + iApplNo); // 刪除資料不存在
+		}
+		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
+		lFacShareAppl = slFacShareAppl == null ? null : slFacShareAppl.getContent();
+
+		if (lFacShareAppl != null && lFacShareAppl.size() > 0) {
+			for (FacShareAppl tFacShareAppl : lFacShareAppl) {
+				Slice<FacShareRelation> slFacShareRelation = facShareRelationService.ApplNoAll(tFacShareAppl.getApplNo(), 0, Integer.MAX_VALUE, titaVo);
+				List<FacShareRelation> lFacShareRelation = slFacShareRelation == null ? null : slFacShareRelation.getContent();
+				if (lFacShareRelation != null && lFacShareRelation.size() > 0) {
+					try {
+						facShareRelationService.deleteAll(lFacShareRelation, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0008", "共同借款人闗係檔" + e.getErrorMsg());
+					}
+				}
+			}
+		}
+
+	}
 }

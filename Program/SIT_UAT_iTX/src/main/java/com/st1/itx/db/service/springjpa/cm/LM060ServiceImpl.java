@@ -1,13 +1,13 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +21,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM060ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -34,18 +33,39 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-		String iYEAR = iENTDY.substring(0, 4);
-		String iMM = iENTDY.substring(4, 6);
-		String iYYMM = iENTDY.substring(0, 6);
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日(int)
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthLastDate = Calendar.getInstance();
+		// 設當年月底日
+		calMonthLastDate.set(iYear, iMonth, 0);
+
+		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < monthLastDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+		
+		
+//		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
+//		String iYEAR = iENTDY.substring(0, 4);
+//		String iMM = iENTDY.substring(4, 6);
+//		String iYYMM = iENTDY.substring(0, 6);
 		String iLYYMM = "";
-		if (iMM.equals("1")) {
-			iLYYMM = String.valueOf(Integer.valueOf(iYEAR) - 1) + "12";
+		if (String.valueOf(iMonth).equals("1")) {
+			iLYYMM = String.valueOf(iYear - 1) + "12";
 		} else {
-			iLYYMM = iYEAR + String.format("%02d", Integer.valueOf(iMM) - 1);
+			iLYYMM = iYear + String.format("%02d", iMonth - 1);
 		}
 
-		logger.info("lM060.findAll YYMM=" + iYYMM + ",LYYMM=" + iLYYMM);
+		this.info("lM060.findAll YYMM=" +  iYear + String.format("%02d", iMonth) + ",LYYMM=" + iLYYMM);
 
 //		F0 : 前期餘額               
 //		F1 : 借方暫付款項--法務費用   
@@ -92,7 +112,7 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		   WHERE TRUNC(FO.\"OpenAcDate\" / 100) = :yymm ";
 		sql += "			 AND FO.\"FeeCode\" NOT IN ('11','15')";
 		sql += "		   UNION ALL";
-		sql += "		   SELECT 0 F0"; 
+		sql += "		   SELECT 0 F0";
 		sql += "				 ,0 F1";
 		sql += "				 ,0 F2";
 		sql += "				 ,0 F3";
@@ -104,13 +124,13 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 + DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,0,F.\"Fee\"),0) F8";
 		sql += "		   FROM \"ForeclosureFee\" F)";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", iYYMM);
-		query.setParameter("lyymm", iLYYMM);
+		query.setParameter("yymm",  iYear + String.format("%02d", iMonth));
+//		query.setParameter("lyymm", iLYYMM);
 
 		return this.convertToMap(query.getResultList());
 	}

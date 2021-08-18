@@ -1,0 +1,413 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2417)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[180,820];printer.width=[15,30];">
+[
+["[L2417]                                 額度與擔保品關聯登錄"],
+["#FdFUNCD+功能",#FunCdX],
+["#FdCOL_IND1+擔保品代號1",#ClCode1,#ClCode1X],
+["#FdCOL_IND2+擔保品代號2",#ClCode2,#ClCode2X],
+["#FdCOL_NO+擔保品編號",#ClNo],
+["#FdAPPL_NO+核准號碼",#ApproveNo,#BTN1,#CustName],
+!["#FdShareAmt+分配金額",#ShareAmt],
+]
+!---------- AP Button AREA ----------
+#T1=X,1,S
+INVOKEJS(SHOW,p2,0)
+
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+
+!---------- AP TEXT AREA Variables ----------
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+<include src="ROM.icf::L2R48.dec"/>
+<include src="ROM.icf::L2R38.dec"/>
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#FunCdHelp=x,50,S
+T(3,1:新增;2:修改;4:刪除)
+
+!ClCode1
+#CDDEF0001=x,20,S
+T(3,CdCode.ClCode1)
+
+#ClCode1Help=x,1024,S
+
+!ClCode21
+#CDDEF0002=x,20,S
+T(3,CdCode.ClCode21)
+
+#ClCode21Help=x,1024,S
+
+!ClCode22
+#CDDEF0003=x,30,S
+T(3,CdCode.ClCode22)
+
+#ClCode22Help=x,1024,S
+
+!ClCode23
+#CDDEF0004=x,30,S
+T(3,CdCode.ClCode23)
+
+#ClCode23Help=x,1024,S
+
+!ClCode24
+#CDDEF0005=x,30,S
+T(3,CdCode.ClCode24)
+
+#ClCode24Help=x,1024,S
+
+!ClCode25
+#CDDEF0006=x,30,S
+T(3,CdCode.ClCode25)
+
+#ClCode25Help=x,1024,S
+
+!ClCode29
+#CDDEF0007=x,30,S
+T(3,CdCode.ClCode29)
+
+#CDDEF0008=x,11,S
+T(3,CdGuarantor)
+
+#ClCode29Help=x,1024,S
+#RelCodeHelp=x,3000,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#CDDEF0008)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClCode1Help,#HelpDesc1)
+T(2,@ClCode21Help,#HelpDesc2)
+T(2,@ClCode22Help,#HelpDesc3)
+T(2,@ClCode23Help,#HelpDesc4)
+T(2,@ClCode24Help,#HelpDesc5)
+T(2,@ClCode25Help,#HelpDesc6)
+T(2,@ClCode29Help,#HelpDesc7)
+T(2,@RelCodeHelp,#HelpDesc8)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2017進入),$)
+CALL(#Init)
+HIDE(#BTN1)
+
+#NTXBUF=X,131,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCd,#NTXBUF,1,1)
+! C(3,#FunCd,1,S,$)
+T(1,@ClCode1,#NTXBUF,2,1)
+T(1,@ClCode2,#NTXBUF,3,2)
+T(1,@ClNo,#NTXBUF,5,7)
+T(1,@ApproveNo,#NTXBUF,12,7)
+
+#Init=@,1,S
+E(0,@ClCode1,0)
+E(0,@ClCode2,0)
+E(0,@ClNo,0)
+E(0,@ApproveNo,0)
+T(3,@FdFUNCD,)
+T(3,@FdCOL_IND1,*)
+T(3,@FdCOL_IND2,*)
+T(3,@FdCOL_NO,*)
+T(3,@FdAPPL_NO,*)
+!T(3,@FdShareAmt,*)
+INVOKEJS(SHOW,p1,6,6,1)
+
+! [功能]
+#FunCd=X,1,S
+!HELP(#FunCdHelp)
+!C(3,#CHAIN,1,s,$)
+!@V(H,#FunCdHelp)
+
+#funcd1=X,1,S
+IF(#FunCd == 1,$,s)
+T(F,@FunCd,0)
+SHOW(#BTN1)
+
+! 重新交易按鈕 0=打開 1=關閉
+#SetSysPar1=X,1,S
+IF(#FunCd ==1 ,E(0,0)ASGN(AGAIN$),$)
+
+#funcd2=X,1,S
+IF(#FunCd == 2,$,s)
+T(F,@FunCd,0)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@ApproveNo,0)
+T(3,@FdFUNCD,)
+T(3,@FdCOL_IND1,)
+T(3,@FdCOL_IND2,)
+T(3,@FdCOL_NO,)
+T(3,@FdAPPL_NO,)
+!T(3,@FdShareAmt,*)
+HIDE(#BTN1)
+
+
+#funcd4=X,1,S
+IF(#FunCd == 4 || #FunCd == 5,$,s)
+T(F,@FunCd,0)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@ApproveNo,0)
+T(F,@ShareAmt,0)
+T(3,@FdFUNCD,)
+T(3,@FdCOL_IND1,)
+T(3,@FdCOL_IND2,)
+T(3,@FdCOL_NO,)
+T(3,@FdAPPL_NO,)
+!T(3,@FdShareAmt,)
+HIDE(#BTN1)
+
+! #CHECKFUNCD4=X,1,S
+! IF(#FunCd == 4,$,s)
+! T(3,@FdShareAmt,)
+! INVOKEJS(SHOW,p1,6,6,0)
+
+! 權限檢查
+#FUNCIND=_,_,S
+E(0,#FunCd)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+#FdFUNCD=X,2,L
+
+#FunCdX=X,4,L
+T(H,#FunCd,#FunCdHelp)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+
+![代號1]
+#ClCode1=A,1,I
+C(3,#FunCd,1,$,s)
+HELP(#ClCode1Help)
+@V(H,#ClCode1Help)
+
+#FdCOL_IND1=X,2,L
+
+#ClCode1X=X,20,L
+T(H,#ClCode1,#ClCode1Help)
+
+
+!調RIM參數
+!L2r48 取擔保品代號2Help
+#RimClCode1=A,1,S
+#RimClCode2=A,2,S
+#RimClNo=A,7,S
+#RimFunCd=A,1,S
+
+!取擔保品代號2Help
+#RimL2R48=X,1,S
+E(0,@RimClCode1,#ClCode1)
+RESET_RIM(#RimL2R48,L2R48)
+S(L2R48,1,#RimClCode1)
+R(1,L2R48)
+
+
+![代號2]
+#ClCode2=A,2,I
+C(3,#FunCd,1,$,s)
+HELP(#L2r48Help1)
+@V(H,#L2r48Help1)
+! SWITCH(#ClCode1,1,HELP(#ClCode21Help),
+!                 2,HELP(#ClCode22Help),
+!                 3,E(0,1)HELP(#ClCode23Help),
+!                 4,E(0,1)HELP(#ClCode24Help),
+!                 5,E(0,1)HELP(#ClCode25Help),
+!                 9,HELP(#ClCode29Help))
+! @SWITCH(#ClCode1,1,V(H,#ClCode21Help),
+!                  2,V(H,#ClCode22Help),
+!                  3,V(H,#ClCode23Help),
+!                  4,V(H,#ClCode24Help),
+!                  5,V(H,#ClCode25Help),
+!                  9,V(H,#ClCode29Help))
+
+#FdCOL_IND2=X,2,L
+
+#COL_IND=A,3,S
+T(2,#ClCode1+#ClCode2)
+
+#ClCode2X=X,20,L
+T(H,#ClCode2,#L2r48Help1)
+! SWITCH(#ClCode1,1,T(H,#ClCode2,#ClCode21Help),
+!                 2,T(H,#ClCode2,#ClCode22Help),
+!                 3,T(H,#ClCode2,#ClCode23Help),
+!                 4,T(H,#ClCode2,#ClCode24Help),
+!                 5,T(H,#ClCode2,#ClCode25Help),
+!                 9,T(H,#ClCode2,#ClCode29Help))       
+       
+![擔保品編號]
+#ClNo=A,7,I
+C(3,#FunCd,1,$,s)
+@V(2,0)
+
+#FdCOL_NO=X,2,L
+
+
+!刪除時，調RIM取得已關聯之核准號碼
+!#RimL2R38=X,1,S
+!IF(#FunCd==1,S,$)
+!E(0,@RimClCode1,#ClCode1)
+!E(0,@RimClCode2,#ClCode2)
+!E(0,@RimClNo,#ClNo)
+!RESET_RIM(#RimL2R38,L2R38)
+!S(L2R38,1,#RimClCode1,#RimClCode2,#RimClNo)
+!R(1,L2R38)
+
+
+#BUF1=X,14,S
+T(2,00000019999999)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApproveNo<-OOApplNo:CustName<-OOCustName})
+
+
+![核准號碼]
+#ApproveNo=A,7,I
+C(3,#FunCd,1,$,s)
+
+<include src="ROM.icf::L2R52.dec"/>
+
+#CustName=x,2.50,L
+
+#Cnt=A,2,S
+E(0,0)
+
+#Fv=A,1,S
+C(2,#FunCd,E(0,0),E(0,1),E(0,1),E(0,1),E(0,0),E(0,0))
+
+#RimL2R52=X,1,S
+RESET_RIM(#RimL2R52,L2R52)
+S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
+R(1,L2R52)
+T(2,@CustName,#L2r52CustName)
+##loop{times:20,i:1}
+T(2,@OwnerCustUKey{i},#L2r52OwnerCustUKey{i})
+T(2,@OwnerId{i},#L2r52OwnerId{i})
+T(2,@OwnerName{i},#L2r52OwnerName{i})
+T(2,@OwnerRelCode{i},#L2r52OwnerRelCode{i})
+C(4,#OwnerCustUKey{i},$,E(0,@Cnt,#Cnt+1))
+T(F,@OwnerRelCode{i},#Fv)
+##end
+
+#S1=X,1,S
+E(0,@Cnt,#Cnt+1)
+INVOKEJS(SHOW,grd1,1,21,0)
+INVOKEJS(SHOW,grd1,1,#Cnt,1)
+
+#FdAPPL_NO=X,2,L
+
+! [分配金額]
+#ShareAmt=m,14,L
+
+
+#RPTFG=A,1,S
+
+#T2=X,1,S
+INVOKEJS(SHOW,p2,1)
+
+</sub>
+
+<sub type="DC" name="p2" layout="cols=1;screen.width=[10,1000];printer.width=[15,30];">
+[
+["擔保品所有權人與授信戶關係登錄"],
+["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[100,500,300], p_cols:[20,20,20]}","","","",
+["所有權人統編","所有權人姓名","與授信戶關係"],
+[#OwnerId1,#OwnerName1,[#OwnerRelCode1,#OwnerRelCodeX1]]
+],
+]
+
+##loop{times:20,i:1}
+
+#OwnerCustUKey{i}=x,32,S
+#OwnerId{i}=X,10,L
+#OwnerName{i}=x,2.50,L
+#OwnerRelCode{i}=X,2,I
+C(3,#FunCd,1,$,C(3,#FunCd,2,$,s))
+C(4,#OwnerCustUKey{i},S,$)
+HELP(#RelCodeHelp)
+@V(H,#RelCodeHelp)
+
+#OwnerRelCodeX{i}=x,20,L
+C(4,#OwnerCustUKey{i},S,$)
+T(H,#OwnerRelCode{i},#RelCodeHelp)
+
+##end
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+
+</sub>
+
+
+!---------- TXFORM = L2417 ----------
+<sub type="FORM" name="L2417">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2417,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2417] 額度與擔保品關聯登錄)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd
+#ClCode1
+#ClCode2
+#ClNo
+#ApproveNo
+#ShareAmt
+##loop{times:20,i:1}
+#OwnerCustUKey{i}
+#OwnerId{i}
+#OwnerName{i}
+#OwnerRelCode{i}
+##end
+#END
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2417
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R38.tom"/>
+<include src="ROM.icf::L2R48.tom"/>
+<include src="ROM.icf::L2R52.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

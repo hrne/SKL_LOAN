@@ -149,7 +149,7 @@ E(0,1)ASGN(LOOP$)
 ! 電催日期
 #OOTelDate=D,7,O
 ! 電催時間
-#OOTelTime=X,5,O
+#OOTelTime=X,4,O
 ! 聯絡對象
 #OOContactCode=A,1,O
 #OOContactCodeX=X,6,O

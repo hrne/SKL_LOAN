@@ -130,6 +130,7 @@ public class L9724Report extends MakeReport {
 						if (daysDiffTotal >= 0 && daysDiffSameMonth >= 0) {
 							makeExcel.setValue(row, col + pivotCol, daysDiffSameMonth, "R");
 						}
+						break;
 					case 7:
 						// total day diff (month included)
 						if (daysDiffTotal >= 0) {

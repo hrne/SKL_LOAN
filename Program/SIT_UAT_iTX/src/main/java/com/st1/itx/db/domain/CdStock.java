@@ -1,6 +1,7 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -22,180 +23,274 @@ import javax.persistence.Column;
 @Table(name = "`CdStock`")
 public class CdStock implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = -8733501437484253933L;
+	private static final long serialVersionUID = -8267851327394501651L;
 
-	// 股票代號
-	@Id
-	@Column(name = "`StockCode`", length = 6)
-	private String stockCode = " ";
+// 股票代號
+  @Id
+  @Column(name = "`StockCode`", length = 10)
+  private String stockCode = " ";
 
-	// 股票簡稱
-	@Column(name = "`StockItem`", length = 40)
-	private String stockItem;
+  // 股票簡稱
+  @Column(name = "`StockItem`", length = 20)
+  private String stockItem;
 
-	// 幣別
-	/* CdCode.Currency */
-	@Column(name = "`Curreny`", length = 3)
-	private String curreny;
+  // 股票公司名稱
+  @Column(name = "`StockCompanyName`", length = 50)
+  private String stockCompanyName;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 幣別
+  /* CdCode.Currency */
+  @Column(name = "`Currency`", length = 3)
+  private String currency;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 前日收盤價
+  @Column(name = "`YdClosePrice`")
+  private BigDecimal ydClosePrice = new BigDecimal("0");
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
+  // 一個月平均價
+  @Column(name = "`MonthlyAvg`")
+  private BigDecimal monthlyAvg = new BigDecimal("0");
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  // 三個月平均價
+  @Column(name = "`ThreeMonthAvg`")
+  private BigDecimal threeMonthAvg = new BigDecimal("0");
 
-	/**
-	 * 股票代號<br>
-	 * 
-	 * @return String
-	 */
-	public String getStockCode() {
-		return this.stockCode == null ? "" : this.stockCode;
-	}
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	/**
-	 * 股票代號<br>
-	 * 
-	 *
-	 * @param stockCode 股票代號
-	 */
-	public void setStockCode(String stockCode) {
-		this.stockCode = stockCode;
-	}
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	/**
-	 * 股票簡稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getStockItem() {
-		return this.stockItem == null ? "" : this.stockItem;
-	}
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	/**
-	 * 股票簡稱<br>
-	 * 
-	 *
-	 * @param stockItem 股票簡稱
-	 */
-	public void setStockItem(String stockItem) {
-		this.stockItem = stockItem;
-	}
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	/**
-	 * 幣別<br>
-	 * CdCode.Currency
-	 * 
-	 * @return String
-	 */
-	public String getCurreny() {
-		return this.curreny == null ? "" : this.curreny;
-	}
 
-	/**
-	 * 幣別<br>
-	 * CdCode.Currency
-	 *
-	 * @param curreny 幣別
-	 */
-	public void setCurreny(String curreny) {
-		this.curreny = curreny;
-	}
+/**
+	* 股票代號<br>
+	* 
+	* @return String
+	*/
+  public String getStockCode() {
+    return this.stockCode == null ? "" : this.stockCode;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 股票代號<br>
+	* 
+  *
+  * @param stockCode 股票代號
+	*/
+  public void setStockCode(String stockCode) {
+    this.stockCode = stockCode;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 股票簡稱<br>
+	* 
+	* @return String
+	*/
+  public String getStockItem() {
+    return this.stockItem == null ? "" : this.stockItem;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 股票簡稱<br>
+	* 
+  *
+  * @param stockItem 股票簡稱
+	*/
+  public void setStockItem(String stockItem) {
+    this.stockItem = stockItem;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
+/**
+	* 股票公司名稱<br>
+	* 
+	* @return String
+	*/
+  public String getStockCompanyName() {
+    return this.stockCompanyName == null ? "" : this.stockCompanyName;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
+/**
+	* 股票公司名稱<br>
+	* 
+  *
+  * @param stockCompanyName 股票公司名稱
+	*/
+  public void setStockCompanyName(String stockCompanyName) {
+    this.stockCompanyName = stockCompanyName;
+  }
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+/**
+	* 幣別<br>
+	* CdCode.Currency
+	* @return String
+	*/
+  public String getCurrency() {
+    return this.currency == null ? "" : this.currency;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
+/**
+	* 幣別<br>
+	* CdCode.Currency
+  *
+  * @param currency 幣別
+	*/
+  public void setCurrency(String currency) {
+    this.currency = currency;
+  }
 
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
+/**
+	* 前日收盤價<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getYdClosePrice() {
+    return this.ydClosePrice;
+  }
 
-	@Override
-	public String toString() {
-		return "CdStock [stockCode=" + stockCode + ", stockItem=" + stockItem + ", curreny=" + curreny + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-				+ ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+/**
+	* 前日收盤價<br>
+	* 
+  *
+  * @param ydClosePrice 前日收盤價
+	*/
+  public void setYdClosePrice(BigDecimal ydClosePrice) {
+    this.ydClosePrice = ydClosePrice;
+  }
+
+/**
+	* 一個月平均價<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getMonthlyAvg() {
+    return this.monthlyAvg;
+  }
+
+/**
+	* 一個月平均價<br>
+	* 
+  *
+  * @param monthlyAvg 一個月平均價
+	*/
+  public void setMonthlyAvg(BigDecimal monthlyAvg) {
+    this.monthlyAvg = monthlyAvg;
+  }
+
+/**
+	* 三個月平均價<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getThreeMonthAvg() {
+    return this.threeMonthAvg;
+  }
+
+/**
+	* 三個月平均價<br>
+	* 
+  *
+  * @param threeMonthAvg 三個月平均價
+	*/
+  public void setThreeMonthAvg(BigDecimal threeMonthAvg) {
+    this.threeMonthAvg = threeMonthAvg;
+  }
+
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
+
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
+
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
+
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
+
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
+
+
+  @Override
+  public String toString() {
+    return "CdStock [stockCode=" + stockCode + ", stockItem=" + stockItem + ", stockCompanyName=" + stockCompanyName + ", currency=" + currency + ", ydClosePrice=" + ydClosePrice + ", monthlyAvg=" + monthlyAvg
+           + ", threeMonthAvg=" + threeMonthAvg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

@@ -154,8 +154,7 @@ public class L2411 extends TradeBuffer {
 
 	/* work area */
 	private int iFunCd;
-	private String iCustId;
-	private int iCustNo;
+
 	// 擔保品代號1
 	private int iClCode1;
 	// 擔保品代號2
@@ -165,7 +164,7 @@ public class L2411 extends TradeBuffer {
 	// 核准號碼
 	private int iApplNo;
 	// 宣告
-	private String custUKey = "";
+
 	private String finalClNo;
 	private ClMainId ClMainId = new ClMainId();
 	private ClImmId ClImmId = new ClImmId();
@@ -175,7 +174,6 @@ public class L2411 extends TradeBuffer {
 	private ClBuildingId clBuildingId = new ClBuildingId();
 	private ClBuildingOwner tClBuildingOwner = new ClBuildingOwner();
 	private ClBuildingOwnerId clBuildingOwnerId = new ClBuildingOwnerId();
-	private CustMain tCustMain = new CustMain();
 	private ClLandId clLandId = new ClLandId();
 	private ClLandOwnerId clLandOwnerId = new ClLandOwnerId();
 	private ClLand tClLand = new ClLand();
@@ -203,10 +201,7 @@ public class L2411 extends TradeBuffer {
 		// tita
 		// 功能
 		iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
-		// 統編
-		iCustId = titaVo.getParam("CustId");
-		// 戶號
-		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+
 		// 核准號碼
 		iApplNo = parse.stringToInteger(titaVo.getParam("ApplNo"));
 		// 擔保品代號1
@@ -216,7 +211,6 @@ public class L2411 extends TradeBuffer {
 		// 擔保品編號
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		// 宣告
-		custUKey = "";
 		finalClNo = StringUtils.leftPad(String.valueOf(iClNo), 7, "0");
 		// isEloan
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
@@ -303,7 +297,6 @@ public class L2411 extends TradeBuffer {
 					// 查無客戶資料
 //					throw new LogicException("E0001", "CustId=" + iCustId + ", CustNo=" + iCustNo);
 //				}
-				custUKey = tCustMain.getCustUKey();
 				// 擔保品主檔
 				this.info("ClMainId1 = " + ClMainId);
 
@@ -411,7 +404,6 @@ public class L2411 extends TradeBuffer {
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
 				// 變更前
 				ClMain beforeClMain = (ClMain) dataLog.clone(tClMain);
-				custUKey = tClMain.getCustUKey();
 				// set
 				setClMain(titaVo);
 				// update

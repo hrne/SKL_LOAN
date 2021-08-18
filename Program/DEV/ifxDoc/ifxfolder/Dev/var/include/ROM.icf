@@ -3216,12 +3216,18 @@ TXFORM=L2R48
 #L2r49ApplNo{n}=A,7,S
 #L2r49CustNo{n}=A,7,S
 #L2r49FacmNo{n}=A,3,S
-#L2r49CustName{n}=c,100,S
+#L2r49CustId{n}=X,10,S
+#L2r49CustName{n}=x,100,S
 #L2r49CaseNo{n}=A,7,S
 #L2r49Deadline{n}=A,7,S
 #L2r49RecycleCode{n}=X,1,S
 #L2r49CurrencyCode{n}=X,3,S
 #L2r49LineAmt{n}=m,14.2,S
+##end
+##loop{times:100,n:1}
+#L2r49ApplNoA{n}=A,7,S
+#L2r49ApplNoB{n}=A,7,S
+#L2r49RelCode{n}=A,7,S
 ##end
 </L2R49.dec>
 
@@ -3232,12 +3238,18 @@ TXFORM=L2R49
 #L2r49ApplNo{n}
 #L2r49CustNo{n}
 #L2r49FacmNo{n}
+#L2r49CustId{n}
 #L2r49CustName{n}
 #L2r49CaseNo{n}
 #L2r49Deadline{n}
 #L2r49RecycleCode{n}
 #L2r49CurrencyCode{n}
 #L2r49LineAmt{n}
+##end
+##loop{times:100,n:1}
+#L2r49ApplNoA{n}
+#L2r49ApplNoB{n}
+#L2r49RelCode{n}
 ##end
 ^
 </L2R49.tom>
@@ -4190,6 +4202,7 @@ TXFORM=L1R03
 ##loop{times:40,i:1}
 #L1r04FormNo{i}=X,10,S
 #L1r04FormName{i}=X,40,S
+#L1r04SendCode{i}=X,1,S
 #L1r04Paper{i}=X,1,S
 #L1r04Msg{i}=X,1,S
 #L1r04EMail{i}=X,1,S
@@ -4202,6 +4215,7 @@ TXFORM=L1R04
 ##loop{times:40,i:1}
 #L1r04FormNo{i}
 #L1r04FormName{i}
+#L1r04SendCode{i}
 #L1r04Paper{i}
 #L1r04Msg{i}
 #L1r04EMail{i}
@@ -4319,6 +4333,7 @@ TXFORM=L1R10
 ##loop {times:40,i:1}
 #L1r11FormNo{i}=X,10,S
 #L1r11FormName{i}=X,40,S
+#L1r11SendCode{i}=X,1,S
 ##end
 </L1R11.dec>
 
@@ -4327,6 +4342,7 @@ TXFORM=L1R11
 ##loop {times:40,i:1}
 #L1r11FormNo{i}
 #L1r11FormName{i}
+#L1r11SendCode{i}
 ##end
 ^
 </L1R11.tom>
@@ -4903,8 +4919,8 @@ TXFORM=L4R24
 #L5r01CaseKindCode=X,1,S
 #L5r01CustLoanKind=X,1,S
 #L5r01Status=X,1,S
-#L5r01DeferYMStart=X,5,S
-#L5r01DeferYMEnd=X,5,S
+#L5r01DeferYMStart=A,5,S
+#L5r01DeferYMEnd=A,5,S
 #L5r01ApplDate=D,7,S
 #L5r01DueAmt=m,14,S
 #L5r01TotalPeriod=A,3,S
@@ -5449,7 +5465,7 @@ TXFORM=L5R17
 
 <L5R18.dec>
 #L5R18TelDate=D,7,S
-#L5R18TelTime=X,5,S
+#L5R18TelTime=X,4,S
 #L5R18ContactCode=X,1,S
 #L5R18RecvrCode=X,1,S
 #L5R18TelArea=X,5,S
@@ -5477,7 +5493,7 @@ TXFORM=L5R18
 
 <L5R19.dec>
 #L5R19MeetDate=D,7,S
-#L5R19MeetTime=X,5,S
+#L5R19MeetTime=X,4,S
 #L5R19ContactCode=X,1,S
 #L5R19MeetPsnCode=X,1,S
 #L5R19CollPsnCode=X,1,S

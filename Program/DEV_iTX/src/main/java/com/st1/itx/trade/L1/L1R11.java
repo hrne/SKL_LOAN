@@ -24,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1R11 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1R11.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -57,27 +56,29 @@ public class L1R11 extends TradeBuffer {
 				lCdReport2.add(tmpCdReport1);
 			}
 		}
-	
+
 		if (lCdReport2 == null || lCdReport2.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "報表代號對照檔"); // 查無資料
 		}
-		
-		int amount = 1; //筆數
-		for (CdReport iCdReport:lCdReport2) {
-			if(iCdReport.getSendCode()==0) {
-				//寄送記號為0跳過
+
+		int amount = 1; // 筆數
+		for (CdReport iCdReport : lCdReport2) {
+			if (iCdReport.getSendCode() == 0) {
+				// 寄送記號為0跳過;1不可申請全部不寄送;2可以申請全部不寄送
 				continue;
 			}
-			this.info("報表"+amount+"為"+iCdReport.getFormNo()+" : "+iCdReport.getFormName()+".");
+			this.info("報表" + amount + "為" + iCdReport.getFormNo() + " : " + iCdReport.getFormName() + ".");
 			this.totaVo.putParam("L1r11FormNo" + amount, iCdReport.getFormNo());
 			this.totaVo.putParam("L1r11FormName" + amount, iCdReport.getFormName());
-			amount ++;
+			this.totaVo.putParam("L1r11SendCode" + amount, iCdReport.getSendCode());
+			amount++;
 		}
-		//補空白資料 總共回傳39筆
-		while (amount <=40){
+		// 補空白資料 總共回傳39筆
+		while (amount <= 40) {
 			this.totaVo.putParam("L1r11FormNo" + amount, " ");
 			this.totaVo.putParam("L1r11FormName" + amount, " ");
-			amount ++;
+			this.totaVo.putParam("L1r11SendCode" + amount, " ");
+			amount++;
 		}
 
 		this.addList(this.totaVo);

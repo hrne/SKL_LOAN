@@ -40,7 +40,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS431 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS431.class);
 	@Autowired
 	public Parse parse;
 
@@ -193,24 +192,20 @@ public class BS431 extends TradeBuffer {
 			}
 
 			if (this.processCnt > 0 && titaVo.isHcodeNormal()) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-						titaVo.getEmpNot() + "L4321", sendMsg, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getEmpNot() + "L4321", sendMsg, titaVo);
 //				提醒原櫃員執行列印對帳單交易
 //				主管放行
 				if (!titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
 					this.info("OrgTlr ..." + titaVo.getOrgTlr());
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getOrgTlr(), "Y", "L4721", "",
-							sendMsg + "，主管已完成確認，需列印利率變動對帳單", titaVo);
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getOrgTlr(), "Y", "L4721", "", sendMsg + "，主管已完成確認，需列印利率變動對帳單", titaVo);
 				}
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", "", sendMsg,
-						titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", "", sendMsg, titaVo);
 //				提醒原櫃員執行列印對帳單交易
 //				主管放行
 				if (!titaVo.isActfgEntry() && titaVo.isHcodeNormal()) {
 					this.info("OrgTlr ..." + titaVo.getOrgTlr());
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getOrgTlr(), "Y", "L4721", "",
-							sendMsg + "，主管已完成確認，需列印利率變動對帳單", titaVo);
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getOrgTlr(), "Y", "L4721", "", sendMsg + "，主管已完成確認，需列印利率變動對帳單", titaVo);
 				}
 			}
 		} else {
@@ -221,8 +216,7 @@ public class BS431 extends TradeBuffer {
 	private void processUpdate(TitaVo titaVo) throws LogicException {
 		this.info("processUpdate...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate,
-				custType1, custType2, iTxKind, this.wkConfirmFlag, this.index, this.limit, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(this.iAdjDate, this.iAdjDate, custType1, custType2, iTxKind, this.wkConfirmFlag, this.index, this.limit, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
@@ -396,17 +390,12 @@ public class BS431 extends TradeBuffer {
 				tLoanRateChange.setIndividualIncr(tBatxRateChange.getIndividualIncr());
 				tLoanRateChange.setFitRate(tBatxRateChange.getAdjustedRate());
 				tBatxRateChange.setJsonFields(tTempVo.getJsonString());
+				tLoanRateChange.setRemark("");
 				tLoanRateChange.setStatus(0);
 			} else {
 				this.info("JsonFields ... " + tBatxRateChange.getJsonFields());
 
 				tTempVo = tTempVo.getVo(tBatxRateChange.getJsonFields());
-
-				this.info("tTempVo ... " + tTempVo.toString());
-				this.info("RateIncr ... " + parse.stringToBigDecimal(this.tTempVo.getParam("RateIncr")));
-				this.info("IndividualIncr ... " + parse.stringToBigDecimal(this.tTempVo.getParam("IndividualIncr")));
-				this.info("FitRate ... " + parse.stringToBigDecimal(this.tTempVo.getParam("FitRate")));
-
 				tLoanRateChange.setRateIncr(parse.stringToBigDecimal(this.tTempVo.getParam("RateIncr")));
 				tLoanRateChange.setIndividualIncr(parse.stringToBigDecimal(this.tTempVo.getParam("IndividualIncr")));
 				tLoanRateChange.setFitRate(parse.stringToBigDecimal(this.tTempVo.getParam("FitRate")));
@@ -459,7 +448,7 @@ public class BS431 extends TradeBuffer {
 			tLoanRateChange.setRateIncr(BigDecimal.ZERO);
 			tLoanRateChange.setIndividualIncr(BigDecimal.ZERO);
 			tLoanRateChange.setFitRate(nextAdjRate);
-			tLoanRateChange.setRemark("");
+			tLoanRateChange.setRemark("預調利率");
 			tLoanRateChange.setAcDate(this.getTxBuffer().getTxCom().getTbsdy());
 			tLoanRateChange.setTellerNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tLoanRateChange.setTxtNo(parse.IntegerToString(this.getTxBuffer().getTxCom().getRelTno(), 8));
@@ -506,9 +495,8 @@ public class BS431 extends TradeBuffer {
 		}
 
 		// 讀取生效日之後的利率變動檔
-		Slice<LoanRateChange> sLoanRateChange = loanRateChangeService.rateChangeBormNoEq(tBatxRateChange.getCustNo(),
-				tBatxRateChange.getFacmNo(), tBatxRateChange.getBormNo(), effectDateS + 19110000 + 1, this.index,
-				this.limit);
+		Slice<LoanRateChange> sLoanRateChange = loanRateChangeService.rateChangeBormNoEq(tBatxRateChange.getCustNo(), tBatxRateChange.getFacmNo(), tBatxRateChange.getBormNo(),
+				effectDateS + 19110000 + 1, this.index, this.limit);
 		List<LoanRateChange> lLoanRateChange = sLoanRateChange == null ? null : sLoanRateChange.getContent();
 
 		if (lLoanRateChange != null && lLoanRateChange.size() != 0) {

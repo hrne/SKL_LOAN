@@ -138,6 +138,7 @@ E(0,@ApplyDt,#L1r04ApplyDt)
 ##loop{times:40,i:1}
 T(2,@FormNo{i},#L1r04FormNo{i})
 T(2,@Notice{i},#L1r04FormName{i})
+T(2,@SendCode{i},#L1r04SendCode{i})
 T(2,@Paper{i},#L1r04Paper{i})
 T(2,@Msg{i},#L1r04Msg{i})
 T(2,@EMail{i},#L1r04EMail{i})
@@ -172,19 +173,16 @@ R(1,L1R11)
 ##loop{times:40,i:1}
 T(2,@FormNo{i},#L1r11FormNo{i})
 T(2,@Notice{i},#L1r11FormName{i})
+T(2,@SendCode{i},#L1r11SendCode{i})
 ##end
 
 
 
 ##loop{times:40,i:1,j:3}
-
 #FormNo{i}=X,10,S
-! C(4,#FormNo{i},INVOKEJS(SHOW,grd1,{k},{k},0),INVOKEJS(SHOW,grd1,{k},{k},1))
-! C(4,#FormNo{i},INVOKEJS(SHOW,grd1,{i},39,0),INVOKEJS(SHOW,grd1,{i},{i},1))
-
 #Notice{i}=X,100,L
 C(4,#Notice{i},INVOKEJS(SHOW,grd1,{j},{j},0),INVOKEJS(SHOW,grd1,{j},{j},1))
-
+#SendCode{i}=X,1,S
 ##end
 
 #MsgFg=X,1,S
@@ -255,6 +253,7 @@ IF(#EMail_ALL_FG==0,T(3,@EMail{i},),T(3,@EMail{i},Y))
 
 #CheckY=X,1,S
 T(2,Y)
+! SendCode==1不可申請全部不寄送;2可以申請全部不寄送
 ##loop{times:40,i:1}
 ! 不列印記號-書面
 #Paper{i}=X,1,I,ui:checkbox;value:;
@@ -276,6 +275,10 @@ C(5,#EmailFg,0,T(3,Y),$)
 C(5,#EmailFg,0,C(4,#EMail{i},V(P,此客戶尚未設定信箱，故不可設定為發送),$),$)
 C(4,#EMail{i},$,IF(#EMail{i} == #CheckY,$,V(P,限輸入Y或空白)))
 
+! 記號檢核
+#CheckSendCode{i}=X,1,S
+C(5,#SendCode{i},1,$,S)
+C(4,#Paper{i},$,C(4,#Msg{i},$,C(4,#EMail{i},$,V(P,不可申請全部不寄送))))
 ##end
 
 

@@ -154,7 +154,7 @@ E(0,1)ASGN(LOOP$)
 ! 面催日期
 #OOMeetDate=D,7,O
 ! 面催時間
-#OOMeetTime=X,5,O
+#OOMeetTime=X,4,O
 ! 聯絡對象
 #OOContactCode=A,1,O
 #OOContactCodeX=X,6,O

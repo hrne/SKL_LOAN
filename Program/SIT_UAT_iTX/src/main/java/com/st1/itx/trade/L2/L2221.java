@@ -215,7 +215,7 @@ public class L2221 extends TradeBuffer {
     		FacRelation dFacRelation = sFacRelationService.findById(tfacRelationId, titaVo);
     		
     		if(dFacRelation != null) {
-    			throw new LogicException(titaVo, "E0002", "交易關係人主檔"); 
+    			throw new LogicException(titaVo, "E0004", "交易關係人主檔"); 
     		}
     		
     		// new table 

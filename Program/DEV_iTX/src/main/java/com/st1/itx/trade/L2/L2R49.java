@@ -111,6 +111,7 @@ public class L2R49 extends TradeBuffer {
 				this.totaVo.putParam("L2r49ApplNo" + i, t.getApplNo());
 				this.totaVo.putParam("L2r49CustNo" + i, t.getCustNo());
 				this.totaVo.putParam("L2r49FacmNo" + i, t.getFacmNo());
+				this.totaVo.putParam("L2r49CustId" + i, tCustMain.getCustId());
 				this.totaVo.putParam("L2r49CustName" + i, tCustMain.getCustName());
 				this.totaVo.putParam("L2r49CaseNo" + i, tFacMain.getCreditSysNo());
 				if (tFacMain.getRecycleCode().equals("1")) {
@@ -127,11 +128,6 @@ public class L2R49 extends TradeBuffer {
 			}
 		}
 
-		
-		
-		
-		
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();
