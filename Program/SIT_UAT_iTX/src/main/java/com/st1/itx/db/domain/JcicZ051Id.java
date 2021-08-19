@@ -33,11 +33,11 @@ public class JcicZ051Id implements Serializable {
   private String custId = " ";
 
   // 協商申請日
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   // 延期繳款年月
-  @Column(name = "`DelayYM`", length = 6)
+  @Column(name = "`DelayYM`")
   private int delayYM = 0;
 
   public JcicZ051Id() {

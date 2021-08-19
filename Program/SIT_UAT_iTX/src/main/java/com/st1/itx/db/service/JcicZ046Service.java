@@ -83,6 +83,41 @@ public interface JcicZ046Service {
   public Slice<JcicZ046> HadZ046(String custId_0, int rcDate_1, String submitKey_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * SubmitKey= , AND CustId= , AND RcDate= , AND CloseDate=
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param closeDate_3 closeDate_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ046 JcicZ046 of List
+   */
+  public Slice<JcicZ046> otherEq(String submitKey_0, String custId_1, int rcDate_2, int closeDate_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Ukey=
+   *
+   * @param ukey_0 ukey_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ046 JcicZ046 of List
+   */
+  public JcicZ046 ukeyFirst(String ukey_0, TitaVo... titaVo);
+
+  /**
+   * SubmitKey= , AND CustId= , AND RcDate= , AND CloseDate=
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param closeDate_3 closeDate_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ046 JcicZ046 of List
+   */
+  public JcicZ046 otherFirst(String submitKey_0, String custId_1, int rcDate_2, int closeDate_3, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ046
    * 
    * @param jcicZ046Id key

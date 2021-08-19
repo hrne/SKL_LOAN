@@ -21,7 +21,7 @@ public class JcicZ061Id implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -9124184936400444004L;
+	private static final long serialVersionUID = -6387741934877112842L;
 
 // 債權金融機構代號
   /* 三位文數字 */
@@ -33,21 +33,27 @@ public class JcicZ061Id implements Serializable {
   private String custId = " ";
 
   // 原前置協商申請日
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   // 申請變更還款條件日
-  @Column(name = "`ChangePayDate`", length = 8)
+  @Column(name = "`ChangePayDate`")
   private int changePayDate = 0;
+
+  // 最大債權金融機構代號
+  /* 三位文數字 */
+  @Column(name = "`MaxMainCode`", length = 3)
+  private String maxMainCode = " ";
 
   public JcicZ061Id() {
   }
 
-  public JcicZ061Id(String submitKey, String custId, int rcDate, int changePayDate) {
+  public JcicZ061Id(String submitKey, String custId, int rcDate, int changePayDate, String maxMainCode) {
     this.submitKey = submitKey;
     this.custId = custId;
     this.rcDate = rcDate;
     this.changePayDate = changePayDate;
+    this.maxMainCode = maxMainCode;
   }
 
 /**
@@ -126,10 +132,29 @@ public class JcicZ061Id implements Serializable {
     this.changePayDate = StaticTool.rocToBc(changePayDate);
   }
 
+/**
+	* 最大債權金融機構代號<br>
+	* 三位文數字
+	* @return String
+	*/
+  public String getMaxMainCode() {
+    return this.maxMainCode == null ? "" : this.maxMainCode;
+  }
+
+/**
+	* 最大債權金融機構代號<br>
+	* 三位文數字
+  *
+  * @param maxMainCode 最大債權金融機構代號
+	*/
+  public void setMaxMainCode(String maxMainCode) {
+    this.maxMainCode = maxMainCode;
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(submitKey, custId, rcDate, changePayDate);
+    return Objects.hash(submitKey, custId, rcDate, changePayDate, maxMainCode);
   }
 
   @Override
@@ -139,11 +164,11 @@ public class JcicZ061Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     JcicZ061Id jcicZ061Id = (JcicZ061Id) obj;
-    return submitKey.equals(jcicZ061Id.submitKey) && custId.equals(jcicZ061Id.custId) && rcDate == jcicZ061Id.rcDate && changePayDate == jcicZ061Id.changePayDate;
+    return submitKey.equals(jcicZ061Id.submitKey) && custId.equals(jcicZ061Id.custId) && rcDate == jcicZ061Id.rcDate && changePayDate == jcicZ061Id.changePayDate && maxMainCode == jcicZ061Id.maxMainCode;
   }
 
   @Override
   public String toString() {
-    return "JcicZ061Id [submitKey=" + submitKey + ", custId=" + custId + ", rcDate=" + rcDate + ", changePayDate=" + changePayDate + "]";
+    return "JcicZ061Id [submitKey=" + submitKey + ", custId=" + custId + ", rcDate=" + rcDate + ", changePayDate=" + changePayDate + ", maxMainCode=" + maxMainCode + "]";
   }
 }

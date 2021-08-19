@@ -34,11 +34,11 @@ public class JcicZ060Id implements Serializable {
 
   // 原前置協商申請日
   /* 指債務人原前置協商申請日期同(["40"前置協商受理申請暨請求回報債權通知資料]-協商申請日) */
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   // 申請變更還款條件日
-  @Column(name = "`ChangePayDate`", length = 8)
+  @Column(name = "`ChangePayDate`")
   private int changePayDate = 0;
 
   public JcicZ060Id() {

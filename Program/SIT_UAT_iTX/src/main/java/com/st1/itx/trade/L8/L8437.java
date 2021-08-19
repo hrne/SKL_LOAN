@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-
 import org.apache.commons.lang3.StringUtils;
 /* log */
 import org.slf4j.Logger;
@@ -61,9 +60,12 @@ public class L8437 extends TradeBuffer {
 			doRemoveJcicDate(titaVo);
 			break;
 		}
+		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	public void doFile(TitaVo titaVo) throws LogicException {
 
 		String iSubmitKey = titaVo.getParam("SubmitKey");
@@ -73,7 +75,7 @@ public class L8437 extends TradeBuffer {
 		// 檔名
 		// BBBMMDDS.XXX 金融機構總行代號+月份+日期+次數.檔案類別
 		String fileNname = iSubmitKey + iReportDate.substring(3) + "." + iTranCode;
-		this.info("檔名=" + fileNname);
+		logger.info("檔名=" + fileNname);
 
 		iL8403File.exec(titaVo);
 		long fileNo = iL8403File.close();

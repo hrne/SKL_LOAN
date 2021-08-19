@@ -90,9 +90,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CreditSysNo", "CustNo", "OwnerCustUKey"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "ApplNo", "OwnerCustUKey"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CreditSysNo", "CustNo", "OwnerCustUKey"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = clOwnerRelationReposDay.findAll(pageable);
@@ -102,34 +102,6 @@ em = null;
       slice = clOwnerRelationReposHist.findAll(pageable);
     else 
       slice = clOwnerRelationRepos.findAll(pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<ClOwnerRelation> ApplNoAll(int clCode1_0, int clCode2_1, int clNo_2, int applNo_3, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<ClOwnerRelation> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("ApplNoAll " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " applNo_3 : " +  applNo_3);
-    if (dbName.equals(ContentName.onDay))
-      slice = clOwnerRelationReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndApplNoIsOrderByOwnerCustUKeyAsc(clCode1_0, clCode2_1, clNo_2, applNo_3, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = clOwnerRelationReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsAndApplNoIsOrderByOwnerCustUKeyAsc(clCode1_0, clCode2_1, clNo_2, applNo_3, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = clOwnerRelationReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsAndApplNoIsOrderByOwnerCustUKeyAsc(clCode1_0, clCode2_1, clNo_2, applNo_3, pageable);
-    else 
-      slice = clOwnerRelationRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndApplNoIsOrderByOwnerCustUKeyAsc(clCode1_0, clCode2_1, clNo_2, applNo_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

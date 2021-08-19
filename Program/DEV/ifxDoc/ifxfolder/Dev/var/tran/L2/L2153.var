@@ -613,7 +613,7 @@ T(2,@BankDeductCdHelp,#HelpDesc3)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#FKEY,0,IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2010進入),$),$)
-C(3,#CHAIN,1,HIDE(#BTN1,#BTN2)T(F,#CustId,0)T(F,#ApplNo,0),T(F,#CustId,1)T(F,#ApplNo,1))
+C(3,#CHAIN,1,HIDE(#BTN1,#BTN2)T(F,@CustId,0)T(F,@ApplNo,0),T(F,@CustId,1)T(F,@ApplNo,1))
 
 #NTXBUF=X,18,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -923,11 +923,10 @@ T(2,@FdIntCalcCode,#WkStar)
 #SendL2r01=X,1,S
 E(0,@RimFuncCode,5)
 T(2,@RimProdNo,#L2r02ProdNo)
-RESET_RIM(#SendL2r01,L2R01)
+! RESET_RIM(#SendL2r01,L2R01)
 S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
 R(1,L2R01)
-
-#RcvL2r01A=X,1,S
+! #RcvL2r01A=X,1,S
 C(3,#FKEY,7,S,$)
 C(3,#L2r01AmortizedCode,9,SHOW(#AmortizedCode,#FreqBase)
                          ,HIDE(#AmortizedCode,#FreqBase)
@@ -970,7 +969,7 @@ T(2,@BreachFlag,#L2r01BreachFlag)
 C(3,#L2r01BreachCode,999,$,E(0,@BreachCode,#L2r01BreachCode))
 C(3,#L2r01BreachCode,999,$,E(0,@BreachGetCode,#L2r01BreachGetCode))
 T(2,@Breach,#L2r01Breach)
-T(2,@Breach1,#L2r01Breach)
+! T(2,@Breach1,#L2r01Breach)
 ##loop{times:10,n:1}
 E(0,@StepMonthS{n},#L2r01StepRateMonths{n})
 E(0,@StepMonthE{n},#L2r01StepRateMonthE{n})
@@ -1047,7 +1046,6 @@ C(3,#BaseRateCode,99,S,$)
 C(3,#Hide2Flag,0,CALL(#HideP2),$)
 C(3,#BaseRateCode,99,S,$)
 C(3,#RateIncr,0,E(0,#L2r01ProdIncr),$)
-@V(2,0.0000)
 
 #bri=+n,2.4,S
 C(3,#BaseRateCode,99,S,$)
@@ -1145,11 +1143,11 @@ T(2,@FdRepayFreq,#WkStar)
 T(2,@FdUtilDeadline,#WkStar)
 T(2,@FdAcctFee, )
 T(2,@PayIntFreqX,#WkUnitX)
-T(F,#PayIntFreqX,0)
+T(F,@PayIntFreqX,0)
 T(2,@RepayFreqX,#WkUnitX)
-T(F,#RepayFreqX,0)
+T(F,@RepayFreqX,0)
 T(2,@GracePeriodX,#WkMonthX)
-T(F,#GracePeriodX,0)
+T(F,@GracePeriodX,0)
 C(3,#L2r01AmortizedCode,9,$,T(3,@FdAmortizedCode, ))
 C(3,#L2r01FreqBase,9,$,T(3,@FdFreqBase, ))
 C(3,#L2r01PayIntFreq,99,$,T(3,@FdPayIntFreq, ))
@@ -1516,6 +1514,7 @@ T(B,僅可輸入0，空白及+#Month{m})
 IF({m}==1,$,C(3,#StepMonthS{m},0,S,$))
 C(3,#StepMonthE{m},0,S,$)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
+IF(#StepMonthE{m}==#checkTerm,S,$)
 E(0,#StepMonthE{m}+1)
 SHOW(#StepMonthS{n},#StepX{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n})
 @
@@ -1694,6 +1693,9 @@ HELP(#DepartmentCodeHelp)
 
 #DepartmentCodeX=X,10,L
 T(H,#DepartmentCode,#DepartmentCodeHelp)
+C(3,#DepartmentCode,0,T(F,@BreachFlag,0)T(F,@ProdBreachFlag,0),T(F,@BreachFlag,1)T(F,@ProdBreachFlag,1))
+
+
 
 !依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
 #checkDepartmentCode=X,1,S
@@ -2184,14 +2186,14 @@ C(3,#Hide7Flag,0,CALL(#HideP7),$)
 !是否限制清償
 #FdBreachFlag=X,2,L
 
-#BreachFlag=X,1,L
-! HELP(Y:是;N:否)
-! @V(3,Y,N)
+#BreachFlag=X,1,I
+C(3,#Hide7Flag,0,CALL(#HideP7),$)
+C(3,#DepartmentCode,0,s,$)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
 
 #BreachFlagX=X,10,L
-SWITCH(#BreachFlag,
-     Y,T(3,是),
-     N,T(3,否))
+T(H,#BreachFlag,#YesNoHelp)
 
 ![違約適用方式]
 #FDBreachCode=X,2,L
@@ -2239,28 +2241,44 @@ HELP(#YesNoHelp)
 T(H,#DecreaseFlag,#YesNoHelp)
 C(4,#DecreaseFlag,T(3,無),$)
 
-
 ![限制清償期限]
 #FdProhibityear=X,2,L
 
 #Prohibityear=A,2,L
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
 IF(#L2r01BreachCode==999,$,S)
-! @V(7)
-! C(3,#AdvanceCloseCode,1,$,S)
 
 #ProhibityearX=X,9,L
-! CALL2(#AdjustDate,#Prohibityear,#ProhibityearX)
+!違約適用方式是否按商品設定
+#FdProdBreachFlag=X,2,L
 
-#Breach=x,200,L
+#ProdBreachFlag=X,1,I
+C(3,#Hide7Flag,0,CALL(#HideP7),$)
+C(5,#BreachFlag,#L2r01BreachFlag,T(3,Y),T(3,N))
+C(3,#DepartmentCode,0,s,$)
+C(5,#BreachFlag,#L2r01BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r01Breach),$),T(F,@ProdBreachFlag,0)),T(F,@ProdBreachFlag,0))
+C(5,#BreachFlag,#L2r01BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r01Breach),$),s),s)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
 
-#Breach1=X,4.50,L
 
-!--- 綁約專案[按年分段] ----------------------------------------------------------
-#HideBreachA=X,1,S
-C(3,#BreachCode,001,$,S)
+#ProdBreachFlagX=X,10,L
+C(4,#ProdBreachFlag,S,$)
+T(H,#ProdBreachFlag,#YesNoHelp)
+
+! #Breach1=x,200,L
+
+#Breach=X,4.50,I
+C(3,#Hide7Flag,0,CALL(#HideP7),$)
+! IF(#ProdBreachFlag=="Y"||#ProdBreachFlag=="",T(F,@Breach,0),T(F,@Breach,1))
+IF(#BreachFlag=="N",S,$)
+IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r01Breach),$)
+C(5,#ProdBreachFlag,Y,s,$)
+C(4,#ProdBreachFlag,s,$)
+
 
 #Wait=X,1,I 
+C(3,#DepartmentCode,0,$,S)
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
 @T(3,)
 
@@ -2286,7 +2304,7 @@ C(3,#HIDE8FG,0,CALL(#HideP8),$)
 C(4,#GroupId,S,$)
 T(2,@RimCustId,#GroupId)
 E(0,@RimCustNo,0)
-RESET_RIM(#RcvL2r07B,L2R07)
+! RESET_RIM(#RcvL2r07B,L2R07)
 S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 T(2,@GroupIdX,#L2r07CustName)
@@ -2448,11 +2466,12 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ]
 </sub>
 
-<sub type="DC" name="p8" layout="cols=2;screen.width=[200,300,200,300];printer.width=[15,30];order=1;">
+<sub type="DC" name="p8" layout="cols=2;screen.width=[300,300,200,300];printer.width=[15,30];order=1;">
 [
 ["<font color=red>@清償金類型"],
-[#<->#,"#FdBreachFlag+是否限制清償",#BreachFlag,#BreachFlagX,#Wait],
-[#<->#,"@",#Breach1],
+[#<->#,"#FdBreachFlag+是否限制清償",#BreachFlag,#BreachFlagX],
+[#<->#,"#FdProdBreachFlag+違約適用方式是否按商品設定",#ProdBreachFlag,#ProdBreachFlagX],
+[#<->#,"@",#Breach,#Wait],
 ]
 </sub>
 
@@ -2506,7 +2525,10 @@ K(LIGHT,#FacmNo,TXTRED,0,1)
 ##loop{times:10,n:1}
 #StepMonthS{n}#StepMonthE{n}#StepRateType{n}#StepRateIncr{n}
 ##end
+#ProdBreachFlag
+#Breach
 #END
+#BreachFlag
 #TwApplAmt#UsApplAmt
 #TwAcctFee#UsAcctFee
 

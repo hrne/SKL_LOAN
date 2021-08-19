@@ -44,6 +44,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdClCode2+擔保品代號２",#ClCode2,#ClCodeX],
 ["#FdClNo+擔保品號碼",#ClNo],
 ["#FdLandSeq+土地序號",#LandSeq],
+["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum,"#Lgtseq"],
 ["@",#BTN_1,#BTN_2,#BTN_3,#BTN_4,#BTNExpand],
 ["#FdLandLocation+土地座落",#LandLocation],
 ["#FdLandCode+地目",#LandCode,#LandCodeX],
@@ -140,15 +141,15 @@ C(3,#PAGE_FG,4,K(LIGHT,#BTN_4,TXTRED,0),K(LIGHT,#BTN_4,TXTRED,-1))
 C(3,#PAGE_FG,5,K(LIGHT,#BTNExpand,TXTRED,0),K(LIGHT,#BTNExpand,TXTRED,-1))
 
 #RESET_PAGES=@,1,S
-INVOKEJS(SHOW,p1,6,20,0)
+INVOKEJS(SHOW,p1,7,21,0)
 INVOKEJS(SHOW,grd1,0)
 INVOKEJS(SHOW,grd2,0)
 CALL(#KLIGHT)
-SWITCH(#PAGE_FG,1,INVOKEJS(SHOW,p1,6,6,1),
-                2,INVOKEJS(SHOW,p1,7,18,1),
-                3,INVOKEJS(SHOW,p1,19,19,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd1_3,1),
-                4,INVOKEJS(SHOW,p1,20,20,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd2_3,1),
-                5,INVOKEJS(SHOW,p1,6,20,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd2,1),
+SWITCH(#PAGE_FG,1,INVOKEJS(SHOW,p1,7,7,1),
+                2,INVOKEJS(SHOW,p1,8,19,1),
+                3,INVOKEJS(SHOW,p1,20,20,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd1_3,1),
+                4,INVOKEJS(SHOW,p1,21,21,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd2_3,1),
+                5,INVOKEJS(SHOW,p1,7,21,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd2,1),
                 $)
 !---------- AP TEXT Area Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -299,6 +300,13 @@ C(3,#CHAIN,1,s,$)
 C(3,#CHAIN,1,T(1,#NTXBUF,11,3),$)
 C(3,#CHAIN,1,s,$)
 
+![原擔保品編號]
+#FdGdRid=X,2,L
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
+#Lgtseq=X,3,L
 
 !調RIM參數
 #RimClCode1=A,1,S

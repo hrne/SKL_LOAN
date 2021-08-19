@@ -21,7 +21,7 @@ public class JcicZ063Id implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -293920779134449770L;
+	private static final long serialVersionUID = 5729699085985045725L;
 
 // 報送單位代號
   /* 三位文數字 */
@@ -33,26 +33,21 @@ public class JcicZ063Id implements Serializable {
   private String custId = " ";
 
   // 原前置協商申請日
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   // 申請變更還款條件日
-  @Column(name = "`ChangePayDate`", length = 8)
+  @Column(name = "`ChangePayDate`")
   private int changePayDate = 0;
-
-  // 變更還款條件結案日期
-  @Column(name = "`ClosedDate`", length = 8)
-  private int closedDate = 0;
 
   public JcicZ063Id() {
   }
 
-  public JcicZ063Id(String submitKey, String custId, int rcDate, int changePayDate, int closedDate) {
+  public JcicZ063Id(String submitKey, String custId, int rcDate, int changePayDate) {
     this.submitKey = submitKey;
     this.custId = custId;
     this.rcDate = rcDate;
     this.changePayDate = changePayDate;
-    this.closedDate = closedDate;
   }
 
 /**
@@ -131,29 +126,10 @@ public class JcicZ063Id implements Serializable {
     this.changePayDate = StaticTool.rocToBc(changePayDate);
   }
 
-/**
-	* 變更還款條件結案日期<br>
-	* 
-	* @return Integer
-	*/
-  public int getClosedDate() {
-    return  StaticTool.bcToRoc(this.closedDate);
-  }
-
-/**
-	* 變更還款條件結案日期<br>
-	* 
-  *
-  * @param closedDate 變更還款條件結案日期
-  * @throws LogicException when Date Is Warn	*/
-  public void setClosedDate(int closedDate) throws LogicException {
-    this.closedDate = StaticTool.rocToBc(closedDate);
-  }
-
 
   @Override
   public int hashCode() {
-    return Objects.hash(submitKey, custId, rcDate, changePayDate, closedDate);
+    return Objects.hash(submitKey, custId, rcDate, changePayDate);
   }
 
   @Override
@@ -163,11 +139,11 @@ public class JcicZ063Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     JcicZ063Id jcicZ063Id = (JcicZ063Id) obj;
-    return submitKey.equals(jcicZ063Id.submitKey) && custId.equals(jcicZ063Id.custId) && rcDate == jcicZ063Id.rcDate && changePayDate == jcicZ063Id.changePayDate && closedDate == jcicZ063Id.closedDate;
+    return submitKey.equals(jcicZ063Id.submitKey) && custId.equals(jcicZ063Id.custId) && rcDate == jcicZ063Id.rcDate && changePayDate == jcicZ063Id.changePayDate;
   }
 
   @Override
   public String toString() {
-    return "JcicZ063Id [submitKey=" + submitKey + ", custId=" + custId + ", rcDate=" + rcDate + ", changePayDate=" + changePayDate + ", closedDate=" + closedDate + "]";
+    return "JcicZ063Id [submitKey=" + submitKey + ", custId=" + custId + ", rcDate=" + rcDate + ", changePayDate=" + changePayDate + "]";
   }
 }

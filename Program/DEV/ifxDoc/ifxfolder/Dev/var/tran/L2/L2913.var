@@ -222,6 +222,12 @@ T(2,#ClCode2)
 #OClNo=A,7,L
 T(2,#ClNo)
 
+![原擔保品編號]
+
+#OGdRid1=X,1,L
+#OGdRid2=X,2,L
+#OGdRnum=X,7,L
+
 !地區別
 #OCityCode=X,2,L
 
@@ -404,7 +410,7 @@ TXFORM=L2913
 <sub type="PART" name="L2913" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
 [
 ["[L2913]                                 股票擔保品資料查詢"],
-[#<->#,"擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],
+["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdRid1,"－",#OGdRid2,"－",#OGdRnum],
 [#<->#,"地區別",#OCityCode,#OCityCodeX],
 ["擔保品類別",#OClTypeCode,#OClTypeCodeX],
 [#<->#,"股票代號",#OStockCode,#OStockCodeX],

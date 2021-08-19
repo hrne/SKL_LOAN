@@ -14,10 +14,10 @@ import com.st1.itx.db.domain.JcicZ571;
 import com.st1.itx.db.service.JcicZ571Service;
 import com.st1.itx.tradeService.TradeBuffer;
 
+
 @Service("L8R34")
 @Scope("prototype")
 /**
- * 
  * 
  * @author Fegie  / Mata
  * @version 1.0.0
@@ -32,7 +32,7 @@ public class L8R34 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8r34 ");
 		this.totaVo.init(titaVo);
-		this.info("L8r34rimstart");
+		logger.info("L8r34rimstart");
 		String iUkey = titaVo.getParam("RimUkey");
         JcicZ571 iJcicZ571 = new JcicZ571();
 		iJcicZ571 = iJcicZ571Service.ukeyFirst(iUkey, titaVo);
@@ -40,7 +40,7 @@ public class L8R34 extends TradeBuffer {
 		if (iJcicZ571 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
 		}else {
-			this.info("L8R34update");
+			logger.info("L8R34update");
 			totaVo.putParam("L8r34TranKey", iJcicZ571.getTranKey());// 交易代碼
 			totaVo.putParam("L8r34CustId", iJcicZ571.getCustId());// 債務人IDN
 			totaVo.putParam("L8r34SubmitKey", iJcicZ571.getSubmitKey());// 報送單位代號

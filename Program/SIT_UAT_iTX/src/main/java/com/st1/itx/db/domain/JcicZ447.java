@@ -29,7 +29,7 @@ public class JcicZ447 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 5694326130843486127L;
+	private static final long serialVersionUID = 232093087297984867L;
 
 @EmbeddedId
   private JcicZ447Id jcicZ447Id;
@@ -54,8 +54,8 @@ public class JcicZ447 implements Serializable {
 
   // 受理調解機構代號
   /* 三位文數字法院名稱代號表(CdCode.CourtCode)或郵遞區號 */
-  @Column(name = "`BankId`", length = 3, insertable = false, updatable = false)
-  private String bankId;
+  @Column(name = "`CourtCode`", length = 3, insertable = false, updatable = false)
+  private String courtCode;
 
   // 依民法第323條計算之債務總金額
   @Column(name = "`Civil323Amt`")
@@ -94,6 +94,10 @@ public class JcicZ447 implements Serializable {
   // 轉JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -204,8 +208,8 @@ public class JcicZ447 implements Serializable {
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
 	* @return String
 	*/
-  public String getBankId() {
-    return this.bankId == null ? "" : this.bankId;
+  public String getCourtCode() {
+    return this.courtCode == null ? "" : this.courtCode;
   }
 
 /**
@@ -213,10 +217,10 @@ public class JcicZ447 implements Serializable {
 	* 三位文數字
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
   *
-  * @param bankId 受理調解機構代號
+  * @param courtCode 受理調解機構代號
 	*/
-  public void setBankId(String bankId) {
-    this.bankId = bankId;
+  public void setCourtCode(String courtCode) {
+    this.courtCode = courtCode;
   }
 
 /**
@@ -391,6 +395,25 @@ public class JcicZ447 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -471,7 +494,7 @@ public class JcicZ447 implements Serializable {
   public String toString() {
     return "JcicZ447 [jcicZ447Id=" + jcicZ447Id + ", tranKey=" + tranKey + ", civil323Amt=" + civil323Amt
            + ", totalAmt=" + totalAmt + ", signDate=" + signDate + ", firstPayDate=" + firstPayDate + ", period=" + period + ", rate=" + rate + ", monthPayAmt=" + monthPayAmt
-           + ", payAccount=" + payAccount + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", payAccount=" + payAccount + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -4,8 +4,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.eum.ContentName;
 @Service("l5075ServiceImpl")
 @Repository
 public class L5075ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5075ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -35,35 +32,48 @@ public class L5075ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 創建程式碼後,檢查初始值
 		// org.junit.Assert.assertNotNull(sPfItDetailService);
 	}
+	// *** 折返控制相關 ***
+		private int index;
 
+		// *** 折返控制相關 ***
+		private int limit;
+		
+		
 	@SuppressWarnings("unchecked")
-	public List<NegMain> findData(TitaVo titaVo) throws LogicException {
-		logger.info("Run l5075ServiceImpl.findData ");
+	public List<NegMain> findData(TitaVo titaVo,int index, int limit) throws LogicException {
+		this.info("Run l5075ServiceImpl.findData ");
 		String WorkSubject = titaVo.getParam("WorkSubject").trim(); // 作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
 		String NextPayDate = titaVo.getParam("NextPayDate").trim(); // 1:滯繳- 逾期基準日;2:應繳-下次應繳日
 		String AcDate = titaVo.getParam("AcDate").trim(); // 3:還款結束日 >= 會計日
 		String CustId = titaVo.getParam("CustId").trim(); // 員工編號
 		String sql = UseSql(titaVo);
-		logger.info("sql=" + sql);
+		// *** 折返控制相關 ***
+		this.index = index;
+		// *** 折返控制相關 ***
+		this.limit = limit;
+		this.info("L597AServiceImpl this.index=[" + this.index + "],this.limit=[" + this.limit + "]");
+		this.info("sql=" + sql);
 		// int AcDate=titaVo.getOrgEntdyI();
 
-		logger.info("L5075ServiceImpl NextPayDate= " + NextPayDate + "");
+		this.info("L5075ServiceImpl NextPayDate= " + NextPayDate + "");
 		if (NextPayDate != null && NextPayDate.length() != 0) {
 			if (NextPayDate.length() == 7) {
 				NextPayDate = String.valueOf((Integer.parseInt(NextPayDate) + 19110000));
 			}
 		}
-		
-		logger.info("L5075ServiceImpl AcDate= " + AcDate + "");
+
+		this.info("L5075ServiceImpl AcDate= " + AcDate + "");
 		if (AcDate != null && AcDate.length() != 0) {
 			if (AcDate.length() == 7) {
 				AcDate = String.valueOf((Integer.parseInt(AcDate) + 19110000));
 			}
 		}
-		
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql, NegMain.class);
+	
+		
 		switch (WorkSubject) {
 		case "1":
 			// 1:滯繳(時間到未繳)
@@ -88,6 +98,16 @@ public class L5075ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (CustId != null && CustId.length() != 0) {
 			query.setParameter("CustId", CustId);
 		}
+		
+		// *** 折返控制相關 ***
+		// 設定從第幾筆開始抓,需在createNativeQuery後設定
+		 query.setFirstResult(this.index*this.limit);
+//		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
+
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(this.limit);
+				
 		return query.getResultList();
 	}
 
@@ -132,7 +152,7 @@ public class L5075ServiceImpl extends ASpringJpaParm implements InitializingBean
 			// E0010 功能選擇錯誤
 			throw new LogicException("E0010", "無效的[作業項目]");
 		}
-		
+ 
 		sql += "Order By \"CustNo\" Asc , \"CaseSeq\" Desc";
 		return sql;
 	}

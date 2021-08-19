@@ -34,7 +34,7 @@ public class JcicZ052Id implements Serializable {
 
   // 協商申請日
   /* YYYYMMDD */
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   public JcicZ052Id() {

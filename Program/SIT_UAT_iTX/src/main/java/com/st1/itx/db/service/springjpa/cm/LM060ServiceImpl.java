@@ -40,32 +40,34 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		// 當日(int)
 		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthLastDate = Calendar.getInstance();
+		Calendar calMonthDate = Calendar.getInstance();
 		// 設當年月底日
-		calMonthLastDate.set(iYear, iMonth, 0);
+		calMonthDate.set(iYear, iMonth, 0);
 
-		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+		// 設上個月底日
+		calMonthDate.set(iYear, iYear - 1, 0);
+
+		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
 		boolean isMonthZero = iMonth - 1 == 0;
 
-		if (nowDate < monthLastDate) {
+		if (nowDate < thisMonthEndDate) {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
-		
-		
-//		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-//		String iYEAR = iENTDY.substring(0, 4);
-//		String iMM = iENTDY.substring(4, 6);
-//		String iYYMM = iENTDY.substring(0, 6);
-		String iLYYMM = "";
-		if (String.valueOf(iMonth).equals("1")) {
-			iLYYMM = String.valueOf(iYear - 1) + "12";
-		} else {
-			iLYYMM = iYear + String.format("%02d", iMonth - 1);
-		}
 
-		this.info("lM060.findAll YYMM=" +  iYear + String.format("%02d", iMonth) + ",LYYMM=" + iLYYMM);
+//		String iLYYMM = "";
+//		
+//		if (String.valueOf(iMonth).equals("1")) {
+//			iLYYMM = String.valueOf(iYear - 1) + "12";
+//		} else {
+//			iLYYMM = iYear + String.format("%02d", iMonth - 1);
+//		}
+
+		this.info("lM060.findAll YYMM=" + iYear + String.format("%02d", iMonth) + ",LYYMM=" + lastMonthEndDate / 100
+				+ ",lday" + lastMonthEndDate);
 
 //		F0 : 前期餘額               
 //		F1 : 借方暫付款項--法務費用   
@@ -86,7 +88,21 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,SUM(\"F6\") AS F6";
 		sql += "			,SUM(\"F7\") AS F7";
 		sql += "			,SUM(\"F8\") AS F8";
-		sql += "	  FROM(SELECT DECODE(A.\"MonthEndYm\",:yymm,A.\"YdBal\",0) F0";
+		sql += "	  FROM(SELECT DECODE(A.\"MonthEndYm\",:lyymm,A.\"YdBal\",0) F0";
+		sql += "				 ,0 F1";
+		sql += "				 ,0 F2";
+		sql += "				 ,0 F3";
+		sql += "				 ,0 F4";
+		sql += "				 ,0 F5";
+		sql += "				 ,0 F6";
+		sql += "				 ,0 F7";
+		sql += "				 ,0 F8";
+		sql += "		   FROM \"AcMain\" A";
+		sql += "		   WHERE A.\"AcDate\" = :lday";
+		sql += "		     AND A.\"MonthEndYm\" = :lyymm";
+		sql += "		     AND A.\"AcctCode\" IN('F07','F24')";
+		sql += "		   UNION ALL";
+		sql += "	       SELECT 0 F0";
 		sql += "				 ,DECODE(A.\"AcctCode\",'F07',A.\"DbAmt\" + A.\"CoreDbAmt\",0) F1";
 		sql += "				 ,DECODE(A.\"AcctCode\",'F24',A.\"DbAmt\" + A.\"CoreDbAmt\",0) F2";
 		sql += "				 ,DECODE(A.\"AcctCode\",'F07',A.\"CrAmt\" + A.\"CoreCrAmt\",0) F3";
@@ -129,9 +145,9 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm",  iYear + String.format("%02d", iMonth));
-//		query.setParameter("lyymm", iLYYMM);
-
+		query.setParameter("yymm", iYear + String.format("%02d", iMonth));
+		query.setParameter("lyymm", lastMonthEndDate / 100);
+		query.setParameter("lday", lastMonthEndDate);
 		return this.convertToMap(query.getResultList());
 	}
 

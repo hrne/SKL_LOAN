@@ -36,7 +36,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6754 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6754.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -55,9 +54,9 @@ public class L6754 extends TradeBuffer {
 
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
-		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth"))+191100;
+		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
 		String iPieceCode = titaVo.getParam("PieceCode");
-		BigDecimal iUnitCnt = new BigDecimal(titaVo.getParam("UnitCnt"));	
+		BigDecimal iUnitCnt = new BigDecimal(titaVo.getParam("UnitCnt"));
 		BigDecimal iUnitAmtCond = new BigDecimal(titaVo.getParam("UnitAmtCond"));
 		BigDecimal iUnitPercent = new BigDecimal(titaVo.getParam("UnitPercent"));
 		BigDecimal iIntrodPerccent = new BigDecimal(titaVo.getParam("IntrodPerccent"));
@@ -69,20 +68,19 @@ public class L6754 extends TradeBuffer {
 		BigDecimal iBsOffrCnt = new BigDecimal(titaVo.getParam("BsOffrCnt"));
 		BigDecimal iBsOffrCntLimit = new BigDecimal(titaVo.getParam("BsOffrCntLimit"));
 		BigDecimal iBsOffrAmtCond = new BigDecimal(titaVo.getParam("BsOffrAmtCond"));
-		BigDecimal iBsOffrCntAmt = new BigDecimal(titaVo.getParam("BsOffrCntAmt"));
 		BigDecimal iBsOffrPerccent = new BigDecimal(titaVo.getParam("BsOffrPerccent"));
-		
+
 		CdPerformance iCdPerformance = new CdPerformance();
 		CdPerformanceId iCdPerformanceId = new CdPerformanceId();
 		iCdPerformanceId.setPieceCode(iPieceCode);
 		iCdPerformanceId.setWorkMonth(iWorkMonth);
-		
-		switch(iFuncCode) {
+
+		switch (iFuncCode) {
 		case 1:
 			iCdPerformance = iCdPerformanceService.findById(iCdPerformanceId, titaVo);
 			if (iCdPerformance == null) {
 				iCdPerformance = new CdPerformance();
-			}else {
+			} else {
 				throw new LogicException(titaVo, "E0005", "已有資料");
 			}
 			iCdPerformance.setCdPerformanceId(iCdPerformanceId);
@@ -98,10 +96,9 @@ public class L6754 extends TradeBuffer {
 			iCdPerformance.setBsOffrCnt(iBsOffrCnt);
 			iCdPerformance.setBsOffrCntLimit(iBsOffrCntLimit);
 			iCdPerformance.setBsOffrAmtCond(iBsOffrAmtCond);
-			iCdPerformance.setBsOffrCntAmt(iBsOffrCntAmt);
 			iCdPerformance.setBsOffrPerccent(iBsOffrPerccent);
 			try {
-				iCdPerformanceService.insert(iCdPerformance,titaVo);
+				iCdPerformanceService.insert(iCdPerformance, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "新增時發生錯誤");
 			}
@@ -111,7 +108,7 @@ public class L6754 extends TradeBuffer {
 			CdPerformance beforeCdPerformance = new CdPerformance();
 			if (iCdPerformance != null) {
 				beforeCdPerformance = (CdPerformance) dataLog.clone(iCdPerformance);
-			}else {
+			} else {
 				throw new LogicException(titaVo, "E0005", "更新時無資料");
 			}
 			iCdPerformance.setUnitCnt(iUnitCnt);
@@ -126,10 +123,9 @@ public class L6754 extends TradeBuffer {
 			iCdPerformance.setBsOffrCnt(iBsOffrCnt);
 			iCdPerformance.setBsOffrCntLimit(iBsOffrCntLimit);
 			iCdPerformance.setBsOffrAmtCond(iBsOffrAmtCond);
-			iCdPerformance.setBsOffrCntAmt(iBsOffrCntAmt);
 			iCdPerformance.setBsOffrPerccent(iBsOffrPerccent);
 			try {
-				iCdPerformanceService.update(iCdPerformance,titaVo);
+				iCdPerformanceService.update(iCdPerformance, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "更新時發生錯誤");
 			}
@@ -141,18 +137,18 @@ public class L6754 extends TradeBuffer {
 			iCdPerformance = iCdPerformanceService.holdById(iCdPerformanceId, titaVo);
 			if (iCdPerformance != null) {
 				try {
-					iCdPerformanceService.delete(iCdPerformance,titaVo);
+					iCdPerformanceService.delete(iCdPerformance, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "刪除時無資料發生錯誤");
 				}
-			}else {
+			} else {
 				throw new LogicException(titaVo, "E0005", "刪除時無資料");
 			}
 			break;
 		default:
 			break;
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

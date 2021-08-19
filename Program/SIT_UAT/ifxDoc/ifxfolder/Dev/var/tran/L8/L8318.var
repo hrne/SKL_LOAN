@@ -1,0 +1,301 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L8318)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,300,200,300];printer.width=[20,20,20,20];order=1;">
+[
+["[L8318]                                 (60)前置協商受理變更還款條件申請暨請求回報剩餘債權通知資料"],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+["#FdRcDate+原前置協商申請日",#RcDate],["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
+["#FdYM+已清分足月期付金年月",#YM],["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+]
+! ["已清分足月期付金年月",#YM,"</br>","※如200801"],["轉JCIC文字檔日期",#OutJcicTxtDate],
+
+#FdTranKey=X,2,L
+#FdCustId=X,2,L
+#FdSubmitKey=X,2,L
+#FdRcDate=X,2,L
+#FdChangePayDate=X,2,L
+#FdYM=X,2,L
+#FdOutJcicTxtDate=X,2,L
+
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!---------- 日期處理 ----------
+#VIEW_SYSDATE=X,8,S
+D(7,2,#SYSDATE,0,0)
+T(1,#VIEW_SYSDATE,2,7)
+E(0,1)ASGN(AGAIN$)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L8R01.dec"/>
+#CDDEF0001=x,20,S
+T(3,CdCode.TranKey)
+#TranKeyHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranKeyHelp,#HelpDesc1)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic060連動進入),$)
+T(F,@RcDate,0)T(F,@ChangePayDate,0)T(F,@YM,0)
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+
+![連動交易]
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@TranKey_Tmp,#NTXBUF,1,1)
+T(1,@TranKey,#NTXBUF,2,1)
+
+! 新增進入
+#Deal_New=X,1,S
+C(5,#TranKey_Tmp,1,$,S)
+T(1,@CustId,#NTXBUF,3,10)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@YM,1)
+K(MODIFYBUTTON,新增)
+T(2,@FdRcDate,*)
+T(2,@FdChangePayDate,*)
+T(2,@FdYM,*)
+
+! 異動進入
+#Deal_Update=X,1,S
+C(5,#TranKey_Tmp,2,$,S)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@YM,1)
+T(2,@FdRcDate,*)
+T(2,@FdChangePayDate,*)
+T(2,@FdYM,*)
+
+! 查詢進入
+#Deal_Search=X,1,S
+C(5,#TranKey_Tmp,5,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(NOBUTTON,CLOSEY)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,刪除)
+
+
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+
+<include src="ROM.icf::L8R29.dec"/>
+#RimUkey=X,32,S
+#RimL8r29=X,1,S
+C(5,#TranKey,A,S,$)
+T(2,@RimUkey,#Ukey)
+RESET_RIM(#RimL8r29,L8R29)
+S(L8R29,1,#RimUkey)
+R(1,L8R29)
+T(2,@CustId,#L8r29CustId)
+T(2,@SubmitKey,#L8r29SubmitKey)
+E(0,@RcDate,#L8r29RcDate)
+E(0,@ChangePayDate,#L8r29ChangePayDate)
+E(0,@YM,#L8r29YM)
+E(0,@OutJcicTxtDate,#L8r29OutJcicTxtDate)
+![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r29TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+! 調Rim相關 結束
+
+
+![交易代碼]
+#TranKey_Tmp=X,1,S
+#TranKey=X,1,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#TranKeyHelp)
+@V(H,#TranKeyHelp)
+
+#TranKeyX=X,4,L
+
+![債務人IDN]
+#CustId=X,10,L
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+
+![報送單位代號]
+#SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
+
+
+
+!原前置協商申請日
+#RcDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+D(8)
+@V(7)
+@A(DATE,0,#RcDate)
+
+
+!申請變更還款條件日
+#ChangePayDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+D(8)
+@V(7)
+@A(DATE,0,#ChangePayDate)
+
+
+#CutChangePayDate=X,1,S
+T(3,@CheckChangePayDateYyyMm,)
+
+!『申請變更還款條件日』不得大於當月10日
+#CheckChangePayDateDd=X,2,S
+T(1,#ChangePayDate,6,2)
+IF(#ChangePayDate>0,
+    IF(#CheckChangePayDateDd>10
+        ,V(P,『申請變更還款條件日』不得大於當月10日)
+    ,$)
+,s)
+
+#CheckChangePayDateYyyMm=X,5,S
+T(1,#ChangePayDate,1,5)
+
+! 已清分足月期付金年月
+#YM=A,5,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@IF(#YM>#CheckChangePayDateYyyMm,V(P,『已清分足月期付金年月』需小於等於『申請變更還款條件日』),$)
+
+#CheckYM=D,7,L
+T(2,#YM+01)
+@A(DATE,0,#CheckYM)
+
+![轉JCIC文字檔日期]
+#OutJcicTxtDate=D,7,L
+
+! 流水號
+#Ukey=X,32,S
+
+#RPTFG=X,1,S
+E(0,0)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L8318 ----------
+<sub type="FORM" name="L8318">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L8318,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8318] 前置協商受理變更還款條件申請暨請求回報剩餘債權通知資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranKey_Tmp
+#TranKey
+#CustId
+#SubmitKey
+#RcDate
+#ChangePayDate
+#YM
+#OutJcicTxtDate
+#Ukey
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8318^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
+<include src="ROM.icf::L8R29.tom"/>
+</sub>
+
+<sub type="PART" name="L8318" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L8318]                                 債務人繳款資料檔案"],
+[#<->#,"案件編號"],
+[#<->#,"統一編號"],
+["借款人戶號"],
+["核准編號"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

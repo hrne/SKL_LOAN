@@ -38,7 +38,7 @@ public class JcicZ056Id implements Serializable {
   private String caseStatus = " ";
 
   // 裁定日期或發文日期
-  @Column(name = "`ClaimDate`", length = 8)
+  @Column(name = "`ClaimDate`")
   private int claimDate = 0;
 
   // 承審法院代碼

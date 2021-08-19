@@ -66,13 +66,13 @@ public class LM038Report extends MakeReport {
 			int col = 0;
 			for (int i = 0; i < tLDVo.size(); i++) {
 
-				String tmpValue = tLDVo.get(ad);
 				ad = "F" + String.valueOf(col);
+				String tmpValue = tLDVo.get(ad);
 				col++;
 				switch (col) {
-				case 7:
+				case 6:
 					total_DataCount = total_DataCount.add(new BigDecimal(1));
-					makeExcel.setValue(row, col, tLDVo.get(ad));
+					makeExcel.setValue(row, col, ad);
 					break;
 
 				case 8:

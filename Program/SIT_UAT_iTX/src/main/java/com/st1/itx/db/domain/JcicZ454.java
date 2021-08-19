@@ -28,7 +28,7 @@ public class JcicZ454 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -4020049451330682634L;
+	private static final long serialVersionUID = -3490539082621488787L;
 
 @EmbeddedId
   private JcicZ454Id jcicZ454Id;
@@ -53,8 +53,8 @@ public class JcicZ454 implements Serializable {
 
   // 受理調解機構代號
   /* 三位文數字法院名稱代號表(CdCode.CourtCode)或郵遞區號 */
-  @Column(name = "`BankId`", length = 3, insertable = false, updatable = false)
-  private String bankId;
+  @Column(name = "`CourtCode`", length = 3, insertable = false, updatable = false)
+  private String courtCode;
 
   // 最大債權金融機構代號
   /* 三位文數字 */
@@ -73,6 +73,10 @@ public class JcicZ454 implements Serializable {
   // 轉JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -183,8 +187,8 @@ public class JcicZ454 implements Serializable {
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
 	* @return String
 	*/
-  public String getBankId() {
-    return this.bankId == null ? "" : this.bankId;
+  public String getCourtCode() {
+    return this.courtCode == null ? "" : this.courtCode;
   }
 
 /**
@@ -192,10 +196,10 @@ public class JcicZ454 implements Serializable {
 	* 三位文數字
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
   *
-  * @param bankId 受理調解機構代號
+  * @param courtCode 受理調解機構代號
 	*/
-  public void setBankId(String bankId) {
-    this.bankId = bankId;
+  public void setCourtCode(String courtCode) {
+    this.courtCode = courtCode;
   }
 
 /**
@@ -285,6 +289,25 @@ E:車貸及次順位不動產抵押權經債權金融機構處分後收回款項
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -364,7 +387,7 @@ E:車貸及次順位不動產抵押權經債權金融機構處分後收回款項
   @Override
   public String toString() {
     return "JcicZ454 [jcicZ454Id=" + jcicZ454Id + ", tranKey=" + tranKey
-           + ", payOffResult=" + payOffResult + ", payOffDate=" + payOffDate + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", payOffResult=" + payOffResult + ", payOffDate=" + payOffDate + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("jcicZ570Service")
 @Repository
-public class JcicZ570ServiceImpl implements JcicZ570Service, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(JcicZ570ServiceImpl.class);
-
+public class JcicZ570ServiceImpl extends ASpringJpaParm implements JcicZ570Service, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class JcicZ570ServiceImpl implements JcicZ570Service, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + jcicZ570Id);
+    this.info("findById " + dbName + " " + jcicZ570Id);
     Optional<JcicZ570> jcicZ570 = null;
     if (dbName.equals(ContentName.onDay))
       jcicZ570 = jcicZ570ReposDay.findById(jcicZ570Id);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "SubmitKey", "CustId", "ApplyDate"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "SubmitKey", "CustId", "ApplyDate"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ570ReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustIdEq " + dbName + " : " + "custId_0 : " + custId_0);
+    this.info("CustIdEq " + dbName + " : " + "custId_0 : " + custId_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ570ReposDay.findAllByCustIdIsOrderByCustIdAscApplyDateDesc(custId_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -153,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("RcDateEq " + dbName + " : " + "applyDate_0 : " + applyDate_0);
+    this.info("RcDateEq " + dbName + " : " + "applyDate_0 : " + applyDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ570ReposDay.findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(applyDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " +  applyDate_1);
+    this.info("CustRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " +  applyDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ570ReposDay.findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(custId_0, applyDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -209,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("otherEq " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " +  applyDate_1 + " submitKey_2 : " +  submitKey_2);
+    this.info("otherEq " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " +  applyDate_1 + " submitKey_2 : " +  submitKey_2);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ570ReposDay.findAllByCustIdIsAndApplyDateIsAndSubmitKeyIsOrderByCreateDateDesc(custId_0, applyDate_1, submitKey_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -230,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("ukeyFirst " + dbName + " : " + "ukey_0 : " + ukey_0);
+    this.info("ukeyFirst " + dbName + " : " + "ukey_0 : " + ukey_0);
     Optional<JcicZ570> jcicZ570T = null;
     if (dbName.equals(ContentName.onDay))
       jcicZ570T = jcicZ570ReposDay.findTopByUkeyIs(ukey_0);
@@ -249,7 +245,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("otherFirst " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " +  applyDate_1 + " submitKey_2 : " +  submitKey_2);
+    this.info("otherFirst " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " +  applyDate_1 + " submitKey_2 : " +  submitKey_2);
     Optional<JcicZ570> jcicZ570T = null;
     if (dbName.equals(ContentName.onDay))
       jcicZ570T = jcicZ570ReposDay.findTopByCustIdIsAndApplyDateIsAndSubmitKeyIsOrderByCreateDateDesc(custId_0, applyDate_1, submitKey_2);
@@ -268,7 +264,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jcicZ570Id);
+    this.info("Hold " + dbName + " " + jcicZ570Id);
     Optional<JcicZ570> jcicZ570 = null;
     if (dbName.equals(ContentName.onDay))
       jcicZ570 = jcicZ570ReposDay.findByJcicZ570Id(jcicZ570Id);
@@ -286,7 +282,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jcicZ570.getJcicZ570Id());
+    this.info("Hold " + dbName + " " + jcicZ570.getJcicZ570Id());
     Optional<JcicZ570> jcicZ570T = null;
     if (dbName.equals(ContentName.onDay))
       jcicZ570T = jcicZ570ReposDay.findByJcicZ570Id(jcicZ570.getJcicZ570Id());
@@ -308,7 +304,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + jcicZ570.getJcicZ570Id());
+    this.info("Insert..." + dbName + " " + jcicZ570.getJcicZ570Id());
     if (this.findById(jcicZ570.getJcicZ570Id()) != null)
       throw new DBException(2);
 
@@ -337,7 +333,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + jcicZ570.getJcicZ570Id());
+    this.info("Update..." + dbName + " " + jcicZ570.getJcicZ570Id());
     if (!empNot.isEmpty())
       jcicZ570.setLastUpdateEmpNo(empNot);
 
@@ -360,7 +356,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + jcicZ570.getJcicZ570Id());
+    this.info("Update..." + dbName + " " + jcicZ570.getJcicZ570Id());
     if (!empNot.isEmpty())
       jcicZ570.setLastUpdateEmpNo(empNot);
 
@@ -380,7 +376,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + jcicZ570.getJcicZ570Id());
+    this.info("Delete..." + dbName + " " + jcicZ570.getJcicZ570Id());
     if (dbName.equals(ContentName.onDay)) {
       jcicZ570ReposDay.delete(jcicZ570);	
       jcicZ570ReposDay.flush();
@@ -409,7 +405,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (JcicZ570 t : jcicZ570){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -444,7 +440,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (jcicZ570 == null || jcicZ570.size() == 0)
       throw new DBException(6);
 
@@ -473,7 +469,7 @@ em = null;
 
   @Override
   public void deleteAll(List<JcicZ570> jcicZ570, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

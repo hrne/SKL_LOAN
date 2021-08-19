@@ -43,6 +43,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdClNo+擔保品號碼",#ClNo],
+["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum],
 ["@",#BTN_1,"@",#BTN_2,"@",#BTN_3,"@",#BTN_4,"@",#BTN_5,"@",#BTN_6,"@",#BTNExpand],
 ["#FdBdLocation+建物門牌",#BdLocation],
 ["#FdBdMainUseCode+建物主要用途",#BdMainUseCode,#BdMainUseCodeX],
@@ -75,10 +76,6 @@ E(0,40)ASGN(INQPRT$)
 [#ParkingNo1,#ParkingQty1,[#ParkingTypeCode1,#ParkingTypeCodeX1],[#ParkingOwnerPart1,"/",#ParkingOwnerTotal1],#ParkingArea1,[#ParkingBdNoA1,"-",#ParkingBdNoB1],[#ParkingLandNoA1,"-",#ParkingLandNoB1],#ParkingAmount1]
 ],
 
-!["#grid#,{id:2,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@獨立產權車位","<br>獨立產權車位登記面積",#OOTIPARKINGAREA,"坪",
-!["建號","登記面積(坪)","價格(元)"],
-![[[#ParkingBdNoA1],["-"],[#ParkingBdNoB1]],[#ParkingArea1],[#ParkingAmt1]]],
-
 ["#grid#,{id:3,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@建物所有權人","","",
 ["統編","姓名","與授信戶關係","持份比率"],
 [[#OwnerId1],[#OwnerName1],[[#OwnerRelCode1],[#OwnerNameOwnerRelCodeX1]],[[#OwnerPart1],["/"],[#OwnerTotal1]]]],
@@ -86,7 +83,6 @@ E(0,40)ASGN(INQPRT$)
 ["原因","建立者","建立日期"],
 [[[#Reason1],[#ReasonX1],[#OtherReason1]],[#CreateEmpNo1],[#CreateDate1]]],
 ]
-!["#FdParkingProperty+獨立產權車位註記",#ParkingProperty,#ParkingPropertyX],
 
 
 #FdClCode1=X,2,L
@@ -188,19 +184,19 @@ C(3,#PAGE_FG,6,K(LIGHT,#BTN_6,TXTRED,0),K(LIGHT,#BTN_6,TXTRED,-1))
 C(3,#PAGE_FG,7,K(LIGHT,#BTNExpand,TXTRED,0),K(LIGHT,#BTNExpand,TXTRED,-1))
 
 #RESET_PAGES=@,1,S
-INVOKEJS(SHOW,p1,5,30,0)
+INVOKEJS(SHOW,p1,6,31,0)
 INVOKEJS(SHOW,grd1,0)
 INVOKEJS(SHOW,grd2,0)
 INVOKEJS(SHOW,grd3,0)
 INVOKEJS(SHOW,grd4,0)
 CALL(#KLIGHT)
-SWITCH(#PAGE_FG,1,INVOKEJS(SHOW,p1,5,5,1),
-                2,INVOKEJS(SHOW,p1,6,26,1),
-                3,INVOKEJS(SHOW,p1,27,27,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd1_3,1),
-                4,INVOKEJS(SHOW,p1,28,28,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd2_3,1),
-                5,INVOKEJS(SHOW,p1,29,29,1)INVOKEJS(SHOW,grd3,1)INVOKEJS(SHOW,grd3_3,1),
-                6,INVOKEJS(SHOW,p1,30,30,1)INVOKEJS(SHOW,grd4,1)INVOKEJS(SHOW,grd4_3,1),
-                7,INVOKEJS(SHOW,p1,5,30,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd3,1)INVOKEJS(SHOW,grd4,1),
+SWITCH(#PAGE_FG,1,INVOKEJS(SHOW,p1,6,6,1),
+                2,INVOKEJS(SHOW,p1,7,27,1),
+                3,INVOKEJS(SHOW,p1,28,28,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd1_3,1),
+                4,INVOKEJS(SHOW,p1,29,29,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd2_3,1),
+                5,INVOKEJS(SHOW,p1,30,30,1)INVOKEJS(SHOW,grd3,1)INVOKEJS(SHOW,grd3_3,1),
+                6,INVOKEJS(SHOW,p1,31,31,1)INVOKEJS(SHOW,grd4,1)INVOKEJS(SHOW,grd4_3,1),
+                7,INVOKEJS(SHOW,p1,6,31,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd3,1)INVOKEJS(SHOW,grd4,1),
                 $)
 !---------- AP TEXT AREA Variables ----------
 
@@ -368,6 +364,15 @@ T(3,)T(H,#ClCode2,#ClCode2Help)
 #ClNo=A,7,L
 C(3,#CHAIN,1,s,$)
 @V(2,0)
+
+![原擔保品編號]
+#FdGdRid=X,2,L
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
+
+
 
 !調RIM參數
 #RimClCode1=A,1,S

@@ -39,17 +39,9 @@ E(0,40)ASGN(INQPRT$)
 ["[L2415]                                 不動產建物擔保品資料登錄"],
 [#<->#,"#FdFUNCD+功能",#FunCdX],
 ["#FdCOL_IND1+擔保品代號1",#ClCode1,#ClCode1X],["#FdCOL_IND2+擔保品代號2",#ClCode2,#ClCode2X],
-[#<->#,"#FdCOL_NO+擔保品編號",#ClNo],
+["#FdCOL_NO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum],
 [#<->#,"#FdSUBTYPE+擔保品類別",#ClTypeCode,#ClTypeCodeX],
 [#<->#,"@",#Btn1,#Btn2,#Btn3,#Btn4,#Btn6,#BtnExpand],
-! [#<->#,"#FdADDRESS_1+建物門牌",#CityCode,#CityItem,"（縣／市）</BR>",
-!                               #AreaCode,#AreaItem,"（鄉／鎮／市／區）</BR>",
-!                               #IrCode,#IrItem,"（地段）</BR>",
-!                               #Road,"（路／街／村）</BR>",
-!                               #Section,"段@",#Alley,"巷@",#Lane,"弄</BR>",
-!                               #Num,"號之",#NumDash,"</BR>",
-!                               #Floor,"樓之",#FloorDash,"</BR>",
-!                               "建號",#BdNo1,"-",#BdNo2],
 [#<->#,"#FdADDRESS_2+建物門牌",#BdLocation],
 ["#FdUSAGE_IND+建物主要用途",#BdMainUseCode,#BdMainUseCodeX],["#FdBD_MATERIAL+建物主要建材",#BdMtrlCode,#BdMtrlCodeX],
 ["#FdBD_CATEGORY+建物類別",#BdTypeCode,#BdTypeCodeX],["#FdTOTAL_FLOOR+總樓層",#TotalFloor,"層"],
@@ -70,18 +62,13 @@ E(0,40)ASGN(INQPRT$)
 ["車位編號","車位數","停車位類別","權利範圍","登記面積(坪)","建號","地號","價格(元)"],
 [#ParkingNo1,#ParkingQty1,[#ParkingTypeCode1,#ParkingTypeCodeX1],[#ParkingOwnerPart1,"/",#ParkingOwnerTotal1],#ParkingArea1,[#ParkingBdNoA1,"-",#ParkingBdNoB1],[#ParkingLandNoA1,"-",#ParkingLandNoB1],#ParkingAmount1]
 ],
-! ["#grid#,{id:3,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","#FdOWNER+建物所有權人","","",
-! ["統編","姓名","與授信戶關係","持份比率"],
-! [#OwnerId_1,#OwnerName_1,[#OwnerRelCode_1,#OwnerRelCode_X_1],[#OwnerPart_1,"/",#OwnerTotal_1]]
-! ],
+
 ["#grid#,{id:4,expand:true,loop:10,row_height:1,s_cols:[200,200,200], p_cols:[20,20,20]}","#FdCHG+建物修改原因","","",
 ["原因","建立者","建立日期"],
 [[#Reason1,#ReasonX1,#OtherReason1,],#CreateEmpNo1,#CreateDate1]
 ],
 ]
-!["#FdPARKING_PROP+獨立產權車位註記",#ParkingProperty,#ParkingPropertyX],
-!["建號","登記面積(坪)","價格(元)"],
-![[#ParkingBdNoA1,"-",#ParkingBdNoB1],#ParkingArea1,#ParkingAmt1]
+
 
 !---------- AP Button AREA ----------
 
@@ -584,6 +571,13 @@ C(3,#CHAIN,1,s,$)
 @V(2,0)
 
 #FdCOL_NO=X,2,L
+
+![原擔保品編號]
+#FdGdRid=X,2,L
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
 
 
 !調RIM參數

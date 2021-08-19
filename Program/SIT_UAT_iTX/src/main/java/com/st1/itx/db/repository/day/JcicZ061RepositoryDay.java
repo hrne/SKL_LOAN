@@ -31,6 +31,15 @@ public interface JcicZ061RepositoryDay extends JpaRepository<JcicZ061, JcicZ061I
   // CustId= , AND RcDate=
   public Slice<JcicZ061> findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDescChangePayDateDesc(String custId_0, int rcDate_1, Pageable pageable);
 
+  // SubmitKey= , AND CustId= , AND RcDate= , AND ChangePayDate= , AND MaxMainCode= 
+  public Slice<JcicZ061> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndChangePayDateIsAndMaxMainCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int changePayDate_3, String maxMainCode_4, Pageable pageable);
+
+  // Ukey=
+  public Optional<JcicZ061> findTopByUkeyIs(String ukey_0);
+
+  // SubmitKey= , AND CustId= , AND RcDate= , AND ChangePayDate= , AND MaxMainCode= 
+  public Optional<JcicZ061> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndChangePayDateIsAndMaxMainCodeIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int changePayDate_3, String maxMainCode_4);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

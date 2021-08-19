@@ -29,7 +29,7 @@ public class JcicZ055 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5075640756286035498L;
+	private static final long serialVersionUID = -435362204935984435L;
 
 @EmbeddedId
   private JcicZ055Id jcicZ055Id;
@@ -140,6 +140,10 @@ public class JcicZ055 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -629,6 +633,25 @@ public class JcicZ055 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -710,7 +733,7 @@ public class JcicZ055 implements Serializable {
     return "JcicZ055 [jcicZ055Id=" + jcicZ055Id + ", tranKey=" + tranKey
            + ", year=" + year + ", courtDiv=" + courtDiv + ", courtCaseNo=" + courtCaseNo + ", payDate=" + payDate + ", payEndDate=" + payEndDate + ", period=" + period
            + ", rate=" + rate + ", outstandAmt=" + outstandAmt + ", subAmt=" + subAmt + ", claimStatus1=" + claimStatus1 + ", saveDate=" + saveDate + ", claimStatus2=" + claimStatus2
-           + ", saveEndDate=" + saveEndDate + ", isImplement=" + isImplement + ", inspectName=" + inspectName + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", saveEndDate=" + saveEndDate + ", isImplement=" + isImplement + ", inspectName=" + inspectName + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

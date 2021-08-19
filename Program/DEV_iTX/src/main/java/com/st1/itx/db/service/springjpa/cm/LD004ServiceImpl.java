@@ -17,7 +17,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -32,94 +31,65 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lD004.findAll ");
 
 		String sql = "";
- 		sql += " SELECT  A.\"SlipNo\"  ";
- 		sql += "        ,A.\"TitaTxtNo\"  ";
- 		sql += "        ,A.\"AcNoCode\"  ";
- 		sql += "        ,CA.\"AcctItem\"  ";
- 		sql += "        ,A.\"SumNo\"  ";
- 		sql += "        ,T.\"EntryDate\"  ";
- 		sql += "        ,A.\"CustNo\"  ";
- 		sql += "        ,A.\"FacmNo\"  ";
- 		sql += "        ,A.\"BormNo\"  ";
- 		sql += "        ,C.\"CustName\"  ";
- 		sql += "        ,AGroup.\"TxAmt\"  ";
- 		sql += "        ,T.\"IntStartDate\"  ";
- 		sql += "        ,T.\"IntEndDate\"  ";
- 		sql += "        ,A.\"Fullname\"  ";
- 		sql += "        ,A.\"AcDate\"  ";
- 		sql += "        ,A.\"AcSubCode\"  ";
- 		sql += "        ,A.\"SlipBatNo\" ";
- 		sql += " FROM (SELECT  A.\"SlipNo\"  ";
- 		sql += "              ,A.\"TitaTxtNo\"  ";
- 		sql += "              ,A.\"AcNoCode\"  ";
- 		sql += "              ,A.\"AcctCode\"  ";
- 		sql += "              ,A.\"SumNo\"    ";
- 		sql += "              ,A.\"CustNo\"  ";
- 		sql += "              ,A.\"FacmNo\"  ";
- 		sql += "              ,A.\"BormNo\"  ";
- 		sql += "              ,DECODE ( A.\"DbCr\",'D', - A.\"TxAmt\",A.\"TxAmt\") \"TxAmt\"  ";
- 		sql += "              ,A.\"RelDy\", A.\"TitaTlrNo\"   ";
- 		sql += "              ,E.\"Fullname\"  ";
- 		sql += "              ,A.\"RelTxseq\"  ";
- 		sql += "              ,A.\"AcDate\"  ";
- 		sql += "              ,A.\"AcSubCode\"  ";
- 		sql += "              ,A.\"DbCr\"  ";
- 		sql += "              ,A.\"SlipBatNo\" ";
- 		sql += "       FROM  \"AcDetail\" A  ";
- 		sql += "       LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = A.\"TitaTlrNo\"  ";
- 		sql += "       WHERE (    A.\"TitaTxCd\" LIKE 'L32%'  ";
- 		sql += "               OR A.\"TitaTxCd\" LIKE 'L34%'  ";
- 		sql += "               OR A.\"TitaTxCd\" LIKE 'L36%' ";
- 		sql += "             )  ";
- 		sql += "         AND (    A.\"AcctCode\" LIKE '3%'  ";
- 		sql += "               OR A.\"AcctCode\" LIKE '9%'  ";
- 		sql += "               OR A.\"AcctCode\" LIKE 'I%'  ";
- 		sql += "               OR A.\"AcctCode\" LIKE 'F%'  ";
- 		sql += "               OR A.\"AcctCode\" = 'TMI'  ";
- 		sql += "             )    ";
- 		sql += "         AND A.\"EntAc\" = 1  ";
- 		sql += "      ) A  ";
- 		sql += " LEFT JOIN \"LoanBorTx\" T ON T.\"AcDate\" = A.\"AcDate\"   ";
- 		sql += "                          AND TO_NUMBER(T.\"TitaTxtNo\") = A.\"TitaTxtNo\"  ";
- 		sql += "                          AND T.\"CustNo\" = A.\"CustNo\"  ";
- 		sql += "                          AND T.\"FacmNo\" = A.\"FacmNo\"  ";
- 		sql += "                          AND T.\"TxAmt\"  = A.\"TxAmt\" * DECODE(A.\"DbCr\",'C',1,-1)  ";
- 		sql += " LEFT JOIN \"CdAcCode\" CA ON CA.\"AcctCode\" = A.\"AcctCode\"    ";
- 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = A.\"CustNo\"  ";
- 		sql += " LEFT JOIN ( SELECT \"AcDate\" ";
- 		sql += "                   ,\"CustNo\" ";
- 		sql += "                   ,\"SlipNo\" ";
- 		sql += "                   ,SUM(\"TxAmt\" * DECODE(\"DbCr\", 'D', -1, 1)) \"TxAmt\" ";
- 		sql += "             FROM \"AcDetail\" ";
- 		sql += "             WHERE :inputTradeSeq = SUBSTR(\"RelTxseq\",5)  ";
- 		sql += "             GROUP BY \"AcDate\", \"CustNo\", \"SlipNo\" ";
- 		sql += "           ) AGroup ON AGroup.\"AcDate\" = A.\"AcDate\" ";
- 		sql += "                   AND AGroup.\"CustNo\" = A.\"CustNo\" ";
- 		sql += "                   AND AGroup.\"SlipNo\" = A.\"SlipNo\" ";
- 		sql += " WHERE C.\"EntCode\" = 1   ";
- 		sql += "   AND :inputTradeSeq = SUBSTR(A.\"RelTxseq\",5)  ";
-
-		/*
-		 * SELECT A."SlipNo", A."TitaTxtNo", A."AcNoCode" , CA."AcctItem", A."SumNo",
-		 * T."EntryDate" , A."CustNo", A."FacmNo", A."BormNo" , C."CustName", A."TxAmt",
-		 * T."IntStartDate" , T."IntEndDate" FROM (SELECT A."SlipNo", A."TitaTxtNo",
-		 * A."AcNoCode" , A."AcctCode", A."SumNo" , A."CustNo", A."FacmNo", A."BormNo" ,
-		 * DECODE(A."DbCr", 'D', - A."TxAmt", A."TxAmt") "TxAmt" , A."RelDy",
-		 * A."TitaTlrNo" FROM "AcDetail" A WHERE A."AcDate" = 本營業日 AND (A."TitaTxCd"
-		 * LIKE 'L32%' OR A."TitaTxCd" LIKE 'L34%') AND (A."AcctCode" LIKE '3%' OR
-		 * A."AcctCode" LIKE '9%') AND A."EntAc" = 1 ) A LEFT JOIN "LoanBorTx" T ON
-		 * T."AcDate" = A."RelDy" AND T."TitaTlrNo" = A."TitaTlrNo" AND T."TitaTxtNo" =
-		 * A."TitaTxtNo" LEFT JOIN "CdAcCode" CA ON CA."AcctCode" = A."AcctCode" LEFT
-		 * JOIN "CustMain" C ON C."CustNo" = A."CustNo" WHERE C."EntCode" = 1
-		 */
+		sql += " SELECT ACD.\"SlipNo\" "; // 傳票號碼
+		sql += "      , ACD.\"TitaTxtNo\" "; // 交易序號
+		sql += "      , ACD.\"AcNoCode\" "; // 會計科目代碼
+		sql += "      , CDAC.\"AcNoItem\" "; // 會計科目名稱
+		sql += "      , ACD.\"SumNo\" "; // 彙總別
+		sql += "      , TX.\"EntryDate\" "; // 入帳日期
+		sql += "      , LPAD(TX.\"CustNo\",7,'0') AS \"CustNo\" "; // 戶號
+		sql += "      , LPAD(TX.\"FacmNo\",3,'0') AS \"FacmNo\" "; //額度
+		sql += "      , LPAD(TX.\"BormNo\",3,'0') AS \"BormNo\" "; // 撥款編號 
+		sql += "      , CM.\"CustName\" "; // 戶名
+		sql += "      , CASE ";
+		sql += "         WHEN :inputOption = 1 "; // 還本收據
+		sql += "         THEN TX.\"Principal\" ";
+		sql += "         WHEN :inputOption = 2 "; // 繳息收據
+		sql += "         THEN TX.\"Interest\" ";
+		sql += "        ELSE 0 END AS \"Amt\" ";
+		sql += "      , TX.\"IntStartDate\" "; // 計算期間-起
+		sql += "      , TX.\"IntEndDate\" "; // 計算期間-止
+		sql += "      , CDE.\"Fullname\" ";
+		sql += "      , TX.\"AcDate\" "; // 會計日期
+		sql += "      , ACD.\"AcSubCode\" "; // 子目
+		sql += "      , ACD.\"SlipBatNo\" "; // 傳票批號
+		sql += " FROM \"LoanBorTx\" TX ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = TX.\"CustNo\" ";
+		sql += " LEFT JOIN \"AcDetail\" ACD ON ACD.\"AcDate\" = TX.\"AcDate\" ";
+		sql += "                         AND ACD.\"TitaTxtNo\" = TX.\"TitaTxtNo\" ";
+		sql += "                         AND ACD.\"TitaTxCd\" = TX.\"TitaTxCd\" ";
+		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
+		sql += "                          AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
+		sql += "                          AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += " LEFT JOIN \"CdEmp\" CDE ON CDE.\"EmployeeNo\" = ACD.\"TitaTlrNo\" ";
+		sql += " WHERE TX.\"TitaHCode\" = 0 "; // 訂正別為0:正常
+		sql += "   AND CM.\"EntCode\" IN (1,2) "; // 企金別為1:企金、2:企金自然人
+		sql += "   AND TX.\"AcDate\" = :inputAcDate "; // 會計日期
+		sql += "   AND ACD.\"SlipNo\" >= :inputSlipNoStart "; // 傳票號碼-起
+		sql += "   AND ACD.\"SlipNo\" <= :inputSlipNoEnd "; // 傳票號碼-止
+		sql += "   AND ACD.\"TitaTxtNo\" >= :inputTitaTxtNoStart "; // 交易序號-起
+		sql += "   AND ACD.\"TitaTxtNo\" <= :inputTitaTxtNoEnd "; // 交易序號-止
+		sql += "   AND CASE ";
+		sql += "         WHEN :inputOption = 1 "; // 作業選項1:還本收據
+		sql += "         THEN TX.\"Principal\" ";
+		sql += "         WHEN :inputOption = 2 "; // 作業選項2:繳息收據
+		sql += "         THEN TX.\"Interest\" ";
+		sql += "       ELSE 0 END > 0 ";
+		sql += "   AND TX.\"TxAmt\" > 0 ";
 
 		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		query = em.createNativeQuery(sql);
-		query.setParameter("inputTradeSeq", titaVo.getParam("inputTradeSeq"));
-
+		
+		query.setParameter("inputAcDate", Integer.toString(Integer.valueOf(titaVo.getParam("inputAcDate"))+19110000));
+		query.setParameter("inputSlipNoStart", titaVo.getParam("inputSlipNoStart"));
+		query.setParameter("inputSlipNoEnd", titaVo.getParam("inputSlipNoEnd"));
+		query.setParameter("inputTitaTxtNoStart", titaVo.getParam("inputTitaTxtNoStart"));
+		query.setParameter("inputTitaTxtNoEnd", titaVo.getParam("inputTitaTxtNoEnd"));
+		query.setParameter("inputOption", titaVo.getParam("inputOption"));
+		
 		return this.convertToMap(query.getResultList());
 	}
 

@@ -35,6 +35,15 @@ public interface JcicZ050Repository extends JpaRepository<JcicZ050, JcicZ050Id> 
   // CustId= , AND TranKey ^i
   public Slice<JcicZ050> findAllByCustIdIsAndTranKeyInOrderByCustIdAscRcDateDescPayDateDesc(String custId_0, List<String> tranKey_1, Pageable pageable);
 
+  // CustId= , AND RcDate= , AND PayDate=
+  public Slice<JcicZ050> findAllByCustIdIsAndRcDateIsAndPayDateIsOrderByCreateDateDesc(String custId_0, int rcDate_1, int payDate_2, Pageable pageable);
+
+  // Ukey=
+  public Optional<JcicZ050> findTopByUkeyIs(String ukey_0);
+
+  // CustId= , AND RcDate= , AND PayDate=
+  public Optional<JcicZ050> findTopByCustIdIsAndRcDateIsAndPayDateIsOrderByCreateDateDesc(String custId_0, int rcDate_1, int payDate_2);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

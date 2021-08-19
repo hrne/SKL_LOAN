@@ -27,7 +27,7 @@ public class CdPerformance implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 9011543980368024209L;
+	private static final long serialVersionUID = 584223766104976467L;
 
 @EmbeddedId
   private CdPerformanceId cdPerformanceId;
@@ -98,14 +98,9 @@ public class CdPerformance implements Serializable {
   private BigDecimal bsOffrCntLimit = new BigDecimal("0");
 
   // 房貸專員_計件金額門檻
-  /* 例: 0=無限制 , 600000=1件(60萬以上) */
+  /* 例: 600000=1件(60萬以上)例: 100000=10萬計0.1件,最高1件 */
   @Column(name = "`BsOffrAmtCond`")
   private BigDecimal bsOffrAmtCond = new BigDecimal("0");
-
-  // 房貸專員_計件金額門檻(動支、增貸)
-  /* 房貸專員_件數&amp;gt;0時有值例: 100000=10萬計0.1件,最高1件 */
-  @Column(name = "`BsOffrCntAmt`")
-  private BigDecimal bsOffrCntAmt = new BigDecimal("0");
 
   // 房貸專員_撥款業績_比例
   /* 輸入比例例: 0=無 , 1=全部計算 , 0.5=撥款金額*1/2 */
@@ -436,7 +431,8 @@ E: 展期件
 
 /**
 	* 房貸專員_計件金額門檻<br>
-	* 例: 0=無限制 , 600000=1件(60萬以上)
+	* 例: 600000=1件(60萬以上)
+例: 100000=10萬計0.1件,最高1件
 	* @return BigDecimal
 	*/
   public BigDecimal getBsOffrAmtCond() {
@@ -445,33 +441,13 @@ E: 展期件
 
 /**
 	* 房貸專員_計件金額門檻<br>
-	* 例: 0=無限制 , 600000=1件(60萬以上)
+	* 例: 600000=1件(60萬以上)
+例: 100000=10萬計0.1件,最高1件
   *
   * @param bsOffrAmtCond 房貸專員_計件金額門檻
 	*/
   public void setBsOffrAmtCond(BigDecimal bsOffrAmtCond) {
     this.bsOffrAmtCond = bsOffrAmtCond;
-  }
-
-/**
-	* 房貸專員_計件金額門檻(動支、增貸)<br>
-	* 房貸專員_件數&amp;gt;0時有值
-例: 100000=10萬計0.1件,最高1件
-	* @return BigDecimal
-	*/
-  public BigDecimal getBsOffrCntAmt() {
-    return this.bsOffrCntAmt;
-  }
-
-/**
-	* 房貸專員_計件金額門檻(動支、增貸)<br>
-	* 房貸專員_件數&amp;gt;0時有值
-例: 100000=10萬計0.1件,最高1件
-  *
-  * @param bsOffrCntAmt 房貸專員_計件金額門檻(動支、增貸)
-	*/
-  public void setBsOffrCntAmt(BigDecimal bsOffrCntAmt) {
-    this.bsOffrCntAmt = bsOffrCntAmt;
   }
 
 /**
@@ -576,7 +552,7 @@ E: 展期件
   public String toString() {
     return "CdPerformance [cdPerformanceId=" + cdPerformanceId + ", unitCnt=" + unitCnt + ", unitAmtCond=" + unitAmtCond + ", unitPercent=" + unitPercent + ", introdPerccent=" + introdPerccent
            + ", introdAmtCond=" + introdAmtCond + ", introdPfEqBase=" + introdPfEqBase + ", introdPfEqAmt=" + introdPfEqAmt + ", introdRewardBase=" + introdRewardBase + ", introdReward=" + introdReward + ", bsOffrCnt=" + bsOffrCnt
-           + ", bsOffrCntLimit=" + bsOffrCntLimit + ", bsOffrAmtCond=" + bsOffrAmtCond + ", bsOffrCntAmt=" + bsOffrCntAmt + ", bsOffrPerccent=" + bsOffrPerccent + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", bsOffrCntLimit=" + bsOffrCntLimit + ", bsOffrAmtCond=" + bsOffrAmtCond + ", bsOffrPerccent=" + bsOffrPerccent + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

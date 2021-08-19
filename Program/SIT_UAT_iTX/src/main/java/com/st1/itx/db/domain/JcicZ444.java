@@ -28,7 +28,7 @@ public class JcicZ444 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6009193978098092560L;
+	private static final long serialVersionUID = -3365195105817253045L;
 
 @EmbeddedId
   private JcicZ444Id jcicZ444Id;
@@ -53,8 +53,8 @@ public class JcicZ444 implements Serializable {
 
   // 受理調解機構代號
   /* 三位文數字法院名稱代號表(CdCode.CourtCode)或郵遞區號 */
-  @Column(name = "`BankId`", length = 3, insertable = false, updatable = false)
-  private String bankId;
+  @Column(name = "`CourtCode`", length = 3, insertable = false, updatable = false)
+  private String courtCode;
 
   // 債務人戶籍之郵遞區號及地址
   /* 38個中文 */
@@ -81,6 +81,10 @@ public class JcicZ444 implements Serializable {
   // 轉JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -191,8 +195,8 @@ public class JcicZ444 implements Serializable {
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
 	* @return String
 	*/
-  public String getBankId() {
-    return this.bankId == null ? "" : this.bankId;
+  public String getCourtCode() {
+    return this.courtCode == null ? "" : this.courtCode;
   }
 
 /**
@@ -200,10 +204,10 @@ public class JcicZ444 implements Serializable {
 	* 三位文數字
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
   *
-  * @param bankId 受理調解機構代號
+  * @param courtCode 受理調解機構代號
 	*/
-  public void setBankId(String bankId) {
-    this.bankId = bankId;
+  public void setCourtCode(String courtCode) {
+    this.courtCode = courtCode;
   }
 
 /**
@@ -321,6 +325,25 @@ public class JcicZ444 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -400,7 +423,7 @@ public class JcicZ444 implements Serializable {
   @Override
   public String toString() {
     return "JcicZ444 [jcicZ444Id=" + jcicZ444Id + ", tranKey=" + tranKey + ", custRegAddr=" + custRegAddr
-           + ", custComAddr=" + custComAddr + ", custRegTelNo=" + custRegTelNo + ", custComTelNo=" + custComTelNo + ", custMobilNo=" + custMobilNo + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", custComAddr=" + custComAddr + ", custRegTelNo=" + custRegTelNo + ", custComTelNo=" + custComTelNo + ", custMobilNo=" + custMobilNo + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

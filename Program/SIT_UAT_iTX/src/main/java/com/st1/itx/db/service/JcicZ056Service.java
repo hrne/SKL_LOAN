@@ -84,6 +84,43 @@ public interface JcicZ056Service {
   public Slice<JcicZ056> CheckCaseStatus(String submitKey_0, String custId_1, int claimDate_2, String courtCode_3, int index, int limit, TitaVo... titaVo);
 
   /**
+   * SubmitKey= , AND CustId= , AND CaseStatus= , AND ClaimDate= , AND CourtCode=
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param caseStatus_2 caseStatus_2
+   * @param claimDate_3 claimDate_3
+   * @param courtCode_4 courtCode_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ056 JcicZ056 of List
+   */
+  public Slice<JcicZ056> otherEq(String submitKey_0, String custId_1, String caseStatus_2, int claimDate_3, String courtCode_4, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Ukey=
+   *
+   * @param ukey_0 ukey_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ056 JcicZ056 of List
+   */
+  public JcicZ056 ukeyFirst(String ukey_0, TitaVo... titaVo);
+
+  /**
+   * SubmitKey= , AND CustId= , AND CaseStatus= , AND ClaimDate= , AND CourtCode=
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param caseStatus_2 caseStatus_2
+   * @param claimDate_3 claimDate_3
+   * @param courtCode_4 courtCode_4
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ056 JcicZ056 of List
+   */
+  public JcicZ056 otherFirst(String submitKey_0, String custId_1, String caseStatus_2, int claimDate_3, String courtCode_4, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ056
    * 
    * @param jcicZ056Id key

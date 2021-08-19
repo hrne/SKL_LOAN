@@ -23,13 +23,22 @@ import com.st1.itx.db.domain.JcicZ575Id;
 public interface JcicZ575RepositoryDay extends JpaRepository<JcicZ575, JcicZ575Id> {
 
   // CustId=
-  public Slice<JcicZ575> findAllByCustIdIsOrderByCustIdAscApplyDateDesc(String custId_0, Pageable pageable);
+  public Slice<JcicZ575> findAllByCustIdIsOrderByApplyDateDescSubmitKeyDescBankIdDescUkeyDesc(String custId_0, Pageable pageable);
 
   // ApplyDate=
-  public Slice<JcicZ575> findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(int applyDate_0, Pageable pageable);
+  public Slice<JcicZ575> findAllByApplyDateIsOrderByCustIdAscSubmitKeyDescBankIdDescUkeyDesc(int applyDate_0, Pageable pageable);
 
   // CustId= , AND ApplyDate=
-  public Slice<JcicZ575> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(String custId_0, int applyDate_1, Pageable pageable);
+  public Slice<JcicZ575> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDescSubmitKeyDescBankIdDescUkeyDesc(String custId_0, int applyDate_1, Pageable pageable);
+
+  // CustId=, AND ApplyDate = ,AND SubmitKey = ,AND BankId = 
+  public Slice<JcicZ575> findAllByCustIdIsAndApplyDateIsAndSubmitKeyIsAndBankIdIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2, String bankId_3, Pageable pageable);
+
+  // Ukey=
+  public Optional<JcicZ575> findTopByUkeyIs(String ukey_0);
+
+  // CustId=, AND ApplyDate = ,AND SubmitKey = ,AND BankId = 
+  public Optional<JcicZ575> findTopByCustIdIsAndApplyDateIsAndSubmitKeyIsAndBankIdIsOrderByCreateDateDesc(String custId_0, int applyDate_1, String submitKey_2, String bankId_3);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

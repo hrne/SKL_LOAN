@@ -70,6 +70,39 @@ public interface JcicZ044Service {
   public Slice<JcicZ044> CustRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * SubmitKey= , AND CustId= , AND RcDate=
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ044 JcicZ044 of List
+   */
+  public Slice<JcicZ044> otherEq(String submitKey_0, String custId_1, int rcDate_2, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Ukey=
+   *
+   * @param ukey_0 ukey_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ044 JcicZ044 of List
+   */
+  public JcicZ044 ukeyFirst(String ukey_0, TitaVo... titaVo);
+
+  /**
+   * SubmitKey= , AND CustId= , AND RcDate=
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ044 JcicZ044 of List
+   */
+  public JcicZ044 otherFirst(String submitKey_0, String custId_1, int rcDate_2, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ044
    * 
    * @param jcicZ044Id key

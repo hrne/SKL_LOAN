@@ -28,7 +28,7 @@ public class JcicZ061 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2090719638929249155L;
+	private static final long serialVersionUID = -4540155970999650036L;
 
 @EmbeddedId
   private JcicZ061Id jcicZ061Id;
@@ -57,7 +57,7 @@ public class JcicZ061 implements Serializable {
 
   // 最大債權金融機構代號
   /* 三位文數字 */
-  @Column(name = "`MaxMainCode`", length = 3)
+  @Column(name = "`MaxMainCode`", length = 3, insertable = false, updatable = false)
   private String maxMainCode;
 
   // 信用貸款協商剩餘債權餘額
@@ -90,6 +90,10 @@ public class JcicZ061 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -366,6 +370,25 @@ public class JcicZ061 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -444,8 +467,9 @@ public class JcicZ061 implements Serializable {
 
   @Override
   public String toString() {
-    return "JcicZ061 [jcicZ061Id=" + jcicZ061Id + ", tranKey=" + tranKey + ", maxMainCode=" + maxMainCode
+    return "JcicZ061 [jcicZ061Id=" + jcicZ061Id + ", tranKey=" + tranKey
            + ", expBalanceAmt=" + expBalanceAmt + ", cashBalanceAmt=" + cashBalanceAmt + ", creditBalanceAmt=" + creditBalanceAmt + ", maxMainNote=" + maxMainNote + ", isGuarantor=" + isGuarantor + ", isChangePayment=" + isChangePayment
-           + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

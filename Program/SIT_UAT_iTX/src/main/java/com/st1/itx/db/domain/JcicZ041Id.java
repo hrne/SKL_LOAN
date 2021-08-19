@@ -23,15 +23,15 @@ public class JcicZ041Id implements Serializable {
 	 */
 	private static final long serialVersionUID = -9064619426267931680L;
 
-// 債務人IDN
+// 報送單位代號
+  /* 三位文數字 */
+  @Column(name = "`SubmitKey`", length = 3)
+  private String submitKey = " ";
+
+  // 債務人IDN
   /* 身份證字號 */
   @Column(name = "`CustId`", length = 10)
   private String custId = " ";
-
-  // 報送單位代號
-  /* 三位文數字 */
-  @Column(name = "`SubmitKey`")
-  private String submitKey = " ";
 
   // 協商申請日
   /* 西元年月 */
@@ -41,29 +41,10 @@ public class JcicZ041Id implements Serializable {
   public JcicZ041Id() {
   }
 
-  public JcicZ041Id(String custId, String submitKey, int rcDate) {
-    this.custId = custId;
+  public JcicZ041Id(String submitKey, String custId, int rcDate) {
     this.submitKey = submitKey;
-    this.rcDate = rcDate;
-  }
-
-/**
-	* 債務人IDN<br>
-	* 身份證字號
-	* @return String
-	*/
-  public String getCustId() {
-    return this.custId == null ? "" : this.custId;
-  }
-
-/**
-	* 債務人IDN<br>
-	* 身份證字號
-  *
-  * @param custId 債務人IDN
-	*/
-  public void setCustId(String custId) {
     this.custId = custId;
+    this.rcDate = rcDate;
   }
 
 /**
@@ -83,6 +64,25 @@ public class JcicZ041Id implements Serializable {
 	*/
   public void setSubmitKey(String submitKey) {
     this.submitKey = submitKey;
+  }
+
+/**
+	* 債務人IDN<br>
+	* 身份證字號
+	* @return String
+	*/
+  public String getCustId() {
+    return this.custId == null ? "" : this.custId;
+  }
+
+/**
+	* 債務人IDN<br>
+	* 身份證字號
+  *
+  * @param custId 債務人IDN
+	*/
+  public void setCustId(String custId) {
+    this.custId = custId;
   }
 
 /**
@@ -107,7 +107,7 @@ public class JcicZ041Id implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(custId, submitKey, rcDate);
+    return Objects.hash(submitKey, custId, rcDate);
   }
 
   @Override
@@ -117,11 +117,11 @@ public class JcicZ041Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     JcicZ041Id jcicZ041Id = (JcicZ041Id) obj;
-    return custId.equals(jcicZ041Id.custId) && submitKey == jcicZ041Id.submitKey && rcDate == jcicZ041Id.rcDate;
+    return submitKey.equals(jcicZ041Id.submitKey) && custId.equals(jcicZ041Id.custId) && rcDate == jcicZ041Id.rcDate;
   }
 
   @Override
   public String toString() {
-    return "JcicZ041Id [custId=" + custId + ", submitKey=" + submitKey + ", rcDate=" + rcDate + "]";
+    return "JcicZ041Id [submitKey=" + submitKey + ", custId=" + custId + ", rcDate=" + rcDate + "]";
   }
 }

@@ -28,7 +28,7 @@ public class JcicZ040 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7505629359761681567L;
+	private static final long serialVersionUID = 3904943107531641199L;
 
 @EmbeddedId
   private JcicZ040Id jcicZ040Id;
@@ -63,7 +63,7 @@ public class JcicZ040 implements Serializable {
   @Column(name = "`ApplyType`", length = 1)
   private String applyType;
 
-  // 轉借金融機構代號
+  // 轉介金融機構代號
   /* 受理方式為B時,本欄必填3位文數字 */
   @Column(name = "`RefBankId`", length = 3)
   private String refBankId;
@@ -101,6 +101,10 @@ public class JcicZ040 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -248,7 +252,7 @@ B:他行轉介
   }
 
 /**
-	* 轉借金融機構代號<br>
+	* 轉介金融機構代號<br>
 	* 受理方式為B時,本欄必填
 3位文數字
 	* @return String
@@ -258,11 +262,11 @@ B:他行轉介
   }
 
 /**
-	* 轉借金融機構代號<br>
+	* 轉介金融機構代號<br>
 	* 受理方式為B時,本欄必填
 3位文數字
   *
-  * @param refBankId 轉借金融機構代號
+  * @param refBankId 轉介金融機構代號
 	*/
   public void setRefBankId(String refBankId) {
     this.refBankId = refBankId;
@@ -402,6 +406,25 @@ B:他行轉介
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -482,7 +505,7 @@ B:他行轉介
   public String toString() {
     return "JcicZ040 [jcicZ040Id=" + jcicZ040Id + ", tranKey=" + tranKey + ", rbDate=" + rbDate + ", applyType=" + applyType
            + ", refBankId=" + refBankId + ", notBankId1=" + notBankId1 + ", notBankId2=" + notBankId2 + ", notBankId3=" + notBankId3 + ", notBankId4=" + notBankId4 + ", notBankId5=" + notBankId5
-           + ", notBankId6=" + notBankId6 + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", notBankId6=" + notBankId6 + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

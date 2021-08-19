@@ -33,7 +33,7 @@ public class JcicZ045Id implements Serializable {
   private String custId = " ";
 
   // 協商申請日
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   // 最大債權金融機構代號

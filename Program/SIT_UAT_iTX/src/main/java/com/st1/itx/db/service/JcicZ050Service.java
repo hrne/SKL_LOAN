@@ -82,6 +82,39 @@ public interface JcicZ050Service {
   public Slice<JcicZ050> RepayActualAmt(String custId_0, List<String> tranKey_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustId= , AND RcDate= , AND PayDate=
+   *
+   * @param custId_0 custId_0
+   * @param rcDate_1 rcDate_1
+   * @param payDate_2 payDate_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ050 JcicZ050 of List
+   */
+  public Slice<JcicZ050> otherEq(String custId_0, int rcDate_1, int payDate_2, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Ukey=
+   *
+   * @param ukey_0 ukey_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ050 JcicZ050 of List
+   */
+  public JcicZ050 ukeyFirst(String ukey_0, TitaVo... titaVo);
+
+  /**
+   * CustId= , AND RcDate= , AND PayDate=
+   *
+   * @param custId_0 custId_0
+   * @param rcDate_1 rcDate_1
+   * @param payDate_2 payDate_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ050 JcicZ050 of List
+   */
+  public JcicZ050 otherFirst(String custId_0, int rcDate_1, int payDate_2, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ050
    * 
    * @param jcicZ050Id key

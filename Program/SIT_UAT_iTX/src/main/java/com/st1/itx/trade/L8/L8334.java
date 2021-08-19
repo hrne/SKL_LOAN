@@ -3,10 +3,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.UUID;
 
-/* log */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,7 +12,6 @@ import org.springframework.stereotype.Service;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
-
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -44,7 +39,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8334 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8334.class);
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ572Service sJcicZ572Service;
@@ -100,7 +94,6 @@ public class L8334 extends TradeBuffer {
 			}catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
-			
 			break;
 		case "2":
 			iKey = titaVo.getParam("Ukey");
@@ -157,7 +150,8 @@ public class L8334 extends TradeBuffer {
 			}
 		default:
 			break;
-		}	
+		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

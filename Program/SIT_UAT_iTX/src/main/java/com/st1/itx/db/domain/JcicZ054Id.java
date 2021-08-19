@@ -23,17 +23,17 @@ public class JcicZ054Id implements Serializable {
 	 */
 	private static final long serialVersionUID = -1159804909736208752L;
 
-// 報送單位代號
+// 債務人IDN
+  @Column(name = "`CustId`", length = 10)
+  private String custId = " ";
+
+  // 報送單位代號
   /* 三位文數字 */
   @Column(name = "`SubmitKey`", length = 3)
   private String submitKey = " ";
 
-  // 債務人IDN
-  @Column(name = "`CustId`", length = 10)
-  private String custId = " ";
-
   // 協商申請日
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   // 最大債權金融機構代號
@@ -44,30 +44,11 @@ public class JcicZ054Id implements Serializable {
   public JcicZ054Id() {
   }
 
-  public JcicZ054Id(String submitKey, String custId, int rcDate, String maxMainCode) {
-    this.submitKey = submitKey;
+  public JcicZ054Id(String custId, String submitKey, int rcDate, String maxMainCode) {
     this.custId = custId;
+    this.submitKey = submitKey;
     this.rcDate = rcDate;
     this.maxMainCode = maxMainCode;
-  }
-
-/**
-	* 報送單位代號<br>
-	* 三位文數字
-	* @return String
-	*/
-  public String getSubmitKey() {
-    return this.submitKey == null ? "" : this.submitKey;
-  }
-
-/**
-	* 報送單位代號<br>
-	* 三位文數字
-  *
-  * @param submitKey 報送單位代號
-	*/
-  public void setSubmitKey(String submitKey) {
-    this.submitKey = submitKey;
   }
 
 /**
@@ -87,6 +68,25 @@ public class JcicZ054Id implements Serializable {
 	*/
   public void setCustId(String custId) {
     this.custId = custId;
+  }
+
+/**
+	* 報送單位代號<br>
+	* 三位文數字
+	* @return String
+	*/
+  public String getSubmitKey() {
+    return this.submitKey == null ? "" : this.submitKey;
+  }
+
+/**
+	* 報送單位代號<br>
+	* 三位文數字
+  *
+  * @param submitKey 報送單位代號
+	*/
+  public void setSubmitKey(String submitKey) {
+    this.submitKey = submitKey;
   }
 
 /**
@@ -130,7 +130,7 @@ public class JcicZ054Id implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(submitKey, custId, rcDate, maxMainCode);
+    return Objects.hash(custId, submitKey, rcDate, maxMainCode);
   }
 
   @Override
@@ -140,11 +140,11 @@ public class JcicZ054Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     JcicZ054Id jcicZ054Id = (JcicZ054Id) obj;
-    return submitKey.equals(jcicZ054Id.submitKey) && custId.equals(jcicZ054Id.custId) && rcDate == jcicZ054Id.rcDate && maxMainCode == jcicZ054Id.maxMainCode;
+    return custId.equals(jcicZ054Id.custId) && submitKey == jcicZ054Id.submitKey && rcDate == jcicZ054Id.rcDate && maxMainCode == jcicZ054Id.maxMainCode;
   }
 
   @Override
   public String toString() {
-    return "JcicZ054Id [submitKey=" + submitKey + ", custId=" + custId + ", rcDate=" + rcDate + ", maxMainCode=" + maxMainCode + "]";
+    return "JcicZ054Id [custId=" + custId + ", submitKey=" + submitKey + ", rcDate=" + rcDate + ", maxMainCode=" + maxMainCode + "]";
   }
 }

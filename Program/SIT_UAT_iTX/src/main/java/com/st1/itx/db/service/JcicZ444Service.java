@@ -70,6 +70,41 @@ public interface JcicZ444Service {
   public Slice<JcicZ444> CustRcEq(String custId_0, int applyDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode= 
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param applyDate_2 applyDate_2
+   * @param courtCode_3 courtCode_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ444 JcicZ444 of List
+   */
+  public Slice<JcicZ444> otherEq(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Ukey=
+   *
+   * @param ukey_0 ukey_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ444 JcicZ444 of List
+   */
+  public JcicZ444 ukeyFirst(String ukey_0, TitaVo... titaVo);
+
+  /**
+   * SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode= 
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param applyDate_2 applyDate_2
+   * @param courtCode_3 courtCode_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ444 JcicZ444 of List
+   */
+  public JcicZ444 otherFirst(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ444
    * 
    * @param jcicZ444Id key

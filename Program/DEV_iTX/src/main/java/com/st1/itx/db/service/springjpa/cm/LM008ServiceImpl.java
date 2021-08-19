@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,7 +24,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM008ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -38,7 +35,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAcctCodeGroup(TitaVo titaVo) throws Exception {
-		logger.info("lM008.findAcctCodeGroup ");
+		this.info("lM008.findAcctCodeGroup ");
 
 		String bcYearMonth = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
 
@@ -50,7 +47,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHERE A.\"YearMonth\" = :bcYearMonth )";
 		sql += "        GROUP BY \"AcctCode\"";
 		sql += "        ORDER BY \"AcctCode\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -61,7 +58,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findDetail(String acctCode, TitaVo titaVo) throws Exception {
-		logger.info("lM008.findDetail acctCode = " + acctCode);
+		this.info("lM008.findDetail acctCode = " + acctCode);
 
 		String bcDate = String.valueOf(Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000);
 		String bcYearMonth = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
@@ -83,7 +80,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    , A.\"FacmNo\"";
 		sql += "                    , A.\"LoanBal\"";
 		sql += "                    , A.\"IntRate\"";
-		sql += "                    , A.\"IntStartDate\"";
+		sql += "                    , DECODE(A.\"IntStartDate\", 0, 99999999, A.\"IntStartDate\")";
 		sql += "                    , CASE WHEN A.\"PayIntDate\" <= :bcDate THEN A.\"Interest\"";
 		sql += "                      ELSE 0 END INT";
 		sql += "                    , CASE WHEN A.\"PayIntDate\" > :bcDate THEN A.\"Interest\"";
@@ -92,11 +89,11 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               LEFT JOIN \"CustMain\" C ON  C.\"CustNo\" = A.\"CustNo\"";
 		sql += "               WHERE A.\"YearMonth\" = :bcYearMonth ";
 		sql += "                 AND A.\"AcctCode\" = :acctCode";
-//		sql += "                 AND A.\"IntStartDate\" <> 0";
+		// sql += "                 AND A.\"IntStartDate\" <> 0";
 		sql += " ) S1";
 		sql += "        GROUP BY \"AcctCode\", \"Aging\", \"CustNo\", \"CustName\", \"FacmNo\"";
 		sql += "        ORDER BY F0, F1, F2, F3";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

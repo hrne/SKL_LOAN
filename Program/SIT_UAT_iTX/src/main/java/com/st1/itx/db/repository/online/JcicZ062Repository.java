@@ -31,6 +31,15 @@ public interface JcicZ062Repository extends JpaRepository<JcicZ062, JcicZ062Id> 
   // CustId= , AND RcDate=
   public Slice<JcicZ062> findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDescChangePayDateDesc(String custId_0, int rcDate_1, Pageable pageable);
 
+  // SubmitKey= , AND CustId= , AND RcDate= , AND ChangePayDate= 
+  public Slice<JcicZ062> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndChangePayDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int changePayDate_3, Pageable pageable);
+
+  // Ukey=
+  public Optional<JcicZ062> findTopByUkeyIs(String ukey_0);
+
+  // SubmitKey= , AND CustId= , AND RcDate= , AND ChangePayDate=
+  public Optional<JcicZ062> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndChangePayDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, int changePayDate_3);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

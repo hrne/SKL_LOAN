@@ -21,7 +21,7 @@ public class JcicZ448Id implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5807652974656758969L;
+	private static final long serialVersionUID = -8048764925535212301L;
 
 // 報送單位代號
   /* 三位文數字 */
@@ -33,13 +33,13 @@ public class JcicZ448Id implements Serializable {
   private String custId = " ";
 
   // 調解申請日
-  @Column(name = "`ApplyDate`", length = 8)
+  @Column(name = "`ApplyDate`")
   private int applyDate = 0;
 
   // 受理調解機構代號
   /* 三位文數字法院名稱代號表(CdCode.CourtCode)或郵遞區號 */
-  @Column(name = "`BankId`", length = 3)
-  private String bankId = " ";
+  @Column(name = "`CourtCode`", length = 3)
+  private String courtCode = " ";
 
   // 債權金融機構代號
   /* 三位文數字 */
@@ -49,11 +49,11 @@ public class JcicZ448Id implements Serializable {
   public JcicZ448Id() {
   }
 
-  public JcicZ448Id(String submitKey, String custId, int applyDate, String bankId, String maxMainCode) {
+  public JcicZ448Id(String submitKey, String custId, int applyDate, String courtCode, String maxMainCode) {
     this.submitKey = submitKey;
     this.custId = custId;
     this.applyDate = applyDate;
-    this.bankId = bankId;
+    this.courtCode = courtCode;
     this.maxMainCode = maxMainCode;
   }
 
@@ -120,8 +120,8 @@ public class JcicZ448Id implements Serializable {
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
 	* @return String
 	*/
-  public String getBankId() {
-    return this.bankId == null ? "" : this.bankId;
+  public String getCourtCode() {
+    return this.courtCode == null ? "" : this.courtCode;
   }
 
 /**
@@ -129,10 +129,10 @@ public class JcicZ448Id implements Serializable {
 	* 三位文數字
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
   *
-  * @param bankId 受理調解機構代號
+  * @param courtCode 受理調解機構代號
 	*/
-  public void setBankId(String bankId) {
-    this.bankId = bankId;
+  public void setCourtCode(String courtCode) {
+    this.courtCode = courtCode;
   }
 
 /**
@@ -157,7 +157,7 @@ public class JcicZ448Id implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(submitKey, custId, applyDate, bankId, maxMainCode);
+    return Objects.hash(submitKey, custId, applyDate, courtCode, maxMainCode);
   }
 
   @Override
@@ -167,11 +167,11 @@ public class JcicZ448Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     JcicZ448Id jcicZ448Id = (JcicZ448Id) obj;
-    return submitKey.equals(jcicZ448Id.submitKey) && custId.equals(jcicZ448Id.custId) && applyDate == jcicZ448Id.applyDate && bankId == jcicZ448Id.bankId && maxMainCode == jcicZ448Id.maxMainCode;
+    return submitKey.equals(jcicZ448Id.submitKey) && custId.equals(jcicZ448Id.custId) && applyDate == jcicZ448Id.applyDate && courtCode == jcicZ448Id.courtCode && maxMainCode == jcicZ448Id.maxMainCode;
   }
 
   @Override
   public String toString() {
-    return "JcicZ448Id [submitKey=" + submitKey + ", custId=" + custId + ", applyDate=" + applyDate + ", bankId=" + bankId + ", maxMainCode=" + maxMainCode + "]";
+    return "JcicZ448Id [submitKey=" + submitKey + ", custId=" + custId + ", applyDate=" + applyDate + ", courtCode=" + courtCode + ", maxMainCode=" + maxMainCode + "]";
   }
 }

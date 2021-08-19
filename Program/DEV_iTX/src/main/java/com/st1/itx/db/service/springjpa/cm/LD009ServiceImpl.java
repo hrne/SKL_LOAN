@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LD009ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -32,15 +29,15 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		
-		logger.info("ld009.findAll ");
-		
-		LocalDate today = LocalDate.of(titaVo.getEntDyI()/10000 + 1911, titaVo.getEntDyI()/100%100, titaVo.getEntDyI()%100);
+
+		this.info("ld009.findAll ");
+
+		LocalDate today = LocalDate.of(titaVo.getEntDyI() / 10000 + 1911, titaVo.getEntDyI() / 100 % 100, titaVo.getEntDyI() % 100);
 		LocalDate yesterday = today.minusDays(1);
-		
-		logger.info(today.getYear() + "/" + today.getMonthValue() + "/" + today.getDayOfMonth());
-		logger.info(yesterday.getYear() + "/" + yesterday.getMonthValue() + "/" + yesterday.getDayOfMonth());
-		
+
+		this.info(today.getYear() + "/" + today.getMonthValue() + "/" + today.getDayOfMonth());
+		this.info(yesterday.getYear() + "/" + yesterday.getMonthValue() + "/" + yesterday.getDayOfMonth());
+
 		String sql = " ";
 		sql += " WITH TOTAL AS ( ";
 		sql += " "; // 前日件數及金額
@@ -61,7 +58,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"DailyLoanBal\" DL ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = DL.\"CustNo\" ";
 		sql += "                            AND AR.\"FacmNo\" = DL.\"FacmNo\" ";
-		sql += "                            AND AR.\"RvNo\"   = TO_CHAR(DL.\"BormNo\") ";
+		sql += "                            AND AR.\"RvNo\"   = LPAD(DL.\"BormNo\", 2, '0') ";
 		sql += " WHERE DL.\"DataDate\" = :lastDay "; // 每日餘額檔的資料日期為前日
 		sql += "   AND DL.\"LoanBalance\" > 0 ";
 		sql += " GROUP BY DL.\"AcctCode\" ";
@@ -87,7 +84,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND FAC.\"FacmNo\" = LBM.\"FacmNo\" ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "                            AND AR.\"FacmNo\" = LBM.\"FacmNo\" ";
-		sql += "                            AND AR.\"RvNo\"   = TO_CHAR(LBM.\"BormNo\") ";
+		sql += "                            AND AR.\"RvNo\"   = LPAD(LBM.\"BormNo\", 2, '0') ";
 		sql += " WHERE LBM.\"DrawdownDate\" = :today "; // 放款主檔的撥款日為今日
 		sql += "   AND LBM.\"LoanBal\" > 0 "; // ??? 待確認:當日撥款當日結清的要算一筆嗎?
 		sql += "   AND LBM.\"RenewFlag\" = 'N' "; // 排除借新還舊案
@@ -127,7 +124,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ) TX ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = TX.\"CustNo\" ";
 		sql += "                            AND AR.\"FacmNo\" = TX.\"FacmNo\" ";
-		sql += "                            AND AR.\"RvNo\"   = TO_CHAR(TX.\"BormNo\") ";
+		sql += "                            AND AR.\"RvNo\"   = LPAD(TX.\"BormNo\", 2, '0')";
 		sql += " GROUP BY TX.\"AcctCode\" ";
 		sql += "        , AR.\"AcSubBookCode\" ";
 		sql += " UNION ALL ";
@@ -151,7 +148,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND FAC.\"FacmNo\" = LBM.\"FacmNo\" ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "                            AND AR.\"FacmNo\" = LBM.\"FacmNo\" ";
-		sql += "                            AND AR.\"RvNo\"   = TO_CHAR(LBM.\"BormNo\") ";
+		sql += "                            AND AR.\"RvNo\"   = LPAD(LBM.\"BormNo\", 2, '0') ";
 		sql += " WHERE LBM.\"DrawdownDate\" = :today "; // 放款主檔的撥款日期為今日
 		sql += "   AND LBM.\"RenewFlag\" = 'Y' "; // 放款主檔的借新還舊記號為Y
 		sql += " GROUP BY FAC.\"AcctCode\" ";
@@ -190,7 +187,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      ) TX ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = TX.\"CustNo\" ";
 		sql += "                              AND AR.\"FacmNo\" = TX.\"FacmNo\" ";
-		sql += "                              AND AR.\"RvNo\"   = TO_CHAR(TX.\"BormNo\") ";
+		sql += "                              AND AR.\"RvNo\"   = LPAD(TX.\"BormNo\", 2, '0') ";
 		sql += " GROUP BY TX.\"AcctCode\" ";
 		sql += "        , AR.\"AcSubBookCode\" ";
 		sql += " UNION ALL ";
@@ -212,7 +209,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"DailyLoanBal\" DL ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = DL.\"CustNo\" ";
 		sql += "                              AND AR.\"FacmNo\" = DL.\"FacmNo\" ";
-		sql += "                              AND AR.\"RvNo\"   = TO_CHAR(DL.\"BormNo\") ";
+		sql += "                              AND AR.\"RvNo\"   = LPAD(DL.\"BormNo\", 2, '0') ";
 		sql += " WHERE DL.\"DataDate\" = :today "; // 每日餘額檔的資料日期為今日
 		sql += "   AND DL.\"LoanBalance\" > 0 ";
 		sql += " GROUP BY DL.\"AcctCode\" ";
@@ -249,15 +246,15 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY t.\"AcctCode\" ";
 		sql += "         ,t.\"AcSubBookCode\" ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
-		query.setParameter("today", today.getYear()+String.format("%02d", today.getMonthValue()) + String.format("%02d", today.getDayOfMonth()));
-		query.setParameter("lastDay", yesterday.getYear()+String.format("%02d", yesterday.getMonthValue()) + String.format("%02d", yesterday.getDayOfMonth()));
-		
+
+		query.setParameter("today", today.getYear() + String.format("%02d", today.getMonthValue()) + String.format("%02d", today.getDayOfMonth()));
+		query.setParameter("lastDay", yesterday.getYear() + String.format("%02d", yesterday.getMonthValue()) + String.format("%02d", yesterday.getDayOfMonth()));
+
 		return this.convertToMap(query.getResultList());
 	}
 

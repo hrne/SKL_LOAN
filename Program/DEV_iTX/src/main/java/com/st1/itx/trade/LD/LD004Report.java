@@ -55,7 +55,7 @@ public class LD004Report extends MakeReport {
 	}
 
 	public void makeReport(TitaVo titaVo, List<Map<String, String>> LD004List) throws LogicException {
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD004", "企金戶還本收據及繳息收據", "", "A4", "P");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD004", "企金戶還本收據及繳息收據", "", "A4", "L");
 		if (LD004List != null && LD004List.size() != 0) {
 			for (Map<String, String> LD4Vo : LD004List) {
 				/*
@@ -64,13 +64,13 @@ public class LD004Report extends MakeReport {
 				 */
 				String An = LD4Vo.get("F2").substring(0, 1);
 
-				this.info("EntryDate error... = " + LD4Vo.get("F5"));
-				this.info("IntStartDate error... = " + LD4Vo.get("F11"));
-				this.info("IntEndDate error... = " + LD4Vo.get("F12"));
+				this.info("EntryDate ... = " + LD4Vo.get("F5"));
+				this.info("IntStartDate ... = " + LD4Vo.get("F11"));
+				this.info("IntEndDate ... = " + LD4Vo.get("F12"));
 
 				this.print(1, 33, "新光人壽保險股份有限公司");
 				this.print(1, 2, "傳票號碼　.....　");
-				this.print(0, 25, LD4Vo.get("F0"), "R");
+				this.print(0, 19, LD4Vo.get("F0"), "L");
 
 				if ("1".equals(An)) {
 					this.print(0, 41, "還本收據");
@@ -105,13 +105,13 @@ public class LD004Report extends MakeReport {
 
 				this.print(1, 1, "┌──────────┬──────────────────┬─────────┐");
 				this.print(1, 1, "│　　　　子目　　　　│　　摘（　　　　　　入帳）要　　　　│　　　 金額 　　　│");
-				this.print(0, 33, showDate(LD4Vo.get("F5").toString(), 1));
+				this.print(0, 39, showDate(LD4Vo.get("F5").toString(), 1), "C");
 				this.print(1, 1, "├──────────┼──────────────────┼─────────┤");
+				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				if (!LD4Vo.get("F16").equals("11"))
 				{
-					this.print(0, 53, "非支票");
+					this.print(0, 55, "非支票");
 				}
-				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(1, 1, "│　　　　　　　　　　│　戶號：　　　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(0, 13, LD4Vo.get("F15"), "C");
 				this.print(0, 34, padStart(LD4Vo.get("F6").toString(), 7, "0") + "-" + padStart(LD4Vo.get("F7").toString(), 3, "0") + "-" + padStart(LD4Vo.get("F8").toString(), 3, "0"));
@@ -125,11 +125,30 @@ public class LD004Report extends MakeReport {
 				BigDecimal f10 = new BigDecimal(LD4Vo.get("F10").toString());
 				DecimalFormat df1 = new DecimalFormat("#,##0");
 				this.print(0, 80, df1.format(f10), "R");
+				
+				// 戶名太長時做wrap
+				
+				String[] custNameWrap = new String[(int)Math.ceil((double)LD4Vo.get("F9").length() / 10)];
+				
+				for (int i = 0; i < custNameWrap.length; i++)
+				{
+					if (i < custNameWrap.length - 1)
+					{
+						custNameWrap[i] = LD4Vo.get("F9").substring(10*i, 10*i+10);
+					} else {
+						custNameWrap[i] = LD4Vo.get("F9").substring(10*i);
+					}
+				}
 
 				this.print(1, 1, "│　　　　　　　　　　│　戶名：　　　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 34, LD4Vo.get("F9"));
+				this.print(0, 34, custNameWrap[0]);
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
+				if (custNameWrap.length >= 2) { this.print(0, 34, custNameWrap[1]); }
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
+				if (custNameWrap.length >= 3) { this.print(0, 34, custNameWrap[2]); }
+				// 先輸出到最大三十字，如果將來有更長的戶名需要輸出，
+				// 這裡可以考慮改成for迴圈
+				
 				this.print(1, 1, "│　　　　　　　　　　│　計算時間：　　　　　　　　　　　　│　　　　　　　　　│");
 				this.print(0, 37, showDate(LD4Vo.get("F11").toString(), 1) + " - " + showDate(LD4Vo.get("F12").toString(), 1));
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");

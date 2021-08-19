@@ -44,7 +44,7 @@ public interface JcicZ575Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ575 JcicZ575 of List
    */
-  public Slice<JcicZ575> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ575> custIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * ApplyDate=
@@ -55,7 +55,7 @@ public interface JcicZ575Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ575 JcicZ575 of List
    */
-  public Slice<JcicZ575> RcDateEq(int applyDate_0, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ575> rcDateEq(int applyDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustId= , AND ApplyDate=
@@ -67,7 +67,42 @@ public interface JcicZ575Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ575 JcicZ575 of List
    */
-  public Slice<JcicZ575> CustRcEq(String custId_0, int applyDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ575> custRcEq(String custId_0, int applyDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustId=, AND ApplyDate = ,AND SubmitKey = ,AND BankId = 
+   *
+   * @param custId_0 custId_0
+   * @param applyDate_1 applyDate_1
+   * @param submitKey_2 submitKey_2
+   * @param bankId_3 bankId_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ575 JcicZ575 of List
+   */
+  public Slice<JcicZ575> otherEq(String custId_0, int applyDate_1, String submitKey_2, String bankId_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Ukey=
+   *
+   * @param ukey_0 ukey_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ575 JcicZ575 of List
+   */
+  public JcicZ575 ukeyFirst(String ukey_0, TitaVo... titaVo);
+
+  /**
+   * CustId=, AND ApplyDate = ,AND SubmitKey = ,AND BankId = 
+   *
+   * @param custId_0 custId_0
+   * @param applyDate_1 applyDate_1
+   * @param submitKey_2 submitKey_2
+   * @param bankId_3 bankId_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ575 JcicZ575 of List
+   */
+  public JcicZ575 otherFirst(String custId_0, int applyDate_1, String submitKey_2, String bankId_3, TitaVo... titaVo);
 
   /**
    * hold By JcicZ575
