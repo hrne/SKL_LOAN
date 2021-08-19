@@ -28,7 +28,7 @@ public class JcicZ060 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6840421620345814734L;
+	private static final long serialVersionUID = 175144295980566884L;
 
 @EmbeddedId
   private JcicZ060Id jcicZ060Id;
@@ -64,6 +64,10 @@ public class JcicZ060 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -226,6 +230,25 @@ public class JcicZ060 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -305,6 +328,7 @@ public class JcicZ060 implements Serializable {
   @Override
   public String toString() {
     return "JcicZ060 [jcicZ060Id=" + jcicZ060Id + ", tranKey=" + tranKey + ", yM=" + yM
-           + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

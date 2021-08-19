@@ -40,7 +40,7 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"#FdFUNCD+功能",#FunCdX],
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdClNo+擔保品編號",#ClNo],["#FdLandSeq+土地序號",#LandSeq],
-["#FdClTypeCode+擔保品類別",#ClTypeCode,#ClTypeCodeX],
+["#FdClTypeCode+擔保品類別",#ClTypeCode,#ClTypeCodeX],["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum,"#Lgtseq"],
 [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#BtnExpand],
 [#<->#,"#FdLD_1+土地座落",#CityCode,#CityItem,"（縣／市）</BR>",
                          #AreaCode,#AreaItem,"（鄉／鎮／市／區）</BR>",
@@ -493,6 +493,14 @@ E(0,@CreateDate{i},#L2r28CreateDate{i})
 #ClTypeCodeX=X,24,L
 IF(#ClCode1==1,T(H,#ClTypeCode,#ClTypeCode21Help),T(H,#ClTypeCode,#ClTypeCode22Help))
 
+![原擔保品編號]
+#FdGdRid=X,2,L
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
+#Lgtseq=X,3,L
+
 <include src="ROM.icf::L6R03.dec"/>
 
 !調RIM參數
@@ -795,7 +803,7 @@ C(4,#OwnerId{i},S,$)
 HELP(#RelationCodeHelp)
 @V(H,#RelationCodeHelp)
 
-#OwnerRelCodeX{i}=X,4,L
+#OwnerRelCodeX{i}=X,40,L
 T(H,#OwnerRelCode{i},#RelationCodeHelp)
 
 ! [土地所有權人-持份比率(分子)]

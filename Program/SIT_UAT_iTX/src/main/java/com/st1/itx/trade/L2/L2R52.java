@@ -20,8 +20,8 @@ import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.service.ClFacService;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.domain.ClMain;
@@ -139,13 +139,16 @@ public class L2R52 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
 		}
 
+		
 		this.info("L2R52 CustNo = " + facMain.getCustNo());
 		CustMain custMain = sCustMainService.custNoFirst(facMain.getCustNo(), facMain.getCustNo(), titaVo);
-		
+
 		if (custMain == null) {
 			throw new LogicException(titaVo, "E0001", "戶號:" + facMain.getCustNo());
 		}
-		
+
+		String CustUKey = custMain.getCustUKey().trim();
+				
 		this.totaVo.putParam("L2r52CustName", custMain.getCustName());
 
 		HashMap<String, String> owners = new HashMap<String, String>();
@@ -156,7 +159,10 @@ public class L2R52 extends TradeBuffer {
 			List<ClBuildingOwner> lClBuildingOwner = slClBuildingOwner == null ? null : slClBuildingOwner.getContent();
 			if (lClBuildingOwner != null && lClBuildingOwner.size() > 0) {
 				for (ClBuildingOwner clBuildingOwner : lClBuildingOwner) {
-					owners.put(clBuildingOwner.getOwnerCustUKey(), clBuildingOwner.getOwnerCustUKey());
+					if (!custMain.getCustUKey().equals(clBuildingOwner.getOwnerCustUKey())) {
+						owners.put(clBuildingOwner.getOwnerCustUKey(), clBuildingOwner.getOwnerCustUKey());
+					}
+
 				}
 			}
 		}
@@ -165,7 +171,9 @@ public class L2R52 extends TradeBuffer {
 			List<ClLandOwner> lClLandOwner = slClLandOwner == null ? null : slClLandOwner.getContent();
 			if (lClLandOwner != null && lClLandOwner.size() > 0) {
 				for (ClLandOwner clLandOwner : lClLandOwner) {
-					owners.put(clLandOwner.getOwnerCustUKey(), clLandOwner.getOwnerCustUKey());
+					if (!custMain.getCustUKey().equals(clLandOwner.getOwnerCustUKey())) {
+						owners.put(clLandOwner.getOwnerCustUKey(), clLandOwner.getOwnerCustUKey());
+					}
 				}
 			}
 		}
@@ -177,7 +185,9 @@ public class L2R52 extends TradeBuffer {
 			clMovablesId.setClNo(iClNo);
 			ClMovables clMovables = sClMovablesService.findById(clMovablesId, titaVo);
 			if (clMovables != null) {
-				owners.put(clMovables.getOwnerCustUKey(), clMovables.getOwnerCustUKey());
+				if (!CustUKey.equals(clMovables.getOwnerCustUKey().trim())) {
+					owners.put(clMovables.getOwnerCustUKey(), clMovables.getOwnerCustUKey());
+				}
 			}
 		}
 
@@ -188,7 +198,10 @@ public class L2R52 extends TradeBuffer {
 			clStockId.setClNo(iClNo);
 			ClStock clStock = sClStockService.findById(clStockId, titaVo);
 			if (clStock != null) {
-				owners.put(clStock.getOwnerCustUKey(), clStock.getOwnerCustUKey());
+				if (!CustUKey.equals(clStock.getOwnerCustUKey().trim())) {
+					owners.put(clStock.getOwnerCustUKey(), clStock.getOwnerCustUKey());
+				}
+
 			}
 		}
 
@@ -198,8 +211,10 @@ public class L2R52 extends TradeBuffer {
 			clOtherId.setClCode2(iClCode2);
 			clOtherId.setClNo(iClNo);
 			ClOther clOther = sClOtherService.findById(clOtherId, titaVo);
-			if (clOther != null) {
-				owners.put(clOther.getOwnerCustUKey(), clOther.getOwnerCustUKey());
+			if (clOther != null) {			
+				if (!CustUKey.equals(clOther.getOwnerCustUKey().trim())) {
+					owners.put(clOther.getOwnerCustUKey(), clOther.getOwnerCustUKey());
+				}
 			}
 		}
 
@@ -216,10 +231,9 @@ public class L2R52 extends TradeBuffer {
 				occursList.putParam("L2r52OwnerName", custMain2.getCustName());
 
 				ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
-				clOwnerRelationId.setClCode1(iClCode1);
-				clOwnerRelationId.setClCode2(iClCode2);
-				clOwnerRelationId.setClNo(iClNo);
-				clOwnerRelationId.setApplNo(iApplNo);
+
+				clOwnerRelationId.setCreditSysNo(facMain.getCreditSysNo());
+				clOwnerRelationId.setCustNo(facMain.getCustNo());
 				clOwnerRelationId.setOwnerCustUKey(custUKey);
 
 				ClOwnerRelation clOwnerRelation = sClOwnerRelationService.findById(clOwnerRelationId, titaVo);

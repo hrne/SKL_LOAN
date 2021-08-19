@@ -33,7 +33,7 @@ public class JcicZ575Id implements Serializable {
   private String custId = " ";
 
   // 更生款項統一收付申請日
-  @Column(name = "`ApplyDate`", length = 8)
+  @Column(name = "`ApplyDate`")
   private int applyDate = 0;
 
   // 異動債權金機構代號

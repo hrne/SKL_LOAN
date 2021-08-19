@@ -70,6 +70,41 @@ public interface JcicZ054Service {
   public Slice<JcicZ054> CustRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * SubmitKey= , AND CustId= , AND RcDate= , AND MaxMainCode=
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param maxMainCode_3 maxMainCode_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ054 JcicZ054 of List
+   */
+  public Slice<JcicZ054> otherEq(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Ukey=
+   *
+   * @param ukey_0 ukey_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ054 JcicZ054 of List
+   */
+  public JcicZ054 ukeyFirst(String ukey_0, TitaVo... titaVo);
+
+  /**
+   * SubmitKey= , AND CustId= , AND RcDate= , AND MaxMainCode=
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param maxMainCode_3 maxMainCode_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ054 JcicZ054 of List
+   */
+  public JcicZ054 otherFirst(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ054
    * 
    * @param jcicZ054Id key

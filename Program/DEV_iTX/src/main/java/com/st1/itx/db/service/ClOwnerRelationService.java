@@ -36,20 +36,6 @@ public interface ClOwnerRelationService {
   public Slice<ClOwnerRelation> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND ApplNo =
-   *
-   * @param clCode1_0 clCode1_0
-   * @param clCode2_1 clCode2_1
-   * @param clNo_2 clNo_2
-   * @param applNo_3 applNo_3
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice ClOwnerRelation ClOwnerRelation of List
-   */
-  public Slice<ClOwnerRelation> ApplNoAll(int clCode1_0, int clCode2_1, int clNo_2, int applNo_3, int index, int limit, TitaVo... titaVo);
-
-  /**
    * hold By ClOwnerRelation
    * 
    * @param clOwnerRelationId key

@@ -29,7 +29,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6994 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6994.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -43,7 +42,7 @@ public class L6994 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth"))+191100;
+		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -55,7 +54,7 @@ public class L6994 extends TradeBuffer {
 		Slice<CdPerformance> slCdPerformance;
 		if (iWorkMonth == 191100) {
 			slCdPerformance = sCdPerformanceService.findAll(this.index, this.limit, titaVo);
-		}else {
+		} else {
 			slCdPerformance = sCdPerformanceService.findWorkMonth(iWorkMonth, this.index, this.limit, titaVo);
 		}
 
@@ -78,7 +77,6 @@ public class L6994 extends TradeBuffer {
 			occursList.putParam("OOBsOffrCnt", tCdPerformance.getBsOffrCnt());
 			occursList.putParam("OOBsOffrCntLimit", tCdPerformance.getBsOffrCntLimit());
 			occursList.putParam("OOBsOffrAmtCond", tCdPerformance.getBsOffrAmtCond());
-			occursList.putParam("OOBsOffrCntAmt", tCdPerformance.getBsOffrCntAmt());
 			occursList.putParam("OOBsOffrPerccent", tCdPerformance.getBsOffrPerccent());
 
 			/* 將每筆資料放入Tota的OcList */

@@ -29,7 +29,7 @@ public class JcicZ043 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6714145402894197752L;
+	private static final long serialVersionUID = -8993925668858297707L;
 
 @EmbeddedId
   private JcicZ043Id jcicZ043Id;
@@ -105,6 +105,10 @@ public class JcicZ043 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -457,6 +461,25 @@ public class JcicZ043 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -537,7 +560,7 @@ public class JcicZ043 implements Serializable {
   public String toString() {
     return "JcicZ043 [jcicZ043Id=" + jcicZ043Id + ", tranKey=" + tranKey
            + ", collateralType=" + collateralType + ", originLoanAmt=" + originLoanAmt + ", creditBalance=" + creditBalance + ", perPeriordAmt=" + perPeriordAmt + ", lastPayAmt=" + lastPayAmt + ", lastPayDate=" + lastPayDate
-           + ", outstandAmt=" + outstandAmt + ", repayPerMonDay=" + repayPerMonDay + ", contractStartYM=" + contractStartYM + ", contractEndYM=" + contractEndYM + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", outstandAmt=" + outstandAmt + ", repayPerMonDay=" + repayPerMonDay + ", contractStartYM=" + contractStartYM + ", contractEndYM=" + contractEndYM + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

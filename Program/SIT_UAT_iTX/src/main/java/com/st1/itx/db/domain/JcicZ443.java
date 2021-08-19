@@ -29,7 +29,7 @@ public class JcicZ443 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6632973231439928304L;
+	private static final long serialVersionUID = -559554452645189542L;
 
 @EmbeddedId
   private JcicZ443Id jcicZ443Id;
@@ -54,8 +54,8 @@ public class JcicZ443 implements Serializable {
 
   // 受理調解機構代號
   /* 三位文數字法院名稱代號表(CdCode.CourtCode)或郵遞區號 */
-  @Column(name = "`BankId`", length = 3, insertable = false, updatable = false)
-  private String bankId;
+  @Column(name = "`CourtCode`", length = 3, insertable = false, updatable = false)
+  private String courtCode;
 
   // 最大債權金融機構代號
   /* 三位文數字 */
@@ -133,6 +133,10 @@ public class JcicZ443 implements Serializable {
   // 轉JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -243,8 +247,8 @@ public class JcicZ443 implements Serializable {
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
 	* @return String
 	*/
-  public String getBankId() {
-    return this.bankId == null ? "" : this.bankId;
+  public String getCourtCode() {
+    return this.courtCode == null ? "" : this.courtCode;
   }
 
 /**
@@ -252,10 +256,10 @@ public class JcicZ443 implements Serializable {
 	* 三位文數字
 法院名稱代號表(CdCode.CourtCode)或郵遞區號
   *
-  * @param bankId 受理調解機構代號
+  * @param courtCode 受理調解機構代號
 	*/
-  public void setBankId(String bankId) {
-    this.bankId = bankId;
+  public void setCourtCode(String courtCode) {
+    this.courtCode = courtCode;
   }
 
 /**
@@ -601,6 +605,25 @@ public class JcicZ443 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -682,7 +705,7 @@ public class JcicZ443 implements Serializable {
     return "JcicZ443 [jcicZ443Id=" + jcicZ443Id + ", tranKey=" + tranKey
            + ", isMaxMain=" + isMaxMain + ", guarantyType=" + guarantyType + ", loanAmt=" + loanAmt + ", creditAmt=" + creditAmt + ", principal=" + principal
            + ", interest=" + interest + ", penalty=" + penalty + ", other=" + other + ", terminalPayAmt=" + terminalPayAmt + ", latestPayAmt=" + latestPayAmt + ", finalPayDay=" + finalPayDay
-           + ", notyetacQuit=" + notyetacQuit + ", mothPayDay=" + mothPayDay + ", beginDate=" + beginDate + ", endDate=" + endDate + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", notyetacQuit=" + notyetacQuit + ", mothPayDay=" + mothPayDay + ", beginDate=" + beginDate + ", endDate=" + endDate + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

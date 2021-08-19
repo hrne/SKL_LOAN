@@ -995,6 +995,8 @@ T(2,@Coorgnizer,#L2r05Coorgnizer)
 T(2,@CoorgnizerLb,#L2r05Coorgnizer)
 T(2,@DepartmentCode,#L2r05DepartmentCode)
 ! E(0,@BreachCode,#L2r05BreachCode)
+C(4,#L2r05ProdBreachFlag,T(3,@ProdBreachFlag,Y),T(2,@ProdBreachFlag,#L2r05ProdBreachFlag))
+C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),$)
 E(0,@CreditScore,#L2r05CreditScore)
 E(0,@GuaranteeDate,#L2r05GuaranteeDate)
 T(2,@ContractNo,#L2r05ContractNo)
@@ -1063,15 +1065,20 @@ C(3,#L2r01ExtraRepayCode,9,$,E(0,@ExtraRepayCode,#L2r01ExtraRepayCode))
 C(3,#L2r01RecycleCode,9,$,E(0,@RecycleCode,#L2r01RecycleCode))
 T(H,@RecycleCodeX,#RecycleCode,#FacmRecycleCodeHelp) 
 C(3,#L2r01GracePeriod,999,$,E(0,@GracePeriod,#L2r01GracePeriod))
-T(2,@BreachFlag,#L2r01BreachFlag)
-T(2,@Breach,#L2r01Breach)
-T(2,@Breach1,#L2r01Breach)
+T(2,@ProdBreachFlag,#L2r05ProdBreachFlag)
+C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),T(2,@Breach,#L2r01Breach))
+C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)),C(4,#L2r01Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)))
+! T(2,@BreachFlag,#L2r01BreachFlag)
+! T(2,@Breach,#L2r01Breach)
+! T(2,@Breach1,#L2r01Breach)
 
 
 #RcvL2r01B=X,1,S
-T(2,@BreachFlag,#L2r01BreachFlag)
-T(2,@Breach,#L2r01Breach)
-T(2,@Breach1,#L2r01Breach)
+C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),T(2,@Breach,#L2r01Breach))
+C(5,#L2r05ProdBreachFlag,N,C(4,#L2r05Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)),C(4,#L2r01Breach,T(3,@BreachFlag,N),T(3,@BreachFlag,Y)))
+! T(2,@BreachFlag,#L2r01BreachFlag)
+! T(2,@Breach,#L2r01Breach)
+! T(2,@Breach1,#L2r01Breach)
 
 
 
@@ -1434,7 +1441,8 @@ C(3,#UpdateCode,1,$,s)
 C(3,#BaseRateCode,99,S,$)
 C(5,#L2r01IncrFlag,Y,$,S)
 C(3,#Hide1Fg,0,CALL(#HideP1),$)
-@V(2,0.0000)
+
+
 #LbRateIncrX=X,12,L
 X(#RateIncr)
 T(B,#LbRateIncrX+#WkPercent)
@@ -1450,8 +1458,6 @@ C(3,#Hide1Fg,0,CALL(#HideP1),$)
 C(3,#UpdateCode,1,$,s)
 C(3,#BaseRateCode,99,S,$)
 C(5,#L2r01IncrFlag,Y,S,$)
-C(3,#Hide1Fg,0,CALL(#HideP1),$)
-@V(2,0.0000)
 
 #LbIndividualIncrX=X,12,L
 X(#IndividualIncr)
@@ -2068,6 +2074,7 @@ C(3,#UpdateCode,1,$,s)
 IF({m}==1,$,C(3,#StepMonthS{m},0,S,$))
 C(3,#StepMonthE{m},0,S,$)
 C(3,#Hide3Fg,0,CALL(#HideP3),$)
+IF(#StepMonthE{m}==#checkTerm,S,$)
 E(0,#StepMonthE{m}+1)
 SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n})
 @
@@ -3099,12 +3106,12 @@ C(3,#Hide8Fg,0,CALL(#HideP8),$)
 
 #ShowP7A=X,1,S
 C(3,#UpdateCode,1,$,s)
-SHOW(#BreachFlag,#BreachFlagX)
+SHOW(#BreachFlag,#BreachFlagX,#ProdBreachFlag,#ProdBreachFlagX,#Breach)
 
 #ShowP7B=X,1,S
 C(3,#UpdateCode,1,S,$)
-SHOW(#BreachFlagX)
-HIDE(#BreachFlag)
+SHOW(#BreachFlagX,#ProdBreachFlagX)
+HIDE(#BreachFlag,#ProdBreachFlag)
 
 #InitP7=X,1,S
 SWITCH(#BreachFlag,Y,T(3,@BreachFlagX,是)
@@ -3115,20 +3122,43 @@ SWITCH(#BreachFlag,Y,T(3,@BreachFlagX,是)
 !是否限制清償
 #FdBreachFlag=X,2,L
 
-#BreachFlag=X,1,L
+#BreachFlag=X,1,I
 C(3,#Hide8Fg,0,CALL(#HideP8),$)
+C(3,#UpdateCode,1,$,s)
+C(3,#DepartmentCode,0,s,$)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
 
 #BreachFlagX=X,10,L
-SWITCH(#BreachFlag,Y,T(3,是)
-                  ,N,T(3,否)
-                  ,,T(3,))
+T(H,#BreachFlag,#YesNoHelp)
+
+!違約適用方式是否按商品設定
+#FdProdBreachFlag=X,2,L
+
+#ProdBreachFlag=X,1,I
+C(3,#Hide8Fg,0,CALL(#HideP8),$)
+C(3,#UpdateCode,1,$,s)
+C(3,#DepartmentCode,0,s,$)
+C(5,#BreachFlag,#L2r01BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r01Breach),$),T(F,@ProdBreachFlag,0)),T(F,@ProdBreachFlag,0))
+C(5,#BreachFlag,#L2r01BreachFlag,C(5,#BreachFlag,Y,C(4,#Breach,T(2,@Breach,#L2r01Breach),$),s),s)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
 
 
+#ProdBreachFlagX=X,10,L
+C(4,#ProdBreachFlag,S,$)
+T(H,#ProdBreachFlag,#YesNoHelp)
 
+! #Breach1=x,200,L
 
-#Breach=x,200,L
-
-#Breach1=X,4.50,L
+#Breach=X,4.50,I
+C(3,#Hide8Fg,0,CALL(#HideP8),$)
+C(3,#UpdateCode,1,$,s)
+! IF(#ProdBreachFlag=="Y"||#ProdBreachFlag=="",T(F,@Breach,0),T(F,@Breach,1))
+IF(#BreachFlag=="N",S,$)
+IF(#ProdBreachFlag=="Y",T(2,@Breach,#L2r01Breach),$)
+C(5,#ProdBreachFlag,Y,s,$)
+C(4,#ProdBreachFlag,s,$)
 
 ! #Breach2=x,130,L
 
@@ -3298,7 +3328,7 @@ CALL2(#ADJUSTDOT,#Precision,#EvaAmt{n},#EvaAmtX{n})
 P(R,#EvaAmtX{n})
 
 #HIDECLSTEP{n}=X,1,S
-C(3,{n},1,S,$)
+! C(3,{n},1,S,$)
 C(4,#ClKey{n},HIDE(#ClKey{n},#ClApplNo{n},#ClCustNo{n},#ClFacmNo{n},#ClMainFlag{n},#EvaAmtX{n}),
               SHOW(#ClKey{n},#ClApplNo{n},#ClCustNo{n},#ClFacmNo{n},#ClMainFlag{n},#EvaAmtX{n}))
 C(4,#ClKey{n},INVOKEJS(SHOW,grd5_{n},0),
@@ -3447,11 +3477,12 @@ C(3,#CheckCode,0,$,S)
 ]
 </sub>
 
-<sub type="DC" name="p8" layout="cols=2;screen.width=[200,300,200,300];printer.width=[15,30];order=1;">
+<sub type="DC" name="p8" layout="cols=2;screen.width=[300,300,200,300];printer.width=[15,30];order=1;">
 [
 ["<font color=red>清償金類型　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
 [#<->#,"#FdBreachFlag+是否限制清償",#BreachFlag,#BreachFlagX],
-[#<->#,"@",#Breach1],
+[#<->#,"#FdProdBreachFlag+違約適用方式是否按商品設定",#ProdBreachFlag,#ProdBreachFlagX],
+[#<->#,"@",#Breach],
 ]
 </sub>
 
@@ -3498,7 +3529,7 @@ T(3,[L2154] 額度資料維護)
 #Introducer#District#FireOfficer#Estimate
 #CreditOfficer#BusinessOfficer#Supervisor
 #InvestigateOfficer#EstimateReview#Coorgnizer
-#BreachFlag
+#BreachFlag#ProdBreachFlag#Breach
 #CreditScore#ContractNo
 #CreditSysNo
 #RelationCode#RelationName#RelationId#RELACCTERR

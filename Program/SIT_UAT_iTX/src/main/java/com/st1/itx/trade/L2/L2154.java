@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -195,7 +193,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2154")
 @Scope("prototype")
 public class L2154 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2154.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -373,7 +370,7 @@ public class L2154 extends TradeBuffer {
 			tFacMain.setLastTlrNo(titaVo.getTlrNo());
 			tFacMain.setLastTxtNo(titaVo.getTxtNo());
 			try {
-				facMainService.update(tFacMain);
+				facMainService.update(tFacMain,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E2010", "額度主檔"); // 更新資料時，發生錯誤
 			}
@@ -441,7 +438,7 @@ public class L2154 extends TradeBuffer {
 				tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
 				tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
 				try {
-					tFacMain = facMainService.update(tFacMain);
+					tFacMain = facMainService.update(tFacMain,titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007",
 							"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
@@ -522,7 +519,7 @@ public class L2154 extends TradeBuffer {
 					tFacMain.setLastTlrNo(titaVo.getTlrNo());
 					tFacMain.setLastTxtNo(titaVo.getTxtNo());
 					try {
-						tFacMain = facMainService.update(tFacMain);
+						tFacMain = facMainService.update(tFacMain,titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008",
 								"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
@@ -587,7 +584,7 @@ public class L2154 extends TradeBuffer {
 					tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
 					tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
 					try {
-						tFacMain = facMainService.update(tFacMain);
+						tFacMain = facMainService.update(tFacMain,titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008",
 								"額度主檔 戶號 = " + wkCustNo + "額度編號 = " + wkFacmNo + e.getErrorMsg()); // 新增資料時，發生錯誤
@@ -686,6 +683,8 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("IrrevocableFlag", tFacMain.getIrrevocableFlag());
 		tTempVo.putParam("RateAdjNoticeCode", tFacMain.getRateAdjNoticeCode());
 		tTempVo.putParam("PieceCode", tFacMain.getPieceCode());
+		tTempVo.putParam("ProdBreachFlag", tFacMain.getProdBreachFlag());
+		tTempVo.putParam("Breach", tFacMain.getBreach());
 		tTempVo.putParam("CreditScore", tFacMain.getCreditScore());
 		tTempVo.putParam("RepayCode", tFacMain.getRepayCode());
 		tTempVo.putParam("RepayBank", titaVo.getParam("RepayBank"));
@@ -769,6 +768,8 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setIrrevocableFlag(titaVo.getParam("IrrevocableFlag"));
 		tFacMain.setRateAdjNoticeCode(titaVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(titaVo.getParam("PieceCode"));
+		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
+		tFacMain.setBreach(titaVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RepayCode")));
 //		tFacMain.setRepayBank(titaVo.getParam("RepayBank"));
@@ -813,7 +814,7 @@ public class L2154 extends TradeBuffer {
 		}
 
 		try {
-			facMainService.update(tFacMain);
+			facMainService.update(tFacMain,titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E2010", "額度主檔"); // 更新資料時，發生錯誤
 		}
@@ -828,102 +829,43 @@ public class L2154 extends TradeBuffer {
 		this.info("   sBreachNo = " + sBreachNo);
 
 		DeleteFacProdBreachRoutine();
-//		if (tFacProd.getBreachCode().equals("999")) {
-//			if (iBreachCode.equals("001") || iBreachCode.equals("003") || iBreachCode.equals("004")
-//					|| iBreachCode.equals("005")) {
-//				for (int i = 1; i <= 10; i++) {
-//					if (this.parse.stringToInteger(titaVo.getParam("BreachaYyB" + i)) > 0) {
-//						tFacProdBreach = new FacProdBreach();
-//						tFacProdBreachId = new FacProdBreachId();
-//						tFacProdBreachId.setBreachNo(sBreachNo);
-//						tFacProdBreachId.setBreachCode(iBreachCode);
-//						tFacProdBreachId.setMonthStart(
-//								this.parse.stringToInteger(titaVo.getParam("BreachaYyA" + i).trim()) * 12);
-//						tFacProdBreach.setFacProdBreachId(tFacProdBreachId);
-//						tFacProdBreach.setBreachNo(iProdNo);
-//						tFacProdBreach.setBreachCode(iBreachCode);
-//						tFacProdBreach.setMonthStart(
-//								this.parse.stringToInteger(titaVo.getParam("BreachaYyA" + i).trim()) * 12);
-//						tFacProdBreach
-//								.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("BreachaYyB" + i).trim()) * 12);
-//						tFacProdBreach.setBreachPercent(
-//								this.parse.stringToBigDecimal(titaVo.getParam("BreachaPercent" + i).trim()));
-//						try {
-//							facProdBreachService.insert(tFacProdBreach);
-//						} catch (DBException e) {
-//							throw new LogicException(titaVo, "E2009", "清償金類型"); // 新增資料時，發生錯誤
-//						}
-//					} else {
-//						break;
-//					}
-//				}
-//			}
-//			if (iBreachCode.equals("002")) {
-//				for (int i = 1; i <= 10; i++) {
-//					if (this.parse.stringToInteger(titaVo.getParam("BreachbMmB" + i)) > 0) {
-//						tFacProdBreach = new FacProdBreach();
-//						tFacProdBreachId = new FacProdBreachId();
-//						tFacProdBreachId.setBreachNo(sBreachNo);
-//						tFacProdBreachId.setBreachCode(iBreachCode);
-//						tFacProdBreachId.setMonthStart(this.parse.stringToInteger(titaVo.getParam("BreachbMmA" + i)));
-//						tFacProdBreach.setFacProdBreachId(tFacProdBreachId);
-//						tFacProdBreach.setBreachNo(iProdNo);
-//						tFacProdBreach.setBreachCode(iBreachCode);
-//						tFacProdBreach.setMonthStart(this.parse.stringToInteger(titaVo.getParam("BreachbMmA" + i)));
-//						tFacProdBreach
-//								.setMonthEnd(this.parse.stringToInteger(titaVo.getParam("BreachbMmB" + i).trim()));
-//						tFacProdBreach.setBreachPercent(
-//								this.parse.stringToBigDecimal(titaVo.getParam("BreachbPercent" + i).trim()));
-//						try {
-//							facProdBreachService.insert(tFacProdBreach);
-//						} catch (DBException e) {
-//							throw new LogicException(titaVo, "E2009", "清償金類型"); // 新增資料時，發生錯誤
-//						}
-//					} else {
-//						break;
-//					}
-//				}
-//			}
-//		}
-//
+
 	}
 
 	// 刪除清償金類型
 	private void DeleteFacProdBreachRoutine() throws LogicException {
 		this.info("DeleteFacProdBreachRoutine ...");
 
-		sBreachNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7)
-				+ FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
-		Slice<FacProdBreach> slFacProdBreach = facProdBreachService.breachNoEq(sBreachNo, "000", "999", this.index,
-				Integer.MAX_VALUE);
-		lFacProdBreach = slFacProdBreach == null ? null : slFacProdBreach.getContent();
-		if (lFacProdBreach == null || lFacProdBreach.size() == 0) {
-			return;
-		}
-		wkIdx = 1;
-		for (FacProdBreach fpb : lFacProdBreach) {
-			tTxTemp = new TxTemp();
-			tTxTempId = new TxTempId();
-			loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, wkIdx, 0, titaVo);
-			tTempVo.clear();
-			tTempVo.putParam("BreachNo", fpb.getBreachNo());
-			tTempVo.putParam("BreachCode", fpb.getBreachCode());
-			tTempVo.putParam("MonthStart", fpb.getMonthStart());
-			tTempVo.putParam("MonthEnd", fpb.getMonthEnd());
-			tTempVo.putParam("BreachPercent", fpb.getBreachPercent());
-			tTxTemp.setText(tTempVo.getJsonString());
-			try {
-				txTempService.insert(tTxTemp);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
-			}
-			wkIdx++;
-		}
-		try {
-			facProdBreachService.deleteAll(lFacProdBreach);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E2008", "清償金類型"); // 刪除資料時，發生錯誤
-		}
+//		sBreachNo = FormatUtil.pad9(String.valueOf(tFacMain.getCustNo()), 7) + FormatUtil.pad9(String.valueOf(tFacMain.getFacmNo()), 3);
+//		Slice<FacProdBreach> slFacProdBreach = facProdBreachService.breachNoEq(sBreachNo, "000", "999", this.index, Integer.MAX_VALUE);
+//		lFacProdBreach = slFacProdBreach == null ? null : slFacProdBreach.getContent();
+//		if (lFacProdBreach == null || lFacProdBreach.size() == 0) {
+//			return;
+//		}
+//		wkIdx = 1;
+//		for (FacProdBreach fpb : lFacProdBreach) {
+//			tTxTemp = new TxTemp();
+//			tTxTempId = new TxTempId();
+//			loanCom.setTxTemp(tTxTempId, tTxTemp, wkCustNo, wkFacmNo, wkIdx, 0, titaVo);
+//			tTempVo.clear();
+//			tTempVo.putParam("BreachNo", fpb.getBreachNo());
+//			tTempVo.putParam("BreachCode", fpb.getBreachCode());
+//			tTempVo.putParam("MonthStart", fpb.getMonthStart());
+//			tTempVo.putParam("MonthEnd", fpb.getMonthEnd());
+//			tTempVo.putParam("BreachPercent", fpb.getBreachPercent());
+//			tTxTemp.setText(tTempVo.getJsonString());
+//			try {
+//				txTempService.insert(tTxTemp);
+//			} catch (DBException e) {
+//				throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
+//			}
+//			wkIdx++;
+//		}
+//		try {
+//			facProdBreachService.deleteAll(lFacProdBreach);
+//		} catch (DBException e) {
+//			throw new LogicException(titaVo, "E2008", "清償金類型"); // 刪除資料時，發生錯誤
+//		}
 	}
 
 	// 訂正時, 還原額度檔
@@ -973,6 +915,8 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setIrrevocableFlag(tTempVo.getParam("IrrevocableFlag"));
 		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
+		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
+		tFacMain.setBreach(tTempVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
 //		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
@@ -1031,7 +975,7 @@ public class L2154 extends TradeBuffer {
 		}
 
 		try {
-			tFacMain = facMainService.update(tFacMain);
+			tFacMain = facMainService.update(tFacMain,titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007",
 					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
@@ -1104,6 +1048,8 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setIrrevocableFlag(tTempVo.getParam("IrrevocableFlag"));
 		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
+		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
+		tFacMain.setBreach(tTempVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
 //		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
@@ -1202,7 +1148,7 @@ public class L2154 extends TradeBuffer {
 				tFacProdStepRate.setLastUpdateEmpNo(titaVo.getTlrNo());
 
 				try {
-					facProdStepRateService.insert(tFacProdStepRate);
+					facProdStepRateService.insert(tFacProdStepRate,titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E2009", "階梯式利率"); // 新增資料時，發生錯誤
 				}

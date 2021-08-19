@@ -29,7 +29,7 @@ public class JcicZ044 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -1368787937662321604L;
+	private static final long serialVersionUID = 3722672457642965751L;
 
 @EmbeddedId
   private JcicZ044Id jcicZ044Id;
@@ -170,6 +170,10 @@ public class JcicZ044 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -844,6 +848,25 @@ public class JcicZ044 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -927,7 +950,7 @@ public class JcicZ044 implements Serializable {
            + ", receYear2=" + receYear2 + ", currentMonthIncome=" + currentMonthIncome + ", livingCost=" + livingCost + ", compName=" + compName + ", compId=" + compId + ", carCnt=" + carCnt
            + ", houseCnt=" + houseCnt + ", landCnt=" + landCnt + ", childCnt=" + childCnt + ", childRate=" + childRate + ", parentCnt=" + parentCnt + ", parentRate=" + parentRate
            + ", mouthCnt=" + mouthCnt + ", mouthRate=" + mouthRate + ", gradeType=" + gradeType + ", payLastAmt=" + payLastAmt + ", period2=" + period2 + ", rate2=" + rate2
-           + ", monthPayAmt2=" + monthPayAmt2 + ", payLastAmt2=" + payLastAmt2 + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", monthPayAmt2=" + monthPayAmt2 + ", payLastAmt2=" + payLastAmt2 + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

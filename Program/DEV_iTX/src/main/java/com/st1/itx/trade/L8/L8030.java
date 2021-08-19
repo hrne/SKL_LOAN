@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
@@ -2726,7 +2727,6 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOPayDate", "");
 	    occursListA.putParam("OOBankId", "");
 	    occursListA.putParam("OOBankIdX", "");
-	    occursListA.putParam("OORcDate", "");
 	    occursListA.putParam("OOChangePayDate", "");
 	    occursListA.putParam("OOClosedDate", "");
 	    occursListA.putParam("OOClaimDate", "");
@@ -2788,7 +2788,6 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOPayDate", "");
 	    	    occursListB.putParam("OOBankId", "");
 	    	    occursListB.putParam("OOBankIdX", "");
-	    	    occursListB.putParam("OORcDate", "");
 	    	    occursListB.putParam("OOChangePayDate", "");
 	    	    occursListB.putParam("OOClosedDate", "");
 	    	    occursListB.putParam("OOClaimDate", "");

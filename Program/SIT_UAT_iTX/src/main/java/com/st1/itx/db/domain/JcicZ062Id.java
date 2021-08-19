@@ -34,11 +34,11 @@ public class JcicZ062Id implements Serializable {
 
   // 協商申請日
   /* 原前置協商申請日 */
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   // 申請變更還款條件日
-  @Column(name = "`ChangePayDate`", length = 8)
+  @Column(name = "`ChangePayDate`")
   private int changePayDate = 0;
 
   public JcicZ062Id() {

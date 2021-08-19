@@ -2,11 +2,8 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -26,6 +23,7 @@ import com.st1.itx.db.domain.ClOtherId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
 import com.st1.itx.db.domain.FacCaseAppl;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.ClMainService;
@@ -259,8 +257,8 @@ public class L2417 extends TradeBuffer {
 				}
 			}
 
-			insertClOwnerRelation(titaVo);
-			
+			updateClOwnerRelation(titaVo);
+
 		} else if (iFunCd == 2) {// FunCd = 2 修改
 
 			// hold住資料
@@ -270,9 +268,9 @@ public class L2417 extends TradeBuffer {
 				throw new LogicException("E2003", "擔保品與額度關聯檔");
 			}
 
-			deleteClOwnerRelation(titaVo);
-			insertClOwnerRelation(titaVo);
-			
+//			deleteClOwnerRelation(titaVo);
+			updateClOwnerRelation(titaVo);
+
 		} else if (iFunCd == 4) {// FunCd = 4 刪除
 
 			tClFac = sClFacService.holdById(clFacId, titaVo);
@@ -285,8 +283,8 @@ public class L2417 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0008", "擔保品與額度關聯檔");// 刪除資料時，發生錯誤
 			}
-			
-			deleteClOwnerRelation(titaVo);
+
+//			deleteClOwnerRelation(titaVo);
 		}
 
 		this.info("L2417 check MainFg ...");
@@ -299,40 +297,56 @@ public class L2417 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void deleteClOwnerRelation(TitaVo titaVo) throws LogicException {
+//	private void deleteClOwnerRelation(TitaVo titaVo) throws LogicException {
+//
+//		Slice<ClOwnerRelation> slClOwnerRelation = sClOwnerRelationService.ApplNoAll(iClCode1, iClCode2, iClNo, iApplNo, 0, Integer.MAX_VALUE, titaVo);
+//		List<ClOwnerRelation> lClOwnerRelation = slClOwnerRelation == null ? null : slClOwnerRelation.getContent();
+//		if (lClOwnerRelation != null && lClOwnerRelation.size() > 0) {
+//			try {
+//				sClOwnerRelationService.deleteAll(lClOwnerRelation, titaVo);
+//			} catch (DBException e) {
+//				throw new LogicException("E0008", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+//			}
+//		}
+//	}
 
-		Slice<ClOwnerRelation> slClOwnerRelation = sClOwnerRelationService.ApplNoAll(iClCode1, iClCode2, iClNo, iApplNo, 0, Integer.MAX_VALUE, titaVo);
-		List<ClOwnerRelation> lClOwnerRelation = slClOwnerRelation == null ? null : slClOwnerRelation.getContent();
-		if (lClOwnerRelation != null && lClOwnerRelation.size() > 0) {
-			try {
-				sClOwnerRelationService.deleteAll(lClOwnerRelation, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
-			}
+	private void updateClOwnerRelation(TitaVo titaVo) throws LogicException {
+		FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
+		if (facMain == null) {
+			throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
 		}
-	}
 
-	private void insertClOwnerRelation(TitaVo titaVo) throws LogicException {
 		for (int i = 1; i <= 20; i++) {
 			String custUKey = titaVo.getParam("OwnerCustUKey" + i).trim();
 			String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
 			if (!"".equals(custUKey)) {
+
 				ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
-				clOwnerRelationId.setClCode1(iClCode1);
-				clOwnerRelationId.setClCode2(iClCode2);
-				clOwnerRelationId.setClNo(iClNo);
-				clOwnerRelationId.setApplNo(iApplNo);
+				clOwnerRelationId.setCreditSysNo(facMain.getCreditSysNo());
+				clOwnerRelationId.setCustNo(facMain.getCustNo());
 				clOwnerRelationId.setOwnerCustUKey(custUKey);
-				ClOwnerRelation clOwnerRelation = new ClOwnerRelation();
-				clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
-				clOwnerRelation.setOwnerRelCode(relCode);
-				try {
-					sClOwnerRelationService.insert(clOwnerRelation, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+
+				ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId, titaVo);
+
+				if (clOwnerRelation == null) {
+					clOwnerRelation = new ClOwnerRelation();
+					clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
+					clOwnerRelation.setOwnerRelCode(relCode);
+					try {
+						sClOwnerRelationService.insert(clOwnerRelation, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+					}
+				} else {
+					clOwnerRelation.setOwnerRelCode(relCode);
+					try {
+						sClOwnerRelationService.update(clOwnerRelation, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0007", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+					}
 				}
 			}
-			
+
 		}
 	}
 }

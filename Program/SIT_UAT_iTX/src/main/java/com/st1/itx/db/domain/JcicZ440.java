@@ -28,7 +28,7 @@ public class JcicZ440 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3567952076885121127L;
+	private static final long serialVersionUID = -3940488188373177805L;
 
 @EmbeddedId
   private JcicZ440Id jcicZ440Id;
@@ -53,8 +53,8 @@ public class JcicZ440 implements Serializable {
 
   // 受理調解機構代號
   /* 三位文數字[受理方式]:1法院名稱代號表(CdCode.CourtCode)[受理方式]:2調解委員會所在郵遞區號 */
-  @Column(name = "`BankId`", length = 3, insertable = false, updatable = false)
-  private String bankId;
+  @Column(name = "`CourtCode`", length = 3, insertable = false, updatable = false)
+  private String courtCode;
 
   // 同意書取得日期
   @Column(name = "`AgreeDate`")
@@ -105,6 +105,10 @@ public class JcicZ440 implements Serializable {
   // 轉JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -218,8 +222,8 @@ public class JcicZ440 implements Serializable {
 調解委員會所在郵遞區號
 	* @return String
 	*/
-  public String getBankId() {
-    return this.bankId == null ? "" : this.bankId;
+  public String getCourtCode() {
+    return this.courtCode == null ? "" : this.courtCode;
   }
 
 /**
@@ -230,10 +234,10 @@ public class JcicZ440 implements Serializable {
 [受理方式]:2
 調解委員會所在郵遞區號
   *
-  * @param bankId 受理調解機構代號
+  * @param courtCode 受理調解機構代號
 	*/
-  public void setBankId(String bankId) {
-    this.bankId = bankId;
+  public void setCourtCode(String courtCode) {
+    this.courtCode = courtCode;
   }
 
 /**
@@ -467,6 +471,25 @@ public class JcicZ440 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -547,7 +570,7 @@ public class JcicZ440 implements Serializable {
   public String toString() {
     return "JcicZ440 [jcicZ440Id=" + jcicZ440Id + ", tranKey=" + tranKey + ", agreeDate=" + agreeDate
            + ", startDate=" + startDate + ", remindDate=" + remindDate + ", applyType=" + applyType + ", reportYn=" + reportYn + ", notBankId1=" + notBankId1 + ", notBankId2=" + notBankId2
-           + ", notBankId3=" + notBankId3 + ", notBankId4=" + notBankId4 + ", notBankId5=" + notBankId5 + ", notBankId6=" + notBankId6 + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", notBankId3=" + notBankId3 + ", notBankId4=" + notBankId4 + ", notBankId5=" + notBankId5 + ", notBankId6=" + notBankId6 + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

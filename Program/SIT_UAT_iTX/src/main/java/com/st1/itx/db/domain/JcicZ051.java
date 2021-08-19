@@ -28,7 +28,7 @@ public class JcicZ051 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8765367440652358232L;
+	private static final long serialVersionUID = 6870091022901408510L;
 
 @EmbeddedId
   private JcicZ051Id jcicZ051Id;
@@ -68,6 +68,10 @@ public class JcicZ051 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -271,6 +275,25 @@ L:受嚴重特殊傳染性肺炎疫情影響繳款
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -350,7 +373,7 @@ L:受嚴重特殊傳染性肺炎疫情影響繳款
   @Override
   public String toString() {
     return "JcicZ051 [jcicZ051Id=" + jcicZ051Id + ", tranKey=" + tranKey + ", delayCode=" + delayCode
-           + ", delayDesc=" + delayDesc + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", delayDesc=" + delayDesc + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

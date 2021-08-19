@@ -29,7 +29,7 @@ public class JcicZ047 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 5009219025428917475L;
+	private static final long serialVersionUID = -1457973601589350007L;
 
 @EmbeddedId
   private JcicZ047Id jcicZ047Id;
@@ -163,6 +163,10 @@ public class JcicZ047 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -747,6 +751,25 @@ public class JcicZ047 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -829,7 +852,7 @@ public class JcicZ047 implements Serializable {
            + ", civil323ExpAmt=" + civil323ExpAmt + ", expLoanAmt=" + expLoanAmt + ", civil323CashAmt=" + civil323CashAmt + ", cashCardAmt=" + cashCardAmt + ", civil323CreditAmt=" + civil323CreditAmt + ", creditCardAmt=" + creditCardAmt
            + ", civil323Amt=" + civil323Amt + ", totalAmt=" + totalAmt + ", passDate=" + passDate + ", interviewDate=" + interviewDate + ", signDate=" + signDate + ", limitDate=" + limitDate
            + ", firstPayDate=" + firstPayDate + ", monthPayAmt=" + monthPayAmt + ", payAccount=" + payAccount + ", postAddr=" + postAddr + ", gradeType=" + gradeType + ", payLastAmt=" + payLastAmt
-           + ", period2=" + period2 + ", rate2=" + rate2 + ", monthPayAmt2=" + monthPayAmt2 + ", payLastAmt2=" + payLastAmt2 + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", period2=" + period2 + ", rate2=" + rate2 + ", monthPayAmt2=" + monthPayAmt2 + ", payLastAmt2=" + payLastAmt2 + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

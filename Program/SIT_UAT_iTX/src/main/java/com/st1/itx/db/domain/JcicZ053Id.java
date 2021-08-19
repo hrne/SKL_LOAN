@@ -34,7 +34,7 @@ public class JcicZ053Id implements Serializable {
 
   // 協商申請日
   /* 指最大債權金融機構實際之收件日期 */
-  @Column(name = "`RcDate`", length = 8)
+  @Column(name = "`RcDate`")
   private int rcDate = 0;
 
   // 最大債權金融機構代號

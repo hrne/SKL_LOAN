@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -29,7 +27,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6757 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6757.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -39,23 +36,22 @@ public class L6757 extends TradeBuffer {
 	@Autowired
 	Parse parse;
 
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6757 ");
 		this.totaVo.init(titaVo);
-		
+
 		int iFunc = Integer.valueOf(titaVo.getParam("FuncCode"));
-		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth"))+191100;
-		int iTargetWorkMonth = Integer.valueOf(titaVo.getParam("TargetWorkMonth"))+191100;
+		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
+		int iTargetWorkMonth = Integer.valueOf(titaVo.getParam("TargetWorkMonth")) + 191100;
 		Slice<CdPerformance> iCdPerformance = null;
 		iCdPerformance = iCdPerformanceService.findWorkMonth(iWorkMonth, this.index, this.limit, titaVo);
- 		switch (iFunc) {
+		switch (iFunc) {
 		case 3:
 			if (iCdPerformance == null) {
 				throw new LogicException("E0005", "新增時發生錯誤，原工作月該資料不存在");
 			}
-			for (CdPerformance cCdPerformance:iCdPerformance) {
+			for (CdPerformance cCdPerformance : iCdPerformance) {
 				CdPerformance aCdPerformance = new CdPerformance();
 				CdPerformanceId aCdPerformanceId = new CdPerformanceId();
 				aCdPerformanceId.setPieceCode(cCdPerformance.getPieceCode());
@@ -77,10 +73,9 @@ public class L6757 extends TradeBuffer {
 				aCdPerformance.setBsOffrCnt(cCdPerformance.getBsOffrCnt());
 				aCdPerformance.setBsOffrCntLimit(cCdPerformance.getBsOffrCntLimit());
 				aCdPerformance.setBsOffrAmtCond(cCdPerformance.getBsOffrAmtCond());
-				aCdPerformance.setBsOffrCntAmt(cCdPerformance.getBsOffrCntAmt());
 				aCdPerformance.setBsOffrPerccent(cCdPerformance.getBsOffrPerccent());
 				try {
-					iCdPerformanceService.insert(aCdPerformance,titaVo);
+					iCdPerformanceService.insert(aCdPerformance, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "新增時發生錯誤");
 				}
@@ -90,11 +85,11 @@ public class L6757 extends TradeBuffer {
 			if (iCdPerformance == null) {
 				throw new LogicException("E0008", "刪除時發生錯誤，原工作月該資料不存在");
 			}
-			for (CdPerformance xCdPerformance:iCdPerformance) {
+			for (CdPerformance xCdPerformance : iCdPerformance) {
 				CdPerformance dCdPerformance = null;
 				dCdPerformance = iCdPerformanceService.holdById(xCdPerformance.getCdPerformanceId(), titaVo);
 				try {
-					iCdPerformanceService.delete(dCdPerformance,titaVo);
+					iCdPerformanceService.delete(dCdPerformance, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "刪除時發生錯誤");
 				}
@@ -103,7 +98,7 @@ public class L6757 extends TradeBuffer {
 		default:
 			break;
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

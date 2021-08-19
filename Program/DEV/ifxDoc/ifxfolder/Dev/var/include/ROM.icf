@@ -28,7 +28,7 @@
 !    L2R14 : 以戶號額度尋找主要擔保品
 !    L2R15 : 尋找關係人明細資料
 !    L2R16 : 尋找交易關係人資料
-!    L2R17 : 尋找利害關係人相關事業檔資料
+!    L2R17 : 尋找原擔保品編號資料
 !    L2R18 : 尋找(準)利害關係人主檔資料
 !    L2R19 : 尋找(準)利害關係人親屬檔資料
 !    L2R20 : 尋找(準)利害關係人相關事業檔資料
@@ -2139,7 +2139,7 @@ TXFORM=L2R16
 ^
 </L2R16.tom>
 
-!尋找利害關係人相關事業檔資料
+!尋找原擔保品編號資料
 <L2R17.dec>
 #2r17CompanyId=X,10,S
 #2r17CompanyName=c,100,S
@@ -3227,7 +3227,7 @@ TXFORM=L2R48
 ##loop{times:100,n:1}
 #L2r49ApplNoA{n}=A,7,S
 #L2r49ApplNoB{n}=A,7,S
-#L2r49RelCode{n}=A,7,S
+#L2r49RelCode{n}=X,2,S
 ##end
 </L2R49.dec>
 
@@ -8026,7 +8026,6 @@ TXFORM=L6R19
 #L6R21BsOffrCnt=n,2.2,S
 #L6R21BsOffrCntLimit=n,2.2,S
 #L6R21BsOffrAmtCond=m,14.2,S
-#L6R21BsOffrCntAmt=m,14.2,S
 #L6R21BsOffrPerccent=n,3.6,S
 </L6R21.dec>
 
@@ -8045,7 +8044,6 @@ TXFORM=L6R21
 #L6R21BsOffrCnt
 #L6R21BsOffrCntLimit
 #L6R21BsOffrAmtCond
-#L6R21BsOffrCntAmt
 #L6R21BsOffrPerccent
 ^
 </L6R21.tom>

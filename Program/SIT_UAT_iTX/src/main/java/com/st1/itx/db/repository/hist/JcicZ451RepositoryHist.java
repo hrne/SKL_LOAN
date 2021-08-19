@@ -31,6 +31,15 @@ public interface JcicZ451RepositoryHist extends JpaRepository<JcicZ451, JcicZ451
   // CustId= , AND ApplyDate=
   public Slice<JcicZ451> findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(String custId_0, int applyDate_1, Pageable pageable);
 
+  // SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode= , AND DelayYM=
+  public Slice<JcicZ451> findAllBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsAndDelayYMIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, int delayYM_4, Pageable pageable);
+
+  // Ukey=
+  public Optional<JcicZ451> findTopByUkeyIs(String ukey_0);
+
+  // SubmitKey= , AND CustId= , AND ApplyDate= , AND CourtCode= , AND DelayYM=
+  public Optional<JcicZ451> findTopBySubmitKeyIsAndCustIdIsAndApplyDateIsAndCourtCodeIsAndDelayYMIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int applyDate_2, String courtCode_3, int delayYM_4);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

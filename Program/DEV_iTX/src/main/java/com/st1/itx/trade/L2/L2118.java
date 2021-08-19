@@ -108,17 +108,26 @@ public class L2118 extends TradeBuffer {
 			// insert 共同借款人資料檔
 			insertFacShareAppl(titaVo);
 
-			//共同借款人闗係檔
+			// 共同借款人闗係檔
 			insertFacShareRelation(titaVo);
-			
+
 			this.info("funcd = " + iFuncCode);
 			break;
 
+		case 2: // 修改
+
+			// 共同借款人闗係檔
+			deleteFacShareRelation(titaVo);
+
+			// 共同借款人闗係檔
+			insertFacShareRelation(titaVo);
+			
+			break;
 		case 4: // 刪除
 
-			//共同借款人闗係檔
+			// 共同借款人闗係檔
 			deleteFacShareRelation(titaVo);
-			
+
 			// delete 共同借款人資料檔
 			deleteFacShareAppl(titaVo);
 
@@ -172,11 +181,12 @@ public class L2118 extends TradeBuffer {
 
 	// delete 共同借款人資料檔
 	private void deleteFacShareAppl(TitaVo titaVo) throws LogicException {
-
+		this.info("L2218.deleteFacShareAppl");
+		
 		iApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo" + 1));
 
 		tFacShareAppl = facShareApplService.findById(iApplNo, titaVo);
-		if (tFacShareAppl != null) {
+		if (tFacShareAppl == null) {
 			throw new LogicException(titaVo, "E2007", "共同借款人 核准號碼 = " + iApplNo); // 刪除資料不存在
 		}
 		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);
@@ -222,11 +232,11 @@ public class L2118 extends TradeBuffer {
 
 	// 刪除共同借款人闗係檔
 	private void deleteFacShareRelation(TitaVo titaVo) throws LogicException {
-
+		this.info("L2218.deleteFacShareRelation");
 		iApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo" + 1));
 
 		tFacShareAppl = facShareApplService.findById(iApplNo, titaVo);
-		if (tFacShareAppl != null) {
+		if (tFacShareAppl == null) {
 			throw new LogicException(titaVo, "E2007", "共同借款人 核准號碼 = " + iApplNo); // 刪除資料不存在
 		}
 		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE, titaVo);

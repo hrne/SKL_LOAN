@@ -39,7 +39,7 @@ public class JcicZ055Id implements Serializable {
 
   // 裁定日或履行完畢日或發文日
   /* 指法院裁定日期(案件狀態為1、3、5)，或債權金融機構認定債務人已依更生方案履行完畢之日期(案件狀態為4)，或發文日期(案件狀態為2、6)已YYYMMDD表示，本欄位值應小於或等於資料報送日期 */
-  @Column(name = "`ClaimDate`", length = 8)
+  @Column(name = "`ClaimDate`")
   private int claimDate = 0;
 
   // 承審法院代碼

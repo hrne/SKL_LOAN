@@ -245,11 +245,18 @@ public class LM018Report extends MakeReport {
 
 					xShift += 26; // length of a new part of form
 
-					// reset all lastBal/lastInt
+					// !!!!!
 
+					// reset all lastBal
+					// not resetting lastInt because of current SQL design,
+					// if any need for different year outputting arises,
+					// lastBal needs to be resetted every year
+
+					// !!!!!
+					
 					for (Subject s : subjects) {
 						s.lastBal = BigDecimal.ZERO;
-						s.lastInt = BigDecimal.ZERO;
+						// s.lastInt = BigDecimal.ZERO;
 					}
 
 				}
@@ -278,7 +285,7 @@ public class LM018Report extends MakeReport {
 					if (!thisSubject.showsGroupIntOnly) {
 						this.print(thisSubject.printY, xPivot + xShift - 6, f3.divide(new BigDecimal(100000000), 4, BigDecimal.ROUND_HALF_UP).toString(), "C");
 					}
-					thisSubject.lastInt = f3;
+					thisSubject.lastInt = thisSubject.lastInt.add(f3);
 
 				}
 

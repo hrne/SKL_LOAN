@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdPerformanceService")
 @Repository
-public class CdPerformanceServiceImpl implements CdPerformanceService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdPerformanceServiceImpl.class);
-
+public class CdPerformanceServiceImpl extends ASpringJpaParm implements CdPerformanceService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CdPerformanceServiceImpl implements CdPerformanceService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdPerformanceId);
+    this.info("findById " + dbName + " " + cdPerformanceId);
     Optional<CdPerformance> cdPerformance = null;
     if (dbName.equals(ContentName.onDay))
       cdPerformance = cdPerformanceReposDay.findById(cdPerformanceId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "WorkMonth", "PieceCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdPerformanceReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = cdPerformanceReposHist.findAll(pageable);
     else 
       slice = cdPerformanceRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findPieceCode " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " pieceCode_1 : " +  pieceCode_1 + " pieceCode_2 : " +  pieceCode_2);
+    this.info("findPieceCode " + dbName + " : " + "workMonth_0 : " + workMonth_0 + " pieceCode_1 : " +  pieceCode_1 + " pieceCode_2 : " +  pieceCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = cdPerformanceReposDay.findAllByWorkMonthIsAndPieceCodeGreaterThanEqualAndPieceCodeLessThanEqualOrderByPieceCodeAsc(workMonth_0, pieceCode_1, pieceCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = cdPerformanceReposHist.findAllByWorkMonthIsAndPieceCodeGreaterThanEqualAndPieceCodeLessThanEqualOrderByPieceCodeAsc(workMonth_0, pieceCode_1, pieceCode_2, pageable);
     else 
       slice = cdPerformanceRepos.findAllByWorkMonthIsAndPieceCodeGreaterThanEqualAndPieceCodeLessThanEqualOrderByPieceCodeAsc(workMonth_0, pieceCode_1, pieceCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findWorkMonth " + dbName + " : " + "workMonth_0 : " + workMonth_0);
+    this.info("findWorkMonth " + dbName + " : " + "workMonth_0 : " + workMonth_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdPerformanceReposDay.findAllByWorkMonthIs(workMonth_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +159,9 @@ em = null;
     else 
       slice = cdPerformanceRepos.findAllByWorkMonthIs(workMonth_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findWorkMonthFirst " + dbName + " : " + "workMonth_0 : " + workMonth_0);
+    this.info("findWorkMonthFirst " + dbName + " : " + "workMonth_0 : " + workMonth_0);
     Optional<CdPerformance> cdPerformanceT = null;
     if (dbName.equals(ContentName.onDay))
       cdPerformanceT = cdPerformanceReposDay.findTopByWorkMonthLessThanEqualOrderByWorkMonthDesc(workMonth_0);
@@ -175,6 +180,7 @@ em = null;
       cdPerformanceT = cdPerformanceReposHist.findTopByWorkMonthLessThanEqualOrderByWorkMonthDesc(workMonth_0);
     else 
       cdPerformanceT = cdPerformanceRepos.findTopByWorkMonthLessThanEqualOrderByWorkMonthDesc(workMonth_0);
+
     return cdPerformanceT.isPresent() ? cdPerformanceT.get() : null;
   }
 
@@ -183,7 +189,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdPerformanceId);
+    this.info("Hold " + dbName + " " + cdPerformanceId);
     Optional<CdPerformance> cdPerformance = null;
     if (dbName.equals(ContentName.onDay))
       cdPerformance = cdPerformanceReposDay.findByCdPerformanceId(cdPerformanceId);
@@ -201,7 +207,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdPerformance.getCdPerformanceId());
+    this.info("Hold " + dbName + " " + cdPerformance.getCdPerformanceId());
     Optional<CdPerformance> cdPerformanceT = null;
     if (dbName.equals(ContentName.onDay))
       cdPerformanceT = cdPerformanceReposDay.findByCdPerformanceId(cdPerformance.getCdPerformanceId());
@@ -223,7 +229,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdPerformance.getCdPerformanceId());
+    this.info("Insert..." + dbName + " " + cdPerformance.getCdPerformanceId());
     if (this.findById(cdPerformance.getCdPerformanceId()) != null)
       throw new DBException(2);
 
@@ -252,7 +258,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdPerformance.getCdPerformanceId());
+    this.info("Update..." + dbName + " " + cdPerformance.getCdPerformanceId());
     if (!empNot.isEmpty())
       cdPerformance.setLastUpdateEmpNo(empNot);
 
@@ -275,7 +281,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdPerformance.getCdPerformanceId());
+    this.info("Update..." + dbName + " " + cdPerformance.getCdPerformanceId());
     if (!empNot.isEmpty())
       cdPerformance.setLastUpdateEmpNo(empNot);
 
@@ -295,7 +301,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdPerformance.getCdPerformanceId());
+    this.info("Delete..." + dbName + " " + cdPerformance.getCdPerformanceId());
     if (dbName.equals(ContentName.onDay)) {
       cdPerformanceReposDay.delete(cdPerformance);	
       cdPerformanceReposDay.flush();
@@ -324,7 +330,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdPerformance t : cdPerformance){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -359,7 +365,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdPerformance == null || cdPerformance.size() == 0)
       throw new DBException(6);
 
@@ -388,7 +394,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdPerformance> cdPerformance, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

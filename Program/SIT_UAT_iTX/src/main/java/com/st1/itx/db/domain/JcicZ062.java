@@ -29,7 +29,7 @@ public class JcicZ062 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2494769213640733945L;
+	private static final long serialVersionUID = -5519534021200299066L;
 
 @EmbeddedId
   private JcicZ062Id jcicZ062Id;
@@ -137,6 +137,10 @@ public class JcicZ062 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -622,6 +626,25 @@ public class JcicZ062 implements Serializable {
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -704,6 +727,6 @@ public class JcicZ062 implements Serializable {
            + ", period=" + period + ", rate=" + rate + ", expBalanceAmt=" + expBalanceAmt + ", cashBalanceAmt=" + cashBalanceAmt + ", creditBalanceAmt=" + creditBalanceAmt + ", chaRepayAmt=" + chaRepayAmt
            + ", chaRepayAgreeDate=" + chaRepayAgreeDate + ", chaRepayViewDate=" + chaRepayViewDate + ", chaRepayEndDate=" + chaRepayEndDate + ", chaRepayFirstDate=" + chaRepayFirstDate + ", payAccount=" + payAccount + ", postAddr=" + postAddr
            + ", monthPayAmt=" + monthPayAmt + ", gradeType=" + gradeType + ", period2=" + period2 + ", rate2=" + rate2 + ", monthPayAmt2=" + monthPayAmt2 + ", outJcicTxtDate=" + outJcicTxtDate
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

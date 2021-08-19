@@ -81,6 +81,12 @@ public class L5075 extends TradeBuffer {
 		this.info("active L5075 ");
 		this.totaVo.init(titaVo);
 
+		/*設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值*/
+		this.index = titaVo.getReturnIndex();
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		//this.limit=Integer.MAX_VALUE;//查全部
+		this.limit=150;//  264* 150 = 39600
+		
 //		String IsMainFin=titaVo.getParam("IsMainFin").trim(); //是否為最大債權 1:Y;2:N
 //		String WorkSubject=titaVo.getParam("WorkSubject").trim(); //作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
 		String NextPayDate = titaVo.getParam("NextPayDate").trim(); // 1:滯繳- 逾期基準日;2:應繳-下次應繳日
@@ -88,7 +94,7 @@ public class L5075 extends TradeBuffer {
 
 		int YYYYmmNextPayDate = Integer.parseInt(NextPayDate);
 
-		List<NegMain> lNegMain = l5075ServiceImpl.findData(titaVo);
+		List<NegMain> lNegMain = l5075ServiceImpl.findData(titaVo, this.index, this.limit);
 		if (lNegMain != null && lNegMain.size() != 0) {
 			// 有找到資料
 			for (NegMain NegMainVO : lNegMain) {
@@ -139,17 +145,20 @@ public class L5075 extends TradeBuffer {
 				occursList.putParam("OOPrincipalBal", NegMainVO.getPrincipalBal());// 總本金餘額
 				// 剩餘期數 = (總本金餘額 - 累溢收) / 期款金額
 				BigDecimal Temptimes = new BigDecimal("0");
-				this.info("NegMainVO.getPrincipalBal=" + NegMainVO.getPrincipalBal());
-				this.info("NegMainVO.getAccuOverAmt=" + NegMainVO.getAccuOverAmt());
-				this.info("NegMainVO.getDueAmt=" + NegMainVO.getDueAmt());
 				Temptimes = NegMainVO.getPrincipalBal().subtract(NegMainVO.getAccuOverAmt());
 				// 餘數無條件進位
 				Temptimes = Temptimes.divide(NegMainVO.getDueAmt(), 2);
 				Temptimes = Temptimes.setScale(0, BigDecimal.ROUND_UP);
 				int times = Temptimes.intValue();
 				occursList.putParam("OOTimes", times);// 剩餘期數
+				
 				this.totaVo.addOccursList(occursList);
 			}
+			
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			titaVo.setReturnIndex(this.setIndexNext());
+			this.totaVo.setMsgEndToEnter();// 手動折返
+			
 		} else {
 			// E2003 查無資料
 			throw new LogicException("E2003", "債務協商案件主檔");

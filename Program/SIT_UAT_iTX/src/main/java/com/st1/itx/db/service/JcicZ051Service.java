@@ -97,6 +97,41 @@ public interface JcicZ051Service {
   public Slice<JcicZ051> SubCustRcEq(String custId_0, int rcDate_1, String submitKey_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * SubmitKey= , AND CustId= , AND RcDate= , AND DelayYM= 
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param delayYM_3 delayYM_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ051 JcicZ051 of List
+   */
+  public Slice<JcicZ051> otherEq(String submitKey_0, String custId_1, int rcDate_2, int delayYM_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * Ukey=
+   *
+   * @param ukey_0 ukey_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ051 JcicZ051 of List
+   */
+  public JcicZ051 ukeyFirst(String ukey_0, TitaVo... titaVo);
+
+  /**
+   * SubmitKey= , AND CustId= , AND RcDate= , AND DelayYM= 
+   *
+   * @param submitKey_0 submitKey_0
+   * @param custId_1 custId_1
+   * @param rcDate_2 rcDate_2
+   * @param delayYM_3 delayYM_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice JcicZ051 JcicZ051 of List
+   */
+  public JcicZ051 otherFirst(String submitKey_0, String custId_1, int rcDate_2, int delayYM_3, TitaVo... titaVo);
+
+  /**
    * hold By JcicZ051
    * 
    * @param jcicZ051Id key

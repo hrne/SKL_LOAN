@@ -313,6 +313,15 @@ T(2,#ClCode1)
 T(2,#ClCode2)
 #OClNo=A,7,L
 T(2,#ClNo)
+
+![原擔保品編號]
+#FdOGdRid=X,2,L
+
+#OGdRid1=X,1,L
+#OGdRid2=X,2,L
+#OGdRnum=X,7,L
+
+
 !擔保品類別
 #OClTypeCode=X,3,L
 
@@ -593,8 +602,7 @@ TXFORM=L2911
 <sub type="PART" name="L2911" layout="cols=3;screen.width=[180,140,180,350];printer.width=[15,30,15,30];order=1">
 [
 ["[L2911]                                 不動產擔保品資料查詢"],
-![#<->#,"#FdOCustId+借款戶統編",#OCustId,#OCustName],
-[#<->#,"#FdOClCode1+擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],
+["#FdOClCode1+擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["#FdOGdRid+原擔保品編號",#OGdRid1,"－",#OGdRid2,"－",#OGdRnum],
 [#<->#,"#FdOClTypeCode+擔保品類別",#OClTypeCode],
 [#<->#,"@@@@@<font color=red>@鑑價"],
 ["#FdOEvaDate+鑑估日期",#OEvaDate],["#FdOEvaAmt+鑑估總值",#OEvaAmt],

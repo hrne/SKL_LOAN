@@ -38,11 +38,9 @@ E(0,40)ASGN(INQPRT$)
 [
 ["[L2411]                                 不動產擔保品資料登錄"],
 [#<->#,"#FdFunCd+功能",#FunCdX],
-! [#<->#,"#FdCustId+借款戶統編",#CustId,#CustIdX],
-! [#<->#,"#FdCustNo+借款戶戶號",#CustNo,#CustNoX],
 [#<->#,"#FdApplNo+核准號碼",#ApplNo,#BTN8,#ApplNoX],
 ["#FdColInd1+擔保品代號1",#ClCode1,#ClCode1X],["#FdColInd2+擔保品代號2",#ClCode2,#ClCode2X],
-[#<->#,"#FdCOLNO+擔保品編號",#ClNo],
+["#FdCOLNO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum,"#Lgtseq"],
 [#<->#,"#FdSubType+擔保品類別",#ClTypeCode,#ClTypeCodeX],
 ! [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#Btn5,"@",#Btn6,"@",#Btn7,"@",#BtnExpand],
 [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#Btn5,"@",#Btn6,"@",#BtnExpand],
@@ -90,10 +88,6 @@ E(0,40)ASGN(INQPRT$)
 ["#FdFirstAmt+前一順位金額",#FirstAmt],["#FdFirstCreditor+前一順位債權人",#FirstCreditor],
 ["#FdSecondAmt+前二順位金額",#SecondAmt],["#FdSecondCreditor+前二順位債權人",#SecondCreditor],
 ["#FdThirdAmt+前三順位金額",#ThirdAmt],["#FdThirdCreditor+前三順位債權人",#ThirdCreditor],
-! ["#grid#,{id:4,expand:true,loop:20,row_height:1,s_cols:[], p_cols:[]}","他項權利","","",
-! ["縣市","地政","收件年","收件字","收件號","權利價值說明","擔保債權總金額"],
-! [#City1,#LandAdm1,#RecYear1,#RecWord1,#RecNumber1,#RightsNote1,#SecuredTotal1]
-! ],
 ]
 !---------- AP Button AREA ----------
 
@@ -395,7 +389,7 @@ CALL(#HIDE_OWNER_ROW_{i})
 C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
 
 #HideAll=@,1,S
-T(3,@FdApplNo,*)
+T(3,@FdApplNo,)
 T(3,@FdFunCd,*)
 T(3,@FdColInd1,*)
 T(3,@FdColInd2,*)
@@ -626,36 +620,18 @@ T(F,@ThirdCreditor,1)
 IF(#FunCd == 2 || #FunCd == 4,T(3,@FdCOLNO,*),S)
 
 #FdCustId=X,2,L
-! 統編(新增時,統編與戶號二擇一輸入)
+
 #CustId=X,10,S
-C(3,#FunCd,1,$,s)
-! @A(ID_UNINO,0,#CustId)
 
 #CustIdX=X,100,S
-C(4,#CustId,S,$)
 
 #FdCustNo=X,2,L
-C(4,#CustId,T(3,*),S)
-! 戶號(新增時,統編與戶號二擇一輸入)
+
 #CustNo=A,7,S
-C(3,#FunCd,1,C(4,#CustId,$,S),s)
-! @C(3,#CustNo,0,V(P,統編，戶號二擇一輸入),$)
+
 
 #CustNoX=X,100,L
 C(3,#CustNo,0,S,$)
-
-! 調Rim檢查使用者輸入的統編或戶號是否存在
-! #RimL1R09=X,1,S
-! IF(#FunCd == 1,$,S)
-! T(2,@RimCustId,#CustId)
-! E(0,@RimCustNo,#CustNo)
-! E(0,@RimFunCd,1)
-! RESET_RIM(#RimL1R09,L1R09)
-! S(L1R09,1,#RimCustId,#RimCustNo,#RimFunCd)
-! R(1,L1R09)
-
-! #RecvL1R09=X,1,S
-! C(4,#CustId,T(2,@CustNoX,#L1r09CustName),T(2,@CustIdX,#L1r09CustName))
 
 #BUF8=X,14,S
 T(2,00000019999999)
@@ -668,8 +644,6 @@ BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF8;ntxbuf5=type<-1:ApplNo<-
 
 #ApplNo=A,7,I
 C(3,#FunCd,1,$,S)
-@V(2,0)
-
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05=X,1,S
@@ -733,27 +707,23 @@ C(2,#ClCode1,T(3,),
              T(H,#ClCode2,#ClCode21Help),
              T(H,#ClCode2,#ClCode22Help)
  )
-! SWITCH(#COLIND,
-!        101,T(3,房地-住宅),
-!        102,T(3,房地-辦公),
-!        103,T(3,房地-商場),
-!        104,T(3,房地-廠房),
-!        105,T(3,房地-停車位),
-!        199,T(3,房地-其他),
-!        201,T(3,土地-住宅區),
-!        202,T(3,土地-商業區),
-!        203,T(3,土地-工業區),
-!        209,T(3,土地-其他分區),
-!        210,T(3,土地-甲種建地),
-!        211,T(3,土地-乙種建地),
-!        212,T(3,土地-丙種建地),
-!        213,T(3,土地-丁種建地),
-!        219,T(3,土地-其他用地),
-!        T(3,))
+
 
 #FdCOLNO=X,2,L
 ! [擔保品編號]
 #ClNo=A,7,L
+
+
+
+![原擔保品編號]
+#FdGdRid=X,2,L
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
+#Lgtseq=X,3,L
+
+
 
 !調RIM參數
 #RimClNo=A,7,S
@@ -1274,6 +1244,7 @@ C(4,#OwnerId{j},S,$)
 C(4,#OwnerId{i},CALL(#HIDE_OWNER_ROW_{i}),$)
 C(4,#OwnerId{i},s,$)
 V(7)A(ID_UNINO,0,#OwnerId{i})
+C(5,#OwnerId{i},#CustId,T(F,#OwnerRelCode{i},0),T(F,#OwnerRelCode{i},1))
 
 ! #RimL1r09{i}=X,1,S
 ! E(0,@RimFunCd,5)
@@ -1331,14 +1302,13 @@ C(4,#OwnerId{i},S,$)
 !#OwnerName{i}=c,100,S
 !T(B,#OwnerNameA{i}+#OwnerNameB{i})
 
-
-
 ! [建物所有權人-持份比率(分子)]
 #OwnerPart{i}=m,10,I
 IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 C(4,#OwnerId{i},S,$)
 @V(2,0)
+
 ! [建物所有權人-持份比率(分母)]
 #OwnerTotal{i}=m,10,I
 IF(#PageFg==2,$,CALL(#Show2))
@@ -1352,14 +1322,14 @@ IF({i} == 1,E(0,@OwnerTotal,#OwnerTotal{i}),V(1,#OwnerTotal))
 IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 C(4,#OwnerId{i},S,$)
-C(5,#OwnerId{i},#L2r05CustId,S,$)
+C(5,#OwnerId{i},#CustId,S,$)
 HELP(#RelationCodeHelp)
 @V(7)
 ! V(H,#RelationCodeHelp)
 IF(#OwnerRelCode{i}==#L2r27OwnerRelCode{i}||#OwnerRelCode{i}==#L2r28OwnerRelCode{i},$,V(H,#RelationCodeHelp))
 
 
-#OwnerRelCodeX{i}=X,20,L
+#OwnerRelCodeX{i}=X,40,L
 C(4,#OwnerRelCode{i},S,$)
 T(H,#OwnerRelCode{i},#RelationCodeHelp)
 

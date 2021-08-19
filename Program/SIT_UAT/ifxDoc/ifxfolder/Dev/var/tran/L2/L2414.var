@@ -42,7 +42,7 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"#FdFuncd+功能",#FunCdX],
 [#<->#,"#FdApplNo+核准號碼",#ApplNo,#BTN1,#ApplNoX],
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
-[#<->#,"#FdClNo+擔保品編號",#ClNo],
+["#FdClNo+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum],
 ["#FdClTypeCode+擔保品類別",#ClTypeCode,#ClTypeItem],
 [#<->#,"#FdCityCode+地區別",#CityCode,#CityItem],
 ["#FdEvaDate+鑑估日期",#EvaDate],["#FdEvaAmt+#EvaAmtLabel",#EvaAmt],
@@ -328,11 +328,9 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApplNo<-
 
 !申請號碼
 #FdApplNo=X,2,L
-T(3,*)
 
 #ApplNo=A,7,I
 C(3,#FunCd,1,$,S)
-@V(2,0)
 
 #RimFuncCode=A,1,S
 #RimTxCode=X,5,S
@@ -388,6 +386,15 @@ T(3,銀行保證－銀行保證)
 #ClNo=A,7,L
 
 #FdClNo=X,2,L
+
+![原擔保品編號]
+#FdGdRid=X,2,L
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
+
+
 
 !調RIM參數
 #RimClNo=A,7,S

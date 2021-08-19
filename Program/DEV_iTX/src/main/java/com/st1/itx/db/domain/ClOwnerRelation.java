@@ -26,28 +26,19 @@ public class ClOwnerRelation implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 4192792105988795720L;
+	private static final long serialVersionUID = 7969510520899723499L;
 
 @EmbeddedId
   private ClOwnerRelationId clOwnerRelationId;
 
-  // 擔保品代號1
-  /* 擔保品代號檔CdCl */
-  @Column(name = "`ClCode1`", insertable = false, updatable = false)
-  private int clCode1 = 0;
+  // 案件編號
+  /* 徵審系統案號(eLoan案件編號) */
+  @Column(name = "`CreditSysNo`", insertable = false, updatable = false)
+  private int creditSysNo = 0;
 
-  // 擔保品代號2
-  /* 擔保品代號檔CdCl */
-  @Column(name = "`ClCode2`", insertable = false, updatable = false)
-  private int clCode2 = 0;
-
-  // 擔保品編號
-  @Column(name = "`ClNo`", insertable = false, updatable = false)
-  private int clNo = 0;
-
-  // 核准號碼
-  @Column(name = "`ApplNo`", insertable = false, updatable = false)
-  private int applNo = 0;
+  // 借款人戶號
+  @Column(name = "`CustNo`", insertable = false, updatable = false)
+  private int custNo = 0;
 
   // 客戶識別碼
   @Column(name = "`OwnerCustUKey`", length = 32, insertable = false, updatable = false)
@@ -86,79 +77,41 @@ public class ClOwnerRelation implements Serializable {
   }
 
 /**
-	* 擔保品代號1<br>
-	* 擔保品代號檔CdCl
+	* 案件編號<br>
+	* 徵審系統案號(eLoan案件編號)
 	* @return Integer
 	*/
-  public int getClCode1() {
-    return this.clCode1;
+  public int getCreditSysNo() {
+    return this.creditSysNo;
   }
 
 /**
-	* 擔保品代號1<br>
-	* 擔保品代號檔CdCl
+	* 案件編號<br>
+	* 徵審系統案號(eLoan案件編號)
   *
-  * @param clCode1 擔保品代號1
+  * @param creditSysNo 案件編號
 	*/
-  public void setClCode1(int clCode1) {
-    this.clCode1 = clCode1;
+  public void setCreditSysNo(int creditSysNo) {
+    this.creditSysNo = creditSysNo;
   }
 
 /**
-	* 擔保品代號2<br>
-	* 擔保品代號檔CdCl
-	* @return Integer
-	*/
-  public int getClCode2() {
-    return this.clCode2;
-  }
-
-/**
-	* 擔保品代號2<br>
-	* 擔保品代號檔CdCl
-  *
-  * @param clCode2 擔保品代號2
-	*/
-  public void setClCode2(int clCode2) {
-    this.clCode2 = clCode2;
-  }
-
-/**
-	* 擔保品編號<br>
+	* 借款人戶號<br>
 	* 
 	* @return Integer
 	*/
-  public int getClNo() {
-    return this.clNo;
+  public int getCustNo() {
+    return this.custNo;
   }
 
 /**
-	* 擔保品編號<br>
+	* 借款人戶號<br>
 	* 
   *
-  * @param clNo 擔保品編號
+  * @param custNo 借款人戶號
 	*/
-  public void setClNo(int clNo) {
-    this.clNo = clNo;
-  }
-
-/**
-	* 核准號碼<br>
-	* 
-	* @return Integer
-	*/
-  public int getApplNo() {
-    return this.applNo;
-  }
-
-/**
-	* 核准號碼<br>
-	* 
-  *
-  * @param applNo 核准號碼
-	*/
-  public void setApplNo(int applNo) {
-    this.applNo = applNo;
+  public void setCustNo(int custNo) {
+    this.custNo = custNo;
   }
 
 /**
@@ -278,7 +231,7 @@ public class ClOwnerRelation implements Serializable {
 
   @Override
   public String toString() {
-    return "ClOwnerRelation [clOwnerRelationId=" + clOwnerRelationId + ", ownerRelCode=" + ownerRelCode
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "ClOwnerRelation [clOwnerRelationId=" + clOwnerRelationId + ", ownerRelCode=" + ownerRelCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

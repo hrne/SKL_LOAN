@@ -40,11 +40,9 @@ E(0,40)ASGN(INQPRT$)
 [
 ["[L2412]                                 動產擔保品資料登錄"],
 [#<->#,"#FdFUNCD+功能",#FunCdX],
-![#<->#,"#FdCustId+統一編號",#CustId],
-![#<->#,"#FdCustNo+戶號",#CustNo],
 [#<->#,"#FdApplNo+核准號碼",#ApplNo,#BTN4,#ApplNoX],
 ["#FdCOL_IND1+擔保品代號1",#ClCode1,#ClCode1X],["#FdCOL_IND2+擔保品代號2",#ClCode2,#ClCode2X],
-[#<->#,"#FdCOL_NO+擔保品編號",#ClNo],
+["#FdCOL_NO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum],
 ["#FdSUB_TYPE+擔保品類別",#ClTypeCode,#SUB_TYPE_X],["#FdCOL_AREA+地區別",#CityCode,#COL_AREA_X],
 [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#BtnExpand],
 ["#FdOWNER_ID+所有權人統編",#OwnerId],["#FdOWNER_NM+所有權人姓名",#OwnerName],
@@ -502,11 +500,9 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4;ntxbuf5=type<-1:ApplNo<-
 
 !申請號碼
 #FdApplNo=X,2,L
-T(3,*)
 
 #ApplNo=A,7,I
 C(3,#FunCd,1,$,S)
-@V(2,0)
 
 #RimFuncCode=A,1,S
 
@@ -561,6 +557,14 @@ T(H,#ClCode2,#ClCode2Help)
 #ClNo=A,7,L
 
 #FdCOL_NO=X,2,L
+
+
+![原擔保品編號]
+#FdGdRid=X,2,L
+
+#GdRid1=A,1,L
+#GdRid2=A,2,L
+#GdRnum=A,7,L
 
 !調RIM參數
 #RimClNo=A,7,S

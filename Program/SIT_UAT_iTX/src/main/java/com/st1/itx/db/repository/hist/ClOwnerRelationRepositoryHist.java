@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import javax.persistence.LockModeType;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,9 +19,6 @@ import com.st1.itx.db.domain.ClOwnerRelationId;
  * @version 1.0.0
  */
 public interface ClOwnerRelationRepositoryHist extends JpaRepository<ClOwnerRelation, ClOwnerRelationId> {
-
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND ApplNo =
-  public Slice<ClOwnerRelation> findAllByClCode1IsAndClCode2IsAndClNoIsAndApplNoIsOrderByOwnerCustUKeyAsc(int clCode1_0, int clCode2_1, int clNo_2, int applNo_3, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

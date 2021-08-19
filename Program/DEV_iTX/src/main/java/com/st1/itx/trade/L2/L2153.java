@@ -33,6 +33,7 @@ import com.st1.itx.db.service.FacProdStepRateService;
 import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BankAuthActCom;
+import com.st1.itx.util.common.ClFacCom;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.date.DateUtil;
@@ -187,7 +188,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2153")
 @Scope("prototype")
 public class L2153 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2153.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -217,6 +217,8 @@ public class L2153 extends TradeBuffer {
 	DateUtil dDateUtil;
 	@Autowired
 	BankAuthActCom bankAuthActCom;
+	@Autowired
+	public ClFacCom clFacCom;
 
 	// input area
 	private TitaVo titaVo = new TitaVo();
@@ -266,6 +268,7 @@ public class L2153 extends TradeBuffer {
 		this.titaVo = titaVo;
 
 		bankAuthActCom.setTxBuffer(txBuffer);
+		clFacCom.setTxBuffer(this.txBuffer);
 
 		// 取得輸入資料
 		iCustId = titaVo.getParam("CustId").trim();
@@ -326,6 +329,10 @@ public class L2153 extends TradeBuffer {
 			bankAuthActCom.acctCheck(titaVo);
 		}
 
+		// 額度與擔保品關聯檔變動處理
+		clFacCom.changeClFac(iApplNo, titaVo);
+		
+		
 		this.info("relcd" + titaVo.toString());
 		this.totaVo.putParam("OCustNo", wkCustNo);
 		this.totaVo.putParam("OFacmNo", wkFacmNo);
@@ -458,6 +465,8 @@ public class L2153 extends TradeBuffer {
 				tFacMain.setLastKinbr(tTempVo.getParam("LastKinbr"));
 				tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
 				tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
+
+				bankAuthActCom.acctCheck(titaVo);
 			}
 			try {
 				tFacMain = facMainService.update2(tFacMain, titaVo);
@@ -597,17 +606,6 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(titaVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tFacCaseAppl.getPieceCode());
 		tFacMain.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RepayCode")));
-//	tFacMain.setRepayBank(titaVo.getParam("RepayBank"));
-//	tFacMain.setRepayAcctNo(this.parse.stringToBigDecimal(titaVo.getParam("RepayAcctNo")));
-//	tFacMain.setPostCode(titaVo.getParam("PostCode"));
-//	tFacMain.setRelationCode(titaVo.getParam("RelationCode"));
-//	tFacMain.setRelationName(titaVo.getParam("RelationName"));
-//	tFacMain.setRelationId(titaVo.getParam("RelationId"));
-//	tFacMain.setRelationBirthday(this.parse.stringToInteger(titaVo.getParam("RelationBirthday")));
-//	tFacMain.setRelationGender(titaVo.getParam("RelationGender"));
-//	tFacMain.setAchAuthCode(titaVo.getParam("AchAuthCode"));
-//	tFacMain.setAchBank(this.parse.stringToInteger(titaVo.getParam("AchBank")));
-//	tFacMain.setAchAuthNo(titaVo.getParam("AchAuthNo"));
 		tFacMain.setIntroducer(titaVo.getParam("Introducer"));
 		tFacMain.setDistrict(titaVo.getParam("District"));
 		tFacMain.setFireOfficer(titaVo.getParam("FireOfficer"));
@@ -626,6 +624,8 @@ public class L2153 extends TradeBuffer {
 //		tFacMain.setProhibityear(parse.stringToInteger(titaVo.getParam("Prohibityear"))); // TODO DB刪除
 		// tFacMain.setGroupId(titaVo.getParam("GroupId"));
 //	tFacMain.setCopyFlag(titaVo.getParam("CopyFlag"));
+		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
+		tFacMain.setBreach(titaVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(titaVo.getParam("GuaranteeDate")));
 		tFacMain.setContractNo("");

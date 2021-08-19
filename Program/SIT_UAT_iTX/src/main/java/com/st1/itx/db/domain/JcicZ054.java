@@ -28,7 +28,7 @@ public class JcicZ054 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1446902971713159714L;
+	private static final long serialVersionUID = 5417077171127902703L;
 
 @EmbeddedId
   private JcicZ054Id jcicZ054Id;
@@ -69,6 +69,10 @@ public class JcicZ054 implements Serializable {
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
   private int outJcicTxtDate = 0;
+
+  // 流水號
+  @Column(name = "`Ukey`", length = 32)
+  private String ukey;
 
   // 建檔日期時間
   @CreatedDate
@@ -258,6 +262,25 @@ E：車貸及次順位不動產抵押權經債權金融機構處分後收回款�
   }
 
 /**
+	* 流水號<br>
+	* 
+	* @return String
+	*/
+  public String getUkey() {
+    return this.ukey == null ? "" : this.ukey;
+  }
+
+/**
+	* 流水號<br>
+	* 
+  *
+  * @param ukey 流水號
+	*/
+  public void setUkey(String ukey) {
+    this.ukey = ukey;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -337,7 +360,7 @@ E：車貸及次順位不動產抵押權經債權金融機構處分後收回款�
   @Override
   public String toString() {
     return "JcicZ054 [jcicZ054Id=" + jcicZ054Id + ", tranKey=" + tranKey + ", payOffResult=" + payOffResult
-           + ", payOffDate=" + payOffDate + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", payOffDate=" + payOffDate + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

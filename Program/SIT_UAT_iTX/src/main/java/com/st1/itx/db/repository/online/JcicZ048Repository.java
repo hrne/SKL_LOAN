@@ -37,6 +37,15 @@ public interface JcicZ048Repository extends JpaRepository<JcicZ048, JcicZ048Id> 
   // CustId= , AND RcDate>= , AND RcDate<=
   public Slice<JcicZ048> findAllByCustIdIsAndRcDateGreaterThanEqualAndRcDateLessThanEqualOrderByCustIdAscRcDateDesc(String custId_0, int rcDate_1, int rcDate_2, Pageable pageable);
 
+  // SubmitKey= , AND CustId= , AND RcDate=
+  public Slice<JcicZ048> findAllBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2, Pageable pageable);
+
+  // Ukey=
+  public Optional<JcicZ048> findTopByUkeyIs(String ukey_0);
+
+  // SubmitKey= , AND CustId= , AND RcDate=
+  public Optional<JcicZ048> findTopBySubmitKeyIsAndCustIdIsAndRcDateIsOrderByCreateDateDesc(String submitKey_0, String custId_1, int rcDate_2);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
