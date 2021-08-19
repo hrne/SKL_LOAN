@@ -52,6 +52,7 @@ E(0,0)
 !---------- AP TEXT AREA Variables ----------
 
 #FdCustNo=X,2,L
+T(3,*)
 #FdCaseSq=X,2,L
 
 
@@ -68,7 +69,7 @@ T(1,#NTXBUF,8,3)
 !戶號
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)
-@C(2,0)
+@V(2,0)
 
 !案件序號
 #CaseSq=A,3,I

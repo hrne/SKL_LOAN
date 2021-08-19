@@ -26,50 +26,50 @@ public class ClNoMap implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7740711368547243587L;
+	private static final long serialVersionUID = -826307995515278983L;
 
 @EmbeddedId
   private ClNoMapId clNoMapId;
 
   // 原擔保品代號1
   /* 原擔保品 */
-  @Column(name = "`GDRID1`", insertable = false, updatable = false)
-  private int gDRID1 = 0;
+  @Column(name = "`GdrId1`", insertable = false, updatable = false)
+  private int gdrId1 = 0;
 
   // 原擔保品代號2
   /* 原擔保品 */
-  @Column(name = "`GDRID2`", insertable = false, updatable = false)
-  private int gDRID2 = 0;
+  @Column(name = "`GdrId2`", insertable = false, updatable = false)
+  private int gdrId2 = 0;
 
   // 原擔保品編號
   /* 原擔保品 */
-  @Column(name = "`GDRNUM`", insertable = false, updatable = false)
-  private int gDRNUM = 0;
+  @Column(name = "`GdrNum`", insertable = false, updatable = false)
+  private int gdrNum = 0;
 
   // 原擔保品序號
   /* 原擔保品 */
-  @Column(name = "`LGTSEQ`", insertable = false, updatable = false)
-  private int lGTSEQ = 0;
+  @Column(name = "`LgtSeq`", insertable = false, updatable = false)
+  private int lgtSeq = 0;
 
   // 最新擔保品代號1
   /* 經過唯一性處理後之最新擔保品若原擔保品未被唯一性處理為一筆,此欄位擺0 */
-  @Column(name = "`MainGDRID1`")
-  private int mainGDRID1 = 0;
+  @Column(name = "`MainGdrId1`")
+  private int mainGdrId1 = 0;
 
   // 最新擔保品代號2
   /* 經過唯一性處理後之最新擔保品若原擔保品未被唯一性處理為一筆,此欄位擺0 */
-  @Column(name = "`MainGDRID2`")
-  private int mainGDRID2 = 0;
+  @Column(name = "`MainGdrId2`")
+  private int mainGdrId2 = 0;
 
   // 最新擔保品編號
   /* 經過唯一性處理後之最新擔保品若原擔保品未被唯一性處理為一筆,此欄位擺0 */
-  @Column(name = "`MainGDRNUM`")
-  private int mainGDRNUM = 0;
+  @Column(name = "`MainGdrNum`")
+  private int mainGdrNum = 0;
 
   // 最新擔保品序號
   /* 經過唯一性處理後之最新擔保品若原擔保品未被唯一性處理為一筆,此欄位擺0 */
-  @Column(name = "`MainLGTSEQ`")
-  private int mainLGTSEQ = 0;
+  @Column(name = "`MainLgtSeq`")
+  private int mainLgtSeq = 0;
 
   // 新擔保品代號1
   /* 與原擔保品對應之新擔保品 */
@@ -123,18 +123,18 @@ public class ClNoMap implements Serializable {
 	* 原擔保品
 	* @return Integer
 	*/
-  public int getGDRID1() {
-    return this.gDRID1;
+  public int getGdrId1() {
+    return this.gdrId1;
   }
 
 /**
 	* 原擔保品代號1<br>
 	* 原擔保品
   *
-  * @param gDRID1 原擔保品代號1
+  * @param gdrId1 原擔保品代號1
 	*/
-  public void setGDRID1(int gDRID1) {
-    this.gDRID1 = gDRID1;
+  public void setGdrId1(int gdrId1) {
+    this.gdrId1 = gdrId1;
   }
 
 /**
@@ -142,18 +142,18 @@ public class ClNoMap implements Serializable {
 	* 原擔保品
 	* @return Integer
 	*/
-  public int getGDRID2() {
-    return this.gDRID2;
+  public int getGdrId2() {
+    return this.gdrId2;
   }
 
 /**
 	* 原擔保品代號2<br>
 	* 原擔保品
   *
-  * @param gDRID2 原擔保品代號2
+  * @param gdrId2 原擔保品代號2
 	*/
-  public void setGDRID2(int gDRID2) {
-    this.gDRID2 = gDRID2;
+  public void setGdrId2(int gdrId2) {
+    this.gdrId2 = gdrId2;
   }
 
 /**
@@ -161,18 +161,18 @@ public class ClNoMap implements Serializable {
 	* 原擔保品
 	* @return Integer
 	*/
-  public int getGDRNUM() {
-    return this.gDRNUM;
+  public int getGdrNum() {
+    return this.gdrNum;
   }
 
 /**
 	* 原擔保品編號<br>
 	* 原擔保品
   *
-  * @param gDRNUM 原擔保品編號
+  * @param gdrNum 原擔保品編號
 	*/
-  public void setGDRNUM(int gDRNUM) {
-    this.gDRNUM = gDRNUM;
+  public void setGdrNum(int gdrNum) {
+    this.gdrNum = gdrNum;
   }
 
 /**
@@ -180,18 +180,18 @@ public class ClNoMap implements Serializable {
 	* 原擔保品
 	* @return Integer
 	*/
-  public int getLGTSEQ() {
-    return this.lGTSEQ;
+  public int getLgtSeq() {
+    return this.lgtSeq;
   }
 
 /**
 	* 原擔保品序號<br>
 	* 原擔保品
   *
-  * @param lGTSEQ 原擔保品序號
+  * @param lgtSeq 原擔保品序號
 	*/
-  public void setLGTSEQ(int lGTSEQ) {
-    this.lGTSEQ = lGTSEQ;
+  public void setLgtSeq(int lgtSeq) {
+    this.lgtSeq = lgtSeq;
   }
 
 /**
@@ -200,8 +200,8 @@ public class ClNoMap implements Serializable {
 若原擔保品未被唯一性處理為一筆,此欄位擺0
 	* @return Integer
 	*/
-  public int getMainGDRID1() {
-    return this.mainGDRID1;
+  public int getMainGdrId1() {
+    return this.mainGdrId1;
   }
 
 /**
@@ -209,10 +209,10 @@ public class ClNoMap implements Serializable {
 	* 經過唯一性處理後之最新擔保品
 若原擔保品未被唯一性處理為一筆,此欄位擺0
   *
-  * @param mainGDRID1 最新擔保品代號1
+  * @param mainGdrId1 最新擔保品代號1
 	*/
-  public void setMainGDRID1(int mainGDRID1) {
-    this.mainGDRID1 = mainGDRID1;
+  public void setMainGdrId1(int mainGdrId1) {
+    this.mainGdrId1 = mainGdrId1;
   }
 
 /**
@@ -221,8 +221,8 @@ public class ClNoMap implements Serializable {
 若原擔保品未被唯一性處理為一筆,此欄位擺0
 	* @return Integer
 	*/
-  public int getMainGDRID2() {
-    return this.mainGDRID2;
+  public int getMainGdrId2() {
+    return this.mainGdrId2;
   }
 
 /**
@@ -230,10 +230,10 @@ public class ClNoMap implements Serializable {
 	* 經過唯一性處理後之最新擔保品
 若原擔保品未被唯一性處理為一筆,此欄位擺0
   *
-  * @param mainGDRID2 最新擔保品代號2
+  * @param mainGdrId2 最新擔保品代號2
 	*/
-  public void setMainGDRID2(int mainGDRID2) {
-    this.mainGDRID2 = mainGDRID2;
+  public void setMainGdrId2(int mainGdrId2) {
+    this.mainGdrId2 = mainGdrId2;
   }
 
 /**
@@ -242,8 +242,8 @@ public class ClNoMap implements Serializable {
 若原擔保品未被唯一性處理為一筆,此欄位擺0
 	* @return Integer
 	*/
-  public int getMainGDRNUM() {
-    return this.mainGDRNUM;
+  public int getMainGdrNum() {
+    return this.mainGdrNum;
   }
 
 /**
@@ -251,10 +251,10 @@ public class ClNoMap implements Serializable {
 	* 經過唯一性處理後之最新擔保品
 若原擔保品未被唯一性處理為一筆,此欄位擺0
   *
-  * @param mainGDRNUM 最新擔保品編號
+  * @param mainGdrNum 最新擔保品編號
 	*/
-  public void setMainGDRNUM(int mainGDRNUM) {
-    this.mainGDRNUM = mainGDRNUM;
+  public void setMainGdrNum(int mainGdrNum) {
+    this.mainGdrNum = mainGdrNum;
   }
 
 /**
@@ -263,8 +263,8 @@ public class ClNoMap implements Serializable {
 若原擔保品未被唯一性處理為一筆,此欄位擺0
 	* @return Integer
 	*/
-  public int getMainLGTSEQ() {
-    return this.mainLGTSEQ;
+  public int getMainLgtSeq() {
+    return this.mainLgtSeq;
   }
 
 /**
@@ -272,10 +272,10 @@ public class ClNoMap implements Serializable {
 	* 經過唯一性處理後之最新擔保品
 若原擔保品未被唯一性處理為一筆,此欄位擺0
   *
-  * @param mainLGTSEQ 最新擔保品序號
+  * @param mainLgtSeq 最新擔保品序號
 	*/
-  public void setMainLGTSEQ(int mainLGTSEQ) {
-    this.mainLGTSEQ = mainLGTSEQ;
+  public void setMainLgtSeq(int mainLgtSeq) {
+    this.mainLgtSeq = mainLgtSeq;
   }
 
 /**
@@ -449,8 +449,8 @@ public class ClNoMap implements Serializable {
 
   @Override
   public String toString() {
-    return "ClNoMap [clNoMapId=" + clNoMapId + ", mainGDRID1=" + mainGDRID1 + ", mainGDRID2=" + mainGDRID2
-           + ", mainGDRNUM=" + mainGDRNUM + ", mainLGTSEQ=" + mainLGTSEQ + ", clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", tfStatus=" + tfStatus
+    return "ClNoMap [clNoMapId=" + clNoMapId + ", mainGdrId1=" + mainGdrId1 + ", mainGdrId2=" + mainGdrId2
+           + ", mainGdrNum=" + mainGdrNum + ", mainLgtSeq=" + mainLgtSeq + ", clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", tfStatus=" + tfStatus
            + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

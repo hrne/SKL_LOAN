@@ -146,7 +146,7 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entdy", entdy);
+		query.setParameter("entYearMonth", entdy.substring(0,6));
 		query.setParameter("entYear", entdy.substring(0,4));
 		return this.convertToMap(query.getResultList());
 	}

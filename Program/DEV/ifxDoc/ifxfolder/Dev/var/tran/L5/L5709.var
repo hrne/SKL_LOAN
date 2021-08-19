@@ -1,0 +1,168 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5709)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,194)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5709" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5709]                                 最大債權撥付回覆檔檢核"],
+[#<->#,"#FdBringUpDate+提兌日",#BringUpDate],
+["#FdBUTTON_FLD+選擇檔案","#BUTTON_FLD",""],
+]
+
+#FdBringUpDate=X,2,L
+T(3,*)
+#FdBUTTON_FLD=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#PreValue=A,1,S
+T(1,@BringUpDate,#SYSDATE,2,7)
+
+! 提兌日
+#BringUpDate=D,7,I
+D(8)
+@V(7)
+@A(DATE,0,#BringUpDate)
+
+!---------- AP TEXT AREA Variables ----------
+!建議寫在第一個輸入欄位前
+
+! 宣告按鈕物件
+! multiple:true : 可上傳多個檔案 (綠底)
+! fieldName : 設定上傳欄名返回傳接收變數 (黃底)
+! width : 上傳檔名顯示框的寛度 (藍底)
+#BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:true;fieldName:#FILENA;width:600
+
+! 宣告按鈕事件
+#BIND_ABA=X,1,S
+BIND(#BUTTON_FLD,click)
+
+! 上傳欄名返回傳接收變數 (請定為小x)
+#FILENA=x,1000,S
+
+#RPTFG=X,1,S
+E(0,0)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5709 -----------
+<sub type="FORM" name="L5709">
+#SCRTIL=_,_,S
+T(3,[L5709] 最大債權撥付回覆檔檢核)
+!#LOOP=X,1,S
+!T(3,1)ASGN(LOOP$)
+! 區別碼
+!#OOCol1=X,1,O
+! 發件單位
+!#OOCol2=X,8,O
+! 發件單位名稱
+!#OOCol2X=X,40,O
+!T(A,#OOCol2,BANKCODE,BankCd3Def,BankCd3,BankCd3X)
+!#OOCol3=X,8,O
+!#OOCol3X=X,40,O
+!T(A,#OOCol3,BANKCODE,BankCd3Def,BankCd3,BankCd3X)
+! 指定入扣帳日
+!#OOCol4=X,7,O
+! 轉帳類別
+!#OOCol5=X,5,O
+! 交易序號
+!#OOCol6=A,10,O
+! 交易金額
+!#OOCol8=m,11.2,O
+!E(0,#OOCol8/100)
+! 委託單位
+!#OOCol10=X,8,O
+! 實際入扣帳日
+!#OOCol11=X,7,O
+! 回應代碼
+!#OOCol12=X,4,O
+!#OOCol12X=X,40,O
+!IF(#OOCol12 == 4001 || #OOCol12 == 4505 || #OOCol12 == 4508 || #OOCol12 == 4806 || #OOCol12 == 4808 || #OOCol12 == 4405 || #OOCol12 == 4705 || #OOCol12 == 2999,$,T(2,#OOCol12))
+!IF(#OOCol12 == 4001,T(3,4001:入/扣帳成功) ,$)
+!IF(#OOCol12 == 4505,T(3,4505:存款不足) ,$)
+!IF(#OOCol12 == 4508,T(3,4508:非委託或已終止帳戶),$)
+!IF(#OOCol12 == 4806,T(3,4806:存戶查核資料錯誤),$)
+!IF(#OOCol12 == 4808,T(3,4808:無此帳戶或問題帳戶),$)
+!IF(#OOCol12 == 4405,T(3,4405:未開卡或額度不足),$)
+!IF(#OOCol12 == 4705,T(3,4705:剔除不轉帳),$)
+!IF(#OOCol12 == 2999,T(3,2999:其他錯誤),$)
+
+! 轉帳行代碼
+!#OOCol13=X,7,O
+! 轉帳帳號
+!#OOCol14=X,16,O
+! 帳號ID
+!#OOCol15=X,10,O
+! 銷帳編號
+!#OOCol16=X,16,O
+
+! 匯款單FileNo
+#ExcelSnoM=X,8,S
+E(2,@SnoF,#ExcelSnoM)
+#SnoF=A,8,S
+
+! 匯款單FileNo
+#ExcelPrtF=A,1,S
+C(3,#SnoF,0,E(0,0),E(0,1))
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#BringUpDate
+#FILENA
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5709
+#ExcelSnoM
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+!<include src="PRT.icf::UPD01.sel"/>
+#ExcelPrtF=1,PDF,,,,,,,,,,,,,ExcelSnoM;2,最大債權撥付回覆檔檢核
+^
+</sub>

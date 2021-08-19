@@ -78,7 +78,7 @@ public class L5601 extends TradeBuffer {
 			aCollTelId.setCaseCode(iCaseCode);
 			aCollTelId.setCustNo(cCollList.getCustNo());
 			aCollTelId.setFacmNo(cCollList.getFacmNo());
-			if (iFunctioncd.equals("1")) {
+			if (iFunctioncd.equals("1") || iFunctioncd.equals("3")) {
 				aCollTelId.setTitaTlrNo(titaVo.getTlrNo());
 				aCollTelId.setTitaTxtNo(titaVo.getTxtNo());
 				aCollTelId.setAcDate(Integer.valueOf(titaVo.getEntDy())); // 西元
@@ -109,7 +109,7 @@ public class L5601 extends TradeBuffer {
 			CollTel bCollTel = iCollTelService.findById(aCollTelId, titaVo);
 
 			// Functoincd: 1-新增 2-修改 5-查詢
-			if (iFunctioncd.equals("1")) {
+			if (iFunctioncd.equals("1") || iFunctioncd.equals("3")) {
 				if (bCollTel == null) {
 					try {
 						this.info("trytoinsert");
@@ -135,7 +135,17 @@ public class L5601 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0003", ""); // 修改資料不存在
 				}
 			} else {
-				// 5不做任何事
+				if (bCollTel != null) {
+					try {
+						this.info("trytodelete");
+						iCollTelService.holdById(aCollTelId);
+						iCollTelService.delete(aCollTel, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時發生錯誤
+					}
+				} else {
+					throw new LogicException(titaVo, "E0008", ""); // 修改資料不存在
+				}
 			}
 			// 更新催收主檔的上次作業項目和日期
 			CollListId dCollListId = new CollListId();

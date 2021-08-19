@@ -19,36 +19,36 @@ public class ClNoMapId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -4178241152593433010L;
+	private static final long serialVersionUID = 8523471102772901791L;
 
 // 原擔保品代號1
   /* 原擔保品 */
-  @Column(name = "`GDRID1`")
-  private int gDRID1 = 0;
+  @Column(name = "`GdrId1`")
+  private int gdrId1 = 0;
 
   // 原擔保品代號2
   /* 原擔保品 */
-  @Column(name = "`GDRID2`")
-  private int gDRID2 = 0;
+  @Column(name = "`GdrId2`")
+  private int gdrId2 = 0;
 
   // 原擔保品編號
   /* 原擔保品 */
-  @Column(name = "`GDRNUM`")
-  private int gDRNUM = 0;
+  @Column(name = "`GdrNum`")
+  private int gdrNum = 0;
 
   // 原擔保品序號
   /* 原擔保品 */
-  @Column(name = "`LGTSEQ`")
-  private int lGTSEQ = 0;
+  @Column(name = "`LgtSeq`")
+  private int lgtSeq = 0;
 
   public ClNoMapId() {
   }
 
-  public ClNoMapId(int gDRID1, int gDRID2, int gDRNUM, int lGTSEQ) {
-    this.gDRID1 = gDRID1;
-    this.gDRID2 = gDRID2;
-    this.gDRNUM = gDRNUM;
-    this.lGTSEQ = lGTSEQ;
+  public ClNoMapId(int gdrId1, int gdrId2, int gdrNum, int lgtSeq) {
+    this.gdrId1 = gdrId1;
+    this.gdrId2 = gdrId2;
+    this.gdrNum = gdrNum;
+    this.lgtSeq = lgtSeq;
   }
 
 /**
@@ -56,18 +56,18 @@ public class ClNoMapId implements Serializable {
 	* 原擔保品
 	* @return Integer
 	*/
-  public int getGDRID1() {
-    return this.gDRID1;
+  public int getGdrId1() {
+    return this.gdrId1;
   }
 
 /**
 	* 原擔保品代號1<br>
 	* 原擔保品
   *
-  * @param gDRID1 原擔保品代號1
+  * @param gdrId1 原擔保品代號1
 	*/
-  public void setGDRID1(int gDRID1) {
-    this.gDRID1 = gDRID1;
+  public void setGdrId1(int gdrId1) {
+    this.gdrId1 = gdrId1;
   }
 
 /**
@@ -75,18 +75,18 @@ public class ClNoMapId implements Serializable {
 	* 原擔保品
 	* @return Integer
 	*/
-  public int getGDRID2() {
-    return this.gDRID2;
+  public int getGdrId2() {
+    return this.gdrId2;
   }
 
 /**
 	* 原擔保品代號2<br>
 	* 原擔保品
   *
-  * @param gDRID2 原擔保品代號2
+  * @param gdrId2 原擔保品代號2
 	*/
-  public void setGDRID2(int gDRID2) {
-    this.gDRID2 = gDRID2;
+  public void setGdrId2(int gdrId2) {
+    this.gdrId2 = gdrId2;
   }
 
 /**
@@ -94,18 +94,18 @@ public class ClNoMapId implements Serializable {
 	* 原擔保品
 	* @return Integer
 	*/
-  public int getGDRNUM() {
-    return this.gDRNUM;
+  public int getGdrNum() {
+    return this.gdrNum;
   }
 
 /**
 	* 原擔保品編號<br>
 	* 原擔保品
   *
-  * @param gDRNUM 原擔保品編號
+  * @param gdrNum 原擔保品編號
 	*/
-  public void setGDRNUM(int gDRNUM) {
-    this.gDRNUM = gDRNUM;
+  public void setGdrNum(int gdrNum) {
+    this.gdrNum = gdrNum;
   }
 
 /**
@@ -113,24 +113,24 @@ public class ClNoMapId implements Serializable {
 	* 原擔保品
 	* @return Integer
 	*/
-  public int getLGTSEQ() {
-    return this.lGTSEQ;
+  public int getLgtSeq() {
+    return this.lgtSeq;
   }
 
 /**
 	* 原擔保品序號<br>
 	* 原擔保品
   *
-  * @param lGTSEQ 原擔保品序號
+  * @param lgtSeq 原擔保品序號
 	*/
-  public void setLGTSEQ(int lGTSEQ) {
-    this.lGTSEQ = lGTSEQ;
+  public void setLgtSeq(int lgtSeq) {
+    this.lgtSeq = lgtSeq;
   }
 
 
   @Override
   public int hashCode() {
-    return Objects.hash(gDRID1, gDRID2, gDRNUM, lGTSEQ);
+    return Objects.hash(gdrId1, gdrId2, gdrNum, lgtSeq);
   }
 
   @Override
@@ -140,11 +140,11 @@ public class ClNoMapId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     ClNoMapId clNoMapId = (ClNoMapId) obj;
-    return gDRID1 == clNoMapId.gDRID1 && gDRID2 == clNoMapId.gDRID2 && gDRNUM == clNoMapId.gDRNUM && lGTSEQ == clNoMapId.lGTSEQ;
+    return gdrId1 == clNoMapId.gdrId1 && gdrId2 == clNoMapId.gdrId2 && gdrNum == clNoMapId.gdrNum && lgtSeq == clNoMapId.lgtSeq;
   }
 
   @Override
   public String toString() {
-    return "ClNoMapId [gDRID1=" + gDRID1 + ", gDRID2=" + gDRID2 + ", gDRNUM=" + gDRNUM + ", lGTSEQ=" + lGTSEQ + "]";
+    return "ClNoMapId [gdrId1=" + gdrId1 + ", gdrId2=" + gdrId2 + ", gdrNum=" + gdrNum + ", lgtSeq=" + lgtSeq + "]";
   }
 }

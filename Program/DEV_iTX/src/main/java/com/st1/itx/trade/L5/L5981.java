@@ -56,7 +56,11 @@ public class L5981 extends TradeBuffer {
 		this.limit = 200; // 45 * 200 = 9000
 
 		Slice<NegFinShareLog> sNegFinShareLog;
-		sNegFinShareLog = sNegFinShareLogService.FindAllFinCode(iCustNo, iCaseSq, this.index, this.limit, titaVo);
+		if (iCaseSq==0) {
+			sNegFinShareLog = sNegFinShareLogService.CustNoEq(iCustNo, this.index, this.limit, titaVo);
+		} else {
+			sNegFinShareLog = sNegFinShareLogService.FindAllFinCode(iCustNo, iCaseSq, this.index, this.limit, titaVo);
+		}
 		List<NegFinShareLog> lNegFinShareLog = sNegFinShareLog == null ? null : sNegFinShareLog.getContent();
 
 		if (lNegFinShareLog == null || lNegFinShareLog.size() == 0) {

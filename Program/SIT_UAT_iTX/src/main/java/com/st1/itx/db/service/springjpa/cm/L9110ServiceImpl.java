@@ -46,7 +46,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                AS \"CompanyAddr\"      "; // -- 公司地址 F10
 		sql += "           , NVL(CM.\"RegZip3\",'') || NVL(CM.\"RegZip2\",'')";
 		sql += "                                AS \"CompanyZip\"       "; // -- 郵遞區號(公司地址) F11
-		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'01')      ";
+		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)    ";
 		sql += "                                AS \"CompanyTel\"       "; // -- 公司電話 ??? 新系統有特別分類嗎? F12
 		sql += "           , \"Fn_GetCustAddr\"(CM.\"CustUKey\",'1')    ";
 		sql += "                                AS \"ContactAddr\"      "; // -- 通訊地址 F13
@@ -54,22 +54,22 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                AS \"ContactZip\"       "; // -- 郵遞區號(通訊地址) F14
 		sql += "           , NVL(CTN.\"LiaisonName\",' ')               ";
 		sql += "                                AS \"ContactName\"      "; // -- 聯絡人姓名 F15
-		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'02')      ";
+		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1)    ";
 		sql += "                                AS \"ContactTel\"       "; // -- 聯絡電話(市話) F16
-		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'03')      ";
+		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1)     ";
 		sql += "                                AS \"ContactCellPhone\" "; // -- 聯絡電話(手機) F17
-		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'04')      ";
+		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'04',1)    ";
 		sql += "                                AS \"Fax\"              "; // -- 傳真 F18
 		sql += "           , ''                 AS \"Station\"          "; // -- 站別 ??? 待確認是否刪除? F19
 		sql += "           , NVL(CR.\"CrossUse\",'N')                   ";
 		sql += "                                AS \"CrossUse\"         "; // -- 交互運用 F20
 		sql += "           , ''                 AS \"RelName\"          "; // -- 關聯戶戶名 ??? 如何呈現? F21
-		sql += "           , GUA.\"GuaId\"                              "; // -- 保證人統編 F22
-		sql += "           , GUA.\"GuaName\"                            "; // -- 保證人姓名 F23
-		sql += "           , GUA.\"GuaRelItem\"                         "; // -- 保證人關係 F24
-		sql += "           , GUA.\"GuaAmt\"                             "; // -- 保證金額 F25
-		sql += "           , GUA.\"GuaAddr\"                            "; // -- 保證人通訊地址 F26
-		sql += "           , GUA.\"GuaZip\"                             "; // -- 保證人郵遞區號(通訊地址) F27
+		sql += "           , '' AS F22 "; // -- 保證人統編 F22 改用queryGua
+		sql += "           , '' AS F23 "; // -- 保證人姓名 F23 改用queryGua
+		sql += "           , '' AS F24 "; // -- 保證人關係 F24 改用queryGua
+		sql += "           , '' AS F25 "; // -- 保證金額 F25 改用queryGua
+		sql += "           , '' AS F26 "; // -- 保證人通訊地址 F26 改用queryGua
+		sql += "           , '' AS F27 "; // -- 保證人郵遞區號(通訊地址) F27 改用queryGua
 		sql += "           , FC.\"ApplDate\"                            "; // -- 鍵檔日期 F28
 		sql += "           , FAC.\"LineAmt\"                            "; // -- 核准額度 F29
 		sql += "           , CDC2.\"Item\" || FAC.\"AcctCode\"          ";
@@ -150,25 +150,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 WHERE \"Enable\" = 'Y' ";
 		sql += "                ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\" ";
 		sql += "                     AND CTN.\"Seq\" = 1 ";
-		sql += "      LEFT JOIN (SELECT GUA.\"ApproveNo\"                         AS \"ApplNo\"  "; // -- *** ApproveNo
-																									// 將會統一改為 ApplNo
-		sql += "                      , GUACM.\"CustId\"                          AS \"GuaId\"   "; // -- 保證人統編
-		sql += "                      , GUACM.\"CustName\"                        AS \"GuaName\" "; // -- 保證人姓名
-		sql += "                      , CDG.\"GuaRelItem\"                                     "; // -- 保證人關係
-		sql += "                      , GUA.\"GuaAmt\"                                         "; // -- 保證金額
-		sql += "                      , \"Fn_GetCustAddr\"(GUACM.\"CustUKey\",'1')  AS \"GuaAddr\" "; // -- 保證人通訊地址
-		sql += "                      , NVL(GUACM.\"CurrZip3\",'') || NVL(GUACM.\"CurrZip2\",'') ";
-		sql += "                                                                AS \"GuaZip\"  "; // -- 保證人郵遞區號(通訊地址)
-		sql += "                      , ROW_NUMBER() OVER (PARTITION BY GUA.\"ApproveNo\" ORDER BY GUA.\"GuaAmt\" DESC) ";
-		sql += "                                                                AS \"Seq\" ";
-		sql += "                 FROM \"Guarantor\" GUA ";
-		sql += "                 LEFT JOIN \"CustMain\" GUACM ON GUACM.\"CustUKey\" = GUA.\"GuaUKey\" "; // --
-																											// 客戶資料主檔(保證人)
-		sql += "                 LEFT JOIN \"CdGuarantor\" CDG ON CDG.\"GuaRelCode\" = GUA.\"GuaRelCode\" "; // --
-																												// 保證人關係代碼檔
-		sql += "                 WHERE GUA.\"GuaStatCode\" = '1' "; // -- 設定
-		sql += "                ) GUA ON GUA.\"ApplNo\" = \"FC\".\"ApplNo\"  "; // -- 保證人檔
-		sql += "                     AND GUA.\"Seq\"    = 1 "; // -- 取保證金額最大者一筆
 		sql += "      LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'AcctCode' "; // -- 共用代碼檔(核准科目)
 		sql += "                             AND CDC2.\"Code\" = FAC.\"AcctCode\" ";
 		sql += "      LEFT JOIN \"CdCode\" CDC3 ON CDC3.\"DefCode\" = 'ExtraRepayCode' "; // -- 共用代碼檔(利率調整不變攤還額)
@@ -232,7 +213,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , LPAD(CF.\"ClNo\",7,'0')  AS \"ClNo\"        "; // -- F1 擔保品號碼 *** 原\"押品號碼\"
 		sql += "            , CDC1.\"Item\"            AS \"ClItem\"      "; // -- F2 擔保品別 *** 原\"押品別\"
 		sql += "            , CLM.\"EvaDate\"          AS \"EvaDate\"     "; // -- F3 鑑價日期
-		sql += "            , ''                       AS \"OtherDate\"   "; // -- F4 他項存續期限 ???
+		sql += "            , CLI.\"ClaimDate\"        AS \"OtherDate\"   "; // -- F4 他項存續期限 ???
 		sql += "            , CLI.\"SettingSeq\"                       "; // -- F5 順位 ** 只有不動產會有此欄位，動產、股票、其他擔保品會是null
 		sql += "            , CLI.\"FirstAmt\"                         "; // -- F6 前順位金額 ***
 																			// 只有不動產會有此欄位，動產、股票、其他擔保品會是null
@@ -336,7 +317,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           ) LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "               AND LO.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "               AND LO.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "               AND LO.\"LandSeq\" <= 1"; // -- 房地從1開始編,土地固定0 ??? 房地只取一筆?
 		sql += " LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = L.\"CityCode\"";
 		sql += " LEFT JOIN \"CdArea\" AREA ON AREA.\"CityCode\" = L.\"CityCode\"";
 		sql += "                          AND AREA.\"AreaCode\" = L.\"AreaCode\"";
@@ -348,6 +328,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        AND CLI.\"ClNo\"    = CF.\"ClNo\"";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
 		sql += "   AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
+		sql += "   AND NVL(L.\"ClNo\",0) > 0 ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -438,6 +419,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                 AND CBPK.\"ClNo\"    = CF.\"ClNo\"";
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
 		sql += "   AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
+		sql += "   AND NVL(L.\"ClNo\",0) > 0 "; // -- 主要擔保品
 
 		this.info("sql=" + sql);
 		Query query;
@@ -488,6 +470,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               AND IR.\"ClNo\"    = CF.\"ClNo\"";
 		sql += "               AND IR.\"Seq\" = 1"; // -- 每張保單取最新一筆 ??? 待確認此邏輯是否正確
 		sql += " WHERE CF.\"ApproveNo\" = :applNo";
+		sql += "   AND NVL(IR.\"NowInsuNo\",' ') <> ' '";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -551,25 +534,28 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ELSE '非十五日薪' END AS \"F8 十五日薪\""; // -- ??? 未確認邏輯
 		sql += "       ,CM.\"SpouseName\" AS \"F9 配偶姓名\" ";
 		sql += "       ,CM.\"SpouseId\" AS \"F10 配偶統一編號\" ";
-		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'03') AS \"F11 BBC\"  "; // -- ?? 手機?
+		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1) AS \"F11 BBC\"  "; // -- ?? 手機?
 		sql += "       ,\"Fn_GetCustAddr\"(CM.\"CustUKey\",'0') AS \"F12 戶籍地址\" ";
 		sql += "       ,CM.\"RegZip3\" || CM.\"RegZip2\" AS \"F13 戶籍-郵遞區號\" ";
-		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'02') AS \"F14 戶籍電話\" ";
+		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1) AS \"F14 戶籍電話\" ";
 		sql += "       ,\"Fn_GetCustAddr\"(CM.\"CustUKey\",'1') AS \"F15 通訊地址\" ";
 		sql += "       ,CM.\"CurrZip3\" || CM.\"CurrZip2\" AS \"F16 通訊-郵遞區號\" ";
 		sql += "       ,NVL(CTN.\"LiaisonName\",' ') AS \"F17 聯絡人姓名\"  "; // -- ??
 		sql += "       ,'(O) '  ";
-		sql += "       || RPAD(\"Fn_GetTelNo\"(CM.\"CustUKey\",'01'),30) ";
+		sql += "       || RPAD(\"Fn_GetTelNo\"(CM.\"CustUKey\",'01',2),35) ";
 		sql += "       || ' (H) '  ";
-		sql += "       || \"Fn_GetTelNo\"(CM.\"CustUKey\",'02') AS \"F18 聯絡電話\" ";
+		sql += "       || \"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1) ";
+		sql += "       || '     '  ";
+		sql += "       || \"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1) ";
+		sql += "                                           AS \"F18 聯絡電話\" ";
 		sql += "       ,NVL(CR.\"CrossUse\",'N') AS \"F19 交互運用\"  "; // -- ??
-		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'04') AS \"F20 傳真\" ";
-		sql += "       ,GUA.\"GuaId\" AS \"F21 保證人統編\" ";
-		sql += "       ,GUA.\"GuaName\" AS \"F22 保證人姓名\" ";
-		sql += "       ,GUA.\"GuaRelItem\" AS \"F23 保證人關係\" ";
-		sql += "       ,GUA.\"GuaAmt\" AS \"F24 保證金額\" ";
-		sql += "       ,GUA.\"GuaAddr\" AS \"F25 保證人通訊地址\" ";
-		sql += "       ,GUA.\"GuaZip\" AS \"F26 保證人郵遞區號(通訊)\" ";
+		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'04',1) AS \"F20 傳真\" ";
+		sql += "       ,'' AS \"F21 保證人統編\" "; // 改用queryGua
+		sql += "       ,'' AS \"F22 保證人姓名\" "; // 改用queryGua
+		sql += "       ,'' AS \"F23 保證人關係\" "; // 改用queryGua
+		sql += "       ,'' AS \"F24 保證金額\" "; // 改用queryGua
+		sql += "       ,'' AS \"F25 保證人通訊地址\" "; // 改用queryGua
+		sql += "       ,'' AS \"F26 保證人郵遞區號(通訊)\" "; // 改用queryGua
 		sql += "       ,FCA.\"ApplDate\" AS \"F27 鍵檔日期\" ";
 		sql += "       ,FM.\"LineAmt\" AS \"F28 核准額度\" ";
 		sql += "       ,CDC2.\"Item\" || FM.\"AcctCode\" AS \"F29 核准科目\" ";
@@ -640,22 +626,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            WHERE \"Enable\" = 'Y' ";
 		sql += "           ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\" ";
 		sql += "                AND CTN.\"Seq\" = 1 ";
-		sql += " LEFT JOIN (SELECT GUA.\"ApproveNo\"                         AS \"ApplNo\"  ";
-		sql += "                 , GUACM.\"CustId\"                          AS \"GuaId\"   ";
-		sql += "                 , GUACM.\"CustName\"                        AS \"GuaName\" ";
-		sql += "                 , CDG.\"GuaRelItem\"                                     ";
-		sql += "                 , GUA.\"GuaAmt\"                                         ";
-		sql += "                 , \"Fn_GetCustAddr\"(GUACM.\"CustUKey\",'1')  AS \"GuaAddr\" ";
-		sql += "                 , NVL(GUACM.\"CurrZip3\",'') || NVL(GUACM.\"CurrZip2\",'') ";
-		sql += "                                                           AS \"GuaZip\"  ";
-		sql += "                 , ROW_NUMBER() OVER (PARTITION BY GUA.\"ApproveNo\" ORDER BY GUA.\"GuaAmt\" DESC) ";
-		sql += "                                                           AS \"Seq\" ";
-		sql += "            FROM \"Guarantor\" GUA ";
-		sql += "            LEFT JOIN \"CustMain\" GUACM ON GUACM.\"CustUKey\" = GUA.\"GuaUKey\"  ";
-		sql += "            LEFT JOIN \"CdGuarantor\" CDG ON CDG.\"GuaRelCode\" = GUA.\"GuaRelCode\" ";
-		sql += "            WHERE GUA.\"GuaStatCode\" = '1' ";
-		sql += "           ) GUA ON GUA.\"ApplNo\" = FCA.\"ApplNo\" ";
-		sql += "                AND GUA.\"Seq\"    = 1  ";
 		sql += " LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'CustTypeCode'  ";
 		sql += "                        AND CDC1.\"Code\" = CM.\"CustTypeCode\" ";
 		sql += " LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'AcctCode' ";
@@ -704,4 +674,38 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> queryGua(TitaVo titaVo, String applNo) throws Exception {
+
+		this.info("L9110.findAll queryGua");
+
+		String sql = "";
+		sql += " SELECT GUACM.\"CustId\"                            AS \"GuaId\"   "; // -- F0 保證人統編
+		sql += "      , GUACM.\"CustName\"                          AS \"GuaName\" "; // -- F1 保證人姓名
+		sql += "      , CDG.\"GuaRelItem\"                                         "; // -- F2 保證人關係
+		sql += "      , GUA.\"GuaAmt\"                                             "; // -- F3 保證金額
+		sql += "      , \"Fn_GetCustAddr\"(GUACM.\"CustUKey\",'1')  AS \"GuaAddr\" "; // -- F4 保證人通訊地址
+		sql += "      , NVL(GUACM.\"CurrZip3\",'') || NVL(GUACM.\"CurrZip2\",'')   ";
+		sql += "                                                    AS \"GuaZip\"  "; // -- F5 保證人郵遞區號(通訊地址)
+		sql += "      , ROW_NUMBER() OVER (PARTITION BY GUA.\"ApproveNo\" ORDER BY GUA.\"GuaAmt\" DESC) ";
+		sql += "                                                    AS \"Seq\" ";
+		sql += " FROM \"Guarantor\" GUA ";
+		// 客戶資料主檔(保證人)
+		sql += " LEFT JOIN \"CustMain\" GUACM ON GUACM.\"CustUKey\" = GUA.\"GuaUKey\" ";
+		// 保證人關係代碼檔
+		sql += " LEFT JOIN \"CdGuarantor\" CDG ON CDG.\"GuaRelCode\" = GUA.\"GuaRelCode\" ";
+		sql += " WHERE GUA.\"GuaStatCode\" = '1' "; // -- 設定
+		// *** ApproveNo 將會統一改為 ApplNo
+		sql += "   AND GUA.\"ApproveNo\" = :applNo "; // -- 申請號碼
+		sql += " ORDER BY \"Seq\" "; // -- 申請號碼
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("applNo", applNo);
+
+		return this.convertToMap(query.getResultList());
+	}
 }

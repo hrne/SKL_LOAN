@@ -126,24 +126,27 @@ public class L9110Report extends MakeReport {
 	private void fillDataLegalPerson(TitaVo titaVo) {
 
 		List<Map<String, String>> listL9110 = null;
-		List<Map<String, String>> listClQuery = null;
 
+		List<Map<String, String>> listGuaQuery = null;
+
+		List<Map<String, String>> listClQuery = null;
 		List<Map<String, String>> listLandQuery = null;
 		List<Map<String, String>> listBuildingQuery = null;
 		List<Map<String, String>> listInsuQuery = null;
-
 		List<Map<String, String>> listStockQuery = null;
 
 		try {
 
 			listL9110 = l9110ServiceImpl.queryLegalPerson(titaVo, thisApplNo);
-			listClQuery = l9110ServiceImpl.queryCl(titaVo, thisApplNo);
 
+			listGuaQuery = l9110ServiceImpl.queryGua(titaVo, thisApplNo);
+
+			listClQuery = l9110ServiceImpl.queryCl(titaVo, thisApplNo);
 			listLandQuery = l9110ServiceImpl.queryLand(titaVo, thisApplNo);
 			listBuildingQuery = l9110ServiceImpl.queryBuilding(titaVo, thisApplNo);
 			listInsuQuery = l9110ServiceImpl.queryInsu(titaVo, thisApplNo);
-
 			listStockQuery = l9110ServiceImpl.queryStock(titaVo, thisApplNo);
+
 		} catch (Exception e) {
 
 			StringWriter errors = new StringWriter();
@@ -205,21 +208,17 @@ public class L9110Report extends MakeReport {
 
 			// 3
 			this.print(1, 1, "    ");
-			if (tL9110.get("F21") != null && !tL9110.get("F22").isEmpty()) {
+			if (listGuaQuery != null && !listGuaQuery.isEmpty()) {
 				this.print(1, 1, "三、保証人資料：");
-				this.print(1, 5, "統一編號 ..... " + tL9110.get("F22"));
-				this.print(0, 33, "姓名 .........　" + tL9110.get("F23"));
-				this.print(0, 99, "關係 .........　" + tL9110.get("F24"));
-				this.print(1, 99, "保証金額 .....　　　" + formatAmtSafely(tL9110.get("F25"), 0));
-				this.print(1, 5, "通訊地址 .....　" + tL9110.get("F26"));
-				this.print(0, 99, "郵遞區號 ..... " + tL9110.get("F27"));
+
+				printGuaDetail(listGuaQuery);
 			} else {
 				this.print(1, 1, "三、保証人資料：  資料未建立");
 			}
 
 			// 4
 			this.print(1, 1, "    ");
-			this.print(1, 5, "四、核准資料");
+			this.print(1, 1, "四、核准資料：");
 			this.print(1, 5, "鍵檔日期 .....　" + this.showRocDate(tL9110.get("F28"), 1));
 			this.print(0, 35, "核准額度 ....."); // amount is R-pined at 49
 			this.print(0, 50, formatAmtSafely(tL9110.get("F29"), 0));
@@ -286,13 +285,20 @@ public class L9110Report extends MakeReport {
 
 					this.print(1, 0, "    ");
 
-					// 列印土地明細
-					printLandDetail(listLandQuery);
+					if (listLandQuery != null && !listLandQuery.isEmpty()) {
+						// 列印土地明細
+						printLandDetail(listLandQuery);
+					}
 
-					// 列印建物明細
-					printBuildingDetail(listBuildingQuery);
+					if (listBuildingQuery != null && !listBuildingQuery.isEmpty()) {
+						// 列印建物明細
+						printBuildingDetail(listBuildingQuery);
+					}
 
-					if (listInsuQuery != null) {
+					if (listInsuQuery != null && !listInsuQuery.isEmpty()) {
+
+						this.print(1, 1, "六、保險資料：");
+
 						// 列印保險資料
 						printInsu(listInsuQuery);
 					} else {
@@ -367,24 +373,27 @@ public class L9110Report extends MakeReport {
 	 */
 	private void fillDataNaturalPerson(TitaVo titaVo) {
 		List<Map<String, String>> listL9110 = null;
-		List<Map<String, String>> listClQuery = null;
 
+		List<Map<String, String>> listGuaQuery = null;
+
+		List<Map<String, String>> listClQuery = null;
 		List<Map<String, String>> listLandQuery = null;
 		List<Map<String, String>> listBuildingQuery = null;
 		List<Map<String, String>> listInsuQuery = null;
-
 		List<Map<String, String>> listStockQuery = null;
 
 		try {
 
 			listL9110 = l9110ServiceImpl.queryNaturalPerson(titaVo, thisApplNo);
-			listClQuery = l9110ServiceImpl.queryCl(titaVo, thisApplNo);
 
+			listGuaQuery = l9110ServiceImpl.queryGua(titaVo, thisApplNo);
+
+			listClQuery = l9110ServiceImpl.queryCl(titaVo, thisApplNo);
 			listLandQuery = l9110ServiceImpl.queryLand(titaVo, thisApplNo);
 			listBuildingQuery = l9110ServiceImpl.queryBuilding(titaVo, thisApplNo);
 			listInsuQuery = l9110ServiceImpl.queryInsu(titaVo, thisApplNo);
-
 			listStockQuery = l9110ServiceImpl.queryStock(titaVo, thisApplNo);
+
 		} catch (Exception e) {
 
 			StringWriter errors = new StringWriter();
@@ -435,21 +444,17 @@ public class L9110Report extends MakeReport {
 
 			// 2
 			this.print(1, 1, "    ");
-			if (tL9110.get("F21") != null && !tL9110.get("F21").isEmpty()) {
+			if (listGuaQuery != null && !listGuaQuery.isEmpty()) {
 				this.print(1, 1, "二、保証人資料：");
-				this.print(1, 5, "統一編號 ..... " + tL9110.get("F21"));
-				this.print(0, 33, "姓名 .........　" + tL9110.get("F22"));
-				this.print(0, 99, "關係 .........　" + tL9110.get("F23"));
-				this.print(1, 99, "保証金額 .....　　　" + formatAmtSafely(tL9110.get("F24"), 0));
-				this.print(1, 5, "通訊地址 .....　" + tL9110.get("F25"));
-				this.print(0, 99, "郵遞區號 ..... " + tL9110.get("F26"));
+
+				printGuaDetail(listGuaQuery);
 			} else {
 				this.print(1, 1, "二、保証人資料：  資料未建立");
 			}
 
 			// 3
 			this.print(1, 1, "    ");
-			this.print(1, 5, "三、核准資料");
+			this.print(1, 1, "三、核准資料：");
 			this.print(1, 5, "鍵檔日期 .....　" + this.showRocDate(tL9110.get("F27"), 1));
 			this.print(0, 35, "核准額度 ....."); // amount is R-pined at 49
 			this.print(0, 50, formatAmtSafely(tL9110.get("F28"), 0));
@@ -521,13 +526,20 @@ public class L9110Report extends MakeReport {
 
 					this.print(1, 0, "    ");
 
-					// 列印土地明細
-					printLandDetail(listLandQuery);
+					if (listLandQuery != null && !listLandQuery.isEmpty()) {
+						// 列印土地明細
+						printLandDetail(listLandQuery);
+					}
 
-					// 列印建物明細
-					printBuildingDetail(listBuildingQuery);
+					if (listBuildingQuery != null && !listBuildingQuery.isEmpty()) {
+						// 列印建物明細
+						printBuildingDetail(listBuildingQuery);
+					}
 
 					if (listInsuQuery != null) {
+
+						this.print(1, 1, "五、保險資料：");
+
 						// 列印保險資料
 						printInsu(listInsuQuery);
 					} else {
@@ -594,6 +606,27 @@ public class L9110Report extends MakeReport {
 		} else {
 			print(1, 1, "核准號碼" + thisApplNo + "無資料");
 		}
+	}
+
+	/**
+	 * 列印保證人明細(自然人、法人共用)
+	 * 
+	 * @param listGuaQuery 保證人明細查詢結果
+	 */
+	private void printGuaDetail(List<Map<String, String>> listGuaQuery) {
+
+		for (Map<String, String> tGua : listGuaQuery) {
+
+			this.print(1, 5, "統一編號 ..... " + tGua.get("F0"));
+			this.print(0, 33, "姓名 .........　" + tGua.get("F1"));
+			this.print(0, 99, "關係 .........　" + tGua.get("F2"));
+
+			this.print(1, 99, "保証金額 .....　　　" + formatAmtSafely(tGua.get("F3"), 0));
+
+			this.print(1, 5, "通訊地址 .....　" + tGua.get("F4"));
+			this.print(0, 99, "郵遞區號 ..... " + tGua.get("F5"));
+		}
+
 	}
 
 	/**
@@ -874,7 +907,6 @@ public class L9110Report extends MakeReport {
 
 		checkSpace(3);
 
-		this.print(1, 1, "五、保險資料：");
 		/**
 		 * --------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
 		 * -----------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345

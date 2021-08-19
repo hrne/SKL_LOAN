@@ -2141,18 +2141,18 @@ TXFORM=L2R16
 
 !尋找原擔保品編號資料
 <L2R17.dec>
-#2r17CompanyId=X,10,S
-#2r17CompanyName=c,100,S
-#2r17HoldingRatio=n,3.2,S
-#2r17JobTitle=A,2,S
+#L2r17GdrId1=A,1,S
+#L2r17GdrId2=A,2,S
+#L2r17GdrNum=A,7,S
+#L2r17LgtSeq=A,2,S
 </L2R17.dec>
 
 <L2R17.tom>
 TXFORM=L2R17
-#2r17CompanyId
-#2r17CompanyName
-#2r17HoldingRatio
-#2r17JobTitle
+#L2r17GdrId1
+#L2r17GdrId2
+#L2r17GdrNum
+#L2r17LgtSeq
 ^
 </L2R17.tom>
 !尋找(準)利害關係人主檔資料

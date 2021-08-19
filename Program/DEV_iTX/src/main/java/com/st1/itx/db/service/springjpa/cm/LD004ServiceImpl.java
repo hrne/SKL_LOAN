@@ -56,7 +56,7 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"LoanBorTx\" TX ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = TX.\"CustNo\" ";
 		sql += " LEFT JOIN \"AcDetail\" ACD ON ACD.\"AcDate\" = TX.\"AcDate\" ";
-		sql += "                         AND ACD.\"TitaTxtNo\" = TX.\"TitaTxtNo\" ";
+		sql += "                         AND ACD.\"TitaTxtNo\" = TO_NUMBER(TX.\"TitaTxtNo\") ";
 		sql += "                         AND ACD.\"TitaTxCd\" = TX.\"TitaTxCd\" ";
 		sql += " LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
 		sql += "                          AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";

@@ -80,7 +80,7 @@ public class LM008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    , A.\"FacmNo\"";
 		sql += "                    , A.\"LoanBal\"";
 		sql += "                    , A.\"IntRate\"";
-		sql += "                    , DECODE(A.\"IntStartDate\", 0, 99999999, A.\"IntStartDate\")";
+		sql += "                    , DECODE(A.\"IntStartDate\", 0, 99999999, A.\"IntStartDate\") \"IntStartDate\" ";
 		sql += "                    , CASE WHEN A.\"PayIntDate\" <= :bcDate THEN A.\"Interest\"";
 		sql += "                      ELSE 0 END INT";
 		sql += "                    , CASE WHEN A.\"PayIntDate\" > :bcDate THEN A.\"Interest\"";

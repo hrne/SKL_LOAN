@@ -42,7 +42,7 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"#FdFUNCD+功能",#FunCdX],
 [#<->#,"#FdApplNo+核准號碼",#ApplNo,#BTN4,#ApplNoX],
 ["#FdCOL_IND1+擔保品代號1",#ClCode1,#ClCode1X],["#FdCOL_IND2+擔保品代號2",#ClCode2,#ClCode2X],
-["#FdCOL_NO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum],
+["#FdCOL_NO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
 ["#FdSUB_TYPE+擔保品類別",#ClTypeCode,#SUB_TYPE_X],["#FdCOL_AREA+地區別",#CityCode,#COL_AREA_X],
 [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#BtnExpand],
 ["#FdOWNER_ID+所有權人統編",#OwnerId],["#FdOWNER_NM+所有權人姓名",#OwnerName],
@@ -558,6 +558,20 @@ T(H,#ClCode2,#ClCode2Help)
 
 #FdCOL_NO=X,2,L
 
+<include src="ROM.icf::L2R17.dec"/>
+!RIM取原擔保品編號
+#RimL2r17=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+RESET_RIM(#RimL2r17,L2R17)
+S(L2R17,1,#RimClCode1,#RimClCode2,#RimClNo)
+R(1,L2R17)
+E(0,@GdRid1,#L2r17GdrId1)
+E(0,@GdRid2,#L2r17GdrId2)
+E(0,@GdRnum,#L2r17GdrNum)
+
 
 ![原擔保品編號]
 #FdGdRid=X,2,L
@@ -565,6 +579,10 @@ T(H,#ClCode2,#ClCode2Help)
 #GdRid1=A,1,L
 #GdRid2=A,2,L
 #GdRnum=A,7,L
+
+#GdALL=X,12,L
+C(3,#GdRid1,0,S,$)
+T(2,#GdRid1+-+#GdRid2+-+#GdRnum)
 
 !調RIM參數
 #RimClNo=A,7,S
@@ -1209,6 +1227,7 @@ TXFORM=L2412
 <include src="ROM.icf::L1R09.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R17.tom"/>
 <include src="ROM.icf::L2R22.tom"/>
 <include src="ROM.icf::L2R24.tom"/>
 <include src="ROM.icf::L2R41.tom"/>

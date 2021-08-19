@@ -36,44 +36,44 @@ public interface ClNoMapService {
   public Slice<ClNoMap> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * GDRID1 = ,AND GDRID2 = ,AND GDRNUM = 
+   * GdrId1 = ,AND GdrId2 = ,AND GdrNum = 
    *
-   * @param gDRID1_0 gDRID1_0
-   * @param gDRID2_1 gDRID2_1
-   * @param gDRNUM_2 gDRNUM_2
+   * @param gdrId1_0 gdrId1_0
+   * @param gdrId2_1 gdrId2_1
+   * @param gdrNum_2 gdrNum_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClNoMap ClNoMap of List
    */
-  public Slice<ClNoMap> findGDRNUM(int gDRID1_0, int gDRID2_1, int gDRNUM_2, int index, int limit, TitaVo... titaVo);
+  public Slice<ClNoMap> findGdrNum(int gdrId1_0, int gdrId2_1, int gdrNum_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * MainGDRID1 = ,AND MainGDRID2 = ,AND MainGDRNUM = ,AND MainLGTSEQ =
+   * MainGdrId1 = ,AND MainGdrId2 = ,AND MainGdrNum = ,AND MainLgtSeq =
    *
-   * @param mainGDRID1_0 mainGDRID1_0
-   * @param mainGDRID2_1 mainGDRID2_1
-   * @param mainGDRNUM_2 mainGDRNUM_2
-   * @param mainLGTSEQ_3 mainLGTSEQ_3
+   * @param mainGdrId1_0 mainGdrId1_0
+   * @param mainGdrId2_1 mainGdrId2_1
+   * @param mainGdrNum_2 mainGdrNum_2
+   * @param mainLgtSeq_3 mainLgtSeq_3
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClNoMap ClNoMap of List
    */
-  public Slice<ClNoMap> findMainLGTSEQ(int mainGDRID1_0, int mainGDRID2_1, int mainGDRNUM_2, int mainLGTSEQ_3, int index, int limit, TitaVo... titaVo);
+  public Slice<ClNoMap> findMainLgtseq(int mainGdrId1_0, int mainGdrId2_1, int mainGdrNum_2, int mainLgtSeq_3, int index, int limit, TitaVo... titaVo);
 
   /**
-   * MainGDRID1 = ,AND MainGDRID2 = ,AND MainGDRNUM = 
+   * MainGdrId1 = ,AND MainGdrId2 = ,AND MainGdrNum = 
    *
-   * @param mainGDRID1_0 mainGDRID1_0
-   * @param mainGDRID2_1 mainGDRID2_1
-   * @param mainGDRNUM_2 mainGDRNUM_2
+   * @param mainGdrId1_0 mainGdrId1_0
+   * @param mainGdrId2_1 mainGdrId2_1
+   * @param mainGdrNum_2 mainGdrNum_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClNoMap ClNoMap of List
    */
-  public Slice<ClNoMap> findMainGDRNUM(int mainGDRID1_0, int mainGDRID2_1, int mainGDRNUM_2, int index, int limit, TitaVo... titaVo);
+  public Slice<ClNoMap> findMainGdrNum(int mainGdrId1_0, int mainGdrId2_1, int mainGdrNum_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * ClCode1 = ,AND ClCode2 = ,AND ClNo = 

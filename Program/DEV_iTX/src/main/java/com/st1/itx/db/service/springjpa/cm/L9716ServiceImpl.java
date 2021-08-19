@@ -1,6 +1,7 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +33,31 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		//LNW0581E
 		this.info("l9716.findAll ");
 
-		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
-		inputYearMonth = inputYearMonth.minusMonths(1);
+//		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
+//		inputYearMonth = inputYearMonth.minusMonths(1);
+		
+
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = Integer.valueOf(titaVo.getParam("inputYear"));
+		int iMonth = Integer.parseInt(titaVo.getParam("inputMonth"));
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日(int)
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthDate = Calendar.getInstance();
+		// 設當年月底日
+		calMonthDate.set(iYear, iMonth, 0);
+
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+		
 
 		String sql = "SELECT M.\"OvduTerm\" F0";
 		sql += "            ,EMP.\"Fullname\" F1";
@@ -42,7 +66,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,M.\"CustNo\" F4";
 		sql += "            ,M.\"FacmNo\" F5";
 		sql += "            ,NVL(CUS.\"CustName\",CUS2.\"CustName\") F6";
-		sql += "            ,FAC.\"FirstDrawdownDate\" F7";
+		sql += "            ,FAC.\"FirstDrawdownDate\" - 19110000 AS  F7";
 		sql += "            ,M.\"PrinBalance\" F8";
 		sql += "            ,M.\"StoreRate\" F9";
 		sql += "            ,M.\"PrevIntDate\" F10";
@@ -136,8 +160,8 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		this.info("L9716 inputYearMonth: " + Integer.toString(inputYearMonth.getYear()) + String.format("%02d", inputYearMonth.getMonthValue()) + " peko");
-		query.setParameter("inputYearMonth", Integer.toString(inputYearMonth.getYear()) + String.format("%02d", inputYearMonth.getMonthValue()));
+		this.info("L9716 inputYearMonth: "+ iYear + String.format("%02d", iMonth));
+		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
 		query.setParameter("inputCollPsn", titaVo.getParam("inputCollPsn"));
 		query.setParameter("inputOvduTermMin", titaVo.getParam("inputOvduTermMin"));
 		query.setParameter("inputOvduTermMax", titaVo.getParam("inputOvduTermMax"));
@@ -151,9 +175,31 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> ovduFindAll(TitaVo titaVo) throws Exception {
 		this.info("l9716.ovduFindAll");
 
-		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
-		inputYearMonth = inputYearMonth.minusMonths(1);
+//		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
+//		inputYearMonth = inputYearMonth.minusMonths(1);
 
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = Integer.valueOf(titaVo.getParam("inputYear"));
+		int iMonth = Integer.parseInt(titaVo.getParam("inputMonth"));
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日(int)
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthDate = Calendar.getInstance();
+		// 設當年月底日
+		calMonthDate.set(iYear, iMonth, 0);
+
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+		
+		
 		String sql = "SELECT * FROM (";
 		sql += "      SELECT DECODE(M.\"AcSubBookCode\",'00A',' ','201','A') AS F0";
 		sql += "            ,L.\"CustNo\" F1";
@@ -169,8 +215,8 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,M.\"UnpaidPrincipal\"";
 		sql += "             + M.\"UnpaidInterest\"";
 		sql += "             - M.\"PrinBalance\" F11";
-		sql += "            ,\"Fn_GetTelNo\"(C.\"CustUKey\",'01') AS F12";
-		sql += "            ,\"Fn_GetTelNo\"(C.\"CustUKey\",'03') AS F13";
+		sql += "            ,\"Fn_GetTelNo\"(C.\"CustUKey\",'01',1) AS F12";
+		sql += "            ,\"Fn_GetTelNo\"(C.\"CustUKey\",'03',1) AS F13";
 		sql += "            ,C1.\"CityItem\"";
 		sql += "            || C2.\"AreaItem\"";
 		sql += "            || C.\"CurrRoad\"";
@@ -183,7 +229,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "										,DECODE(C.\"CurrNum\",NULL,'',C.\"CurrNum\" || '之') || C.\"CurrNumDash\" || '號')";
 		sql += "            || DECODE(C.\"CurrFloor\",NULL,'',C.\"CurrFloor\" || '樓')";
 		sql += "            || DECODE(C.\"CurrFloorDash\",NULL,'','之' || C.\"CurrFloorDash\") AS F14";
-		sql += "            ,\"Fn_GetTelNo\"(C.\"CustUKey\",'01') AS F15";
+		sql += "            ,\"Fn_GetTelNo\"(C.\"CustUKey\",'01',1) AS F15";
 		sql += "            ,C3.\"CityItem\"";
 		sql += "            || C4.\"AreaItem\"";
 		sql += "            || C.\"RegRoad\"";
@@ -278,8 +324,8 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		this.info("L9716 inputYearMonth: " + Integer.toString(inputYearMonth.getYear()) + String.format("%02d", inputYearMonth.getMonthValue()) + " peko");
-		query.setParameter("inputYearMonth", Integer.toString(inputYearMonth.getYear()) + String.format("%02d", inputYearMonth.getMonthValue()));
+		this.info("L9716 inputYearMonth: " + iYear + String.format("%02d", iMonth));
+		query.setParameter("inputYearMonth",iYear + String.format("%02d", iMonth));
 	
 
 		return this.convertToMap(query.getResultList());

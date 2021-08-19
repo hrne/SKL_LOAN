@@ -22,17 +22,17 @@ import com.st1.itx.db.domain.ClNoMapId;
  */
 public interface ClNoMapRepositoryDay extends JpaRepository<ClNoMap, ClNoMapId> {
 
-  // GDRID1 = ,AND GDRID2 = ,AND GDRNUM = 
-  public Slice<ClNoMap> findAllByGDRID1IsAndGDRID2IsAndGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(int gDRID1_0, int gDRID2_1, int gDRNUM_2, Pageable pageable);
+  // GdrId1 = ,AND GdrId2 = ,AND GdrNum = 
+  public Slice<ClNoMap> findAllByGdrId1IsAndGdrId2IsAndGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(int gdrId1_0, int gdrId2_1, int gdrNum_2, Pageable pageable);
 
-  // MainGDRID1 = ,AND MainGDRID2 = ,AND MainGDRNUM = ,AND MainLGTSEQ =
-  public Slice<ClNoMap> findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsAndMainLGTSEQIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(int mainGDRID1_0, int mainGDRID2_1, int mainGDRNUM_2, int mainLGTSEQ_3, Pageable pageable);
+  // MainGdrId1 = ,AND MainGdrId2 = ,AND MainGdrNum = ,AND MainLgtSeq =
+  public Slice<ClNoMap> findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsAndMainLgtSeqIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(int mainGdrId1_0, int mainGdrId2_1, int mainGdrNum_2, int mainLgtSeq_3, Pageable pageable);
 
-  // MainGDRID1 = ,AND MainGDRID2 = ,AND MainGDRNUM = 
-  public Slice<ClNoMap> findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(int mainGDRID1_0, int mainGDRID2_1, int mainGDRNUM_2, Pageable pageable);
+  // MainGdrId1 = ,AND MainGdrId2 = ,AND MainGdrNum = 
+  public Slice<ClNoMap> findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(int mainGdrId1_0, int mainGdrId2_1, int mainGdrNum_2, Pageable pageable);
 
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Slice<ClNoMap> findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+  public Slice<ClNoMap> findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

@@ -72,7 +72,7 @@ public class LM038Report extends MakeReport {
 				switch (col) {
 				case 6:
 					total_DataCount = total_DataCount.add(new BigDecimal(1));
-					makeExcel.setValue(row, col, ad);
+					makeExcel.setValue(row, col, tmpValue);
 					break;
 
 				case 8:
@@ -94,10 +94,10 @@ public class LM038Report extends MakeReport {
 					break;
 
 				case 26:
-					makeExcel.setValue(row, col, tLDVo.get(ad), "R");
+					makeExcel.setValue(row, col, tmpValue, "R");
 					break;
 				case 21:
-					makeExcel.setValue(row, col, tLDVo.get(ad), "L");
+					makeExcel.setValue(row, col, tmpValue, "L");
 					break;
 				case 15:
 					BigDecimal tmpAmt = tmpValue == null || tmpValue.isEmpty() ? BigDecimal.ZERO : new BigDecimal(tmpValue);
@@ -105,7 +105,7 @@ public class LM038Report extends MakeReport {
 					makeExcel.setValue(row, col, tmpAmt, "#,##0");
 					break;
 				default:
-					makeExcel.setValue(row, col, tLDVo.get(ad));
+					makeExcel.setValue(row, col, tmpValue);
 					break;
 				}
 			} // for

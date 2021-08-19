@@ -6,6 +6,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+/* log */
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +20,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.OccursList;
 /* Tita & Tota 資料物件 */
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
@@ -34,6 +37,7 @@ import com.st1.itx.db.service.NegApprService;
 
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.NegReportCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -53,7 +57,7 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5709 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5709.class);
+	private static final Logger logger = LoggerFactory.getLogger(L5709.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegReportCom NegReportCom;
@@ -66,7 +70,8 @@ public class L5709 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-
+	@Autowired
+	public MakeExcel makeExcel;
 	@Autowired
 	public NegAppr01Service sNegAppr01Service;
 	@Autowired
@@ -76,7 +81,7 @@ public class L5709 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("Run L5709");
+		logger.info("Run L5709");
 		this.info("active L5709 ");
 		this.totaVo.init(titaVo);
 		String BringUpDate = titaVo.getParam("BringUpDate").trim();// 提兌日
@@ -101,7 +106,7 @@ public class L5709 extends TradeBuffer {
 			for(NegAppr cNegAppr:lNegAppr) {
 			tNegAppr = sNegApprService.holdById(cNegAppr.getNegApprId(), titaVo);
 			tApprAcDate = tNegAppr.getApprAcDate();
-			this.info("tApprAcDate=="+tApprAcDate);
+			logger.info("tApprAcDate=="+tApprAcDate);
 			}
 		}
 		tApprAcDate = tApprAcDate+19110000;
@@ -111,24 +116,62 @@ public class L5709 extends TradeBuffer {
 		} catch (IOException e) {
 
 		}
+		
+		
+		int i =1;
+		String Col11="";//回應代碼
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5709", "最大債權撥付回覆檔檢核", "最大債權撥付回覆檔檢核");
+		makeExcel.setValue(1, 1, "區別碼");
+		makeExcel.setValue(1, 2, "發件單位");
+		makeExcel.setValue(1, 3, "收件單位");
+		makeExcel.setValue(1, 4, "指定入扣帳日");
+		makeExcel.setValue(1, 5, "轉帳類別");
+		makeExcel.setValue(1, 6, "交易序號");
+		makeExcel.setValue(1, 7, "交易金額");
+		makeExcel.setValue(1, 8, "委託單位");
+		makeExcel.setValue(1, 9, "實際入扣帳日");
+		makeExcel.setValue(1, 10, "回應代碼");
+		makeExcel.setValue(1, 11, "轉帳行代碼");
+		makeExcel.setValue(1, 12, "轉帳帳號");
+		makeExcel.setValue(1, 13, "帳號ID");
+		makeExcel.setValue(1, 14, "銷帳編號");
+		
 		for (String Detail[] : lDetailData) {
-			OccursList occursList = new OccursList();
-			occursList.putParam("OOCol1", Detail[0]);// 區別碼
-			occursList.putParam("OOCol2", Detail[1]);// 發件單位
-			occursList.putParam("OOCol3", Detail[2]);// 收件單位
-			occursList.putParam("OOCol4", Detail[3]);// 指定入扣帳日
-			occursList.putParam("OOCol5", Detail[4]);// 轉帳類別
-			occursList.putParam("OOCol6", Detail[5]);// 交易序號
-			occursList.putParam("OOCol8", Detail[7]);// 交易金額
-			occursList.putParam("OOCol10", Detail[9]);// 委託單位
-			occursList.putParam("OOCol11", Detail[10]);// 實際入扣帳日
-			occursList.putParam("OOCol12", Detail[11]);// 回應代碼
-			occursList.putParam("OOCol13", Detail[12]);// 轉帳行代碼
-			occursList.putParam("OOCol14", Detail[13]);// 轉帳帳號
-			occursList.putParam("OOCol15", Detail[14]);// 帳號ID
-			occursList.putParam("OOCol16", Detail[15]);// 銷帳編號
-			this.totaVo.addOccursList(occursList);
-
+			i++;
+			makeExcel.setValue(i, 1, Detail[0]);// 區別碼
+			makeExcel.setValue(i, 2, Detail[1]);// 發件單位
+			makeExcel.setValue(i, 3, Detail[2]);// 收件單位
+			makeExcel.setValue(i, 4, Detail[3]);// 指定入扣帳日
+			makeExcel.setValue(i, 5, Detail[4]);// 轉帳類別
+			makeExcel.setValue(i, 6, Detail[5]);// 交易序號
+			makeExcel.setValue(i, 7, Integer.parseInt(Detail[7])/100, "#.##00");// 交易金額
+			makeExcel.setValue(i, 8, Detail[9]);// 委託單位
+			makeExcel.setValue(i, 9, Detail[10]);// 實際入扣帳日
+			if(("4001").equals(Detail[11])) {
+				Col11 = "4001:入/扣帳成功";
+			} else if(("4505").equals(Detail[11])) {
+				Col11 = "4505:存款不足";
+			} else if(("4508").equals(Detail[11])) {
+				Col11 = "4508:非委託或已終止帳戶";
+			} else 	if(("4806").equals(Detail[11])) {
+				Col11 = "4806:存戶查核資料錯誤";
+			} else 	if(("4808").equals(Detail[11])) {
+				Col11 = "4808:無此帳戶或問題帳戶";
+			} else 	if(("4405").equals(Detail[11])) {
+				Col11 = "4405:未開卡或額度不足";
+			} else 	if(("4705").equals(Detail[11])) {
+				Col11 = "4705:剔除不轉帳";
+			} else 	if(("2999").equals(Detail[11])) {
+				Col11 = "2999:其他錯誤";
+			} else {
+				Col11 = Detail[11];
+			}
+			makeExcel.setValue(i, 10, Col11);// 回應代碼
+			makeExcel.setValue(i, 11, Detail[12]);// 轉帳行代碼
+			makeExcel.setValue(i, 12, Detail[13]);// 轉帳帳號
+			makeExcel.setValue(i, 13, Detail[14]);// 帳號ID
+			makeExcel.setValue(i, 14, Detail[15]);// 銷帳編號
+//			this.totaVo.addOccursList(occursList);
 			if (("+").equals(Detail[6])) {
 				// 檢核正確
 				// 從交易序號 找到正確的NEGAPPR01的資料
@@ -140,9 +183,9 @@ public class L5709 extends TradeBuffer {
 				Slice<NegAppr01> slNegAppr01 = sNegAppr01Service.FindBatch(BatchTxtNo, FinCode, tApprAcDate, 0,
 						Integer.MAX_VALUE, titaVo);
 				List<NegAppr01> lNegAppr01 = slNegAppr01 == null ? null : slNegAppr01.getContent();
-				this.info("L5709 lNegAppr01!=null titaVo.isHcodeNormal()=[" + titaVo.isHcodeNormal() + "]");
+				logger.info("L5709 lNegAppr01!=null titaVo.isHcodeNormal()=[" + titaVo.isHcodeNormal() + "]");
 				if (lNegAppr01 != null) {
-					this.info("L5709 lNegAppr01!=null ");
+					logger.info("L5709 lNegAppr01!=null ");
 					for (NegAppr01 NegAppr01VO : lNegAppr01) {
 						NegAppr01Id NegAppr01IdVO = NegAppr01VO.getNegAppr01Id();
 
@@ -151,7 +194,7 @@ public class L5709 extends TradeBuffer {
 							BigDecimal ApprAmt = new BigDecimal(Detail[7]);// 撥付金額
 							BigDecimal Hund = new BigDecimal(100);// 撥付金額
 							ApprAmt = ApprAmt.divide(Hund);
-							this.info("ApprAmt=="+ApprAmt);
+							logger.info("ApprAmt=="+ApprAmt);
 							String ReplyCode = Detail[11];// 回應代碼
 							int NegAppr01UpdVOApprAcDate = NegAppr01UpdVO.getApprAcDate();// 撥付傳票日期
 							if (titaVo.isHcodeNormal()) {
@@ -159,7 +202,7 @@ public class L5709 extends TradeBuffer {
 								if (NegAppr01UpdVOApprAcDate != 0) {
 									if (ApprAmt.compareTo(NegAppr01UpdVO.getApprAmt()) != 0) {
 										//
-										this.info("L5709 ApprAmt(檔案上傳)=[" + ApprAmt + "],(資料庫)=["
+										logger.info("L5709 ApprAmt(檔案上傳)=[" + ApprAmt + "],(資料庫)=["
 												+ NegAppr01UpdVO.getApprAmt() + "],NegAppr01Id=["
 												+ NegAppr01UpdVO.getNegAppr01Id().toString() + "]");
 										throw new LogicException(titaVo, "", "撥付金額不一致請查驗");
@@ -199,6 +242,24 @@ public class L5709 extends TradeBuffer {
 		// TODO Auto-generated catch block
 //			throw new LogicException(titaVo, "","發生未預期的錯誤");
 //		}
+		if (lDetailData != null) {
+		makeExcel.setWidth(2, 15);
+		makeExcel.setWidth(3, 15);
+		makeExcel.setWidth(4, 15);
+		makeExcel.setWidth(5, 15);
+		makeExcel.setWidth(6, 15);
+		makeExcel.setWidth(7, 30);
+		makeExcel.setWidth(8, 15);
+		makeExcel.setWidth(9, 15);
+		makeExcel.setWidth(10, 40);
+		makeExcel.setWidth(11, 15);
+		makeExcel.setWidth(12, 30);
+		makeExcel.setWidth(13, 15);
+		makeExcel.setWidth(14, 15);
+		}
+		long sno = makeExcel.close();
+		makeExcel.toExcel(sno);
+		totaVo.put("ExcelSnoM", "" + sno);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

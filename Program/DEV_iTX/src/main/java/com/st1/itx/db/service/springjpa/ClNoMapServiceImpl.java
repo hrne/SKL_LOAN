@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("clNoMapService")
 @Repository
-public class ClNoMapServiceImpl implements ClNoMapService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(ClNoMapServiceImpl.class);
-
+public class ClNoMapServiceImpl extends ASpringJpaParm implements ClNoMapService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class ClNoMapServiceImpl implements ClNoMapService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + clNoMapId);
+    this.info("findById " + dbName + " " + clNoMapId);
     Optional<ClNoMap> clNoMap = null;
     if (dbName.equals(ContentName.onDay))
       clNoMap = clNoMapReposDay.findById(clNoMapId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "GdrId1", "GdrId2", "GdrNum", "LgtSeq"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "GDRID1", "GDRID2", "GDRNUM", "LGTSEQ"));
-    logger.info("findAll " + dbName);
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "GdrId1", "GdrId2", "GdrNum", "LgtSeq"));
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = clNoMapReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -114,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<ClNoMap> findGDRNUM(int gDRID1_0, int gDRID2_1, int gDRNUM_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClNoMap> findGdrNum(int gdrId1_0, int gdrId2_1, int gdrNum_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClNoMap> slice = null;
     if (titaVo.length != 0)
@@ -125,15 +121,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findGDRNUM " + dbName + " : " + "gDRID1_0 : " + gDRID1_0 + " gDRID2_1 : " +  gDRID2_1 + " gDRNUM_2 : " +  gDRNUM_2);
+    this.info("findGdrNum " + dbName + " : " + "gdrId1_0 : " + gdrId1_0 + " gdrId2_1 : " +  gdrId2_1 + " gdrNum_2 : " +  gdrNum_2);
     if (dbName.equals(ContentName.onDay))
-      slice = clNoMapReposDay.findAllByGDRID1IsAndGDRID2IsAndGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(gDRID1_0, gDRID2_1, gDRNUM_2, pageable);
+      slice = clNoMapReposDay.findAllByGdrId1IsAndGdrId2IsAndGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(gdrId1_0, gdrId2_1, gdrNum_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clNoMapReposMon.findAllByGDRID1IsAndGDRID2IsAndGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(gDRID1_0, gDRID2_1, gDRNUM_2, pageable);
+      slice = clNoMapReposMon.findAllByGdrId1IsAndGdrId2IsAndGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(gdrId1_0, gdrId2_1, gdrNum_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clNoMapReposHist.findAllByGDRID1IsAndGDRID2IsAndGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(gDRID1_0, gDRID2_1, gDRNUM_2, pageable);
+      slice = clNoMapReposHist.findAllByGdrId1IsAndGdrId2IsAndGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(gdrId1_0, gdrId2_1, gdrNum_2, pageable);
     else 
-      slice = clNoMapRepos.findAllByGDRID1IsAndGDRID2IsAndGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(gDRID1_0, gDRID2_1, gDRNUM_2, pageable);
+      slice = clNoMapRepos.findAllByGdrId1IsAndGdrId2IsAndGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(gdrId1_0, gdrId2_1, gdrNum_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -142,7 +138,7 @@ em = null;
   }
 
   @Override
-  public Slice<ClNoMap> findMainLGTSEQ(int mainGDRID1_0, int mainGDRID2_1, int mainGDRNUM_2, int mainLGTSEQ_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClNoMap> findMainLgtseq(int mainGdrId1_0, int mainGdrId2_1, int mainGdrNum_2, int mainLgtSeq_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClNoMap> slice = null;
     if (titaVo.length != 0)
@@ -153,15 +149,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findMainLGTSEQ " + dbName + " : " + "mainGDRID1_0 : " + mainGDRID1_0 + " mainGDRID2_1 : " +  mainGDRID2_1 + " mainGDRNUM_2 : " +  mainGDRNUM_2 + " mainLGTSEQ_3 : " +  mainLGTSEQ_3);
+    this.info("findMainLgtseq " + dbName + " : " + "mainGdrId1_0 : " + mainGdrId1_0 + " mainGdrId2_1 : " +  mainGdrId2_1 + " mainGdrNum_2 : " +  mainGdrNum_2 + " mainLgtSeq_3 : " +  mainLgtSeq_3);
     if (dbName.equals(ContentName.onDay))
-      slice = clNoMapReposDay.findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsAndMainLGTSEQIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(mainGDRID1_0, mainGDRID2_1, mainGDRNUM_2, mainLGTSEQ_3, pageable);
+      slice = clNoMapReposDay.findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsAndMainLgtSeqIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(mainGdrId1_0, mainGdrId2_1, mainGdrNum_2, mainLgtSeq_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clNoMapReposMon.findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsAndMainLGTSEQIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(mainGDRID1_0, mainGDRID2_1, mainGDRNUM_2, mainLGTSEQ_3, pageable);
+      slice = clNoMapReposMon.findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsAndMainLgtSeqIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(mainGdrId1_0, mainGdrId2_1, mainGdrNum_2, mainLgtSeq_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clNoMapReposHist.findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsAndMainLGTSEQIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(mainGDRID1_0, mainGDRID2_1, mainGDRNUM_2, mainLGTSEQ_3, pageable);
+      slice = clNoMapReposHist.findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsAndMainLgtSeqIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(mainGdrId1_0, mainGdrId2_1, mainGdrNum_2, mainLgtSeq_3, pageable);
     else 
-      slice = clNoMapRepos.findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsAndMainLGTSEQIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(mainGDRID1_0, mainGDRID2_1, mainGDRNUM_2, mainLGTSEQ_3, pageable);
+      slice = clNoMapRepos.findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsAndMainLgtSeqIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(mainGdrId1_0, mainGdrId2_1, mainGdrNum_2, mainLgtSeq_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -170,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<ClNoMap> findMainGDRNUM(int mainGDRID1_0, int mainGDRID2_1, int mainGDRNUM_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClNoMap> findMainGdrNum(int mainGdrId1_0, int mainGdrId2_1, int mainGdrNum_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClNoMap> slice = null;
     if (titaVo.length != 0)
@@ -181,15 +177,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findMainGDRNUM " + dbName + " : " + "mainGDRID1_0 : " + mainGDRID1_0 + " mainGDRID2_1 : " +  mainGDRID2_1 + " mainGDRNUM_2 : " +  mainGDRNUM_2);
+    this.info("findMainGdrNum " + dbName + " : " + "mainGdrId1_0 : " + mainGdrId1_0 + " mainGdrId2_1 : " +  mainGdrId2_1 + " mainGdrNum_2 : " +  mainGdrNum_2);
     if (dbName.equals(ContentName.onDay))
-      slice = clNoMapReposDay.findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(mainGDRID1_0, mainGDRID2_1, mainGDRNUM_2, pageable);
+      slice = clNoMapReposDay.findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(mainGdrId1_0, mainGdrId2_1, mainGdrNum_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clNoMapReposMon.findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(mainGDRID1_0, mainGDRID2_1, mainGDRNUM_2, pageable);
+      slice = clNoMapReposMon.findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(mainGdrId1_0, mainGdrId2_1, mainGdrNum_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clNoMapReposHist.findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(mainGDRID1_0, mainGDRID2_1, mainGDRNUM_2, pageable);
+      slice = clNoMapReposHist.findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(mainGdrId1_0, mainGdrId2_1, mainGdrNum_2, pageable);
     else 
-      slice = clNoMapRepos.findAllByMainGDRID1IsAndMainGDRID2IsAndMainGDRNUMIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(mainGDRID1_0, mainGDRID2_1, mainGDRNUM_2, pageable);
+      slice = clNoMapRepos.findAllByMainGdrId1IsAndMainGdrId2IsAndMainGdrNumIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(mainGdrId1_0, mainGdrId2_1, mainGdrNum_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -209,15 +205,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findNewClNo " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("findNewClNo " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = clNoMapReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clNoMapReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clNoMapReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clNoMapReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clNoMapReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clNoMapReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else 
-      slice = clNoMapRepos.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGDRID1AscGDRID2AscGDRNUMAscLGTSEQAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clNoMapRepos.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByGdrId1AscGdrId2AscGdrNumAscLgtSeqAsc(clCode1_0, clCode2_1, clNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -230,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clNoMapId);
+    this.info("Hold " + dbName + " " + clNoMapId);
     Optional<ClNoMap> clNoMap = null;
     if (dbName.equals(ContentName.onDay))
       clNoMap = clNoMapReposDay.findByClNoMapId(clNoMapId);
@@ -248,7 +244,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clNoMap.getClNoMapId());
+    this.info("Hold " + dbName + " " + clNoMap.getClNoMapId());
     Optional<ClNoMap> clNoMapT = null;
     if (dbName.equals(ContentName.onDay))
       clNoMapT = clNoMapReposDay.findByClNoMapId(clNoMap.getClNoMapId());
@@ -270,7 +266,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + clNoMap.getClNoMapId());
+    this.info("Insert..." + dbName + " " + clNoMap.getClNoMapId());
     if (this.findById(clNoMap.getClNoMapId()) != null)
       throw new DBException(2);
 
@@ -299,7 +295,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clNoMap.getClNoMapId());
+    this.info("Update..." + dbName + " " + clNoMap.getClNoMapId());
     if (!empNot.isEmpty())
       clNoMap.setLastUpdateEmpNo(empNot);
 
@@ -322,7 +318,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clNoMap.getClNoMapId());
+    this.info("Update..." + dbName + " " + clNoMap.getClNoMapId());
     if (!empNot.isEmpty())
       clNoMap.setLastUpdateEmpNo(empNot);
 
@@ -342,7 +338,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + clNoMap.getClNoMapId());
+    this.info("Delete..." + dbName + " " + clNoMap.getClNoMapId());
     if (dbName.equals(ContentName.onDay)) {
       clNoMapReposDay.delete(clNoMap);	
       clNoMapReposDay.flush();
@@ -371,7 +367,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (ClNoMap t : clNoMap){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -406,7 +402,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (clNoMap == null || clNoMap.size() == 0)
       throw new DBException(6);
 
@@ -435,7 +431,7 @@ em = null;
 
   @Override
   public void deleteAll(List<ClNoMap> clNoMap, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

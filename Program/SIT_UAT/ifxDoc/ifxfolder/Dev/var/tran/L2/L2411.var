@@ -40,7 +40,7 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"#FdFunCd+功能",#FunCdX],
 [#<->#,"#FdApplNo+核准號碼",#ApplNo,#BTN8,#ApplNoX],
 ["#FdColInd1+擔保品代號1",#ClCode1,#ClCode1X],["#FdColInd2+擔保品代號2",#ClCode2,#ClCode2X],
-["#FdCOLNO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum,"#Lgtseq"],
+["#FdCOLNO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
 [#<->#,"#FdSubType+擔保品類別",#ClTypeCode,#ClTypeCodeX],
 ! [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#Btn5,"@",#Btn6,"@",#Btn7,"@",#BtnExpand],
 [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#Btn5,"@",#Btn6,"@",#BtnExpand],
@@ -713,7 +713,20 @@ C(2,#ClCode1,T(3,),
 ! [擔保品編號]
 #ClNo=A,7,L
 
-
+<include src="ROM.icf::L2R17.dec"/>
+!RIM取原擔保品編號
+#RimL2r17=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+RESET_RIM(#RimL2r17,L2R17)
+S(L2R17,1,#RimClCode1,#RimClCode2,#RimClNo)
+R(1,L2R17)
+E(0,@GdRid1,#L2r17GdrId1)
+E(0,@GdRid2,#L2r17GdrId2)
+E(0,@GdRnum,#L2r17GdrNum)
+E(0,@Lgtseq,#L2r17LgtSeq)
 
 ![原擔保品編號]
 #FdGdRid=X,2,L
@@ -721,9 +734,11 @@ C(2,#ClCode1,T(3,),
 #GdRid1=A,1,L
 #GdRid2=A,2,L
 #GdRnum=A,7,L
-#Lgtseq=X,3,L
+#Lgtseq=A,2,L
 
-
+#GdALL=X,15,L
+C(3,#GdRid1,0,S,$)
+T(2,#GdRid1+-+#GdRid2+-+#GdRnum+-+#Lgtseq)
 
 !調RIM參數
 #RimClNo=A,7,S
@@ -1244,7 +1259,9 @@ C(4,#OwnerId{j},S,$)
 C(4,#OwnerId{i},CALL(#HIDE_OWNER_ROW_{i}),$)
 C(4,#OwnerId{i},s,$)
 V(7)A(ID_UNINO,0,#OwnerId{i})
-C(5,#OwnerId{i},#CustId,T(F,#OwnerRelCode{i},0),T(F,#OwnerRelCode{i},1))
+
+#tt{i}=X,1,S
+C(4,#CustId,T(F,#OwnerRelCode{i},0),C(5,#OwnerId{i},#CustId,T(F,#OwnerRelCode{i},0),T(F,#OwnerRelCode{i},1)))
 
 ! #RimL1r09{i}=X,1,S
 ! E(0,@RimFunCd,5)
@@ -1322,6 +1339,7 @@ IF({i} == 1,E(0,@OwnerTotal,#OwnerTotal{i}),V(1,#OwnerTotal))
 IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 C(4,#OwnerId{i},S,$)
+C(4,#CustId,S,$)
 C(5,#OwnerId{i},#CustId,S,$)
 HELP(#RelationCodeHelp)
 @V(7)
@@ -1997,6 +2015,7 @@ TXFORM=L2411
 <include src="ROM.icf::L1R09.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R17.tom"/>
 <include src="ROM.icf::L2R33.tom"/>
 <include src="ROM.icf::L2R22.tom"/>
 <include src="ROM.icf::L2R23.tom"/>

@@ -28,7 +28,7 @@ E(0,0)
 [#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
 ["#FdTelDate+電催日期",#TelDate],["#FdTelTime+電催時間",#TelTime],
 ["#FdContactCode+電催對象",#ContactCode,#ContactCodeX],["#FdRecvrCode+接話人",#RecvrCode,#RecvrCodeX],
-[#<->#,"#FdTelPhone+連絡電話",#TelArea,"-",#TelNo,"-",#TelExt,#LiaisonName],
+[#<->#,"#FdTelPhone+連絡電話",#TelArea,#TelNo,#TelExt,#LiaisonName],
 [#<->#,#BTNF],
 ["#FdResultCode+通話結果",#ResultCode,#ResultCodeX],["#FdCallDate+提醒日期",#CallDate],
 [#<->#,"#FdRemark+其他記錄",#Remark],
@@ -167,16 +167,35 @@ T(H,@ResultCodeX,#ResultCode,#ResultCodeHelp)
 #FdFacmNo=X,1,L
 
 #FdTelDate=X,1,L
-C(3,#FunctionCd,5,T(3,#FdTelDate, ),T(3,#FdTelDate,*))
+C(3,#FunctionCd,1,T(3,#FdTelDate,*),$)
+C(3,#FunctionCd,2,T(3,#FdTelDate,*),$)
+C(3,#FunctionCd,3,T(3,#FdTelDate,*),$)
+C(3,#FunctionCd,4,T(3,#FdTelDate, ),$)
+C(3,#FunctionCd,5,T(3,#FdTelDate, ),$)
 #FdTelTime=X,1,L
-C(3,#FunctionCd,5,T(3,#FdTelTime, ),T(3,#FdTelTime,*))
+C(3,#FunctionCd,1,T(3,#FdTelTime,*),$)
+C(3,#FunctionCd,2,T(3,#FdTelTime,*),$)
+C(3,#FunctionCd,3,T(3,#FdTelTime,*),$)
+C(3,#FunctionCd,4,T(3,#FdTelTime, ),$)
+C(3,#FunctionCd,5,T(3,#FdTelTime, ),$)
 #FdContactCode=X,1,L
-C(3,#FunctionCd,5,T(3,#FdContactCode, ),T(3,#FdContactCode,*))
+C(3,#FunctionCd,1,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdContactCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdContactCode, ),$)
 #FdRecvrCode=X,1,L
-C(3,#FunctionCd,5,T(3,#FdRecvrCode, ),T(3,#FdRecvrCode,*))
+C(3,#FunctionCd,1,T(3,#FdRecvrCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdRecvrCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdRecvrCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdRecvrCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdRecvrCode, ),$)
 #FdResultCode=X,1,L
-C(3,#FunctionCd,5,T(3,#FdResultCode, ),T(3,#FdResultCode,*))
-
+C(3,#FunctionCd,1,T(3,#FdResultCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdResultCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdResultCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdResultCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdResultCode, ),$)
 !end
 
 ! 登放序號
@@ -184,18 +203,12 @@ C(3,#FunctionCd,5,T(3,#FdResultCode, ),T(3,#FdResultCode,*))
 IF (#FunctionCd==1 || #FunctionCd==2|| #FunctionCd==3,T(F,@TelDate,1)T(F,@TelTime,1)T(F,@ContactCode,1)T(F,@RecvrCode,1)T(F,@TelPhone,1)T(F,@ResultCode,1)T(F,@CallDate,1)T(F,@Remark,1),
                                                       T(F,@TelDate,0)T(F,@TelTime,0)T(F,@ContactCode,0)T(F,@RecvrCode,0)T(F,@TelPhone,0)T(F,@ResultCode,0)T(F,@CallDate,0)T(F,@Remark,0)T(F,@TelArea,0)T(F,@TelNo,0)T(F,@TelExt,0))
 
-IF(#FunctionCd == 5,INVOKEJS(SHOW,L5601,8,8,0)INVOKEJS(SHOW,L5601,12,12,0),INVOKEJS(SHOW,L5601,8,8,1)INVOKEJS(SHOW,L5601,12,12,1))
+IF(#FunctionCd == 5 || #FunctionCd == 4,INVOKEJS(SHOW,L5601,8,8,0)INVOKEJS(SHOW,L5601,12,12,0),INVOKEJS(SHOW,L5601,8,8,1)INVOKEJS(SHOW,L5601,12,12,1))
 IF(#FunctionCd==5,K(NOBUTTON,CLOSEY),$)
 C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
 
 ! 功能
 #FunctionCd=A,1,S
-C(3,#FunctionCd,3,E(0,1),s)
-C(3,#CHAIN,0,$,s)
-C(2,#FunctionCd,S,$,$,s,s,s)
-HELP(#FunctionCdHelp)
-@V(H,#FunctionCdHelp)
-E(0,@FUNCIND,#FunctionCd)
 
 #FunctionCdX=X,4,L
 T(H,#FunctionCd,#FunctionCdHelp)
@@ -206,10 +219,7 @@ ASGN(AGAIN$)
 
 ! 案件種類
 #CaseCode=A,1,L
-C(3,#CHAIN,0,$,s)
-C(2,#FunctionCd,S,$,$,s,s,s)
-HELP(#CaseCodeHelp)
-@V(H,#CaseCodeHelp)
+
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)
 
@@ -246,17 +256,12 @@ BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
 
 ! 戶號
 #CustNo=A,7,L
-C(3,#CHAIN,0,$,s)
-C(2,#FunctionCd,S,$,$,s,s,s)
 
 ! 戶名----調RIM
 #CustName=X,20,L
 
 ! 額度編號
 #FacmNo=A,3,L
-C(3,#CHAIN,0,$,s)
-C(2,#FunctionCd,S,$,$,s,s,s)
-
 ! 催收人員
 #AccCollPsn=X,8,L
 #AccCollPsnX=X,40,L
@@ -277,9 +282,8 @@ C(2,#FunctionCd,S,$,$,s,s,s)
 T(4,#SYSCDATE)
 
 #TelDate=D,7,I
-C(2,#FunctionCd,S,$,$,s,s,s)
-C(2,#FunctionCd,S,T(1,#TelDateX,2,7),$,$,s,s)
-
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(3,#FunctionCd,1,T(1,#TelDateX,2,7),$)
 D(8)
 @V(7)
 A(DATE,0,#TelDate)
@@ -288,14 +292,14 @@ A(DATE,0,#TelDate)
 #TelTimeX=X,6,S
 T(4,TIME$)
 #TelTime=X,4,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#FunctionCd,1,T(1,#TelTimeX,1,4),$)
 @V(7)A(TIME,HHmm,#TelTime)
 
 ! 電催對象
 #ContactCode=A,1,I
 HELP(#ContactCodeHelp)
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 @V(H,#ContactCodeHelp)
 
 #ContactCodeX=X,6,L
@@ -303,7 +307,7 @@ T(H,#ContactCode,#ContactCodeHelp)
 
 ! 接話人
 #RecvrCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#RecvrCodeHelp)
 @V(H,#RecvrCodeHelp)
 #RecvrCodeX=X,4,L
@@ -337,15 +341,15 @@ BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFF;ntxbuf5=type<-1:TelArea<
 
 ! 連絡電話
 #TelArea=X,5,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 @C(4,#TelArea,S,V(9))
 
 #TelNo=X,10,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 @C(4,#TelNo,S,V(9))
 
 #TelExt=X,5,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 @C(4,#TelExt,S,V(9))
 
 ! 聯絡人姓名
@@ -353,7 +357,7 @@ C(2,#FunctionCd,S,$,$,s,s,s)
 
 ! 通話結果
 #ResultCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#ResultCodeHelp,cols:2)
 @V(H,#ResultCodeHelp)
 
@@ -364,7 +368,7 @@ T(H,#ResultCode,#ResultCodeHelp)
 IF(#ResultCode==9,T(3,@FdRemark,*),T(3,@FdRemark,))
 ! 提醒日期
 #CallDate=D,7,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#FunctionCd,1,T(1,#TelDateX,2,7),$)
 D(8)
 @A(DATE,0,#CallDate)
@@ -376,7 +380,7 @@ D(8)
 ! C(2,#FunctionCd,S,$,$,s,s,s)
 
 #Remark=X,2.40,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 
 @C(3,#ResultCode,9,V(7),$)
 
