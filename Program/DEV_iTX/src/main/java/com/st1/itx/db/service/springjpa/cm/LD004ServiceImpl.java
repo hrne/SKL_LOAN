@@ -71,7 +71,7 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND ACD.\"TitaTxtNo\" <= :inputTitaTxtNoEnd "; // 交易序號-止
 		sql += "   AND CASE ";
 		sql += "         WHEN :inputOption = 1 "; // 作業選項1:還本收據
-		sql += "         THEN TX.\"Principal\" ";
+		sql += "         THEN TX.\"Principal\" + TX.\"ExtraRepay\" ";
 		sql += "         WHEN :inputOption = 2 "; // 作業選項2:繳息收據
 		sql += "         THEN TX.\"Interest\" ";
 		sql += "       ELSE 0 END > 0 ";

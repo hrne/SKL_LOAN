@@ -43,7 +43,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdClNo+擔保品號碼",#ClNo],
-["#FdGdRid+原擔保品編號",#GdRid1,"－",#GdRid2,"－",#GdRnum],
+["#FdGdRid+原擔保品編號",#GdALL],
 ["@",#BTN_1,"@",#BTN_2,"@",#BTN_3,"@",#BTN_4,"@",#BTN_5,"@",#BTN_6,"@",#BTNExpand],
 ["#FdBdLocation+建物門牌",#BdLocation],
 ["#FdBdMainUseCode+建物主要用途",#BdMainUseCode,#BdMainUseCodeX],
@@ -365,14 +365,31 @@ T(3,)T(H,#ClCode2,#ClCode2Help)
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
+<include src="ROM.icf::L2R17.dec"/>
+!RIM取原擔保品編號
+#RimL2r17=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+RESET_RIM(#RimL2r17,L2R17)
+S(L2R17,1,#RimClCode1,#RimClCode2,#RimClNo)
+R(1,L2R17)
+E(0,@GdRid1,#L2r17GdrId1)
+E(0,@GdRid2,#L2r17GdrId2)
+E(0,@GdRnum,#L2r17GdrNum)
+E(0,@Lgtseq,#L2r17LgtSeq)
+
 ![原擔保品編號]
 #FdGdRid=X,2,L
 
 #GdRid1=A,1,L
 #GdRid2=A,2,L
 #GdRnum=A,7,L
+#Lgtseq=A,2,L
 
-
+#GdALL=X,15,L
+C(3,#GdRid1,0,S,$)
+T(2,#GdRid1+-+#GdRid2+-+#GdRnum+-+#Lgtseq)
 
 !調RIM參數
 #RimClCode1=A,1,S
@@ -784,6 +801,7 @@ TXFORM=L2915
 ##end
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R17.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

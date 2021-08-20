@@ -73,11 +73,11 @@ public class L5602 extends TradeBuffer {
 			iCollMeetId.setCaseCode(titaVo.getParam("CaseCode"));
 			iCollMeetId.setCustNo(CollListVo.getCustNo());
 			iCollMeetId.setFacmNo(CollListVo.getFacmNo());
-			if (iFuntionCd.equals("1")) {
+			if (iFuntionCd.equals("1") || iFuntionCd.equals("3")) {
 				iCollMeetId.setTitaTlrNo(titaVo.getTlrNo());
 				iCollMeetId.setTitaTxtNo(titaVo.getTxtNo());
 				iCollMeetId.setAcDate(Integer.valueOf(titaVo.getEntDy()));// 營業日 放acdate
-			} else if (iFuntionCd.equals("2")) {
+			} else {
 				iCollMeetId.setTitaTlrNo(titaVo.getParam("TitaTlrNo"));
 				iCollMeetId.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
 				iCollMeetId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));// 營業日 放acdate
@@ -96,7 +96,7 @@ public class L5602 extends TradeBuffer {
 			iCollMeet.setMeetPlace(titaVo.getParam("MeetPlace"));
 			iCollMeet.setRemark(titaVo.getParam("Remark"));
 			CollMeet tCollMeet = iCollMeetService.findById(iCollMeetId, titaVo);
-			if (iFuntionCd.equals("1")) {
+			if (iFuntionCd.equals("1") || iFuntionCd.equals("3")) {
 				if (tCollMeet == null) {
 					try {
 						this.info("trytoinsert");
@@ -121,6 +121,19 @@ public class L5602 extends TradeBuffer {
 				} else {
 					this.info("nottrytoupdate");
 					throw new LogicException(titaVo, "E0005", ""); // 電催檔找不到資料錯誤
+				}
+			}
+			if (iFuntionCd.equals("4")) {
+				if (tCollMeet != null) {
+					try {
+						iCollMeetService.holdById(iCollMeetId);
+						iCollMeetService.delete(iCollMeet, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 電催檔更新資料錯誤
+					}
+				} else {
+					this.info("nottrytoupdate");
+					throw new LogicException(titaVo, "E0008", ""); // 電催檔找不到資料錯誤
 				}
 			}
 			// 更新list的上次作業日期和項目

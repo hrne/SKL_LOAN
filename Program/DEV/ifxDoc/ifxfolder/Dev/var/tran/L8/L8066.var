@@ -184,7 +184,7 @@ TXFORM=L8066
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
-#OOLastUpdateEmpNo=最後更新人員
+#OOLastUpdate_Combine=最後更新人員
 {width:120,align:'center'}
 ^
 

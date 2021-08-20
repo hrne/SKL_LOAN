@@ -165,14 +165,14 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("inputEntryDateMin=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
 		this.info("inputEntryDateMax=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
 		this.info("inputYearMonth=" + iYear + String.format("%02d", iMonth));
-		this.info("inputCollector=" + titaVo.getParam("inputCollector"));
+		this.info("inputCollectorShow=" + titaVo.getParam("inputCollectorShow"));
 		this.info("inputDrawdownDate=" +Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
 		Query query;
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputEntryDateMin", Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
 		query.setParameter("inputEntryDateMax", Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
 		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
-		query.setParameter("inputCollector", titaVo.getParam("inputCollector"));
+		query.setParameter("inputCollector", titaVo.getParam("inputCollectorShow"));
 		query.setParameter("inputDrawdownDate", Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
 
 		return this.convertToMap(query.getResultList());

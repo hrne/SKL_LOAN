@@ -420,7 +420,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[150,350,200,350];printer.width=[15,35,15,35];order=1">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,800];printer.width=[15,35,15,35];order=1">
 [
 ["[L2154]                                 額度資料維護"],
 [#<->#,"#FdACTFG+登放記號",#ACTFGX],
@@ -816,7 +816,7 @@ T(2,@RateAdjFreqX,#WkMonthX)
 T(3,@UtilDeadlineX, 前)
 T(3,@GracePeriodX, 個月)
 T(3,@RecycleDeadlineX, 前)
-K(LIGHT,#FdBaseRateCode,TXTRED,-1)
+! K(LIGHT,#FdBaseRateCode,TXTRED,-1)
 K(LIGHT,#FdApproveRate,TXTRED,-1)
 K(LIGHT,#FdRateAdjFreq,TXTRED,-1)
 K(LIGHT,#FdExtraRepayCode,TXTRED,-1)
@@ -831,7 +831,7 @@ K(LIGHT,#FdPayIntFreq,TXTRED,-1)
 K(LIGHT,#FdCustTypeCode,TXTRED,-1)
 K(LIGHT,#FdApplAmt,TXTRED,-1)
 C(3,#FuncCode,2,$,S)
-K(LIGHT,#FdBaseRateCode,TXTRED,0)
+! K(LIGHT,#FdBaseRateCode,TXTRED,0)
 K(LIGHT,#FdApproveRate,TXTRED,0)
 K(LIGHT,#FdRateAdjFreq,TXTRED,0)
 K(LIGHT,#FdExtraRepayCode,TXTRED,0)
@@ -1249,6 +1249,8 @@ A(ID_UNINO,0,#CustId)
 
 #WkStar=X,2,S
 C(2,#FuncCode,S,T(3,*),T(3,*),S,T(3, ),T(3, ))
+#BusinessOfficerItem=X,20,L
+C(4,#BusinessOfficerItem,T(3,房貸專員),$)
 
 
 ![徵審系統案號]
@@ -1299,10 +1301,10 @@ BIND(#BTNExpand,click, {cmd=CALLSEND;DOCODE=Expand})
 #FDP2=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
 T(2,@FdProdNo, )
-T(2,@FdBaseRateCode,#WkStar)
+! T(2,@FdBaseRateCode,#WkStar)
 T(2,@FdBaseRate, )
 T(2,@FdProdRate, )
-T(2,@FdRateIncr,#WkStar)
+! T(2,@FdRateIncr,#WkStar)
 T(2,@FdIndividualIncr, )
 T(2,@FdApproveRate, )
 T(2,@FdRateCode,#WkStar)
@@ -1547,7 +1549,7 @@ C(3,#Hide2Fg,0,CALL(#HideP2),$)
 
 #FDP3=X,1,S
 T(2,@FdCurrencyCode, )
-T(2,@FdApplAmt,#WkStar)
+C(3,#L2r05BormNo,0,T(2,@FdApplAmt,#WkStar),$)
 T(2,@FdAcctCode, )
 T(2,@FdLoanTermYy,#WkStar)
 T(2,@FdAmortizedCode,#WkStar)
@@ -1629,6 +1631,7 @@ C(3,#Precision,0,SHOW(#TwApplAmt)
 
 #TwUtilAmt=m,14,S
 C(3,#L2r05UtilAmt,0,E(0,1),E(0,#L2r05UtilAmt))
+C(3,#L2r05BormNo,0,T(F,@TwApplAmt,1)T(F,@UsApplAmt,1),T(F,@TwApplAmt,0)T(F,@UsApplAmt,0))
 
 #TwApplAmt=m,14,I
 C(3,#UpdateCode,1,$,s)
@@ -2305,6 +2308,10 @@ HELP(#DepartmentCodeHelp)
 
 #DepartmentCodeX=X,10,L
 T(H,#DepartmentCode,#DepartmentCodeHelp)
+
+!依[案件隸屬單位]:企金時顯示[企金人員],餘為[房貸專員]
+#checkDepartmentCode=X,1,S
+C(3,#DepartmentCode,0,T(3,@BusinessOfficerItem,房貸專員),T(3,@BusinessOfficerItem,企金人員))
 
 ![代繳所得稅]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -3051,7 +3058,7 @@ BIND(#BTN21,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BUF21B;ntxbuf5=type<-1:Coorg
 C(4,#Coorgnizer,S,$)
 T(2,@RimEmployeeNo,#Coorgnizer)
 E(0,@RimFunCd,#FuncCode)
-IF(#L2r05Coorgnizer==#Coorgnizer,T(3,@RimErrorSkip,Y),T(3,@RimErrorSkip,))
+IF(#L2r05Coorgnizer==#Coorgnizer,E(0,@RimFunCd,5),E(0,@RimFunCd,#FuncCode))
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r13J,L2R13),$)
 S(L2R13,1,#RimFunCd,#RimEmployeeNo)
 R(1,L2R13)
@@ -3379,7 +3386,7 @@ C(3,#CheckCode,0,$,S)
 <sub type="DC" name="p2" layout="cols=2;screen.width=[200,300,200,300];printer.width=[15,30];order=1;">
 [
 ["<font color=red>@利率"],
-["#FdProdNo+商品名稱",#ProdNo,#ProdNoX],
+[#<->#,"#FdProdNo+商品名稱",#ProdNo,#ProdNoX],
 ["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX],
 ["#FdBaseRate+指標利率",#LbBaseRateX],
 ["#FdProdRate+商品利率",#LbProdRateX],
@@ -3452,19 +3459,19 @@ C(3,#CheckCode,0,$,S)
 ]
 </sub>
 
-<sub type="DC" name="p7" layout="cols=2;screen.width=[200,300,200,300];printer.width=[15,30];order=1;">
+<sub type="DC" name="p7" layout="cols=2;screen.width=[200,300,250,250];printer.width=[15,30];order=1;">
 [
 ["<font color=red>@專員"],
 ["#FdIntroducer+介紹人",#Introducer,#BTN11,#IntroducerLb,#IntroducerX],
-["#FdDistrict+區部",#District,#DistrictX],
+["#FdDistrict+@區部",#District,#DistrictX],
 ["#FdFireOfficer+火險服務",#FireOfficer,#BTN12,#FireOfficerLb,#FireOfficerX],
-["#FdEstimate+估價人員",#Estimate,#BTN13,#EstimateLb,#EstimateX],
+["#FdEstimate+@估價人員",#Estimate,#BTN13,#EstimateLb,#EstimateX],
 ["#FdCreditOfficer+授信人員",#CreditOfficer,#BTN14,#CreditOfficerLb,#CreditOfficerX],
-["#FdBusinessOfficer+房貸專員",#BusinessOfficer,#BTN16,#BusinessOfficerLb,#BusinessOfficerX],
+["#FdBusinessOfficer+#BusinessOfficerItem",#BusinessOfficer,#BTN16,#BusinessOfficerLb,#BusinessOfficerX],
 ["#FdSupervisor+核決主管",#Supervisor,#BTN17,#SupervisorLb,#SupervisorX],
-["#FdInvestigateOfficer+徵信人員",#InvestigateOfficer,#BTN19,#InvestigateOfficerLb,#InvestigateOfficerX],
+["#FdInvestigateOfficer+@徵信人員",#InvestigateOfficer,#BTN19,#InvestigateOfficerLb,#InvestigateOfficerX],
 ["#FdEstimateReview+估價覆核人員",#EstimateReview,#BTN20,#EstimateReviewLb,#EstimateReviewX],
-["#FdCoorgnizer+協辦人",#Coorgnizer,#BTN21,#CoorgnizerLb,#CoorgnizerX],
+["#FdCoorgnizer+@協辦人",#Coorgnizer,#BTN21,#CoorgnizerLb,#CoorgnizerX],
 ]
 </sub>
 

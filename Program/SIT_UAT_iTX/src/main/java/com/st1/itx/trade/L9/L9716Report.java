@@ -39,12 +39,12 @@ public class L9716Report extends MakeReport {
 
 		List<Map<String, String>> lL9716_1 = null;
 		List<Map<String, String>> lL9716_2 = null;
-		
+
 		try {
-			
+
 			lL9716_1 = l9716ServiceImpl.findAll(titaVo);
 			lL9716_2 = l9716ServiceImpl.ovduFindAll(titaVo);
-			
+
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -53,10 +53,10 @@ public class L9716Report extends MakeReport {
 
 		exportExcel(titaVo, lL9716_1);
 		exportExcel2(titaVo, lL9716_2);
-		
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
-		
+
 		return true;
 
 	}
@@ -68,7 +68,8 @@ public class L9716Report extends MakeReport {
 
 		this.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
+				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
 		if (lList != null && lList.size() != 0) {
 
@@ -113,19 +114,14 @@ public class L9716Report extends MakeReport {
 			makeExcel.setValue(pivotRow, pivotCol, "本月無資料");
 		}
 
-	
 	}
-	
-	
-	
-	
 
 	private void exportExcel2(TitaVo titaVo, List<Map<String, String>> lList) throws LogicException {
 
 		int pivotRow = 2; // 1-based
 		int pivotCol = 2; // 1-based
-		
-		String SheetName ="催收明細表";
+
+		String SheetName = "催收明細表";
 		String tmpValue = "";
 
 		this.info(TXCD + "Report exportExcel2");
@@ -152,6 +148,11 @@ public class L9716Report extends MakeReport {
 					// switch by code of Column; i.e. Col A, Col B...
 					// breaks if more than 26 columns!
 					tmpValue = tLDVo.get("F" + i);
+
+					if (tmpValue == "F42") {
+						break;
+					}
+
 					switch (String.valueOf((char) (65 + i))) {
 					// if specific column needs special treatment, insert case here.
 					default:
@@ -168,7 +169,7 @@ public class L9716Report extends MakeReport {
 				rowShift++;
 
 			} // for
-
+			makeExcel.formulaCaculate(1, 1);
 			makeExcel.formulaCaculate(1, 6);
 			makeExcel.formulaCaculate(1, 9);
 			makeExcel.formulaCaculate(1, 38);
@@ -176,6 +177,5 @@ public class L9716Report extends MakeReport {
 			makeExcel.setValue(pivotRow, pivotCol, "本月無資料");
 		}
 
-	
 	}
 }

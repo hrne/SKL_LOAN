@@ -47,7 +47,7 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
 		// 設上個月底日
-		calMonthDate.set(iYear, iYear - 1, 0);
+		calMonthDate.set(iYear, iMonth - 1, 0);
 
 		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 

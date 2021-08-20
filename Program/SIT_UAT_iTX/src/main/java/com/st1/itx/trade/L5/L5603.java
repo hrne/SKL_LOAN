@@ -75,11 +75,11 @@ public class L5603 extends TradeBuffer {
 			iCollLetterId.setCaseCode(titaVo.getParam("CaseCode"));
 			iCollLetterId.setCustNo(iCollListVo.getCustNo());
 			iCollLetterId.setFacmNo(iCollListVo.getFacmNo());
-			if (iFunctionCd.equals("1")) {
+			if (iFunctionCd.equals("1") || iFunctionCd.equals("3")) {
 				iCollLetterId.setTitaTlrNo(titaVo.getTlrNo());
 				iCollLetterId.setTitaTxtNo(titaVo.getTxtNo());
 				iCollLetterId.setAcDate(Integer.valueOf(titaVo.getEntDy()));// 營業日 放acdate
-			} else if (iFunctionCd.equals("2")) {
+			} else {
 				iCollLetterId.setTitaTlrNo(titaVo.getParam("TitaTlrNo"));
 				iCollLetterId.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
 				iCollLetterId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));// 營業日 放acdate
@@ -97,13 +97,13 @@ public class L5603 extends TradeBuffer {
 			iCollLetter.setAddress(titaVo.getParam("Address"));
 			iCollLetter.setRemark(titaVo.getParam("Remark"));
 			CollLetter tCollLetter = iCollLetterService.findById(iCollLetterId, titaVo);
-			if (iFunctionCd.equals("1")) {
+			if (iFunctionCd.equals("1") || iFunctionCd.equals("3")) {
 				if (tCollLetter == null) {
 					try {
 						this.info("trytoinsert");
 						iCollLetterService.insert(iCollLetter, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 電催檔找不到資料錯誤
+						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 函催檔找不到資料錯誤
 					}
 				}
 			}
@@ -115,11 +115,23 @@ public class L5603 extends TradeBuffer {
 						iCollLetterService.holdById(iCollLetterId);
 						iCollLetterService.update(iCollLetter, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 電催檔更新資料錯誤
+						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 函催檔更新資料錯誤
 					}
 				} else {
 					this.info("nottrytoupdate");
-					throw new LogicException(titaVo, "E0005", ""); // 電催檔找不到資料錯誤
+					throw new LogicException(titaVo, "E0005", ""); // 函催檔找不到資料錯誤
+				}
+			}else {
+				if (tCollLetter != null) {
+					try {
+						iCollLetterService.holdById(iCollLetterId);
+						iCollLetterService.delete(iCollLetter, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 函催檔更新資料錯誤
+					}
+				} else {
+					this.info("nottrytoupdate");
+					throw new LogicException(titaVo, "E0008", ""); // 函催檔找不到資料錯誤
 				}
 			}
 			// 更新list的上次作業日期和項目

@@ -55,6 +55,7 @@ ClTypeCode=X,3
 CityCode=X,2
 OwnerId=X,10
 OwnerName=X,2.50
+OwnerRelCode=X,2
 EvaDate=9,7
 EvaAmt=9,14
 ServiceLife=X,2

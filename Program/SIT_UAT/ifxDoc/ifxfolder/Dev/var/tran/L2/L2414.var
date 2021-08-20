@@ -51,6 +51,7 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"#FdPledgeNO+保證書字號",#PledgeNO],
 [#<->#,"#FdOwnerId+所有權人統編",#OwnerId],
 [#<->#,"#FdOwnerName+所有權人姓名",#OwnerName],
+[#<->#,"#FdOwnerRelCode+與授信戶關係",#OwnerRelCode,#OwnerRelCodeX],
 [#<->#,"#FdIssuingId+發行機構統編",#IssuingId],
 [#<->#,"#FdIssuingCounty+發行機構所在國別",#IssuingCounty,#IssuingCountyX],
 ["#FdDocNo+憑證編號",#DocNo],["#FdLoanToValue+貸放成數",#LoanToValue,"％"],
@@ -121,9 +122,14 @@ T(3,CdCode.NationalityCode)
 
 #NationalityCodeHelp=x,1024,S
 
+#CDDEF08=x,20,S
+T(3,CdGuarantor)
+
+#RelationCodeHelp=x,3000,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClStatCodeHelp,#HelpDesc1)
@@ -133,7 +139,7 @@ T(2,@PledgeBankCodeHelp,#HelpDesc4)
 T(2,@YesNoHelp,#HelpDesc5)
 T(2,@SyndCodeHelp,#HelpDesc6)
 T(2,@NationalityCodeHelp,#HelpDesc7)
-
+T(2,@RelationCodeHelp,#HelpDesc8)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -145,12 +151,10 @@ E(0,@RimFKey,#FKEY)
 #NTXBUF=X,200,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
-!T(1,@CustId,#NTXBUF,2,10)
-!T(1,@CustNo,#NTXBUF,12,7)
-T(1,@ClCode1,#NTXBUF,19,1)
-T(1,@ClCode2,#NTXBUF,21,2)
-T(1,@ClNo,#NTXBUF,24,7)
-!T(1,@ClTypeCode,#NTXBUF,33,3)
+T(1,@ApplNo,#NTXBUF,2,7)
+T(1,@ClCode1,#NTXBUF,9,1)
+T(1,@ClCode2,#NTXBUF,11,2)
+T(1,@ClNo,#NTXBUF,14,7)
 
 
 
@@ -170,6 +174,7 @@ T(3,@FdEvaDate,*)
 T(3,@FdEvaAmt,*)
 T(3,@FdOwnerId,*)
 T(3,@FdOwnerName,*)
+T(3,@FdOwnerRelCode,*)
 T(3,@FdSynd,*)
 T(3,@FdSettingStat,*)
 T(3,@FdClStat,*)
@@ -330,7 +335,8 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApplNo<-
 #FdApplNo=X,2,L
 
 #ApplNo=A,7,I
-C(3,#FunCd,1,$,S)
+C(3,#FunCd,1,$,s)
+@C(3,#ApplNo,0,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13,13,1))
 
 #RimFuncCode=A,1,S
 #RimTxCode=X,5,S
@@ -359,6 +365,9 @@ R(1,L2R07)
 
 #ApplNoX=X,100,L
 T(2,#L2r07CustName)
+
+#APPCHECK=X,1,L
+C(3,#ApplNo,0,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13,13,1))
 
 ! [擔保品代號1]
 #ClCode1=A,1,L
@@ -513,7 +522,7 @@ IF(#ClTypeCode=="101" ||#ClTypeCode=="102" ||#ClTypeCode=="103" ||#ClTypeCode=="
 ! C(5,#ClTypeCode,110,E(0,1),E(0,0))
 ! C(5,#ClTypeCode,130,E(0,1),E(0,0))
 ! C(5,#ClTypeCode,1E1,E(0,1),E(0,0))
-INVOKEJS(SHOW,p1,16,27,#PHFG)
+INVOKEJS(SHOW,p1,17,28,#PHFG)
 
 
 
@@ -647,6 +656,23 @@ C(4,#L1r09CustName,$,s)
 @V(7)
 
 #FdOwnerName=X,2,L
+
+#FdOwnerRelCode=X,2,L
+C(4,#CustId,s,$)
+C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13,13,1))
+
+!與授信戶關係
+#OwnerRelCode=X,2,I
+IF(#FunCd==4,s,$)
+C(4,#OwnerId,S,$)
+C(4,#CustId,S,$)
+C(5,#OwnerId,#CustId,S,$)
+HELP(#RelationCodeHelp)
+@V(H,#RelationCodeHelp)
+
+#OwnerRelCodeX=X,40,L
+C(4,#OwnerRelCode,S,$)
+T(H,#OwnerRelCode,#RelationCodeHelp)
 
 ! [發行機構統編]
 #IssuingId=X,10,I
@@ -993,6 +1019,7 @@ IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
 #PledgeNO
 #OwnerId
 #OwnerName
+#OwnerRelCode
 #IssuingId
 #IssuingCounty
 #DocNo

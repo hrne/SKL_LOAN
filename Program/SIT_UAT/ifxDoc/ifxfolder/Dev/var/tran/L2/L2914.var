@@ -128,6 +128,23 @@ E(0,1)
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
+#RimClCode1=A,1,S
+#RimClCode2=A,2,S
+#RimClNo=A,7,S
+
+<include src="ROM.icf::L2R17.dec"/>
+!RIM取原擔保品編號
+#RimL2r17=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+RESET_RIM(#RimL2r17,L2R17)
+S(L2R17,1,#RimClCode1,#RimClCode2,#RimClNo)
+R(1,L2R17)
+E(0,@OGdRid1,#L2r17GdrId1)
+E(0,@OGdRid2,#L2r17GdrId2)
+E(0,@OGdRnum,#L2r17GdrNum)
+
 #RPTFG=A,1,S
 E(0,0)
 
@@ -153,10 +170,13 @@ T(2,#ClNo)
 
 ![原擔保品編號]
 
-#OGdRid1=X,1,L
-#OGdRid2=X,2,L
-#OGdRnum=X,7,L
+#OGdRid1=A,1,L
+#OGdRid2=A,2,L
+#OGdRnum=A,7,L
 
+#OGdALL=X,12,L
+C(3,#OGdRid1,0,S,$)
+T(2,#OGdRid1+-+#OGdRid2+-+#OGdRnum)
 
 !地區別
 #OCityCode=X,2,L
@@ -412,13 +432,14 @@ TXFORM=L2914
 #ORPTFG
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R17.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 <sub type="PART" name="L2914" layout="cols=3;screen.width=[150,370,150,370];printer.width=[15,30,15,30];order=1">
 [
 ["[L2914]                                 其他擔保品資料查詢"],
-["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdRid1,"－",#OGdRid2,"－",#OGdRnum],
+["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdALL],
 [#<->#,"地區別",#OCityCode,#OCityCodeX],
 [#<->#,"擔保品類別",#OClTypeCode,#OClTypeCodeX],
 ["鑑估日期",#OEvaDate],["估值／現值",#OPledgeAmt],
@@ -452,7 +473,7 @@ TXFORM=L2914
 <sub type="PART" name="L291A" layout="cols=3;screen.width=[150,370,150,370];printer.width=[15,30,15,30];order=1">
 [
 ["[L2914]                                 其他擔保品資料查詢"],
-["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdRid1,"－",#OGdRid2,"－",#OGdRnum],
+["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdALL],
 [#<->#,"地區別",#OCityCode,#OCityCodeX],
 [#<->#,"擔保品類別",#OClTypeCode,#OClTypeCodeX],
 ["鑑估日期",#OEvaDate],["保證金額",#OPledgeAmt],
@@ -472,7 +493,7 @@ TXFORM=L2914
 <sub type="PART" name="L291B" layout="cols=3;screen.width=[150,370,150,370];printer.width=[15,30,15,30];order=1">
 [
 ["[L2914]                                 其他擔保品資料查詢"],
-["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdRid1,"－",#OGdRid2,"－",#OGdRnum],
+["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdALL],
 [#<->#,"地區別",#OCityCode,#OCityCodeX],
 [#<->#,"擔保品類別",#OClTypeCode,#OClTypeCodeX],
 ["鑑估日期",#OEvaDate],["估值／現值",#OPledgeAmt],
@@ -489,7 +510,7 @@ TXFORM=L2914
 <sub type="PART" name="L291C" layout="cols=3;screen.width=[150,370,150,370];printer.width=[15,30,15,30];order=1">
 [
 ["[L2914]                                 其他擔保品資料查詢"],
-["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdRid1,"－",#OGdRid2,"－",#OGdRnum],
+["擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["原擔保品編號",#OGdALL],
 [#<->#,"地區別",#OCityCode,#OCityCodeX],
 [#<->#,"擔保品類別",#OClTypeCode,#OClTypeCodeX],
 ["鑑估日期",#OEvaDate],["估值／現值",#OPledgeAmt],

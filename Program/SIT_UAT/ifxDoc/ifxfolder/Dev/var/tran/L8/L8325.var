@@ -105,31 +105,29 @@ T(1,@TranKey,#NTXBUF,2,1)
 C(5,#TranKey_Tmp,1,$,S)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)   
+T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1) 
 K(MODIFYBUTTON,新增)
 T(2,@FdApplyDate,*)
 T(2,@FdCourtCode,*)
-T(2,@FdCivil323Amt,*)
-T(2,@FdTotalAmt,*)
-T(2,@FdFirstPayDate,*)
-T(2,@FdPeriod,*)
-T(2,@FdRate,*)
-T(2,@FdMonthPayAmt,*)
-T(2,@FdPayAccount,*)
+T(2,@FdCustRegAddr,*)
+T(2,@FdCustComAddr,*)
+T(2,@FdCustRegTelNo,*)
+T(2,@FdCustComTelNo,*)
+T(2,@FdCustMobilNo,*)
 
 
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
-T(F,@TranKey,1)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)
+T(F,@TranKey,1)T(F,@CourtCode,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1) 
 T(1,@Ukey,#NTXBUF,3,32)
-T(2,@FdCivil323Amt,*)
-T(2,@FdTotalAmt,*)
-T(2,@FdFirstPayDate,*)
-T(2,@FdPeriod,*)
-T(2,@FdRate,*)
-T(2,@FdMonthPayAmt,*)
-T(2,@FdPayAccount,*)
+T(2,@FdApplyDate,*)
+T(2,@FdCourtCode,*)
+T(2,@FdCustRegAddr,*)
+T(2,@FdCustComAddr,*)
+T(2,@FdCustRegTelNo,*)
+T(2,@FdCustComTelNo,*)
+T(2,@FdCustMobilNo,*)
 T(3,@TranKeyHelp,C:異動;D:補件))
 
 ! 查詢進入
@@ -138,7 +136,6 @@ C(5,#TranKey_Tmp,5,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(NOBUTTON,CLOSEY)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-
 ! 刪除進入
 #Deal_Delete=X,1,S
 C(5,#TranKey_Tmp,4,$,S)
@@ -311,6 +308,7 @@ T(3,[L8325] 債務人繳款資料檔案)
 #CustComTelNo
 #CustMobilNo
 #OutJcicTxtDate
+#Ukey
 </sub>
 
 

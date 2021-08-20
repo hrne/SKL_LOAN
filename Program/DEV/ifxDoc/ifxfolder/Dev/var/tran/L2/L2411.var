@@ -373,12 +373,11 @@ E(0,@RimFKey,#FKEY)
 #NTXBUF=X,200,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
-T(1,@ClCode1,#NTXBUF,19,1)
-T(1,@ClCode2,#NTXBUF,21,2)
-T(1,@ClNo,#NTXBUF,24,7)
-! T(1,@ClTypeCode,#NTXBUF,33,3)
-! T(1,@CustId,#NTXBUF,2,10)
-! T(1,@CustNo,#NTXBUF,12,7)
+T(1,@ApplNo,#NTXBUF,2,7)
+T(1,@ClCode1,#NTXBUF,9,1)
+T(1,@ClCode2,#NTXBUF,11,2)
+T(1,@ClNo,#NTXBUF,14,7)
+
 
 #Init=X,1,S
 CALL(#HideAll)
@@ -643,7 +642,7 @@ BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF8;ntxbuf5=type<-1:ApplNo<-
 #FdApplNo=X,2,L
 
 #ApplNo=A,7,I
-C(3,#FunCd,1,$,S)
+C(3,#FunCd,1,$,s)
 
 !用核准號碼(ApplNo)調L2R05
 #SendL2r05=X,1,S

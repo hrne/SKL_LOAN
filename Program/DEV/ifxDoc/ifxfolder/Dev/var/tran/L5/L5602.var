@@ -32,7 +32,7 @@ E(0,0)
 [#<->#,"#FdMeetPlaceCode+面催地點類別",#MeetPlaceCode,#MeetPlaceCodeX],
 [#<->#,"#FdMeetPlace+面催地點",#MeetPlace],
 [#<->#,"#FdRemark+面催記錄",#Remark],
-[#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo],
+[#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo,#EditEmpNoX],
 ]
 !---------- AP TEXT AREA Variables ----------
 #BTNA=X,1,I,ui:button;value:電催查詢;enable:1;tabbable:0
@@ -123,7 +123,7 @@ T(2,@CustUKey,#L5R15CustUKey)
 T(2,@ClNo,#L5R15ClNo)
 T(2,@ClCode1,#L5R15ClCode1)
 T(2,@ClCode2,#L5R15ClCode2)
-#Space=X,1,S
+#Space1=X,1,S
 
 <include src="ROM.icf::L5R19.dec"/>
 #RimCaseCode=X,1,S
@@ -158,7 +158,16 @@ T(H,@ContactCodeX,#ContactCode,#ContactCodeHelp)
 T(H,@MeetPsnCodeX,#MeetPsnCode,#MeetPsnCodeHelp)
 T(H,@MeetPlaceCodeX,#MeetPlaceCode,#MeetPlaceCodeHelp)
 T(H,@AccCollPsnCodeX,#AccCollPsnCode,#AccCollPsnCodeHelp)
-
+#Space=X,1,S
+T(4,@EditEmpNo,TLRNO$)
+<include src="ROM.icf::L5R28.dec"/>
+#RimEmployeeNo=X,6,S
+#RimL5R28=X,1,S
+T(2,@RimEmployeeNo,#EditEmpNo)
+RESET_RIM(#RimL5R28,L5R28)
+S(L5R28,1,#RimEmployeeNo)
+R(1,L5R28)
+T(2,@EditEmpNoX,#L5r28FullName)
 !必輸欄位
 #FdFunctionCd=X,1,L
 #FdCaseCode=X,1,L
@@ -175,38 +184,60 @@ T(H,@AccCollPsnCodeX,#AccCollPsnCode,#AccCollPsnCodeHelp)
 #FdFacmNo=X,1,L
 
 #FdMeetDate=X,1,L
-C(3,#FunctionCd,5,T(3,#FdMeetDate, ),T(3,#FdMeetDate,*))
+C(3,#FunctionCd,1,T(3,#FdMeetDate,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetDate,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetDate,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetDate, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetDate, ),$)
 #FdMeetTime=X,1,L
-C(3,#FunctionCd,5,T(3,#FdMeetTime, ),T(3,#FdMeetTime,*))
+C(3,#FunctionCd,1,T(3,#FdMeetTime,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetTime,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetTime,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetTime, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetTime, ),$)
 #FdContactCode=X,1,L
-C(3,#FunctionCd,5,T(3,#FdContactCode, ),T(3,#FdContactCode,*))
+C(3,#FunctionCd,1,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdContactCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdContactCode, ),$)
 #FdMeetPsnCode=X,1,L
-C(3,#FunctionCd,5,T(3,#FdMeetPsnCode, ),T(3,#FdMeetPsnCode,*))
+C(3,#FunctionCd,1,T(3,#FdMeetPsnCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetPsnCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetPsnCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetPsnCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetPsnCode, ),$)
 #FdAccCollPsnCode=X,1,L
-C(3,#FunctionCd,5,T(3,#FdAccCollPsnCode, ),T(3,#FdAccCollPsnCode,*))
+C(3,#FunctionCd,1,T(3,#FdAccCollPsnCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdAccCollPsnCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdAccCollPsnCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdAccCollPsnCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdAccCollPsnCode, ),$)
 #FdMeetPlaceCode=X,1,L
-C(3,#FunctionCd,5,T(3,#FdMeetPlaceCode, ),T(3,#FdMeetPlaceCode,*))
+C(3,#FunctionCd,1,T(3,#FdMeetPlaceCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetPlaceCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetPlaceCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetPlaceCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetPlaceCode, ),$)
 #FdMeetPlace=X,1,L
-C(3,#FunctionCd,5,T(3,#FdMeetPlace, ),T(3,#FdMeetPlace,*))
+C(3,#FunctionCd,1,T(3,#FdMeetPlace,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetPlace,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetPlace,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetPlace, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetPlace, ),$)
 
 ! 登放序號
 #ActSeq=X,20,S
 IF (#FunctionCd==1 || #FunctionCd==2|| #FunctionCd==3,T(F,@MeetDate,1)T(F,@MeetTime,1)T(F,@ContactCode,1)T(F,@MeetPsnCode,1)T(F,@AccCollPsnCode,1)T(F,@AccCollPsnName,1)T(F,@MeetPlaceCode,1)T(F,@MeetPlace,1)T(F,@Remark,1),
                                                       T(F,@MeetDate,0)T(F,@MeetTime,0)T(F,@ContactCode,0)T(F,@MeetPsnCode,0)T(F,@AccCollPsnCode,0)T(F,@AccCollPsnName,0)T(F,@MeetPlaceCode,0)T(F,@MeetPlace,0)T(F,@Remark,0))
 
-IF(#FunctionCd == 5,INVOKEJS(SHOW,L5602,8,8,0),INVOKEJS(SHOW,L5602,8,8,1))
+IF(#FunctionCd == 4 || #FunctionCd == 5,INVOKEJS(SHOW,L5602,8,8,0),INVOKEJS(SHOW,L5602,8,8,1))
 
 IF(#FunctionCd==5,K(NOBUTTON,CLOSEY),$)
 C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
 
 ! 功能
 #FunctionCd=A,1,S
-C(3,#FunctionCd,3,E(0,1),s)
-C(3,#CHAIN,0,$,s)
-C(2,#FunctionCd,S,$,$,s,s,s)
-HELP(#FunctionCdHelp)
-@V(H,#FunctionCdHelp)
-E(0,@FUNCIND,#FunctionCd)
 
 #FunctionCdX=X,4,L
 T(H,#FunctionCd,#FunctionCdHelp)
@@ -216,12 +247,8 @@ C(2,#FunctionCd,$,$,E(0,1),$,E(0,1))
 ASGN(AGAIN$)
 ! 案件種類
 #CaseCode=A,1,L
-C(3,#CHAIN,0,$,s)
-C(2,#FunctionCd,S,$,$,s,s,s)
-HELP(#CaseCodeHelp)
-@V(H,#CaseCodeHelp)
+
 #CaseCodeX=X,4,L
-T(H,#CaseCode,#CaseCodeHelp)
 
 !<電催查詢>
 #BUFA=X,11,S
@@ -256,17 +283,12 @@ BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
 
 ! 戶號
 #CustNo=A,7,L
-C(3,#CHAIN,0,$,s)
-C(2,#FunctionCd,S,$,$,s,s,s)
 
 ! 戶名----調RIM
 #CustName=X,20,L
 
 ! 額度編號
 #FacmNo=A,3,L
-C(3,#CHAIN,0,$,s)
-C(2,#FunctionCd,S,$,$,s,s,s)
-
 ! 催收人員
 #AccCollPsn=X,8,L
 #AccCollPsnX=X,40,L
@@ -292,8 +314,8 @@ C(2,#FunctionCd,S,$,$,s,s,s)
 T(4,#SYSCDATE)
 
 #MeetDate=D,7,I
-C(2,#FunctionCd,S,$,$,s,s,s)
-C(2,#FunctionCd,S,T(1,#MeetDateX,2,7),$,T(1,#MeetDateX,2,7),s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(2,#FunctionCd,S,T(1,#MeetDateX,2,7),$,$,s,s)
 D(8)
 @V(7)
 @A(DATE,0,#MeetDate)
@@ -302,14 +324,14 @@ D(8)
 #MeetTimeX=X,6,S
 T(4,TIME$)
 #MeetTime=X,4,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#FunctionCd,1,T(1,#MeetTimeX,1,4),$)
 @V(7)A(TIME,HHmm,#MeetTime)
 
 
 ! 面催對象
 #ContactCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#ContactCodeHelp)
 @V(H,#ContactCodeHelp)
 #ContactCodeX=X,6,L
@@ -317,7 +339,7 @@ T(H,#ContactCode,#ContactCodeHelp)
 
 ! 面晤人
 #MeetPsnCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MeetPsnCodeHelp)
 @V(H,#MeetPsnCodeHelp)
 #MeetPsnCodeX=X,4,L
@@ -325,12 +347,12 @@ T(H,#MeetPsnCode,#MeetPsnCodeHelp)
 
 ! 催收人員
 #AccCollPsnCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#AccCollPsnCodeHelp)
 @V(H,#AccCollPsnCodeHelp)
 #AccCollPsnCodeX=X,6,L
 T(H,#AccCollPsnCode,#AccCollPsnCodeHelp)
-@C(3,#AccCollPsnCode,1,HIDE(#BTNF),SHOW(#BTNF))
+@C(3,#AccCollPsnCode,1,HIDE(#BTNF)T(F,@AccCollPsnName,0),SHOW(#BTNF)T(F,@AccCollPsnName,1))
 IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF),$)
 
 ! 催收人員姓名
@@ -340,7 +362,7 @@ IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF),$)
 BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#AccCollPsnNameBUF;ntxbuf5=type<-1:AccCollPsnName<-OOAccCollPsn})
 
 #AccCollPsnName=X,6,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#AccCollPsnCode,1,T(2,#TLRNO),$)
 C(3,#AccCollPsnCode,1,s,$)
 
@@ -358,7 +380,7 @@ T(2,@AccCollPsnNameX,#L5R17FullName)
 
 ! 面催地點選項
 #MeetPlaceCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MeetPlaceCodeHelp)
 @V(H,#MeetPlaceCodeHelp)
 #MeetPlaceCodeX=X,10,L
@@ -376,7 +398,7 @@ T(2,@RimAddressCode,#MeetPlaceCode)
 T(2,@RimClNo,#ClNo)
 T(2,@RimClCode1,#ClCode1)
 T(2,@RimClCode2,#ClCode2)
-C(3,#FunctionCd,1,$,S)
+C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#MeetPlaceCode,4,S,$)
 RESET_RIM(#RimL5R24,L5R24)
 S(L5R24,1,#RimCustUKey,#RimAddressCode,#RimClNo,#RimClCode1,#RimClCode2)
@@ -386,18 +408,17 @@ T(2,@MeetPlace,#L5R24FullAddress)
 
 ! 面催地點
 #MeetPlace=X,60,I
+C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#MeetPlaceCode,4,T(2,#MeetPlace, ),$)
-C(2,#FunctionCd,S,$,$,s,s,s)
 @V(7)
 
 ! 其他記錄
 #Remark=X,2.80,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 ! T(2,#MemoA+#MemoB)
 ! 維護人員
 #EditEmpNo=X,6,L
-T(4,TLRNO$)
-C(2,#FunctionCd,S,$,$,s,s,s)
+#EditEmpNoX=X,50,L
 ! 經辦
 #TitaTlrNo=X,6,L
 ! 交易序號
@@ -447,6 +468,7 @@ C(2,#FunctionCd,S,$,$,s,s,s)
 <include src="ROM.icf::L5R17.tom"/>
 <include src="ROM.icf::L5R19.tom"/>
 <include src="ROM.icf::L5R24.tom"/>
+<include src="ROM.icf::L5R28.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5602
 

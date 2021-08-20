@@ -167,7 +167,7 @@ C(1,#OOMailObj,S,S,$)
 T(H,#OOMailObj,#MailObjHelp)
 
 ! 姓名
-#OOCustName=X,10,O
+#OOCustName=X,100,O
 ! 送達否
 #OODelvrYet=A,1,O
 #OODelvrYetX=X,6,O

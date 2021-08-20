@@ -53,6 +53,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdMONTHLY_AVG+一個月平均價",#MonthlyAvg,"元"],["#FdClosingPrice+前日收盤價",#YdClosingPrice,"元"],
 ["#FdQUARTER_AVG+三個月平均價",#ThreeMonthAvg,"元"],["#FdVALUE_AMT+鑑定單價",#EvaUnitPrice,"元"],
 ["#FdOWNER_ID+股票持有人統編",#OwnerId],["#FdOWNER_NAME+股票持有人姓名",#OwnerName],
+[#<->#,"#FdOwnerRelCode+與授信戶關係",#OwnerRelCode,#OwnerRelCodeX],
 ["#FdMEMB_POS+公司內部人職稱",#InsiderJobTitle,#InsiderJobTitleX],["#FdMEMB_IND+公司內部人身分註記",#InsiderPosition,#InsiderPositionX],
 ["#FdLEGAL_REL+法定關係人統編",#LegalPersonId],["#FdLOAN_PER+貸放成數",#LoanToValue,"%"],
 ["#FdCOL_MTR+擔保維持率",#ClMtr,"%"],["#FdNOTICE_MTR+通知追繳維持率",#NoticeMtr,"%"],
@@ -174,14 +175,20 @@ T(2,@EvaStandardHelp,#HelpDesc10)
 T(3,CdCode.ClTypeCode3)
 #ClTypeCode3Help=x,1024,S
 
+#CDDEF0013=x,20,S
+T(3,CdGuarantor)
+
+
+#RelationCodeHelp=x,3000,S
+
 #Help2Rim=X,1,S
 RESET_RIM(#Help2Rim,XXR99)
-S(XXR99,01,#CDDEF0011,#CDDEF0012)
+S(XXR99,01,#CDDEF0011,#CDDEF0012,#CDDEF0013)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@StockCodeHelp,#HelpDesc1)
 T(2,@ClTypeCode3Help,#HelpDesc2)
-
+T(2,@RelationCodeHelp,#HelpDesc3)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -192,12 +199,10 @@ E(0,@RimFKey,#FKEY)
 #NTXBUF=X,200,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
-!T(1,@CustId,#NTXBUF,2,10)
-!T(1,@CustNo,#NTXBUF,12,7)
-T(1,@ClCode1,#NTXBUF,19,1)
-T(1,@ClCode2,#NTXBUF,21,2)
-T(1,@ClNo,#NTXBUF,24,7)
-!T(1,@ClTypeCode,#NTXBUF,33,3)
+T(1,@ApplNo,#NTXBUF,2,7)
+T(1,@ClCode1,#NTXBUF,9,1)
+T(1,@ClCode2,#NTXBUF,11,2)
+T(1,@ClNo,#NTXBUF,14,7)
 
 ![功能]
 #FunCd=X,1,S
@@ -231,6 +236,7 @@ T(3,@FdCOL_IND1,*)
 T(3,@FdVALUE_STANDARD,*)
 T(3,@FdOWNER_ID,*)
 T(3,@FdOWNER_NAME,*)
+T(3,@FdOwnerRelCode,*)
 T(3,@FdLOAN_PER,*)
 T(3,@FdCOMPUTE_MTR,*)
 T(3,@FdSettingStat,*)
@@ -301,6 +307,7 @@ T(3,@FdCOL_AREA, )
 T(3,@FdSTOCK_CODE,*)
 T(3,@FdOWNER_ID,*)
 T(3,@FdOWNER_NAME,*)
+T(3,@FdOwnerRelCode,*)
 T(3,@FdLOAN_PER,*)
 T(3,@FdCOMPUTE_MTR,*)
 T(3,@FdSETTING_DT,*)
@@ -383,17 +390,6 @@ E(0,#RimSettingAmt)
 ! 戶號
 #CustNo=A,7,L
 
-
-
-!#RimL1R09=X,1,S
-!IF(#FunCd==1,$,S)
-!T(2,@RimCustId,#CustId)
-!E(0,@RimCustNo,#CustNo)
-!E(0,@RimFunCd,1)
-!RESET_RIM(#RimL1R09,L1R09)
-!S(L1R09,1,#RimCustId,#RimCustNo,#RimFunCd)
-!R(1,L1R09)
-
 #BUF1=X,14,S
 T(2,00000019999999)
 
@@ -405,7 +401,8 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApplNo<-
 #FdApplNo=X,2,L
 
 #ApplNo=A,7,I
-C(3,#FunCd,1,$,S)
+C(3,#FunCd,1,$,s)
+@C(3,#ApplNo,0,INVOKEJS(SHOW,p1,15,15,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,15,15,1))
 
 #RimFuncCode=A,1,S
 #RimTxCode=X,5,S
@@ -433,8 +430,11 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
 #ApplNoX=X,100,L
+C(3,#ApplNo,0,S,$)
 T(2,#L2r07CustName)
 
+#APPCHECK=X,1,L
+C(3,#ApplNo,0,INVOKEJS(SHOW,p1,15,15,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,15,15,1))
 
 ! [擔保品代號1]
 #ClCode1=X,1,I
@@ -804,6 +804,22 @@ C(4,#L1r09CustName,$,s)
 
 #FdOWNER_NAME=X,2,L
 
+#FdOwnerRelCode=X,2,L
+C(4,#CustId,s,$)
+C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p1,15,15,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,15,15,1))
+
+!與授信戶關係
+#OwnerRelCode=X,2,I
+IF(#FunCd==4,s,$)
+C(4,#OwnerId,S,$)
+C(4,#CustId,S,$)
+C(5,#OwnerId,#CustId,S,$)
+HELP(#RelationCodeHelp)
+@V(H,#RelationCodeHelp)
+
+#OwnerRelCodeX=X,40,L
+C(4,#OwnerRelCode,S,$)
+T(H,#OwnerRelCode,#RelationCodeHelp)
 
 ! [公司內部人職稱]
 #InsiderJobTitle=X,2,I
@@ -1114,6 +1130,7 @@ IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
 #EvaUnitPrice
 #OwnerId
 #OwnerName
+#OwnerRelCode
 #InsiderJobTitle
 #InsiderPosition
 #LegalPersonId

@@ -1,14 +1,14 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.time.LocalDate;
+import java.text.SimpleDateFormat;
+//import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +21,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9719ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -32,10 +31,36 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("l9719.findAll ");
+		this.info("l9719.findAll ");
+
+//		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
+//		LocalDate inputlastYearMonth = inputYearMonth.minusMonths(1);
 		
-		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
-		LocalDate inputlastYearMonth = inputYearMonth.minusMonths(1);
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日(int)
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthDate = Calendar.getInstance();
+		// 設當年月底日
+		calMonthDate.set(iYear, iMonth, 0);
+
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+		// 設上個月底日
+		calMonthDate.set(iYear, iMonth - 1, 0);
+
+		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+		
 
 		String sql = "WITH rawData AS ( ";
 		sql += "      SELECT DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') AS \"AcctCode\"";
@@ -137,8 +162,8 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             AS \"IntAmt-Loan\"";
 		sql += "      	    ,CodeAII.\"AcNoCode\" AS \"IntAmt-AcctCode\"";
 		sql += "            ,CodeAII.\"AcNoItem\" AS \"IntAmt-AcctItem\"";
-		sql += "            ,TotalA.\"AccumDPAmortized\" AS \"OvduAccum\"";
-		sql += "            ,TotalB.\"AccumDPAmortized\" AS \"LoanAccum\"";
+		sql += "            ,NVL(TotalA.\"AccumDPAmortized\",0) AS \"OvduAccum\"";
+		sql += "            ,NVL(TotalB.\"AccumDPAmortized\",0) AS \"LoanAccum\"";
 		sql += "      	    ,SUBSTR(:inputYearMonth, 1, 4)";
 		sql += "      	     || '年'";
 		sql += "      	     || SUBSTR(:inputYearMonth, 5, 2)";
@@ -152,16 +177,17 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CdAcCode\" CodeAII ON CodeAII.\"AcctCode\" = 'AII'";
 		sql += "      WHERE Ovdu.\"AcctCode\" = '990'";
 
-		logger.info("sql=" + sql);
-		
+		this.info("sql=" + sql);
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		
+
 		Query query;
 		query = em.createNativeQuery(sql);
-		
-		query.setParameter("inputYearMonth", Integer.toString(inputYearMonth.getYear()) + String.format("%02d",inputYearMonth.getMonthValue()));
-		query.setParameter("lastYearMonth", Integer.toString(inputlastYearMonth.getYear()) + String.format("%02d",inputlastYearMonth.getMonthValue()));
-		
+
+//		query.setParameter("inputYearMonth", Integer.toString(inputYearMonth.getYear()) + String.format("%02d", inputYearMonth.getMonthValue()));
+//		query.setParameter("lastYearMonth", Integer.toString(inputlastYearMonth.getYear()) + String.format("%02d", inputlastYearMonth.getMonthValue()));
+		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
+		query.setParameter("lastYearMonth", lastMonthEndDate / 100);
 		return this.convertToMap(query.getResultList());
 	}
 

@@ -246,9 +246,23 @@ C(2,#ClCode1,T(3,),T(H,#ClCode2,#ClCode21Help),
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
-! !土地序號
-! #LandSeq=A,3,I
-! C(3,#ClCode1,1,$,S)
+#RimClCode1=A,1,S
+#RimClCode2=A,2,S
+#RimClNo=A,7,S
+
+<include src="ROM.icf::L2R17.dec"/>
+!RIM取原擔保品編號
+#RimL2r17=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+RESET_RIM(#RimL2r17,L2R17)
+S(L2R17,1,#RimClCode1,#RimClCode2,#RimClNo)
+R(1,L2R17)
+E(0,@OGdRid1,#L2r17GdrId1)
+E(0,@OGdRid2,#L2r17GdrId2)
+E(0,@OGdRnum,#L2r17GdrNum)
+E(0,@OLgtseq,#L2r17LgtSeq)
 
 
 #RPTFG=A,1,S
@@ -314,13 +328,18 @@ T(2,#ClCode2)
 #OClNo=A,7,L
 T(2,#ClNo)
 
+
 ![原擔保品編號]
 #FdOGdRid=X,2,L
 
-#OGdRid1=X,1,L
-#OGdRid2=X,2,L
-#OGdRnum=X,7,L
+#OGdRid1=A,1,L
+#OGdRid2=A,2,L
+#OGdRnum=A,7,L
+#OLgtseq=A,2,L
 
+#OGdALL=X,15,L
+C(3,#OGdRid1,0,S,$)
+T(2,#OGdRid1+-+#OGdRid2+-+#OGdRnum+-+#OLgtseq)
 
 !擔保品類別
 #OClTypeCode=X,3,L
@@ -596,13 +615,14 @@ TXFORM=L2911
 #OOAddress
 ^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R17.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
 <sub type="PART" name="L2911" layout="cols=3;screen.width=[180,140,180,350];printer.width=[15,30,15,30];order=1">
 [
 ["[L2911]                                 不動產擔保品資料查詢"],
-["#FdOClCode1+擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["#FdOGdRid+原擔保品編號",#OGdRid1,"－",#OGdRid2,"－",#OGdRnum],
+["#FdOClCode1+擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["#FdOGdRid+原擔保品編號",#OGdALL],
 [#<->#,"#FdOClTypeCode+擔保品類別",#OClTypeCode],
 [#<->#,"@@@@@<font color=red>@鑑價"],
 ["#FdOEvaDate+鑑估日期",#OEvaDate],["#FdOEvaAmt+鑑估總值",#OEvaAmt],

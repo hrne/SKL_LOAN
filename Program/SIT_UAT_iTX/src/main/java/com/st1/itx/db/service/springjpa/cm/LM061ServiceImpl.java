@@ -115,7 +115,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      WHERE M.\"YearMonth\" = :yymm";
 		sql += "        AND M.\"Status\" IN (2,6,7)";
 		sql += "        AND M.\"AssetClass\" IN ('21','22','23','3','4','5')";
-		sql += "        AND M.\"OvduTerm\" >= 0 ";
+		sql += "        AND M.\"OvduTerm\" > 0 ";
 		sql += "     	AND M.\"PrevIntDate\" <= :iOneYearAgo";
 		sql += "     ORDER BY M.\"CustNo\"";
 		sql += "             ,M.\"FacmNo\"";

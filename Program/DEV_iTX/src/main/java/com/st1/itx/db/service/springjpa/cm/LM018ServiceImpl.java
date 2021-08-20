@@ -121,7 +121,7 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            AND ad.\"AcctCode\" IN ('IC1','IC2','IC3','IC4','IOP','IOV') ";
 		sql += "            GROUP BY spn.\"ProdNoShow\" ";
 		sql += "                    ,om.\"YearMonth\" ";
-		sql += "           ) int ON int.\"VisibleMonth\" = om.\"YearMonth\" ";
+		sql += "           ) int ON int.\"YearMonth\" = om.\"YearMonth\" ";
 		sql += " LEFT JOIN (SELECT spn.\"ProdNoShow\" ";
 		sql += "                  ,om.\"YearMonth\" ";
 		sql += "                  ,SUM(mlb.\"LoanBalance\") \"BalSum\" ";

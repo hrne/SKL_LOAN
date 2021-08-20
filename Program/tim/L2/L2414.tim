@@ -62,6 +62,7 @@ PledgeBankCode=X,2
 PledgeNO=X,30
 OwnerId=X,10
 OwnerName=X,2.50
+OwnerRelCode=X,2
 IssuingId=X,10
 IssuingCounty=X,3
 DocNo=X,30

@@ -32,7 +32,7 @@ E(0,0)
 [#<->#,#BTNF],
 ["#FdResultCode+通話結果",#ResultCode,#ResultCodeX],["#FdCallDate+提醒日期",#CallDate],
 [#<->#,"#FdRemark+其他記錄",#Remark],
-[#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo],
+[#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo,#EditEmpNoX],
 ]
 !---------- AP TEXT AREA Variables ----------
 #BTNA=X,1,I,ui:button;value:電催查詢;enable:1;tabbable:0
@@ -150,7 +150,16 @@ T(2,@Remark,#L5R18ReMark)
 T(H,@ContactCodeX,#ContactCode,#ContactCodeHelp)
 T(H,@RecvrCodeX,#RecvrCode,#RecvrCodeHelp)
 T(H,@ResultCodeX,#ResultCode,#ResultCodeHelp)
-
+#Space2=X,1,S
+T(4,@EditEmpNo,TLRNO$)
+<include src="ROM.icf::L5R28.dec"/>
+#RimEmployeeNo=X,6,S
+#RimL5R28=X,1,S
+T(2,@RimEmployeeNo,#EditEmpNo)
+RESET_RIM(#RimL5R28,L5R28)
+S(L5R28,1,#RimEmployeeNo)
+R(1,L5R28)
+T(2,@EditEmpNoX,#L5r28FullName)
 !必輸欄位
 #FdFunctionCd=X,1,L
 #FdCaseCode=X,1,L
@@ -386,7 +395,7 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 
 ! 維護人員
 #EditEmpNo=X,6,L
-T(4,TLRNO$)
+#EditEmpNoX=X,50,L
 ! 經辦
 #TitaTlrNo=X,6,L
 ! 交易序號
@@ -436,6 +445,7 @@ T(4,TLRNO$)
 <include src="ROM.icf::L5R15.tom"/>
 <include src="ROM.icf::L5R18.tom"/>
 <include src="ROM.icf::L5R23.tom"/>
+<include src="ROM.icf::L5R28.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5601
 

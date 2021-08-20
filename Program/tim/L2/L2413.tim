@@ -68,6 +68,7 @@ ThreeMonthAvg=9,14
 EvaUnitPrice=9,14
 OwnerId=X,10
 OwnerName=X,2.50
+OwnerRelCode=X,2
 InsiderJobTitle=X,2
 InsiderPosition=X,2
 LegalPersonId=X,10

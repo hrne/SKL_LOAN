@@ -32,7 +32,7 @@ public class PfDetail implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5380854526031298952L;
+	private static final long serialVersionUID = 1L;
 
 // 序號
   @Id
@@ -112,8 +112,8 @@ public class PfDetail implements Serializable {
   @Column(name = "`InterviewerB`", length = 6)
   private String interviewerB;
 
-  // 是否以新員工資料更新介紹人所屬單位Y/Null
-  /* 重轉時更新單位、區部、部室及處經理代號、區經理代號、部經理代號 */
+  // 業績重算時是否以新員工資料更新介紹人所屬單位Y/N/null
+  /* 單位、區部、部室及處經理代號、區經理代號、部經理代號 */
   @Column(name = "`IsReNewEmpUnit`", length = 1)
   private String isReNewEmpUnit;
 
@@ -147,55 +147,107 @@ public class PfDetail implements Serializable {
   @Column(name = "`DeptManager`", length = 8)
   private String deptManager;
 
-  // 介紹人額度累計計算金額
-  /* 額度累計撥款扣除未逾一個月即結清及繳納1期但未繳足3期期款即結清（含部分還款達60萬之案件) */
+  // 介紹單位件數累計計算金額
+  /* 同一額度、同一撥款工作月、同一計件代碼，累計計算金額追回未繳足3期期款即結清（含部分還款達60萬之案件)同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算 */
   @Column(name = "`ComputeItAmtFac`")
   private BigDecimal computeItAmtFac = new BigDecimal("0");
 
-  // 介紹人件數
-  /* 依介紹人額度累計計算金額計算，扣除已計，同一案件編號限一件 */
+  // 介紹單位件數
+  /* 0,無計件 1.有計件寫入介紹人業績明細檔時，代碼(2&amp;B)之是否計件寫入(代碼1&amp;A) */
   @Column(name = "`ItPerfCnt`")
   private BigDecimal itPerfCnt = new BigDecimal("0");
 
+  // 介紹人業績金額計算金額
+  /* 撥款金額、追回差額(未繳足3期期款即結清、含部分還款達60萬之案件) */
+  @Column(name = "`ComputeItAmt`")
+  private BigDecimal computeItAmt = new BigDecimal("0");
+
+  // 介紹人業績金額
+  /* 單筆計算 */
+  @Column(name = "`ItPerfAmt`")
+  private BigDecimal itPerfAmt = new BigDecimal("0");
+
   // 介紹人換算業績
-  /* 依介紹人額度累計計算金額計算，扣除已計 */
+  /* 單筆計算 */
   @Column(name = "`ItPerfEqAmt`")
   private BigDecimal itPerfEqAmt = new BigDecimal("0");
 
   // 介紹人業務報酬
-  /* 依介紹人額度累計計算金額計算，扣除已計 */
+  /* 單筆計算 */
   @Column(name = "`ItPerfReward`")
   private BigDecimal itPerfReward = new BigDecimal("0");
 
-  // 介紹人業績金額
-  /* 依介紹人額度累計計算金額計算，扣除已計 */
-  @Column(name = "`ItPerfAmt`")
-  private BigDecimal itPerfAmt = new BigDecimal("0");
+  // 介紹人介紹獎金計算金額
+  /* 同一額度、同一撥款工作月，同一計件代碼，累計計算 */
+  @Column(name = "`ComputeItBonusAmt`")
+  private BigDecimal computeItBonusAmt = new BigDecimal("0");
 
   // 介紹人介紹獎金
-  /* 依介紹人額度累計計算金額計算，扣除已計 */
+  /* 依累計金額計算，扣除已計追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件 */
   @Column(name = "`ItBonus`")
   private BigDecimal itBonus = new BigDecimal("0");
 
   // 介紹人加碼獎勵津貼計算金額
-  /* 同一案件編號撥款累計扣除未逾一個月即結清(含部分還款達60萬元) */
+  /* 同一額度、同一撥款工作月，累計計算 */
   @Column(name = "`ComputeAddBonusAmt`")
   private BigDecimal computeAddBonusAmt = new BigDecimal("0");
 
   // 介紹人加碼獎勵津貼
-  /* 依介紹人加碼獎勵津貼計算金額計算，扣除已計 */
+  /* 依累計金額計算，扣除已計追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件 */
   @Column(name = "`ItAddBonus`")
   private BigDecimal itAddBonus = new BigDecimal("0");
 
   // 協辦人員協辦獎金計算金額
-  /* 同一案件編號撥款累計扣除未逾一個月即結清(含部分還款達60萬元) */
+  /* 同一額度、同一撥款工作月，累計計算 */
   @Column(name = "`ComputeCoBonusAmt`")
   private BigDecimal computeCoBonusAmt = new BigDecimal("0");
 
   // 協辦人員協辦獎金
-  /* 依協辦人員協辦獎金計算金額計算，扣除已計 */
+  /* 依協辦人員協辦獎金計算金額計算，扣除已計追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件 */
   @Column(name = "`CoorgnizerBonus`")
   private BigDecimal coorgnizerBonus = new BigDecimal("0");
+
+  // 房貸專員
+  /* FacMain.BusinessOfficer 放款業務專員 */
+  @Column(name = "`BsOfficer`", length = 6)
+  private String bsOfficer;
+
+  // 部室代號
+  /* 應以PfBsOfficer(房貸專員業績目標檔)計算業績 */
+  @Column(name = "`BsDeptCode`", length = 6)
+  private String bsDeptCode;
+
+  // 房貸專員件數累計計算金額
+  /* 同一額度、同一撥款工作月、同一計件代碼，累計計算金額追回未逾一個月即結清(含部分還款達60萬元)同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算 */
+  @Column(name = "`ComputeBsAmtFac`")
+  private BigDecimal computeBsAmtFac = new BigDecimal("0");
+
+  // 房貸專員件數
+  @Column(name = "`BsPerfCnt`")
+  private BigDecimal bsPerfCnt = new BigDecimal("0");
+
+  // 房貸專員計算金額
+  /* 撥款金額、追回差額(未繳足3期期款即結清、含部分還款達60萬之案件) */
+  @Column(name = "`ComputeBsAmt`")
+  private BigDecimal computeBsAmt = new BigDecimal("0");
+
+  // 房貸專員業績金額
+  /* 單筆計算 */
+  @Column(name = "`BsPerfAmt`")
+  private BigDecimal bsPerfAmt = new BigDecimal("0");
+
+  // 工作月
+  @Column(name = "`WorkMonth`")
+  private int workMonth = 0;
+
+  // 工作季
+  @Column(name = "`WorkSeason`")
+  private int workSeason = 0;
+
+  // 連同計件代碼
+  /* 同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算 */
+  @Column(name = "`PieceCodeCombine`", length = 1)
+  private String pieceCodeCombine;
 
   // 理財型房貸(Y/N)
   /* 只寫入首筆撥貸 */
@@ -284,39 +336,6 @@ public class PfDetail implements Serializable {
   /* 協辦獎金 */
   @Column(name = "`IsDay15Exclude5`", length = 1)
   private String isDay15Exclude5;
-
-  // 房貸專員
-  /* FacMain.BusinessOfficer 放款業務專員 */
-  @Column(name = "`BsOfficer`", length = 6)
-  private String bsOfficer;
-
-  // 部室代號
-  /* 應以PfBsOfficer(房貸專員業績目標檔)計算業績 */
-  @Column(name = "`BsDeptCode`", length = 6)
-  private String bsDeptCode;
-
-  // 房貸專員額度累計計算金額
-  /* 額度累計累計計算，追回未逾一個月即結清(含部分還款達60萬元) */
-  @Column(name = "`ComputeBsAmtFac`")
-  private BigDecimal computeBsAmtFac = new BigDecimal("0");
-
-  // 房貸專員件數
-  /* 依房貸專員額度累計計算金額計算，同一案件編號限一件 */
-  @Column(name = "`BsPerfCnt`")
-  private BigDecimal bsPerfCnt = new BigDecimal("0");
-
-  // 房貸專員業績金額
-  /* 依房貸專員額度累計計算金額計算 */
-  @Column(name = "`BsPerfAmt`")
-  private BigDecimal bsPerfAmt = new BigDecimal("0");
-
-  // 工作月
-  @Column(name = "`WorkMonth`")
-  private int workMonth = 0;
-
-  // 工作季
-  @Column(name = "`WorkSeason`")
-  private int workSeason = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -666,8 +685,8 @@ public class PfDetail implements Serializable {
   }
 
 /**
-	* 是否以新員工資料更新介紹人所屬單位Y/Null<br>
-	* 重轉時更新單位、區部、部室及處經理代號、區經理代號、部經理代號
+	* 業績重算時是否以新員工資料更新介紹人所屬單位Y/N/null<br>
+	* 單位、區部、部室及處經理代號、區經理代號、部經理代號
 	* @return String
 	*/
   public String getIsReNewEmpUnit() {
@@ -675,10 +694,10 @@ public class PfDetail implements Serializable {
   }
 
 /**
-	* 是否以新員工資料更新介紹人所屬單位Y/Null<br>
-	* 重轉時更新單位、區部、部室及處經理代號、區經理代號、部經理代號
+	* 業績重算時是否以新員工資料更新介紹人所屬單位Y/N/null<br>
+	* 單位、區部、部室及處經理代號、區經理代號、部經理代號
   *
-  * @param isReNewEmpUnit 是否以新員工資料更新介紹人所屬單位Y/Null
+  * @param isReNewEmpUnit 業績重算時是否以新員工資料更新介紹人所屬單位Y/N/null
 	*/
   public void setIsReNewEmpUnit(String isReNewEmpUnit) {
     this.isReNewEmpUnit = isReNewEmpUnit;
@@ -799,8 +818,10 @@ public class PfDetail implements Serializable {
   }
 
 /**
-	* 介紹人額度累計計算金額<br>
-	* 額度累計撥款扣除未逾一個月即結清及繳納1期但未繳足3期期款即結清（含部分還款達60萬之案件)
+	* 介紹單位件數累計計算金額<br>
+	* 同一額度、同一撥款工作月、同一計件代碼，累計計算金額
+追回未繳足3期期款即結清（含部分還款達60萬之案件)
+同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算
 	* @return BigDecimal
 	*/
   public BigDecimal getComputeItAmtFac() {
@@ -808,18 +829,21 @@ public class PfDetail implements Serializable {
   }
 
 /**
-	* 介紹人額度累計計算金額<br>
-	* 額度累計撥款扣除未逾一個月即結清及繳納1期但未繳足3期期款即結清（含部分還款達60萬之案件)
+	* 介紹單位件數累計計算金額<br>
+	* 同一額度、同一撥款工作月、同一計件代碼，累計計算金額
+追回未繳足3期期款即結清（含部分還款達60萬之案件)
+同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算
   *
-  * @param computeItAmtFac 介紹人額度累計計算金額
+  * @param computeItAmtFac 介紹單位件數累計計算金額
 	*/
   public void setComputeItAmtFac(BigDecimal computeItAmtFac) {
     this.computeItAmtFac = computeItAmtFac;
   }
 
 /**
-	* 介紹人件數<br>
-	* 依介紹人額度累計計算金額計算，扣除已計，同一案件編號限一件
+	* 介紹單位件數<br>
+	* 0,無計件 1.有計件
+寫入介紹人業績明細檔時，代碼(2&amp;B)之是否計件寫入(代碼1&amp;A)
 	* @return BigDecimal
 	*/
   public BigDecimal getItPerfCnt() {
@@ -827,18 +851,57 @@ public class PfDetail implements Serializable {
   }
 
 /**
-	* 介紹人件數<br>
-	* 依介紹人額度累計計算金額計算，扣除已計，同一案件編號限一件
+	* 介紹單位件數<br>
+	* 0,無計件 1.有計件
+寫入介紹人業績明細檔時，代碼(2&amp;B)之是否計件寫入(代碼1&amp;A)
   *
-  * @param itPerfCnt 介紹人件數
+  * @param itPerfCnt 介紹單位件數
 	*/
   public void setItPerfCnt(BigDecimal itPerfCnt) {
     this.itPerfCnt = itPerfCnt;
   }
 
 /**
+	* 介紹人業績金額計算金額<br>
+	* 撥款金額、追回差額(未繳足3期期款即結清、含部分還款達60萬之案件)
+	* @return BigDecimal
+	*/
+  public BigDecimal getComputeItAmt() {
+    return this.computeItAmt;
+  }
+
+/**
+	* 介紹人業績金額計算金額<br>
+	* 撥款金額、追回差額(未繳足3期期款即結清、含部分還款達60萬之案件)
+  *
+  * @param computeItAmt 介紹人業績金額計算金額
+	*/
+  public void setComputeItAmt(BigDecimal computeItAmt) {
+    this.computeItAmt = computeItAmt;
+  }
+
+/**
+	* 介紹人業績金額<br>
+	* 單筆計算
+	* @return BigDecimal
+	*/
+  public BigDecimal getItPerfAmt() {
+    return this.itPerfAmt;
+  }
+
+/**
+	* 介紹人業績金額<br>
+	* 單筆計算
+  *
+  * @param itPerfAmt 介紹人業績金額
+	*/
+  public void setItPerfAmt(BigDecimal itPerfAmt) {
+    this.itPerfAmt = itPerfAmt;
+  }
+
+/**
 	* 介紹人換算業績<br>
-	* 依介紹人額度累計計算金額計算，扣除已計
+	* 單筆計算
 	* @return BigDecimal
 	*/
   public BigDecimal getItPerfEqAmt() {
@@ -847,7 +910,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 介紹人換算業績<br>
-	* 依介紹人額度累計計算金額計算，扣除已計
+	* 單筆計算
   *
   * @param itPerfEqAmt 介紹人換算業績
 	*/
@@ -857,7 +920,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 介紹人業務報酬<br>
-	* 依介紹人額度累計計算金額計算，扣除已計
+	* 單筆計算
 	* @return BigDecimal
 	*/
   public BigDecimal getItPerfReward() {
@@ -866,7 +929,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 介紹人業務報酬<br>
-	* 依介紹人額度累計計算金額計算，扣除已計
+	* 單筆計算
   *
   * @param itPerfReward 介紹人業務報酬
 	*/
@@ -875,27 +938,28 @@ public class PfDetail implements Serializable {
   }
 
 /**
-	* 介紹人業績金額<br>
-	* 依介紹人額度累計計算金額計算，扣除已計
+	* 介紹人介紹獎金計算金額<br>
+	* 同一額度、同一撥款工作月，同一計件代碼，累計計算
 	* @return BigDecimal
 	*/
-  public BigDecimal getItPerfAmt() {
-    return this.itPerfAmt;
+  public BigDecimal getComputeItBonusAmt() {
+    return this.computeItBonusAmt;
   }
 
 /**
-	* 介紹人業績金額<br>
-	* 依介紹人額度累計計算金額計算，扣除已計
+	* 介紹人介紹獎金計算金額<br>
+	* 同一額度、同一撥款工作月，同一計件代碼，累計計算
   *
-  * @param itPerfAmt 介紹人業績金額
+  * @param computeItBonusAmt 介紹人介紹獎金計算金額
 	*/
-  public void setItPerfAmt(BigDecimal itPerfAmt) {
-    this.itPerfAmt = itPerfAmt;
+  public void setComputeItBonusAmt(BigDecimal computeItBonusAmt) {
+    this.computeItBonusAmt = computeItBonusAmt;
   }
 
 /**
 	* 介紹人介紹獎金<br>
-	* 依介紹人額度累計計算金額計算，扣除已計
+	* 依累計金額計算，扣除已計
+追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件
 	* @return BigDecimal
 	*/
   public BigDecimal getItBonus() {
@@ -904,7 +968,8 @@ public class PfDetail implements Serializable {
 
 /**
 	* 介紹人介紹獎金<br>
-	* 依介紹人額度累計計算金額計算，扣除已計
+	* 依累計金額計算，扣除已計
+追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件
   *
   * @param itBonus 介紹人介紹獎金
 	*/
@@ -914,7 +979,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 介紹人加碼獎勵津貼計算金額<br>
-	* 同一案件編號撥款累計扣除未逾一個月即結清(含部分還款達60萬元)
+	* 同一額度、同一撥款工作月，累計計算
 	* @return BigDecimal
 	*/
   public BigDecimal getComputeAddBonusAmt() {
@@ -923,7 +988,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 介紹人加碼獎勵津貼計算金額<br>
-	* 同一案件編號撥款累計扣除未逾一個月即結清(含部分還款達60萬元)
+	* 同一額度、同一撥款工作月，累計計算
   *
   * @param computeAddBonusAmt 介紹人加碼獎勵津貼計算金額
 	*/
@@ -933,7 +998,8 @@ public class PfDetail implements Serializable {
 
 /**
 	* 介紹人加碼獎勵津貼<br>
-	* 依介紹人加碼獎勵津貼計算金額計算，扣除已計
+	* 依累計金額計算，扣除已計
+追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件
 	* @return BigDecimal
 	*/
   public BigDecimal getItAddBonus() {
@@ -942,7 +1008,8 @@ public class PfDetail implements Serializable {
 
 /**
 	* 介紹人加碼獎勵津貼<br>
-	* 依介紹人加碼獎勵津貼計算金額計算，扣除已計
+	* 依累計金額計算，扣除已計
+追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件
   *
   * @param itAddBonus 介紹人加碼獎勵津貼
 	*/
@@ -952,7 +1019,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 協辦人員協辦獎金計算金額<br>
-	* 同一案件編號撥款累計扣除未逾一個月即結清(含部分還款達60萬元)
+	* 同一額度、同一撥款工作月，累計計算
 	* @return BigDecimal
 	*/
   public BigDecimal getComputeCoBonusAmt() {
@@ -961,7 +1028,7 @@ public class PfDetail implements Serializable {
 
 /**
 	* 協辦人員協辦獎金計算金額<br>
-	* 同一案件編號撥款累計扣除未逾一個月即結清(含部分還款達60萬元)
+	* 同一額度、同一撥款工作月，累計計算
   *
   * @param computeCoBonusAmt 協辦人員協辦獎金計算金額
 	*/
@@ -972,6 +1039,7 @@ public class PfDetail implements Serializable {
 /**
 	* 協辦人員協辦獎金<br>
 	* 依協辦人員協辦獎金計算金額計算，扣除已計
+追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件
 	* @return BigDecimal
 	*/
   public BigDecimal getCoorgnizerBonus() {
@@ -981,11 +1049,187 @@ public class PfDetail implements Serializable {
 /**
 	* 協辦人員協辦獎金<br>
 	* 依協辦人員協辦獎金計算金額計算，扣除已計
+追回撥款後計息期間未逾一個月即結清(含部分還款達60萬元)案件
   *
   * @param coorgnizerBonus 協辦人員協辦獎金
 	*/
   public void setCoorgnizerBonus(BigDecimal coorgnizerBonus) {
     this.coorgnizerBonus = coorgnizerBonus;
+  }
+
+/**
+	* 房貸專員<br>
+	* FacMain.BusinessOfficer 放款業務專員
+	* @return String
+	*/
+  public String getBsOfficer() {
+    return this.bsOfficer == null ? "" : this.bsOfficer;
+  }
+
+/**
+	* 房貸專員<br>
+	* FacMain.BusinessOfficer 放款業務專員
+  *
+  * @param bsOfficer 房貸專員
+	*/
+  public void setBsOfficer(String bsOfficer) {
+    this.bsOfficer = bsOfficer;
+  }
+
+/**
+	* 部室代號<br>
+	* 應以PfBsOfficer(房貸專員業績目標檔)計算業績
+	* @return String
+	*/
+  public String getBsDeptCode() {
+    return this.bsDeptCode == null ? "" : this.bsDeptCode;
+  }
+
+/**
+	* 部室代號<br>
+	* 應以PfBsOfficer(房貸專員業績目標檔)計算業績
+  *
+  * @param bsDeptCode 部室代號
+	*/
+  public void setBsDeptCode(String bsDeptCode) {
+    this.bsDeptCode = bsDeptCode;
+  }
+
+/**
+	* 房貸專員件數累計計算金額<br>
+	* 同一額度、同一撥款工作月、同一計件代碼，累計計算金額
+追回未逾一個月即結清(含部分還款達60萬元)
+同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算
+	* @return BigDecimal
+	*/
+  public BigDecimal getComputeBsAmtFac() {
+    return this.computeBsAmtFac;
+  }
+
+/**
+	* 房貸專員件數累計計算金額<br>
+	* 同一額度、同一撥款工作月、同一計件代碼，累計計算金額
+追回未逾一個月即結清(含部分還款達60萬元)
+同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算
+  *
+  * @param computeBsAmtFac 房貸專員件數累計計算金額
+	*/
+  public void setComputeBsAmtFac(BigDecimal computeBsAmtFac) {
+    this.computeBsAmtFac = computeBsAmtFac;
+  }
+
+/**
+	* 房貸專員件數<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getBsPerfCnt() {
+    return this.bsPerfCnt;
+  }
+
+/**
+	* 房貸專員件數<br>
+	* 
+  *
+  * @param bsPerfCnt 房貸專員件數
+	*/
+  public void setBsPerfCnt(BigDecimal bsPerfCnt) {
+    this.bsPerfCnt = bsPerfCnt;
+  }
+
+/**
+	* 房貸專員計算金額<br>
+	* 撥款金額、追回差額(未繳足3期期款即結清、含部分還款達60萬之案件)
+	* @return BigDecimal
+	*/
+  public BigDecimal getComputeBsAmt() {
+    return this.computeBsAmt;
+  }
+
+/**
+	* 房貸專員計算金額<br>
+	* 撥款金額、追回差額(未繳足3期期款即結清、含部分還款達60萬之案件)
+  *
+  * @param computeBsAmt 房貸專員計算金額
+	*/
+  public void setComputeBsAmt(BigDecimal computeBsAmt) {
+    this.computeBsAmt = computeBsAmt;
+  }
+
+/**
+	* 房貸專員業績金額<br>
+	* 單筆計算
+	* @return BigDecimal
+	*/
+  public BigDecimal getBsPerfAmt() {
+    return this.bsPerfAmt;
+  }
+
+/**
+	* 房貸專員業績金額<br>
+	* 單筆計算
+  *
+  * @param bsPerfAmt 房貸專員業績金額
+	*/
+  public void setBsPerfAmt(BigDecimal bsPerfAmt) {
+    this.bsPerfAmt = bsPerfAmt;
+  }
+
+/**
+	* 工作月<br>
+	* 
+	* @return Integer
+	*/
+  public int getWorkMonth() {
+    return this.workMonth;
+  }
+
+/**
+	* 工作月<br>
+	* 
+  *
+  * @param workMonth 工作月
+	*/
+  public void setWorkMonth(int workMonth) {
+    this.workMonth = workMonth;
+  }
+
+/**
+	* 工作季<br>
+	* 
+	* @return Integer
+	*/
+  public int getWorkSeason() {
+    return this.workSeason;
+  }
+
+/**
+	* 工作季<br>
+	* 
+  *
+  * @param workSeason 工作季
+	*/
+  public void setWorkSeason(int workSeason) {
+    this.workSeason = workSeason;
+  }
+
+/**
+	* 連同計件代碼<br>
+	* 同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算
+	* @return String
+	*/
+  public String getPieceCodeCombine() {
+    return this.pieceCodeCombine == null ? "" : this.pieceCodeCombine;
+  }
+
+/**
+	* 連同計件代碼<br>
+	* 同案件新貸件(代碼2&amp;B)於6個月內撥款，連同(代碼1&amp;A)計算
+  *
+  * @param pieceCodeCombine 連同計件代碼
+	*/
+  public void setPieceCodeCombine(String pieceCodeCombine) {
+    this.pieceCodeCombine = pieceCodeCombine;
   }
 
 /**
@@ -1331,139 +1575,6 @@ public class PfDetail implements Serializable {
   }
 
 /**
-	* 房貸專員<br>
-	* FacMain.BusinessOfficer 放款業務專員
-	* @return String
-	*/
-  public String getBsOfficer() {
-    return this.bsOfficer == null ? "" : this.bsOfficer;
-  }
-
-/**
-	* 房貸專員<br>
-	* FacMain.BusinessOfficer 放款業務專員
-  *
-  * @param bsOfficer 房貸專員
-	*/
-  public void setBsOfficer(String bsOfficer) {
-    this.bsOfficer = bsOfficer;
-  }
-
-/**
-	* 部室代號<br>
-	* 應以PfBsOfficer(房貸專員業績目標檔)計算業績
-	* @return String
-	*/
-  public String getBsDeptCode() {
-    return this.bsDeptCode == null ? "" : this.bsDeptCode;
-  }
-
-/**
-	* 部室代號<br>
-	* 應以PfBsOfficer(房貸專員業績目標檔)計算業績
-  *
-  * @param bsDeptCode 部室代號
-	*/
-  public void setBsDeptCode(String bsDeptCode) {
-    this.bsDeptCode = bsDeptCode;
-  }
-
-/**
-	* 房貸專員額度累計計算金額<br>
-	* 額度累計累計計算，追回未逾一個月即結清(含部分還款達60萬元)
-	* @return BigDecimal
-	*/
-  public BigDecimal getComputeBsAmtFac() {
-    return this.computeBsAmtFac;
-  }
-
-/**
-	* 房貸專員額度累計計算金額<br>
-	* 額度累計累計計算，追回未逾一個月即結清(含部分還款達60萬元)
-  *
-  * @param computeBsAmtFac 房貸專員額度累計計算金額
-	*/
-  public void setComputeBsAmtFac(BigDecimal computeBsAmtFac) {
-    this.computeBsAmtFac = computeBsAmtFac;
-  }
-
-/**
-	* 房貸專員件數<br>
-	* 依房貸專員額度累計計算金額計算，同一案件編號限一件
-	* @return BigDecimal
-	*/
-  public BigDecimal getBsPerfCnt() {
-    return this.bsPerfCnt;
-  }
-
-/**
-	* 房貸專員件數<br>
-	* 依房貸專員額度累計計算金額計算，同一案件編號限一件
-  *
-  * @param bsPerfCnt 房貸專員件數
-	*/
-  public void setBsPerfCnt(BigDecimal bsPerfCnt) {
-    this.bsPerfCnt = bsPerfCnt;
-  }
-
-/**
-	* 房貸專員業績金額<br>
-	* 依房貸專員額度累計計算金額計算
-	* @return BigDecimal
-	*/
-  public BigDecimal getBsPerfAmt() {
-    return this.bsPerfAmt;
-  }
-
-/**
-	* 房貸專員業績金額<br>
-	* 依房貸專員額度累計計算金額計算
-  *
-  * @param bsPerfAmt 房貸專員業績金額
-	*/
-  public void setBsPerfAmt(BigDecimal bsPerfAmt) {
-    this.bsPerfAmt = bsPerfAmt;
-  }
-
-/**
-	* 工作月<br>
-	* 
-	* @return Integer
-	*/
-  public int getWorkMonth() {
-    return this.workMonth;
-  }
-
-/**
-	* 工作月<br>
-	* 
-  *
-  * @param workMonth 工作月
-	*/
-  public void setWorkMonth(int workMonth) {
-    this.workMonth = workMonth;
-  }
-
-/**
-	* 工作季<br>
-	* 
-	* @return Integer
-	*/
-  public int getWorkSeason() {
-    return this.workSeason;
-  }
-
-/**
-	* 工作季<br>
-	* 
-  *
-  * @param workSeason 工作季
-	*/
-  public void setWorkSeason(int workSeason) {
-    this.workSeason = workSeason;
-  }
-
-/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1546,12 +1657,13 @@ public class PfDetail implements Serializable {
            + ", repayType=" + repayType + ", drawdownDate=" + drawdownDate + ", drawdownAmt=" + drawdownAmt + ", pieceCode=" + pieceCode + ", repaidPeriod=" + repaidPeriod + ", prodCode=" + prodCode
            + ", creditSysNo=" + creditSysNo + ", introducer=" + introducer + ", coorgnizer=" + coorgnizer + ", interviewerA=" + interviewerA + ", interviewerB=" + interviewerB + ", isReNewEmpUnit=" + isReNewEmpUnit
            + ", unitCode=" + unitCode + ", distCode=" + distCode + ", deptCode=" + deptCode + ", unitManager=" + unitManager + ", distManager=" + distManager + ", deptManager=" + deptManager
-           + ", computeItAmtFac=" + computeItAmtFac + ", itPerfCnt=" + itPerfCnt + ", itPerfEqAmt=" + itPerfEqAmt + ", itPerfReward=" + itPerfReward + ", itPerfAmt=" + itPerfAmt + ", itBonus=" + itBonus
-           + ", computeAddBonusAmt=" + computeAddBonusAmt + ", itAddBonus=" + itAddBonus + ", computeCoBonusAmt=" + computeCoBonusAmt + ", coorgnizerBonus=" + coorgnizerBonus + ", isProdFinancial=" + isProdFinancial + ", isIntroducerDay15=" + isIntroducerDay15
-           + ", isCoorgnizerDay15=" + isCoorgnizerDay15 + ", isProdExclude1=" + isProdExclude1 + ", isProdExclude2=" + isProdExclude2 + ", isProdExclude3=" + isProdExclude3 + ", isProdExclude4=" + isProdExclude4 + ", isProdExclude5=" + isProdExclude5
-           + ", isDeptExclude1=" + isDeptExclude1 + ", isDeptExclude2=" + isDeptExclude2 + ", isDeptExclude3=" + isDeptExclude3 + ", isDeptExclude4=" + isDeptExclude4 + ", isDeptExclude5=" + isDeptExclude5 + ", isDay15Exclude1=" + isDay15Exclude1
-           + ", isDay15Exclude2=" + isDay15Exclude2 + ", isDay15Exclude3=" + isDay15Exclude3 + ", isDay15Exclude4=" + isDay15Exclude4 + ", isDay15Exclude5=" + isDay15Exclude5 + ", bsOfficer=" + bsOfficer + ", bsDeptCode=" + bsDeptCode
-           + ", computeBsAmtFac=" + computeBsAmtFac + ", bsPerfCnt=" + bsPerfCnt + ", bsPerfAmt=" + bsPerfAmt + ", workMonth=" + workMonth + ", workSeason=" + workSeason + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", computeItAmtFac=" + computeItAmtFac + ", itPerfCnt=" + itPerfCnt + ", computeItAmt=" + computeItAmt + ", itPerfAmt=" + itPerfAmt + ", itPerfEqAmt=" + itPerfEqAmt + ", itPerfReward=" + itPerfReward
+           + ", computeItBonusAmt=" + computeItBonusAmt + ", itBonus=" + itBonus + ", computeAddBonusAmt=" + computeAddBonusAmt + ", itAddBonus=" + itAddBonus + ", computeCoBonusAmt=" + computeCoBonusAmt + ", coorgnizerBonus=" + coorgnizerBonus
+           + ", bsOfficer=" + bsOfficer + ", bsDeptCode=" + bsDeptCode + ", computeBsAmtFac=" + computeBsAmtFac + ", bsPerfCnt=" + bsPerfCnt + ", computeBsAmt=" + computeBsAmt + ", bsPerfAmt=" + bsPerfAmt
+           + ", workMonth=" + workMonth + ", workSeason=" + workSeason + ", pieceCodeCombine=" + pieceCodeCombine + ", isProdFinancial=" + isProdFinancial + ", isIntroducerDay15=" + isIntroducerDay15 + ", isCoorgnizerDay15=" + isCoorgnizerDay15
+           + ", isProdExclude1=" + isProdExclude1 + ", isProdExclude2=" + isProdExclude2 + ", isProdExclude3=" + isProdExclude3 + ", isProdExclude4=" + isProdExclude4 + ", isProdExclude5=" + isProdExclude5 + ", isDeptExclude1=" + isDeptExclude1
+           + ", isDeptExclude2=" + isDeptExclude2 + ", isDeptExclude3=" + isDeptExclude3 + ", isDeptExclude4=" + isDeptExclude4 + ", isDeptExclude5=" + isDeptExclude5 + ", isDay15Exclude1=" + isDay15Exclude1 + ", isDay15Exclude2=" + isDay15Exclude2
+           + ", isDay15Exclude3=" + isDay15Exclude3 + ", isDay15Exclude4=" + isDay15Exclude4 + ", isDay15Exclude5=" + isDay15Exclude5 + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

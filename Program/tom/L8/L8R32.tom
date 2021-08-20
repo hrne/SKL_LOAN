@@ -1,8 +1,8 @@
 L8r32TranKey=X,1
 L8r32CustId=X,10
 L8r32SubmitKey=X,3
-L8r32RcDate=9,7
 L8r32ChangePayDate=9,7
+L8r32RcDate=9,7
 L8r32ClosedDate=9,7
 L8r32ClosedResult=X,1
 L8r32OutJcicTxtDate=9,7

@@ -1,0 +1,15 @@
+OOFacmNo=9,3
+OOMailTypeCode=9,1
+OOMailDate=9,7
+OOMailObj=9,1
+OOCustName=X,100
+OODelvrYet=9,1
+OODelvrCode=9,1
+OOAddress=X,60
+OORemark=X,160
+OOEditEmpNo=X,6
+OOActSeq=X,20
+OOTitaTxtNo=X,8
+OOTitaTlrNo=X,6
+OOTitaAcDate=X,7
+OOEditEmpNoX=X,40

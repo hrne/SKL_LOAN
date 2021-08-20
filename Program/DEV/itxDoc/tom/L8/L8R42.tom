@@ -1,10 +1,8 @@
 L8r42TranKey=X,1
 L8r42CustId=X,10
 L8r42SubmitKey=X,3
-L8r42SubmitKeyX=X,80
 L8r42ApplyDate=9,7
-L8r42BankId=X,3
-L8r42BankIdX=X,80
+L8r42CourtCode=X,3
 L8r42CustRegAddr=X,76
 L8r42CustComAddr=X,76
 L8r42CustRegTelNo=X,16
