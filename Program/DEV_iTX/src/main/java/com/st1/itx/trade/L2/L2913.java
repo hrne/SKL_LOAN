@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -16,21 +15,15 @@ import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClStockService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * END=X,1<br>
- */
+
 
 @Service("L2913")
 @Scope("prototype")
@@ -70,7 +63,6 @@ public class L2913 extends TradeBuffer {
 		this.info("active L2913 ");
 		this.totaVo.init(titaVo);
 
-		// tita
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
@@ -84,8 +76,6 @@ public class L2913 extends TradeBuffer {
 		ClStock tClStock = new ClStock();
 		CdCity tCdCity = new CdCity();
 
-		// new arraylist
-		List<CdCity> lCdCity = new ArrayList<CdCity>();
 
 		// 組PK
 		// ClMain
@@ -134,8 +124,7 @@ public class L2913 extends TradeBuffer {
 		this.totaVo.putParam("OYdClosingPrice", tClStock.getYdClosingPrice());
 		this.totaVo.putParam("OThreeMonthAvg", tClStock.getThreeMonthAvg());
 		this.totaVo.putParam("OEvaUnitPrice", tClStock.getEvaUnitPrice());
-//		this.totaVo.putParam("OOwnerId", tClStock.getOwnerId());
-//		this.totaVo.putParam("OOwnerName", tClStock.getOwnerName());
+
 		CustMain custMain = sCustMainService.findById(tClStock.getOwnerCustUKey(), titaVo);
 		if (custMain != null) {
 			this.totaVo.putParam("OOwnerId", custMain.getCustId());

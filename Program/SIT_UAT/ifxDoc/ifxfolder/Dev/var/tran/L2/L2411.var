@@ -42,7 +42,6 @@ E(0,40)ASGN(INQPRT$)
 ["#FdColInd1+擔保品代號1",#ClCode1,#ClCode1X],["#FdColInd2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdCOLNO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
 [#<->#,"#FdSubType+擔保品類別",#ClTypeCode,#ClTypeCodeX],
-! [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#Btn5,"@",#Btn6,"@",#Btn7,"@",#BtnExpand],
 [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#Btn5,"@",#Btn6,"@",#BtnExpand],
 [#<->#,"#FdADDRESS_1+建物門牌",#CityCode,#CityItem,"（縣／市）</BR>",
                               #AreaCode,#AreaItem,"（鄉／鎮／市／區）</BR>",
@@ -102,7 +101,6 @@ T(3,與授信用關係)
 #Btn4=X,4,I,ui:button;value:抵押;enable:1;tabbable:0
 #Btn5=X,4,I,ui:button;value:處分;enable:1;tabbable:0
 #Btn6=X,4,I,ui:button;value:設定;enable:1;tabbable:0
-! #Btn7=X,4,I,ui:button;value:他項權利;enable:1;tabbable:0
 #BtnExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:0
 #BTN1=X,15,I,ui:button;value:保險/鑑定公司查詢;enable:1;tabbable:0;
 #BTN8=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
@@ -124,9 +122,6 @@ BIND(#Btn5,click, {cmd=CALLSEND;DOCODE=Show5})
 
 #Bind6=X,1,S
 BIND(#Btn6,click, {cmd=CALLSEND;DOCODE=Show6})
-
-! #Bind7=X,1,S
-! BIND(#Btn7,click, {cmd=CALLSEND;DOCODE=Show7})
 
 #PageFg=A,1,S
 E(0,0)
@@ -161,10 +156,6 @@ CALL(#ResetPages)
 IF(#PageFg==6,E(0,@PageFg,0),E(0,@PageFg,6))
 CALL(#ResetPages)
 
-! 顯示第7頁
-! #Show7=@,1,S
-! IF(#PageFg==7,E(0,@PageFg,0),E(0,@PageFg,7))
-! CALL(#ResetPages)
 
 ! 展開全部頁籤
 #Expand=@,1,S
@@ -180,7 +171,6 @@ C(3,#PageFg,3,K(LIGHT,#Btn3,TXTRED,0),K(LIGHT,#Btn3,TXTRED,-1))
 C(3,#PageFg,4,K(LIGHT,#Btn4,TXTRED,0),K(LIGHT,#Btn4,TXTRED,-1))
 C(3,#PageFg,5,K(LIGHT,#Btn5,TXTRED,0),K(LIGHT,#Btn5,TXTRED,-1))
 C(3,#PageFg,6,K(LIGHT,#Btn6,TXTRED,0),K(LIGHT,#Btn6,TXTRED,-1))
-! C(3,#PageFg,7,K(LIGHT,#Btn7,TXTRED,0),K(LIGHT,#Btn7,TXTRED,-1))
 C(3,#PageFg,8,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
 
 
@@ -193,7 +183,6 @@ SWITCH(#PageFg,1,CALL(#checkclcode),
                 4,INVOKEJS(SHOW,p1,15,27,1),
                 5,INVOKEJS(SHOW,p1,28,31,1),
                 6,INVOKEJS(SHOW,p1,32,37,1),
-               !  7,INVOKEJS(SHOW,p1,35,38,1),
                 8,INVOKEJS(SHOW,p1,9,37,1)
                 CALL(#checkclcode),
                 $)
@@ -253,8 +242,6 @@ T(3,CdCode.ClTypeCode22)
 #ClTypeCode22Help=x,1024,S
 
 #CDDEF05=x,20,S
-!T(3,CdCode.RelationCode)
-! T(3,CdCode.GuaTypeCode)
 T(3,CdGuarantor)
 
 
@@ -424,7 +411,6 @@ E(0,@RentEvaValue,0)
 E(0,@RentPrice,0)
 E(0,@OwnershipCode,0)
 E(0,@MtgCode,0)
-! T(3,@CB1,)
 T(3,@MtgCheck,)
 T(3,@MtgLoan,)
 T(3,@MtgPledge,)
@@ -519,7 +505,6 @@ T(F,@RentPrice,0)
 T(F,@EvaCompany,0)
 T(F,@OwnershipCode,0)
 T(F,@MtgCode,0)
-! T(F,@CB1,0)
 T(F,@MtgCheck,0)
 T(F,@MtgLoan,0)
 T(F,@MtgPledge,0)
@@ -582,7 +567,6 @@ T(F,@RentPrice,1)
 T(F,@EvaCompany,1)
 T(F,@OwnershipCode,1)
 T(F,@MtgCode,1)
-! T(F,@CB1,1)
 T(F,@MtgCheck,1)
 T(F,@MtgLoan,1)
 T(F,@MtgPledge,1)
@@ -815,8 +799,7 @@ T(2,@ThirdCreditor,#L2r23ThirdCreditor)
 IF(#L2r23MtgCheck == "Y",$,s)
 IF(#L2r23MtgLoan == "Y",$,s)
 IF(#L2r23MtgPledge == "Y",$,s)
-T(3,@LastCB1,Y)
-! T(3,@CB1,Y)
+T(3,@LastCB1,Y
 
 
 !RIM取擔保主檔(不動產)
@@ -850,8 +833,6 @@ E(0,@BdNo2,#L2r27BdNo2)
 ##loop{times:10,i:1}
 T(2,@OwnerId{i},#L2r27OwnerId{i})
 T(2,@OwnerName{i},#L2r27OwnerName{i})
-!T(1,@OwnerNameA{i},#L2r27OwnerName{i},1,50)
-!T(1,@OwnerNameB{i},#L2r27OwnerName{i},51,50)
 T(2,@OwnerRelCode{i},#L2r27OwnerRelCode{i})
 E(0,@OwnerPart{i},#L2r27OwnerPart{i})
 E(0,@OwnerTotal{i},#L2r27OwnerTotal{i})
@@ -882,8 +863,6 @@ E(0,@LandNo2,#L2r28LandNo2)
 ##loop{times:10,i:1}
 T(2,@OwnerId{i},#L2r28OwnerId{i})
 T(2,@OwnerName{i},#L2r28OwnerName{i})
-!T(1,@OwnerNameA{i},#L2r28OwnerName{i},1,50)
-!T(1,@OwnerNameB{i},#L2r28OwnerName{i},51,50)
 T(2,@OwnerRelCode{i},#L2r28OwnerRelCode{i})
 E(0,@OwnerPart{i},#L2r28OwnerPart{i})
 E(0,@OwnerTotal{i},#L2r28OwnerTotal{i})
@@ -1262,14 +1241,6 @@ V(7)A(ID_UNINO,0,#OwnerId{i})
 #tt{i}=X,1,S
 C(4,#CustId,T(F,#OwnerRelCode{i},0),C(5,#OwnerId{i},#CustId,T(F,#OwnerRelCode{i},0),T(F,#OwnerRelCode{i},1)))
 
-! #RimL1r09{i}=X,1,S
-! E(0,@RimFunCd,5)
-! T(2,@RimCustId,#OwnerId{i})
-! E(0,@RimCustNo,0)
-! RESET_RIM(#RimL1r09{i},L1R09)
-! S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
-! R(1,L1R09)
-
 !RIM取擔保主檔
 #RimL2r43{i}=X,1,S
 C(4,#OwnerId{i},S,$)
@@ -1290,8 +1261,6 @@ C(3,#ClCode1,1,T(B,#clcode1txt1+#L2r43ClNo+#clcode1txt2),
 #CheckL2R43{i}=X,1,S
 C(4,#OwnerId{i},S,$)
 T(2,@OwnerName{i},#L2r43CustName)
-!T(1,@OwnerNameA{i},#L2r43CustName,1,50)
-!T(1,@OwnerNameB{i},#L2r43CustName,51,50)
 C(3,#L2r43ClNo,0,$,V(P,#CheckClno{i}))
 
 ! T(2,@OwnerName{i},#L1r09CustName)
@@ -1303,20 +1272,6 @@ IF(#FunCd==4,s,$)
 C(4,#L2r43CustName,$,s)
 C(4,#OwnerId{i},S,$)
 
-!#OwnerNameA{i}=c,50,I
-!IF(#PageFg==2,$,CALL(#Show2))
-!IF(#FunCd==4,s,$)
-!C(4,#L2r43CustName,$,s)
-!C(4,#OwnerId{i},S,$)
-!
-!#OwnerNameB{i}=c,50,I
-!IF(#PageFg==2,$,CALL(#Show2))
-!IF(#FunCd==4,s,$)
-!C(4,#L2r43CustName,$,s)
-!C(4,#OwnerId{i},S,$)
-
-!#OwnerName{i}=c,100,S
-!T(B,#OwnerNameA{i}+#OwnerNameB{i})
 
 ! [建物所有權人-持份比率(分子)]
 #OwnerPart{i}=m,10,I
@@ -1342,7 +1297,6 @@ C(4,#CustId,S,$)
 C(5,#OwnerId{i},#CustId,S,$)
 HELP(#RelationCodeHelp)
 @V(7)
-! V(H,#RelationCodeHelp)
 IF(#OwnerRelCode{i}==#L2r27OwnerRelCode{i}||#OwnerRelCode{i}==#L2r28OwnerRelCode{i},$,V(H,#RelationCodeHelp))
 
 
@@ -1465,7 +1419,7 @@ C(3,#MtgCode,0,T(3,@MtgCheck,Y)T(3,@MtgLoan,Y)T(3,@MtgPledge,Y),T(3,@MtgCheck,N)
 
 #MtgCodeX=X,30,L
 T(3,)T(H,#MtgCode,#MtgCodeHelp)
-!C(3,#MtgCode,1,INVOKEJS(SHOW,p1,18,21,0),INVOKEJS(SHOW,p1,18,21,1))
+
 
 #LastCB1=X,1,L
 
@@ -1473,18 +1427,6 @@ T(3,)T(H,#MtgCode,#MtgCodeHelp)
 #CheckAllFg=A,1,S
 
 #FdCB=X,2,L
-! [最高限額抵押權之擔保債權種類]
-! #CB1=X,1,I,ui:checkbox;value:;
-! IF(#FunCd==4,s,$)
-! IF(#MtgCode==1,S,$)
-! @C(4,#CB1,$,T(3,Y))
-! IF(#LastCB1==#CB1,s,$)
-! C(4,#CB1,T(3,@MtgCheck, ),T(3,@MtgCheck,Y))
-! C(4,#CB1,T(3,@MtgLoan, ),T(3,@MtgLoan,Y))
-! C(4,#CB1,T(3,@MtgPledge, ),T(3,@MtgPledge,Y))
-
-! #CbAft=X,1,S
-! T(2,@LastCB1,#CB1)
 #FdMtgCheck=X,2,L
 #FdMtgLoan=X,2,L
 #FdMtgPledge=X,2,L
@@ -1519,9 +1461,7 @@ T(3,)T(H,#MtgPledge,#YNHelp)
 
 #AfterCheck=X,1,S
 C(4,#AfterCheck,T(3,X),T(3, ))
-! C(4,#MtgCheck,T(3,#CB1, ),$)
-! C(4,#MtgLoan,T(3,#CB1, ),$)
-! C(4,#MtgPledge,T(3,#CB1, ),$)
+
 
 #FdClStatus=X,2,L
 ![擔保品狀況碼]
@@ -1660,7 +1600,7 @@ HELP(#MtgReasonCodeHelp)
 @V(H,#MtgReasonCodeHelp)
 IF(#MtgReasonCode=="",T(3,@FdReceivedNo, ),T(3,@FdReceivedNo,*))
 IF(#MtgReasonCode=="",T(3,@FdCancelNo, ),T(3,@FdCancelNo,*))
-! IF(#MtgReasonCode=="",INVOKEJS(SHOW,p1,25,26,0),INVOKEJS(SHOW,p1,25,26,1))
+
 
 #MtgReasonCodeX=X,32,L
 T(3,)T(H,#MtgReasonCode,#MtgReasonCodeHelp)
@@ -1812,53 +1752,7 @@ IF(#SettingSeq>=4,$,S)
 @V(7)
 
 #FdThirdCreditor=X,2,L
-! #City0=X,6,S
-! !----他項權利
-! ##loop{times:20,h:0,i:1,j:2,rowSeq:3}
 
-! !縣市
-! #City{i}=x,6,I
-! IF(#PageFg==7,$,CALL(#Show7))
-! INVOKEJS(SHOW,grd4_{rowSeq},1)
-! IF({i}>1,C(4,#City{h},C(4,#City{i},INVOKEJS(SHOW,grd4_{rowSeq},0),$),$),$)
-! IF({i}>1,C(4,#City{h},C(4,#City{i},S,$),$),$)
-! @C(4,#City{i},INVOKEJS(SHOW,grd4_{rowSeq},0),INVOKEJS(SHOW,grd4_{rowSeq},1))
-! IF({i}>1||{i}<20,C(4,#City{j},C(4,#City{i},S,$),$),$)
-
-! !地政
-! #LandAdm{i}=x,6,I
-! C(4,#City{i},S,$)
-! IF(#PageFg==7,$,CALL(#Show7))
-
-! !收件年
-! #RecYear{i}=A,3,I
-! C(4,#City{i},S,$)
-! IF(#PageFg==7,$,CALL(#Show7))
-
-! !收件字
-! #RecWord{i}=x,8,I
-! C(4,#City{i},S,$)
-! IF(#PageFg==7,$,CALL(#Show7))
-
-! !收件號
-! #RecNumber{i}=X,6,I
-! C(4,#City{i},S,$)
-! IF(#PageFg==7,$,CALL(#Show7))
-
-
-! !權利價值說明
-! #RightsNote{i}=x,20,I
-! C(4,#City{i},S,$)
-! IF(#PageFg==7,$,CALL(#Show7))
-! HELP(本金最高限額新台幣:;最高限額新台幣:)
-
-! !擔保債權總金額
-! #SecuredTotal{i}=m,14,I
-! C(4,#City{i},S,$)
-! IF(#PageFg==7,$,CALL(#Show7))
-
-
-! ##end
 !---- Expand 展開
 
 #ShowAll=X,1,S

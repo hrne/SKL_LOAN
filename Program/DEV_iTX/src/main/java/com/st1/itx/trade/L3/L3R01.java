@@ -34,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R01")
 @Scope("prototype")
 public class L3R01 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3R01.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -75,9 +74,8 @@ public class L3R01 extends TradeBuffer {
 		}
 
 		// 查詢未齊件管理檔
-		LoanNotYet tLoanNotYet = loanNotYetService.findById(new LoanNotYetId(iRimCustNo, iRimFacmNo, iRimNotYetCode),
-				titaVo);
-		
+		LoanNotYet tLoanNotYet = loanNotYetService.findById(new LoanNotYetId(iRimCustNo, iRimFacmNo, iRimNotYetCode), titaVo);
+
 		// 新增時,有資料時顯示錯誤訊息
 		if (iFunCd == 1) {
 			if (tLoanNotYet != null) {
@@ -85,16 +83,14 @@ public class L3R01 extends TradeBuffer {
 			}
 		} else if (iFunCd == 2) {
 			if (tLoanNotYet == null) {
-				throw new LogicException(titaVo, "E0003",
-						"戶號 = " + iRimCustNo + "額度編號 = " + iRimFacmNo + " 未齊件代號 = " + iRimNotYetCode); // 修改資料不存在
+				throw new LogicException(titaVo, "E0003", "戶號 = " + iRimCustNo + "額度編號 = " + iRimFacmNo + " 未齊件代號 = " + iRimNotYetCode); // 修改資料不存在
 			} else {
 				wkYetDate = tLoanNotYet.getYetDate();
 				wkCloseDate = tLoanNotYet.getCloseDate();
 			}
 		} else if (iFunCd >= 4) {
 			if (tLoanNotYet == null) {
-				throw new LogicException(titaVo, "E0001",
-						"戶號 = " + iRimCustNo + "額度編號 = " + iRimFacmNo + " 未齊件代號 = " + iRimNotYetCode); // 查詢資料不存在
+				throw new LogicException(titaVo, "E0001", "戶號 = " + iRimCustNo + "額度編號 = " + iRimFacmNo + " 未齊件代號 = " + iRimNotYetCode); // 查詢資料不存在
 			} else {
 
 				wkYetDate = tLoanNotYet.getYetDate();
@@ -102,17 +98,21 @@ public class L3R01 extends TradeBuffer {
 			}
 		}
 
-
 		this.totaVo.putParam("OYetDays", wkYetDays);
 		this.totaVo.putParam("OYetDate", wkYetDate);
 		this.totaVo.putParam("OCloseDate", wkCloseDate);
 
-		if(tLoanNotYet.getReMark() != null) {
-			this.totaVo.putParam("OReMark", tLoanNotYet.getReMark());
+		if(tLoanNotYet != null) {
+			if (tLoanNotYet.getReMark() != null) {
+				this.totaVo.putParam("OReMark", tLoanNotYet.getReMark());
+			} else {
+				this.totaVo.putParam("OReMark", "");
+			}
 		} else {
 			this.totaVo.putParam("OReMark", "");
 		}
 		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

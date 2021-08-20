@@ -79,7 +79,7 @@ public class L2038 extends TradeBuffer {
 
 		// *** 折返控制相關 ***
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 40; // 129 * 400 = 51600
+		this.limit = 10; // 129 * 400 = 51600
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
@@ -91,22 +91,8 @@ public class L2038 extends TradeBuffer {
 			throw new LogicException("E0013", "L2038");
 
 		}
-
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-//		if (resultList != null && resultList.size() >= this.limit) {
-//			titaVo.setReturnIndex(this.setIndexNext());
-			/* 手動折返 */
-//			this.totaVo.setMsgEndToEnter();
-//		}
 		
 		if (resultList != null && resultList.size() > 0) {
-
-//			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-//			if (resultList.size() == this.limit) {
-//				titaVo.setReturnIndex(this.setIndexNext());
-//				/* 手動折返 */
-//				this.totaVo.setMsgEndToEnter();
-//			}
 			
 			int TempClCode1 = 0;
 			int TempClCode2 = 0;
@@ -117,9 +103,7 @@ public class L2038 extends TradeBuffer {
 				// new occurs
 				OccursList occurslist = new OccursList();
 				
-//				if( TempClCode1 != parse.stringToInteger(result.get("F4")) 
-//						|| TempClCode2 != parse.stringToInteger(result.get("F5")) 
-//						|| TempClNo != parse.stringToInteger(result.get("F6"))) { 				
+			
 					occurslist.putParam("OOApproveNo", result.get("F0"));
 					occurslist.putParam("OOFacmNo", result.get("F1"));
 					occurslist.putParam("OOCustId", result.get("F2"));				
@@ -134,7 +118,7 @@ public class L2038 extends TradeBuffer {
 					
 					occurslist.putParam("OONewNote", result.get("F7"));
 					occurslist.putParam("OOClTypeCode", result.get("F8"));
-//					occurslist.putParam("OOOwnerId", result.get("F9"));
+
 					
 					occurslist.putParam("OOOwnerId", "");
 					occurslist.putParam("OOOwnerName", "");
@@ -196,26 +180,15 @@ public class L2038 extends TradeBuffer {
 						occurslist.putParam("OOFlag", "Y");
 					} else {
 						occurslist.putParam("OOFlag", " ");
-					}
-					
-					
-					
-					
-					
-					
+					}	
 					
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occurslist);
 					
-//					/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-//					if (resultList.size() == this.limit) {
-//						titaVo.setReturnIndex(this.setIndexNext());
-//						/* 手動折返 */
-//						this.totaVo.setMsgEndToEnter();
-//					}
+
 				}
 			}
-//		}
+
 
 		List<LinkedHashMap<String, String>> chkOccursList = this.totaVo.getOccursList();
 

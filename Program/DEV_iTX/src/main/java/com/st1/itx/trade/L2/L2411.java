@@ -32,11 +32,10 @@ import com.st1.itx.db.domain.ClLandOwner;
 import com.st1.itx.db.domain.ClLandOwnerId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.ClOwnerRelation;
 import com.st1.itx.db.domain.ClOwnerRelationId;
-import com.st1.itx.db.service.ClOwnerRelationService;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdClService;
@@ -47,6 +46,7 @@ import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.ClMainService;
+import com.st1.itx.db.service.ClOwnerRelationService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
@@ -57,47 +57,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FUNCD=9,1<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * SUBTYPE=X,3<br>
- * COLKIND=9,2<br>
- * VALUEDT=9,7<br>
- * VALUETOTAL=X,14<br>
- * NETWORTH=X,14<br>
- * LVITAX=X,14<br>
- * RENTNET=X,14<br>
- * RENTAMT=X,14<br>
- * APPRID=X,20<br>
- * OWNERSHIP=9,1<br>
- * MORTGAGE=9,1<br>
- * CB_1=X,1<br>
- * CB_2=X,1<br>
- * CB_3=X,1<br>
- * CB_4=X,1<br>
- * COLSTATUS=9,1<br>
- * AGREEMENT=X,1<br>
- * LIMITCANCELDT=9,7<br>
- * GUAIND=9,1<br>
- * LOANPER=9,3.2<br>
- * OTHEROWNERAMT=X,14<br>
- * COMPENSATIONCOPY=9,1<br>
- * BUILDINGREMARK=X,20<br>
- * COLFAC=X,3<br>
- * INTERSYNDLOAN=X,1<br>
- * INTERSYNDTYPE=X,1<br>
- * DISPOSITIONPRICE=X,14<br>
- * DISPOSITIONDT=9,7<br>
- * MORTGAGEREASON=X,1<br>
- * REC_DT=9,7<br>
- * REC_NO=X,20<br>
- * CANCEL_DT=9,7<br>
- * CANCEL_NO=X,20<br>
- * END=X,1<br>
- */
 
 @Service("L2411")
 @Scope("prototype")
@@ -300,16 +259,7 @@ public class L2411 extends TradeBuffer {
 
 		if (tClMain == null) {
 			if (iFunCd == 1) {
-				// 依照使用者輸入之統編或戶號取得客戶識別碼
-//				if (!iCustId.isEmpty()) {
-//					tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
-//				} else if (iCustNo > 0) {
-//					tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
-//				}
-//				if (tCustMain == null) {
-				// 查無客戶資料
-//					throw new LogicException("E0001", "CustId=" + iCustId + ", CustNo=" + iCustNo);
-//				}
+
 				// 擔保品主檔
 				this.info("ClMainId1 = " + ClMainId);
 
@@ -679,7 +629,6 @@ public class L2411 extends TradeBuffer {
 		tClMain.setClCode1(iClCode1);
 		tClMain.setClCode2(iClCode2);
 		tClMain.setClNo(iClNo);
-//		tClMain.setCustUKey(custUKey);
 		tClMain.setClTypeCode(titaVo.getParam("ClTypeCode"));
 		tClMain.setCityCode(titaVo.getParam("CityCode"));
 		tClMain.setAreaCode(titaVo.getParam("AreaCode"));
@@ -844,8 +793,6 @@ public class L2411 extends TradeBuffer {
 			tClBuildingOwner.setClCode1(iClCode1);
 			tClBuildingOwner.setClCode2(iClCode2);
 			tClBuildingOwner.setClNo(iClNo);
-//			tClBuildingOwner.setOwnerId(iOwnerId);
-//			tClBuildingOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
 			tClBuildingOwner.setOwnerRelCode(titaVo.getParam("OwnerRelCode" + i));
 			tClBuildingOwner.setOwnerPart(parse.stringToBigDecimal(titaVo.getParam("OwnerPart" + i)));
 			tClBuildingOwner.setOwnerTotal(parse.stringToBigDecimal(titaVo.getParam("OwnerTotal" + i)));
@@ -933,8 +880,6 @@ public class L2411 extends TradeBuffer {
 			tClLandOwner.setClCode2(iClCode2);
 			tClLandOwner.setClNo(iClNo);
 			tClLandOwner.setLandSeq(0);
-//			tClLandOwner.setOwnerId(iOwnerId);
-//			tClLandOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
 			tClLandOwner.setOwnerRelCode(titaVo.getParam("OwnerRelCode" + i));
 			tClLandOwner.setOwnerPart(parse.stringToBigDecimal(titaVo.getParam("OwnerPart" + i)));
 			tClLandOwner.setOwnerTotal(parse.stringToBigDecimal(titaVo.getParam("OwnerTotal" + i)));

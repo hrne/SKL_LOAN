@@ -580,14 +580,13 @@ C(3,#FunCd,1,$,s)
 HELP(#ClTypeCode3Help)
 @IF(#FunCd == 1,$,s)
 V(H,#ClTypeCode3Help)
-! IF(#ClCode1==3,V(H,#ClTypeCode23Help),V(H,#ClTypeCode24Help))
+
 
 #FdCOL_TYPE=X,2,L
 
 #ClTypeCodeX=X,30,L
 T(H,#ClTypeCode,#ClTypeCode3Help)
-! IF(#ClCode1==3,T(H,#ClTypeCode,#ClTypeCode23Help),
-!                T(H,#ClTypeCode,#ClTypeCode24Help))
+
 
 !調RIM參數
 

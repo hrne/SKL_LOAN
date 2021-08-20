@@ -3790,6 +3790,8 @@ TXFORM=L3R08
 #L3r09IndividualIncr=n,2.4,S
 #L3r09FitRate=n,2.4,S
 #L3r09Remark=X,60,S
+#L3r09FacProdNo=X,5,S
+#L3r09FacBaseRateCode=X,2,S
 </L3R09.dec>
 
 <L3R09.tom>
@@ -3807,6 +3809,8 @@ TXFORM=L3R09
 #L3r09IndividualIncr
 #L3r09FitRate
 #L3r09Remark
+#L3r09FacProdNo
+#L3r09FacBaseRateCode
 ^
 </L3R09.tom>
 
@@ -7160,7 +7164,7 @@ TXFORM=L8R41
 #L8r42CustId=X,10,S
 #L8r42SubmitKey=X,3,S
 #L8r42ApplyDate=D,7,S
-#L8r42BankId=X,3,S
+#L8r42CourtCode=X,3,S
 #L8r42CustRegAddr=X,76,S
 #L8r42CustComAddr=X,76,S
 #L8r42CustRegTelNo=X,16,S
@@ -7175,7 +7179,7 @@ TXFORM=L8R42
 #L8r42CustId
 #L8r42SubmitKey
 #L8r42ApplyDate
-#L8r42BankId
+#L8r42CourtCode
 #L8r42CustRegAddr
 #L8r42CustComAddr
 #L8r42CustRegTelNo
@@ -7184,7 +7188,6 @@ TXFORM=L8R42
 #L8r42OutJcicTxtDate
 ^
 </L8R42.tom>
-
 <L8R43.dec>
 #L8r43TranKey=X,1,S
 #L8r43CustId=X,10,S

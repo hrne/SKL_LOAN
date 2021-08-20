@@ -308,22 +308,6 @@ C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L1R09.dec"/>
 
-!#RimL1R09=X,1,S
-!IF(#FunCd==1,$,S)
-!T(2,@RimCustId,#CustId)
-!E(0,@RimCustNo,#CustNo)
-!E(0,@RimFunCd,1)
-!RESET_RIM(#RimL1R09,L1R09)
-!S(L1R09,1,#RimCustId,#RimCustNo,#RimFunCd)
-!R(1,L1R09)
-
-! #BEFORE_COL_NO=X,1,S
-! INVOKEJS(SHOW,p1,5,5,1)
-! IF(#FunCd==1,$,S)
-! E(0,@ClNo,0)
-! INVOKEJS(SHOW,p1,5,5,0)
-
-
 #BUF1=X,14,S
 T(2,00000019999999)
 
@@ -516,12 +500,6 @@ IF(#ClTypeCode >= 998,T(2,@FdPledgeNO,*),T(2,@FdPledgeNO,))
 !有價證券記號
 #PHFG=X,1,S
 IF(#ClTypeCode=="101" ||#ClTypeCode=="102" ||#ClTypeCode=="103" ||#ClTypeCode=="110" ||#ClTypeCode=="130" ||#ClTypeCode=="1E1" ,E(0,1),E(0,0))
-! C(5,#ClTypeCode,101,E(0,1),E(0,0))
-! C(5,#ClTypeCode,102,E(0,1),E(0,0))
-! C(5,#ClTypeCode,103,E(0,1),E(0,0))
-! C(5,#ClTypeCode,110,E(0,1),E(0,0))
-! C(5,#ClTypeCode,130,E(0,1),E(0,0))
-! C(5,#ClTypeCode,1E1,E(0,1),E(0,0))
 INVOKEJS(SHOW,p1,17,28,#PHFG)
 
 
@@ -535,7 +513,7 @@ IF(#ClTypeCode >= 998,T(2,@FdEvaAmt,),T(2,@FdEvaAmt,*))
 
 #ClTypeItem=X,50,L
 T(H,#ClTypeCode,#ClTypeCodeHelp)
-! C(4,#ClTypeCode,S,$)T(A,#ClTypeCode,L2DEF,ClOtherTypeCodeDef,ClOtherTypeCode,ClOtherTypeCodeX)
+
 
 <include src="ROM.icf::L6R03.dec"/>
 
@@ -646,7 +624,7 @@ R(1,L1R09)
 
 #CheckL1R09=X,1,S
 C(4,#L1r09CustName,$,T(2,@OwnerName,#L1r09CustName))
-! C(4,#OwnerName,$,S)
+
 
 
 ! [所有權人姓名]
@@ -930,14 +908,12 @@ IF(#FunCd==4,s,$)
 IF(#Synd=="Y",$,S)
 HELP(#SyndCodeHelp)
 @V(H,#SyndCodeHelp)
-! @IF(#Synd=="Y",$,S)
-! V(1,1,2)
 
 #FdSyndCode=X,2,L
 
 #SyndCodeX=X,6,L
 T(H,#SyndCode,#SyndCodeHelp)
-! SWITCH(#SyndCode,1,T(3,主辦行),2,T(3,參貸行),T(3,))
+
 
 ! [處分價格]
 #DispPrice=m,14,I

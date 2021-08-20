@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -24,13 +23,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L2912")
 @Scope("prototype")
@@ -71,7 +63,6 @@ public class L2912 extends TradeBuffer {
 		this.info("active L2912 ");
 		this.totaVo.init(titaVo);
 
-		// tita
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
@@ -124,7 +115,7 @@ public class L2912 extends TradeBuffer {
 
 		// 地區別中文
 		CdCity tCdCity = new CdCity();
-		List<CdCity> lCdCity = new ArrayList<CdCity>();
+
 		/* 取縣市名稱 */
 		if (tClMain.getCityCode() != null) {
 			tCdCity = cdCityService.findById(tClMain.getCityCode(), titaVo);
@@ -139,8 +130,6 @@ public class L2912 extends TradeBuffer {
 		this.totaVo.putParam("OCityCodeX", tCdCity.getCityItem());
 		this.totaVo.putParam("OClTypeCode", tClMain.getClTypeCode());
 		
-//		this.totaVo.putParam("OOwnerId", tClMovables.getOwnerId());
-//		this.totaVo.putParam("OOwnerName", tClMovables.getOwnerName());
 		CustMain custMain = sCustMainService.findById(tClMovables.getOwnerCustUKey(), titaVo);
 		if (custMain != null) {
 			this.totaVo.putParam("OOwnerId", custMain.getCustId());
@@ -163,15 +152,9 @@ public class L2912 extends TradeBuffer {
 		this.totaVo.putParam("OLicenseTypeCode", tClMovables.getLicenseTypeCode());
 		this.totaVo.putParam("OLicenseUsageCode", tClMovables.getLicenseUsageCode());
 		this.totaVo.putParam("OLiceneIssueDate", tClMovables.getLiceneIssueDate());
-//		if (tClMovables.getMfgYearMonth() > 0) {
-//			if (tClMovables.getMfgYearMonth() > 191100) {
+
 		this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth() - 191100);
-//			} else {
-//				this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth());
-//			}
-//		} else {
-//			this.totaVo.putParam("OMfgYearMonth", tClMovables.getMfgYearMonth());
-//		}
+
 		this.totaVo.putParam("OVehicleTypeCode", tClMovables.getVehicleTypeCode());
 		this.totaVo.putParam("OVehicleStyleCode", tClMovables.getVehicleStyleCode());
 		this.totaVo.putParam("OVehicleOfficeCode", tClMovables.getVehicleOfficeCode());

@@ -52,7 +52,6 @@ import com.st1.itx.db.service.CustMainService;
  * @version 1.0.0
  */
 public class L5971 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5971.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegMainService sNegMainService;
@@ -208,9 +207,11 @@ public class L5971 extends TradeBuffer {
 				TestFinnd++;
 			}
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			if (slNegTrans != null && slNegTrans.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
 			// this.totaVo.setMsgEndToAuto();// 自動折返
 			this.totaVo.setMsgEndToEnter();// 手動折返
+			}
 
 			if (TestFinnd == 0) {
 				throw new LogicException(titaVo, "E0001", "債務協商案件主檔");

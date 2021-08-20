@@ -15,10 +15,10 @@ import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClOther;
 import com.st1.itx.db.domain.ClOtherId;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClOtherService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -56,7 +56,6 @@ public class L2914 extends TradeBuffer {
 		this.info("active L2914 ");
 		this.totaVo.init(titaVo);
 
-		// tita
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
@@ -143,8 +142,7 @@ public class L2914 extends TradeBuffer {
 		this.totaVo.putParam("OPledgeEndDate", tClOther.getPledgeEndDate());
 		this.totaVo.putParam("OPledgeBankCode", tClOther.getPledgeBankCode());
 		this.totaVo.putParam("OPledgeNO", tClOther.getPledgeNO());
-//		this.totaVo.putParam("OOwnerId", tClOther.getOwnerId());
-//		this.totaVo.putParam("OOwnerName", tClOther.getOwnerName());
+		
 		CustMain custMain = sCustMainService.findById(tClOther.getOwnerCustUKey(), titaVo);
 		if (custMain != null) {
 			this.totaVo.putParam("OOwnerId", custMain.getCustId());

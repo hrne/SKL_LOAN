@@ -23,23 +23,16 @@ import com.st1.itx.db.domain.ClLandReasonId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandReasonService;
 import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.ClMainService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * COL_IND1=9,1<br>
- * COL_IND2=9,2<br>
- * COL_NO=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L2416")
 @Scope("prototype")
@@ -108,7 +101,7 @@ public class L2416 extends TradeBuffer {
 			this.isEloan = true;
 		}
 
-		// tita
+		
 		iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
@@ -126,8 +119,7 @@ public class L2416 extends TradeBuffer {
 		clMainId.setClCode1(iClCode1);
 		clMainId.setClCode2(iClCode2);
 		clMainId.setClNo(iClNo);
-// eric 20210422 findbyid > holdbyid
-//		tClMain = sClMainService.findById(clMainId, titaVo);
+
 		tClMain = sClMainService.holdById(clMainId, titaVo);
 		if (tClMain == null) {
 			throw new LogicException("E0019", "應先輸入L2411"); // 輸入資料錯誤
@@ -210,7 +202,6 @@ public class L2416 extends TradeBuffer {
 				InsertClLandReason(titaVo);
 				// FunCD=4 刪除
 			} else if (iFunCd == 4) {
-//				tClLand = sClLandService.holdById(clLandId, titaVo);
 
 				if (tClLand != null) {
 					try {
@@ -279,7 +270,7 @@ public class L2416 extends TradeBuffer {
 			}
 		}
 
-//		this.totaVo.putParam("OResult", "Y");
+
 		this.totaVo.putParam("LandSeq", tClLand.getLandSeq());
 
 		this.addList(this.totaVo);
@@ -311,18 +302,14 @@ public class L2416 extends TradeBuffer {
 	private void setClLand(TitaVo titaVo) throws LogicException {
 		this.info("L2416.setClLand = " + iFunCd);
 		if (iFunCd == 4) {
-//			tClLand.setClLandId(clLandId);
-//			tClLand.setClCode1(iClCode1);
-//			tClLand.setClCode2(iClCode2);
-//			tClLand.setClNo(iClNo);
-//			tClLand.setLandSeq(iLandSeq);
+
 			tClLand.setCityCode(titaVo.getParam("CityCode"));
 			tClLand.setAreaCode(titaVo.getParam("AreaCode"));
 			tClLand.setIrCode(titaVo.getParam("IrCode"));
 			tClLand.setLandNo1(titaVo.getParam("LandNo1"));
 			tClLand.setLandNo2(titaVo.getParam("LandNo2"));
 			tClLand.setLandLocation(titaVo.getParam("LandLocation"));
-			//
+			
 			tClLand.setLandCode("");
 			tClLand.setArea(BigDecimal.ZERO);
 			tClLand.setLandZoningCode("");
@@ -336,18 +323,14 @@ public class L2416 extends TradeBuffer {
 			tClLand.setLandRentStartDate(0);
 			tClLand.setLandRentEndDate(0);
 		} else {
-//			tClLand.setClLandId(clLandId);
-//			tClLand.setClCode1(iClCode1);
-//			tClLand.setClCode2(iClCode2);
-//			tClLand.setClNo(iClNo);
-//			tClLand.setLandSeq(iLandSeq);
+
 			tClLand.setCityCode(titaVo.getParam("CityCode"));
 			tClLand.setAreaCode(titaVo.getParam("AreaCode"));
 			tClLand.setIrCode(titaVo.getParam("IrCode"));
 			tClLand.setLandNo1(titaVo.getParam("LandNo1"));
 			tClLand.setLandNo2(titaVo.getParam("LandNo2"));
 			tClLand.setLandLocation(titaVo.getParam("LandLocation"));
-			//
+			
 			tClLand.setLandCode(titaVo.getParam("LandCode"));
 			tClLand.setArea(parse.stringToBigDecimal(titaVo.getParam("Area")));
 			tClLand.setLandZoningCode(titaVo.getParam("LandZoningCode"));
@@ -404,8 +387,7 @@ public class L2416 extends TradeBuffer {
 			tClLandOwner.setClCode2(iClCode2);
 			tClLandOwner.setClNo(iClNo);
 			tClLandOwner.setLandSeq(iLandSeq);
-//			tClLandOwner.setOwnerId(iOwnerId);
-//			tClLandOwner.setOwnerName(titaVo.getParam("OwnerName" + i));
+
 			tClLandOwner.setOwnerRelCode(titaVo.getParam("OwnerRelCode" + i));
 			tClLandOwner.setOwnerPart(parse.stringToBigDecimal(titaVo.getParam("OwnerPart" + i)));
 			tClLandOwner.setOwnerTotal(parse.stringToBigDecimal(titaVo.getParam("OwnerTotal" + i)));

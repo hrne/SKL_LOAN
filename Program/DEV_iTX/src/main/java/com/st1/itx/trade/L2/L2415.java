@@ -23,10 +23,10 @@ import com.st1.itx.db.domain.ClBuildingPublic;
 import com.st1.itx.db.domain.ClBuildingPublicId;
 import com.st1.itx.db.domain.ClBuildingReason;
 import com.st1.itx.db.domain.ClBuildingReasonId;
-import com.st1.itx.db.domain.ClParking;
-import com.st1.itx.db.domain.ClParkingId;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.domain.ClParking;
+import com.st1.itx.db.domain.ClParkingId;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
@@ -34,21 +34,14 @@ import com.st1.itx.db.service.ClBuildingParkingService;
 import com.st1.itx.db.service.ClBuildingPublicService;
 import com.st1.itx.db.service.ClBuildingReasonService;
 import com.st1.itx.db.service.ClBuildingService;
-import com.st1.itx.db.service.ClParkingService;
 import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.ClMainService;
+import com.st1.itx.db.service.ClParkingService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L2415")
 @Scope("prototype")
@@ -130,7 +123,7 @@ public class L2415 extends TradeBuffer {
 	List<ClBuildingOwner> lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 	List<ClBuildingReason> lClBuildingReason = new ArrayList<ClBuildingReason>();
 
-	// new table 裝tita
+	// new table 
 	ClMain tClMain = new ClMain();
 	ClBuilding tClBuilding = new ClBuilding();
 	ClBuildingPublic tClBuildingPublic = new ClBuildingPublic();
@@ -149,18 +142,18 @@ public class L2415 extends TradeBuffer {
 			this.isEloan = true;
 		}
 
-		// tita
+
 		iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 
-		// 塞pk ClMain
+		// 塞 ClMain
 		clMainId.setClCode1(iClCode1);
 		clMainId.setClCode2(iClCode2);
 		clMainId.setClNo(iClNo);
 
-		// 塞pk ClBuilding
+		// 塞 ClBuilding
 		clBuildingId.setClCode1(iClCode1);
 		clBuildingId.setClCode2(iClCode2);
 		clBuildingId.setClNo(iClNo);
@@ -197,10 +190,7 @@ public class L2415 extends TradeBuffer {
 			// insert 公設建號
 			insertClBuildingPublic(titaVo);
 
-			// insert ClBuildingParking 獨立產權車位
-			// insertClBuildingParking(titaVo);
-
-			//// insert ClParking 車位
+			// insert ClParking 車位
 			insertClParking(titaVo);
 
 			// insert 擔保品不動產建物修改原因檔
@@ -233,10 +223,10 @@ public class L2415 extends TradeBuffer {
 			insertClBuildingPublic(titaVo);
 
 			// delete ClBuildingParking 獨立產權車位
-			// deleteClBuildingParking(titaVo);
+
 			deleteClParking(titaVo);
 			// insert ClBuildingParking 獨立產權車位
-			// insertClBuildingParking(titaVo);
+
 			insertClParking(titaVo);
 
 			// delete 擔保品不動產建物修改原因檔
@@ -259,7 +249,7 @@ public class L2415 extends TradeBuffer {
 			deleteClBuildingPublic(titaVo);
 
 			// delete ClBuildingParking 獨立產權車位
-			// deleteClBuildingParking(titaVo);
+
 			deleteClParking(titaVo);
 
 			// delete 擔保品不動產建物修改原因檔
@@ -328,9 +318,7 @@ public class L2415 extends TradeBuffer {
 		for (int i = 1; i <= 10; i++) {
 			// 若該筆無資料就離開迴圈
 			String publicBdNoA = titaVo.get("PublicBdNoA" + i);
-//			if (parse.stringToInteger(titaVo.getParam("PublicBdNoA" + i)) == 0 || titaVo.getParam("PublicBdNoA" + i) == null || titaVo.getParam("PublicBdNoA" + i).trim().isEmpty()) {
-//				break;
-//			}
+
 			if (publicBdNoA == null || "".equals(publicBdNoA) || parse.stringToInteger(publicBdNoA) == 0) {
 				break;
 			}
@@ -375,65 +363,6 @@ public class L2415 extends TradeBuffer {
 		}
 	}
 
-	// insert 獨立產權車位
-	private void insertClBuildingParking(TitaVo titaVo) throws LogicException {
-		this.info("L2415 insertClBuildingParking");
-		// List ClBuildingParking 獨立產權車位
-		for (int i = 1; i <= 10; i++) {
-			String parkingBdNoA = titaVo.get("ParkingBdNoA" + i);
-
-			// 若該筆無資料就離開迴圈
-//			if (parse.stringToInteger(titaVo.getParam("ParkingBdNoA" + i)) == 0 || titaVo.getParam("ParkingBdNoA" + i) == null || titaVo.getParam("ParkingBdNoA" + i).trim().isEmpty()) {
-//				break;
-//			}
-			if (parkingBdNoA == null || "".equals(parkingBdNoA) || parse.stringToInteger(parkingBdNoA) == 0) {
-				break;
-			}
-			// new table ClBuildingPublic
-			tClBuildingParking = new ClBuildingParking();
-
-			int iParkingBdNoA = parse.stringToInteger(titaVo.getParam("ParkingBdNoA" + i));
-			int iParkingBdNoB = parse.stringToInteger(titaVo.getParam("ParkingBdNoB" + i));
-			this.info("iParkingBdNoA L2415 " + iParkingBdNoA);
-			clBuildingParkingId = new ClBuildingParkingId();
-
-			clBuildingParkingId.setClCode1(iClCode1);
-			clBuildingParkingId.setClCode2(iClCode2);
-			clBuildingParkingId.setClNo(iClNo);
-			clBuildingParkingId.setParkingBdNo1(iParkingBdNoA);
-			clBuildingParkingId.setParkingBdNo2(iParkingBdNoB);
-			this.info("ClBuildingParkingId L2415 " + clBuildingParkingId);
-
-			tClBuildingParking.setClBuildingParkingId(clBuildingParkingId);
-			tClBuildingParking.setClCode1(iClCode1);
-			tClBuildingParking.setClCode2(iClCode2);
-			tClBuildingParking.setClNo(iClNo);
-			tClBuildingParking.setParkingBdNo1(iParkingBdNoA);
-			tClBuildingParking.setParkingBdNo2(iParkingBdNoB);
-			tClBuildingParking.setArea(parse.stringToBigDecimal(titaVo.getParam("ParkingArea" + i)));
-			tClBuildingParking.setAmt(parse.stringToBigDecimal(titaVo.getParam("ParkingAmt" + i)));
-			this.info("tClBuildingParking L2415" + tClBuildingParking);
-			try {
-				sClBuildingParkingService.insert(tClBuildingParking, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", "擔保品不動產獨立產權車位檔" + e.getErrorMsg());
-			}
-		}
-	}
-
-	// delete 獨立產權車位
-	private void deleteClBuildingParking(TitaVo titaVo) throws LogicException {
-		this.info("L2415 deleteClBuildingParking");
-		Slice<ClBuildingParking> slClBuildingParking = sClBuildingParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
-		lClBuildingParking = slClBuildingParking == null ? null : slClBuildingParking.getContent();
-		if (lClBuildingParking != null) {
-			try {
-				sClBuildingParkingService.deleteAll(lClBuildingParking);
-			} catch (DBException e) {
-				throw new LogicException("E0008", "擔保品不動產獨立產權車位檔" + e.getErrorMsg());
-			}
-		}
-	}
 
 	// insert 車位
 	private void insertClParking(TitaVo titaVo) throws LogicException {

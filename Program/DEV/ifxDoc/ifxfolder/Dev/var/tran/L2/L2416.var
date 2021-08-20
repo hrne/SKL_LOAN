@@ -109,9 +109,6 @@ IF(#Reason{n}==0,INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
 ##end
 
 #ResetPages=@,1,S
-!INVOKEJS(SHOW,p1,6,17,0)
-!INVOKEJS(SHOW,grd1,0)
-!INVOKEJS(SHOW,grd2,0)
 INVOKEJS(SHOW,p2,0)
 INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
@@ -289,7 +286,6 @@ T(F,@EvaUnitPrice,#LabelControlFlag)
 T(F,@LandUsageCode,#LabelControlFlag)
 T(F,@LandRentStartDate,#LabelControlFlag)
 T(F,@LandRentEndDate,#LabelControlFlag)
-! T(F,@LandOwnedArea,#LabelControlFlag)
 ##loop{times:10,i:1}
 T(F,@OwnerId{i},#LabelControlFlag)
 T(F,@OwnerName{i},#LabelControlFlag)
@@ -415,10 +411,7 @@ C(3,#CHAIN,1,s,$)
 
 
 !調RIM參數
-! #RimClCode1=A,1,S
-! #RimClCode2=A,2,S
 #RimClNo=A,7,S
-! #RimFunCd=A,1,S
 
 <include src="ROM.icf::L2R28.dec"/>
 !RIM取擔保主檔
@@ -612,7 +605,6 @@ IF(#FunCd==4,s,$)
 #LandLocation=x,100,L
 IF(#FunCd==4,s,T(B,#CityItem+#AreaItem+#IrItem))
 IF(#LandNo2==0,T(B,#LandLocation+#LandNo1+地號),T(B,#LandLocation+#LandNo1+-+#LandNo2+地號)))
-! IF(#LandNo1==0,$,C(4,#LandNo1,$,))
 
 #FdLD_1=X,2,L
 
@@ -740,11 +732,6 @@ IF(#PageFg==2,$,CALL(#SHOW_2))
 @A(DATE,0,#LandRentEndDate)
 
 #FdLD_RENT_ED=X,2,L
-
-! [土地持分面積]
-! #LandOwnedArea=m,5.2,I
-! IF(#PageFg==2,$,CALL(#SHOW_2))
-! IF(#FunCd==4,s,$)
 
 #FdAREA_OWNED=X,2,L
 

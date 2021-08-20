@@ -37,10 +37,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * END=X,1<br>
- */
 
 @Service("L2414")
 @Scope("prototype")
@@ -143,26 +139,6 @@ public class L2414 extends TradeBuffer {
 
 		if (iFunCd == 1) {
 
-			// 錯誤處理
-//			if (iCustId.isEmpty() && iCustNo == 0) {
-//				throw new LogicException("E2051", "");
-//			}
-
-//			if (!iCustId.isEmpty()) {
-//				tCustMain = sCustMainService.custIdFirst(iCustId);
-				// 錯誤處理
-//				if (tCustMain == null) {
-//					throw new LogicException("E1003", iCustId);
-//				}
-//			} else {
-//				tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
-				// 錯誤處理
-//				if (tCustMain == null) {
-//					throw new LogicException("E1004", String.valueOf(iCustNo));
-//				}
-//			}
-
-
 			// 取號使用參數
 			String Colind4s = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
 
@@ -191,7 +167,6 @@ public class L2414 extends TradeBuffer {
 			tClMain.setClCode1(iClCode1);
 			tClMain.setClCode2(iClCode2);
 			tClMain.setClNo(iClNo);
-//			tClMain.setCustUKey(custUKey);
 			tClMain.setClTypeCode(titaVo.getParam("ClTypeCode"));
 			tClMain.setCityCode(titaVo.getParam("CityCode"));/* 地區別 */
 			tClMain.setClStatus(titaVo.getParam("ClStatus"));
@@ -241,8 +216,7 @@ public class L2414 extends TradeBuffer {
 			tClOther.setPledgeEndDate(parse.stringToInteger(titaVo.getParam("PledgeEndDate")));
 			tClOther.setPledgeBankCode(titaVo.getParam("PledgeBankCode"));
 			tClOther.setPledgeNO(titaVo.getParam("PledgeNO"));
-//			tClOther.setOwnerId(titaVo.getParam("OwnerId"));
-//			tClOther.setOwnerName(titaVo.getParam("OwnerName"));
+
 			tClOther = setOwnerCustUKey(tClOther, titaVo);
 			tClOther.setIssuingId(titaVo.getParam("IssuingId"));
 			tClOther.setIssuingCounty(titaVo.getParam("IssuingCounty"));
@@ -418,8 +392,6 @@ public class L2414 extends TradeBuffer {
 			tClOther.setPledgeEndDate(parse.stringToInteger(titaVo.getParam("PledgeEndDate")));
 			tClOther.setPledgeBankCode(titaVo.getParam("PledgeBankCode"));
 			tClOther.setPledgeNO(titaVo.getParam("PledgeNO"));
-//			tClOther.setOwnerId(titaVo.getParam("OwnerId"));
-//			tClOther.setOwnerName(titaVo.getParam("OwnerName"));
 			tClOther = setOwnerCustUKey(tClOther, titaVo);
 			tClOther.setIssuingId(titaVo.getParam("IssuingId"));
 			tClOther.setIssuingCounty(titaVo.getParam("IssuingCounty"));
@@ -455,7 +427,6 @@ public class L2414 extends TradeBuffer {
 
 			tClOther = sClOtherService.holdById(tClOtherId);
 
-			// holde table修改
 			tClOther = sClOtherService.holdById(tClOtherId);
 			if (tClOther == null) {
 				throw new LogicException("E0006", "擔保品其他檔");
@@ -512,7 +483,7 @@ public class L2414 extends TradeBuffer {
 
 		CustMain custMain = sCustMainService.custIdFirst(titaVo.getParam("OwnerId"), titaVo);
 		if (custMain != null) {
-//		Slice<ClOther> sClOther = sClOtherService.findUnique(titaVo.getParam("StockCode"), titaVo.getParam("OwnerId"), titaVo.getParam("OwnerId"), 0, Integer.MAX_VALUE);
+
 			Slice<ClOther> sClOther = sClOtherService.findUnique(titaVo.getParam("StockCode"), custMain.getCustId(), custMain.getCustId(), 0, Integer.MAX_VALUE);
 			List<ClOther> lClOther = sClOther == null ? null : sClOther.getContent();
 			if (lClOther != null) {

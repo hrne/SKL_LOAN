@@ -37,55 +37,7 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunCd=X,1<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * ClTypeCode=X,3<br>
- * CityCode=9,2<br>
- * OwnerId=X,10<br>
- * OwnerName=X,18<br>
- * EvaDate=9,7<br>
- * EvaAmt=9,14<br>
- * ServiceLife=X,2<br>
- * ProductSpec=X,20<br>
- * ProductType=X,10<br>
- * ProductBrand=X,20<br>
- * ProductCC=X,10<br>
- * ProductColor=X,10<br>
- * EngineSN=X,50<br>
- * LicenseNo=X,10<br>
- * LicenseTypeCode=X,1<br>
- * LicenseUsageCode=X,1<br>
- * LiceneIssueDate=9,7<br>
- * MfgYearMonth=X,6<br>
- * VehicleTypeCode=X,2<br>
- * VehicleStyleCode=X,2<br>
- * VehicleOfficeCode=X,3<br>
- * Currency=X,2<br>
- * ExchangeRate=X,9<br>
- * Insurance=X,1<br>
- * LoanToValue=9,3.2<br>
- * MtgCode=9,1<br>
- * MtgCheck=X,1<br>
- * MtgLoan=X,1<br>
- * MtgPledge=X,1<br>
- * Synd=X,1<br>
- * SyndCode=X,1<br>
- * DispPrice=9,14<br>
- * DispDate=9,7<br>
- * SettingAmt=9,14.2<br>
- * ReceiptNo=X,20<br>
- * MtgNo=X,20<br>
- * ReceivedDate=9,7<br>
- * MortgageIssueStartDate=9,7<br>
- * MortgageIssueEndDate=9,7<br>
- * ClStatus=9,1<br>
- * Remark=X,60<br>
- * END=X,1<br>
- */
+
 
 @Service("L2412")
 @Scope("prototype")
@@ -198,17 +150,6 @@ public class L2412 extends TradeBuffer {
 		if (tClMain == null) {
 			if (iFunCd == 1) {
 
-				// 依照使用者輸入之統編或戶號取得客戶識別碼
-//				if (!iCustId.isEmpty()) {
-//					tCustMain = sCustMainService.custIdFirst(iCustId);
-//				} else if (iCustNo > 0) {
-//					tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
-//				} else {
-					// 查無客戶資料
-//					throw new LogicException("E1001", "L2412");
-//				}
-
-
 				this.info("新增時取號");
 
 				String clCode = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
@@ -227,7 +168,7 @@ public class L2412 extends TradeBuffer {
 				clMainId.setClNo(iClNo);
 				tClMain = new ClMain();
 				// 搬值
-//				tClMain.setCustUKey(custUKey);
+
 				setClMain(titaVo);
 				// 塞pk
 				clMovablesId.setClCode1(iClCode1);
@@ -457,7 +398,6 @@ public class L2412 extends TradeBuffer {
 		tClMain.setClCode1(iClCode1);
 		tClMain.setClCode2(iClCode2);
 		tClMain.setClNo(iClNo);
-//		tClMain.setCustUKey(custUKey);
 		tClMain.setClTypeCode(titaVo.getParam("ClTypeCode"));
 		tClMain.setCityCode(titaVo.getParam("CityCode"));/* 地區別 */
 		tClMain.setClStatus(titaVo.getParam("ClStatus"));
@@ -503,8 +443,6 @@ public class L2412 extends TradeBuffer {
 		tClMovables.setClCode1(iClCode1);
 		tClMovables.setClCode2(iClCode2);
 		tClMovables.setClNo(iClNo);
-//		tClMovables.setOwnerId(titaVo.getParam("OwnerId"));
-//		tClMovables.setOwnerName(titaVo.getParam("OwnerName"));
 		CustMain custMain = sCustMainService.custIdFirst(titaVo.getParam("OwnerId"), titaVo);
 		if (custMain == null) {
 			String Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");

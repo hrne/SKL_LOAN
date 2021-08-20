@@ -80,7 +80,6 @@ E(0,40)ASGN(INQPRT$)
 #Btn2=X,4,I,ui:button;value:建物資料;enable:1;tabbable:0
 #Btn3=X,4,I,ui:button;value:公設建號;enable:1;tabbable:0
 #Btn4=X,4,I,ui:button;value:車位;enable:1;tabbable:0
-! #Btn5=X,4,I,ui:button;value:建物所有權人;enable:1;tabbable:0
 #Btn6=X,4,I,ui:button;value:建物修改原因;enable:1;tabbable:0
 
 #BIND_1=X,1,S
@@ -94,9 +93,6 @@ BIND(#Btn3,click, {cmd=CALLSEND;DOCODE=Show3})
 
 #BIND_4=X,1,S
 BIND(#Btn4,click, {cmd=CALLSEND;DOCODE=Show4})
-
-! #BIND_5=X,1,S
-! BIND(#Btn5,click, {cmd=CALLSEND;DOCODE=Show5})
 
 #BIND_6=X,1,S
 BIND(#Btn6,click, {cmd=CALLSEND;DOCODE=Show6})
@@ -171,7 +167,6 @@ IF(#PublicBdNoA{n}==0,INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
 IF(#Reason{n}==0,INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
 ##end
 ##loop{times:100,n:1,k:2,j:3}
-!IF(#ParkingBdNoA{n}==0,INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
 C(4,#ParkingNo{n},INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
 ##end
 
@@ -179,7 +174,6 @@ C(4,#ParkingNo{n},INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
 INVOKEJS(SHOW,p1,6,22,0)
 INVOKEJS(SHOW,grd1,0)
 INVOKEJS(SHOW,grd2,0)
-! INVOKEJS(SHOW,grd3,0)
 INVOKEJS(SHOW,grd4,0)
 CALL(#KLIGHT)
 CALL(#CALLGRID)
@@ -187,20 +181,14 @@ SWITCH(#PageFg,1,IF(#FunCd==4,INVOKEJS(SHOW,p1,6,6,1),INVOKEJS(SHOW,p1,6,6,1)),
                 2,INVOKEJS(SHOW,p1,7,17,1),
                 3,INVOKEJS(SHOW,p1,18,18,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd1_2,1),
                 4,INVOKEJS(SHOW,p1,19,19,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd2_2,1),
-               !  5,INVOKEJS(SHOW,p1,21,21,1)INVOKEJS(SHOW,grd3,1)INVOKEJS(SHOW,grd3_3,1),
                 6,INVOKEJS(SHOW,p1,20,20,1)INVOKEJS(SHOW,grd4,1)INVOKEJS(SHOW,grd4_2,1),
                 7,INVOKEJS(SHOW,p1,6,20,1)CALL(#ShowAllGrid),
                 $)
 
 #ShowAllGrid=@,1,S
 INVOKEJS(SHOW,grd1,1)
-! INVOKEJS(SHOW,grd1_3,#ShowG1,1)INVOKEJS(SHOW,grd1_4,1)INVOKEJS(SHOW,grd1_5,1)INVOKEJS(SHOW,grd1_6,1)INVOKEJS(SHOW,grd1_7,1)INVOKEJS(SHOW,grd1_8,1)INVOKEJS(SHOW,grd1_9,1)INVOKEJS(SHOW,grd1_10,1)INVOKEJS(SHOW,grd1_11,1)INVOKEJS(SHOW,grd1_12,1)
 INVOKEJS(SHOW,grd2,1)
-! INVOKEJS(SHOW,grd2_3,#ShowG2,1)INVOKEJS(SHOW,grd2_4,1)INVOKEJS(SHOW,grd2_5,1)INVOKEJS(SHOW,grd2_6,1)INVOKEJS(SHOW,grd2_7,1)INVOKEJS(SHOW,grd2_8,1)INVOKEJS(SHOW,grd2_9,1)INVOKEJS(SHOW,grd2_10,1)INVOKEJS(SHOW,grd2_11,1)INVOKEJS(SHOW,grd2_12,1)
-! INVOKEJS(SHOW,grd3,1)INVOKEJS(SHOW,grd3_3,#ShowG3,1)
-! INVOKEJS(SHOW,grd3_4,1)INVOKEJS(SHOW,grd3_5,1)INVOKEJS(SHOW,grd3_6,1)INVOKEJS(SHOW,grd3_7,1)INVOKEJS(SHOW,grd3_8,1)INVOKEJS(SHOW,grd3_9,1)INVOKEJS(SHOW,grd3_10,1)INVOKEJS(SHOW,grd3_11,1)INVOKEJS(SHOW,grd3_12,1)
 INVOKEJS(SHOW,grd4,1)INVOKEJS(SHOW,grd4_3,#ShowG4,1)
-! INVOKEJS(SHOW,grd4_4,1)INVOKEJS(SHOW,grd4_5,1)INVOKEJS(SHOW,grd4_6,1)INVOKEJS(SHOW,grd4_7,1)INVOKEJS(SHOW,grd4_8,1)INVOKEJS(SHOW,grd4_9,1)INVOKEJS(SHOW,grd4_10,1)INVOKEJS(SHOW,grd4_11,1)INVOKEJS(SHOW,grd4_12,1)
 !---------- AP TEXT AREA Variables ----------
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -314,24 +302,10 @@ T(3,@FdBD_USE,)
 T(3,@FdPARKING_TYPE,)
 T(3,@FdPARKING_PROP,)
 T(3,@FdHOUSE_BUY_DT,)
-! T(3,@FdOWNER,)
 T(3,@FdCHG,)
 E(0,@ClCode2,0)
 E(0,@ClNo,0)
 T(3,@ClTypeCode,)
-! T(3,@CityCode,)
-! T(3,@AreaCode,)
-! T(3,@IrCode,)
-! T(3,@Road,)
-! T(3,@Section,)
-! T(3,@Alley,)
-! T(3,@Lane,)
-! T(3,@Num,)
-! T(3,@NumDash,)
-! T(3,@Floor,)
-! T(3,@FloorDash,)
-! T(3,@BdNo1,)
-! T(3,@BdNo2,)
 T(3,@BdLocation,)
 E(0,@BdMainUseCode,0)
 E(0,@BdMtrlCode,0)
@@ -354,19 +328,6 @@ T(3,@ParkingProperty,)
 T(3,@HouseTaxNo,)
 E(0,@HouseBuyDate,0)
 T(F,@ClTypeCode,#LbCONTROL_FG)
-! T(F,@CityCode,#LbCONTROL_FG)
-! T(F,@AreaCode,#LbCONTROL_FG)
-! T(F,@IrCode,#LbCONTROL_FG)
-! T(F,@Road,#LbCONTROL_FG)
-! T(F,@Section,#LbCONTROL_FG)
-! T(F,@Alley,#LbCONTROL_FG)
-! T(F,@Lane,#LbCONTROL_FG)
-! T(F,@Num,#LbCONTROL_FG)
-! T(F,@NumDash,#LbCONTROL_FG)
-! T(F,@Floor,#LbCONTROL_FG)
-! T(F,@FloorDash,#LbCONTROL_FG)
-! T(F,@BdNo1,#LbCONTROL_FG)
-! T(F,@BdNo2,#LbCONTROL_FG)
 T(F,@BdMainUseCode,#LbCONTROL_FG)
 T(F,@BdMtrlCode,#LbCONTROL_FG)
 T(F,@BdTypeCode,#LbCONTROL_FG)
@@ -390,7 +351,6 @@ T(F,@HouseBuyDate,#LbCONTROL_FG)
 ##loop{times:10,i:1}
 CALL(#HIDE_PE_ROW_{i})
 CALL(#HIDE_PP_ROW_{i})
-! CALL(#HIDE_OWNER_ROW_{i})
 CALL(#HIDE_ROW_{i})
 HIDE(#OtherReason{i})
 T(F,@PublicBdNoA{i},#LbCONTROL_FG)
@@ -433,7 +393,6 @@ T(3,@FdBD_USE,*)
 T(3,@FdPARKING_TYPE,*)
 T(3,@FdPARKING_PROP,*)
 T(3,@FdHOUSE_BUY_DT,*)
-! T(3,@FdOWNER,*)
 
 #LbCONTROL_FG=A,1,S
 E(0,1)
@@ -600,10 +559,7 @@ C(3,#GdRid1,0,S,$)
 T(2,#GdRid1+-+#GdRid2+-+#GdRnum+-+#Lgtseq)
 
 !調RIM參數
-! #RimClCode1=A,1,S
-! #RimClCode2=A,2,S
 #RimClNo=A,7,S
-! #RimFunCd=A,1,S
 
 <include src="ROM.icf::L2R27.dec"/>
 !RIM取擔保主檔
@@ -620,19 +576,6 @@ R(1,L2R27)
 #checkL2r27A=X,1,S
 C(3,#CHAIN,1,C(3,#FunCd,1,S,$),$)
 T(2,@ClTypeCode,#L2r27ClTypeCode)
-! T(2,@CityCode,#L2r27CityCode)
-! T(2,@AreaCode,#L2r27AreaCode)
-! T(2,@IrCode,#L2r27IrCode)
-! T(2,@Road,#L2r27Road)
-! T(2,@Section,#L2r27Section)
-! T(2,@Alley,#L2r27Alley)
-! T(2,@Lane,#L2r27Lane)
-! T(2,@Num,#L2r27Num)
-! T(2,@NumDash,#L2r27NumDash)
-! T(2,@Floor,#L2r27Floor)
-! T(2,@FloorDash,#L2r27FloorDash)
-! T(2,@BdNo1,#L2r27BdNo1)
-! T(2,@BdNo2,#L2r27BdNo2)
 T(2,@BdLocation,#L2r27BdLocation)
 E(0,@BdMainUseCode,#L2r27BdMainUseCode)
 E(0,@BdMtrlCode,#L2r27BdMtrlCode)
@@ -660,23 +603,13 @@ E(0,@PublicBdNoB{i},#L2r27PublicBdNoB{i})
 E(0,@Area{i},#L2r27Area{i})
 T(2,@PublicBdOwnerId{i},#L2r27PublicBdOwnerId{i})
 T(2,@PublicBdOwnerName{i},#L2r27PublicBdOwnerName{i})
-! T(2,@OwnerId_{i},#L2r27OwnerId_{i})
-! T(2,@OwnerName_{i},#L2r27OwnerName_{i})
-! T(2,@OwnerRelCode_{i},#L2r27OwnerRelCode_{i})
-! E(0,@OwnerPart_{i},#L2r27OwnerPart_{i})
-! E(0,@OwnerTotal_{i},#L2r27OwnerTotal_{i})
 T(2,@Reason{i},#L2r27Reason{i})
 T(2,@OtherReason{i},#L2r27OtherReason{i})
 
 T(2,@CreateEmpNo{i},#L2r27CreateEmpNo{i})
 E(0,@CreateDate{i},#L2r27CreateDate{i})
 ##end
-!##loop{times:10,i:1}
-!E(0,@ParkingBdNoA{i},#L2r27ParkingBdNoA{i})
-!E(0,@ParkingBdNoB{i},#L2r27ParkingBdNoB{i})
-!E(0,@ParkingArea{i},#L2r27ParkingArea{i})
-!E(0,@ParkingAmt{i},#L2r27ParkingAmt{i})
-!##end
+
 
 !RIM取擔保主檔
 #RimL2r27B=X,1,S
@@ -692,19 +625,6 @@ R(1,L2R27)
 #checkL2r27B=X,1,S
 C(3,#CHAIN,1,C(3,#FunCd,1,$,S),S)
 T(2,@ClTypeCode,#L2r27ClTypeCode)
-! T(2,@CityCode,#L2r27CityCode)
-! T(2,@AreaCode,#L2r27AreaCode)
-! T(2,@IrCode,#L2r27IrCode)
-! T(2,@Road,#L2r27Road)
-! T(2,@Section,#L2r27Section)
-! T(2,@Alley,#L2r27Alley)
-! T(2,@Lane,#L2r27Lane)
-! T(2,@Num,#L2r27Num)
-! T(2,@NumDash,#L2r27NumDash)
-! T(2,@Floor,#L2r27Floor)
-! T(2,@FloorDash,#L2r27FloorDash)
-! T(2,@BdNo1,#L2r27BdNo1)
-! T(2,@BdNo2,#L2r27BdNo2)
 T(2,@BdLocation,#L2r27BdLocation)
 E(0,@BdMainUseCode,#L2r27BdMainUseCode)
 E(0,@BdMtrlCode,#L2r27BdMtrlCode)
@@ -732,25 +652,13 @@ E(0,@PublicBdNoB{i},#L2r27PublicBdNoB{i})
 E(0,@Area{i},#L2r27Area{i})
 T(2,@PublicBdOwnerId{i},#L2r27PublicBdOwnerId{i})
 T(2,@PublicBdOwnerName{i},#L2r27PublicBdOwnerName{i})
-! T(2,@OwnerId_{i},#L2r27OwnerId_{i})
-! T(2,@OwnerName_{i},#L2r27OwnerName_{i})
-! T(2,@OwnerRelCode_{i},#L2r27OwnerRelCode_{i})
-! E(0,@OwnerPart_{i},#L2r27OwnerPart_{i})
-! E(0,@OwnerTotal_{i},#L2r27OwnerTotal_{i})
 T(2,@Reason{i},#L2r27Reason{i})
 T(2,@OtherReason{i},#L2r27OtherReason{i})
 
 T(2,@CreateEmpNo{i},#L2r27CreateEmpNo{i})
 E(0,@CreateDate{i},#L2r27CreateDate{i})
 ##end
-!##loop{times:10,i:1}
-!T(2,@ParkingBdNoA{i},#L2r27ParkingBdNoA{i})
-!T(2,@ParkingBdNoB{i},#L2r27ParkingBdNoB{i})
-!E(0,@ParkingArea{i},#L2r27ParkingArea{i})
-!E(0,@ParkingAmt{i},#L2r27ParkingAmt{i})
-!##end
 
-!
 #T1=x,1,S
 ##loop{times:100,i:1}
 T(2,@ParkingNo{i},#L2r27ParkingNo{i})
@@ -780,159 +688,6 @@ T(H,#ClTypeCode,#ClTypeCodeHelp)
 !調RIM參數
 #RimCityCode=X,2,S
 #RimAreaCode=X,3,S
-
-! ! 調RIM取縣市代碼
-! #RimL6r03City=X,1,S
-! C(3,#FunCd,4,s,$)
-! C(3,#FunCd,5,s,$)
-! E(0,@RimFunCd,1)
-! T(3,@RimCityCode,)
-! T(3,@RimAreaCode,)
-! RESET_RIM(#RimL6r03City,L6R03)
-! S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
-! R(1,L6R03)
-
-! ! 縣市代碼的下拉選單
-! #L6r03ResultCity=x,50000,S
-! T(2,#L6r03Result)
-
-! ! 市
-! #CityCode=X,2,I
-! IF(#PageFg==1,$,CALL(#Show1))
-! IF(#FunCd==4,s,$)
-! HIDE(#CityItem)
-! HELP(#L6r03ResultCity,cols:5)
-! @V(H,#L6r03ResultCity)
-! SHOW(#CityItem)
-
-! ! 縣市代碼對應名稱
-! #CityItem=x,10,L
-! T(H,#CityCode,#L6r03ResultCity)
-
-! !調RIM縣市 ED
-
-! !調RIM鄉鎮 ST
-! ! 調RIM取鄉鎮市區代碼
-! #RimL6r03Area=X,1,S
-! C(3,#FunCd,4,s,$)
-! C(3,#FunCd,5,s,$)
-! E(0,@RimFunCd,2)
-! T(2,@RimCityCode,#CityCode)
-! T(3,@RimAreaCode,)
-! RESET_RIM(#RimL6r03Area,L6R03)
-! S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
-! R(1,L6R03)
-
-! ! 鄉鎮市區代碼的下拉選單
-! #L6r03ResultArea=x,50000,S
-! T(2,#L6r03Result)
-
-
-! ! 區
-! #AreaCode=X,3,S
-! IF(#FunCd==4,s,$)
-! HIDE(#AreaItem)
-! HELP(#L6r03ResultArea,cols:5)
-! @V(H,#L6r03ResultArea)
-! SHOW(#AreaItem)
-
-! ! 鄉鎮市區代碼的對應名稱
-! #AreaItem=x,20,L
-! T(H,#AreaCode,#L6r03ResultArea)
-
-! !調RIM鄉鎮 ED
-
-
-! !調RIM地段 ST
-! ! 調RIM取地段代碼
-! #RimL6r03Ir=X,1,S
-! C(3,#FunCd,4,s,$)
-! C(3,#FunCd,5,s,$)
-! E(0,@RimFunCd,3)
-! T(2,@RimCityCode,#CityCode)
-! T(2,@RimAreaCode,#AreaCode)
-! RESET_RIM(#RimL6r03Ir,L6R03)
-! S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
-! R(1,L6R03)
-
-! ! 地段代碼的下拉選單
-! #L6r03ResultIr=X,50000,S
-! T(2,#L6r03Result)
-
-
-! ! 地段
-! #IrCode=X,5,I
-! IF(#FunCd==4,s,$)
-! HIDE(#IrItem)
-! HELP(#L6r03ResultIr,cols:5)
-! @V(H,#L6r03ResultIr)
-! SHOW(#IrItem)
-
-! ! 地段代碼的對應名稱
-! #IrItem=X,20,L
-! T(H,#IrCode,#L6r03ResultIr)
-
-! !調RIM地段 ED
-
-! ! 路/街/村里
-! #Road=x,20,I
-! IF(#FunCd==4,s,$)
-
-! ! 段
-! #Section=X,5,I
-! IF(#FunCd==4,s,$)
-! @C(4,#Section,s,$)
-! V(9)V(2,0)
-
-! ! 巷
-! #Alley=X,5,I
-! IF(#FunCd==4,s,$)
-! @C(4,#Alley,s,$)
-! V(9)V(2,0)
-
-! ! 弄
-! #Lane=X,5,I
-! IF(#FunCd==4,s,$)
-! @C(4,#Lane,s,$)
-! V(9)V(2,0)
-
-! ! 號
-! #Num=X,5,I
-! IF(#FunCd==4,s,$)
-! @C(4,#Num,s,$)
-! V(9)V(2,0)
-
-! #NumDash=X,5,I
-! IF(#FunCd==4,s,$)
-! IF(#Num=="",S,$)
-! @C(4,#NumDash,s,$)
-! V(9)V(2,0)
-
-! ! 樓
-! #Floor=X,5,I
-! IF(#FunCd==4,s,$)
-! @C(4,#Floor,s,$)
-! V(9)V(2,0)
-
-! #FloorDash=X,5,I
-! IF(#FunCd==4,s,$)
-! IF(#Floor=="",S,$)
-! @C(4,#FloorDash,s,$)
-! V(9)V(2,0)
-
-! ! 建號
-! #BdNo1=X,5,I
-! IF(#FunCd==4,s,$)
-! @C(4,#BdNo1,s,$)
-! V(9)V(2,0)
-
-! #BdNo2=X,3,I
-! IF(#PageFg==1,$,CALL(#Show1))
-! IF(#FunCd==4,s,$)
-! IF(#BdNo1=="",S,$)
-! @C(4,#BdNo1,s,$)
-! ! V(9)V(2,0)
-! @V(7)
 
 ! [建物門牌]
 #BdLocation=x,150,L
@@ -1116,14 +871,11 @@ T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
 
 ! [獨立產權車位註記]
 #ParkingProperty=X,1,L
-!IF(#FunCd==4,s,$)
-!HELP(#YNHelp)
-!@V(H,#YNHelp)
 
 #FdPARKING_PROP=X,2,L
 
 #ParkingPropertyX=X,2,L
-!T(H,#ParkingProperty,#YNHelp)
+
 
 ! [房屋稅籍號碼]
 #HouseTaxNo=X,12,I
@@ -1180,7 +932,7 @@ C(3,#PublicBdNoA{i},0,S,$)
 IF(#FunCd==4,s,$)
 C(3,#PublicBdNoA{i},0,S,$)
 @V(2,0)E(0,@TEMP_Area,#Area{i})
-! V(9)
+
 
 ! [公設建號-所有權人統編]
 #PublicBdOwnerId{i}=X,10,I
@@ -1203,8 +955,7 @@ R(1,L1R09)
 #CheckL1R09PublicBd{i}=X,1,S
 C(4,#PublicBdOwnerId{i},S,$)
 C(4,#L1r09CustName,$,T(2,@PublicBdOwnerName{i},#L1r09CustName))
-! C(4,#PublicBdOwnerName{i},$,S)
-! T(2,@PublicBdOwnerName{i},#L1r09CustName)
+
 
 
 ! [公設建號-所有權人姓名]
@@ -1249,8 +1000,7 @@ C(4,#ParkingNo{j},CALL(#HIDE_PP_ROW_{i}),CALL(#SHOW_PP_ROW_{i}))
 C(4,#ParkingNo{j},s,$)
 @
 C(4,#ParkingNo{i},CALL(#HIDE_PP_ROW_{i}),CALL(#SHOW_PP_ROW_{i}))
-!C(3,#ParkingBdNoA{i},0,S,$)
-!V(9)V(2,00000)E(0,@TEMP_ParkingBdNoA,#ParkingBdNoA{i})E(0,#TEMP_ParkingBdNoA)
+
 
 !車位數量
 #ParkingQty{i}=m,5,I
@@ -1288,15 +1038,6 @@ IF(#ParkingOwnerPart{i} > #ParkingOwnerTotal{i},V(P,持份分子不可大於持�
 #ParkingArea{i}=m,8.2,I
 IF(#FunCd==4,s,$)
 C(4,#ParkingNo{i},S,$)
-@
-!V(2,0)
-!E(0,@TEMP_ParkingArea,#ParkingArea{i})
-! V(9)
-
-!段小段代碼
-!#ParkingIrCode{i}=X,5,S
-!IF(#FunCd==4,s,$)
-!C(4,#ParkingNo{i},S,$)
 
 ! [獨立產權車位-建號]
 #ParkingBdNoA{i}=A,5,I
@@ -1325,94 +1066,6 @@ IF(#FunCd==4,s,$)
 C(4,#ParkingNo{i},S,$)
 
 ##end
-
-! #FdOWNER=X,2,L
-
-! #OwnerId_0=X,1,S
-! T(3,X)
-
-! #OwnerPart=m,10,S
-! #OwnerTotal=m,10,S
-
-
-
-! ##loop{times:10,i:1,j:0,rowSeq:3}
-
-! #HIDE_OWNER_ROW_{i}=@,1,S
-! INVOKEJS(SHOW,grd3_{rowSeq},0)
-
-! #SHOW_OWNER_ROW_{i}=@,1,S
-! INVOKEJS(SHOW,grd3_{rowSeq},1)
-
-! ! [建物所有權人-統編]
-! #OwnerId_{i}=X,10,I
-! IF(#PageFg==5,$,CALL(#Show5))
-! IF(#FunCd==4,s,$)
-! C(4,#OwnerId_{j},CALL(#HIDE_OWNER_ROW_{i}),CALL(#SHOW_OWNER_ROW_{i}))
-! C(4,#OwnerId_{j},S,$)
-! @IF({i} == 1,V(7),$)
-! C(4,#OwnerId_{i},CALL(#HIDE_OWNER_ROW_{i}),$)
-! C(4,#OwnerId_{i},s,$)
-! V(7)A(ID_UNINO,0,#OwnerId_{i})
-
-! #RimL1r09{i}=X,1,S
-! E(0,@RimFunCd,5)
-! T(2,@RimCustId,#OwnerId_{i})
-! E(0,@RimCustNo,0)
-! RESET_RIM(#RimL1r09{i},L1R09)
-! S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
-! R(1,L1R09)
-
-
-! #CheckL1R09{i}=X,1,S
-! C(4,#L1r09CustName,$,T(2,@OwnerName_{i},#L1r09CustName))
-! ! T(2,@OwnerName_{i},#L1r09CustName)
-
-! ! [建物所有權人-姓名]
-! #OwnerName_{i}=x,100,I
-! IF(#PageFg==5,$,CALL(#Show5))
-! IF(#FunCd==4,s,$)
-! C(4,#L1r09CustName,$,s)
-! C(4,#OwnerId_{i},S,$)
-
-! ! [建物所有權人-與授信戶關係]
-! #OwnerRelCode_{i}=A,1,I
-! IF(#PageFg==5,$,CALL(#Show5))
-! IF(#FunCd==4,s,$)
-! C(4,#OwnerId_{i},S,$)
-! HELP(1:本人;2:配偶;3:子女;4:父母,5:其他)
-! @V(1,1,2,3,4,5)
-
-! #OwnerRelCode_X_{i}=X,4,L
-! SWITCH(#OwnerRelCode_{i},1,T(3,本人),
-!                       2,T(3,配偶),
-!                       3,T(3,子女),
-!                       4,T(3,父母),
-!                       5,T(3,其他),
-!                       T(3,),
-! )
-
-! ! [建物所有權人-持份比率(分子)]
-! #OwnerPart_{i}=m,10,I
-! IF(#PageFg==5,$,CALL(#Show5))
-! IF(#FunCd==4,s,$)
-! C(4,#OwnerId_{i},S,$)
-! @V(2,0)
-! IF({i}==1,E(0,@OwnerPart,#OwnerPart_{i}),E(0,@OwnerPart,#OwnerPart+#OwnerPart_{i}))
-
-! ! [建物所有權人-持份比率(分母)]
-! #OwnerTotal_{i}=m,10,I
-! IF(#PageFg==5,$,CALL(#Show5))
-! IF(#FunCd==4,s,$)
-! C(4,#OwnerId_{i},S,$)
-! @V(2,0)
-! IF(#OwnerTotal == 0,E(0,@OwnerTotal,#OwnerTotal_{i}),V(1,#OwnerTotal))
-
-! #CheckOwnerPart_{i}=x,1,S
-! IF(#OwnerPart <= #OwnerTotal,s,$)
-! V(P,持份比率之分子總和需小於或等於持份比率之分母)
-
-! ##end
 
 #FdCHG=X,2,L
 
@@ -1447,9 +1100,6 @@ C(3,#FunCd,2,IF({i}==1,V(7),C(4,#Reason{i},S,V(H,#ReasonHelp))),$)
 C(4,#Reason{i},CALL(#HIDE_ROW_{i}),CALL(#SHOW_ROW_{i}))
 C(4,#Reason{i},s,$)
 V(H,#ReasonHelp)
-
-
-
 
 #ReasonX{i}=X,20,L
 T(H,#Reason{i},#ReasonHelp)
@@ -1573,10 +1223,7 @@ ALERT(#OResultX);
 #END
 
 </sub>
-!#ParkingBdNoA{i}
-!#ParkingBdNoB{i}
-!#ParkingArea{i}
-!#ParkingAmt{i}
+
 
 !------ 下行電文TOM ------
 <sub type="TOM">

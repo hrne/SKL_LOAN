@@ -32,7 +32,7 @@ public class PfDetail implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -2572428859857977623L;
 
 // 序號
   @Id

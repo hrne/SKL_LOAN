@@ -193,7 +193,6 @@ C(3,#CHAIN,1,T(4,NTXBUF4$),S)
 #ClMainType=X,1,I
 C(3,#CHAIN,1,s,$)
 HELP(#ClMainTypeHelp)
-!@IF(#ClMainType==1,INVOKEJS(SHOW,p1,10,15,1),INVOKEJS(SHOW,p1,10,15,0))
 @
 C(4,#ClMainType,S,$)
 V(7)V(5,1,4)
@@ -329,22 +328,7 @@ C(3,#FacmNo,0,T(2,#CCusNo),T(2,#CCusNo+-+#FacmNo))
 C(3,#CHAIN,1,s,$)
 @C(4,#OwnerId,S,$)
 A(ID_UNINO,0,#OwnerId)
-!~--------------------------
-! !縣市區域
-! #CityCode=X,2,I
-! C(4,#ClCode1,S,$)
-! IF(#ClCode1==1,$,S)
 
-! !鄉鎮市區
-! #AreaCode=X,3,I
-! C(4,#ClCode1,S,$)
-! IF(#ClCode1==1,$,S)
-
-! !段小段
-! #IrCode=X,5,I
-! C(4,#ClCode1,S,$)
-! IF(#ClCode1==1,$,S)
-!~-------------------------
 
 !返回縣市清值
 #RimLCity=@,1,S
@@ -385,7 +369,7 @@ T(2,@L6r03ResultArea,#L6r03Result)
 
 ! 鄉鎮市區代碼的下拉選單
 #L6r03ResultArea=X,50000,S
-! T(2,@L6r03ResultArea,#L6r03Result)
+
 
 
 ! 區
@@ -688,7 +672,6 @@ T(2,#OOClCode1+#Dash+#OOClCode2+#Dash+#OOClNo)
 #OOOwnerIdLB=X,11,L
 
 #OOOwnerFlag=X,1,S
-!IF(#OOOwnerFlag == "Y",T(2,@OOOwnerIdLB,#OOOwnerId+*),T(2,@OOOwnerIdLB,#OOOwnerId))
 T(2,@OOOwnerIdLB,#OOOwnerId)
 
 #OOOwnerName=X,20,L
@@ -832,14 +815,12 @@ BIND(grid,{ cmd=CHAIN; ntxcd=#COL_TXCD;text=#COL_TXNM;ntxbuf=#COL_BUF})
 T(2,0000000000+#OOClCode1+#OOClCode2+#OOClNo+Y)
 
 #OO_BTN4_COL=X,1,S
-!BIND(grid,{ cmd=CHAIN; ntxcd=L2017;text=#FACM_TXNM;ntxbuf=#COL_BUF2})
 IF(#OOFlag == "Y",BIND(grid,{ cmd=CHAIN; ntxcd=L2017;text=#FACM_TXNM;ntxbuf=#COL_BUF2}),BIND(grid,cancel))
 
 #COL_BUF3=X,10,S
 T(2,#OOClCode1+#OOClCode2+#OOClNo)
 
 #OO_BTN5_COL=X,1,S
-!BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#ELSE_TXNM;ntxbuf=#COL_BUF3})
 IF(#OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#ELSE_TXNM;ntxbuf=#COL_BUF3}),BIND(grid,cancel))
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -912,16 +893,6 @@ TXFORM=L2038
 [
 ["[L2038]                                 擔保品明細資料查詢"],
 [""],
-! ["@擔保品大類",#OH_COL_TYPE,#OH_COL_TYPEX],
-! ["@擔保品類別",#OH_SUBTYPE,#OH_SUBTYPEX],
-! ["@擔保品編號",#OH_COLNO],
-! ["@額度編號",#OH_FACMNO],
-! ["@核准號碼",#OH_ApplNo],
-! ["@借款戶統編",#OH_CUSTID],
-! ["@戶號",#OH_CUSTNO],
-! ["@所有權人統編",#OH_OWNERID],
-! ["@設定狀態",#OH_SETTING_STAT,#OH_SETTING_X],
-! ["@擔保品狀態",#OH_COL_STAT,#OH_COL_X],
 ]
 </sub>
 !---------- 單據輸出組合 ----------

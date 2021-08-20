@@ -20,29 +20,22 @@ import com.st1.itx.db.domain.ClBuildingOwner;
 //import com.st1.itx.db.domain.ClBuildingParking;
 import com.st1.itx.db.domain.ClBuildingPublic;
 import com.st1.itx.db.domain.ClBuildingReason;
-import com.st1.itx.db.domain.ClParking;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.domain.ClParking;
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 //import com.st1.itx.db.service.ClBuildingParkingService;
 import com.st1.itx.db.service.ClBuildingPublicService;
 import com.st1.itx.db.service.ClBuildingReasonService;
 import com.st1.itx.db.service.ClBuildingService;
-import com.st1.itx.db.service.ClParkingService;
 import com.st1.itx.db.service.ClMainService;
+import com.st1.itx.db.service.ClParkingService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * ClCode1=9,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L2915")
 @Scope("prototype")
@@ -65,10 +58,6 @@ public class L2915 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingPublicService sClBuildingPublicService;
-
-	/* DB服務注入 */
-//	@Autowired
-//	public ClBuildingParkingService sClBuildingParkingService;
 
 	/* DB服務注入 */
 	@Autowired
@@ -106,13 +95,11 @@ public class L2915 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 100; // 75 * 500 = 37500
 
-		// tita
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("RimClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 		// new ArrayList
 		List<ClBuildingPublic> lClBuildingPublic = new ArrayList<ClBuildingPublic>();
-//		List<ClBuildingParking> lClBuildingParking = new ArrayList<ClBuildingParking>();
 		List<ClBuildingOwner> lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 		List<ClBuildingReason> lClBuildingReason = new ArrayList<ClBuildingReason>();
 		int dataSize3 = 0;
@@ -130,7 +117,7 @@ public class L2915 extends TradeBuffer {
 		ClMainId.setClCode1(iClCode1);
 		ClMainId.setClCode2(iClCode2);
 		ClMainId.setClNo(iClNo);
-		// tita擔保品編號取擔保品不動產建物檔資料
+		// TITA擔保品編號取擔保品不動產建物檔資料
 		tClBuilding = sClBuildingService.findById(ClBuildingId, titaVo);
 		tClMain = sClMainService.findById(ClMainId, titaVo);
 		// 測試該擔保品編號是否存在擔保品不動產建物檔
@@ -142,7 +129,7 @@ public class L2915 extends TradeBuffer {
 			throw new LogicException("E0001", "L2915該擔保品編號不存在擔保品主檔");
 		}
 		// 該擔保品編號存在擔保品不動產建物檔
-		// 塞tota
+
 		this.totaVo.putParam("BdLocation", tClBuilding.getBdLocation());
 		this.totaVo.putParam("BdMainUseCode", tClBuilding.getBdMainUseCode());
 		this.totaVo.putParam("BdMtrlCode", tClBuilding.getBdMtrlCode());
@@ -166,7 +153,7 @@ public class L2915 extends TradeBuffer {
 		this.totaVo.putParam("HouseBuyDate", tClBuilding.getHouseBuyDate());
 		this.totaVo.putParam("ClStatus", tClMain.getClStatus());
 
-		// tita擔保品編號取建物公設建號檔資料list
+		// TITA擔保品編號取建物公設建號檔資料list
 		Slice<ClBuildingPublic> slClBuildingPublic = sClBuildingPublicService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClBuildingPublic = slClBuildingPublic == null ? null : new ArrayList<ClBuildingPublic>(slClBuildingPublic.getContent());
 		// 資料筆數
@@ -205,46 +192,9 @@ public class L2915 extends TradeBuffer {
 			i++;
 
 		}
-		// tita擔保品編號取建物獨立產權車位檔資料list
-//		Slice<ClBuildingParking> slClBuildingParking = sClBuildingParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0,
-//				Integer.MAX_VALUE, titaVo);
-//		lClBuildingParking = slClBuildingParking == null ? null
-//				: new ArrayList<ClBuildingParking>(slClBuildingParking.getContent());
-//		// 資料筆數
-//		int dataSize2 = 0;
-//		if (lClBuildingParking != null) {
-//			dataSize2 = lClBuildingParking.size();
-//		} else {
-//			lClBuildingParking = new ArrayList<ClBuildingParking>();
-//		}
-//
-//		this.info("L1R05 lClBuildingParking size in DB = " + dataSize2);
-//
-//		// 暫時只抓前10筆,把第11筆之後的刪除
-//		if (dataSize2 > 10) {
-//			for (int j = dataSize2 + 1; j <= dataSize2; j++) {
-//				lClBuildingParking.remove(j);
-//			}
-//		} else if (dataSize2 <= 10) {
-//			// 若不足10筆,補足10筆
-//			for (int j = dataSize2 + 1; j <= 10; j++) {
-//				ClBuildingParking tClBuildingParking = new ClBuildingParking();
-//				lClBuildingParking.add(tClBuildingParking);
-//			}
-//		}
-//
-//		int j = 1;
-//		for (ClBuildingParking tClBuildingParking : lClBuildingParking) {
-//
-//			this.totaVo.putParam("ParkingBdNoA" + j, tClBuildingParking.getParkingBdNo1());
-//			this.totaVo.putParam("ParkingBdNoB" + j, tClBuildingParking.getParkingBdNo2());
-//			this.totaVo.putParam("ParkingArea" + j, tClBuildingParking.getArea());
-//			this.totaVo.putParam("ParkingAmt" + j, tClBuildingParking.getAmt());
-//
-//			j++;
-//		}
 
-		// tita擔保品編號取建物所有權人檔資料list
+
+		// TITA擔保品編號取建物所有權人檔資料list
 		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClBuildingOwner = slClBuildingOwner == null ? null : new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
 		if (lClBuildingOwner == null) {
@@ -291,7 +241,7 @@ public class L2915 extends TradeBuffer {
 			}
 			k++;
 		}
-		// tita擔保品編號取建物修改原因檔資料list
+		// TITA擔保品編號取建物修改原因檔資料list
 		Slice<ClBuildingReason> slClBuildingReason = sClBuildingReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClBuildingReason = slClBuildingReason == null ? null : new ArrayList<ClBuildingReason>(slClBuildingReason.getContent());
 		// 資料筆數
@@ -332,17 +282,6 @@ public class L2915 extends TradeBuffer {
 				this.info("createDate = " + createDate);
 			}
 
-//			else {
-//				this.info("tClBuildingReason.getCreateDate().toString()L2915 "
-//						+ tClBuildingReason.getCreateDate().toString());
-//				String CreateDate = tClBuildingReason.getCreateDate().toString();
-//				this.info("CreateDate L2915 " + CreateDate);
-//				String CreateDate2 = CreateDate.substring(0, 4) + CreateDate.substring(5, 7)
-//						+ CreateDate.substring(8, 10);
-//				int CreateDate3 = parse.stringToInteger(CreateDate2) - 19110000;
-//				CreateDate4 = String.valueOf(CreateDate3);
-//			}
-
 			this.totaVo.putParam("Reason" + l, tClBuildingReason.getReason());
 			this.totaVo.putParam("OtherReason" + l, tClBuildingReason.getOtherReason());
 			this.totaVo.putParam("CreateEmpNo" + l, tClBuildingReason.getCreateEmpNo());
@@ -363,7 +302,6 @@ public class L2915 extends TradeBuffer {
 				if (j > 100) {
 					break;
 				}
-//				OccursList occursList = new OccursList();
 
 				this.totaVo.putParam("ParkingNo" + j, tClParking.getParkingNo());
 				this.totaVo.putParam("ParkingQty" + j, tClParking.getParkingQty());
@@ -377,19 +315,6 @@ public class L2915 extends TradeBuffer {
 				this.totaVo.putParam("ParkingArea" + j, tClParking.getParkingArea());
 				this.totaVo.putParam("ParkingAmount" + j, tClParking.getAmount());
 
-//				occursList.putParam("ParkingNo", tClParking.getParkingNo());
-//				occursList.putParam("ParkingQty", tClParking.getParkingQty());
-//				occursList.putParam("ParkingTypeCode", tClParking.getParkingTypeCode());
-//				occursList.putParam("ParkingOwnerPart", tClParking.getOwnerPart());
-//				occursList.putParam("ParkingOwnerTotal", tClParking.getOwnerTotal());
-//				occursList.putParam("ParkingBdNoA", tClParking.getBdNo1());
-//				occursList.putParam("ParkingBdNoB", tClParking.getBdNo2());
-//				occursList.putParam("ParkingLandNoA", tClParking.getLandNo1());
-//				occursList.putParam("ParkingLandNoB", tClParking.getLandNo2());
-//				occursList.putParam("ParkingArea", tClParking.getParkingArea());
-//				occursList.putParam("ParkingAmount", tClParking.getAmount());
-
-//				this.totaVo.addOccursList(occursList);
 				j++;
 			}
 		}

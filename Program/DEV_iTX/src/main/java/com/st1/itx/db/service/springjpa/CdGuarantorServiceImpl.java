@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdGuarantorService")
 @Repository
-public class CdGuarantorServiceImpl implements CdGuarantorService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdGuarantorServiceImpl.class);
-
+public class CdGuarantorServiceImpl extends ASpringJpaParm implements CdGuarantorService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class CdGuarantorServiceImpl implements CdGuarantorService, InitializingB
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + guaRelCode);
+    this.info("findById " + dbName + " " + guaRelCode);
     Optional<CdGuarantor> cdGuarantor = null;
     if (dbName.equals(ContentName.onDay))
       cdGuarantor = cdGuarantorReposDay.findById(guaRelCode);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "GuaRelCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "GuaRelCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdGuarantorReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
     else 
       slice = cdGuarantorRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -114,7 +113,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("guaRelJcicFirst " + dbName + " : " + "guaRelJcic_0 : " + guaRelJcic_0 + " guaRelJcic_1 : " +  guaRelJcic_1);
+    this.info("guaRelJcicFirst " + dbName + " : " + "guaRelJcic_0 : " + guaRelJcic_0 + " guaRelJcic_1 : " +  guaRelJcic_1);
     Optional<CdGuarantor> cdGuarantorT = null;
     if (dbName.equals(ContentName.onDay))
       cdGuarantorT = cdGuarantorReposDay.findTopByGuaRelJcicGreaterThanEqualAndGuaRelJcicLessThanEqual(guaRelJcic_0, guaRelJcic_1);
@@ -124,6 +123,7 @@ em = null;
       cdGuarantorT = cdGuarantorReposHist.findTopByGuaRelJcicGreaterThanEqualAndGuaRelJcicLessThanEqual(guaRelJcic_0, guaRelJcic_1);
     else 
       cdGuarantorT = cdGuarantorRepos.findTopByGuaRelJcicGreaterThanEqualAndGuaRelJcicLessThanEqual(guaRelJcic_0, guaRelJcic_1);
+
     return cdGuarantorT.isPresent() ? cdGuarantorT.get() : null;
   }
 
@@ -139,7 +139,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findGuaRelCode " + dbName + " : " + "guaRelCode_0 : " + guaRelCode_0 + " guaRelCode_1 : " +  guaRelCode_1);
+    this.info("findGuaRelCode " + dbName + " : " + "guaRelCode_0 : " + guaRelCode_0 + " guaRelCode_1 : " +  guaRelCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdGuarantorReposDay.findAllByGuaRelCodeGreaterThanEqualAndGuaRelCodeLessThanEqualOrderByGuaRelCodeAsc(guaRelCode_0, guaRelCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -149,6 +149,9 @@ em = null;
     else 
       slice = cdGuarantorRepos.findAllByGuaRelCodeGreaterThanEqualAndGuaRelCodeLessThanEqualOrderByGuaRelCodeAsc(guaRelCode_0, guaRelCode_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -157,7 +160,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + guaRelCode);
+    this.info("Hold " + dbName + " " + guaRelCode);
     Optional<CdGuarantor> cdGuarantor = null;
     if (dbName.equals(ContentName.onDay))
       cdGuarantor = cdGuarantorReposDay.findByGuaRelCode(guaRelCode);
@@ -175,7 +178,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdGuarantor.getGuaRelCode());
+    this.info("Hold " + dbName + " " + cdGuarantor.getGuaRelCode());
     Optional<CdGuarantor> cdGuarantorT = null;
     if (dbName.equals(ContentName.onDay))
       cdGuarantorT = cdGuarantorReposDay.findByGuaRelCode(cdGuarantor.getGuaRelCode());
@@ -197,7 +200,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdGuarantor.getGuaRelCode());
+    this.info("Insert..." + dbName + " " + cdGuarantor.getGuaRelCode());
     if (this.findById(cdGuarantor.getGuaRelCode()) != null)
       throw new DBException(2);
 
@@ -226,7 +229,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdGuarantor.getGuaRelCode());
+    this.info("Update..." + dbName + " " + cdGuarantor.getGuaRelCode());
     if (!empNot.isEmpty())
       cdGuarantor.setLastUpdateEmpNo(empNot);
 
@@ -249,7 +252,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdGuarantor.getGuaRelCode());
+    this.info("Update..." + dbName + " " + cdGuarantor.getGuaRelCode());
     if (!empNot.isEmpty())
       cdGuarantor.setLastUpdateEmpNo(empNot);
 
@@ -269,7 +272,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdGuarantor.getGuaRelCode());
+    this.info("Delete..." + dbName + " " + cdGuarantor.getGuaRelCode());
     if (dbName.equals(ContentName.onDay)) {
       cdGuarantorReposDay.delete(cdGuarantor);	
       cdGuarantorReposDay.flush();
@@ -298,7 +301,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdGuarantor t : cdGuarantor){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -333,7 +336,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdGuarantor == null || cdGuarantor.size() == 0)
       throw new DBException(6);
 
@@ -362,7 +365,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdGuarantor> cdGuarantor, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

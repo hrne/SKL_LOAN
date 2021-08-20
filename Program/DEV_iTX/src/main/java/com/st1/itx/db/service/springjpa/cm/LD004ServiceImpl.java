@@ -43,7 +43,7 @@ public class LD004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CM.\"CustName\" "; // 戶名
 		sql += "      , CASE ";
 		sql += "         WHEN :inputOption = 1 "; // 還本收據
-		sql += "         THEN TX.\"Principal\" ";
+		sql += "         THEN TX.\"Principal\" + TX.\"ExtraRepay\" ";
 		sql += "         WHEN :inputOption = 2 "; // 繳息收據
 		sql += "         THEN TX.\"Interest\" ";
 		sql += "        ELSE 0 END AS \"Amt\" ";

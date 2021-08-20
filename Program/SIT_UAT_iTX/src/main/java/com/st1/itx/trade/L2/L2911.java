@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -33,13 +31,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * COLIND1=9,1<br>
- * COLIND2=9,2<br>
- * COLNO=9,7<br>
- * END=X,1<br>
- */
 
 @Service("L2911")
 @Scope("prototype")
@@ -50,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2911 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2911.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -74,7 +64,7 @@ public class L2911 extends TradeBuffer {
 
 	@Autowired
 	public CdInsurerService sCdInsurerService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -91,12 +81,11 @@ public class L2911 extends TradeBuffer {
 		Slice<ClLand> slClLand = null;
 		String custid = "";
 		String custname = "";
-		// tita
+
 		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 
-		// new pk
 		ClMainId ClMainId = new ClMainId();
 		ClImmId ClImmId = new ClImmId();
 
@@ -128,35 +117,26 @@ public class L2911 extends TradeBuffer {
 			custname = tCustMain.getCustName();
 
 		}
-		String oL2915Fg = "Y";
-		String oL2916Fg = "Y";
 
 		ClBuilding tClBuilding = sClBuildingService.findById(new ClBuildingId(iClCode1, iClCode2, iClNo), titaVo);
 
-//		if (tClBuilding == null) {
-//			oL2915Fg = "N";
-//		}
-
 		slClLand = sClLandService.findClNo(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
 		List<ClLand> lClLand = slClLand == null ? null : new ArrayList<ClLand>(slClLand.getContent());
-//		if (tClLand == null) {
-//			oL2916Fg = "N";
-//		}
-		
+
+
 		// 查詢保險公司資料檔
 		Slice<CdInsurer> slCdInsurer;
 		slCdInsurer = sCdInsurerService.insurerTypeRange("1", "2", tClImm.getEvaCompanyCode(), tClImm.getEvaCompanyCode(), this.index, this.limit, titaVo);
-		
+
 		List<CdInsurer> lCdInsurer = slCdInsurer == null ? null : slCdInsurer.getContent();
 
 		String OEvaCompanyX = "";
 		// 如有找到資料
-		if (lCdInsurer != null ) {
-		  for (CdInsurer tCdInsurer : lCdInsurer) {
-			OEvaCompanyX = 	tCdInsurer.getInsurerItem();
-		  }
+		if (lCdInsurer != null) {
+			for (CdInsurer tCdInsurer : lCdInsurer) {
+				OEvaCompanyX = tCdInsurer.getInsurerItem();
+			}
 		}
-		
 
 		this.totaVo.putParam("OCustId", custid);
 		this.totaVo.putParam("OCustName", custname);
@@ -172,7 +152,7 @@ public class L2911 extends TradeBuffer {
 		this.totaVo.putParam("ORentPrice", tClImm.getRentPrice());
 		this.totaVo.putParam("OEvaCompany", tClImm.getEvaCompanyCode());
 		this.totaVo.putParam("OEvaCompanyX", OEvaCompanyX);
-		
+
 		this.totaVo.putParam("OOwnershipCode", tClImm.getOwnershipCode());
 		this.totaVo.putParam("OMtgCode", tClImm.getMtgCode());
 		this.totaVo.putParam("OMtgCheck", tClImm.getMtgCheck());
@@ -208,8 +188,6 @@ public class L2911 extends TradeBuffer {
 		this.totaVo.putParam("OThirdAmt", tClImm.getThirdAmt());
 		this.totaVo.putParam("OThirdCreditor", tClImm.getThirdCreditor());
 
-//		this.totaVo.putParam("OL2915Fg", oL2915Fg);
-//		this.totaVo.putParam("OL2916Fg", oL2916Fg);
 		if (tClBuilding != null) {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOtradecode", "L2915");

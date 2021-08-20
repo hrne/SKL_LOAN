@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM009ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,7 +30,7 @@ public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("lM009.findAll ");
+		this.info("lM009.findAll ");
 
 		String iYRMO = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000) / 100);
 
@@ -77,7 +74,7 @@ public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		sql += "               WHERE A.\"AcctCode\" > '300' AND A.\"AcctCode\" < '390')";
 //		sql += "        GROUP BY \"F1\", \"F2\", \"F4\"";
 //		sql += "        ORDER BY \"F1\"";
-		
+
 		String sql = "SELECT C.\"AcctItem\"";
 		sql += "            ,CdC.\"Item\" AS \"AcSubBookItem\"";
 		sql += "            ,SUM(S1.\"Count\") AS \"Count\"";
@@ -86,19 +83,19 @@ public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,A.\"AcSubBookCode\" AS \"AcSubBookCode\"";
 		sql += "                  ,1 AS \"Count\"";
 		sql += "                  ,A.\"CustNo\"";
-		sql += "                  ,A.\"FacmNo\"";
 		sql += "                  ,SUM(A.\"Interest\") AS \"Interest\"";
 		sql += "            FROM \"AcLoanInt\" A";
 		sql += "            WHERE A.\"YearMonth\" = :iyemo";
 		sql += "              AND A.\"AcctCode\" IN ('IC1', 'IC2', 'IC3', 'IC4')";
-		sql += "            GROUP BY A.\"AcctCode\", A.\"AcSubBookCode\", A.\"CustNo\", A.\"FacmNo\") S1";
+		sql += "              AND A.\"Interest\" > 0 ";
+		sql += "            GROUP BY A.\"AcctCode\", A.\"AcSubBookCode\", A.\"CustNo\") S1";
 		sql += "      LEFT JOIN \"CdAcCode\" C ON C.\"AcctCode\" = DECODE(S1.\"AcctCode\", 'IC1', '310', 'IC2', '320', 'IC3', '330', 'IC4', '340')";
 		sql += "      LEFT JOIN \"CdCode\" CdC ON CdC.\"DefCode\" = 'AcSubBookCode' AND CdC.\"Code\" = S1.\"AcSubBookCode\"";
 		sql += "      GROUP BY C.\"AcctItem\"";
 		sql += "              ,CdC.\"Item\"";
 		sql += "      ORDER BY C.\"AcctItem\"";
 		sql += "              ,CdC.\"Item\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

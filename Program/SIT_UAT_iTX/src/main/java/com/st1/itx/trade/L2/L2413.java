@@ -37,51 +37,7 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-/**
- * Tita<br>
- * FunCd=X,1<br>
- * ClTypeCode=X,3<br>
- * ClCode1=X,1<br>
- * ClCode2=9,2<br>
- * ClNo=9,7<br>
- * CityCode=9,2<br>
- * StockCode=X,4<br>
- * ListingType=X,2<br>
- * StockType=X,2<br>
- * CompanyId=X,10<br>
- * DataYear=9,4<br>
- * IssuedShares=9,14<br>
- * NetWorth=9,14<br>
- * EvaStandard=X,12<br>
- * ParValue=9,14.2<br>
- * MonthlyAvg=9,14.2<br>
- * YdClosingPrice=9,14.2<br>
- * ThreeMonthAvg=9,14.2<br>
- * EvaUnitPrice=9,14.2<br>
- * OwnerId=X,10<br>
- * OwnerName=X,10<br>
- * InsiderJobTitle=X,2<br>
- * InsiderPosition=X,2<br>
- * LegalPersonId=X,10<br>
- * LoanToValue=9,3.2<br>
- * ClMtr=9,3.2<br>
- * NoticeMtr=9,3.2<br>
- * ImplementMtr=9,3.2<br>
- * PledgeNo=X,14<br>
- * ComputeMTR=X,1<br>
- * SettingDate=9,7<br>
- * SettingBalance=9,14<br>
- * VALUE_DT=9,7<br>
- * ESTVALUE_AMT=9,14<br>
- * MtgDate=9,7<br>
- * CustodyNo=X,5<br>
- * Synd=X,1<br>
- * SyndCode=X,1<br>
- * DispPrice=9,14<br>
- * DispDate=9,7<br>
- * ClStatus=9,1<br>
- * END=X,1<br>
- */
+
 
 @Service("L2413")
 @Scope("prototype")
@@ -175,28 +131,6 @@ public class L2413 extends TradeBuffer {
 
 		if (iFunCd == 1) {
 
-			// 錯誤處理
-//			if (iCustId.isEmpty() && iCustNo == 0) {
-
-//				throw new LogicException("E2051", "L2413");
-
-//			}
-
-//			if (!iCustId.isEmpty()) {
-//				tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
-				// 錯誤處理
-//				if (tCustMain == null) {
-//					throw new LogicException("E1003", iCustId);
-//				}
-//			} else {
-//				tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo);
-				// 錯誤處理
-//				if (tCustMain == null) {
-//					throw new LogicException("E1004", String.valueOf(iCustNo));
-//				}
-//			}
-
-
 			// 取號使用參數
 			String Colind4s = StringUtils.leftPad(String.valueOf(iClCode1), 2, "0") + StringUtils.leftPad(String.valueOf(iClCode2), 2, "0");
 
@@ -269,8 +203,6 @@ public class L2413 extends TradeBuffer {
 			tClStock.setThreeMonthAvg(parse.stringToBigDecimal(titaVo.getParam("ThreeMonthAvg")));
 			tClStock.setEvaUnitPrice(parse.stringToBigDecimal(titaVo.getParam("EvaUnitPrice")));
 
-//			tClStock.setOwnerId(titaVo.getParam("OwnerId"));
-//			tClStock.setOwnerName(titaVo.getParam("OwnerName"));
 			tClStock = setOwnerCustUKey(tClStock, titaVo);
 
 			tClStock.setInsiderJobTitle(titaVo.getParam("InsiderJobTitle"));
@@ -383,7 +315,6 @@ public class L2413 extends TradeBuffer {
 
 			if (iFunCd == 2) {
 
-//				tClMain = sClMainService.holdById(tClMainId);
 				tClStock = sClStockService.holdById(tClStockId);
 
 				// 變更前
@@ -441,8 +372,6 @@ public class L2413 extends TradeBuffer {
 				tClStock.setThreeMonthAvg(parse.stringToBigDecimal(titaVo.getParam("ThreeMonthAvg")));
 				tClStock.setEvaUnitPrice(parse.stringToBigDecimal(titaVo.getParam("EvaUnitPrice")));
 
-//				tClStock.setOwnerId(titaVo.getParam("OwnerId"));
-//				tClStock.setOwnerName(titaVo.getParam("OwnerName"));
 				tClStock = setOwnerCustUKey(tClStock, titaVo);
 
 				tClStock.setInsiderJobTitle(titaVo.getParam("InsiderJobTitle"));
@@ -484,8 +413,6 @@ public class L2413 extends TradeBuffer {
 				/* 刪除 */
 				try {
 
-//					tClStock = sClStockService.holdById(tClStockId);
-
 					if (tClStock != null) {
 						sClStockService.delete(tClStock);
 					}
@@ -495,7 +422,6 @@ public class L2413 extends TradeBuffer {
 
 				}
 				try {
-//					tClMain = sClMainService.holdById(tClMainId);
 
 					sClMainService.delete(tClMain);
 				} catch (DBException e) {
@@ -543,7 +469,6 @@ public class L2413 extends TradeBuffer {
 
 		CustMain custMain = sCustMainService.custIdFirst(titaVo.getParam("OwnerId"), titaVo);
 		if (custMain != null) {
-//		Slice<ClStock> sClStock = sClStockService.findUnique(titaVo.getParam("StockCode"), titaVo.getParam("OwnerId"), 0, Integer.MAX_VALUE);
 			Slice<ClStock> sClStock = sClStockService.findUnique(titaVo.getParam("StockCode"), custMain.getCustId(), 0, Integer.MAX_VALUE);
 			List<ClStock> lClStock = sClStock == null ? null : sClStock.getContent();
 			if (lClStock != null) {

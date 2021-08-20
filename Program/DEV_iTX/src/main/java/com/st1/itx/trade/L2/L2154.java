@@ -630,7 +630,6 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("LastBormRvNo", tFacMain.getLastBormRvNo());
 //		tTempVo.putParam("CustUKey", tFacMain.getCustUKey());
 		tTempVo.putParam("ApplNo", tFacMain.getApplNo());
-		tTempVo.putParam("ProdNo", tFacMain.getProdNo());
 		tTempVo.putParam("AnnualIncr", tFacMain.getAnnualIncr());
 		tTempVo.putParam("EmailIncr", tFacMain.getEmailIncr());
 		tTempVo.putParam("GraceIncr", tFacMain.getGraceIncr());
@@ -647,6 +646,7 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("ColSetFlag", tFacMain.getColSetFlag());
 		tTempVo.putParam("L9110Flag", tFacMain.getL9110Flag());
 		// 以下為可維護項目
+		tTempVo.putParam("ProdNo", tFacMain.getProdNo());
 		tTempVo.putParam("CreditSysNo", tFacMain.getCreditSysNo());
 		tTempVo.putParam("BaseRateCode", tFacMain.getBaseRateCode());
 		tTempVo.putParam("RateIncr", tFacMain.getRateIncr());
@@ -656,6 +656,7 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("FirstRateAdjFreq", tFacMain.getFirstRateAdjFreq());
 		tTempVo.putParam("RateAdjFreq", tFacMain.getRateAdjFreq());
 		tTempVo.putParam("LineAmt", tFacMain.getLineAmt());
+		tTempVo.putParam("AcctCode", tFacMain.getAcctCode());
 		tTempVo.putParam("LoanTermYy", tFacMain.getLoanTermYy());
 		tTempVo.putParam("LoanTermMm", tFacMain.getLoanTermMm());
 		tTempVo.putParam("LoanTermDd", tFacMain.getLoanTermDd());
@@ -733,6 +734,7 @@ public class L2154 extends TradeBuffer {
 
 		beforeFacMain = (FacMain) datalog.clone(tFacMain);
 		tFacMain.setCreditSysNo(this.parse.stringToInteger(titaVo.getParam("CreditSysNo")));
+		tFacMain.setProdNo(titaVo.getParam("ProdNo"));
 		tFacMain.setBaseRateCode(titaVo.getParam("BaseRateCode"));
 		tFacMain.setRateIncr(this.parse.stringToBigDecimal(titaVo.getParam("RateIncr")));
 		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(titaVo.getParam("IndividualIncr")));
@@ -740,6 +742,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateCode(titaVo.getParam("RateCode"));
 		tFacMain.setFirstRateAdjFreq(this.parse.stringToInteger(titaVo.getParam("FirstRateAdjFreq")));
 		tFacMain.setRateAdjFreq(this.parse.stringToInteger(titaVo.getParam("RateAdjFreq")));
+		tFacMain.setAcctCode(titaVo.getParam("AcctCode"));
 		tFacMain.setLineAmt(this.parse.stringToBigDecimal(titaVo.getParam("TimApplAmt")));
 		tFacMain.setLoanTermYy(this.parse.stringToInteger(titaVo.getParam("LoanTermYy")));
 		tFacMain.setLoanTermMm(this.parse.stringToInteger(titaVo.getParam("LoanTermMm")));
@@ -880,6 +883,7 @@ public class L2154 extends TradeBuffer {
 		loanCom.checkEraseFacmTxSeqNo(tFacMain, titaVo);
 		beforeFacMain = (FacMain) datalog.clone(tFacMain);
 		tFacMain.setCreditSysNo(this.parse.stringToInteger(tTempVo.getParam("CreditSysNo")));
+		tFacMain.setProdNo(tTempVo.getParam("ProdNo"));
 		tFacMain.setBaseRateCode(tTempVo.getParam("BaseRateCode"));
 		tFacMain.setRateIncr(this.parse.stringToBigDecimal(tTempVo.getParam("RateIncr")));
 		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("IndividualIncr")));
@@ -888,6 +892,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setFirstRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("FirstRateAdjFreq")));
 		tFacMain.setRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("RateAdjFreq")));
 		tFacMain.setLineAmt(this.parse.stringToBigDecimal(tTempVo.getParam("LineAmt")));
+		tFacMain.setAcctCode(tTempVo.getParam("AcctCode"));
 		tFacMain.setLoanTermYy(this.parse.stringToInteger(tTempVo.getParam("LoanTermYy")));
 		tFacMain.setLoanTermMm(this.parse.stringToInteger(tTempVo.getParam("LoanTermMm")));
 		tFacMain.setLoanTermDd(this.parse.stringToInteger(tTempVo.getParam("LoanTermDd")));
@@ -999,14 +1004,12 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setLastBormRvNo(this.parse.stringToInteger(tTempVo.getParam("LastBormRvNo")));
 //		tFacMain.setCustUKey(tTempVo.getParam("CustUKey"));
 		tFacMain.setApplNo(this.parse.stringToInteger(tTempVo.getParam("ApplNo")));
-		tFacMain.setProdNo(tTempVo.getParam("ProdNo"));
 		tFacMain.setAnnualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("AnnualIncr")));
 		tFacMain.setEmailIncr(this.parse.stringToBigDecimal(tTempVo.getParam("EmailIncr")));
 		tFacMain.setGraceIncr(this.parse.stringToBigDecimal(tTempVo.getParam("GraceIncr")));
 		tFacMain.setCurrencyCode(tTempVo.getParam("CurrencyCode"));
 		tFacMain.setUtilAmt(this.parse.stringToBigDecimal(tTempVo.getParam("UtilAmt")));
 		tFacMain.setUtilBal(this.parse.stringToBigDecimal(tTempVo.getParam("UtilBal")));
-		tFacMain.setAcctCode(tTempVo.getParam("AcctCode"));
 		tFacMain.setFirstDrawdownDate(this.parse.stringToInteger(tTempVo.getParam("FirstDrawdownDate")));
 		tFacMain.setMaturityDate(this.parse.stringToInteger(tTempVo.getParam("MaturityDate")));
 //		tFacMain.setCopyFlag(tTempVo.getParam("CopyFlag"));
@@ -1017,6 +1020,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setL9110Flag(tTempVo.getParam("L9110Flag"));
 		// 以下為可維護項目
 		tFacMain.setCreditSysNo(this.parse.stringToInteger(tTempVo.getParam("CreditSysNo")));
+		tFacMain.setProdNo(tTempVo.getParam("ProdNo"));
 		tFacMain.setBaseRateCode(tTempVo.getParam("BaseRateCode"));
 		tFacMain.setRateIncr(this.parse.stringToBigDecimal(tTempVo.getParam("RateIncr")));
 		tFacMain.setIndividualIncr(this.parse.stringToBigDecimal(tTempVo.getParam("IndividualIncr")));
@@ -1025,6 +1029,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setFirstRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("FirstRateAdjFreq")));
 		tFacMain.setRateAdjFreq(this.parse.stringToInteger(tTempVo.getParam("RateAdjFreq")));
 		tFacMain.setLineAmt(this.parse.stringToBigDecimal(tTempVo.getParam("TimApplAmt")));
+		tFacMain.setAcctCode(tTempVo.getParam("AcctCode"));
 		tFacMain.setLoanTermYy(this.parse.stringToInteger(tTempVo.getParam("LoanTermYy")));
 		tFacMain.setLoanTermMm(this.parse.stringToInteger(tTempVo.getParam("LoanTermMm")));
 		tFacMain.setLoanTermDd(this.parse.stringToInteger(tTempVo.getParam("LoanTermDd")));
