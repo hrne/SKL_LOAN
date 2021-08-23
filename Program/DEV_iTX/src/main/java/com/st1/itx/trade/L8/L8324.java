@@ -204,7 +204,9 @@ public class L8324 extends TradeBuffer {
 			    iJcicZ443.setMothPayDay(iJcicZ443Log.getMothPayDay());
 			    iJcicZ443.setBeginDate(iJcicZ443Log.getBeginDate());
 			    iJcicZ443.setEndDate(iJcicZ443Log.getEndDate());
-		        
+			    iJcicZ443.setTranKey(iJcicZ443Log.getTranKey());
+			    iJcicZ443.setOutJcicTxtDate(iJcicZ443Log.getOutJcicTxtDate());
+				
 		        try {
 		            sJcicZ443Service.update(iJcicZ443, titaVo);
 		        }catch (DBException e) {

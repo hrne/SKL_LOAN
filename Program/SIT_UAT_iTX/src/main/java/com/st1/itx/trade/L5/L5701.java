@@ -45,8 +45,8 @@ import com.st1.itx.db.service.NegFinShareLogService;
  * Tita<br>
  * FunctionCode=X,2<br>
  * CustId=X,10<br>
- * DeferYMStart=X,5<br>
- * DeferYMEnd=X,5<br>
+ * DeferYMStart=9,5<br>
+ * DeferYMEnd=9,5<br>
  * CaseKindCode=X,1<br>
  * CustLoanKind=X,1<br>
  * CustNo=X,7<br>
@@ -398,8 +398,8 @@ public class L5701 extends TradeBuffer {
 	
 	
 	public NegMain InputNegMain(NegMainId NegMainIdVO) throws LogicException {
-		String DeferYMStart = titaVo.getParam("DeferYMStart").trim(); // 延期繳款年月(起)
-		String DeferYMEnd = titaVo.getParam("DeferYMEnd").trim(); // 延期繳款年月(訖)
+		int DeferYMStart = parse.stringToInteger(titaVo.getParam("DeferYMStart").trim()); // 延期繳款年月(起)
+		int DeferYMEnd = parse.stringToInteger(titaVo.getParam("DeferYMEnd").trim()); // 延期繳款年月(訖)
 		String CaseKindCode = titaVo.getParam("CaseKindCode").trim(); // 案件種類
 		String Status = titaVo.getParam("Status").trim(); // 戶況
 		String CustLoanKind = titaVo.getParam("CustLoanKind").trim(); // 債權戶別
@@ -420,17 +420,14 @@ public class L5701 extends TradeBuffer {
 		NegMain InputNegMain = new NegMain();
 
 		InputNegMain.setNegMainId(NegMainIdVO);
-		if (DeferYMStart.length() < 5) {
+		if (DeferYMStart == 0) {
 			InputNegMain.setDeferYMStart(0);// 延期繳款年月(parse.stringToInteger(起)
 			InputNegMain.setDeferYMEnd(0);// 延期繳款年月(parse.stringToInteger(訖)
 		} else {
-			InputNegMain.setDeferYMStart(parse.stringToInteger(DeferYMStart) + 191100);// 延期繳款年月(parse.stringToInteger(起)
-			InputNegMain.setDeferYMEnd(parse.stringToInteger(DeferYMEnd) + 191100);// 延期繳款年月(parse.stringToInteger(訖)
+			InputNegMain.setDeferYMStart(DeferYMStart + 191100);// 延期繳款年月(parse.stringToInteger(起)
+			InputNegMain.setDeferYMEnd(DeferYMEnd + 191100);// 延期繳款年月(parse.stringToInteger(訖)
 		}
 
-		if (InputNegMain.getDeferYMStart() != 0 && InputNegMain.getDeferYMEnd() != 0) {
-			// 喘息期
-		}
 
 		InputNegMain.setCaseKindCode(CaseKindCode);// 案件種類
 		InputNegMain.setStatus(Status);// 戶況

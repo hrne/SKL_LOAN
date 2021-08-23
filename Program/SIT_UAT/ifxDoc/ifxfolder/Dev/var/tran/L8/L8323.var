@@ -38,13 +38,14 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[300,100,300,300];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,350,150];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8323]                                 (442)前置調解回報無擔保債權金額資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 ["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
-["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],["#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
+[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+[#<->#,"#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
 ["#FdIsClaims+是否為本金融機構債務人",#IsClaims],["#FdGuarLoanCnt+本金融機構有擔保債權筆數",#GuarLoanCnt],
 ["#FdCivil323ExpAmt+依民法第323條計算之信用放款本息餘額",#Civil323ExpAmt],["#FdCivil323CashAmt+依民法第323條計算之現金卡放款本息餘額",#Civil323CashAmt],
 ["#FdCivil323CreditAmt+依民法第323條計算之信用卡本息餘額",#Civil323CreditAmt],["#FdCivil323GuarAmt+依民法第323條計算之保證債權本息餘額",#Civil323GuarAmt],
@@ -118,7 +119,7 @@ T(2,@YesNoHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-V(P,本交易為連動交易，請由L8030-Jcic442連動進入)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic442連動進入),$)
 T(F,@TranKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)
 T(F,@MaxMainCode,0)T(F,@IsMaxMain,0)T(F,@IsClaims,0)T(F,@GuarLoanCnt,0)
 T(F,@Civil323ExpAmt,0)T(F,@Civil323CashAmt,0)T(F,@Civil323CreditAmt,0)T(F,@Civil323GuarAmt,0)
@@ -279,14 +280,15 @@ E(0,@OutJcicTxtDate,#L8r40OutJcicTxtDate)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
-T(2,@TranKey,#L8r35TranKey)
+T(2,@TranKey,#L8r40TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(2,@RimJcicBankCode,#CourtCode,#MaxMainCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
-T(2,@MaxMainCodeX,#L8r01JcicBankName)
+!T(2,@RimJcicBankCode,#CourtCode)
+!T(2,@RimJcicBankCode,#MaxMainCode)
+!RESET_RIM(#RimL8r01,L8R01)
+!S(L8R01,1,#RimJcicBankCode)
+!R(1,L8R01)
+!T(2,@CourtCodeX,#L8r01JcicBankName)
+!T(2,@MaxMainCodeX,#L8r01JcicBankName)
 ! 調Rim相關 結束
 
 ![交易代碼]
@@ -331,6 +333,7 @@ R(1,L8R01)
 T(2,@CourtCodeX,#L8r01JcicBankName)
 
 #CourtCodeX=X,80,L
+T(2,@CourtCodeX,#L8r01JcicBankName)
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
@@ -344,6 +347,8 @@ R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 #MaxMainCodeX=X,80,L
+T(2,@MaxMainCodeX,#L8r01JcicBankName)
+
 
 !是否為最大債權金融機構報送
 #IsMaxMain=X,1,I
@@ -539,6 +544,7 @@ T(3,[L8323] 前置調解回報無擔保債權金額資料)
 #GuarObliPena
 #GuarObliOther
 #OutJcicTxtDate
+#Ukey
 </sub>
 
 

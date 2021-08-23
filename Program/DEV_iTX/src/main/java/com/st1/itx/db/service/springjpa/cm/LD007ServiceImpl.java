@@ -45,8 +45,8 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                     ,B.\"PieceCode\" ";
 		sql += "                     ,B.\"DrawdownAmt\" ";
 		sql += "                     ,B.\"WorkMonth\" ";
-		sql += "                     ,NVL(B1.\"DeptItem\", ' ') AS F1 ";
-		sql += "                     ,NVL(B2.\"DistItem\", ' ') AS F2 ";
+		sql += "                     ,NVL(NVL(B1.\"DeptItem\", B1.\"UnitItem\"), ' ') AS F1 ";
+		sql += "                     ,NVL(NVL(B2.\"DistItem\", B2.\"UnitItem\"), ' ') AS F2 ";
 		sql += "                     ,NVL(B3.\"UnitItem\", ' ') AS F3 ";
 		sql += "                     ,NVL(E1.\"Fullname\", ' ') AS F4 ";
 		sql += "                     ,NVL(I.\"Introducer\", ' ') AS F5 ";

@@ -48,7 +48,9 @@ T(4,CHAIN$)
 T(3,LD004)
 
 #inputAcDate=D,7,I
-@V(5,0,#SYSDATE)
+@V(7)
+A(DATE,0,#inputAcDate)
+V(5,0,#SYSDATE)
 
 #inputSlipNoStart=N,6,I
 

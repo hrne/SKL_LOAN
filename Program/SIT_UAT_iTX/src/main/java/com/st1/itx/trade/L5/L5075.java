@@ -85,7 +85,7 @@ public class L5075 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		//this.limit=Integer.MAX_VALUE;//查全部
-		this.limit=150;//  264* 150 = 39600
+		this.limit=100;//查全部
 		
 //		String IsMainFin=titaVo.getParam("IsMainFin").trim(); //是否為最大債權 1:Y;2:N
 //		String WorkSubject=titaVo.getParam("WorkSubject").trim(); //作業項目 1:滯繳(時間到未繳);2:應繳(通通抓出來);3即將到期(本金餘額<=三期期款)
@@ -145,6 +145,9 @@ public class L5075 extends TradeBuffer {
 				occursList.putParam("OOPrincipalBal", NegMainVO.getPrincipalBal());// 總本金餘額
 				// 剩餘期數 = (總本金餘額 - 累溢收) / 期款金額
 				BigDecimal Temptimes = new BigDecimal("0");
+				this.info("NegMainVO.getPrincipalBal=" + NegMainVO.getPrincipalBal());
+				this.info("NegMainVO.getAccuOverAmt=" + NegMainVO.getAccuOverAmt());
+				this.info("NegMainVO.getDueAmt=" + NegMainVO.getDueAmt());
 				Temptimes = NegMainVO.getPrincipalBal().subtract(NegMainVO.getAccuOverAmt());
 				// 餘數無條件進位
 				Temptimes = Temptimes.divide(NegMainVO.getDueAmt(), 2);
@@ -155,9 +158,12 @@ public class L5075 extends TradeBuffer {
 				this.totaVo.addOccursList(occursList);
 			}
 			
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
+			if(lNegMain != null && lNegMain.size()>=this.limit) {
+				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+				titaVo.setReturnIndex(this.setIndexNext());
+				this.totaVo.setMsgEndToEnter();// 手動折返
+			}
+			
 			
 		} else {
 			// E2003 查無資料

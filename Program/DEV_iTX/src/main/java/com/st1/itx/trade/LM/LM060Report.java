@@ -4,7 +4,9 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -23,7 +25,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LM060Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM060Report.class);
 
 	@Autowired
 	LM060ServiceImpl lm060ServiceImpl;
@@ -37,7 +38,7 @@ public class LM060Report extends MakeReport {
 		this.info("MakeReport.printHeader");
 		// 設定字體大小
 		this.setFontSize(16);
- 
+
 		this.setCharSpaces(0);
 
 		// 明細起始列(自訂亦必須)
@@ -52,17 +53,43 @@ public class LM060Report extends MakeReport {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM060Report exec txcom " + txcom);
-//		this.info("LM060Report exec titaVo" + titaVo);
-		String iENTDY = titaVo.get("ENTDY").substring(1, 4) + "." + titaVo.get("ENTDY").substring(4, 6) + "."
-				+ titaVo.get("ENTDY").substring(6, 8);
 
-		String iLMONDY = String.valueOf(txcom.getLmndy());
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		iLMONDY = iLMONDY.substring(0, 3) + "." + iLMONDY.substring(3, 5) + "." + iLMONDY.substring(5, 7);
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日(int)
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthDate = Calendar.getInstance();
+		// 設當年月底日
+		calMonthDate.set(iYear, iMonth, 0);
 
-		this.info("LM060Report exec IENTDY=" + iENTDY + ",ILMONDY=" + iLMONDY);
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM060", "轉銷呆帳備忘錄", "密", "A4", "P");
+		
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+
+		// 設上個月底日
+		calMonthDate.set(iYear, iMonth - 1, 0);
+		
+		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+		this.info("lM060.findAll YYMM=" + iYear + String.format("%02d", iMonth) + ",LYYMM=" + lastMonthEndDate / 100
+				+ ",lday" + lastMonthEndDate);
+
+		String iENTDY = thisMonthEndDate / 10000 + "." + (thisMonthEndDate / 100) % 100 + "." + thisMonthEndDate % 100;
+
+		String iLMONDY =lastMonthEndDate / 10000 + "." + (lastMonthEndDate / 100) % 100 + "." + lastMonthEndDate % 100;
+//		String iLMONDY = String.valueOf(txcom.getLmndy());
+//		iLMONDY = iLMONDY.substring(0, 3) + "." + iLMONDY.substring(3, 5) + "." + iLMONDY.substring(5, 7);
+
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM060", "暫付款金額調節表_內部控管", "密", "A4", "P");
 
 		try {
 			fnAllList = lm060ServiceImpl.findAll(titaVo);
@@ -80,9 +107,9 @@ public class LM060Report extends MakeReport {
 			this.print(1, 6, "");
 			this.print(1, 6, "暫付款--法務課暨催收款項-法務費用調節總表：");
 			this.print(3, 6, "");
-			if(tLVo.get("F8")=="0") {
+			if (tLVo.get("F8") == "0") {
 				this.print(0, 10, "本日無資料");
-				
+
 			}
 			this.print(1, 28, "前期餘額：" + iLMONDY + "  ＝");
 			this.print(0, 67, showAmt(tLVo.get("F0")), "R");

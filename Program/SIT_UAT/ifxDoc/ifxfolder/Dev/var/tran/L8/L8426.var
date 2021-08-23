@@ -106,7 +106,7 @@ T(2,@ReportTime,1)
 
 ! 交易代號
 #TranCode=X,3,L
-T(2,575)
+T(2,443)
 #RPTFG=X,1,S
 E(0,0) 
 </sub>

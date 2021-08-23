@@ -32,6 +32,11 @@ T(3,L2222)
 ]
 
 !---------- AP TEXT AREA Variables ----------
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
 #FdNone=X,2,L
 #FdRelCode=X,2,L
 T(2,*)

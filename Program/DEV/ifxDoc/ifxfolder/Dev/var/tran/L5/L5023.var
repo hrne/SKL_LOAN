@@ -1,0 +1,186 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5023)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,40)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+K(MODIFYBUTTON,查詢)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5023" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5023]                                 晤談人員明細資料查詢"],
+["#FdMain+查詢條件","@(戶號、案件編號，需擇一輸入)"],
+[#<->#,"#FdCustNo+．戶號",#CustNo],
+[#<->#,"#FdCreditSysNo+．案件編號",#CreditSysNo],
+]
+#FdMain=X,2,L
+T(3,*)
+
+#FdCustNo=X,2,L
+#FdCreditSysNo=X,2,L
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+! #NTXBUF=X,7,S
+! C(3,#CHAIN,1,T(4,NTXBUF$),S)
+! T(1,@CustNo,#NTXBUF,1,7)
+! INVOKEJS(SHOW,p1,02,02,1)
+
+! 戶號
+#CustNo=A,7,I
+
+! 案件編號
+#CreditSysNo=A,7,I
+C(3,#CustNo,0,$,S)
+@C(3,#CustNo,0,C(3,#CreditSysNo,0,V(P,戶號與案件編號需則一輸入),$),$)
+
+#MRKEY=_,_,S
+C(3,#CustNo,0,S,$)
+T(2,#CustNo)
+
+#RPTFG=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5023 -----------
+<sub type="FORM" name="L5023">
+
+#SCRTIL=_,_,S
+T(3,[L5023] 晤談人員明細資料)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 戶號
+#OOCustNo=A,7,O
+! 額度
+#OOFacmNo=A,3,O
+! 晤談一
+#OOInterviewerA=X,6,O
+#OOInterviewerAX=X,40,O
+#ACom=X,47,O
+T(2,#OOInterviewerA+ +#OOInterviewerAX)
+! 晤談二
+#OOInterviewerB=X,6,O
+#OOInterviewerBX=X,40,O
+#BCom=X,47,O
+T(2,#OOInterviewerB+ +#OOInterviewerBX)
+! 鍵檔人員
+#OOKeyiner=X,6,O
+#OOKeyinerX=X,40,O
+#CCom=X,47,O
+T(2,#OOKeyiner+ +#OOKeyinerX)
+! 協辦人員
+#OOCoorgnizer=X,6,O
+#OOCoorgnizerX=X,40,O
+#DCom=X,47,O
+T(2,#OOCoorgnizer+ +#OOCoorgnizerX)
+! 1+7+4+1+16+16+16=61
+#OOBUF_EDIT=X,36,S
+T(2,2+#OOCustNo+#OOFacmNo+#OOInterviewerA+#OOInterviewerB+#OOKeyiner+#OOCoorgnizer)
+#OOBUF_DELETE=X,36,S
+T(2,4+#OOCustNo+#OOFacmNo+#OOInterviewerA+#OOInterviewerB+#OOKeyiner+#OOCoorgnizer)
+#OOBUF_SEARCH=X,36,S
+T(2,5+#OOCustNo+#OOFacmNo+#OOInterviewerA+#OOInterviewerB+#OOKeyiner+#OOCoorgnizer)
+
+#OOBTN_EDIT=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5406; ntxbuf=#OOBUF_EDIT})
+#OOBTN_DELETE=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5406; ntxbuf=#OOBUF_DELETE})
+#OOBTN_SEARCH=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5406; ntxbuf=#OOBUF_SEARCH})
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CustNo
+#CreditSysNo
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5023
+#OOCustNo#OOFacmNo#OOInterviewerA#OOInterviewerB#OOKeyiner#OOCoorgnizer#OOInterviewerAX#OOInterviewerBX#OOKeyinerX#OOCoorgnizerX
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L5023" layout="cols=1;screen.width=[130,870];order=1;">
+[
+["[L5023]                                 晤談人員明細資料查詢                                                "],
+! [#<->#,"@戶號",#CustNo],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L5023
+#any={detail:true, header:'L5023.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_EDIT=修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+#OOBTN_DELETE=刪除
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBTN_SEARCH=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+
+#OOCustNo=戶號
+{width:80,align:'center'}
+#OOFacmNo=額度
+{width:80,align:'center'}
+#ACom=晤談一
+{width:105,align:'center'}
+#BCom=晤談二
+{width:105,align:'center'}
+#CCom=鍵檔人員
+{width:105,align:'center'}
+#DCom=協辦人員
+{width:105,align:'center'}
+
+^
+<include src="PRT.icf::INQ04.sel" map="i=L5023;cpi=15"/>
+#CustNo
+%
+#OOCustNo#OOFacmNo#OOInterviewerA#OOInterviewerB#OOKeyiner#OOCoorgnizer#OOInterviewerAX#OOInterviewerBX#OOKeyinerX#OOCoorgnizerX
+@^
+</sub>

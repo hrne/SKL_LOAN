@@ -3,6 +3,8 @@ package com.st1.itx.trade.L5;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,7 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L597A extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L597A.class);
+	private static final Logger logger = LoggerFactory.getLogger(L597A.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegCom NegCom;
@@ -77,14 +79,14 @@ public class L597A extends TradeBuffer {
 			sql = l597AServiceImpl.FindL597A(titaVo, AcDate, IsMainFin, SearchOption, SearchDetail, Export, IsBtn,"");
 		} catch (Exception e) {
 			//E5003 組建SQL語法發生問題
-			this.info("L5051 ErrorForSql="+e);
+			logger.info("L5051 ErrorForSql="+e);
 			throw new LogicException(titaVo, "E5003","");
 		}
 		try {
 			Data=l597AServiceImpl.FindL597A(l597AServiceImpl.FindData(this.index, this.limit, sql, titaVo, AcDate, IsMainFin, SearchOption, SearchDetail, Export, IsBtn),"L597A");
 		} catch (Exception e) {
 			//E5004 讀取DB時發生問題
-			this.info("L5051 ErrorForDB="+e);
+			logger.info("L5051 ErrorForDB="+e);
 			throw new LogicException(titaVo, "E5004","");
 		}
 		
@@ -127,9 +129,13 @@ public class L597A extends TradeBuffer {
 				this.totaVo.addOccursList(occursList1);
 			}
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			titaVo.setReturnIndex(this.setIndexNext());
-			//this.totaVo.setMsgEndToAuto();// 自動折返
-			this.totaVo.setMsgEndToEnter();// 手動折返
+			if(Data !=null && Data.size() >=this.limit) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				//this.totaVo.setMsgEndToAuto();// 自動折返
+				this.totaVo.setMsgEndToEnter();// 手動折返
+			}
+			
+			
 		}else {
 			//E2003 查無資料
 			throw new LogicException(titaVo, "E2003","");

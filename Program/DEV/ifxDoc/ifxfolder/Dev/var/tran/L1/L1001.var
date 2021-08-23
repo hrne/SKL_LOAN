@@ -66,14 +66,14 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[120,850];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L1001]                                 顧客明細資料查詢"],
 ["#FdMain+查詢條件","@(借款人戶號、統一編號、戶名、手機號碼，需擇一輸入)"],
-["#FdCustNoSt+借款人戶號",#CustNoSt,"~",#CustNoEd],
-["#FdCustId+統一編號",#CustId],
-["#FdCustName+戶名",#CustName],
-["#FdMobile+手機號碼",#Mobile],
+["#FdCustNoSt+．借款人戶號",#CustNoSt,"~",#CustNoEd],
+["#FdCustId+．統一編號",#CustId],
+["#FdCustName+．戶名",#CustName],
+["#FdMobile+．手機號碼",#Mobile],
 ["#FdIdKind+身份別",#IdKind,#IdKindX],
 ]
 

@@ -46,10 +46,6 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
-		// 設上個月底日
-		calMonthDate.set(iYear, iMonth - 1, 0);
-
-		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
 		boolean isMonthZero = iMonth - 1 == 0;
 
@@ -58,6 +54,11 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
+		// 設上個月底日
+		calMonthDate.set(iYear, iMonth - 1, 0);
+		
+		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+		
 //		String iLYYMM = "";
 //		
 //		if (String.valueOf(iMonth).equals("1")) {

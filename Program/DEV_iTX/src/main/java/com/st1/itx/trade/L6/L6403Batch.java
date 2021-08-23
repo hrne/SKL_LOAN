@@ -127,118 +127,120 @@ public class L6403Batch extends TradeBuffer {
 		for (int i = 1; i <= 30; i++) {
 			String iTranNo = titaVo.get("ApaCode" + i);
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim();
+				
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("ApaBtn" + i).trim();
+					String iInqFg = titaVo.get("OiaBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
 			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("ApaBtn" + i).trim();
-				String iInqFg = titaVo.get("OiaBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+			
 		}
 		// L2
 		for (int i = 1; i <= 90; i++) {
 			String iTranNo = titaVo.get("ApbCode" + i);
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim();
-			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("ApbBtn" + i).trim();
-				String iInqFg = titaVo.get("OibBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+				
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("ApbBtn" + i).trim();
+					String iInqFg = titaVo.get("OibBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
+			}			
+			
 		}
 		// L3
 		for (int i = 1; i <= 50; i++) {
 			String iTranNo = titaVo.get("ApcCode" + i);
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim(); 
+				
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("ApcBtn" + i).trim();
+					String iInqFg = titaVo.get("OicBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
 			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("ApcBtn" + i).trim();
-				String iInqFg = titaVo.get("OicBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+			
 		}
 		// L4
 		for (int i = 1; i <= 100; i++) {
 			String iTranNo = titaVo.get("ApdCode" + i);
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim(); 
+				
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("ApdBtn" + i).trim();
+					String iInqFg = titaVo.get("OidBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
 			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("ApdBtn" + i).trim();
-				String iInqFg = titaVo.get("OidBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+			
 		}
 		// L5
 		for (int i = 1; i <= 100; i++) {
 			String iTranNo = titaVo.get("ApeCode" + i);
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim(); 
+				
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("ApeBtn" + i).trim();
+					String iInqFg = titaVo.get("OieBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
 			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("ApeBtn" + i).trim();
-				String iInqFg = titaVo.get("OieBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+			
 		}
 		// L6
 		for (int i = 1; i <= 110; i++) {
 			String iTranNo = titaVo.get("ApfCode" + i);
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim(); 
+				
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("ApfBtn" + i).trim();
+					String iInqFg = titaVo.get("OifBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
 			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("ApfBtn" + i).trim();
-				String iInqFg = titaVo.get("OifBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+			
 		}
 		// L7
 		for (int i = 1; i <= 20; i++) {
 			String iTranNo = titaVo.get("ApgCode" + i);
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim(); 
+				
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("ApgBtn" + i).trim();
+					String iInqFg = titaVo.get("OigBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
 			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("ApgBtn" + i).trim();
-				String iInqFg = titaVo.get("OigBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+			
 		}
 		// L8
 		for (int i = 1; i <= 150; i++) {
 			String iTranNo = titaVo.get("AphCode" + i);
+			
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim(); 
+				this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("AphBtn" + i).trim();
+					String iInqFg = titaVo.get("OihBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
 			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("AphBtn" + i).trim();
-				String iInqFg = titaVo.get("OihBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+			
 		}
 		// L9
 		for (int i = 1; i <= 50; i++) {
 			String iTranNo = titaVo.get("ApiCode" + i);
+			
 			if(iTranNo!=null) {
-				iTranNo = iTranNo.trim(); 
+				if (iTranNo.trim().length() == 5) {
+					String iCanFg = titaVo.get("ApiBtn" + i).trim();
+					String iInqFg = titaVo.get("OiiBtn" + i).trim();
+					InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
+				}
 			}
-//			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
-			if (iTranNo.length() == 5) {
-				String iCanFg = titaVo.get("ApiBtn" + i).trim();
-				String iInqFg = titaVo.get("OiiBtn" + i).trim();
-				InserOnetAuthority(AuthNo, iTranNo, iCanFg, iInqFg, titaVo);
-			}
+
+			
 		}
 
 	}

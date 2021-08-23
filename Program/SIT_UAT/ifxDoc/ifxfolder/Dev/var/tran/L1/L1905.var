@@ -51,8 +51,8 @@ K(MODIFYBUTTON,1,新增)
 [
 ["[L1905]                                 顧客聯絡電話查詢"],
 ["#FdMain+查詢條件","@(統一編號、戶號，需擇一輸入)"],
-["#FdCustId+統一編號",#CustId,#BTN1,#CustIdName],
-["#FdCustNo+戶號",#CustNo,#BTN2,#CustNoName],
+["#FdCustId+．統一編號",#CustId,#BTN1,#CustIdName],
+["#FdCustNo+．戶號",#CustNo,#BTN2,#CustNoName],
 ]
 #FdMain=X,2,L
 T(3,*)

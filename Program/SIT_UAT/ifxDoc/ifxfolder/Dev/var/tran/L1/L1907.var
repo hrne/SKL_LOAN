@@ -1,0 +1,459 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L1907)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+
+#BTNADDBUF=X,18,S
+T(2,1+        +000)
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L1107; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L1907]                                 公司戶財務狀況明細資料查詢"],
+["#FdMain+查詢條件","@(統一編號、公司名稱，需擇一輸入)"],
+["#FdCustId+．統一編號",#CustId,#BTN2,#CustName],
+["#FdCustFullname+．公司名稱",#CustFullname],
+["#FdRPTFG+顯示方式",
+<include src="COM.icf::RPTFG.scr"/>
+],
+]
+#FdMain=X,2,L
+T(3,*)
+#FdCustId=X,2,L
+#FdCustFullname=X,2,L
+#FdRPTFG=X,2,L
+T(3,*)
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN1=X,15,I,ui:button;value:新增;enable:0;tabbable:0;title:L1107 公司戶財務狀況管理
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+! #BUF1=X,42,S
+! ENABLE(#BTN1)
+!ENABLE(#BTN2)ENABLE(#BTN3)
+#Submit=A,1,S
+K(MODIFYBUTTON,查詢)
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+
+#NTXBUF=X,12,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustId,#NTXBUF,2,8)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+#BUFA=X,1,S
+
+#BINDA=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFA;ntxbuf5=type<-1:CustId<-OOCustId})
+
+!統一編號
+#CustId=X,8,I
+! INVOKEJS(SHOW,p1,1,2,1)
+!C(3,#CHAIN,1,s,$)
+! @C(4,#CustId,$,A(ID_UNINO,0,#CustId)INVOKEJS(SHOW,p1,2,2,0))
+C(4,#CustId,$,T(2,@BTNADDBUF,1+#CustId+000))
+
+!RIM參數使用
+#RimCustId=X,10,S
+#RimCustNo=A,7,S
+#RimFunCd=A,1,S
+E(0,5)
+<include src="ROM.icf::L1R01.dec"/>
+
+#RimL1r01=X,1,S
+T(2,@RimCustId,#CustId)
+C(4,#CustId,S,$)
+RESET_RIM(#RimL1r01,L1R01)
+S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
+R(1,L1R01)
+
+!戶名
+#CustName=X,100,L
+T(2,#L1r01CustName)
+C(4,#CustId,T(3, ),$)
+
+!查詢用戶名
+#CustFullname=X,100,I
+C(4,#CustId,$,S)
+! C(4,#CustId,INVOKEJS(SHOW,p1,1,1,0),S)
+! #RPTFG=A,1,S
+! E(0,0)
+@C(4,#CustId,C(4,#CustFullname,V(P,需擇一輸入查詢條件),$),$)
+
+#RETURN=A,1,S
+E(0,0)
+
+![折返KEY]
+#RTNTXT=X,9,S
+
+#FunCd1=A,1,S
+T(3,1)
+#FunCd2=A,1,S
+T(3,2)
+#FunCd3=A,1,S
+T(3,3)
+#FunCd4=A,1,S
+T(3,4)
+#FunCd5=A,1,S
+T(3,5)
+
+
+#FunCd=A,1,S
+E(0,2)
+
+! #BUF1=X,9,S
+! C(4,#CustId,HIDE(#BTN1),SHOW(#BTN1))
+! T(2,1+#CustId)
+
+! #BIND1=X,1,S
+! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1107; ntxbuf=#BUF1})
+
+
+<include src="COM.icf::RPTFG.dec"/>
+
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(3,#CHAIN,0,T(3,1),T(3,2))
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L1907 ----------
+<sub type="FORM" name="L1907">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L1907,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L1907] 公司戶財務狀況明細資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#OCustId=X,8,L
+T(2,#CustId)
+
+#OCustName=X,100,L
+T(2,#CustName)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+#OOCustId=X,8,L
+#OODataYear=A,3,L
+#OOATotal=m,14,L
+#OOLTotal=m,14,L
+#OOCap=m,14,L
+#OONetIncome=m,14,L
+
+! 配合L1107查詢歷史資料新增
+#OOCash=m,14,L
+#OOShortInv=m,14,L
+#OOAR=m,14,L
+#OOInventory=m,14,L
+#OOLongInv=m,14,L
+#OOFixedAsset=m,14,L
+#OOOtherAsset=m,14,L
+#OOBankLoan=m,14,L
+#OOOtherCurrLiab=m,14,L
+#OOLongLiab=m,14,L
+#OOOtherLiab=m,14,L
+#OONewWorthTotal=m,14,L
+#OORetainEarning=m,14,L
+#OOOpIncome=m,14,L
+#OOOpCost=m,14,L
+#OOOpProfit=m,14,L
+#OOOpExpense=m,14,L
+#OOOpRevenue=m,14,L
+#OONopIncome=m,14,L
+#OOFinExpense=m,14,L
+#OONopExpense=m,14,L
+#OOAccountant=x,28,L
+#OOAccountDate=m,14,L
+
+!修改
+#OOBUF1=X,12,S
+T(2,#FunCd2+#OOCustId+#OODataYear)
+#OOBTN1=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1107; ntxbuf=#OOBUF1})
+
+!複製
+#OOBUF2=X,12,S
+T(2,#FunCd3+#OOCustId+#OODataYear)
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1107; ntxbuf=#OOBUF2})
+
+!刪除
+#OOBUF3=X,12,S
+T(2,#FunCd4+#OOCustId+#OODataYear)
+#OOBTN3=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1107; ntxbuf=#OOBUF3})
+
+!查詢
+#OOBUF4=X,12,S
+T(2,#FunCd5+#OOCustId+#OODataYear)
+#OOBTN4=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L1107; ntxbuf=#OOBUF4})
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustId#CustFullname#RETURN#END#RTNTXT
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L1907
+#OOCustId
+#OODataYear
+#OOATotal
+#OOLTotal
+#OOCap
+#OONetIncome
+#OOCash
+#OOShortInv
+#OOAR
+#OOInventory
+#OOLongInv
+#OOFixedAsset
+#OOOtherAsset
+#OOBankLoan
+#OOOtherCurrLiab
+#OOLongLiab
+#OOOtherLiab
+#OONewWorthTotal
+#OORetainEarning
+#OOOpIncome
+#OOOpCost
+#OOOpProfit
+#OOOpExpense
+#OOOpRevenue
+#OONopIncome
+#OOFinExpense
+#OONopExpense
+#OOAccountant
+#OOAccountDate
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R01.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="L1907" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L1907]                                 公司戶財務狀況明細資料查詢                                                                   "],
+[""],
+! ["@統一編號",#OCustId,#OCustName],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#RPTFG2=1,QUERY.GRID,L1907
+#any={detail:true, header:'L1907.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN1=
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+#OOBTN2=
+{width:50,search:false,formatter:'cust:bind-button:複製',align:'center',canExport:false}
+#OOBTN3=
+{width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
+#OOBTN4=
+{width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOCustId=統一編號
+{width:80,align:'center'}
+
+#OODataYear=年度
+{width:80,align:'center'}
+
+#OOATotal=資產總額
+{width:140,align:'right'}
+
+#OOLTotal=負債總額
+{width:140,align:'right'}
+
+#OOCap=資本
+{width:140,align:'right'}
+
+#OONetIncome=稅後淨利
+{width:140,align:'right'}
+
+#OOCash=現金/銀存
+{width:0,hidden:true}
+#OOShortInv=短期投資
+{width:0,hidden:true}
+#OOAR=應收帳款票據
+{width:0,hidden:true}
+#OOInventory=存貨
+{width:0,hidden:true}
+#OOLongInv=長期投資
+{width:0,hidden:true}
+#OOFixedAsset=固定資產
+{width:0,hidden:true}
+#OOOtherAsset=其他資產
+{width:0,hidden:true}
+#OOBankLoan=銀行借款
+{width:0,hidden:true}
+#OOOtherCurrLiab=其他流動負債
+{width:0,hidden:true}
+#OOLongLiab=長期負債
+{width:0,hidden:true}
+#OOOtherLiab=其他負債
+{width:0,hidden:true}
+#OONewWorthTotal=淨值總額
+{width:0,hidden:true}
+#OORetainEarning=公積保留盈餘
+{width:0,hidden:true}
+#OOOpIncome=營業收入
+{width:0,hidden:true}
+#OOOpCost=營業成本
+{width:0,hidden:true}
+#OOOpProfit=營業毛利
+{width:0,hidden:true}
+{width:0,hidden:true}
+#OOOpExpense=管銷費用
+{width:0,hidden:true}
+#OOOpRevenue=營業利益
+{width:0,hidden:true}
+#OONopIncome=營業外收入
+{width:0,hidden:true}
+#OOFinExpense=財務支出
+{width:0,hidden:true}
+#OONopExpense=其他營業支出
+{width:0,hidden:true}
+#OOAccountant=簽證會計師
+{width:0,hidden:true}
+#OOAccountDate=簽證日期
+{width:0,hidden:true}
+^
+
+#RPTFG2=2,QUERY.GRID,L1907
+#any={detail:true, header:'L1907.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOCustId=統一編號
+{width:80,align:'center'}
+
+#OODataYear=年度
+{width:80,align:'center'}
+
+#OOATotal=資產總額
+{width:140,align:'right'}
+
+#OOLTotal=負債總額
+{width:140,align:'right'}
+
+#OOCap=資本
+{width:140,align:'right'}
+
+#OONetIncome=稅後淨利
+{width:140,align:'right'}
+
+#OOCash=現金/銀存
+{width:0,hidden:true}
+#OOShortInv=短期投資
+{width:0,hidden:true}
+#OOAR=應收帳款票據
+{width:0,hidden:true}
+#OOInventory=存貨
+{width:0,hidden:true}
+#OOLongInv=長期投資
+{width:0,hidden:true}
+#OOFixedAsset=固定資產
+{width:0,hidden:true}
+#OOOtherAsset=其他資產
+{width:0,hidden:true}
+#OOBankLoan=銀行借款
+{width:0,hidden:true}
+#OOOtherCurrLiab=其他流動負債
+{width:0,hidden:true}
+#OOLongLiab=長期負債
+{width:0,hidden:true}
+#OOOtherLiab=其他負債
+{width:0,hidden:true}
+#OONewWorthTotal=淨值總額
+{width:0,hidden:true}
+#OORetainEarning=公積保留盈餘
+{width:0,hidden:true}
+#OOOpIncome=營業收入
+{width:0,hidden:true}
+#OOOpCost=營業成本
+{width:0,hidden:true}
+#OOOpProfit=營業毛利
+{width:0,hidden:true}
+{width:0,hidden:true}
+#OOOpExpense=管銷費用
+{width:0,hidden:true}
+#OOOpRevenue=營業利益
+{width:0,hidden:true}
+#OONopIncome=營業外收入
+{width:0,hidden:true}
+#OOFinExpense=財務支出
+{width:0,hidden:true}
+#OONopExpense=其他營業支出
+{width:0,hidden:true}
+#OOAccountant=簽證會計師
+{width:0,hidden:true}
+#OOAccountDate=簽證日期
+{width:0,hidden:true}
+^
+
+<include src="PRT.icf::INQ01.sel" map="i=L1907;cpi=15"/>
+#CustId#CustFullname
+%
+#OOCustId#OODataYear#OOATotal#OOLTotal#OOCap#OONetIncome
+@^
+
+</sub>

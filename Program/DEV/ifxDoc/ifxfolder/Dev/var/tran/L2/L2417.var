@@ -281,6 +281,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApproveN
 ![核准號碼]
 #ApproveNo=A,7,I
 C(3,#FunCd,1,$,s)
+@V(2,0)
 
 <include src="ROM.icf::L2R52.dec"/>
 
@@ -302,6 +303,7 @@ T(2,@OwnerCustUKey{i},#L2r52OwnerCustUKey{i})
 T(2,@OwnerId{i},#L2r52OwnerId{i})
 T(2,@OwnerName{i},#L2r52OwnerName{i})
 T(2,@OwnerRelCode{i},#L2r52OwnerRelCode{i})
+T(H,@OwnerRelCodeX{i},#OwnerRelCode{i},#RelCodeHelp)
 C(4,#OwnerCustUKey{i},$,E(0,@Cnt,#Cnt+1))
 T(F,@OwnerRelCode{i},#Fv)
 ##end

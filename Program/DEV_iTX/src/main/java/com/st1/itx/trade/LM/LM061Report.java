@@ -57,9 +57,7 @@ public class LM061Report extends MakeReport {
 			String tempCustNo = "";
 			// 從第三列開始塞值
 			int row = 3;
-			int num = 1;
-
-
+			int num = 0;
 
 			for (Map<String, String> tLDVo : fnAllList) {
 
@@ -69,18 +67,23 @@ public class LM061Report extends MakeReport {
 				}
 
 //				makeExcel.setValue(row, 1, tLDVo.get("F19"));
-
-				makeExcel.setValue(row, 2, tempCustNo.equals(tLDVo.get("F0")) ? num : num++);
-
 				tempCustNo = tLDVo.get("F0");
+				if (!tempCustNo.equals(tLDVo.get("F0"))) {
 
+					num++;
+
+				}
+
+				makeExcel.setValue(row, 2, num);
+
+				BigDecimal ovduBal = tLDVo.get("F3") == null || tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(tLDVo.get("F3"));
+				
+				this.info("tLDVo:" + tLDVo);
+
+				
 				for (int i = 0; i < tLDVo.size(); i++) {
 					fdnm = "F" + i;
-
-
-
-					BigDecimal ovduBal = tLDVo.get("F3") == null || tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO
-							: new BigDecimal(tLDVo.get("F3"));
 
 					switch (i) {
 					case 0:// 戶號
@@ -97,28 +100,25 @@ public class LM061Report extends MakeReport {
 					case 5:// 催收款餘額
 						makeExcel.setValue(row, i + 3,
 								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)),
-										"$* #,##0", "R");
+								"$* #,##0", "R");
 						break;
-						
+
 					case 6:// 繳息迄日
 						makeExcel.setValue(row, i + 3,
 								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "R");
 						break;
-						
+
 					case 7: // 利率
 						makeExcel.setValue(row, i + 3,
 								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "0.0000",
 								"R");
 						break;
-						
-			
+
 					case 8:// 到期日
 					case 9:// 轉催收日
 						makeExcel.setValue(row, i + 3,
 								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "R");
 						break;
-						
-						
 
 					case 13:// 轉呆金額
 						makeExcel.setValue(row, 17,
@@ -164,7 +164,7 @@ public class LM061Report extends MakeReport {
 								"$* #,##0", "R");
 					}
 
-					break;
+	
 
 //					switch (i) {
 //					case 0:

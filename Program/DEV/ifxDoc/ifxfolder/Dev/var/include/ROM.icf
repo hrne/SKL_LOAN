@@ -7037,12 +7037,9 @@ TXFORM=L8R39
 #L8r40TranKey=X,1,S
 #L8r40CustId=X,10,S
 #L8r40SubmitKey=X,3,S
-#L8r40SubmitKeyX=X,80,S
 #L8r40ApplyDate=D,7,S
-#L8r40BankId=X,3,S
-#L8r40BankIdX=X,80,S
+#L8r40CourtCode=X,3,S
 #L8r40MaxMainCode=X,3,S
-#L8r40MaxMainCodeX=X,80,S
 #L8r40IsMaxMain=X,1,S
 #L8r40IsClaims=X,1,S
 #L8r40GuarLoanCnt=A,2,S
@@ -7075,8 +7072,7 @@ TXFORM=L8R40
 #L8r40CustId
 #L8r40SubmitKey
 #L8r40ApplyDate
-#L8r40BankId
-#L8r40BankIdX
+#L8r40CourtCode
 #L8r40MaxMainCode
 #L8r40IsMaxMain
 #L8r40IsClaims
@@ -7110,7 +7106,7 @@ TXFORM=L8R40
 #L8r41CustId=X,10,S
 #L8r41SubmitKey=X,3,S
 #L8r41ApplyDate=D,7,S
-#L8r41BankId=X,3,S
+#L8r41CourtCode=X,3,S
 #L8r41MaxMainCode=X,3,S
 #L8r41IsMaxMain=X,1,S
 #L8r41Account=X,50,S
@@ -7137,7 +7133,7 @@ TXFORM=L8R41
 #L8r41CustId
 #L8r41SubmitKey
 #L8r41ApplyDate
-#L8r41BankId
+#L8r41CourtCode
 #L8r41MaxMainCode
 #L8r41IsMaxMain
 #L8r41Account
@@ -7479,6 +7475,7 @@ TXFORM=L8R54
 #L8r55CourtCode=X,3,S
 #L8r55MaxMainCode=X,3,S
 #L8r55DelayYM=X,6,S
+#L8r55Account=X,50,S
 </L8R55.dec>
 
 <L8R55.tom>
@@ -7494,6 +7491,7 @@ TXFORM=L8R55
 #L8r55CourtCode
 #L8r55MaxMainCode
 #L8r55DelayYM
+#L8r55Account
 ^
 </L8R55.tom>
 

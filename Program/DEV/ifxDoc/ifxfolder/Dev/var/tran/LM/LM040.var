@@ -1,0 +1,129 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LM040)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[120,850];printer.width=[20,20,20,20];order=1;">
+[
+["[LM040]                                  LM040地區別正常戶金額	"],
+["撥款日期",#InputDate],
+]
+
+!---------- AP TEXT AREA Variables ----------
+! #CHAIN=A,1,S
+! T(4,CHAIN$)
+
+! #NTXBUF=X,3,S
+! C(3,#CHAIN,1,T(4,NTXBUF$),S)
+! T(1,@FUNCD,#NTXBUF,1,1)
+! T(1,@TLR,#NTXBUF,2,2)
+! T(2,@FKEY,7)
+
+
+!-----------------------------------------------------
+
+! Getting Help
+
+#StatusHelp=X,1024,S
+#DefTypeHelp=X,1024,S
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF0001=x,23,S
+T(3,CdCode.Status)
+
+#StatusHelpRim=X,1,S
+RESET_RIM(#StatusHelpRim,XXR99)
+S(XXR99,02,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@StatusHelp,#HelpDesc1)
+
+! Inputs
+#InputDate=D,7,I
+T(1,#SYSDATE,2,7)
+@V(7)
+A(DATE,0,#InputDate)
+V(5,0,#SYSDATE)
+
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+! #PRTSC_RFG=X,1,S
+! C(3,#HCODE,1,S,$)
+! C(5,#TXFORM,LM040,$,S)
+! C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="LM040">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,C5100,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM040] LM040金融機構承作購置高價住宅貸款統計)
+
+</sub>
+
+!---------- TXFORM = LM040 ----------
+<sub type="FORM" name="LM040">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LM040,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM040] LM040金融機構承作購置高價住宅貸款統計)
+
+
+#OEMPNOS=X,6,S
+IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#InputDate
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+TXFORM=LM040
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

@@ -38,29 +38,30 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[200,200,250,350];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[400,100,350,150];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8324]                                 (443)前置調解回報有擔保債權金額資料"],
-[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+["#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 ["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdBankId+受理調解機構代號",#BankId,#BankIdX],
-["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],["#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
+["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+["#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
 ["#FdAccount+帳號",#Account],["#FdGuarantyType+擔保品類別",#GuarantyType,#GuarantyTypeX],
 ["#FdLoanAmt+原借款金額",#LoanAmt],["#FdCreditAmt+授信餘額",#CreditAmt],
 ["#FdPrincipal+本金",#Principal],["#FdInterest+利息",#Interest],
 ["#FdPenalty+違約金",#Penalty],["#FdOther+其他費用",#Other],
 ["#FdTerminalPayAmt+每期應付金額",#TerminalPayAmt],["#FdLatestPayAmt+最近一期繳款金額",#LatestPayAmt],
 ["#FdFinalPayDay+最後繳息日",#FinalPayDay],["#FdNotyetacQuit+已到期尚未清償金額",#NotyetacQuit],
-[#<->#,"#FdMothPayDay+每月應還款日",#MothPayDay],
+["#FdMothPayDay+每月應還款日",#MothPayDay],
 ["#FdBeginDate+契約起始年月",#BeginDate],["#FdEndDate+契約截止年月",#EndDate],
-[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
 #FdTranKey=X,2,L
 #FdCustId=X,2,L
 #FdSubmitKey=X,2,L
 #FdApplyDate=X,2,L
-#FdBankId=X,2,L
+#FdCourtCode=X,2,L
 #FdMaxMainCode=X,2,L
 #FdIsMaxMain=X,2,L
 #FdAccount=X,2,L
@@ -108,9 +109,8 @@ T(2,@YesNoHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-IF(#CHAIN!=0,s,$)
-V(P,本交易為連動交易，請由L8030-Jcic443連動進入)
-T(F,@TranKey,0)T(F,@CustId,0)T(F,@SubmitKey,0)T(F,@ApplyDate,0)T(F,@BankId,0)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic443連動進入),$)
+T(F,@TranKey,0)T(F,@CustId,0)T(F,@SubmitKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)
 T(F,@MaxMainCode,0)T(F,@IsMaxMain,0)T(F,@Account,0)T(F,@GuarantyType,0)T(F,@LoanAmt,0)
 T(F,@CreditAmt,0)T(F,@Principal,0)T(F,@Interest,0)T(F,@Penalty,0)T(F,@Other,0)
 T(F,@TerminalPayAmt,0)T(F,@LatestPayAmt,0)T(F,@FinalPayDay,0)T(F,@NotyetacQuit,0)T(F,@MothPayDay,0)
@@ -128,22 +128,21 @@ T(1,@TranKey,#NTXBUF,2,1)
 ! 新增進入
 #Deal_New=X,1,S
 C(5,#TranKey_Tmp,1,$,S)
-! T(2,@TranKey,A)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@ApplyDate,0)T(F,@BankId,0)T(F,@MaxMainCode,0)T(F,@IsMaxMain,0)
-T(F,@Account,0)T(F,@GuarantyType,0)T(F,@LoanAmt,0)T(F,@CreditAmt,0)
-T(F,@Principal,0)T(F,@Interest,0)T(F,@Penalty,0)T(F,@Other,0)
-T(F,@TerminalPayAmt,0)T(F,@LatestPayAmt,0)T(F,@FinalPayDay,0)
-T(F,@NotyetacQuit,0)T(F,@MothPayDay,0)
-T(F,@BeginDate,0)T(F,@EndDate,0)
+T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@MaxMainCode,1)T(F,@IsMaxMain,1)
+T(F,@Account,1)T(F,@GuarantyType,1)T(F,@LoanAmt,1)T(F,@CreditAmt,1)
+T(F,@Principal,1)T(F,@Interest,1)T(F,@Penalty,1)T(F,@Other,1)
+T(F,@TerminalPayAmt,1)T(F,@LatestPayAmt,1)T(F,@FinalPayDay,1)
+T(F,@NotyetacQuit,1)T(F,@MothPayDay,1)
+T(F,@BeginDate,1)T(F,@EndDate,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdApplyDate,*)
-T(2,@FdBankId,*)
+T(2,@FdCourtCode,*)
 T(2,@FdMaxMainCode,*)
 T(2,@FdIsMaxMain,*)
-T(2,@FdPayAccount,*)
 T(2,@FdGuarantyType,*)
+T(2,@FdAccount,*)
 T(2,@FdLoanAmt,*)
 T(2,@FdCreditAmt,*)
 T(2,@FdPrincipal,*)
@@ -161,16 +160,14 @@ T(2,@FdEndDate,*)
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
-T(F,@TranKey,1)T(F,@MaxMainCode,1)T(F,@IsMaxMain,1)
-T(F,@Account,1)T(F,@GuarantyType,1)T(F,@LoanAmt,1)T(F,@CreditAmt,1)
+T(1,@Ukey,#NTXBUF,3,32)
+T(F,@TranKey,1)T(F,@IsMaxMain,1)
+T(F,@GuarantyType,1)T(F,@LoanAmt,1)T(F,@CreditAmt,1)
 T(F,@Principal,1)T(F,@Interest,1)T(F,@Penalty,1)T(F,@Other,1)
 T(F,@TerminalPayAmt,1)T(F,@LatestPayAmt,1)T(F,@FinalPayDay,1)
 T(F,@NotyetacQuit,1)T(F,@MothPayDay,1)
 T(F,@BeginDate,1)T(F,@EndDate,1)
-T(1,@Ukey,#NTXBUF,3,32)
-T(2,@FdMaxMainCode,*)
 T(2,@FdIsMaxMain,*)
-T(2,@FdPayAccount,*)
 T(2,@FdGuarantyType,*)
 T(2,@FdLoanAmt,*)
 T(2,@FdCreditAmt,*)
@@ -225,7 +222,7 @@ T(2,@TranKey,#L8r41TranKey)
 T(2,@CustId,#L8r41CustId)
 T(2,@SubmitKey,#L8r41SubmitKey)
 E(0,@ApplyDate,#L8r41ApplyDate)
-T(2,@BankId,#L8r41BankId)
+T(2,@CourtCode,#L8r41CourtCode)
 T(2,@MaxMainCode,#L8r41MaxMainCode)
 T(2,@IsMaxMain,#L8r41IsMaxMain)
 T(2,@Account,#L8r41Account)
@@ -245,9 +242,10 @@ E(0,@BeginDate,#L8r41BeginDate)
 E(0,@EndDate,#L8r41EndDate)
 E(0,@OutJcicTxtDate,#L8r41OutJcicTxtDate)
 ![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
-T(2,@TranKey,#L8r38TranKey)
+T(2,@TranKey,#L8r41TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 
 ![交易代碼]
@@ -258,7 +256,12 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
+! C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdCustRegTelNo,*)T(2,@FdCustComTelNo,*)T(2,@FdCustMobilNo,*),C(5,#TranKey,D,K(MODIFYBUTTON,補件)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdCustRegTelNo, )T(2,@FdCustComTelNo, )T(2,@FdCustMobilNo, ),$))
 #TranKeyX=X,4,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+T(H,#TranKey,#TranKeyHelp)
 
 ![債務人IDN]
 #CustId=X,10,L
@@ -276,23 +279,25 @@ D(8)
 A(DATE,0,#ApplyDate)
 
 !受理調解機構代號-承審法院代碼OR郵遞區號
-#BankId=X,3,I
+#CourtCode=X,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 @V(7)
-T(2,@RimJcicBankCode,#BankId)
+T(2,@RimJcicBankCode,#CourtCode)
 RESET_RIM(#RimL8R01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
-T(2,@BankIdX,#L8r01JcicBankName)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 
-#BankIdX=X,80,L
+#CourtCodeX=X,80,L
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,2,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 @V(7)
-IF(#MaxMainCode!="",$,s)
 T(2,@RimJcicBankCode,#MaxMainCode)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
@@ -314,17 +319,14 @@ V(8,0,50)
 
 !擔保品類別
 #GuarantyType=X,2,I
-HELP(#CollateralTypeHelp,cols:6)
-@V(H,#CollateralTypeHelp)
-
+HELP(#TranKeyHelp,cols:6)
+@V(H,#TranKeyHelp)
+!看書
 #GuarantyTypeX=X,50,L
-T(H,#GuarantyType,#CollateralTypeHelp)
+T(H,#GuarantyType,#TranKeyHelp)
 
 !原借款金額
 #LoanAmt=m,12,I
-
-!授信餘額
-#CreditAmt=m,12,I
 
 !本金
 #Principal=m,10,I
@@ -338,6 +340,8 @@ T(H,#GuarantyType,#CollateralTypeHelp)
 !其他費用
 #Other=m,10,I
 
+!授信餘額
+#CreditAmt=m,12,I
 #Total=m,14,S
 @E(0,#Principal+#Interest+#Penalty+#Other)
 IF(#CreditAmt!=#Total,$,S)
@@ -384,9 +388,8 @@ IF(#BeginDate>#EndDate,$,s)
 V(P,契約起始年月不可大於契約截止年月)
 
 !轉JCIC文字檔日期
-#OutJcicTxtDate=D,7,I
-D(8)
-@A(DATE,0,#OutJcicTxtDate)
+#OutJcicTxtDate=D,7,L
+
 ! !<儲存>
 ! #BUF1=X,10,S
 ! T(2,#CUSTID)
@@ -430,7 +433,7 @@ T(3,[L8324] 前置調解回報有擔保債權金額資料)
 #CustId
 #SubmitKey
 #ApplyDate
-#BankId
+#CourtCode
 #MaxMainCode
 #IsMaxMain
 #Account
@@ -449,6 +452,7 @@ T(3,[L8324] 前置調解回報有擔保債權金額資料)
 #BeginDate
 #EndDate
 #OutJcicTxtDate
+#Ukey
 </sub>
 
 
@@ -457,7 +461,6 @@ T(3,[L8324] 前置調解回報有擔保債權金額資料)
 TXFORM=L8324^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
-<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R41.tom"/>
 </sub>

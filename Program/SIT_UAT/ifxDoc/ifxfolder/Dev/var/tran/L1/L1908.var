@@ -55,8 +55,8 @@ K(MODIFYBUTTON,1,新增)
 [
 ["[L1908]                                 申請不列印書面通知書查詢"],
 ["#FdMain+查詢條件","@(戶號、統一編號，需擇一輸入)"],
-["#FdCustNo+戶號",#CustNo,"-",#FacmNo,"（000=全部額度）",#BTN2,#CustName],
-["#FdCustId+統一編號",#CustId,#BTN3,#CustName],
+["#FdCustNo+．戶號",#CustNo,"-",#FacmNo,"（000=全部額度）",#BTN2,#CustName],
+["#FdCustId+．統一編號",#CustId,#BTN3,#CustName],
 ["#FdRPTFG+顯示方式",
 <include src="COM.icf::RPTFG.scr"/>
 ],
