@@ -701,9 +701,9 @@ X(#OOShareTotal)
 #OOStockCodeX=X,10,L
 T(H,#OOOther,#StockCodeHelp)
 
-#OOStock=x,4,L
+#OOStock=x,10,L
 IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
-T(1,#OOOther,1,4)
+T(1,#OOOther,1,10)
 
 #OOOther1=x,100,L
 IF(#OOClCode1 == 1,$,S)

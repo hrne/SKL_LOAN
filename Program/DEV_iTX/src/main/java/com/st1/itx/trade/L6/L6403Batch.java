@@ -125,7 +125,10 @@ public class L6403Batch extends TradeBuffer {
 		this.info("L6403 > InsertAllAuthority AuthNo = " + AuthNo);
 		// L1
 		for (int i = 1; i <= 30; i++) {
-			String iTranNo = titaVo.get("ApaCode" + i).trim();
+			String iTranNo = titaVo.get("ApaCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim();
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("ApaBtn" + i).trim();
@@ -135,7 +138,10 @@ public class L6403Batch extends TradeBuffer {
 		}
 		// L2
 		for (int i = 1; i <= 90; i++) {
-			String iTranNo = titaVo.get("ApbCode" + i).trim();
+			String iTranNo = titaVo.get("ApbCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim();
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("ApbBtn" + i).trim();
@@ -145,7 +151,10 @@ public class L6403Batch extends TradeBuffer {
 		}
 		// L3
 		for (int i = 1; i <= 50; i++) {
-			String iTranNo = titaVo.get("ApcCode" + i).trim();
+			String iTranNo = titaVo.get("ApcCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim(); 
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("ApcBtn" + i).trim();
@@ -155,7 +164,10 @@ public class L6403Batch extends TradeBuffer {
 		}
 		// L4
 		for (int i = 1; i <= 100; i++) {
-			String iTranNo = titaVo.get("ApdCode" + i).trim();
+			String iTranNo = titaVo.get("ApdCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim(); 
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("ApdBtn" + i).trim();
@@ -165,7 +177,10 @@ public class L6403Batch extends TradeBuffer {
 		}
 		// L5
 		for (int i = 1; i <= 100; i++) {
-			String iTranNo = titaVo.get("ApeCode" + i).trim();
+			String iTranNo = titaVo.get("ApeCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim(); 
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("ApeBtn" + i).trim();
@@ -175,7 +190,10 @@ public class L6403Batch extends TradeBuffer {
 		}
 		// L6
 		for (int i = 1; i <= 110; i++) {
-			String iTranNo = titaVo.get("ApfCode" + i).trim();
+			String iTranNo = titaVo.get("ApfCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim(); 
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("ApfBtn" + i).trim();
@@ -185,7 +203,10 @@ public class L6403Batch extends TradeBuffer {
 		}
 		// L7
 		for (int i = 1; i <= 20; i++) {
-			String iTranNo = titaVo.get("ApgCode" + i).trim();
+			String iTranNo = titaVo.get("ApgCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim(); 
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("ApgBtn" + i).trim();
@@ -195,7 +216,10 @@ public class L6403Batch extends TradeBuffer {
 		}
 		// L8
 		for (int i = 1; i <= 150; i++) {
-			String iTranNo = titaVo.get("AphCode" + i).trim();
+			String iTranNo = titaVo.get("AphCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim(); 
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("AphBtn" + i).trim();
@@ -205,7 +229,10 @@ public class L6403Batch extends TradeBuffer {
 		}
 		// L9
 		for (int i = 1; i <= 50; i++) {
-			String iTranNo = titaVo.get("ApiCode" + i).trim();
+			String iTranNo = titaVo.get("ApiCode" + i);
+			if(iTranNo!=null) {
+				iTranNo = iTranNo.trim(); 
+			}
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {
 				String iCanFg = titaVo.get("ApiBtn" + i).trim();

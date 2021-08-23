@@ -88,11 +88,8 @@ public class LM061Report extends MakeReport {
 						makeExcel.setValue(row, i + 3,
 								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "R");
 						break;
-
-					case 7: // 利率
-						makeExcel.setValue(row, i + 3,
-								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "0.0000",
-								"R");
+					case 2:// 戶名
+						makeExcel.setValue(row, i + 3, tLDVo.get(fdnm), "R");
 						break;
 
 					case 3:// 核貸金額
@@ -100,8 +97,28 @@ public class LM061Report extends MakeReport {
 					case 5:// 催收款餘額
 						makeExcel.setValue(row, i + 3,
 								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)),
-								"$* #,##0", "R");
+										"$* #,##0", "R");
 						break;
+						
+					case 6:// 繳息迄日
+						makeExcel.setValue(row, i + 3,
+								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "R");
+						break;
+						
+					case 7: // 利率
+						makeExcel.setValue(row, i + 3,
+								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "0.0000",
+								"R");
+						break;
+						
+			
+					case 8:// 到期日
+					case 9:// 轉催收日
+						makeExcel.setValue(row, i + 3,
+								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "R");
+						break;
+						
+						
 
 					case 13:// 轉呆金額
 						makeExcel.setValue(row, 17,
@@ -109,16 +126,6 @@ public class LM061Report extends MakeReport {
 								"$* #,##0", "R");
 						break;
 
-					case 6:// 繳息迄日
-					case 8:// 到期日
-					case 9:// 轉催收日
-						makeExcel.setValue(row, i + 3,
-								tLDVo.get(fdnm).isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "R");
-						break;
-
-					case 2:// 戶名
-						makeExcel.setValue(row, i + 3, tLDVo.get(fdnm), "R");
-						break;
 					case 14:// 擔保品坐落
 					case 15:// 符合規範
 					case 16:// 催收人員
@@ -132,7 +139,7 @@ public class LM061Report extends MakeReport {
 					}
 
 					// 法務進度(F10)
-					makeExcel.setValue(row, 18, tLDVo.get("F10"), "L");
+					makeExcel.setValue(row, 15, tLDVo.get("F10"), "L");
 
 					// 金額(F11)
 					// 法務進度代號(F12)

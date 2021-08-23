@@ -478,15 +478,16 @@ public class MainProcess extends SysLogger {
 		TxCom txCom = this.txBuffer.getTxCom();
 
 		/* 交易控制 */
-		TxTranCode tTxTranCode = txTranCodeService.findById(this.titaVo.getTxCode());
+		TxTranCode tTxTranCode2 = null;
 
 		if (this.titaVo.isTxcdSpecial() || this.titaVo.isTxcdInq()) {
 			txCom.setCanCancel(0);
 			txCom.setCanModify(0);
 		} else {
+			TxTranCode tTxTranCode = txTranCodeService.findById(this.titaVo.getTxCode());
 			if (tTxTranCode == null)
 				throw new LogicException("EC001", "交易控制檔(TxTranCode):" + this.titaVo.getTxCode());
-			
+
 			if (tTxTranCode.getStatus() == 1)
 				throw new LogicException("EC008", "交易代號 " + this.titaVo.getTxCode() + " 已停用");
 
@@ -499,9 +500,11 @@ public class MainProcess extends SysLogger {
 					this.titaVo.getTxCode(), this.titaVo.getActFgI(), funcode)) {
 				throw new LogicException("EC008", "經辦 [" + this.titaVo.getTlrNo() + "] 無交易 [" + this.titaVo.getTxCode() + "] 執行權限");
 			}
+
+			tTxTranCode2 = tTxTranCode;
 		}
 
-		if (tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && titaVo.getEmpNos().trim().isEmpty())
+		if (tTxTranCode2 != null && tTxTranCode2.getCustDataCtrlFg() == 1 && titaVo.getEmpNos().trim().isEmpty())
 			if (titaVo.getMrKey().length() >= 7 && parse.isNumeric(titaVo.getMrKey().substring(0, 7))) {
 				CustDataCtrl tCustDataCtrl = sCustDataCtrlService.findById(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
 				if (tCustDataCtrl != null && "Y".equals(tCustDataCtrl.getEnable()))

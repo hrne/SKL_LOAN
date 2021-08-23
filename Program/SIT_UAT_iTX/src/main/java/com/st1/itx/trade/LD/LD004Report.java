@@ -83,7 +83,7 @@ public class LD004Report extends MakeReport {
 
 				this.print(0, 56, "科目：　");
 				this.print(0, 64, LD4Vo.get("F2"));
-				this.print(1, 40, showDate(titaVo.getParam("ENTDY"), 1));
+				this.print(1, 40, showDate(LD4Vo.get("F14").toString(), 1));
 
 				if ("1".equals(An)) {
 					this.print(0, 64, "擔保放款" + "－");

@@ -436,6 +436,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 #BTN1=X,15,I,ui:button;value:額度查詢;enable:1;tabbable:0;title:L2015 額度明細資料查詢
+#BTN2=X,15,I,ui:button;value:商品參數查詢;enable:1;tabbable:0;title:L2001 商品參數明細資料查詢
 #BTN11=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
 #BTN12=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
 #BTN13=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
@@ -798,9 +799,11 @@ IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
 T(2,#CustNo+9999999000)
 IF(#FKEY==0 || #FKEY==7,$,s)
 C(3,#UpdateCode,1,SHOW(#CreditSysNo)
+                  SHOW(#BTN2)
                   HIDE(#LbCreditSysNo)
                   T(F,@PieceCode,1)
                  ,SHOW(#LbCreditSysNo)
+                  HIDE(#BTN2)
                   HIDE(#CreditSysNo)
                   T(F,@PieceCode,0))
 
@@ -1356,13 +1359,19 @@ X(@LbRateAdjFreq,#RateAdjFreq)
 T(B,@LbRateAdjFreq,#LbRateAdjFreq+#WkMonthX)
 C(3,#RateCode,3,$,T(3,@LbRateAdjFreq,無))
 
+#BUF2=X,9,S
+T(2,#ProdNo+1)
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF2;ntxbuf5=type<-1:ProdNo<-OOProdNo})
+
+
 ![商品代碼]
 !自動顯示不必輸入
 #FdProdNo=X,2,L
 
 #ProdNo=X,5,I
 C(3,#UpdateCode,1,$,s)
-T(2,#L2r01ProdNo)
 @
 C(5,#ProdNo,#L2r05ProdNo,$,C(3,#L2r05UtilAmt,0,$,V(P,尚有放款餘額，不可變更商品代碼)))
 
@@ -1639,7 +1648,7 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,$,s)
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
 C(3,#L2r05BormNo,0,$,s)
-@V(2,0)V(5,#TwUtilAmt,99999999999999)
+@V(2,0)
 
 #UsUtilAmt=m,14.2,S
 C(3,#L2r05UtilAmt,0,E(0,1),E(0,#L2r05UtilAmt))
@@ -1649,7 +1658,7 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,s,$)
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
 C(3,#L2r05BormNo,0,$,s)
-@V(2,0)V(5,#UsUtilAmt,99999999999999.99)
+@V(2,0)
 
 #LbApplAmt=X,21,L
 C(3,#Precision,0,X(#TwApplAmt),X(#UsApplAmt))
@@ -3391,7 +3400,7 @@ C(3,#CheckCode,0,$,S)
 <sub type="DC" name="p2" layout="cols=2;screen.width=[200,300,200,300];printer.width=[15,30];order=1;">
 [
 ["<font color=red>@利率"],
-[#<->#,"#FdProdNo+商品代碼",#ProdNo,#ProdNoX],
+[#<->#,"#FdProdNo+商品代碼",#ProdNo,#BTN2,#ProdNoX],
 ["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX],
 ["#FdBaseRate+指標利率",#LbBaseRateX],
 ["#FdProdRate+商品利率",#LbProdRateX],

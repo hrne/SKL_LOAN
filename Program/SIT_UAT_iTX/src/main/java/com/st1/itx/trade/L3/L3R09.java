@@ -3,8 +3,6 @@ package com.st1.itx.trade.L3;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -44,7 +42,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R09")
 @Scope("prototype")
 public class L3R09 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3R09.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -63,7 +60,7 @@ public class L3R09 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L3R09 ");
+		this.info("active L3R09 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料

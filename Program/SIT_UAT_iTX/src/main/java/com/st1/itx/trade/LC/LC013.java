@@ -2,9 +2,8 @@ package com.st1.itx.trade.LC;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -38,7 +37,6 @@ import java.text.SimpleDateFormat;
  * @version 1.0.0
  */
 public class LC013 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LC013.class);
 
 	@Autowired
 	public TxTellerService txTellerService;
@@ -48,11 +46,11 @@ public class LC013 extends TradeBuffer {
 
 	@Autowired
 	public TxAgentService txAgentService;
-	
+
 	@Autowired
 	public CheckAuth checkAuth;
 
-	HashMap authNos = new HashMap();
+	Map<String, String> authNos = new HashMap<String, String>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -63,7 +61,7 @@ public class LC013 extends TradeBuffer {
 		TlrAuth(titaVo.getTlrNo(), "", "", titaVo);
 
 		// 代理權限
-		Slice<TxAgent> slTxAgent = txAgentService.findByAgentTlrNo(titaVo.getTlrNo(), 0, 1000, titaVo);
+		Slice<TxAgent> slTxAgent = txAgentService.findByAgentTlrNo(titaVo.getTlrNo(), 0, 1000);
 		List<TxAgent> lTxAgent = slTxAgent == null ? null : slTxAgent.getContent();
 
 		// 現在時間
@@ -91,13 +89,13 @@ public class LC013 extends TradeBuffer {
 				 * if (txAgent.getEndDate() == this.getTxBuffer().getTxCom().getTbsdy() &&
 				 * txAgent.getEndTime() < nowTime) { continue; }
 				 */
-				
+
 				checkAuth.setTxBuffer(this.txBuffer);
-				
+
 				if (!checkAuth.isAgent(txAgent)) {
 					continue;
 				}
-				
+
 				this.info("LC013 1 = " + txAgent.getTlrNo());
 
 				// 代理人姓名
@@ -154,13 +152,13 @@ public class LC013 extends TradeBuffer {
 			return;
 		}
 
-		TxAuthGroup txAuthGroup = txAuthGroupService.findById(authNo, titaVo);
+		TxAuthGroup txAuthGroup = txAuthGroupService.findById(authNo);
 
 		if (txAuthGroup == null) {
 			return;
 		}
 
-		//檢查重複權限
+		// 檢查重複權限
 		if (authNos.size() > 0) {
 			if (authNos.get(authNo) != null) {
 				return;

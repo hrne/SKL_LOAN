@@ -49,6 +49,9 @@ public interface FacMainRepositoryHist extends JpaRepository<FacMain, FacMainId>
   // CustNo = ,AND CreditSysNo =
   public Optional<FacMain> findTopByCustNoIsAndCreditSysNoIsOrderByCustNoAscFacmNoAsc(int custNo_0, int creditSysNo_1);
 
+  // CustNo = 
+  public Slice<FacMain> findAllByCustNoIsOrderByCreditSysNoAscFacmNoAsc(int custNo_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

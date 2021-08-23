@@ -821,13 +821,26 @@ public class NegReportCom extends CommBuffer {
 								tNegAppr.setExportMark(1);
 							}
 						} else {
-							// 逆向
+							// 訂正
 							if (tNegAppr.getExportDate() != IntDateRoc) {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "L5707[製檔日期]不等於 [會計日]");
-							} else {
-								tNegAppr.setExportMark(0);
 							}
+							if (tNegAppr.getBringUpMark() == 1 ) {
+								// E5009 資料檢核錯誤
+								throw new LogicException(titaVo, "E5009", "已執行過[L5709最大債權撥付回覆檔檢核]");
+							}
+							if (tNegAppr.getApprAcMark() == 1) {
+								// E5009 資料檢核錯誤
+								throw new LogicException(titaVo, "E5009", "已執行過[L5708最大債權撥付出帳]");
+							}
+							if (tNegAppr.getExportMark() == 0) {
+								// E5009 資料檢核錯誤
+								throw new LogicException(titaVo, "E5009", "未執行[L5707撥付製檔]");
+							}
+
+							tNegAppr.setExportMark(0);
+							
 						}
 					} else if (Status == 2) {
 						// 撥付傳票
@@ -848,11 +861,20 @@ public class NegReportCom extends CommBuffer {
 								tNegAppr.setApprAcMark(1);
 							}
 						} else {
-							// 逆向
+							// 訂正
 							if (tNegAppr.getApprAcDate() != IntDateRoc) {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "L5704[傳票日期] 不等於 [會計日]");
 							}
+							if (tNegAppr.getBringUpMark() == 1 ) {
+								// E5009 資料檢核錯誤
+								throw new LogicException(titaVo, "E5009", "已執行過[L5709最大債權撥付回覆檔檢核]");
+							}
+							if (tNegAppr.getApprAcMark() == 0) {
+								// E5009 資料檢核錯誤
+								throw new LogicException(titaVo, "E5009", "未執行[L5708最大債權撥付出帳]");
+							}
+							
 							tNegAppr.setApprAcMark(0);
 						}
 					} else if (Status == 3) {
@@ -880,10 +902,14 @@ public class NegReportCom extends CommBuffer {
 								tNegAppr.setBringUpMark(1);
 							}
 						} else {
-							// 逆向
+							// 訂正
 							if (tNegAppr.getBringUpDate() != IntDateRoc) {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "L5704[傳票日期] 不等於 [會計日]");
+							}
+							if (tNegAppr.getBringUpMark() == 0 ) {
+								// E5009 資料檢核錯誤
+								throw new LogicException(titaVo, "E5009", "未執行[L5709最大債權撥付回覆檔檢核]");
 							}
 							tNegAppr.setBringUpMark(0);
 						}
@@ -1416,7 +1442,7 @@ public class NegReportCom extends CommBuffer {
 							// 委託單位區別-固定為[0]
 							String Detail9 = "0";
 							// 委託單位-委託轉帳之事業單位統編
-							// 1. 轉帳類別為 0290 02970時,該欄位置入最大債權銀行/發卡機構代號,左靠右補0,代號首位為[A]時請置入[10]
+							// 1. 轉帳類別為 02960 02970時,該欄位置入最大債權銀行/發卡機構代號,左靠右補0,代號首位為[A]時請置入[10]
 							String Detail10 = "";
 							if (lTrialTrans1AccCode.contains(TransAccCode)) {
 								// 最大債權銀行/發卡機構代號

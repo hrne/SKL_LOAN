@@ -38,7 +38,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		int iYear = Integer.valueOf(titaVo.getParam("inputYear"));
+		int iYear = Integer.valueOf(titaVo.getParam("inputYear")+1911);
 		int iMonth = Integer.parseInt(titaVo.getParam("inputMonth"));
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -179,7 +179,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		inputYearMonth = inputYearMonth.minusMonths(1);
 
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		int iYear = Integer.valueOf(titaVo.getParam("inputYear"));
+		int iYear = Integer.valueOf(titaVo.getParam("inputYear")+1911);
 		int iMonth = Integer.parseInt(titaVo.getParam("inputMonth"));
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");

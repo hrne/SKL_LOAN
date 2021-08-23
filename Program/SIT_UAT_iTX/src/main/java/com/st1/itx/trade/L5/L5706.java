@@ -1,10 +1,14 @@
 package com.st1.itx.trade.L5;
 
+import java.io.BufferedReader;
+
 //import static java.util.Collections.sort;
 
 //import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.LineNumberReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,6 +17,7 @@ import java.util.HashMap;
 //import java.util.Vector;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +29,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
@@ -33,6 +37,7 @@ import com.st1.itx.db.service.NegMainService;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicAtomDetail;
@@ -41,8 +46,11 @@ import com.st1.itx.db.domain.JcicZ048;
 import com.st1.itx.db.domain.JcicZ048Id;
 import com.st1.itx.db.domain.JcicZ062;
 import com.st1.itx.db.domain.JcicZ062Id;
+import com.st1.itx.db.domain.NegFinAcct;
 import com.st1.itx.db.domain.NegFinShare;
 import com.st1.itx.db.domain.NegFinShareId;
+import com.st1.itx.db.domain.NegFinShareLog;
+import com.st1.itx.db.domain.NegFinShareLogId;
 import com.st1.itx.db.domain.NegMain;
 import com.st1.itx.db.domain.NegMainId;
 /*DB服務*/
@@ -51,6 +59,8 @@ import com.st1.itx.db.service.JcicAtomDetailService;
 import com.st1.itx.db.service.JcicAtomMainService;
 import com.st1.itx.db.service.JcicZ048Service;
 import com.st1.itx.db.service.JcicZ062Service;
+import com.st1.itx.db.service.NegFinAcctService;
+import com.st1.itx.db.service.NegFinShareLogService;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.data.DataLog;
@@ -72,6 +82,8 @@ public class L5706 extends TradeBuffer {
 	@Autowired
 	public NegFinShareService sNegFinShareService;
 	@Autowired
+	public NegFinShareLogService sNegFinShareLogService;
+	@Autowired
 	public NegMainService sNegMainService;
 	@Autowired
 	public CustMainService sCustMainService;
@@ -84,6 +96,8 @@ public class L5706 extends TradeBuffer {
 	@Autowired
 	public JcicZ062Service sJcicZ062Service;
 	@Autowired
+	public NegFinAcctService sNegFinAcctService;
+	@Autowired
 	public NegCom negCom;
 
 	/* 日期工具 */
@@ -95,7 +109,7 @@ public class L5706 extends TradeBuffer {
 	public Parse parse;
 
 	@Autowired
-	public FileCom FileCom;
+	public FileCom filecom;
 
 	@Autowired
 	public DataLog dataLog;
@@ -103,18 +117,31 @@ public class L5706 extends TradeBuffer {
 	@Value("${iTXInFolder}")
 	private String inFolder = "";
 
-	int updInsDb = 1;// 1:異動 0:不異動
+	private boolean isNewMain= false;// 是否為新案件
 	int errorMsg = 1;// 回報錯誤 1:回報 0:不回報
-	Map<String, String> OccursDataValue = new HashMap<String, String>();
-	String OccursData[] = { "OORow", "OOCode", "OODataType", "OOMainRemark", "OOFiledName", "OOFiledType", "OODetailRemark", "OOValue" };
-
+//	Map<String, String> OccursDataValue = new HashMap<String, String>();
+//	String OccursData[] = { "OORow", "OOCode", "OODataType", "OOMainRemark", "OOFiledName", "OOFiledType",
+//			"OODetailRemark", "OOValue" };
+	private ArrayList<NegFinShare> lNegFinShareM260 = new ArrayList<NegFinShare>(); // 正常
+	private ArrayList<NegFinShare> lNegFinShareM262 = new ArrayList<NegFinShare>(); // 單獨受償
+	private ArrayList<NegFinShare> lNegFinShareM264 = new ArrayList<NegFinShare>(); // 變更還款條件
+	
+	private ArrayList<NegFinShareLog> lNegFinShareLogM260 = new ArrayList<NegFinShareLog>();
+	private ArrayList<NegFinShareLog> lNegFinShareLogM262 = new ArrayList<NegFinShareLog>();
+	private ArrayList<NegFinShareLog> lNegFinShareLogM264 = new ArrayList<NegFinShareLog>();
+	private int CustNo262 = 0;
+	private int CaseSeq262 = 0;
+	private BigDecimal totalContrAmt = BigDecimal.ZERO;
+	private BigDecimal dueAmt = BigDecimal.ZERO;
+	private String custid = "" ;
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5706 ");
 		this.totaVo.init(titaVo);
 		this.info("L5706 TitaVo=[" + titaVo + "]");
 		// 路徑
-		String FilePath = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
+		String FilePath = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+				+ File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
@@ -125,16 +152,6 @@ public class L5706 extends TradeBuffer {
 		// 目前occurst長度
 		// int OccursL=1030;
 
-		// 測試用路徑
-		int TestPath = 0;// 0:不使用測試路徑 1:使用測試路徑
-		if (TestPath == 1) {
-			String Path = "D:\\新光人壽\\開發資料\\L5\\L5706檔案匯入資料格式\\";// St1Share的路徑
-			String FineName = "";
-//			FineName="L5706債權比例分攤資料維護(匯入檔案)(單筆).txt";
-//			FineName="L5706債權比例分攤資料維護(匯入檔案)(註銷日期和註銷本金)(單筆).txt";
-//			FineName="L5706債權比例分攤資料維護(匯入檔案)(多筆).txt";
-			FilePath = Path + FineName;
-		}
 
 		File file = null;// 讀取檔案
 		String ReadFileName = "";
@@ -145,100 +162,58 @@ public class L5706 extends TradeBuffer {
 			// E5006 未預期的錯誤
 			throw new LogicException(titaVo, "E5006", "檔案讀取發生問題");
 		}
-
+		
 		if (file.exists()) {
-			this.info("L5706 File Exists True");
-			// byte[] byt;
-
-			ArrayList<String> lBr = new ArrayList<>();
-			// 編碼參數，設定為UTF-8 || big5
+			BufferedReader br =null;
+			
+			
+			
 			try {
-				lBr = FileCom.intputTxt(FilePath, "big5");
-			} catch (IOException e) {
-				this.info("L5706(" + FilePath + ") : " + e.getMessage());
-//						throw new LogicException("E0014", "BS420(" + filePath1 + ")");
-				// E5006 未預期的錯誤
-				throw new LogicException(titaVo, "E5006", "檔案讀取發生問題");
-			}
+				FileReader fr = new FileReader(file);
+				br = new BufferedReader(fr);
+				
+				long fileLength = file.length();
+				LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file));
+    			lineNumberReader.skip(fileLength);
+    	        int CountRow = lineNumberReader.getLineNumber();
+    	        lineNumberReader.close();
+				int numLine = 0;
 
-			// int TestType=0;//0:Head 1:Body 2:End
-
-			try {
-				int lBrS = lBr.size();
-				this.info("L5706 lBrS=[" + lBrS + "]");
-
-//				int TestRow=this.index+this.limit;
-//				if(TestRow<=lBrS-this.limit) {
-//					Row=TestRow;
-//					
-//					/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-//					//this.info("L5706 setReturnIndex=["+this.setIndexNext()+"],Row=["+Row+"]");
-//					
-////					this.totaVo.setMsgEndToEnter();// 手動折返
-//				}else {
-//					Row=lBrS-1;
-//				}
-				int Row = this.index;
-				int Row1 = Row + this.limit;
-				if (Row1 < lBrS) {
-					titaVo.setReturnIndex(Row1);// this.setIndexNext()這玩意會自動+1;
-					this.totaVo.setMsgEndToAuto();// 自動折返
-				}
-				int RowEnd = 0;
-				if (Row == 0) {
-					RowEnd = Row;
-					RowEnd = RowEnd + 1;
-					titaVo.setReturnIndex(RowEnd);
-				} else {
-					Row++;
-					RowEnd = Row;
-				}
-				this.info("L5706 First,this.index=[" + this.index + "] ,this.limit=[" + this.limit + "],Row=[" + Row + "]");
-				for (int i = Row; i <= RowEnd && Row < lBrS; i++) {
-					String ThisLine = lBr.get(i);
-
-					this.info("L5706 Infor i=[" + (i) + "],Row=[" + Row + "],this.index=[" + this.index + "] ,this.limit=[" + this.limit + "] ");
-					this.info("L5706 ThisLine =[" + ThisLine + "]");
-					if (i == 0) {
-						// 資料檢核
+				while (br.ready()) {
+					String ThisLine = br.readLine();
+					this.info("ThisLine == [" + ThisLine + "]");
+					numLine++;
+					// 資料檢核
+					if (numLine == 1) {
 						if (ThisLine.indexOf("JCIC-INQ-BARE-V01-458") != 0) {
 							// E5009 資料檢核錯誤
 							if (errorMsg == 1) {
-								throw new LogicException(titaVo, "E5009", "首筆不為JCIC-INQ-BARE-V01-458開頭");
+								throw new LogicException(titaVo, "E5009", "首筆資料表頭格式不正確");
 							}
 						}
 						continue;
 					}
 
+					// 結尾須把最後一個客戶分攤檔資料寫入
+					if(CountRow==numLine) {
+						if (ThisLine.length() > 4 && ("TRLR").equals(ThisLine.substring(0, 4))) {
+							doUpdate(titaVo);
+						} else {
+							if (errorMsg == 1) {
+								throw new LogicException(titaVo, "E5009", "尾筆資料表頭格式不正確");
+							}
+						}
+					} 
 					// TR 是結尾的記號
 					if (ThisLine != null && ThisLine.length() != 0 && !("TR").equals(ThisLine.substring(0, 2))) {
-						OccursDataValue = new HashMap<String, String>();// 更新
 
 						String Code = ThisLine.substring(33, 39);
-						OccursDataValue.put(OccursData[0], String.valueOf(i + 1));// OORow
-						OccursDataValue.put(OccursData[1], Code);// OOCode
 						this.info("L5706 Code=[" + (Code) + "]");
 						String ThisLineUse = ThisLine.substring(39, ThisLine.length());
-						Map<String, String[]> mLineCut = cutSkill(titaVo, Code, ThisLineUse);
 
-						if (mLineCut != null) {
-							for (String Key : mLineCut.keySet()) {
-								String Data[] = mLineCut.get(Key);
+						Map<String, String[]> mLineCut = cutSkill(Code, ThisLineUse , titaVo);
+						
 
-								this.info("Key=[" + Key + "],value=[" + Data[0] + "],Remark=[" + Data[1] + "]");
-							}
-						} else {
-							continue;
-						}
-
-//						//案件種類為債協的代號
-//						String CaseKindCode1Function[]= {"AAS003","ZZS240","ZZS260","ZZM260","ZZS263","ZZM262","ZZM263","ZZM264"};
-//						//案件種類為調解的代號
-//						String CaseKindCode2Function[]= {"ZDM411","ZDM421"};
-//						//案件種類為更生的代號
-//						String CaseKindCode3Function[]= {"ZZM280","ZZM281","ZZM282","ZZM284","ZZM300","ZZM305","ZZM306","ZZM308","ZZS300"};
-//						//案件種類為清算的代號
-//						String CaseKindCode4Function[]= {"ZZM280","ZZM283","ZZM285"};
 
 //						ZZM260 各債權金融機構無擔保債權暨還款分配資料 (多筆 Z98)
 //						ZZM261 債務人所有延期繳款資料 (多筆 Z98)
@@ -254,13 +229,14 @@ public class L5706 extends TradeBuffer {
 						// 第三字元 'S' 為單筆, 'M' 為多筆, 'I' 為背景資訊; * 尚未開放查詢
 						switch (Code) {
 						case "AAS003":
-							doAAS003(titaVo, Code, mLineCut);
+							doUpdate(titaVo);
+//								doAAS003(Code, mLineCut, titaVo);
 							break;
 						case "ZZS240":
-							doZZS240(titaVo, Code, mLineCut);
+							doZZS240(Code, mLineCut, titaVo);// Z048
 							break;
 						case "ZZS260":
-							doZZS260(titaVo, Code, mLineCut);
+							doZZS260(Code, mLineCut, titaVo);// 更新NegMain
 							break;
 						case "ZZS261":
 							break;
@@ -269,44 +245,115 @@ public class L5706 extends TradeBuffer {
 						case "ZZS262":
 							break;
 						case "ZZS263":
-							doZZS263(titaVo, Code, mLineCut);
+//								doZZS263(Code, mLineCut,titaVo);
 							break;
 						case "ZZM262": // 單獨受償後各機構無擔保債權暨還款分配資料
-							doZZM262(titaVo, Code, mLineCut);
+							doZZM262(Code, mLineCut, titaVo);
 							break;
-						case "ZZM263": // 變更還款條件 UPDATE TBJCICMAIN
-							doZZM263(titaVo, Code, mLineCut);
+						case "ZZM263": // 變更還款條件 UPDATE 債權主檔
+							doZZM263(Code, mLineCut, titaVo);// Z062
 							break;
 						case "ZZM264": // 變更還款條件 UPDATE TBJCICSHARE
-							doZZM264(titaVo, Code, mLineCut);
+							doZZM264(Code, mLineCut, titaVo);
 							break;
 						case "ZZM260": // 一般債權機構代號及名稱,債權比例
-							doZZM260(titaVo, Code, mLineCut);
+							doZZM260(Code, mLineCut, titaVo);
 							break;
 						default:
 							break;
 						}
 					}
+					
 				}
-
+				fr.close();
+				
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				this.info("L5706 Error BrReady e=[" + e.toString() + "]");
-				throw new LogicException(titaVo, "E5006", "寫入資料庫發生錯誤");
+				throw new LogicException(titaVo, "EC001", e.getMessage());
+			} finally {
+				SafeClose.close(br);
 			}
-
+			
+			
 		} else {
 			String ErrorMsg = "檔案不存在,請查驗路徑.\r\n" + ReadFileName;
 			// E5006 未預期的錯誤
 			throw new LogicException(titaVo, "E5006", ErrorMsg);
 		}
-
+		
+		totaVo.putParam("OSuccessFlag", 1);
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	public String getCutSkill(TitaVo titaVo, String Code, Map<String, String[]> mData, String Key) throws LogicException {
+	public void doUpdate(TitaVo titaVo) throws LogicException {
+		// lNegFinShareM260 // 正常
+		// lNegFinShareM262 // 單獨受償
+		// lNegFinShareM264 // 變更還款條件
+		if (lNegFinShareM260.size() == 0 && lNegFinShareM262.size() == 0 && lNegFinShareM264.size() == 0) {
+		} else {
+
+			if (lNegFinShareM262.size() == 0 && lNegFinShareM264.size() == 0) { // 寫正常的分攤檔
+				if (isNewMain == true) { // 新案件才新增
+					CheckNegFinShare(lNegFinShareM260, custid, "ZZM260", titaVo);// 檢核期金+比例+簽約金額
+					try {
+						sNegFinShareService.insertAll(lNegFinShareM260, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0005", "債務協商債權分攤檔");
+					}
+					try {
+						sNegFinShareLogService.insertAll(lNegFinShareLogM260, titaVo); // 分攤歷程檔
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0005", "債務協商債權分攤檔歷程檔");
+					}
+				}
+			} else if (lNegFinShareM264.size() == 0) { // 寫單獨受償的分攤檔-需先刪掉原分攤資料再新增
+				CheckNegFinShare(lNegFinShareM262, custid, "ZZM262", titaVo);// 檢核期金+比例
+				// 刪除NegFinShare內最大案件序號
+				DeleteZZM262(CustNo262, CaseSeq262, titaVo);
+
+				try {
+					sNegFinShareService.insertAll(lNegFinShareM262, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "債務協商債權分攤檔");
+				}
+				try {
+					sNegFinShareLogService.insertAll(lNegFinShareLogM262, titaVo); // 分攤歷程檔
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "債務協商債權分攤檔歷程檔");
+				}
+
+			} else { // 寫變更還款條件的分攤檔
+				CheckNegFinShare(lNegFinShareM264, custid, "ZZM264", titaVo);// 檢核期金+比例+簽約金額
+
+				try {
+					sNegFinShareService.insertAll(lNegFinShareM264, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "債務協商債權分攤檔");
+				}
+				try {
+					sNegFinShareLogService.insertAll(lNegFinShareLogM264, titaVo); // 分攤歷程檔
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "債務協商債權分攤檔歷程檔");
+				}
+
+			}
+		}
+
+		lNegFinShareM260 = new ArrayList<NegFinShare>(); // 正常
+		lNegFinShareM262 = new ArrayList<NegFinShare>(); // 單獨受償
+		lNegFinShareM264 = new ArrayList<NegFinShare>(); // 變更還款條件
+		lNegFinShareLogM260 = new ArrayList<NegFinShareLog>();
+		lNegFinShareLogM262 = new ArrayList<NegFinShareLog>();
+		lNegFinShareLogM264 = new ArrayList<NegFinShareLog>();
+		totalContrAmt = BigDecimal.ZERO;
+		dueAmt = BigDecimal.ZERO;
+		custid = "" ;
+
+	}
+
+	public String getCutSkill(String Code, Map<String, String[]> mData, String Key ,TitaVo titaVo)
+			throws LogicException {
 		if (!mData.containsKey(Key)) {
 			// E5009 資料檢核錯誤
 			throw new LogicException(titaVo, "E5009", "資料格式代碼(" + Code + "),無此關鍵字(" + Key + ")");
@@ -317,29 +364,29 @@ public class L5706 extends TradeBuffer {
 
 	/**
 	 * 
-	 * @param titaVo
 	 * @param Code        功能代碼共6碼
 	 * @param ThisLineUse 要被切的資料欄位
+	 * @param titaVo
 	 * @return 功能代碼的欄位名稱,StringArray 0:切割後的資料 1:欄位說明
 	 * @throws LogicException               錯誤訊息
 	 * @throws UnsupportedEncodingException
 	 */
-	public Map<String, String[]> cutSkill(TitaVo titaVo, String Code, String ThisLineUse) throws LogicException, UnsupportedEncodingException {
+	public Map<String, String[]> cutSkill(String Code, String ThisLineUse , TitaVo titaVo)
+			throws LogicException, UnsupportedEncodingException {
 		Map<String, String[]> mData = new HashMap<>();
 
 		JcicAtomMain tJcicAtomMain = sJcicAtomMainService.findById(Code, titaVo);
 		if (tJcicAtomMain != null) {
-			OccursDataValue.put(OccursData[2], tJcicAtomMain.getDataType());// OODataType
-			OccursDataValue.put(OccursData[3], tJcicAtomMain.getRemark());// OOMainRemark
 
-			Slice<JcicAtomDetail> sJcicAtomDetail = sJcicAtomDetailService.findByFunctionCode(Code, 0, Integer.MAX_VALUE, titaVo);
+			Slice<JcicAtomDetail> sJcicAtomDetail = sJcicAtomDetailService.findByFunctionCode(Code, 0,
+					Integer.MAX_VALUE, titaVo);
 			List<JcicAtomDetail> lJcicAtomDetail = sJcicAtomDetail == null ? null : sJcicAtomDetail.getContent();
-			if (lJcicAtomDetail != null && lJcicAtomDetail.size() > 0)
-				;
-			else
+			if (lJcicAtomDetail != null && lJcicAtomDetail.size() > 0) {
+
+			} else {
 				// E5009 資料檢核錯誤
 				throw new LogicException(titaVo, "E5009", "JcicAtomDetail無此資料格式(" + Code + ")");
-
+			}
 			// ThisLineUse="";
 
 			int StartLength = 0;
@@ -347,92 +394,55 @@ public class L5706 extends TradeBuffer {
 			int bytL = byt.length;
 			for (JcicAtomDetail JcicAtomDetailVo : lJcicAtomDetail) {
 				String FiledName = JcicAtomDetailVo.getFiledName();
-				// int DataOrder=JcicAtomDetailVo.getDataOrder();
 				String FiledType = JcicAtomDetailVo.getFiledType();
-				// String FunctionCode=JcicAtomDetailVo.getFunctionCode();
 				String Remark = JcicAtomDetailVo.getRemark();
 
 				int Length = 0;
-				if (FiledType != null) {
-					int FiledTypeL = FiledType.length();
+				if (FiledType == null) {
+					throw new LogicException(titaVo, "E5009", "FiledType欄位不可為空值");// E5009 資料檢核錯誤
+				}
+				int FiledTypeL = FiledType.length();
 
-					int FiledTypeL1 = FiledTypeL - 1;
+				int FiledTypeL1 = FiledTypeL - 1;
 
-					if (FiledType.indexOf("Char") != -1) {
-						Length = Integer.parseInt(FiledType.substring(5, FiledTypeL1));
-					} else if (FiledType.indexOf("Num") != -1) {
-						Length = Integer.parseInt(FiledType.substring(4, FiledTypeL1));
-					} else {
-						// E5009 資料檢核錯誤
-						throw new LogicException(titaVo, "E5009", "出現未定義的資料型態[" + FiledType + "]");
-					}
-					// int OrgLenth=Length;
-					// int OrgStartLength=StartLength;
-
-					if (StartLength > bytL) {
-						this.info("L5706 Error ThisLineUse=[" + ThisLineUse + "]");
-						// E5009 資料檢核錯誤
-						throw new LogicException(titaVo, "E5009", "資料長度有問題,請查驗.");
-					}
-
-					String Value = ByteToString(titaVo, byt, StartLength, Length);
-					StartLength = StartLength + Length;
-
-					String data[] = { Value, Remark };
-					mData.put(FiledName, data);
-
-					// "OOFiledName","OOFiledType","OODetailRemark","OOValue"
-					OccursDataValue.put(OccursData[4], FiledName);// OOFiledName
-					OccursDataValue.put(OccursData[5], FiledType);// OOFiledType
-
-					OccursDataValue.put(OccursData[6], Remark);// OODetailRemark
-					OccursDataValue.put(OccursData[7], Value);// OOValue
-					// this.info("Key=["+FiledName+"],value=["+Value+"],Remark=["+Remark+"],StartLength=["+OrgStartLength+"],Length=["+OrgLenth+"]");
-
-					OccursList occursList = new OccursList();
-					for (String Key : OccursDataValue.keySet()) {
-						occursList.putParam(Key, OccursDataValue.get(Key));
-					}
-					this.totaVo.addOccursList(occursList);
+				if (FiledType.indexOf("Char") != -1) {
+					Length = Integer.parseInt(FiledType.substring(5, FiledTypeL1));
+				} else if (FiledType.indexOf("Num") != -1) {
+					Length = Integer.parseInt(FiledType.substring(4, FiledTypeL1));
 				} else {
 					// E5009 資料檢核錯誤
-					throw new LogicException(titaVo, "E5009", "FiledType欄位不可為空值");
+					throw new LogicException(titaVo, "E5009", "出現未定義的資料型態[" + FiledType + "]");
 				}
+
+				if (StartLength > bytL) {
+					this.info("L5706 Error ThisLineUse=[" + ThisLineUse + "]");
+					// E5009 資料檢核錯誤
+					throw new LogicException(titaVo, "E5009", "資料長度有問題,請查驗.");
+				}
+
+				String Value = ByteToString(byt, StartLength, Length, titaVo);
+				StartLength = StartLength + Length;
+
+				String data[] = { Value, Remark };
+				mData.put(FiledName, data);
 
 			}
 		} else {
-//			if(errorMsg==1) {
-//				// E5009 資料檢核錯誤 
-//				throw new LogicException(titaVo, "E5009", "JcicAtomMain無此資料格式("+Code+")");
-//			}else {
-//				OccursDataValue.put(OccursData[2],"未知記號");//OODataType
-//				OccursDataValue.put(OccursData[3],"無法判別的記號");//OOMainRemark
-//				OccursDataValue.put(OccursData[4],"UNKNOW");//OOFiledName
-//				OccursDataValue.put(OccursData[5],"CHAR(*)");//OOFiledType
-//				
-//				OccursDataValue.put(OccursData[6],"未知");//OODetailRemark
-//				OccursDataValue.put(OccursData[7],"");//OOValue
-//				
-//				OccursList occursList = new OccursList();
-//				for(String Key:OccursDataValue.keySet()) {
-//					occursList.putParam(Key,OccursDataValue.get(Key));
-//				}
-//				this.totaVo.addOccursList(occursList);
+//			OccursDataValue.put(OccursData[2], "未知記號");// OODataType
+//			OccursDataValue.put(OccursData[3], "無法判別的記號");// OOMainRemark
+//			OccursDataValue.put(OccursData[4], "UNKNOW");// OOFiledName
+//			OccursDataValue.put(OccursData[5], "CHAR(*)");// OOFiledType
+//
+//			OccursDataValue.put(OccursData[6], "未知");// OODetailRemark
+//			OccursDataValue.put(OccursData[7], "");// OOValue
+
+//			OccursList occursList = new OccursList();
+//			for (String Key : OccursDataValue.keySet()) {
+//				occursList.putParam(Key, OccursDataValue.get(Key));
 //			}
-			OccursDataValue.put(OccursData[2], "未知記號");// OODataType
-			OccursDataValue.put(OccursData[3], "無法判別的記號");// OOMainRemark
-			OccursDataValue.put(OccursData[4], "UNKNOW");// OOFiledName
-			OccursDataValue.put(OccursData[5], "CHAR(*)");// OOFiledType
-
-			OccursDataValue.put(OccursData[6], "未知");// OODetailRemark
-			OccursDataValue.put(OccursData[7], "");// OOValue
-
-			OccursList occursList = new OccursList();
-			for (String Key : OccursDataValue.keySet()) {
-				occursList.putParam(Key, OccursDataValue.get(Key));
-			}
-			this.totaVo.addOccursList(occursList);
+//			this.totaVo.addOccursList(occursList);
 		}
+
 		return mData;
 	}
 
@@ -448,17 +458,17 @@ public class L5706 extends TradeBuffer {
 		return sum;
 	}
 
-	public String ByteToString(TitaVo titaVo, byte[] byt, int Start, int len) throws LogicException {
+	public String ByteToString(byte[] byt, int Start, int len , TitaVo titaVo) throws LogicException {
 		// ByteToString
 
 		byte[] NewByt = new byte[len];
 		for (int i = 0; i < len; i++) {
 			NewByt[i] = byt[(Start + i)];
 		}
-		String str = null;
+		String str = new String(NewByt);
 		try {
 			// str=new String(str.getBytes("utf-8"));
-			str = new String(NewByt, "BIG5");
+			str = new String(str.getBytes("big5"));
 		} catch (UnsupportedEncodingException e) {
 			this.info("L5706 ByteToString=" + e.toString());
 			// E5010 資料格式轉換有誤
@@ -491,45 +501,44 @@ public class L5706 extends TradeBuffer {
 		}
 	}
 
-	public int CheckCustId(TitaVo titaVo, String id) throws LogicException {
+	public int CheckCustId(String id , TitaVo titaVo) throws LogicException {
 		this.info("L5706 CheckCustId Run");
 		int CustNo = 0;
 		// 查驗此客戶編號存在不存在,回傳CustNo
 		if (id != null && id.trim().length() != 0) {
-			CustMain CustMainVO = sCustMainService.custIdFirst(id, titaVo);
-			if (CustMainVO != null) {
-				CustNo = CustMainVO.getCustNo();
-
+			CustMain tCustMain = sCustMainService.custIdFirst(id, titaVo);
+			if (tCustMain != null) {
+				CustNo = tCustMain.getCustNo();
+				
 				if (CustNo == 0) {
 					// 取號
 					CustNo = negCom.getNewCustNo(id, titaVo);
+					
 					// E5008 戶號為0
 					// throw new LogicException(titaVo, "E5008","");
 				}
 			} else {
+			
 				if (errorMsg == 1) {
-					// E0001 查詢資料不存在
 					throw new LogicException(titaVo, "E0001", "查無客戶主檔資料[" + id + "]");
 				}
 
 			}
 		} else {
 			if (errorMsg == 1) {
-				// E5007 身分證字號為空值
-				throw new LogicException(titaVo, "E5007", "");
+				throw new LogicException(titaVo, "E5007", "");// E5007 身分證字號為空值
 			}
 		}
-
 		return CustNo;
 	}
 
-	public NegMain CheckNegMain(TitaVo titaVo, int CustNo) throws LogicException {
+	public NegMain CheckNegMain(int custNo , TitaVo titaVo) throws LogicException {
 		this.info("L5706 CheckNegMain Run");
-		NegMain NegMainVO = new NegMain();
-		if (CustNo != 0) {
-			NegMainVO = sNegMainService.CustNoFirst(CustNo, titaVo);
-			if (NegMainVO != null) {
-				return NegMainVO;
+		NegMain tNegMain = new NegMain();
+		if (custNo != 0) {
+			tNegMain = sNegMainService.CustNoFirst(custNo, titaVo);
+			if (tNegMain != null) {
+				return tNegMain;
 			} else {
 				if (errorMsg == 1) {
 					// E0001 查詢資料不存在
@@ -537,19 +546,100 @@ public class L5706 extends TradeBuffer {
 				}
 			}
 		}
-		return NegMainVO;
+		return tNegMain;
+	}
+	
+	
+	public void CheckNegFinAcct(String fincode ,String id,  String code , TitaVo titaVo) throws LogicException {
+		this.info("L5706 CheckNegFinAcct Run");
+		NegFinAcct tNegFinAcct = new NegFinAcct();
+		if (fincode != null && fincode.trim().length() != 0) {
+			tNegFinAcct = sNegFinAcctService.findById(fincode, titaVo);
+			if (tNegFinAcct != null) {
+
+			} else {
+				throw new LogicException(titaVo, "E0001", "債權金融機構=" + fincode + ",身分證字號=" + id +",識別碼=" + code);
+			}
+		} else {
+			throw new LogicException(titaVo, "E0015", "債權金融機構不可空白" +  ":身分證字號=" + id +",識別碼=" + code);
+		}
 	}
 
-	public int StrToInt(TitaVo titaVo, String value, String DateName) throws LogicException {
-		int IntValue = 0;
+	public void CheckNegFinShare(ArrayList<NegFinShare> lNegFinShare ,String id,  String code , TitaVo titaVo) throws LogicException {
+		this.info("L5706 CheckNegFinShare Run");
+		BigDecimal sumrate = BigDecimal.ZERO;
+		BigDecimal totalrate = new BigDecimal("100");
+		BigDecimal sumdueamt = BigDecimal.ZERO;
+		BigDecimal sumtotal = BigDecimal.ZERO;
+		
+		// 檢核期金+比例+簽約金額
+		for (NegFinShare fin : lNegFinShare) {
+			sumrate = sumrate.add(fin.getAmtRatio());
+			sumdueamt = sumdueamt.add(fin.getDueAmt());
+			sumtotal = sumtotal.add(fin.getContractAmt());
+		}
+		if (sumrate.compareTo(totalrate) != 0) {	// 檢核比例
+			throw new LogicException(titaVo, "E0015", "債權比例合計有誤" + ",身分證字號=" + id +",識別碼=" + code);
+		}
+
+		if (sumdueamt.compareTo(dueAmt) !=0 ) {	// 檢核期金
+			throw new LogicException(titaVo, "E0015", "每期可分配金額合計有誤" + ",身分證字號=" + id +",識別碼=" + code);
+		}
+		
+		if (sumtotal.compareTo(totalContrAmt) != 0 && !"ZZM262".equals(code)) {	// 非ZZM262要檢查簽約金額
+			throw new LogicException(titaVo, "E0015", "債權簽約金額合計有誤" + ",身分證字號=" + id +",識別碼=" + code);
+		}
+		
+	}
+
+	
+	public int StrToInt(String value, String DataName , TitaVo titaVo) throws LogicException {
+		int intvalue = 0;
 		value = TrimStart(value, '0');
 		if (IsNullOrEmpty(value)) {
-			IntValue = Integer.parseInt(value);
+			value = "0";
 		}
-		return IntValue;
+		intvalue = Integer.parseInt(value);
+		return intvalue;
+	}
+	
+	public int FindSeq(int CustNo, int CaseSeq, TitaVo titaVo) throws LogicException {
+		int iSeq = 0;
+		int oSeq = 1;
+		Slice<NegFinShareLog> sNegFinShareLog = sNegFinShareLogService.FindAllFinCode(CustNo, CaseSeq, this.index, Integer.MAX_VALUE, titaVo);
+		List<NegFinShareLog> mNegFinShareLog = sNegFinShareLog == null ? null : sNegFinShareLog.getContent();
+		//更新歷程檔 找最大歷程序號
+		if (mNegFinShareLog != null) {
+			for (NegFinShareLog tNegFinShareLog : mNegFinShareLog) {
+				iSeq = tNegFinShareLog.getSeq();
+				if (iSeq > oSeq) {
+					oSeq = iSeq;
+				}
+			}
+		} else {
+			oSeq = 0;
+		}
+		return oSeq+1;
 	}
 
-	public BigDecimal StringToBigDecimal(TitaVo titaVo, String strBd) throws LogicException {
+	public void DeleteZZM262(int CustNo, int CaseSeq, TitaVo titaVo) throws LogicException {
+		
+		Slice<NegFinShare> sNegFinShare = sNegFinShareService.FindAllFinCode(CustNo, CaseSeq, this.index, Integer.MAX_VALUE, titaVo);
+		
+		List<NegFinShare> mNegFinShare = sNegFinShare == null ? null : sNegFinShare.getContent();
+		this.info("Delete All=="+mNegFinShare);
+		if(mNegFinShare!=null) {
+				try {
+					sNegFinShareService.deleteAll(mNegFinShare);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
+				}
+		}
+		
+	}
+	
+	
+	public BigDecimal StringToBigDecimal(String strBd , TitaVo titaVo) throws LogicException {
 		BigDecimal BdV = BigDecimal.ZERO;
 		strBd = TrimStart(strBd, '0');
 		if (IsNullOrEmpty(strBd)) {
@@ -559,23 +649,21 @@ public class L5706 extends TradeBuffer {
 		return BdV;
 	}
 
-	public int DateRocToDC(TitaVo titaVo, String Date, String DateName) throws LogicException {
-		Date = Date.trim();
-		int Dc = 0;
-		if (Date != null && Date.length() != 0) {
-			int DateL = Date.length();
-			if (DateL <= 7) {
-				Dc = (Integer.parseInt(Date) + 19110000);
-			}
+	public int DateRocToDC(String date, String dateName , TitaVo titaVo) throws LogicException {
+
+		date = date.trim();
+		int dc = 0;
+		if (date != null && date.length() != 0) {
+			dc = (Integer.parseInt(date) + 19110000);
 		} else {
 			// E5009 資料檢核錯誤
-			throw new LogicException(titaVo, "E5009", DateName + ":不可為空值");
+			throw new LogicException(titaVo, "E5009", dateName + ":不可為空值");
 		}
 
-		return Dc;
+		return dc;
 	}
 
-	public void doZZS240(TitaVo titaVo, String Code, Map<String, String[]> mLineCut) throws LogicException {
+	public void doZZS240(String Code, Map<String, String[]> mLineCut , TitaVo titaVo) throws LogicException {
 		// ZZS240 債務協商 債務人基本資料 (單筆 Z96 Z98)
 
 		// IDN_BAN Char(10) 身分證號
@@ -588,36 +676,43 @@ public class L5706 extends TradeBuffer {
 		// COM_TELNO Char(16) 通訊電話
 		// MOBIL_NO Char(16) 行動電話
 		// FILLER Char(30) 保留欄位
-		String IDN_BAN = getCutSkill(titaVo, Code, mLineCut, "IDN_BAN");// 身分證號
-		String MAIN_CODE = getCutSkill(titaVo, Code, mLineCut, "MAIN_CODE");// 最大債權金融機構
+		String IDN_BAN = getCutSkill(Code, mLineCut, "IDN_BAN" , titaVo);// 身分證號
+		String MAIN_CODE = getCutSkill(Code, mLineCut, "MAIN_CODE" , titaVo);// 最大債權金融機構
 		// String
 		// MAIN_CODE_NAME=getCutSkill(titaVo,Code,mLineCut,"MAIN_CODE_NAME");//最大債權金融機構名稱
-		String RECEIVE_DATE = getCutSkill(titaVo, Code, mLineCut, "RECEIVE_DATE");// 協商申請日期
-		String REG_ADDR = getCutSkill(titaVo, Code, mLineCut, "REG_ADDR");// 戶籍地址
-		String COM_ADDR = getCutSkill(titaVo, Code, mLineCut, "COM_ADDR");// 通訊地址
-		String REG_TELNO = getCutSkill(titaVo, Code, mLineCut, "REG_TELNO");// 戶籍電話
-		String COM_TELNO = getCutSkill(titaVo, Code, mLineCut, "COM_TELNO");// 通訊電話
-		String MOBIL_NO = getCutSkill(titaVo, Code, mLineCut, "MOBIL_NO");// 行動電話
+		String RECEIVE_DATE = getCutSkill(Code, mLineCut, "RECEIVE_DATE" , titaVo);// 協商申請日期
+		String REG_ADDR = getCutSkill(Code, mLineCut, "REG_ADDR" , titaVo);// 戶籍地址
+		String COM_ADDR = getCutSkill(Code, mLineCut, "COM_ADDR" , titaVo);// 通訊地址
+		String REG_TELNO = getCutSkill(Code, mLineCut, "REG_TELNO" , titaVo);// 戶籍電話
+		String COM_TELNO = getCutSkill(Code, mLineCut, "COM_TELNO" , titaVo);// 通訊電話
+		String MOBIL_NO = getCutSkill(Code, mLineCut, "MOBIL_NO" , titaVo);// 行動電話
+
+		// 查驗是否已有客戶主檔
+		int CustNo = CheckCustId(IDN_BAN , titaVo);
 
 		JcicZ048Id tJcicZ048Id = new JcicZ048Id();
 		tJcicZ048Id.setCustId(IDN_BAN);
-		tJcicZ048Id.setRcDate(DateRocToDC(titaVo, RECEIVE_DATE, "協商申請日"));
+		tJcicZ048Id.setRcDate(DateRocToDC(RECEIVE_DATE, "協商申請日" , titaVo));
 		tJcicZ048Id.setSubmitKey(MAIN_CODE);
-		JcicZ048 tJcicZ048Vo = sJcicZ048Service.findById(tJcicZ048Id, titaVo);
-		if (tJcicZ048Vo != null) {
+		JcicZ048 tJcicZ048 = sJcicZ048Service.findById(tJcicZ048Id, titaVo);
+		if (tJcicZ048 != null) {
 			// 已有資料
 		} else {
 			// 未有資料
-			tJcicZ048Vo = new JcicZ048();
-			tJcicZ048Vo.setJcicZ048Id(tJcicZ048Id);
-			tJcicZ048Vo.setTranKey("A");
-			tJcicZ048Vo.setCustRegAddr(REG_ADDR.trim());// 債務人戶籍之郵遞區號及地址
-			tJcicZ048Vo.setCustComAddr(COM_ADDR.trim());// 債務人通訊地之郵遞區號及地址
-			tJcicZ048Vo.setCustRegTelNo(REG_TELNO.trim());// 債務人戶籍電話
-			tJcicZ048Vo.setCustComTelNo(COM_TELNO.trim());// 債務人通訊電話
-			tJcicZ048Vo.setCustMobilNo(MOBIL_NO.trim());// 債務人行動電話
+			tJcicZ048 = new JcicZ048();
+			tJcicZ048.setJcicZ048Id(tJcicZ048Id);
+			tJcicZ048.setTranKey("A");
+			tJcicZ048.setCustRegAddr(REG_ADDR.trim());// 債務人戶籍之郵遞區號及地址
+			tJcicZ048.setCustComAddr(COM_ADDR.trim());// 債務人通訊地之郵遞區號及地址
+			tJcicZ048.setCustRegTelNo(REG_TELNO.trim());// 債務人戶籍電話
+			tJcicZ048.setCustComTelNo(COM_TELNO.trim());// 債務人通訊電話
+			tJcicZ048.setCustMobilNo(MOBIL_NO.trim());// 債務人行動電話
+			tJcicZ048.setOutJcicTxtDate(0);
+			String iKey = "";
+			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+			tJcicZ048.setUkey(iKey);
 			try {
-				sJcicZ048Service.insert(tJcicZ048Vo, titaVo);
+				sJcicZ048Service.insert(tJcicZ048, titaVo);
 			} catch (DBException e) {
 				// E0005 新增資料時，發生錯誤
 				throw new LogicException(titaVo, "E0005", "債務人基本資料");
@@ -626,7 +721,7 @@ public class L5706 extends TradeBuffer {
 
 	}
 
-	public void doAAS003(TitaVo titaVo, String Code, Map<String, String[]> mLineCut) throws LogicException {
+	public void doAAS003(String Code, Map<String, String[]> mLineCut , TitaVo titaVo) throws LogicException {
 		// AAS003 自然人姓名,身分證補發,通報,補充註記 (單筆, 取代AAS001)
 		// IDN Char(10) 身分證號
 		// PNAME Char(40) 中文姓名
@@ -652,7 +747,7 @@ public class L5706 extends TradeBuffer {
 		// 新壽原程式碼用來找CustNo戶號用
 	}
 
-	public void doZZS260(TitaVo titaVo, String Code, Map<String, String[]> mLineCut) throws LogicException {
+	public void doZZS260(String Code, Map<String, String[]> mLineCut , TitaVo titaVo) throws LogicException {
 		// ZZS260 債務協商 金融機構無擔保債務協議資料 (單筆 Z98)
 
 		// IDN_BAN Char(10) 身分證號
@@ -673,78 +768,73 @@ public class L5706 extends TradeBuffer {
 		// TOTAL_AMT Num(9) 總簽約金額合計
 		// FILLER Char(30) 保留欄位
 
-		String IDN_BAN = getCutSkill(titaVo, Code, mLineCut, "IDN_BAN");// 身分證號
-		String MAIN_CODE = getCutSkill(titaVo, Code, mLineCut, "MAIN_CODE");// 最大債權金融機構
+		String IDN_BAN = getCutSkill(Code, mLineCut, "IDN_BAN" , titaVo);// 身分證號
+		String MAIN_CODE = getCutSkill(Code, mLineCut, "MAIN_CODE" , titaVo);// 最大債權金融機構
 		// String
 		// MAIN_CODE_NAME=getCutSkill(titaVo,Code,mLineCut,"MAIN_CODE_NAME");//最大債權金融機構名稱
-		String RECEIVE_DATE = getCutSkill(titaVo, Code, mLineCut, "RECEIVE_DATE");// 協商申請日期
+		String RECEIVE_DATE = getCutSkill(Code, mLineCut, "RECEIVE_DATE" , titaVo);// 協商申請日期
 		// String PASS_DATE=getCutSkill(titaVo,Code,mLineCut,"PASS_DATE");//協議完成日期
-		// String
-		// INTERVIEW_DATE=getCutSkill(titaVo,Code,mLineCut,"INTERVIEW_DATE");//面談日期
+		// String INTERVIEW_DATE=getCutSkill(titaVo,Code,mLineCut,"INTERVIEW_DATE");//面談日期
 		// String SIGN_DATE=getCutSkill(titaVo,Code,mLineCut,"SIGN_DATE");//簽約完成日期
-		String PERIOD = getCutSkill(titaVo, Code, mLineCut, "PERIOD");// 期數
-		String RATE = getCutSkill(titaVo, Code, mLineCut, "RATE");// 利率
-		String FIRST_PAY_DATE = getCutSkill(titaVo, Code, mLineCut, "FIRST_PAY_DATE").trim();// 首期應繳款日期
-		String PAY_AMOUNT = getCutSkill(titaVo, Code, mLineCut, "PAY_AMOUNT");// 月付金
+		String PERIOD = getCutSkill(Code, mLineCut, "PERIOD" , titaVo);// 期數
+		String RATE = getCutSkill(Code, mLineCut, "RATE" , titaVo);// 利率
+		String FIRST_PAY_DATE = getCutSkill(Code, mLineCut, "FIRST_PAY_DATE" , titaVo).trim();// 首期應繳款日期
+		String PAY_AMOUNT = getCutSkill(Code, mLineCut, "PAY_AMOUNT" , titaVo);// 月付金
 //		String PAY_ACCOUNT=getCutSkill(titaVo,Code,mLineCut,"PAY_ACCOUNT");//繳款帳號
 //		String EXP_LOAN_AMT=getCutSkill(titaVo,Code,mLineCut,"EXP_LOAN_AMT");//信用貸款債務總簽約金額
 //		String CASH_CARD_AMT=getCutSkill(titaVo,Code,mLineCut,"CASH_CARD_AMT");//現金卡債務總簽約金額
 //		String CREDIT_CARD_AMT=getCutSkill(titaVo,Code,mLineCut,"CREDIT_CARD_AMT");//信用卡債務簽約總金額
-		String TOTAL_AMT = getCutSkill(titaVo, Code, mLineCut, "TOTAL_AMT");// 總簽約金額合計
+		String TOTAL_AMT = getCutSkill(Code, mLineCut, "TOTAL_AMT" , titaVo);// 總簽約金額合計
 
 		// 查驗是否已有客戶主檔
-		this.info("L5706 CheckCustId ZZS260");
-		int CustNo = CheckCustId(titaVo, IDN_BAN);
-		this.info("L5706 CheckCustId ZZS260 End");
-//		//查驗是否已有債協主檔,沒有就新增
-//		this.info("L5706 CheckNegMain ZZS260");
-//		NegMain NegMainVO=CheckNegMain(titaVo,CustNo);
-//		this.info("L5706 CheckNegMain ZZS260 End");
-//		if(NegMainVO!=null) {
-//			
-//		}else {
-//			this.info("L5706 NegMainInsert ZZS260");
-//			//NegMainVO=NegMainInsert(0,titaVo,IDN_BAN,CustNo,pay_status,receive_date,pay_amount,period,rate,first_pay_date,maxmain_code,total_amt,receive_date1);
-//			this.info("L5706 NegMainInsert ZZS260 End");
-//		}
-
+		int CustNo = CheckCustId(IDN_BAN , titaVo);
+		custid = IDN_BAN ;
+		//檢查債權機構
+		CheckNegFinAcct(MAIN_CODE , IDN_BAN , "ZZS260" , titaVo);
+		
 		// 檢查是否有NEGMAIN的主檔-無則新增
-		NegMain NegMainVO = sNegMainService.CustNoAndApplDateFirst(CustNo, DateRocToDC(titaVo, RECEIVE_DATE, "協商申請日"), MAIN_CODE, titaVo);
-		if (NegMainVO != null) {
-			// 已有資料
-			// 不做處理
-			if (errorMsg == 1) {
-				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "身份證字號[" + IDN_BAN + "]已存在,債權資料,不可新增.");
-			}
-
+		NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo, DateRocToDC(RECEIVE_DATE, "協商申請日" , titaVo),
+				MAIN_CODE, titaVo);
+		if (tNegMain != null) {
+			isNewMain = false;
+			totalContrAmt = tNegMain.getTotalContrAmt();//分攤檔金額檢核使用
+			dueAmt = tNegMain.getDueAmt();//分攤檔金額檢核使用
+			// 已有資料不做處理
 		} else {
+			isNewMain = true;
 			// 未有資料-新增處理
-			NegMainId NegMainIdVo = new NegMainId();
-			NegMainIdVo.setCaseSeq(1);
-			NegMainIdVo.setCustNo(CustNo);
+			NegMainId tNegMainId = new NegMainId();
+			// 找該戶號序號最大的
+			NegMain t1NegMain = CheckNegMain(CustNo , titaVo);
+			if (t1NegMain != null) {
+				tNegMainId.setCaseSeq(t1NegMain.getCaseSeq() + 1);
+			} else {
+				tNegMainId.setCaseSeq(1);
+			}
+			tNegMainId.setCustNo(CustNo);
 
-			NegMain NegMainVo = new NegMain();
+			NegMain t2NegMain = new NegMain();
 
-			NegMainVo.setNegMainId(NegMainIdVo);
-			NegMainVo.setCaseSeq(NegMainIdVo.getCaseSeq());
-			NegMainVo.setCustNo(NegMainIdVo.getCustNo());
-			NegMainVo.setMainFinCode(MAIN_CODE);
+			t2NegMain.setNegMainId(tNegMainId);
+			t2NegMain.setCaseSeq(tNegMainId.getCaseSeq());
+			t2NegMain.setCustNo(tNegMainId.getCustNo());
+			t2NegMain.setMainFinCode(MAIN_CODE);
 
-			NegMainVo.setApplDate(DateRocToDC(titaVo, RECEIVE_DATE, "協商申請日"));
-			NegMainVo.setTotalPeriod(StrToInt(titaVo, PERIOD, "期數"));
-			NegMainVo.setIntRate(StringToBigDecimal(titaVo, RATE));
-			NegMainVo.setFirstDueDate(DateRocToDC(titaVo, FIRST_PAY_DATE, "首次應繳日"));
-			NegMainVo.setDueAmt(StringToBigDecimal(titaVo, PAY_AMOUNT));
-			NegMainVo.setTotalContrAmt(StringToBigDecimal(titaVo, TOTAL_AMT));// 簽約總金額
-
-			CustMain CustMainVO = sCustMainService.custIdFirst(IDN_BAN, titaVo);
+			t2NegMain.setApplDate(DateRocToDC(RECEIVE_DATE, "協商申請日" , titaVo));
+			t2NegMain.setTotalPeriod(StrToInt(PERIOD, "期數" ,titaVo));
+			t2NegMain.setIntRate(StringToBigDecimal(RATE ,titaVo));
+			t2NegMain.setFirstDueDate(DateRocToDC(FIRST_PAY_DATE, "首次應繳日" , titaVo));
+			t2NegMain.setDueAmt(StringToBigDecimal(PAY_AMOUNT , titaVo));
+			t2NegMain.setTotalContrAmt(StringToBigDecimal(TOTAL_AMT , titaVo));// 簽約總金額
+			totalContrAmt = t2NegMain.getTotalContrAmt() ;//分攤檔金額檢核使用
+			dueAmt = t2NegMain.getDueAmt();//分攤檔金額檢核使用
+			CustMain tCustMain = sCustMainService.custIdFirst(IDN_BAN, titaVo);
 			String CustLoanKind = "";
-			if (CustMainVO != null) {
+			if (tCustMain != null) {
 				List<String> CustTypeCode = new ArrayList<String>();
 				CustTypeCode.add("05");
 				// 戶別
-				if (CustTypeCode.contains(CustMainVO.getCustTypeCode())) {
+				if (CustTypeCode.contains(tCustMain.getCustTypeCode())) {
 					// 是保代戶
 					CustLoanKind = "2";
 				} else {
@@ -757,42 +847,46 @@ public class L5706 extends TradeBuffer {
 				}
 
 			}
+			t2NegMain.setCaseKindCode("1");// 案件種類 1:協商;2:調解;3:更生;4:清算
+			t2NegMain.setStatus("0");// 債權戶況 0:正常 1:已變更 2:毀諾 3:結案 4:未生效
+			t2NegMain.setCustLoanKind(CustLoanKind);// 債權戶別"1:放款戶 ;2:保貸戶;客戶主檔:保貸別
+			t2NegMain.setTwoStepCode("N");// 二階段註記
 
-			NegMainVo.setCaseKindCode("1");// 案件種類 1:協商;2:調解;3:更生;4:清算
-			NegMainVo.setStatus("0");// 債權戶況 0:正常 1:已變更 2:毀諾 3:結案 4:未生效
-			NegMainVo.setCustLoanKind(CustLoanKind);// 債權戶別"1:放款戶 ;2:保貸戶;客戶主檔:保貸別
-			NegMainVo.setTwoStepCode("N");// 二階段註記
+			t2NegMain.setDeferYMStart(0);// 延期繳款年月(起)
+			t2NegMain.setDeferYMEnd(0);// 延期繳款年月(訖)
 
-			NegMainVo.setDeferYMStart(0);// 延期繳款年月(起)
-			NegMainVo.setDeferYMEnd(0);// 延期繳款年月(訖)
+			t2NegMain.setPrincipalBal(t2NegMain.getTotalContrAmt());// 總本金餘額
 
-			NegMainVo.setPrincipalBal(NegMainVo.getPrincipalBal());// 總本金餘額
-
-			NegMainVo.setNextPayDate(NegMainVo.getFirstDueDate());// 下次應繳日
-			int LastDueDate = negCom.getRepayDate(NegMainVo.getFirstDueDate(), NegMainVo.getTotalPeriod() - 1 , titaVo);
-			NegMainVo.setLastDueDate(LastDueDate);// 還款結束日
+			t2NegMain.setNextPayDate(t2NegMain.getFirstDueDate());// 下次應繳日
+			int LastDueDate = 0;
+			if(t2NegMain.getTotalPeriod() > 0) {
+				LastDueDate = negCom.getRepayDate(t2NegMain.getFirstDueDate(), t2NegMain.getTotalPeriod()-1, titaVo); //並非計算下一期故須減1
+			}else {
+				LastDueDate = t2NegMain.getFirstDueDate();
+			}
+			
+			t2NegMain.setLastDueDate(LastDueDate);// 還款結束日
 			String IsMainFin = "";
 			if (("458").equals(MAIN_CODE)) {
 				IsMainFin = "Y";
 			} else {
 				IsMainFin = "N";
 			}
-			NegMainVo.setIsMainFin(IsMainFin);// 是否最大債權
+			t2NegMain.setIsMainFin(IsMainFin);// 是否最大債權
 
-			NegMainVo.setStatusDate(dateUtil.getNowIntegerForBC());// 戶況日期
+			t2NegMain.setStatusDate(0);// 戶況日期
 
-			if (updInsDb == 1) {
-				try {
-					sNegMainService.insert(NegMainVo, titaVo);
-				} catch (DBException e) {
-					// E0005 新增資料時，發生錯誤
-					throw new LogicException(titaVo, "E0005", "債務協商案件主檔");
-				}
+			try {
+				sNegMainService.insert(t2NegMain, titaVo);	
+			} catch (DBException e) {
+				// E0005 新增資料時，發生錯誤
+				throw new LogicException(titaVo, "E0005", "債務協商案件主檔");
 			}
 		}
+		
 	}
 
-	public void doZZM260(TitaVo titaVo, String Code, Map<String, String[]> mLineCut) throws LogicException {
+	public void doZZM260(String Code, Map<String, String[]> mLineCut , TitaVo titaVo) throws LogicException {
 		// ZZM260 債務協商 各債權金融機構無擔保債權暨還款分配資料 (多筆 Z98)
 		// IDN_BAN Char(10) 身分證號
 		// RECEIVE_DATE Char(7) 協商申請日期
@@ -804,64 +898,46 @@ public class L5706 extends TradeBuffer {
 		// CREDIT_CARD_AMT Num(9) 信用卡債權金額
 		// DISP_AMT Num(9) 每期可分配金額
 		// LOAN_RATE Num(6) 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
-		String IDN_BAN = getCutSkill(titaVo, Code, mLineCut, "IDN_BAN");// 身分證號
-		String RECEIVE_DATE = getCutSkill(titaVo, Code, mLineCut, "RECEIVE_DATE");// 協商申請日期
-		String MAIN_CODE = getCutSkill(titaVo, Code, mLineCut, "MAIN_CODE");// 最大債權金融機構
-		String BANK_CODE = getCutSkill(titaVo, Code, mLineCut, "BANK_CODE");// 債權金融機構
+		String IDN_BAN = getCutSkill(Code, mLineCut, "IDN_BAN" , titaVo);// 身分證號
+		String RECEIVE_DATE = getCutSkill(Code, mLineCut, "RECEIVE_DATE" , titaVo);// 協商申請日期
+		String MAIN_CODE = getCutSkill(Code, mLineCut, "MAIN_CODE" , titaVo);// 最大債權金融機構
+		String BANK_CODE = getCutSkill(Code, mLineCut, "BANK_CODE" , titaVo);// 債權金融機構
 		// String
 		// BANK_CODE_NAME=getCutSkill(titaVo,Code,mLineCut,"BANK_CODE_NAME");//債權金融機構名稱
-		String EXP_LOAN_AMT = getCutSkill(titaVo, Code, mLineCut, "EXP_LOAN_AMT");// 信用貸款債權金額
-		String CASH_CARD_AMT = getCutSkill(titaVo, Code, mLineCut, "CASH_CARD_AMT");// 現金卡債權金額
-		String CREDIT_CARD_AMT = getCutSkill(titaVo, Code, mLineCut, "CREDIT_CARD_AMT");// 信用卡債權金額
-		String DISP_AMT = getCutSkill(titaVo, Code, mLineCut, "DISP_AMT");// 每期可分配金額
-		String LOAN_RATE = getCutSkill(titaVo, Code, mLineCut, "LOAN_RATE");// 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
+		String EXP_LOAN_AMT = getCutSkill(Code, mLineCut, "EXP_LOAN_AMT" , titaVo);// 信用貸款債權金額
+		String CASH_CARD_AMT = getCutSkill(Code, mLineCut, "CASH_CARD_AMT" , titaVo);// 現金卡債權金額
+		String CREDIT_CARD_AMT = getCutSkill(Code, mLineCut, "CREDIT_CARD_AMT" , titaVo);// 信用卡債權金額
+		String DISP_AMT = getCutSkill(Code, mLineCut, "DISP_AMT" , titaVo);// 每期可分配金額
+		String LOAN_RATE = getCutSkill(Code, mLineCut, "LOAN_RATE" , titaVo);// 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
 
-		int CustNo = CheckCustId(titaVo, IDN_BAN);
-//		CustNoAndApplDateFirst
-		NegMain NegMainVO = sNegMainService.CustNoAndApplDateFirst(CustNo, DateRocToDC(titaVo, RECEIVE_DATE, "協商申請日"), MAIN_CODE, titaVo);
-//		sNegMainService.custNO
-		if (NegMainVO != null) {
-			// 已有資料
-			InsertNegFinShare(titaVo, IDN_BAN, CustNo, NegMainVO.getCaseSeq(), BANK_CODE, EXP_LOAN_AMT, CASH_CARD_AMT, CREDIT_CARD_AMT, LOAN_RATE, DISP_AMT);
-		} else {
-			// 無資料
-			if (errorMsg == 1) {
-				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "身份證字號[" + IDN_BAN + "]債權資料不存在.");
+		int CustNo = CheckCustId(IDN_BAN , titaVo);
+		custid = IDN_BAN ;
+
+		//檢查債權機構
+		CheckNegFinAcct(BANK_CODE , IDN_BAN , "ZZM260" , titaVo);
+
+
+		if (("458").equals(MAIN_CODE)) {	//最大債權才做
+			//		CustNoAndApplDateFirst
+			NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo,
+					DateRocToDC(RECEIVE_DATE, "協商申請日", titaVo), MAIN_CODE, titaVo);
+			if (tNegMain != null) {
+				// 已有資料
+				InsertNegFinShare(IDN_BAN, CustNo, tNegMain.getCaseSeq(), BANK_CODE, EXP_LOAN_AMT, CASH_CARD_AMT,
+						CREDIT_CARD_AMT, LOAN_RATE, DISP_AMT, "ZZM260", titaVo);
+
+			} else {
+				// 無資料
+				if (errorMsg == 1) {
+					// E5009 資料檢核錯誤
+					throw new LogicException(titaVo, "E5009", "身分證字號[" + IDN_BAN + "]債權資料不存在.");
+				}
+
 			}
-
 		}
 	}
 
-	public void doZZS263(TitaVo titaVo, String Code, Map<String, String[]> mLineCut) throws LogicException {
-		// 最後一筆
-		// 新增主檔
-		// ZZS263R120032147099040245810911230000110000013860000013860001 11402100000
-		// ZZS263N2205132441080529458 000000000000000000000000000 1200910
-		// ZZS263P2229779521061030458 000000000000000000000000000 1210110
-		// ZZS263T2223782391061109458 000000000000000000000000000 1220710
-
-//		ZZS263
-//		N220513244
-//		1080529
-//		458
-//		       
-//		000000000
-//		000000000
-//		000000000        1200910
-//		
-//		身分證號:R120032147
-//		協商申請日期:0990402
-//		最大債權金融機構:458
-//		最近一次繳還款日期:1091123
-//		最近一次繳款金額:000011000
-//		累計實際還款金額:001386000
-//		累計應還款金額:001386000
-//		債權狀態:1
-//		清償結案或毀諾日期:       
-//		前置協商註記揭露期限:1140210
-//		進入第二階梯還款年月:0000
-
+	public void doZZS263(String Code, Map<String, String[]> mLineCut , TitaVo titaVo) throws LogicException {
 		// ZZS263 債務協商 債務人繳款資料(9904起) (單筆 Z98 債務人繳款資料)
 		// IDN_BAN Char(10) 身分證號
 		// RECEIVE_DATE Char(7) 協商申請日期
@@ -875,98 +951,24 @@ public class L5706 extends TradeBuffer {
 		// LIMIT_DATE Char(7) 前置協商註記揭露期限
 		// LAD_PAY_DATE Char(5) 進入第二階梯還款年月
 		// FILLER Char(30) 保留欄位
-		String IDN_BAN = getCutSkill(titaVo, Code, mLineCut, "IDN_BAN");// 身分證號
-		String RECEIVE_DATE = getCutSkill(titaVo, Code, mLineCut, "RECEIVE_DATE");// 協商申請日期
-		String MAIN_CODE = getCutSkill(titaVo, Code, mLineCut, "MAIN_CODE");// 最大債權金融機構
-		String PAY_DATE = getCutSkill(titaVo, Code, mLineCut, "PAY_DATE");// 最近一次繳還款日期
+//		String IDN_BAN=getCutSkill(titaVo,Code,mLineCut,"IDN_BAN");//身分證號
+//		String RECEIVE_DATE=getCutSkill(titaVo,Code,mLineCut,"RECEIVE_DATE");//協商申請日期
+//		String MAIN_CODE=getCutSkill(titaVo,Code,mLineCut,"MAIN_CODE");//最大債權金融機構
+//		String PAY_DATE=getCutSkill(titaVo,Code,mLineCut,"PAY_DATE");//最近一次繳還款日期
 //		String PAY_AMT=getCutSkill(titaVo,Code,mLineCut,"PAY_AMT");//最近一次繳款金額
 //		String PAYAMT_1=getCutSkill(titaVo,Code,mLineCut,"PAYAMT_1");//累計實際還款金額
 //		String PAYAMT_2=getCutSkill(titaVo,Code,mLineCut,"PAYAMT_2");//累計應還款金額
-		String PAY_STATUS = getCutSkill(titaVo, Code, mLineCut, "PAY_STATUS");// 債權狀態 1:正常, 2:結案, 3:毀諾, 4:毀諾後清償, 5:協商終止
+//		String PAY_STATUS=getCutSkill(titaVo,Code,mLineCut,"PAY_STATUS");//債權狀態  1:正常, 2:結案, 3:毀諾, 4:毀諾後清償, 5:協商終止
 //		String CASE_DATE=getCutSkill(titaVo,Code,mLineCut,"CASE_DATE");//清償結案或毀諾日期
 //		String LIMIT_DATE=getCutSkill(titaVo,Code,mLineCut,"LIMIT_DATE");//前置協商註記揭露期限
 //		String LAD_PAY_DATE=getCutSkill(titaVo,Code,mLineCut,"LAD_PAY_DATE");//進入第二階梯還款年月
 
-		if ((" ").equals(PAY_STATUS)) {
-			// 不存在PAY_STATUS
+		// 維護主檔戶況=>改為做入帳還款時再由交易維護主檔戶況
+		// 不用處理
 
-		} else {
-			// 只有異動PayStatus其他不動
-			if (PAY_DATE != null && PAY_DATE.length() != 0) {
-				// 最近一次繳還款日期
-
-				int CustNo = CheckCustId(titaVo, IDN_BAN);
-
-				NegMain NegMainVO = sNegMainService.CustNoAndApplDateFirst(CustNo, DateRocToDC(titaVo, RECEIVE_DATE, "協商申請日"), MAIN_CODE, titaVo);
-				if (NegMainVO != null) {
-					// 已有資料
-					NegMain OrgNegMain = (NegMain) dataLog.clone(NegMainVO);
-					NegMainVO = sNegMainService.holdById(NegMainVO.getNegMainId(), titaVo);
-					if (NegMainVO != null) {
-						NegMainVO.setPayIntDate(DateRocToDC(titaVo, PAY_DATE, "最近一次繳還款日期"));
-
-						String status = "";// 債權狀態 0:正常,1:已變更,2:毀諾,3:結案,4:未生效,5:調解不成立
-						switch (PAY_STATUS) {
-						// PAY_STATUS 0:正常 1:已變更 2:毀諾 3:結案 4:未生效 5:調解不成立
-						case "0":
-							// PAY_STATUS 0:正常
-							status = "0";
-							break;
-						case "1":
-							// PAY_STATUS 1:已變更
-							status = "1";
-							break;
-						case "2":
-							// PAY_STATUS 2:毀諾
-							status = "2";
-							break;
-						case "3":
-							// PAY_STATUS 3:結案
-							status = "3";
-							break;
-						case "4":
-							// PAY_STATUS 4:未生效
-							status = "4";
-							break;
-						case "5":
-							// PAY_STATUS 5:調解不成立
-							status = "5";
-							break;
-						default:
-							// E5009 資料檢核錯誤
-							throw new LogicException(titaVo, "E5009", "[債權狀態]不存在.");
-						}
-						NegMainVO.setStatus(status);
-
-						if (errorMsg == 1) {
-							try {
-								sNegMainService.update2(NegMainVO, titaVo);// 資料異動後-1
-								dataLog.setEnv(titaVo, OrgNegMain, NegMainVO);// 資料異動後-2
-								dataLog.exec();// 資料異動後-3
-							} catch (DBException e) {
-								// E0007 更新資料時，發生錯誤
-								throw new LogicException(titaVo, "E0007", "");
-							}
-						}
-					} else {
-						// E0006 鎖定資料時，發生錯誤
-						throw new LogicException(titaVo, "E0006", "");
-					}
-				} else {
-					// 無資料
-					if (errorMsg == 1) {
-						// E5009 資料檢核錯誤
-						throw new LogicException(titaVo, "E5009", "身份證字號[" + IDN_BAN + "]債權資料不存在.");
-					}
-
-				}
-			} else {
-
-			}
-		}
 	}
 
-	public void doZZM262(TitaVo titaVo, String Code, Map<String, String[]> mLineCut) throws LogicException {
+	public void doZZM262(String Code, Map<String, String[]> mLineCut , TitaVo titaVo) throws LogicException {
 		// ZZM262 債務協商 單獨受償後各機構無擔保債權暨還款分配資料 (多筆 Z98)
 		// IDN_BAN Char(10) 身分證號
 		// RECEIVE_DATE Char(7) 協商申請日期
@@ -983,178 +985,145 @@ public class L5706 extends TradeBuffer {
 		// PAY_SEQ Num(5) 單獨受償次序
 		// PAY_REASON Char(1) 單獨受償原因代碼 (對照表)
 		// FILLER Char(30) 保留欄位
-		String IDN_BAN = getCutSkill(titaVo, Code, mLineCut, "IDN_BAN");// 身分證號
-		String RECEIVE_DATE = getCutSkill(titaVo, Code, mLineCut, "RECEIVE_DATE");// 協商申請日期
-		String MAIN_CODE = getCutSkill(titaVo, Code, mLineCut, "MAIN_CODE");// 最大債權金融機構
-		String BANK_CODE = getCutSkill(titaVo, Code, mLineCut, "BANK_CODE");// 債權金融機構
+		String IDN_BAN = getCutSkill(Code, mLineCut, "IDN_BAN" , titaVo);// 身分證號
+		String RECEIVE_DATE = getCutSkill(Code, mLineCut, "RECEIVE_DATE" , titaVo);// 協商申請日期
+		String MAIN_CODE = getCutSkill(Code, mLineCut, "MAIN_CODE" , titaVo);// 最大債權金融機構
+		String BANK_CODE = getCutSkill(Code, mLineCut, "BANK_CODE" , titaVo);// 債權金融機構
 //		String BANK_CODE_NAME=getCutSkill(titaVo,Code,mLineCut,"BANK_CODE_NAME");//債權金融機構名稱
-		String EXP_LOAN_AMT = getCutSkill(titaVo, Code, mLineCut, "EXP_LOAN_AMT");// 信用貸款債權金額
-		String CASH_CARD_AMT = getCutSkill(titaVo, Code, mLineCut, "CASH_CARD_AMT");// 現金卡債權金額
-		String CREDIT_CARD_AMT = getCutSkill(titaVo, Code, mLineCut, "CREDIT_CARD_AMT");// 信用卡債權金額
-		String DISP_AMT = getCutSkill(titaVo, Code, mLineCut, "DISP_AMT");// 每期可分配金額
-		String LOAN_RATE = getCutSkill(titaVo, Code, mLineCut, "LOAN_RATE");// 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
+		String EXP_LOAN_AMT = getCutSkill(Code, mLineCut, "EXP_LOAN_AMT" , titaVo);// 信用貸款債權金額
+		String CASH_CARD_AMT = getCutSkill(Code, mLineCut, "CASH_CARD_AMT" , titaVo);// 現金卡債權金額
+		String CREDIT_CARD_AMT = getCutSkill(Code, mLineCut, "CREDIT_CARD_AMT" , titaVo);// 信用卡債權金額
+		String DISP_AMT = getCutSkill(Code, mLineCut, "DISP_AMT" , titaVo);// 每期可分配金額
+		String LOAN_RATE = getCutSkill(Code, mLineCut, "LOAN_RATE" , titaVo);// 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
 //		String PAY_BANK=getCutSkill(titaVo,Code,mLineCut,"PAY_BANK");//單獨受償金融機構
 //		String PAY_DATE=getCutSkill(titaVo,Code,mLineCut,"PAY_DATE");//單獨受償日期
 //		String PAY_SEQ=getCutSkill(titaVo,Code,mLineCut,"PAY_SEQ");//單獨受償次序
 //		String PAY_REASON=getCutSkill(titaVo,Code,mLineCut,"PAY_REASON");//單獨受償原因代碼  (對照表)
 
-//		id=getCutSkill(titaVo,Code,mLineCut,"IDN_BAN");//身分證號
-//		receive_date=getCutSkill(titaVo,Code,mLineCut,"RECEIVE_DATE");//協商申請日期
-//		maxmain_code=getCutSkill(titaVo,Code,mLineCut,"MAIN_CODE").trim();//最大債權金融機構
-//		main_code=getCutSkill(titaVo,Code,mLineCut,"BANK_CODE").trim();//債權金融機構
-//		main_codename=getCutSkill(titaVo,Code,mLineCut,"BANK_CODE_NAME").trim();//債權金融機構名稱
-//		amt1=getCutSkill(titaVo,Code,mLineCut,"EXP_LOAN_AMT");//信用貸款債權金額
-//		amt2=getCutSkill(titaVo,Code,mLineCut,"CASH_CARD_AMT");//現金卡債權金額
-//		amt3=getCutSkill(titaVo,Code,mLineCut,"CREDIT_CARD_AMT");//信用卡債權金額
-//		disp_amt=getCutSkill(titaVo,Code,mLineCut,"DISP_AMT");//每期可分配金額
-//		loan_rate=getCutSkill(titaVo,Code,mLineCut,"LOAN_RATE");//佔全部協商無擔保債權比例  小數點兩位, 例如023.45
-//		String ZZM262payBank=getCutSkill(titaVo,Code,mLineCut,"PAY_BANK");//單獨受償金融機構
-//		String ZZM262payDate=getCutSkill(titaVo,Code,mLineCut,"PAY_DATE");//單獨受償日期
-//		String ZZM262paySeq=getCutSkill(titaVo,Code,mLineCut,"PAY_SEQ");//單獨受償次序
-//		String ZZM262payReason=getCutSkill(titaVo,Code,mLineCut,"PAY_REASON");//單獨受償原因代碼  (對照表)
+		// 找債協主檔序號最大的那筆
+		int CustNo = CheckCustId(IDN_BAN , titaVo);
+		custid = IDN_BAN ;
 
-		// 上筆要變已變更
-		// 其他的照舊
-		int CustNo = CheckCustId(titaVo, IDN_BAN);
-		NegMain NegMainVO = sNegMainService.CustNoAndApplDateFirst(CustNo, DateRocToDC(titaVo, RECEIVE_DATE, "協商申請日"), MAIN_CODE, titaVo);
-		if (NegMainVO != null) {
-			// 最大的CaseNo
-			int CaseSeq = NegMainVO.getCaseSeq();
-			// 前一筆資料
-			NegMainId tNegMainId = new NegMainId();
-			tNegMainId.setCaseSeq(CaseSeq - 1);
-			tNegMainId.setCustNo(CustNo);
-			NegMain NegMainVO1 = sNegMainService.findById(tNegMainId, titaVo);
+		//檢查債權機構
+		CheckNegFinAcct(BANK_CODE , IDN_BAN , "ZZM262" , titaVo);
 
-			String flowType = "0";
-			if (NegMainVO1 != null) {
-				// 有上一筆
-				String Status = NegMainVO1.getStatus();
-				if (("1").equals(Status)) {
-					// 已變更
-					// 直接異動NegFinShare
-					flowType = "2";
-				} else {
-					// 本筆資料改為已變更,新增一筆NegMain
-					flowType = "1";
-				}
+		if (("458").equals(MAIN_CODE)) { // 最大債權才做
+			NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo,
+					DateRocToDC(RECEIVE_DATE, "協商申請日", titaVo), MAIN_CODE, titaVo);
+
+			if (tNegMain != null) {
+				// 已有資料
+				InsertNegFinShare(IDN_BAN, CustNo, tNegMain.getCaseSeq(), BANK_CODE, EXP_LOAN_AMT, CASH_CARD_AMT,
+						CREDIT_CARD_AMT, LOAN_RATE, DISP_AMT, "ZZM262", titaVo);
 			} else {
-				// 無上一筆資料
-				// 本筆資料改為已變更,新增一筆NegMain
-				flowType = "1";
-			}
-			switch (flowType) {
-			case "0":
-				break;
-			case "1":
-				// 本筆資料改為已變更,新增一筆NegMain
-				CaseSeq = UpdAndInsNegMain(NegMainVO, titaVo);
-			case "2":
-				// 直接新增NegFinShare
-				InsertNegFinShare(titaVo, IDN_BAN, CustNo, CaseSeq, BANK_CODE, EXP_LOAN_AMT, CASH_CARD_AMT, CREDIT_CARD_AMT, LOAN_RATE, DISP_AMT);
-				break;
-			default:
-
-			}
-		} else {
-			// 無資料
-			if (errorMsg == 1) {
-				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "身份證字號[" + IDN_BAN + "]債權資料不存在.");
+				// 無資料
+				if (errorMsg == 1) {
+					// E5009 資料檢核錯誤
+					throw new LogicException(titaVo, "E5009", "身分證字號[" + IDN_BAN + "]債權資料不存在.");
+				}
 			}
 		}
 	}
 
-	public void InsertNegFinShare(TitaVo titaVo, String CustId, int CustNo, int CaseSeq, String FinCode, String ExpLoanAmt, String CashCardAmt, String CreditCardAmt, String LoanRate, String DispAmt)
+	public void InsertNegFinShare(String CustId, int CustNo, int CaseSeq, String FinCode,
+			String ExpLoanAmt, String CashCardAmt, String CreditCardAmt, String LoanRate, String DispAmt, String Code , TitaVo titaVo)
 			throws LogicException {
-		NegFinShareId NegFinShareIdVO = new NegFinShareId();
-		NegFinShareIdVO.setCaseSeq(CaseSeq);
-		NegFinShareIdVO.setCustNo(CustNo);
-		NegFinShareIdVO.setFinCode(FinCode);
-		this.info("L5706 InsertNegFinShare NegFinShareIdVO=[" + NegFinShareIdVO + "]");
-		NegFinShare NegFinShareVO = sNegFinShareService.findById(NegFinShareIdVO, titaVo);
-		if (NegFinShareVO != null) {
+		String Code1 = Code;
+		
+		//歷程檔找最大歷程序號
+		int oSeq = FindSeq(CustNo, CaseSeq, titaVo);
+		
+		NegFinShareLogId tNegFinShareLogId = new NegFinShareLogId();
+		tNegFinShareLogId.setCustNo(CustNo);
+		tNegFinShareLogId.setCaseSeq(CaseSeq);
+		tNegFinShareLogId.setFinCode(FinCode);
+		tNegFinShareLogId.setSeq(oSeq);	
+		
+		NegFinShareId tNegFinShareId = new NegFinShareId();
+		tNegFinShareId.setCaseSeq(CaseSeq);
+		tNegFinShareId.setCustNo(CustNo);
+		tNegFinShareId.setFinCode(FinCode);
+		
+		this.info("L5706 InsertNegFinShare tNegFinShareId=[" + tNegFinShareId + "]");
+		NegFinShare tNegFinShare = sNegFinShareService.findById(tNegFinShareId, titaVo);
+		
+		
+		if (tNegFinShare != null && !("ZZM262").equals(Code1)) {
 			if (errorMsg == 1) {
 				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "身份證字號[" + CustId + "] 戶號:[" + CustNo + "] 案件序號:[" + CaseSeq + "] 債權銀行:[" + FinCode + "] 已有債務協商債權分攤檔資料.");
+//				throw new LogicException(titaVo, "E5009","身分證字號["+CustId+"] 戶號:["+CustNo+"] 案件序號:["+CaseSeq+"] 債權銀行:["+FinCode+"] 已有債務協商債權分攤檔資料.");
 			}
-
 		} else {
-			this.info("L5706 ZZM260 Word IsNullOrEmpty EXP_LOAN_AMT=[" + ExpLoanAmt + "] amt2=[" + CashCardAmt + "] amt3=[" + CreditCardAmt + "]");
 
-			NegFinShareVO = new NegFinShare();
-			NegFinShareVO.setNegFinShareId(NegFinShareIdVO);
+			tNegFinShare = new NegFinShare();
+			tNegFinShare.setNegFinShareId(tNegFinShareId);
 			BigDecimal amtall = sumAmt(ExpLoanAmt, CashCardAmt, CreditCardAmt);
-			NegFinShareVO.setContractAmt(amtall);// 簽約金額
-			NegFinShareVO.setAmtRatio(StringToBigDecimal(titaVo, LoanRate));// 債權比例% 
-			NegFinShareVO.setDueAmt(StringToBigDecimal(titaVo, DispAmt));// 期款
-			NegFinShareVO.setCancelDate(0);// 註銷日期
-			NegFinShareVO.setCancelAmt(BigDecimal.ZERO);// 註銷本金
-			try {
-				sNegFinShareService.insert(NegFinShareVO, titaVo);
-			} catch (DBException e) {
-				// E0005 新增資料時，發生錯誤
-				throw new LogicException(titaVo, "E0005", "債務協商債權分攤檔");
+			tNegFinShare.setContractAmt(amtall);// 簽約金額
+			tNegFinShare.setAmtRatio(StringToBigDecimal(LoanRate , titaVo));// 債權比例% 
+			tNegFinShare.setDueAmt(StringToBigDecimal(DispAmt , titaVo));// 期款
+			tNegFinShare.setCancelDate(0);// 註銷日期
+			tNegFinShare.setCancelAmt(BigDecimal.ZERO);// 註銷本金
+			
+			NegFinShareLog tNegFinShareLog = new NegFinShareLog();
+			tNegFinShareLog.setNegFinShareLogId(tNegFinShareLogId);
+			tNegFinShareLog.setContractAmt(amtall);
+			tNegFinShareLog.setAmtRatio(StringToBigDecimal(LoanRate , titaVo));
+			tNegFinShareLog.setDueAmt(StringToBigDecimal(DispAmt , titaVo));
+			tNegFinShareLog.setCancelDate(0);
+			tNegFinShareLog.setCancelAmt(BigDecimal.ZERO);
+			
+			
+			// 依傳入的識別碼分別存到不同暫存檔
+			
+			if (("ZZM260").equals(Code1)) {
+				lNegFinShareM260.add(tNegFinShare);
+				lNegFinShareLogM260.add(tNegFinShareLog);
 			}
+			if (("ZZM262").equals(Code1)) {
+				CustNo262 = CustNo;
+				CaseSeq262 = CaseSeq;
+				lNegFinShareM262.add(tNegFinShare);
+				lNegFinShareLogM262.add(tNegFinShareLog);
+			}
+			if (("ZZM264").equals(Code1)) {
+				lNegFinShareM264.add(tNegFinShare);
+				lNegFinShareLogM264.add(tNegFinShareLog);
+			}
+			// try {
+//				sNegFinShareService.insert(tNegFinShare, titaVo);
+//			} catch (DBException e) {
+//				//E0005 新增資料時，發生錯誤
+//				throw new LogicException(titaVo, "E0005", "債務協商債權分攤檔");
+//			}
 		}
+		
 	}
 
-	public void UpdNegMain(NegMain NegMainVO, TitaVo titaVo) throws LogicException {
+	public void UpdNegMain(NegMain tNegMain, int chgCondDate, TitaVo titaVo) throws LogicException {
 		// 本筆資料改為已變更
-		NegMain OrgNegMain = (NegMain) dataLog.clone(NegMainVO);
-		NegMainVO = sNegMainService.holdById(NegMainVO.getNegMainId(), titaVo);
-		if (NegMainVO != null) {
-			NegMainVO.setStatus("1");
+		NegMain OrgNegMain = (NegMain) dataLog.clone(tNegMain);
+		tNegMain = sNegMainService.holdById(tNegMain.getNegMainId(), titaVo);
+		if (tNegMain != null) {
+			tNegMain.setStatus("1");
+			tNegMain.setStatusDate(dateUtil.getNowIntegerForBC());//戶況日期
+			tNegMain.setChgCondDate(chgCondDate);// 申請變更還款條件日
 			try {
-				sNegMainService.update2(NegMainVO, titaVo);// 資料異動後-1
-				dataLog.setEnv(titaVo, OrgNegMain, NegMainVO);// 資料異動後-2
+				sNegMainService.update2(tNegMain, titaVo);// 資料異動後-1
+				dataLog.setEnv(titaVo, OrgNegMain, tNegMain);// 資料異動後-2
 				dataLog.exec();// 資料異動後-3
 			} catch (DBException e) {
 				// E0007 更新資料時，發生錯誤
-				throw new LogicException(titaVo, "E0007", "");
+				throw new LogicException(titaVo, "E0007", "債務協商案件主檔");
 			}
 
 		} else {
 			// E0006 鎖定資料時，發生錯誤
-			throw new LogicException(titaVo, "E0006", "");
+			throw new LogicException(titaVo, "E0006", "債務協商案件主檔");
 		}
 	}
 
-	public int UpdAndInsNegMain(NegMain NegMainVO, TitaVo titaVo) throws LogicException {
-		// 本筆資料改為已變更,新增一筆NegMain
-		UpdNegMain(NegMainVO, titaVo);
 
-		int newCaseSeq = NegMainVO.getCaseSeq() + 1;
-		NegMainId InsertNegMainId = new NegMainId();
-		InsertNegMainId.setCaseSeq(newCaseSeq);
-		InsertNegMainId.setCustNo(NegMainVO.getCustNo());
-
-		NegMain InsertNegMainVO = new NegMain();
-		InsertNegMainVO = (NegMain) dataLog.clone(NegMainVO);
-		InsertNegMainVO.setStatus("0");
-		InsertNegMainVO.setNegMainId(InsertNegMainId);
-		InsertNegMainVO.setCustNo(InsertNegMainId.getCustNo());
-		InsertNegMainVO.setCaseSeq(InsertNegMainId.getCaseSeq());
-		try {
-			sNegMainService.insert(InsertNegMainVO, titaVo);
-		} catch (DBException e1) {
-			// E0005 新增資料時，發生錯誤
-			throw new LogicException(titaVo, "E0005", "債務協商案件主檔");
-		}
-//		NegMain InsertNegMainVO=sNegMainService.findById(InsertNegMainId, titaVo);
-//		if(InsertNegMainVO!=null) {
-//			
-//		}else {
-//			InsertNegMainVO = new NegMain();
-//			
-//		}
-//		InsertNegMainVO.setStatus("0");
-//		InsertNegMainVO.setCaseSeq(newCaseSeq);
-
-		return newCaseSeq;
-	}
-
-	public void doZZM263(TitaVo titaVo, String Code, Map<String, String[]> mLineCut) throws LogicException {
+	public void doZZM263(String Code, Map<String, String[]> mLineCut , TitaVo titaVo) throws LogicException {
 		// ZZM263 債務協商 金融機構無擔保債務變更還款條件協議資料 (Z98 金融機構無擔保債務變更還款條件協議資料)
 		// IDN_BAN Char(10) 身分證號
 		// RECEIVE_DATE Char(7) 協商申請日期
@@ -1180,80 +1149,120 @@ public class L5706 extends TradeBuffer {
 		// LAD_PAY_AMT Num(9) 第二階梯月付金
 		// FILLER Char(30) 保留欄位
 
-		String IDN_BAN = getCutSkill(titaVo, Code, mLineCut, "IDN_BAN");// 身分證號
-		String RECEIVE_DATE = getCutSkill(titaVo, Code, mLineCut, "RECEIVE_DATE");// 協商申請日期
-		String MAIN_CODE = getCutSkill(titaVo, Code, mLineCut, "MAIN_CODE").trim();// 最大債權金融機構
-		String CHANGE_PAY_DATE = getCutSkill(titaVo, Code, mLineCut, "CHANGE_PAY_DATE");// 申請變更還款條件日
-		String COMMIT_PAY_PERIOD = getCutSkill(titaVo, Code, mLineCut, "COMMIT_PAY_PERIOD");// 變更還款條件已履約期數
-		String CHANGE_PASS_DATE = getCutSkill(titaVo, Code, mLineCut, "CHANGE_PASS_DATE");// 變更還款條件協議完成日
-		String CHANGE_INTERVI_DATE = getCutSkill(titaVo, Code, mLineCut, "CHANGE_INTERVI_DATE");// 變更還款條件面談日期
-		String CHANGE_SIGN_DATE = getCutSkill(titaVo, Code, mLineCut, "CHANGE_SIGN_DATE");// 變更還款條件簽約日期
-		String FIRST_PERIOD = getCutSkill(titaVo, Code, mLineCut, "FIRST_PERIOD");// （第一階梯）期數
-		String FIRST_RATE = getCutSkill(titaVo, Code, mLineCut, "FIRST_RATE");// （第一階梯）利率
-		String FIRST_PAY_DATE = getCutSkill(titaVo, Code, mLineCut, "FIRST_PAY_DATE");// 變更還款條件首期應繳款日期
-		String PAY_AMOUNT = getCutSkill(titaVo, Code, mLineCut, "PAY_AMOUNT");// 月付金
-		String PAY_ACCOUNT = getCutSkill(titaVo, Code, mLineCut, "PAY_ACCOUNT");// 繳款帳號
+		String IDN_BAN = getCutSkill(Code, mLineCut, "IDN_BAN" , titaVo);// 身分證號
+		String RECEIVE_DATE = getCutSkill(Code, mLineCut, "RECEIVE_DATE" , titaVo);// 協商申請日期
+		String MAIN_CODE = getCutSkill(Code, mLineCut, "MAIN_CODE" , titaVo).trim();// 最大債權金融機構
+		String CHANGE_PAY_DATE = getCutSkill(Code, mLineCut, "CHANGE_PAY_DATE" , titaVo);// 申請變更還款條件日
+		String COMMIT_PAY_PERIOD = getCutSkill(Code, mLineCut, "COMMIT_PAY_PERIOD" , titaVo);// 變更還款條件已履約期數
+		String CHANGE_PASS_DATE = getCutSkill(Code, mLineCut, "CHANGE_PASS_DATE" , titaVo);// 變更還款條件協議完成日
+		String CHANGE_INTERVI_DATE = getCutSkill(Code, mLineCut, "CHANGE_INTERVI_DATE" , titaVo);// 變更還款條件面談日期
+		String CHANGE_SIGN_DATE = getCutSkill(Code, mLineCut, "CHANGE_SIGN_DATE" , titaVo);// 變更還款條件簽約日期
+		String FIRST_PERIOD = getCutSkill(Code, mLineCut, "FIRST_PERIOD" , titaVo);// （第一階梯）期數
+		String FIRST_RATE = getCutSkill(Code, mLineCut, "FIRST_RATE" , titaVo);// （第一階梯）利率
+		String FIRST_PAY_DATE = getCutSkill(Code, mLineCut, "FIRST_PAY_DATE" , titaVo);// 變更還款條件首期應繳款日期
+		String PAY_AMOUNT = getCutSkill(Code, mLineCut, "PAY_AMOUNT" , titaVo);// 月付金
+		String PAY_ACCOUNT = getCutSkill(Code, mLineCut, "PAY_ACCOUNT" , titaVo);// 繳款帳號
 //		String CLOSE_DATE=getCutSkill(titaVo,Code,mLineCut,"CLOSE_DATE");//變更還款條件結案日期
-		String REM_EXP_AMT = getCutSkill(titaVo, Code, mLineCut, "REM_EXP_AMT");// 信用貸款協商剩餘債務總金額
-		String REM_CASH_AMT = getCutSkill(titaVo, Code, mLineCut, "REM_CASH_AMT");// 現金卡協商剩餘債務總金額
-		String REM_CREDIT_AMT = getCutSkill(titaVo, Code, mLineCut, "REM_CREDIT_AMT");// 信用卡協商剩餘債務總金額
-		String CHANGE_TOTAL_AMT = getCutSkill(titaVo, Code, mLineCut, "CHANGE_TOTAL_AMT");// 變更還款條件簽約總債務金額
-		String LAD_PAY_NOTE = getCutSkill(titaVo, Code, mLineCut, "LAD_PAY_NOTE");// 屬階梯式還款註記
-		String LAD_PERIOD = getCutSkill(titaVo, Code, mLineCut, "LAD_PERIOD");// 第二階梯期數
-		String LAD_RATE = getCutSkill(titaVo, Code, mLineCut, "LAD_RATE");// 第二階梯利率
-		String LAD_PAY_AMT = getCutSkill(titaVo, Code, mLineCut, "LAD_PAY_AMT");// 第二階梯月付金
+		String REM_EXP_AMT = getCutSkill(Code, mLineCut, "REM_EXP_AMT" , titaVo);// 信用貸款協商剩餘債務總金額
+		String REM_CASH_AMT = getCutSkill(Code, mLineCut, "REM_CASH_AMT" , titaVo);// 現金卡協商剩餘債務總金額
+		String REM_CREDIT_AMT = getCutSkill(Code, mLineCut, "REM_CREDIT_AMT" , titaVo);// 信用卡協商剩餘債務總金額
+		String CHANGE_TOTAL_AMT = getCutSkill(Code, mLineCut, "CHANGE_TOTAL_AMT" , titaVo);// 變更還款條件簽約總債務金額
+		String LAD_PAY_NOTE = getCutSkill(Code, mLineCut, "LAD_PAY_NOTE" , titaVo);// 屬階梯式還款註記
+		String LAD_PERIOD = getCutSkill(Code, mLineCut, "LAD_PERIOD" , titaVo);// 第二階梯期數
+		String LAD_RATE = getCutSkill(Code, mLineCut, "LAD_RATE" , titaVo);// 第二階梯利率
+		String LAD_PAY_AMT = getCutSkill(Code, mLineCut, "LAD_PAY_AMT" , titaVo);// 第二階梯月付金
 
-		int chgCondDate = DateRocToDC(titaVo, CHANGE_PAY_DATE, "申請變更還款條件日");
-		int ApplyDate = DateRocToDC(titaVo, RECEIVE_DATE, "協商申請日");
-		int FirstDueDate = DateRocToDC(titaVo, FIRST_PAY_DATE, "首次應繳日");
+		int chgCondDate = DateRocToDC(CHANGE_PAY_DATE, "申請變更還款條件日",titaVo);
+		int ApplyDate = DateRocToDC(RECEIVE_DATE, "協商申請日",titaVo);
+		int FirstDueDate = DateRocToDC(FIRST_PAY_DATE, "首次應繳日" , titaVo);
 		// 本筆資料改為已變更,新增一筆NegMain
-		int CustNo = CheckCustId(titaVo, IDN_BAN);
-		NegMain NegMainVO = sNegMainService.CustNoAndApplDateFirst(CustNo, ApplyDate, MAIN_CODE, titaVo);
-		if (NegMainVO != null) {
-			// 本筆資料改為已變更
-			UpdNegMain(NegMainVO, titaVo);
-			// 新增一筆NegMain
-			int newCaseSeq = NegMainVO.getCaseSeq() + 1;
-			NegMain InsertNegMainVO = new NegMain();
-			InsertNegMainVO = (NegMain) dataLog.clone(NegMainVO);
+		int CustNo = CheckCustId(IDN_BAN , titaVo);
+		custid = IDN_BAN ;
+		//檢查債權機構
+		CheckNegFinAcct(MAIN_CODE , IDN_BAN , "ZZM263" , titaVo);
 
-			InsertNegMainVO.setStatus("0");
-			InsertNegMainVO.setCaseSeq(newCaseSeq);
-			InsertNegMainVO.setChgCondDate(chgCondDate);
-			InsertNegMainVO.setTotalContrAmt(new BigDecimal(CHANGE_TOTAL_AMT));// 簽約總金額
-			InsertNegMainVO.setTotalPeriod(parse.stringToInteger(FIRST_PERIOD));// 期數
-			InsertNegMainVO.setIntRate(parse.stringToBigDecimal(FIRST_RATE)); // 計息條件%
-			InsertNegMainVO.setDueAmt(parse.stringToBigDecimal(PAY_AMOUNT));// 月付金
-			InsertNegMainVO.setFirstDueDate(FirstDueDate);// 首次應繳日
-			int LastDueDate = negCom.getRepayDate(FirstDueDate, InsertNegMainVO.getTotalPeriod() - 1 , titaVo);
-			InsertNegMainVO.setLastDueDate(LastDueDate);// 還款結束日
+		
+		NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo, ApplyDate, MAIN_CODE, titaVo);
+		if (tNegMain == null) {
+			// E5009 資料檢核錯誤
+			throw new LogicException(titaVo, "E5009",
+					"身分證字號[" + IDN_BAN + "] 戶號:[" + CustNo + "] 最大債權銀行:[" + MAIN_CODE + "] 未有債權資料");
+		}
+		// 本筆資料改為已變更,申請變更還款條件日也需寫入
+		UpdNegMain(tNegMain, chgCondDate, titaVo);
+		// 新增一筆NegMain
+		NegMain InserttNegMain = new NegMain();
+		NegMainId InserttNegMainId = new NegMainId();
+		InserttNegMain = (NegMain) dataLog.clone(tNegMain);
 
-			InsertNegMainVO.setNextPayDate(FirstDueDate);// 下次應繳日
+		// 找該戶號序號最大的
+		NegMain t1NegMain = CheckNegMain(CustNo, titaVo);
+		if (t1NegMain != null) {
+			InserttNegMainId.setCaseSeq(t1NegMain.getCaseSeq() + 1);
+		} else {
+			InserttNegMainId.setCaseSeq(1);
+		}
+		InserttNegMainId.setCustNo(CustNo);
+		InserttNegMain.setNegMainId(InserttNegMainId);
+		InserttNegMain.setStatus("0");
+		InserttNegMain.setChgCondDate(0); // 新一筆申請變更還款條件日=0
+		InserttNegMain.setTotalContrAmt(new BigDecimal(CHANGE_TOTAL_AMT));// 簽約總金額
+		InserttNegMain.setTotalPeriod(parse.stringToInteger(FIRST_PERIOD));// 期數
+		InserttNegMain.setIntRate(parse.stringToBigDecimal(FIRST_RATE)); // 計息條件%
+		InserttNegMain.setDueAmt(parse.stringToBigDecimal(PAY_AMOUNT));// 月付金
+		InserttNegMain.setFirstDueDate(FirstDueDate);// 首次應繳日
+		totalContrAmt = InserttNegMain.getTotalContrAmt();//分攤檔金額檢核使用
+		dueAmt = InserttNegMain.getDueAmt();//分攤檔金額檢核使用
 
-			InsertNegMainVO.setRepaidPeriod(0);// 已繳期數
-			InsertNegMainVO.setPayIntDate(0);// 繳息迄日
-			InsertNegMainVO.setPrincipalBal(new BigDecimal(CHANGE_TOTAL_AMT));// 總本金餘額
+		int LastDueDate = 0;
+		if (InserttNegMain.getTotalPeriod() > 0) {
+			LastDueDate = negCom.getRepayDate(InserttNegMain.getFirstDueDate(), InserttNegMain.getTotalPeriod() - 1,
+					titaVo); // 並非計算下一期故須減1
+		} else {
+			LastDueDate = InserttNegMain.getFirstDueDate();
+		}
+		InserttNegMain.setLastDueDate(LastDueDate);// 還款結束日
 
-			String TwoStepCode = "N";
-			if (("Y").equals(LAD_PAY_NOTE) && ("N").equals(LAD_PAY_NOTE)) {
-				TwoStepCode = LAD_PAY_NOTE;
+		InserttNegMain.setNextPayDate(FirstDueDate);// 下次應繳日
+		InserttNegMain.setRepaidPeriod(0);// 已繳期數
+		InserttNegMain.setPayIntDate(0);// 繳息迄日
+		InserttNegMain.setPrincipalBal(new BigDecimal(CHANGE_TOTAL_AMT));// 總本金餘額
+		InserttNegMain.setDeferYMStart(0);// 延期繳款年月(起)
+		InserttNegMain.setDeferYMEnd(0);// 延期繳款年月(訖)
+		InserttNegMain.setAccuTempAmt(BigDecimal.ZERO);// 累繳金額
+		InserttNegMain.setAccuOverAmt(BigDecimal.ZERO);// 累溢繳金額
+		InserttNegMain.setAccuDueAmt(BigDecimal.ZERO);// 累應還金額
+		InserttNegMain.setAccuSklShareAmt(BigDecimal.ZERO);// 累新壽分攤金額
+		InserttNegMain.setRepayPrincipal(BigDecimal.ZERO);// 累償還本金
+		InserttNegMain.setRepayInterest(BigDecimal.ZERO);// 累償還利息
+		InserttNegMain.setStatusDate(0);//戶況日期
+		String isMainFin = "";
+		if (("458").equals(MAIN_CODE)) {
+			isMainFin = "Y";
+		} else {
+			isMainFin = "N";
+		}
+		InserttNegMain.setIsMainFin(isMainFin);//是否最大債權
+
+		String TwoStepCode = "N";
+		if (("Y").equals(LAD_PAY_NOTE)) {
+			if (LAD_PERIOD != null && LAD_PERIOD.length() != 0 && parse.stringToInteger(LAD_PERIOD) > 0) {
+				TwoStepCode = "2";
 			} else {
-				if (LAD_PERIOD != null && LAD_PERIOD.length() != 0) {
-					if (parse.stringToInteger(LAD_PERIOD) > 0) {
-						TwoStepCode = "Y";
-					}
-				}
+				TwoStepCode = "1";
 			}
-			InsertNegMainVO.setTwoStepCode(TwoStepCode);
+		}
+		InserttNegMain.setTwoStepCode(TwoStepCode);
 
-			try {
-				sNegMainService.insert(InsertNegMainVO, titaVo);
-			} catch (DBException e1) {
-				// E0005 新增資料時，發生錯誤
-				throw new LogicException(titaVo, "E0005", "");
-			}
+		try {
+			sNegMainService.insert(InserttNegMain, titaVo);
+		} catch (DBException e1) {
+			// E0005 新增資料時，發生錯誤
+			throw new LogicException(titaVo, "E0005", "債務協商案件主檔");
+		}
 
-			// JcicZ062
+		// JcicZ062
+		if (("458").contentEquals(MAIN_CODE)) {
 			JcicZ062Id tJcicZ062Id = new JcicZ062Id();
 			tJcicZ062Id.setChangePayDate(chgCondDate);
 			tJcicZ062Id.setCustId(IDN_BAN);
@@ -1274,9 +1283,9 @@ public class L5706 extends TradeBuffer {
 				tJcicZ062.setCashBalanceAmt(parse.stringToInteger(REM_CASH_AMT));// 現金卡協商剩餘債務簽約餘額
 				tJcicZ062.setCreditBalanceAmt(parse.stringToInteger(REM_CREDIT_AMT));// 信用卡協商剩餘債務簽約餘額
 				tJcicZ062.setChaRepayAmt(parse.stringToBigDecimal(CHANGE_TOTAL_AMT));// 變更還款條件簽約總債務金額
-				tJcicZ062.setChaRepayAgreeDate(DateRocToDC(titaVo, CHANGE_PASS_DATE, "變更還款條件協議完成日"));// 變更還款條件協議完成日
-				tJcicZ062.setChaRepayViewDate(DateRocToDC(titaVo, CHANGE_INTERVI_DATE, "變更還款條件面談日期"));// 變更還款條件面談日期
-				tJcicZ062.setChaRepayEndDate(DateRocToDC(titaVo, CHANGE_SIGN_DATE, "變更還款條件簽約日期"));// 變更還款條件簽約完成日期
+				tJcicZ062.setChaRepayAgreeDate(DateRocToDC(CHANGE_PASS_DATE, "變更還款條件協議完成日",titaVo));// 變更還款條件協議完成日
+				tJcicZ062.setChaRepayViewDate(DateRocToDC(CHANGE_INTERVI_DATE, "變更還款條件面談日期",titaVo));// 變更還款條件面談日期
+				tJcicZ062.setChaRepayEndDate(DateRocToDC(CHANGE_SIGN_DATE, "變更還款條件簽約日期",titaVo));// 變更還款條件簽約完成日期
 				tJcicZ062.setChaRepayFirstDate(FirstDueDate);// 變更還款條件首期應繳款日
 				tJcicZ062.setPayAccount(PAY_ACCOUNT);// 繳款帳號
 				tJcicZ062.setPostAddr("台北市中正區忠孝西路一段66號18樓");// 最大債權金融機構聲請狀送達地址
@@ -1285,15 +1294,22 @@ public class L5706 extends TradeBuffer {
 				tJcicZ062.setPeriod2(parse.stringToInteger(LAD_PERIOD));// 第二階梯期數
 				tJcicZ062.setRate2(parse.stringToBigDecimal(LAD_RATE));// 第二階梯利率
 				tJcicZ062.setMonthPayAmt2(parse.stringToInteger(LAD_PAY_AMT));// 第二階段月付金
-			}
+				tJcicZ062.setOutJcicTxtDate(0);
+				String iKey = "";
+				iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+				tJcicZ062.setUkey(iKey);
 
-		} else {
-			// E5009 資料檢核錯誤
-			throw new LogicException(titaVo, "E5009", "身份證字號[" + IDN_BAN + "] 戶號:[" + CustNo + "] 最大債權銀行:[" + MAIN_CODE + "] 未有債權資料");
+				try {
+					sJcicZ062Service.insert(tJcicZ062, titaVo);
+				} catch (DBException e) {
+					// E0005 新增資料時，發生錯誤
+					throw new LogicException(titaVo, "E0005", "金融機構無擔保債務變更還款條件協議資料");
+				}
+			}
 		}
 	}
 
-	public void doZZM264(TitaVo titaVo, String Code, Map<String, String[]> mLineCut) throws LogicException {
+	public void doZZM264(String Code, Map<String, String[]> mLineCut , TitaVo titaVo) throws LogicException {
 		// ZZM264 債務協商 債權金融機構剩餘無擔保債權暨還款分配資料 (Z98 各債權金融機構剩餘無擔保債權暨還款分配資料(變更還款後))
 		// IDN_BAN Char(10) 身分證號
 		// RECEIVE_DATE Char(7) 協商申請日期
@@ -1309,35 +1325,42 @@ public class L5706 extends TradeBuffer {
 		// LOAN_RATE Num(6) 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
 		// MAIN_SEND_NOTE Char(1) 最大債權金融機構報送註記
 		// FILLER Char(30) 保留欄位
-		String IDN_BAN = getCutSkill(titaVo, Code, mLineCut, "IDN_BAN");// 身分證號
-		String RECEIVE_DATE = getCutSkill(titaVo, Code, mLineCut, "RECEIVE_DATE");// 協商申請日期
-		String MAIN_CODE = getCutSkill(titaVo, Code, mLineCut, "MAIN_CODE");// 最大債權金融機構
+		String IDN_BAN = getCutSkill(Code, mLineCut, "IDN_BAN" , titaVo);// 身分證號
+		String RECEIVE_DATE = getCutSkill(Code, mLineCut, "RECEIVE_DATE" , titaVo);// 協商申請日期
+		String MAIN_CODE = getCutSkill(Code, mLineCut, "MAIN_CODE" , titaVo);// 最大債權金融機構
 //		String CHANGE_PAY_DATE=getCutSkill(titaVo,Code,mLineCut,"CHANGE_PAY_DATE");//申請變更還款條件日
-		String BANK_CODE = getCutSkill(titaVo, Code, mLineCut, "BANK_CODE");// 債權金融機構
+		String BANK_CODE = getCutSkill(Code, mLineCut, "BANK_CODE" , titaVo);// 債權金融機構
 //		String BANK_CODE_NAME=getCutSkill(titaVo,Code,mLineCut,"BANK_CODE_NAME");//債權金融機構名稱
-		String EXP_LOAN_AMT = getCutSkill(titaVo, Code, mLineCut, "EXP_LOAN_AMT");// 信用貸款債權金額
-		String CASH_CARD_AMT = getCutSkill(titaVo, Code, mLineCut, "CASH_CARD_AMT");// 現金卡債權金額
-		String CREDIT_CARD_AMT = getCutSkill(titaVo, Code, mLineCut, "CREDIT_CARD_AMT");// 信用卡債權金額
-		String DISP_AMT1 = getCutSkill(titaVo, Code, mLineCut, "DISP_AMT1");// 第一階梯分配金額
+		String EXP_LOAN_AMT = getCutSkill(Code, mLineCut, "EXP_LOAN_AMT" , titaVo);// 信用貸款債權金額
+		String CASH_CARD_AMT = getCutSkill(Code, mLineCut, "CASH_CARD_AMT" , titaVo);// 現金卡債權金額
+		String CREDIT_CARD_AMT = getCutSkill(Code, mLineCut, "CREDIT_CARD_AMT" , titaVo);// 信用卡債權金額
+		String DISP_AMT1 = getCutSkill(Code, mLineCut, "DISP_AMT1" , titaVo);// 第一階梯分配金額
 //		String DISP_AMT2=getCutSkill(titaVo,Code,mLineCut,"DISP_AMT2");//第二階梯分配金額
-		String LOAN_RATE = getCutSkill(titaVo, Code, mLineCut, "LOAN_RATE");// 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
+		String LOAN_RATE = getCutSkill(Code, mLineCut, "LOAN_RATE" , titaVo);// 佔全部協商無擔保債權比例 小數點兩位, 例如023.45
 //		String MAIN_SEND_NOTE=getCutSkill(titaVo,Code,mLineCut,"MAIN_SEND_NOTE");//最大債權金融機構報送註記
 
-		int CustNo = CheckCustId(titaVo, IDN_BAN);
-//		CustNoAndApplDateFirst
-		NegMain NegMainVO = sNegMainService.CustNoAndApplDateFirst(CustNo, DateRocToDC(titaVo, RECEIVE_DATE, "協商申請日"), MAIN_CODE, titaVo);
-//		sNegMainService.custNO
-		if (NegMainVO != null) {
-			// 已有資料
-			InsertNegFinShare(titaVo, IDN_BAN, CustNo, NegMainVO.getCaseSeq(), BANK_CODE, EXP_LOAN_AMT, CASH_CARD_AMT, CREDIT_CARD_AMT, LOAN_RATE, DISP_AMT1);
-		} else {
-			// 無資料
-			if (errorMsg == 1) {
-				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "身份證字號[" + IDN_BAN + "]債權資料不存在.");
+		int CustNo = CheckCustId(IDN_BAN , titaVo);
+		custid = IDN_BAN ;
+
+		//檢查債權機構
+		CheckNegFinAcct(BANK_CODE , IDN_BAN , "ZZM264" , titaVo);
+
+		if (("458").equals(MAIN_CODE)) { // 最大債權才做
+			NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo,
+					DateRocToDC(RECEIVE_DATE, "協商申請日", titaVo), MAIN_CODE, titaVo);
+			
+			if (tNegMain != null) {
+				// 已有資料
+				InsertNegFinShare(IDN_BAN, CustNo, tNegMain.getNegMainId().getCaseSeq(), BANK_CODE, EXP_LOAN_AMT, CASH_CARD_AMT,
+						CREDIT_CARD_AMT, LOAN_RATE, DISP_AMT1, "ZZM264", titaVo);
+			} else {
+				// 無資料
+				if (errorMsg == 1) {
+					// E5009 資料檢核錯誤
+					throw new LogicException(titaVo, "E5009", "身分證字號[" + IDN_BAN + "]債權資料不存在.");
+				}
+
 			}
-
 		}
-
 	}
 }

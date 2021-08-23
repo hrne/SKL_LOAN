@@ -436,12 +436,12 @@ public class NegCom extends CommBuffer {
 		// String OringnalTxKind=transTxKind;
 		transTxKind = "";
 
-		// 剩餘本利和=總本金餘額(1+年利率/12/100)
-		BigDecimal CloseAmt = mainPrincipalBal
-				.add(mainPrincipalBal.multiply(mainIntRate).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP));//
-
 		// 可抵繳金額=交易金額+累溢收
 		BigDecimal CanCountAmt = transTxAmt.add(mainAccuOverAmt);
+
+		// 剩餘本利和=總本金餘額(1+年利率/12/100)
+		BigDecimal CloseAmt = mainPrincipalBal
+				.add(mainPrincipalBal.multiply(mainIntRate).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP));
 
 		// 剩餘本利和<=可分配金額
 		if (CloseAmt.compareTo(CanCountAmt) <= 0) {
@@ -537,7 +537,6 @@ public class NegCom extends CommBuffer {
 		}
 
 		mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt);// Main累繳金額
-		mainRepaidPeriod = mainRepaidPeriod + transRepayPeriod;// 已繳期數
 		mainAccuOverAmt = mainAccuOverAmt.add(transOverAmt).subtract(transOverRepayAmt); // Main累溢收金額=Main累溢收金額+轉入溢收金額-溢收抵繳金額
 		mainAccuOverAmt = mainAccuOverAmt.subtract(transReturnAmt); // 累溢收金額減退還金額
 		transSklShareAmt = BigDecimal.ZERO; // 新壽攤分
@@ -580,7 +579,8 @@ public class NegCom extends CommBuffer {
 			mainPayIntDate = transIntEndDate;
 			mainNextPayDate = 0;	// 下次應繳日 歸零
 		}
-		
+
+		mainRepaidPeriod = mainRepaidPeriod + transRepayPeriod;// 已繳期數
 		
 		// 更新資料庫
 		if (ChekUpdDB == 1) {
@@ -974,7 +974,7 @@ public class NegCom extends CommBuffer {
 		if (tJcicZ573 != null) {
 			if (tJcicZ573.getOutJcicTxtDate() != 0) {
 				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "已有JCICZ573文字檔日期");
+				throw new LogicException(titaVo, "E5009", "已報送聯徵更生債務人繳款資料");
 			}
 		}
 		String tranKey = "";
@@ -992,7 +992,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ573Service.update(tJcicZ573, titaVo);
 				} catch (DBException e) {
 					// E0007 更新資料時，發生錯誤
-					throw new LogicException(titaVo, "E0007", "JcicZ573");
+					throw new LogicException(titaVo, "E0007", "更生債務人繳款資料");
 				}
 			} else {
 				// Insert
@@ -1010,13 +1010,13 @@ public class NegCom extends CommBuffer {
 					sJcicZ573Service.insert(tJcicZ573, titaVo);
 				} catch (DBException e) {
 					// E0005 新增資料時，發生錯誤
-					throw new LogicException(titaVo, "E0005", "JcicZ573");
+					throw new LogicException(titaVo, "E0005", "更生債務人繳款資料");
 				}
 			}
 		} else {
 			// 訂正
 			if (tJcicZ573 == null) {
-				throw new LogicException(titaVo, "E0003", "JcicZ573-未存在資料");
+				throw new LogicException(titaVo, "E0003", "更生債務人繳款資料");
 			}
 			// 訂正最後一筆
 			if (tJcicZ573.getPayAmt() == payAmt.intValue()) {
@@ -1025,7 +1025,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ573Service.delete(tJcicZ573, titaVo);
 				} catch (DBException e) {
 					// E0008 刪除資料時，發生錯誤
-					throw new LogicException(titaVo, "E0008", "JcicZ573");
+					throw new LogicException(titaVo, "E0008", "更生債務人繳款資料");
 				}
 				// 訂正非最後一筆
 			} else {
@@ -1035,7 +1035,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ573Service.update(tJcicZ573, titaVo);
 				} catch (DBException e) {
 					// E0007 更新資料時，發生錯誤
-					throw new LogicException(titaVo, "E0007", "JcicZ573-未存在資料");
+					throw new LogicException(titaVo, "E0007", "更生債務人繳款資料");
 				}
 			}
 		}
@@ -1058,14 +1058,14 @@ public class NegCom extends CommBuffer {
 		if (tJcicZ046 != null) {
 			if (tJcicZ046.getOutJcicTxtDate() != 0) {
 				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "已有JCICZ046文字檔日期");
+				throw new LogicException(titaVo, "E5009", "已報送聯徵結案通知資料");
 			}
 		}
 		if (titaVo.isHcodeNormal()) {
 			// 正向
 			if (tJcicZ046 != null) {
 				// 已存在不可新增
-				throw new LogicException(titaVo, "E0002", "JcicZ046");
+				throw new LogicException(titaVo, "E0002", "結案通知資料");
 
 			} else {
 				// Insert
@@ -1082,7 +1082,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ046Service.insert(tJcicZ046, titaVo);
 				} catch (DBException e) {
 					// E0005 新增資料時，發生錯誤
-					throw new LogicException(titaVo, "E0005", "JcicZ046");
+					throw new LogicException(titaVo, "E0005", "結案通知資料");
 				}
 			}
 
@@ -1090,14 +1090,14 @@ public class NegCom extends CommBuffer {
 			// 訂正
 			if (tJcicZ046 == null) {
 				// E0007 更新資料時，發生錯誤
-				throw new LogicException(titaVo, "E0007", "JcicZ046-未存在資料");
+				throw new LogicException(titaVo, "E0007", "結案通知資料");
 			}
 			// DELETE
 			try {
 				sJcicZ046Service.delete(tJcicZ046, titaVo);
 			} catch (DBException e) {
 				// E0008 刪除資料時，發生錯誤
-				throw new LogicException(titaVo, "E0008", "JcicZ046");
+				throw new LogicException(titaVo, "E0008", "結案通知資料");
 			}
 
 		}
@@ -1116,7 +1116,7 @@ public class NegCom extends CommBuffer {
 		if (tJcicZ450 != null) {
 			if (tJcicZ450.getOutJcicTxtDate() != 0) {
 				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "已有JCICZ450文字檔日期");
+				throw new LogicException(titaVo, "E5009", "已報送聯徵前置調解債務人繳款資料");
 			}
 		}
 		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
@@ -1141,7 +1141,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ450Service.update(tJcicZ450, titaVo);
 				} catch (DBException e) {
 					// E0007 更新資料時，發生錯誤
-					throw new LogicException(titaVo, "E0007", "JcicZ40");
+					throw new LogicException(titaVo, "E0007", "前置調解債務人繳款資料");
 				}
 			} else {
 				// Insert
@@ -1164,7 +1164,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ450Service.insert(tJcicZ450, titaVo);
 				} catch (DBException e) {
 					// E0005 新增資料時，發生錯誤
-					throw new LogicException(titaVo, "E0005", "JcicZ450");
+					throw new LogicException(titaVo, "E0005", "前置調解債務人繳款資料");
 				}
 			}
 
@@ -1172,7 +1172,7 @@ public class NegCom extends CommBuffer {
 			// 訂正
 			if (tJcicZ450 == null) {
 				// E0003 修改資料不存在
-				throw new LogicException(titaVo, "E0003", "JcicZ450處理時發生錯誤");
+				throw new LogicException(titaVo, "E0003", "前置調解債務人繳款資料");
 			}
 			payStatus = tJcicZ450.getPayStatus(); // 訂正前交易別
 			// 訂正最後一筆
@@ -1182,7 +1182,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ450Service.delete(tJcicZ450, titaVo);
 				} catch (DBException e) {
 					// E0008 刪除資料時，發生錯誤
-					throw new LogicException(titaVo, "E0008", "JcicZ450");
+					throw new LogicException(titaVo, "E0008", "前置調解債務人繳款資料");
 				}
 				// 訂正非最後一筆
 			} else {
@@ -1194,7 +1194,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ450Service.update(tJcicZ450, titaVo);
 				} catch (DBException e) {
 					// E0007 更新資料時，發生錯誤
-					throw new LogicException(titaVo, "E0007", "JcicZ450");
+					throw new LogicException(titaVo, "E0007", "前置調解債務人繳款資料");
 				}
 			}
 		}
@@ -1212,7 +1212,7 @@ public class NegCom extends CommBuffer {
 			// Status = tJcicZ050.getStatus();
 			if (tJcicZ050.getOutJcicTxtDate() != 0) {
 				// E5009 資料檢核錯誤
-				throw new LogicException(titaVo, "E5009", "已有JCICZ050文字檔日期");
+				throw new LogicException(titaVo, "E5009", "已報送聯徵債務人繳款資料");
 			}
 		}
 
@@ -1240,7 +1240,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ050Service.update(tJcicZ050, titaVo);
 				} catch (DBException e) {
 					// E0007 更新資料時，發生錯誤
-					throw new LogicException(titaVo, "E0007", "JcicZ050");
+					throw new LogicException(titaVo, "E0007", "債務人繳款資料");
 				}
 			} else {
 				// Insert
@@ -1262,14 +1262,14 @@ public class NegCom extends CommBuffer {
 					sJcicZ050Service.insert(tJcicZ050, titaVo);
 				} catch (DBException e) {
 					// E0005 新增資料時，發生錯誤
-					throw new LogicException(titaVo, "E0005", "JcicZ050");
+					throw new LogicException(titaVo, "E0005", "債務人繳款資料");
 				}
 			}
 
 		} else {
 			// 訂正
 			if (tJcicZ050 == null) {
-				throw new LogicException(titaVo, "E0003", "JcicZ050處理時發生錯誤");
+				throw new LogicException(titaVo, "E0003", "債務人繳款資料");
 			}
 			payStatus = tJcicZ050.getStatus(); // 訂正前交易別
 			// 訂正最後一筆
@@ -1278,7 +1278,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ050Service.delete(tJcicZ050, titaVo);
 				} catch (DBException e) {
 					// E0008 刪除資料時，發生錯誤
-					throw new LogicException(titaVo, "E0008", "JcicZ050");
+					throw new LogicException(titaVo, "E0008", "債務人繳款資料");
 				}
 
 				// 訂正非最後一筆
@@ -1290,7 +1290,7 @@ public class NegCom extends CommBuffer {
 					sJcicZ050Service.update(tJcicZ050, titaVo);
 				} catch (DBException e) {
 					// E0007 更新資料時，發生錯誤
-					throw new LogicException(titaVo, "E0007", "JcicZ050");
+					throw new LogicException(titaVo, "E0007", "債務人繳款資料");
 				}
 			}
 		}
@@ -1354,7 +1354,7 @@ public class NegCom extends CommBuffer {
 			if (tNegTrans == null) {
 				throw new LogicException(titaVo, "E0006", "債務協商交易檔");
 			}
-			if (tNegTrans.getIntEndDate() > 0) {
+			if (tNegTrans.getExportDate() > 0) {
 				throw new LogicException(titaVo, "E0015", "已撥付製檔不可訂正");
 			}
 			

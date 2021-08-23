@@ -97,8 +97,8 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,'AA' AS \"ProdNoShow\" ";
 		sql += " FROM DUAL ";
 		sql += " ) ";
-		sql += " SELECT om.\"VisibleMonth\" F0";
-		sql += "       ,int.\"ProdNoShow\" F1";
+		sql += " SELECT int.\"ProdNoShow\" F0";
+		sql += "       ,om.\"VisibleMonth\" F1";
 		sql += "       ,SUM(bal.\"BalSum\") F2";
 		sql += "       ,SUM(int.\"IntSum\") F3";
 		sql += " FROM \"OutputMonths\" om  ";

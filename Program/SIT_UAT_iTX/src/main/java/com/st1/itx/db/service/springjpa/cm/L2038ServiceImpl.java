@@ -43,8 +43,14 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	// *** 折返控制相關 ***
 	private int limit;
-
-	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+	
+	// *** 折返控制相關 ***
+	private int cnt;
+	
+	// *** 折返控制相關 ***
+	private int size;
+	
+//	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 	
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -54,10 +60,10 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L2038ServiceImpl.find");
 
 		String sql = "";
-		sql += "     SELECT MIN(cf.\"F1\")                           AS \"ApproveNo\"";
-		sql += "           ,MIN(cf.\"F2\")                           AS \"FacmNo\"";
+		sql += "     SELECT MIN(cf.\"ApproveNo\")                           AS \"ApproveNo\"";
+		sql += "           ,MIN(cf.\"FacmNo\")                           AS \"FacmNo\"";
 		sql += "           ,MIN(cu.\"CustId\")                       AS \"CustId\"";
-		sql += "           ,MIN(cf.\"F3\")                           AS \"CustNo\"";
+		sql += "           ,MIN(cf.\"CustNo\")                           AS \"CustNo\"";
 		sql += "           ,cm.\"ClCode1\"                      AS \"ClCode1\"";
 		sql += "           ,cm.\"ClCode2\"                      AS \"ClCode2\"";
 		sql += "           ,cm.\"ClNo\"                         AS \"ClNo\"";
@@ -93,17 +99,17 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    LEFT JOIN (SELECT \"ClCode1\"";
 		sql += "                     ,\"ClCode2\"";
 		sql += "                     ,\"ClNo\"";
-		sql += "                     ,MIN(\"ApproveNo\") AS \"F1\"";
-		sql += "                     ,MIN(\"FacmNo\") AS \"F2\"";
-		sql += "                     ,MIN(\"CustNo\") AS \"F3\"";		
+		sql += "                     ,\"ApproveNo\"";
+		sql += "                     ,\"FacmNo\"";
+		sql += "                     ,\"CustNo\"";		
 		sql += "                      FROM \"ClFac\"";
 				
-		sql += "                     GROUP BY \"ClCode1\",\"ClCode2\",\"ClNo\"";
+		sql += "                     GROUP BY \"ClCode1\",\"ClCode2\",\"ClNo\",\"ApproveNo\",\"FacmNo\",\"CustNo\"";
 		sql += "                     ) cf ON cf.\"ClCode1\" = cm.\"ClCode1\"";
 		sql += "                         AND cf.\"ClCode2\" = cm.\"ClCode2\"";
 		sql += "                         AND cf.\"ClNo\"    = cm.\"ClNo\"";
 		
-		sql += "     LEFT JOIN \"CustMain\" cu ON cu.\"CustNo\" = cf.\"F3\"";		
+		sql += "     LEFT JOIN \"CustMain\" cu ON cu.\"CustNo\" = cf.\"CustNo\"";		
 		
 		sql += "     LEFT JOIN (SELECT \"ClCode1\"";
 		sql += "                      ,\"ClCode2\"";
@@ -174,20 +180,23 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += conditionSql;
 		sql += "     GROUP BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
 		sql += "     ORDER BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
-		sql += sqlRow;
+//		sql += sqlRow;
 		this.info("sql = " + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		this.info("LIMIT = " + this.limit + "INDEX = " + this.index) ;
 		
 		query = em.createNativeQuery(sql);
-
+		
 		setConditionValue(titaVo);
+		
+		cnt = query.getResultList().size();
+		this.info("Total cnt ..." + cnt);
+	
 		
 //		// *** 折返控制相關 ***
 //		// 設定從第幾筆開始抓,需在createNativeQuery後設定
-//		query.setFirstResult(this.index * this.limit);
-		query.setFirstResult(0);
+		query.setFirstResult(this.index * this.limit);
+		
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
@@ -195,6 +204,9 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		@SuppressWarnings("unchecked")
 		List<Object> result = query.getResultList();
 
+		size = result.size();
+		this.info("Total size ..." + size);
+		
 		return this.convertToMap(result);
 	}
 
@@ -264,7 +276,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
         // ApproveNo 核准號碼 
 		int approveNo = parse.stringToInteger(titaVo.getParam("ApproveNo"));
 		if (approveNo > 0) {
-			conditionList.add(" cf.\"F1\" = :approveNo ");
+			conditionList.add(" cf.\"ApproveNo\" = :approveNo ");
 		}
 		// CustId 借款戶統編 
 		String custId = titaVo.getParam("CustId");
@@ -277,11 +289,11 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		
 		if (custNo > 0) {
-			conditionList.add(" cf.\"F3\" = :custNo ");
+			conditionList.add(" cf.\"CustNo\" = :custNo ");
 		}
 
 		if (facmNo > 0) {
-			conditionList.add(" cf.\"F2\" = :facmNo ");
+			conditionList.add(" cf.\"FacmNo\" = :facmNo ");
 		}
 		// OwnerId 所有權人統編
 		String ownerId = titaVo.getParam("OwnerId");
@@ -569,9 +581,10 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("floorDash", String.valueOf(floorDash));
 		}
 		
-		query.setParameter("ThisIndex", this.index);
-		query.setParameter("ThisLimit", this.limit);
 		return;
 	}
 
+	public int getSize() {
+		return cnt;
+	}
 }

@@ -92,7 +92,17 @@ public class L2038 extends TradeBuffer {
 
 		}
 		
+		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+
+		
+		List<LinkedHashMap<String, String>> chkOccursList = null; 
 		if (resultList != null && resultList.size() > 0) {
+			
+			if (resultList.size() == this.limit && hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
 			
 			int TempClCode1 = 0;
 			int TempClCode2 = 0;
@@ -186,17 +196,38 @@ public class L2038 extends TradeBuffer {
 					this.totaVo.addOccursList(occurslist);
 					
 
-				}
-			}
+				} // for
+			
+			  chkOccursList = this.totaVo.getOccursList();
+			} // if
 
-
-		List<LinkedHashMap<String, String>> chkOccursList = this.totaVo.getOccursList();
-
-		if (chkOccursList == null || chkOccursList.size() == 0) {
+		if ( chkOccursList == null  && titaVo.getReturnIndex() == 0 ) {
 			throw new LogicException("E2003", "擔保品主檔"); // 查無資料
 		}
-
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+	
+	private Boolean hasNext() {
+		Boolean result = true;
+
+		int times = this.index + 1;
+		int cnt = sL2038ServiceImpl.getSize();
+		int size = times * this.limit;
+
+		this.info("index ..." + this.index);
+		this.info("times ..." + times);
+		this.info("cnt ..." + cnt);
+		this.info("size ..." + size);
+
+		if (size == cnt) {
+			result = false;
+		}
+		this.info("result ..." + result);
+
+		return result;
+	}
+	
+	
 }

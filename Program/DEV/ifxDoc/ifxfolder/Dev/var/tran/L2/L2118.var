@@ -86,11 +86,10 @@ T(2,@CurrPrecisionHelp,#HelpDesc1)
 T(2,@RelCodeHelp,#HelpDesc2) 
 
 
-
-
 !FuncCode
 #FuncCodeHelp=x,30,S
 T(3,1:新增;2:修改;4:刪除;5:查詢)
+
 
 !YN
 #YNHelp=X,30,S
@@ -112,8 +111,11 @@ T(1,@ApplNo1,#NTXBUF,2,7)
 #FuncCode=A,1,L
 C(3,#FuncCode,0,E(0,1),$)
 C(3,#CHAIN,1,s,E(0,1))
-HELP(#FuncCodeHelp)
-@V(H,#FuncCodeHelp)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
 
 !依功能選項顯示submit按鈕名稱
 #FuncCodeX=X,4,L
@@ -124,8 +126,16 @@ C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新
 
 !維護記號 1-可維護 0-純顯示
 #UpdateCode=A,1,S
-IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
+!IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
+IF(#FuncCode==1,E(0,1),E(0,0))
 ! C(3,#FuncCode,1,T(F,#CustNo,1),T(F,#CustNo,0))
+
+
+
+#CtrlBTN=X,1,S
+##loop{times:10,n:1}
+C(3,#UpdateCode,1,SHOW(#BTNA{n}),HIDE(#BTNA{n}))
+##end
 
 
 #ctrltf=X,1,S
@@ -158,6 +168,10 @@ T(2,@MCurrencyCode{n},#L2r49CurrencyCode{n})
 E(0,@MLineAmt{n},#L2r49LineAmt{n})
 T(2,@MRecycleCode{n},#L2r49RecycleCode{n})
 ##end
+##loop{times:10,n:1}
+T(2,@RelCode{n},#L2r49RelCode{n})
+T(H,@RelCodeX{n},#RelCode{n},#RelCodeHelp)
+##end
 
 
 !以主要戶號申報聯徵
@@ -187,6 +201,7 @@ E(0,0)
 
 #BUFa{n}=X,18,S
 T(3,000000000000000)
+IF(#FuncCode == 1 || #FuncCode == 2,$,HIDE(#BTNA{n}))
 
 #BINDa{n}=X,1,S
 BIND(#BTNA{n},click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUFa{n};ntxbuf5=type<-1:ApplNo{n}<-OOApplNo})
@@ -307,7 +322,7 @@ P(R,#MLineAmtX{n})
 <sub type="DC" name="p2" layout="cols=2;screen.width=[10,1200];printer.width=[15,30];order=1;">
 [
 ["<font color=red>@共同借款人"],
-["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[,70,140,210,70,250,70,70,], p_cols:[5,15,15,15,15,20,15,15,15]}","","",
+["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[,70,120,250,70,120,70,70,], p_cols:[5,15,15,15,15,20,15,15,15]}","","",
 ["","核准號碼","戶號","戶名","案件編號","循環動用</br>動支期限",
 "幣別","核准額度","循環動用"],
 [[#BTNA1],[#ApplNo1],[#MCustFacmNo1],[#CustId1,#MCustNameS1],[#MCaseNo1],[#MUtilDeadline1],
@@ -383,8 +398,8 @@ INVOKEJS(SHOW,grd2,1,#Cnt2,1)
 #NameB{i}=X,2.50,L
 
 #RelCode{i}=X,2,I
-IF(#FuncCode==1,$,T(F,#RelCode{i},0))
-IF(#FuncCode==1,$,s)
+IF(#FuncCode==1 || #FuncCode==2,$,T(F,#RelCode{i},0))
+IF(#FuncCode==1 || #FuncCode==2,$,s)
 C(4,#IdA{i},S,$)
 HELP(#RelCodeHelp)
 @V(H,#RelCodeHelp)

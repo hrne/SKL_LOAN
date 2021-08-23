@@ -617,10 +617,12 @@ HELP(#L6r03ResultCity,cols:5)
 T(H,#CityCode,#L6r03ResultCity)
 
 ! [股票代號]
-#StockCode=X,4,I
+#StockCode=X,10,I
 IF(#FunCd==4,s,$)
 HELP(#StockCodeHelp)
-@V(H,#StockCodeHelp)
+@
+C(4,#L2r25StockCode,V(H,#StockCodeHelp),C(5,#StockCode,#L2r25StockCode,$,V(H,#StockCodeHelp)))
+
 
 #FdSTOCK_CODE=X,2,L
 

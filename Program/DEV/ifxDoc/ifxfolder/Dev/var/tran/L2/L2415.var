@@ -41,32 +41,8 @@ E(0,40)ASGN(INQPRT$)
 ["#FdCOL_IND1+擔保品代號1",#ClCode1,#ClCode1X],["#FdCOL_IND2+擔保品代號2",#ClCode2,#ClCode2X],
 ["#FdCOL_NO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
 [#<->#,"#FdSUBTYPE+擔保品類別",#ClTypeCode,#ClTypeCodeX],
-[#<->#,"@",#Btn1,#Btn2,#Btn3,#Btn4,#Btn6,#BtnExpand],
 [#<->#,"#FdADDRESS_2+建物門牌",#BdLocation],
-["#FdUSAGE_IND+建物主要用途",#BdMainUseCode,#BdMainUseCodeX],["#FdBD_MATERIAL+建物主要建材",#BdMtrlCode,#BdMtrlCodeX],
-["#FdBD_CATEGORY+建物類別",#BdTypeCode,#BdTypeCodeX],["#FdTOTAL_FLOOR+總樓層",#TotalFloor,"層"],
-["#FdFLOOR_NO+擔保品所在樓層",#FloorNo,"層"],["#FdFLOOR_AREA+擔保品所在樓層面積",#FloorArea,"坪"],
-["#FdAreaAMT+鑑價單價",#EvaUnitPrice,"元／坪"],["#FdRF_STRUCTURE+屋頂結構",#RoofStructureCode,#RoofStructureCodeX],
-[#<->#,"#FdBD_DT+建築完成日期",#BdDate],
-["#FdSUB_BD_USAGE+附屬建物用途",#BdSubUsageCode,#BdSubUsageCodeX],["#FdSUB_BD_AREA+附屬建物面積",#BdSubArea,"坪"],
-["#FdSELLER_ID+賣方統編",#SellerId],["#FdSELLER_NAME+賣方姓名",#SellerName],
-["#FdCONTRACT_PRICE+買賣契約價格",#ContractPrice],["#FdCONTRACT_DT+買賣契約日期",#ContractDate],
-[#<->#,"#FdBD_USE+建物使用別",#BdUsageCode,#BdUsageCodeX],
-[#<->#,"#FdPARKING_TYPE+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
-["#FdHOUSE_TAX_SN+房屋稅籍號碼",#HouseTaxNo],["#FdHOUSE_BUY_DT+房屋取得日期",#HouseBuyDate],
-["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[200,200,200,200], p_cols:[20,20,20]}","#FdPE+公設建號","","",
-["建號","登記面積(坪)","所有權人統編","所有權人姓名"],
-[[#PublicBdNoA1,"-",#PublicBdNoB1],#Area1,#PublicBdOwnerId1,#PublicBdOwnerName1]
-],
-["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[100,90,210,140,140,100,100,140], p_cols:[20,20,30,40,20,30,30,30]}","#FdPP+車位","","",
-["車位編號","車位數","停車位類別","權利範圍","登記面積(坪)","建號","地號","價格(元)"],
-[#ParkingNo1,#ParkingQty1,[#ParkingTypeCode1,#ParkingTypeCodeX1],[#ParkingOwnerPart1,"/",#ParkingOwnerTotal1],#ParkingArea1,[#ParkingBdNoA1,"-",#ParkingBdNoB1],[#ParkingLandNoA1,"-",#ParkingLandNoB1],#ParkingAmount1]
-],
-
-["#grid#,{id:4,expand:true,loop:10,row_height:1,s_cols:[200,200,200], p_cols:[20,20,20]}","#FdCHG+建物修改原因","","",
-["原因","建立者","建立日期"],
-[[#Reason1,#ReasonX1,#OtherReason1,],#CreateEmpNo1,#CreateDate1]
-],
+[#<->#,"@",#Btn1,#Btn2,#Btn3,#Btn4,#BtnExpand],
 ]
 
 
@@ -76,11 +52,10 @@ E(0,40)ASGN(INQPRT$)
 <include src="ROM.icf::L2Rim.dec"/>
 ![Buttom資料查詢]
 #BUF1=X,42,S
-#Btn1=X,4,I,ui:button;value:建物門牌;enable:1;tabbable:0
-#Btn2=X,4,I,ui:button;value:建物資料;enable:1;tabbable:0
-#Btn3=X,4,I,ui:button;value:公設建號;enable:1;tabbable:0
-#Btn4=X,4,I,ui:button;value:車位;enable:1;tabbable:0
-#Btn6=X,4,I,ui:button;value:建物修改原因;enable:1;tabbable:0
+#Btn1=X,4,I,ui:button;value:建物資料;enable:1;tabbable:0
+#Btn2=X,4,I,ui:button;value:公設建號;enable:1;tabbable:0
+#Btn3=X,4,I,ui:button;value:車位;enable:1;tabbable:0
+#Btn4=X,4,I,ui:button;value:建物修改原因;enable:1;tabbable:0
 
 #BIND_1=X,1,S
 BIND(#Btn1,click, {cmd=CALLSEND;DOCODE=Show1})
@@ -93,9 +68,6 @@ BIND(#Btn3,click, {cmd=CALLSEND;DOCODE=Show3})
 
 #BIND_4=X,1,S
 BIND(#Btn4,click, {cmd=CALLSEND;DOCODE=Show4})
-
-#BIND_6=X,1,S
-BIND(#Btn6,click, {cmd=CALLSEND;DOCODE=Show6})
 
 #PageFg=A,1,S
 E(0,0)
@@ -120,19 +92,9 @@ CALL(#ResetPages)
 IF(#PageFg==4,E(0,@PageFg,0),E(0,@PageFg,4))
 CALL(#ResetPages)
 
-! 顯示第五頁
-#Show5=@,1,S
-IF(#PageFg==5,E(0,@PageFg,0),E(0,@PageFg,5))
-CALL(#ResetPages)
-
-! 顯示第六頁
-#Show6=@,1,S
-IF(#PageFg==6,E(0,@PageFg,0),E(0,@PageFg,6))
-CALL(#ResetPages)
-
 ! 展開全部頁籤
 #Expand=@,1,S
-IF(#PageFg==7,E(0,@PageFg,0),E(0,@PageFg,7))
+IF(#PageFg==5,E(0,@PageFg,0),E(0,@PageFg,5))
 CALL(#ResetPages)
 
 !控制按鈕變色
@@ -141,9 +103,9 @@ C(3,#PageFg,1,K(LIGHT,#Btn1,TXTRED,0),K(LIGHT,#Btn1,TXTRED,-1))
 C(3,#PageFg,2,K(LIGHT,#Btn2,TXTRED,0),K(LIGHT,#Btn2,TXTRED,-1))
 C(3,#PageFg,3,K(LIGHT,#Btn3,TXTRED,0),K(LIGHT,#Btn3,TXTRED,-1))
 C(3,#PageFg,4,K(LIGHT,#Btn4,TXTRED,0),K(LIGHT,#Btn4,TXTRED,-1))
-C(3,#PageFg,5,K(LIGHT,#Btn5,TXTRED,0),K(LIGHT,#Btn5,TXTRED,-1))
-C(3,#PageFg,6,K(LIGHT,#Btn6,TXTRED,0),K(LIGHT,#Btn6,TXTRED,-1))
-C(3,#PageFg,7,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
+C(3,#PageFg,5,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
+
+
 
 !預設顯示公設建號幾行
 #ShowG1=X,2,S
@@ -171,24 +133,19 @@ C(4,#ParkingNo{n},INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
 ##end
 
 #ResetPages=@,1,S
-INVOKEJS(SHOW,p1,6,22,0)
-INVOKEJS(SHOW,grd1,0)
-INVOKEJS(SHOW,grd2,0)
-INVOKEJS(SHOW,grd4,0)
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+INVOKEJS(SHOW,p4,0)
+INVOKEJS(SHOW,p5,0)
 CALL(#KLIGHT)
 CALL(#CALLGRID)
-SWITCH(#PageFg,1,IF(#FunCd==4,INVOKEJS(SHOW,p1,6,6,1),INVOKEJS(SHOW,p1,6,6,1)),
-                2,INVOKEJS(SHOW,p1,7,17,1),
-                3,INVOKEJS(SHOW,p1,18,18,1)INVOKEJS(SHOW,grd1,1)INVOKEJS(SHOW,grd1_2,1),
-                4,INVOKEJS(SHOW,p1,19,19,1)INVOKEJS(SHOW,grd2,1)INVOKEJS(SHOW,grd2_2,1),
-                6,INVOKEJS(SHOW,p1,20,20,1)INVOKEJS(SHOW,grd4,1)INVOKEJS(SHOW,grd4_2,1),
-                7,INVOKEJS(SHOW,p1,6,20,1)CALL(#ShowAllGrid),
-                $)
+IF(#PageFg==1 || #PageFg==5,INVOKEJS(SHOW,p2,1),$)
+IF(#PageFg==2 || #PageFg==5,INVOKEJS(SHOW,p3,1),$)
+IF(#PageFg==3 || #PageFg==5,INVOKEJS(SHOW,p4,1),$)
+IF(#PageFg==4 || #PageFg==5,INVOKEJS(SHOW,p5,1),$)
 
-#ShowAllGrid=@,1,S
-INVOKEJS(SHOW,grd1,1)
-INVOKEJS(SHOW,grd2,1)
-INVOKEJS(SHOW,grd4,1)INVOKEJS(SHOW,grd4_3,#ShowG4,1)
+
+
 !---------- AP TEXT AREA Variables ----------
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -282,7 +239,7 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2911進入),$)
 CALL(#Init)
 
 #Init=@,1,S
-HIDE(#Btn6)
+HIDE(#Btn4)
 IF(#PageFg==1,$,CALL(#Show1))
 CALL(#ResetPages)
 T(3,@FdFUNCD,*)
@@ -422,7 +379,7 @@ HELP(#FunCdHelp)
 
 #checkfuncd=X,1,S
 IF(#FunCd == 4,E(0,@LbCONTROL_FG,0),E(0,@LbCONTROL_FG,1))
-IF(#FunCd == 1,HIDE(#Btn6),SHOW(#Btn6))
+IF(#FunCd == 1,HIDE(#Btn4),SHOW(#Btn4))
 IF(#FunCd == 2,T(3,@FdCHG,*),$)
 IF(#FunCd == 1 || #FunCd == 2,CALL(#SET_REQUIRED),$)
 
@@ -691,7 +648,6 @@ T(H,#ClTypeCode,#ClTypeCodeHelp)
 
 ! [建物門牌]
 #BdLocation=x,150,L
-IF(#PageFg==1,$,CALL(#Show1))
 
 #FdADDRESS_1=X,2,L
 
@@ -699,7 +655,7 @@ IF(#PageFg==1,$,CALL(#Show1))
 
 ! [建物主要用途]
 #BdMainUseCode=A,2,I
-IF(#PageFg==2,$,CALL(#Show2))
+IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 HELP(#BdMainUseCodeHelp)
 @V(H,#BdMainUseCodeHelp)
@@ -887,7 +843,7 @@ V(2,0)
 
 ! [房屋取得日期]
 #HouseBuyDate=D,7,I
-IF(#PageFg==2,$,CALL(#Show2))
+IF(#PageFg==1,$,CALL(#Show1))
 IF(#FunCd==4,s,$)
 D(8)
 @V(7)V(2,0)A(4,0,#HouseBuyDate)
@@ -913,7 +869,7 @@ INVOKEJS(SHOW,grd1_{rowSeq},1)
 
 ! [公設建號-建號]
 #PublicBdNoA{i}=A,5,I
-IF(#PageFg==3,$,CALL(#Show3))
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 C(3,#PublicBdNoA{j},0,CALL(#HIDE_PE_ROW_{i}),CALL(#SHOW_PE_ROW_{i}))
 C(3,#PublicBdNoA{j},0,S,$)
@@ -936,7 +892,7 @@ C(3,#PublicBdNoA{i},0,S,$)
 
 ! [公設建號-所有權人統編]
 #PublicBdOwnerId{i}=X,10,I
-IF(#PageFg==3,$,CALL(#Show3))
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 C(3,#PublicBdNoA{i},0,S,$)
 @A(ID_UNINO,0,#PublicBdOwnerId{i})
@@ -960,7 +916,7 @@ C(4,#L1r09CustName,$,T(2,@PublicBdOwnerName{i},#L1r09CustName))
 
 ! [公設建號-所有權人姓名]
 #PublicBdOwnerName{i}=x,2.50,I
-IF(#PageFg==3,$,CALL(#Show3))
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 C(3,#PublicBdNoA{i},0,S,$)
 C(4,#PublicBdOwnerId{i},S,$)
@@ -994,7 +950,7 @@ INVOKEJS(SHOW,grd2_{rowSeq},1)
 
 !車位編號
 #ParkingNo{i}=x,20,I
-IF(#PageFg==4,$,CALL(#Show4))
+IF(#PageFg==3,$,CALL(#Show3))
 IF(#FunCd==4,s,$)
 C(4,#ParkingNo{j},CALL(#HIDE_PP_ROW_{i}),CALL(#SHOW_PP_ROW_{i}))
 C(4,#ParkingNo{j},s,$)
@@ -1090,7 +1046,7 @@ INVOKEJS(SHOW,grd4_{rowSeq},1)
 ! [建物修改原因-原因]
 #Reason{i}=X,1,I
 IF(#FunCd==1,S,$)
-IF(#PageFg==6,$,CALL(#Show6))
+IF(#PageFg==4,$,CALL(#Show4))
 C(4,#Reason{j},CALL(#HIDE_ROW_{i}),CALL(#SHOW_ROW_{i}))
 C(4,#Reason{j},S,$)
 IF(#FunCd==4,s,$)
@@ -1124,7 +1080,7 @@ E(0,#DT)
 
 #ShowAll=X,1,S
 ENABLE(#BtnExpand)
-E(0,@PageFg,7)
+E(0,@PageFg,5)
 CALL(#ResetPages)
 
 !---- Expand 展開
@@ -1137,6 +1093,52 @@ BIND(#BtnExpand,click, {cmd=CALLSEND;DOCODE=Expand})
 E(0,1)
 
 
+</sub>
+
+<sub type="DC" name="p2" layout="cols=3;screen.width=[200,350,200,450];printer.width=[20,50,20,50];order=1">
+[
+["建物資料"],
+["#FdUSAGE_IND+建物主要用途",#BdMainUseCode,#BdMainUseCodeX],["#FdBD_MATERIAL+建物主要建材",#BdMtrlCode,#BdMtrlCodeX],
+["#FdBD_CATEGORY+建物類別",#BdTypeCode,#BdTypeCodeX],["#FdTOTAL_FLOOR+總樓層",#TotalFloor,"層"],
+["#FdFLOOR_NO+擔保品所在樓層",#FloorNo,"層"],["#FdFLOOR_AREA+擔保品所在樓層面積",#FloorArea,"坪"],
+["#FdAreaAMT+鑑價單價",#EvaUnitPrice,"元／坪"],["#FdRF_STRUCTURE+屋頂結構",#RoofStructureCode,#RoofStructureCodeX],
+[#<->#,"#FdBD_DT+建築完成日期",#BdDate],
+["#FdSUB_BD_USAGE+附屬建物用途",#BdSubUsageCode,#BdSubUsageCodeX],["#FdSUB_BD_AREA+附屬建物面積",#BdSubArea,"坪"],
+["#FdSELLER_ID+賣方統編",#SellerId],["#FdSELLER_NAME+賣方姓名",#SellerName],
+["#FdCONTRACT_PRICE+買賣契約價格",#ContractPrice],["#FdCONTRACT_DT+買賣契約日期",#ContractDate],
+["#FdBD_USE+建物使用別",#BdUsageCode,#BdUsageCodeX],["#FdPARKING_TYPE+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
+["#FdHOUSE_TAX_SN+房屋稅籍號碼",#HouseTaxNo],["#FdHOUSE_BUY_DT+房屋取得日期",#HouseBuyDate],
+]
+</sub>
+
+<sub type="DC" name="p3" layout="cols=1;screen.width=[200,1010];printer.width=[20,50,20,50];order=1">
+[
+["公設建號"],
+["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[200,200,200,200], p_cols:[20,20,20]}","#FdPE+公設建號","","",
+["建號","登記面積(坪)","所有權人統編","所有權人姓名"],
+[[#PublicBdNoA1,"-",#PublicBdNoB1],#Area1,#PublicBdOwnerId1,#PublicBdOwnerName1]
+],
+]
+</sub>
+
+<sub type="DC" name="p4" layout="cols=1;screen.width=[200,1010];printer.width=[20,50,20,50];order=1">
+[
+["車位"],
+["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[100,90,210,140,140,100,100,140], p_cols:[20,20,30,40,20,30,30,30]}","#FdPP+車位","","",
+["車位編號","車位數","停車位類別","權利範圍","登記面積(坪)","建號","地號","價格(元)"],
+[#ParkingNo1,#ParkingQty1,[#ParkingTypeCode1,#ParkingTypeCodeX1],[#ParkingOwnerPart1,"/",#ParkingOwnerTotal1],#ParkingArea1,[#ParkingBdNoA1,"-",#ParkingBdNoB1],[#ParkingLandNoA1,"-",#ParkingLandNoB1],#ParkingAmount1]
+],
+]
+</sub>
+
+<sub type="DC" name="p5" layout="cols=1;screen.width=[200,1010];printer.width=[20,50,20,50];order=1">
+[
+["建物修改原因"],
+["#grid#,{id:4,expand:true,loop:10,row_height:1,s_cols:[200,200,200], p_cols:[20,20,20]}","#FdCHG+建物修改原因","","",
+["原因","建立者","建立日期"],
+[[#Reason1,#ReasonX1,#OtherReason1,],#CreateEmpNo1,#CreateDate1]
+],
+]
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

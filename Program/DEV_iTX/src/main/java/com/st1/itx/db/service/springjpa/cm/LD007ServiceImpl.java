@@ -68,6 +68,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               WHERE B.\"WorkMonth\" >= (:inputYearStart || :inputMonthStart) ";
 		sql += "                 AND B.\"WorkMonth\" <= (:inputYearEnd || :inputMonthEnd) ";
 		sql += "                 AND B.\"DrawdownAmt\" > 0 ";
+		sql += "                 AND B.\"PerfAmt\" > 0 ";
 
 		this.info("sql=" + sql);
 		Query query;

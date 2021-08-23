@@ -261,7 +261,7 @@ T(2,#OGdRid1+-+#OGdRid2+-+#OGdRnum)
 T(3,)T(H,#OClTypeCode,#ClTypeCodeHelp)
 
 !股票代號
-#OStockCode=X,5,L
+#OStockCode=X,10,L
 
 #OStockCodeX=X,20,L
 T(H,#OStockCode,#StockCodeHelp)

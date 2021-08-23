@@ -117,7 +117,7 @@ public class L2R25 extends TradeBuffer {
 			this.totaVo.putParam("L2r25OwnerName", custMain.getCustName());
 		} else {
 			this.totaVo.putParam("L2r25OwnerId", "");
-			this.totaVo.putParam("L2r25OwnerId", "");
+			this.totaVo.putParam("L2r25OwnerName", "");
 		}
 		
 		this.totaVo.putParam("L2r25InsiderJobTitle", tClStock.getInsiderJobTitle());

@@ -151,6 +151,17 @@ public interface FacMainService {
   public FacMain fildCustNoCreditSysNoFirst(int custNo_0, int creditSysNo_1, TitaVo... titaVo);
 
   /**
+   * CustNo = 
+   *
+   * @param custNo_0 custNo_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice FacMain FacMain of List
+   */
+  public Slice<FacMain> CustNoAll(int custNo_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By FacMain
    * 
    * @param facMainId key
