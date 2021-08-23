@@ -2,6 +2,7 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +24,6 @@ import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClBuildingOwnerId;
 import com.st1.itx.db.domain.ClFac;
-import com.st1.itx.db.domain.ClFacId;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
 import com.st1.itx.db.domain.ClLand;
@@ -302,49 +302,74 @@ public class L2411 extends TradeBuffer {
 					// insert 土地所有權人檔
 					InsertClLandOwner(titaVo);
 				}
-				// 依核准號碼建立一筆額度與擔保品關聯檔
-				if (iApplNo > 0) { // 核准編號大於0才去做
-
-					ClFacId clFacId = new ClFacId();
-					clFacId.setClCode1(iClCode1);
-					clFacId.setClCode2(iClCode2);
-					clFacId.setClNo(iClNo);
-					clFacId.setApproveNo(iApplNo);
-					ClFac tClFac = sClFacService.findById(clFacId, titaVo);
-					
-					// 新增資料重複
-					if (tClFac != null) {
-						throw new LogicException("E0005", "額度與擔保品關聯檔"); // 新增資料時，發生錯誤
-					} else {
-						tClFac = new ClFac();
-						clFacId = new ClFacId();
-						clFacId.setClCode1(iClCode1);
-						clFacId.setClCode2(iClCode2);
-						clFacId.setClNo(iClNo);
-						clFacId.setApproveNo(iApplNo);
-						tClFac.setApproveNo(iApplNo);
-						tClFac.setClCode1(iClCode1);
-						tClFac.setClCode2(iClCode2);
-						tClFac.setClNo(iClNo);
-						tClFac.setClFacId(clFacId);
-						tClFac.setCustNo(tFacMain.getCustNo());
-						tClFac.setFacmNo(tFacMain.getFacmNo());
-						tClFac.setMainFlag("Y");
-						tClFac.setShareAmt(BigDecimal.ZERO);
-						tClFac.setFacShareFlag(0);
-						tClFac.setOriSettingAmt(parse.stringToBigDecimal(titaVo.getParam("SettingAmt")));
-
-						// insert
-						try {
-							sClFacService.insert(tClFac, titaVo);
-						} catch (DBException e) {
-							throw new LogicException("E0005", "額度與擔保品關聯檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
-						}
-
-						// 額度與擔保品關聯檔變動處理
-						clFacCom.changeClFac(iApplNo, titaVo);
+				
+				if( iApplNo > 0 ) {
+				  List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
+				  for (int i = 1; i <= 20; i++) {
+					// 若該筆無資料就離開迴圈
+					if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
+						break;
 					}
+					
+					String iOwnerId = titaVo.getParam("OwnerId" + i);
+					
+					CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
+					
+					if( custMain != null) {						
+						String custUKey = custMain.getCustUKey().trim();
+						String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
+						HashMap<String, String> map = new HashMap<String, String>();
+						map.put("OwnerCustUKey", custUKey);
+						map.put("OwnerRelCode", relCode);
+						ownerMap.add(map);
+					}
+				  }			
+				  clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
+				
 				} // if
+//				// 依核准號碼建立一筆額度與擔保品關聯檔
+//				if (iApplNo > 0) { // 核准編號大於0才去做
+//
+//					ClFacId clFacId = new ClFacId();
+//					clFacId.setClCode1(iClCode1);
+//					clFacId.setClCode2(iClCode2);
+//					clFacId.setClNo(iClNo);
+//					clFacId.setApproveNo(iApplNo);
+//					ClFac tClFac = sClFacService.findById(clFacId, titaVo);
+//					
+//					// 新增資料重複
+//					if (tClFac != null) {
+//						throw new LogicException("E0005", "額度與擔保品關聯檔"); // 新增資料時，發生錯誤
+//					} else {
+//						tClFac = new ClFac();
+//						clFacId = new ClFacId();
+//						clFacId.setClCode1(iClCode1);
+//						clFacId.setClCode2(iClCode2);
+//						clFacId.setClNo(iClNo);
+//						clFacId.setApproveNo(iApplNo);
+//						tClFac.setApproveNo(iApplNo);
+//						tClFac.setClCode1(iClCode1);
+//						tClFac.setClCode2(iClCode2);
+//						tClFac.setClNo(iClNo);
+//						tClFac.setClFacId(clFacId);
+//						tClFac.setCustNo(tFacMain.getCustNo());
+//						tClFac.setFacmNo(tFacMain.getFacmNo());
+//						tClFac.setMainFlag("Y");
+//						tClFac.setShareAmt(BigDecimal.ZERO);
+//						tClFac.setFacShareFlag(0);
+//						tClFac.setOriSettingAmt(parse.stringToBigDecimal(titaVo.getParam("SettingAmt")));
+//
+//						// insert
+//						try {
+//							sClFacService.insert(tClFac, titaVo);
+//						} catch (DBException e) {
+//							throw new LogicException("E0005", "額度與擔保品關聯檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
+//						}
+//
+//						// 額度與擔保品關聯檔變動處理
+//						clFacCom.changeClFac(iApplNo, titaVo);
+//					}
+//				} // if
 
 			} else if (iFunCd == 2) {
 				throw new LogicException("E0003", "擔保品主檔"); // 修改資料不存在

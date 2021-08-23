@@ -6,8 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -40,8 +38,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2072 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2072.class);
-
 	
 	@Autowired
 	public CdEmpService sCdEmpService;
@@ -64,7 +60,7 @@ public class L2072 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L2072 ");
+		this.info("active L2072 ");
 		this.totaVo.init(titaVo);
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -110,7 +106,7 @@ public class L2072 extends TradeBuffer {
 		CdEmp tCdEmp = new CdEmp();
 		
 		for (CustRmk tCustRmk : lCustRmk) {
-			logger.info("tCustRmk---->" + tCustRmk);
+			this.info("tCustRmk---->" + tCustRmk);
 			// new occurs
 			OccursList occurslist = new OccursList();
 
@@ -146,8 +142,8 @@ public class L2072 extends TradeBuffer {
 			// 宣告
 			ts = tCustRmk.getCreateDate();
 			uts = tCustRmk.getLastUpdate();
-			logger.info("ts = " + ts);
-			logger.info("uts = " + uts);
+			this.info("ts = " + ts);
+			this.info("uts = " + uts);
 			DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
 
 			createDate = sdfdate.format(ts);
@@ -155,8 +151,8 @@ public class L2072 extends TradeBuffer {
 			
 			createDate = parse.IntegerToString(parse.stringToInteger(createDate) - 19110000, 8);
 			updateDate = parse.IntegerToString(parse.stringToInteger(updateDate) - 19110000, 8);
-			logger.info("createDate = " + createDate);
-			logger.info("updateDate = " + updateDate);
+			this.info("createDate = " + createDate);
+			this.info("updateDate = " + updateDate);
 			
 			occurslist.putParam("OOCreateDate",createDate);
 			occurslist.putParam("OOLastUpdate",updateDate);
