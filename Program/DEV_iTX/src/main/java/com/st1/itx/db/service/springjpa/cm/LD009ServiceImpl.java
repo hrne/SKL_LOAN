@@ -57,8 +57,9 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , SUM(0)                     AS \"TodayBal\"           "; // 今日金額
 		sql += " FROM \"DailyLoanBal\" DL ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = DL.\"CustNo\" ";
-		sql += "                            AND AR.\"FacmNo\" = DL.\"FacmNo\" ";
-		sql += "                            AND AR.\"RvNo\"   = LPAD(DL.\"BormNo\", 3, '0') ";
+		sql += "                              AND AR.\"FacmNo\" = DL.\"FacmNo\" ";
+		sql += "                              AND AR.\"RvNo\"   = LPAD(DL.\"BormNo\", 3, '0') ";
+		sql += "                              AND AR.\"AcctCode\" = DL.\"AcctCode\" ";
 		sql += " WHERE DL.\"DataDate\" = :lastDay "; // 每日餘額檔的資料日期為前日
 		sql += "   AND DL.\"LoanBalance\" > 0 ";
 		sql += " GROUP BY DL.\"AcctCode\" ";
@@ -83,8 +84,9 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "                        AND FAC.\"FacmNo\" = LBM.\"FacmNo\" ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = LBM.\"CustNo\" ";
-		sql += "                            AND AR.\"FacmNo\" = LBM.\"FacmNo\" ";
-		sql += "                            AND AR.\"RvNo\"   = LPAD(LBM.\"BormNo\", 3, '0') ";
+		sql += "                              AND AR.\"FacmNo\" = LBM.\"FacmNo\" ";
+		sql += "                              AND AR.\"RvNo\"   = LPAD(LBM.\"BormNo\", 3, '0') ";
+		sql += "                              AND AR.\"AcctCode\" = FAC.\"AcctCode\" ";
 		sql += " WHERE LBM.\"DrawdownDate\" = :today "; // 放款主檔的撥款日為今日
 		sql += "   AND LBM.\"LoanBal\" > 0 "; // ??? 待確認:當日撥款當日結清的要算一筆嗎?
 		sql += "   AND LBM.\"RenewFlag\" = 'N' "; // 排除借新還舊案
@@ -110,21 +112,21 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , LTX.\"FacmNo\" ";
 		sql += "            , LTX.\"BormNo\" ";
 		sql += "            , FAC.\"AcctCode\" ";
-		sql += "            , SUM(\"Principal\") AS \"Principal\" "; // 實收本金
+		sql += "            , SUM(\"Principal\" + \"ExtraRepay\") AS \"Principal\" "; // 實收本金
 		sql += "       FROM \"LoanBorTx\" LTX ";
 		sql += "       LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = LTX.\"CustNo\" ";
 		sql += "                              AND FAC.\"FacmNo\" = LTX.\"FacmNo\" ";
 		sql += "       WHERE LTX.\"AcDate\" = :today "; // 放款交易內容檔的會計日期為今日
-		sql += "         AND NVL(JSON_VALUE(LTX.\"OtherFields\", '$.CaseCloseCode'), ' ') IN ('0','3','4','5','6','7','8') ";
-		sql += "             "; // 結案區分為0,3,4,5,6,7,8
+		sql += "         AND LTX.\"TitaHCode\" = 0 ";
 		sql += "       GROUP BY LTX.\"CustNo\" ";
 		sql += "              , LTX.\"FacmNo\" ";
 		sql += "              , LTX.\"BormNo\" ";
 		sql += "              , FAC.\"AcctCode\" ";
 		sql += "      ) TX ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = TX.\"CustNo\" ";
-		sql += "                            AND AR.\"FacmNo\" = TX.\"FacmNo\" ";
-		sql += "                            AND AR.\"RvNo\"   = LPAD(TX.\"BormNo\", 3, '0')";
+		sql += "                              AND AR.\"FacmNo\" = TX.\"FacmNo\" ";
+		sql += "                              AND AR.\"RvNo\"   = LPAD(TX.\"BormNo\", 3, '0')";
+		sql += "                              AND AR.\"AcctCode\" = TX.\"AcctCode\" ";
 		sql += " GROUP BY TX.\"AcctCode\" ";
 		sql += "        , AR.\"AcSubBookCode\" ";
 		sql += " UNION ALL ";
@@ -147,8 +149,9 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "                        AND FAC.\"FacmNo\" = LBM.\"FacmNo\" ";
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = LBM.\"CustNo\" ";
-		sql += "                            AND AR.\"FacmNo\" = LBM.\"FacmNo\" ";
-		sql += "                            AND AR.\"RvNo\"   = LPAD(LBM.\"BormNo\", 3, '0') ";
+		sql += "                              AND AR.\"FacmNo\" = LBM.\"FacmNo\" ";
+		sql += "                              AND AR.\"RvNo\"   = LPAD(LBM.\"BormNo\", 3, '0') ";
+		sql += "                              AND AR.\"AcctCode\" = FAC.\"AcctCode\" ";
 		sql += " WHERE LBM.\"DrawdownDate\" = :today "; // 放款主檔的撥款日期為今日
 		sql += "   AND LBM.\"RenewFlag\" = 'Y' "; // 放款主檔的借新還舊記號為Y
 		sql += " GROUP BY FAC.\"AcctCode\" ";
@@ -188,6 +191,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = TX.\"CustNo\" ";
 		sql += "                              AND AR.\"FacmNo\" = TX.\"FacmNo\" ";
 		sql += "                              AND AR.\"RvNo\"   = LPAD(TX.\"BormNo\", 3, '0') ";
+		sql += "                              AND AR.\"AcctCode\" = TX.\"AcctCode\" ";
 		sql += " GROUP BY TX.\"AcctCode\" ";
 		sql += "        , AR.\"AcSubBookCode\" ";
 		sql += " UNION ALL ";
@@ -210,6 +214,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"AcReceivable\" AR ON AR.\"CustNo\" = DL.\"CustNo\" ";
 		sql += "                              AND AR.\"FacmNo\" = DL.\"FacmNo\" ";
 		sql += "                              AND AR.\"RvNo\"   = LPAD(DL.\"BormNo\", 3, '0') ";
+		sql += "                              AND AR.\"AcctCode\" = DL.\"AcctCode\" ";
 		sql += " WHERE DL.\"DataDate\" = :today "; // 每日餘額檔的資料日期為今日
 		sql += "   AND DL.\"LoanBalance\" > 0 ";
 		sql += " GROUP BY DL.\"AcctCode\" ";

@@ -1,5 +1,7 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -34,11 +36,31 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo, int i) throws Exception {
-		String yymm = String.valueOf(Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000);
 
 		this.info("lM051.findAll ");
-		this.info("yymm:" + yymm);
-		
+
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日(int)
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthLastDate = Calendar.getInstance();
+		// 設當年月底日
+		calMonthLastDate.set(iYear, iMonth, 0);
+
+		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < monthLastDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+
+		this.info("yymm:" + iYear * 100 + iMonth);
+
 		// 0
 		String groupSelect1 = "	WHERE M.\"ProdNo\" NOT IN ('60','61','62') AND M.\"Status\" = 0 ";
 		// 協
@@ -89,12 +111,10 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "					  ,DECODE(M.\"AcSubBookCode\",'201','00A',' ') AS \"AcSubBookCode\"";
 		sql += "					  ,M.\"PrinBalance\"";
 		sql += "					  ,M.\"FacAcctCode\"";
-
 		sql += "					  ,(CASE";
 		sql += "						 WHEN M.\"OvduTerm\" > 5 OR M.\"OvduTerm\"= 0 THEN 99";
 		sql += "						 ELSE M.\"OvduTerm\"";
 		sql += "					   END) AS \"OvduTerm\"";
-
 		sql += "					  ,(CASE";
 		sql += "						 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" <= 5 AND M.\"OvduDays\" > 30 AND M.\"Status\" = 0 THEN '*協-' ";
 		sql += "						 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"OvduTerm\" = 0 AND M.\"OvduDays\" =0 AND M.\"Status\" = 0 THEN '協' ";
@@ -103,7 +123,6 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						 WHEN M.\"ProdNo\" IN ('60','61','62') AND M.\"Status\" IN (2,6,7)  THEN '催協' ";
 		sql += "						 ELSE ' '";
 		sql += "					   END) AS \"OvduText\"";
-
 		sql += "					  ,M.\"CityCode\"";
 		sql += "					  ,M.\"PrevIntDate\"";
 		sql += "					  ,M.\"RenewCode\"";
@@ -157,7 +176,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", yymm.substring(0, 6));
+		query.setParameter("yymm", iYear * 100 + iMonth);
 		return this.convertToMap(query.getResultList());
 	}
 

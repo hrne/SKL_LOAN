@@ -2,10 +2,10 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -13,13 +13,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
-import com.st1.itx.db.domain.ClMain;
-import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CdCityService;
-import com.st1.itx.db.service.ClMainService;
-import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.springjpa.cm.L2919ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -38,19 +34,12 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2919 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2919.class);
 
-	/* DB服務注入 */
 	@Autowired
-	public ClMainService sClMainService;
-	@Autowired
-	public CustMainService sCustMainService;
+	public L2919ServiceImpl sL2919ServiceImpl;
+
 	@Autowired
 	public CdCityService cdCityService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
 
 	/* 轉換工具 */
 	@Autowired
@@ -67,74 +56,91 @@ public class L2919 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 100; // 122 * 400 = 48800
+		this.limit = 10; // 122 * 400 = 48800
 
-		// tita
-		String iCustId = titaVo.getParam("CustId");
-		// new table
-		CustMain tCustMain = new CustMain();
-		// new ArrayList
-		List<ClMain> lClMain = new ArrayList<ClMain>();
-		// 統編查客戶主檔CustUKey取擔保品主檔資料
-		tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
-		// 該統編不存在客戶主檔 拋錯
-		if (tCustMain == null) {
-			throw new LogicException(titaVo, "E2003", "L2919 該統編" + iCustId + "不存在於客戶主檔。");
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+
+		try {
+			// *** 折返控制相關 ***
+			resultList = sL2919ServiceImpl.FindAll(this.index, this.limit, titaVo);
+		} catch (Exception e) {
+			this.error("L2919ServiceImpl findByCondition " + e.getMessage());
+			throw new LogicException("E0013", "L2919");
+
 		}
-		String custUKey = tCustMain.getCustUKey();
-
-		Slice<ClMain> slClMain = sClMainService.findCustUKey(custUKey, this.index, this.limit, titaVo);
-		lClMain = slClMain == null ? null : slClMain.getContent();
-		// 該統編查無擔保品主檔
-		if (lClMain == null) {
-			throw new LogicException(titaVo, "E2003", "L2919 該統編" + iCustId + "不存在於擔保品主檔。");
-		}
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slClMain != null && slClMain.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			/* 手動折返 */
-			this.totaVo.setMsgEndToEnter();
-		}
-		for (ClMain tClMain : lClMain) {
-
-			// new occurs
-			OccursList occurslist = new OccursList();
-			// new table
-			tCustMain = new CustMain();
-
-			tCustMain = sCustMainService.findById(tClMain.getCustUKey(), titaVo);
-
-			// 取通訊名稱
-			/* table 取值 */
-			/* table-參數2:CityCode */
-			String cityCode = tClMain.getCityCode();
-			this.info("縣市 = " + cityCode);
-
-			CdCity tCdCity = new CdCity();
-
-			if (!(cityCode.isEmpty() || cityCode == null)) {
-				/* 取縣市名稱 */
-				tCdCity = cdCityService.findById(cityCode, titaVo);
-				if (tCdCity == null) {
-					tCdCity = new CdCity();
-				}
-				this.info("戶籍縣市   " + tCdCity.getCityItem());
+		
+		if (resultList != null && resultList.size() > 0) {
+			
+			if (resultList.size() == this.limit && hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
 			}
+			
+			
+			for (Map<String, String> result : resultList) {
+				this.info("L2919 result = " + result.toString());
+				// new occurs
+				OccursList occurslist = new OccursList();
+			
+				occurslist.putParam("OOClCode1", result.get("F0"));
+				occurslist.putParam("OOClCode2", result.get("F1"));
+				occurslist.putParam("OOClNo", result.get("F2"));				
+				occurslist.putParam("OOClTypeCode", result.get("F3"));
+				occurslist.putParam("OOCustName", result.get("F6"));
+				occurslist.putParam("OOCustNo", result.get("F7"));
+				
 
-			occurslist.putParam("OOClCode1", tClMain.getClCode1());
-			occurslist.putParam("OOClCode2", tClMain.getClCode2());
-			occurslist.putParam("OOClNo", tClMain.getClNo());
-			occurslist.putParam("OOClTypeCode", tClMain.getClTypeCode());
-//			occurslist.putParam("OOCityCode", tClMain.getCityCode());
-			occurslist.putParam("OOCityItem", tCdCity.getCityItem());
-			occurslist.putParam("OOCustName", tCustMain.getCustName());
-			occurslist.putParam("OOCustNo", tCustMain.getCustNo());
+				String cityCode = result.get("F4");
+				this.info("縣市 = " + cityCode);
 
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occurslist);
-		}
+				CdCity tCdCity = new CdCity();
 
+				if (!(cityCode.isEmpty() || cityCode == null)) {
+					/* 取縣市名稱 */
+					tCdCity = cdCityService.findById(cityCode, titaVo);
+					if (tCdCity == null) {
+						tCdCity = new CdCity();
+					}
+					this.info("戶籍縣市   " + tCdCity.getCityItem());
+				}
+	
+				occurslist.putParam("OOCityItem", tCdCity.getCityItem());
+					
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occurslist);
+					
+
+			} // for
+			
+			  
+		} // if
+
+		
 		this.addList(this.totaVo);
 		return this.sendList();
+		
 	}
+		
+	
+	private Boolean hasNext() {
+		Boolean result = true;
+
+		int times = this.index + 1;
+		int cnt = sL2919ServiceImpl.getSize();
+		int size = times * this.limit;
+
+		this.info("index ..." + this.index);
+		this.info("times ..." + times);
+		this.info("cnt ..." + cnt);
+		this.info("size ..." + size);
+
+		if (size == cnt) {
+			result = false;
+		}
+		this.info("result ..." + result);
+
+		return result;
+	}
+	
 }

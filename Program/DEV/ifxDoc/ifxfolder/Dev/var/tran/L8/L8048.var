@@ -4,7 +4,6 @@
 
 <sub type="SYS" name="label">
 
-
 !#TXCD
 !T(3,L8048)
 
@@ -162,19 +161,17 @@ TXFORM=L8048
 
 <sub type="SELECT">
 #RPTFG=0,QUERY.GRID,L8048
-#any={detail:true, header:'L8048.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+#any={detail:true, header:'L8031.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 #OOTranKeyX=交易代碼
-{width:80,align:'center'}
-!L8321(63)
-#OOClosedDate=變更還款條件結案日期
 {width:100,align:'center'}
-#OOClosedResultX=結案原因
-{width:300,align:'center'}
+!L8318(6O)
+#OOYM=已清分足月期付金年月
+{width:100,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期
-{width:100,align:'center'}
+{width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
-#OOLastUpdate_Combine=最後更新人員
+#OOLastUpdateEmpNo=最後更新人員
 {width:120,align:'center'}
 ^
 

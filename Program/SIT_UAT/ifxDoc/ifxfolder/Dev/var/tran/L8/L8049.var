@@ -4,7 +4,6 @@
 
 <sub type="SYS" name="label">
 
-
 !#TXCD
 !T(3,L8049)
 
@@ -167,6 +166,7 @@ TXFORM=L8049
 #OOLastUpdate
 #OOLastUpdateEmpNo
 #OOLastUpdateEmpNoName
+
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
@@ -184,6 +184,8 @@ TXFORM=L8049
 #RPTFG=0,QUERY.GRID,L8049
 #any={detail:true, header:'L8049.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 !L8319(61)
+#OOTranKeyX=交易代碼
+{width:80,align:'center'}
 #OOExpBalanceAmt=信用貸款協商剩餘債權餘額
 {width:100,align:'center'}
 #OOCashBalanceAmt=現金卡協商剩餘債權餘額
@@ -202,6 +204,7 @@ TXFORM=L8049
 {width:200,align:'center'}
 #OOLastUpdate_Combine=最後更新人員
 {width:120,align:'center'}
+
 ^
 <include src="PRT.icf::INQ01.sel"/>
 </sub>

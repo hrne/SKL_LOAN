@@ -42,8 +42,12 @@ public class L1R18 extends TradeBuffer {
 			iCustMain = iCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
 		}
 		
-		if (iCustMain == null) {
-			throw new LogicException("E0001", "客戶檔查無此統一編號:" + iCustId); // 查無資料
+		if (iCustMain==null) {
+			if (iCustNo == 0) {
+				throw new LogicException("E0001", "客戶檔查無此統一編號:" + iCustId); // 查無資料
+			}else {
+				throw new LogicException("E0001", "客戶檔查無此戶號:" + iCustNo); // 查無資料
+			}
 		}
 		
 		

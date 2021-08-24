@@ -547,6 +547,7 @@ IF(#FunCd == 1 || #FunCd == 2,$,S)
 T(3,@FdSubType,*)
 T(3,@FdEvaDate,*)
 T(3,@FdEvaAmt,*)
+T(3,@FdEvaNetWorth,*)
 T(3,@FdOwnershipCode,*)
 T(3,@FdAgreement,*)
 T(3,@FdClCode,*)
@@ -1351,6 +1352,7 @@ IF(#FunCd==4,s,$)
 ! [評估淨值]
 #EvaNetWorth=m,14,I
 IF(#FunCd==4,s,$)
+@V(2,0)
 
 #FdLVITax=X,2,L
 ! [土地增值稅]

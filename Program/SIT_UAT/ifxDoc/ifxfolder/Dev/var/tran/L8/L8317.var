@@ -259,12 +259,12 @@ T(H,#TranKey,#TranKeyHelp)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
+C(5,#TranKey,D,s,$)
 HELP(#CaseStatus56Help)
 @V(H,#CaseStatus56Help)
 
 #CaseStatusX=X,40,L
 T(H,#CaseStatus,#CaseStatus56Help)
-
 
 #ClaimDateName=X,16,L
 T(H,#CaseStatus,#ClaimDateNameHelp)
@@ -274,6 +274,7 @@ T(H,#CaseStatus,#ClaimDateNameHelp)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
+C(5,#TranKey,D,s,$)
 D(8)
 @V(7)
 A(DATE,0,#ClaimDate)
@@ -283,37 +284,41 @@ A(DATE,0,#ClaimDate)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-HELP(#CourtCodeHelp,cols:4)
-@V(H,#CourtCodeHelp)V(7)
-
+C(5,#TranKey,D,s,$)
 #CourtCodeX=X,60,L
 T(H,#CourtCode,#CourtCodeHelp)
 IF(#CourtCode=="",$,s)
 V(P,承審法院代碼必須選擇！)
 
 
+
+
 !年度別
 #Year=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(7)
 
 !法院承審股別 4個中文字
 #CourtDiv=X,8,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(8,0,4)
 
 !法院案號 40個中文字
 #CourtCaseNo=X,80,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(8,0,40)
 
 !法院裁定免責確定
 #Approve=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
@@ -325,11 +330,13 @@ V(P,案件狀態為「D：清算撤銷免責確定」時，除原必要填報項
 #OutstandAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 
 !法院裁定保全處分
 #ClaimStatus1=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
@@ -338,6 +345,7 @@ HELP(#YesNoHelp)
 #SaveDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 D(8)
 @V(7)
 @A(DATE,0,#SaveDate)
@@ -346,6 +354,7 @@ D(8)
 #ClaimStatus2=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
@@ -353,16 +362,19 @@ HELP(#YesNoHelp)
 #SaveEndDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 
 !清算損失金額
 #SubAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 
 !管理人 10個中文
 #AdminName=X,20,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(8,0,10)
 
 ![轉JCIC文字檔日期]
