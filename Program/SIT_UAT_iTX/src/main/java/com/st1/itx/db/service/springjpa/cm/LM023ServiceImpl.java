@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM023ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM023ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,10 +30,10 @@ public class LM023ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("lM023.findAll ");
+		this.info("lM023.findAll ");
 		String entdy = String.valueOf((Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000));
 		String acbrno = titaVo.getParam("ACBRNO");
-		logger.info("acbrno---->" + acbrno);
+		this.info("acbrno---->" + acbrno);
 		String sql = "SELECT M.\"AcNoCode\"";
 		sql += "             , C.\"AcNoItem\"";
 		sql += "             , M.\"AcSubBookCode\"";
@@ -48,10 +45,10 @@ public class LM023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        LEFT JOIN \"CdCode\" D ON D.\"DefCode\" = 'AcSubBookCode' ";
 		sql += "                              AND D.\"Code\" = M.\"AcSubBookCode\" ";
 		sql += "        WHERE M.\"AcDate\" = :entdy";
-		sql += "          AND M.\"BranchNo\" = :acbrno";
+		// sql += " AND M.\"BranchNo\" = :acbrno";
 		sql += "          AND M.\"AcNoCode\" LIKE '4%'";
 		sql += "        ORDER BY M.\"AcNoCode\", M.\"AcSubBookCode\" DESC";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -62,21 +59,70 @@ public class LM023ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> find1(TitaVo titaVo) throws Exception {
-		logger.info("lM023.findAll ");
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 10000);
-		String last = String.valueOf(((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 10000) - 1);
-		String sql = "SELECT \"F1\", \"F2\", SUM(F3) FROM(" + "SELECT 9999 F1, MOD(M.\"MonthEndYm\", 100) F2," + "       M.\"TdBal\" F3" + " FROM \"AcMain\" M"
-				+ " WHERE TRUNC(M.\"MonthEndYm\" / 100) = :entdy" + "   AND M.\"AcNoCode\" LIKE '4%'" + "   AND M.\"AcBookCode\" = '000'" + "  UNION ALL"
-				+ "  SELECT B.\"Year\" F1, B.\"Month\" F2, B.\"Budget\" F3" + "  FROM \"CdBudget\" B" + "  WHERE B.\"Year\" = :entdy" + "  UNION ALL"
-				+ "  SELECT B.\"Year\" F1, B.\"Month\" F2, B.\"Budget\" F3" + "  FROM \"CdBudget\" B" + "  WHERE B.\"Year\" = :last)" + "  GROUP BY \"F1\", \"F2\"" + "  ORDER BY \"F1\" DESC, \"F2\"";
-		logger.info("sql=" + sql);
+	public List<Map<String, String>> findAll2(TitaVo titaVo) throws Exception {
+		this.info("lM023.findAll2 ");
+		String thisYear = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 10000);
+		String lastYear = String.valueOf(((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 10000) - 1);
+		// String sql = "SELECT \"F1\"";
+		// sql += " ,\"F2\"";
+		// sql += " ,SUM(F3) FROM( SELECT 9999 F1";
+		// sql += " ,MOD(M.\"MonthEndYm\", 100) F2";
+		// sql += " ,M.\"TdBal\" F3";
+		// sql += " FROM \"AcMain\" M";
+		// sql += " WHERE TRUNC(M.\"MonthEndYm\" / 100) = :entdy";
+		// sql += " AND M.\"AcNoCode\" LIKE '4%' ";
+		// sql += " AND M.\"AcBookCode\" = '000' ";
+		// sql += " UNION ALL";
+		// sql += " SELECT B.\"Year\" F1";
+		// sql += " ,B.\"Month\" F2";
+		// sql += " ,B.\"Budget\" F3";
+		// sql += " FROM \"CdBudget\" B";
+		// sql += " WHERE B.\"Year\" = :entdy";
+		// sql += " UNION ALL";
+		// sql += " SELECT B.\"Year\" F1";
+		// sql += " ,B.\"Month\" F2";
+		// sql += " ,B.\"Budget\" F3";
+		// sql += " FROM \"CdBudget\" B";
+		// sql += " WHERE B.\"Year\" = :last)";
+		// sql += " GROUP BY \"F1\"";
+		// sql += " ,\"F2\"";
+		// sql += " ORDER BY \"F1\" DESC, \"F2\"";
+
+		String sql = "SELECT \"DataSeq\"";
+		sql += "     		,\"Year\"";
+		sql += "     		,\"Month\"";
+		sql += "     		,SUM(NVL(\"Amt\",0)) AS \"Amt\" ";
+		sql += "	  FROM ( SELECT CASE";
+		sql += "               		  WHEN TRUNC(M.\"MonthEndYm\" / 100) = :thisYear ";
+		sql += "                	  THEN 0";
+		sql += "              		ELSE 2 ";
+		sql += "              		END AS \"DataSeq\"";
+		sql += "            	   ,TRUNC(M.\"MonthEndYm\" / 100) AS \"Year\"";
+		sql += "            	   ,MOD(M.\"MonthEndYm\", 100) AS \"Month\"";
+		sql += "            	   ,M.\"TdBal\" AS \"Amt\"";
+		sql += "      		 FROM \"AcMain\" M";
+		sql += "       		 WHERE TRUNC(M.\"MonthEndYm\" / 100) IN (:thisYear,:lastYear)";
+		sql += "        	   AND M.\"AcNoCode\" LIKE '4%'";
+		sql += "       		 UNION ALL";
+		sql += "       		 SELECT 1          AS \"DataSeq\"";
+		sql += "            	   ,B.\"Year\"   AS \"Year\"";
+		sql += "            	   ,B.\"Month\"  AS \"Month\"";
+		sql += "            	   ,B.\"Budget\" AS \"Amt\"";
+		sql += "       		 FROM \"CdBudget\" B";
+		sql += "       		 WHERE  B.\"Year\" = :thisYear )";
+		sql += "	  GROUP BY \"DataSeq\"";
+		sql += "       	 	  ,\"Year\"";
+		sql += "       		  ,\"Month\"";
+		sql += "	  ORDER BY \"DataSeq\"";
+		sql += "       		  ,\"Year\"";
+		sql += "       		  ,\"Month\"";
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entdy", entdy);
-		query.setParameter("last", last);
+		query.setParameter("thisYear", thisYear);
+		query.setParameter("lastYear", lastYear);
 		return this.convertToMap(query.getResultList());
 	}
 

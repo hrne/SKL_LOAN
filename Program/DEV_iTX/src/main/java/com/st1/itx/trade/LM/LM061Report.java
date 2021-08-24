@@ -67,13 +67,14 @@ public class LM061Report extends MakeReport {
 				}
 
 //				makeExcel.setValue(row, 1, tLDVo.get("F19"));
-				tempCustNo = tLDVo.get("F0");
+			
 				if (!tempCustNo.equals(tLDVo.get("F0"))) {
 
 					num++;
 
 				}
-
+				tempCustNo = tLDVo.get("F0");
+				
 				makeExcel.setValue(row, 2, num);
 
 				BigDecimal ovduBal = tLDVo.get("F3") == null || tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO

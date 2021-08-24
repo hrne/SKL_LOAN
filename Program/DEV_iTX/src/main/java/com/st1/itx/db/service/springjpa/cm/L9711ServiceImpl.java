@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9711ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -38,13 +35,13 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L9711.findAll");
+		this.info("L9711.findAll");
 
 		String iSDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ST")) + 19110000);
 		String iEDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE_ED")) + 19110000);
 
 		String iCUSTNO = titaVo.get("CUSTNO");
-		logger.info("iCUSTNO="+iCUSTNO+",iSDAY="+iSDAY+",iEDAY="+iEDAY);
+		this.info("iCUSTNO=" + iCUSTNO + ",iSDAY=" + iSDAY + ",iEDAY=" + iEDAY);
 		String sql = "";
 		sql += "SELECT * FROM(";
 		sql += "	SELECT ' ' F0";
@@ -66,20 +63,32 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,M.\"NextRepayDate\" F16";
 		sql += "        ,C.\"CurrZip3\" F17";
 		sql += "        ,C.\"CurrZip2\" F18";
-		sql += "        ,C2.\"CityItem\" F19";
-		sql += "        ,C3.\"AreaItem\" F20";
-		sql += "        ,C.\"CurrRoad\" F21";
-		sql += "        ,C.\"CurrSection\" F22";
-		sql += "        ,C.\"CurrAlley\" F23";
-		sql += "        ,C.\"CurrLane\" F24";
-		sql += "        ,C.\"CurrNum\" F25";
-		sql += "        ,C.\"CurrNumDash\" F26";
-		sql += "        ,C.\"CurrFloor\" F27";
-		sql += "        ,C.\"CurrFloorDash\" F28";
-		sql += "        ,F.\"RepayCode\" F29";
-		sql += "        ,M.\"AmortizedCode\" F30";
-		sql += "        ,F.\"AcctCode\" F31";
-		// sql += "        ,M.\"BormNo\" T1";
+		sql += "        ,C2.\"CityItem\"";
+		sql += "        || C3.\"AreaItem\"";
+		sql += "        || C.\"CurrRoad\"";
+		sql += "        || DECODE(C.\"CurrSection\",NULL,'',C.\"CurrSection\" || '段')";
+		sql += "        || DECODE(C.\"CurrAlley\",NULL,'',C.\"CurrAlley\" || '巷')";
+		sql += "        || DECODE(C.\"CurrLane\",NULL,'',C.\"CurrLane\" || '弄')";
+		sql += "        || DECODE(C.\"CurrNumDash\",NULL";
+		sql += "								   ,DECODE(C.\"CurrNum\",NULL,'',C.\"CurrNum\" || '號')";
+		sql += "								   ,DECODE(C.\"CurrNum\",NULL,'',C.\"CurrNum\" || '之') || C.\"CurrNumDash\" || '號')";
+		sql += "        || DECODE(C.\"CurrFloor\",NULL,'',C.\"CurrFloor\" || '樓')";
+		sql += "        || DECODE(C.\"CurrFloorDash\",NULL,'','之' || C.\"CurrFloorDash\") AS F19";
+//		sql += "        ,C2.\"CityItem\" F19";
+//		sql += "        ,C3.\"AreaItem\" F20";
+//		sql += "        ,C.\"CurrRoad\" F21";
+//		sql += "        ,C.\"CurrSection\" F22";
+//		sql += "        ,C.\"CurrAlley\" F23";
+//		sql += "        ,C.\"CurrLane\" F24";
+//		sql += "        ,C.\"CurrNum\" F25";
+//		sql += "        ,C.\"CurrNumDash\" F26";
+//		sql += "        ,C.\"CurrFloor\" F27";
+//		sql += "        ,C.\"CurrFloorDash\" F28";
+//		sql += "        ,F.\"RepayCode\" F20";
+		sql += "        ,CC.\"Item\" F20";
+		sql += "        ,M.\"AmortizedCode\" F21";
+		sql += "        ,F.\"AcctCode\" F22";
+		// sql += " ,M.\"BormNo\" T1";
 		sql += "        ,ROW_NUMBER() OVER (PARTITION BY M.\"CustNo\", M.\"FacmNo\" ORDER BY T.\"TelTypeCode\") AS SEQ";
 		sql += "	FROM(SELECT M.\"CustNo\"";
 		sql += "			   ,M.\"FacmNo\"";
@@ -111,6 +120,8 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	LEFT JOIN \"CdArea\" C3 ON C3.\"CityCode\" = C.\"CurrCityCode\"";
 		sql += "						   AND C3.\"AreaCode\" = C.\"CurrAreaCode\"";
 		sql += "	LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = F.\"BusinessOfficer\"";
+		sql += "	LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'RepayCode'";
+		sql += "						   AND CC.\"Code\" = F.\"RepayCode\"";
 		sql += "	LEFT JOIN \"CustTelNo\" T ON  T.\"CustUKey\" = C.\"CustUKey\"";
 		sql += "							 AND T.\"Enable\"   = 'Y' ) D";
 		sql += "	WHERE D.\"SEQ\" = 1 ";
@@ -119,9 +130,9 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,D.\"F4\"";
 		sql += "			,D.\"F5\"";
 
-		logger.info("sql=" + sql);
-		Query query; 
- 
+		this.info("sql=" + sql);
+		Query query;
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("isday", iSDAY);
@@ -129,7 +140,6 @@ public class L9711ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!iCUSTNO.equals("0000000")) {
 			query.setParameter("icustno", iCUSTNO);
 		}
-		
 
 		return this.convertToMap(query.getResultList());
 	}

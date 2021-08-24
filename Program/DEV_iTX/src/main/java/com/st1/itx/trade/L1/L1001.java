@@ -106,19 +106,19 @@ public class L1001 extends TradeBuffer {
 
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("L1001 Start");
 		this.totaVo.init(titaVo);
 
-		int iCustNoSt = parse.stringToInteger(titaVo.get("CustNoSt"));
-		int iCustNoEd = parse.stringToInteger(titaVo.get("CustNoEd"));
+		int iCustNoSt = iParse.stringToInteger(titaVo.get("CustNoSt"));
+		int iCustNoEd = iParse.stringToInteger(titaVo.get("CustNoEd"));
 		String iCustId = titaVo.getParam("CustId");
 		String iCustNm = titaVo.get("CustName").trim();
 		String iMobile = titaVo.get("Mobile").trim();
-		int iCustType = parse.stringToInteger(titaVo.getParam("IdKind"));
+		int iCustType = iParse.stringToInteger(titaVo.getParam("IdKind"));
 		int iKind = 0;
 		if (iCustNoSt != 0 && iCustNoEd != 0) {
 			// find by custno
@@ -196,7 +196,6 @@ public class L1001 extends TradeBuffer {
 				List<ClFac> tmpClFac1 = new ArrayList<ClFac>(); // 擔保品
 				List<CustCross> tmpCustCross = new ArrayList<CustCross>();
 				List<CustTelNo> tmpCustTelNo = new ArrayList<CustTelNo>(); // 客戶電話
-				List<FacShareAppl> tmplFacShareAppl = new ArrayList<FacShareAppl>(); //共同借款人
 				// ArrayList of 核准號碼
 				ArrayList<Integer> listApproveNo = new ArrayList<Integer>();
 				// 顧客按鈕fg

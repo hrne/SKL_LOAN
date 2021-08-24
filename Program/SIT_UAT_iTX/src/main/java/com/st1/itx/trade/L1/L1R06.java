@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -18,13 +16,10 @@ import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustCrossService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L1R06")
 @Scope("prototype")
 public class L1R06 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1R06.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -35,14 +30,6 @@ public class L1R06 extends TradeBuffer {
 
 	@Autowired
 	public CdCodeService iCdCodeService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -67,9 +54,9 @@ public class L1R06 extends TradeBuffer {
 		CustCross iCustCross = new CustCross();
 		int i = 1;
 
-		//for L1101/L1102 use
+		// for L1101/L1102 use
 		if (NewCust != null && "Y".equals(NewCust.trim())) {
-			
+
 		} else {
 			if (!iCustId.equals("")) {
 				iCustMain = iCustMainService.custIdFirst(iCustId, titaVo);
@@ -84,7 +71,7 @@ public class L1R06 extends TradeBuffer {
 			}
 		}
 		// 抓子公司名稱
-		iCdCode = iCdCodeService.getCodeList(1, "SubCompanyCode", this.index, this.limit, titaVo);
+		iCdCode = iCdCodeService.getCodeList(1, "SubCompanyCode", 0,Integer.MAX_VALUE, titaVo);
 		if (iCdCode == null) {
 			throw new LogicException(titaVo, "E0001", "共用代碼檔查無子公司選項"); // 查無資料
 		}

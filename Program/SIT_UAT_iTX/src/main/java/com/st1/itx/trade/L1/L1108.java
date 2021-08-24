@@ -18,7 +18,6 @@ import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L1108")
@@ -39,16 +38,12 @@ public class L1108 extends TradeBuffer {
 	@Autowired
 	public FacMainService sFacMainService;
 
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -59,10 +54,10 @@ public class L1108 extends TradeBuffer {
 		String funcd = titaVo.getParam("FunCd").trim();
 
 		// 取tita戶號先確定是否已在額度主檔測試
-		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iCustNo = iParse.stringToInteger(titaVo.getParam("CustNo"));
 
 		// 取tita額度號碼
-		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		int iFacmNo = iParse.stringToInteger(titaVo.getParam("FacmNo"));
 
 		FacMain tFacMain = new FacMain();
 		String iFormNo;
@@ -105,7 +100,7 @@ public class L1108 extends TradeBuffer {
 						VarEMail = "Y";
 					}
 
-					int ApplyDt = parse.stringToInteger(titaVo.getParam("ApplyDt"));
+					int ApplyDt = iParse.stringToInteger(titaVo.getParam("ApplyDt"));
 
 					CustNotice tCustNotice = new CustNotice();
 					CustNoticeId tCustNoticePK = new CustNoticeId();
@@ -157,7 +152,7 @@ public class L1108 extends TradeBuffer {
 					VarEMail = "Y";
 				}
 
-				int ApplyDt = parse.stringToInteger(titaVo.getParam("ApplyDt"));
+				int ApplyDt = iParse.stringToInteger(titaVo.getParam("ApplyDt"));
 
 				CustNotice tCustNotice = new CustNotice();
 				CustNoticeId tCustNoticePK = new CustNoticeId();
@@ -190,7 +185,7 @@ public class L1108 extends TradeBuffer {
 					}
 				} else {
 					// 變更前
-					CustNotice beforeCustNotice = (CustNotice) dataLog.clone(tCustNotice);
+					CustNotice beforeCustNotice = (CustNotice) iDataLog.clone(tCustNotice);
 					tCustNotice.setPaperNotice(VarPaper);
 					tCustNotice.setMsgNotice(VarMsg);
 					tCustNotice.setEmailNotice(VarEMail);
@@ -203,8 +198,8 @@ public class L1108 extends TradeBuffer {
 					}
 
 					// 紀錄變更前變更後
-					dataLog.setEnv(titaVo, beforeCustNotice, tCustNotice);
-					dataLog.exec();
+					iDataLog.setEnv(titaVo, beforeCustNotice, tCustNotice);
+					iDataLog.exec();
 				}
 			}
 		}

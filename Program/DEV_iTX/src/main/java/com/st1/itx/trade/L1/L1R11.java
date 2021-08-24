@@ -37,12 +37,6 @@ public class L1R11 extends TradeBuffer {
 		this.info("active L1R11 ");
 		this.totaVo.init(titaVo);
 
-		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		this.index = titaVo.getReturnIndex();
-
-		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 200; // 178 * 200 = 35,600
-
 		Slice<CdReport> slCdReport1;
 		Slice<CdReport> slCdReport2;
 		ArrayList<CdReport> lCdReport1 = new ArrayList<CdReport>();

@@ -54,7 +54,7 @@ E(0,40)ASGN(INQPRT$)
 #BUF1=X,42,S
 #Btn1=X,4,I,ui:button;value:建物資料;enable:1;tabbable:0
 #Btn2=X,4,I,ui:button;value:公設建號;enable:1;tabbable:0
-#Btn3=X,4,I,ui:button;value:車位;enable:1;tabbable:0
+#Btn3=X,4,I,ui:button;value:車位資料;enable:1;tabbable:0
 #Btn4=X,4,I,ui:button;value:建物修改原因;enable:1;tabbable:0
 
 #BIND_1=X,1,S
@@ -1123,8 +1123,8 @@ E(0,1)
 
 <sub type="DC" name="p4" layout="cols=1;screen.width=[200,1010];printer.width=[20,50,20,50];order=1">
 [
-["車位"],
-["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[100,90,210,140,140,100,100,140], p_cols:[20,20,30,40,20,30,30,30]}","#FdPP+車位","","",
+["車位資料"],
+["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[100,90,210,140,140,100,100,140], p_cols:[20,20,30,40,20,30,30,30]}","#FdPP+車位資料","","",
 ["車位編號","車位數","停車位類別","權利範圍","登記面積(坪)","建號","地號","價格(元)"],
 [#ParkingNo1,#ParkingQty1,[#ParkingTypeCode1,#ParkingTypeCodeX1],[#ParkingOwnerPart1,"/",#ParkingOwnerTotal1],#ParkingArea1,[#ParkingBdNoA1,"-",#ParkingBdNoB1],[#ParkingLandNoA1,"-",#ParkingLandNoB1],#ParkingAmount1]
 ],

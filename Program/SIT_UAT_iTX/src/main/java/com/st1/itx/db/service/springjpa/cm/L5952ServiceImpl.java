@@ -53,6 +53,7 @@ public class L5952ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5952 += ",ICBUnit.\"UnitItem\" AS \"介紹人區域中心名稱\" ";
 		sqlL5952 += ",IEMP.\"Fullname\" AS \"介紹人姓名\" ";
 		sqlL5952 += ",ITD.\"Introducer\" AS \"介紹人員編\" ";
+		sqlL5952 += ",L.\"RenewFlag\" AS \"展期/借新還舊\" ";		
 		sqlL5952 += "FROM ( SELECT ";
 		sqlL5952 += " SUM(\"PerfCnt\") AS \"PerfCnt\" ";
 		sqlL5952 += ",SUM(\"PerfAmt\") AS \"PerfAmt\" ";
@@ -62,6 +63,7 @@ public class L5952ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5952 += ",MIN(\"BormNo\") AS \"BormNo\" ";
 		sqlL5952 += ",MIN(\"DrawdownDate\") AS \"DrawdownDate\" ";
 		sqlL5952 += ",MIN (\"ProdCode\") AS \"ProdCode\" ";
+		sqlL5952 += ",MIN(\"PerfDate\") AS \"PerfDate\" ";
 		sqlL5952 += ",\"PieceCode\" ";
 		sqlL5952 += ",SUM(\"DrawdownAmt\") AS \"DrawdownAmt\" ";
 		sqlL5952 += ",\"WorkMonth\" ";
@@ -104,6 +106,11 @@ public class L5952ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5952 += "LEFT JOIN \"CdBcm\" ICBDist ON ICBDist.\"UnitCode\"=ITD.\"DistCode\" ";
 		sqlL5952 += "LEFT JOIN \"CdBcm\" ICBDept ON ICBDept.\"UnitCode\"=ITD.\"DeptCode\" ";
 		sqlL5952 += "LEFT JOIN \"CdEmp\" IEMP ON IEMP.\"EmployeeNo\"=ITD.\"Introducer\" ";
+		sqlL5952 += "LEFT JOIN \"LoanBorMain\" L ";
+		sqlL5952 += "ON BSD.\"PerfDate\" <>  BSD.\"DrawdownDate\" ";
+		sqlL5952 += "AND L.\"CustNo\" = BSD.\"CustNo\" ";
+		sqlL5952 += "AND L.\"FacmNo\" = BSD.\"FacmNo\" ";
+		sqlL5952 += "AND L.\"BormNo\" = BSD.\"BormNo\" ";
 
 		sqlL5952 += "ORDER BY BSD.\"BsOfficer\",BSD.\"CustNo\",BSD.\"FacmNo\",BSD.\"BormNo\" ";
 

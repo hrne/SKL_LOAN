@@ -30,15 +30,14 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		//LNW0581E
+		// LNW0581E
 		this.info("l9716.findAll ");
 
 //		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
 //		inputYearMonth = inputYearMonth.minusMonths(1);
-		
 
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		int iYear = Integer.valueOf(titaVo.getParam("inputYear")+1911);
+		int iYear = Integer.valueOf(titaVo.getParam("inputYear")) + 1911;
 		int iMonth = Integer.parseInt(titaVo.getParam("inputMonth"));
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -50,14 +49,12 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
-
 		boolean isMonthZero = iMonth - 1 == 0;
 
 		if (nowDate < thisMonthEndDate) {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
-		
 
 		String sql = "SELECT M.\"OvduTerm\" F0";
 		sql += "            ,EMP.\"Fullname\" F1";
@@ -160,7 +157,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		this.info("L9716 inputYearMonth: "+ iYear + String.format("%02d", iMonth));
+		this.info("L9716 inputYearMonth: " + iYear + String.format("%02d", iMonth));
 		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
 		query.setParameter("inputCollPsn", titaVo.getParam("inputCollPsn"));
 		query.setParameter("inputOvduTermMin", titaVo.getParam("inputOvduTermMin"));
@@ -168,9 +165,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query.getResultList());
 	}
-	
-	
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> ovduFindAll(TitaVo titaVo) throws Exception {
 		this.info("l9716.ovduFindAll");
@@ -179,7 +174,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		inputYearMonth = inputYearMonth.minusMonths(1);
 
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		int iYear = Integer.valueOf(titaVo.getParam("inputYear")+1911);
+		int iYear = Integer.valueOf(titaVo.getParam("inputYear")) + 1911;
 		int iMonth = Integer.parseInt(titaVo.getParam("inputMonth"));
 
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
@@ -191,15 +186,13 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
-
 		boolean isMonthZero = iMonth - 1 == 0;
 
 		if (nowDate < thisMonthEndDate) {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
-		
-		
+
 		String sql = "SELECT * FROM (";
 		sql += "      SELECT DECODE(M.\"AcSubBookCode\",'00A',' ','201','A') AS F0";
 		sql += "            ,L.\"CustNo\" F1";
@@ -286,7 +279,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND CL.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                             AND CL.\"ClNo\" = CF.\"ClNo\"";
 		sql += "      LEFT JOIN \"CustTelNo\" T1 ON T1.\"CustUKey\" = C.\"CustUKey\"";
-		sql += "                             	AND T1.\"Enable\" = 'Y'";		
+		sql += "                             	AND T1.\"Enable\" = 'Y'";
 		sql += "      LEFT JOIN \"CdCity\" C1 ON C1.\"CityCode\" =  C.\"CurrCityCode\"";
 		sql += "      LEFT JOIN \"CdArea\" C2 ON C2.\"CityCode\" =  C.\"CurrCityCode\"";
 		sql += "                             AND C2.\"AreaCode\" =  C.\"CurrAreaCode\"";
@@ -319,7 +312,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             ,L.\"FacmNo\"";
 		sql += "     		 ,L.\"BormNo\") RES";
 		sql += "     WHERE RES.\"SEQ\" = 1 ";
-		
+
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -327,8 +320,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		query = em.createNativeQuery(sql);
 		this.info("L9716 inputYearMonth: " + iYear + String.format("%02d", iMonth));
-		query.setParameter("inputYearMonth",iYear + String.format("%02d", iMonth));
-	
+		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
 
 		return this.convertToMap(query.getResultList());
 	}

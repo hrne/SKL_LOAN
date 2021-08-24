@@ -162,6 +162,15 @@ public interface FacMainService {
   public Slice<FacMain> CustNoAll(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * ProdNo =
+   *
+   * @param prodNo_0 prodNo_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice FacMain FacMain of List
+   */
+  public FacMain findProdNoFirst(String prodNo_0, TitaVo... titaVo);
+
+  /**
    * hold By FacMain
    * 
    * @param facMainId key

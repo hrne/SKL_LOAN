@@ -90,7 +90,7 @@ public class L5951 extends TradeBuffer {
 			if ("Y".equals(iSumByFacm)) {
 				OOBormNo = "";
 			}
-			int OODrawdownDate =  parse.stringToInteger(lData[7]) - 19110000;// 撥款日
+			int OODrawdownDate = parse.stringToInteger(lData[7]) - 19110000;// 撥款日
 			String OOProdCode = lData[8];// 利率代碼
 			String OOPieceCode = lData[9];// 計件代碼
 			String OOCntingCode = lData[10];// 是否計件
@@ -113,7 +113,8 @@ public class L5951 extends TradeBuffer {
 			String OOPerfReward = lData[27];// 三階業務報酬
 			String OOPerfAmt = lData[28];// 業績金額
 			int OOWorkMonth = parse.stringToInteger(lData[29]) - 191100;// 工作月
-			int OOPerfDate =  parse.stringToInteger(lData[30]) - 19110000;// 業績日期
+			int OOPerfDate = parse.stringToInteger(lData[30]) - 19110000;// 業績日期
+			String renewFlag = lData[31];// 展期/借新還舊;
 
 			OccursList occursList1 = new OccursList();
 			occursList1.putParam("OOBsDeptX", OOBsDeptX);// 部室別
@@ -127,7 +128,7 @@ public class L5951 extends TradeBuffer {
 			occursList1.putParam("OOProdCode", OOProdCode);// 利率代碼
 			occursList1.putParam("OOPieceCode", OOPieceCode);// 計件代碼
 			occursList1.putParam("OOCntingCode", OOCntingCode);// 是否計件
-			occursList1.putParam("OODrawdownAmt",OODrawdownAmt);// 撥款金額
+			occursList1.putParam("OODrawdownAmt", OODrawdownAmt);// 撥款金額
 			occursList1.putParam("OODeptCode", OODeptCode);// 介紹人部市代號
 			occursList1.putParam("OODistCode", OODistCode);// 介紹人區部代號
 			occursList1.putParam("OOUnitCode", OOUnitCode);// 介紹人單位代號
@@ -144,15 +145,17 @@ public class L5951 extends TradeBuffer {
 			occursList1.putParam("OOUnitManagerName", OOUnitManagerName);// 處經理名稱
 			occursList1.putParam("OOPerfEqAmt", OOPerfEqAmt);// 三階換算業績
 			occursList1.putParam("OOPerfReward", OOPerfReward);// 三階業務報酬
-			occursList1.putParam("OOPerfAmt",OOPerfAmt);// 已用額度
+			occursList1.putParam("OOPerfAmt", OOPerfAmt);// 已用額度
 			occursList1.putParam("OOWorkMonth", OOWorkMonth);// 工作月
 			occursList1.putParam("OOPerfDate", OOPerfDate);// 業績日期
+			String OOReMark =  "1".equals(renewFlag) ? "展期" : ("2".equals(renewFlag) ? "借新還舊" : "");;
+			occursList1.putParam("OOReMark", OOReMark);// 備註
+
 			this.totaVo.addOccursList(occursList1);
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 
 }

@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -16,8 +14,6 @@ import com.st1.itx.db.domain.CustRelId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustRelService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L1R02")
 @Scope("prototype")
@@ -28,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1R02 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1R02.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -37,14 +32,6 @@ public class L1R02 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustRelService sCustRelService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -58,36 +45,36 @@ public class L1R02 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		
+
 		String iCustId = titaVo.getParam("RimCustId1");
 		String iRelId = titaVo.getParam("RimRelId");
-		
+
 		CustMain iCustMain = new CustMain();
 		CustMain iRelMain = new CustMain();
-		
+
 		iCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 		iRelMain = sCustMainService.custIdFirst(iRelId, titaVo);
-		
-		if(iCustMain == null) {
-			throw new LogicException(titaVo, "E0001", "統編"+iCustId+"不存在");
+
+		if (iCustMain == null) {
+			throw new LogicException(titaVo, "E0001", "統編" + iCustId + "不存在");
 		}
-		if(iRelMain == null) {
-			throw new LogicException(titaVo, "E0001", "統編"+iRelId+"不存在");
+		if (iRelMain == null) {
+			throw new LogicException(titaVo, "E0001", "統編" + iRelId + "不存在");
 		}
 
 		CustRelId iCustRelId = new CustRelId();
 		CustRel iCustRel = new CustRel();
 		iCustRelId.setCustUKey(iCustMain.getCustUKey());
 		iCustRelId.setRelUKey(iRelMain.getCustUKey());
-		
+
 		iCustRel = sCustRelService.findById(iCustRelId, titaVo);
-		
+
 		String ExitFg = "0";
-		if(iCustRel != null) {
-			ExitFg ="1";
+		if (iCustRel != null) {
+			ExitFg = "1";
 		}
 		this.totaVo.putParam("L1r02ExitFg", ExitFg);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.JcicZ053;
+import com.st1.itx.db.domain.JcicZ054;
 import com.st1.itx.db.domain.JcicZ055;
 import com.st1.itx.db.domain.JcicZ056;
 import com.st1.itx.db.domain.JcicZ060;
@@ -14,6 +17,7 @@ import com.st1.itx.db.domain.JcicZ061;
 import com.st1.itx.db.domain.JcicZ062;
 import com.st1.itx.db.domain.JcicZ063;
 import com.st1.itx.db.domain.JcicZ440;
+import com.st1.itx.db.domain.JcicZ442;
 import com.st1.itx.db.domain.JcicZ443;
 import com.st1.itx.db.domain.JcicZ444;
 import com.st1.itx.db.domain.JcicZ447;
@@ -26,6 +30,8 @@ import com.st1.itx.db.domain.JcicZ572;
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ574;
 import com.st1.itx.db.domain.JcicZ575;
+import com.st1.itx.db.service.JcicZ053Service;
+import com.st1.itx.db.service.JcicZ054Service;
 import com.st1.itx.db.service.JcicZ055Service;
 import com.st1.itx.db.service.JcicZ056Service;
 import com.st1.itx.db.service.JcicZ060Service;
@@ -33,6 +39,7 @@ import com.st1.itx.db.service.JcicZ061Service;
 import com.st1.itx.db.service.JcicZ062Service;
 import com.st1.itx.db.service.JcicZ063Service;
 import com.st1.itx.db.service.JcicZ440Service;
+import com.st1.itx.db.service.JcicZ442Service;
 import com.st1.itx.db.service.JcicZ443Service;
 import com.st1.itx.db.service.JcicZ444Service;
 import com.st1.itx.db.service.JcicZ447Service;
@@ -60,6 +67,10 @@ import com.st1.itx.util.parse.Parse;
 public class L8R55 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ053Service iJcicZ053Service;
+	@Autowired
+	public JcicZ054Service iJcicZ054Service;
+	@Autowired
 	public JcicZ055Service iJcicZ055Service;
 	@Autowired
 	public JcicZ056Service iJcicZ056Service;
@@ -73,6 +84,8 @@ public class L8R55 extends TradeBuffer {
 	public JcicZ063Service iJcicZ063Service;
 	@Autowired
 	public JcicZ440Service iJcicZ440Service;
+	@Autowired
+	public JcicZ442Service iJcicZ442Service;
 	@Autowired
 	public JcicZ443Service iJcicZ443Service;
 	@Autowired
@@ -112,6 +125,46 @@ public class L8R55 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		String iChainCd = titaVo.getParam("RimChainCd");
 		switch(iChainCd) {
+		case "L8314":
+			JcicZ053 iJcicZ053 = new JcicZ053();
+			iJcicZ053 = iJcicZ053Service.ukeyFirst(iUkey, titaVo);
+			if (iJcicZ053 == null) {
+				throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
+			}else {
+				totaVo.putParam("L8r55SubmitKey", iJcicZ053.getSubmitKey());
+				totaVo.putParam("L8r55ApplyDate", iJcicZ053.getRcDate());
+				totaVo.putParam("L8r55BankId", "");
+				totaVo.putParam("L8r55PayDate", "");
+				totaVo.putParam("L8r55ChangePayDate", "");
+				totaVo.putParam("L8r55CaseStatus", "");
+				totaVo.putParam("L8r55ClaimDate", "");
+				totaVo.putParam("L8r55CourtCode", "");
+				totaVo.putParam("L8r55MaxMainCode", iJcicZ053.getMaxMainCode());
+				totaVo.putParam("L8r55DelayYM", "");
+				totaVo.putParam("L8r55Account", "");
+			}
+		break;
+		case "L8315":
+			JcicZ054 iJcicZ054 = new JcicZ054();
+			iJcicZ054 = iJcicZ054Service.ukeyFirst(iUkey, titaVo);
+			
+			if (iJcicZ054 == null) {
+				throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
+			}else {
+				totaVo.putParam("L8r55CustId", iJcicZ054.getCustId());
+				totaVo.putParam("L8r55SubmitKey", iJcicZ054.getSubmitKey());
+				totaVo.putParam("L8r55ApplyDate", iJcicZ054.getRcDate());
+				totaVo.putParam("L8r55BankId", "");
+				totaVo.putParam("L8r55PayDate", "");
+				totaVo.putParam("L8r55ChangePayDate", "");
+				totaVo.putParam("L8r55CaseStatus", "");
+				totaVo.putParam("L8r55ClaimDate", "");
+				totaVo.putParam("L8r55CourtCode", "");
+				totaVo.putParam("L8r55MaxMainCode", iJcicZ054.getMaxMainCode());
+				totaVo.putParam("L8r55DelayYM", "");
+				totaVo.putParam("L8r55Account", "");
+			}
+		break;
 		case "L8316":
 			JcicZ055 iJcicZ055 = new JcicZ055();
 			iJcicZ055 = iJcicZ055Service.ukeyFirst(iUkey, titaVo);
@@ -255,6 +308,27 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55ClaimDate", "");
 				totaVo.putParam("L8r55CourtCode", iJcicZ440.getCourtCode());
 				totaVo.putParam("L8r55MaxMainCode", "");
+				totaVo.putParam("L8r55DelayYM", "");
+				totaVo.putParam("L8r55Account", "");
+			}
+		break;
+		case "L8323":
+			JcicZ442 iJcicZ442 = new JcicZ442();
+			iJcicZ442 = iJcicZ442Service.ukeyFirst(iUkey, titaVo);
+			
+			if (iJcicZ442 == null) {
+				throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
+			}else {
+				totaVo.putParam("L8r55CustId", iJcicZ442.getCustId());
+				totaVo.putParam("L8r55SubmitKey", iJcicZ442.getSubmitKey());
+				totaVo.putParam("L8r55ApplyDate", iJcicZ442.getApplyDate());
+				totaVo.putParam("L8r55BankId", "");
+				totaVo.putParam("L8r55PayDate", "");
+				totaVo.putParam("L8r55ChangePayDate", "");
+				totaVo.putParam("L8r55CaseStatus", "");
+				totaVo.putParam("L8r55ClaimDate", "");
+				totaVo.putParam("L8r55CourtCode", iJcicZ442.getCourtCode());
+				totaVo.putParam("L8r55MaxMainCode", iJcicZ442.getMaxMainCode());
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
 			}

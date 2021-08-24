@@ -15,8 +15,6 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustFinService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L1907")
 @Scope("prototype")
@@ -27,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1907 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1907.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -36,14 +33,6 @@ public class L1907 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustFinService iCustFinService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -61,31 +50,31 @@ public class L1907 extends TradeBuffer {
 		// 取tita統編or戶號
 		String iCustId = titaVo.getParam("CustId").trim();
 		String iCustFullname = titaVo.getParam("CustFullname");
-		
-		if(iCustId.equals("")) {
+
+		if (iCustId.equals("")) {
 			this.info("戶名");
 			Slice<CustMain> iCustMain = null;
 			String iCustUKey = "";
 			iCustMain = iCustMainService.custNameEq(iCustFullname, this.index, this.limit, titaVo);
-			if(iCustMain==null) {
-				throw new LogicException("E0001", "客戶資料主檔無此公司名稱:"+iCustFullname); // 查無資料
+			if (iCustMain == null) {
+				throw new LogicException("E0001", "客戶資料主檔無此公司名稱:" + iCustFullname); // 查無資料
 			}
-			for(CustMain xCustMain:iCustMain) {
+			for (CustMain xCustMain : iCustMain) {
 				iCustUKey = xCustMain.getCustUKey();
 				Slice<CustFin> iCustFin = null;
 				iCustFin = iCustFinService.custUKeyEq(iCustUKey, this.index, this.limit, titaVo);
-				if(iCustFin==null) {
-					throw new LogicException("E0001", "公司戶財務狀況檔無此公司名稱:"+iCustFullname); // 查無資料
+				if (iCustFin == null) {
+					throw new LogicException("E0001", "公司戶財務狀況檔無此公司名稱:" + iCustFullname); // 查無資料
 				}
-				for (CustFin tCustFin:iCustFin) {
+				for (CustFin tCustFin : iCustFin) {
 					OccursList occursList = new OccursList();
 					occursList.putParam("OOCustId", xCustMain.getCustId());
-					occursList.putParam("OODataYear", Integer.valueOf(tCustFin.getDataYear())-1911);
+					occursList.putParam("OODataYear", Integer.valueOf(tCustFin.getDataYear()) - 1911);
 					occursList.putParam("OOATotal", tCustFin.getAssetTotal());
 					occursList.putParam("OOLTotal", tCustFin.getLiabTotal());
 					occursList.putParam("OOCap", tCustFin.getCapital());
 					occursList.putParam("OONetIncome", tCustFin.getNetIncome());
-					//配合L1107帶入歷史資料新增
+					// 配合L1107帶入歷史資料新增
 					occursList.putParam("OOCash", tCustFin.getCash());
 					occursList.putParam("OOShortInv", tCustFin.getShortInv());
 					occursList.putParam("OOAR", tCustFin.getAR());
@@ -112,29 +101,29 @@ public class L1907 extends TradeBuffer {
 					this.totaVo.addOccursList(occursList);
 				}
 			}
-		}else {
+		} else {
 			this.info("統編");
-			CustMain iCustMain  = new CustMain();
+			CustMain iCustMain = new CustMain();
 			Slice<CustFin> iCustFin = null;
 			String iCustUKey = "";
 			iCustMain = iCustMainService.custIdFirst(iCustId, titaVo);
-			if(iCustMain==null) {
-				throw new LogicException("E0001", "客戶資料主檔無此統一編號:"+iCustId); // 查無資料
+			if (iCustMain == null) {
+				throw new LogicException("E0001", "客戶資料主檔無此統一編號:" + iCustId); // 查無資料
 			}
 			iCustUKey = iCustMain.getCustUKey();
 			iCustFin = iCustFinService.custUKeyEq(iCustUKey, this.index, this.limit, titaVo);
-			if(iCustFin == null) {
-				throw new LogicException("E0001", "公司戶財務狀況檔無此統一編號:"+iCustId); // 查無資料
+			if (iCustFin == null) {
+				throw new LogicException("E0001", "公司戶財務狀況檔無此統一編號:" + iCustId); // 查無資料
 			}
-			for(CustFin tCustFin:iCustFin) {
+			for (CustFin tCustFin : iCustFin) {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOCustId", iCustId);
-				occursList.putParam("OODataYear", Integer.valueOf(tCustFin.getDataYear())-1911);
+				occursList.putParam("OODataYear", Integer.valueOf(tCustFin.getDataYear()) - 1911);
 				occursList.putParam("OOATotal", tCustFin.getAssetTotal());
 				occursList.putParam("OOLTotal", tCustFin.getLiabTotal());
 				occursList.putParam("OOCap", tCustFin.getCapital());
 				occursList.putParam("OONetIncome", tCustFin.getNetIncome());
-				//配合L1107帶入歷史資料新增
+				// 配合L1107帶入歷史資料新增
 				occursList.putParam("OOCash", tCustFin.getCash());
 				occursList.putParam("OOShortInv", tCustFin.getShortInv());
 				occursList.putParam("OOAR", tCustFin.getAR());
@@ -161,7 +150,6 @@ public class L1907 extends TradeBuffer {
 				this.totaVo.addOccursList(occursList);
 			}
 		}
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

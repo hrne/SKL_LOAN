@@ -34,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L1905")
 @Scope("prototype")
 public class L1905 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1905.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -43,12 +42,12 @@ public class L1905 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustTelNoService sCustTelNoService;
-	
+
 	@Autowired
 	public CdEmpService iCdEmpService;
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -64,7 +63,7 @@ public class L1905 extends TradeBuffer {
 		this.limit = 200; // 229 * 200 = 45800
 
 		String custId = titaVo.getParam("CustId").trim();
-		int icustNo = parse.stringToInteger(titaVo.getParam("CustNo").trim());
+		int icustNo = iParse.stringToInteger(titaVo.getParam("CustNo").trim());
 
 		CustMain tCustMain = new CustMain();
 
@@ -107,24 +106,24 @@ public class L1905 extends TradeBuffer {
 				String iLastTelNo = tCustTelNo.getLastUpdateEmpNo();
 				CdEmp iCdEmp = new CdEmp();
 				iCdEmp = iCdEmpService.findById(iLastTelNo, titaVo);
-				
+
 				occursList.putParam("OOTelTypeCode", tCustTelNo.getTelTypeCode());
 				occursList.putParam("OOTelArea", tCustTelNo.getTelArea());
 				occursList.putParam("OOTelNo", tCustTelNo.getTelNo());
 				occursList.putParam("OOTelExt", tCustTelNo.getTelExt());
 //				occursList.putParam("OOMobile", tCustTelNo.getMobile()); 因改電話格式廢除
 				occursList.putParam("OORelationCode", tCustTelNo.getRelationCode());
-				occursList.putParam("OOLiaisonName", tCustTelNo.getLiaisonName());	
-				if(iCdEmp == null) {
+				occursList.putParam("OOLiaisonName", tCustTelNo.getLiaisonName());
+				if (iCdEmp == null) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
-				}else {
+				} else {
 					occursList.putParam("OOLastUpdateEmpNoName", iCdEmp.getFullname());
 				}
 				String tU = tCustTelNo.getLastUpdate().toString();
-				String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0,10).replace("-", ""))-19110000), 7,'0');
-				uDate = uDate.substring(0,3)+"/"+uDate.substring(3, 5)+"/"+uDate.substring(5);
-				String uTime = tU.substring(11,19);
-				occursList.putParam("OOLastUpdate",uDate+" "+uTime);
+				String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+				uDate = uDate.substring(0, 3) + "/" + uDate.substring(3, 5) + "/" + uDate.substring(5);
+				String uTime = tU.substring(11, 19);
+				occursList.putParam("OOLastUpdate", uDate + " " + uTime);
 				occursList.putParam("OOLastUpdateEmpNo", iLastTelNo);
 				occursList.putParam("OOEnable", tCustTelNo.getEnable());
 				occursList.putParam("OOTelChgRsnCode", tCustTelNo.getTelChgRsnCode());

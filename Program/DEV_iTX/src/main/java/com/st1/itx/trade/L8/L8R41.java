@@ -41,6 +41,8 @@ public class L8R41 extends TradeBuffer {
             totaVo.putParam("L8r41ApplyDate", iJcicZ443.getApplyDate());// 調解申請日
             totaVo.putParam("L8r41CourtCode", iJcicZ443.getCourtCode());// 受理調解機構代號
             totaVo.putParam("L8r41IsMaxMain", iJcicZ443.getIsMaxMain());
+            totaVo.putParam("L8r41Account", iJcicZ443.getAccount());
+            totaVo.putParam("L8r41MaxMainCode", iJcicZ443.getMaxMainCode());
             totaVo.putParam("L8r41GuarantyType", iJcicZ443.getGuarantyType());
             totaVo.putParam("L8r41LoanAmt", iJcicZ443.getLoanAmt());
             totaVo.putParam("L8r41CreditAmt", iJcicZ443.getCreditAmt());
@@ -53,7 +55,7 @@ public class L8R41 extends TradeBuffer {
 		    totaVo.putParam("L8r41FinalPayDay", iJcicZ443.getFinalPayDay());
 		    totaVo.putParam("L8r41NotyetacQuit", iJcicZ443.getNotyetacQuit());
 		    totaVo.putParam("L8r41MothPayDay", iJcicZ443.getMothPayDay());
-		    totaVo.putParam("L8r41getBeginDate", iJcicZ443.getBeginDate());
+		    totaVo.putParam("L8r41BeginDate", iJcicZ443.getBeginDate());
 		    totaVo.putParam("L8r41EndDate", iJcicZ443.getEndDate());
             totaVo.putParam("L8r41OutJcicTxtDate", iJcicZ443.getOutJcicTxtDate());// 轉JCIC文字檔日期  
 		}

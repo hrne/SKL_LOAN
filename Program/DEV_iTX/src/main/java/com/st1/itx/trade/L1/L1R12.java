@@ -15,7 +15,6 @@ import com.st1.itx.db.domain.CdCity;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L1R12")
 @Scope("prototype")
@@ -26,16 +25,13 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1R12 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1R12.class);
 
 	/* DB服務注入 */
 	@Autowired
-	public CdAreaService cdAreaService;
+	public CdAreaService iCdAreaService;
 	@Autowired
-	public CdCityService cdCityService;
+	public CdCityService iCdCityService;
 
-	@Autowired
-	Parse parse;
 
 	// TITA
 	private String RimCityCode;
@@ -69,13 +65,13 @@ public class L1R12 extends TradeBuffer {
 		// 通訊地址
 		String Address = "";
 
-		CdCity cdCity = cdCityService.findById(RimCityCode);
+		CdCity cdCity = iCdCityService.findById(RimCityCode);
 		Address += cdCity.getCityItem();
 
 		CdAreaId cdAreaId = new CdAreaId();
 		cdAreaId.setCityCode(RimCityCode);
 		cdAreaId.setAreaCode(RimAreaCode);
-		CdArea cdArea = cdAreaService.findById(cdAreaId);
+		CdArea cdArea = iCdAreaService.findById(cdAreaId);
 		if (cdArea != null) {
 			Address += cdArea.getAreaItem();
 		}
@@ -105,7 +101,7 @@ public class L1R12 extends TradeBuffer {
 			Address += "-" + RimFloorDash;
 		}
 		this.totaVo.putParam("L1r12Address", Address);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -1,0 +1,11 @@
+OOTranKey=X,1
+OOExpBalanceAmt=9,9
+OOCashBalanceAmt=9,9
+OOCreditBalanceAmt=9,9
+OOMaxMainNote=X,1
+OOIsGuarantor=X,1
+OOIsChangePayment=X,1
+OOOutJcicTxtDate=9,7
+OOLastUpdate=X,30
+OOLastUpdateEmpNo=X,6
+OOLastUpdateEmpNoName=X,50

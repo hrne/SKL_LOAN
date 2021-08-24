@@ -100,6 +100,7 @@ public class L5952 extends TradeBuffer {
 				String OOUnitDept = lData[16];// 區域中心名稱
 				String OOIntroducerName = lData[17];// 姓名
 				String OOIntroducer = lData[18];// 員編
+				String renewFlag = lData[19];// 展期/借新還舊;		
 				OccursList occursList1 = new OccursList();
 				occursList1.putParam("OOBsDeptX", OOBsDeptX);// 部室名
 				occursList1.putParam("OOBsOfficerName", OOBsOfficerName);// 房貸專員名稱
@@ -120,6 +121,8 @@ public class L5952 extends TradeBuffer {
 				occursList1.putParam("OOUnitDept", OOUnitDept);// 區域中心名稱
 				occursList1.putParam("OOIntroducerName", OOIntroducerName);// 姓名
 				occursList1.putParam("OOIntroducer", OOIntroducer);// 員編
+				String OOReMark =  "1".equals(renewFlag) ? "展期" : ("2".equals(renewFlag) ? "借新還舊" : "");;
+				occursList1.putParam("OOReMark", OOReMark);// 備註
 				this.totaVo.addOccursList(occursList1);
 			}
 		}

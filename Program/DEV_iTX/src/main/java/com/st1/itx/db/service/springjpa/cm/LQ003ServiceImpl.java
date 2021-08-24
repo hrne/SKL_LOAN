@@ -34,7 +34,7 @@ public class LQ003ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo, int Q) throws Exception {
 		this.info("lQ003.findAll ");
- 
+
 //		// 當西元年月
 //		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000).substring(0, 6);
 //		// 前一西元年
@@ -118,7 +118,7 @@ public class LQ003ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("type:" + Q + "-" + resYm);
 
-		String sql = "SELECT M.\"CityCode\" AS F0";
+		String sql = "SELECT CC.\"CityItem\" AS F0";
 		sql += "			,CC.\"CityCode\" AS F1";
 		sql += "            ,ROUND(SUM(M.\"PrinBalance\") / 1000000,8) AS F2"; // 總額
 
@@ -135,31 +135,33 @@ public class LQ003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						   THEN M.\"PrinBalance\"";
 		sql += "						 ELSE 0 END";
 		sql += "					  ) / 1000000,8) AS F3";// 逾放
+		if (Q == 0) {
 
-		sql += "            ,ROUND(SUM(";
-		sql += "					 CASE";
-		sql += "					   WHEN M.\"AcctCode\" = 990 ";
-		sql += "						   THEN M.\"PrinBalance\"";
-		sql += "						 ELSE 0 END";
-		sql += "					  ) / 1000000,8) AS F4";// 催收
+			sql += "            ,ROUND(SUM(";
+			sql += "					 CASE";
+			sql += "					   WHEN M.\"AcctCode\" = 990 ";
+			sql += "						   THEN M.\"PrinBalance\"";
+			sql += "						 ELSE 0 END";
+			sql += "					  ) / 1000000,8) AS F4";// 催收
 
-		sql += "            ,ROUND(SUM(";
-		sql += "					 CASE";
-		sql += "					   WHEN M.\"AcctCode\" = 990 ";
-		sql += "						   THEN M.\"Cnt\"";
-		sql += "						 ELSE 0 END";
-		sql += "					  ) / 1000000,8) + ";
-		sql += "             ROUND(SUM(";
-		sql += "					 CASE";
-		sql += "					   WHEN M.\"AcctCode\" <> 990 ";
-		sql += "						AND M.\"OvduTerm\" >= 3 ";
-		sql += "						   THEN M.\"Cnt\"";
-		sql += "						 ELSE 0 END";
-		sql += "					  ) / 1000000,0) AS F5";// 逾放件數
+			sql += "            ,ROUND(SUM(";
+			sql += "					 CASE";
+			sql += "					   WHEN M.\"AcctCode\" = 990 ";
+			sql += "						   THEN M.\"Cnt\"";
+			sql += "						 ELSE 0 END";
+			sql += "					  ) / 1000000,8) + ";
+			sql += "             ROUND(SUM(";
+			sql += "					 CASE";
+			sql += "					   WHEN M.\"AcctCode\" <> 990 ";
+			sql += "						AND M.\"OvduTerm\" >= 3 ";
+			sql += "						   THEN M.\"Cnt\"";
+			sql += "						 ELSE 0 END";
+			sql += "					  ) / 1000000,0) AS F5";// 逾放件數
+		}
 		sql += "      FROM (SELECT M.\"AcctCode\"";
 		sql += "				  ,M.\"OvduTerm\"";
 		sql += "				  ,DECODE(M.\"EntCode\", '1', 1, 0) AS \"EntCode\"";
-		sql += "                  ,TO_NUMBER(NVL(M.\"CityCode\", 0)) AS \"CityCode\"";
+		sql += "                  ,LPAD(M.\"CityCode\",1,0) AS \"CityCode\"";
 		sql += "                  ,1 AS \"Cnt\"";
 		sql += "                  ,M.\"PrinBalance\"";
 		sql += "            FROM \"MonthlyFacBal\" M";
@@ -168,9 +170,9 @@ public class LQ003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            LEFT JOIN \"CdCity\" CC ON CC.\"CityCode\" = M.\"CityCode\"";
 		sql += "            WHERE M.\"EntCode\" = 0 ";
 		sql += "              AND M.\"CityCode\" <> 0 ";
-		sql += "      GROUP BY M.\"CityCode\"";
+		sql += "      GROUP BY CC.\"CityItem\"";
 		sql += "			  ,CC.\"CityCode\"";
-		sql += "      ORDER BY M.\"CityCode\"";
+		sql += "      ORDER BY CC.\"CityItem\"";
 
 		this.info("sql=" + sql);
 

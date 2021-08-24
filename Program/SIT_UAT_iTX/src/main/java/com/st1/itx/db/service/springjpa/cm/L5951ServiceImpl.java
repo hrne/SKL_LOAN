@@ -64,6 +64,7 @@ public class L5951ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5951 += ",I.\"PerfAmt\" AS \"業績金額\" ";
 		sqlL5951 += ",I.\"WorkMonth\" AS \"工作月\" ";
 		sqlL5951 += ",I.\"PerfDate\" AS \"業績日期\" ";
+		sqlL5951 += ",L.\"RenewFlag\" AS \"展期/借新還舊\" ";		
 		sqlL5951 += "FROM ( SELECT ";
 		sqlL5951 += " \"CustNo\" ";
 		sqlL5951 += ",\"FacmNo\" ";
@@ -122,12 +123,11 @@ public class L5951ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5951 += ",\"FacmNo\" ";
 		sqlL5951 += ",\"WorkMonth\" ";
 		sqlL5951 += " ) B ";
-		sqlL5951 += "ON I.\"CustNo\" = B.\"CustNo\" ";
-		sqlL5951 += "AND I.\"FacmNo\" = B.\"FacmNo\" ";
-		sqlL5951 += "AND I.\"WorkMonth\" = B.\"WorkMonth\" ";
+		sqlL5951 += "ON B.\"CustNo\" = I.\"CustNo\" ";
+		sqlL5951 += "AND B.\"FacmNo\" = I.\"FacmNo\" ";
+		sqlL5951 += "AND B.\"WorkMonth\" = I.\"WorkMonth\" ";
 		sqlL5951 += "LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = I.\"CustNo\" ";
 		sqlL5951 += "LEFT JOIN \"CdEmp\" EBS ON EBS.\"EmployeeNo\" = B.\"BsOfficer\" ";
-
 		sqlL5951 += "LEFT JOIN \"PfBsOfficer\" BSOF ";
 		sqlL5951 += "ON BSOF.\"WorkMonth\"=B.\"WorkMonth\" AND BSOF.\"EmpNo\"=B.\"BsOfficer\" ";
 		sqlL5951 += "LEFT JOIN \"CdEmp\" EI ON EI.\"EmployeeNo\" = I.\"Introducer\" ";
@@ -138,6 +138,11 @@ public class L5951ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL5951 += "LEFT JOIN \"CdEmp\" DeptE ON DeptE.\"EmployeeNo\" = I.\"DeptManager\" ";
 		sqlL5951 += "LEFT JOIN \"CdEmp\" DistE ON DistE.\"EmployeeNo\" = I.\"DistManager\" ";
 		sqlL5951 += "LEFT JOIN \"CdEmp\" UnitE ON UnitE.\"EmployeeNo\" = I.\"UnitManager\" ";
+		sqlL5951 += "LEFT JOIN \"LoanBorMain\" L ";
+		sqlL5951 += "ON I.\"PerfDate\" <>  I.\"DrawdownDate\" ";
+		sqlL5951 += "AND L.\"CustNo\" = I.\"CustNo\" ";
+		sqlL5951 += "AND L.\"FacmNo\" = I.\"FacmNo\" ";
+		sqlL5951 += "AND L.\"BormNo\" = I.\"BormNo\" ";
 
 		sqlL5951 += "ORDER BY I.\"Introducer\",I.\"CustNo\",I.\"FacmNo\",I.\"BormNo\" ";
 

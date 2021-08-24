@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.FacProdAcctFee;
 import com.st1.itx.db.domain.FacProdBreach;
 import com.st1.itx.db.domain.FacProdPremium;
 import com.st1.itx.db.domain.FacProdStepRate;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdAcctFeeService;
 import com.st1.itx.db.service.FacProdBreachService;
 import com.st1.itx.db.service.FacProdPremiumService;
@@ -37,11 +39,12 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R01")
 @Scope("prototype")
 public class L2R01 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R01.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public FacProdService facProdService;
+	@Autowired
+	public FacMainService facMainService;
 	@Autowired
 	public FacProdStepRateService facProdStepRateService;
 	@Autowired
@@ -67,6 +70,7 @@ public class L2R01 extends TradeBuffer {
 	private String wkBreachD = "";
 	private String wkBreachE = "";
 	private String wkBreachF = "";
+	private String wkUseProdFg = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -91,6 +95,7 @@ public class L2R01 extends TradeBuffer {
 		SetTotaPremium();
 		SetTotaAcctFee();
 		SetTotaBreach();
+		wkUseProdFg = "";
 		// 查詢商品參數檔
 		tFacProd = facProdService.findById(iRimProdNo, titaVo);
 		/* 如有有找到資料 */
@@ -168,6 +173,8 @@ public class L2R01 extends TradeBuffer {
 			SetTotaFacProd();
 		} else {
 			if (iRimTxCode.equals("L2101") && (iRimFuncCode == 1 || iRimFuncCode == 3)) {
+
+				this.totaVo.putParam("OUseProdFg", wkUseProdFg);
 				this.addList(this.totaVo);
 				return this.sendList();
 			} else {
@@ -220,6 +227,13 @@ public class L2R01 extends TradeBuffer {
 		if (!(lFacProdAcctFee == null || lFacProdAcctFee.isEmpty())) {
 //			SetTotaBreach();
 		}
+
+		FacMain tFacMain = facMainService.findProdNoFirst(iRimProdNo, titaVo);
+		if (!(tFacMain == null)) {
+			wkUseProdFg = "Y";
+		}
+		this.totaVo.putParam("OUseProdFg", wkUseProdFg);
+
 		this.info("totaVo = " + this.totaVo);
 
 		this.addList(this.totaVo);

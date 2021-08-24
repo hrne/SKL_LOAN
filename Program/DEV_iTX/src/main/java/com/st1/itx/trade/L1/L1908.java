@@ -23,7 +23,6 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustNoticeService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L1908")
@@ -53,13 +52,9 @@ public class L1908 extends TradeBuffer {
 	@Autowired
 	public CdEmpService iCdEmpService;
 
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -75,10 +70,10 @@ public class L1908 extends TradeBuffer {
 		this.limit = 300; // 25 * 500 = 12500
 
 		// 取tita戶號
-		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iCustNo = iParse.stringToInteger(titaVo.getParam("CustNo"));
 
 		// FacmNo額度編號
-		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		int iFacmNo = iParse.stringToInteger(titaVo.getParam("FacmNo"));
 
 		String iCustId = titaVo.getParam("CustId");
 

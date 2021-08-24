@@ -363,6 +363,25 @@ em = null;
   }
 
   @Override
+  public FacMain findProdNoFirst(String prodNo_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findProdNoFirst " + dbName + " : " + "prodNo_0 : " + prodNo_0);
+    Optional<FacMain> facMainT = null;
+    if (dbName.equals(ContentName.onDay))
+      facMainT = facMainReposDay.findTopByProdNoIsOrderByCustNoAscFacmNoAsc(prodNo_0);
+    else if (dbName.equals(ContentName.onMon))
+      facMainT = facMainReposMon.findTopByProdNoIsOrderByCustNoAscFacmNoAsc(prodNo_0);
+    else if (dbName.equals(ContentName.onHist))
+      facMainT = facMainReposHist.findTopByProdNoIsOrderByCustNoAscFacmNoAsc(prodNo_0);
+    else 
+      facMainT = facMainRepos.findTopByProdNoIsOrderByCustNoAscFacmNoAsc(prodNo_0);
+
+    return facMainT.isPresent() ? facMainT.get() : null;
+  }
+
+  @Override
   public FacMain holdById(FacMainId facMainId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

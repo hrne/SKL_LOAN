@@ -156,7 +156,7 @@ SWITCH(#TranCode,
     042,T(3,L),
     043,T(3,O),
     044,T(3,L),
-    045,T(3,M),
+    45,T(3,M),
     046,T(3,N),
     47,T(3,L),
     048,T(3,L),
@@ -165,7 +165,7 @@ SWITCH(#TranCode,
     51,T(3,E),
     52,T(3,L),
     53,T(3,M),
-    54,T(3,M),
+    054,T(3,M),
     055,T(3,2),
     056,T(3,2),
     060,T(3,P),
@@ -603,14 +603,14 @@ TXFORM=L8030
 {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
 #OOBTN6=歷程
 {width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
-! #OOCustId=身分證字號
-! {width:100,align:'center',hidden:false}
-! #OORcDate=協商申請日
-! {width:100,align:'center',hidden:false}
-! #OOSubmitKey_Combine=報送單位代號
-! {width:120,align:'center',hidden:false}
-! #OOMaxMainCode=最大債權金融機構代號
-! {width:200,align:'center',hidden:false}
+#OOCustId=身分證字號
+{width:100,align:'center',hidden:false}
+#OORcDate=協商申請日
+{width:100,align:'center',hidden:false}
+#OOSubmitKey_Combine=報送單位代號
+{width:120,align:'center',hidden:false}
+#OOMaxMainCode=最大債權金融機構代號
+{width:200,align:'center',hidden:false}
 ^
 #RPTFG=N,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -765,9 +765,9 @@ TXFORM=L8030
 #OOCustId=身分證字號
 {width:100,align:'center',hidden:false}
 #OORcDate=調解申請日
-{width:180,align:'center',hidden:false}
-#OOSubmitKey_Combine=報送單位代號
 {width:120,align:'center',hidden:false}
+#OOSubmitKey_Combine=報送單位代號
+{width:180,align:'center',hidden:false}
 #OOCourtCode=受理調解機構代號
 {width:200,align:'center',hidden:false}
 #OOMaxMainCode=最大債權金融機構代號

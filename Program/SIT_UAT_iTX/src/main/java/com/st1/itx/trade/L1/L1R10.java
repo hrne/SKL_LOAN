@@ -2,8 +2,6 @@ package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1R10 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1R10.class);
 	/* DB服務注入 */
 	@Autowired
 	public CdCityService sCdCityService;
@@ -39,7 +36,7 @@ public class L1R10 extends TradeBuffer {
 
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -54,8 +51,8 @@ public class L1R10 extends TradeBuffer {
 		CdArea tCdArea = new CdArea();
 
 //		取得輸入資料
-		int iZip3 = parse.stringToInteger(titaVo.getParam("RimZip3"));
-		int iZip2 = parse.stringToInteger(titaVo.getParam("RimZip2"));
+		int iZip3 = iParse.stringToInteger(titaVo.getParam("RimZip3"));
+		int iZip2 = iParse.stringToInteger(titaVo.getParam("RimZip2"));
 		String iCityCode = titaVo.getParam("RimCityCode");
 		String iAreaCode = titaVo.getParam("RimAreaCode");
 
@@ -72,11 +69,11 @@ public class L1R10 extends TradeBuffer {
 				tCdArea = new CdArea();
 
 			}
-			Zip3 = parse.stringToInteger(tCdArea.getZip3());
+			Zip3 = iParse.stringToInteger(tCdArea.getZip3());
 
 		} else if (iZip3 > 0) {
 			this.info("輸入郵遞區號代碼");
-			tCdArea = sCdAreaService.Zip3First(parse.IntegerToString(iZip3, 3), titaVo);
+			tCdArea = sCdAreaService.Zip3First(iParse.IntegerToString(iZip3, 3), titaVo);
 			if (tCdArea == null) {
 				tCdArea = new CdArea();
 			}

@@ -41,11 +41,11 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[400,100,350,150];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8324]                                 (443)前置調解回報有擔保債權金額資料"],
-["#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 ["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
-["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
-["#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
+[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+[#<->#,"#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
 ["#FdAccount+帳號",#Account],["#FdGuarantyType+擔保品類別",#GuarantyType,#GuarantyTypeX],
 ["#FdLoanAmt+原借款金額",#LoanAmt],["#FdCreditAmt+授信餘額",#CreditAmt],
 ["#FdPrincipal+本金",#Principal],["#FdInterest+利息",#Interest],
@@ -54,7 +54,7 @@ E(0,0)
 ["#FdFinalPayDay+最後繳息日",#FinalPayDay],["#FdNotyetacQuit+已到期尚未清償金額",#NotyetacQuit],
 ["#FdMothPayDay+每月應還款日",#MothPayDay],
 ["#FdBeginDate+契約起始年月",#BeginDate],["#FdEndDate+契約截止年月",#EndDate],
-["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
 #FdTranKey=X,2,L
@@ -273,6 +273,8 @@ T(H,#TranKey,#TranKeyHelp)
 
 !調解申請日
 #ApplyDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)
@@ -291,6 +293,10 @@ R(1,L8R01)
 T(2,@CourtCodeX,#L8r01JcicBankName)
 
 #CourtCodeX=X,80,L
+T(2,@RimJcicBankCode,#CourtCode)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
@@ -304,21 +310,32 @@ R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 #MaxMainCodeX=X,80,L
+T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 
 !是否為最大債權金融機構報送
 #IsMaxMain=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
 !帳號
 #Account=X,50,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 @V(7)
 V(8,0,50)
 
 
 !擔保品類別
 #GuarantyType=X,2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp,cols:6)
 @V(H,#TranKeyHelp)
 !看書
@@ -327,21 +344,33 @@ T(H,#GuarantyType,#TranKeyHelp)
 
 !原借款金額
 #LoanAmt=m,12,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 !本金
 #Principal=m,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 !利息
 #Interest=m,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 !違約金
 #Penalty=m,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 !其他費用
 #Other=m,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 !授信餘額
 #CreditAmt=m,12,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 #Total=m,14,S
 @E(0,#Principal+#Interest+#Penalty+#Other)
 IF(#CreditAmt!=#Total,$,S)
@@ -349,21 +378,31 @@ V(P,授信餘額合計有誤，請重新輸入。〔本金＋利息＋違約金�
 
 !每期應付金額
 #TerminalPayAmt=m,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 !最近一期繳款金額
 #LatestPayAmt=m,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 
 !最後繳息日
 #FinalPayDay=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 D(8)
 @A(DATE,0,#FinalPayDay)
 
 !已到期尚未清償金額
 #NotyetacQuit=m,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 !每月應還款日
 #MothPayDay=A,2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 #ChekcMothPayDay=X,1,S
 IF(#MothPayDay>=1 && #MothPayDay<=31,S,$)
@@ -371,6 +410,8 @@ V(P,每月應還款日輸入有誤)
 
 !契約起始年月
 #BeginDate=X,5,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 @V(7)
 
 #CheckBeginDate=D,7,S
@@ -379,6 +420,8 @@ T(2,#BeginDate+01)
 
 !契約截止年月
 #EndDate=X,5,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 @V(7)
 
 #CheckEndDate=D,7,S

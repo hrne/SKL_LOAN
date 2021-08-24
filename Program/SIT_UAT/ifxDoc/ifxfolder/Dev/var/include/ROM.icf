@@ -1540,7 +1540,7 @@ TXFORM=CWAMX
 #L2r01RepayFreq=A,2,S
 #L2r01GracePeriod=A,3,S
 #L2r01BreachFlag=X,1,S
-#L2r01BreachCode=A,3,S
+#L2r01BreachCode=X,3,S
 #L2r01BreachGetCode=X,1,S
 #L2r01ProhibitMonth=A,3,S
 #L2r01GovOfferFlag=X,1,S
@@ -1566,6 +1566,7 @@ TXFORM=CWAMX
 #L2r01AcctFeeLoanAmt{n}=m,14.2,S
 #L2r01AcctFeeAcctFee{n}=m,14.2,S
 ##end
+#L2r01UseProdFg=X,1,S
 </L2R01.dec>
 
 <L2R01.tom>
@@ -1627,6 +1628,7 @@ TXFORM=L2R01
 #L2r01AcctFeeLoanAmt{n}
 #L2r01AcctFeeAcctFee{n}
 ##end
+#L2r01UseProdFg
 ^
 </L2R01.tom>
 
@@ -4452,6 +4454,17 @@ TXFORM=L1R17
 #L1R17AreaItem
 ^
 </L1R17.tom>
+
+<L1R18.dec>
+#L1R18CustName=X,100,S
+</L1R18.dec>
+
+<L1R18.tom>
+TXFORM=L1R18
+#L1R18CustName
+^
+</L1R18.tom>
+
 
 
 --------------------------------------------------------------

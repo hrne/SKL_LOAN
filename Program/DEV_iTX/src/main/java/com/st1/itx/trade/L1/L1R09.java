@@ -12,7 +12,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L1R09")
@@ -24,19 +23,14 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1R09 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1R09.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService sCustMainService;
 
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -45,9 +39,9 @@ public class L1R09 extends TradeBuffer {
 
 		// tita
 		String iCustId = titaVo.getParam("RimCustId");
-		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
+		int iCustNo = iParse.stringToInteger(titaVo.getParam("RimCustNo"));
 		// 功能
-		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
+		int iFunCd = iParse.stringToInteger(titaVo.getParam("RimFunCd"));
 		// new table
 		CustMain tCustMain = new CustMain();
 		if (iCustNo > 0) {

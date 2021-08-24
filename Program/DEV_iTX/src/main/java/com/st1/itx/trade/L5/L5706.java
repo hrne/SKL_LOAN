@@ -1,6 +1,6 @@
 package com.st1.itx.trade.L5;
 
-import java.io.BufferedReader;
+
 
 //import static java.util.Collections.sort;
 
@@ -37,7 +37,6 @@ import com.st1.itx.db.service.NegMainService;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.util.parse.Parse;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.JcicAtomDetail;
@@ -109,7 +108,7 @@ public class L5706 extends TradeBuffer {
 	public Parse parse;
 
 	@Autowired
-	public FileCom filecom;
+	public FileCom FileCom;
 
 	@Autowired
 	public DataLog dataLog;
@@ -164,27 +163,32 @@ public class L5706 extends TradeBuffer {
 		}
 		
 		if (file.exists()) {
-			BufferedReader br =null;
-			
+			ArrayList<String> lBr = new ArrayList<>();
+			// 編碼參數，設定為UTF-8 || big5
+			try {
+				lBr = FileCom.intputTxt(FilePath, "big5");
+			} catch (IOException e) {
+				this.info("L5706(" + FilePath + ") : " + e.getMessage());
+				throw new LogicException(titaVo, "E5006", "檔案讀取發生問題");
+			}
 			
 			
 			try {
-				FileReader fr = new FileReader(file);
-				br = new BufferedReader(fr);
 				
 				long fileLength = file.length();
 				LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file));
     			lineNumberReader.skip(fileLength);
     	        int CountRow = lineNumberReader.getLineNumber();
     	        lineNumberReader.close();
-				int numLine = 0;
+				
 
-				while (br.ready()) {
-					String ThisLine = br.readLine();
+
+					for(int i=0; i<CountRow; i++) {
+					String ThisLine = lBr.get(i);
 					this.info("ThisLine == [" + ThisLine + "]");
-					numLine++;
+					
 					// 資料檢核
-					if (numLine == 1) {
+					if (i == 0) {
 						if (ThisLine.indexOf("JCIC-INQ-BARE-V01-458") != 0) {
 							// E5009 資料檢核錯誤
 							if (errorMsg == 1) {
@@ -195,7 +199,7 @@ public class L5706 extends TradeBuffer {
 					}
 
 					// 結尾須把最後一個客戶分攤檔資料寫入
-					if(CountRow==numLine) {
+					if(i == CountRow-1) {
 						if (ThisLine.length() > 4 && ("TRLR").equals(ThisLine.substring(0, 4))) {
 							doUpdate(titaVo);
 						} else {
@@ -265,13 +269,9 @@ public class L5706 extends TradeBuffer {
 					}
 					
 				}
-				fr.close();
-				
 			} catch (IOException e) {
 				throw new LogicException(titaVo, "EC001", e.getMessage());
-			} finally {
-				SafeClose.close(br);
-			}
+			} 
 			
 			
 		} else {

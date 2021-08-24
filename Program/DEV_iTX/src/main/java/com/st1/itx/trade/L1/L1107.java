@@ -17,7 +17,6 @@ import com.st1.itx.db.service.CustFinService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -63,7 +62,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1107 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1107.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -73,16 +71,12 @@ public class L1107 extends TradeBuffer {
 	@Autowired
 	public CustFinService sCustFinService;
 
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -106,7 +100,7 @@ public class L1107 extends TradeBuffer {
 
 		String DataYear = titaVo.getParam("DataYear");
 		// 年度
-		int datayear = parse.stringToInteger(DataYear) + 1911;
+		int datayear = iParse.stringToInteger(DataYear) + 1911;
 		this.info(" L1107 datayear" + datayear);
 
 		// new table
@@ -123,36 +117,36 @@ public class L1107 extends TradeBuffer {
 			// tita值塞進Table
 			tCustFin.setCustUKey(custUKey);
 			tCustFin.setDataYear(datayear);
-			tCustFin.setAssetTotal(parse.stringToBigDecimal(titaVo.getParam("ATotal")));
-			tCustFin.setCash(parse.stringToBigDecimal(titaVo.getParam("Cash")));
-			tCustFin.setShortInv(parse.stringToBigDecimal(titaVo.getParam("ShortTerm")));
-			tCustFin.setAR(parse.stringToBigDecimal(titaVo.getParam("AR")));
-			tCustFin.setInventory(parse.stringToBigDecimal(titaVo.getParam("Inventory")));
-			tCustFin.setLongInv(parse.stringToBigDecimal(titaVo.getParam("LongInv")));
-			tCustFin.setFixedAsset(parse.stringToBigDecimal(titaVo.getParam("FixedAsset")));
-			tCustFin.setOtherAsset(parse.stringToBigDecimal(titaVo.getParam("OtherAsset")));
-			tCustFin.setLiabTotal(parse.stringToBigDecimal(titaVo.getParam("LiabTotal")));
-			tCustFin.setBankLoan(parse.stringToBigDecimal(titaVo.getParam("BankLoan")));
-			tCustFin.setOtherCurrLiab(parse.stringToBigDecimal(titaVo.getParam("OtherCurrLiab")));
-			tCustFin.setLongLiab(parse.stringToBigDecimal(titaVo.getParam("LongLiab")));
-			tCustFin.setOtherLiab(parse.stringToBigDecimal(titaVo.getParam("OtherLiab")));
-			tCustFin.setNetWorthTotal(parse.stringToBigDecimal(titaVo.getParam("NetWorthTotal")));
-			tCustFin.setCapital(parse.stringToBigDecimal(titaVo.getParam("Capital")));
-			tCustFin.setRetainEarning(parse.stringToBigDecimal(titaVo.getParam("RetainEarning")));
-			tCustFin.setOpIncome(parse.stringToBigDecimal(titaVo.getParam("OpIncome")));
-			tCustFin.setOpCost(parse.stringToBigDecimal(titaVo.getParam("OpCost")));
-			tCustFin.setOpProfit(parse.stringToBigDecimal(titaVo.getParam("OpProfit")));
-			tCustFin.setOpExpense(parse.stringToBigDecimal(titaVo.getParam("OpExpense")));
-			tCustFin.setOpRevenue(parse.stringToBigDecimal(titaVo.getParam("OpRevenue")));
-			tCustFin.setNopIncome(parse.stringToBigDecimal(titaVo.getParam("NopIncome")));
-			tCustFin.setFinExpense(parse.stringToBigDecimal(titaVo.getParam("FinExpense")));
-			tCustFin.setNopExpense(parse.stringToBigDecimal(titaVo.getParam("NopExpense")));
-			tCustFin.setNetIncome(parse.stringToBigDecimal(titaVo.getParam("NetIncome")));
+			tCustFin.setAssetTotal(iParse.stringToBigDecimal(titaVo.getParam("ATotal")));
+			tCustFin.setCash(iParse.stringToBigDecimal(titaVo.getParam("Cash")));
+			tCustFin.setShortInv(iParse.stringToBigDecimal(titaVo.getParam("ShortTerm")));
+			tCustFin.setAR(iParse.stringToBigDecimal(titaVo.getParam("AR")));
+			tCustFin.setInventory(iParse.stringToBigDecimal(titaVo.getParam("Inventory")));
+			tCustFin.setLongInv(iParse.stringToBigDecimal(titaVo.getParam("LongInv")));
+			tCustFin.setFixedAsset(iParse.stringToBigDecimal(titaVo.getParam("FixedAsset")));
+			tCustFin.setOtherAsset(iParse.stringToBigDecimal(titaVo.getParam("OtherAsset")));
+			tCustFin.setLiabTotal(iParse.stringToBigDecimal(titaVo.getParam("LiabTotal")));
+			tCustFin.setBankLoan(iParse.stringToBigDecimal(titaVo.getParam("BankLoan")));
+			tCustFin.setOtherCurrLiab(iParse.stringToBigDecimal(titaVo.getParam("OtherCurrLiab")));
+			tCustFin.setLongLiab(iParse.stringToBigDecimal(titaVo.getParam("LongLiab")));
+			tCustFin.setOtherLiab(iParse.stringToBigDecimal(titaVo.getParam("OtherLiab")));
+			tCustFin.setNetWorthTotal(iParse.stringToBigDecimal(titaVo.getParam("NetWorthTotal")));
+			tCustFin.setCapital(iParse.stringToBigDecimal(titaVo.getParam("Capital")));
+			tCustFin.setRetainEarning(iParse.stringToBigDecimal(titaVo.getParam("RetainEarning")));
+			tCustFin.setOpIncome(iParse.stringToBigDecimal(titaVo.getParam("OpIncome")));
+			tCustFin.setOpCost(iParse.stringToBigDecimal(titaVo.getParam("OpCost")));
+			tCustFin.setOpProfit(iParse.stringToBigDecimal(titaVo.getParam("OpProfit")));
+			tCustFin.setOpExpense(iParse.stringToBigDecimal(titaVo.getParam("OpExpense")));
+			tCustFin.setOpRevenue(iParse.stringToBigDecimal(titaVo.getParam("OpRevenue")));
+			tCustFin.setNopIncome(iParse.stringToBigDecimal(titaVo.getParam("NopIncome")));
+			tCustFin.setFinExpense(iParse.stringToBigDecimal(titaVo.getParam("FinExpense")));
+			tCustFin.setNopExpense(iParse.stringToBigDecimal(titaVo.getParam("NopExpense")));
+			tCustFin.setNetIncome(iParse.stringToBigDecimal(titaVo.getParam("NetIncome")));
 			tCustFin.setAccountant(titaVo.getParam("Accountant"));
-			tCustFin.setAccountDate(parse.stringToInteger(titaVo.getParam("AccountDate")));
+			tCustFin.setAccountDate(iParse.stringToInteger(titaVo.getParam("AccountDate")));
 
 			try {
-				sCustFinService.insert(tCustFin,titaVo);
+				sCustFinService.insert(tCustFin, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "公司戶財務狀況檔");
 			}
@@ -167,48 +161,48 @@ public class L1107 extends TradeBuffer {
 			}
 
 			// 變更前
-			CustFin beforeCustFin = (CustFin) dataLog.clone(tCustFin);
+			CustFin beforeCustFin = (CustFin) iDataLog.clone(tCustFin);
 
 			this.info(" L1107 beforeCustFin.toString() " + beforeCustFin.toString());
 
 			// tita值塞進Table
-			tCustFin.setAssetTotal(parse.stringToBigDecimal(titaVo.getParam("ATotal")));
-			tCustFin.setCash(parse.stringToBigDecimal(titaVo.getParam("Cash")));
-			tCustFin.setShortInv(parse.stringToBigDecimal(titaVo.getParam("ShortTerm")));
-			tCustFin.setAR(parse.stringToBigDecimal(titaVo.getParam("AR")));
-			tCustFin.setInventory(parse.stringToBigDecimal(titaVo.getParam("Inventory")));
-			tCustFin.setLongInv(parse.stringToBigDecimal(titaVo.getParam("LongInv")));
-			tCustFin.setFixedAsset(parse.stringToBigDecimal(titaVo.getParam("FixedAsset")));
-			tCustFin.setOtherAsset(parse.stringToBigDecimal(titaVo.getParam("OtherAsset")));
-			tCustFin.setLiabTotal(parse.stringToBigDecimal(titaVo.getParam("LiabTotal")));
-			tCustFin.setBankLoan(parse.stringToBigDecimal(titaVo.getParam("BankLoan")));
-			tCustFin.setOtherCurrLiab(parse.stringToBigDecimal(titaVo.getParam("OtherCurrLiab")));
-			tCustFin.setLongLiab(parse.stringToBigDecimal(titaVo.getParam("LongLiab")));
-			tCustFin.setOtherLiab(parse.stringToBigDecimal(titaVo.getParam("OtherLiab")));
-			tCustFin.setNetWorthTotal(parse.stringToBigDecimal(titaVo.getParam("NetWorthTotal")));
-			tCustFin.setCapital(parse.stringToBigDecimal(titaVo.getParam("Capital")));
-			tCustFin.setRetainEarning(parse.stringToBigDecimal(titaVo.getParam("RetainEarning")));
-			tCustFin.setOpIncome(parse.stringToBigDecimal(titaVo.getParam("OpIncome")));
-			tCustFin.setOpCost(parse.stringToBigDecimal(titaVo.getParam("OpCost")));
-			tCustFin.setOpProfit(parse.stringToBigDecimal(titaVo.getParam("OpProfit")));
-			tCustFin.setOpExpense(parse.stringToBigDecimal(titaVo.getParam("OpExpense")));
-			tCustFin.setOpRevenue(parse.stringToBigDecimal(titaVo.getParam("OpRevenue")));
-			tCustFin.setNopIncome(parse.stringToBigDecimal(titaVo.getParam("NopIncome")));
-			tCustFin.setFinExpense(parse.stringToBigDecimal(titaVo.getParam("FinExpense")));
-			tCustFin.setNopExpense(parse.stringToBigDecimal(titaVo.getParam("NopExpense")));
-			tCustFin.setNetIncome(parse.stringToBigDecimal(titaVo.getParam("NetIncome")));
+			tCustFin.setAssetTotal(iParse.stringToBigDecimal(titaVo.getParam("ATotal")));
+			tCustFin.setCash(iParse.stringToBigDecimal(titaVo.getParam("Cash")));
+			tCustFin.setShortInv(iParse.stringToBigDecimal(titaVo.getParam("ShortTerm")));
+			tCustFin.setAR(iParse.stringToBigDecimal(titaVo.getParam("AR")));
+			tCustFin.setInventory(iParse.stringToBigDecimal(titaVo.getParam("Inventory")));
+			tCustFin.setLongInv(iParse.stringToBigDecimal(titaVo.getParam("LongInv")));
+			tCustFin.setFixedAsset(iParse.stringToBigDecimal(titaVo.getParam("FixedAsset")));
+			tCustFin.setOtherAsset(iParse.stringToBigDecimal(titaVo.getParam("OtherAsset")));
+			tCustFin.setLiabTotal(iParse.stringToBigDecimal(titaVo.getParam("LiabTotal")));
+			tCustFin.setBankLoan(iParse.stringToBigDecimal(titaVo.getParam("BankLoan")));
+			tCustFin.setOtherCurrLiab(iParse.stringToBigDecimal(titaVo.getParam("OtherCurrLiab")));
+			tCustFin.setLongLiab(iParse.stringToBigDecimal(titaVo.getParam("LongLiab")));
+			tCustFin.setOtherLiab(iParse.stringToBigDecimal(titaVo.getParam("OtherLiab")));
+			tCustFin.setNetWorthTotal(iParse.stringToBigDecimal(titaVo.getParam("NetWorthTotal")));
+			tCustFin.setCapital(iParse.stringToBigDecimal(titaVo.getParam("Capital")));
+			tCustFin.setRetainEarning(iParse.stringToBigDecimal(titaVo.getParam("RetainEarning")));
+			tCustFin.setOpIncome(iParse.stringToBigDecimal(titaVo.getParam("OpIncome")));
+			tCustFin.setOpCost(iParse.stringToBigDecimal(titaVo.getParam("OpCost")));
+			tCustFin.setOpProfit(iParse.stringToBigDecimal(titaVo.getParam("OpProfit")));
+			tCustFin.setOpExpense(iParse.stringToBigDecimal(titaVo.getParam("OpExpense")));
+			tCustFin.setOpRevenue(iParse.stringToBigDecimal(titaVo.getParam("OpRevenue")));
+			tCustFin.setNopIncome(iParse.stringToBigDecimal(titaVo.getParam("NopIncome")));
+			tCustFin.setFinExpense(iParse.stringToBigDecimal(titaVo.getParam("FinExpense")));
+			tCustFin.setNopExpense(iParse.stringToBigDecimal(titaVo.getParam("NopExpense")));
+			tCustFin.setNetIncome(iParse.stringToBigDecimal(titaVo.getParam("NetIncome")));
 			tCustFin.setAccountant(titaVo.getParam("Accountant"));
-			tCustFin.setAccountDate(parse.stringToInteger(titaVo.getParam("AccountDate")));
+			tCustFin.setAccountDate(iParse.stringToInteger(titaVo.getParam("AccountDate")));
 
 			try {
-				tCustFin = sCustFinService.update2(tCustFin,titaVo);
+				tCustFin = sCustFinService.update2(tCustFin, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "公司戶財務狀況檔");
 			}
 
 			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeCustFin, tCustFin);
-			dataLog.exec();
+			iDataLog.setEnv(titaVo, beforeCustFin, tCustFin);
+			iDataLog.exec();
 
 		} else if (funcd.equals("4")) {
 

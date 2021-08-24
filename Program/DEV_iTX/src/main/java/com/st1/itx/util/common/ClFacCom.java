@@ -94,7 +94,7 @@ public class ClFacCom extends TradeBuffer {
 	 * @param iClCode2  擔保品代號2
 	 * @param iClNo    擔保品編號
 	 * @param iApplNo  核准號碼
-	 * @param ownerMap 擔保品提供人CustUKey & 與授信戶關係
+	 * @param ownerMap 擔保品提供人CustUKey＆與授信戶關係
 	 * @throws LogicException LogicException
 	 */
 	public void insertClFac(TitaVo titaVo, int iClCode1, int iClCode2, int iClNo, int iApplNo, List<HashMap<String, String>> ownerMap) throws LogicException {

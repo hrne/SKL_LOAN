@@ -20,13 +20,10 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L1105")
 @Scope("prototype")
 public class L1105 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1105.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -36,16 +33,8 @@ public class L1105 extends TradeBuffer {
 	@Autowired
 	public CustTelNoService sCustTelNoService;
 
-	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
-
-	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 
 	private boolean isEloan = false;
 
@@ -63,7 +52,6 @@ public class L1105 extends TradeBuffer {
 		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		String iCustId = titaVo.getParam("CustId");
 		String iCustUKey = "";
-		int count = 1;
 		CustMain iCustMain = new CustMain();
 		// check if input id or no exist in custmain
 		if (iCustNo == 0) {
@@ -89,7 +77,7 @@ public class L1105 extends TradeBuffer {
 		String iTelArea = titaVo.getParam("TelArea");
 		String iTelNo = titaVo.getParam("TelNo");
 		String iTelExt = titaVo.getParam("TelExt");
-		String iTelOther = StringUtils.rightPad(titaVo.getParam("TelOther"), 20," ");
+		String iTelOther = StringUtils.rightPad(titaVo.getParam("TelOther"), 20, " ");
 		String iTelChgRsnCode = titaVo.getParam("TelChgRsnCode");
 		String iRelationCode = titaVo.getParam("RelationCode");
 		String iLiaisonName = titaVo.getParam("LiaisonName");
@@ -105,15 +93,15 @@ public class L1105 extends TradeBuffer {
 			iTelNo = iTelOther.substring(5, 15);
 			iTelExt = iTelOther.substring(15);
 		}
-		
+
 		if (isEloan && "1".equals(iFuncFg)) {
-			String telNoUKey = uniqueEloan(iCustUKey,iTelTypeCode,iTelArea,iTelNo,iTelExt);
+			String telNoUKey = uniqueEloan(iCustUKey, iTelTypeCode, iTelArea, iTelNo, iTelExt);
 			if (!"".equals(telNoUKey)) {
 				iFuncFg = "2";
 				tita_TelNoUKey = telNoUKey;
 			}
 		}
-		
+
 		if (iFuncFg.equals("1")) {
 			String new_telNoUKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
 			tCustTelNo.setTelNoUKey(new_telNoUKey);
@@ -137,13 +125,13 @@ public class L1105 extends TradeBuffer {
 			}
 		} else {
 			tCustTelNo = sCustTelNoService.holdById(tita_TelNoUKey, titaVo);
-			
+
 			if (tCustTelNo == null) {
 				throw new LogicException("E0003", "客戶聯絡電話檔");
 			}
 //			hCustTelNo = sCustTelNoService.findById(tita_TelNoUKey, titaVo);
 			// 變更前
-			CustTelNo beforeCustTelNo = (CustTelNo) dataLog.clone(tCustTelNo);
+			CustTelNo beforeCustTelNo = (CustTelNo) iDataLog.clone(tCustTelNo);
 			tCustTelNo.setTelTypeCode(iTelTypeCode);
 			tCustTelNo.setTelArea(iTelArea);
 			tCustTelNo.setTelNo(iTelNo);
@@ -162,8 +150,8 @@ public class L1105 extends TradeBuffer {
 				throw new LogicException("E0007", "客戶聯絡電話檔");
 			}
 			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeCustTelNo, tCustTelNo);
-			dataLog.exec();
+			iDataLog.setEnv(titaVo, beforeCustTelNo, tCustTelNo);
+			iDataLog.exec();
 		}
 
 		this.totaVo.putParam("OResult", "Y");
@@ -171,21 +159,21 @@ public class L1105 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
-	private String uniqueEloan(String iCustUKey,String iTelTypeCode,String iTelArea,String iTelNo,String iTelExt) {
+
+	private String uniqueEloan(String iCustUKey, String iTelTypeCode, String iTelArea, String iTelNo, String iTelExt) {
 		String telNoUKey = "";
 		Slice<CustTelNo> sCustTelNo = sCustTelNoService.findCustUKey(iCustUKey, 0, Integer.MAX_VALUE);
 		List<CustTelNo> lCustTelNo = sCustTelNo == null ? null : sCustTelNo.getContent();
-		
+
 		if (lCustTelNo != null) {
 			for (CustTelNo custTelNo : lCustTelNo) {
 				if (iTelTypeCode.equals(custTelNo.getTelTypeCode()) && iTelArea.equals(custTelNo.getTelArea()) && iTelNo.equals(custTelNo.getTelNo()) && iTelExt.equals(custTelNo.getTelExt())) {
-					telNoUKey = custTelNo.getTelNoUKey(); 
+					telNoUKey = custTelNo.getTelNoUKey();
 					break;
 				}
 			}
-		} 
+		}
 
-		return telNoUKey; 
+		return telNoUKey;
 	}
 }

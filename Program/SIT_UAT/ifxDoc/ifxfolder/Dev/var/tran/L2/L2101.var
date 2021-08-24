@@ -1,0 +1,1944 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!=====================================================================
+!#FKEY>0時，重新執行
+!=====================================================================
+<sub type="PREDC" name="PreDC">
+!#PDC=X,1,S
+!C(3,#FKEY,0,NOP,T(R,#MRKEY,#REFNO))
+!C(3,#FKEY,3,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),$)
+!C(3,#FKEY,7,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),s)
+
+!<include src="COM.icf::ACTFGX-RUN.pre"/>
+!<include src="COM.icf::TITLE-RUN.pre"/>
+!<include src="TITF.icf::RPRUN.dec"/>
+
+!先隱藏欄位 FLAG 0=隱藏 1=顯示
+#HIDE2FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE3FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE4FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE5FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE6FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE7FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE8FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#EXPANDFG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+!商品標題 P2T(5)
+#P2T=A,2,S
+E(0,5)
+!商品範圍 P2S(6)~P2E(11)
+#P2S=A,2,S
+E(0,6)
+#P2E=A,2,S
+E(0,#P2S+5)
+!利率標題 P2T(12)
+!利率範圍 P3S(13)~P3E(16)
+#P3S=A,2,S
+E(0,#P2E+2)
+#P3E=A,2,S
+E(0,#P3S+3)
+!階梯式利率標題 P3T(17)
+#P3T=A,2,S
+E(0,#P3E+1)
+!階梯式利率範圍 P3T1S(18)~P3T1E(18)
+#P3T1S=A,2,S
+E(0,#P3T+1)
+#P3T1E=A,2,S
+E(0,#P3T1S)
+!年繳保費優惠減碼標題 P4T(19)
+#P4T=A,2,S
+E(0,#P3T1E+1)
+!年繳保費優惠減碼範圍 P4T1S(20)~P4T1E(20)
+#P4T1S=A,2,S
+E(0,#P4T+1)
+#P4T1E=A,2,S
+E(0,#P4T1S)
+#P4E=A,2,S
+E(0,#P4T1S+1)
+!帳管費標題 P5T(21)
+#P5T=A,2,S
+E(0,#P4T1S+1)
+!帳管費範圍 P5T1S(22)~P5T1E(22)
+#P5T1S=A,2,S
+E(0,#P5T+1)
+#P5T1E=A,2,S
+E(0,#P5T1S)
+!綁約條件標題 P6T(23)
+#P6T=A,2,S
+E(0,#P5T1E+1)
+!綁約條件範圍 P6S(24)~P6E(35)
+!P6ENBreach 為綁約條件文字顯示
+#P6S=A,2,S
+E(0,#P6T+1)
+#P6ENBreach=A,2,S
+E(0,#P6S+7)
+#P6E=A,2,S
+E(0,#P6S+12)
+
+!是否綁約為N時隱藏欄位
+#P6HIDES=A,2,S
+E(0,#P6S+1)
+#P6HIDEE=A,2,S
+E(0,#P6HIDES+11)
+
+
+#KLIGHT=@,1,S
+C(3,#HIDE2FG,1,K(LIGHT,#BTNHIDEP2,TXTRED,0),K(LIGHT,#BTNHIDEP2,TXTRED,-1))
+C(3,#HIDE3FG,1,K(LIGHT,#BTNHIDEP3,TXTRED,0),K(LIGHT,#BTNHIDEP3,TXTRED,-1))
+C(3,#HIDE5FG,1,K(LIGHT,#BTNHIDEP5,TXTRED,0),K(LIGHT,#BTNHIDEP5,TXTRED,-1))
+C(3,#HIDE6FG,1,K(LIGHT,#BTNHIDEP6,TXTRED,0),K(LIGHT,#BTNHIDEP6,TXTRED,-1))
+C(3,#HIDE7FG,1,K(LIGHT,#BTNHIDEP7,TXTRED,0),K(LIGHT,#BTNHIDEP7,TXTRED,-1))
+C(3,#HIDE8FG,1,K(LIGHT,#BTNHIDEP8,TXTRED,0),K(LIGHT,#BTNHIDEP8,TXTRED,-1))
+CALL(#Wk_HIDE_P6_1)
+CALL(#Wk_HIDE_P7_1)
+CALL(#CALLGRID)
+
+
+#CALLGRID=@,1,S
+##loop{times:10,n:1,k:2}
+IF(#StepMonthE{n}==0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+IF(#TwPremium{n}==0,INVOKEJS(SHOW,grd2_{n},0),INVOKEJS(SHOW,grd2_{n},1))
+##end
+##loop{times:5,n:1,k:2}
+IF(#TwLoanAmt{n}==0,INVOKEJS(SHOW,grd3_{n},0),INVOKEJS(SHOW,grd3_{n},1))
+##end
+
+#endcheck=@,1,S
+IF(#StepMonthE1==0,INVOKEJS(SHOW,grd1,0)INVOKEJS(SHOW,p1,#P3T,#P3T,0),$)
+IF(#TwPremium1==0,INVOKEJS(SHOW,grd2,0)INVOKEJS(SHOW,p1,#P4T,#P4T,0),$)
+IF(#TwLoanAmt1==0,INVOKEJS(SHOW,grd3,0)INVOKEJS(SHOW,p1,#P5T,#P5T,0),$)
+
+
+#showgrd1=@,1,S
+INVOKEJS(SHOW,grd1,1)
+C(3,#UpdateCode,1,$,s)
+SHOW(#StepMonthS1,#StepMonthE1,#StepRateType1,#StepRateTypeX1,#StepRateIncr1,#StepRatePer1)
+INVOKEJS(SHOW,grd1_1,1)
+! ##loop{times:10,n:1,k:2}
+! C(3,{n},10,s,$)
+! C(3,#StepMonthE{n},0,s,INVOKEJS(SHOW,grd1_{k},1)SHOW(#StepMonthS{k},#StepMonthE{k},#StepRateType{k},#StepRateTypeX{k},#StepRateIncr{k},#StepRatePer{k}))
+! ##end
+
+#showgrd2=@,1,S
+INVOKEJS(SHOW,grd2,1)
+C(3,#UpdateCode,1,$,s)
+SHOW(#PremiumIncr1,#PremiumPer1)
+C(3,#Precision,0,SHOW(#TwPremium1)HIDE(#UsPremium1)
+                ,SHOW(#UsPremium1)HIDE(#TwPremium1))
+INVOKEJS(SHOW,grd2_1,1)
+! ##loop{times:10,n:1,k:2}
+! C(3,{n},10,s,$)
+! C(3,#TwPremium{n},0,s,INVOKEJS(SHOW,grd2_{k},1)SHOW(#TwPremium{k},#UsPremium{k},#PremiumIncr{k},#PremiumPer{k}))
+! C(3,#Precision,0,SHOW(#TwPremium{k})HIDE(#UsPremium{k})
+!                 ,SHOW(#UsPremium{k})HIDE(#TwPremium{k}))
+! ##end
+
+#showgrd3=@,1,S
+INVOKEJS(SHOW,grd3,1)
+C(3,#UpdateCode,1,$,s)
+C(3,#Precision,0,SHOW(#TwLoanAmt1,#TwAcctFee1)HIDE(#UsLoanAmt1,#UsAcctFee1)
+                ,SHOW(#UsLoanAmt1,#UsAcctFee1)HIDE(#TwLoanAmt1,#TwAcctFee1))
+INVOKEJS(SHOW,grd3_1,1)
+! ##loop{times:5,n:1,k:2}
+! C(3,{n},5,s,$)
+! C(3,#TwPremium{n},0,s,INVOKEJS(SHOW,grd3_{k},1)SHOW(#TwLoanAmt{k},#UsLoanAmt{k},#TwAcctFee{k},#UsAcctFee{k}))
+! C(3,#Precision,0,SHOW(#TwLoanAmt{k},#TwAcctFee{k})HIDE(#UsLoanAmt{k},#UsAcctFee{k})
+!                 ,SHOW(#UsLoanAmt{k},#UsAcctFee{k})HIDE(#TwLoanAmt{k},#TwAcctFee{k}))
+
+! ##end
+
+!--- P2 商品
+#HIDEP2=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE2FG,1,E(0,@HIDE2FG,0),E(0,@HIDE2FG,1))
+INVOKEJS(SHOW,p1,#P2S,#P2E,#HIDE2FG)
+C(3,#HIDE2FG,1,K(LIGHT,#BTNHIDEP2,TXTRED,0),K(LIGHT,#BTNHIDEP2,TXTRED,-1))
+C(3,#HIDE2FG,1,$,s)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+C(3,#HIDE8FG,1,CALL(#HIDEP8),$)
+CALL(#KLIGHT)
+CALL(#showgrd2)
+CALL(#showgrd3)
+
+!--- P3 利率
+#HIDEP3=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE3FG,1,E(0,@HIDE3FG,0),E(0,@HIDE3FG,1))
+INVOKEJS(SHOW,p1,#P3S,#P3E,#HIDE3FG)
+INVOKEJS(SHOW,p1,#P3T1S,#P3T1E,#HIDE3FG)
+C(3,#HIDE3FG,1,K(LIGHT,#BTNHIDEP3,TXTRED,0),K(LIGHT,#BTNHIDEP3,TXTRED,-1))
+C(3,#HIDE3FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+C(3,#HIDE8FG,1,CALL(#HIDEP8),$)
+CALL(#KLIGHT)
+CALL(#showgrd1)
+
+!--- P6 年繳保費優惠減碼
+#HIDEP6=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE6FG,1,E(0,@HIDE6FG,0),E(0,@HIDE6FG,1))
+INVOKEJS(SHOW,p1,#P4T1S,#P4T1E,#HIDE6FG)
+C(3,#HIDE6FG,1,K(LIGHT,#BTNHIDEP6,TXTRED,0),K(LIGHT,#BTNHIDEP6,TXTRED,-1))
+C(3,#HIDE6FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+C(3,#HIDE8FG,1,CALL(#HIDEP8),$)
+CALL(#KLIGHT)
+CALL(#showgrd2)
+
+!--- P7 帳管費
+#HIDEP7=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE7FG,1,E(0,@HIDE7FG,0),E(0,@HIDE7FG,1))
+INVOKEJS(SHOW,p1,#P5T1S,#P5T1E,#HIDE7FG)
+C(3,#HIDE7FG,1,K(LIGHT,#BTNHIDEP7,TXTRED,0),K(LIGHT,#BTNHIDEP7,TXTRED,-1))
+C(3,#HIDE7FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+! C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE8FG,1,CALL(#HIDEP8),$)
+CALL(#KLIGHT)
+CALL(#showgrd3)
+
+!--- P8 綁約條件
+#HIDEP8=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE8FG,1,E(0,@HIDE8FG,0),E(0,@HIDE8FG,1))
+INVOKEJS(SHOW,p1,#P6S,#P6ENBreach,#HIDE8FG)
+C(3,#FuncCode,5,INVOKEJS(SHOW,p1,#P6S,#P6E,#HIDE8FG),$)
+C(5,#BreachFlag,N,INVOKEJS(SHOW,p1,#P6HIDES,#P6HIDEE,0),$)
+! INVOKEJS(SHOW,p1,#P8S1,#P6E,0)
+! C(5,#BreachCode,001,INVOKEJS(SHOW,p1,#P8S1,#P8E1,#HIDE8FG),$)
+! C(5,#BreachCode,002,INVOKEJS(SHOW,p1,#P8S2,#P8E2,#HIDE8FG),$)
+! C(5,#BreachCode,003,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
+! C(5,#BreachCode,004,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
+! C(5,#BreachCode,005,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
+C(3,#HIDE8FG,1,K(LIGHT,#BTNHIDEP8,TXTRED,0),K(LIGHT,#BTNHIDEP8,TXTRED,-1))
+C(3,#HIDE8FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+CALL(#KLIGHT)
+
+!--- 展開
+#EXPAND=@,1,S
+C(3,#EXPANDFG,1,E(0,@EXPANDFG,0),E(0,@EXPANDFG,1))
+INVOKEJS(SHOW,p1,#P2T,#P6ENBreach,#EXPANDFG)
+C(3,#FuncCode,5,INVOKEJS(SHOW,p1,#P2T,#P6E,#EXPANDFG),$)
+C(5,#BreachFlag,N,INVOKEJS(SHOW,p1,#P6HIDES,#P6HIDEE,0),$)
+! INVOKEJS(SHOW,p1,#P8S1,#P6E,0)
+! C(5,#BreachCode,001,INVOKEJS(SHOW,p1,#P8S1,#P8E1,#HIDE8FG),$)
+! C(5,#BreachCode,002,INVOKEJS(SHOW,p1,#P8S2,#P8E2,#HIDE8FG),$)
+! C(5,#BreachCode,003,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
+! C(5,#BreachCode,004,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
+! C(5,#BreachCode,005,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
+C(3,#EXPANDFG,1,K(LIGHT,#BTNEXPAND,TXTRED,0),K(LIGHT,#BTNEXPAND,TXTRED,-1))
+C(3,#EXPANDFG,1,$,s)
+E(0,@HIDE2FG,0)
+E(0,@HIDE3FG,0)
+E(0,@HIDE4FG,0)
+E(0,@HIDE5FG,0)
+E(0,@HIDE6FG,0)
+E(0,@HIDE7FG,0)
+E(0,@HIDE8FG,0)
+CALL(#KLIGHT)
+CALL(#endcheck)
+
+!--- 全部關閉
+#CLOSEALL=@,1,S
+INVOKEJS(SHOW,p1,#P2T,#P6E,0)
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+C(3,#HIDE8FG,1,CALL(#HIDEP8),$)
+
+!test FK=9 時全展開
+#testFK9=X,1,S
+IF(#FKEY==9,INVOKEJS(SHOW,p1,#P2T,#P6E,1),$)
+
+</sub>
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,320,200,320];printer.width=[20,40,20,40];order=1">
+[
+["[L2101]                                 商品參數維護"],
+[#<->#,"#FdFuncCodeX+功能",#FuncCodeX],
+[#<->#,"#FdCopyProdNo+複製來源",#CopyProdNo,#CopyName],
+["#FdProdNo+商品代碼",#ProdNo,#BTN1],
+["@","@"],
+! [#<->#,"@",#BTNHIDEP2,"@",#BTNHIDEP3,"@",#BTNHIDEP4,"@",#BTNHIDEP5,"@",#BTNHIDEP6,"@",#BTNHIDEP7,"@",#BTNHIDEP8,"@",#BTNEXPAND],
+! [#<->#,"@",#BTNHIDEP2,"@",#BTNHIDEP3,"@",#BTNHIDEP4,"@",#BTNHIDEP6,"@",#BTNHIDEP7,"@",#BTNHIDEP8,"@",#BTNEXPAND],
+[#<->#,"@",#BTNHIDEP2,"@",#BTNHIDEP3,"@",#BTNHIDEP6,"@",#BTNHIDEP7,"@",#BTNHIDEP8,"@",#BTNEXPAND],
+!4
+!商品
+!5
+[#<->#,"<font color=red>@商品",""], 
+[#<->#,"#FdProdName+商品名稱",#ProdName], 
+["#FdStartDate+商品生效日期",#StartDate], 
+["#FdEndDate+商品截止日期",#EndDate],
+["#FdStatusCode+商品狀態",#StatusCodeX],["#FdAgreementFg+是否為協議商品",#AgreementFg,#AgreementFgX],
+[#<->#,"#FdCurrencyCode+幣別",#CurrencyCode],
+["#FdGovOfferFlag+政府優惠房貸",#GovOfferFlag,#GovOfferFlagX],
+["#FdFinancialFlag+理財型房貸",#FinancialFlag,#FinancialFlagX],
+["#FdEmpFlag+員工優惠貸款",#EmpFlag,#EmpFlagX],
+!11
+!利率
+!12
+[#<->#,"<font color=red>@利率",""],
+["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX],
+["#FdBaseRate+指標利率",#BaseRateX],
+["#FdProdIncr+商品加碼利率",#ProdIncr,#LbProdIncr,#ProdIncrX,#IncrFlag],
+["#FdProdRate+商品利率",#ProdRateX],
+["#FdLowLimitRate+利率下限",#LowLimitRate,#LbLowLimitRate,#LowLimitRateX],
+! ["#FdIncrFlag+加減碼是否依合約",#IncrFlag,#IncrFlagX],
+["#FdRateCode+利率區分",#RateCode,#RateCodeX],
+["@"],
+["@"],
+!16
+!階梯式利率
+!17
+[#<->#,"<font color=red>@階梯式利率",""],
+["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[150,200,200], p_cols:[15,15,15]}","","",
+["月數","利率種類","利率"],
+[[#StepMonthS1,"-",#StepMonthE1,"@"],[#StepRateType1,#StepRateTypeX1],[#StepRateIncr1,#StepRatePer1],],
+],
+!18
+!年繳保費優惠減碼
+!19
+[#<->#,"<font color=red>年繳保費優惠減碼",""],
+["#grid#,{id:2,expand:true,loop:10,row_height:1,s_cols:[250,150,610], p_cols:[30,15,]}","","",
+["保戶壽險年繳化保費(含)以上","@優惠減碼"],
+[[#TwPremium1,#UsPremium1],[#PremiumIncr1,#PremiumPer1],""],
+],
+!20
+!帳管費
+!21
+[#<->#,"<font color=red>@帳管費",""],
+["#grid#,{id:3,expand:true,loop:5,row_height:1,s_cols:[200,200,610], p_cols:[20,15,]}","","",
+["貸款金額(含)以上","帳管費"],
+[[#TwLoanAmt1,#UsLoanAmt1],[#TwAcctFee1,#UsAcctFee1],""],
+],
+!22
+!23
+!清償金類型
+[#<->#,"<font color=red>綁約條件",""],
+[#<->#,"#FdBreachFlag+是否綁約",#BreachFlag,#BreachFlagX],
+[#<->#,"#FdBreachCode+違約適用方式",#BreachCode,#BreachCodeX],
+[#<->#,"#FdProhibitMonth+限制清償期間",#ProhibitMonth,"月"],
+[#<->#,"#FdBreachGetCode+違約金收取方式",#BreachGetCode,#BreachGetCodeX],
+[#<->#,"#FdBreachPercent+違約金百分比",#BreachPercent,"@%"],
+[#<->#,"#FdBreachDecreaseMonth+違約金分段月數",#BreachDecreaseMonth],
+[#<->#,"#FdBreachDecrease+分段遞減百分比",#BreachDecrease,"@%"],
+[#<->#,"#FdBreachStartPercent+還款起算比例",#BreachStartPercent,"@%"],
+[#<->#,"@",#Breach1],
+! [#<->#,"@",#Breach2],
+! [#<->#,"@",#Breach3],
+! [#<->#,"@",#Breach4],
+!35
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:商品明細查詢;enable:0;tabbable:0;title:L2001 商品參數明細資料查詢
+#BTNHIDEP2=X,15,I,ui:button;value:   商品     ;enable:1;tabbable:0
+#BTNHIDEP3=X,15,I,ui:button;value:   利率     ;enable:1;tabbable:0
+#BTNHIDEP6=X,15,I,ui:button;value: 年繳保費優惠減碼 ;enable:1;tabbable:0
+#BTNHIDEP7=X,15,I,ui:button;value:   帳管費   ;enable:1;tabbable:0
+#BTNHIDEP8=X,15,I,ui:button;value: 綁約條件 ;enable:1;tabbable:0
+#BTNEXPAND=X,15,I,ui:button;value:   展開     ;enable:1;tabbable:0
+
+
+!---------- AP TEXT AREA Variables ----------
+#INVKALL=X,1,S
+INVOKEJS(SHOW,p1,1)
+INVOKEJS(SHOW,p1,2,2,0)
+INVOKEJS(SHOW,p1,#P2T,#P6E,0)
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!EnableFg
+#CDDEF01=x,20,S
+T(3,CdCode.EnableFg)
+
+#EnableFgHelp=x,1024,S
+
+!BaseRate0
+#CDDEF02=x,25,S
+T(3,CdCode.BaseRate0)
+
+#BaseRate0Help=x,1024,S
+
+!FacmRateCode
+#CDDEF03=x,25,S
+T(3,CdCode.FacmRateCode)
+
+#FacmRateCodeHelp=x,1024,S
+
+!ProdBreachCode
+#CDDEF04=x,30,S
+T(3,CdCode.ProdBreachCode)
+
+#ProdBreachCodeHelp=x,1024,S
+
+!BreachGetCode
+#CDDEF05=x,30,S
+T(3,CdCode.BreachGetCode)
+
+#BreachGetCodeHelp=x,1024,S
+
+!StatusCode
+#CDDEF06=x,30,S
+T(3,CdCode.StatusCode)
+
+#StatusCodeHelp=x,1024,S
+
+!RateType
+#CDDEF07=x,30,S
+T(3,CdCode.RateType)
+
+#RateTypeHelp=x,1024,S 
+
+#CDDEF08=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S
+
+#CDDEF09=x,26,S
+T(3,CdCode.Currency)
+
+#CurrencyHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@EnableFgHelp,#HelpDesc1)
+T(2,@BaseRate0Help,#HelpDesc2) 
+T(2,@FacmRateCodeHelp,#HelpDesc3)
+T(2,@ProdBreachCodeHelp,#HelpDesc4)
+T(2,@BreachGetCodeHelp,#HelpDesc5)
+T(2,@StatusCodeHelp,#HelpDesc6)
+T(2,@RateTypeHelp,#HelpDesc7)
+T(2,@CurrPrecisionHelp,#HelpDesc8)
+T(2,@CurrencyHelp,#HelpDesc9)
+
+!FuncCode
+#FuncCodeHelp=x,30,S
+T(3,1:新增;2:修改;4:刪除;5:查詢)
+
+#YesNoHelp=x,20,S
+T(3,Y:是;N:否)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2001進入),$)
+HIDE(#BTN1)
+T(2,@RimTxCode,#TXCD)
+! INVOKEJS(SHOW,p1,32,35,0)
+
+#NTXBUF=X,71,S
+C(3,#CHAIN,1,T(4,NTXBUF$)HIDE(#FuncCode),S)
+
+#CHECKMOD0=X,1,S
+E(0,0)
+
+#CHECKMODP4=X,1,S
+E(0,0)
+
+#CHECKMODP6=X,1,S
+E(0,0)
+
+#CHECKMODP7=X,1,S
+E(0,0)
+
+#CHECKMODP8=X,1,S
+E(0,0)
+
+#WkSYSDATE=D,7,S
+E(0,#SYSDATE)
+
+#wksyscdate=D,7,S
+E(0,#SYSCDATE)
+
+
+!----------------------------------------------------
+![功能]
+!商品已生效禁止修改及刪除
+#FuncCode=N,1,S
+CALL(#CLOSEALL)
+C(3,#CHAIN,1,T(1,#NTXBUF,1,1),$)
+C(3,#FuncCode,3,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
+C(3,#CHAIN,1,IF(#FuncCode==1||#FuncCode==3,T(F,@ProdNo,1),T(F,@ProdNo,0)),$)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCodeHelp)
+@V(7)V(H,#FuncCodeHelp)
+C(3,#FuncCode,1,HIDE(#BTN1),SHOW(#BTN1))
+C(3,#FuncCode,1,DISABLE(#BTN1),ENABLE(#BTN1))
+E(0,@FUNCIND,#FuncCode)
+
+#SetSysPar1=X,1,S
+IF(#FuncCode ==1 ,E(0,0)ASGN(AGAIN$),$)
+
+#FuncCodeX=X,4,L
+E(0,@FUNCIND,#FuncCode)
+T(H,#FuncCode,#FuncCodeHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+IF(#FuncCode==3,T(3,新增),$)
+! C(2,#FuncCode,S,K(NOBUTTON,SHOW),K(NOBUTTON,SHOW),K(NOBUTTON,SHOW),K(NOBUTTON,SHOW),K(NOBUTTON,CLOSE))
+
+!除功能為1新增時,其他隱藏重新交易按鈕
+! #AGAIN=X,1,S
+! C(3,#FuncCode,1,$,S)
+! E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+#FdFuncCodeX=X,2,L
+#FdCopyProdNo=X,2,L
+#FdProdNo=X,2,L
+
+#ShowFd=X,1,S
+C(2,#FuncCode,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+T(2,@FdFuncCodeX,#ShowFd)     
+T(2,@FdProdNo,#ShowFd)
+
+#UpdateCode=N,1,S
+IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
+
+#UseProdFg=X,1,S
+
+#BUF1=X,6,S
+T(2,#ProdNo+0)
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF1;ntxbuf5=type<-1:ProdNo<-OOProdNo})
+
+#WkPercent=X,3,S
+T(3,%)
+
+#WkMonthX=X,5,S
+T(3, 個月)
+
+#WkSpc=X,2,S
+
+#WkStar=X,2,S
+C(3,#UpdateCode,1,T(3,*),T(3, ))
+
+#WkStar2=X,2,S
+C(3,#FuncCode,2,T(3,*),T(3, ))
+
+#INITP0=X,1,S
+T(2,@ProdIncrX,#WkPercent)
+T(2,@LowLimitRateX,#WkPercent)
+E(0,@BaseRate,0)
+E(0,@ProdRate,0)
+C(3,#FuncCode,1,$,S)
+T(3,@BaseRateCodeX, )
+T(3,@IncrFlagX, )
+T(3,@BreachFlagX, )
+T(3,@BreachCodeX, )
+T(3,@GovOfferFlagX, )
+T(3,@FinancialFlagX, )
+
+![複製來源]
+#CopyProdNo=X,5,L
+C(3,#CHAIN,1,$,S)
+C(3,#FuncCode,3,$,S)
+T(1,#NTXBUF,7,5)
+
+#CopyName=X,60,L
+C(3,#CHAIN,1,$,S)
+C(3,#FuncCode,3,$,S)
+T(1,#NTXBUF,12,60)
+
+![商品代碼]
+#ProdNo=X,5,I
+CALL(#CLOSEALL)
+C(3,#CHAIN,1,T(1,#NTXBUF,2,5),$)
+IF(#CHAIN==1 && #FuncCode!=1 && #FuncCode!=3,s,$)
+@V(7)
+C(3,#FuncCode,3,V(4,#CopyProdNo),$)
+
+#SendL2r01A=X,1,S
+T(2,@RimProdNo,#ProdNo)
+E(0,@RimFuncCode,#FuncCode)
+C(3,#UpdateCode,0,$,RESET_RIM(#SendL2r01A,L2R01))
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+
+#SendL2r01B=X,1,S
+C(3,#FuncCode,3,$,S)
+T(2,@RimProdNo,#CopyProdNo)
+E(0,@RimFuncCode,5)
+C(3,#UpdateCode,0,$,RESET_RIM(#SendL2r01B,L2R01))
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+
+#RcvL2r01A=X,1,S
+T(2,@ProdName,#L2r01ProdName)
+E(0,@StartDate,#L2r01StartDate)
+E(0,@EndDate,#L2r01EndDate)
+T(2,@StatusCode,#L2r01StatusCode)
+T(2,@AgreementFg,#L2r01AgreementFg)
+T(2,@CurrencyCode,#L2r01CurrencyCode)
+T(H,@Precision,#CurrencyCode,#CurrPrecisionHelp)
+T(2,@BaseRateCode,#L2r01BaseRateCode)
+E(0,@ProdIncr,#L2r01ProdIncr)
+E(0,@LowLimitRate,#L2r01LowLimitRate)
+T(2,@IncrFlag,#L2r01IncrFlag)
+E(0,@RateCode,#L2r01RateCode)
+T(2,@BreachFlag,#L2r01BreachFlag)
+T(2,@BreachCode,#L2r01BreachCode)
+T(2,@BreachGetCode,#L2r01BreachGetCode)
+E(0,@ProhibitMonth,#L2r01ProhibitMonth)
+E(0,@BreachPercent,#L2r01BreachPercent)
+E(0,@BreachDecreaseMonth,#L2r01BreachDecreaseMonth)
+E(0,@BreachDecrease,#L2r01BreachDecrease)
+E(0,@BreachStartPercent,#L2r01BreachStartPercent)
+T(2,@GovOfferFlag,#L2r01GovOfferFlag)
+T(3,@FinancialFlag,N)
+T(2,@EmpFlag,#L2r01EmpFlag)
+T(2,@Breach,#L2r01Breach)
+C(3,#UpdateCode,0,T(2,@Breach1,#L2r01Breach),$)
+! C(3,#UpdateCode,0,T(1,@Breach2,#L2r01Breach,51,50),$)
+! C(3,#UpdateCode,0,T(1,@Breach3,#L2r01Breach,101,50),$)
+! C(3,#UpdateCode,0,T(1,@Breach4,#L2r01Breach,151,50),$)
+##loop{times:10,n:1}
+E(0,@StepMonthS{n},#L2r01StepRateMonths{n})
+E(0,@StepMonthE{n},#L2r01StepRateMonthE{n})
+E(0,@StepRateType{n},#L2r01StepRateType{n})
+E(0,@StepRateIncr{n},#L2r01StepRateIncr{n})
+T(3,@StepRatePer{n},%)
+##end
+##loop{times:10,n:1}
+E(0,@TwPremium{n},#L2r01Premium{n})
+E(0,@UsPremium{n},#L2r01Premium{n})
+E(0,@PremiumIncr{n},#L2r01PremiumIncr{n})
+C(3,#Precision,0,E(0,@TimPremium{n},#TwPremium{n}),E(0,@TimPremium{n},#UsPremium{n}))
+T(3,@PremiumPer{n},%)
+##end 
+##loop{times:5,n:1}
+E(0,@TwLoanAmt{n},#L2r01AcctFeeLoanAmt{n})
+E(0,@UsLoanAmt{n},#L2r01AcctFeeLoanAmt{n})
+E(0,@TwAcctFee{n},#L2r01AcctFeeAcctFee{n})
+E(0,@UsAcctFee{n},#L2r01AcctFeeAcctFee{n})
+C(3,#Precision,0,E(0,@TimLoanAmt{n},#TwLoanAmt{n}),E(0,@TimLoanAmt{n},#UsLoanAmt{n}))
+##end
+T(H,@StatusCodeX,#StatusCode,#StatusCodeHelp)
+C(3,#StatusCode,0,IF(#StartDate <= #wksyscdate,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效)),$)
+C(3,#EndDate,0,$,IF(#EndDate < #wksyscdate,T(3,@StatusCodeX,已失效),$))
+T(H,@BaseRateCodeX,#BaseRateCode,#BaseRate0Help)
+T(H,@IncrFlagX,#IncrFlag,#YesNoHelp)
+C(3,#FuncCode,1,S,$)
+##loop{times:10,n:1}
+T(3,@StepRateTypeX{n}, )
+T(H,@StepRateTypeX{n},#StepRateType{n},#RateTypeHelp)
+##end
+T(H,@AgreementFgX,#AgreementFg,#YesNoHelp) 
+T(H,@GovOfferFlagX,#GovOfferFlag,#YesNoHelp) 
+T(H,@FinancialFlagX,#FinancialFlag,#YesNoHelp) 
+T(H,@BreachGetCodeX,#BreachGetCode,#BreachGetCodeHelp)
+T(H,@BreachCodeX,#BreachCode,#ProdBreachCodeHelp)
+T(H,@EmpFlagX,#EmpFlag,#YesNoHelp) 
+C(5,#BreachCode,0,T(3,@BreachCodeX,無),$)
+C(4,#BreachGetCode,T(3,@BreachGetCodeX,無),$)
+! C(5,#BreachFlag,Y,T(3,@BreachGetCodeX,無),$)
+C(5,#BreachGetCode,0,T(3,@BreachGetCodeX,無),$)
+C(4,#BreachFlag,T(3,@BreachCodeX,無)
+                      T(3,@BreachGetCodeX,無),$)
+CALL(#KLIGHT)
+##loop{times:9,n:2,m:1}
+SHOW(#PremiumIncr{n},#PremiumPer{n})
+C(3,#Precision,0,SHOW(#TwPremium{n})HIDE(#UsPremium{n})
+                ,SHOW(#UsPremium{n})HIDE(#TwPremium{n}))
+##end
+##loop{times:4,n:2,m:1}
+C(3,#Precision,0,SHOW(#TwLoanAmt{n},#TwAcctFee{n})HIDE(#UsLoanAmt{n},#UsAcctFee{n})
+                ,SHOW(#UsLoanAmt{n},#UsAcctFee{n})HIDE(#TwLoanAmt{n},#TwAcctFee{n}))
+##end
+C(3,#FuncCode,3,E(0,@StartDate,#SYSCDATE),$)
+T(2,@UseProdFg,#L2r01UseProdFg)
+
+
+!檢查輸入生效日期是否生效 1為生效 0為未生效
+#checkeffdate=A,1,S
+E(0,0)
+IF(#StartDate <= #wksyscdate,E(0,1),E(0,0))
+! C(3,#FuncCode,2,$,s)
+! C(3,#StatusCode,0,$,s)
+C(3,#checkeffdate,1,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效))
+C(3,#EndDate,0,$,IF(#EndDate < #wksyscdate,T(3,@StatusCodeX,已失效),$))
+
+
+!判斷商品是否已生效
+!商品參數生效後禁止刪除,只允許修改商品狀態、商品截止日期
+!1生效 0未生效
+#Effective=A,1,S
+E(0,0)
+C(3,#FuncCode,2,$,S)
+! IF(#L2r01StartDate <= #WkSYSDATE||#L2r01StartDate <= #wksyscdate,E(0,1),E(0,0))
+IF(#L2r01StartDate <= #wksyscdate,E(0,1),E(0,0))
+
+
+#EffectDate=D,7,S
+E(0,#SYSCDATE)
+! E(0,#SYSDATE)
+
+#EffectTime=A,4,S
+E(0,0)
+
+#SendL2r06A=X,1,S
+C(3,#FuncCode,1,S,$)
+T(2,@RimCurrencyCode,#CurrencyCode)
+T(2,@RimBaseRateCode,#BaseRateCode)
+E(0,@RimEffectDate,#EffectDate)
+E(0,@RimEffectTime,#EffectTime)
+C(3,#UpdateCode,0,$,RESET_RIM(#SendL2r06A,L2R06))
+S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
+R(1,L2R06)
+
+#RcvL2r06A=X,1,S
+C(3,#FuncCode,1,S,$)
+E(0,@BaseRate,#L2r06Rate)
+X(@BaseRateX,#BaseRate)
+T(B,@BaseRateX,#BaseRateX+#WkPercent)
+E(0,@ProdRate,#BaseRate+#ProdIncr)
+X(@ProdRateX,#ProdRate)
+T(B,@ProdRateX,#ProdRateX+#WkPercent)
+
+!---- P2 商品
+#INVK2=X,1,S
+ENABLE(#BTNHIDEP2)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+
+#BINDP2=X,1,S
+BIND(#BTNHIDEP2,click, {cmd=CALLSEND;DOCODE=HIDEP2})
+#BINDP3=X,1,S
+BIND(#BTNHIDEP3,click, {cmd=CALLSEND;DOCODE=HIDEP3})
+#BINDP6=X,1,S
+BIND(#BTNHIDEP6,click, {cmd=CALLSEND;DOCODE=HIDEP6})
+#BINDP7=X,1,S
+BIND(#BTNHIDEP7,click, {cmd=CALLSEND;DOCODE=HIDEP7})
+#BINDP8=X,1,S
+BIND(#BTNHIDEP8,click, {cmd=CALLSEND;DOCODE=HIDEP8})
+#BINDEXPAND=X,1,S
+BIND(#BTNEXPAND,click, {cmd=CALLSEND;DOCODE=EXPAND})
+
+#FdP2=X,1,S
+T(2,@FdProdName,#WkStar)
+T(2,@FdStartDate,#WkStar)
+T(2,@FdEndDate,#WkSpc)
+T(2,@FdStatusCode,#WkStar2)
+T(2,@FdCurrencyCode,#WkSpc)
+C(3,#Effective,1,$,S)
+T(2,@FdProdName,#WkSpc)
+T(2,@FdStartDate,#WkSpc)
+T(2,@FdEndDate,#WkStar)
+T(2,@FdStatusCode,#WkStar2)
+T(2,@FdCurrencyCode,#WkSpc)
+T(2,@FdGovOfferFlag,#WkStar)
+T(2,@FdFinancialFlag,#WkStar)
+T(2,@FdEmpFlag,#WkStar)
+T(2,@FdAgreementFg,#WkStar)
+C(3,#Effective,1,
+    T(2,@FdGovOfferFlag,#WkSpc)
+    T(2,@FdFinancialFlag,#WkSpc)
+    T(2,@FdEmpFlag,#WkSpc),$)
+
+#TEXTONP2=X,1,S
+C(3,#UpdateCode,1,$,S)
+C(3,#FuncCode,2,SHOW(#StatusCode),HIDE(#StatusCode))
+T(F,@ProdName,1)
+T(F,@ProdName,1)
+T(F,@StartDate,1)
+T(F,@EndDate,1)
+T(F,@StatusCode,1)
+SHOW(#GovOfferFlag,#FinancialFlag,#EmpFlag)
+T(F,@AgreementFg,1)
+T(F,@GovOfferFlag,1)
+T(F,@FinancialFlag,1)
+T(F,@EmpFlag,1)
+T(F,@BreachCode,1)
+T(F,@BreachGetCode,1)
+T(F,@DecreaseFlag,1)
+T(F,@ProhibitMonth,1)
+
+
+!商品生效 或 刪除 查詢時處理
+#TEXTOFFP2=X,1,S
+C(3,#UpdateCode,0,HIDE(#StatusCode),$)
+IF(#UpdateCode==0 || #Effective==1,$,S)
+HIDE(#GovOfferFlag,#FinancialFlag,#EmpFlag)
+T(F,@ProdName,0)
+T(F,@ProdName,0)
+IF(#UpdateCode==1 && #Effective==1,C(5,#UseProdFg,Y,T(F,@StartDate,0),T(F,@StartDate,1)),T(F,@StartDate,0))
+T(F,@EndDate,0)
+T(F,@StatusCode,0)
+T(F,@AgreementFg,0)
+T(F,@GovOfferFlag,0)
+T(F,@FinancialFlag,0)
+T(F,@BreachCode,0)
+T(F,@BreachGetCode,0)
+T(F,@BreachFlag,0)
+T(F,@DecreaseFlag,0)
+T(F,@ProhibitMonth,0)
+T(F,@BreachPercent,0)
+T(F,@BreachDecreaseMonth,0)
+T(F,@BreachDecrease,0)
+T(F,@BreachStartPercent,0)
+T(F,@BaseRateCode,0)
+T(F,@ProdIncr,0)
+T(F,@LowLimitRate,0)
+T(F,@IncrFlag,0)
+T(F,@RateCode,0)
+##loop{times:10,n:1}
+T(F,@StepMonthS{n},0)
+T(F,@StepMonthE{n},0)
+T(F,@StepRateType{n},0)
+T(F,@StepRateIncr{n},0)
+T(F,@TwPremium{n},0)
+T(F,@UsPremium{n},0)
+T(F,@PremiumIncr{n},0)
+##end
+##loop{times:5,n:1}
+T(F,@TwLoanAmt{n},0)
+T(F,@UsLoanAmt{n},0)
+T(F,@TwAcctFee{n},0)
+T(F,@UsAcctFee{n},0)
+##end
+
+
+#INITP2=X,1,S
+! T(3,@LowAmtTill, ~ )
+! T(3,@LbWKTILL, ~ )
+! T(H,@StatusCodeX,#StatusCode,#StatusCodeHelp)
+T(H,@GovOfferFlagX,#GovOfferFlag,#YesNoHelp) 
+T(H,@FinancialFlagX,#FinancialFlag,#YesNoHelp) 
+T(H,@EmpFlagX,#EmpFlag,#YesNoHelp) 
+
+![商品名稱]
+#FdProdName=X,2,L
+
+#ProdName=c,60,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+@V(7)
+
+![商品生效日期]
+#FdStartDate=X,2,L
+
+#StartDate=D,7,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
+! C(3,#Effective,1,s,$)
+C(3,#FuncCode,1,C(3,#StartDate,0,E(0,#SYSCDATE),$),$)
+C(3,#FuncCode,1,C(4,#StartDate,E(0,#SYSCDATE),$),$)
+C(3,#FuncCode,3,E(0,@StartDate,#SYSCDATE),$)
+D(8)
+@V(7)
+A(DATE,0,#StartDate)
+C(3,#StartDate,#L2r01StartDate,$,V(5,#SYSCDATE,9991231))
+
+#CheckF2Eff=X,1,S
+C(3,#FuncCode,2,$,S)
+C(3,#Effective,1,$,S)
+T(F,#EndDate,1)
+T(F,#StatusCode,1)
+
+!檢查輸入生效日期是否生效 1為生效 0為未生效
+#checkeffdate1=A,1,S
+E(0,0)
+IF(#StartDate <= #wksyscdate,E(0,1),E(0,0))
+! C(3,#FuncCode,2,$,s)
+! C(3,#StatusCode,0,$,s)
+C(3,#checkeffdate,1,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效))
+C(3,#EndDate,0,$,IF(#EndDate < #wksyscdate,T(3,@StatusCodeX,已失效),$))
+
+![商品截止日期]
+!商品參數生效後禁止刪除,只允許修改商品狀態、商品截止日期
+#FdEndDate=X,2,L
+
+
+
+#EndDate=D,7,I
+C(3,#UpdateCode,1,$,s)
+SHOW(#EndDate)
+D(8)
+@
+C(4,#EndDate,$,A(DATE,0,#EndDate))
+C(4,#EndDate,$,V(5,#StartDate,9991231))
+
+
+!檢查輸入截止日期是否截止
+#checkEndDate=A,1,S
+C(3,#EndDate,0,S,$)
+IF(#EndDate < #wksyscdate,T(3,@StatusCodeX,已失效),$)
+
+
+![商品狀態]
+!新增複製時固定為0 啟用
+!商品狀態 如為0 啟用(1.已生效,2未生效) 1停用
+!商品參數生效後禁止刪除,只允許修改商品狀態、商品截止日期
+#FdStatusCode=X,2,L
+
+#StatusCode=X,1,S
+IF(#FuncCode==1||#FuncCode==3,E(0,0),$)
+C(3,#FuncCode,2,$,s)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+HELP(#StatusCodeHelp)
+! @V(H,#StatusCodeHelp)
+
+#StatusCodeX=X,6,L
+! T(H,#StatusCode,#StatusCodeHelp)
+C(3,#StatusCode,0,$,s)
+C(3,#checkeffdate,1,T(3,已生效),T(3,待生效))
+C(3,#EndDate,0,s,$)
+IF(#EndDate < #wksyscdate,T(3,已失效),$)
+! C(2,#StatusCode,T(3,啟用),T(3,停用),T(3, ))
+
+!是否為協議商品
+#FdAgreementFg=X,2,L
+#AgreementFg=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#FuncCode,1,C(4,#AgreementFg,T(3,N),$),$)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
+
+#AgreementFgX=X,2,L
+T(H,#AgreementFg,#YesNoHelp)
+
+! 2020-11-17 Wei修改
+! 欄位"商品截止日期"需保留可輸入空白的功能,但需與#L2r01EndDate比較,故另外開立此欄位
+! 預設0,若欄位"商品截止日期"為空白則保留0,否則將值傳入
+#TmpEndDate=A,7,S
+E(0,0)
+C(4,#EndDate,s,E(0,#EndDate))
+
+#TmpRimEndDate=A,7,S
+E(0,0)
+C(4,#L2r01EndDate,s,E(0,#L2r01EndDate))
+
+! #MsgEffectiveErr=X,1,S
+! @
+! C(3,#Effective,1,$,S)
+! IF(#TmpEndDate == #L2r01EndDate,$,S)
+! V(P,修改時，必須至少修改一個項目) 
+
+![幣別]
+#FdCurrencyCode=X,2,L
+
+#CurrencyCode=X,3,L
+! HELP(#CurrencyHelp)
+C(3,#FuncCode,1,T(3,TWD),$)
+
+#Precision=N,1,S
+T(H,#CurrencyCode,#CurrPrecisionHelp)
+             
+
+![政府優惠房貸]
+#FdGovOfferFlag=X,2,L
+
+#GovOfferFlag=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+HELP(#YesNoHelp)
+C(3,#FuncCode,1,C(4,#GovOfferFlag,T(3,N),$),$)
+@V(H,#YesNoHelp)
+
+#GovOfferFlagX=X,2,L
+T(H,#GovOfferFlag,#YesNoHelp) 
+
+
+![理財型房貸]
+#FdFinancialFlag=X,2,L
+
+#FinancialFlag=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+HELP(#YesNoHelp)
+C(3,#FuncCode,1,C(4,#FinancialFlag,T(3,N),$),$)
+@V(H,#YesNoHelp)
+
+#FinancialFlagX=X,2,L
+T(H,#FinancialFlag,#YesNoHelp) 
+
+
+![員工優惠貸款]
+#FdEmpFlag=X,2,L
+
+#EmpFlag=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+HELP(#YesNoHelp)
+C(3,#FuncCode,1,C(4,#EmpFlag,T(3,N),$),$)
+@V(H,#YesNoHelp)
+
+#EmpFlagX=X,2,L
+T(H,#EmpFlag,#YesNoHelp) 
+
+
+!---- P3 利率
+#INVK3=X,1,S
+ENABLE(#BTNHIDEP3)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+
+
+#FdP3=X,1,S
+T(2,@FdBaseRateCode,#WkStar)
+T(2,@FdBaseRate,#WkSpc)
+T(2,@FdProdRate,#WkSpc)
+T(2,@FdProdIncr,#WkSpc)
+T(2,@FdLowLimitRate,#WkSpc)
+T(2,@FdIncrFlag,#WkStar)
+T(2,@FdRateCode,#WkStar)
+C(3,#Effective,1,$,S)
+T(2,@FdBaseRateCode,#WkSpc)
+T(2,@FdBaseRate,#WkSpc)
+T(2,@FdProdRate,#WkSpc)
+T(2,@FdProdIncr,#WkSpc)
+T(2,@FdLowLimitRate,#WkSpc)
+T(2,@FdIncrFlag,#WkSpc)
+T(2,@FdRateCode,#WkStar)
+
+#TEXTONP3=X,1,S
+C(3,#UpdateCode,1,$,S)
+SHOW(#BaseRateCode,#ProdIncr,#ProdIncrX,#LowLimitRate,#LowLimitRateX,#IncrFlag)
+HIDE(#LbProdIncr,#LbLowLimitRate)
+T(F,@BaseRateCode,1)
+T(F,@ProdIncr,1)
+T(F,@LowLimitRate,1)
+T(F,@IncrFlag,1)
+T(F,@RateCode,1)
+
+#TEXTOFFP3=X,1,S
+IF(#UpdateCode==0 || #Effective==1,$,S)
+SHOW(#LbProdIncr,#LbLowLimitRate)
+HIDE(#ProdIncr,#ProdIncrX,#LowLimitRate,#LowLimitRateX)
+T(F,@BaseRateCode,0)
+T(F,@ProdIncr,0)
+T(F,@LowLimitRate,0)
+T(F,@IncrFlag,0)
+T(F,@RateCode,0)
+
+#INITP3=X,1,S
+T(H,@BaseRateCodeX,#BaseRateCode,#BaseRate0Help)
+T(H,@IncrFlagX,#IncrFlag,#YesNoHelp)
+T(H,@RateCodeX,#RateCode,#FacmRateCodeHelp)
+
+![指標利率代碼]
+#FdBaseRateCode=X,2,L
+
+#BaseRateCode=X,2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+HELP(#BaseRate0Help)
+@V(H,#BaseRate0Help)
+
+#BaseRateCodeX=x,20,L
+T(H,#BaseRateCode,#BaseRate0Help)
+C(5,#BaseRateCode,99,SHOW(#LbProdIncr)HIDE(#ProdIncr,#ProdIncrX),SHOW(#ProdIncr,#ProdIncrX)HIDE(#LbProdIncr))
+
+#SendL2r06B=X,1,S
+T(2,@RimCurrencyCode,#CurrencyCode)
+T(2,@RimBaseRateCode,#BaseRateCode)
+E(0,@RimEffectDate,#EffectDate)
+E(0,@RimEffectTime,#EffectTime)
+C(3,#UpdateCode,0,$,RESET_RIM(#SendL2r06B,L2R06))
+S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
+R(1,L2R06)
+
+#FdBaseRate=X,2,L
+
+#BaseRate=n,2.4,S
+E(0,#L2r06Rate)
+
+#BaseRateX=X,12,L
+X(#BaseRate)
+T(B,#BaseRateX+#WkPercent)
+E(0,@ProdRate,#BaseRate+#ProdIncr)
+X(@ProdRateX,#ProdRate)
+T(B,@ProdRateX,#ProdRateX+#WkPercent)
+
+![商品利率加減碼]
+#FdProdIncr=X,2,L
+
+! #WkBaseRate1=n,2.4,S
+! E(0,0-#BaseRate)
+
+! #WkBaseRate2=n,2.4,S
+! E(0,99.9999-#BaseRate)
+
+#ProdIncr=+n,2.4,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(5,#BaseRateCode,99,S,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+C(3,#FuncCode,1,C(3,#ProdIncr,E(0,0),$),$)
+
+#LbProdIncr=X,12,L
+X(#ProdIncr)
+T(B,#LbProdIncr+#WkPercent)
+
+#ProdIncrX=X,3,L
+
+
+![加減碼是否依合約]
+#FdIncrFlag=X,2,L
+
+#IncrFlag=X,1,L
+C(3,#FuncCode,1,C(4,#IncrFlag,T(3,Y),$),$)
+! C(3,#UpdateCode,1,$,s)
+! C(3,#Effective,1,s,$)
+! C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+! HELP(#YesNoHelp)
+! @V(H,#YesNoHelp)
+
+#IncrFlagX=X,2,L
+! T(H,#IncrFlag,#YesNoHelp)
+
+
+
+![商品利率]
+#FdProdRate=X,2,L
+
+#ProdRate=n,2.4,S
+E(0,#BaseRate+#ProdIncr)
+
+#ProdRateX=X,12,L
+X(#ProdRate)
+T(B,#ProdRateX+#WkPercent)
+
+
+![利率下限]
+#FdLowLimitRate=X,2,L
+
+#LowLimitRate=n,2.4,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+C(3,#FuncCode,1,C(3,#LowLimitRate,0,E(0,0),$),$)
+@V(5,0,99.9999)
+
+#LbLowLimitRate=X,12,L
+X(#LowLimitRate)
+T(B,#LbLowLimitRate+#WkPercent)
+
+#LowLimitRateX=X,3,L
+
+
+
+![利率區分]
+!商品不限制時,才須輸入,否則自動顯示不必輸入
+#FdRateCode=X,2,L
+
+#RateCode=A,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+HELP(#FacmRateCodeHelp)
+@V(H,#FacmRateCodeHelp)
+
+#RateCodeX=X,10,L
+T(H,#RateCode,#FacmRateCodeHelp)
+
+
+
+##loop{times:9,n:2,m:4}
+#HIDESTEPALL{n}=X,1,S
+SHOW(#StepRateType{n})
+T(F,@StepMonthS{n},1)
+T(F,@StepRateType{n},1)
+T(F,@StepRateIncr{n},1)
+IF(#StepMonthS{n}==0,INVOKEJS(SHOW,grd1_{m},0)HIDE(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n}),$)
+##end
+
+#TEXT_ON_P4_1=X,1,S
+C(3,#UpdateCode,1,$,S)
+SHOW(#StepRateType1)
+T(F,@StepMonthS1,1)
+T(F,@StepRateType1,1)
+T(F,@StepRateIncr1,1)
+
+#TEXT_OFF_P4_1=X,1,S
+IF(#UpdateCode==0 || #Effective==1,$,S)
+HIDE(#StepRateType1)
+T(F,@StepMonthS1,0)
+T(F,@StepMonthE1,0)
+T(F,@StepRateType1,0)
+T(F,@StepRateIncr1,0)
+
+#INITP4=X,1,S
+C(3,#FuncCode,1,S,$)
+##loop{times:10,n:1}
+T(3,@StepRateTypeX{n}, )
+T(H,#StepRateType{n},#RateTypeHelp)
+##end
+
+#StepMonthS1=N,3,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+INVOKEJS(SHOW,grd1_1,1)
+@
+C(3,#StepMonthS1,0,S,$)
+IF(#StepMonthS1!=1,V(P,僅可輸入0，空白及1),$)
+
+#StepMonthE1=N,3,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#StepMonthS1,0,S,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+@
+C(3,#StepMonthS1,0,s,$)
+V(6,0,#StepMonthS1)
+
+#Month1=X,3,S
+E(0,#StepMonthE1+1)
+T(2,#Month1)
+
+#StepRateType1=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#StepMonthE1,0,S,$)
+C(3,#BaseRateCode,99,E(0,1),$)
+HELP(#RateTypeHelp)
+@
+C(3,#BaseRateCode,99,V(1,1),V(1,1,2))
+
+
+#StepRateTypeX1=X,10,L
+T(H,#StepRateType1,#RateTypeHelp)
+
+#StepRateIncr1=+n,2.4,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+C(3,#StepMonthE1,0,S,$)
+@
+IF(#StepMonthE1==0,INVOKEJS(SHOW,grd1_2,0),INVOKEJS(SHOW,grd1_2,1))
+
+#StepRatePer1=X,2,L
+
+##loop{times:9,n:2,m:1,j:2,k:3}
+
+#TEXT_ON_P4{n}=X,1,S
+C(3,#UpdateCode,1,$,S)
+IF(#StepMonthS{m} > 0,SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n}),$)
+T(F,@StepMonthS{n},1)
+T(F,@StepMonthE{n},1)
+T(F,@StepRateType{n},1)
+T(F,@StepRateIncr{n},1)
+
+#TEXT_OFF_P4{n}=X,1,S
+IF(#UpdateCode==0 || #Effective==1,$,S)
+IF(#StepMonthS{n} > 0,SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n})HIDE(#StepRateType{n}),$)
+T(F,@StepMonthS{n},0)
+T(F,@StepMonthE{n},0)
+T(F,@StepRateIncr{n},0)
+
+#test{n}=X,20,S
+T(B,僅可輸入0，空白及+#Month{m})
+
+#StepMonthS{n}=N,3,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+IF({m}==1,$,C(3,#StepMonthS{m},0,S,$))
+C(3,#StepMonthE{m},0,S,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+E(0,#StepMonthE{m}+1)
+INVOKEJS(SHOW,grd1_{j},1)
+SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n})
+@
+C(3,#StepMonthS{n},0,E(0,@StepMonthE{m},999)E(0,@Month{m},0)T(2,@test{n},僅可輸入0或空白),$)
+C(3,#StepMonthS{n},0,S,$)
+C(3,#StepMonthE{m},0,S,IF(#StepMonthS{n}!=#Month{m},V(P,#test{n}),$))
+
+#StepMonthE{n}=N,3,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#StepMonthS{n},0,S,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n})
+@IF({n}==1,$,V(6,0,#StepMonthS{n}))
+
+#Month{n}=X,3,S
+E(0,#StepMonthE{n}+1)
+
+#StepRateType{n}=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#StepMonthE{n},0,S,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+HELP(#RateTypeHelp)
+@
+C(3,#BaseRateCode,99,V(1,1),V(1,1,2))
+
+#StepRateTypeX{n}=X,10,L
+C(4,#StepRateType{n},S,$)
+T(H,#StepRateType{n},#RateTypeHelp)
+! T(H,#StepRateCode{n},#FacmRateCodeHelp)
+
+#StepRateIncr{n}=+n,2.4,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+C(3,#StepMonthE{n},0,S,$)
+@
+IF({n}==1,S,IF(#StepMonthS{n}==0,INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1)))
+
+#StepRatePer{n}=X,2,L
+
+#HIDESTEP{n}=X,1,S
+IF(#StepMonthS{n}==0,INVOKEJS(SHOW,grd1_{k},0)HIDE(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n}),$)
+  
+##end
+
+#WkSTPMOD=X,1,S
+C(3,#FuncCode,2,$,S)
+E(0,@CHECKMODP4,0)
+! C(3,#Effective,1,S,$)
+##loop{times:10,n:1}
+IF(#StepMonthS{n} != #L2r01StepRateMonths{n},E(0,@CHECKMODP4,1),$)
+IF(#StepMonthE{n} != #L2r01StepRateMonthE{n},E(0,@CHECKMODP4,1),$)
+IF(#StepRateType{n} != #L2r01StepRateType{n},E(0,@CHECKMODP4,1),$)
+IF(#StepRateIncr{n} != #L2r01StepRateIncr{n},E(0,@CHECKMODP4,1),$)
+##end
+
+
+!------------------[年繳保費優惠]
+
+!--- P6 年繳保費優惠減碼
+#INVK6=X,1,S
+ENABLE(#BTNHIDEP6)
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+
+##loop{times:9,n:2}
+#HIDE_PremiumALL{n}=X,1,S
+HIDE(#TwPremium{n},#UsPremium{n},#PremiumIncr{n},#PremiumPer{n})
+IF(#TimPremium{n} > 0,$,s)
+SHOW(#TwPremium{n},#PremiumIncr{n},#PremiumPer{n})
+T(F,@TwPremium{n},1)
+T(F,@UsPremium{n},1)
+T(F,@PremiumIncr{n},1)
+##end
+
+#Wk_HIDE_P6_1=@,1,S
+SHOW(#PremiumIncr1,#PremiumPer1)
+C(3,#Precision,0,SHOW(#TwPremium1)HIDE(#UsPremium1)
+                ,SHOW(#UsPremium1)HIDE(#TwPremium1))
+
+#TEXT_ON_P6_1=X,1,S
+C(3,#UpdateCode,1,$,S)
+T(F,@TwPremium1,1)
+T(F,@UsPremium1,1)
+T(F,@PremiumIncr1,1)
+
+
+#TEXT_OFF_P6_1=X,1,S
+IF(#UpdateCode==0 || #Effective==1,$,S)
+T(F,@TwPremium1,0)
+T(F,@UsPremium1,0)
+T(F,@PremiumIncr1,0)
+
+#TwPremium1=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,$,s)
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+SHOW(#TwPremium1,#PremiumIncr1,#PremiumPer1)
+INVOKEJS(SHOW,grd2_1,1)
+@I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+! V(2,0)
+
+#UsPremium1=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,s,$)
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+SHOW(#UsPremium1,#PremiumIncr1,#PremiumPer1)
+INVOKEJS(SHOW,grd2_1,1)
+@I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+! V(2,0)
+
+#TimPremium1=m,14.2,S
+C(3,#Precision,0,E(0,#TwPremium1),E(0,#UsPremium1))
+IF(#TimPremium1==0,INVOKEJS(SHOW,grd2_2,0),INVOKEJS(SHOW,grd2_2,1))
+
+#PremiumIncr1=+n,2.4,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+IF(#Precision==0,C(3,#TwPremium1,0,S,$),C(3,#UsPremium1,0,S,$))
+SHOW(#TwPremium1,#PremiumIncr1,#PremiumPer1)
+@V(5,-9.9999,-0.0001)
+
+#PremiumPer1=X,2,L
+
+##loop{times:9,n:2,m:1,k:3}
+
+#Wk_HIDE_P6{n}=X,1,S
+IF(#TimPremium{m}==0,S,$)
+SHOW(#PremiumIncr{n},#PremiumPer{n})
+C(3,#Precision,0,SHOW(#TwPremium{n})HIDE(#UsPremium{n})
+                ,SHOW(#UsPremium{n})HIDE(#TwPremium{n}))
+
+#TEXT_ON_P6{n}=X,1,S
+IF(#TimPremium{m}==0,S,$)
+C(3,#UpdateCode,1,$,S)
+T(F,@PremiumIncr{n},1)
+T(F,@TwPremium{n},1)
+T(F,@UsPremium{n},1)
+
+
+#TEXT_OFF_P6{n}=X,1,S
+IF(#TimPremium{m}==0,S,$)
+IF(#UpdateCode==0 || #Effective==1,$,S)
+T(F,@PremiumIncr{n},0)
+T(F,@TwPremium{n},0)
+T(F,@UsPremium{n},0)
+
+#TwPremium{n}=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,$,s)
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+IF(#TimPremium{m}==0,S,$)
+SHOW(#TwPremium{n},#PremiumIncr{n},#PremiumPer{n})
+@V(6,1,#TimPremium{m})
+I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#UsPremium{n}=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,s,$)
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+IF(#TimPremium{m}==0,S,$)
+SHOW(#UsPremium{n},#PremiumIncr{n},#PremiumPer{n})
+@V(6,1,#TimPremium{m})
+I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#TimPremium{n}=m,14.2,S
+C(3,#Precision,0,E(0,#TwPremium{n}),E(0,#UsPremium{n}))
+IF(#TimPremium{n}==0,INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
+
+#PremiumIncr{n}=+n,2.4,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+IF(#Precision==0,C(3,#TwPremium{n},0,S,$),C(3,#UsPremium{n},0,S,$))
+@V(5,-9.9999,-0.0001)
+
+#PremiumPer{n}=X,2,L
+
+#HIDE_Premium{n}=X,1,S
+IF(#TimPremium{n}==0,HIDE(#TwPremium{n},#UsPremium{n},#PremiumIncr{n},#PremiumPer{n}),$)
+
+##end
+
+
+#WkPREMOD=X,1,S
+C(3,#FuncCode,2,$,S)
+E(0,@CHECKMODP6,0)
+##loop{times:10,n:1}
+C(3,#Precision,0,
+    IF(#TwPremium{n} != #L2r01Premium{n},E(0,@CHECKMODP6,1),$)
+   ,IF(#UsPremium{n} != #L2r01Premium{n},E(0,@CHECKMODP6,1),$)) 
+IF(#PremiumIncr{n} != #L2r01PremiumIncr{n},E(0,@CHECKMODP6,1),$)
+##end
+
+!--- P7 帳管費
+#INVK7=X,1,S
+ENABLE(#BTNHIDEP7)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+
+
+##loop{times:4,n:2}
+#HIDE_AcctFeeALL{n}=X,1,S
+HIDE(#TwLoanAmt{n},#UsLoanAmt{n},#TwAcctFee{n},#UsAcctFee{n})
+IF(#TimLoanAmt{n} > 0,$,s)
+SHOW(#TwLoanAmt{n},#TwAcctFee{n})
+T(F,@TwLoanAmt{n},1)
+T(F,@UsLoanAmt{n},1)
+T(F,@TwAcctFee{n},1)
+T(F,@UsAcctFee{n},1)
+##end
+
+#Wk_HIDE_P7_1=@,1,S
+C(3,#Precision,0,SHOW(#TwLoanAmt1,#TwAcctFee1)HIDE(#UsLoanAmt1,#UsAcctFee1)
+                ,SHOW(#UsLoanAmt1,#UsAcctFee1)HIDE(#TwLoanAmt1,#TwAcctFee1))
+
+#TEXT_ON_P7_1=X,1,S
+C(3,#UpdateCode,1,$,S)
+T(F,@TwLoanAmt1,1)
+T(F,@UsLoanAmt1,1)
+T(F,@TwAcctFee1,1)
+T(F,@UsAcctFee1,1)
+
+#TEXT_OFF_P7_1=X,1,S
+IF(#UpdateCode==0 || #Effective==1,$,S)
+T(F,@TwLoanAmt1,0)
+T(F,@UsLoanAmt1,0)
+T(F,@TwAcctFee1,0)
+T(F,@UsAcctFee1,0)
+
+#TwLoanAmt1=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,$,S)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+INVOKEJS(SHOW,grd3_1,1)
+C(3,#Precision,0,SHOW(#TwLoanAmt1,#TwAcctFee1)HIDE(#UsLoanAmt1,#UsAcctFee1)
+                ,SHOW(#UsLoanAmt1,#UsAcctFee1)HIDE(#TwLoanAmt1,#TwAcctFee1))
+@I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#UsLoanAmt1=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,S,$)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+INVOKEJS(SHOW,grd3_1,1)
+C(3,#Precision,0,SHOW(#TwLoanAmt1,#TwAcctFee1)HIDE(#UsLoanAmt1,#UsAcctFee1)
+                ,SHOW(#UsLoanAmt1,#UsAcctFee1)HIDE(#TwLoanAmt1,#TwAcctFee1))
+@I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#TimLoanAmt1=m,14.2,S
+C(3,#Precision,0,E(0,#TwLoanAmt1),E(0,#UsLoanAmt1))
+
+#TwAcctFee1=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,$,S)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+C(3,#TwLoanAmt1,0,S,$)
+C(3,#Precision,0,SHOW(#TwLoanAmt1,#TwAcctFee1)HIDE(#UsLoanAmt1,#UsAcctFee1)
+                ,SHOW(#UsLoanAmt1,#UsAcctFee1)HIDE(#TwLoanAmt1,#TwAcctFee1))
+@V(2,0)
+I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#UsAcctFee1=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,S,$)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+C(3,#UsLoanAmt1,0,S,$)
+C(3,#Precision,0,SHOW(#TwLoanAmt1,#TwAcctFee1)HIDE(#UsLoanAmt1,#UsAcctFee1)
+                ,SHOW(#UsLoanAmt1,#UsAcctFee1)HIDE(#TwLoanAmt1,#TwAcctFee1))
+@V(2,0)
+I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#TimAcctFee1=m,14.2,S
+C(3,#Precision,0,E(0,#TwAcctFee1),E(0,#UsAcctFee1))
+IF(#TimLoanAmt1==0,INVOKEJS(SHOW,grd3_2,0),INVOKEJS(SHOW,grd3_2,1))
+
+##loop{times:4,n:2,m:1,k:3}
+
+#Wk_HIDE_P7{n}=X,1,S
+C(3,#Precision,0,SHOW(#TwLoanAmt{n},#TwAcctFee{n})HIDE(#UsLoanAmt{n},#UsAcctFee{n})
+                ,SHOW(#UsLoanAmt{n},#UsAcctFee{n})HIDE(#TwLoanAmt{n},#TwAcctFee{n}))
+
+#TEXT_ON_P7{n}=X,1,S
+C(3,#UpdateCode,1,$,S)
+T(F,@TwLoanAmt{n},1)
+T(F,@UsLoanAmt{n},1)
+T(F,@TwAcctFee{n},1)
+T(F,@UsAcctFee{n},1)
+
+#TEXT_OFF_P7{n}=X,1,S
+IF(#UpdateCode==0 || #Effective==1,$,S)
+T(F,@TwLoanAmt{n},0)
+T(F,@UsLoanAmt{n},0)
+T(F,@TwAcctFee{n},0)
+T(F,@UsAcctFee{n},0)
+
+#TwLoanAmt{n}=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,$,S)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+IF(#TimLoanAmt{m}==0,S,$)
+INVOKEJS(SHOW,grd3_{n},1)
+SHOW(#TwLoanAmt{n},#TwAcctFee{n})
+@V(6,1,#TimLoanAmt{m})
+I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#UsLoanAmt{n}=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,S,$)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+IF(#TimLoanAmt{m}==0,S,$)
+INVOKEJS(SHOW,grd3_{n},1)
+SHOW(#UsLoanAmt{n},#UsAcctFee{n})
+@V(6,1,#TimLoanAmt{m})
+I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#TimLoanAmt{n}=m,14.2,S
+C(3,#Precision,0,E(0,#TwLoanAmt{n}),E(0,#UsLoanAmt{n}))
+
+#TwAcctFee{n}=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,$,S)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+C(3,#TwLoanAmt{n},0,S,$)
+@V(2,0)
+I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#UsAcctFee{n}=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#Precision,0,S,$)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+C(3,#UsLoanAmt{n},0,S,$)
+@V(2,0)
+I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#TimAcctFee{n}=m,14.2,S
+C(3,#Precision,0,E(0,#TwAcctFee{n}),E(0,#UsAcctFee{n}))
+IF(#TimLoanAmt{n}==0,INVOKEJS(SHOW,grd3_{k},0),INVOKEJS(SHOW,grd3_{k},1))
+
+#HIDE_AcctFee{n}=X,1,S
+IF(#TimAcctFee{n}==0,HIDE(#TwLoanAmt{n},#UsLoanAmt{n},#TwAcctFee{n},#UsAcctFee{n}),$)
+
+##end
+
+#WkACTMOD=X,1,S
+C(3,#FuncCode,2,$,S)
+E(0,@CHECKMODP7,0)
+##loop{times:5,n:1}
+C(3,#Precision,0,
+    IF(#TwLoanAmt{n} != #L2r01AcctFeeLoanAmt{n},E(0,@CHECKMODP7,1),$)
+   ,IF(#UsLoanAmt{n} != #L2r01AcctFeeLoanAmt{n},E(0,@CHECKMODP7,1),$)) 
+C(3,#Precision,0,   
+    IF(#TwAcctFee{n} != #L2r01AcctFeeAcctFee{n},E(0,@CHECKMODP7,1),$)
+   ,IF(#UsAcctFee{n} != #L2r01AcctFeeAcctFee{n},E(0,@CHECKMODP7,1),$))
+##end
+
+!--- P8 清償金類型
+#INVK8=X,1,S
+ENABLE(#BTNHIDEP8)
+C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
+
+
+#FdP8=X,1,S
+T(2,@FdBreachFlag,#WkStar)
+T(2,@FdBreachGetCode,#WkStar)
+T(2,@FdBreachCode,#WkStar)
+T(2,@FdBreachPercent,#WkStar)
+T(2,@FdBreachPercent,#WkStar)
+T(2,@FdBreachDecreaseMonth,#WkStar)
+T(2,@FdBreachDecrease,#WkStar)
+C(3,#Effective,1,$,S)
+T(2,@FdBreachFlag,#WkSpc)
+T(2,@FdBreachCode,#WkSpc)
+T(2,@FdBreachGetCode,#WkSpc)
+T(2,@FdBreachPercent,#WkSpc)
+T(2,@FdBreachDecreaseMonth,#WkSpc)
+T(2,@FdBreachDecrease,#WkSpc)
+
+
+#INITP8=X,1,S
+T(H,@BreachFlagX,#BreachFlag,#YesNoHelp)
+T(H,@BreachGetCodeX,#BreachGetCode,#BreachGetCodeHelp)
+T(H,@BreachCodeX,#BreachCode,#ProdBreachCodeHelp)
+C(5,#BreachCode,0,T(3,@BreachCodeX,無),$)
+C(5,#BreachFlag,N,T(3,@BreachCodeX,無)
+                      T(3,@BreachGetCodeX,無),$)
+
+
+
+!是否綁約
+#FdBreachFlag=X,2,L
+
+#BreachFlag=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
+
+#BreachFlagX=X,10,L
+T(H,#BreachFlag,#YesNoHelp)
+C(5,#BreachFlag,Y,INVOKEJS(SHOW,p1,24,31,1),INVOKEJS(SHOW,p1,24,31,0))
+
+#BreachFlag_SKIP=X,1,S
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+IF(#BreachFlag=="N",T(2,@FdBreachCode,#WkSpc)
+                   ,T(2,@FdProhibitMonth,#WkStar)T(2,@FdBreachCode,#WkStar))
+
+
+![違約適用方式]
+#FdBreachCode=X,2,L
+C(3,#UpdateCode,1,$,S)
+C(5,#BreachFlag,N,HIDE(#BreachCode,#BreachGetCode)
+                       ,SHOW(#BreachCode,#BreachGetCode))
+
+#BreachCode=X,3,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
+HELP(#ProdBreachCodeHelp)
+@V(H,#ProdBreachCodeHelp)
+
+#BreachCodeX=X,40,L
+T(H,#BreachCode,#ProdBreachCodeHelp)
+C(5,#BreachFlag,N,T(3,無),$)
+
+#BreachCode_SKIP=X,1,S
+C(3,#UpdateCode,1,$,S)
+IF(#BreachFlag=="N",T(2,@FdBreachGetCode,#WkSpc)
+                                      HIDE(#BreachGetCode)
+                                     ,T(2,@FdBreachGetCode,#WkStar)
+                                      SHOW(#BreachGetCode))
+
+
+![綁約年限]
+#FdProhibitMonth=X,2,L
+
+#ProhibitMonth=A,3,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
+@
+V(2,0)
+
+#ProhibitMonthX=X,9,L
+
+
+![違約金收取方式]
+#FdBreachGetCode=X,2,L
+
+#BreachGetCode=X,1,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
+HELP(#BreachGetCodeHelp)
+@V(H,#BreachGetCodeHelp)
+
+#BreachGetCodeX=X,16,L
+T(H,#BreachGetCode,#BreachGetCodeHelp)
+C(5,#BreachFlag,N,T(3,@BreachGetCodeX,無),$)
+C(5,#BreachGetCode,0,T(3,@BreachGetCodeX,無),$)
+
+!違約金百分比
+#FdBreachPercent=X,2,L
+
+#BreachPercent=n,3.2,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+@V(2,0)
+V(5,0,100)
+
+!違約金分段月數
+#FdBreachDecreaseMonth=X,2,L
+
+#BreachDecreaseMonth=n,3,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+@V(2,0)
+
+!分段遞減百分比
+#FdBreachDecrease=X,2,L
+
+#BreachDecrease=n,3.2,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+@V(2,0)
+V(5,0,100)
+IF(#BreachDecrease>#BreachPercent,V(P,不可大於違約金百分比),$)
+
+!還款起算比例
+#FdBreachStartPercent=X,2,L
+
+#BreachStartPercent=n,3,I
+C(5,#BreachFlag,N,S,$)
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+@V(5,0,100)
+
+#Breach=x,200,L
+C(5,#BreachFlag,N,S,$)
+
+#Breach1=X,4.50,L
+C(5,#BreachFlag,N,S,$)
+
+
+
+
+!-----------------------------------------------------------------
+#WkBreachMOD=X,1,S
+C(3,#FuncCode,2,$,S)
+E(0,@CHECKMODP8,0)
+! C(3,#Effective,1,S,$)
+IF(#BreachFlag != #L2r01BreachFlag,E(0,@CHECKMODP8,1),$)
+IF(#BreachCode != #L2r01BreachCode,E(0,@CHECKMODP8,1),$)
+IF(#BreachGetCode != #L2r01BreachGetCode,E(0,@CHECKMODP8,1),$)
+!----------------------------------------------------------
+#WkCHKMOD0=X,1,S
+C(3,#FuncCode,2,$,S)
+E(0,@CHECKMOD0,0)
+IF(#ProdName != #L2r01ProdName,E(0,@CHECKMOD0,1),$)
+ALERT(#ProdName,#L2r01ProdName,#CHECKMOD0)
+IF(#StartDate != #L2r01StartDate,E(0,@CHECKMOD0,1),$)
+ALERT(#StartDate,#L2r01StartDate,#CHECKMOD0)
+IF(#L2r01EndDate==0,C(4,#EndDate,$,E(0,@CHECKMOD0,1)),IF(#EndDate != #L2r01EndDate,E(0,@CHECKMOD0,1),$))
+ALERT(#EndDate,#L2r01EndDate,#CHECKMOD0)
+IF(#StatusCode != #L2r01StatusCode,E(0,@CHECKMOD0,1),$)
+ALERT(#StatusCode,#L2r01StatusCode,#CHECKMOD0)
+IF(#CurrencyCode != #L2r01CurrencyCode,E(0,@CHECKMOD0,1),$)  
+ALERT(#CurrencyCode,#L2r01CurrencyCode,#CHECKMOD0)                   
+IF(#BaseRateCode != #L2r01BaseRateCode,E(0,@CHECKMOD0,1),$)  
+ALERT(#BaseRateCode,#L2r01BaseRateCode,#CHECKMOD0)                      
+IF(#ProdIncr != #L2r01ProdIncr,E(0,@CHECKMOD0,1),$)           
+ALERT(#ProdIncr,#L2r01ProdIncr,#CHECKMOD0)             
+IF(#RateCode != #L2r01RateCode,E(0,@CHECKMOD0,1),$)
+ALERT(#RateCode,#L2r01RateCode,#CHECKMOD0)
+IF(#LowLimitRate != #L2r01LowLimitRate,E(0,@CHECKMOD0,1),$)       
+ALERT(#LowLimitRate,#L2r01LowLimitRate,#CHECKMOD0)        
+IF(#GovOfferFlag != #L2r01GovOfferFlag,E(0,@CHECKMOD0,1),$) 
+ALERT(#GovOfferFlag,#L2r01GovOfferFlag,#CHECKMOD0)
+
+!---- EXPAND 展開
+
+#INVKEXPAND=X,1,S
+ENABLE(#BTNEXPAND)
+E(0,@EXPANDFG,0)
+C(3,#EXPANDFG,0,CALL(#EXPAND),$)
+
+#MSGERR=X,1,S
+@
+C(3,#FuncCode,2,$,S)
+ALERT(#CHECKMOD0,#CHECKMODP4,#CHECKMODP6,#CHECKMODP7,#CHECKMODP8)
+IF(#CHECKMOD0==1 || #CHECKMODP4==1 || #CHECKMODP6==1 || #CHECKMODP7==1 || #CHECKMODP8==1,S,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,V(P,該商品已生效，只能修改商品截止日期),V(P,該商品已生效，只能修改商品生效日及商品截止日期)),V(P,修改時，必須至少修改一個項目))
+
+#checkenddate=X,1,S
+C(3,#EndDate,0,HIDE(#EndDate),SHOW(#EndDate))
+
+
+!0010 商品參數維護需主管核可
+!#RQSP=X,4,S
+!C(3,#UpdateCode,1,T(3,0010),T(3, ))
+!ASGN(RQSP$)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L2R06.dec"/>
+</sub>
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2101 ----------
+<sub type="FORM" name="L2101">
+
+#SCRPRT=_,_,S
+C(3,#FuncCode,5,S,$)
+C(5,#TXFORM,L2101,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2101] 商品參數維護)
+
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FuncCode#ProdNo#ProdName#StartDate#EndDate#StatusCode#AgreementFg
+#CurrencyCode#BaseRateCode#ProdIncr#RateCode
+#LowLimitRate#IncrFlag
+#BreachFlag
+#BreachCode#BreachGetCode#ProhibitMonth
+#BreachPercent#BreachDecreaseMonth#BreachDecrease#BreachStartPercent
+#GovOfferFlag#FinancialFlag#EmpFlag
+##loop{times:10,n:1}
+#StepMonthS{n}#StepMonthE{n}#StepRateType{n}#StepRateIncr{n}
+##end
+##loop{times:10,n:1}
+#TwPremium{n}#UsPremium{n}#TimPremium{n}#PremiumIncr{n}
+##end    
+##loop{times:5,n:1}
+#TwLoanAmt{n}#UsLoanAmt{n}#TimLoanAmt{n}#TwAcctFee{n}#UsAcctFee{n}#TimAcctFee{n}
+##end
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2101^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R06.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+</sub>

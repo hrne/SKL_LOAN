@@ -192,9 +192,9 @@ public class LQ003Report extends MakeReport {
 
 			for (Map<String, String> tLDVo2 : findList2) {
 				// 上季末貸款總額
-				BigDecimal f9 = tLDVo2.get("F3") == null || tLDVo2.get("F3").length() == 0 ? BigDecimal.ZERO
+				BigDecimal lf3 = tLDVo2.get("F3") == null || tLDVo2.get("F3").length() == 0 ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo2.get("F3"));
-				makeExcel.setValue(i, 9, f9, "#,##0", "R");
+				makeExcel.setValue(i, 9, lf3, "#,##0", "R");
 
 				i++;
 			}

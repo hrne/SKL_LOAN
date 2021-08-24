@@ -37,7 +37,6 @@ import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.data.BankRelationVo;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -65,7 +64,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L1101")
 @Scope("prototype")
 public class L1101 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1101.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -91,18 +89,14 @@ public class L1101 extends TradeBuffer {
 	@Autowired
 	public CdCodeService iCdCodeService;
 
-	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
+	public Parse iParse;
 
 	@Autowired
-	public Parse parse;
+	SendRsp iSendRsp;
 
 	@Autowired
-	SendRsp sendRsp;
-
-	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 
 	private CustMain tCustMain;
 	private boolean isEloan = false;
@@ -168,11 +162,11 @@ public class L1101 extends TradeBuffer {
 				throw new LogicException("E0005", "客戶資料主檔");
 			}
 //by eric 2021.7.31
-			setCustCross(titaVo,tCustMain);
+			setCustCross(titaVo, tCustMain);
 			break;
 		case "2": // 修改
 			// 變更前
-			beforeCustMain = (CustMain) dataLog.clone(tCustMain);
+			beforeCustMain = (CustMain) iDataLog.clone(tCustMain);
 			// 搬值
 
 			setCstMain(titaVo);
@@ -182,8 +176,8 @@ public class L1101 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeCustMain, tCustMain);
-			dataLog.exec();
+			iDataLog.setEnv(titaVo, beforeCustMain, tCustMain);
+			iDataLog.exec();
 			break;
 		case "4": // 刪除
 //		刪除功能暫時先拔掉 資料刪除影響很多db
@@ -203,7 +197,7 @@ public class L1101 extends TradeBuffer {
 				iChkFg = 0;
 				iChkFg = inqLoanBorMain(tCustMain.getCustNo(), iChkFg, titaVo);
 				if (iChkFg != 0) {
-					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
+					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
 				}
 			}
 
@@ -283,10 +277,10 @@ public class L1101 extends TradeBuffer {
 		if (tCustMain.getIncomeDataDate().equals("") || tCustMain.getIncomeDataDate().equals("0")) {
 			this.totaVo.putParam("OIncomeDataDate", "");
 		} else {
-			if (parse.stringToInteger(tCustMain.getIncomeDataDate()) > 191100) {
-				this.totaVo.putParam("OIncomeDataDate", parse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100);
+			if (iParse.stringToInteger(tCustMain.getIncomeDataDate()) > 191100) {
+				this.totaVo.putParam("OIncomeDataDate", iParse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100);
 			} else {
-				this.totaVo.putParam("OIncomeDataDate", parse.stringToInteger(tCustMain.getIncomeDataDate()));
+				this.totaVo.putParam("OIncomeDataDate", iParse.stringToInteger(tCustMain.getIncomeDataDate()));
 			}
 		}
 
@@ -368,7 +362,7 @@ public class L1101 extends TradeBuffer {
 	private void setCstMain(TitaVo titaVo) throws LogicException {
 
 		tCustMain.setCustName(titaVo.getParam("CustName"));
-		tCustMain.setBirthday(parse.stringToInteger(titaVo.getParam("Birthday")));
+		tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("Birthday")));
 		tCustMain.setSex(titaVo.getParam("Sex"));
 		tCustMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));
 		tCustMain.setIndustryCode(titaVo.getParam("IndustryCode"));
@@ -413,13 +407,13 @@ public class L1101 extends TradeBuffer {
 		tCustMain.setCurrCompTel(titaVo.getParam("CurrCompTel"));
 		tCustMain.setJobTitle(titaVo.getParam("JobTitle"));
 		tCustMain.setJobTenure(titaVo.getParam("JobTenure"));
-		tCustMain.setIncomeOfYearly(parse.stringToInteger(titaVo.getParam("IncomeOfYearly")));
+		tCustMain.setIncomeOfYearly(iParse.stringToInteger(titaVo.getParam("IncomeOfYearly")));
 		if (titaVo.getParam("IncomeDataDate").equals("")) {
 			tCustMain.setIncomeDataDate("");
-		} else if (parse.stringToInteger(titaVo.getParam("IncomeDataDate")) > 191100) {
-			tCustMain.setIncomeDataDate("" + parse.stringToInteger(titaVo.getParam("IncomeDataDate")));
+		} else if (iParse.stringToInteger(titaVo.getParam("IncomeDataDate")) > 191100) {
+			tCustMain.setIncomeDataDate("" + iParse.stringToInteger(titaVo.getParam("IncomeDataDate")));
 		} else {
-			tCustMain.setIncomeDataDate("" + (parse.stringToInteger(titaVo.getParam("IncomeDataDate")) + 191100));
+			tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDate")) + 191100));
 		}
 
 		tCustMain.setPassportNo(titaVo.getParam("PassportNo"));
@@ -432,12 +426,12 @@ public class L1101 extends TradeBuffer {
 			tCustMain.setIntroducer(beforeCustMain.getIntroducer());
 		}
 //		Introducer
-		//分行別預設0000 --2021.8.6 Fegie
+		// 分行別預設0000 --2021.8.6 Fegie
 		tCustMain.setBranchNo("0000");
 	}
 
 	// by eric 2021.7.31
-	private void setCustCross(TitaVo titaVo,CustMain custMain) throws LogicException {
+	private void setCustCross(TitaVo titaVo, CustMain custMain) throws LogicException {
 		String SubCompanyFg = titaVo.getParam("SubCompanyFg");
 		this.info("active SubCompanyFg=" + SubCompanyFg + "/" + custMain.getCustUKey());
 		if ("Y".equals(SubCompanyFg)) {
@@ -467,7 +461,7 @@ public class L1101 extends TradeBuffer {
 					}
 				} else {
 					// update
-					CustCross beforeCustCross = (CustCross) dataLog.clone(fCustCross);
+					CustCross beforeCustCross = (CustCross) iDataLog.clone(fCustCross);
 					fCustCross.setCrossUse(iCrossUse);
 					try {
 						fCustCross = iCustCrossService.update2(fCustCross, titaVo);
@@ -476,8 +470,8 @@ public class L1101 extends TradeBuffer {
 					}
 
 					// 紀錄變更前變更後
-					dataLog.setEnv(titaVo, beforeCustCross, fCustCross);
-					dataLog.exec();
+					iDataLog.setEnv(titaVo, beforeCustCross, fCustCross);
+					iDataLog.exec();
 				}
 			}
 

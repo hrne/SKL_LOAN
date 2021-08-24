@@ -51,7 +51,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS440 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS440.class);
 
 	@Autowired
 	public Parse parse;
@@ -381,33 +380,35 @@ public class BS440 extends TradeBuffer {
 					ownAmtMap.put(tmp3, BigDecimal.ZERO);
 				}
 
+//              期款可暫收抵繳
 //				應扣金額 shuAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
 
 //				若應扣金額<=暫收款
 //				扣款金額=0
 //				暫收款(該扣款代碼)=應扣金額
 //				暫收款(目前額度下)=暫收款(目前額度下)-應扣金額
-				if (shuAmtMap.get(tmp).compareTo(tmpAmtMap.get(tmp2)) <= 0) {
-					repAmtMap.put(tmp, BigDecimal.ZERO);
-					tmpAmtMap.put(tmp, shuAmtMap.get(tmp));
-					tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).subtract(shuAmtMap.get(tmp)));
-				} else {
+				if (tBaTxVo.getRepayType() == 1 || tBaTxVo.getRepayType() == 3) {
+					if (shuAmtMap.get(tmp).compareTo(tmpAmtMap.get(tmp2)) <= 0) {
+						repAmtMap.put(tmp, BigDecimal.ZERO);
+						tmpAmtMap.put(tmp, shuAmtMap.get(tmp));
+						tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).subtract(shuAmtMap.get(tmp)));
+					} else {
 //				若應扣金額>暫收款
 //				扣款金額=應扣金額-暫收款
 //				暫收款(該扣款代碼) = 暫收款(目前額度下)
 //				暫收款(目前額度下)
-					BigDecimal repayAmt = shuAmtMap.get(tmp).subtract(tmpAmtMap.get(tmp2));
-					repAmtMap.put(tmp, repayAmt);
+						BigDecimal repayAmt = shuAmtMap.get(tmp).subtract(tmpAmtMap.get(tmp2));
+						repAmtMap.put(tmp, repayAmt);
 //					合計至額度，限額計算用
-					if (!repAmtFacMap.containsKey(tmp2)) {
-						repAmtFacMap.put(tmp2, repayAmt);
-					} else {
-						repAmtFacMap.put(tmp2, repAmtFacMap.get(tmp2).add(repayAmt));
+						if (!repAmtFacMap.containsKey(tmp2)) {
+							repAmtFacMap.put(tmp2, repayAmt);
+						} else {
+							repAmtFacMap.put(tmp2, repAmtFacMap.get(tmp2).add(repayAmt));
+						}
+						tmpAmtMap.put(tmp, tmpAmtMap.get(tmp2));
+						tmpAmtMap.put(tmp2, BigDecimal.ZERO);
 					}
-					tmpAmtMap.put(tmp, tmpAmtMap.get(tmp2));
-					tmpAmtMap.put(tmp2, BigDecimal.ZERO);
 				}
-
 //				費用才抓取BatxVo.AcctCode
 				if (tBaTxVo.getRepayType() == 4 || tBaTxVo.getRepayType() == 5 || tBaTxVo.getRepayType() == 6) {
 					rpAcCodeMap.put(tmp, tBaTxVo.getAcctCode());

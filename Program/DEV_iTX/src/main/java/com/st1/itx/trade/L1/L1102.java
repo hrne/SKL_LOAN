@@ -34,7 +34,6 @@ import com.st1.itx.util.common.BankRelationCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.common.data.BankRelationVo;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -58,7 +57,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1102 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1102.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -82,14 +80,10 @@ public class L1102 extends TradeBuffer {
 	@Autowired
 	public CdCodeService iCdCodeService;
 
-	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
-
+	public Parse iParse;
 	@Autowired
-	public Parse parse;
-	@Autowired
-	SendRsp sendRsp;
+	SendRsp iSendRsp;
 	private String wkIsLimit = "N";
 	private String wkIsRelated = "N";
 	private String wkIsLnrelNear = "N";
@@ -110,7 +104,7 @@ public class L1102 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 300;  // 300 * 185 = 55500
+		this.limit = 300; // 300 * 185 = 55500
 		// 功能 1:新增 4:刪除
 		String funcd = titaVo.getParam("FunCd");
 
@@ -128,7 +122,7 @@ public class L1102 extends TradeBuffer {
 			tCustMain.setCustId(CustId);
 
 			tCustMain.setCustName(titaVo.getParam("CustName"));
-			tCustMain.setBirthday(parse.stringToInteger(titaVo.getParam("Birthday")));
+			tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("Birthday")));
 			tCustMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));
 			tCustMain.setIndustryCode(titaVo.getParam("IndustryCode"));
 			tCustMain.setNationalityCode(titaVo.getParam("NationalityCode"));
@@ -161,33 +155,33 @@ public class L1102 extends TradeBuffer {
 			tCustMain.setEmail(titaVo.getParam("Email"));
 			tCustMain.setEntCode(titaVo.getParam("EntCode"));
 			tCustMain.setEName(titaVo.getParam("EName"));
-			tCustMain.setIncomeOfYearly(parse.stringToInteger(titaVo.getParam("IncomeOfYearly")));
+			tCustMain.setIncomeOfYearly(iParse.stringToInteger(titaVo.getParam("IncomeOfYearly")));
 
 			if (titaVo.getParam("IncomeDataDate").equals("")) {
 				tCustMain.setIncomeDataDate("");
 			} else {
-				tCustMain.setIncomeDataDate("" + (parse.stringToInteger(titaVo.getParam("IncomeDataDate")) + 191100));
+				tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDate")) + 191100));
 			}
-			
-			//分行別預設0000 --2021.8.6 Fegie
+
+			// 分行別預設0000 --2021.8.6 Fegie
 			tCustMain.setBranchNo("0000");
 
 			/* 存入DB */
 
 			try {
-				custMainService.insert(tCustMain,titaVo);
+				custMainService.insert(tCustMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "客戶資料主檔");
 			}
 			// 如果是查詢先主管刷卡
 		} else if ("5".equals(funcd)) {
-			if(titaVo.getEmpNos().trim().isEmpty()) {
+			if (titaVo.getEmpNos().trim().isEmpty()) {
 				this.info("主管 = " + titaVo.getEmpNos().trim());
-	
+
 				iChkFg = 0;
 				iChkFg = inqLoanBorMain(tCustMain.getCustNo(), iChkFg, titaVo);
 				if (iChkFg != 0)
-					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
+					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "已結清滿5年");
 			}
 			BankRelationVo vo = bankRelationCom.getBankRelation(CustId, titaVo);
 
@@ -215,8 +209,7 @@ public class L1102 extends TradeBuffer {
 
 		this.info("tCustMain = " + tCustMain);
 		// 用客戶識別碼取電話資料
-		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
 		List<CustTelNo> lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 		// 查詢行業別代號資料檔
@@ -224,7 +217,6 @@ public class L1102 extends TradeBuffer {
 		if (tCdIndustry == null) {
 			tCdIndustry = new CdIndustry();
 		}
-		
 
 		// 通訊地址
 		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain);
@@ -259,17 +251,17 @@ public class L1102 extends TradeBuffer {
 		if (tCustMain.getIncomeDataDate().equals("") || tCustMain.getIncomeDataDate().equals("0")) {
 			this.totaVo.putParam("OIncomeDataDate", "");
 		} else {
-			this.totaVo.putParam("OIncomeDataDate", parse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100);
+			this.totaVo.putParam("OIncomeDataDate", iParse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100);
 		}
 		this.totaVo.putParam("OCustCross", "Y");
 
 //		交互運用
 		Slice<CdCode> iCdCode = iCdCodeService.getCodeList(1, "SubCompanyCode", this.index, this.limit, titaVo);
-		if(iCdCode == null) {
+		if (iCdCode == null) {
 			throw new LogicException(titaVo, "E0001", "共用代碼檔查無子公司選項"); // 查無資料
 		}
-		int i = 1 ;
-		for (CdCode xCdCode:iCdCode) {
+		int i = 1;
+		for (CdCode xCdCode : iCdCode) {
 			if (xCdCode.getEnable().equals("N")) {
 				continue;
 			}
@@ -279,23 +271,23 @@ public class L1102 extends TradeBuffer {
 			iCustCrossId.setSubCompanyCode(xCdCode.getCode());
 			iCustCross = iCustCrossService.findById(iCustCrossId, titaVo);
 			if (iCustCross == null) {
-				this.totaVo.putParam("OSubCompanyCode"+i, xCdCode.getCode());
-				this.totaVo.putParam("OCrossUse"+i, "N");
-			}else {
-				this.totaVo.putParam("OSubCompanyCode"+i, xCdCode.getCode());
-				this.totaVo.putParam("OCrossUse"+i, iCustCross.getCrossUse());
+				this.totaVo.putParam("OSubCompanyCode" + i, xCdCode.getCode());
+				this.totaVo.putParam("OCrossUse" + i, "N");
+			} else {
+				this.totaVo.putParam("OSubCompanyCode" + i, xCdCode.getCode());
+				this.totaVo.putParam("OCrossUse" + i, iCustCross.getCrossUse());
 			}
 			i++;
 		}
-		while(true) {
+		while (true) {
 			if (i > 20) {
 				break;
 			}
-			this.totaVo.putParam("OSubCompanyCode"+i, "");
-			this.totaVo.putParam("OCrossUse"+i, "");
+			this.totaVo.putParam("OSubCompanyCode" + i, "");
+			this.totaVo.putParam("OCrossUse" + i, "");
 			i++;
 		}
-		
+
 		if (lCustTelNo == null || lCustTelNo.size() == 0) {
 			this.info("無電話資料");
 			lCustTelNo = new ArrayList<CustTelNo>();
@@ -340,8 +332,7 @@ public class L1102 extends TradeBuffer {
 		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
 
 			// 0:正常戶 2:催收戶 4:逾期戶 6:呆帳戶 7:部分轉呆戶 => 不需授權
-			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4
-					|| tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
+			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
 				cChkFg = 0;
 				return cChkFg;
 			}

@@ -1,0 +1,272 @@
+----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+
+!#TXCD
+!T(3,L8053)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度-Occ回來後去切的長度]
+#INQLEN=n,3,S
+E(0,40)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(NOBUTTON,CLOSEY)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
+[
+["[L8053]                                 消債條列JCIC報送資料歷程查詢"],
+["#FdCustId+身分證字號",#CustId],
+["#FdRcDate+款項統一收付申請日",#RcDate],
+["#FdSubmitKey+報送單位代號",#SubmitKey],
+["#FdCourtCode+受理調解機構代號",#CourtCode],
+["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode],
+]
+
+#FdCustId=X,2,L
+#FdRcDate=X,2,L
+#FdSubmitKey=X,2,L
+#FdCourtCode=X,2,L
+#FdMaxMainCode=X,2,L
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF0001=x,20,S
+T(3,CdCode.TranKey)
+#TranKeyHelp=x,1024,S
+
+#CDDEF0002=x,20,S
+T(3,CdCode.YesNo)
+#YesNoHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranKeyHelp,#HelpDesc1)
+T(2,@YesNoHelp,#HelpDesc2)
+
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@ChainCd,#NTXBUF,1,5)
+T(1,@Ukey,#NTXBUF,6,32)
+
+#CustId=X,10,L
+#RcDate=D,7,L
+#SubmitKey=X,3,L
+#CourtCode=X,3,L
+#MaxMainCode=X,3,L
+<include src="ROM.icf::L8R55.dec"/>
+#RimUkey=X,32,S
+#RimChainCd=X,5,S
+#RimL8r55=X,1,S
+T(2,@RimUkey,#Ukey)
+T(2,@RimChainCd,#ChainCd)
+RESET_RIM(#RimL8r55,L8R55)
+S(L8R55,1,#RimChainCd,#RimUkey)
+R(1,L8R55)
+T(2,@CustId,#L8r55CustId)
+T(2,@SubmitKey,#L8r55SubmitKey)
+E(0,@RcDate,#L8r55ApplyDate)
+T(2,@CourtCode,#L8r55CourtCode)
+T(2,@MaxMainCode,#L8r55MaxMainCode)
+#ChainCd=X,5,S
+#Ukey=X,32,S
+#RPTFG=A,1,S
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L80530 ----------
+<sub type="FORM" name="L8053">
+
+#SCRTIL=_,_,S
+T(3,[L8053] 消債條列JCIC報送資料歷程查詢)
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+! 以下固定
+#OOTranKey=X,1,S
+#OOTranKey_Tmp=X,10,S
+T(H,#OOTranKey,#TranKeyHelp)
+#OOTranKeyX=X,15,S
+T(2,#OOTranKey+ - +#OOTranKey_Tmp)
+! 以下變動
+#OOIsMaxMain=X,1,S
+#OOIsClaims=X,1,S
+#OOGuarLoanCnt=A,2,S
+#OOCivil323ExpAmt=m,9,S
+#OOCivil323CashAmt=m,9,S
+#OOCivil323CreditAmt=m,9,S
+#OOCivil323GuarAmt=m,9,S
+#OOReceExpPrin=m,9,S
+#OOReceExpInte=m,9,S
+#OOReceExpPena=m,9,S
+#OOReceExpOther=m,9,S
+#OOCashCardPrin=m,9,S
+#OOCashCardInte=m,9,S
+#OOCashCardPena=m,9,S
+#OOCashCardOther=m,9,S
+#OOCreditCardPrin=m,9,S
+#OOCreditCardInte=m,9,S
+#OOCreditCardPena=m,9,S
+#OOCreditCardOther=m,9,S
+#OOGuarObliPrin=m,9,S
+#OOGuarObliInte=m,9,S
+#OOGuarObliPena=m,9,S
+#OOGuarObliOther=m,9,S
+! 以下固定
+#OOLastUpdate=X,30,S
+#OOLastUpdateEmpNo=X,6,S
+#OOOutJcicTxtDate=D,7,S
+C(3,#OOOutJcicTxtDate,0,S,$)
+</sub>
+
+!------ 上行電文 ------
+<sub type="TIM">
+#ChainCd
+#Ukey
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8053
+#OOTranKey
+#OOIsMaxMain
+#OOIsClaims
+#OOGuarLoanCnt
+#OOCivil323ExpAmt
+#OOCivil323CashAmt
+#OOCivil323CreditAmt
+#OOCivil323GuarAmt
+#OOReceExpPrin
+#OOReceExpInte
+#OOReceExpPena
+#OOReceExpOther
+#OOCashCardPrin
+#OOCashCardInte
+#OOCashCardPena
+#OOCashCardOther
+#OOCreditCardPrin
+#OOCreditCardInte
+#OOCreditCardPena
+#OOCreditCardOther
+#OOGuarObliPrin
+#OOGuarObliInte
+#OOGuarObliPena
+#OOGuarObliOther
+#OOOutJcicTxtDate
+#OOLastUpdate
+#OOLastUpdateEmpNo
+^
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R55.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L8053" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
+[
+["[L8053]                                 消債條列JCIC報送資料歷程查詢                                                                            "],
+]
+</sub>
+
+<sub type="SELECT">
+#RPTFG=0,QUERY.GRID,L8053
+#any={detail:true, header:'L8053.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+#OOTranKeyX=交易代碼
+{width:100,align:'center'}
+!L8323(442)
+#OOIsMaxMain=是否為最大債權金融機構報送
+{width:100,align:'center'}
+#OOIsClaims=是否為本金融機構債務人
+{width:100,align:'center'}
+#OOGuarLoanCnt=本金融機構有擔保債權筆數
+{width:100,align:'center'}
+#OOCivil323ExpAmt=依民法第323條計算之信用放款本息餘額
+{width:100,align:'center'}
+#OOCivil323CashAmt=依民法第323條計算之現金卡放款本息餘額
+{width:100,align:'center'}
+#OOCivil323CreditAmt=依民法第323條計算之信用卡本息餘額
+{width:100,align:'center'}
+#OOCivil323GuarAmt=依民法第323條計算之保證債權本息餘額
+{width:100,align:'center'}
+#OOReceExpPrin=信用放款本金
+{width:100,align:'center'}
+#OOReceExpInte=信用放款利息
+{width:100,align:'center'}
+#OOReceExpPena=信用放款違約金
+{width:100,align:'center'}
+#OOReceExpOther=信用放款其他費用
+{width:100,align:'center'}
+#OOCashCardPrin=現金卡本金
+{width:100,align:'center'}
+#OOCashCardInte=現金卡利息
+{width:100,align:'center'}
+#OOCashCardPena=現金卡違約金
+{width:100,align:'center'}
+#OOCashCardOther=現金卡其他費用
+{width:100,align:'center'}
+#OOCreditCardPrin=信用卡本金
+{width:100,align:'center'}
+#OOCreditCardInte=信用卡利息
+{width:100,align:'center'}
+#OOCreditCardPena=信用卡違約金
+{width:100,align:'center'}
+#OOCreditCardOther=信用卡其他費用
+{width:100,align:'center'}
+#OOGuarObliPrin=保證債權本金
+{width:100,align:'center'}
+#OOGuarObliInte=保證債權利息
+{width:100,align:'center'}
+#OOGuarObliPena=保證債權違約金
+{width:100,align:'center'}
+#OOGuarObliOther=保證債權其他費用
+{width:100,align:'center'}
+#OOOutJcicTxtDate=資料轉出日期
+{width:200,align:'center'}
+#OOLastUpdate=最後更新日期時間
+{width:200,align:'center'}
+#OOLastUpdateEmpNo=最後更新人員
+{width:120,align:'center'}
+^
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

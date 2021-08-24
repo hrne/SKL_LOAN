@@ -2,8 +2,6 @@ package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -20,8 +18,6 @@ import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustRelDetailService;
 import com.st1.itx.db.service.CustRelMainService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 /**
  * Tita<br>
@@ -41,31 +37,22 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L1906 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1906.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CustRelMainService iCustRelMainService;
-	
+
 	@Autowired
 	public CustRelDetailService iCustRelDetailService;
-	
+
 	@Autowired
 	public CdEmpService iCdEmpService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1906 ");
 		this.totaVo.init(titaVo);
-		
+
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -77,19 +64,19 @@ public class L1906 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");
 		String iRelMainUKey = "";
 		CustRelMain iCustRelMain = new CustRelMain();
-		Slice<CustRelDetail> iCustRelDetail = null; //客戶為主
-		Slice<CustRelDetail> rCustRelDetail = null; //客戶為關聯戶
+		Slice<CustRelDetail> iCustRelDetail = null; // 客戶為主
+		Slice<CustRelDetail> rCustRelDetail = null; // 客戶為關聯戶
 		iCustRelMain = iCustRelMainService.custRelIdFirst(iCustId, titaVo);
 		if (iCustRelMain == null) {
-			throw new LogicException("E0001", "客戶關係主檔查無資料:"+iCustId); // 查無資料
+			throw new LogicException("E0001", "客戶關係主檔查無資料:" + iCustId); // 查無資料
 		}
 		iRelMainUKey = iCustRelMain.getUkey();
 		iCustRelDetail = iCustRelDetailService.custRelMainUKeyEq(iRelMainUKey, this.index, this.limit, titaVo);
-		
+
 		if (iCustRelDetail == null) {
-			throw new LogicException("E0001", "客戶關係明細檔查無資料:"+iCustId); // 查無資料
+			throw new LogicException("E0001", "客戶關係明細檔查無資料:" + iCustId); // 查無資料
 		}
-		
+
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (iCustRelDetail != null && iCustRelDetail.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
@@ -101,7 +88,7 @@ public class L1906 extends TradeBuffer {
 		for (CustRelDetail tCustRelDetail : iCustRelDetail) {
 			CdEmp iCdEmp = new CdEmp();
 			iCdEmp = iCdEmpService.findById(tCustRelDetail.getLastUpdateEmpNo(), titaVo);
-			
+
 			// new occurs
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCustRelMainUKey", tCustRelDetail.getCustRelMainUKey());
@@ -117,20 +104,20 @@ public class L1906 extends TradeBuffer {
 			occursList.putParam("OONote", tCustRelDetail.getNote().replace("$n", "\n"));
 			String tC = tCustRelDetail.getCreateDate().toString();
 			String tU = tCustRelDetail.getLastUpdate().toString();
-			String cDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tC.substring(0,10).replace("-", ""))-19110000), 7,'0');
-			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0,10).replace("-", ""))-19110000), 7,'0');
-			cDate = cDate.substring(0,3)+"/"+cDate.substring(3, 5)+"/"+cDate.substring(5);
-			uDate = uDate.substring(0,3)+"/"+uDate.substring(3, 5)+"/"+uDate.substring(5);
-			String cTime = tC.substring(11,19);
-			String uTime = tU.substring(11,19);
-			
-			occursList.putParam("OOCreateDate",cDate+" "+cTime);
-			occursList.putParam("OOLastUpdate",uDate+" "+uTime);
+			String cDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tC.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			cDate = cDate.substring(0, 3) + "/" + cDate.substring(3, 5) + "/" + cDate.substring(5);
+			uDate = uDate.substring(0, 3) + "/" + uDate.substring(3, 5) + "/" + uDate.substring(5);
+			String cTime = tC.substring(11, 19);
+			String uTime = tU.substring(11, 19);
+
+			occursList.putParam("OOCreateDate", cDate + " " + cTime);
+			occursList.putParam("OOLastUpdate", uDate + " " + uTime);
 			occursList.putParam("OOLastUpdateEmpNo", tCustRelDetail.getLastUpdateEmpNo());
 			if (iCdEmp == null) {
 				occursList.putParam("OOLastUpdateEmpNoX", "");
-			}else {
-				this.info("名稱==="+iCdEmp.getFullname());
+			} else {
+				this.info("名稱===" + iCdEmp.getFullname());
 				occursList.putParam("OOLastUpdateEmpNoX", iCdEmp.getFullname());
 			}
 			/* 將每筆資料放入Tota的OcList */
@@ -138,7 +125,7 @@ public class L1906 extends TradeBuffer {
 
 		}
 		rCustRelDetail = iCustRelDetailService.relIdEq(iCustId, this.index, this.limit, titaVo);
-		if(rCustRelDetail!=null) {
+		if (rCustRelDetail != null) {
 			for (CustRelDetail aCustRelDetail : rCustRelDetail) {
 				CdEmp iCdEmp = new CdEmp();
 				iCdEmp = iCdEmpService.findById(aCustRelDetail.getLastUpdateEmpNo(), titaVo);
@@ -159,19 +146,19 @@ public class L1906 extends TradeBuffer {
 				occursList.putParam("OONote", aCustRelDetail.getNote().replace("$n", "\n"));
 				String taC = aCustRelDetail.getCreateDate().toString();
 				String taU = aCustRelDetail.getLastUpdate().toString();
-				String caDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taC.substring(0,10).replace("-", ""))-19110000), 7,'0');
-				String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0,10).replace("-", ""))-19110000), 7,'0');
-				caDate = caDate.substring(0,3)+"/"+caDate.substring(3, 5)+"/"+caDate.substring(5);
-				uaDate = uaDate.substring(0,3)+"/"+uaDate.substring(3, 5)+"/"+uaDate.substring(5);
-				String cTime = taC.substring(11,19);
-				String uTime = taU.substring(11,19);
-				
-				occursList.putParam("OOCreateDate",caDate+" "+cTime);
-				occursList.putParam("OOLastUpdate",uaDate+" "+uTime);
+				String caDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taC.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+				String uaDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(taU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+				caDate = caDate.substring(0, 3) + "/" + caDate.substring(3, 5) + "/" + caDate.substring(5);
+				uaDate = uaDate.substring(0, 3) + "/" + uaDate.substring(3, 5) + "/" + uaDate.substring(5);
+				String cTime = taC.substring(11, 19);
+				String uTime = taU.substring(11, 19);
+
+				occursList.putParam("OOCreateDate", caDate + " " + cTime);
+				occursList.putParam("OOLastUpdate", uaDate + " " + uTime);
 				occursList.putParam("OOLastUpdateEmpNo", aCustRelDetail.getLastUpdateEmpNo());
 				if (iCdEmp == null) {
 					occursList.putParam("OOLastUpdateEmpNoX", "");
-				}else {
+				} else {
 					occursList.putParam("OOLastUpdateEmpNoX", iCdEmp.getFullname());
 				}
 				/* 將每筆資料放入Tota的OcList */

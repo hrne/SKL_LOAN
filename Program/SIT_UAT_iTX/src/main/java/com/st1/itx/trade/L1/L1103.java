@@ -2,8 +2,6 @@ package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -17,7 +15,6 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -54,21 +51,16 @@ import com.st1.itx.util.parse.Parse;
 @Service("L1103")
 @Scope("prototype")
 public class L1103 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1103.class);
 
 	/* DB服務注入 */
 	@Autowired
-	public CustMainService custMainService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
+	public CustMainService iCustMainService;
 
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -78,14 +70,14 @@ public class L1103 extends TradeBuffer {
 		titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
 		String custid = titaVo.get("CustId");
-		CustMain tCustMain = custMainService.custIdFirst(custid);
+		CustMain tCustMain = iCustMainService.custIdFirst(custid);
 
 		// 例外處理 若查無資料請至L1101新增
 		if (tCustMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔");
 		}
 		// 鎖定這筆
-		tCustMain = custMainService.holdById(tCustMain);
+		tCustMain = iCustMainService.holdById(tCustMain);
 
 		// 經辦登錄時更新
 		if (titaVo.isActfgEntry()) {
@@ -98,7 +90,7 @@ public class L1103 extends TradeBuffer {
 				String new_custid = titaVo.getParam("CustIdAfter");
 
 				// 先檢查新統編是否已存在
-				CustMain tCustMain2 = custMainService.custIdFirst(new_custid);
+				CustMain tCustMain2 = iCustMainService.custIdFirst(new_custid);
 
 				// 新統編不存在,可修改
 				if (tCustMain2 == null) {
@@ -129,7 +121,7 @@ public class L1103 extends TradeBuffer {
 			}
 			try {
 				// 更新資料
-				tCustMain = custMainService.update2(tCustMain,titaVo);
+				tCustMain = iCustMainService.update2(tCustMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "客戶資料主檔");
 
@@ -145,7 +137,7 @@ public class L1103 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0017", " "); // 該筆交易狀態非待放行，不可做交易放行
 			}
 			// 變更前
-			CustMain beforeCustMain = (CustMain) dataLog.clone(tCustMain);
+			CustMain beforeCustMain = (CustMain) iDataLog.clone(tCustMain);
 			// 單位別
 			if (titaVo.getParam("BranchNoInd").equals("X")) {
 				tCustMain.setBranchNo(titaVo.getParam("BranchNo"));
@@ -158,7 +150,7 @@ public class L1103 extends TradeBuffer {
 
 			// 出生年月日
 			if (titaVo.getParam("BirthdayInd").equals("X")) {
-				tCustMain.setBirthday(parse.stringToInteger(titaVo.getParam("BirthdayAft")));
+				tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("BirthdayAft")));
 			}
 
 			// 性別
@@ -383,7 +375,7 @@ public class L1103 extends TradeBuffer {
 
 			// 年收入
 			if (titaVo.getParam("IncomeofyearlyInd").equals("X")) {
-				tCustMain.setIncomeOfYearly(parse.stringToInteger(titaVo.getParam("IncomeofyearlyAft")));
+				tCustMain.setIncomeOfYearly(iParse.stringToInteger(titaVo.getParam("IncomeofyearlyAft")));
 			}
 
 			// 年收入資料年月
@@ -391,8 +383,7 @@ public class L1103 extends TradeBuffer {
 				if (titaVo.getParam("IncomedatadateAft").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate(
-							"" + (parse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
+					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
 				}
 
 			}
@@ -421,14 +412,14 @@ public class L1103 extends TradeBuffer {
 //			tCustMain.setMainTenanceTlrNo("");
 
 			try {
-				tCustMain = custMainService.update2(tCustMain,titaVo);
+				tCustMain = iCustMainService.update2(tCustMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 
 			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeCustMain, tCustMain);
-			dataLog.exec();
+			iDataLog.setEnv(titaVo, beforeCustMain, tCustMain);
+			iDataLog.exec();
 		}
 		// 放行訂正
 		if (titaVo.isActfgSuprele() && titaVo.isHcodeErase()) {
@@ -438,7 +429,7 @@ public class L1103 extends TradeBuffer {
 			}
 
 			// 變更前
-			CustMain beforeCustMain = (CustMain) dataLog.clone(tCustMain);
+			CustMain beforeCustMain = (CustMain) iDataLog.clone(tCustMain);
 
 			// 戶名
 			if (titaVo.getParam("CustNameInd").equals("X")) {
@@ -447,7 +438,7 @@ public class L1103 extends TradeBuffer {
 
 			// 出生年月日
 			if (titaVo.getParam("BirthdayInd").equals("X")) {
-				tCustMain.setBirthday(parse.stringToInteger(titaVo.getParam("BirthdayBefore")));
+				tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("BirthdayBefore")));
 			}
 
 			// 性別
@@ -672,7 +663,7 @@ public class L1103 extends TradeBuffer {
 
 			// 年收入
 			if (titaVo.getParam("IncomeofyearlyInd").equals("X")) {
-				tCustMain.setIncomeOfYearly(parse.stringToInteger(titaVo.getParam("IncomeofyearlyBefore")));
+				tCustMain.setIncomeOfYearly(iParse.stringToInteger(titaVo.getParam("IncomeofyearlyBefore")));
 			}
 
 			// 年收入資料年月
@@ -680,8 +671,7 @@ public class L1103 extends TradeBuffer {
 				if (titaVo.getParam("IncomedatadateBefore").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate(
-							"" + (parse.stringToInteger(titaVo.getParam("IncomedatadateBefore")) + 191100));
+					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateBefore")) + 191100));
 				}
 
 			}
@@ -709,13 +699,13 @@ public class L1103 extends TradeBuffer {
 			// 維護中櫃員代號
 //			tCustMain.setMainTenanceTlrNo(titaVo.getTlrNo());
 			try {
-				tCustMain = custMainService.update2(tCustMain,titaVo);
+				tCustMain = iCustMainService.update2(tCustMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeCustMain, tCustMain);
-			dataLog.exec();
+			iDataLog.setEnv(titaVo, beforeCustMain, tCustMain);
+			iDataLog.exec();
 		}
 
 		this.addList(this.totaVo);

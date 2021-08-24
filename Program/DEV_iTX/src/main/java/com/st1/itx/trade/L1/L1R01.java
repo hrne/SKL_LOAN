@@ -13,7 +13,6 @@ import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -24,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L1R01")
 @Scope("prototype")
 public class L1R01 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1R01.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -34,10 +32,7 @@ public class L1R01 extends TradeBuffer {
 	public CustTelNoService sCustTelNoService;
 
 	@Autowired
-	public Parse parse;
-
-	@Autowired
-	SendRsp sendRsp;
+	public Parse iParse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -50,7 +45,7 @@ public class L1R01 extends TradeBuffer {
 		String funcd = titaVo.get("RimFunCd");
 
 		// RimCustNo=9,7
-		int iCustNo = parse.stringToInteger(titaVo.get("RimCustNo").trim());
+		int iCustNo = iParse.stringToInteger(titaVo.get("RimCustNo").trim());
 
 		CustMain tCustMain = new CustMain();
 
@@ -145,12 +140,10 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01JobTenure", tCustMain.getJobTenure());
 		this.totaVo.putParam("L1r01IncomeOfYearly", tCustMain.getIncomeOfYearly());
 
-		if (tCustMain.getIncomeDataDate() == null || "".equals(tCustMain.getIncomeDataDate())
-				|| "0".equals(tCustMain.getIncomeDataDate())) {
+		if (tCustMain.getIncomeDataDate() == null || "".equals(tCustMain.getIncomeDataDate()) || "0".equals(tCustMain.getIncomeDataDate())) {
 			this.totaVo.putParam("L1r01IncomeDataDate", "");
 		} else {
-			this.totaVo.putParam("L1r01IncomeDataDate",
-					(parse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100));
+			this.totaVo.putParam("L1r01IncomeDataDate", (iParse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100));
 		}
 		this.totaVo.putParam("L1r01PassportNo", tCustMain.getPassportNo());
 		this.totaVo.putParam("L1r01AMLJobCode", tCustMain.getAMLJobCode());

@@ -16,8 +16,6 @@ import com.st1.itx.db.service.CustCrossService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L1109")
 @Scope("prototype")
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L1109 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1109.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -37,16 +34,8 @@ public class L1109 extends TradeBuffer {
 	@Autowired
 	public CustCrossService iCustCrossService;
 
-	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
-
-	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -60,37 +49,38 @@ public class L1109 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		
+
 		String iCustId = titaVo.getParam("CustId");
 		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		CustMain iCustMain = new CustMain();
 		String iCustUKey = "";
 		if (!iCustId.equals("")) {
 			iCustMain = iCustMainService.custIdFirst(iCustId, titaVo);
-		}else if (iCustNo !=0) {
+		} else if (iCustNo != 0) {
 			iCustMain = iCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
-		}else {
+		} else {
 			throw new LogicException(titaVo, "E0001", "統一編號與戶號須擇一輸入"); // 輸入錯誤
-		}	
+		}
 		if (iCustMain == null) {
 			throw new LogicException(titaVo, "E0001", "客戶主檔查無資料"); // 輸入錯誤
 		}
 		iCustUKey = iCustMain.getCustUKey();
-		
+
 		int i = 1;
 		while (true) {
 			CustCross fCustCross = new CustCross();
-			CustCrossId fCustCrossId = new CustCrossId(); //findbyId
-			String iSubCompanyCode = titaVo.get("SubCompanyCode"+i);
-			if (i ==21) {
+			CustCrossId fCustCrossId = new CustCrossId(); // findbyId
+			if (i == 21) {
 				break;
 			}
-			this.info("上送=="+iSubCompanyCode+".");
-			if (iSubCompanyCode.equals("")) {
-				break;
-			}
+			String iSubCompanyCode = titaVo.get("SubCompanyCode" + i).trim();
+			this.info("上送==" + iSubCompanyCode + ".");
 			
-			String iCrossUse = titaVo.get("CrossUse"+i);
+			if (iSubCompanyCode.isEmpty()) {
+				break;
+			}
+
+			String iCrossUse = titaVo.get("CrossUse" + i);
 			if ("".equals(iCrossUse)) {
 				iCrossUse = "N";
 			}
@@ -99,32 +89,32 @@ public class L1109 extends TradeBuffer {
 			fCustCrossId.setSubCompanyCode(iSubCompanyCode);
 			fCustCross = iCustCrossService.holdById(fCustCrossId, titaVo);
 			if (fCustCross == null) {
-				//insert
-				fCustCross = new CustCross(); //init
+				// insert
+				fCustCross = new CustCross(); // init
 				fCustCross.setCustCrossId(fCustCrossId);
 				fCustCross.setCrossUse(iCrossUse);
 				try {
-					iCustCrossService.insert(fCustCross,titaVo);
+					iCustCrossService.insert(fCustCross, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "新增時發生錯誤");
 				}
-			}else {
-					//update
-				CustCross beforeCustCross = (CustCross) dataLog.clone(fCustCross);
+			} else {
+				// update
+				CustCross beforeCustCross = (CustCross) iDataLog.clone(fCustCross);
 				fCustCross.setCrossUse(iCrossUse);
 				try {
-					fCustCross = iCustCrossService.update2(fCustCross,titaVo);
+					fCustCross = iCustCrossService.update2(fCustCross, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", "更新時發生錯誤");
 				}
 
 				// 紀錄變更前變更後
-				dataLog.setEnv(titaVo, beforeCustCross, fCustCross);
-				dataLog.exec();
+				iDataLog.setEnv(titaVo, beforeCustCross, fCustCross);
+				iDataLog.exec();
 			}
 			i++;
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

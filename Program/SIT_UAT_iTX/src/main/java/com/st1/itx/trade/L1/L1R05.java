@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -14,13 +12,10 @@ import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L1R05")
 @Scope("prototype")
 public class L1R05 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L1R05.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -29,14 +24,6 @@ public class L1R05 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustTelNoService sCustTelNoService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -53,23 +40,23 @@ public class L1R05 extends TradeBuffer {
 
 		// tita取值
 		String iTelNoUKey = titaVo.getParam("TelNoUKey");
-		
+
 		CustTelNo iCustTelNo = new CustTelNo();
-		
+
 		iCustTelNo = sCustTelNoService.findById(iTelNoUKey, titaVo);
-		
-		if(iCustTelNo == null) {
+
+		if (iCustTelNo == null) {
 			throw new LogicException(titaVo, "E0001", "客戶電話主檔查無資料");
-		}else {
+		} else {
 			this.totaVo.putParam("L1r05TelTypeCode", iCustTelNo.getTelTypeCode());
 			this.totaVo.putParam("L1r05TelArea", iCustTelNo.getTelArea());
 			this.totaVo.putParam("L1r05TelNo", iCustTelNo.getTelNo());
 			this.totaVo.putParam("L1r05TelExt", iCustTelNo.getTelExt());
 			if (iCustTelNo.getTelTypeCode().equals("09")) {
 				String iTelOther = "";
-				iTelOther = iCustTelNo.getTelArea()+iCustTelNo.getTelNo()+iCustTelNo.getTelExt();
+				iTelOther = iCustTelNo.getTelArea() + iCustTelNo.getTelNo() + iCustTelNo.getTelExt();
 				this.totaVo.putParam("L1r05TelOther", iTelOther);
-			}else {
+			} else {
 				this.totaVo.putParam("L1r05TelOther", "");
 			}
 			this.totaVo.putParam("L1r05TelChgRsnCode", iCustTelNo.getTelChgRsnCode());
@@ -79,8 +66,7 @@ public class L1R05 extends TradeBuffer {
 			this.totaVo.putParam("L1r05StopReason", iCustTelNo.getStopReason());
 			this.totaVo.putParam("L1r05Enable", iCustTelNo.getEnable());
 		}
-		
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
