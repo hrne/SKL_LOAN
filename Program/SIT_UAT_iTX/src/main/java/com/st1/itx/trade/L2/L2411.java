@@ -997,7 +997,7 @@ public class L2411 extends TradeBuffer {
 			result += "之" + FloorDash;
 		}
 		if (!BdNo1.isEmpty()) {
-			result += "建號" + BdNo1;
+			result += "，建號" + BdNo1;
 		}
 		if (!BdNo2.isEmpty()) {
 			result += "-" + BdNo2;

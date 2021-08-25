@@ -1601,7 +1601,6 @@ public class L8403File extends MakeFile {
 				String iMaxMainCode = sJcicZ054.getMaxMainCode();
 				String iPayOffResult = sJcicZ054.getPayOffResult();
 				String iPayOffDate = String.valueOf(sJcicZ054.getPayOffDate());
-				int ixPayOffDate = Integer.valueOf(sJcicZ054.getPayOffDate());
 				String iUkey = sJcicZ054.getUkey();
 				int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 				String text = "54"+iTranKey+iSubmitKey+StringUtils.rightPad(iCustId, 10,"")
@@ -1626,7 +1625,6 @@ public class L8403File extends MakeFile {
 				iJcicZ054LogId.setUkey(iUkey);
 				iJcicZ054Log.setJcicZ054LogId(iJcicZ054LogId);
 				iJcicZ054Log.setPayOffResult(iPayOffResult);
-				iJcicZ054Log.setPayOffDate(ixPayOffDate);
 				iJcicZ054Log.setTranKey(iTranKey);
 				iJcicZ054Log.setOutJcicTxtDate(iDate);
 

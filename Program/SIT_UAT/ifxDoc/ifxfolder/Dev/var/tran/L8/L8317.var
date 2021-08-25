@@ -165,7 +165,7 @@ T(2,@FdClaimStatus2,*)
 T(2,@FdSaveEndDate,*)
 T(2,@FdSubAmt,*)
 T(2,@FdAdminName,*)
-T(3,@TranKeyHelp,C:異動;D:刪除))
+T(3,@TranKeyHelp,C:異動;D:刪除)
 ! 查詢進入
 #Deal_Search=X,1,S
 C(5,#TranKey_Tmp,5,$,S)

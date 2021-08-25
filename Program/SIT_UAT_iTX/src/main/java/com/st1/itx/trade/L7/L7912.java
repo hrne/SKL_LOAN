@@ -2,10 +2,7 @@ package com.st1.itx.trade.L7;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -38,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L7912 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L7912.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -46,7 +42,7 @@ public class L7912 extends TradeBuffer {
 
 	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
+	public DateUtil iDateUtil;
 
 	@Autowired
 	public CustMainService custMainService;
@@ -80,31 +76,30 @@ public class L7912 extends TradeBuffer {
 		int iAcDate = titaVo.getEntDyI();
 
 		// 會計日前一月
-		dateUtil.init();
-		dateUtil.setDate_1(iAcDate);
-		dateUtil.setMons(-1);
-		int iAcDate_1M = dateUtil.getCalenderDay();
+		iDateUtil.init();
+		iDateUtil.setDate_1(iAcDate);
+		iDateUtil.setMons(-1);
+		int iAcDate_1M = iDateUtil.getCalenderDay();
 
 		// 會計日前半年
-		dateUtil.init();
-		dateUtil.setDate_1(iAcDate);
-		dateUtil.setMons(-6);
-		int iAcDate_6M = dateUtil.getCalenderDay();
+		iDateUtil.init();
+		iDateUtil.setDate_1(iAcDate);
+		iDateUtil.setMons(-6);
+		int iAcDate_6M = iDateUtil.getCalenderDay();
 
 		// 會計日前1年
-		dateUtil.init();
-		dateUtil.setDate_1(iAcDate);
-		dateUtil.setYears(-1);
-		int iAcDate_1Y = dateUtil.getCalenderDay();
+		iDateUtil.init();
+		iDateUtil.setDate_1(iAcDate);
+		iDateUtil.setYears(-1);
+		int iAcDate_1Y = iDateUtil.getCalenderDay();
 
 		// 會計日前7天
-		dateUtil.init();
-		dateUtil.setDate_1(iAcDate);
-		dateUtil.setDays(-7);
-		int iAcDate_7D = dateUtil.getCalenderDay();
+		iDateUtil.init();
+		iDateUtil.setDate_1(iAcDate);
+		iDateUtil.setDays(-7);
+		int iAcDate_7D = iDateUtil.getCalenderDay();
 
 		int iCustNo = 0;
-		List<Map<String, String>> i7912SqlReturn = new ArrayList<Map<String, String>>();
 		CustMain tCustMain = new CustMain();
 
 		// 抓取戶號
@@ -114,8 +109,7 @@ public class L7912 extends TradeBuffer {
 		} else {
 			iCustNo = custMainService.custIdFirst(iCustId, titaVo).getCustNo();
 		}
-		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, 1, 999, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, 1, 999, 0, Integer.MAX_VALUE, titaVo);
 		List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		if (lFacMain == null) {
 			throw new LogicException(titaVo, "E0001", "額度不存在");
@@ -123,7 +117,7 @@ public class L7912 extends TradeBuffer {
 		for (FacMain fac : lFacMain) {
 			TotaVo totaVo2 = new TotaVo();
 			totaVo2.init(titaVo);
-			
+
 			int wkMaturityDate = 0;
 			// 半年內曾滯繳一期以上
 			int wkOverdue1MFlag = 0;
@@ -132,8 +126,7 @@ public class L7912 extends TradeBuffer {
 			int wkOverdue7DCnt = 0;
 			int wkDueDate = 0;
 
-			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, fac.getFacmNo(),
-					fac.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, fac.getFacmNo(), fac.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 			List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 			if (lLoanBorMain != null) {
 				for (LoanBorMain ln : lLoanBorMain) {
@@ -151,26 +144,25 @@ public class L7912 extends TradeBuffer {
 				}
 			}
 			this.info("fac acdate " + wkOverdue7DCnt + ":" + fac.getFacmNo() + ";" + wkOverdue1MFlag);
-			Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findDueDateRange(iCustNo, fac.getFacmNo(), fac.getFacmNo(),
-					1, 900, iAcDate_1Y + 19110000, iAcDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorTx> slLoanBorTx = loanBorTxService.findDueDateRange(iCustNo, fac.getFacmNo(), fac.getFacmNo(), 1, 900, iAcDate_1Y + 19110000, iAcDate + 19110000, 0, Integer.MAX_VALUE,
+					titaVo);
 			List<LoanBorTx> lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
 			if (lLoanBorTx != null) {
 				for (LoanBorTx tx : lLoanBorTx) {
 					// 正常交易、計息交易、應繳日小於入帳日、不同應繳日
-					if (tx.getTitaHCode().equals("0") && tx.getIntStartDate() > 0 && tx.getDueDate() < tx.getEntryDate()
-							&& wkDueDate != tx.getDueDate()) {
+					if (tx.getTitaHCode().equals("0") && tx.getIntStartDate() > 0 && tx.getDueDate() < tx.getEntryDate() && wkDueDate != tx.getDueDate()) {
 						wkDueDate = tx.getDueDate();
-						dateUtil.setDate_1(tx.getDueDate());
-						dateUtil.setDate_2(tx.getEntryDate());
-						dateUtil.dateDiffSp();
-						if (tx.getDueDate() >= iAcDate_6M && dateUtil.getMons() >= 1) {
+						iDateUtil.setDate_1(tx.getDueDate());
+						iDateUtil.setDate_2(tx.getEntryDate());
+						iDateUtil.dateDiffSp();
+						if (tx.getDueDate() >= iAcDate_6M && iDateUtil.getMons() >= 1) {
 							wkOverdue1MFlag = 1;
 						}
-						if (tx.getDueDate() >= iAcDate_1Y && dateUtil.getDays() >= 7) {
+						if (tx.getDueDate() >= iAcDate_1Y && iDateUtil.getDays() >= 7) {
 							wkOverdue7DCnt++;
 						}
-						this.info("dateUtil mon = " + dateUtil.getMons());
-						this.info("dateUtil day = " + dateUtil.getDays());
+						this.info("dateUtil mon = " + iDateUtil.getMons());
+						this.info("dateUtil day = " + iDateUtil.getDays());
 					}
 				}
 

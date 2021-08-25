@@ -43,9 +43,9 @@ public class L6754 extends TradeBuffer {
 	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
-	Parse parse;
+	Parse iParse;
 	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -53,7 +53,7 @@ public class L6754 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
+		int iFuncCode = this.iParse.stringToInteger(titaVo.getParam("FuncCode"));
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
 		String iPieceCode = titaVo.getParam("PieceCode");
 		BigDecimal iUnitCnt = new BigDecimal(titaVo.getParam("UnitCnt"));
@@ -107,7 +107,7 @@ public class L6754 extends TradeBuffer {
 			iCdPerformance = iCdPerformanceService.holdById(iCdPerformanceId, titaVo);
 			CdPerformance beforeCdPerformance = new CdPerformance();
 			if (iCdPerformance != null) {
-				beforeCdPerformance = (CdPerformance) dataLog.clone(iCdPerformance);
+				beforeCdPerformance = (CdPerformance) iDataLog.clone(iCdPerformance);
 			} else {
 				throw new LogicException(titaVo, "E0005", "更新時無資料");
 			}
@@ -130,8 +130,8 @@ public class L6754 extends TradeBuffer {
 				throw new LogicException("E0007", "更新時發生錯誤");
 			}
 			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeCdPerformance, iCdPerformance);
-			dataLog.exec();
+			iDataLog.setEnv(titaVo, beforeCdPerformance, iCdPerformance);
+			iDataLog.exec();
 			break;
 		case 4:
 			iCdPerformance = iCdPerformanceService.holdById(iCdPerformanceId, titaVo);

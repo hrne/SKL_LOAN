@@ -63,7 +63,7 @@ public class JcicZ054 implements Serializable {
 
   // 單獨全數受清償日期
   /* 指單獨受償金融機構實際之受清償日期 */
-  @Column(name = "`PayOffDate`")
+  @Column(name = "`PayOffDate`", insertable = false, updatable = false)
   private int payOffDate = 0;
 
   // 轉出JCIC文字檔日期
@@ -360,7 +360,7 @@ E：車貸及次順位不動產抵押權經債權金融機構處分後收回款�
   @Override
   public String toString() {
     return "JcicZ054 [jcicZ054Id=" + jcicZ054Id + ", tranKey=" + tranKey + ", payOffResult=" + payOffResult
-           + ", payOffDate=" + payOffDate + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", outJcicTxtDate=" + outJcicTxtDate + ", ukey=" + ukey + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
            + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

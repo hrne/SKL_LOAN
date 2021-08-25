@@ -69,7 +69,7 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"@",#PublicValue3],
 ["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
 ["#FdSettingDate+設定日期",#SettingDate],["#FdSettingBal+設定金額",#SettingBal],
-["#FdSynd+聯貸案",#Synd,#SyndX],["#FdSyndCode+聯貸案類型",#SyndCode,#SyndCodeX],
+!["#FdSynd+聯貸案",#Synd,#SyndX],["#FdSyndCode+聯貸案類型",#SyndCode,#SyndCodeX],
 ["#FdDispPrice+處分價格",#DispPrice],["#FdDispDate+處分日期",#DispDate],
 [#<->#,"#FdClStatus+擔保品狀況碼",#ClStatus,#ClStatusX],
 ]
@@ -890,29 +890,29 @@ E(0,@RimSettingAmt,#SettingBal)
 CALL(#RimL2r41)
 
 ! [是否聯貸案]
-#Synd=X,1,I
-IF(#FunCd==4,s,$)
-HELP(#YesNoHelp)
-@V(H,#YesNoHelp)
-IF(#Synd=="Y",T(3,@FdSyndCode,*),T(3,@FdSyndCode, ))
+#Synd=X,1,S
+!IF(#FunCd==4,s,$)
+!HELP(#YesNoHelp)
+!@V(H,#YesNoHelp)
+!IF(#Synd=="Y",T(3,@FdSyndCode,*),T(3,@FdSyndCode, ))
 
 #FdSynd=X,2,L
 
 #SyndX=X,2,L
-T(H,#Synd,#YesNoHelp)
+!T(H,#Synd,#YesNoHelp)
 
 
 ! [聯貸案類型]
-#SyndCode=X,1,I
-IF(#FunCd==4,s,$)
-IF(#Synd=="Y",$,S)
-HELP(#SyndCodeHelp)
-@V(H,#SyndCodeHelp)
+#SyndCode=X,1,S
+!IF(#FunCd==4,s,$)
+!IF(#Synd=="Y",$,S)
+!HELP(#SyndCodeHelp)
+!@V(H,#SyndCodeHelp)
 
 #FdSyndCode=X,2,L
 
 #SyndCodeX=X,6,L
-T(H,#SyndCode,#SyndCodeHelp)
+!T(H,#SyndCode,#SyndCodeHelp)
 
 
 ! [處分價格]

@@ -305,13 +305,13 @@ TXFORM=L1907
 #RPTFG2=1,QUERY.GRID,L1907
 #any={detail:true, header:'L1907.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN1=
+#OOBTN1=修改
 {width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
-#OOBTN2=
+#OOBTN2=複製
 {width:50,search:false,formatter:'cust:bind-button:複製',align:'center',canExport:false}
-#OOBTN3=
+#OOBTN3=刪除
 {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
-#OOBTN4=
+#OOBTN4=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 #OOCustId=統一編號
 {width:80,align:'center'}

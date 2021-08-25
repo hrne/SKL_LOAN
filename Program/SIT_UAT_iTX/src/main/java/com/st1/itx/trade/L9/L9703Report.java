@@ -1,7 +1,5 @@
 package com.st1.itx.trade.L9;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,6 @@ import com.st1.itx.util.parse.Parse;
 @Component
 @Scope("prototype")
 public class L9703Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9703Report.class);
 
 	@Autowired
 	Parse parse;
@@ -43,7 +40,7 @@ public class L9703Report extends MakeReport {
 			l9703report2.exec(titaVo, txbuffer);
 
 		} else { // 整批
-			this.info("L9703Report: CustNo == 0,出明細筆+通知書");
+			this.info("L9703Report: CustNo == 0,出明細表+通知書");
 			l9703report1.setParentTranCode(parentTranCode);
 			l9703report2.setParentTranCode(parentTranCode);
 

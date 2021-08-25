@@ -28,7 +28,7 @@ public class JcicZ054Log implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5768489533128022674L;
+	private static final long serialVersionUID = -4270834286788180994L;
 
 @EmbeddedId
   private JcicZ054LogId jcicZ054LogId;
@@ -50,11 +50,6 @@ public class JcicZ054Log implements Serializable {
   /* A：於協商前已聲請強制執行並獲分配之款項，於日後領取分配款者B：債務人於最高限額抵押權內清償無擔保債務C：保證人代為清償債務D：廠商將分期付款產品之款項退回貸款金融機構，並沖抵貸款金融機構債務;E：車貸及次順位不動產抵押權經債權金融機構處分後收回款項並沖抵貸款金融機構債務 */
   @Column(name = "`PayOffResult`", length = 1)
   private String payOffResult;
-
-  // 單獨全數受清償日期
-  /* 指單獨受償金融機構實際之受清償日期 */
-  @Column(name = "`PayOffDate`")
-  private int payOffDate = 0;
 
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
@@ -172,25 +167,6 @@ E：車貸及次順位不動產抵押權經債權金融機構處分後收回款�
   }
 
 /**
-	* 單獨全數受清償日期<br>
-	* 指單獨受償金融機構實際之受清償日期
-	* @return Integer
-	*/
-  public int getPayOffDate() {
-    return StaticTool.bcToRoc(this.payOffDate);
-  }
-
-/**
-	* 單獨全數受清償日期<br>
-	* 指單獨受償金融機構實際之受清償日期
-  *
-  * @param payOffDate 單獨全數受清償日期
-  * @throws LogicException when Date Is Warn	*/
-  public void setPayOffDate(int payOffDate) throws LogicException {
-    this.payOffDate = StaticTool.rocToBc(payOffDate);
-  }
-
-/**
 	* 轉出JCIC文字檔日期<br>
 	* 
 	* @return Integer
@@ -288,7 +264,7 @@ E：車貸及次順位不動產抵押權經債權金融機構處分後收回款�
 
   @Override
   public String toString() {
-    return "JcicZ054Log [jcicZ054LogId=" + jcicZ054LogId + ", tranKey=" + tranKey + ", payOffResult=" + payOffResult + ", payOffDate=" + payOffDate + ", outJcicTxtDate=" + outJcicTxtDate
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "JcicZ054Log [jcicZ054LogId=" + jcicZ054LogId + ", tranKey=" + tranKey + ", payOffResult=" + payOffResult + ", outJcicTxtDate=" + outJcicTxtDate + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

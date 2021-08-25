@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -33,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
 @Component
 @Scope("prototype")
 public class L9703Report1 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9703Report1.class);
 
 	@Autowired
 	L9703ServiceImpl l9703ServiceImpl;
@@ -71,10 +68,10 @@ public class L9703Report1 extends MakeReport {
 
 		this.info("L9703Report1.printHeader");
 
+		this.setFontSize(8);
+
 		String today = dDateUtil.getNowStringBc();
 		String nowTime = dDateUtil.getNowStringTime();
-
-		this.setFontSize(8);
 
 		this.print(-1, 150, "機密等級：密");
 
@@ -98,18 +95,20 @@ public class L9703Report1 extends MakeReport {
 		this.print(-5, 150, "時　間：" + this.showTime(nowTime));
 
 		this.print(-6, 150, "頁　次：　" + this.getNowPage());
-		
-		this.print(-7, 1, "　押品 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　    最近　　　逾期");
-		this.print(-8, 1,
-				" 地區別　 經辦　　　　戶號　　　　戶名　　　初貸日　　　本金餘額　 利率　 繳息迄日　 應繳日　　日數　　未收本息　　　　違約金　　　溢短繳　　　　合計　聯絡人　　　電話　　　　繳款方式");
-		this.print(-9, 1,
-				"-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+		/**
+		 * --------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
+		 * -----------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
+		 */
+		print(-7, 1, "擔保品　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　最近　　　逾期");
+		print(-8, 1, "地區別　催收人員　戶號　　　　戶名　　　初貸日　　　本金餘額　　利率　　繳息迄日　　應繳日　　日數　　　未收本息　　　　違約金　　　　溢短繳　　　　　合計　　聯絡人　　　　　　繳款方式");
+		print(-9, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(10);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(35);
+		this.setMaxRows(36);
 
 	}
 
@@ -150,9 +149,11 @@ public class L9703Report1 extends MakeReport {
 		BigDecimal totalOfTotal = BigDecimal.ZERO; // 合計加總
 
 		int tbsdy = titaVo.getEntDyI();
-		if (listL9703.size() == 0) {
+		if (listL9703 == null || listL9703.size() == 0) {
 			this.print(1, 1, "*******    查無資料   ******");
+			return;
 		}
+
 		for (Map<String, String> tL9703 : listL9703) {
 			List<BaTxVo> listBaTxVo = new ArrayList<>();
 
@@ -213,15 +214,15 @@ public class L9703Report1 extends MakeReport {
 			totalOfTotal = totalOfTotal.add(total); // 合計加總計算
 
 			// 地區別
-			this.print(1, 2, tL9703.get("F0"));
+			this.print(1, 1, tL9703.get("F0"));
 
-			// 經辦
-			this.print(0, 10, tL9703.get("F1"));
+			// 催收人員
+			this.print(0, 8, tL9703.get("F1"));
 
 			// 戶號
 			String tmpCustNo = tL9703.get("F2");
 			String tmpFacmNo = tL9703.get("F3");
-			this.print(0, 18, FormatUtil.pad9(tmpCustNo, 7) + "-" + FormatUtil.pad9(tmpFacmNo, 3));
+			this.print(0, 15, FormatUtil.pad9(tmpCustNo, 7) + "-" + FormatUtil.pad9(tmpFacmNo, 3));
 
 			// 報表長度僅能容納5個中文字
 			// 戶名
@@ -229,100 +230,109 @@ public class L9703Report1 extends MakeReport {
 			if (custName.length() > 5) {
 				custName = custName.substring(0, 5);
 			}
-			this.print(0, 30, custName);
+			this.print(0, 27, custName);
 
 			// 初貸日
 			String drawdownDate = tL9703.get("F5");
 			if (drawdownDate == null || "0".equals(drawdownDate) || drawdownDate.isEmpty()) {
-				this.print(0, 47, "", "R");
+				this.print(0, 36, "");
 			} else {
-				this.print(0, 47, this.showRocDate(drawdownDate, 1), "R");
+				this.print(0, 36, this.showRocDate(drawdownDate, 1));
 			}
 
 			// 本金餘額
 			BigDecimal loanBal = tL9703.get("F6") == null ? BigDecimal.ZERO : new BigDecimal(tL9703.get("F6"));
-			this.print(0, 59, formatAmt(loanBal, 0), "R");
+			this.print(0, 57, formatAmt(loanBal, 0), "R");
 			totalOfLoanBal = totalOfLoanBal.add(loanBal); // 本金餘額加總計算
 
 			// 利率
-			this.print(0, 66, formatAmt(intRate, 4), "R");
+			this.print(0, 64, formatAmt(intRate, 4), "R");
 
 			// 繳息迄日
 			String interestEndDate = tL9703.get("F7");
 			if (interestEndDate == null || "0".equals(interestEndDate) || interestEndDate.isEmpty()) {
-				this.print(0, 75, "", "R");
+				this.print(0, 65, "");
 			} else {
-				this.print(0, 75, this.showRocDate(interestEndDate, 1), "R");
+				this.print(0, 65, this.showRocDate(interestEndDate, 1));
 			}
 
-			// 應繳日
+			// 最近應繳日
 			String lastRepaidDate = tL9703.get("F8");
 			if (lastRepaidDate == null || "0".equals(lastRepaidDate) || lastRepaidDate.isEmpty()) {
-				this.print(0, 85, "", "R");
+				this.print(0, 75, "");
 			} else {
-				this.print(0, 85, this.showRocDate(lastRepaidDate, 1), "R");
+				this.print(0, 75, this.showRocDate(lastRepaidDate, 1));
 			}
 
 			// 日數
-			this.print(0, 90, tL9703.get("F9"), "R");
+			this.print(0, 89, tL9703.get("F9"), "R");
 
 			// 未收本息
-			this.print(0, 102, formatAmt(unpaidPriInt, 0), "R");
+			this.print(0, 103, formatAmt(unpaidPriInt, 0), "R");
 
 			// 違約金
-			this.print(0, 114, formatAmt(breachAmtAndDelayInt, 0), "R");
+			this.print(0, 115, formatAmt(breachAmtAndDelayInt, 0), "R");
 
 			// 溢短繳
-			this.print(0, 125, formatAmt(overflow, 0), "R");
+			this.print(0, 128, formatAmt(overflow, 0), "R");
 
 			// 合計
-			this.print(0, 135, formatAmt(total, 0), "R");
+			this.print(0, 140, formatAmt(total, 0), "R");
 
 			// 聯絡人
 			String cName = tL9703.get("F10");
-			if (cName.length() > 10) {
-				cName = cName.substring(0, 10);
+			if (cName != null && !cName.isEmpty()) {
+				if (cName.length() > 5) {
+					cName = cName.substring(0, 5);
+				}
+				this.print(0, 142, cName);
 			}
-			this.print(0, 137, cName);
 
 			// 電話
-			this.print(0, 147, tL9703.get("F11"));
+//			this.print(0, 149, tL9703.get("F11"));
 
 			// 繳款方式
 			this.print(0, 159, tL9703.get("F13"));
 
-			this.print(1, 1, "　　　　 　　　　　 　手機號碼..... ");
-			if (tL9703.get("F12") != null) {
-				this.print(0, 37, tL9703.get("F12"));
+			String cellPhone = tL9703.get("F12");
+
+			if (cellPhone != null && !cellPhone.isEmpty()) {
+				this.print(1, 15, "手機號碼..... " + cellPhone);
 			} else {
-				this.print(0, 42, "*");
+				this.print(1, 15, "手機號碼..... *");
+			}
+
+			String phoneNumber = tL9703.get("F11");
+
+			if (phoneNumber != null && !phoneNumber.isEmpty()) {
+				this.print(0, 143, "電話..... " + phoneNumber);
+			} else {
+				this.print(0, 143, "電話..... *");
 			}
 
 			counts++;
 
 		} // for
 
-		this.print(1, 1,
-				"－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
-		this.print(1, 5, "合　　計　　　　　筆");
-		this.print(0, 13, FormatUtil.pad9(String.valueOf(counts), 7));
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		print(1, 5, "合　　計　　　　　筆");
+		print(0, 13, FormatUtil.pad9(String.valueOf(counts), 7));
 
 		// 本金餘額總計
-		this.print(0, 59, formatAmt(totalOfLoanBal, 0), "R");
+		print(0, 57, formatAmt(totalOfLoanBal, 0), "R");
 
 		// 未收本息總計
-		this.print(0, 102, formatAmt(totalOfUnpaidPriInt, 0), "R");
+		print(0, 103, formatAmt(totalOfUnpaidPriInt, 0), "R");
 
 		// 違約金總計
-		this.print(0, 114, formatAmt(totalOfBreachAmtAndDelayInt, 0), "R");
+		print(0, 115, formatAmt(totalOfBreachAmtAndDelayInt, 0), "R");
 
 		// 溢短繳總計
-		this.print(0, 125, formatAmt(totalOfOverflow, 0), "R");
+		print(0, 128, formatAmt(totalOfOverflow, 0), "R");
 
 		// 合計總計
-		this.print(0, 135, formatAmt(totalOfTotal, 0), "R");
-		this.print(1, 1,
-				"－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
+		print(0, 140, formatAmt(totalOfTotal, 0), "R");
+		print(1, 1, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		long sno = this.close();
 		this.toPdf(sno);

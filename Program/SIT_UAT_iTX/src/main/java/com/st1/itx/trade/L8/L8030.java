@@ -1361,6 +1361,7 @@ public class L8030 extends TradeBuffer {
 				rJcicZ054Id.setRcDate(xJcicZ054.getRcDate());
 				rJcicZ054Id.setCustId(xJcicZ054.getCustId());
 				rJcicZ054Id.setSubmitKey(xJcicZ054.getSubmitKey());
+				rJcicZ054Id.setPayOffDate(xJcicZ054.getPayOffDate());
 				rJcicZ054 = iJcicZ054Service.findById(rJcicZ054Id, titaVo);
 				//已報送檔案(OutJcicDate!=0)才可做異動，否則只能刪除
 				if (rJcicZ054.getOutJcicTxtDate()==0) {

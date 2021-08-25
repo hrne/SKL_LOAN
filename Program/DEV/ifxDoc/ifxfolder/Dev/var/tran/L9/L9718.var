@@ -43,7 +43,7 @@ E(0,0)
 ["[L9718]                               逾期放款催繳處理結果"],
 ["@年月份",#inputYearMonth],
 ["@入帳日期範圍",#inputEntryDateMin,"－",#inputEntryDateMax],
-["@催收人員",#inputCollPsnShow],
+["@催收人員",#inputCollectorShow],
 ["@撥款日期",#inputDrawdownDate],
 ]
 !---------- AP TEXT AREA Variables ----------
@@ -89,7 +89,7 @@ E(0,#defaultEntryDateMax)
 #inputCollectorShow=X,6,I
 
 #inputCollector=X,6,S
-@C(4,#inputCollectorShow,T(3,999999),T(2,#inputCollector))
+@C(4,#inputCollectorShow,T(3,999999),T(2,#inputCollectorShow))
 
 #inputDrawdownDate=D,7,I
 T(3,0700101)

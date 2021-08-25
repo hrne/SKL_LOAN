@@ -152,11 +152,11 @@ public class L9719Report extends MakeReport {
 			for (Map<String, String> tLDVo : lL9719) {
 
 				for (int i = 0; i <= 2; i++) {
-					print(-10 + i * 2, 26, tLDVo.get("F" + Integer.toString(2 + i * 4)), "C");
-					print(-10 + i * 2, 50, tLDVo.get("F" + Integer.toString(3 + i * 4)), "C");
-					print(-10 + i * 2, 99, tLDVo.get("F" + Integer.toString(0 + i * 4)), "R");
-					print(-10 + i * 2, 124, tLDVo.get("F" + Integer.toString(1 + i * 4)), "R");
-					print(-10 + i * 2, 143, tLDVo.get("F14"), "C");
+					print(-10 - i * 2, 26, tLDVo.get("F" + Integer.toString(2 + i * 4)), "C");
+					print(-10 - i * 2, 50, tLDVo.get("F" + Integer.toString(3 + i * 4)), "C");
+					print(-10 - i * 2, 99, tLDVo.get("F" + Integer.toString(0 + i * 4)), "R");
+					print(-10 - i * 2, 124, tLDVo.get("F" + Integer.toString(1 + i * 4)), "R");
+					print(-10 - i * 2, 143, tLDVo.get("F14"), "C");
 				}
 
 				print(-16, 90, nfNum.format(Integer.parseInt(tLDVo.get("F0")) + Integer.parseInt(tLDVo.get("F4")) + Integer.parseInt(tLDVo.get("F8"))), "C");

@@ -15,8 +15,6 @@ import com.st1.itx.db.domain.CdPerformance;
 import com.st1.itx.db.domain.CdPerformanceId;
 import com.st1.itx.db.service.CdPerformanceService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L6757")
 @Scope("prototype")
@@ -31,10 +29,7 @@ public class L6757 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdPerformanceService iCdPerformanceService;
-	@Autowired
-	DateUtil dDateUtil;
-	@Autowired
-	Parse parse;
+
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

@@ -54,7 +54,7 @@ public class LM023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("entdy", entdy);
-		query.setParameter("acbrno", acbrno);
+		// query.setParameter("acbrno", acbrno);
 		return this.convertToMap(query.getResultList());
 	}
 

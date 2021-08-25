@@ -14,8 +14,6 @@ import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.PfBsOfficerService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L5R14")
 @Scope("prototype")
@@ -26,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R14 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5R14.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -39,14 +36,6 @@ public class L5R14 extends TradeBuffer {
 	public CdBcmService iCdBcmService;
 	@Autowired
 	public CdEmpService iCdEmpService;
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		// L5401交易內調RIM用,資料來源為CdBcm表
@@ -78,7 +67,7 @@ public class L5R14 extends TradeBuffer {
 					iCdEmp = iCdEmpService.findById(iCdBcm.getUnitManager(), titaVo);
 					if (iCdEmp == null) {
 						totaVo.putParam("L5R14EmpName", "");
-					}else{
+					} else {
 						totaVo.putParam("L5R14EmpName", iCdEmp.getFullname());
 					}
 				}
@@ -106,7 +95,7 @@ public class L5R14 extends TradeBuffer {
 					iCdEmp = iCdEmpService.findById(iCdBcm.getDistManager(), titaVo);
 					if (iCdEmp == null) {
 						totaVo.putParam("L5R14EmpName", "");
-					}else{
+					} else {
 						totaVo.putParam("L5R14EmpName", iCdEmp.getFullname());
 					}
 				}
@@ -134,7 +123,7 @@ public class L5R14 extends TradeBuffer {
 					iCdEmp = iCdEmpService.findById(iCdBcm.getDeptManager(), titaVo);
 					if (iCdEmp == null) {
 						totaVo.putParam("L5R14EmpName", "");
-					}else{
+					} else {
 						totaVo.putParam("L5R14EmpName", iCdEmp.getFullname());
 					}
 				}

@@ -257,7 +257,7 @@ TXFORM=L190A
 {width:100,align:'center'}
 
 #OOCenterCodeName=單位名稱
-{width:100,align:'center'}
+{width:100,align:'left'}
 
 #OOCommLineTypeX=員工身份別
 {width:100,align:'left'}

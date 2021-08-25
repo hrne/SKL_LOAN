@@ -25,7 +25,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9711p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9711p.class);
 
 	@Autowired
 	L9711Report l9711report;
@@ -46,7 +45,7 @@ public class L9711p extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		this.info("L9711p titaVo.getTxcd() = " + titaVo.getTxcd());
-//		String parentTranCode = titaVo.getTxcd();
+		String parentTranCode = titaVo.getTxcd();
 
 //		l9711report.setParentTranCode(parentTranCode);
 //		l9711report2.setParentTranCode(parentTranCode);
@@ -64,15 +63,13 @@ public class L9711p extends TradeBuffer {
 
 		if (l9711List != null && !l9711List.isEmpty()) {
 			l9711report2.exec(titaVo, txbuffer, l9711List);
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單已完成", titaVo);
 		} else {
 			l9711report2.exec(titaVo, txbuffer, l9711List);
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "L9711放款到期明細表及通知單查無資料", titaVo);
 		}
-		
-		if (true){
+
+		if (true) {
 			this.addList(this.totaVo);
 		}
 		return this.sendList();

@@ -104,7 +104,7 @@ public class LM051Report extends MakeReport {
 				makeExcel.setValue(row, 7, Integer.valueOf(tLDVo.get("F5")), "L");
 				// F6 逾期數；8
 //				putTerm(row, tLDVo);
-				
+
 				String ovduText = "";
 				if (!tLDVo.get("F18").isEmpty()) {
 					if (Integer.valueOf(tLDVo.get("F6")) == 99) {
@@ -115,7 +115,7 @@ public class LM051Report extends MakeReport {
 						ovduText = tLDVo.get("F18") + tLDVo.get("F6");
 					}
 				} else {
-					//逾期數
+					// 逾期數
 					ovduText = tLDVo.get("F6");
 				}
 
@@ -133,7 +133,7 @@ public class LM051Report extends MakeReport {
 				// F4 五類金額(用F16區分F4)=；12~17
 				putAsset(row, tLDVo.get("F4"), tLDVo.get("F16"));
 				// F10 分類標準(文字)；18
-				makeExcel.setValue(row, 17, tLDVo.get("F10"), "L");
+				makeExcel.setValue(row, 17, tLDVo.get("F10").isEmpty() ? "核貸估價" : tLDVo.get("F10"), "L");
 				// F11 金額 19
 				makeExcel.setValue(row, 18, Integer.valueOf(tLDVo.get("F11")), "#,##0");
 				// F12 備註；20
@@ -210,109 +210,28 @@ public class LM051Report extends MakeReport {
 		makeExcel.setValue(row, 8, tmp, "C");
 	}
 
-//	for (int i = 0; i < tLDVo.size(); i++) {
-//
-//		ad = "F" + String.valueOf(i);
-//
-//		switch (i) {
-//		case 0:// F0 戶號
-//
-//			// 戶號
-//			makeExcel.setValue(row, 1, Integer.valueOf(tLDVo.get(ad)));
-//			break;
-//
-//		case 1:// F1 額度
-//
-//			// 額度
-//			makeExcel.setValue(row, 2, Integer.valueOf(tLDVo.get(ad)), "C");
-//			break;
-//
-//		case 2:// F2 利變
-//
-//			// 利變
-//			makeExcel.setValue(row, 3,
-//					tLDVo.get(ad) == null || tLDVo.get(ad).length() == 0 ? " " : tLDVo.get(ad), "C");
-//			break;
-//
-//		case 3:// F3 戶名
-//
-//			// 戶名
-//			makeExcel.setValue(row, 4, tLDVo.get(ad), "L");
-//			break;
-//
-//		case 4:// F4 本金餘額
-//
-//			if (tLDVo.get(ad).equals("")) {
-//				makeExcel.setValue(row, 5, 0, "#,##0");
-//			} else {
-//				makeExcel.setValue(row, 5, Float.valueOf(tLDVo.get(ad)), "#,##0");
-//				// 分類
-//				putAsset(row, tLDVo);
-//			}
-//			break;
-//
-//		case 5:// F5 科目 欄位6
-//
-//			makeExcel.setValue(row, 6, Integer.valueOf(tLDVo.get(ad)), "C");
-//			break;
-//
-//		case 6:// F6 逾期數
-//
-//			// 逾期數
-//			putTerm(row, tLDVo);
-//			break;
-//
-//		case 7:// F7 地區 欄位8
-//		case 8:// F8 繳息迄日 欄位9
-//
-//			makeExcel.setValue(row, i + 1, tLDVo.get(ad) == null || tLDVo.get(ad).length() == 0 ? 0
-//					: Integer.valueOf(tLDVo.get(ad)), "C");
-//			break;
-//
-//		case 9:// F9 分類標準(文字)
-//
-//			makeExcel.setValue(row, 16, tLDVo.get(ad), "L");
-//			break;
-//
-//		case 10:// F10 金額(待確認)
-//
-//			makeExcel.setValue(row, 17, Integer.valueOf(tLDVo.get(ad)));
-//			break;
-//
-//		case 11:// F11 備註
-//
-//			makeExcel.setValue(row, 18, tLDVo.get(ad), "L");
-//			break;
-//
-//		case 12:// F12 基本利率代碼
-//			makeExcel.setValue(row, 19, tLDVo.get(ad), "C");
-//			break;
-//
-//		case 13:// F13
-//		case 14:// F14 無擔保=>分類5 金額?
-//
-//			makeExcel.setValue(row, 16, tLDVo.get(ad));
-//			break;
-//
-//		case 15:// F15 五分類代號
-//			putAsset(row, tLDVo);
-////			makeExcel.setValue(row, 10, Integer.valueOf(tLDVo.get(ad)), "C");
-//			break;
-//
-//		case 16:
-//			if (tLDVo.get("F12").equals(" ")) {
-//				makeExcel.setValue(row, i + 1, "無擔保");
-//			} else if (tLDVo.get(ad).equals("")) {
-//				makeExcel.setValue(row, i + 1, 0, "#,##0");
-//			} else {
-//				makeExcel.setValue(row, i + 1, Float.valueOf(tLDVo.get(ad)), "#,##0");
-//				putAsset(row, tLDVo);
-//			}
-//			break;
-//		default:
-//
-//			break;
-//		}
-//	}
-//}
+	private void memoText(int typeNum) {
+		String one1 = "有足額擔保";
+		String one2 = "有擔保";
+		String one3 = "無擔保";
+
+		String two1 = "--但債信不良(" + typeNum + ")";
+		String two2 = "--拍定後不足額(" + typeNum + ")";
+		String two3 = "--逾繳12月以上(" + typeNum + ")";
+		String two4 = "--逾繳7-12月(" + typeNum + ")";
+		String two5 = "--協議後正常還款(" + typeNum + ")";
+
+		String three1 = "--逾期";
+		String three2 = "--正常繳息";
+		String three3 = "--逾期未滿30日";
+
+	}
+
+	private void regalText() {
+		String one = "核貸估價";
+
+		String two = "協議戶";
+
+	}
+
 }

@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9703ServiceImpl.class);
 
 	@Autowired
 	Parse parse;
@@ -53,14 +50,14 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
 
-		logger.info("L9703 queryForDetail");
-		logger.info("L9703 icustno    = " + icustno);
-		logger.info("L9703 ifacmno    = " + ifacmno);
-		logger.info("L9703 UnpaidCond = " + unpay);
-		logger.info("L9703 st         = " + st);
-		logger.info("L9703 ed         = " + ed);
-		logger.info("L9703 repay      = " + repay);
-		logger.info("L9703 custType   = " + custType);
+		this.info("L9703 queryForDetail");
+		this.info("L9703 icustno    = " + icustno);
+		this.info("L9703 ifacmno    = " + ifacmno);
+		this.info("L9703 UnpaidCond = " + unpay);
+		this.info("L9703 st         = " + st);
+		this.info("L9703 ed         = " + ed);
+		this.info("L9703 repay      = " + repay);
+		this.info("L9703 custType   = " + custType);
 
 		String sql = "SELECT CC.\"CityItem\" F0";
 		sql += "            ,E.\"Fullname\" F1";
@@ -72,15 +69,9 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,D.\"PrevIntDate\" AS F7";
 		sql += "            ,D.\"NextIntDate\" AS F8";
 		sql += "            ,D.\"OvduDays\" AS F9";
-		sql += "            ,CASE";
-		sql += "               WHEN T1.\"Enable\" IS NOT NULL THEN T1.\"LiaisonName\"";
-		sql += "             ELSE N' ' END  AS F10";
-		sql += "            ,CASE";
-		sql += "               WHEN T1.\"Enable\" IS NOT NULL THEN T1.\"TelArea\" || T1.\"TelNo\" || T1.\"TelExt\"";
-		sql += "             ELSE ' ' END  AS F11";
-		sql += "            ,CASE";
-		sql += "               WHEN T2.\"Enable\" IS NOT NULL THEN  T2.\"TelNo\"";
-		sql += "             ELSE ' ' END  AS F12";
+		sql += "            ,NVL(T1.\"LiaisonName\",' ') AS F10";
+		sql += "            ,\"Fn_GetTelNo\"(D.\"CustUKey\",'02',1)  AS F11";
+		sql += "            ,\"Fn_GetTelNo\"(D.\"CustUKey\",'03',1)  AS F12";
 		sql += "            ,Cd.\"Item\" AS F13";
 		sql += "      FROM (SELECT F.\"BusinessOfficer\"";
 		sql += "                  ,L.\"CustNo\"";
@@ -98,7 +89,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\"";
 		sql += "                                   AND F.\"FacmNo\" = L.\"FacmNo\"";
 		sql += "            WHERE L.\"CaseCode\" = 1";
-		sql += "              AND L.\"Status\" IN (0, 2, 4, 6)";
+		sql += "              AND L.\"Status\" IN (0, 4)";
 		sql += queryCondition(icustno, ifacmno, unpay, repay, custType);// 在子查詢的where篩選
 		sql += "           ) D";
 		sql += "      LEFT JOIN \"CdEmp\" E ON  E.\"EmployeeNo\" = D.\"BusinessOfficer\"";
@@ -112,40 +103,27 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CdCode\" Cd ON Cd.\"Code\" = D.\"RepayCode\"";
 		sql += "                             AND Cd.\"DefCode\" = 'RepayCode'";
 		sql += "      LEFT JOIN (                              ";
-		sql += "          select                               ";
-		sql += "           \"CustUKey\"                        ";
-		sql += "          ,\"LiaisonName\"                     ";
-		sql += "          ,\"Enable\"                          ";
-		sql += "          ,\"TelArea\"                         ";
-		sql += "          ,\"TelNo\"                           ";
-		sql += "          ,\"TelExt\"                          ";
-		sql += "          ,ROW_NUMBER() OVER (PARTITION BY \"CustUKey\", \"TelTypeCode\" ORDER BY \"LastUpdate\" Desc) AS SEQ ";
-		sql += "          from \"CustTelNo\"                   ";
-		sql += "          where \"TelTypeCode\" = '01'         ";
-		sql += "            and \"Enable\" = 'Y'               ";
+		sql += "          SELECT CTN.\"CustUKey\" ";
+		sql += "               , CASE";
+		sql += "                   WHEN CTN.\"RelationCode\" = '00' ";
+		sql += "                   THEN CM.\"CustName\" ";
+		sql += "                 ELSE CTN.\"LiaisonName\" END AS \"LiaisonName\" ";
+		sql += "               , ROW_NUMBER() OVER (PARTITION BY CTN.\"CustUKey\" ORDER BY CTN.\"RelationCode\") AS SEQ ";
+		sql += "          FROM \"CustTelNo\" CTN";
+		sql += "          LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = CTN.\"CustUKey\" ";
+		sql += "          WHERE CTN.\"TelTypeCode\" = '02' ";
+		sql += "            AND CTN.\"Enable\" = 'Y' ";
 		sql += "      )    T1 ON T1.\"CustUKey\" = D.\"CustUKey\" ";
 		sql += "             AND T1.SEQ = 1                    ";
-		sql += "      LEFT JOIN (                              ";
-		sql += "          select                               ";
-		sql += "           \"CustUKey\"                        ";
-		sql += "          ,\"LiaisonName\"                     ";
-		sql += "          ,\"Enable\"                          ";
-		sql += "          ,\"TelNo\"                           ";
-		sql += "          ,ROW_NUMBER() OVER (PARTITION BY \"CustUKey\", \"TelTypeCode\" ORDER BY \"LastUpdate\" Desc) AS SEQ ";
-		sql += "          from \"CustTelNo\"                   ";
-		sql += "          where \"TelTypeCode\" = '03'         ";
-		sql += "            and \"Enable\" = 'Y'               ";
-		sql += "      )    T2 ON T2.\"CustUKey\" = D.\"CustUKey\" ";
-		sql += "             AND T2.SEQ = 1                    ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		int custno = Integer.valueOf(icustno);
-		int facmno = Integer.valueOf(ifacmno);
+		int custno = Integer.parseInt(icustno);
+		int facmno = Integer.parseInt(ifacmno);
 
 //		if (!"0000000".equals(icustno)) {
 		if (custno > 0) {
@@ -169,8 +147,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String condition = " ";
 
-		int custno = Integer.valueOf(icustno);
-		int facmno = Integer.valueOf(ifacmno);
+		int custno = Integer.parseInt(icustno);
+		int facmno = Integer.parseInt(ifacmno);
 		// 沒輸入戶號
 		// if ("0000000".equals(icustno)) {
 		if (custno == 0) {
@@ -220,7 +198,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryForNotice(TitaVo titaVo) throws Exception {
 
-		logger.info("L9703 queryForPdf");
+		this.info("L9703 queryForPdf");
 
 		String iCUSTNO = titaVo.get("CustNo");
 		String iFACMNO = titaVo.get("FacmNo");
@@ -239,14 +217,14 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String repay = titaVo.getParam("RepayType");
 		String custType = titaVo.getParam("CustType");
 
-		logger.info("L9703 queryForNotice");
-		logger.info("L9703 iCUSTNO    = " + iCUSTNO);
-		logger.info("L9703 iFACMNO    = " + iFACMNO);
-		logger.info("L9703 UnpaidCond = " + unpay);
-		logger.info("L9703 st         = " + st);
-		logger.info("L9703 ed         = " + ed);
-		logger.info("L9703 repay      = " + repay);
-		logger.info("L9703 custType   = " + custType);
+		this.info("L9703 queryForNotice");
+		this.info("L9703 iCUSTNO    = " + iCUSTNO);
+		this.info("L9703 iFACMNO    = " + iFACMNO);
+		this.info("L9703 UnpaidCond = " + unpay);
+		this.info("L9703 st         = " + st);
+		this.info("L9703 ed         = " + ed);
+		this.info("L9703 repay      = " + repay);
+		this.info("L9703 custType   = " + custType);
 
 		String sql = " SELECT *";
 		sql += "       FROM (SELECT ' ' F0";
@@ -307,8 +285,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int custno = parse.stringToInteger(iCUSTNO);
 		int facmno = parse.stringToInteger(iFACMNO);
 
-		logger.info("L9703 custno/facmno    = " + custno + "-" + facmno);
-		logger.info("L9703 tlrno    = " + tlrno);
+		this.info("L9703 custno/facmno    = " + custno + "-" + facmno);
+		this.info("L9703 tlrno    = " + tlrno);
 
 		if (custno > 0) {
 			sql += "          AND  M.\"CustNo\"     =  :icustno";
@@ -348,7 +326,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       WHERE D.\"SEQ\" = 1";
 		sql += "       ORDER BY D.\"F0\", D.\"F1\"";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

@@ -29,7 +29,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 public class L5965 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
-	public CollRemindService collremindservice;
+	public CollRemindService iCollRemindService;
 
 	@Autowired
 	public CdEmpService iCdEmpService;
@@ -37,13 +37,13 @@ public class L5965 extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
-		String icasecode = titaVo.getParam("CaseCode");
-		int icustno = Integer.valueOf(titaVo.getParam("CustNo"));
-		int ifacmno = Integer.valueOf(titaVo.getParam("FacmNo"));
-		String icondcodeflag = titaVo.getParam("CondCodeFlag");
+		String iCaseCode = titaVo.getParam("CaseCode");
+		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
+		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
+		String iCondCodeFlag = titaVo.getParam("CondCodeFlag");
 		String iCondition = "";
 
-		switch (icondcodeflag) {
+		switch (iCondCodeFlag) {
 		case "0":
 			iCondition = "已到期";
 			break;
@@ -65,33 +65,33 @@ public class L5965 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
 
-		Slice<CollRemind> tcollremind = collremindservice.findCl(icasecode, icustno, ifacmno, icondcodeflag, this.index, this.limit, titaVo);
-		this.info("tcollremind=" + tcollremind);
-		if (tcollremind != null) {
+		Slice<CollRemind> tCollRemind = iCollRemindService.findCl(iCaseCode, iCustNo, iFacmNo, iCondCodeFlag, this.index, this.limit, titaVo);
+		this.info("tcollremind=" + tCollRemind);
+		if (tCollRemind != null) {
 			this.info("got tcollremind");
-			for (CollRemind recollremind : tcollremind) {
+			for (CollRemind reCollRemind : tCollRemind) {
 				OccursList occursList = new OccursList();
-				occursList.putParam("OOFacmNo", recollremind.getFacmNo());
-				occursList.putParam("OOCondCode", recollremind.getCondCode());
-				occursList.putParam("OORemindDate", recollremind.getRemindDate());
-				occursList.putParam("OOEditDate", recollremind.getEditDate());
-				occursList.putParam("OOEditTime", recollremind.getEditTime());
-				occursList.putParam("OORemindCode", recollremind.getRemindCode());
-				occursList.putParam("OORemark", recollremind.getRemark());
-				CdEmp iCdEmp = iCdEmpService.findAgentIdFirst(recollremind.getLastUpdateEmpNo(),titaVo);
+				occursList.putParam("OOFacmNo", reCollRemind.getFacmNo());
+				occursList.putParam("OOCondCode", reCollRemind.getCondCode());
+				occursList.putParam("OORemindDate", reCollRemind.getRemindDate());
+				occursList.putParam("OOEditDate", reCollRemind.getEditDate());
+				occursList.putParam("OOEditTime", reCollRemind.getEditTime());
+				occursList.putParam("OORemindCode", reCollRemind.getRemindCode());
+				occursList.putParam("OORemark", reCollRemind.getRemark());
+				CdEmp iCdEmp = iCdEmpService.findAgentIdFirst(reCollRemind.getLastUpdateEmpNo(),titaVo);
 				if (iCdEmp == null) {
 					occursList.putParam("OOEditEmpNoX", "");
 				}else {
 					occursList.putParam("OOEditEmpNoX", iCdEmp.getFullname());
 				}
-				occursList.putParam("OOActSeq", recollremind.getTitaTxtNo());
-				occursList.putParam("OOTitaTxtNo", recollremind.getTitaTxtNo());
-				occursList.putParam("OOTitaTlrNo", recollremind.getTitaTlrNo());
-				occursList.putParam("OOTitaAcDate", recollremind.getAcDate());
+				occursList.putParam("OOActSeq", reCollRemind.getTitaTxtNo());
+				occursList.putParam("OOTitaTxtNo", reCollRemind.getTitaTxtNo());
+				occursList.putParam("OOTitaTlrNo", reCollRemind.getTitaTlrNo());
+				occursList.putParam("OOTitaAcDate", reCollRemind.getAcDate());
 				this.totaVo.addOccursList(occursList);
 			}
 		} else {
-			throw new LogicException(titaVo, "E0001", "提醒主檔查無戶號:" + icustno + "額度:" + ifacmno + "之" + iCondition + "資料");
+			throw new LogicException(titaVo, "E0001", "提醒主檔查無戶號:" + iCustNo + "額度:" + iFacmNo + "之" + iCondition + "資料");
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

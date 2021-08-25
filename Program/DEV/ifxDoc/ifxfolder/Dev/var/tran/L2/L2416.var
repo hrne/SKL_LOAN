@@ -123,6 +123,9 @@ IF(#PageFg==4 || #PageFg==5,INVOKEJS(SHOW,p5,1),$)
 !---------- AP TEXT Area Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
 #FunCdHelp=x,50,S
 T(3,1:新增;2:修改;4:刪除)
 
@@ -353,6 +356,8 @@ HELP(#FunCdHelp)
 CALL(#Init)
 CALL(#ResetPages)
 
+#SetSysPar1=X,1,S
+IF(#FunCd ==1 || #FunCd ==3,E(0,0)ASGN(AGAIN$),$)
 
 !刪除隱藏重新交易按鈕
 #AGAIN=X,1,S
@@ -604,7 +609,7 @@ IF(#FunCd==4,s,$)
 ! [土地座落]
 #LandLocation=x,100,L
 IF(#FunCd==4,s,T(B,#CityItem+#AreaItem+#IrItem))
-IF(#LandNo2==0,T(B,#LandLocation+#LandNo1+地號),T(B,#LandLocation+#LandNo1+-+#LandNo2+地號)))
+T(B,#LandLocation+，+地號+#LandNo1+-+#LandNo2)
 
 #FdLD_1=X,2,L
 

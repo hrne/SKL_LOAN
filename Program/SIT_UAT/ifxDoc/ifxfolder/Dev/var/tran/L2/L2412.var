@@ -64,7 +64,7 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"#FdMtgCheck+@票據",#MtgCheck,#MtgCheckX],
 [#<->#,"#FdMtgLoan+@借款",#MtgLoan,#MtgLoanX],
 [#<->#,"#FdMtgPledge+@保證債務",#MtgPledge,#MtgPledgeX],
-["#FdINTERSYND_LOAN+聯貸案",#Synd,#INTERSYND_LOAN_X],["#FdINTERSYND_TYPE+聯貸案類型",#SyndCode,#INTERSYND_TYPE_X],
+!["#FdINTERSYND_LOAN+聯貸案",#Synd,#INTERSYND_LOAN_X],["#FdINTERSYND_TYPE+聯貸案類型",#SyndCode,#INTERSYND_TYPE_X],
 ["#FdDISPOSITION_PRICE+處分價格",#DispPrice],["#FdDISPOSITION_DT+處分日期",#DispDate],
 ["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
 ["#FdSettingAmt+抵押設定金額",#SettingAmt],["#FdReceiptNo+收件字號",#ReceiptNo],
@@ -124,14 +124,14 @@ C(3,#PageFg,4,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
 
 
 #ResetPages=@,1,S
-INVOKEJS(SHOW,p1,7,33,0)
+INVOKEJS(SHOW,p1,7,32,0)
 CALL(#KLIGHT)
 SWITCH(#PageFg,1,INVOKEJS(SHOW,p1,7,18,1),
-                2,INVOKEJS(SHOW,p1,19,26,1),
-                3,INVOKEJS(SHOW,p1,27,33,1),
-                4,INVOKEJS(SHOW,p1,7,33,1),
+                2,INVOKEJS(SHOW,p1,19,25,1),
+                3,INVOKEJS(SHOW,p1,26,32,1),
+                4,INVOKEJS(SHOW,p1,7,32,1),
                 $)
-C(3,#PageFg,2,C(3,#MtgCode,0,INVOKEJS(SHOW,p1,23,26,1),INVOKEJS(SHOW,p1,23,26,0)),$)
+C(3,#PageFg,2,C(3,#MtgCode,0,INVOKEJS(SHOW,p1,23,25,1),INVOKEJS(SHOW,p1,23,25,0)),$)
 !Rim參數
 #RimEvaAmt=m,14,S
 #RimLoanToValue=m,3.2,S
@@ -929,6 +929,7 @@ T(3,)T(H,#Insurance,#YNHelp)
 
 !貸放成數
 #LoanToValue=m,3.2,I
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 @V(2,0)
 
@@ -950,6 +951,7 @@ IF(#FunCd==4,s,$)
 
 !抵押權註記
 #MtgCode=A,1,I
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 HELP(#MtgCodeHelp)
 @V(H,#MtgCodeHelp)
@@ -975,6 +977,7 @@ E(0,0)
 #chcekmtg=A,1,S
 
 #MtgCheck=X,1,I
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 IF(#MtgCode==1,s,$)
 HELP(#YNHelp)
@@ -984,6 +987,7 @@ HELP(#YNHelp)
 T(3,)T(H,#MtgCheck,#YNHelp)
 
 #MtgLoan=X,1,I
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 IF(#MtgCode==1,s,$)
 HELP(#YNHelp)
@@ -993,6 +997,7 @@ HELP(#YNHelp)
 T(3,)T(H,#MtgLoan,#YNHelp)
 
 #MtgPledge=X,1,I
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 IF(#MtgCode==1,s,$)
 HELP(#YNHelp)
@@ -1006,31 +1011,31 @@ T(3,)T(H,#MtgPledge,#YNHelp)
 
 
 !聯貸案
-#Synd=X,1,I
-IF(#FunCd==4,s,$)
-IF(#PageFg==2,$,CALL(#Show2))
-HELP(#YNHelp)
-@V(H,#YNHelp)
-IF(#Synd=="Y",T(3,@FdINTERSYND_TYPE,*),T(3,@FdINTERSYND_TYPE, ))
+#Synd=X,1,S
+!IF(#FunCd==4,s,$)
+!IF(#PageFg==2,$,CALL(#Show2))
+!HELP(#YNHelp)
+!@V(H,#YNHelp)
+!IF(#Synd=="Y",T(3,@FdINTERSYND_TYPE,*),T(3,@FdINTERSYND_TYPE, ))
 
 #FdINTERSYND_LOAN=X,2,L
 
 #INTERSYND_LOAN_X=X,2,L
-T(3,)T(H,#Synd,#YNHelp)
+!T(3,)T(H,#Synd,#YNHelp)
 
 !聯貸案類型
-#SyndCode=X,1,I
-IF(#FunCd==4,s,$)
-IF(#PageFg==2,$,CALL(#Show2))
-IF(#Synd=="Y",$,S)
-HELP(#SyndCodeHelp)
-@IF(#Synd=="Y",$,S)
-V(H,#SyndCodeHelp)
+#SyndCode=X,1,S
+!IF(#FunCd==4,s,$)
+!IF(#PageFg==2,$,CALL(#Show2))
+!IF(#Synd=="Y",$,S)
+!HELP(#SyndCodeHelp)
+!@IF(#Synd=="Y",$,S)
+!V(H,#SyndCodeHelp)
 
 #FdINTERSYND_TYPE=X,2,L
 
-#INTERSYND_TYPE_X=X,6,L
-T(3,)T(H,#SyndCode,#SyndCodeHelp)
+#INTERSYND_TYPE_X=X,6,S
+!T(3,)T(H,#SyndCode,#SyndCodeHelp)
 
 !處分價格
 #DispPrice=m,14,I

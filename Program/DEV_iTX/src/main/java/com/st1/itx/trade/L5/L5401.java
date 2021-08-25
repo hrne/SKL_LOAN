@@ -18,13 +18,13 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.PfBsDetailService;
 import com.st1.itx.db.service.PfBsOfficerService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.PfBsDetail;
 import com.st1.itx.db.domain.PfBsOfficer;
 import com.st1.itx.db.domain.PfBsOfficerId;
+
 @Component("L5401")
 @Scope("prototype")
 
@@ -36,29 +36,21 @@ import com.st1.itx.db.domain.PfBsOfficerId;
  */
 
 public class L5401 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5401.class);
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
-	
-	@Autowired
-	public PfBsDetailService pfbsdetailservice;
-	@Autowired
-	public PfBsOfficerService pfbsofficerservice;
-	@Autowired
 	public PfBsDetailService iPfBsDetailService;
+	@Autowired
+	public PfBsOfficerService iPfBsOfficerService;
 	@Autowired
 	public CustMainService iCustMainService;
 	@Autowired
 	public ClFacService iClFacService;
-	
+
 	@Autowired
 	public DataLog dataLog;
 
-	
-	
-	//資料來源: 輸入欄位=年月份撈PfBsOfficerService的GoalAmt(目標金額)
-	//					=工作月撈PfBsDetailService的PerfAmt(業績金額)
+	// 資料來源: 輸入欄位=年月份撈PfBsOfficerService的GoalAmt(目標金額)
+	// =工作月撈PfBsDetailService的PerfAmt(業績金額)
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		/*
@@ -68,11 +60,11 @@ public class L5401 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;
-		
+
 		this.totaVo.init(titaVo);
 		String ifFunctionCode = titaVo.getParam("FunctionCode");
-		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth"))+191100;
-		String iEmpNo = titaVo.getParam("EmpNo"); 
+		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
+		String iEmpNo = titaVo.getParam("EmpNo");
 		String iFullname = titaVo.getParam("EmpNoName");
 		String iAreaCode = titaVo.getParam("AreaCode");
 		String iAreaItem = titaVo.getParam("AreaItem");
@@ -87,10 +79,10 @@ public class L5401 extends TradeBuffer {
 		PfBsOfficer iPfBsOfficer = new PfBsOfficer();
 		iPfBsOfficerId.setEmpNo(iEmpNo);
 		iPfBsOfficerId.setWorkMonth(iWorkMonth);
-		iPfBsOfficer = pfbsofficerservice.holdById(iPfBsOfficerId);
-		switch(ifFunctionCode) {
-		case "1": //新增
-			if(iPfBsOfficer == null) {
+		iPfBsOfficer = iPfBsOfficerService.holdById(iPfBsOfficerId);
+		switch (ifFunctionCode) {
+		case "1": // 新增
+			if (iPfBsOfficer == null) {
 				PfBsOfficer sPfBsOfficer = new PfBsOfficer();
 				sPfBsOfficer.setPfBsOfficerId(iPfBsOfficerId);
 				sPfBsOfficer.setFullname(iFullname);
@@ -104,18 +96,18 @@ public class L5401 extends TradeBuffer {
 				sPfBsOfficer.setSmryGoalAmt(iSmryGoalAmt);
 				sPfBsOfficer.setStationName(iStationName);
 				try {
-					pfbsofficerservice.insert(sPfBsOfficer,titaVo);
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); //資料新建錯誤
+					iPfBsOfficerService.insert(sPfBsOfficer, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 資料新建錯誤
 				}
-			}else {	
-				throw new LogicException(titaVo, "E0005", "已有相同資料"); //已有相同資料錯誤
+			} else {
+				throw new LogicException(titaVo, "E0005", "已有相同資料"); // 已有相同資料錯誤
 			}
 			break;
-		case "2": //修改
-			if(iPfBsOfficer == null) {
-				throw new LogicException(titaVo, "E2006", ""); //無資料錯誤
-			}else {
+		case "2": // 修改
+			if (iPfBsOfficer == null) {
+				throw new LogicException(titaVo, "E2006", ""); // 無資料錯誤
+			} else {
 				iPfBsOfficer.setPfBsOfficerId(iPfBsOfficerId);
 				iPfBsOfficer.setAreaCode(iAreaCode);
 				iPfBsOfficer.setAreaItem(iAreaItem);
@@ -127,14 +119,14 @@ public class L5401 extends TradeBuffer {
 				iPfBsOfficer.setSmryGoalAmt(iSmryGoalAmt);
 				iPfBsOfficer.setStationName(iStationName);
 				try {
-					iPfBsOfficer = pfbsofficerservice.update2(iPfBsOfficer,titaVo);	
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); //資料新建錯誤
+					iPfBsOfficer = iPfBsOfficerService.update2(iPfBsOfficer, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 資料新建錯誤
 				}
 			}
 			break;
-		case "3": //複製
-			if(iPfBsOfficer == null) {
+		case "3": // 複製
+			if (iPfBsOfficer == null) {
 				PfBsOfficer sPfBsOfficer = new PfBsOfficer();
 				sPfBsOfficer.setPfBsOfficerId(iPfBsOfficerId);
 				sPfBsOfficer.setFullname(iFullname);
@@ -148,31 +140,31 @@ public class L5401 extends TradeBuffer {
 				sPfBsOfficer.setSmryGoalAmt(iSmryGoalAmt);
 				sPfBsOfficer.setStationName(iStationName);
 				try {
-					pfbsofficerservice.insert(sPfBsOfficer,titaVo);
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); //資料新建錯誤
+					iPfBsOfficerService.insert(sPfBsOfficer, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 資料新建錯誤
 				}
-			}else {	
-				throw new LogicException(titaVo, "E0005", "已有相同資料"); //已有相同資料錯誤
+			} else {
+				throw new LogicException(titaVo, "E0005", "已有相同資料"); // 已有相同資料錯誤
 			}
 			break;
-		case "4": //刪除
-			if(iPfBsOfficer == null) {
-				throw new LogicException(titaVo, "E2007", ""); //無資料錯誤
-			}else {
+		case "4": // 刪除
+			if (iPfBsOfficer == null) {
+				throw new LogicException(titaVo, "E2007", ""); // 無資料錯誤
+			} else {
 				try {
-					pfbsofficerservice.delete(iPfBsOfficer);	
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); //資料新建錯誤
+					iPfBsOfficerService.delete(iPfBsOfficer);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 資料新建錯誤
 				}
 			}
 			break;
-		case "5": //查詢???
+		case "5": // 查詢???
 			Slice<PfBsDetail> iPfBsDetail = null;
 			iPfBsDetail = iPfBsDetailService.findBsOfficerOneMonth(iEmpNo, iWorkMonth, this.index, this.limit, titaVo);
-			
-			if(iPfBsDetail != null) {
-				for (PfBsDetail xPfBsDetail :iPfBsDetail) {
+
+			if (iPfBsDetail != null) {
+				for (PfBsDetail xPfBsDetail : iPfBsDetail) {
 					OccursList occursList = new OccursList();
 					CustMain iCustMain = new CustMain();
 					ClFac iClFac = new ClFac();
@@ -191,10 +183,10 @@ public class L5401 extends TradeBuffer {
 					occursList.putParam("OOPerfCnt", xPfBsDetail.getPerfCnt());
 					if (iClFac == null) {
 						occursList.putParam("OOProdCode", "");
-					}else {
-						if (iClFac.getClCode1()==9 && iClFac.getClCode2()==1) {
+					} else {
+						if (iClFac.getClCode1() == 9 && iClFac.getClCode2() == 1) {
 							occursList.putParam("OOProdCode", "C");
-						}else {
+						} else {
 							occursList.putParam("OOProdCode", "H");
 						}
 					}
@@ -206,7 +198,7 @@ public class L5401 extends TradeBuffer {
 					titaVo.setReturnIndex(this.setIndexNext());
 					this.totaVo.setMsgEndToEnter();// 手動折返
 				}
-			}else {
+			} else {
 				throw new LogicException(titaVo, "E0001", "查無詳細撥款資料");
 			}
 

@@ -15,7 +15,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,231)ASGN(INQLEN$)
+E(0,222)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -211,7 +211,7 @@ T(3,9:動產)
 #ClCode1Help3=X,1024,S
 T(3,3:股票;4:其他有價證券)
 #ClCode1Help4=X,1024,S
-T(3,5:其他擔保品)
+T(3,5:銀行保證)
 
 !擔保品代號1
 #ClCode1=X,1,I
@@ -681,13 +681,18 @@ T(2,@OOOwnerIdLB,#OOOwnerId)
 #Amt=X,21,S
 X(#OOSettingAmt)
 
-#OOSettingStat=X,4,L
+#OOSettingStat=X,1,L
 #OOSettingStatX=x,4,L
 T(H,#OOSettingStat,#SettingStatHelp)
-#OOClStat=X,7,L
+#OOSetting=X,6,L
+T(2,#OOSettingStat+.+#OOSettingStatX)
+
+#OOClStat=X,1,L
 #OOClStatX=x,10,L
 C(4,#OOClStat,S,$)
 T(H,#OOClStat,#ClStatHelp)
+#OOCl=X,12,L
+T(2,#OOClStat+.+#OOClStatX)
 
 #OOShareTotal=m,14,L
 
@@ -701,9 +706,9 @@ X(#OOShareTotal)
 #OOStockCodeX=X,10,L
 T(H,#OOOther,#StockCodeHelp)
 
-#OOStock=x,4,L
+#OOStock=x,10,L
 IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
-T(1,#OOOther,1,4)
+T(1,#OOOther,1,10)
 
 #OOOther1=x,100,L
 IF(#OOClCode1 == 1,$,S)
@@ -919,10 +924,10 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
@@ -942,6 +947,8 @@ TXFORM=L2038
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 #OO_BTN4_COL=額度關聯
 {width:70,search:false,formatter:'cust:bind-button:額度關聯',align:'center',canExport:false}
+#OO_BTN5_COL=他項權利
+{width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
@@ -949,20 +956,20 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
 {width:120,align:'right'}
 
 #OOOther1=建物門牌
-{width:250,align:'left'}
+{width:300,align:'left'}
 
 #OOOther2=土地座落
-{width:250,align:'left'}
+{width:300,align:'left'}
 ^
 
 #RPTFG=2,QUERY.GRID,L2038
@@ -976,6 +983,8 @@ TXFORM=L2038
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 #OO_BTN4_COL=額度關聯
 {width:70,search:false,formatter:'cust:bind-button:額度關聯',align:'center',canExport:false}
+#OO_BTN5_COL=他項權利
+{width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
@@ -983,17 +992,17 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
 {width:120,align:'right'}
 
 #OOOther1=建物門牌
-{width:250,align:'left'}
+{width:300,align:'left'}
 
 
 ^
@@ -1008,6 +1017,8 @@ TXFORM=L2038
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 #OO_BTN4_COL=額度關聯
 {width:70,search:false,formatter:'cust:bind-button:額度關聯',align:'center',canExport:false}
+#OO_BTN5_COL=他項權利
+{width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
@@ -1015,17 +1026,17 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
 {width:120,align:'right'}
 
 #OOOther2=土地座落
-{width:250,align:'left'}
+{width:300,align:'left'}
 ^
 
 
@@ -1040,6 +1051,8 @@ TXFORM=L2038
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 #OO_BTN4_COL=額度關聯
 {width:70,search:false,formatter:'cust:bind-button:額度關聯',align:'center',canExport:false}
+#OO_BTN5_COL=他項權利
+{width:70,search:false,formatter:'cust:bind-button:他項權利',align:'center',canExport:false}
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
@@ -1047,10 +1060,10 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
@@ -1069,10 +1082,10 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
@@ -1089,20 +1102,20 @@ TXFORM=L2038
 #Amt=設定金額
 {width:120,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
 {width:100,align:'right'}
 
 #OOOther1=建物門牌
-{width:250,align:'left'}
+{width:300,align:'left'}
 
 #OOOther2=土地座落
-{width:250,align:'left'}
+{width:300,align:'left'}
 
 ^
 
@@ -1115,17 +1128,17 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
 {width:120,align:'right'}
 
 #OOOther1=建物門牌
-{width:250,align:'left'}
+{width:300,align:'left'}
 ^
 
 #RPTFG=8,QUERY.GRID,L2038
@@ -1137,17 +1150,17 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額
 {width:120,align:'right'}
 
 #OOOther2=土地座落
-{width:250,align:'left'}
+{width:300,align:'left'}
 ^
 
 #RPTFG=10,QUERY.GRID,L2038
@@ -1159,10 +1172,10 @@ TXFORM=L2038
 #Amt=設定金額
 {width:100,align:'right'}
 
-#OOSettingStatX=設定狀態
+#OOSetting=設定狀態
 {width:75,align:'center'}
 
-#OOClStatX=擔保品狀態
+#OOCl=擔保品狀態
 {width:85,align:'center'}
 
 #Amt1=可分配金額

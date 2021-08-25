@@ -13,7 +13,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.PfReward;
 import com.st1.itx.db.service.PfRewardService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
 import com.st1.itx.util.data.DataLog;
 
 @Component("L5406")
@@ -29,11 +28,9 @@ import com.st1.itx.util.data.DataLog;
 public class L5406 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
-	@Autowired
 	public PfRewardService iPfRewardService;
 	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -65,7 +62,7 @@ public class L5406 extends TradeBuffer {
 //				break;
 			case 2:
 				PfReward iPfReward = new PfReward();
-				iPfReward = (PfReward) dataLog.clone(hPfReward);
+				iPfReward = (PfReward) iDataLog.clone(hPfReward);
 				hPfReward.setInterviewerA(iInterviewerA);
 				hPfReward.setInterviewerB(iInterviewerB);
 				try {
@@ -75,14 +72,14 @@ public class L5406 extends TradeBuffer {
 					throw new LogicException("E0005", "更新時發生錯誤");
 				}
 				// 紀錄變更前變更後
-				dataLog.setEnv(titaVo, iPfReward, hPfReward);
-				dataLog.exec(iChgRsn);
+				iDataLog.setEnv(titaVo, iPfReward, hPfReward);
+				iDataLog.exec(iChgRsn);
 				break;
 //			case 3:
 //				break;
 			case 4:
 				iPfReward = new PfReward();
-				iPfReward = (PfReward) dataLog.clone(hPfReward);
+				iPfReward = (PfReward) iDataLog.clone(hPfReward);
 				hPfReward.setInterviewerA("");
 				hPfReward.setInterviewerB("");
 				try {
@@ -92,8 +89,8 @@ public class L5406 extends TradeBuffer {
 					throw new LogicException("E0005", "更新時發生錯誤");
 				}
 				// 紀錄變更前變更後
-				dataLog.setEnv(titaVo, iPfReward, hPfReward);
-				dataLog.exec(iChgRsn);
+				iDataLog.setEnv(titaVo, iPfReward, hPfReward);
+				iDataLog.exec(iChgRsn);
 				break;
 //			case 5:
 //				break;

@@ -21,7 +21,7 @@ public class JcicZ054Id implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -1159804909736208752L;
+	private static final long serialVersionUID = -5827159076563587175L;
 
 // 債務人IDN
   @Column(name = "`CustId`", length = 10)
@@ -41,14 +41,20 @@ public class JcicZ054Id implements Serializable {
   @Column(name = "`MaxMainCode`", length = 3)
   private String maxMainCode = " ";
 
+  // 單獨全數受清償日期
+  /* 指單獨受償金融機構實際之受清償日期 */
+  @Column(name = "`PayOffDate`")
+  private int payOffDate = 0;
+
   public JcicZ054Id() {
   }
 
-  public JcicZ054Id(String custId, String submitKey, int rcDate, String maxMainCode) {
+  public JcicZ054Id(String custId, String submitKey, int rcDate, String maxMainCode, int payOffDate) {
     this.custId = custId;
     this.submitKey = submitKey;
     this.rcDate = rcDate;
     this.maxMainCode = maxMainCode;
+    this.payOffDate = payOffDate;
   }
 
 /**
@@ -127,10 +133,29 @@ public class JcicZ054Id implements Serializable {
     this.maxMainCode = maxMainCode;
   }
 
+/**
+	* 單獨全數受清償日期<br>
+	* 指單獨受償金融機構實際之受清償日期
+	* @return Integer
+	*/
+  public int getPayOffDate() {
+    return  StaticTool.bcToRoc(this.payOffDate);
+  }
+
+/**
+	* 單獨全數受清償日期<br>
+	* 指單獨受償金融機構實際之受清償日期
+  *
+  * @param payOffDate 單獨全數受清償日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setPayOffDate(int payOffDate) throws LogicException {
+    this.payOffDate = StaticTool.rocToBc(payOffDate);
+  }
+
 
   @Override
   public int hashCode() {
-    return Objects.hash(custId, submitKey, rcDate, maxMainCode);
+    return Objects.hash(custId, submitKey, rcDate, maxMainCode, payOffDate);
   }
 
   @Override
@@ -140,11 +165,11 @@ public class JcicZ054Id implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     JcicZ054Id jcicZ054Id = (JcicZ054Id) obj;
-    return custId.equals(jcicZ054Id.custId) && submitKey == jcicZ054Id.submitKey && rcDate == jcicZ054Id.rcDate && maxMainCode == jcicZ054Id.maxMainCode;
+    return custId.equals(jcicZ054Id.custId) && submitKey == jcicZ054Id.submitKey && rcDate == jcicZ054Id.rcDate && maxMainCode == jcicZ054Id.maxMainCode && payOffDate == jcicZ054Id.payOffDate;
   }
 
   @Override
   public String toString() {
-    return "JcicZ054Id [custId=" + custId + ", submitKey=" + submitKey + ", rcDate=" + rcDate + ", maxMainCode=" + maxMainCode + "]";
+    return "JcicZ054Id [custId=" + custId + ", submitKey=" + submitKey + ", rcDate=" + rcDate + ", maxMainCode=" + maxMainCode + ", payOffDate=" + payOffDate + "]";
   }
 }

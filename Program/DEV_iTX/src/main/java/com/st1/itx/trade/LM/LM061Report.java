@@ -149,7 +149,7 @@ public class LM061Report extends MakeReport {
 								tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")),
 								"$* #,##0", "R");
 
-						makeExcel.setValue(row, 14, this.computeDivide(ovduBal, ovduBal, 4), "##0.0%");
+						makeExcel.setValue(row, 14, this.computeDivide(ovduBal,  new BigDecimal(tLDVo.get("F11")), 4), "##0.0%");
 					}
 
 					if (tLDVo.get("F12").equals("077")) {
@@ -166,57 +166,6 @@ public class LM061Report extends MakeReport {
 					}
 
 	
-
-//					switch (i) {
-//					case 0:
-//					case 1:
-//						// 戶號(數字右靠)
-//						if (value == null || value.isEmpty()) {
-//							makeExcel.setValue(row, i + 3, 0);
-//						} else {
-//							makeExcel.setValue(row, i + 3, Integer.valueOf(tLDVo.get(fdnm)));
-//						}
-//						break;
-//					case 3:
-//					case 4:
-//					case 5:
-//					case 10:
-//					case 13:
-//					case 14:
-//					case 16:
-//						// 金額
-//						BigDecimal amt = value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value);
-//
-//						if (amt.compareTo(BigDecimal.ZERO) > 0) {
-//
-//							makeExcel.setValue(row, i + 3, amt, "$* #,##0");
-//
-//							if (i == 10 && amt.compareTo(BigDecimal.ZERO) > 0) {
-//
-//								String xOvduBal = tLDVo.get("F5");
-//
-//								BigDecimal ovduBal = xOvduBal == null || xOvduBal.isEmpty() ? BigDecimal.ZERO
-//										: new BigDecimal(xOvduBal);
-//
-//								makeExcel.setValue(row, 14, this.computeDivide(ovduBal, amt, 4), "##0.0%");
-//							}
-//						}
-//						break;
-//					case 7:
-//						// 利率
-//						BigDecimal rate = value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value);
-//
-//						makeExcel.setValue(row, i + 3, rate, "0.0000");
-//						break;
-//					case 11:
-//					case 18:
-//					case 20:
-//						break;
-//					default:
-//						// 字串左靠
-//						makeExcel.setValue(row, i + 3, value);
-//						break;
-//					}
 
 				}
 				row++;

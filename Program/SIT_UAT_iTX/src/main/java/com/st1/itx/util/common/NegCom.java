@@ -529,7 +529,7 @@ public class NegCom extends CommBuffer {
 		if (transTxAmt.compareTo(rePayAmt) > 0) {
 			transTempRepayAmt = rePayAmt;// 暫收抵繳金額 = 還款金額
 			transOverRepayAmt = BigDecimal.ZERO;// 溢收抵繳金額
-			transOverAmt = transTxAmt.subtract(rePayAmt);// 轉入溢收金額= 暫收金額減還款金額，為正時
+			transOverAmt = transTxAmt.subtract(rePayAmt).subtract(transReturnAmt);// 轉入溢收金額= 暫收金額減還款金額減退還金額，為正時
 		} else {
 			transTempRepayAmt = transTxAmt;// 暫收抵繳金額 = 暫收金額
 			transOverRepayAmt = rePayAmt.subtract(transTxAmt); // 溢收抵繳金額 = 暫收金額減還款金額，為負時
@@ -578,6 +578,7 @@ public class NegCom extends CommBuffer {
 			transIntEndDate = tNegMain.getLastDueDate();
 			mainPayIntDate = transIntEndDate;
 			mainNextPayDate = 0;	// 下次應繳日 歸零
+			mainAccuDueAmt = mainAccuTempAmt.subtract(transReturnAmt);//結清時等於累繳金額減退還金額
 		}
 
 		mainRepaidPeriod = mainRepaidPeriod + transRepayPeriod;// 已繳期數
@@ -1748,39 +1749,33 @@ public class NegCom extends CommBuffer {
 		return YyyyMm;
 	}
 
-	public Map<String, String> NegMainSholdPay(NegMain tNegMain, int TrialDate) throws LogicException {
+	public Map<String, String> NegMainSholdPay(NegMain tNegMain, int trialDate) throws LogicException {
 		// int Today=dateUtil.getNowIntegerForBC();
 		// L5075使用本段程式
 		String OOPayTerm = "";// 應還期數
 		String OOPayAmt = "";// 應繳金額
-		String OOOverDueAmt = "";// OOOverDueAmt 應催繳金額=OOPayTerm 應還期數-AccuOverAmt 累溢收
+		String OOOverDueAmt = "";// OOOverDueAmt 應催繳金額=OOPayAmt 應繳金額 減 AccuOverAmt 累溢收
 
-		BigDecimal DueAmt = tNegMain.getDueAmt();// 月付金(期款)
-		// int TotalPeriod=tNegMain.getTotalPeriod();//期數
+		int lastDueDate = tNegMain.getLastDueDate();// 還款結束日
+		int nextPayDate = tNegMain.getNextPayDate();// 下次應繳日
+		BigDecimal accuOverAmt = tNegMain.getAccuOverAmt();// 累溢收
 
-		// int FirstDueDate=tNegMain.getFirstDueDate();//首次應繳日
-		int LastDueDate = tNegMain.getLastDueDate();// 還款結束日
-
-		// BigDecimal TotalContrAmt=tNegMain.getTotalContrAmt();//簽約總金額
-		int NextPayDate = tNegMain.getNextPayDate();// 下次應繳日
-		// int RepaidPeriod=tNegMain.getRepaidPeriod();//已繳期數
-		// BigDecimal RepayPrincipal=tNegMain.getRepayPrincipal();//還本本金
-		// BigDecimal RepayInterest=tNegMain.getRepayInterest();//還本利息
-
-		BigDecimal AccuOverAmt = tNegMain.getAccuOverAmt();// 累溢收
-		int FinallDate = 0;// 最後結束的日期-計算剩餘期數
-		if (TrialDate <= LastDueDate) {
-			FinallDate = TrialDate;
+		int finallDate = 0;// 最後結束的日期-計算剩餘期數
+		if (trialDate <= lastDueDate) {
+			finallDate = trialDate;
 		} else {
-			FinallDate = LastDueDate;
+			finallDate = lastDueDate;
 		}
 
-		int DiffPeriod = DiffMonth(1, NextPayDate, FinallDate) + 1;
+		int diffPeriod = DiffMonth(1, nextPayDate, finallDate) + 1;
+		OOPayTerm = String.valueOf(diffPeriod);
+		//OOPayAmt = String.valueOf(dueAmt.multiply(BigDecimal.valueOf(diffPeriod)));
+		//計算應繳金額
+		BigDecimal accuDueAmt = BigDecimal.ZERO; // 應繳金額
+		accuDueAmt = calAccuDueAmt(tNegMain, diffPeriod);
+		OOPayAmt = String.valueOf(accuDueAmt);
 
-		OOPayTerm = String.valueOf(DiffPeriod);
-		OOPayAmt = String.valueOf(DueAmt.multiply(BigDecimal.valueOf(DiffPeriod)));
-
-		OOOverDueAmt = String.valueOf(BigDecimal.valueOf(Double.parseDouble(OOPayAmt)).subtract(AccuOverAmt));
+		OOOverDueAmt = String.valueOf(BigDecimal.valueOf(Double.parseDouble(OOPayAmt)).subtract(accuOverAmt));
 		Map<String, String> Data = new HashMap<String, String>();
 		Data.put("OOPayTerm", OOPayTerm);
 		Data.put("OOPayAmt", OOPayAmt);
@@ -1788,6 +1783,39 @@ public class NegCom extends CommBuffer {
 		return Data;
 	}
 
+	public BigDecimal calAccuDueAmt(NegMain tNegMain, int diffPeriod) {
+		BigDecimal dueAmt = tNegMain.getDueAmt();// 月付金(期款)
+		BigDecimal oBalance = tNegMain.getPrincipalBal();// 剩餘本金
+		BigDecimal irate = tNegMain.getIntRate();// 利率
+		BigDecimal oPrincipal = BigDecimal.ZERO;// 應繳本金
+		BigDecimal oInterest = BigDecimal.ZERO;// 應繳利息
+		BigDecimal osum = BigDecimal.ZERO;// 本利和
+		BigDecimal accuDueAmt = BigDecimal.ZERO; // 應繳金額
+
+		for (int i = 0; i < diffPeriod; i++) {
+			if (oBalance.compareTo(BigDecimal.ZERO) <= 0) {
+				break;
+			}
+			oInterest = (oBalance.multiply(irate)).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP);// 應繳利息
+			if (oBalance.compareTo(dueAmt) <= 0) {
+				oPrincipal = oBalance;
+			} else {
+				oPrincipal = dueAmt.subtract(oInterest);// 應繳本金
+			}
+			osum = oInterest.add(oPrincipal);// 本利合計
+			if (osum.compareTo(dueAmt) < 0) {
+				oPrincipal = oBalance;
+				oBalance = BigDecimal.ZERO;
+				osum = oPrincipal.add(oInterest);
+			} else {
+				oBalance = oBalance.subtract(oPrincipal);
+			}
+			accuDueAmt = accuDueAmt.add(osum);// 應繳金額
+		}
+		return accuDueAmt;
+	}
+	
+	
 	public int DcToRoc(Integer Ymd) {
 		if (Ymd != null && Ymd != 0) {
 			if (String.valueOf(Ymd).length() == 8) {

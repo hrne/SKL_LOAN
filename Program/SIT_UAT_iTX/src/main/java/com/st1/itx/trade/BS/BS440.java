@@ -408,6 +408,15 @@ public class BS440 extends TradeBuffer {
 						tmpAmtMap.put(tmp, tmpAmtMap.get(tmp2));
 						tmpAmtMap.put(tmp2, BigDecimal.ZERO);
 					}
+				} else {
+					repAmtMap.put(tmp, shuAmtMap.get(tmp));
+					tmpAmtMap.put(tmp, BigDecimal.ZERO);
+//				合計至額度，限額計算用
+					if (!repAmtFacMap.containsKey(tmp2)) {
+						repAmtFacMap.put(tmp2, shuAmtMap.get(tmp));
+					} else {
+						repAmtFacMap.put(tmp2, repAmtFacMap.get(tmp2).add(shuAmtMap.get(tmp)));
+					}
 				}
 //				費用才抓取BatxVo.AcctCode
 				if (tBaTxVo.getRepayType() == 4 || tBaTxVo.getRepayType() == 5 || tBaTxVo.getRepayType() == 6) {

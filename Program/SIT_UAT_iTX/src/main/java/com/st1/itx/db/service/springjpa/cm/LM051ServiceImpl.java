@@ -82,19 +82,34 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,SUBSTR(M.\"AssetClass\",0,1) AS \"Class\""; // F9
 		sql += "			,CD.\"Item\""; // F10
 		sql += "			,NVL(M.\"Amount\",0) AS \"Amount\""; // F11
-		sql += "			,' ' AS \"Memo\""; // F12
+		sql += "			,(CASE ";
+		sql += "				WHEN M.\"PrinBalance\" = 1 THEN '無擔保'";
+		sql += "				WHEN M.\"PrinBalance\" > 1 THEN '有擔保'";
+		sql += "			  ELSE '' END) ||";
+		sql += "			 (CASE ";
+		sql += "				WHEN M.\"Status\" = 0 THEN '--但債信不良(' || M.\"AssetNum\" || ')' ";
+		sql += "				WHEN M.\"PrinBalance\" > 1 THEN '有擔保'";
+		sql += "			  ELSE '' END) ||";
+		sql += "			 (CASE ";
+		sql += "				WHEN M.\"OvduTerm\" > 0 AND M.\"OvduTerm\" <= 5 AND M.\"OvduDays\" > 30 THEN '--逾期'";
+		sql += "				WHEN M.\"OvduDays\" = 0 THEN '--正常繳息'";
+		sql += "				WHEN M.\"OvduDays\" > 0 AND M.\"OvduDays\" <= 30 THEN '--逾期未滿30日'";
+		sql += "				WHEN M.\"OvduTerm\" > 6 AND M.\"OvduTerm\" <= 12 AND M.\"OvduDays\" > 30 THEN '--逾期7-12(' || M.\"AssetNum\" ||')'";
+		sql += "				WHEN M.\"OvduTerm\" > 12 THEN '--逾期12月(' || M.\"AssetNum\" || ')'";
+		sql += "				WHEN M.\"OvduDays\" = 0 AND M.\"ProdNo\" IN ('60','61','62') THEN '--協議後正常繳款(' || M.\"AssetNum\" || ')'";
+		sql += "			  ELSE '' END) AS \"Memo\""; // F12
 		sql += "			,M.\"ProdNo\""; // F13
 		sql += "			,M.\"RenewCode\""; // F14
 		sql += "			,M.\"LawAmount\""; // F15
 		sql += "			,M.\"AssetClass\""; // F16
 		sql += "			,M.\"Status\""; // F17
-		sql += "			,M.\"OvduText\""; // F18
 		sql += "	  FROM(SELECT M.\"CustNo\"";
 		sql += "				 ,M.\"FacmNo\"";
 		sql += "				 ,NVL(M.\"AcSubBookCode\",' ') AS \"AcSubBookCode\"";
 		sql += "				 ,M.\"PrinBalance\"";
 		sql += "				 ,M.\"FacAcctCode\"";
 		sql += "				 ,M.\"OvduTerm\"";
+		sql += "				 ,M.\"OvduDays\"";
 		sql += "				 ,M.\"CityCode\"";
 		sql += "				 ,M.\"PrevIntDate\"";
 		sql += "				 ,NVL(L.\"LegalProg\",'000') AS \"LegalProg\"";
@@ -106,6 +121,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 ,M.\"Status\"";
 		sql += "				 ,M.\"OvduText\"";
 		sql += "				 ,M.\"ProdNo\"";
+		sql += "				 ,M.\"AssetNum\"";
 		sql += "		   FROM(SELECT M.\"CustNo\"";
 		sql += "					  ,M.\"FacmNo\"";
 		sql += "					  ,DECODE(M.\"AcSubBookCode\",'201','00A',' ') AS \"AcSubBookCode\"";
@@ -128,8 +144,10 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "					  ,M.\"RenewCode\"";
 		sql += "					  ,M.\"LawAmount\"";
 		sql += "					  ,M.\"AssetClass\"";
+		sql += "					  ,SUBSTR(M.\"AssetClass\",0,1) AS \"AssetNum\"";
 		sql += "				 	  ,M.\"Status\"";
 		sql += "				 	  ,M.\"ProdNo\"";
+		sql += "				      ,M.\"OvduDays\"";
 		sql += "				FROM \"MonthlyFacBal\" M";
 		sql += "				WHERE M.\"YearMonth\" =  :yymm ";
 		sql += "				  AND M.\"Status\" IN (0, 2, 6, 7)";

@@ -468,21 +468,16 @@ E(0,1)
 T(3,房地)
 
 ! [代號2]
-#ClCode2=A,2,I
+#ClCode2=A,2,L
 C(3,#CHAIN,1,s,$)
-HELP(#ClCode2Help),             
-@V(H,#ClCode2Help)
 
 #FdCOL_IND2=X,2,L
 
-#COLIND=A,3,S
-T(2,#ClCode1+#ClCode2)
-
 #ClCode2X=X,13,L
-T(H,#COLIND,#ClCode2Help)
+T(H,#ClCode2,#ClCode2Help)
 
 ![擔保品編號]
-#ClNo=A,7,I
+#ClNo=A,7,L
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 

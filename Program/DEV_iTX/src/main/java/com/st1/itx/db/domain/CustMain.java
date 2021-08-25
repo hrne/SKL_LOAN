@@ -28,7 +28,7 @@ public class CustMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6993293632812681382L;
+	private static final long serialVersionUID = 2581908358507189783L;
 
 // 客戶識別碼
   @Id
@@ -294,10 +294,15 @@ public class CustMain implements Serializable {
   @Column(name = "`IsSuspectedCheckType`", length = 1)
   private String isSuspectedCheckType;
 
-  // 建檔狀態
+  // 資料狀態
   /* 0.已完成建檔 1.未完成建檔(2021/08/13上DB)by eric */
   @Column(name = "`DataStatus`")
   private int dataStatus = 0;
+
+  // 建檔身分別
+  /* 0.借戶1.保證人2.擔保品提供人3.交易關係人2021/08/24新增欄位(2021/08/25上DB)by eric */
+  @Column(name = "`TypeCode`")
+  private int typeCode = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -1532,7 +1537,7 @@ N:否
   }
 
 /**
-	* 建檔狀態<br>
+	* 資料狀態<br>
 	* 0.已完成建檔 1.未完成建檔
 (2021/08/13上DB)by eric
 	* @return Integer
@@ -1542,14 +1547,37 @@ N:否
   }
 
 /**
-	* 建檔狀態<br>
+	* 資料狀態<br>
 	* 0.已完成建檔 1.未完成建檔
 (2021/08/13上DB)by eric
   *
-  * @param dataStatus 建檔狀態
+  * @param dataStatus 資料狀態
 	*/
   public void setDataStatus(int dataStatus) {
     this.dataStatus = dataStatus;
+  }
+
+/**
+	* 建檔身分別<br>
+	* 0.借戶1.保證人2.擔保品提供人3.交易關係人
+2021/08/24新增欄位
+(2021/08/25上DB)by eric
+	* @return Integer
+	*/
+  public int getTypeCode() {
+    return this.typeCode;
+  }
+
+/**
+	* 建檔身分別<br>
+	* 0.借戶1.保證人2.擔保品提供人3.交易關係人
+2021/08/24新增欄位
+(2021/08/25上DB)by eric
+  *
+  * @param typeCode 建檔身分別
+	*/
+  public void setTypeCode(int typeCode) {
+    this.typeCode = typeCode;
   }
 
 /**
@@ -1641,7 +1669,7 @@ N:否
            + ", currCompId=" + currCompId + ", currCompTel=" + currCompTel + ", jobTitle=" + jobTitle + ", jobTenure=" + jobTenure + ", incomeOfYearly=" + incomeOfYearly + ", incomeDataDate=" + incomeDataDate
            + ", passportNo=" + passportNo + ", aMLJobCode=" + aMLJobCode + ", aMLGroup=" + aMLGroup + ", indigenousName=" + indigenousName + ", lastFacmNo=" + lastFacmNo + ", lastSyndNo=" + lastSyndNo
            + ", allowInquire=" + allowInquire + ", email=" + email + ", actFg=" + actFg + ", introducer=" + introducer + ", isSuspected=" + isSuspected + ", isSuspectedCheck=" + isSuspectedCheck
-           + ", isSuspectedCheckType=" + isSuspectedCheckType + ", dataStatus=" + dataStatus + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", isSuspectedCheckType=" + isSuspectedCheckType + ", dataStatus=" + dataStatus + ", typeCode=" + typeCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

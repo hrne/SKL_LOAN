@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -29,13 +27,12 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R32 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5R32.class);
 
 	@Autowired
-	public Parse parse;
+	public Parse iParse;
 
 	@Autowired
-	public DateUtil dateUtil;
+	public DateUtil iDateUtil;
 
 	@Autowired
 	public L5R32ServiceImpl l5R32ServiceImpl;
@@ -61,21 +58,21 @@ public class L5R32 extends TradeBuffer {
 		BigDecimal aldyLoanBal = BigDecimal.ZERO;
 
 		if (!"".equals(titaVo.getParam("RimFuncCode"))) {
-			functionCode = parse.stringToInteger(titaVo.getParam("RimFuncCode"));
+			functionCode = iParse.stringToInteger(titaVo.getParam("RimFuncCode"));
 		}
 
 		switch (functionCode) {
 		case 1:
-			dateUtil.init();
-			
-			if ((""+today).length() >= 7) {
-				this.info("today ..." + (""+today));
-				monthFirst = (""+today).substring(0, 5) + "01";
+			iDateUtil.init();
+
+			if (("" + today).length() >= 7) {
+				this.info("today ..." + ("" + today));
+				monthFirst = ("" + today).substring(0, 5) + "01";
 			}
 
-			monthFirstI = parse.stringToInteger(monthFirst);
+			monthFirstI = iParse.stringToInteger(monthFirst);
 
-			lastMonthEnd = dateUtil.getbussDate(monthFirstI, -1);
+			lastMonthEnd = iDateUtil.getbussDate(monthFirstI, -1);
 
 			break;
 		case 2:
@@ -89,7 +86,7 @@ public class L5R32 extends TradeBuffer {
 
 			if (fnAllList != null && fnAllList.size() > 0) {
 				for (Map<String, String> fnAllTable : fnAllList) {
-					aldyLoanBal = aldyLoanBal.add(parse.stringToBigDecimal(fnAllTable.get("F0")));
+					aldyLoanBal = aldyLoanBal.add(iParse.stringToBigDecimal(fnAllTable.get("F0")));
 				}
 			}
 

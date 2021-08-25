@@ -25,8 +25,8 @@ import com.st1.itx.db.service.FacShareLimitService;
 import com.st1.itx.tradeService.TradeBuffer;
 
 /**
- * 取得額度可用餘額<BR>
- * 可用額度計算=Min(合併額度控管「可用總額度/循環動用」,Min(額度核准金額,擔保品分配金額) -已動用額度餘額))<BR>
+ * 1.caculate 取得額度可用餘額<BR>
+ * 2.caculateCl 取得擔保品可用餘額<BR>
  * 
  * @author st1
  *
@@ -73,7 +73,10 @@ public class LoanAvailableAmt extends TradeBuffer {
 	}
 
 	/**
-	 * 可用額度計算=Min(合併額度控管「可用總額度/循環動用」,Min(額度核准金額,擔保品分配金額) -已動用額度餘額))
+	 * 可用額度計算=Min<BR>
+	 * 1.核准額度限額「核准額度限額 - 已動用額度」<BR>
+	 * 2.合併額度控管限額「總額度 - 已動用額度總額」<BR>
+	 * 3.擔保品可使用額度「擔保品可分配金額 - 撥款餘額」<BR>
 	 * 
 	 * @param tFacMain 額度檔
 	 * @param titaVo   ..
@@ -83,7 +86,6 @@ public class LoanAvailableAmt extends TradeBuffer {
 	public BigDecimal caculate(FacMain tFacMain, TitaVo titaVo) throws LogicException {
 		this.info("LoanAvailableAmt caculate ... ");
 		init();
-		// 可用額度= Min((合併額度控管「可用總額度/循環動用」- 已動用額度總額),(Min(額度核准金額,擔保品分配金額) -已動用額度))
 		// 核准額度限額
 		this.limitFlag = "F"; // 限額計算方式 F-核准額度
 		if (tFacMain.getLineAmt().compareTo(tFacMain.getUtilBal()) > 0) {
@@ -132,6 +134,7 @@ public class LoanAvailableAmt extends TradeBuffer {
 		// 擔保品可使用額度 = 可分配金額 - 撥款餘額
 		BigDecimal wkAvailable = BigDecimal.ZERO;
 		BigDecimal wkUtilAmt = BigDecimal.ZERO;
+		// 本額度的所有擔保品
 		Slice<ClFac> slClFac = clFacService.approveNoEq(tFacMain.getApplNo(), 0, Integer.MAX_VALUE, titaVo);
 		if (slClFac != null) {
 			for (ClFac t : slClFac.getContent()) {
@@ -140,6 +143,8 @@ public class LoanAvailableAmt extends TradeBuffer {
 				lClFac.add(t);
 			}
 		}
+
+		// 同擔保品的其他額度
 		for (ClFac t : new ArrayList<>(lClFac)) {
 			getShareFac(t, titaVo);
 		}
@@ -190,7 +195,7 @@ public class LoanAvailableAmt extends TradeBuffer {
 			}
 			this.info("wkUtilAmt 1 end = " + wkUtilAmt + t.toString());
 		}
-		// 若不足，再佔用本額度擔保品
+		// 計算本額度、本額度擔保品的占用
 		for (ClFac t : lClFac) {
 			if (t.getFacShareFlag() == 1 && t.getApproveNo() == tFacMain.getApplNo()) {
 				FacMain t1FacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
@@ -248,6 +253,8 @@ public class LoanAvailableAmt extends TradeBuffer {
 			}
 		}
 		lClFac.addAll(lClFacTmp);
+
+		// 其他額度的其他擔保擔保品
 		for (ClFac t : lClFacTmp) {
 			getShareCl(t, titaVo);
 		}
@@ -309,8 +316,117 @@ public class LoanAvailableAmt extends TradeBuffer {
 
 	}
 
+	// 取得擔保品限額的可使用額度
+	public BigDecimal checkClAvailable(int iClCode1, int iClCode2, int iClNo, BigDecimal iShareTotal, TitaVo titaVo)
+			throws LogicException {
+		this.info("checkClAvailable ... ");
+		// 擔保品可使用額度 = 可分配金額 - 撥款餘額
+		BigDecimal wkAvailable = BigDecimal.ZERO;
+		BigDecimal wkUtilAmt = BigDecimal.ZERO;
+		// 本擔保品下的全部額度
+		Slice<ClFac> slClFac = clFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		if (slClFac != null) {
+			for (ClFac t : slClFac.getContent()) {
+				t.setFacShareFlag(0);
+				t.setShareAmt(BigDecimal.ZERO);
+				lClFac.add(t);
+			}
+		}
+
+		// 所有額度下的其他擔保品
+		for (ClFac t : new ArrayList<>(lClFac)) {
+			getShareCl(t, titaVo);
+		}
+
+		// 擔保品的可分配金額
+		for (ClFac t : lClFac) {
+			if (t.getFacShareFlag() == 0) {
+				if (iClCode1 == t.getClCode1() && iClCode2 == t.getClCode2() && iClNo == t.getClNo()) {
+					t.setShareAmt(iShareTotal);
+				} else {
+					ClMain tClMain1 = clMainService.findById(new ClMainId(t.getClCode1(), t.getClCode2(), t.getClNo()),
+							titaVo);
+					t.setShareAmt(tClMain1.getShareTotal());
+					t.setFacShareFlag(1);
+				}
+				for (ClFac c : lClFac) {
+					if (c.getClCode1() == t.getClCode1() && c.getClCode2() == t.getClCode2()
+							&& c.getClNo() == t.getClNo()) {
+						c.setFacShareFlag(1);
+					}
+				}
+			}
+		}
+
+		for (ClFac t : lClFac) {
+			this.info("checkCl 1 = " + t.toString());
+		}
+
+//	 可使用額度 = 可分配金額 - 撥款餘額
+
+		// 計算其他擔保品、非本擔保品額度的占用
+		for (ClFac t : lClFac) {
+			if (t.getFacShareFlag() == 1
+					&& (t.getClCode1() != iClCode1 || t.getClCode2() != iClCode2 || t.getClNo() != iClNo)) {
+				FacMain t1FacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
+				wkUtilAmt = wkUtilAmt.add(t1FacMain.getUtilAmt());// 撥款餘額
+				this.info("wkUtilAmt 1 = " + wkUtilAmt + t.toString());
+				for (ClFac c : lClFac) {
+					if (c.getApproveNo() == t1FacMain.getApplNo()) {
+						c.setFacShareFlag(2);
+					}
+					if (t.getClCode1() != iClCode1 || t.getClCode2() != iClCode2 || t.getClNo() != iClNo) {
+						if (wkUtilAmt.compareTo(t.getShareAmt()) > 0) {
+							t.setShareAmt(BigDecimal.ZERO);
+							wkUtilAmt = wkUtilAmt.subtract(t.getShareAmt());
+						} else {
+							t.setShareAmt(t.getShareAmt().subtract(wkUtilAmt));
+							wkUtilAmt = BigDecimal.ZERO;
+						}
+					}
+				}
+			}
+			this.info("wkUtilAmt 1 end = " + wkUtilAmt + t.toString());
+		}
+		// 計算本擔保品、本擔保品額度的占用
+		for (ClFac t : lClFac) {
+			if (t.getFacShareFlag() == 1
+					&& (t.getClCode1() == iClCode1 && t.getClCode2() == iClCode2 && t.getClNo() == iClNo)) {
+				FacMain t1FacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
+				wkUtilAmt = wkUtilAmt.add(t1FacMain.getUtilAmt());// 撥款餘額
+				this.info("wkUtilAmt 2 = " + wkUtilAmt + t.toString());
+				for (ClFac c : lClFac) {
+					if (c.getApproveNo() == t1FacMain.getApplNo()) {
+						c.setFacShareFlag(2);
+					}
+					if (t.getClCode1() == iClCode1 && t.getClCode2() == iClCode2 && t.getClNo() == iClNo) {
+						if (wkUtilAmt.compareTo(t.getShareAmt()) > 0) {
+							t.setShareAmt(BigDecimal.ZERO);
+							wkUtilAmt = wkUtilAmt.subtract(t.getShareAmt());
+						} else {
+							t.setShareAmt(t.getShareAmt().subtract(wkUtilAmt));
+							wkUtilAmt = BigDecimal.ZERO;
+						}
+					}
+				}
+			}
+			this.info("wkUtilAmt 2 end = " + wkUtilAmt + t.toString());
+		}
+		
+		wkAvailable = BigDecimal.ZERO.subtract(wkUtilAmt);
+
+		// 計算本額度擔保品的可使用額度
+		for (ClFac t : lClFac) {
+			if (t.getClCode1() == iClCode1 && t.getClCode2() == iClCode2 && t.getClNo() == iClNo) {
+				wkAvailable = wkAvailable.add(t.getShareAmt());
+				this.info(" wkAvailable  " + wkAvailable + t.toString());
+			}
+		}
+		return wkAvailable;
+	}
+
 	/**
-	 * 可用額度=Min((合併額度控管「可用總額度/循環動用」- 已動用額度總額),(Min(額度核准金額,擔保品分配金額) -已動用額度))
+	 * 可用額度計算=Min(「核准額度限額 - 已動用額度」, 「合併額度控管總額度 - 已動用額度總額」,「擔保品可分配金額 - 撥款餘額」)
 	 * 
 	 * @return BigDecimal
 	 */

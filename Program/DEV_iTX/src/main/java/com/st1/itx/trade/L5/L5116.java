@@ -14,10 +14,8 @@ import com.st1.itx.db.domain.GraceConditionId;
 import com.st1.itx.db.service.GraceConditionService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.parse.Parse;
 
 /* DB容器 */
-
 
 @Component("L5116")
 @Scope("prototype")
@@ -30,12 +28,9 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L5116 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5116.class);
 	/* 轉型共用工具 */
 	@Autowired
-	public Parse parse;
-	@Autowired
-	public DataLog dataLog;
+	public DataLog iDataLog;
 	@Autowired
 	public GraceConditionService iGraceConditionService;
 
@@ -54,12 +49,12 @@ public class L5116 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		
+
 		GraceCondition iGraceCondition = new GraceCondition();
 		GraceConditionId iGraceConditionId = new GraceConditionId();
 		iGraceConditionId.setCustNo(iCustNo);
 		iGraceConditionId.setFacmNo(iFacmNo);
-		switch(iFunctioncd) {
+		switch (iFunctioncd) {
 		case "1":
 			iGraceCondition = iGraceConditionService.findById(iGraceConditionId, titaVo);
 			if (iGraceCondition == null) {
@@ -68,19 +63,19 @@ public class L5116 extends TradeBuffer {
 				iGraceCondition.setActUse(iActUse);
 				try {
 					iGraceConditionService.insert(iGraceCondition, titaVo);
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); //新增資料時發生錯誤
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時發生錯誤
 				}
-			}else {
-				throw new LogicException(titaVo, "E0005","新增資料已存在");
-			}		
+			} else {
+				throw new LogicException(titaVo, "E0005", "新增資料已存在");
+			}
 			break;
 		case "2":
 			iGraceCondition = iGraceConditionService.holdById(iGraceConditionId, titaVo);
 			if (iGraceCondition == null) {
-				throw new LogicException(titaVo, "E0003","修改資料不存在");
-			}else {
-				GraceCondition oiGraceCondition = (GraceCondition) dataLog.clone(iGraceCondition);
+				throw new LogicException(titaVo, "E0003", "修改資料不存在");
+			} else {
+				GraceCondition oiGraceCondition = (GraceCondition) iDataLog.clone(iGraceCondition);
 				iGraceCondition.setActUse(iActUse);
 				try {
 					iGraceConditionService.update(iGraceCondition, titaVo);
@@ -88,15 +83,15 @@ public class L5116 extends TradeBuffer {
 					throw new LogicException("E0007", e.getErrorMsg());
 				}
 				// 紀錄變更前變更後
-				dataLog.setEnv(titaVo, oiGraceCondition, iGraceCondition);
-				dataLog.exec();
+				iDataLog.setEnv(titaVo, oiGraceCondition, iGraceCondition);
+				iDataLog.exec();
 			}
 			break;
 		case "4":
 			iGraceCondition = iGraceConditionService.holdById(iGraceConditionId, titaVo);
 			if (iGraceCondition == null) {
-				throw new LogicException(titaVo, "E0008","刪除資料不存在");
-			}else {
+				throw new LogicException(titaVo, "E0008", "刪除資料不存在");
+			} else {
 				try {
 					iGraceConditionService.delete(iGraceCondition, titaVo);
 				} catch (DBException e) {
@@ -105,10 +100,9 @@ public class L5116 extends TradeBuffer {
 			}
 			break;
 		}
-		
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 }

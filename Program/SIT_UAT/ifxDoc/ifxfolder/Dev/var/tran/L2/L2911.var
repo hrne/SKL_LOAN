@@ -517,6 +517,9 @@ IF(#OOtradecode=="L2915",T(2,#FUN2+#OClCode1+#OClCode2+#OClNo),T(2,#FUN2+#OClCod
 !刪除
 #OBuf4=X,14,S
 IF(#OOtradecode=="L2915",T(2,#FUN4+#OClCode1+#OClCode2+#OClNo),T(2,#FUN4+#OClCode1+#OClCode2+#OClNo+#OOLandSeqX))
+!保險單
+#OBuf5=X,14,S
+T(2,2+#OClCode1+#OClCode2+#OClNo)
 
 
 
@@ -538,7 +541,11 @@ C(4,#OOAddress,BIND(grid,cancel),$)
 #OBtn4=X,10,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOtradecode2; ntxbuf=#OBuf4})
 C(4,#OOAddress,BIND(grid,cancel),$)
+C(5,#OOtradecode,"L2915",BIND(grid,cancel),$)
 
+#OBtn5=X,10,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L4060; ntxbuf=#OBuf5})
+C(5,#OOtradecode,"L2915",$,BIND(grid,cancel))
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -667,12 +674,14 @@ TXFORM=L2911
 #Cl1Type=類別
 {width:80,align:'center'}
 
-#OBtn3=
+#OBtn3=查詢
 {width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
-#OBtn4=
+#OBtn4=刪除
 {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
-#OBtn2=
+#OBtn2=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OBtn5=保險單
+{width:60,search:false,formatter:'cust:bind-button:保險單',align:'center',canExport:false}
 
 
 #OOLandSeqX=序號

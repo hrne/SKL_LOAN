@@ -13,8 +13,6 @@ import com.st1.itx.db.service.CdBcmService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.PfBsOfficerService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L5R13")
 @Scope("prototype")
@@ -25,32 +23,24 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R13 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5R13.class);
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	@Autowired
 	public PfBsOfficerService iPfBsOffcierService;
-	
+
 	@Autowired
 	public CdBcmService iCdBcmService;
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
 
-	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
-	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		//L5401交易內調RIM用,資料來源為CdBcm表
+		// L5401交易內調RIM用,資料來源為CdBcm表
 		this.info("active L5R13 ");
-		this.info("L5R13 titaVo=["+titaVo+"]");
+		this.info("L5R13 titaVo=[" + titaVo + "]");
 		this.totaVo.init(titaVo);
-		String iChoose = titaVo.getParam("RimChoose").trim();//輸入位置
+		String iChoose = titaVo.getParam("RimChoose").trim();// 輸入位置
 		CdBcm iCdBcm = new CdBcm();
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -59,11 +49,11 @@ public class L5R13 extends TradeBuffer {
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 500;
-		//分別撈資料
-		switch(iChoose) {
+		// 分別撈資料
+		switch (iChoose) {
 		case "1":
-			this.info("查詢區域中心"); 
-			//取消使用 保留
+			this.info("查詢區域中心");
+			// 取消使用 保留
 //			String iAreaCode = titaVo.getParam("RimAreaCode").trim();//區域中心
 //			if(iAreaCode.equals("")) {
 ////				totaVo.putParam("L5R13AreaItem", "");
@@ -102,38 +92,38 @@ public class L5R13 extends TradeBuffer {
 //			break;	
 		case "2":
 			this.info("查詢部室代號");
-			String iDeptCode = titaVo.getParam("RimDeptCode").trim();//部室代號
-			if(iDeptCode.equals("")) {
+			String iDeptCode = titaVo.getParam("RimDeptCode").trim();// 部室代號
+			if (iDeptCode.equals("")) {
 //				totaVo.putParam("L5R13AreaItem", "");
 				totaVo.putParam("L5R13DeptItem", "");
 				totaVo.putParam("L5R13DistItem", "");
 				break;
-			}	
-			iCdBcm = iCdBcmService.deptCodeFirst(iDeptCode,titaVo);
-			if(iCdBcm!=null) {
+			}
+			iCdBcm = iCdBcmService.deptCodeFirst(iDeptCode, titaVo);
+			if (iCdBcm != null) {
 //				totaVo.putParam("L5R13AreaItem", "");
 				totaVo.putParam("L5R13DeptItem", iCdBcm.getDeptItem());
 				totaVo.putParam("L5R13DistItem", "");
-			}else {
-				throw new LogicException(titaVo, "E0001", "無此部室代號"); //無此代號錯誤
+			} else {
+				throw new LogicException(titaVo, "E0001", "無此部室代號"); // 無此代號錯誤
 			}
 			break;
 		case "3":
 			this.info("查詢區部代號");
-			String iDistCode = titaVo.getParam("RimDistCode").trim();//區部代號
-			if(iDistCode.equals("")) {
+			String iDistCode = titaVo.getParam("RimDistCode").trim();// 區部代號
+			if (iDistCode.equals("")) {
 //				totaVo.putParam("L5R13AreaItem", "");
 				totaVo.putParam("L5R13DeptItem", "");
 				totaVo.putParam("L5R13DistItem", "");
 				break;
 			}
-			iCdBcm = iCdBcmService.distCodeFirst(iDistCode,titaVo);
-			if(iCdBcm!=null) {
+			iCdBcm = iCdBcmService.distCodeFirst(iDistCode, titaVo);
+			if (iCdBcm != null) {
 //				totaVo.putParam("L5R13AreaItem", "");
 				totaVo.putParam("L5R13DistItem", iCdBcm.getDistItem());
 				totaVo.putParam("L5R13DeptItem", "");
-			}else {
-				throw new LogicException(titaVo, "E0001", "無此區部代號"); //無此代號錯誤
+			} else {
+				throw new LogicException(titaVo, "E0001", "無此區部代號"); // 無此代號錯誤
 			}
 			break;
 		}

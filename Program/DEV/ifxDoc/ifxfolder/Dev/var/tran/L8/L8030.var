@@ -603,6 +603,8 @@ TXFORM=L8030
 {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
 #OOBTN6=歷程
 {width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
+#OOTranKey_Combine=狀態
+{width:60,align:'center',hidden:false}
 #OOCustId=身分證字號
 {width:100,align:'center',hidden:false}
 #OORcDate=協商申請日
@@ -611,6 +613,8 @@ TXFORM=L8030
 {width:120,align:'center',hidden:false}
 #OOMaxMainCode=最大債權金融機構代號
 {width:200,align:'center',hidden:false}
+#OOOutJcicTxtDate=轉JCIC文字檔日期
+{width:180,align:'center',hidden:false}
 ^
 #RPTFG=N,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}

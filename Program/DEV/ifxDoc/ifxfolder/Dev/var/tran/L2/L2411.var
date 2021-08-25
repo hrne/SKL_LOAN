@@ -76,7 +76,7 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"#FdOtherOwnerTotal+其他債權人設定總額",#OtherOwnerTotal],
 [#<->#,"#FdCompensationCopy+代償後謄本",#CompensationCopy,#CompensationCopyX],
 [#<->#,"#FdBdRmk+建物標示備註",#BdRmk],
-["#FdSynd+聯貸案",#Synd,#SyndX],["#FdSyndCode+聯貸案類型",#SyndCode,#SyndCodeX],
+!["#FdSynd+聯貸案",#Synd,#SyndX],["#FdSyndCode+聯貸案類型",#SyndCode,#SyndCodeX],
 ["#FdDispPrice+處分價格",#DispPrice],["#FdDispDate+處分日期",#DispDate],
 [#<->#,"#FdMtgReasonCode+最高抵押權確定事由",#MtgReasonCode,#MtgReasonCodeX],
 ["#FdREC_DT+收文日期",#ReceivedDate],["#FdReceivedNo+收文案號",#ReceivedNo],
@@ -175,15 +175,15 @@ C(3,#PageFg,8,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
 
 
 #ResetPages=@,1,S
-INVOKEJS(SHOW,p1,7,37,0)
+INVOKEJS(SHOW,p1,7,36,0)
 CALL(#KLIGHT)
 SWITCH(#PageFg,1,CALL(#checkclcode),
                 2,INVOKEJS(SHOW,p1,9,10,1),
                 3,INVOKEJS(SHOW,p1,11,14,1),
-                4,INVOKEJS(SHOW,p1,15,27,1),
-                5,INVOKEJS(SHOW,p1,28,31,1),
-                6,INVOKEJS(SHOW,p1,32,37,1),
-                8,INVOKEJS(SHOW,p1,9,37,1)
+                4,INVOKEJS(SHOW,p1,15,26,1),
+                5,INVOKEJS(SHOW,p1,27,30,1),
+                6,INVOKEJS(SHOW,p1,31,36,1),
+                8,INVOKEJS(SHOW,p1,9,36,1)
                 CALL(#checkclcode),
                 $)
 C(3,#PageFg,4,C(3,#MtgCode,0,INVOKEJS(SHOW,p1,17,20,1),INVOKEJS(SHOW,p1,17,20,0)),$)
@@ -651,6 +651,7 @@ S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
 R(1,L2R07)
 
 #ApplNoX=X,100,L
+C(3,#ApplNo,0,S,$)
 T(2,#L2r07CustName)
 
 
@@ -1200,7 +1201,7 @@ IF(#FunCd==4,s,$)
 ! [土地座落]
 #LandLocation=x,150,L
 IF(#FunCd==4,s,T(B,#CityItemB+#AreaItemB+#IrItemB))
-IF(#LandNo2==0,T(B,#LandLocation+#LandNo1+地號),T(B,#LandLocation+#LandNo1+-+#LandNo2+地號)))
+T(B,#LandLocation+，+地號+#LandNo1+-+#LandNo2)
 
 
 !-------------
@@ -1219,6 +1220,8 @@ T(3,相同，請改用修改功能)
 #clcode2txt1=x,34,S
 T(3,土地座落之土地所有權人與擔保品編號)
 
+#Dash=X,1,S
+T(3,-)
 
 ##loop{times:10,i:1,j:0,rowSeq:2}
 
@@ -1255,9 +1258,11 @@ S(L2R43,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd,#RimCustId,#CityCode,#AreaC
 R(1,L2R43)
 
 
-#CheckClno{i}=x,62,S
+#CheckClno{i}=x,70,S
 C(3,#ClCode1,1,T(B,#clcode1txt1+#L2r43ClNo+#clcode1txt2),
-               T(B,#clcode2txt1+#L2r43ClNo+#clcode1txt2))
+               T(B,#clcode2txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2))
+!C(3,#ClCode1,1,T(B,#clcode1txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2),
+!               T(B,#clcode2txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2))
 
 #CheckL2R43{i}=X,1,S
 C(4,#OwnerId{i},S,$)
@@ -1415,6 +1420,7 @@ T(3,)T(H,#OwnershipCode,#OwnershipCodeHelp)
 #FdMtgCode=X,2,L
 ! [抵押權註記]
 #MtgCode=A,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 HELP(#MtgCodeHelp)
 @V(H,#MtgCodeHelp)
@@ -1435,6 +1441,7 @@ T(3,)T(H,#MtgCode,#MtgCodeHelp)
 #FdMtgPledge=X,2,L
 
 #MtgCheck=X,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 IF(#MtgCode==1,s,$)
 HELP(#YNHelp)
@@ -1444,6 +1451,7 @@ HELP(#YNHelp)
 T(3,)T(H,#MtgCheck,#YNHelp)
 
 #MtgLoan=X,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 IF(#MtgCode==1,s,$)
 HELP(#YNHelp)
@@ -1453,6 +1461,7 @@ HELP(#YNHelp)
 T(3,)T(H,#MtgLoan,#YNHelp)
 
 #MtgPledge=X,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 IF(#MtgCode==1,s,$)
 HELP(#YNHelp)
@@ -1469,6 +1478,7 @@ C(4,#AfterCheck,T(3,X),T(3, ))
 #FdClStatus=X,2,L
 ![擔保品狀況碼]
 #ClStatus=A,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 C(3,#FunCd,1,E(0,1),$)
 HELP(#ClStatusHelp)
@@ -1481,6 +1491,7 @@ T(3,)T(H,#ClStatus,#ClStatusHelp)
 #FdClStat=X,2,L
 ![擔保品狀態]
 #ClStat=X,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 C(3,#FunCd,1,E(0,0),$)
 HELP(#ClStatHelp)
@@ -1492,6 +1503,7 @@ T(3,)T(H,#ClStat,#ClStatHelp)
 #FdAgreement=X,2,L
 ![檢附同意書]
 #Agreement=X,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 HELP(#YNHelp)
 @V(H,#YNHelp)
@@ -1502,6 +1514,7 @@ T(3,)T(H,#Agreement,#YNHelp)
 #FdLimitCancelDate=X,2,L
 ![限制塗銷日期]
 #LimitCancelDate=D,7,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 D(8)
 @IF(#LimitCancelDate == 0,s,$)
@@ -1510,6 +1523,7 @@ A(4,0,#LimitCancelDate)
 #FdClCode=X,2,L
 ![擔保註記]
 #ClCode=A,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 HELP(#ClCodeHelp)
 @V(H,#ClCodeHelp)
@@ -1521,6 +1535,7 @@ T(3,)T(H,#ClCode,#ClCodeHelp)
 #FdLoanToValue=X,2,L
 ![貸放成數]
 #LoanToValue=m,3.2,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 IF(#ClCode==2,S,$)
 @IF(#ClCode==2,S,$)
@@ -1536,12 +1551,14 @@ CALL(#RimL2r41)
 #FdOtherOwnerTotal=X,2,L
 ![其他債權人設定總額]
 #OtherOwnerTotal=m,14,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 
 
 #FdCompensationCopy=X,2,L
 ![代償後謄本]
 #CompensationCopy=A,1,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 HELP(#ZeroOneHelp)
 @V(H,#ZeroOneHelp)
@@ -1552,33 +1569,34 @@ T(3,)T(H,#CompensationCopy,#ZeroOneHelp)
 #FdBdRmk=X,2,L
 ![建物標示備註]
 #BdRmk=x,60,I
+IF(#PageFg==4,$,CALL(#Show4))
 IF(#FunCd==4,s,$)
 
 
 #FdSynd=X,2,L
 ![聯貸案]
-#Synd=X,1,I
-IF(#FunCd==4,s,$)
-IF(#PageFg==4,$,CALL(#Show4))
-HELP(#YNHelp)
-@V(H,#YNHelp)
-IF(#Synd=="Y",T(3,@FdSyndCode,*),T(3,@FdSyndCode, ))
+#Synd=X,1,S
+!IF(#FunCd==4,s,$)
+!IF(#PageFg==4,$,CALL(#Show4))
+!HELP(#YNHelp)
+!@V(H,#YNHelp)
+!IF(#Synd=="Y",T(3,@FdSyndCode,*),T(3,@FdSyndCode, ))
 
 #SyndX=X,2,L
-T(3,)T(H,#Synd,#YNHelp)
+!T(3,)T(H,#Synd,#YNHelp)
 
 #FdSyndCode=X,2,L
 ![聯貸案類型]
-#SyndCode=X,1,I
-IF(#FunCd==4,s,$)
-IF(#PageFg==4,$,CALL(#Show4))
-IF(#Synd=="Y",$,S)
-HELP(#SyndCodeHelp)
-@IF(#Synd=="Y",$,S)
-V(H,#SyndCodeHelp)
+#SyndCode=X,1,S
+!IF(#FunCd==4,s,$)
+!IF(#PageFg==4,$,CALL(#Show4))
+!IF(#Synd=="Y",$,S)
+!HELP(#SyndCodeHelp)
+!@IF(#Synd=="Y",$,S)
+!V(H,#SyndCodeHelp)
 
 #SyndCodeX=X,6,L
-T(3,)T(H,#SyndCode,#SyndCodeHelp)
+!T(3,)T(H,#SyndCode,#SyndCodeHelp)
 
 #FdDispPrice=X,2,L
 ![處分價格]
@@ -1668,13 +1686,32 @@ T(H,#SettingStat,#SettingStatHelp)
 IF(#FunCd==4,s,$)
 @V(7)V(2,0)
 
+#RimEvaNetWorth=m,14.2,S
+#RimSettingStat=X,1,S
+#RimClStat=X,1,S
+
+#SendL2R53=X,1,S
+C(3,#FunCd,2,$,S)
+E(0,@RimFunCd,5)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimEvaAmt,#EvaAmt)
+E(0,@RimEvaNetWorth,#EvaNetWorth)
+E(0,@RimLoanToValue,#LoanToValue)
+E(0,@RimSettingAmt,#SettingAmt)
+T(2,@RimSettingStat,#SettingStat)
+T(2,@RimClStat,#ClStat)
+RESET_RIM(#SendL2R53,L2R53)
+S(L2R53,1,#RimFunCd,#RimClCode1,#RimClCode2,#RimClNo,#RimEvaAmt,#RimEvaNetWorth,#RimLoanToValue,#RimSettingAmt,#RimSettingStat,#RimClStat)
+R(1,L2R53)
 
 #checkL2R41B=X,1,S
 C(3,#FunCd,2,$,S)
 E(0,@RimEvaAmt,0)
 E(0,@RimLoanToValue,0)
 E(0,@RimSettingAmt,#SettingAmt)
-CALL(#RimL2r41)
+! CALL(#RimL2r41)
 
 #FdSettingAmt=X,2,L
 
@@ -1798,21 +1835,30 @@ IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
 
 
 
-#BUF3=X,11,S
+#BUF1=X,11,S
 T(2,2+#ClCode1+#ClCode2+#ClNo)
-#BUF2=X,14,S
-T(2,1+#ClCode1+#ClCode2+#ClNo+000)
 
 #button=x,100,S
-T(2,{ cmd=CHAIN; ntxcd=L2415; ntxbuf=#BUF3})ASGN(BTN_NEW1$)
+T(2,{ cmd=CHAIN; ntxcd=L2415; ntxbuf=#BUF1})ASGN(BTN_NEW1$)
 C(3,#FunCd,1,$,S)
 C(3,#ClCode1,1,$,S)
 K(MODIFYBUTTON,1,不動產建物擔保品資料登錄)
+
+#BUF2=X,14,S
+T(2,1+#ClCode1+#ClCode2+#ClNo+000)
 
 #button2=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L2416; ntxbuf=#BUF2})ASGN(BTN_NEW2$)
 C(3,#FunCd,1,$,S)
 K(MODIFYBUTTON,2,不動產土地擔保品資料登錄)
+
+#BUF3=X,14,S
+T(2,2+#ClCode1+#ClCode2+#ClNo)
+
+#button3=x,100,S
+T(2,{ cmd=CHAIN; ntxcd=L4060; ntxbuf=#BUF3})ASGN(BTN_NEW3$)
+C(3,#FunCd,1,$,S)
+K(MODIFYBUTTON,3,保險單)
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -1919,6 +1965,7 @@ TXFORM=L2411
 <include src="ROM.icf::L2R28.tom"/>
 <include src="ROM.icf::L2R41.tom"/>
 <include src="ROM.icf::L2R43.tom"/>
+<include src="ROM.icf::L2R53.tom"/>
 <include src="ROM.icf::L6R03.tom"/>
 <include src="ROM.icf::L6R10.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

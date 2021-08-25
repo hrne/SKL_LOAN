@@ -14,7 +14,6 @@ import com.st1.itx.db.domain.PfDeparment;
 import com.st1.itx.db.domain.PfDeparmentId;
 import com.st1.itx.db.service.PfDeparmentService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
 
 @Component("L5405")
 @Scope("prototype")
@@ -27,10 +26,7 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L5405 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5405.class);
 	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
 	@Autowired
 	public PfDeparmentService iPfDeparmentService;
 
@@ -87,7 +83,7 @@ public class L5405 extends TradeBuffer {
 		case 1:
 			if (xPfDeparment == null) {
 				try {
-					iPfDeparmentService.insert(iPfDeparment,titaVo);
+					iPfDeparmentService.insert(iPfDeparment, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 資料新建錯誤
 				}
@@ -101,7 +97,7 @@ public class L5405 extends TradeBuffer {
 			} else {
 				try {
 					iPfDeparmentService.holdById(iPfDeparmentId);
-					iPfDeparmentService.update(iPfDeparment,titaVo);
+					iPfDeparmentService.update(iPfDeparment, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 資料更新錯誤
 				}
