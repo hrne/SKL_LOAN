@@ -245,12 +245,12 @@ public class L2R43 extends TradeBuffer {
 		if (!FloorDash.isEmpty()) {
 			result += "之" + FloorDash;
 		}
-		if (!BdNo1.isEmpty()) {
-			result += "，建號" + BdNo1;
-		}
-		if (!BdNo2.isEmpty()) {
-			result += "-" + BdNo2;
-		}
+//		if (!BdNo1.isEmpty()) {
+//			result += "，建號" + BdNo1;
+//		}
+//		if (!BdNo2.isEmpty()) {
+//			result += "-" + BdNo2;
+//		}
 		this.info("L2415 getBdLocation result = " + result);
 		return result;
 	}

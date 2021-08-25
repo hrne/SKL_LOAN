@@ -26,6 +26,7 @@ import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.ClMainService;
 
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -69,6 +70,9 @@ public class L2480 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClFacService sClFacService;
+
+	@Autowired
+	LoanAvailableAmt loanAvailableAmt;
 
 	/* 日期工具 */
 	@Autowired
@@ -345,6 +349,7 @@ public class L2480 extends TradeBuffer {
 		loanToValue = tClImm.getLoanToValue();
 		settingAmt = tClImm.getSettingAmt();
 		BigDecimal shareCompAmt = BigDecimal.ZERO;
+		BigDecimal wkAvailable = BigDecimal.ZERO;
 		BigDecimal wkEvaAmt = parse.stringToBigDecimal(titaVo.getParam("EvaAmt"));
 		BigDecimal wkEvaNetWorth = parse.stringToBigDecimal(titaVo.getParam("EvaNetWorth"));
 
@@ -355,31 +360,31 @@ public class L2480 extends TradeBuffer {
 			shareCompAmt = wkEvaAmt;
 		}
 
-		/*
-		 * 可分配金額 可分配金額=鑑估總值*貸放成數(四捨五入至個位數) 同一擔保品在ClFac擔保品關聯檔的分配金額加總需小於ClMain擔保品主檔的可分配金額
-		 */
-
-		shareTotal = evaAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
-		this.info(" 分配金額 = " + evaAmt + "*" + loanToValue + "=" + shareTotal);
-
-		// 分配金額和設定金額比較 較低的為可分配金額
-		this.info("分配金額和設定金額比較 = " + settingAmt + "," + shareTotal);
-		if (settingAmt.compareTo(shareTotal) < 0) {
-			shareTotal = settingAmt;
-		}
-
-//		"1.若""評估淨值""有值取""評估淨值""否則取""鑑估總值"")*貸放成數(四捨五入至個位數)
-//		2.若設定金額低於可分配金額則為設定金額
-//		3.擔保品塗銷/解除設定時(該筆擔保品的可分配金額設為零)"
-
 		shareTotal = shareCompAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0,
 				BigDecimal.ROUND_HALF_UP);
+
+		// 分配金額和設定金額比較 較低的為可分配金額
+		this.info("分配金額和設定金額比較 = " + shareTotal + "," + settingAmt);
 		if (settingAmt.compareTo(shareTotal) < 0) {
 			shareTotal = settingAmt;
 		}
 
-		this.info(" 可分配金額 = " + shareTotal);
-		// 查此擔保品在"擔保品與額度關聯檔"
+		ClImm t = sClImmService.findById(new ClImmId(iClCode1, iClCode2, iClNo), titaVo);
+		if (t == null) {
+			throw new LogicException("E0001", "該擔保品編號不存在擔保品不動產檔 =" + iClCode1 + -+iClCode2 + -+iClNo);
+		}
+		if ("1".equals(t.getClStat()) || "2".equals(t.getSettingStat())) {
+			shareTotal = BigDecimal.ZERO;
+		}
+
+		wkAvailable = loanAvailableAmt.checkClAvailable(iClCode1, iClCode2, iClNo, shareTotal, titaVo); // 可用額度
+
+		if (wkAvailable.compareTo(BigDecimal.ZERO) < 0) {
+			throw new LogicException("E3071", "可分配金額不足 ： = " + wkAvailable);
+		}
+
+
+
 		Slice<ClFac> slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		List<ClFac> lClFac = slClFac == null ? null : slClFac.getContent();
 

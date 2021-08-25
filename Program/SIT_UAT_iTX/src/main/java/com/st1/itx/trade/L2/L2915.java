@@ -130,7 +130,7 @@ public class L2915 extends TradeBuffer {
 		}
 		// 該擔保品編號存在擔保品不動產建物檔
 
-		this.totaVo.putParam("BdLocation", tClBuilding.getBdLocation());
+		this.totaVo.putParam("BdLocation", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
 		this.totaVo.putParam("BdMainUseCode", tClBuilding.getBdMainUseCode());
 		this.totaVo.putParam("BdMtrlCode", tClBuilding.getBdMtrlCode());
 		this.totaVo.putParam("BdTypeCode", tClBuilding.getBdTypeCode());

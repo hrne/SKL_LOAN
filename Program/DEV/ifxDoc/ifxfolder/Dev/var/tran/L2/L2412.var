@@ -81,6 +81,10 @@ E(0,40)ASGN(INQPRT$)
 #Btn2=X,4,I,ui:button;value:抵押;enable:1;tabbable:0
 #Btn3=X,4,I,ui:button;value:處分;enable:1;tabbable:0
 #BTN4=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+#BtnExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:0
+
+
+
 
 #BIND_1=X,1,S
 BIND(#Btn1,click, {cmd=CALLSEND;DOCODE=Show1})
@@ -90,6 +94,9 @@ BIND(#Btn2,click, {cmd=CALLSEND;DOCODE=Show2})
 
 #BIND_3=X,1,S
 BIND(#Btn3,click, {cmd=CALLSEND;DOCODE=Show3})
+
+#BINDExpand=X,1,S
+BIND(#BtnExpand,click, {cmd=CALLSEND;DOCODE=Expand})
 
 #PageFg=A,1,S
 E(0,0)
@@ -132,15 +139,7 @@ SWITCH(#PageFg,1,INVOKEJS(SHOW,p1,7,18,1),
                 4,INVOKEJS(SHOW,p1,7,32,1),
                 $)
 C(3,#PageFg,2,C(3,#MtgCode,0,INVOKEJS(SHOW,p1,23,25,1),INVOKEJS(SHOW,p1,23,25,0)),$)
-!Rim參數
-#RimEvaAmt=m,14,S
-#RimLoanToValue=m,3.2,S
-#RimSettingAmt=m,14,S
-!修改時檢核鑑價總值or設定金額是否小於同一擔保品分配金額加總
-#RimL2r41=@,1,S
-RESET_RIM(#RimL2r41,L2R41)
-S(L2R41,1,#ClCode1,#ClCode2,#ClNo,#RimEvaAmt,#RimLoanToValue,#RimSettingAmt)
-R(1,L2R41)
+
 !---------- AP TEXT AREA Variables ----------
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -272,8 +271,57 @@ T(1,@ClCode1,#NTXBUF,9,1)
 T(1,@ClCode2,#NTXBUF,11,2)
 T(1,@ClNo,#NTXBUF,14,7)
 
-
-
+#FdFUNCD=X,2,L
+#FdApplNo=X,2,L
+#FdCOL_IND1=X,2,L
+#FdCOL_IND2=X,2,L
+#FdCOL_NO=X,2,L
+#FdGdRid=X,2,L
+#FdSUB_TYPE=X,2,L
+#FdCOL_AREA=X,2,L
+#FdOWNER_ID=X,2,L
+#FdOWNER_NM=X,2,L
+#FdOwnerRelCode=X,2,L
+#FdVALUE_DT=X,2,L
+#FdVALUE_TOTAL=X,2,L
+#FdSERVICE_LIFE=X,2,L
+#FdSPEC=X,2,L
+#FdPRODUCT_TYPE=X,2,L
+#FdBRAND=X,2,L
+#FdENGINE_DISPLACEMENT=X,2,L
+#FdCOLOR=X,2,L
+#FdENGINE_SN=X,2,L
+#FdLICENSE_NO=X,2,L
+#FdLICENSE_IND=X,2,L
+#FdLICENSE_USAGE=X,2,L
+#FdLICENSE_ISSUE_DT=X,2,L
+#FdMANUFACTURED_YM=X,2,L
+#FdVEHICLE_TYPE=X,2,L
+#FdCAR_STYLE=X,2,L
+#FdVEHICLE_OFFICE=X,2,L
+#FdCURRENCY=X,2,L
+#FdEX_RATE=X,2,L
+#FdINSU_IND=X,2,L
+#FdLOAN_PER=X,2,L
+#FdScrapValue=X,2,L
+#FdMORTGAGE=X,2,L
+#FdMtgCheck=X,2,L
+#FdMtgLoan=X,2,L
+#FdMtgPledge=X,2,L
+#FdINTERSYND_LOAN=X,2,L
+#FdINTERSYND_TYPE=X,2,L
+#FdDISPOSITION_PRICE=X,2,L
+#FdDISPOSITION_DT=X,2,L
+#FdSettingStat=X,2,L
+#FdClStat=X,2,L
+#FdSettingAmt=X,2,L
+#FdReceiptNo=X,2,L
+#FdMtgNo=X,2,L
+#FdReceivedDate=X,2,L
+#FdMortgageIssueStartDate=X,2,L
+#FdMortgageIssueEndDate=X,2,L
+#FdCOL_STATUS=X,2,L
+#FdRMK=X,2,L
 
 #Init=@,1,S
 T(3,@FdFUNCD,*)
@@ -336,7 +384,7 @@ T(F,@ClStatus,0)
 T(F,@Remark,0)
 C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
 
-#FdFUNCD=X,2,L
+
 ![功能]
 #FunCd=X,1,S
 CALL(#Init)
@@ -497,7 +545,7 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4;ntxbuf5=type<-1:ApplNo<-
 
 
 !申請號碼
-#FdApplNo=X,2,L
+
 
 #ApplNo=A,7,I
 C(3,#FunCd,1,$,s)
@@ -538,7 +586,7 @@ C(3,#ApplNo,0,INVOKEJS(SHOW,p1,8,8,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,8,8,
 C(3,#FunCd,1,$,s)
 E(0,9)
 
-#FdCOL_IND1=X,2,L
+
 
 #ClCode1X=X,4,L
 T(3,動產)
@@ -549,7 +597,6 @@ C(3,#FunCd,1,$,s)
 HELP(#ClCode2Help)
 @V(H,#ClCode2Help)
 
-#FdCOL_IND2=X,2,L
 
 #ClCode2X=X,13,L
 T(H,#ClCode2,#ClCode2Help)
@@ -557,7 +604,6 @@ T(H,#ClCode2,#ClCode2Help)
 ![擔保品編號]
 #ClNo=A,7,L
 
-#FdCOL_NO=X,2,L
 
 <include src="ROM.icf::L2R17.dec"/>
 !RIM取原擔保品編號
@@ -575,7 +621,6 @@ E(0,@GdRnum,#L2r17GdrNum)
 
 
 ![原擔保品編號]
-#FdGdRid=X,2,L
 
 #GdRid1=A,1,L
 #GdRid2=A,2,L
@@ -591,6 +636,7 @@ T(2,#GdRid1+-+#GdRid2+-+#GdRnum)
 <include src="ROM.icf::L2R22.dec"/>
 !RIM取擔保主檔
 #RimL2r22=X,1,S
+C(3,#FunCd,1,S,$)
 E(0,@RimClCode1,#ClCode1)
 E(0,@RimClCode2,#ClCode2)
 E(0,@RimClNo,#ClNo)
@@ -600,6 +646,7 @@ S(L2R22,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
 R(1,L2R22)
 
 #checkL2r22=X,1,S
+C(3,#FunCd,1,S,$)
 T(2,@ClTypeCode,#L2r22ClTypeCode)
 E(0,@EvaDate,#L2r22EvaDate)
 T(2,@CityCode,#L2r22CityCode)
@@ -667,7 +714,6 @@ IF(#FunCd==1,$,s)
 HELP(#ClTypeCodeHelp)
 @V(H,#ClTypeCodeHelp)
 
-#FdSUB_TYPE=X,2,L
 
 #SUB_TYPE_X=X,24,L
 T(H,#ClTypeCode,#ClTypeCodeHelp)
@@ -695,9 +741,9 @@ IF(#FunCd==1,$,s)
 HELP(#L6r03ResultCity,cols:5)
 @C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
 
-#FdCOL_AREA=X,2,L
 
 #COL_AREA_X=X,10,L
+C(4,#CityCode,S,$)
 T(H,#CityCode,#L6r03ResultCity)
 
 
@@ -708,7 +754,6 @@ IF(#PageFg==1,$,CALL(#Show1))
 @V(7)
 A(ID_UNINO,0,#OwnerId)
 
-#FdOWNER_ID=X,2,L
 
 
 #RimL1r09=X,1,S
@@ -731,7 +776,7 @@ IF(#FunCd==4,s,$)
 C(4,#L1r09CustName,$,s)
 @V(7)
 
-#FdOwnerRelCode=X,2,L
+
 C(4,#CustId,s,$)
 C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p1,8,8,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,8,8,1))
 
@@ -749,70 +794,58 @@ C(4,#OwnerRelCode,S,$)
 T(H,#OwnerRelCode,#RelationCodeHelp)
 
 
-#FdOWNER_NM=X,2,L
-
 !鑑估日期
 #EvaDate=D,7,I
 IF(#FunCd==4,s,$)
 @V(7)A(4,0,#EvaDate)
 
-#FdVALUE_DT=X,2,L
 
 !鑑價總值
 #EvaAmt=m,14,I
 IF(#FunCd==4,s,$)
 @V(2,0)
 
-#FdVALUE_TOTAL=X,2,L
 
 ! 耐用年限
 #ServiceLife=X,2,I
 IF(#FunCd==4,s,$)
 @IF(#ServiceLife=="",S,V(9))
 
-#FdSERVICE_LIFE=X,2,L
 
 ! 形式/規格
 #ProductSpec=x,20,I
 IF(#FunCd==4,s,$)
 
-#FdSPEC=X,2,L
 
 ! 產品代號/型號
 #ProductType=x,10,I
 IF(#FunCd==4,s,$)
 
-#FdPRODUCT_TYPE=X,2,L
 
 ! 品牌/廠牌/船名
 #ProductBrand=x,20,I
 IF(#FunCd==4,s,$)
 
-#FdBRAND=X,2,L
 
 !排氣量
 #ProductCC=X,10,I
 IF(#FunCd==4,s,$)
 
-#FdENGINE_DISPLACEMENT=X,2,L
 
 ! 顏色
 #ProductColor=x,10,I
 IF(#FunCd==4,s,$)
 
-#FdCOLOR=X,2,L
 
 ! 引擎號碼
 #EngineSN=X,50,I
 IF(#FunCd==4,s,$)
 
-#FdENGINE_SN=X,2,L
 
 ! 牌照號碼
 #LicenseNo=X,10,I
 IF(#FunCd==4,s,$)
 
-#FdLICENSE_NO=X,2,L
 
 ! 牌照類別
 #LicenseTypeCode=X,1,I
@@ -821,7 +854,6 @@ HELP(#LicenseTypeHelp)
 @IF(#LicenseTypeCode=="",S,$)
 V(H,#LicenseTypeHelp)
 
-#FdLICENSE_IND=X,2,L
 
 #LICENSE_IND_X=X,4,L
 T(3,)T(H,#LicenseTypeCode,#LicenseTypeHelp)
@@ -833,7 +865,6 @@ HELP(#LicenseUsageHelp)
 @IF(#LicenseUsageCode=="",S,$)
 V(H,#LicenseUsageHelp)
 
-#FdLICENSE_USAGE=X,2,L
 
 #LICENSE_USAGE_X=X,4,L
 T(3,)T(H,#LicenseUsageCode,#LicenseUsageHelp)
@@ -843,7 +874,6 @@ T(3,)T(H,#LicenseUsageCode,#LicenseUsageHelp)
 IF(#FunCd==4,s,$)
 @A(4,0,#LiceneIssueDate)
 
-#FdLICENSE_ISSUE_DT=X,2,L
 
 #MANU_MM=A,2,S
 
@@ -855,7 +885,6 @@ V(9)
 T(1,@MANU_MM,#MfgYearMonth,4,5)
 IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月,格式yyyMM),$)
 
-#FdMANUFACTURED_YM=X,2,L
 
 ! 車別
 #VehicleTypeCode=X,2,I
@@ -864,7 +893,6 @@ HELP(#VehicleTypeHelp)
 @IF(#VehicleTypeCode=="",S,$)
 V(H,#VehicleTypeHelp)
 
-#FdVEHICLE_TYPE=X,2,L
 
 #VEHICLE_TYPE_X=X,30,L
 C(4,#VehicleTypeCode,S,$)T(H,#VehicleTypeCode,#VehicleTypeHelp)
@@ -876,7 +904,6 @@ HELP(#VehicleStyleHelp)
 @IF(#VehicleStyleCode=="",S,$)
 V(H,#VehicleStyleHelp)
 
-#FdCAR_STYLE=X,2,L
 
 #CAR_STYLE_X=X,20,L
 C(4,#VehicleStyleCode,S,$)T(H,#VehicleStyleCode,#VehicleStyleHelp)
@@ -888,7 +915,6 @@ HELP(#VehicleOfficeHelp)
 @IF(#VehicleOfficeCode=="",S,$)
 V(H,#VehicleOfficeHelp)
 
-#FdVEHICLE_OFFICE=X,2,L
 
 #VEHICLE_OFFICE_X=X,30,L
 C(4,#VehicleOfficeCode,S,$)T(H,#VehicleOfficeCode,#VehicleOfficeHelp)
@@ -899,7 +925,6 @@ T(3,TWD)
 IF(#FunCd==4,s,$)
 IF(#PageFg==1,$,CALL(#Show1))
 
-#FdCURRENCY=X,2,L
 
 #CurrencyX=X,10,L
 C(4,#Currency,S,$)
@@ -913,7 +938,6 @@ IF(#Currency=="TWD",E(0,1),$)
 
 #TMP_EX_RATE=m,3.2,S
 
-#FdEX_RATE=X,2,L
 
 ! 投保註記
 #Insurance=X,1,I
@@ -922,7 +946,6 @@ IF(#PageFg==2,$,CALL(#Show2))
 HELP(#YNHelp)
 @V(H,#YNHelp)
 
-#FdINSU_IND=X,2,L
 
 #INSU_IND_X=X,2,L
 T(3,)T(H,#Insurance,#YNHelp)
@@ -934,17 +957,6 @@ IF(#FunCd==4,s,$)
 @V(2,0)
 
 
-#checkL2R41A=X,1,S
-C(3,#FunCd,2,$,S)
-E(0,@RimEvaAmt,#EvaAmt)
-E(0,@RimLoanToValue,#LoanToValue)
-E(0,@RimSettingAmt,0)
-CALL(#RimL2r41)
-
-
-#FdLOAN_PER=X,2,L
-
-#FdScrapValue=X,2,L
 !殘值
 #ScrapValue=m,14,I
 IF(#FunCd==4,s,$)
@@ -961,18 +973,12 @@ T(H,#MtgLoanX,#MtgLoan,#YNHelp)
 T(H,#MtgPledgeX,#MtgPledge,#YNHelp)
 
 
-#FdMORTGAGE=X,2,L
-
 #MORTGAGE_X=X,30,L
 T(3,)T(H,#MtgCode,#MtgCodeHelp)
 !C(3,#MtgCode,1,INVOKEJS(SHOW,p1,22,25,0),INVOKEJS(SHOW,p1,22,25,1))
 
 #CHECKALL_FG=A,1,S
 E(0,0)
-
-#FdMtgCheck=X,2,L
-#FdMtgLoan=X,2,L
-#FdMtgPledge=X,2,L
 
 #chcekmtg=A,1,S
 
@@ -1018,7 +1024,6 @@ T(3,)T(H,#MtgPledge,#YNHelp)
 !@V(H,#YNHelp)
 !IF(#Synd=="Y",T(3,@FdINTERSYND_TYPE,*),T(3,@FdINTERSYND_TYPE, ))
 
-#FdINTERSYND_LOAN=X,2,L
 
 #INTERSYND_LOAN_X=X,2,L
 !T(3,)T(H,#Synd,#YNHelp)
@@ -1032,7 +1037,6 @@ T(3,)T(H,#MtgPledge,#YNHelp)
 !@IF(#Synd=="Y",$,S)
 !V(H,#SyndCodeHelp)
 
-#FdINTERSYND_TYPE=X,2,L
 
 #INTERSYND_TYPE_X=X,6,S
 !T(3,)T(H,#SyndCode,#SyndCodeHelp)
@@ -1043,7 +1047,6 @@ IF(#FunCd==4,s,$)
 IF(#PageFg==3,$,CALL(#Show3))
 @IF(#DispPrice=="",S,$)
 
-#FdDISPOSITION_PRICE=X,2,L
 
 !處分日期
 #DispDate=D,7,I
@@ -1051,9 +1054,7 @@ IF(#FunCd==4,s,$)
 @IF(#DispDate=="",S,$)
 A(4,0,#DispDate)
 
-#FdDISPOSITION_DT=X,2,L
 
-#FdSettingStat=X,2,L
 ! [設定狀態]
 #SettingStat=A,1,I
 IF(#FunCd==4,s,$)
@@ -1064,7 +1065,7 @@ HELP(#SettingStatHelp)
 C(4,#SettingStat,S,$)
 T(H,#SettingStat,#SettingStatHelp)
 
-#FdClStat=X,2,L
+
 ! [擔保品狀態]
 #ClStat=A,1,I
 IF(#FunCd==4,s,$)
@@ -1079,13 +1080,31 @@ T(3,)T(H,#ClStat,#ClStatHelp)
 IF(#FunCd==4,s,$)
 @V(7)V(2,0)
 
-#checkL2R41B=X,1,S
-C(3,#FunCd,2,$,S)
-E(0,@RimEvaAmt,0)
-E(0,@RimLoanToValue,0)
-E(0,@RimSettingAmt,#SettingAmt)
-CALL(#RimL2r41)
+!Rim參數
+#RimEvaAmt=m,14,S
+#RimLoanToValue=m,3.2,S
+#RimSettingAmt=m,14,S
+#RimEvaNetWorth=m,14.2,S
+#RimSettingStat=X,1,S
+#RimClStat=X,1,S
 
+
+
+#SendL2R41=X,1,S
+C(3,#FunCd,2,$,S)
+E(0,@RimFunCd,5)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimEvaAmt,#EvaAmt)
+! E(0,@RimEvaNetWorth,#EvaNetWorth)
+E(0,@RimLoanToValue,#LoanToValue)
+E(0,@RimSettingAmt,#SettingAmt)
+T(2,@RimSettingStat,#SettingStat)
+T(2,@RimClStat,#ClStat)
+RESET_RIM(#SendL2R41,L2R41)
+S(L2R41,1,#RimFunCd,#RimClCode1,#RimClCode2,#RimClNo,#RimEvaAmt,#RimEvaNetWorth,#RimLoanToValue,#RimSettingAmt,#RimSettingStat,#RimClStat)
+R(1,L2R41)
 !收件字號
 #ReceiptNo=X,20,I
 IF(#FunCd==4,s,$)
@@ -1111,19 +1130,12 @@ IF(#FunCd==4,s,$)
 C(4,#MortgageIssueStartDate,$,V(5,#MortgageIssueStartDate,9991231))
 A(4,0,#MortgageIssueEndDate)
 
-#FdSettingAmt=X,2,L
-#FdReceiptNo=X,2,L
-#FdMtgNo=X,2,L
-#FdReceivedDate=X,2,L
-#FdMortgageIssueStartDate=X,2,L
-#FdMortgageIssueEndDate=X,2,L
 
 !擔保品狀況碼
 #ClStatus=A,1,L
 IF(#FunCd==4,s,$)
 E(0,1)
 
-#FdCOL_STATUS=X,2,L
 
 #COL_STATUS_X=X,7,L
 T(3,已抵押)
@@ -1133,20 +1145,11 @@ T(3,已抵押)
 IF(#FunCd==4,s,$)
 IF(#PageFg==3,$,CALL(#Show3))
 
-#FdRMK=X,2,L
-
 
 #SHOWALL=X,1,S
 ENABLE(#BtnExpand)
 E(0,@PageFg,4)
 CALL(#ResetPages)
-
-!---- Expand 展開
-#BINDExpand=X,1,S
-BIND(#BtnExpand,click, {cmd=CALLSEND;DOCODE=Expand})
-
-
-#BtnExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:0
 
 
 #RPTFG=A,1,S

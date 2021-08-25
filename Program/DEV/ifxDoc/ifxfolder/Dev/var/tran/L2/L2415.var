@@ -69,6 +69,12 @@ BIND(#Btn3,click, {cmd=CALLSEND;DOCODE=Show3})
 #BIND_4=X,1,S
 BIND(#Btn4,click, {cmd=CALLSEND;DOCODE=Show4})
 
+!---- Expand 展開
+#BindExpand=X,1,S
+BIND(#BtnExpand,click, {cmd=CALLSEND;DOCODE=Expand})
+
+#BtnExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:0
+
 #PageFg=A,1,S
 E(0,0)
 
@@ -439,6 +445,10 @@ E(0,#FunCd)
 <include src="COM.icf::CheckAuth.rtn"/>
 
 #FdFUNCD=X,2,L
+#FdPARKING_TYPE=X,2,L
+#FdPARKING_PROP=X,2,L
+#FdPARKING_AREA=X,2,L
+
 
 #FunCdX=X,4,L
 T(H,#FunCd,#FunCdHelp)
@@ -528,6 +538,8 @@ R(1,L2R27)
 #checkL2r27A=X,1,S
 C(3,#CHAIN,1,C(3,#FunCd,1,S,$),$)
 T(2,@ClTypeCode,#L2r27ClTypeCode)
+T(2,@BdNo1,#L2r27BdNo1)
+T(2,@BdNo2,#L2r27BdNo2)
 T(2,@BdLocation,#L2r27BdLocation)
 E(0,@BdMainUseCode,#L2r27BdMainUseCode)
 E(0,@BdMtrlCode,#L2r27BdMtrlCode)
@@ -577,6 +589,8 @@ R(1,L2R27)
 #checkL2r27B=X,1,S
 C(3,#CHAIN,1,C(3,#FunCd,1,$,S),S)
 T(2,@ClTypeCode,#L2r27ClTypeCode)
+T(2,@BdNo1,#L2r27BdNo1)
+T(2,@BdNo2,#L2r27BdNo2)
 T(2,@BdLocation,#L2r27BdLocation)
 E(0,@BdMainUseCode,#L2r27BdMainUseCode)
 E(0,@BdMtrlCode,#L2r27BdMtrlCode)
@@ -641,8 +655,12 @@ T(H,#ClTypeCode,#ClTypeCodeHelp)
 #RimCityCode=X,2,S
 #RimAreaCode=X,3,S
 
+#BdNo1=X,5,S
+#BdNo2=X,3,S
+
 ! [建物門牌]
 #BdLocation=x,150,L
+T(B,#BdLocation+，+建號+#BdNo1+-+#BdNo2)
 
 #FdADDRESS_1=X,2,L
 
@@ -778,7 +796,7 @@ R(1,L1R09)
 C(4,#L1r09CustName,$,T(2,@SellerName,#L1r09CustName))
 
 ! [賣方姓名]
-#SellerName=x,100,I
+#SellerName=x,2.50,I
 IF(#FunCd==4,s,$)
 C(4,#L1r09CustName,$,s)
 
@@ -815,15 +833,14 @@ IF(#FunCd==4,s,$)
 HELP(#ParkingTypeCodeHelp)
 @V(H,#ParkingTypeCodeHelp)
 
-#FdPARKING_TYPE=X,2,L
-
 #ParkingTypeCodeX=X,13,L
 T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
 
+#ParkingArea=m,14.2,I
+C(3,#ParkingTypeCode,5,S,$)
+
 ! [獨立產權車位註記]
 #ParkingProperty=X,1,L
-
-#FdPARKING_PROP=X,2,L
 
 #ParkingPropertyX=X,2,L
 
@@ -1078,11 +1095,6 @@ ENABLE(#BtnExpand)
 E(0,@PageFg,5)
 CALL(#ResetPages)
 
-!---- Expand 展開
-#BindExpand=X,1,S
-BIND(#BtnExpand,click, {cmd=CALLSEND;DOCODE=Expand})
-
-#BtnExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:0
 
 #RPTFG=A,1,S
 E(0,1)
@@ -1101,7 +1113,9 @@ E(0,1)
 ["#FdSUB_BD_USAGE+附屬建物用途",#BdSubUsageCode,#BdSubUsageCodeX],["#FdSUB_BD_AREA+附屬建物面積",#BdSubArea,"坪"],
 ["#FdSELLER_ID+賣方統編",#SellerId],["#FdSELLER_NAME+賣方姓名",#SellerName],
 ["#FdCONTRACT_PRICE+買賣契約價格",#ContractPrice],["#FdCONTRACT_DT+買賣契約日期",#ContractDate],
-["#FdBD_USE+建物使用別",#BdUsageCode,#BdUsageCodeX],["#FdPARKING_TYPE+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
+[#<->#,"#FdBD_USE+建物使用別",#BdUsageCode,#BdUsageCodeX],
+["#FdPARKING_TYPE+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
+["#FdPARKING_AREA+停車位面積",#ParkingArea],
 ["#FdHOUSE_TAX_SN+房屋稅籍號碼",#HouseTaxNo],["#FdHOUSE_BUY_DT+房屋取得日期",#HouseBuyDate],
 ]
 </sub>
@@ -1109,7 +1123,7 @@ E(0,1)
 <sub type="DC" name="p3" layout="cols=1;screen.width=[200,1010];printer.width=[20,50,20,50];order=1">
 [
 ["公設建號"],
-["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[200,200,200,200], p_cols:[20,20,20]}","#FdPE+公設建號","","",
+["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[200,200,200,200], p_cols:[20,20,20]}","","","",
 ["建號","登記面積(坪)","所有權人統編","所有權人姓名"],
 [[#PublicBdNoA1,"-",#PublicBdNoB1],#Area1,#PublicBdOwnerId1,#PublicBdOwnerName1]
 ],
@@ -1119,7 +1133,7 @@ E(0,1)
 <sub type="DC" name="p4" layout="cols=1;screen.width=[200,1010];printer.width=[20,50,20,50];order=1">
 [
 ["車位資料"],
-["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[100,90,210,140,140,100,100,140], p_cols:[20,20,30,40,20,30,30,30]}","#FdPP+車位資料","","",
+["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[100,90,210,140,140,100,100,140], p_cols:[20,20,30,40,20,30,30,30]}","","","",
 ["車位編號","車位數","停車位類別","權利範圍","登記面積(坪)","建號","地號","價格(元)"],
 [#ParkingNo1,#ParkingQty1,[#ParkingTypeCode1,#ParkingTypeCodeX1],[#ParkingOwnerPart1,"/",#ParkingOwnerTotal1],#ParkingArea1,[#ParkingBdNoA1,"-",#ParkingBdNoB1],[#ParkingLandNoA1,"-",#ParkingLandNoB1],#ParkingAmount1]
 ],

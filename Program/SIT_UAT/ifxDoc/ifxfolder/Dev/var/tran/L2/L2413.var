@@ -365,15 +365,6 @@ T(F,@ClStatus,1)
 C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
 
 
-!Rim參數 L2R41
-#RimEvaAmt=m,14,S
-#RimLoanToValue=m,3.2,S
-#RimSettingAmt=m,14,S
-!修改時檢核鑑價總值or設定金額是否小於同一擔保品分配金額加總
-#RimL2r41=@,1,S
-RESET_RIM(#RimL2r41,L2R41)
-S(L2R41,1,#ClCode1,#ClCode2,#ClNo,#RimEvaAmt,#RimLoanToValue,#RimSettingAmt)
-R(1,L2R41)
 
 #SettingAmt=m,14,S
 E(0,#RimSettingAmt)
@@ -614,6 +605,7 @@ HELP(#L6r03ResultCity,cols:5)
 #FdCOL_AREA=X,2,L
 
 #CityCodeX=X,8,L
+C(4,#CityCode,S,$)
 T(H,#CityCode,#L6r03ResultCity)
 
 ! [股票代號]
@@ -972,12 +964,6 @@ V(9)
 
 #FdSETTING_AMT=X,2,L
 
-#checkL2R41B=X,1,S
-C(3,#FunCd,2,$,S)
-E(0,@RimEvaAmt,0)
-E(0,@RimLoanToValue,0)
-E(0,@RimSettingAmt,#SettingBalance)
-CALL(#RimL2r41)
 
 ! [鑑估日期]
 #EvaDate=D,7,I
@@ -993,12 +979,30 @@ IF(#FunCd==4,s,$)
 @V(2,0)
 V(9)
 
-#checkL2R41A=X,1,S
+!Rim參數
+#RimEvaAmt=m,14,S
+#RimLoanToValue=m,3.2,S
+#RimSettingAmt=m,14,S
+#RimEvaNetWorth=m,14.2,S
+#RimSettingStat=X,1,S
+#RimClStat=X,1,S
+
+#SendL2R41=X,1,S
 C(3,#FunCd,2,$,S)
+E(0,@RimFunCd,5)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
 E(0,@RimEvaAmt,#EvaAmt)
+! E(0,@RimEvaNetWorth,#EvaNetWorth)
 E(0,@RimLoanToValue,#LoanToValue)
-E(0,@RimSettingAmt,0)
-CALL(#RimL2r41)
+E(0,@RimSettingAmt,#SettingAmt)
+T(2,@RimSettingStat,#SettingStat)
+T(2,@RimClStat,#ClStat)
+RESET_RIM(#SendL2R41,L2R41)
+S(L2R41,1,#RimFunCd,#RimClCode1,#RimClCode2,#RimClNo,#RimEvaAmt,#RimEvaNetWorth,#RimLoanToValue,#RimSettingAmt,#RimSettingStat,#RimClStat)
+R(1,L2R41)
+
 
 #FdESTVALUE_AMT=X,2,L
 

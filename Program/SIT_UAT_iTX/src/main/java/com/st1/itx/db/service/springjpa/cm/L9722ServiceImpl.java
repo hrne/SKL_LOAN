@@ -27,35 +27,32 @@ public class L9722ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(String yearMonth, TitaVo titaVo) throws Exception {
 		this.info("l9722.findAll ");
-
-		int inputBCYear = Integer.parseInt(titaVo.getParam("InputYear")) + 1911;
-		int inputMonth = Integer.parseInt(titaVo.getParam("InputMonth"));
-
-		String yearMonth = Integer.toString(inputBCYear) + Integer.toString(inputMonth);
 
 		this.info("yearMonth = " + yearMonth);
 
-		String sql = "SELECT m.\"CustNo\"               AS F0";
-		sql += "            ,m.\"FacmNo\"               AS F1";
-		sql += "            ,c.\"EntCode\"              AS F2";
-		sql += "            ,m.\"DepartmentCode\"       AS F3";
+		String sql = "SELECT m.\"CustNo\"               AS F0"; // 戶號
+		sql += "            ,m.\"FacmNo\"               AS F1"; // 額度
+		sql += "            ,c.\"EntCode\"              AS F2"; // 企金別
+		sql += "            ,m.\"DepartmentCode\"       AS F3"; // 通路
 		sql += "            ,CASE ";
-		sql += "               WHEN nvl(cl.\"EvaNetWorth\", 0) = 0";
+		sql += "               WHEN NVL(cl.\"EvaNetWorth\", 0) = 0";
 		sql += "               THEN 0 ";
-		sql += "             ELSE trunc(f.\"LineAmt\" / cl.\"EvaNetWorth\" * 100, 2)";
-		sql += "             END                        AS F4";
-		sql += "            ,m.\"OvduTerm\"             AS F5";
-		sql += "            ,m.\"Status\"               AS F6";
-		sql += "            ,m.\"ClCode1\"              AS F7";
-		sql += "            ,m.\"ClCode2\"              AS F8";
-		sql += "            ,m.\"ClNo\"                 AS F9";
-		sql += "            ,nvl(cl.\"EvaNetWorth\", 0) AS F10";
-		sql += "            ,m.\"PrinBalance\"          AS F11";
-		sql += "            ,m.\"BadDebtBal\"           AS F12";
-		sql += "            ,f.\"FirstDrawdownDate\"    AS F13";
-		sql += "            ,f.\"MaturityDate\"         AS F14";
+		sql += "             ELSE ROUND(f.\"LineAmt\" / cl.\"EvaNetWorth\" * 100, 2)";
+		sql += "             END                        AS F4"; // 貸款成數
+		sql += "            ,m.\"OvduTerm\"             AS F5"; // 逾期期數
+		sql += "            ,m.\"Status\"               AS F6"; // 戶況
+		sql += "            ,m.\"ClCode1\" ";
+		sql += "             || '-' ";
+		sql += "             || LPAD(m.\"ClCode2\",2,'0') ";
+		sql += "             || '-' ";
+		sql += "             || LPAD(m.\"ClNo\",7,'0')  AS F7"; // 押品別
+		sql += "            ,nvl(cl.\"EvaNetWorth\", 0) AS F8"; // 評估淨值
+		sql += "            ,m.\"PrinBalance\"          AS F9"; // 放款餘額
+		sql += "            ,m.\"BadDebtBal\"           AS F10"; // 轉銷呆帳金額
+		sql += "            ,f.\"FirstDrawdownDate\"    AS F11"; // 撥款日期
+		sql += "            ,f.\"MaturityDate\"         AS F12"; // 到期日
 		sql += "      FROM \"MonthlyFacBal\"  m";
 		sql += "      LEFT JOIN \"CustMain\" c ON c.\"CustNo\" = m.\"CustNo\"";
 		sql += "      LEFT JOIN \"FacMain\"  f ON f.\"CustNo\" = m.\"CustNo\"";

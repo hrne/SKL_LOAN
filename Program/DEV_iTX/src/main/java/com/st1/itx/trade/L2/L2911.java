@@ -192,7 +192,7 @@ public class L2911 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOtradecode", "L2915");
 			occursList.putParam("OOLandSeq", "");
-			occursList.putParam("OOAddress", tClBuilding.getBdLocation());
+			occursList.putParam("OOAddress", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
 			this.totaVo.addOccursList(occursList);
 		}
 		if (lClLand != null) {
