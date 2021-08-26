@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("jcicMonthlyLoanDataService")
 @Repository
-public class JcicMonthlyLoanDataServiceImpl implements JcicMonthlyLoanDataService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(JcicMonthlyLoanDataServiceImpl.class);
-
+public class JcicMonthlyLoanDataServiceImpl extends ASpringJpaParm implements JcicMonthlyLoanDataService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class JcicMonthlyLoanDataServiceImpl implements JcicMonthlyLoanDataServic
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + jcicMonthlyLoanDataId);
+    this.info("findById " + dbName + " " + jcicMonthlyLoanDataId);
     Optional<JcicMonthlyLoanData> jcicMonthlyLoanData = null;
     if (dbName.equals(ContentName.onDay))
       jcicMonthlyLoanData = jcicMonthlyLoanDataReposDay.findById(jcicMonthlyLoanDataId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo", "BormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = jcicMonthlyLoanDataReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +103,9 @@ em = null;
     else 
       slice = jcicMonthlyLoanDataRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jcicMonthlyLoanDataId);
+    this.info("Hold " + dbName + " " + jcicMonthlyLoanDataId);
     Optional<JcicMonthlyLoanData> jcicMonthlyLoanData = null;
     if (dbName.equals(ContentName.onDay))
       jcicMonthlyLoanData = jcicMonthlyLoanDataReposDay.findByJcicMonthlyLoanDataId(jcicMonthlyLoanDataId);
@@ -133,7 +132,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
+    this.info("Hold " + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
     Optional<JcicMonthlyLoanData> jcicMonthlyLoanDataT = null;
     if (dbName.equals(ContentName.onDay))
       jcicMonthlyLoanDataT = jcicMonthlyLoanDataReposDay.findByJcicMonthlyLoanDataId(jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
@@ -155,7 +154,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
+    this.info("Insert..." + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
     if (this.findById(jcicMonthlyLoanData.getJcicMonthlyLoanDataId()) != null)
       throw new DBException(2);
 
@@ -184,7 +183,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
+    this.info("Update..." + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
     if (!empNot.isEmpty())
       jcicMonthlyLoanData.setLastUpdateEmpNo(empNot);
 
@@ -207,7 +206,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
+    this.info("Update..." + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
     if (!empNot.isEmpty())
       jcicMonthlyLoanData.setLastUpdateEmpNo(empNot);
 
@@ -227,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
+    this.info("Delete..." + dbName + " " + jcicMonthlyLoanData.getJcicMonthlyLoanDataId());
     if (dbName.equals(ContentName.onDay)) {
       jcicMonthlyLoanDataReposDay.delete(jcicMonthlyLoanData);	
       jcicMonthlyLoanDataReposDay.flush();
@@ -256,7 +255,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (JcicMonthlyLoanData t : jcicMonthlyLoanData){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -291,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (jcicMonthlyLoanData == null || jcicMonthlyLoanData.size() == 0)
       throw new DBException(6);
 
@@ -320,7 +319,7 @@ em = null;
 
   @Override
   public void deleteAll(List<JcicMonthlyLoanData> jcicMonthlyLoanData, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

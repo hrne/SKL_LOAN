@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -22,8 +20,6 @@ import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
-import com.st1.itx.db.service.ForeclosureFeeService;
-import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -46,7 +42,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6984 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6984.class);
 
 	@Autowired
 	public Parse parse;
@@ -60,14 +55,9 @@ public class L6984 extends TradeBuffer {
 	@Autowired
 	public CustMainService sCustMainService;
 	@Autowired
-	public ForeclosureFeeService sForeclosureFeeService;
-	@Autowired
 	public LoanBorMainService sLoanBorMainService;
 	@Autowired
 	public FacMainService sFacMainService;
-
-	@Autowired
-	public InsuRenewService insuRenewService;
 
 	private int selectCode = 0;
 	private int custNo = 0;
@@ -214,6 +204,8 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("TimFinalBal", tLoanBorMain.getFinalBal());
 				occursList.putParam("NotYetFlag", tLoanBorMain.getNotYetFlag());
 				occursList.putParam("PieceCode", tLoanBorMain.getPieceCode());
+				occursList.putParam("PieceCodeSecond", tLoanBorMain.getPieceCodeSecond());
+				occursList.putParam("PieceCodeSecondAmt", tLoanBorMain.getPieceCodeSecondAmt());
 				occursList.putParam("UsageCode", tLoanBorMain.getUsageCode());
 				occursList.putParam("SyndNo", tLoanBorMain.getSyndNo());
 				occursList.putParam("RenewFlag", tLoanBorMain.getRenewFlag());

@@ -37,6 +37,8 @@ public class LH001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT CRD.\"RelName\" "; // -- 姓名、名稱
 		sql += "      , CRD.\"RelId\" "; // -- 身分證號碼/統一編號
 		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"LoanBal\" "; // -- 放款餘額
+		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"GroupLoanBal\" "; // -- 放款餘額
+		sql += "      , CRM.\"Ukey\" ";
 		sql += " FROM \"CustRelMain\" CRM ";
 		sql += " LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
 		sql += " LEFT JOIN ( SELECT CM.\"CustId\" ";
@@ -70,9 +72,11 @@ public class LH001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- ??? 3000萬以上條件取消
 		String sql = " ";
 		sql += " SELECT CRD.\"RelName\" "; // -- 姓名、名稱
+		sql += "        || '及其同一關係人' AS \"RelName\" ";
 		sql += "      , CRD.\"RelId\" "; // -- 身分證號碼/統一編號
 		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"LoanBal\" "; // -- 放款餘額
 		sql += "      , GP.\"GroupLoanBal\" "; // -- 整組放款餘額
+		sql += "      , CRM.\"Ukey\" ";
 		sql += " FROM \"CustRelMain\" CRM ";
 		sql += " LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
 		sql += " LEFT JOIN ( SELECT CM.\"CustId\" ";
@@ -92,13 +96,19 @@ public class LH001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "                         GROUP BY CM.\"CustId\" ";
 		sql += "                       ) LBM ON LBM.\"CustId\" = CRD.\"RelId\" ";
+		sql += "             WHERE ( LENGTHB(CRM.\"CustRelId\") >= 10 "; // -- 篩選同一關係人
+		sql += "                     OR LENGTHB(CRD.\"RelId\") >= 10 "; // -- 篩選同一關係人
+		sql += "                   ) "; // -- 篩選同一關係人
 		sql += "             GROUP BY CRM.\"Ukey\" ";
 		sql += "           ) GP ON GP.\"Ukey\" = CRM.\"Ukey\" ";
-		sql += " WHERE LENGTHB(CRM.\"CustRelId\") >= 10 "; // -- 篩選同一關係人
-		// sql += " AND LENGTHB(CRD.\"RelId\") >= 10 "; // -- 篩選同一關係人
+		sql += " WHERE ( LENGTHB(CRM.\"CustRelId\") >= 10 "; // -- 篩選同一關係人
+		sql += "         OR LENGTHB(CRD.\"RelId\") >= 10 "; // -- 篩選同一關係人
+		sql += "       ) "; // -- 篩選同一關係人
 		// sql += " AND NVL(LBM.\"LoanBal\",0) >= 30000000 "; // -- ??? 3000萬以上條件取消
-		sql += " AND NVL(LBM.\"LoanBal\",0) > 0 ";
+		sql += "   AND NVL(LBM.\"LoanBal\",0) > 0 ";
+		sql += "   AND GP.\"GroupLoanBal\" > NVL(LBM.\"LoanBal\",0) "; // 兩筆以上才進表
 		sql += " ORDER BY GP.\"GroupLoanBal\" DESC ";
+		sql += "        , CRM.\"Ukey\" ";
 		sql += "        , CRD.\"RelId\" ";
 
 		this.info("sql=" + sql);
@@ -123,9 +133,11 @@ public class LH001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- 同一關係人3000萬元(含)以上明細。
 		// -- ??? 3000萬以上條件取消
 		sql += " SELECT CRD.\"RelName\" "; // -- 姓名、名稱
+		sql += "        || '及其同一關係企業'  AS \"RelName\" ";
 		sql += "      , CRD.\"RelId\" "; // -- 身分證號碼/統一編號
 		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"LoanBal\" "; // -- 放款餘額
 		sql += "      , GP.\"GroupLoanBal\" "; // -- 整組放款餘額
+		sql += "      , CRM.\"Ukey\" ";
 		sql += " FROM \"CustRelMain\" CRM ";
 		sql += " LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
 		sql += " LEFT JOIN ( SELECT CM.\"CustId\" ";
@@ -145,13 +157,17 @@ public class LH001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "                         GROUP BY CM.\"CustId\" ";
 		sql += "                       ) LBM ON LBM.\"CustId\" = CRD.\"RelId\" ";
+		sql += "             WHERE LENGTHB(CRM.\"CustRelId\") = 8 "; // -- 篩選同一關係企業
+		sql += "               AND LENGTHB(CRD.\"RelId\") = 8 "; // -- 篩選同一關係企業
 		sql += "             GROUP BY CRM.\"Ukey\" ";
 		sql += "           ) GP ON GP.\"Ukey\" = CRM.\"Ukey\" ";
 		sql += " WHERE LENGTHB(CRM.\"CustRelId\") = 8 "; // -- 篩選同一關係企業
 		sql += "   AND LENGTHB(CRD.\"RelId\") = 8 "; // -- 篩選同一關係企業
 		// sql += " AND NVL(LBM.\"LoanBal\",0) >= 30000000 "; // -- ??? 3000萬以上條件取消
-		sql += " AND NVL(LBM.\"LoanBal\",0) > 0 ";
+		sql += "   AND NVL(LBM.\"LoanBal\",0) > 0 ";
+		sql += "   AND GP.\"GroupLoanBal\" > NVL(LBM.\"LoanBal\",0) "; // 兩筆以上才進表
 		sql += " ORDER BY GP.\"GroupLoanBal\" DESC ";
+		sql += "        , CRM.\"Ukey\" ";
 		sql += "        , CRD.\"RelId\" ";
 
 		this.info("sql=" + sql);

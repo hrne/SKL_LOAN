@@ -177,7 +177,7 @@ public class L9716Report extends MakeReport {
 
 			} // for
 			for (int i = 1; i <= lList.size(); i++) {
-				makeExcel.formulaCaculate(2 + i, 1);
+				makeExcel.formulaCaculate(1 + i, 1);
 			}
 
 			makeExcel.formulaCaculate(1, 6);

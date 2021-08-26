@@ -419,6 +419,13 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			conditionList.add(" cb.\"FloorDash\" = :floorDash ");
 		}
 		
+		// LicenseNo 牌照號碼
+		String licenseNo = titaVo.getParam("LicenseNo");
+		if (licenseNo != null && !licenseNo.isEmpty()) {
+			licenseNo = "%" + licenseNo + "%";
+			conditionList.add(" cmv.\"LicenseNo\" LIKE :licenseNo ");
+		}
+		
 		this.info("L2038ServiceImpl conditionList.size() = " + conditionList.size());
 
 		// 根據篩選條件語句數量,組成一句where語句,若無則維持空白
@@ -579,6 +586,12 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int floorDash = parse.stringToInteger(titaVo.getParam("FloorDash"));
 		if (floorDash > 0) {
 			query.setParameter("floorDash", String.valueOf(floorDash));
+		}
+		
+		String licenseNo = titaVo.getParam("LicenseNo");
+		if (licenseNo != null && !licenseNo.isEmpty()) {
+			licenseNo = "%" + licenseNo + "%";
+			query.setParameter("licenseNo", licenseNo);
 		}
 		
 		return;

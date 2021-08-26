@@ -40,6 +40,9 @@ public interface ReltMainRepositoryHist extends JpaRepository<ReltMain, ReltMain
   // CustNo =
   public Optional<ReltMain> findTopByCustNoIs(int custNo_0);
 
+  // CaseNo =
+  public Slice<ReltMain> findAllByCaseNoIs(int caseNo_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

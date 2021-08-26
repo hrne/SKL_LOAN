@@ -1126,6 +1126,15 @@ C(3,#DrawdownCode,0,S,$)T(H,#DrawdownCode,#DrawdownCodeHelp)
 E(0,#L2r05LineAmt-#L2r05UtilBal+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
 
 
+#AvailableX=X,22,S
+CALL2(#ADJUSTDOT,#PRECISION,#Available,#AvailableX)
+
+#AvailableXX=X,100,S
+T(2,可使用額度：+#AvailableX)
+IF(#L2r05LimitFlag=="F",T(2,F：核准額度限額：+#AvailableX),$)
+IF(#L2r05LimitFlag=="C",T(2,C：擔保品限額：+#AvailableX),$)
+IF(#L2r05LimitFlag=="S",T(2,S：合併額度控管限額：+#AvailableX),$)
+
 ![撥款金額]
 !必須輸入
 #FdDrawdownAmt=X,2,L
@@ -1133,12 +1142,19 @@ E(0,#L2r05LineAmt-#L2r05UtilBal+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
 #TwDrawdownAmt=m,14,I
 C(3,#PRECISION,0,$,S)
 C(5,#L2r01CharCode,2,s,$)
-@V(2,0)V(5,#L2r01LowAmt,#Available)
+@V(2,0)
+! V(5,#L2r01LowAmt,#Available)
+IF(#TwDrawdownAmt>#Available,V(P,#AvailableXX),$)
+
+
+
 
 #UsDrawdownAmt=m,14.2,I
 C(3,#PRECISION,0,S,$)
 C(5,#L2r01CharCode,2,s,$)
-@V(2,0)V(5,#L2r01LowAmt,#Available)
+@V(2,0)
+! V(5,#L2r01LowAmt,#Available)
+IF(#UsDrawdownAmt>#Available,V(P,#AvailableXX),$)
 
 #TimDrawdownAmt=m,14.2,S
 C(3,#PRECISION,0,E(0,#TwDrawdownAmt),E(0,#UsDrawdownAmt))

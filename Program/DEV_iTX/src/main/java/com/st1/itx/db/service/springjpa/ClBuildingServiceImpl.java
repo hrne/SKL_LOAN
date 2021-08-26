@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("clBuildingService")
 @Repository
-public class ClBuildingServiceImpl implements ClBuildingService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(ClBuildingServiceImpl.class);
-
+public class ClBuildingServiceImpl extends ASpringJpaParm implements ClBuildingService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class ClBuildingServiceImpl implements ClBuildingService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + clBuildingId);
+    this.info("findById " + dbName + " " + clBuildingId);
     Optional<ClBuilding> clBuilding = null;
     if (dbName.equals(ContentName.onDay))
       clBuilding = clBuildingReposDay.findById(clBuildingId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = clBuildingReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = clBuildingReposHist.findAll(pageable);
     else 
       slice = clBuildingRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findClCode1 " + dbName + " : " + "clCode1_0 : " + clCode1_0);
+    this.info("findClCode1 " + dbName + " : " + "clCode1_0 : " + clCode1_0);
     if (dbName.equals(ContentName.onDay))
       slice = clBuildingReposDay.findAllByClCode1Is(clCode1_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = clBuildingReposHist.findAllByClCode1Is(clCode1_0, pageable);
     else 
       slice = clBuildingRepos.findAllByClCode1Is(clCode1_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findClCode2 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1);
+    this.info("findClCode2 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1);
     if (dbName.equals(ContentName.onDay))
       slice = clBuildingReposDay.findAllByClCode1IsAndClCode2Is(clCode1_0, clCode2_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = clBuildingReposHist.findAllByClCode1IsAndClCode2Is(clCode1_0, clCode2_1, pageable);
     else 
       slice = clBuildingRepos.findAllByClCode1IsAndClCode2Is(clCode1_0, clCode2_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findClNo " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("findClNo " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = clBuildingReposDay.findAllByClCode1IsAndClCode2IsAndClNoIs(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = clBuildingReposHist.findAllByClCode1IsAndClCode2IsAndClNoIs(clCode1_0, clCode2_1, clNo_2, pageable);
     else 
       slice = clBuildingRepos.findAllByClCode1IsAndClCode2IsAndClNoIs(clCode1_0, clCode2_1, clNo_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findBdLocationEq " + dbName + " : " + "bdLocation_0 : " + bdLocation_0);
+    this.info("findBdLocationEq " + dbName + " : " + "bdLocation_0 : " + bdLocation_0);
     if (dbName.equals(ContentName.onDay))
       slice = clBuildingReposDay.findAllByBdLocationIsOrderByClCode1AscClCode2AscClNoAsc(bdLocation_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -207,6 +215,9 @@ em = null;
     else 
       slice = clBuildingRepos.findAllByBdLocationIsOrderByClCode1AscClCode2AscClNoAsc(bdLocation_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -215,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clBuildingId);
+    this.info("Hold " + dbName + " " + clBuildingId);
     Optional<ClBuilding> clBuilding = null;
     if (dbName.equals(ContentName.onDay))
       clBuilding = clBuildingReposDay.findByClBuildingId(clBuildingId);
@@ -233,7 +244,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clBuilding.getClBuildingId());
+    this.info("Hold " + dbName + " " + clBuilding.getClBuildingId());
     Optional<ClBuilding> clBuildingT = null;
     if (dbName.equals(ContentName.onDay))
       clBuildingT = clBuildingReposDay.findByClBuildingId(clBuilding.getClBuildingId());
@@ -255,7 +266,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + clBuilding.getClBuildingId());
+    this.info("Insert..." + dbName + " " + clBuilding.getClBuildingId());
     if (this.findById(clBuilding.getClBuildingId()) != null)
       throw new DBException(2);
 
@@ -284,7 +295,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clBuilding.getClBuildingId());
+    this.info("Update..." + dbName + " " + clBuilding.getClBuildingId());
     if (!empNot.isEmpty())
       clBuilding.setLastUpdateEmpNo(empNot);
 
@@ -307,7 +318,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clBuilding.getClBuildingId());
+    this.info("Update..." + dbName + " " + clBuilding.getClBuildingId());
     if (!empNot.isEmpty())
       clBuilding.setLastUpdateEmpNo(empNot);
 
@@ -327,7 +338,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + clBuilding.getClBuildingId());
+    this.info("Delete..." + dbName + " " + clBuilding.getClBuildingId());
     if (dbName.equals(ContentName.onDay)) {
       clBuildingReposDay.delete(clBuilding);	
       clBuildingReposDay.flush();
@@ -356,7 +367,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (ClBuilding t : clBuilding){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -391,7 +402,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (clBuilding == null || clBuilding.size() == 0)
       throw new DBException(6);
 
@@ -420,7 +431,7 @@ em = null;
 
   @Override
   public void deleteAll(List<ClBuilding> clBuilding, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

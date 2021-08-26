@@ -291,7 +291,7 @@ public class MakeExcel extends CommBuffer {
 
 		n += targetRow;
 
-		for (; targetRow <= n; targetRow++) {
+		for (; targetRow < n; targetRow++) {
 
 			int sourceRow = targetRow - 1;
 

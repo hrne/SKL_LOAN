@@ -1804,6 +1804,8 @@ TXFORM=L2R04
 #L2r05BormCount=A,3,S
 #L2r05BormNo=A,3,S
 #L2r05DueAmt=m,14.2,S
+#L2r05AvailableAmt=+m,14.2,S
+#L2r05LimitFlag=X,1,S
 #L2r05BaseRate=n,2.4,S
 #L2r05CloseFg=X,1,S
 #L2r05RvBormNo=A,3,S
@@ -1911,6 +1913,8 @@ TXFORM=L2R05
 #L2r05BormCount
 #L2r05BormNo
 #L2r05DueAmt
+#L2r05AvailableAmt
+#L2r05LimitFlag
 #L2r05BaseRate
 #L2r05CloseFg
 #L2r05RvBormNo

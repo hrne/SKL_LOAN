@@ -342,16 +342,15 @@ public class LM049Report extends MakeReport {
 					if (tmpRecord[1] < rowCursor) {
 						tmpRecord[1] = rowCursor;
 					}
-
 				} else {
 					tmpRecord[0] = rowCursor;
 					tmpRecord[1] = rowCursor;
 				}
 				this.info("tmpRecord[0] = " + tmpRecord[0]);
 				this.info("tmpRecord[1] = " + tmpRecord[1]);
-				sameCollateralRange.put("custNoClNo", tmpRecord);
-			}
 
+				sameCollateralRange.put(custNoClNo, tmpRecord);
+			}
 			rowCursor++;
 		}
 
@@ -396,7 +395,7 @@ public class LM049Report extends MakeReport {
 				// 佔淨值比
 				makeExcel.setMergedRegion(v[0], v[1], 14, 14);
 				// 備註說明
-				makeExcel.setMergedRegion(v[0], v[1], 14, 16);
+				makeExcel.setMergedRegion(v[0], v[1], 16, 16);
 			}
 		});
 

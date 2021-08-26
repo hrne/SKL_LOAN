@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -100,7 +101,7 @@ public class LH001Report extends MakeReport {
 		}
 		if (listA.size() > 0) {
 			// 寫入資料
-			setValueToExcel(rowCursorA, listA);
+			setValueToExcel(rowCursorA, listA, false);
 		}
 		if (listB.size() > 1) {
 			// 將表格往下移，移出空間
@@ -110,7 +111,7 @@ public class LH001Report extends MakeReport {
 		}
 		if (listB.size() > 0) {
 			// 寫入資料
-			setValueToExcel(rowCursorB, listB);
+			setValueToExcel(rowCursorB, listB, true);
 		}
 		if (listC.size() > 1) {
 			// 將表格往下移，移出空間
@@ -118,14 +119,17 @@ public class LH001Report extends MakeReport {
 		}
 		if (listC.size() > 0) {
 			// 寫入資料
-			setValueToExcel(rowCursorC, listC);
+			setValueToExcel(rowCursorC, listC, true);
 		}
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
 
-	private void setValueToExcel(int rowCursor, List<Map<String, String>> list) throws LogicException {
+	private void setValueToExcel(int rowCursor, List<Map<String, String>> list, boolean mergeFlag)
+			throws LogicException {
+
+		Map<String, int[]> mergeRowRange = new HashMap<>();
 
 		for (Map<String, String> map : list) {
 			// 戶名
@@ -145,40 +149,63 @@ public class LH001Report extends MakeReport {
 			makeExcel.setValue(rowCursor, 8, "有擔保品金額:" + formatAmt(amt, 0));
 			// 有無保證機構
 			makeExcel.setValue(rowCursor, 9, "N");
-			// 交易金額
-			makeExcel.setValue(rowCursor, 10, amt);
 
+			BigDecimal groupAmt = divThousand(getBigDecimal(map.get("F3")));
+
+			// 交易金額
+			makeExcel.setValue(rowCursor, 10, groupAmt);
+
+			// 判斷是否需要合併
+			if (mergeFlag) {
+
+				// 取得PK
+				String custRelMainUKey = map.get("F4");
+
+				int[] rowRange = new int[2];
+
+				if (mergeRowRange.containsKey(custRelMainUKey)) {
+
+					rowRange = mergeRowRange.get(custRelMainUKey);
+
+					if (rowRange[0] > rowCursor) {
+						rowRange[0] = rowCursor;
+					}
+					if (rowRange[1] < rowCursor) {
+						rowRange[1] = rowCursor;
+					}
+				} else {
+					rowRange[0] = rowCursor;
+					rowRange[1] = rowCursor;
+				}
+				this.info("rowRange[0] = " + rowRange[0]);
+				this.info("rowRange[1] = " + rowRange[1]);
+
+				mergeRowRange.put(custRelMainUKey, rowRange);
+			}
 			rowCursor++;
+		}
+
+		// 合併儲存格
+		if (mergeFlag && mergeRowRange.size() > 0) {
+			mergeRows(mergeRowRange);
 		}
 	}
 
 	/**
 	 * 合併一批資料的儲存格
 	 * 
-	 * @param sameCollateralRange 一批資料中需要合併的起訖行數
+	 * @param mergeColumnRange 一批資料中需要合併的起訖行數
 	 */
-	private void mergeColumns(Map<String, int[]> sameCollateralRange) {
+	private void mergeRows(Map<String, int[]> mergeRowRange) {
 
-		sameCollateralRange.forEach((k, v) -> {
-//			this.info("mergeColumns k " + k);
-//			this.info("mergeColumns v[0] " + v[0]);
-//			this.info("mergeColumns v[1] " + v[1]);
+		mergeRowRange.forEach((k, v) -> {
+//			this.info("mergeRows k " + k);
+//			this.info("mergeRows v[0] " + v[0]);
+//			this.info("mergeRows v[1] " + v[1]);
 
 			if (v[0] < v[1]) {
-				// 戶名
-				makeExcel.setMergedRegion(v[0], v[1], 2, 2);
-				// 金控公司負責人及大股東
-				makeExcel.setMergedRegion(v[0], v[1], 3, 3);
-				// 擔保品估價
-				makeExcel.setMergedRegion(v[0], v[1], 7, 7);
-				// 貸放成數
-				makeExcel.setMergedRegion(v[0], v[1], 8, 8);
-				// 授信餘額
-				makeExcel.setMergedRegion(v[0], v[1], 13, 13);
-				// 佔淨值比
-				makeExcel.setMergedRegion(v[0], v[1], 14, 14);
-				// 備註說明
-				makeExcel.setMergedRegion(v[0], v[1], 14, 16);
+				// 交易金額
+				makeExcel.setMergedRegion(v[0], v[1], 10, 10);
 			}
 		});
 

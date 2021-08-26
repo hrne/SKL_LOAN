@@ -29,7 +29,7 @@ public class JcicMonthlyLoanData implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7577121629720956778L;
+	private static final long serialVersionUID = 5551683677741341026L;
 
 @EmbeddedId
   private JcicMonthlyLoanDataId jcicMonthlyLoanDataId;
@@ -268,126 +268,6 @@ public class JcicMonthlyLoanData implements Serializable {
   @Column(name = "`PartAmt`")
   private BigDecimal partAmt = new BigDecimal("0");
 
-  // 共同債務人或債務關係人身份代號1
-  @Column(name = "`GuaTypeCode1`", length = 1)
-  private String guaTypeCode1;
-
-  // 共同債務人或債務關係人身份統一編號1
-  @Column(name = "`GuaId1`", length = 10)
-  private String guaId1;
-
-  // 與主債務人關係1
-  @Column(name = "`GuaRelCode1`", length = 2)
-  private String guaRelCode1;
-
-  // 共同債務人或債務關係人身份代號2
-  @Column(name = "`GuaTypeCode2`", length = 1)
-  private String guaTypeCode2;
-
-  // 共同債務人或債務關係人身份統一編號2
-  @Column(name = "`GuaId2`", length = 10)
-  private String guaId2;
-
-  // 與主債務人關係2
-  @Column(name = "`GuaRelCode2`", length = 2)
-  private String guaRelCode2;
-
-  // 共同債務人或債務關係人身份代號3
-  @Column(name = "`GuaTypeCode3`", length = 1)
-  private String guaTypeCode3;
-
-  // 共同債務人或債務關係人身份統一編號3
-  @Column(name = "`GuaId3`", length = 10)
-  private String guaId3;
-
-  // 與主債務人關係3
-  @Column(name = "`GuaRelCode3`", length = 2)
-  private String guaRelCode3;
-
-  // 共同債務人或債務關係人身份代號4
-  @Column(name = "`GuaTypeCode4`", length = 1)
-  private String guaTypeCode4;
-
-  // 共同債務人或債務關係人身份統一編號4
-  @Column(name = "`GuaId4`", length = 10)
-  private String guaId4;
-
-  // 與主債務人關係4
-  @Column(name = "`GuaRelCode4`", length = 2)
-  private String guaRelCode4;
-
-  // 共同債務人或債務關係人身份代號5
-  @Column(name = "`GuaTypeCode5`", length = 1)
-  private String guaTypeCode5;
-
-  // 共同債務人或債務關係人身份統一編號5
-  @Column(name = "`GuaId5`", length = 10)
-  private String guaId5;
-
-  // 與主債務人關係5
-  @Column(name = "`GuaRelCode5`", length = 2)
-  private String guaRelCode5;
-
-  // 共同債務人或債務關係人身份代號6
-  @Column(name = "`GuaTypeCode6`", length = 1)
-  private String guaTypeCode6;
-
-  // 共同債務人或債務關係人身份統一編號6
-  @Column(name = "`GuaId6`", length = 10)
-  private String guaId6;
-
-  // 與主債務人關係6
-  @Column(name = "`GuaRelCode6`", length = 2)
-  private String guaRelCode6;
-
-  // 共同債務人或債務關係人身份代號7
-  @Column(name = "`GuaTypeCode7`", length = 1)
-  private String guaTypeCode7;
-
-  // 共同債務人或債務關係人身份統一編號7
-  @Column(name = "`GuaId7`", length = 10)
-  private String guaId7;
-
-  // 與主債務人關係7
-  @Column(name = "`GuaRelCode7`", length = 2)
-  private String guaRelCode7;
-
-  // 共同債務人或債務關係人身份代號8
-  @Column(name = "`GuaTypeCode8`", length = 1)
-  private String guaTypeCode8;
-
-  // 共同債務人或債務關係人身份統一編號8
-  @Column(name = "`GuaId8`", length = 10)
-  private String guaId8;
-
-  // 與主債務人關係8
-  @Column(name = "`GuaRelCode8`", length = 2)
-  private String guaRelCode8;
-
-  // 共同債務人或債務關係人身份代號9
-  @Column(name = "`GuaTypeCode9`", length = 1)
-  private String guaTypeCode9;
-
-  // 共同債務人或債務關係人身份統一編號9
-  @Column(name = "`GuaId9`", length = 10)
-  private String guaId9;
-
-  // 與主債務人關係9
-  @Column(name = "`GuaRelCode9`", length = 2)
-  private String guaRelCode9;
-
-  // 共同債務人或債務關係人身份代號10
-  @Column(name = "`GuaTypeCode10`", length = 1)
-  private String guaTypeCode10;
-
-  // 共同債務人或債務關係人身份統一編號10
-  @Column(name = "`GuaId10`", length = 10)
-  private String guaId10;
-
-  // 與主債務人關係10
-  @Column(name = "`GuaRelCode10`", length = 2)
-  private String guaRelCode10;
-
   // 轉催收日期
   @Column(name = "`OvduDate`")
   private int ovduDate = 0;
@@ -400,6 +280,16 @@ public class JcicMonthlyLoanData implements Serializable {
   /* Y:不報送呆帳(聯徵授信) */
   @Column(name = "`BadDebtSkipFg`", length = 1)
   private String badDebtSkipFg;
+
+  // 帳冊別
+  /* 000：全公司 */
+  @Column(name = "`AcBookCode`", length = 3)
+  private String acBookCode;
+
+  // 區隔帳冊
+  /* 00A:傳統帳冊201:利變年金帳冊 */
+  @Column(name = "`AcSubBookCode`", length = 3)
+  private String acSubBookCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -1463,576 +1353,6 @@ public class JcicMonthlyLoanData implements Serializable {
   }
 
 /**
-	* 共同債務人或債務關係人身份代號1<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode1() {
-    return this.guaTypeCode1 == null ? "" : this.guaTypeCode1;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號1<br>
-	* 
-  *
-  * @param guaTypeCode1 共同債務人或債務關係人身份代號1
-	*/
-  public void setGuaTypeCode1(String guaTypeCode1) {
-    this.guaTypeCode1 = guaTypeCode1;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號1<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId1() {
-    return this.guaId1 == null ? "" : this.guaId1;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號1<br>
-	* 
-  *
-  * @param guaId1 共同債務人或債務關係人身份統一編號1
-	*/
-  public void setGuaId1(String guaId1) {
-    this.guaId1 = guaId1;
-  }
-
-/**
-	* 與主債務人關係1<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode1() {
-    return this.guaRelCode1 == null ? "" : this.guaRelCode1;
-  }
-
-/**
-	* 與主債務人關係1<br>
-	* 
-  *
-  * @param guaRelCode1 與主債務人關係1
-	*/
-  public void setGuaRelCode1(String guaRelCode1) {
-    this.guaRelCode1 = guaRelCode1;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號2<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode2() {
-    return this.guaTypeCode2 == null ? "" : this.guaTypeCode2;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號2<br>
-	* 
-  *
-  * @param guaTypeCode2 共同債務人或債務關係人身份代號2
-	*/
-  public void setGuaTypeCode2(String guaTypeCode2) {
-    this.guaTypeCode2 = guaTypeCode2;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號2<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId2() {
-    return this.guaId2 == null ? "" : this.guaId2;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號2<br>
-	* 
-  *
-  * @param guaId2 共同債務人或債務關係人身份統一編號2
-	*/
-  public void setGuaId2(String guaId2) {
-    this.guaId2 = guaId2;
-  }
-
-/**
-	* 與主債務人關係2<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode2() {
-    return this.guaRelCode2 == null ? "" : this.guaRelCode2;
-  }
-
-/**
-	* 與主債務人關係2<br>
-	* 
-  *
-  * @param guaRelCode2 與主債務人關係2
-	*/
-  public void setGuaRelCode2(String guaRelCode2) {
-    this.guaRelCode2 = guaRelCode2;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號3<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode3() {
-    return this.guaTypeCode3 == null ? "" : this.guaTypeCode3;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號3<br>
-	* 
-  *
-  * @param guaTypeCode3 共同債務人或債務關係人身份代號3
-	*/
-  public void setGuaTypeCode3(String guaTypeCode3) {
-    this.guaTypeCode3 = guaTypeCode3;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號3<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId3() {
-    return this.guaId3 == null ? "" : this.guaId3;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號3<br>
-	* 
-  *
-  * @param guaId3 共同債務人或債務關係人身份統一編號3
-	*/
-  public void setGuaId3(String guaId3) {
-    this.guaId3 = guaId3;
-  }
-
-/**
-	* 與主債務人關係3<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode3() {
-    return this.guaRelCode3 == null ? "" : this.guaRelCode3;
-  }
-
-/**
-	* 與主債務人關係3<br>
-	* 
-  *
-  * @param guaRelCode3 與主債務人關係3
-	*/
-  public void setGuaRelCode3(String guaRelCode3) {
-    this.guaRelCode3 = guaRelCode3;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號4<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode4() {
-    return this.guaTypeCode4 == null ? "" : this.guaTypeCode4;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號4<br>
-	* 
-  *
-  * @param guaTypeCode4 共同債務人或債務關係人身份代號4
-	*/
-  public void setGuaTypeCode4(String guaTypeCode4) {
-    this.guaTypeCode4 = guaTypeCode4;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號4<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId4() {
-    return this.guaId4 == null ? "" : this.guaId4;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號4<br>
-	* 
-  *
-  * @param guaId4 共同債務人或債務關係人身份統一編號4
-	*/
-  public void setGuaId4(String guaId4) {
-    this.guaId4 = guaId4;
-  }
-
-/**
-	* 與主債務人關係4<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode4() {
-    return this.guaRelCode4 == null ? "" : this.guaRelCode4;
-  }
-
-/**
-	* 與主債務人關係4<br>
-	* 
-  *
-  * @param guaRelCode4 與主債務人關係4
-	*/
-  public void setGuaRelCode4(String guaRelCode4) {
-    this.guaRelCode4 = guaRelCode4;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號5<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode5() {
-    return this.guaTypeCode5 == null ? "" : this.guaTypeCode5;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號5<br>
-	* 
-  *
-  * @param guaTypeCode5 共同債務人或債務關係人身份代號5
-	*/
-  public void setGuaTypeCode5(String guaTypeCode5) {
-    this.guaTypeCode5 = guaTypeCode5;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號5<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId5() {
-    return this.guaId5 == null ? "" : this.guaId5;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號5<br>
-	* 
-  *
-  * @param guaId5 共同債務人或債務關係人身份統一編號5
-	*/
-  public void setGuaId5(String guaId5) {
-    this.guaId5 = guaId5;
-  }
-
-/**
-	* 與主債務人關係5<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode5() {
-    return this.guaRelCode5 == null ? "" : this.guaRelCode5;
-  }
-
-/**
-	* 與主債務人關係5<br>
-	* 
-  *
-  * @param guaRelCode5 與主債務人關係5
-	*/
-  public void setGuaRelCode5(String guaRelCode5) {
-    this.guaRelCode5 = guaRelCode5;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號6<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode6() {
-    return this.guaTypeCode6 == null ? "" : this.guaTypeCode6;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號6<br>
-	* 
-  *
-  * @param guaTypeCode6 共同債務人或債務關係人身份代號6
-	*/
-  public void setGuaTypeCode6(String guaTypeCode6) {
-    this.guaTypeCode6 = guaTypeCode6;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號6<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId6() {
-    return this.guaId6 == null ? "" : this.guaId6;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號6<br>
-	* 
-  *
-  * @param guaId6 共同債務人或債務關係人身份統一編號6
-	*/
-  public void setGuaId6(String guaId6) {
-    this.guaId6 = guaId6;
-  }
-
-/**
-	* 與主債務人關係6<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode6() {
-    return this.guaRelCode6 == null ? "" : this.guaRelCode6;
-  }
-
-/**
-	* 與主債務人關係6<br>
-	* 
-  *
-  * @param guaRelCode6 與主債務人關係6
-	*/
-  public void setGuaRelCode6(String guaRelCode6) {
-    this.guaRelCode6 = guaRelCode6;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號7<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode7() {
-    return this.guaTypeCode7 == null ? "" : this.guaTypeCode7;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號7<br>
-	* 
-  *
-  * @param guaTypeCode7 共同債務人或債務關係人身份代號7
-	*/
-  public void setGuaTypeCode7(String guaTypeCode7) {
-    this.guaTypeCode7 = guaTypeCode7;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號7<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId7() {
-    return this.guaId7 == null ? "" : this.guaId7;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號7<br>
-	* 
-  *
-  * @param guaId7 共同債務人或債務關係人身份統一編號7
-	*/
-  public void setGuaId7(String guaId7) {
-    this.guaId7 = guaId7;
-  }
-
-/**
-	* 與主債務人關係7<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode7() {
-    return this.guaRelCode7 == null ? "" : this.guaRelCode7;
-  }
-
-/**
-	* 與主債務人關係7<br>
-	* 
-  *
-  * @param guaRelCode7 與主債務人關係7
-	*/
-  public void setGuaRelCode7(String guaRelCode7) {
-    this.guaRelCode7 = guaRelCode7;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號8<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode8() {
-    return this.guaTypeCode8 == null ? "" : this.guaTypeCode8;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號8<br>
-	* 
-  *
-  * @param guaTypeCode8 共同債務人或債務關係人身份代號8
-	*/
-  public void setGuaTypeCode8(String guaTypeCode8) {
-    this.guaTypeCode8 = guaTypeCode8;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號8<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId8() {
-    return this.guaId8 == null ? "" : this.guaId8;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號8<br>
-	* 
-  *
-  * @param guaId8 共同債務人或債務關係人身份統一編號8
-	*/
-  public void setGuaId8(String guaId8) {
-    this.guaId8 = guaId8;
-  }
-
-/**
-	* 與主債務人關係8<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode8() {
-    return this.guaRelCode8 == null ? "" : this.guaRelCode8;
-  }
-
-/**
-	* 與主債務人關係8<br>
-	* 
-  *
-  * @param guaRelCode8 與主債務人關係8
-	*/
-  public void setGuaRelCode8(String guaRelCode8) {
-    this.guaRelCode8 = guaRelCode8;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號9<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode9() {
-    return this.guaTypeCode9 == null ? "" : this.guaTypeCode9;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號9<br>
-	* 
-  *
-  * @param guaTypeCode9 共同債務人或債務關係人身份代號9
-	*/
-  public void setGuaTypeCode9(String guaTypeCode9) {
-    this.guaTypeCode9 = guaTypeCode9;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號9<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId9() {
-    return this.guaId9 == null ? "" : this.guaId9;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號9<br>
-	* 
-  *
-  * @param guaId9 共同債務人或債務關係人身份統一編號9
-	*/
-  public void setGuaId9(String guaId9) {
-    this.guaId9 = guaId9;
-  }
-
-/**
-	* 與主債務人關係9<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode9() {
-    return this.guaRelCode9 == null ? "" : this.guaRelCode9;
-  }
-
-/**
-	* 與主債務人關係9<br>
-	* 
-  *
-  * @param guaRelCode9 與主債務人關係9
-	*/
-  public void setGuaRelCode9(String guaRelCode9) {
-    this.guaRelCode9 = guaRelCode9;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號10<br>
-	* 
-	* @return String
-	*/
-  public String getGuaTypeCode10() {
-    return this.guaTypeCode10 == null ? "" : this.guaTypeCode10;
-  }
-
-/**
-	* 共同債務人或債務關係人身份代號10<br>
-	* 
-  *
-  * @param guaTypeCode10 共同債務人或債務關係人身份代號10
-	*/
-  public void setGuaTypeCode10(String guaTypeCode10) {
-    this.guaTypeCode10 = guaTypeCode10;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號10<br>
-	* 
-	* @return String
-	*/
-  public String getGuaId10() {
-    return this.guaId10 == null ? "" : this.guaId10;
-  }
-
-/**
-	* 共同債務人或債務關係人身份統一編號10<br>
-	* 
-  *
-  * @param guaId10 共同債務人或債務關係人身份統一編號10
-	*/
-  public void setGuaId10(String guaId10) {
-    this.guaId10 = guaId10;
-  }
-
-/**
-	* 與主債務人關係10<br>
-	* 
-	* @return String
-	*/
-  public String getGuaRelCode10() {
-    return this.guaRelCode10 == null ? "" : this.guaRelCode10;
-  }
-
-/**
-	* 與主債務人關係10<br>
-	* 
-  *
-  * @param guaRelCode10 與主債務人關係10
-	*/
-  public void setGuaRelCode10(String guaRelCode10) {
-    this.guaRelCode10 = guaRelCode10;
-  }
-
-/**
 	* 轉催收日期<br>
 	* 
 	* @return Integer
@@ -2087,6 +1407,46 @@ public class JcicMonthlyLoanData implements Serializable {
 	*/
   public void setBadDebtSkipFg(String badDebtSkipFg) {
     this.badDebtSkipFg = badDebtSkipFg;
+  }
+
+/**
+	* 帳冊別<br>
+	* 000：全公司
+	* @return String
+	*/
+  public String getAcBookCode() {
+    return this.acBookCode == null ? "" : this.acBookCode;
+  }
+
+/**
+	* 帳冊別<br>
+	* 000：全公司
+  *
+  * @param acBookCode 帳冊別
+	*/
+  public void setAcBookCode(String acBookCode) {
+    this.acBookCode = acBookCode;
+  }
+
+/**
+	* 區隔帳冊<br>
+	* 00A:傳統帳冊
+201:利變年金帳冊
+	* @return String
+	*/
+  public String getAcSubBookCode() {
+    return this.acSubBookCode == null ? "" : this.acSubBookCode;
+  }
+
+/**
+	* 區隔帳冊<br>
+	* 00A:傳統帳冊
+201:利變年金帳冊
+  *
+  * @param acSubBookCode 區隔帳冊
+	*/
+  public void setAcSubBookCode(String acSubBookCode) {
+    this.acSubBookCode = acSubBookCode;
   }
 
 /**
@@ -2177,12 +1537,7 @@ public class JcicMonthlyLoanData implements Serializable {
            + ", prevRepaidDate=" + prevRepaidDate + ", nextPayIntDate=" + nextPayIntDate + ", nextRepayDate=" + nextRepayDate + ", intDelayMon=" + intDelayMon + ", repayDelayMon=" + repayDelayMon + ", repaidEndMon=" + repaidEndMon
            + ", clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", clTypeCode=" + clTypeCode + ", clType=" + clType + ", evaAmt=" + evaAmt
            + ", dispDate=" + dispDate + ", syndNo=" + syndNo + ", syndCode=" + syndCode + ", signingDate=" + signingDate + ", syndAmt=" + syndAmt + ", partAmt=" + partAmt
-           + ", guaTypeCode1=" + guaTypeCode1 + ", guaId1=" + guaId1 + ", guaRelCode1=" + guaRelCode1 + ", guaTypeCode2=" + guaTypeCode2 + ", guaId2=" + guaId2 + ", guaRelCode2=" + guaRelCode2
-           + ", guaTypeCode3=" + guaTypeCode3 + ", guaId3=" + guaId3 + ", guaRelCode3=" + guaRelCode3 + ", guaTypeCode4=" + guaTypeCode4 + ", guaId4=" + guaId4 + ", guaRelCode4=" + guaRelCode4
-           + ", guaTypeCode5=" + guaTypeCode5 + ", guaId5=" + guaId5 + ", guaRelCode5=" + guaRelCode5 + ", guaTypeCode6=" + guaTypeCode6 + ", guaId6=" + guaId6 + ", guaRelCode6=" + guaRelCode6
-           + ", guaTypeCode7=" + guaTypeCode7 + ", guaId7=" + guaId7 + ", guaRelCode7=" + guaRelCode7 + ", guaTypeCode8=" + guaTypeCode8 + ", guaId8=" + guaId8 + ", guaRelCode8=" + guaRelCode8
-           + ", guaTypeCode9=" + guaTypeCode9 + ", guaId9=" + guaId9 + ", guaRelCode9=" + guaRelCode9 + ", guaTypeCode10=" + guaTypeCode10 + ", guaId10=" + guaId10 + ", guaRelCode10=" + guaRelCode10
-           + ", ovduDate=" + ovduDate + ", badDebtDate=" + badDebtDate + ", badDebtSkipFg=" + badDebtSkipFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", ovduDate=" + ovduDate + ", badDebtDate=" + badDebtDate + ", badDebtSkipFg=" + badDebtSkipFg + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

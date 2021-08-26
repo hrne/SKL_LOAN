@@ -58,6 +58,8 @@ create table "JcicMonthlyLoanData" (
   "OvduDate" decimal(8, 0) default 0 not null,
   "BadDebtDate" decimal(8, 0) default 0 not null,
   "BadDebtSkipFg" varchar2(1),
+  "AcBookCode" varchar2(3),
+  "AcSubBookCode" varchar2(3),
   "CreateDate" timestamp,
   "CreateEmpNo" varchar2(6),
   "LastUpdate" timestamp,
@@ -124,6 +126,8 @@ comment on column "JcicMonthlyLoanData"."PartAmt" is '參貸金額';
 comment on column "JcicMonthlyLoanData"."OvduDate" is '轉催收日期';
 comment on column "JcicMonthlyLoanData"."BadDebtDate" is '轉呆帳日期';
 comment on column "JcicMonthlyLoanData"."BadDebtSkipFg" is '不報送呆帳記號';
+comment on column "JcicMonthlyLoanData"."AcBookCode" is '帳冊別';
+comment on column "JcicMonthlyLoanData"."AcSubBookCode" is '區隔帳冊';
 comment on column "JcicMonthlyLoanData"."CreateDate" is '建檔日期時間';
 comment on column "JcicMonthlyLoanData"."CreateEmpNo" is '建檔人員';
 comment on column "JcicMonthlyLoanData"."LastUpdate" is '最後更新日期時間';

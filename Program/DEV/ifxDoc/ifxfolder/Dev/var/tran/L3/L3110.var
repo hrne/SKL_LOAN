@@ -152,7 +152,7 @@ E(0,#P5S+6)
 E(0,#P5E+2)
 
 #P6E=A,2,S
-E(0,#P6S+2)
+E(0,#P6S+4)
 
 #P7S=A,2,S
 E(0,#P6E+2)
@@ -356,7 +356,9 @@ T(H,@ACTFGX,#ACTFG,#ActFgHelp)
 [#<->#,"<font color=red>@其他",""],
 ["#FdCustTypeCode+客戶別",#CustTypeCodeX],
 ["#FdNotYetFlag+未齊件",#NotYetFlag,#NotYetFlagX,#BTN6],
-["#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
+[#<->#,"#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
+["#FdPieceCodeSecond+計件代碼2",#PieceCodeSecond,#PieceCodeSecondX],
+["#FdPieceCodeSecondAmt+計件代碼2金額",#TwPieceCodeSecondAmt,#UsPieceCodeSecondAmt],
 ["#FdUsageCode+資金用途別",#UsageCodeX],
 ["#FdSyndNo+聯貸案序號",#SyndNo],
 ["#FdCompensateFlag+是否為代償案件",#CompensateFlag,#CompensateFlagX],
@@ -383,6 +385,23 @@ T(H,@ACTFGX,#ACTFG,#ActFgHelp)
 #BTNHIDEP6=X,15,I,ui:button;value:   其他     ;enable:1;tabbable:0
 #BTNHIDEP7=X,15,I,ui:button;value:  撥款帳號  ;enable:1;tabbable:0
 !#BTNEXPAND=X,15,I,ui:button;value:   展開     ;enable:1;tabbable:1
+#BTNEXPAND=X,15,I,ui:button;value:   展開     ;enable:1;tabbable:0
+
+#BINDP2=X,1,S
+BIND(#BTNHIDEP2,click, {cmd=CALLSEND;DOCODE=HIDEP2})
+#BINDP3=X,1,S
+BIND(#BTNHIDEP3,click, {cmd=CALLSEND;DOCODE=HIDEP3})
+#BINDP4=X,1,S
+BIND(#BTNHIDEP4,click, {cmd=CALLSEND;DOCODE=HIDEP4})
+#BINDP5=X,1,S
+BIND(#BTNHIDEP5,click, {cmd=CALLSEND;DOCODE=HIDEP5})
+#BINDP6=X,1,S
+BIND(#BTNHIDEP6,click, {cmd=CALLSEND;DOCODE=HIDEP6})
+#BINDP7=X,1,S
+BIND(#BTNHIDEP7,click, {cmd=CALLSEND;DOCODE=HIDEP7})
+#BINDEXPAND=X,1,S
+BIND(#BTNEXPAND,click, {cmd=CALLSEND;DOCODE=EXPAND})
+
 
 #WKHIDE=X,1,S
 HIDE(#Wait,#Wait1,#Wait2)
@@ -541,6 +560,7 @@ T(3,Y:是;N:否)
 
 #INIT=X,1,S
 INVOKEJS(SHOW,p2,0)
+HIDE(#UsDrawdownAmt,#LbUsAcctFee,#UsFinalBal,#UsPieceCodeSecondAmt)
 
 #BeforeDrawdownAmt=m,14.2,S
 
@@ -847,8 +867,6 @@ T(H,@IntCalcCodeX,#IntCalcCode,#ProdIntCalcCodeHelp)
 ENABLE(#BTNHIDEP2)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 
-#BINDP2=X,1,S
-BIND(#BTNHIDEP2,click, {cmd=CALLSEND;DOCODE=HIDEP2})
 
 ![商品代碼]
 !依核准額度自動顯示不必輸入 L2R05
@@ -948,8 +966,6 @@ C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 ENABLE(#BTNHIDEP3)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 
-#BINDP3=X,1,S
-BIND(#BTNHIDEP3,click, {cmd=CALLSEND;DOCODE=HIDEP3})
 
 ##loop{times:10,n:1}
 
@@ -998,8 +1014,6 @@ C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 ENABLE(#BTNHIDEP4)
 C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
 
-#BINDP4=X,1,S
-BIND(#BTNHIDEP4,click, {cmd=CALLSEND;DOCODE=HIDEP4})
 
 #PRECISION=N,1,S
 E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
@@ -1031,12 +1045,19 @@ HIDE(#TwDrawdownAmt,#UsDrawdownAmt,#TwAcctFee,#UsAcctFee,#GraceDate,#TwFinalBal,
 SHOW(#DrawdownAmtX,#GraceDateX,#LbAcctFee)
 ! CALL2(#ADJUSTDOT,#PRECISION,#L2r05DuePayAmt,#DrawdownAmtX)
 
+
 #WKHIDEAMT=X,1,S
 C(5,#L2r01CharCode,2,S,$)
-C(3,#PRECISION,0,SHOW(#TwDrawdownAmt,#TwAcctFee,#TwFinalBal)
-                 HIDE(#UsDrawdownAmt,#UsAcctFee,#UsFinalBal,#LbAcctFee)
-                ,HIDE(#TwDrawdownAmt,#TwAcctFee,#UsFinalBal,#LbAcctFee)
-                 SHOW(#UsDrawdownAmt,#UsAcctFee,#TwFinalBal))
+C(3,#PRECISION,0,SHOW(#TwDrawdownAmt,#TwAcctFee,#TwFinalBal,#TwPieceCodeSecondAmt)
+                 HIDE(#UsDrawdownAmt,#UsAcctFee,#UsFinalBal,#UsPieceCodeSecondAmt,#LbAcctFee)
+                ,HIDE(#TwDrawdownAmt,#TwAcctFee,#TwFinalBal,#TwPieceCodeSecondAmt,#LbAcctFee)
+                 SHOW(#UsDrawdownAmt,#UsAcctFee,#UsFinalBal,#UsPieceCodeSecondAmt))
+
+
+
+
+
+
 !個金                 
 #WKHIDEDEPT=X,1,S                 
 C(3,#L2r05DepartmentCode,1,S,$)
@@ -1083,6 +1104,16 @@ T(2,#CurrencyCode)
 #Available=+m,14.2,S
 E(0,#L2r05LineAmt-#L2r05UtilBal+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
 
+
+#AvailableX=X,22,S
+CALL2(#ADJUSTDOT,#PRECISION,#Available,#AvailableX)
+
+#AvailableXX=X,100,S
+T(2,可使用額度：+#AvailableX)
+IF(#L2r05LimitFlag=="F",T(2,F：核准額度限額：+#AvailableX),$)
+IF(#L2r05LimitFlag=="C",T(2,C：擔保品限額：+#AvailableX),$)
+IF(#L2r05LimitFlag=="S",T(2,S：合併額度控管限額：+#AvailableX),$)
+
 ![撥款金額]
 !必須輸入
 #FdDrawdownAmt=X,2,L
@@ -1090,12 +1121,16 @@ E(0,#L2r05LineAmt-#L2r05UtilBal+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
 #TwDrawdownAmt=m,14,I
 C(5,#L2r01CharCode,2,s,$)
 C(3,#PRECISION,0,$,s)
-@V(2,0)V(5,#L2r01LowAmt,#Available)
+@V(2,0)
+! V(5,#L2r01LowAmt,#Available)
+IF(#TwDrawdownAmt>#Available,V(P,#AvailableXX),$)
 
 #UsDrawdownAmt=m,14.2,I
 C(5,#L2r01CharCode,2,s,$)
 C(3,#PRECISION,0,s,$)
-@V(2,0)V(5,#L2r01LowAmt,#Available)
+@V(2,0)
+! V(5,#L2r01LowAmt,#Available)
+IF(#UsDrawdownAmt>#Available,V(P,#AvailableXX),$)
 
 #TimDrawdownAmt=m,14.2,S
 C(3,#PRECISION,0,E(0,#TwDrawdownAmt),E(0,#UsDrawdownAmt))
@@ -1620,8 +1655,6 @@ C(3,#PRECISION,0,E(0,#TwFinalBal),E(0,#UsFinalBal))
 ENABLE(#BTNHIDEP5)
 C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
 
-#BINDP5=X,1,S
-BIND(#BTNHIDEP5,click, {cmd=CALLSEND;DOCODE=HIDEP5})
 
 ![繳款方式]
 !必須輸入,依核准額度自動顯示,不可修改 L2R05
@@ -1728,8 +1761,6 @@ C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
 ENABLE(#BTNHIDEP6)
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 
-#BINDP6=X,1,S
-BIND(#BTNHIDEP6,click, {cmd=CALLSEND;DOCODE=HIDEP6})
 
 #BUF6A=X,41,S
 T(2,+0000000+#CustNo+          +0000000+      +#FacmNo+2)
@@ -1794,6 +1825,44 @@ HELP(#PieceCodeHelp,cols:2)
 T(3,)T(H,#PieceCode,#PieceCodeHelp)            
 
 
+
+!計件代碼2
+#FdPieceCodeSecond=X,2,L
+
+#PieceCodeSecond=X,1,I
+HELP(#PieceCodeHelp,cols:2)
+@
+C(4,#PieceCodeSecond,S,$)
+V(H,#PieceCodeHelp)
+! C(5,#RenewFlag,Y,V(3,C,D,3,4),$)
+C(5,#PieceCodeSecond,#PieceCode,V(P,不可與計件代碼相同),$)
+
+#PieceCodeSecondX=X,20,L
+T(3,)T(H,#PieceCodeSecond,#PieceCodeHelp)
+C(4,#PieceCodeSecond,T(3,@FdPieceCodeSecondAmt,)T(F,@TwPieceCodeSecondAmt,0)T(F,@UsPieceCodeSecondAmt,0),
+                     T(3,@FdPieceCodeSecondAmt,*)T(F,@TwPieceCodeSecondAmt,1)T(F,@UsPieceCodeSecondAmt,1))
+
+!計件代碼2金額
+#FdPieceCodeSecondAmt=X,2,L
+
+#TwPieceCodeSecondAmt=m,14,I
+C(4,#PieceCodeSecond,S,$)
+C(3,#PRECISION,0,$,S)
+@
+C(3,#TwPieceCodeSecondAmt,0,s,$)
+IF(#TwPieceCodeSecondAmt<=#TwDrawdownAmt,$,V(P,計件代碼2金額不可大於撥款金額))
+
+
+#UsPieceCodeSecondAmt=m,14.2,I
+C(4,#PieceCodeSecond,S,$)
+C(3,#PRECISION,0,S,$)
+@
+C(3,#UsPieceCodeSecondAmt,0,s,$)
+IF(#UsPieceCodeSecondAmt<=#UsDrawdownAmt,$,V(P,計件代碼2金額不可大於撥款金額))
+
+#TimPieceCodeSecondAmt=m,14.2,S
+C(3,#PRECISION,0,E(0,#TwPieceCodeSecondAmt),E(0,#UsPieceCodeSecondAmt))
+
 ![資金用途別]
 !必須輸入
 #FdUsageCode=X,2,L
@@ -1848,8 +1917,6 @@ T(3,@FdRemitBranch,*)
 T(3,@FdRemitAcctNo,*)
 T(3,@FdCompensateAcct,*)
 
-#BINDP7=X,1,S
-BIND(#BTNHIDEP7,click, {cmd=CALLSEND;DOCODE=HIDEP7})
 
 #BUF5A=X,7,S
 
@@ -2024,10 +2091,6 @@ ENABLE(#BTNEXPAND)
 E(0,@EXPANDFG,0)
 C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 
-#BINDEXPAND=X,1,S
-BIND(#BTNEXPAND,click, {cmd=CALLSEND;DOCODE=EXPAND})
-
-#BTNEXPAND=X,15,I,ui:button;value:   展開     ;enable:1;tabbable:0
 
 
 </sub>
@@ -2073,7 +2136,8 @@ K(MODIFYBUTTON,1,提交)
 #MaturityDate#IntCalcCode#AmortizedCode#FreqBase#PayIntFreq#RepayFreq
 #GracePeriod#GraceDate#SpecificDd#SpecificDate#FirstDueDate#FirstAdjRateDate
 #NextIntDate#NextRepayDate#TotalPeriod#TimAcctFee#TimFinalBal
-#NotYetFlag#PieceCode#UsageCode#SyndNo#RenewFlag
+#NotYetFlag#PieceCode#PieceCodeSecond
+#TimPieceCodeSecondAmt#UsageCode#SyndNo#RenewFlag
 #RelationCode#RelationName#RelationId#RelationBirthday#RelationGender
 #RemitBank#RemitBranch#RemitAcctNo#CompensateAcct#Remark
 #CustNo#CustId#ApplNo#TwDrawdownAmt#UsDrawdownAmt#CompensateFlag
@@ -2081,7 +2145,9 @@ K(MODIFYBUTTON,1,提交)
 #RpRemitIdKind#RpRemitId#RpRemitGender#RpRemitBirthday
 #RemitIdKind#RemitId#RemitGender#RemitBirthday
 #END
-#TwAcctFee#UsAcctFee#TwFinalBal#UsFinalBal
+#TwAcctFee#UsAcctFee
+#TwFinalBal#UsFinalBal
+#TwPieceCodeSecondAmt#UsPieceCodeSecondAmt
 </sub>
 
 

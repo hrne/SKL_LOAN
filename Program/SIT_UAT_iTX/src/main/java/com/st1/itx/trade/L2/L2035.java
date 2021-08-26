@@ -63,23 +63,32 @@ public class L2035 extends TradeBuffer {
 		ReltMain iReltMain = new ReltMain();
 		Slice<ReltMain> sReltMain = null;
 		OccursList occursList = new OccursList();
+		ArrayList<Integer> iCaseNoList = new ArrayList<>();
 		if (iCustNo == 0) {
 			iReltMain = sReltMainService.caseNoFirst(iCaseNo, titaVo);
 			if (iReltMain == null) {
 				throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
 			}
 			occursList.putParam("OOCaseNo", iReltMain.getCaseNo());
+			this.totaVo.addOccursList(occursList);
 		}else {
 			sReltMain = sReltMainService.custNoEq(iCustNo,this.index,this.limit, titaVo);
 			if (sReltMain == null) {
 				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
 			}
 			for (ReltMain ssReltMain:sReltMain) {
-				iReltMain = new ReltMain();
-				occursList.putParam("OOCaseNo", ssReltMain.getCaseNo());
+				occursList = new OccursList();
+				if (iCaseNoList.contains(ssReltMain.getCaseNo())) {
+					continue;
+				}else {
+					iCaseNoList.add(ssReltMain.getCaseNo());
+					occursList.putParam("OOCaseNo", ssReltMain.getCaseNo());
+					this.totaVo.addOccursList(occursList);
+				}
+				
 			}
 		}
-		this.totaVo.addOccursList(occursList);
+		
 		
 		this.addList(this.totaVo);
 		return this.sendList();

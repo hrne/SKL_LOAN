@@ -107,9 +107,13 @@ public class LoanAvailableAmt extends TradeBuffer {
 
 		// 可用額度(擔保品)
 		this.availableCl = compClAvailable(tFacMain, titaVo);
-		// 無合併額度控管，主額度下所有合併額度控管的使用金額計匴
+		// 擔保品共用記號 1-擔保品可使用小於額度可使用金額, 2-無關聯擔保品
 		if (this.availableCl.compareTo(this.availableAmt) < 0) {
-			this.clShareFlag = "Y"; // Y-擔保品可使用小於額度可使用金額
+			if (lClFac.size() == 0) {
+				this.clShareFlag = "2"; 
+			} else {
+				this.clShareFlag = "1"; 
+			}
 			this.limitFlag = "C"; // C-擔保品
 			this.availableAmt = this.availableCl;
 		}
@@ -120,7 +124,7 @@ public class LoanAvailableAmt extends TradeBuffer {
 		this.info("可用額度(額度)= " + this.availableFac);
 		this.info("合併額度控管Y/N  = " + this.facShareFlag);
 		this.info("可用額度(合併額度控管)= " + this.availableShare);
-		this.info("擔保品可使用小於額度可使用金額  = " + this.clShareFlag);
+		this.info("擔保品共用記號 1-擔保品可使用小於額度可使用金額, 2-無關聯擔保品 = " + this.clShareFlag); 
 		this.info("可用額度(擔保品)= " + this.availableCl);
 		this.info("限額計算方式 F-核准額度, C-擔保品 S-合併額度控管 = " + this.limitFlag);
 		this.info("可用額度 = " + this.availableAmt);
@@ -466,7 +470,7 @@ public class LoanAvailableAmt extends TradeBuffer {
 	}
 
 	/**
-	 * Y-擔保品可使用小於額度可使用金額
+	 * 擔保品共用記號 1-擔保品可使用小於額度可使用金額, 2-無關聯擔保品
 	 * 
 	 * @return Y/space
 	 */

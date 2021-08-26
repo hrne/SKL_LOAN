@@ -186,10 +186,10 @@ T(3,1)ASGN(LOOP$)
 
 !複製
 #OOBUF3=X,228,S
-T(2,3+#OOCaseNo)
+T(2,#OOCaseNo)
 
 #OOBTN3=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2306; ntxbuf=#OOBUF3})
+BIND(grid,{ cmd=CHAIN; ntxcd=L2305; ntxbuf=#OOBUF3})
 
 #OOBUF5=X,228,S
 T(2,3+#OOCaseNo)

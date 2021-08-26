@@ -45,10 +45,10 @@ T(3,@FdRptFg,*)
 [
 ["[L3001]                                 放款明細資料查詢"],
 ["#FdMain+查詢條件","@(借款人戶號、統一編號、核准編號、案件編號，需擇一輸入)"],
-["#FdCustNo+借款人戶號",#CustNo,"@@@",#BTN2,#CustNoX],
-["#FdCustId+統一編號",#CustId,#BTN3,#CustIdX],
-["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN4,#ApplNoX],
-["#FdCaseNo+案件編號",#CaseNo,"@@@",#CaseNoX],
+["#FdCustNo+．借款人戶號",#CustNo,"@@@",#BTN2,#CustNoX],
+["#FdCustId+．統一編號",#CustId,#BTN3,#CustIdX],
+["#FdApplNo+．核准編號",#ApplNo,"@@@",#BTN4,#ApplNoX],
+["#FdCaseNo+．案件編號",#CaseNo,"@@@",#CaseNoX],
 ["#FdRptFg+顯示方式",
 <include src="COM.icf::RPTFG.scr"/>
 ],
@@ -421,7 +421,6 @@ E(0,#OOAvailable)
 CALL2(#ADJUSTDOT,#Precision,#OOAvailable,#OOAvailableX)
 P(R,#OOAvailableX)
 
-
 !合併額度控管額度記號
 #OOShareFacFg=X,1,S
 
@@ -498,12 +497,15 @@ C(5,#OOShareFacFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L291B; ntxbuf=#OOBUF10}),$)
 
 !連結 L2017額度與擔保品關聯查詢
 #OOBUF11=X,31,S
-T(2,#OOCustNo+#OOFacmNo+0000000000+ )
+T(2,#OOCustNo+#OOFacmNo+0000000000+Y)
 !擔保品分配金額小於額度核准金額時顯示
-!Y顯示額度
-!其他關聯
+!1顯示不足額
+!2顯示未關聯
+!空白顯示擔保品
 #BTN11NAME=X,20,S
-C(5,#OOClShareFg,Y,T(3,不足額),T(3,擔保品))
+C(4,#OOClShareFg,T(3,擔保品),C(5,#OOClShareFg,1,T(3,不足額),T(3,未關聯)))
+! C(5,#OOClShareFg,Y,T(3,不足額),T(3,擔保品))
+
 #OOBTN11=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2017;text=#BTN11NAME; ntxbuf=#OOBUF11})
 

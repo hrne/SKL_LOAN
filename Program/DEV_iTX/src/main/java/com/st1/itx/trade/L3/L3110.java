@@ -107,7 +107,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3110")
 @Scope("prototype")
 public class L3110 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3110.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -249,10 +248,10 @@ public class L3110 extends TradeBuffer {
 			return;
 		}
 		// 已預約金額
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo, iFacmNo, iFacmNo,0,
-			Integer.MAX_VALUE, titaVo);		
-		if (slLoanBorMain !=null) {
-			for (LoanBorMain rv :slLoanBorMain.getContent() ) {
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.findStatusEq(Arrays.asList(99), iCustNo, iFacmNo, iFacmNo,
+				0, Integer.MAX_VALUE, titaVo);
+		if (slLoanBorMain != null) {
+			for (LoanBorMain rv : slLoanBorMain.getContent()) {
 				wkRvDrawdownAmt = wkRvDrawdownAmt.add(rv.getDrawdownAmt());
 			}
 		}
@@ -264,7 +263,8 @@ public class L3110 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0006", "額度主檔"); // 鎖定資料時，發生錯誤
 		}
 		if (tFacMain.getActFg() == 1) {
-			throw new LogicException(titaVo, "E0021", "額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
+			throw new LogicException(titaVo, "E0021",
+					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 		}
 		if (titaVo.isHcodeNormal()) {
 			// 檢查額度
@@ -299,7 +299,8 @@ public class L3110 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
 			}
 			titaVo.putParam("BormNo", wkBormNo);
-			titaVo.putParam("MRKEY", FormatUtil.pad9(String.valueOf(iCustNo), 7) + "-" + FormatUtil.pad9(String.valueOf(iFacmNo), 3) + "-" + FormatUtil.pad9(String.valueOf(wkBormNo), 3));
+			titaVo.putParam("MRKEY", FormatUtil.pad9(String.valueOf(iCustNo), 7) + "-"
+					+ FormatUtil.pad9(String.valueOf(iFacmNo), 3) + "-" + FormatUtil.pad9(String.valueOf(wkBormNo), 3));
 			// 更新額度資料
 			tFacMain.setLastBormRvNo(wkBormNo);
 
@@ -313,8 +314,10 @@ public class L3110 extends TradeBuffer {
 
 		if (titaVo.isHcodeErase() || titaVo.isHcodeModify()) {
 			// 查詢交易暫存檔
-			String wkSeqNo = FormatUtil.pad9(String.valueOf(iCustNo), 7) + FormatUtil.pad9(String.valueOf(iFacmNo), 3) + FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "000";
-			tTxTemp = txTempService.findById(new TxTempId(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(), titaVo.getOrgTlr(), titaVo.getOrgTno(), wkSeqNo));
+			String wkSeqNo = FormatUtil.pad9(String.valueOf(iCustNo), 7) + FormatUtil.pad9(String.valueOf(iFacmNo), 3)
+					+ FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "000";
+			tTxTemp = txTempService.findById(new TxTempId(titaVo.getOrgEntdyI() + 19110000, titaVo.getOrgKin(),
+					titaVo.getOrgTlr(), titaVo.getOrgTno(), wkSeqNo));
 			if (tTxTemp == null) {
 				throw new LogicException(titaVo, "E0001", "交易暫存檔"); // 查詢資料不存在
 			}
@@ -349,7 +352,8 @@ public class L3110 extends TradeBuffer {
 		}
 		// 更新額度檔
 		try {
-			tFacMain.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tFacMain.setLastUpdate(
+					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			tFacMain.setLastUpdateEmpNo(titaVo.getTlrNo());
 			facMainService.update(tFacMain);
 		} catch (DBException e) {
@@ -557,6 +561,8 @@ public class L3110 extends TradeBuffer {
 		tLoanBorMain.setNotYetFlag(titaVo.getParam("NotYetFlag"));
 		tLoanBorMain.setRenewFlag(titaVo.getParam("RenewFlag"));
 		tLoanBorMain.setPieceCode(titaVo.getParam("PieceCode"));
+		tLoanBorMain.setPieceCodeSecond(titaVo.getParam("PieceCodeSecond"));
+		tLoanBorMain.setPieceCodeSecondAmt(parse.stringToBigDecimal(titaVo.getParam("TimPieceCodeSecondAmt")));
 		tLoanBorMain.setUsageCode(titaVo.getParam("UsageCode"));
 		tLoanBorMain.setSyndNo(this.parse.stringToInteger(titaVo.getParam("SyndNo")));
 		tLoanBorMain.setRelationCode(tempVo.getParam("RelationCode"));

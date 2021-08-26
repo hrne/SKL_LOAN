@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("jcicB201Service")
 @Repository
-public class JcicB201ServiceImpl implements JcicB201Service, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(JcicB201ServiceImpl.class);
-
+public class JcicB201ServiceImpl extends ASpringJpaParm implements JcicB201Service, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class JcicB201ServiceImpl implements JcicB201Service, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + jcicB201Id);
+    this.info("findById " + dbName + " " + jcicB201Id);
     Optional<JcicB201> jcicB201 = null;
     if (dbName.equals(ContentName.onDay))
       jcicB201 = jcicB201ReposDay.findById(jcicB201Id);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYM", "BankItem", "BranchItem", "TranCode", "SubTranCode", "AcctNo", "SeqNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "BankItem", "BranchItem", "TranCode", "SubTranCode", "AcctNo", "SeqNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = jcicB201ReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +103,9 @@ em = null;
     else 
       slice = jcicB201Repos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jcicB201Id);
+    this.info("Hold " + dbName + " " + jcicB201Id);
     Optional<JcicB201> jcicB201 = null;
     if (dbName.equals(ContentName.onDay))
       jcicB201 = jcicB201ReposDay.findByJcicB201Id(jcicB201Id);
@@ -133,7 +132,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jcicB201.getJcicB201Id());
+    this.info("Hold " + dbName + " " + jcicB201.getJcicB201Id());
     Optional<JcicB201> jcicB201T = null;
     if (dbName.equals(ContentName.onDay))
       jcicB201T = jcicB201ReposDay.findByJcicB201Id(jcicB201.getJcicB201Id());
@@ -155,7 +154,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + jcicB201.getJcicB201Id());
+    this.info("Insert..." + dbName + " " + jcicB201.getJcicB201Id());
     if (this.findById(jcicB201.getJcicB201Id()) != null)
       throw new DBException(2);
 
@@ -184,7 +183,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + jcicB201.getJcicB201Id());
+    this.info("Update..." + dbName + " " + jcicB201.getJcicB201Id());
     if (!empNot.isEmpty())
       jcicB201.setLastUpdateEmpNo(empNot);
 
@@ -207,7 +206,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + jcicB201.getJcicB201Id());
+    this.info("Update..." + dbName + " " + jcicB201.getJcicB201Id());
     if (!empNot.isEmpty())
       jcicB201.setLastUpdateEmpNo(empNot);
 
@@ -227,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + jcicB201.getJcicB201Id());
+    this.info("Delete..." + dbName + " " + jcicB201.getJcicB201Id());
     if (dbName.equals(ContentName.onDay)) {
       jcicB201ReposDay.delete(jcicB201);	
       jcicB201ReposDay.flush();
@@ -256,7 +255,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (JcicB201 t : jcicB201){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -291,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (jcicB201 == null || jcicB201.size() == 0)
       throw new DBException(6);
 
@@ -320,7 +319,7 @@ em = null;
 
   @Override
   public void deleteAll(List<JcicB201> jcicB201, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)
