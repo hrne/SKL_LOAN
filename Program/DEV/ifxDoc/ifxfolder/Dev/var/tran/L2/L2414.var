@@ -276,6 +276,35 @@ E(0,#FunCd)
 <include src="COM.icf::CheckAuth.rtn"/>
 
 #FdFuncd=X,2,L
+#FdApplNo=X,2,L
+#FdClCode1=X,2,L
+#FdClCode2=X,2,L
+#FdClNo=X,2,L
+#FdGdRid=X,2,L
+#FdClTypeCode=X,2,L
+#FdCityCode=X,2,L
+#FdEvaDate=X,2,L
+#FdPledgeAmt=X,2,L
+#FdPledgeStartDate=X,2,L
+#FdPledgeEndDate=X,2,L
+#FdPledgeBankCode=X,2,L
+#FdPledgeNO=X,2,L
+#FdOwnerId=X,2,L
+#FdOwnerName=X,2,L
+#FdOwnerRelCode=X,2,L
+#FdIssuingId=X,2,L
+#FdIssuingCounty=X,2,L
+#FdDocNo=X,2,L
+#FdLoanToValue=X,2,L
+#FdSettingStat=X,2,L
+#FdClStat=X,2,L
+#FdSettingDate=X,2,L
+#FdSettingBal=X,2,L
+#FdSynd=X,2,L
+#FdSyndCode=X,2,L
+#FdDispPrice=X,2,L
+#FdDispDate=X,2,L
+#FdClStatus=X,2,L
 
 #FunCdX=X,4,L
 SWITCH(#FunCd,1,T(3,新增),2,T(3,修改),4,T(3,刪除))
@@ -304,7 +333,6 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApplNo<-
 
 
 !申請號碼
-#FdApplNo=X,2,L
 
 #ApplNo=A,7,I
 C(3,#FunCd,1,$,s)
@@ -346,7 +374,6 @@ C(3,#ApplNo,0,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13
 C(3,#FunCd,1,$,s)
 E(0,5)
 
-#FdClCode1=X,2,L
 
 #ClCode1X=X,10,L
 C(3,#FunCd,1,$,s)
@@ -357,7 +384,6 @@ T(3,銀行保證)
 C(3,#FunCd,1,$,s)
 E(0,01)
 
-#FdClCode2=X,2,L
 
 #ClCode2X=X,30,L
 C(3,#FunCd,1,$,s)
@@ -366,7 +392,6 @@ T(3,銀行保證－銀行保證)
 ! [擔保品編號]
 #ClNo=A,7,L
 
-#FdClNo=X,2,L
 
 <include src="ROM.icf::L2R17.dec"/>
 !RIM取原擔保品編號
@@ -383,7 +408,6 @@ E(0,@GdRid2,#L2r17GdrId2)
 E(0,@GdRnum,#L2r17GdrNum)
 
 ![原擔保品編號]
-#FdGdRid=X,2,L
 
 #GdRid1=A,1,L
 #GdRid2=A,2,L
@@ -497,7 +521,6 @@ IF(#ClTypeCode >= 998,HIDE(#EvaAmtLabel),SHOW(#EvaAmtLabel))
 IF(#ClTypeCode >= 998,HIDE(#EvaAmt),SHOW(#EvaAmt))
 IF(#ClTypeCode >= 998,T(2,@FdEvaAmt,),T(2,@FdEvaAmt,*))
 
-#FdClTypeCode=X,2,L
 
 #ClTypeItem=X,50,L
 T(H,#ClTypeCode,#ClTypeCodeHelp)
@@ -522,7 +545,7 @@ R(1,L6R03)
 #L6r03ResultCity=X,10000,S
 T(2,#L6r03Result)
 
-#FdCityCode=X,2,L
+
 ! [地區別]
 #CityCode=X,2,I
 IF(#FunCd==4,s,$)
@@ -539,7 +562,6 @@ T(H,#CityCode,#L6r03ResultCity)
 IF(#FunCd==4,s,$)
 @V(7)A(4,0,#EvaDate)
 
-#FdEvaDate=X,2,L
 
 
 ! [鑑估值]
@@ -550,14 +572,6 @@ IF(#ClTypeCode >= 998,s,$)
 @V(2,0)
 
 #FdEvaAmt=X,2,L
-
-
-!星號欄位
-#FdPledgeAmt=X,2,L
-#FdPledgeStartDate=X,2,L
-#FdPledgeEndDate=X,2,L
-#FdPledgeBankCode=X,2,L
-#FdPledgeNO=X,2,L
 
 !保證金額
 #PledgeAmt=m,14,I
@@ -599,7 +613,6 @@ IF(#ClTypeCode >= 998,$,S)
 IF(#FunCd==4,s,$)
 @V(7)A(ID_UNINO,0,#OwnerId)
 
-#FdOwnerId=X,2,L
 
 #RimL1r09=X,1,S
 T(2,@L1r09CustName,)
@@ -622,9 +635,8 @@ IF(#FunCd==4,s,$)
 C(4,#L1r09CustName,$,s)
 @V(7)
 
-#FdOwnerName=X,2,L
 
-#FdOwnerRelCode=X,2,L
+#OwnerCHECK=X,1,S
 C(4,#CustId,s,$)
 C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p1,13,13,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,13,13,1))
 
@@ -646,7 +658,6 @@ T(H,#OwnerRelCode,#RelationCodeHelp)
 IF(#FunCd==4,s,$)
 @C(4,#IssuingId,$,A(ID_UNINO,0,#IssuingId))
 
-#FdIssuingId=X,2,L
 
 ! [發行機構所在國別]
 #IssuingCounty=X,3,I
@@ -659,16 +670,11 @@ HELP(#NationalityCodeHelp)
 #IssuingCountyX=X,10,L
 T(H,#IssuingCounty,#NationalityCodeHelp)
 
-#FdIssuingCounty=X,2,L
-
 
 ! [憑證編號]
 #DocNo=X,30,I
 IF(#FunCd==4,s,$)
 
-#FdDocNo=X,2,L
-
-#FdLoanToValue=X,2,L
 
 ! [貸放成數]
 #LoanToValue=m,3.2,I
@@ -832,7 +838,6 @@ IF(#FunCd==4,s,$)
 C(3,#PHFG,1,$,S)
 T(2,#PublicValue1+#PublicValue2+#PublicValue3)
 
-#FdSettingStat=X,2,L
 ! [設定狀態]
 #SettingStat=A,1,I
 IF(#FunCd==4,s,$)
@@ -842,7 +847,7 @@ HELP(#SettingStatCodeHelp)
 #SettingStatX=x,4,L
 T(H,#SettingStat,#SettingStatCodeHelp)
 
-#FdClStat=X,2,L
+
 ! [擔保品狀態]
 #ClStat=A,1,I
 IF(#FunCd==4,s,$)
@@ -852,13 +857,13 @@ HELP(#ClStatCodeHelp)
 #ClStatX=x,10,L
 T(H,#ClStat,#ClStatCodeHelp)
 
-#FdSettingDate=X,2,L
+
 ! [設定日期]
 #SettingDate=D,7,I
 IF(#FunCd==4,s,$)
 @V(7)A(4,0,#SettingDate)
 
-#FdSettingBal=X,2,L
+
 ! [設定金額]
 #SettingBal=m,14,I
 IF(#FunCd==4,s,$)
@@ -897,7 +902,6 @@ R(1,L2R41)
 !@V(H,#YesNoHelp)
 !IF(#Synd=="Y",T(3,@FdSyndCode,*),T(3,@FdSyndCode, ))
 
-#FdSynd=X,2,L
 
 #SyndX=X,2,L
 !T(H,#Synd,#YesNoHelp)
@@ -910,8 +914,6 @@ R(1,L2R41)
 !HELP(#SyndCodeHelp)
 !@V(H,#SyndCodeHelp)
 
-#FdSyndCode=X,2,L
-
 #SyndCodeX=X,6,L
 !T(H,#SyndCode,#SyndCodeHelp)
 
@@ -920,8 +922,6 @@ R(1,L2R41)
 #DispPrice=m,14,I
 IF(#FunCd==4,s,$)
 
-#FdDispPrice=X,2,L
-
 
 ! [處分日期]
 #DispDate=D,7,I
@@ -929,14 +929,11 @@ IF(#FunCd==4,s,$)
 IF(#DispPrice == 0,S,$)
 @V(7)A(4,0,#DispDate)
 
-#FdDispDate=X,2,L
-
 
 ! [擔保品狀況碼]
 #ClStatus=A,1,L
 E(0,1)
 
-#FdClStatus=X,2,L
 
 #ClStatusX=X,7,L
 T(3,已抵押)

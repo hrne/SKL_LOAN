@@ -303,6 +303,9 @@ public class L8030 extends TradeBuffer {
 		case"050":
 			dealZ050(iCustId,this.index,this.limit,titaVo);
 			break;
+		case"052":
+			dealZ052(iCustId,this.index,this.limit,titaVo);
+			break;
 		case"053":
 			dealZ053(iCustId,this.index,this.limit,titaVo);
 			break;
@@ -1206,6 +1209,192 @@ public class L8030 extends TradeBuffer {
 	        }
 	    }
 	}
+	public void dealZ051(String custId ,int index,int limit,TitaVo titaVo) throws LogicException {
+        //固定內容起始
+		OccursList occursListA = new OccursList();
+		occursListA.putParam("OOStatusFg", "0");
+		occursListA.putParam("OOHistoryFg", "0");
+		occursListA.putParam("OODeleteFg", "0");
+		occursListA.putParam("OOChainTxCd", "L8312");
+		occursListA.putParam("OOHistoryTxCd", "L8042");
+		occursListA.putParam("OOUkey", "");
+		occursListA.putParam("OOCustId", custId);
+		occursListA.putParam("OOSubmitKey", "");
+		occursListA.putParam("OOSubmitKeyX", "");
+		occursListA.putParam("OORcDate", "");
+		occursListA.putParam("OODelayYM", "");
+		occursListA.putParam("OOOutJcicTxtDate", "");
+		occursListA.putParam("OOTranKey", "");
+        
+		//固定回傳
+		occursListA.putParam("OOMaxMainCode", "");
+		occursListA.putParam("OOCaseStatus", "");
+		occursListA.putParam("OOClaimDate", "");
+		occursListA.putParam("OOCourtCode", "");
+	    occursListA.putParam("OOAccount", "");
+		occursListA.putParam("OOBankId", "");
+		occursListA.putParam("OOBankIdX", "");
+		occursListA.putParam("OOClosedDate", "");
+		occursListA.putParam("OOChangePayDate", "");
+		occursListA.putParam("OOPayDate", "");
+		this.totaVo.addOccursList(occursListA);
+		//固定內容結束
+		
+		//若有資料則以下處理回傳
+		Slice<JcicZ051> sJcicZ051 = null;
+		sJcicZ051 = iJcicZ051Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		if (sJcicZ051 != null) {
+			for (JcicZ051 xJcicZ051:sJcicZ051) {
+				OccursList occursListB = new OccursList();
+				//575 layout回傳
+				occursListB.putParam("OOChainTxCd", "L8312");
+				occursListB.putParam("OOHistoryTxCd", "L8042");
+				occursListB.putParam("OOUkey", xJcicZ051.getUkey());
+				occursListB.putParam("OOCustId", xJcicZ051.getCustId());
+				occursListB.putParam("OORcDate", xJcicZ051.getRcDate());
+				occursListB.putParam("OOSubmitKey", xJcicZ051.getSubmitKey());
+				occursListB.putParam("OODelayYM", xJcicZ051.getDelayYM());
+				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ051.getSubmitKey(),titaVo));
+				occursListB.putParam("OOTranKey", xJcicZ051.getTranKey());
+				int iOutJcicTxtDate = 0;
+				iOutJcicTxtDate = xJcicZ051.getOutJcicTxtDate();
+				if (iOutJcicTxtDate ==0) {
+					occursListB.putParam("OOOutJcicTxtDate", "");
+				}else {
+					occursListB.putParam("OOOutJcicTxtDate", iOutJcicTxtDate);
+				}
+				//按鈕控制
+				JcicZ051 rJcicZ051 = new JcicZ051();
+				JcicZ051Id rJcicZ051Id = new JcicZ051Id();
+				rJcicZ051Id.setRcDate(xJcicZ051.getRcDate());
+				rJcicZ051Id.setCustId(xJcicZ051.getCustId());
+				rJcicZ051Id.setSubmitKey(xJcicZ051.getSubmitKey());
+				rJcicZ051 = iJcicZ051Service.findById(rJcicZ051Id, titaVo);
+				//已報送檔案(OutJcicDate!=0)才可做異動，否則只能刪除
+				if (rJcicZ051.getOutJcicTxtDate()==0) {
+					occursListB.putParam("OODeleteFg", "1");
+					occursListB.putParam("OOStatusFg", "2");
+				}else {
+					occursListB.putParam("OODeleteFg", "0");
+					occursListB.putParam("OOStatusFg", "1");
+				}
+				
+				//歷程按鈕控制
+				Slice<JcicZ051Log> iJcicZ051Log = null;
+				iJcicZ051Log = iJcicZ051LogService.ukeyEq(xJcicZ051.getUkey(), 0, Integer.MAX_VALUE, titaVo);
+				if (iJcicZ051Log == null) {
+					occursListB.putParam("OOHistoryFg", "0");
+				}else {
+					occursListB.putParam("OOHistoryFg", "1");
+				}
+				//固定回傳
+				occursListA.putParam("OOMaxMainCode", "");
+				occursListA.putParam("OOCaseStatus", "");
+				occursListA.putParam("OOClaimDate", "");
+				occursListA.putParam("OOCourtCode", "");
+			    occursListA.putParam("OOAccount", "");
+				occursListA.putParam("OOBankId", "");
+				occursListA.putParam("OOBankIdX", "");
+				occursListA.putParam("OOClosedDate", "");
+				occursListA.putParam("OOChangePayDate", "");
+				occursListA.putParam("OOPayDate", "");
+				this.totaVo.addOccursList(occursListB);
+			}
+		}
+	}
+	public void dealZ052(String custId ,int index,int limit,TitaVo titaVo) throws LogicException {
+        //固定內容起始
+		OccursList occursListA = new OccursList();
+		occursListA.putParam("OOStatusFg", "0");
+		occursListA.putParam("OOHistoryFg", "0");
+		occursListA.putParam("OODeleteFg", "0");
+		occursListA.putParam("OOChainTxCd", "L8313");
+		occursListA.putParam("OOHistoryTxCd", "L8043");
+		occursListA.putParam("OOUkey", "");
+		occursListA.putParam("OOCustId", custId);
+		occursListA.putParam("OOSubmitKey", "");
+		occursListA.putParam("OOSubmitKeyX", "");
+		occursListA.putParam("OORcDate", "");
+		occursListA.putParam("OOOutJcicTxtDate", "");
+		occursListA.putParam("OOTranKey", "");
+        
+		//固定回傳
+		occursListA.putParam("OOMaxMainCode", "");
+		occursListA.putParam("OOCaseStatus", "");
+		occursListA.putParam("OOClaimDate", "");
+		occursListA.putParam("OOCourtCode", "");
+		occursListA.putParam("OODelayYM", "");
+	    occursListA.putParam("OOAccount", "");
+		occursListA.putParam("OOBankId", "");
+		occursListA.putParam("OOBankIdX", "");
+		occursListA.putParam("OOClosedDate", "");
+		occursListA.putParam("OOChangePayDate", "");
+		occursListA.putParam("OOPayDate", "");
+		this.totaVo.addOccursList(occursListA);
+		//固定內容結束
+		
+		//若有資料則以下處理回傳
+		Slice<JcicZ052> sJcicZ052 = null;
+		sJcicZ052 = iJcicZ052Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		if (sJcicZ052 != null) {
+			for (JcicZ052 xJcicZ052:sJcicZ052) {
+				OccursList occursListB = new OccursList();
+				//575 layout回傳
+				occursListB.putParam("OOChainTxCd", "L8313");
+				occursListB.putParam("OOHistoryTxCd", "L8043");
+				occursListB.putParam("OOUkey", xJcicZ052.getUkey());
+				occursListB.putParam("OOCustId", xJcicZ052.getCustId());
+				occursListB.putParam("OORcDate", xJcicZ052.getRcDate());
+				occursListB.putParam("OOSubmitKey", xJcicZ052.getSubmitKey());
+				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ052.getSubmitKey(),titaVo));
+				occursListB.putParam("OOTranKey", xJcicZ052.getTranKey());
+				int iOutJcicTxtDate = 0;
+				iOutJcicTxtDate = xJcicZ052.getOutJcicTxtDate();
+				if (iOutJcicTxtDate ==0) {
+					occursListB.putParam("OOOutJcicTxtDate", "");
+				}else {
+					occursListB.putParam("OOOutJcicTxtDate", iOutJcicTxtDate);
+				}
+				//按鈕控制
+				JcicZ052 rJcicZ052 = new JcicZ052();
+				JcicZ052Id rJcicZ052Id = new JcicZ052Id();
+				rJcicZ052Id.setRcDate(xJcicZ052.getRcDate());
+				rJcicZ052Id.setCustId(xJcicZ052.getCustId());
+				rJcicZ052Id.setSubmitKey(xJcicZ052.getSubmitKey());
+				rJcicZ052 = iJcicZ052Service.findById(rJcicZ052Id, titaVo);
+				//已報送檔案(OutJcicDate!=0)才可做異動，否則只能刪除
+				if (rJcicZ052.getOutJcicTxtDate()==0) {
+					occursListB.putParam("OODeleteFg", "1");
+					occursListB.putParam("OOStatusFg", "2");
+				}else {
+					occursListB.putParam("OODeleteFg", "0");
+					occursListB.putParam("OOStatusFg", "1");
+				}
+				
+				//歷程按鈕控制
+				Slice<JcicZ052Log> iJcicZ052Log = null;
+				iJcicZ052Log = iJcicZ052LogService.ukeyEq(xJcicZ052.getUkey(), 0, Integer.MAX_VALUE, titaVo);
+				if (iJcicZ052Log == null) {
+					occursListB.putParam("OOHistoryFg", "0");
+				}else {
+					occursListB.putParam("OOHistoryFg", "1");
+				}
+				//固定回傳
+				occursListA.putParam("OOMaxMainCode", "");
+				occursListA.putParam("OOCaseStatus", "");
+				occursListA.putParam("OOClaimDate", "");
+				occursListA.putParam("OOCourtCode", "");
+				occursListA.putParam("OODelayYM", "");
+			    occursListA.putParam("OOAccount", "");
+				occursListA.putParam("OOBankId", "");
+				occursListA.putParam("OOBankIdX", "");
+				occursListA.putParam("OOClosedDate", "");
+				occursListA.putParam("OOChangePayDate", "");
+				occursListA.putParam("OOPayDate", "");
+				this.totaVo.addOccursList(occursListB);
+			}
+		}
+	}
 	public void dealZ053(String custId ,int index,int limit,TitaVo titaVo) throws LogicException {
         //固定內容起始
 		OccursList occursListA = new OccursList();
@@ -1286,16 +1475,16 @@ public class L8030 extends TradeBuffer {
 					occursListB.putParam("OOHistoryFg", "1");
 				}
 				//固定回傳
-                occursListA.putParam("OOCaseStatus", "");
-                occursListA.putParam("OOClaimDate", "");
-                occursListA.putParam("OOCourtCode", "");
-                occursListA.putParam("OODelayYM", "");
-                occursListA.putParam("OOAccount", "");
-                occursListA.putParam("OOBankId", "");
-                occursListA.putParam("OOBankIdX", "");
-                occursListA.putParam("OOClosedDate", "");
-                occursListA.putParam("OOChangePayDate", "");
-                occursListA.putParam("OOPayDate", "");
+                occursListB.putParam("OOCaseStatus", "");
+                occursListB.putParam("OOClaimDate", "");
+                occursListB.putParam("OOCourtCode", "");
+                occursListB.putParam("OODelayYM", "");
+                occursListB.putParam("OOAccount", "");
+                occursListB.putParam("OOBankId", "");
+                occursListB.putParam("OOBankIdX", "");
+                occursListB.putParam("OOClosedDate", "");
+                occursListB.putParam("OOChangePayDate", "");
+                occursListB.putParam("OOPayDate", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -1312,16 +1501,17 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCustId", custId);
 		occursListA.putParam("OOSubmitKey", "");
 		occursListA.putParam("OOSubmitKeyX", "");
-		occursListA.putParam("OOCourtCode", "");
-		occursListA.putParam("OOClaimDate", "");
-		occursListA.putParam("OOCaseStatus", "");
+		occursListA.putParam("OORcDate", "");
+		occursListA.putParam("OOMaxMainCode", "");
+		occursListA.putParam("OOPayOffDate", "");
 		occursListA.putParam("OOOutJcicTxtDate", "");
 		occursListA.putParam("OOTranKey", "");
 
 		//固定回傳
+		occursListA.putParam("OOCourtCode", "");
+		occursListA.putParam("OOClaimDate", "");
+		occursListA.putParam("OOCaseStatus", "");
 		occursListA.putParam("OODelayYM", "");
-		occursListA.putParam("OORcDate", "");
-		occursListA.putParam("OOMaxMainCode", "");
 	    occursListA.putParam("OOAccount", "");
 		occursListA.putParam("OOBankId", "");
 		occursListA.putParam("OOBankIdX", "");
@@ -1381,6 +1571,9 @@ public class L8030 extends TradeBuffer {
 					occursListB.putParam("OOHistoryFg", "1");
 				}
 				//固定回傳
+				occursListB.putParam("OOCourtCode", "");
+				occursListB.putParam("OOClaimDate", "");
+				occursListB.putParam("OOCaseStatus", "");
 				occursListB.putParam("OODelayYM", "");
 			    occursListB.putParam("OOAccount", "");
 				occursListB.putParam("OOBankId", "");

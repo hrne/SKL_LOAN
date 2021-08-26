@@ -2,11 +2,11 @@ package com.st1.itx.trade.LH;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.HashMap;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -19,12 +19,10 @@ import com.st1.itx.util.common.MakeReport;
 
 @Component
 @Scope("prototype")
-
 public class LH001Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LH001Report.class);
 
 	@Autowired
-	LH001ServiceImpl LH001ServiceImpl;
+	LH001ServiceImpl lH001ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
@@ -35,86 +33,175 @@ public class LH001Report extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
-		// 設定資料庫(必須的)
-//		LH001ServiceImpl.getEntityManager(titaVo);
-		try {
+		List<Map<String, String>> listQueryA = null;
+		List<Map<String, String>> listQueryB = null;
+		List<Map<String, String>> listQueryC = null;
 
-//			List<HashMap<String, String>> LH001List = LH001ServiceImpl.findAll();
-//			if(LH001List.size() > 0){
-			testExcel(titaVo);
-//			  testExcel(titaVo, LH001List);
-//			}
+		try {
+			listQueryA = lH001ServiceImpl.queryA(titaVo);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LH001ServiceImpl.testExcel error = " + errors.toString());
 		}
+
+		try {
+			listQueryB = lH001ServiceImpl.queryB(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("LH001ServiceImpl.testExcel error = " + errors.toString());
+		}
+		try {
+			listQueryC = lH001ServiceImpl.queryC(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("LH001ServiceImpl.testExcel error = " + errors.toString());
+		}
+		exportExcel(listQueryA, listQueryB, listQueryC, titaVo);
 	}
 
-	private void testExcel(TitaVo titaVo, List<HashMap<String, String>> LDList) throws LogicException {
-		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LH001", "住宅違約統計季報_服務課申報表", "LH001住宅違約統計季報_服務課申報表", "放款管理課_住宅違約統計季報_服務課申報表.xlsx", "填報");
-		// makeExcel.setValue(5,1,"測試帳號");
-//		makeExcel.setValue(1,1,"測試2");
-//		String inf = "經辦;房貸專員;戶名;戶號;額度;"  // 24
-//				+ "撥款;撥款日;利率代碼;計件代碼;是否計件;"
-//				+ "撥款金額;部室代號;區部代號;單位代號;部室;"
-//				+ "區部;單位;員工代號;介紹人;處經理;"
-//				+ "區經理;換算業績;業務報酬;業績金額";
-//		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23";
-//		
-//		String inf1[] = inf.split(";");
-//		String txt1[] = txt.split(";") ;
-//		int i = 1;
-//		this.info("-----------------" + LDList);
-//		for (HashMap<String, String> tLDVo : LDList) {
-//			for( int j = 1 ; j <= tLDVo.size(); j++) {
-//				if( i == 1) {
-//					makeExcel.setValue(i, j, inf1[j-1]);
-//				} else {
-//					if(tLDVo.get(txt1[j-1]) == null) {
-//						makeExcel.setValue(i, j, "");
-//					} else {
-//						this.info("->" + tLDVo.get(txt1[j-1]));
-//						makeExcel.setValue(i, j, tLDVo.get(txt1[j-1]));
-//					}
-//				} // else 
-//			}		
-//			i++;
-//		}
+	private void exportExcel(List<Map<String, String>> listA, List<Map<String, String>> listB,
+			List<Map<String, String>> listC, TitaVo titaVo) throws LogicException {
+
+		this.info("exportExcel");
+
+		if (listA == null) {
+			listA = new ArrayList<>();
+		}
+		if (listB == null) {
+			listB = new ArrayList<>();
+		}
+		if (listC == null) {
+			listC = new ArrayList<>();
+		}
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LH001", "表A07_會計部申報表", "LH001表A07_會計部申報表",
+				"LH001_底稿_表A07_會計部申報表.xlsx", "新表7(108.03.31)");
+
+		int bcAcDate = titaVo.getEntDyI() + 19110000;
+
+		// 輸出日期
+		makeExcel.setValue(2, 5, "中華民國" + showRocDate(bcAcDate, 0), "C");
+
+		makeExcel.setSheet("新表7(108.03.31)", "新表7(" + showRocDate(bcAcDate, 6) + ")");
+
+		int rowCursorA = 5;
+		int rowCursorB = 8;
+		int rowCursorC = 11;
+
+		if (listA.size() > 1) {
+			// 將表格往下移，移出空間
+			makeExcel.setShiftRow(rowCursorA + 1, listA.size() - 1);
+			// 更新行數指標
+			rowCursorB += listA.size() - 1;
+			rowCursorC += listA.size() - 1;
+		}
+		if (listA.size() > 0) {
+			// 寫入資料
+			setValueToExcel(rowCursorA, listA);
+		}
+		if (listB.size() > 1) {
+			// 將表格往下移，移出空間
+			makeExcel.setShiftRow(rowCursorB + 1, listB.size() - 1);
+			// 更新行數指標
+			rowCursorC += listB.size() - 1;
+		}
+		if (listB.size() > 0) {
+			// 寫入資料
+			setValueToExcel(rowCursorB, listB);
+		}
+		if (listC.size() > 1) {
+			// 將表格往下移，移出空間
+			makeExcel.setShiftRow(rowCursorC + 1, listC.size() - 1);
+		}
+		if (listC.size() > 0) {
+			// 寫入資料
+			setValueToExcel(rowCursorC, listC);
+		}
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
 
-	private void testExcel(TitaVo titaVo) throws LogicException {
-		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LH001", "表A07_會計部申報表", "LH001表A07_會計部申報表", "表A07_會計部申報表.xlsx", "新表7(108.03.31");
-		// makeExcel.setValue(5,1,"測試日期");
+	private void setValueToExcel(int rowCursor, List<Map<String, String>> list) throws LogicException {
 
-		makeExcel.setValue(5, 1, "孫X空");
-		makeExcel.setValue(5, 2, "123456788");
-		makeExcel.setValue(5, 5, "1");
-		makeExcel.setValue(5, 6, "授信（不含短期票券之保證或背書）");
-		makeExcel.setValue(5, 7, "12");
-		makeExcel.setValue(5, 8, "有擔保金額：5,555,555");
-		makeExcel.setValue(5, 9, "N");
-		makeExcel.setValue(5, 10, "4,444,444");
-		makeExcel.setValue(34, 10, "4,444,444");
+		for (Map<String, String> map : list) {
+			// 戶名
+			makeExcel.setValue(rowCursor, 1, map.get("F0"));
+			// 身分證號碼/統一編號
+			makeExcel.setValue(rowCursor, 2, map.get("F1"));
+			// 交易行為類別代號
+			makeExcel.setValue(rowCursor, 5, "1");
+			// 交易行為類別
+			makeExcel.setValue(rowCursor, 6, "授信（不含短期票券之保證或背書）");
+			// 內容說明類別代號
+			makeExcel.setValue(rowCursor, 7, "12");
 
-		makeExcel.setValue(36, 1, "孫X空及其同一關係人");
-		makeExcel.setValue(36, 2, "A123321225");
-		makeExcel.setValue(36, 5, "1");
-		makeExcel.setValue(36, 6, "授信（不含短期票券之保證或背書）");
-		makeExcel.setValue(36, 7, "12");
-		makeExcel.setValue(36, 8, "有擔保金額：99,999");
-		makeExcel.setValue(36, 9, "N");
-		makeExcel.setValue(36, 10, "59,999");
-		makeExcel.setValue(39, 10, "59,999");
+			BigDecimal amt = divThousand(getBigDecimal(map.get("F2")));
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+			// 內容說明
+			makeExcel.setValue(rowCursor, 8, "有擔保品金額:" + formatAmt(amt, 0));
+			// 有無保證機構
+			makeExcel.setValue(rowCursor, 9, "N");
+			// 交易金額
+			makeExcel.setValue(rowCursor, 10, amt);
+
+			rowCursor++;
+		}
 	}
 
+	/**
+	 * 合併一批資料的儲存格
+	 * 
+	 * @param sameCollateralRange 一批資料中需要合併的起訖行數
+	 */
+	private void mergeColumns(Map<String, int[]> sameCollateralRange) {
+
+		sameCollateralRange.forEach((k, v) -> {
+//			this.info("mergeColumns k " + k);
+//			this.info("mergeColumns v[0] " + v[0]);
+//			this.info("mergeColumns v[1] " + v[1]);
+
+			if (v[0] < v[1]) {
+				// 戶名
+				makeExcel.setMergedRegion(v[0], v[1], 2, 2);
+				// 金控公司負責人及大股東
+				makeExcel.setMergedRegion(v[0], v[1], 3, 3);
+				// 擔保品估價
+				makeExcel.setMergedRegion(v[0], v[1], 7, 7);
+				// 貸放成數
+				makeExcel.setMergedRegion(v[0], v[1], 8, 8);
+				// 授信餘額
+				makeExcel.setMergedRegion(v[0], v[1], 13, 13);
+				// 佔淨值比
+				makeExcel.setMergedRegion(v[0], v[1], 14, 14);
+				// 備註說明
+				makeExcel.setMergedRegion(v[0], v[1], 14, 16);
+			}
+		});
+
+	}
+
+	/**
+	 * 千元單位運算
+	 * 
+	 * @param input 數值，此報表應僅有淨值、擔保品估價及授信餘額需要做千元單位運算
+	 * @return 傳入值除1000之結果
+	 */
+	private BigDecimal divThousand(BigDecimal input) {
+
+//		this.info("divThousand input = " + input);
+
+		if (input == null) {
+			return BigDecimal.ZERO;
+		}
+
+		input = computeDivide(input, new BigDecimal("1000"), 3);
+
+//		this.info("divThousand return = " + input);
+
+		return input;
+	}
 }

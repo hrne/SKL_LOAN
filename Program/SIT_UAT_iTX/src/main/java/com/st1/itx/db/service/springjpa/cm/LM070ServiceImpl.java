@@ -38,7 +38,8 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "	SELECT I.\"CustNo\"";
 		sql += "	      ,I.\"FacmNo\"";
-		sql += "	      ,F.\"UtilBal\"";
+		// sql += "	      ,F.\"UtilBal\"";
+		sql += "		  ,LO.\"thisAmt\"";
 		sql += "	      ,I.\"PieceCode\"";
 		sql += "	      ,NVL(I.\"CntingCode\", 'N') AS \"CntingCode\"";
 		sql += "	      ,L.\"totalDrawdownAmt\"";
@@ -55,7 +56,7 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	      ,I.\"PerfEqAmt\"";
 		sql += " 	      ,I.\"PerfReward\"";
 		sql += " 	      ,NVL(E2.\"AgentId\", E5.\"AgentId\") AS \"UnitAgentId\"";
-		sql += "	      ,NVL(E2.\"AgentId\", E5.\"AgentId\") AS \"DistAgentId\"";
+		sql += "	      ,NVL(E3.\"AgentId\", E6.\"AgentId\") AS \"DistAgentId\"";
 		sql += "	      ,R.\"IntroducerAddBonus\"";
 		sql += "	FROM(SELECT I.\"CustNo\"";
 		sql += " 	           ,I.\"FacmNo\"";
@@ -118,6 +119,17 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	                        AND R.\"FacmNo\" = I.\"FacmNo\"";
 		sql += "	                        AND R.\"BormNo\" = I.\"BormNo\"";
 		sql += "	                        AND R.\"Introducer\" = I.\"Introducer\"";
+		sql += "	LEFT JOIN ( SELECT  L.\"CustNo\"";
+		sql += "					  , L.\"FacmNo\"";
+		sql += "	  	 			  , SUM(L.\"TxAmt\") AS \"thisAmt\"";
+		sql += "	            FROM \"LoanBorTx\" L";
+		sql += " 	     	    LEFT JOIN \"CdWorkMonth\" M ON M.\"StartDate\" <= :iday ";
+		sql += " 	                            		   AND M.\"EndDate\" >= :iday ";
+		sql += "	        	WHERE L.\"AcDate\" >= M.\"StartDate\"";
+		sql += "	              AND L.\"AcDate\" <= M.\"EndDate\"";
+		sql += "	        	GROUP BY L.\"CustNo\"";
+		sql += "						,L.\"FacmNo\") LO";
+		sql += "	 ON LO.\"CustNo\" = I.\"CustNo\" AND LO.\"FacmNo\" = I.\"FacmNo\"";
 		sql += "	WHERE  I.\"WorkMonth\" = ( M.\"Year\" * 100 + M.\"Month\" )";
 		sql += "	  AND I.\"PerfDate\" >= M.\"StartDate\"";
 		sql += "	  AND I.\"PerfDate\" <= M.\"EndDate\"";

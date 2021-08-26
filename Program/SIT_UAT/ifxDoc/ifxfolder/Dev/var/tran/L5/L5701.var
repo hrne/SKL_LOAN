@@ -896,7 +896,7 @@ E(0,@RimContractAmtX,#RimContractAmtX+#L5r01NegFinShareContractAmt{i})
 
 !若簽約總金額修改則放總金額否則放調RIM簽約金額合計
 #ContractAmtX=m,14,S
-IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",E(0,#TotalContrAmt),$)
+IF(#FunctionCode=="01"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",E(0,#TotalContrAmt),$)
 IF(#FunctionCode=="02",IF(#L5r01TotalContrAmt!=#TotalContrAmt,E(0,#TotalContrAmt),E(0,#RimContractAmtX)),$)
 
 ##loop {times:30,i:1,j:0}
@@ -957,6 +957,7 @@ C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額錯�
 ##loop {times:30,i:1}
 C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW,grd1_{i},0),$)
 ##end
+
 
 </sub>
 

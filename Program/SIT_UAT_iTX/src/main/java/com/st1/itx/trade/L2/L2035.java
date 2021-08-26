@@ -1,10 +1,6 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -15,8 +11,6 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ReltMain;
-import com.st1.itx.db.service.ReltCompanyService;
-import com.st1.itx.db.service.ReltFamilyService;
 import com.st1.itx.db.service.ReltMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -36,19 +30,10 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2035 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2035.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public ReltMainService sReltMainService;
-
-	/* DB服務注入 */
-	@Autowired
-	public ReltFamilyService sReltFamilyService;
-
-	/* DB服務注入 */
-	@Autowired
-	public ReltCompanyService sReltCompanyService;
 
 	/* 日期工具 */
 	@Autowired
@@ -74,57 +59,28 @@ public class L2035 extends TradeBuffer {
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		// 取tita案件編號
 		int iCaseNo = parse.stringToInteger(titaVo.getParam("CaseNo"));
-		// new array list
-		List<ReltMain> lReltMain = new ArrayList<ReltMain>();
 		
-		Slice<ReltMain> slReltMain = null;
-
-		ReltMain tReltMain = new ReltMain();
-
-		if (iCustNo != 0) {
-
-			slReltMain = sReltMainService.CustNoEq(iCustNo, index, limit, titaVo);
-
-			if (slReltMain == null) {
-				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
-			}
-			
-			for(ReltMain tMain: slReltMain) {
-			  lReltMain.add(tMain);
-			}
-
-		} else {
-
-			tReltMain = sReltMainService.CaseNoFirst(iCaseNo, titaVo);
-
-			if (tReltMain == null) {
+		ReltMain iReltMain = new ReltMain();
+		Slice<ReltMain> sReltMain = null;
+		OccursList occursList = new OccursList();
+		if (iCustNo == 0) {
+			iReltMain = sReltMainService.caseNoFirst(iCaseNo, titaVo);
+			if (iReltMain == null) {
 				throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
 			}
-			
-			lReltMain.add(tReltMain);
+			occursList.putParam("OOCaseNo", iReltMain.getCaseNo());
+		}else {
+			sReltMain = sReltMainService.custNoEq(iCustNo,this.index,this.limit, titaVo);
+			if (sReltMain == null) {
+				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
+			}
+			for (ReltMain ssReltMain:sReltMain) {
+				iReltMain = new ReltMain();
+				occursList.putParam("OOCaseNo", ssReltMain.getCaseNo());
+			}
 		}
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-//		if (slReltMain != null && slReltMain.hasNext()) {
-//			titaVo.setReturnIndex(this.setIndexNext());
-//			/* 手動折返 */
-//			this.totaVo.setMsgEndToEnter();
-//		}
-		for (ReltMain tmpReltMain : lReltMain) {
-			this.info("tGuarantor L2035" + tReltMain);
-			// new occurs
-			OccursList occursList = new OccursList();
-			
-			occursList.putParam("OOCaseNo", tmpReltMain.getCaseNo());
-			occursList.putParam("OOCustNo", tmpReltMain.getCustNo());
-			occursList.putParam("OOReltId", tmpReltMain.getReltId());
-			occursList.putParam("OORelName", tmpReltMain.getReltName());
-			occursList.putParam("OOPosInd", tmpReltMain.getReltCode());
-			occursList.putParam("OORemarkType", tmpReltMain.getRemarkType());
-			occursList.putParam("OORemark", tmpReltMain.getReltmark());
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
-		}
-
+		this.totaVo.addOccursList(occursList);
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

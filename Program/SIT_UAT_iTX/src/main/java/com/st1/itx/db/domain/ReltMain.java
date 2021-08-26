@@ -9,9 +9,11 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
- * ReltMain 關係人主檔<br>
+ * ReltMain 借款戶關係人/關係企業主檔<br>
  * Gen By Tool
  * 
  * @author AdamPan
@@ -26,7 +28,7 @@ public class ReltMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 4853657191439664633L;
+	private static final long serialVersionUID = -9059326639063348120L;
 
 @EmbeddedId
   private ReltMainId reltMainId;
@@ -47,8 +49,8 @@ public class ReltMain implements Serializable {
   @Column(name = "`ReltName`", length = 100)
   private String reltName;
 
-  // 關係人職稱
-  /* 共用代碼檔01 本人02 配偶03 祖(外祖)父母04 父母05 兄弟姊妹06 子女07 孫(外孫)子女08 有控制與從屬關係09 相互投資關係10 董事長11 董事12 監察人99 其他 */
+  // 關係
+  /* 共用代碼檔(CustRelationType)01 本人02 配偶03 祖(外祖)父母04 父母05 兄弟姊妹06 子女07 孫(外孫)子女08 有控制與從屬關係09 相互投資關係10 董事長11 董事12 監察人99 其他 */
   @Column(name = "`ReltCode`", length = 2)
   private String reltCode;
 
@@ -60,6 +62,10 @@ public class ReltMain implements Serializable {
   // 備註
   @Column(name = "`Reltmark`", length = 100)
   private String reltmark;
+
+  // 申請日期
+  @Column(name = "`ApplDate`")
+  private int applDate = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -165,8 +171,8 @@ public class ReltMain implements Serializable {
   }
 
 /**
-	* 關係人職稱<br>
-	* 共用代碼檔
+	* 關係<br>
+	* 共用代碼檔(CustRelationType)
 01 本人
 02 配偶
 03 祖(外祖)父母
@@ -187,8 +193,8 @@ public class ReltMain implements Serializable {
   }
 
 /**
-	* 關係人職稱<br>
-	* 共用代碼檔
+	* 關係<br>
+	* 共用代碼檔(CustRelationType)
 01 本人
 02 配偶
 03 祖(外祖)父母
@@ -203,7 +209,7 @@ public class ReltMain implements Serializable {
 12 監察人
 99 其他
   *
-  * @param reltCode 關係人職稱
+  * @param reltCode 關係
 	*/
   public void setReltCode(String reltCode) {
     this.reltCode = reltCode;
@@ -255,6 +261,25 @@ public class ReltMain implements Serializable {
 	*/
   public void setReltmark(String reltmark) {
     this.reltmark = reltmark;
+  }
+
+/**
+	* 申請日期<br>
+	* 
+	* @return Integer
+	*/
+  public int getApplDate() {
+    return StaticTool.bcToRoc(this.applDate);
+  }
+
+/**
+	* 申請日期<br>
+	* 
+  *
+  * @param applDate 申請日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setApplDate(int applDate) throws LogicException {
+    this.applDate = StaticTool.rocToBc(applDate);
   }
 
 /**
@@ -337,6 +362,7 @@ public class ReltMain implements Serializable {
   @Override
   public String toString() {
     return "ReltMain [reltMainId=" + reltMainId + ", reltName=" + reltName + ", reltCode=" + reltCode + ", remarkType=" + remarkType
-           + ", reltmark=" + reltmark + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", reltmark=" + reltmark + ", applDate=" + applDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

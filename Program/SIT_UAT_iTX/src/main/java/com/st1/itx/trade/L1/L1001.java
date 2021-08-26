@@ -19,14 +19,13 @@ import com.st1.itx.db.domain.CustCross;
 import com.st1.itx.db.domain.CustFin;
 /* DB容器 */
 import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.CustRelMain;
-import com.st1.itx.db.domain.CustRelDetail;
 import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacShareAppl;
 import com.st1.itx.db.domain.Guarantor;
 import com.st1.itx.db.domain.LoanNotYet;
+import com.st1.itx.db.domain.ReltMain;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.CustCrossService;
@@ -34,13 +33,13 @@ import com.st1.itx.db.service.CustFinService;
 /* DB服務 */
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustRelDetailService;
-import com.st1.itx.db.service.CustRelMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.db.service.LoanNotYetService;
+import com.st1.itx.db.service.ReltMainService;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -78,7 +77,7 @@ public class L1001 extends TradeBuffer {
 	public FacMainService sFacMainService;
 
 	@Autowired
-	public CustRelMainService iCustRelMainService;
+	public ReltMainService iReltMainService;
 
 	@Autowired
 	public CustRelDetailService iCustRelDetailService;
@@ -263,11 +262,13 @@ public class L1001 extends TradeBuffer {
 					FacShareApplBTNFg = 1;
 				}
 				// 關聯戶按鈕fg
-				CustRelMain stmpCustRelMain = iCustRelMainService.custRelIdFirst(aCustMain.getCustId(), titaVo);
-				this.info("關聯戶 =" + stmpCustRelMain);
-				if (stmpCustRelMain != null) {
-					Slice<CustRelDetail> stmpCustRelDetail = iCustRelDetailService.custRelMainUKeyEq(stmpCustRelMain.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-					if (stmpCustRelDetail != null) {
+				ReltMain stmpReltMain = iReltMainService.reltIdFirst(aCustMain.getCustId(), titaVo);
+				this.info("關聯戶 =" + stmpReltMain);
+				if (stmpReltMain != null) {
+					CustRelBTNFg = 1;
+				}else {
+					ReltMain stmpReltMain1 = iReltMainService.custNoFirst(aCustMain.getCustNo(), titaVo);
+					if (stmpReltMain1 != null) {
 						CustRelBTNFg = 1;
 					}
 				}
@@ -432,11 +433,13 @@ public class L1001 extends TradeBuffer {
 				FacShareApplBTNFg2 = 1;
 			}
 			// 關聯戶按鈕fg
-			CustRelMain stmpCustRelMain2 = iCustRelMainService.custRelIdFirst(iCustMain2.getCustId(), titaVo);
-			this.info("關聯戶 =" + stmpCustRelMain2);
-			if (stmpCustRelMain2 != null) {
-				Slice<CustRelDetail> stmpCustRelDetail2 = iCustRelDetailService.custRelMainUKeyEq(stmpCustRelMain2.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-				if (stmpCustRelDetail2 != null) {
+			ReltMain stmpReltMain2 = iReltMainService.reltIdFirst(iCustMain2.getCustId(), titaVo);
+			this.info("關聯戶 =" + stmpReltMain2);
+			if (stmpReltMain2 != null) {
+				CustRelBTNFg2 = 1;
+			}else {
+				ReltMain stmpReltMain21 = iReltMainService.custNoFirst(iCustMain2.getCustNo(), titaVo);
+				if (stmpReltMain21 != null) {
 					CustRelBTNFg2 = 1;
 				}
 			}
@@ -599,11 +602,13 @@ public class L1001 extends TradeBuffer {
 				}
 				
 				// 關聯戶按鈕fg
-				CustRelMain stmpCustRelMain3 = iCustRelMainService.custRelIdFirst(bCustMain.getCustId(), titaVo);
-				this.info("關聯戶 =" + stmpCustRelMain3);
-				if (stmpCustRelMain3 != null) {
-					Slice<CustRelDetail> stmpCustRelDetail3 = iCustRelDetailService.custRelMainUKeyEq(stmpCustRelMain3.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-					if (stmpCustRelDetail3 != null) {
+				ReltMain stmpReltMain3 = iReltMainService.reltIdFirst(bCustMain.getCustId(), titaVo);
+				this.info("關聯戶 =" + stmpReltMain3);
+				if (stmpReltMain3 != null) {
+					CustRelBTNFg3 = 1;
+				}else {
+					ReltMain stmpReltMain31 = iReltMainService.custNoFirst(bCustMain.getCustNo(), titaVo);
+					if (stmpReltMain31 != null) {
 						CustRelBTNFg3 = 1;
 					}
 				}
@@ -777,11 +782,13 @@ public class L1001 extends TradeBuffer {
 				
 
 				// 關聯戶按鈕fg
-				CustRelMain stmpCustRelMain4 = iCustRelMainService.custRelIdFirst(dCustMain.getCustId(), titaVo);
-				this.info("關聯戶 =" + stmpCustRelMain4);
-				if (stmpCustRelMain4 != null) {
-					Slice<CustRelDetail> stmpCustRelDetail4 = iCustRelDetailService.custRelMainUKeyEq(stmpCustRelMain4.getUkey(), 0, Integer.MAX_VALUE, titaVo);
-					if (stmpCustRelDetail4 != null) {
+				ReltMain stmpReltMain4 = iReltMainService.reltIdFirst(dCustMain.getCustId(), titaVo);
+				this.info("關聯戶 =" + stmpReltMain4);
+				if (stmpReltMain4 != null) {
+					CustRelBTNFg4 = 1;
+				}else {
+					ReltMain stmpReltMain41 = iReltMainService.custNoFirst(dCustMain.getCustNo(), titaVo);
+					if (stmpReltMain41 != null) {
 						CustRelBTNFg4 = 1;
 					}
 				}

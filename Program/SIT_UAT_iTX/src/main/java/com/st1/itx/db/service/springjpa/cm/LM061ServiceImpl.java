@@ -98,7 +98,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,CD.\"Item\"";
 		sql += "            ,COL.\"Amount\"";
 		sql += "            ,COL.\"LegalProg\"";
-		sql += "            ,LO.\"BadDebtDate\"";
+		sql += "            ,LO.\"BadDebtAmt\"";
 		sql += "            ,CB.\"BdLocation\"";
 		sql += "            ,'V'";
 //		sql += "            ,M.\"AccCollPsn\"";
@@ -133,7 +133,7 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             				  AND CD.\"Code\" = COL.\"LegalProg\"";
 		sql += "      LEFT JOIN (SELECT \"CustNo\"";
 		sql += "                       ,\"FacmNo\"";
-		sql += "                       ,SUM(NVL(\"BadDebtDate\",0)) AS \"BadDebtDate\"";
+		sql += "                       ,SUM(NVL(\"BadDebtAmt\",0)) AS \"BadDebtAmt\"";
 		sql += "                       ,SUM(NVL(\"OvduAmt\",0)) AS \"OvduAmt\""; // 轉催收本息
 		sql += "                       ,MIN(NVL(\"OvduDate\",99991231)) AS \"OvduDate\""; // 轉催收本息
 		sql += "                 FROM \"LoanOverdue\"";

@@ -161,7 +161,7 @@ public class LQ003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      FROM (SELECT M.\"AcctCode\"";
 		sql += "				  ,M.\"OvduTerm\"";
 		sql += "				  ,DECODE(M.\"EntCode\", '1', 1, 0) AS \"EntCode\"";
-		sql += "                  ,LPAD(M.\"CityCode\",1,0) AS \"CityCode\"";
+		sql += "                  ,LPAD(M.\"CityCode\",2,0) AS \"CityCode\"";
 		sql += "                  ,1 AS \"Cnt\"";
 		sql += "                  ,M.\"PrinBalance\"";
 		sql += "            FROM \"MonthlyFacBal\" M";

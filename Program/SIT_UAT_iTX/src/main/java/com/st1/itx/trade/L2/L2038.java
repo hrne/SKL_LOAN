@@ -17,11 +17,14 @@ import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClLand;
 import com.st1.itx.db.domain.ClLandId;
+import com.st1.itx.db.domain.ClMovables;
+import com.st1.itx.db.domain.ClMovablesId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClLandService;
+import com.st1.itx.db.service.ClMovablesService;
 import com.st1.itx.db.service.ClStockService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L2038ServiceImpl;
@@ -54,6 +57,9 @@ public class L2038 extends TradeBuffer {
 	
 	@Autowired
 	public ClStockService sClStockService;
+	
+	@Autowired
+	public ClMovablesService sClMovablesService;
 	
 	/* DB服務注入 */
 	@Autowired
@@ -155,7 +161,7 @@ public class L2038 extends TradeBuffer {
 						tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
 						
 						if(tClBuilding != null) {
-							occurslist.putParam("OOOther", tClBuilding.getBdLocation());
+							occurslist.putParam("OOOther", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
 						} 
 						
 					} else if( TempClCode1 == 2) {
@@ -170,7 +176,7 @@ public class L2038 extends TradeBuffer {
 							occurslist.putParam("OOOther", tClLand.getLandLocation());
 						} 
 						
-					} else if( TempClCode1 == 3 || TempClCode1 ==4) {
+					} else if( TempClCode1 == 3 || TempClCode1 == 4) {
 						ClStockId tClStockId = new ClStockId();
 						tClStockId.setClCode1(TempClCode1);
 						tClStockId.setClCode2(TempClCode2);
@@ -181,8 +187,19 @@ public class L2038 extends TradeBuffer {
 						if(tClStock != null) {
 							occurslist.putParam("OOOther", tClStock.getStockCode());
 						} 
-					} else {
-					  occurslist.putParam("OOOther", " ");
+					} else if( TempClCode1 == 9){
+						ClMovablesId tClMovablesId = new ClMovablesId();
+						tClMovablesId.setClCode1(TempClCode1);
+						tClMovablesId.setClCode2(TempClCode2);
+						tClMovablesId.setClNo(TempClNo);
+						ClMovables tClMovables = new ClMovables();
+						tClMovables = sClMovablesService.findById(tClMovablesId, titaVo);
+						
+						if(tClMovables != null) {
+						  occurslist.putParam("OOOther", tClMovables.getLicenseNo());
+						} else {
+					      occurslist.putParam("OOOther", " ");
+						}
 					}
 					
 					

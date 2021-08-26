@@ -6,9 +6,7 @@ package com.st1.itx.trade.L5;
 
 //import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.LineNumberReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -152,38 +150,24 @@ public class L5706 extends TradeBuffer {
 		// int OccursL=1030;
 
 
-		File file = null;// 讀取檔案
-		String ReadFileName = "";
+		ArrayList<String> lBr = new ArrayList<>();
+		// 編碼參數，設定為UTF-8 || big5
 		try {
-			ReadFileName = FilePath;// 讀取檔案
-			file = new File(ReadFileName);
-		} catch (Exception e) {
+			lBr = FileCom.intputTxt(FilePath, "big5");
+		} catch (IOException e) {
+			this.info("L5706(" + FilePath + ") : " + e.getMessage());
+			String ErrorMsg = "檔案不存在,請查驗路徑.\r\n" + FilePath;
 			// E5006 未預期的錯誤
-			throw new LogicException(titaVo, "E5006", "檔案讀取發生問題");
+			throw new LogicException(titaVo, "E5006", ErrorMsg);
 		}
 		
-		if (file.exists()) {
-			ArrayList<String> lBr = new ArrayList<>();
-			// 編碼參數，設定為UTF-8 || big5
-			try {
-				lBr = FileCom.intputTxt(FilePath, "big5");
-			} catch (IOException e) {
-				this.info("L5706(" + FilePath + ") : " + e.getMessage());
-				throw new LogicException(titaVo, "E5006", "檔案讀取發生問題");
-			}
-			
-			
 			try {
 				
-				long fileLength = file.length();
-				LineNumberReader lineNumberReader = new LineNumberReader(new FileReader(file));
-    			lineNumberReader.skip(fileLength);
-    	        int CountRow = lineNumberReader.getLineNumber();
-    	        lineNumberReader.close();
+				int fileLength = lBr.size();
+				this.info("fileLength=="+fileLength);
 				
-
-
-					for(int i=0; i<CountRow; i++) {
+				for(int i=0; i<fileLength; i++) {
+					
 					String ThisLine = lBr.get(i);
 					this.info("ThisLine == [" + ThisLine + "]");
 					
@@ -199,7 +183,9 @@ public class L5706 extends TradeBuffer {
 					}
 
 					// 結尾須把最後一個客戶分攤檔資料寫入
-					if(i == CountRow-1) {
+					
+					this.info("i=="+i);
+					if(i == fileLength-1) {
 						if (ThisLine.length() > 4 && ("TRLR").equals(ThisLine.substring(0, 4))) {
 							doUpdate(titaVo);
 						} else {
@@ -216,7 +202,7 @@ public class L5706 extends TradeBuffer {
 						String ThisLineUse = ThisLine.substring(39, ThisLine.length());
 
 						Map<String, String[]> mLineCut = cutSkill(Code, ThisLineUse , titaVo);
-						
+						if(mLineCut==null) {continue;}
 
 
 //						ZZM260 各債權金融機構無擔保債權暨還款分配資料 (多筆 Z98)
@@ -273,12 +259,6 @@ public class L5706 extends TradeBuffer {
 				throw new LogicException(titaVo, "EC001", e.getMessage());
 			} 
 			
-			
-		} else {
-			String ErrorMsg = "檔案不存在,請查驗路徑.\r\n" + ReadFileName;
-			// E5006 未預期的錯誤
-			throw new LogicException(titaVo, "E5006", ErrorMsg);
-		}
 		
 		totaVo.putParam("OSuccessFlag", 1);
 		
@@ -465,10 +445,10 @@ public class L5706 extends TradeBuffer {
 		for (int i = 0; i < len; i++) {
 			NewByt[i] = byt[(Start + i)];
 		}
-		String str = new String(NewByt);
+		String str = null;
 		try {
 			// str=new String(str.getBytes("utf-8"));
-			str = new String(str.getBytes("big5"));
+			str = new String(NewByt, "BIG5");
 		} catch (UnsupportedEncodingException e) {
 			this.info("L5706 ByteToString=" + e.toString());
 			// E5010 資料格式轉換有誤

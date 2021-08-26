@@ -1,8 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-//import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -35,33 +32,16 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
 //		LocalDate inputlastYearMonth = inputYearMonth.minusMonths(1);
-		
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		int iYear = Integer.valueOf(titaVo.getParam("inputYear"))+ 1911;
-		int iMonth =Integer.valueOf(titaVo.getParam("inputMonth"));
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		// 當日(int)
-		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthDate = Calendar.getInstance();
-		// 設當年月底日
-		calMonthDate.set(iYear, iMonth, 0);
-
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
-
-	
+		int iYear = Integer.valueOf(titaVo.getParam("inputYear")) + 1911;
+		int iMonth = Integer.valueOf(titaVo.getParam("inputMonth"));
 
 		boolean isMonthZero = iMonth - 1 == 0;
 
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-		
-		// 設上個月底日
-		calMonthDate.set(iYear, iMonth - 1, 0);
+		int ilYear = isMonthZero ? (iYear - 1) : iYear;
+		int ilMonth = isMonthZero ? 12 : iMonth - 1;
 
-		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+		this.info("thisMonthEndDate:" + (iYear * 100 + iMonth) + "~thisMonthEndDate:" + (ilYear * 100 + ilMonth));
 
 		String sql = "WITH rawData AS ( ";
 		sql += "      SELECT DECODE(NVL(MLB.\"AcctCode\", ' '), '990', '990', 'OTHER') AS \"AcctCode\"";
@@ -187,8 +167,8 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //		query.setParameter("inputYearMonth", Integer.toString(inputYearMonth.getYear()) + String.format("%02d", inputYearMonth.getMonthValue()));
 //		query.setParameter("lastYearMonth", Integer.toString(inputlastYearMonth.getYear()) + String.format("%02d", inputlastYearMonth.getMonthValue()));
-		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
-		query.setParameter("lastYearMonth", lastMonthEndDate / 100);
+		query.setParameter("inputYearMonth", iYear * 100 + iMonth);
+		query.setParameter("lastYearMonth", ilYear * 100 + ilMonth);
 		return this.convertToMap(query.getResultList());
 	}
 

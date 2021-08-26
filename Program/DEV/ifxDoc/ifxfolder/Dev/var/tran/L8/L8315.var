@@ -82,6 +82,7 @@ T(3,CdCode.PayOffResult)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
+! S(XXR99,01,#CDDEF0001)
 S(XXR99,01,#CDDEF0001,#CDDEF0002)
 R(1,XXR99)
 CALL(#HelpProc)
@@ -112,17 +113,17 @@ T(F,@RcDate,1)T(F,@MaxMainCode,1)T(F,@PayOffResult,1)T(F,@PayOffDate,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdMaxMainCode,*)
-T(2,@PayOffResult,*)
-T(2,@PayOffDate,*)
+T(2,@FdPayOffResult,*)
+T(2,@FdPayOffDate,*)
 
 
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@PayOffResult,1)
-T(1,@Ukey,#NTXBUF,3,32)
-T(2,@PayOffResult,*)
+T(2,@FdPayOffResult,*)
 
 
 
@@ -131,7 +132,6 @@ T(2,@PayOffResult,*)
 C(5,#TranKey_Tmp,5,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(NOBUTTON,CLOSEY)
-T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 
 ! 刪除進入
 #Deal_Delete=X,1,S
@@ -161,7 +161,6 @@ T(2,@RimUkey,#Ukey)
 RESET_RIM(#RimL8r26,L8R26)
 S(L8R26,1,#RimUkey)
 R(1,L8R26)
-T(2,@TranKey,#L8r26TranKey)
 T(2,@CustId,#L8r26CustId)
 T(2,@SubmitKey,#L8r26SubmitKey)
 E(0,@RcDate,#L8r26RcDate)
@@ -171,11 +170,16 @@ E(0,@PayOffDate,#L8r26PayOffDate)
 E(0,@OutJcicTxtDate,#L8r26OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(H,#PayOffResult,#PayOffResultHelp)
+! T(H,@PayOffResultX,#PayOffResult,#PayOffResultHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r26TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@MaxMainCodeX,#L8r01JcicBankName)
 ! 調Rim相關 結束
 
 
@@ -188,7 +192,12 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
+
 #TranKeyX=X,4,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+T(H,#TranKey,#TranKeyHelp)
 
 ![債務人IDN]
 #CustId=X,10,L
@@ -235,6 +244,7 @@ T(H,#PayOffResult,#PayOffResultHelp)
 #PayOffDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @A(DATE,0,#PayOffDate)
 

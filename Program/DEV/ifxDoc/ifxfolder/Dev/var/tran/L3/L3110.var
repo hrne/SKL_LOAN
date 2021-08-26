@@ -1,0 +1,2114 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,XW111)
+
+![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款 03:債協 09:放款
+#SECNO=_,_,S
+T(3,01)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,2)
+
+#ACTFG=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,1)
+
+![借貸別 (1:借 2:貸)]
+#CRDB=_,_,S
+E(0,1)
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#WkInitFd=X,1,S
+T(2,@FdActFg, )
+T(2,@FdCustNo, )
+T(2,@FdCustId, )
+T(2,@FdApplNo, )
+T(2,@FdFacmNo,*)
+T(2,@FdBormNo, )
+T(2,@FdProdNo, )
+T(2,@FdBaseRateCode, ) 
+T(2,@FdBaseRate, ) 
+T(2,@FdProdRate, )
+T(2,@FdRateIncr,)                  
+T(2,@FdApproveRate, )
+T(2,@FdRateCode, )
+T(2,@FdRateAdjFreq,*)
+T(2,@FdAcctCode, )　       
+T(2,@FdDrawdownCode, )
+T(2,@FdCurrencyCode, )
+T(2,@FdDrawdownAmt,*)
+T(2,@FdDrawdownDate,*)
+T(2,@FdLoanTerm, )
+T(2,@FdMaturityDate, )             
+T(2,@FdAmortizedCode,*)
+T(2,@FdFreqBase,*)
+T(2,@FdPayIntFreq,*)               
+T(2,@FdRepayFreq,*)
+T(2,@FdGracePeriod, )
+T(2,@FdGraceDate, )
+T(2,@FdSpecificDd,*)                  
+T(2,@FdFirstDueDate,*)
+T(2,@FdFirstAdjRateDate,*)
+T(2,@FdAcctFee, )
+T(2,@FdFinalBal, )
+T(2,@FdRepayCode, )
+T(2,@FdRepayAcctNo, )
+T(2,@FdRepayBank, )           
+T(2,@FdPostCode, )
+T(2,@FdRelationCode, )
+T(2,@FdRelationName, )
+T(2,@FdRelationId, )
+T(2,@FdRelationBirthday, )
+T(2,@FdRelationGender, )
+T(2,@FdCustTypeCode, )
+T(2,@FdNotYetFlag, )
+T(2,@FdPieceCode,*)
+T(2,@FdUsageCode, )
+T(2,@FdSyndNo, )
+!T(2,@FdRenewFlag,*)  
+</sub>
+
+!=====================================================================
+!#FKEY>0時，重新執行
+!=====================================================================
+<sub type="PREDC" name="PreDC">
+!#PDC=X,1,S
+!C(3,#FKEY,0,NOP,T(R,#MRKEY,#REFNO))
+!C(3,#FKEY,3,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),$)
+!C(3,#FKEY,7,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),s)
+
+!<include src="COM.icf::ACTFGX-RUN.pre"/>
+!<include src="COM.icf::TITLE-RUN.pre"/>
+!<include src="TITF.icf::RPRUN.dec"/>
+
+!先隱藏欄位 FLAG 0=隱藏 1=顯示
+#HIDE2FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE3FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE4FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE5FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE6FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#HIDE7FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#EXPANDFG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+#P2SH=A,2,S
+E(0,7)
+
+#P2S=A,2,S
+E(0,8)
+
+#P2E=A,2,S
+E(0,#P2S+4)
+
+#P3S=A,2,S
+E(0,#P2E+2)
+
+#P3E=A,2,S
+E(0,#P3S)
+
+#P4S=A,2,S
+E(0,#P3E+2)
+
+#P4E=A,2,S
+E(0,#P4S+9)
+
+#P5S=A,2,S
+E(0,#P4E+2)
+
+#P5E=A,2,S
+E(0,#P5S+6)
+
+#P6S=A,2,S
+E(0,#P5E+2)
+
+#P6E=A,2,S
+E(0,#P6S+2)
+
+#P7S=A,2,S
+E(0,#P6E+2)
+
+#P7E=A,2,S
+E(0,#P7S+4)
+
+#KLIGHT=@,1,S
+C(3,#HIDE2FG,1,K(LIGHT,#BTNHIDEP2,TXTRED,0),K(LIGHT,#BTNHIDEP2,TXTRED,-1))
+C(3,#HIDE3FG,1,K(LIGHT,#BTNHIDEP3,TXTRED,0),K(LIGHT,#BTNHIDEP3,TXTRED,-1))
+C(3,#HIDE4FG,1,K(LIGHT,#BTNHIDEP4,TXTRED,0),K(LIGHT,#BTNHIDEP4,TXTRED,-1))
+C(3,#HIDE5FG,1,K(LIGHT,#BTNHIDEP5,TXTRED,0),K(LIGHT,#BTNHIDEP5,TXTRED,-1))
+C(3,#HIDE6FG,1,K(LIGHT,#BTNHIDEP6,TXTRED,0),K(LIGHT,#BTNHIDEP6,TXTRED,-1))
+C(3,#HIDE7FG,1,K(LIGHT,#BTNHIDEP7,TXTRED,0),K(LIGHT,#BTNHIDEP7,TXTRED,-1))
+IF(#NotYetFlag=="Y",SHOW(#BTN6),HIDE(#BTN6))
+CALL(#CALLGRID)
+
+!控制階梯式利率
+#CALLGRID=@,1,S
+##loop{times:10,n:1,k:2}
+IF(#StepRateMonthE{n}==0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+##end
+
+
+!--- P2 利率
+#HIDEP2=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE2FG,1,E(0,@HIDE2FG,0),E(0,@HIDE2FG,1))
+INVOKEJS(SHOW,p1,#P2S,#P2E,#HIDE2FG)
+C(3,#HIDE2FG,1,K(LIGHT,#BTNHIDEP2,TXTRED,0),K(LIGHT,#BTNHIDEP2,TXTRED,-1))
+C(3,#HIDE2FG,1,$,s)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
+C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+CALL(#KLIGHT)
+
+!--- P3 階梯式利率
+#HIDEP3=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE3FG,1,E(0,@HIDE3FG,0),E(0,@HIDE3FG,1))
+INVOKEJS(SHOW,p1,#P3S,#P3E,#HIDE3FG)
+C(3,#HIDE3FG,1,K(LIGHT,#BTNHIDEP3,TXTRED,0),K(LIGHT,#BTNHIDEP3,TXTRED,-1))
+C(3,#HIDE3FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
+C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$) 
+CALL(#KLIGHT)
+
+!--- P4 金額日期
+#HIDEP4=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE4FG,1,E(0,@HIDE4FG,0),E(0,@HIDE4FG,1))
+INVOKEJS(SHOW,p1,#P4S,#P4E,#HIDE4FG)
+C(3,#HIDE4FG,1,K(LIGHT,#BTNHIDEP4,TXTRED,0),K(LIGHT,#BTNHIDEP4,TXTRED,-1))
+C(3,#HIDE4FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+CALL(#KLIGHT)
+
+!--- P5 扣款帳號
+#HIDEP5=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE5FG,1,E(0,@HIDE5FG,0),E(0,@HIDE5FG,1))
+INVOKEJS(SHOW,p1,#P5S,#P5E,#HIDE5FG)
+C(3,#HIDE5FG,1,K(LIGHT,#BTNHIDEP5,TXTRED,0),K(LIGHT,#BTNHIDEP5,TXTRED,-1))
+C(3,#HIDE5FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+CALL(#KLIGHT)
+
+!--- P6 其他
+#HIDEP6=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE6FG,1,E(0,@HIDE6FG,0),E(0,@HIDE6FG,1))
+INVOKEJS(SHOW,p1,#P6S,#P6E,#HIDE6FG)
+C(3,#HIDE6FG,1,K(LIGHT,#BTNHIDEP6,TXTRED,0),K(LIGHT,#BTNHIDEP6,TXTRED,-1))
+C(3,#HIDE6FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
+C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+CALL(#KLIGHT)
+
+!--- P7 匯款帳號
+#HIDEP7=@,1,S
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE7FG,1,E(0,@HIDE7FG,0),E(0,@HIDE7FG,1))
+INVOKEJS(SHOW,p1,#P7S,#P7E,#HIDE7FG)
+C(3,#HIDE7FG,1,K(LIGHT,#BTNHIDEP7,TXTRED,0),K(LIGHT,#BTNHIDEP7,TXTRED,-1))
+C(3,#HIDE7FG,1,$,s)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
+C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+CALL(#KLIGHT)
+
+!--- 展開
+#EXPAND=@,1,S
+C(3,#EXPANDFG,1,E(0,@EXPANDFG,0),E(0,@EXPANDFG,1))
+INVOKEJS(SHOW,p1,#P2SH,#P7E,#EXPANDFG)
+C(3,#EXPANDFG,1,K(LIGHT,#BTNEXPAND,TXTRED,0),K(LIGHT,#BTNEXPAND,TXTRED,-1))
+C(3,#EXPANDFG,1,$,s)
+E(0,@HIDE2FG,0)
+E(0,@HIDE3FG,0)
+E(0,@HIDE4FG,0)
+E(0,@HIDE5FG,0)
+E(0,@HIDE6FG,0)
+E(0,@HIDE7FG,0)
+CALL(#KLIGHT)
+
+!--- 全部關閉
+#CLOSEALL=@,1,S
+INVOKEJS(SHOW,p1,#P2SH,#P7E,0)
+C(3,#EXPANDFG,1,CALL(#EXPAND),$)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#HIDE3FG,1,CALL(#HIDEP3),$)
+C(3,#HIDE4FG,1,CALL(#HIDEP4),$)
+C(3,#HIDE5FG,1,CALL(#HIDEP5),$)
+C(3,#HIDE6FG,1,CALL(#HIDEP6),$)
+C(3,#HIDE7FG,1,CALL(#HIDEP7),$)
+
+#ActFgHelp=x,20,S
+T(3,1:登錄;2:放行)
+
+#INVKALL=X,1,S
+K(MODIFYBUTTON,登錄)
+C(3,#FKEY,0,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,p1,#P2SH,#P7E,0),HIDE(#BTN1,#BTN2,#BTN3,#BTN4))
+! C(3,#FKEY,2,T(H,@ACTFGX,#ActFgHelp),$)
+T(H,@ACTFGX,#ACTFG,#ActFgHelp)
+
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[240,200,200,200];printer.width=[20,35,20,35];order=1">
+[
+["[L3110]                                 預約撥款"],
+[#<->#,"#FdActFg+登放記號",#ACTFGX],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+[#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
+[#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
+["#FdFacmNo+額度編號",#FacmNo,"-",#NewBormNo,"@@@@@@@",#BTN4],
+["#FdBormNo+預約序號",#BormNo],
+[#<->#,"@",#BTNHIDEP2,"@",#BTNHIDEP3,"@",#BTNHIDEP4,"@",#BTNHIDEP5,"@",#BTNHIDEP6,"@",#BTNHIDEP7,"@",#BTNEXPAND],
+[#<->#,"<font color=red>@利率",""],
+[#<->#,"#FdProdNo+商品代碼",#ProdNo,#ProdName],
+["#FdBaseRateCode+指標利率代碼",#BaseRateCode,#BaseRateCodeX], 
+["#FdBaseRate+指標利率",#BaseRate,"@%"], 
+["#FdProdRate+商品利率",#ProdRate,"@%"],
+["#FdRateIncr+利率加減碼",#RateIncr,"@%"],                  
+["#FdApproveRate+核准利率",#ApproveRate,"@%"],
+["#FdRateCode+利率區分",#RateCodeX],
+[#<->#,"#FdRateAdjFreq+利率調整週期",#RateAdjFreq,"@個月",#Wait1],
+[#<->#,"<font color=red>@階梯式利率",""],
+["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[150,200,200,610], p_cols:[15,15,15]}","","",
+["月數","利率種類","利率"],
+[[#StepRateMonths1,"-",#StepRateMonthE1],[#StepRateType1,#StepRateTypeX1],[#StepRateIncr1,#StepRatePer1]],#Wait
+],
+[#<->#,"<font color=red>@金額、日期",""],
+["#FdAcctCode+業務科目",#AcctCodeX],　       
+["#FdDrawdownCode+撥款方式",#DrawdownCodeX],
+["#FdCurrencyCode+幣別",#CurrencyCode],
+["#FdDrawdownAmt+撥款金額",#TwDrawdownAmt,#UsDrawdownAmt,#DrawdownAmtX],
+["#FdDrawdownDate+預約撥款日期",#DrawdownDate],
+["#FdTotalPeriod+總期數",#TotalPeriod],
+["#FdMaturityDate+到期日",#MaturityDate],        
+["#FdIntCalcCode+計息方式",#IntCalcCodeX],     
+["#FdAmortizedCode+攤還方式",#AmortizedCode,#AmortizedCodeX],
+["#FdFreqBase+週期基準",#FreqBase,#FreqBaseX],
+["#FdPayIntFreq+繳息週期",#PayIntFreq,#PayIntFreqX],               
+["#FdRepayFreq+還本週期",#RepayFreq,#RepayFreqX],
+["#FdGracePeriod+寬限期",#GracePeriod,"@個月"],
+["#FdGraceDate+寬限到期日",#GraceDate,#GraceDateX],
+["#FdSpecificDd+指定應繳日",#SpecificDd],                  
+["#FdFirstDueDate+首次應繳日",#FirstDueDate],
+["#FdFirstAdjRateDate+首次利率調整日期",#FirstAdjRateDate],
+["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee,#LbAcctFee],
+["#FdFinalBal+最後一期餘額",#TwFinalBal,#UsFinalBal],
+[#<->#,"<font color=red>@扣款帳號",""],
+["#FdRepayCode+繳款方式",#RepayCodeX],
+["#FdRepayAcctNo+扣款帳號",#RepayAcctNo],
+["#FdRepayBank+扣款銀行",#RepayBankX],             
+["#FdPostCode+郵局存款別",#PostCodeX],
+["#FdRelationCode+與借款人關係",#RelationCodeX], 
+[#<->#,"#FdRelationName+帳戶戶名",#RelationName],
+[#<->#,"#FdRelationId+身份證字號",#RelationId],
+[#<->#,"#FdRelationBirthday+出生日期",#RelationBirthday],
+[#<->#,"#FdRelationGender+性別",#RelationGenderX,#Wait2],
+[#<->#,"<font color=red>@其他",""],
+["#FdCustTypeCode+客戶別",#CustTypeCodeX],
+["#FdNotYetFlag+未齊件",#NotYetFlag,#NotYetFlagX,#BTN6],
+["#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
+["#FdUsageCode+資金用途別",#UsageCodeX],
+["#FdSyndNo+聯貸案序號",#SyndNo],
+["#FdCompensateFlag+是否為代償案件",#CompensateFlag,#CompensateFlagX],
+!["#FdRenewFlag+借新還舊",#RenewFlag,#RenewFlagX],                 
+[#<->#,"<font color=red>@撥款帳號",""],
+[#<->#,"#FdRemitBank+匯款銀行",#RemitBank,#BTN5,#RemitBankX],
+[#<->#,"#FdRemitBranch+匯款分行",#RemitBranch,#RemitBranchX],
+[#<->#,"#FdRemitAcctNo+匯款帳號",#RemitAcctNo],
+[#<->#,"#FdCompensateAcct+戶名",#CompensateAcct],
+[#<->#,"#FdRemark+附言",#Remark],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:額度資料明細;enable:1;tabbable:0;title:L2015 額度明細資料查詢;
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
+#BTN3=X,15,I,ui:button;value:核准號碼明細;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+#BTN4=X,15,I,ui:button;value:放款資料查詢;enable:1;tabbable:0;title:L3001 放款明細資料查詢
+#BTN5=X,15,I,ui:button;value:行庫資料查詢;enable:1;tabbable:0;title:L6071 行庫資料查詢;
+#BTN6=X,15,I,ui:button;value:未齊件查詢;enable:1;tabbable:0;title:L2921 未齊件查詢;
+#BTNHIDEP2=X,15,I,ui:button;value:    利率    ;enable:1;tabbable:0
+#BTNHIDEP3=X,15,I,ui:button;value: 階梯式利率 ;enable:1;tabbable:0
+#BTNHIDEP4=X,15,I,ui:button;value: 金額、日期 ;enable:1;tabbable:0
+!#BTNHIDEP5=X,15,I,ui:button;value:  扣款帳號  ;enable:1;tabbable:0
+#BTNHIDEP6=X,15,I,ui:button;value:   其他     ;enable:1;tabbable:0
+#BTNHIDEP7=X,15,I,ui:button;value:  撥款帳號  ;enable:1;tabbable:0
+!#BTNEXPAND=X,15,I,ui:button;value:   展開     ;enable:1;tabbable:1
+
+#WKHIDE=X,1,S
+HIDE(#Wait,#Wait1,#Wait2)
+C(3,#FKEY,0,SHOW(#BTN1)HIDE(#BTN2,#BTN3,#BTN4)INVOKEJS(SHOW,p1,1,4,1),$)
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!Sex
+#CDDEF01=x,20,S
+T(3,CdCode.Sex)
+
+#SexHelp=x,1024,S
+
+!ProdIntCalcCode
+#CDDEF02=x,25,S
+T(3,CdCode.ProdIntCalcCode)
+
+#ProdIntCalcCodeHelp=x,1024,S
+
+!FacmAmortizedCode 攤還方式
+#CDDEF03=x,25,S
+T(3,CdCode.FacmAmortizedCode)
+
+#FacmAmortizedCodeHelp=x,1024,S
+
+![撥款方式]
+#CDDEF04=x,30,S
+T(3,CdCode.DrawdownCode)
+
+#DrawdownCodeHelp=x,1024,S
+
+![週期基準]
+#CDDEF05=x,30,S
+T(3,CdCode.FreqBase)
+
+#FreqBaseHelp=x,1024,S
+
+![週期基準輸出]
+#CDDEF06=x,30,S
+T(3,CdCode.FreqBase2)
+
+#FreqBase2Help=x,1024,S
+
+![計件代碼]
+#CDDEF07=x,30,S
+T(3,CdCode.PieceCode)
+
+#PieceCodeHelp=x,1024,S
+
+![匯款人身份別]
+#CDDEF08=x,30,S
+T(3,CdCode.CustType)
+
+#CustTypeHelp=x,1024,S
+
+
+![指標利率代碼]
+#CDDEF09=x,30,S
+T(3,CdCode.BaseRate0)
+
+#BaseRateCodeHelp=x,1024,S
+
+
+![幣別名稱]
+#CDDEF10=x,30,S
+T(3,CdCode.Currency)
+
+#CurrencyCodeHelp=x,1024,S
+
+![利率區分]
+#CDDEF11=x,30,S
+T(3,CdCode.FacmRateCode)
+
+#FacmRateCodeHelp=x,1024,S
+
+![業務科目]
+#CDDEF12=x,30,S
+T(3,CdCode.FacmAcctCode)
+
+#FacmAcctCodeHelp=x,1024,S
+
+![繳款方式]
+#CDDEF13=x,30,S
+T(3,CdCode.RepayCode)
+
+#RepayCodeHelp=x,1024,S
+
+![資金用途別]
+#CDDEF14=x,30,S
+T(3,CdCode.UsageCode)
+
+#UsageCodeHelp=x,1024,S
+
+![郵局存款別]
+#CDDEF15=x,30,S
+T(3,CdCode.PostCode)
+
+#PostCodeHelp=x,1024,S
+
+![與借款人關係]
+#CDDEF16=x,30,S
+T(3,CdCode.RelationCode)
+
+#RelationCodeHelp=x,1024,S
+
+#CDDEF17=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S 
+
+!客戶別
+#CDDEF18=x,20,S
+T(3,CdCode.CustTypeCode)
+
+#CustTypeCodeHelp=x,1024,S
+
+!RenewFlag 展期借新還舊記號
+#CDDEF19=x,25,S
+T(3,CdCode.RenewFlag)
+
+#RenewFlagHelp=x,1024,S 
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@SexHelp,#HelpDesc1)
+T(2,@ProdIntCalcCodeHelp,#HelpDesc2)
+T(2,@FacmAmortizedCodeHelp,#HelpDesc3)
+T(2,@DrawdownCodeHelp,#HelpDesc4)
+T(2,@FreqBaseHelp,#HelpDesc5)
+T(2,@FreqBase2Help,#HelpDesc6)
+T(2,@PieceCodeHelp,#HelpDesc7)
+T(2,@CustTypeHelp,#HelpDesc8)
+T(2,@BaseRateCodeHelp,#HelpDesc9)
+T(2,@CurrencyCodeHelp,#HelpDesc10)
+
+#HelpRim2=X,1,S
+RESET_RIM(#HelpRim2,XXR99)
+S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14,#CDDEF15,#CDDEF16,#CDDEF17,#CDDEF18,#CDDEF19)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FacmRateCodeHelp,#HelpDesc1)
+T(2,@FacmAcctCodeHelp,#HelpDesc2)
+T(2,@RepayCodeHelp,#HelpDesc3)
+T(2,@UsageCodeHelp,#HelpDesc4)
+T(2,@PostCodeHelp,#HelpDesc5)
+T(2,@RelationCodeHelp,#HelpDesc6)
+T(2,@CurrPrecisionHelp,#HelpDesc7)
+T(2,@CustTypeCodeHelp,#HelpDesc8)
+T(2,@RenewFlagHelp,#HelpDesc9)
+
+#YNHelp=x,20,S
+T(3,Y:是;N:否)
+
+#INIT=X,1,S
+INVOKEJS(SHOW,p2,0)
+
+#BeforeDrawdownAmt=m,14.2,S
+
+![登放記號]
+#FdActFg=X,2,L
+
+#ACTFGX=X,8,L
+T(3,)T(H,#ACTFG,#ActFgHelp)
+
+#BUF1A=X,18,S
+T(3,00000019999999000)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+
+![借款人戶號]
+!借款人戶號, 統一編號或核准編號擇一輸入
+#FdCustNo=X,2,L
+
+#CustNo=A,7,I
+CALL(#CLOSEALL)
+INVOKEJS(SHOW,p1,1,5,1)
+C(3,#FKEY,0,$,s)
+SHOW(#BTN1)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+
+#WKBTN1=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#CustNo,0,HIDE(#BTN1),SHOW(#BTN1))
+C(3,#CustNo,0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
+
+#BUF1B=X,18,S
+C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
+! T(2,#CustNo+9999999000)
+
+#BIND1B=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+
+#SendL2r07A=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#CustNo,0,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustNoX=X,100,L
+C(3,#FKEY,0,$,s)
+C(3,#CustNo,0,S,$)
+T(2,#L2r07CustName)
+
+#BUF2A=X,100,S
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+
+![統一編號]
+#FdCustId=X,2,L
+
+#CustId=X,10,I
+CALL(#CLOSEALL)
+C(3,#CustNo,0,$,S)
+INVOKEJS(SHOW,p1,3,3,1)
+C(3,#FKEY,0,$,s)
+SHOW(#BTN2)
+@C(4,#CustId,S,$)
+V(7)
+
+#BUF2B=X,100,S
+T(2,0000000+#CustId)
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+
+#CheckCustId=X,1,S
+C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+#WKBTN2=X,1,S
+C(3,#FKEY,0,$,s)
+C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
+C(4,#CustId,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
+
+#SendL2r07B=X,1,S
+C(3,#FKEY,0,$,s)
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@CustIdX,#L2r07CustName)
+
+#CustIdX=X,100,L
+
+#IdCustNo=A,7,S
+C(3,#FKEY,0,$,s)
+C(4,#CustId,E(0,#CustNo),E(0,#L2r07CustNo))
+
+#BUF3A=X,18,S
+T(3,000000199999990)
+
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+
+![核准編號]
+#FdApplNo=X,2,L
+C(3,#FKEY,0,$,s)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+T(3,*)
+
+#ApplNo=A,7,I
+CALL(#CLOSEALL)
+C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
+INVOKEJS(SHOW,p1,4,4,1)
+C(3,#FKEY,0,$,s)
+SHOW(#BTN3)
+@V(2,0)
+
+#WKBTN3=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
+
+#BUF3B=X,18,S
+C(3,#ApplNo,0,T(3,000000199999990),T(2,#ApplNo+99999990))
+! T(2,#ApplNo+99999990)
+
+#BIND3B=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05A=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05A,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+T(2,@FacmNo,#L2r05FacmNo)
+
+#SendL2r07C=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#CustNo,0,$,S)C(4,#CustId,$,S)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07C,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@ApplNoX,#L2r07CustName)
+
+#ApplNoX=X,100,L
+
+#SendL6r28=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimBusinessType,LN)
+RESET_RIM(#SendL6r28,L6R28)
+S(L6R28,1,#RimFuncCode,#RimTxCode,#RimBusinessType)
+R(1,L6R28)
+
+#TimCustNo=A,7,S
+E(0,0)
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+T(2,@LockCustNo,#TimCustNo)
+! <include src="COM.icf::LockControl.rtn"/>
+
+#TimCustNoX=X,100,S
+E(0,0)
+C(3,#CustNo,0,$,T(2,#CustNoX))
+C(4,#CustId,$,T(2,#CustIdX))
+C(3,#ApplNo,0,$,E(0,#ApplNoX))
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+T(2,@CompensateAcct,#TimCustNoX)
+
+#WkCaseNo=A,7,S
+
+#WkFacmNo=A,3,S
+
+#BUF4A=X,34,S
+T(2,#WkCaseNo+#CustNo+#CustId+#ApplNo+#WkFacmNo)
+
+#BIND4A=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3001; ntxbuf=#BUF4A;ntxbuf5=type<-1:FacmNo<-OOFacmNo})
+
+![額度編號]
+!必須輸入
+#FdFacmNo=X,2,L
+C(3,#ApplNo,0,T(3,*)T(F,@FacmNo,1),T(3, )T(F,@FacmNo,0))
+
+#FacmNo=A,3,I
+CALL(#CLOSEALL)
+C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
+C(3,#FKEY,0,$,s)
+C(3,#ApplNo,0,$,s)
+SHOW(#BTN4)
+@V(2,0)
+
+#WKBTN4=X,1,S
+C(3,#FKEY,0,$,s)
+C(3,#ApplNo,0,SHOW(#BTN4),HIDE(#BTN4))
+
+!用CustNo,FacmNo調L2R05
+#SendL2r05B=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#ApplNo,0,$,S)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#IdCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05B,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+
+
+![預定撥款序號]
+#NewBormNo=A,3,L
+
+
+![撥款序號]
+#FdBormNo=X,2,L
+
+#BormNo=A,3,L
+C(3,#FKEY,0,E(0,0),$)
+
+#RcvL2r05A=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+T(2,@ProdNo,#L2r05ProdNo)
+T(2,@BaseRateCode,#L2r05BaseRateCode)
+T(2,@CurrencyCode,#L2r05CurrencyCode)
+E(0,@LoanTermYy,#L2r05LoanTermYy)
+E(0,@LoanTermMm,#L2r05LoanTermMm)
+E(0,@LoanTermDd,#L2r05LoanTermDd)
+E(0,@RateCode,#L2r05RateCode)
+T(2,@IntCalcCode,#L2r05IntCalcCode)
+E(0,@AcctCode,#L2r05AcctCode)
+T(2,@CustTypeCode,#L2r05CustTypeCode)
+E(0,@RepayCode,#L2r05RepayCode)
+E(0,@RepayAcctNo,#L2r05RepayAcctNo)
+E(0,@RepayBank,#L2r05RepayBank)
+T(2,@PostCode,#L2r05PostCode)
+T(2,@RelationCode,#L2r05RelationCode)
+T(2,@RelationName,#L2r05RelationName)
+T(2,@RelationId,#L2r05RelationId)
+E(0,@RelationBirthday,#L2r05RelationBirthday)
+T(2,@RelationGender,#L2r05RelationGender)
+C(3,#FKEY,0,$,s)
+C(3,#L2r05BaseRateCode,99,$,E(0,@RateIncr,#L2r05RateIncr))
+! E(0,@RateIncr,#L2r05RateIncr)
+E(0,@RateAdjFreq,#L2r05RateAdjFreq)
+E(0,@FirstRateAdjFreq,#L2r05FirstRateAdjFreq)
+E(0,@ApproveRate,#L2r05ApproveRate)
+E(0,@AmortizedCode,#L2r05AmortizedCode)
+E(0,@FreqBase,#L2r05FreqBase)
+E(0,@PayIntFreq,#L2r05PayIntFreq)
+E(0,@RepayFreq,#L2r05RepayFreq)
+E(0,@GracePeriod,#L2r05GracePeriod)
+E(0,@TwAcctFee,#L2r05AcctFee)
+E(0,@UsAcctFee,#L2r05AcctFee)
+E(0,@LbTwAcctFee,#L2r05AcctFee)
+E(0,@LbUsAcctFee,#L2r05AcctFee)
+E(0,@UsageCode,#L2r05UsageCode)
+T(2,@PieceCode,#L2r05PieceCode)
+! E(0,@TwDrawdownAmt,#L2r05DuePayAmt)
+! E(0,@UsDrawdownAmt,#L2r05DuePayAmt)
+T(2,@NotYetFlag,#L2r05CloseFg)
+E(0,@NewBormNo,#L2r05RvBormNo)
+T(2,@CompensateFlag,#L2r05CompensateFlag)
+##loop{times:10,n:1}
+E(0,@StepRateMonths{n},#L2r05StepRateMonths{n})
+E(0,@StepRateMonthE{n},#L2r05StepRateMonthE{n})
+E(0,@StepRateType{n},#L2r05StepRateType{n})
+E(0,@StepRateIncr{n},#L2r05StepRateIncr{n})
+T(3,@StepRatePer{n},%)
+##end
+
+
+#RcvL2r05B=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+T(H,@BaseRateCodeX,#BaseRateCode,#BaseRateCodeHelp)      
+T(H,@CurrencyCodeX,#CurrencyCode,#CurrencyCodeHelp) 
+T(H,@RateCodeX,#RateCode,#FacmRateCodeHelp)
+T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
+T(H,@AmortizedCodeX,#AmortizedCode,#FacmAmortizedCodeHelp) 
+T(H,@FreqBaseX,#FreqBase,#FreqBase2Help) 
+T(H,@CustTypeCodeX,#CustTypeCode,#CustTypeHelp)
+T(H,@RepayCodeX,#RepayCode,#RepayCodeHelp)
+T(H,@PieceCodeX,#PieceCode,#PieceCodeHelp)    
+T(H,@UsageCodeX,#UsageCode,#UsageCodeHelp)
+T(H,@PostCodeX,#PostCode,#PostCodeHelp)  
+T(H,@RelationCodeX,#RelationCode,#RelationCodeHelp)
+T(H,@IntCalcCodeX,#IntCalcCode,#ProdIntCalcCodeHelp)
+
+!---- P2 利率
+
+#INVK2=X,1,S
+ENABLE(#BTNHIDEP2)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+
+#BINDP2=X,1,S
+BIND(#BTNHIDEP2,click, {cmd=CALLSEND;DOCODE=HIDEP2})
+
+![商品代碼]
+!依核准額度自動顯示不必輸入 L2R05
+#FdProdNo=X,2,L
+
+#ProdNo=X,5,L
+
+#SendL2r01=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimProdNo,#ProdNo)
+RESET_RIM(#SendL2r01,L2R01)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+T(2,@ProdName,#L2r01ProdName)
+
+#ProdName=X,60,L
+         
+![指標利率代碼]
+!依核准額度自動顯示不必輸入 L2R05
+#FdBaseRateCode=X,2,L
+
+#BaseRateCode=A,2,L
+
+#BaseRateCodeX=X,30,L
+C(3,#BaseRateCode,0,S,$)T(H,#BaseRateCode,#BaseRateCodeHelp)            
+
+#EffectDate=D,7,S
+E(0,#SYSDATE)
+
+#SendL2r06=X,1,S
+T(2,@RimCurrencyCode,#L2r05CurrencyCode)
+T(2,@RimBaseRateCode,#BaseRateCode)
+E(0,@RimEffectDate,#EffectDate)
+E(0,@RimEffectTime,0)
+RESET_RIM(#SendL2r06,L2R06)
+S(L2R06,1,#RimTxCode,#RimCurrencyCode,#RimBaseRateCode,#RimEffectDate,#RimEffectTime)
+R(1,L2R06)
+
+![指標利率]
+!L2R01
+#FdBaseRate=X,2,L
+
+#BaseRate=n,2.4,L
+E(0,#L2r06Rate)
+                
+![商品利率]
+!依核准額度自動顯示不必輸入 L2R01
+#FdProdRate=X,2,L
+
+#ProdRate=n,2.4,L
+E(0,#BaseRate+#L2r01ProdIncr)
+
+![利率加減碼]  
+!依核准額度自動顯示不必輸入 L2R05
+#FdRateIncr=X,2,L
+
+#RateIncr=+n,2.4,L
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+C(3,#FKEY,7,T(2,@BeforeDrawdownAmt,#TimDrawdownAmt),$)
+                  
+![核准利率]
+!依核准額度自動顯示不必輸入 L2R05
+#FdApproveRate=X,2,L
+
+#ApproveRate=n,2.4,L
+E(0,#BaseRate+#RateIncr)
+C(3,#BaseRateCode,99,E(0,#L2r05ApproveRate),$)
+
+![利率區分]
+!依核准額度自動顯示不必輸入 L2R05
+#FdRateCode=X,2,L
+
+#RateCode=A,1,S
+
+#RateCodeX=X,10,L
+T(3,)T(H,#RateCode,#FacmRateCodeHelp)            
+
+![利率調整週期]
+!利率區分為 '3' 者，必須輸入利率調整週
+#FdRateAdjFreq=X,2,L
+C(3,#RateCode,3,T(3,*)T(F,@RateAdjFreq,1),T(3, )T(F,@RateAdjFreq,0))
+
+#RateAdjFreq=A,2,I
+C(3,#RateCode,3,$,S)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+@V(2,0)
+
+!首次利率調整週期
+#FirstRateAdjFreq=X,2,S
+
+#Wait1=X,1,I 
+C(3,#RateCode,3,S,$)
+C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
+
+!--- P3 階梯式利率
+#INVK3=X,1,S
+ENABLE(#BTNHIDEP3)
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+
+#BINDP3=X,1,S
+BIND(#BTNHIDEP3,click, {cmd=CALLSEND;DOCODE=HIDEP3})
+
+##loop{times:10,n:1}
+
+#SHOWSTEP{n}=X,1,S
+SHOW(#StepRateMonths{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n})
+
+#StepRateMonths{n}=A,3,L
+E(0,#L2r05StepRateMonths{n})
+#StepRateMonthE{n}=A,3,L
+E(0,#L2r05StepRateMonthE{n})
+
+#StepRateType{n}=A,1,L
+E(0,#L2r05StepRateType{n})
+
+#StepRateTypeX{n}=X,10,L
+C(3,#StepRateType{n},0,S,$)
+SWITCH(#StepRateType{n},1,T(3,固定利率)
+                     ,2,T(3,加碼利率)
+                     ,,T(3,))
+! T(A,#StepRateCode{n},L2DEF,FacmRateCodeDef,FacmRateCode,FacmRateCodeX)
+
+#StepRateIncr{n}=+n,2.4,L
+E(0,#L2r05StepRateIncr{n})
+
+
+#StepRatePer{n}=X,2,L
+T(3,@StepRatePer{n},%)
+
+
+#HIDESTEP{n}=X,1,S
+IF({n} > 1 && #StepRateMonths{n}==0,$,S)
+HIDE(#StepRateMonths{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n})
+
+##end
+
+!#BTNHIDEP3=X,15,I,ui:button;value: 階梯式利率 ;enable:1;tabbable:0
+!C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+
+#Wait=X,1,I 
+C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
+
+
+
+!---- P4 金額日期
+#INVK4=X,1,S
+ENABLE(#BTNHIDEP4)
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+
+#BINDP4=X,1,S
+BIND(#BTNHIDEP4,click, {cmd=CALLSEND;DOCODE=HIDEP4})
+
+#PRECISION=N,1,S
+E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
+
+#WkCharCodeP4=X,1,S
+SHOW(#FreqBase,#AmortizedCode,#GraceDate)
+HIDE(#DrawdownAmtX,#GraceDateX)
+T(F,@FreqBase,1)
+T(F,@PayIntFreq,1)
+T(F,@RepayFreq,1)
+T(F,@GracePeriod,1)
+T(F,@GraceDate,1)
+C(5,#L2r01CharCode,2,$,S)
+HIDE(#FreqBase,#AmortizedCode)
+T(3,@FdDrawdownAmt, )
+T(3,@FdAmortizedCode, )
+T(3,@FdFreqBase, )
+T(3,@FdPayIntFreq, )
+T(3,@FdRepayFreq, )
+T(3,@FdFinalBal, )
+T(F,@FreqBase,0)
+T(F,@PayIntFreq,0)
+T(F,@RepayFreq,0)
+T(F,@GracePeriod,0)
+T(F,@GraceDate,0)
+E(0,@TwFinalBal,0)
+E(0,@UsFinalBal,0)
+HIDE(#TwDrawdownAmt,#UsDrawdownAmt,#TwAcctFee,#UsAcctFee,#GraceDate,#TwFinalBal,#UsFinalBal)
+SHOW(#DrawdownAmtX,#GraceDateX,#LbAcctFee)
+! CALL2(#ADJUSTDOT,#PRECISION,#L2r05DuePayAmt,#DrawdownAmtX)
+
+#WKHIDEAMT=X,1,S
+C(5,#L2r01CharCode,2,S,$)
+C(3,#PRECISION,0,SHOW(#TwDrawdownAmt,#TwAcctFee,#TwFinalBal)
+                 HIDE(#UsDrawdownAmt,#UsAcctFee,#UsFinalBal,#LbAcctFee)
+                ,HIDE(#TwDrawdownAmt,#TwAcctFee,#UsFinalBal,#LbAcctFee)
+                 SHOW(#UsDrawdownAmt,#UsAcctFee,#TwFinalBal))
+!個金                 
+#WKHIDEDEPT=X,1,S                 
+C(3,#L2r05DepartmentCode,1,S,$)
+SHOW(#LbAcctFee)
+HIDE(#TwAcctFee,#UsAcctFee)
+
+#LbAcctFee=X,21,L
+C(3,#PRECISION,0,X(#LbTwAcctFee),X(#LbUsAcctFee))
+P(L,#LbAcctFee)
+
+![業務科目]　
+!依核准額度自動顯示不必輸入 L2R05
+#FdAcctCode=X,2,L
+
+#AcctCode=A,3,S
+
+#AcctCodeX=X,20,L
+T(3,)T(H,#AcctCode,#FacmAcctCodeHelp)
+
+
+![撥款方式]
+!預約撥款,撥款方式僅提供整批匯款。
+#FdDrawdownCode=X,2,L
+
+#DrawdownCode=A,1,S
+E(0,1)
+
+#DrawdownCodeX=X,10,L   
+T(3,)T(H,#DrawdownCode,#DrawdownCodeHelp)            
+
+![幣別]
+!L2R05
+#FdCurrencyCode=X,2,L
+
+#CurrencyCode=X,3,L
+
+#CurrencyCodeX=X,10,S
+
+![SWIFT幣別三碼]
+#CURNM=_,_,S
+T(2,#CurrencyCode)
+
+!可使用額度
+#Available=+m,14.2,S
+E(0,#L2r05LineAmt-#L2r05UtilBal+#BeforeDrawdownAmt-#L2r05RvDrawdownAmt)
+
+![撥款金額]
+!必須輸入
+#FdDrawdownAmt=X,2,L
+
+#TwDrawdownAmt=m,14,I
+C(5,#L2r01CharCode,2,s,$)
+C(3,#PRECISION,0,$,s)
+@V(2,0)V(5,#L2r01LowAmt,#Available)
+
+#UsDrawdownAmt=m,14.2,I
+C(5,#L2r01CharCode,2,s,$)
+C(3,#PRECISION,0,s,$)
+@V(2,0)V(5,#L2r01LowAmt,#Available)
+
+#TimDrawdownAmt=m,14.2,S
+C(3,#PRECISION,0,E(0,#TwDrawdownAmt),E(0,#UsDrawdownAmt))
+
+#DrawdownAmtX=X,22,L
+CALL2(#ADJUSTDOT,#PRECISION,#TimDrawdownAmt,#DrawdownAmtX)
+
+![交易金額]
+#TXAMT=_,_,S
+E(0,#TimDrawdownAmt)
+
+#WKNDY=D,8,S
+E(0,#SYSNDATE)
+
+#WKDDEND=D,8,S
+D(7,2,#SYSDATE,1,0)
+
+#WKDEADLINE=D,7,S
+C(3,#L2r05RecycleCode,0,E(0,#L2r05UtilDeadline),C(3,#L2r05UtilAmt,0,E(0,#L2r05UtilDeadline),E(0,#L2r05RecycleDeadline)))
+
+#MINDATE=D,7,S
+M(L,#WKDDEND,#WKDEADLINE)
+
+![撥款日期]
+!必須輸入且 >= 次會計日期
+!ii.撥款時,由使用者輸入,畫面初值為次會計日期.
+!  a.非循環動用者，撥款（展期）日期應≦動支期限
+!  b.循環動用且從未撥款者，撥款（展期）日期<=動支期限
+!  c.循環動用者，撥款（展期）日期應<=循環動用期限
+#FdDrawdownDate=X,2,L
+
+#DrawdownDate=D,7,I
+E(0,#WKNDY)
+@V(7)A(DATE,0,#DrawdownDate)
+V(5,#WKNDY,#WKDDEND)
+! V(5,#WKNDY,#MINDATE)
+  
+![貸款期間]
+!必須輸入
+#FdLoanTerm=X,2,L
+
+#LoanTermYy=A,2,L
+E(0,#L2r05LoanTermYy)
+
+#LoanTermMm=A,2,L
+E(0,#L2r05LoanTermMm)
+
+#LoanTermDd=A,3,L
+E(0,#L2r05LoanTermDd)
+
+#WkYyMm=N,8,S
+E(0,#L2r05LoanTermYy*12+#L2r05LoanTermMm)
+
+#WkBeginMm=A,2,S
+C(3,#AcctCode,310,E(0,1),$)
+C(3,#AcctCode,320,E(0,#L6R28AcctCode320A*12),$)
+C(3,#AcctCode,330,E(0,#L6R28AcctCode330A*12),$)
+C(3,#AcctCode,340,E(0,#L6R28AcctCode330A*12),$)
+
+
+#WkBeginDate=D,8,S
+C(3,#L2r05FirstDrawdownDate,0,D(7,2,#DrawdownDate,#WkBeginMm,0),D(7,2,#L2r05FirstDrawdownDate,#WkBeginMm,0))
+
+#WkMaturityDate=D,8,S
+C(3,#L2r05FirstDrawdownDate,0,D(7,2,#DrawdownDate,#WkYyMm,#LoanTermDd),E(0,#L2r05MaturityDate))
+
+![到期日]
+!自動顯示
+#FdMaturityDate=X,2,L
+
+#MaturityDate=D,7,L
+E(0,#WkMaturityDate)
+!C(3,#MaturityDate,0,E(0,#WkMaturityDate),$)
+!@A(DATE,0,#MaturityDate)
+!V(5,#WkBeginDate,#WkMaturityDate)
+
+#WkDifferenceDate=A,8,S
+D(7,1,#DrawdownDate,#MaturityDate,0)
+T(1,@LoanTermYy,#WkDifferenceDate,003,002)
+T(1,@LoanTermMm,#WkDifferenceDate,005,002)
+T(1,@LoanTermDd,#WkDifferenceDate,007,002)
+                
+!計息方式
+#FdIntCalcCode=X,2,L
+
+#IntCalcCode=X,1,L
+
+#IntCalcCodeX=X,8,L
+T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
+
+
+
+![攤還方式] 
+!1.按月繳息 2.到期取息  3.本息平均法  4.本金平均法
+!必須輸入  
+#FdAmortizedCode=X,2,L
+
+#AmortizedCode=A,1,I
+C(5,#L2r01CharCode,2,s,$)
+HELP(#FacmAmortizedCodeHelp)
+@V(H,#FacmAmortizedCodeHelp)
+C(3,#AcctCode,330,V(2,1),$)
+C(3,#AcctCode,340,V(2,1),$)
+!利率為0,攤還方式不可為本息平均法
+C(3,#ApproveRate,0,V(2,3),$)
+
+#AmortizedCodeX=X,12,L
+T(3,)T(H,#AmortizedCode,#FacmAmortizedCodeHelp)            
+
+![週期基準]  
+!1:日 2:月 3:週
+!必須輸入,內定值為月 
+#FdFreqBase=X,2,L
+
+#FreqBase=A,1,I
+HELP(#FreqBaseHelp)
+!到期取息者,週期基準固定為月不必輸入
+C(3,#AmortizedCode,2,E(0,2),$)C(3,#AmortizedCode,2,s,$)  
+C(3,#FreqBase,0,E(0,2),$)
+C(5,#L2r01CharCode,2,s,$)
+@V(H,#FreqBaseHelp)
+!本息平均法者,週期基準只能是月或週
+C(3,#AmortizedCode,3,V(1,2,3),$) 
+!本金平均法者,週期基準只能是月或週 
+C(3,#AmortizedCode,4,V(1,2,3),$)  
+
+#FreqBaseX=X,8,L
+T(3,)T(H,#FreqBase,#FreqBaseHelp)            
+               
+#PayIntFreqX=X,8,L
+T(3,)T(H,#FreqBase,#FreqBase2Help)
+
+#RepayFreqX=X,8,L
+T(3,)T(H,#FreqBase,#FreqBase2Help)
+
+![繳息週期]
+!必須輸入   
+#FdPayIntFreq=X,2,L
+
+!週期基準為週者，繳息週期固定為雙週
+!到期取息者是到期還本繳息，因此沒有繳息週期
+#PayIntFreq=A,2,I
+C(3,#AmortizedCode,2,S,$)     
+C(3,#FreqBase,3,E(0,2),$)C(3,#FreqBase,3,s,$)  
+C(3,#PayIntFreq,0,E(0,1),$)
+C(5,#L2r01CharCode,2,s,$)
+@V(5,1,12)
+
+![還本週期]
+!必須輸入
+#FdRepayFreq=X,2,L
+C(3,#AmortizedCode,1,S,$)                  
+C(3,#AmortizedCode,2,S,$) 
+C(3,#AmortizedCode,3,S,$)      
+IF(#FreqBase==2 && #PayIntFreq > 1,S,$)
+IF(#FreqBase==3 && #PayIntFreq > 2,s,$)
+
+#RepayFreq=A,2,I
+C(5,#L2r01CharCode,2,s,$)
+!按月繳息者是到期還本，因此沒有還本週期
+C(3,#AmortizedCode,1,S,$)    
+!到期取息者是到期還本繳息，因此沒有還本週期                
+C(3,#AmortizedCode,2,S,$)     
+!攤還方式為本息平均法時，還本週期須等於繳息週期               
+IF(#AmortizedCode==3,E(0,#PayIntFreq),$)     
+IF(#AmortizedCode==3,s,$)
+!繳息週期不等於１時，還本週期須等於繳息週期
+IF(#FreqBase==2 && #PayIntFreq > 1,E(0,#PayIntFreq),$)   
+IF(#FreqBase==2 && #PayIntFreq > 1,s,$)
+!繳息週期不等於１時，還本週期須等於繳息週期
+IF(#FreqBase==3 && #PayIntFreq > 2,E(0,#PayIntFreq),$)   
+IF(#FreqBase==3 && #PayIntFreq > 2,s,$)
+C(3,#RepayFreq,0,E(0,1),$)
+@V(5,#PayIntFreq,12)V(5,#PayIntFreq,99)
+
+#WKMM=N,3,S
+E(0,#LoanTermYy*12+#LoanTermMm-1)C(1,#WKMM,E(0,0),$,$)
+
+!計算總期數(週期基準=日,週)
+#WKBEG1=F,8,S
+E(0,#DrawdownDate+19110000)
+
+#WKEND1=F,8,S
+E(0,#MaturityDate+19110000)
+
+#WKDAYCNT=A,5,S
+D(6,1,#WKBEG1,#WKEND1)
+
+#WKBASEDAY=A,1,S
+E(0,1)
+C(3,#FreqBase,3,E(0,7),$)
+
+#WKPERIOD1A=n,5.5,S
+C(3,#FreqBase,2,S,$)
+C(3,#PayIntFreq,0,S,$)
+E(0,#WKDAYCNT/#PayIntFreq/#WKBASEDAY)
+
+#WKPERIOD1B=n,5,S
+C(3,#FreqBase,2,S,$)
+C(3,#PayIntFreq,0,E(0,1),$)
+C(3,#PayIntFreq,0,s,$)
+E(0,#WKDAYCNT/#PayIntFreq/#WKBASEDAY)
+
+!計算總期數(週期基準=月)
+#WKSPCDATE=D,7,S
+E(0,#DrawdownDate)
+
+#WKYYYYMMDD=A,8,S
+D(7,1,#WKSPCDATE,#MaturityDate,0)
+
+#WKYYYY2=N,4,S
+T(1,#WKYYYYMMDD,001,004)
+
+#WKMM2=N,2,S
+T(1,#WKYYYYMMDD,005,002)
+
+#WKDD2=N,2,S
+T(1,#WKYYYYMMDD,007,002)
+!改
+#WKMONTM2=A,4,S
+C(3,#AmortizedCode,2,S,$) 
+C(3,#FreqBase,2,$,S)
+E(0,#WKYYYY2*12+#WKMM2)
+C(3,#WKDD2,0,$,E(0,#WKMONTM2+1))
+
+#WKPERIOD2A=n,3.5,S
+C(3,#AmortizedCode,2,S,$) 
+C(3,#FreqBase,2,$,S)
+C(3,#PayIntFreq,0,S,$)
+E(0,#WKMONTM2/#PayIntFreq)
+
+#WKPERIOD2B=n,3,S
+C(3,#AmortizedCode,2,S,$) 
+C(3,#FreqBase,2,$,S)
+C(3,#PayIntFreq,0,E(0,1),$)
+C(3,#PayIntFreq,0,s,$)
+E(0,#WKMONTM2/#PayIntFreq)
+
+!總期數
+#TotalPeriod1=A,3,S
+C(3,#WKPERIOD1A,#WKPERIOD1B,E(0,#WKPERIOD1B),E(0,#WKPERIOD1B+1))
+
+#TotalPeriod2=A,3,S
+C(3,#WKPERIOD2A,#WKPERIOD2B,E(0,#WKPERIOD2B),E(0,#WKPERIOD2B+1))
+
+#FdTotalPeriod=X,2,L
+#TotalPeriod=A,3,L
+C(3,#AmortizedCode,2,E(0,1),$) 
+C(3,#AmortizedCode,2,s,$) 
+C(3,#FreqBase,2,E(0,#TotalPeriod2),E(0,#TotalPeriod1))
+
+![寬限期]
+!依核准額度自動顯示,可修改
+!攤還方式為本息或本金平均戶時，才可輸入寬限到期日 L2R05
+#FdGracePeriod=X,2,L
+
+#GracePeriod=A,3,I
+C(5,#L2r01CharCode,2,S,$)
+IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
+@V(5,0,#WKMM)
+
+
+#WKGDATE=D,8,S
+C(3,#L2r05FirstDrawdownDate,0,D(7,2,#DrawdownDate,#GracePeriod,0),D(7,2,#L2r05FirstDrawdownDate,#GracePeriod,0))
+                    
+![寬限到期日]
+!攤還方式為本息或本金平均戶時，才可輸入寬限到期日
+#FdGraceDate=X,2,L
+
+#GraceDate=D,7,I
+IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
+C(3,#GracePeriod,0,S,$)
+E(0,#WKGDATE)
+@C(3,#GraceDate,#WKGDATE,s,$)
+A(DATE,0,#GraceDate)
+
+#GraceDateX=X,9,L
+CALL2(#AdjustDate,#GraceDate,#GraceDateX)
+
+#WKGRCDATE=D,8,S
+E(0,#GraceDate)
+
+#WKGYYMMDD=A,8,S
+IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
+C(3,#GracePeriod,0,S,$)
+C(3,#GraceDate,#WKGDATE,S,$)
+D(7,1,#DrawdownDate,#WKGRCDATE,0)
+
+#GDATEYY=N,2,S
+IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
+C(3,#GracePeriod,0,S,$)
+C(3,#GraceDate,#WKGDATE,S,$)
+T(1,#WKGYYMMDD,003,002)
+
+#GDATEMM=N,2,S
+IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
+C(3,#GracePeriod,0,S,$)
+C(3,#GraceDate,#WKGDATE,S,$)
+T(1,#WKGYYMMDD,005,002)
+
+#GDATEYYMM=A,3,S
+IF(#AmortizedCode==3 || #AmortizedCode==4,$,S)
+C(3,#GracePeriod,0,S,$)
+C(3,#GraceDate,#WKGDATE,S,$)
+E(0,#GDATEYY*12+#GDATEMM)
+T(1,@GracePeriod,#GDATEYYMM,001,003)
+!改 原是T(1,#MaturityDate,006,002)取到期日的日期16 造成WKSPDD= 15-16=小於, 14-16=小於,16-16=等於  
+#WKSPDD=A,2,S
+T(1,#DrawdownDate,006,002)
+
+![指定應繳日]
+!必須輸入
+!到期取息者,沒有指定應繳日
+#FdSpecificDd=X,2,L
+C(3,#AmortizedCode,2,S,$)
+C(3,#FreqBase,2,$,S)
+T(3,*)
+
+#SpecificDd=A,2,I
+C(3,#AmortizedCode,2,S,$)
+C(3,#FreqBase,2,$,S)
+C(3,#L2r05SpecificDd,0,E(0,#WKSPDD),E(0,#L2r05SpecificDd))
+@V(5,1,31)
+
+!改 原是T(1,#MaturityDate,006,002)取到期日的日期16 造成WKSPDD= 15-16=小於, 14-16=小於,16-16=等於  
+#WKSP2DD=+m,2,S
+E(0,#SpecificDd-#WKSPDD)
+
+#WKEND2YYMM=A,6,S
+E(0,#MaturityDate/100)
+
+
+#wkmadate=A,8,S
+E(0,#MaturityDate)
+!虛擬基準日
+#VirtualSpecificDate=A,8,S
+E(0,1090100+#SpecificDd)
+
+#VirtualDiff=A,8,S
+D(7,1,#VirtualSpecificDate,#wkmadate,0)
+T(1,@VirtualDiffYY,#VirtualDiff,001,004)
+T(1,@VirtualDiffMM,#VirtualDiff,005,002)
+T(1,@VirtualDiffDD,#VirtualDiff,007,002)
+
+#VirtualDiffYY=A,4,S
+#VirtualDiffMM=A,2,S
+#VirtualDiffDD=A,2,S
+
+!虛擬基準月差
+#VirtualDiffMons=A,8,S
+C(3,#FreqBase,2,$,S)
+C(1,#VirtualDiffDD,E(0,#VirtualDiffYY*12+#VirtualDiffMM),E(0,#VirtualDiffYY*12+#VirtualDiffMM),E(0,#VirtualDiffYY*12+#VirtualDiffMM+1))
+E(0,#VirtualDiffMons-#TotalPeriod*#PayIntFreq)
+
+
+
+!改 原是C(1,#WKSP2DD,E(0,#WKEND2YYMM*100+#SpecificDd),E(0,MaturityDate),E(0,#WKEND2YYMM*100+#SpecificDd))
+!造成首次應繳日的日不對 等於時日會跑成16
+! #WKEND2DATE=D,8,S
+! C(1,#WKSP2DD,E(0,#WKEND2YYMM*100+#SpecificDd),E(0,#WKEND2YYMM*100+#SpecificDd),E(0,#WKEND2YYMM*100+#SpecificDd))
+! C(1,#WKSP2DD,D(7,2,#WKEND2DATE,1,0),$,$)
+! A(DATE,0,#WKEND2DATE)
+
+#WkYyMm2=N,8,S
+E(0,#LoanTermYy*12+#LoanTermMm)
+
+#WKDWMM=A,7,S
+T(1,#DrawdownDate,001,005)
+E(0,#WKDWMM*100)
+
+!指定基準日期
+#SpecificDate=D,8,S
+C(3,#SpecificDd,0,E(0,#DrawdownDate),D(7,3,#VirtualSpecificDate,#VirtualDiffMons,0))
+! C(3,#SpecificDd,0,E(0,#DrawdownDate),D(7,3,#WKEND2DATE,#WkYyMm2,0))
+C(3,#AmortizedCode,5,E(0,#WKDWMM+#SpecificDd))
+
+#WKWEEKINT=A,3,S
+E(0,#PayIntFreq*7)
+
+!下次繳息日處理月
+#NextIntDateFreqBase=A,8,S
+C(3,#FreqBase,2,$,S)
+E(0,#VirtualDiffMons+#PayIntFreq)
+
+!下次繳息日
+#NextIntDate=D,8,S
+E(0,#MaturityDate)
+C(3,#AmortizedCode,2,s,$) 
+C(3,#FreqBase,1,D(7,2,#SpecificDate,0,#PayIntFreq),$)
+C(3,#FreqBase,2,D(7,2,#VirtualSpecificDate,#NextIntDateFreqBase,0),$)
+C(3,#FreqBase,3,D(7,2,#SpecificDate,0,#WKWEEKINT),$)
+
+![首次應繳日]
+!自動顯示不必輸入
+!到期取息者,首次應繳日=到期日
+!首次繳款日必須大於撥款日期,首次繳款日不可大於到期日
+#FdFirstDueDate=X,2,L
+
+#FirstDueDate=D,7,I
+E(0,#NextIntDate)
+@V(7)
+A(DATE,0,#FirstDueDate)
+T(1,@FirstDueDateDD,#FirstDueDate,006,002)
+
+!取首次應繳日天
+#FirstDueDateDD=A,2,S
+
+!取首次應繳日該月最後一天
+#FirstDueDate01=A,8,S
+E(0,#FirstDueDate/100)
+E(0,#FirstDueDate01*100+01)
+D(7,2,#FirstDueDate01,1,0)
+D(7,3,#FirstDueDate01,0,1)
+T(1,@FirstDueDate01DD,#FirstDueDate01,007,002)
+!首次應繳日該月最後一天
+#FirstDueDate01DD=A,2,S
+
+!撥款日期+24天
+#DrawdownDateAd24=D,8,S
+D(7,2,#DrawdownDate,0,24)
+#DrawdownDateAd247=D,7,S
+E(0,#DrawdownDateAd24)
+
+!撥款日期+繳息週期N+1個月
+#PayIntFreqA1=A,2,S
+E(0,#PayIntFreq+1)
+#DrawdownDateM=D,8,S
+D(7,2,#DrawdownDate,#PayIntFreqA1,0)
+#DrawdownDateM7=D,7,S
+E(0,#DrawdownDateM)
+
+#Mmsg=X,30,S
+T(2,首次應繳日超過+#PayIntFreqA1+個月)
+
+#CHECKFDD=A,8,S
+C(3,#AmortizedCode,2,S,$)
+C(3,#FreqBase,2,$,S)
+IF(#SpecificDd>#FirstDueDate01DD,IF(#FirstDueDate01DD==#FirstDueDateDD,$,V(P,不符合指定應繳日)),IF(#SpecificDd==#FirstDueDateDD,$,V(P,不符合指定應繳日)))
+IF(#FirstDueDate>#DrawdownDateAd247,$,ALERT(首次應繳日未滿25天))
+IF(#FirstDueDate<#DrawdownDateM7,$,ALERT(#Mmsg))
+
+
+!下次還本日
+#NextRepayDate=D,8,S
+E(0,#MaturityDate)
+C(3,#AmortizedCode,1,s,$)
+C(3,#AmortizedCode,2,s,$)
+C(3,#AmortizedCode,5,s,$)
+E(0,#FirstDueDate)
+! C(3,#FreqBase,2,D(7,2,#WkRepayDate,#PayIntFreq,0),$)
+! C(3,#FreqBase,3,D(7,2,#WkRepayDate,0,#WKWEEKINT),$)
+
+#WKAMT1=m,14.2,S
+E(0,#TimDrawdownAmt-1)
+
+#WKFADJ=D,8,S
+D(7,2,#DrawdownDate,#FirstRateAdjFreq,0) 
+
+#WKADJ=D,8,S
+D(7,2,#DrawdownDate,#RateAdjFreq,0)
+
+
+![首次利率調整日期]
+!自動顯示可修改 L2R05
+#FdFirstAdjRateDate=X,2,L
+
+#FirstAdjRateDate=D,7,I
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#RateCode,3,$,S)
+E(0,#L2r05FirstAdjRateDate)
+C(3,#L2r05FirstAdjRateDate,0,E(0,#WKFADJ),$)
+@A(DATE,0,#FirstAdjRateDate)
+V(6,010101,#DrawdownDate)
+V(6,#MaturityDate,9991231)
+
+
+![帳管費]
+!個金不可修改，企金＞＝０, L2R05
+#FdAcctFee=X,2,L
+
+#TwAcctFee=m,14,I
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#L2r05DepartmentCode,1,$,s)
+C(3,#PRECISION,0,$,s)
+
+#LbTwAcctFee=m,14,S
+E(0,#TwAcctFee)
+
+#UsAcctFee=m,14.2,I
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#L2r05DepartmentCode,1,$,s)
+C(3,#PRECISION,0,s,$)
+
+#LbUsAcctFee=m,14,S
+E(0,#UsAcctFee)
+
+#TimAcctFee=m,14.2,S
+C(3,#PRECISION,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
+
+![最後一期餘額]上線版鎖住預設0
+#FdFinalBal=X,2,L
+
+#TwFinalBal=m,14,I
+C(3,#PRECISION,0,$,s)
+C(5,#L2r01CharCode,2,s,$)
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#TwFinalBal,0,E(0,0),$)
+@V(5,0,#WKAMT1)
+
+#UsFinalBal=m,14.2,I
+C(3,#PRECISION,0,s,$)
+C(5,#L2r01CharCode,2,s,$)
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#UsFinalBal,0,E(0,0),$)
+@V(5,0,#WKAMT1)
+
+#TimFinalBal=m,14.2,S
+C(3,#PRECISION,0,E(0,#TwFinalBal),E(0,#UsFinalBal))
+
+!---- P5 扣款帳號
+#INVK5=X,1,S
+ENABLE(#BTNHIDEP5)
+C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
+
+#BINDP5=X,1,S
+BIND(#BTNHIDEP5,click, {cmd=CALLSEND;DOCODE=HIDEP5})
+
+![繳款方式]
+!必須輸入,依核准額度自動顯示,不可修改 L2R05
+#FdRepayCode=X,2,L
+
+#RepayCode=A,2,S
+
+#RepayCodeX=X,16,L
+T(3,)T(H,#RepayCode,#RepayCodeHelp)            
+                
+![扣款帳號]
+!依核准額度自動顯示,不可修改,須即時做AML檢查 L2R05
+#FdRepayAcctNo=X,2,L
+
+#RepayAcctNo=A,14,L
+
+![扣款銀行]
+!依核准額度自動顯示,不可修改 L2R05
+#FdRepayBank=X,2,L
+
+#RepayBank=A,3,S
+
+#SendL2r09A=X,1,S
+C(3,#RepayCode,2,$,S)
+T(2,@RimBankCode,#RepayBank)
+RESET_RIM(#SendL2r09A,L2R09)
+S(L2R09,1,#RimTxCode,#RimBankCode)
+R(1,L2R09)
+
+#RepayBankX=X,20,L
+T(2,#L2r09BankItem)
+              
+![郵局存款別]
+!依核准額度自動顯示,不可修改 L2R05
+#FdPostCode=X,2,L
+
+#PostCode=X,1,S
+
+#PostCodeX=X,4,L
+C(3,#RepayBank,700,$,S)
+T(3,)T(H,#PostCode,#PostCodeHelp)            
+
+![與借款人關係] 
+!L2R05
+#FdRelationCode=X,2,L
+
+#RelationCode=X,2,S
+
+#RelationCodeX=X,4,L
+T(3,)T(H,#RelationCode,#RelationCodeHelp)            
+
+![帳戶戶名]
+#FdRelationName=X,2,L
+
+#RelationName=X,100,L
+!C(4,#RelationCode,S,$)
+!@V(7)
+
+![身份證字號]
+#FdRelationId=X,2,L
+
+#RelationId=X,10,L
+!C(4,#RelationCode,S,$)
+!@V(7)A(ID,0,#RelationId)
+
+#WKID=N,1,S
+!T(4,STAT$)
+
+![出生日期]
+#FdRelationBirthday=X,2,L
+
+#RelationBirthday=D,7,L
+!C(4,#RelationCode,S,$)
+!D(8)
+!@V(7)A(DATE,0,#RelationBirthday)
+
+![性別]
+#FdRelationGender=X,2,L
+
+#RelationGender=X,1,S
+
+#RelationGenderX=X,2,L
+C(4,#RelationCode,S,$)
+T(H,#RelationGender,#SexHelp)
+
+#checkcustidlen=A,2,S
+C(4,#RelationId,S,$)
+P(1,#RelationId)
+
+!檢查銀扣身分別
+#CheckRelationIdKind=X,1,S
+IF(#RelationGender==""||#checkcustidlen==8,E(0,2),E(0,1))
+
+
+#BTNHIDEP5=X,15,I,ui:button;value:  扣款帳號  ;enable:1;tabbable:0
+C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
+
+
+#Wait2=X,1,I
+C(3,#HIDE5FG,0,CALL(#HIDEP5),$)
+
+!--- P6 其他
+#INVK6=X,1,S
+ENABLE(#BTNHIDEP6)
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+
+#BINDP6=X,1,S
+BIND(#BTNHIDEP6,click, {cmd=CALLSEND;DOCODE=HIDEP6})
+
+#BUF6A=X,41,S
+T(2,+0000000+#CustNo+          +0000000+      +#FacmNo+2)
+
+
+#BIND6A=X,1,S
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L2921; ntxbuf=#BUF6A})
+
+#WkCharCodeP6=X,1,S
+!SHOW(#RenewFlag)
+T(F,@SyndNo,1)
+C(5,#L2r01CharCode,2,$,S)
+!T(3,@RenewFlag,N)
+!HIDE(#RenewFlag)
+!T(A,@RenewFlagX,#RenewFlag,L3DEF,YesNoDef,YesNo,YesNoX)
+E(0,@SyndNo,0)
+T(F,@SyndNo,0)
+
+![客戶別]
+!依核准額度自動顯示不必輸入 L2R05
+#FdCustTypeCode=X,2,L
+
+#CustTypeCode=X,2,S
+
+#CustTypeCodeX=X,20,L
+T(3,)T(H,#CustTypeCode,#CustTypeCodeHelp)
+
+![未齊件] 
+!必須輸入
+#FdNotYetFlag=X,2,L
+
+#NotYetFlag=X,1,L
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+
+
+#NotYetFlagX=X,2,L
+T(3,)T(H,#NotYetFlag,#YNHelp)
+
+#SETNTXCD=X,5,S
+T(3,L3140)
+C(5,#NotYetFlag,Y,ASGN(NTXCD$),$)
+
+#WkCustId=X,10,S
+#WkApplNo=A,7,S
+
+#NTXBUF=X,34,S
+T(2,#WkCaseNo+#L2r05CustNo+#WkCustId+#WkApplNo+#FacmNo)
+C(5,#NotYetFlag,Y,ASGN(NTXBUF$),$)
+
+![計件代碼]
+!必須輸入
+!7/21會議 撥款可修改計件代碼
+#FdPieceCode=X,2,L
+T(3,*)
+
+#PieceCode=X,1,I
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+HELP(#PieceCodeHelp,cols:2)
+@V(7)V(H,#PieceCodeHelp)
+
+#PieceCodeX=X,20,L
+T(3,)T(H,#PieceCode,#PieceCodeHelp)            
+
+
+![資金用途別]
+!必須輸入
+#FdUsageCode=X,2,L
+
+#UsageCode=A,2,S
+!HELP(L3DEF,UsageCodeDef,UsageCode,UsageCodeX)
+!@V(2,0)V(E,0,L3DEF,UsageCodeDef)
+
+#UsageCodeX=X,20,L
+T(3,)T(H,#UsageCode,#UsageCodeHelp)            
+
+![聯貸案序號]
+#FdSyndNo=X,2,L
+
+#SyndNo=A,3,I
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+C(5,#L2r01CharCode,2,S,$)
+! E(0,0)
+
+![借新還舊]
+!#FdRenewFlag=X,2,L
+!T(3,*)
+
+#RenewFlag=X,1,S
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+T(3,0)
+!HELP(L3DEF,YesNoDef,YesNo,YesNoX)
+!@V(E,0,L3DEF,YesNoDef)
+
+
+!#RenewFlagX=X,2,L
+!T(A,#RenewFlag,L3DEF,YesNoDef,YesNo,YesNoX)
+
+!是否為代償案件
+#FdCompensateFlag=X,2,L
+
+#CompensateFlag=X,1,I
+C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
+@C(4,#CompensateFlag,S,V(3,Y,N))
+
+
+#CompensateFlagX=X,2,L
+T(3,)T(H,#CompensateFlag,#YNHelp)
+
+
+!--- P7 撥款帳號
+#INVK7=X,1,S
+ENABLE(#BTNHIDEP7)
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+T(3,@FdRemitBank,*)
+T(3,@FdRemitBranch,*)
+T(3,@FdRemitAcctNo,*)
+T(3,@FdCompensateAcct,*)
+
+#BINDP7=X,1,S
+BIND(#BTNHIDEP7,click, {cmd=CALLSEND;DOCODE=HIDEP7})
+
+#BUF5A=X,7,S
+
+#BIND5A=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF5A;ntxbuf5=type<-1:RemitBank<-OOBankCodeA:RemitBranch<-OOBankCodeB})
+
+![匯款銀行]
+#FdRemitBank=X,2,L
+T(3,*)
+
+#RemitBank=X,3,I
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+@V(7)
+
+#SendL2r09B=X,1,S
+T(2,@RimBankCode,#RemitBank)
+RESET_RIM(#SendL2r09B,L2R09)
+S(L2R09,1,#RimTxCode,#RimBankCode)
+R(1,L2R09)
+
+#RemitBankX=X,30,L
+T(2,#L2r09BankItem)
+
+![匯款分行]
+#FdRemitBranch=X,2,L
+T(3,*)
+
+#RemitBranch=X,4,I
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+@V(7)
+
+#SendL2r09C=X,1,S
+T(2,@RimBankCode,#RemitBank+#RemitBranch)
+RESET_RIM(#SendL2r09C,L2R09)
+S(L2R09,1,#RimTxCode,#RimBankCode)
+R(1,L2R09)
+
+#RemitBranchX=X,30,L
+T(2,#L2r09BranchItem)
+
+![匯款帳號]
+#FdRemitAcctNo=X,2,L
+T(3,*)
+
+#RemitAcctNo=A,14,I
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+@V(2,0)
+
+![戶名]
+#FdCompensateAcct=X,2,L
+T(3,*)
+
+#CompensateAcct=x,100,I
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+@V(7)
+
+![附言]
+#FdRemark=X,2,L
+
+#Remark=c,40,I
+C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
+
+#checkAMLName=X,1,S
+IF(#CompensateAcct!=#TimCustNoX&&#CompensateAcct!=#RelationName,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
+! !---- EXPAND 展開
+
+! #INVKEXPAND=X,1,S
+! ENABLE(#BTNEXPAND)
+! E(0,@EXPANDFG,0)
+! C(3,#EXPANDFG,0,CALL(#EXPAND),$)
+
+! #BINDEXPAND=X,1,S
+! BIND(#BTNEXPAND,click, {cmd=CALLSEND;DOCODE=EXPAND})
+
+! #BTNEXPAND=X,15,I,ui:button;value:   展開     ;enable:1;tabbable:1
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R06.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R09.dec"/>
+<include src="ROM.icf::L6R28.dec"/>
+</sub>
+!-------- AML處理 -----------------------
+<sub type="DC" name="p2" layout="cols=1;screen.width=[200,600];printer.width=[40,60];order=1;">
+[
+["@"],
+[#RPTITLEtt],
+["匯款人身份別",#RpRemitIdKind,#RpRemitIdKindX],
+["匯款人身份證/居留證號碼",#RpRemitId],
+["匯款人性別",#RpRemitGender,#RpRemitGenderX],
+["匯款人出生日期",#RpRemitBirthday],
+]
+
+!------------------
+#INITp2=X,1,S
+C(4,#INITp2,T(2,@RpRemitIdKind,)
+T(2,@RpRemitId,)
+T(2,@RpRemitGender,)
+E(0,@RpRemitBirthday,0),$)
+T(2,@INITp2,1)
+
+#RPTITLEtt=X,20,L
+IF(#CompensateAcct==#TimCustNoX,T(3,匯款人資料（本人）),$)
+IF(#CompensateAcct==#RelationName,T(3,匯款人資料（同銀扣第三人）),$)
+IF(#CompensateAcct!=#TimCustNoX&&#CompensateAcct!=#RelationName,T(3,匯款人資料),$)
+
+!匯款人身份別
+#RpRemitIdKind=X,1,I
+IF(#CompensateAcct!=#TimCustNoX&&#CompensateAcct!=#RelationName,$,S)
+HELP(#CustTypeHelp)
+@V(H,#CustTypeHelp)
+
+#RpRemitIdKindX=X,6,L
+T(3,)T(H,#RpRemitIdKind,#CustTypeHelp)
+
+!身份證/居留證號碼
+#RpRemitId=X,10,I
+IF(#CompensateAcct!=#TimCustNoX&&#CompensateAcct!=#RelationName,$,S)
+@C(4,#RpRemitId,s,$)
+IF(#RpRemitIdKind=="1",A(ID,0,#RpRemitId),A(ID_UNINO,0,#RpRemitId))
+
+!性別
+#RpRemitGender=X,1,I
+IF(#CompensateAcct!=#TimCustNoX&&#CompensateAcct!=#RelationName,$,S)
+C(3,#RpRemitIdKind,1,$,S)
+HELP(#SexHelp)
+@V(H,#SexHelp)
+
+#RpRemitGenderX=X,2,L
+T(H,#RpRemitGender,#SexHelp)
+
+!出生日期
+#RpRemitBirthday=D,7,I
+IF(#CompensateAcct!=#TimCustNoX&&#CompensateAcct!=#RelationName,$,S)
+C(4,#RpRemitGender,S,$)
+@A(DATE,0,#RpRemitBirthday)
+
+
+!AML處理
+!-----------------------------------------------------------------
+!AML參數
+#RemitIdKind=X,1,S
+#RemitId=X,10,S
+#RemitGender=X,1,S
+#RemitBirthday=D,7,S
+
+#checkaml=X,1,S
+!匯款戶名=借款人戶名
+IF(#CompensateAcct==#TimCustNoX,T(2,@RemitIdKind,#L2r07RemitIdKind)
+                       T(2,@RemitId,#L2r07RemitId)
+                       T(2,@RemitGender,#L2r07RemitGender)
+                       E(0,@RemitBirthday,#L2r07RemitBirthday),$)
+!匯款戶名=銀扣戶名
+IF(#CompensateAcct==#RelationName,T(2,@RemitIdKind,#CheckRelationIdKind)
+                       T(2,@RemitId,#RelationId)
+                       T(2,@RemitGender,#RelationGender)
+                       E(0,@RemitBirthday,#RelationBirthday),$)
+!匯款戶名=其他戶名
+IF(#CompensateAcct!=#TimCustNoX&&#CompensateAcct!=#RelationName,T(2,@RemitIdKind,#RpRemitIdKind)
+                       T(2,@RemitId,#RpRemitId)
+                       T(2,@RemitGender,#RpRemitGender)
+                       E(0,@RemitBirthday,#RpRemitBirthday),$)
+
+
+!---- EXPAND 展開
+
+#INVKEXPAND=X,1,S
+ENABLE(#BTNEXPAND)
+E(0,@EXPANDFG,0)
+C(3,#EXPANDFG,0,CALL(#EXPAND),$)
+
+#BINDEXPAND=X,1,S
+BIND(#BTNEXPAND,click, {cmd=CALLSEND;DOCODE=EXPAND})
+
+#BTNEXPAND=X,15,I,ui:button;value:   展開     ;enable:1;tabbable:0
+
+
+</sub>
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L3110 ----------
+<sub type="FORM" name="L3110">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L3110,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L3110] 預約撥款)
+K(LIGHT,#BormNo,TXTRED,0)
+
+
+#Entdy=X,8,S
+T(2,#ENTDY)
+
+#TxNo=X,18,S
+T(2,#KINBR+#TLRNO+#TXTNO)
+
+#RimData=x,100,S
+T(6A,#Entdy+#TxNo)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+#button=x,100,S
+C(2,#FKEY,$,S,S,S,S,S,S,$,S,S,S)
+T(2,{ cmd=SendOut;once=1; ntxcd=L3110; txno=#RimData;rim=LCR05;auto=true})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,提交)
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+
+#TimCustNo#FacmNo#BormNo#RateIncr
+#ApproveRate#RateCode#RateAdjFreq#DrawdownCode
+#CurrencyCode#TimDrawdownAmt#DrawdownDate#LoanTermYy#LoanTermMm#LoanTermDd
+#MaturityDate#IntCalcCode#AmortizedCode#FreqBase#PayIntFreq#RepayFreq
+#GracePeriod#GraceDate#SpecificDd#SpecificDate#FirstDueDate#FirstAdjRateDate
+#NextIntDate#NextRepayDate#TotalPeriod#TimAcctFee#TimFinalBal
+#NotYetFlag#PieceCode#UsageCode#SyndNo#RenewFlag
+#RelationCode#RelationName#RelationId#RelationBirthday#RelationGender
+#RemitBank#RemitBranch#RemitAcctNo#CompensateAcct#Remark
+#CustNo#CustId#ApplNo#TwDrawdownAmt#UsDrawdownAmt#CompensateFlag
+#IdCustNo
+#RpRemitIdKind#RpRemitId#RpRemitGender#RpRemitBirthday
+#RemitIdKind#RemitId#RemitGender#RemitBirthday
+#END
+#TwAcctFee#UsAcctFee#TwFinalBal#UsFinalBal
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L3110
+#BormNo^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="COM.icf::LockControl.tom"/>
+<include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R06.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R09.tom"/>
+<include src="ROM.icf::L6R28.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+</sub>

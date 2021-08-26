@@ -354,7 +354,7 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3051", "可用額度=" + wkAvailableAmt + "小於撥款金額" + iDrawdownAmt); // 額度不足撥款金額
 			}
 			// 借新還舊(同額度)不檢查動支期限
-			if ("Y".equals(titaVo.getParam("RenewFlag")) && titaVo.getParam("RpFacmNo1") == titaVo.getParam("FacmNo")) {
+			if ("2".equals(titaVo.getParam("RenewFlag")) && titaVo.getParam("RpFacmNo1") == titaVo.getParam("FacmNo")) {
 				this.info("RenewFlag" + titaVo.getParam("RenewFlag") + "," + titaVo.getParam("RpFacmNo1") + "="
 						+ titaVo.getParam("FacmNo"));
 			} else {
@@ -493,6 +493,11 @@ public class L3100 extends TradeBuffer {
 				loanBorMainService.insert(tLoanBorMain);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E3009", "撥款檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+			}
+			// 展期借新還舊記號為0:正常時,撥款日期不可小於本營業日
+			if (titaVo.getParam("RenewFlag").equals("0")
+					&& parse.stringToInteger(titaVo.getParam("DrawdownDate")) < wkTbsDy) {
+				throw new LogicException(titaVo, "E3050", "撥款日期 = " + titaVo.getParam("DrawdownDate")); // 非展期／借新還舊，撥款日期不可小於本營業日
 			}
 		}
 		// 登錄訂正
@@ -969,8 +974,10 @@ public class L3100 extends TradeBuffer {
 		if (wkReserve) {
 			tLoanBorTx.setTxTypeCode(1); // 0: 臨櫃交易 1: 批次交易
 		}
-		if ("Y".equals(titaVo.getParam("RenewFlag"))) {
+		if ("1".equals(titaVo.getParam("RenewFlag"))) {
 			tLoanBorTx.setDesc("展期");
+		} else if ("2".equals(titaVo.getParam("RenewFlag"))) {
+			tLoanBorTx.setDesc("借新還舊");
 		} else {
 			tLoanBorTx.setDesc("撥款");
 		}

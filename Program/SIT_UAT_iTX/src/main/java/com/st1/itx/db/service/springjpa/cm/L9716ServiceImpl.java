@@ -62,7 +62,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,CITY.\"CityItem\" F3";
 		sql += "            ,M.\"CustNo\" F4";
 		sql += "            ,M.\"FacmNo\" F5";
-		sql += "            ,NVL(CUS.\"CustName\",CUS2.\"CustName\") F6";
+		sql += "            ,NVL(C.\"CustName\",'') F6";
 		sql += "            ,FAC.\"FirstDrawdownDate\" - 19110000 AS  F7";
 		sql += "            ,M.\"PrinBalance\" F8";
 		sql += "            ,M.\"StoreRate\" F9";
@@ -80,14 +80,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             + M.\"UnpaidBreachAmt\"";
 		sql += "             + M.\"UnpaidDelayInt\" F19";
 		sql += "            ,NVL(CUS.\"LiaisonName\",CUS2.\"LiaisonName\") F20";
-		sql += "            ,(CASE";
-		sql += "				WHEN CUS.\"TelArea\" IS NOT NULL AND CUS2.\"TelArea\" IS NULL AND LENGTH(CUS.\"TelNo\") > 4 THEN CUS.\"TelArea\" || '-' || CUS.\"TelNo\"";
-		sql += "				WHEN CUS.\"TelArea\" IS NULL AND CUS2.\"TelArea\" IS NULL AND CUS2.\"TelNo\" IS NULL THEN CUS.\"TelNo\"";
-		sql += "				WHEN CUS.\"TelArea\" IS NULL AND CUS2.\"TelArea\" IS NULL AND LENGTH(CUS.\"TelNo\") > 4 THEN CUS.\"TelNo\"";
-		sql += "				WHEN CUS.\"TelNo\" IS NULL AND CUS2.\"TelNo\" IS NULL THEN CUS2.\"TelNo\"";
-		sql += "				WHEN CUS.\"TelArea\" IS NULL AND CUS2.\"TelArea\" IS NULL AND LENGTH(CUS.\"TelNo\") < 4 THEN CUS2.\"TelNo\"";
-		sql += "				WHEN CUS.\"TelArea\" IS NULL AND CUS2.\"TelArea\" IS NULL THEN CUS2.\"TelNo\"";
-		sql += "			ELSE '' END) F21";
+		sql += "            ,NVL(\"Fn_GetTelNo\"(C.\"CustUKey\",'01',1),\"Fn_GetTelNo\"(C.\"CustUKey\",'03',1)) F21";
 		sql += "            ,LAW.\"LegalProg\" F22";
 		sql += "            ,CDL.\"Item\" F23";
 		sql += "            ,LAW.\"RecordDate\" F24";
@@ -129,6 +122,7 @@ public class L9716ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                ) CUS2 ON CUS2.\"CustNo\" = M.\"CustNo\"";
 		sql += "                     AND CUS2.\"TelRowNo\" = 1";
 		sql += "      LEFT JOIN \"CdEmp\" EMP ON EMP.\"EmployeeNo\" = M.\"AccCollPsn\"";
+		sql += "      LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = M.\"CustNo\"";
 		sql += "      LEFT JOIN (SELECT \"CustNo\"";
 		sql += "                       ,\"FacmNo\"";
 		sql += "                       ,\"LegalProg\"";

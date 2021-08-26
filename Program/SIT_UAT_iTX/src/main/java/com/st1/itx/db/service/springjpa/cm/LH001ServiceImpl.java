@@ -1,27 +1,23 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.eum.ContentName;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LH001ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LH001ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -31,143 +27,142 @@ public class LH001ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<HashMap<String, String>> findAll() throws Exception {
-		logger.info("lH001.findAll ");
-		String sql = "SELECT   \"F1\"";
-		sql += "               , \"F2\"";
-		sql += "               , \"F3\"";
-		sql += "               , \"F4\"";
-		sql += "               , \"F5\"";
-		sql += "               , \"F6\"";// 總表
-		sql += "               , SUM(F7)";
-		sql += "               , SUM(F8)";
-		sql += "        FROM ( SELECT B0.\"DeptItem\" AS F1";// 部室稱號
-		sql += "                    , B0.\"DistItem\" AS F2";// 區部名稱
-		sql += "                    , E0.\"Fullname\" AS F3";// 姓名
-		sql += "                    , I.\"WorkMonth\" AS F4";// 工作月
-		sql += "                    , W.\"StartDate\" AS F5";// 開始日期
-		sql += "                    , W.\"EndDate\" AS F6";// 終止日期
-		sql += "                    , I.\"PerfCnt\" AS F7";// 件數
-		sql += "                    , I.\"PerfAmt\" AS F8";// 業績金額
-		sql += "               FROM \"PfItDetail\" I";
-		sql += "               LEFT JOIN \"CdBcm\" B0 ON B0.\"UnitCode\" = I.\"DeptCode\" ";
-		sql += "               LEFT JOIN \"CdEmp\" E0 ON E0.\"EmployeeNo\" = B0.\"DeptManager\" ";
-		sql += "               LEFT JOIN \"CdWorkMonth\" W ON   W.\"Year\" = TRUNC(I.\"WorkMonth\" / 100)";
-		sql += "                                          AND  W.\"Month\" = MOD(I.\"WorkMonth\", 100)       ";
-		sql += "               UNION ALL ";
-		sql += "               SELECT DISTINCT B0.\"DeptItem\" AS F1";
-		sql += "                             , B0.\"DistItem\" AS F2";
-		sql += "                             , E0.\"Fullname\" AS F3";
-		sql += "                             , W.\"Year\" * 100 + W.\"Month\"";
-		sql += "                             , W.\"StartDate\" AS F5";
-		sql += "                             , W.\"EndDate\" AS F6";
-		sql += "                             , 0 AS F7";
-		sql += "                             , 0 AS F8";
-		sql += "               FROM \"PfItDetail\" I CROSS JOIN \"CdWorkMonth\" W";
-		sql += "               LEFT JOIN \"CdBcm\" B0 ON B0.\"UnitCode\" = I.\"DeptCode\" ";
-		sql += "               LEFT JOIN \"CdEmp\" E0 ON E0.\"EmployeeNo\" = B0.\"DeptManager\" ) ";
-		sql += "        GROUP BY \"F1\"";
-		sql += "                , \"F2\"";
-		sql += "                , \"F3\"";
-		sql += "                , \"F4\"";
-		sql += "                , \"F5\"";
-		sql += "                , \"F6\"";
-		sql += "        ORDER BY \"F1\"";
-		sql += "                , \"F2\"";
-		sql += "                , \"F3\"";
-		sql += "                , \"F4\"";
-		sql += "                , \"F5\"";
-		sql += "                , \"F6\"";
-		logger.info("sql=" + sql);
-		String sql1 = "SELECT \"F1\"";
-		sql += "               , \"F2\"";
-		sql += "               , \"F3\"";
-		sql += "               , \"F4\"";
-		sql += "               , \"F5\"";
-		sql += "               , \"F6\"";// 部室分表
-		sql += "               , SUM(F7)";
-		sql += "               , SUM(F8)";
-		sql += "         FROM ( SELECT B0.\"DistItem\" AS F1";// 部室名稱
-		sql += "                     , B0.\"UnitItem\" AS F2";// 區部名稱
-		sql += "                     , E0.\"Fullname\" AS F3";// 姓名
-		sql += "                     , I.\"WorkMonth\" AS F4";// 工作月份
-		sql += "                     , W.\"StartDate\" AS F5";// 開始日期
-		sql += "                     , W.\"EndDate\" AS F6";// 結束日期
-		sql += "                     , I.\"PerfCnt\" AS F7";// 件數
-		sql += "                     , I.\"PerfAmt\" AS F8";// 業績金額
-		sql += "                FROM \"PfItDetail\" I";
-		sql += "                LEFT JOIN \"CdBcm\" B0 ON B0.\"UnitCode\" = I.\"DeptCode\" ";
-		sql += "                LEFT JOIN \"CdEmp\" E0 ON E0.\"EmployeeNo\" = B0.\"DistManager\" ";
-		sql += "                LEFT JOIN \"CdWorkMonth\" W ON W.\"Year\" = TRUNC(I.\"WorkMonth\" / 100 ) ";
-		sql += "                                           AND  W.\"Month\" = MOD(I.\"WorkMonth\", 100) ";
-		sql += "                UNION ALL ";
-		sql += "                SELECT DISTINCT B0.\"DistItem\" AS F1";
-		sql += "                              , B0.\"UnitItem\" AS F2";
-		sql += "                              , E0.\"Fullname\" AS F3";
-		sql += "                              , W.\"Year\" * 100 ";
-		sql += "                              , W.\"Month\" AS F4";
-		sql += "                              , W.\"StartDate\" AS F5";
-		sql += "                              , W.\"EndDate\" AS F6";
-		sql += "                              , 0 AS F7";
-		sql += "                              , 0 AS F8";
-		sql += "                FROM \"PfItDetail\" I CROSS JOIN \"CdWorkMonth\" W ";
-		sql += "                LEFT JOIN \"CdBcm\" B0 ON B0.\"UnitCode\" = I.\"DeptCode\" ";
-		sql += "                LEFT JOIN \"CdEmp\" E0 ON E0.\"EmployeeNo\" = B0.\"DistManager\" ) ";
-		sql += "         GROUP BY \"F1\"";
-		sql += "                , \"F2\"";
-		sql += "                , \"F3\"";
-		sql += "                , \"F4\"";
-		sql += "                , \"F5\"";
-		sql += "                , \"F6\"";
-		sql += "         ORDER BY \"F1\"";
-		sql += "                , \"F2\"";
-		sql += "                , \"F3\"";
-		sql += "                , \"F4\"";
-		sql += "                , \"F5\"";
-		sql += "                , \"F6\"";
-		logger.info("sql1=" + sql1);
+	public List<Map<String, String>> queryA(TitaVo titaVo) throws Exception {
+		this.info("lH001.queryA ");
+
+		String sql = " ";
+		// -- 表1:同一自然人或法人
+		// -- 同一自然人或同一法人（含二、同一關係人）3000萬元(含)以上明細。
+		// -- ??? 3000萬以上條件取消
+		sql += " SELECT CRD.\"RelName\" "; // -- 姓名、名稱
+		sql += "      , CRD.\"RelId\" "; // -- 身分證號碼/統一編號
+		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"LoanBal\" "; // -- 放款餘額
+		sql += " FROM \"CustRelMain\" CRM ";
+		sql += " LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
+		sql += " LEFT JOIN ( SELECT CM.\"CustId\" ";
+		sql += "                  , SUM(LBM.\"LoanBal\") AS \"LoanBal\" ";
+		sql += "             FROM \"LoanBorMain\" LBM  ";
+		sql += "             LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "             GROUP BY CM.\"CustId\" ";
+		sql += "           ) LBM ON LBM.\"CustId\" = CRD.\"RelId\" ";
+		// sql += " WHERE NVL(LBM.\"LoanBal\",0) >= 30000000 "; // -- ??? 3000萬以上條件取消
+		sql += " WHERE NVL(LBM.\"LoanBal\",0) > 0 ";
+		sql += " ORDER BY NVL(LBM.\"LoanBal\",0) DESC ";
+		sql += "        , CRD.\"RelId\" ";
+		this.info("sql=" + sql);
+
 		Query query;
-//		query = em.createQuery(sql, lH001Vo.class);
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query = em.createNativeQuery(sql1);
+
 		// 設定參數
 //		query.setParameter("defno", defno);
 
 		return this.convertToMap(query.getResultList());
 	}
 
-//	private List convertToTranScanResponsetest(List list) {
-//
-//		List<HashMap<String, String>> result = new ArrayList<HashMap<String, String>>();
-//		
-//		try {
-//
-//			for (Iterator iter = list.iterator(); iter.hasNext();) {
-//
-//				Object[] values = (Object[]) iter.next();
-//
-//				HashMap<String, String> m = new HashMap<String, String>();
-//
-//				for (int i = 0; i < values.length; i++) {
-//
-//					m.put("f"+Integer.toString(i+1), values[i].toString());
-//
-//				}
-//
-//				logger.info(" m : " + m);
-//				result.add(m);
-//
-//			}
-//
-//		} catch (Exception e) {
-//
-//			this.error("Exception:" + e);
-//
-//		}
-//
-//		logger.info("result:" + result.size());
-//
-//		return result;
-//	}
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> queryB(TitaVo titaVo) throws Exception {
+		this.info("lH001.queryB ");
+
+		// -- 表2:同一關係人
+		// -- 同一關係人3000萬元(含)以上明細。
+		// -- ??? 3000萬以上條件取消
+		String sql = " ";
+		sql += " SELECT CRD.\"RelName\" "; // -- 姓名、名稱
+		sql += "      , CRD.\"RelId\" "; // -- 身分證號碼/統一編號
+		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"LoanBal\" "; // -- 放款餘額
+		sql += "      , GP.\"GroupLoanBal\" "; // -- 整組放款餘額
+		sql += " FROM \"CustRelMain\" CRM ";
+		sql += " LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
+		sql += " LEFT JOIN ( SELECT CM.\"CustId\" ";
+		sql += "                  , SUM(LBM.\"LoanBal\") AS \"LoanBal\" ";
+		sql += "             FROM \"LoanBorMain\" LBM  ";
+		sql += "             LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "             GROUP BY CM.\"CustId\" ";
+		sql += "           ) LBM ON LBM.\"CustId\" = CRD.\"RelId\" ";
+		sql += " LEFT JOIN ( "; // -- 計算整組餘額
+		sql += "             SELECT CRM.\"Ukey\" ";
+		sql += "                  , SUM(NVL(LBM.\"LoanBal\",0)) AS \"GroupLoanBal\" "; // -- 放款餘額
+		sql += "             FROM \"CustRelMain\" CRM ";
+		sql += "             LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
+		sql += "             LEFT JOIN ( SELECT CM.\"CustId\" ";
+		sql += "                              , SUM(LBM.\"LoanBal\") AS \"LoanBal\" ";
+		sql += "                         FROM \"LoanBorMain\" LBM  ";
+		sql += "                         LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "                         GROUP BY CM.\"CustId\" ";
+		sql += "                       ) LBM ON LBM.\"CustId\" = CRD.\"RelId\" ";
+		sql += "             GROUP BY CRM.\"Ukey\" ";
+		sql += "           ) GP ON GP.\"Ukey\" = CRM.\"Ukey\" ";
+		sql += " WHERE LENGTHB(CRM.\"CustRelId\") >= 10 "; // -- 篩選同一關係人
+		// sql += " AND LENGTHB(CRD.\"RelId\") >= 10 "; // -- 篩選同一關係人
+		// sql += " AND NVL(LBM.\"LoanBal\",0) >= 30000000 "; // -- ??? 3000萬以上條件取消
+		sql += " AND NVL(LBM.\"LoanBal\",0) > 0 ";
+		sql += " ORDER BY GP.\"GroupLoanBal\" DESC ";
+		sql += "        , CRD.\"RelId\" ";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		// 設定參數
+//		query.setParameter("defno", defno);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> queryC(TitaVo titaVo) throws Exception {
+		this.info("lH001.queryC ");
+
+		String sql = " ";
+
+		// -- 表3:同一關係企業
+		// -- 同一關係人3000萬元(含)以上明細。
+		// -- ??? 3000萬以上條件取消
+		sql += " SELECT CRD.\"RelName\" "; // -- 姓名、名稱
+		sql += "      , CRD.\"RelId\" "; // -- 身分證號碼/統一編號
+		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"LoanBal\" "; // -- 放款餘額
+		sql += "      , GP.\"GroupLoanBal\" "; // -- 整組放款餘額
+		sql += " FROM \"CustRelMain\" CRM ";
+		sql += " LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
+		sql += " LEFT JOIN ( SELECT CM.\"CustId\" ";
+		sql += "                  , SUM(LBM.\"LoanBal\") AS \"LoanBal\" ";
+		sql += "             FROM \"LoanBorMain\" LBM  ";
+		sql += "             LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "             GROUP BY CM.\"CustId\" ";
+		sql += "           ) LBM ON LBM.\"CustId\" = CRD.\"RelId\" ";
+		sql += " LEFT JOIN ( "; // -- 計算整組餘額
+		sql += "             SELECT CRM.\"Ukey\" ";
+		sql += "                  , SUM(NVL(LBM.\"LoanBal\",0)) AS \"GroupLoanBal\" "; // -- 放款餘額
+		sql += "             FROM \"CustRelMain\" CRM ";
+		sql += "             LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
+		sql += "             LEFT JOIN ( SELECT CM.\"CustId\" ";
+		sql += "                              , SUM(LBM.\"LoanBal\") AS \"LoanBal\" ";
+		sql += "                         FROM \"LoanBorMain\" LBM  ";
+		sql += "                         LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LBM.\"CustNo\" ";
+		sql += "                         GROUP BY CM.\"CustId\" ";
+		sql += "                       ) LBM ON LBM.\"CustId\" = CRD.\"RelId\" ";
+		sql += "             GROUP BY CRM.\"Ukey\" ";
+		sql += "           ) GP ON GP.\"Ukey\" = CRM.\"Ukey\" ";
+		sql += " WHERE LENGTHB(CRM.\"CustRelId\") = 8 "; // -- 篩選同一關係企業
+		sql += "   AND LENGTHB(CRD.\"RelId\") = 8 "; // -- 篩選同一關係企業
+		// sql += " AND NVL(LBM.\"LoanBal\",0) >= 30000000 "; // -- ??? 3000萬以上條件取消
+		sql += " AND NVL(LBM.\"LoanBal\",0) > 0 ";
+		sql += " ORDER BY GP.\"GroupLoanBal\" DESC ";
+		sql += "        , CRD.\"RelId\" ";
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		// 設定參數
+//		query.setParameter("defno", defno);
+
+		return this.convertToMap(query.getResultList());
+	}
 }

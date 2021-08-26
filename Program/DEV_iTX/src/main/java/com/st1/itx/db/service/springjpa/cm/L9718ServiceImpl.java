@@ -83,8 +83,8 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,M.\"OvduBal\" AS F12";
 		sql += "            ,M.\"PrevIntDate\" AS F13";
 		sql += "            ,CASE WHEN M.\"AcctCode\" = '990'";
-		sql += "             THEN TX.\"OvTxAmt\"";
-		sql += "             ELSE TX.\"LnTxAmt\"";
+		sql += "             THEN NVL(TX.\"OvTxAmt\",0)";
+		sql += "             ELSE NVL(TX.\"LnTxAmt\",0)";
 		sql += "             END AS F14";
 		sql += "            ,CASE WHEN M.\"AcctCode\" = '990'";
 		sql += "                  THEN TX.\"OvEntryDate\"";

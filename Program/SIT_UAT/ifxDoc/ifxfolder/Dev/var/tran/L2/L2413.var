@@ -221,6 +221,52 @@ E(0,#FunCd)
 <include src="COM.icf::CheckAuth.rtn"/>
 
 #FdFUNCD=X,2,L
+#FdApplNo=X,2,L
+#FdCOL_IND1=X,2,L
+#FdCOL_IND2=X,2,L
+#FdCOL_NO=X,2,L
+#FdGdRid=X,2,L
+#FdCOL_TYPE=X,2,L
+#FdCOL_AREA=X,2,L
+#FdSTOCK_CODE=X,2,L
+#FdLIST_TYPE=X,2,L
+#FdSTOCK_TYPE=X,2,L
+#FdSTOCK_ID=X,2,L
+#FdDATA_YEAR=X,2,L
+#FdSHARES=X,2,L
+#FdVALUE_STANDARD=X,2,L
+#FdSHARE_VALUE=X,2,L
+#FdBVPS=X,2,L
+#FdMONTHLY_AVG=X,2,L
+#FdClosingPrice=X,2,L
+#FdQUARTER_AVG=X,2,L
+#FdVALUE_AMT=X,2,L
+#FdOWNER_ID=X,2,L
+#FdOWNER_NAME=X,2,L
+#FdOwnerRelCode=X,2,L
+#FdMEMB_POS=X,2,L
+#FdMEMB_IND=X,2,L
+#FdLEGAL_REL=X,2,L
+#FdLOAN_PER=X,2,L
+#FdCOL_MTR=X,2,L
+#FdNOTICE_MTR=X,2,L
+#FdIMPLEMENT_MTR=X,2,L
+#FdPLEDGE_NO=X,2,L
+#FdCOMPUTE_MTR=X,2,L
+#FdSettingStat=X,2,L
+#FdClStat=X,2,L
+#FdSETTING_DT=X,2,L
+#FdSETTING_AMT=X,2,L
+#FdVALUE_DT=X,2,L
+#FdESTVALUE_AMT=X,2,L
+#FdMORTGAGE_DT=X,2,L
+#FdCUSTODY_NO=X,2,L
+#FdINTERSYNDLOAN=X,2,L
+#FdINTERSYND_TYPE=X,2,L
+#FdDISPOSITION_PRICE=X,2,L
+#FdDISPOSITION_DT=X,2,L
+#FdCOL_STATUS=X,2,L
+
 
 #FunCdX=X,4,L
 T(H,#FunCd,#FunCdHelp)
@@ -366,8 +412,6 @@ C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
 
 
 
-#SettingAmt=m,14,S
-E(0,#RimSettingAmt)
 
 #FdCustId=X,2,L
 
@@ -389,7 +433,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1;ntxbuf5=type<-1:ApplNo<-
 
 
 !申請號碼
-#FdApplNo=X,2,L
+
 
 #ApplNo=A,7,I
 C(3,#FunCd,1,$,s)
@@ -433,7 +477,6 @@ C(3,#FunCd,1,$,s)
 HELP(#ClCode1Help)
 @V(H,#ClCode1Help)
 
-#FdCOL_IND1=X,2,L
 
 #ClCode1X=X,12,L
 C(4,#ClCode1,S,$)
@@ -443,7 +486,6 @@ T(H,#ClCode1,#ClCode1Help)
 #ClCode2=A,2,L
 E(0,1)
 
-#FdCOL_IND2=X,2,L
 
 #COL_IND=X,3,S
 T(2,#ClCode1+#ClCode2)
@@ -456,7 +498,6 @@ C(3,#ClCode1,3,T(3,股票),T(3,其他有價證券))
 ! [擔保品編號]
 #ClNo=A,7,L
 
-#FdCOL_NO=X,2,L
 
 <include src="ROM.icf::L2R17.dec"/>
 !RIM取原擔保品編號
@@ -473,7 +514,6 @@ E(0,@GdRid2,#L2r17GdrId2)
 E(0,@GdRnum,#L2r17GdrNum)
 
 ![原擔保品編號]
-#FdGdRid=X,2,L
 
 #GdRid1=A,1,L
 #GdRid2=A,2,L
@@ -573,8 +613,6 @@ HELP(#ClTypeCode3Help)
 V(H,#ClTypeCode3Help)
 
 
-#FdCOL_TYPE=X,2,L
-
 #ClTypeCodeX=X,30,L
 T(H,#ClTypeCode,#ClTypeCode3Help)
 
@@ -602,7 +640,6 @@ IF(#FunCd==4,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
 
-#FdCOL_AREA=X,2,L
 
 #CityCodeX=X,8,L
 C(4,#CityCode,S,$)
@@ -615,8 +652,6 @@ HELP(#StockCodeHelp)
 @
 C(4,#L2r25StockCode,V(H,#StockCodeHelp),C(5,#StockCode,#L2r25StockCode,$,V(H,#StockCodeHelp)))
 
-
-#FdSTOCK_CODE=X,2,L
 
 #StockCodeX=X,10,L
 T(H,#StockCode,#StockCodeHelp)
@@ -638,8 +673,6 @@ V(H,#ListingTypeHelp)
 
 #TEMP_LIST_TYPE=A,2,S
 
-#FdLIST_TYPE=X,2,L
-
 #ListingTypeX=X,6,L
 C(4,#ListingType,S,$)
 T(H,#ListingType,#ListingTypeHelp)
@@ -655,8 +688,6 @@ V(H,#StockTypeHelp)
 
 #TEMP_STOCK_TYPE=A,1,S
 
-#FdSTOCK_TYPE=X,2,L
-
 
 #StockTypeX=X,6,L
 C(4,#StockType,S,$)
@@ -667,14 +698,11 @@ T(H,#StockType,#StockTypeHelp)
 IF(#FunCd==4,s,$)
 @A(ID_UNINO,0,#CompanyId)
 
-#FdSTOCK_ID=X,2,L
 
 ! [資料年度]
 #DataYear=A,3,I
 IF(#FunCd==4,s,$)
 @V(9)
-
-#FdDATA_YEAR=X,2,L
 
 
 ! [發行股數]
@@ -682,7 +710,6 @@ IF(#FunCd==4,s,$)
 IF(#FunCd==4,s,$)
 @V(9)
 
-#FdSHARES=X,2,L
 
 ! [每股單價鑑估標準]
 #EvaStandard=X,2,I
@@ -699,7 +726,6 @@ IF(#EvaStandard==05,T(3,@FdQUARTER_AVG,*),$)
 #EvaStandardX=X,30,L
 T(H,#EvaStandard,#EvaStandardHelp)
 
-#FdVALUE_STANDARD=X,2,L
 
 ! [非上市(櫃)每股淨值]
 #NetWorth=n,14,I
@@ -708,10 +734,6 @@ IF(#FunCd==4,s,$)
 V(9)
 IF(#EvaStandard=="01",V(2,0),$)
 
-#FdSHARE_VALUE=X,2,L
-
-
-
 
 ! [每股面額]
 #ParValue=m,14,I
@@ -719,16 +741,12 @@ IF(#FunCd==4,s,$)
 @
 IF(#EvaStandard=="02",V(2,0),$)
 
-#FdBVPS=X,2,L
-
 
 ! [一個月平均價]
 #MonthlyAvg=m,14,I
 IF(#FunCd==4,s,$)
 @
 IF(#EvaStandard=="04",V(2,0),$)
-
-#FdMONTHLY_AVG=X,2,L
 
 
 ! [前日收盤價]
@@ -740,8 +758,6 @@ V(7)
 
 IF(#EvaStandard=="03",V(2,0),$)
 
-#FdClosingPrice=X,2,L
-
 
 ! [三個月平均價]
 #ThreeMonthAvg=m,14,I
@@ -749,7 +765,6 @@ IF(#FunCd==4,s,$)
 @
 IF(#EvaStandard=="05",V(2,0),$)
 
-#FdQUARTER_AVG=X,2,L
 
 ! [鑑定單價]
 #EvaUnitPrice=m,14,L
@@ -761,17 +776,10 @@ IF(#EvaStandard=="05",E(0,#ThreeMonthAvg),$)
 IF(#FunCd==4,s,$)
 
 
-#FdVALUE_AMT=X,2,L
-
-
-
-
 ! [股票持有人統編]
 #OwnerId=X,10,I
 IF(#FunCd==4,s,$)
 @V(7)A(ID_UNINO,0,#OwnerId)
-
-#FdOWNER_ID=X,2,L
 
 
 #RimL1r09=X,1,S
@@ -795,9 +803,8 @@ IF(#FunCd==4,s,$)
 C(4,#L1r09CustName,$,s)
 @V(7)
 
-#FdOWNER_NAME=X,2,L
 
-#FdOwnerRelCode=X,2,L
+#OwnerCHECK=X,1,S
 C(4,#CustId,s,$)
 C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p1,15,15,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,15,15,1))
 
@@ -825,7 +832,6 @@ V(H,#JobTitleHelp)
 
 #TEMP_MEMB_POS=A,2,S
 
-#FdMEMB_POS=X,2,L
 
 
 #InsiderJobTitleX=X,30,L
@@ -843,8 +849,6 @@ V(H,#PositionHelp)
 
 #TEMP_MEMB_IND=A,2,S
 
-#FdMEMB_IND=X,2,L
-
 
 #InsiderPositionX=X,20,L
 T(H,#InsiderPosition,#PositionHelp)
@@ -855,7 +859,6 @@ C(4,#InsiderPosition,S,$)
 IF(#FunCd==4,s,$)
 @A(ID_UNINO,0,#LegalPersonId)
 
-#FdLEGAL_REL=X,2,L
 
 #RimL1r09A=X,1,S
 T(2,@L1r09CustName,)
@@ -882,35 +885,25 @@ IF(#LoanToValue==60,E(0,@ClMtr,140)E(0,@NoticeMtr,135)E(0,@ImplementMtr,125),$)
 IF(#LoanToValue==70,E(0,@ClMtr,125)E(0,@NoticeMtr,120)E(0,@ImplementMtr,115),$)
 IF(#LoanToValue==80,E(0,@ClMtr,110)E(0,@NoticeMtr,105)E(0,@ImplementMtr,100),$)
 
-#FdLOAN_PER=X,2,L
-
 
 ! [擔保維持率]
 #ClMtr=m,3.2,I
 IF(#FunCd==4,s,$)
-
-#FdCOL_MTR=X,2,L
 
 
 ! [通知追繳維持率]
 #NoticeMtr=m,3.2,I
 IF(#FunCd==4,s,$)
 
-#FdNOTICE_MTR=X,2,L
-
 
 ! [實行職權維持率]
 #ImplementMtr=m,3.2,I
 IF(#FunCd==4,s,$)
 
-#FdIMPLEMENT_MTR=X,2,L
-
 
 ! [質權設定書號]
 #PledgeNo=X,14,I
 IF(#FunCd==4,s,$)
-
-#FdPLEDGE_NO=X,2,L
 
 
 ! [計算維持率]
@@ -919,13 +912,9 @@ IF(#FunCd==4,s,$)
 HELP(#YNHelp)
 @V(H,#YNHelp)
 
-#FdCOMPUTE_MTR=X,2,L
-
 
 #ComputeMTRX=X,2,L
 T(H,#ComputeMTR,#YNHelp)
-
-#FdSettingStat=X,2,L
 
 ! [設定狀態]
 #SettingStat=A,1,I
@@ -936,7 +925,6 @@ HELP(#SettingStatHelp)
 #SettingStatX=x,4,L
 T(H,#SettingStat,#SettingStatHelp)
 
-#FdClStat=X,2,L
 
 ! [擔保品狀態]
 #ClStat=A,1,I
@@ -953,8 +941,6 @@ T(H,#ClStat,#ClStatHelp)
 IF(#FunCd==4,s,$)
 @V(7)A(4,0,#SettingDate)
 
-#FdSETTING_DT=X,2,L
-
 
 ! [設質股數餘額]
 #SettingBalance=m,14,I
@@ -962,15 +948,11 @@ IF(#FunCd==4,s,$)
 @V(2,0)
 V(9)
 
-#FdSETTING_AMT=X,2,L
-
 
 ! [鑑估日期]
 #EvaDate=D,7,I
 IF(#FunCd==4,s,$)
 @V(7)A(4,0,#EvaDate)
-
-#FdVALUE_DT=X,2,L
 
 
 ! [鑑估值]
@@ -978,6 +960,11 @@ IF(#FunCd==4,s,$)
 IF(#FunCd==4,s,$)
 @V(2,0)
 V(9)
+
+!設定金額
+#SettingAmt=m,14,S
+E(0,#EvaUnitPrice*#SettingBalance)
+
 
 !Rim參數
 #RimEvaAmt=m,14,S
@@ -1004,23 +991,15 @@ S(L2R41,1,#RimFunCd,#RimClCode1,#RimClCode2,#RimClNo,#RimEvaAmt,#RimEvaNetWorth,
 R(1,L2R41)
 
 
-#FdESTVALUE_AMT=X,2,L
-
-
 ! [擔保債權確定日期]
 #MtgDate=D,7,I
 IF(#FunCd==4,s,$)
 @V(7)A(4,0,#MtgDate)
 
-#FdMORTGAGE_DT=X,2,L
-
 
 ! [保管條號碼]
 #CustodyNo=X,5,I
 IF(#FunCd==4,s,$)
-
-#FdCUSTODY_NO=X,2,L
-
 
 ! [聯貸案]
 #Synd=X,1,S
@@ -1030,7 +1009,6 @@ IF(#FunCd==4,s,$)
 !IF(#FunCd == 1 || #FunCd == 2,$,s)
 !IF(#Synd=="Y",T(3,@FdINTERSYND_TYPE,*),T(3,@FdINTERSYND_TYPE, ))
 
-#FdINTERSYNDLOAN=X,2,L
 
 #SyndX=X,2,L
 !T(H,#Synd,#YNHelp)
@@ -1043,8 +1021,6 @@ IF(#FunCd==4,s,$)
 !@IF(#Synd=="Y",$,S)
 !V(H,#SyndCodeHelp)
 
-#FdINTERSYND_TYPE=X,2,L
-
 
 #SyndCodeX=X,6,L
 !T(H,#SyndCode,#SyndCodeHelp)
@@ -1054,21 +1030,18 @@ IF(#FunCd==4,s,$)
 IF(#FunCd==4,s,$)
 @V(9)
 
-#FdDISPOSITION_PRICE=X,2,L
 
 ! [處分日期]
 #DispDate=D,7,I
 IF(#FunCd==4,s,$)
 @A(DATE,0,#DispDate)
 
-#FdDISPOSITION_DT=X,2,L
 
 ! [擔保品狀況碼]
 #ClStatus=A,1,L
 IF(#FunCd==4,s,$)
 E(0,1)
 
-#FdCOL_STATUS=X,2,L
 
 #ClStatusX=X,7,L
 T(3,已抵押)

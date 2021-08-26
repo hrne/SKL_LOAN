@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * ReltMain 關係人主檔<br>
+ * ReltMain 借款戶關係人/關係企業主檔<br>
  * Gen By Tool
  * 
  * @author AdamPan

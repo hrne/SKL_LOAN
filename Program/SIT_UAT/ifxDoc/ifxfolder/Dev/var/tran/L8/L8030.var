@@ -162,9 +162,9 @@ SWITCH(#TranCode,
     048,T(3,L),
     49,T(3,L),
     050,T(3,D),
-    51,T(3,E),
-    52,T(3,L),
-    53,T(3,M),
+    051,T(3,E),
+    052,T(3,L),
+    053,T(3,M),
     054,T(3,M),
     055,T(3,2),
     056,T(3,2),
@@ -488,14 +488,16 @@ TXFORM=L8030
 {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
 #OOBTN6=歷程
 {width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
-! #OOCustId=身分證字號
-! {width:100,align:'center',hidden:false}
-! #OORcDate=協商申請日
-! {width:100,align:'center',hidden:false}
-! #OOSubmitKey_Combine=報送單位代號
-! {width:120,align:'center',hidden:false}
-! #OODelayYM=延期繳款年月
-! {width:120,align:'center',hidden:false}
+#OOCustId=身分證字號
+{width:100,align:'center',hidden:false}
+#OORcDate=協商申請日
+{width:100,align:'center',hidden:false}
+#OOSubmitKey_Combine=報送單位代號
+{width:120,align:'center',hidden:false}
+#OODelayYM=延期繳款年月
+{width:120,align:'center',hidden:false}
+#OOOutJcicTxtDate=轉JCIC文字檔日期
+{width:200,align:'center',hidden:false}
 ^
 #RPTFG=G,QUERY.GRID,L8030
 #any={detail:true, header:'L8030A.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}

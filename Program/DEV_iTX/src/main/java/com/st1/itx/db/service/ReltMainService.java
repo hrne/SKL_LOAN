@@ -42,7 +42,7 @@ public interface ReltMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice ReltMain ReltMain of List
    */
-  public ReltMain ReltIdFirst(String reltId_0, TitaVo... titaVo);
+  public ReltMain reltIdFirst(String reltId_0, TitaVo... titaVo);
 
   /**
    * ReltId =
@@ -53,7 +53,7 @@ public interface ReltMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice ReltMain ReltMain of List
    */
-  public Slice<ReltMain> ReltIdEq(String reltId_0, int index, int limit, TitaVo... titaVo);
+  public Slice<ReltMain> reltIdEq(String reltId_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseNo =
@@ -62,7 +62,7 @@ public interface ReltMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice ReltMain ReltMain of List
    */
-  public ReltMain CaseNoFirst(int caseNo_0, TitaVo... titaVo);
+  public ReltMain caseNoFirst(int caseNo_0, TitaVo... titaVo);
 
   /**
    * CustNo =
@@ -73,7 +73,7 @@ public interface ReltMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice ReltMain ReltMain of List
    */
-  public Slice<ReltMain> CustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
+  public Slice<ReltMain> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseNo = ,AND CustNo = ,AND ReltId = 
@@ -84,7 +84,16 @@ public interface ReltMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice ReltMain ReltMain of List
    */
-  public ReltMain CaseNoCustNoReltIdFirst(int caseNo_0, int custNo_1, String reltId_2, TitaVo... titaVo);
+  public ReltMain caseNoCustNoReltIdFirst(int caseNo_0, int custNo_1, String reltId_2, TitaVo... titaVo);
+
+  /**
+   * CustNo =
+   *
+   * @param custNo_0 custNo_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice ReltMain ReltMain of List
+   */
+  public ReltMain custNoFirst(int custNo_0, TitaVo... titaVo);
 
   /**
    * hold By ReltMain

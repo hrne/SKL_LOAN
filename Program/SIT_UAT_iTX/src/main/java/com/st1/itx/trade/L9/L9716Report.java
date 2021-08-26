@@ -91,16 +91,21 @@ public class L9716Report extends MakeReport {
 					// switch by code of Column; i.e. Col A, Col B...
 					// breaks if more than 26 columns!
 					tmpValue = tLDVo.get("F" + i);
+					this.info("L9716.tmpValue" + tmpValue + ",F?:" + i);
 					switch (String.valueOf((char) (65 + i))) {
 					// if specific column needs special treatment, insert case here.
 					default:
 						try {
 							makeExcel.setValue(row, col, new BigDecimal(tmpValue), "L");
 						} catch (Exception e) {
-							this.info("L9716.catch1"+tmpValue);
+							this.info("L9716.catch1" + tmpValue);
 							makeExcel.setValue(row, col, tmpValue, "L");
 						}
 						break;
+					}
+
+					if (tmpValue.length() == 0) {
+						makeExcel.setValue(row, col, tLDVo.get("F" + i), "L");
 					}
 
 				} // for
@@ -160,7 +165,7 @@ public class L9716Report extends MakeReport {
 						try {
 							makeExcel.setValue(row, col, new BigDecimal(tmpValue), "L");
 						} catch (Exception e) {
-							this.info("L9716.catch2"+tmpValue);
+							this.info("L9716.catch2" + tmpValue);
 							makeExcel.setValue(row, col, tmpValue, "L");
 						}
 						break;

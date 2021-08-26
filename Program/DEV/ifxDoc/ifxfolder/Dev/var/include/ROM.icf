@@ -6488,7 +6488,6 @@ TXFORM=L8R22
 #L8r23TranKey=X,1,S
 #L8r23CustId=X,10,S
 #L8r23SubmitKey=X,3,S
-#L8r23SubmitKeyX=X,80,S
 #L8r23RcDate=D,7,S
 #L8r23DelayCode=X,1,S
 #L8r23DelayYM=X,6,S
@@ -6501,7 +6500,6 @@ TXFORM=L8R23
 #L8r23TranKey
 #L8r23CustId
 #L8r23SubmitKey
-#L8r23SubmitKeyX
 #L8r23RcDate
 #L8r23DelayCode
 #L8r23DelayYM
@@ -6514,7 +6512,6 @@ TXFORM=L8R23
 #L8r24TranKey=X,1,S
 #L8r24CustId=X,10,S
 #L8r24SubmitKey=X,3,S
-#L8r24SubmitKeyX=X,80,S
 #L8r24RcDate=D,7,S
 #L8r24BankCode1=X,10,S
 #L8r24DataCode1=X,2,S
@@ -6526,11 +6523,6 @@ TXFORM=L8R23
 #L8r24DataCode4=X,2,S
 #L8r24BankCode5=X,10,S
 #L8r24DataCode5=X,2,S
-#L8r24BankCodeX1=X,80,S
-#L8r24BankCodeX2=X,80,S
-#L8r24BankCodeX3=X,80,S
-#L8r24BankCodeX4=X,80,S
-#L8r24BankCodeX5=X,80,S
 #L8r24ChangePayDate=D,7,S
 #L8r24OutJcicTxtDate=D,7,S
 </L8R24.dec>
@@ -6540,7 +6532,6 @@ TXFORM=L8R24
 #L8r24TranKey
 #L8r24CustId
 #L8r24SubmitKey
-#L8r24SubmitKeyX
 #L8r24RcDate
 #L8r24BankCode1
 #L8r24DataCode1
@@ -6552,11 +6543,6 @@ TXFORM=L8R24
 #L8r24DataCode4
 #L8r24BankCode5
 #L8r24DataCode5
-#L8r24BankCodeX1
-#L8r24BankCodeX2
-#L8r24BankCodeX3
-#L8r24BankCodeX4
-#L8r24BankCodeX5
 #L8r24ChangePayDate
 #L8r24OutJcicTxtDate
 ^
@@ -8148,7 +8134,7 @@ TXFORM=L6R26
 
 !尋找會計業務關帳控制檔資料
 <L6R27Rim.dec>
-#RimSecNo=9,2,S
+#RimSecNo=X,2,S
 </L6R27Rim.dec>
 
 <L6R27.dec>

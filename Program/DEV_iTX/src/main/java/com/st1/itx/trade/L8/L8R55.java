@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.JcicZ051;
+import com.st1.itx.db.domain.JcicZ052;
 import com.st1.itx.db.domain.JcicZ053;
 import com.st1.itx.db.domain.JcicZ054;
 import com.st1.itx.db.domain.JcicZ055;
@@ -30,6 +32,8 @@ import com.st1.itx.db.domain.JcicZ572;
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ574;
 import com.st1.itx.db.domain.JcicZ575;
+import com.st1.itx.db.service.JcicZ051Service;
+import com.st1.itx.db.service.JcicZ052Service;
 import com.st1.itx.db.service.JcicZ053Service;
 import com.st1.itx.db.service.JcicZ054Service;
 import com.st1.itx.db.service.JcicZ055Service;
@@ -66,6 +70,10 @@ import com.st1.itx.util.parse.Parse;
  */
 public class L8R55 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public JcicZ051Service iJcicZ051Service;
+	@Autowired
+	public JcicZ052Service iJcicZ052Service;
 	@Autowired
 	public JcicZ053Service iJcicZ053Service;
 	@Autowired
@@ -125,12 +133,53 @@ public class L8R55 extends TradeBuffer {
 		String iUkey = titaVo.getParam("RimUkey");
 		String iChainCd = titaVo.getParam("RimChainCd");
 		switch(iChainCd) {
+		case "L8312":
+			JcicZ051 iJcicZ051 = new JcicZ051();
+			iJcicZ051 = iJcicZ051Service.ukeyFirst(iUkey, titaVo);
+			if (iJcicZ051 == null) {
+				throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
+			}else {
+				totaVo.putParam("L8r55SubmitKey", iJcicZ051.getSubmitKey());
+				totaVo.putParam("L8r55ApplyDate", iJcicZ051.getRcDate());
+				totaVo.putParam("L8r55BankId", "");
+				totaVo.putParam("L8r55PayDate", "");
+				totaVo.putParam("L8r55ChangePayDate", "");
+				totaVo.putParam("L8r55CaseStatus", "");
+				totaVo.putParam("L8r55ClaimDate", "");
+				totaVo.putParam("L8r55CourtCode", "");
+				totaVo.putParam("L8r55MaxMainCode","");
+				totaVo.putParam("L8r55DelayYM", iJcicZ051.getDelayYM());
+				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
+			}
+		break;
+		case "L8313":
+			JcicZ052 iJcicZ052 = new JcicZ052();
+			iJcicZ052 = iJcicZ052Service.ukeyFirst(iUkey, titaVo);
+			if (iJcicZ052 == null) {
+				throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
+			}else {
+				totaVo.putParam("L8r55SubmitKey", iJcicZ052.getSubmitKey());
+				totaVo.putParam("L8r55ApplyDate", iJcicZ052.getRcDate());
+				totaVo.putParam("L8r55BankId", "");
+				totaVo.putParam("L8r55PayDate", "");
+				totaVo.putParam("L8r55ChangePayDate", "");
+				totaVo.putParam("L8r55CaseStatus", "");
+				totaVo.putParam("L8r55ClaimDate", "");
+				totaVo.putParam("L8r55CourtCode", "");
+				totaVo.putParam("L8r55MaxMainCode","");
+				totaVo.putParam("L8r55DelayYM", "");
+				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
+			}
+		break;
 		case "L8314":
 			JcicZ053 iJcicZ053 = new JcicZ053();
 			iJcicZ053 = iJcicZ053Service.ukeyFirst(iUkey, titaVo);
 			if (iJcicZ053 == null) {
 				throw new LogicException(titaVo, "E0001", ""); // 無此代號錯誤
 			}else {
+				totaVo.putParam("L8r55CustId", iJcicZ053.getCustId());
 				totaVo.putParam("L8r55SubmitKey", iJcicZ053.getSubmitKey());
 				totaVo.putParam("L8r55ApplyDate", iJcicZ053.getRcDate());
 				totaVo.putParam("L8r55BankId", "");
@@ -142,6 +191,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", iJcicZ053.getMaxMainCode());
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8315":
@@ -163,6 +213,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", iJcicZ054.getMaxMainCode());
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", iJcicZ054.getPayOffDate());
 			}
 		break;
 		case "L8316":
@@ -184,6 +235,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8317":
@@ -205,6 +257,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8318":
@@ -226,6 +279,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8319":
@@ -247,6 +301,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", iJcicZ061.getMaxMainCode());
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8320":
@@ -268,6 +323,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8321":
@@ -289,6 +345,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8322":
@@ -310,6 +367,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8323":
@@ -331,6 +389,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", iJcicZ442.getMaxMainCode());
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8324":
@@ -352,6 +411,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", iJcicZ443.getMaxMainCode());
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", iJcicZ443.getAccount());
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8325":
@@ -373,6 +433,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8327":
@@ -394,6 +455,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8328":
@@ -415,6 +477,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", iJcicZ448.getMaxMainCode());
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;	
 		case "L8330":
@@ -436,6 +499,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", iJcicZ451.getDelayYM());
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8331":
@@ -457,6 +521,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", iJcicZ454.getMaxMainCode());
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8332":
@@ -478,6 +543,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8333":
@@ -499,6 +565,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8334":
@@ -520,6 +587,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8335":
@@ -541,6 +609,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8336":
@@ -562,6 +631,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		case "L8337":
@@ -583,6 +653,7 @@ public class L8R55 extends TradeBuffer {
 				totaVo.putParam("L8r55MaxMainCode", "");
 				totaVo.putParam("L8r55DelayYM", "");
 				totaVo.putParam("L8r55Account", "");
+				totaVo.putParam("L8r55PayOffDate", "");
 			}
 		break;
 		}

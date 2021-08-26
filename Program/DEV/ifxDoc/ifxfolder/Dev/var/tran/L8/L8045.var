@@ -41,20 +41,19 @@ K(NOBUTTON,CLOSEY)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L8046]                                 消債條列JCIC報送資料歷程查詢"],
+["[L8045]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdSubmitKey+報送單位代號",#SubmitKey],
-["#FdCaseStatus+案件狀態",#CaseStatus],
-["#FdClaimDate+裁定日期或發文日期",#ClaimDate],
-["#FdCourtCode+受理調解機構代號",#CourtCode],
+["#FdRcDate+協商申請日",#RcDate],
+["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode],
 ["#FdPayOffDate+單獨全數受清償日期 ",#PayOffDate],
 ]
 
+
 #FdCustId=X,2,L
 #FdSubmitKey=X,2,L
-#FdCaseStatus=X,2,L
-#FdClaimDate=X,2,L
-#FdCourtCode=X,2,L
+#FdRcDate=X,2,L
+#FdMaxMainCode=X,2,L
 #FdPayOffDate=X,2,L
 
 !---------- AP TEXT AREA Variables ----------
@@ -103,11 +102,9 @@ T(1,@ChainCd,#NTXBUF,1,5)
 T(1,@Ukey,#NTXBUF,6,32)
 
 #CustId=X,10,L
-#RcDate=D,7,L
 #SubmitKey=X,3,L
-#CaseStatus=X,1,L
-#ClaimDate=D,7,L
-#CourtCode=X,3,L
+#RcDate=D,7,L
+#MaxMainCode=X,3,L
 #PayOffDate=D,7,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
@@ -118,13 +115,11 @@ T(2,@RimChainCd,#ChainCd)
 RESET_RIM(#RimL8r55,L8R55)
 S(L8R55,1,#RimChainCd,#RimUkey)
 R(1,L8R55)
-T(2,@CaseStatus,#L8r55CaseStatus)
-T(2,@ClaimDate,#L8r55ClaimDate)
-T(2,@CourtCode,#L8r55CourtCode)
 T(2,@CustId,#L8r55CustId)
 T(2,@SubmitKey,#L8r55SubmitKey)
-E(0,@PayOffDate,#L8r55PayOffDate)
 E(0,@RcDate,#L8r55ApplyDate)
+T(2,@MaxMainCode,#L8r55MaxMainCode)
+E(0,@PayOffDate,#L8r55PayOffDate)
 
 #ChainCd=X,5,S
 #Ukey=X,32,S
@@ -139,11 +134,11 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 <include src="PRT.icf::PRTHEAD.rtn"/>
 </sub>
 
-!---------- TXFORM = L80460 ----------
-<sub type="FORM" name="L8046">
+!---------- TXFORM = L80450 ----------
+<sub type="FORM" name="L8045">
 
 #SCRTIL=_,_,S
-T(3,[L8046] 消債條列JCIC報送資料歷程查詢)
+T(3,[L8045] 消債條列JCIC報送資料歷程查詢)
 
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
@@ -154,21 +149,7 @@ T(H,#OOTranKey,#TranKeyHelp)
 #OOTranKeyX=X,15,S
 T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 ! 以下變動
-#OOYear=A,3,S
-#OOCourtDiv=C,9,S
-#OOCourtCaseNo=C,45,S
-#OOPayDate=D,7,S
-#OOPayEndDate=D,7,S
-#OOPeriod=A,3,S
-#OORate=m,2.2,S
-#OOOutstandAmt=M,9,S
-#OOSubAmt=M,9,S
-#OOClaimStatus1=X,1,S
-#OOSaveDate=D,7,S
-#OOClaimStatus2=X,1,S
-#OOSaveEndDate=D,7,S
-#OOIsImplement=X,1,S
-#OOInspectName=C,10,S 
+#OOPayOffResult=X,1,S
 ! 以下固定
 #OOLastUpdate=X,30,S
 #OOLastUpdateEmpNo=X,6,S
@@ -186,23 +167,9 @@ C(3,#OOOutJcicTxtDate,0,S,$)
 </sub>
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L8046
+TXFORM=L8045
 #OOTranKey
-#OOYear
-#OOCourtDiv
-#OOCourtCaseNo
-#OOPayDate
-#OOPayEndDate
-#OOPeriod
-#OORate
-#OOOutstandAmt
-#OOSubAmt
-#OOClaimStatus1
-#OOSaveDate
-#OOClaimStatus2
-#OOSaveEndDate
-#OOIsImplement
-#OOInspectName
+#OOPayOffResult
 #OOOutJcicTxtDate
 #OOLastUpdate
 #OOLastUpdateEmpNo
@@ -214,48 +181,20 @@ TXFORM=L8046
 </sub>
 
 !---------- 單據輸出組合 ----------
-<sub type="PART" name="L8046" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
+<sub type="PART" name="L8045" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
 [
-["[L8046]                                 消債條列JCIC報送資料歷程查詢                                                                            "],
+["[L8045]                                 消債條列JCIC報送資料歷程查詢                                                                            "],
 ]
 </sub>
 
 <sub type="SELECT">
 
-#RPTFG=0,QUERY.GRID,L8046
-#any={detail:true, header:'L8046.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+#RPTFG=0,QUERY.GRID,L8045
+#any={detail:true, header:'L8045.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 #OOTranKeyX=交易代碼
 {width:100,align:'center'}
-!L8316(55)
-#OOYear=年度別
-{width:100,align:'center'}
-#OOCourtDiv=法院承審股別
-{width:100,align:'center'}
-#OOCourtCaseNo=法院案號
-{width:100,align:'center'}
-#OOPayDate=更生方案首期應繳款日
-{width:100,align:'center'}
-#OOPayEndDate=更生方案末期應繳款日
-{width:100,align:'center'}
-#OOPeriod=更生條件(期數)
-{width:100,align:'center'}
-#OORate=更生條件(利率)
-{width:100,align:'center'}
-#OOOutstandAmt=原始債權金額
-{width:100,align:'center'}
-#OOSubAmt=更生損失金額
-{width:100,align:'center'}
-#OOClaimStatus1=法院裁定保全處分
-{width:100,align:'center'}
-#OOSaveDate=保全處分起始日
-{width:100,align:'center'}
-#OOClaimStatus2=法院裁定撤銷保全處分
-{width:100,align:'center'}
-#OOSaveEndDate=保全處分撤銷日
-{width:100,align:'center'}
-#OOIsImplement=是否依更生條件履行
-{width:100,align:'center'}
-#OOInspectName=監督人姓名
+!L8315(54)
+#OOPayOffResult=單獨全數受清償原因
 {width:100,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}

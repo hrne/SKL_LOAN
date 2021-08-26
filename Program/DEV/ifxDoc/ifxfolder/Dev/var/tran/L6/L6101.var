@@ -1,0 +1,250 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L6101)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,11)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,202)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6101]                                 業務關帳作業"],
+["#FdSecNo+業務類別",#SecNo,#SecNoX],
+["#FdClsFg+關帳狀態",#ClsFg,#ClsFgX],
+["#FdBatNo+業務批號",#BatNo],
+["#FdCoreSeqNo+上傳核心序號",#CoreSeqNo],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BUF1=X,42,S
+!ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+
+#Submit=X,4,S
+K(MODIFYBUTTON,登錄)
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!ClsFg
+#CDCODEClsFg=x,20,S                  
+T(3,CdCode.ClsFg)                  
+                                      
+#ClsFgHelp=x,100,S
+#ClsFg1Help=x,100,S
+
+!SecNo
+#CDCODESecNo=x,20,S                  
+T(3,CdCode.SecNo)                  
+                                        
+#SecNoHelp=x,100,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEClsFg,#CDCODESecNo)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClsFgHelp,#HelpDesc1)
+T(2,@SecNoHelp,#HelpDesc2)
+T(2,@ClsFg1Help,0:開帳;+#HelpDesc1)
+
+! 必輸欄位
+#FdSecNo=X,2,L
+T(3,*)
+#FdClsFg=X,2,L
+T(3,*)
+#FdBatNo=X,2,L
+#FdCoreSeqNo=X,2,L
+
+! 顯示框線
+#WKTF=X,1,S
+T(F,@SecNo,1)T(F,@ClsFg,1)T(F,@BatNo,0)T(F,@CoreSeqNo,0))
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+!業務類別
+#SecNo=X,2,I
+HELP(#SecNoHelp)
+@V(H,#SecNoHelp)
+
+#SecNoX=X,8,L
+T(H,#SecNo,#SecNoHelp)
+
+#SendL6R27=X,1,S
+T(2,@RimSecNo,#SecNo)
+RESET_RIM(#SendL6R27,L6R27)
+S(L6R27,1,#RimSecNo)
+R(1,L6R27)
+
+E(0,@ClsFg,#L6R27ClsFg)
+E(0,@BatNo,#L6R27BatNo)
+E(0,@CoreSeqNo,#L6R27CoreSeqNo)
+
+!關帳狀態   !02支票繳款不可選[開帳]，限選[關帳]及[關帳取消)
+#ClsFg=A,1,I
+C(3,#SecNo,2,HELP(#ClsFgHelp)
+            ,HELP(#ClsFg1Help))
+@C(3,#SecNo,2,C(2,#L6R27ClsFg,V(1,0,1),V(1,1),V(1,2))
+             ,C(2,#L6R27ClsFg,V(1,0,1),V(1,1),V(1,0,2)))
+
+#ClsFgX=X,8,L
+T(H,#ClsFg,#ClsFg1Help)
+
+!業務批號 !若開帳,則＋１
+#BatNo=A,2,L
+C(3,#ClsFg,0,E(0,#L6R27BatNo+1),E(0,#L6R27BatNo))
+
+!業務關帳次數 未用畫面拿掉
+!#ClsNo=A,2,L
+
+!上傳核心序號 ! 02支票繳款/09放款 關帳時＋１ , 上傳核心序號都是更新在 09 那筆
+#CoreSeqNo=A,3,L
+C(3,#SecNo,9,$,S))
+@C(3,#ClsFg,1,E(0,#L6R27CoreSeqNo+1),S))
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+#RETURN=A,1,S
+E(0,0)
+
+![折返KEY]
+#RTNTXT=X,9,S
+
+<include src="ROM.icf::L6R27Rim.dec"/>
+<include src="ROM.icf::L6R27.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6101 ----------
+<sub type="FORM" name="L6101">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6101,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6101] 業務關帳作業)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+#OOResult=X,4,L
+#OOBatNo09=A,2,L
+#OOBatNo01=A,2,L
+#OOCoreSeqNo=A,3,L
+
+#SETNTXCD=X,5,S
+C(2,#SecNo,T(3,),T(3,L4101),T(3,L4701))
+C(3,#OOResult,4101,ASGN(NTXCD$),$)
+C(3,#OOResult,4701,ASGN(NTXCD$),$)
+
+#NTXCDSHOW=X,40,S
+C(2,#SecNo,T(3,),T(3,撥款匯款作業),T(3,票據媒體製作))
+C(3,#OOResult,4101,ASGN(NTXCDSHOW$),$)
+C(3,#OOResult,4701,ASGN(NTXCDSHOW$),$)
+
+#NTXBUF=X,6,S
+C(2,#SecNo,T(3,),T(2,LN+#OOBatNo09+#OOBatNo01),T(3,))
+C(3,#OOResult,4101,ASGN(NTXBUF$),$)
+C(3,#OOResult,4701,ASGN(NTXBUF$),$)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOMsgCode=X,60,L
+#OOMessage=X,200,L
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#SecNo
+#ClsFg
+#BatNo
+#CoreSeqNo
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L6101
+#OOResult
+#OOBatNo09
+#OOBatNo01
+#OOCoreSeqNo
+#OOMsgCode
+#OOMessage
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R27.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6101
+#any={detail:true, header:'L6101.part', caption:'', width:1010, rowNum:20, rowList:[20,40,60]}
+
+#OOMsgCode=處理檢核
+{width:220,align:'left'}
+
+#OOMessage=處理訊息
+{width:900,align:'left'}
+
+^
+<include src="PRT.icf::INQ01.sel" map="i=L6101;cpi=15"/>
+#SecNo#SecNoX
+#ClsFg#ClsFgX
+#BatNo
+#CoreSeqNo
+#OOResult
+%
+#OOMsgCode
+#OOMessage
+@^
+</sub>

@@ -62,7 +62,7 @@ C(3,#CHAIN,0,K(MODIFYBUTTON,2,新增法人),$)
 
 #ORGFG=_,_,S
 E(0,0)
-
+!JS(MOUSE,1)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -76,7 +76,6 @@ E(0,0)
 ["#FdMobile+．手機號碼",#Mobile],
 ["#FdIdKind+身份別",#IdKind,#IdKindX],
 ]
-
 #FdMain=X,2,L
 T(3,*)
 #FdCustNoSt=X,2,L
@@ -352,11 +351,11 @@ IF(#OOFacShareApplBTNFg==0,BIND(grid,cancel),$)
 
 
 !關聯戶
-#OOBUF11=X,10,S
-T(2,#OOCustId)
+#OOBUF11=X,7,S
+T(2,#OOCustNo)
 
 #OOBTN11=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L1906; ntxbuf=#OOBUF11})
+BIND(grid,{ cmd=CHAIN; ntxcd=L2035; ntxbuf=#OOBUF11})
 IF(#OOCustRelBTNFg==0,BIND(grid,cancel),$)
 
 !交互運用

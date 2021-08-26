@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("reltMainService")
 @Repository
-public class ReltMainServiceImpl implements ReltMainService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(ReltMainServiceImpl.class);
-
+public class ReltMainServiceImpl extends ASpringJpaParm implements ReltMainService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class ReltMainServiceImpl implements ReltMainService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + reltMainId);
+    this.info("findById " + dbName + " " + reltMainId);
     Optional<ReltMain> reltMain = null;
     if (dbName.equals(ContentName.onDay))
       reltMain = reltMainReposDay.findById(reltMainId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CaseNo", "CustNo", "ReltId"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CaseNo", "CustNo", "ReltId"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = reltMainReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -114,11 +110,11 @@ em = null;
   }
 
   @Override
-  public ReltMain ReltIdFirst(String reltId_0, TitaVo... titaVo) {
+  public ReltMain reltIdFirst(String reltId_0, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("ReltIdFirst " + dbName + " : " + "reltId_0 : " + reltId_0);
+    this.info("reltIdFirst " + dbName + " : " + "reltId_0 : " + reltId_0);
     Optional<ReltMain> reltMainT = null;
     if (dbName.equals(ContentName.onDay))
       reltMainT = reltMainReposDay.findTopByReltIdIs(reltId_0);
@@ -133,7 +129,7 @@ em = null;
   }
 
   @Override
-  public Slice<ReltMain> ReltIdEq(String reltId_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<ReltMain> reltIdEq(String reltId_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ReltMain> slice = null;
     if (titaVo.length != 0)
@@ -144,7 +140,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("ReltIdEq " + dbName + " : " + "reltId_0 : " + reltId_0);
+    this.info("reltIdEq " + dbName + " : " + "reltId_0 : " + reltId_0);
     if (dbName.equals(ContentName.onDay))
       slice = reltMainReposDay.findAllByReltIdIs(reltId_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -161,11 +157,11 @@ em = null;
   }
 
   @Override
-  public ReltMain CaseNoFirst(int caseNo_0, TitaVo... titaVo) {
+  public ReltMain caseNoFirst(int caseNo_0, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("CaseNoFirst " + dbName + " : " + "caseNo_0 : " + caseNo_0);
+    this.info("caseNoFirst " + dbName + " : " + "caseNo_0 : " + caseNo_0);
     Optional<ReltMain> reltMainT = null;
     if (dbName.equals(ContentName.onDay))
       reltMainT = reltMainReposDay.findTopByCaseNoIs(caseNo_0);
@@ -180,7 +176,7 @@ em = null;
   }
 
   @Override
-  public Slice<ReltMain> CustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<ReltMain> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ReltMain> slice = null;
     if (titaVo.length != 0)
@@ -191,7 +187,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = reltMainReposDay.findAllByCustNoIs(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -208,11 +204,11 @@ em = null;
   }
 
   @Override
-  public ReltMain CaseNoCustNoReltIdFirst(int caseNo_0, int custNo_1, String reltId_2, TitaVo... titaVo) {
+  public ReltMain caseNoCustNoReltIdFirst(int caseNo_0, int custNo_1, String reltId_2, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("CaseNoCustNoReltIdFirst " + dbName + " : " + "caseNo_0 : " + caseNo_0 + " custNo_1 : " +  custNo_1 + " reltId_2 : " +  reltId_2);
+    this.info("caseNoCustNoReltIdFirst " + dbName + " : " + "caseNo_0 : " + caseNo_0 + " custNo_1 : " +  custNo_1 + " reltId_2 : " +  reltId_2);
     Optional<ReltMain> reltMainT = null;
     if (dbName.equals(ContentName.onDay))
       reltMainT = reltMainReposDay.findTopByCaseNoIsAndCustNoIsAndReltIdIs(caseNo_0, custNo_1, reltId_2);
@@ -227,11 +223,30 @@ em = null;
   }
 
   @Override
+  public ReltMain custNoFirst(int custNo_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("custNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
+    Optional<ReltMain> reltMainT = null;
+    if (dbName.equals(ContentName.onDay))
+      reltMainT = reltMainReposDay.findTopByCustNoIs(custNo_0);
+    else if (dbName.equals(ContentName.onMon))
+      reltMainT = reltMainReposMon.findTopByCustNoIs(custNo_0);
+    else if (dbName.equals(ContentName.onHist))
+      reltMainT = reltMainReposHist.findTopByCustNoIs(custNo_0);
+    else 
+      reltMainT = reltMainRepos.findTopByCustNoIs(custNo_0);
+
+    return reltMainT.isPresent() ? reltMainT.get() : null;
+  }
+
+  @Override
   public ReltMain holdById(ReltMainId reltMainId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + reltMainId);
+    this.info("Hold " + dbName + " " + reltMainId);
     Optional<ReltMain> reltMain = null;
     if (dbName.equals(ContentName.onDay))
       reltMain = reltMainReposDay.findByReltMainId(reltMainId);
@@ -249,7 +264,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + reltMain.getReltMainId());
+    this.info("Hold " + dbName + " " + reltMain.getReltMainId());
     Optional<ReltMain> reltMainT = null;
     if (dbName.equals(ContentName.onDay))
       reltMainT = reltMainReposDay.findByReltMainId(reltMain.getReltMainId());
@@ -271,7 +286,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + reltMain.getReltMainId());
+    this.info("Insert..." + dbName + " " + reltMain.getReltMainId());
     if (this.findById(reltMain.getReltMainId()) != null)
       throw new DBException(2);
 
@@ -300,7 +315,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + reltMain.getReltMainId());
+    this.info("Update..." + dbName + " " + reltMain.getReltMainId());
     if (!empNot.isEmpty())
       reltMain.setLastUpdateEmpNo(empNot);
 
@@ -323,7 +338,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + reltMain.getReltMainId());
+    this.info("Update..." + dbName + " " + reltMain.getReltMainId());
     if (!empNot.isEmpty())
       reltMain.setLastUpdateEmpNo(empNot);
 
@@ -343,7 +358,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + reltMain.getReltMainId());
+    this.info("Delete..." + dbName + " " + reltMain.getReltMainId());
     if (dbName.equals(ContentName.onDay)) {
       reltMainReposDay.delete(reltMain);	
       reltMainReposDay.flush();
@@ -372,7 +387,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (ReltMain t : reltMain){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -407,7 +422,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (reltMain == null || reltMain.size() == 0)
       throw new DBException(6);
 
@@ -436,7 +451,7 @@ em = null;
 
   @Override
   public void deleteAll(List<ReltMain> reltMain, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

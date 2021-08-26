@@ -296,7 +296,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 [#<->#,"<font color=red>@其他",""],
 ["#FdCustTypeCode+客戶別",#CustTypeCodeX],
 ["#FdNotYetFlag+未齊件",#NotYetFlag,#NotYetFlagX,#BTN5],
-["#FdRenewFlag+借新還舊",#RenewFlag,#RenewFlagX],  
+["#FdRenewFlag+展期／借新還舊",#RenewFlag,#RenewFlagX],  
 ["#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
 ["#FdPieceCodeSecond+計件代碼2",#PieceCodeSecond,#PieceCodeSecondX],
 ["#FdPieceCodeSecondAmt+計件代碼2金額",#TwPieceCodeSecondAmt,#UsPieceCodeSecondAmt],
@@ -440,6 +440,12 @@ T(3,CdCode.RateType)
 
 #RateTypeHelp=x,1024,S 
 
+!RenewFlag 展期借新還舊記號
+#CDDEF20=x,25,S
+T(3,CdCode.RenewFlag)
+
+#RenewFlagHelp=x,1024,S 
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
@@ -458,7 +464,7 @@ T(2,@CurrencyCodeHelp,#HelpDesc10)
 
 #HelpRim2=X,1,S
 RESET_RIM(#HelpRim2,XXR99)
-S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14,#CDDEF15,#CDDEF16,#CDDEF17,#CDDEF18,#CDDEF19)
+S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14,#CDDEF15,#CDDEF16,#CDDEF17,#CDDEF18,#CDDEF19,#CDDEF20)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FacmRateCodeHelp,#HelpDesc1)
@@ -470,6 +476,7 @@ T(2,@RelationCodeHelp,#HelpDesc6)
 T(2,@CurrPrecisionHelp,#HelpDesc7)
 T(2,@CustTypeCodeHelp,#HelpDesc8)
 T(2,@RateTypeHelp,#HelpDesc9)
+T(2,@RenewFlagHelp,#HelpDesc10)
 
 #YNHelp=x,20,S
 T(3,Y:是;N:否)
@@ -1152,8 +1159,8 @@ E(0,#TimDrawdownAmt)
 !  d.撥款日期不可大於會計日期
 #FdDrawdownDate=X,2,L
 
-#DrawdownDate=D,7,L
-E(0,#SYSDATE)
+#DrawdownDate=D,7,I
+C(3,#DrawdownDate,0,E(0,#SYSDATE),$)
 D(8)
 @V(7)A(DATE,0,#DrawdownDate)
 ! V(5,0010101,#SYSDATE)
@@ -1493,7 +1500,7 @@ E(0,#VirtualDiffMons-#TotalPeriod*#PayIntFreq)
 ! C(1,#WKSP2DD,E(0,#WKEND2YYMM*100+#SpecificDd),E(0,#WKEND2YYMM*100+#SpecificDd),E(0,#WKEND2YYMM*100+#SpecificDd))
 ! C(1,#WKSP2DD,D(7,2,#WKEND2DATE,1,0),$,$)
 ! A(DATE,0,#WKEND2DATE)
-! ALERT("WKEND2DATE",#WKEND2DATE)
+
 
 !貸款期間的年換算成月+貸款期間的月
 #WkYyMm2=N,8,S
@@ -1821,7 +1828,7 @@ T(F,@SyndNo,1)
 C(5,#L2r01CharCode,2,$,S)
 T(3,@RenewFlag,N)
 HIDE(#RenewFlag)
-T(H,@RenewFlagX,#RenewFlag,#YNHelp)
+T(H,@RenewFlagX,#RenewFlag,#RenewFlagHelp)
 E(0,@SyndNo,0)
 T(F,@SyndNo,0)
 
@@ -1835,7 +1842,7 @@ T(F,@SyndNo,0)
 #CustTypeCodeX=X,20,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
 
-![未齊件] 
+![未齊件]
 !必須輸入
 #FdNotYetFlag=X,2,L
 
@@ -1856,17 +1863,18 @@ C(5,#NotYetFlag,Y,ASGN(NTXBUF$),$)
 C(4,#NotYetFlag,S,$)T(H,#NotYetFlag,#YNHelp)
 
 ![借新還舊]
+!0=正常 1=展期 2=借新還舊
 #FdRenewFlag=X,2,L
 
 #RenewFlag=X,1,I
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 C(5,#L2r01CharCode,2,s,$)
-C(3,#FKEY,0,T(3,N),$)
-HELP(#YNHelp)
-@V(H,#YNHelp)
+C(3,#FKEY,0,C(4,#RenewFlag,T(3,0),$),$)
+HELP(#RenewFlagHelp)
+@V(H,#RenewFlagHelp)
 
-#RenewFlagX=X,2,L
-T(3,)T(H,#RenewFlag,#YNHelp)
+#RenewFlagX=X,8,L
+T(3,)T(H,#RenewFlag,#RenewFlagHelp)
 
 ![計件代碼]
 !必須輸入
@@ -1875,13 +1883,13 @@ T(3,)T(H,#RenewFlag,#YNHelp)
 #FdPieceCode=X,2,L
 
 #PieceCode=X,1,I
+C(5,#RenewFlag,2,E(0,7),$)
 HELP(#PieceCodeHelp,cols:2)
 @V(7)V(H,#PieceCodeHelp)
-C(5,#RenewFlag,Y,V(3,C,D,3,4),$)
+! C(5,#RenewFlag,Y,V(3,C,D,3,4),$)
 
 #PieceCodeX=X,20,L
 T(3,)T(H,#PieceCode,#PieceCodeHelp)            
-
 
 
 !計件代碼2
@@ -1892,7 +1900,7 @@ HELP(#PieceCodeHelp,cols:2)
 @
 C(4,#PieceCodeSecond,S,$)
 V(H,#PieceCodeHelp)
-C(5,#RenewFlag,Y,V(3,C,D,3,4),$)
+! C(5,#RenewFlag,Y,V(3,C,D,3,4),$)
 C(5,#PieceCodeSecond,#PieceCode,V(P,不可與計件代碼相同),$)
 
 #PieceCodeSecondX=X,20,L
@@ -1948,7 +1956,6 @@ C(5,#L2r01CharCode,2,S,$)
 HELP(#YNHelp)
 @V(H,#YNHelp)
 
-
 #CompensateFlagX=X,2,L
 T(3,)T(H,#CompensateFlag,#YNHelp)
 
@@ -1962,11 +1969,13 @@ T(2,#CurrencyCode)
 
 !應收付類別,4:撥款 6:撥款-借新還舊
 #TMPRPFG=X,1,S
-C(5,#RenewFlag,Y,E(0,@RPFG,6),E(0,@RPFG,4))
+IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPFG,6),E(0,@RPFG,4))
+! C(5,#RenewFlag,Y,E(0,@RPFG,6),E(0,@RPFG,4))
 
 !撥款方式
 #TMPRPTYP=X,1,S
-C(5,#RenewFlag,Y,E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
+IF(#RenewFlag=="1"||#RenewFlag=="2",E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
+! C(5,#RenewFlag,Y,E(0,@RPTYPZ,91),E(0,@RPTYPZ,#DrawdownCode))
 
 !應收付總金額,撥款金額
 #TMPRPTOT=X,1,S

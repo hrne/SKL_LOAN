@@ -1308,6 +1308,7 @@ public class MakeReport extends CommBuffer {
 	 * type = 3: yyymmdd<BR>
 	 * type = 4: （中文） yyy 年 mm 月<BR>
 	 * type = 5: yyy 年 mm 月<BR>
+	 * type = 6: yyy.mm.dd<BR>
 	 * 
 	 * @param date 西曆日期
 	 * @param type 樣式<BR>
@@ -1412,6 +1413,7 @@ public class MakeReport extends CommBuffer {
 	 * type = 3: yyymmdd<BR>
 	 * type = 4: （中文） yyy 年 mm 月<BR>
 	 * type = 5: yyy 年 mm 月<BR>
+	 * type = 6: yyy.mm.dd<BR>
 	 * 
 	 * @param date 西曆日期
 	 * @param type 樣式<BR>
@@ -1542,6 +1544,9 @@ public class MakeReport extends CommBuffer {
 			break;
 		case 5:
 			result = rocYear + "年" + rocMonth + "月";
+			break;
+		case 6:
+			result = rocYear + "." + rocMonth + "." + rocDay;
 			break;
 		default:
 			result = rocYear + rocMonth + rocDay;

@@ -52,7 +52,7 @@
 !    L2R38 : 尋找額度與擔保品關聯檔資料
 !    L2R39 : 依三擇一輸入尋找是否存在(準)關係人檔
 !    L2R40 : 用擔保品編號和核准號碼查擔保品與額度關聯檔
-!    L2R41 : 比較鑑價總值*貸放成數,設定金額是否比該擔保品分配金額加總低
+!    L2R41 : 計算分配金額是否小於可用餘額
 !    L2R42 : 取保證人關係代碼下拉選單
 !    L2R43 : 取建物或土地所有權人姓名
 !    L2R44 : 取扣款銀行資料
@@ -3421,9 +3421,6 @@ TXFORM=L2R52
 
 
 
-
-
-
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -6491,7 +6488,6 @@ TXFORM=L8R22
 #L8r23TranKey=X,1,S
 #L8r23CustId=X,10,S
 #L8r23SubmitKey=X,3,S
-#L8r23SubmitKeyX=X,80,S
 #L8r23RcDate=D,7,S
 #L8r23DelayCode=X,1,S
 #L8r23DelayYM=X,6,S
@@ -6504,7 +6500,6 @@ TXFORM=L8R23
 #L8r23TranKey
 #L8r23CustId
 #L8r23SubmitKey
-#L8r23SubmitKeyX
 #L8r23RcDate
 #L8r23DelayCode
 #L8r23DelayYM
@@ -6517,7 +6512,6 @@ TXFORM=L8R23
 #L8r24TranKey=X,1,S
 #L8r24CustId=X,10,S
 #L8r24SubmitKey=X,3,S
-#L8r24SubmitKeyX=X,80,S
 #L8r24RcDate=D,7,S
 #L8r24BankCode1=X,10,S
 #L8r24DataCode1=X,2,S
@@ -6529,11 +6523,6 @@ TXFORM=L8R23
 #L8r24DataCode4=X,2,S
 #L8r24BankCode5=X,10,S
 #L8r24DataCode5=X,2,S
-#L8r24BankCodeX1=X,80,S
-#L8r24BankCodeX2=X,80,S
-#L8r24BankCodeX3=X,80,S
-#L8r24BankCodeX4=X,80,S
-#L8r24BankCodeX5=X,80,S
 #L8r24ChangePayDate=D,7,S
 #L8r24OutJcicTxtDate=D,7,S
 </L8R24.dec>
@@ -6543,7 +6532,6 @@ TXFORM=L8R24
 #L8r24TranKey
 #L8r24CustId
 #L8r24SubmitKey
-#L8r24SubmitKeyX
 #L8r24RcDate
 #L8r24BankCode1
 #L8r24DataCode1
@@ -6555,11 +6543,6 @@ TXFORM=L8R24
 #L8r24DataCode4
 #L8r24BankCode5
 #L8r24DataCode5
-#L8r24BankCodeX1
-#L8r24BankCodeX2
-#L8r24BankCodeX3
-#L8r24BankCodeX4
-#L8r24BankCodeX5
 #L8r24ChangePayDate
 #L8r24OutJcicTxtDate
 ^
@@ -6597,10 +6580,8 @@ TXFORM=L8R25
 #L8r26TranKey=X,1,S
 #L8r26CustId=X,10,S
 #L8r26SubmitKey=X,3,S
-#L8r26SubmitKeyX=X,80,S
 #L8r26RcDate=D,7,S
 #L8r26MaxMainCode=X,10,S
-#L8r26MaxMainCodeX=X,80,S
 #L8r26PayOffResult=X,1,S
 #L8r26PayOffDate=D,7,S
 #L8r26OutJcicTxtDate=D,7,S
@@ -6611,10 +6592,8 @@ TXFORM=L8R26
 #L8r26TranKey
 #L8r26CustId
 #L8r26SubmitKey
-#L8r26SubmitKeyX
 #L8r26RcDate
 #L8r26MaxMainCode
-#L8r26MaxMainCodeX
 #L8r26PayOffResult
 #L8r26PayOffDate
 #L8r26OutJcicTxtDate
@@ -7489,6 +7468,7 @@ TXFORM=L8R54
 #L8r55MaxMainCode=X,3,S
 #L8r55DelayYM=X,6,S
 #L8r55Account=X,50,S
+#L8r55PayOffDate=D,7,S
 </L8R55.dec>
 
 <L8R55.tom>
@@ -7505,6 +7485,7 @@ TXFORM=L8R55
 #L8r55MaxMainCode
 #L8r55DelayYM
 #L8r55Account
+#L8r55PayOffDate
 ^
 </L8R55.tom>
 
@@ -8153,7 +8134,7 @@ TXFORM=L6R26
 
 !尋找會計業務關帳控制檔資料
 <L6R27Rim.dec>
-#RimSecNo=9,2,S
+#RimSecNo=X,2,S
 </L6R27Rim.dec>
 
 <L6R27.dec>

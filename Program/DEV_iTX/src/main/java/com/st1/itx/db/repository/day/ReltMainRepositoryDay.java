@@ -37,6 +37,9 @@ public interface ReltMainRepositoryDay extends JpaRepository<ReltMain, ReltMainI
   // CaseNo = ,AND CustNo = ,AND ReltId = 
   public Optional<ReltMain> findTopByCaseNoIsAndCustNoIsAndReltIdIs(int caseNo_0, int custNo_1, String reltId_2);
 
+  // CustNo =
+  public Optional<ReltMain> findTopByCustNoIs(int custNo_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
