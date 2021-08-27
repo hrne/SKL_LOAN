@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,859)ASGN(INQLEN$)
+E(0,879)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -99,16 +99,6 @@ HELP(#YNHelp)
 #RPTFG=A,1,S
 E(0,1)
 
-
-! 計件代碼於L5951查詢條件須排除
-! String strPieceCodeNotIn ="'G','G1','G2','GA','GB','GC','GD','GF','GG','GH','GJ','GA', '1B','1C','1D'";
-#PieceCodeNotIn=X,100,S
-T(3,G，G1，G2，GA，GB，GC，GD，GF，GG，GH，GJ，GA，1B，1C，1D)
-
-! 排除[團體意外險部]
-! String strDeptCodeNotIn="'109000', 'A0Y000'";
-#DeptCodeNotIn=X,100,S
-T(3,109000，A0Y000)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -194,6 +184,9 @@ C(3,OODrawdownDate,0,S,$)
 #OOWorkMonth=A,5,O
 ! 業績日期
 #OOPerfDate=D,7,O
+! 備註
+#OOReMark=X,20,O
+
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -202,8 +195,7 @@ C(3,OODrawdownDate,0,S,$)
 #WorkMonthFm
 #WorkMonthTo
 #SumByFacm
-#PieceCodeNotIn
-#DeptCodeNotIn
+
 </sub>
 
 !------ 下行電文TOM ------
@@ -241,6 +233,7 @@ TXFORM=L5951
 #OOPerfAmt
 #OOWorkMonth
 #OOPerfDate
+#OOReMark
 ^
 </sub>
 
@@ -306,5 +299,7 @@ TXFORM=L5951
 {width:110,align:'left'}
 #OODistManagerName=區經理名稱
 {width:110,align:'left'}
+#OOReMark=備註
+{width:80,align:'center'}
 ^
 </sub>

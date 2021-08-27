@@ -30,5 +30,9 @@ public class SysLogger {
 	public void error(String msg) {
 		logger.error(msg);
 	}
+	
+	public void mustInfo(String msg) {
+		logger.info(msg);
+	}
 
 }

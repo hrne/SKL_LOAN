@@ -45,12 +45,12 @@ E(0,40)ASGN(INQPRT$)
 ["#FdCOL_NO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
 ["#FdCOL_TYPE+擔保品類別",#ClTypeCode,#ClTypeCodeX],
 [#<->#,"#FdCOL_AREA+地區別",#CityCode,#CityCodeX],
-[#<->#,"#FdSTOCK_CODE+股票代號",#StockCode,#StockCodeX],
+[#<->#,"#FdSTOCK_CODE+股票代號",#StockCode,#BTN2,#StockCodeX],
 ["#FdLIST_TYPE+掛牌別",#ListingType,#ListingTypeX],["#FdSTOCK_TYPE+股票種類",#StockType,#StockTypeX],
 ["#FdSTOCK_ID+發行公司統一編號",#CompanyId],["#FdDATA_YEAR+資料年度",#DataYear],
 ["#FdSHARES+發行股數",#IssuedShares,"股"],["#FdVALUE_STANDARD+每股單價鑑估標準",#EvaStandard,#EvaStandardX],
 ["#FdSHARE_VALUE+非上市（櫃）每股淨值",#NetWorth,"元"],["#FdBVPS+每股面額",#ParValue,"元"],
-["#FdMONTHLY_AVG+一個月平均價",#MonthlyAvg,"元"],["#FdClosingPrice+前日收盤價",#YdClosingPrice,"元"],
+["#FdClosingPrice+前日收盤價",#YdClosingPrice,"元"],["#FdMONTHLY_AVG+一個月平均價",#MonthlyAvg,"元"],
 ["#FdQUARTER_AVG+三個月平均價",#ThreeMonthAvg,"元"],["#FdVALUE_AMT+鑑定單價",#EvaUnitPrice,"元"],
 ["#FdOWNER_ID+股票持有人統編",#OwnerId],["#FdOWNER_NAME+股票持有人姓名",#OwnerName],
 [#<->#,"#FdOwnerRelCode+與授信戶關係",#OwnerRelCode,#OwnerRelCodeX],
@@ -76,6 +76,7 @@ E(0,40)ASGN(INQPRT$)
 <include src="ROM.icf::L2R25.dec"/>
 ![Buttom資料查詢]
 #BTN1=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+#BTN2=X,15,I,ui:button;value:股票查詢;enable:1;tabbable:0;title:L6064 各類代碼檔查詢;
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -148,13 +149,6 @@ T(3,CdCode.EvaStandard)
 
 #EvaStandardHelp=x,1024,S
 
-
-!StockCode
-#CDDEF0011=x,20,S
-T(3,CdCode.StockCode)
-
-#StockCodeHelp=x,1024,S 
-
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#CDDEF0008,#CDDEF0009,#CDDEF0010)
@@ -183,12 +177,11 @@ T(3,CdGuarantor)
 
 #Help2Rim=X,1,S
 RESET_RIM(#Help2Rim,XXR99)
-S(XXR99,01,#CDDEF0011,#CDDEF0012,#CDDEF0013)
+S(XXR99,01,#CDDEF0012,#CDDEF0013)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@StockCodeHelp,#HelpDesc1)
-T(2,@ClTypeCode3Help,#HelpDesc2)
-T(2,@RelationCodeHelp,#HelpDesc3)
+T(2,@ClTypeCode3Help,#HelpDesc1)
+T(2,@RelationCodeHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -301,6 +294,7 @@ C(3,#FunCd,1,INVOKEJS(SHOW,p1,2,2,1),INVOKEJS(SHOW,p1,2,2,0))
 
 #IF_FUNCD_4=X,1,S
 IF(#FunCd==4,$,S)
+HIDE(#BTN2)
 T(F,@CustId,0)
 T(F,@CustNo,0)
 T(F,@ClCode1,0)
@@ -593,7 +587,6 @@ E(0,@SettingDate,#L2r25SettingDate)
 E(0,@SettingBalance,#L2r25SettingBalance)
 E(0,@MtgDate,#L2r25MtgDate)
 T(2,@CustodyNo,#L2r25CustodyNo)
-T(H,@StockCodeX,#StockCode,#StockCodeHelp)
 T(H,@ListingTypeX,#ListingType,#ListingTypeHelp)
 T(H,@StockTypeX,#StockType,#StockTypeHelp)
 T(H,@EvaStandardX,#EvaStandard,#EvaStandardHelp)
@@ -645,16 +638,30 @@ HELP(#L6r03ResultCity,cols:5)
 C(4,#CityCode,S,$)
 T(H,#CityCode,#L6r03ResultCity)
 
+
+#BUF2=x,42,S
+T(2,02+StockCode           +                    )
+
+#BIND2=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6064; ntxbuf=#BUF2;ntxbuf5=type<-1:StockCode<-OOCode:StockCodeX<-OOItem})
+
 ! [股票代號]
 #StockCode=X,10,I
 IF(#FunCd==4,s,$)
-HELP(#StockCodeHelp)
-@
-C(4,#L2r25StockCode,V(H,#StockCodeHelp),C(5,#StockCode,#L2r25StockCode,$,V(H,#StockCodeHelp)))
+@V(7)
 
+#RimStockCode=X,10,S
 
-#StockCodeX=X,10,L
-T(H,#StockCode,#StockCodeHelp)
+<include src="ROM.icf::L2R18.dec"/>
+!RIM取股票代碼
+#RimL2r18=X,1,S
+T(2,@RimStockCode,#StockCode)
+RESET_RIM(#RimL2r18,L2R18)
+S(L2R18,1,#RimStockCode)
+R(1,L2R18)
+
+#StockCodeX=X,20,L
+T(2,#L2r18StockCodeX)
 
 ! [掛牌別]
 #ListingType=X,2,I
@@ -719,8 +726,8 @@ HELP(#EvaStandardHelp)
 T(3,@FdSHARE_VALUE,)T(3,@FdBVPS,)T(3,@FdMONTHLY_AVG,)T(3,@FdClosingPrice,)T(3,@FdQUARTER_AVG,)
 IF(#EvaStandard==01,T(3,@FdSHARE_VALUE,*),$)
 IF(#EvaStandard==02,T(3,@FdBVPS,*),$)
-IF(#EvaStandard==03,T(3,@FdMONTHLY_AVG,*),$)
-IF(#EvaStandard==04,T(3,@FdClosingPrice,*),$)
+IF(#EvaStandard==03,T(3,@FdClosingPrice,*),$)
+IF(#EvaStandard==04,T(3,@FdMONTHLY_AVG,*),$)
 IF(#EvaStandard==05,T(3,@FdQUARTER_AVG,*),$)
 
 #EvaStandardX=X,30,L
@@ -742,13 +749,6 @@ IF(#FunCd==4,s,$)
 IF(#EvaStandard=="02",V(2,0),$)
 
 
-! [一個月平均價]
-#MonthlyAvg=m,14,I
-IF(#FunCd==4,s,$)
-@
-IF(#EvaStandard=="04",V(2,0),$)
-
-
 ! [前日收盤價]
 #YdClosingPrice=m,14,I
 IF(#FunCd==4,s,$)
@@ -757,6 +757,12 @@ IF(#ClTypeCode == 141 || #ClTypeCode == 142,$,S)
 V(7)
 
 IF(#EvaStandard=="03",V(2,0),$)
+
+! [一個月平均價]
+#MonthlyAvg=m,14,I
+IF(#FunCd==4,s,$)
+@
+IF(#EvaStandard=="04",V(2,0),$)
 
 
 ! [三個月平均價]
@@ -875,6 +881,7 @@ T(3,:<font color=red>下列「擔保維持率」、「通知追繳維持率」�
     ;60:％　擔保維持率：140％　通知追繳最低維持率：135％　實行質權維持率：125％
     ;70:％　擔保維持率：125％　通知追繳最低維持率：120％　實行質權維持率：115％
     ;80:％　擔保維持率：110％　通知追繳最低維持率：105％　實行質權維持率：100％)
+
 ! [貸放成數]
 #LoanToValue=m,3.2,I
 IF(#FunCd==4,s,$)
@@ -1146,6 +1153,7 @@ TXFORM=L2413
 <include src="ROM.icf::L2R05.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
 <include src="ROM.icf::L2R17.tom"/>
+<include src="ROM.icf::L2R18.tom"/>
 <include src="ROM.icf::L2R22.tom"/>
 <include src="ROM.icf::L6R03.tom"/>
 <include src="ROM.icf::L2R25.tom"/>

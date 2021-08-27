@@ -244,7 +244,7 @@ public class ApControl extends SysLogger {
 		}
 
 		watch.stop();
-		this.info("Total execution time " + watch.getTotalTimeMillis() + " Millisecond");
+		this.mustInfo("Total execution time " + watch.getTotalTimeMillis() + " Millisecond");
 
 		if (!this.titaVo.getBatchJobId().isEmpty())
 			this.callBatchJob(this.titaVo.getBatchJobId());
