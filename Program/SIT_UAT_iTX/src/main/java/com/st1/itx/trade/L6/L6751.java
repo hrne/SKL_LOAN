@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -17,8 +15,15 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBonus;
 import com.st1.itx.db.domain.CdBonusId;
+import com.st1.itx.db.domain.CdPfParms;
+import com.st1.itx.db.domain.CdPfParmsId;
+import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.service.CdBonusService;
+import com.st1.itx.db.service.CdPfParmsService;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -38,11 +43,20 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6751 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6751.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdBonusService sCdBonusService;
+	
+	@Autowired
+	public CdWorkMonthService iCdWorkMonthService;
+	
+	@Autowired
+	public CdPfParmsService iCdPfParmsService;
+	
+	@Autowired
+	SendRsp sendRsp;
+	
 
 	/* 日期工具 */
 	@Autowired
@@ -52,20 +66,39 @@ public class L6751 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
+	private boolean duringWorkMonth = false;
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6751 ");
 		this.totaVo.init(titaVo);
 
 		String iFuncCode = titaVo.getParam("FuncCode");
-//		int iYear = this.parse.stringToInteger(titaVo.getParam("Year"));
-//		int iMonth = this.parse.stringToInteger(titaVo.getParam("Month"));
-//		int iFYear = iYear + 1911;
+		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
+		int iYear = Integer.valueOf(titaVo.getParam("WorkMonth").substring(0,3))+1911;
+		int iMonth = Integer.valueOf(titaVo.getParam("WorkMonth").substring(3,5));
+		this.info("iYear=" + iYear);
+		this.info("iMonth=" + iMonth);
 		
-		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth"))+191100;
+		int AcDate = titaVo.getEntDyI();// 7碼
+		
+		
+		CdWorkMonth tWorkMonth = iCdWorkMonthService.findById(new CdWorkMonthId(iYear,iMonth), titaVo);
+		
+		if(tWorkMonth!=null) {
+			int MonthStart = tWorkMonth.getStartDate();
+			int MonthEnd = tWorkMonth.getEndDate();
+			if(MonthStart <= AcDate && AcDate<=MonthEnd) {
+				this.info("duringWorkMonth True");
+				duringWorkMonth = true;
+			}
+		}
+		
+		
+		
+		
 
 		// 新增 - 每個條件都建一筆
-		if (iFuncCode.equals("1") ||iFuncCode.equals("3")) {
+		if (iFuncCode.equals("1") || iFuncCode.equals("3")) {
 
 			// 每個條件都建一筆
 			moveCdBonus(iFuncCode, iWorkMonth, titaVo);
@@ -133,6 +166,53 @@ public class L6751 extends TradeBuffer {
 		} else if (!(iFuncCode.equals("5"))) {
 			throw new LogicException(titaVo, "E0010", "L6751"); // 功能選擇錯誤
 		}
+		
+		if(("1").equals(iFuncCode) || ("2").equals(iFuncCode) || ("3").equals(iFuncCode) || ("4").equals(iFuncCode)) {
+			
+			if(duringWorkMonth==true) {
+				this.info("duringWorkMonth True");
+				
+				CdPfParms tCdPfParm = new CdPfParms();
+				CdPfParmsId tCdPfParmId = new CdPfParmsId();
+				
+				
+				CdPfParms sCdPfParm = iCdPfParmsService.findById(new CdPfParmsId("R"," "," "),titaVo);
+				this.info("sCdPfParm=="+sCdPfParm);
+				if(sCdPfParm == null) {
+					//業績重算 設條件記號1=R 有效工作月起 其餘為空白 OR 0
+					tCdPfParmId.setConditionCode1("R");
+					tCdPfParmId.setConditionCode2(" ");
+					tCdPfParmId.setCondition(" ");
+					tCdPfParm.setWorkMonthStart(iWorkMonth);
+					tCdPfParm.setWorkMonthEnd(0);
+					tCdPfParm.setCdPfParmsId(tCdPfParmId);
+					
+					try {
+						iCdPfParmsService.insert(tCdPfParm, titaVo);
+					} catch(DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+					}
+					
+				} else {
+					tCdPfParm = iCdPfParmsService.holdById(new CdPfParmsId("R"," "," "),titaVo);
+					tCdPfParm.setWorkMonthStart(iWorkMonth);
+					tCdPfParm.setWorkMonthEnd(0);
+					try {
+						iCdPfParmsService.update(tCdPfParm, titaVo);
+					} catch(DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+					}
+					
+				}
+				//主管授權
+				if (!titaVo.getHsupCode().equals("1")) {
+					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+				}
+				
+			}
+			
+			
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -160,7 +240,6 @@ public class L6751 extends TradeBuffer {
 
 		} // end j
 
-		
 		// 條件記號=3 (金額級距)
 		for (int l = 0; l <= 19; l++) {
 
@@ -203,7 +282,6 @@ public class L6751 extends TradeBuffer {
 			}
 
 		} // end l
-
 
 	}
 

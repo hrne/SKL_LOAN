@@ -10,12 +10,14 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.CdCityService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClStockService;
 import com.st1.itx.db.service.CustMainService;
@@ -50,6 +52,10 @@ public class L2913 extends TradeBuffer {
 	@Autowired
 	public CustMainService sCustMainService;
 
+	/* DB服務注入 */
+	@Autowired
+	public CdCodeService sCdCodeDefService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -112,6 +118,14 @@ public class L2913 extends TradeBuffer {
 		this.totaVo.putParam("OCityCodeX", tCdCity.getCityItem());
 		this.totaVo.putParam("OClTypeCode", tClMain.getClTypeCode());
 		this.totaVo.putParam("OStockCode", tClStock.getStockCode());
+		
+		CdCode tCdCode = sCdCodeDefService.getItemFirst(2, "StockCode", tClStock.getStockCode(), titaVo);
+		
+		if(tCdCode != null) {
+		  this.totaVo.putParam("OStockCodeX", tCdCode.getItem());
+		} else {
+		  this.totaVo.putParam("OStockCodeX", "");
+		}	
 		this.totaVo.putParam("OListingType", tClStock.getListingType());
 		this.totaVo.putParam("OStockType", tClStock.getStockType());
 		this.totaVo.putParam("OCompanyId", tClStock.getCompanyId());

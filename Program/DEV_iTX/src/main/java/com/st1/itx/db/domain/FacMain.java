@@ -29,7 +29,7 @@ public class FacMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -25361551668119904L;
+	private static final long serialVersionUID = -465743187365178801L;
 
 @EmbeddedId
   private FacMainId facMainId;
@@ -304,8 +304,8 @@ public class FacMain implements Serializable {
   private String prodBreachFlag;
 
   // 違約適用說明
-  @Column(name = "`Breach`", length = 100)
-  private String breach;
+  @Column(name = "`BreachDescription`", length = 100)
+  private String breachDescription;
 
   // 信用評分
   @Column(name = "`CreditScore`")
@@ -1722,18 +1722,18 @@ N:否
 	* 
 	* @return String
 	*/
-  public String getBreach() {
-    return this.breach == null ? "" : this.breach;
+  public String getBreachDescription() {
+    return this.breachDescription == null ? "" : this.breachDescription;
   }
 
 /**
 	* 違約適用說明<br>
 	* 
   *
-  * @param breach 違約適用說明
+  * @param breachDescription 違約適用說明
 	*/
-  public void setBreach(String breach) {
-    this.breach = breach;
+  public void setBreachDescription(String breachDescription) {
+    this.breachDescription = breachDescription;
   }
 
 /**
@@ -2055,7 +2055,7 @@ N:否
            + ", incomeTaxFlag=" + incomeTaxFlag + ", compensateFlag=" + compensateFlag + ", irrevocableFlag=" + irrevocableFlag + ", rateAdjNoticeCode=" + rateAdjNoticeCode + ", pieceCode=" + pieceCode + ", repayCode=" + repayCode
            + ", introducer=" + introducer + ", district=" + district + ", fireOfficer=" + fireOfficer + ", estimate=" + estimate + ", creditOfficer=" + creditOfficer + ", loanOfficer=" + loanOfficer
            + ", businessOfficer=" + businessOfficer + ", supervisor=" + supervisor + ", investigateOfficer=" + investigateOfficer + ", estimateReview=" + estimateReview + ", coorgnizer=" + coorgnizer + ", advanceCloseCode=" + advanceCloseCode
-           + ", prodBreachFlag=" + prodBreachFlag + ", breach=" + breach + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo + ", colSetFlag=" + colSetFlag
+           + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo + ", colSetFlag=" + colSetFlag
            + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo + ", acDate=" + acDate
            + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
            + "]";

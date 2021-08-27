@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.util.date.DateUtil;
 
 @Service
 @Repository
@@ -26,8 +25,6 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
-	@Autowired
-	private DateUtil dDateUtil;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -37,19 +34,6 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-//		int iTBsDay = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-
-//		dDateUtil.setDate_1(iTBsDay);
-
-//		dDateUtil.setYears(-2);
-
-//		int twoYearsAgo = dDateUtil.getCalenderDay();
-
-//		dDateUtil.setDate_1(iTBsDay);
-
-//		dDateUtil.setYears(-1);
-
-//		int oneYearAgo = dDateUtil.getCalenderDay();
 
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
@@ -59,26 +43,28 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 當日(int)
 		int nowDate = Integer.valueOf(iEntdy);
 		Calendar calMonthDate = Calendar.getInstance();
-		// 設當年月底日
+		// 設當年月底日 0是月底
 		calMonthDate.set(iYear, iMonth, 0);
 
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
 		boolean isMonthZero = iMonth - 1 == 0;
-		// 一年前
-		calMonthDate.add(Calendar.YEAR, -1);
-		
-		int lastYearDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
-		
+
 		if (nowDate < thisMonthEndDate) {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
+		
+		//月底日
+		int iDay = thisMonthEndDate % 100;	
+		
+		// 一年前：月份扣13。 1月為0,2月為1 以此類推。 
+		calMonthDate.set(iYear, iMonth-13, iDay);
 
-//		String iENTDY = String.valueOf(iTBsDay);
+		int lastYearDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
 		String iYYMM = iYear + String.format("%02d", iMonth);
 
-//		String iTwoYearsAgo = String.valueOf(twoYearsAgo);
 		String iOneYearAgo = String.valueOf(lastYearDate);
 
 		this.info("iOneYearAgo:" + iOneYearAgo + ",iYYMM:" + iYYMM);
@@ -123,7 +109,8 @@ public class LM061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        ,\"RecordDate\"";
 		sql += "                        ,\"Amount\"";
 		sql += "                        ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\",\"FacmNo\"";
-		sql += "                                            ORDER BY \"TitaTxtNo\" DESC";
+		sql += "                                            ORDER BY \"RecordDate\" DESC";
+		sql += "                                            		,\"TitaTxtNo\" DESC";
 		sql += "                ) AS \"LawRowNo\"";
 		sql += "      FROM \"CollLaw\"";
 		sql += "    ) COL ON COL.\"CustNo\"  = M.\"CustNo\"";

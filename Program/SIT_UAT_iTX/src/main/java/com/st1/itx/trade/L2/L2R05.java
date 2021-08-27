@@ -418,7 +418,7 @@ public class L2R05 extends TradeBuffer {
 //		this.totaVo.putParam("ODecreaseFlag", tFacProd.getDecreaseFlag());
 //		this.totaVo.putParam("OCopyFlag", tFacMain.getCopyFlag());
 		this.totaVo.putParam("OProdBreachFlag", tFacMain.getProdBreachFlag());
-		this.totaVo.putParam("OBreach", tFacMain.getBreach());
+		this.totaVo.putParam("OBreach", tFacMain.getBreachDescription());
 		this.totaVo.putParam("OCreditScore", tFacMain.getCreditScore());
 		this.totaVo.putParam("OGuaranteeDate", tFacMain.getGuaranteeDate());
 		this.totaVo.putParam("OContractNo", tFacMain.getContractNo());
@@ -441,7 +441,7 @@ public class L2R05 extends TradeBuffer {
 //		this.totaVo.putParam("OCancelCode", tFacMain.getCancelCode());
 		// 可用額度=Min(共用額度「可用總額度/循環動用」,Min(額度核准金額,擔保品分配金額) -已動用額度餘額))
 		BigDecimal wkAvailableAmt = loanAvailableAmt.caculate(tFacMain, titaVo); // 可用額度
-		// 限額計算方式 F-額度, C-擔保品 S-共用額度
+		// 限額計算方式 F-核准額度, C-擔保品 S-合併額度控管
 		String wkLimitFlag = loanAvailableAmt.getLimitFlag();
 		this.totaVo.putParam("OAvailableAmt", wkAvailableAmt);
 		this.totaVo.putParam("OLimitFlag", wkLimitFlag);

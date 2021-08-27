@@ -34,5 +34,4 @@ public class SysLogger {
 	public void mustInfo(String msg) {
 		logger.info(msg);
 	}
-
 }

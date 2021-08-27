@@ -36,6 +36,7 @@ import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -81,14 +82,8 @@ public class L2017 extends TradeBuffer {
 	@Autowired
 	public CdCodeService sCdCodeService;
 
-//	@Autowired
-//	public ClImmService sClImmService;
-//	@Autowired
-//	public ClStockService sClStockService;
-//	@Autowired
-//	public ClOtherService sClOtherService;
-//	@Autowired
-//	public ClMovablesService sClMovablesService;
+	@Autowired
+	public FacStatusCom facStatusCom;
 
 	/* 日期工具 */
 	@Autowired
@@ -168,7 +163,6 @@ public class L2017 extends TradeBuffer {
 		CustMain tCustMain = new CustMain();
 		ClMain tClMain = new ClMain();
 		FacMain tFacMain = new FacMain();
-		CdCode tCdCode = new CdCode();
 		FacCaseAppl tFacCaseAppl = new FacCaseAppl();
 		InsuOrignal tInsuOrignal = new InsuOrignal();
 		Slice<ClFac> slClFac = null;
@@ -258,140 +252,49 @@ public class L2017 extends TradeBuffer {
 			// 容器 : 計算額度下所有撥款序號之貸放餘額加總
 			BigDecimal loanBal = new BigDecimal(0);
 			// 容器 : 此額度下最後一筆撥款序號之戶況
-			int loanStatus = 0;
+			int loanStatus = 99;
 			String loanStatusX = "";
 
 			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(thisCustNo, thisFacmNo, thisFacmNo, 0,
 					900, 0, Integer.MAX_VALUE, titaVo);
-			List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null
-					: new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 
-			if (lLoanBorMain != null && lLoanBorMain.size() > 0) {
-
-				// 依戶號、額度號碼、撥款序號，由小到大排序
-				lLoanBorMain.sort((c1, c2) -> {
-					if (c1.getCustNo() - c2.getCustNo() != 0) {
-						return c1.getCustNo() - c2.getCustNo();
-					} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
-						return c1.getFacmNo() - c2.getFacmNo();
-					} else if (c1.getBormNo() - c2.getBormNo() != 0) {
-						return c1.getBormNo() - c2.getBormNo();
-					} else {
-						return 0;
+			if (slLoanBorMain != null) {
+				loanStatus = facStatusCom.settingStatus(slLoanBorMain.getContent(),
+						this.txBuffer.getTxBizDate().getTbsDy());
+				// 含結案為N時跳掉結案戶
+				if (iSearchClsFg.equals("N")) {
+					if (loanStatus == 1 || loanStatus == 3 || loanStatus == 8 || loanStatus == 9) {
+						continue;
 					}
-				});
-
-				for (LoanBorMain tLoanBorMain : lLoanBorMain) {
-
-					if (iSearchClsFg.equals("N")) {
-						this.info("是否已結案檢查");
-
-						// 戶況:3 為已結案
-						if (tLoanBorMain.getStatus() == 3) {
-							loanStatus = tLoanBorMain.getStatus();
-							continue;
-						}
-					}
-
+				}
+				for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
 					// 計算額度下所有撥款序號之貸放金額加總
 					loanAmt = loanAmt.add(tLoanBorMain.getDrawdownAmt());
 
 					// 計算額度下所有撥款序號之貸放餘額加總
 					loanBal = loanBal.add(tLoanBorMain.getLoanBal());
-
-					// 此額度下最後一筆撥款序號之戶況
-					loanStatus = tLoanBorMain.getStatus();
-
 				}
 
-			}
-			// 含結案為N時跳掉結案戶
-			if (iSearchClsFg.equals("N") && loanStatus == 3) {
-				continue;
 			}
 
 			// 取狀態
-			tCdCode = new CdCode();
-			CdCodeId cdCodeId = new CdCodeId();
-			cdCodeId.setDefCode("Status");
-			cdCodeId.setCode(parse.IntegerToString(loanStatus, 2));
-			tCdCode = sCdCodeService.findById(cdCodeId, titaVo);
-			if (tCdCode != null) {
-				loanStatusX = tCdCode.getItem();
-				if (lLoanBorMain == null) {
-					loanStatusX = "未撥款";
+			if (loanStatus == 99) {
+				loanStatusX = "未撥款";
+			} else {
+				CdCode tCdCode = sCdCodeService.findById(new CdCodeId("Status",parse.IntegerToString(loanStatus, 2)), titaVo);
+				if (tCdCode != null) {
+					loanStatusX = tCdCode.getItem();
 				}
 			}
-//			// 取設定金額
-//			int tmpClCode1 = tmpClFac.getClCode1();
-//			int tmpClCode2 = tmpClFac.getClCode2();
-//			int tmpClNo = tmpClFac.getClNo();
-
-			BigDecimal settingAmt = BigDecimal.ZERO;
-			settingAmt = tmpClFac.getOriSettingAmt();
-
-//			// 依據擔保品代號1查不同Table
-//			switch (tmpClCode1) {
-//			case 1:
-//			case 2:
-//				ClImmId tClImmId = new ClImmId();
-//				tClImmId.setClCode1(tmpClCode1);
-//				tClImmId.setClCode2(tmpClCode2);
-//				tClImmId.setClNo(tmpClNo);
-//				ClImm tClImm = sClImmService.findById(tClImmId, titaVo);
-//				if (tClImm == null) {
-//					tClImm = new ClImm();
-//				}
-//				settingAmt = tClImm.getSettingAmt();
-//				break;
-//			case 3:
-//			case 4:
-//				ClStockId tClStockId = new ClStockId();
-//				tClStockId.setClCode1(tmpClCode1);
-//				tClStockId.setClCode2(tmpClCode2);
-//				tClStockId.setClNo(tmpClNo);
-//				ClStock tClStock = sClStockService.findById(tClStockId, titaVo);
-//				if (tClStock == null) {
-//					tClStock = new ClStock();
-//				}
-//				settingAmt = tClStock.getSettingBalance();
-//				break;
-//			case 5:
-//				ClOtherId tClOtherId = new ClOtherId();
-//				tClOtherId.setClCode1(tmpClCode1);
-//				tClOtherId.setClCode2(tmpClCode2);
-//				tClOtherId.setClNo(tmpClNo);
-//				ClOther tClOther = sClOtherService.findById(tClOtherId, titaVo);
-//				if (tClOther == null) {
-//					tClOther = new ClOther();
-//				}
-//				settingAmt = tClOther.getSettingAmt();
-//
-//				break;
-//			case 9:
-//				ClMovablesId tClMovablesId = new ClMovablesId();
-//				tClMovablesId.setClCode1(tmpClCode1);
-//				tClMovablesId.setClCode2(tmpClCode2);
-//				tClMovablesId.setClNo(tmpClNo);
-//				ClMovables tClMovables = sClMovablesService.findById(tClMovablesId, titaVo);
-//				if (tClMovables == null) {
-//					tClMovables = new ClMovables();
-//				}
-//				settingAmt = tClMovables.getSettingAmt();
-//				break;
-//			}
 
 			// 同一擔保品編號只顯示第一筆
 			String wkOrigInsuNo = "";
-			this.info("1 = " + wkClCode1 + ":" + wkClCode2 + ":" + wkClNo);
-			this.info("2 = " + tmpClFac.getClCode1() + ":" + tmpClFac.getClCode2() + ":" + tmpClFac.getClNo());
 			if (wkClCode1 == tmpClFac.getClCode1() && wkClCode2 == tmpClFac.getClCode2()
 					&& wkClNo == tmpClFac.getClNo()) {
 				wkOrigInsuNo = "";
 			} else {
 				wkOrigInsuNo = tInsuOrignal.getOrigInsuNo();
 			}
-			this.info("wkOrigInsuNo 3 " + wkOrigInsuNo);
 			wkClCode1 = tmpClFac.getClCode1();
 			wkClCode2 = tmpClFac.getClCode2();
 			wkClNo = tmpClFac.getClNo();
@@ -418,7 +321,7 @@ public class L2017 extends TradeBuffer {
 			occurslist.putParam("OClNo", tmpClFac.getClNo());
 			occurslist.putParam("OOApplNo", tmpClFac.getApproveNo());
 			occurslist.putParam("OOEvaAmt", tClMain.getEvaAmt());
-			occurslist.putParam("OOSettingAmt", settingAmt);
+			occurslist.putParam("OOSettingAmt", tmpClFac.getOriSettingAmt());
 			// 核准日期 案件申請檔 新增funtion 依核准號碼,處理情形找駁准日期
 			occurslist.putParam("OOApproveDate", tFacCaseAppl.getApproveDate());
 			occurslist.putParam("OOLineAmt", tFacMain.getLineAmt());

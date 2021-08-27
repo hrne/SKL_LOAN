@@ -685,7 +685,7 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("RateAdjNoticeCode", tFacMain.getRateAdjNoticeCode());
 		tTempVo.putParam("PieceCode", tFacMain.getPieceCode());
 		tTempVo.putParam("ProdBreachFlag", tFacMain.getProdBreachFlag());
-		tTempVo.putParam("Breach", tFacMain.getBreach());
+		tTempVo.putParam("Breach", tFacMain.getBreachDescription());
 		tTempVo.putParam("CreditScore", tFacMain.getCreditScore());
 		tTempVo.putParam("RepayCode", tFacMain.getRepayCode());
 		tTempVo.putParam("RepayBank", titaVo.getParam("RepayBank"));
@@ -772,7 +772,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(titaVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(titaVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
-		tFacMain.setBreach(titaVo.getParam("Breach"));
+		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RepayCode")));
 //		tFacMain.setRepayBank(titaVo.getParam("RepayBank"));
@@ -921,7 +921,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
-		tFacMain.setBreach(tTempVo.getParam("Breach"));
+		tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
 //		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));
@@ -1054,7 +1054,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setRateAdjNoticeCode(tTempVo.getParam("RateAdjNoticeCode"));
 		tFacMain.setPieceCode(tTempVo.getParam("PieceCode"));
 		tFacMain.setProdBreachFlag(tTempVo.getParam("ProdBreachFlag"));
-		tFacMain.setBreach(tTempVo.getParam("Breach"));
+		tFacMain.setBreachDescription(tTempVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(tTempVo.getParam("CreditScore")));
 		tFacMain.setRepayCode(this.parse.stringToInteger(tTempVo.getParam("RepayCode")));
 //		tFacMain.setRepayBank(tTempVo.getParam("RepayBank"));

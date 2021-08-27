@@ -1,0 +1,293 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6064)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,93)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+!HIDE(#BTN1)
+
+#FirstIn=A,1,S
+E(0,1)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L6604; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增代碼)
+K(MODIFYBUTTON,查詢)
+
+!#DefTypeH=x,150,S
+!T(3,01:顧客管理作業;02:業務作業;03:帳務作業;04:批次作業;05:管理性作業;06:共同作業;07:介接外部系統;08:遵循法令作業;09:報表作業)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6064]                                 各類代碼檔查詢"],
+["#FdDefType+業務類別",#DefType,#DefTypeX],
+["#FdDefCode+代碼檔代號",#DefCode,#CodeBTN],
+["#FdDefItem+代碼檔名稱",#DefItem],
+["#FdCode+代碼",#Code],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:新增代碼檔代碼;enable:1;tabbable:0;title:L6604 各類代碼檔維護
+!#BUF1=X,42,S
+
+#FdDefType=X,2,L
+#FdDefCode=X,2,L
+#FdDefItem=X,2,L
+#FdCode=X,2,L
+!#FdRPTFG=X,2,L
+!T(3,*)
+
+#CodeBTN=X,15,I,ui:button;value:代碼檔代號查詢;enable:1;tabbable:0;title:L6069 代碼檔代號查詢;
+
+#b1=X,1,S
+BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:DefCode<-OOCode:DefItem<-OOItem})
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!業務類別
+#CDCODEMenuCode=x,20,S
+T(3,CdCode.MenuCode)
+#DefTypeH=x,1024,S
+
+!類別代碼
+#CDCODECodeType=x,20,S
+T(3,CdCode.CodeType)
+#DefCodeH=x,30000,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEMenuCode,#CDCODECodeType)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@DefTypeH,#HelpDesc1)
+T(2,@DefCodeH,#HelpDesc2)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=x,42,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@DefType,#NTXBUF,1,2)
+T(1,@DefCode,#NTXBUF,3,20)
+T(1,@Code,#NTXBUF,23,20)
+HIDE(#CodeBTN)
+
+#WKTF=X,1,S
+C(3,#CHAIN,1,T(F,@DefType,0)T(F,@DefCode,0)T(F,@DefItem,0),$)
+
+!業務類別
+#DefType=X,2,I
+C(3,#CHAIN,1,s,$)
+HELP(#DefTypeH)
+@C(4,#DefType,$,V(H,#DefTypeH))
+
+#DefTypeX=x,20,L
+C(4,#DefType,S,T(H,#DefType,#DefTypeH))
+
+!代碼檔代號
+#DefCode=x,20,I
+C(3,#CHAIN,1,s,$)
+!HELP(#DefCodeH)
+@C(4,#DefCode,$,V(H,#DefCodeH))
+IF(#DefType=="" & #DefCode=="",V(P,業務類別、代碼檔代號需擇一輸入),$)
+
+#Rim6R33DefType=X,2,S
+
+#Rim6R33DefCode=x,20,S
+
+#SendL6R33=X,1,S
+IF(#DefType!=""&& #DefCode!="",$,S)
+T(2,@Rim6R33DefType,#DefType)
+T(2,@Rim6R33DefCode,#DefCode)
+RESET_RIM(#SendL6R33,L6R33)
+S(L6R33,1,#Rim6R33DefType,#Rim6R33DefCode)
+R(1,L6R33)
+E(0,@RimFlag,#L6R33Flag)
+
+#RimFlag=9,1,S
+IF(#DefType!=""&& #DefCode!="",$,S)
+C(3,#RimFlag,0,V(P,業務類別有誤),S)
+
+
+!代碼檔名稱
+#DefItem=x,80,L
+!C(3,#CHAIN,1,s,$)
+C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
+
+!代碼
+#Code=x,20,I
+!C(3,#CHAIN,1,s,$)
+
+#RPTFG=A,1,S
+
+!<include src="COM.icf::RPTFG.dec"/>
+<include src="ROM.icf::L6R33.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6064 ----------
+<sub type="FORM" name="L6064">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6064,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6064] 各類代碼檔)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 代碼(TOTA)
+#OODefCode=x,20,L
+
+#OODefItem=x,50,L
+T(H,#OODefCode,#DefCodeH)
+
+! 代碼(TOTA)
+#OOCode=x,20,L
+
+! 說明(TOTA)
+#OOItem=x,100,L
+
+! 業務類別(TOTA)
+#OOType=A,2,L
+
+#OOTypeX=x,50,L
+T(H,#OOType,#DefTypeH)
+
+
+! 啟用記號(TOTA)
+#OOEnable=X,1,L
+
+
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
+
+#OOBUF2=x,41,S
+T(2,#OOFunc2+#OODefCode+#OOCode)
+
+#OOBTN2=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=修改;ntxbuf=#OOBUF2})
+
+! 刪除的按鈕
+#OOFunc4=A,1,S
+E(0,4)
+
+#OOBUF4=x,41,S
+T(2,#OOFunc4+#OODefCode+#OOCode)
+
+#OOBTN4=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=刪除;ntxbuf=#OOBUF4})
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#DefType#DefCode#Code
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R33.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L6064
+#OODefCode
+#OOCode
+#OOItem
+#OOType
+#OOEnable
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6064" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6064]                                 各類代碼檔查詢                                                                              "],
+[""],
+]
+</sub>
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6064
+#any={detail:true, header:'L6064.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+
+#OODefCode=代碼檔代碼
+{width:150,hidden:true}
+
+#OODefItem=代碼檔說明
+{width:300,hidden:true}
+
+#OOCode=代碼
+{width:150,align:'left'}
+
+#OOItem=代碼說明
+{width:300,align:'left'}
+
+#OOType=業務類別
+{width:70,align:'center'}
+
+#OOTypeX=業務類別</br>說明
+{width:100,align:'left'}
+
+#OOEnable=啟用記號
+{width:70,align:'center'}
+
+^
+</sub>

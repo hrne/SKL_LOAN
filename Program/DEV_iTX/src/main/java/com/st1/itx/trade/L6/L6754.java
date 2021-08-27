@@ -13,10 +13,17 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdPerformance;
 import com.st1.itx.db.domain.CdPerformanceId;
+import com.st1.itx.db.domain.CdPfParms;
+import com.st1.itx.db.domain.CdPfParmsId;
+import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.service.CdPerformanceService;
+import com.st1.itx.db.service.CdPfParmsService;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
 /**
@@ -45,8 +52,16 @@ public class L6754 extends TradeBuffer {
 	@Autowired
 	Parse iParse;
 	@Autowired
+	public CdWorkMonthService iCdWorkMonthService;
+	@Autowired
+	public CdPfParmsService iCdPfParmsService;
+	@Autowired
+	SendRsp sendRsp;
+	@Autowired
 	public DataLog iDataLog;
 
+	private boolean duringWorkMonth = false;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6754 ");
@@ -55,6 +70,9 @@ public class L6754 extends TradeBuffer {
 		// 取得輸入資料
 		int iFuncCode = this.iParse.stringToInteger(titaVo.getParam("FuncCode"));
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
+		int iYear = Integer.valueOf(titaVo.getParam("WorkMonth").substring(0,3))+1911;
+		int iMonth = Integer.valueOf(titaVo.getParam("WorkMonth").substring(3,5));
+		int AcDate = titaVo.getEntDyI();// 7碼
 		String iPieceCode = titaVo.getParam("PieceCode");
 		BigDecimal iUnitCnt = new BigDecimal(titaVo.getParam("UnitCnt"));
 		BigDecimal iUnitAmtCond = new BigDecimal(titaVo.getParam("UnitAmtCond"));
@@ -69,7 +87,18 @@ public class L6754 extends TradeBuffer {
 		BigDecimal iBsOffrCntLimit = new BigDecimal(titaVo.getParam("BsOffrCntLimit"));
 		BigDecimal iBsOffrAmtCond = new BigDecimal(titaVo.getParam("BsOffrAmtCond"));
 		BigDecimal iBsOffrPerccent = new BigDecimal(titaVo.getParam("BsOffrPerccent"));
-
+		
+		//檢查工作月區間
+		CdWorkMonth tWorkMonth = iCdWorkMonthService.findById(new CdWorkMonthId(iYear,iMonth), titaVo);
+		if(tWorkMonth!=null) {
+			int MonthStart = tWorkMonth.getStartDate();
+			int MonthEnd = tWorkMonth.getEndDate();
+			if(MonthStart <= AcDate && AcDate<=MonthEnd) {
+				
+				duringWorkMonth = true;
+			}
+		}
+		
 		CdPerformance iCdPerformance = new CdPerformance();
 		CdPerformanceId iCdPerformanceId = new CdPerformanceId();
 		iCdPerformanceId.setPieceCode(iPieceCode);
@@ -148,7 +177,51 @@ public class L6754 extends TradeBuffer {
 		default:
 			break;
 		}
-
+		
+		//異動重算業績記號
+		if(iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 4 ) {
+			
+			if(duringWorkMonth==true) {
+				this.info("duringWorkMonth True");
+				
+				CdPfParms tCdPfParm = new CdPfParms();
+				CdPfParmsId tCdPfParmId = new CdPfParmsId();
+				
+				CdPfParms sCdPfParm = iCdPfParmsService.findById(new CdPfParmsId("R"," "," "),titaVo);
+				this.info("sCdPfParm=="+sCdPfParm);
+				if(sCdPfParm == null) {
+					//業績重算 設條件記號1=R 有效工作月起 其餘為空白 OR 0
+					tCdPfParmId.setConditionCode1("R");//記號
+					tCdPfParmId.setConditionCode2(" ");
+					tCdPfParmId.setCondition(" ");
+					tCdPfParm.setWorkMonthStart(iWorkMonth);
+					tCdPfParm.setWorkMonthEnd(0);
+					tCdPfParm.setCdPfParmsId(tCdPfParmId);
+					
+					try {
+						iCdPfParmsService.insert(tCdPfParm, titaVo);
+					} catch(DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+					}
+					
+				} else {
+					tCdPfParm = iCdPfParmsService.holdById(new CdPfParmsId("R"," "," "),titaVo);
+					tCdPfParm.setWorkMonthStart(iWorkMonth);
+					tCdPfParm.setWorkMonthEnd(0);
+					try {
+						iCdPfParmsService.update(tCdPfParm, titaVo);
+					} catch(DBException e) {
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+					}
+					
+				}
+				//主管授權
+				if (!titaVo.getHsupCode().equals("1")) {
+					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+				}
+			}
+		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

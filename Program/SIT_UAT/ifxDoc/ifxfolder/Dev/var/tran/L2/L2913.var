@@ -262,9 +262,8 @@ T(3,)T(H,#OClTypeCode,#ClTypeCodeHelp)
 
 !股票代號
 #OStockCode=X,10,L
-
 #OStockCodeX=X,20,L
-T(H,#OStockCode,#StockCodeHelp)
+
 !掛牌別
 #OListingType=X,10,L
 #OListingTypeX=X,10,L
@@ -387,6 +386,7 @@ TXFORM=L2913
 #OCityCodeX
 #OClTypeCode
 #OStockCode
+#OStockCodeX
 #OListingType
 #OStockType
 #OCompanyId

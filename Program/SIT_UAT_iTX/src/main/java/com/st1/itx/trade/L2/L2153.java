@@ -625,7 +625,7 @@ public class L2153 extends TradeBuffer {
 		// tFacMain.setGroupId(titaVo.getParam("GroupId"));
 //	tFacMain.setCopyFlag(titaVo.getParam("CopyFlag"));
 		tFacMain.setProdBreachFlag(titaVo.getParam("ProdBreachFlag"));
-		tFacMain.setBreach(titaVo.getParam("Breach"));
+		tFacMain.setBreachDescription(titaVo.getParam("Breach"));
 		tFacMain.setCreditScore(this.parse.stringToInteger(titaVo.getParam("CreditScore")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(titaVo.getParam("GuaranteeDate")));
 		tFacMain.setContractNo("");
