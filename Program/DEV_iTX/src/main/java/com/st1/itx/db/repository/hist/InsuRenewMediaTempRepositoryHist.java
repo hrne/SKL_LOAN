@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.InsuRenewMediaTempId;
  */
 public interface InsuRenewMediaTempRepositoryHist extends JpaRepository<InsuRenewMediaTemp, InsuRenewMediaTempId> {
 
-  // FireInsuMonth >= ,AND FireInsuMonth <= 
-  public Slice<InsuRenewMediaTemp> findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqual(String fireInsuMonth_0, String fireInsuMonth_1, Pageable pageable);
+	// FireInsuMonth >= ,AND FireInsuMonth <=
+	public Slice<InsuRenewMediaTemp> findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqual(String fireInsuMonth_0, String fireInsuMonth_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<InsuRenewMediaTemp> findByInsuRenewMediaTempId(InsuRenewMediaTempId insuRenewMediaTempId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<InsuRenewMediaTemp> findByInsuRenewMediaTempId(InsuRenewMediaTempId insuRenewMediaTempId);
 
 }
-

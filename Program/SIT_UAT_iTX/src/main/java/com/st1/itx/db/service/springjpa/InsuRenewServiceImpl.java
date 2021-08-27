@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("insuRenewService")
 @Repository
-public class InsuRenewServiceImpl implements InsuRenewService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(InsuRenewServiceImpl.class);
-
+public class InsuRenewServiceImpl extends ASpringJpaParm implements InsuRenewService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class InsuRenewServiceImpl implements InsuRenewService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + insuRenewId);
+    this.info("findById " + dbName + " " + insuRenewId);
     Optional<InsuRenew> insuRenew = null;
     if (dbName.equals(ContentName.onDay))
       insuRenew = insuRenewReposDay.findById(insuRenewId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "PrevInsuNo", "EndoInsuNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = insuRenewReposHist.findAll(pageable);
     else 
       slice = insuRenewRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectA " + dbName + " : " + "acDate_0 : " + acDate_0);
+    this.info("selectA " + dbName + " : " + "acDate_0 : " + acDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByAcDateIsOrderByInsuEndDateDescInsuStartDateAsc(acDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = insuRenewReposHist.findAllByAcDateIsOrderByInsuEndDateDescInsuStartDateAsc(acDate_0, pageable);
     else 
       slice = insuRenewRepos.findAllByAcDateIsOrderByInsuEndDateDescInsuStartDateAsc(acDate_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectB " + dbName + " : " + "acDate_0 : " + acDate_0 + " repayCode_1 : " +  repayCode_1);
+    this.info("selectB " + dbName + " : " + "acDate_0 : " + acDate_0 + " repayCode_1 : " +  repayCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByAcDateIsAndRepayCodeIsOrderByInsuEndDateDescInsuStartDateAsc(acDate_0, repayCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = insuRenewReposHist.findAllByAcDateIsAndRepayCodeIsOrderByInsuEndDateDescInsuStartDateAsc(acDate_0, repayCode_1, pageable);
     else 
       slice = insuRenewRepos.findAllByAcDateIsAndRepayCodeIsOrderByInsuEndDateDescInsuStartDateAsc(acDate_0, repayCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectC " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0);
+    this.info("selectC " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectD " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1);
+    this.info("selectD " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndRepayCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -206,6 +214,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndRepayCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndRepayCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -222,7 +233,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectE " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " acDate_1 : " +  acDate_1 + " statusCode_2 : " +  statusCode_2);
+    this.info("selectE " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " acDate_1 : " +  acDate_1 + " statusCode_2 : " +  statusCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndAcDateIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, acDate_1, statusCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -231,6 +242,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndAcDateIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, acDate_1, statusCode_2, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndAcDateIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, acDate_1, statusCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -247,7 +261,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectF " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " acDate_1 : " +  acDate_1 + " statusCode_2 : " +  statusCode_2);
+    this.info("selectF " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " acDate_1 : " +  acDate_1 + " statusCode_2 : " +  statusCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndAcDateGreaterThanAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, acDate_1, statusCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -256,6 +270,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndAcDateGreaterThanAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, acDate_1, statusCode_2, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndAcDateGreaterThanAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, acDate_1, statusCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -272,7 +289,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectG " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " statusCode_1 : " +  statusCode_1);
+    this.info("selectG " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " statusCode_1 : " +  statusCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, statusCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -281,6 +298,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, statusCode_1, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, statusCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -297,7 +317,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectH " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " renewCode_1 : " +  renewCode_1);
+    this.info("selectH " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " renewCode_1 : " +  renewCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndRenewCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, renewCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -306,6 +326,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndRenewCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, renewCode_1, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndRenewCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, renewCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -322,7 +345,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectI " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1 + " acDate_2 : " +  acDate_2 + " statusCode_3 : " +  statusCode_3);
+    this.info("selectI " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1 + " acDate_2 : " +  acDate_2 + " statusCode_3 : " +  statusCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndRepayCodeIsAndAcDateIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, acDate_2, statusCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -331,6 +354,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndRepayCodeIsAndAcDateIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, acDate_2, statusCode_3, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndRepayCodeIsAndAcDateIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, acDate_2, statusCode_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -347,7 +373,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectJ " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1 + " acDate_2 : " +  acDate_2 + " statusCode_3 : " +  statusCode_3);
+    this.info("selectJ " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1 + " acDate_2 : " +  acDate_2 + " statusCode_3 : " +  statusCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndRepayCodeIsAndAcDateGreaterThanAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, acDate_2, statusCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -356,6 +382,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndRepayCodeIsAndAcDateGreaterThanAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, acDate_2, statusCode_3, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndRepayCodeIsAndAcDateGreaterThanAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, acDate_2, statusCode_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -372,7 +401,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectK " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1 + " statusCode_2 : " +  statusCode_2);
+    this.info("selectK " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1 + " statusCode_2 : " +  statusCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndRepayCodeIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, statusCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -381,6 +410,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndRepayCodeIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, statusCode_2, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndRepayCodeIsAndStatusCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, statusCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -397,7 +429,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectL " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1 + " renewCode_2 : " +  renewCode_2);
+    this.info("selectL " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " repayCode_1 : " +  repayCode_1 + " renewCode_2 : " +  renewCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndRepayCodeIsAndRenewCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, renewCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -406,6 +438,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndRepayCodeIsAndRenewCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, renewCode_2, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndRepayCodeIsAndRenewCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, repayCode_1, renewCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -422,7 +457,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findNowInsuEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("findNowInsuEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -432,11 +467,14 @@ em = null;
     else 
       slice = insuRenewRepos.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override
-  public Slice<InsuRenew> findCustEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<InsuRenew> insuEndDateRange(int insuEndDate_0, int insuEndDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<InsuRenew> slice = null;
     if (titaVo.length != 0)
@@ -447,140 +485,18 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCustEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("insuEndDateRange " + dbName + " : " + "insuEndDate_0 : " + insuEndDate_0 + " insuEndDate_1 : " +  insuEndDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = insuRenewReposDay.findAllByCustNoIsOrderByFacmNoAscInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+      slice = insuRenewReposDay.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewReposMon.findAllByCustNoIsOrderByFacmNoAscInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+      slice = insuRenewReposMon.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewReposHist.findAllByCustNoIsOrderByFacmNoAscInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+      slice = insuRenewReposHist.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
     else 
-      slice = insuRenewRepos.findAllByCustNoIsOrderByFacmNoAscInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+      slice = insuRenewRepos.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
 
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<InsuRenew> findL4965A(int custNo_0, int facmNo_1, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<InsuRenew> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4965A " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
-    if (dbName.equals(ContentName.onDay))
-      slice = insuRenewReposDay.findAllByCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewReposMon.findAllByCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewReposHist.findAllByCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, pageable);
-    else 
-      slice = insuRenewRepos.findAllByCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<InsuRenew> findL4965B(String nowInsuNo_0, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<InsuRenew> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4965B " + dbName + " : " + "nowInsuNo_0 : " + nowInsuNo_0);
-    if (dbName.equals(ContentName.onDay))
-      slice = insuRenewReposDay.findAllByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(nowInsuNo_0, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewReposMon.findAllByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(nowInsuNo_0, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewReposHist.findAllByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(nowInsuNo_0, pageable);
-    else 
-      slice = insuRenewRepos.findAllByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(nowInsuNo_0, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<InsuRenew> findL4965C(String insuCompany_0, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<InsuRenew> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4965C " + dbName + " : " + "insuCompany_0 : " + insuCompany_0);
-    if (dbName.equals(ContentName.onDay))
-      slice = insuRenewReposDay.findAllByInsuCompanyIsOrderByInsuEndDateDescInsuStartDateAsc(insuCompany_0, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewReposMon.findAllByInsuCompanyIsOrderByInsuEndDateDescInsuStartDateAsc(insuCompany_0, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewReposHist.findAllByInsuCompanyIsOrderByInsuEndDateDescInsuStartDateAsc(insuCompany_0, pageable);
-    else 
-      slice = insuRenewRepos.findAllByInsuCompanyIsOrderByInsuEndDateDescInsuStartDateAsc(insuCompany_0, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<InsuRenew> findL4965D(String insuTypeCode_0, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<InsuRenew> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4965D " + dbName + " : " + "insuTypeCode_0 : " + insuTypeCode_0);
-    if (dbName.equals(ContentName.onDay))
-      slice = insuRenewReposDay.findAllByInsuTypeCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuTypeCode_0, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewReposMon.findAllByInsuTypeCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuTypeCode_0, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewReposHist.findAllByInsuTypeCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuTypeCode_0, pageable);
-    else 
-      slice = insuRenewRepos.findAllByInsuTypeCodeIsOrderByInsuEndDateDescInsuStartDateAsc(insuTypeCode_0, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<InsuRenew> findL4965Z(int insuEndDate_0, int insuEndDate_1, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<InsuRenew> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4965Z " + dbName + " : " + "insuEndDate_0 : " + insuEndDate_0 + " insuEndDate_1 : " +  insuEndDate_1);
-    if (dbName.equals(ContentName.onDay))
-      slice = insuRenewReposDay.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuEndDate_0, insuEndDate_1, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = insuRenewReposMon.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuEndDate_0, insuEndDate_1, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = insuRenewReposHist.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuEndDate_0, insuEndDate_1, pageable);
-    else 
-      slice = insuRenewRepos.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuEndDate_0, insuEndDate_1, pageable);
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -590,7 +506,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("prevInsuNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " prevInsuNo_2 : " +  prevInsuNo_2);
+    this.info("prevInsuNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " prevInsuNo_2 : " +  prevInsuNo_2);
     Optional<InsuRenew> insuRenewT = null;
     if (dbName.equals(ContentName.onDay))
       insuRenewT = insuRenewReposDay.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, prevInsuNo_2);
@@ -600,6 +516,7 @@ em = null;
       insuRenewT = insuRenewReposHist.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, prevInsuNo_2);
     else 
       insuRenewT = insuRenewRepos.findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, prevInsuNo_2);
+
     return insuRenewT.isPresent() ? insuRenewT.get() : null;
   }
 
@@ -615,7 +532,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4601A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2);
+    this.info("findL4601A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, custNo_1, facmNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -624,6 +541,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, custNo_1, facmNo_2, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, custNo_1, facmNo_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -640,7 +560,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4601B " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " clCode1_1 : " +  clCode1_1 + " clCode2_2 : " +  clCode2_2 + " clNo_3 : " +  clNo_3);
+    this.info("findL4601B " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " clCode1_1 : " +  clCode1_1 + " clCode2_2 : " +  clCode2_2 + " clNo_3 : " +  clNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, clCode1_1, clCode2_2, clNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -649,6 +569,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, clCode1_1, clCode2_2, clNo_3, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, clCode1_1, clCode2_2, clNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -665,7 +588,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4604A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " renewCode_1 : " +  renewCode_1 + " acDate_2 : " +  acDate_2 + " acDate_3 : " +  acDate_3);
+    this.info("findL4604A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " renewCode_1 : " +  renewCode_1 + " acDate_2 : " +  acDate_2 + " acDate_3 : " +  acDate_3);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthIsAndRenewCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, renewCode_1, acDate_2, acDate_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -674,6 +597,9 @@ em = null;
       slice = insuRenewReposHist.findAllByInsuYearMonthIsAndRenewCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, renewCode_1, acDate_2, acDate_3, pageable);
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthIsAndRenewCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, renewCode_1, acDate_2, acDate_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -690,7 +616,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4962A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " insuYearMonth_1 : " +  insuYearMonth_1);
+    this.info("findL4962A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " insuYearMonth_1 : " +  insuYearMonth_1);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -700,6 +626,9 @@ em = null;
     else 
       slice = insuRenewRepos.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -708,7 +637,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findL4600AFirst " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " nowInsuNo_3 : " +  nowInsuNo_3);
+    this.info("findL4600AFirst " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " nowInsuNo_3 : " +  nowInsuNo_3);
     Optional<InsuRenew> insuRenewT = null;
     if (dbName.equals(ContentName.onDay))
       insuRenewT = insuRenewReposDay.findTopByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, nowInsuNo_3);
@@ -718,6 +647,7 @@ em = null;
       insuRenewT = insuRenewReposHist.findTopByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, nowInsuNo_3);
     else 
       insuRenewT = insuRenewRepos.findTopByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, nowInsuNo_3);
+
     return insuRenewT.isPresent() ? insuRenewT.get() : null;
   }
 
@@ -733,7 +663,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4605A " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " prevInsuNo_3 : " +  prevInsuNo_3);
+    this.info("findL4605A " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " prevInsuNo_3 : " +  prevInsuNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, prevInsuNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -743,6 +673,56 @@ em = null;
     else 
       slice = insuRenewRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, prevInsuNo_3, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public InsuRenew findNotiTempFgFirst(String notiTempFg_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findNotiTempFgFirst " + dbName + " : " + "notiTempFg_0 : " + notiTempFg_0);
+    Optional<InsuRenew> insuRenewT = null;
+    if (dbName.equals(ContentName.onDay))
+      insuRenewT = insuRenewReposDay.findTopByNotiTempFgIsOrderByInsuYearMonthDesc(notiTempFg_0);
+    else if (dbName.equals(ContentName.onMon))
+      insuRenewT = insuRenewReposMon.findTopByNotiTempFgIsOrderByInsuYearMonthDesc(notiTempFg_0);
+    else if (dbName.equals(ContentName.onHist))
+      insuRenewT = insuRenewReposHist.findTopByNotiTempFgIsOrderByInsuYearMonthDesc(notiTempFg_0);
+    else 
+      insuRenewT = insuRenewRepos.findTopByNotiTempFgIsOrderByInsuYearMonthDesc(notiTempFg_0);
+
+    return insuRenewT.isPresent() ? insuRenewT.get() : null;
+  }
+
+  @Override
+  public Slice<InsuRenew> findCustEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<InsuRenew> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findCustEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = insuRenewReposDay.findAllByCustNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = insuRenewReposMon.findAllByCustNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = insuRenewReposHist.findAllByCustNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+    else 
+      slice = insuRenewRepos.findAllByCustNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -751,7 +731,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + insuRenewId);
+    this.info("Hold " + dbName + " " + insuRenewId);
     Optional<InsuRenew> insuRenew = null;
     if (dbName.equals(ContentName.onDay))
       insuRenew = insuRenewReposDay.findByInsuRenewId(insuRenewId);
@@ -769,7 +749,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + insuRenew.getInsuRenewId());
+    this.info("Hold " + dbName + " " + insuRenew.getInsuRenewId());
     Optional<InsuRenew> insuRenewT = null;
     if (dbName.equals(ContentName.onDay))
       insuRenewT = insuRenewReposDay.findByInsuRenewId(insuRenew.getInsuRenewId());
@@ -791,7 +771,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + insuRenew.getInsuRenewId());
+    this.info("Insert..." + dbName + " " + insuRenew.getInsuRenewId());
     if (this.findById(insuRenew.getInsuRenewId()) != null)
       throw new DBException(2);
 
@@ -820,7 +800,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + insuRenew.getInsuRenewId());
+    this.info("Update..." + dbName + " " + insuRenew.getInsuRenewId());
     if (!empNot.isEmpty())
       insuRenew.setLastUpdateEmpNo(empNot);
 
@@ -843,7 +823,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + insuRenew.getInsuRenewId());
+    this.info("Update..." + dbName + " " + insuRenew.getInsuRenewId());
     if (!empNot.isEmpty())
       insuRenew.setLastUpdateEmpNo(empNot);
 
@@ -863,7 +843,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + insuRenew.getInsuRenewId());
+    this.info("Delete..." + dbName + " " + insuRenew.getInsuRenewId());
     if (dbName.equals(ContentName.onDay)) {
       insuRenewReposDay.delete(insuRenew);	
       insuRenewReposDay.flush();
@@ -892,7 +872,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (InsuRenew t : insuRenew){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -927,7 +907,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (insuRenew == null || insuRenew.size() == 0)
       throw new DBException(6);
 
@@ -956,7 +936,7 @@ em = null;
 
   @Override
   public void deleteAll(List<InsuRenew> insuRenew, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

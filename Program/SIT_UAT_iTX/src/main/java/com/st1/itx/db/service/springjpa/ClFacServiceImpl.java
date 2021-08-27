@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("clFacService")
 @Repository
-public class ClFacServiceImpl implements ClFacService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(ClFacServiceImpl.class);
-
+public class ClFacServiceImpl extends ASpringJpaParm implements ClFacService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class ClFacServiceImpl implements ClFacService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + clFacId);
+    this.info("findById " + dbName + " " + clFacId);
     Optional<ClFac> clFac = null;
     if (dbName.equals(ContentName.onDay))
       clFac = clFacReposDay.findById(clFacId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "ApproveNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = clFacReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,15 +121,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("clCode1Eq " + dbName + " : " + "clCode1_0 : " + clCode1_0);
+    this.info("clCode1Eq " + dbName + " : " + "clCode1_0 : " + clCode1_0);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByClCode1IsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, pageable);
+      slice = clFacReposDay.findAllByClCode1IsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByClCode1IsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, pageable);
+      slice = clFacReposMon.findAllByClCode1IsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByClCode1IsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, pageable);
+      slice = clFacReposHist.findAllByClCode1IsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, pageable);
     else 
-      slice = clFacRepos.findAllByClCode1IsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, pageable);
+      slice = clFacRepos.findAllByClCode1IsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -153,15 +149,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("clCode2Eq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1);
+    this.info("clCode2Eq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByClCode1IsAndClCode2IsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, pageable);
+      slice = clFacReposDay.findAllByClCode1IsAndClCode2IsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByClCode1IsAndClCode2IsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, pageable);
+      slice = clFacReposMon.findAllByClCode1IsAndClCode2IsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByClCode1IsAndClCode2IsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, pageable);
+      slice = clFacReposHist.findAllByClCode1IsAndClCode2IsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, pageable);
     else 
-      slice = clFacRepos.findAllByClCode1IsAndClCode2IsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, pageable);
+      slice = clFacRepos.findAllByClCode1IsAndClCode2IsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -181,15 +177,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("clNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("clNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clFacReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clFacReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clFacReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else 
-      slice = clFacRepos.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
+      slice = clFacRepos.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -209,15 +205,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("approveNoEq " + dbName + " : " + "approveNo_0 : " + approveNo_0);
+    this.info("approveNoEq " + dbName + " : " + "approveNo_0 : " + approveNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByApproveNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(approveNo_0, pageable);
+      slice = clFacReposDay.findAllByApproveNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(approveNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByApproveNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(approveNo_0, pageable);
+      slice = clFacReposMon.findAllByApproveNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(approveNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByApproveNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(approveNo_0, pageable);
+      slice = clFacReposHist.findAllByApproveNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(approveNo_0, pageable);
     else 
-      slice = clFacRepos.findAllByApproveNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(approveNo_0, pageable);
+      slice = clFacRepos.findAllByApproveNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(approveNo_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -237,15 +233,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("facmNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
+    this.info("facmNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByCustNoIsAndFacmNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, pageable);
+      slice = clFacReposDay.findAllByCustNoIsAndFacmNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByCustNoIsAndFacmNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, pageable);
+      slice = clFacReposMon.findAllByCustNoIsAndFacmNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByCustNoIsAndFacmNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, pageable);
+      slice = clFacReposHist.findAllByCustNoIsAndFacmNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, pageable);
     else 
-      slice = clFacRepos.findAllByCustNoIsAndFacmNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, pageable);
+      slice = clFacRepos.findAllByCustNoIsAndFacmNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -265,15 +261,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByCustNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, pageable);
+      slice = clFacReposDay.findAllByCustNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByCustNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, pageable);
+      slice = clFacReposMon.findAllByCustNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByCustNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, pageable);
+      slice = clFacReposHist.findAllByCustNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, pageable);
     else 
-      slice = clFacRepos.findAllByCustNoIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, pageable);
+      slice = clFacRepos.findAllByCustNoIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -293,15 +289,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findRange " + dbName + " : " + "approveNo_0 : " + approveNo_0 + " approveNo_1 : " +  approveNo_1 + " facmNo_2 : " +  facmNo_2 + " facmNo_3 : " +  facmNo_3);
+    this.info("findRange " + dbName + " : " + "approveNo_0 : " + approveNo_0 + " approveNo_1 : " +  approveNo_1 + " facmNo_2 : " +  facmNo_2 + " facmNo_3 : " +  facmNo_3);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(approveNo_0, approveNo_1, facmNo_2, facmNo_3, pageable);
+      slice = clFacReposDay.findAllByApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(approveNo_0, approveNo_1, facmNo_2, facmNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(approveNo_0, approveNo_1, facmNo_2, facmNo_3, pageable);
+      slice = clFacReposMon.findAllByApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(approveNo_0, approveNo_1, facmNo_2, facmNo_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(approveNo_0, approveNo_1, facmNo_2, facmNo_3, pageable);
+      slice = clFacReposHist.findAllByApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(approveNo_0, approveNo_1, facmNo_2, facmNo_3, pageable);
     else 
-      slice = clFacRepos.findAllByApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(approveNo_0, approveNo_1, facmNo_2, facmNo_3, pageable);
+      slice = clFacRepos.findAllByApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(approveNo_0, approveNo_1, facmNo_2, facmNo_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -321,15 +317,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectForL2038 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " approveNo_3 : " +  approveNo_3 + " approveNo_4 : " +  approveNo_4 + " custNo_5 : " +  custNo_5 + " custNo_6 : " +  custNo_6 + " facmNo_7 : " +  facmNo_7 + " facmNo_8 : " +  facmNo_8);
+    this.info("selectForL2038 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " approveNo_3 : " +  approveNo_3 + " approveNo_4 : " +  approveNo_4 + " custNo_5 : " +  custNo_5 + " custNo_6 : " +  custNo_6 + " facmNo_7 : " +  facmNo_7 + " facmNo_8 : " +  facmNo_8);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, approveNo_3, approveNo_4, custNo_5, custNo_6, facmNo_7, facmNo_8, pageable);
+      slice = clFacReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, approveNo_3, approveNo_4, custNo_5, custNo_6, facmNo_7, facmNo_8, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, approveNo_3, approveNo_4, custNo_5, custNo_6, facmNo_7, facmNo_8, pageable);
+      slice = clFacReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, approveNo_3, approveNo_4, custNo_5, custNo_6, facmNo_7, facmNo_8, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, approveNo_3, approveNo_4, custNo_5, custNo_6, facmNo_7, facmNo_8, pageable);
+      slice = clFacReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, approveNo_3, approveNo_4, custNo_5, custNo_6, facmNo_7, facmNo_8, pageable);
     else 
-      slice = clFacRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, approveNo_3, approveNo_4, custNo_5, custNo_6, facmNo_7, facmNo_8, pageable);
+      slice = clFacRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode2_1, clNo_2, approveNo_3, approveNo_4, custNo_5, custNo_6, facmNo_7, facmNo_8, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -349,15 +345,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectForL2049 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode1_1 : " +  clCode1_1 + " clCode2_2 : " +  clCode2_2 + " clCode2_3 : " +  clCode2_3 + " clNo_4 : " +  clNo_4 + " clNo_5 : " +  clNo_5 + " custNo_6 : " +  custNo_6 + " custNo_7 : " +  custNo_7 + " facmNo_8 : " +  facmNo_8 + " facmNo_9 : " +  facmNo_9 + " approveNo_10 : " +  approveNo_10 + " approveNo_11 : " +  approveNo_11);
+    this.info("selectForL2049 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode1_1 : " +  clCode1_1 + " clCode2_2 : " +  clCode2_2 + " clCode2_3 : " +  clCode2_3 + " clNo_4 : " +  clNo_4 + " clNo_5 : " +  clNo_5 + " custNo_6 : " +  custNo_6 + " custNo_7 : " +  custNo_7 + " facmNo_8 : " +  facmNo_8 + " facmNo_9 : " +  facmNo_9 + " approveNo_10 : " +  approveNo_10 + " approveNo_11 : " +  approveNo_11);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode1_1, clCode2_2, clCode2_3, clNo_4, clNo_5, custNo_6, custNo_7, facmNo_8, facmNo_9, approveNo_10, approveNo_11, pageable);
+      slice = clFacReposDay.findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode1_1, clCode2_2, clCode2_3, clNo_4, clNo_5, custNo_6, custNo_7, facmNo_8, facmNo_9, approveNo_10, approveNo_11, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode1_1, clCode2_2, clCode2_3, clNo_4, clNo_5, custNo_6, custNo_7, facmNo_8, facmNo_9, approveNo_10, approveNo_11, pageable);
+      slice = clFacReposMon.findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode1_1, clCode2_2, clCode2_3, clNo_4, clNo_5, custNo_6, custNo_7, facmNo_8, facmNo_9, approveNo_10, approveNo_11, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode1_1, clCode2_2, clCode2_3, clNo_4, clNo_5, custNo_6, custNo_7, facmNo_8, facmNo_9, approveNo_10, approveNo_11, pageable);
+      slice = clFacReposHist.findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode1_1, clCode2_2, clCode2_3, clNo_4, clNo_5, custNo_6, custNo_7, facmNo_8, facmNo_9, approveNo_10, approveNo_11, pageable);
     else 
-      slice = clFacRepos.findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(clCode1_0, clCode1_1, clCode2_2, clCode2_3, clNo_4, clNo_5, custNo_6, custNo_7, facmNo_8, facmNo_9, approveNo_10, approveNo_11, pageable);
+      slice = clFacRepos.findAllByClCode1GreaterThanEqualAndClCode1LessThanEqualAndClCode2GreaterThanEqualAndClCode2LessThanEqualAndClNoGreaterThanEqualAndClNoLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndApproveNoGreaterThanEqualAndApproveNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(clCode1_0, clCode1_1, clCode2_2, clCode2_3, clNo_4, clNo_5, custNo_6, custNo_7, facmNo_8, facmNo_9, approveNo_10, approveNo_11, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -377,15 +373,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectForL2017CustNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2);
+    this.info("selectForL2017CustNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = clFacReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
+      slice = clFacReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clFacReposMon.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
+      slice = clFacReposMon.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clFacReposHist.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
+      slice = clFacReposHist.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
     else 
-      slice = clFacRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
+      slice = clFacRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, facmNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -398,16 +394,16 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("mainClNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " mainFlag_2 : " +  mainFlag_2);
+    this.info("mainClNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " mainFlag_2 : " +  mainFlag_2);
     Optional<ClFac> clFacT = null;
     if (dbName.equals(ContentName.onDay))
-      clFacT = clFacReposDay.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
+      clFacT = clFacReposDay.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
     else if (dbName.equals(ContentName.onMon))
-      clFacT = clFacReposMon.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
+      clFacT = clFacReposMon.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
     else if (dbName.equals(ContentName.onHist))
-      clFacT = clFacReposHist.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
+      clFacT = clFacReposHist.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
     else 
-      clFacT = clFacRepos.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscFacShareFlagAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
+      clFacT = clFacRepos.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
 
     return clFacT.isPresent() ? clFacT.get() : null;
   }
@@ -417,7 +413,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clFacId);
+    this.info("Hold " + dbName + " " + clFacId);
     Optional<ClFac> clFac = null;
     if (dbName.equals(ContentName.onDay))
       clFac = clFacReposDay.findByClFacId(clFacId);
@@ -435,7 +431,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + clFac.getClFacId());
+    this.info("Hold " + dbName + " " + clFac.getClFacId());
     Optional<ClFac> clFacT = null;
     if (dbName.equals(ContentName.onDay))
       clFacT = clFacReposDay.findByClFacId(clFac.getClFacId());
@@ -457,7 +453,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + clFac.getClFacId());
+    this.info("Insert..." + dbName + " " + clFac.getClFacId());
     if (this.findById(clFac.getClFacId()) != null)
       throw new DBException(2);
 
@@ -486,7 +482,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clFac.getClFacId());
+    this.info("Update..." + dbName + " " + clFac.getClFacId());
     if (!empNot.isEmpty())
       clFac.setLastUpdateEmpNo(empNot);
 
@@ -509,7 +505,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + clFac.getClFacId());
+    this.info("Update..." + dbName + " " + clFac.getClFacId());
     if (!empNot.isEmpty())
       clFac.setLastUpdateEmpNo(empNot);
 
@@ -529,7 +525,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + clFac.getClFacId());
+    this.info("Delete..." + dbName + " " + clFac.getClFacId());
     if (dbName.equals(ContentName.onDay)) {
       clFacReposDay.delete(clFac);	
       clFacReposDay.flush();
@@ -558,7 +554,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (ClFac t : clFac){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -593,7 +589,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (clFac == null || clFac.size() == 0)
       throw new DBException(6);
 
@@ -622,7 +618,7 @@ em = null;
 
   @Override
   public void deleteAll(List<ClFac> clFac, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

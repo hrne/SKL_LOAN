@@ -157,6 +157,27 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         AND cl.\"ClCode2\" = cm.\"ClCode2\"";
 		sql += "                         AND cl.\"ClNo\"    = cm.\"ClNo\"";
 		
+		
+		sql += "    LEFT JOIN (SELECT \"ClCode1\"";
+		sql += "                     ,\"ClCode2\"";
+		sql += "                     ,\"ClNo\"";
+		sql += "                     ,TO_NUMBER(\"LandNo1\" || \"LandNo2\") AS \"LandNo\"";
+		sql += "               FROM \"ClLand\" ";
+		sql += "    ) lNo ON lNo.\"ClCode1\" = cm.\"ClCode1\""; 
+	    sql	+= "          AND lNo.\"ClCode2\" = cm.\"ClCode2\""; 
+	    sql	+= "          AND lNo.\"ClNo\"    = cm.\"ClNo\"";
+
+	    
+	    sql += "    LEFT JOIN (SELECT \"ClCode1\"";
+		sql += "                     ,\"ClCode2\"";
+		sql += "                     ,\"ClNo\"";
+		sql += "                     ,TO_NUMBER(\"BdNo1\" || \"BdNo2\") AS \"BdNo\"";
+		sql += "               FROM \"ClBuilding\" ";
+		sql += "    ) bNo ON bNo.\"ClCode1\" = cm.\"ClCode1\""; 
+	    sql	+= "          AND bNo.\"ClCode2\" = cm.\"ClCode2\""; 
+	    sql	+= "          AND bNo.\"ClNo\"    = cm.\"ClNo\"";
+		
+	    
 		sql += "     LEFT JOIN (SELECT \"ClCode1\"";
 		sql += "                      ,\"ClCode2\"";
 		sql += "                      ,\"ClNo\"";
@@ -325,62 +346,59 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 發行公司統編
 		String CompanyId = titaVo.getParam("CompanyId");
 		if (CompanyId != null && !CompanyId.isEmpty()) {
-			CompanyId = "%" + CompanyId + "%";
+//			CompanyId = "%" + CompanyId + "%";
 			conditionList.add(" cs.\"CompanyId\" LIKE :CompanyId ");
-			
-		}// TODO
+		}
+		
 		// CityCode 縣市區域
 		String cityCode = titaVo.getParam("CityCode");
 		if (parse.stringToInteger(cityCode) > 0) {
-//			if(ClCode1 == 1) {
 				conditionList.add(" cbl.\"CityCode\" = :cityCode ");				
-//			} else {
-//				conditionList.add(" cl.\"CityCode\" = :cityCode ");				
-//			}
 		}
+		
 		// AreaCode 鄉鎮市區
 		String areaCode = titaVo.getParam("AreaCode");
 		if (parse.stringToInteger(areaCode) > 0) {
-//			if(ClCode1 == 1) {
 				conditionList.add(" cbl.\"AreaCode\" = :areaCode ");				
-//			} else {
-//				conditionList.add(" cl.\"AreaCode\" = :areaCode ");				
-//			}
 		}
+		
 		// IrCode 段小段
 		String irCode = titaVo.getParam("IrCode");
 		if (parse.stringToInteger(irCode) > 0) {
-//			if(ClCode1 == 1) {
 				conditionList.add(" cbl.\"IrCode\" = :irCode ");				
-//			} else {
-//				conditionList.add(" cl.\"IrCode\" = :irCode ");				
-//			}
-
 		}
-		// LandNo1 土地地號1
-		String landNo1 = titaVo.getParam("LandNo1");
-		if (parse.stringToInteger(landNo1) > 0) {
-			conditionList.add(" cl.\"LandNo1\" = :landNo1 ");
+		
+		// 地號區間
+		int landNo1 = parse.stringToInteger(titaVo.getParam("LandNo1"));
+		int landNo2 = parse.stringToInteger(titaVo.getParam("LandNo2"));
+		int landNo3 = parse.stringToInteger(titaVo.getParam("LandNo3"));
+		int landNo4 = parse.stringToInteger(titaVo.getParam("LandNo4"));
+		
+		if( landNo1 > 0 || landNo2 > 0 ) {
+			conditionList.add(" lNo.\"LandNo\" >= :startlandNo ");
+		}	
+		
+		if( landNo3 > 0 || landNo4 > 0 ) {
+			conditionList.add(" lNo.\"LandNo\" <= :endlandNo ");
+		}		
+		
+		// 建號區間
+		int bdNo1 = parse.stringToInteger(titaVo.getParam("BdNo1"));
+		int bdNo2 = parse.stringToInteger(titaVo.getParam("BdNo2"));
+		int bdNo3 = parse.stringToInteger(titaVo.getParam("BdNo3"));
+		int bdNo4 = parse.stringToInteger(titaVo.getParam("BdNo4"));
+		
+		if( bdNo1 > 0 || bdNo2 > 0 ) {
+			conditionList.add(" bNo.\"BdNo\" >= :startbdNo ");
 		}
-		// LandNo2 土地地號2
-		String landNo2 = titaVo.getParam("LandNo2");
-		if (parse.stringToInteger(landNo2) > 0) {
-			conditionList.add(" cl.\"LandNo2\" = :landNo2 ");
+		if( bdNo3 > 0 || bdNo4 > 0 ) {
+			conditionList.add(" bNo.\"BdNo\" <= :endbdNo ");
 		}
-		// BdNo1 建物建號1
-		String bdNo1 = titaVo.getParam("BdNo1");
-		if (parse.stringToInteger(bdNo1) > 0) {
-			conditionList.add(" cb.\"BdNo1\" = :bdNo1 ");
-		}
-		// BdNo2 建物建號2
-		String bdNo2 = titaVo.getParam("BdNo2");
-		if (parse.stringToInteger(bdNo2) > 0) {
-			conditionList.add(" cb.\"BdNo2\" = :bdNo2 ");
-		}
+		
 		// Road 路
 		String road = titaVo.getParam("Road");
 		if (road != null && !road.isEmpty()) {
-			road = "%" + road + "%";
+//			road = "%" + road + "%";
 			conditionList.add(" cb.\"Road\" LIKE :road ");
 		}
 		// Section 段
@@ -422,7 +440,7 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// LicenseNo 牌照號碼
 		String licenseNo = titaVo.getParam("LicenseNo");
 		if (licenseNo != null && !licenseNo.isEmpty()) {
-			licenseNo = "%" + licenseNo + "%";
+//			licenseNo = "%" + licenseNo + "%";
 			conditionList.add(" cmv.\"LicenseNo\" LIKE :licenseNo ");
 		}
 		
@@ -527,26 +545,73 @@ public class L2038ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("irCode", irCode);
 		}
 
-		String landNo1 = titaVo.getParam("LandNo1");
-		if (parse.stringToInteger(landNo1) > 0) {
-			query.setParameter("landNo1", landNo1);
+//		String landNo1 = titaVo.getParam("LandNo1");
+//		if (parse.stringToInteger(landNo1) > 0) {
+//			query.setParameter("landNo1", landNo1);
+//		}
+//
+//		String landNo2 = titaVo.getParam("LandNo2");
+//		if (parse.stringToInteger(landNo2) > 0) {
+//			query.setParameter("landNo2", landNo2);
+//		}
+		// 土地地號區間
+		int startlandNo = 0 ;
+		int endlandNo = 0 ;
+		int startbdNo = 0 ;
+		int endbdNo = 0 ;
+		
+		int landNo1 = parse.stringToInteger(titaVo.getParam("LandNo1"));
+		int landNo2 = parse.stringToInteger(titaVo.getParam("LandNo2"));
+		int landNo3 = parse.stringToInteger(titaVo.getParam("LandNo3"));
+		int landNo4 = parse.stringToInteger(titaVo.getParam("LandNo4"));
+		
+		if ( landNo1 > 0 ) {
+			startlandNo = landNo1 * 10000;
 		}
-
-		String landNo2 = titaVo.getParam("LandNo2");
-		if (parse.stringToInteger(landNo2) > 0) {
-			query.setParameter("landNo2", landNo2);
+		if ( landNo2 > 0 ) {
+			startlandNo = startlandNo + landNo2;
 		}
-
-		String bdNo1 = titaVo.getParam("BdNo1");
-		if (parse.stringToInteger(bdNo1) > 0) {
-			query.setParameter("bdNo1", bdNo1);
+		if (landNo3 > 0) {
+			endlandNo = landNo3*10000;
 		}
-
-		String bdNo2 = titaVo.getParam("BdNo2");
-		if (parse.stringToInteger(bdNo2) > 0) {
-			query.setParameter("bdNo2", bdNo2);
+		if (landNo4 > 0) {
+			endlandNo = endlandNo + landNo4;
 		}
-
+		
+		if( landNo1 > 0 || landNo2 > 0 ) {
+			query.setParameter("startlandNo", startlandNo);
+		}	
+		if( landNo3 > 0 || landNo4 > 0 ) {
+			query.setParameter("endlandNo", endlandNo);
+		}
+		
+		
+		// 建物建號區間
+		int bdNo1 = parse.stringToInteger(titaVo.getParam("BdNo1"));
+		int bdNo2 = parse.stringToInteger(titaVo.getParam("BdNo2"));
+		int bdNo3 = parse.stringToInteger(titaVo.getParam("BdNo3"));
+		int bdNo4 = parse.stringToInteger(titaVo.getParam("BdNo4"));
+		
+		if ( bdNo1 > 0 ) {
+			startbdNo = bdNo1 * 1000;
+		}
+		if ( bdNo2 > 0 ) {
+			startbdNo = startbdNo + bdNo2;
+		}		
+		if ( bdNo3 > 0 ) {
+			endbdNo = bdNo3 * 1000;
+		}
+		if ( bdNo4 > 0 ) {
+			endbdNo = endbdNo + bdNo4;
+		}
+		
+		if( bdNo1 > 0 || bdNo2 > 0 ) {
+			query.setParameter("startbdNo", startbdNo);
+		}
+		if( bdNo3 > 0 || bdNo4 > 0 ) {
+			query.setParameter("endbdNo", endbdNo);
+		}
+		
 		String road = titaVo.getParam("Road");
 		if (road != null && !road.isEmpty()) {
 			road = "%" + road + "%";

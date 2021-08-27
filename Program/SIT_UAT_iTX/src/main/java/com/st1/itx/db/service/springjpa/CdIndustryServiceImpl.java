@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdIndustryService")
 @Repository
-public class CdIndustryServiceImpl implements CdIndustryService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdIndustryServiceImpl.class);
-
+public class CdIndustryServiceImpl extends ASpringJpaParm implements CdIndustryService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class CdIndustryServiceImpl implements CdIndustryService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + industryCode);
+    this.info("findById " + dbName + " " + industryCode);
     Optional<CdIndustry> cdIndustry = null;
     if (dbName.equals(ContentName.onDay))
       cdIndustry = cdIndustryReposDay.findById(industryCode);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "IndustryCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "IndustryCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdIndustryReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +101,9 @@ em = null;
       slice = cdIndustryReposHist.findAll(pageable);
     else 
       slice = cdIndustryRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +120,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findMainType " + dbName + " : " + "mainType_0 : " + mainType_0 + " mainType_1 : " +  mainType_1);
+    this.info("findMainType " + dbName + " : " + "mainType_0 : " + mainType_0 + " mainType_1 : " +  mainType_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdIndustryReposDay.findAllByMainTypeGreaterThanEqualAndMainTypeLessThanEqual(mainType_0, mainType_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -130,6 +129,9 @@ em = null;
       slice = cdIndustryReposHist.findAllByMainTypeGreaterThanEqualAndMainTypeLessThanEqual(mainType_0, mainType_1, pageable);
     else 
       slice = cdIndustryRepos.findAllByMainTypeGreaterThanEqualAndMainTypeLessThanEqual(mainType_0, mainType_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -146,7 +148,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findIndustryCode " + dbName + " : " + "industryCode_0 : " + industryCode_0 + " industryCode_1 : " +  industryCode_1);
+    this.info("findIndustryCode " + dbName + " : " + "industryCode_0 : " + industryCode_0 + " industryCode_1 : " +  industryCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdIndustryReposDay.findAllByIndustryCodeGreaterThanEqualAndIndustryCodeLessThanEqualOrderByIndustryCodeAsc(industryCode_0, industryCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
     else 
       slice = cdIndustryRepos.findAllByIndustryCodeGreaterThanEqualAndIndustryCodeLessThanEqualOrderByIndustryCodeAsc(industryCode_0, industryCode_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -164,7 +169,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + industryCode);
+    this.info("Hold " + dbName + " " + industryCode);
     Optional<CdIndustry> cdIndustry = null;
     if (dbName.equals(ContentName.onDay))
       cdIndustry = cdIndustryReposDay.findByIndustryCode(industryCode);
@@ -182,7 +187,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdIndustry.getIndustryCode());
+    this.info("Hold " + dbName + " " + cdIndustry.getIndustryCode());
     Optional<CdIndustry> cdIndustryT = null;
     if (dbName.equals(ContentName.onDay))
       cdIndustryT = cdIndustryReposDay.findByIndustryCode(cdIndustry.getIndustryCode());
@@ -204,7 +209,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdIndustry.getIndustryCode());
+    this.info("Insert..." + dbName + " " + cdIndustry.getIndustryCode());
     if (this.findById(cdIndustry.getIndustryCode()) != null)
       throw new DBException(2);
 
@@ -233,7 +238,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdIndustry.getIndustryCode());
+    this.info("Update..." + dbName + " " + cdIndustry.getIndustryCode());
     if (!empNot.isEmpty())
       cdIndustry.setLastUpdateEmpNo(empNot);
 
@@ -256,7 +261,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdIndustry.getIndustryCode());
+    this.info("Update..." + dbName + " " + cdIndustry.getIndustryCode());
     if (!empNot.isEmpty())
       cdIndustry.setLastUpdateEmpNo(empNot);
 
@@ -276,7 +281,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdIndustry.getIndustryCode());
+    this.info("Delete..." + dbName + " " + cdIndustry.getIndustryCode());
     if (dbName.equals(ContentName.onDay)) {
       cdIndustryReposDay.delete(cdIndustry);	
       cdIndustryReposDay.flush();
@@ -305,7 +310,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdIndustry t : cdIndustry){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -340,7 +345,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdIndustry == null || cdIndustry.size() == 0)
       throw new DBException(6);
 
@@ -369,7 +374,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdIndustry> cdIndustry, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

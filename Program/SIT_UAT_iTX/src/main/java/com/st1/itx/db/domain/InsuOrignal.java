@@ -51,7 +51,6 @@ public class InsuOrignal implements Serializable {
   private String origInsuNo;
 
   // 批單號碼
-  /* 修改時需填入 */
   @Column(name = "`EndoInsuNo`", length = 17, insertable = false, updatable = false)
   private String endoInsuNo;
 
@@ -60,7 +59,7 @@ public class InsuOrignal implements Serializable {
   private String insuCompany;
 
   // 保險類別
-  /* 01:住宅火險地震險02:火險03:地震險04:汽車全險05:綜合營造險06:動產火險07:其他 */
+  /* CdCode:InsuTypeCode01:住宅火險地震險02:火險03:地震險04:汽車全險05:綜合營造險06:動產火險07:其他 */
   @Column(name = "`InsuTypeCode`", length = 2)
   private String insuTypeCode;
 
@@ -193,7 +192,7 @@ public class InsuOrignal implements Serializable {
 
 /**
 	* 批單號碼<br>
-	* 修改時需填入
+	* 
 	* @return String
 	*/
   public String getEndoInsuNo() {
@@ -202,7 +201,7 @@ public class InsuOrignal implements Serializable {
 
 /**
 	* 批單號碼<br>
-	* 修改時需填入
+	* 
   *
   * @param endoInsuNo 批單號碼
 	*/
@@ -231,7 +230,8 @@ public class InsuOrignal implements Serializable {
 
 /**
 	* 保險類別<br>
-	* 01:住宅火險地震險
+	* CdCode:InsuTypeCode
+01:住宅火險地震險
 02:火險
 03:地震險
 04:汽車全險
@@ -246,7 +246,8 @@ public class InsuOrignal implements Serializable {
 
 /**
 	* 保險類別<br>
-	* 01:住宅火險地震險
+	* CdCode:InsuTypeCode
+01:住宅火險地震險
 02:火險
 03:地震險
 04:汽車全險

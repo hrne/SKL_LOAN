@@ -55,8 +55,8 @@ public class InsuRenew implements Serializable {
   @Column(name = "`EndoInsuNo`", length = 17, insertable = false, updatable = false)
   private String endoInsuNo;
 
-  // 原火險到期年月
-  /* 到期迄日的前一個月產出當月份的資料 */
+  // 火險單年月
+  /* 原火險到期年月 */
   @Column(name = "`InsuYearMonth`")
   private int insuYearMonth = 0;
 
@@ -77,7 +77,7 @@ public class InsuRenew implements Serializable {
   private String origInsuNo;
 
   // 是否續保
-  /* 1.自保2.續保 */
+  /* 0.1.自保2.續保 */
   @Column(name = "`RenewCode`")
   private int renewCode = 0;
 
@@ -86,12 +86,12 @@ public class InsuRenew implements Serializable {
   private String insuCompany;
 
   // 保險類別
-  /* 01:住宅火險地震險02:火險03:地震險04:汽車全險05:綜合營造險06:動產火險07:其他 */
+  /* CdCode:InsuTypeCode01:住宅火險地震險02:火險03:地震險04:汽車全險05:綜合營造險06:動產火險07:其他 */
   @Column(name = "`InsuTypeCode`", length = 2)
   private String insuTypeCode;
 
   // 繳款方式
-  /* 1:匯款轉帳2:銀行扣款3:員工扣薪4:支票5:特約金6:人事特約金7:定存特約8:劃撥存款 */
+  /* CdCode:RepayCode1:匯款轉帳2:銀行扣款3:員工扣薪4:支票5:特約金6:人事特約金7:定存特約8:劃撥存款 */
   @Column(name = "`RepayCode`")
   private int repayCode = 0;
 
@@ -137,7 +137,7 @@ public class InsuRenew implements Serializable {
   private String titaTxtNo;
 
   // 入通知檔
-  /* Y:已入N:未入 */
+  /* Y:已入N:未入(通知作業後新增)null:待通知 */
   @Column(name = "`NotiTempFg`", length = 1)
   private String notiTempFg;
 
@@ -277,8 +277,8 @@ public class InsuRenew implements Serializable {
   }
 
 /**
-	* 原火險到期年月<br>
-	* 到期迄日的前一個月產出當月份的資料
+	* 火險單年月<br>
+	* 原火險到期年月
 	* @return Integer
 	*/
   public int getInsuYearMonth() {
@@ -286,10 +286,10 @@ public class InsuRenew implements Serializable {
   }
 
 /**
-	* 原火險到期年月<br>
-	* 到期迄日的前一個月產出當月份的資料
+	* 火險單年月<br>
+	* 原火險到期年月
   *
-  * @param insuYearMonth 原火險到期年月
+  * @param insuYearMonth 火險單年月
 	*/
   public void setInsuYearMonth(int insuYearMonth) {
     this.insuYearMonth = insuYearMonth;
@@ -373,7 +373,8 @@ public class InsuRenew implements Serializable {
 
 /**
 	* 是否續保<br>
-	* 1.自保
+	* 0.
+1.自保
 2.續保
 	* @return Integer
 	*/
@@ -383,7 +384,8 @@ public class InsuRenew implements Serializable {
 
 /**
 	* 是否續保<br>
-	* 1.自保
+	* 0.
+1.自保
 2.續保
   *
   * @param renewCode 是否續保
@@ -413,7 +415,8 @@ public class InsuRenew implements Serializable {
 
 /**
 	* 保險類別<br>
-	* 01:住宅火險地震險
+	* CdCode:InsuTypeCode
+01:住宅火險地震險
 02:火險
 03:地震險
 04:汽車全險
@@ -428,7 +431,8 @@ public class InsuRenew implements Serializable {
 
 /**
 	* 保險類別<br>
-	* 01:住宅火險地震險
+	* CdCode:InsuTypeCode
+01:住宅火險地震險
 02:火險
 03:地震險
 04:汽車全險
@@ -444,7 +448,8 @@ public class InsuRenew implements Serializable {
 
 /**
 	* 繳款方式<br>
-	* 1:匯款轉帳
+	* CdCode:RepayCode
+1:匯款轉帳
 2:銀行扣款
 3:員工扣薪
 4:支票
@@ -460,7 +465,8 @@ public class InsuRenew implements Serializable {
 
 /**
 	* 繳款方式<br>
-	* 1:匯款轉帳
+	* CdCode:RepayCode
+1:匯款轉帳
 2:銀行扣款
 3:員工扣薪
 4:支票
@@ -668,7 +674,8 @@ public class InsuRenew implements Serializable {
 /**
 	* 入通知檔<br>
 	* Y:已入
-N:未入
+N:未入(通知作業後新增)
+null:待通知
 	* @return String
 	*/
   public String getNotiTempFg() {
@@ -678,7 +685,8 @@ N:未入
 /**
 	* 入通知檔<br>
 	* Y:已入
-N:未入
+N:未入(通知作業後新增)
+null:待通知
   *
   * @param notiTempFg 入通知檔
 	*/

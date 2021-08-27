@@ -189,13 +189,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = reltMainReposDay.findAllByCustNoIs(custNo_0, pageable);
+      slice = reltMainReposDay.findAllByCustNoIsOrderByCaseNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = reltMainReposMon.findAllByCustNoIs(custNo_0, pageable);
+      slice = reltMainReposMon.findAllByCustNoIsOrderByCaseNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = reltMainReposHist.findAllByCustNoIs(custNo_0, pageable);
+      slice = reltMainReposHist.findAllByCustNoIsOrderByCaseNoAsc(custNo_0, pageable);
     else 
-      slice = reltMainRepos.findAllByCustNoIs(custNo_0, pageable);
+      slice = reltMainRepos.findAllByCustNoIsOrderByCaseNoAsc(custNo_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -255,13 +255,41 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("caseNoEq " + dbName + " : " + "caseNo_0 : " + caseNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = reltMainReposDay.findAllByCaseNoIs(caseNo_0, pageable);
+      slice = reltMainReposDay.findAllByCaseNoIsOrderByCustNoAsc(caseNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = reltMainReposMon.findAllByCaseNoIs(caseNo_0, pageable);
+      slice = reltMainReposMon.findAllByCaseNoIsOrderByCustNoAsc(caseNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = reltMainReposHist.findAllByCaseNoIs(caseNo_0, pageable);
+      slice = reltMainReposHist.findAllByCaseNoIsOrderByCustNoAsc(caseNo_0, pageable);
     else 
-      slice = reltMainRepos.findAllByCaseNoIs(caseNo_0, pageable);
+      slice = reltMainRepos.findAllByCaseNoIsOrderByCustNoAsc(caseNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<ReltMain> findByBoth(int caseNo_0, int custNo_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<ReltMain> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBoth " + dbName + " : " + "caseNo_0 : " + caseNo_0 + " custNo_1 : " +  custNo_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = reltMainReposDay.findAllByCaseNoIsAndCustNoIs(caseNo_0, custNo_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = reltMainReposMon.findAllByCaseNoIsAndCustNoIs(caseNo_0, custNo_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = reltMainReposHist.findAllByCaseNoIsAndCustNoIs(caseNo_0, custNo_1, pageable);
+    else 
+      slice = reltMainRepos.findAllByCaseNoIsAndCustNoIs(caseNo_0, custNo_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

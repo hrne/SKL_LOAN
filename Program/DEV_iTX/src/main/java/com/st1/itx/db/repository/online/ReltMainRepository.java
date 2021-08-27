@@ -32,7 +32,7 @@ public interface ReltMainRepository extends JpaRepository<ReltMain, ReltMainId> 
   public Optional<ReltMain> findTopByCaseNoIs(int caseNo_0);
 
   // CustNo =
-  public Slice<ReltMain> findAllByCustNoIs(int custNo_0, Pageable pageable);
+  public Slice<ReltMain> findAllByCustNoIsOrderByCaseNoAsc(int custNo_0, Pageable pageable);
 
   // CaseNo = ,AND CustNo = ,AND ReltId = 
   public Optional<ReltMain> findTopByCaseNoIsAndCustNoIsAndReltIdIs(int caseNo_0, int custNo_1, String reltId_2);
@@ -41,7 +41,10 @@ public interface ReltMainRepository extends JpaRepository<ReltMain, ReltMainId> 
   public Optional<ReltMain> findTopByCustNoIs(int custNo_0);
 
   // CaseNo =
-  public Slice<ReltMain> findAllByCaseNoIs(int caseNo_0, Pageable pageable);
+  public Slice<ReltMain> findAllByCaseNoIsOrderByCustNoAsc(int caseNo_0, Pageable pageable);
+
+  // CaseNo = ,AND CustNo = 
+  public Slice<ReltMain> findAllByCaseNoIsAndCustNoIs(int caseNo_0, int custNo_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

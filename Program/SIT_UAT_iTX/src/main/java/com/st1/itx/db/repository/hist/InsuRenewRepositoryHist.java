@@ -61,23 +61,8 @@ public interface InsuRenewRepositoryHist extends JpaRepository<InsuRenew, InsuRe
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
   public Slice<InsuRenew> findAllByClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDescInsuStartDateAsc(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // CustNo = 
-  public Slice<InsuRenew> findAllByCustNoIsOrderByFacmNoAscInsuEndDateDescInsuStartDateAsc(int custNo_0, Pageable pageable);
-
-  // CustNo = ,AND FacmNo = 
-  public Slice<InsuRenew> findAllByCustNoIsAndFacmNoIsOrderByInsuEndDateDescInsuStartDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
-
-  // NowInsuNo = 
-  public Slice<InsuRenew> findAllByNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(String nowInsuNo_0, Pageable pageable);
-
-  // InsuCompany = 
-  public Slice<InsuRenew> findAllByInsuCompanyIsOrderByInsuEndDateDescInsuStartDateAsc(String insuCompany_0, Pageable pageable);
-
-  // InsuTypeCode = 
-  public Slice<InsuRenew> findAllByInsuTypeCodeIsOrderByInsuEndDateDescInsuStartDateAsc(String insuTypeCode_0, Pageable pageable);
-
   // InsuEndDate >= ,AND InsuEndDate <= 
-  public Slice<InsuRenew> findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescInsuStartDateAsc(int insuEndDate_0, int insuEndDate_1, Pageable pageable);
+  public Slice<InsuRenew> findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByInsuEndDateDescOrigInsuNoAscEndoInsuNoAsc(int insuEndDate_0, int insuEndDate_1, Pageable pageable);
 
   // CustNo = ,AND FacmNo = ,AND PrevInsuNo = 
   public Optional<InsuRenew> findTopByCustNoIsAndFacmNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int custNo_0, int facmNo_1, String prevInsuNo_2);
@@ -99,6 +84,12 @@ public interface InsuRenewRepositoryHist extends JpaRepository<InsuRenew, InsuRe
 
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND PrevInsuNo = 
   public Slice<InsuRenew> findAllByClCode1IsAndClCode2IsAndClNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int clCode1_0, int clCode2_1, int clNo_2, String prevInsuNo_3, Pageable pageable);
+
+  // NotiTempFg = 
+  public Optional<InsuRenew> findTopByNotiTempFgIsOrderByInsuYearMonthDesc(String notiTempFg_0);
+
+  // CustNo = 
+  public Slice<InsuRenew> findAllByCustNoIsOrderByInsuEndDateDescInsuStartDateAsc(int custNo_0, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

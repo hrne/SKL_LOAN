@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("ifrs9FacDataService")
 @Repository
-public class Ifrs9FacDataServiceImpl implements Ifrs9FacDataService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(Ifrs9FacDataServiceImpl.class);
-
+public class Ifrs9FacDataServiceImpl extends ASpringJpaParm implements Ifrs9FacDataService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class Ifrs9FacDataServiceImpl implements Ifrs9FacDataService, Initializin
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + ifrs9FacDataId);
+    this.info("findById " + dbName + " " + ifrs9FacDataId);
     Optional<Ifrs9FacData> ifrs9FacData = null;
     if (dbName.equals(ContentName.onDay))
       ifrs9FacData = ifrs9FacDataReposDay.findById(ifrs9FacDataId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataYM", "CustNo", "FacmNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = ifrs9FacDataReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +103,9 @@ em = null;
     else 
       slice = ifrs9FacDataRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + ifrs9FacDataId);
+    this.info("Hold " + dbName + " " + ifrs9FacDataId);
     Optional<Ifrs9FacData> ifrs9FacData = null;
     if (dbName.equals(ContentName.onDay))
       ifrs9FacData = ifrs9FacDataReposDay.findByIfrs9FacDataId(ifrs9FacDataId);
@@ -133,7 +132,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
+    this.info("Hold " + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
     Optional<Ifrs9FacData> ifrs9FacDataT = null;
     if (dbName.equals(ContentName.onDay))
       ifrs9FacDataT = ifrs9FacDataReposDay.findByIfrs9FacDataId(ifrs9FacData.getIfrs9FacDataId());
@@ -155,7 +154,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
+    this.info("Insert..." + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
     if (this.findById(ifrs9FacData.getIfrs9FacDataId()) != null)
       throw new DBException(2);
 
@@ -184,7 +183,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
+    this.info("Update..." + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
     if (!empNot.isEmpty())
       ifrs9FacData.setLastUpdateEmpNo(empNot);
 
@@ -207,7 +206,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
+    this.info("Update..." + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
     if (!empNot.isEmpty())
       ifrs9FacData.setLastUpdateEmpNo(empNot);
 
@@ -227,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
+    this.info("Delete..." + dbName + " " + ifrs9FacData.getIfrs9FacDataId());
     if (dbName.equals(ContentName.onDay)) {
       ifrs9FacDataReposDay.delete(ifrs9FacData);	
       ifrs9FacDataReposDay.flush();
@@ -256,7 +255,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (Ifrs9FacData t : ifrs9FacData){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -291,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (ifrs9FacData == null || ifrs9FacData.size() == 0)
       throw new DBException(6);
 
@@ -320,7 +319,7 @@ em = null;
 
   @Override
   public void deleteAll(List<Ifrs9FacData> ifrs9FacData, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

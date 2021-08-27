@@ -199,62 +199,6 @@ public interface InsuRenewService {
   public Slice<InsuRenew> findNowInsuEq(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = 
-   *
-   * @param custNo_0 custNo_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice InsuRenew InsuRenew of List
-   */
-  public Slice<InsuRenew> findCustEq(int custNo_0, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustNo = ,AND FacmNo = 
-   *
-   * @param custNo_0 custNo_0
-   * @param facmNo_1 facmNo_1
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice InsuRenew InsuRenew of List
-   */
-  public Slice<InsuRenew> findL4965A(int custNo_0, int facmNo_1, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * NowInsuNo = 
-   *
-   * @param nowInsuNo_0 nowInsuNo_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice InsuRenew InsuRenew of List
-   */
-  public Slice<InsuRenew> findL4965B(String nowInsuNo_0, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * InsuCompany = 
-   *
-   * @param insuCompany_0 insuCompany_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice InsuRenew InsuRenew of List
-   */
-  public Slice<InsuRenew> findL4965C(String insuCompany_0, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * InsuTypeCode = 
-   *
-   * @param insuTypeCode_0 insuTypeCode_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice InsuRenew InsuRenew of List
-   */
-  public Slice<InsuRenew> findL4965D(String insuTypeCode_0, int index, int limit, TitaVo... titaVo);
-
-  /**
    * InsuEndDate &gt;= ,AND InsuEndDate &lt;= 
    *
    * @param insuEndDate_0 insuEndDate_0
@@ -264,7 +208,7 @@ public interface InsuRenewService {
    * @param titaVo Variable-Length Argument
    * @return Slice InsuRenew InsuRenew of List
    */
-  public Slice<InsuRenew> findL4965Z(int insuEndDate_0, int insuEndDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<InsuRenew> insuEndDateRange(int insuEndDate_0, int insuEndDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo = ,AND FacmNo = ,AND PrevInsuNo = 
@@ -355,6 +299,26 @@ public interface InsuRenewService {
    * @return Slice InsuRenew InsuRenew of List
    */
   public Slice<InsuRenew> findL4605A(int clCode1_0, int clCode2_1, int clNo_2, String prevInsuNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * NotiTempFg = 
+   *
+   * @param notiTempFg_0 notiTempFg_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuRenew InsuRenew of List
+   */
+  public InsuRenew findNotiTempFgFirst(String notiTempFg_0, TitaVo... titaVo);
+
+  /**
+   * CustNo = 
+   *
+   * @param custNo_0 custNo_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuRenew InsuRenew of List
+   */
+  public Slice<InsuRenew> findCustEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By InsuRenew

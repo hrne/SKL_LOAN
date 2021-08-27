@@ -32,7 +32,7 @@ public class FacStatusCom {
 	 * @throws LogicException LogicException
 	 */
 	public int settingStatus(List<LoanBorMain> lLoanBorMain, int tbsdy) throws LogicException {
-		int priorty = 10;
+		int priorty = 11;
 		int status = 0;
 //	 priority    status  
 //		  1  --  6.呆帳戶
@@ -44,6 +44,7 @@ public class FacStatusCom {
 //		  7  --  8.債權轉讓戶
 //		  8  --  9.呆帳結案戶
 //		  9  --  3.結案戶
+//       10  --  1.展期
 		for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
 			if (tmpLoanBorMain.getStatus() > 1 && tmpLoanBorMain.getStatus() < 90) {
 				switch (tmpLoanBorMain.getStatus()) {
@@ -103,6 +104,12 @@ public class FacStatusCom {
 					if (priorty > 9) {
 						status = 3;
 						priorty = 9;
+					}
+					break;
+				case 1:
+					if (priorty > 10) {
+						status = 1;
+						priorty = 10;
 					}
 					break;
 				}

@@ -56,7 +56,7 @@ public interface InsuOrignalService {
    * @param titaVo Variable-Length Argument
    * @return Slice InsuOrignal InsuOrignal of List
    */
-  public Slice<InsuOrignal> insuEndDateRNG(int insuEndDate_0, int insuEndDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<InsuOrignal> insuEndDateRange(int insuEndDate_0, int insuEndDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * ClCode1 = ,AND ClCode2 = ,AND ClNo = 

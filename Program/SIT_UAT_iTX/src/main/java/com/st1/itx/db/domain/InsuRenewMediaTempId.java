@@ -15,84 +15,82 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class InsuRenewMediaTempId implements Serializable {
 
-
-  /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1357240506942772739L;
 
 // 火險到期年月
-  @Column(name = "`FireInsuMonth`", length = 6)
-  private String fireInsuMonth = " ";
+	@Column(name = "`FireInsuMonth`", length = 6)
+	private String fireInsuMonth = " ";
 
-  // 保單號碼
-  @Column(name = "`InsuNo`", length = 16)
-  private String insuNo = " ";
+	// 保單號碼
+	@Column(name = "`InsuNo`", length = 16)
+	private String insuNo = " ";
 
-  public InsuRenewMediaTempId() {
-  }
+	public InsuRenewMediaTempId() {
+	}
 
-  public InsuRenewMediaTempId(String fireInsuMonth, String insuNo) {
-    this.fireInsuMonth = fireInsuMonth;
-    this.insuNo = insuNo;
-  }
+	public InsuRenewMediaTempId(String fireInsuMonth, String insuNo) {
+		this.fireInsuMonth = fireInsuMonth;
+		this.insuNo = insuNo;
+	}
 
-/**
-	* 火險到期年月<br>
-	* 
-	* @return String
-	*/
-  public String getFireInsuMonth() {
-    return this.fireInsuMonth == null ? "" : this.fireInsuMonth;
-  }
+	/**
+	 * 火險到期年月<br>
+	 * 
+	 * @return String
+	 */
+	public String getFireInsuMonth() {
+		return this.fireInsuMonth == null ? "" : this.fireInsuMonth;
+	}
 
-/**
-	* 火險到期年月<br>
-	* 
-  *
-  * @param fireInsuMonth 火險到期年月
-	*/
-  public void setFireInsuMonth(String fireInsuMonth) {
-    this.fireInsuMonth = fireInsuMonth;
-  }
+	/**
+	 * 火險到期年月<br>
+	 * 
+	 *
+	 * @param fireInsuMonth 火險到期年月
+	 */
+	public void setFireInsuMonth(String fireInsuMonth) {
+		this.fireInsuMonth = fireInsuMonth;
+	}
 
-/**
-	* 保單號碼<br>
-	* 
-	* @return String
-	*/
-  public String getInsuNo() {
-    return this.insuNo == null ? "" : this.insuNo;
-  }
+	/**
+	 * 保單號碼<br>
+	 * 
+	 * @return String
+	 */
+	public String getInsuNo() {
+		return this.insuNo == null ? "" : this.insuNo;
+	}
 
-/**
-	* 保單號碼<br>
-	* 
-  *
-  * @param insuNo 保單號碼
-	*/
-  public void setInsuNo(String insuNo) {
-    this.insuNo = insuNo;
-  }
+	/**
+	 * 保單號碼<br>
+	 * 
+	 *
+	 * @param insuNo 保單號碼
+	 */
+	public void setInsuNo(String insuNo) {
+		this.insuNo = insuNo;
+	}
 
+	@Override
+	public int hashCode() {
+		return Objects.hash(fireInsuMonth, insuNo);
+	}
 
-  @Override
-  public int hashCode() {
-    return Objects.hash(fireInsuMonth, insuNo);
-  }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null || getClass() != obj.getClass())
+			return false;
+		InsuRenewMediaTempId insuRenewMediaTempId = (InsuRenewMediaTempId) obj;
+		return fireInsuMonth.equals(insuRenewMediaTempId.fireInsuMonth) && insuNo == insuRenewMediaTempId.insuNo;
+	}
 
-  @Override
-  public boolean equals(Object obj) {
-    if(this == obj)
-      return true;
-    if(obj == null || getClass() != obj.getClass())
-      return false;
-    InsuRenewMediaTempId insuRenewMediaTempId = (InsuRenewMediaTempId) obj;
-    return fireInsuMonth.equals(insuRenewMediaTempId.fireInsuMonth) && insuNo == insuRenewMediaTempId.insuNo;
-  }
-
-  @Override
-  public String toString() {
-    return "InsuRenewMediaTempId [fireInsuMonth=" + fireInsuMonth + ", insuNo=" + insuNo + "]";
-  }
+	@Override
+	public String toString() {
+		return "InsuRenewMediaTempId [fireInsuMonth=" + fireInsuMonth + ", insuNo=" + insuNo + "]";
+	}
 }

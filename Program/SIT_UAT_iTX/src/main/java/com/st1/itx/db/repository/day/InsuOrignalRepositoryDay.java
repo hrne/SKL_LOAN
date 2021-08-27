@@ -26,7 +26,7 @@ public interface InsuOrignalRepositoryDay extends JpaRepository<InsuOrignal, Ins
   public Optional<InsuOrignal> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDesc(int clCode1_0, int clCode2_1, int clNo_2);
 
   // InsuEndDate >= , AND InsuEndDate <=
-  public Slice<InsuOrignal> findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqual(int insuEndDate_0, int insuEndDate_1, Pageable pageable);
+  public Slice<InsuOrignal> findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(int insuEndDate_0, int insuEndDate_1, Pageable pageable);
 
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
   public Slice<InsuOrignal> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);

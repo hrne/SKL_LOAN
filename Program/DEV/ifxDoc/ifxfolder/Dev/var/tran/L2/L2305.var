@@ -39,11 +39,11 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,200,200,300];printer.width=[20,20];order=1">
 [
 ["[L2305]                                 借款戶關係人/關係企業維護(整批)"],
-["#FdOrigin+原Eloan案件編號",#OriginCaseNo],
-["#FdTarget+目標Eloan案件編號",#TargetCaseNo],
+["#FdOrigin+複製Eloan案件編號",#OriginCaseNo],["#FdCustNo+複製戶號",#OriginCustNo],
+["#FdTarget+Eloan案件編號",#TargetCaseNo],["#FdCaseNo+戶號",#TargetCustNo],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -52,9 +52,10 @@ E(0,0)
 ! ENABLE(#BTN1)
 
 #FdOrigin=X,2,L
-
+#FdCustNo=X,2,L
 #FdTarget=X,2,L
 T(3,*)
+#FdCaseNo=X,2,L
 K(MODIFYBUTTON,新增)
 
 !---------- AP TEXT AREA Variables ----------
@@ -66,11 +67,13 @@ C(3,#CHAIN,1,$,V(P,此為連動交易，請從交易:L2035進入))
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@OriginCaseNo,#NTXBUF,1,7)
 T(1,@TargetCaseNo,#NTXBUF,1,7)
-
-
+T(1,@OriginCustNo,#NTXBUF,8,7)
+T(1,@TargetCustNo,#NTXBUF,8,7)
 #OriginCaseNo=A,7,L
+#OriginCustNo=A,7,L
 #TargetCaseNo=A,7,I
 @V(2,0)
+#TargetCustNo=A,7,L
 
 #RPTFG=A,1,S
 
@@ -96,7 +99,9 @@ T(3,[L2305] 借款戶關係人/關係企業維護(整批))
 !------ 上行電文 ------
 <sub type="TIM">
 #OriginCaseNo
+#OriginCustNo
 #TargetCaseNo
+#TargetCustNo
 </sub>
 
 

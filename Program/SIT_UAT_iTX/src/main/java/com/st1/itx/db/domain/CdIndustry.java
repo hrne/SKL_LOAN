@@ -26,9 +26,10 @@ public class CdIndustry implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7349683034156486754L;
+	private static final long serialVersionUID = 9035899544096202655L;
 
 // 行業代號
+  /* 位數不足6碼者，前補零 */
   @Id
   @Column(name = "`IndustryCode`", length = 6)
   private String industryCode = " ";
@@ -40,6 +41,11 @@ public class CdIndustry implements Serializable {
   // 主計處大類
   @Column(name = "`MainType`", length = 1)
   private String mainType;
+
+  // 企金放款產業評等
+  /* 報表使用LM048企業放款風險承擔限額控管表值為NULL時不進表 */
+  @Column(name = "`IndustryRating`", length = 1)
+  private String industryRating;
 
   // 啟用記號
   /* Y:啟用 , N:未啟用 */
@@ -67,7 +73,7 @@ public class CdIndustry implements Serializable {
 
 /**
 	* 行業代號<br>
-	* 
+	* 位數不足6碼者，前補零
 	* @return String
 	*/
   public String getIndustryCode() {
@@ -76,7 +82,7 @@ public class CdIndustry implements Serializable {
 
 /**
 	* 行業代號<br>
-	* 
+	* 位數不足6碼者，前補零
   *
   * @param industryCode 行業代號
 	*/
@@ -120,6 +126,29 @@ public class CdIndustry implements Serializable {
 	*/
   public void setMainType(String mainType) {
     this.mainType = mainType;
+  }
+
+/**
+	* 企金放款產業評等<br>
+	* 報表使用
+LM048企業放款風險承擔限額控管表
+值為NULL時不進表
+	* @return String
+	*/
+  public String getIndustryRating() {
+    return this.industryRating == null ? "" : this.industryRating;
+  }
+
+/**
+	* 企金放款產業評等<br>
+	* 報表使用
+LM048企業放款風險承擔限額控管表
+值為NULL時不進表
+  *
+  * @param industryRating 企金放款產業評等
+	*/
+  public void setIndustryRating(String industryRating) {
+    this.industryRating = industryRating;
   }
 
 /**
@@ -220,7 +249,7 @@ public class CdIndustry implements Serializable {
 
   @Override
   public String toString() {
-    return "CdIndustry [industryCode=" + industryCode + ", industryItem=" + industryItem + ", mainType=" + mainType + ", enable=" + enable + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "CdIndustry [industryCode=" + industryCode + ", industryItem=" + industryItem + ", mainType=" + mainType + ", industryRating=" + industryRating + ", enable=" + enable + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

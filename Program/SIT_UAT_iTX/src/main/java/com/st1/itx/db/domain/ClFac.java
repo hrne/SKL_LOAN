@@ -65,12 +65,12 @@ public class ClFac implements Serializable {
   private String mainFlag;
 
   // 共用額度記號
-  /* 0:非共用額度1:主要額度(共用額度)2:共用額度 */
+  /* 運算用不更新 */
   @Column(name = "`FacShareFlag`")
   private int facShareFlag = 0;
 
   // 分配金額
-  /* 同一擔保品在ClFac擔保品關聯檔的分配金額加總需小於ClMain擔保品主檔的可分配金額 */
+  /* 放款餘額的佔用金額，運算用不更新1.先占用單獨擔保品2.再占用共同擔保品3.其他額度優先占用其他擔保品 */
   @Column(name = "`ShareAmt`")
   private BigDecimal shareAmt = new BigDecimal("0");
 
@@ -245,9 +245,7 @@ N:否
 
 /**
 	* 共用額度記號<br>
-	* 0:非共用額度
-1:主要額度(共用額度)
-2:共用額度
+	* 運算用不更新
 	* @return Integer
 	*/
   public int getFacShareFlag() {
@@ -256,9 +254,7 @@ N:否
 
 /**
 	* 共用額度記號<br>
-	* 0:非共用額度
-1:主要額度(共用額度)
-2:共用額度
+	* 運算用不更新
   *
   * @param facShareFlag 共用額度記號
 	*/
@@ -268,7 +264,10 @@ N:否
 
 /**
 	* 分配金額<br>
-	* 同一擔保品在ClFac擔保品關聯檔的分配金額加總需小於ClMain擔保品主檔的可分配金額
+	* 放款餘額的佔用金額，運算用不更新
+1.先占用單獨擔保品
+2.再占用共同擔保品
+3.其他額度優先占用其他擔保品
 	* @return BigDecimal
 	*/
   public BigDecimal getShareAmt() {
@@ -277,7 +276,10 @@ N:否
 
 /**
 	* 分配金額<br>
-	* 同一擔保品在ClFac擔保品關聯檔的分配金額加總需小於ClMain擔保品主檔的可分配金額
+	* 放款餘額的佔用金額，運算用不更新
+1.先占用單獨擔保品
+2.再占用共同擔保品
+3.其他額度優先占用其他擔保品
   *
   * @param shareAmt 分配金額
 	*/

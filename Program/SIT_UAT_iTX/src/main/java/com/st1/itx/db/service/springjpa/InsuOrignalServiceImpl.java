@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("insuOrignalService")
 @Repository
-public class InsuOrignalServiceImpl implements InsuOrignalService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(InsuOrignalServiceImpl.class);
-
+public class InsuOrignalServiceImpl extends ASpringJpaParm implements InsuOrignalService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class InsuOrignalServiceImpl implements InsuOrignalService, InitializingB
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + insuOrignalId);
+    this.info("findById " + dbName + " " + insuOrignalId);
     Optional<InsuOrignal> insuOrignal = null;
     if (dbName.equals(ContentName.onDay))
       insuOrignal = insuOrignalReposDay.findById(insuOrignalId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "OrigInsuNo", "EndoInsuNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = insuOrignalReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +103,9 @@ em = null;
     else 
       slice = insuOrignalRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("clNoFirst " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("clNoFirst " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
     Optional<InsuOrignal> insuOrignalT = null;
     if (dbName.equals(ContentName.onDay))
       insuOrignalT = insuOrignalReposDay.findTopByClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDesc(clCode1_0, clCode2_1, clNo_2);
@@ -125,11 +124,12 @@ em = null;
       insuOrignalT = insuOrignalReposHist.findTopByClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDesc(clCode1_0, clCode2_1, clNo_2);
     else 
       insuOrignalT = insuOrignalRepos.findTopByClCode1IsAndClCode2IsAndClNoIsOrderByInsuEndDateDesc(clCode1_0, clCode2_1, clNo_2);
+
     return insuOrignalT.isPresent() ? insuOrignalT.get() : null;
   }
 
   @Override
-  public Slice<InsuOrignal> insuEndDateRNG(int insuEndDate_0, int insuEndDate_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<InsuOrignal> insuEndDateRange(int insuEndDate_0, int insuEndDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<InsuOrignal> slice = null;
     if (titaVo.length != 0)
@@ -140,15 +140,18 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("insuEndDateRNG " + dbName + " : " + "insuEndDate_0 : " + insuEndDate_0 + " insuEndDate_1 : " +  insuEndDate_1);
+    this.info("insuEndDateRange " + dbName + " : " + "insuEndDate_0 : " + insuEndDate_0 + " insuEndDate_1 : " +  insuEndDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = insuOrignalReposDay.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqual(insuEndDate_0, insuEndDate_1, pageable);
+      slice = insuOrignalReposDay.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = insuOrignalReposMon.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqual(insuEndDate_0, insuEndDate_1, pageable);
+      slice = insuOrignalReposMon.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = insuOrignalReposHist.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqual(insuEndDate_0, insuEndDate_1, pageable);
+      slice = insuOrignalReposHist.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
     else 
-      slice = insuOrignalRepos.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqual(insuEndDate_0, insuEndDate_1, pageable);
+      slice = insuOrignalRepos.findAllByInsuEndDateGreaterThanEqualAndInsuEndDateLessThanEqualOrderByOrigInsuNoAscEndoInsuNoAsc(insuEndDate_0, insuEndDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -165,7 +168,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("clNoEqual " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
+    this.info("clNoEqual " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = insuOrignalReposDay.findAllByClCode1IsAndClCode2IsAndClNoIs(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -175,6 +178,9 @@ em = null;
     else 
       slice = insuOrignalRepos.findAllByClCode1IsAndClCode2IsAndClNoIs(clCode1_0, clCode2_1, clNo_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -183,7 +189,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + insuOrignalId);
+    this.info("Hold " + dbName + " " + insuOrignalId);
     Optional<InsuOrignal> insuOrignal = null;
     if (dbName.equals(ContentName.onDay))
       insuOrignal = insuOrignalReposDay.findByInsuOrignalId(insuOrignalId);
@@ -201,7 +207,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + insuOrignal.getInsuOrignalId());
+    this.info("Hold " + dbName + " " + insuOrignal.getInsuOrignalId());
     Optional<InsuOrignal> insuOrignalT = null;
     if (dbName.equals(ContentName.onDay))
       insuOrignalT = insuOrignalReposDay.findByInsuOrignalId(insuOrignal.getInsuOrignalId());
@@ -223,7 +229,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + insuOrignal.getInsuOrignalId());
+    this.info("Insert..." + dbName + " " + insuOrignal.getInsuOrignalId());
     if (this.findById(insuOrignal.getInsuOrignalId()) != null)
       throw new DBException(2);
 
@@ -252,7 +258,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + insuOrignal.getInsuOrignalId());
+    this.info("Update..." + dbName + " " + insuOrignal.getInsuOrignalId());
     if (!empNot.isEmpty())
       insuOrignal.setLastUpdateEmpNo(empNot);
 
@@ -275,7 +281,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + insuOrignal.getInsuOrignalId());
+    this.info("Update..." + dbName + " " + insuOrignal.getInsuOrignalId());
     if (!empNot.isEmpty())
       insuOrignal.setLastUpdateEmpNo(empNot);
 
@@ -295,7 +301,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + insuOrignal.getInsuOrignalId());
+    this.info("Delete..." + dbName + " " + insuOrignal.getInsuOrignalId());
     if (dbName.equals(ContentName.onDay)) {
       insuOrignalReposDay.delete(insuOrignal);	
       insuOrignalReposDay.flush();
@@ -324,7 +330,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (InsuOrignal t : insuOrignal){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -359,7 +365,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (insuOrignal == null || insuOrignal.size() == 0)
       throw new DBException(6);
 
@@ -388,7 +394,7 @@ em = null;
 
   @Override
   public void deleteAll(List<InsuOrignal> insuOrignal, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

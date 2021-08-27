@@ -2,7 +2,6 @@ package com.st1.itx.trade.BS;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +32,6 @@ import com.st1.itx.db.domain.InsuOrignalId;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.InsuRenewId;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
-import com.st1.itx.db.domain.InsuRenewMediaTempId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
@@ -51,6 +49,7 @@ import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.CustNoticeCom;
+import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.data.InsuRenewFileVo;
@@ -120,6 +119,12 @@ public class BS460 extends TradeBuffer {
 	public CdCityService cdCityService;
 
 	@Autowired
+	public FacStatusCom facStatusCom;
+
+	@Autowired
+	DateUtil dDateUtil;
+
+	@Autowired
 	public FileCom fileCom;
 
 	@Autowired
@@ -146,6 +151,8 @@ public class BS460 extends TradeBuffer {
 	private int repayCode = 0;
 	private Boolean checkFlag = true;
 	private String sendMsg = " ";
+	private List<InsuRenew> lInsuRenewTemp = new ArrayList<InsuRenew>();
+	private List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -160,9 +167,11 @@ public class BS460 extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4600 已產生火險到期檔", titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+					"L4600 已產生火險到期檔", titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -174,24 +183,26 @@ public class BS460 extends TradeBuffer {
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 		insuStartDate = parse.stringToInteger(iInsuEndMonth + "01");
 		insuEndDate = parse.stringToInteger(iInsuEndMonth + "31");
-//		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		this.index = titaVo.getReturnIndex();
-//		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = Integer.MAX_VALUE;
 
 //		檢核該月份是否做過詢價
 		check(titaVo);
 
 //		刪除舊資料
-		deleInsuRenew(iInsuEndMonth);
+		deleInsuRenew(iInsuEndMonth, titaVo);
 
+//      
+//		step1 將到期年月，加入續保List
 //		新保 ->續保
-//		step1 將到期年月與tita相同之新保者，自動寫入續保檔下一期
-		orignalRenew(titaVo);
+		orignalToList(titaVo);
+//		續保 ->續保
+		renewToList(titaVo);
 
 //		續保 -> 續保(新年度)
 //		step2 將續保檔內到期年月與tita相同者產出下一期
-		renewRenew(titaVo);
+		updateRenew(titaVo);
+		if (lInsuRenew.size() == 0) {
+			throw new LogicException("E0001", "查無資料");
+		}
 
 //		續保(新年度) ->FILE
 //		step3 將下一期產出file
@@ -204,7 +215,8 @@ public class BS460 extends TradeBuffer {
 		// 轉換資料格式
 		ArrayList<String> file = insuRenewFileVo.toFile();
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔",
+				"LNM01P.txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -217,390 +229,197 @@ public class BS460 extends TradeBuffer {
 		makeFile.toFile(sno);
 	}
 
-	private void orignalRenew(TitaVo titaVo) throws LogicException {
-//		新保 ->續保
-//		step1 將到期年月與tita相同之新保者，自動寫入續保檔下一期
-		List<ClFac> lClFac = new ArrayList<ClFac>();
-
-		List<InsuOrignal> lInsuOrignal = new ArrayList<InsuOrignal>();
-
-		Slice<InsuOrignal> sInsuOrignal = null;
-
-		sInsuOrignal = insuOrignalService.insuEndDateRNG(insuStartDate, insuEndDate, this.index, this.limit, titaVo);
-
-		lInsuOrignal = sInsuOrignal == null ? null : sInsuOrignal.getContent();
-
-		if (lInsuOrignal != null && lInsuOrignal.size() != 0) {
-//			合計
-			HashMap<String, Integer> flag = new HashMap<>();
-			HashMap<String, BigDecimal> fireAmt = new HashMap<>();
-			HashMap<String, BigDecimal> fireFee = new HashMap<>();
-			HashMap<String, BigDecimal> eqthAmt = new HashMap<>();
-			HashMap<String, BigDecimal> eqthFee = new HashMap<>();
-
-			for (InsuOrignal tInsuOrignal : lInsuOrignal) {
-				String insuNo = tInsuOrignal.getInsuOrignalId().getOrigInsuNo();
-				BigDecimal fa = tInsuOrignal.getFireInsuCovrg();
-				BigDecimal ff = tInsuOrignal.getFireInsuPrem();
-				BigDecimal ea = tInsuOrignal.getEthqInsuCovrg();
-				BigDecimal ef = tInsuOrignal.getEthqInsuPrem();
-
-				if (!fireAmt.containsKey(insuNo)) {
-					fireAmt.put(insuNo, fa);
-				} else {
-					fireAmt.put(insuNo, fa.add(fireAmt.get(insuNo)));
-				}
-
-				if (!fireFee.containsKey(insuNo)) {
-					fireFee.put(insuNo, ff);
-				} else {
-					fireFee.put(insuNo, ff.add(fireFee.get(insuNo)));
-				}
-
-				if (!eqthAmt.containsKey(insuNo)) {
-					eqthAmt.put(insuNo, ea);
-				} else {
-					eqthAmt.put(insuNo, ea.add(eqthAmt.get(insuNo)));
-				}
-
-				if (!eqthFee.containsKey(insuNo)) {
-					eqthFee.put(insuNo, ef);
-				} else {
-					eqthFee.put(insuNo, ef.add(eqthFee.get(insuNo)));
-				}
-			}
-
-			for (InsuOrignal tInsuOrignal : lInsuOrignal) {
+	private void orignalToList(TitaVo titaVo) throws LogicException {
+		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.insuEndDateRange(insuStartDate, insuEndDate, 0,
+				Integer.MAX_VALUE, titaVo);
+		if (slInsuOrignal != null) {
+			for (InsuOrignal tInsuOrignal : slInsuOrignal.getContent()) {
 				InsuRenew tempInsuRenew = new InsuRenew();
-				InsuRenew t2InsuRenew = new InsuRenew();
-				InsuRenewId tempInsuRenewId = new InsuRenewId();
-				Slice<ClFac> sClFac = null;
-
-				String insuNo = tInsuOrignal.getInsuOrignalId().getOrigInsuNo();
-
-				tempInsuRenewId.setClCode1(tInsuOrignal.getClCode1());
-				tempInsuRenewId.setClCode2(tInsuOrignal.getClCode2());
-				tempInsuRenewId.setClNo(tInsuOrignal.getClNo());
-				tempInsuRenewId.setPrevInsuNo(tInsuOrignal.getOrigInsuNo());
-				tempInsuRenewId.setEndoInsuNo(" ");
-
-//				排除自保件及其批單號碼
-				t2InsuRenew = insuRenewService.findById(tempInsuRenewId, titaVo);
-
-//				自保件跳過
-				if (t2InsuRenew != null) {
-					this.info("排除自保件 ... " + insuNo);
-					continue;
-				}
-
-//				重複保單號碼跳過
-				if (flag.containsKey(insuNo)) {
-					this.info("重複保單號碼 ... " + insuNo);
-					continue;
-				} else {
-					flag.put(insuNo, 1);
-				}
-
-//				戶號 抓取 擔保品關聯額度檔
-				sClFac = clFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(), tInsuOrignal.getClNo(), this.index, this.limit);
-
-				lClFac = sClFac == null ? null : sClFac.getContent();
-
-				findFacmNo(lClFac);
-
-//				同擔保品內 判斷status
-//				額度 0.正常>2.催收>7.部呆>6.呆帳，排除結案戶(其他戶況)。
-//				若戶況相同選擇額度最大者
-				this.info("custNo : " + custNo);
-				this.info("facmNo : " + facmNo);
-
-				if (custNo == 0) {
-					this.info("custNo == 0 ，檢核是否無撥款號碼");
-					continue;
-				}
-
-				tempInsuRenew.setCustNo(custNo);
-				tempInsuRenew.setFacmNo(facmNo);
-
-				tempInsuRenew.setInsuRenewId(tempInsuRenewId);
-				tempInsuRenew.setInsuYearMonth(iInsuEndMonth);
-				tempInsuRenew.setNowInsuNo("");
+				tempInsuRenew.setClCode1(tInsuOrignal.getClCode1());
+				tempInsuRenew.setClCode2(tInsuOrignal.getClCode2());
+				tempInsuRenew.setClNo(tInsuOrignal.getClNo());
+				tempInsuRenew.setPrevInsuNo(tInsuOrignal.getOrigInsuNo());
 				tempInsuRenew.setOrigInsuNo(tInsuOrignal.getOrigInsuNo());
-				tempInsuRenew.setRenewCode(2);
+				tempInsuRenew.setNowInsuNo(tInsuOrignal.getOrigInsuNo());
 				tempInsuRenew.setInsuCompany(tInsuOrignal.getInsuCompany());
 				tempInsuRenew.setInsuTypeCode(tInsuOrignal.getInsuTypeCode());
-				tempInsuRenew.setRepayCode(repayCode);
-//				tempInsuRenew.setFireInsuCovrg(BigDecimal.ZERO);
-//				tempInsuRenew.setFireInsuPrem(BigDecimal.ZERO);
-//				tempInsuRenew.setEthqInsuCovrg(BigDecimal.ZERO);
-//				tempInsuRenew.setEthqInsuPrem(BigDecimal.ZERO);
-				tempInsuRenew.setFireInsuCovrg(fireAmt.get(insuNo));
-				tempInsuRenew.setFireInsuPrem(fireFee.get(insuNo));
-				tempInsuRenew.setEthqInsuCovrg(eqthAmt.get(insuNo));
-				tempInsuRenew.setEthqInsuPrem(eqthFee.get(insuNo));
-
-				tempInsuRenew.setInsuStartDate(tInsuOrignal.getInsuEndDate());
-				tempInsuRenew.setInsuEndDate(tInsuOrignal.getInsuEndDate() + 10000);
-				tempInsuRenew.setTotInsuPrem(BigDecimal.ZERO);
-				tempInsuRenew.setAcDate(0);
-				tempInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
-				tempInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
-				tempInsuRenew.setNotiTempFg("N");
-				tempInsuRenew.setStatusCode(0);
-				tempInsuRenew.setOvduDate(0);
-				tempInsuRenew.setOvduNo(BigDecimal.ZERO);
-
-				try {
-					insuRenewService.insert(tempInsuRenew);
-				} catch (DBException e) {
-					throw new LogicException("E0005", "L4600 " + e.getErrorMsg());
+				tempInsuRenew.setFireInsuCovrg(tInsuOrignal.getFireInsuCovrg());
+				tempInsuRenew.setFireInsuPrem(tInsuOrignal.getFireInsuPrem());
+				tempInsuRenew.setEthqInsuCovrg(tInsuOrignal.getEthqInsuCovrg());
+				tempInsuRenew.setEthqInsuPrem(tInsuOrignal.getEthqInsuPrem());
+				tempInsuRenew.setInsuStartDate(tInsuOrignal.getInsuStartDate());
+				tempInsuRenew.setInsuEndDate(tInsuOrignal.getInsuEndDate());
+				tempInsuRenew.setTotInsuPrem(tInsuOrignal.getFireInsuPrem().add(tInsuOrignal.getEthqInsuPrem()));
+				if ("".equals(tInsuOrignal.getEndoInsuNo().trim())) {
+					lInsuRenewTemp.add(tempInsuRenew);
+				} else {
+					endoInsuNoToList(tempInsuRenew, titaVo);
 				}
 			}
 		}
 	}
 
-	private void renewRenew(TitaVo titaVo) throws LogicException {
-//		續保 -> 續保(新年度)
-//		step2 將續保檔內到期年月與tita相同者產出下一期
-		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+	private void endoInsuNoToList(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
+		for (InsuRenew t : lInsuRenewTemp) {
+			if (tInsuRenew.getClCode1() == t.getClCode1() && tInsuRenew.getClCode2() == t.getClCode2()
+					&& tInsuRenew.getClNo() == t.getClNo() && tInsuRenew.getClCode2() == t.getClCode2()
+					&& tInsuRenew.getPrevInsuNo().equals(t.getPrevInsuNo())
+					&& tInsuRenew.getInsuEndDate() == t.getInsuEndDate()) {
+				t.setFireInsuCovrg(t.getFireInsuCovrg().add(tInsuRenew.getFireInsuCovrg()));
+				t.setFireInsuPrem(t.getFireInsuPrem().add(tInsuRenew.getFireInsuPrem()));
+				t.setEthqInsuCovrg(t.getEthqInsuCovrg().add(tInsuRenew.getEthqInsuCovrg()));
+				t.setEthqInsuPrem(t.getEthqInsuPrem().add(tInsuRenew.getEthqInsuPrem()));
+			}
+		}
+	}
 
-		Slice<InsuRenew> sInsuRenew = null;
-
-		sInsuRenew = insuRenewService.findL4965Z(insuStartDate, insuEndDate, this.index, this.limit);
-
-		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-
-		if (lInsuRenew != null && lInsuRenew.size() != 0) {
-			HashMap<String, Integer> flag = new HashMap<>();
-			HashMap<String, BigDecimal> fireAmt = new HashMap<>();
-			HashMap<String, BigDecimal> fireFee = new HashMap<>();
-			HashMap<String, BigDecimal> eqthAmt = new HashMap<>();
-			HashMap<String, BigDecimal> eqthFee = new HashMap<>();
-
-			for (InsuRenew tInsuRenew : lInsuRenew) {
-				String insuNo = tInsuRenew.getInsuRenewId().getPrevInsuNo();
-				BigDecimal fa = tInsuRenew.getFireInsuCovrg();
-				BigDecimal ff = tInsuRenew.getFireInsuPrem();
-				BigDecimal ea = tInsuRenew.getEthqInsuCovrg();
-				BigDecimal ef = tInsuRenew.getEthqInsuPrem();
-
-				if (!fireAmt.containsKey(insuNo)) {
-					fireAmt.put(insuNo, fa);
+	private void renewToList(TitaVo titaVo) throws LogicException {
+		Slice<InsuRenew> slInsuRenew = insuRenewService.insuEndDateRange(insuStartDate, insuEndDate, 0, Integer.MAX_VALUE);
+		if (slInsuRenew != null) {
+			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
+				if ("".equals(tInsuRenew.getEndoInsuNo().trim())) {
+					lInsuRenewTemp.add(tInsuRenew);
 				} else {
-					fireAmt.put(insuNo, fa.add(fireAmt.get(insuNo)));
-				}
-
-				if (!fireFee.containsKey(insuNo)) {
-					fireFee.put(insuNo, ff);
-				} else {
-					fireFee.put(insuNo, ff.add(fireFee.get(insuNo)));
-				}
-
-				if (!eqthAmt.containsKey(insuNo)) {
-					eqthAmt.put(insuNo, ea);
-				} else {
-					eqthAmt.put(insuNo, ea.add(eqthAmt.get(insuNo)));
-				}
-
-				if (!eqthFee.containsKey(insuNo)) {
-					eqthFee.put(insuNo, ef);
-				} else {
-					eqthFee.put(insuNo, ef.add(eqthFee.get(insuNo)));
+					endoInsuNoToList(tInsuRenew, titaVo);
 				}
 			}
+		}
+	}
 
-			for (InsuRenew tInsuRenew : lInsuRenew) {
-				String insuNo = tInsuRenew.getInsuRenewId().getPrevInsuNo();
-				String insuNoL = tInsuRenew.getNowInsuNo();
+	private void updateRenew(TitaVo titaVo) throws LogicException {
 
-//				尚未續保跳過
-				if ("".equals(insuNoL)) {
-					this.info("無新保單號碼 ... " + insuNo);
-					continue;
-				}
+		for (InsuRenew t : lInsuRenewTemp) {
 
-//				已提前自保跳過
-				InsuRenewId nInsuRenewId = new InsuRenewId();
-				nInsuRenewId.setClCode1(tInsuRenew.getClCode1());
-				nInsuRenewId.setClCode2(tInsuRenew.getClCode2());
-				nInsuRenewId.setClNo(tInsuRenew.getClNo());
-				nInsuRenewId.setPrevInsuNo(insuNoL);
-				nInsuRenewId.setEndoInsuNo(" ");
-
-				InsuRenew nInsuRenew = insuRenewService.findById(nInsuRenewId, titaVo);
+//				無新保單號碼
+			if ("".equals(t.getNowInsuNo())) {
+				this.info("無新保單號碼 ... " + t.getNowInsuNo());
+				continue;
+			}
 
 //				排除自保件
-				if (nInsuRenew != null) {
-					this.info("排除自保件 ... " + insuNo);
-					continue;
-				}
+			InsuRenew nInsuRenew = insuRenewService.findById(
+					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "), titaVo);
 
-//				重複保單號碼跳過
-				if (flag.containsKey(insuNo)) {
-					this.info("重複保單號碼 ... " + insuNo);
-					continue;
-				} else {
-					flag.put(insuNo, 1);
-				}
+			if (nInsuRenew != null) {
+				this.info("排除自保件 ... " + t.getNowInsuNo());
+				continue;
+			}
 
-				InsuRenewId tInsuRenewId = new InsuRenewId();
-				InsuRenew tempInsuRenew = new InsuRenew();
+			// 找額度
+			findFacmNo(t, titaVo);
+			if (this.facmNo == 0) {
+				continue;
+			}
 
-				InsuOrignal tInsuOrignal = new InsuOrignal();
-				tInsuOrignal = insuOrignalService.clNoFirst(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(), tInsuRenew.getClNo());
+			InsuRenew tInsuRenew = new InsuRenew();
 
-				tInsuRenewId.setClCode1(tInsuRenew.getInsuRenewId().getClCode1());
-				tInsuRenewId.setClCode2(tInsuRenew.getInsuRenewId().getClCode2());
-				tInsuRenewId.setClNo(tInsuRenew.getInsuRenewId().getClNo());
-				tInsuRenewId.setPrevInsuNo(tInsuRenew.getNowInsuNo());
-				tInsuRenewId.setEndoInsuNo(" ");
-
-				tempInsuRenew.setInsuRenewId(tInsuRenewId);
-				tempInsuRenew.setNowInsuNo("");
-
-				this.info("iInsuEndMonth : " + iInsuEndMonth);
-				this.info("getCustNo : " + tInsuRenew.getCustNo());
-				this.info("getFacmNo : " + tInsuRenew.getFacmNo());
-
-				tempInsuRenew.setInsuYearMonth(iInsuEndMonth);
-				tempInsuRenew.setCustNo(tInsuRenew.getCustNo());
-				tempInsuRenew.setFacmNo(tInsuRenew.getFacmNo());
-
-				if (tInsuOrignal != null) {
-					tempInsuRenew.setOrigInsuNo(tInsuOrignal.getOrigInsuNo());
-				} else {
-					tempInsuRenew.setOrigInsuNo(lastYearInsuRenew(insuStartDate, insuEndDate));
-//					前一年的InsuRenew.nowInsuNo
-				}
-
-				tempInsuRenew.setRenewCode(2);
-				tempInsuRenew.setInsuCompany(tInsuRenew.getInsuCompany());
-				tempInsuRenew.setInsuTypeCode(tInsuRenew.getInsuTypeCode());
-				tempInsuRenew.setRepayCode(tInsuRenew.getRepayCode());
-				tempInsuRenew.setFireInsuCovrg(fireAmt.get(insuNo));
-				tempInsuRenew.setFireInsuPrem(fireFee.get(insuNo));
-				tempInsuRenew.setEthqInsuCovrg(eqthAmt.get(insuNo));
-				tempInsuRenew.setEthqInsuPrem(eqthFee.get(insuNo));
-				tempInsuRenew.setInsuStartDate(tInsuRenew.getInsuEndDate());
-				tempInsuRenew.setInsuEndDate(tInsuRenew.getInsuEndDate() + 10000);
-				tempInsuRenew.setTotInsuPrem(tInsuRenew.getEthqInsuPrem().add(tInsuRenew.getFireInsuPrem()));
-				tempInsuRenew.setAcDate(0);
-				tempInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
-				tempInsuRenew.setTitaTxtNo(this.getTxBuffer().getTxCom().getRelTno() + "");
-				tempInsuRenew.setNotiTempFg("N");
-				tempInsuRenew.setStatusCode(0);
-				tempInsuRenew.setOvduDate(0);
-				tempInsuRenew.setOvduNo(BigDecimal.ZERO);
-
-				try {
-					insuRenewService.insert(tempInsuRenew);
-				} catch (DBException e) {
-					throw new LogicException("E0007", "InsuRenew update error : " + e.getErrorMsg());
-				}
+			tInsuRenew.setClCode1(t.getClCode1());
+			tInsuRenew.setClCode2(t.getClCode2());
+			tInsuRenew.setClNo(t.getClNo());
+			tInsuRenew.setPrevInsuNo(t.getNowInsuNo());
+			tInsuRenew.setEndoInsuNo(" ");
+			tInsuRenew.setInsuRenewId(new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "));
+			tInsuRenew.setNowInsuNo("");
+			tInsuRenew.setOrigInsuNo(t.getOrigInsuNo());
+			tInsuRenew.setInsuYearMonth(iInsuEndMonth);
+			tInsuRenew.setCustNo(this.custNo);
+			tInsuRenew.setFacmNo(this.facmNo);
+			tInsuRenew.setRenewCode(2); // 續保
+			tInsuRenew.setInsuCompany(t.getInsuCompany());
+			tInsuRenew.setInsuTypeCode(t.getInsuTypeCode());
+			tInsuRenew.setRepayCode(this.repayCode);
+			tInsuRenew.setFireInsuCovrg(t.getFireInsuCovrg());
+			tInsuRenew.setFireInsuPrem(t.getFireInsuPrem());
+			tInsuRenew.setEthqInsuCovrg(t.getEthqInsuCovrg());
+			tInsuRenew.setEthqInsuPrem(t.getEthqInsuPrem());
+			tInsuRenew.setInsuStartDate(t.getInsuEndDate());
+			dDateUtil.init();
+			dDateUtil.setDate_1(t.getInsuEndDate());
+			dDateUtil.setYears(1);
+			tInsuRenew.setInsuEndDate(dDateUtil.getCalenderDay());
+			tInsuRenew.setTotInsuPrem(t.getTotInsuPrem());
+			tInsuRenew.setAcDate(0);
+			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
+			tInsuRenew.setTitaTxtNo(this.getTxBuffer().getTxCom().getRelTno() + "");
+			tInsuRenew.setNotiTempFg(""); // 待通知
+			tInsuRenew.setStatusCode(0);
+			tInsuRenew.setOvduDate(0);
+			tInsuRenew.setOvduNo(BigDecimal.ZERO);
+			lInsuRenew.add(tInsuRenew);
+		}
+		if (lInsuRenew.size() > 0) {
+			try {
+				insuRenewService.insertAll(lInsuRenew);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "InsuRenew : " + e.getErrorMsg());
 			}
 		}
 	}
 
-	private void findFacmNo(List<ClFac> lClFac) {
-		int flagStatus = 0;
-		HashMap<tmpFacm, Integer> applNo = new HashMap<>();
-		custNo = 0;
-		facmNo = 0;
-		repayCode = 0;
-
-		if (lClFac != null && lClFac.size() != 0) {
-			for (ClFac pClFac : lClFac) {
-				List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
-
-				Slice<LoanBorMain> sLoanBorMain = null;
-
-				sLoanBorMain = loanBorMainService.bormCustNoEq(pClFac.getCustNo(), pClFac.getFacmNo(), pClFac.getFacmNo(), 0, 999, this.index, this.limit);
-
-				lLoanBorMain = sLoanBorMain == null ? null : sLoanBorMain.getContent();
-
+	private void findFacmNo(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
+		this.custNo = 0;
+		this.facmNo = 0;
+		this.repayCode = 0;
 //				1.戶況順序 0.正常>2.催收>7.部呆>6.呆帳，排除結案戶。
-//				2.若同戶況，根據申請序號最大者
-				if (lLoanBorMain != null && lLoanBorMain.size() != 0) {
-					for (LoanBorMain tLoanBorMain : lLoanBorMain) {
-						tmpFacm temp = new tmpFacm(tLoanBorMain.getCustNo(), tLoanBorMain.getStatus());
+//				2.若同戶況，原額度優先、其次根據申請序號最小者
 
-						FacMain tFacMain = new FacMain();
-						FacMainId tFacMainId = new FacMainId();
-						tFacMainId.setCustNo(tLoanBorMain.getCustNo());
-						tFacMainId.setFacmNo(tLoanBorMain.getFacmNo());
-						tFacMain = facMainService.findById(tFacMainId);
-						if (tFacMain != null) {
-							if (!applNo.containsKey(temp)) {
-								applNo.put(temp, 0);
-							}
+		int priorty = 9;
+		// 原額度
+		Slice<LoanBorMain> slLoanBorMain;
+		if (tInsuRenew.getFacmNo() > 0) {
+			slLoanBorMain = loanBorMainService.bormCustNoEq(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(),
+					tInsuRenew.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
+			if (slLoanBorMain != null) {
+				int status = facStatusCom.settingStatus(slLoanBorMain.getContent(), tInsuRenew.getInsuEndDate());
+				if (status == 0 || status == 4) {
+					priorty = 0;
+					custNo = tInsuRenew.getCustNo();
+					facmNo = tInsuRenew.getFacmNo();
+				}
+			}
+		}
+
+		if (priorty > 0) {
+			int priortyNow = 9;
+			Slice<ClFac> slClFac = clFacService.clNoEq(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(),
+					tInsuRenew.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+			if (slClFac != null) {
+				for (ClFac tClFac : slClFac.getContent()) {
+					slLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(),
+							tClFac.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
+					if (slLoanBorMain != null) {
+						int status = facStatusCom.settingStatus(slLoanBorMain.getContent(),
+								tInsuRenew.getInsuEndDate());
+						if (status == 0 || status == 4) {
+							priortyNow = 1;
+						} else if (status == 2) {
+							priortyNow = 2;
+						} else if (status == 7) {
+							priortyNow = 3;
+						} else if (status == 6) {
+							priortyNow = 4;
 						}
-
-						switch (tLoanBorMain.getStatus()) {
-						case 0:
-							if (flagStatus == 1) {
-								if (applNo.get(temp) < tFacMain.getApplNo()) {
-									custNo = tLoanBorMain.getCustNo();
-									facmNo = tLoanBorMain.getFacmNo();
-									repayCode = tFacMain.getRepayCode();
-									applNo.put(temp, tFacMain.getApplNo());
-								}
-							} else {
-								flagStatus = 1;
-								custNo = tLoanBorMain.getCustNo();
-								facmNo = tLoanBorMain.getFacmNo();
-								repayCode = tFacMain.getRepayCode();
-							}
-							break;
-						case 2:
-							if (flagStatus > 2 || flagStatus == 0) {
-								flagStatus = 2;
-								custNo = tLoanBorMain.getCustNo();
-								facmNo = tLoanBorMain.getFacmNo();
-								repayCode = tFacMain.getRepayCode();
-							} else if (flagStatus == 2) {
-								if (applNo.get(temp) < tFacMain.getApplNo()) {
-									custNo = tLoanBorMain.getCustNo();
-									facmNo = tLoanBorMain.getFacmNo();
-									repayCode = tFacMain.getRepayCode();
-									applNo.put(temp, tFacMain.getApplNo());
-								}
-							}
-							break;
-						case 7:
-							if (flagStatus > 3 || flagStatus == 0) {
-								flagStatus = 3;
-								custNo = tLoanBorMain.getCustNo();
-								facmNo = tLoanBorMain.getFacmNo();
-								repayCode = tFacMain.getRepayCode();
-							} else if (flagStatus == 3) {
-								if (applNo.get(temp) < tFacMain.getApplNo()) {
-									custNo = tLoanBorMain.getCustNo();
-									facmNo = tLoanBorMain.getFacmNo();
-									repayCode = tFacMain.getRepayCode();
-									applNo.put(temp, tFacMain.getApplNo());
-								}
-							}
-							break;
-						case 6:
-							if (flagStatus > 4 || flagStatus == 0) {
-								flagStatus = 4;
-								custNo = tLoanBorMain.getCustNo();
-								facmNo = tLoanBorMain.getFacmNo();
-								repayCode = tFacMain.getRepayCode();
-							} else if (flagStatus == 4) {
-								if (applNo.get(temp) < tFacMain.getApplNo()) {
-									custNo = tLoanBorMain.getCustNo();
-									facmNo = tLoanBorMain.getFacmNo();
-									repayCode = tFacMain.getRepayCode();
-									applNo.put(temp, tFacMain.getApplNo());
-								}
-							}
+					}
+					if (priortyNow <= priorty) {
+						this.custNo = tClFac.getCustNo();
+						this.facmNo = tClFac.getFacmNo();
+						priorty = priortyNow;
+						if (priortyNow == 1) {
 							break;
 						}
 					}
 				}
 			}
 		}
+		if (priorty < 9) {
+			FacMain tFacMain = facMainService.findById(new FacMainId(custNo, facmNo), titaVo);
+			if (tFacMain != null) {
+				this.repayCode = tFacMain.getRepayCode();
+			}
+		}
+
+		this.info("CustNo=" + this.custNo + ", FacmNo=" + this.facmNo);
+
 	}
 
 	private String dateSlashFormat(int today) {
@@ -617,17 +436,11 @@ public class BS460 extends TradeBuffer {
 		return slashedDate;
 	}
 
-	private void deleInsuRenew(int insuMonth) throws LogicException {
-		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+	private void deleInsuRenew(int insuMonth, TitaVo titaVo) throws LogicException {
+		Slice<InsuRenew> sInsuRenew = insuRenewService.selectC(insuMonth, 0, Integer.MAX_VALUE, titaVo);
 
-		Slice<InsuRenew> sInsuRenew = null;
-
-		sInsuRenew = insuRenewService.selectC(insuMonth, this.index, this.limit);
-
-		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-
-		if (lInsuRenew != null && lInsuRenew.size() != 0) {
-			for (InsuRenew tInsuRenew : lInsuRenew) {
+		if (sInsuRenew != null) {
+			for (InsuRenew tInsuRenew : sInsuRenew.getContent()) {
 
 				if (tInsuRenew.getAcDate() > 0) {
 					this.info("continue... ，ACDATE > 0");
@@ -640,10 +453,10 @@ public class BS460 extends TradeBuffer {
 					continue;
 				}
 
-				insuRenewService.holdById(tInsuRenew.getInsuRenewId());
+				insuRenewService.holdById(tInsuRenew, titaVo);
 
 				try {
-					insuRenewService.delete(tInsuRenew);
+					insuRenewService.delete(tInsuRenew, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0008", "InsuRenew delete error : " + e.getErrorMsg());
 				}
@@ -651,33 +464,14 @@ public class BS460 extends TradeBuffer {
 		}
 	}
 
-	private String lastYearInsuRenew(int insuStartDate, int insuEndDate) {
-		String result = "";
-
-		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
-
-		Slice<InsuRenew> sInsuRenew = null;
-
-		sInsuRenew = insuRenewService.findL4965Z(insuStartDate, insuEndDate, this.index, this.limit);
-
-		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-
-		if (lInsuRenew != null && lInsuRenew.size() != 0) {
-			for (InsuRenew tInsuRenew : lInsuRenew) {
-				result = tInsuRenew.getNowInsuNo();
-			}
-		}
-		return result;
-	}
-
-	private String findZipCode(CustMain tCustMain) {
+	private String findZipCode(CustMain tCustMain, TitaVo titaVo) throws LogicException {
 		String zip = "";
 		if (tCustMain != null) {
 			CdArea tCdArea = new CdArea();
 			CdAreaId tCdAreaId = new CdAreaId();
 			tCdAreaId.setCityCode(tCustMain.getCurrCityCode());
 			tCdAreaId.setAreaCode(tCustMain.getCurrAreaCode());
-			tCdArea = cdAreaService.findById(tCdAreaId);
+			tCdArea = cdAreaService.findById(tCdAreaId, titaVo);
 			if (tCdArea != null) {
 				zip = tCdArea.getZip3();
 			}
@@ -685,17 +479,7 @@ public class BS460 extends TradeBuffer {
 		return zip;
 	}
 
-	public static boolean isNumeric(String str) {
-		for (int i = 0; i < str.length(); i++) {
-//			System.out.println(str.charAt(i));
-			if (!Character.isDigit(str.charAt(i))) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	public String replaceComma(String addresss) {
+	private String replaceComma(String addresss) {
 		String result = addresss;
 
 		if (addresss.indexOf(",") >= 0) {
@@ -709,232 +493,126 @@ public class BS460 extends TradeBuffer {
 	}
 
 //	將下一期產出file
-	public void toFile(TitaVo titaVo) throws LogicException {
-//		條件 : 次一年度到期年月 & 續保\自保記號==2.續保
-		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+	private void toFile(TitaVo titaVo) throws LogicException {
 
-		Slice<InsuRenew> sInsuRenew = null;
-
-		sInsuRenew = insuRenewService.selectC(iInsuEndMonth, this.index, this.limit, titaVo);
-
-		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-
-//		QC.360 同保單號碼合計
-
-		HashMap<String, Integer> flag = new HashMap<>();
-
-		if (lInsuRenew != null && lInsuRenew.size() != 0) {
-			HashMap<String, BigDecimal> fireAmt = new HashMap<>();
-			HashMap<String, BigDecimal> fireFee = new HashMap<>();
-			HashMap<String, BigDecimal> eqthAmt = new HashMap<>();
-			HashMap<String, BigDecimal> eqthFee = new HashMap<>();
-
-			for (InsuRenew tInsuRenew : lInsuRenew) {
-				String insuNo = tInsuRenew.getInsuRenewId().getPrevInsuNo();
-
-//				排除自保件
-				if (tInsuRenew.getRenewCode() == 1) {
-					this.info("排除自保件 ... " + insuNo);
-					continue;
-				}
-
-				BigDecimal fa = tInsuRenew.getFireInsuCovrg();
-				BigDecimal ff = tInsuRenew.getFireInsuPrem();
-				BigDecimal ea = tInsuRenew.getEthqInsuCovrg();
-				BigDecimal ef = tInsuRenew.getEthqInsuPrem();
-
-				if (!fireAmt.containsKey(insuNo)) {
-					fireAmt.put(insuNo, fa);
-				} else {
-					fireAmt.put(insuNo, fa.add(fireAmt.get(insuNo)));
-				}
-
-				if (!fireFee.containsKey(insuNo)) {
-					fireFee.put(insuNo, ff);
-				} else {
-					fireFee.put(insuNo, ff.add(fireFee.get(insuNo)));
-				}
-
-				if (!eqthAmt.containsKey(insuNo)) {
-					eqthAmt.put(insuNo, ea);
-				} else {
-					eqthAmt.put(insuNo, ea.add(eqthAmt.get(insuNo)));
-				}
-
-				if (!eqthFee.containsKey(insuNo)) {
-					eqthFee.put(insuNo, ef);
-				} else {
-					eqthFee.put(insuNo, ef.add(eqthFee.get(insuNo)));
-				}
+		for (InsuRenew t : lInsuRenew) {
+			this.info("InsuRenew = " + t.toString());
+			OccursList occursList = new OccursList();
+			occursList.putParam("FireInsuMonth", FormatUtil.padX("" + (t.getInsuYearMonth()), 6));
+			occursList.putParam("ReturnCode", FormatUtil.pad9("99", 2));
+			occursList.putParam("InsuCampCode", FormatUtil.pad9("01", 2));
+			CustMain tCustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
+			FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
+			ClBuilding tClBuilding = null;
+			ClBuildingOwner tClBuildingOwner = null;
+			if (t.getClCode1() == 1) {
+				tClBuilding = clBuildingService.findById(new ClBuildingId(t.getClCode1(), t.getClCode2(), t.getClNo()),
+						titaVo);
+				tClBuildingOwner = clBuildingOwnerService.clNoFirst(t.getClCode1(), t.getClCode2(), t.getClNo(),
+						titaVo);
 			}
-
-			for (InsuRenew tInsuRenew : lInsuRenew) {
-				String insuNo = tInsuRenew.getInsuRenewId().getPrevInsuNo();
-
-//				重複保單號碼跳過
-				if (flag.containsKey(insuNo)) {
-					this.info("重複保單號碼 ... " + insuNo);
-					continue;
-				} else {
-					flag.put(insuNo, 1);
-				}
-
-//				排除自保件
-				if (tInsuRenew.getRenewCode() == 1) {
-					this.info("排除自保件 ... " + insuNo);
-					continue;
-				}
-
-				CustMain tCustMain = new CustMain();
-				tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo());
-
-				ClBuildingId tClBuildingId = new ClBuildingId();
-				tClBuildingId.setClCode1(tInsuRenew.getInsuRenewId().getClCode1());
-				tClBuildingId.setClCode2(tInsuRenew.getInsuRenewId().getClCode2());
-				tClBuildingId.setClNo(tInsuRenew.getInsuRenewId().getClNo());
-				ClBuilding tClBuilding = new ClBuilding();
-				tClBuilding = clBuildingService.findById(tClBuildingId);
-
-				FacMainId tFacMainId = new FacMainId();
-				FacMain tFacMain = new FacMain();
-				tFacMainId.setCustNo(tInsuRenew.getCustNo());
-				tFacMainId.setFacmNo(tInsuRenew.getFacmNo());
-				tFacMain = facMainService.findById(tFacMainId);
-
-				ClBuildingOwner tClBuildingOwner = new ClBuildingOwner();
-				tClBuildingOwner = clBuildingOwnerService.clNoFirst(tInsuRenew.getInsuRenewId().getClCode1(), tInsuRenew.getInsuRenewId().getClCode2(), tInsuRenew.getInsuRenewId().getClNo());
-
-				OccursList occursList = new OccursList();
-				occursList.putParam("FireInsuMonth", FormatUtil.padX("" + (tInsuRenew.getInsuYearMonth()), 6));
-				occursList.putParam("ReturnCode", FormatUtil.pad9("99", 2));
-				occursList.putParam("InsuCampCode", FormatUtil.pad9("01", 2));
-				if (tClBuildingOwner != null) {
-//					occursList.putParam("InsuCustId", FormatUtil.padX(tClBuildingOwner.getOwnerId(), 10));
-//					occursList.putParam("InsuCustName", FormatUtil.padX(tClBuildingOwner.getOwnerName(), 12));
-					CustMain custMain = custMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
-					if (custMain != null) {
-						occursList.putParam("InsuCustId", FormatUtil.padX(custMain.getCustId(), 10));
-						occursList.putParam("InsuCustName", FormatUtil.padX(custMain.getCustName(), 12));
-					} else {
-						occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
-						occursList.putParam("InsuCustName", FormatUtil.padX("", 12));
-					}
+			if (tClBuildingOwner != null) {
+				CustMain custMain = custMainService.findById(tClBuildingOwner.getOwnerCustUKey(), titaVo);
+				if (custMain != null) {
+					occursList.putParam("InsuCustId", FormatUtil.padX(custMain.getCustId(), 10));
+					occursList.putParam("InsuCustName", FormatUtil.padX(custMain.getCustName(), 12));
 				} else {
 					occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
 					occursList.putParam("InsuCustName", FormatUtil.padX("", 12));
 				}
-				if (tCustMain != null) {
-					occursList.putParam("LoanCustId", FormatUtil.padX(tCustMain.getCustId(), 10));
-					occursList.putParam("LoanCustName", FormatUtil.padX(tCustMain.getCustName(), 12));
-				} else {
-					occursList.putParam("LoanCustId", FormatUtil.padX("", 10));
-					occursList.putParam("LoanCustName", FormatUtil.padX("", 12));
+			} else {
+				occursList.putParam("InsuCustId", FormatUtil.padX("", 10));
+				occursList.putParam("InsuCustName", FormatUtil.padX("", 12));
+			}
+			if (tCustMain != null) {
+				occursList.putParam("LoanCustId", FormatUtil.padX(tCustMain.getCustId(), 10));
+				occursList.putParam("LoanCustName", FormatUtil.padX(tCustMain.getCustName(), 12));
+			} else {
+				occursList.putParam("LoanCustId", FormatUtil.padX("", 10));
+				occursList.putParam("LoanCustName", FormatUtil.padX("", 12));
+			}
+
+			BigDecimal mainArea = BigDecimal.ZERO;
+			BigDecimal subArea = BigDecimal.ZERO;
+			BigDecimal parkArea = BigDecimal.ZERO;
+			BigDecimal publicArea = BigDecimal.ZERO;
+
+			if (tClBuilding != null) {
+				Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(tClBuilding.getClCode1(),
+						tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+				Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(),
+						tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+				if (sClBuildingParking != null) {
+					for (ClBuildingParking tClBuildingParking : sClBuildingParking.getContent()) {
+						parkArea = parkArea.add(tClBuildingParking.getArea());
+					}
+				}
+				if (sClBuildingPublic != null) {
+					for (ClBuildingPublic tClBuildingPublic : sClBuildingPublic.getContent()) {
+						publicArea = publicArea.add(tClBuildingPublic.getArea());
+					}
 				}
 
-				BigDecimal mainArea = BigDecimal.ZERO;
-				BigDecimal subArea = BigDecimal.ZERO;
-				BigDecimal parkArea = BigDecimal.ZERO;
-				BigDecimal publicArea = BigDecimal.ZERO;
-
-				if (tClBuilding != null) {
-					List<ClBuildingParking> lClBuildingParking = new ArrayList<ClBuildingParking>();
-					List<ClBuildingPublic> lClBuildingPublic = new ArrayList<ClBuildingPublic>();
-
-					Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit,
-							titaVo);
-					Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), this.index, this.limit,
-							titaVo);
-
-					lClBuildingParking = sClBuildingParking == null ? null : sClBuildingParking.getContent();
-					lClBuildingPublic = sClBuildingPublic == null ? null : sClBuildingPublic.getContent();
-
-					if (lClBuildingParking != null && lClBuildingParking.size() != 0) {
-						for (ClBuildingParking tClBuildingParking : lClBuildingParking) {
-							parkArea = parkArea.add(tClBuildingParking.getArea());
-						}
-					}
-					if (lClBuildingPublic != null && lClBuildingPublic.size() != 0) {
-						for (ClBuildingPublic tClBuildingPublic : lClBuildingPublic) {
-							publicArea = publicArea.add(tClBuildingPublic.getArea());
-						}
-					}
-
-					mainArea = tClBuilding.getFloorArea();
-					subArea = tClBuilding.getBdSubArea();
-					occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain), 5));
-					occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 58));
-					occursList.putParam("BuildingSquare", FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
-					occursList.putParam("BuildingCode", FormatUtil.pad9("" + tClBuilding.getBdMtrlCode(), 2));
-					occursList.putParam("BuildingYears", FormatUtil.pad9(("" + tClBuilding.getBdDate()), 7).substring(0, 3));
-					occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getFloor(), 2));
-					occursList.putParam("RoofCode", FormatUtil.pad9("" + tClBuilding.getRoofStructureCode(), 2));
-					occursList.putParam("BusinessUnit", FormatUtil.pad9("" + tClBuilding.getBdMainUseCode(), 4));
-				} else {
-					occursList.putParam("PostalCode", FormatUtil.padX("", 5));
-					occursList.putParam("Address", FormatUtil.padX("", 58));
-					occursList.putParam("BuildingSquare", FormatUtil.padX("", 9));
-					occursList.putParam("BuildingCode", FormatUtil.padX("", 2));
-					occursList.putParam("BuildingYears", FormatUtil.padX((""), 3));
-					occursList.putParam("BuildingFloors", FormatUtil.padX("", 2));
-					occursList.putParam("RoofCode", FormatUtil.padX("", 2));
-					occursList.putParam("BusinessUnit", FormatUtil.padX("", 4));
-				}
-				occursList.putParam("ClCode1", FormatUtil.padX("" + tInsuRenew.getInsuRenewId().getClCode1(), 1));
-				occursList.putParam("ClCode2", FormatUtil.pad9("" + tInsuRenew.getInsuRenewId().getClCode2(), 2));
-				occursList.putParam("ClNo", FormatUtil.pad9("" + tInsuRenew.getInsuRenewId().getClNo(), 7));
+				mainArea = tClBuilding.getFloorArea();
+				subArea = tClBuilding.getBdSubArea();
+				occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain, titaVo), 5));
+				occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 58));
+				occursList.putParam("BuildingSquare",
+						FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
+				occursList.putParam("BuildingCode", FormatUtil.pad9("" + tClBuilding.getBdMtrlCode(), 2));
+				occursList.putParam("BuildingYears",
+						FormatUtil.pad9(("" + tClBuilding.getBdDate()), 7).substring(0, 3));
+				occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getFloor(), 2));
+				occursList.putParam("RoofCode", FormatUtil.pad9("" + tClBuilding.getRoofStructureCode(), 2));
+				occursList.putParam("BusinessUnit", FormatUtil.pad9("" + tClBuilding.getBdMainUseCode(), 4));
+			} else {
+				occursList.putParam("PostalCode", FormatUtil.padX("", 5));
+				occursList.putParam("Address", FormatUtil.padX("", 58));
+				occursList.putParam("BuildingSquare", FormatUtil.padX("", 9));
+				occursList.putParam("BuildingCode", FormatUtil.padX("", 2));
+				occursList.putParam("BuildingYears", FormatUtil.padX((""), 3));
+				occursList.putParam("BuildingFloors", FormatUtil.padX("", 2));
+				occursList.putParam("RoofCode", FormatUtil.padX("", 2));
+				occursList.putParam("BusinessUnit", FormatUtil.padX("", 4));
+			}
+			occursList.putParam("ClCode1", FormatUtil.padX("" + t.getClCode1(), 1));
+			occursList.putParam("ClCode2", FormatUtil.pad9("" + t.getClCode2(), 2));
+			occursList.putParam("ClNo", FormatUtil.pad9("" + t.getClNo(), 7));
 
 //						19	Seq					序號			X	2	???
-				occursList.putParam("Seq", FormatUtil.pad9("", 2)); // ???
+			occursList.putParam("Seq", FormatUtil.pad9("", 2)); // ???
+			occursList.putParam("InsuNo", FormatUtil.padX("" + t.getPrevInsuNo(), 16));
 
-				this.info("PrevInsuNo : " + tInsuRenew.getPrevInsuNo());
-				this.info("Id's PrevInsuNo : " + tInsuRenew.getInsuRenewId().getPrevInsuNo());
-				occursList.putParam("InsuNo", FormatUtil.padX("" + tInsuRenew.getInsuRenewId().getPrevInsuNo(), 16));
-
-				int b4StartDate = 0;
-				int b4EndDate = 0;
+			int b4StartDate = 0;
+			int b4EndDate = 0;
 
 //				原保單之年月
 //				1.初保檔 = 原保險單號碼=原始保險單號碼
-				if (tInsuRenew.getInsuRenewId().getPrevInsuNo().equals(tInsuRenew.getOrigInsuNo())) {
-					InsuOrignal tInsuOrignal = new InsuOrignal();
-					InsuOrignalId tInsuOrignalId = new InsuOrignalId();
+			if (t.getPrevInsuNo().equals(t.getOrigInsuNo())) {
+				InsuOrignal tInsuOrignal = insuOrignalService.findById(
+						new InsuOrignalId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getPrevInsuNo(), " "), titaVo);
 
-					tInsuOrignalId.setClCode1(tInsuRenew.getInsuRenewId().getClCode1());
-					tInsuOrignalId.setClCode2(tInsuRenew.getInsuRenewId().getClCode2());
-					tInsuOrignalId.setClNo(tInsuRenew.getInsuRenewId().getClNo());
-					tInsuOrignalId.setOrigInsuNo(tInsuRenew.getInsuRenewId().getPrevInsuNo());
-					tInsuOrignalId.setEndoInsuNo(" ");
-
-					tInsuOrignal = insuOrignalService.findById(tInsuOrignalId, titaVo);
-
-					b4StartDate = tInsuOrignal.getInsuStartDate();
-					b4EndDate = tInsuOrignal.getInsuEndDate();
-				}
+				b4StartDate = tInsuOrignal.getInsuStartDate();
+				b4EndDate = tInsuOrignal.getInsuEndDate();
+			}
 //				2.續保檔 = 原保險單號碼(t)=目前保險單號碼(t2)
-				else {
-					InsuRenew t2InsuRenew = insuRenewService.findL4600AFirst(tInsuRenew.getInsuRenewId().getClCode1(), tInsuRenew.getInsuRenewId().getClCode2(), tInsuRenew.getInsuRenewId().getClNo(),
-							tInsuRenew.getInsuRenewId().getPrevInsuNo(), titaVo);
-					b4StartDate = t2InsuRenew.getInsuStartDate();
-					b4EndDate = t2InsuRenew.getInsuEndDate();
-				}
+			else {
+				InsuRenew t2InsuRenew = insuRenewService.findL4600AFirst(t.getClCode1(), t.getClCode2(), t.getClNo(),
+						t.getPrevInsuNo(), titaVo);
+				b4StartDate = t2InsuRenew.getInsuStartDate();
+				b4EndDate = t2InsuRenew.getInsuEndDate();
+			}
 
-				occursList.putParam("InsuStartDate", dateSlashFormat(b4StartDate));
-				occursList.putParam("InsuEndDate", dateSlashFormat(b4EndDate));
-				occursList.putParam("FireInsuAmt", FormatUtil.pad9("" + fireAmt.get(insuNo), 11));
-				occursList.putParam("FireInsuFee", FormatUtil.pad9("" + fireFee.get(insuNo), 7));
-				occursList.putParam("EqInsuAmt", FormatUtil.pad9("" + eqthAmt.get(insuNo), 7));
-				occursList.putParam("EqInsuFee", FormatUtil.pad9("" + eqthFee.get(insuNo), 6));
-				occursList.putParam("CustNo", FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7));
-				occursList.putParam("FacmNo", FormatUtil.pad9("" + tInsuRenew.getFacmNo(), 3));
-				occursList.putParam("Space", FormatUtil.padX("", 4));
-				occursList.putParam("SendDate", FormatUtil.padLeft("" + this.getTxBuffer().getTxCom().getTbsdyf(), 14));
-
-				InsuRenewMediaTemp tInsuRenewMediaTemp = new InsuRenewMediaTemp();
-				InsuRenewMediaTempId tInsuRenewMediaTempId = new InsuRenewMediaTempId();
-				tInsuRenewMediaTempId.setFireInsuMonth("" + iInsuEndMonth);
-				tInsuRenewMediaTempId.setInsuNo(tInsuRenew.getInsuRenewId().getPrevInsuNo());
-
-				tInsuRenewMediaTemp = insuRenewMediaTempService.findById(tInsuRenewMediaTempId);
+			occursList.putParam("InsuStartDate", dateSlashFormat(b4StartDate));
+			occursList.putParam("InsuEndDate", dateSlashFormat(b4EndDate));
+			occursList.putParam("FireInsuAmt", FormatUtil.pad9("" + t.getFireInsuCovrg(), 11));
+			occursList.putParam("FireInsuFee", FormatUtil.pad9("" + t.getFireInsuPrem(), 7));
+			occursList.putParam("EqInsuAmt", FormatUtil.pad9("" + t.getEthqInsuCovrg(), 7));
+			occursList.putParam("EqInsuFee", FormatUtil.pad9("" + t.getEthqInsuPrem(), 6));
+			occursList.putParam("CustNo", FormatUtil.pad9("" + t.getCustNo(), 7));
+			occursList.putParam("FacmNo", FormatUtil.pad9("" + t.getFacmNo(), 3));
+			occursList.putParam("Space", FormatUtil.padX("", 4));
+			occursList.putParam("SendDate", FormatUtil.padLeft("" + this.getTxBuffer().getTxCom().getTbsdyf(), 14));
 //						SklSalesName 2.CdEmp.FullName
 //						SklUnitCode  2.CdEmp.CenterCodeAcc
 //						SklUnitName  2.CdEmp.CenterShortName
@@ -943,59 +621,41 @@ public class BS460 extends TradeBuffer {
 //						RenewUnit    2.CdEmp.CenterCodeShort
 
 //				L4602之後來回改抓取temp檔
-				if (tInsuRenewMediaTemp != null) {
-					throw new LogicException("E0015", "該批已送回詢價 ");
-				}
 //				BS460第一次出去 放空白		
-				else {
-					occursList.putParam("NewInusNo", FormatUtil.padX("", 16));
-					occursList.putParam("NewInsuStartDate", FormatUtil.padX("", 10));
-					occursList.putParam("NewInsuEndDate", FormatUtil.padX("", 10));
-					occursList.putParam("NewFireInsuAmt", FormatUtil.padX("", 11));
-					occursList.putParam("NewFireInsuFee", FormatUtil.padX("", 7));
-					occursList.putParam("NewEqInsuAmt", FormatUtil.padX("", 7));
-					occursList.putParam("NewEqInsuFee", FormatUtil.padX("", 6));
-					occursList.putParam("NewTotalFee", FormatUtil.padX("", 7));
+			occursList.putParam("NewInusNo", FormatUtil.padX("", 16));
+			occursList.putParam("NewInsuStartDate", FormatUtil.padX("", 10));
+			occursList.putParam("NewInsuEndDate", FormatUtil.padX("", 10));
+			occursList.putParam("NewFireInsuAmt", FormatUtil.padX("", 11));
+			occursList.putParam("NewFireInsuFee", FormatUtil.padX("", 7));
+			occursList.putParam("NewEqInsuAmt", FormatUtil.padX("", 7));
+			occursList.putParam("NewEqInsuFee", FormatUtil.padX("", 6));
+			occursList.putParam("NewTotalFee", FormatUtil.padX("", 7));
 
-					CdEmp tCdEmp = new CdEmp();
-					if (tFacMain != null) {
-						tCdEmp = cdEmpService.findById(tFacMain.getIntroducer());
-						occursList.putParam("SklSalesCode", FormatUtil.padX("" + tFacMain.getIntroducer(), 6));
-					} else {
-						occursList.putParam("SklSalesCode", FormatUtil.padX("", 6));
-					}
-					if (tCdEmp != null) {
-						occursList.putParam("SklSalesName", FormatUtil.padX("" + tCdEmp.getFullname(), 10));
-						occursList.putParam("SklUnitCode", FormatUtil.padX("" + tCdEmp.getCenterCodeAcc(), 6));
-						occursList.putParam("SklUnitName", FormatUtil.padX("" + tCdEmp.getCenterShortName(), 10));
-						occursList.putParam("RenewTrlCode", FormatUtil.padX("" + tCdEmp.getCenterCode1(), 8));
-						occursList.putParam("RenewUnit", FormatUtil.padX("" + tCdEmp.getCenterCode1Short(), 10));
-					} else {
-						occursList.putParam("SklSalesName", FormatUtil.padX("", 10));
-						occursList.putParam("SklUnitCode", FormatUtil.padX("", 6));
-						occursList.putParam("SklUnitName", FormatUtil.padX("", 10));
-						occursList.putParam("RenewTrlCode", FormatUtil.padX("", 8));
-						occursList.putParam("RenewUnit", FormatUtil.padX("", 10));
-					}
-					occursList.putParam("Remark1", FormatUtil.padX("", 16));
-					occursList.putParam("MailingAddress", FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain), 60));
-					occursList.putParam("Remark2", FormatUtil.padX("", 39));
-					occursList.putParam("Space46", FormatUtil.padX("", 46));
-
-//					CdEmp tCdEmpRN = new CdEmp();
-//					tCdEmpRN = cdEmpService.findById(this.getTxBuffer().getTxCom().getRelNo());
-//					if (tCdEmpRN != null) {
-//						occursList.putParam("RenewTrlCode", FormatUtil.padX("" + this.getTxBuffer().getTxCom().getRelNo(), 8));
-//						occursList.putParam("RenewUnit", FormatUtil.padX("" + tCdEmpRN.getCenterCode(), 7));
-//					} else {
-//						occursList.putParam("RenewTrlCode", FormatUtil.padX("", 8));
-//						occursList.putParam("RenewUnit", FormatUtil.padX("", 7));
-//					}
-				}
-				tmp.add(occursList);
+			CdEmp tCdEmp = new CdEmp();
+			if (tFacMain != null) {
+				tCdEmp = cdEmpService.findById(tFacMain.getIntroducer());
+				occursList.putParam("SklSalesCode", FormatUtil.padX("" + tFacMain.getIntroducer(), 6));
+			} else {
+				occursList.putParam("SklSalesCode", FormatUtil.padX("", 6));
 			}
-		} else {
-			throw new LogicException("E0001", "查無資料");
+			if (tCdEmp != null) {
+				occursList.putParam("SklSalesName", FormatUtil.padX("" + tCdEmp.getFullname(), 10));
+				occursList.putParam("SklUnitCode", FormatUtil.padX("" + tCdEmp.getCenterCodeAcc(), 6));
+				occursList.putParam("SklUnitName", FormatUtil.padX("" + tCdEmp.getCenterShortName(), 10));
+				occursList.putParam("RenewTrlCode", FormatUtil.padX("" + tCdEmp.getCenterCode1(), 8));
+				occursList.putParam("RenewUnit", FormatUtil.padX("" + tCdEmp.getCenterCode1Short(), 10));
+			} else {
+				occursList.putParam("SklSalesName", FormatUtil.padX("", 10));
+				occursList.putParam("SklUnitCode", FormatUtil.padX("", 6));
+				occursList.putParam("SklUnitName", FormatUtil.padX("", 10));
+				occursList.putParam("RenewTrlCode", FormatUtil.padX("", 8));
+				occursList.putParam("RenewUnit", FormatUtil.padX("", 10));
+			}
+			occursList.putParam("Remark1", FormatUtil.padX("", 16));
+			occursList.putParam("MailingAddress", FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain), 60));
+			occursList.putParam("Remark2", FormatUtil.padX("", 39));
+			occursList.putParam("Space46", FormatUtil.padX("", 46));
+			tmp.add(occursList);
 		}
 	}
 
@@ -1017,86 +677,14 @@ public class BS460 extends TradeBuffer {
 	}
 
 	private void check(TitaVo titaVo) throws LogicException {
-		List<InsuRenewMediaTemp> lInsuRenewMediaTemp = new ArrayList<InsuRenewMediaTemp>();
-
-		Slice<InsuRenewMediaTemp> sInsuRenewMediaTemp = null;
-
 		String sInsuEndMonth = iInsuEndMonth + "";
 
-		sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(sInsuEndMonth, sInsuEndMonth, this.index, this.limit, titaVo);
-
-		lInsuRenewMediaTemp = sInsuRenewMediaTemp == null ? null : sInsuRenewMediaTemp.getContent();
-
-//		SklSalesName 2.CdEmp.FullName
-//		SklUnitCode  2.CdEmp.CenterCodeAcc
-//		SklUnitName  2.CdEmp.CenterShortName
-//		SklSalesCode 1.facm.Introducer ->CdEmp.EmployeeNo
-//		RenewTrlCode 2.CdEmp.CenterCode1
-//		RenewUnit    2.CdEmp.CenterCodeShort
-
-		// L4602之後來回改抓取temp檔
-		if (lInsuRenewMediaTemp != null && lInsuRenewMediaTemp.size() != 0) {
-			throw new LogicException("E0015", "該批已送回詢價 ");
+		Slice<InsuRenewMediaTemp> sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(sInsuEndMonth,
+				sInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+		// 已執行L4602
+		if (sInsuRenewMediaTemp != null) {
+			throw new LogicException("E0015", "該批已送回詢價，不可再產檔 ");
 		}
 	}
 
-//	暫時紀錄戶號額度
-	private class tmpFacm {
-
-		private int custNo = 0;
-		private int status = 0;
-
-		public tmpFacm(int custNo, int status) {
-			this.setCustNo(custNo);
-			this.setStatus(status);
-		}
-
-		private int getCustNo() {
-			return custNo;
-		}
-
-		private void setCustNo(int custNo) {
-			this.custNo = custNo;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + custNo;
-			result = prime * result + status;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpFacm other = (tmpFacm) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (custNo != other.custNo)
-				return false;
-			if (status != other.status)
-				return false;
-			return true;
-		}
-
-		private int getStatus() {
-			return status;
-		}
-
-		private void setStatus(int status) {
-			this.status = status;
-		}
-
-		private BS460 getEnclosingInstance() {
-			return BS460.this;
-		}
-	}
 }

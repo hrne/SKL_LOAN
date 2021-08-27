@@ -45,33 +45,6 @@ E(0,40)ASGN(INQPRT$)
 ["#FdCOL_NO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
 ["#FdSUB_TYPE+擔保品類別",#ClTypeCode,#SUB_TYPE_X],["#FdCOL_AREA+地區別",#CityCode,#COL_AREA_X],
 [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#BtnExpand],
-["#FdOWNER_ID+所有權人統編",#OwnerId],["#FdOWNER_NM+所有權人姓名",#OwnerName],
-[#<->#,"#FdOwnerRelCode+與授信戶關係",#OwnerRelCode,#OwnerRelCodeX],
-["#FdVALUE_DT+鑑估日期",#EvaDate],["#FdVALUE_TOTAL+鑑價總值",#EvaAmt],
-["#FdSERVICE_LIFE+耐用年限",#ServiceLife],["#FdSPEC+形式／規格",#ProductSpec],
-["#FdPRODUCT_TYPE+產品代號／型號",#ProductType],["#FdBRAND+品牌／廠牌／船名",#ProductBrand],
-["#FdENGINE_DISPLACEMENT+排氣量",#ProductCC],["#FdCOLOR+顏色",#ProductColor],
-[#<->#,"#FdENGINE_SN+引擎號碼",#EngineSN],
-["#FdLICENSE_NO+牌照號碼",#LicenseNo],["#FdLICENSE_IND+牌照類別",#LicenseTypeCode,#LICENSE_IND_X],
-["#FdLICENSE_USAGE+牌照用途",#LicenseUsageCode,#LICENSE_USAGE_X],["#FdLICENSE_ISSUE_DT+發照日期",#LiceneIssueDate],
-["#FdMANUFACTURED_YM+製造年月",#MfgYearMonth],["#FdVEHICLE_TYPE+車別",#VehicleTypeCode,#VEHICLE_TYPE_X],
-["#FdCAR_STYLE+車身樣式",#VehicleStyleCode,#CAR_STYLE_X],["#FdVEHICLE_OFFICE+監理處所",#VehicleOfficeCode,#VEHICLE_OFFICE_X],
-["#FdCURRENCY+幣別",#Currency,#CurrencyX],["#FdEX_RATE+匯率",#ExchangeRate],
-["#FdINSU_IND+投保註記",#Insurance,#INSU_IND_X],["#FdLOAN_PER+貸放成數",#LoanToValue,"%"],
-[#<->#,"#FdScrapValue+殘值",#ScrapValue],
-[#<->#,"#FdMORTGAGE+抵押權註記",#MtgCode,#MORTGAGE_X],
-[#<->#,"@","最高限額抵押權之擔保債權種類"],
-[#<->#,"#FdMtgCheck+@票據",#MtgCheck,#MtgCheckX],
-[#<->#,"#FdMtgLoan+@借款",#MtgLoan,#MtgLoanX],
-[#<->#,"#FdMtgPledge+@保證債務",#MtgPledge,#MtgPledgeX],
-!["#FdINTERSYND_LOAN+聯貸案",#Synd,#INTERSYND_LOAN_X],["#FdINTERSYND_TYPE+聯貸案類型",#SyndCode,#INTERSYND_TYPE_X],
-["#FdDISPOSITION_PRICE+處分價格",#DispPrice],["#FdDISPOSITION_DT+處分日期",#DispDate],
-["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
-["#FdSettingAmt+抵押設定金額",#SettingAmt],["#FdReceiptNo+收件字號",#ReceiptNo],
-["#FdMtgNo+抵押登記字號",#MtgNo],["#FdReceivedDate+抵押收件日",#ReceivedDate],
-["#FdMortgageIssueStartDate+抵押登記起日",#MortgageIssueStartDate],["#FdMortgageIssueEndDate+抵押登記迄日",#MortgageIssueEndDate],
-[#<->#,"#FdCOL_STATUS+擔保品狀況碼",#ClStatus,#COL_STATUS_X],
-[#<->#,"#FdRMK+備註",#Remark],
 ]
 !---------- AP Button AREA ----------
 
@@ -131,15 +104,13 @@ C(3,#PageFg,4,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
 
 
 #ResetPages=@,1,S
-INVOKEJS(SHOW,p1,7,32,0)
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+INVOKEJS(SHOW,p4,0)
 CALL(#KLIGHT)
-SWITCH(#PageFg,1,INVOKEJS(SHOW,p1,7,18,1),
-                2,INVOKEJS(SHOW,p1,19,25,1),
-                3,INVOKEJS(SHOW,p1,26,32,1),
-                4,INVOKEJS(SHOW,p1,7,32,1),
-                $)
-C(3,#PageFg,2,C(3,#MtgCode,0,INVOKEJS(SHOW,p1,23,25,1),INVOKEJS(SHOW,p1,23,25,0)),$)
-C(3,#ClCode2,02,INVOKEJS(SHOW,p1,12,17,0),INVOKEJS(SHOW,p1,12,17,1)),$)
+IF(#PageFg==1 || #PageFg==4,INVOKEJS(SHOW,p2,1),$)
+IF(#PageFg==2 || #PageFg==4,INVOKEJS(SHOW,p3,1),$)
+IF(#PageFg==3 || #PageFg==4,INVOKEJS(SHOW,p4,1),$)
 
 !---------- AP TEXT AREA Variables ----------
 ! Help
@@ -550,7 +521,7 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4;ntxbuf5=type<-1:ApplNo<-
 
 #ApplNo=A,7,I
 C(3,#FunCd,1,$,s)
-@C(3,#ApplNo,0,INVOKEJS(SHOW,p1,8,8,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,8,8,1))
+@C(3,#ApplNo,0,INVOKEJS(SHOW,p2,2,2,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p2,2,2,1))
 
 #RimFuncCode=A,1,S
 
@@ -580,7 +551,7 @@ C(3,#ApplNo,0,S,$)
 T(2,#L2r07CustName)
 
 #APPCHECK=X,1,L
-C(3,#ApplNo,0,INVOKEJS(SHOW,p1,8,8,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,8,8,1))
+C(3,#ApplNo,0,INVOKEJS(SHOW,p2,2,2,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p2,2,2,1))
 
 ![代號1]
 #ClCode1=A,1,L
@@ -597,7 +568,7 @@ T(3,動產)
 C(3,#FunCd,1,$,s)
 HELP(#ClCode2Help)
 @V(H,#ClCode2Help)
-C(3,#ClCode2,02,INVOKEJS(SHOW,p1,12,17,0),INVOKEJS(SHOW,p1,12,17,1))
+C(3,#ClCode2,02,INVOKEJS(SHOW,p2,6,11,0),INVOKEJS(SHOW,p2,6,11,1))
 
 #ClCode2X=X,13,L
 T(H,#ClCode2,#ClCode2Help)
@@ -779,7 +750,7 @@ C(4,#L1r09CustName,$,s)
 
 
 C(4,#CustId,s,$)
-C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p1,8,8,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p1,8,8,1))
+C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p2,2,2,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p2,2,2,1))
 
 !與授信戶關係
 #OwnerRelCode=X,2,I
@@ -831,26 +802,28 @@ IF(#FunCd==4,s,$)
 !排氣量
 #ProductCC=X,10,I
 IF(#FunCd==4,s,$)
+C(3,#ClCode2,02,S,$)
 
 
 ! 顏色
 #ProductColor=x,10,I
 IF(#FunCd==4,s,$)
-
+C(3,#ClCode2,02,S,$)
 
 ! 引擎號碼
 #EngineSN=X,50,I
 IF(#FunCd==4,s,$)
-
+C(3,#ClCode2,02,S,$)
 
 ! 牌照號碼
 #LicenseNo=X,10,I
 IF(#FunCd==4,s,$)
-
+C(3,#ClCode2,02,S,$)
 
 ! 牌照類別
 #LicenseTypeCode=X,1,I
 IF(#FunCd==4,s,$)
+C(3,#ClCode2,02,S,$)
 HELP(#LicenseTypeHelp)
 @IF(#LicenseTypeCode=="",S,$)
 V(H,#LicenseTypeHelp)
@@ -862,6 +835,7 @@ T(3,)T(H,#LicenseTypeCode,#LicenseTypeHelp)
 ! 牌照用途
 #LicenseUsageCode=X,1,I
 IF(#FunCd==4,s,$)
+C(3,#ClCode2,02,S,$)
 HELP(#LicenseUsageHelp)
 @IF(#LicenseUsageCode=="",S,$)
 V(H,#LicenseUsageHelp)
@@ -873,6 +847,7 @@ T(3,)T(H,#LicenseUsageCode,#LicenseUsageHelp)
 ! 發照日期
 #LiceneIssueDate=D,7,I
 IF(#FunCd==4,s,$)
+C(3,#ClCode2,02,S,$)
 @A(4,0,#LiceneIssueDate)
 
 
@@ -881,6 +856,7 @@ IF(#FunCd==4,s,$)
 ! 製造年月
 #MfgYearMonth=X,5,I
 IF(#FunCd==4,s,$)
+C(3,#ClCode2,02,S,$)
 @IF(#MfgYearMonth=="",S,$)
 V(9)
 T(1,@MANU_MM,#MfgYearMonth,4,5)
@@ -890,6 +866,7 @@ IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月,格式yyyMM),$)
 ! 車別
 #VehicleTypeCode=X,2,I
 IF(#FunCd==4,s,$)
+C(3,#ClCode2,02,S,$)
 HELP(#VehicleTypeHelp)
 @IF(#VehicleTypeCode=="",S,$)
 V(H,#VehicleTypeHelp)
@@ -901,6 +878,7 @@ C(4,#VehicleTypeCode,S,$)T(H,#VehicleTypeCode,#VehicleTypeHelp)
 ! 車身樣式
 #VehicleStyleCode=X,2,I
 IF(#FunCd==4,s,$)
+C(3,#ClCode2,02,S,$)
 HELP(#VehicleStyleHelp)
 @IF(#VehicleStyleCode=="",S,$)
 V(H,#VehicleStyleHelp)
@@ -912,6 +890,7 @@ C(4,#VehicleStyleCode,S,$)T(H,#VehicleStyleCode,#VehicleStyleHelp)
 ! 監理處所
 #VehicleOfficeCode=X,3,I
 IF(#FunCd==4,s,$)
+C(3,#ClCode2,02,S,$)
 HELP(#VehicleOfficeHelp)
 @IF(#VehicleOfficeCode=="",S,$)
 V(H,#VehicleOfficeHelp)
@@ -973,10 +952,8 @@ T(H,@MtgCheckX,#MtgCheck,#YNHelp)
 T(H,#MtgLoanX,#MtgLoan,#YNHelp)
 T(H,#MtgPledgeX,#MtgPledge,#YNHelp)
 
-
 #MORTGAGE_X=X,30,L
 T(3,)T(H,#MtgCode,#MtgCodeHelp)
-!C(3,#MtgCode,1,INVOKEJS(SHOW,p1,22,25,0),INVOKEJS(SHOW,p1,22,25,1))
 
 #CHECKALL_FG=A,1,S
 E(0,0)
@@ -1156,6 +1133,50 @@ CALL(#ResetPages)
 #RPTFG=A,1,S
 E(0,1)
 
+</sub>
+
+<sub type="DC" name="p2" layout="cols=3;screen.width=[150,240,200,460];printer.width=[15,30,15,30];order=1">
+[
+["鑑價"],
+["#FdOWNER_ID+所有權人統編",#OwnerId],["#FdOWNER_NM+所有權人姓名",#OwnerName],
+[#<->#,"#FdOwnerRelCode+與授信戶關係",#OwnerRelCode,#OwnerRelCodeX],
+["#FdVALUE_DT+鑑估日期",#EvaDate],["#FdVALUE_TOTAL+鑑價總值",#EvaAmt],
+["#FdSERVICE_LIFE+耐用年限",#ServiceLife],["#FdSPEC+形式／規格",#ProductSpec],
+["#FdPRODUCT_TYPE+產品代號／型號",#ProductType],["#FdBRAND+品牌／廠牌／船名",#ProductBrand],
+["#FdENGINE_DISPLACEMENT+排氣量",#ProductCC],["#FdCOLOR+顏色",#ProductColor],
+[#<->#,"#FdENGINE_SN+引擎號碼",#EngineSN],
+["#FdLICENSE_NO+牌照號碼",#LicenseNo],["#FdLICENSE_IND+牌照類別",#LicenseTypeCode,#LICENSE_IND_X],
+["#FdLICENSE_USAGE+牌照用途",#LicenseUsageCode,#LICENSE_USAGE_X],["#FdLICENSE_ISSUE_DT+發照日期",#LiceneIssueDate],
+["#FdMANUFACTURED_YM+製造年月",#MfgYearMonth],["#FdVEHICLE_TYPE+車別",#VehicleTypeCode,#VEHICLE_TYPE_X],
+["#FdCAR_STYLE+車身樣式",#VehicleStyleCode,#CAR_STYLE_X],["#FdVEHICLE_OFFICE+監理處所",#VehicleOfficeCode,#VEHICLE_OFFICE_X],
+["#FdCURRENCY+幣別",#Currency,#CurrencyX],["#FdEX_RATE+匯率",#ExchangeRate],
+]
+</sub>
+
+<sub type="DC" name="p3" layout="cols=3;screen.width=[150,240,200,460];printer.width=[15,30,15,30];order=1">
+[
+["抵押"],
+["#FdINSU_IND+投保註記",#Insurance,#INSU_IND_X],["#FdLOAN_PER+貸放成數",#LoanToValue,"%"],
+[#<->#,"#FdScrapValue+殘值",#ScrapValue],
+[#<->#,"#FdMORTGAGE+抵押權註記",#MtgCode,#MORTGAGE_X],
+[#<->#,"@","最高限額抵押權之擔保債權種類"],
+[#<->#,"#FdMtgCheck+@票據",#MtgCheck,#MtgCheckX],
+[#<->#,"#FdMtgLoan+@借款",#MtgLoan,#MtgLoanX],
+[#<->#,"#FdMtgPledge+@保證債務",#MtgPledge,#MtgPledgeX],
+]
+</sub>
+
+<sub type="DC" name="p4" layout="cols=3;screen.width=[150,240,200,460];printer.width=[15,30,15,30];order=1">
+[
+["處分"],
+["#FdDISPOSITION_PRICE+處分價格",#DispPrice],["#FdDISPOSITION_DT+處分日期",#DispDate],
+["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
+["#FdSettingAmt+抵押設定金額",#SettingAmt],["#FdReceiptNo+收件字號",#ReceiptNo],
+["#FdMtgNo+抵押登記字號",#MtgNo],["#FdReceivedDate+抵押收件日",#ReceivedDate],
+["#FdMortgageIssueStartDate+抵押登記起日",#MortgageIssueStartDate],["#FdMortgageIssueEndDate+抵押登記迄日",#MortgageIssueEndDate],
+[#<->#,"#FdCOL_STATUS+擔保品狀況碼",#ClStatus,#COL_STATUS_X],
+[#<->#,"#FdRMK+備註",#Remark],
+]
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

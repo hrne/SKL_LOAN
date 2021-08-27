@@ -1,0 +1,16 @@
+OOTranKey=X,1
+OOBankCode1=X,10
+OODataCode1=X,2
+OOBankCode2=X,10
+OODataCode2=X,2
+OOBankCode3=X,10
+OODataCode3=X,2
+OOBankCode4=X,10
+OODataCode4=X,2
+OOBankCode5=X,10
+OODataCode5=X,2
+OOChangePayDate=9,7
+OOOutJcicTxtDate=9,7
+OOLastUpdate=X,30
+OOLastUpdateEmpNo=X,6
+OOLastUpdateEmpNoName=X,50

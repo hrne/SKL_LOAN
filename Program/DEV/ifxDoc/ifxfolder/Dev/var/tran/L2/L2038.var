@@ -15,7 +15,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,222)ASGN(INQLEN$)
+E(0,322)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -70,16 +70,6 @@ K(MODIFYBUTTON,4,其他擔保品新增)
 ["#FdCustNo+戶號",#CustNo,#BTN3],
 ["#FdFacmNo+額度編號",#FacmNo],
 ["#FdOwnerId+所有權人統編",#OwnerId,#BTN4],
-!["#FdCityCode+縣市區域",#CityCode],
-!["#FdAreaCode+鄉鎮市區",#AreaCode],
-!["#FdIrCode+段小段",#IrCode],
-!["#FdLandNo1+土地地號",#LandNo1,"-",#LandNo2],
-!["#FdBdNo1+建物建號",#BdNo1,"-",#BdNo2],
-!["#FdRoad+建物門牌",#Road," 路",#Section," 段",#Alley," 巷",#Lane," 弄","</br>",
-!#Num," 號之",#NumDash,"</br>",
-!#Floor," 樓之",#FloorDash],
-!["#FdLicenseNo+牌照號碼",#LicenseNo],
-!["#FdCompanyId+股票發行公司統編",#CompanyId],
 ["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],
 ["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
 ]
@@ -468,28 +458,54 @@ T(H,#IrCode,#L6r03ResultIr)
 !調RIM地段 ED
 
 
-
-
-
-!土地地號4
+!土地地號1
 #LandNo1=A,4,I
 C(3,#CHAIN,1,s,$)
 IF(#ClMainType==1,$,S)
 
-!土地地號4
+!土地地號2
 #LandNo2=A,4,I
 C(3,#CHAIN,1,s,$)
 IF(#ClMainType==1,$,S)
 
-!建物建號5
+!土地地號3
+#LandNo3=A,4,I
+C(3,#CHAIN,1,s,$)
+IF(#ClMainType==1,$,S)
+C(3,#LandNo1,0,$,E(0,#LandNo1))
+@V(5,#LandNo1,9999)
+
+!土地地號4
+#LandNo4=A,4,I
+C(3,#CHAIN,1,s,$)
+IF(#ClMainType==1,$,S)
+IF(#LandNo1 == #LandNo3,E(0,#LandNo2),$)
+@IF(#LandNo1 == #LandNo3,V(5,#LandNo2,9999),$)
+
+!建物建號1
 #BdNo1=A,5,I
 C(3,#CHAIN,1,s,$)
 IF(#ClMainType==1,$,S)
 
-!建物建號3
+!建物建號2
 #BdNo2=A,3,I
 C(3,#CHAIN,1,s,$)
 IF(#ClMainType==1,$,S)
+
+!建物建號3
+#BdNo3=A,5,I
+C(3,#CHAIN,1,s,$)
+IF(#ClMainType==1,$,S)
+C(3,#BdNo1,0,$,E(0,#BdNo1))
+@V(5,#BdNo1,99999)
+
+!建物建號4
+#BdNo4=A,3,I
+C(3,#CHAIN,1,s,$)
+IF(#ClMainType==1,$,S)
+IF(#BdNo1 == #BdNo3,E(0,#BdNo2),$)
+@IF(#BdNo1 == #BdNo3,V(5,#BdNo2,999),$)
+
 
 !建物門牌
 #Road=c,20,I
@@ -568,8 +584,8 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 ["#FdCityCode+縣市區域",#CityCode],
 ["#FdAreaCode+鄉鎮市區",#AreaCode],
 ["#FdIrCode+段小段",#IrCode],
-["#FdLandNo1+土地地號",#LandNo1,"-",#LandNo2],
-["#FdBdNo1+建物建號",#BdNo1,"-",#BdNo2],
+["#FdLandNo1+土地地號",#LandNo1,"-",#LandNo2,"~",#LandNo3,"-",#LandNo4],
+["#FdBdNo1+建物建號",#BdNo1,"-",#BdNo2,"~",#BdNo3,"-",#BdNo4],
 ["#FdRoad+建物門牌",#Road," 路",#Section," 段",#Alley," 巷",#Lane," 弄","</br>",
 #Num," 號之",#NumDash,"</br>",
 #Floor," 樓之",#FloorDash],
@@ -745,7 +761,7 @@ X(#OOShareTotal)
 
 
 #OOOther=x,100,L
-
+#OOOther1=x,100,L
 
 #OOStockCodeX=X,10,L
 T(H,#OOOther,#StockCodeHelp)
@@ -754,21 +770,10 @@ T(H,#OOOther,#StockCodeHelp)
 IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
 T(1,#OOOther,1,10)
 
-#OOOther1=x,100,L
-IF(#OOClCode1 == 1,$,S)
-T(2,#OOOther)
-
-#OOOther2=x,100,L
-IF(#OOClCode1 == 2,$,S)
-T(2,#OOOther)
-
 #OOOther3=x,110,L
 IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
 T(2,#OOStock+#OOStockCodeX)
 
-#OOOther4=x,110,L
-IF(#OOClCode1 == 9,$,S)
-T(2,#OOOther)
 
 #OOFlag=X,1,S
 
@@ -897,8 +902,12 @@ IF(#OOClCode1 == 1 || #OOClCode1 == 2,BIND(grid,{ cmd=CHAIN; ntxcd=L2918;text=#E
 #IrCode
 #LandNo1
 #LandNo2
+#LandNo3
+#LandNo4
 #BdNo1
 #BdNo2
+#BdNo3
+#BdNo4
 #Road
 #Section
 #Alley
@@ -935,6 +944,7 @@ TXFORM=L2038
 #OOClStat
 #OOShareTotal
 #OOOther
+#OOOther1
 #OOFlag
 ^
 <include src="COM.icf::TRCTL.tom"/>
@@ -1014,10 +1024,10 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther1=建物門牌
+#OOOther=建物門牌
 {width:400,align:'left'}
 
-#OOOther2=土地座落
+#OOOther1=土地座落
 {width:400,align:'left'}
 ^
 
@@ -1050,7 +1060,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther1=建物門牌
+#OOOther=建物門牌
 {width:400,align:'left'}
 
 
@@ -1084,7 +1094,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther2=土地座落
+#OOOther=土地座落
 {width:400,align:'left'}
 ^
 
@@ -1117,7 +1127,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther4=牌照號碼
+#OOOther=牌照號碼
 {width:150,align:'left'}
 ^
 
@@ -1194,10 +1204,10 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:100,align:'right'}
 
-#OOOther1=建物門牌
+#OOOther=建物門牌
 {width:400,align:'left'}
 
-#OOOther2=土地座落
+#OOOther1=土地座落
 {width:400,align:'left'}
 
 ^
@@ -1220,7 +1230,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther1=建物門牌
+#OOOther=建物門牌
 {width:400,align:'left'}
 ^
 
@@ -1242,7 +1252,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther2=土地座落
+#OOOther=土地座落
 {width:400,align:'left'}
 ^
 
@@ -1264,7 +1274,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther4=牌照號碼
+#OOOther=牌照號碼
 {width:150,align:'left'}
 ^
 

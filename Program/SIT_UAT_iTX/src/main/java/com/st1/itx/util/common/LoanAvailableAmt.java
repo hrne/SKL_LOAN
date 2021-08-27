@@ -225,7 +225,6 @@ public class LoanAvailableAmt extends TradeBuffer {
 			this.info("wkUtilAmt 2 end = " + wkUtilAmt + ", " + t.toString());
 		}
 
-		wkAvailable = BigDecimal.ZERO.subtract(wkUtilAmt);
 
 		// 計算本額度擔保品的可使用額度
 		for (ClFac t : lClFac) {

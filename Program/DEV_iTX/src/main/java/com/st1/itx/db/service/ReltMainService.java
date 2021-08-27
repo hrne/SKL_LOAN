@@ -107,6 +107,18 @@ public interface ReltMainService {
   public Slice<ReltMain> caseNoEq(int caseNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CaseNo = ,AND CustNo = 
+   *
+   * @param caseNo_0 caseNo_0
+   * @param custNo_1 custNo_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice ReltMain ReltMain of List
+   */
+  public Slice<ReltMain> findByBoth(int caseNo_0, int custNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By ReltMain
    * 
    * @param reltMainId key

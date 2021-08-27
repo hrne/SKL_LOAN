@@ -29,13 +29,13 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 	
 	public enum EntCodeCondition
 	{
-		Natural(0),
-		Enterprise(1),
-		All(9);
+		Natural("0"),
+		Enterprise("1"),
+		All("%");
 		
-		private int value;
+		private String value;
 		
-		EntCodeCondition(int value)
+		EntCodeCondition(String value)
 		{
 			this.value = value;
 		}
@@ -45,7 +45,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 	{
 		Yes("Y"),
 		No("N"),
-		All("X");
+		All("%");
 		
 		private String value;
 		
@@ -62,162 +62,158 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String entdy = String.valueOf((Integer.valueOf(titaVo.getParam("inputDate")) + 19110000));
 
 		String sql = " ";
-		sql += " WITH TotalData AS ( ";
-		sql += "     SELECT * ";
-		sql += "     FROM ( SELECT DECODE(C.\"EntCode\",'1','1','0') AS \"EntCode\" ";
-		sql += "                  ,R.\"IsRels\" AS \"IsRels\" ";
-		sql += "                  ,D.\"CustNo\" AS \"CustNo\" ";
-		sql += "                  ,LPAD(D.\"FacmNo\", 3, '0') AS \"FacmNo\" ";
-		sql += "                  ,C.\"CustId\" AS \"CustId\" ";
-		sql += "                  ,C.\"CustName\" AS \"CustName\" ";
-		sql += "                  ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" LIKE '8%' OR D.\"AcctCode\" = '340' ";
-		sql += "                        THEN 0 ";
-		sql += "                   ELSE CASE CF.\"ClCode1\" ";
-		sql += "                          WHEN 1 ";
-		sql += "                          THEN 2 ";
-		sql += "                          WHEN 3 ";
-		sql += "                          THEN 4 ";
-		sql += "                        ELSE CF.\"ClCode1\" END  ";
-		sql += "                   END AS \"ClCode1\" ";
-		sql += "                  ,F.\"LineAmt\" AS \"LineAmt\" ";
-		sql += "                  ,SUM(ROUND(NVL(IIM.\"BookValue\", D.\"LoanBalance\"))) AS \"BookValue\" ";
-		sql += "            FROM \"DailyLoanBal\" D ";
-		sql += "            LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = D.\"CustNo\" ";
-		sql += "            LEFT JOIN ( SELECT cm.\"CustNo\" ";
-		sql += "                              ,CASE COUNT(brs.\"CustId\") + COUNT(brf.\"CustId\") + COUNT(brc.\"CustId\") ";
-		sql += "                                 WHEN 0 ";
-		sql += "                                 THEN 'N' ";
-		sql += "                               ELSE 'Y' END AS \"IsRels\" ";
-		sql += "                        FROM \"CustMain\" cm ";
-		sql += "                        LEFT JOIN \"BankRelationSelf\" brs ON brs.\"CustId\" = cm.\"CustId\" ";
-		sql += "                        LEFT JOIN \"BankRelationFamily\" brf ON brf.\"CustId\" = cm.\"CustId\" ";
-		sql += "                                                             OR brf.\"RelationId\" = cm.\"CustId\" ";
-		sql += "                        LEFT JOIN \"BankRelationCompany\" brc ON brc.\"CompanyId\" = cm.\"CustId\" ";
-		sql += "                                                              OR brc.\"CustId\" = cm.\"CustId\" ";
-		sql += "                        GROUP BY cm.\"CustNo\" ";
-		sql += "                      ) R ON R.\"CustNo\" = D.\"CustNo\" ";
-		sql += "            LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = D.\"CustNo\" ";
-		sql += "                                   AND F.\"FacmNo\" = D.\"FacmNo\" ";
-		sql += "            LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = D.\"CustNo\" ";
-		sql += "                                  AND CF.\"FacmNo\" = D.\"FacmNo\" ";
-		sql += "                                  AND CF.\"MainFlag\" = 'Y' ";
-		sql += "            LEFT JOIN ( SELECT \"CustNo\" ";
-		sql += "                              ,\"FacmNo\" ";
-		sql += "                              ,\"BormNo\" ";
-		sql += "                              ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\" ";
-		sql += "                                                              ,\"FacmNo\" ";
-		sql += "                                                              ,\"BormNo\" ";
-		sql += "                                                  ORDER BY \"YearMonth\" DESC ";
-		sql += "                                                 ) \"Seq\" ";
-		sql += "                              ,ROUND(\"BookValue\") \"BookValue\" ";
-		sql += "                        FROM \"Ias39IntMethod\" ";
-		sql += "                      ) IIM ON IIM.\"CustNo\" = D.\"CustNo\" ";
-		sql += "                           AND IIM.\"FacmNo\" = D.\"FacmNo\" ";
-		sql += "                           AND IIM.\"BormNo\" = D.\"BormNo\" ";
-		sql += "                           AND NVL(IIM.\"Seq\", 0) = 1 ";
-		sql += "            LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = D.\"CustNo\" ";
-		sql += "                                         AND LBM.\"FacmNo\" = D.\"FacmNo\" ";
-		sql += "                                         AND LBM.\"BormNo\" = D.\"BormNo\" ";
-		sql += "            WHERE D.\"MonthEndYm\" = :YearMonth ";
-		sql += "              AND F.\"FirstDrawdownDate\" <= :entdy ";
-		sql += "              AND LBM.\"Status\" IN (0,4) ";
-		sql += "              AND LBM.\"LoanBal\" > 0 ";
-		sql += "            GROUP BY DECODE(C.\"EntCode\", '1', '1', '0') ";
-		sql += "                    ,R.\"IsRels\" ";
-		sql += "                    ,D.\"CustNo\" ";
-		sql += "                    ,LPAD(D.\"FacmNo\", 3, '0') ";
-		sql += "                    ,C.\"CustId\" ";
-		sql += "                    ,C.\"CustName\" ";
-		sql += "                    ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" LIKE '8%' OR D.\"AcctCode\" = '340' ";
-		sql += "                          THEN 0 ";
-		sql += "                     ELSE CASE CF.\"ClCode1\" ";
-		sql += "                            WHEN 1 ";
-		sql += "                            THEN 2 ";
-		sql += "                            WHEN 3 ";
-		sql += "                            THEN 4 ";
-		sql += "                          ELSE CF.\"ClCode1\" END ";
-		sql += "                     END ";
-		sql += "                    ,F.\"LineAmt\" ";
-		sql += "     ) ";
-		sql += "     ORDER BY \"EntCode\" ";
-		sql += "             ,\"IsRels\" ";
-		sql += "             ,\"CustNo\" ";
-		sql += " ), ";
-		sql += "  ";
-		sql += " TotalData_LineTotal AS ( ";
-		sql += "     SELECT t1.* ";
-		sql += "           ,t2.\"LineTotal\" ";
-		sql += "     FROM TotalData t1 ";
-		sql += "     LEFT JOIN (SELECT \"CustNo\" ";
-		sql += "                      ,SUM(\"LineAmt\") \"LineTotal\" ";
-		sql += "                FROM TotalData ";
-		sql += "                GROUP BY \"CustNo\" ";
-		sql += "               ) t2 ON t2.\"CustNo\" = t1.\"CustNo\" ";
-		sql += " ) ";
-		sql += "  ";
-		sql += " SELECT * ";
-		sql += " FROM TotalData_LineTotal ";
-		sql += " WHERE \"LineTotal\" >= :LineAmtThreshold ";
-		if (entCodeCondition != EntCodeCondition.All)
-		{
-			sql += "   AND \"EntCode\" = :EntCodeCondition ";
-		}
-		
-		if (isRelsCondition != IsRelsCondition.All)
-		{
-			sql += "   AND \"IsRels\" = :IsRelsCondition ";
-		}
-		sql += "  ";
-		sql += " UNION ALL ";
-		sql += "  ";
-		sql += " SELECT :EntCodeCondition AS \"EntCode\" ";
-		sql += "       ,:IsRelsCondition AS \"IsRels\" ";
-		sql += "       ,NULL AS \"CustNo\" ";
-		sql += "       ,NULL AS \"FacmNo\" ";
-		sql += "       ,'Everything_Above_Peko' AS \"CustId\" ";
-		sql += "       ,u'全部_以上' AS \"CustName\" ";
-		sql += "       ,\"ClCode1\" AS \"ClCode1\" ";
-		sql += "       ,SUM(\"LineAmt\") AS \"LineAmt\" ";
-		sql += "       ,SUM(\"BookValue\") AS \"BookValue\" ";
-		sql += "       ,NULL AS \"LineTotal\" ";
-		sql += " FROM TotalData_LineTotal ";
-		sql += " WHERE \"LineTotal\" >= :LineAmtThreshold ";
-		if (entCodeCondition != EntCodeCondition.All)
-		{
-			sql += "   AND \"EntCode\" = :EntCodeCondition ";
-		}
-		
-		if (isRelsCondition != IsRelsCondition.All)
-		{
-			sql += "   AND \"IsRels\" = :IsRelsCondition ";
-		}
-		sql += " GROUP BY \"ClCode1\" ";
-		sql += "  ";
-		sql += " UNION ALL ";
-		sql += "  ";
-		sql += " SELECT :EntCodeCondition AS \"EntCode\" ";
-		sql += "       ,:IsRelsCondition AS \"IsRels\" ";
-		sql += "       ,NULL AS \"CustNo\" ";
-		sql += "       ,NULL AS \"FacmNo\" ";
-		sql += "       ,'Everything_Below_Miko' AS \"CustId\" ";
-		sql += "       ,u'全部_以下' AS \"CustName\" ";
-		sql += "       ,\"ClCode1\" AS \"ClCode1\" ";
-		sql += "       ,SUM(\"LineAmt\") AS \"LineAmt\" ";
-		sql += "       ,SUM(\"BookValue\") AS \"BookValue\" ";
-		sql += "       ,NULL AS \"LineTotal\" ";
-		sql += " FROM TotalData_LineTotal ";
-		sql += " WHERE \"LineTotal\" < :LineAmtThreshold ";
-		if (entCodeCondition != EntCodeCondition.All)
-		{
-			sql += "   AND \"EntCode\" = :EntCodeCondition ";
-		}
-		
-		if (isRelsCondition != IsRelsCondition.All)
-		{
-			sql += "   AND \"IsRels\" = :IsRelsCondition ";
-		}
-		sql += " GROUP BY \"ClCode1\" ";
-		sql += "  ";
+		sql += "  WITH TotalData AS (  ";
+		sql += "      SELECT *  ";
+		sql += "      FROM ( SELECT DECODE(C.\"EntCode\",'1','1','0') AS \"EntCode\"  ";
+		sql += "                   ,R.\"IsRels\" AS \"IsRels\"  ";
+		sql += "                   ,TO_CHAR(D.\"CustNo\") AS \"CustNo\"  ";
+		sql += "                   ,LPAD(D.\"FacmNo\", 3, '0') AS \"FacmNo\"  ";
+		sql += "                   ,C.\"CustId\" AS \"CustId\"  ";
+		sql += "                   ,C.\"CustName\" AS \"CustName\"  ";
+		sql += "                   ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" LIKE '8%' OR D.\"AcctCode\" = '340'  ";
+		sql += "                         THEN 0  ";
+		sql += "                    ELSE CASE CF.\"ClCode1\"  ";
+		sql += "                           WHEN 1  ";
+		sql += "                           THEN 2  ";
+		sql += "                           WHEN 3  ";
+		sql += "                           THEN 4  ";
+		sql += "                         ELSE CF.\"ClCode1\" END   ";
+		sql += "                    END AS \"ClCode1\"  ";
+		sql += "                   ,F.\"LineAmt\" AS \"LineAmt\"  ";
+		sql += "                   ,SUM(ROUND(NVL(IIM.\"BookValue\", D.\"LoanBalance\"))) AS \"BookValue\"  ";
+		sql += "             FROM \"DailyLoanBal\" D  ";
+		sql += "             LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = D.\"CustNo\"  ";
+		sql += "             LEFT JOIN ( SELECT cm.\"CustNo\"  ";
+		sql += "                               ,CASE COUNT(brs.\"CustId\") + COUNT(brf.\"CustId\") + COUNT(brc.\"CustId\")  ";
+		sql += "                                  WHEN 0  ";
+		sql += "                                  THEN 'N'  ";
+		sql += "                                ELSE 'Y' END AS \"IsRels\"  ";
+		sql += "                         FROM \"CustMain\" cm  ";
+		sql += "                         LEFT JOIN \"BankRelationSelf\" brs ON brs.\"CustId\" = cm.\"CustId\"  ";
+		sql += "                         LEFT JOIN \"BankRelationFamily\" brf ON brf.\"CustId\" = cm.\"CustId\"  ";
+		sql += "                                                              OR brf.\"RelationId\" = cm.\"CustId\"  ";
+		sql += "                         LEFT JOIN \"BankRelationCompany\" brc ON brc.\"CompanyId\" = cm.\"CustId\"  ";
+		sql += "                                                               OR brc.\"CustId\" = cm.\"CustId\"  ";
+		sql += "                         GROUP BY cm.\"CustNo\"  ";
+		sql += "                       ) R ON R.\"CustNo\" = D.\"CustNo\"  ";
+		sql += "             LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = D.\"CustNo\"  ";
+		sql += "                                    AND F.\"FacmNo\" = D.\"FacmNo\"  ";
+		sql += "             LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = D.\"CustNo\"  ";
+		sql += "                                   AND CF.\"FacmNo\" = D.\"FacmNo\"  ";
+		sql += "                                   AND CF.\"MainFlag\" = 'Y'  ";
+		sql += "             LEFT JOIN ( SELECT \"CustNo\"  ";
+		sql += "                               ,\"FacmNo\"  ";
+		sql += "                               ,\"BormNo\"  ";
+		sql += "                               ,ROW_NUMBER() OVER (PARTITION BY \"CustNo\"  ";
+		sql += "                                                               ,\"FacmNo\"  ";
+		sql += "                                                               ,\"BormNo\"  ";
+		sql += "                                                   ORDER BY \"YearMonth\" DESC  ";
+		sql += "                                                  ) \"Seq\"  ";
+		sql += "                               ,ROUND(\"BookValue\") \"BookValue\"  ";
+		sql += "                         FROM \"Ias39IntMethod\"  ";
+		sql += "                       ) IIM ON IIM.\"CustNo\" = D.\"CustNo\"  ";
+		sql += "                            AND IIM.\"FacmNo\" = D.\"FacmNo\"  ";
+		sql += "                            AND IIM.\"BormNo\" = D.\"BormNo\"  ";
+		sql += "                            AND NVL(IIM.\"Seq\", 0) = 1  ";
+		sql += "             LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = D.\"CustNo\"  ";
+		sql += "                                          AND LBM.\"FacmNo\" = D.\"FacmNo\"  ";
+		sql += "                                          AND LBM.\"BormNo\" = D.\"BormNo\"  ";
+		sql += "             WHERE D.\"MonthEndYm\" = :YearMonth  ";
+		sql += "               AND F.\"FirstDrawdownDate\" <= :entdy  ";
+		sql += "               AND LBM.\"Status\" IN (0,4)  ";
+		sql += "               AND LBM.\"LoanBal\" > 0  ";
+		sql += "             GROUP BY DECODE(C.\"EntCode\", '1', '1', '0')  ";
+		sql += "                     ,R.\"IsRels\"  ";
+		sql += "                     ,D.\"CustNo\"  ";
+		sql += "                     ,LPAD(D.\"FacmNo\", 3, '0')  ";
+		sql += "                     ,C.\"CustId\"  ";
+		sql += "                     ,C.\"CustName\"  ";
+		sql += "                     ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" LIKE '8%' OR D.\"AcctCode\" = '340'  ";
+		sql += "                           THEN 0  ";
+		sql += "                      ELSE CASE CF.\"ClCode1\"  ";
+		sql += "                             WHEN 1  ";
+		sql += "                             THEN 2  ";
+		sql += "                             WHEN 3  ";
+		sql += "                             THEN 4  ";
+		sql += "                           ELSE CF.\"ClCode1\" END  ";
+		sql += "                      END  ";
+		sql += "                     ,F.\"LineAmt\"  ";
+		sql += "      )  ";
+		sql += "      ORDER BY \"EntCode\" ";
+		sql += "              ,\"IsRels\" ";
+		sql += "              ,\"CustNo\" ";
+		sql += "              ,\"FacmNo\" ";
+		sql += "  ),  ";
+		sql += "    ";
+		sql += "  TotalData_LineTotal AS (  ";
+		sql += "      SELECT t1.*  ";
+		sql += "            ,t2.\"LineTotal\"  ";
+		sql += "      FROM TotalData t1  ";
+		sql += "      LEFT JOIN (SELECT \"CustNo\"  ";
+		sql += "                       ,SUM(\"LineAmt\") \"LineTotal\"  ";
+		sql += "                 FROM TotalData  ";
+		sql += "                 GROUP BY \"CustNo\"  ";
+		sql += "                ) t2 ON t2.\"CustNo\" = t1.\"CustNo\"  ";
+		sql += "  )  ";
+		sql += "    ";
+		sql += "  SELECT *  ";
+		sql += "  FROM TotalData_LineTotal  ";
+		sql += "  WHERE \"LineTotal\" >= :LineAmtThreshold  ";
+		sql += "    AND \"EntCode\" LIKE :EntCodeCondition  ";
+		sql += "    AND \"IsRels\" LIKE :IsRelsCondition  ";
+		sql += "    ";
+		sql += "  UNION ALL  ";
+		sql += "    ";
+		sql += "  SELECT :EntCodeCondition AS \"EntCode\"  ";
+		sql += "        ,:IsRelsCondition AS \"IsRels\"  ";
+		sql += "        ,' ' AS \"CustNo\"  ";
+		sql += "        ,' ' AS \"FacmNo\"  ";
+		sql += "        ,'Everything_Above_Peko' AS \"CustId\"  ";
+		sql += "        ,u'以上合計' AS \"CustName\"  ";
+		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
+		sql += "        ,SUM(\"LineAmt\") AS \"LineAmt\"  ";
+		sql += "        ,SUM(\"BookValue\") AS \"BookValue\"  ";
+		sql += "        ,NULL AS \"LineTotal\"  ";
+		sql += "  FROM TotalData_LineTotal  ";
+		sql += "  WHERE \"LineTotal\" >= :LineAmtThreshold  ";
+		sql += "    AND \"EntCode\" LIKE :EntCodeCondition  ";
+		sql += "    AND \"IsRels\" LIKE :IsRelsCondition  ";
+		sql += "  GROUP BY \"ClCode1\"  ";
+		sql += "    ";
+		sql += "  UNION ALL  ";
+		sql += "    ";
+		sql += "  SELECT :EntCodeCondition AS \"EntCode\"  ";
+		sql += "        ,:IsRelsCondition AS \"IsRels\"  ";
+		sql += "        ,' ' AS \"CustNo\"  ";
+		sql += "        ,' ' AS \"FacmNo\"  ";
+		sql += "        ,'Everything_Below_Peko' AS \"CustId\"  ";
+		sql += "        ,u'以下合計' AS \"CustName\"  ";
+		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
+		sql += "        ,SUM(\"LineAmt\") AS \"LineAmt\"  ";
+		sql += "        ,SUM(\"BookValue\") AS \"BookValue\"  ";
+		sql += "        ,NULL AS \"LineTotal\"  ";
+		sql += "  FROM TotalData_LineTotal  ";
+		sql += "  WHERE \"LineTotal\" < :LineAmtThreshold  ";
+		sql += "    AND \"EntCode\" LIKE :EntCodeCondition  ";
+		sql += "    AND \"IsRels\" LIKE :IsRelsCondition  ";
+		sql += "  GROUP BY \"ClCode1\"  ";
+		sql += "    ";
+		sql += "  UNION ALL  ";
+		sql += "    ";
+		sql += "  SELECT :EntCodeCondition AS \"EntCode\"  ";
+		sql += "        ,:IsRelsCondition AS \"IsRels\"  ";
+		sql += "        ,' ' AS \"CustNo\"  ";
+		sql += "        ,' ' AS \"FacmNo\"  ";
+		sql += "        ,'Everything_Miko' AS \"CustId\"  ";
+		sql += "        ,u'總計' AS \"CustName\"  ";
+		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
+		sql += "        ,SUM(\"LineAmt\") AS \"LineAmt\"  ";
+		sql += "        ,SUM(\"BookValue\") AS \"BookValue\"  ";
+		sql += "        ,NULL AS \"LineTotal\"  ";
+		sql += "  FROM TotalData_LineTotal  ";
+		sql += "  WHERE \"EntCode\" LIKE :EntCodeCondition  ";
+		sql += "    AND \"IsRels\" LIKE :IsRelsCondition  ";
+		sql += "  GROUP BY \"ClCode1\"  ";
 		
 		this.info("sql=" + sql);
 

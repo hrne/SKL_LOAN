@@ -42,12 +42,15 @@ public class L2305 extends TradeBuffer {
 		this.info("active L2305 ");
 		this.totaVo.init(titaVo);
 
-		int iOrigin = Integer.valueOf(titaVo.getParam("OriginCaseNo"));
-		int iTarget = Integer.valueOf(titaVo.getParam("TargetCaseNo"));
+		int iOriginCaseNo = Integer.valueOf(titaVo.getParam("OriginCaseNo"));
+		int iTargetCaseNo = Integer.valueOf(titaVo.getParam("TargetCaseNo"));
+		
+		int iOriginCustNo = Integer.valueOf(titaVo.getParam("OriginCustNo")); //若戶號可修改時使用
+		int iTargetCustNo = Integer.valueOf(titaVo.getParam("TargetCustNo"));
 		
 		Slice<ReltMain> iReltMain = null;
 		
-		iReltMain = iReltMainService.caseNoEq(iOrigin, 0, Integer.MAX_VALUE, titaVo);
+		iReltMain = iReltMainService.caseNoEq(iOriginCaseNo, 0, Integer.MAX_VALUE, titaVo);
 		
 		if (iReltMain == null) {
 			throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
@@ -57,12 +60,12 @@ public class L2305 extends TradeBuffer {
 			ReltMain nReltMain = new ReltMain();
 			ReltMain tReltMain = new ReltMain();
 			ReltMainId nReltMainId = new ReltMainId();
-			nReltMainId.setCaseNo(iTarget);
-			nReltMainId.setCustNo(rReltMain.getCustNo());
+			nReltMainId.setCaseNo(iTargetCaseNo);
+			nReltMainId.setCustNo(iTargetCustNo);
 			nReltMainId.setReltId(rReltMain.getReltId());
 			tReltMain = iReltMainService.findById(nReltMainId, titaVo);
 			if (tReltMain !=null) {
-				throw new LogicException(titaVo, "E0005", "案件編號"+iTarget+"已有相同資料(戶號: "+rReltMain.getCustNo()+"，關係人統編: "+rReltMain.getReltId()+")"); 
+				throw new LogicException(titaVo, "E0005", "案件編號"+iTargetCaseNo+"已有相同資料(戶號: "+rReltMain.getCustNo()+"，關係人統編: "+rReltMain.getReltId()+")"); 
 			}
 			nReltMain.setReltMainId(nReltMainId);
 			nReltMain.setApplDate(rReltMain.getApplDate());

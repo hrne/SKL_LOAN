@@ -19,10 +19,10 @@ import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClMain;
+import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -36,6 +36,7 @@ import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -59,7 +60,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4060 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4060.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -96,6 +96,9 @@ public class L4060 extends TradeBuffer {
 	@Autowired
 	public ClBuildingService clBuildingService;
 
+	@Autowired
+	public FacStatusCom facStatusCom;
+
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -104,18 +107,16 @@ public class L4060 extends TradeBuffer {
 	@Autowired
 	public DateUtil dateUtil;
 
-	private List<ClFac> listClFac;
+	private List<ClFac> listClFac = new ArrayList<ClFac>();
 	private CustMain tCustMain;
 	private FacMain tFacMain;
 	private FacCaseAppl tFacCaseAppl;
 	private InsuOrignal tInsuOrignal;
 	private InsuRenew tInsuRenew;
-	private ClMain tClMain;
-	private List<LoanBorMain> listLoanBorMain;
 	private OccursList occursList;
 	private BigDecimal drawdownAmt;
 	private BigDecimal loanBalance;
-	private int facmApplNo;
+//	private int facmApplNo;
 	private int statusCode;
 	private int classFlag;
 	private String newInsu;
@@ -124,17 +125,14 @@ public class L4060 extends TradeBuffer {
 	// initialize variable
 	@PostConstruct
 	public void init() {
-		this.tCustMain = new CustMain();
-		this.tFacMain = new FacMain();
-		this.tFacCaseAppl = new FacCaseAppl();
-		this.tInsuOrignal = new InsuOrignal();
-		this.tInsuRenew = new InsuRenew();
-		this.tClMain = new ClMain();
-		this.listClFac = new ArrayList<ClFac>();
+		this.tCustMain = null;
+		this.tFacMain = null;
+		this.tFacCaseAppl = null;
+		this.tInsuOrignal = null;
+		this.tInsuRenew = null;
 		this.drawdownAmt = new BigDecimal(0);
 		this.loanBalance = new BigDecimal(0);
-		this.facmApplNo = 0;
-		this.statusCode = 0;
+		this.statusCode = 10;
 		this.classFlag = 9;
 		this.newInsu = "Y";
 		this.dtlInsu = "N";
@@ -149,6 +147,11 @@ public class L4060 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 500;
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		int iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
+		int iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
+		int iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 
 		Slice<ClFac> sClFac = null;
 
@@ -157,148 +160,123 @@ public class L4060 extends TradeBuffer {
 		/* 1:用戶號找擔保品 */
 		if (titaVo.getParam("FunctionCode").equals("1")) {
 			if (parse.stringToInteger(titaVo.getParam("FacmNo")) == 0) {
-				sClFac = clFacService.custNoEq(parse.stringToInteger(titaVo.getParam("CustNo")), this.index,
-						this.limit);
+				sClFac = clFacService.custNoEq(iCustNo, this.index, this.limit, titaVo);
 			} else {
-				sClFac = clFacService.facmNoEq(parse.stringToInteger(titaVo.getParam("CustNo")),
-						parse.stringToInteger(titaVo.getParam("FacmNo")), this.index, this.limit);
+				sClFac = clFacService.facmNoEq(iCustNo, iFacmNo, this.index, this.limit, titaVo);
 			}
 
 			/* 2:用擔保品找戶號 */
 		} else if (titaVo.getParam("FunctionCode").equals("2")) {
-			sClFac = clFacService.clNoEq(parse.stringToInteger(titaVo.getParam("ClCode1")),
-					parse.stringToInteger(titaVo.getParam("ClCode2")), parse.stringToInteger(titaVo.getParam("ClNo")),
-					this.index, this.limit);
+			sClFac = clFacService.clNoEq(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
 		}
 
-		listClFac = sClFac == null ? null : sClFac.getContent();
+		if (sClFac != null) {
+			listClFac = sClFac.getContent();
+		}
 
-		if (listClFac == null || listClFac.size() == 0) {
+		// 找未建額度關聯的擔保品
+		if (titaVo.getParam("FunctionCode").equals("2") && listClFac.size() == 0) {
+			this.info("L4060-a test!! ");
+			Slice<ClMain> sClMain = clMainService.findClNo(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
+			if (sClMain != null) {
+				ClFac tClFac = new ClFac();
+				tClFac.setClCode1(iClCode1);
+				tClFac.setClCode2(iClCode2);
+				tClFac.setClNo(iClNo);
+				listClFac.add(tClFac);
+				this.info("L4060-b test!! ");
+			}
+		}
+
+		if (listClFac.size() == 0) {
 			throw new LogicException(titaVo, "E0001", " 查無資料 ");
 		}
 
-		int clFac = 0;
-		int facM = 0;
+//		int clFac = 0;
+//		int facM = 0;
 
 		/* 用找出的list做歷遍寫入totalist */
 		/* ClFac #OOCustNoLB=戶號 #OOClNoLB=擔保品編號 */
 		for (ClFac tClFac : listClFac) {
 			init();
-
-//			僅有房地押品才查詢
-			if (tClFac.getClCode1() != 1) {
-				this.info("ClCode1 != 1...，tClFac.getClCode1() = " + tClFac.getClCode1());
-				continue;
-			} else {
-				clFac = 1;
+			if (tClFac.getApproveNo() > 0) {
+				tFacCaseAppl = facCaseApplService.findById(tClFac.getApproveNo(), titaVo);
+				tCustMain = custMainService.findById(tFacCaseAppl.getCustUKey(), titaVo);
+				tFacMain = facMainService.facmApplNoFirst(tClFac.getApproveNo(), titaVo);
 			}
-
-			tCustMain = custMainService.custNoFirst(tClFac.getCustNo(), tClFac.getCustNo());
-			/* CusM #OOCustNm=戶名 */
-
-			FacMainId tFacMainId = new FacMainId();
-			tFacMainId.setCustNo(tClFac.getCustNo());
-			tFacMainId.setFacmNo(tClFac.getFacmNo());
-			tFacMain = facMainService.findById(tFacMainId, titaVo);
-
-			/* FacM #OOLineAmt=核准額度 */
-
-			if (tFacMain == null) {
-				this.info("tFacMain == null... ");
-				continue;
-			} else {
-				facM = 1;
-			}
-
-			facmApplNo = tFacMain.getApplNo();
-			tFacCaseAppl = facCaseApplService.findById(facmApplNo);
-			/* FacCaseAppl #OOApproveDate=核准日期 ??? how to join */
-
-			Slice<ClMain> sClMain = null;
-
-			sClMain = clMainService.findClNo(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), this.index,
-					this.limit);
-
-			List<ClMain> l2ClMain = new ArrayList<ClMain>();
-
-			l2ClMain = sClMain == null ? null : sClMain.getContent();
 
 			BigDecimal evaAmt = BigDecimal.ZERO;
+			ClMain tClMain = clMainService
+					.findById(new ClMainId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
 
-			if (l2ClMain != null && l2ClMain.size() != 0) {
-				tClMain = l2ClMain.get(0);
-
+			if (tClMain != null) {
 				evaAmt = tClMain.getEvaAmt();
 			}
 
 			String bdLocation = "";
-
-			ClBuilding tClBuilding = new ClBuilding();
-			ClBuildingId tClBuildingId = new ClBuildingId();
-			tClBuildingId.setClCode1(tClFac.getClCode1());
-			tClBuildingId.setClCode2(tClFac.getClCode2());
-			tClBuildingId.setClNo(tClFac.getClNo());
-
-			tClBuilding = clBuildingService.findById(tClBuildingId);
-			if (tClBuilding == null) {
-				bdLocation = "";
-			} else {
+			ClBuilding tClBuilding = clBuildingService
+					.findById(new ClBuildingId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
+			if (tClBuilding != null) {
 				bdLocation = limitLength(tClBuilding.getBdLocation(), 99);
 			}
 
 			tInsuOrignal = insuOrignalService.clNoFirst(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo());
 
-			tInsuRenew = new InsuRenew();
-			List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
-
-			Slice<InsuRenew> sInsuRenew = null;
-
-			sInsuRenew = insuRenewService.findNowInsuEq(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(),
-					this.index, this.limit);
-
-			lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
+			Slice<InsuRenew> sInsuRenew = insuRenewService.findNowInsuEq(tClFac.getClCode1(), tClFac.getClCode2(),
+					tClFac.getClNo(), this.index, this.limit, titaVo);
 
 //			保單明細按鈕 on
-			if (tInsuOrignal != null || lInsuRenew != null) {
+			if (tInsuOrignal != null || sInsuRenew != null) {
 				dtlInsu = "Y";
 			}
 
-			if (lInsuRenew != null && lInsuRenew.size() != 0) {
-				tInsuRenew = lInsuRenew.get(0);
+			String nowInsuNo = "";
+			if (sInsuRenew != null) {
+				InsuRenew tInsuRenew = sInsuRenew.getContent().get(0);
+				if ("".equals(tInsuRenew.getNowInsuNo())) {
+					nowInsuNo = tInsuRenew.getPrevInsuNo();
+				} else {
+					nowInsuNo = tInsuRenew.getNowInsuNo();
+				}
+			} else if (tInsuOrignal != null) {
+				nowInsuNo = tInsuOrignal.getOrigInsuNo();
 			}
 
-			/* InsuOrigin #OONowInsuNo */
-
-			Slice<LoanBorMain> sLoanBorMain = null;
-
-			sLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(), tClFac.getFacmNo(),
-					0, 999, this.index, this.limit);
 			/* Borm #OOStatus=狀態 0: 正常戶 4: 逾期戶 2: 催收戶 6: 呆帳戶 */
 			/* #OOLOANAMT=貸放金額 SUM(DrawdownAmt) */
 			/* #OOLOANBAL=貸放餘額 SUM(LoanBalance) */
 
-			listLoanBorMain = sLoanBorMain == null ? null : sLoanBorMain.getContent();
-
-			if (listLoanBorMain == null || listLoanBorMain.size() == 0) {
-
-			} else {
-				for (LoanBorMain tLoanBorMain : listLoanBorMain) {
+			Slice<LoanBorMain> sLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(),
+					tClFac.getFacmNo(), 0, 900, this.index, this.limit, titaVo);
+			List<LoanBorMain> lLoanBorMain = sLoanBorMain == null ? null : sLoanBorMain.getContent();
+			if (sLoanBorMain != null) {
+				for (LoanBorMain tLoanBorMain : sLoanBorMain.getContent()) {
 					drawdownAmt = drawdownAmt.add(tLoanBorMain.getDrawdownAmt());
 					loanBalance = loanBalance.add(tLoanBorMain.getLoanBal());
-					statusCode = tLoanBorMain.getStatus();
-					calcStatus(statusCode);
 				}
+				this.statusCode = facStatusCom.settingStatus(lLoanBorMain,this.txBuffer.getTxBizDate().getTbsDy());
 			}
-
 			occursList = new OccursList();
 			occursList.putParam("OOCustNo", tClFac.getCustNo());
 			occursList.putParam("OOFacmNo", tClFac.getFacmNo());
 			occursList.putParam("OOClCode1", tClFac.getClCode1());
 			occursList.putParam("OOClCode2", tClFac.getClCode2());
 			occursList.putParam("OOClNo", tClFac.getClNo());
-			occursList.putParam("OOCustNm", tCustMain.getCustName());
-			occursList.putParam("OOLineAmt", tFacMain.getLineAmt());
-			occursList.putParam("OOApproveDate", tFacCaseAppl.getApproveDate());
+			String custName = "";
+			if (tCustMain != null) {
+				custName = tCustMain.getCustName();
+			}
+			BigDecimal lineAmt = BigDecimal.ZERO;
+			if (tFacMain != null) {
+				lineAmt = tFacMain.getLineAmt();
+			}
+			int approveDate = 0;
+			if (tFacCaseAppl != null) {
+				approveDate = tFacCaseAppl.getApproveDate();
+			}
+			occursList.putParam("OOCustNm", custName);
+			occursList.putParam("OOLineAmt", lineAmt);
+			occursList.putParam("OOApproveDate", approveDate);
 			occursList.putParam("OOEvaAmt", evaAmt);
 			occursList.putParam("OOBdLocation", bdLocation);
 			occursList.putParam("OODrawdownAmt", drawdownAmt);
@@ -306,53 +284,30 @@ public class L4060 extends TradeBuffer {
 			occursList.putParam("OOStatus", statusCodeX(statusCode));
 			occursList.putParam("OONEWINSU", newInsu);
 			occursList.putParam("OODTLINSU", dtlInsu);
-			occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
+			occursList.putParam("OONowInsuNo", nowInsuNo);
 
 			this.totaVo.addOccursList(occursList);
-		}
-
-		if (clFac == 0 && facM == 0) {
-			throw new LogicException(titaVo, "E0001", " 查無資料 ");
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	/* 按照 6呆帳 -> 7部呆 -> 2催收 -> 0正常 -> else 階級顯示 */
-	private int calcStatus(int tmpStatusCode) throws LogicException {
-		if (tmpStatusCode == 6) {
-			classFlag = 1;
-		} else if (tmpStatusCode == 7 && classFlag >= 2) {
-			classFlag = 2;
-		} else if (tmpStatusCode == 2 && classFlag >= 3) {
-			classFlag = 3;
-		} else if (tmpStatusCode == 0 && classFlag >= 4) {
-			classFlag = 4;
-		}
-
-		switch (classFlag) {
-		case 1:
-			statusCode = 6;
-			break;
-		case 2:
-			statusCode = 7;
-			break;
-		case 3:
-			statusCode = 2;
-			break;
-		case 4:
-			statusCode = 0;
-			break;
-		default:
-			/* status */
-		}
-		return statusCode;
-	}
-
 	private String statusCodeX(int statusCode) {
+//		 priority    status  
+//		  1  --  6.呆帳戶
+//		  2  --  7.部分轉呆戶
+//		  3  --  2.催收戶
+//		  4  --  4.逾期戶(正常戶逾期超過一個月)
+//		  5  --  0.正常戶
+//		  6  --  5.催收結案戶
+//		  7  --  8.債權轉讓戶
+//		  8  --  9.呆帳結案戶
+//		  9  --  3.結案戶
+//       10  --  1.展期
 		String result = "";
 		switch (statusCode) {
 		case 0:
+		case 4:
 			result = "正常";
 			break;
 		case 2:
@@ -363,6 +318,15 @@ public class L4060 extends TradeBuffer {
 			break;
 		case 7:
 			result = "部呆";
+			break;
+		case 3:
+		case 5:
+		case 8:
+		case 9:
+			result = "結案";
+			break;
+		case 1:
+			result = "展期";
 			break;
 		default:
 			/* status */

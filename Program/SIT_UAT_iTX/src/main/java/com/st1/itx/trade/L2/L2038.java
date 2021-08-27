@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -104,11 +105,6 @@ public class L2038 extends TradeBuffer {
 		List<LinkedHashMap<String, String>> chkOccursList = null; 
 		if (resultList != null && resultList.size() > 0) {
 			
-			if (resultList.size() == this.limit && hasNext()) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
-			}
 			
 			int TempClCode1 = 0;
 			int TempClCode2 = 0;
@@ -162,19 +158,72 @@ public class L2038 extends TradeBuffer {
 						
 						if(tClBuilding != null) {
 							occurslist.putParam("OOOther", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
-						} 
+						} else {
+							occurslist.putParam("OOOther", "");
+						}
+						
+						
+						int landNo1 = parse.stringToInteger(titaVo.getParam("LandNo1"));
+						int landNo2 = parse.stringToInteger(titaVo.getParam("LandNo2"));
+						int landNo3 = parse.stringToInteger(titaVo.getParam("LandNo3"));
+						int landNo4 = parse.stringToInteger(titaVo.getParam("LandNo4"));
+						int startlandNo = 0;
+						int endlandNo = 0;
+						
+						if ( landNo1 > 0 ) {
+							startlandNo = landNo1 * 10000;
+						}
+						if ( landNo2 > 0 ) {
+							startlandNo = startlandNo + landNo2;
+						}
+						if (landNo3 > 0) {
+							endlandNo = landNo3*10000;
+						}
+						if (landNo4 > 0) {
+							endlandNo = endlandNo + landNo4;
+						}
+						
+						Slice<ClLand> slClLand = sClLandService.findClNo(TempClCode1, TempClCode2, TempClNo, this.index, this.limit, titaVo);
+
+						List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
+						
+						if(lClLand != null) {
+						
+							occurslist.putParam("OOOther1", "");
+							
+							for(ClLand tClLand : lClLand) {		
+								
+								if (landNo1 > 0 || landNo2 > 0 || landNo3 > 0 || landNo4  > 0 ) { // 打建號且有打地號 或 打地號
+								  int tempNo = parse.stringToInteger(tClLand.getLandNo1()) * 10000 + parse.stringToInteger(tClLand.getLandNo2());					
+								  if( startlandNo <=  tempNo && tempNo <= endlandNo) {									
+									occurslist.putParam("OOOther1", tClLand.getLandLocation());
+								  } // if
+								} else { // 只打建號查詢隨便一筆
+									occurslist.putParam("OOOther1", tClLand.getLandLocation());
+								}
+								
+							} // for
+							
+						} else {
+							occurslist.putParam("OOOther1", "");
+						}
 						
 					} else if( TempClCode1 == 2) {
 						ClLandId clLandId = new ClLandId();
 						clLandId.setClCode1(TempClCode1);
 						clLandId.setClCode2(TempClCode2);
 						clLandId.setClNo(TempClNo);
+						clLandId.setLandSeq(0);
 						ClLand tClLand = new ClLand();
 						tClLand = sClLandService.findById(clLandId, titaVo);
 						
 						if(tClLand != null) {
-							occurslist.putParam("OOOther", tClLand.getLandLocation());
-						} 
+							occurslist.putParam("OOOther", "");
+							occurslist.putParam("OOOther1", tClLand.getLandLocation());
+						} else {
+							occurslist.putParam("OOOther", "");
+							occurslist.putParam("OOOther1", "");
+						}
 						
 					} else if( TempClCode1 == 3 || TempClCode1 == 4) {
 						ClStockId tClStockId = new ClStockId();
@@ -186,7 +235,11 @@ public class L2038 extends TradeBuffer {
 						
 						if(tClStock != null) {
 							occurslist.putParam("OOOther", tClStock.getStockCode());
-						} 
+							occurslist.putParam("OOOther1", "");
+						} else {
+							occurslist.putParam("OOOther", "");
+							occurslist.putParam("OOOther1", "");
+						}
 					} else if( TempClCode1 == 9){
 						ClMovablesId tClMovablesId = new ClMovablesId();
 						tClMovablesId.setClCode1(TempClCode1);
@@ -197,8 +250,10 @@ public class L2038 extends TradeBuffer {
 						
 						if(tClMovables != null) {
 						  occurslist.putParam("OOOther", tClMovables.getLicenseNo());
+						  occurslist.putParam("OOOther1", "");
 						} else {
-					      occurslist.putParam("OOOther", " ");
+					      occurslist.putParam("OOOther", "");
+					      occurslist.putParam("OOOther1", "");
 						}
 					}
 					
@@ -216,6 +271,13 @@ public class L2038 extends TradeBuffer {
 				} // for
 			
 			  chkOccursList = this.totaVo.getOccursList();
+			  
+			  if (resultList.size() == this.limit && hasNext()) {
+				 titaVo.setReturnIndex(this.setIndexNext());
+					/* 手動折返 */
+				 this.totaVo.setMsgEndToEnter();
+			  }
+				
 			} // if
 
 		if ( chkOccursList == null  && titaVo.getReturnIndex() == 0 ) {

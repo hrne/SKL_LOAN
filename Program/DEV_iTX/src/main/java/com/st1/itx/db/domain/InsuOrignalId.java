@@ -38,7 +38,6 @@ public class InsuOrignalId implements Serializable {
   private String origInsuNo = " ";
 
   // 批單號碼
-  /* 修改時需填入 */
   @Column(name = "`EndoInsuNo`", length = 17)
   private String endoInsuNo = " ";
 
@@ -131,7 +130,7 @@ public class InsuOrignalId implements Serializable {
 
 /**
 	* 批單號碼<br>
-	* 修改時需填入
+	* 
 	* @return String
 	*/
   public String getEndoInsuNo() {
@@ -140,7 +139,7 @@ public class InsuOrignalId implements Serializable {
 
 /**
 	* 批單號碼<br>
-	* 修改時需填入
+	* 
   *
   * @param endoInsuNo 批單號碼
 	*/

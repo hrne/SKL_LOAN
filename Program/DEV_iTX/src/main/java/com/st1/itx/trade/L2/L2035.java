@@ -13,8 +13,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ReltMain;
 import com.st1.itx.db.service.ReltMainService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 /**
  * Tita<br>
@@ -26,7 +24,7 @@ import com.st1.itx.util.parse.Parse;
 /**
  * 
  * 
- * @author YuJiaXing
+ * @author Fegie
  * @version 1.0.0
  */
 public class L2035 extends TradeBuffer {
@@ -34,14 +32,6 @@ public class L2035 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ReltMainService sReltMainService;
-
-	/* 日期工具 */
-	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -56,36 +46,33 @@ public class L2035 extends TradeBuffer {
 		this.limit = 100; // 38 * 500 = 19000
 
 		// 取tita戶號
-		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iCustNo = Integer.valueOf((titaVo.getParam("CustNo")));
 		// 取tita案件編號
-		int iCaseNo = parse.stringToInteger(titaVo.getParam("CaseNo"));
+		int iCaseNo = Integer.valueOf((titaVo.getParam("CaseNo")));
 		
-		ReltMain iReltMain = new ReltMain();
 		Slice<ReltMain> sReltMain = null;
 		OccursList occursList = new OccursList();
-		ArrayList<Integer> iCaseNoList = new ArrayList<>();
 		if (iCustNo == 0) {
-			iReltMain = sReltMainService.caseNoFirst(iCaseNo, titaVo);
-			if (iReltMain == null) {
+			sReltMain = sReltMainService.caseNoEq(iCaseNo,this.index,this.limit, titaVo);
+			if (sReltMain == null) {
 				throw new LogicException(titaVo, "E2003", "無關係人檔資料"); // 查無資料
 			}
-			occursList.putParam("OOCaseNo", iReltMain.getCaseNo());
-			this.totaVo.addOccursList(occursList);
+			for (ReltMain s1ReltMain:sReltMain) {
+				occursList = new OccursList();
+				occursList.putParam("OOCaseNo", s1ReltMain.getCaseNo());
+				occursList.putParam("OOCustNo", s1ReltMain.getCustNo());
+				this.totaVo.addOccursList(occursList);
+			}
 		}else {
 			sReltMain = sReltMainService.custNoEq(iCustNo,this.index,this.limit, titaVo);
 			if (sReltMain == null) {
 				throw new LogicException(titaVo, "E2003", "該戶號" + iCustNo + "無關係人檔資料"); // 查無資料
 			}
-			for (ReltMain ssReltMain:sReltMain) {
+			for (ReltMain s2ReltMain:sReltMain) {
 				occursList = new OccursList();
-				if (iCaseNoList.contains(ssReltMain.getCaseNo())) {
-					continue;
-				}else {
-					iCaseNoList.add(ssReltMain.getCaseNo());
-					occursList.putParam("OOCaseNo", ssReltMain.getCaseNo());
-					this.totaVo.addOccursList(occursList);
-				}
-				
+				occursList.putParam("OOCaseNo", s2ReltMain.getCaseNo());
+				occursList.putParam("OOCustNo", s2ReltMain.getCustNo());
+				this.totaVo.addOccursList(occursList);				
 			}
 		}
 		
