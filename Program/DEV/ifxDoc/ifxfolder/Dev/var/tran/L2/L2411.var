@@ -1923,7 +1923,7 @@ IF(#FunCd==1 || #FunCd==3,E(0,@ClNo,#OClNo),S)
 
 
 #BUF1=X,11,S
-T(2,2+#ClCode1+#ClCode2+#ClNo)
+T(2,1+#ClCode1+#ClCode2+#ClNo)
 
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L2415; ntxbuf=#BUF1})ASGN(BTN_NEW1$)

@@ -118,6 +118,7 @@ CALL(#CALLGRID)
 IF(#PageFg==1 || #PageFg==5,INVOKEJS(SHOW,p2,1),$)
 IF(#PageFg==2 || #PageFg==5,INVOKEJS(SHOW,p3,1),$)
 IF(#PageFg==3 || #PageFg==5,INVOKEJS(SHOW,p4,1),$)
+IF(#FunCd == 1,s,$)
 IF(#PageFg==4 || #PageFg==5,INVOKEJS(SHOW,p5,1),$)
 
 !---------- AP TEXT Area Variables ----------

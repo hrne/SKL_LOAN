@@ -109,7 +109,6 @@ public class LM061Report extends MakeReport {
 				for (int i = 0; i < tLDVo.size(); i++) {
 					fdnm = "F" + i;
 
-					
 					switch (i) {
 					case 0:// 戶號
 					case 1:// 額度
@@ -168,17 +167,19 @@ public class LM061Report extends MakeReport {
 
 					// 金額(F11)
 					// 法務進度代號(F12)
-					 
+
 					// 鑑價金額
 					F11 = tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11"));
 
-					//
-					if (tLDVo.get("F12").equals("056") || tLDVo.get("F12").equals("058")) {
+					// 代號 56 拍定金額   58 分配金額
+					if (tLDVo.get("F12").equals("056")) {
 
 						// 和上一個戶號不一樣就歸零 並直接附值
 						// 和上一個戶號一樣就累加 並 合併儲存格 再賦值
 						if (!tempCustNo2.equals(tLDVo.get("F0"))) {
-
+							
+							tempCustNo2 = tLDVo.get("F0");
+							
 							// 上一同戶號多額度跟這筆比較，如果有1筆以上就使用合併
 							if (tempCount > 1) {
 
@@ -251,14 +252,16 @@ public class LM061Report extends MakeReport {
 						}
 
 					}
-
+					
+					// 代號 77 協議達成
 					if (tLDVo.get("F12").equals("077")) {
-						makeExcel.setValue(row, 18, "V", "C");
+						makeExcel.setValue(row, 18, " ", "C");
 						makeExcel.setValue(row, 19,
 								tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")),
 								"$* #,##0", "R");
 					}
 
+					// 代號 901 拍定不足額
 					if (tLDVo.get("F12").equals("901")) {
 						makeExcel.setValue(row, 16,
 								tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")),

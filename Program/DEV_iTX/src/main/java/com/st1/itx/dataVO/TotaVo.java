@@ -32,6 +32,8 @@ public class TotaVo extends LinkedHashMap<String, Object> {
 
 	private static final long serialVersionUID = -3395642179667569163L;
 
+	private boolean isHtmlContent = false;
+
 	private List<LinkedHashMap<String, String>> occursList = new ArrayList<LinkedHashMap<String, String>>();
 
 	/**
@@ -284,6 +286,14 @@ public class TotaVo extends LinkedHashMap<String, Object> {
 	 */
 	public TitaVo getEcTitaVo() {
 		return (TitaVo) this.get("EC");
+	}
+
+	public boolean isHtmlContent() {
+		return isHtmlContent;
+	}
+
+	public void setHtmlContent(boolean isHtmlContent) {
+		this.isHtmlContent = isHtmlContent;
 	}
 
 }

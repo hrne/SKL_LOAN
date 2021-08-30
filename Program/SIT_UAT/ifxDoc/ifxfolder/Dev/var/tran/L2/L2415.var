@@ -148,6 +148,7 @@ CALL(#CALLGRID)
 IF(#PageFg==1 || #PageFg==5,INVOKEJS(SHOW,p2,1),$)
 IF(#PageFg==2 || #PageFg==5,INVOKEJS(SHOW,p3,1),$)
 IF(#PageFg==3 || #PageFg==5,INVOKEJS(SHOW,p4,1),$)
+IF(#FunCd == 1,s,$)
 IF(#PageFg==4 || #PageFg==5,INVOKEJS(SHOW,p5,1),$)
 
 
@@ -391,7 +392,7 @@ IF(#FunCd == 1 || #FunCd == 2,CALL(#SET_REQUIRED),$)
 
 !FunCd=2 隱藏框線
 #WKTF=X,1,S
-IF(#FunCd==2,T(F,@BdMainUseCode,#LbCONTROL_FG)
+IF(#FunCd==1 || #FunCd==2,T(F,@BdMainUseCode,#LbCONTROL_FG)
 T(F,@BdMtrlCode,#LbCONTROL_FG)
 T(F,@BdTypeCode,#LbCONTROL_FG)
 T(F,@TotalFloor,#LbCONTROL_FG)

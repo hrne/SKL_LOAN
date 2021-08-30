@@ -172,31 +172,31 @@ public class L2415 extends TradeBuffer {
 		}
 
 		// 擔保品主檔有資料
-		// 新增
-		if (iFunCd == 1) {
-			if (tClBuilding != null) {
-				throw new LogicException("E0002", "擔保品不動產建物檔主檔");
-			} else {
-				tClBuilding = new ClBuilding();
-			}
-			// 擔保品不動產建物檔主檔
-			setClBuilding(titaVo);
-			try {
-				tClBuilding = sClBuildingService.insert(tClBuilding, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0005", "擔保品不動產建物檔主檔" + e.getErrorMsg());
-			}
-
-			// insert 公設建號
-			insertClBuildingPublic(titaVo);
-
-			// insert ClParking 車位
-			insertClParking(titaVo);
-
-			// insert 擔保品不動產建物修改原因檔
-			insertClBuildingReason(titaVo);
-
-		} else if (iFunCd == 2) {
+//		// 新增
+//		if (iFunCd == 1) {
+//			if (tClBuilding != null) {
+//				throw new LogicException("E0002", "擔保品不動產建物檔主檔");
+//			} else {
+//				tClBuilding = new ClBuilding();
+//			}
+//			// 擔保品不動產建物檔主檔
+//			setClBuilding(titaVo);
+//			try {
+//				tClBuilding = sClBuildingService.insert(tClBuilding, titaVo);
+//			} catch (DBException e) {
+//				throw new LogicException("E0005", "擔保品不動產建物檔主檔" + e.getErrorMsg());
+//			}
+//
+//			// insert 公設建號
+//			insertClBuildingPublic(titaVo);
+//
+//			// insert ClParking 車位
+//			insertClParking(titaVo);
+//
+//			// insert 擔保品不動產建物修改原因檔
+//			insertClBuildingReason(titaVo);
+//
+		 if (iFunCd == 1 || iFunCd == 2) {
 
 			if (tClBuilding == null) {
 				tClBuilding = new ClBuilding();

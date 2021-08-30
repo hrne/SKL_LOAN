@@ -136,13 +136,16 @@ public class LM023Report extends MakeReport {
 			this.print(-15, 100, "　年度預算");
 			this.print(-16, 100, "　年度現階段累積達成率");
 
-			int tempAmt = 0;
-			int total0 = 0;
-			int total1 = 0;
-			int total2 = 0;
+//			int tempAmt = 0;
+			BigDecimal tempAmt = BigDecimal.ZERO;
 
-//			DecimalFormat df1 = new DecimalFormat("#,##0");
-			double resTotal = 0.00;
+			BigDecimal total0 = BigDecimal.ZERO;
+			BigDecimal total1 = BigDecimal.ZERO;
+			BigDecimal total2 = BigDecimal.ZERO;
+
+//			DecimalFormat df2 = new DecimalFormat("#,##0");
+			BigDecimal resTotal = BigDecimal.ZERO;
+			BigDecimal percent = new BigDecimal("100");
 			int colSpace = 0;
 
 			int totalPos = 0;
@@ -162,7 +165,8 @@ public class LM023Report extends MakeReport {
 				dataSeq = Integer.valueOf(lM023List2.get(i).get("F0")).toString();
 
 				// 利息金額
-				tempAmt = Integer.valueOf(lM023List2.get(i).get("F3"));
+				tempAmt = lM023List2.get(i).get("F3").isEmpty() ? BigDecimal.ZERO
+						: new BigDecimal(lM023List2.get(i).get("F3"));
 				// 欄位間隔
 				colSpace = Integer.valueOf(lM023List2.get(i).get("F2")) - 1;
 
@@ -170,7 +174,7 @@ public class LM023Report extends MakeReport {
 
 					year = String.valueOf(Integer.valueOf(lM023List2.get(i).get("F1")) - 1911);
 
-					total0 = total0 + tempAmt;
+					total0 = total0.add(tempAmt);
 
 					this.print(-8, 16 + (colSpace * 9), df1.format(tempAmt), "L");
 
@@ -179,13 +183,13 @@ public class LM023Report extends MakeReport {
 				}
 
 				if (dataSeq.equals("1")) {
-					total1 = total1 + tempAmt;
+					total1 = total1.add(tempAmt);
 					this.print(-9, 16 + (colSpace * 9), df1.format(tempAmt), "L");
 
 				}
 
 				if (dataSeq.equals("2")) {
-					total2 = total2 + tempAmt;
+					total2 = total2.add(tempAmt);
 					this.print(-10, 16 + (colSpace * 9), df1.format(tempAmt), "L");
 
 				}
@@ -198,7 +202,8 @@ public class LM023Report extends MakeReport {
 			this.print(-9, totalPos, df1.format(total1), "L");
 			this.print(-10, totalPos, df1.format(total2), "L");
 
-			resTotal = total0 == 0 || total1 == 0 ? 0 : (total0 / total1) * 100;
+			resTotal = total0 == BigDecimal.ZERO || total1 == BigDecimal.ZERO ? BigDecimal.ZERO
+					: total0.divide(total2, 4, BigDecimal.ROUND_HALF_UP).multiply(percent);
 			this.print(-12, totalPos, resTotal + "%", "L");
 
 			this.print(-8, 5, year + "年度");

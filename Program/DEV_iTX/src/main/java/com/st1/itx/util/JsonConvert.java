@@ -85,7 +85,10 @@ public class JsonConvert extends SysLogger {
 					this.info("tota len : " + msglen);
 					tota += FormatUtil.pad9(msglen, 5) + totat.substring(5);
 				} else {
-					hostFormatter.init(t.getMsgId() + ".tom");
+					if (t.isHtmlContent())
+						hostFormatter.init("NOTICE.tom");
+					else
+						hostFormatter.init(t.getMsgId() + ".tom");
 					String totat = hostFormatter.format(true, t);
 					if (t.getOccursList().size() > 0) {
 						hostFormatter.init(t.getMsgId() + "_OC.tom");
