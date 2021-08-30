@@ -78,6 +78,7 @@ public class ContentName {
 	public static final String warnMsg = "warnMsg";
 	public static final String errorMsgId = "MSGID";
 	public static final String errorMsg = "ERRMSG";
+	public static final String noticeMsg = "noticeMsg";
 
 	/* DB */
 	public static final String dataBase = "DATABASE";

@@ -292,8 +292,11 @@ public class TotaVo extends LinkedHashMap<String, Object> {
 		return isHtmlContent;
 	}
 
-	public void setHtmlContent(boolean isHtmlContent) {
-		this.isHtmlContent = isHtmlContent;
+	public void setHtmlContent(String msg) {
+		this.putParam(ContentName.noticeMsg, msg);
+		this.isHtmlContent = true;
+		// 固定MSGID
+		this.setMsgId("NO001");
 	}
 
 }
