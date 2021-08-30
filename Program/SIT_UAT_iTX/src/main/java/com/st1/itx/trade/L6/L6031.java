@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -33,12 +31,11 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6031 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6031.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdCodeService sCdCodeService;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -56,22 +53,23 @@ public class L6031 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200; // 96 * 200 = 19,200
 
-		//查詢代碼檔
-		Slice<CdCode> sCdCode= null;
-		if(("00").equals(iBaseRateCode)) {
-			sCdCode = sCdCodeService.defCodeEq("BaseRate","%" , this.index, this.limit, titaVo);
+		// 查詢代碼檔
+		Slice<CdCode> sCdCode = null;
+		if (("00").equals(iBaseRateCode)) {
+			sCdCode = sCdCodeService.defCodeEq("BaseRate", "%",  this.index, this.limit, titaVo);
 		} else {
-			sCdCode = sCdCodeService.defCodeEq("BaseRate",iBaseRateCode+"%" , this.index, this.limit, titaVo);
+			sCdCode = sCdCodeService.defCodeEq("BaseRate", iBaseRateCode + "%",  this.index, this.limit, titaVo);
 		}
-		
-		
+
 		List<CdCode> lCdCode = sCdCode == null ? null : sCdCode.getContent();
 		if (lCdCode == null || lCdCode.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "共用代碼檔"); // 查無資料
 		}
-	
-		
+
 		for (CdCode tCdCode : lCdCode) {
+			if(("N").equals(tCdCode.getEnable())) {
+				continue;
+			}
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOBaseRateCode", tCdCode.getCode());
 			occursList.putParam("OOBaseRateItem", tCdCode.getItem());

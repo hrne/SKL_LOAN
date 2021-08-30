@@ -1,0 +1,750 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L8303)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,350,150];printer.width=[20,20,20,20];order=1;">
+[
+["[L8303]                                 (42)回報無擔保債權金額資料"],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+["#FdRcDate+協商申請日",#RcDate],["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+["#FdIsClaims+是否為本金融機構債務人",#IsClaims],["#FdGuarLoanCnt+本金融機構有擔保債權筆數",#GuarLoanCnt,#GuarLoanCntX],
+["#FdExpLoanAmt+信用貸款對內本息餘額",#ExpLoanAmt,#ExpLoanAmtX],["#FdCivil323ExpAmt+依民法第323條計算之信用貸款本息餘額",#Civil323ExpAmt,#Civil323ExpAmtX],
+[#<->#,"#FdReceExpAmt+信用貸款最近一期繳款金額",#ReceExpAmt,#ReceExpAmtX],
+["#FdCashCardAmt+現金卡放款對內本息餘額",#CashCardAmt,#CashCardAmtX],["#FdCivil323CashAmt+依民法第323條計算之現金卡放款本息餘額",#Civil323CashAmt,#Civil323CashAmtX],
+[#<->#,"#FdReceCashAmt+現金卡最近一期繳款金額",#ReceCashAmt,#ReceCashAmtX],
+["#FdCreditCardAmt+信用卡對內本息餘額",#CreditCardAmt,#CreditCardAmtX],["#FdCivil323CreditAmt+依民法第323條計算之信用卡本息餘額",#Civil323CreditAmt,#Civil323CreditAmtX],
+[#<->#,"#FdReceCreditAmt+信用卡最近一期繳款金額",#ReceCreditAmt,#ReceCreditAmtX],
+["#FdReceExpPrin+信用貸款本金",#ReceExpPrin,#ReceExpPrinX],["#FdReceExpInte+信用貸款利息",#ReceExpInte,#ReceExpInteX],
+["#FdReceExpPena+信用貸款違約金",#ReceExpPena,#ReceExpPenaX],["#FdReceExpOther+信用貸款其他費用",#ReceExpOther,#ReceExpOtherX],
+["#FdCashCardPrin+現金卡本金",#CashCardPrin,#CashCardPrinX],["#FdCashCardInte+現金卡利息",#CashCardInte,#CashCardInteX],
+["#FdCashCardPena+現金卡違約金",#CashCardPena,#CashCardPenaX],["#FdCashCardOther+現金卡其他費用",#CashCardOther,#CashCardOtherX],
+["#FdCreditCardPrin+信用卡本金",#CreditCardPrin,#CreditCardPrinX],["#FdCreditCardInte+信用卡利息",#CreditCardInte,#CreditCardInteX],
+["#FdCreditCardPena+信用卡違約金",#CreditCardPena,#CreditCardPenaX],["#FdCreditCardOther+信用卡其他費用",#CreditCardOther,#CreditCardOtherX],
+["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+]
+
+#FdTranKey=X,2,L
+#FdCustId=X,2,L
+#FdSubmitKey=X,2,L
+#FdRcDate=X,2,L
+#FdMaxMainCode=X,2,L
+#FdIsClaims=X,2,L
+#FdGuarLoanCnt=X,2,L
+#FdExpLoanAmt=X,2,L
+#FdCivil323ExpAmt=X,2,L
+#FdReceExpAmt=X,2,L
+#FdCashCardAmt=X,2,L
+#FdCivil323CashAmt=X,2,L
+#FdReceCashAmt=X,2,L
+#FdCreditCardAmt=X,2,L
+#FdCivil323CreditAmt=X,2,L
+#FdReceCreditAmt=X,2,L
+#FdReceExpPrin=X,2,L
+#FdReceExpInte=X,2,L
+#FdReceExpPena=X,2,L
+#FdReceExpOther=X,2,L
+#FdCashCardPrin=X,2,L
+#FdCashCardInte=X,2,L
+#FdCashCardPena=X,2,L
+#FdCashCardOther=X,2,L
+#FdCreditCardPrin=X,2,L
+#FdCreditCardInte=X,2,L
+#FdCreditCardPena=X,2,L
+#FdCreditCardOther=X,2,L
+#FdOutJcicTxtDate=X,2,L
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!---------- 日期處理 ----------
+#VIEW_SYSDATE=X,8,S
+D(7,2,#SYSDATE,0,0)
+T(1,#VIEW_SYSDATE,2,7)
+E(0,1)ASGN(AGAIN$)
+!---------- AP TEXT AREA Variables ----------
+![隱藏欄位]
+HIDE(#GuarLoanCntX,#ExpLoanAmtX,#Civil323ExpAmtX,#ReceExpAmtX,#CashCardAmtX,#Civil323CashAmtX,#ReceCashAmtX,#CreditCardAmtX,#Civil323CreditAmtX,#ReceCreditAmtX,#ReceExpPrinX,#ReceExpInteX,#ReceExpPenaX,#ReceExpOtherX,#CashCardPrinX,#CashCardInteX,#CashCardPenaX,#CashCardOtherX,#CreditCardPrinX,#CreditCardInteX,#CreditCardPenaX,#CreditCardOtherX)
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L8R01.dec"/>
+
+#CDDEF0001=x,20,S
+T(3,CdCode.TranKey)
+#TranKeyHelp=x,1024,S
+
+#CDDEF0002=x,20,S
+T(3,CdCode.YesNo)
+#YesNoHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranKeyHelp,#HelpDesc1)
+T(2,@YesNoHelp,#HelpDesc2)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic042連動進入),$)
+T(F,@TranKey,0)T(F,@RcDate,0)T(F,@MaxMainCode,0)T(F,@IsClaims,0)T(F,@GuarLoanCnt,0)T(F,@ExpLoanAmt,0)T(F,@Civil323ExpAmt,0)
+T(F,@ReceExpAmt,0)T(F,@CashCardAmt,0)T(F,@Civil323CashAmt,0)T(F,@ReceCashAmt,0)T(F,@CreditCardAmt,0)T(F,@Civil323CreditAmt,0)
+T(F,@ReceCreditAmt,0)T(F,@ReceExpPrin,0)T(F,@ReceExpInte,0)T(F,@ReceExpPena,0)T(F,@ReceExpOther,0)T(F,@CashCardPrin,0)
+T(F,@CashCardInte,0)T(F,@CashCardPena,0)T(F,@CashCardOther,0)T(F,@CreditCardPrin,0)T(F,@CreditCardInte,0)
+T(F,@CreditCardPena,0)T(F,@CreditCardOther,0)
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+
+![連動交易]
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@TranKey_Tmp,#NTXBUF,1,1)
+T(1,@TranKey,#NTXBUF,2,1)
+
+! 新增進入
+#Deal_New=X,1,S
+C(5,#TranKey_Tmp,1,$,S)
+T(1,@CustId,#NTXBUF,3,10)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@RcDate,1)T(F,@MaxMainCode,1)T(F,@IsClaims,1)T(F,@GuarLoanCnt,1)T(F,@ExpLoanAmt,1)T(F,@Civil323ExpAmt,1)
+T(F,@ReceExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@ReceCashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
+T(F,@ReceCreditAmt,1)T(F,@ReceExpPrin,1)T(F,@ReceExpInte,1)T(F,@ReceExpPena,1)T(F,@ReceExpOther,1)T(F,@CashCardPrin,1)
+T(F,@CashCardInte,1)T(F,@CashCardPena,1)T(F,@CashCardOther,1)T(F,@CreditCardPrin,1)T(F,@CreditCardInte,1)
+T(F,@CreditCardPena,1)T(F,@CreditCardOther,1)
+K(MODIFYBUTTON,新增)
+T(2,@FdRcDate,*)
+T(2,@FdMaxMainCode,*)
+T(2,@FdIsClaims,*)
+T(2,@FdGuarLoanCnt,*)
+T(2,@FdExpLoanAmt,*)
+T(2,@FdCivil323ExpAmt,*)
+T(2,@FdReceExpAmt,*)
+T(2,@FdCashCardAmt,*)
+T(2,@FdCivil323CashAmt,*)
+T(2,@FdReceCashAmt,*)
+T(2,@FdCreditCardAmt,*)
+T(2,@FdCivil323CreditAmt,*)
+T(2,@FdReceCreditAmt,*)
+T(2,@FdReceExpPrin,*)
+T(2,@FdReceExpInte,*)
+T(2,@FdReceExpPena,*)
+T(2,@FdReceExpOther,*)
+T(2,@FdCashCardPrin,*)
+T(2,@FdCashCardInte,*)
+T(2,@FdCashCardPena,*)
+T(2,@FdCashCardOther,*)
+T(2,@FdCreditCardPrin,*)
+T(2,@FdCreditCardInte,*)
+T(2,@FdCreditCardPena,*)
+T(2,@FdCreditCardOther,*)
+
+! 異動進入
+#Deal_Update=X,1,S
+C(5,#TranKey_Tmp,2,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@IsClaims,1)T(F,@GuarLoanCnt,1)T(F,@ExpLoanAmt,1)T(F,@Civil323ExpAmt,1)
+T(F,@ReceExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@ReceCashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
+T(F,@ReceCreditAmt,1)T(F,@ReceExpPrin,1)T(F,@ReceExpInte,1)T(F,@ReceExpPena,1)T(F,@ReceExpOther,1)T(F,@CashCardPrin,1)
+T(F,@CashCardInte,1)T(F,@CashCardPena,1)T(F,@CashCardOther,1)T(F,@CreditCardPrin,1)T(F,@CreditCardInte,1)
+T(F,@CreditCardPena,1)T(F,@CreditCardOther,1)
+T(2,@FdIsClaims,*)
+T(2,@FdGuarLoanCnt,*)
+T(2,@FdExpLoanAmt,*)
+T(2,@FdCivil323ExpAmt,*)
+T(2,@FdReceExpAmt,*)
+T(2,@FdCashCardAmt,*)
+T(2,@FdCivil323CashAmt,*)
+T(2,@FdReceCashAmt,*)
+T(2,@FdCreditCardAmt,*)
+T(2,@FdCivil323CreditAmt,*)
+T(2,@FdReceCreditAmt,*)
+T(2,@FdReceExpPrin,*)
+T(2,@FdReceExpInte,*)
+T(2,@FdReceExpPena,*)
+T(2,@FdReceExpOther,*)
+T(2,@FdCashCardPrin,*)
+T(2,@FdCashCardInte,*)
+T(2,@FdCashCardPena,*)
+T(2,@FdCashCardOther,*)
+T(2,@FdCreditCardPrin,*)
+T(2,@FdCreditCardInte,*)
+T(2,@FdCreditCardPena,*)
+T(2,@FdCreditCardOther,*)
+
+! 查詢進入
+#Deal_Search=X,1,S
+C(5,#TranKey_Tmp,5,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(NOBUTTON,CLOSEY)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,刪除)
+
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L8R13.dec"/>
+#RimUkey=X,32,S
+#RimL8r13=X,1,S
+C(5,#TranKey,A,S,$)
+T(2,@RimUkey,#Ukey)
+RESET_RIM(#RimL8r13,L8R13)
+S(L8R13,1,#RimUkey)
+R(1,L8R13)
+T(2,@CustId,#L8r13CustId)
+T(2,@SubmitKey,#L8r13SubmitKey)
+E(0,@RcDate,#L8r13RcDate)
+T(2,@MaxMainCode,#L8r13MaxMainCode)
+T(2,@IsClaims,#L8r13IsClaims)
+E(0,@GuarLoanCnt,#L8r13GuarLoanCnt)
+E(0,@ExpLoanAmt,#L8r13ExpLoanAmt)
+E(0,@Civil323ExpAmt,#L8r13Civil323ExpAmt)
+E(0,@ReceExpAmt,#L8r13ReceExpAmt)
+E(0,@CashCardAmt,#L8r13CashCardAmt)
+E(0,@Civil323CashAmt,#L8r13Civil323CashAmt)
+E(0,@ReceCashAmt,#L8r13ReceCashAmt)
+E(0,@CreditCardAmt,#L8r13CreditCardAmt)
+E(0,@Civil323CreditAmt,#L8r13Civil323CreditAmt)
+E(0,@ReceCreditAmt,#L8r13ReceCreditAmt)
+E(0,@ReceExpPrin,#L8r13ReceExpPrin)
+E(0,@ReceExpInte,#L8r13ReceExpInte)
+E(0,@ReceExpPena,#L8r13ReceExpPena)
+E(0,@ReceExpOther,#L8r13ReceExpOther)
+E(0,@CashCardPrin,#L8r13CashCardPrin)
+E(0,@CashCardInte,#L8r13CashCardInte)
+E(0,@CashCardPena,#L8r13CashCardPena)
+E(0,@CashCardOther,#L8r13CashCardOther)
+E(0,@CreditCardPrin,#L8r13CreditCardPrin)
+E(0,@CreditCardInte,#L8r13CreditCardInte)
+E(0,@CreditCardPena,#L8r13CreditCardPena)
+E(0,@CreditCardOther,#L8r13CreditCardOther)
+T(2,@OutJcicTxtDate,#L8r13OutJcicTxtDate)
+![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r13TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+! 調Rim相關 結束
+
+!---------- AP TEXT AREA Variables ----------
+![交易代碼]
+#TranKey_Tmp=X,1,S
+#TranKey=X,1,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#TranKeyHelp)
+@V(H,#TranKeyHelp)
+
+#TranKeyX=X,4,L
+
+![債務人IDN]
+#CustId=X,10,L
+
+
+
+![報送單位代號]
+#SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
+
+
+![協商申請日]
+#RcDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+D(8)
+@V(7)
+@A(DATE,0,#RcDate)
+
+
+![#RcDate+25日]
+#RcDateA25=D,8,S
+D(7,2,#RcDate,0,25)
+
+#RcDateA25X=D,7,S
+T(1,#RcDateA25,2,7)
+
+![最大債權金融機構代號]
+#MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@V(7)
+T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@MaxMainCodeX,#L8r01JcicBankName)
+
+#MaxMainCodeX=X,80,L
+
+![是否為本金融機構債務人]
+#IsClaims=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
+
+#CheckIsClaimsIsN=X,1,S
+IF(#IsClaims=="N",$,S)
+SHOW(#GuarLoanCntX,#ExpLoanAmtX,#Civil323ExpAmtX,#ReceExpAmtX,#CashCardAmtX,#Civil323CashAmtX,#ReceCashAmtX,#CreditCardAmtX,#Civil323CreditAmtX,#ReceCreditAmtX,#ReceExpPrinX,#ReceExpInteX,#ReceExpPenaX,#ReceExpOtherX,#CashCardPrinX,#CashCardInteX,#CashCardPenaX,#CashCardOtherX,#CreditCardPrinX,#CreditCardInteX,#CreditCardPenaX,#CreditCardOtherX)
+HIDE(#GuarLoanCnt,#ExpLoanAmt,#Civil323ExpAmt,#ReceExpAmt,#CashCardAmt,#Civil323CashAmt,#ReceCashAmt,#CreditCardAmt,#Civil323CreditAmt,#ReceCreditAmt,#ReceExpPrin,#ReceExpInte,#ReceExpPena,#ReceExpOther,#CashCardPrin,#CashCardInte,#CashCardPena,#CashCardOther,#CreditCardPrin,#CreditCardInte,#CreditCardPena,#CreditCardOther)
+
+#CheckIsClaimsIsY=X,1,S
+IF(#IsClaims=="Y",$,S)
+HIDE(#GuarLoanCntX,#ExpLoanAmtX,#Civil323ExpAmtX,#ReceExpAmtX,#CashCardAmtX,#Civil323CashAmtX,#ReceCashAmtX,#CreditCardAmtX,#Civil323CreditAmtX,#ReceCreditAmtX,#ReceExpPrinX,#ReceExpInteX,#ReceExpPenaX,#ReceExpOtherX,#CashCardPrinX,#CashCardInteX,#CashCardPenaX,#CashCardOtherX,#CreditCardPrinX,#CreditCardInteX,#CreditCardPenaX,#CreditCardOtherX)
+SHOW(#GuarLoanCnt,#ExpLoanAmt,#Civil323ExpAmt,#ReceExpAmt,#CashCardAmt,#Civil323CashAmt,#ReceCashAmt,#CreditCardAmt,#Civil323CreditAmt,#ReceCreditAmt,#ReceExpPrin,#ReceExpInte,#ReceExpPena,#ReceExpOther,#CashCardPrin,#CashCardInte,#CashCardPena,#CashCardOther,#CreditCardPrin,#CreditCardInte,#CreditCardPena,#CreditCardOther)
+
+
+![本金融機構有擔保債權筆數]
+#GuarLoanCnt=M,2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#GuarLoanCntX=X,2,L
+IF(#IsClaims!="",S,$)
+
+![信用貸款對內本息餘額]
+#ExpLoanAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#ExpLoanAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!依民法第323條計算之信用貸款本息餘額
+#Civil323ExpAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#Civil323ExpAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用貸款最近一期繳款金額
+#ReceExpAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#ReceExpAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!現金卡放款對內本息餘額
+#CashCardAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CashCardAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!依民法第323條計算之現金卡放款本息餘額
+#Civil323CashAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#Civil323CashAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!現金卡最近一期繳款金額
+#ReceCashAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#ReceCashAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用卡對內本息餘額
+#CreditCardAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CreditCardAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!依民法第323條計算之信用卡本息餘額
+#Civil323CreditAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#Civil323CreditAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用卡最近一期繳款金額
+#ReceCreditAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#ReceCreditAmtX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用貸款本金
+#ReceExpPrin=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#ReceExpPrinX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用貸款利息
+#ReceExpInte=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#ReceExpInteX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用貸款違約金
+#ReceExpPena=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#ReceExpPenaX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用貸款其他費用
+#ReceExpOther=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#ReceExpOtherX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!#IsClaims==Y 才需要檢核
+! 檢核 依民法第323條計算之信用貸款本息餘額!=信用貸款本金+信用貸款利息+信用貸款違約金+信用貸款其他費用
+!#Civil323ExpAmt!=#ReceExpPrin+#ReceExpInte+#ReceExpPena+#ReceExpOther
+! 依民法第323條計算之信用貸款本息餘額合計有誤，請重新輸入
+#SumReceExp=M,22,S
+IF(#IsClaims=="Y",$,s)
+E(3,#ReceExpPrin+#ReceExpInte+#ReceExpPena+#ReceExpOther)
+
+#CheckCivil323ExpAmt=M,9,S
+IF(#IsClaims=="Y",$,s)
+E(3,#SumReceExp-#Civil323ExpAmt)
+C(1,#CheckCivil323ExpAmt,$,s,$)
+V(P,依民法第323條計算之信用貸款本息餘額合計有誤，請重新輸入[依民法第323條計算之信用貸款本息餘額!=信用貸款本金+信用貸款利息+信用貸款違約金+信用貸款其他費用])
+
+!現金卡本金
+#CashCardPrin=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CashCardPrinX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!現金卡利息
+#CashCardInte=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CashCardInteX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!現金卡違約金
+#CashCardPena=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CashCardPenaX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!現金卡其他費用
+#CashCardOther=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CashCardOtherX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!#IsClaims==Y 才需要檢核
+! 檢核 依民法第323條計算之現金卡放款本息餘額!=現金卡本金+現金卡利息+現金卡違約金+現金卡其他費用
+!#Civil323CashAmt!=#CashCardPrin+#CashCardInte+#CashCardPena+#CashCardOther
+! 依民法第323條計算之現金卡放款本息餘額合計有誤，請重新輸入
+#SumCashCard=M,22,S
+IF(#IsClaims=="Y",$,s)
+E(3,#CashCardPrin+#CashCardInte+#CashCardPena+#CashCardOther)
+
+#CheckCivil323CashAmt=M,9,S
+IF(#IsClaims=="Y",$,s)
+E(3,#SumCashCard-#Civil323CashAmt)
+C(1,#CheckCivil323CashAmt,$,s,$)
+V(P,依民法第323條計算之現金卡放款本息餘額合計有誤，請重新輸入[依民法第323條計算之現金卡放款本息餘額!=現金卡本金+現金卡利息+現金卡違約金+現金卡其他費用])
+
+!信用卡本金
+#CreditCardPrin=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CreditCardPrinX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用卡利息
+#CreditCardInte=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CreditCardInteX=X,9,L
+IF(#IsClaims!="",S,$)
+
+!信用卡違約金
+#CreditCardPena=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CreditCardPenaX=X,9,L
+IF(#IsClaims!="",S,$)
+
+
+!信用卡其他費用
+#CreditCardOther=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#IsClaims=="N",s,$)
+
+#CreditCardOtherX=X,9,L
+IF(#IsClaims!="",S,$)
+
+
+!#IsClaims==Y 才需要檢核
+! 檢核 依民法第323條計算之信用卡本息餘額!=信用卡本金+信用卡利息+信用卡違約金+信用卡其他費用
+!#Civil323CreditAmt!=#CreditCardPrin+#CreditCardInte+#CreditCardPena+#CreditCardOther
+! 依民法第323條計算之信用卡本息餘額合計有誤，請重新輸入
+#SumCreditCard=M,22,S
+IF(#IsClaims=="Y",$,s)
+E(3,#CreditCardPrin+#CreditCardInte+#CreditCardPena+#CreditCardOther)
+
+#CheckCivil323CreditAmt=M,9,S
+IF(#IsClaims=="Y",$,s)
+E(3,#SumCreditCard-#Civil323CreditAmt)
+C(1,#CheckCivil323CreditAmt,$,s,$)
+V(P,依民法第323條計算之信用卡本息餘額合計有誤，請重新輸入[依民法第323條計算之信用卡本息餘額!=信用卡本金+信用卡利息+信用卡違約金+信用卡其他費用])
+
+![本金融機構有擔保債權筆數==0 #GuarLoanCnt==0]
+! (10)信用貸款對內本息餘額 #ExpLoanAmt
+! (11)依民法第323條計算之信用貸款本息餘額 #Civil323ExpAmt
+! (13)現金卡放款對內本息餘額 #CashCardAmt
+! (14)依民法第323條計算之現金卡放款本息餘額 #Civil323CashAmt
+! (16)信用卡對內本息餘額 #CreditCardAmt
+! (17)依民法第323條計算之信用卡本息餘額 #Civil323CreditAmt
+#SumAmt=M,22,S
+IF(#GuarLoanCnt==0,$,S)
+E(3,#ExpLoanAmt+#Civil323ExpAmt+#CashCardAmt+#Civil323CashAmt+#CreditCardAmt+#Civil323CreditAmt)
+
+![IF(#GuarLoanCnt==0 && #IsClaims=="Y")=>#SumAmt>0]
+#CheckGuarLoanCntY=X,1,S
+IF(#GuarLoanCnt==0 && #IsClaims=="Y",$,S)
+C(1,#SumAmt,$,$,s)
+V(P,[信用貸款對內本息餘額+依民法第323條計算之信用貸款本息餘額+現金卡放款對內本息餘額+依民法第323條計算之現金卡放款本息餘額+信用卡對內本息餘額+依民法第323條計算之信用卡本息餘額]要大於0)
+
+!本條不須檢核 因為 #IsClaims=="N" 時 會自動把以下欄位通通塞0
+! ![IF(#GuarLoanCnt==0 && #IsClaims=="N")=>#SumAmt==0]
+! #CheckGuarLoanCntN=X,1,S
+! IF(#GuarLoanCnt==0 && #IsClaims=="N",$,S)
+! C(1,#SumAmt,$,s,$)
+! V(P,[信用貸款對內本息餘額+依民法第323條計算之信用貸款本息餘額+現金卡放款對內本息餘額+依民法第323條計算之現金卡放款本息餘額+信用卡對內本息餘額+依民法第323條計算之信用卡本息餘額]!=0)
+
+![轉JCIC文字檔日期]
+#OutJcicTxtDate=D,7,L
+
+! 流水號
+#Ukey=X,32,S
+
+! D(8)
+![Claims==Y 顯示用的關係要把舊的直全部塞0]
+![注意 JAVA 那裡也有做處理 避免前端尚未修改的話]
+#CheckIsClaimsN=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@IF(#IsClaims=="N",$,S)
+E(0,@GuarLoanCnt,0)
+E(0,@ExpLoanAmt,0)
+E(0,@Civil323ExpAmt,0)
+E(0,@ReceExpAmt,0)
+E(0,@CashCardAmt,0)
+E(0,@Civil323CashAmt,0)
+E(0,@ReceCashAmt,0)
+E(0,@CreditCardAmt,0)
+E(0,@Civil323CreditAmt,0)
+E(0,@ReceCreditAmt,0)
+E(0,@ReceExpPrin,0)
+E(0,@ReceExpInte,0)
+E(0,@ReceExpPena,0)
+E(0,@ReceExpOther,0)
+E(0,@CashCardPrin,0)
+E(0,@CashCardInte,0)
+E(0,@CashCardPena,0)
+E(0,@CashCardOther,0)
+E(0,@CreditCardPrin,0)
+E(0,@CreditCardInte,0)
+E(0,@CreditCardPena,0)
+E(0,@CreditCardOther,0)
+
+! @IF(#OutJcicTxtDate>#RcDateA25X,$,s)
+! V(P,報送日期大於協商申請日+25日)
+
+![列印用系統變數]
+#RPTFG=X,1,S
+E(0,0)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L8303 ----------
+<sub type="FORM" name="L8303">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L8303,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8303] 回報無擔保債權金額資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranKey_Tmp
+#TranKey
+#SubmitKey
+#CustId
+#RcDate
+#MaxMainCode
+#IsClaims
+#GuarLoanCnt
+#ExpLoanAmt
+#Civil323ExpAmt
+#ReceExpAmt
+#CashCardAmt
+#Civil323CashAmt
+#ReceCashAmt
+#CreditCardAmt
+#Civil323CreditAmt
+#ReceCreditAmt
+#ReceExpPrin
+#ReceExpInte
+#ReceExpPena
+#ReceExpOther
+#CashCardPrin
+#CashCardInte
+#CashCardPena
+#CashCardOther
+#CreditCardPrin
+#CreditCardInte
+#CreditCardPena
+#CreditCardOther
+#OutJcicTxtDate
+#Ukey
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8303^
+
+! 調Rim相關 開始
+<include src="ROM.icf::L8R01.tom"/>
+<include src="ROM.icf::L8R13.tom"/>
+! 調Rim相關 結束
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L8303" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L8303]                                 回報無擔保債權金額資料"],
+[#<->#,"案件編號"],
+[#<->#,"統一編號"],
+["借款人戶號"],
+["核准編號"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

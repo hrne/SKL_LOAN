@@ -71,7 +71,7 @@ public class CustMain implements Serializable {
   @Column(name = "`IndustryCode`", length = 6)
   private String industryCode;
 
-  // 國籍
+  // 自然人:出生地國籍/法人:註冊地國籍
   /* 國籍對照檔 */
   @Column(name = "`NationalityCode`", length = 2)
   private String nationalityCode;
@@ -517,7 +517,7 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 國籍<br>
+	* 自然人:出生地國籍/法人:註冊地國籍<br>
 	* 國籍對照檔
 	* @return String
 	*/
@@ -526,10 +526,10 @@ public class CustMain implements Serializable {
   }
 
 /**
-	* 國籍<br>
+	* 自然人:出生地國籍/法人:註冊地國籍<br>
 	* 國籍對照檔
   *
-  * @param nationalityCode 國籍
+  * @param nationalityCode 自然人:出生地國籍/法人:註冊地國籍
 	*/
   public void setNationalityCode(String nationalityCode) {
     this.nationalityCode = nationalityCode;

@@ -37,7 +37,6 @@ import com.st1.itx.db.service.CdCodeService;
  */
 
 public class L6064 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6064.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -55,7 +54,7 @@ public class L6064 extends TradeBuffer {
 		String iDefType = titaVo.getParam("DefType");
 		String iDefCode = titaVo.getParam("DefCode").trim();
 		String iCode = titaVo.getParam("Code");
-
+		String iCodeItem = titaVo.getParam("CodeItem");
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -63,11 +62,15 @@ public class L6064 extends TradeBuffer {
 		this.limit = 200; // 217 * 200 = 43400
 
 		Slice<CdCode> slCdCode = null;
-		if (iDefCode.length()>0 || iDefType.equals("")) {
-			slCdCode = sCdCodeDefService.defCodeEq(iDefCode, iCode + "%", this.index, this.limit, titaVo);
+		if (iDefCode.length() > 0 || iDefType.equals("")) {
+			if(("").equals(iCode)) {
+				slCdCode = sCdCodeDefService.defItemEq(iDefCode, iCodeItem + "%", index, limit, titaVo);
+			} else {				
+				slCdCode = sCdCodeDefService.defCodeEq(iDefCode, iCode + "%", this.index, this.limit, titaVo);
+			}
 		} else {
 			int iDefType9 = Integer.parseInt(iDefType);
-			slCdCode = sCdCodeDefService.DefTypeEq("CodeType", iDefType9, iCode + "%", this.index, this.limit, titaVo);
+			slCdCode = sCdCodeDefService.DefTypeEq("CodeType", iDefType9, iCode + "%",iCodeItem + "%", this.index, this.limit, titaVo);
 		}
 		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
 

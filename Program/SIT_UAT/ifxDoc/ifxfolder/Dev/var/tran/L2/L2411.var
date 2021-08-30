@@ -1297,15 +1297,15 @@ E(0,@RimClNo,#ClNo)
 E(0,@RimFunCd,#FunCd)
 T(2,@RimCustId,#OwnerId{i})
 RESET_RIM(#RimL2r43{i},L2R43)
-S(L2R43,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd,#RimCustId,#CityCode,#AreaCode,#Road,#Section,#Alley,#Lane,#Num,#NumDash,#Floor,#FloorDash,#BdNo1,#BdNo2,#LandLocation)
+S(L2R43,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd,#RimCustId,#CityCode,#AreaCode,#IrCode,#BdNo1,#BdNo2,#CityCodeB,#AreaCodeB,#IrCodeB,#LandNo1,#LandNo2)
 R(1,L2R43)
 
 
 #CheckClno{i}=x,70,S
-C(3,#ClCode1,1,T(B,#clcode1txt1+#L2r43ClNo+#clcode1txt2),
-               T(B,#clcode2txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2))
-!C(3,#ClCode1,1,T(B,#clcode1txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2),
+!C(3,#ClCode1,1,T(B,#clcode1txt1+#L2r43ClNo+#clcode1txt2),
 !               T(B,#clcode2txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2))
+C(3,#ClCode1,1,T(B,#clcode1txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2),
+               T(B,#clcode2txt1+#ClCode1+#Dash+#ClCode2+#Dash+#L2r43ClNo+#clcode1txt2))
 
 #CheckL2R43{i}=X,1,S
 C(4,#OwnerId{i},S,$)

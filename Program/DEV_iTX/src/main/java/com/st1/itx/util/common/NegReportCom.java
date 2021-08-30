@@ -338,7 +338,6 @@ public class NegReportCom extends CommBuffer {
 		// int Today = dateUtil.getNowIntegerForBC();
 		int Today = titaVo.getOrgEntdyI();// 會計日期
 		StringBuffer sbBatchTx03 = new StringBuffer();
-		// 讀檔案-寫入Trans
 		int DataLength[] = { 8, 14, 8 };
 		File file = new File(FilePath);
 //		List<String[]> lDetailData = new ArrayList<String[]>();// 明細表資料
@@ -801,8 +800,8 @@ public class NegReportCom extends CommBuffer {
 
 				tNegApprOrg = tNegAppr;
 				if (tNegAppr != null) {
-					this.info("tNegAppr.getExportDate()=[" + tNegAppr.getExportDate() + "] , String.valueOf(tNegAppr.getExportDate()).length()=[" + String.valueOf(tNegAppr.getExportDate()).length()
-							+ "]");
+					//this.info("tNegAppr.getExportDate()=[" + tNegAppr.getExportDate() + "] , String.valueOf(tNegAppr.getExportDate()).length()=[" + String.valueOf(tNegAppr.getExportDate()).length()
+					//		+ "]");
 					this.info("CheckNegArrp IntDate=[" + IntDateRoc + "]" + ",[製檔 " + tNegAppr.getExportMark() + "," + tNegAppr.getExportDate() + "]" + ",[傳票 " + tNegAppr.getApprAcMark() + ","
 							+ tNegAppr.getApprAcDate() + "]" + ",[提兌 " + tNegAppr.getBringUpMark() + "," + tNegAppr.getBringUpDate() + "]");
 					if (Status == 1) {
@@ -1280,6 +1279,9 @@ public class NegReportCom extends CommBuffer {
 							case "02960":
 								// 還款狀況-0:正常,1:溢繳,2:短繳,3:大額還本,4:結清
 								Detail16 = tNegTrans.getTxKind();// tNegTrans-交易別
+								if (("5").equals(Detail16)) {//tNegTrans-交易別=5:提前清償
+									Detail16 = "4";
+								}
 								break;
 							case "02970":
 								// 還款狀況-0:正常,1:溢繳,2:短繳,3:大額還本,4:結清
@@ -1387,7 +1389,7 @@ public class NegReportCom extends CommBuffer {
 					String Head5 = TransAccCode;
 					Head5 = LRFormat(Head5, 5, "R", "0");
 
-					this.info("BatchTx01 Head1=[" + Head1 + "],Head2=[" + Head2 + "],Head3=[" + Head3 + "],Head4=[" + Head4 + "],Head5=[" + Head5 + "]");
+					//this.info("BatchTx01 Head1=[" + Head1 + "],Head2=[" + Head2 + "],Head3=[" + Head3 + "],Head4=[" + Head4 + "],Head5=[" + Head5 + "]");
 
 					// 性質別
 					String Head6 = "1";
@@ -1398,7 +1400,7 @@ public class NegReportCom extends CommBuffer {
 					// 保留欄
 					String Head8 = LRFormat("", 168, "R", " ");
 					Same2To5 = Head2 + Head3 + Head4 + Head5;
-					this.info("BatchTx01 Same2To5=[" + Same2To5 + "]");
+					//this.info("BatchTx01 Same2To5=[" + Same2To5 + "]");
 
 					sbHead.append(Head1);
 					sbHead.append(Same2To5);
@@ -1736,7 +1738,7 @@ public class NegReportCom extends CommBuffer {
 	}
 
 	/**
-	 * LRFormat 字串隊齊
+	 * LRFormat 字串對齊
 	 * 
 	 * @param str         原始的字串
 	 * @param TotalLength 字串總長度

@@ -36,7 +36,7 @@ public interface CdCodeService {
   public Slice<CdCode> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * DefCode = ,AND Code %
+   * DefCode = ,AND Code % 
    *
    * @param defCode_0 defCode_0
    * @param code_1 code_1
@@ -61,17 +61,18 @@ public interface CdCodeService {
   public Slice<CdCode> defCodeEq2(String defCode_0, int defType_1, String code_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * DefCode &lt;&gt; ,AND DefType = ,AND Code %
+   * DefCode &lt;&gt; ,AND DefType = ,AND Code %, AND Item %
    *
    * @param defCode_0 defCode_0
    * @param defType_1 defType_1
    * @param code_2 code_2
+   * @param item_3 item_3
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice CdCode CdCode of List
    */
-  public Slice<CdCode> DefTypeEq(String defCode_0, int defType_1, String code_2, int index, int limit, TitaVo... titaVo);
+  public Slice<CdCode> DefTypeEq(String defCode_0, int defType_1, String code_2, String item_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * DefType = 
@@ -119,6 +120,18 @@ public interface CdCodeService {
    * @return Slice CdCode CdCode of List
    */
   public Slice<CdCode> getCodeList2(int defType_0, String defCode_1, List<String> code_2, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * DefCode = ,AND Item %
+   *
+   * @param defCode_0 defCode_0
+   * @param item_1 item_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdCode CdCode of List
+   */
+  public Slice<CdCode> defItemEq(String defCode_0, String item_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By CdCode

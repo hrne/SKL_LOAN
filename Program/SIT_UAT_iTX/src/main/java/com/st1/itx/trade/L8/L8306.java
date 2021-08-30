@@ -77,11 +77,11 @@ public class L8306 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		
 		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey=titaVo.getParam("TranKey").trim(); //交易代碼
-		String iCustId=titaVo.getParam("CustId").trim();//債務人IDN
-		String iSubmitKey=titaVo.getParam("SubmitKey").trim();//報送單位代號
+		String iTranKey=titaVo.getParam("TranKey"); //交易代碼
+		String iCustId=titaVo.getParam("CustId");//債務人IDN
+		String iSubmitKey=titaVo.getParam("SubmitKey");//報送單位代號
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		String iMaxMainCode=titaVo.getParam("MaxMainCode").trim();
+		String iMaxMainCode=titaVo.getParam("MaxMainCode");
 		String iAgreeCode = String.valueOf(titaVo.getParam("AgreeCode"));
 
 

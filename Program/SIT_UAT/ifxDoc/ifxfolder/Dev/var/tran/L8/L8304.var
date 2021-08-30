@@ -38,7 +38,7 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[150,350,150,350];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8304]                                 (43)回報有擔保債權金額資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
@@ -86,9 +86,9 @@ E(0,1)ASGN(AGAIN$)
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
-#CDDEF0002=x,20,S
+#CDDEF0002=x,25,S
 T(3,CdCode.CollateralType)
-#CollateralTypeHelp=x,2048,S
+#CollateralTypeHelp=x,10000,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -108,12 +108,14 @@ T(F,@OutstandAmt,0)T(F,@RepayPerMonDay,0)T(F,@ContractStartYM,0)T(F,@ContractEnd
 C(3,#CHAIN,1,$,S)
 E(0,1)
 ASGN(CAUTO$)
+
 ![連動交易]
 #NTXBUF=X,138,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@TranKey_Tmp,#NTXBUF,1,1)
 T(1,@TranKey,#NTXBUF,2,1)
 ! 連動傳值處理
+
 ! 新增進入
 #Deal_New=X,1,S
 C(5,#TranKey_Tmp,1,$,S)
@@ -124,144 +126,153 @@ T(F,@RcDate,1)T(F,@MaxMainCode,1)T(F,@Account,1)T(F,@CollateralType,1)T(F,@Origi
 T(F,@CreditBalance,1)T(F,@PerPeriordAmt,1)T(F,@LastPayAmt,1)T(F,@LastPayDate,1)
 T(F,@OutstandAmt,1)T(F,@RepayPerMonDay,1)T(F,@ContractStartYM,1)T(F,@ContractEndYM,1)
 K(MODIFYBUTTON,新增)
-T(2,@FdApplyDate,*)
-T(2,@FdModifyType,*)
-T(2,@FdBankId,*)
+T(2,@FdRcDate,*)
+T(2,@FdMaxMainCode,*)
+T(2,@FdAccount,*)
+T(2,@FdCollateralType,*)
+T(2,@FdOriginLoanAmt,*)
+T(2,@FdCreditBalance,*)
+T(2,@FdPerPeriordAmt,*)
+T(2,@FdLastPayAmt,*)
+T(2,@FdLastPayDate,*)
+T(2,@FdOutstandAmt,*)
+T(2,@FdRepayPerMonDay,*)
+T(2,@FdContractStartYM,*)
+T(2,@FdContractEndYM,*)
+
+! 異動進入
+#Deal_Update=X,1,S
+C(5,#TranKey_Tmp,2,$,S)
+T(F,@TranKey,1)T(F,@CollateralType,1)T(F,@OriginLoanAmt,1)
+T(F,@CreditBalance,1)T(F,@PerPeriordAmt,1)T(F,@LastPayAmt,1)T(F,@LastPayDate,1)
+T(F,@OutstandAmt,1)T(F,@RepayPerMonDay,1)T(F,@ContractStartYM,1)T(F,@ContractEndYM,1)
+T(1,@Ukey,#NTXBUF,3,32)
+T(2,@FdCollateralType,*)
+T(2,@FdOriginLoanAmt,*)
+T(2,@FdCreditBalance,*)
+T(2,@FdPerPeriordAmt,*)
+T(2,@FdLastPayAmt,*)
+T(2,@FdLastPayDate,*)
+T(2,@FdOutstandAmt,*)
+T(2,@FdRepayPerMonDay,*)
+T(2,@FdContractStartYM,*)
+T(2,@FdContractEndYM,*)
+T(3,@TranKeyHelp,C:異動;D:刪除))
 
 
-![隱藏原本的傳輸按鈕]
-#HideSubmitButton=X,1,S
-IF(#FunctionCd=="05",$,S)
+! 查詢進入
+#Deal_Search=X,1,S
+C(5,#TranKey_Tmp,5,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
 K(NOBUTTON,CLOSEY)
-
-! [刪除]須把SUMITBUTTON改成刪除
-#DeleteSubmitButton=X,1,S
-IF(#FunctionCd=="04",$,S)
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,刪除)
 
-! [調Rim相關]
-! 定義Rom欄位名稱、型態、長度
-<include src="ROM.icf::L8R13.dec"/>
-
-! 宣告Rim欲傳送的欄位1
-! 欄位名稱即為後端在titaVo get值時的KEY
-! 要注意欄為型態跟長度
-#RimCustId=X,10,S
-! 宣告Rim欲傳送的欄位2
-#RimRcDate=D,7,S
-! 宣告Rim欲傳送的欄位3
-#RimSubmitKey=X,3,S
-! 宣告Rim欲傳送的欄位4
-#RimMaxMainCode=X,10,S
-
-#RimAccount=X,50,S
-! Rim L8R13.java
-! RESET_RIM() 用意參考var function  每次調RIM->RESET_RIM(#RIM_L8r13,L8R13)
-! S() 為送出資料
-! 參數1為此Rim的交易代號
-! 參數2為將收到的值切成幾筆
-! 參數3及其後皆為tita欄位
-! R() 為收到的電文轉入欄位
-! 參數1，為 0 時，不顯示；為 1 時，顯示。
-! 參數2，交易代號，在本交易的電文區要寫TXFROM
-! RESET_RIM(#RimL8r13,L8R13) !是否每次都需要重複調RIM
-#RimL8r13=X,1,S
-IF(#CHAIN==1,$,S)
-C(4,#CustId,S,$)
-C(4,#RcDate,S,IF(#RcDate!=0,$,S))
-C(4,#SubmitKey,S,$)
-C(4,#Account,S,$)
-T(2,@RimCustId,#CustId)
-E(0,@RimRcDate,#RcDate)
-T(2,@RimSubmitKey,#SubmitKey)
-T(2,@RimMaxMainCode,#MaxMainCode)
-T(2,@RimAccount,#Account)
-RESET_RIM(#RimL8r13,L8R13)
-S(L8R13,1,#RimCustId,#RimRcDate,#RimSubmitKey,#RimMaxMainCode,#RimAccount)
-R(1,L8R13)
-T(2,@TranKey,#L8r13TranKey)
-T(2,@CustId,#L8r13CustId)
-T(2,@SubmitKey,#L8r13SubmitKey)
-T(2,@SubmitKeyX,#L8r13SubmitKeyX)
-E(0,@RcDate,#L8r13RcDate)
-T(2,@MaxMainCode,#L8r13MaxMainCode)
-T(2,@MaxMainCodeX,#L8r13MaxMainCodeX)
-T(2,@Account,#L8r13Account)
-T(2,@CollateralType,#L8r13CollateralType)
-E(0,@OriginLoanAmt,#L8r13OriginLoanAmt)
-E(0,@CreditBalance,#L8r13CreditBalance)
-E(0,@PerPeriordAmt,#L8r13PerPeriordAmt)
-E(0,@LastPayAmt,#L8r13LastPayAmt)
-E(0,@LastPayDate,#L8r13LastPayDate)
-E(0,@OutstandAmt,#L8r13OutstandAmt)
-E(0,@RepayPerMonDay,#L8r13RepayPerMonDay)
-E(0,@ContractStartYM,#L8r13ContractStartYM)
-E(0,@ContractEndYM,#L8r13ContractEndYM)
-E(0,@OutJcicTxtDate,#L8r13OutJcicTxtDate)
-T(2,@CheckRim,1)
-![下拉選單的值]
-T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(H,@CollateralTypeX,#CollateralType,#CollateralTypeHelp)
-! T(A,@TranKeyX,#TranKey,L8DEF,TranKeyDef,TranKey,TranKeyX)
-! T(A,@CollateralTypeX,#CollateralType,L8DEF,CollateralTypeDef,CollateralType,CollateralTypeX)
-! 調Rim相關 結束
-
-! 檢查RIM有沒有跑,沒跑就要丟預設值
-! 新增這邊的資料會蓋過,從L8030來的資料
-#CheckRim=X,1,S
-IF(#CheckRim!=1,$,S)
-T(3,@TranKey,A)
+! 預設值
+#Default=X,1,S
 T(2,@SubmitKey,458)
-IF(#RcDate!=0,$,E(0,@RcDate,#VIEW_SYSDATE))
-
-#TranKeyIsC=X,1,S
-IF(#CHAIN==1,$,S)
-IF(#TranKey!="A",$,S)
-HIDE(#CustId,#SubmitKey,#RcDate,#MaxMainCode,#Account)
-
-! 是否跳過, FunctionCd=04:刪除-實際刪除,05:查詢 時可以直接跳過輸入的部分
-#CheckSkip=X,1,S
-IF(#FunctionCd=="04" || #FunctionCd=="05",T(3,1),T(3,0))
-
-![交易代碼]
-#TranKey=X,1,I
-IF(#FunctionCd=="01",s,$)
-IF(#CheckSkip==1,s,$)
-HELP(#TranKeyHelp)
-@V(H,#TranKeyHelp)
-
-#TranKeyX=X,4,L
-T(H,#TranKey,#TranKeyHelp)
-IF(#FunctionCd!="01" && #TranKey=="A",$,s)
-V(P,此案件已建檔，交易代碼不可選擇新增，請重新選擇交易代碼)
-
-![債務人IDN]
-#CustId=X,10,I
-IF(#FunctionCd=="02",s,$)
-IF(#CheckSkip==1,s,$)
-@V(7)
-A(ID_UNINO,0,#CustId)
-
-
-![報送單位代號]
 #RimJcicBankCode=X,3,S
-#SubmitKey=X,3,I
-IF(#CheckSkip==1,s,$)
-IF(#FunctionCd=="02",s,$)
-@V(7)
-IF(#SubmitKey!="",$,s)
+#RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L8R14.dec"/>
+
+#RimUkey=X,32,S
+#RimL8r14=X,1,S
+C(5,#TranKey,A,S,$)
+T(2,@RimUkey,#Ukey)
+RESET_RIM(#RimL8r14,L8R14)
+S(L8R14,1,#RimUkey)
+R(1,L8R14)
+T(2,@TranKey,#L8r14TranKey)
+T(2,@CustId,#L8r14CustId)
+T(2,@SubmitKey,#L8r14SubmitKey)
+E(0,@RcDate,#L8r14RcDate)
+T(2,@MaxMainCode,#L8r14MaxMainCode)
+T(2,@Account,#L8r14Account)
+T(2,@CollateralType,#L8r14CollateralType)
+E(0,@OriginLoanAmt,#L8r14OriginLoanAmt)
+E(0,@CreditBalance,#L8r14CreditBalance)
+E(0,@PerPeriordAmt,#L8r14PerPeriordAmt)
+E(0,@LastPayAmt,#L8r14LastPayAmt)
+E(0,@LastPayDate,#L8r14LastPayDate)
+E(0,@OutstandAmt,#L8r14OutstandAmt)
+E(0,@RepayPerMonDay,#L8r14RepayPerMonDay)
+E(0,@ContractStartYM,#L8r14ContractStartYM)
+E(0,@ContractEndYM,#L8r14ContractEndYM)
+E(0,@OutJcicTxtDate,#L8r14OutJcicTxtDate)
+![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(H,@CollateralTypeX,#CollateralType,#CollateralTypeHelp)
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r14TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@MaxMainCodeX,#L8r01JcicBankName)
+! 調Rim相關 結束
+
+
+
+![交易代碼]
+#TranKey_Tmp=X,1,S
+#TranKey=X,1,I
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#TranKeyHelp)
+@V(H,#TranKeyHelp)
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)
+T(F,@CollateralType,1)
+T(F,@OriginLoanAmt,1)
+T(F,@CreditBalance,1)T(F,@PerPeriordAmt,1)T(F,@LastPayAmt,1)T(F,@LastPayDate,1)
+T(F,@OutstandAmt,1)T(F,@RepayPerMonDay,1)T(F,@ContractStartYM,1)T(F,@ContractEndYM,1)
+T(2,@FdCollateralType,*)
+T(2,@FdOriginLoanAmt,*)T(2,@FdCreditBalance,*)T(2,@FdPerPeriordAmt,*)T(2,@FdLastPayAmt,*)
+T(2,@FdLastPayDate,*)T(2,@FdOutstandAmt,*)T(2,@FdRepayPerMonDay,*)T(2,@FdContractStartYM,*)T(2,@FdContractEndYM,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)
+T(F,@CollateralType,0)
+T(F,@OriginLoanAmt,0)
+T(F,@CreditBalance,0)T(F,@PerPeriordAmt,0)T(F,@LastPayAmt,0)T(F,@LastPayDate,0)
+T(F,@OutstandAmt,0)T(F,@RepayPerMonDay,0)T(F,@ContractStartYM,0)T(F,@ContractEndYM,0)
+T(2,@FdCollateralType, )
+T(2,@FdOriginLoanAmt, )T(2,@FdCreditBalance, )T(2,@FdPerPeriordAmt, )T(2,@FdLastPayAmt, )
+T(2,@FdLastPayDate, )T(2,@FdOutstandAmt, )T(2,@FdRepayPerMonDay, )T(2,@FdContractStartYM, )T(2,@FdContractEndYM, ),$))
+
+#TranKeyX=X,4,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+T(H,#TranKey,#TranKeyHelp)
+
+![債務人IDN]
+#CustId=X,10,L
+
+
+
+![報送單位代號]
+#SubmitKey=X,3,L
 
 #SubmitKeyX=X,80,L
 
 
 ![協商申請日]
 #RcDate=D,7,I
-IF(#FunctionCd=="02",s,$)
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)
 @A(DATE,0,#RcDate)
@@ -275,9 +286,12 @@ T(1,#RcDateA25,2,7)
 
 ![最大債權金融機構代號]
 #MaxMainCode=X,3,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 @V(7)
 T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
@@ -287,67 +301,87 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 ![帳號]
 #Account=X,50,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 @V(7)
+V(8,0,50)
 
 
 
 ![擔保品類別]
 #CollateralType=X,2,I
-IF(#CheckSkip==1,s,$)
-HELP(#CollateralTypeHelp,cols:5)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CollateralType,#L8r14CollateralType),$)
+C(5,#TranKey,D,s,$)
+HELP(#CollateralTypeHelp)
 @V(H,#CollateralTypeHelp)
 
 #CheckCollateralType=X,1,S
-IF(#CollateralType=="00" || #CollateralType=="01" || #CollateralType=="02" || #CollateralType=="03" || #CollateralType=="04" || #CollateralType=="05" || #CollateralType=="06" || #CollateralType=="07" || #CollateralType=="08" || #CollateralType=="09" ,$,S)
-V(P,擔保品類別不可介於00～09)
+! IF(#CollateralType=="00" || #CollateralType=="01" || #CollateralType=="02" || #CollateralType=="03" || #CollateralType=="04" || #CollateralType=="05" || #CollateralType=="06" || #CollateralType=="07" || #CollateralType=="08" || #CollateralType=="09" ,$,S)
+! V(P,擔保品類別不可介於00～09)
 
-! HELP(L8DEF,CollateralTypeDef,CollateralType,CollateralTypeX,cols:5)
-! @V(E,0,L8DEF,CollateralTypeDef)
+
 
 #CollateralTypeX=X,50,L
-T(H,@CollateralTypeX,#CollateralType,#CollateralTypeHelp)
-! T(A,#CollateralType,L8DEF,CollateralTypeDef,CollateralType,CollateralTypeX)
+T(H,#CollateralType,#CollateralTypeHelp)
+
 
 ![原借款金額]
 #OriginLoanAmt=M,12,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(9)
 
 ![授信餘額]
 #CreditBalance=M,12,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(9)
 
 ![每期應付金額]
 #PerPeriordAmt=M,10,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(9)
 
 ![最近一期繳款金額]
 #LastPayAmt=M,10,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(9)
 
 ![最後繳息日]
 #LastPayDate=D,7,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#LastPayDate)
 
 ![已到期尚未清償金額]
 #OutstandAmt=M,10,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(9)
 
 ![每月應還款日]
 #RepayPerMonDay=M,2,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(5,1,31)
 
 ![契約起始年月]
 #ContractStartYM=A,5,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 
 #CheckContractStartYM=D,7,S
 T(2,#ContractStartYM+01)
@@ -355,7 +389,9 @@ T(2,#ContractStartYM+01)
 
 ![契約截止年月]
 #ContractEndYM=A,5,I
-IF(#CheckSkip==1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 
 #CheckContractEndYM=D,7,S
 T(2,#ContractEndYM+01)
@@ -366,13 +402,11 @@ IF(#ContractEndYM>=#ContractStartYM,S,$)
 V(P,契約起始年月不得大於截止年月)
 
 ![轉JCIC文字檔日期]
-#OutJcicTxtDate=D,7,I
-IF(#CheckSkip==1,s,$)
-D(8)
-@A(DATE,0,#OutJcicTxtDate)
-! D(8)
-! @IF(#OutJcicTxtDate>#RcDateA25X,$,s)
-! V(P,報送日期大於協商申請日+25日)
+#OutJcicTxtDate=D,7,L
+
+
+! 流水號
+#Ukey=X,32,S
 
 ! !<儲存>
 ! #BUF1=X,10,S
@@ -410,7 +444,7 @@ T(3,[L8304] 回報有擔保債權金額資料)
 
 !------ 上行電文 ------
 <sub type="TIM">
-#FunctionCd
+#TranKey_Tmp
 #TranKey
 #CustId
 #SubmitKey
@@ -428,6 +462,7 @@ T(3,[L8304] 回報有擔保債權金額資料)
 #ContractStartYM
 #ContractEndYM
 #OutJcicTxtDate
+#Ukey
 </sub>
 
 
@@ -436,7 +471,7 @@ T(3,[L8304] 回報有擔保債權金額資料)
 TXFORM=L8304^
 ! 調Rim相關 開始
 <include src="ROM.icf::L8R01.tom"/>
-<include src="ROM.icf::L8R13.tom"/>
+<include src="ROM.icf::L8R14.tom"/>
 ! 調Rim相關 結束
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

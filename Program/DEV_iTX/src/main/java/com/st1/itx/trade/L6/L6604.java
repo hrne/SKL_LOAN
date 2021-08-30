@@ -35,7 +35,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6604 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6604.class);
 
 	/* DB服務注入 */
 	@Autowired

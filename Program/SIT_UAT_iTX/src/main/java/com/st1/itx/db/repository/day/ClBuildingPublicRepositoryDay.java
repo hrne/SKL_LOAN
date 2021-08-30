@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,18 @@ import com.st1.itx.db.domain.ClBuildingPublicId;
  */
 public interface ClBuildingPublicRepositoryDay extends JpaRepository<ClBuildingPublic, ClBuildingPublicId> {
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
-  public Slice<ClBuildingPublic> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
+	// ClCode1 = ,AND ClCode2 = ,AND ClNo =
+	public Slice<ClBuildingPublic> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // PublicBdNo1 = 
-  public Slice<ClBuildingPublic> findAllByPublicBdNo1Is(int publicBdNo1_0, Pageable pageable);
+	// PublicBdNo1 =
+	public Slice<ClBuildingPublic> findAllByPublicBdNo1Is(int publicBdNo1_0, Pageable pageable);
 
-  // PublicBdNo1 = ,AND PublicBdNo2 = 
-  public Slice<ClBuildingPublic> findAllByPublicBdNo1IsAndPublicBdNo2Is(int publicBdNo1_0, int publicBdNo2_1, Pageable pageable);
+	// PublicBdNo1 = ,AND PublicBdNo2 =
+	public Slice<ClBuildingPublic> findAllByPublicBdNo1IsAndPublicBdNo2Is(int publicBdNo1_0, int publicBdNo2_1, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<ClBuildingPublic> findByClBuildingPublicId(ClBuildingPublicId clBuildingPublicId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<ClBuildingPublic> findByClBuildingPublicId(ClBuildingPublicId clBuildingPublicId);
 
 }
-

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdAreaId;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingOwner;
 import com.st1.itx.db.domain.ClBuildingOwnerId;
@@ -70,8 +69,8 @@ public class L2R43 extends TradeBuffer {
 	private String iCustId;
 	private int iClCode1;
 	private int iClCode2;
-	private int clNo;
-	private String bdLocation;
+//	private int clNo;
+//	private String bdLocation;
 	private CustMain tCustMain;
 
 	@Override
@@ -82,7 +81,7 @@ public class L2R43 extends TradeBuffer {
 		iCustId = titaVo.getParam("RimCustId");
 		iClCode1 = parse.stringToInteger(titaVo.getParam("RimClCode1"));
 		iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
-		clNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
+//		clNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 		// 功能
 		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
 		tCustMain = new CustMain();
@@ -105,7 +104,7 @@ public class L2R43 extends TradeBuffer {
 		if (iFunCd == 1 && clNo == 0) {
 			// 擔保品編號唯一性規則
 			if (iClCode1 == 1) {
-				bdLocation = getBdLocation(titaVo);
+//				bdLocation = getBdLocation(titaVo);
 				clNo = getBuildingClNo(titaVo);
 
 			} else {
@@ -124,11 +123,16 @@ public class L2R43 extends TradeBuffer {
 	private int getBuildingClNo(TitaVo titaVo) throws LogicException {
 //	 擔保品編號唯一性規則
 //	  1. 房地擔保品：
-//	         建物門牌+建物所有權人(多)
+//	     縣市別(CITY)+鄉鎮市區代號(VILL)+段/小段代號(DIST)+建號(BDNO) +建物所有權人
 //	  2. 土地擔保品：
-//		  土地座落+土地所有權人(多)
+//		 縣市別(CITY)+鄉鎮市區代號(VILL)+段/小段代號(DIST)+地號(LDNO) +土地所有權人
 		int clNo = 0;
-		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(bdLocation, this.index, Integer.MAX_VALUE, titaVo);
+		
+
+		
+		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(), titaVo.getParam("AreaCode").trim()
+				,titaVo.getParam("IrCode").trim(),titaVo.getParam("BdNo1").trim(), titaVo.getParam("BdNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
+		
 		List<ClBuilding> lClBuilding = slClBuilding == null ? null : slClBuilding.getContent();
 		if (lClBuilding != null) {
 			for (ClBuilding cl : lClBuilding) {
@@ -162,7 +166,10 @@ public class L2R43 extends TradeBuffer {
 	// 土地擔保品編號
 	private int getLandClNo(TitaVo titaVo) throws LogicException {
 		int clNo = 0;
-		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("LandLocation"), this.index, Integer.MAX_VALUE, titaVo);
+		
+		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(), titaVo.getParam("AreaCodeB").trim()
+				,titaVo.getParam("IrCodeB").trim(),titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
+		
 		List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
 		if (lClLand != null) {
 			for (ClLand cl : lClLand) {
@@ -189,70 +196,62 @@ public class L2R43 extends TradeBuffer {
 		return isSameOwner;
 	}
 
-	private String getBdLocation(TitaVo titaVo) throws LogicException {
-
-		String result = "";
-
-		String CityCode = titaVo.getParam("CityCode").trim();
-
-		String CityItem = "";
-		CityItem = sCdCityService.findById(CityCode).getCityItem().trim();
-
-		String AreaCode = titaVo.getParam("AreaCode").trim();
-
-		String AreaItem = "";
-		CdAreaId cdAreaId = new CdAreaId(CityCode, AreaCode);
-		AreaItem = sCdAreaService.findById(cdAreaId).getAreaItem().trim();
-
-		String Road = titaVo.getParam("Road").trim();
-		String Section = titaVo.getParam("Section").trim();
-		String Alley = titaVo.getParam("Alley").trim();
-		String Lane = titaVo.getParam("Lane").trim();
-		String Num = titaVo.getParam("Num").trim();
-		String NumDash = titaVo.getParam("NumDash").trim();
-		String Floor = titaVo.getParam("Floor").trim();
-		String FloorDash = titaVo.getParam("FloorDash").trim();
-		String BdNo1 = titaVo.getParam("BdNo1").trim();
-		String BdNo2 = titaVo.getParam("BdNo2").trim();
-
-		if (!CityItem.isEmpty()) {
-			result += CityItem;
-		}
-		if (!AreaItem.isEmpty()) {
-			result += AreaItem;
-		}
-		if (!Road.isEmpty()) {
-			result += Road;
-		}
-		if (!Section.isEmpty()) {
-			result += Section + "段";
-		}
-		if (!Alley.isEmpty()) {
-			result += Alley + "巷";
-		}
-		if (!Lane.isEmpty()) {
-			result += Lane + "弄";
-		}
-		if (!Num.isEmpty()) {
-			result += Num + "號";
-		}
-		if (!NumDash.isEmpty()) {
-			result += "之" + NumDash + ",";
-		}
-		if (!Floor.isEmpty()) {
-			result += Floor + "樓";
-		}
-		if (!FloorDash.isEmpty()) {
-			result += "之" + FloorDash;
-		}
-//		if (!BdNo1.isEmpty()) {
-//			result += "，建號" + BdNo1;
+//	private String getBdLocation(TitaVo titaVo) throws LogicException {
+//
+//		String result = "";
+//
+//		String CityCode = titaVo.getParam("CityCode").trim();
+//
+//		String CityItem = "";
+//		CityItem = sCdCityService.findById(CityCode).getCityItem().trim();
+//
+//		String AreaCode = titaVo.getParam("AreaCode").trim();
+//
+//		String AreaItem = "";
+//		CdAreaId cdAreaId = new CdAreaId(CityCode, AreaCode);
+//		AreaItem = sCdAreaService.findById(cdAreaId).getAreaItem().trim();
+//
+//		String Road = titaVo.getParam("Road").trim();
+//		String Section = titaVo.getParam("Section").trim();
+//		String Alley = titaVo.getParam("Alley").trim();
+//		String Lane = titaVo.getParam("Lane").trim();
+//		String Num = titaVo.getParam("Num").trim();
+//		String NumDash = titaVo.getParam("NumDash").trim();
+//		String Floor = titaVo.getParam("Floor").trim();
+//		String FloorDash = titaVo.getParam("FloorDash").trim();
+//
+//		if (!CityItem.isEmpty()) {
+//			result += CityItem;
 //		}
-//		if (!BdNo2.isEmpty()) {
-//			result += "-" + BdNo2;
+//		if (!AreaItem.isEmpty()) {
+//			result += AreaItem;
 //		}
-		this.info("L2415 getBdLocation result = " + result);
-		return result;
-	}
+//		if (!Road.isEmpty()) {
+//			result += Road;
+//		}
+//		if (!Section.isEmpty()) {
+//			result += Section + "段";
+//		}
+//		if (!Alley.isEmpty()) {
+//			result += Alley + "巷";
+//		}
+//		if (!Lane.isEmpty()) {
+//			result += Lane + "弄";
+//		}
+//		if (!Num.isEmpty()) {
+//			result += Num + "號";
+//		}
+//		if (!NumDash.isEmpty()) {
+//			result += "之" + NumDash + ",";
+//		}
+//		if (!Floor.isEmpty()) {
+//			result += Floor + "樓";
+//		}
+//		if (!FloorDash.isEmpty()) {
+//			result += "之" + FloorDash;
+//		}
+//		this.info("L2415 getBdLocation result = " + result);
+//		return result;
+//	}
 
 }

@@ -560,7 +560,9 @@ public class L2411 extends TradeBuffer {
 //	  2. 土地擔保品：
 //		  土地座落+土地所有權人(多)
 		int clNo = 0;
-		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(bdLocation, this.index, Integer.MAX_VALUE, titaVo);
+//		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(bdLocation, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(), titaVo.getParam("AreaCode").trim()
+				,titaVo.getParam("IrCode").trim(),titaVo.getParam("BdNo1").trim(), titaVo.getParam("BdNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
 		List<ClBuilding> lClBuilding = slClBuilding == null ? null : slClBuilding.getContent();
 		if (lClBuilding != null) {
 			for (ClBuilding cl : lClBuilding) {
@@ -605,7 +607,8 @@ public class L2411 extends TradeBuffer {
 	// 土地擔保品編號
 	private int getLandClNo(TitaVo titaVo) throws LogicException {
 		int clNo = 0;
-		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("LandLocation"), this.index, Integer.MAX_VALUE, titaVo);
+		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(), titaVo.getParam("AreaCodeB").trim()
+				,titaVo.getParam("IrCodeB").trim(),titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
 		List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
 		if (lClLand != null) {
 			for (ClLand cl : lClLand) {
@@ -963,8 +966,6 @@ public class L2411 extends TradeBuffer {
 		String NumDash = titaVo.getParam("NumDash").trim();
 		String Floor = titaVo.getParam("Floor").trim();
 		String FloorDash = titaVo.getParam("FloorDash").trim();
-		String BdNo1 = titaVo.getParam("BdNo1").trim();
-		String BdNo2 = titaVo.getParam("BdNo2").trim();
 
 		if (!CityItem.isEmpty()) {
 			result += CityItem;
@@ -996,12 +997,6 @@ public class L2411 extends TradeBuffer {
 		if (!FloorDash.isEmpty()) {
 			result += "之" + FloorDash;
 		}
-//		if (!BdNo1.isEmpty()) {
-//			result += "，建號" + BdNo1;
-//		}
-//		if (!BdNo2.isEmpty()) {
-//			result += "-" + BdNo2;
-//		}
 		this.info("L2415 getBdLocation result = " + result);
 		return result;
 	}

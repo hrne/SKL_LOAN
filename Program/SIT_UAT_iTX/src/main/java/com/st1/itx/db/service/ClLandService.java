@@ -89,15 +89,19 @@ public interface ClLandService {
   public Slice<ClLand> findIrCode(String cityCode_0, String areaCode_1, String irCode_2, String landNo1_3, String landNo1_4, String landNo2_5, String landNo2_6, int index, int limit, TitaVo... titaVo);
 
   /**
-   * LandLocation = 
+   * CityCode = ,AND AreaCode = ,AND IrCode = ,AND LandNo1 = ,AND LandNo2 = 
    *
-   * @param landLocation_0 landLocation_0
+   * @param cityCode_0 cityCode_0
+   * @param areaCode_1 areaCode_1
+   * @param irCode_2 irCode_2
+   * @param landNo1_3 landNo1_3
+   * @param landNo2_4 landNo2_4
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClLand ClLand of List
    */
-  public Slice<ClLand> findLandLocationEq(String landLocation_0, int index, int limit, TitaVo... titaVo);
+  public Slice<ClLand> findLandLocationEq(String cityCode_0, String areaCode_1, String irCode_2, String landNo1_3, String landNo2_4, int index, int limit, TitaVo... titaVo);
 
   /**
    * ClCode1 = ,AND ClCode2 = ,AND ClNo = 

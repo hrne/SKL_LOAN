@@ -294,6 +294,9 @@ public class L8030 extends TradeBuffer {
 		case"043":
 			dealZ043(iCustId,this.index,this.limit,titaVo);
 			break;
+		case"044":
+			dealZ044(iCustId,this.index,this.limit,titaVo);
+			break;
 		case"045":
 			dealZ045(iCustId,this.index,this.limit,titaVo);
 			break;
@@ -405,6 +408,7 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOHistoryFg", "0");
 	    occursListA.putParam("OODeleteFg", "0");
 	    occursListA.putParam("OOChainTxCd", "L8301");
+	    occursListA.putParam("OOHistoryTxCd", "L8031");
 	    occursListA.putParam("OOUkey", "");
 	    occursListA.putParam("OOCustId", custId);
 	    occursListA.putParam("OOSubmitKey", "");
@@ -435,6 +439,7 @@ public class L8030 extends TradeBuffer {
 	            OccursList occursListB = new OccursList();
 	            //040 layout回傳
 	            occursListB.putParam("OOChainTxCd", "L8301");
+	            occursListB.putParam("OOHistoryTxCd", "L8031");
 	            occursListB.putParam("OOUkey", xJcicZ040.getUkey());
 	            occursListB.putParam("OOCustId", xJcicZ040.getCustId());
 	            occursListB.putParam("OOSubmitKey", xJcicZ040.getSubmitKey());
@@ -496,6 +501,7 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOHistoryFg", "0");
 	    occursListA.putParam("OODeleteFg", "0");
 	    occursListA.putParam("OOChainTxCd", "L8302");
+	    occursListA.putParam("OOHistoryTxCd", "L8032");
 	    occursListA.putParam("OOUkey", "");
 	    occursListA.putParam("OOCustId", custId);
 	    occursListA.putParam("OOSubmitKey", "");
@@ -526,6 +532,7 @@ public class L8030 extends TradeBuffer {
 	            OccursList occursListB = new OccursList();
 	            //041 layout回傳
 	            occursListB.putParam("OOChainTxCd", "L8302");
+	            occursListB.putParam("OOHistoryTxCd", "L8032");
 	            occursListB.putParam("OOUkey", xJcicZ041.getUkey());
 	            occursListB.putParam("OOCustId", xJcicZ041.getCustId());
 	            occursListB.putParam("OOSubmitKey", xJcicZ041.getSubmitKey());
@@ -587,16 +594,17 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOHistoryFg", "0");
 	    occursListA.putParam("OODeleteFg", "0");
 	    occursListA.putParam("OOChainTxCd", "L8303");
+	    occursListA.putParam("OOHistoryTxCd", "L8033");
 	    occursListA.putParam("OOUkey", "");
 	    occursListA.putParam("OOCustId", custId);
 	    occursListA.putParam("OOSubmitKey", "");
 	    occursListA.putParam("OOSubmitKeyX", "");
+	    occursListA.putParam("OOMaxMainCode", "");
 	    occursListA.putParam("OOOutJcicTxtDate", "");
 	    occursListA.putParam("OORcDate", "");
 	    occursListA.putParam("OOTranKey", "");
 	    //固定回傳
 	    occursListA.putParam("OODelayYM", "");
-	    occursListA.putParam("OOMaxMainCode", "");
 	    occursListA.putParam("OOAccount", "");
 	    occursListA.putParam("OOClosedDate", "");
 	    occursListA.putParam("OOBankId", "");
@@ -617,10 +625,12 @@ public class L8030 extends TradeBuffer {
 	            OccursList occursListB = new OccursList();
 	            //042 layout回傳
 	            occursListB.putParam("OOChainTxCd", "L8303");
+	            occursListB.putParam("OOHistoryTxCd", "L8033");
 	            occursListB.putParam("OOUkey", xJcicZ042.getUkey());
 	            occursListB.putParam("OOCustId", xJcicZ042.getCustId());
 	            occursListB.putParam("OOSubmitKey", xJcicZ042.getSubmitKey());
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ042.getSubmitKey(),titaVo));
+	    	    occursListB.putParam("OOMaxMainCode", xJcicZ042.getMaxMainCode());
 	            occursListB.putParam("OORcDate", xJcicZ042.getRcDate());
 	            occursListB.putParam("OOTranKey", xJcicZ042.getTranKey());
 	            int iOutJcicTxtDate = 0;
@@ -636,6 +646,7 @@ public class L8030 extends TradeBuffer {
 	            rJcicZ042Id.setRcDate(xJcicZ042.getRcDate());
 	            rJcicZ042Id.setCustId(xJcicZ042.getCustId());
 	            rJcicZ042Id.setSubmitKey(xJcicZ042.getSubmitKey());	
+	            rJcicZ042Id.setMaxMainCode(xJcicZ042.getMaxMainCode());	
 	            rJcicZ042 = iJcicZ042Service.findById(rJcicZ042Id, titaVo);
 	            //已報送檔案(OutJcicDate!=0)才可做異動，否則只能刪除
 	            if (rJcicZ042.getOutJcicTxtDate()==0) {
@@ -655,17 +666,16 @@ public class L8030 extends TradeBuffer {
 	                occursListB.putParam("OOHistoryFg", "1");
 	            }
 	            //固定回傳
-	            occursListB.putParam("OODelayYM", "");
-	            occursListB.putParam("OOMaxMainCode", "");
+	    	    occursListB.putParam("OODelayYM", "");
 	    	    occursListB.putParam("OOAccount", "");
 	    	    occursListB.putParam("OOClosedDate", "");
 	    	    occursListB.putParam("OOBankId", "");
 	    	    occursListB.putParam("OOBankIdX", "");
 	    	    occursListB.putParam("OOChangePayDate", "");
+	    	    occursListB.putParam("OOPayDate", "");
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
-	    	    occursListB.putParam("OOPayDate", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -677,15 +687,15 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOStatusFg", "0");
 	    occursListA.putParam("OOHistoryFg", "0");
 	    occursListA.putParam("OODeleteFg", "0");
-	    occursListA.putParam("OOChainTxCd", "L8306");
-	    occursListA.putParam("OOHistoryTxCd", "L8036");
+	    occursListA.putParam("OOChainTxCd", "L8304");
+	    occursListA.putParam("OOHistoryTxCd", "L8034");
 	    occursListA.putParam("OOUkey", "");
+	    occursListA.putParam("OOTranKey", "");
 	    occursListA.putParam("OOCustId", custId);
 	    occursListA.putParam("OOSubmitKey", "");
 	    occursListA.putParam("OOSubmitKeyX", "");
 	    occursListA.putParam("OOOutJcicTxtDate", "");
 	    occursListA.putParam("OORcDate", "");
-	    occursListA.putParam("OOTranKey", "");
 	    occursListA.putParam("OOMaxMainCode", "");
 	    occursListA.putParam("OOAccount", "");
 	    //固定回傳
@@ -708,8 +718,8 @@ public class L8030 extends TradeBuffer {
 	        for (JcicZ043 xJcicZ043:sJcicZ043) {
 	            OccursList occursListB = new OccursList();
 	            //043 layout回傳
-	    	    occursListB.putParam("OOChainTxCd", "L8306");
-	    	    occursListB.putParam("OOHistoryTxCd", "L8036");
+	    	    occursListB.putParam("OOChainTxCd", "L8304");
+	    	    occursListB.putParam("OOHistoryTxCd", "L8034");
 	            occursListB.putParam("OOUkey", xJcicZ043.getUkey());
 	            occursListB.putParam("OOCustId", xJcicZ043.getCustId());
 	            occursListB.putParam("OOSubmitKey", xJcicZ043.getSubmitKey());
@@ -773,6 +783,7 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOHistoryFg", "0");
 	    occursListA.putParam("OODeleteFg", "0");
 	    occursListA.putParam("OOChainTxCd", "L8305");
+	    occursListA.putParam("OOHistoryTxCd", "L8035");
 	    occursListA.putParam("OOUkey", "");
 	    occursListA.putParam("OOCustId", custId);
 	    occursListA.putParam("OOSubmitKey", "");
@@ -803,6 +814,7 @@ public class L8030 extends TradeBuffer {
 	            OccursList occursListB = new OccursList();
 	            //044 layout回傳
 	            occursListB.putParam("OOChainTxCd", "L8305");
+	            occursListB.putParam("OOHistoryTxCd", "L8035");
 	            occursListB.putParam("OOUkey", xJcicZ044.getUkey());
 	            occursListB.putParam("OOCustId", xJcicZ044.getCustId());
 	            occursListB.putParam("OOSubmitKey", xJcicZ044.getSubmitKey());

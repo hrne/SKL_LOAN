@@ -29,7 +29,7 @@ public class ClBuilding implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2730398903747838969L;
+	private static final long serialVersionUID = -5159009671094499831L;
 
 @EmbeddedId
   private ClBuildingId clBuildingId;
@@ -180,9 +180,13 @@ public class ClBuilding implements Serializable {
   private int contractDate = 0;
 
   // 停車位形式
-  /* 共用代碼檔1:無車位2:坡道平面車位3:機械平面車位4:坡道機械車位5:機械機械車位6:庭院車位 */
+  /* CdCode.ParkingTypeCode0:無車位1:坡道平面車位2:機械平面車位3:坡道機械車位4:機械機械車位5:庭院車位 */
   @Column(name = "`ParkingTypeCode`", length = 1)
   private String parkingTypeCode;
+
+  // 登記面積(坪)
+  @Column(name = "`ParkingArea`")
+  private BigDecimal parkingArea = new BigDecimal("0");
 
   // 獨立產權車位註記
   /* Y:是N:否 */
@@ -951,13 +955,13 @@ public class ClBuilding implements Serializable {
 
 /**
 	* 停車位形式<br>
-	* 共用代碼檔
-1:無車位
-2:坡道平面車位
-3:機械平面車位
-4:坡道機械車位
-5:機械機械車位
-6:庭院車位
+	* CdCode.ParkingTypeCode
+0:無車位
+1:坡道平面車位
+2:機械平面車位
+3:坡道機械車位
+4:機械機械車位
+5:庭院車位
 	* @return String
 	*/
   public String getParkingTypeCode() {
@@ -966,18 +970,37 @@ public class ClBuilding implements Serializable {
 
 /**
 	* 停車位形式<br>
-	* 共用代碼檔
-1:無車位
-2:坡道平面車位
-3:機械平面車位
-4:坡道機械車位
-5:機械機械車位
-6:庭院車位
+	* CdCode.ParkingTypeCode
+0:無車位
+1:坡道平面車位
+2:機械平面車位
+3:坡道機械車位
+4:機械機械車位
+5:庭院車位
   *
   * @param parkingTypeCode 停車位形式
 	*/
   public void setParkingTypeCode(String parkingTypeCode) {
     this.parkingTypeCode = parkingTypeCode;
+  }
+
+/**
+	* 登記面積(坪)<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getParkingArea() {
+    return this.parkingArea;
+  }
+
+/**
+	* 登記面積(坪)<br>
+	* 
+  *
+  * @param parkingArea 登記面積(坪)
+	*/
+  public void setParkingArea(BigDecimal parkingArea) {
+    this.parkingArea = parkingArea;
   }
 
 /**
@@ -1123,7 +1146,8 @@ N:否
            + ", floor=" + floor + ", floorDash=" + floorDash + ", bdNo1=" + bdNo1 + ", bdNo2=" + bdNo2 + ", bdLocation=" + bdLocation + ", bdMainUseCode=" + bdMainUseCode
            + ", bdUsageCode=" + bdUsageCode + ", bdMtrlCode=" + bdMtrlCode + ", bdTypeCode=" + bdTypeCode + ", totalFloor=" + totalFloor + ", floorNo=" + floorNo + ", floorArea=" + floorArea
            + ", evaUnitPrice=" + evaUnitPrice + ", roofStructureCode=" + roofStructureCode + ", bdDate=" + bdDate + ", bdSubUsageCode=" + bdSubUsageCode + ", bdSubArea=" + bdSubArea + ", sellerId=" + sellerId
-           + ", sellerName=" + sellerName + ", contractPrice=" + contractPrice + ", contractDate=" + contractDate + ", parkingTypeCode=" + parkingTypeCode + ", parkingProperty=" + parkingProperty + ", houseTaxNo=" + houseTaxNo
-           + ", houseBuyDate=" + houseBuyDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", sellerName=" + sellerName + ", contractPrice=" + contractPrice + ", contractDate=" + contractDate + ", parkingTypeCode=" + parkingTypeCode + ", parkingArea=" + parkingArea + ", parkingProperty=" + parkingProperty
+           + ", houseTaxNo=" + houseTaxNo + ", houseBuyDate=" + houseBuyDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

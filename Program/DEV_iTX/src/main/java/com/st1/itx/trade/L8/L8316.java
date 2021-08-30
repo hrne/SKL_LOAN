@@ -79,15 +79,15 @@ public class L8316 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		
 		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey=titaVo.getParam("TranKey").trim(); //交易代碼
-		String iCustId=titaVo.getParam("CustId").trim();//債務人IDN
-		String iSubmitKey=titaVo.getParam("SubmitKey").trim();//報送單位代號
-		String iCaseStatus=titaVo.getParam("CaseStatus").trim();//案件狀態
+		String iTranKey=titaVo.getParam("TranKey"); //交易代碼
+		String iCustId=titaVo.getParam("CustId");//債務人IDN
+		String iSubmitKey=titaVo.getParam("SubmitKey");//報送單位代號
+		String iCaseStatus=titaVo.getParam("CaseStatus");//案件狀態
 		int iClaimDate= Integer.valueOf(titaVo.getParam("ClaimDate"));//裁定日期
-		String iCourtCode=titaVo.getParam("CourtCode").trim();//承審法院代碼
-		int iYear =  Integer.valueOf(titaVo.getParam("Year").trim());
-		String iCourtDiv = titaVo.getParam("CourtDiv").trim();
-		String iCourtCaseNo = titaVo.getParam("CourtCaseNo").trim();
+		String iCourtCode=titaVo.getParam("CourtCode");//承審法院代碼
+		int iYear =  Integer.valueOf(titaVo.getParam("Year"));
+		String iCourtDiv = titaVo.getParam("CourtDiv");
+		String iCourtCaseNo = titaVo.getParam("CourtCaseNo");
 		int iPayDate = Integer.valueOf(titaVo.getParam("PayDate"));
 		int iPayEndDate = Integer.valueOf(titaVo.getParam("PayEndDate"));
 		int iPeriod = Integer.valueOf(titaVo.getParam("Period"));

@@ -32,9 +32,9 @@ public class LM023Report extends MakeReport {
 	public void printHeader() {
 		this.info("MakeReport.printHeader");
 
-		this.setBeginRow(6);
+		this.setBeginRow(8);
 		this.setMaxRows(45);
-		this.setFontSize(8);
+		this.setFontSize(10);
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -55,7 +55,6 @@ public class LM023Report extends MakeReport {
 			this.info("lM023ServiceImpl.findAll error = " + errors.toString());
 		}
 
-
 		this.setFontSize(8);
 		this.print(-4, 200, "機密等級：□極機密 □機密 ■密 □普通", "R");
 		this.print(-5, 200, "文件持有人請嚴加管控本項文件", "R");
@@ -66,9 +65,7 @@ public class LM023Report extends MakeReport {
 		this.print(-7, 148, "10804 科子目", "C");
 
 		String No = "";
-		
-		
-		
+
 		this.setFontSize(10);
 
 		DecimalFormat df1 = new DecimalFormat("#,##0");
@@ -78,20 +75,20 @@ public class LM023Report extends MakeReport {
 				if (i == 0) {
 					No = lM023List.get(i).get("F0").toString();
 					this.print(1, 9, lM023List.get(i).get("F0").toString());
-					this.print(0, 18, lM023List.get(i).get("F1").toString());
-					this.print(0, 43, lM023List.get(i).get("F2").toString());
-					this.print(0, 47, lM023List.get(i).get("F3").toString());
+					this.print(0, 21, lM023List.get(i).get("F1").toString());
+					this.print(0, 46, lM023List.get(i).get("F2").toString());
+					this.print(0, 50, lM023List.get(i).get("F3").toString());
 
 				} else {
 					if (No.equals(lM023List.get(i).get("F0").toString())) { // 是否同科目代號
-						this.print(1, 43, lM023List.get(i).get("F2").toString());
-						this.print(0, 47, lM023List.get(i).get("F3").toString());
+						this.print(1, 46, lM023List.get(i).get("F2").toString());
+						this.print(0, 50, lM023List.get(i).get("F3").toString());
 					} else {
 						No = lM023List.get(i).get("F0").toString();
 						this.print(1, 9, lM023List.get(i).get("F0").toString());
-						this.print(0, 18, lM023List.get(i).get("F1").toString());
-						this.print(0, 43, lM023List.get(i).get("F2").toString());
-						this.print(0, 47, lM023List.get(i).get("F3").toString());
+						this.print(0, 21, lM023List.get(i).get("F1").toString());
+						this.print(0, 46, lM023List.get(i).get("F2").toString());
+						this.print(0, 50, lM023List.get(i).get("F3").toString());
 
 					}
 
@@ -99,13 +96,13 @@ public class LM023Report extends MakeReport {
 
 				BigDecimal f4 = new BigDecimal(lM023List.get(i).get("F4").toString());
 				if (f4.intValue() >= 0) {
-					this.print(0, 73, df1.format(f4), "R");
-					this.print(0, 87, "-");
-					this.print(0, 107, df1.format(f4), "R");
+					this.print(0, 76, df1.format(f4), "R");
+					this.print(0, 90, "-", "R");
+					this.print(0, 110, df1.format(f4), "R");
 				} else {
-					this.print(0, 71, "-");
-					this.print(0, 89, df1.format(f4), "R");
-					this.print(0, 107, df1.format(f4), "R");
+					this.print(0, 76, "-", "R");
+					this.print(0, 90, df1.format(f4), "R");
+					this.print(0, 110, df1.format(f4), "R");
 				}
 
 			}
@@ -121,8 +118,14 @@ public class LM023Report extends MakeReport {
 			this.newPage();
 			this.setFontSize(12);
 			this.print(-6, 5, "利息收入");
-			this.print(-7, 5,
-					"        M 1月      2月      3月      4月      5月       6月      7月      8月      9月      10月      11月      12月      Total");
+
+			this.print(-7, 5, "        M");
+
+			for (int i = 0; i < 12; i++) {
+				this.print(-7, 16 + (i * 9), (i + 1) + "月");
+			}
+
+			this.print(-7, 124, "Total");
 			this.print(-8, 5, "");
 			this.print(-9, 5, "預算       ");
 			this.print(-10, 5, "上年度同期     ");
@@ -130,112 +133,86 @@ public class LM023Report extends MakeReport {
 			this.print(1, 5, "         ");
 			this.print(1, 2, "");
 			this.print(1, 2, "");
-			this.print(-15, 100, "　年度預算　億。");
-			this.print(-16, 100, "　年度現階段累積達成率　%");
+			this.print(-15, 100, "　年度預算");
+			this.print(-16, 100, "　年度現階段累積達成率");
 
-			BigDecimal total = BigDecimal.ZERO;
+			int tempAmt = 0;
+			int total0 = 0;
+			int total1 = 0;
+			int total2 = 0;
+
 //			DecimalFormat df1 = new DecimalFormat("#,##0");
+			double resTotal = 0.00;
+			int colSpace = 0;
+
 			int totalPos = 0;
+			String dataSeq = "";
+//			DecimalFormat df2 = new DecimalFormat("%.2f");
+
+			int count = 0;
+
 			for (int i = 0; i < lM023List2.size(); i++) {
 
-				year = String.valueOf(Integer.valueOf(lM023List2.get(i).get("F1")) - 1911);
-//				lM023List2.get(i).get("F0").toString();
+				if (!dataSeq.equals(lM023List2.get(i).get("F0").toString())) {
+					count = 0;
+				}
+				count++;
 
-				lM023List2.get(i).get("F2").toString();
-				lM023List2.get(i).get("F3").toString();
+				// 0 今年 1預算 2上年度
+				dataSeq = Integer.valueOf(lM023List2.get(i).get("F0")).toString();
 
-				total = total.add(new BigDecimal(lM023List2.get(i).get("F1")));
-				this.print(-8, 15 + (i * 9), df1.format(new BigDecimal(lM023List2.get(i).get("F1"))), "L");
-				totalPos = 15 + (i * 9) + 9;
+				// 利息金額
+				tempAmt = Integer.valueOf(lM023List2.get(i).get("F3"));
+				// 欄位間隔
+				colSpace = Integer.valueOf(lM023List2.get(i).get("F2")) - 1;
+
+				if (dataSeq.equals("0")) {
+
+					year = String.valueOf(Integer.valueOf(lM023List2.get(i).get("F1")) - 1911);
+
+					total0 = total0 + tempAmt;
+
+					this.print(-8, 16 + (colSpace * 9), df1.format(tempAmt), "L");
+
+					this.print(-11, 16 + (colSpace * 9), df1.format(total0), "L");
+
+				}
+
+				if (dataSeq.equals("1")) {
+					total1 = total1 + tempAmt;
+					this.print(-9, 16 + (colSpace * 9), df1.format(tempAmt), "L");
+
+				}
+
+				if (dataSeq.equals("2")) {
+					total2 = total2 + tempAmt;
+					this.print(-10, 16 + (colSpace * 9), df1.format(tempAmt), "L");
+
+				}
+
 			}
-			this.print(-8, totalPos, df1.format(total), "L");
-			this.print(-8, 5, year);
+
+			totalPos = 124;
+
+			this.print(-8, totalPos, df1.format(total0), "L");
+			this.print(-9, totalPos, df1.format(total1), "L");
+			this.print(-10, totalPos, df1.format(total2), "L");
+
+			resTotal = total0 == 0 || total1 == 0 ? 0 : (total0 / total1) * 100;
+			this.print(-12, totalPos, resTotal + "%", "L");
+
+			this.print(-8, 5, year + "年度");
+			this.print(-15, 111, total1 + "億。");
+			this.print(-16, 122, resTotal + "%");
 
 		} else {
+
 			this.print(-8, 10, "本日無資料");
+
 		}
 
 		long sno = this.close();
 		this.toPdf(sno);
 	}
-
-//	if (lM023List.size() !=0 && lM023List != null) {
-//	this.setFontSize(8);
-//	this.print(-1, 120, "機密等級：□極機密 □機密 ■密 □普通");
-//	this.print(-2, 124, "文件持有人請嚴加管控本項文件");
-//
-//	this.setFontSize(10);
-//	this.print(1, 5, "科目代號            科目中文             帳冊別              借餘          貸餘             原餘額");
-//	this.print(1, 5, "──────────────────────────────────────────────────────────────                           10804 科子目");
-//	String No = "";
-//
-//	DecimalFormat df1 = new DecimalFormat("#,##0");
-//	for (int i = 0; i < lM023List.size(); i++) {
-//
-//		if (i == 0) {
-//			No = lM023List.get(i).get("F0").toString();
-//			this.print(1, 9, lM023List.get(i).get("F0").toString());
-//			this.print(0, 18, lM023List.get(i).get("F1").toString());
-//			this.print(0, 43, lM023List.get(i).get("F2").toString());
-//			this.print(0, 47, lM023List.get(i).get("F3").toString());
-//
-//		} else {
-//			if (No.equals(lM023List.get(i).get("F0").toString())) { // 是否同科目代號
-//				this.print(1, 43, lM023List.get(i).get("F2").toString());
-//				this.print(0, 47, lM023List.get(i).get("F3").toString());
-//			} else {
-//				No = lM023List.get(i).get("F0").toString();
-//				this.print(1, 9, lM023List.get(i).get("F0").toString());
-//				this.print(0, 18, lM023List.get(i).get("F1").toString());
-//				this.print(0, 43, lM023List.get(i).get("F2").toString());
-//				this.print(0, 47, lM023List.get(i).get("F3").toString());
-//
-//			}
-//
-//		}
-//
-//		BigDecimal f4 = new BigDecimal(lM023List.get(i).get("F4").toString());
-//		if (f4.intValue() >= 0) {
-//			this.print(0, 73, df1.format(f4), "R");
-//			this.print(0, 87, "-");
-//			this.print(0, 107, df1.format(f4), "R");
-//		} else {
-//			this.print(0, 71, "-");
-//			this.print(0, 89, df1.format(f4), "R");
-//			this.print(0, 107, df1.format(f4), "R");
-//		}
-//
-//	}
-//
-//	this.newPage();
-//	this.print(1, 5, "利息收入");
-//	this.print(1, 5, "        M 1月      2月      3月      4月      5月       6月      7月      8月      9月      10月      11月      12月      Total");
-//	this.print(1, 5, "108年度  ");
-//	this.print(1, 5, "預算       ");
-//	this.print(1, 5, "上年度同期     ");
-//	this.print(1, 5, "息收合計      ");
-//	this.print(1, 5, "         ");
-//	this.print(1, 2, "");
-//	this.print(1, 2, "");
-//	this.print(1, 60, "　年度預算　億。");
-//	this.print(1, 60, "　年度現階段累積達成率　%");
-//
-//}else {
-//	this.print(-3, 160, "機密等級：□極機密 □機密 ■密 □普通","R");
-//	this.print(-4, 160, "文件持有人請嚴加管控本項文件","R");
-//	
-//	this.print(-6, 5, "科目代號            科目中文             帳冊別              借餘          貸餘             原餘額");
-//	this.print(-7, 5, "──────────────────────────────────────────────────────────────");
-//	
-//	this.print(-7, 150, "10804 科子目","C");
-//	newPage();
-//	this.print(1, 5, "利息收入");
-//	this.print(1, 5, "        M 1月      2月      3月      4月      5月       6月      7月      8月      9月      10月      11月      12月      Total");
-//	this.print(1, 5, "108年度       ");
-//	this.print(1, 5, "預算           ");
-//	this.print(1, 5, "上年度同期     ");
-//	this.print(1, 5, "息收合計     ");
-//
-//}
 
 }

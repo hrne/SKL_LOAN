@@ -90,7 +90,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "LandSeq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "LandSeq"));
     this.info("findAll " + dbName);
@@ -222,7 +222,7 @@ em = null;
   }
 
   @Override
-  public Slice<ClLand> findLandLocationEq(String landLocation_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClLand> findLandLocationEq(String cityCode_0, String areaCode_1, String irCode_2, String landNo1_3, String landNo2_4, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClLand> slice = null;
     if (titaVo.length != 0)
@@ -233,15 +233,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findLandLocationEq " + dbName + " : " + "landLocation_0 : " + landLocation_0);
+    this.info("findLandLocationEq " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " areaCode_1 : " +  areaCode_1 + " irCode_2 : " +  irCode_2 + " landNo1_3 : " +  landNo1_3 + " landNo2_4 : " +  landNo2_4);
     if (dbName.equals(ContentName.onDay))
-      slice = clLandReposDay.findAllByLandLocationIsOrderByClCode1AscClCode2AscClNoAsc(landLocation_0, pageable);
+      slice = clLandReposDay.findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndLandNo1IsAndLandNo2IsOrderByClCode1AscClCode2AscClNoAsc(cityCode_0, areaCode_1, irCode_2, landNo1_3, landNo2_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clLandReposMon.findAllByLandLocationIsOrderByClCode1AscClCode2AscClNoAsc(landLocation_0, pageable);
+      slice = clLandReposMon.findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndLandNo1IsAndLandNo2IsOrderByClCode1AscClCode2AscClNoAsc(cityCode_0, areaCode_1, irCode_2, landNo1_3, landNo2_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clLandReposHist.findAllByLandLocationIsOrderByClCode1AscClCode2AscClNoAsc(landLocation_0, pageable);
+      slice = clLandReposHist.findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndLandNo1IsAndLandNo2IsOrderByClCode1AscClCode2AscClNoAsc(cityCode_0, areaCode_1, irCode_2, landNo1_3, landNo2_4, pageable);
     else 
-      slice = clLandRepos.findAllByLandLocationIsOrderByClCode1AscClCode2AscClNoAsc(landLocation_0, pageable);
+      slice = clLandRepos.findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndLandNo1IsAndLandNo2IsOrderByClCode1AscClCode2AscClNoAsc(cityCode_0, areaCode_1, irCode_2, landNo1_3, landNo2_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

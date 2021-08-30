@@ -194,7 +194,7 @@ em = null;
   }
 
   @Override
-  public Slice<ClBuilding> findBdLocationEq(String bdLocation_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClBuilding> findBdLocationEq(String cityCode_0, String areaCode_1, String irCode_2, String bdNo1_3, String bdNo2_4, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClBuilding> slice = null;
     if (titaVo.length != 0)
@@ -205,15 +205,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findBdLocationEq " + dbName + " : " + "bdLocation_0 : " + bdLocation_0);
+    this.info("findBdLocationEq " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " areaCode_1 : " +  areaCode_1 + " irCode_2 : " +  irCode_2 + " bdNo1_3 : " +  bdNo1_3 + " bdNo2_4 : " +  bdNo2_4);
     if (dbName.equals(ContentName.onDay))
-      slice = clBuildingReposDay.findAllByBdLocationIsOrderByClCode1AscClCode2AscClNoAsc(bdLocation_0, pageable);
+      slice = clBuildingReposDay.findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndBdNo1IsAndBdNo2IsOrderByClCode1AscClCode2AscClNoAsc(cityCode_0, areaCode_1, irCode_2, bdNo1_3, bdNo2_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clBuildingReposMon.findAllByBdLocationIsOrderByClCode1AscClCode2AscClNoAsc(bdLocation_0, pageable);
+      slice = clBuildingReposMon.findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndBdNo1IsAndBdNo2IsOrderByClCode1AscClCode2AscClNoAsc(cityCode_0, areaCode_1, irCode_2, bdNo1_3, bdNo2_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clBuildingReposHist.findAllByBdLocationIsOrderByClCode1AscClCode2AscClNoAsc(bdLocation_0, pageable);
+      slice = clBuildingReposHist.findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndBdNo1IsAndBdNo2IsOrderByClCode1AscClCode2AscClNoAsc(cityCode_0, areaCode_1, irCode_2, bdNo1_3, bdNo2_4, pageable);
     else 
-      slice = clBuildingRepos.findAllByBdLocationIsOrderByClCode1AscClCode2AscClNoAsc(bdLocation_0, pageable);
+      slice = clBuildingRepos.findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndBdNo1IsAndBdNo2IsOrderByClCode1AscClCode2AscClNoAsc(cityCode_0, areaCode_1, irCode_2, bdNo1_3, bdNo2_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

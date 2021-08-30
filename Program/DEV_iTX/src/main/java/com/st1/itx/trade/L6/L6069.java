@@ -26,7 +26,6 @@ import com.st1.itx.db.service.CdCodeService;
  * @version 1.0.0
  */
 public class L6069 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6069.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -49,7 +48,7 @@ public class L6069 extends TradeBuffer {
 
 		Slice<CdCode> slCdCode = null;
 		if ("".equals(iDefType)) {
-			slCdCode = sCdCodeDefService.defCodeEq("CodeType", iCode + "%", this.index, this.limit, titaVo);
+			slCdCode = sCdCodeDefService.defCodeEq("CodeType", iCode + "%" ,  this.index, this.limit, titaVo);
 		} else {
 			int iDefType9 = Integer.parseInt(iDefType);
 			slCdCode = sCdCodeDefService.defCodeEq2("CodeType", iDefType9, iCode + "%", this.index, this.limit, titaVo);

@@ -763,16 +763,11 @@ X(#OOShareTotal)
 #OOOther=x,100,L
 #OOOther1=x,100,L
 
-#OOStockCodeX=X,10,L
-T(H,#OOOther,#StockCodeHelp)
 
 #OOStock=x,10,L
 IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
 T(1,#OOOther,1,10)
 
-#OOOther3=x,110,L
-IF(#OOClCode1 == 3 || #OOClCode1 == 4,$,S)
-T(2,#OOStock+#OOStockCodeX)
 
 
 #OOFlag=X,1,S
@@ -1160,7 +1155,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther3=股票名稱
+#OOOther=股票名稱
 {width:150,align:'left'}
 ^
 
@@ -1296,7 +1291,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther3=股票名稱
+#OOOther=股票名稱
 {width:150,align:'left'}
 ^
 </sub>

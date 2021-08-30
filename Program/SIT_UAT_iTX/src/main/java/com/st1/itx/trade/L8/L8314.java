@@ -77,14 +77,14 @@ public class L8314 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		
 		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
-		String iTranKey=titaVo.getParam("TranKey").trim(); //交易代碼
-		String iCustId=titaVo.getParam("CustId").trim();//債務人IDN
-		String iSubmitKey=titaVo.getParam("SubmitKey").trim();//報送單位代號
+		String iTranKey=titaVo.getParam("TranKey"); //交易代碼
+		String iCustId=titaVo.getParam("CustId");//債務人IDN
+		String iSubmitKey=titaVo.getParam("SubmitKey");//報送單位代號
 		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
-		String iMaxMainCode = titaVo.getParam("MaxMainCode").trim();
-		String iAgreeSend=titaVo.getParam("AgreeSend").trim();
-		String iAgreeSendData1=titaVo.getParam("AgreeSendData1").trim();
-		String iAgreeSendData2=titaVo.getParam("AgreeSendData2").trim();
+		String iMaxMainCode = titaVo.getParam("MaxMainCode");
+		String iAgreeSend=titaVo.getParam("AgreeSend");
+		String iAgreeSendData1=titaVo.getParam("AgreeSendData1");
+		String iAgreeSendData2=titaVo.getParam("AgreeSendData2");
 		int iChangePayDate=Integer.valueOf(titaVo.getParam("ChangePayDate"));
 		String iKey = "";
 		//JcicZ053

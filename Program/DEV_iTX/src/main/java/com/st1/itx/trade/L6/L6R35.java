@@ -25,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R35 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R35.class);
 	/* DB服務注入 */
 	@Autowired
 	public CdCodeService sCdCodeDefService;

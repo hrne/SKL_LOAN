@@ -31,8 +31,8 @@ public interface ClBuildingRepository extends JpaRepository<ClBuilding, ClBuildi
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
   public Slice<ClBuilding> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
-  // BdLocation = 
-  public Slice<ClBuilding> findAllByBdLocationIsOrderByClCode1AscClCode2AscClNoAsc(String bdLocation_0, Pageable pageable);
+  // CityCode = ,AND AreaCode = ,AND IrCode = ,AND BdNo1 = ,AND BdNo2 =
+  public Slice<ClBuilding> findAllByCityCodeIsAndAreaCodeIsAndIrCodeIsAndBdNo1IsAndBdNo2IsOrderByClCode1AscClCode2AscClNoAsc(String cityCode_0, String areaCode_1, String irCode_2, String bdNo1_3, String bdNo2_4, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

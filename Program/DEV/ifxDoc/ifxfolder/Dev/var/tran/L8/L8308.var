@@ -125,7 +125,7 @@ T(3, :非屬二階段還款;1:第一階段;2:第二階段)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic575連動進入),$)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic047連動進入),$)
 T(F,@TranKey,0)T(F,@RcDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@ExpLoanAmt,0)
 T(F,@Civil323ExpAmt,0)T(F,@CashCardAmt,0)T(F,@Civil323CashAmt,0)T(F,@CreditCardAmt,0)T(F,@Civil323CreditAmt,0)
 T(F,@TotalAmt,0)T(F,@Civil323Amt,0)T(F,@InterviewDate,0)T(F,@PassDate,0)T(F,@LimitDate,0)

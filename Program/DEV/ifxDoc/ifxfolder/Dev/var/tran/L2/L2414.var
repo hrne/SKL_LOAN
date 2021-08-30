@@ -61,15 +61,11 @@ E(0,40)ASGN(INQPRT$)
 ["@@@@@@評等日期",#CreditDate],["@@@@@@評等公司",#Credit,#CreditX],
 ["@@@@@@外部評等",#ExternalCredit],["@@@@@@主要指數",#Index,#IndexX],
 ["@@@@@@交易方法",#TradingMethod,#TradingMethodX],["@@@@@@受償順位",#Compensation],
-[#<->#,"#FdClStatus+投資內容",#Investment1],
-[#<->#,"@",#Investment2],
-[#<->#,"@",#Investment3],
-[#<->#,"#FdClStatus+公開價值",#PublicValue1],
-[#<->#,"@",#PublicValue2],
-[#<->#,"@",#PublicValue3],
+[#<->#,"#FdClStatus+投資內容",#Investment],
+[#<->#,"#FdClStatus+公開價值",#PublicValue],
 ["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
 ["#FdSettingDate+設定日期",#SettingDate],["#FdSettingBal+設定金額",#SettingBal],
-!["#FdSynd+聯貸案",#Synd,#SyndX],["#FdSyndCode+聯貸案類型",#SyndCode,#SyndCodeX],
+["#FdSynd+聯貸案",#Synd,#SyndX],["#FdSyndCode+聯貸案類型",#SyndCode,#SyndCodeX],
 ["#FdDispPrice+處分價格",#DispPrice],["#FdDispDate+處分日期",#DispDate],
 [#<->#,"#FdClStatus+擔保品狀況碼",#ClStatus,#ClStatusX],
 ]
@@ -206,12 +202,8 @@ T(F,@ExternalCredit,1)
 T(F,@Index,1)
 T(F,@TradingMethod,1)
 T(F,@Compensation,1)
-T(F,@Investment1,1)
-T(F,@Investment2,1)
-T(F,@Investment3,1)
-T(F,@PublicValue1,1)
-T(F,@PublicValue2,1)
-T(F,@PublicValue3,1)
+T(F,@Investment,1)
+T(F,@PublicValue,1)
 T(F,@SettingStat,1)
 T(F,@ClStat,1)
 T(F,@SettingDate,1)
@@ -479,13 +471,7 @@ T(2,@Index,#L2r26Index)
 T(2,@TradingMethod,#L2r26TradingMethod)
 T(2,@Compensation,#L2r26Compensation)
 T(2,@Investment,#L2r26Investment)
-T(1,@Investment1,#L2r26Investment,1,100)
-T(1,@Investment2,#L2r26Investment,101,100)
-T(1,@Investment3,#L2r26Investment,201,100)
 T(2,@PublicValue,#L2r26PublicValue)
-T(1,@PublicValue1,#L2r26PublicValue,1,100)
-T(1,@PublicValue2,#L2r26PublicValue,101,100)
-T(1,@PublicValue3,#L2r26PublicValue,201,100)
 E(0,@SettingStat,#L2r26SettingStat)
 E(0,@ClStat,#L2r26ClStat)
 E(0,@SettingDate,#L2r26SettingDate)
@@ -809,34 +795,16 @@ IF(#FunCd==4,s,$)
 @C(4,#Compensation,S,V(9))
 
 !投資內容 Investment
-#Investment1=c,100,I
-C(3,#PHFG,1,$,S)
-IF(#FunCd==4,s,$)
-#Investment2=c,100,I
-C(3,#PHFG,1,$,S)
-IF(#FunCd==4,s,$)
-#Investment3=c,100,I
-C(3,#PHFG,1,$,S)
-IF(#FunCd==4,s,$)
 
-#Investment=c,300,S
-C(3,#PHFG,1,$,S)
-T(2,#Investment1+#Investment2+#Investment3)
-
-!公開價值 PublicValue
-#PublicValue1=c,100,I
-C(3,#PHFG,1,$,S)
-IF(#FunCd==4,s,$)
-#PublicValue2=c,100,I
-C(3,#PHFG,1,$,S)
-IF(#FunCd==4,s,$)
-#PublicValue3=c,100,I
+#Investment=x,3.100,I
 C(3,#PHFG,1,$,S)
 IF(#FunCd==4,s,$)
 
-#PublicValue=c,300,S
+!公開價值 PublicValue
+
+#PublicValue=x,3.100,I
 C(3,#PHFG,1,$,S)
-T(2,#PublicValue1+#PublicValue2+#PublicValue3)
+IF(#FunCd==4,s,$)
 
 ! [設定狀態]
 #SettingStat=A,1,I

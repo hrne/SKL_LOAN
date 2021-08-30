@@ -29,7 +29,7 @@ public class FacMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -465743187365178801L;
+	private static final long serialVersionUID = -4220559053941206093L;
 
 @EmbeddedId
   private FacMainId facMainId;
@@ -97,11 +97,11 @@ public class FacMain implements Serializable {
   @Column(name = "`RateCode`", length = 1)
   private String rateCode;
 
-  // 首次利率調整週期
+  // 首次利率調整週期(月)
   @Column(name = "`FirstRateAdjFreq`")
   private int firstRateAdjFreq = 0;
 
-  // 利率調整週期
+  // 利率調整週期(月)
   @Column(name = "`RateAdjFreq`")
   private int rateAdjFreq = 0;
 
@@ -358,6 +358,16 @@ public class FacMain implements Serializable {
   // 單位別
   @Column(name = "`BranchNo`", length = 4)
   private String branchNo;
+
+  // 核准層級
+  /* CdCode:ApprovedLevel(2021.8.27異動)by eric */
+  @Column(name = "`ApprovedLevel`", length = 1)
+  private String approvedLevel;
+
+  // 核准人員
+  /* CdEmp(2021.8.27異動)by eric */
+  @Column(name = "`ApprovedEmpNo`", length = 6)
+  private String approvedEmpNo;
 
   // 建檔日期時間
   @CreatedDate
@@ -678,7 +688,7 @@ public class FacMain implements Serializable {
   }
 
 /**
-	* 首次利率調整週期<br>
+	* 首次利率調整週期(月)<br>
 	* 
 	* @return Integer
 	*/
@@ -687,17 +697,17 @@ public class FacMain implements Serializable {
   }
 
 /**
-	* 首次利率調整週期<br>
+	* 首次利率調整週期(月)<br>
 	* 
   *
-  * @param firstRateAdjFreq 首次利率調整週期
+  * @param firstRateAdjFreq 首次利率調整週期(月)
 	*/
   public void setFirstRateAdjFreq(int firstRateAdjFreq) {
     this.firstRateAdjFreq = firstRateAdjFreq;
   }
 
 /**
-	* 利率調整週期<br>
+	* 利率調整週期(月)<br>
 	* 
 	* @return Integer
 	*/
@@ -706,10 +716,10 @@ public class FacMain implements Serializable {
   }
 
 /**
-	* 利率調整週期<br>
+	* 利率調整週期(月)<br>
 	* 
   *
-  * @param rateAdjFreq 利率調整週期
+  * @param rateAdjFreq 利率調整週期(月)
 	*/
   public void setRateAdjFreq(int rateAdjFreq) {
     this.rateAdjFreq = rateAdjFreq;
@@ -1967,6 +1977,48 @@ N:否
   }
 
 /**
+	* 核准層級<br>
+	* CdCode:ApprovedLevel
+(2021.8.27異動)by eric
+	* @return String
+	*/
+  public String getApprovedLevel() {
+    return this.approvedLevel == null ? "" : this.approvedLevel;
+  }
+
+/**
+	* 核准層級<br>
+	* CdCode:ApprovedLevel
+(2021.8.27異動)by eric
+  *
+  * @param approvedLevel 核准層級
+	*/
+  public void setApprovedLevel(String approvedLevel) {
+    this.approvedLevel = approvedLevel;
+  }
+
+/**
+	* 核准人員<br>
+	* CdEmp
+(2021.8.27異動)by eric
+	* @return String
+	*/
+  public String getApprovedEmpNo() {
+    return this.approvedEmpNo == null ? "" : this.approvedEmpNo;
+  }
+
+/**
+	* 核准人員<br>
+	* CdEmp
+(2021.8.27異動)by eric
+  *
+  * @param approvedEmpNo 核准人員
+	*/
+  public void setApprovedEmpNo(String approvedEmpNo) {
+    this.approvedEmpNo = approvedEmpNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -2057,7 +2109,7 @@ N:否
            + ", businessOfficer=" + businessOfficer + ", supervisor=" + supervisor + ", investigateOfficer=" + investigateOfficer + ", estimateReview=" + estimateReview + ", coorgnizer=" + coorgnizer + ", advanceCloseCode=" + advanceCloseCode
            + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo + ", colSetFlag=" + colSetFlag
            + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo + ", acDate=" + acDate
-           + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", approvedEmpNo=" + approvedEmpNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

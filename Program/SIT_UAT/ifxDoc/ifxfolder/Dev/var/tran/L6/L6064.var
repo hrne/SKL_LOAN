@@ -57,6 +57,7 @@ K(MODIFYBUTTON,查詢)
 ["#FdDefCode+代碼檔代號",#DefCode,#CodeBTN],
 ["#FdDefItem+代碼檔名稱",#DefItem],
 ["#FdCode+代碼",#Code],
+["#FdCodeItem+代碼說明",#CodeItem],
 !["#FdRPTFG+顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
 !],
@@ -70,6 +71,7 @@ K(MODIFYBUTTON,查詢)
 #FdDefCode=X,2,L
 #FdDefItem=X,2,L
 #FdCode=X,2,L
+#FdCodeItem=X,2,L
 !#FdRPTFG=X,2,L
 !T(3,*)
 
@@ -155,6 +157,8 @@ C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
 #Code=x,20,I
 !C(3,#CHAIN,1,s,$)
 
+#CodeItem=x,50,I
+
 #RPTFG=A,1,S
 
 !<include src="COM.icf::RPTFG.dec"/>
@@ -229,7 +233,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=刪除;ntxbuf=#OOBUF4})
 
 !------ 上行電文 ------
 <sub type="TIM">
-#DefType#DefCode#Code
+#DefType#DefCode#Code#CodeItem
 #END
 </sub>
 

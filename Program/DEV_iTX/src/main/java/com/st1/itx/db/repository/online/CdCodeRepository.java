@@ -23,14 +23,14 @@ import com.st1.itx.db.domain.CdCodeId;
  */
 public interface CdCodeRepository extends JpaRepository<CdCode, CdCodeId> {
 
-  // DefCode = ,AND Code %
+  // DefCode = ,AND Code % 
   public Slice<CdCode> findAllByDefCodeIsAndCodeLikeOrderByCodeAsc(String defCode_0, String code_1, Pageable pageable);
 
   // DefCode = ,AND DefType = ,AND Code %
   public Slice<CdCode> findAllByDefCodeIsAndDefTypeIsAndCodeLikeOrderByCodeAsc(String defCode_0, int defType_1, String code_2, Pageable pageable);
 
-  // DefCode <> ,AND DefType = ,AND Code %
-  public Slice<CdCode> findAllByDefCodeNotAndDefTypeIsAndCodeLikeOrderByDefCodeAscCodeAsc(String defCode_0, int defType_1, String code_2, Pageable pageable);
+  // DefCode <> ,AND DefType = ,AND Code %, AND Item %
+  public Slice<CdCode> findAllByDefCodeNotAndDefTypeIsAndCodeLikeAndItemLikeOrderByDefCodeAscCodeAsc(String defCode_0, int defType_1, String code_2, String item_3, Pageable pageable);
 
   // DefType = 
   public Slice<CdCode> findAllByDefTypeIsOrderByDefCodeAscCodeAsc(int defType_0, Pageable pageable);
@@ -43,6 +43,9 @@ public interface CdCodeRepository extends JpaRepository<CdCode, CdCodeId> {
 
   // DefType = ,AND DefCode = ,AND Code ^i
   public Slice<CdCode> findAllByDefTypeIsAndDefCodeIsAndCodeInOrderByDefCodeAscCodeAsc(int defType_0, String defCode_1, List<String> code_2, Pageable pageable);
+
+  // DefCode = ,AND Item %
+  public Slice<CdCode> findAllByDefCodeIsAndItemLikeOrderByCodeAsc(String defCode_0, String item_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

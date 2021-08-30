@@ -1,36 +1,33 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-
-/* log */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.UUID;
 
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 
-
 /* Tita & Tota 資料物件 */
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ051;
 import com.st1.itx.db.domain.JcicZ051Id;
+import com.st1.itx.db.domain.JcicZ051Log;
+import com.st1.itx.db.service.JcicZ051LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ051Service;
 
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
-import com.st1.itx.util.common.JcicCom;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 /**
@@ -38,10 +35,20 @@ import com.st1.itx.util.data.DataLog;
 * TranKey=X,1<br>
 * CustId=X,10<br>
 * SubmitKey=X,10<br>
-* RcDate=9,7<br>
-* DelayCode=X,1<br>
-* DelayYM=X,6<br>
-* DelayDesc=X,80<br>
+* CaseStatus=X,1<br>
+* ClaimDate=9,7<br>
+* CourtCode=X,3<br>
+* Year=9,3<br>
+* CourtDiv=X,8<br>
+* CourtCaseNo=X,80<br>
+* Approve=X,1<br>
+* OutstandAmt=9,9<br>
+* ClaimStatus1=X,1<br>
+* SaveDate=9,7<br>
+* ClaimStatus2=X,1<br>
+* SaveEndDate=9,7<br>
+* SubAmt=9,9<br>
+* AdminName=X,20<br>
 * OutJcicTxtDate=9,7<br>
 */
 
@@ -50,134 +57,115 @@ import com.st1.itx.util.data.DataLog;
 /**
  * 
  * 
- * @author Jacky
+ * @author Mata
  * @version 1.0.0
  */
 public class L8312 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8312.class);
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ051Service sJcicZ051Service;
 	@Autowired
-	public JcicCom jcicCom;
-	/* 日期工具 */
+	public JcicZ051LogService sJcicZ051LogService;
 	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉型共用工具 */
+	SendRsp iSendRsp;
 	@Autowired
-	public Parse parse;
-	@Autowired
-	public DataLog dataLog;
-	@Autowired
-	SendRsp sendRsp;
+	public DataLog iDataLog;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("Run L8312");
 		this.info("active L8312 ");
 		this.totaVo.init(titaVo);
-		String FunctionCd=titaVo.getParam("FunctionCd").trim(); //功能代碼:01:新增,02:修改,04:刪除,05:查詢
-		String TranKey=titaVo.getParam("TranKey").trim(); //交易代碼
-		String CustId=titaVo.getParam("CustId").trim();//債務人IDN
-		String SubmitKey=titaVo.getParam("SubmitKey").trim();//報送單位代號
-		String RcDate=titaVo.getParam("RcDate").trim();//協商申請日
 		
-		String DelayYM=titaVo.getParam("DelayYM").trim();//延期繳款年月
-		String OutJcicTxtDate=titaVo.getParam("OutJcicTxtDate").trim();//轉出Jcic文字檔日期
-		//int Today=dateUtil.getNowIntegerForBC();
-		/* DB資料容器WD */
-		//JcicMAaster
-		JcicZ051 tJcicZ051 = new JcicZ051();
-		JcicZ051Id tJcicZ051Id = new JcicZ051Id();
-		tJcicZ051Id.setCustId(CustId);//債務人IDN
-		tJcicZ051Id.setSubmitKey(SubmitKey);//報送單位代號
-		tJcicZ051Id.setRcDate(Integer.parseInt(jcicCom.RocTurnDc(RcDate,0)));//協商申請日
-		tJcicZ051Id.setDelayYM(Integer.parseInt(jcicCom.RocTurnDc(DelayYM,1)));;//繳款年月
-		
-		tJcicZ051.setJcicZ051Id(tJcicZ051Id);
+		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
+		String iTranKey=titaVo.getParam("TranKey"); //交易代碼
+		String iCustId=titaVo.getParam("CustId");//債務人IDN
+		String iSubmitKey=titaVo.getParam("SubmitKey");//報送單位代號
+		int iRcDate = Integer.valueOf(titaVo.getParam("RcDate"));
+		int iDelayYM = Integer.valueOf(titaVo.getParam("DelayYM"));
+		String iDelayCode =titaVo.getParam("DelayCode");
+		String iDelayDesc =titaVo.getParam("DelayDesc");
+		String iKey = "";
+		//JcicZ051
+		JcicZ051 iJcicZ051 = new JcicZ051();
+		JcicZ051Id iJcicZ051Id = new JcicZ051Id();
+		iJcicZ051Id.setCustId(iCustId);//債務人IDN
+		iJcicZ051Id.setSubmitKey(iSubmitKey);//報送單位代號
+		iJcicZ051Id.setRcDate(iRcDate);
+		iJcicZ051Id.setDelayYM(iDelayYM);
+		JcicZ051 chJcicZ051 = new JcicZ051();
 
-		tJcicZ051.setTranKey(TranKey);
-		tJcicZ051.setDelayCode(titaVo.getParam("DelayCode").trim());//延期繳款原因
-		tJcicZ051.setDelayDesc(titaVo.getParam("DelayDesc").trim());//延期繳款案情說明
-
-		//OutJcicTxtDate 可以刪除不可異動
-		if(jcicCom.JcicOutDateCanUpdByUser(titaVo)==true) {
-			tJcicZ051.setOutJcicTxtDate(Integer.parseInt(jcicCom.RocTurnDc(OutJcicTxtDate,0)));
-		}else {
-			tJcicZ051.setOutJcicTxtDate(0);
-		}
-		JcicZ051 tJcicZ051VO=sJcicZ051Service.holdById(tJcicZ051Id, titaVo);
-		JcicZ051 OrgJcicZ051 = null;
-		if(tJcicZ051VO!=null) {
-			OrgJcicZ051 = (JcicZ051) dataLog.clone(tJcicZ051VO);//資料異動前
-		}
-
-		this.info("tJcicZ051VO=["+tJcicZ051.toString()+"]");
-
-		if((jcicCom.getDeleteFunctionCode()).equals(FunctionCd)) {
-			boolean DeleteTF=jcicCom.DeleteLogic(titaVo,tJcicZ051VO,tJcicZ051VO.getOutJcicTxtDate());
-			if(DeleteTF) {
-				//刷主管卡後始可刪除
-				// 交易需主管核可
-				if(("A").equals(OrgJcicZ051.getTranKey())) {
-					
-				}else {
-					//刷主管卡後始可刪除
-					// 交易需主管核可
-					if (!titaVo.getHsupCode().equals("1")) {
-						//titaVo.getSupCode();
-						sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-					}
+		switch(iTranKey_Tmp) {
+		case "1":
+			//檢核是否重複，並寫入JcicZ051
+			chJcicZ051 = sJcicZ051Service.findById(iJcicZ051Id, titaVo);
+			if (chJcicZ051!=null) {
+				throw new LogicException("E0005", "已有相同資料");
+			}
+			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");          
+            iJcicZ051.setJcicZ051Id(iJcicZ051Id);
+			iJcicZ051.setTranKey(iTranKey);
+			iJcicZ051.setDelayCode(iDelayCode);
+			iJcicZ051.setDelayDesc(iDelayDesc);
+			iJcicZ051.setUkey(iKey);
+			try {
+				sJcicZ051Service.insert(iJcicZ051, titaVo);
+			}catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+			break;
+		case "2":
+			iKey = titaVo.getParam("Ukey");
+			iJcicZ051 = sJcicZ051Service.ukeyFirst(iKey, titaVo);
+			JcicZ051 uJcicZ051 = new JcicZ051();
+			uJcicZ051 = sJcicZ051Service.holdById(iJcicZ051.getJcicZ051Id(), titaVo);
+			if (uJcicZ051 == null) {
+				throw new LogicException("E0007", "無此更新資料");
+			}			
+			uJcicZ051.setTranKey(iTranKey);
+			uJcicZ051.setDelayCode(iDelayCode);
+			uJcicZ051.setDelayDesc(iDelayDesc);
+			uJcicZ051.setOutJcicTxtDate(0);
+			JcicZ051 oldJcicZ051 = (JcicZ051) iDataLog.clone(uJcicZ051);
+			try {
+				sJcicZ051Service.update(uJcicZ051, titaVo);
+			}catch (DBException e) {
+				throw new LogicException("E0005", "更生債權金額異動通知資料");
+			}
+			iDataLog.setEnv(titaVo, oldJcicZ051, uJcicZ051);
+			iDataLog.exec();
+			break;
+		case "4": //需刷主管卡
+			iJcicZ051 = sJcicZ051Service.findById(iJcicZ051Id);
+			if (iJcicZ051 == null) {
+				throw new LogicException("E0008", "");
+			}
+			if (!titaVo.getHsupCode().equals("1")) {
+				iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
+			}
+			Slice<JcicZ051Log> dJcicLogZ051 = null;
+			dJcicLogZ051 = sJcicZ051LogService.ukeyEq(iJcicZ051.getUkey(), 0, Integer.MAX_VALUE, titaVo);
+			if (dJcicLogZ051 == null) {
+				//尚未開始寫入log檔之資料，主檔資料可刪除
+			try {
+				sJcicZ051Service.delete(iJcicZ051, titaVo);
+			}catch (DBException e) {
+				throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
-				//刪除
+			}else {//已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
+				//最近一筆之資料
+				JcicZ051Log iJcicZ051Log = dJcicLogZ051.getContent().get(0);
+				iJcicZ051.setDelayCode(iJcicZ051Log.getDelayCode());
+				iJcicZ051.setDelayDesc(iJcicZ051Log.getDelayDesc());
+				iJcicZ051.setTranKey(iJcicZ051Log.getTranKey());
+				iJcicZ051.setOutJcicTxtDate(iJcicZ051Log.getOutJcicTxtDate());
 				try {
-					sJcicZ051Service.delete(tJcicZ051VO, titaVo);
-				} catch (DBException e) {
-					//E0008 刪除資料時，發生錯誤
-					throw new LogicException(titaVo, "E0008", "");
+					sJcicZ051Service.update(iJcicZ051, titaVo);
+				}catch (DBException e) {
+					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
-		}else {
-			jcicCom.checkJcicZ051(tJcicZ051,titaVo);
-			if(tJcicZ051VO!=null ) {
-				if (TranKey.equals("A")) {
-					throw new LogicException(titaVo, "E0002", "");
-				}
-				
-				
-				//UPDATE
-				//KeyValue
-				tJcicZ051.setCreateDate(tJcicZ051VO.getCreateDate());
-				tJcicZ051.setCreateEmpNo(tJcicZ051VO.getCreateEmpNo());
-				if(OutJcicTxtDate!=null && OutJcicTxtDate.length()!=0) {
-					if(Integer.parseInt(OutJcicTxtDate)==0) {
-						tJcicZ051.setOutJcicTxtDate(0);
-					}
-				}else {
-					tJcicZ051.setOutJcicTxtDate(Integer.parseInt(jcicCom.RocTurnDc(OutJcicTxtDate,0)));
-				}
-
-				tJcicZ051.setCreateDate(OrgJcicZ051.getCreateDate());
-				tJcicZ051.setCreateEmpNo(OrgJcicZ051.getCreateEmpNo());
-				try {
-					tJcicZ051 = sJcicZ051Service.update2(tJcicZ051, titaVo);//資料異動後-1
-					dataLog.setEnv(titaVo, OrgJcicZ051, tJcicZ051);//資料異動後-2
-					dataLog.exec();//資料異動後-3
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "");
-				}
-			}else {
-				//INSERT
-				TranKey="A";
-				tJcicZ051.setTranKey(TranKey);
-				try {
-					sJcicZ051Service.insert(tJcicZ051, titaVo);
-				} catch (DBException e) {
-					//E0005	新增資料時，發生錯誤
-					throw new LogicException(titaVo, "E0005", "");
-				}
-				
-			}
+		default:
+			break;
 		}
 		
 		this.addList(this.totaVo);

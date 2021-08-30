@@ -72,15 +72,19 @@ public interface ClBuildingService {
   public Slice<ClBuilding> findClNo(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * BdLocation = 
+   * CityCode = ,AND AreaCode = ,AND IrCode = ,AND BdNo1 = ,AND BdNo2 =
    *
-   * @param bdLocation_0 bdLocation_0
+   * @param cityCode_0 cityCode_0
+   * @param areaCode_1 areaCode_1
+   * @param irCode_2 irCode_2
+   * @param bdNo1_3 bdNo1_3
+   * @param bdNo2_4 bdNo2_4
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClBuilding ClBuilding of List
    */
-  public Slice<ClBuilding> findBdLocationEq(String bdLocation_0, int index, int limit, TitaVo... titaVo);
+  public Slice<ClBuilding> findBdLocationEq(String cityCode_0, String areaCode_1, String irCode_2, String bdNo1_3, String bdNo2_4, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By ClBuilding

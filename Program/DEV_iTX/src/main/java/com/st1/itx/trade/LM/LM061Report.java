@@ -168,7 +168,7 @@ public class LM061Report extends MakeReport {
 
 					// 金額(F11)
 					// 法務進度代號(F12)
-					
+					 
 					// 鑑價金額
 					F11 = tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11"));
 
