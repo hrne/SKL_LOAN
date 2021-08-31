@@ -162,8 +162,7 @@ T(3,1:新增;2:修改;4:刪除)
 
 #YNHelp=x,20,S
 T(3,Y:是;N:否)
-              
-
+            
 !ClCode2
 #CDDEF01=x,20,S
 T(3,CdCode.ClCode21)
@@ -872,6 +871,18 @@ T(3,X)
 #TEMP_PublicBdNoB=A,3,S
 #TEMP_Area=m,14.2,S
 
+<include src="ROM.icf::L2R19.dec"/>
+#RimL2r19=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+RESET_RIM(#RimL2r19,L2R19)
+S(L2R19,1,#RimClCode1,#RimClCode2,#RimClNo)
+R(1,L2R19)
+
+#PublicBdOwnerIdHelp=x,1000,S
+T(2,#L2r19PublicBdOwnerId)
+
 ##loop{times:10,i:1,j:0,rowSeq:2}
 
 #HIDE_PE_ROW_{i}=@,1,S
@@ -908,7 +919,8 @@ C(3,#PublicBdNoA{i},0,S,$)
 IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 C(3,#PublicBdNoA{i},0,S,$)
-@A(ID_UNINO,0,#PublicBdOwnerId{i})
+HELP(#PublicBdOwnerIdHelp)
+@A(ID_UNINO,0,#PublicBdOwnerId{i})V(H,#PublicBdOwnerIdHelp)
 
 
 #RimL1r09PublicBd{i}=X,1,S
@@ -1244,6 +1256,7 @@ TXFORM=L2415
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R17.tom"/>
+<include src="ROM.icf::L2R19.tom"/>
 <include src="ROM.icf::L2R27.tom"/>
 <include src="ROM.icf::L1R09.tom"/>
 <include src="ROM.icf::L6R03.tom"/>

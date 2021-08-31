@@ -564,13 +564,13 @@ TXFORM=L8030
 #OOCustId=身分證字號
 {width:100,align:'center',hidden:false}
 #OORcDate=調解申請日
-{width:200,align:'center',hidden:false}
+{width:100,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
-#OOBankId_Combine=受理調解機構代號
+{width:200,align:'center',hidden:false}
+#OOCourtCode=受理調解機構代號
 {width:200,align:'center',hidden:false}
 #OOPayDate=繳款日期
-{width:150,align:'center',hidden:false}
+{width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
 ^

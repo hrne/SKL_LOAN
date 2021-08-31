@@ -28,7 +28,7 @@ public class JcicZ046Log implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7700127012386303671L;
+	private static final long serialVersionUID = 5045717590448466668L;
 
 @EmbeddedId
   private JcicZ046LogId jcicZ046LogId;
@@ -51,9 +51,10 @@ public class JcicZ046Log implements Serializable {
   @Column(name = "`BreakCode`", length = 2)
   private String breakCode;
 
-  // 結案日期
-  @Column(name = "`CloseDate`")
-  private int closeDate = 0;
+  // 結案原因代號
+  /* 00:毀諾01:協商終止11:未能接受足以負擔之還款方案12:要求折讓本金未為金融機構所接受13:要求撤銷原已協商通過之還款方案並要求更優惠還款方案14:無法負擔任何還款條件15:本行/本公司未能於文件齊全後30日內開始協商17:協商意願低落18:債務人於協商前大量借款或密集消費19:債務人於最大債權金融機構通知簽署協議書10日曆天內未完成簽約手續21:資產大於負債49:其他(協商不成立)53:經最大債權金融機構通知面談後兩次無故不到場面談55:債務人主動撤案，終止協商56:與債務人聯絡多日（多次），仍無法聯繫上89:其他(協商自始未開始)90:毀諾後清償95:申請資格不符96:債務人透過代辦業者申請，經勸導自行撤件。97:資料key值報送錯誤，本行結案98:依規定轉他行承辦，本行結案99:依債務清償方案履行完畢 */
+  @Column(name = "`CloseCode`", length = 2)
+  private String closeCode;
 
   // 轉出JCIC文字檔日期
   @Column(name = "`OutJcicTxtDate`")
@@ -175,22 +176,64 @@ public class JcicZ046Log implements Serializable {
   }
 
 /**
-	* 結案日期<br>
-	* 
-	* @return Integer
+	* 結案原因代號<br>
+	* 00:毀諾
+01:協商終止
+11:未能接受足以負擔之還款方案
+12:要求折讓本金未為金融機構所接受
+13:要求撤銷原已協商通過之還款方案並要求更優惠還款方案
+14:無法負擔任何還款條件
+15:本行/本公司未能於文件齊全後30日內開始協商
+17:協商意願低落
+18:債務人於協商前大量借款或密集消費
+19:債務人於最大債權金融機構通知簽署協議書10日曆天內未完成簽約手續
+21:資產大於負債
+49:其他(協商不成立)
+53:經最大債權金融機構通知面談後兩次無故不到場面談
+55:債務人主動撤案，終止協商
+56:與債務人聯絡多日（多次），仍無法聯繫上
+89:其他(協商自始未開始)
+90:毀諾後清償
+95:申請資格不符
+96:債務人透過代辦業者申請，經勸導自行撤件。
+97:資料key值報送錯誤，本行結案
+98:依規定轉他行承辦，本行結案
+99:依債務清償方案履行完畢
+	* @return String
 	*/
-  public int getCloseDate() {
-    return StaticTool.bcToRoc(this.closeDate);
+  public String getCloseCode() {
+    return this.closeCode == null ? "" : this.closeCode;
   }
 
 /**
-	* 結案日期<br>
-	* 
+	* 結案原因代號<br>
+	* 00:毀諾
+01:協商終止
+11:未能接受足以負擔之還款方案
+12:要求折讓本金未為金融機構所接受
+13:要求撤銷原已協商通過之還款方案並要求更優惠還款方案
+14:無法負擔任何還款條件
+15:本行/本公司未能於文件齊全後30日內開始協商
+17:協商意願低落
+18:債務人於協商前大量借款或密集消費
+19:債務人於最大債權金融機構通知簽署協議書10日曆天內未完成簽約手續
+21:資產大於負債
+49:其他(協商不成立)
+53:經最大債權金融機構通知面談後兩次無故不到場面談
+55:債務人主動撤案，終止協商
+56:與債務人聯絡多日（多次），仍無法聯繫上
+89:其他(協商自始未開始)
+90:毀諾後清償
+95:申請資格不符
+96:債務人透過代辦業者申請，經勸導自行撤件。
+97:資料key值報送錯誤，本行結案
+98:依規定轉他行承辦，本行結案
+99:依債務清償方案履行完畢
   *
-  * @param closeDate 結案日期
-  * @throws LogicException when Date Is Warn	*/
-  public void setCloseDate(int closeDate) throws LogicException {
-    this.closeDate = StaticTool.rocToBc(closeDate);
+  * @param closeCode 結案原因代號
+	*/
+  public void setCloseCode(String closeCode) {
+    this.closeCode = closeCode;
   }
 
 /**
@@ -291,7 +334,7 @@ public class JcicZ046Log implements Serializable {
 
   @Override
   public String toString() {
-    return "JcicZ046Log [jcicZ046LogId=" + jcicZ046LogId + ", tranKey=" + tranKey + ", breakCode=" + breakCode + ", closeDate=" + closeDate + ", outJcicTxtDate=" + outJcicTxtDate
+    return "JcicZ046Log [jcicZ046LogId=" + jcicZ046LogId + ", tranKey=" + tranKey + ", breakCode=" + breakCode + ", closeCode=" + closeCode + ", outJcicTxtDate=" + outJcicTxtDate
            + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

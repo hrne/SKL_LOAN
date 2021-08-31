@@ -100,7 +100,7 @@ public class L2221 extends TradeBuffer {
 	    		tCustMain.setCustId(iCustId);
 	    		tCustMain.setCustName(titaVo.getParam("CustName"));
 	    		tCustMain.setDataStatus(1);
-	    		
+	    		tCustMain.setTypeCode(3);
 	    		try {
 	    			sCustMainService.insert(tCustMain, titaVo);
 				} catch (DBException e) {

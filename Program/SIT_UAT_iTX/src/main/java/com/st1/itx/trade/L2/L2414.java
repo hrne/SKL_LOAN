@@ -476,7 +476,7 @@ public class L2414 extends TradeBuffer {
 			custMain.setCustId(titaVo.getParam("OwnerId"));
 			custMain.setCustName(titaVo.getParam("OwnerName"));
 			custMain.setDataStatus(1);
-
+			custMain.setTypeCode(2);
 			try {
 				sCustMainService.insert(custMain, titaVo);
 			} catch (DBException e) {

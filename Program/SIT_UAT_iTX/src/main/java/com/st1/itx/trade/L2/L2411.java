@@ -808,7 +808,7 @@ public class L2411 extends TradeBuffer {
 				custMain.setCustId(iOwnerId);
 				custMain.setCustName(titaVo.getParam("OwnerName" + i));
 				custMain.setDataStatus(1);
-
+				custMain.setTypeCode(2);
 				try {
 					sCustMainService.insert(custMain, titaVo);
 				} catch (DBException e) {
@@ -894,7 +894,7 @@ public class L2411 extends TradeBuffer {
 				custMain.setCustId(iOwnerId);
 				custMain.setCustName(titaVo.getParam("OwnerName" + i));
 				custMain.setDataStatus(1);
-
+				custMain.setTypeCode(2);
 				try {
 					sCustMainService.insert(custMain, titaVo);
 				} catch (DBException e) {

@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9717ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -29,21 +26,19 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-	
+
 	public static enum OutputSortBy {
-		Agent,
-		Year,
-		LargeAmt_Customer,
-		LargeAmt_Agent
+		Agent, Year, LargeAmt_Customer, LargeAmt_Agent
 	}
 
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo, OutputSortBy kind) throws Exception {
-		logger.info("l9717.findAll ");
-		
+		this.info("l9717.findAll ");
+
 		String sql = "WITH fulldata AS ( SELECT m.\"CustNo\"";
 		sql += "                        ,m.\"FacmNo\"";
 		sql += "                        ,CM.\"CustName\"";
+		sql += "                        ,1 AS \"CNT\"";
 		sql += "                        ,CASE";
 		sql += "                         WHEN m.\"AcctCode\" = '990' ";
 		sql += "                         THEN 990";
@@ -54,10 +49,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        ,emp.\"Fullname\" AS \"BusinessOfficerFullName\"";
 		sql += "                        ,trunc(fac.\"FirstDrawdownDate\" / 10000) AS \"DrawdownYear\"";
 		sql += "                        ,tot.\"PrinBalance\"   AS \"TotalPrinBalance\"";
-		sql += "                        ,CASE :outputSortByColumn WHEN 'Year' ";
-		sql += "                                                  THEN TO_CHAR(trunc(fac.\"FirstDrawdownDate\" / 10000)) ";
-		sql += "                                                  ELSE fac.\"BusinessOfficer\" ";
-		sql += "                         END AS \"Pivot\"";
+		sql += "                        ,TO_CHAR(trunc(fac.\"FirstDrawdownDate\" / 10000))  AS \"Pivot\"";
 		sql += "                  FROM \"MonthlyFacBal\" m";
 		sql += "                  LEFT JOIN \"FacMain\" fac ON fac.\"CustNo\" = m.\"CustNo\"";
 		sql += "                                         AND fac.\"FacmNo\" = m.\"FacmNo\"";
@@ -78,113 +70,117 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                          (     m.\"OvduTerm\" >= :inputOverdueTermMin";
 		sql += "                            AND m.\"OvduTerm\" <= :inputOverdueTermMax ) )";
 		sql += "                    AND fac.\"FirstDrawdownDate\" >= 19810101";
-	    sql += "                    AND ( (:largeAmountOnly = 'Y' AND tot.\"PrinBalance\" >= 50000000)";
-	    sql += "                     OR   (:largeAmountOnly = 'N' AND tot.\"PrinBalance\" <  50000000) )";
+		sql += "                    AND ( (:largeAmountOnly = 'Y' AND tot.\"PrinBalance\" >= 50000000)";
+		sql += "                     OR   (:largeAmountOnly = 'N' AND tot.\"PrinBalance\" <  50000000) )";
 		sql += "                )";
-		
-		if (kind != OutputSortBy.LargeAmt_Customer )
-		{
-		sql += "      SELECT f.\"Pivot\" AS \"Pivot\"";
-		sql += "            ,f.\"BusinessOfficer\"";
-		sql += "            ,f.\"BusinessOfficerFullName\"";
-		sql += "            ,f.\"DrawdownYear\"";
-		sql += "            ,nvl(termi.cnt, 0) \"TermICnt\"";
-		sql += "            ,nvl(termi.amt, 0) \"TermIAmt\"";
-		sql += "            ,nvl(termii.cnt, 0) \"TermIICnt\"";
-		sql += "            ,nvl(termii.amt, 0) \"TermIIAmt\"";
-		sql += "            ,nvl(termiii.cnt, 0) \"TermIIICnt\"";
-		sql += "            ,nvl(termiii.amt, 0) \"TermIIIAmt\"";
-		sql += "            ,nvl(termiv.cnt, 0) \"TermIVCnt\"";
-		sql += "            ,nvl(termiv.amt, 0) \"TermIVAmt\"";
-		sql += "            ,nvl(termv.cnt, 0) \"TermVCnt\"";
-		sql += "            ,nvl(termv.amt, 0) \"TermVAmt\"";
-		sql += "            ,nvl(termvi.cnt, 0) \"TermVICnt\"";
-		sql += "            ,nvl(termvi.amt, 0) \"TermVIAmt\"";
-		sql += "            ,nvl(termOvdu.cnt, 0) \"TermOvduCnt\"";
-		sql += "            ,nvl(termOvdu.amt, 0) \"TermOvduAmt\"";
-		sql += "            ,NVL(termi.cnt,0) + NVL(termii.cnt,0) + NVL(termiii.cnt,0) + NVL(termiv.cnt,0) + NVL(termv.cnt,0) + NVL(termvi.cnt,0) + NVL(termovdu.cnt,0) as \"totalCnt\"";
-		sql += "            ,NVL(termi.amt,0) + NVL(termii.amt,0) + NVL(termiii.amt,0) + NVL(termiv.amt,0) + NVL(termv.amt,0) + NVL(termvi.amt,0) + NVL(termovdu.amt,0) as \"totalAmt\"";
-		sql += "      FROM fullData f ";
-		sql += "      LEFT JOIN ( SELECT \"Pivot\"";
-		sql += "                        ,COUNT(*) AS cnt";
-		sql += "                        ,SUM(\"PrinBalance\") AS amt";
-		sql += "                  FROM fullData f";
-		sql += "                  WHERE f.\"OvduTerm\" = 1 ";
-		sql += "                  GROUP BY \"Pivot\"";
-		sql += "                ) TermI ON termi.\"Pivot\" = f.\"Pivot\"";
-		sql += "      LEFT JOIN ( SELECT \"Pivot\"";
-		sql += "                        ,COUNT(*) AS cnt";
-		sql += "                        ,SUM(\"PrinBalance\") AS amt";
-		sql += "                  FROM fullData f";
-		sql += "                  WHERE f.\"OvduTerm\" = 2 ";
-		sql += "                  GROUP BY \"Pivot\"";
-		sql += "                ) TermII ON termii.\"Pivot\" = f.\"Pivot\"";
-		sql += "      LEFT JOIN ( SELECT \"Pivot\"";
-		sql += "                        ,COUNT(*) AS cnt";
-		sql += "                        ,SUM(\"PrinBalance\") AS amt";
-		sql += "                  FROM fullData f";
-		sql += "                  WHERE f.\"OvduTerm\" = 3 ";
-		sql += "                  GROUP BY \"Pivot\"";
-		sql += "                ) TermIII ON termiii.\"Pivot\" = f.\"Pivot\"";
-		sql += "      LEFT JOIN ( SELECT \"Pivot\"";
-		sql += "                        ,COUNT(*) AS cnt";
-		sql += "                        ,SUM(\"PrinBalance\") AS amt";
-		sql += "                  FROM fullData f";
-		sql += "                  WHERE f.\"OvduTerm\" = 4  ";
-		sql += "                  GROUP BY \"Pivot\"";
-		sql += "                ) TermIV ON termiii.\"Pivot\" = f.\"Pivot\"";
-		sql += "      LEFT JOIN ( SELECT \"Pivot\"";
-		sql += "                        ,COUNT(*) AS cnt";
-		sql += "                        ,SUM(\"PrinBalance\") AS amt";
-		sql += "                  FROM fullData f";
-		sql += "                  WHERE f.\"OvduTerm\" = 5 ";
-		sql += "                  GROUP BY \"Pivot\"";
-		sql += "                ) TermV ON termiii.\"Pivot\" = f.\"Pivot\"";
-		sql += "      LEFT JOIN ( SELECT \"Pivot\"";
-		sql += "                        ,COUNT(*) AS cnt";
-		sql += "                        ,SUM(\"PrinBalance\") AS amt";
-		sql += "                  FROM fullData f";
-		sql += "                  WHERE f.\"OvduTerm\" = 6 ";
-		sql += "                  GROUP BY \"Pivot\"";
-		sql += "                      ) TermVI ON termiii.\"Pivot\" = f.\"Pivot\"";
-		sql += "      LEFT JOIN ( SELECT \"Pivot\"";
-		sql += "                        ,COUNT(*) AS cnt";
-		sql += "                        ,SUM(\"PrinBalance\") AS amt";
-		sql += "                  FROM fullData f";
-		sql += "                  WHERE f.\"OvduTerm\" = 990 ";
-		sql += "                  GROUP BY \"Pivot\"";
-		sql += "                ) TermOvdu ON termOvdu.\"Pivot\" = f.\"Pivot\"";
-		}
-		else
-		{
-		sql += "      SELECT f.\"BusinessOfficer\" AS \"empCode\"";
-		sql += "            ,f.\"BusinessOfficerFullName\" AS \"empName\"";
-		sql += "            ,f.\"CustNo\" AS \"CustNo\"";
-		sql += "            ,f.\"CustName\" AS \"CustName\"";
-		sql += "            ,f.\"OvduTerm\" AS \"OvduTerm\"";
-		sql += "            ,SUM(f.\"PrinBalance\") AS \"TotalBalance\"";
-		sql += "      FROM fullData f ";
-		sql += "      WHERE f.\"TotalPrinBalance\" >= 50000000 ";
-		sql += "      GROUP BY f.\"CustNo\",f.\"CustName\",f.\"BusinessOfficer\",f.\"BusinessOfficerFullName\",f.\"OvduTerm\"";
+
+		if (kind == OutputSortBy.Year) {
+			sql += "      SELECT RES.\"Pivot\" AS \"Pivot\"";
+			sql += "            ,RES.\"OvduTerm\" AS \"OvduTerm\"";
+			sql += "            ,SUM(RES.\"CNT\") AS \"CNT\"";
+			sql += "            ,SUM(RES.\"PrinBalance\") AS \"PrinBalance\"";
+			sql += "      FROM (";
+
+			sql += "      SELECT f.\"Pivot\" AS \"Pivot\"";
+			sql += "            ,f.\"OvduTerm\" AS \"OvduTerm\"";
+			sql += "            ,SUM(f.\"CNT\") AS \"CNT\"";
+			sql += "            ,SUM(f.\"PrinBalance\") AS \"PrinBalance\"";
+			sql += "      FROM fullData f ";
+
+			for (int i = 1; i <= 7; i++) {
+
+				if (i == 7) {
+					i = 990;
+				}
+				sql += "      UNION ALL";
+				sql += "      SELECT DISTINCT f.\"Pivot\" AS \"Pivot\"";
+				sql += "            ," + i + " AS \"OvduTerm\"";
+				sql += "            ,0";
+				sql += "            ,0";
+				sql += "      FROM fullData f ";
+
+			}
+
+			sql += "      )RES";
+			sql += "      GROUP BY RES.\"Pivot\",RES.\"OvduTerm\"";
+			sql += "      ORDER BY RES.\"Pivot\",RES.\"OvduTerm\"";
+
 		}
 
-		logger.info("sql=" + sql);
-		
-		LocalDate lastYearMonth = LocalDate.of(  Integer.parseInt(titaVo.getParam("inputYear"))+1911
-				                               , Integer.parseInt(titaVo.getParam("inputMonth"))
-				                               , 1 ).minusMonths(1);
-		
+		if (kind == OutputSortBy.Agent || kind == OutputSortBy.LargeAmt_Agent) {
+			sql += "      SELECT RES.\"BusinessOfficer\" AS \"BusinessOfficer\"";
+			sql += "            ,RES.\"OvduTerm\" AS \"OvduTerm\"";
+			sql += "            ,SUM(RES.\"CNT\") AS \"CNT\"";
+			sql += "            ,SUM(RES.\"PrinBalance\") AS \"PrinBalance\"";
+			sql += "            ,RES.\"BusinessOfficerFullName\" AS \"BusinessOfficerFullName\"";
+			sql += "      FROM (";
+
+			sql += "      SELECT f.\"BusinessOfficer\" AS \"BusinessOfficer\"";
+			sql += "            ,f.\"BusinessOfficerFullName\" AS \"BusinessOfficerFullName\"";
+			sql += "            ,f.\"OvduTerm\" AS \"OvduTerm\"";
+			sql += "            ,SUM(f.\"CNT\") AS \"CNT\"";
+			sql += "            ,SUM(f.\"PrinBalance\") AS \"PrinBalance\"";
+			sql += "      FROM fullData f ";
+
+			for (int i = 1; i <= 7; i++) {
+
+				if (i == 7) {
+					i = 990;
+				}
+				sql += "      UNION ALL";
+				sql += "      SELECT DISTINCT f.\"BusinessOfficer\" AS \"BusinessOfficer\"";
+				sql += "            ,f.\"BusinessOfficerFullName\" AS \"BusinessOfficerFullName\"";
+				sql += "            ," + i + " AS \"OvduTerm\"";
+				sql += "            ,0";
+				sql += "            ,0";
+				sql += "            ,0";
+				sql += "      FROM fullData f ";
+
+			}
+
+			sql += "      )RES";
+			sql += "      GROUP BY RES.\"BusinessOfficer\",RES.\"BusinessOfficerFullName\",RES.\"OvduTerm\"";
+			sql += "      ORDER BY CASE ";
+			sql += "      			 WHEN ASCII(SUBSTR(RES.\"BusinessOfficer\",0,2)) < 65 ";
+			sql += "      			 THEN ASCII(SUBSTR(RES.\"BusinessOfficer\",0,2)) + 65";
+			sql += "      			 WHEN ASCII(SUBSTR(RES.\"BusinessOfficer\",0,2)) >= 65 ";
+			sql += "      			 THEN ASCII(SUBSTR(RES.\"BusinessOfficer\",0,2))";
+			sql += "      		     ELSE 1";
+			sql += " 			   END ASC";
+			sql += " 			  ,SUBSTR(RES.\"BusinessOfficer\",0,2) ASC";
+			sql += " 			  ,RES.\"OvduTerm\" ASC";
+
+		}
+
+		if (kind == OutputSortBy.LargeAmt_Customer) {
+			sql += "      SELECT f.\"BusinessOfficer\" AS \"empCode\"";
+			sql += "            ,f.\"BusinessOfficerFullName\" AS \"empName\"";
+			sql += "            ,f.\"CustNo\" AS \"CustNo\"";
+			sql += "            ,f.\"CustName\" AS \"CustName\"";
+			sql += "            ,f.\"OvduTerm\" AS \"OvduTerm\"";
+			sql += "            ,SUM(f.\"PrinBalance\") AS \"TotalBalance\"";
+			sql += "      FROM fullData f ";
+			sql += "      WHERE f.\"TotalPrinBalance\" >= 50000000 ";
+			sql += "      GROUP BY f.\"CustNo\",f.\"CustName\",f.\"BusinessOfficer\",f.\"BusinessOfficerFullName\",f.\"OvduTerm\"";
+		}
+
+		this.info("sql=" + sql);
+
+		LocalDate lastYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911,
+				Integer.parseInt(titaVo.getParam("inputMonth")), 1).minusMonths(1);
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		
+
 		Query query;
 		query = em.createNativeQuery(sql);
-		query.setParameter("inputYearMonth", Integer.toString(lastYearMonth.getYear()) + String.format("%02d",lastYearMonth.getMonthValue()));
+		query.setParameter("inputYearMonth",
+				Integer.toString(lastYearMonth.getYear()) + String.format("%02d", lastYearMonth.getMonthValue()));
 		query.setParameter("inputOverdueTermMin", titaVo.getParam("inputOverdueTermMin"));
 		query.setParameter("inputOverdueTermMax", titaVo.getParam("inputOverdueTermMax"));
 		query.setParameter("inputBusinessOfficer", titaVo.getParam("inputBusinessOfficer"));
-		query.setParameter("largeAmountOnly", kind == OutputSortBy.LargeAmt_Agent || kind == OutputSortBy.LargeAmt_Customer ? "Y" : "N");
-		query.setParameter("outputSortByColumn", kind == OutputSortBy.Year ? "Year" : "BusinessOfficer");
-		
+		query.setParameter("largeAmountOnly",
+				kind == OutputSortBy.LargeAmt_Agent || kind == OutputSortBy.LargeAmt_Customer ? "Y" : "N");
+
 		return this.convertToMap(query.getResultList());
 	}
 

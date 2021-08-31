@@ -469,7 +469,7 @@ public class L5701 extends TradeBuffer {
 			NegMain sNegMsain = sNegMainService.holdById(NegMainVO.getNegMainId());
 			NegMain beforeNegMain = (NegMain) iDataLog.clone(sNegMsain);
 			try {
-				sNegMsain = sNegMainService.update2(InputNegMain);
+				sNegMsain = sNegMainService.update(InputNegMain);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}

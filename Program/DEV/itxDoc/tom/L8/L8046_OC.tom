@@ -1,23 +1,15 @@
 OOTranKey=X,1
-OOYear=9,3
-OOCourtDiv=X,9
-OOCourtCaseNo=X,45
-OOPayDate=9,7
-OOPayEndDate=9,7
-OOPeriod=9,3
-OORate=9,2.2
-OOOutstandAmt=9,9
-OOSubAmt=9,9
-OOClaimStatus1=X,1
-OOSaveDate=9,7
-OOClaimStatus2=X,1
-OOSaveEndDate=9,7
-OOIsImplement=X,1
-OOInspectName=X,10
+OOCustId=X,10
+OOSubmitKey=X,3
+OORcDate=9,7
+OOCloseDate=9,7
+OOCloseCode=X,2
+OOBreakCode=X,2
 OOOutJcicTxtDate=9,7
 OOLastUpdate=X,30
 OOLastUpdateEmpNo=X,6
 OOLastUpdateEmpNoName=X,50
+
 
 
 

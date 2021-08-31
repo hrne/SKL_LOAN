@@ -43,50 +43,6 @@ E(0,40)ASGN(INQPRT$)
 ["#FdCOLNO+擔保品編號",#ClNo],["#FdGdRid+原擔保品編號",#GdALL],
 [#<->#,"#FdSubType+擔保品類別",#ClTypeCode,#ClTypeCodeX],
 [#<->#,"@",#Btn1,"@",#Btn2,"@",#Btn3,"@",#Btn4,"@",#Btn5,"@",#Btn6,"@",#BtnExpand],
-![#<->#,"#FdADDRESS_1+建物門牌",#CityCode,#CityItem,"（縣／市）</BR>",
-!                              #AreaCode,#AreaItem,"（鄉／鎮／市／區）</BR>",
-!                              #IrCode,#IrItem,"（地段）</BR>",
-!                              #Road,"（路／街／村）</BR>",
-!                              #Section,"段@",#Alley,"巷@",#Lane,"弄</BR>",
-!                              #Num,"號之",#NumDash,"</BR>",
-!                              #Floor,"樓之",#FloorDash,"</BR>",
-!                              "建號",#BdNo1,"-",#BdNo2],
-![#<->#,"#FdLD_1+土地座落",#CityCodeB,#CityItemB,"（縣／市）</BR>",
-!                         #AreaCodeB,#AreaItemB,"（鄉／鎮／市／區）</BR>",
-!                         #IrCodeB,#IrItemB,"（地段）</BR>",
-!                         "地號",#LandNo1,"－",#LandNo2],
-!["#grid#,{id:3,expand:true,loop:10,row_height:1,s_cols:[150,500,250,500], p_cols:[20,20,20,20]}","#FdOWNER+所有權人","","",
-!["統編","姓名","持份比率","與授信戶關係"],
-![[#OwnerId1],#OwnerName1,[#OwnerPart1,"/",#OwnerTotal1],[#OwnerRelCode1,#OwnerRelCodeX1]]
-!],
-![#<->#,"@","@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@合@@@計@@@@",#OwnerPart,"/",#OwnerTotal],
-!["#FdEvaDate+鑑估日期",#EvaDate],["#FdEvaAmt+鑑價總值",#EvaAmt],
-!["#FdEvaNetWorth+評估淨值",#EvaNetWorth],["#FdLVITax+土地增值稅",#LVITax],
-!["#FdRentEvaValue+出租評估淨值",#RentEvaValue],["#FdRentPrice+押租金",#RentPrice],
-![#<->#,"#FdEvaCompany+鑑價公司",#EvaCompany,#BTN1,#EvaCompanyX],
-![#<->#,"#FdOwnershipCode+權利種類",#OwnershipCode,#OwnershipCodeX],
-![#<->#,"#FdMtgCode+抵押權註記",#MtgCode,#MtgCodeX],
-![#<->#,"@","最高限額抵押權之擔保債權種類"],
-![#<->#,"#FdMtgCheck+@票據",#MtgCheck,#MtgCheckX],
-![#<->#,"#FdMtgLoan+@借款",#MtgLoan,#MtgLoanX],
-![#<->#,"#FdMtgPledge+@保證債務",#MtgPledge,#MtgPledgeX],
-!["#FdClStatus+擔保品狀況碼",#ClStatus,#ClStatusX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
-!["#FdAgreement+檢附同意書",#Agreement,#AgreementX],["#FdLimitCancelDate+限制塗銷日期",#LimitCancelDate],
-!["#FdClCode+擔保註記",#ClCode,#ClCodeX],["#FdLoanToValue+貸放成數",#LoanToValue,"%"],
-![#<->#,"#FdOtherOwnerTotal+其他債權人設定總額",#OtherOwnerTotal],
-![#<->#,"#FdCompensationCopy+代償後謄本",#CompensationCopy,#CompensationCopyX],
-![#<->#,"#FdBdRmk+建物標示備註",#BdRmk],
-!["#FdSynd+聯貸案",#Synd,#SyndX],["#FdSyndCode+聯貸案類型",#SyndCode,#SyndCodeX],
-!["#FdDispPrice+處分價格",#DispPrice],["#FdDispDate+處分日期",#DispDate],
-![#<->#,"#FdMtgReasonCode+最高抵押權確定事由",#MtgReasonCode,#MtgReasonCodeX],
-!["#FdREC_DT+收文日期",#ReceivedDate],["#FdReceivedNo+收文案號",#ReceivedNo],
-!["#FdCancelDate+撤銷日期",#CancelDate],["#FdCancelNo+撤銷案號",#CancelNo],
-!["#FdSettingDate+設定日期",#SettingDate],["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],
-!["#FdSettingAmt+設定金額",#SettingAmt],["#FdClaimDate+擔保債權確定日期",#ClaimDate],
-![#<->#,"#FdSettingSeq+設定順位",#SettingSeq],
-!["#FdFirstAmt+前一順位金額",#FirstAmt],["#FdFirstCreditor+前一順位債權人",#FirstCreditor],
-!["#FdSecondAmt+前二順位金額",#SecondAmt],["#FdSecondCreditor+前二順位債權人",#SecondCreditor],
-!["#FdThirdAmt+前三順位金額",#ThirdAmt],["#FdThirdCreditor+前三順位債權人",#ThirdCreditor],
 ]
 !---------- AP Button AREA ----------
 
@@ -178,6 +134,10 @@ C(3,#PageFg,5,K(LIGHT,#Btn5,TXTRED,0),K(LIGHT,#Btn5,TXTRED,-1))
 C(3,#PageFg,6,K(LIGHT,#Btn6,TXTRED,0),K(LIGHT,#Btn6,TXTRED,-1))
 C(3,#PageFg,7,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
 
+#CALLGRID=@,1,S
+##loop{times:10,n:1,k:2,j:3}
+C(4,#OwnerId{n},INVOKEJS(SHOW,grd3_{k},0),INVOKEJS(SHOW,grd3_{k},1))
+##end
 
 #ResetPages=@,1,S
 INVOKEJS(SHOW,p2,0)
@@ -187,6 +147,7 @@ INVOKEJS(SHOW,p5,0)
 INVOKEJS(SHOW,p6,0)
 INVOKEJS(SHOW,p7,0)
 CALL(#KLIGHT)
+CALL(#CALLGRID)
 IF(#PageFg==1 || #PageFg==7,INVOKEJS(SHOW,p2,1),$)
 IF(#PageFg==2 || #PageFg==7,INVOKEJS(SHOW,p3,1),$)
 IF(#PageFg==3 || #PageFg==7,INVOKEJS(SHOW,p4,1),$)
@@ -1265,6 +1226,7 @@ T(3,土地座落之土地所有權人與擔保品編號)
 
 #Dash=X,1,S
 T(3,-)
+
 
 ##loop{times:10,i:1,j:0,rowSeq:2}
 
