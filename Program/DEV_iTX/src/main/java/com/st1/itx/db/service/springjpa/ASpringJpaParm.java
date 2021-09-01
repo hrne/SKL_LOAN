@@ -14,13 +14,21 @@ public class ASpringJpaParm extends SysLogger {
 
 	public List<Map<String, String>> convertToMap(List<Object> list) {
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
-
 		try {
 			for (Iterator<Object> iter = list.iterator(); iter.hasNext();) {
 				Object[] values = (Object[]) iter.next();
 				Map<String, String> m = new LinkedHashMap<String, String>();
-				for (int i = 0; i < values.length; i++)
-					m.put("F" + Integer.toString(i), values[i] == null ? "" : values[i].toString());
+				for (int i = 0; i < values.length; i++) {
+					String value = "";
+					if (values[i] == null)
+						value = "";
+					else {
+						String[] ss = values[i].toString().split("\\$n");
+						for (String s : ss)
+							value += s;
+					}
+					m.put("F" + Integer.toString(i), value);
+				}
 				result.add(m);
 			}
 		} catch (Exception e) {
