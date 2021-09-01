@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdPfParmsService")
 @Repository
-public class CdPfParmsServiceImpl implements CdPfParmsService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdPfParmsServiceImpl.class);
-
+public class CdPfParmsServiceImpl extends ASpringJpaParm implements CdPfParmsService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CdPfParmsServiceImpl implements CdPfParmsService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdPfParmsId);
+    this.info("findById " + dbName + " " + cdPfParmsId);
     Optional<CdPfParms> cdPfParms = null;
     if (dbName.equals(ContentName.onDay))
       cdPfParms = cdPfParmsReposDay.findById(cdPfParmsId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ConditionCode1", "ConditionCode2", "Condition"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ConditionCode1", "ConditionCode2", "Condition"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdPfParmsReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findConditionCode1Eq " + dbName + " : " + "conditionCode1_0 : " + conditionCode1_0);
+    this.info("findConditionCode1Eq " + dbName + " : " + "conditionCode1_0 : " + conditionCode1_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdPfParmsReposDay.findAllByConditionCode1IsOrderByConditionCode2AscConditionAsc(conditionCode1_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -153,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCode1AndCode2Eq " + dbName + " : " + "conditionCode1_0 : " + conditionCode1_0 + " conditionCode2_1 : " +  conditionCode2_1);
+    this.info("findCode1AndCode2Eq " + dbName + " : " + "conditionCode1_0 : " + conditionCode1_0 + " conditionCode2_1 : " +  conditionCode2_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdPfParmsReposDay.findAllByConditionCode1IsAndConditionCode2IsOrderByConditionAsc(conditionCode1_0, conditionCode2_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -174,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdPfParmsId);
+    this.info("Hold " + dbName + " " + cdPfParmsId);
     Optional<CdPfParms> cdPfParms = null;
     if (dbName.equals(ContentName.onDay))
       cdPfParms = cdPfParmsReposDay.findByCdPfParmsId(cdPfParmsId);
@@ -192,7 +188,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdPfParms.getCdPfParmsId());
+    this.info("Hold " + dbName + " " + cdPfParms.getCdPfParmsId());
     Optional<CdPfParms> cdPfParmsT = null;
     if (dbName.equals(ContentName.onDay))
       cdPfParmsT = cdPfParmsReposDay.findByCdPfParmsId(cdPfParms.getCdPfParmsId());
@@ -214,7 +210,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdPfParms.getCdPfParmsId());
+    this.info("Insert..." + dbName + " " + cdPfParms.getCdPfParmsId());
     if (this.findById(cdPfParms.getCdPfParmsId()) != null)
       throw new DBException(2);
 
@@ -243,7 +239,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdPfParms.getCdPfParmsId());
+    this.info("Update..." + dbName + " " + cdPfParms.getCdPfParmsId());
     if (!empNot.isEmpty())
       cdPfParms.setLastUpdateEmpNo(empNot);
 
@@ -266,7 +262,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdPfParms.getCdPfParmsId());
+    this.info("Update..." + dbName + " " + cdPfParms.getCdPfParmsId());
     if (!empNot.isEmpty())
       cdPfParms.setLastUpdateEmpNo(empNot);
 
@@ -286,7 +282,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdPfParms.getCdPfParmsId());
+    this.info("Delete..." + dbName + " " + cdPfParms.getCdPfParmsId());
     if (dbName.equals(ContentName.onDay)) {
       cdPfParmsReposDay.delete(cdPfParms);	
       cdPfParmsReposDay.flush();
@@ -315,7 +311,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdPfParms t : cdPfParms){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -350,7 +346,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdPfParms == null || cdPfParms.size() == 0)
       throw new DBException(6);
 
@@ -379,7 +375,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdPfParms> cdPfParms, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

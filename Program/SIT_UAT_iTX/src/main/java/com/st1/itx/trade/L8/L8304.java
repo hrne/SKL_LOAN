@@ -85,12 +85,12 @@ public class L8304 extends TradeBuffer {
 		String iMaxMainCode=titaVo.getParam("MaxMainCode");
 		String iAccount=titaVo.getParam("Account");
 		String iCollateralType=titaVo.getParam("CollateralType");
-		BigDecimal iOriginLoanAmt= new BigDecimal("OriginLoanAmt");
-		BigDecimal iCreditBalance=new BigDecimal("CreditBalance");
-		BigDecimal iPerPeriordAmt=new BigDecimal("PerPeriordAmt");
-		BigDecimal iLastPayAmt=new BigDecimal("LastPayAmt");
+		BigDecimal iOriginLoanAmt= new BigDecimal(titaVo.getParam("OriginLoanAmt"));
+		BigDecimal iCreditBalance=new BigDecimal(titaVo.getParam("CreditBalance"));
+		BigDecimal iPerPeriordAmt=new BigDecimal(titaVo.getParam("PerPeriordAmt"));
+		BigDecimal iLastPayAmt=new BigDecimal(titaVo.getParam("LastPayAmt"));
 		int iLastPayDate=Integer.valueOf(titaVo.getParam("LastPayDate"));
-		BigDecimal iOutstandAmt=new BigDecimal("OutstandAmt");
+		BigDecimal iOutstandAmt=new BigDecimal(titaVo.getParam("OutstandAmt"));
 		int iRepayPerMonDay=Integer.valueOf(titaVo.getParam("RepayPerMonDay"));
 		int iContractStartYM=Integer.valueOf(titaVo.getParam("ContractStartYM"));
 		int iContractEndYM=Integer.valueOf(titaVo.getParam("ContractEndYM"));

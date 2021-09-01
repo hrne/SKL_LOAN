@@ -28,6 +28,7 @@ K(MODIFYBUTTON,修改)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 <include src="ROM.icf::L6R37.dec"/>
+<include src="ROM.icf::L6R38.dec"/>
 #CDDEF0001=x,20,S
 T(3,CdCode.Exclude)
 #ExcludeHelp=x,1024,S
@@ -110,8 +111,6 @@ C(4,#ProdNoD{n},INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
 C(4,#ProdNoE{n},INVOKEJS(SHOW,grd5_{k},0),INVOKEJS(SHOW,grd5_{k},1))
 ##end
 
-
-
 #ResetPages=@,1,S
 INVOKEJS(SHOW,p1,0)
 INVOKEJS(SHOW,p2,0)
@@ -119,13 +118,43 @@ INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
 INVOKEJS(SHOW,p5,0)
 CALL(#CALLGRID)
-IF(#PageFg==1 ,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,grd1_2,1),$)
-IF(#PageFg==2 ,INVOKEJS(SHOW,p2,1)INVOKEJS(SHOW,grd2_2,1),$)
-IF(#PageFg==3 ,INVOKEJS(SHOW,p3,1)INVOKEJS(SHOW,grd3_2,1),$)
-IF(#PageFg==4 ,INVOKEJS(SHOW,p4,1)INVOKEJS(SHOW,grd4_2,1),$)
-IF(#PageFg==5 ,INVOKEJS(SHOW,p5,1)INVOKEJS(SHOW,grd5_2,1),$)
+IF(#PageFg==1 ,INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,grd1_2,1)K(LIGHT,#Ap1,TXTRED,0),K(LIGHT,#Ap1,TXTRED,-1))
+IF(#PageFg==2 ,INVOKEJS(SHOW,p2,1)INVOKEJS(SHOW,grd2_2,1)K(LIGHT,#Ap2,TXTRED,0),K(LIGHT,#Ap2,TXTRED,-1))
+IF(#PageFg==3 ,INVOKEJS(SHOW,p3,1)INVOKEJS(SHOW,grd3_2,1)K(LIGHT,#Ap3,TXTRED,0),K(LIGHT,#Ap3,TXTRED,-1))
+IF(#PageFg==4 ,INVOKEJS(SHOW,p4,1)INVOKEJS(SHOW,grd4_2,1)K(LIGHT,#Ap4,TXTRED,0),K(LIGHT,#Ap4,TXTRED,-1))
+IF(#PageFg==5 ,INVOKEJS(SHOW,p5,1)INVOKEJS(SHOW,grd5_2,1)K(LIGHT,#Ap5,TXTRED,0),K(LIGHT,#Ap5,TXTRED,-1))
+! 調Rim(L6R38)
+#RimFunc=A,1,S
+E(0,1)
+#RimL6R38=X,1,S
 
-! 調Rim值宣告
+RESET_RIM(#RimL6R38,L6R38)
+S(L6R38,1,#RimFunc)
+R(1,L6R38)
+##loop{times:30,i:1}
+T(2,@ProdNoA{i},#L6R38ProdNoA{i})
+T(2,@ProdNoAX{i},#L6R38ProdNoXA{i})
+T(2,@ProdNoB{i},#L6R38ProdNoB{i})
+T(2,@ProdNoBX{i},#L6R38ProdNoXB{i})
+T(2,@ProdNoC{i},#L6R38ProdNoC{i})
+T(2,@ProdNoCX{i},#L6R38ProdNoXC{i})
+T(2,@ProdNoD{i},#L6R38ProdNoD{i})
+T(2,@ProdNoDX{i},#L6R38ProdNoXD{i})
+T(2,@ProdNoE{i},#L6R38ProdNoE{i})
+T(2,@ProdNoEX{i},#L6R38ProdNoXE{i})
+E(0,@WorkMonthSA{i},#L6R38WorkMonthSA{i})
+E(0,@WorkMonthEA{i},#L6R38WorkMonthEA{i})
+E(0,@WorkMonthSB{i},#L6R38WorkMonthSB{i})
+E(0,@WorkMonthEB{i},#L6R38WorkMonthEB{i})
+E(0,@WorkMonthSC{i},#L6R38WorkMonthSC{i})
+E(0,@WorkMonthEC{i},#L6R38WorkMonthEC{i})
+E(0,@WorkMonthSD{i},#L6R38WorkMonthSD{i})
+E(0,@WorkMonthED{i},#L6R38WorkMonthED{i})
+E(0,@WorkMonthSE{i},#L6R38WorkMonthSE{i})
+E(0,@WorkMonthEE{i},#L6R38WorkMonthEE{i})
+##end
+
+! 調Rim值宣告(L6R37)
 #RimFlag=A,1,S
 E(0,1)
 #RimProdCode=X,5,S
@@ -137,7 +166,7 @@ T(3,X)
 ##loop{times:30,i:1,j:0,rowSeq:2}
 
 #HIDE_A_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd1_{rowSeq},0)
+C(4,#L6R38ProdNoA{i},INVOKEJS(SHOW,grd1_{rowSeq},0),INVOKEJS(SHOW,grd1_{rowSeq},1))
 
 #SHOW_A_ROW_{i}=@,1,S
 INVOKEJS(SHOW,grd1_{rowSeq},1)
@@ -177,7 +206,7 @@ T(3,X)
 ##loop{times:30,i:1,j:0,rowSeq:2}
 
 #HIDE_B_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd2_{rowSeq},0)
+C(4,#L6R38ProdNoB{i},INVOKEJS(SHOW,grd2_{rowSeq},0),INVOKEJS(SHOW,grd2_{rowSeq},1))
 
 #SHOW_B_ROW_{i}=@,1,S
 INVOKEJS(SHOW,grd2_{rowSeq},1)
@@ -218,8 +247,7 @@ T(3,X)
 ##loop{times:30,i:1,j:0,rowSeq:2}
 
 #HIDE_C_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd3_{rowSeq},0)
-
+C(4,#L6R38ProdNoC{i},INVOKEJS(SHOW,grd3_{rowSeq},0),INVOKEJS(SHOW,grd3_{rowSeq},1))
 #SHOW_C_ROW_{i}=@,1,S
 INVOKEJS(SHOW,grd3_{rowSeq},1)
 
@@ -259,8 +287,7 @@ T(3,X)
 ##loop{times:30,i:1,j:0,rowSeq:2}
 
 #HIDE_D_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd4_{rowSeq},0)
-
+C(4,#L6R38ProdNoD{i},INVOKEJS(SHOW,grd4_{rowSeq},0),INVOKEJS(SHOW,grd4_{rowSeq},1))
 #SHOW_D_ROW_{i}=@,1,S
 INVOKEJS(SHOW,grd4_{rowSeq},1)
 
@@ -300,8 +327,7 @@ T(3,X)
 ##loop{times:30,i:1,j:0,rowSeq:2}
 
 #HIDE_E_ROW_{i}=@,1,S
-INVOKEJS(SHOW,grd5_{rowSeq},0)
-
+C(4,#L6R38ProdNoE{i},INVOKEJS(SHOW,grd5_{rowSeq},0),INVOKEJS(SHOW,grd5_{rowSeq},1))
 #SHOW_E_ROW_{i}=@,1,S
 INVOKEJS(SHOW,grd5_{rowSeq},1)
 
@@ -333,7 +359,8 @@ C(4,#ProdNoE{j},S,$)
 @C(4,#ProdNoE{i},S,$)
 C(3,#WorkMonthEE{i},0,S,A(YM13,1,#WorkMonthEE{i}))
 IF(#WorkMonthSE{i}>#WorkMonthEE{i},V(P,止月不可小於起月),$)
-##end
+##end
+
 
 
 

@@ -22,17 +22,17 @@ public class CdPfParmsId implements Serializable {
 	private static final long serialVersionUID = 6334864616061210762L;
 
 // 條件記號1
-  /* 1.排除商品別2.排除部門別3.是否排除15日薪非業績人員4.業績追回時通知員工代碼(email) */
+  /* 1.排除商品別2.排除部門別3.是否排除15日薪非業績人員4.業績追回時通知員工代碼(email)R.業績重算設定 */
   @Column(name = "`ConditionCode1`", length = 1)
   private String conditionCode1 = " ";
 
   // 條件記號2
-  /* 條件記號1為1、2、3時1.業績全部2.換算業績、業務報酬3.介紹獎金4.加碼獎勵津貼5.協辦獎金 */
+  /* 條件記號1為1、2、3時1.業績全部2.換算業績、業務報酬3.介紹獎金4.加碼獎勵津貼5.協辦獎金其他為空白1位 */
   @Column(name = "`ConditionCode2`", length = 1)
   private String conditionCode2 = " ";
 
   // 標準條件
-  /* 條件記號1=1時為商品別代號條件記號1=2時為部門別代號條件記號1=3時為為空白1位條件記號1=4時為員工代碼 */
+  /* 條件記號1=1時為商品別代號條件記號1=2時為部門別代號條件記號1=3、R時為為空白1位條件記號1=4時為員工代碼 */
   @Column(name = "`Condition`", length = 6)
   private String condition = " ";
 
@@ -51,6 +51,7 @@ public class CdPfParmsId implements Serializable {
 2.排除部門別
 3.是否排除15日薪非業績人員
 4.業績追回時通知員工代碼(email)
+R.業績重算設定
 	* @return String
 	*/
   public String getConditionCode1() {
@@ -63,6 +64,7 @@ public class CdPfParmsId implements Serializable {
 2.排除部門別
 3.是否排除15日薪非業績人員
 4.業績追回時通知員工代碼(email)
+R.業績重算設定
   *
   * @param conditionCode1 條件記號1
 	*/
@@ -78,6 +80,7 @@ public class CdPfParmsId implements Serializable {
 3.介紹獎金
 4.加碼獎勵津貼
 5.協辦獎金
+其他為空白1位
 	* @return String
 	*/
   public String getConditionCode2() {
@@ -92,6 +95,7 @@ public class CdPfParmsId implements Serializable {
 3.介紹獎金
 4.加碼獎勵津貼
 5.協辦獎金
+其他為空白1位
   *
   * @param conditionCode2 條件記號2
 	*/
@@ -103,7 +107,7 @@ public class CdPfParmsId implements Serializable {
 	* 標準條件<br>
 	* 條件記號1=1時為商品別代號
 條件記號1=2時為部門別代號
-條件記號1=3時為為空白1位
+條件記號1=3、R時為為空白1位
 條件記號1=4時為員工代碼
 	* @return String
 	*/
@@ -115,7 +119,7 @@ public class CdPfParmsId implements Serializable {
 	* 標準條件<br>
 	* 條件記號1=1時為商品別代號
 條件記號1=2時為部門別代號
-條件記號1=3時為為空白1位
+條件記號1=3、R時為為空白1位
 條件記號1=4時為員工代碼
   *
   * @param condition 標準條件

@@ -99,13 +99,18 @@ T(3,CdCode.TranKey)
 T(3,CdCode.YesNo)
 #YesNoHelp=x,1024,S
 
+#CDDEF0003=x,25,S
+T(3,CdCode.CollateralType)
+#CollateralTypeHelp=x,10000,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@YesNoHelp,#HelpDesc2)
+T(2,@CollateralTypeHelp,#HelpDesc3)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -243,6 +248,7 @@ E(0,@EndDate,#L8r41EndDate)
 E(0,@OutJcicTxtDate,#L8r41OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(H,@GuarantyTypeX,#GuarantyType,#CollateralTypeHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r41TranKey)
@@ -336,11 +342,11 @@ V(8,0,50)
 #GuarantyType=X,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-HELP(#TranKeyHelp,cols:6)
-@V(H,#TranKeyHelp)
+HELP(#CollateralTypeHelp,cols:6)
+@V(H,#CollateralTypeHelp)
 !看書
 #GuarantyTypeX=X,50,L
-T(H,#GuarantyType,#TranKeyHelp)
+T(H,#GuarantyType,#CollateralTypeHelp)
 
 !原借款金額
 #LoanAmt=m,12,I
