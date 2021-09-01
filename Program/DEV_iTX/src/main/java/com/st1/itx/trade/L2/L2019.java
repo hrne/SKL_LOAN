@@ -22,6 +22,9 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
+/*
+ * L2019 合併額度控管資料查詢
+ */
 /**
  * Tita<br>
  * CreditSysNo=9,7<br>

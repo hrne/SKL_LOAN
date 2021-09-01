@@ -35,7 +35,7 @@ E(0,1)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 !T(3,@BTN3Name,  同戶籍地址)
-
+!JS(MOUSE,1)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -43,7 +43,8 @@ E(0,0)
 [
 ["[L1101]                                 顧客基本資料維護-自然人"],
 [#<->#,"#FdFunCd+功能",#FunCdx],
-[#<->#,"#FdCustId+身分證字號",#CustId],
+["#FdCustId+身分證字號",#CustId],
+["#FdTypeCode+建檔身分別",#TypeCode,#TypeCodeX],
 [#<->#,"#FdCustName+戶名",#CustName],
 [#<->#,"#FdEName+英文姓名",#EName],
 ["#FdBirthday+出生年月日",#Birthday],
@@ -66,7 +67,7 @@ E(0,0)
 [#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
 [#<->#,"#FdIsRelated+是否為利害關係人",#IsRelatedX],
 [#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNearX],
-[#<->#,"#FdIsLnrelNear+是否為金控疑似準利害關係人",#IsFinancialX],
+[#<->#,"#FdIsFinancial+是否為金控疑似準利害關係人",#IsFinancialX],
 [#<->#,"#FdEduCode+教育程度代號",#EduCode,#EduCodeX],
 [#<->#,"#FdOwnedHome+自有住宅有無",#OwnedHome,#OwnedHomeX],
 [#<->#,"#FdCurrCompId+任職機構統編",#CurrCompId],
@@ -89,10 +90,10 @@ E(0,0)
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L1R01.dec"/>
-<include src="ROM.icf::L6R06.dec"/>
 <include src="ROM.icf::L1R10.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L2R08.dec"/>
+<include src="ROM.icf::L6R06.dec"/>
 
 ! #BTN1=X,15,I,ui:button;value:L1105;enable:0;tabbable:0;title=顧客聯絡電話維護;
 !#BTN2=X,15,I,ui:button;value:行業別代號查詢;enable:1;tabbable:0;title=行業別代號查詢;
@@ -105,7 +106,7 @@ INVOKEJS(SHOW,p2,0)
 
 ![Buttom資料查詢]
 #BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BinCdEmp=X,1,S
+#BindCdEmp=X,1,S
 BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:EmpNo<-OOEmployeeNo:EmpNo2<-OOEmployeeNo:EmployeeName<-OOFullname})
 
 
@@ -162,31 +163,14 @@ IF(#RegFg==0,$,s)
 #FdRegZip3=X,2,L
 #FdRegZip2=X,2,L
 #FdRegCityCode=X,2,L
-#FdRegAreaCode=X,2,L
-#FdRegRoad=X,2,L
-#FdRegSection=X,2,L
-#FdRegAlley=X,2,L
-#FdRegLane=X,2,L
-#FdRegNum=X,2,L
-#FdRegNumDash=X,2,L
-#FdRegFloor=X,2,L
-#FdRegFloorDash=X,2,L
 #FdCurrZip3=X,2,L
 #FdCurrZip2=X,2,L
 #FdCurrCityCode=X,2,L
-#FdCurrAreaCode=X,2,L
-#FdCurrRoad=X,2,L
-#FdCurrSection=X,2,L
-#FdCurrAlley=X,2,L
-#FdCurrLane=X,2,L
-#FdCurrNum=X,2,L
-#FdCurrNumDash=X,2,L
-#FdCurrFloor=X,2,L
-#FdCurrFloorDash=X,2,L
 #FdEmail=X,2,L
 #FdIsLimit=X,2,L
 #FdIsRelated=X,2,L
 #FdIsLnrelNear=X,2,L
+#FdIsFinancial=X,2,L
 #FdEntCode=X,2,L
 #FdEmpNo=X,10,L
 T(3,*    員工代號)
@@ -205,7 +189,6 @@ T(3,*    員工代號)
 #FdAMLGroup=X,2,L
 #FdIndigenousName=X,2,L
 #FdSubCompanyFg=X,2,L
-T(3,*)
 
 ! 永遠為必輸欄位
 #FdFunCd=X,2,L
@@ -213,9 +196,13 @@ T(3, )
 #FdCustId=X,2,L
 T(3,*)
 
+#FdTypeCode=X,2,L
+T(3,*)
 
 !---------- AP TEXT AREA Variables ----------
 ! Help
+#TypeCodeHelp=x,100,S
+T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人)
 
 !Sex 性別
 #CDDEF0001=x,20,S
@@ -333,9 +320,6 @@ R(1,L6R03)
 #L6r03ResultCity=X,10000,S
 T(2,#L6r03Result)
 
-
-
-
 #CHAIN=A,1,S
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
@@ -386,53 +370,105 @@ C(2,#FunCd,$,$,E(0,1),$,E(0,1),E(0,1))
 ASGN(AGAIN$)
 
 
-
 #WKSPC=X,2,S
 
 #WKSTAR=X,1,S
 C(2,#FunCd,S,T(3,*),S,S,S,S)
 
-#WKNAME=X,1,S
+#WKTFKEY=X,1,S
+IF(#FunCd == 1 ,E(0,1),E(0,0))
+
+
+
+#IfFunCd5=X,1,S
+IF(#FunCd==5,INVOKEJS(SHOW,p1,3,65,0),INVOKEJS(SHOW,p1,3,65,1))
+!INVOKEJS(SHOW,p1,12,12,0)
+!INVOKEJS(SHOW,p1,16,16,0)
+
+#checkIdlen=A,2,S
+!-----
+!身分證字號
+#CustId=X,10,I
+C(3,#FunCd,1,$,s)
+C(3,#FunCd,1,T(F,@CustId,1),T(F,@CustId,0))
+@
+V(7)
+P(1,@checkIdlen,#CustId)
+C(3,#checkIdlen,10,$,V(P,請輸入正確身分證字號))
+A(ID_UNINO,0,#CustId)
+
+#IdSTAT=A,1,S
+T(4,STAT$)
+C(3,#IdSTAT,4,T(2,@FdPassportNo,#WKSTAR),T(2,@FdPassportNo,#WKSPC))
+
+#checkSex=X,1,S
+C(3,#FunCd,1,$,S)
+T(1,#CustId,2,1)
+C(3,#checkSex,1,E(0,@Sex,1),$)
+C(3,#checkSex,8,E(0,@Sex,1),$)
+C(5,#checkSex,A,T(2,@Sex,1),$)
+C(5,#checkSex,C,T(2,@Sex,1),$)
+C(3,#checkSex,2,E(0,@Sex,2),$)
+C(3,#checkSex,9,E(0,@Sex,2),$)
+C(5,#checkSex,B,T(2,@Sex,2),$)
+C(5,#checkSex,D,T(2,@Sex,2),$)
+
+!#RimFunCd=A,1,S
+!#RimCustId=X,10,S
+
+!#RimCustNo=A,7,S
+
+#RimL1r01=X,1,S
+C(3,#FunCd,5,S,$)
+E(0,@RimFunCd,#FunCd)
+T(2,@RimCustId,#CustId)
+RESET_RIM(#RimL1r01,L1R01)
+S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
+R(1,L1R01)
+T(2,@CustName,#L1r01CustName)
+T(2,@TypeCode,#L1r01TypeCode)
+
+#TypeCode=A,1,I
+HELP(#TypeCodeHelp)
+@V(H,#TypeCodeHelp)
+
+#TypeCodeX=x,20,L
+T(H,#TypeCode,#TypeCodeHelp)
+
+
+! 
+#Fd=X,1,S
 T(2,@FdCustName,#WKSTAR)
-T(2,@FdBirthday,#WKSTAR)
-T(2,@FdSex,#WKSTAR)
-T(2,@FdCustTypeCode,#WKSTAR)
-!T(2,@FdIndustryCode,#WKSTAR)
-T(2,@FdNationalityCode,#WKSTAR)
+T(2,@FdEName,#WKSPC)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+T(2,@FdBirthday,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+T(2,@FdSex,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdCustTypeCode,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdEntCode,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+T(2,@FdNationalityCode,#Fd)
 T(2,@FdSpouseId,#WKSPC)
 T(2,@FdSpouseName,#WKSPC)
-!T(2,@FdRegZip3,#WKSTAR)
-T(2,@FdRegZip2,#WKSTAR)
-T(2,@FdRegCityCode,#WKSTAR)
-T(2,@FdRegAreaCode,#WKSTAR)
-T(2,@FdRegRoad,#WKSTAR)
-T(2,@FdRegSection,#WKSTAR)
-T(2,@FdRegAlley,#WKSTAR)
-T(2,@FdRegLane,#WKSTAR)
-T(2,@FdRegNum,#WKSTAR)
-T(2,@FdRegNumDash,#WKSTAR)
-T(2,@FdRegFloor,#WKSTAR)
-T(2,@FdRegFloorDash,#WKSTAR)
-!T(2,@FdCurrZip3,#WKSTAR)
-T(2,@FdCurrZip2,#WKSTAR)
-T(2,@FdCurrCityCode,#WKSTAR)
-T(2,@FdCurrAreaCode,#WKSTAR)
-T(2,@FdCurrRoad,#WKSTAR)
-T(2,@FdCurrSection,#WKSTAR)
-T(2,@FdCurrAlley,#WKSTAR)
-T(2,@FdCurrLane,#WKSTAR)
-T(2,@FdCurrNum,#WKSTAR)
-T(2,@FdCurrNumDash,#WKSTAR)
-T(2,@FdCurrFloor,#WKSTAR)
-T(2,@FdCurrFloorDash,#WKSTAR)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdRegCityCode,#Fd)
+T(2,@FdRegZip2,#WKSPC)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+T(2,@FdCurrCityCode,#Fd)
+T(2,@FdCurrZip2,#WKSPC)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdEmail,#Fd)
 T(2,@FdIsLimit,#WKSPC)
 T(2,@FdIsRelated,#WKSPC)
 T(2,@FdIsLnrelNear,#WKSPC)
-T(2,@FdEntCode,#WKSTAR)
-!T(2,@FdEmpNo,#WKSPC)
-T(2,@FdEName,#WKSPC)
-T(2,@FdEduCode,#WKSTAR)
-T(2,@FdOwnedHome,#WKSTAR)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+T(2,@FdIsFinancial,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdEduCode,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdOwnedHome,#Fd)
 T(2,@FdCurrCompName,#WKSPC)
 T(2,@FdCurrCompId,#WKSPC)
 T(2,@FdCurrCompTel,#WKSPC)
@@ -441,18 +477,16 @@ T(2,@FdJobTenure,#WKSPC)
 T(2,@FdIncomeOfYearly,#WKSPC)
 T(2,@FdIncomeDataDate,#WKSPC)
 T(2,@FdPassportNo,#WKSPC)
-T(2,@FdAMLJobCode,#WKSTAR)
-T(2,@FdAMLGroup,#WKSTAR)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdAMLJobCode,#Fd)
+T(2,@FdAMLGroup,#Fd)
+T(2,@FdSubCompanyFg,#Fd)
 T(2,@FdIndigenousName,#WKSPC)
 
 !FunCd=1顯示框線
 
-#WKTFKEY=X,1,S
-IF(#FunCd == 1 ,E(0,1),E(0,0))
-
 #WKTF=X,1,S
 T(F,@CustName,#WKTFKEY)
-! T(F,@CustName2,#WKTFKEY)
 T(F,@Birthday,#WKTFKEY)
 T(F,@Sex,#WKTFKEY)
 T(F,@CustTypeCode,#WKTFKEY)
@@ -504,57 +538,6 @@ T(F,@PassportNo,#WKTFKEY)
 T(F,@AMLJobCode,#WKTFKEY)
 T(F,@AMLGroup,#WKTFKEY)
 T(F,@IndigenousName,#WKTFKEY)
-
-
-#IfFunCd5=X,1,S
-IF(#FunCd==5,INVOKEJS(SHOW,p1,3,65,0),INVOKEJS(SHOW,p1,3,65,1))
-!INVOKEJS(SHOW,p1,12,12,0)
-!INVOKEJS(SHOW,p1,16,16,0)
-
-#checkIdlen=A,2,S
-!-----
-!身分證字號
-#CustId=X,10,I
-C(3,#FunCd,1,$,s)
-C(3,#FunCd,1,T(F,@CustId,1),T(F,@CustId,0))
-@
-V(7)
-P(1,@checkIdlen,#CustId)
-C(3,#checkIdlen,10,$,V(P,請輸入正確身分證字號))
-A(ID_UNINO,0,#CustId)
-
-#IdSTAT=A,1,S
-T(4,STAT$)
-C(3,#IdSTAT,4,T(2,@FdPassportNo,#WKSTAR),T(2,@FdPassportNo,#WKSPC))
-
-#checkSex=X,1,S
-C(3,#FunCd,1,$,S)
-T(1,#CustId,2,1)
-C(3,#checkSex,1,E(0,@Sex,1),$)
-C(3,#checkSex,8,E(0,@Sex,1),$)
-C(5,#checkSex,A,T(2,@Sex,1),$)
-C(5,#checkSex,C,T(2,@Sex,1),$)
-C(3,#checkSex,2,E(0,@Sex,2),$)
-C(3,#checkSex,9,E(0,@Sex,2),$)
-C(5,#checkSex,B,T(2,@Sex,2),$)
-C(5,#checkSex,D,T(2,@Sex,2),$)
-
-
-
-
-!#RimFunCd=A,1,S
-!#RimCustId=X,10,S
-
-!#RimCustNo=A,7,S
-
-#RimL1r01=X,1,S
-C(3,#FunCd,5,S,$)
-E(0,@RimFunCd,#FunCd)
-T(2,@RimCustId,#CustId)
-RESET_RIM(#RimL1r01,L1R01)
-S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
-R(1,L1R01)
-
 
 !調Rim
 ! <include src="ROM.icf::L1R08.dec"/>
@@ -611,7 +594,9 @@ C(3,#FunCd,5,s,$)
 #Birthday=D,7,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@V(7)A(DATE,0,#Birthday)
+@
+IF(#FdBirthday=="*",V(7),$)
+A(DATE,0,#Birthday)
 
 !性別
 #Sex=A,1,I
@@ -629,7 +614,9 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#CustTypeCode,T(3,00),$)
 HELP(#CustTypeCodeHelp)
-@V(H,#CustTypeCodeHelp)
+@
+IF(#FdCustTypeCode=="*",$,s)
+V(H,#CustTypeCodeHelp)
 
 #CustTypeCodeX=X,10,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
@@ -661,20 +648,15 @@ T(2,@EmpNo2,#EmpNo)
 
 #EmployeeName=x,40,L
 
-
-!行業別查詢按鈕
-!#BUF2=X,18,S
-!
-!#BIND2=X,1,S
-!BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6062; ntxbuf=#BUF2;ntxbuf5=type<-1:IndustryCode<-OOIndustryCode:IndustryCodeX<-OOIndustryItem})
-
 !企金別
 #EntCode=X,1,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#EntCode,T(3,0),$)
 HELP(#EntCodeHelp)
-@V(7)V(H,#EntCodeHelp)
+@
+IF(#FdEntCode=="*",V(7),$)
+C(4,#EntCode,$,V(H,#EntCodeHelp))
 
 #EntCodeX=X,10,L
 T(H,#EntCode,#EntCodeHelp)
@@ -682,23 +664,7 @@ T(H,#EntCode,#EntCodeHelp)
 !行業別
 #IndustryCode=X,6,L
 T(3,060000)
-!C(3,#FunCd,4,s,$)
-!C(3,#FunCd,5,s,$)
-!@V(2,0)
 
-
-!#SendL6R06=X,1,S
-!#RimIndustryCode=X,6,S
-!C(3,#FunCd,5,S,$)
-!E(0,@RimFuncCode,5)
-!T(2,@RimIndustryCode,#IndustryCode)
-!RESET_RIM(#SendL6R06,L6R06)
-!S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
-!R(1,L6R06)
-
-!#RL6R06=X,1,S
-!C(3,#FunCd,5,S,$)
-!T(2,@IndustryCodeX,#L6R06IndustryItem)
 
 #IndustryCodeX=x,20,L
 T(3,個人)
@@ -709,7 +675,9 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#NationalityCode,T(3,TW),$)
 HELP(#NationalityCodeHelp)
-@V(H,#NationalityCodeHelp)
+@
+IF(#FdNationalityCode=="*",V(7),$)
+C(4,#NationalityCode,$,V(H,#NationalityCodeHelp))
 
 #NationalityCodex=X,50,L
 T(H,#NationalityCode,#NationalityCodeHelp)
@@ -730,10 +698,10 @@ C(3,#FunCd,5,s,$)
 #RegCityCode=X,2,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
 HELP(#L6r03ResultCity,cols:5)
-@V(H,#L6r03ResultCity)
+@
+IF(#FdRegCityCode=="*",V(7),$)
+C(4,#RegCityCode,$,V(H,#L6r03ResultCity))
 
 ! 縣市代碼對應名稱
 #RegCityItem=X,8,L
@@ -741,6 +709,7 @@ T(H,#RegCityCode,#L6r03ResultCity)
 
 ! 調RIM取鄉鎮市區代碼
 #RimL6r03Area=X,1,S
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 E(0,@RimFunCd,2)
@@ -756,6 +725,7 @@ T(2,#L6r03Result)
 
 !戶籍-鄉鎮市區代碼
 #RegAreaCode=X,3,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 !INVOKEJS(SHOW,p1,11,11,1)
@@ -769,6 +739,7 @@ T(H,#RegAreaCode,#L6r03ResultArea)
 
 ! 調RIM取鄉鎮市區代碼B
 #RimL1r10B=X,1,S
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 T(2,@RimCityCode,#RegCityCode)
@@ -784,6 +755,7 @@ E(0,@RegZip3,#L1r10Zip3)
 
 !戶籍-路名
 #RegRoad=c,40,I
+C(4,#RegCityCode,S,$)
 TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
@@ -793,12 +765,14 @@ C(3,#FunCd,5,s,$)
 
 !戶籍-段
 #RegSection=X,5,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 !INVOKEJS(SHOW,p1,12,12,0)
 
 !戶籍-巷
 #RegAlley=X,5,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 !INVOKEJS(SHOW,p1,11,11,1)
@@ -806,6 +780,7 @@ C(3,#FunCd,5,s,$)
 
 !戶籍-弄
 #RegLane=X,5,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 !INVOKEJS(SHOW,p1,11,11,1)
@@ -813,6 +788,7 @@ C(3,#FunCd,5,s,$)
 
 !戶籍-號
 #RegNum=X,5,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 !INVOKEJS(SHOW,p1,11,11,1)
@@ -820,6 +796,7 @@ C(3,#FunCd,5,s,$)
 
 !戶籍-號之
 #RegNumDash=X,5,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#RegNum,S,$)
@@ -828,6 +805,7 @@ C(4,#RegNum,S,$)
 
 !戶籍-樓
 #RegFloor=X,5,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 !INVOKEJS(SHOW,p1,11,11,1)
@@ -835,16 +813,14 @@ C(3,#FunCd,5,s,$)
 
 !戶籍-樓之
 #RegFloorDash=X,5,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#RegFloor,S,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
-@
-!INVOKEJS(SHOW,p1,12,12,1)
 
 !戶籍地址
 #RimL1r12AddressA=X,1,S
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 T(2,@RimCityCode,#RegCityCode)
@@ -863,64 +839,46 @@ R(1,L1R12)
 
 !戶籍地址
 #CheckL1R12A=X,1,S
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 T(2,@Regaddress,#L1r12Address)
 
 !戶籍-郵遞區號前三碼
 #RegZip3=X,3,L
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @C(3,#RegZip3,0,S,$)
 
 !戶籍-郵遞區號後兩碼
 #RegZip2=X,3,I
+C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@C(4,#RegZip2,S,$)
+@
+C(4,#RegZip2,S,$)
 V(9)
 
-! 調RIM取鄉鎮市區代碼A
-!#RimL1r10A=X,1,S
-!C(3,#FunCd,4,s,$)
-!C(3,#FunCd,5,s,$)
-!E(0,@RimZip3,#RegZip3)
-!T(2,@RimCityCode,)
-!T(2,@RimAreaCode,)
-!RESET_RIM(#RimL1r10A,L1R10)
-!S(L1R10,1,#RimZip3,#RimZip2,#RimCityCode,#RimAreaCode)
-!R(1,L1R10)
-!
-!#checkL1r10A=X,1,S
-!C(3,#FunCd,4,s,$)
-!C(3,#FunCd,5,s,$)
-!T(2,@RegCityCode,#L1r10CityCode)
-!T(2,@RegAreaCode,#L1r10AreaCode)
-
-#FdRegaddress=X,2,L
-
 #Regaddress=X,115,L
-!C(3,#FunCd,4,s,$)
-!C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,11,11,0)
-!INVOKEJS(SHOW,p1,12,12,1)
-!BIND(#BTN3Name,click, {cmd=CALLSEND;DOCODE=CopyReg;text=#BTN3Name})
 
 #SameRegHelp=X,100,S
 T(3,N:另行輸入;Y:同戶籍地址)
 
 !---- 同戶籍地址
 #SameReg=X,1,I
+C(4,#RegCityCode,T(3,N),$)
+C(4,#RegCityCode,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#SameReg,T(3,N),$)
 HELP(#SameRegHelp)
 @
 V(H,#SameRegHelp)
-C(5,#SameReg,Y,INVOKEJS(SHOW,p1,15,15,0),INVOKEJS(SHOW,p1,15,15,1))
 
 #SameRegX=X,30,L
 T(H,#SameReg,#SameRegHelp)
-! C(5,#SameReg,Y,INVOKEJS(SHOW,p1,15,15,0),INVOKEJS(SHOW,p1,15,15,1))
+C(5,#SameReg,Y,INVOKEJS(SHOW,p1,15,15,0),INVOKEJS(SHOW,p1,15,15,1))
 C(5,#SameReg,Y,$,s)
 T(2,@CurrZip3,#RegZip3)
 T(2,@CurrZip2,#RegZip2)
@@ -944,9 +902,6 @@ C(5,#SameReg,Y,T(F,@CurrZip2,0),T(F,@CurrZip2,1))
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
-!IF(#RegFg==5,s,$)
 HELP(#L6r03ResultCity,cols:5)
 @V(H,#L6r03ResultCity)
 
@@ -976,9 +931,6 @@ T(2,#L6r03Result)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
-!IF(#RegFg==5,s,$)
 HELP(#L6r03ResultArea1,cols:5)
 @V(H,#L6r03ResultArea1)
 
@@ -1009,8 +961,6 @@ TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 @V(7)
 
 !通訊-段
@@ -1018,36 +968,24 @@ C(5,#SameReg,Y,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!IF(#RegFg==5,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 !通訊-巷
 #CurrAlley=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!IF(#RegFg==5,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 !通訊-弄
 #CurrLane=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!IF(#RegFg==5,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 !通訊-號
 #CurrNum=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!IF(#RegFg==5,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 !通訊-號之
 #CurrNumDash=X,5,I
@@ -1055,18 +993,12 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#CurrNum,S,$)
 C(5,#SameReg,Y,s,$)
-!IF(#RegFg==5,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 !通訊-樓
 #CurrFloor=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!IF(#RegFg==5,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 !通訊-樓之
 #CurrFloorDash=X,5,I
@@ -1074,13 +1006,10 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#CurrFloor,S,$)
 C(5,#SameReg,Y,s,$)
-!IF(#RegFg==5,s,$)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 #FdCurraddress=X,2,L
 
-!戶籍地址
+!通訊地址
 #RimL1r12AddressB=X,1,S
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
@@ -1107,45 +1036,18 @@ C(5,#SameReg,Y,s,$)
 T(2,@Curraddress,#L1r12Address)
 
 #Curraddress=X,115,L
-!INVOKEJS(SHOW,p1,15,15,0)
-!INVOKEJS(SHOW,p1,16,16,1)
-!IF(#RegFg==5,s,$)
 
-!#CurrZip3Lb=X,3,L
-!#CurrZip2Lb=X,3,L
 !通訊-郵遞區號前三碼
 #CurrZip3=X,3,L
-!C(3,#FunCd,4,s,$)
-!C(3,#FunCd,5,s,$)
-!IF(#RegFg==5,s,$)
-!@C(3,#CurrZip3,0,s,$)
 
 !通訊-郵遞區號後三碼
 #CurrZip2=X,3,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
-!IF(#RegFg==5,s,$)
 @
 C(4,#CurrZip2,S,$)
 V(9)
-
-! 調RIM取鄉鎮市區代碼A
-!#RimL1r10C=X,1,S
-!C(3,#FunCd,4,s,$)
-!C(3,#FunCd,5,s,$)
-!E(0,@RimZip3,#CurrZip3)
-!T(2,@RimCityCode,)
-!T(2,@RimAreaCode,)
-!RESET_RIM(#RimL1r10C,L1R10)
-!S(L1R10,1,#RimZip3,#RimZip2,#RimCityCode,#RimAreaCode)
-!R(1,L1R10)
-!
-!#checkL1r10C=X,1,S
-!C(3,#FunCd,4,s,$)
-!C(3,#FunCd,5,s,$)
-!T(2,@CurrCityCode,#L1r10CityCode)
-!T(2,@CurrAreaCode,#L1r10AreaCode)
 
 
 !電子信箱
@@ -1153,6 +1055,7 @@ V(9)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
+IF(#FdEmail=="*",V(7),$)
 C(4,#Email,$,A(M,0,#Email))
 
 <include src="ROM.icf::L1R16.dec"/>
@@ -1195,7 +1098,8 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 HELP(#EduCodeHelp)
 @
-V(H,#EduCodeHelp)
+IF(#FdEduCode=="*",V(7),$)
+C(4,#EduCode,$,V(H,#EduCodeHelp))
 
 #EduCodeX=X,10,L
 T(H,#EduCode,#EduCodeHelp)
@@ -1206,7 +1110,8 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 HELP(#YesNoHelp)
 @
-V(H,#YesNoHelp)
+IF(#FdOwnedHome=="*",V(7),$)
+C(4,#OwnedHome,$,V(H,#YesNoHelp))
 
 #OwnedHomeX=X,4,L
 T(H,#OwnedHome,#YesNoHelp)
@@ -1215,7 +1120,8 @@ T(H,#OwnedHome,#YesNoHelp)
 #CurrCompId=X,8,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@A(ID_UNINO,0,#CurrCompId)
+@
+C(4,#CurrCompId,$,A(ID_UNINO,0,#CurrCompId))
 
 !任職機構名稱
 #CurrCompName=c,60,I
@@ -1265,8 +1171,9 @@ C(3,#IdSTAT,4,C(4,#PassportNo,V(P,外國人使用稅籍編號建檔，需輸入�
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 HELP(#AMLJobCodeHelp)
-@V(H,#AMLJobCodeHelp)
-
+@
+IF(#FdAMLJobCode=="*",V(7),$)
+C(4,#AMLJobCode,$,V(H,#AMLJobCodeHelp))
 
 #AMLJobCodeX=X,30,L
 T(H,#AMLJobCode,#AMLJobCodeHelp)
@@ -1276,7 +1183,9 @@ T(H,#AMLJobCode,#AMLJobCodeHelp)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 HELP(#AMLCodeHelp)
-@V(H,#AMLCodeHelp)
+@
+IF(#FdAMLGroup=="*",V(7),$)
+C(4,#AMLGroup,$,V(H,#AMLCodeHelp))
 
 #AMLGroupX=X,30,L
 T(H,#AMLGroup,#AMLCodeHelp)
@@ -1286,10 +1195,6 @@ T(H,#AMLGroup,#AMLCodeHelp)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 
-! #Introducer=X,6,S
-! C(3,#FunCd,4,s,$)
-! C(3,#FunCd,5,s,$)
-
 #SubCompanyFgHelp=X,200,S
 T(3,Y:同意提供申請人之帳務、信用、投資及保險資料作為共同行鎖之用;N:不同意)
 
@@ -1298,7 +1203,8 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 HELP(#SubCompanyFgHelp)
 @
-V(H,#SubCompanyFgHelp)
+IF(#FdSubCompanyFg=="*",V(7),s)
+C(4,#SubCompanyFg,$,V(H,#SubCompanyFgHelp))
 
 #SubCompanyFgX=X,60,L
 T(H,#SubCompanyFg,#SubCompanyFgHelp)
@@ -1572,6 +1478,7 @@ T(H,#OOEnable,#EnableHelp)
 <sub type="TIM">
 #FunCd
 #CustId
+#TypeCode
 #BranchNo
 #CustName
 #Birthday

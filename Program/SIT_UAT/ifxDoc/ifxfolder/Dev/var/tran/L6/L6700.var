@@ -1,0 +1,211 @@
+﻿!---------- BAFIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L6700)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+#AmlHighFgH=x,100,S
+T(3,0:無權限;1:有權限)
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,60];">
+[
+["[L6700]                                 未齊件代碼維護"],
+["#FdFunCode+功能",#FunCodeX],
+["#FdNotYetCode+未齊件代碼",#NotYetCode],
+["#FdNotYetItem+未齊件說明",#NotYetItem],
+["#FdYetDays+齊件日期計算日",#YetDays,"@工作日"],
+["#FdEnable+啟用記號",#Enable],
+]
+
+!---------- AP TEXT AREA Variables ----------
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6070進入),$)
+C(2,#CHAIN,$,T(F,@FunCode,0))
+
+
+#NTXBUF=X,7,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCode,#NTXBUF,1,1)
+T(1,@NotYetCode,#NTXBUF,2,2)
+!T(2,@FKEY,7)
+
+!自動更新L6070機制
+!#AutoReFresh=A,1,S
+!C(3,#CHAIN,1,$,S)
+!E(0,1)
+!ASGN(CAUTO$)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#CODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,50,S
+T(3,1:新增;2:修改;3:複製;4:刪除;5:查詢)
+
+#EnableH=X,100,S
+T(3,Y:啟用;N:未啟用)
+
+!#HelpRim=X,1,S
+!RESET_RIM(#HelpRim,XXR99)
+!S(XXR99,01,#CODEFuncCode2)
+!R(1,XXR99)
+!CALL(#HelpProc)
+!T(2,@FuncCode2Help,#HelpDesc1)
+
+
+!-----------------------------------------------------
+#Fd1=X,2,L
+C(3,#CHAIN,0,$,S)
+T(3,*)
+
+
+![維護記號](1:新增;2:修改;4:刪除;5:查詢)
+#FunCode=A,1,S
+!T(F,@FdFunCode,0)
+!T(F,@FdNotYetCode,0)
+!T(F,@FdNotYetItem,0)
+!T(F,@FdYetDays,0)
+!T(F,@FdEnable,0)
+
+#FdFunCode=X,2,L
+
+#FdNotYetCode=X,2,L
+C(2,#FunCode,$,T(3,*),S,S,S,S)
+
+#FdNotYetItem=X,2,L
+C(2,#FunCode,s,T(3,*),T(3,*),S,S)
+
+#FdYetDays=X,2,L
+C(2,#FunCode,s,T(3,*),T(3,*),S,S)
+
+#FdEnable=X,2,L
+C(2,#FunCode,s,T(3,*),T(3,*),S,S)
+
+
+![維護記號名稱]
+#FunCodeX=X,4,L
+C(3,#FunCode,5,T(3,查詢),T(H,#FunCode,#FuncCode2Help))
+C(2,#FunCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+C(3,#FunCode,5,K(NOBUTTON,CLOSEY),$)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FunCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+!顯示框線
+#ShowFrame=A,1,S
+C(2,#FunCode,T(3,0),T(3,1),T(3,1),T(3,1),T(3,0),T(3,0))
+T(F,@NotYetCode,#ShowFrame)
+T(F,@NotYetItem,#ShowFrame)
+T(F,@YetDays,#ShowFrame)
+T(F,@Enable,#ShowFrame)
+C(3,#FunCode,1,T(F,@NotYetCode,1),T(F,@NotYetCode,0))
+
+![未齊件代碼]
+#NotYetCode=X,2,I
+C(3,#FunCode,1,$,s))
+@
+V(7)
+V(NL)
+!V(8,6,6)
+
+#MRKEY=_,_,S
+T(2,#NotYetCode)
+
+#RIM_L6R39=A,1,S
+RESET_RIM(#RIM_L6R39,L6R39)
+S(L6R39,01,#FunCode,#NotYetCode,#END)
+R(1,L6R39)
+
+![未齊件說明]
+#NotYetItem=x,40,I
+C(2,#FunCode,$,$,$,$,s,s)
+@V(7)
+
+![齊件日期計算日]
+#YetDays=m,3,I
+C(2,#FunCode,$,$,$,$,s,s)
+@V(2,0)
+
+![啟用記號]
+#Enable=X,1,I
+C(2,#FunCode,s,$,$,$,s,s)
+HELP(#EnableH)
+@V(H,#EnableH)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+</sub>
+
+
+
+!---------- TXFORM = L6700 ----------
+<sub type="FORM" name="L6700">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6700,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6700] 未齊件代碼維護)
+
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#FunCode
+#NotYetCode
+#NotYetItem
+#YetDays
+#Enable
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L6700
+^
+TXFORM=L6R39
+#NotYetCode
+#NotYetItem
+#YetDays
+#Enable
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

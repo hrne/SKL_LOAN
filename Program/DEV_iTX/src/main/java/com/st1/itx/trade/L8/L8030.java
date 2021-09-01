@@ -428,6 +428,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -489,6 +491,8 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
 	    	    occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOMaxMainCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -521,6 +525,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -582,6 +588,8 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
 	    	    occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOMaxMainCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -614,6 +622,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -631,6 +641,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKey", xJcicZ042.getSubmitKey());
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ042.getSubmitKey(),titaVo));
 	    	    occursListB.putParam("OOMaxMainCode", xJcicZ042.getMaxMainCode());
+	    	    occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ042.getMaxMainCode(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ042.getRcDate());
 	            occursListB.putParam("OOTranKey", xJcicZ042.getTranKey());
 	            int iOutJcicTxtDate = 0;
@@ -676,6 +687,7 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
+	    		occursListA.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -708,6 +720,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -727,6 +741,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OORcDate", xJcicZ043.getRcDate());
 	            occursListB.putParam("OOTranKey", xJcicZ043.getTranKey());
 	            occursListB.putParam("OOMaxMainCode", xJcicZ043.getMaxMainCode());
+	            occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ043.getMaxMainCode(),titaVo));
 	    	    occursListB.putParam("OOAccount", xJcicZ043.getAccount());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ043.getOutJcicTxtDate();
@@ -771,6 +786,7 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
+	    		occursListA.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -803,6 +819,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -864,6 +882,8 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
 	    	    occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOMaxMainCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -896,6 +916,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -915,6 +937,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OORcDate", xJcicZ045.getRcDate());
 	            occursListB.putParam("OOTranKey", xJcicZ045.getTranKey());
 	    	    occursListB.putParam("OOMaxMainCode", xJcicZ045.getMaxMainCode());
+	    	    occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ045.getMaxMainCode(),titaVo));
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ045.getOutJcicTxtDate();
 	            if (iOutJcicTxtDate ==0) {
@@ -958,6 +981,7 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
 	    	    occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -990,6 +1014,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -1052,6 +1078,8 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
 	    	    occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOMaxMainCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -1084,6 +1112,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -1144,6 +1174,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOChangePayDate", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -1175,6 +1207,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");
 	    occursListA.putParam("OOCloseDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -1237,6 +1271,8 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
 	    	    occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOMaxMainCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -1269,6 +1305,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -1329,6 +1367,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOChangePayDate", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -1360,6 +1400,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -1422,6 +1464,8 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
+	    		occursListB.putParam("OOMaxMainCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -1454,6 +1498,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -1516,6 +1562,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOChangePayDate", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -1548,6 +1596,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -1609,6 +1659,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOChangePayDate", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -1641,6 +1693,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -1657,6 +1711,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCustId", xJcicZ053.getCustId());
 				occursListB.putParam("OORcDate", xJcicZ053.getRcDate());
 				occursListB.putParam("OOMaxMainCode", xJcicZ053.getMaxMainCode());
+				occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ053.getMaxMainCode(),titaVo));
 				occursListB.putParam("OOSubmitKey", xJcicZ053.getSubmitKey());
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ053.getSubmitKey(),titaVo));
 				occursListB.putParam("OOTranKey", xJcicZ053.getTranKey());
@@ -1703,6 +1758,7 @@ public class L8030 extends TradeBuffer {
                 occursListB.putParam("OOCloseDate", "");
                 occursListB.putParam("OOChangePayDate", "");
                 occursListB.putParam("OOPayDate", "");
+        		occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -1736,6 +1792,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -1752,6 +1810,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCustId", xJcicZ054.getCustId());
 				occursListB.putParam("OORcDate", xJcicZ054.getRcDate());
 				occursListB.putParam("OOMaxMainCode", xJcicZ054.getMaxMainCode());
+				occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ054.getMaxMainCode(),titaVo));
 				occursListB.putParam("OOSubmitKey", xJcicZ054.getSubmitKey());
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ054.getSubmitKey(),titaVo));
 				occursListB.putParam("OOTranKey", xJcicZ054.getTranKey());
@@ -1799,6 +1858,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOChangePayDate", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -1831,6 +1891,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -1846,6 +1908,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOUkey", xJcicZ055.getUkey());
 				occursListB.putParam("OOCustId", xJcicZ055.getCustId());
 				occursListB.putParam("OOCourtCode", xJcicZ055.getCourtCode());
+				occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ055.getCourtCode(),titaVo));
 				occursListB.putParam("OOClaimDate", xJcicZ055.getClaimDate());
 				occursListB.putParam("OOCaseStatus", xJcicZ055.getCaseStatus());
 				occursListB.putParam("OOSubmitKey", xJcicZ055.getSubmitKey());
@@ -1894,6 +1957,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOChangePayDate", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -1926,6 +1990,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOChangePayDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -1941,6 +2007,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOUkey", xJcicZ056.getUkey());
 				occursListB.putParam("OOCustId", xJcicZ056.getCustId());
 				occursListB.putParam("OOCourtCode", xJcicZ056.getCourtCode());
+				occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ056.getCourtCode(),titaVo));
 				occursListB.putParam("OOClaimDate", xJcicZ056.getClaimDate());
 				occursListB.putParam("OOCaseStatus", xJcicZ056.getCaseStatus());
 				occursListB.putParam("OOSubmitKey", xJcicZ056.getSubmitKey());
@@ -1989,6 +2056,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOChangePayDate", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -2021,6 +2089,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOBankIdX", "");
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -2084,7 +2154,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOBankIdX", "");
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOPayDate", "");
-				
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -2117,6 +2188,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOBankIdX", "");
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -2181,7 +2254,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOBankIdX", "");
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOPayDate", "");
-				
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -2213,6 +2287,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOBankIdX", "");
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -2275,7 +2351,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOBankIdX", "");
 				occursListB.putParam("OOCloseDate", "");
 				occursListB.putParam("OOPayDate", "");
-				
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -2307,6 +2384,9 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOBankId", "");
 		occursListA.putParam("OOBankIdX", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
+		occursListA.putParam("OOCloseDate", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -2325,7 +2405,6 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOSubmitKey", xJcicZ063.getSubmitKey());
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ063.getSubmitKey(),titaVo));
 				occursListB.putParam("OOChangePayDate", xJcicZ063.getChangePayDate());
-				occursListB.putParam("OOCloseDate", xJcicZ063.getClosedDate());
 				occursListB.putParam("OOTranKey", xJcicZ063.getTranKey());
 				int iOutJcicTxtDate = 0;
 				iOutJcicTxtDate = xJcicZ063.getOutJcicTxtDate();
@@ -2369,6 +2448,9 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOBankId", "");
 				occursListB.putParam("OOBankIdX", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
+				occursListB.putParam("OOCloseDate", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -2401,6 +2483,8 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOBankId", "");
 		occursListA.putParam("OOBankIdX", "");
 		occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -2419,6 +2503,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOSubmitKey", xJcicZ440.getSubmitKey());
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ440.getSubmitKey(),titaVo));
 				occursListB.putParam("OOCourtCode", xJcicZ440.getCourtCode());
+				occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ440.getCourtCode(),titaVo));
 				occursListB.putParam("OOTranKey", xJcicZ440.getTranKey());
 				int iOutJcicTxtDate = 0;
 				iOutJcicTxtDate = xJcicZ440.getOutJcicTxtDate();
@@ -2463,6 +2548,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOBankId", "");
 				occursListB.putParam("OOBankIdX", "");
 				occursListB.putParam("OOPayDate", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -2495,6 +2582,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOBankId", "");
 	    occursListA.putParam("OOBankIdX", "");
 	    occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -2513,7 +2602,9 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ442.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ442.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ442.getCourtCode());
+	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ442.getCourtCode(),titaVo));
 	            occursListB.putParam("OOMaxMainCode", xJcicZ442.getMaxMainCode());
+	            occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ442.getMaxMainCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ442.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ442.getOutJcicTxtDate();
@@ -2558,6 +2649,7 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOCloseDate", "");
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
+	    	    
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -2592,6 +2684,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOBankId", "");
 	    occursListA.putParam("OOBankIdX", "");
 	    occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -2610,7 +2704,9 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ443.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ443.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ443.getCourtCode());
+	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ443.getCourtCode(),titaVo));
 	    	    occursListB.putParam("OOMaxMainCode", xJcicZ443.getMaxMainCode());
+	    	    occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ443.getMaxMainCode(),titaVo));
 	    	    occursListB.putParam("OOAccount", xJcicZ443.getAccount());
 	            occursListB.putParam("OOTranKey", xJcicZ443.getTranKey());
 	            int iOutJcicTxtDate = 0;
@@ -2687,6 +2783,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOBankId", "");
 	    occursListA.putParam("OOBankIdX", "");
 	    occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -2705,6 +2803,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ444.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ444.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ444.getCourtCode());
+	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ444.getCourtCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ444.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ444.getOutJcicTxtDate();
@@ -2749,6 +2848,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOClaimDate", "");
 	            occursListB.putParam("OOCaseStatus", "");	
 	            occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOMaxMainCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -2780,6 +2880,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOBankId", "");
 	    occursListA.putParam("OOBankIdX", "");
 	    occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -2798,6 +2900,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ446.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ446.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ446.getCourtCode());
+	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ446.getCourtCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ446.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ446.getOutJcicTxtDate();
@@ -2842,6 +2945,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOClaimDate", "");
 	            occursListB.putParam("OOCaseStatus", "");	
 	            occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOMaxMainCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -2873,6 +2977,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOBankId", "");
 	    occursListA.putParam("OOBankIdX", "");
 	    occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -2891,6 +2997,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ447.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ447.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ447.getCourtCode());
+	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ447.getCourtCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ447.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ447.getOutJcicTxtDate();
@@ -2935,6 +3042,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOClaimDate", "");
 	            occursListB.putParam("OOCaseStatus", "");	
 	            occursListB.putParam("OOPayDate", "");
+	    		occursListB.putParam("OOMaxMainCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -2966,6 +3074,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOBankId", "");
 	    occursListA.putParam("OOBankIdX", "");
 	    occursListA.putParam("OOPayDate", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -2984,7 +3094,9 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ448.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ448.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ448.getCourtCode());
+	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ448.getCourtCode(),titaVo));
 	            occursListB.putParam("OOMaxMainCode", xJcicZ448.getMaxMainCode());
+	            occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ448.getMaxMainCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ448.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ448.getOutJcicTxtDate();
@@ -3060,6 +3172,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOChangePayDate", "");
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -3079,6 +3193,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OORcDate", xJcicZ450.getApplyDate());
 	    	    occursListB.putParam("OOPayDate", xJcicZ450.getPayDate());
 	    	    occursListB.putParam("OOCourtCode", xJcicZ450.getCourtCode());
+	    	    occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ450.getCourtCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ450.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ450.getOutJcicTxtDate();
@@ -3123,6 +3238,7 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOChangePayDate", "");
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
+	    		occursListB.putParam("OOMaxMainCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -3155,6 +3271,8 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -3173,6 +3291,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ451.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ451.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ451.getCourtCode());
+	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ451.getCourtCode(),titaVo));
 	            occursListB.putParam("OODelayYM", xJcicZ451.getDelayYM());
 	            occursListB.putParam("OOTranKey", xJcicZ451.getTranKey());
 	            int iOutJcicTxtDate = 0;
@@ -3219,6 +3338,7 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOChangePayDate", "");
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
+	    		occursListB.putParam("OOMaxMainCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -3240,6 +3360,9 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOTranKey", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOMaxMainCode", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
+
 	    //固定回傳   
 	    occursListA.putParam("OODelayYM", "");
 	    occursListA.putParam("OOAccount", "");
@@ -3268,7 +3391,9 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ454.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ454.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ454.getCourtCode());
+	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ454.getCourtCode(),titaVo));
 	            occursListB.putParam("OOMaxMainCode", xJcicZ454.getMaxMainCode());
+	            occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ454.getMaxMainCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ454.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ454.getOutJcicTxtDate();
@@ -3313,6 +3438,8 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOCloseDate", "");
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
+
+
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -3345,6 +3472,9 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
+
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -3406,6 +3536,9 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
+	    		occursListB.putParam("OOMaxMainCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
+
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -3437,6 +3570,9 @@ public class L8030 extends TradeBuffer {
 	    occursListA.putParam("OOClaimDate", "");
 	    occursListA.putParam("OOCourtCode", "");
 	    occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
+
 	    this.totaVo.addOccursList(occursListA);
 	    //固定內容結束
 	    
@@ -3499,6 +3635,9 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOClaimDate", "");
 				occursListB.putParam("OOCourtCode", "");
 				occursListB.putParam("OOCaseStatus", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
+
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -3529,7 +3668,10 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOCloseDate", "");
 		occursListA.putParam("OOClaimDate", "");
 		occursListA.putParam("OOCourtCode", "");
-		occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOCaseStatus", "");
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
+
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -3593,6 +3735,9 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOClaimDate", "");
 				occursListB.putParam("OOCourtCode", "");
 				occursListB.putParam("OOCaseStatus", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
+
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -3624,6 +3769,9 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOClaimDate", "");
 		occursListA.putParam("OOCourtCode", "");
 		occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
+
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -3686,7 +3834,9 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOClaimDate", "");
 				occursListB.putParam("OOCourtCode", "");
 				occursListB.putParam("OOCaseStatus", "");
-				
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
+
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -3718,6 +3868,9 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOClaimDate", "");
 		occursListA.putParam("OOCourtCode", "");
 		occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
+
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -3779,7 +3932,9 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOClaimDate", "");
 				occursListB.putParam("OOCourtCode", "");
 				occursListB.putParam("OOCaseStatus", "");
-				
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
+
 				this.totaVo.addOccursList(occursListB);
 			}
 		}
@@ -3812,6 +3967,9 @@ public class L8030 extends TradeBuffer {
 		occursListA.putParam("OOClaimDate", "");
 		occursListA.putParam("OOCourtCode", "");
 		occursListA.putParam("OOCaseStatus", "");	
+		occursListA.putParam("OOMaxMainCodeX", "");
+		occursListA.putParam("OOCourtCodeX", "");
+
 		this.totaVo.addOccursList(occursListA);
 		//固定內容結束
 		
@@ -3874,6 +4032,8 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOClaimDate", "");
 				occursListB.putParam("OOCourtCode", "");
 				occursListB.putParam("OOCaseStatus", "");
+				occursListB.putParam("OOMaxMainCodeX", "");
+				occursListB.putParam("OOCourtCodeX", "");
 				this.totaVo.addOccursList(occursListB);
 			}
 		}

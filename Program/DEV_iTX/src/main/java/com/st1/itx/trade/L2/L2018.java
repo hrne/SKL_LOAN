@@ -24,6 +24,9 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
+/*
+ * L2018 共同借款人資料查詢
+ */
 /**
  * Tita<br>
  * CreditSysNo=9,7<br>

@@ -22,7 +22,6 @@ import com.st1.itx.util.common.data.BankRelationVo;
  * @version 1.0.0
  */
 public class L1R16 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L1R16.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -32,27 +31,36 @@ public class L1R16 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1R16 ");
 		this.totaVo.init(titaVo);
-		
+
 		String iCustId = titaVo.getParam("RimCustId");
-		
+
 		BankRelationVo vo = iBankRelationCom.getBankRelation(iCustId, titaVo);
-		
+
 		if ("Y".equals(vo.getIsLimit())) {
 			totaVo.putParam("L1R16IsLimitYn", "Y");
-		}else {
+		} else {
 			totaVo.putParam("L1R16IsLimitYn", "N");
 		}
 		if ("Y".equals(vo.getIsRelated())) {
 			totaVo.putParam("L1R16IsRelatedYn", "Y");
-		}else {
+		} else {
 			totaVo.putParam("L1R16IsRelatedYn", "N");
 		}
 		if ("Y".equals(vo.getIsLnrelNear())) {
 			totaVo.putParam("L1R16IsLnrelNearYn", "Y");
-		}else {
+		} else {
 			totaVo.putParam("L1R16IsLnrelNearYn", "N");
 		}
+
+		//2021.8.31 by eric
+		if ("Y".equals(vo.getIsFinancial())) {
+			totaVo.putParam("L1R16IsFinancialYn", "Y");
+		} else {
+			totaVo.putParam("L1R16IsFinancialYn", "N");
+		}
 		
+		totaVo.putParam("L1R16DataDate", vo.getDataDate());
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

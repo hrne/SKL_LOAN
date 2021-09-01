@@ -53,7 +53,7 @@ public class L8R39 extends TradeBuffer {
 			totaVo.putParam("L8r39StartDate", iJcicZ440.getStartDate());
 			totaVo.putParam("L8r39RemindDate", iJcicZ440.getRemindDate());
 			totaVo.putParam("L8r39ApplyType", iJcicZ440.getApplyType());
-			totaVo.putParam("L8r39ReportYne", iJcicZ440.getReportYn());
+			totaVo.putParam("L8r39ReportYn", iJcicZ440.getReportYn());
 			totaVo.putParam("L8r39NotBankId1", iJcicZ440.getNotBankId1());
 			totaVo.putParam("L8r39NotBankId2", iJcicZ440.getNotBankId2());
 			totaVo.putParam("L8r39NotBankId3", iJcicZ440.getNotBankId3());

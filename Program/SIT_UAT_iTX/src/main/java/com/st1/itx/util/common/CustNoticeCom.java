@@ -345,6 +345,8 @@ public class CustNoticeCom extends TradeBuffer {
 					}
 				}
 			}
+		} else {
+			return currAddress;
 		}
 
 		currAddress += custMain.getCurrRoad();
@@ -399,6 +401,8 @@ public class CustNoticeCom extends TradeBuffer {
 					}
 				}
 			}
+		} else {
+			return regAddress;
 		}
 
 		regAddress += custMain.getRegRoad();

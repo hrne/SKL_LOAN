@@ -1,0 +1,273 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2703)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,20)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,1080];printer.width=[20,20];">
+[
+["[L2703]                                 結清客戶申請個人資料控管維護"],
+["#FdFunCdX+功能",#FunCdX],
+["#FdCustId+客戶統一編號",#CustId,#BTN1],
+["#FdCustNo+借款人戶號",#CustNo],
+["#FdCustName+戶名",#CustName],
+["#FdCreateEmpNo+建立者",#CreateEmpNo,#CreateEmpName],
+["#FdCreateDate+建立時間",#CreateDate,#CreateTime],
+]
+
+#FdFunCdX=X,2,L
+#FdCustId=X,2,L
+T(3,*)
+#FdCustNo=X,2,L
+#FdCustName=X,2,L
+#FdCreateEmpNo=X,2,L
+#FdCreateDate=X,2,L
+
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+
+
+!---------- AP TEXT AREA Variables ----------
+
+#SetSysPar=X,1,S
+C(3,#FunCd,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2073進入),$)
+#HideAll=@,1,S
+T(3,@CustId,)
+E(0,@CustNo,0)
+T(3,@CustName,)
+T(3,@CreateEmpNo,)
+T(3,@CreateEmpName,)
+E(0,@CreateDate,0)
+T(3,@CREATETMHH,)
+T(3,@CREATETMMM,)
+T(3,@CREATETMSS,)
+T(3,@CreateTime,)
+
+
+#NTXBUF=X,142,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCd,#NTXBUF,1,1)
+T(1,@CustId,#NTXBUF,2,10),$)
+
+!功能 下拉式選單 1.新增 4.刪除 5.查詢
+#FunCd=A,1,S
+C(3,#CHAIN,1,s,$)
+CALL(#HideAll)
+HELP(1: 新增;4: 刪除;5: 查詢)
+@V(1,1,4,5)
+E(0,@FUNCIND,#FunCd)
+
+#FunCdX=X,4,L
+C(4,#FunCd,S,$)
+C(2,#FunCd,T(3,),
+           T(3,新增),
+           T(3,),
+           T(3,),
+           T(3,刪除),
+           T(3,查詢),
+           )
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+
+#ShowFd=X,1,S
+C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+T(2,@FdCustId,#ShowFd)
+
+!刪除、查詢關闢框線
+#WKTF=X,1,S
+IF(#FunCd==4 || #FunCd==5,HIDE(#BTN1)T(F,@CustNo,0)T(F,@CustId,0),$)
+
+
+#BUF1=X,31,S
+
+
+!瀏覽 連結 (準)利害關係人明細資料查詢 L2035
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-OOCustId})
+
+
+!統一編號 (可以不存在於顧客檔)
+#CustId=X,10,I
+@V(7)A(ID_UNINO,0,#CustId)
+
+!RIM查顧客檔(取得戶號,戶名,建立者,建立時間)
+!調RIM參數
+
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R31.dec"/>
+
+!調RIML2R31
+#RimL2r31=X,1,S
+E(0,@RimFunCd,#FunCd)
+T(2,@RimCustId,#CustId)
+RESET_RIM(#RimL2r31,L2R31)
+S(L2R31,1,#RimFunCd,#RimCustId)
+R(1,L2R31)
+
+
+#checkL2R31=X,1,S
+E(0,@CustNo,#L2r31CustNo)
+T(2,@CustName,#L2r31CustName)
+T(2,@CreateEmpNo,#L2r31CreateEmpNo)
+C(3,#FunCd,1,S,$)
+T(2,@CreateDate,#L2r31CreateDate)
+T(2,@CreateTime,#L2r31CreateTime)
+
+
+
+
+!借款人戶號
+#CustNo=A,7,L
+
+!戶名
+#CustName=X,100,L
+
+!建立者
+#CreateEmpNo=X,8,L
+
+#CreateEmpName=X,100,L
+
+
+!建立日期
+#CreateDate=D,7,L
+
+
+!建立時間
+!時
+#CREATETMHH=X,2,S
+!分
+#CREATETMMM=X,2,S
+!秒
+#CREATETMSS=X,2,S
+
+#CreateTime=X,8,L
+
+
+#RPTFG=A,1,S
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2703 ----------
+<sub type="FORM" name="L2703">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2703,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2703] 結清客戶申請個人資料控管維護)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!建立日期
+#OCreateDate=D,7,L
+C(3,#FunCd,1,$,S)
+T(2,@CreateDate,#OCreateDate)
+
+!建立時間
+#OCreateTime=X,20,L
+C(3,#FunCd,1,$,S)
+T(1,@OCREATETMHH,#OCreateTime,1,2)
+T(1,@OCREATETMMM,#OCreateTime,3,2)
+T(1,@OCREATETMSS,#OCreateTime,5,2)
+T(2,@OCreateTime,#OCREATETMHH+:+#OCREATETMMM+:+#OCREATETMSS)
+T(2,@CreateTime,#OCreateTime)
+
+!時
+#OCREATETMHH=X,2,S
+!分
+#OCREATETMMM=X,2,S
+!秒
+#OCREATETMSS=X,2,S
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd
+#CustId
+#CustNo
+#CustName
+#CreateEmpNo
+#CreateDate
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2703
+#OCreateDate
+#OCreateTime
+^
+<include src="ROM.icf::L2R31.tom"/>
+<include src="ROM.icf::L1R09.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L2703" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L2703]                                 結清客戶申請個人資料控管維護"],
+[#<->#,"@案件編號"],
+[#<->#,"@統一編號"],
+["@借款人戶號"],
+["@核准編號"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

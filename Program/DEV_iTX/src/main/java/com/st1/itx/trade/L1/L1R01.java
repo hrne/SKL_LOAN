@@ -14,6 +14,7 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.common.CustNoticeCom;
 
 /*
  * RimCustId=X,10
@@ -30,6 +31,9 @@ public class L1R01 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustTelNoService sCustTelNoService;
+	
+	@Autowired
+	public CustNoticeCom custNoticeCom;
 
 	@Autowired
 	public Parse iParse;
@@ -43,6 +47,8 @@ public class L1R01 extends TradeBuffer {
 		String iCustId = titaVo.get("RimCustId").trim();
 
 		String funcd = titaVo.get("RimFunCd");
+
+		String txcd = titaVo.get("TXCD");
 
 		// RimCustNo=9,7
 		int iCustNo = iParse.stringToInteger(titaVo.get("RimCustNo").trim());
@@ -58,11 +64,17 @@ public class L1R01 extends TradeBuffer {
 			// 統編、戶號需擇一輸入
 			throw new LogicException("E0010", "客戶主檔");
 		}
-
+		
 		// 邏輯錯誤處理
 		if (funcd.equals("1") && tCustMain != null) {
-			// 若為新增，但資料已存在，拋錯
-			throw new LogicException("E0002", "客戶主檔");
+			// 2021.8.29 by eric
+			if ((tCustMain.getDataStatus() == 1) && ("L1101".equals(txcd) || "L1102".equals(txcd))) {
+
+			} else {
+				// 若為新增，但資料已存在，拋錯
+				throw new LogicException("E0002", "客戶主檔");
+			}
+
 		} else if (tCustMain == null) {
 			switch (funcd) {
 			case "1":
@@ -84,6 +96,12 @@ public class L1R01 extends TradeBuffer {
 			default:
 				// funch不在以上範圍，拋錯
 				throw new LogicException("E0010", "客戶主檔");
+			}
+		}
+
+		if ("L1103".equals(txcd) || "L1104".equals(txcd)) {
+			if (tCustMain.getActFg() == 1) {
+				throw new LogicException("E0021", "");
 			}
 		}
 
@@ -140,16 +158,21 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01JobTenure", tCustMain.getJobTenure());
 		this.totaVo.putParam("L1r01IncomeOfYearly", tCustMain.getIncomeOfYearly());
 
-		if (tCustMain.getIncomeDataDate() == null || "".equals(tCustMain.getIncomeDataDate()) || "0".equals(tCustMain.getIncomeDataDate())) {
+		if (tCustMain.getIncomeDataDate() == null || "".equals(tCustMain.getIncomeDataDate())
+				|| "0".equals(tCustMain.getIncomeDataDate())) {
 			this.totaVo.putParam("L1r01IncomeDataDate", "");
 		} else {
-			this.totaVo.putParam("L1r01IncomeDataDate", (iParse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100));
+			this.totaVo.putParam("L1r01IncomeDataDate",
+					(iParse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100));
 		}
 		this.totaVo.putParam("L1r01PassportNo", tCustMain.getPassportNo());
 		this.totaVo.putParam("L1r01AMLJobCode", tCustMain.getAMLJobCode());
 		this.totaVo.putParam("L1r01AMLGroup", tCustMain.getAMLGroup());
 		this.totaVo.putParam("L1r01IndigenousName", tCustMain.getIndigenousName());
 		this.totaVo.putParam("L1r01Introducer", tCustMain.getIntroducer());
+		this.totaVo.putParam("L1r01TypeCode", tCustMain.getTypeCode());
+		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain));
+		this.totaVo.putParam("L1r01CurrAddress", custNoticeCom.getCurrAddress(tCustMain));
 
 		this.addList(this.totaVo);
 		return this.sendList();

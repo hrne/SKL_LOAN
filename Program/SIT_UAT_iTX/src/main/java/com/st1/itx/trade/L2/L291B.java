@@ -25,7 +25,7 @@ import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.parse.Parse;
 
 /*
- * L291B 共用額度登錄
+ * L291B 合併額度控管額度查詢
  */
 /*
  * Tita
@@ -41,7 +41,7 @@ import com.st1.itx.util.parse.Parse;
  */
 
 /**
- * L291B 共用額度查詢
+ * L291B 合併額度控管額度查詢
  * 
  * @author iza
  * @version 1.0.0

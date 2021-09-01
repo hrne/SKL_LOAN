@@ -24,7 +24,7 @@ import com.st1.itx.util.common.LoanAvailableAmt;
 import com.st1.itx.util.parse.Parse;
 
 /*
- * L291A 共用額度登錄
+ * L291A 共同借款人額度查詢
  */
 /*
  * Tita
@@ -40,7 +40,7 @@ import com.st1.itx.util.parse.Parse;
  */
 
 /**
- * L291A 共用額度查詢
+ * L291A 共同借款人額度查詢
  * 
  * @author iza
  * @version 1.0.0

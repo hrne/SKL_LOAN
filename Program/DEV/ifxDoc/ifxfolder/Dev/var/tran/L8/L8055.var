@@ -4,7 +4,6 @@
 
 <sub type="SYS" name="label">
 
-
 !#TXCD
 !T(3,L8055)
 
@@ -129,12 +128,6 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 #OOCustRegTelNo=X,16,S
 #OOCustComTelNo=X,16,S
 #OOCustMobilNo=X,16,S
-C(3,#OOClosedDate,0,S,$)
-#OOClosedResult=X,1,S
-#OOClosedResult_Tmp=X,50,S
-T(H,#OOClosedResult,#ClosedResultHelp)
-#OOClosedResultX=X,55,S
-T(2,#OOClosedResult+ - +#OOClosedResult_Tmp)
 ! 以下固定
 #OOLastUpdate=X,30,S
 #OOLastUpdateEmpNo=X,6,S

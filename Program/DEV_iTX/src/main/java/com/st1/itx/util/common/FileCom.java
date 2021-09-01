@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.CommBuffer;
-import com.st1.itx.util.filter.FilterUtils;
 import com.st1.itx.util.filter.SafeClose;
 
 /**
@@ -59,7 +58,8 @@ public class FileCom extends CommBuffer {
 
 		try {
 			// 檔案路徑
-			File file = new File(FilterUtils.escape(filePath));
+//			File file = new File(FilterUtils.escape(filePath));
+			File file = new File(filePath);
 			fis = new FileInputStream(file);
 			isr = new InputStreamReader(fis, codeType);
 			br = new BufferedReader(isr);

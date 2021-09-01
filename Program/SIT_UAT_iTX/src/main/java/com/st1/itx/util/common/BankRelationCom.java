@@ -3,6 +3,8 @@ package com.st1.itx.util.common;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -14,10 +16,12 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankRelationCompany;
 import com.st1.itx.db.domain.BankRelationFamily;
 import com.st1.itx.db.domain.BankRelationSelf;
+import com.st1.itx.db.domain.BankRelationSuspected;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.BankRelationCompanyService;
 import com.st1.itx.db.service.BankRelationFamilyService;
 import com.st1.itx.db.service.BankRelationSelfService;
+import com.st1.itx.db.service.BankRelationSuspectedService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.BankRelationVo;
@@ -44,6 +48,7 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class BankRelationCom extends TradeBuffer {
+	private static final Logger logger = LoggerFactory.getLogger(BankRelationCom.class);
 
 	@Autowired
 	public BankRelationCompanyService bankRelationCompanyService;
@@ -51,6 +56,8 @@ public class BankRelationCom extends TradeBuffer {
 	public BankRelationSelfService bankRelationSelfService;
 	@Autowired
 	public BankRelationFamilyService bankRelationFamilyService;
+	@Autowired
+	public BankRelationSuspectedService bankRelationSuspectedService;
 	@Autowired
 	public CdEmpService cdEmpService;
 
@@ -63,12 +70,16 @@ public class BankRelationCom extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("BankRelationCom ... " + titaVo);
+		logger.info("BankRelationCom ... " + titaVo);
 		return null;
 	}
 
 	public BankRelationVo getBankRelation(String iCustId, TitaVo titaVo) throws LogicException {
-		this.info("getBankRelation  ... ");
+		return getBankRelation(iCustId, "", titaVo);
+	}
+
+	public BankRelationVo getBankRelation(String iCustId, String iCustName, TitaVo titaVo) throws LogicException {
+		logger.info("getBankRelation  ... ");
 		BankRelationVo vo = new BankRelationVo();
 		Slice<BankRelationCompany> slBankRelationCompany = bankRelationCompanyService.findCompanyIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 		List<BankRelationCompany> lBankRelationCompany = slBankRelationCompany == null ? null : slBankRelationCompany.getContent();
@@ -76,8 +87,13 @@ public class BankRelationCom extends TradeBuffer {
 		List<BankRelationSelf> lBankRelationSelf = slBankRelationSelf == null ? null : slBankRelationSelf.getContent();
 		Slice<BankRelationFamily> slBankRelationFamily = bankRelationFamilyService.findRelationIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 		List<BankRelationFamily> lBankRelationFamily = slBankRelationFamily == null ? null : slBankRelationFamily.getContent();
+		Slice<BankRelationSuspected> slBankRelationSuspected = bankRelationSuspectedService.RepCusNameEq(iCustName, 0, Integer.MAX_VALUE, titaVo);
+		List<BankRelationSuspected> lBankRelationSuspected = slBankRelationSuspected == null ? null : slBankRelationSuspected.getContent();
 		if (lBankRelationCompany != null) {
 			for (BankRelationCompany t : lBankRelationCompany) {
+				if ("".equals(vo.getDataDate())) {
+					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+				}
 				if ("1".equals(t.getLAW001())) {
 					vo.setLAW001("Y");
 				}
@@ -97,6 +113,9 @@ public class BankRelationCom extends TradeBuffer {
 		}
 		if (lBankRelationSelf != null) {
 			for (BankRelationSelf t : lBankRelationSelf) {
+				if ("".equals(vo.getDataDate())) {
+					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+				}
 				if ("1".equals(t.getLAW001())) {
 					vo.setLAW001("Y");
 				}
@@ -115,6 +134,9 @@ public class BankRelationCom extends TradeBuffer {
 			}
 			if (lBankRelationFamily != null) {
 				for (BankRelationFamily t : lBankRelationFamily) {
+					if ("".equals(vo.getDataDate())) {
+						vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					}
 					if ("1".equals(t.getLAW001())) {
 						vo.setLAW001("Y");
 					}
@@ -131,6 +153,16 @@ public class BankRelationCom extends TradeBuffer {
 						vo.setLAW008("Y");
 					}
 				}
+			}
+
+			//因為是姓名完全比對,有吻合資料,即預判為Y
+			if (lBankRelationSuspected != null) {
+				if ("".equals(vo.getDataDate())) {
+					for (BankRelationFamily t : lBankRelationFamily) {
+						vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+					}
+				}
+				vo.setIsFinancial("Y");
 			}
 		}
 		// 是否為15日薪員工
@@ -153,7 +185,52 @@ public class BankRelationCom extends TradeBuffer {
 			vo.setIsLimit("Y");
 		}
 
-		this.info(iCustId + " BankRelationVo=" + vo.toString());
+		// 2021.8.6 by eric : 資料日期是空的時,找首筆資料的第一筆顯示
+		if ("".equals(vo.getDataDate())) {
+			slBankRelationCompany = bankRelationCompanyService.findAll(0, 1, titaVo);
+			lBankRelationCompany = slBankRelationCompany == null ? null : slBankRelationCompany.getContent();
+			if (lBankRelationCompany != null) {
+				for (BankRelationCompany t : lBankRelationCompany) {
+					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+				}
+			}
+		}
+
+		if ("".equals(vo.getDataDate().trim())) {
+			slBankRelationSelf = bankRelationSelfService.findAll(0, 1, titaVo);
+			lBankRelationSelf = slBankRelationSelf == null ? null : slBankRelationSelf.getContent();
+			if (lBankRelationSelf != null) {
+				for (BankRelationSelf t : lBankRelationSelf) {
+					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+				}
+			}
+		}
+
+		if ("".equals(vo.getDataDate().trim())) {
+			slBankRelationFamily = bankRelationFamilyService.findAll(0, 1, titaVo);
+			lBankRelationFamily = slBankRelationFamily == null ? null : slBankRelationFamily.getContent();
+			if (lBankRelationFamily != null) {
+				for (BankRelationFamily t : lBankRelationFamily) {
+					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+				}
+			}
+		}
+
+		if ("".equals(vo.getDataDate().trim())) {
+			slBankRelationSuspected = bankRelationSuspectedService.findAll(0, 1, titaVo);
+			lBankRelationSuspected = slBankRelationSuspected == null ? null : slBankRelationSuspected.getContent();
+			if (lBankRelationSuspected != null) {
+				for (BankRelationSuspected t : lBankRelationSuspected) {
+					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+				}
+			}
+		}
+		
+		if ("".equals(vo.getDataDate().trim())) {
+			vo.setDataDate(String.valueOf(titaVo.getEntDyI()));
+		}
+		
+		logger.info(iCustId + " BankRelationVo=" + vo.toString());
 
 		return vo;
 	}
