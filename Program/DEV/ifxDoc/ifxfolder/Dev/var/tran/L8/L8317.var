@@ -285,6 +285,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey,D,s,$)
+HELP(#CourtCodeHelp,cols:4)
+@V(H,#CourtCodeHelp)V(7)
+
 #CourtCodeX=X,60,L
 T(H,#CourtCode,#CourtCodeHelp)
 IF(#CourtCode=="",$,s)

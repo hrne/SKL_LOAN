@@ -53,7 +53,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3005")
 @Scope("prototype")
 public class L3005 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3005.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -130,8 +129,8 @@ public class L3005 extends TradeBuffer {
 //		lCommitFeeFlag.add("Y"); // 是否有收承諾費
 //		lCommitFeeFlag.add("N");
 
-		slLoanSynd = loanSyndService.syndCustNoRange(iCustNo, iCustNo, "%", 0, 99991231, 0, 99991231, 0, 99991231,
-				 0, Integer.MAX_VALUE, titaVo);
+		slLoanSynd = loanSyndService.syndCustNoRange(iCustNo, iCustNo, "%", 0, 99991231, 0, 99991231, 0, 99991231, 0,
+				Integer.MAX_VALUE, titaVo);
 		lLoanSynd = slLoanSynd == null ? null : slLoanSynd.getContent();
 		if (lLoanSynd == null || lLoanSynd.size() == 0) {
 			wkSyndFlag = "N";
@@ -149,7 +148,7 @@ public class L3005 extends TradeBuffer {
 		}
 		// 查詢各項費用
 		baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
-		
+
 		this.totaVo.putParam("OCustNo", iCustNo);
 		this.totaVo.putParam("OCustRmkFlag", oCustRmkFlag);
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
@@ -209,6 +208,9 @@ public class L3005 extends TradeBuffer {
 		for (LoanBorTx ln : lLoanBorTx) {
 			newRelNo = titaVo.getKinbr() + ln.getTitaTlrNo() + ln.getTitaTxtNo();
 			OccursList occursList = new OccursList();
+			BigDecimal wkTempAmt = BigDecimal.ZERO;
+			BigDecimal wkShortfall = BigDecimal.ZERO;
+
 			tTempVo = new TempVo();
 			if (iTitaHCode == 0 && !ln.getTitaHCode().equals("0")) {
 				continue;
@@ -250,6 +252,15 @@ public class L3005 extends TradeBuffer {
 			}
 			this.totaVo.putParam("OCurrencyCode", ln.getTitaCurCd());
 
+			wkShortfall = ln.getOverflow().subtract(ln.getShortfall());
+			// 暫收款金額為負時，為暫收抵繳
+			// 暫收款金額為正時，為溢短繳
+			if (ln.getTempAmt().compareTo(BigDecimal.ZERO) < 0) {
+				wkTempAmt = BigDecimal.ZERO.subtract(ln.getTempAmt());
+			} else {
+				wkShortfall = wkShortfall.add(ln.getTempAmt());
+			}
+
 			relNo = titaVo.getKinbr() + ln.getTitaTlrNo() + ln.getTitaTxtNo();
 			occursList.putParam("OOEntryDate", ln.getEntryDate());
 			occursList.putParam("OOAcDate", ln.getAcDate());
@@ -262,16 +273,16 @@ public class L3005 extends TradeBuffer {
 			occursList.putParam("OOCurrencyCode", ln.getTitaCurCd());
 			if (ln.getTitaHCode().equals("1") || ln.getTitaHCode().equals("3")) {
 				occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(ln.getTxAmt()));
-				occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(ln.getTempAmt()));
+				occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(wkTempAmt));
 				occursList.putParam("OOShortfall",
-						BigDecimal.ZERO.subtract(ln.getOverflow().subtract(ln.getShortfall())));
-				this.info("OOTempAmt1------->" + ln.getTempAmt());
+						BigDecimal.ZERO.subtract(wkShortfall));
+
 
 			} else {
 				occursList.putParam("OOTxAmt", ln.getTxAmt());
-				occursList.putParam("OOTempAmt", ln.getTempAmt());
-				occursList.putParam("OOShortfall", ln.getOverflow().subtract(ln.getShortfall()));
-				this.info("OOTempAmt2------->" + ln.getTempAmt());
+				occursList.putParam("OOTempAmt", wkTempAmt);
+				occursList.putParam("OOShortfall", wkShortfall);
+
 			}
 
 			occursList.putParam("OOLoanBal", ln.getLoanBal());

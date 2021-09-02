@@ -23,6 +23,7 @@ import com.st1.itx.db.service.FacProdPremiumService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.FacProdStepRateService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.parse.Parse;
 
 /* Tita
@@ -57,19 +58,18 @@ public class L2R01 extends TradeBuffer {
 	@Autowired
 	Parse parse;
 
+	@Autowired
+	LoanCloseBreachCom loanCloseBreachCom;
+
 	// work area
 	private String wkBreachCode;
+	private String BreachDescription = "";
 	private FacProd tFacProd = new FacProd();
 	private Slice<FacProdStepRate> lFacProdStepRate;
 	private Slice<FacProdPremium> lFacProdPremium;
 	private Slice<FacProdAcctFee> lFacProdAcctFee;
 	private Slice<FacProdBreach> lFacProdBreach;
-	private String wkBreachA = "";
-	private String wkBreachB = "";
-	private String wkBreachC = "";
-	private String wkBreachD = "";
-	private String wkBreachE = "";
-	private String wkBreachF = "";
+
 	private String wkUseProdFg = "";
 
 	@Override
@@ -128,46 +128,8 @@ public class L2R01 extends TradeBuffer {
 
 			}
 
-			if ("Y".equals(tFacProd.getBreachFlag())) {
-				wkBreachA = "自借款日起算，於未滿 " + tFacProd.getProhibitMonth() + "個月期間提前清償者";
-				if (tFacProd.getBreachStartPercent() != 0) {
-					wkBreachB = "，還款金額達 " + tFacProd.getBreachStartPercent() + "% 以上時";
-				}
-				switch (tFacProd.getBreachCode()) {
-				case "001":
-					wkBreachC = "，按各次提前清償金額";
-					break;
-				case "002":
-					wkBreachC = "，按各次提前清償金額";
-					break;
-				case "003":
-					wkBreachC = "，每次還款按核准額度";
-					break;
-				case "004":
-					wkBreachC = "，每次還款依撥款金額";
-					break;
-				case "005":
-					wkBreachC = "，按各次提前清償金額";
-					break;
-				}
-				if (tFacProd.getBreachPercent().compareTo(BigDecimal.ZERO) > 0) {
-					wkBreachD = "，" + tFacProd.getBreachPercent() + "% 計付違約金";
-				}
-				if (tFacProd.getBreachDecreaseMonth() != 0) {
-					wkBreachE = "，但每" + tFacProd.getBreachDecreaseMonth() + "個月遞減違約金" + tFacProd.getBreachDecrease()
-							+ "%";
-				}
-				switch (tFacProd.getBreachGetCode()) {
-				case "1":
-					wkBreachF = "，即時收取";
-					break;
-
-				case "2":
-					wkBreachF = "，領清償證明時收取";
-					break;
-				}
-
-			}
+			 BreachDescription = loanCloseBreachCom.getBreachDescription(tFacProd.getProdNo(), titaVo);
+			this.info("清償違約說明= " + BreachDescription);
 
 			/* 將每筆資料放入Tota */
 			SetTotaFacProd();
@@ -287,7 +249,7 @@ public class L2R01 extends TradeBuffer {
 		this.totaVo.putParam("OBreachDecreaseMonth", tFacProd.getBreachDecreaseMonth());
 		this.totaVo.putParam("OBreachDecrease", tFacProd.getBreachDecrease());
 		this.totaVo.putParam("OBreachStartPercent", tFacProd.getBreachStartPercent());
-		this.totaVo.putParam("OBreach", wkBreachA + wkBreachB + wkBreachC + wkBreachD + wkBreachE + wkBreachF);
+		this.totaVo.putParam("OBreach", BreachDescription);
 		for (int i = 1; i <= 10; i++) {
 			this.totaVo.putParam("StepMonths" + i, 0);
 			this.totaVo.putParam("StepMonthE" + i, 0);

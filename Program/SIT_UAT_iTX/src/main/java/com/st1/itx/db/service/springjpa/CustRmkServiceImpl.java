@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("custRmkService")
 @Repository
-public class CustRmkServiceImpl implements CustRmkService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CustRmkServiceImpl.class);
-
+public class CustRmkServiceImpl extends ASpringJpaParm implements CustRmkService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CustRmkServiceImpl implements CustRmkService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + custRmkId);
+    this.info("findById " + dbName + " " + custRmkId);
     Optional<CustRmk> custRmk = null;
     if (dbName.equals(ContentName.onDay))
       custRmk = custRmkReposDay.findById(custRmkId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "RmkNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "RmkNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = custRmkReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = custRmkReposHist.findAll(pageable);
     else 
       slice = custRmkRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = custRmkReposDay.findAllByCustNoIs(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = custRmkReposHist.findAllByCustNoIs(custNo_0, pageable);
     else 
       slice = custRmkRepos.findAllByCustNoIs(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findRmkCode " + dbName + " : " + "rmkCode_0 : " + rmkCode_0);
+    this.info("findRmkCode " + dbName + " : " + "rmkCode_0 : " + rmkCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = custRmkReposDay.findAllByRmkCodeIs(rmkCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +159,9 @@ em = null;
     else 
       slice = custRmkRepos.findAllByRmkCodeIs(rmkCode_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("maxRmkNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("maxRmkNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
     Optional<CustRmk> custRmkT = null;
     if (dbName.equals(ContentName.onDay))
       custRmkT = custRmkReposDay.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
@@ -175,6 +180,7 @@ em = null;
       custRmkT = custRmkReposHist.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
     else 
       custRmkT = custRmkRepos.findTopByCustNoIsOrderByRmkNoDesc(custNo_0);
+
     return custRmkT.isPresent() ? custRmkT.get() : null;
   }
 
@@ -183,7 +189,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + custRmkId);
+    this.info("Hold " + dbName + " " + custRmkId);
     Optional<CustRmk> custRmk = null;
     if (dbName.equals(ContentName.onDay))
       custRmk = custRmkReposDay.findByCustRmkId(custRmkId);
@@ -201,7 +207,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + custRmk.getCustRmkId());
+    this.info("Hold " + dbName + " " + custRmk.getCustRmkId());
     Optional<CustRmk> custRmkT = null;
     if (dbName.equals(ContentName.onDay))
       custRmkT = custRmkReposDay.findByCustRmkId(custRmk.getCustRmkId());
@@ -223,7 +229,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + custRmk.getCustRmkId());
+    this.info("Insert..." + dbName + " " + custRmk.getCustRmkId());
     if (this.findById(custRmk.getCustRmkId()) != null)
       throw new DBException(2);
 
@@ -252,7 +258,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + custRmk.getCustRmkId());
+    this.info("Update..." + dbName + " " + custRmk.getCustRmkId());
     if (!empNot.isEmpty())
       custRmk.setLastUpdateEmpNo(empNot);
 
@@ -275,7 +281,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + custRmk.getCustRmkId());
+    this.info("Update..." + dbName + " " + custRmk.getCustRmkId());
     if (!empNot.isEmpty())
       custRmk.setLastUpdateEmpNo(empNot);
 
@@ -295,7 +301,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + custRmk.getCustRmkId());
+    this.info("Delete..." + dbName + " " + custRmk.getCustRmkId());
     if (dbName.equals(ContentName.onDay)) {
       custRmkReposDay.delete(custRmk);	
       custRmkReposDay.flush();
@@ -324,7 +330,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CustRmk t : custRmk){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -359,7 +365,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (custRmk == null || custRmk.size() == 0)
       throw new DBException(6);
 
@@ -388,7 +394,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CustRmk> custRmk, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

@@ -91,6 +91,8 @@ T(3,*)
 #FdCourCode=X,1,L
 T(3,*)
 
+#FdPrincipalBal=X,2,L
+T(3,  )
 #FdDueAmt=X,2,L
 T(3,*)
 #FdIntRate=X,2,L
@@ -249,6 +251,7 @@ T(2,@LastDueDate,#L5r01LastDueDate)
 T(2,@IsMainFin,#L5r01IsMainFin)
 E(0,@TotalContrAmt,#L5r01TotalContrAmt)
 T(2,@MainFinCode,#L5r01MainFinCode)
+E(0,@PrincipalBal,#L5r01PrincipalBal)
 T(2,@TwoStepCode,#L5r01TwoStepCode)
 T(2,@PayerCustNo,#L5r01PayerCustNo)
 T(2,@ChgCondDate,#L5r01ChgCondDate)
@@ -414,8 +417,8 @@ IF (#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode
 ##loop {times:30,i:1}
 T(F,#NegFinShareFinCode{i},#WKTF2)
 T(F,#NegFinShareContractAmt{i},#WKTF2)
-T(F,@NegFinShareAmtRatio{i},0)
-T(F,@NegFinShareDueAmt{i},0)
+T(F,@NegFinShareAmtRatio{i},#WKTF3)
+T(F,@NegFinShareDueAmt{i},#WKTF3)
 T(F,@NegFinShareCancelDate{i},#WKTF3)
 T(F,@NegFinShareCancelAmt{i},0)
 ##end
@@ -605,22 +608,21 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 #FirstDueDate=D,7,I
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 D(8)
-@V(7)
-@A(DATE,0,#FirstDueDate)
+@V(7)A(DATE,0,#FirstDueDate)
 
 !還款結束日計算
 #TotalPeriodN=N,3,S
 E(0,#TotalPeriod-1)
 #LastDueDateN=A,8,S
 D(7,2,#FirstDueDate,#TotalPeriodN,0)
+
 ! 還款結束日
 #LastDueDate=D,7,I
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 E(0,#LastDueDateN)
 D(8)
-@V(7)
-@A(DATE,0,#LastDueDate)
-@IF(#FirstDueDate>#LastDueDate,V(P,[還款結束日]不得小於[首次應繳日]),s)
+@V(7)A(DATE,0,#LastDueDate)
+IF(#FirstDueDate>#LastDueDate,V(P,[還款結束日]不得小於[首次應繳日]),s)
 
 ! 文字欄位
 #FieldName=X,10,L
@@ -649,6 +651,11 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#IsMainFin=="Y",s,$)
 @V(7)
+
+!總本金餘額
+#PrincipalBal=m,14,S
+IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+E(0,#TotalContrAmt)
 
 #CheckMainFinCode=X,1,S
 IF(#IsMainFin=="N",$,S)
@@ -760,6 +767,15 @@ T(2,#CustNo+#CaseSeq)
 #BINDJ=X,1,S
 BIND(#BTNJ,click, {cmd=CHAIN; ntxcd=L5981; ntxbuf=#BUFJ})
 
+!RIM簽約金額
+#RimContractAmtX=m,14,S
+E(0,0)
+
+##loop {times:30,i:1}
+#ContracAmtX{i}=X,1,S
+E(0,@RimContractAmtX,#RimContractAmtX+#L5r01NegFinShareContractAmt{i})
+##end
+
 
 ##loop {times:30,i:1,j:0,k:2}
 ! Test{i}==1 繼續 Test{i}==0跳過
@@ -786,27 +802,27 @@ C(3,{i},6,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinC
 C(3,{i},7,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6)),$)
 C(3,{i},8,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7)),$)
 C(3,{i},9,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8)),$)
-C(3,{i},10,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10)),$)
-C(3,{i},11,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11)),$)
-C(3,{i},12,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12)),$)
-C(3,{i},13,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13)),$)
-C(3,{i},14,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14)),$)
-C(3,{i},15,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15)),$)
-C(3,{i},16,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16)),$)
-C(3,{i},17,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17)),$)
-C(3,{i},18,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18)),$)
-C(3,{i},19,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19)),$)
-C(3,{i},20,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20)),$)
-C(3,{i},21,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21)),$)
-C(3,{i},22,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22)),$)
-C(3,{i},23,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23)),$)
-C(3,{i},24,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24)),$)
-C(3,{i},25,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25)),$)
-C(3,{i},26,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26)),$)
-C(3,{i},27,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27)),$)
-C(3,{i},28,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27,#NegFinShareFinCode28)),$)
-C(3,{i},29,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27,#NegFinShareFinCode28,#NegFinShareFinCode29)),$)
-C(3,{i},30,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27,#NegFinShareFinCode28,#NegFinShareFinCode29,#NegFinShareFinCode30)),$)
+C(3,{i},10,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9)),$)
+C(3,{i},11,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10)),$)
+C(3,{i},12,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11)),$)
+C(3,{i},13,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12)),$)
+C(3,{i},14,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13)),$)
+C(3,{i},15,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14)),$)
+C(3,{i},16,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15)),$)
+C(3,{i},17,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16)),$)
+C(3,{i},18,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17)),$)
+C(3,{i},19,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18)),$)
+C(3,{i},20,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19)),$)
+C(3,{i},21,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20)),$)
+C(3,{i},22,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21)),$)
+C(3,{i},23,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22)),$)
+C(3,{i},24,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23)),$)
+C(3,{i},25,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24)),$)
+C(3,{i},26,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25)),$)
+C(3,{i},27,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26)),$)
+C(3,{i},28,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27)),$)
+C(3,{i},29,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27,#NegFinShareFinCode28)),$)
+C(3,{i},30,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27,#NegFinShareFinCode28,#NegFinShareFinCode29)),$)
 
 #AMK{i}=X,1,S
 !IF(#Test{i}==1 && {i}<=30,$,S)
@@ -832,13 +848,23 @@ IF(#Test{i}=="0",S,$)
 IF(#NegFinShareFinCode{i}=="",S,$)
 @V(2,0)
 
-#NegFinShareAmtRatio{i}=m,3.2,O
-C(3,#NegFinShareAmtRatio{i},0,$,s)
-E(0,0)
+#CountShareRatio{i}=X,1,S
+IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11",$,s)
+E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}*100/#TotalContrAmt)
 
-#NegFinShareDueAmt{i}=m,14,O
-C(3,#NegFinShareDueAmt{i},0,$,s)
-E(0,0)
+#NegFinShareAmtRatio{i}=m,3.2,I
+C(4,#NegFinShareFinCode{i},S,$)
+IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+
+#CountShareDueAmt{i}=X,1,S
+IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11",$,s)
+E(0,@NegFinShareDueAmt{i},#NegFinShareContractAmt{i}*#DueAmt/#TotalContrAmt)
+
+
+#NegFinShareDueAmt{i}=m,14,I
+C(4,#NegFinShareFinCode{i},S,$)
+IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+
 
 #NegFinShareCancelDate{i}=D,7,I
 IF(#CaseKindCode=="1",s,$)
@@ -852,14 +878,9 @@ D(8)
 
 #NegFinShareCancelAmt{i}=m,14,O
 IF(#CaseKindCode=="1",s,$)
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#NegFinShareCancelDate{i}>0,$,S)
-E(0,@NegFinShareCancelAmt{i},#NegFinShareContractAmt{i})
-
-#ChkRatio{i}=X,1,S
-C(3,#NegFinShareCancelAmt{i},0,s,$)
-E(0,#NegFinShareAmtRatio{i},0)
-E(0,#NegFinShareDueAmt{i},0)
+IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",E(0,#NegFinShareContractAmt{i}),$)
+IF(#FunctionCode=="02"||#FunctionCode=="06",E(0,#NegFinShareContractAmt{i}*#PrincipalBal/#RimContractAmtX),$)
 
 #AMKS{i}=X,1,S
 C(4,#NegFinShareFinCode{i},$,INVOKEJS(SHOW,grd1_{k},1))
@@ -875,10 +896,6 @@ E(0,0)
 #CountDueAmtX=m,14,S
 E(0,0)
 
-!RIM簽約金額
-#RimContractAmtX=m,14,S
-E(0,0)
-
 !簽約金額(不包含註銷金額)
 #CountContractAmtX=m,14,S
 E(0,0)
@@ -887,67 +904,54 @@ E(0,0)
 #CountCancelAmtX=m,14,S
 E(0,0)
 
-!註銷金額、RIM之簽約金額合計
-##loop {times:30,i:1}
-#CancelAmtX{i}=X,1,S
-E(0,@CountCancelAmtX,#CountCancelAmtX+#NegFinShareCancelAmt{i})
-E(0,@RimContractAmtX,#RimContractAmtX+#L5r01NegFinShareContractAmt{i})
-##end
+
 
 !若簽約總金額修改則放總金額否則放調RIM簽約金額合計
 #ContractAmtX=m,14,S
 IF(#FunctionCode=="01"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",E(0,#TotalContrAmt),$)
 IF(#FunctionCode=="02",IF(#L5r01TotalContrAmt!=#TotalContrAmt,E(0,#TotalContrAmt),E(0,#RimContractAmtX)),$)
 
-##loop {times:30,i:1,j:0}
-!計算比例
-#AmtRatioX{i}=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-C(3,#NegFinShareCancelAmt{i},0,$,s)
-C(3,#NegFinShareContractAmt{i},0,s,$)
-E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}/(#ContractAmtX-#CountCancelAmtX)*100)
-E(0,#CountAmtRatioX,#CountAmtRatioX+#NegFinShareAmtRatio{i})
-
-!最後一筆比例用減的
-#cAmtRatio{i}=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-IF({i}==1,s,$)
-C(4,#NegFinShareFinCode{i},$,s)
-C(4,#NegFinShareFinCode{j},s,$)
-E(0,#CountAmtRatioX,#CountAmtRatioX-#NegFinShareAmtRatio{j})
-E(0,@NegFinShareAmtRatio{j},100-#CountAmtRatioX)
-
-!計算期款
-#DueAmtX{i}=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-C(3,#NegFinShareCancelAmt{i},0,$,s)
-C(3,#NegFinShareAmtRatio{i},0,s,$)
-E(0,@NegFinShareDueAmt{i},#NegFinShareAmtRatio{i}*#DueAmt/100)
-E(0,#CountDueAmtX,#CountDueAmtX+#NegFinShareDueAmt{i})
-
-
-!最後一筆期金用減的
-#cDueAmtX{i}=X,1,S
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-IF({i}==1,s,$)
-C(4,#NegFinShareFinCode{i},$,s)
-C(4,#NegFinShareFinCode{j},s,$)
-E(0,#CountDueAmtX,#CountDueAmtX-#NegFinShareDueAmt{j})
-E(0,#NegFinShareDueAmt{j},#DueAmt-#CountDueAmtX)
+##loop {times:30,i:1}
 
 !簽約金額計算(不包含註銷金額)
-#Amt{i}=X,1,S
+#Amt1{i}=X,1,S
 IF(#IsMainFin=="Y",$,S)
 IF(#CaseKindCode=="1",s,$)
 C(3,#NegFinShareCancelDate{i},0,$,s)
 E(0,@CountContractAmtX,#CountContractAmtX+#NegFinShareContractAmt{i})
 
+!註銷金額合計
+#CancelAmtX{i}=X,1,S
+E(0,@CountCancelAmtX,#CountCancelAmtX+#NegFinShareCancelAmt{i})
+
+!比例合計
+#Amt2{i}=X,1,S
+C(3,#NegFinShareCancelDate{i},0,$,s)
+E(0,@CountAmtRatioX,#CountAmtRatioX+#NegFinShareAmtRatio{i})
+
+!期金合計
+#Amt3{i}=X,1,S
+C(3,#NegFinShareCancelDate{i},0,$,s)
+E(0,@CountDueAmtX,#CountDueAmtX+#NegFinShareDueAmt{i})
+
 ##end
 
 
+#CAmtRatio=X,1,S
+IF(#IsMainFin=="Y",$,S)
+IF(#CaseKindCode=="1",s,$)
+IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+C(3,#CountAmtRatioX,0,s,$)
+IF(#CountAmtRatioX!=100,V(P,債權比例總和錯誤),$)
 
+#CAmtDueAmt=X,1,S
+IF(#IsMainFin=="Y",$,S)
+IF(#CaseKindCode=="1",s,$)
+IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+C(3,#CountDueAmtX,0,s,$)
+IF(#CountDueAmtX!=#DueAmt,V(P,期款總和錯誤),$)
 
-#CheckContracAmt1=X,1,S
+#CContracAmt=X,1,S
 IF(#IsMainFin=="Y",$,S)
 IF(#CaseKindCode=="1",s,$)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)

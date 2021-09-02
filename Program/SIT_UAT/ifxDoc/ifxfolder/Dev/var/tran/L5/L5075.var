@@ -162,7 +162,7 @@ E(0,2)
 <sub type="FORM" name="L5075">
 
 #SCRTIL=_,_,S
-T(3,[L5075] 債務協商滯繳/應繳明細)
+T(3,[L5075] 債務協商滯繳/應繳明細表)
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
@@ -189,7 +189,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5701; ntxbuf=#OOBufA})
 T(2,11+#OOCustId+#OOCustNo+#OOCaseSeq)
 #OOBtnH=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5701; ntxbuf=#OOBufH})
-IF(#OOTwoStepCode=="1" && #OOLastDueDate==#OONextPayDate,s,$)
+IF(#OOTwoStepCode=="N" || #OOTimes > 1,$,s)
 BIND(grid,cancel)
 
 
@@ -207,8 +207,8 @@ BIND(grid,cancel)
 #OOAccuOverAmt=m,14,O
 ! 應催繳金額 由L5075-NegCom計算
 #OOOverDueAmt=m,14,O
-! 已繳期金
-#OOAccuDueAmt=m,14,O
+! 已繳期金=>改為累繳金額
+#OOAccuTempAmt=m,14,O
 ! 延期年月(起)
 #OODeferYMStart=A,6,O
 ! 延期年月(訖)
@@ -301,7 +301,7 @@ TXFORM=L5075
 #OOPayAmt
 #OOAccuOverAmt
 #OOOverDueAmt
-#OOAccuDueAmt
+#OOAccuTempAmt
 #OODeferYMStart
 #OODeferYMEnd
 #OOAcDate
@@ -363,7 +363,7 @@ TXFORM=L5075
 {width:95,align:'right'}
 #OOOverDueAmt=應催繳金額
 {width:110,align:'right'}
-#OOAccuDueAmt=已繳期金
+#OOAccuTempAmt=累繳金額
 {width:95,align:'right'}
 #OOPrincipalBal=總本金餘額
 {width:110,align:'right'}
@@ -398,7 +398,7 @@ TXFORM=L5075
 #OOPayAmt
 #OOAccuOverAmt
 #OOOverDueAmt
-#OOAccuDueAmt
+#OOAccuTempAmt
 #OOLastDueDate
 #OODeferYMStart
 #OODeferYMEnd

@@ -85,10 +85,14 @@ T(3,CdCode.CaseStatus55)
 
 #CaseStatus55Help=x,1024,S
 
+! CourtCode
+#CDDECourtCode56=x,20,S                  
+T(3,CdCode.CourtCode) 
+#CourtCode56Help=x,1024,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDCODETranKey,#CDCODETranCode,#CDCODEDateFieldName,#CDCODECaseStatus56,#CDCODECaseStatus55)
+S(XXR99,01,#CDCODETranKey,#CDCODETranCode,#CDCODEDateFieldName,#CDCODECaseStatus56,#CDCODECaseStatus55,#CDDECourtCode56)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
@@ -96,6 +100,7 @@ T(2,@TranCodeHelp,#HelpDesc2)
 T(2,@DateFieldNameHelp,#HelpDesc3)
 T(2,@CaseStatus56Help,#HelpDesc4)
 T(2,@CaseStatus55Help,#HelpDesc5)
+T(2,@CourtCode56Help,#HelpDesc6)
 
 
 #CHAIN=A,1,S
@@ -167,11 +172,11 @@ SWITCH(#TranCode,
     053,T(3,M),
     054,T(3,M),
     055,T(3,2),
-    056,T(3,2),
+    056,T(3,6),
     060,T(3,P),
     061,T(3,P),
     062,T(3,P),
-    063,T(3,5),
+    063,T(3,P),
     440,T(3,S),
     442,T(3,T),
     443,T(3,T),
@@ -230,9 +235,9 @@ T(2,#OOBankId+ +#OOBankIdX)
 #OOHistoryTxCd=X,5,S
 
 #OOMaxMainCode=X,3,S
-!#OOMaxMainCodeX=X,50,S
-!#OOMaxMainCode_Combine=X,60,S
-!T(2,#OOMaxMainCode+ +#OOMaxMainCodeX)
+#OOMaxMainCodeX=X,50,S
+#OOMaxMainCode_Combine=X,60,S
+T(2,#OOMaxMainCode+ +#OOMaxMainCodeX)
 
 #OOAccount=X,50,S
 
@@ -256,9 +261,14 @@ C(3,#OORcDate,0,S,$)
 C(3,#OOClaimDate,0,S,$)
 
 #OOCourtCode=X,3,S
-!#OOCourtCodeX=X,50,S
-!#OOCourtCode_Combine=X,60,S
-!T(2,#OOCourtCode+ +#OOCourtCodeX)
+#OOCourtCodeX=X,50,S
+#OOCourtCode_Combine=X,60,S
+T(2,#OOCourtCode+ +#OOCourtCodeX)
+
+!法院代號
+#OOCourtCode56_Combine=X,60,S
+T(H,@OOCourtCodeX,#OOCourtCode,#CourtCode56Help)
+T(2,@OOCourtCode56_Combine,#OOCourtCode+ +#OOCourtCodeX)
 
 
 #OOCaseStatus=X,1,S
@@ -269,8 +279,12 @@ T(2, )
 T(H,@OOCaseStatusX,#OOCaseStatus,#CaseStatus56Help)
 T(2,@OOCaseStatus_Combine,#OOCaseStatus+ +#OOCaseStatusX)
 
-#OOClosedDate=D,7,S
-C(3,#OOClosedDate,0,S,$)
+#OOCaseStatus55_Combine=X,20,S
+T(H,@OOCaseStatusX,#OOCaseStatus,#CaseStatus55Help)
+T(2,@OOCaseStatus55_Combine,#OOCaseStatus+ +#OOCaseStatusX)
+
+#OOCloseDate=D,7,S
+C(3,#OOCloseDate,0,S,$)
 
 #OOChangePayDate=D,7,S
 C(3,#OOChangePayDate,0,S,$)
@@ -341,10 +355,12 @@ TXFORM=L8030
 #OOPayDate
 #OOClaimDate
 #OOCourtCode
+#OOCourtCodeX
 #OOCaseStatus
-#OOClosedDate
+#OOCloseDate
 #OOChangePayDate
 #OOMaxMainCode
+#OOMaxMainCodeX
 #OOAccount
 #OODelayYM
 #OOOutJcicTxtDate
@@ -370,14 +386,14 @@ TXFORM=L8030
 {width:60,align:'center',hidden:false}
 #OOCustId=身分證字號
 {width:100,align:'center',hidden:false}
-#OOCaseStatus_Combine=案件狀態
+#OOCaseStatus55_Combine=案件狀態
 {width:100,align:'left',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
+{width:200,align:'center',hidden:false}
 #OOClaimDate=裁定日期
 {width:100,align:'center',hidden:false}
-#OOCourtCode=承審法院代號
-{width:120,align:'center',hidden:false}
+#OOCourtCode56_Combine=承審法院代號
+{width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
 ^
@@ -398,10 +414,35 @@ TXFORM=L8030
 #OORcDate=原前置協商申請日
 {width:200,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
+{width:200,align:'center',hidden:false}
 #OOChangePayDate=申請變更還款條件日
 {width:200,align:'center',hidden:false}
-#OOClosedDate=變更還款條件結案日期
+#OOCloseDate=變更還款條件結案日期
+{width:200,align:'center',hidden:false}
+#OOOutJcicTxtDate=轉JCIC文字檔日期
+{width:200,align:'center',hidden:false}
+^
+#RPTFG=6,QUERY.GRID,L8030
+#any={detail:true, header:'L8030B.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
+#OOBTN5=查詢
+{width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+#OOBTN2=狀態
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
+#OOBTN6=歷程
+{width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
+#OOTranKey_Combine=狀態
+{width:60,align:'center',hidden:false}
+#OOCustId=身分證字號
+{width:100,align:'center',hidden:false}
+#OOCaseStatus_Combine=案件狀態
+{width:200,align:'left',hidden:false}
+#OOSubmitKey_Combine=報送單位代號
+{width:200,align:'center',hidden:false}
+#OOClaimDate=裁定日期
+{width:100,align:'center',hidden:false}
+#OOCourtCode56_Combine=承審法院代號
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:200,align:'center',hidden:false}
@@ -417,7 +458,7 @@ TXFORM=L8030
 #OOBTN6=歷程
 {width:50,search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false}
 #OOTranKey_Combine=狀態
-{width:100,align:'center',hidden:false}
+{width:60,align:'center',hidden:false}
 #OOCustId=身分證字號
 {width:100,align:'center',hidden:false}
 #OORcDate=款項統一收付申請日
@@ -472,7 +513,7 @@ TXFORM=L8030
 #OORcDate=協商申請日
 {width:100,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
+{width:200,align:'center',hidden:false}
 #OOPayDate=繳款日期
 {width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
@@ -493,7 +534,7 @@ TXFORM=L8030
 #OORcDate=協商申請日
 {width:100,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
+{width:200,align:'center',hidden:false}
 #OODelayYM=延期繳款年月
 {width:120,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
@@ -514,11 +555,11 @@ TXFORM=L8030
 #OOCustId=身分證字號
 {width:100,align:'center',hidden:false}
 #OORcDate=調解申請日
-{width:180,align:'center',hidden:false}
+{width:150,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
-#OOCourtCode=受理調解機構代號
-{width:120,align:'center',hidden:false}
+{width:200,align:'center',hidden:false}
+#OOCourtCode_Combine=受理調解機構代號
+{width:200,align:'center',hidden:false}
 #OODelayYM=延期繳款年月
 {width:120,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
@@ -539,15 +580,15 @@ TXFORM=L8030
 #OOCustId=身分證字號
 {width:100,align:'center',hidden:false}
 #OORcDate=調解申請日
-{width:180,align:'center',hidden:false}
+{width:100,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
-#OOCourtCode=受理調解機構代號
-{width:120,align:'center',hidden:false}
-#OOMaxMainCode=最大債權金融機構代號
+{width:200,align:'center',hidden:false}
+#OOCourtCode_Combine=受理調解機構代號
+{width:200,align:'center',hidden:false}
+#OOMaxMainCode_Combine=最大債權金融機構代號
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
-{width:200,align:'center',hidden:false}
+{width:140,align:'center',hidden:false}
 ^
 #RPTFG=K,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -567,7 +608,7 @@ TXFORM=L8030
 {width:100,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
 {width:200,align:'center',hidden:false}
-#OOCourtCode=受理調解機構代號
+#OOCourtCode_Combine=受理調解機構代號
 {width:200,align:'center',hidden:false}
 #OOPayDate=繳款日期
 {width:100,align:'center',hidden:false}
@@ -612,8 +653,8 @@ TXFORM=L8030
 #OORcDate=協商申請日
 {width:100,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
-#OOMaxMainCode=最大債權金融機構代號
+{width:200,align:'center',hidden:false}
+#OOMaxMainCode_Combine=最大債權金融機構代號
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
@@ -635,8 +676,8 @@ TXFORM=L8030
 #OORcDate=協商申請日
 {width:100,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
-#OOClosedDate=結案日期
+{width:200,align:'center',hidden:false}
+#OOCloseDate=結案日期
 {width:100,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
@@ -658,8 +699,8 @@ TXFORM=L8030
 #OORcDate=協商申請日
 {width:100,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
-#OOMaxMainCode=最大債權金融機構代號
+{width:200,align:'center',hidden:false}
+#OOMaxMainCode_Combine=最大債權金融機構代號
 {width:200,align:'center',hidden:false}
 #OOAccount=帳戶
 {width:400,align:'left',hidden:false}
@@ -683,7 +724,7 @@ TXFORM=L8030
 #OORcDate=原前置協商申請日
 {width:200,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
+{width:200,align:'center',hidden:false}
 #OOChangePayDate=申請變更還款條件日
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
@@ -725,13 +766,13 @@ TXFORM=L8030
 #OOCustId=身分證字號
 {width:100,align:'center',hidden:false}
 #OORcDate=款項統一收付申請日
-{width:180,align:'center',hidden:false}
+{width:150,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
+{width:200,align:'center',hidden:false}
 #OOBankId_Combine=債權金融機構代號
-{width:180,align:'center',hidden:false}
+{width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
-{width:180,align:'center',hidden:false}
+{width:170,align:'center',hidden:false}
 ^
 #RPTFG=S,QUERY.GRID,L8030
 #any={detail:true, header:'L8030D.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60,60,60]}
@@ -750,8 +791,8 @@ TXFORM=L8030
 #OORcDate=調解申請日
 {width:200,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:120,align:'center',hidden:false}
-#OOCourtCode=受理調解機構代號
+{width:200,align:'center',hidden:false}
+#OOCourtCode_Combine=受理調解機構代號
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}
@@ -773,10 +814,10 @@ TXFORM=L8030
 #OORcDate=調解申請日
 {width:120,align:'center',hidden:false}
 #OOSubmitKey_Combine=報送單位代號
-{width:180,align:'center',hidden:false}
-#OOCourtCode=受理調解機構代號
 {width:200,align:'center',hidden:false}
-#OOMaxMainCode=最大債權金融機構代號
+#OOCourtCode_Combine=受理調解機構代號
+{width:200,align:'center',hidden:false}
+#OOMaxMainCode_Combine=最大債權金融機構代號
 {width:200,align:'center',hidden:false}
 #OOOutJcicTxtDate=轉JCIC文字檔日期
 {width:180,align:'center',hidden:false}

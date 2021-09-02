@@ -69,13 +69,23 @@ public class L1103 extends TradeBuffer {
 
 		titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
+		String iCustUKey = titaVo.get("CustUKey");
+
 		String custid = titaVo.get("CustId");
-		CustMain tCustMain = iCustMainService.custIdFirst(custid);
+
+		CustMain tCustMain = new CustMain();
+		
+		if (iCustUKey != null && !iCustUKey.isEmpty()) {
+			tCustMain = iCustMainService.findById(iCustUKey, titaVo);
+		} else {
+			tCustMain = iCustMainService.custIdFirst(custid, titaVo);
+		}
 
 		// 例外處理 若查無資料請至L1101新增
 		if (tCustMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔");
 		}
+		
 		// 鎖定這筆
 		tCustMain = iCustMainService.holdById(tCustMain);
 
@@ -84,26 +94,29 @@ public class L1103 extends TradeBuffer {
 
 			// 若該欄位有被修改,更新該欄位資料
 
-			// 如果要修改統編
-			if (titaVo.getParam("CustIdInd").trim().equals("X")) {
-				// 修改後的統編
-				String new_custid = titaVo.getParam("CustIdAft");
+			
+			//不可修正交易
+			
+			// 正常交易或
+			if (titaVo.isHcodeNormal()) {
+				
+				// 如果要修改統編
+				if (titaVo.getParam("CustIdInd").trim().equals("X")) {
+					// 修改後的統編
+					String new_custid = titaVo.getParam("CustIdAft");
 
-				// 先檢查新統編是否已存在
-				CustMain tCustMain2 = iCustMainService.custIdFirst(new_custid);
+					// 先檢查新統編是否已存在
+					CustMain tCustMain2 = iCustMainService.custIdFirst(new_custid);
 
-				// 新統編不存在,可修改
-				if (tCustMain2 == null) {
-					// 更換資料
-					tCustMain.setCustId(new_custid);
-				} else {
-					// 例外處理 新統編已存在
-					throw new LogicException("E1005", "客戶資料主檔");
+					// 新統編不存在,可修改
+					if (tCustMain2 == null) {
+						// 更換資料
+						tCustMain.setCustId(new_custid);
+					} else {
+						// 例外處理 新統編已存在
+						throw new LogicException("E1005", "客戶資料主檔");
+					}
 				}
-			}
-
-			// 正常交易或修正交易
-			if (titaVo.isHcodeNormal() || titaVo.isHcodeModify()) {
 
 				if (titaVo.isHcodeNormal() && tCustMain.getActFg() == 1) {
 					throw new LogicException(titaVo, "E0021", " "); // 該筆資料待放行中
@@ -114,6 +127,22 @@ public class L1103 extends TradeBuffer {
 
 				// 訂正交易
 			} else {
+				if (titaVo.getParam("CustIdInd").trim().equals("X")) {
+					// 檢查原統編是否被佔用
+					String old_custid = titaVo.getParam("CustIdBef");
+
+					// 先檢查新統編是否已存在
+					CustMain tCustMain2 = iCustMainService.custIdFirst(old_custid);
+
+					// 新統編不存在,可修改
+					if (tCustMain2 == null) {
+						// 更換資料
+						tCustMain.setCustId(old_custid);
+					} else {
+						// 例外處理 新統編已存在
+						throw new LogicException("E0007", "原客戶統編已被佔用");
+					}
+				}
 
 				tCustMain.setActFg(0);
 				// 維護中櫃員代號
@@ -128,6 +157,7 @@ public class L1103 extends TradeBuffer {
 			}
 
 		}
+		
 		// 放行一般
 		if (titaVo.isActfgSuprele() && titaVo.isHcodeNormal()) {
 			this.info("放行一般");
@@ -427,7 +457,7 @@ public class L1103 extends TradeBuffer {
 			if (titaVo.getParam("TypeCodeInd").equals("X")) {
 				tCustMain.setTypeCode(iParse.stringToInteger(titaVo.getParam("TypeCodeBef")));
 			}
-			
+
 			// 戶名
 			if (titaVo.getParam("CustNameInd").equals("X")) {
 				tCustMain.setCustName(titaVo.getParam("CustNameBef"));

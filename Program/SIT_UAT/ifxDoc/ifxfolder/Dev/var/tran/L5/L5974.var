@@ -105,7 +105,7 @@ E(0,100)
 <sub type="FORM" name="L5974">
 
 #SCRTIL=_,_,S
-T(3,[L5974] 債權銀行帳號明細資料)
+T(3,[L5974] 債權銀行帳號明細表)
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)

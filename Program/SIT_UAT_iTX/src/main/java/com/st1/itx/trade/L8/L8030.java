@@ -687,7 +687,7 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
-	    		occursListA.putParam("OOCourtCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }
@@ -786,7 +786,7 @@ public class L8030 extends TradeBuffer {
 	    	    occursListB.putParam("OOClaimDate", "");
 	    	    occursListB.putParam("OOCourtCode", "");
 	    	    occursListB.putParam("OOCaseStatus", "");	
-	    		occursListA.putParam("OOCourtCodeX", "");
+	    		occursListB.putParam("OOCourtCodeX", "");
 	            this.totaVo.addOccursList(occursListB);
 	        }
 	    }

@@ -342,11 +342,13 @@
 			<groupId>org.apache.tomcat</groupId>
 			<artifactId>tomcat-jdbc</artifactId>
 			<version>${Tomcat-jdbc-Ver}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc8</artifactId>
 			<version>19.3.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- hibernate -->

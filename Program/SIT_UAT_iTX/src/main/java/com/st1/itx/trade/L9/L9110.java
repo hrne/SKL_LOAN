@@ -2,8 +2,6 @@ package com.st1.itx.trade.L9;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
 @Service("L9110")
 @Scope("prototype")
 public class L9110 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L9110.class);
 
 	/* 報表服務注入 */
 	@Autowired
@@ -46,18 +43,20 @@ public class L9110 extends TradeBuffer {
 
 		l9110Report.setParentTranCode(parentTranCode);
 
-		boolean isFinished = l9110Report.exec(titaVo, this.totaVo);
+//		boolean isFinished = l9110Report.exec(titaVo, this.totaVo);
 
-		String nowBcDate = dDateUtil.getNowStringBc();
-		String nowTime = dDateUtil.getNowStringTime();
+		l9110Report.exec(titaVo, this.totaVo);
 
-		String tlrNo = titaVo.getTlrNo();
+//		String nowBcDate = dDateUtil.getNowStringBc();
+//		String nowTime = dDateUtil.getNowStringTime();
+//
+//		String tlrNo = titaVo.getTlrNo();
 
-		if (isFinished) {
-			webClient.sendPost(nowBcDate, nowTime, tlrNo, "Y", "LC009", tlrNo, "L9110首次撥款審核資料表已完成", titaVo);
-		} else {
-			webClient.sendPost(nowBcDate, nowTime, tlrNo, "Y", "L9110", tlrNo, "L9110首次撥款審核資料表查無資料", titaVo);
-		}
+//		if (isFinished) {
+//			webClient.sendPost(nowBcDate, nowTime, tlrNo, "Y", "LC009", tlrNo, "L9110首次撥款審核資料表已完成", titaVo);
+//		} else {
+//			webClient.sendPost(nowBcDate, nowTime, tlrNo, "Y", "L9110", tlrNo, "L9110首次撥款審核資料表查無資料", titaVo);
+//		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

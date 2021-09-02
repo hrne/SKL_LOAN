@@ -1,0 +1,257 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5973)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,268)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,40)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+#button=x,1,S
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5973" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5973]                                 最大債權撥付明細查詢"],
+["#FdYYY+製檔日期",#YYY,"/",#MM,"/",#DD,"(輸入年月，日可不輸入)"],
+["#FdCustId+身分證字號",#CustId,"(空白=全部)"],
+]
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! CaseKindCode
+#CaseKindCodeCode=x,20,S
+T(3,CdCode.CaseKindCode)
+#CaseKindCodeHelpRim=X,1,S
+RESET_RIM(#CaseKindCodeHelpRim,XXR99)
+S(XXR99,01,#CaseKindCodeCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CaseKindCodeHelp,#HelpDesc1)
+#CaseKindCodeHelp=x,1024,S
+
+#FdYYY=X,2,L
+#FdCustId=X,2,L
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,17,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@YYY,#NTXBUF,1,3)
+T(1,@MM,#NTXBUF,4,2)
+T(1,@DD,#NTXBUF,6,2)
+T(1,@CustId,#NTXBUF,8,10)
+
+! 製檔日期
+#YYY=A,3,I
+C(3,#CHAIN,0,$,s)
+
+#MM=A,2,I
+C(3,#CHAIN,0,$,s)
+IF(#YYY==0,s,$)
+@V(5,1,12)
+
+#DD=A,2,I
+C(3,#CHAIN,0,$,s)
+IF(#YYY==0,s,$)
+@V(5,0,31)D(8)
+
+#DateFormate=D,7,S
+T(2,#YYY+#MM+#DD)
+IF(#DD==0,s,$)
+@A(DATE,0,#DateFormate)
+
+! 身分證字號
+#CustId=X,10,I
+C(3,#CHAIN,0,$,s)
+@C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+
+!身分證找戶號
+<include src="ROM.icf::L2R47.dec"/>
+#Rim2R47CustId=X,10,S
+
+#RimL2R47=X,1,S
+C(4,#CustId,S,$)
+T(2,@Rim2R47CustId,#CustId)
+RESET_RIM(#RimL2R47,L2R47)
+S(L2R47,1,#Rim2R47CustId)
+R(1,L2R47)
+
+#MRKEY=_,_,S
+C(4,#CustId,S,$)
+T(2,#L2R47CustNo)
+
+#RPTFG=A,1,S
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5973 -----------
+<sub type="FORM" name="L5973">
+
+#SCRTIL=_,_,S
+T(3,[L5973] 最大債權撥付明細表)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+! 位階------每筆的第一筆給1 其餘給0
+#OORank=A,1,S
+
+! 製檔日期
+#OOExportDate=D,7,O
+
+#OOExportDateA=X,3,S
+T(1,#OOExportDate,1,3)
+#OOExportDateB=X,2,S
+T(1,#OOExportDate,4,2)
+#OOExportDateC=X,2,S
+T(1,#OOExportDate,6,2)
+
+#OOExportDateX=X,9,S
+IF(#OOExportDate==0,T(3,),T(2,#OOExportDateA+/+#OOExportDateB+/+#OOExportDateC))
+
+! 案件種類
+#OOCaseKindCode=A,1,O
+#OOCaseKindCodeX=X,4,O
+T(H,#OOCaseKindCode,#CaseKindCodeHelp)
+
+! 身分證字號
+#OOCustId=X,10,O
+
+! C(3,#OORank,1,T(2,#OOCustId),T(2, ))
+
+! 戶號
+#OOCustNo=A,7,O
+#OOCustNoX=X,7,O
+T(2,#OOCustNo)
+! C(3,#OORank,1,T(2,#OOCustNo),T(2, ))
+! 戶名
+#OOCustName=X,100,O
+! C(3,#OORank,1,T(2,#OOCustName),T(2, ))
+
+! 債權機構
+#OOFinCodeName=A,3,O
+! 機構名稱
+#OOFinCodeNameNM=X,100,O
+
+! 撥付金額
+#OOApprAmt=m,14,O
+! 累計撥付金額
+#OOAccuApprAmt=m,14,O
+! 撥付比例
+#OOAmtRatio=m,2.2,O
+
+#XXAmtRatioX=X,5,O
+X(#OOAmtRatio)
+
+#OOAmtRatioX=X,10,O
+C(3,#XXAmtRatioX,0,T(2,),T(2,#XXAmtRatioX))
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#YYY
+#MM
+#DD
+#CustId
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R47.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5973
+#OORank
+#OOExportDate
+#OOCaseKindCode
+#OOCustId
+#OOCustNo
+#OOCustName
+#OOFinCodeName
+#OOFinCodeNameNM
+#OOApprAmt
+#OOAccuApprAmt
+#OOAmtRatio
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L5973" layout="cols=1;screen.width=[0,1000];order=1;">
+[
+["[L5973]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@最大債權撥付明細查詢"],
+[""],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L5973
+#any={detail:true, header:'L5973.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOExportDateX=製檔日期
+{width:85,align:'center'}
+#OOCaseKindCodeX=案件種類
+{width:85,align:'center'}
+#OOCustId=身分證字號
+{width:100,align:'center'}
+#OOCustNoX=戶號
+{width:85,align:'center'}
+#OOCustName=戶名
+{width:85,align:'left'}
+#OOFinCodeName=債權機構
+{width:120,align:'center'}
+#OOFinCodeNameNM=機構名稱
+{width:85,align:'left'}
+#OOApprAmt=撥付金額
+{width:100,align:'right'}
+#OOAccuApprAmt=累計撥付金額
+{width:120,align:'right'}
+#OOAmtRatioX=撥付比例％
+{width:85,align:'right'}
+
+^
+</sub>

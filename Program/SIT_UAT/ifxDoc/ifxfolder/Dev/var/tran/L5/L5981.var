@@ -97,7 +97,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 !C(5,#TXFORM,L5981,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L5981] 債權異動歷程)
+T(3,[L5981] 債權異動歷程表)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------

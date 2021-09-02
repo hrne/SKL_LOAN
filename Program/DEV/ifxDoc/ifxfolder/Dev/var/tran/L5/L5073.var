@@ -46,7 +46,7 @@ K(MODIFYBUTTON,1,新增)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
-["[L5073]                                 撥付日期查詢"],
+["[L5073]                                 債務協商作業-撥付日期查詢"],
 ["#FdYearMonth+年月",#Year,#Month,"(月份0表示查詢整年度)"],
 !["#FdRPTFG+顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
@@ -98,7 +98,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 !C(5,#TXFORM,L5073,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L5073] 撥付日期查詢)
+T(3,[L5073] 債務協商撥付日期明細表)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
@@ -182,7 +182,7 @@ TXFORM=L5073
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L5073" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
 [
-["[L5073]                                 撥付日期查詢                                             "],
+["[L5073]                    債務協商作業-撥付日期查詢                                             "],
 ]
 </sub>
 

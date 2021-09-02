@@ -42,7 +42,7 @@ public class L1R01 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1R01 ");
 		this.totaVo.init(titaVo);
-
+		
 		// RimCustId=X,10
 		String iCustId = titaVo.get("RimCustId").trim();
 
@@ -107,6 +107,7 @@ public class L1R01 extends TradeBuffer {
 
 		/* 存入Tota */
 		/* key 名稱需與L1R01.tom相同 */
+		this.totaVo.putParam("L1r01CustUKey", tCustMain.getCustUKey());
 		this.totaVo.putParam("L1r01CustId", tCustMain.getCustId());
 		this.totaVo.putParam("L1r01CustNo", tCustMain.getCustNo());
 		this.totaVo.putParam("L1r01BranchNo", tCustMain.getBranchNo());

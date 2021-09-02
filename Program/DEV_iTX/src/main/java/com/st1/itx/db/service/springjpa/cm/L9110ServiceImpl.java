@@ -15,7 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 
-@Service("l9110ServiceImpl")
+@Service
 @Repository
 public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
@@ -27,348 +27,41 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> queryLegalPerson(TitaVo titaVo, String applNo) throws Exception {
-
-		this.info("L9110.findAll LegalPerson");
-
-		// -- 法人格式
-		String sql = "SELECT LPAD(CM.\"CustNo\",7,0) AS F0              "; // -- 戶號 F0
-		sql += "           , LPAD(FAC.\"FacmNo\",3,0) AS F1             "; // -- 額度號碼 F1
-		sql += "           , CM.\"CustName\"                            "; // -- 戶名 F2
-		sql += "           , CM.\"CustId\"                              "; // -- 統編 F3
-		sql += "           , FC.\"ApplNo\"                              "; // -- 核准號碼 F4
-		sql += "           , CM.\"SpouseName\"                          "; // -- 負責人姓名 F5
-		sql += "           , CM.\"SpouseId\"                            "; // -- 負責人身分證 F6
-		sql += "           , CI.\"IndustryItem\"                        "; // -- 行業別(中文) F7
-		sql += "           , CDC1.\"Item\"        AS \"CustTypeItem\"   "; // -- 客戶別(中文) F8
-		sql += "           , CM.\"Birthday\"                            "; // -- 設立日期 F9
-		sql += "           , \"Fn_GetCustAddr\"(CM.\"CustUKey\",'0')    ";
-		sql += "                                AS \"CompanyAddr\"      "; // -- 公司地址 F10
-		sql += "           , NVL(CM.\"RegZip3\",'') || NVL(CM.\"RegZip2\",'')";
-		sql += "                                AS \"CompanyZip\"       "; // -- 郵遞區號(公司地址) F11
-		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'01',1)    ";
-		sql += "                                AS \"CompanyTel\"       "; // -- 公司電話 ??? 新系統有特別分類嗎? F12
-		sql += "           , \"Fn_GetCustAddr\"(CM.\"CustUKey\",'1')    ";
-		sql += "                                AS \"ContactAddr\"      "; // -- 通訊地址 F13
-		sql += "           , NVL(CM.\"CurrZip3\",'') || NVL(CM.\"CurrZip2\",'')";
-		sql += "                                AS \"ContactZip\"       "; // -- 郵遞區號(通訊地址) F14
-		sql += "           , NVL(CTN.\"LiaisonName\",' ')               ";
-		sql += "                                AS \"ContactName\"      "; // -- 聯絡人姓名 F15
-		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1)    ";
-		sql += "                                AS \"ContactTel\"       "; // -- 聯絡電話(市話) F16
-		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1)     ";
-		sql += "                                AS \"ContactCellPhone\" "; // -- 聯絡電話(手機) F17
-		sql += "           , \"Fn_GetTelNo\"(CM.\"CustUKey\",'04',1)    ";
-		sql += "                                AS \"Fax\"              "; // -- 傳真 F18
-		sql += "           , ''                 AS \"Station\"          "; // -- 站別 ??? 待確認是否刪除? F19
-		sql += "           , NVL(CR.\"CrossUse\",'N')                   ";
-		sql += "                                AS \"CrossUse\"         "; // -- 交互運用 F20
-		sql += "           , ''                 AS \"RelName\"          "; // -- 關聯戶戶名 ??? 如何呈現? F21
-		sql += "           , '' AS F22 "; // -- 保證人統編 F22 改用queryGua
-		sql += "           , '' AS F23 "; // -- 保證人姓名 F23 改用queryGua
-		sql += "           , '' AS F24 "; // -- 保證人關係 F24 改用queryGua
-		sql += "           , '' AS F25 "; // -- 保證金額 F25 改用queryGua
-		sql += "           , '' AS F26 "; // -- 保證人通訊地址 F26 改用queryGua
-		sql += "           , '' AS F27 "; // -- 保證人郵遞區號(通訊地址) F27 改用queryGua
-		sql += "           , FC.\"ApplDate\"                            "; // -- 鍵檔日期 F28
-		sql += "           , FAC.\"LineAmt\"                            "; // -- 核准額度 F29
-		sql += "           , CDC2.\"Item\" || FAC.\"AcctCode\"          ";
-		sql += "                                AS \"FacAcctCode\"      "; // -- 核准科目 F30
-		sql += "           , FAC.\"LoanTermYy\"                         "; // -- 貸款期間年 F31
-		sql += "           , FAC.\"LoanTermMm\"                         "; // -- 貸款期間月 F32
-		sql += "           , FAC.\"LoanTermDd\"                         "; // -- 貸款期間日 F33
-		sql += "           , FAC.\"ProdNo\"                             "; // -- 商品代碼(原基本利率代碼) F34
-		sql += "           , FAC.\"ApproveRate\"                        "; // -- 核准利率 F35
-		sql += "           , FAC.\"RateAdjFreq\"                        "; // -- 利率調整週期 F36
-		sql += "           , CDC3.\"Item\"        AS \"ExtraRepayItem\" "; // -- 利率調整不變攤還額 F37
-		sql += "           , FAC.\"CreditScore\"                        "; // -- 信用評分 F38
-		sql += "           , FAC.\"UtilDeadline\"                       "; // -- 動支期限 F39
-		sql += "           , FAC.\"RateIncr\"                           "; // -- 利率加減碼 F40
-		sql += "           , CDC4.\"Item\"        AS \"UsageItem\"      "; // -- 用途別 F41
-		sql += "           , FAC.\"RecycleDeadline\"                    "; // -- 循環動用期限 F42
-		sql += "           , NVL(CDE1.\"Fullname\",N'')                 ";
-		sql += "                                AS \"IntroduceName\"    "; // -- 介紹人姓名 F43
-		sql += "           , CASE                                       ";
-		sql += "               WHEN FAC.\"IncomeTaxFlag\" = 'Y'         ";
-		sql += "               THEN '代繳'                              ";
-		sql += "             ELSE '不代繳' END   AS \"IncomeTax\"       "; // -- 代繳所得稅 F44
-		sql += "           , CASE                                      ";
-		sql += "               WHEN FAC.\"CompensateFlag\" = 'Y'       ";
-		sql += "               THEN '代償件'                            ";
-		sql += "             ELSE '非代償件' END AS \"Compensate\"      "; // -- 代償碼 F45
-		sql += "           , CDC5.\"Item\"         AS \"AmortizedItem\"   "; // -- 攤還方式 F46
-		sql += "           , FAC.\"GracePeriod\"                        "; // -- 寬限總月數 F47
-		sql += "           , FAC.\"FirstRateAdjFreq\"                   "; // -- 首次調整週期 F48
-		sql += "           , CDC6.\"Item\"         AS \"RepayItem\"       "; // -- 繳款方式 F49
-		sql += "           , CDC7.\"Item\"         AS \"RepayBank\"       "; // -- 扣款銀行 F50
-		sql += "           , \"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0')";
-		sql += "                                 AS \"RepayAcct\"       "; // -- 扣款帳號 F51
-		sql += "           ,FAC.\"PayIntFreq\"                          "; // -- 繳息週期 F52
-		sql += "           ,FAC.\"RateCode\"                            "; // -- 利率區分 F53
-		sql += "           ,PROD.\"BreachCode\"                         "; // -- 違約適用方式 F54
-		sql += "           ,PROD.\"BreachPercent\"                      "; // -- 違約率-金額 F55
-		sql += "           ,PROD.\"BreachDecreaseMonth\"                "; // -- 違約率-月數 F56
-		sql += "           ,''                   AS \"BreachMonth\"     "; // -- 違約還款月數 ??? F57
-		sql += "           ,''                   AS \"LastMonth\"       "; // -- 前段月數 ??? F58
-		sql += "           ,FAC.\"PieceCode\"                           "; // -- 計件代碼 F59
-		sql += "           ,NVL(CDE2.\"Fullname\",FAC.\"FireOfficer\")  ";
-		sql += "                                 AS \"FireOfficer\"     "; // -- 火險服務姓名 *** 串不到姓名時顯示員編 F60
-		sql += "           ,NVL(CDE3.\"Fullname\",FAC.\"LoanOfficer\")  ";
-		sql += "                                 AS \"LoanOfficer\"     "; // -- 放款專員 *** 串不到姓名時顯示員編 F61
-		sql += "           ,NVL(CDE4.\"Fullname\",FAC.\"Supervisor\")   ";
-		sql += "                                 AS \"Supervisor\"      "; // -- 督辦姓名 *** 串不到姓名時顯示員編 F62
-		sql += "           ,PROD.\"ProhibitMonth\"                      "; // -- 限制清償年限 *** 原\"禁領清償年限\" F63
-		sql += "           ,FAC.\"AcctFee\"                             "; // -- 帳管費 F64
-		sql += "           ,NVL(CDE5.\"Fullname\",FAC.\"EstimateReview\") ";
-		sql += "                                 AS \"EstimateReview\"  "; // -- 估價覆核姓名 *** 串不到姓名時顯示員編 F65
-		sql += "           ,CM.\"CustTypeCode\" || ' ' || CDC1.\"Item\"   ";
-		sql += "                                 AS \"CustTypeItem2\"   "; // -- 客戶別 *** 與第一段的客戶別差異: 代碼+中文 F66
-		sql += "           ,NVL(CDE6.\"Fullname\",FAC.\"InvestigateOfficer\") ";
-		sql += "                                 AS \"InvestigateOfficer\" ";
-		sql += "                                                      "; // -- 徵信姓名 *** 串不到姓名時顯示員編 F67
-		sql += "           ,NVL(CDE7.\"Fullname\",FAC.\"CreditOfficer\") ";
-		sql += "                                 AS \"CreditOfficer\"   "; // -- 授信姓名 *** 串不到姓名時顯示員編 F68
-		sql += "           ,NVL(CDE8.\"Fullname\",FAC.\"Coorgnizer\") ";
-		sql += "                                 AS \"Coorgnizer\"      "; // -- 協辦姓名 *** 串不到姓名時顯示員編 F69
-		sql += "           ,NVL(LBM.\"LoanBal\",0) AS \"LoanBal\"       "; // -- 本戶目前總額 F70
-		sql += "      FROM \"FacCaseAppl\" FC "; // -- 案件申請檔 ";
-		sql += "      LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FC.\"CustUKey\" "; // -- 客戶資料主檔
-		sql += "      LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FC.\"ApplNo\" "; // -- 額度主檔
-		sql += "      LEFT JOIN \"CdIndustry\" CI ON CI.\"IndustryCode\" = CM.\"IndustryCode\" "; // -- 行業別代碼檔
-		sql += "      LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'CustTypeCode' "; // -- 共用代碼檔(客戶別)
-		sql += "                             AND CDC1.\"Code\" = CM.\"CustTypeCode\" ";
-		sql += "      LEFT JOIN (SELECT tmpCTN.\"CustUKey\" ";
-		sql += "                      , CASE";
-		sql += "                          WHEN tmpCTN.\"RelationCode\" = '00'";
-		sql += "                          THEN tmpCM.\"CustName\" ";
-		sql += "                        ELSE tmpCTN.\"LiaisonName\" END AS \"LiaisonName\" ";
-		sql += "                      , ROW_NUMBER() OVER (PARTITION BY tmpCTN.\"CustUKey\" ";
-		sql += "                                           ORDER BY tmpCTN.\"RelationCode\" ";
-		sql += "                                     ) AS \"Seq\" ";
-		sql += "                 FROM \"CustTelNo\" tmpCTN ";
-		sql += "                 LEFT JOIN \"CustMain\" tmpCM ON tmpCM.\"CustUKey\" = tmpCTN.\"CustUKey\" ";
-		sql += "                 WHERE \"Enable\" = 'Y' ";
-		sql += "                ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\" ";
-		sql += "                     AND CTN.\"Seq\" = 1 ";
-		sql += "      LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'AcctCode' "; // -- 共用代碼檔(核准科目)
-		sql += "                             AND CDC2.\"Code\" = FAC.\"AcctCode\" ";
-		sql += "      LEFT JOIN \"CdCode\" CDC3 ON CDC3.\"DefCode\" = 'ExtraRepayCode' "; // -- 共用代碼檔(利率調整不變攤還額)
-		sql += "                             AND CDC3.\"Code\" = FAC.\"ExtraRepayCode\" ";
-		sql += "      LEFT JOIN \"CdCode\" CDC4 ON CDC4.\"DefCode\" = 'UsageCode' "; // -- 共用代碼檔(用途別)
-		sql += "                             AND CDC4.\"Code\" = FAC.\"UsageCode\" ";
-		sql += "      LEFT JOIN \"CdEmp\" CDE1 ON CDE1.\"EmployeeNo\" = FAC.\"Introducer\" "; // --員工資料檔(介紹人)
-		sql += "      LEFT JOIN \"CdCode\" CDC5 ON CDC5.\"DefCode\" = 'FacmAmortizedCode' "; // -- 共用代碼檔(攤還方式)
-		sql += "                             AND CDC5.\"Code\" = FAC.\"AmortizedCode\" ";
-		sql += "      LEFT JOIN \"CdCode\" CDC6 ON CDC6.\"DefCode\" = 'FacmRepayCode' "; // -- 共用代碼檔(繳款方式)
-		sql += "                             AND CDC6.\"Code\" = FAC.\"RepayCode\" ";
-		sql += "      LEFT JOIN \"CdCode\" CDC7 ON CDC7.\"DefCode\" = 'BankDeductCd' "; // -- 共用代碼檔(扣款銀行)
-		sql += "                             AND CDC7.\"Code\" = \"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0') ";
-		sql += "      LEFT JOIN \"FacProd\" PROD ON PROD.\"ProdNo\" = FAC.\"ProdNo\" ";
-		sql += "      LEFT JOIN \"CdEmp\" CDE2 ON CDE2.\"EmployeeNo\" = FAC.\"FireOfficer\" "; // --員工資料檔(火險服務)
-		sql += "      LEFT JOIN \"CdEmp\" CDE3 ON CDE3.\"EmployeeNo\" = FAC.\"LoanOfficer\" "; // --員工資料檔(放款專員)
-		sql += "      LEFT JOIN \"CdEmp\" CDE4 ON CDE4.\"EmployeeNo\" = FAC.\"Supervisor\" "; // --員工資料檔(督辦)
-		sql += "      LEFT JOIN \"CdEmp\" CDE5 ON CDE5.\"EmployeeNo\" = FAC.\"EstimateReview\" "; // --員工資料檔(估價覆核)
-		sql += "      LEFT JOIN \"CdEmp\" CDE6 ON CDE6.\"EmployeeNo\" = FAC.\"InvestigateOfficer\" "; // --員工資料檔(徵信)
-		sql += "      LEFT JOIN \"CdEmp\" CDE7 ON CDE7.\"EmployeeNo\" = FAC.\"CreditOfficer\" "; // --員工資料檔(授信)
-		sql += "      LEFT JOIN \"CdEmp\" CDE8 ON CDE8.\"EmployeeNo\" = FAC.\"Coorgnizer\" "; // --員工資料檔(協辦)
-		sql += "      LEFT JOIN ( SELECT \"CustNo\"";
-		sql += "                        ,SUM(\"LoanBal\") AS \"LoanBal\"";
-		sql += "                  FROM \"LoanBorMain\" ";
-		sql += "                  GROUP BY \"CustNo\"";
-		sql += "                ) LBM ON LBM.\"CustNo\" = CM.\"CustNo\""; // --總額
-		sql += "      LEFT JOIN ( SELECT \"CustUKey\" ";
-		sql += "                       , \"CrossUse\" ";
-		sql += "                  FROM \"CustCross\" ";
-		sql += "                  WHERE \"CrossUse\" = 'Y' ";
-		sql += "                  GROUP BY \"CustUKey\",\"CrossUse\" ";
-		sql += "                ) CR ON CR.\"CustUKey\" = CM.\"CustUKey\" ";
-		sql += "      WHERE FC.\"ApplNo\" = :applNo";
-
-		this.info("sql=" + sql);
-		Query query;
-
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
-		query.setParameter("applNo", applNo);
-
-		return this.convertToMap(query.getResultList());
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> queryCl(TitaVo titaVo, String applNo) throws Exception {
-
-		this.info("L9110ServiceImpl.queryCl ");
-
-		// -- L9110 Query(擔保品)
-		String sql = "SELECT CASE";
-		sql += "                WHEN CF.\"ClCode1\" IN ('1','2')";
-		sql += "                THEN '不動產'";
-		sql += "                WHEN CF.\"ClCode1\" IN ('3','4')";
-		sql += "                THEN '股票'";
-		sql += "                WHEN CF.\"ClCode1\" = '5'";
-		sql += "                THEN '其他'";
-		sql += "                WHEN CF.\"ClCode1\" = '9'";
-		sql += "                THEN '動產'";
-		sql += "              ELSE ' ' END             AS \"Collateral\"  "; // -- F0 擔保品資料 *** 原\"押品資料\"
-		sql += "            , LPAD(CF.\"ClNo\",7,'0')  AS \"ClNo\"        "; // -- F1 擔保品號碼 *** 原\"押品號碼\"
-		sql += "            , CDC1.\"Item\"            AS \"ClItem\"      "; // -- F2 擔保品別 *** 原\"押品別\"
-		sql += "            , CLM.\"EvaDate\"          AS \"EvaDate\"     "; // -- F3 鑑價日期
-		sql += "            , CLI.\"ClaimDate\"        AS \"OtherDate\"   "; // -- F4 他項存續期限 ???
-		sql += "            , CLI.\"SettingSeq\"                       "; // -- F5 順位 ** 只有不動產會有此欄位，動產、股票、其他擔保品會是null
-		sql += "            , CLI.\"FirstAmt\"                         "; // -- F6 前順位金額 ***
-																			// 只有不動產會有此欄位，動產、股票、其他擔保品會是null
-		sql += "            , CITY.\"CityItem\"                        "; // -- F7 地區別
-		sql += "            , CDC2.\"Item\"            AS \"EvaCompany\"  "; // -- F8 鑑定公司 ***
-																				// 只有不動產會有此欄位，動產、股票、其他擔保品會是null
-		sql += "            , CLI.\"BdRmk\"                            "; // -- F9 建物標示備註 ***
-																			// 只有不動產會有此欄位，動產、股票、其他擔保品會是null
-		sql += "            , CASE";
-		sql += "                WHEN CF.\"ClCode1\" IN ('1','2')";
-		sql += "                THEN CLI.\"SettingDate\" ";
-		sql += "                WHEN CF.\"ClCode1\" IN ('3','4')";
-		sql += "                THEN CLS.\"SettingDate\" ";
-		sql += "                WHEN CF.\"ClCode1\" = '5'";
-		sql += "                THEN CLO.\"SettingDate\" ";
-		sql += "                WHEN CF.\"ClCode1\" = '9'";
-		sql += "                THEN CLMOV.\"SettingDate\" ";
-		sql += "              ELSE 0 END               AS \"SettingDate\" "; // -- F10 設定日期
-		sql += "            , CF.\"ClCode1\"           AS \"ClCode1\"  "; // -- F11 擔保品代號1
-		sql += "            , CLS.\"StockCode\"";
-		sql += "              || ' '";
-		sql += "              || CDS.\"StockItem\"     AS \"StockName\" "; // F12 股票代號及股票名稱
-		sql += "            , CLS.\"PledgeNo\"         AS \"PledgeNo\" "; // F13 質權設定書號
-		sql += "            , CLS.\"ThreeMonthAvg\"    AS \"ThreeMonthAvg\" ";// F14 三個月平均價
-		sql += "            , CLS.\"YdClosingPrice\"   AS \"YdClosingPrice\" "; // F15 前日收盤價
-		sql += "            , CLS.\"EvaUnitPrice\"     AS \"EvaUnitPrice\" "; // F16 鑑定單價
-		sql += "            , CLM.\"EvaAmt\"           AS \"EvaAmt\" ";// F17 鑑定總價
-		sql += "            , CLS.\"LoanToValue\"      AS \"LTV\" "; // F18 貸放成數
-		sql += "            , FAC.\"LineAmt\"          AS \"LineAmt\" "; // F19 核准額度
-		sql += "            , CLS.\"CustodyNo\"        AS \"CustodyNo\" ";// F20 保管條號碼
-		sql += "       FROM \"ClFac\" CF";
-		sql += "       LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = CF.\"ApproveNo\"";
-		sql += "       LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'ClCode2' || CF.\"ClCode1\"";
-		sql += "                                AND CDC1.\"Code\"    = LPAD(CF.\"ClCode2\",2,'0')";
-		sql += "       LEFT JOIN \"ClMain\" CLM ON CLM.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                               AND CLM.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                               AND CLM.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "       LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                              AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                              AND CLI.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "       LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = CLM.\"CityCode\"";
-		sql += "       LEFT JOIN \"ClStock\" CLS ON CLS.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                                AND CLS.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                                AND CLS.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "       LEFT JOIN \"CdStock\" CDS ON CDS.\"StockCode\" = CLS.\"StockCode\"";
-		sql += "       LEFT JOIN \"ClOther\" CLO ON CLO.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                                AND CLO.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                                AND CLO.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "       LEFT JOIN \"ClMovables\" CLMOV ON CLMOV.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                                     AND CLMOV.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                                     AND CLMOV.\"ClNo\"    = CF.\"ClNo\"";
-		sql += "       LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'EvaCompanyCode'";
-		sql += "                                AND CDC2.\"Code\" = NVL(CLI.\"EvaCompanyCode\",' ')";
-		sql += "       WHERE CF.\"ApproveNo\" = :applNo";
-		sql += "         AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
-
-		this.info("sql=" + sql);
-		Query query;
-
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
-		query.setParameter("applNo", applNo);
-
-		return this.convertToMap(query.getResultList());
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> queryLand(TitaVo titaVo, String applNo) throws Exception {
-
-		this.info("L9110ServiceImpl.queryLand");
-
-		String sql = ""; // -- L9110 Query(土地)
-		sql += "SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\"";
-		sql += "                                     , CF.\"ClCode2\"";
-		sql += "                                     , CF.\"ClNo\"";
-		sql += "                          ORDER BY LO.\"LandSeq\""; // -- ??? 房地只取一筆?
-		sql += "                         ) AS \"Seq\"     "; // -- 序號
-		sql += "     , LO.\"OwnerId\"                     "; // -- 提供人 ??? 房地只取一筆?
-		sql += "     , CITY.\"CityItem\"                  "; // -- 縣市
-		sql += "     , AREA.\"AreaItem\"                  "; // -- 鄉鎮區
-		sql += "     , CDLS.\"IrItem\"                    "; // -- 段小段
-		sql += "     , L.\"LandNo1\" || '-' || L.\"LandNo2\"";
-		sql += "                           AS \"LandNo\"  "; // -- 地號
-		sql += "     , L.\"Area\"                         "; // -- 面積
-		sql += "     , L.\"TransferedYear\"               "; // -- 年度
-		sql += "     , L.\"LastTransferedAmt\"            "; // -- 前次移轉
-		sql += "     , L.\"EvaUnitPrice\"                 "; // -- 鑑定單價
-		sql += "     , 0                   AS \"ApplyAmt\""; // -- 核貸 ???
-		sql += "     , CLI.\"SettingAmt\"                 "; // -- 設定
-		sql += " FROM \"ClFac\" CF ";
-		sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                    AND L.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                    AND L.\"ClNo\"    = CF.\"ClNo\"";
-		sql += " LEFT JOIN (SELECT NVL(CM.\"CustId\",' ') AS \"OwnerId\"";
-		sql += "                 , LO.\"ClCode1\"";
-		sql += "                 , LO.\"ClCode2\"";
-		sql += "                 , LO.\"ClNo\"";
-		sql += "                 , LO.\"LandSeq\"";
-		sql += "            FROM \"ClLandOwner\" LO ";
-		sql += "            LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = LO.\"OwnerCustUKey\"";
-		sql += "           ) LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "               AND LO.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "               AND LO.\"ClNo\"    = CF.\"ClNo\"";
-		sql += " LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = L.\"CityCode\"";
-		sql += " LEFT JOIN \"CdArea\" AREA ON AREA.\"CityCode\" = L.\"CityCode\"";
-		sql += "                          AND AREA.\"AreaCode\" = L.\"AreaCode\"";
-		sql += " LEFT JOIN \"CdLandSection\" CDLS ON CDLS.\"CityCode\" = L.\"CityCode\"";
-		sql += "                                 AND CDLS.\"AreaCode\" = L.\"AreaCode\"";
-		sql += "                                 AND CDLS.\"IrCode\"   = L.\"IrCode\"";
-		sql += " LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
-		sql += "                        AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
-		sql += "                        AND CLI.\"ClNo\"    = CF.\"ClNo\"";
-		sql += " WHERE CF.\"ApproveNo\" = :applNo";
-		sql += "   AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
-		sql += "   AND NVL(L.\"ClNo\",0) > 0 ";
-
-		this.info("sql=" + sql);
-		Query query;
-
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		query = em.createNativeQuery(sql);
-		query.setParameter("applNo", applNo);
-
-		return this.convertToMap(query.getResultList());
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryBuilding(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110ServiceImpl.queryBuilding");
 
-		// -- L9110 法人Query(建物)
+		// -- L9110 自然人/法人Query(建物)
 		String sql = "";
 		sql += " SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\"";
 		sql += "                                     , CF.\"ClCode2\"";
 		sql += "                                     , CF.\"ClNo\"";
 		sql += "                          ORDER BY LO.\"OwnerPart\" DESC "; // -- ??? 待確認排序方式
-		sql += "                         )   AS \"Seq\"    "; // -- 序號 F0
-		sql += "      , LO.\"OwnerId\"                      "; // -- 提供人 F1
-		sql += "      , LPAD(L.\"BdNo1\",5,'0') AS \"BdNo\"   "; // -- 主建物建號 F2
+		sql += "                         )              AS Seq "; // -- 序號 F0
+		sql += "      , LO.\"Owner\"                    AS Owner "; // -- 提供人 F1
+		sql += "      , LPAD(L.\"BdNo1\",5,'0') ";
+		sql += "        || LPAD(L.\"BdNo2\",3,'0')      AS BdNo "; // -- 主建物建號 F2
 		sql += "      , LPAD(CBP1.\"PublicBdNo1\",5,'0') ";
-		sql += "                             AS \"PublicBdNo\"";
-		sql += "                                         "; // -- 公設建號 F3
-		sql += "      , L.\"FloorArea\"                     "; // -- 主建物 F4
-		sql += "      , CBP2.\"PublicArea\"                 "; // -- 公設 F5
-		sql += "      , CBPK.\"ParkingArea\"                "; // -- 車位 F6
-		sql += "      , L.\"EvaUnitPrice\"                  "; // -- 鑑定單價 F7
-		sql += "      , 0                   AS \"ApplyAmt\" "; // -- 核貸 ??? F8
-		sql += "      , CLI.\"SettingAmt\"                  "; // -- 設定 F9
-		sql += "      , L.\"BdLocation\"                    "; // -- 門牌地址 F10
+		sql += "        || LPAD(CBP1.\"PublicBdNo2\",3,'0') ";
+		sql += "                                        AS PublicBdNo ";// -- 公設建號 F3
+		sql += "      , NVL(L.\"FloorArea\",0) ";
+		sql += "        + NVL(L.\"BdSubArea\",0)        AS BdArea "; // -- 主建物 F4
+		sql += "      , CBP2.\"PublicArea\"             AS PublicArea "; // -- 公設 F5
+		sql += "      , CASE ";
+		sql += "          WHEN CF.\"ClCode1\" = 1 AND CF.\"ClCode2\" = 5 "; // -- 獨立產權車位時，車位跟主建物面積顯示一樣
+		sql += "          THEN NVL(L.\"FloorArea\",0)+ NVL(L.\"BdSubArea\",0) ";
+		sql += "        ELSE 0 END                      AS ParkingArea "; // -- 車位 F6
+		sql += "      , L.\"EvaUnitPrice\"              AS EvaUnitPrice "; // -- 鑑定單價 F7
+		sql += "      , CLI.\"SettingAmt\"              AS SettingAmt "; // -- 設定 F8
+		sql += "      , L.\"BdLocation\"                AS BdLocation "; // -- 門牌地址 F9
+		sql += "      , NVL(SUBSTR(L.\"SellerName\",0,7),' ') ";
+		sql += "                                        AS SellerName "; // -- 賣方姓名 F10
+		sql += "      , NVL(L.\"SellerId\",' ')         AS SellerId "; // -- 賣方ID F11
 		sql += " FROM \"ClFac\" CF ";
 		sql += " LEFT JOIN \"ClBuilding\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                           AND L.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                           AND L.\"ClNo\"    = CF.\"ClNo\"";
-		sql += " LEFT JOIN (SELECT NVL(CM.\"CustId\",' ') AS \"OwnerId\"";
+		sql += " LEFT JOIN (SELECT NVL(CM.\"CustId\",' ') || NVL(SUBSTR(CM.\"CustName\",0,15),' ') AS \"Owner\"";
 		sql += "                 , LO.\"ClCode1\"";
 		sql += "                 , LO.\"ClCode2\"";
 		sql += "                 , LO.\"ClNo\"";
@@ -385,6 +78,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  , \"ClCode2\"";
 		sql += "                  , \"ClNo\"";
 		sql += "                  , \"PublicBdNo1\"";
+		sql += "                  , \"PublicBdNo2\"";
 		sql += "                  , ROW_NUMBER() OVER (PARTITION BY \"ClCode1\"";
 		sql += "                                                  , \"ClCode2\"";
 		sql += "                                                  , \"ClNo\"";
@@ -432,6 +126,192 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> queryCl(TitaVo titaVo, String applNo) throws Exception {
+
+		this.info("L9110ServiceImpl.queryCl ");
+
+		// -- L9110 Query(擔保品)
+		String sql = " SELECT CASE";
+		sql += "                WHEN CF.\"ClCode1\" IN ('1','2')";
+		sql += "                THEN '不動產'";
+		sql += "                WHEN CF.\"ClCode1\" IN ('3','4')";
+		sql += "                THEN '股票'";
+		sql += "                WHEN CF.\"ClCode1\" = '5'";
+		sql += "                THEN '其他'";
+		sql += "                WHEN CF.\"ClCode1\" = '9'";
+		sql += "                THEN '動產'";
+		sql += "              ELSE ' ' END             AS Collateral "; // -- F0 擔保品資料 *** 原\"押品資料\"
+		sql += "            , LPAD(CF.\"ClCode1\",1,'0') ";
+		sql += "              || '-' || LPAD(CF.\"ClCode2\",2,'0') ";
+		sql += "              || '-' || LPAD(CF.\"ClNo\",7,'0') ";
+		sql += "                                       AS ClNo "; // -- F1 擔保品號碼 原\"押品號碼\"
+		sql += "            , CDC1.\"Item\"            AS ClItem "; // -- F2 擔保品別 原\"押品別\"
+		sql += "            , CLM.\"EvaDate\"          AS EvaDate "; // -- F3 鑑價日期
+		sql += "            , CLI.\"ClaimDate\"        AS OtherDate "; // -- F4 他項存續期限 ???
+		sql += "            , CLI.\"SettingSeq\"       AS SettingSeq "; // -- F5 順位 只有不動產會有此欄位
+		sql += "            , CLI.\"FirstAmt\"         AS FirstAmt "; // -- F6 前順位金額 只有不動產會有此欄位
+		sql += "            , CITY.\"CityItem\"        AS CityItem "; // -- F7 地區別
+		sql += "            , CDC2.\"Item\"            AS EvaCompany "; // -- F8 鑑定公司 只有不動產會有此欄位
+		sql += "            , CLI.\"BdRmk\"            AS BdRmk "; // -- F9 建物標示備註 只有不動產會有此欄位
+		sql += "            , CASE";
+		sql += "                WHEN CF.\"ClCode1\" IN ('1','2')";
+		sql += "                THEN CLI.\"SettingDate\" ";
+		sql += "                WHEN CF.\"ClCode1\" IN ('3','4')";
+		sql += "                THEN CLS.\"SettingDate\" ";
+		sql += "                WHEN CF.\"ClCode1\" = '5'";
+		sql += "                THEN CLO.\"SettingDate\" ";
+		sql += "                WHEN CF.\"ClCode1\" = '9'";
+		sql += "                THEN CLMOV.\"SettingDate\" ";
+		sql += "              ELSE 0 END               AS SettingDate "; // -- F10 設定日期
+		sql += "            , CF.\"ClCode1\"           AS ClCode1  "; // -- F11 擔保品代號1
+		sql += "            , CLS.\"StockCode\"";
+		sql += "              || ' '";
+		sql += "              || CDS.\"StockItem\"     AS StockName "; // F12 股票代號及股票名稱
+		sql += "            , CLS.\"PledgeNo\"         AS PledgeNo "; // F13 質權設定書號
+		sql += "            , CLS.\"ThreeMonthAvg\"    AS ThreeMonthAvg ";// F14 三個月平均價
+		sql += "            , CLS.\"YdClosingPrice\"   AS YdClosingPrice "; // F15 前日收盤價
+		sql += "            , CLS.\"EvaUnitPrice\"     AS EvaUnitPrice "; // F16 鑑定單價
+		sql += "            , CLM.\"EvaAmt\"           AS EvaAmt ";// F17 鑑定總價
+		sql += "            , CLS.\"LoanToValue\"      AS LTV "; // F18 貸放成數
+		sql += "            , FAC.\"LineAmt\"          AS LineAmt "; // F19 核准額度
+		sql += "            , CLS.\"CustodyNo\"        AS CustodyNo ";// F20 保管條號碼
+		sql += "            , CLI.\"EvaNetWorth\"      AS EvaNetWorth ";// F21 評估淨值
+		sql += "            , CLI.\"SettingAmt\"       AS SettingAmt ";// F22 設定金額
+		sql += "       FROM \"ClFac\" CF";
+		sql += "       LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = CF.\"ApproveNo\"";
+		sql += "       LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'ClCode2' || CF.\"ClCode1\"";
+		sql += "                                AND CDC1.\"Code\"    = LPAD(CF.\"ClCode2\",2,'0')";
+		sql += "       LEFT JOIN \"ClMain\" CLM ON CLM.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                               AND CLM.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                               AND CLM.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "       LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                              AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                              AND CLI.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "       LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = CLM.\"CityCode\"";
+		sql += "       LEFT JOIN \"ClStock\" CLS ON CLS.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                                AND CLS.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                                AND CLS.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "       LEFT JOIN \"CdStock\" CDS ON CDS.\"StockCode\" = CLS.\"StockCode\"";
+		sql += "       LEFT JOIN \"ClOther\" CLO ON CLO.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                                AND CLO.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                                AND CLO.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "       LEFT JOIN \"ClMovables\" CLMOV ON CLMOV.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                                     AND CLMOV.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                                     AND CLMOV.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "       LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'EvaCompanyCode'";
+		sql += "                                AND CDC2.\"Code\" = NVL(CLI.\"EvaCompanyCode\",' ')";
+		sql += "       WHERE CF.\"ApproveNo\" = :applNo";
+		sql += "         AND CF.\"MainFlag\" = 'Y' "; // -- 主要擔保品
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("applNo", applNo);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+	public List<Map<String, String>> queryCrossUse(TitaVo titaVo, String applNo) {
+
+		this.info("L9110 queryCrossUse");
+
+		String sql = "";
+		sql += " SELECT \"Fn_GetCdCode\"('SubCompanyCode',CC.\"SubCompanyCode\") ";
+		sql += "                          AS SubCompany "; // F0 子公司名稱
+		sql += "      , CC.\"CrossUse\"   AS CrossUse "; // F1 同意使用
+		sql += " FROM \"FacCaseAppl\" FCA ";
+		sql += " LEFT JOIN \"CustCross\" CC ON CC.\"CustUKey\" = FCA.\"CustUKey\" ";
+		sql += " WHERE CC.\"CrossUse\" = 'Y' "; // 同意使用
+		sql += "   AND FCA.\"ApplNo\" = :applNo "; // 申請號碼
+		sql += " ORDER BY CC.\"SubCompanyCode\" "; // 子公司代碼
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("applNo", applNo);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> queryCustTelNo(TitaVo titaVo, String applNo) throws Exception {
+
+		this.info("L9110.findAll queryCustTelNo");
+
+		String sql = "";
+		sql += " SELECT \"Fn_GetCdCode\"('TelTypeCode',CTN.\"TelTypeCode\") ";
+		sql += "                           AS TelType "; // -- F0 電話種類
+		sql += "      , CTN.\"TelArea\"    AS TelArea "; // -- F1 電話區碼
+		sql += "      , CTN.\"TelNo\"      AS TelNo "; // -- F2 電話號碼
+		sql += "      , CTN.\"TelExt\"     AS TelExt "; // -- F3 分機號碼
+		sql += "      , \"Fn_GetCdCode\"('RelationCode',CTN.\"RelationCode\") ";
+		sql += "                           AS Relation "; // -- F4 與借款人關係
+		sql += "      , CASE ";
+		sql += "          WHEN CTN.\"RelationCode\" = '00' ";
+		sql += "          THEN SUBSTR(CM.\"CustName\",0,10) ";
+		sql += "        ELSE SUBSTR(CTN.\"LiaisonName\",0,10) ";
+		sql += "        END                AS LiaisonName "; // -- F5 聯絡人姓名
+		sql += " FROM \"FacCaseAppl\" FCA ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FCA.\"CustUKey\" ";
+		sql += " LEFT JOIN \"CustTelNo\" CTN ON CTN.\"CustUKey\" = FCA.\"CustUKey\" ";
+		sql += " WHERE CTN.\"Enable\" = 'Y' "; // -- 啟用
+		sql += "   AND FCA.\"ApplNo\" = :applNo "; // -- 申請號碼
+		sql += " ORDER BY CTN.\"TelTypeCode\" "; // -- 電話種類
+		sql += "        , CTN.\"RelationCode\" "; // -- 與借款戶關係
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("applNo", applNo);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> queryGua(TitaVo titaVo, String applNo) throws Exception {
+
+		this.info("L9110.findAll queryGua");
+
+		String sql = "";
+		sql += " SELECT GUACM.\"CustId\"     AS GuaId "; // -- F0 保證人統編
+		sql += "      , GUACM.\"CustName\"   AS GuaName "; // -- F1 保證人姓名
+		sql += "      , CDG.\"GuaRelItem\"   AS GuaRelItem "; // -- F2 保證人關係
+		sql += "      , GUA.\"GuaAmt\"       AS GuaAmt "; // -- F3 保證金額
+		sql += "      , \"Fn_GetCustAddr\"(GUACM.\"CustUKey\",'1') ";
+		sql += "                             AS GuaAddr "; // -- F4 保證人通訊地址
+		sql += "      , NVL(GUACM.\"CurrZip3\",'') || NVL(GUACM.\"CurrZip2\",'') ";
+		sql += "                             AS GuaZip  "; // -- F5 保證人郵遞區號(通訊地址)
+		sql += "      , \"Fn_GetCdCode\"('GuaTypeCode',GUA.\"GuaTypeCode\") ";
+		sql += "                             AS GuaType "; // -- F6 保證類別
+		sql += "      , ROW_NUMBER() OVER (PARTITION BY GUA.\"ApproveNo\" ORDER BY GUA.\"GuaAmt\" DESC) ";
+		sql += "                             AS Seq ";
+		sql += " FROM \"Guarantor\" GUA ";
+		// 客戶資料主檔(保證人)
+		sql += " LEFT JOIN \"CustMain\" GUACM ON GUACM.\"CustUKey\" = GUA.\"GuaUKey\" ";
+		// 保證人關係代碼檔
+		sql += " LEFT JOIN \"CdGuarantor\" CDG ON CDG.\"GuaRelCode\" = GUA.\"GuaRelCode\" ";
+		sql += " WHERE GUA.\"GuaStatCode\" = '1' "; // -- 設定
+		// *** ApproveNo 將會統一改為 ApplNo
+		sql += "   AND GUA.\"ApproveNo\" = :applNo "; // -- 申請號碼
+		sql += " ORDER BY Seq "; // -- 申請號碼
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("applNo", applNo);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryInsu(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110ServiceImpl.queryInsu");
@@ -439,13 +319,13 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- L9110 法人Query(火險)
 		String sql = "";
 		sql += " SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ApproveNo\"";
-		sql += "                           ORDER BY IR.\"PrevInsuNo\" DESC"; // -- ??? 待確認排序方式
-		sql += "                          )   AS \"Seq\""; // -- 序號
-		sql += "      , IR.\"NowInsuNo\""; // -- 保單號碼
-		sql += "      , IR.\"InsuAmt\""; // -- 保險金額
-		sql += "      , IR.\"InsuStartDate\""; // -- 保險起日
-		sql += "      , IR.\"InsuEndDate\""; // -- 保險迄日
-		sql += "      , IR.\"InsuCompany\""; // -- 保險公司
+		sql += "                           ORDER BY IR.\"PrevInsuNo\" DESC";
+		sql += "                          )   AS Seq "; // -- 序號
+		sql += "      , IR.\"NowInsuNo\"      AS NowInsuNo"; // -- 保單號碼
+		sql += "      , IR.\"InsuAmt\"        AS InsuAmt"; // -- 保險金額
+		sql += "      , IR.\"InsuStartDate\"  AS InsuStartDate"; // -- 保險起日
+		sql += "      , IR.\"InsuEndDate\"    AS InsuEndDate"; // -- 保險迄日
+		sql += "      , IR.\"InsuCompany\"    AS InsuCompany"; // -- 保險公司
 		sql += " FROM \"ClFac\" CF";
 		sql += " LEFT JOIN ( SELECT IR.\"ClCode1\"";
 		sql += "                  , IR.\"ClCode2\"";
@@ -483,13 +363,208 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> queryLand(TitaVo titaVo, String applNo) throws Exception {
+
+		this.info("L9110ServiceImpl.queryLand");
+
+		String sql = ""; // -- L9110 Query(土地)
+		sql += "SELECT ROW_NUMBER() OVER (PARTITION BY CF.\"ClCode1\"";
+		sql += "                                     , CF.\"ClCode2\"";
+		sql += "                                     , CF.\"ClNo\"";
+		sql += "                          ORDER BY LO.\"LandSeq\""; // -- ??? 房地只取一筆?
+		sql += "                         )     AS Seq "; // -- F0 序號
+		sql += "     , LO.\"Owner\"            AS Owner "; // -- F1 提供人 ??? 房地只取一筆?
+		sql += "     , CITY.\"CityItem\"       AS CityItem "; // -- F2 縣市
+		sql += "     , AREA.\"AreaItem\"       AS AreaItem "; // -- F3 鄉鎮區
+		sql += "     , CDLS.\"IrItem\"         AS IrItem "; // -- F4 段小段
+		sql += "     , LPAD(L.\"LandNo1\",4,'0') ";
+		sql += "       || '-' ";
+		sql += "       || LPAD(L.\"LandNo2\",4,'0') ";
+		sql += "                               AS LandNo "; // -- F5 地號
+		sql += "     , L.\"Area\"              AS Area "; // -- F6 面積
+		sql += "     , L.\"TransferedYear\"    AS TransferedYear "; // -- F7 年度
+		sql += "     , L.\"LastTransferedAmt\" AS LastTransferedAmt "; // -- F8 前次移轉
+		sql += "     , L.\"EvaUnitPrice\"      AS EvaUnitPrice "; // -- F9 鑑定單價
+		sql += "     , CLI.\"SettingAmt\"      AS SettingAmt "; // -- F10設定
+		sql += " FROM \"ClFac\" CF ";
+		sql += " LEFT JOIN \"ClLand\" L ON L.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                    AND L.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                    AND L.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " LEFT JOIN (SELECT NVL(CM.\"CustId\",' ') || NVL(SUBSTR(CM.\"CustName\",0,15),' ') AS \"Owner\"";
+		sql += "                 , LO.\"ClCode1\"";
+		sql += "                 , LO.\"ClCode2\"";
+		sql += "                 , LO.\"ClNo\"";
+		sql += "                 , LO.\"LandSeq\"";
+		sql += "            FROM \"ClLandOwner\" LO ";
+		sql += "            LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = LO.\"OwnerCustUKey\"";
+		sql += "           ) LO ON LO.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "               AND LO.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "               AND LO.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = L.\"CityCode\"";
+		sql += " LEFT JOIN \"CdArea\" AREA ON AREA.\"CityCode\" = L.\"CityCode\"";
+		sql += "                          AND AREA.\"AreaCode\" = L.\"AreaCode\"";
+		sql += " LEFT JOIN \"CdLandSection\" CDLS ON CDLS.\"CityCode\" = L.\"CityCode\"";
+		sql += "                                 AND CDLS.\"AreaCode\" = L.\"AreaCode\"";
+		sql += "                                 AND CDLS.\"IrCode\"   = L.\"IrCode\"";
+		sql += " LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
+		sql += "                        AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
+		sql += "                        AND CLI.\"ClNo\"    = CF.\"ClNo\"";
+		sql += " WHERE CF.\"ApproveNo\" = :applNo";
+		sql += "   AND CF.\"MainFlag\" = 'Y'"; // -- 主要擔保品
+		sql += "   AND NVL(L.\"ClNo\",0) > 0 ";
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("applNo", applNo);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Map<String, String>> queryPerson(TitaVo titaVo, String applNo) throws Exception {
+
+		this.info("L9110.findAll Person");
+
+		// -- 自然人、法人的基本資料、核准資料
+		String sql = " ";
+		sql += " SELECT LPAD(NVL(CM.\"CustNo\",0),7,'0') ";
+		sql += "        || '-' ";
+		sql += "        || LPAD(NVL(FAC.\"FacmNo\",0),3,'0') ";
+		sql += "                                       AS F0戶號 ";
+		sql += "      , SUBSTR(CM.\"CustName\",0,25)   AS F1戶名 ";
+		sql += "      , CM.\"CustId\"                  AS F2統編 ";
+		sql += "      , LPAD(FC.\"ApplNo\",7,'0')      AS F3核准號碼 ";
+		sql += "      , \"Fn_GetCdCode\"('Sex',CM.\"Sex\") ";
+		sql += "                                       AS F4性別 "; // 法人不出
+		sql += "      , CM.\"SpouseName\"              AS F5負責人姓名 "; // 自然人-配偶姓名
+		sql += "      , CM.\"SpouseId\"                AS F6負責人身分證 "; // 自然人-配偶統一編號
+		sql += "      , CI.\"IndustryItem\"            AS F7行業別 "; // 自然人不出
+		sql += "      , \"Fn_GetCdCode\"('CustTypeCode',CM.\"CustTypeCode\") ";
+		sql += "                                       AS F8客戶別 ";
+		sql += "      , CM.\"EmpNo\"                   AS F9員工代號 "; // 法人不出
+		sql += "      , CASE";
+		sql += "          WHEN CM.\"EmpNo\" IS NULL";
+		sql += "          THEN '非員工'";
+		sql += "          WHEN NVL(CDE.\"CommLineCode\",' ') = '35'";
+		sql += "          THEN '十五日薪'";
+		sql += "        ELSE '非十五日薪' END          AS F10十五日薪 "; // 法人不出
+		sql += "      , CM.\"Birthday\"                AS F11設立日期 "; // 自然人出生年月日
+		sql += "      , \"Fn_GetCustAddr\"(CM.\"CustUKey\",'0') ";
+		sql += "                                       AS F12公司地址 "; // 自然人戶籍地址
+		sql += "      , NVL(CM.\"RegZip3\",'') || NVL(CM.\"RegZip2\",'')";
+		sql += "                                       AS F13公司郵遞區號 "; // 自然人戶籍郵遞區號
+		sql += "      , \"Fn_GetCustAddr\"(CM.\"CustUKey\",'1') ";
+		sql += "                                       AS F14通訊地址 ";
+		sql += "      , NVL(CM.\"CurrZip3\",'') || NVL(CM.\"CurrZip2\",'')";
+		sql += "                                       AS F15通訊郵遞區號 ";
+		sql += "      , FC.\"ApplDate\"                AS F16鍵檔日期 ";
+		sql += "      , FAC.\"LineAmt\"                AS F17核准額度 ";
+		sql += "      , \"Fn_GetCdCode\"('AcctCode',FAC.\"AcctCode\") || FAC.\"AcctCode\" ";
+		sql += "                                       AS F18核准科目 ";
+		sql += "      , FAC.\"LoanTermYy\"             AS F19貸款期間年 ";
+		sql += "      , FAC.\"LoanTermMm\"             AS F20貸款期間月 ";
+		sql += "      , FAC.\"LoanTermDd\"             AS F21貸款期間日 ";
+		sql += "      , FAC.\"ProdNo\"                 AS F22商品代碼 ";
+		sql += "      , FAC.\"ApproveRate\"            AS F23核准利率 ";
+		sql += "      , FAC.\"RateAdjFreq\"            AS F24利率調整週期 ";
+		sql += "      , \"Fn_GetCdCode\"('ExtraRepayCode',FAC.\"ExtraRepayCode\") ";
+		sql += "                                       AS F25利率調整不變攤還額 ";
+		sql += "      , FAC.\"CreditScore\"            AS F26信用評分 ";
+		sql += "      , FAC.\"UtilDeadline\"           AS F27動支期限 ";
+		sql += "      , FAC.\"RateIncr\"               AS F28利率加減碼 ";
+		sql += "      , \"Fn_GetCdCode\"('UsageCode',FAC.\"UsageCode\") ";
+		sql += "                                       AS F29用途別 ";
+		sql += "      , FAC.\"RecycleDeadline\"        AS F30循環動用期限 ";
+		sql += "      ,\"Fn_GetEmpName\"(FAC.\"Introducer\",1) ";
+		sql += "                                       AS F31介紹人姓名 ";
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"IncomeTaxFlag\" = 'Y' ";
+		sql += "          THEN '代繳' ";
+		sql += "        ELSE '不代繳' END              AS F32代繳所得稅 ";
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"CompensateFlag\" = 'Y' ";
+		sql += "          THEN '代償件' ";
+		sql += "        ELSE '非代償件' END            AS F33代償碼 ";
+		sql += "      , \"Fn_GetCdCode\"('FacmAmortizedCode',FAC.\"AmortizedCode\") ";
+		sql += "                                       AS F34攤還方式 ";
+		sql += "      , FAC.\"GracePeriod\"            AS F35寬限總月數 ";
+		sql += "      , FAC.\"FirstRateAdjFreq\"       AS F36首次調整週期 ";
+		sql += "      , \"Fn_GetCdCode\"('RepayCode',FAC.\"RepayCode\") ";
+		sql += "                                       AS F37繳款方式 ";
+		sql += "      , \"Fn_GetCdCode\"('BankDeductCd',\"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0')) ";
+		sql += "                                       AS F38扣款銀行 ";
+		sql += "      , \"Fn_GetRepayAcct\"(FAC.\"CustNo\",FAC.\"FacmNo\",'0')";
+		sql += "                                       AS F39扣款帳號 ";
+		sql += "      , FAC.\"PayIntFreq\"             AS F40繳息週期 ";
+		sql += "      , FAC.\"RateCode\"               AS F41利率區分 ";
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"ProdBreachFlag\" = 'Y' ";
+//		sql += "          WHEN PROD.\"BreachCode\" IS NOT NULL ";
+		sql += "          THEN TO_NCHAR(\"Fn_GetCdCode\"('BreachCode',PROD.\"BreachCode\")) ";
+		sql += "        ELSE FAC.\"BreachDescription\" ";
+//		sql += "        ELSE NULL ";
+		sql += "        END                            AS F42違約適用方式 ";
+		sql += "      , GROUPCM.\"CustName\"           AS F43團體戶名 "; // 法人不出
+		sql += "      , FAC.\"PieceCode\"              AS F44計件代碼 ";
+		sql += "      , \"Fn_GetEmpName\"(FAC.\"FireOfficer\",1) ";
+		sql += "                                       AS F45火險服務姓名 ";
+		sql += "      , \"Fn_GetEmpName\"(FAC.\"LoanOfficer\",1) ";
+		sql += "                                       AS F46放款專員 ";
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"ApprovedLevel\" = '9' ";
+		sql += "          THEN '董事會' "; // 核准層級9:董事會，不需填寫核決主管
+		sql += "        ELSE \"Fn_GetEmpName\"(FAC.\"Supervisor\",1) ";
+		sql += "        END                            AS F47核決主管 ";
+		sql += "      , PROD.\"ProhibitMonth\"         AS F48限制清償期限 ";
+		sql += "      , FAC.\"AcctFee\"                AS F49帳管費 ";
+		sql += "      , \"Fn_GetEmpName\"(FAC.\"EstimateReview\",1) ";
+		sql += "                                       AS F50估價覆核姓名 ";
+		sql += "      , \"Fn_GetCdCode\"('CustTypeCode',FAC.\"CustTypeCode\") ";
+		sql += "                                       AS F51客戶別 ";
+		sql += "      , \"Fn_GetEmpName\"(FAC.\"InvestigateOfficer\",1) ";
+		sql += "                                       AS F52徵信姓名 ";
+		sql += "      , \"Fn_GetEmpName\"(FAC.\"CreditOfficer\",1) ";
+		sql += "                                       AS F53授信姓名 ";
+		sql += "      , \"Fn_GetEmpName\"(FAC.\"Coorgnizer\",1) ";
+		sql += "                                       AS F54協辦姓名 ";
+		sql += "      , NVL(LBM.\"LoanBal\",0)         AS F55本戶目前總額 ";
+		sql += "      , \"Fn_GetCdCode\"('RuleCode',FAC.\"RuleCode\") ";
+		sql += "                                       AS F56規定管制代碼 ";
+		sql += " FROM \"FacCaseAppl\" FC "; // 案件申請檔 ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FC.\"CustUKey\" "; // 客戶資料主檔
+		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FC.\"ApplNo\" "; // 額度主檔
+		sql += " LEFT JOIN \"FacProd\" PROD ON PROD.\"ProdNo\" = FAC.\"ProdNo\" ";
+		sql += " LEFT JOIN \"CdIndustry\" CI ON CI.\"IndustryCode\" = CM.\"IndustryCode\" "; // 行業別代碼檔
+		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                   ,SUM(\"LoanBal\") AS \"LoanBal\" ";
+		sql += "             FROM \"LoanBorMain\" ";
+		sql += "             GROUP BY \"CustNo\" ";
+		sql += "           ) LBM ON LBM.\"CustNo\" = CM.\"CustNo\" "; // 計算放款餘額加總
+		sql += " LEFT JOIN \"CustMain\" GROUPCM ON GROUPCM.\"CustUKey\" = FC.\"GroupUKey\" "; // 團體戶
+		sql += " LEFT JOIN \"CdEmp\" CDE ON CDE.\"EmployeeNo\" = CM.\"EmpNo\" "; // 十五日薪判斷相關
+		sql += " WHERE FC.\"ApplNo\" = :applNo";
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("applNo", applNo);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryStock(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110ServiceImpl.queryStock");
 
 		// -- L9110 Query(股票)
 		String sql = "";
-		sql += " SELECT NVL(CM.\"CustId\",' ') AS \"OwnerId\" "; // F0 股票持有人統編
+		sql += " SELECT NVL(CM.\"CustId\",' ') || NVL(SUBSTR(CM.\"CustName\",0,15),' ') AS \"Owner\" "; // F0 股票持有人
 		sql += "      , CS.\"SettingBalance\" "; // F1 設質股數餘額
 		sql += "      , CS.\"SettingBalance\" ";
 		sql += "        * CS.\"ParValue\" AS \"TotalParValue\" "; // F2 面額合計
@@ -511,158 +586,42 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> queryNaturalPerson(TitaVo titaVo, String applNo) throws Exception {
+	public List<Map<String, String>> queryCoborrower(TitaVo titaVo, String applNo) {
 
-		this.info("L9110.findAll NaturalPerson");
+		this.info("L9110ServiceImpl.queryCoborrower");
 
-		// -- L9110 自然人Query
+		// -- L9110 Query(共同借款人)
 		String sql = "";
-		sql += " SELECT LPAD(FM.\"CustNo\",7,0) || '-' || LPAD(FM.\"FacmNo\",3,0) AS \"F0 戶號\" ";
-		sql += "       ,CM.\"CustName\" AS \"F1 戶名\" ";
-		sql += "       ,CM.\"CustId\" AS \"F2 統編\" ";
-		sql += "       ,FCA.\"ApplNo\" AS \"F3 核准編號\" ";
-		sql += "       ,CdSex.\"Item\" AS \"F4 性別\" ";
-		sql += "       ,CM.\"Birthday\" AS \"F5 出生年月日\" ";
-		sql += "       ,CdCustType.\"Item\" AS \"F6 客戶別\" ";
-		sql += "       ,CM.\"EmpNo\" AS \"F7 員工代號\" ";
-		sql += "       ,CASE";
-		sql += "          WHEN CM.\"EmpNo\" IS NULL";
-		sql += "          THEN '非員工'";
-		sql += "          WHEN NVL(CDE9.\"CommLineCode\",' ') = '35'";
-		sql += "          THEN '十五日薪'";
-		sql += "        ELSE '非十五日薪' END AS \"F8 十五日薪\""; // -- ??? 未確認邏輯
-		sql += "       ,CM.\"SpouseName\" AS \"F9 配偶姓名\" ";
-		sql += "       ,CM.\"SpouseId\" AS \"F10 配偶統一編號\" ";
-		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1) AS \"F11 BBC\"  "; // -- ?? 手機?
-		sql += "       ,\"Fn_GetCustAddr\"(CM.\"CustUKey\",'0') AS \"F12 戶籍地址\" ";
-		sql += "       ,CM.\"RegZip3\" || CM.\"RegZip2\" AS \"F13 戶籍-郵遞區號\" ";
-		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1) AS \"F14 戶籍電話\" ";
-		sql += "       ,\"Fn_GetCustAddr\"(CM.\"CustUKey\",'1') AS \"F15 通訊地址\" ";
-		sql += "       ,CM.\"CurrZip3\" || CM.\"CurrZip2\" AS \"F16 通訊-郵遞區號\" ";
-		sql += "       ,NVL(CTN.\"LiaisonName\",' ') AS \"F17 聯絡人姓名\"  "; // -- ??
-		sql += "       ,'(O) '  ";
-		sql += "       || RPAD(\"Fn_GetTelNo\"(CM.\"CustUKey\",'01',2),35) ";
-		sql += "       || ' (H) '  ";
-		sql += "       || \"Fn_GetTelNo\"(CM.\"CustUKey\",'02',1) ";
-		sql += "       || '     '  ";
-		sql += "       || \"Fn_GetTelNo\"(CM.\"CustUKey\",'03',1) ";
-		sql += "                                           AS \"F18 聯絡電話\" ";
-		sql += "       ,NVL(CR.\"CrossUse\",'N') AS \"F19 交互運用\"  "; // -- ??
-		sql += "       ,\"Fn_GetTelNo\"(CM.\"CustUKey\",'04',1) AS \"F20 傳真\" ";
-		sql += "       ,'' AS \"F21 保證人統編\" "; // 改用queryGua
-		sql += "       ,'' AS \"F22 保證人姓名\" "; // 改用queryGua
-		sql += "       ,'' AS \"F23 保證人關係\" "; // 改用queryGua
-		sql += "       ,'' AS \"F24 保證金額\" "; // 改用queryGua
-		sql += "       ,'' AS \"F25 保證人通訊地址\" "; // 改用queryGua
-		sql += "       ,'' AS \"F26 保證人郵遞區號(通訊)\" "; // 改用queryGua
-		sql += "       ,FCA.\"ApplDate\" AS \"F27 鍵檔日期\" ";
-		sql += "       ,FM.\"LineAmt\" AS \"F28 核准額度\" ";
-		sql += "       ,CDC2.\"Item\" || FM.\"AcctCode\" AS \"F29 核准科目\" ";
-		sql += "       ,FM.\"LoanTermYy\" AS \"F30 貸款期間年\" ";
-		sql += "       ,FM.\"LoanTermMm\" AS \"F31 貸款期間月\" ";
-		sql += "       ,FM.\"LoanTermDd\" AS \"F32 貸款期間日\" ";
-		sql += "       ,FM.\"ProdNo\" AS \"F33 商品代碼\" ";
-		sql += "       ,FM.\"ApproveRate\" AS \"F34 核准利率\" ";
-		sql += "       ,FM.\"RateAdjFreq\" AS \"F35 利率調整週期\" ";
-		sql += "       ,CDC3.\"Item\" AS \"F36 利率調整不變攤還額\" ";
-		sql += "       ,FM.\"CreditScore\" AS \"F37 信用評分\" ";
-		sql += "       ,FM.\"UtilDeadline\" AS \"F38 動支期限\" ";
-		sql += "       ,FM.\"RateIncr\" AS \"F39 利率加減碼\" ";
-		sql += "       ,CDC4.\"Item\" AS \"F40 用途別\" ";
-		sql += "       ,FM.\"RecycleDeadline\" AS \"F41 循環動用期限\" ";
-		sql += "       ,NVL(CDE1.\"Fullname\",' ')  AS \"F42 介紹人姓名\" ";
-		sql += "       ,CASE ";
-		sql += "          WHEN FM.\"IncomeTaxFlag\" = 'Y' ";
-		sql += "          THEN '代繳' ";
-		sql += "        ELSE '不代繳' END AS \"F43 代繳所得稅\" ";
-		sql += "       ,CASE ";
-		sql += "          WHEN FM.\"CompensateFlag\" = 'Y' ";
-		sql += "          THEN '代償件' ";
-		sql += "        ELSE '非代償件' END AS \"F44 代償碼\" ";
-		sql += "       ,CDC5.\"Item\" AS \"F45 攤還方式\" ";
-		sql += "       ,FM.\"GracePeriod\" AS \"F46 寬限總期數\" ";
-		sql += "       ,FM.\"FirstRateAdjFreq\" AS \"F47 首次調整週期\" ";
-		sql += "       ,CDC6.\"Item\" AS \"F48 繳款方式\" ";
-		sql += "       ,CDC7.\"Item\" AS \"F49 扣款銀行\" ";
-		sql += "       ,\"Fn_GetRepayAcct\"(FM.\"CustNo\",FM.\"FacmNo\",'0') AS \"F50 扣款帳號\" ";
-		sql += "       ,FM.\"PayIntFreq\" AS \"F51 繳息週期\" ";
-		sql += "       ,FM.\"RateCode\" AS \"F52 利率區分\" ";
-		sql += "       ,PROD.\"BreachCode\" AS \"F53 違約適用方式\" ";
-		sql += "       ,PROD.\"BreachPercent\" AS \"F54 違約率-金額\" ";
-		sql += "       ,PROD.\"BreachDecreaseMonth\" AS \"F55 違約率-月數\" ";
-		sql += "       ,' ' AS \"F56 違約還款月數\"  "; // -- ??
-		sql += "       ,' ' AS \"F57 前段月數\"  "; // -- ??
-		sql += "       ,GROUPCM.\"CustName\" AS \"F58 團體戶名\" ";
-		sql += "       ,FM.\"PieceCode\" AS \"F59 計件代碼\" ";
-		sql += "       ,NVL(CDE2.\"Fullname\",FM.\"FireOfficer\") AS \"F60 火險服務姓名\" "; // -- 串不到時顯示員編
-		sql += "       ,NVL(CDE3.\"Fullname\",FM.\"LoanOfficer\") AS \"F61 放款專員\" "; // -- 串不到時顯示員編
-		sql += "       ,NVL(CDE4.\"Fullname\",FM.\"Supervisor\") AS \"F62 督辦姓名\" "; // -- 串不到姓名時顯示員編
-		sql += "       ,PROD.\"ProhibitMonth\" AS \"F63 限制清償年限\"  "; // -- 原\"禁領清償年限\"
-		sql += "       ,FM.\"AcctFee\" AS \"F64 帳管費\" ";
-		sql += "       ,NVL(CDE5.\"Fullname\",FM.\"EstimateReview\") AS \"F65 估價覆核姓名\" "; // -- 串不到姓名時顯示員編
-		sql += "       ,CM.\"CustTypeCode\" || ' ' || CDC1.\"Item\" AS \"F66 客戶別\" "; // -- 與第一段的客戶別差異: 代碼+中文
-		sql += "       ,NVL(CDE6.\"Fullname\",FM.\"InvestigateOfficer\") AS \"F67 徵信姓名\" "; // -- 串不到姓名時顯示員編
-		sql += "       ,NVL(CDE7.\"Fullname\",FM.\"CreditOfficer\") AS \"F68 授信姓名\" "; // -- 串不到姓名時顯示員編
-		sql += "       ,NVL(CDE8.\"Fullname\",FM.\"Coorgnizer\") AS \"F69 協辦姓名\" "; // -- 串不到姓名時顯示員編
-		sql += "       ,NVL(LBM.\"LoanBal\",0) AS \"F70 本戶目前總額\" ";
-		sql += " FROM \"FacCaseAppl\" FCA ";
-		sql += " LEFT JOIN \"FacMain\" FM ON FM.\"ApplNo\" = FCA.\"ApplNo\" ";
-		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustUKey\" = FCA.\"CustUKey\" ";
-		sql += " LEFT JOIN \"CdCode\" CdSex ON CdSex.\"DefCode\" = 'Sex'  ";
-		sql += "                         AND CdSex.\"Code\" = CM.\"Sex\" ";
-		sql += " LEFT JOIN \"CdCode\" CdCustType ON CdCustType.\"DefCode\" = 'CustTypeCode' ";
-		sql += "                              AND CdCustType.\"Code\" = CM.\"CustTypeCode\" ";
-		sql += " LEFT JOIN (SELECT tmpCTN.\"CustUKey\" ";
-		sql += "                 , CASE";
-		sql += "                     WHEN tmpCTN.\"RelationCode\" = '00'";
-		sql += "                     THEN tmpCM.\"CustName\" ";
-		sql += "                   ELSE tmpCTN.\"LiaisonName\" END AS \"LiaisonName\" ";
-		sql += "                 , ROW_NUMBER() OVER (PARTITION BY tmpCTN.\"CustUKey\" ";
-		sql += "                                      ORDER BY tmpCTN.\"RelationCode\" ";
-		sql += "                                     ) AS \"Seq\" ";
-		sql += "            FROM \"CustTelNo\" tmpCTN ";
-		sql += "            LEFT JOIN \"CustMain\" tmpCM ON tmpCM.\"CustUKey\" = tmpCTN.\"CustUKey\" ";
-		sql += "            WHERE \"Enable\" = 'Y' ";
-		sql += "           ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\" ";
-		sql += "                AND CTN.\"Seq\" = 1 ";
-		sql += " LEFT JOIN \"CdCode\" CDC1 ON CDC1.\"DefCode\" = 'CustTypeCode'  ";
-		sql += "                        AND CDC1.\"Code\" = CM.\"CustTypeCode\" ";
-		sql += " LEFT JOIN \"CdCode\" CDC2 ON CDC2.\"DefCode\" = 'AcctCode' ";
-		sql += "                        AND CDC2.\"Code\" = FM.\"AcctCode\" ";
-		sql += " LEFT JOIN \"CdCode\" CDC3 ON CDC3.\"DefCode\" = 'ExtraRepayCode' ";
-		sql += "                        AND CDC3.\"Code\" = FM.\"ExtraRepayCode\" ";
-		sql += " LEFT JOIN \"CdCode\" CDC4 ON CDC4.\"DefCode\" = 'UsageCode'  ";
-		sql += "                        AND CDC4.\"Code\" = FM.\"UsageCode\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE1 ON CDE1.\"EmployeeNo\" = FM.\"Introducer\" ";
-		sql += " LEFT JOIN \"CdCode\" CDC5 ON CDC5.\"DefCode\" = 'FacmAmortizedCode' ";
-		sql += "                        AND CDC5.\"Code\" = FM.\"AmortizedCode\" ";
-		sql += " LEFT JOIN \"CdCode\" CDC6 ON CDC6.\"DefCode\" = 'FacmRepayCode'  ";
-		sql += "                        AND CDC6.\"Code\" = FM.\"RepayCode\" ";
-		sql += " LEFT JOIN \"CdCode\" CDC7 ON CDC7.\"DefCode\" = 'BankDeductCd' ";
-		sql += "                        AND CDC7.\"Code\" = \"Fn_GetRepayAcct\"(FM.\"CustNo\",FM.\"FacmNo\",'0') ";
-		sql += " LEFT JOIN \"FacProd\" PROD ON PROD.\"ProdNo\" = FM.\"ProdNo\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE2 ON CDE2.\"EmployeeNo\" = FM.\"FireOfficer\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE3 ON CDE3.\"EmployeeNo\" = FM.\"LoanOfficer\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE4 ON CDE4.\"EmployeeNo\" = FM.\"Supervisor\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE5 ON CDE5.\"EmployeeNo\" = FM.\"EstimateReview\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE6 ON CDE6.\"EmployeeNo\" = FM.\"InvestigateOfficer\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE7 ON CDE7.\"EmployeeNo\" = FM.\"CreditOfficer\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE8 ON CDE8.\"EmployeeNo\" = FM.\"Coorgnizer\" ";
-		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
-		sql += "                   ,SUM(\"LoanBal\") AS \"LoanBal\" ";
-		sql += "             FROM \"LoanBorMain\"  ";
-		sql += "             GROUP BY \"CustNo\" ";
-		sql += "           ) LBM ON LBM.\"CustNo\" = CM.\"CustNo\" ";
-		sql += " LEFT JOIN ( SELECT \"CustUKey\" ";
-		sql += "                  , \"CrossUse\" ";
-		sql += "             FROM \"CustCross\" ";
-		sql += "             WHERE \"CrossUse\" = 'Y' ";
-		sql += "             GROUP BY \"CustUKey\",\"CrossUse\" ";
-		sql += "           ) CR ON CR.\"CustUKey\" = CM.\"CustUKey\" ";
-		sql += " LEFT JOIN \"CustMain\" GROUPCM ON GROUPCM.\"CustUKey\" = FCA.\"GroupUKey\" ";
-		sql += " LEFT JOIN \"CdEmp\" CDE9 ON CDE9.\"EmployeeNo\" = CM.\"EmpNo\" ";
-		sql += " WHERE FCA.\"ApplNo\" = :applNo ";
+		sql += " SELECT LPAD(S1.\"CustNo\",7,'0') ";
+		sql += "        || '-' || LPAD(S1.\"FacmNo\",3,'0') ";
+		sql += "         AS \"CustNo\" "; // -- F0 戶號
+		sql += "      , SUBSTR(CM.\"CustName\",0,11) AS \"CustName\" "; // -- F1 戶名
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"RecycleCode\" = '1' ";
+		sql += "          THEN FAC.\"RecycleDeadline\" ";
+		sql += "        ELSE FAC.\"UtilDeadline\" END AS \"UtilDeadline\" "; // -- F2 循環動用動支期限
+		sql += "      , FAC.\"CurrencyCode\" "; // -- F3 幣別
+		sql += "      , FAC.\"LineAmt\" "; // -- F4 核准額度
+		sql += "      , FAC.\"UtilBal\" "; // -- F5 已動用額度餘額
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"RecycleCode\" = '1' ";
+		sql += "          THEN 'Y' ";
+		sql += "        ELSE 'N' END AS \"IsRecycle\" "; // -- F6 循環動用
+		sql += "      , S1.\"JcicMergeFlag\" ";// -- F7 是否合併申報
+		sql += " FROM (SELECT FSA.\"MainApplNo\" ";
+		sql += "       FROM \"FacShareAppl\" FSA ";
+		sql += "       WHERE FSA.\"ApplNo\" = :applNo ";
+		sql += "       UNION ";
+		sql += "       SELECT FSA.\"MainApplNo\" ";
+		sql += "       FROM \"FacShareAppl\" FSA ";
+		sql += "       WHERE FSA.\"MainApplNo\" = :applNo ";
+		sql += "      ) S0 ";
+		sql += " LEFT JOIN \"FacShareAppl\" S1 ON S1.\"MainApplNo\" = S0.\"MainApplNo\" ";
+		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = S1.\"CustNo\" ";
+		sql += "                        AND FAC.\"FacmNo\" = S1.\"FacmNo\" ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = S1.\"CustNo\" ";
+		sql += " ORDER BY S1.\"MainApplNo\" ";
+		sql += "        , S1.\"KeyinSeq\" ";
 
 		this.info("sql=" + sql);
 		Query query;
@@ -674,30 +633,61 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query.getResultList());
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> queryGua(TitaVo titaVo, String applNo) throws Exception {
+	public List<Map<String, String>> queryShareQuota(TitaVo titaVo, String applNo) {
 
-		this.info("L9110.findAll queryGua");
+		this.info("L9110ServiceImpl.queryShareQuota");
 
+		// -- L9110 Query(合併額度控管)
 		String sql = "";
-		sql += " SELECT GUACM.\"CustId\"                            AS \"GuaId\"   "; // -- F0 保證人統編
-		sql += "      , GUACM.\"CustName\"                          AS \"GuaName\" "; // -- F1 保證人姓名
-		sql += "      , CDG.\"GuaRelItem\"                                         "; // -- F2 保證人關係
-		sql += "      , GUA.\"GuaAmt\"                                             "; // -- F3 保證金額
-		sql += "      , \"Fn_GetCustAddr\"(GUACM.\"CustUKey\",'1')  AS \"GuaAddr\" "; // -- F4 保證人通訊地址
-		sql += "      , NVL(GUACM.\"CurrZip3\",'') || NVL(GUACM.\"CurrZip2\",'')   ";
-		sql += "                                                    AS \"GuaZip\"  "; // -- F5 保證人郵遞區號(通訊地址)
-		sql += "      , ROW_NUMBER() OVER (PARTITION BY GUA.\"ApproveNo\" ORDER BY GUA.\"GuaAmt\" DESC) ";
-		sql += "                                                    AS \"Seq\" ";
-		sql += " FROM \"Guarantor\" GUA ";
-		// 客戶資料主檔(保證人)
-		sql += " LEFT JOIN \"CustMain\" GUACM ON GUACM.\"CustUKey\" = GUA.\"GuaUKey\" ";
-		// 保證人關係代碼檔
-		sql += " LEFT JOIN \"CdGuarantor\" CDG ON CDG.\"GuaRelCode\" = GUA.\"GuaRelCode\" ";
-		sql += " WHERE GUA.\"GuaStatCode\" = '1' "; // -- 設定
-		// *** ApproveNo 將會統一改為 ApplNo
-		sql += "   AND GUA.\"ApproveNo\" = :applNo "; // -- 申請號碼
-		sql += " ORDER BY \"Seq\" "; // -- 申請號碼
+
+		sql += " SELECT LPAD(S0.\"MainApplNo\",7,'0') AS \"MainApplNo\" "; // F0 主要核准號碼
+		sql += "      , TTL.\"MainCCY\" "; // F1 主要核准號碼之幣別
+		sql += "      , TTL.\"LineAmtTotal\" "; // F2 核准額度加總
+		sql += "      , TTL.\"UtilBalTotal\" "; // F3 已動用額度餘額加總
+		sql += "      , TTL.\"UtilAmtTotal\" "; // F4 貸出金額(放款餘額、目前餘額)加總
+		sql += "      , LPAD(S1.\"CustNo\",7,'0') ";
+		sql += "        || '-' ";
+		sql += "        || LPAD(S1.\"FacmNo\",3,'0') AS \"CustNo\" "; // F5 戶號
+		sql += "      , CM.\"CustName\" "; // F6 戶名
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"RecycleCode\" = '1' ";
+		sql += "          THEN FAC.\"RecycleDeadline\" ";
+		sql += "        ELSE FAC.\"UtilDeadline\" END AS \"UtilDeadline\" "; // F7 循環動用動支期限
+		sql += "      , FAC.\"CurrencyCode\" "; // F8 幣別
+		sql += "      , FAC.\"LineAmt\" "; // F9 核准額度
+		sql += "      , FAC.\"UtilBal\" "; // F10 已動用額度餘額
+		sql += "      , FAC.\"UtilAmt\" "; // F11 貸出金額(放款餘額、目前餘額)
+		sql += "      , CASE ";
+		sql += "          WHEN FAC.\"RecycleCode\" = '1' ";
+		sql += "          THEN 'Y' ";
+		sql += "        ELSE 'N' END AS \"IsRecycle\" "; // F12 循環動用
+		sql += " FROM (SELECT FSL.\"MainApplNo\" ";
+		sql += "       FROM \"FacShareLimit\" FSL ";
+		sql += "       WHERE FSL.\"ApplNo\" = :applNo ";
+		sql += "       UNION ";
+		sql += "       SELECT FSL.\"MainApplNo\" ";
+		sql += "       FROM \"FacShareLimit\" FSL ";
+		sql += "       WHERE FSL.\"MainApplNo\" = :applNo ";
+		sql += "      ) S0 ";
+		sql += " LEFT JOIN \"FacShareLimit\" S1 ON S1.\"MainApplNo\" = S0.\"MainApplNo\" ";
+		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = S1.\"CustNo\" ";
+		sql += "                        AND FAC.\"FacmNo\" = S1.\"FacmNo\" ";
+		sql += " LEFT JOIN (SELECT FSL.\"MainApplNo\" ";
+		sql += "                 , FAC.\"CurrencyCode\" AS \"MainCCY\" ";
+		sql += "                 , SUM(FAC.\"LineAmt\") AS \"LineAmtTotal\" ";
+		sql += "                 , SUM(FAC.\"UtilBal\") AS \"UtilBalTotal\" ";
+		sql += "                 , SUM(FAC.\"UtilAmt\") AS \"UtilAmtTotal\" ";
+		sql += "            FROM \"FacShareLimit\" FSL ";
+		sql += "            LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = FSL.\"CustNo\" ";
+		sql += "                                   AND FAC.\"FacmNo\" = FSL.\"FacmNo\" ";
+		sql += "            GROUP BY FSL.\"MainApplNo\" ";
+		sql += "                   , FAC.\"CurrencyCode\" ";
+		sql += "           ) TTL ON TTL.\"MainApplNo\" = S0.\"MainApplNo\" ";
+		sql += "                AND TTL.\"MainCCY\" = FAC.\"CurrencyCode\" ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = S1.\"CustNo\" ";
+		sql += " ORDER BY TTL.\"MainApplNo\" ";
+		sql += "        , TTL.\"MainCCY\" ";
+		sql += "        , S1.\"KeyinSeq\" ";
 
 		this.info("sql=" + sql);
 		Query query;

@@ -182,7 +182,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 <sub type="FORM" name="L5972">
 
 #SCRTIL=_,_,S
-T(3,[L5972] 債務協商入帳明細資料)
+T(3,[L5972] 債務協商入帳明細表)
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)

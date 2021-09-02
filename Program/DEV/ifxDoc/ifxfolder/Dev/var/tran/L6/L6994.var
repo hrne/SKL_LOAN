@@ -218,6 +218,9 @@ X(2,#OOBsOffrPerccent)P(L,#OOBsOffrPerccentX,)
 #OOBsOffrPerccentX1=X,11,L
 C(1,#OOBsOffrPerccent,S,T(2, ),T(B,#OOBsOffrPerccentX))
 
+!1:已停效
+#OOFlag=A,1,S
+
 ! 修改的按鈕
 #OOFunc2=A,1,S
 E(0,2)
@@ -226,7 +229,8 @@ E(0,2)
 T(2,#OOFunc2+#WorkMonth+#OOPieceCode)
 
 #OOBTN2=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=修改;ntxbuf=#OOBUF2})
+C(3,#OOFlag,0,BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=修改;ntxbuf=#OOBUF2}),
+							BIND(grid,cancel))	
 
 ! 刪除的按鈕
 #OOFunc4=A,1,S
@@ -277,6 +281,7 @@ TXFORM=L6994
 #OOBsOffrCntLimit
 #OOBsOffrAmtCond
 #OOBsOffrPerccent
+#OOFlag
 ^
 </sub>
 

@@ -15,6 +15,7 @@ L5r01LastDueDate=9,7
 L5r01IsMainFin=X,1
 L5r01TotalContrAmt=9,14
 L5r01MainFinCode=X,8
+L5r01PrincipalBal=9,14
 L5r01TwoStepCode=X,1
 L5r01PayerCustNo=9,7
 L5r01ChgCondDate=9,7

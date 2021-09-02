@@ -335,8 +335,6 @@ public class NegReportCom extends CommBuffer {
 
 	@SuppressWarnings("resource")
 	public StringBuffer BatchTx02(TitaVo titaVo, String FilePath, String BringUpDate) throws LogicException, IOException {
-		// int Today = dateUtil.getNowIntegerForBC();
-		int Today = titaVo.getOrgEntdyI();// 會計日期
 		StringBuffer sbBatchTx03 = new StringBuffer();
 		int DataLength[] = { 8, 14, 8 };
 		File file = new File(FilePath);
@@ -460,7 +458,6 @@ public class NegReportCom extends CommBuffer {
 			fr = null;
 
 			if (lTotalData != null && lTotalData.size() != 0) {
-				int AcDate = Today;
 
 				BigDecimal SumTranAmt = new BigDecimal("0");// 交易總金額
 				int SumTranCount = 0;// 交易總筆數
@@ -541,7 +538,7 @@ public class NegReportCom extends CommBuffer {
 						tNegAppr02.setNegAppr02Id(tNegAppr02Id);
 
 						// 會計日期
-						tNegAppr02.setAcDate(AcDate);
+						tNegAppr02.setAcDate(0);
 
 						// 發件單位 Detail[1]
 						tNegAppr02.setSendUnit(FromFinCode);

@@ -2,8 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -18,6 +16,7 @@ import com.st1.itx.db.domain.CustRmkId;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustRmkService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -31,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2702 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2702.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -52,6 +50,9 @@ public class L2702 extends TradeBuffer {
 	@Autowired
 	public DataLog dataLog;
 
+	@Autowired
+	public SendRsp sendRsp;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2702 ");
@@ -99,7 +100,7 @@ public class L2702 extends TradeBuffer {
 			tCustRmk.setCustUKey(tCustMain.getCustUKey());
 			tCustRmk.setRmkCode(titaVo.getParam("RmkCode"));
 			tCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
-                        tCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
+			tCustRmk.setCreateEmpNo(titaVo.getParam("TlrNo"));
 			tCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
 			/* 存入DB */
@@ -115,7 +116,7 @@ public class L2702 extends TradeBuffer {
 			// PK找顧客管控警訊檔HOLD資料
 			tCustRmk = sCustRmkService.holdById(custRmkId);
 
-                        if (tCustRmk == null) {
+			if (tCustRmk == null) {
 				throw new LogicException(titaVo, "E0003", "L2702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在於顧客管控警訊檔。");
 			}
 			// 變更前
@@ -131,7 +132,11 @@ public class L2702 extends TradeBuffer {
 			tCustRmk.setRmkDesc(titaVo.getParam("RmkDesc"));
 			tCustRmk.setLastUpdateEmpNo(titaVo.getParam("TlrNo"));
 
-
+			// 非建檔者修改須刷主管卡
+			if (tCustRmk.getCreateEmpNo() != tCustRmk.getLastUpdateEmpNo() && titaVo.getEmpNos().trim().isEmpty()) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "非建檔者修改");
+			}
+						
 			try {
 				// 修改
 				tCustRmk = sCustRmkService.update2(tCustRmk);
@@ -154,6 +159,11 @@ public class L2702 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0004", "L2702 該戶號,備忘錄序號" + iCustNo + iRmkNo + "不存在於顧客管控警訊檔。");
 			}
 
+			// 刪除須刷主管卡
+			if (titaVo.getEmpNos().trim().isEmpty()) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+						
 			try {
 
 				this.info(" L2702 deleteCustRmkLog" + tCustRmk);

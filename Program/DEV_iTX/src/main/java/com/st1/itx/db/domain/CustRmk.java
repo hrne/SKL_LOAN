@@ -45,7 +45,7 @@ public class CustRmk implements Serializable {
 
   // 備忘錄代碼
   /* 共用代碼檔 */
-  @Column(name = "`RmkCode`", length = 2)
+  @Column(name = "`RmkCode`", length = 3)
   private String rmkCode;
 
   // 備忘錄說明

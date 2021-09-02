@@ -18,6 +18,7 @@ import com.st1.itx.db.domain.NegFinShareLog;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.NegFinShareLogService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.NegCom;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L5981") // 國稅局申報檔查詢
@@ -36,7 +37,8 @@ public class L5981 extends TradeBuffer {
 	public NegFinShareLogService sNegFinShareLogService;
 	@Autowired
 	Parse parse;
-
+	@Autowired
+	public NegCom sNegCom;
 	@Autowired
 	public CdBankService sCdBankService;
 
@@ -82,13 +84,10 @@ public class L5981 extends TradeBuffer {
 
 			tCdBankId.setBankCode(FinCode);
 			tCdBankId.setBranchCode("    ");
-			tCdBank = sCdBankService.findById(tCdBankId, titaVo);
-			this.info("tCdBank==" + tCdBank);
-			if (tCdBank != null) {
-				occursList.putParam("OOFinCodeName", tCdBank.getBankItem());// 債權機構名稱
-			} else {
-				occursList.putParam("OOFinCodeName", "");
-			}
+			
+			String tBankItem = sNegCom.FindNegFinAcc(FinCode, titaVo)[0];
+			occursList.putParam("OOFinCodeName", tBankItem);// 債權機構名稱
+			
 
 			this.info("OOFinCodeName==" + occursList.get("OOFinCodeName"));
 
