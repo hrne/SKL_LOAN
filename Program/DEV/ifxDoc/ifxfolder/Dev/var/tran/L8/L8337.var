@@ -228,6 +228,11 @@ T(2,@BankIdX,#L8r01JcicBankName)
 
 
 #BankIdX=X,80,L
+T(2,@RimJcicBankCode,#BankId)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@BankIdX,#L8r01JcicBankName)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

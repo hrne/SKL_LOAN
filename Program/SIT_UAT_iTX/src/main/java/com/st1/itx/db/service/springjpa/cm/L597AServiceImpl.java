@@ -185,35 +185,35 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "'NegAppr02' AS \"使用表格\",";
 			sqlSelect += "NegAp02.\"TxAmt\" AS \"合計資料\",";
 			sqlSelect += "NegAp02.\"CustId\" AS \"身分證號\",";
-			sqlSelect += "NegTran.\"CaseSeq\" AS \"案件序號\",";
+			sqlSelect += "' ' AS \"案件序號\",";
 			sqlSelect += "NegAp02.\"CustNo\" AS \"戶號\",";
 			sqlSelect += "c.\"CustName\" AS \"戶名\",";
-			sqlSelect += "NegTran.\"TxKind\" AS \"交易別\",";
+			sqlSelect += "' ' AS \"交易別\",";
 			sqlSelect += "' ' AS \"備註\",";
-			sqlSelect += "NegTran.\"AcDate\" AS \"會計日\",";
-			sqlSelect += "NegTran.\"EntryDate\" AS \"入帳日\",";
-			sqlSelect += "NegTran.\"RepayDate\" AS \"入帳還款日\",";
-			sqlSelect += "NegTran.\"TxAmt\" AS \"暫收金額\",";
-			sqlSelect += "(NVL(NegTran.\"OverAmt\",0)-NVL(NegTran.\"OverRepayAmt\",0)) AS \"溢繳款\",";	//轉入溢收金額 - 溢收抵繳金
-			sqlSelect += "NegTran.\"RepayPeriod\" AS \"繳期數\",";
+			sqlSelect += "NegAp02.\"AcDate\" AS \"會計日\",";
+			sqlSelect += "'' AS \"入帳日\",";
+			sqlSelect += "'' AS \"入帳還款日\",";
+			sqlSelect += "'' AS \"暫收金額\",";
+			sqlSelect += "'' AS \"溢繳款\",";	
+			sqlSelect += "'' AS \"繳期數\",";
 			sqlSelect += "NegAp02.\"TxAmt\" AS \"還款金額\",";
-			sqlSelect += "NegTran.\"ShouldPayPeriod\" AS \"應還期數\",";
-			sqlSelect += "(NegTran.\"DueAmt\" * NegTran.\"ShouldPayPeriod\") AS \"應還金額\",";
-			sqlSelect += "NegTran.\"AccuOverAmt\" AS \"累溢短收\",";
-			sqlSelect += "NegTran.\"SklShareAmt\" AS \"新壽攤分\",";
-			sqlSelect += "NegTran.\"ApprAmt\" AS \"撥付金額\",";
-			sqlSelect += "NegTran.\"ReturnAmt\" AS \"退還金額\",";
-			sqlSelect += "NegTran.\"TitaTlrNo\" AS \"經辦\",";
-			sqlSelect += "NegTran.\"TitaTxtNo\" AS \"交易序號\"";
+			sqlSelect += "'' AS \"應還期數\",";
+			sqlSelect += "'' AS \"應還金額\",";
+			sqlSelect += "'' AS \"累溢短收\",";
+			sqlSelect += "'' AS \"新壽攤分\",";
+			sqlSelect += "'' AS \"撥付金額\",";
+			sqlSelect += "'' AS \"退還金額\",";
+			sqlSelect += "'' AS \"經辦\",";
+			sqlSelect += "'' AS \"交易序號\"";
 //			sqlSelect+="NegAp02.\"TxSeq\" AS \"交易序號\" ";
 
 			sqlFrom += "FROM \"NegAppr02\" NegAp02 ";
 
 			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON NegAp02.\"CustId\"=c.\"CustId\" ";
-			sqlLeftJoin += "LEFT JOIN \"NegTrans\" NegTran ON NegTran.\"CustNo\"=c.\"CustNo\" AND NegAp02.\"AcDate\"=NegTran.\"AcDate\" ";
+//			sqlLeftJoin += "LEFT JOIN \"NegTrans\" NegTran ON NegTran.\"CustNo\"=c.\"CustNo\" AND NegAp02.\"AcDate\"=NegTran.\"AcDate\" ";
 			sqlWhere += "WHERE 1=1 ";
-			// 110629新增 :會計日期 AcDate為 Tita會計日期
-			sqlWhere += "AND NegAp02.\"AcDate\" = :AcDate ";
+			// 會計日期 AcDate為 0
+			sqlWhere += "AND NegAp02.\"AcDate\" = 0 ";
 			if (State == 13) {
 				// 撥入筆數 13
 			} else if (State == 14) {
@@ -468,8 +468,8 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L597AServiceImpl strAcDate=[" + strAcDate + "]");
 //		if(State==1 || State==2 || State==6 || State==7 || State==8 || State==12 || State==16 || (!titaVo.isHcodeNormal() && (ExportDateYN==3 || ExportDateYN==4))) {
-		if (State == 1 || (State == 2 && (IsMainFin == 1)) || (State == 4 && Detail == 0 && ExportDateYN == 0) || State == 6 || State == 7 || State == 8 || State == 12 || State == 13 || State == 14
-				|| State == 15 || State == 16 || (!titaVo.isHcodeNormal() && (ExportDateYN == 3 || ExportDateYN == 4))) {
+		if (State == 1 || (State == 2 && (IsMainFin == 1)) || (State == 4 && Detail == 0 && ExportDateYN == 0) || State == 6 || State == 7 || State == 8 || State == 12  
+				 || State == 16 || (!titaVo.isHcodeNormal() && (ExportDateYN == 3 || ExportDateYN == 4))) {
 
 			if (strAcDate != null && strAcDate.length() != 0) {
 				if (Integer.parseInt(strAcDate) == 0) {

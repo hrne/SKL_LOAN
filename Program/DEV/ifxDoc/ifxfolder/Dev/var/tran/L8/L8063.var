@@ -3,6 +3,7 @@
 </sub>
 
 <sub type="SYS" name="label">
+
 !#TXCD
 !T(3,L8063)
 
@@ -43,8 +44,8 @@ K(NOBUTTON,CLOSEY)
 ["[L8063]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdRcDate+款項統一收付申請日",#RcDate],
-["#FdSubmitKey+報送單位代號",#SubmitKey],
-["#FdBankId+債權金融機構代號",#BankId],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+["#FdBankId+債權金融機構代號",#BankId,#BankIdX],
 ]
 
 #FdCustId=X,2,L
@@ -58,7 +59,7 @@ T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
-
+<include src="ROM.icf::L8R01.dec"/>
 #CDDEF0001=x,20,S
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
@@ -75,6 +76,18 @@ CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@YesNoHelp,#HelpDesc2)
 
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+
 #NTXBUF=X,138,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ChainCd,#NTXBUF,1,5)
@@ -84,6 +97,8 @@ T(1,@Ukey,#NTXBUF,6,32)
 #RcDate=D,7,L
 #SubmitKey=X,3,L
 #BankId=X,3,L
+#SubmitKeyX=X,80,L
+#BankIdX=X,80,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
 #RimChainCd=X,5,S
@@ -100,6 +115,12 @@ T(2,@BankId,#L8r55BankId)
 #ChainCd=X,5,S
 #Ukey=X,32,S
 #RPTFG=A,1,S
+
+T(2,@RimJcicBankCode,#BankId)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@BankIdX,#L8r01JcicBankName)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -163,6 +184,7 @@ TXFORM=L8063
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 </sub>
 
@@ -181,15 +203,15 @@ TXFORM=L8063
 #OOTranKeyX=交易代碼
 {width:100,align:'center'}
 #OOOwnerYn=是否為更生債權人
-{width:100,align:'center'}
+{width:150,align:'center'}
 #OOPayYn=債務人是否仍依更生方案正常還款予本金融機構
-{width:100,align:'center'}
+{width:350,align:'center'}
 #OOOwnerAmt=本金融機構更生債權總金額
-{width:100,align:'center'}
+{width:150,align:'right'}
 #OOAllotAmt=參與分配債權金額
-{width:100,align:'center'}
+{width:150,align:'right'}
 #OOUnallotAmt=未參與分配債權金額
-{width:100,align:'center'}
+{width:150,align:'right'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間

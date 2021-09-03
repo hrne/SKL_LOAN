@@ -43,7 +43,7 @@ K(NOBUTTON,CLOSEY)
 [
 ["[L8040]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
-["#FdSubmitKey+報送單位代號",#SubmitKey],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],
 ]
 
@@ -60,7 +60,7 @@ T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
-
+<include src="ROM.icf::L8R01.dec"/>
 
 #CDDEF0001=x,20,S
 T(3,CdCode.TranKey)
@@ -85,7 +85,16 @@ T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@ClaimStatusHelp,#HelpDesc2)
 T(2,@CourtCodeHelp,#HelpDesc3)
 
-
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 
 
@@ -96,6 +105,7 @@ T(1,@Ukey,#NTXBUF,6,32)
 
 #CustId=X,10,L
 #SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
 #RcDate=D,7,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
@@ -183,6 +193,7 @@ TXFORM=L8040
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 </sub>
 

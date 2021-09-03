@@ -4,7 +4,6 @@
 
 <sub type="SYS" name="label">
 
-
 !#TXCD
 !T(3,L8051)
 
@@ -45,7 +44,7 @@ K(NOBUTTON,CLOSEY)
 ["[L8051]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdRcDate+款項統一收付申請日",#RcDate],
-["#FdSubmitKey+報送單位代號",#SubmitKey],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
 
 ]
@@ -60,6 +59,7 @@ T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L8R01.dec"/>
 #CDDEF0001=x,20,S
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
@@ -76,6 +76,17 @@ CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@ClosedResultHelp,#HelpDesc2)
 
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
 
 #NTXBUF=X,138,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -86,6 +97,7 @@ T(1,@Ukey,#NTXBUF,6,32)
 #RcDate=D,7,L
 #SubmitKey=X,3,L
 #ChangePayDate=D,7,L
+#SubmitKeyX=X,80,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
 #RimChainCd=X,5,S
@@ -164,6 +176,7 @@ TXFORM=L8051
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 </sub>
 
@@ -182,9 +195,9 @@ TXFORM=L8051
 {width:80,align:'center'}
 !L8321(63)
 #OOClosedDate=變更還款條件結案日期
-{width:100,align:'center'}
+{width:200,align:'center'}
 #OOClosedResultX=結案原因
-{width:300,align:'center'}
+{width:200,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:100,align:'center'}
 #OOLastUpdate=最後更新日期時間

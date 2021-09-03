@@ -337,6 +337,8 @@ T(3,)T(H,#OClStat,#ClStatHelp)
 #OSettingDate=D,7,L
 !設質股數餘額
 #OSettingBalance=m,14,L
+!全戶維持率
+#OAcMtr=n,3.2,L
 !鑑估日期
 #OEvaDate=D,7,L
 !鑑估值
@@ -414,6 +416,7 @@ TXFORM=L2913
 #OClStat
 #OSettingDate
 #OSettingBalance
+#OAcMtr
 #OEvaDate
 #OEvaAmt
 #OMtgDate
@@ -452,6 +455,7 @@ TXFORM=L2913
 [#<->#,"<font color=red>@質權","@"],
 ["設定狀態",#OSettingStatX],["擔保品狀態",#OClStatX],
 ["股票設(解)質日期",#OSettingDate],["設質股數餘額",#OSettingBalance],
+[#<->#,"全戶維持率",#OAcMtr,"%"],
 ["鑑估日期",#OEvaDate],["鑑估值",#OEvaAmt],
 ["擔保債權確定日期",#OMtgDate],["保管條號碼",#OCustodyNo],
 ["聯貸案",#OSynd,#OSyndX],["聯貸案類型",#OSyndCode,#OSyndCodeX],

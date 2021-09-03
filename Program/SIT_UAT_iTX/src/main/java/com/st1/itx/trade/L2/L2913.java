@@ -1,9 +1,13 @@
 package com.st1.itx.trade.L2;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -11,17 +15,22 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClStock;
 import com.st1.itx.db.domain.ClStockId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClStockService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.FacStatusCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -55,6 +64,16 @@ public class L2913 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CdCodeService sCdCodeDefService;
+	
+	/* DB服務注入 */
+	@Autowired
+	public ClFacService sClFacService;
+	
+	@Autowired
+	public LoanBorMainService sLoanBorMainService;
+	
+	@Autowired
+	public FacStatusCom facStatusCom;
 	
 	/* 日期工具 */
 	@Autowired
@@ -160,6 +179,68 @@ public class L2913 extends TradeBuffer {
 		this.totaVo.putParam("OClStat", tClStock.getClStat());
 		this.totaVo.putParam("OSettingDate", tClStock.getSettingDate());
 		this.totaVo.putParam("OSettingBalance", tClStock.getSettingBalance());
+		
+		
+		Slice<ClFac> slClFac = null;
+		List<ClFac> lClFac = new ArrayList<ClFac>();
+		
+		slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, this.index, Integer.MAX_VALUE, titaVo);
+		
+		lClFac = slClFac == null ? null : new ArrayList<ClFac>(slClFac.getContent());
+		this.info("lClFac = " + lClFac);
+		if (lClFac == null || lClFac.size() == 0) {
+			
+			this.totaVo.putParam("OAcMtr", "");
+			
+		} else {
+			
+			BigDecimal loanBal = new BigDecimal(0);
+			for (ClFac tmpClFac : lClFac) {
+				int thisCustNo = tmpClFac.getCustNo();
+				int thisFacmNo = tmpClFac.getFacmNo();
+				
+				
+				
+				Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(thisCustNo, thisFacmNo, thisFacmNo, 0,
+						900, 0, Integer.MAX_VALUE, titaVo);
+				
+				
+				if (slLoanBorMain != null) {
+					
+					for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
+
+						// 計算額度下所有撥款序號之貸放餘額加總
+						loanBal = loanBal.add(tLoanBorMain.getLoanBal());
+					} // for
+
+				} // if
+			} // for
+			
+			BigDecimal AcMtr = new BigDecimal("0");
+			
+			if(loanBal.compareTo(new BigDecimal("0")) == 0 ) { // 貸放餘額為0
+				this.totaVo.putParam("OAcMtr", "");
+			} else {
+			
+			  // 全戶維持率 = 收盤價 * 設定股數 /借款餘額
+			  AcMtr = (tClStock.getYdClosingPrice().multiply(tClStock.getSettingBalance())).multiply(new BigDecimal("100")) ; 
+			  AcMtr = (AcMtr.divide(loanBal,2,RoundingMode.HALF_DOWN)); // 無條件捨去
+			  if(AcMtr.compareTo(new BigDecimal("0")) == 0) {// 等於 0
+				this.totaVo.putParam("OAcMtr", "");
+			  } else if(AcMtr.compareTo(new BigDecimal("1000")) == 1) {  // 大於1000
+				this.totaVo.putParam("OAcMtr", "999.99");
+		  	  } else {
+//		  		String acmtr = AcMtr.toString();
+//		  		for( int i = acmtr.length() ; i < 6 ; i++) {
+//		  			acmtr = " " + acmtr;
+//		  		}
+			    this.totaVo.putParam("OAcMtr", AcMtr);
+			  }
+			} // else
+		}
+		
+		
+		
 		this.totaVo.putParam("OEvaDate", tClMain.getEvaDate());
 		this.totaVo.putParam("OEvaAmt", tClMain.getEvaAmt());
 		this.totaVo.putParam("OMtgDate", tClStock.getMtgDate());

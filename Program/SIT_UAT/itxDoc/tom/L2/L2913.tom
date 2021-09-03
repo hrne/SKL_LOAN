@@ -30,6 +30,7 @@ OSettingStat=9,1
 OClStat=9,1
 OSettingDate=9,7
 OSettingBalance=9,14
+OAcMtr=9,3.2
 OEvaDate=9,7
 OEvaAmt=9,14
 OMtgDate=9,7

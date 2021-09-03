@@ -35,7 +35,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6301 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6301.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -63,6 +62,14 @@ public class L6301 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L6301"); // 功能選擇錯誤
 		}
 
+//		// isActfgSuprele() 放行
+//		this.info("ActfgSuprele="+titaVo.isActfgSuprele());
+		if (titaVo.isActfgSuprele() && iFuncCode == 1) {
+			iFuncCode = 2;
+	    } else if ((!(titaVo.isActfgSuprele())) && iFuncCode == 4) {
+			iFuncCode = 2;
+		}
+				
 		// BaseRate0的選單-商品用含99:自訂(執行L6604建立)
 		insCdCode(iFuncCode, "BaseRate0", iCode, titaVo);
 
@@ -79,15 +86,13 @@ public class L6301 extends TradeBuffer {
 		// 更新各類代碼檔
 		CdCode tCdCode = new CdCode();
 		CdCodeId tCdCodeId = new CdCodeId();
-		
+
 		tCdCodeId.setDefCode(mDefCode);
 		tCdCodeId.setCode(mCode);
-		
-	
+
 		Slice<CdBaseRate> tCdBaseRate = null;
-		List<CdBaseRate> lCdBaseRate =null;
-		
-		
+		List<CdBaseRate> lCdBaseRate = null;
+
 		switch (mFuncCode) {
 		case 1: // 新增
 			tCdCode.setCdCodeId(tCdCodeId);
@@ -97,7 +102,7 @@ public class L6301 extends TradeBuffer {
 				sCdCodeService.insert(tCdCode, titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
-					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
+					throw new LogicException(titaVo, "E0002", "代碼檔代號:"+mDefCode); // 新增資料已存在
 				} else {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時，發生錯誤
 				}
@@ -107,16 +112,16 @@ public class L6301 extends TradeBuffer {
 		case 2: // 修改
 			tCdCode = sCdCodeService.holdById(new CdCodeId(mDefCode, mCode));
 			if (tCdCode == null) {
-				throw new LogicException(titaVo, "E0003", mCode); // 修改	資料不存在
+				throw new LogicException(titaVo, "E0003", mCode); // 修改 資料不存在
 			}
 			
-			//檢查CdBAseRate是否已建立指標利率，如已有請先刪除再修改指標利率種類
+			// 檢查CdBAseRate是否已建立指標利率，如已有請先刪除再修改指標利率種類
 			tCdBaseRate = sCdBaseRateService.baseRateCodeEq("TWD", mCode, 00000000, 99999999, 0, 1, titaVo);
 			lCdBaseRate = tCdBaseRate == null ? null : tCdBaseRate.getContent();
-			if (lCdBaseRate != null){
-				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指指標利率種類"); 
+			if (!titaVo.isActfgSuprele() && lCdBaseRate != null) {
+				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指指標利率種類");
 			}
-			
+
 			CdCode tCdCode2 = (CdCode) dataLog.clone(tCdCode); ////
 			try {
 				tCdCode = moveCdCode(tCdCode, mFuncCode, titaVo);
@@ -130,14 +135,14 @@ public class L6301 extends TradeBuffer {
 
 		case 4: // 刪除
 			tCdCode = sCdCodeService.holdById(new CdCodeId(mDefCode, mCode));
-			
-			//檢查CdBAseRate是否已建立指標利率，如已有請先刪除再刪除指標利率種類
+
+			// 檢查CdBAseRate是否已建立指標利率，如已有請先刪除再刪除指標利率種類
 			tCdBaseRate = sCdBaseRateService.baseRateCodeEq("TWD", mCode, 00000000, 99999999, 0, 1, titaVo);
 			lCdBaseRate = tCdBaseRate == null ? null : tCdBaseRate.getContent();
-			if (lCdBaseRate != null){
-				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指標利率種類"); 
+			if (!titaVo.isActfgSuprele() && lCdBaseRate != null) {
+				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指標利率種類");
 			}
-			
+
 			if (tCdCode != null) {
 				try {
 					sCdCodeService.delete(tCdCode);
@@ -157,7 +162,14 @@ public class L6301 extends TradeBuffer {
 
 		mCdCode.setDefType(2);
 		mCdCode.setItem(titaVo.getParam("Item"));
-		mCdCode.setEnable("Y");
+		
+		if (titaVo.isActfgSuprele()) {
+			mCdCode.setEnable("Y");
+		} else {
+			mCdCode.setEnable("N");
+		}
+		
+		
 
 		if (mFuncCode != 2) {
 			mCdCode.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));

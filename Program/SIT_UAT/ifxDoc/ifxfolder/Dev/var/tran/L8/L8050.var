@@ -44,7 +44,7 @@ K(NOBUTTON,CLOSEY)
 ["[L8050]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdRcDate+款項統一收付申請日",#RcDate],
-["#FdSubmitKey+報送單位代號",#SubmitKey],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
 ]
 
@@ -80,9 +80,21 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ChainCd,#NTXBUF,1,5)
 T(1,@Ukey,#NTXBUF,6,32)
 
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
 #CustId=X,10,L
 #RcDate=D,7,L
 #SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
 #ChangePayDate=D,7,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
@@ -193,6 +205,7 @@ TXFORM=L8050
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 </sub>
 
@@ -211,41 +224,41 @@ TXFORM=L8050
 {width:80,align:'center'}
 !L8320(62)
 #OOCompletePeriod=變更還款條件已履約期數
-{width:100,align:'center'}
+{width:250,align:'left'}
 #OOPeriod=(第一階梯)期數
-{width:100,align:'center'}
+{width:115,align:'left'}
 #OORate=(第一階梯)利率
-{width:100,align:'center'}
+{width:115,align:'left'}
 #OOExpBalanceAmt=信用貸款協商剩餘債務簽約餘額
-{width:100,align:'center'}
+{width:230,align:'right'}
 #OOCashBalanceAmt=現金卡協商剩餘債務簽約餘額
-{width:100,align:'center'}
+{width:230,align:'right'}
 #OOCreditBalanceAmt=信用卡協商剩餘債務簽約餘額
-{width:100,align:'center'}
+{width:230,align:'right'}
 #OOChaRepayAmt=變更還款條件簽約總債務金額
-{width:100,align:'center'}
+{width:230,align:'right'}
 #OOChaRepayAgreeDate=變更還款條件協議完成日
-{width:100,align:'center'}
+{width:230,align:'center'}
 #OOChaRepayViewDate=變更還款條件面談日期
-{width:100,align:'center'}
+{width:230,align:'center'}
 #OOChaRepayEndDate=變更還款條件簽約完成日期
-{width:100,align:'center'}
+{width:230,align:'center'}
 #OOChaRepayFirstDate=變更還款條件首期應繳款日
-{width:100,align:'center'}
+{width:230,align:'center'}
 #OOPayAccount=繳款帳號
-{width:100,align:'center'}
+{width:100,align:'left'}
 #OOPostAddr=最大債權金融機構聲請狀送達地址
-{width:100,align:'center'}
+{width:250,align:'left'}
 #OOMonthPayAmt=月付金
-{width:100,align:'center'}
+{width:100,align:'right'}
 #OOGradeType=屬階梯式還款註記
 {width:100,align:'center'}
 #OOPeriod2=第二階梯期數
-{width:100,align:'center'}
+{width:100,align:'left'}
 #OORate2=第二階梯利率
-{width:100,align:'center'}
+{width:100,align:'left'}
 #OOMonthPayAmt2=第二階段月付金
-{width:100,align:'center'}
+{width:100,align:'right'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間

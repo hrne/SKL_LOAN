@@ -128,6 +128,6 @@ TXFORM=L5710
 <sub type="SELECT">
 #ExcelPrtF=1,PDF,,,,,,,,,,,,,ExcelSnoM;2,一般債權撥付資料檢核結果
 ^
-#TxtPrtF=1,PDF,,,,,,,,,,,,,TxtSnoF;3,一般債權撥付資料檢核BACHTX03
+#TxtPrtF=1,PDF,,,,,,,,,,,,,TxtSnoF;3,一般債權撥付媒體檔-BACHTX03
 ^
 </sub>

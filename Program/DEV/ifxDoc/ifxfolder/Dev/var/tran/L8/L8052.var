@@ -4,7 +4,6 @@
 
 <sub type="SYS" name="label">
 
-
 !#TXCD
 !T(3,L8052)
 
@@ -45,8 +44,8 @@ K(NOBUTTON,CLOSEY)
 ["[L8052]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdRcDate+款項統一收付申請日",#RcDate],
-["#FdSubmitKey+報送單位代號",#SubmitKey],
-["#FdCourtCode+受理調解機構代號",#CourtCode],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ]
 
 #FdCustId=X,2,L
@@ -87,6 +86,17 @@ T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@YesNoHelp,#HelpDesc2)
 T(2,@ApplyTypeHelp,#HelpDesc3)
 
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
 #NTXBUF=X,138,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ChainCd,#NTXBUF,1,5)
@@ -96,6 +106,8 @@ T(1,@Ukey,#NTXBUF,6,32)
 #RcDate=D,7,L
 #SubmitKey=X,3,L
 #CourtCode=X,3,L
+#SubmitKeyX=X,80,L
+#CourtCodeX=X,80,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
 #RimChainCd=X,5,S
@@ -112,6 +124,12 @@ T(2,@CourtCode,#L8r55CourtCode)
 #ChainCd=X,5,S
 #Ukey=X,32,S
 #RPTFG=A,1,S
+
+T(2,@RimJcicBankCode,#CourtCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -185,6 +203,7 @@ TXFORM=L8052
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 </sub>
 !---------- 單據輸出組合 ----------
@@ -204,25 +223,25 @@ TXFORM=L8052
 #OOAgreeDate=同意書取得日期
 {width:100,align:'center'}
 #OOStartDate=首次調解日
-{width:100,align:'center'}
+{width:110,align:'center'}
 #OORemindDate=債權計算基準日
-{width:100,align:'center'}
+{width:120,align:'center'}
 #OOApplyType=受理方式
 {width:100,align:'center'}
 #OOReportYn=協辦行是否需自行回報債權
-{width:100,align:'center'}
+{width:195,align:'center'}
 #OONotBankId1=未揭露債權機構代號1
-{width:100,align:'center'}
+{width:160,align:'left'}
 #OONotBankId2=未揭露債權機構代號2
-{width:100,align:'center'}
+{width:160,align:'left'}
 #OONotBankId3=未揭露債權機構代號3
-{width:100,align:'center'}
+{width:160,align:'left'}
 #OONotBankId4=未揭露債權機構代號4
-{width:100,align:'center'}
+{width:160,align:'left'}
 #OONotBankId5=未揭露債權機構代號5
-{width:100,align:'center'}
+{width:160,align:'left'}
 #OONotBankId6=未揭露債權機構代號6
-{width:100,align:'center'}
+{width:160,align:'left'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間

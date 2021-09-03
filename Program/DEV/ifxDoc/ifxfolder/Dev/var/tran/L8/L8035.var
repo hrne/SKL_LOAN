@@ -43,7 +43,7 @@ K(NOBUTTON,CLOSEY)
 [
 ["[L8035]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
-["#FdSubmitKey+報送單位代號",#SubmitKey],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],
 ]
 
@@ -59,7 +59,7 @@ T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
-
+<include src="ROM.icf::L8R01.dec"/>
 
 ! TranKey
 #CDDEF0001=x,20,S
@@ -72,7 +72,7 @@ T(3,CdCode.DebtCode)
 #DebtCodeHelp=x,1024,S
 
 #GradeTypeDscp=X,50,S
-T(3, :非屬二階段還款;1:第一階段;2:第二階段)
+T(3,0:非屬二階段還款;1:第一階段;2:第二階段)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -82,6 +82,16 @@ CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@DebtCodeHelp,#HelpDesc2)
 
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 #NTXBUF=X,138,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -90,6 +100,7 @@ T(1,@Ukey,#NTXBUF,6,32)
 
 #CustId=X,10,L
 #SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
 #RcDate=D,7,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
@@ -221,6 +232,7 @@ TXFORM=L8035
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 </sub>
 
@@ -239,66 +251,66 @@ TXFORM=L8035
 {width:100,align:'center'}
 !L8305(44)
 #OODebtCodeX=負債主因
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OONonGageAmt=無擔保金融債務協商總金額
-{width:100,align:'center'}
+{width:200,align:'right'}
 #OOPeriod=期數
-{width:100,align:'center'}
+{width:100,align:'left'}
 #OORate=利率
-{width:100,align:'center'}
+{width:100,align:'left'}
 #OOMonthPayAmt=協商方案估計月付金
-{width:100,align:'center'}
+{width:150,align:'right'}
 #OOReceYearIncome=最近年度綜合所得總額
-{width:100,align:'center'}
+{width:200,align:'right'}
 #OOReceYear=最近年度別
 {width:100,align:'center'}
 #OOReceYear2Income=前兩年度當年綜合所得總額
-{width:100,align:'center'}
+{width:200,align:'right'}
 #OOReceYear2=前兩年度別
 {width:100,align:'center'}
 #OOCurrentMonthIncome=目前每月收入
-{width:100,align:'center'}
+{width:100,align:'right'}
 #OOLivingCost=生活支出總額
-{width:100,align:'center'}
+{width:100,align:'right'}
 #OOCompName=目前主要所得來源公司名稱
-{width:100,align:'center'}
+{width:200,align:'left'}
 #OOCompId=目前主要所得公司統編
-{width:100,align:'center'}
+{width:150,align:'center'}
 #OOCarCnt=債務人名下車輛數量
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOHouseCnt=債務人名下建物比數
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOLandCnt=債務人名下土地比數
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOChildCnt=撫養子女人數
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOChildRate=撫養子女責任比率
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOParentCnt=撫養父母人數
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOParentRate=撫養父母責任比率
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOMouthCnt=其他法定撫養人數
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOMouthRate=其他法定撫養人之責任比率
-{width:100,align:'center'}
+{width:200,align:'left'}
 #OOGradeTypeX=屬二階段還款方案之階段註記
-{width:100,align:'center'}
+{width:200,align:'left'}
 #OOPayLastAmt=第一階段最後一期應繳金額
-{width:100,align:'center'}
+{width:200,align:'right'}
 #OOPeriod2=第二階段期數
-{width:100,align:'center'}
+{width:100,align:'left'}
 #OORate2=第二階段利率
-{width:100,align:'center'}
+{width:100,align:'left'}
 #OOMonthPayAmt2=第二階段協商方案估計月付金
-{width:100,align:'center'}
+{width:200,align:'right'}
 #OOPayLastAmt2=第二階段最後一期應繳金額
-{width:100,align:'center'}
+{width:200,align:'right'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間
 {width:200,align:'center'}
-#OOLastUpdateEmpNo=最後更新人員
+#OOLastUpdate_Combine=最後更新人員
 {width:120,align:'center'}
 ^
 

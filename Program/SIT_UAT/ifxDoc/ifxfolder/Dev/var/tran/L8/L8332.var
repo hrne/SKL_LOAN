@@ -38,28 +38,28 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,250,250];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8332]                                 (570)受理更生款項統一收付通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 ["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+款項統一收付申請日",#ApplyDate],["#FdAdjudicateDate+更生方案認可裁定日",#AdjudicateDate],
 [#<->#,"#FdBankCount+更生債權金融機構家數",#BankCount],
-["#FdBank1+債權金融機構代號1",#Bank1],["#FdBank2+債權金融機構代號2",#Bank2],
-["#FdBank3+債權金融機構代號3",#Bank3],["#FdBank4+債權金融機構代號4",#Bank4],
-["#FdBank5+債權金融機構代號5",#Bank5],["#FdBank6+債權金融機構代號6",#Bank6],
-["#FdBank7+債權金融機構代號7",#Bank7],["#FdBank8+債權金融機構代號8",#Bank8],
-["#FdBank9+債權金融機構代號9",#Bank9],["#FdBank10+債權金融機構代號10",#Bank10],
-["#FdBank11+債權金融機構代號11",#Bank11],["#FdBank12+債權金融機構代號12",#Bank12],
-["#FdBank13+債權金融機構代號13",#Bank13],["#FdBank14+債權金融機構代號14",#Bank14],
-["#FdBank15+債權金融機構代號15",#Bank15],["#FdBank16+債權金融機構代號16",#Bank16],
-["#FdBank17+債權金融機構代號17",#Bank17],["#FdBank18+債權金融機構代號18",#Bank18],
-["#FdBank19+債權金融機構代號19",#Bank19],["#FdBank20+債權金融機構代號20",#Bank20],
-["#FdBank21+債權金融機構代號21",#Bank21],["#FdBank22+債權金融機構代號22",#Bank22],
-["#FdBank23+債權金融機構代號23",#Bank23],["#FdBank24+債權金融機構代號24",#Bank24],
-["#FdBank25+債權金融機構代號25",#Bank25],["#FdBank26+債權金融機構代號26",#Bank26],
-["#FdBank27+債權金融機構代號27",#Bank27],["#FdBank28+債權金融機構代號28",#Bank28],
-["#FdBank29+債權金融機構代號29",#Bank29],["#FdBank30+債權金融機構代號30",#Bank30],
+[#<->#,"#FdBank1+債權金融機構代號1",#Bank1,#BankX1],[#<->#,"#FdBank2+債權金融機構代號2",#Bank2,#BankX2],
+[#<->#,"#FdBank3+債權金融機構代號3",#Bank3,#BankX3],[#<->#,"#FdBank4+債權金融機構代號4",#Bank4,#BankX4],
+[#<->#,"#FdBank5+債權金融機構代號5",#Bank5,#BankX5],[#<->#,"#FdBank6+債權金融機構代號6",#Bank6,#BankX6],
+[#<->#,"#FdBank7+債權金融機構代號7",#Bank7,#BankX7],[#<->#,"#FdBank8+債權金融機構代號8",#Bank8,#BankX8],
+[#<->#,"#FdBank9+債權金融機構代號9",#Bank9,#BankX9],[#<->#,"#FdBank10+債權金融機構代號10",#Bank10,#BankX10],
+[#<->#,"#FdBank11+債權金融機構代號11",#Bank11,#BankX11],[#<->#,"#FdBank12+債權金融機構代號12",#Bank12,#BankX12],
+[#<->#,"#FdBank13+債權金融機構代號13",#Bank13,#BankX13],[#<->#,"#FdBank14+債權金融機構代號14",#Bank14,#BankX14],
+[#<->#,"#FdBank15+債權金融機構代號15",#Bank15,#BankX15],[#<->#,"#FdBank16+債權金融機構代號16",#Bank16,#BankX16],
+[#<->#,"#FdBank17+債權金融機構代號17",#Bank17,#BankX17],[#<->#,"#FdBank18+債權金融機構代號18",#Bank18,#BankX18],
+[#<->#,"#FdBank19+債權金融機構代號19",#Bank19,#BankX19],[#<->#,"#FdBank20+債權金融機構代號20",#Bank20,#BankX20],
+[#<->#,"#FdBank21+債權金融機構代號21",#Bank21,#BankX21],[#<->#,"#FdBank22+債權金融機構代號22",#Bank22,#BankX22],
+[#<->#,"#FdBank23+債權金融機構代號23",#Bank23,#BankX23],[#<->#,"#FdBank24+債權金融機構代號24",#Bank24,#BankX24],
+[#<->#,"#FdBank25+債權金融機構代號25",#Bank25,#BankX25],[#<->#,"#FdBank26+債權金融機構代號26",#Bank26,#BankX26],
+[#<->#,"#FdBank27+債權金融機構代號27",#Bank27,#BankX27],[#<->#,"#FdBank28+債權金融機構代號28",#Bank28,#BankX28],
+[#<->#,"#FdBank29+債權金融機構代號29",#Bank29,#BankX29],[#<->#,"#FdBank30+債權金融機構代號30",#Bank30,#BankX30],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
@@ -259,7 +259,19 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@AdjudicateDate,1)T(F,@BankCount,1)T(2,@FdAdjudicateDate,*)T(2,@FdBankCount,*),C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@AdjudicateDate,0)T(F,@BankCount,0)T(2,@FdAdjudicateDate, )T(2,@FdBankCount, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@AdjudicateDate,1)T(F,@BankCount,1)
+T(F,@Bank1,1)T(F,@Bank2,1)T(F,@Bank3,1)T(F,@Bank4,1)T(F,@Bank5,1)T(F,@Bank6,1)T(F,@Bank7,1)T(F,@Bank8,1)T(F,@Bank9,1)T(F,@Bank10,1)
+T(F,@Bank11,1)T(F,@Bank12,1)T(F,@Bank13,1)T(F,@Bank14,1)T(F,@Bank15,1)T(F,@Bank16,1)T(F,@Bank17,1)T(F,@Bank18,1)
+T(F,@Bank19,1)T(F,@Bank20,1)T(F,@Bank21,1)T(F,@Bank22,1)T(F,@Bank23,1)T(F,@Bank24,1)T(F,@Bank25,1)T(F,@Bank26,1)
+T(F,@Bank27,1)T(F,@Bank28,1)T(F,@Bank29,1)T(F,@Bank30,1)
+T(2,@FdAdjudicateDate,*)T(2,@FdBankCount,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@AdjudicateDate,0)T(F,@BankCount,0)
+T(F,@Bank1,0)T(F,@Bank2,0)T(F,@Bank3,0)T(F,@Bank4,0)T(F,@Bank5,0)T(F,@Bank6,0)T(F,@Bank7,0)T(F,@Bank8,0)T(F,@Bank9,0)T(F,@Bank10,0)
+T(F,@Bank11,0)T(F,@Bank12,0)T(F,@Bank13,0)T(F,@Bank14,0)T(F,@Bank15,0)T(F,@Bank16,0)T(F,@Bank17,0)T(F,@Bank18,0)
+T(F,@Bank19,0)T(F,@Bank20,0)T(F,@Bank21,0)T(F,@Bank22,0)T(F,@Bank23,0)T(F,@Bank24,0)T(F,@Bank25,0)T(F,@Bank26,0)
+T(F,@Bank27,0)T(F,@Bank28,0)T(F,@Bank29,0)T(F,@Bank30,0)
+T(2,@FdAdjudicateDate, )T(2,@FdBankCount, ),$))
+
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
@@ -287,6 +299,7 @@ D(8)
 #AdjudicateDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 D(8)
 @V(7)A(DATE,0,#AdjudicateDate)
 
@@ -294,24 +307,35 @@ D(8)
 #BankCount=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 @V(5,1,30)
 
 
 !債權金融機構代號1~30
+#Bank0=x,3,L
+T(2,1)
+##loop{times:30,i:1,j:0}
 
-##loop{times:30,i:1}
+#Bank{i}=X,3,I
+IF(#Bank{j}!="",$,S)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 
-#Bank{i}=x,3,I
-C(2,#BankCount,$,T(F,@Bank{i},1),$)
+#RimL8r01{i}=X,1,S
+IF(#Bank{i}=="",S,$)
+T(2,@RimJcicBankCode,#Bank{i})
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@BankX{i},#L8r01JcicBankName)
 
+!債權金融機構代號中文名稱
+#BankX{i}=X,80,L
 
 ##end
 
-
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L
-D(8)
-@A(DATE,0,#OutJcicTxtDate)
 
 ! 流水號
 #Ukey=X,32,S

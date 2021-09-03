@@ -734,6 +734,20 @@ public class L3100 extends TradeBuffer {
 		this.info("   LoanBorTxRoutine ...");
 		this.info("   titaVo.isActfgSuprele()    = " + titaVo.isActfgSuprele());
 		if (titaVo.isActfgSuprele()) {
+			// TODO:放行時更新主管編號
+
+				tLoanBorTx = new LoanBorTx();
+				tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, wkBormNo, wkBorxNo), titaVo);
+				if (tLoanBorTx == null) {
+					throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
+				}
+				tLoanBorTx.setTitaEmpNoS(titaVo.getTlrNo());
+				try {
+					loanBorTxService.update(tLoanBorTx, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "放款交易內容檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
+			
 			this.info("return");
 			return;
 		}
@@ -763,6 +777,8 @@ public class L3100 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 		}
+
+		
 	}
 
 	private void AcDetailRoutine() throws LogicException {

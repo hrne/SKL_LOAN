@@ -12,10 +12,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -40,7 +42,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3002")
 @Scope("prototype")
 public class L3002 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3002.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -49,6 +50,8 @@ public class L3002 extends TradeBuffer {
 	public LoanBorMainService loanBorMainService;
 	@Autowired
 	public LoanBookService loanBookService;
+	@Autowired
+	public CustMainService custMainService;
 
 	@Autowired
 	Parse parse;
@@ -62,6 +65,8 @@ public class L3002 extends TradeBuffer {
 		int iCaseNo = this.parse.stringToInteger(titaVo.getParam("CaseNo"));
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
+		int iDrawdownDateS = this.parse.stringToInteger(titaVo.getParam("DrawdownDateS"));
+		int iDrawdownDateE = this.parse.stringToInteger(titaVo.getParam("DrawdownDateE"));
 
 		// work area
 		List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
@@ -89,8 +94,26 @@ public class L3002 extends TradeBuffer {
 				lFacmNo.add(xFacMain.getFacmNo());
 			}
 			slLoanBorMain = loanBorMainService.bormFacmNoIn(iCustNo, lFacmNo, 1, 900, this.index, this.limit, titaVo);
-			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+		} else if (iDrawdownDateS > 0) {
+
+			// 查詢放款主檔, 預約撥款者不會顯示
+			List<Integer> lBormStatus = new ArrayList<Integer>();
+			lBormStatus.add(0); // 0: 正常戶
+			lBormStatus.add(1); // 1:展期
+			lBormStatus.add(2); // 2: 催收戶
+			lBormStatus.add(3); // 3: 結案戶
+			lBormStatus.add(4); // 4: 逾期戶
+			lBormStatus.add(5); // 5: 催收結案戶
+			lBormStatus.add(6); // 6: 呆帳戶
+			lBormStatus.add(7); // 7: 部分轉呆戶
+			lBormStatus.add(8); // 8: 債權轉讓戶
+			lBormStatus.add(9); // 9: 呆帳結案戶
+
+			slLoanBorMain = loanBorMainService.bormDrawdownDateRange(iDrawdownDateS + 19110000,
+					iDrawdownDateE + 19110000, 1, 900, lBormStatus, this.index, this.limit, titaVo);
+
 		} else {
+
 			wkCustNo = iCustNo;
 			if (iFacmNo > 0) {
 				wkFacmNoStart = iFacmNo;
@@ -101,13 +124,16 @@ public class L3002 extends TradeBuffer {
 			}
 			slLoanBorMain = loanBorMainService.bormCustNoEq(wkCustNo, wkFacmNoStart, wkFacmNoEnd, 1, 900, this.index,
 					this.limit, titaVo);
-			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		}
+
+		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
 		// 如有有找到資料
 		FacMain tFacMain = new FacMain();
+		CustMain tCustMain = new CustMain();
 		LoanBook tLoanBook = new LoanBook();
 		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
 			OccursList occursList = new OccursList();
@@ -121,15 +147,22 @@ public class L3002 extends TradeBuffer {
 			occursList.putParam("OOCaseNo", tFacMain.getCreditSysNo());
 			occursList.putParam("OOApplNo", tFacMain.getApplNo());
 			occursList.putParam("OOCustNo", tLoanBorMain.getCustNo());
+
+			tCustMain = custMainService.custNoFirst(tLoanBorMain.getCustNo(), tLoanBorMain.getCustNo(), titaVo);
+			if (tCustMain == null) {
+				occursList.putParam("OOCustName", "");
+			} else {
+				occursList.putParam("OOCustName", tCustMain.getCustName());
+			}
 			occursList.putParam("OOFacmNo", tLoanBorMain.getFacmNo());
 			occursList.putParam("OOBormNo", tLoanBorMain.getBormNo());
 			occursList.putParam("OODrawdownDate", tLoanBorMain.getDrawdownDate());
 			occursList.putParam("OOMaturityDate", tLoanBorMain.getMaturityDate());
 			occursList.putParam("OOStatus", tLoanBorMain.getStatus());
 			// 未繳過期款 日期 顯示撥款日
-			if(tLoanBorMain.getPrevPayIntDate()==0) {
+			if (tLoanBorMain.getPrevPayIntDate() == 0) {
 				occursList.putParam("OOPrevIntDate", tLoanBorMain.getDrawdownDate());
-			}else {
+			} else {
 				occursList.putParam("OOPrevIntDate", tLoanBorMain.getPrevPayIntDate());
 			}
 			occursList.putParam("OOStoreRate", tLoanBorMain.getStoreRate());

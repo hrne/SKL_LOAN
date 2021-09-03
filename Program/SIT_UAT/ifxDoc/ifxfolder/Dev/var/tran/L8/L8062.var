@@ -3,6 +3,7 @@
 </sub>
 
 <sub type="SYS" name="label">
+
 !#TXCD
 !T(3,L8062)
 
@@ -43,7 +44,7 @@ K(NOBUTTON,CLOSEY)
 ["[L8062]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdRcDate+款項統一收付申請日",#RcDate],
-["#FdSubmitKey+報送單位代號",#SubmitKey],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ]
 
 #FdCustId=X,2,L
@@ -55,7 +56,7 @@ T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
-!<include src="ROM.icf::L8R01.dec"/>
+<include src="ROM.icf::L8R01.dec"/>
 
 #CDDEF0001=x,20,S
 T(3,CdCode.TranKey)
@@ -69,6 +70,17 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
 #NTXBUF=X,138,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ChainCd,#NTXBUF,1,5)
@@ -77,6 +89,7 @@ T(1,@Ukey,#NTXBUF,6,32)
 #CustId=X,10,L
 #RcDate=D,7,L
 #SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
 #RimChainCd=X,5,S
@@ -210,6 +223,7 @@ TXFORM=L8062
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 </sub>
 
@@ -225,71 +239,71 @@ TXFORM=L8062
 #any={detail:true, header:'L8062.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 !L8332(570)
 #OOTranKeyX=交易代碼
-{width:100,align:'center'}
+{width:150,align:'center'}
 #OOAdjudicateDate=更生方案認可裁定日
-{width:100,align:'center'}
+{width:150,align:'center'}
 #OOBankCount=更生債權金融機構家數
-{width:100,align:'center'}
+{width:150,align:'center'}
 #OOBank1=債權金融機構代號1
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank2=債權金融機構代號2
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank3=債權金融機構代號3
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank4=債權金融機構代號4
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank5=債權金融機構代號5
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank6=債權金融機構代號6
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank7=債權金融機構代號7
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank8=債權金融機構代號8
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank9=債權金融機構代號9
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOBank10=債權金融機構代號10
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank11=債權金融機構代號11
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank12=債權金融機構代號12
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank13=債權金融機構代號13
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank14=債權金融機構代號14
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank15=債權金融機構代號15
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank16=債權金融機構代號16
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank17=債權金融機構代號17
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank18=債權金融機構代號18
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank19=債權金融機構代號19
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank20=債權金融機構代號20
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank21=債權金融機構代號21
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank22=債權金融機構代號22
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank23=債權金融機構代號23
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank24=債權金融機構代號24
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank25=債權金融機構代號25
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank26=債權金融機構代號26
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank27=債權金融機構代號27
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank28=債權金融機構代號28
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank29=債權金融機構代號29
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOBank30=債權金融機構代號30
-{width:100,align:'center'}
+{width:155,align:'left'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間

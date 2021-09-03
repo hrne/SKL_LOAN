@@ -216,8 +216,10 @@ T(H,@ApplyTypeX,#ApplyType,#ApplyTypeDscp)
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r11TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-
-
+T(2,@RimJcicBankCode,#RefBankId)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@RefBankIdX,#L8r01JcicBankName)
 
 ![交易代碼]
 #TranKey_Tmp=X,1,S
@@ -293,6 +295,7 @@ T(H,#ApplyType,#ApplyTypeDscp)
 
 ![轉介金融機構代號]
 #RefBankId=x,3,I
+C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 IF(#ApplyType=="A",S,$)

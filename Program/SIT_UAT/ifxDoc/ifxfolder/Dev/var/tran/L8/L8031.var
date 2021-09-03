@@ -43,7 +43,7 @@ K(NOBUTTON,CLOSEY)
 [
 ["[L8031]                                 消債條列JCIC報送資料歷程查詢"],
 ["#FdCustId+身分證字號",#CustId],
-["#FdSubmitKey+報送單位代號",#SubmitKey],
+["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],
 ]
 
@@ -60,6 +60,13 @@ T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L8R01.dec"/>
+
+! #OOBankId=X,3,S
+! #OOBankIdX=X,50,S
+! #OOBankId_Combine=X,60,S
+! T(2,#OOBankId+ +#OOBankIdX)
+
 
 
 #CDDEF0001=x,20,S
@@ -78,16 +85,15 @@ CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@ApplyTypeDscp,#HelpDesc2)
 
-
-
-
 #NTXBUF=X,138,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ChainCd,#NTXBUF,1,5)
 T(1,@Ukey,#NTXBUF,6,32)
 
+
 #CustId=X,10,L
 #SubmitKey=X,3,L
+#SubmitKeyX=X,80,L
 #RcDate=D,7,L
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
@@ -101,6 +107,16 @@ R(1,L8R55)
 T(2,@CustId,#L8r55CustId)
 T(2,@SubmitKey,#L8r55SubmitKey)
 E(0,@RcDate,#L8r55ApplyDate)
+
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+
 #ChainCd=X,5,S
 #Ukey=X,32,S
 #RPTFG=A,1,S
@@ -136,12 +152,29 @@ T(H,#OOApplyType,#ApplyTypeDscp)
 #OOApplyTypeX=X,15,S
 T(2,#OOApplyType+ - +#OOApplyType_Tmp)
 #OORefBankId=X,3,S
+#OORefBankIdX=X,50,S
+#OOBankId_Combine=X,60,S
+T(2,#OORefBankId+ +#OORefBankIdX)
 #OONotBankId1=X,3,S
 #OONotBankId2=X,3,S
 #OONotBankId3=X,3,S
 #OONotBankId4=X,3,S
 #OONotBankId5=X,3,S
 #OONotBankId6=X,3,S
+! ##loop {times:6,i:1,j:0}
+
+! #OONotBankId{i}=x,3,I
+! IF(#OONotBankId{j}!="",$,s)
+
+! #CheckNotBankId{i}=X,1,S
+! IF(#NotBankId{i}=="",$,S)
+! T(2,@NotBankIdX{i},)
+
+! #NotBankIdX{i}=X,80,L
+
+! ##end
+
+
 ! 以下固定
 #OOLastUpdate=X,30,S
 #OOLastUpdateEmpNo=X,6,S
@@ -177,6 +210,7 @@ TXFORM=L8031
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
 </sub>
 
@@ -196,22 +230,22 @@ TXFORM=L8031
 !L8301(40)
 #OORbDate=止息基準日
 {width:100,align:'center'}
-#OOApplyType=受理方式
+#OOApplyTypeX=受理方式
 {width:100,align:'center'}
-#OORefBankId=轉介金融機構代號
-{width:100,align:'center'}
+#OOBankId_Combine=轉介金融機構代號
+{width:150,align:'center'}
 #OONotBankId1=未揭露債權機構代號1
-{width:100,align:'center'}
+{width:180,align:'center'}
 #OONotBankId2=未揭露債權機構代號2
-{width:100,align:'center'}
+{width:180,align:'center'}
 #OONotBankId3=未揭露債權機構代號3
-{width:100,align:'center'}
+{width:180,align:'center'}
 #OONotBankId4=未揭露債權機構代號4
-{width:100,align:'center'}
+{width:180,align:'center'}
 #OONotBankId5=未揭露債權機構代號5
-{width:100,align:'center'}
+{width:180,align:'center'}
 #OONotBankId6=未揭露債權機構代號6
-{width:100,align:'center'}
+{width:180,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間

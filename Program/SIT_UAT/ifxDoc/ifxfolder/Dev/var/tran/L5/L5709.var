@@ -87,7 +87,7 @@ E(0,0)
 !------------ TXFORM = L5709 -----------
 <sub type="FORM" name="L5709">
 #SCRTIL=_,_,S
-T(3,[L5709] 最大債權撥付回覆檔檢核)
+T(3,[L5709] 最大債權撥付回覆檔檢核結果)
 !#LOOP=X,1,S
 !T(3,1)ASGN(LOOP$)
 ! 區別碼
@@ -163,6 +163,6 @@ TXFORM=L5709
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 !<include src="PRT.icf::UPD01.sel"/>
-#ExcelPrtF=1,PDF,,,,,,,,,,,,,ExcelSnoM;2,最大債權撥付回覆檔檢核
+#ExcelPrtF=1,PDF,,,,,,,,,,,,,ExcelSnoM;2,最大債權撥付回覆檔檢核結果
 ^
 </sub>

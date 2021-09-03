@@ -1,0 +1,82 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5707)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5707" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5707]                                 最大債權撥付產檔"],
+[#<->#,"#FdBringUpDate+提兌日",#BringUpDate],
+]
+
+#FdBringUpDate=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#PRE_VALUE=A,1,S
+T(1,@BringUpDate,#SYSDATE,2,7)
+
+! 提兌日
+#BringUpDate=D,7,I
+D(8)
+@V(7)
+@A(DATE,0,#BringUpDate)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5707 -----------
+<sub type="FORM" name="L5707">
+#SCRTIL=_,_,S
+T(3,[L5707] 最大債權撥付產檔)
+
+#TestTitle=X,40,S
+T(2,#SCRTIL)
+
+! 匯款單FileNo
+#TxtSnoF=X,8,S
+E(2,@SnoF,#TxtSnoF)
+#SnoF=A,8,S
+
+! 匯款單FileNo
+#TxtPrtF=A,1,S
+C(3,#SnoF,0,E(0,0),E(0,1))
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#BringUpDate
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5707
+#TxtSnoF
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+#TxtPrtF=1,PDF,,,,,,,,,,,,,TxtSnoF;3,最大債權撥付媒體檔-BATCHTX01
+^
+</sub>

@@ -1,0 +1,112 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LM048)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#BUF2=X,11,S
+T(2,1+          )
+
+#ORGFG=_,_,S
+E(0,0)
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,850];printer.width=[20,20];">
+[
+["[LM048]                                 LM048 企業放款風險承擔限額控管表"],
+["@資料年月",#DataYear,"@年",#DataMonth,"@月"],
+["@企業放款餘額限額",#EntLoanBalLimit,"@元"],
+]
+
+#TXCD2=X,5,S
+T(3,LM048)
+
+!日曆日
+#DATE=D,8,S
+T(4,DATE$)
+
+#DATEYear=A,3,S
+T(1,#DATE,2,3)
+
+![年月]
+#DataYear=A,3,I
+T(1,#DATE,2,3)
+@V(5,0,#DATEYear)
+
+#DataMonth=A,2,I
+T(1,#DATE,5,2)
+@V(5,1,12)
+
+#YearMonth=A,5,S
+E(0,#DataYear*100)
+E(0,#YearMonth+#DataMonth)
+
+#EntLoanBalLimit=m,14,I
+@V(2,0)
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = LM048 ----------
+<sub type="FORM" name="LM048">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LM048,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LM048] LM048 企業放款風險承擔限額控管表)
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#YearMonth
+#EntLoanBalLimit
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=LM048
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="LM048" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
+[
+["[LM048]                                 企業放款風險承擔限額控管表                                                                            "],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

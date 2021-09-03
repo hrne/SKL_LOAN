@@ -175,9 +175,16 @@ T(2,@CustRegTelNo,#L8r42CustRegTelNo)
 T(2,@CustComTelNo,#L8r42CustComTelNo)
 T(2,@CustMobilNo,#L8r42CustMobilNo)
 E(0,@OutJcicTxtDate,#L8r42OutJcicTxtDate)
-
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r42TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(2,@RimJcicBankCode,#CourtCode)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 ! 調Rim相關 結束
 
 ![交易代碼]
@@ -318,7 +325,6 @@ TXFORM=L8325^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="ROM.icf::L8R01.tom"/>
-<include src="ROM.icf::L8R03.tom"/>
 <include src="ROM.icf::L8R19.tom"/>
 <include src="ROM.icf::L8R42.tom"/>
 </sub>
