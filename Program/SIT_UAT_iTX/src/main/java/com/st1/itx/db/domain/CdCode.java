@@ -26,7 +26,7 @@ public class CdCode implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3577505854559583230L;
+	private static final long serialVersionUID = 2355529709863884981L;
 
 @EmbeddedId
   private CdCodeId cdCodeId;
@@ -52,6 +52,11 @@ public class CdCode implements Serializable {
   /* Y:啟用 , N:未啟用 */
   @Column(name = "`Enable`", length = 1)
   private String enable;
+
+  // 生效記號
+  /* 0:已放行 2:未放行因應L6301放行新增記號 */
+  @Column(name = "`EffectFlag`")
+  private int effectFlag = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -192,6 +197,27 @@ public class CdCode implements Serializable {
   }
 
 /**
+	* 生效記號<br>
+	* 0:已放行 2:未放行
+因應L6301放行新增記號
+	* @return Integer
+	*/
+  public int getEffectFlag() {
+    return this.effectFlag;
+  }
+
+/**
+	* 生效記號<br>
+	* 0:已放行 2:未放行
+因應L6301放行新增記號
+  *
+  * @param effectFlag 生效記號
+	*/
+  public void setEffectFlag(int effectFlag) {
+    this.effectFlag = effectFlag;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -270,7 +296,7 @@ public class CdCode implements Serializable {
 
   @Override
   public String toString() {
-    return "CdCode [cdCodeId=" + cdCodeId + ", defType=" + defType + ", item=" + item + ", enable=" + enable + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "CdCode [cdCodeId=" + cdCodeId + ", defType=" + defType + ", item=" + item + ", enable=" + enable + ", effectFlag=" + effectFlag
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

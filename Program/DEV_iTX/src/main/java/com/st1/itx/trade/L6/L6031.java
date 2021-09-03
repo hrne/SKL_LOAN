@@ -67,12 +67,11 @@ public class L6031 extends TradeBuffer {
 		}
 
 		for (CdCode tCdCode : lCdCode) {
-			if(("N").equals(tCdCode.getEnable())) {
-				continue;
-			}
+	
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOBaseRateCode", tCdCode.getCode());
 			occursList.putParam("OOBaseRateItem", tCdCode.getItem());
+			occursList.putParam("OOEffectFlag", tCdCode.getEffectFlag());
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

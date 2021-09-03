@@ -120,10 +120,10 @@ public class L8329 extends TradeBuffer {
 			if (uJcicZ450 == null) {
 				throw new LogicException("E0007", "無此更新資料");
 			}
-			iJcicZ450.setPayAmt(iPayAmt);
-			iJcicZ450.setSumRepayActualAmt(iSumRepayActualAmt);
-			iJcicZ450.setSumRepayShouldAmt(iSumRepayShouldAmt);
-			iJcicZ450.setPayStatus(iPayStatus);
+			uJcicZ450.setPayAmt(iPayAmt);
+			uJcicZ450.setSumRepayActualAmt(iSumRepayActualAmt);
+			uJcicZ450.setSumRepayShouldAmt(iSumRepayShouldAmt);
+			uJcicZ450.setPayStatus(iPayStatus);
 			uJcicZ450.setTranKey(iTranKey);
 			uJcicZ450.setOutJcicTxtDate(0);
 			JcicZ450 oldJcicZ450 = (JcicZ450) iDataLog.clone(uJcicZ450);

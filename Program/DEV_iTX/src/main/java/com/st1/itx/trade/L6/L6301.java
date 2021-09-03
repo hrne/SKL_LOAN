@@ -122,6 +122,10 @@ public class L6301 extends TradeBuffer {
 				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指指標利率種類");
 			}
 
+			if (!titaVo.isActfgSuprele() && tCdCode.getEffectFlag() == 2) {
+				throw new LogicException(titaVo, "", "未放行交易不可修改/刪除");
+			}
+			
 			CdCode tCdCode2 = (CdCode) dataLog.clone(tCdCode); ////
 			try {
 				tCdCode = moveCdCode(tCdCode, mFuncCode, titaVo);
@@ -141,6 +145,10 @@ public class L6301 extends TradeBuffer {
 			lCdBaseRate = tCdBaseRate == null ? null : tCdBaseRate.getContent();
 			if (!titaVo.isActfgSuprele() && lCdBaseRate != null) {
 				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指標利率種類");
+			}
+			
+			if (!titaVo.isActfgSuprele() && tCdCode.getEffectFlag() == 2) {
+				throw new LogicException(titaVo, "", "未放行交易不可修改/刪除");
 			}
 
 			if (tCdCode != null) {
@@ -162,11 +170,15 @@ public class L6301 extends TradeBuffer {
 
 		mCdCode.setDefType(2);
 		mCdCode.setItem(titaVo.getParam("Item"));
-		
-		if (titaVo.isActfgSuprele()) {
-			mCdCode.setEnable("Y");
-		} else {
-			mCdCode.setEnable("N");
+		mCdCode.setEnable("Y");
+		//0:已放行 2:未放行
+		if(("BaseRate").equals(mCdCode.getCdCodeId().getDefCode())) {
+			if (titaVo.isActfgSuprele()) {
+				mCdCode.setEffectFlag(0);
+			} else {
+				mCdCode.setEffectFlag(2);
+			}
+			
 		}
 		
 		

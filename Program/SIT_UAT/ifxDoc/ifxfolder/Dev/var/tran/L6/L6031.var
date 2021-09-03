@@ -163,6 +163,14 @@ T(3,1)ASGN(LOOP$)
 #OOBaseRateItem=X,40,L
 !T(H,#OOBaseRateCode,#ApHelp) 
 
+!生效記號
+#OOEffectFlag=N,1,S
+#OOEffectFlagX=X,6,L
+C(2,#OOEffectFlag,T(3,),
+                  T(3,),
+                  T(3,未放行))
+
+
 ! 修改的按鈕
 #OOBUF_2=X,136,S
 T(2,2+#OOBaseRateCode+#OOBaseRateItem)
@@ -201,6 +209,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6032;text=查詢指標利率;ntxbuf=#OOBUF_5})
 TXFORM=L6031
 #OOBaseRateCode
 #OOBaseRateItem
+#OOEffectFlag
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
@@ -238,6 +247,8 @@ TXFORM=L6031
 #OOBaseRateItem=指標利率種類名稱
 {width:250,align:'left'}
 
+#OOEffectFlagX=生效記號
+{width:70,align:'center'}
 ^
 
 </sub>

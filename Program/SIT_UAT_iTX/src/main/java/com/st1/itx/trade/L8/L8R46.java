@@ -46,7 +46,7 @@ public class L8R46 extends TradeBuffer {
 			totaVo.putParam("L8r46SumRepayActualAmt",iJcicZ450.getSumRepayActualAmt());
 			totaVo.putParam("L8r46SumRepayShouldAmt",iJcicZ450.getSumRepayShouldAmt());
 			totaVo.putParam("L8r46PayStatus",iJcicZ450.getPayStatus());
-			totaVo.putParam("L8r46OutJcicTxtDate", "");// 轉JCIC文字檔日期
+			totaVo.putParam("L8r46OutJcicTxtDate", iJcicZ450.getOutJcicTxtDate());// 轉JCIC文字檔日期
 		}
 		this.addList(this.totaVo);
 		return this.sendList();

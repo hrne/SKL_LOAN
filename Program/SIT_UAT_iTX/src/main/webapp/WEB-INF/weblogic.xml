@@ -25,13 +25,22 @@
 
 	<wls:container-descriptor>
 		<wls:servlet-reload-check-secs>10</wls:servlet-reload-check-secs>
-		<!-- <wls:prefer-web-inf-classes>true</wls:prefer-web-inf-classes> -->
+		<!-- 
+		<wls:prefer-web-inf-classes>true</wls:prefer-web-inf-classes>
 		<wls:prefer-application-packages>
 			<wls:package-name>org.slf4j.*</wls:package-name>
+			<wls:package-name>log4j</wls:package-name>
 			<wls:package-name>org.springframework.*</wls:package-name>
 			<wls:package-name>org.apache.xmlbeans.*</wls:package-name>
 		</wls:prefer-application-packages>
+		-->
+		<wls:prefer-application-packages>
+			<wls:package-name>ch.qos.logback.*</wls:package-name>
+			<wls:package-name>org.jboss.logging.*</wls:package-name>
+			<wls:package-name>org.slf4j.*</wls:package-name>
+		</wls:prefer-application-packages>
+		<wls:prefer-application-resources>
+			<wls:resource-name>org/slf4j/impl/StaticLoggerBinder.class</wls:resource-name>
+		</wls:prefer-application-resources>
 	</wls:container-descriptor>
-
-
 </wls:weblogic-web-app>
