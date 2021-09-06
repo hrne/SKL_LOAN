@@ -11,6 +11,7 @@ public class ContentName {
 
 	public static final String kinbr = "KINBR";
 	public static final String tlrno = "TLRNO";
+	public static final String empnm = "EMPNM";
 	public static final String txtno = "TXTNO";
 	public static final String entdd = "ENTDY";
 	public static final String entdy = "ENTDY";

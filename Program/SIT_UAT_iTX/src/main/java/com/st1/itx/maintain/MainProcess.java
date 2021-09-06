@@ -130,6 +130,8 @@ public class MainProcess extends SysLogger {
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);
 			txBuffer.init(titaVo);
 			txTeller = tTxTeller;
+			
+			this.titaVo.put(ContentName.empnm, this.txTeller.getTlrItem());
 		} else
 			txBuffer.init(titaVo);
 	}

@@ -38,6 +38,8 @@
 			<wls:package-name>ch.qos.logback.*</wls:package-name>
 			<wls:package-name>org.jboss.logging.*</wls:package-name>
 			<wls:package-name>org.slf4j.*</wls:package-name>
+			<wls:package-name>org.springframework.*</wls:package-name>
+			<wls:package-name>org.apache.xmlbeans.*</wls:package-name>
 		</wls:prefer-application-packages>
 		<wls:prefer-application-resources>
 			<wls:resource-name>org/slf4j/impl/StaticLoggerBinder.class</wls:resource-name>

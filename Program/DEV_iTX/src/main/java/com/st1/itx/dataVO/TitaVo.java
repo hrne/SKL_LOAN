@@ -582,6 +582,14 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getTlrNo() {
 		return this.get(ContentName.tlrno) == null ? "" : this.get(ContentName.tlrno);
 	}
+	
+	/**
+	 * 櫃員姓名
+	 * @return String
+	 */
+	public String getEmpNm() {
+		return this.get(ContentName.empnm) == null ? "" : this.get(ContentName.empnm);
+	}
 
 	public boolean isEloan() {
 		return "E-LOAN".equals(this.getTlrNo()) || "E-TEST".equals(this.getTlrNo());
