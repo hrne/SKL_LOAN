@@ -41,7 +41,7 @@ K(NOBUTTON,CLOSEY)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L8047]                                 消債條列JCIC報送資料歷程查詢"],
+["[L8047]                                 消債條列JCIC報送資料歷程查詢(056)"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdCaseStatus+案件狀態",#CaseStatus],
@@ -222,7 +222,7 @@ TXFORM=L8047
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L8047" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
 [
-["[L8047]                                 消債條列JCIC報送資料歷程查詢                                                                            "],
+["[L8047]                                 消債條列JCIC報送資料歷程查詢(056)                                                                           "],
 ]
 </sub>
 
@@ -238,7 +238,7 @@ TXFORM=L8047
 #OOCourtDiv=法院承審股別
 {width:100,align:'center'}
 #OOCourtCaseNo=法院案號
-{width:100,align:'center'}
+{width:150,align:'left'}
 #OOApprove=法院裁定免責確定
 {width:150,align:'center'}
 #OOOutstandAmt=原始債權金額
@@ -254,7 +254,7 @@ TXFORM=L8047
 #OOSaveEndDate=保全處分撤銷日
 {width:150,align:'center'}
 #OOAdminName=管理人姓名
-{width:100,align:'left'}
+{width:150,align:'left'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間

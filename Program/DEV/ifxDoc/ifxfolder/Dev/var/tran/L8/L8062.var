@@ -41,7 +41,7 @@ K(NOBUTTON,CLOSEY)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L8062]                                 消債條列JCIC報送資料歷程查詢"],
+["[L8062]                                 消債條列JCIC報送資料歷程查詢(570)"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdRcDate+款項統一收付申請日",#RcDate],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
@@ -136,35 +136,125 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 C(3,#OOAdjudicateDate,0,S,$)
 #OOBankCount=M,2,S
 #OOBank1=X,3,S
+#OOBank1X=X,50,S
+#OOBank_Combine1=X,60,S
+T(2,#OOBank1+ +#OOBank1X)
 #OOBank2=X,3,S
+#OOBank2X=X,50,S
+#OOBank_Combine2=X,60,S
+T(2,#OOBank2+ +#OOBank2X)
 #OOBank3=X,3,S
+#OOBank3X=X,50,S
+#OOBank_Combine3=X,60,S
+T(2,#OOBank3+ +#OOBank3X)
 #OOBank4=X,3,S
+#OOBank4X=X,50,S
+#OOBank_Combine4=X,60,S
+T(2,#OOBank4+ +#OOBank4X)
 #OOBank5=X,3,S
+#OOBank5X=X,50,S
+#OOBank_Combine5=X,60,S
+T(2,#OOBank5+ +#OOBank5X)
 #OOBank6=X,3,S
+#OOBank6X=X,50,S
+#OOBank_Combine6=X,60,S
+T(2,#OOBank6+ +#OOBank6X)
 #OOBank7=X,3,S
+#OOBank7X=X,50,S
+#OOBank_Combine7=X,60,S
+T(2,#OOBank7+ +#OOBank7X)
 #OOBank8=X,3,S
+#OOBank8X=X,50,S
+#OOBank_Combine8=X,60,S
+T(2,#OOBank8+ +#OOBank8X)
 #OOBank9=X,3,S
+#OOBank9X=X,50,S
+#OOBank_Combine9=X,60,S
+T(2,#OOBank9+ +#OOBank9X)
 #OOBank10=X,3,S
+#OOBank10X=X,50,S
+#OOBank_Combine10=X,60,S
+T(2,#OOBank10+ +#OOBank10X)
 #OOBank11=X,3,S
+#OOBank11X=X,50,S
+#OOBank_Combine11=X,60,S
+T(2,#OOBank11+ +#OOBank11X)
 #OOBank12=X,3,S
+#OOBank12X=X,50,S
+#OOBank_Combine12=X,60,S
+T(2,#OOBank12+ +#OOBank12X)
 #OOBank13=X,3,S
+#OOBank13X=X,50,S
+#OOBank_Combine13=X,60,S
+T(2,#OOBank13+ +#OOBank13X)
 #OOBank14=X,3,S
+#OOBank14X=X,50,S
+#OOBank_Combine14=X,60,S
+T(2,#OOBank14+ +#OOBank14X)
 #OOBank15=X,3,S
+#OOBank15X=X,50,S
+#OOBank_Combine15=X,60,S
+T(2,#OOBank15+ +#OOBank15X)
 #OOBank16=X,3,S
+#OOBank16X=X,50,S
+#OOBank_Combine16=X,60,S
+T(2,#OOBank16+ +#OOBank16X)
 #OOBank17=X,3,S
+#OOBank17X=X,50,S
+#OOBank_Combine17=X,60,S
+T(2,#OOBank17+ +#OOBank17X)
 #OOBank18=X,3,S
+#OOBank18X=X,50,S
+#OOBank_Combine18=X,60,S
+T(2,#OOBank18+ +#OOBank18X)
 #OOBank19=X,3,S
+#OOBank19X=X,50,S
+#OOBank_Combine19=X,60,S
+T(2,#OOBank19+ +#OOBank19X)
 #OOBank20=X,3,S
+#OOBank20X=X,50,S
+#OOBank_Combine20=X,60,S
+T(2,#OOBank20+ +#OOBank20X)
 #OOBank21=X,3,S
+#OOBank21X=X,50,S
+#OOBank_Combine21=X,60,S
+T(2,#OOBank21+ +#OOBank21X)
 #OOBank22=X,3,S
+#OOBank22X=X,50,S
+#OOBank_Combine22=X,60,S
+T(2,#OOBank22+ +#OOBank22X)
 #OOBank23=X,3,S
+#OOBank23X=X,50,S
+#OOBank_Combine23=X,60,S
+T(2,#OOBank23+ +#OOBank23X)
 #OOBank24=X,3,S
+#OOBank24X=X,50,S
+#OOBank_Combine24=X,60,S
+T(2,#OOBank24+ +#OOBank24X)
 #OOBank25=X,3,S
+#OOBank25X=X,50,S
+#OOBank_Combine25=X,60,S
+T(2,#OOBank25+ +#OOBank25X)
 #OOBank26=X,3,S
+#OOBank26X=X,50,S
+#OOBank_Combine26=X,60,S
+T(2,#OOBank26+ +#OOBank26X)
 #OOBank27=X,3,S
+#OOBank27X=X,50,S
+#OOBank_Combine27=X,60,S
+T(2,#OOBank27+ +#OOBank27X)
 #OOBank28=X,3,S
+#OOBank28X=X,50,S
+#OOBank_Combine28=X,60,S
+T(2,#OOBank28+ +#OOBank28X)
 #OOBank29=X,3,S
+#OOBank29X=X,50,S
+#OOBank_Combine29=X,60,S
+T(2,#OOBank29+ +#OOBank29X)
 #OOBank30=X,3,S
+#OOBank30X=X,50,S
+#OOBank_Combine30=X,60,S
+T(2,#OOBank30+ +#OOBank30X)
 ! 以下固定
 #OOLastUpdate=X,30,S
 #OOLastUpdateEmpNo=X,6,S
@@ -216,6 +306,36 @@ TXFORM=L8062
 #OOBank28
 #OOBank29
 #OOBank30
+#OOBank1X
+#OOBank2X
+#OOBank3X
+#OOBank4X
+#OOBank5X
+#OOBank6X
+#OOBank7X
+#OOBank8X
+#OOBank9X
+#OOBank10X
+#OOBank11X
+#OOBank12X
+#OOBank13X
+#OOBank14X
+#OOBank15X
+#OOBank16X
+#OOBank17X
+#OOBank18X
+#OOBank19X
+#OOBank20X
+#OOBank21X
+#OOBank22X
+#OOBank23X
+#OOBank24X
+#OOBank25X
+#OOBank26X
+#OOBank27X
+#OOBank28X
+#OOBank29X
+#OOBank30X
 #OOOutJcicTxtDate
 #OOLastUpdate
 #OOLastUpdateEmpNo
@@ -230,7 +350,7 @@ TXFORM=L8062
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L8062" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
 [
-["[L8062]                                 消債條列JCIC報送資料歷程查詢                                                                            "],
+["[L8062]                                 消債條列JCIC報送資料歷程查詢(570)                                                                            "],
 ]
 </sub>
 
@@ -243,66 +363,66 @@ TXFORM=L8062
 #OOAdjudicateDate=更生方案認可裁定日
 {width:150,align:'center'}
 #OOBankCount=更生債權金融機構家數
-{width:150,align:'center'}
-#OOBank1=債權金融機構代號1
 {width:150,align:'left'}
-#OOBank2=債權金融機構代號2
+#OOBank_Combine1=債權金融機構代號1
 {width:150,align:'left'}
-#OOBank3=債權金融機構代號3
+#OOBank_Combine2=債權金融機構代號2
 {width:150,align:'left'}
-#OOBank4=債權金融機構代號4
+#OOBank_Combine3=債權金融機構代號3
 {width:150,align:'left'}
-#OOBank5=債權金融機構代號5
+#OOBank_Combine4=債權金融機構代號4
 {width:150,align:'left'}
-#OOBank6=債權金融機構代號6
+#OOBank_Combine5=債權金融機構代號5
 {width:150,align:'left'}
-#OOBank7=債權金融機構代號7
+#OOBank_Combine6=債權金融機構代號6
 {width:150,align:'left'}
-#OOBank8=債權金融機構代號8
+#OOBank_Combine7=債權金融機構代號7
 {width:150,align:'left'}
-#OOBank9=債權金融機構代號9
+#OOBank_Combine8=債權金融機構代號8
 {width:150,align:'left'}
-#OOBank10=債權金融機構代號10
+#OOBank_Combine9=債權金融機構代號9
+{width:150,align:'left'}
+#OOBank_Combine10=債權金融機構代號10
 {width:155,align:'left'}
-#OOBank11=債權金融機構代號11
+#OOBank_Combine11=債權金融機構代號11
 {width:155,align:'left'}
-#OOBank12=債權金融機構代號12
+#OOBank_Combine12=債權金融機構代號12
 {width:155,align:'left'}
-#OOBank13=債權金融機構代號13
+#OOBank_Combine13=債權金融機構代號13
 {width:155,align:'left'}
-#OOBank14=債權金融機構代號14
+#OOBank_Combine14=債權金融機構代號14
 {width:155,align:'left'}
-#OOBank15=債權金融機構代號15
+#OOBank_Combine15=債權金融機構代號15
 {width:155,align:'left'}
-#OOBank16=債權金融機構代號16
+#OOBank_Combine16=債權金融機構代號16
 {width:155,align:'left'}
-#OOBank17=債權金融機構代號17
+#OOBank_Combine17=債權金融機構代號17
 {width:155,align:'left'}
-#OOBank18=債權金融機構代號18
+#OOBank_Combine18=債權金融機構代號18
 {width:155,align:'left'}
-#OOBank19=債權金融機構代號19
+#OOBank_Combine19=債權金融機構代號19
 {width:155,align:'left'}
-#OOBank20=債權金融機構代號20
+#OOBank_Combine20=債權金融機構代號20
 {width:155,align:'left'}
-#OOBank21=債權金融機構代號21
+#OOBank_Combine21=債權金融機構代號21
 {width:155,align:'left'}
-#OOBank22=債權金融機構代號22
+#OOBank_Combine22=債權金融機構代號22
 {width:155,align:'left'}
-#OOBank23=債權金融機構代號23
+#OOBank_Combine23=債權金融機構代號23
 {width:155,align:'left'}
-#OOBank24=債權金融機構代號24
+#OOBank_Combine24=債權金融機構代號24
 {width:155,align:'left'}
-#OOBank25=債權金融機構代號25
+#OOBank_Combine25=債權金融機構代號25
 {width:155,align:'left'}
-#OOBank26=債權金融機構代號26
+#OOBank_Combine26=債權金融機構代號26
 {width:155,align:'left'}
-#OOBank27=債權金融機構代號27
+#OOBank_Combine27=債權金融機構代號27
 {width:155,align:'left'}
-#OOBank28=債權金融機構代號28
+#OOBank_Combine28=債權金融機構代號28
 {width:155,align:'left'}
-#OOBank29=債權金融機構代號29
+#OOBank_Combine29=債權金融機構代號29
 {width:155,align:'left'}
-#OOBank30=債權金融機構代號30
+#OOBank_Combine30=債權金融機構代號30
 {width:155,align:'left'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}

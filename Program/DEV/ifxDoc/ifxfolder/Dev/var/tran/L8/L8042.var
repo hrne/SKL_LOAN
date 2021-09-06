@@ -41,7 +41,7 @@ K(NOBUTTON,CLOSEY)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L8042]                                 消債條列JCIC報送資料歷程查詢"],
+["[L8042]                                 消債條列JCIC報送資料歷程查詢(051)"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],
@@ -183,7 +183,7 @@ TXFORM=L8042
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L8042" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
 [
-["[L8042]                                 消債條列JCIC報送資料歷程查詢                                                                            "],
+["[L8042]                                 消債條列JCIC報送資料歷程查詢(051)                                                                            "],
 ]
 </sub>
 

@@ -41,7 +41,7 @@ K(NOBUTTON,CLOSEY)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L8067]                                 消債條列JCIC報送資料歷程查詢"],
+["[L8067]                                 消債條列JCIC報送資料歷程查詢(575)"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdRcDate+款項統一收付申請日",#RcDate],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
@@ -188,7 +188,7 @@ TXFORM=L8067
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L8067" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
 [
-["[L8067]                                 消債條列JCIC報送資料歷程查詢                                                                            "],
+["[L8067]                                 消債條列JCIC報送資料歷程查詢(575)                                                                         "],
 ]
 </sub>
 
@@ -198,7 +198,7 @@ TXFORM=L8067
 #OOTranKeyX=交易代碼
 {width:100,align:'center'}
 #OOModifyTypeX=債權異動類別
-{width:400,align:'left'}
+{width:400,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間

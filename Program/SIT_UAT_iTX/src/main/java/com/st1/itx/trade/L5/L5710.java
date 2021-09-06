@@ -127,7 +127,7 @@ public class L5710 extends TradeBuffer {
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
-			// throw new LogicException(titaVo, "", "發生未預期的錯誤"); //點掉本行:會蓋掉原錯誤訊息
+			// throw new LogicException(titaVo, "", "發生未預期的錯誤"); 
 		}
 		if (sbData != null) {
 			makeExcel.setWidth(2, 15);

@@ -41,7 +41,7 @@ K(NOBUTTON,CLOSEY)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L8043]                                 消債條列JCIC報送資料歷程查詢"],
+["[L8043]                                 消債條列JCIC報送資料歷程查詢(052)"],
 ["#FdCustId+身分證字號",#CustId],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],
@@ -69,6 +69,11 @@ T(3,CdCode.TranKey)
 #CDDEF0002=x,20,S
 T(3,CdCode.YesNo)
 #YesNoHelp=x,1024,S
+
+
+!DataCode 
+#DataCodeHelp=x,114,S
+T(3,42:回報無擔保債權金額資料;43:回報有擔保債權金額資料;61:回報協商剩餘債權金額資料)
 
 
 #HelpRim=X,1,S
@@ -99,7 +104,6 @@ T(1,@Ukey,#NTXBUF,6,32)
 #SubmitKey=X,3,L
 #SubmitKeyX=X,80,L
 #RcDate=D,7,L
-
 <include src="ROM.icf::L8R55.dec"/>
 #RimUkey=X,32,S
 #RimChainCd=X,5,S
@@ -143,16 +147,64 @@ T(H,#OOTranKey,#TranKeyHelp)
 T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 ! 以下變動
 #OOBankCode1=X,10,S
+#OOBankCode1X=X,50,S
+#OOBankCode_Combine1=X,60,S
+T(2,#OOBankCode1+ +#OOBankCode1X)
+
 #OODataCode1=X,2,S
+#OODataCode1_Tmp=X,10,S
+C(4,#OODataCode1,S,T(H,#OODataCode1,#DataCodeHelp)))
+#OODataCode1X=X,15,S
+C(4,#OODataCode1,S,T(2,#OODataCode1+ - +#OODataCode1_Tmp))
+
+
 #OOBankCode2=X,10,S
+#OOBankCode2X=X,50,S
+#OOBankCode_Combine2=X,60,S
+T(2,#OOBankCode2+ +#OOBankCode2X)
+
 #OODataCode2=X,2,S
+#OODataCode2_Tmp=X,10,S
+C(4,#OODataCode2,S,T(H,#OODataCode2,#DataCodeHelp)))
+#OODataCode2X=X,15,S
+C(4,#OODataCode2,S,T(2,#OODataCode2+ - +#OODataCode2_Tmp))
+
 #OOBankCode3=X,10,S
+#OOBankCode3X=X,50,S
+#OOBankCode_Combine3=X,60,S
+T(2,#OOBankCode3+ +#OOBankCode3X)
+
 #OODataCode3=X,2,S
+#OODataCode3_Tmp=X,10,S
+C(4,#OODataCode3,S,T(H,#OODataCode3,#DataCodeHelp)))
+#OODataCode3X=X,15,S
+C(4,#OODataCode3,S,T(2,#OODataCode3+ - +#OODataCode3_Tmp))
+
+
 #OOBankCode4=X,10,S
+#OOBankCode4X=X,50,S
+#OOBankCode_Combine4=X,60,S
+T(2,#OOBankCode4+ +#OOBankCode4X)
+
 #OODataCode4=X,2,S
+#OODataCode4_Tmp=X,10,S
+C(4,#OODataCode4,S,T(H,#OODataCode4,#DataCodeHelp)))
+#OODataCode4X=X,15,S
+C(4,#OODataCode4,S,T(2,#OODataCode4+ - +#OODataCode4_Tmp))
+
 #OOBankCode5=X,10,S
+#OOBankCode5X=X,50,S
+#OOBankCode_Combine5=X,60,S
+T(2,#OOBankCode5+ +#OOBankCode5X)
+
 #OODataCode5=X,2,S
+#OODataCode5_Tmp=X,10,S
+C(4,#OODataCode5,S,T(H,#OODataCode5,#DataCodeHelp)))
+#OODataCode5X=X,15,S
+C(4,#OODataCode5,S,T(2,#OODataCode5+ - +#OODataCode5_Tmp))
+
 #OOChangePayDate=D,7,S
+
 ! 以下固定
 #OOLastUpdate=X,30,S
 #OOLastUpdateEmpNo=X,6,S
@@ -173,14 +225,19 @@ C(3,#OOOutJcicTxtDate,0,S,$)
 TXFORM=L8043
 #OOTranKey
 #OOBankCode1
+#OOBankCode1X
 #OODataCode1
 #OOBankCode2
+#OOBankCode2X
 #OODataCode2
 #OOBankCode3
+#OOBankCode3X
 #OODataCode3
 #OOBankCode4
+#OOBankCode4X
 #OODataCode4
 #OOBankCode5
+#OOBankCode5X
 #OODataCode5
 #OOChangePayDate
 #OOOutJcicTxtDate
@@ -197,7 +254,7 @@ TXFORM=L8043
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L8043" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
 [
-["[L8043]                                 消債條列JCIC報送資料歷程查詢                                                                            "],
+["[L8043]                                 消債條列JCIC報送資料歷程查詢(052)                                                                            "],
 ]
 </sub>
 
@@ -208,26 +265,26 @@ TXFORM=L8043
 #OOTranKeyX=交易代碼
 {width:100,align:'center'}
 !L8313(52)
-#OOBankCode1=補報送債權機構代號1
-{width:100,align:'center'}
-#OODataCode1=補報送檔案格式資料別1
-{width:100,align:'center'}
-#OOBankCode2=補報送債權機構代號2
-{width:100,align:'center'}
-#OODataCode2=補報送檔案格式資料別2
-{width:100,align:'center'}
-#OOBankCode3=補報送債權機構代號3
-{width:100,align:'center'}
-#OODataCode3=補報送檔案格式資料別3
-{width:100,align:'center'}
-#OOBankCode4=補報送債權機構代號4
-{width:100,align:'center'}
-#OODataCode4=補報送檔案格式資料別4
-{width:100,align:'center'}
-#OOBankCode5=補報送債權機構代號5
-{width:100,align:'center'}
-#OODataCode5=補報送檔案格式資料別5
-{width:100,align:'center'}
+#OOBankCode_Combine1=補報送債權機構代號1
+{width:100,align:'left'}
+#OODataCode1X=補報送檔案格式資料別1
+{width:100,align:'left'}
+#OOBankCode_Combine2=補報送債權機構代號2
+{width:100,align:'left'}
+#OODataCode2X=補報送檔案格式資料別2
+{width:100,align:'left'}
+#OOBankCode_Combine3=補報送債權機構代號3
+{width:100,align:'left'}
+#OODataCode3X=補報送檔案格式資料別3
+{width:100,align:'left'}
+#OOBankCode_Combine4=補報送債權機構代號4
+{width:100,align:'left'}
+#OODataCode4X=補報送檔案格式資料別4
+{width:100,align:'left'}
+#OOBankCode_Combine5=補報送債權機構代號5
+{width:100,align:'left'}
+#OODataCode5X=補報送檔案格式資料別5
+{width:100,align:'left'}
 #OOChangePayDate=申請變更還款條件日
 {width:100,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期

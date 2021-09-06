@@ -12,9 +12,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.JcicZ570;
 import com.st1.itx.db.domain.JcicZ570Log;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.JcicZ570LogService;
 import com.st1.itx.db.service.JcicZ570Service;
@@ -29,6 +31,8 @@ public class L8062 extends TradeBuffer  {
 		public JcicZ570Service iJcicZ570Service;
 		@Autowired
 		public JcicZ570LogService iJcicZ570LogService;
+		@Autowired
+		public CdCodeService iCdCodeService;
 		@Override
 		public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 			this.info("active L8062 ");
@@ -82,7 +86,39 @@ public class L8062 extends TradeBuffer  {
 				    occursListA.putParam("OOBank28", rJcicZ570.getBank28());
 				    occursListA.putParam("OOBank29", rJcicZ570.getBank29());
 				    occursListA.putParam("OOBank30", rJcicZ570.getBank30());
-                iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				    
+	                occursListA.putParam("OOBank1X", dealBankName(rJcicZ570.getBank1(),titaVo));
+					occursListA.putParam("OOBank2X", dealBankName(rJcicZ570.getBank2(),titaVo));
+					occursListA.putParam("OOBank3X", dealBankName(rJcicZ570.getBank3(),titaVo));
+					occursListA.putParam("OOBank4X", dealBankName(rJcicZ570.getBank4(),titaVo));
+					occursListA.putParam("OOBank5X", dealBankName(rJcicZ570.getBank5(),titaVo));
+					occursListA.putParam("OOBank6X", dealBankName(rJcicZ570.getBank6(),titaVo));
+					occursListA.putParam("OOBank7X", dealBankName(rJcicZ570.getBank7(),titaVo));
+					occursListA.putParam("OOBank8X", dealBankName(rJcicZ570.getBank8(),titaVo));
+					occursListA.putParam("OOBank9X", dealBankName(rJcicZ570.getBank9(),titaVo));
+					occursListA.putParam("OOBank10X", dealBankName(rJcicZ570.getBank10(),titaVo));
+					occursListA.putParam("OOBank11X", dealBankName(rJcicZ570.getBank11(),titaVo));
+					occursListA.putParam("OOBank12X", dealBankName(rJcicZ570.getBank12(),titaVo));
+					occursListA.putParam("OOBank13X", dealBankName(rJcicZ570.getBank13(),titaVo));
+					occursListA.putParam("OOBank14X", dealBankName(rJcicZ570.getBank14(),titaVo));
+					occursListA.putParam("OOBank15X", dealBankName(rJcicZ570.getBank15(),titaVo));
+					occursListA.putParam("OOBank16X", dealBankName(rJcicZ570.getBank16(),titaVo));
+					occursListA.putParam("OOBank17X", dealBankName(rJcicZ570.getBank17(),titaVo));
+					occursListA.putParam("OOBank18X", dealBankName(rJcicZ570.getBank18(),titaVo));
+					occursListA.putParam("OOBank19X", dealBankName(rJcicZ570.getBank19(),titaVo));
+					occursListA.putParam("OOBank20X", dealBankName(rJcicZ570.getBank20(),titaVo));
+					occursListA.putParam("OOBank21X", dealBankName(rJcicZ570.getBank21(),titaVo));
+					occursListA.putParam("OOBank22X", dealBankName(rJcicZ570.getBank22(),titaVo));
+					occursListA.putParam("OOBank23X", dealBankName(rJcicZ570.getBank23(),titaVo));
+					occursListA.putParam("OOBank24X", dealBankName(rJcicZ570.getBank24(),titaVo));
+					occursListA.putParam("OOBank25X", dealBankName(rJcicZ570.getBank25(),titaVo));
+					occursListA.putParam("OOBank26X", dealBankName(rJcicZ570.getBank26(),titaVo));
+					occursListA.putParam("OOBank27X", dealBankName(rJcicZ570.getBank27(),titaVo));
+					occursListA.putParam("OOBank28X", dealBankName(rJcicZ570.getBank28(),titaVo));
+					occursListA.putParam("OOBank29X", dealBankName(rJcicZ570.getBank29(),titaVo));
+					occursListA.putParam("OOBank30X", dealBankName(rJcicZ570.getBank30(),titaVo));
+	                
+				    iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
 				if(iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -141,7 +177,39 @@ public class L8062 extends TradeBuffer  {
 			    occursList.putParam("OOBank28", rrJcicZ570Log.getBank28());
 			    occursList.putParam("OOBank29", rrJcicZ570Log.getBank29());
 			    occursList.putParam("OOBank30", rrJcicZ570Log.getBank30());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				
+                occursList.putParam("OOBank1X", dealBankName(rrJcicZ570Log.getBank1(),titaVo));
+				occursList.putParam("OOBank2X", dealBankName(rrJcicZ570Log.getBank2(),titaVo));
+				occursList.putParam("OOBank3X", dealBankName(rrJcicZ570Log.getBank3(),titaVo));
+				occursList.putParam("OOBank4X", dealBankName(rrJcicZ570Log.getBank4(),titaVo));
+				occursList.putParam("OOBank5X", dealBankName(rrJcicZ570Log.getBank5(),titaVo));
+				occursList.putParam("OOBank6X", dealBankName(rrJcicZ570Log.getBank6(),titaVo));
+				occursList.putParam("OOBank7X", dealBankName(rrJcicZ570Log.getBank7(),titaVo));
+				occursList.putParam("OOBank8X", dealBankName(rrJcicZ570Log.getBank8(),titaVo));
+				occursList.putParam("OOBank9X", dealBankName(rrJcicZ570Log.getBank9(),titaVo));
+				occursList.putParam("OOBank10X", dealBankName(rrJcicZ570Log.getBank10(),titaVo));
+				occursList.putParam("OOBank11X", dealBankName(rrJcicZ570Log.getBank11(),titaVo));
+				occursList.putParam("OOBank12X", dealBankName(rrJcicZ570Log.getBank12(),titaVo));
+				occursList.putParam("OOBank13X", dealBankName(rrJcicZ570Log.getBank13(),titaVo));
+				occursList.putParam("OOBank14X", dealBankName(rrJcicZ570Log.getBank14(),titaVo));
+				occursList.putParam("OOBank15X", dealBankName(rrJcicZ570Log.getBank15(),titaVo));
+				occursList.putParam("OOBank16X", dealBankName(rrJcicZ570Log.getBank16(),titaVo));
+				occursList.putParam("OOBank17X", dealBankName(rrJcicZ570Log.getBank17(),titaVo));
+				occursList.putParam("OOBank18X", dealBankName(rrJcicZ570Log.getBank18(),titaVo));
+				occursList.putParam("OOBank19X", dealBankName(rrJcicZ570Log.getBank19(),titaVo));
+				occursList.putParam("OOBank20X", dealBankName(rrJcicZ570Log.getBank20(),titaVo));
+				occursList.putParam("OOBank21X", dealBankName(rrJcicZ570Log.getBank21(),titaVo));
+				occursList.putParam("OOBank22X", dealBankName(rrJcicZ570Log.getBank22(),titaVo));
+				occursList.putParam("OOBank23X", dealBankName(rrJcicZ570Log.getBank23(),titaVo));
+				occursList.putParam("OOBank24X", dealBankName(rrJcicZ570Log.getBank24(),titaVo));
+				occursList.putParam("OOBank25X", dealBankName(rrJcicZ570Log.getBank25(),titaVo));
+				occursList.putParam("OOBank26X", dealBankName(rrJcicZ570Log.getBank26(),titaVo));
+				occursList.putParam("OOBank27X", dealBankName(rrJcicZ570Log.getBank27(),titaVo));
+				occursList.putParam("OOBank28X", dealBankName(rrJcicZ570Log.getBank28(),titaVo));
+				occursList.putParam("OOBank29X", dealBankName(rrJcicZ570Log.getBank29(),titaVo));
+				occursList.putParam("OOBank30X", dealBankName(rrJcicZ570Log.getBank30(),titaVo));
+			    
+			    iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
 				if(iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -163,4 +231,16 @@ public class L8062 extends TradeBuffer  {
 			this.addList(this.totaVo);
 			return this.sendList();
 		}
+		public String dealBankName(String BankId,TitaVo titaVo) throws LogicException {
+			CdCode tCdCode = new CdCode();
+			tCdCode=iCdCodeService.getItemFirst(8, "JcicBankCode", BankId,titaVo);
+			String JcicBankName="";//80碼長度
+			if(tCdCode!=null) {
+				JcicBankName=tCdCode.getItem();
+			}
+			return JcicBankName;
+		}
 }
+	
+
+

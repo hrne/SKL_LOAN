@@ -12,9 +12,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.JcicZ052;
 import com.st1.itx.db.domain.JcicZ052Log;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.JcicZ052LogService;
 import com.st1.itx.db.service.JcicZ052Service;
@@ -29,6 +31,8 @@ public class L8043 extends TradeBuffer  {
 		public JcicZ052Service iJcicZ052Service;
 		@Autowired
 		public JcicZ052LogService iJcicZ052LogService;
+		@Autowired
+		public CdCodeService iCdCodeService;
 		@Override
 		public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 			this.info("active L8043 ");
@@ -60,6 +64,12 @@ public class L8043 extends TradeBuffer  {
 				occursListA.putParam("OODataCode4",rJcicZ052.getDataCode4());
 				occursListA.putParam("OOBankCode5",rJcicZ052.getBankCode5());
 				occursListA.putParam("OODataCode5",rJcicZ052.getDataCode5());
+                occursListA.putParam("OOBankCode1X", dealBankName(rJcicZ052.getBankCode1(),titaVo));
+				occursListA.putParam("OOBankCode2X", dealBankName(rJcicZ052.getBankCode2(),titaVo));
+				occursListA.putParam("OOBankCode3X", dealBankName(rJcicZ052.getBankCode3(),titaVo));
+				occursListA.putParam("OOBankCode4X", dealBankName(rJcicZ052.getBankCode4(),titaVo));
+				occursListA.putParam("OOBankCode5X", dealBankName(rJcicZ052.getBankCode5(),titaVo));
+
 				occursListA.putParam("OOChangePayDate",rJcicZ052.getChangePayDate());
 				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
@@ -98,6 +108,13 @@ public class L8043 extends TradeBuffer  {
 				occursList.putParam("OODataCode4",rrJcicZ052Log.getDataCode4());
 				occursList.putParam("OOBankCode5",rrJcicZ052Log.getBankCode5());
 				occursList.putParam("OODataCode5",rrJcicZ052Log.getDataCode5());
+				
+                occursList.putParam("OOBankCode1X", dealBankName(rrJcicZ052Log.getBankCode1(),titaVo));
+				occursList.putParam("OOBankCode2X", dealBankName(rrJcicZ052Log.getBankCode2(),titaVo));
+				occursList.putParam("OOBankCode3X", dealBankName(rrJcicZ052Log.getBankCode3(),titaVo));
+				occursList.putParam("OOBankCode4X", dealBankName(rrJcicZ052Log.getBankCode4(),titaVo));
+				occursList.putParam("OOBankCode5X", dealBankName(rrJcicZ052Log.getBankCode5(),titaVo));
+
 				occursList.putParam("OOChangePayDate",rrJcicZ052Log.getChangePayDate());
 				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
@@ -120,6 +137,15 @@ public class L8043 extends TradeBuffer  {
 			}		
 			this.addList(this.totaVo);
 			return this.sendList();
+		}
+		public String dealBankName(String BankId,TitaVo titaVo) throws LogicException {
+			CdCode tCdCode = new CdCode();
+			tCdCode=iCdCodeService.getItemFirst(8, "JcicBankCode", BankId,titaVo);
+			String JcicBankName="";//80碼長度
+			if(tCdCode!=null) {
+				JcicBankName=tCdCode.getItem();
+			}
+			return JcicBankName;
 		}
 }
 	

@@ -1005,6 +1005,8 @@ T(H,#ParkingTypeCode{i},#ParkingTypeCodeHelp)
 #ParkingOwnerPart{i}=m,8,I
 IF(#FunCd==4,s,$)
 C(4,#ParkingNo{i},S,$)
+@
+V(2,0)
 
 !持份比率(分母)
 #ParkingOwnerTotal{i}=m,8,I
@@ -1019,11 +1021,12 @@ IF(#ParkingOwnerPart{i} > #ParkingOwnerTotal{i},V(P,持份分子不可大於持�
 #ParkingArea{i}=m,8.2,I
 IF(#FunCd==4,s,$)
 C(4,#ParkingNo{i},S,$)
-
+@V(2,0)
 ! [獨立產權車位-建號]
 #ParkingBdNoA{i}=A,5,I
 IF(#FunCd==4,s,$)
 C(4,#ParkingNo{i},S,$)
+@V(2,0)
 
 #ParkingBdNoB{i}=A,3,I
 IF(#FunCd==4,s,$)
@@ -1034,6 +1037,7 @@ C(3,#ParkingBdNoA{i},0,S,$)
 #ParkingLandNoA{i}=A,4,I
 IF(#FunCd==4,s,$)
 C(4,#ParkingNo{i},S,$)
+@V(2,0)
 
 !地號(子號)
 #ParkingLandNoB{i}=A,4,I
@@ -1045,6 +1049,7 @@ C(3,#ParkingLandNoA{i},0,S,$)
 #ParkingAmount{i}=m,10,I
 IF(#FunCd==4,s,$)
 C(4,#ParkingNo{i},S,$)
+@V(2,0)
 
 ##end
 

@@ -201,8 +201,7 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@PayStatus,1)T(2,@FdPayAmt,*)T(2,@FdSumRepayActualAmt,*)T(2,@FdSumRepayShouldAmt,*)T(2,@FdPayStatus,*),
-C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayStatus,0)T(F,@SumRepayActualAmt,0)T(2,@SumRepayShouldAmt,0)T(2,@PayStatus,0)T(2,@FdPayAmt, )T(2,@FdSumRepayActualAmt, )T(2,@FdSumRepayShouldAmt, )T(2,@FdPayStatus, ),$))
-
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayAmt,0)T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@PayStatus,0)T(2,@FdPayAmt, )T(2,@FdSumRepayActualAmt, )T(2,@FdSumRepayShouldAmt, )T(2,@FdPayStatus, ),$))
 
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
@@ -249,6 +248,7 @@ T(2,@CourtCodeX,#L8r01JcicBankName)
 
 !繳款日期
 #PayDate=D,7,I
+C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,s,$)
@@ -260,18 +260,21 @@ A(DATE,0,#PayDate)
 #PayAmt=m,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,E(0,@PayAmt,#L8r46PayAmt),$)
 C(5,#TranKey,D,s,$)
 
 !累計實際還款金額
 #SumRepayActualAmt=m,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,E(0,@SumRepayActualAmt,#L8r46SumRepayActualAmt),$)
 C(5,#TranKey,D,s,$)
 
 !截至目前累計應還款金額
 #SumRepayShouldAmt=m,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,E(0,@SumRepayShouldAmt,#L8r46SumRepayShouldAmt),$)
 C(5,#TranKey,D,s,$)
 
 !債權結案註記
