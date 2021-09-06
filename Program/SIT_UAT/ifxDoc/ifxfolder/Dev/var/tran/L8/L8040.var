@@ -154,6 +154,10 @@ T(H,#OOClaimStatus,#ClaimStatusHelp)
 T(2,#OOClaimStatus+ - +#OOClaimStatus_Tmp)
 #OOApplyDate=D,7,S
 #OOCourtCode=X,3,S
+#OOCourtCode_Tmp=X,10,S
+T(H,#OOCourtCode,#CourtCodeHelp)
+#OOCourtCodeX=X,15,S
+T(2,#OOCourtCode+ - +#OOCourtCode_Tmp)
 #OOYear=A,3,S
 #OOCourtDiv=X,6,S
 #OOCourtCaseNo=X,60,S
@@ -215,14 +219,14 @@ TXFORM=L8040
 {width:100,align:'center'}
 #OOApplyDate=遞狀日
 {width:100,align:'center'}
-#OOCourtCode=承審法律代碼
-{width:100,align:'center'}
+#OOCourtCodeX=承審法律代碼
+{width:120,align:'center'}
 #OOYear=年度別
 {width:100,align:'center'}
 #OOCourtDiv=法院承審股別
-{width:100,align:'center'}
+{width:100,align:'left'}
 #OOCourtCaseNo=法院案號
-{width:100,align:'center'}
+{width:200,align:'left'}
 #OOApprove=法院認可與否
 {width:100,align:'center'}
 #OOClaimDate=法院裁定日期

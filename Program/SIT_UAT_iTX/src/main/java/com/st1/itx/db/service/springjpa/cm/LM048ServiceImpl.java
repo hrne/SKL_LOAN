@@ -44,21 +44,21 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ELSE 'B_Else' "; // -- B評等其他
 		sql += "        END                         AS Rating "; // -- F0 評等
 		sql += "      , CDI.\"IndustryItem\"        AS IndustryItem "; // -- F1 行業別名稱
-		sql += "      , CM.\"CustNo\"               AS CustNo "; // -- F2 戶號
-		sql += "      , CM.\"CustName\"                           "; // -- F3 戶名
-		sql += "      , FAC.\"LineAmt\"                           "; // -- F4 核貸金額
-		sql += "      , ML.\"LoanBal\"                            "; // -- F5 放款本金餘額
-		sql += "      , ML.\"StoreRate\"                          "; // -- F6 利率(%)
-		sql += "      , LBM.\"MaturityDate\"                      "; // -- F7 到期日
-		sql += "      , LBM.\"PrevPayIntDate\"                    "; // -- F8 繳息迄日
-		sql += "      , GP.\"GroupName\"                          "; // -- F9 同一關係企業或集團名稱
-		sql += "      , GP.\"GroupPercentage\"                    "; // -- F10 同一關係企業或集團核貸金額占淨值比例
-		sql += "      , ROUND(FAC.\"LineAmt\" / CDV.\"Totalequity\" * 100 , 2) ";
-		sql += "                            AS \"CustPercentage\" "; // -- F11 單一授信對象核貸金額占淨值比例
+		sql += "      , LPAD(CM.\"CustNo\",7,'0')   AS CustNo "; // -- F2 戶號
+		sql += "      , CM.\"CustName\"             AS CustName "; // -- F3 戶名
+		sql += "      , FAC.\"LineAmt\"             AS LineAmt "; // -- F4 核貸金額
+		sql += "      , ML.\"LoanBal\"              AS LoanBal "; // -- F5 放款本金餘額
+		sql += "      , ML.\"StoreRate\"            AS StoreRate "; // -- F6 利率(%)
+		sql += "      , LBM.\"MaturityDate\"        AS MaturityDate "; // -- F7 到期日
+		sql += "      , LBM.\"PrevPayIntDate\"      AS PrevPayIntDate "; // -- F8 繳息迄日
+		sql += "      , GP.\"GroupName\"            AS GroupName "; // -- F9 同一關係企業或集團名稱
+		sql += "      , GP.\"GroupPercentage\"      AS GroupPercentage "; // -- F10 同一關係企業或集團核貸金額占淨值比例
+		sql += "      , ROUND(CUSTFAC.\"LineAmt\" / CDV.\"Totalequity\" , 8) ";
+		sql += "                                    AS CustPercentage "; // -- F11 單一授信對象核貸金額占淨值比例
 		sql += " FROM \"CustMain\" CM ";
 		sql += " LEFT JOIN \"CdIndustry\" CDI ON CDI.\"IndustryCode\" = CM.\"IndustryCode\" ";
-		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CM.\"CustNo\" ";
 		sql += " LEFT JOIN \"CdVarValue\" CDV ON CDV.\"YearMonth\" = :inputYearMonth ";
+		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CM.\"CustNo\" ";
 		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
 		sql += "                  , \"FacmNo\" ";
 		sql += "                  , SUM(\"LoanBalance\") AS \"LoanBal\" ";
@@ -81,9 +81,25 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                    , \"FacmNo\" ";
 		sql += "           ) LBM ON LBM.\"CustNo\" = FAC.\"CustNo\" ";
 		sql += "                AND LBM.\"FacmNo\" = FAC.\"FacmNo\" ";
+		sql += " LEFT JOIN ( SELECT FAC.\"CustNo\" ";
+		sql += "                  , SUM(FAC.\"LineAmt\") AS \"LineAmt\"";
+		sql += "             FROM \"FacMain\" FAC ";
+		sql += "             LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                              , \"FacmNo\" ";
+		sql += "                              , SUM(\"LoanBalance\") AS \"LoanBal\" ";
+		sql += "                         FROM \"MonthlyLoanBal\" ";
+		sql += "                         WHERE \"LoanBalance\" > 0 ";
+		sql += "                           AND \"YearMonth\" = :inputYearMonth ";
+		sql += "                         GROUP BY \"CustNo\" ";
+		sql += "                                , \"FacmNo\" ";
+		sql += "                       ) ML ON ML.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "                           AND ML.\"FacmNo\" = FAC.\"FacmNo\" ";
+		sql += "             WHERE ML.\"LoanBal\" > 0 ";
+		sql += "             GROUP BY FAC.\"CustNo\" ";
+		sql += "           ) CUSTFAC ON CUSTFAC.\"CustNo\" = CM.\"CustNo\" ";
 		sql += " LEFT JOIN ( SELECT CRD.\"RelId\" ";
 		sql += "                  , CRM.\"CustRelName\" || '關係企業' AS \"GroupName\" ";
-		sql += "                  , ROUND(GP.\"GroupLineAmt\" / CDV.\"Totalequity\" * 100 , 2) ";
+		sql += "                  , ROUND(GP.\"GroupLineAmt\" / CDV.\"Totalequity\" , 8) ";
 		sql += "                                                   AS \"GroupPercentage\" ";
 		sql += "             FROM \"CustRelMain\" CRM ";
 		sql += "             LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
@@ -92,7 +108,18 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               , SUM(FAC.\"LineAmt\") AS \"LineAmt\" ";
 		sql += "                         FROM \"FacMain\" FAC  ";
 		sql += "                         LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "                         LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                                          , \"FacmNo\" ";
+		sql += "                                          , SUM(\"LoanBalance\") AS \"LoanBal\" ";
+		sql += "                                     FROM \"MonthlyLoanBal\" ";
+		sql += "                                     WHERE \"LoanBalance\" > 0 ";
+		sql += "                                       AND \"YearMonth\" = :inputYearMonth ";
+		sql += "                                     GROUP BY \"CustNo\" ";
+		sql += "                                            , \"FacmNo\" ";
+		sql += "                                   ) ML ON ML.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "                                       AND ML.\"FacmNo\" = FAC.\"FacmNo\" ";
 		sql += "                         WHERE TRUNC(FAC.\"FirstDrawdownDate\" / 100) <= :inputYearMonth ";
+		sql += "                           AND ML.\"LoanBal\" > 0 ";
 		sql += "                         GROUP BY CM.\"CustId\" ";
 		sql += "                       ) FAC ON FAC.\"CustId\" = CRD.\"RelId\" ";
 		sql += "             LEFT JOIN ( "; // -- 計算整組餘額
@@ -103,8 +130,19 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         LEFT JOIN ( SELECT CM.\"CustId\" ";
 		sql += "                                          , SUM(FAC.\"LineAmt\") AS \"LineAmt\" ";
 		sql += "                                     FROM \"FacMain\" FAC  ";
+		sql += "                                     LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                                                      , \"FacmNo\" ";
+		sql += "                                                      , SUM(\"LoanBalance\") AS \"LoanBal\" ";
+		sql += "                                                 FROM \"MonthlyLoanBal\" ";
+		sql += "                                                 WHERE \"LoanBalance\" > 0 ";
+		sql += "                                                   AND \"YearMonth\" = :inputYearMonth ";
+		sql += "                                                 GROUP BY \"CustNo\" ";
+		sql += "                                                        , \"FacmNo\" ";
+		sql += "                                               ) ML ON ML.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "                                                   AND ML.\"FacmNo\" = FAC.\"FacmNo\" ";
 		sql += "                                     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
 		sql += "                                     WHERE TRUNC(FAC.\"FirstDrawdownDate\" / 100) <= :inputYearMonth ";
+		sql += "                                       AND ML.\"LoanBal\" > 0 ";
 		sql += "                                     GROUP BY CM.\"CustId\" ";
 		sql += "                                   ) FAC ON FAC.\"CustId\" = CRD.\"RelId\" ";
 		sql += "                         WHERE LENGTHB(CRM.\"CustRelId\") = 8 "; // -- 篩選關係企業
@@ -119,6 +157,8 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE CM.\"EntCode\" = '1' "; // -- 企金別為1
 		sql += "   AND ML.\"LoanBal\" > 0 "; // -- 當月底有放款餘額
 		sql += " ORDER BY Rating ";
+		sql += "        , IndustryItem ";
+		sql += "        , GroupName";
 		sql += "        , CustNo ";
 		sql += "        , FAC.\"FacmNo\" ";
 
@@ -131,6 +171,43 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputYearMonth", inputYearMonth);
 		query.setParameter("entLoanBalLimit", entLoanBalLimit);
+
+		return this.convertToMap(query.getResultList());
+	}
+
+	public List<Map<String, String>> queryLoanBal(int inputYearMonth, TitaVo titaVo) {
+
+		this.info("LM048ServiceImpl queryLoanBal ");
+		this.info("LM048ServiceImpl inputYearMonth = " + inputYearMonth);
+
+		String sql = " ";
+		sql += " SELECT CASE ";
+		sql += "          WHEN CM.\"EntCode\" = '1' ";
+		sql += "          THEN '1' ";
+		sql += "        ELSE '0' END               AS EntCode "; // -- F0 企金別
+		sql += "      , SUM(NVL(ML.\"LoanBal\",0)) AS LoanBal "; // -- F1 企業放款總餘額
+		sql += " FROM \"CustMain\" CM ";
+		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                  , SUM(\"LoanBalance\") AS \"LoanBal\" ";
+		sql += "             FROM \"MonthlyLoanBal\" ";
+		sql += "             WHERE \"LoanBalance\" > 0 ";
+		sql += "               AND \"YearMonth\" = :inputYearMonth ";
+		sql += "             GROUP BY \"CustNo\" ";
+		sql += "           ) ML ON ML.\"CustNo\" = CM.\"CustNo\" ";
+		sql += " WHERE ML.\"LoanBal\" > 0 "; // -- 當月底有放款餘額
+		sql += " GROUP BY CASE ";
+		sql += "          WHEN CM.\"EntCode\" = '1' ";
+		sql += "          THEN '1' ";
+		sql += "        ELSE '0' END ";
+
+		this.info("sql=" + sql);
+
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+
+		query = em.createNativeQuery(sql);
+		query.setParameter("inputYearMonth", inputYearMonth);
 
 		return this.convertToMap(query.getResultList());
 	}

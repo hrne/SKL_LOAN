@@ -229,7 +229,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@RbDate,1)T(F,@ApplyType,1)T(F,@RefBankId,1)
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CustId,0)T(F,@SubmitKey,0)T(F,@RbDate,1)T(F,@ApplyType,1)T(F,@RefBankId,1)
 T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
 T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
 T(2,@FdRbDate,*)T(2,@FdApplyType,*)T(2,@FdRefBankId,*)T(2,@FdNotBankId1,*)
@@ -248,7 +248,8 @@ C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,C,s,$)
-
+@V(7)
+A(ID_UNINO,0,#CustId)
 
 
 ![報送單位代號]
@@ -295,7 +296,6 @@ T(H,#ApplyType,#ApplyTypeDscp)
 
 ![轉介金融機構代號]
 #RefBankId=x,3,I
-C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 IF(#ApplyType=="A",S,$)

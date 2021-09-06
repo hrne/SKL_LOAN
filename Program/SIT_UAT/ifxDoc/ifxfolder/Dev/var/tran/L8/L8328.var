@@ -240,7 +240,11 @@ R(1,L8R01)
 T(2,@CourtCodeX,#L8r01JcicBankName)
 
 #CourtCodeX=X,80,L
-
+T(2,@RimJcicBankCode,#CourtCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
@@ -255,6 +259,11 @@ R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 #MaxMainCodeX=X,80,L
+T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 
 !簽約金額-本金

@@ -385,14 +385,14 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
-!#CheckPeriod=X,1,S
-!IF(#GradeType=="Y",$,s)
-!IF(#Period=="012" || #Period=="024",s,$)
-!V(P,當屬階梯式還款註記選擇「Y」時，第一階梯期數需為「012」或「024」，請重新輸入)
+#CheckPeriod=X,1,S
+IF(#GradeType=="Y",$,s)
+IF(#Period=="012" || #Period=="024",s,$)
+V(P,當屬階梯式還款註記選擇「Y」時，第一階梯期數需為「012」或「024」，請重新輸入)
 
-!#CheckRate=X,1,S
-!IF(#CheckRate==0,s,$)
-!V(P,當屬階梯式還款註記選擇「Y」時，第一階梯利率需為「00.00」，請重新輸入)
+#CheckRate=X,1,S
+IF(#CheckRate==0,s,$)
+V(P,當屬階梯式還款註記選擇「Y」時，第一階梯利率需為「00.00」，請重新輸入)
 
 !第二階梯期數
 #Period2=A,3,I
@@ -411,9 +411,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 E(0,#CompletePeriod+#Period)
 
-!#CheckPeriod2=X,1,S
-!IF(#Period2!=0 && #SumPeriod>180,V(P,「變更還款條件已履約期數」+「第一階梯期數」+「第二階梯期數」不得超過180，請重新輸入),$)
-!IF(#Period2==0 && #SumPeriod1>180,V(P,「變更還款條件已履約期數」+「第一階梯期數」不得超過180，請重新輸入),$)
+#CheckPeriod2=X,1,S
+IF(#Period2!=0 && #SumPeriod>180,V(P,「變更還款條件已履約期數」+「第一階梯期數」+「第二階梯期數」不得超過180，請重新輸入),$)
+IF(#Period2==0 && #SumPeriod1>180,V(P,「變更還款條件已履約期數」+「第一階梯期數」不得超過180，請重新輸入),$)
 
 !第二階梯利率
 #Rate2=m,2.2,I

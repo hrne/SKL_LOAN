@@ -836,7 +836,7 @@ HELP(#ParkingTypeCodeHelp)
 #ParkingTypeCodeX=X,13,L
 T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
 
-#ParkingArea=m,14.2,I
+#ParkingArea=m,9.2,I
 C(3,#ParkingTypeCode,5,S,$)
 
 ! [獨立產權車位註記]
@@ -1218,6 +1218,7 @@ ALERT(#OResultX);
 #BdUsageCode
 #ParkingTypeCode
 #ParkingProperty
+#ParkingArea
 #HouseTaxNo
 #HouseBuyDate
 ##loop{times:10,i:1}

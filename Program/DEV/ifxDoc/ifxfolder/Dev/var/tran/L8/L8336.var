@@ -40,7 +40,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[200,350,150,300];printer.width=[20,20,20,20];order=1;">
 [
-["[L8326]                                 (574)更生款項統一收付結案通知資料"],
+["[L8336]                                 (574)更生款項統一收付結案通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 ["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+款項統一收付申請日",#ApplyDate],["#FdCloseDate+結案日期",#CloseDate],
@@ -117,7 +117,7 @@ T(1,@Ukey,#NTXBUF,3,32)
 T(2,@FdCloseDate,*)
 T(2,@FdCloseMark,*)
 T(2,@FdPhoneNo,*)
-T(3,@TranKeyHelp,C:異動;D:刪除))
+T(3,@TranKeyHelp,C:異動;D:刪除)
 ! 查詢進入
 #Deal_Search=X,1,S
 C(5,#TranKey_Tmp,5,$,S)
@@ -204,7 +204,7 @@ D(8)
 @V(7)A(DATE,0,#CloseDate)
 
 !結案原因
-#CloseMark=X,2,I
+#CloseMark=A,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CloseMark,#L8r37CloseMark),$)
@@ -221,7 +221,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@PhoneNo,#L8r37PhoneNo),$)
 C(5,#TranKey,D,s,$)
-@V(7)V(9)
+@V(7)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

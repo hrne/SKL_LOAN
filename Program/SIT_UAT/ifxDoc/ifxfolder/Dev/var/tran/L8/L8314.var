@@ -261,13 +261,13 @@ HELP(#YesNoHelp)
 IF(#AgreeSend=="Y",$,S)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-HELP(#DataCodeHelp)
+HELP(#DataCodeHelp1)
 @V(H,#DataCodeHelp1)
 
 
 ! 同意報送檔案格式資料別名稱2
 #AgreeSendDataX1=X,40,L
-T(H,#AgreeSendData1,#DataCodeHelp)
+T(H,#AgreeSendData1,#DataCodeHelp1)
 
 
 ! 同意報送檔案格式資料別2
@@ -276,7 +276,7 @@ IF(#AgreeSend=="Y",$,S)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#DataCodeHelp)
-@V(H,#DataCodeHelp1)
+@V(H,#DataCodeHelp)
 
 
 ! 同意報送檔案格式資料別名稱2

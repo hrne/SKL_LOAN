@@ -184,6 +184,7 @@ C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
+
 ![債務人IDN]
 #CustId=X,10,L
 
@@ -192,6 +193,27 @@ T(H,#TranKey,#TranKeyHelp)
 #SubmitKey=X,3,L
 
 #SubmitKeyX=X,80,L
+
+!債權金融機構代號
+#BankId=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@V(7)
+T(2,@RimJcicBankCode,#BankId)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@BankIdX,#L8r01JcicBankName)
+
+
+#BankIdX=X,80,L
+T(2,@RimJcicBankCode,#BankId)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@BankIdX,#L8r01JcicBankName)
+
 
 !款項統一收付申請日
 #ApplyDate=D,7,I
@@ -214,25 +236,7 @@ HELP(#ModifyTypeHelp)
 #ModifyTypeX=X,40,L
 T(H,#ModifyType,#ModifyTypeHelp)
 
-!債權金融機構代號
-#BankId=X,3,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey_Tmp,2,s,$)
-@V(7)
-T(2,@RimJcicBankCode,#BankId)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@BankIdX,#L8r01JcicBankName)
 
-
-#BankIdX=X,80,L
-T(2,@RimJcicBankCode,#BankId)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@BankIdX,#L8r01JcicBankName)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

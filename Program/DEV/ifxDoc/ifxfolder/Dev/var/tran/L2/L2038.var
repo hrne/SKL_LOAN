@@ -562,7 +562,7 @@ IF(#ClCode1 == 1,E(0,2),$)
 IF(#ClCode1 == 2,E(0,3),$)
 IF(#ClMainType==2 ,E(0,4),$)
 IF(#ClMainType==3 || #ClCode1 == 3 || #ClCode1 == 4,E(0,5),$)
-
+IF(#ClMainType==4 || #ClCode1 == 5,E(0,0),$)
 
 #RPTFG1=A,1,S
 C(4,#NTXBUF4,S,E(0,@RPTFG,6))
@@ -571,7 +571,7 @@ IF(#ClCode1 == 1,E(0,@RPTFG,8),$)
 IF(#ClCode1 == 2,E(0,@RPTFG,10),$)
 IF(#ClMainType==2 ,E(0,@RPTFG,11),$)
 IF(#ClMainType==3 || #ClCode1 == 3 || #ClCode1 == 4,E(0,@RPTFG,12),$)
-
+IF(#ClMainType==4 || #ClCode1 == 5,E(0,@RPTFG,6),$)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)

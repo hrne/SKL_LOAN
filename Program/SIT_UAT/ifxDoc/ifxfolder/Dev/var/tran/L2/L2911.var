@@ -68,6 +68,7 @@ T(3,*)
 
 #FdOOwnershipCode=X,2,L
 #FdOMtgCode=X,2,L
+#FdKind=X,2,L
 #FdOMtgCheck=X,2,L
 #FdOMtgLoan=X,2,L
 #FdOMtgPledge=X,2,L
@@ -364,15 +365,29 @@ T(3,)T(H,#OOwnershipCode,#OwnershipCodeHelp)
 !抵押權註記
 #OMtgCode=A,1,L
 
-#OMtgCodeX=X,30,L
+#OMtgCodeX=X,25,L
 T(3,)T(H,#OMtgCode,#MtgCodeHelp)
 
 !最高限額抵押權之擔保債權種類
+
 #OMtgCheck=X,1,L
 
 #OMtgLoan=X,1,L
 
 #OMtgPledge=X,1,L
+
+
+#OMtgAllfg=X,1,L
+IF(#OMtgCheck == "Y" && #OMtgLoan == "Y" && #OMtgPledge == "Y",T(3,@OMtgAllfg,V),T(3,@OMtgAllfg, ))
+
+#OMtgCheckfg=X,1,L
+IF(#OMtgCheck == "Y",T(3,@OMtgCheckfg,V),T(3,@OMtgCheckfg,))
+
+#OMtgLoanfg=X,1,L
+IF(#OMtgLoan == "Y",T(3,@OMtgLoanfg,V),T(3,@OMtgLoanfg,))
+
+#OMtgPledgefg=X,1,L
+IF(#OMtgPledge == "Y",T(3,@OMtgPledgefg,V),T(3,@OMtgPledgefg,))
 
 !擔保品狀況碼
 #OClStatus=A,1,L
@@ -626,7 +641,7 @@ TXFORM=L2911
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
-<sub type="PART" name="L2911" layout="cols=3;screen.width=[180,140,180,350];printer.width=[15,30,15,30];order=1">
+<sub type="PART" name="L2911" layout="cols=3;screen.width=[180,260,300,350];printer.width=[15,30,15,30];order=1">
 [
 ["[L2911]                                 不動產擔保品資料查詢"],
 ["#FdOClCode1+擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["#FdOGdRid+原擔保品編號",#OGdALL],
@@ -638,18 +653,13 @@ TXFORM=L2911
 ["#FdOEvaCompany+鑑價公司",#OEvaCompany],["#FdOEvaCompanyX+鑑價公司名稱",#OEvaCompanyX],
 [#<->#,"@@@@@<font color=red>@抵押"],
 [#<->#,"#FdOOwnershipCode+權利種類",#OOwnershipCode,#OOwnershipCodeX],
-[#<->#,"#FdOMtgCode+抵押權註記",#OMtgCode,#OMtgCodeX],
-[#<->#,"","@@@@@@<font color=red>@最高限額抵押權之擔保債權種類"],
-["#FdOMtgCheck+票據",#OMtgCheck],
-["#FdOMtgLoan+借款",#OMtgLoan],
-["#FdOMtgPledge+保證債務",#OMtgPledge],
+["#FdOMtgCode+抵押權註記",#OMtgCode,#OMtgCodeX],["#FdKind+最高限額抵押權之擔保債權種類",#OMtgAllfg,"全選",#OMtgCheckfg,"票據",#OMtgLoanfg,"借款",#OMtgPledgefg,"保證債務"],
 ["#FdOClStatus+擔保品狀況碼",#OClStatus,#OClStatusX],["#FdOClStat+擔保品狀態",#OClStat,#OClStatX],
 ["#FdOAgreement+檢附同意書",#OAgreement],["#FdOLimitCancelDate+限制塗銷日期",#OLimitCancelDate],
 ["#FdOClCode+擔保註記",#OClCode,#OClCodeX],["#FdOLoanToValue+貸放成數",#OLoanToValue,"@%@"],
 [#<->#,"#FdOOtherOwnerTotal+其他債權人設定總額",#OOtherOwnerTotal],
 [#<->#,"#FdOCompensationCopy+代償後謄本",#OCompensationCopy],
 [#<->#,"#FdOBdRmk+建物標示備註",#OBdRmk],
-["#FdOSynd+聯貸案",#OSynd],["#FdOSyndCode+聯貸案類型",#OSyndCode,#OSyndCodeX],
 [#<->#,"@@@@@<font color=red>@處分"],
 ["#FdODispPrice+處分價格",#ODispPrice],["#FdODispDate+處分日期",#ODispDate],
 [#<->#,"#FdOMtgReasonCode+最高抵押權確定事由",#OMtgReasonCode,#OMtgReasonCodeX],

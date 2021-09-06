@@ -44,11 +44,14 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 ["#FdCustId+債務人IDN",#CustId,],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+原前置協商申請日",#RcDate],["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
-["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],["#FdExpBalanceAmt+信用貸款協商剩餘債權餘額",#ExpBalanceAmt],
-["#FdCashBalanceAmt+現金卡協商剩餘債權餘額",#CashBalanceAmt],["#FdCreditBalanceAmt+信用卡協商剩餘債權餘額",#CreditBalanceAmt],
-["#FdMaxMainNote+最大債權金融機構報送註記",#MaxMainNote],
-["#FdIsGuarantor+是否有保證人",#IsGuarantor],["#FdIsChangePayment+是否同意債務人申請變更還款條件方案",#IsChangePayment],
-["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+[#<->#,"#FdExpBalanceAmt+信用貸款協商剩餘債權餘額",#ExpBalanceAmt],
+[#<->#,"#FdCashBalanceAmt+現金卡協商剩餘債權餘額",#CashBalanceAmt],
+[#<->#,"#FdCreditBalanceAmt+信用卡協商剩餘債權餘額",#CreditBalanceAmt],
+[#<->#,"#FdMaxMainNote+最大債權金融機構報送註記",#MaxMainNote],
+[#<->#,"#FdIsGuarantor+是否有保證人",#IsGuarantor],
+[#<->#,"#FdIsChangePayment+是否同意債務人申請變更還款條件方案",#IsChangePayment],
+[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
 #FdTranKey=X,2,L

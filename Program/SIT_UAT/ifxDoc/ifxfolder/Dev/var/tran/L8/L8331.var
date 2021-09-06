@@ -41,13 +41,13 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8331]                                 (454)前置調解單獨全數受清償資料"],
-[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+["#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 ["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
-[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
-[#<->#,"#FdPayOffResult+單獨全數受清償原因",#PayOffResult,#PayOffResultX],
-[#<->#,"#FdPayOffDate+單獨全數受清償日期",#PayOffDate],
-[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+["#FdPayOffResult+單獨全數受清償原因",#PayOffResult,#PayOffResultX],
+["#FdPayOffDate+單獨全數受清償日期",#PayOffDate],
+["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
 #FdTranKey=X,2,L
@@ -129,7 +129,6 @@ T(3,@TranKeyHelp,C:異動;D:刪除))
 C(5,#TranKey_Tmp,5,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(NOBUTTON,CLOSEY)
-T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 
 ! 刪除進入
 #Deal_Delete=X,1,S
@@ -230,6 +229,11 @@ R(1,L8R01)
 T(2,@CourtCodeX,#L8r01JcicBankName)
 
 #CourtCodeX=X,80,L
+T(2,@RimJcicBankCode,#CourtCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
@@ -243,6 +247,11 @@ R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 #MaxMainCodeX=X,80,L
+T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 
 !單獨全數受清償原因

@@ -210,21 +210,6 @@ D(8)
 @V(7)
 @A(DATE,0,#ApplyDate)
 
-!生效日期
-#StartDate=D,7,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-D(8)
-@V(7)A(DATE,0,#StartDate)
-
-!本分配表首繳日
-#PayDate=D,7,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey_Tmp,2,s,$)
-D(8)
-@V(7)A(DATE,0,#PayDate)
-
 !債權金融機構代號
 #BankId=X,3,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -244,6 +229,23 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@BankIdX,#L8r01JcicBankName)
 
+!生效日期
+#StartDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+D(8)
+@V(7)A(DATE,0,#StartDate)
+
+!本分配表首繳日
+#PayDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+D(8)
+@V(7)A(DATE,0,#PayDate)
+
+
+
 !參與分配債權金額
 #AllotAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -255,7 +257,6 @@ C(5,#TranKey_Tmp,4,s,$)
 #OwnPercentage=m,3.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
 @V(2,0)
 
 !轉JCIC文字檔日期

@@ -460,9 +460,11 @@ T(2,@CustNo,#L5r09CustNo)
 IF(#FunctionCode=="01"||#FunctionCode=="02",$,s)
 HELP(#YNHelp)
 @V(H,#YNHelp)
-C(5,#IsMainFin,Y,T(2,@FieldName,簽約總金額)T(3,@MainFinCode,458)T(2,@MainFinCodeName,),T(2,@FieldName,新壽總金額))
-IF(#FunctionCode==02,IF(#MainFinCode!=#L5r01MainFinCode,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),s),$)
+C(5,#IsMainFin,Y,T(2,@FieldName,簽約總金額),T(2,@FieldName,新壽總金額))
+IF(#FunctionCode==02,IF(#MainFinCode!=#L5r01MainFinCode || #L5r01IsMainFin =="N",C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),s),$)
 IF(#FunctionCode==01,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),$)
+T(3,@MainFinCode,458)
+T(2,@MainFinCodeName,)
 
 #IsMainFinIsY=@,1,S
 INVOKEJS(SHOW,grd1,1)
@@ -1002,9 +1004,9 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 IF(#CountDueAmtX!=#DueAmt,V(P,期款總和錯誤),$)
 
 #AKMS2=X,1,S
-##loop {times:30,i:1}
-C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW,grd1_{i},0),$)
-##end
+IF(#IsMainFin=="N",$,S)
+INVOKEJS(SHOW,grd1,0)
+
 
 
 </sub>

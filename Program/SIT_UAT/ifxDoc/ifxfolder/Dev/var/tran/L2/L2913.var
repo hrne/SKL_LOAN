@@ -458,7 +458,6 @@ TXFORM=L2913
 [#<->#,"全戶維持率",#OAcMtr,"%"],
 ["鑑估日期",#OEvaDate],["鑑估值",#OEvaAmt],
 ["擔保債權確定日期",#OMtgDate],["保管條號碼",#OCustodyNo],
-["聯貸案",#OSynd,#OSyndX],["聯貸案類型",#OSyndCode,#OSyndCodeX],
 ["處分價格",#ODispPrice],["處分日期",#ODispDate],
 [#<->#,"擔保品狀況碼",#OClStatus,#OClStatusX],
 ]

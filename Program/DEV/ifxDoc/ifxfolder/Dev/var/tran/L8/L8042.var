@@ -195,7 +195,7 @@ TXFORM=L8042
 {width:100,align:'center'}
 !L8312(51)
 #OODelayCodeX=延期繳款原因
-{width:200,align:'center'}
+{width:200,align:'left'}
 #OODelayDesc=延期繳款案情說明
 {width:150,align:'center'}
 #OOOutJcicTxtDate=資料轉出日期

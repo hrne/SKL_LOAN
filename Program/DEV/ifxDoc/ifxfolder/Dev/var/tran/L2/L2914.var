@@ -296,22 +296,10 @@ T(H,#OTradingMethod,#TradingMethodHelp)
 #OCompensation=X,3,L
 
 !投資內容 Investment
-#OInvestment=c,300,S
-T(1,@OInvestment1,#OInvestment,1,100)
-T(1,@OInvestment2,#OInvestment,101,100)
-T(1,@OInvestment3,#OInvestment,201,100)
-#OInvestment1=c,100,L
-#OInvestment2=c,100,L
-#OInvestment3=c,100,L
+#OInvestment=c,3.100,S
 
 !公開價值 PublicValue
-#OPublicValue=c,300,S
-T(1,@OPublicValue1,#OPublicValue,1,100)
-T(1,@OPublicValue2,#OPublicValue,101,100)
-T(1,@OPublicValue3,#OPublicValue,201,100)
-#OPublicValue1=c,100,L
-#OPublicValue2=c,100,L
-#OPublicValue3=c,100,L
+#OPublicValue=c,3.100,S
 
 #OSettingStat=A,1,S
 
@@ -456,15 +444,10 @@ TXFORM=L2914
 ["評等日期",#OCreditDate],["評等公司",#OCredit,#OCreditX],
 ["外部評等",#OExternalCredit],["主要指數",#OIndex,#OIndexX],
 ["交易方法",#OTradingMethod,#OTradingMethodX],["受償順位",#OCompensation],
-[#<->#,"投資內容",#OInvestment1],
-[#<->#,"@",#OInvestment2],
-[#<->#,"@",#OInvestment3],
-[#<->#,"公開價值",#OPublicValue1],
-[#<->#,"@",#OPublicValue2],
-[#<->#,"@",#OPublicValue3],
+[#<->#,"投資內容",#OInvestment],
+[#<->#,"公開價值",#OPublicValue],
 ["設定狀態",#OSettingStatX],["擔保品狀態",#OClStatX],
 ["設定日期",#OSettingDate],["設定金額",#OSettingAmt],
-["聯貸案",#OSynd,#OSyndX],["聯貸案類型",#OSyndCode,#OSyndCodeX],
 ["處分價格",#ODispPrice],["處分日期",#ODispDate],
 [#<->#,"擔保品狀況碼",#OClStatus,#OClStatusX],
 ]
@@ -484,7 +467,6 @@ TXFORM=L2914
 ["憑證編號",#ODocNo],["貸放成數",#OLoanToValue,"%"],
 ["設定狀態",#OSettingStatX],["擔保品狀態",#OClStatX],
 ["設定日期",#OSettingDate],["設定金額",#OSettingAmt],
-["聯貸案",#OSynd,#OSyndX],["聯貸案類型",#OSyndCode,#OSyndCodeX],
 ["處分價格",#ODispPrice],["處分日期",#ODispDate],
 [#<->#,"擔保品狀況碼",#OClStatus,#OClStatusX],
 ]
@@ -502,7 +484,6 @@ TXFORM=L2914
 ["憑證編號",#ODocNo],["貸放成數",#OLoanToValue,"%"],
 ["設定狀態",#OSettingStatX],["擔保品狀態",#OClStatX],
 ["設定日期",#OSettingDate],["設定金額",#OSettingAmt],
-["聯貸案",#OSynd,#OSyndX],["聯貸案類型",#OSyndCode,#OSyndCodeX],
 ["處分價格",#ODispPrice],["處分日期",#ODispDate],
 [#<->#,"擔保品狀況碼",#OClStatus,#OClStatusX],
 ]
@@ -523,15 +504,10 @@ TXFORM=L2914
 ["評等日期",#OCreditDate],["評等公司",#OCredit,#OCreditX],
 ["外部評等",#OExternalCredit],["主要指數",#OIndex,#OIndexX],
 ["交易方法",#OTradingMethod,#OTradingMethodX],["受償順位",#OCompensation],
-[#<->#,"投資內容",#OInvestment1],
-[#<->#,"@",#OInvestment2],
-[#<->#,"@",#OInvestment3],
-[#<->#,"公開價值",#OPublicValue1],
-[#<->#,"@",#OPublicValue2],
-[#<->#,"@",#OPublicValue3],
+[#<->#,"投資內容",#OInvestment],
+[#<->#,"公開價值",#OPublicValue],
 ["設定狀態",#OSettingStatX],["擔保品狀態",#OClStatX],
 ["設定日期",#OSettingDate],["設定金額",#OSettingAmt],
-["聯貸案",#OSynd,#OSyndX],["聯貸案類型",#OSyndCode,#OSyndCodeX],
 ["處分價格",#ODispPrice],["處分日期",#ODispDate],
 [#<->#,"擔保品狀況碼",#OClStatus,#OClStatusX],
 ]

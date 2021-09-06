@@ -82,6 +82,7 @@ T(3,*)
 #FdOLoanToValue=X,2,L
 
 #FdOMtgCode=X,2,L
+#FdKind=X,2,L
 #FdOMtgCheck=X,2,L
 #FdOMtgLoan=X,2,L
 #FdOMtgPledge=X,2,L
@@ -397,12 +398,24 @@ T(3,)T(H,#OInsurance,#YNHelp)
 #OSalvageValue=m,14,L
 !抵押權註記
 #OMtgCode=X,1,L
-#OMtgCodeX=X,30,L
+#OMtgCodeX=X,25,L
 T(3,)T(H,#OMtgCode,#MtgCodeHelp)
 !最高限額抵押權之擔保債權種類
 #OMtgCheck=X,1,L
 #OMtgLoan=X,1,L
 #OMtgPledge=X,1,L
+
+#OMtgAllfg=X,1,L
+IF(#OMtgCheck == "Y" && #OMtgLoan == "Y" && #OMtgPledge == "Y",T(3,@OMtgAllfg,V),T(3,@OMtgAllfg, ))
+
+#OMtgCheckfg=X,1,L
+IF(#OMtgCheck == "Y",T(3,@OMtgCheckfg,V),T(3,@OMtgCheckfg,))
+
+#OMtgLoanfg=X,1,L
+IF(#OMtgLoan == "Y",T(3,@OMtgLoanfg,V),T(3,@OMtgLoanfg,))
+
+#OMtgPledgefg=X,1,L
+IF(#OMtgPledge == "Y",T(3,@OMtgPledgefg,V),T(3,@OMtgPledgefg,))
 
 !聯貸案
 #OSynd=X,1,L
@@ -521,7 +534,7 @@ TXFORM=L2912
 <include src="ROM.icf::L2R17.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
-<sub type="PART" name="L2912" layout="cols=3;screen.width=[150,250,150,350];printer.width=[15,30,15,30];order=1">
+<sub type="PART" name="L2912" layout="cols=3;screen.width=[150,260,300,350];printer.width=[15,30,15,30];order=1">
 [
 ["[L2912]                                 動產擔保品資料查詢"],
 ["#FdOClCode1+擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["#FdOGdRid+原擔保品編號",#OGdALL],
@@ -541,12 +554,7 @@ TXFORM=L2912
 ["#FdOInsurance+投保註記",#OInsurance,#OInsuranceX],["#FdOLoanToValue+貸放成數",#OLoanToValue,"%"],
 [#<->#,"#FdOSalvageValue+殘值",#OSalvageValue],
 [#<->#,"@@@@@<font color=red>@抵押"],
-[#<->#,"#FdOMtgCode+抵押權註記",#OMtgCode,#OMtgCodeX],
-[#<->#,"","@@@@@@<font color=red>@最高限額抵押權之擔保債權種類"],
-[#<->#,"#FdOMtgCheck+票據",#OMtgCheck],
-[#<->#,"#FdOMtgLoan+借款",#OMtgLoan],
-[#<->#,"#FdOMtgPledge+保證債務",#OMtgPledge],
-["#FdOSynd+聯貸案",#OSynd,#OSyndX],["#FdOSyndCode+聯貸案類型",#OSyndCode,#OSyndCodeX],
+["#FdOMtgCode+抵押權註記",#OMtgCode,#OMtgCodeX],["#FdKind+最高限額抵押權之擔保債權種類",#OMtgAllfg,"全選",#OMtgCheckfg,"票據",#OMtgLoanfg,"借款",#OMtgPledgefg,"保證債務"],
 ["#FdODispPrice+處分價格",#ODispPrice],["#FdODispDate+處分日期",#ODispDate],
 ["#FdOSettingStatX+設定狀態",#OSettingStatX],["#FdOClStatX+擔保品狀態",#OClStatX],
 ["#FdOSettingAmt+抵押設定金額",#OSettingAmt],["#FdOReceiptNo+收件字號",#OReceiptNo],

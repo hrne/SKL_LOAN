@@ -71,6 +71,13 @@ T(3,CdCode.TranKey)
 T(3,CdCode.YesNo)
 #YesNoHelp=x,1024,S
 
+! DataCode
+#DataCodeHelp=x,114,S
+T(3,42:回報無擔保債權金額資料;43:回報有擔保債權金額資料;61:回報協商剩餘債權金額資料)
+
+! 只可填寫42,43 問題單577
+#DataCodeHelp1=x,114,S
+T(3,42:回報無擔保債權金額資料;43:回報有擔保債權金額資料)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -151,7 +158,15 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 ! 以下變動
 #OOAgreeSend=X,1,S
 #OOAgreeSendData1=X,2,S
+#OOAgreeSendData1_Tmp=X,10,S
+T(H,#OOAgreeSendData1,#DataCodeHelp1)
+#OOAgreeSendData1X=X,15,S
+T(2,#OOAgreeSendData1+ - +#OOAgreeSendData1_Tmp)
 #OOAgreeSendData2=X,2,S
+#OOAgreeSendData2_Tmp=X,10,S
+T(H,#OOAgreeSendData2,#DataCodeHelp)
+#OOAgreeSendData2X=X,15,S
+T(2,#OOAgreeSendData2+ - +#OOAgreeSendData2_Tmp)
 ! 以下固定
 #OOLastUpdate=X,30,S
 #OOLastUpdateEmpNo=X,6,S
@@ -200,11 +215,11 @@ TXFORM=L8044
 {width:100,align:'center'}
 !L8314(53)
 #OOAgreeSend=是否同意報送例外處理檔案格式
-{width:100,align:'center'}
-#OOAgreeSendData1=同意補報送檔案格式資料別1
-{width:100,align:'center'}
-#OOAgreeSendData2=同意補報送檔案格式資料別2
-{width:100,align:'center'}
+{width:250,align:'center'}
+#OOAgreeSendData1X=同意補報送檔案格式資料別1
+{width:250,align:'left'}
+#OOAgreeSendData2X=同意補報送檔案格式資料別2
+{width:250,align:'left'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}
 #OOLastUpdate=最後更新日期時間

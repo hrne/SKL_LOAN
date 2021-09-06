@@ -76,7 +76,6 @@ T(3,CdCode.YesNo)
 T(3,CdCode.ApplyType)
 #ApplyTypeHelp=x,1024,S
 
-
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
@@ -159,13 +158,44 @@ T(2,#OOTranKey+ - +#OOTranKey_Tmp)
 #OOStartDate=D,7,S
 #OORemindDate=D,7,S
 #OOApplyType=X,1,S
+#OOApplyType_Tmp=X,10,S
+T(H,#OOApplyType,#ApplyTypeHelp)
+#OOApplyTypeX=X,15,S
+T(2,#OOApplyType+ - +#OOApplyType_Tmp)
 #OOReportYn=X,1,S
+
+
 #OONotBankId1=x,3,S
+#OONotBankId1X=X,50,S
+#OOBankId_Combine1=X,60,S
+T(2,#OONotBankId1+ +#OONotBankId1X)
+
 #OONotBankId2=x,3,S
+#OONotBankId2X=X,50,S
+#OOBankId_Combine2=X,60,S
+T(2,#OONotBankId2+ +#OONotBankId2X)
+
 #OONotBankId3=x,3,S
+#OONotBankId3X=X,50,S
+#OOBankId_Combine3=X,60,S
+T(2,#OONotBankId3+ +#OONotBankId3X)
+
 #OONotBankId4=x,3,S
+#OONotBankId4X=X,50,S
+#OOBankId_Combine4=X,60,S
+T(2,#OONotBankId4+ +#OONotBankId4X)
+
 #OONotBankId5=x,3,S
+#OONotBankId5X=X,50,S
+#OOBankId_Combine5=X,60,S
+T(2,#OONotBankId5+ +#OONotBankId5X)
+
 #OONotBankId6=x,3,S
+#OONotBankId6X=X,50,S
+#OOBankId_Combine6=X,60,S
+T(2,#OONotBankId6+ +#OONotBankId6X)
+
+
 ! 以下固定
 #OOLastUpdate=X,30,S
 #OOLastUpdateEmpNo=X,6,S
@@ -191,11 +221,17 @@ TXFORM=L8052
 #OOApplyType
 #OOReportYn
 #OONotBankId1
+#OONotBankId1X
 #OONotBankId2
+#OONotBankId2X
 #OONotBankId3
+#OONotBankId3X
 #OONotBankId4
+#OONotBankId4X
 #OONotBankId5
+#OONotBankId5X
 #OONotBankId6
+#OONotBankId6X
 #OOOutJcicTxtDate
 #OOLastUpdate
 #OOLastUpdateEmpNo
@@ -226,21 +262,21 @@ TXFORM=L8052
 {width:110,align:'center'}
 #OORemindDate=債權計算基準日
 {width:120,align:'center'}
-#OOApplyType=受理方式
+#OOApplyTypeX=受理方式
 {width:100,align:'center'}
 #OOReportYn=協辦行是否需自行回報債權
 {width:195,align:'center'}
-#OONotBankId1=未揭露債權機構代號1
+#OOBankId_Combine1=未揭露債權機構代號1
 {width:160,align:'left'}
-#OONotBankId2=未揭露債權機構代號2
+#OOBankId_Combine2=未揭露債權機構代號2
 {width:160,align:'left'}
-#OONotBankId3=未揭露債權機構代號3
+#OOBankId_Combine3=未揭露債權機構代號3
 {width:160,align:'left'}
-#OONotBankId4=未揭露債權機構代號4
+#OOBankId_Combine4=未揭露債權機構代號4
 {width:160,align:'left'}
-#OONotBankId5=未揭露債權機構代號5
+#OOBankId_Combine5=未揭露債權機構代號5
 {width:160,align:'left'}
-#OONotBankId6=未揭露債權機構代號6
+#OOBankId_Combine6=未揭露債權機構代號6
 {width:160,align:'left'}
 #OOOutJcicTxtDate=資料轉出日期
 {width:200,align:'center'}

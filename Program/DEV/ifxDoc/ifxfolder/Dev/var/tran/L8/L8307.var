@@ -222,7 +222,7 @@ D(8)
 
 
 !結案原因代號
-#CloseCode=X,2,I
+#CloseCode=A,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CloseCode,#L8r17CloseCode),$)
@@ -243,6 +243,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@BreakCode,#L8r17BreakCode),$)
 C(5,#TranKey,D,s,$)
+IF(#CloseCode=="00",$,S)
 HELP(#BreakCodeHelp,cols:3)
 @V(H,#BreakCodeHelp)
 

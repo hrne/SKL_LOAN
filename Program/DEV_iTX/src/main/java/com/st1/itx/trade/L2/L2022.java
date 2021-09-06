@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -15,44 +13,44 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
-import com.st1.itx.db.service.FacMainService;
-import com.st1.itx.db.domain.FacShareAppl;
-import com.st1.itx.db.service.FacShareApplService;
-import com.st1.itx.db.domain.Guarantor;
-import com.st1.itx.db.service.GuarantorService;
-import com.st1.itx.db.domain.ClFac;
-import com.st1.itx.db.service.ClFacService;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdGuarantor;
 import com.st1.itx.db.domain.ClBuildingOwner;
-import com.st1.itx.db.service.ClBuildingOwnerService;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClLandOwner;
-import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.domain.ClMovables;
 import com.st1.itx.db.domain.ClMovablesId;
-import com.st1.itx.db.service.ClMovablesService;
-import com.st1.itx.db.domain.ClStock;
-import com.st1.itx.db.domain.ClStockId;
-import com.st1.itx.db.service.ClStockService;
 import com.st1.itx.db.domain.ClOther;
 import com.st1.itx.db.domain.ClOtherId;
-import com.st1.itx.db.service.ClOtherService;
 import com.st1.itx.db.domain.ClOwnerRelation;
 import com.st1.itx.db.domain.ClOwnerRelationId;
-import com.st1.itx.db.service.ClOwnerRelationService;
+import com.st1.itx.db.domain.ClStock;
+import com.st1.itx.db.domain.ClStockId;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacRelation;
-import com.st1.itx.db.service.FacRelationService;
+import com.st1.itx.db.domain.FacShareAppl;
 import com.st1.itx.db.domain.FacShareRelation;
 import com.st1.itx.db.domain.FacShareRelationId;
-import com.st1.itx.db.service.FacShareRelationService;
-import com.st1.itx.db.domain.CdGuarantor;
-import com.st1.itx.db.service.CdGuarantorService;
-import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.Guarantor;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdGuarantorService;
+import com.st1.itx.db.service.ClBuildingOwnerService;
+import com.st1.itx.db.service.ClFacService;
+import com.st1.itx.db.service.ClLandOwnerService;
+import com.st1.itx.db.service.ClMovablesService;
+import com.st1.itx.db.service.ClOtherService;
+import com.st1.itx.db.service.ClOwnerRelationService;
+import com.st1.itx.db.service.ClStockService;
+import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.FacRelationService;
+import com.st1.itx.db.service.FacShareApplService;
+import com.st1.itx.db.service.FacShareRelationService;
+import com.st1.itx.db.service.GuarantorService;
+import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 @Service("L2022")
 @Scope("prototype")
@@ -63,7 +61,6 @@ import com.st1.itx.db.service.CdCodeService;
  * @version 1.0.0
  */
 public class L2022 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2022.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -207,7 +204,7 @@ public class L2022 extends TradeBuffer {
 	}
 
 	private void findAllCdGuarantor() {
-		Slice<CdGuarantor> slCdGuarantor = slCdGuarantor = sCdGuarantorService.findAll(0, Integer.MAX_VALUE);
+		Slice<CdGuarantor> slCdGuarantor  = sCdGuarantorService.findAll(0, Integer.MAX_VALUE);
 		List<CdGuarantor> lCdGuarantor = slCdGuarantor == null ? null : slCdGuarantor.getContent();
 
 		if (lCdGuarantor != null && lCdGuarantor.size() > 0) {
@@ -218,7 +215,7 @@ public class L2022 extends TradeBuffer {
 	}
 
 	private void findAllCdCode() {
-		Slice<CdCode> slCdCode = slCdCode = sCdCodeService.defCodeEq("FacRelationCode", "%", 0, Integer.MAX_VALUE);
+		Slice<CdCode> slCdCode =  sCdCodeService.defCodeEq("FacRelationCode", "%", 0, Integer.MAX_VALUE);
 		List<CdCode> lCdCode = slCdCode == null ? null : slCdCode.getContent();
 
 		if (lCdCode != null && lCdCode.size() > 0) {
@@ -246,9 +243,8 @@ public class L2022 extends TradeBuffer {
 		mainCustNo = tCustMain.getCustNo();
 		mainCustName = tCustMain.getCustName();
 
-		if (tCustMain == null) {
-			return;
-		} else {
+		if (tCustMain != null) {
+			
 			if (tCustMain.getCustId().trim().length() > 8) {
 				mainRel = "授信戶本人";
 			} else {
@@ -368,7 +364,6 @@ public class L2022 extends TradeBuffer {
 
 		if (lClFac != null && lClFac.size() > 0) {
 			for (ClFac tClFac : lClFac) {
-				OccursList occursList = new OccursList();
 
 				int iClCode1 = tClFac.getClCode1();
 				int iClCode2 = tClFac.getClCode2();

@@ -34,9 +34,34 @@ public class LM013Report extends MakeReport {
 	private String reportKind = "";
 	
 	private enum DataType {
-		None,
-		Peko,
-		Miko
+		None(null),
+		Sum("Sum"),
+		Total("Total");
+		
+		private String keyword;
+		
+		DataType(String keyword)
+		{
+			this.keyword = keyword;
+		}
+		
+		public String getKeyword()
+		{
+			return this.keyword;
+		}
+		
+		public static DataType getType(String s)
+		{
+			for (int i = 0; i < DataType.values().length; i++)
+			{
+				if (s.contains(DataType.values()[i].keyword))
+				{
+					return DataType.values()[i];
+				}
+			}
+			
+			return DataType.None;
+		}
 	}
 	
 	private class DataList {
@@ -208,24 +233,24 @@ public class LM013Report extends MakeReport {
 					
 					// 處理: 判斷是否換了一類, 需要畫線? 需要換行?
 					
-					thisDataType = tLDVo.get("F4").contains("Miko") ? DataType.Miko : (tLDVo.get("F4").contains("Peko") ? DataType.Peko : DataType.None);
+					thisDataType = DataType.getType(tLDVo.get("F4"));
 					
 					if (lastTLDVo != null)
 					{
-						lastDataType = lastTLDVo.get("F4").contains("Miko") ? DataType.Miko : (lastTLDVo.get("F4").contains("Peko") ? DataType.Peko : DataType.None);
+						lastDataType = DataType.getType(tLDVo.get("F4"));
 												
 						// 情況1A  : 兩種資料類型不同，前一筆是正常資料        - 出上一戶最後的合計（顯示名字）, 然後畫線換行
-						// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Peko) - 畫線換行
+						// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum) - 畫線換行
 						
 						// 情況2A  : 兩種資料類型一樣, 正常資料, 同戶號   - 換行
 						// 情況2B  : 兩種資料類型一樣, 正常資料, 不同戶號 - 出上一戶/筆最後的合計（顯示名字）, 然後畫線換行
-						// 情況2C  : 兩種資料類型一樣，合計資料 (Peko)    - 換行
-						// 情況2D  : 兩種資料類型一樣，總計資料 (Miko)    - 無處理
+						// 情況2C  : 兩種資料類型一樣，合計資料 (Sum)    - 換行
+						// 情況2D  : 兩種資料類型一樣，總計資料 (Total)    - 無處理
 						
 						if ( lastDataType != thisDataType )
 						{
 							// 情況1A  : 兩種資料類型不同，前一筆是正常資料        - 出上一戶最後的合計（顯示名字）, 然後畫線換行
-							// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Peko) - 畫線換行
+							// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum) - 畫線換行
 							
 							if (lastDataType == DataType.None)
 							{
@@ -281,9 +306,9 @@ public class LM013Report extends MakeReport {
 							// 情況2A  : 兩種資料類型一樣, 正常資料, 同戶號   - 換行
 							
 							this.print(1, 0, " ");
-						} else if (thisDataType == DataType.Peko)
+						} else if (thisDataType == DataType.Sum)
 						{
-							// 情況2C  : 兩種資料類型一樣，合計資料 (Peko)    - 換行
+							// 情況2C  : 兩種資料類型一樣，合計資料 (Sum)    - 換行
 							this.print(1, 0, " ");
 						}
 					}
@@ -301,7 +326,7 @@ public class LM013Report extends MakeReport {
 						this.print(0, 15, tLDVo.get("F4"), "L"); // 身分證	
 					} else
 					{
-						this.print(0, 15, tLDVo.get("F5"), "L"); // 姓名 - Peko與Miko類資料的此欄為"以上合計/以下合計/總計"
+						this.print(0, 15, tLDVo.get("F5"), "L"); // 姓名 - Sum與Total類資料的此欄為"以上合計/以下合計/總計"
 					}
 					
 					// 計算合計用

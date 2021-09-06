@@ -8,14 +8,15 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.JcicZ440;
 import com.st1.itx.db.domain.JcicZ440Log;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.JcicZ440LogService;
 import com.st1.itx.db.service.JcicZ440Service;
@@ -30,6 +31,8 @@ public class L8052 extends TradeBuffer  {
 		public JcicZ440Service iJcicZ440Service;
 		@Autowired
 		public JcicZ440LogService iJcicZ440LogService;
+		@Autowired
+		public CdCodeService iCdCodeService;
 		@Override
 		public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 			this.info("active L8052 ");
@@ -57,11 +60,17 @@ public class L8052 extends TradeBuffer  {
 				occursListA.putParam("OOApplyType", rJcicZ440.getApplyType());
 				occursListA.putParam("OOReportYn", rJcicZ440.getReportYn());
 				occursListA.putParam("OONotBankId1", rJcicZ440.getNotBankId1());
+				occursListA.putParam("OONotBankId1X", dealBankName(rJcicZ440.getNotBankId1(),titaVo));
 				occursListA.putParam("OONotBankId2", rJcicZ440.getNotBankId2());
+				occursListA.putParam("OONotBankId2X", dealBankName(rJcicZ440.getNotBankId2(),titaVo));
 				occursListA.putParam("OONotBankId3", rJcicZ440.getNotBankId3());
+				occursListA.putParam("OONotBankId3X", dealBankName(rJcicZ440.getNotBankId3(),titaVo));
 				occursListA.putParam("OONotBankId4", rJcicZ440.getNotBankId4());
+				occursListA.putParam("OONotBankId4X", dealBankName(rJcicZ440.getNotBankId4(),titaVo));
 				occursListA.putParam("OONotBankId5", rJcicZ440.getNotBankId5());
+				occursListA.putParam("OONotBankId5X", dealBankName(rJcicZ440.getNotBankId5(),titaVo));
 				occursListA.putParam("OONotBankId6", rJcicZ440.getNotBankId6());			
+				occursListA.putParam("OONotBankId6X", dealBankName(rJcicZ440.getNotBankId6(),titaVo));
 				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
@@ -100,6 +109,12 @@ public class L8052 extends TradeBuffer  {
 				occursList.putParam("OONotBankId4", rrJcicZ440Log.getNotBankId4());
 				occursList.putParam("OONotBankId5", rrJcicZ440Log.getNotBankId5());
 				occursList.putParam("OONotBankId6", rrJcicZ440Log.getNotBankId6());
+				occursList.putParam("OONotBankId1X", dealBankName(rrJcicZ440Log.getNotBankId1(),titaVo));
+				occursList.putParam("OONotBankId2X", dealBankName(rrJcicZ440Log.getNotBankId2(),titaVo));
+				occursList.putParam("OONotBankId3X", dealBankName(rrJcicZ440Log.getNotBankId3(),titaVo));
+				occursList.putParam("OONotBankId4X", dealBankName(rrJcicZ440Log.getNotBankId4(),titaVo));
+				occursList.putParam("OONotBankId5X", dealBankName(rrJcicZ440Log.getNotBankId5(),titaVo));
+				occursList.putParam("OONotBankId6X", dealBankName(rrJcicZ440Log.getNotBankId6(),titaVo));
 				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
@@ -121,6 +136,15 @@ public class L8052 extends TradeBuffer  {
 			}		
 			this.addList(this.totaVo);
 			return this.sendList();
+		}
+		public String dealBankName(String BankId,TitaVo titaVo) throws LogicException {
+			CdCode tCdCode = new CdCode();
+			tCdCode=iCdCodeService.getItemFirst(8, "JcicBankCode", BankId,titaVo);
+			String JcicBankName="";//80碼長度
+			if(tCdCode!=null) {
+				JcicBankName=tCdCode.getItem();
+			}
+			return JcicBankName;
 		}
 }
 	

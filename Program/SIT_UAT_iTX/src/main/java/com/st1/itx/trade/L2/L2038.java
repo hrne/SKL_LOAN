@@ -270,6 +270,9 @@ public class L2038 extends TradeBuffer {
 					      occurslist.putParam("OOOther", "");
 					      occurslist.putParam("OOOther1", "");
 						}
+					} else {
+						occurslist.putParam("OOOther", "");
+						occurslist.putParam("OOOther1", "");
 					}
 					
 					

@@ -12,9 +12,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.JcicZ040;
 import com.st1.itx.db.domain.JcicZ040Log;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.JcicZ040LogService;
 import com.st1.itx.db.service.JcicZ040Service;
@@ -29,6 +31,8 @@ public class L8031 extends TradeBuffer  {
 		public JcicZ040Service iJcicZ040Service;
 		@Autowired
 		public JcicZ040LogService iJcicZ040LogService;
+		@Autowired
+		public CdCodeService iCdCodeService;
 		@Override
 		public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 			this.info("active L8031 ");
@@ -52,12 +56,19 @@ public class L8031 extends TradeBuffer  {
 				occursListA.putParam("OORbDate", rJcicZ040.getRbDate());
 				occursListA.putParam("OOApplyType", rJcicZ040.getApplyType());
 				occursListA.putParam("OORefBankId", rJcicZ040.getRefBankId());
+				occursListA.putParam("OORefBankIdX", dealBankName(rJcicZ040.getRefBankId(),titaVo));
 				occursListA.putParam("OONotBankId1", rJcicZ040.getNotBankId1());
+				occursListA.putParam("OONotBankId1X", dealBankName(rJcicZ040.getNotBankId1(),titaVo));
 				occursListA.putParam("OONotBankId2", rJcicZ040.getNotBankId2());
+				occursListA.putParam("OONotBankId2X", dealBankName(rJcicZ040.getNotBankId2(),titaVo));
 				occursListA.putParam("OONotBankId3", rJcicZ040.getNotBankId3());
+				occursListA.putParam("OONotBankId3X", dealBankName(rJcicZ040.getNotBankId3(),titaVo));
 				occursListA.putParam("OONotBankId4", rJcicZ040.getNotBankId4());
+				occursListA.putParam("OONotBankId4X", dealBankName(rJcicZ040.getNotBankId4(),titaVo));
 				occursListA.putParam("OONotBankId5", rJcicZ040.getNotBankId5());
+				occursListA.putParam("OONotBankId5X", dealBankName(rJcicZ040.getNotBankId5(),titaVo));
 				occursListA.putParam("OONotBankId6", rJcicZ040.getNotBankId6());
+				occursListA.putParam("OONotBankId6X", dealBankName(rJcicZ040.getNotBankId6(),titaVo));
 				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
@@ -88,12 +99,19 @@ public class L8031 extends TradeBuffer  {
 				occursList.putParam("OORbDate", rrJcicZ040Log.getRbDate());
 				occursList.putParam("OOApplyType", rrJcicZ040Log.getApplyType());
 				occursList.putParam("OORefBankId", rrJcicZ040Log.getRefBankId());
+				occursList.putParam("OORefBankIdX", dealBankName(rrJcicZ040Log.getRefBankId(),titaVo));
 				occursList.putParam("OONotBankId1", rrJcicZ040Log.getNotBankId1());
+				occursList.putParam("OONotBankId1X", dealBankName(rrJcicZ040Log.getNotBankId1(),titaVo));
 				occursList.putParam("OONotBankId2", rrJcicZ040Log.getNotBankId2());
+				occursList.putParam("OONotBankId2X", dealBankName(rrJcicZ040Log.getNotBankId2(),titaVo));
 				occursList.putParam("OONotBankId3", rrJcicZ040Log.getNotBankId3());
+				occursList.putParam("OONotBankId3X", dealBankName(rrJcicZ040Log.getNotBankId3(),titaVo));
 				occursList.putParam("OONotBankId4", rrJcicZ040Log.getNotBankId4());
+				occursList.putParam("OONotBankId4X", dealBankName(rrJcicZ040Log.getNotBankId4(),titaVo));
 				occursList.putParam("OONotBankId5", rrJcicZ040Log.getNotBankId5());
+				occursList.putParam("OONotBankId5X", dealBankName(rrJcicZ040Log.getNotBankId5(),titaVo));
 				occursList.putParam("OONotBankId6", rrJcicZ040Log.getNotBankId6());
+				occursList.putParam("OONotBankId6X", dealBankName(rrJcicZ040Log.getNotBankId6(),titaVo));
 				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
@@ -115,6 +133,15 @@ public class L8031 extends TradeBuffer  {
 			}		
 			this.addList(this.totaVo);
 			return this.sendList();
+		}
+		public String dealBankName(String BankId,TitaVo titaVo) throws LogicException {
+			CdCode tCdCode = new CdCode();
+			tCdCode=iCdCodeService.getItemFirst(8, "JcicBankCode", BankId,titaVo);
+			String JcicBankName="";//80碼長度
+			if(tCdCode!=null) {
+				JcicBankName=tCdCode.getItem();
+			}
+			return JcicBankName;
 		}
 }
 	
