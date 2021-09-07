@@ -28,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R31 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R31.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -94,6 +93,7 @@ public class L6R31 extends TradeBuffer {
 		this.totaVo.putParam("L6R31Email", mCdReport.getEmail());
 		this.totaVo.putParam("L6R31SignCode", mCdReport.getSignCode());
 		this.totaVo.putParam("L6R31UsageDesc", mCdReport.getUsageDesc());
+		this.totaVo.putParam("L6R31Watermark", mCdReport.getWatermarkFlag());
 		this.totaVo.putParam("L6R31Enable", mCdReport.getEnable());
 
 	}

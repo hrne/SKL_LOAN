@@ -2,14 +2,11 @@ package com.st1.itx.trade.LP;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.Map;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -25,27 +22,26 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class LP001Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LP001Report.class);
 
 	@Autowired
-	LP001ServiceImpl LP001ServiceImpl;
+	LP001ServiceImpl lP001ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
 
 	@Autowired
 	DateUtil dateUtil;
- 
+
 	@Override
 	public void printHeader() {
- 
+
 		this.info("MakeReport.printHeader");
 
 		this.print(-2, 145, "機密等級：密");
 		this.print(-3, 2, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 80, "新光人壽保險股份有限公司", "C");
 		this.print(-4, 2, "報  表：" + this.getRptCode());
-		this.print(-4, 80, "工作月區域中心業績累計", "C");
+		this.print(-4, 80, "工作月放款審查課各區業績累計", "C");
 		this.print(-3, 145, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
 		this.print(-4, 145, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
 				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
@@ -64,16 +60,24 @@ public class LP001Report extends MakeReport {
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 
-		List<Map<String, String>> fnAllList = new ArrayList<>();
 		try {
-			wkSsnList = LP001ServiceImpl.wkSsn(titaVo);
-			if (wkSsnList.size() > 0) {
-				fnAllList = LP001ServiceImpl.findAll(titaVo, wkSsnList.get(0));
+			wkSsnList = lP001ServiceImpl.wkSsn(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("LP001ServiceImpl.wkSsn error = " + errors.toString());
+		}
+
+		List<Map<String, String>> fnAllList = new ArrayList<>();
+
+		try {
+			if (wkSsnList != null && !wkSsnList.isEmpty()) {
+				fnAllList = lP001ServiceImpl.findAll(titaVo, wkSsnList.get(0));
 			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LP001ServiceImpl.WorkSeason error = " + errors.toString());
+			this.error("LP001ServiceImpl.findAll error = " + errors.toString());
 		}
 
 		exportExcel(titaVo, wkSsnList.get(0), fnAllList);
@@ -82,11 +86,20 @@ public class LP001Report extends MakeReport {
 
 	}
 
+	private int reportDate = 0;
+	private String brno = "";
+	private String reportCode = "LP001";
+	private String reportItem = "工作月放款審查課各區業績累計";
+	private String security = "密";
+	private String pageSize = "A4";
+	private String pageOrientation = "L";
+
 	private void exportReport(TitaVo titaVo, Map<String, String> wkVo, List<Map<String, String>> fnAllList)
 			throws LogicException {
 		this.info("===========in PDF");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP001", "工作月區域中心業績累計", "密", "A4", "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem, security, pageSize,
+				pageOrientation);
 
 		this.setCharSpaces(0);
 
@@ -103,9 +116,9 @@ public class LP001Report extends MakeReport {
 		}
 
 		// 民國年
-		String ROCYear = String.valueOf(iYEAR - 1911);
+		String rocYear = String.valueOf(iYEAR - 1911);
 		// 民國年月
-//		String yymm = ROCYear + String.format("%02d", iMM);
+//		String yymm = rocYear + String.format("%02d", iMM);
 		// 月份
 		String mm = String.valueOf(iMM);
 
@@ -124,22 +137,22 @@ public class LP001Report extends MakeReport {
 		String southMan = "";
 
 		// 北區件數
-		double northCnt[] = new double[13];
+		double[] northCnt = new double[13];
 		// 中區件數
-		double centralCnt[] = new double[13];
+		double[] centralCnt = new double[13];
 		// 南區件數
-		double southCnt[] = new double[13];
+		double[] southCnt = new double[13];
 		// 全區件數
-		double totalCnt[] = new double[13];
+		double[] totalCnt = new double[13];
 
 		// 北區金額
-		int northAmt[] = new int[13];
+		int[] northAmt = new int[13];
 		// 中區金額
-		int centralAmt[] = new int[13];
+		int[] centralAmt = new int[13];
 		// 南區金額
-		int southAmt[] = new int[13];
+		int[] southAmt = new int[13];
 		// 全區金額
-		int totalAmt[] = new int[13];
+		int[] totalAmt = new int[13];
 
 		// 工作月位置
 		int position = 0;
@@ -174,11 +187,11 @@ public class LP001Report extends MakeReport {
 			case "10HC00":
 				if (cn == 0) {
 					row = -14;
-					this.print(row, deVal, "北部", "C");
-					this.print(row, maVal, northMan == "" ? tLDVo.get("F0") : northMan, "C");
+					this.print(row, deVal, "北區", "C");
+					this.print(row, maVal, northMan.isEmpty() ? tLDVo.get("F0") : northMan, "C");
 					row = -34;
-					this.print(row, deVal, "北部", "C");
-					this.print(row, maVal, northMan == "" ? tLDVo.get("F0") : northMan, "C");
+					this.print(row, deVal, "北區", "C");
+					this.print(row, maVal, northMan.isEmpty() ? tLDVo.get("F0") : northMan, "C");
 					cn++;
 				}
 
@@ -190,11 +203,11 @@ public class LP001Report extends MakeReport {
 			case "10HJ00":
 				if (cc == 0) {
 					row = -18;
-					this.print(row, deVal, "中部", "C");
-					this.print(row, maVal, centralMan == "" ? tLDVo.get("F0") : centralMan, "C");
+					this.print(row, deVal, "中區", "C");
+					this.print(row, maVal, centralMan.isEmpty() ? tLDVo.get("F0") : centralMan, "C");
 					row = -38;
-					this.print(row, deVal, "中部", "C");
-					this.print(row, maVal, centralMan == "" ? tLDVo.get("F0") : centralMan, "C");
+					this.print(row, deVal, "中區", "C");
+					this.print(row, maVal, centralMan.isEmpty() ? tLDVo.get("F0") : centralMan, "C");
 					cc++;
 				}
 
@@ -206,11 +219,11 @@ public class LP001Report extends MakeReport {
 			case "10HL00":
 				if (cs == 0) {
 					row = -22;
-					this.print(row, deVal, "南部", "C");
-					this.print(row, maVal, southMan == "" ? tLDVo.get("F0") : southMan, "C");
+					this.print(row, deVal, "南區", "C");
+					this.print(row, maVal, southMan.isEmpty() ? tLDVo.get("F0") : southMan, "C");
 					row = -42;
-					this.print(row, deVal, "南部", "C");
-					this.print(row, maVal, southMan == "" ? tLDVo.get("F0") : southMan, "C");
+					this.print(row, deVal, "南區", "C");
+					this.print(row, maVal, southMan.isEmpty() ? tLDVo.get("F0") : southMan, "C");
 					cs++;
 				}
 
@@ -218,6 +231,8 @@ public class LP001Report extends MakeReport {
 				southCnt[position] += Double.parseDouble(tLDVo.get("F2"));
 				southAmt[position] += Integer.parseInt(tLDVo.get("F3"));
 
+				break;
+			default:
 				break;
 			}
 
@@ -228,8 +243,8 @@ public class LP001Report extends MakeReport {
 		}
 
 		this.print(1, 1, "");
-		//放款區域中心業績累計明細表--> 放款審查課各區業績累計明細表
-		this.print(-7, 2, ROCYear + "年" + title + "工作月 放款審查課各區業績累計明細表");
+		// 放款區域中心業績累計明細表--> 放款審查課各區業績累計明細表
+		this.print(-7, 2, rocYear + "年" + title + "工作月 放款審查課各區業績累計");
 		// 工作月 起始列
 		int t1 = -9;
 		// 區域 經理 起始列
@@ -337,7 +352,7 @@ public class LP001Report extends MakeReport {
 		}
 
 		long snoPdf = this.close();
-		this.toPdf(snoPdf);
+		this.toPdf(snoPdf, reportCode + "_" + reportItem);
 	}
 
 	/**
@@ -382,7 +397,8 @@ public class LP001Report extends MakeReport {
 
 			// 間距
 			int columnInterval = 110;
-			this.drawLine(x2 + columnInterval * (x - 1), 370 + startColumn, x2 + columnInterval * (x - 1), 565 + startColumn); // y4
+			this.drawLine(x2 + columnInterval * (x - 1), 370 + startColumn, x2 + columnInterval * (x - 1),
+					565 + startColumn); // y4
 
 			this.drawLine(x3 + columnInterval * x, 345 + startColumn, x3 + columnInterval * x, 565 + startColumn); // y5
 		}
@@ -394,8 +410,8 @@ public class LP001Report extends MakeReport {
 
 		this.info("===========in Excel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP001", "工作月區域中心業績累計", "LP001工作月區域中心業績累計",
-				"區域中心業績累計.xls", "10805");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), reportCode, reportItem,
+				reportCode + "_" + reportItem, "LP001_底稿_區域中心業績累計.xlsx", "10805");
 
 		int iYEAR = 0;
 		int iMM = 0;
@@ -410,9 +426,9 @@ public class LP001Report extends MakeReport {
 		}
 
 		// 民國年
-		String ROCYear = String.valueOf(iYEAR - 1911);
+		String rocYear = String.valueOf(iYEAR - 1911);
 		// 民國年月
-		String yymm = ROCYear + String.format("%02d", iMM);
+		String yymm = rocYear + String.format("%02d", iMM);
 		// 月份
 		String mm = String.valueOf(iMM);
 
@@ -421,7 +437,7 @@ public class LP001Report extends MakeReport {
 		// 標題
 		String title = "第1~" + mm;
 
-		makeExcel.setValue(1, 1, ROCYear + "年" + title + "工作月 放款區域中心業績累計明細表");
+		makeExcel.setValue(1, 1, rocYear + "年" + title + "工作月 放款審查課各區業績累計表");
 
 		makeExcel.setValue(10, 15, title + "工作月累計");
 
@@ -433,22 +449,22 @@ public class LP001Report extends MakeReport {
 		String southMan = "";
 
 		// 北區件數
-		double northCnt[] = new double[13];
+		double[] northCnt = new double[13];
 		// 中區件數
-		double centralCnt[] = new double[13];
+		double[] centralCnt = new double[13];
 		// 南區件數
-		double southCnt[] = new double[13];
+		double[] southCnt = new double[13];
 		// 全區件數
-		double totalCnt[] = new double[13];
+		double[] totalCnt = new double[13];
 
 		// 北區金額
-		int northAmt[] = new int[13];
+		int[] northAmt = new int[13];
 		// 中區金額
-		int centralAmt[] = new int[13];
+		int[] centralAmt = new int[13];
 		// 南區金額
-		int southAmt[] = new int[13];
+		int[] southAmt = new int[13];
 		// 全區金額
-		int totalAmt[] = new int[13];
+		int[] totalAmt = new int[13];
 
 		// 工作月位置
 		int position = 0;
@@ -474,10 +490,8 @@ public class LP001Report extends MakeReport {
 				case "10HC00":
 					if (cn == 0) {
 
-						makeExcel.setValue(5, 1, "北部", "C");
-						makeExcel.setValue(5, 2, northMan == "" ? tLDVo.get("F0") : northMan, "C");
-						makeExcel.setValue(13, 1, "北部", "C");
-						makeExcel.setValue(13, 2, northMan == "" ? tLDVo.get("F0") : northMan, "C");
+						makeExcel.setValue(5, 2, northMan.isEmpty() ? tLDVo.get("F0") : northMan, "C");
+						makeExcel.setValue(13, 2, northMan.isEmpty() ? tLDVo.get("F0") : northMan, "C");
 						cn++;
 					}
 
@@ -488,10 +502,8 @@ public class LP001Report extends MakeReport {
 					break;
 				case "10HJ00":
 					if (cc == 0) {
-						makeExcel.setValue(6, 1, "中部", "C");
-						makeExcel.setValue(6, 2, centralMan == "" ? tLDVo.get("F0") : centralMan, "C");
-						makeExcel.setValue(14, 1, "中部", "C");
-						makeExcel.setValue(14, 2, centralMan == "" ? tLDVo.get("F0") : centralMan, "C");
+						makeExcel.setValue(6, 2, centralMan.isEmpty() ? tLDVo.get("F0") : centralMan, "C");
+						makeExcel.setValue(14, 2, centralMan.isEmpty() ? tLDVo.get("F0") : centralMan, "C");
 						cc++;
 					}
 
@@ -503,10 +515,8 @@ public class LP001Report extends MakeReport {
 				case "10HL00":
 
 					if (cs == 0) {
-						makeExcel.setValue(7, 1, "南部", "C");
-						makeExcel.setValue(7, 2, southMan == "" ? tLDVo.get("F0") : southMan, "C");
-						makeExcel.setValue(15, 1, "南部", "C");
-						makeExcel.setValue(15, 2, southMan == "" ? tLDVo.get("F0") : southMan, "C");
+						makeExcel.setValue(7, 2, southMan.isEmpty() ? tLDVo.get("F0") : southMan, "C");
+						makeExcel.setValue(15, 2, southMan.isEmpty() ? tLDVo.get("F0") : southMan, "C");
 						cs++;
 					}
 
@@ -514,6 +524,8 @@ public class LP001Report extends MakeReport {
 					southCnt[position] += Double.parseDouble(tLDVo.get("F2"));
 					southAmt[position] += Integer.parseInt(tLDVo.get("F3"));
 
+					break;
+				default:
 					break;
 				}
 				totalCnt[position] += Double.parseDouble(tLDVo.get("F2"));
@@ -526,37 +538,37 @@ public class LP001Report extends MakeReport {
 				int col = j < 7 ? startCol + (j * 2) : startCol + ((j - 7) * 2);
 				int addRow = j < 7 ? 0 : 8;
 				// 北區 X工作月 總計 件數及金額
-				makeExcel.setValue(5 + addRow, col, new BigDecimal(northCnt[j]), "#,##0.0", "R");
-				makeExcel.setValue(5 + addRow, col + 1, new BigDecimal(northAmt[j]), "#,##0", "R");
+				makeExcel.setValue(5 + addRow, col, getBigDecimal(northCnt[j]), "#,##0.0", "R");
+				makeExcel.setValue(5 + addRow, col + 1, getBigDecimal(northAmt[j]), "#,##0", "R");
 
 				// 中區 X工作月 總計 件數及金額
-				makeExcel.setValue(6 + addRow, col, new BigDecimal(centralCnt[j]), "#,##0.0", "R");
-				makeExcel.setValue(6 + addRow, col + 1, new BigDecimal(centralAmt[j]), "#,##0", "R");
+				makeExcel.setValue(6 + addRow, col, getBigDecimal(centralCnt[j]), "#,##0.0", "R");
+				makeExcel.setValue(6 + addRow, col + 1, getBigDecimal(centralAmt[j]), "#,##0", "R");
 
 				// 南區 X工作月 總計 件數及金額
-				makeExcel.setValue(7 + addRow, col, new BigDecimal(southCnt[j]), "#,##0.0", "R");
-				makeExcel.setValue(7 + addRow, col + 1, new BigDecimal(southAmt[j]), "#,##0", "R");
+				makeExcel.setValue(7 + addRow, col, getBigDecimal(southCnt[j]), "#,##0.0", "R");
+				makeExcel.setValue(7 + addRow, col + 1, getBigDecimal(southAmt[j]), "#,##0", "R");
 
 				// 全區 X工作月 總計 件數及金額
-				makeExcel.setValue(8 + addRow, col, new BigDecimal(totalCnt[j]), "#,##0.0", "R");
-				makeExcel.setValue(8 + addRow, col + 1, new BigDecimal(totalAmt[j]), "#,##0", "R");
+				makeExcel.setValue(8 + addRow, col, getBigDecimal(totalCnt[j]), "#,##0.0", "R");
+				makeExcel.setValue(8 + addRow, col + 1, getBigDecimal(totalAmt[j]), "#,##0", "R");
 
 			}
 			// 北區 全工作月 總計 件數及金額
-			makeExcel.setValue(13, 15, new BigDecimal(sum(northCnt)), "#,##0.0", "R");
-			makeExcel.setValue(13, 16, new BigDecimal(sum(northAmt)), "#,##0", "R");
+			makeExcel.setValue(13, 15, getBigDecimal(sum(northCnt)), "#,##0.0", "R");
+			makeExcel.setValue(13, 16, getBigDecimal(sum(northAmt)), "#,##0", "R");
 
 			// 中區 全工作月 總計 件數及金額
-			makeExcel.setValue(14, 15, new BigDecimal(sum(centralCnt)), "#,##0.0", "R");
-			makeExcel.setValue(14, 16, new BigDecimal(sum(centralAmt)), "#,##0", "R");
+			makeExcel.setValue(14, 15, getBigDecimal(sum(centralCnt)), "#,##0.0", "R");
+			makeExcel.setValue(14, 16, getBigDecimal(sum(centralAmt)), "#,##0", "R");
 
 			// 南區 全工作月 總計 件數及金額
-			makeExcel.setValue(15, 15, new BigDecimal(sum(southCnt)), "#,##0.0", "R");
-			makeExcel.setValue(15, 16, new BigDecimal(sum(southAmt)), "#,##0", "R");
+			makeExcel.setValue(15, 15, getBigDecimal(sum(southCnt)), "#,##0.0", "R");
+			makeExcel.setValue(15, 16, getBigDecimal(sum(southAmt)), "#,##0", "R");
 
 			// 全區 全工作月 總計 件數及金額
-			makeExcel.setValue(16, 15, new BigDecimal(sum(totalCnt)), "#,##0.0", "R");
-			makeExcel.setValue(16, 16, new BigDecimal(sum(totalAmt)), "#,##0", "R");
+			makeExcel.setValue(16, 15, getBigDecimal(sum(totalCnt)), "#,##0.0", "R");
+			makeExcel.setValue(16, 16, getBigDecimal(sum(totalAmt)), "#,##0", "R");
 
 		} else {
 			makeExcel.setValue(5, 3, "本日無資料");
@@ -569,6 +581,7 @@ public class LP001Report extends MakeReport {
 	 * 合計
 	 * 
 	 * @param num 陣列(浮點數)
+	 * @return double
 	 */
 	public double sum(double[] num) {
 		if (num == null || num.length == 0) {
@@ -585,6 +598,7 @@ public class LP001Report extends MakeReport {
 	 * 合計
 	 * 
 	 * @param num 陣列(數值)
+	 * @return int
 	 */
 	public int sum(int[] num) {
 		if (num == null || num.length == 0) {

@@ -12,34 +12,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
 
-//@Service("LM023")
-//@Scope("prototype")
-///**
-// * 
-// * 
-// * @author Eric Chang
-// * @version 1.0.0
-// */
-//public class LM023 extends TradeBuffer {
-//	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LM023.class);
-//
-//	@Autowired
-//	public LM023Report lm023report;
-// 
-//	@Override
-//	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-//		this.info("active LM023 ");
-//		this.totaVo.init(titaVo);
-//
-//		lm023report.exec(titaVo);
-//
-//		this.addList(this.totaVo);
-//		return this.sendList();
-//	}
-//
-//}
- 
 @Service("LM023")
 @Scope("step")
 /**
@@ -51,23 +23,21 @@ import com.st1.itx.tradeService.BatchBase;
 public class LM023 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
-	public LM023Report lm023report;
+	public LM023Report lM023report;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		;
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM023.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM023 ");
-		lm023report.exec(titaVo);
+		lM023report.exec(titaVo);
 	}
 
 }

@@ -26,6 +26,8 @@ import com.st1.itx.db.domain.ClBuildingOwnerId;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
+import com.st1.itx.db.domain.ClImmRankDetail;
+import com.st1.itx.db.domain.ClImmRankDetailId;
 import com.st1.itx.db.domain.ClLand;
 import com.st1.itx.db.domain.ClLandId;
 import com.st1.itx.db.domain.ClLandOwner;
@@ -42,6 +44,7 @@ import com.st1.itx.db.service.CdClService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClFacService;
+import com.st1.itx.db.service.ClImmRankDetailService;
 import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandService;
@@ -74,6 +77,8 @@ public class L2411 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClImmService sClImmService;
+	@Autowired
+	public ClImmRankDetailService sClImmRankDetailService;
 	@Autowired
 	public ClMainService sClMainService;
 	@Autowired
@@ -126,13 +131,17 @@ public class L2411 extends TradeBuffer {
 	private int iClNo;
 	// 核准號碼
 	private int iApplNo;
+	// 設定順位
+	private String iSettingSeq;
 	// 宣告
 
 	private String finalClNo;
 	private ClMainId ClMainId = new ClMainId();
 	private ClImmId ClImmId = new ClImmId();
+	private ClImmRankDetailId ClImmRankDetailId = new ClImmRankDetailId();
 	private ClMain tClMain = new ClMain();
 	private ClImm tClImm = new ClImm();
+	private ClImmRankDetail tClImmRankDetail = new ClImmRankDetail();
 	private ClBuilding tClBuilding = new ClBuilding();
 	private ClBuildingId clBuildingId = new ClBuildingId();
 	private ClBuildingOwner tClBuildingOwner = new ClBuildingOwner();
@@ -143,6 +152,7 @@ public class L2411 extends TradeBuffer {
 	private ClLandOwner tClLandOwner = new ClLandOwner();
 	private List<ClLandOwner> lClLandOwner = new ArrayList<ClLandOwner>();
 	private List<ClBuildingOwner> lClBuildingOwner = new ArrayList<ClBuildingOwner>();
+	private List<ClImmRankDetail> lClImmRankDetail = new ArrayList<ClImmRankDetail>();
 	private String bdLocation;
 	private boolean isEloan = false;
 	private FacMain tFacMain;
@@ -176,6 +186,8 @@ public class L2411 extends TradeBuffer {
 		iClNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		// 宣告
 		finalClNo = StringUtils.leftPad(String.valueOf(iClNo), 7, "0");
+		// 設定順位
+		iSettingSeq = titaVo.getParam("SettingSeq");
 		// isEloan
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
 			this.isEloan = true;
@@ -237,7 +249,7 @@ public class L2411 extends TradeBuffer {
 		ClImmId.setClCode1(iClCode1);
 		ClImmId.setClCode2(iClCode2);
 		ClImmId.setClNo(iClNo);
-
+		
 		clBuildingId.setClCode1(iClCode1);
 		clBuildingId.setClCode2(iClCode2);
 		clBuildingId.setClNo(iClNo);
@@ -277,6 +289,11 @@ public class L2411 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0005", "擔保品不動產檔" + e.getErrorMsg());
 				}
+				
+				// 擔保品不動產檔設定順位明細
+				setClImmRankDetail(titaVo);
+				
+				
 				// 房地擔保品
 				if (iClCode1 == 1) {
 					// 擔保品不動產建物檔主檔
@@ -327,49 +344,7 @@ public class L2411 extends TradeBuffer {
 				  clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
 				
 				} // if
-//				// 依核准號碼建立一筆額度與擔保品關聯檔
-//				if (iApplNo > 0) { // 核准編號大於0才去做
-//
-//					ClFacId clFacId = new ClFacId();
-//					clFacId.setClCode1(iClCode1);
-//					clFacId.setClCode2(iClCode2);
-//					clFacId.setClNo(iClNo);
-//					clFacId.setApproveNo(iApplNo);
-//					ClFac tClFac = sClFacService.findById(clFacId, titaVo);
-//					
-//					// 新增資料重複
-//					if (tClFac != null) {
-//						throw new LogicException("E0005", "額度與擔保品關聯檔"); // 新增資料時，發生錯誤
-//					} else {
-//						tClFac = new ClFac();
-//						clFacId = new ClFacId();
-//						clFacId.setClCode1(iClCode1);
-//						clFacId.setClCode2(iClCode2);
-//						clFacId.setClNo(iClNo);
-//						clFacId.setApproveNo(iApplNo);
-//						tClFac.setApproveNo(iApplNo);
-//						tClFac.setClCode1(iClCode1);
-//						tClFac.setClCode2(iClCode2);
-//						tClFac.setClNo(iClNo);
-//						tClFac.setClFacId(clFacId);
-//						tClFac.setCustNo(tFacMain.getCustNo());
-//						tClFac.setFacmNo(tFacMain.getFacmNo());
-//						tClFac.setMainFlag("Y");
-//						tClFac.setShareAmt(BigDecimal.ZERO);
-//						tClFac.setFacShareFlag(0);
-//						tClFac.setOriSettingAmt(parse.stringToBigDecimal(titaVo.getParam("SettingAmt")));
-//
-//						// insert
-//						try {
-//							sClFacService.insert(tClFac, titaVo);
-//						} catch (DBException e) {
-//							throw new LogicException("E0005", "額度與擔保品關聯檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
-//						}
-//
-//						// 額度與擔保品關聯檔變動處理
-//						clFacCom.changeClFac(iApplNo, titaVo);
-//					}
-//				} // if
+
 
 			} else if (iFunCd == 2) {
 				throw new LogicException("E0003", "擔保品主檔"); // 修改資料不存在
@@ -408,10 +383,18 @@ public class L2411 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品不動產檔" + e.getErrorMsg());
 				}
+				
+				
 				// 紀錄變更前變更後 不動產檔
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);
 				dataLog.exec();
 
+				
+				// 擔保品不動產檔設定順位明細
+				deleteClImmRankDetail(titaVo);
+				
+				setClImmRankDetail(titaVo);
+				
 				// 房地擔保品
 				if (iClCode1 == 1) {
 					// 擔保品不動產建物檔主檔
@@ -740,14 +723,55 @@ public class L2411 extends TradeBuffer {
 		tClImm.setSettingAmt(parse.stringToBigDecimal(titaVo.getParam("SettingAmt")));
 		tClImm.setClaimDate(parse.stringToInteger(titaVo.getParam("ClaimDate")));
 		tClImm.setSettingSeq(titaVo.getParam("SettingSeq"));
-		tClImm.setFirstCreditor(titaVo.getParam("FirstCreditor"));
-		tClImm.setFirstAmt(parse.stringToBigDecimal(titaVo.getParam("FirstAmt")));
-		tClImm.setSecondCreditor(titaVo.getParam("SecondCreditor"));
-		tClImm.setSecondAmt(parse.stringToBigDecimal(titaVo.getParam("SecondAmt")));
-		tClImm.setThirdCreditor(titaVo.getParam("ThirdCreditor"));
-		tClImm.setThirdAmt(parse.stringToBigDecimal(titaVo.getParam("ThirdAmt")));
+	}
+	
+	private void setClImmRankDetail(TitaVo titaVo) throws LogicException {		
+	  
+	  int times = parse.stringToInteger(iSettingSeq) ; 
+	  
+	  for(int i = 1; i <= times;i++) {
+		
+		ClImmRankDetailId.setClCode1(iClCode1);
+		ClImmRankDetailId.setClCode2(iClCode2);
+		ClImmRankDetailId.setClNo(iClNo);
+		ClImmRankDetailId.setSettingSeq(""+i);
+		
+		
+		tClImmRankDetail = new ClImmRankDetail();
+
+		tClImmRankDetail.setClImmRankDetailId(ClImmRankDetailId);
+		
+		tClImmRankDetail.setClCode1(iClCode1);
+		tClImmRankDetail.setClCode2(iClCode2);
+		tClImmRankDetail.setClNo(iClNo);
+		tClImmRankDetail.setSettingSeq(""+i);
+		
+		if( i > 1 ) { // 第一順位之外
+		  tClImmRankDetail.setFirstCreditor(titaVo.getParam("FirstCreditor" + (i-1)));
+		  tClImmRankDetail.setFirstAmt(parse.stringToBigDecimal(titaVo.getParam("FirstAmt" + (i-1))));
+		}
+		
+		try {
+			sClImmRankDetailService.insert(tClImmRankDetail, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0005", "擔保品不動產檔設定順位明細檔" + e.getErrorMsg());
+		}
+	  }
 	}
 
+	private void deleteClImmRankDetail(TitaVo titaVo) throws LogicException {		
+		  
+		Slice<ClImmRankDetail> slClImmRankDetail = sClImmRankDetailService.clNoEq(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
+		lClImmRankDetail = slClImmRankDetail == null ? null : slClImmRankDetail.getContent();
+		if (lClImmRankDetail != null && lClImmRankDetail.size() > 0) {
+			try {
+				sClImmRankDetailService.deleteAll(lClImmRankDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0008", "擔保品不動產檔設定順位明細檔" + e.getErrorMsg());
+			}
+		}
+	}
+	
 	private void setClBuilding(TitaVo titaVo) throws LogicException {
 
 		tClBuilding.setClBuildingId(clBuildingId);

@@ -300,6 +300,7 @@ V(P,承審法院代碼必須選擇！)
 #Year=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Year,#L8r28Year),$)
 C(5,#TranKey,D,s,$)
 @V(7)
 
@@ -307,6 +308,7 @@ C(5,#TranKey,D,s,$)
 #CourtDiv=X,8,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CourtDiv,#L8r28CourtDiv),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,4)
 
@@ -314,6 +316,7 @@ C(5,#TranKey,D,s,$)
 #CourtCaseNo=X,80,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CourtCaseNo,#L8r28CourtCaseNo),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,40)
 
@@ -321,6 +324,7 @@ C(5,#TranKey,D,s,$)
 #Approve=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Approve,#L8r28Approve),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
@@ -333,12 +337,14 @@ V(P,案件狀態為「D：清算撤銷免責確定」時，除原必要填報項
 #OutstandAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@OutstandAmt,#L8r28OutstandAmt),$)
 C(5,#TranKey,D,s,$)
 
 !法院裁定保全處分
 #ClaimStatus1=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@ClaimStatus1,#L8r28ClaimStatus1),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
@@ -348,6 +354,7 @@ HELP(#YesNoHelp)
 #SaveDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SaveDate,#L8r28SaveDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @V(7)
@@ -357,6 +364,7 @@ D(8)
 #ClaimStatus2=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@ClaimStatus2,#L8r28ClaimStatus2),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
@@ -365,18 +373,21 @@ HELP(#YesNoHelp)
 #SaveEndDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SaveEndDate,#L8r28SaveEndDate),$)
 C(5,#TranKey,D,s,$)
 
 !清算損失金額
 #SubAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SubAmt,#L8r28SubAmt),$)
 C(5,#TranKey,D,s,$)
 
 !管理人 10個中文
 #AdminName=X,20,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@AdminName,#L8r28AdminName),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,10)
 

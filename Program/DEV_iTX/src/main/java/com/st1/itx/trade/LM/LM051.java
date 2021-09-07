@@ -21,24 +21,22 @@ import com.st1.itx.tradeService.BatchBase;
  * @version 1.0.0
  */
 public class LM051 extends BatchBase implements Tasklet, InitializingBean {
-  
+
 	@Autowired
-	public LM051Report LM051report;
+	public LM051Report lM051report;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		;
 	}
- 
+
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM051.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM051 ");
-		LM051report.exec(titaVo);
+		lM051report.exec(titaVo);
 	}
 }

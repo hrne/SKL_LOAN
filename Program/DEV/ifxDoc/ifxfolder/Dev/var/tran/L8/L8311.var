@@ -244,24 +244,28 @@ D(8)
 #PayAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayAmt,#L8r22PayAmt),$)
 C(5,#TranKey,D,s,$)
 
 !累計實際還款金額
 #SumRepayActualAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SumRepayActualAmt,#L8r22SumRepayActualAmt),$)
 C(5,#TranKey,D,s,$)
 
 !累計應還款金額
 #SumRepayShouldAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SumRepayShouldAmt,#L8r22SumRepayShouldAmt),$)
 C(5,#TranKey,D,s,$)
 
 !債權結案註記
 #Status=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Status,#L8r22Status),$)
 C(5,#TranKey,D,s,$)
 HELP(#Status50Help)
 @V(H,#Status50Help)
@@ -273,6 +277,7 @@ T(H,#Status,#Status50Help)
 #SecondRepayYM=X,5,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SecondRepayYM,#L8r22SecondRepayYM),$)
 C(5,#TranKey,D,s,$)
 
 

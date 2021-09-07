@@ -249,6 +249,7 @@ V(P,延期繳款年月不得小於調解申請日)
 #DelayDesc=X,60,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@DelayDesc,#L8r23DelayDesc),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,20)
 

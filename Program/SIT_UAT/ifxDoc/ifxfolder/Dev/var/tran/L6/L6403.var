@@ -53,7 +53,7 @@ T(2,@FKEY,7)
 !Ap8: 150
 !Ap9: 50
 
-#ApL=X,20000,S  
+#ApL=X,26000,S  
 
 ##loop {times:9,i:1}
 #ApL{i}=X,10000,S  
@@ -187,6 +187,7 @@ T(3,0:正常;1:停用)
 #ApIdx=A,6,S
 #ApLen=A,3,S
 #Ap0Len=A,4,S
+#ApL9test=X,10000,S
 
 #Ap0Proc=@,1,S
 E(0,@ApIdx,1)
@@ -195,8 +196,8 @@ T(1,@Ap0Len,#ApL,#ApIdx,4)
 E(0,@ApIdx,#ApIdx+4)
 T(1,@ApL{i},#ApL,#ApIdx,#Ap0Len)
 E(0,@ApIdx,#ApIdx+#Ap0Len)
-##end
 
+##end
 !-- p1 begin
 
 #Ap1ProcA=@,1,S

@@ -351,54 +351,63 @@ D(8)
 #Period=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Period,#L8r18Period),$)
 C(5,#TranKey,D,s,$)
 
 ![利率]
 #Rate=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Rate,#L8r18Rate),$)
 C(5,#TranKey,D,s,$)
 
 ![信用貸款債務簽約總金額]
 #ExpLoanAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@ExpLoanAmt,#L8r18ExpLoanAmt),$)
 C(5,#TranKey,D,s,$)
 
 ![依民法第323條計算之信用貸款債務總金額]
 #Civil323ExpAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Civil323ExpAmt,#L8r18Civil323ExpAmt),$)
 C(5,#TranKey,D,s,$)
 
 ![現金卡債務簽約總金額]
 #CashCardAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CashCardAmt,#L8r18CashCardAmt),$)
 C(5,#TranKey,D,s,$)
 
 ![依民法第323條計算之現金卡債務總金額]
 #Civil323CashAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Civil323CashAmt,#L8r18Civil323CashAmt),$)
 C(5,#TranKey,D,s,$)
 
 ![信用卡債務簽約總金額]
 #CreditCardAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CreditCardAmt,#L8r18CreditCardAmt),$)
 C(5,#TranKey,D,s,$)
 
 ![依民法第323條計算之信用卡債務總金額]
 #Civil323CreditAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Civil323CreditAmt,#L8r18Civil323CreditAmt),$)
 C(5,#TranKey,D,s,$)
 
 ![簽約總債務金額]
 #TotalAmt=M,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@TotalAmt,#L8r18TotalAmt),$)
 C(5,#TranKey,D,s,$)
 
 #CheckTotalAmt=M,15,S
@@ -410,6 +419,7 @@ V(P,簽約總債務金額需等於 信用貸款債務簽約總金額+現金卡�
 #Civil323Amt=M,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Civil323Amt,#L8r18Civil323Amt),$)
 C(5,#TranKey,D,s,$)
 
 #CheckCivil323Amt=M,15,S
@@ -422,6 +432,7 @@ V(P,依民法第323條計算之債務總金額需等於 依民法第323條計算
 #InterviewDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@InterviewDate,#L8r18InterviewDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#InterviewDate)
@@ -430,6 +441,7 @@ D(8)
 #PassDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PassDate,#L8r18PassDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#PassDate)
@@ -438,6 +450,7 @@ D(8)
 #LimitDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@LimitDate,#L8r18LimitDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#LimitDate)
@@ -446,6 +459,7 @@ D(8)
 #SignDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SignDate,#L8r18SignDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#SignDate)
@@ -458,12 +472,14 @@ V(P,#ErroMsg)
 #MonthPayAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@MonthPayAmt,#L8r18MonthPayAmt),$)
 C(5,#TranKey,D,s,$)
 
 ![首期應繳日]
 #FirstPayDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@FirstPayDate,#L8r18FirstPayDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#FirstPayDate)
@@ -509,6 +525,7 @@ IF(#Rate!=0,$,s)
 #PayLastAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayLastAmt,#L8r18PayLastAmt),$)
 C(5,#TranKey,D,s,$)
 
 #CheckPayLastAmt=X,1,S
@@ -529,6 +546,7 @@ V(P,第一階段最後一期應繳金額應等於（簽約總債務金額）減�
 #Period2=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Period2,#L8r18Period2),$)
 C(5,#TranKey,D,s,$)
 @IF(#GradeType!="2" && #Period2>0,$,s)
 V(P,第二階段期數須為空白！)
@@ -548,6 +566,7 @@ V(P,第二階段期數不可為空！)
 #Rate2=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Rate2,#L8r18Rate2),$)
 C(5,#TranKey,D,s,$)
 
 #CheckRate21=X,1,S
@@ -564,6 +583,7 @@ V(P,第二階段利率須為空白！)
 #MonthPayAmt2=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@MonthPayAmt2,#L8r18MonthPayAmt2),$)
 C(5,#TranKey,D,s,$)
 
 #CheckMonthPayAmt21=X,1,S
@@ -580,6 +600,7 @@ V(P,第二階段協商方案估計月付金須為空白！)
 #PayLastAmt2=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayLastAmt2,#L8r18PayLastAmt2),$)
 C(5,#TranKey,D,s,$)
 
 #CheckPayLastAmt21=X,1,S
@@ -597,6 +618,7 @@ V(P,第二階段最後一期應繳金額須為空白！)
 #PayAccount=X,40,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayAccount,#L8r18PayAccount),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,20)
 
@@ -604,6 +626,7 @@ C(5,#TranKey,D,s,$)
 #PostAddr=X,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PostAddr,#L8r18PostAddr),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,38)
 

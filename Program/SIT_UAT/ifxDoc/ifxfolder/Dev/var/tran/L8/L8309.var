@@ -228,6 +228,7 @@ D(8)
 #CustRegAddr=X,114,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CustRegAddr,#L8r20CustRegAddr),$)
 C(5,#TranKey,X,s,$)
 @V(8,0,38)
 
@@ -235,6 +236,7 @@ C(5,#TranKey,X,s,$)
 #CustComAddr=X,114,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CustComAddr,#L8r20CustComAddr),$)
 C(5,#TranKey,X,s,$)
 @V(8,0,38)
 
@@ -242,6 +244,7 @@ C(5,#TranKey,X,s,$)
 #CustRegTelNo=X,16,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CustRegTelNo,#L8r20CustRegTelNo),$)
 C(5,#TranKey,X,s,$)
 @V(8,0,16)
 
@@ -249,6 +252,7 @@ C(5,#TranKey,X,s,$)
 #CustComTelNo=X,16,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CustComTelNo,#L8r20CustComTelNo),$)
 C(5,#TranKey,X,s,$)
 @V(8,0,16)
 
@@ -256,6 +260,7 @@ C(5,#TranKey,X,s,$)
 #CustMobilNo=X,16,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CustMobilNo,#L8r20CustMobilNo),$)
 C(5,#TranKey,X,s,$)
 
 #CheckConnectTel=X,1,S

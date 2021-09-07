@@ -20,7 +20,6 @@
 //  */
 // public class LP002 extends TradeBuffer {
 // 	@SuppressWarnings("unused")
-// 	// private static final Logger logger = LoggerFactory.getLogger(LP002.class);
 
 // 	@Autowired
 // 	public LP002Report lp002report;
@@ -36,6 +35,7 @@
 // 	}
 // }
 package com.st1.itx.trade.LP;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -48,7 +48,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
 
-
 @Service("LP002")
 @Scope("step")
 /**
@@ -60,24 +59,22 @@ import com.st1.itx.tradeService.BatchBase;
 public class LP002 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
-	LP002Report lp002report;
- 
+	LP002Report lP002Report;
+
 	@Override
-	public void afterPropertiesSet() throws Exception { 
+	public void afterPropertiesSet() throws Exception {
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LP002.class);
 		return this.exec(contribution, "M");
 	}
- 
+
 	@Override
 	public void run() throws LogicException {
 		this.info("active LP002 ");
-		lp002report.setTxBuffer(this.getTxBuffer());
-		lp002report.exec(titaVo);
+		lP002Report.setTxBuffer(this.getTxBuffer());
+		lP002Report.exec(titaVo);
 	}
 
 }
-

@@ -15,7 +15,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM023ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
-import com.st1.itx.util.date.DateUtil;
 
 @Component
 @Scope("prototype")
@@ -24,9 +23,6 @@ public class LM023Report extends MakeReport {
 
 	@Autowired
 	public LM023ServiceImpl lM023ServiceImpl;
-
-	@Autowired
-	DateUtil dDateUtil;
 
 	@Override
 	public void printHeader() {
@@ -64,7 +60,7 @@ public class LM023Report extends MakeReport {
 		this.print(-7, 10, "──────────────────────────────────────────────────────────────");
 		this.print(-7, 148, "10804 科子目", "C");
 
-		String No = "";
+		String no = "";
 
 		this.setFontSize(10);
 
@@ -73,18 +69,18 @@ public class LM023Report extends MakeReport {
 			for (int i = 0; i < lM023List.size(); i++) {
 
 				if (i == 0) {
-					No = lM023List.get(i).get("F0").toString();
+					no = lM023List.get(i).get("F0").toString();
 					this.print(1, 9, lM023List.get(i).get("F0").toString());
 					this.print(0, 21, lM023List.get(i).get("F1").toString());
 					this.print(0, 46, lM023List.get(i).get("F2").toString());
 					this.print(0, 50, lM023List.get(i).get("F3").toString());
 
 				} else {
-					if (No.equals(lM023List.get(i).get("F0").toString())) { // 是否同科目代號
+					if (no.equals(lM023List.get(i).get("F0").toString())) { // 是否同科目代號
 						this.print(1, 46, lM023List.get(i).get("F2").toString());
 						this.print(0, 50, lM023List.get(i).get("F3").toString());
 					} else {
-						No = lM023List.get(i).get("F0").toString();
+						no = lM023List.get(i).get("F0").toString();
 						this.print(1, 9, lM023List.get(i).get("F0").toString());
 						this.print(0, 21, lM023List.get(i).get("F1").toString());
 						this.print(0, 46, lM023List.get(i).get("F2").toString());
@@ -109,7 +105,6 @@ public class LM023Report extends MakeReport {
 		} else {
 			this.print(-8, 10, "本日無資料");
 		}
-		;
 
 		if (lM023List2.size() != 0 && lM023List2 != null) {
 			String year = "";
@@ -136,7 +131,6 @@ public class LM023Report extends MakeReport {
 			this.print(-15, 100, "　年度預算");
 			this.print(-16, 100, "　年度現階段累積達成率");
 
-//			int tempAmt = 0;
 			BigDecimal tempAmt = BigDecimal.ZERO;
 
 			BigDecimal total0 = BigDecimal.ZERO;
@@ -160,7 +154,7 @@ public class LM023Report extends MakeReport {
 					count = 0;
 				}
 				count++;
-
+ 
 				// 0 今年 1預算 2上年度
 				dataSeq = Integer.valueOf(lM023List2.get(i).get("F0")).toString();
 
@@ -202,7 +196,7 @@ public class LM023Report extends MakeReport {
 			this.print(-9, totalPos, df1.format(total1), "L");
 			this.print(-10, totalPos, df1.format(total2), "L");
 
-			resTotal = total0 == BigDecimal.ZERO || total1 == BigDecimal.ZERO ? BigDecimal.ZERO
+			resTotal = total0 == BigDecimal.ZERO || total2 == BigDecimal.ZERO ? BigDecimal.ZERO
 					: total0.divide(total2, 4, BigDecimal.ROUND_HALF_UP).multiply(percent);
 			this.print(-12, totalPos, resTotal + "%", "L");
 

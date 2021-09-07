@@ -22,18 +22,12 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 // 20201204 T
 public class LP002Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LP002Report.class);
 
 	@Autowired
-	LP002ServiceImpl LP002ServiceImpl;
+	LP002ServiceImpl lP002ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
-
-	@Override
-	public void printTitle() {
- 
-	}
 
 	List<Map<String, String>> findList = new ArrayList<>();
 
@@ -96,14 +90,14 @@ public class LP002Report extends MakeReport {
 
 		this.info("LP002Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP002", "三階(部室、區部、通訊處)累計表",
-				"LP002三階(部室、區部、通訊處)累計表", "推展_部室、區部、通訊處業績累計.xls", "部室");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP002", "部室、區部、通訊處業績", "LP002_部室、區部、通訊處業績",
+				"LP002_底稿_推展_部室、區部、通訊處業績.xlsx", "部室");
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 
 		try {
 			// 找工作月
-			wkSsnList = LP002ServiceImpl.wkSsn(titaVo);
+			wkSsnList = lP002ServiceImpl.wkSsn(titaVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -126,7 +120,7 @@ public class LP002Report extends MakeReport {
 	 */
 	private void exportExcel(TitaVo titaVo, Map<String, String> wkSsnVo) throws LogicException {
 		// 民國年
-		String ROCYear = "";
+		String rocYear = "";
 		// 當前工作月
 		int wkMonth = 0;
 		// 工作月
@@ -135,14 +129,15 @@ public class LP002Report extends MakeReport {
 //		int iYEAR = Integer.parseInt(wkSsnVo.get("F0"));
 //		int iMM = Integer.parseInt(wkSsnVo.get("F1"));
 
+		//
 		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
-			ROCYear = String.valueOf(Integer.parseInt(wkSsnVo.get("F0")) - 1912);
+			rocYear = String.valueOf(Integer.parseInt(wkSsnVo.get("F0")) - 1912);
 			wkMonth = 13;
 			monthHead = "13";
 		} else {
-			ROCYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
-			wkMonth = Integer.parseInt(wkSsnVo.get("F1")) - 1;
-			monthHead = String.valueOf(Integer.parseInt(wkSsnVo.get("F1")) - 1);
+			rocYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
+			wkMonth = Integer.parseInt(wkSsnVo.get("F1"));
+			monthHead = String.valueOf(Integer.parseInt(wkSsnVo.get("F1")));
 		}
 
 		// 起始欄位
@@ -182,7 +177,7 @@ public class LP002Report extends MakeReport {
 		col = 4;
 
 		makeExcel.setSheet("部室");
-		makeExcel.setValue(1, 1, ROCYear + "年第1~" + monthHead + "工作月部室業績統計");
+		makeExcel.setValue(1, 1, rocYear + "年第1~" + monthHead + "工作月部室業績統計");
 
 		// 建攔位
 		setColTitle(col, wkMonth, lastWkMonth);
@@ -195,7 +190,7 @@ public class LP002Report extends MakeReport {
 		col = 5;
 
 		makeExcel.setSheet("區部");
-		makeExcel.setValue(1, 1, ROCYear + "年第1~" + monthHead + "工作月區部業績統計");
+		makeExcel.setValue(1, 1, rocYear + "年第1~" + monthHead + "工作月區部業績統計");
 
 		// 建攔位
 		setColTitle(col, wkMonth, lastWkMonth);
@@ -211,7 +206,7 @@ public class LP002Report extends MakeReport {
 		String unit = "";
 
 		makeExcel.setSheet("營管");
-		makeExcel.setValue(1, 1, ROCYear + "年第1~" + monthHead + "工作月營管部業績統計");
+		makeExcel.setValue(1, 1, rocYear + "年第1~" + monthHead + "工作月營管部業績統計");
 
 		// 單位代號
 		unit = "A0B000";
@@ -224,7 +219,7 @@ public class LP002Report extends MakeReport {
 		/*--------------------------------------------------------------------------*/
 
 		makeExcel.setSheet("營推");
-		makeExcel.setValue(1, 1, ROCYear + "年第1~" + monthHead + "工作月營推部業績統計");
+		makeExcel.setValue(1, 1, rocYear + "年第1~" + monthHead + "工作月營推部業績統計");
 
 		// 單位代號
 		unit = "A0F000";
@@ -238,7 +233,7 @@ public class LP002Report extends MakeReport {
 		/*--------------------------------------------------------------------------*/
 
 		makeExcel.setSheet("業推");
-		makeExcel.setValue(1, 1, ROCYear + "年第1~" + monthHead + "工作月業推部業績統計");
+		makeExcel.setValue(1, 1, rocYear + "年第1~" + monthHead + "工作月業推部業績統計");
 
 		// 單位代號
 		unit = "A0E000";
@@ -252,7 +247,7 @@ public class LP002Report extends MakeReport {
 		/*--------------------------------------------------------------------------*/
 
 		makeExcel.setSheet("業開");
-		makeExcel.setValue(1, 1, ROCYear + "年第1~" + monthHead + "工作月業開部業績統計");
+		makeExcel.setValue(1, 1, rocYear + "年第1~" + monthHead + "工作月業開部業績統計");
 
 		// 單位代號
 		unit = "A0M000";
@@ -357,7 +352,7 @@ public class LP002Report extends MakeReport {
 
 		try {
 
-			findList = LP002ServiceImpl.findDept(titaVo, wkSsnVo);
+			findList = lP002ServiceImpl.findDept(titaVo, wkSsnVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -398,7 +393,7 @@ public class LP002Report extends MakeReport {
 
 			cntColTotal5 = BigDecimal.ZERO;
 			amtColTotal5 = BigDecimal.ZERO;
-			
+
 			cntColAllTotal = BigDecimal.ZERO;
 			amtColAllTotal = BigDecimal.ZERO;
 
@@ -410,33 +405,27 @@ public class LP002Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
-				BigDecimal cnt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F4"));
-				BigDecimal amt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
 
 				if (!deptcode.equals(tLDVo.get("F6"))) {
 
 					switch (tLDVo.get("F6")) {
 					case "A0B000":
-
 						sName = "營管部";
-
 						break;
 					case "A0F000":
-
 						sName = "營推部";
-
 						break;
 					case "A0E000":
-
 						sName = "業推部";
-
 						break;
 					case "A0M000":
-
 						sName = "業開部";
-
+						break;
+					default:
 						break;
 					}
 					// 部室代號
@@ -459,8 +448,6 @@ public class LP002Report extends MakeReport {
 					cntRowTotal = BigDecimal.ZERO;
 					amtRowTotal = BigDecimal.ZERO;
 
-
-
 					firstCreate = true;
 				}
 
@@ -469,12 +456,12 @@ public class LP002Report extends MakeReport {
 
 				if (wkMonth <= 3) {
 
-					makeExcel.setValue(tRow, scol, cnt, "#,##0", "R");
-					makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
+					makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
+					makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
 
 					// 累計+陸續工作月的 總計
-					cntRowTotal = cntRowTotal.add(cnt);
-					amtRowTotal = amtRowTotal.add(amt);
+					cntRowTotal = cntRowTotal.add(tmpCnt);
+					amtRowTotal = amtRowTotal.add(tmpAmt);
 
 					scol += 2;
 
@@ -483,17 +470,16 @@ public class LP002Report extends MakeReport {
 					if (dmm <= lastWkMonth) {
 
 						// 列 前工作月總計
-						cntTotal = cntTotal.add(cnt);
-						amtTotal = amtTotal.add(amt);
-						
-						// 累計+陸續工作月的 總計
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntTotal = cntTotal.add(tmpCnt);
+						amtTotal = amtTotal.add(tmpAmt);
 
+						// 累計+陸續工作月的 總計
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
 						// 累計的總計
-						cntColTotal = cntColTotal.add(cnt);
-						amtColTotal = amtColTotal.add(amt);
+						cntColTotal = cntColTotal.add(tmpCnt);
+						amtColTotal = amtColTotal.add(tmpAmt);
 
 					} else if (dmm > lastWkMonth) {
 						// 當 第i工作月 超過 上季末工作月 再開始建攔位
@@ -509,11 +495,11 @@ public class LP002Report extends MakeReport {
 						}
 
 						// 累計+陸續工作月的 總計
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
-						makeExcel.setValue(tRow, scol, cnt, "#,##0", "R");
-						makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
+						makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
+						makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
 						scol += 2;
 
 					}
@@ -526,11 +512,11 @@ public class LP002Report extends MakeReport {
 
 				if (dmm > lastWkMonth) {
 
-					sizeT = toWkMonth(dmm, cnt, amt);
+					sizeT = toWkMonth(dmm, tmpCnt, tmpAmt);
 
 				}
-				cntColAllTotal = cntColAllTotal.add(cnt);
-				amtColAllTotal = amtColAllTotal.add(amt);
+				cntColAllTotal = cntColAllTotal.add(tmpCnt);
+				amtColAllTotal = amtColAllTotal.add(tmpAmt);
 
 			}
 			tRow++;
@@ -585,7 +571,7 @@ public class LP002Report extends MakeReport {
 
 		try {
 
-			findList = LP002ServiceImpl.findDist(titaVo, wkSsnVo);
+			findList = lP002ServiceImpl.findDist(titaVo, wkSsnVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -627,7 +613,7 @@ public class LP002Report extends MakeReport {
 
 			cntColTotal5 = BigDecimal.ZERO;
 			amtColTotal5 = BigDecimal.ZERO;
-			
+
 			cntColAllTotal = BigDecimal.ZERO;
 			amtColAllTotal = BigDecimal.ZERO;
 
@@ -637,9 +623,9 @@ public class LP002Report extends MakeReport {
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
 
-				BigDecimal cnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal amt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F6"));
 
 				if (!distcode.equals(tLDVo.get("F7"))) {
@@ -647,27 +633,21 @@ public class LP002Report extends MakeReport {
 					switch (tLDVo.get("F0")) {
 					case "A0B000":
 					case "營業管理部":
-
 						sName = "營管部";
-
 						break;
 					case "A0F000":
 					case "營業推展部":
-
 						sName = "營推部";
-
 						break;
 					case "A0E000":
 					case "業務推展部":
-
 						sName = "業推部";
-
 						break;
 					case "A0M000":
 					case "營業開發部":
-
 						sName = "業開部";
-
+						break;
+					default:
 						break;
 					}
 					// 部室代號
@@ -691,7 +671,6 @@ public class LP002Report extends MakeReport {
 					cntRowTotal = BigDecimal.ZERO;
 					amtRowTotal = BigDecimal.ZERO;
 
-
 					firstCreate = true;
 				}
 
@@ -700,11 +679,11 @@ public class LP002Report extends MakeReport {
 
 				if (wkMonth <= 3) {
 
-					makeExcel.setValue(tRow, scol, cnt, "#,##0", "R");
-					makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
+					makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
+					makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
 
-					cntRowTotal = cntRowTotal.add(cnt);
-					amtRowTotal = amtRowTotal.add(amt);
+					cntRowTotal = cntRowTotal.add(tmpCnt);
+					amtRowTotal = amtRowTotal.add(tmpAmt);
 
 					scol += 2;
 
@@ -713,16 +692,16 @@ public class LP002Report extends MakeReport {
 					if (dmm <= lastWkMonth) {
 
 						// 列 前工作月總計
-						cntTotal = cntTotal.add(cnt);
-						amtTotal = amtTotal.add(amt);
+						cntTotal = cntTotal.add(tmpCnt);
+						amtTotal = amtTotal.add(tmpAmt);
 
 						// 累計+陸續工作月的 總計
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
-						
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
+
 						// 累計的總計
-						cntColTotal = cntColTotal.add(cnt);
-						amtColTotal = amtColTotal.add(amt);
+						cntColTotal = cntColTotal.add(tmpCnt);
+						amtColTotal = amtColTotal.add(tmpAmt);
 
 					} else if (dmm > lastWkMonth) {
 						// 當 第i工作月 超過 上季末工作月 再開始建攔位
@@ -742,14 +721,14 @@ public class LP002Report extends MakeReport {
 						}
 
 						// 累計+陸續工作月的 總計
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
-//						this.info(ccc+"cntTotal=" + cnt + "~tRow=" + tRow + "~scol=" + scol);
-//						this.info(ccc+"amtTotal=" + amt + "~tRow=" + tRow + "~scol=" + scol);
+//						this.info(ccc+"cntTotal=" + tmpCnt + "~tRow=" + tRow + "~scol=" + scol);
+//						this.info(ccc+"amtTotal=" + tmpAmt + "~tRow=" + tRow + "~scol=" + scol);
 
-						makeExcel.setValue(tRow, scol, cnt, "#,##0", "R");
-						makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
+						makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
+						makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
 						scol += 2;
 
 					}
@@ -763,14 +742,13 @@ public class LP002Report extends MakeReport {
 				makeExcel.setValue(tRow, scol, cntRowTotal, "#,##0", "R");
 				makeExcel.setValue(tRow, scol + 1, amtRowTotal, "#,##0", "R");
 
-				
 				if (dmm > lastWkMonth) {
 
-					sizeT = toWkMonth(dmm, cnt, amt);
+					sizeT = toWkMonth(dmm, tmpCnt, tmpAmt);
 
 				}
-				cntColAllTotal = cntColAllTotal.add(cnt);
-				amtColAllTotal = amtColAllTotal.add(amt);
+				cntColAllTotal = cntColAllTotal.add(tmpCnt);
+				amtColAllTotal = amtColAllTotal.add(tmpAmt);
 
 			}
 			tRow++;
@@ -827,7 +805,7 @@ public class LP002Report extends MakeReport {
 
 		try {
 
-			findList = LP002ServiceImpl.findUnit(titaVo, wkSsnVo, unitCode);
+			findList = lP002ServiceImpl.findUnit(titaVo, wkSsnVo, unitCode);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -853,7 +831,7 @@ public class LP002Report extends MakeReport {
 
 			// 是否 產資料至 前工作月累計 欄位
 			boolean firstCreate = true;
-			
+
 			cntColTotal1 = BigDecimal.ZERO;
 			amtColTotal1 = BigDecimal.ZERO;
 
@@ -877,9 +855,9 @@ public class LP002Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
-				BigDecimal cnt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F4"));
-				BigDecimal amt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
 
 				if (!unitcode.equals(tLDVo.get("F7"))) {
@@ -910,11 +888,11 @@ public class LP002Report extends MakeReport {
 
 				if (wkMonth <= 3) {
 
-					makeExcel.setValue(tRow, scol, cnt, "#,##0", "R");
-					makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
+					makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
+					makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
 
-					cntRowTotal = cntRowTotal.add(cnt);
-					amtRowTotal = amtRowTotal.add(amt);
+					cntRowTotal = cntRowTotal.add(tmpCnt);
+					amtRowTotal = amtRowTotal.add(tmpAmt);
 
 					scol += 2;
 
@@ -923,16 +901,16 @@ public class LP002Report extends MakeReport {
 					if (dmm <= lastWkMonth) {
 
 						// 列 前工作月總計
-						cntTotal = cntTotal.add(cnt);
-						amtTotal = amtTotal.add(amt);
+						cntTotal = cntTotal.add(tmpCnt);
+						amtTotal = amtTotal.add(tmpAmt);
 
 						// 累計+陸續工作月的 總計
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
-						
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
+
 						// 累計的總計
-						cntColTotal = cntColTotal.add(cnt);
-						amtColTotal = amtColTotal.add(amt);
+						cntColTotal = cntColTotal.add(tmpCnt);
+						amtColTotal = amtColTotal.add(tmpAmt);
 
 					} else if (dmm > lastWkMonth) {
 						// 當 第i工作月 超過 上季末工作月 再開始建攔位
@@ -948,11 +926,11 @@ public class LP002Report extends MakeReport {
 						}
 
 						// 累計+陸續工作月的 總計
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
-						makeExcel.setValue(tRow, scol, cnt, "#,##0", "R");
-						makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
+						makeExcel.setValue(tRow, scol, tmpCnt, "#,##0", "R");
+						makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
 						scol += 2;
 
 					}
@@ -965,12 +943,12 @@ public class LP002Report extends MakeReport {
 
 				if (dmm > lastWkMonth) {
 
-					sizeT = toWkMonth(dmm, cnt, amt);
+					sizeT = toWkMonth(dmm, tmpCnt, tmpAmt);
 
 				}
 
-				cntColAllTotal = cntColAllTotal.add(cnt);
-				amtColAllTotal = amtColAllTotal.add(amt);
+				cntColAllTotal = cntColAllTotal.add(tmpCnt);
+				amtColAllTotal = amtColAllTotal.add(tmpAmt);
 
 			}
 			tRow++;

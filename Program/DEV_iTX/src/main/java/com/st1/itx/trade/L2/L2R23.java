@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -11,6 +13,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClImm;
 import com.st1.itx.db.domain.ClImmId;
+import com.st1.itx.db.domain.ClImmRankDetail;
+import com.st1.itx.db.service.ClImmRankDetailService;
 import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -25,12 +29,13 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R23 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R23.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public ClImmService sClImmService;
-
+	@Autowired
+	public ClImmRankDetailService sClImmRankDetailService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -121,12 +126,26 @@ public class L2R23 extends TradeBuffer {
 		this.totaVo.putParam("L2r23SettingAmt", tClImm.getSettingAmt());
 		this.totaVo.putParam("L2r23ClaimDate", tClImm.getClaimDate());
 		this.totaVo.putParam("L2r23SettingSeq", tClImm.getSettingSeq());
-		this.totaVo.putParam("L2r23FirstCreditor", tClImm.getFirstCreditor());
-		this.totaVo.putParam("L2r23FirstAmt", tClImm.getFirstAmt());
-		this.totaVo.putParam("L2r23SecondCreditor", tClImm.getSecondCreditor());
-		this.totaVo.putParam("L2r23SecondAmt", tClImm.getSecondAmt());
-		this.totaVo.putParam("L2r23ThirdCreditor", tClImm.getThirdCreditor());
-		this.totaVo.putParam("L2r23ThirdAmt", tClImm.getThirdAmt());
+		
+		List<ClImmRankDetail> lClImmRankDetail = new ArrayList<ClImmRankDetail>();
+		Slice<ClImmRankDetail> slClImmRankDetail = sClImmRankDetailService.clNoEq(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
+		lClImmRankDetail = slClImmRankDetail == null ? null : slClImmRankDetail.getContent();
+		
+		
+		for(int i = 0 ; i <= 9 ; i++) {
+			this.totaVo.putParam("L2r23FirstCreditor" + i, "");
+			this.totaVo.putParam("L2r23FirstAmt" + i, "");
+		}
+		
+		int k = 0;
+		for (ClImmRankDetail tClImmRankDetail : lClImmRankDetail) {
+		
+			  this.totaVo.putParam("L2r23FirstCreditor" + k, tClImmRankDetail.getFirstCreditor());
+			  this.totaVo.putParam("L2r23FirstAmt" + k, tClImmRankDetail.getFirstAmt());
+
+			k++;
+		}
+		
 
 		this.addList(this.totaVo);
 		return this.sendList();

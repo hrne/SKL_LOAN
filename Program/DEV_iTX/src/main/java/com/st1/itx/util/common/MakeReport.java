@@ -1296,7 +1296,7 @@ public class MakeReport extends CommBuffer {
 	private void setWatermark(PdfContentByte cb, Document document) throws IOException, DocumentException {
 
 		PdfGState graphicState = new PdfGState();
-		graphicState.setFillOpacity(0.7f);
+		graphicState.setFillOpacity(0.3f);
 		graphicState.setStrokeOpacity(1f);
 
 		BaseFont tmpBaseFont = this.setBaseFont("1");
@@ -1757,6 +1757,25 @@ public class MakeReport extends CommBuffer {
 						+ "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
+		}
+		return result;
+	}
+
+	/**
+	 * 傳入double,回傳BigDecimal,無法轉換為BigDecimal時給零
+	 * 
+	 * @param inputdouble 傳入字串
+	 * @return BigDecimal
+	 */
+	public BigDecimal getBigDecimal(double inputdouble) {
+		BigDecimal result = BigDecimal.ZERO;
+
+		try {
+			result = BigDecimal.valueOf(inputdouble);
+		} catch (NumberFormatException e) {
+			this.error("getBigDecimal inputdouble : \"" + inputdouble
+					+ "\" parse to BigDecimal has NumberFormatException.");
+			result = BigDecimal.ZERO;
 		}
 		return result;
 	}

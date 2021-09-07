@@ -215,7 +215,7 @@ IF(#ScDate!=0,$,s)
 A(DATE,0,#ScDate)
 
 ![協商開始日]
-#NegoStartDate=D,7,L
+#NegoStartDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)

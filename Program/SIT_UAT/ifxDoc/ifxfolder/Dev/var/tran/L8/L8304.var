@@ -332,6 +332,7 @@ T(H,#CollateralType,#CollateralTypeHelp)
 #OriginLoanAmt=M,12,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@OriginLoanAmt,#L8r14OriginLoanAmt),$)
 C(5,#TranKey,D,s,$)
 @V(9)
 
@@ -339,6 +340,7 @@ C(5,#TranKey,D,s,$)
 #CreditBalance=M,12,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CreditBalance,#L8r14CreditBalance),$)
 C(5,#TranKey,D,s,$)
 @V(9)
 
@@ -346,6 +348,7 @@ C(5,#TranKey,D,s,$)
 #PerPeriordAmt=M,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PerPeriordAmt,#L8r14PerPeriordAmt),$)
 C(5,#TranKey,D,s,$)
 @V(9)
 
@@ -353,6 +356,7 @@ C(5,#TranKey,D,s,$)
 #LastPayAmt=M,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@LastPayAmt,#L8r14LastPayAmt),$)
 C(5,#TranKey,D,s,$)
 @V(9)
 
@@ -360,6 +364,7 @@ C(5,#TranKey,D,s,$)
 #LastPayDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@LastPayDate,#L8r14LastPayDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#LastPayDate)
@@ -368,6 +373,7 @@ D(8)
 #OutstandAmt=M,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@OutstandAmt,#L8r14OutstandAmt),$)
 C(5,#TranKey,D,s,$)
 @V(9)
 
@@ -375,6 +381,7 @@ C(5,#TranKey,D,s,$)
 #RepayPerMonDay=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@RepayPerMonDay,#L8r14RepayPerMonDay),$)
 C(5,#TranKey,D,s,$)
 @V(5,1,31)
 
@@ -382,6 +389,7 @@ C(5,#TranKey,D,s,$)
 #ContractStartYM=A,5,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@ContractStartYM,#L8r14ContractStartYM),$)
 C(5,#TranKey,D,s,$)
 
 #CheckContractStartYM=D,7,S
@@ -392,6 +400,7 @@ T(2,#ContractStartYM+01)
 #ContractEndYM=A,5,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@ContractEndYM,#L8r14ContractEndYM),$)
 C(5,#TranKey,D,s,$)
 
 #CheckContractEndYM=D,7,S

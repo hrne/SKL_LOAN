@@ -136,6 +136,11 @@ C(3,#PageFg,5,K(LIGHT,#Btn5,TXTRED,0),K(LIGHT,#Btn5,TXTRED,-1))
 C(3,#PageFg,6,K(LIGHT,#Btn6,TXTRED,0),K(LIGHT,#Btn6,TXTRED,-1))
 C(3,#PageFg,7,K(LIGHT,#BtnExpand,TXTRED,0),K(LIGHT,#BtnExpand,TXTRED,-1))
 
+#Ranktxt1=x,2,S
+T(3,前)
+#Ranktxt3=x,4,S
+T(3,順位)
+
 #CALLGRID=@,1,S
 ##loop{times:10,n:1,k:2,j:3}
 C(4,#OwnerId{n},INVOKEJS(SHOW,grd3_{k},0),INVOKEJS(SHOW,grd3_{k},1))
@@ -391,10 +396,6 @@ HIDE(#MtgPledgefg)
 #FdSettingSeq=X,2,L
 #FdFirstAmt=X,2,L
 #FdFirstCreditor=X,2,L
-#FdSecondAmt=X,2,L
-#FdSecondCreditor=X,2,L
-#FdThirdAmt=X,2,L
-#FdThirdCreditor=X,2,L
 
 #HideAll=@,1,S
 T(3,@FdApplNo,)
@@ -416,10 +417,6 @@ T(3,@FdClaimDate,)
 T(3,@FdSettingSeq,)
 T(3,@FdFirstAmt,)
 T(3,@FdFirstCreditor,)
-T(3,@FdSecondAmt,)
-T(3,@FdSecondCreditor,)
-T(3,@FdThirdAmt,)
-T(3,@FdThirdCreditor,)
 T(3,@FdEvaCompany,*)
 T(3,@FdMtgCode,*)
 T(3,@FdClStatus,*)
@@ -457,12 +454,6 @@ E(0,@SettingDate,0)
 E(0,@SettingAmt,0)
 E(0,@ClaimDate,0)
 E(0,@SettingSeq,0)
-E(0,@FirstAmt,0)
-T(3,@FirstCreditor,)
-E(0,@SecondAmt,0)
-T(3,@SecondCreditor,)
-E(0,@ThirdAmt,0)
-T(3,@ThirdCreditor,)
 
 
 ! [功能]
@@ -550,14 +541,20 @@ T(F,@SettingDate,0)
 T(F,@SettingAmt,0)
 T(F,@ClaimDate,0)
 T(F,@SettingSeq,0)
-T(F,@FirstAmt,0)
-T(F,@FirstCreditor,0)
-T(F,@SecondAmt,0)
-T(F,@SecondCreditor,0)
-T(F,@ThirdAmt,0)
-T(F,@ThirdCreditor,0)
 T(F,@SettingStat,0)
 T(F,@ClStat,0)
+##loop{times:10,n:1,}
+T(F,@OwnerId{n},0)
+T(F,@OwnerName{n},0)
+T(F,@OwnerRelCode{n},0)
+T(F,@OwnerPart{n},0)
+T(F,@OwnerTotal{n},0)
+##end
+
+##loop{times:8,n:1,}
+T(F,@FirstAmt{n},0)
+T(F,@FirstCreditor{n},0)
+##end
 HIDE(#BTN1)
 HIDE(#MtgAllbtn)
 HIDE(#MtgCheckbtn)
@@ -622,12 +619,6 @@ T(F,@SettingDate,1)
 T(F,@SettingAmt,1)
 T(F,@ClaimDate,1)
 T(F,@SettingSeq,1)
-T(F,@FirstAmt,1)
-T(F,@FirstCreditor,1)
-T(F,@SecondAmt,1)
-T(F,@SecondCreditor,1)
-T(F,@ThirdAmt,1)
-T(F,@ThirdCreditor,1)
 
 ! 若功能為 2 修改 或 4 刪除  : 擔保品號碼為必輸欄位，上*號
 #FunCd24=X,1,S
@@ -823,12 +814,24 @@ T(2,@SettingStat,#L2r23SettingStat)
 E(0,@SettingAmt,#L2r23SettingAmt)
 E(0,@ClaimDate,#L2r23ClaimDate)
 E(0,@SettingSeq,#L2r23SettingSeq)
-E(0,@FirstAmt,#L2r23FirstAmt)
-T(2,@FirstCreditor,#L2r23FirstCreditor)
-E(0,@SecondAmt,#L2r23SecondAmt)
-T(2,@SecondCreditor,#L2r23SecondCreditor)
-E(0,@ThirdAmt,#L2r23ThirdAmt)
-T(2,@ThirdCreditor,#L2r23ThirdCreditor)
+##loop{times:9,i:0}
+T(2,@FirstCreditor{i},#L2r23FirstCreditor{i})
+T(2,@FirstAmt{i},#L2r23FirstAmt{i})
+##end
+##loop{times:8,n:1,k:2,}
+C(3,#FirstAmt{n},0,INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
+#Ranktxt2{n}=x,2,S
+IF({n} == 1,T(3,一),$) 
+IF({n} == 2,T(3,二),$)
+IF({n} == 3,T(3,三),$)
+IF({n} == 4,T(3,四),$)
+IF({n} == 5,T(3,五),$)
+IF({n} == 6,T(3,六),$)
+IF({n} == 7,T(3,七),$)
+IF({n} == 8,T(3,八),$)
+#Rank{n}=X,40,L
+T(2,#Ranktxt1+#Ranktxt2{n}+#Ranktxt3)
+##end
 IF(#L2r23MtgCheck == "",$,s)
 IF(#L2r23MtgLoan == "Y",$,s)
 IF(#L2r23MtgPledge == "Y",$,s)
@@ -1744,67 +1747,46 @@ D(8)
 @V(7)V(2,0)A(4,0,#ClaimDate)
 
 
+
 ! [設定順位]
 #SettingSeq=A,1,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==6,$,CALL(#Show6))
 HELP(#SettingSeqHelp)
 @V(H,#SettingSeqHelp)
-IF(#SettingSeq == 1,T(3,@FdFirstAmt,*)T(3,@FdFirstCreditor,*)
-IF(#SettingSeq >= 2,T(3,@FdFirstAmt,*),$)
-IF(#SettingSeq >= 2,T(3,@FdFirstCreditor,*),$)
-IF(#SettingSeq >= 3,T(3,@FdSecondAmt,*),$)
-IF(#SettingSeq >= 3,T(3,@FdSecondCreditor,*),$)
-IF(#SettingSeq >= 4,T(3,@FdThirdAmt,*),$)
-IF(#SettingSeq >= 4,T(3,@FdThirdCreditor,*),$)
 
+#Rank0=X,40,S
+#FirstAmt0=m,14,S
+#FirstCreditor0=X,40,S
+
+
+##loop{times:8,i:1,rowSeq:2}
+
+#CheckSettingSeq{i}=x,1,L
+IF(#SettingSeq>{i},INVOKEJS(SHOW,grd4_{rowSeq},1),INVOKEJS(SHOW,grd4_{rowSeq},0))
+##end
+
+
+##loop{times:8,i:1,j:0,rowSeq:2}
 
 ! [前一順位金額]
-#FirstAmt=m,14,I
+#FirstAmt{i}=m,14,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==6,$,CALL(#Show6))
-IF(#SettingSeq>=2,$,S)
+IF(#SettingSeq>{i},$,S)
 @V(2,0)
 
 
 ! [前一順位債權人]
-#FirstCreditor=X,10,I
+#FirstCreditor{i}=X,40,I
 IF(#FunCd==4,s,$)
 IF(#PageFg==6,$,CALL(#Show6))
-IF(#SettingSeq>=2,$,S)
+T(3,新光人壽保險股份有限公司)
+C(3,#FirstAmt{i},0,S,$)
 @V(7)
 
+##end
 
-! [前二順位金額]
-#SecondAmt=m,14,I
-IF(#FunCd==4,s,$)
-IF(#PageFg==6,$,CALL(#Show6))
-IF(#SettingSeq>=3,$,S)
-@V(2,0)
-
-
-! [前二順位債權人]
-#SecondCreditor=X,10,I
-IF(#FunCd==4,s,$)
-IF(#PageFg==6,$,CALL(#Show6))
-IF(#SettingSeq>=3,$,S)
-@V(7)
-
-
-! [前三順位金額]
-#ThirdAmt=m,14,I
-IF(#FunCd==4,s,$)
-IF(#PageFg==6,$,CALL(#Show6))
-IF(#SettingSeq>=4,$,S)
-@V(2,0)
-
-
-! [前三順位債權人]
-#ThirdCreditor=X,10,I
-IF(#FunCd==4,s,$)
-IF(#PageFg==6,$,CALL(#Show6))
-IF(#SettingSeq>=4,$,S)
-@V(7)
 
 #ShowAll=X,1,S
 ENABLE(#BtnExpand)
@@ -1889,9 +1871,10 @@ E(0,1)
 ["#FdSettingDate+設定日期",#SettingDate],["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],
 ["#FdSettingAmt+設定金額",#SettingAmt],["#FdClaimDate+擔保債權確定日期",#ClaimDate],
 [#<->#,"#FdSettingSeq+設定順位",#SettingSeq],
-["#FdFirstAmt+前一順位金額",#FirstAmt],["#FdFirstCreditor+前一順位債權人",#FirstCreditor],
-["#FdSecondAmt+前二順位金額",#SecondAmt],["#FdSecondCreditor+前二順位債權人",#SecondCreditor],
-["#FdThirdAmt+前三順位金額",#ThirdAmt],["#FdThirdCreditor+前三順位債權人",#ThirdCreditor],
+["#grid#,{id:4,expand:true,loop:8,row_height:1,s_cols:[100,100,150,300], p_cols:[20,20,20,20]}","","","",
+["順位說明","順位金額","順位債權人"],
+[[#Rank1],[#FirstAmt1],[#FirstCreditor1]]
+],
 ]
 </sub>
 !---------- 輸出共用變數宣告區 ----------
@@ -2023,12 +2006,10 @@ K(MODIFYBUTTON,3,保險單)
 #SettingAmt
 #ClaimDate
 #SettingSeq
-#FirstAmt
-#FirstCreditor
-#SecondAmt
-#SecondCreditor
-#ThirdAmt
-#ThirdCreditor
+##loop{times:8,i:1}
+#FirstAmt{i}
+#FirstCreditor{i}
+##end
 #END
 </sub>
 

@@ -88,7 +88,7 @@ T(1,#VIEW_SYSDATE,2,7)
 E(0,1)ASGN(AGAIN$)
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
-
+<include src="ROM.icf::L8R01.dec"/>
 #CDDEF0001=x,20,S
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
@@ -123,7 +123,7 @@ T(2,@CaseStatus55Help,#HelpDesc4)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic055連動進入),$)
-T(F,@TranKey,0)T(F,@CustId,0)T(F,@ClaimDate,0)T(F,@CaseStatus,0)
+T(F,@TranKey,0)T(F,@CustId,0)T(F,@ClaimDate,0)T(F,@CaseStatus,0)T(F,@CourtCode,0)
 T(F,@Year,0)T(F,@CourtDiv,0)T(F,@CourtCaseNo,0)T(F,@PayDate,0)T(F,@PayEndDate,0)
 T(F,@Period,0)T(F,@Rate,0)T(F,@OutstandAmt,0)T(F,@SubAmt,0)T(F,@ClaimStatus1,0)
 T(F,@SaveDate,0)T(F,@ClaimStatus2,0)T(F,@SaveEndDate,0)T(F,@IsImplement,0)T(F,@InspectName,0)
@@ -165,30 +165,12 @@ T(2,@FdInspectName,*)
 
 ! 異動進入
 #Deal_Update=X,1,S
-C(5,#TranKey_Tmp,2,$,S)
-T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+C(5,#TranKey_Tmp,2,$,S) 
+!T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)
-T(F,@PayDate,1)T(F,@PayEndDate,1)T(F,@Period,1)
-T(F,@Rate,1)T(F,@OutstandAmt,1)T(F,@SubAmt,1)
-T(F,@ClaimStatus1,1)T(F,@SaveDate,1)T(F,@ClaimStatus2,1)
-T(F,@SaveEndDate,1)T(F,@IsImplement,1)T(F,@InspectName,1)
+T(F,@TranKey,1)T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@PayDate,1)T(F,@PayEndDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@OutstandAmt,1)T(F,@SubAmt,1)T(F,@ClaimStatus1,1)T(F,@SaveDate,1)T(F,@ClaimStatus2,1)T(F,@SaveEndDate,1)T(F,@IsImplement,1)T(F,@InspectName,1)
+T(2,@FdYear,*)T(2,@FdCourtDiv,*)T(2,@FdCourtCaseNo,*)T(2,@FdPayDate,*)T(2,@FdPayEndDate,*)T(2,@FdPeriod,*)T(2,@FdRate,*)T(2,@FdOutstandAmt,*)T(2,@FdSubAmt,*)T(2,@FdClaimStatus1,*)T(2,@FdSaveDate,*)T(2,@FdClaimStatus2,*)T(2,@FdSaveEndDate,*)T(2,@FdIsImplement,*)T(2,@FdInspectName,*)
 T(3,@TranKeyHelp,C:異動;D:刪除)
-T(2,@FdYear,*)
-T(2,@FdCourtDiv,*)
-T(2,@FdCourtCaseNo,*)
-T(2,@FdPayDate,*)
-T(2,@FdPayEndDate,*)
-T(2,@FdPeriod,*)
-T(2,@FdRate,*)
-T(2,@FdOutstandAmt,*)
-T(2,@FdSubAmt,*)
-T(2,@FdClaimStatus1,*)
-T(2,@FdSaveDate,*)
-T(2,@FdClaimStatus2,*)
-T(2,@FdSaveEndDate,*)
-T(2,@FdIsImplement,*)
-T(2,@FdInspectName,*)
 
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -204,7 +186,6 @@ K(MODIFYBUTTON,刪除)
 ! 預設值
 #Default=X,1,S
 T(2,@SubmitKey,458)
-<include src="ROM.icf::L8R01.dec"/>
 #RimJcicBankCode=X,3,S
 #RimL8r01=X,1,S
 T(2,@RimJcicBankCode,#SubmitKey)
@@ -224,6 +205,7 @@ T(2,@RimUkey,#Ukey)
 RESET_RIM(#RimL8r27,L8R27)
 S(L8R27,1,#RimUkey)
 R(1,L8R27)
+T(2,@TranKey,#L8r27TranKey)
 T(2,@CustId,#L8r27CustId)
 T(2,@SubmitKey,#L8r27SubmitKey)
 T(2,@CaseStatus,#L8r27CaseStatus)
@@ -266,12 +248,29 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@OutstandAmt,1)T(F,@ClaimStatus1,1)T(F,@SaveDate,1)T(F,@ClaimStatus2,1)T(F,@SaveEndDate,1)T(F,@SubAmt,1)T(2,@FdYear,*)
-T(2,@FdCourtDiv,*)T(2,@FdCourtCaseNo,*)T(2,@FdOutstandAmt,*)T(2,@FdClaimStatus1,*)T(2,@FdSaveDate,*)T(2,@FdClaimStatus2,*)T(2,@FdSaveEndDate,*)T(2,@FdSubAmt,*),
-C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Year,0)T(F,@CourtDiv,0)T(F,@CourtCaseNo,0)T(F,@OutstandAmt,0)T(F,@ClaimStatus1,0)T(F,@SaveDate,0)T(F,@ClaimStatus2,0)T(F,@SaveEndDate,0)T(F,@SubAmt,0)T(2,@FdYear, )
-T(2,@FdCourtDiv, )T(2,@FdCourtCaseNo, )T(2,@FdOutstandAmt, )T(2,@FdClaimStatus1, )T(2,@FdSaveDate, )T(2,@FdClaimStatus2, )T(2,@FdSaveEndDate, )T(2,@FdSubAmt, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)
+T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@PayDate,1)T(F,@PayEndDate,1)
+T(F,@Period,1)T(F,@Rate,1)T(F,@OutstandAmt,1)T(F,@SubAmt,1)T(F,@ClaimStatus1,1)
+T(F,@SaveDate,1)T(F,@ClaimStatus2,1)T(F,@SaveEndDate,1)T(F,@IsImplement,1)T(F,@InspectName,1)
+T(2,@FdYear,*)T(2,@FdCourtDiv,*)T(2,@FdCourtCaseNo,*)T(2,@FdPayDate,*)
+T(2,@FdPayEndDate,*)T(2,@FdPeriod,*)T(2,@FdRate,*)T(2,@FdOutstandAmt,*)
+T(2,@FdSubAmt,*)T(2,@FdClaimStatus1,*)T(2,@FdSaveDate,*)T(2,@FdClaimStatus2,*)
+T(2,@FdSaveEndDate,*)T(2,@FdIsImplement,*)T(2,@FdInspectName,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除) 
+T(F,@Year,0)T(F,@CourtDiv,0)T(F,@CourtCaseNo,0)T(F,@PayDate,0)T(F,@PayEndDate,0)
+T(F,@Period,0)T(F,@Rate,0)T(F,@OutstandAmt,0)T(F,@SubAmt,0)T(F,@ClaimStatus1,0)
+T(F,@SaveDate,0)T(F,@ClaimStatus2,0)T(F,@SaveEndDate,0)T(F,@IsImplement,0)
+T(F,@InspectName,0)
+T(2,@FdYear, )T(2,@FdCourtDiv, )T(2,@FdCourtCaseNo, )T(2,@FdPayDate, )
+T(2,@FdPayEndDate, )T(2,@FdPeriod, )T(2,@FdRate, )T(2,@FdOutstandAmt, )
+T(2,@FdSubAmt, )T(2,@FdClaimStatus1, )T(2,@FdSaveDate, )T(2,@FdClaimStatus2, )
+T(2,@FdSaveEndDate, )T(2,@FdIsImplement, )T(2,@FdInspectName, ),$))
 
 #TranKeyX=X,4,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+T(H,#TranKey,#TranKeyHelp)
 
 ![債務人IDN]
 #CustId=X,10,L
@@ -310,9 +309,9 @@ D(8)
 
 !承審法院代碼
 #CourtCode=X,3,I
-C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey,D,s,$)
 HELP(#CourtCodeHelp,cols:4)
 @V(H,#CourtCodeHelp)V(7)
@@ -327,6 +326,7 @@ V(P,承審法院代碼必須選擇！)
 #Year=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Year,#L8r27Year),$)
 C(5,#TranKey,D,s,$)
 @V(7)
 
@@ -334,6 +334,7 @@ C(5,#TranKey,D,s,$)
 #CourtDiv=C,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CourtDiv,#L8r27CourtDiv),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,2)
 
@@ -341,6 +342,7 @@ C(5,#TranKey,D,s,$)
 #CourtCaseNo=C,45,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CourtCaseNo,#L8r27CourtCaseNo),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,20)
 
@@ -348,6 +350,7 @@ C(5,#TranKey,D,s,$)
 #PayDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayDate,#L8r27PayDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#PayDate)
@@ -356,6 +359,7 @@ D(8)
 #PayEndDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayEndDate,#L8r27PayEndDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#PayEndDate)
@@ -364,6 +368,7 @@ D(8)
 #Period=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Period,#L8r27Period),$)
 C(5,#TranKey,D,s,$)
 
 #CheckCaseStatusIs3Period=X,1,S
@@ -374,24 +379,28 @@ V(P,更生條件（期數）不可為０！)
 #Rate=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Rate,#L8r27Rate),$)
 C(5,#TranKey,D,s,$)
 
 !原始債權金額
 #OutstandAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@OutstandAmt,#L8r27OutstandAmt),$)
 C(5,#TranKey,D,s,$)
 
 !更生損失金額
 #SubAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SubAmt,#L8r27SubAmt),$)
 C(5,#TranKey,D,s,$)
 
 !法院裁定保全處分
 #ClaimStatus1=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@ClaimStatus1,#L8r27ClaimStatus1),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
@@ -400,6 +409,7 @@ HELP(#YesNoHelp)
 #SaveDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SaveDate,#L8r27SaveDate),$)
 C(5,#TranKey,D,s,$)
 @A(DATE,0,#SaveDate)
 
@@ -407,6 +417,7 @@ C(5,#TranKey,D,s,$)
 #ClaimStatus2=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@ClaimStatus2,#L8r27ClaimStatus2),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
@@ -415,6 +426,7 @@ HELP(#YesNoHelp)
 #SaveEndDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SaveEndDate,#L8r27SaveEndDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#SaveEndDate)
@@ -423,6 +435,7 @@ D(8)
 #IsImplement=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@IsImplement,#L8r27IsImplement),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
@@ -431,6 +444,7 @@ HELP(#YesNoHelp)
 #InspectName=C,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@InspectName,#L8r27InspectName),$)
 C(5,#TranKey,D,s,$)
 @V(8,0,5)
 

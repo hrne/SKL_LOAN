@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -32,7 +30,6 @@ import com.st1.itx.tradeService.TradeBuffer;
  */
 
 public class L6068 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6068.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -77,6 +74,7 @@ public class L6068 extends TradeBuffer {
 			occursList.putParam("OOEmail", tCdReport.getEmail());
 			occursList.putParam("OOUsageDesc", tCdReport.getUsageDesc());
 			occursList.putParam("OOSignCode", tCdReport.getSignCode());
+			occursList.putParam("OOWatermarkFlag", tCdReport.getWatermarkFlag());
 			occursList.putParam("OOEnable", tCdReport.getEnable());
 
 			/* 將每筆資料放入Tota的OcList */

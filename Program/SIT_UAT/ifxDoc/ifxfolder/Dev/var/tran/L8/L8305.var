@@ -388,6 +388,7 @@ T(H,#DebtCode,#DebtCodeHelp)
 #NonGageAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@NonGageAmt,#L8r15NonGageAmt),$)
 C(5,#TranKey,X,s,$)
 @V(7)
 IF(#NonGageAmt==0,$,s)
@@ -397,6 +398,7 @@ V(P,無擔保金融債務協商總金額不可為0！)
 #Period=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@Period,#L8r15Period),$)
 C(5,#TranKey,X,s,$)
 @V(7)
 
@@ -408,12 +410,14 @@ V(P,期數不得大於180)
 #Rate=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@Rate,#L8r15Rate),$)
 C(5,#TranKey,X,s,$)
 
 !協商方案估計月付金
 #MonthPayAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@MonthPayAmt,#L8r15MonthPayAmt),$)
 C(5,#TranKey,X,s,$)
 
 #CheckMonthPayAmt=X,1,S
@@ -426,6 +430,7 @@ V(P,協商方案估計月付金不可為空！)
 #ReceYearIncome=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@ReceYearIncome,#L8r15ReceYearIncome),$)
 C(5,#TranKey,X,s,$)
 
 #CheckReceYearIncome=X,1,S
@@ -436,6 +441,7 @@ V(P,最近年度綜合所得總額不可為空！)
 #ReceYear=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@ReceYear,#L8r15ReceYear),$)
 C(5,#TranKey,X,s,$)
 
 ! #CheckReceYear=M,5,S
@@ -448,6 +454,7 @@ C(5,#TranKey,X,s,$)
 #ReceYear2Income=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@ReceYear2Income,#L8r15ReceYear2Income),$)
 C(5,#TranKey,X,s,$)
 
 #CheckReceYear2Income=X,1,S
@@ -458,6 +465,7 @@ V(P,前二年度綜合所得總額不可為空！)
 #ReceYear2=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@ReceYear2,#L8r15ReceYear2),$)
 C(5,#TranKey,X,s,$)
 ! #CheckReceYear2=M,5,S
 ! E(0,#ReceYear2-1911)
@@ -468,6 +476,7 @@ C(5,#TranKey,X,s,$)
 #CurrentMonthIncome=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CurrentMonthIncome,#L8r15CurrentMonthIncome),$)
 C(5,#TranKey,X,s,$)
 
 #CheckCurrentMonthIncome=X,1,S
@@ -478,6 +487,7 @@ V(P,目前每月收入不可為空！)
 #LivingCost=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@LivingCost,#L8r15LivingCost),$)
 C(5,#TranKey,X,s,$)
 
 #CheckLivingCost=X,1,S
@@ -488,6 +498,7 @@ V(P,生活支出總額不可為空！)
 #CompName=X,40,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CompName,#L8r15CompName),$)
 C(5,#TranKey,X,s,$)
 @V(8,0,20)
 
@@ -495,59 +506,70 @@ C(5,#TranKey,X,s,$)
 #CompId=X,8,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CompId,#L8r15CompId),$)
 C(5,#TranKey,X,s,$)
 !債務人名下車輛數量
 #CarCnt=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@CarCnt,#L8r15CarCnt),$)
 C(5,#TranKey,X,s,$)
 !債務人名下建物筆數
 #HouseCnt=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@HouseCnt,#L8r15HouseCnt),$)
 C(5,#TranKey,X,s,$)
 !債務人名下土地筆數
 #LandCnt=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@LandCnt,#L8r15LandCnt),$)
 C(5,#TranKey,X,s,$)
 !撫養子女人數
 #ChildCnt=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@ChildCnt,#L8r15ChildCnt),$)
 C(5,#TranKey,X,s,$)
 !撫養子女責任比率
 #ChildRate=m,3.1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@ChildRate,#L8r15ChildRate),$)
 C(5,#TranKey,X,s,$)
 !撫養父母人數
 #ParentCnt=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@ParentCnt,#L8r15ParentCnt),$)
 C(5,#TranKey,X,s,$)
 !撫養父母責任比率
 #ParentRate=m,3.1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@ParentRate,#L8r15ParentRate),$)
 C(5,#TranKey,X,s,$)
 
 !其他法定撫養人數
 #MouthCnt=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@MouthCnt,#L8r15MouthCnt),$)
 C(5,#TranKey,X,s,$)
 
 !其他法定撫養人之責任比率
 #MouthRate=m,3.1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@MouthRate,#L8r15MouthRate),$)
 C(5,#TranKey,X,s,$)
 
 !屬二階段還款方案之階段註記
 #GradeType=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@GradeType,#L8r15GradeType),$)
 C(5,#TranKey,X,s,$)
 HELP(#GradeTypeDscp)
 @C(4,#GradeType,$,V(H,#GradeTypeDscp))
@@ -571,6 +593,7 @@ V(P,利率只可填0！)
 #PayLastAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@PayLastAmt,#L8r15PayLastAmt),$)
 C(5,#TranKey,X,s,$)
 @IF(#PayLastAmt<0,$,s)
 V(P,第一階段最後一期應繳金額不可小於零！)
@@ -594,6 +617,7 @@ V(P,第一階段最後一期應繳金額應等於（無擔保金融債務協商�
 #Period2=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@Period2,#L8r15Period2),$)
 C(5,#TranKey,X,s,$)
 
 
@@ -615,6 +639,7 @@ IF(#GradeType=="2"
 #Rate2=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@Rate2,#L8r15Rate2),$)
 C(5,#TranKey,X,s,$)
 
 
@@ -635,6 +660,7 @@ IF(#GradeType=="2"
 #MonthPayAmt2=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@MonthPayAmt2,#L8r15MonthPayAmt2),$)
 C(5,#TranKey,X,s,$)
 @IF(#MonthPayAmt2<0,$,s)
 V(P第二階段協商方案估計月付金不可小於零！)
@@ -660,6 +686,7 @@ IF(#GradeType=="2"
 #PayLastAmt2=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,X,T(2,@PayLastAmt2,#L8r15PayLastAmt2),$)
 C(5,#TranKey,X,s,$)
 @IF(#PayLastAmt2<0,$,s)
 V(P,第二階段最後一期應繳金額不可小於零！)

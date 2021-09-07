@@ -22,7 +22,7 @@ public class LM051Report extends MakeReport {
 
 	@Autowired
 	LM051ServiceImpl lM051ServiceImpl;
-
+ 
 	@Autowired
 	MakeExcel makeExcel;
 
@@ -133,7 +133,17 @@ public class LM051Report extends MakeReport {
 				// F4 五類金額(用F16區分F4)=；12~17
 				putAsset(row, tLDVo.get("F4"), tLDVo.get("F16"));
 				// F10 分類標準(文字)；18
-				makeExcel.setValue(row, 17, tLDVo.get("F10").isEmpty() ? "核貸估價" : tLDVo.get("F10"), "L");
+				String classText = "";
+				if (tLDVo.get("F13") == "60" || tLDVo.get("F13") == "61" || tLDVo.get("F13") == "62") {
+					if(!tLDVo.get("F10").isEmpty()) {
+						classText = "協議戶 /" + tLDVo.get("F10");
+					}else {
+						classText = "協議戶 ";
+					}
+				} else {
+					classText = tLDVo.get("F10");
+				}
+				makeExcel.setValue(row, 17, tLDVo.get("F10").isEmpty() ? "核貸估價" : classText, "L");
 				// F11 金額 19
 				makeExcel.setValue(row, 18, Integer.valueOf(tLDVo.get("F11")), "#,##0");
 				// F12 備註；20
@@ -190,48 +200,48 @@ public class LM051Report extends MakeReport {
 	}
 
 	/**
-	 * 逾期數
-	 * 
-	 * @param row 列數
-	 * @param
-	 */
-	private void putTerm(int row, Map<String, String> tLDVo) throws LogicException {
-		String tmp = "";
-		if (tLDVo.get("F17").equals("2")) {
-			tmp = "催";
-			if (tLDVo.get("F14").equals("2")) {
-				tmp = tmp + "協";
-			}
-		} else if (tLDVo.get("F14").equals("2")) {
-			tmp = "協";
-		} else {
-			tmp = tLDVo.get("F6");
-		}
-		makeExcel.setValue(row, 8, tmp, "C");
-	}
+//	 * 逾期數
+//	 * 
+//	 * @param row 列數
+//	 * @param
+//	 */
+//	private void putTerm(int row, Map<String, String> tLDVo) throws LogicException {
+//		String tmp = "";
+//		if (tLDVo.get("F17").equals("2")) {
+//			tmp = "催";
+//			if (tLDVo.get("F14").equals("2")) {
+//				tmp = tmp + "協";
+//			}
+//		} else if (tLDVo.get("F14").equals("2")) {
+//			tmp = "協";
+//		} else {
+//			tmp = tLDVo.get("F6");
+//		}
+//		makeExcel.setValue(row, 8, tmp, "C");
+//	}
 
-	private void memoText(int typeNum) {
-		String one1 = "有足額擔保";
-		String one2 = "有擔保";
-		String one3 = "無擔保";
-
-		String two1 = "--但債信不良(" + typeNum + ")";
-		String two2 = "--拍定後不足額(" + typeNum + ")";
-		String two3 = "--逾繳12月以上(" + typeNum + ")";
-		String two4 = "--逾繳7-12月(" + typeNum + ")";
-		String two5 = "--協議後正常還款(" + typeNum + ")";
-
-		String three1 = "--逾期";
-		String three2 = "--正常繳息";
-		String three3 = "--逾期未滿30日";
-
-	}
-
-	private void regalText() {
-		String one = "核貸估價";
-
-		String two = "協議戶";
-
-	}
+//	private void memoText(int typeNum) {
+//		String one1 = "有足額擔保";
+//		String one2 = "有擔保";
+//		String one3 = "無擔保";
+//
+//		String two1 = "--但債信不良(" + typeNum + ")";
+//		String two2 = "--拍定後不足額(" + typeNum + ")";
+//		String two3 = "--逾繳12月以上(" + typeNum + ")";
+//		String two4 = "--逾繳7-12月(" + typeNum + ")";
+//		String two5 = "--協議後正常還款(" + typeNum + ")";
+//
+//		String three1 = "--逾期";
+//		String three2 = "--正常繳息";
+//		String three3 = "--逾期未滿30日";
+//
+//	}
+//
+//	private void regalText() {
+//		String one = "核貸估價";
+//
+//		String two = "協議戶";
+//
+//	}
 
 }

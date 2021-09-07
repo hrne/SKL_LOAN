@@ -36,6 +36,19 @@ public interface ClImmRankDetailService {
   public Slice<ClImmRankDetail> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+   *
+   * @param clCode1_0 clCode1_0
+   * @param clCode2_1 clCode2_1
+   * @param clNo_2 clNo_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice ClImmRankDetail ClImmRankDetail of List
+   */
+  public Slice<ClImmRankDetail> clNoEq(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By ClImmRankDetail
    * 
    * @param clImmRankDetailId key

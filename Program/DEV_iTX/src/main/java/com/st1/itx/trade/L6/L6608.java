@@ -31,7 +31,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6608 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6608.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -120,6 +119,7 @@ public class L6608 extends TradeBuffer {
 		mCdReport.setEmail(this.parse.stringToInteger((titaVo.getParam("Email"))));
 		mCdReport.setUsageDesc(titaVo.getParam("UsageDesc"));
 		mCdReport.setSignCode(this.parse.stringToInteger((titaVo.getParam("SignCode"))));
+		mCdReport.setWatermarkFlag(this.parse.stringToInteger(titaVo.getParam("Watermark")));
 		mCdReport.setEnable(titaVo.getParam("Enable"));
 
 		if (mFuncCode != 2) {

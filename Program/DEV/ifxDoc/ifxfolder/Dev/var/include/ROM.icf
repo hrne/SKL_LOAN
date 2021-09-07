@@ -2283,12 +2283,10 @@ TXFORM=L2R22
 #L2r23SettingAmt=m,14,S
 #L2r23ClaimDate=D,7,S
 #L2r23SettingSeq=A,1,S
-#L2r23FirstCreditor=X,10,S
-#L2r23FirstAmt=m,14,S
-#L2r23SecondCreditor=X,10,S
-#L2r23SecondAmt=m,14,S
-#L2r23ThirdCreditor=X,10,S
-#L2r23ThirdAmt=m,14,S
+##loop{times:9,i:0}
+#L2r23FirstCreditor{i}=X,40,S
+#L2r23FirstAmt{i}=m,14,S
+##end
 </L2R23.dec>
 
 <L2R23.tom>
@@ -2324,12 +2322,10 @@ TXFORM=L2R23
 #L2r23SettingAmt
 #L2r23ClaimDate
 #L2r23SettingSeq
-#L2r23FirstCreditor
-#L2r23FirstAmt
-#L2r23SecondCreditor
-#L2r23SecondAmt
-#L2r23ThirdCreditor
-#L2r23ThirdAmt
+##loop{times:9,i:0}
+#L2r23FirstCreditor{i}
+#L2r23FirstAmt{i}
+##end
 ^
 </L2R23.tom>
 !    L2R24 : 尋找擔保品動產檔 ClCode1,ClCode2,ClNo
@@ -8269,6 +8265,7 @@ TXFORM=L6R29
 #L6R31Email=A,1,S
 #L6R31SignCode=A,1,S
 #L6R31UsageDesc=X,80,S
+#L6R31Watermark=A,1,S
 #L6R31Enable=X,1,S
 </L6R31.dec>
 
@@ -8283,6 +8280,7 @@ TXFORM=L6R31
 #L6R31Email
 #L6R31SignCode
 #L6R31UsageDesc
+#L6R31Watermark
 #L6R31Enable
 ^
 </L6R31.tom>
