@@ -3,8 +3,6 @@ package com.st1.itx.trade.L4;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -30,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4930 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4930.class);
 	@Autowired
 	public Parse parse;
 
@@ -81,15 +78,13 @@ public class L4930 extends TradeBuffer {
 			if (iCustNo == 0) {
 				sBatxDetail = batxDetailService.findL4920HEq(iAcDate, iBatchNo, func2, this.index, this.limit, titaVo);
 			} else {
-				sBatxDetail = batxDetailService.findL4930A(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit,
-						titaVo);
+				sBatxDetail = batxDetailService.findL4930A(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit, titaVo);
 			}
 		} else if (iFunctionCode == 1) {
 			if (iCustNo == 0) {
 				sBatxDetail = batxDetailService.findL4920HEq(iAcDate, iBatchNo, func1, this.index, this.limit, titaVo);
 			} else {
-				sBatxDetail = batxDetailService.findL4930A(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit,
-						titaVo);
+				sBatxDetail = batxDetailService.findL4930A(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit, titaVo);
 			}
 		}
 
@@ -122,6 +117,7 @@ public class L4930 extends TradeBuffer {
 
 				occursList.putParam("OOProcCode", tBatxDetail.getProcCode());
 				occursList.putParam("OOProcStsCode", tBatxDetail.getProcStsCode());
+				occursList.putParam("OOEntryDate", tBatxDetail.getEntryDate());
 
 				String procNote = "";
 				if (tBatxDetail.getProcNote() != null) {
@@ -140,24 +136,21 @@ public class L4930 extends TradeBuffer {
 					}
 //					當吃檔進去時不會寫入還款類別，檢核後才會寫入。
 //					若該筆無還款類別且為數字型態，顯示虛擬帳號
-					if (tempVo.get("VirtualAcctNo") != null && tBatxDetail.getRepayType() == 0
-							&& isNumeric(tempVo.get("VirtualAcctNo"))) {
+					if (tempVo.get("VirtualAcctNo") != null && tBatxDetail.getRepayType() == 0 && isNumeric(tempVo.get("VirtualAcctNo"))) {
 						procNote = procNote + "虛擬帳號:" + tempVo.get("VirtualAcctNo");
 					}
 				}
-				
+
 				occursList.putParam("OOProcNote", procNote);
-				
+
 				if (iFunctionCode == 2) {
 					if (tBatxDetail.getProcStsCode().equals("7")) {
-						occursList.putParam("OOTxSn",
-								titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
+						occursList.putParam("OOTxSn", titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
 					} else {
 						occursList.putParam("OOTxSn", "");
 					}
 				} else {
-					occursList.putParam("OOTxSn",
-							titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
+					occursList.putParam("OOTxSn", titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
 				}
 				this.totaVo.addOccursList(occursList);
 			}

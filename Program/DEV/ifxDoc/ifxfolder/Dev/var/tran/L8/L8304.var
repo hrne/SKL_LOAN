@@ -303,6 +303,7 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 #Account=X,50,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 @V(7)
 V(8,0,50)
 

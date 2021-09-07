@@ -2,6 +2,8 @@ package com.st1.itx.trade.L3;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +37,7 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R10")
 @Scope("prototype")
 public class L3R10 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3R10.class);
+	private static final Logger logger = LoggerFactory.getLogger(L3R10.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -54,7 +56,7 @@ public class L3R10 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L3R10 ");
+		logger.info("active L3R10 ");
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		loanCom.setTxBuffer(this.txBuffer);
@@ -106,6 +108,7 @@ public class L3R10 extends TradeBuffer {
 		this.totaVo.putParam("OSigningDate", 0);
 		this.totaVo.putParam("ODrawdownStartDate", 0);
 		this.totaVo.putParam("ODrawdownEndDate", 0);
+		this.totaVo.putParam("OSyndTypeCodeFlag", "");
 		this.totaVo.putParam("OPartRate", 0);
 		this.totaVo.putParam("OCurrencyCode", "");
 		this.totaVo.putParam("OSyndAmt", "0");
@@ -132,6 +135,7 @@ public class L3R10 extends TradeBuffer {
 		this.totaVo.putParam("OSigningDate", tLoanSynd.getSigningDate());
 		this.totaVo.putParam("ODrawdownStartDate", tLoanSynd.getDrawdownStartDate());
 		this.totaVo.putParam("ODrawdownEndDate", tLoanSynd.getDrawdownEndDate());
+		this.totaVo.putParam("OSyndTypeCodeFlag", tLoanSynd.getSyndTypeCodeFlag());
 		this.totaVo.putParam("OPartRate", tLoanSynd.getPartRate());
 		this.totaVo.putParam("OCurrencyCode", tLoanSynd.getCurrencyCode());
 		this.totaVo.putParam("OSyndAmt", tLoanSynd.getSyndAmt());

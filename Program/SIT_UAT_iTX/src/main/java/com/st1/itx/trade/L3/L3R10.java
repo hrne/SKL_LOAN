@@ -56,7 +56,7 @@ public class L3R10 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L3R10 ");
+		logger.info("active L3R10 ");
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
 		loanCom.setTxBuffer(this.txBuffer);
@@ -108,6 +108,7 @@ public class L3R10 extends TradeBuffer {
 		this.totaVo.putParam("OSigningDate", 0);
 		this.totaVo.putParam("ODrawdownStartDate", 0);
 		this.totaVo.putParam("ODrawdownEndDate", 0);
+		this.totaVo.putParam("OSyndTypeCodeFlag", "");
 		this.totaVo.putParam("OPartRate", 0);
 		this.totaVo.putParam("OCurrencyCode", "");
 		this.totaVo.putParam("OSyndAmt", "0");
@@ -134,6 +135,7 @@ public class L3R10 extends TradeBuffer {
 		this.totaVo.putParam("OSigningDate", tLoanSynd.getSigningDate());
 		this.totaVo.putParam("ODrawdownStartDate", tLoanSynd.getDrawdownStartDate());
 		this.totaVo.putParam("ODrawdownEndDate", tLoanSynd.getDrawdownEndDate());
+		this.totaVo.putParam("OSyndTypeCodeFlag", tLoanSynd.getSyndTypeCodeFlag());
 		this.totaVo.putParam("OPartRate", tLoanSynd.getPartRate());
 		this.totaVo.putParam("OCurrencyCode", tLoanSynd.getCurrencyCode());
 		this.totaVo.putParam("OSyndAmt", tLoanSynd.getSyndAmt());

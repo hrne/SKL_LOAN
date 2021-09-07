@@ -97,6 +97,7 @@ public class L2600 extends TradeBuffer {
 	private String iCustId;
 	private int iCustNo;
 	private int iSyndNo;
+	private String iSyndTypeCode;
 	private String iGuaId;
 	private String iLeadingBank;
 	private int iSigningDate;
@@ -147,6 +148,7 @@ public class L2600 extends TradeBuffer {
 		iCustId = titaVo.getParam("CustId");
 		iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		iSyndNo = this.parse.stringToInteger(titaVo.getParam("SyndNo"));
+		iSyndTypeCode = titaVo.getParam("SyndTypeCode");
 		iGuaId = titaVo.getParam("GuaId");
 		iLeadingBank = titaVo.getParam("LeadingBank");
 		iSigningDate = this.parse.stringToInteger(titaVo.getParam("SigningDate"));
@@ -266,6 +268,7 @@ public class L2600 extends TradeBuffer {
 		tLoanSynd.setLastBorxNo(wkBorxNo);
 		tLoanSynd.setCustUKey(loanCom.getCustUKey(iCustId, titaVo));
 		tLoanSynd.setGuaUKey(loanCom.getCustUKey(iGuaId, titaVo));
+		tLoanSynd.setSyndTypeCodeFlag(iSyndTypeCode);
 		tLoanSynd.setLeadingBank(iLeadingBank);
 		tLoanSynd.setSigningDate(iSigningDate);
 		tLoanSynd.setDrawdownStartDate(iDrawdownStartDate);
@@ -369,7 +372,8 @@ public class L2600 extends TradeBuffer {
 	private void DeleteLoanSyndItemRoutine() throws LogicException {
 		this.info("DeleteLoanSyndItemRoutine ...");
 
-		Slice<LoanSyndItem> slLoanSyndItem = loanSyndItemService.findSyndNo(wkCustNo, wkSyndNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanSyndItem> slLoanSyndItem = loanSyndItemService.findSyndNo(wkCustNo, wkSyndNo, 0, Integer.MAX_VALUE,
+				titaVo);
 		List<LoanSyndItem> lLoanSyndItem = slLoanSyndItem == null ? null : slLoanSyndItem.getContent();
 		if (lLoanSyndItem != null && lLoanSyndItem.size() > 0) {
 			try {

@@ -131,7 +131,7 @@ T(2,@FdPeriod,*)
 T(2,@FdRate,*)
 T(2,@FdMonthPayAmt,*)
 T(2,@FdPayAccount,*)
-T(3,@TranKeyHelp,C:異動;D:補件))
+T(3,@TranKeyHelp,C:異動;D:刪除;X:補件))
 
 
 ! 查詢進入
@@ -202,7 +202,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdCivil323Amt,*)T(2,@FdTotalAmt,*)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPeriod,*)T(2,@FdRate,*)T(2,@FdMonthPayAmt,*)T(2,@FdPayAccount,*),C(5,#TranKey,D,K(MODIFYBUTTON,補件)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdCivil323Amt, )T(2,@FdTotalAmt, )T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPeriod, )T(2,@FdRate, )T(2,@FdMonthPayAmt, )T(2,@FdPayAccount, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@SignDate,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)T(2,@FdCivil323Amt,*)T(2,@FdTotalAmt,*)T(2,@FdSignDate,*)T(2,@FdFirstPayDate,*)T(2,@FdPeriod,*)T(2,@FdRate,*)T(2,@FdMonthPayAmt,*)T(2,@FdPayAccount,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdCivil323Amt, )T(2,@FdTotalAmt, )T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPeriod, )T(2,@FdRate, )T(2,@FdMonthPayAmt, )T(2,@FdPayAccount, ),$))
+C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@SignDate,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)T(2,@FdCivil323Amt, )T(2,@FdTotalAmt, )T(2,@FdSignDate, )T(2,@FdFirstPayDate, )T(2,@FdPeriod, )T(2,@FdRate, )T(2,@FdMonthPayAmt, )T(2,@FdPayAccount, ),$))
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
@@ -237,23 +239,35 @@ R(1,L8R01)
 T(2,@CourtCodeX,#L8r01JcicBankName)
 
 #CourtCodeX=X,80,L
-
+T(2,@RimJcicBankCode,#CourtCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 !依民法第323條計算之債權總金額
 #Civil323Amt=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@Civil323Amt,#L8r44Civil323Amt),$)
+C(5,#TranKey,X,T(2,@Civil323Amt,#L8r44Civil323Amt),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !簽約總債權金額
 #TotalAmt=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@TotalAmt,#L8r44TotalAmt),$)
+C(5,#TranKey,X,T(2,@TotalAmt,#L8r44TotalAmt),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !簽約完成日期
 #SignDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 D(8)
 @V(7)
 A(DATE,0,#SignDate)
@@ -264,6 +278,8 @@ A(DATE,0,#SignDate)
 #FirstPayDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 D(8)
 @V(7)
 A(DATE,0,#FirstPayDate)
@@ -274,6 +290,8 @@ A(DATE,0,#FirstPayDate)
 #Period=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 #CheckPeriod=X,1,S
 IF(#Period>=0 && #Period<=180,S,$)
 V(P,期數需小於或等於180)
@@ -282,16 +300,25 @@ V(P,期數需小於或等於180)
 #Rate=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 !月付金
 #MonthPayAmt=m,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@MonthPayAmt,#L8r44MonthPayAmt),$)
+C(5,#TranKey,X,T(2,@MonthPayAmt,#L8r44MonthPayAmt),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !繳款帳號
 #PayAccount=X,20,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayAccount,#L8r44PayAccount),$)
+C(5,#TranKey,X,T(2,@PayAccount,#L8r44PayAccount),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

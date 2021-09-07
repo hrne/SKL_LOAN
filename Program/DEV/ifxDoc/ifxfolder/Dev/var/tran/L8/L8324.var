@@ -262,7 +262,14 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-! C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdCustRegTelNo,*)T(2,@FdCustComTelNo,*)T(2,@FdCustMobilNo,*),C(5,#TranKey,D,K(MODIFYBUTTON,補件)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdCustRegTelNo, )T(2,@FdCustComTelNo, )T(2,@FdCustMobilNo, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@IsMaxMain,1)T(F,@GuarantyType,1)T(F,@LoanAmt,1)T(F,@CreditAmt,1)T(F,@Principal,1)T(F,@Interest,1)T(F,@Penalty,1)T(F,@Other,1)T(F,@TerminalPayAmt,1)T(F,@LatestPayAmt,1)T(F,@FinalPayDay,1)T(F,@NotyetacQuit,1)T(F,@MothPayDay,1)T(F,@BeginDate,1)T(F,@EndDate,1)
+T(2,@FdIsMaxMain,*)T(2,@FdGuarantyType,*)T(2,@FdLoanAmt,*)T(2,@FdCreditAmt,*)T(2,@FdPrincipal,*)T(2,@FdInterest,*)T(2,@FdPenalty,*)T(2,@FdOther,*)T(2,@FdTerminalPayAmt,*)T(2,@FdLatestPayAmt,*)T(2,@FdFinalPayDay,*)T(2,@FdNotyetacQuit,*)T(2,@FdMothPayDay,*)T(2,@FdBeginDate,*)T(2,@FdEndDate,*)
+,
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@IsMaxMain,0)T(F,@GuarantyType,0)T(F,@LoanAmt,0)T(F,@CreditAmt,0)T(F,@Principal,0)T(F,@Interest,0)T(F,@Penalty,0)T(F,@Other,0)T(F,@TerminalPayAmt,0)T(F,@LatestPayAmt,0)T(F,@FinalPayDay,0)T(F,@NotyetacQuit,0)T(F,@MothPayDay,0)T(F,@BeginDate,0)T(F,@EndDate,0)
+T(2,@FdIsMaxMain, )T(2,@FdGuarantyType, )T(2,@FdLoanAmt, )T(2,@FdCreditAmt, )T(2,@FdPrincipal, )T(2,@FdInterest, )T(2,@FdPenalty, )T(2,@FdOther, )T(2,@FdTerminalPayAmt, )T(2,@FdLatestPayAmt, )T(2,@FdFinalPayDay, )T(2,@FdNotyetacQuit, )T(2,@FdMothPayDay, )T(2,@FdBeginDate, )T(2,@FdEndDate, )
+,$))
+
+
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
@@ -327,13 +334,21 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 #IsMaxMain=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@IsMaxMain,#L8r41IsMaxMain),$)
+C(5,#TranKey,X,T(2,@IsMaxMain,#L8r41IsMaxMain),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
 !帳號
-#Account=X,50,I
+#Account=X,50,L
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Account,#L8r41Account),$)
+C(5,#TranKey,X,T(2,@Account,#L8r41Account),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(7)
 V(8,0,50)
 
@@ -342,9 +357,13 @@ V(8,0,50)
 #GuarantyType=X,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@GuarantyType,#L8r41GuarantyType),$)
+C(5,#TranKey,X,T(2,@GuarantyType,#L8r41GuarantyType),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 HELP(#CollateralTypeHelp,cols:6)
 @V(H,#CollateralTypeHelp)
-!看書
+
 #GuarantyTypeX=X,50,L
 T(H,#GuarantyType,#CollateralTypeHelp)
 
@@ -352,31 +371,50 @@ T(H,#GuarantyType,#CollateralTypeHelp)
 #LoanAmt=m,12,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@LoanAmt,#L8r41LoanAmt),$)
+C(5,#TranKey,X,T(2,@LoanAmt,#L8r41LoanAmt),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 !本金
 #Principal=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@Principal,#L8r41Principal),$)
+C(5,#TranKey,X,T(2,@Principal,#L8r41Principal),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 !利息
 #Interest=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@Interest,#L8r41Interest),$)
+C(5,#TranKey,X,T(2,@Interest,#L8r41Interest),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 !違約金
 #Penalty=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@Penalty,#L8r41Penalty),$)
+C(5,#TranKey,X,T(2,@Penalty,#L8r41Penalty),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 !其他費用
 #Other=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@Other,#L8r41Other),$)
+C(5,#TranKey,X,T(2,@Other,#L8r41Other),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 !授信餘額
 #CreditAmt=m,12,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CreditAmt,#L8r41CreditAmt),$)
+C(5,#TranKey,X,T(2,@CreditAmt,#L8r41CreditAmt),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 #Total=m,14,S
 @E(0,#Principal+#Interest+#Penalty+#Other)
 IF(#CreditAmt!=#Total,$,S)
@@ -386,17 +424,27 @@ V(P,授信餘額合計有誤，請重新輸入。〔本金＋利息＋違約金�
 #TerminalPayAmt=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@TerminalPayAmt,#L8r41TerminalPayAmt),$)
+C(5,#TranKey,X,T(2,@TerminalPayAmt,#L8r41TerminalPayAmt),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 !最近一期繳款金額
 #LatestPayAmt=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@LatestPayAmt,#L8r41LatestPayAmt),$)
+C(5,#TranKey,X,T(2,@LatestPayAmt,#L8r41LatestPayAmt),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !最後繳息日
 #FinalPayDay=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@FinalPayDay,#L8r41FinalPayDay),$)
+C(5,#TranKey,X,T(2,@FinalPayDay,#L8r41FinalPayDay),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 D(8)
 @A(DATE,0,#FinalPayDay)
 
@@ -404,12 +452,18 @@ D(8)
 #NotyetacQuit=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@NotyetacQuit,#L8r41NotyetacQuit),$)
+C(5,#TranKey,X,T(2,@NotyetacQuit,#L8r41NotyetacQuit),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 !每月應還款日
 #MothPayDay=A,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#TranKey,D,T(2,@MothPayDay,#L8r41MothPayDay),$)
+C(5,#TranKey,X,T(2,@MothPayDay,#L8r41MothPayDay),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 #ChekcMothPayDay=X,1,S
 IF(#MothPayDay>=1 && #MothPayDay<=31,S,$)
 V(P,每月應還款日輸入有誤)
@@ -418,6 +472,10 @@ V(P,每月應還款日輸入有誤)
 #BeginDate=X,5,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@BeginDate,#L8r41BeginDate),$)
+C(5,#TranKey,X,T(2,@BeginDate,#L8r41BeginDate),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(7)
 
 #CheckBeginDate=D,7,S
@@ -428,6 +486,10 @@ T(2,#BeginDate+01)
 #EndDate=X,5,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@EndDate,#L8r41EndDate),$)
+C(5,#TranKey,X,T(2,@EndDate,#L8r41EndDate),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(7)
 
 #CheckEndDate=D,7,S

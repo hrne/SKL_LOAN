@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -82,7 +80,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3210")
 @Scope("prototype")
 public class L3210 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3210.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -116,7 +113,6 @@ public class L3210 extends TradeBuffer {
 	private int iTempReasonCode;
 	private int iTempSourceCode;
 	private BigDecimal iTempAmt;
-	private BigDecimal iTxAmt;
 	private LoanCheque tLoanCheque;
 	private LoanChequeId tLoanChequeId;
 	private BigDecimal wkTempAmt;
@@ -140,7 +136,7 @@ public class L3210 extends TradeBuffer {
 		this.iTempAmt = BigDecimal.ZERO;
 		this.wkTempAmt = BigDecimal.ZERO;
 		this.tTempVo = new TempVo();
-		new ArrayList<AcDetail>();
+		this.lAcDetail = new ArrayList<AcDetail>();
 	}
 
 	@Override
@@ -161,7 +157,6 @@ public class L3210 extends TradeBuffer {
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 		iTempSourceCode = this.parse.stringToInteger(titaVo.getParam("TempSourceCode"));
 		iTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimTempAmt"));
-		iTxAmt = parse.stringToBigDecimal(titaVo.getTxAmt()); // 回收金額
 		// 交易金額
 		if (iTempReasonCode == 3 || iTempReasonCode == 6) // 期票、即期票
 			this.isBortx = false;
@@ -169,7 +164,7 @@ public class L3210 extends TradeBuffer {
 			this.isBortx = true;
 
 		// 暫收款金額 存入暫收為正
-		wkTempAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
+		wkTempAmt = iTempAmt;
 
 		if (iTempSourceCode == 4) { // 支票
 			tLoanChequeId = new LoanChequeId(iChequeAcct, iChequeNo);
@@ -284,6 +279,7 @@ public class L3210 extends TradeBuffer {
 				acDetail.setCustNo(iCustNo);
 				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
 				lAcDetail.add(acDetail);
+				this.info("SlipNote = " + acDetail.getSlipNote());
 				/* 5.找債協專戶的匯入款，為一般債權匯入款的戶號 for L3210暫收入帳 */
 				TempVo tTempVo = acNegCom.getNegAppr02CustNo(iEntryDate, iTempAmt, iCustNo, titaVo);
 				if (!"".equals(tTempVo.getParam("NegCustNo"))) {
@@ -296,6 +292,8 @@ public class L3210 extends TradeBuffer {
 					acDetail.setCustNo(iCustNo);
 					acDetail.setSlipNote("一般債權撥付");
 					lAcDetail.add(acDetail);
+					this.info("SlipNote1 = " + acDetail.getSlipNote());
+
 					acDetail = new AcDetail();
 					acDetail.setDbCr("C");
 					acDetail.setSumNo("094"); // 094 :轉債協暫收款
@@ -303,8 +301,10 @@ public class L3210 extends TradeBuffer {
 					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
 					acDetail.setTxAmt(iTempAmt);
 					acDetail.setCustNo(negCustNo);
-					acDetail.setSlipNote(titaVo.getParam("一般債權撥付"));
+					acDetail.setSlipNote("一般債權撥付");
+					acDetail.setJsonFields(tTempVo.getJsonString()); // for AcNegCom Updae
 					lAcDetail.add(acDetail);
+					this.info("SlipNote2 = " + acDetail.getSlipNote());
 				}
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;
@@ -338,17 +338,16 @@ public class L3210 extends TradeBuffer {
 				// 貸方
 				if (titaVo.isTrmtypBatch()) {
 					acDetailSettleUnpaid();
-				} else {
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode("TAV");
-					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-					acDetail.setTxAmt(iTempAmt);
-					acDetail.setCustNo(iCustNo);
-					acDetail.setFacmNo(iFacmNo);
-					acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
-					lAcDetail.add(acDetail);
 				}
+				acDetail = new AcDetail();
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode("TAV");
+				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+				acDetail.setTxAmt(wkTempAmt);
+				acDetail.setCustNo(iCustNo);
+				acDetail.setFacmNo(iFacmNo);
+				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
+				lAcDetail.add(acDetail);
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;
 			case 10: // AML凍結／未確定
@@ -373,21 +372,21 @@ public class L3210 extends TradeBuffer {
 				// 整批入帳自動收回費用
 				if (titaVo.isTrmtypBatch()) {
 					acDetailSettleUnpaid();
-				} else {
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setAcctCode("TAV");
-					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-					acDetail.setTxAmt(iTempAmt);
-					acDetail.setCustNo(iCustNo);
-					acDetail.setFacmNo(iFacmNo);
-					acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
-					lAcDetail.add(acDetail);
 				}
+				acDetail = new AcDetail();
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode("TAV");
+				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+				acDetail.setTxAmt(wkTempAmt);
+				acDetail.setCustNo(iCustNo);
+				acDetail.setFacmNo(iFacmNo);
+				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
+				lAcDetail.add(acDetail);
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;
 			}
-			this.info("AcDetailRoutine " + lAcDetail.toString());
+			this.info("L3210 AcDetailRoutine  " + lAcDetail.toString());
+			this.info("L3210 AcDetailCom.... : acListsize=" + this.txBuffer.getAcDetailList().size());
 
 			// 產生會計分錄
 			acDetailCom.setTxBuffer(this.txBuffer);
@@ -399,12 +398,13 @@ public class L3210 extends TradeBuffer {
 	// 貸方費用帳務處理
 	private void acDetailSettleUnpaid() throws LogicException {
 		this.baTxList = new ArrayList<BaTxVo>();
+		BigDecimal acctAmt = BigDecimal.ZERO;
 		int iRepayType = parse.stringToInteger(titaVo.getParam("RpType1"));
 		if (iRepayType <= 3) {
 			iRepayType = 9; // 09-其他
 		}
 		// call 應繳試算
-		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, iRepayType, iTxAmt, titaVo);
+		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, iRepayType, iTempAmt, titaVo);
 		if (this.baTxList != null) {
 			for (BaTxVo ba : this.baTxList) {
 				if (ba.getDataKind() == 1 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
@@ -418,11 +418,12 @@ public class L3210 extends TradeBuffer {
 					acDetail.setRvNo(ba.getRvNo());
 					acDetail.setReceivableFlag(ba.getReceivableFlag());
 					lAcDetail.add(acDetail);
+					acctAmt = acctAmt.add(ba.getAcctAmt());
 				}
 			}
-			// 暫收款金額
-			wkTempAmt = baTxCom.getTempAmt();
 		}
+		// 暫收款金額
+		wkTempAmt = iTempAmt.subtract(acctAmt);
 	}
 
 	// 新增放款交易內容檔
@@ -446,14 +447,14 @@ public class L3210 extends TradeBuffer {
 		tTempVo.clear();
 		tTempVo.putParam("TempReasonCode", iTempReasonCode);
 		tTempVo.putParam("TempSourceCode", iTempSourceCode);
-		tTempVo.putParam("BatchNo", titaVo.getBacthNo()); //整批批號
+		tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 
 		if (titaVo.get("RpCode1") != null) {
 			tTempVo.putParam("RepayCode", titaVo.getParam("RpCode1")); // 還款來源
 		}
 		if (titaVo.get("RpDscpt1") != null) {
 			tTempVo.putParam("DscptCode", titaVo.getParam("RpDscpt1")); // 摘要代碼
-		}		
+		}
 		if (titaVo.getBacthNo().trim() != "") {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號

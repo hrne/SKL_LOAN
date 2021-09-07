@@ -38,18 +38,21 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,350,150];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8322]                                 (440)前置調解受理申請暨請求回報債權通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 ["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-[#<->#,"#FdApplyDate+調解申請日",#ApplyDate],
-["#FdApplyType+受理方式",#ApplyType,#ApplyTypeX],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ["#FdAgreeDate+同意書取得日期",#AgreeDate],["#FdStartDate+首次調解日",#StartDate],
-["#FdRemindDate+債權計算基準日",#RemindDate],["#FdReportYn+協辦行是否需自行回報債權",#ReportYn],
-["#FdNotBankId1+未揭露債權機構代號1",#NotBankId1,#NotBankIdX1],["#FdNotBankId2+未揭露債權機構代號2",#NotBankId2,#NotBankIdX2],
-["#FdNotBankId3+未揭露債權機構代號3",#NotBankId3,#NotBankIdX3],["#FdNotBankId4+未揭露債權機構代號4",#NotBankId4,#NotBankIdX4],
-["#FdNotBankId5+未揭露債權機構代號5",#NotBankId5,#NotBankIdX5],["#FdNotBankId6+未揭露債權機構代號6",#NotBankId6,#NotBankIdX6],
+["#FdRemindDate+債權計算基準日",#RemindDate],["#FdApplyType+受理方式",#ApplyType,#ApplyTypeX],
+[#<->#,"#FdReportYn+協辦行是否需自行回報債權",#ReportYn],
+[#<->#,"#FdNotBankId1+未揭露債權機構代號1",#NotBankId1,#NotBankIdX1],
+[#<->#,"#FdNotBankId2+未揭露債權機構代號2",#NotBankId2,#NotBankIdX2],
+[#<->#,"#FdNotBankId3+未揭露債權機構代號3",#NotBankId3,#NotBankIdX3],
+[#<->#,"#FdNotBankId4+未揭露債權機構代號4",#NotBankId4,#NotBankIdX4],
+[#<->#,"#FdNotBankId5+未揭露債權機構代號5",#NotBankId5,#NotBankIdX5],
+[#<->#,"#FdNotBankId6+未揭露債權機構代號6",#NotBankId6,#NotBankIdX6],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
@@ -109,8 +112,8 @@ T(2,@ApplyTypeHelp,#HelpDesc3)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic440連動進入),$)
-T(F,@TranKey,0)T(F,@ApplyDate,0)T(F,@ApplyType,0)T(F,@CourtCode,0)T(F,@AgreeDate,0)T(F,@StartDate,0)
-T(F,@RemindDate,0)T(F,@ReportYn,0)T(F,@NotBankId1,0)T(F,@NotBankId2,0)T(F,@NotBankId3,0)
+T(F,@TranKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@AgreeDate,0)T(F,@StartDate,0)
+T(F,@RemindDate,0)T(F,@ApplyType,0)T(F,@ReportYn,0)T(F,@NotBankId1,0)T(F,@NotBankId2,0)T(F,@NotBankId3,0)
 T(F,@NotBankId4,0)T(F,@NotBankId5,0)T(F,@NotBankId6,0)
 #AutoReFresh=A,1,S
 C(3,#CHAIN,1,$,S)
@@ -128,8 +131,8 @@ T(1,@TranKey,#NTXBUF,2,1)
 C(5,#TranKey_Tmp,1,$,S)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@ApplyDate,1)T(F,@ApplyType,1)T(F,@CourtCode,1)T(F,@AgreeDate,1)T(F,@StartDate,1)
-T(F,@RemindDate,1)T(F,@ReportYn,1)T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
+T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@AgreeDate,1)T(F,@StartDate,1)
+T(F,@RemindDate,1)T(F,@ApplyType,1)T(F,@ReportYn,1)T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
 T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdApplyDate,*)
@@ -151,11 +154,12 @@ T(2,@FdNotBankId6,*)
 C(5,#TranKey_Tmp,2,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@AgreeDate,1)T(F,@StartDate,1)T(F,@RemindDate,1)T(F,@ReportYn,1)
+T(F,@AgreeDate,1)T(F,@StartDate,1)T(F,@RemindDate,1)T(F,@ApplyType,1)T(F,@ReportYn,1)
 T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
 T(2,@FdAgreeDate,*)
 T(2,@FdStartDate,*)
 T(2,@FdRemindDate,*)
+T(2,@FdApplyType,*)
 T(2,@FdReportYn,*)
 T(2,@FdNotBankId1,*)
 T(2,@FdNotBankId2,*)
@@ -257,24 +261,14 @@ HELP(#TranKeyHelp)
 
 !款項統一收付申請日
 #ApplyDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)
 @A(DATE,0,#ApplyDate)
 
-!受理方式
-#ApplyType=X,1,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-HELP(#ApplyTypeHelp)
-@V(H,#ApplyTypeHelp)
 
-#ApplyTypeX=X,40,L
-T(H,#ApplyType,#ApplyTypeHelp)
-
-!#RimJcicCourtZipCode=X,3,S
-#RimApplyType=X,1,S
-T(2,#ApplyType)
 
 !受理調解機構代號-承審法院代碼OR郵遞區號
 #CourtCode=X,3,I
@@ -288,6 +282,10 @@ R(1,L8R01)
 T(2,@CourtCodeX,#L8r01JcicBankName)
 
 #CourtCodeX=X,80,L
+T(2,@RimJcicBankCode,#CourtCode)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 
 !同意書取得日期
 #AgreeDate=D,7,I
@@ -313,6 +311,20 @@ D(8)
 @V(7)
 @A(DATE,0,#RemindDate)
 
+!受理方式
+#ApplyType=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#ApplyTypeHelp)
+@V(H,#ApplyTypeHelp)
+
+#ApplyTypeX=X,40,L
+T(H,#ApplyType,#ApplyTypeHelp)
+
+!#RimJcicCourtZipCode=X,3,S
+#RimApplyType=X,1,S
+T(2,#ApplyType)
+
 !協辦行是否需自行回報債權
 #ReportYn=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -328,6 +340,8 @@ T(2,1)
 ##loop {times:6,i:1,j:0}
 
 #NotBankId{i}=x,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 IF(#NotBankId{j}!="",$,S)
 
 #CheckNotBankId{i}=X,1,S

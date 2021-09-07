@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.online;
 
+
 import java.util.Optional;
 
 import java.util.List;
@@ -22,39 +23,31 @@ import com.st1.itx.db.domain.TxRecordId;
  */
 public interface TxRecordRepository extends JpaRepository<TxRecord, TxRecordId> {
 
-	// Entdy = ,AND BrNo =
-	public Slice<TxRecord> findAllByEntdyIsAndBrNoIsOrderByCreateDateAsc(int entdy_0, String brNo_1, Pageable pageable);
+  // Entdy = ,AND BrNo =
+  public Slice<TxRecord> findAllByEntdyIsAndBrNoIsOrderByCreateDateAsc(int entdy_0, String brNo_1, Pageable pageable);
 
-	// Entdy = ,AND BrNo = ,AND TxResult = ,AND CanCancel = ,AND ActionFg = ,AND
-	// Hcode<> ,AND TlrNo % ,AND TranNo %
-	public Slice<TxRecord> findAllByEntdyIsAndBrNoIsAndTxResultIsAndCanCancelIsAndActionFgIsAndHcodeNotAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, String brNo_1, String txResult_2,
-			int canCancel_3, int actionFg_4, int hcode_5, String tlrNo_6, String tranNo_7, Pageable pageable);
+  // Entdy = ,AND BrNo = ,AND TxResult = ,AND CanCancel = ,AND ActionFg = ,AND Hcode<> ,AND TlrNo % ,AND TranNo %
+  public Slice<TxRecord> findAllByEntdyIsAndBrNoIsAndTxResultIsAndCanCancelIsAndActionFgIsAndHcodeNotAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, String brNo_1, String txResult_2, int canCancel_3, int actionFg_4, int hcode_5, String tlrNo_6, String tranNo_7, Pageable pageable);
 
-	// Entdy = ,AND BrNo = ,AND TxResult = ,AND CanModify = ,AND ActionFg = ,AND
-	// Hcode<> ,AND TlrNo % ,AND TranNo %
-	public Slice<TxRecord> findAllByEntdyIsAndBrNoIsAndTxResultIsAndCanModifyIsAndActionFgIsAndHcodeNotAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, String brNo_1, String txResult_2,
-			int canModify_3, int actionFg_4, int hcode_5, String tlrNo_6, String tranNo_7, Pageable pageable);
+  // Entdy = ,AND BrNo = ,AND TxResult = ,AND CanModify = ,AND ActionFg = ,AND Hcode<> ,AND TlrNo % ,AND TranNo %
+  public Slice<TxRecord> findAllByEntdyIsAndBrNoIsAndTxResultIsAndCanModifyIsAndActionFgIsAndHcodeNotAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, String brNo_1, String txResult_2, int canModify_3, int actionFg_4, int hcode_5, String tlrNo_6, String tranNo_7, Pageable pageable);
 
-	// Entdy = ,AND BrNo = ,AND TxResult = ,AND ActionFg = ,AND TlrNo % ,AND TranNo
-	// %
-	public Slice<TxRecord> findAllByEntdyIsAndBrNoIsAndTxResultIsAndActionFgIsAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, String brNo_1, String txResult_2, int actionFg_3,
-			String tlrNo_4, String tranNo_5, Pageable pageable);
+  // Entdy >= ,AND Entdy <= ,AND BrNo = ,AND TxResult = ,AND ActionFg = ,AND TlrNo % ,AND TranNo %
+  public Slice<TxRecord> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndBrNoIsAndTxResultIsAndActionFgIsAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, int entdy_1, String brNo_2, String txResult_3, int actionFg_4, String tlrNo_5, String tranNo_6, Pageable pageable);
 
-	// Entdy = ,AND BrNo = ,AND TxResult = ,AND TlrNo % ,AND TranNo %
-	public Slice<TxRecord> findAllByEntdyIsAndBrNoIsAndTxResultIsAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, String brNo_1, String txResult_2, String tlrNo_3, String tranNo_4,
-			Pageable pageable);
+  // Entdy >= ,AND Entdy <= ,AND BrNo = ,AND TxResult = ,AND TlrNo % ,AND TranNo %
+  public Slice<TxRecord> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndBrNoIsAndTxResultIsAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, int entdy_1, String brNo_2, String txResult_3, String tlrNo_4, String tranNo_5, Pageable pageable);
 
-	// Entdy = ,AND BrNo = ,AND TxResult = ,AND Hcode = ,AND TlrNo % ,AND TranNo %
-	public Slice<TxRecord> findAllByEntdyIsAndBrNoIsAndTxResultIsAndHcodeIsAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, String brNo_1, String txResult_2, int hcode_3, String tlrNo_4,
-			String tranNo_5, Pageable pageable);
+  // Entdy >= ,AND Entdy <= ,AND BrNo = ,AND TxResult = ,AND Hcode = ,AND TlrNo % ,AND TranNo %
+  public Slice<TxRecord> findAllByEntdyGreaterThanEqualAndEntdyLessThanEqualAndBrNoIsAndTxResultIsAndHcodeIsAndTlrNoLikeAndTranNoLikeOrderByCreateDateAsc(int entdy_0, int entdy_1, String brNo_2, String txResult_3, int hcode_4, String tlrNo_5, String tranNo_6, Pageable pageable);
 
-	// MrKey % ,AND TranNo ^i ,AND Entdy >= ,AND Entdy <=
-	public Slice<TxRecord> findAllByMrKeyLikeAndTranNoInAndEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByCreateDateAsc(String mrKey_0, List<String> tranNo_1, int entdy_2, int entdy_3,
-			Pageable pageable);
+  // MrKey % ,AND TranNo ^i ,AND Entdy >= ,AND Entdy <= 
+  public Slice<TxRecord> findAllByMrKeyLikeAndTranNoInAndEntdyGreaterThanEqualAndEntdyLessThanEqualOrderByCreateDateAsc(String mrKey_0, List<String> tranNo_1, int entdy_2, int entdy_3, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<TxRecord> findByTxRecordId(TxRecordId txRecordId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<TxRecord> findByTxRecordId(TxRecordId txRecordId);
 
 }
+

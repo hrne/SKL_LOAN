@@ -203,6 +203,7 @@ RpRemitIdKind=X,1
 RpRemitId=X,10
 RpRemitGender=X,1
 RpRemitBirthday=9,7
+RPTITLEtt=X,20
 RemitIdKind=X,1
 RemitId=X,10
 RemitGender=X,1

@@ -189,7 +189,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@PayOffResult,1)T(F,@PayOffDate,1)T(2,@FdPayOffResult,*)T(2,@FdPayOffDate,*),C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayOffResult,0)T(F,@PayOffDate,0)T(2,@FdPayOffResult, )T(2,@FdPayOffDate, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@PayOffResult,1)T(F,@PayOffDate,1)T(2,@FdPayOffResult,*)T(2,@FdPayOffDate,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@PayOffResult,0)T(F,@PayOffDate,0)T(2,@FdPayOffResult, )T(2,@FdPayOffDate, ),$))
 
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
@@ -271,6 +272,7 @@ T(H,#PayOffResult,#PayOffResultHelp)
 #PayOffDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#PayOffDate)
 

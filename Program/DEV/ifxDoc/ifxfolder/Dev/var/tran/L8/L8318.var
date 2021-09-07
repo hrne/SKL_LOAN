@@ -110,9 +110,7 @@ T(2,@FdYM,*)
 C(5,#TranKey_Tmp,2,$,S)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@YM,1)
-T(2,@FdRcDate,*)
-T(2,@FdChangePayDate,*)
+T(F,@YM,1)
 T(2,@FdYM,*)
 
 ! 查詢進入
@@ -177,8 +175,6 @@ HELP(#TranKeyHelp)
 
 ![債務人IDN]
 #CustId=X,10,L
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
 
 ![報送單位代號]
 #SubmitKey=X,3,L
@@ -190,6 +186,7 @@ C(5,#TranKey_Tmp,4,s,$)
 #RcDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)
 @A(DATE,0,#RcDate)
@@ -199,6 +196,7 @@ D(8)
 #ChangePayDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)
 @A(DATE,0,#ChangePayDate)

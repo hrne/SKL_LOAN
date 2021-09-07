@@ -26,7 +26,7 @@ public class CdReport implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -8183848508379151877L;
+	private static final long serialVersionUID = 6207244020777025946L;
 
 // 報表代號
   @Id
@@ -70,6 +70,11 @@ public class CdReport implements Serializable {
   /* 0:不需簽核  1:需簽核 */
   @Column(name = "`SignCode`")
   private int signCode = 0;
+
+  // 浮水印記號
+  /* 0:不需浮水印 1:需浮水印 */
+  @Column(name = "`WatermarkFlag`")
+  private int watermarkFlag = 0;
 
   // 啟用記號
   /* Y:啟用 , N:停用 */
@@ -281,6 +286,25 @@ public class CdReport implements Serializable {
   }
 
 /**
+	* 浮水印記號<br>
+	* 0:不需浮水印 1:需浮水印
+	* @return Integer
+	*/
+  public int getWatermarkFlag() {
+    return this.watermarkFlag;
+  }
+
+/**
+	* 浮水印記號<br>
+	* 0:不需浮水印 1:需浮水印
+  *
+  * @param watermarkFlag 浮水印記號
+	*/
+  public void setWatermarkFlag(int watermarkFlag) {
+    this.watermarkFlag = watermarkFlag;
+  }
+
+/**
 	* 啟用記號<br>
 	* Y:啟用 , N:停用
 	* @return String
@@ -379,7 +403,7 @@ public class CdReport implements Serializable {
   @Override
   public String toString() {
     return "CdReport [formNo=" + formNo + ", formName=" + formName + ", cycle=" + cycle + ", sendCode=" + sendCode + ", letter=" + letter + ", message=" + message
-           + ", email=" + email + ", usageDesc=" + usageDesc + ", signCode=" + signCode + ", enable=" + enable + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", email=" + email + ", usageDesc=" + usageDesc + ", signCode=" + signCode + ", watermarkFlag=" + watermarkFlag + ", enable=" + enable + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

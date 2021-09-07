@@ -212,8 +212,8 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON NegAp02.\"CustId\"=c.\"CustId\" ";
 //			sqlLeftJoin += "LEFT JOIN \"NegTrans\" NegTran ON NegTran.\"CustNo\"=c.\"CustNo\" AND NegAp02.\"AcDate\"=NegTran.\"AcDate\" ";
 			sqlWhere += "WHERE 1=1 ";
-			// 會計日期 AcDate為 0
-			sqlWhere += "AND NegAp02.\"AcDate\" = 0 ";
+			//sqlWhere += "AND NegAp02.\"AcDate\" = 0 ";
+			sqlWhere += "AND NegAp02.\"BringUpDate\" = (SELECT MAX(\"BringUpDate\") FROM \"NegAppr02\" WHERE \"BringUpDate\" > 0  )";
 			if (State == 13) {
 				// 撥入筆數 13
 			} else if (State == 14) {
@@ -479,7 +479,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 			query.setParameter("AcDate", strAcDate);
 			this.info("L597A query AcDate=[" + strAcDate + "]");
-		} else if (State == 5 || State == 9 || State == 10 || State == 17) {
+		} else if (State == 5 || State == 9 || State == 10 || State == 17 ) {
 			String ThisMothStart = strAcDate.substring(0, 6) + "01";
 			String ThisMothEnd = strAcDate.substring(0, 6) + "31";
 			query.setParameter("ThisMothStart", ThisMothStart);

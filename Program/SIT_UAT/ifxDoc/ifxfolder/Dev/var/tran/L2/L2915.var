@@ -63,7 +63,7 @@ E(0,40)ASGN(INQPRT$)
 ["#FdContractDate+買賣契約日期",#ContractDate],
 ["#FdBdUsageCode+建物使用別",#BdUsageCode,#BdUsageCodeX],
 ["#FdParkingTypeCode+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
-["#FdParkingProperty"],
+["#FdPARKING_AREA+停車位面積",#ParkingArea],
 ["#FdHouseTaxNo+房屋稅籍號碼",#HouseTaxNo],
 ["#FdHouseBuyDate+房屋取得日期",#HouseBuyDate],
 ["#FdClStatus+押品狀況碼",#ClStatus,#ClStatusX],
@@ -109,7 +109,7 @@ T(3,)
 #FdContractDate=X,2,L
 #FdBdUsageCode=X,2,L
 #FdParkingTypeCode=X,2,L
-#FdParkingProperty=X,2,L
+#FdPARKING_AREA=X,2,L
 #FdHouseTaxNo=X,2,L
 #FdHouseBuyDate=X,2,L
 #FdClStatus=X,2,L
@@ -484,6 +484,10 @@ T(3,)T(H,#BdUsageCode,#BdUsageCodeHelp)
 #ParkingTypeCodeX=X,13,L
 T(3,)T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
 
+#ParkingArea=m,9.2,L
+C(3,#ParkingTypeCode,5,S,$)
+
+
 ! [獨立產權車位註記]
 #ParkingProperty=X,1,L
 
@@ -766,6 +770,7 @@ TXFORM=L2915
 #ContractDate
 #BdUsageCode
 #ParkingTypeCode
+#ParkingArea
 #ParkingProperty
 #HouseTaxNo
 #HouseBuyDate

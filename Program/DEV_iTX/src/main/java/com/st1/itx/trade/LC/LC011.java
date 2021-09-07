@@ -34,7 +34,6 @@ import com.st1.itx.db.service.TxTranCodeService;
  * @version 1.0.0
  */
 public class LC011 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LC011.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -45,7 +44,7 @@ public class LC011 extends TradeBuffer {
 
 	@Autowired
 	public TxTranCodeService sTxTranCodeService;
-	
+
 	@Autowired
 	CdBranchService cdBranchService;
 
@@ -56,13 +55,14 @@ public class LC011 extends TradeBuffer {
 	Parse parse;
 
 	private HashMap tlrItems = new HashMap();
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC011 ");
 		this.totaVo.init(titaVo);
 
-		int iEntday = Integer.valueOf(titaVo.get("iEntdy").trim()) + 19110000;
+		int iEntdaySt = Integer.valueOf(titaVo.get("iEntdySt").trim()) + 19110000;
+		int iEntdyEd = Integer.valueOf(titaVo.get("iEntdyEd").trim()) + 19110000;
 		String iBrNo = titaVo.get("iBrNo").trim();
 		String iTlrNo = titaVo.get("iTlrNo").trim();
 		String iTranNo = titaVo.get("iTranNo").trim();
@@ -70,10 +70,10 @@ public class LC011 extends TradeBuffer {
 		String iTlrItem = "";
 		String iTranItem = "";
 
-		this.info("LC001 parm = " + iEntday + "/" + iBrNo + "/" + iTlrNo + "/" + iTranNo + "/" + iStatus);
+		this.info("LC001 parm = " + iEntdaySt + "/" + iEntdyEd + "/" + iBrNo + "/" + iTlrNo + "/" + iTranNo + "/" + iStatus);
 
 		CdBranch cdBranch = cdBranchService.findById(iBrNo);
-						
+
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -84,23 +84,17 @@ public class LC011 extends TradeBuffer {
 
 		Slice<TxRecord> slTxRecord = null;
 		if (iStatus == 9) {
-			slTxRecord = txRecordService.findByLC011All(iEntday, iBrNo, "S", iTlrNo + "%", iTranNo + "%", this.index,
-					this.limit);
+			slTxRecord = txRecordService.findByLC011All(iEntdaySt, iEntdyEd, iBrNo, "S", iTlrNo + "%", iTranNo + "%", this.index, this.limit);
 		} else if (iStatus == 0) {
-			slTxRecord = txRecordService.findByLC011(iEntday, iBrNo, "S", 0, iTlrNo + "%", iTranNo + "%", this.index,
-					this.limit);
+			slTxRecord = txRecordService.findByLC011(iEntdaySt, iEntdyEd, iBrNo, "S", 0, iTlrNo + "%", iTranNo + "%", this.index, this.limit);
 		} else if (iStatus == 1 || iStatus == 2) {
-			slTxRecord = txRecordService.findByLC011Hcode(iEntday, iBrNo, "S", iStatus, iTlrNo + "%", iTranNo + "%",
-					this.index, this.limit);
+			slTxRecord = txRecordService.findByLC011Hcode(iEntdaySt, iEntdyEd, iBrNo, "S", iStatus, iTlrNo + "%", iTranNo + "%", this.index, this.limit);
 		} else if (iStatus == 3) {
-			slTxRecord = txRecordService.findByLC011(iEntday, iBrNo, "S", 1, iTlrNo + "%", iTranNo + "%", this.index,
-					this.limit);
+			slTxRecord = txRecordService.findByLC011(iEntdaySt, iEntdyEd, iBrNo, "S", 1, iTlrNo + "%", iTranNo + "%", this.index, this.limit);
 		} else if (iStatus == 4) {
-			slTxRecord = txRecordService.findByLC011(iEntday, iBrNo, "S", 2, iTlrNo + "%", iTranNo + "%", this.index,
-					this.limit);
+			slTxRecord = txRecordService.findByLC011(iEntdaySt, iEntdyEd, iBrNo, "S", 2, iTlrNo + "%", iTranNo + "%", this.index, this.limit);
 		} else if (iStatus == 5) {
-			slTxRecord = txRecordService.findByLC011(iEntday, iBrNo, "S", 3, iTlrNo + "%", iTranNo + "%", this.index,
-					this.limit);
+			slTxRecord = txRecordService.findByLC011(iEntdaySt, iEntdyEd, iBrNo, "S", 3, iTlrNo + "%", iTranNo + "%", this.index, this.limit);
 		}
 
 		List<TxRecord> lTxRecord = slTxRecord == null ? null : slTxRecord.getContent();
@@ -118,7 +112,7 @@ public class LC011 extends TradeBuffer {
 				occursList.putParam("MrKey", tTxRecord.getMrKey());
 				occursList.putParam("CurName", tTxRecord.getCurName());
 				occursList.putParam("TxAmt", tTxRecord.getTxAmt());
-				occursList.putParam("BrNo",cdBranch.getBranchItem());
+				occursList.putParam("BrNo", cdBranch.getBranchItem());
 				// 放行、審核放行，抓經辦代碼
 				if (tTxRecord.getFlowStep() == 2 || tTxRecord.getFlowStep() == 4) {
 					occursList.putParam("TlrNo", tTxRecord.getOrgTxNo().substring(4, 10));
@@ -141,8 +135,7 @@ public class LC011 extends TradeBuffer {
 				}
 				occursList.putParam("FlowType", tTxRecord.getFlowType());
 				occursList.putParam("FlowStep", tTxRecord.getFlowStep());
-				if (tTxRecord.getHcode() == 1 && tTxRecord.getOrgEntdy() > 0
-						&& tTxRecord.getOrgEntdy() != tTxRecord.getEntdy()) {
+				if (tTxRecord.getHcode() == 1 && tTxRecord.getOrgEntdy() > 0 && tTxRecord.getOrgEntdy() != tTxRecord.getEntdy()) {
 					occursList.putParam("Hcode", 3);
 				} else {
 					occursList.putParam("Hcode", tTxRecord.getHcode());
@@ -162,11 +155,9 @@ public class LC011 extends TradeBuffer {
 				iTranItem = inqTxTranCode(tTxRecord.getTranNo(), iTranItem, titaVo);
 				occursList.putParam("TranItem", iTranItem);
 
-
 				if (tTxRecord.getAcCnt() > 0) {
 					// 當天訂正及被訂正交易 無分錄
-					if (tTxRecord.getHcode() == 1 && tTxRecord.getOrgEntdy() == tTxRecord.getEntdy()
-							|| tTxRecord.getActionFg() == 1) {
+					if (tTxRecord.getHcode() == 1 && tTxRecord.getOrgEntdy() == tTxRecord.getEntdy() || tTxRecord.getActionFg() == 1) {
 						occursList.putParam("AcCnt", 0);
 					} else {
 						occursList.putParam("AcCnt", 1);
@@ -212,19 +203,19 @@ public class LC011 extends TradeBuffer {
 
 	// 查詢使用者
 
-	private String inqTxTeller(String tlrNo,TitaVo titaVo) {
+	private String inqTxTeller(String tlrNo, TitaVo titaVo) {
 		String tlrItem = "";
-		
+
 		if ("".equals(tlrNo)) {
 			return tlrItem;
 		}
-		
+
 		if (tlrItems.size() > 0) {
 			if (tlrItems.get(tlrNo) != null) {
 				tlrItem = tlrItems.get(tlrNo).toString();
-			}			
+			}
 		}
-		
+
 		if ("".equals(tlrItem)) {
 			TxTeller txTeller = txTellerService.findById(tlrNo, titaVo);
 			if (txTeller == null) {
@@ -233,7 +224,7 @@ public class LC011 extends TradeBuffer {
 				tlrItem = txTeller.getTlrItem();
 				tlrItems.put(tlrNo, tlrItem);
 			}
-		} 
+		}
 		return tlrItem;
 	}
 }

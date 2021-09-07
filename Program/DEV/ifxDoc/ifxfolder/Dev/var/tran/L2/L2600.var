@@ -285,6 +285,7 @@ R(1,L3R10)
 
 #RcvL3r10A=X,1,S
 C(3,#FuncCode,3,$,S)
+T(2,@SyndTypeCode,#L3r10SyndTypeCodeFlag)
 T(2,@GuaId,#L3r10GuaId)
 T(2,@LeadingBank,#L3r10LeadingBank)
 E(0,@SigningDate,#L3r10SigningDate)
@@ -308,6 +309,12 @@ E(0,@MaturityDate{n},#L3r10MaturityDate{n})
 ##end
 CALL(#INVKALL)
 
+#SyndTypeCode=X,1,I
+HELP(#SyndTypeCodeHelp)
+@V(H,#SyndTypeCodeHelp)
+
+#SyndTypeCodeX=X,10,L
+T(H,#SyndTypeCode,#SyndTypeCodeHelp)
 
 ![借款戶統編]
 !必須輸入
@@ -359,12 +366,6 @@ C(3,#CHAIN,1,T(1,#NTXBUF,19,5),$)
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
-#SyndTypeCode=X,1,I
-HELP(#SyndTypeCodeHelp)
-@V(H,#SyndTypeCodeHelp)
-
-#SyndTypeCodeX=X,10,L
-T(H,#SyndTypeCode,#SyndTypeCodeHelp)
 
 #BUF2A=X,7,S
 

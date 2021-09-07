@@ -127,7 +127,7 @@ T(2,@FdCustComAddr,*)
 T(2,@FdCustRegTelNo,*)
 T(2,@FdCustComTelNo,*)
 T(2,@FdCustMobilNo,*)
-T(3,@TranKeyHelp,C:異動;D:補件))
+T(3,@TranKeyHelp,C:異動;D:刪除;X:補件))
 
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -194,7 +194,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdCustRegTelNo,*)T(2,@FdCustComTelNo,*)T(2,@FdCustMobilNo,*),C(5,#TranKey,D,K(MODIFYBUTTON,補件)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdCustRegTelNo, )T(2,@FdCustComTelNo, )T(2,@FdCustMobilNo, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)T(2,@FdCustRegAddr,*)T(2,@FdCustComAddr,*)T(2,@FdCustRegTelNo,*)T(2,@FdCustComTelNo,*)T(2,@FdCustMobilNo,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdCustRegTelNo, )T(2,@FdCustComTelNo, )T(2,@FdCustMobilNo, ),$))
+C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0)T(2,@FdCustRegAddr, )T(2,@FdCustComAddr, )T(2,@FdCustRegTelNo, )T(2,@FdCustComTelNo, )T(2,@FdCustMobilNo, ),$))
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
 C(5,#TranKey_Tmp,5,s,$)
@@ -240,30 +242,50 @@ T(2,@CourtCodeX,#L8r01JcicBankName)
 #CustRegAddr=C,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CustRegAddr,#L8r42CustRegAddr),$)
+C(5,#TranKey,X,T(2,@CustRegAddr,#L8r42CustRegAddr),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(8,0,38)
 
 !債務人通訊地之郵遞區號及地址
 #CustComAddr=C,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CustComAddr,#L8r42CustComAddr),$)
+C(5,#TranKey,X,T(2,@CustComAddr,#L8r42CustComAddr),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(8,0,38)
 
 !債務人戶籍電話
 #CustRegTelNo=X,16,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CustRegTelNo,#L8r42CustRegTelNo),$)
+C(5,#TranKey,X,T(2,@CustRegTelNo,#L8r42CustRegTelNo),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(8,0,16)
 
 !債務人通訊電話
 #CustComTelNo=X,16,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CustComTelNo,#L8r42CustComTelNo),$)
+C(5,#TranKey,X,T(2,@CustComTelNo,#L8r42CustComTelNo),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(8,0,16)
 
 !債務人行動電話
 #CustMobilNo=X,16,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CustMobilNo,#L8r42CustMobilNo),$)
+C(5,#TranKey,X,T(2,@CustMobilNo,#L8r42CustMobilNo),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(8,0,16)
 
 #CheckConnect=X,1,S

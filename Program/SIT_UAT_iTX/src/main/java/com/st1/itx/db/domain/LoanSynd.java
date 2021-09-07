@@ -29,7 +29,7 @@ public class LoanSynd implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2256634671715354710L;
+	private static final long serialVersionUID = -6463359645184901022L;
 
 @EmbeddedId
   private LoanSyndId loanSyndId;
@@ -38,7 +38,7 @@ public class LoanSynd implements Serializable {
   @Column(name = "`CustNo`", insertable = false, updatable = false)
   private int custNo = 0;
 
-  // 聯貸案序號
+  // 聯貸編號
   @Column(name = "`SyndNo`", insertable = false, updatable = false)
   private int syndNo = 0;
 
@@ -69,6 +69,11 @@ public class LoanSynd implements Serializable {
   // 動撥迄日
   @Column(name = "`DrawdownEndDate`")
   private int drawdownEndDate = 0;
+
+  // 國內或國際聯貸
+  /* CdCode.SyndTypeCodeA:國內B:國際 */
+  @Column(name = "`SyndTypeCodeFlag`", length = 1)
+  private String syndTypeCodeFlag;
 
   // 是否有收承諾費
   /* Y:是 N:否刪除(L3600.L3010有使用一併修改) */
@@ -186,7 +191,7 @@ public class LoanSynd implements Serializable {
   }
 
 /**
-	* 聯貸案序號<br>
+	* 聯貸編號<br>
 	* 
 	* @return Integer
 	*/
@@ -195,10 +200,10 @@ public class LoanSynd implements Serializable {
   }
 
 /**
-	* 聯貸案序號<br>
+	* 聯貸編號<br>
 	* 
   *
-  * @param syndNo 聯貸案序號
+  * @param syndNo 聯貸編號
 	*/
   public void setSyndNo(int syndNo) {
     this.syndNo = syndNo;
@@ -335,6 +340,29 @@ public class LoanSynd implements Serializable {
   * @throws LogicException when Date Is Warn	*/
   public void setDrawdownEndDate(int drawdownEndDate) throws LogicException {
     this.drawdownEndDate = StaticTool.rocToBc(drawdownEndDate);
+  }
+
+/**
+	* 國內或國際聯貸<br>
+	* CdCode.SyndTypeCode
+A:國內
+B:國際
+	* @return String
+	*/
+  public String getSyndTypeCodeFlag() {
+    return this.syndTypeCodeFlag == null ? "" : this.syndTypeCodeFlag;
+  }
+
+/**
+	* 國內或國際聯貸<br>
+	* CdCode.SyndTypeCode
+A:國內
+B:國際
+  *
+  * @param syndTypeCodeFlag 國內或國際聯貸
+	*/
+  public void setSyndTypeCodeFlag(String syndTypeCodeFlag) {
+    this.syndTypeCodeFlag = syndTypeCodeFlag;
   }
 
 /**
@@ -704,9 +732,9 @@ public class LoanSynd implements Serializable {
   @Override
   public String toString() {
     return "LoanSynd [loanSyndId=" + loanSyndId + ", lastBorxNo=" + lastBorxNo + ", custUKey=" + custUKey + ", guaUKey=" + guaUKey + ", leadingBank=" + leadingBank
-           + ", signingDate=" + signingDate + ", drawdownStartDate=" + drawdownStartDate + ", drawdownEndDate=" + drawdownEndDate + ", commitFeeFlag=" + commitFeeFlag + ", partRate=" + partRate + ", currencyCode=" + currencyCode
-           + ", syndAmt=" + syndAmt + ", partAmt=" + partAmt + ", agentBank=" + agentBank + ", creditPeriod=" + creditPeriod + ", centralBankPercent=" + centralBankPercent + ", masterCustUkey=" + masterCustUkey
-           + ", subCustUkey1=" + subCustUkey1 + ", subCustUkey2=" + subCustUkey2 + ", subCustUkey3=" + subCustUkey3 + ", subCustUkey4=" + subCustUkey4 + ", subCustUkey5=" + subCustUkey5 + ", subCustUkey6=" + subCustUkey6
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", signingDate=" + signingDate + ", drawdownStartDate=" + drawdownStartDate + ", drawdownEndDate=" + drawdownEndDate + ", syndTypeCodeFlag=" + syndTypeCodeFlag + ", commitFeeFlag=" + commitFeeFlag + ", partRate=" + partRate
+           + ", currencyCode=" + currencyCode + ", syndAmt=" + syndAmt + ", partAmt=" + partAmt + ", agentBank=" + agentBank + ", creditPeriod=" + creditPeriod + ", centralBankPercent=" + centralBankPercent
+           + ", masterCustUkey=" + masterCustUkey + ", subCustUkey1=" + subCustUkey1 + ", subCustUkey2=" + subCustUkey2 + ", subCustUkey3=" + subCustUkey3 + ", subCustUkey4=" + subCustUkey4 + ", subCustUkey5=" + subCustUkey5
+           + ", subCustUkey6=" + subCustUkey6 + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

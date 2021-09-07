@@ -3813,6 +3813,7 @@ TXFORM=L3R09
 #L3r10SigningDate=D,7,S
 #L3r10DrawdownStartDate=D,7,S
 #L3r10DrawdownEndDate=D,7,S
+#L3r10SyndTypeCodeFlag=X,1,S
 #L3r10PartRate=n,2.4,S
 #L3r10CurrencyCode=X,3,S
 #L3r10SyndAmt=m,14.2,S
@@ -4894,6 +4895,7 @@ TXFORM=L4R21
 #L4r22RelAcctBirthday=D,7,S
 #L4r22RelAcctGender=X,1,S
 #L4r22LimitAmt=m,14,S
+#L4r22NewCreateFlag=X,1,S
 </L4R22.dec>
 
 <L4R22.tom>
@@ -4905,6 +4907,7 @@ TXFORM=L4R22
 #L4r22RelAcctBirthday
 #L4r22RelAcctGender
 #L4r22LimitAmt
+#L4r22NewCreateFlag
 ^
 </L4R22.tom>
 
@@ -8568,3 +8571,33 @@ TXFORM=L6R41
 #L6R41WorkMonthEE
 ^
 </L6R41.tom>
+
+<L6R42.dec>
+#L6R42Email=x,50,S
+</L6R42.dec>
+
+<L6R42.tom>
+TXFORM=L6R42
+#L6R42Email
+^
+</L6R42.tom>
+
+<L6R43.dec>
+##loop{times:30,a:1}
+#L6R43EmpNo{a}=X,6,S
+#L6R43Email{a}=x,50,S
+#L6R43WorkMonthS{a}=9,5,S
+#L6R43WorkMonthE{a}=9,5,S
+##end
+</L6R43.dec>
+
+<L6R43.tom>
+TXFORM=L6R43
+##loop{times:30,a:1}
+#L6R43EmpNo{a}
+#L6R43Email{a}
+#L6R43WorkMonthS{a}
+#L6R43WorkMonthE{a}
+##end
+^
+</L6R43.tom>

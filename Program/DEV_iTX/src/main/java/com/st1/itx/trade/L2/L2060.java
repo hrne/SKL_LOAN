@@ -97,8 +97,10 @@ public class L2060 extends TradeBuffer {
 		this.limit = 100; // 183 * 250 = 45750
 
 		// 查詢放款主檔
-		slLoanSynd = loanSyndService.syndCustNoRange(wkCustNoStart, wkCustNoEnd, iLeadingBank, iSigningDateStart + 19110000, iSigningDateEnd + 19110000, iDrawdownStartDateStart + 19110000,
-				iDrawdownStartDateEnd > 0 ? iDrawdownStartDateEnd + 19110000 : 99991231, iDrawdownEndDateStart + 19110000, iDrawdownEndDateEnd > 0 ? iDrawdownEndDateEnd + 19110000 : 99991231,
+		slLoanSynd = loanSyndService.syndCustNoRange(wkCustNoStart, wkCustNoEnd, iLeadingBank,
+				iSigningDateStart + 19110000, iSigningDateEnd + 19110000, iDrawdownStartDateStart + 19110000,
+				iDrawdownStartDateEnd > 0 ? iDrawdownStartDateEnd + 19110000 : 99991231,
+				iDrawdownEndDateStart + 19110000, iDrawdownEndDateEnd > 0 ? iDrawdownEndDateEnd + 19110000 : 99991231,
 				this.index, this.limit, titaVo);
 		lLoanSynd = slLoanSynd == null ? null : slLoanSynd.getContent();
 		if (lLoanSynd == null || lLoanSynd.size() == 0) {
@@ -121,6 +123,11 @@ public class L2060 extends TradeBuffer {
 			occursList.putParam("OOCurrencyCode", ln.getCurrencyCode());
 			occursList.putParam("OOSyndAmt", ln.getSyndAmt());
 			occursList.putParam("OOPartAmt", ln.getPartAmt());
+			if ("Y".equals(ln.getSyndTypeCodeFlag())) {
+				occursList.putParam("OOSyndTypeCode", "Y");
+			} else {
+				occursList.putParam("OOSyndTypeCode", "");
+			}
 
 			// 將每筆資料放入Tota的OcList
 			this.totaVo.addOccursList(occursList);

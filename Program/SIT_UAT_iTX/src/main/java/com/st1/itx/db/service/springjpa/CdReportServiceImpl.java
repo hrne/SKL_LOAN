@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdReportService")
 @Repository
-public class CdReportServiceImpl implements CdReportService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdReportServiceImpl.class);
-
+public class CdReportServiceImpl extends ASpringJpaParm implements CdReportService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class CdReportServiceImpl implements CdReportService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + formNo);
+    this.info("findById " + dbName + " " + formNo);
     Optional<CdReport> cdReport = null;
     if (dbName.equals(ContentName.onDay))
       cdReport = cdReportReposDay.findById(formNo);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "FormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "FormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdReportReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +101,9 @@ em = null;
       slice = cdReportReposHist.findAll(pageable);
     else 
       slice = cdReportRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +120,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCycle " + dbName + " : " + "cycle_0 : " + cycle_0);
+    this.info("findCycle " + dbName + " : " + "cycle_0 : " + cycle_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdReportReposDay.findAllByCycleIs(cycle_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -130,6 +129,9 @@ em = null;
       slice = cdReportReposHist.findAllByCycleIs(cycle_0, pageable);
     else 
       slice = cdReportRepos.findAllByCycleIs(cycle_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -146,7 +148,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findEnable " + dbName + " : " + "enable_0 : " + enable_0);
+    this.info("findEnable " + dbName + " : " + "enable_0 : " + enable_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdReportReposDay.findAllByEnableIs(enable_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -155,6 +157,9 @@ em = null;
       slice = cdReportReposHist.findAllByEnableIs(enable_0, pageable);
     else 
       slice = cdReportRepos.findAllByEnableIs(enable_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -171,7 +176,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("formNoLike " + dbName + " : " + "formNo_0 : " + formNo_0);
+    this.info("formNoLike " + dbName + " : " + "formNo_0 : " + formNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdReportReposDay.findAllByFormNoLikeOrderByFormNoAsc(formNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -180,6 +185,9 @@ em = null;
       slice = cdReportReposHist.findAllByFormNoLikeOrderByFormNoAsc(formNo_0, pageable);
     else 
       slice = cdReportRepos.findAllByFormNoLikeOrderByFormNoAsc(formNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -196,7 +204,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("formNameLike " + dbName + " : " + "formName_0 : " + formName_0);
+    this.info("formNameLike " + dbName + " : " + "formName_0 : " + formName_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdReportReposDay.findAllByFormNameLikeOrderByFormNoAsc(formName_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -206,6 +214,9 @@ em = null;
     else 
       slice = cdReportRepos.findAllByFormNameLikeOrderByFormNoAsc(formName_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -214,7 +225,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("FormNoFirst " + dbName + " : " + "formNo_0 : " + formNo_0);
+    this.info("FormNoFirst " + dbName + " : " + "formNo_0 : " + formNo_0);
     Optional<CdReport> cdReportT = null;
     if (dbName.equals(ContentName.onDay))
       cdReportT = cdReportReposDay.findTopByFormNoIs(formNo_0);
@@ -224,6 +235,7 @@ em = null;
       cdReportT = cdReportReposHist.findTopByFormNoIs(formNo_0);
     else 
       cdReportT = cdReportRepos.findTopByFormNoIs(formNo_0);
+
     return cdReportT.isPresent() ? cdReportT.get() : null;
   }
 
@@ -232,7 +244,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + formNo);
+    this.info("Hold " + dbName + " " + formNo);
     Optional<CdReport> cdReport = null;
     if (dbName.equals(ContentName.onDay))
       cdReport = cdReportReposDay.findByFormNo(formNo);
@@ -250,7 +262,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdReport.getFormNo());
+    this.info("Hold " + dbName + " " + cdReport.getFormNo());
     Optional<CdReport> cdReportT = null;
     if (dbName.equals(ContentName.onDay))
       cdReportT = cdReportReposDay.findByFormNo(cdReport.getFormNo());
@@ -272,7 +284,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdReport.getFormNo());
+    this.info("Insert..." + dbName + " " + cdReport.getFormNo());
     if (this.findById(cdReport.getFormNo()) != null)
       throw new DBException(2);
 
@@ -301,7 +313,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdReport.getFormNo());
+    this.info("Update..." + dbName + " " + cdReport.getFormNo());
     if (!empNot.isEmpty())
       cdReport.setLastUpdateEmpNo(empNot);
 
@@ -324,7 +336,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdReport.getFormNo());
+    this.info("Update..." + dbName + " " + cdReport.getFormNo());
     if (!empNot.isEmpty())
       cdReport.setLastUpdateEmpNo(empNot);
 
@@ -344,7 +356,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdReport.getFormNo());
+    this.info("Delete..." + dbName + " " + cdReport.getFormNo());
     if (dbName.equals(ContentName.onDay)) {
       cdReportReposDay.delete(cdReport);	
       cdReportReposDay.flush();
@@ -373,7 +385,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdReport t : cdReport){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -408,7 +420,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdReport == null || cdReport.size() == 0)
       throw new DBException(6);
 
@@ -437,7 +449,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdReport> cdReport, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

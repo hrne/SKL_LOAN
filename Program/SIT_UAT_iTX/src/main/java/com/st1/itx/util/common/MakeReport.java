@@ -20,12 +20,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.AcroFields;
 import com.itextpdf.text.pdf.BaseFont;
 import com.itextpdf.text.pdf.PdfContentByte;
 import com.itextpdf.text.pdf.PdfCopy;
+import com.itextpdf.text.pdf.PdfGState;
 import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfSmartCopy;
 import com.itextpdf.text.pdf.PdfStamper;
@@ -99,6 +101,9 @@ public class MakeReport extends CommBuffer {
 	private String rptCode;
 	// 報表名稱
 	private String rptItem;
+
+	// 是否需要浮水印
+	private boolean watermarkFlag;
 
 	public String getRptItem() {
 		return rptItem;
@@ -911,6 +916,15 @@ public class MakeReport extends CommBuffer {
 
 		this.info("MakeReport.toPdf.filename =" + outfile);
 
+		// 檢查是否需浮水印
+		CdReport tCdReport = cdReportService.findById(this.rptCode, titaVo);
+
+		watermarkFlag = false;
+
+		if (tCdReport != null && tCdReport.getWatermarkFlag() == 1) {
+			watermarkFlag = true;
+		}
+
 		// 先刪除舊檔
 		File file = new File(outfile);
 
@@ -1044,7 +1058,10 @@ public class MakeReport extends CommBuffer {
 					fontsize = Integer.valueOf(map.get("font.size").toString());
 					fontwidth = fontsize / 2 + charSpaces;
 					fonthigh = fontsize + lineSpaces + 2;
-					;
+
+					if (watermarkFlag) {
+						this.setWatermark(writer.getDirectContentUnder(), document);
+					}
 				} else if ("9".equals(type)) {
 					this.useDefault = true;
 
@@ -1106,6 +1123,9 @@ public class MakeReport extends CommBuffer {
 						document.newPage();
 					}
 
+					if (watermarkFlag) {
+						this.setWatermark(writer.getDirectContentUnder(), document);
+					}
 				} else if ("2".equals(type)) {
 					// 設定字型
 					String font = map.get("font").toString();
@@ -1240,7 +1260,6 @@ public class MakeReport extends CommBuffer {
 						fonthigh = fontsize + lineSpaces + 2;
 					}
 				}
-
 			}
 
 			if (this.useDefault) {
@@ -1256,13 +1275,61 @@ public class MakeReport extends CommBuffer {
 				document.close();
 				fos.close();
 			}
+		} catch (
 
-		} catch (IOException e) {
+		IOException e) {
 			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",輸出PDF " + e.getMessage());
 		} catch (DocumentException e) {
 			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",資料PDF " + e.getMessage());
 		}
 
+	}
+
+	/**
+	 * 浮水印
+	 * 
+	 * @param cb       PdfContentByte
+	 * @param document Document
+	 * @throws IOException       IOException
+	 * @throws DocumentException DocumentException
+	 */
+	private void setWatermark(PdfContentByte cb, Document document) throws IOException, DocumentException {
+
+		PdfGState graphicState = new PdfGState();
+		graphicState.setFillOpacity(0.7f);
+		graphicState.setStrokeOpacity(1f);
+
+		BaseFont tmpBaseFont = this.setBaseFont("1");
+
+		String watermark = "";
+
+		watermark += titaVo.getTlrNo();
+		watermark += " ";
+		watermark += titaVo.getEmpNm();
+		watermark += " ";
+		watermark += this.showRocDate(titaVo.getCalDy(), 2);
+		watermark += " ";
+		watermark += this.showTime(titaVo.getCalTm());
+
+		cb.setGState(graphicState);
+		cb.beginText();
+		cb.setFontAndSize(tmpBaseFont, 12);
+		cb.setColorFill(BaseColor.LIGHT_GRAY);
+
+		float widthMax = document.getPageSize().getWidth();
+		float heightMax = document.getPageSize().getHeight();
+
+		this.info("widthMax = " + widthMax);
+		this.info("heightMax = " + heightMax);
+
+		for (float w = 0; w < widthMax + 150f; w += 150f) {
+			this.info("w = " + w);
+			for (float h = 0; h < heightMax + 80f; h += 80f) {
+				this.info("h = " + h);
+				cb.showTextAligned(Element.ALIGN_CENTER, watermark, w, h, 15f);
+			}
+		}
+		cb.endText();
 	}
 
 	/**

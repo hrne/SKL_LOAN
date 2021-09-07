@@ -444,7 +444,7 @@ TXFORM=L2913
 ["發行公司統一編號",#OCompanyId],["資料年度",#ODataYear],
 ["發行股數",#OIssuedShares],["非上市(櫃)每股淨值",#ONetWorth],
 ["每股單價鑑估標準",#OEvaStandard,#OEvaStandardX],["每股面額",#OParValue],
-["一個月平均價",#OMonthlyAvg],["前日收盤價",#OYdClosingPrice],
+["前日收盤價",#OYdClosingPrice],["一個月平均價",#OMonthlyAvg],
 ["三個月平均價",#OThreeMonthAvg],["鑑定單價",#OEvaUnitPrice],
 ["股票持有人統編",#OOwnerId],["股票持有人姓名",#OOwnerName],
 ["公司內部人職稱",#OInsiderJobTitle,#OInsiderJobTitleX],["公司內部人身分註記",#OInsiderPosition,#OInsiderPositionX],

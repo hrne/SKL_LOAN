@@ -1,0 +1,626 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L3005)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,43)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,154)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,20)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+
+#InitValue=@,1,S
+T(3,@FdApplNo, )
+T(3,@FdRptFg,*)
+T(F,@BormNo,1)
+T(3,@FdTitaHCode,*)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,970];printer.width=[20,20];">
+[
+["[L3005]                                 交易明細資料查詢"],
+["#FdMain+查詢條件","@(借款人戶號、統一編號、核准編號，需擇一輸入)"],
+["#FdCustNo+借款人戶號",#CustNo,"@",#BTN1,#CustNoX],
+["#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
+["#FdApplNo+核准編號",#ApplNo,"@",#BTN3,#ApplNoX],
+["#FdFacmNo+額度編號",#FacmNo,"@",#BTN4],
+["#FdBormNo+撥款序號",#BormNo,"@",#BTN5],
+["#FdAcDate+會計日期",#AcDate],
+["#FdEntryDate+入帳日期",#EntryDate],
+["#FdTitaHCode+訂正別",#TitaHCode,#TitaHCodeX],
+["#FdRptFg+顯示方式",
+<include src="COM.icf::RPTFG.scr"/>
+],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title:L2015 額度明細資料查詢;
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
+#BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+#BTN4=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title:L3002 撥款明細資料查詢
+#BTN5=X,15,I,ui:button;value:繳息情形查詢;enable:1;tabbable:0;title:L3911 繳息情形查詢
+
+#WKHIDE=X,1,S
+HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5)
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF0001=x,26,S
+T(3,CdCode.CurrPrecision)
+#CurrPrecisionHelp=x,1024,S 
+
+#CDDEF0002=x,26,S
+T(3,CdCode.TitaHCode)
+#TitaHCodeHelp=x,1024,S 
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CurrPrecisionHelp,#HelpDesc1) 
+T(2,@TitaHCodeHelp,#HelpDesc2) 
+
+!---------- AP TEXT AREA Variables ----------
+#FdMain=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,31,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#BUF1A=X,18,S
+T(3,00000009999999000)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo})
+
+![借款人戶號]
+!借款人戶號, 統一編號或核准編號擇一輸入
+#FdCustNo=X,2,L
+
+#CustNo=A,7,I
+CALL(#InitValue)
+! INVOKEJS(SHOW,p1,1,3,1)
+SHOW(#BTN1)
+C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
+C(3,#CHAIN,1,s,$)
+
+#WKBTN1=X,1,S
+C(3,#CustNo,0,HIDE(#BTN1),SHOW(#BTN1))
+! C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
+
+#BUF1B=X,18,S
+T(2,#CustNo+9999999000)
+
+#BIND1B=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo})
+
+#SendL2r07A=X,1,S
+C(3,#CustNo,0,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@CustIdX,#L2r07CustName)
+
+#CustNoX=X,100,L
+C(3,#CustNo,0,S,T(2,#L2r07CustName))
+
+#BUF2A=X,100,S
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+
+![統一編號]
+#FdCustId=X,2,L
+
+#CustId=X,10,I
+CALL(#InitValue)
+! INVOKEJS(SHOW,p1,2,3,1)
+C(3,#CustNo,0,$,S)
+SHOW(#BTN2)
+@C(4,#CustId,S,$)V(7)
+
+#BUF2B=X,100,S
+T(2,0000000+#CustId)
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+
+#CheckCustId=X,1,S
+C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+#WKBTN2=X,1,S
+C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
+! C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,3,0))
+
+#SendLr07B=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendLr07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustIdX=X,100,L
+C(4,#CustId,S,T(2,#L2r07CustName))
+
+#BUF3A=X,18,S
+T(3,000000099999990)
+
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+![核准編號]
+#FdApplNo=X,2,L
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+T(3,*)
+
+#ApplNo=A,7,I
+! INVOKEJS(SHOW,p1,3,3,1)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+SHOW(#BTN3)
+@V(2,0)
+
+#WKBTN3=X,1,S
+C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
+! C(3,#ApplNo,0,INVOKEJS(SHOW,p1,3,3,0),$)
+
+#BUF3B=X,18,S
+T(2,#ApplNo+99999990)
+
+#BIND3B=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+E(0,@FacmNo,#L2r05FacmNo)
+
+#SendL2r07C=X,1,S
+C(3,#ApplNo,0,S,$)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07C,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#ApplNoX=X,100,L
+C(3,#ApplNo,0,S,T(2,#L2r07CustName))
+
+!#WK3=N,1,S
+!E(0,0)
+!C(3,#CustNo,0,$,E(0,1))
+!C(4,#CustId,$,E(0,2))
+!C(3,#ApplNo,0,$,E(0,3))
+!
+!#ENBTN4=X,1,S
+!C(3,#WK3,0,DISABLE(#BTN4),ENABLE(#BTN4))
+!        
+#TimCustNo=A,7,S
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+
+#WkCaseNo=A,7,S
+
+#BUF4A=X,35,S
+T(2,#WkCaseNo+#CustNo+#CustId+#ApplNo+#FacmNo)
+
+#BIND4A=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF4A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:BormNo<-OOBormNo})
+
+![額度編號]
+!可不輸入
+#FdFacmNo=X,2,L
+
+#FacmNo=A,3,I
+C(3,#CHAIN,1,T(1,#NTXBUF,8,3),$)
+C(3,#CHAIN,1,s,$)
+C(3,#ApplNo,0,SHOW(#BTN4),HIDE(#BTN4))
+C(3,#ApplNo,0,$,s)
+
+#BUF5=X,35,S
+T(2,L3005+#CustNo+#FacmNo+#BormNo)
+
+#BIND5=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3911; ntxbuf=#BUF5;ntxbuf5=type<-1:BormNo<-OOBormNo})
+
+![撥款序號]
+!若額度號碼有輸入,則撥款序號必需輸入
+#FdBormNo=X,2,L
+C(3,#FacmNo,0,T(F,@BormNo,0),T(F,@BormNo,1))
+
+#BormNo=A,3,I
+C(3,#CHAIN,1,T(1,#NTXBUF,11,3),$)
+C(3,#CHAIN,1,s,$)
+C(3,#FacmNo,0,HIDE(#BTN5),SHOW(#BTN5))
+C(3,#FacmNo,0,S,$)
+! INVOKEJS(SHOW,p1,7,7,1)
+! INVOKEJS(SHOW,p1,6,6,1)
+
+![會計日期]
+!DEFAULT當月1日,必須輸入
+#FdAcDate=X,2,L
+
+#AcDate=D,7,I
+C(3,#CHAIN,1,T(1,#NTXBUF,14,7),$)
+C(3,#CHAIN,1,s,$)
+E(0,#SYSDATE/100)
+E(0,#AcDate*100+1)
+
+
+![入帳日期]
+#FdEntryDate=X,2,L
+
+#EntryDate=D,7,I
+C(3,#AcDate,0,$,S)
+C(3,#CHAIN,1,T(1,#NTXBUF,14,7),$)
+C(3,#CHAIN,1,s,$)
+E(0,#SYSDATE/100)
+E(0,#EntryDate*100+1)
+@V(7)A(DATE,0,#EntryDate)
+
+
+#FdTitaHCode=X,2,L
+
+#inTitaHCodeHelp=x,20,S
+T(3,0:正常;9:全部)
+
+#TitaHCode=A,1,I
+C(3,#CHAIN,1,s,$)
+HELP(#inTitaHCodeHelp)
+E(0,0)
+@V(H,#inTitaHCodeHelp)
+
+#TitaHCodeX=X,10,L
+T(3,)T(H,#TitaHCode,#inTitaHCodeHelp)
+
+#FdRptFg=X,2,L
+<include src="COM.icf::RPTFG.dec"/>
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
+C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
+
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L3005 ----------
+<sub type="FORM" name="L3005">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L3005,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L3005] 交易明細資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#OCustNo=A,7,L
+
+#OCustNoX=X,100,L
+T(2,#CustNoX)
+
+#OCustRmkFlag=X,1,S
+
+#OCurrencyCode=X,3,S
+
+#Precision=N,1,S
+E(0,0)T(H,#OCurrencyCode,#CurrPrecisionHelp)
+
+#OFacmNo=A,3,L
+E(0,#FacmNo)
+
+#OBormNo=A,3,L
+E(0,#BormNo)
+
+#OAcDate=D,7,L
+E(0,#AcDate)
+
+#OEntryDate=D,7,L
+E(0,#EntryDate)
+
+#OExcessive=+m,14.2,S
+
+#OExcessiveX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OExcessive,#OExcessiveX)
+
+#OShortfall=+m,14.2,S
+
+#OShortfallX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OShortfall,#OShortfallX)
+
+!查詢
+#FUNC5=A,1,S
+E(0,5)
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOEntryDate=D,7,S
+IF(#OOEntryDate==0,S,$)
+
+#OOAcDate=D,7,S
+IF(#OOAcDate==0,S,$)
+
+#OOFacmNo=A,3,S
+
+#OOBormNo=A,3,S
+
+#OOFacmNoX=X,7,L
+C(3,#OOBormNo,0,T(2,#OOFacmNo),T(2,#OOFacmNo+-+#OOBormNo))
+! T(2,#OOFacmNo+-+#OOBormNo)
+
+#OOKinbr=A,4,S
+
+#OOTellerNo=X,6,S
+
+#OOTxtNo=A,8,S
+
+#OORelNo=X,18,L
+
+#OOl6932=X,18,S
+T(2,#OOKinbr+#OOTellerNo+#OOTxtNo)
+
+#OOAcDtRelNo=X,25,L
+T(2,#OOAcDate+#OORelNo)
+
+#OODesc=X,20,O
+
+#OOCurrencyCode=X,3,O 
+
+#OOPrecision=N,1,S
+E(0,0)T(H,#OOCurrencyCode,#CurrPrecisionHelp)
+
+#OOTxAmt=+m,14.2,S
+
+#OOTxAmtX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OOTxAmt,#OOTxAmtX)
+P(R,#OOTxAmtX)
+
+#OOTempAmt=+m,14.2,S
+
+#OOTempAmtX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OOTempAmt,#OOTempAmtX)
+P(R,#OOTempAmtX)
+
+
+#OOShortfall=+m,14.2,S
+
+#OOShortfallX=X,22,O
+CALL2(#ADJUSTDOT,#OOPrecision,#OOShortfall,#OOShortfallX)
+P(R,#OOShortfallX)
+
+#OOLoanBal=m,14.2,S
+
+#OOLoanBalX=X,22,O
+C(3,#OOBormNo,0,S,$)
+CALL2(#ADJUSTDOT,#OOPrecision,#OOLoanBal,#OOLoanBalX)
+P(R,#OOLoanBalX)
+
+#OORate=n,2.4,S
+
+#OORateX=X,9,O
+X(#OORate)
+T(B,#OORateX+%)
+P(R,#OORateX)
+
+!訂正別
+#OOTitaHCode=A,1,S
+
+#OOTitaHCodeX=X,6,L
+T(H,#OOTitaHCode,#TitaHCodeHelp)
+
+!分錄Fg
+#OOAcFg=X,1,S
+
+!查詢Fg
+#OOFeeFg=X,1,S
+
+!計息明細Fg
+#OOLoanIntDetailFg=X,1,S
+
+!交易代號
+#OOTxCd=X,5,S
+
+#16sp=X,16,S
+
+!查詢
+#OOBUF1=X,61,S
+IF(#OOTxCd=="L3701",T(2,#OOAcDate+#OOAcDate+#16sp+#OOl6932+#OCustNo+#OOFacmNo+#OOBormNo),T(2,#OOAcDate+#OOTellerNo+#OOTxtNo+#OCustNo+#OOFacmNo+#OOBormNo))
+
+#OOchain=X,5,S
+IF(#OOTxCd=="L3701",T(3,L6932),T(3,L3912))
+
+#OOBTN1NAME=X,10,S
+IF(#OOAcFg=="",T(3,內容),T(3,內容查詢))
+
+#OOBTN1=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=#OOchain;text=#OOBTN1NAME ;ntxbuf=#OOBUF1})
+
+!備忘錄
+#OOBUF2=X,7,S
+T(2,#OCustNo)
+
+#OOBTN2=X,1,S
+C(5,#OCustRmkFlag,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L2072; ntxbuf=#OOBUF2}),BIND(grid,cancel))
+
+!分錄
+#OOBUF3=X,32,S
+T(2,#OOAcDate+0000000+#OORelNo)
+
+#OOBTN3=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄;ntxbuf=#OOBUF3})
+C(5,#OOAcFg,"Y",$,BIND(grid,cancel))
+
+!計息明細
+#OOBUF4=X,34,S
+T(2,#OCustNo+#OOFacmNo+#OOBormNo+#OOAcDate+#OOTellerNo+#OOTxtNo)
+
+#OOBTN4=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L3913;text=計息;ntxbuf=#OOBUF4})
+C(5,#OOLoanIntDetailFg,"Y",$,BIND(grid,cancel))
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+#TimCustNo#CustId#ApplNo#FacmNo#BormNo#AcDate#EntryDate#TitaHCode
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L3005
+#OCustNo#OCustRmkFlag#OExcessive#OShortfall#OCurrencyCode
+#OOEntryDate#OOAcDate#OOFacmNo#OOBormNo#OORelNo#OOTellerNo#OOTxtNo#OODesc#OOCurrencyCode#OOTxAmt
+#OOShortfall#OOLoanBal#OORate#OOTitaHCode#OOAcFg#OOFeeFg#OOLoanIntDetailFg#OOTxCd#OOTempAmt
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+<sub type="PART" name="L3005" layout="cols=1;screen.width=[130,870];printer.width=[15,30,15,30];">
+[
+["[L3005]                                 交易明細資料查詢"],
+!["@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX,],
+!["@會計日期",#OAcDate],
+["@本戶累溢收",#OExcessiveX],
+["@本戶累短收",#OShortfallX],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L3005
+#any={detail:true, header:'L3005.part', caption:'', width:1200, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN1=內容查詢
+{width:70,search:false,formatter:'cust:bind-button:內容查詢;L3912 交易內容查詢',align:'center',canExport:false}
+
+! #OOBTN2=
+! {width:60,search:false,formatter:'cust:bind-button:備忘錄;L2072 顧客控管警訊明細資料查詢',align:'center',canExport:false}
+
+#OOEntryDate=入帳日期
+{width:80,align:'center'}
+
+#OOAcDate=會計日期
+{width:80,align:'center'}
+
+#OOFacmNoX=額度編號
+{width:80,align:'center'}
+
+#OODesc=摘要
+{width:90}
+
+#OOCurrencyCode=幣別 
+{width:50,align:'center'}
+
+#OOTxAmtX=交易金額 
+{width:180}
+
+#OOTempAmtX=暫收抵繳 
+{width:180}
+
+#OOShortfallX=溢短收
+{width:180}
+
+#OOLoanBalX=放款餘額
+{width:180}
+
+#OORateX=利率
+{width:80}
+
+#OOTitaHCodeX=訂正別
+{width:70,align:'center'}
+
+#OOBTN3=分錄
+{width:40,search:true,formatter:'cust:bind-button:分錄;L6901 分錄',align:'center',canExport:false,}
+
+#OOFeeFg=費用
+{width:45,align:'center'}
+
+#OOAcDtRelNo=交易序號
+{width:200,align:'center'}
+
+#OOBTN4=計息
+{width:40,search:true,formatter:'cust:bind-button:計息;L3913 計息',align:'center',canExport:false,}
+^
+
+<include src="PRT.icf::INQ01.sel" map="i=L3005;cpi=15"/>
+#OCustNo#OFacmNo#OBormNo#OCustNoX#OAcDate#OExcessiveX#OShortfallX
+%
+#OOEntryDate#OOAcDate#OOFacmNoX#OODesc#OOCurrencyCode#OOTxAmtX#OOTempAmtX#OOShortfallX#OOLoanBalX
+#OORateX#OOTitaHCodeX#OOFeeFg#OOAcDtRelNo
+@^
+</sub>

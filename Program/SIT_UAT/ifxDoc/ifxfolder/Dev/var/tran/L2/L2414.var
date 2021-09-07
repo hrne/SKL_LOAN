@@ -65,7 +65,6 @@ E(0,40)ASGN(INQPRT$)
 [#<->#,"#FdClStatus+公開價值",#PublicValue],
 ["#FdSettingStat+設定狀態",#SettingStat,#SettingStatX],["#FdClStat+擔保品狀態",#ClStat,#ClStatX],
 ["#FdSettingDate+設定日期",#SettingDate],["#FdSettingBal+設定金額",#SettingBal],
-["#FdSynd+聯貸案",#Synd,#SyndX],["#FdSyndCode+聯貸案類型",#SyndCode,#SyndCodeX],
 ["#FdDispPrice+處分價格",#DispPrice],["#FdDispDate+處分日期",#DispDate],
 [#<->#,"#FdClStatus+擔保品狀況碼",#ClStatus,#ClStatusX],
 ]
@@ -215,7 +214,7 @@ T(F,@DispDate,1)
 
 !FunCd=2 隱藏框線
 #WKTF=X,1,S
-IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0)T(F,@CityCode,0),$)
+IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0),$)
 
 #IF_FUNCD_4=X,1,S
 IF(#FunCd==4,$,S)
@@ -248,6 +247,22 @@ T(F,@Synd,0)
 T(F,@SyndCode,0)
 T(F,@DispPrice,0)
 T(F,@DispDate,0)
+
+T(F,@SecuritiesType,0)
+T(F,@Listed,0)
+T(F,@OfferingDate,0)
+T(F,@ExpirationDate,0)
+T(F,@TargetIssuer,0)
+T(F,@SubTargetIssuer,0)
+T(F,@CreditDate,0)
+T(F,@Credit,0)
+T(F,@ExternalCredit,0)
+T(F,@Index,0)
+T(F,@TradingMethod,0)
+T(F,@Compensation,0)
+T(F,@Investment,0)
+T(F,@PublicValue,0)
+
 
 
 ! [功能]
@@ -498,7 +513,7 @@ IF(#ClTypeCode >= 998,T(2,@FdPledgeNO,*),T(2,@FdPledgeNO,))
 !有價證券記號
 #PHFG=X,1,S
 IF(#ClTypeCode=="101" ||#ClTypeCode=="102" ||#ClTypeCode=="103" ||#ClTypeCode=="110" ||#ClTypeCode=="130" ||#ClTypeCode=="1E1" ,E(0,1),E(0,0))
-INVOKEJS(SHOW,p1,17,28,#PHFG)
+INVOKEJS(SHOW,p1,17,24,#PHFG)
 
 
 

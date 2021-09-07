@@ -48,7 +48,7 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 public class CustNoticeCom extends TradeBuffer {
 
-//	private TitaVo titaVo;
+ 	private TitaVo titaVo;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -97,7 +97,7 @@ public class CustNoticeCom extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-//		this.titaVo = titaVo;
+ 		this.titaVo = titaVo;
 		this.totaVo.init(titaVo);
 
 		this.addList(this.totaVo);
@@ -135,7 +135,7 @@ public class CustNoticeCom extends TradeBuffer {
 			break;
 		case 1:
 			CustMain tCustMain = new CustMain();
-			tCustMain = custMainService.custNoFirst(custNo, custNo);
+			tCustMain = custMainService.custNoFirst(custNo, custNo,titaVo);
 
 			FacMain tFacMain = new FacMain();
 			FacMainId tFacMainId = new FacMainId();
@@ -143,7 +143,7 @@ public class CustNoticeCom extends TradeBuffer {
 			tFacMainId.setCustNo(custNo);
 			tFacMainId.setFacmNo(facmNo);
 
-			tFacMain = facMainService.findById(tFacMainId);
+			tFacMain = facMainService.findById(tFacMainId,titaVo);
 
 			reportCode = parse.stringToInteger(tFacMain.getRateAdjNoticeCode());
 
@@ -345,8 +345,6 @@ public class CustNoticeCom extends TradeBuffer {
 					}
 				}
 			}
-		} else {
-			return currAddress;
 		}
 
 		currAddress += custMain.getCurrRoad();
@@ -401,8 +399,6 @@ public class CustNoticeCom extends TradeBuffer {
 					}
 				}
 			}
-		} else {
-			return regAddress;
 		}
 
 		regAddress += custMain.getRegRoad();

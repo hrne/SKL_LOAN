@@ -25,7 +25,7 @@ public class LoanSyndId implements Serializable {
   @Column(name = "`CustNo`")
   private int custNo = 0;
 
-  // 聯貸案序號
+  // 聯貸編號
   @Column(name = "`SyndNo`")
   private int syndNo = 0;
 
@@ -57,7 +57,7 @@ public class LoanSyndId implements Serializable {
   }
 
 /**
-	* 聯貸案序號<br>
+	* 聯貸編號<br>
 	* 
 	* @return Integer
 	*/
@@ -66,10 +66,10 @@ public class LoanSyndId implements Serializable {
   }
 
 /**
-	* 聯貸案序號<br>
+	* 聯貸編號<br>
 	* 
   *
-  * @param syndNo 聯貸案序號
+  * @param syndNo 聯貸編號
 	*/
   public void setSyndNo(int syndNo) {
     this.syndNo = syndNo;

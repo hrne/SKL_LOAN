@@ -104,7 +104,7 @@ public class TxToDoCom extends TradeBuffer {
 		// 放行時執行
 		// 1.交易更新處理狀態
 		if (titaVo.isActfgRelease()) {
-			tMain = txToDoMainService.excuteTxcdFirst("C", titaVo.getTxcd()); // C-連結或啟動原交易，執行後明細檔狀態改為已處理
+			tMain = txToDoMainService.excuteTxcdFirst("C", titaVo.getTxcd(), titaVo); // C-連結或啟動原交易，執行後明細檔狀態改為已處理
 			if (tMain != null)
 				txUpdStatus(tMain, titaVo);
 		}
@@ -127,7 +127,8 @@ public class TxToDoCom extends TradeBuffer {
 		int bormNo = 0;
 		if (titaVo.get("TxBormNo") != null)
 			bormNo = this.parse.stringToInteger(titaVo.getParam("TxBormNo"));
-		else if ("-".equals(titaVo.getMrKey().substring(11, 12)) && parse.isNumeric(titaVo.getMrKey().substring(12, 15)))
+		else if ("-".equals(titaVo.getMrKey().substring(11, 12))
+				&& parse.isNumeric(titaVo.getMrKey().substring(12, 15)))
 			bormNo = parse.stringToInteger(titaVo.getMrKey().substring(12, 15));
 
 		String iDtlValue = titaVo.get("TxDtlValue");
@@ -139,11 +140,13 @@ public class TxToDoCom extends TradeBuffer {
 		tDetailId.setFacmNo(facmNo);
 		tDetailId.setBormNo(bormNo);
 		tDetailId.setDtlValue(iDtlValue);
-		tDetail = txToDoDetailService.findById(tDetailId);
+		tDetail = txToDoDetailService.findById(tDetailId, titaVo);
 //		this.info("upd "+tDetail.toString());
 		// 新增與處理交易序號需不相同
 		if (tDetail != null && tDetail.getStatus() <= 2)
-			if (tDetail.getTitaTlrNo() == null || titaVo.getTlrNo() == null || !tDetail.getTitaTlrNo().equals(titaVo.getTlrNo()) || parse.stringToInteger(titaVo.getTxtNo()) != tDetail.getTitaTxtNo())
+			if (tDetail.getTitaTlrNo() == null || titaVo.getTlrNo() == null
+					|| !tDetail.getTitaTlrNo().equals(titaVo.getTlrNo())
+					|| parse.stringToInteger(titaVo.getTxtNo()) != tDetail.getTitaTxtNo())
 				updDetailStatus(2, tDetailId, titaVo); // 2.已處理
 
 	}
@@ -172,7 +175,7 @@ public class TxToDoCom extends TradeBuffer {
 			// 重複跳過時，正常且找得到或訂定時找不到，跳過處理
 			boolean skip = false;
 			if (dupSkip) {
-				if (txToDoDetailService.holdById(tDetailId) != null) {
+				if (txToDoDetailService.holdById(tDetailId, titaVo) != null) {
 					if (HCode == 0)
 						skip = true;
 				} else {
@@ -184,7 +187,7 @@ public class TxToDoCom extends TradeBuffer {
 				tDetail.setTxToDoDetailId(tDetailId);
 				tDetail.setDataDate(this.txBuffer.getMgBizDate().getTbsDy());
 				// 應處理主檔
-				tMain = txToDoMainService.holdById(tDetail.getItemCode()); // hold
+				tMain = txToDoMainService.holdById(tDetail.getItemCode(), titaVo); // hold
 				if (tMain == null) {
 					this.info("***  ");
 					tMain = new TxToDoMain();
@@ -195,7 +198,7 @@ public class TxToDoCom extends TradeBuffer {
 						subMainCntValue(tMain, tDetail, titaVo);
 					}
 					try {
-						txToDoMainService.insert(tMain);
+						txToDoMainService.insert(tMain, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0005", "TxToDoMain insert " + tMain + e.getErrorMsg());
 					}
@@ -208,7 +211,7 @@ public class TxToDoCom extends TradeBuffer {
 						subMainCntValue(tMain, tDetail, titaVo);
 					}
 					try {
-						txToDoMainService.update(tMain);
+						txToDoMainService.update(tMain, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", "TxToDoMain update " + tMain + e.getErrorMsg());
 					}
@@ -219,16 +222,17 @@ public class TxToDoCom extends TradeBuffer {
 						tDetail.setExcuteTxcd(tMain.getExcuteTxcd());
 					// this.info("Add ="+tDetail.toString());
 					try {
-						txToDoDetailService.insert(tDetail);
+						txToDoDetailService.insert(tDetail, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0005", "TxToDoDetail insert " + tDetail + e.getErrorMsg());
 					}
 
 				} else { // 訂正
 					try {
-						txToDoDetailService.delete(tDetail);
+						txToDoDetailService.delete(tDetail, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", "TxToDoDetail deleteAll " + tDetail + e.getErrorMsg());
+						throw new LogicException(titaVo, "E0008",
+								"TxToDoDetail deleteAll " + tDetail + e.getErrorMsg());
 					}
 				}
 			}
@@ -243,7 +247,8 @@ public class TxToDoCom extends TradeBuffer {
 			throw new LogicException(titaVo, "E0013", "toDoList empty ");
 		for (int i = 0; i < detailList.size(); i++) {
 			if (!detailList.get(i).getItemCode().equals(detailList.get(0).getItemCode())) {
-				throw new LogicException(titaVo, "E0013", "每筆項目需相同 " + detailList.get(0).getItemCode() + " " + detailList.get(i).getItemCode());
+				throw new LogicException(titaVo, "E0013",
+						"每筆項目需相同 " + detailList.get(0).getItemCode() + " " + detailList.get(i).getItemCode());
 			}
 		}
 	}
@@ -257,7 +262,8 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param titaVo     TitaVo
 	 * @throws LogicException LogicException
 	 */
-	public void addByDetailList(boolean dupSkip, int HCode, List<TxToDoDetail> detailList, TitaVo titaVo) throws LogicException {
+	public void addByDetailList(boolean dupSkip, int HCode, List<TxToDoDetail> detailList, TitaVo titaVo)
+			throws LogicException {
 		this.info("TxToDoCom ... addByDetailList" + detailList.size());
 		// check Detail List
 		checkDetailList(detailList, titaVo);
@@ -290,7 +296,7 @@ public class TxToDoCom extends TradeBuffer {
 			// hold txToDoDetail
 			if (tDetailId.getDtlValue() == null || tDetailId.getDtlValue().trim().length() == 0)
 				tDetailId.setDtlValue(" ");
-			tDetail = txToDoDetailService.holdById(tDetailId);
+			tDetail = txToDoDetailService.holdById(tDetailId, titaVo);
 			if (tDetail == null)
 				this.info("TxToDoCom ... updByDetailId notfound ");
 			else {
@@ -300,7 +306,7 @@ public class TxToDoCom extends TradeBuffer {
 				if (tDetail.getStatus() == status)
 					this.info("TxToDoCom ... updByDetailId same status");
 				else {
-					tMain = txToDoMainService.holdById(tDetailId.getItemCode());
+					tMain = txToDoMainService.holdById(tDetailId.getItemCode(), titaVo);
 					if (tMain == null)
 						throw new LogicException(titaVo, "E0006", "TxToDoMain Notfound" + tDetailId);
 					// 減原資料狀態筆數
@@ -312,7 +318,7 @@ public class TxToDoCom extends TradeBuffer {
 					addMainCntValue(tMain, tDetail, titaVo);
 
 					try {
-						txToDoMainService.update(tMain);
+						txToDoMainService.update(tMain, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", "TxToDoMain update " + tMain + e.getErrorMsg());
 					}
@@ -326,7 +332,7 @@ public class TxToDoCom extends TradeBuffer {
 					}
 					try {
 
-						txToDoDetailService.update(tDetail);
+						txToDoDetailService.update(tDetail, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", "TxToDoDetail update " + tMain + e.getErrorMsg());
 					}
@@ -355,7 +361,7 @@ public class TxToDoCom extends TradeBuffer {
 					tDetailId.setFacmNo(tDetail.getFacmNo());
 					tDetailId.setBormNo(tDetail.getBormNo());
 					tDetailId.setDtlValue(tDetail.getDtlValue());
-					tDetail = txToDoDetailService.holdById(tDetailId);
+					tDetail = txToDoDetailService.holdById(tDetailId, titaVo);
 					updDetailStatus(tDetail.getStatus(), tDetailId, titaVo);
 				}
 			}
@@ -377,19 +383,19 @@ public class TxToDoCom extends TradeBuffer {
 		checkDetailList(detailList, titaVo);
 
 		// update TxToDoMain
-		tMain = txToDoMainService.holdById(detailList.get(0).getItemCode());
+		tMain = txToDoMainService.holdById(detailList.get(0).getItemCode(), titaVo);
 
 		subListCntValue(tMain, detailList, titaVo); // 減原資料狀態筆數
 
 		try {
-			txToDoMainService.update(tMain);
+			txToDoMainService.update(tMain, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "TxToDoMain update " + tMain + e.getErrorMsg());
 		}
 
 		// delete TxToDoDetail
 		try {
-			txToDoDetailService.deleteAll(detailList);
+			txToDoDetailService.deleteAll(detailList, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0008", "TxToDoDetail  deleteAll " + tMain + e.getErrorMsg());
 		}
@@ -421,10 +427,10 @@ public class TxToDoCom extends TradeBuffer {
 	public void dailyHouseKeeping(TitaVo titaVo) throws LogicException {
 
 		this.info("TxToDoCom ... dailyHouseKeeping");
-		Slice<TxToDoMain> mainList = txToDoMainService.findAll(this.index, Integer.MAX_VALUE);
+		Slice<TxToDoMain> mainList = txToDoMainService.findAll(this.index, Integer.MAX_VALUE, titaVo);
 		if (mainList != null) {
 			try {
-				txToDoMainService.deleteAll(mainList.getContent());
+				txToDoMainService.deleteAll(mainList.getContent(), titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "TxToDoMain deleteAll " + e.getErrorMsg());
 			}
@@ -436,25 +442,28 @@ public class TxToDoCom extends TradeBuffer {
 				// delete txToDoDetail depending on YdReserveF
 				// 昨日留存 == Y => 刪除 資料狀態 = 2.已處理, 3.已刪 (不含 0.未處理 1.已保留)，else 刪除全部
 				if ("Y".equals(tMain.getYdReserveFg()))
-					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 2, 3, this.index, Integer.MAX_VALUE);
+					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 2, 3, this.index,
+							Integer.MAX_VALUE, titaVo);
 				else
-					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 0, 9, this.index, Integer.MAX_VALUE);
+					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 0, 9, this.index,
+							Integer.MAX_VALUE, titaVo);
 				if (detailList != null) {
 					try {
-						txToDoDetailService.deleteAll(detailList.getContent());
+						txToDoDetailService.deleteAll(detailList.getContent(), titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008", "TxToDoDetail deleteAll " + e.getErrorMsg());
 					}
 				}
 				// if YdReserveFg = 'Y' find all remaining detail list
 				if ("Y".equals(tMain.getYdReserveFg())) {
-					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 0, 1, this.index, Integer.MAX_VALUE);
+					detailList = txToDoDetailService.detailStatusRange(tMain.getItemCode(), 0, 1, this.index,
+							Integer.MAX_VALUE, titaVo);
 					if (detailList != null) {
 						TxToDoMain tTxToDoMain = new TxToDoMain();
 						mntMainFixValue(tTxToDoMain, tMain.getItemCode(), titaVo);
 						addListCntValue(tTxToDoMain, detailList.getContent(), titaVo);
 						try {
-							txToDoMainService.insert(tTxToDoMain);
+							txToDoMainService.insert(tTxToDoMain, titaVo);
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0005", "TxToDoMain insert " + tMain + e.getErrorMsg());
 						}
@@ -467,7 +476,8 @@ public class TxToDoCom extends TradeBuffer {
 
 	/* 累加應處理清單筆數 */
 	private void addMainCntValue(TxToDoMain tMain, TxToDoDetail tdetail, TitaVo titaVo) throws LogicException {
-		this.info("TxToDoCom ... addMainCntValue " + tdetail.getDataDate() + ", tx=" + this.txBuffer.getTxBizDate().getTbsDy());
+		this.info("TxToDoCom ... addMainCntValue " + tdetail.getDataDate() + ", tx="
+				+ this.txBuffer.getTxBizDate().getTbsDy());
 		if (tdetail.getDataDate() < this.txBuffer.getTxBizDate().getTbsDy())
 			tMain.setYdReserveCnt(tMain.getYdReserveCnt() + 1); // 昨日留存筆數
 		else

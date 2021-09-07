@@ -16,6 +16,7 @@ ContractPrice=9,14
 ContractDate=9,7
 BdUsageCode=9,1
 ParkingTypeCode=9,1
+ParkingArea=9,9.2
 ParkingProperty=X,1
 HouseTaxNo=X,12
 HouseBuyDate=9,7

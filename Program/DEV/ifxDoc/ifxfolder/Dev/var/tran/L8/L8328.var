@@ -124,7 +124,7 @@ T(2,@FdSignPrin,*)
 T(2,@FdSignOther,*)
 T(2,@FdOwnPercentage,*)
 T(2,@FdAcQuitAmt,*)
-T(3,@TranKeyHelp,C:異動;D:補件))
+T(3,@TranKeyHelp,C:異動;D:刪除;X:補件))
 
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -200,7 +200,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1)T(2,@FdSignPrin,*)T(2,@FdSignOther,*)T(2,@FdOwnPercentage,*)T(2,@FdAcQuitAmt,*),C(5,#TranKey,D,K(MODIFYBUTTON,補件)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0)T(2,@FdSignPrin, )T(2,@FdSignOther, )T(2,@FdOwnPercentage, )T(2,@FdAcQuitAmt, ),$))
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@SignPrin,1)T(F,@SignOther,1)T(F,@OwnPercentage,1)T(F,@AcQuitAmt,1)T(2,@FdSignPrin,*)T(2,@FdSignOther,*)T(2,@FdOwnPercentage,*)T(2,@FdAcQuitAmt,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0)T(2,@FdSignPrin, )T(2,@FdSignOther, )T(2,@FdOwnPercentage, )T(2,@FdAcQuitAmt, ),$))
+C(5,#TranKey,X,K(MODIFYBUTTON,補件)T(F,@SignPrin,0)T(F,@SignOther,0)T(F,@OwnPercentage,0)T(F,@AcQuitAmt,0)T(2,@FdSignPrin, )T(2,@FdSignOther, )T(2,@FdOwnPercentage, )T(2,@FdAcQuitAmt, ),$))
 
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
@@ -270,25 +272,37 @@ T(2,@MaxMainCodeX,#L8r01JcicBankName)
 #SignPrin=m,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SignPrin,#L8r45SignPrin),$)
+C(5,#TranKey,X,T(2,@SignPrin,#L8r45SignPrin),$)
 C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !簽約金額-利息、違約金及其他費用
 #SignOther=m,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SignOther,#L8r45SignOther),$)
+C(5,#TranKey,X,T(2,@SignOther,#L8r45SignOther),$)
 C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !債權比例
 #OwnPercentage=m,3.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@OwnPercentage,#L8r45OwnPercentage),$)
+C(5,#TranKey,X,T(2,@OwnPercentage,#L8r45OwnPercentage),$)
 C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !每月清償金額
 #AcQuitAmt=m,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@AcQuitAmt,#L8r45OwnPercentage),$)
+C(5,#TranKey,X,T(2,@AcQuitAmt,#L8r45OwnPercentage),$)
 C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

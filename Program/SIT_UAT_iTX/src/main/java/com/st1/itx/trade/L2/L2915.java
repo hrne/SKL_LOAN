@@ -148,6 +148,7 @@ public class L2915 extends TradeBuffer {
 		this.totaVo.putParam("ContractDate", tClBuilding.getContractDate());
 		this.totaVo.putParam("BdUsageCode", tClBuilding.getBdUsageCode());
 		this.totaVo.putParam("ParkingTypeCode", tClBuilding.getParkingTypeCode());
+		this.totaVo.putParam("ParkingArea", tClBuilding.getParkingArea());
 		this.totaVo.putParam("ParkingProperty", tClBuilding.getParkingProperty());
 		this.totaVo.putParam("HouseTaxNo", tClBuilding.getHouseTaxNo());
 		this.totaVo.putParam("HouseBuyDate", tClBuilding.getHouseBuyDate());
