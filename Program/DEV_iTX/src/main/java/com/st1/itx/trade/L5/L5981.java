@@ -59,9 +59,9 @@ public class L5981 extends TradeBuffer {
 
 		Slice<NegFinShareLog> sNegFinShareLog;
 		if (iCaseSq==0) {
-			sNegFinShareLog = sNegFinShareLogService.CustNoEq(iCustNo, this.index, this.limit, titaVo);
+			sNegFinShareLog = sNegFinShareLogService.custNoEq(iCustNo, this.index, this.limit, titaVo);
 		} else {
-			sNegFinShareLog = sNegFinShareLogService.FindAllFinCode(iCustNo, iCaseSq, this.index, this.limit, titaVo);
+			sNegFinShareLog = sNegFinShareLogService.findFinCodeAll(iCustNo, iCaseSq, this.index, this.limit, titaVo);
 		}
 		List<NegFinShareLog> lNegFinShareLog = sNegFinShareLog == null ? null : sNegFinShareLog.getContent();
 

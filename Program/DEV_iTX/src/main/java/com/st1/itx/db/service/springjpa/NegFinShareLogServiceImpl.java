@@ -90,7 +90,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "CaseSeq", "Seq", "FinCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "CaseSeq", "Seq", "FinCode"));
     this.info("findAll " + dbName);
@@ -110,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegFinShareLog> FindAllFinCode(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegFinShareLog> findFinCodeAll(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegFinShareLog> slice = null;
     if (titaVo.length != 0)
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("FindAllFinCode " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1);
+    this.info("findFinCodeAll " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1);
     if (dbName.equals(ContentName.onDay))
       slice = negFinShareLogReposDay.findAllByCustNoIsAndCaseSeqIsOrderByCustNoAscCaseSeqAscSeqDescFinCodeAsc(custNo_0, caseSeq_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -138,7 +138,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegFinShareLog> FindNewSeq(int custNo_0, int caseSeq_1, int seq_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegFinShareLog> findNewSeq(int custNo_0, int caseSeq_1, int seq_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegFinShareLog> slice = null;
     if (titaVo.length != 0)
@@ -149,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("FindNewSeq " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1 + " seq_2 : " +  seq_2);
+    this.info("findNewSeq " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1 + " seq_2 : " +  seq_2);
     if (dbName.equals(ContentName.onDay))
       slice = negFinShareLogReposDay.findAllByCustNoIsAndCaseSeqIsAndSeqIs(custNo_0, caseSeq_1, seq_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -166,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegFinShareLog> CustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegFinShareLog> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegFinShareLog> slice = null;
     if (titaVo.length != 0)
@@ -177,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = negFinShareLogReposDay.findAllByCustNoIsOrderByCaseSeqDescSeqDescFinCodeAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))

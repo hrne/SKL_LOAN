@@ -404,7 +404,7 @@ TXFORM=L597A
 
 ^
 #RPTFG=0,QUERY.GRID,L597A
-#any={header:'L597A.part',caption:'',width:1000,rowNum:40,
+#any={header:'L597A.part',caption:'',width:1000,rowNum:40, ifxDisplay:'1',
 ifxBatch:{
 	name:'待處理',
 	type:'5',
@@ -462,7 +462,7 @@ ifxBatch:{
 
 ^
 #RPTFG=1,QUERY.GRID,L597A
-#any={header:'L597A.part',caption:'',width:1000,rowNum:40,
+#any={header:'L597A.part',caption:'',width:1000,rowNum:40, ifxDisplay:'1',
 ifxBatch:{
 	name:'未入帳',
 	type:'5',

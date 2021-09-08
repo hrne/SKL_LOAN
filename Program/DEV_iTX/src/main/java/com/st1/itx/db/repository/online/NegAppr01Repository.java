@@ -40,7 +40,7 @@ public interface NegAppr01Repository extends JpaRepository<NegAppr01, NegAppr01I
   // BringUpDate=
   public Slice<NegAppr01> findAllByBringUpDateIs(int bringUpDate_0, Pageable pageable);
 
-  // BatchTxtNo = , AND FinCode= , AND ApprDate=
+  // BatchTxtNo = , AND FinCode = , AND ApprDate=
   public Slice<NegAppr01> findAllByBatchTxtNoIsAndFinCodeIsAndApprDateIs(String batchTxtNo_0, String finCode_1, int apprDate_2, Pageable pageable);
 
   // CustNo = , AND CaseSeq = 

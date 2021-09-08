@@ -89,7 +89,7 @@ public class L5704 extends TradeBuffer {
 		} else if (FunctionCode.equals("2")) {
 
 			Slice<NegAppr> sNegAppr;
-			sNegAppr = sNegApprService.YyyyMmEq(iYearMonth, this.index, this.limit, titaVo);
+			sNegAppr = sNegApprService.yyyyMmEq(iYearMonth, this.index, this.limit, titaVo);
 			List<NegAppr> lNegAppr = sNegAppr == null ? null : sNegAppr.getContent();
 
 			if (lNegAppr == null || lNegAppr.size() == 0) {
@@ -130,7 +130,7 @@ public class L5704 extends TradeBuffer {
 		} else if (FunctionCode.equals("4")) {
 			this.info("FunctionCode=4 Start");
 			Slice<NegAppr> sNegAppr;
-			sNegAppr = sNegApprService.YyyyMmEq(iYearMonth, this.index, this.limit, titaVo);
+			sNegAppr = sNegApprService.yyyyMmEq(iYearMonth, this.index, this.limit, titaVo);
 			List<NegAppr> lNegAppr = sNegAppr == null ? null : sNegAppr.getContent();
 
 			if (lNegAppr == null || lNegAppr.size() == 0) {

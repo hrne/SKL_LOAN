@@ -44,7 +44,7 @@ public interface NegQueryCustService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegQueryCust NegQueryCust of List
    */
-  public Slice<NegQueryCust> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegQueryCust> custIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * AcDate= ,AND FileYN= 
@@ -56,7 +56,7 @@ public interface NegQueryCustService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegQueryCust NegQueryCust of List
    */
-  public Slice<NegQueryCust> FirstAcDate(int acDate_0, String fileYN_1, int index, int limit, TitaVo... titaVo);
+  public Slice<NegQueryCust> firstAcDate(int acDate_0, String fileYN_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * AcDate= 
@@ -67,7 +67,7 @@ public interface NegQueryCustService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegQueryCust NegQueryCust of List
    */
-  public Slice<NegQueryCust> AcDateEq(int acDate_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegQueryCust> acDateEq(int acDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By NegQueryCust

@@ -44,7 +44,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> CustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo= , AND ExportDate =
@@ -56,7 +56,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> CustNoExportDateEq(int custNo_0, int exportDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> custNoExportDateEq(int custNo_0, int exportDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo= , AND ExportDate&gt;= , AND ExportDate &lt;=
@@ -69,7 +69,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> CustExporBetween(int custNo_0, int exportDate_1, int exportDate_2, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> custExporBetween(int custNo_0, int exportDate_1, int exportDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * ExportDate=
@@ -80,7 +80,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> ExportEq(int exportDate_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> exportEq(int exportDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * ExportDate&gt;= , AND ExportDate &lt;=
@@ -92,7 +92,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> ExportDateBetween(int exportDate_0, int exportDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> exportDateBetween(int exportDate_0, int exportDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * BringUpDate=
@@ -103,10 +103,10 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> BringUpDateEq(int bringUpDate_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> bringUpDateEq(int bringUpDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * BatchTxtNo = , AND FinCode= , AND ApprDate=
+   * BatchTxtNo = , AND FinCode = , AND ApprDate=
    *
    * @param batchTxtNo_0 batchTxtNo_0
    * @param finCode_1 finCode_1
@@ -116,7 +116,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> FindBatch(String batchTxtNo_0, String finCode_1, int apprDate_2, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> findBatch(String batchTxtNo_0, String finCode_1, int apprDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo = , AND CaseSeq = 
@@ -128,7 +128,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> SumCustNo(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> sumCustNo(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo = , AND CaseSeq = , AND FinCode=
@@ -141,7 +141,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> SumCustNoFinCode(int custNo_0, int caseSeq_1, String finCode_2, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> sumCustNoFinCode(int custNo_0, int caseSeq_1, String finCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * AcDate = , AND TitaTlrNo = ,AND TitaTxtNo=
@@ -154,7 +154,7 @@ public interface NegAppr01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr01 NegAppr01 of List
    */
-  public Slice<NegAppr01> FindTrans(int acDate_0, String titaTlrNo_1, int titaTxtNo_2, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr01> findTrans(int acDate_0, String titaTlrNo_1, int titaTxtNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By NegAppr01

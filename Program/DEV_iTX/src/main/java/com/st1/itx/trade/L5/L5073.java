@@ -71,9 +71,9 @@ public class L5073 extends TradeBuffer {
 
 		Slice<NegAppr> sNegAppr;
 		if (iMonth == 0) {
-			sNegAppr = sNegApprService.YyyyMmBetween(YMStart, YMEnd, this.index, this.limit, titaVo);
+			sNegAppr = sNegApprService.yyyyMmBetween(YMStart, YMEnd, this.index, this.limit, titaVo);
 		} else {
-			sNegAppr = sNegApprService.YyyyMmEq(YearMonth, this.index, this.limit, titaVo);
+			sNegAppr = sNegApprService.yyyyMmEq(YearMonth, this.index, this.limit, titaVo);
 		}
 		List<NegAppr> lNegAppr = sNegAppr == null ? null : sNegAppr.getContent();
 

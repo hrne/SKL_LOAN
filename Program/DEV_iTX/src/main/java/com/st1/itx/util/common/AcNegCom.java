@@ -128,7 +128,7 @@ public class AcNegCom extends TradeBuffer {
 		tNegTrans.setNegTransId(tNegTransId);
 		// 正常交易新增、訂正交易要刪除
 		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.當日訂正 2.隔日訂正
-			tNegMain = negMainService.StatusFirst("0", ac.getCustNo(), titaVo); // 0-正常
+			tNegMain = negMainService.statusFirst("0", ac.getCustNo(), titaVo); // 0-正常
 			if (tNegMain == null) {
 				throw new LogicException(titaVo, "E6003", "acNegCom 非債協戶 " + ac.getCustNo());
 			}
@@ -177,7 +177,7 @@ public class AcNegCom extends TradeBuffer {
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) // 專戶
 			acctCode = "T10";
 		else {
-			tNegMain = negMainService.CustNoFirst(custNo, titaVo);
+			tNegMain = negMainService.custNoFirst(custNo, titaVo);
 			if (tNegMain == null)
 				throw new LogicException(titaVo, "E6003", "acNegCom getAcctCode 該戶非債協戶 " + custNo);
 			else {
@@ -222,7 +222,7 @@ public class AcNegCom extends TradeBuffer {
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo())
 			acctCode = "T10";
 		else {
-			tNegMain = negMainService.CustNoFirst(custNo, titaVo);
+			tNegMain = negMainService.custNoFirst(custNo, titaVo);
 			if (tNegMain == null)
 				throw new LogicException(titaVo, "E6003", "acNegCom getReturnAcctCode 該戶非債協戶 " + custNo);
 			else {
@@ -266,7 +266,7 @@ public class AcNegCom extends TradeBuffer {
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo())
 			acctCode = "T10";
 		else {
-			tNegMain = negMainService.CustNoFirst(custNo, titaVo);
+			tNegMain = negMainService.custNoFirst(custNo, titaVo);
 			if (tNegMain == null)
 				throw new LogicException(titaVo, "E6003", "acNegCom getApprAcctCode 該戶非債協戶 " + custNo);
 			else {
@@ -307,7 +307,7 @@ public class AcNegCom extends TradeBuffer {
 		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) // 專戶
 			isNegCustNo = true;
 		else {
-			tNegMain = negMainService.StatusFirst("0", custNo, titaVo); // 0-正常
+			tNegMain = negMainService.statusFirst("0", custNo, titaVo); // 0-正常
 			if (tNegMain != null)
 				isNegCustNo = true;
 		}

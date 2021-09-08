@@ -47,7 +47,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> HaveCustNo(String caseKindCode_0, String custLoanKind_1, String status_2, int custNo_3, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> haveCustNo(String caseKindCode_0, String custLoanKind_1, String status_2, int custNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseKindCode= , AND CustLoanKind= , AND Status=
@@ -60,7 +60,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> NoCustNo(String caseKindCode_0, String custLoanKind_1, String status_2, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> noCustNo(String caseKindCode_0, String custLoanKind_1, String status_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo=
@@ -71,7 +71,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> CustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseKindCode=
@@ -82,7 +82,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> CaseKindCodeEq(String caseKindCode_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> caseKindCodeEq(String caseKindCode_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustLoanKind=
@@ -93,7 +93,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> CustLoanKindEq(String custLoanKind_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> custLoanKindEq(String custLoanKind_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * Status=
@@ -104,7 +104,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> StatusEq(String status_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> statusEq(String status_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo=
@@ -113,7 +113,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public NegMain CustNoFirst(int custNo_0, TitaVo... titaVo);
+  public NegMain custNoFirst(int custNo_0, TitaVo... titaVo);
 
   /**
    * Status= ,AND CustNo= 
@@ -123,7 +123,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public NegMain StatusFirst(String status_0, int custNo_1, TitaVo... titaVo);
+  public NegMain statusFirst(String status_0, int custNo_1, TitaVo... titaVo);
 
   /**
    * Status^i , AND IsMainFin= , AND NextPayDate&gt;= , AND NextPayDate&lt;= , AND CustNo=
@@ -138,7 +138,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> L5705HadCustId(List<String> status_0, String isMainFin_1, int nextPayDate_2, int nextPayDate_3, int custNo_4, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> l5705HadCustId(List<String> status_0, String isMainFin_1, int nextPayDate_2, int nextPayDate_3, int custNo_4, int index, int limit, TitaVo... titaVo);
 
   /**
    * Status^i , AND IsMainFin= , AND NextPayDate&gt;= , AND NextPayDate&lt;= 
@@ -152,7 +152,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> L5705NoCustId(List<String> status_0, String isMainFin_1, int nextPayDate_2, int nextPayDate_3, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> l5705NoCustId(List<String> status_0, String isMainFin_1, int nextPayDate_2, int nextPayDate_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo= , AND ApplDate= , AND MainFinCode= 
@@ -165,7 +165,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public Slice<NegMain> CustNoAndApplDate(int custNo_0, int applDate_1, String mainFinCode_2, int index, int limit, TitaVo... titaVo);
+  public Slice<NegMain> custNoAndApplDate(int custNo_0, int applDate_1, String mainFinCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo= , AND ApplDate= , AND MainFinCode= 
@@ -176,7 +176,7 @@ public interface NegMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegMain NegMain of List
    */
-  public NegMain CustNoAndApplDateFirst(int custNo_0, int applDate_1, String mainFinCode_2, TitaVo... titaVo);
+  public NegMain custNoAndApplDateFirst(int custNo_0, int applDate_1, String mainFinCode_2, TitaVo... titaVo);
 
   /**
    * hold By NegMain

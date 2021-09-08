@@ -648,7 +648,7 @@ public class NegReportCom extends CommBuffer {
 						if (CustNo != 0) {
 							// 戶號存在
 							// 檢查NegMain在不在
-							NegMain tNegMain = sNegMainService.CustNoFirst(CustNo, titaVo);
+							NegMain tNegMain = sNegMainService.custNoFirst(CustNo, titaVo);
 							if (tNegMain != null) {
 								// 已存在
 								StatusCode = "4001"; // 4001:入/扣帳成功
@@ -771,7 +771,7 @@ public class NegReportCom extends CommBuffer {
 	}
 
 	public String CheckNegArrp(int IntDate, int Status, TitaVo titaVo) throws LogicException {
-		Slice<NegAppr> slNegAppr = sNegApprService.BringUpDateEq(IntDate, 0, 500, titaVo);
+		Slice<NegAppr> slNegAppr = sNegApprService.bringUpDateEq(IntDate, 0, 500, titaVo);
 		List<NegAppr> lNegAppr = slNegAppr == null ? null : slNegAppr.getContent();
 
 		String pKindCode = "";
@@ -1002,7 +1002,7 @@ public class NegReportCom extends CommBuffer {
 						// 直接找NEGAPPR01即可 ,原使用SumCustNo改用FindTrans
 						this.info("no1  = " + tNegTrans.getCustNo());
 						this.info("seq1  = " + tNegTrans.getCaseSeq());
-						Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.FindTrans(Integer.parseInt(AcDate), TitaTlrNo, Integer.parseInt(TitaTxtNo), 0, Integer.MAX_VALUE, titaVo);
+						Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.findTrans(Integer.parseInt(AcDate), TitaTlrNo, Integer.parseInt(TitaTxtNo), 0, Integer.MAX_VALUE, titaVo);
 						List<NegAppr01> lTempNegAppr01 = sNegAppr01 == null ? null : sNegAppr01.getContent();
 
 						if (lTempNegAppr01 != null && lTempNegAppr01.size() != 0) {
@@ -1164,7 +1164,7 @@ public class NegReportCom extends CommBuffer {
 		// 入/扣帳日(同檔案一致)-Order4
 		int AssigeDate = 0;//
 
-		Slice<NegAppr> sNegAppr = sNegApprService.BringUpDateEq(IntBringUpdate, 0, 500, titaVo);
+		Slice<NegAppr> sNegAppr = sNegApprService.bringUpDateEq(IntBringUpdate, 0, 500, titaVo);
 		List<NegAppr> lNegAppr = sNegAppr == null ? null : sNegAppr.getContent();
 
 		if (lNegAppr != null && lNegAppr.size() != 0) {

@@ -118,11 +118,12 @@ public class NegMain implements Serializable {
   @Column(name = "`AccuTempAmt`")
   private BigDecimal accuTempAmt = new BigDecimal("0");
 
-  // 累溢收金額
+  // 累溢繳金額
   @Column(name = "`AccuOverAmt`")
   private BigDecimal accuOverAmt = new BigDecimal("0");
 
   // 累應還金額
+  /* 繳款時更新,結清時等於累繳金額減退還金額,其他等於期款乘以(首次應繳日至會計日之月差) */
   @Column(name = "`AccuDueAmt`")
   private BigDecimal accuDueAmt = new BigDecimal("0");
 
@@ -617,7 +618,7 @@ N
   }
 
 /**
-	* 累溢收金額<br>
+	* 累溢繳金額<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -626,10 +627,10 @@ N
   }
 
 /**
-	* 累溢收金額<br>
+	* 累溢繳金額<br>
 	* 
   *
-  * @param accuOverAmt 累溢收金額
+  * @param accuOverAmt 累溢繳金額
 	*/
   public void setAccuOverAmt(BigDecimal accuOverAmt) {
     this.accuOverAmt = accuOverAmt;
@@ -637,7 +638,7 @@ N
 
 /**
 	* 累應還金額<br>
-	* 
+	* 繳款時更新,結清時等於累繳金額減退還金額,其他等於期款乘以(首次應繳日至會計日之月差)
 	* @return BigDecimal
 	*/
   public BigDecimal getAccuDueAmt() {
@@ -646,7 +647,7 @@ N
 
 /**
 	* 累應還金額<br>
-	* 
+	* 繳款時更新,結清時等於累繳金額減退還金額,其他等於期款乘以(首次應繳日至會計日之月差)
   *
   * @param accuDueAmt 累應還金額
 	*/

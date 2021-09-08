@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("negMainService")
 @Repository
-public class NegMainServiceImpl implements NegMainService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(NegMainServiceImpl.class);
-
+public class NegMainServiceImpl extends ASpringJpaParm implements NegMainService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class NegMainServiceImpl implements NegMainService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + negMainId);
+    this.info("findById " + dbName + " " + negMainId);
     Optional<NegMain> negMain = null;
     if (dbName.equals(ContentName.onDay))
       negMain = negMainReposDay.findById(negMainId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "CaseSeq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "CaseSeq"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -114,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> HaveCustNo(String caseKindCode_0, String custLoanKind_1, String status_2, int custNo_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> haveCustNo(String caseKindCode_0, String custLoanKind_1, String status_2, int custNo_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("HaveCustNo " + dbName + " : " + "caseKindCode_0 : " + caseKindCode_0 + " custLoanKind_1 : " +  custLoanKind_1 + " status_2 : " +  status_2 + " custNo_3 : " +  custNo_3);
+    this.info("haveCustNo " + dbName + " : " + "caseKindCode_0 : " + caseKindCode_0 + " custLoanKind_1 : " +  custLoanKind_1 + " status_2 : " +  status_2 + " custNo_3 : " +  custNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByCaseKindCodeIsAndCustLoanKindIsAndStatusIsAndCustNoIsOrderByCustNoDescCaseSeqAsc(caseKindCode_0, custLoanKind_1, status_2, custNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -142,7 +138,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> NoCustNo(String caseKindCode_0, String custLoanKind_1, String status_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> noCustNo(String caseKindCode_0, String custLoanKind_1, String status_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -153,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("NoCustNo " + dbName + " : " + "caseKindCode_0 : " + caseKindCode_0 + " custLoanKind_1 : " +  custLoanKind_1 + " status_2 : " +  status_2);
+    this.info("noCustNo " + dbName + " : " + "caseKindCode_0 : " + caseKindCode_0 + " custLoanKind_1 : " +  custLoanKind_1 + " status_2 : " +  status_2);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByCaseKindCodeIsAndCustLoanKindIsAndStatusIsOrderByCustNoDescCaseSeqAsc(caseKindCode_0, custLoanKind_1, status_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -170,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> CustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -181,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByCustNoIsOrderByCustNoDescCaseSeqAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -198,7 +194,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> CaseKindCodeEq(String caseKindCode_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> caseKindCodeEq(String caseKindCode_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -209,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CaseKindCodeEq " + dbName + " : " + "caseKindCode_0 : " + caseKindCode_0);
+    this.info("caseKindCodeEq " + dbName + " : " + "caseKindCode_0 : " + caseKindCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByCaseKindCodeIsOrderByCustNoDescCaseSeqAsc(caseKindCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -226,7 +222,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> CustLoanKindEq(String custLoanKind_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> custLoanKindEq(String custLoanKind_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -237,7 +233,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustLoanKindEq " + dbName + " : " + "custLoanKind_0 : " + custLoanKind_0);
+    this.info("custLoanKindEq " + dbName + " : " + "custLoanKind_0 : " + custLoanKind_0);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByCustLoanKindIsOrderByCustNoDescCaseSeqAsc(custLoanKind_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -254,7 +250,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> StatusEq(String status_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> statusEq(String status_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -265,7 +261,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("StatusEq " + dbName + " : " + "status_0 : " + status_0);
+    this.info("statusEq " + dbName + " : " + "status_0 : " + status_0);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByStatusIsOrderByCustNoDescCaseSeqAsc(status_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -282,11 +278,11 @@ em = null;
   }
 
   @Override
-  public NegMain CustNoFirst(int custNo_0, TitaVo... titaVo) {
+  public NegMain custNoFirst(int custNo_0, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("CustNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("custNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
     Optional<NegMain> negMainT = null;
     if (dbName.equals(ContentName.onDay))
       negMainT = negMainReposDay.findTopByCustNoIsOrderByCaseSeqDesc(custNo_0);
@@ -301,11 +297,11 @@ em = null;
   }
 
   @Override
-  public NegMain StatusFirst(String status_0, int custNo_1, TitaVo... titaVo) {
+  public NegMain statusFirst(String status_0, int custNo_1, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("StatusFirst " + dbName + " : " + "status_0 : " + status_0 + " custNo_1 : " +  custNo_1);
+    this.info("statusFirst " + dbName + " : " + "status_0 : " + status_0 + " custNo_1 : " +  custNo_1);
     Optional<NegMain> negMainT = null;
     if (dbName.equals(ContentName.onDay))
       negMainT = negMainReposDay.findTopByStatusIsAndCustNoIsOrderByCaseSeqAsc(status_0, custNo_1);
@@ -320,7 +316,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> L5705HadCustId(List<String> status_0, String isMainFin_1, int nextPayDate_2, int nextPayDate_3, int custNo_4, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> l5705HadCustId(List<String> status_0, String isMainFin_1, int nextPayDate_2, int nextPayDate_3, int custNo_4, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -331,7 +327,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("L5705HadCustId " + dbName + " : " + "status_0 : " + status_0 + " isMainFin_1 : " +  isMainFin_1 + " nextPayDate_2 : " +  nextPayDate_2 + " nextPayDate_3 : " +  nextPayDate_3 + " custNo_4 : " +  custNo_4);
+    this.info("l5705HadCustId " + dbName + " : " + "status_0 : " + status_0 + " isMainFin_1 : " +  isMainFin_1 + " nextPayDate_2 : " +  nextPayDate_2 + " nextPayDate_3 : " +  nextPayDate_3 + " custNo_4 : " +  custNo_4);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByStatusInAndIsMainFinIsAndNextPayDateGreaterThanEqualAndNextPayDateLessThanEqualAndCustNoIsOrderByCustNoDescCaseSeqAsc(status_0, isMainFin_1, nextPayDate_2, nextPayDate_3, custNo_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -348,7 +344,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> L5705NoCustId(List<String> status_0, String isMainFin_1, int nextPayDate_2, int nextPayDate_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> l5705NoCustId(List<String> status_0, String isMainFin_1, int nextPayDate_2, int nextPayDate_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -359,7 +355,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("L5705NoCustId " + dbName + " : " + "status_0 : " + status_0 + " isMainFin_1 : " +  isMainFin_1 + " nextPayDate_2 : " +  nextPayDate_2 + " nextPayDate_3 : " +  nextPayDate_3);
+    this.info("l5705NoCustId " + dbName + " : " + "status_0 : " + status_0 + " isMainFin_1 : " +  isMainFin_1 + " nextPayDate_2 : " +  nextPayDate_2 + " nextPayDate_3 : " +  nextPayDate_3);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByStatusInAndIsMainFinIsAndNextPayDateGreaterThanEqualAndNextPayDateLessThanEqualOrderByCustNoDescCaseSeqAsc(status_0, isMainFin_1, nextPayDate_2, nextPayDate_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -376,7 +372,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegMain> CustNoAndApplDate(int custNo_0, int applDate_1, String mainFinCode_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegMain> custNoAndApplDate(int custNo_0, int applDate_1, String mainFinCode_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegMain> slice = null;
     if (titaVo.length != 0)
@@ -387,7 +383,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustNoAndApplDate " + dbName + " : " + "custNo_0 : " + custNo_0 + " applDate_1 : " +  applDate_1 + " mainFinCode_2 : " +  mainFinCode_2);
+    this.info("custNoAndApplDate " + dbName + " : " + "custNo_0 : " + custNo_0 + " applDate_1 : " +  applDate_1 + " mainFinCode_2 : " +  mainFinCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = negMainReposDay.findAllByCustNoIsAndApplDateIsAndMainFinCodeIsOrderByCustNoDescCaseSeqAsc(custNo_0, applDate_1, mainFinCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -404,11 +400,11 @@ em = null;
   }
 
   @Override
-  public NegMain CustNoAndApplDateFirst(int custNo_0, int applDate_1, String mainFinCode_2, TitaVo... titaVo) {
+  public NegMain custNoAndApplDateFirst(int custNo_0, int applDate_1, String mainFinCode_2, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("CustNoAndApplDateFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " applDate_1 : " +  applDate_1 + " mainFinCode_2 : " +  mainFinCode_2);
+    this.info("custNoAndApplDateFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " applDate_1 : " +  applDate_1 + " mainFinCode_2 : " +  mainFinCode_2);
     Optional<NegMain> negMainT = null;
     if (dbName.equals(ContentName.onDay))
       negMainT = negMainReposDay.findTopByCustNoIsAndApplDateIsAndMainFinCodeIsOrderByCustNoDescCaseSeqDesc(custNo_0, applDate_1, mainFinCode_2);
@@ -427,7 +423,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + negMainId);
+    this.info("Hold " + dbName + " " + negMainId);
     Optional<NegMain> negMain = null;
     if (dbName.equals(ContentName.onDay))
       negMain = negMainReposDay.findByNegMainId(negMainId);
@@ -445,7 +441,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + negMain.getNegMainId());
+    this.info("Hold " + dbName + " " + negMain.getNegMainId());
     Optional<NegMain> negMainT = null;
     if (dbName.equals(ContentName.onDay))
       negMainT = negMainReposDay.findByNegMainId(negMain.getNegMainId());
@@ -467,7 +463,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + negMain.getNegMainId());
+    this.info("Insert..." + dbName + " " + negMain.getNegMainId());
     if (this.findById(negMain.getNegMainId()) != null)
       throw new DBException(2);
 
@@ -496,7 +492,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + negMain.getNegMainId());
+    this.info("Update..." + dbName + " " + negMain.getNegMainId());
     if (!empNot.isEmpty())
       negMain.setLastUpdateEmpNo(empNot);
 
@@ -519,7 +515,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + negMain.getNegMainId());
+    this.info("Update..." + dbName + " " + negMain.getNegMainId());
     if (!empNot.isEmpty())
       negMain.setLastUpdateEmpNo(empNot);
 
@@ -539,7 +535,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + negMain.getNegMainId());
+    this.info("Delete..." + dbName + " " + negMain.getNegMainId());
     if (dbName.equals(ContentName.onDay)) {
       negMainReposDay.delete(negMain);	
       negMainReposDay.flush();
@@ -568,7 +564,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (NegMain t : negMain){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -603,7 +599,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (negMain == null || negMain.size() == 0)
       throw new DBException(6);
 
@@ -632,7 +628,7 @@ em = null;
 
   @Override
   public void deleteAll(List<NegMain> negMain, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

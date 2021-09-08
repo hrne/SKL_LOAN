@@ -97,7 +97,7 @@ public class L5705 extends TradeBuffer {
 
 	public int maxSeqForHadNegQueryCust(String DcToday, TitaVo titaVo) throws LogicException {
 		int seq = 0;
-		Slice<NegQueryCust> slHadNegQueryCust = sNegQueryCustService.FirstAcDate(Integer.parseInt(DcToday), "Y", 0, Integer.MAX_VALUE, titaVo);
+		Slice<NegQueryCust> slHadNegQueryCust = sNegQueryCustService.firstAcDate(Integer.parseInt(DcToday), "Y", 0, Integer.MAX_VALUE, titaVo);
 		List<NegQueryCust> lHadNegQueryCust = slHadNegQueryCust == null ? null : slHadNegQueryCust.getContent();
 		if (lHadNegQueryCust != null && lHadNegQueryCust.size() != 0) {
 			int TempSeq = 0;
@@ -123,7 +123,7 @@ public class L5705 extends TradeBuffer {
 		int ThisSeq = 0;// 批號
 		List<String> lCustId = new ArrayList<String>();
 
-		Slice<NegQueryCust> slNegQueryCust = sNegQueryCustService.FirstAcDate(Integer.parseInt(DcToday), "N", 0, Integer.MAX_VALUE, titaVo);
+		Slice<NegQueryCust> slNegQueryCust = sNegQueryCustService.firstAcDate(Integer.parseInt(DcToday), "N", 0, Integer.MAX_VALUE, titaVo);
 		List<NegQueryCust> lNegQueryCust = slNegQueryCust == null ? null : slNegQueryCust.getContent();
 		List<NegQueryCust> lUpdNegQueryCust = new ArrayList<NegQueryCust>();
 

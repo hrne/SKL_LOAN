@@ -107,7 +107,7 @@ public class L5074 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;// 查全部
 
-		Slice<NegAppr> slNegAppr = sNegApprService.AcDateEq(IntAcDate, IntAcDate, IntAcDate, this.index, this.limit, titaVo);
+		Slice<NegAppr> slNegAppr = sNegApprService.acDateEq(IntAcDate, IntAcDate, IntAcDate, this.index, this.limit, titaVo);
 		List<NegAppr> lNegAppr = slNegAppr == null ? null : slNegAppr.getContent();
 
 		int TotalLength = 23;
@@ -635,21 +635,21 @@ public class L5074 extends TradeBuffer {
 			break;
 		case "2":
 			// 撥付產檔日(L5707)
-			slNegTrans = sNegTransService.ExportDateEq(IntAcDate, 0, 1, titaVo);
+			slNegTrans = sNegTransService.exportDateEq(IntAcDate, 0, 1, titaVo);
 			if (slNegTrans != null && slNegTrans.getSize() != 0) {
 				TF = true;
 			}
 			break;
 		case "3":
 			// 撥付傳票日(L5708)
-			slNegTrans = sNegTransService.ExportAcDateEq(IntAcDate, 0, 1, titaVo);
+			slNegTrans = sNegTransService.exportAcDateEq(IntAcDate, 0, 1, titaVo);
 			if (slNegTrans != null && slNegTrans.getSize() != 0) {
 				TF = true;
 			}
 			break;
 		case "4":
 			// 撥付提兌日(L5709)
-			Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.BringUpDateEq(IntAcDate, 0, 1, titaVo);
+			Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.bringUpDateEq(IntAcDate, 0, 1, titaVo);
 			if (sNegAppr01 != null && sNegAppr01.getSize() != 0) {
 				TF = true;
 			}

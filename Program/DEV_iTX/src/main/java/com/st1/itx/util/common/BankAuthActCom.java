@@ -399,9 +399,9 @@ public class BankAuthActCom extends TradeBuffer {
 	/**
 	 * 維護郵局授權檔
 	 * 
-	 * @param status 1:停止使用 0:授權成功
+	 * @param iStatus 1:停止使用 0:授權成功
 	 * @param titaVo ..
-	 * @throws LogicException..
+	 * @throws LogicException ..
 	 */
 	public void mntPostAuth(String iStatus, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom mntPostAuth ...");
@@ -460,9 +460,9 @@ public class BankAuthActCom extends TradeBuffer {
 	/**
 	 * 維護ACH授權檔
 	 * 
-	 * @param status 1:停止使用 0:授權成功
+	 * @param iStatus 1:停止使用 0:授權成功
 	 * @param titaVo ..
-	 * @throws LogicException..
+	 * @throws LogicException ..
 	 */
 	public void mntAchAuth(String iStatus, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom mntAchAuth ...");

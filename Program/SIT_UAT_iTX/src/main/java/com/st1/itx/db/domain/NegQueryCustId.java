@@ -2,11 +2,11 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+
 /**
- * NegQueryCust 債務協商客戶分攤檔產生<br>
+ * NegQueryCust 債協客戶請求資料<br>
  * Gen By Tool
  * 
  * @author AdamPan

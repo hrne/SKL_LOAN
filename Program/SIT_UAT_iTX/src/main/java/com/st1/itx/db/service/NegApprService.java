@@ -45,7 +45,7 @@ public interface NegApprService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr NegAppr of List
    */
-  public Slice<NegAppr> YyyyMmBetween(int yyyyMm_0, int yyyyMm_1, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr> yyyyMmBetween(int yyyyMm_0, int yyyyMm_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * YyyyMm=
@@ -56,7 +56,7 @@ public interface NegApprService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr NegAppr of List
    */
-  public Slice<NegAppr> YyyyMmEq(int yyyyMm_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr> yyyyMmEq(int yyyyMm_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * ExportDate = , OR ApprAcDate = , OR BringUpDate = 
@@ -69,7 +69,7 @@ public interface NegApprService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr NegAppr of List
    */
-  public Slice<NegAppr> AcDateEq(int exportDate_0, int apprAcDate_1, int bringUpDate_2, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr> acDateEq(int exportDate_0, int apprAcDate_1, int bringUpDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * BringUpDate =
@@ -80,7 +80,7 @@ public interface NegApprService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegAppr NegAppr of List
    */
-  public Slice<NegAppr> BringUpDateEq(int bringUpDate_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegAppr> bringUpDateEq(int bringUpDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By NegAppr

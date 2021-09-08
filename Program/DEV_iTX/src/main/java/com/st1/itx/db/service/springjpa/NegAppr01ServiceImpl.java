@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("negAppr01Service")
 @Repository
-public class NegAppr01ServiceImpl implements NegAppr01Service, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(NegAppr01ServiceImpl.class);
-
+public class NegAppr01ServiceImpl extends ASpringJpaParm implements NegAppr01Service, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class NegAppr01ServiceImpl implements NegAppr01Service, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + negAppr01Id);
+    this.info("findById " + dbName + " " + negAppr01Id);
     Optional<NegAppr01> negAppr01 = null;
     if (dbName.equals(ContentName.onDay))
       negAppr01 = negAppr01ReposDay.findById(negAppr01Id);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo", "FinCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo", "FinCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -114,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> CustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByCustNoIsOrderByExportDateDescCustNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -142,7 +138,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> CustNoExportDateEq(int custNo_0, int exportDate_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> custNoExportDateEq(int custNo_0, int exportDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -153,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustNoExportDateEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " exportDate_1 : " +  exportDate_1);
+    this.info("custNoExportDateEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " exportDate_1 : " +  exportDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByCustNoIsAndExportDateIsOrderByExportDateDescCustNoAsc(custNo_0, exportDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -170,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> CustExporBetween(int custNo_0, int exportDate_1, int exportDate_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> custExporBetween(int custNo_0, int exportDate_1, int exportDate_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -181,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustExporBetween " + dbName + " : " + "custNo_0 : " + custNo_0 + " exportDate_1 : " +  exportDate_1 + " exportDate_2 : " +  exportDate_2);
+    this.info("custExporBetween " + dbName + " : " + "custNo_0 : " + custNo_0 + " exportDate_1 : " +  exportDate_1 + " exportDate_2 : " +  exportDate_2);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByCustNoIsAndExportDateGreaterThanEqualAndExportDateLessThanEqualOrderByExportDateDescCustNoAsc(custNo_0, exportDate_1, exportDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -198,7 +194,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> ExportEq(int exportDate_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> exportEq(int exportDate_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -209,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("ExportEq " + dbName + " : " + "exportDate_0 : " + exportDate_0);
+    this.info("exportEq " + dbName + " : " + "exportDate_0 : " + exportDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByExportDateIsOrderByExportDateDescCustNoAsc(exportDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -226,7 +222,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> ExportDateBetween(int exportDate_0, int exportDate_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> exportDateBetween(int exportDate_0, int exportDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -237,7 +233,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("ExportDateBetween " + dbName + " : " + "exportDate_0 : " + exportDate_0 + " exportDate_1 : " +  exportDate_1);
+    this.info("exportDateBetween " + dbName + " : " + "exportDate_0 : " + exportDate_0 + " exportDate_1 : " +  exportDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByExportDateGreaterThanEqualAndExportDateLessThanEqualOrderByExportDateDescCustNoAsc(exportDate_0, exportDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -254,7 +250,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> BringUpDateEq(int bringUpDate_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> bringUpDateEq(int bringUpDate_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -265,7 +261,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("BringUpDateEq " + dbName + " : " + "bringUpDate_0 : " + bringUpDate_0);
+    this.info("bringUpDateEq " + dbName + " : " + "bringUpDate_0 : " + bringUpDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByBringUpDateIs(bringUpDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -282,7 +278,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> FindBatch(String batchTxtNo_0, String finCode_1, int apprDate_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> findBatch(String batchTxtNo_0, String finCode_1, int apprDate_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -293,7 +289,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("FindBatch " + dbName + " : " + "batchTxtNo_0 : " + batchTxtNo_0 + " finCode_1 : " +  finCode_1 + " apprDate_2 : " +  apprDate_2);
+    this.info("findBatch " + dbName + " : " + "batchTxtNo_0 : " + batchTxtNo_0 + " finCode_1 : " +  finCode_1 + " apprDate_2 : " +  apprDate_2);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByBatchTxtNoIsAndFinCodeIsAndApprDateIs(batchTxtNo_0, finCode_1, apprDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -310,7 +306,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> SumCustNo(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> sumCustNo(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -321,7 +317,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SumCustNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1);
+    this.info("sumCustNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByCustNoIsAndCaseSeqIs(custNo_0, caseSeq_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -338,7 +334,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> SumCustNoFinCode(int custNo_0, int caseSeq_1, String finCode_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> sumCustNoFinCode(int custNo_0, int caseSeq_1, String finCode_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -349,7 +345,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SumCustNoFinCode " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1 + " finCode_2 : " +  finCode_2);
+    this.info("sumCustNoFinCode " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1 + " finCode_2 : " +  finCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByCustNoIsAndCaseSeqIsAndFinCodeIs(custNo_0, caseSeq_1, finCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -366,7 +362,7 @@ em = null;
   }
 
   @Override
-  public Slice<NegAppr01> FindTrans(int acDate_0, String titaTlrNo_1, int titaTxtNo_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<NegAppr01> findTrans(int acDate_0, String titaTlrNo_1, int titaTxtNo_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<NegAppr01> slice = null;
     if (titaVo.length != 0)
@@ -377,7 +373,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("FindTrans " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaTlrNo_1 : " +  titaTlrNo_1 + " titaTxtNo_2 : " +  titaTxtNo_2);
+    this.info("findTrans " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaTlrNo_1 : " +  titaTlrNo_1 + " titaTxtNo_2 : " +  titaTxtNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = negAppr01ReposDay.findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(acDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -398,7 +394,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + negAppr01Id);
+    this.info("Hold " + dbName + " " + negAppr01Id);
     Optional<NegAppr01> negAppr01 = null;
     if (dbName.equals(ContentName.onDay))
       negAppr01 = negAppr01ReposDay.findByNegAppr01Id(negAppr01Id);
@@ -416,7 +412,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + negAppr01.getNegAppr01Id());
+    this.info("Hold " + dbName + " " + negAppr01.getNegAppr01Id());
     Optional<NegAppr01> negAppr01T = null;
     if (dbName.equals(ContentName.onDay))
       negAppr01T = negAppr01ReposDay.findByNegAppr01Id(negAppr01.getNegAppr01Id());
@@ -438,7 +434,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + negAppr01.getNegAppr01Id());
+    this.info("Insert..." + dbName + " " + negAppr01.getNegAppr01Id());
     if (this.findById(negAppr01.getNegAppr01Id()) != null)
       throw new DBException(2);
 
@@ -467,7 +463,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + negAppr01.getNegAppr01Id());
+    this.info("Update..." + dbName + " " + negAppr01.getNegAppr01Id());
     if (!empNot.isEmpty())
       negAppr01.setLastUpdateEmpNo(empNot);
 
@@ -490,7 +486,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + negAppr01.getNegAppr01Id());
+    this.info("Update..." + dbName + " " + negAppr01.getNegAppr01Id());
     if (!empNot.isEmpty())
       negAppr01.setLastUpdateEmpNo(empNot);
 
@@ -510,7 +506,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + negAppr01.getNegAppr01Id());
+    this.info("Delete..." + dbName + " " + negAppr01.getNegAppr01Id());
     if (dbName.equals(ContentName.onDay)) {
       negAppr01ReposDay.delete(negAppr01);	
       negAppr01ReposDay.flush();
@@ -539,7 +535,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (NegAppr01 t : negAppr01){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -574,7 +570,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (negAppr01 == null || negAppr01.size() == 0)
       throw new DBException(6);
 
@@ -603,7 +599,7 @@ em = null;
 
   @Override
   public void deleteAll(List<NegAppr01> negAppr01, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

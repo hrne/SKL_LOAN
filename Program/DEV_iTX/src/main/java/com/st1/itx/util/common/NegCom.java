@@ -856,7 +856,7 @@ public class NegCom extends CommBuffer {
 	// 最大債權分配
 	public void updNegFinShare(NegTrans tNegTrans, NegMain tNegMain, BigDecimal shareAmSum, TitaVo titaVo)
 			throws LogicException {
-		Slice<NegFinShare> slNegFinShare = sNegFinShareService.FindAllFinCode(tNegTrans.getCustNo(),
+		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(tNegTrans.getCustNo(),
 				tNegTrans.getCaseSeq(), this.index, this.limit, titaVo);
 		if (slNegFinShare == null) {
 			throw new LogicException(titaVo, "E0001", "債務協商債權分攤檔"); // 查詢資料不存在
@@ -2135,7 +2135,7 @@ public class NegCom extends CommBuffer {
 
 	private BigDecimal SumCustNoFinCode(int CustNo, int CaseSeq, String FinCode, TitaVo titaVo) {
 		BigDecimal AccuApprAmt = BigDecimal.ZERO;
-		Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.SumCustNoFinCode(CustNo, CaseSeq, FinCode, 0, Integer.MAX_VALUE,
+		Slice<NegAppr01> sNegAppr01 = sNegAppr01Service.sumCustNoFinCode(CustNo, CaseSeq, FinCode, 0, Integer.MAX_VALUE,
 				titaVo);
 		List<NegAppr01> lsNegAppr01 = sNegAppr01 == null ? null : sNegAppr01.getContent();
 		if (lsNegAppr01 != null) {

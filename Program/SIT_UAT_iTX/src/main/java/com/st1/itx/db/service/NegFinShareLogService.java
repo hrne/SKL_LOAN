@@ -45,7 +45,7 @@ public interface NegFinShareLogService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegFinShareLog NegFinShareLog of List
    */
-  public Slice<NegFinShareLog> FindAllFinCode(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo);
+  public Slice<NegFinShareLog> findFinCodeAll(int custNo_0, int caseSeq_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo = , AND CaseSeq = ,AND Seq =
@@ -58,7 +58,7 @@ public interface NegFinShareLogService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegFinShareLog NegFinShareLog of List
    */
-  public Slice<NegFinShareLog> FindNewSeq(int custNo_0, int caseSeq_1, int seq_2, int index, int limit, TitaVo... titaVo);
+  public Slice<NegFinShareLog> findNewSeq(int custNo_0, int caseSeq_1, int seq_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo =
@@ -69,7 +69,7 @@ public interface NegFinShareLogService {
    * @param titaVo Variable-Length Argument
    * @return Slice NegFinShareLog NegFinShareLog of List
    */
-  public Slice<NegFinShareLog> CustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
+  public Slice<NegFinShareLog> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By NegFinShareLog

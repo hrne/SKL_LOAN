@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.day;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -21,12 +22,13 @@ import com.st1.itx.db.domain.NegFinShareId;
  */
 public interface NegFinShareRepositoryDay extends JpaRepository<NegFinShare, NegFinShareId> {
 
-	// CustNo = , AND CaseSeq =
-	public Slice<NegFinShare> findAllByCustNoIsAndCaseSeqIsOrderByCustNoDescCaseSeqDesc(int custNo_0, int caseSeq_1, Pageable pageable);
+  // CustNo = , AND CaseSeq = 
+  public Slice<NegFinShare> findAllByCustNoIsAndCaseSeqIsOrderByCustNoDescCaseSeqDesc(int custNo_0, int caseSeq_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<NegFinShare> findByNegFinShareId(NegFinShareId negFinShareId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<NegFinShare> findByNegFinShareId(NegFinShareId negFinShareId);
 
 }
+

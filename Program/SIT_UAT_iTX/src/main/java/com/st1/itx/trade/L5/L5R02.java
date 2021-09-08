@@ -61,7 +61,7 @@ public class L5R02 extends TradeBuffer {
 
 		Slice<NegAppr> slNegAppr;
 
-		slNegAppr = sNegApprService.YyyyMmEq(YearMonth, this.index, this.limit, titaVo);
+		slNegAppr = sNegApprService.yyyyMmEq(YearMonth, this.index, this.limit, titaVo);
 
 		if (iFunctionCode == 1) {
 			if (slNegAppr != null) {

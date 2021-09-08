@@ -110,22 +110,22 @@ public class L5973 extends TradeBuffer {
 			intExportDate = parse.stringToInteger(ExportDate) + 19110000;
 			if (DD != null && DD.length() != 0 && iDD > 0) {
 				if (iCustNo != 0) {
-					slNegAppr01 = sNegAppr01Service.CustNoExportDateEq(iCustNo, intExportDate, this.index, this.limit, titaVo);
+					slNegAppr01 = sNegAppr01Service.custNoExportDateEq(iCustNo, intExportDate, this.index, this.limit, titaVo);
 				} else {
-					slNegAppr01 = sNegAppr01Service.ExportEq(intExportDate, this.index, this.limit, titaVo);
+					slNegAppr01 = sNegAppr01Service.exportEq(intExportDate, this.index, this.limit, titaVo);
 				}
 			} else {
 				DateFrom = intExportDate + 01;
 				DateTo = intExportDate + 31;
 				if (iCustNo != 0) {
-					slNegAppr01 = sNegAppr01Service.CustExporBetween(iCustNo, DateFrom, DateTo, this.index, this.limit, titaVo);
+					slNegAppr01 = sNegAppr01Service.custExporBetween(iCustNo, DateFrom, DateTo, this.index, this.limit, titaVo);
 				} else {
-					slNegAppr01 = sNegAppr01Service.ExportDateBetween(DateFrom, DateTo, this.index, this.limit, titaVo);
+					slNegAppr01 = sNegAppr01Service.exportDateBetween(DateFrom, DateTo, this.index, this.limit, titaVo);
 				}
 			}
 		} else {
 			if (iCustNo != 0) {
-				slNegAppr01 = sNegAppr01Service.CustNoEq(iCustNo, this.index, this.limit, titaVo);
+				slNegAppr01 = sNegAppr01Service.custNoEq(iCustNo, this.index, this.limit, titaVo);
 			} else {
 				slNegAppr01 = sNegAppr01Service.findAll(this.index, this.limit, titaVo);
 			}

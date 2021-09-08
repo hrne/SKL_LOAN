@@ -370,7 +370,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[240,120,120,150];printer.width=[15,35,15,35];order=1">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,800];printer.width=[15,35,15,35];order=1">
 [
 ["[L2153]                                 核准額度登錄"],
 [#<->#,"#FdActFg+登放記號",#ACTFGX],
@@ -1778,8 +1778,8 @@ T(H,#RepayCode,#RepayCodeHelp)
 
 #WkFDP5A=X,1,S
 C(3,#RepayCode,2,
-    T(2,@FdRepayBank,)
-    T(2,@FdRepayAcctNo,)
+    T(2,@FdRepayBank,*)
+    T(2,@FdRepayAcctNo,*)
    ,T(3,@FdRepayBank, )
     T(3,@FdRepayAcctNo, ))
 
@@ -1882,6 +1882,7 @@ HELP(#RelationCodeHelp)
 @V(H,#RelationCodeHelp)
 
 #RelationCodeX=X,4,L
+T(3,)
 T(H,#RelationCode,#RelationCodeHelp)
 
 #WkFdP5C=X,1,S
@@ -2399,13 +2400,12 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdUtilDeadline+動支期限",#UtilDeadline,"@前"],
 ["#FdGracePeriod+寬限總月數",#GracePeriod,#LbGracePeriod,#GracePeriodX],
 ["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee],
-["@"],
 ]
 </sub>
 
 <sub type="DC" name="p4" layout="cols=2;screen.width=[250,300,200,300];printer.width=[15,30];order=1;">
 [
-["<font color=red>@階梯式利率　　　　　　　　　　　　　　　　　　　　　　　　　　　　"],
+["<font color=red>@階梯式利率　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 "],
 ["#grid#,{id:4,expand:true,loop:10,row_height:1,s_cols:[170,150,150], p_cols:[20,20,20]}","","",
 ["@@@@@月數@@@@@","@@@@@利率種類@@@@@","@@@@@利率@@@@@"],
 [[#StepMonthS1,#StepX1,#StepMonthE1],[#StepRateType1,#StepRateTypeX1],[#StepRateIncr1,#StepRatePer1],],
@@ -2445,13 +2445,10 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 [#<->#,"#FdRelationId+身份證字號",#RelationId],
 [#<->#,"#FdRelationBirthday+出生日期",#RelationBirthday],
 [#<->#,"#FdRelationGender+性別",#RelationGender,#RelationGenderX],
-[#<->#,"@"],
-[#<->#,"@"],
-[#<->#,"@"],
 ]
 </sub>
 
-<sub type="DC" name="p7" layout="cols=2;screen.width=[200,300,250,300];printer.width=[15,30];order=1;">
+<sub type="DC" name="p7" layout="cols=2;screen.width=[200,300,250,250];printer.width=[15,30];order=1;">
 [
 ["<font color=red>@專員"],
 ["#FdIntroducer+介紹人",#Introducer,#BTN11,#IntroducerX],
@@ -2462,13 +2459,12 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdBusinessOfficer+#BusinessOfficerItem",#BusinessOfficer,#BTN16,#BusinessOfficerX],
 ["#FdSupervisor+核決主管",#Supervisor,#BTN17,#SupervisorX],
 ["#FdCoorgnizer+@協辦人",#Coorgnizer,#BTN18,#CoorgnizerX],
-["@","@"],
 ]
 </sub>
 
 <sub type="DC" name="p8" layout="cols=2;screen.width=[300,300,200,300];printer.width=[15,30];order=1;">
 [
-["<font color=red>@清償金類型"],
+["<font color=red>@清償金類型　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 　　　　　　　　"],
 [#<->#,"#FdBreachFlag+是否限制清償",#BreachFlag,#BreachFlagX],
 [#<->#,"#FdProdBreachFlag+違約適用方式是否按商品設定",#ProdBreachFlag,#ProdBreachFlagX],
 [#<->#,"@",#Breach,#Wait],
@@ -2477,11 +2473,10 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 
 <sub type="DC" name="p9" layout="cols=2;screen.width=[200,300,200,300];printer.width=[15,30];order=1;">
 [
-["<font color=red>@其他"],
+["<font color=red>@其他　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 　　　　　　　　　　　　　　　"],
 [#<->#,"#FdGroupId+團體戶統編",#GroupId,#GroupIdX],
 [#<->#,"#FdCreditScore+信用評分",#CreditScore],
 [#<->#,"#FdGuaranteeDate+對保日期",#GuaranteeDate],
-[#<->#,"@"],
 ]
 </sub>
 

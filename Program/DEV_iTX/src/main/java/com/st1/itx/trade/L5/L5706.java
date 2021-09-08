@@ -518,7 +518,7 @@ public class L5706 extends TradeBuffer {
 		this.info("L5706 CheckNegMain Run");
 		NegMain tNegMain = new NegMain();
 		if (custNo != 0) {
-			tNegMain = sNegMainService.CustNoFirst(custNo, titaVo);
+			tNegMain = sNegMainService.custNoFirst(custNo, titaVo);
 			if (tNegMain != null) {
 				return tNegMain;
 			} else {
@@ -588,7 +588,7 @@ public class L5706 extends TradeBuffer {
 	public int FindSeq(int CustNo, int CaseSeq, TitaVo titaVo) throws LogicException {
 		int iSeq = 0;
 		int oSeq = 1;
-		Slice<NegFinShareLog> sNegFinShareLog = sNegFinShareLogService.FindAllFinCode(CustNo, CaseSeq, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<NegFinShareLog> sNegFinShareLog = sNegFinShareLogService.findFinCodeAll(CustNo, CaseSeq, this.index, Integer.MAX_VALUE, titaVo);
 		List<NegFinShareLog> mNegFinShareLog = sNegFinShareLog == null ? null : sNegFinShareLog.getContent();
 		//更新歷程檔 找最大歷程序號
 		if (mNegFinShareLog != null) {
@@ -606,7 +606,7 @@ public class L5706 extends TradeBuffer {
 
 	public void DeleteZZM262(int CustNo, int CaseSeq, TitaVo titaVo) throws LogicException {
 		
-		Slice<NegFinShare> sNegFinShare = sNegFinShareService.FindAllFinCode(CustNo, CaseSeq, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<NegFinShare> sNegFinShare = sNegFinShareService.findFinCodeAll(CustNo, CaseSeq, this.index, Integer.MAX_VALUE, titaVo);
 		
 		List<NegFinShare> mNegFinShare = sNegFinShare == null ? null : sNegFinShare.getContent();
 		this.info("Delete All=="+mNegFinShare);
@@ -775,7 +775,7 @@ public class L5706 extends TradeBuffer {
 		CheckNegFinAcct(MAIN_CODE , IDN_BAN , "ZZS260" , titaVo);
 		
 		// 檢查是否有NEGMAIN的主檔-無則新增
-		NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo, DateRocToDC(RECEIVE_DATE, "協商申請日" , titaVo),
+		NegMain tNegMain = sNegMainService.custNoAndApplDateFirst(CustNo, DateRocToDC(RECEIVE_DATE, "協商申請日" , titaVo),
 				MAIN_CODE, titaVo);
 		if (tNegMain != null) {
 			isNewMain = false;
@@ -901,7 +901,7 @@ public class L5706 extends TradeBuffer {
 
 		if (("458").equals(MAIN_CODE)) {	//最大債權才做
 			//		CustNoAndApplDateFirst
-			NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo,
+			NegMain tNegMain = sNegMainService.custNoAndApplDateFirst(CustNo,
 					DateRocToDC(RECEIVE_DATE, "協商申請日", titaVo), MAIN_CODE, titaVo);
 			if (tNegMain != null) {
 				// 已有資料
@@ -990,7 +990,7 @@ public class L5706 extends TradeBuffer {
 		CheckNegFinAcct(BANK_CODE , IDN_BAN , "ZZM262" , titaVo);
 
 		if (("458").equals(MAIN_CODE)) { // 最大債權才做
-			NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo,
+			NegMain tNegMain = sNegMainService.custNoAndApplDateFirst(CustNo,
 					DateRocToDC(RECEIVE_DATE, "協商申請日", titaVo), MAIN_CODE, titaVo);
 
 			if (tNegMain == null) {
@@ -1090,7 +1090,7 @@ public class L5706 extends TradeBuffer {
 		//ZZM262寫本次單獨受償的債權機構資料紀錄在NegFinShareLog
 		
 		//計算目前債務協商債權分攤檔簽約金額加總
-		Slice<NegFinShare> slNegFinShare = sNegFinShareService.FindAllFinCode(tNegMain.getCustNo(),
+		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(tNegMain.getCustNo(),
 				tNegMain.getCaseSeq(), this.index, 30);
 		List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
 		BigDecimal PrincipalBal = new BigDecimal("0");
@@ -1245,7 +1245,7 @@ public class L5706 extends TradeBuffer {
 		CheckNegFinAcct(MAIN_CODE , IDN_BAN , "ZZM263" , titaVo);
 
 		
-		NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo, ApplyDate, MAIN_CODE, titaVo);
+		NegMain tNegMain = sNegMainService.custNoAndApplDateFirst(CustNo, ApplyDate, MAIN_CODE, titaVo);
 		if (tNegMain == null) {
 			// E5009 資料檢核錯誤
 			throw new LogicException(titaVo, "E5009",
@@ -1409,7 +1409,7 @@ public class L5706 extends TradeBuffer {
 		CheckNegFinAcct(BANK_CODE , IDN_BAN , "ZZM264" , titaVo);
 
 		if (("458").equals(MAIN_CODE)) { // 最大債權才做
-			NegMain tNegMain = sNegMainService.CustNoAndApplDateFirst(CustNo,
+			NegMain tNegMain = sNegMainService.custNoAndApplDateFirst(CustNo,
 					DateRocToDC(RECEIVE_DATE, "協商申請日", titaVo), MAIN_CODE, titaVo);
 			
 			if (tNegMain != null) {

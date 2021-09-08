@@ -11,7 +11,7 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
 
 /**
- * NegQueryCust 債務協商客戶分攤檔產生<br>
+ * NegQueryCust 債協客戶請求資料<br>
  * Gen By Tool
  * 
  * @author AdamPan
@@ -46,7 +46,7 @@ public class NegQueryCust implements Serializable {
   private String fileYN;
 
   // 批號
-  /* 從1開始編 */
+  /* 從1開始編依會計日期每產制一次就加一 */
   @Column(name = "`SeqNo`")
   private int seqNo = 0;
 
@@ -137,6 +137,7 @@ public class NegQueryCust implements Serializable {
 /**
 	* 批號<br>
 	* 從1開始編
+依會計日期每產制一次就加一
 	* @return Integer
 	*/
   public int getSeqNo() {
@@ -146,6 +147,7 @@ public class NegQueryCust implements Serializable {
 /**
 	* 批號<br>
 	* 從1開始編
+依會計日期每產制一次就加一
   *
   * @param seqNo 批號
 	*/

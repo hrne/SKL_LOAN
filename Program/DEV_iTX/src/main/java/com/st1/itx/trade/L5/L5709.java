@@ -6,10 +6,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/* log */
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +53,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5709 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5709.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegReportCom NegReportCom;
@@ -81,7 +76,7 @@ public class L5709 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("Run L5709");
+		this.info("Run L5709");
 		this.info("active L5709 ");
 		this.totaVo.init(titaVo);
 		String BringUpDate = titaVo.getParam("BringUpDate").trim();// 提兌日
@@ -98,7 +93,7 @@ public class L5709 extends TradeBuffer {
 
 		NegReportCom.CheckNegArrp(IntBringUpDate, 3, titaVo);
 		
-		Slice<NegAppr> slNegAppr = sNegApprService.BringUpDateEq(IntBringUpDate, 0, 500, titaVo);	
+		Slice<NegAppr> slNegAppr = sNegApprService.bringUpDateEq(IntBringUpDate, 0, 500, titaVo);	
 		List<NegAppr> lNegAppr = slNegAppr == null ? null : slNegAppr.getContent();
 		int tApprAcDate=0;
 		NegAppr tNegAppr = new NegAppr();
@@ -106,7 +101,7 @@ public class L5709 extends TradeBuffer {
 			for(NegAppr cNegAppr:lNegAppr) {
 			tNegAppr = sNegApprService.holdById(cNegAppr.getNegApprId(), titaVo);
 			tApprAcDate = tNegAppr.getApprAcDate();
-			logger.info("tApprAcDate=="+tApprAcDate);
+			this.info("tApprAcDate=="+tApprAcDate);
 			}
 		}
 		tApprAcDate = tApprAcDate+19110000;
@@ -180,12 +175,12 @@ public class L5709 extends TradeBuffer {
 				String BatchTxtNo = Detail[5];
 				// List<NegAppr01> lNegAppr01 =
 				// NegReportCom.InsUpdNegApprO1(IntBringUpdate,3,titaVo);
-				Slice<NegAppr01> slNegAppr01 = sNegAppr01Service.FindBatch(BatchTxtNo, FinCode, tApprAcDate, 0,
+				Slice<NegAppr01> slNegAppr01 = sNegAppr01Service.findBatch(BatchTxtNo, FinCode, tApprAcDate, 0,
 						Integer.MAX_VALUE, titaVo);
 				List<NegAppr01> lNegAppr01 = slNegAppr01 == null ? null : slNegAppr01.getContent();
-				logger.info("L5709 lNegAppr01!=null titaVo.isHcodeNormal()=[" + titaVo.isHcodeNormal() + "]");
+				this.info("L5709 lNegAppr01!=null titaVo.isHcodeNormal()=[" + titaVo.isHcodeNormal() + "]");
 				if (lNegAppr01 != null) {
-					logger.info("L5709 lNegAppr01!=null ");
+					this.info("L5709 lNegAppr01!=null ");
 					for (NegAppr01 NegAppr01VO : lNegAppr01) {
 						NegAppr01Id NegAppr01IdVO = NegAppr01VO.getNegAppr01Id();
 
@@ -194,7 +189,7 @@ public class L5709 extends TradeBuffer {
 							BigDecimal ApprAmt = new BigDecimal(Detail[7]);// 撥付金額
 							BigDecimal Hund = new BigDecimal(100);// 撥付金額
 							ApprAmt = ApprAmt.divide(Hund);
-							logger.info("ApprAmt=="+ApprAmt);
+							this.info("ApprAmt=="+ApprAmt);
 							String ReplyCode = Detail[11];// 回應代碼
 							int NegAppr01UpdVOApprAcDate = NegAppr01UpdVO.getApprAcDate();// 撥付傳票日期
 							if (titaVo.isHcodeNormal()) {
@@ -202,7 +197,7 @@ public class L5709 extends TradeBuffer {
 								if (NegAppr01UpdVOApprAcDate != 0) {
 									if (ApprAmt.compareTo(NegAppr01UpdVO.getApprAmt()) != 0) {
 										//
-										logger.info("L5709 ApprAmt(檔案上傳)=[" + ApprAmt + "],(資料庫)=["
+										this.info("L5709 ApprAmt(檔案上傳)=[" + ApprAmt + "],(資料庫)=["
 												+ NegAppr01UpdVO.getApprAmt() + "],NegAppr01Id=["
 												+ NegAppr01UpdVO.getNegAppr01Id().toString() + "]");
 										throw new LogicException(titaVo, "", "撥付金額不一致請查驗");

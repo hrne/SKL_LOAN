@@ -362,7 +362,7 @@ public class L5701 extends TradeBuffer {
 	public int MaxIntCaseSeq(String CustNo) throws LogicException {
 		// 取號CustNo
 		int IntCaseSeq = 0;
-		Slice<NegMain> slNegMain = sNegMainService.CustNoEq(parse.stringToInteger(CustNo), this.index, this.limit, titaVo);
+		Slice<NegMain> slNegMain = sNegMainService.custNoEq(parse.stringToInteger(CustNo), this.index, this.limit, titaVo);
 		List<NegMain> lNegMain = slNegMain == null ? null : slNegMain.getContent();
 
 		if (lNegMain != null && lNegMain.size() != 0) {
@@ -378,7 +378,7 @@ public class L5701 extends TradeBuffer {
 
 	public void checkstatus(int custno ,String functioncode,int caseseq,String status, TitaVo titaVo) throws LogicException {
 		// 一個戶號只可有一個戶況為0正常
-		Slice<NegMain> slNegMain = sNegMainService.CustNoEq(custno, this.index, this.limit, titaVo);
+		Slice<NegMain> slNegMain = sNegMainService.custNoEq(custno, this.index, this.limit, titaVo);
 		List<NegMain> lNegMain = slNegMain == null ? null : slNegMain.getContent();
 
 		if (lNegMain == null) {
@@ -519,7 +519,7 @@ public class L5701 extends TradeBuffer {
 
 	public void DelNegFinShare(int intCustNo, int IntCaseSeq) throws LogicException {
 		// 全部清掉 NegFinShare
-		Slice<NegFinShare> slNegFinShare = sNegFinShareService.FindAllFinCode(intCustNo, IntCaseSeq, this.index, this.limit, titaVo);
+		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(intCustNo, IntCaseSeq, this.index, this.limit, titaVo);
 		List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
 
 		if (lNegFinShare != null && lNegFinShare.size() != 0) {
@@ -534,7 +534,7 @@ public class L5701 extends TradeBuffer {
 
 	public void DelNegFinShareLog(int intCustNo, int IntCaseSeq) throws LogicException {
 		// 全部清掉 NegFinShareLog
-		Slice<NegFinShareLog> slNegFinShareLog = sNegFinShareLogService.FindAllFinCode(intCustNo, IntCaseSeq, this.index, this.limit, titaVo);
+		Slice<NegFinShareLog> slNegFinShareLog = sNegFinShareLogService.findFinCodeAll(intCustNo, IntCaseSeq, this.index, this.limit, titaVo);
 		List<NegFinShareLog> lNegFinShareLog = slNegFinShareLog == null ? null : slNegFinShareLog.getContent();
 
 		if (lNegFinShareLog != null && lNegFinShareLog.size() != 0) {
@@ -675,7 +675,7 @@ public class L5701 extends TradeBuffer {
 		Boolean bt = false;
 		Slice<NegFinShareLog> sNegFinShareLog;
 
-		sNegFinShareLog = sNegFinShareLogService.FindAllFinCode(mCustNo, mCaseSeq, this.index, this.limit, titaVo);
+		sNegFinShareLog = sNegFinShareLogService.findFinCodeAll(mCustNo, mCaseSeq, this.index, this.limit, titaVo);
 		List<NegFinShareLog> lNegFinShareLog = sNegFinShareLog == null ? null : sNegFinShareLog.getContent();
 		if (lNegFinShareLog != null) {
 			for (NegFinShareLog tNegFinShareLog : lNegFinShareLog) {
@@ -689,7 +689,7 @@ public class L5701 extends TradeBuffer {
 
 		// 抓NegFinShareLog內最新歷程序號資料資料
 		Slice<NegFinShareLog> nNegFinShareLog;
-		nNegFinShareLog = sNegFinShareLogService.FindNewSeq(mCustNo, mCaseSeq, oldSeq, this.index, this.limit, titaVo);
+		nNegFinShareLog = sNegFinShareLogService.findNewSeq(mCustNo, mCaseSeq, oldSeq, this.index, this.limit, titaVo);
 		List<NegFinShareLog> bNegFinShareLog = nNegFinShareLog == null ? null : nNegFinShareLog.getContent();
 
 		ArrayList<String> NewArraylist;

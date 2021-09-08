@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("negAppr02Service")
 @Repository
-public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(NegAppr02ServiceImpl.class);
+public class NegAppr02ServiceImpl extends ASpringJpaParm implements NegAppr02Service, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + negAppr02Id);
+		this.info("findById " + dbName + " " + negAppr02Id);
 		Optional<NegAppr02> negAppr02 = null;
 		if (dbName.equals(ContentName.onDay))
 			negAppr02 = negAppr02ReposDay.findById(negAppr02Id);
@@ -95,7 +92,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "BringUpDate", "FinCode", "TxSeq"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = negAppr02ReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -117,7 +114,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("acDateBetween " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " + acDate_1);
+		this.info("acDateBetween " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " + acDate_1);
 		if (dbName.equals(ContentName.onDay))
 			slice = negAppr02ReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByCustIdAscAcDateAsc(acDate_0, acDate_1, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -139,7 +136,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("acDateEq " + dbName + " : " + "acDate_0 : " + acDate_0);
+		this.info("acDateEq " + dbName + " : " + "acDate_0 : " + acDate_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = negAppr02ReposDay.findAllByAcDateIsOrderByCustIdAsc(acDate_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -161,7 +158,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 		Pageable pageable = PageRequest.of(index, limit);
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("bringUpDateEq " + dbName + " : " + "bringUpDate_0 : " + bringUpDate_0);
+		this.info("bringUpDateEq " + dbName + " : " + "bringUpDate_0 : " + bringUpDate_0);
 		if (dbName.equals(ContentName.onDay))
 			slice = negAppr02ReposDay.findAllByBringUpDateIsOrderByCustIdAsc(bringUpDate_0, pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -179,7 +176,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + negAppr02Id);
+		this.info("Hold " + dbName + " " + negAppr02Id);
 		Optional<NegAppr02> negAppr02 = null;
 		if (dbName.equals(ContentName.onDay))
 			negAppr02 = negAppr02ReposDay.findByNegAppr02Id(negAppr02Id);
@@ -197,7 +194,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + negAppr02.getNegAppr02Id());
+		this.info("Hold " + dbName + " " + negAppr02.getNegAppr02Id());
 		Optional<NegAppr02> negAppr02T = null;
 		if (dbName.equals(ContentName.onDay))
 			negAppr02T = negAppr02ReposDay.findByNegAppr02Id(negAppr02.getNegAppr02Id());
@@ -219,7 +216,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + negAppr02.getNegAppr02Id());
+		this.info("Insert..." + dbName + " " + negAppr02.getNegAppr02Id());
 		if (this.findById(negAppr02.getNegAppr02Id()) != null)
 			throw new DBException(2);
 
@@ -245,7 +242,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + negAppr02.getNegAppr02Id());
+		this.info("Update..." + dbName + " " + negAppr02.getNegAppr02Id());
 		if (!empNot.isEmpty())
 			negAppr02.setLastUpdateEmpNo(empNot);
 
@@ -268,7 +265,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + negAppr02.getNegAppr02Id());
+		this.info("Update..." + dbName + " " + negAppr02.getNegAppr02Id());
 		if (!empNot.isEmpty())
 			negAppr02.setLastUpdateEmpNo(empNot);
 
@@ -288,7 +285,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + negAppr02.getNegAppr02Id());
+		this.info("Delete..." + dbName + " " + negAppr02.getNegAppr02Id());
 		if (dbName.equals(ContentName.onDay)) {
 			negAppr02ReposDay.delete(negAppr02);
 			negAppr02ReposDay.flush();
@@ -315,7 +312,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (NegAppr02 t : negAppr02)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -344,7 +341,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (negAppr02 == null || negAppr02.size() == 0)
 			throw new DBException(6);
 
@@ -369,7 +366,7 @@ public class NegAppr02ServiceImpl implements NegAppr02Service, InitializingBean 
 
 	@Override
 	public void deleteAll(List<NegAppr02> negAppr02, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)
