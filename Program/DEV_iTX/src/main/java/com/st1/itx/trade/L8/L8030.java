@@ -435,7 +435,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ040> sJcicZ040 = null;
-	    sJcicZ040 = iJcicZ040Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ040 = iJcicZ040Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ040 != null) {
 	        for (JcicZ040 xJcicZ040:sJcicZ040) {
 	            OccursList occursListB = new OccursList();
@@ -532,7 +532,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ041> sJcicZ041 = null;
-	    sJcicZ041 = iJcicZ041Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ041 = iJcicZ041Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ041 != null) {
 	        for (JcicZ041 xJcicZ041:sJcicZ041) {
 	            OccursList occursListB = new OccursList();
@@ -629,7 +629,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ042> sJcicZ042 = null;
-	    sJcicZ042 = iJcicZ042Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ042 = iJcicZ042Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ042 != null) {
 	        for (JcicZ042 xJcicZ042:sJcicZ042) {
 	            OccursList occursListB = new OccursList();
@@ -727,7 +727,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ043> sJcicZ043 = null;
-	    sJcicZ043 = iJcicZ043Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ043 = iJcicZ043Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ043 != null) {
 	        for (JcicZ043 xJcicZ043:sJcicZ043) {
 	            OccursList occursListB = new OccursList();
@@ -826,7 +826,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ044> sJcicZ044 = null;
-	    sJcicZ044 = iJcicZ044Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ044 = iJcicZ044Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ044 != null) {
 	        for (JcicZ044 xJcicZ044:sJcicZ044) {
 	            OccursList occursListB = new OccursList();
@@ -923,7 +923,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ045> sJcicZ045 = null;
-	    sJcicZ045 = iJcicZ045Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ045 = iJcicZ045Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ045 != null) {
 	        for (JcicZ045 xJcicZ045:sJcicZ045) {
 	            OccursList occursListB = new OccursList();
@@ -1021,7 +1021,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ046> sJcicZ046 = null;
-	    sJcicZ046 = iJcicZ046Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ046 = iJcicZ046Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ046 != null) {
 	        for (JcicZ046 xJcicZ046:sJcicZ046) {
 	            OccursList occursListB = new OccursList();
@@ -1119,7 +1119,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ047> sJcicZ047 = null;
-		sJcicZ047 = iJcicZ047Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ047 = iJcicZ047Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ047 != null) {
 			for (JcicZ047 xJcicZ047:sJcicZ047) {
 				OccursList occursListB = new OccursList();
@@ -1214,7 +1214,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ048> sJcicZ048 = null;
-	    sJcicZ048 = iJcicZ048Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ048 = iJcicZ048Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ048 != null) {
 	        for (JcicZ048 xJcicZ048:sJcicZ048) {
 	            OccursList occursListB = new OccursList();
@@ -1312,7 +1312,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ049> sJcicZ049 = null;
-		sJcicZ049 = iJcicZ049Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ049 = iJcicZ049Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ049 != null) {
 			for (JcicZ049 xJcicZ049:sJcicZ049) {
 				OccursList occursListB = new OccursList();
@@ -1407,7 +1407,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ050> sJcicZ050 = null;
-	    sJcicZ050 = iJcicZ050Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ050 = iJcicZ050Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ050 != null) {
 	        for (JcicZ050 xJcicZ050:sJcicZ050) {
 	            OccursList occursListB = new OccursList();
@@ -1505,7 +1505,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ051> sJcicZ051 = null;
-		sJcicZ051 = iJcicZ051Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ051 = iJcicZ051Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ051 != null) {
 			for (JcicZ051 xJcicZ051:sJcicZ051) {
 				OccursList occursListB = new OccursList();
@@ -1603,7 +1603,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ052> sJcicZ052 = null;
-		sJcicZ052 = iJcicZ052Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ052 = iJcicZ052Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ052 != null) {
 			for (JcicZ052 xJcicZ052:sJcicZ052) {
 				OccursList occursListB = new OccursList();
@@ -1700,7 +1700,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ053> sJcicZ053 = null;
-		sJcicZ053 = iJcicZ053Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ053 = iJcicZ053Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ053 != null) {
 			for (JcicZ053 xJcicZ053:sJcicZ053) {
 				OccursList occursListB = new OccursList();
@@ -1799,7 +1799,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ054> sJcicZ054 = null;
-		sJcicZ054 = iJcicZ054Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ054 = iJcicZ054Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ054 != null) {
 			for (JcicZ054 xJcicZ054:sJcicZ054) {
 				OccursList occursListB = new OccursList();
@@ -1898,7 +1898,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ055> sJcicZ055 = null;
-		sJcicZ055 = iJcicZ055Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ055 = iJcicZ055Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ055 != null) {
 			for (JcicZ055 xJcicZ055:sJcicZ055) {
 				OccursList occursListB = new OccursList();
@@ -1997,7 +1997,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ056> sJcicZ056 = null;
-		sJcicZ056 = iJcicZ056Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ056 = iJcicZ056Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ056 != null) {
 			for (JcicZ056 xJcicZ056:sJcicZ056) {
 				OccursList occursListB = new OccursList();
@@ -2096,7 +2096,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ060> sJcicZ060 = null;
-		sJcicZ060 = iJcicZ060Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ060 = iJcicZ060Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ060 != null) {
 			for (JcicZ060 xJcicZ060:sJcicZ060) {
 				OccursList occursListB = new OccursList();
@@ -2195,7 +2195,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ061> sJcicZ061 = null;
-		sJcicZ061 = iJcicZ061Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ061 = iJcicZ061Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ061 != null) {
 			for (JcicZ061 xJcicZ061:sJcicZ061) {
 				this.info("test==="+xJcicZ061.getCreateDate());
@@ -2294,7 +2294,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ062> sJcicZ062 = null;
-		sJcicZ062 = iJcicZ062Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ062 = iJcicZ062Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ062 != null) {
 			for (JcicZ062 xJcicZ062:sJcicZ062) {
 				OccursList occursListB = new OccursList();
@@ -2392,7 +2392,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ063> sJcicZ063 = null;
-		sJcicZ063 = iJcicZ063Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ063 = iJcicZ063Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ063 != null) {
 			for (JcicZ063 xJcicZ063:sJcicZ063) {
 				OccursList occursListB = new OccursList();
@@ -2490,7 +2490,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ440> sJcicZ440 = null;
-		sJcicZ440 = iJcicZ440Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ440 = iJcicZ440Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ440 != null) {
 			for (JcicZ440 xJcicZ440:sJcicZ440) {
 				OccursList occursListB = new OccursList();
@@ -2589,7 +2589,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ442> sJcicZ442 = null;
-	    sJcicZ442 = iJcicZ442Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ442 = iJcicZ442Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ442 != null) {
 	        for (JcicZ442 xJcicZ442:sJcicZ442) {
 	            OccursList occursListB = new OccursList();
@@ -2691,7 +2691,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ443> sJcicZ443 = null;
-	    sJcicZ443 = iJcicZ443Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ443 = iJcicZ443Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ443 != null) {
 	        for (JcicZ443 xJcicZ443:sJcicZ443) {
 	            OccursList occursListB = new OccursList();
@@ -2790,7 +2790,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ444> sJcicZ444 = null;
-	    sJcicZ444 = iJcicZ444Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ444 = iJcicZ444Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ444 != null) {
 	        for (JcicZ444 xJcicZ444:sJcicZ444) {
 	            OccursList occursListB = new OccursList();
@@ -2887,7 +2887,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ446> sJcicZ446 = null;
-	    sJcicZ446 = iJcicZ446Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ446 = iJcicZ446Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ446 != null) {
 	        for (JcicZ446 xJcicZ446:sJcicZ446) {
 	            OccursList occursListB = new OccursList();
@@ -2984,7 +2984,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ447> sJcicZ447 = null;
-	    sJcicZ447 = iJcicZ447Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ447 = iJcicZ447Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ447 != null) {
 	        for (JcicZ447 xJcicZ447:sJcicZ447) {
 	            OccursList occursListB = new OccursList();
@@ -3081,7 +3081,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ448> sJcicZ448 = null;
-	    sJcicZ448 = iJcicZ448Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ448 = iJcicZ448Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ448 != null) {
 	        for (JcicZ448 xJcicZ448:sJcicZ448) {
 	            OccursList occursListB = new OccursList();
@@ -3179,7 +3179,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ450> sJcicZ450 = null;
-	    sJcicZ450 = iJcicZ450Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ450 = iJcicZ450Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ450 != null) {
 	        for (JcicZ450 xJcicZ450:sJcicZ450) {
 	            OccursList occursListB = new OccursList();
@@ -3278,7 +3278,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ451> sJcicZ451 = null;
-	    sJcicZ451 = iJcicZ451Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ451 = iJcicZ451Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ451 != null) {
 	        for (JcicZ451 xJcicZ451:sJcicZ451) {
 	            OccursList occursListB = new OccursList();
@@ -3378,7 +3378,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ454> sJcicZ454 = null;
-	    sJcicZ454 = iJcicZ454Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ454 = iJcicZ454Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ454 != null) {
 	        for (JcicZ454 xJcicZ454:sJcicZ454) {
 	            OccursList occursListB = new OccursList();
@@ -3480,7 +3480,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ570> sJcicZ570 = null;
-	    sJcicZ570 = iJcicZ570Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ570 = iJcicZ570Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ570 != null) {
 	        for (JcicZ570 xJcicZ570:sJcicZ570) {
 	            OccursList occursListB = new OccursList();
@@ -3578,7 +3578,7 @@ public class L8030 extends TradeBuffer {
 	    
 	    //若有資料則以下處理回傳
 	    Slice<JcicZ571> sJcicZ571 = null;
-	    sJcicZ571 = iJcicZ571Service.CustIdEq(custId, this.index, this.limit, titaVo);
+	    sJcicZ571 = iJcicZ571Service.custIdEq(custId, this.index, this.limit, titaVo);
 	    if (sJcicZ571 != null) {
 	        for (JcicZ571 xJcicZ571:sJcicZ571) {
 	            OccursList occursListB = new OccursList();
@@ -3677,7 +3677,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ572> sJcicZ572 = null;
-		sJcicZ572 = iJcicZ572Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ572 = iJcicZ572Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ572 != null) {
 			for (JcicZ572 xJcicZ572:sJcicZ572) {
 				OccursList occursListB = new OccursList();
@@ -3777,7 +3777,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ573> sJcicZ573 = null;
-		sJcicZ573 = iJcicZ573Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ573 = iJcicZ573Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ573 != null) {
 			for (JcicZ573 xJcicZ573:sJcicZ573) {
 				OccursList occursListB = new OccursList();
@@ -3876,7 +3876,7 @@ public class L8030 extends TradeBuffer {
 		
 		//若有資料則以下處理回傳
 		Slice<JcicZ574> sJcicZ574 = null;
-		sJcicZ574 = iJcicZ574Service.CustIdEq(custId, this.index, this.limit, titaVo);
+		sJcicZ574 = iJcicZ574Service.custIdEq(custId, this.index, this.limit, titaVo);
 		if (sJcicZ574 != null) {
 			for (JcicZ574 xJcicZ574:sJcicZ574) {
 				OccursList occursListB = new OccursList();

@@ -110,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ049> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ049> custIdEq(String custId_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ049> slice = null;
     if (titaVo.length != 0)
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustIdEq " + dbName + " : " + "custId_0 : " + custId_0);
+    this.info("custIdEq " + dbName + " : " + "custId_0 : " + custId_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ049ReposDay.findAllByCustIdIsOrderByCustIdAscRcDateDesc(custId_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -138,7 +138,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ049> RcDateEq(int rcDate_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ049> rcDateEq(int rcDate_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ049> slice = null;
     if (titaVo.length != 0)
@@ -149,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("RcDateEq " + dbName + " : " + "rcDate_0 : " + rcDate_0);
+    this.info("rcDateEq " + dbName + " : " + "rcDate_0 : " + rcDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ049ReposDay.findAllByRcDateIsOrderByCustIdAscRcDateDesc(rcDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -166,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ049> CustRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ049> custRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ049> slice = null;
     if (titaVo.length != 0)
@@ -177,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " rcDate_1 : " +  rcDate_1);
+    this.info("custRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " rcDate_1 : " +  rcDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ049ReposDay.findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDesc(custId_0, rcDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))

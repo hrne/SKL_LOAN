@@ -442,6 +442,11 @@ public class L1101 extends TradeBuffer {
 //		Introducer
 		// 分行別預設0000 --2021.8.6 Fegie
 		tCustMain.setBranchNo("0000");
+		
+		tCustMain.setIsSuspected(titaVo.getParam("IsFinancial"));
+		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsFinancialCheck"));
+		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsFinancialCheckType"));
+
 	}
 
 	// by eric 2021.7.31

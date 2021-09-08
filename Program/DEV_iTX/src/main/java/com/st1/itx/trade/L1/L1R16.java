@@ -33,8 +33,9 @@ public class L1R16 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String iCustId = titaVo.getParam("RimCustId");
+		String iCustName = titaVo.getParam("RimCustName").toString().trim();
 
-		BankRelationVo vo = iBankRelationCom.getBankRelation(iCustId, titaVo);
+		BankRelationVo vo = iBankRelationCom.getBankRelation(iCustId,iCustName, titaVo);
 
 		if ("Y".equals(vo.getIsLimit())) {
 			totaVo.putParam("L1R16IsLimitYn", "Y");

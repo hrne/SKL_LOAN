@@ -375,6 +375,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@SaveEndDate,#L8r28SaveEndDate),$)
 C(5,#TranKey,D,s,$)
+D(8)
+@V(7)
+@A(DATE,0,#SaveEndDate)
 
 !清算損失金額
 #SubAmt=M,9,I

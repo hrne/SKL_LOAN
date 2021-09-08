@@ -28,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R24 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R24.class);
 
 	@Autowired
 	public Parse parse;
@@ -60,6 +59,9 @@ public class L4R24 extends TradeBuffer {
 			tPostAuthLogId.setCustNo(custNo);
 			tPostAuthLogId.setRepayAcct(acctNo);
 			tPostAuthLogId.setPostDepCode(postDepCode);
+			if ("9".equals(authApplCode)) {
+				authApplCode = "1";
+			}
 			tPostAuthLogId.setAuthApplCode(authApplCode);
 			tPostAuthLogId.setAuthCode("1");
 
@@ -79,7 +81,11 @@ public class L4R24 extends TradeBuffer {
 				}
 			}
 		} else {
+
 			String createFlag = titaVo.getParam("RimCreateFlag");
+			if ("Z".equals(createFlag)) {
+				createFlag = "A";
+			}
 
 			AchAuthLogId tAchAuthLogId = new AchAuthLogId();
 			tAchAuthLogId.setAuthCreateDate(authCreateDate);

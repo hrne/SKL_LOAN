@@ -527,7 +527,7 @@ public class JcicCom extends CommBuffer {
 
 	public int countJcicZ043(String CustId, int RcDate, String SubmitKey, String MaxMainCode, TitaVo titaVo) throws LogicException {
 		RcDate = Integer.parseInt(RocTurnDc(String.valueOf(RcDate), 0));
-		Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.CoutCollaterals(CustId, RcDate, SubmitKey, MaxMainCode, index, limit, titaVo);
+		Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.coutCollaterals(CustId, RcDate, SubmitKey, MaxMainCode, index, limit, titaVo);
 		int count = 0;
 		if (sJcicZ043 != null) {
 			count = sJcicZ043.getSize();
@@ -656,7 +656,7 @@ public class JcicCom extends CommBuffer {
 		// 相同KEY值報送'446'結案後，不得新增、異動、刪除或補件本檔案。
 		RcDate = Integer.parseInt(RocTurnDc(String.valueOf(RcDate), 0));
 		Slice<JcicZ046> slJcicZ046 = null;
-		slJcicZ046 = sJcicZ046Service.HadZ046(CustId, RcDate, SubmitKey, 0, Integer.MAX_VALUE, titaVo);
+		slJcicZ046 = sJcicZ046Service.hadZ046(CustId, RcDate, SubmitKey, 0, Integer.MAX_VALUE, titaVo);
 		List<JcicZ046> lJcicZ046 = slJcicZ046 == null ? null : slJcicZ046.getContent();
 		if (lJcicZ046 != null) {
 			// E5009 資料檢核錯誤
@@ -747,7 +747,7 @@ public class JcicCom extends CommBuffer {
 			// 若第11欄[債權結案註記]填報‘Y’:債務全數清償者，必須隨同報送‘46’:結案通知資料，且第7欄結案原因代號必須填報‘99’:依債務清償方案履行完畢，否則予以剔退。
 			if (("Y").equals(ThisJcicZ050.getStatus())) {
 				Slice<JcicZ046> slJcicZ046 = null;
-				slJcicZ046 = sJcicZ046Service.CustRcEq(JcicZ050CustId, JcicZ050RcDate, this.index, this.limit, titaVo);
+				slJcicZ046 = sJcicZ046Service.custRcEq(JcicZ050CustId, JcicZ050RcDate, this.index, this.limit, titaVo);
 				List<JcicZ046> lJcicZ046 = slJcicZ046 == null ? null : slJcicZ046.getContent();
 				JcicZ046 JcicZ046Vo = null;
 				if (lJcicZ046 != null) {
@@ -773,7 +773,7 @@ public class JcicCom extends CommBuffer {
 			}
 
 			// 若第9欄[累計實際還款金額]不等於該IDN所有已報送本檔案資料之第8欄[繳款金額]之合計(含本次繳金額)，則以剔退處理。
-			Slice<JcicZ050> slJcicZ050 = sJcicZ050Service.CustRcEq(JcicZ050CustId, JcicZ050RcDate, 0, Integer.MAX_VALUE, titaVo);
+			Slice<JcicZ050> slJcicZ050 = sJcicZ050Service.custRcEq(JcicZ050CustId, JcicZ050RcDate, 0, Integer.MAX_VALUE, titaVo);
 			List<JcicZ050> lJcicZ050 = slJcicZ050 == null ? null : slJcicZ050.getContent();
 			BigDecimal SumPayAmt = BigDecimal.ZERO;
 			if (lJcicZ050 != null) {

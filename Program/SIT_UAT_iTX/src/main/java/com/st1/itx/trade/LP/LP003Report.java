@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,20 +19,14 @@ import com.st1.itx.util.common.MakeReport;
 
 @Component
 @Scope("prototype")
-
 public class LP003Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LP003Report.class);
 
 	@Autowired
-	LP003ServiceImpl LP003ServiceImpl;
+	LP003ServiceImpl lP003ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
 
-	@Override
-	public void printTitle() {
-	}
- 
 	List<Map<String, String>> findList = new ArrayList<>();
 
 	BigDecimal[] gamtArr = null;
@@ -106,13 +98,13 @@ public class LP003Report extends MakeReport {
 
 		this.info("LP003Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP003", "部專暨房專業績累計表", "LP003部專暨房專業績累計表",
-				"部專暨房專業績累計表.xls", "部專");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP003", "部專暨房專業績累計表", "LP003_部專暨房專業績累計表",
+				"LP003_底稿_部專暨房專業績累計表.xlsx", "部專");
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 
 		try {
-			wkSsnList = LP003ServiceImpl.wkSsn(titaVo);
+			wkSsnList = lP003ServiceImpl.wkSsn(titaVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -135,7 +127,7 @@ public class LP003Report extends MakeReport {
 	 */
 	private void exportExcel(TitaVo titaVo, Map<String, String> wkSsnVo) throws LogicException {
 		// 民國年
-		String ROCYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
+		String rocYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
 
 		// 當前工作月
 		int wkMonth = Integer.valueOf(wkSsnVo.get("F1"));
@@ -144,11 +136,11 @@ public class LP003Report extends MakeReport {
 //		monthHead = wkSsnVo.get("F1") == "1" ? "1" : "1~" + wkSsnVo.get("F1");
 
 		if (Integer.parseInt(wkSsnVo.get("F1")) == 1) {
-			ROCYear = String.valueOf(Integer.parseInt(wkSsnVo.get("F0")) - 1912);
+			rocYear = String.valueOf(Integer.parseInt(wkSsnVo.get("F0")) - 1912);
 			wkMonth = 13;
 			monthHead = "13";
 		} else {
-			ROCYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
+			rocYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
 			wkMonth = Integer.parseInt(wkSsnVo.get("F1")) - 1;
 			monthHead = String.valueOf(Integer.parseInt(wkSsnVo.get("F1")) - 1);
 		}
@@ -190,7 +182,7 @@ public class LP003Report extends MakeReport {
 		/*--------------------------------------------------------------------------*/
 		col = 4;
 		makeExcel.setSheet("部專");
-		makeExcel.setValue(1, 1, ROCYear + "年第1~" + monthHead + "工作月房貸部專業績累計明細表");
+		makeExcel.setValue(1, 1, rocYear + "年第1~" + monthHead + "工作月房貸部專業績累計明細表");
 
 		// 建攔位
 		setColTitle(col, wkMonth, lastWkMonth);
@@ -203,7 +195,7 @@ public class LP003Report extends MakeReport {
 		col = 6;
 
 		makeExcel.setSheet("專員");
-		makeExcel.setValue(1, 1, ROCYear + "年第1~" + monthHead + "工作月房貸專員業績累計明細表");
+		makeExcel.setValue(1, 1, rocYear + "年第1~" + monthHead + "工作月房貸專員業績累計明細表");
 
 		// 建攔位
 		setColTitle(col, wkMonth, lastWkMonth);
@@ -333,7 +325,7 @@ public class LP003Report extends MakeReport {
 
 		try {
 
-			findList = LP003ServiceImpl.findDept(titaVo, wkSsnVo);
+			findList = lP003ServiceImpl.findDept(titaVo, wkSsnVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -392,11 +384,11 @@ public class LP003Report extends MakeReport {
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
 
-				BigDecimal gamt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
+				BigDecimal gamt = tLDVo.get("F4") == null || tLDVo.get("F4").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F4"));
-				BigDecimal cnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F5") == null || tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal amt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F6") == null || tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F6"));
 
 				if (!deptcode.equals(tLDVo.get("F7"))) {
@@ -434,12 +426,12 @@ public class LP003Report extends MakeReport {
 					makeExcel.setValue(tRow, scol, gamt, "#,##0", "R");
 					makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
 					makeExcel.setValue(tRow, scol + 2, cnt, "#,##0", "R");
-					makeExcel.setValue(tRow, scol + 3, cpRate(gamt, amt), "R");
+					makeExcel.setValue(tRow, scol + 3, cpRate(gamt, tmpAmt), "R");
 
 					// 累計+陸續工作月的 總計
 					gamtRowTotal = gamtRowTotal.add(gamt);
-					cntRowTotal = cntRowTotal.add(cnt);
-					amtRowTotal = amtRowTotal.add(amt);
+					cntRowTotal = cntRowTotal.add(tmpCnt);
+					amtRowTotal = amtRowTotal.add(tmpAmt);
 
 					scol += 4;
 
@@ -449,18 +441,18 @@ public class LP003Report extends MakeReport {
 
 						// 列 前工作月總計
 						gamtTotal = gamtTotal.add(gamt);
-						cntTotal = cntTotal.add(cnt);
-						amtTotal = amtTotal.add(amt);
+						cntTotal = cntTotal.add(tmpCnt);
+						amtTotal = amtTotal.add(tmpAmt);
 
 						// 累計+陸續工作月的 總計
 						gamtRowTotal = gamtRowTotal.add(gamt);
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
 						// 累計的總計
 						gamtColTotal = gamtColTotal.add(gamt);
-						cntColTotal = cntColTotal.add(cnt);
-						amtColTotal = amtColTotal.add(amt);
+						cntColTotal = cntColTotal.add(tmpCnt);
+						amtColTotal = amtColTotal.add(tmpAmt);
 
 					} else if (dmm > lastWkMonth) {
 						// 當 第i工作月 超過 上季末工作月 再開始建攔位
@@ -478,13 +470,13 @@ public class LP003Report extends MakeReport {
 						}
 						// 累計+陸續工作月的 總計
 						gamtRowTotal = gamtRowTotal.add(gamt);
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
 						makeExcel.setValue(tRow, scol, gamt, "#,##0", "R");
 						makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
 						makeExcel.setValue(tRow, scol + 2, cnt, "#,##0", "R");
-						makeExcel.setValue(tRow, scol + 3, cpRate(gamt, amt), "R");
+						makeExcel.setValue(tRow, scol + 3, cpRate(gamt, tmpAmt), "R");
 
 						scol += 4;
 
@@ -501,13 +493,13 @@ public class LP003Report extends MakeReport {
 
 				if (dmm > lastWkMonth) {
 
-					sizeT = toWkMonth(dmm, gamt, cnt, amt);
+					sizeT = toWkMonth(dmm, gamt, tmpCnt, tmpAmt);
 
 				}
 
 				gamtColAllTotal = gamtColAllTotal.add(gamt);
-				cntColAllTotal = cntColAllTotal.add(cnt);
-				amtColAllTotal = amtColAllTotal.add(amt);
+				cntColAllTotal = cntColAllTotal.add(tmpCnt);
+				amtColAllTotal = amtColAllTotal.add(tmpAmt);
 
 			}
 			tRow++;
@@ -572,7 +564,7 @@ public class LP003Report extends MakeReport {
 
 		try {
 
-			findList = LP003ServiceImpl.findEmp(titaVo, wkSsnVo, 0);
+			findList = lP003ServiceImpl.findEmp(titaVo, wkSsnVo, 0);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -628,17 +620,21 @@ public class LP003Report extends MakeReport {
 			// 是否 產資料至 前工作月累計 欄位
 			boolean firstCreate = true;
 
+			BigDecimal rank = BigDecimal.ZERO;
+
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
 
-				BigDecimal gamt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal gamt = tLDVo.get("F5") == null || tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal cnt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F6") == null || tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F6"));
-				BigDecimal amt = tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F7") == null || tLDVo.get("F7").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F7"));
 
 				if (!deptcode.equals(tLDVo.get("F8"))) {
+
+					rank = getBigDecimal(tLDVo.get("F0"));
 
 					// 部室代號
 					deptcode = tLDVo.get("F8");
@@ -677,11 +673,11 @@ public class LP003Report extends MakeReport {
 					makeExcel.setValue(tRow, scol, gamt, "#,##0", "R");
 					makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
 					makeExcel.setValue(tRow, scol + 2, cnt, "#,##0", "R");
-					makeExcel.setValue(tRow, scol + 3, cpRate(gamt, amt), "R");
+					makeExcel.setValue(tRow, scol + 3, cpRate(gamt, tmpAmt), "R");
 					// 累計+陸續工作月的 總計
 					gamtRowTotal = gamtRowTotal.add(gamt);
-					cntRowTotal = cntRowTotal.add(cnt);
-					amtRowTotal = amtRowTotal.add(amt);
+					cntRowTotal = cntRowTotal.add(tmpCnt);
+					amtRowTotal = amtRowTotal.add(tmpAmt);
 
 					scol += 4;
 
@@ -691,18 +687,18 @@ public class LP003Report extends MakeReport {
 
 						// 列 前工作月總計
 						gamtTotal = gamtTotal.add(gamt);
-						cntTotal = cntTotal.add(cnt);
-						amtTotal = amtTotal.add(amt);
+						cntTotal = cntTotal.add(tmpCnt);
+						amtTotal = amtTotal.add(tmpAmt);
 
 						// 累計+陸續工作月的 總計
 						gamtRowTotal = gamtRowTotal.add(gamt);
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
 						// 累計的總計
 						gamtColTotal = gamtColTotal.add(gamt);
-						cntColTotal = cntColTotal.add(cnt);
-						amtColTotal = amtColTotal.add(amt);
+						cntColTotal = cntColTotal.add(tmpCnt);
+						amtColTotal = amtColTotal.add(tmpAmt);
 
 					} else if (dmm > lastWkMonth) {
 						// 當 第i工作月 超過 上季末工作月 再開始建攔位
@@ -721,13 +717,13 @@ public class LP003Report extends MakeReport {
 
 						// 累計+陸續工作月的 總計
 						gamtRowTotal = gamtRowTotal.add(gamt);
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
 						makeExcel.setValue(tRow, scol, gamt, "#,##0", "R");
 						makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
 						makeExcel.setValue(tRow, scol + 2, cnt, "#,##0", "R");
-						makeExcel.setValue(tRow, scol + 3, cpRate(gamt, amt), "R");
+						makeExcel.setValue(tRow, scol + 3, cpRate(gamt, tmpAmt), "R");
 
 						scol += 4;
 
@@ -744,20 +740,20 @@ public class LP003Report extends MakeReport {
 
 				if (dmm > lastWkMonth) {
 
-					sizeT = toWkMonth(dmm, gamt, cnt, amt);
+					sizeT = toWkMonth(dmm, gamt, tmpCnt, tmpAmt);
 
 				}
 
 				gamtColAllTotal = gamtColAllTotal.add(gamt);
-				cntColAllTotal = cntColAllTotal.add(cnt);
-				amtColAllTotal = amtColAllTotal.add(amt);
+				cntColAllTotal = cntColAllTotal.add(tmpCnt);
+				amtColAllTotal = amtColAllTotal.add(tmpAmt);
 
 			}
 
 			// 再找房貸部專
 			try {
 
-				findList = LP003ServiceImpl.findEmp(titaVo, wkSsnVo, 1);
+				findList = lP003ServiceImpl.findEmp(titaVo, wkSsnVo, 1);
 
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
@@ -768,19 +764,21 @@ public class LP003Report extends MakeReport {
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
 
-				BigDecimal gamt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal gamt = tLDVo.get("F5") == null || tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal cnt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F6") == null || tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F6"));
-				BigDecimal amt = tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F7") == null || tLDVo.get("F7").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F7"));
 
 				if (!deptcode.equals(tLDVo.get("F8"))) {
 
+					String thisRank = rank.add(getBigDecimal(tLDVo.get("F0"))).toString();
+
 					// 部室代號
 					deptcode = tLDVo.get("F8");
 					// 排行
-					makeExcel.setValue(sRow, 1, "");
+					makeExcel.setValue(sRow, 1, thisRank);
 					// 部室
 					makeExcel.setValue(sRow, 2, tLDVo.get("F1"));
 					// 區部
@@ -812,13 +810,13 @@ public class LP003Report extends MakeReport {
 				if (wkMonth <= 3) {
 
 					makeExcel.setValue(tRow, scol, gamt, "#,##0", "R");
-					makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
-					makeExcel.setValue(tRow, scol + 2, cnt, "#,##0", "R");
-					makeExcel.setValue(tRow, scol + 3, cpRate(gamt, amt), "R");
+					makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
+					makeExcel.setValue(tRow, scol + 2, tmpCnt, "#,##0", "R");
+					makeExcel.setValue(tRow, scol + 3, cpRate(gamt, tmpAmt), "R");
 					// 累計+陸續工作月的 總計
 					gamtRowTotal = gamtRowTotal.add(gamt);
-					cntRowTotal = cntRowTotal.add(cnt);
-					amtRowTotal = amtRowTotal.add(amt);
+					cntRowTotal = cntRowTotal.add(tmpCnt);
+					amtRowTotal = amtRowTotal.add(tmpAmt);
 
 					scol += 4;
 
@@ -828,18 +826,18 @@ public class LP003Report extends MakeReport {
 
 						// 列 前工作月總計
 						gamtTotal = gamtTotal.add(gamt);
-						cntTotal = cntTotal.add(cnt);
-						amtTotal = amtTotal.add(amt);
+						cntTotal = cntTotal.add(tmpCnt);
+						amtTotal = amtTotal.add(tmpAmt);
 
 						// 累計+陸續工作月的 總計
 						gamtRowTotal = gamtRowTotal.add(gamt);
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
 						// 累計的總計
 						gamtColTotal = gamtColTotal.add(gamt);
-						cntColTotal = cntColTotal.add(cnt);
-						amtColTotal = amtColTotal.add(amt);
+						cntColTotal = cntColTotal.add(tmpCnt);
+						amtColTotal = amtColTotal.add(tmpAmt);
 
 					} else if (dmm > lastWkMonth) {
 						// 當 第i工作月 超過 上季末工作月 再開始建攔位
@@ -858,13 +856,13 @@ public class LP003Report extends MakeReport {
 
 						// 累計+陸續工作月的 總計
 						gamtRowTotal = gamtRowTotal.add(gamt);
-						cntRowTotal = cntRowTotal.add(cnt);
-						amtRowTotal = amtRowTotal.add(amt);
+						cntRowTotal = cntRowTotal.add(tmpCnt);
+						amtRowTotal = amtRowTotal.add(tmpAmt);
 
 						makeExcel.setValue(tRow, scol, gamt, "#,##0", "R");
-						makeExcel.setValue(tRow, scol + 1, amt, "#,##0", "R");
-						makeExcel.setValue(tRow, scol + 2, cnt, "#,##0", "R");
-						makeExcel.setValue(tRow, scol + 3, cpRate(gamt, amt), "R");
+						makeExcel.setValue(tRow, scol + 1, tmpAmt, "#,##0", "R");
+						makeExcel.setValue(tRow, scol + 2, tmpCnt, "#,##0", "R");
+						makeExcel.setValue(tRow, scol + 3, cpRate(gamt, tmpAmt), "R");
 
 						scol += 4;
 
@@ -881,13 +879,13 @@ public class LP003Report extends MakeReport {
 
 				if (dmm > lastWkMonth) {
 
-					sizeT = toWkMonth(dmm, gamt, cnt, amt);
+					sizeT = toWkMonth(dmm, gamt, tmpCnt, tmpAmt);
 
 				}
 
 				gamtColAllTotal = gamtColAllTotal.add(gamt);
-				cntColAllTotal = cntColAllTotal.add(cnt);
-				amtColAllTotal = amtColAllTotal.add(amt);
+				cntColAllTotal = cntColAllTotal.add(tmpCnt);
+				amtColAllTotal = amtColAllTotal.add(tmpAmt);
 
 			}
 
@@ -949,13 +947,13 @@ public class LP003Report extends MakeReport {
 	private void setDeptThisWKM(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth) throws LogicException {
 		this.info("===========setDeptThisWKM");
 		// 民國年
-		String ROCYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
+		String rocYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
 
 		String dateM = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")));
 
 		try {
 
-			findList = LP003ServiceImpl.findDeptThisWKM(titaVo, wkSsnVo);
+			findList = lP003ServiceImpl.findDeptThisWKM(titaVo, wkSsnVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -963,10 +961,11 @@ public class LP003Report extends MakeReport {
 			this.info("LP003ServiceImpl.findEmp error = " + errors.toString());
 		}
 
+		// 房貸部專業績統計報表
 		makeExcel.setSheet("Sheet2");
 
 		// 標題
-		makeExcel.setValue(1, 1, ROCYear + "." + wkMonth + "工作月房貸部專業績統計報表", "C");
+		makeExcel.setValue(1, 1, rocYear + "." + wkMonth + "工作月房貸部專業績統計報表", "C");
 		makeExcel.setValue(2, 1,
 				"結算日期：" + dateM.substring(0, 3) + "." + dateM.substring(3, 5) + "." + dateM.substring(5, 7), "R");
 
@@ -974,21 +973,14 @@ public class LP003Report extends MakeReport {
 			// 起始列
 			sRow = 4;
 
-//			makeExcel.setShiftRow(sRow, findList.size() - 1);
+			makeExcel.setShiftRow(sRow + 1, findList.size() - 1);
+
+			// 合計-房貸責任額
+			BigDecimal targetTotal = BigDecimal.ZERO;
+			BigDecimal drawdownTotal = BigDecimal.ZERO;
+			BigDecimal countTotal = BigDecimal.ZERO;
 
 			for (Map<String, String> tLDVo : findList) {
-
-				BigDecimal gamt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F4"));
-
-				BigDecimal amt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F5"));
-
-				BigDecimal cnt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F6"));
-
-				BigDecimal percent = tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F7"));
 
 				// 排行
 				makeExcel.setValue(sRow, 1, tLDVo.get("F0"), "C");
@@ -998,14 +990,26 @@ public class LP003Report extends MakeReport {
 				makeExcel.setValue(sRow, 3, tLDVo.get("F2"), "C");
 				// 電腦編號
 				makeExcel.setValue(sRow, 4, tLDVo.get("F3"), "C");
+
 				// 房貸責任額
-				makeExcel.setValue(sRow, 5, gamt, "#,##0");
+				BigDecimal targetAmt = getBigDecimal(tLDVo.get("F4"));
+				makeExcel.setValue(sRow, 5, targetAmt, "#,##0");
+				targetTotal = targetTotal.add(targetAmt);
+
 				// 房貸撥款金額
-				makeExcel.setValue(sRow, 6, amt, "#,##0");
-				// 房貸撥款金額
-				makeExcel.setValue(sRow, 7, cnt, "0.0");
+				BigDecimal drawdownAmt = getBigDecimal(tLDVo.get("F5"));
+				makeExcel.setValue(sRow, 6, drawdownAmt, "#,##0");
+				drawdownTotal = drawdownTotal.add(drawdownAmt);
+
+				// 房貸件數
+				BigDecimal count = getBigDecimal(tLDVo.get("F6"));
+				makeExcel.setValue(sRow, 7, count, "0.0");
+				countTotal = countTotal.add(count);
+
 				// 達成率
+				BigDecimal percent = getBigDecimal(tLDVo.get("F7"));
 				makeExcel.setValue(sRow, 8, percent, "0.00");
+
 				// 服務部室
 				makeExcel.setValue(sRow, 9, tLDVo.get("F8"), "C");
 
@@ -1013,6 +1017,14 @@ public class LP003Report extends MakeReport {
 				sRow++;
 
 			}
+
+			// 印合計
+			// 合計-房貸責任額
+			makeExcel.setValue(sRow, 5, targetTotal, "#,##0");
+			// 合計-房貸撥款金額
+			makeExcel.setValue(sRow, 6, drawdownTotal, "#,##0");
+			// 合計-房貸件數
+			makeExcel.setValue(sRow, 7, countTotal, "0.0");
 
 		} else {
 			makeExcel.setValue(4, 1, "本日無資料");
@@ -1031,7 +1043,7 @@ public class LP003Report extends MakeReport {
 	private void setEmpThisWKM(TitaVo titaVo, Map<String, String> wkSsnVo, int wkMonth) throws LogicException {
 		this.info("===========setEmpThisWKM");
 		// 民國年
-		String ROCYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
+		String rocYear = String.valueOf(Integer.valueOf(wkSsnVo.get("F0")) - 1911);
 
 		String dateM = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")));
 
@@ -1039,9 +1051,9 @@ public class LP003Report extends MakeReport {
 		List<Map<String, String>> findListBS1 = null;
 		try {
 
-			findListBS0 = LP003ServiceImpl.findEmpThisWKM(titaVo, wkSsnVo, 0);
+			findListBS0 = lP003ServiceImpl.findEmpThisWKM(titaVo, wkSsnVo, 0);
 
-			findListBS1 = LP003ServiceImpl.findEmpThisWKM(titaVo, wkSsnVo, 1);
+			findListBS1 = lP003ServiceImpl.findEmpThisWKM(titaVo, wkSsnVo, 1);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -1049,10 +1061,11 @@ public class LP003Report extends MakeReport {
 			this.info("LP003ServiceImpl.findEmp error = " + errors.toString());
 		}
 
+		// 房貸專員業績統計報表
 		makeExcel.setSheet("Sheet1");
 
 		// 標題
-		makeExcel.setValue(1, 1, ROCYear + "." + wkMonth + "工作月房貸專員業績統計報表", "C");
+		makeExcel.setValue(1, 1, rocYear + "." + wkMonth + "工作月房貸專員業績統計報表", "C");
 		makeExcel.setValue(2, 1,
 				"結算日期：" + dateM.substring(0, 3) + "." + dateM.substring(3, 5) + "." + dateM.substring(5, 7), "R");
 
@@ -1060,71 +1073,86 @@ public class LP003Report extends MakeReport {
 
 			// 起始列
 			sRow = 4;
-//			int shiftRow = findListBS0.size() + findListBS1.size() - 1;
-//			makeExcel.setShiftRow(sRow, shiftRow);
+			int shiftRow = findListBS0.size() + findListBS1.size() - 1;
+			makeExcel.setShiftRow(sRow + 1, shiftRow);
 
+			BigDecimal rank = BigDecimal.ZERO;
+
+			// 合計-房貸責任額
+			BigDecimal targetTotal = BigDecimal.ZERO;
+			BigDecimal drawdownTotal = BigDecimal.ZERO;
+			BigDecimal countTotal = BigDecimal.ZERO;
 //			this.info("從" + sRow + "~" + shiftRow);
-			//房貸專員
+			// 房貸專員
 			for (Map<String, String> tLDVo : findListBS0) {
-
-				BigDecimal gamt = tLDVo.get("F3") == null || tLDVo.get("F3").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F3"));
-				BigDecimal amt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F4"));
-				BigDecimal cnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal percent = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F6"));
 
 				// 排行
 				makeExcel.setValue(sRow, 1, tLDVo.get("F0"), "C");
+				rank = getBigDecimal(tLDVo.get("F0"));
+
 				// 姓名
 				makeExcel.setValue(sRow, 2, tLDVo.get("F1"), "C");
 				// 電腦編號
 				makeExcel.setValue(sRow, 3, tLDVo.get("F2"), "C");
+
 				// 房貸責任額
-				makeExcel.setValue(sRow, 4, gamt, "#,##0");
+				BigDecimal targetAmt = getBigDecimal(tLDVo.get("F3"));
+				makeExcel.setValue(sRow, 4, targetAmt, "#,##0");
+				targetTotal = targetTotal.add(targetAmt);
+
 				// 房貸撥款金額
-				makeExcel.setValue(sRow, 5, amt, "#,##0");
-				// 房貸撥款金額
-				makeExcel.setValue(sRow, 6, cnt, "0.0");
+				BigDecimal drawdonwAmt = getBigDecimal(tLDVo.get("F4"));
+				makeExcel.setValue(sRow, 5, drawdonwAmt, "#,##0");
+				drawdownTotal = drawdownTotal.add(drawdonwAmt);
+
+				// 房貸件數
+				BigDecimal count = getBigDecimal(tLDVo.get("F5"));
+				makeExcel.setValue(sRow, 6, count, "0.0");
+				countTotal = countTotal.add(count);
+
 				// 達成率
+				BigDecimal percent = getBigDecimal(tLDVo.get("F6"));
 				makeExcel.setValue(sRow, 7, percent, "0.00");
+
 				// 服務部室
 				makeExcel.setValue(sRow, 8, tLDVo.get("F7"), "C");
 				// 服務區部
 				makeExcel.setValue(sRow, 9, tLDVo.get("F8"), "C");
 
 				sRow++;
-
 			}
 
-			//房貸部專
+			// 房貸部專
 			for (Map<String, String> tLDVo : findListBS1) {
 
-				BigDecimal gamt = tLDVo.get("F3") == null || tLDVo.get("F3").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F3"));
-				BigDecimal amt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F4"));
-				BigDecimal cnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal percent = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F6"));
+				String thisRank = rank.add(getBigDecimal(tLDVo.get("F0"))).toString();
 
 				// 排行
-				makeExcel.setValue(sRow, 1, "", "C");
+				makeExcel.setValue(sRow, 1, thisRank, "C");
 				// 姓名
 				makeExcel.setValue(sRow, 2, tLDVo.get("F1"), "C");
 				// 電腦編號
 				makeExcel.setValue(sRow, 3, tLDVo.get("F2"), "C");
+
 				// 房貸責任額
-				makeExcel.setValue(sRow, 4, gamt, "#,##0");
+				BigDecimal targetAmt = getBigDecimal(tLDVo.get("F3"));
+				makeExcel.setValue(sRow, 4, targetAmt, "#,##0");
+				targetTotal = targetTotal.add(targetAmt);
+
 				// 房貸撥款金額
-				makeExcel.setValue(sRow, 5, amt, "#,##0");
-				// 房貸撥款金額
-				makeExcel.setValue(sRow, 6, cnt, "0.0");
+				BigDecimal drawdonwAmt = getBigDecimal(tLDVo.get("F4"));
+				makeExcel.setValue(sRow, 5, drawdonwAmt, "#,##0");
+				drawdownTotal = drawdownTotal.add(drawdonwAmt);
+
+				// 房貸件數
+				BigDecimal count = getBigDecimal(tLDVo.get("F5"));
+				makeExcel.setValue(sRow, 6, count, "0.0");
+				countTotal = countTotal.add(count);
+
 				// 達成率
+				BigDecimal percent = getBigDecimal(tLDVo.get("F6"));
 				makeExcel.setValue(sRow, 7, percent, "0.00");
+
 				// 服務部室
 				makeExcel.setValue(sRow, 8, tLDVo.get("F7"), "C");
 				// 服務區部
@@ -1133,6 +1161,13 @@ public class LP003Report extends MakeReport {
 
 			}
 
+			// 印合計
+			// 合計-房貸責任額
+			makeExcel.setValue(sRow, 4, targetTotal, "#,##0");
+			// 合計-房貸撥款金額
+			makeExcel.setValue(sRow, 5, drawdownTotal, "#,##0");
+			// 合計-房貸件數
+			makeExcel.setValue(sRow, 6, countTotal, "0.0");
 		} else {
 			makeExcel.setValue(4, 1, "本日無資料");
 		}
@@ -1148,7 +1183,7 @@ public class LP003Report extends MakeReport {
 	 * 
 	 */
 	private int toWkMonth(int dmm, BigDecimal gamt, BigDecimal cnt, BigDecimal amt) {
-		this.info(dmm+"工作月～責任:"+gamt+"~撥款:"+amt+"~件數"+cnt);
+		this.info(dmm + "工作月～責任:" + gamt + "~撥款:" + amt + "~件數" + cnt);
 		// 各工作月 加總
 		switch (dmm) {
 		case 1:
@@ -1159,8 +1194,8 @@ public class LP003Report extends MakeReport {
 			gamtArr[0] = gamtColTotal1;
 			cntArr[0] = cntColTotal1;
 			amtArr[0] = amtColTotal1;
-			this.info("第1組:責任額:"+gamtArr[0]+"~撥款"+amtArr[0]);
-			
+			this.info("第1組:責任額:" + gamtArr[0] + "~撥款" + amtArr[0]);
+
 			size = 2;
 			break;
 		case 2:
@@ -1174,7 +1209,7 @@ public class LP003Report extends MakeReport {
 			gamtArr[1] = gamtColTotal2;
 			cntArr[1] = cntColTotal2;
 			amtArr[1] = amtColTotal2;
-			this.info("第2組:責任額:"+gamtArr[1]+"~撥款"+amtArr[1]);
+			this.info("第2組:責任額:" + gamtArr[1] + "~撥款" + amtArr[1]);
 			size = 3;
 			break;
 		case 3:
@@ -1188,8 +1223,8 @@ public class LP003Report extends MakeReport {
 			gamtArr[2] = gamtColTotal3;
 			cntArr[2] = cntColTotal3;
 			amtArr[2] = cntColTotal3;
-			this.info("第3組:責任額:"+gamtArr[2]+"~撥款"+amtArr[2]);
-			
+			this.info("第3組:責任額:" + gamtArr[2] + "~撥款" + amtArr[2]);
+
 			size = 4;
 			break;
 
@@ -1203,7 +1238,7 @@ public class LP003Report extends MakeReport {
 			gamtArr[3] = gamtColTotal4;
 			cntArr[3] = cntColTotal4;
 			amtArr[3] = amtColTotal4;
-			this.info("第4組:責任額:"+gamtArr[3]+"~撥款"+amtArr[3]);
+			this.info("第4組:責任額:" + gamtArr[3] + "~撥款" + amtArr[3]);
 			size = 5;
 			break;
 		case 13:
@@ -1214,16 +1249,12 @@ public class LP003Report extends MakeReport {
 			gamtArr[4] = gamtColTotal5;
 			cntArr[4] = cntColTotal5;
 			amtArr[4] = amtColTotal5;
-			this.info("第5組:責任額:"+gamtArr[4]+"~撥款"+amtArr[4]);
+			this.info("第5組:責任額:" + gamtArr[4] + "~撥款" + amtArr[4]);
 			size = 6;
 			break;
 		default:
 			break;
 		}
-
-		
-	
-	
 
 //		this.info(""++""++""++""++""++"");
 //		this.info("累計工作月"++""++""++""++""++"");

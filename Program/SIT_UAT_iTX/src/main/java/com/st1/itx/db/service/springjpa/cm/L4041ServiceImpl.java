@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4041ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -61,10 +58,10 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4041.findAll");
+		this.info("L4041.findAll");
 
 		String sql = "";
-		String status = "";
+		String searchstatus = "";
 		String searchMediaCode = "";
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iPropDate = parse.stringToInteger(titaVo.getParam("PropDate"));
@@ -76,39 +73,40 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		switch (iFunctionCode) {
-		// 1. 篩選 2.重新授權 3.取消
+		// 1. 篩選資料 2.產出媒體檔 3.重製媒體碼
 		case 1:
 			switch (iAuthApplCode) {
-			case 1:
-				status = "' '";
+			case 1: // 1.申請
+				searchstatus = " in (' ')";
 				searchMediaCode = " is null ";
 				break;
-			case 2:
-				status = "'03','06','07','08','09','10','11','12','13','14','16','17','18','19','91','98'";
+			case 2: //2.終止
+				searchstatus = " not in  (' ', '00')";
 				searchMediaCode = " = 'Y' ";
 				break;
 			case 3:
-				status = "'00'";
+				searchstatus = " in ('00')";
 				searchMediaCode = " = 'Y' ";
 				break;
 			}
 			break;
 		// 產出媒體
 		case 2:
-			status = "' ','03','06','07','08','09','10','11','12','13','14','16','17','18','19','91','98'";
+			searchstatus = " in (' ')";
+			searchMediaCode = " is null ";
 			break;
 		// 重製媒體碼
 		case 3:
-			status = "' '";
+			searchstatus = " in (' ')";
 			searchMediaCode = " = 'Y' ";
 			break;
 		}
-		logger.info("status = " + status);
-		logger.info("searchMediaCode = " + searchMediaCode);
-		logger.info("iCustNo = " + iCustNo);
-		logger.info("iPropDate = " + iPropDate);
-		logger.info("iFunctionCode = " + iFunctionCode);
-		logger.info("iAuthApplCode = " + iAuthApplCode);
+		this.info("searchstatus = " + searchstatus);
+		this.info("searchMediaCode = " + searchMediaCode);
+		this.info("iCustNo = " + iCustNo);
+		this.info("iPropDate = " + iPropDate);
+		this.info("iFunctionCode = " + iFunctionCode);
+		this.info("iAuthApplCode = " + iAuthApplCode);
 
 		sql += " select                         ";
 		sql += "   \"AuthCreateDate\"   as F0   ";
@@ -169,8 +167,7 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) p                            ";
 		sql += " where seq = 1                ";
 
-		sql += "   and \"AuthErrorCode\" in ( " + status + " ) ";
-		sql += "   and \"AuthApplCode\" != '9'  ";
+		sql += "   and \"AuthErrorCode\""  + searchstatus ;
 		switch (iFunctionCode) {
 		case 1:
 			sql += "   and \"PostMediaCode\" " + searchMediaCode;
@@ -202,14 +199,14 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		 產出媒體       -> 提出日+狀態
 //		 重製媒體碼   -> 提出日+狀態+媒體碼
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -222,7 +219,7 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

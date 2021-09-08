@@ -1,6 +1,7 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;

@@ -81,14 +81,21 @@ public class BankRelationCom extends TradeBuffer {
 	public BankRelationVo getBankRelation(String iCustId, String iCustName, TitaVo titaVo) throws LogicException {
 		logger.info("getBankRelation  ... ");
 		BankRelationVo vo = new BankRelationVo();
-		Slice<BankRelationCompany> slBankRelationCompany = bankRelationCompanyService.findCompanyIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-		List<BankRelationCompany> lBankRelationCompany = slBankRelationCompany == null ? null : slBankRelationCompany.getContent();
-		Slice<BankRelationSelf> slBankRelationSelf = bankRelationSelfService.findCustIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BankRelationCompany> slBankRelationCompany = bankRelationCompanyService.findCompanyIdEq(iCustId, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<BankRelationCompany> lBankRelationCompany = slBankRelationCompany == null ? null
+				: slBankRelationCompany.getContent();
+		Slice<BankRelationSelf> slBankRelationSelf = bankRelationSelfService.findCustIdEq(iCustId, 0, Integer.MAX_VALUE,
+				titaVo);
 		List<BankRelationSelf> lBankRelationSelf = slBankRelationSelf == null ? null : slBankRelationSelf.getContent();
-		Slice<BankRelationFamily> slBankRelationFamily = bankRelationFamilyService.findRelationIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-		List<BankRelationFamily> lBankRelationFamily = slBankRelationFamily == null ? null : slBankRelationFamily.getContent();
-		Slice<BankRelationSuspected> slBankRelationSuspected = bankRelationSuspectedService.RepCusNameEq(iCustName, 0, Integer.MAX_VALUE, titaVo);
-		List<BankRelationSuspected> lBankRelationSuspected = slBankRelationSuspected == null ? null : slBankRelationSuspected.getContent();
+		Slice<BankRelationFamily> slBankRelationFamily = bankRelationFamilyService.findRelationIdEq(iCustId, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<BankRelationFamily> lBankRelationFamily = slBankRelationFamily == null ? null
+				: slBankRelationFamily.getContent();
+		Slice<BankRelationSuspected> slBankRelationSuspected = bankRelationSuspectedService.RepCusNameEq(iCustName, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<BankRelationSuspected> lBankRelationSuspected = slBankRelationSuspected == null ? null
+				: slBankRelationSuspected.getContent();
 		if (lBankRelationCompany != null) {
 			for (BankRelationCompany t : lBankRelationCompany) {
 				if ("".equals(vo.getDataDate())) {
@@ -132,39 +139,40 @@ public class BankRelationCom extends TradeBuffer {
 					vo.setLAW008("Y");
 				}
 			}
-			if (lBankRelationFamily != null) {
-				for (BankRelationFamily t : lBankRelationFamily) {
-					if ("".equals(vo.getDataDate())) {
-						vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
-					}
-					if ("1".equals(t.getLAW001())) {
-						vo.setLAW001("Y");
-					}
-					if ("1".equals(t.getLAW002())) {
-						vo.setLAW002("Y");
-					}
-					if ("1".equals(t.getLAW003())) {
-						vo.setLAW003("Y");
-					}
-					if ("1".equals(t.getLAW005())) {
-						vo.setLAW005("Y");
-					}
-					if ("1".equals(t.getLAW008())) {
-						vo.setLAW008("Y");
-					}
-				}
-			}
 
-			//因為是姓名完全比對,有吻合資料,即預判為Y
-			if (lBankRelationSuspected != null) {
+		}
+		if (lBankRelationFamily != null) {
+			for (BankRelationFamily t : lBankRelationFamily) {
 				if ("".equals(vo.getDataDate())) {
-					for (BankRelationFamily t : lBankRelationFamily) {
-						vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
-					}
+					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
 				}
-				vo.setIsFinancial("Y");
+				if ("1".equals(t.getLAW001())) {
+					vo.setLAW001("Y");
+				}
+				if ("1".equals(t.getLAW002())) {
+					vo.setLAW002("Y");
+				}
+				if ("1".equals(t.getLAW003())) {
+					vo.setLAW003("Y");
+				}
+				if ("1".equals(t.getLAW005())) {
+					vo.setLAW005("Y");
+				}
+				if ("1".equals(t.getLAW008())) {
+					vo.setLAW008("Y");
+				}
 			}
 		}
+		// 因為是姓名完全比對,有吻合資料,即預判為Y
+		if (lBankRelationSuspected != null) {
+			if ("".equals(vo.getDataDate())) {
+				for (BankRelationSuspected t : lBankRelationSuspected) {
+					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
+				}
+			}
+			vo.setIsFinancial("Y");
+		}
+		
 		// 是否為15日薪員工
 		CdEmp tCdEmp = cdEmpService.findAgentIdFirst(iCustId, titaVo);
 
@@ -213,6 +221,7 @@ public class BankRelationCom extends TradeBuffer {
 				for (BankRelationFamily t : lBankRelationFamily) {
 					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
 				}
+
 			}
 		}
 
@@ -225,11 +234,11 @@ public class BankRelationCom extends TradeBuffer {
 				}
 			}
 		}
-		
-		if ("".equals(vo.getDataDate().trim())) {
-			vo.setDataDate(String.valueOf(titaVo.getEntDyI()));
-		}
-		
+
+		// if ("".equals(vo.getDataDate().trim())) {
+		vo.setDataDate(String.valueOf(titaVo.getEntDyI()));
+		// }
+
 		logger.info(iCustId + " BankRelationVo=" + vo.toString());
 
 		return vo;

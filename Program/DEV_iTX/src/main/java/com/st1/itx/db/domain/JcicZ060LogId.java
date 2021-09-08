@@ -2,8 +2,10 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
+
 
 /**
  * JcicZ060Log 債務人繳款資料檔案<br>

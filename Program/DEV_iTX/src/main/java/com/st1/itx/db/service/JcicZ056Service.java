@@ -44,7 +44,7 @@ public interface JcicZ056Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ056 JcicZ056 of List
    */
-  public Slice<JcicZ056> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ056> custIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * ClaimDate=
@@ -55,7 +55,7 @@ public interface JcicZ056Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ056 JcicZ056 of List
    */
-  public Slice<JcicZ056> ClaimDateEq(int claimDate_0, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ056> claimDateEq(int claimDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustId= , AND ClaimDate=
@@ -67,7 +67,7 @@ public interface JcicZ056Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ056 JcicZ056 of List
    */
-  public Slice<JcicZ056> CustRcEq(String custId_0, int claimDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ056> custRcEq(String custId_0, int claimDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * SubmitKey= , AND CustId= , AND ClaimDate= , AND CourtCode=
@@ -81,7 +81,7 @@ public interface JcicZ056Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ056 JcicZ056 of List
    */
-  public Slice<JcicZ056> CheckCaseStatus(String submitKey_0, String custId_1, int claimDate_2, String courtCode_3, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ056> checkCaseStatus(String submitKey_0, String custId_1, int claimDate_2, String courtCode_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * SubmitKey= , AND CustId= , AND CaseStatus= , AND ClaimDate= , AND CourtCode=

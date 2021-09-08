@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4040ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -61,10 +58,10 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4040.findAll");
+		this.info("L4040.findAll");
 
 		String sql = "";
-		String status = "";
+		String searchstatus = "";
 		String searchMediaCode = "";
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iPropDate = parse.stringToInteger(titaVo.getParam("PropDate"));
@@ -75,40 +72,40 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iPropDate = iPropDate + 19110000;
 		}
 
-		switch (iFunctionCode) {
 		// 1. 篩選 2.重新授權 3.取消
-		case 1:
+		switch (iFunctionCode) {
+		case 1: // 篩選資料
 			switch (iCreateFlag) {
-			case 1:
-				status = "' '";
+			case 1: // 新增授權
+				searchstatus = " in (' ')";
 				searchMediaCode = " is null ";
 				break;
-			case 2:
-				status = "'1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','Z'";
+			case 2: // 再次授權
+				searchstatus = " not in (' ','0')";
 				searchMediaCode = " = 'Y' ";
 				break;
-			case 3:
-				status = "'0'";
+			case 3: // 取消授權
+				searchstatus = " in '0'";
 				searchMediaCode = " = 'Y' ";
 				break;
 			}
 			break;
-		// 產出媒體
-		case 2:
-			status = "' ','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F','G','H','I','Z'";
+		case 2:// 產出媒體
+			searchstatus = " in (' ')";
+			searchMediaCode = " is null ";
 			break;
-		// 重製媒體碼
-		case 3:
-			status = "' '";
+
+		case 3:// 重製媒體碼
+			searchstatus = " in (' ')";
 			searchMediaCode = " = 'Y' ";
 			break;
 		}
-		logger.info("status = " + status);
-		logger.info("searchMediaCode = " + searchMediaCode);
-		logger.info("iCustNo = " + iCustNo);
-		logger.info("iPropDate = " + iPropDate);
-		logger.info("iFunctionCode = " + iFunctionCode);
-		logger.info("iCreateFlag = " + iCreateFlag);
+		this.info("searchstatus = " + searchstatus);
+		this.info("searchMediaCode = " + searchMediaCode);
+		this.info("iCustNo = " + iCustNo);
+		this.info("iPropDate = " + iPropDate);
+		this.info("iFunctionCode = " + iFunctionCode);
+		this.info("iCreateFlag = " + iCreateFlag);
 
 		sql += " select                                     ";
 		sql += "    c.\"CustId\"               as F0        ";
@@ -164,11 +161,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) a                                        ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = a.\"CustNo\" ";
 		sql += " where a.seq = 1                            ";
-		sql += "   and a.\"AuthStatus\" in ( " + status + " ) ";
-		sql += "   and a.\"CreateFlag\" != 'Z'              ";
-		if (iCreateFlag == 3) {
-			sql += "   and a.\"CreateFlag\" != 'D'              ";
-		}
+		sql += "   and a.\"AuthStatus\" " + searchstatus;
 		switch (iFunctionCode) {
 		case 1:
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
@@ -199,14 +192,14 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		 產出媒體       -> 提出日+狀態s
 //		 重製媒體碼   -> 提出日+狀態+媒體碼
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -219,7 +212,7 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

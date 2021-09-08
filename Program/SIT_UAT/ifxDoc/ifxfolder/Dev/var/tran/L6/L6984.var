@@ -158,7 +158,8 @@ T(2,#OOCustNo+－+#OOFacmNo)
 
 ! 登放序號
 #OORelNo=X,22,L
-
+C(3,#OORelNo,0,S,$)
+#OORelNoX=X,22,L
 ! 項目
 #OOItemCode=X,6,S
 
@@ -751,7 +752,7 @@ ifxBatch:{
 #OODrawdownAmt=撥款金額
 {width:150,align:'right'}
 
-#OORelNo=登放序號
+#OORelNoX=登放序號
 {width:150,align:'left'}
 
 #DTL_BTN=

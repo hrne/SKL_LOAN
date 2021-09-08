@@ -110,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ570> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ570> custIdEq(String custId_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ570> slice = null;
     if (titaVo.length != 0)
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustIdEq " + dbName + " : " + "custId_0 : " + custId_0);
+    this.info("custIdEq " + dbName + " : " + "custId_0 : " + custId_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ570ReposDay.findAllByCustIdIsOrderByCustIdAscApplyDateDesc(custId_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -138,7 +138,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ570> RcDateEq(int applyDate_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ570> rcDateEq(int applyDate_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ570> slice = null;
     if (titaVo.length != 0)
@@ -149,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("RcDateEq " + dbName + " : " + "applyDate_0 : " + applyDate_0);
+    this.info("rcDateEq " + dbName + " : " + "applyDate_0 : " + applyDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ570ReposDay.findAllByApplyDateIsOrderByCustIdAscApplyDateDesc(applyDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -166,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ570> CustRcEq(String custId_0, int applyDate_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ570> custRcEq(String custId_0, int applyDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ570> slice = null;
     if (titaVo.length != 0)
@@ -177,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " +  applyDate_1);
+    this.info("custRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " applyDate_1 : " +  applyDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ570ReposDay.findAllByCustIdIsAndApplyDateIsOrderByCustIdAscApplyDateDesc(custId_0, applyDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -257,6 +257,846 @@ em = null;
       jcicZ570T = jcicZ570Repos.findTopByCustIdIsAndApplyDateIsAndSubmitKeyIsOrderByCreateDateDesc(custId_0, applyDate_1, submitKey_2);
 
     return jcicZ570T.isPresent() ? jcicZ570T.get() : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank1(String custId_0, String bank1_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank1 " + dbName + " : " + "custId_0 : " + custId_0 + " bank1_1 : " +  bank1_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank1Is(custId_0, bank1_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank1Is(custId_0, bank1_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank1Is(custId_0, bank1_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank1Is(custId_0, bank1_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank2(String custId_0, String bank2_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank2 " + dbName + " : " + "custId_0 : " + custId_0 + " bank2_1 : " +  bank2_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank2Is(custId_0, bank2_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank2Is(custId_0, bank2_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank2Is(custId_0, bank2_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank2Is(custId_0, bank2_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank3(String custId_0, String bank3_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank3 " + dbName + " : " + "custId_0 : " + custId_0 + " bank3_1 : " +  bank3_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank3Is(custId_0, bank3_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank3Is(custId_0, bank3_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank3Is(custId_0, bank3_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank3Is(custId_0, bank3_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank4(String custId_0, String bank4_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank4 " + dbName + " : " + "custId_0 : " + custId_0 + " bank4_1 : " +  bank4_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank4Is(custId_0, bank4_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank4Is(custId_0, bank4_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank4Is(custId_0, bank4_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank4Is(custId_0, bank4_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank5(String custId_0, String bank5_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank5 " + dbName + " : " + "custId_0 : " + custId_0 + " bank5_1 : " +  bank5_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank5Is(custId_0, bank5_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank5Is(custId_0, bank5_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank5Is(custId_0, bank5_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank5Is(custId_0, bank5_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank6(String custId_0, String bank6_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank6 " + dbName + " : " + "custId_0 : " + custId_0 + " bank6_1 : " +  bank6_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank6Is(custId_0, bank6_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank6Is(custId_0, bank6_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank6Is(custId_0, bank6_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank6Is(custId_0, bank6_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank7(String custId_0, String bank7_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank7 " + dbName + " : " + "custId_0 : " + custId_0 + " bank7_1 : " +  bank7_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank7Is(custId_0, bank7_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank7Is(custId_0, bank7_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank7Is(custId_0, bank7_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank7Is(custId_0, bank7_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank8(String custId_0, String bank8_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank8 " + dbName + " : " + "custId_0 : " + custId_0 + " bank8_1 : " +  bank8_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank8Is(custId_0, bank8_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank8Is(custId_0, bank8_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank8Is(custId_0, bank8_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank8Is(custId_0, bank8_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank9(String custId_0, String bank9_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank9 " + dbName + " : " + "custId_0 : " + custId_0 + " bank9_1 : " +  bank9_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank9Is(custId_0, bank9_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank9Is(custId_0, bank9_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank9Is(custId_0, bank9_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank9Is(custId_0, bank9_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank10(String custId_0, String bank10_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank10 " + dbName + " : " + "custId_0 : " + custId_0 + " bank10_1 : " +  bank10_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank10Is(custId_0, bank10_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank10Is(custId_0, bank10_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank10Is(custId_0, bank10_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank10Is(custId_0, bank10_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank11(String custId_0, String bank11_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank11 " + dbName + " : " + "custId_0 : " + custId_0 + " bank11_1 : " +  bank11_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank11Is(custId_0, bank11_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank11Is(custId_0, bank11_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank11Is(custId_0, bank11_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank11Is(custId_0, bank11_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank12(String custId_0, String bank12_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank12 " + dbName + " : " + "custId_0 : " + custId_0 + " bank12_1 : " +  bank12_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank12Is(custId_0, bank12_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank12Is(custId_0, bank12_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank12Is(custId_0, bank12_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank12Is(custId_0, bank12_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank13(String custId_0, String bank13_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank13 " + dbName + " : " + "custId_0 : " + custId_0 + " bank13_1 : " +  bank13_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank13Is(custId_0, bank13_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank13Is(custId_0, bank13_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank13Is(custId_0, bank13_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank13Is(custId_0, bank13_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank14(String custId_0, String bank14_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank14 " + dbName + " : " + "custId_0 : " + custId_0 + " bank14_1 : " +  bank14_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank14Is(custId_0, bank14_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank14Is(custId_0, bank14_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank14Is(custId_0, bank14_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank14Is(custId_0, bank14_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank15(String custId_0, String bank15_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank15 " + dbName + " : " + "custId_0 : " + custId_0 + " bank15_1 : " +  bank15_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank15Is(custId_0, bank15_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank15Is(custId_0, bank15_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank15Is(custId_0, bank15_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank15Is(custId_0, bank15_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank16(String custId_0, String bank16_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank16 " + dbName + " : " + "custId_0 : " + custId_0 + " bank16_1 : " +  bank16_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank16Is(custId_0, bank16_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank16Is(custId_0, bank16_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank16Is(custId_0, bank16_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank16Is(custId_0, bank16_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank17(String custId_0, String bank17_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank17 " + dbName + " : " + "custId_0 : " + custId_0 + " bank17_1 : " +  bank17_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank17Is(custId_0, bank17_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank17Is(custId_0, bank17_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank17Is(custId_0, bank17_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank17Is(custId_0, bank17_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank18(String custId_0, String bank18_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank18 " + dbName + " : " + "custId_0 : " + custId_0 + " bank18_1 : " +  bank18_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank18Is(custId_0, bank18_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank18Is(custId_0, bank18_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank18Is(custId_0, bank18_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank18Is(custId_0, bank18_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank19(String custId_0, String bank19_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank19 " + dbName + " : " + "custId_0 : " + custId_0 + " bank19_1 : " +  bank19_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank19Is(custId_0, bank19_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank19Is(custId_0, bank19_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank19Is(custId_0, bank19_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank19Is(custId_0, bank19_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank20(String custId_0, String bank20_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank20 " + dbName + " : " + "custId_0 : " + custId_0 + " bank20_1 : " +  bank20_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank20Is(custId_0, bank20_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank20Is(custId_0, bank20_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank20Is(custId_0, bank20_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank20Is(custId_0, bank20_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank21(String custId_0, String bank21_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank21 " + dbName + " : " + "custId_0 : " + custId_0 + " bank21_1 : " +  bank21_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank21Is(custId_0, bank21_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank21Is(custId_0, bank21_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank21Is(custId_0, bank21_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank21Is(custId_0, bank21_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank22(String custId_0, String bank22_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank22 " + dbName + " : " + "custId_0 : " + custId_0 + " bank22_1 : " +  bank22_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank22Is(custId_0, bank22_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank22Is(custId_0, bank22_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank22Is(custId_0, bank22_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank22Is(custId_0, bank22_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank23(String custId_0, String bank23_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank23 " + dbName + " : " + "custId_0 : " + custId_0 + " bank23_1 : " +  bank23_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank23Is(custId_0, bank23_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank23Is(custId_0, bank23_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank23Is(custId_0, bank23_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank23Is(custId_0, bank23_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank24(String custId_0, String bank24_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank24 " + dbName + " : " + "custId_0 : " + custId_0 + " bank24_1 : " +  bank24_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank24Is(custId_0, bank24_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank24Is(custId_0, bank24_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank24Is(custId_0, bank24_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank24Is(custId_0, bank24_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank25(String custId_0, String bank25_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank25 " + dbName + " : " + "custId_0 : " + custId_0 + " bank25_1 : " +  bank25_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank25Is(custId_0, bank25_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank25Is(custId_0, bank25_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank25Is(custId_0, bank25_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank25Is(custId_0, bank25_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank26(String custId_0, String bank26_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank26 " + dbName + " : " + "custId_0 : " + custId_0 + " bank26_1 : " +  bank26_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank26Is(custId_0, bank26_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank26Is(custId_0, bank26_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank26Is(custId_0, bank26_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank26Is(custId_0, bank26_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank27(String custId_0, String bank27_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank27 " + dbName + " : " + "custId_0 : " + custId_0 + " bank27_1 : " +  bank27_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank27Is(custId_0, bank27_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank27Is(custId_0, bank27_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank27Is(custId_0, bank27_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank27Is(custId_0, bank27_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank28(String custId_0, String bank28_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank28 " + dbName + " : " + "custId_0 : " + custId_0 + " bank28_1 : " +  bank28_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank28Is(custId_0, bank28_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank28Is(custId_0, bank28_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank28Is(custId_0, bank28_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank28Is(custId_0, bank28_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank29(String custId_0, String bank29_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank29 " + dbName + " : " + "custId_0 : " + custId_0 + " bank29_1 : " +  bank29_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank29Is(custId_0, bank29_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank29Is(custId_0, bank29_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank29Is(custId_0, bank29_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank29Is(custId_0, bank29_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<JcicZ570> findByBank30(String custId_0, String bank30_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<JcicZ570> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByBank30 " + dbName + " : " + "custId_0 : " + custId_0 + " bank30_1 : " +  bank30_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = jcicZ570ReposDay.findAllByCustIdIsAndBank30Is(custId_0, bank30_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = jcicZ570ReposMon.findAllByCustIdIsAndBank30Is(custId_0, bank30_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = jcicZ570ReposHist.findAllByCustIdIsAndBank30Is(custId_0, bank30_1, pageable);
+    else 
+      slice = jcicZ570Repos.findAllByCustIdIsAndBank30Is(custId_0, bank30_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override

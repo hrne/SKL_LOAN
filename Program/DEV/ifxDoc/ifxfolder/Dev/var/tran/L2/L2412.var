@@ -56,6 +56,58 @@ E(0,40)ASGN(INQPRT$)
 #BTN4=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
 #BtnExpand=X,4,I,ui:button;value:展開;enable:1;tabbable:0
 
+#MtgAllbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgAllbtn,click, {cmd=CALLSEND;DOCODE=MtgAllProc})
+
+#MtgCheckbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgCheckbtn,click, {cmd=CALLSEND;DOCODE=MtgCheckProc})
+
+#MtgLoanbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgLoanbtn,click, {cmd=CALLSEND;DOCODE=MtgLoanProc})
+
+#MtgPledgebtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgPledgebtn,click, {cmd=CALLSEND;DOCODE=MtgPledgeProc})
+
+#MtgAllProc=@,1,S
+C(5,#MtgAllbtn,V,C(5,#MtgCheckbtn,V,C(5,#MtgLoanbtn,C(5,#MtgPledgebtn,V,s,$),$),$),$)
+T(3,@MtgAllbtn,V)T(3,@MtgCheckbtn,V)T(3,@MtgLoanbtn,V)T(3,@MtgPledgebtn,V)T(3,@MtgCheck,Y)T(3,@MtgLoan,Y)T(3,@MtgPledge,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgCheckProc=@,1,S
+C(5,#MtgCheckbtn,V,C(4,#MtgLoanbtn,C(4,#MtgPledgebtn,s,$),$),$)
+C(5,#MtgCheckbtn,V,T(3,@MtgCheckbtn, )T(3,@MtgAllbtn, )T(3,@MtgCheck,N),T(3,@MtgCheckbtn,V)T(3,@MtgCheck,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgLoanProc=@,1,S
+C(5,#MtgLoanbtn,V,C(4,#MtgCheckbtn,C(4,#MtgPledgebtn,s,$),$),$)
+C(5,#MtgLoanbtn,V,T(3,@MtgLoanbtn, )T(3,@MtgAllbtn, )T(3,@MtgLoan,N),T(3,@MtgLoanbtn,V)T(3,@MtgLoan,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgPledgeProc=@,1,S
+C(5,#MtgPledgebtn,V,C(4,#MtgCheckbtn,C(4,#MtgLoanbtn,s,$),$),$)
+C(5,#MtgPledgebtn,V,T(3,@MtgPledgebtn, )T(3,@MtgAllbtn, )T(3,@MtgPledge,N),T(3,@MtgPledgebtn,V)T(3,@MtgPledge,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgAllBind=X,1,S
+BIND(#MtgAllbtn,click, {cmd=CALLSEND;DOCODE=MtgAllProc})
+
+#MtgCheckBind=X,1,S
+BIND(#MtgCheckbtn,click, {cmd=CALLSEND;DOCODE=MtgCheckProc})
+
+#MtgLoanBind=X,1,S
+BIND(#MtgLoanbtn,click, {cmd=CALLSEND;DOCODE=MtgLoanProc})
+
+#MtgPledgeBind=X,1,S
+BIND(#MtgPledgebtn,click, {cmd=CALLSEND;DOCODE=MtgPledgeProc})
+
 #BIND_1=X,1,S
 BIND(#Btn1,click, {cmd=CALLSEND;DOCODE=Show1})
 
@@ -460,7 +512,6 @@ T(3,@FdVALUE_DT,*)
 T(3,@FdVALUE_TOTAL,*)
 T(3,@FdINSU_IND,*)
 T(3,@FdMORTGAGE,*)
-T(3,@FdCOL_STATUS,*)
 T(3,@FdClStat,*)
 T(3,@FdSettingStat,*)
 T(3,@FdLOAN_PER,*)
@@ -763,16 +814,18 @@ T(2,@OwnerName,#L1r09CustName)
 !所有權人姓名
 #OwnerName=x,2.50,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(4,#L1r09CustName,$,s)
 @V(7)
 
-
+#OwnerCHECK=X,1,S
 C(4,#CustId,s,$)
-C(5,#OwnerId,#CustId,INVOKEJS(SHOW,p2,2,2,0)T(2,@OwnerRelCode,  ),INVOKEJS(SHOW,p2,2,2,1))
+C(5,#OwnerId,#CustId,T(2,@OwnerRelCode,  )INVOKEJS(SHOW,p2,2,2,0),INVOKEJS(SHOW,p2,2,2,1))
 
 !與授信戶關係
 #OwnerRelCode=X,2,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(4,#OwnerId,S,$)
 C(4,#CustId,S,$)
 C(5,#OwnerId,#CustId,S,$)
@@ -787,60 +840,68 @@ T(H,#OwnerRelCode,#RelationCodeHelp)
 !鑑估日期
 #EvaDate=D,7,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 @V(7)A(4,0,#EvaDate)
 
 
 !鑑價總值
 #EvaAmt=m,14,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 @V(2,0)
 
 
 ! 耐用年限
 #ServiceLife=X,2,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 @IF(#ServiceLife=="",S,V(9))
 
 
 ! 形式/規格
 #ProductSpec=x,20,I
 IF(#FunCd==4,s,$)
-
+IF(#PageFg==1,$,CALL(#Show1))
 
 ! 產品代號/型號
 #ProductType=x,10,I
 IF(#FunCd==4,s,$)
-
+IF(#PageFg==1,$,CALL(#Show1))
 
 ! 品牌/廠牌/船名
 #ProductBrand=x,20,I
 IF(#FunCd==4,s,$)
-
+IF(#PageFg==1,$,CALL(#Show1))
 
 !排氣量
 #ProductCC=X,10,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 
 
 ! 顏色
 #ProductColor=x,10,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 
 ! 引擎號碼
 #EngineSN=X,50,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 
 ! 牌照號碼
 #LicenseNo=X,10,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 
 ! 牌照類別
 #LicenseTypeCode=X,1,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 HELP(#LicenseTypeHelp)
 @IF(#LicenseTypeCode=="",S,$)
@@ -853,6 +914,7 @@ T(3,)T(H,#LicenseTypeCode,#LicenseTypeHelp)
 ! 牌照用途
 #LicenseUsageCode=X,1,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 HELP(#LicenseUsageHelp)
 @IF(#LicenseUsageCode=="",S,$)
@@ -865,6 +927,7 @@ T(3,)T(H,#LicenseUsageCode,#LicenseUsageHelp)
 ! 發照日期
 #LiceneIssueDate=D,7,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 @A(4,0,#LiceneIssueDate)
 
@@ -874,6 +937,7 @@ C(3,#ClCode2,02,S,$)
 ! 製造年月
 #MfgYearMonth=X,5,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 @IF(#MfgYearMonth=="",S,$)
 V(9)
@@ -884,6 +948,7 @@ IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月,格式yyyMM),$)
 ! 車別
 #VehicleTypeCode=X,2,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 HELP(#VehicleTypeHelp)
 @IF(#VehicleTypeCode=="",S,$)
@@ -896,6 +961,7 @@ C(4,#VehicleTypeCode,S,$)T(H,#VehicleTypeCode,#VehicleTypeHelp)
 ! 車身樣式
 #VehicleStyleCode=X,2,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 HELP(#VehicleStyleHelp)
 @IF(#VehicleStyleCode=="",S,$)
@@ -908,6 +974,7 @@ C(4,#VehicleStyleCode,S,$)T(H,#VehicleStyleCode,#VehicleStyleHelp)
 ! 監理處所
 #VehicleOfficeCode=X,3,I
 IF(#FunCd==4,s,$)
+IF(#PageFg==1,$,CALL(#Show1))
 C(3,#ClCode2,02,S,$)
 HELP(#VehicleOfficeHelp)
 @IF(#VehicleOfficeCode=="",S,$)
@@ -922,17 +989,18 @@ C(4,#VehicleOfficeCode,S,$)T(H,#VehicleOfficeCode,#VehicleOfficeHelp)
 T(3,TWD)
 IF(#FunCd==4,s,$)
 IF(#PageFg==1,$,CALL(#Show1))
-
+IF(#Currency=="TWD",T(F,@ExchangeRate,0),T(F,@ExchangeRate,1))
 
 #CurrencyX=X,10,L
 C(4,#Currency,S,$)
 T(H,#Currency,#CurrencyHelp)
 
 ! 匯率
-#ExchangeRate=m,3.5,I
+#ExchangeRate=m,3.5,L
 IF(#FunCd==4,s,$)
 IF(#PageFg==1,$,CALL(#Show1))
 IF(#Currency=="TWD",E(0,1),$)
+!IF(#Currency=="TWD",s,$)
 
 #TMP_EX_RATE=m,3.2,S
 
@@ -954,11 +1022,6 @@ IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 @V(2,0)
 
-
-!殘值
-#ScrapValue=m,14,I
-IF(#FunCd==4,s,$)
-
 !抵押權註記
 #MtgCode=A,1,I
 IF(#PageFg==2,$,CALL(#Show2))
@@ -975,40 +1038,6 @@ C(3,#MtgCode,0,ENABLE(#MtgAllbtn)ENABLE(#MtgCheckbtn)ENABLE(#MtgLoanbtn)ENABLE(#
 #MORTGAGE_X=X,25,L
 T(3,)T(H,#MtgCode,#MtgCodeHelp)
 
-#MtgAllbtn=X,1,I,ui:button;value: ;enable:1;tabbable:1
-IF(#FunCd==4,s,$)
-IF(#PageFg==2,$,CALL(#Show2))
-C(3,#MtgCode,0,$,S)
-BIND(#MtgAllbtn,click, {cmd=CALLSEND;DOCODE=MtgAllProc})
-
-#MtgCheckbtn=X,1,I,ui:button;value: ;enable:1;tabbable:1
-IF(#FunCd==4,s,$)
-IF(#PageFg==2,$,CALL(#Show2))
-C(3,#MtgCode,0,$,S)
-BIND(#MtgCheckbtn,click, {cmd=CALLSEND;DOCODE=MtgCheckProc})
-
-#MtgLoanbtn=X,1,I,ui:button;value: ;enable:1;tabbable:1
-IF(#FunCd==4,s,$)
-IF(#PageFg==2,$,CALL(#Show2))
-C(3,#MtgCode,0,$,S)
-BIND(#MtgLoanbtn,click, {cmd=CALLSEND;DOCODE=MtgLoanProc})
-
-#MtgPledgebtn=X,1,I,ui:button;value: ;enable:1;tabbable:1
-IF(#FunCd==4,s,$)
-IF(#PageFg==2,$,CALL(#Show2))
-C(3,#MtgCode,0,$,S)
-BIND(#MtgPledgebtn,click, {cmd=CALLSEND;DOCODE=MtgPledgeProc})
-@C(4,#MtgCheckbtn,C(4,#MtgLoanbtn,C(4,#MtgPledgebtn,V(P,最高限額抵押權之擔保債權種類最少要選擇1個),$),$),$)
-
-#MtgAllProc=@,1,S
-C(5,#MtgAllbtn,V,T(3,@MtgAllbtn, )T(3,@MtgCheckbtn, )T(3,@MtgLoanbtn, )T(3,@MtgPledgebtn, )T(3,@MtgCheck,N)T(3,@MtgLoan,N)T(3,@MtgPledge,N),
-T(3,@MtgAllbtn,V)T(3,@MtgCheckbtn,V)T(3,@MtgLoanbtn,V)T(3,@MtgPledgebtn,V)T(3,@MtgCheck,Y)T(3,@MtgLoan,Y)T(3,@MtgPledge,Y))
-#MtgCheckProc=@,1,S
-C(5,#MtgCheckbtn,V,T(3,@MtgCheckbtn, )T(3,@MtgAllbtn, )T(3,@MtgCheck,N),T(3,@MtgCheckbtn,V)T(3,@MtgCheck,Y))
-#MtgLoanProc=@,1,S
-C(5,#MtgLoanbtn,V,T(3,@MtgLoanbtn, )T(3,@MtgAllbtn, )T(3,@MtgLoan,N),T(3,@MtgLoanbtn,V)T(3,@MtgLoan,Y))
-#MtgPledgeProc=@,1,S
-C(5,#MtgPledgebtn,V,T(3,@MtgPledgebtn, )T(3,@MtgAllbtn, )T(3,@MtgPledge,N),T(3,@MtgPledgebtn,V)T(3,@MtgPledge,Y))
 
 #MtgAllfg=X,1,L
 #MtgCheckfg=X,1,L
@@ -1019,7 +1048,9 @@ C(5,#MtgPledgebtn,V,T(3,@MtgPledgebtn, )T(3,@MtgAllbtn, )T(3,@MtgPledge,N),T(3,@
 #MtgLoan=X,1,S
 #MtgPledge=X,1,S
 
-
+!殘值
+#ScrapValue=m,14,I
+IF(#FunCd==4,s,$)
 
 
 !聯貸案
@@ -1185,8 +1216,8 @@ E(0,1)
 [
 ["抵押"],
 ["#FdINSU_IND+投保註記",#Insurance,#INSU_IND_X],["#FdLOAN_PER+貸放成數",#LoanToValue,"%"],
-[#<->#,"#FdScrapValue+殘值",#ScrapValue],
 ["#FdMORTGAGE+抵押權註記",#MtgCode,#MORTGAGE_X],["#FdKind+最高限額抵押權之擔保債權種類",#MtgAllfg,#MtgAllbtn,"全選",#MtgCheckfg,#MtgCheckbtn,"票據",#MtgLoanfg,#MtgLoanbtn,"借款",#MtgPledgefg,#MtgPledgebtn,"保證債務"],
+[#<->#,"#FdScrapValue+殘值",#ScrapValue],
 ]
 </sub>
 

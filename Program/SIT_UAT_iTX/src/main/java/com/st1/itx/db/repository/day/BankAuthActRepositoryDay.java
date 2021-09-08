@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,19 +21,20 @@ import com.st1.itx.db.domain.BankAuthActId;
  */
 public interface BankAuthActRepositoryDay extends JpaRepository<BankAuthAct, BankAuthActId> {
 
-  // CustNo = , AND RepayAcct = , AND FacmNo >=, AND FacmNo <= 
-  public Slice<BankAuthAct> findAllByCustNoIsAndRepayAcctIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByFacmNoAsc(int custNo_0, String repayAcct_1, int facmNo_2, int facmNo_3, Pageable pageable);
+	// CustNo = , AND RepayAcct = , AND FacmNo >=, AND FacmNo <=
+	public Slice<BankAuthAct> findAllByCustNoIsAndRepayAcctIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByFacmNoAsc(int custNo_0, String repayAcct_1, int facmNo_2, int facmNo_3,
+			Pageable pageable);
 
-  // CustNo = , AND FacmNo = 
-  public Slice<BankAuthAct> findAllByCustNoIsAndFacmNoIs(int custNo_0, int facmNo_1, Pageable pageable);
+	// CustNo = , AND FacmNo =
+	public Slice<BankAuthAct> findAllByCustNoIsAndFacmNoIs(int custNo_0, int facmNo_1, Pageable pageable);
 
-  // CustNo = , AND RepayAcct = , AND RepayBank = , AND FacmNo >=, AND FacmNo <= 
-  public Slice<BankAuthAct> findAllByCustNoIsAndRepayAcctIsAndRepayBankIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByFacmNoAsc(int custNo_0, String repayAcct_1, String repayBank_2, int facmNo_3, int facmNo_4, Pageable pageable);
+	// CustNo = , AND RepayAcct = , AND RepayBank = , AND FacmNo >=, AND FacmNo <=
+	public Slice<BankAuthAct> findAllByCustNoIsAndRepayAcctIsAndRepayBankIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualOrderByFacmNoAsc(int custNo_0, String repayAcct_1, String repayBank_2,
+			int facmNo_3, int facmNo_4, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<BankAuthAct> findByBankAuthActId(BankAuthActId bankAuthActId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<BankAuthAct> findByBankAuthActId(BankAuthActId bankAuthActId);
 
 }
-

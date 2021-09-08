@@ -110,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ056> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ056> custIdEq(String custId_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ056> slice = null;
     if (titaVo.length != 0)
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustIdEq " + dbName + " : " + "custId_0 : " + custId_0);
+    this.info("custIdEq " + dbName + " : " + "custId_0 : " + custId_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ056ReposDay.findAllByCustIdIsOrderByCustIdAscClaimDateDesc(custId_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -138,7 +138,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ056> ClaimDateEq(int claimDate_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ056> claimDateEq(int claimDate_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ056> slice = null;
     if (titaVo.length != 0)
@@ -149,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("ClaimDateEq " + dbName + " : " + "claimDate_0 : " + claimDate_0);
+    this.info("claimDateEq " + dbName + " : " + "claimDate_0 : " + claimDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ056ReposDay.findAllByClaimDateIsOrderByCustIdAscClaimDateDesc(claimDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -166,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ056> CustRcEq(String custId_0, int claimDate_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ056> custRcEq(String custId_0, int claimDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ056> slice = null;
     if (titaVo.length != 0)
@@ -177,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " claimDate_1 : " +  claimDate_1);
+    this.info("custRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " claimDate_1 : " +  claimDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ056ReposDay.findAllByCustIdIsAndClaimDateIsOrderByCustIdAscClaimDateDesc(custId_0, claimDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -194,7 +194,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ056> CheckCaseStatus(String submitKey_0, String custId_1, int claimDate_2, String courtCode_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ056> checkCaseStatus(String submitKey_0, String custId_1, int claimDate_2, String courtCode_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ056> slice = null;
     if (titaVo.length != 0)
@@ -205,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CheckCaseStatus " + dbName + " : " + "submitKey_0 : " + submitKey_0 + " custId_1 : " +  custId_1 + " claimDate_2 : " +  claimDate_2 + " courtCode_3 : " +  courtCode_3);
+    this.info("checkCaseStatus " + dbName + " : " + "submitKey_0 : " + submitKey_0 + " custId_1 : " +  custId_1 + " claimDate_2 : " +  claimDate_2 + " courtCode_3 : " +  courtCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ056ReposDay.findAllBySubmitKeyIsAndCustIdIsAndClaimDateIsAndCourtCodeIsOrderByCustIdAscClaimDateDescCaseStatusAsc(submitKey_0, custId_1, claimDate_2, courtCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))

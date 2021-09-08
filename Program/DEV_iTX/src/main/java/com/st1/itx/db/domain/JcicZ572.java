@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -29,7 +30,7 @@ public class JcicZ572 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2738442814254437372L;
+	private static final long serialVersionUID = 1L;
 
 @EmbeddedId
   private JcicZ572Id jcicZ572Id;

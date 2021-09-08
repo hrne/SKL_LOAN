@@ -384,11 +384,11 @@ public class LP003Report extends MakeReport {
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
 
-				BigDecimal gamt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
+				BigDecimal gamt = tLDVo.get("F4") == null || tLDVo.get("F4").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F4"));
-				BigDecimal tmpCnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F5") == null || tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal tmpAmt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F6") == null || tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F6"));
 
 				if (!deptcode.equals(tLDVo.get("F7"))) {
@@ -620,17 +620,21 @@ public class LP003Report extends MakeReport {
 			// 是否 產資料至 前工作月累計 欄位
 			boolean firstCreate = true;
 
+			BigDecimal rank = BigDecimal.ZERO;
+
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
 
-				BigDecimal gamt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal gamt = tLDVo.get("F5") == null || tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal tmpCnt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F6") == null || tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F6"));
-				BigDecimal tmpAmt = tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F7") == null || tLDVo.get("F7").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F7"));
 
 				if (!deptcode.equals(tLDVo.get("F8"))) {
+
+					rank = getBigDecimal(tLDVo.get("F0"));
 
 					// 部室代號
 					deptcode = tLDVo.get("F8");
@@ -760,19 +764,21 @@ public class LP003Report extends MakeReport {
 			for (Map<String, String> tLDVo : findList) {
 //				this.info("list" + tLDVo);
 
-				BigDecimal gamt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
+				BigDecimal gamt = tLDVo.get("F5") == null || tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal tmpCnt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpCnt = tLDVo.get("F6") == null || tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F6"));
-				BigDecimal tmpAmt = tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? BigDecimal.ZERO
+				BigDecimal tmpAmt = tLDVo.get("F7") == null || tLDVo.get("F7").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F7"));
 
 				if (!deptcode.equals(tLDVo.get("F8"))) {
 
+					String thisRank = rank.add(getBigDecimal(tLDVo.get("F0"))).toString();
+
 					// 部室代號
 					deptcode = tLDVo.get("F8");
 					// 排行
-					makeExcel.setValue(sRow, 1, "");
+					makeExcel.setValue(sRow, 1, thisRank);
 					// 部室
 					makeExcel.setValue(sRow, 2, tLDVo.get("F1"));
 					// 區部
@@ -955,6 +961,7 @@ public class LP003Report extends MakeReport {
 			this.info("LP003ServiceImpl.findEmp error = " + errors.toString());
 		}
 
+		// 房貸部專業績統計報表
 		makeExcel.setSheet("Sheet2");
 
 		// 標題
@@ -966,21 +973,14 @@ public class LP003Report extends MakeReport {
 			// 起始列
 			sRow = 4;
 
-//			makeExcel.setShiftRow(sRow, findList.size() - 1);
+			makeExcel.setShiftRow(sRow + 1, findList.size() - 1);
+
+			// 合計-房貸責任額
+			BigDecimal targetTotal = BigDecimal.ZERO;
+			BigDecimal drawdownTotal = BigDecimal.ZERO;
+			BigDecimal countTotal = BigDecimal.ZERO;
 
 			for (Map<String, String> tLDVo : findList) {
-
-				BigDecimal gamt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F4"));
-
-				BigDecimal tmpAmt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F5"));
-
-				BigDecimal tmpCnt = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F6"));
-
-				BigDecimal percent = tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F7"));
 
 				// 排行
 				makeExcel.setValue(sRow, 1, tLDVo.get("F0"), "C");
@@ -990,14 +990,26 @@ public class LP003Report extends MakeReport {
 				makeExcel.setValue(sRow, 3, tLDVo.get("F2"), "C");
 				// 電腦編號
 				makeExcel.setValue(sRow, 4, tLDVo.get("F3"), "C");
+
 				// 房貸責任額
-				makeExcel.setValue(sRow, 5, gamt, "#,##0");
+				BigDecimal targetAmt = getBigDecimal(tLDVo.get("F4"));
+				makeExcel.setValue(sRow, 5, targetAmt, "#,##0");
+				targetTotal = targetTotal.add(targetAmt);
+
 				// 房貸撥款金額
-				makeExcel.setValue(sRow, 6, tmpAmt, "#,##0");
-				// 房貸撥款金額
-				makeExcel.setValue(sRow, 7, tmpCnt, "0.0");
+				BigDecimal drawdownAmt = getBigDecimal(tLDVo.get("F5"));
+				makeExcel.setValue(sRow, 6, drawdownAmt, "#,##0");
+				drawdownTotal = drawdownTotal.add(drawdownAmt);
+
+				// 房貸件數
+				BigDecimal count = getBigDecimal(tLDVo.get("F6"));
+				makeExcel.setValue(sRow, 7, count, "0.0");
+				countTotal = countTotal.add(count);
+
 				// 達成率
+				BigDecimal percent = getBigDecimal(tLDVo.get("F7"));
 				makeExcel.setValue(sRow, 8, percent, "0.00");
+
 				// 服務部室
 				makeExcel.setValue(sRow, 9, tLDVo.get("F8"), "C");
 
@@ -1005,6 +1017,14 @@ public class LP003Report extends MakeReport {
 				sRow++;
 
 			}
+
+			// 印合計
+			// 合計-房貸責任額
+			makeExcel.setValue(sRow, 5, targetTotal, "#,##0");
+			// 合計-房貸撥款金額
+			makeExcel.setValue(sRow, 6, drawdownTotal, "#,##0");
+			// 合計-房貸件數
+			makeExcel.setValue(sRow, 7, countTotal, "0.0");
 
 		} else {
 			makeExcel.setValue(4, 1, "本日無資料");
@@ -1041,6 +1061,7 @@ public class LP003Report extends MakeReport {
 			this.info("LP003ServiceImpl.findEmp error = " + errors.toString());
 		}
 
+		// 房貸專員業績統計報表
 		makeExcel.setSheet("Sheet1");
 
 		// 標題
@@ -1052,71 +1073,86 @@ public class LP003Report extends MakeReport {
 
 			// 起始列
 			sRow = 4;
-//			int shiftRow = findListBS0.size() + findListBS1.size() - 1;
-//			makeExcel.setShiftRow(sRow, shiftRow);
+			int shiftRow = findListBS0.size() + findListBS1.size() - 1;
+			makeExcel.setShiftRow(sRow + 1, shiftRow);
 
+			BigDecimal rank = BigDecimal.ZERO;
+
+			// 合計-房貸責任額
+			BigDecimal targetTotal = BigDecimal.ZERO;
+			BigDecimal drawdownTotal = BigDecimal.ZERO;
+			BigDecimal countTotal = BigDecimal.ZERO;
 //			this.info("從" + sRow + "~" + shiftRow);
 			// 房貸專員
 			for (Map<String, String> tLDVo : findListBS0) {
 
-				BigDecimal gamt = tLDVo.get("F3") == null || tLDVo.get("F3").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F3"));
-				BigDecimal tmpAmt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F4"));
-				BigDecimal cnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal percent = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F6"));
-
 				// 排行
 				makeExcel.setValue(sRow, 1, tLDVo.get("F0"), "C");
+				rank = getBigDecimal(tLDVo.get("F0"));
+
 				// 姓名
 				makeExcel.setValue(sRow, 2, tLDVo.get("F1"), "C");
 				// 電腦編號
 				makeExcel.setValue(sRow, 3, tLDVo.get("F2"), "C");
+
 				// 房貸責任額
-				makeExcel.setValue(sRow, 4, gamt, "#,##0");
+				BigDecimal targetAmt = getBigDecimal(tLDVo.get("F3"));
+				makeExcel.setValue(sRow, 4, targetAmt, "#,##0");
+				targetTotal = targetTotal.add(targetAmt);
+
 				// 房貸撥款金額
-				makeExcel.setValue(sRow, 5, tmpAmt, "#,##0");
-				// 房貸撥款金額
-				makeExcel.setValue(sRow, 6, cnt, "0.0");
+				BigDecimal drawdonwAmt = getBigDecimal(tLDVo.get("F4"));
+				makeExcel.setValue(sRow, 5, drawdonwAmt, "#,##0");
+				drawdownTotal = drawdownTotal.add(drawdonwAmt);
+
+				// 房貸件數
+				BigDecimal count = getBigDecimal(tLDVo.get("F5"));
+				makeExcel.setValue(sRow, 6, count, "0.0");
+				countTotal = countTotal.add(count);
+
 				// 達成率
+				BigDecimal percent = getBigDecimal(tLDVo.get("F6"));
 				makeExcel.setValue(sRow, 7, percent, "0.00");
+
 				// 服務部室
 				makeExcel.setValue(sRow, 8, tLDVo.get("F7"), "C");
 				// 服務區部
 				makeExcel.setValue(sRow, 9, tLDVo.get("F8"), "C");
 
 				sRow++;
-
 			}
 
 			// 房貸部專
 			for (Map<String, String> tLDVo : findListBS1) {
 
-				BigDecimal gamt = tLDVo.get("F3") == null || tLDVo.get("F3").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F3"));
-				BigDecimal tmpAmt = tLDVo.get("F4") == null || tLDVo.get("F4").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F4"));
-				BigDecimal cnt = tLDVo.get("F5") == null || tLDVo.get("F5").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F5"));
-				BigDecimal percent = tLDVo.get("F6") == null || tLDVo.get("F6").length() == 0 ? BigDecimal.ZERO
-						: new BigDecimal(tLDVo.get("F6"));
+				String thisRank = rank.add(getBigDecimal(tLDVo.get("F0"))).toString();
 
 				// 排行
-				makeExcel.setValue(sRow, 1, "", "C");
+				makeExcel.setValue(sRow, 1, thisRank, "C");
 				// 姓名
 				makeExcel.setValue(sRow, 2, tLDVo.get("F1"), "C");
 				// 電腦編號
 				makeExcel.setValue(sRow, 3, tLDVo.get("F2"), "C");
+
 				// 房貸責任額
-				makeExcel.setValue(sRow, 4, gamt, "#,##0");
+				BigDecimal targetAmt = getBigDecimal(tLDVo.get("F3"));
+				makeExcel.setValue(sRow, 4, targetAmt, "#,##0");
+				targetTotal = targetTotal.add(targetAmt);
+
 				// 房貸撥款金額
-				makeExcel.setValue(sRow, 5, tmpAmt, "#,##0");
-				// 房貸撥款金額
-				makeExcel.setValue(sRow, 6, cnt, "0.0");
+				BigDecimal drawdonwAmt = getBigDecimal(tLDVo.get("F4"));
+				makeExcel.setValue(sRow, 5, drawdonwAmt, "#,##0");
+				drawdownTotal = drawdownTotal.add(drawdonwAmt);
+
+				// 房貸件數
+				BigDecimal count = getBigDecimal(tLDVo.get("F5"));
+				makeExcel.setValue(sRow, 6, count, "0.0");
+				countTotal = countTotal.add(count);
+
 				// 達成率
+				BigDecimal percent = getBigDecimal(tLDVo.get("F6"));
 				makeExcel.setValue(sRow, 7, percent, "0.00");
+
 				// 服務部室
 				makeExcel.setValue(sRow, 8, tLDVo.get("F7"), "C");
 				// 服務區部
@@ -1125,6 +1161,13 @@ public class LP003Report extends MakeReport {
 
 			}
 
+			// 印合計
+			// 合計-房貸責任額
+			makeExcel.setValue(sRow, 4, targetTotal, "#,##0");
+			// 合計-房貸撥款金額
+			makeExcel.setValue(sRow, 5, drawdownTotal, "#,##0");
+			// 合計-房貸件數
+			makeExcel.setValue(sRow, 6, countTotal, "0.0");
 		} else {
 			makeExcel.setValue(4, 1, "本日無資料");
 		}

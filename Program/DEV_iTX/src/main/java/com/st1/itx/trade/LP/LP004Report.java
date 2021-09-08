@@ -19,20 +19,13 @@ import com.st1.itx.util.common.MakeReport;
 
 @Component
 @Scope("prototype")
-
 public class LP004Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LP004Report.class);
 
 	@Autowired
-	LP004ServiceImpl LP004ServiceImpl;
+	LP004ServiceImpl lP004ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
-
-	@Override
-	public void printTitle() {
- 
-	}
 
 	List<Map<String, String>> findList = new ArrayList<>();
 
@@ -45,13 +38,13 @@ public class LP004Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP004", "內網業績統計報表", "LP004單位成績(內部網站)",
-				"單位成績(內部網站).xls", "區域中心");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP004", "內網業績統計報表", "LP004_單位成績(內部網站)",
+				"LP004_底稿_單位成績(內部網站).xlsx", "區域中心");
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
 
 		try {
-			wkSsnList = LP004ServiceImpl.wkSsn(titaVo);
+			wkSsnList = lP004ServiceImpl.wkSsn(titaVo);
 
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
@@ -136,7 +129,7 @@ public class LP004Report extends MakeReport {
 
 		try {
 
-			findList = LP004ServiceImpl.findArea(titaVo, wkSsnVo);
+			findList = lP004ServiceImpl.findArea(titaVo, wkSsnVo);
 
 		} catch (Exception e) {
 
@@ -164,27 +157,27 @@ public class LP004Report extends MakeReport {
 				makeExcel.setValue(row, 2, tLDVo.get("F1"));
 
 				// 上月件數
-				BigDecimal lcntBD = tLDVo.get("F2") != null || tLDVo.get("F2") == "0" ? BigDecimal.ZERO
+				BigDecimal lcntBD = tLDVo.get("F2") != null || tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F2"));
 
 				lcntBD = lcntBD.setScale(1, 4);
 				makeExcel.setValue(row, 3, lcntBD, "0.0", "R");
 
 				// 上月金額
-				BigDecimal lamtBD = tLDVo.get("F3") != null || tLDVo.get("F3") == "0" ? BigDecimal.ZERO
+				BigDecimal lamtBD = tLDVo.get("F3") != null || tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F3"));
 
 				makeExcel.setValue(row, 4, lamtBD, "#,##0", "R");
 
 				// 當月件數
-				BigDecimal ncntBD = tLDVo.get("F4") != null || tLDVo.get("F4") == "0" ? BigDecimal.ZERO
+				BigDecimal ncntBD = tLDVo.get("F4") != null || tLDVo.get("F4").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F4"));
 
 				ncntBD = ncntBD.setScale(1, 4);
 				makeExcel.setValue(row, 5, ncntBD, "0.0", "R");
 
 				// 當月金額
-				BigDecimal namtBD = tLDVo.get("F5") != null || tLDVo.get("F5") == "0" ? BigDecimal.ZERO
+				BigDecimal namtBD = tLDVo.get("F5") != null || tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
 
 				makeExcel.setValue(row, 6, namtBD, "#,##0", "R");
@@ -225,7 +218,7 @@ public class LP004Report extends MakeReport {
 		this.info("===========setAllDept");
 
 		try {
-			findList = LP004ServiceImpl.findAllDept(titaVo, wkSsnVo);
+			findList = lP004ServiceImpl.findAllDept(titaVo, wkSsnVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -252,26 +245,26 @@ public class LP004Report extends MakeReport {
 				makeExcel.setValue(row, 4, tLDVo.get("F2"));
 
 				// 責任額
-				BigDecimal lgamtBD = tLDVo.get("F3") != null || tLDVo.get("F3") == "0" ? BigDecimal.ZERO
+				BigDecimal lgamtBD = tLDVo.get("F3") != null || tLDVo.get("F3").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F3"));
 
 				makeExcel.setValue(row, 5, lgamtBD, "#,##0", "R");
 
 				// 撥款金額
-				BigDecimal lamtBD = tLDVo.get("F4") != null || tLDVo.get("F4") == "0" ? BigDecimal.ZERO
+				BigDecimal lamtBD = tLDVo.get("F4") != null || tLDVo.get("F4").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F4"));
 
 				makeExcel.setValue(row, 6, lamtBD, "#,##0", "R");
 
 				// 件數
-				BigDecimal ncntBD = tLDVo.get("F5") != null || tLDVo.get("F5") == "0" ? BigDecimal.ZERO
+				BigDecimal ncntBD = tLDVo.get("F5") != null || tLDVo.get("F5").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F5"));
 
 				ncntBD = ncntBD.setScale(1, 4);
 				makeExcel.setValue(row, 7, ncntBD, "0.0", "R");
 
 				// 達成率
-				BigDecimal goal = tLDVo.get("F6") != null || tLDVo.get("F6") == "0" ? BigDecimal.ZERO
+				BigDecimal goal = tLDVo.get("F6") != null || tLDVo.get("F6").isEmpty() ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F6"));
 
 				makeExcel.setValue(row, 8, goal.multiply(new BigDecimal("100")) + "%", "#,##0.00", "R");
@@ -309,7 +302,7 @@ public class LP004Report extends MakeReport {
 		this.info("===========setBsOfficer");
 
 		try {
-			findList = LP004ServiceImpl.findBsOfficer(titaVo, wkSsnVo);
+			findList = lP004ServiceImpl.findBsOfficer(titaVo, wkSsnVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -390,7 +383,7 @@ public class LP004Report extends MakeReport {
 		this.info("===========setDist");
 
 		try {
-			findList = LP004ServiceImpl.findDist(titaVo, wkSsnVo);
+			findList = lP004ServiceImpl.findDist(titaVo, wkSsnVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -463,14 +456,14 @@ public class LP004Report extends MakeReport {
 
 		List<Map<String, String>> findMortgageSpecialist = new ArrayList<>();
 		try {
-			findList = LP004ServiceImpl.findAsDept(titaVo, wkSsnVo);
-			findMortgageSpecialist = LP004ServiceImpl.findMortgageSpecialist(titaVo, wkSsnVo);
+			findList = lP004ServiceImpl.findAsDept(titaVo, wkSsnVo);
+			findMortgageSpecialist = lP004ServiceImpl.findMortgageSpecialist(titaVo, wkSsnVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LP004ServiceImpl.setDept error = " + errors.toString());
 		}
-		String MortgageSpecialist = "";
+		String mortgageSpecialist = "";
 		int cnt = 0;
 		int amt = 0;
 		int tcnt = 0;
@@ -498,7 +491,7 @@ public class LP004Report extends MakeReport {
 				makeExcel.setValue(row, 3, tLDVo.get("F1"));
 
 				if (findMortgageSpecialist.size() > 0) {
-					MortgageSpecialist = "";
+					mortgageSpecialist = "";
 					for (Map<String, String> tLDVo2 : findMortgageSpecialist) {
 
 						if (tLDVo2.get("F2").length() > 4) {
@@ -507,21 +500,21 @@ public class LP004Report extends MakeReport {
 								this.info("tLDVo2.get(\"F0\")" + tLDVo2.get("F0"));
 								this.info("tLDVo2.get(\"F2\")" + tLDVo2.get("F2").substring(0, 2));
 								this.info("tLDVo.get(\"F1\")" + tLDVo.get("F1").substring(0, 2));
-								MortgageSpecialist = tLDVo2.get("F0");
+								mortgageSpecialist = tLDVo2.get("F0");
 							}
 						} else {
 							if (tLDVo.get("F1").substring(0, 2).equals(tLDVo2.get("F2").substring(0, 2))) {
 								this.info("tLDVo2.get(\"F0\")" + tLDVo2.get("F0"));
 								this.info("tLDVo2.get(\"F2\")" + tLDVo2.get("F2").substring(0, 2));
 								this.info("tLDVo.get(\"F1\")" + tLDVo.get("F1").substring(0, 2));
-								MortgageSpecialist = tLDVo2.get("F0");
+								mortgageSpecialist = tLDVo2.get("F0");
 							}
 						}
 					}
 				}
 				makeExcel.setValue(row, 4, tLDVo.get("F2"));
 
-				makeExcel.setValue(row, 5, MortgageSpecialist);
+				makeExcel.setValue(row, 5, mortgageSpecialist);
 				BigDecimal lcntBD = tLDVo.get("F3") != null || tLDVo.get("F3").length() == 0 ? BigDecimal.ZERO
 						: new BigDecimal(tLDVo.get("F3"));
 
@@ -567,7 +560,7 @@ public class LP004Report extends MakeReport {
 		this.info("===========exportExcelUnitTable");
 
 		try {
-			findList = LP004ServiceImpl.findAll(titaVo, wkSsnVo, deptCode);
+			findList = lP004ServiceImpl.findAll(titaVo, wkSsnVo, deptCode);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

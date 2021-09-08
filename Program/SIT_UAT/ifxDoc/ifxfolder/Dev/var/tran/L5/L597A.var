@@ -1,0 +1,601 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L597A)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,390)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+! ["會計日期",#AcDate],
+<sub type="DC" name="L597A" layout="cols=1;screen.width=[100,900];printer.width=[20,80];">
+[
+["[L597A]                                 債務協商作業-整批處理"],
+["債權區分",#IsMainFin,#IsMainFinX],
+["查詢選項",#SearchOption,#SearchOptionX],
+["查詢細項",#SearchDetail,#SearchDetailX],
+["是否製檔",#Export,#ExportX],
+["是否為按鈕",#IsBtn,#IsBtnX],
+]
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L5074進入),$)
+
+#NTXBUF=X,13,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@AcDate,#NTXBUF,1,7)
+T(1,@IsMainFin,#NTXBUF,8,1)
+T(1,@SearchOption,#NTXBUF,9,2)
+T(1,@SearchDetail,#NTXBUF,11,1)
+T(1,@Export,#NTXBUF,12,1)
+T(1,@IsBtn,#NTXBUF,13,1)
+! INVOKEJS(SHOW,p1,02,02,1)
+
+! 債權Help
+#HelpIsMainFin=X,31,S
+!T(3,0:一般債權;1:最大債權;2:無)
+T(3,0:一般債權;1:最大債權)
+
+! 會計日期
+#AcDate=D,7,S
+C(3,#CHAIN,0,$,s)
+E(0,#SYSDATE)
+
+! 債權區分
+#IsMainFin=A,1,I
+C(3,#CHAIN,0,$,s)
+HELP(#HelpIsMainFin)
+@V(H,#HelpIsMainFin)
+
+#IsMainFinX=X,8,L
+T(H,#IsMainFin,#HelpIsMainFin)
+
+! 查詢選項Help
+#HelpSearchOption=X,265,S
+T(3,
+!01:前日匯入;
+02:未入帳;
+03:待處理;
+04:已入帳;
+05:本月入帳;
+06:放款攤分;
+07:保單攤分;
+08:結清退還;
+09:本月放款;
+10:本月保單;
+11:累計未退還;
+12:本日匯入未入帳;
+13:撥入筆數;
+14:檢核成功;
+15:檢核失敗;
+16:放款暫收;
+17:本月放款
+)
+
+! 查詢選項  新增最大債權跟一般債權可輸入範圍限制
+#SearchOption=X,2,I
+C(3,#CHAIN,0,$,s)
+HELP(#HelpSearchOption,cols:2)
+@V(H,#HelpSearchOption)
+@IF(#IsMainFin==0,V(3,02,03,04,05,13,14,15,16,17),V(3,02,03,04,05,06,07,08,09,10,11,12))
+
+#SearchOptionX=X,14,L
+T(H,#SearchOption,#HelpSearchOption)
+
+
+#WarnMsg=X,34,S
+T(2,最大債權才可選擇+#SearchOptionX)
+
+#CheckSearchOptio=X,1,S
+IF(#IsMainFin==0,$,S)
+IF(#SearchOption==06 || #SearchOption==07 || #SearchOption==08 || #SearchOption==09 || #SearchOption==10 || #SearchOption==11 || #SearchOption==12,$,S)
+V(P,#WarnMsg)
+
+! 查詢細項 Help
+#HelpSearchDetail=X,41,S
+T(3,
+0:無;
+1:債協;
+2:調解;
+3:更生;
+4:清算
+)
+
+! 查詢細項
+#SearchDetail=X,1,I
+C(3,#CHAIN,0,$,s)
+HELP(#HelpSearchDetail)
+@V(H,#HelpSearchDetail)
+
+#SearchDetailX=X,4,L
+T(H,#SearchDetail,#HelpSearchDetail)
+
+! 是否製檔 Help
+#HelpExport=X,23,S
+T(3,
+0:無;
+1:已製檔;
+2:未製檔
+)
+
+! 是否製檔
+#Export=X,1,I
+C(3,#CHAIN,0,$,s)
+HELP(#HelpExport)
+@V(H,#HelpExport)
+
+#ExportX=X,6,L
+T(H,#Export,#HelpExport)
+
+!最大債權已入帳04且細項為0,每一個細項製檔日可能不同,故不可選已製檔
+#CheckExport=X,1,S
+IF(#Export==1,$,S)
+IF(#SearchOption==04 && #SearchDetail==0,V(P,查詢已製檔資料時查詢細項不可為0),S)
+
+
+! 是否為BTN Help
+#HelpIsBtn=X,7,S
+T(3,0:N;1:Y;
+)
+
+! 是否為BTN
+#IsBtn=X,1,I
+C(3,#CHAIN,0,$,s)
+HELP(#HelpIsBtn)
+@V(H,#HelpIsBtn)
+
+#IsBtnX=X,1,L
+T(H,#IsBtn,#HelpIsBtn)
+
+#RPTFG=A,1,S
+IF(#SearchOption=="02" || #SearchOption=="12",E(0,0),IF(#SearchOption=="03",E(0,1),E(0,2)))
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L597A -----------
+<sub type="FORM" name="L597A">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L597A,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L597A] 債務協商作業-整批處理)
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 序號
+#OOSeq=X,9,O
+
+! 身分證字號
+#OOCustId=X,10,O
+! 戶號
+#OOCustNo=A,7,O
+! 案件序號
+#OOCaseSeq=X,3,O
+
+! 戶名
+#OOCustName=X,100,O
+! 交易別
+#OOTxSts=A,1,O
+#OOTxStsX=X,10,O
+IF(#SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15" || #SearchOption=="11",S,$)
+SWITCH(#OOTxSts,0,T(2,正常),
+                1,T(2,溢繳),
+                2,T(2,短繳),
+                3,T(2,提前還本),
+                4,T(2,結清),
+                5,T(2,提前清償),
+				        6,T(2,待處理),
+				        9,T(2,未處理)
+				)
+! 備註
+#OORemark=X,100,O
+! 會計日
+#OOAcctDate=D,7,O
+! 入帳日
+#OOEntryDate=D,7,O
+! 入帳還款日
+#OORepayDate=D,7,O
+! 暫收金額
+#OOTmpAmt=m,14,O
+! 溢繳款
+#OOOverPayAmt=+m,13,O
+
+! 繳期數
+#OOPayPeriod=m,4,O
+! 還款金額
+#OOPayAmt=m,14,O
+! 應還期數
+#OORevivPeriod=m,4,O
+! 應還金額
+#OORevivAmt=m,14,O
+! 累溢收
+#OOAcumTmpAmt=m,14,O
+! 新壽攤分
+#OOSklShareAmt=m,14,O
+! 撥付金額
+#OOApprAmt=m,14,O
+! 退還金額
+#OOReturnAmt=m,14,O
+
+! 經辦
+#OOTitaTlrNo=X,6,S
+! 交易序號
+#OOTitaTxtNo=A,8,S
+
+
+! 交易序號(顯示用)
+#OOShowTitaTxtNo=X,14,O
+T(2,#OOTitaTlrNo+#OOTitaTxtNo)
+
+! 名稱
+#OOBtnSearchValue=X,8,O
+
+IF(#SearchOption=="11" || #SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15"
+	,T(2,)
+	,IF(#OORepayDate==0
+		,T(2,入帳還款)
+		,T(2,)
+	)
+)
+
+! 入帳還款,撥付製檔,撥付出帳
+! <入帳>         L5702-債務協商作業－暫收入帳
+! <訂正>         L5702-債務協商作業－暫收入帳
+! <暫收款退還>    L3220暫收款退還 
+! <暫收款銷帳>    L3230 暫收款銷帳
+! <查詢>	L5971-債務協商交易資料查詢
+
+! [查詢]
+! 轉入L5702用的東東 NegTrans-Key-AcDate(7),TitaTlrNo(6),TitaTxtNo(8)
+#OONegTransKey=X,21,O
+T(2,#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo)
+
+#OOBufSearch=X,21,O
+T(2,#OONegTransKey)
+
+! IF(#OOSeq==1,BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch}),BIND(grid,cancel))
+#OOBtnSearch=A,1,O
+BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch})
+! BIND(grid,{ cmd=CHAIN; ntxcd=L5702; ntxbuf=#OOBufSearch})
+IF (#OOTxSts==9,S,$)
+BIND(grid,cancel)
+
+
+! 會計日期
+#TransAcDate=D,7,O
+T(2,#OOAcctDate)
+! 經辦
+#TransTitaTlrNo=X,6,O
+T(2,#OOTitaTlrNo)
+! 交易序號
+#TransTitaTxtNo=X,8,O
+T(2,#OOTitaTxtNo)
+#NewTransTxKind=A,1,O
+E(0,0)
+! 退還金額
+#NewTransReturnAmt=m,14,O
+E(0,0)
+#TrialFunc=A,1,L
+E(0,3)
+! 逐筆傳送的資料
+#secret-no=x,1000,S
+T(6A,#TrialFunc+#AcDate+#IsMainFin+#SearchOption+#SearchDetail+#Export+#IsBtn+#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo)
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
+
+#ButtonName=x,8,O
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#AcDate
+#IsMainFin
+#SearchOption
+#SearchDetail
+#Export
+#IsBtn
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L597A
+#OOSeq
+#OOCustId
+#OOCustNo
+#OOCaseSeq
+#OOCustName
+#OOTxSts
+#OOAcctDate
+#OOEntryDate
+#OORepayDate
+#OOTmpAmt
+#OOOverPayAmt
+#OOPayPeriod
+#OOPayAmt
+#OORevivPeriod
+#OORevivAmt
+#OOAcumTmpAmt
+#OOSklShareAmt
+#OOApprAmt
+#OOReturnAmt
+#OOTitaTlrNo
+#OOTitaTxtNo
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+! ["@會計日期",#AcDate],
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L597A" layout="cols=1;screen.width=[100,900];order=1;">
+[
+["[L597A]                     債務協商作業-整批處理"],
+[""],
+! ["債權區分",#IsMainFin,#IsMainFinX],
+! ["查詢選項",#SearchOption,#SearchOptionX],
+! ["查詢細項",#SearchDetail,#SearchDetailX],
+! ["是否製檔",#Export,#ExportX],
+! ["是否為按鈕",#IsBtn,#IsBtnX]
+]
+</sub>
+
+!勾選多筆-入帳明細轉待處理L570A
+
+<sub type="SELECT">
+#batch-print=1,L597A.PFNX,NA,,,,,,1169:827
+
+^
+#RPTFG=0,QUERY.GRID,L597A
+#any={header:'L597A.part',caption:'',width:1000,rowNum:40,
+ifxBatch:{
+	name:'待處理',
+	type:'5',
+	rim:'L570A',
+	txtno:'#secret-no',
+	pfnx:'L597A.PFNX',
+	col_captions:["身分證字號","戶號","案件序號","交易別","暫收金額","交易序號","放行傳輸序號       ","放行狀態"],
+	col_names:["#OOCustId","#OOCustNo","#OOCaseSeq","#OOTxStsX","#OOTmpAmt","#OOShowTitaTxtNo","#batch-row-txtno","#batch-row-status"]
+	}
+}
+#secret-no
+
+#OOCustId=身分證字號
+{width:100,align:'center'}
+#OOCustNo=戶號
+{width:60,align:'right'}
+#OOCaseSeq=案件序號
+{width:80,align:'right'}
+#OOCustName=戶名
+{width:80,align:'center'}
+#OOTxStsX=交易別
+{width:60,align:'left'}
+#OORemark=備註
+{width:60,align:'left'}
+#OOBtnSearch=入帳還款
+{search:false,formatter:'cust:bind-button:',align:'center',canExport:false,width:80}
+#OOAcctDate=會計日
+{width:70,align:'center'}
+#OOEntryDate=入帳日
+{width:70,align:'center'}
+#OORepayDate=入帳還款日
+{width:70,align:'center'}
+#OOTmpAmt=暫收金額
+{width:90,align:'right'}
+#OOOverPayAmt=溢繳款
+{width:70,align:'right'}
+#OOPayPeriod=繳期數
+{width:70,align:'right'}
+#OOPayAmt=還款金額
+{width:90,align:'right'}
+#OORevivPeriod=應還期數
+{width:90,align:'right'}
+#OORevivAmt=應還金額
+{width:90,align:'right'}
+#OOAcumTmpAmt=累溢收
+{width:90,align:'right'}
+#OOSklShareAmt=新壽攤分
+{width:90,align:'right'}
+#OOApprAmt=撥付金額
+{width:90,align:'right'}
+#OOReturnAmt=退還金額
+{width:90,align:'right'}
+#OOShowTitaTxtNo=交易序號
+{width:120,align:'right'}
+
+^
+#RPTFG=1,QUERY.GRID,L597A
+#any={header:'L597A.part',caption:'',width:1000,rowNum:40,
+ifxBatch:{
+	name:'未入帳',
+	type:'5',
+	rim:'L570A',
+	txtno:'#secret-no',
+	pfnx:'L597A.PFNX',
+	col_captions:["身分證字號","戶號","案件序號","交易別","暫收金額","交易序號","放行傳輸序號       ","放行狀態"],
+	col_names:["#OOCustId","#OOCustNo","#OOCaseSeq","#OOTxStsX","#OOTmpAmt","#OOShowTitaTxtNo","#batch-row-txtno","#batch-row-status"]
+	}
+}
+#secret-no
+
+#OOCustId=身分證字號
+{width:100,align:'center'}
+#OOCustNo=戶號
+{width:60,align:'right'}
+#OOCaseSeq=案件序號
+{width:80,align:'right'}
+#OOCustName=戶名
+{width:80,align:'center'}
+#OOTxStsX=交易別
+{width:60,align:'left'}
+#OORemark=備註
+{width:60,align:'left'}
+#OOBtnSearch=入帳還款
+{search:false,formatter:'cust:bind-button:',align:'center',canExport:false,width:80}
+#OOAcctDate=會計日
+{width:70,align:'center'}
+#OOEntryDate=入帳日
+{width:70,align:'center'}
+#OORepayDate=入帳還款日
+{width:70,align:'center'}
+#OOTmpAmt=暫收金額
+{width:90,align:'right'}
+#OOOverPayAmt=溢繳款
+{width:70,align:'right'}
+#OOPayPeriod=繳期數
+{width:70,align:'right'}
+#OOPayAmt=還款金額
+{width:90,align:'right'}
+#OORevivPeriod=應還期數
+{width:90,align:'right'}
+#OORevivAmt=應還金額
+{width:90,align:'right'}
+#OOAcumTmpAmt=累溢收
+{width:90,align:'right'}
+#OOSklShareAmt=新壽攤分
+{width:90,align:'right'}
+#OOApprAmt=撥付金額
+{width:90,align:'right'}
+#OOReturnAmt=退還金額
+{width:90,align:'right'}
+#OOShowTitaTxtNo=交易序號
+{width:120,align:'right'}
+
+^
+#RPTFG=2,QUERY.GRID,L597A
+#any={header:'L597A.part',caption:'',width:1000,rowNum:40, ifxDisplay:'0'}
+#secret-no
+
+#OOCustId=身分證字號
+{width:100,align:'center'}
+#OOCustNo=戶號
+{width:60,align:'right'}
+#OOCaseSeq=案件序號
+{width:80,align:'right'}
+#OOCustName=戶名
+{width:80,align:'center'}
+#OOTxStsX=交易別
+{width:60,align:'left'}
+#OORemark=備註
+{width:60,align:'left'}
+#OOBtnSearch=入帳還款
+{search:false,formatter:'cust:bind-button:',align:'center',canExport:false,width:80}
+#OOAcctDate=會計日
+{width:70,align:'center'}
+#OOEntryDate=入帳日
+{width:70,align:'center'}
+#OORepayDate=入帳還款日
+{width:70,align:'center'}
+#OOTmpAmt=暫收金額
+{width:90,align:'right'}
+#OOOverPayAmt=溢繳款
+{width:70,align:'right'}
+#OOPayPeriod=繳期數
+{width:70,align:'right'}
+#OOPayAmt=還款金額
+{width:90,align:'right'}
+#OORevivPeriod=應還期數
+{width:90,align:'right'}
+#OORevivAmt=應還金額
+{width:90,align:'right'}
+#OOAcumTmpAmt=累溢收
+{width:90,align:'right'}
+#OOSklShareAmt=新壽攤分
+{width:90,align:'right'}
+#OOApprAmt=撥付金額
+{width:90,align:'right'}
+#OOReturnAmt=退還金額
+{width:90,align:'right'}
+#OOShowTitaTxtNo=交易序號
+{width:120,align:'right'}
+
+^
+
+<include src="PRT.icf::INQ04.sel" map="i=L597A;cpi=15"/>
+<sub type="TIM">
+#AcDate
+#IsMainFin
+#SearchOption
+#SearchDetail
+#Export
+#IsBtn
+%
+#OOCustId
+#OOCustNo
+#OOCaseSeq
+#OOCustName
+#OOTxSts
+#OORemark
+#OOAcctDate
+#OOEntryDate
+#OORepayDate
+#OOTmpAmt
+#OOOverPayAmt
+#OOPayPeriod
+#OOPayAmt
+#OORevivPeriod
+#OORevivAmt
+#OOAcumTmpAmt
+#OOSklShareAmt
+#OOApprAmt
+#OOReturnAmt
+#OOShowTitaTxtNo
+^
+</sub>

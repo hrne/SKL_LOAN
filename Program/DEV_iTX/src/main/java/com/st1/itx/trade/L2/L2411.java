@@ -486,6 +486,10 @@ public class L2411 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0008", "擔保品不動產檔" + e.getErrorMsg());
 				}
+				
+				// 擔保品不動產檔設定順位明細
+				deleteClImmRankDetail(titaVo);
+				
 				// 房地擔保品
 				if (iClCode1 == 1) {
 					// 擔保品不動產建物檔主檔

@@ -40,7 +40,6 @@ import com.st1.itx.util.common.BankAuthActCom;
  * @version 1.0.0
  */
 public class L4412 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4412.class);
 
 	@Autowired
 	public BankAuthActCom bankAuthActCom;
@@ -49,10 +48,45 @@ public class L4412 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4412 ");
 		this.totaVo.init(titaVo);
-
 		bankAuthActCom.setTxBuffer(this.getTxBuffer());
 
-		bankAuthActCom.acctCheck(titaVo);
+		// tita
+		String iFunCode = titaVo.getParam("FuncCode");
+		String iAuthApplCode = titaVo.getParam("AuthApplCode");
+
+		this.info("iFunCode = " + iFunCode);
+		this.info("iAuthApplCode = " + iAuthApplCode);
+
+		// FunCode 1 新增
+		if ("1".equals(iFunCode)) {
+			if ("1".equals(iAuthApplCode)) {
+
+				bankAuthActCom.add("A", titaVo);
+			} else {
+				bankAuthActCom.add("D", titaVo);
+			}
+
+			// FunCode 2 修改
+		} else if ("2".equals(iFunCode)) {
+
+			// 授權狀態未授權先刪除後新增
+			if ("".equals(titaVo.getParam("AuthErrorCode").trim())) {
+				bankAuthActCom.del("A", titaVo);
+				bankAuthActCom.add("A", titaVo);
+			} else {
+				if ("1".equals(iAuthApplCode)) {
+					bankAuthActCom.mntPostAuth("0", titaVo);
+				} else {
+					bankAuthActCom.mntPostAuth("1", titaVo);
+				}
+			}
+
+			// FunCode 4 刪除
+		} else if ("4".equals(iFunCode)) {
+			bankAuthActCom.del("A", titaVo);
+		} else {
+
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

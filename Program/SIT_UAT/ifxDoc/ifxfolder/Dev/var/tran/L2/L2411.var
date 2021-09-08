@@ -47,9 +47,6 @@ E(0,40)ASGN(INQPRT$)
 ]
 !---------- AP Button AREA ----------
 
-#OwnerRelCodeTitle=X,12,L
-T(3,與授信用關係)
-
 ![Buttom資料查詢]
 #Buf1=X,42,S
 #Btn1=X,8,I,ui:button;value:建物門牌;enable:1;tabbable:0
@@ -62,6 +59,64 @@ T(3,與授信用關係)
 #BTN1=X,15,I,ui:button;value:保險/鑑定公司查詢;enable:1;tabbable:0;
 #BTN8=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
 
+![瀏覽1]
+#BUF1A=X,4,S
+T(2,2+  +0)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6073; ntxbuf=#BUF1A;ntxbuf5=type<-1:EvaCompany<-OOInsurerCode:EvaCompanyX<-OOInsurerItem})
+
+#MtgAllbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgAllbtn,click, {cmd=CALLSEND;DOCODE=MtgAllProc})
+
+#MtgCheckbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgCheckbtn,click, {cmd=CALLSEND;DOCODE=MtgCheckProc})
+
+#MtgLoanbtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgLoanbtn,click, {cmd=CALLSEND;DOCODE=MtgLoanProc})
+
+#MtgPledgebtn=X,1,I,ui:button;value: ;enable:1;tabbable:0
+IF(#FunCd==4,s,$)
+IF(#PageFg==4,$,CALL(#Show4))
+BIND(#MtgPledgebtn,click, {cmd=CALLSEND;DOCODE=MtgPledgeProc})
+
+#MtgAllProc=@,1,S
+C(5,#MtgAllbtn,V,C(5,#MtgCheckbtn,V,C(5,#MtgLoanbtn,C(5,#MtgPledgebtn,V,s,$),$),$),$)
+T(3,@MtgAllbtn,V)T(3,@MtgCheckbtn,V)T(3,@MtgLoanbtn,V)T(3,@MtgPledgebtn,V)T(3,@MtgCheck,Y)T(3,@MtgLoan,Y)T(3,@MtgPledge,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgCheckProc=@,1,S
+C(5,#MtgCheckbtn,V,C(4,#MtgLoanbtn,C(4,#MtgPledgebtn,s,$),$),$)
+C(5,#MtgCheckbtn,V,T(3,@MtgCheckbtn, )T(3,@MtgAllbtn, )T(3,@MtgCheck,N),T(3,@MtgCheckbtn,V)T(3,@MtgCheck,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgLoanProc=@,1,S
+C(5,#MtgLoanbtn,V,C(4,#MtgCheckbtn,C(4,#MtgPledgebtn,s,$),$),$)
+C(5,#MtgLoanbtn,V,T(3,@MtgLoanbtn, )T(3,@MtgAllbtn, )T(3,@MtgLoan,N),T(3,@MtgLoanbtn,V)T(3,@MtgLoan,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgPledgeProc=@,1,S
+C(5,#MtgPledgebtn,V,C(4,#MtgCheckbtn,C(4,#MtgLoanbtn,s,$),$),$)
+C(5,#MtgPledgebtn,V,T(3,@MtgPledgebtn, )T(3,@MtgAllbtn, )T(3,@MtgPledge,N),T(3,@MtgPledgebtn,V)T(3,@MtgPledge,Y))
+!V(P,最高限額抵押權之擔保債權種類最少要選擇1個)
+
+#MtgAllBind=X,1,S
+BIND(#MtgAllbtn,click, {cmd=CALLSEND;DOCODE=MtgAllProc})
+
+#MtgCheckBind=X,1,S
+BIND(#MtgCheckbtn,click, {cmd=CALLSEND;DOCODE=MtgCheckProc})
+
+#MtgLoanBind=X,1,S
+BIND(#MtgLoanbtn,click, {cmd=CALLSEND;DOCODE=MtgLoanProc})
+
+#MtgPledgeBind=X,1,S
+BIND(#MtgPledgebtn,click, {cmd=CALLSEND;DOCODE=MtgPledgeProc})
 
 #Bind1=X,1,S
 BIND(#Btn1,click, {cmd=CALLSEND;DOCODE=Show1})
@@ -1409,13 +1464,6 @@ IF(#FunCd==4,s,$)
 IF(#FunCd==4,s,$)
 @IF(#RentPrice=="",s,$)
 
-![瀏覽1]
-#BUF1A=X,4,S
-T(2,2+  +0)
-
-#BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6073; ntxbuf=#BUF1A;ntxbuf5=type<-1:EvaCompany<-OOInsurerCode:EvaCompanyX<-OOInsurerItem})
-
 
 ! [鑑價公司]
 #EvaCompany=X,2,I
@@ -1465,41 +1513,6 @@ C(3,#MtgCode,0,ENABLE(#MtgAllbtn)ENABLE(#MtgCheckbtn)ENABLE(#MtgLoanbtn)ENABLE(#
 
 #MtgCodeX=X,25,L
 T(3,)T(H,#MtgCode,#MtgCodeHelp)
-
-#MtgAllbtn=X,1,I,ui:button;value: ;enable:1;tabbable:1
-IF(#FunCd==4,s,$)
-IF(#PageFg==4,$,CALL(#Show4))
-C(3,#MtgCode,0,$,S)
-BIND(#MtgAllbtn,click, {cmd=CALLSEND;DOCODE=MtgAllProc})
-
-#MtgCheckbtn=X,1,I,ui:button;value: ;enable:1;tabbable:1
-IF(#FunCd==4,s,$)
-IF(#PageFg==4,$,CALL(#Show4))
-C(3,#MtgCode,0,$,S)
-BIND(#MtgCheckbtn,click, {cmd=CALLSEND;DOCODE=MtgCheckProc})
-
-#MtgLoanbtn=X,1,I,ui:button;value: ;enable:1;tabbable:1
-IF(#FunCd==4,s,$)
-IF(#PageFg==4,$,CALL(#Show4))
-C(3,#MtgCode,0,$,S)
-BIND(#MtgLoanbtn,click, {cmd=CALLSEND;DOCODE=MtgLoanProc})
-
-#MtgPledgebtn=X,1,I,ui:button;value: ;enable:1;tabbable:1
-IF(#FunCd==4,s,$)
-IF(#PageFg==4,$,CALL(#Show4))
-C(3,#MtgCode,0,$,S)
-BIND(#MtgPledgebtn,click, {cmd=CALLSEND;DOCODE=MtgPledgeProc})
-@C(4,#MtgCheckbtn,C(4,#MtgLoanbtn,C(4,#MtgPledgebtn,V(P,最高限額抵押權之擔保債權種類最少要選擇1個),$),$),$)
-
-#MtgAllProc=@,1,S
-C(5,#MtgAllbtn,V,T(3,@MtgAllbtn, )T(3,@MtgCheckbtn, )T(3,@MtgLoanbtn, )T(3,@MtgPledgebtn, )T(3,@MtgCheck,N)T(3,@MtgLoan,N)T(3,@MtgPledge,N),
-T(3,@MtgAllbtn,V)T(3,@MtgCheckbtn,V)T(3,@MtgLoanbtn,V)T(3,@MtgPledgebtn,V)T(3,@MtgCheck,Y)T(3,@MtgLoan,Y)T(3,@MtgPledge,Y))
-#MtgCheckProc=@,1,S
-C(5,#MtgCheckbtn,V,T(3,@MtgCheckbtn, )T(3,@MtgAllbtn, )T(3,@MtgCheck,N),T(3,@MtgCheckbtn,V)T(3,@MtgCheck,Y))
-#MtgLoanProc=@,1,S
-C(5,#MtgLoanbtn,V,T(3,@MtgLoanbtn, )T(3,@MtgAllbtn, )T(3,@MtgLoan,N),T(3,@MtgLoanbtn,V)T(3,@MtgLoan,Y))
-#MtgPledgeProc=@,1,S
-C(5,#MtgPledgebtn,V,T(3,@MtgPledgebtn, )T(3,@MtgAllbtn, )T(3,@MtgPledge,N),T(3,@MtgPledgebtn,V)T(3,@MtgPledge,Y))
 
 #MtgAllfg=X,1,L
 #MtgCheckfg=X,1,L

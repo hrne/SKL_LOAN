@@ -90,9 +90,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustId", "SubmitKey", "RcDate", "MaxMainCode"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustId", "SubmitKey", "RcDate", "MaxMainCode", "PayOffDate"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustId", "SubmitKey", "RcDate", "MaxMainCode"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustId", "SubmitKey", "RcDate", "MaxMainCode", "PayOffDate"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ054ReposDay.findAll(pageable);
@@ -110,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ054> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ054> custIdEq(String custId_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ054> slice = null;
     if (titaVo.length != 0)
@@ -121,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustIdEq " + dbName + " : " + "custId_0 : " + custId_0);
+    this.info("custIdEq " + dbName + " : " + "custId_0 : " + custId_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ054ReposDay.findAllByCustIdIsOrderByCustIdAscRcDateDesc(custId_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -138,7 +138,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ054> RcDateEq(int rcDate_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ054> rcDateEq(int rcDate_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ054> slice = null;
     if (titaVo.length != 0)
@@ -149,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("RcDateEq " + dbName + " : " + "rcDate_0 : " + rcDate_0);
+    this.info("rcDateEq " + dbName + " : " + "rcDate_0 : " + rcDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ054ReposDay.findAllByRcDateIsOrderByCustIdAscRcDateDesc(rcDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -166,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ054> CustRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ054> custRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ054> slice = null;
     if (titaVo.length != 0)
@@ -177,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("CustRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " rcDate_1 : " +  rcDate_1);
+    this.info("custRcEq " + dbName + " : " + "custId_0 : " + custId_0 + " rcDate_1 : " +  rcDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = jcicZ054ReposDay.findAllByCustIdIsAndRcDateIsOrderByCustIdAscRcDateDesc(custId_0, rcDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -194,7 +194,7 @@ em = null;
   }
 
   @Override
-  public Slice<JcicZ054> otherEq(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<JcicZ054> otherEq(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, int payOffDate_4, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<JcicZ054> slice = null;
     if (titaVo.length != 0)
@@ -205,15 +205,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("otherEq " + dbName + " : " + "submitKey_0 : " + submitKey_0 + " custId_1 : " +  custId_1 + " rcDate_2 : " +  rcDate_2 + " maxMainCode_3 : " +  maxMainCode_3);
+    this.info("otherEq " + dbName + " : " + "submitKey_0 : " + submitKey_0 + " custId_1 : " +  custId_1 + " rcDate_2 : " +  rcDate_2 + " maxMainCode_3 : " +  maxMainCode_3 + " payOffDate_4 : " +  payOffDate_4);
     if (dbName.equals(ContentName.onDay))
-      slice = jcicZ054ReposDay.findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, pageable);
+      slice = jcicZ054ReposDay.findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, payOffDate_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = jcicZ054ReposMon.findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, pageable);
+      slice = jcicZ054ReposMon.findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, payOffDate_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = jcicZ054ReposHist.findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, pageable);
+      slice = jcicZ054ReposHist.findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, payOffDate_4, pageable);
     else 
-      slice = jcicZ054Repos.findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, pageable);
+      slice = jcicZ054Repos.findAllBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, payOffDate_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -241,20 +241,20 @@ em = null;
   }
 
   @Override
-  public JcicZ054 otherFirst(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, TitaVo... titaVo) {
+  public JcicZ054 otherFirst(String submitKey_0, String custId_1, int rcDate_2, String maxMainCode_3, int payOffDate_4, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("otherFirst " + dbName + " : " + "submitKey_0 : " + submitKey_0 + " custId_1 : " +  custId_1 + " rcDate_2 : " +  rcDate_2 + " maxMainCode_3 : " +  maxMainCode_3);
+    this.info("otherFirst " + dbName + " : " + "submitKey_0 : " + submitKey_0 + " custId_1 : " +  custId_1 + " rcDate_2 : " +  rcDate_2 + " maxMainCode_3 : " +  maxMainCode_3 + " payOffDate_4 : " +  payOffDate_4);
     Optional<JcicZ054> jcicZ054T = null;
     if (dbName.equals(ContentName.onDay))
-      jcicZ054T = jcicZ054ReposDay.findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3);
+      jcicZ054T = jcicZ054ReposDay.findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, payOffDate_4);
     else if (dbName.equals(ContentName.onMon))
-      jcicZ054T = jcicZ054ReposMon.findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3);
+      jcicZ054T = jcicZ054ReposMon.findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, payOffDate_4);
     else if (dbName.equals(ContentName.onHist))
-      jcicZ054T = jcicZ054ReposHist.findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3);
+      jcicZ054T = jcicZ054ReposHist.findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, payOffDate_4);
     else 
-      jcicZ054T = jcicZ054Repos.findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3);
+      jcicZ054T = jcicZ054Repos.findTopBySubmitKeyIsAndCustIdIsAndRcDateIsAndMaxMainCodeIsAndPayOffDateIsOrderByCreateDateDesc(submitKey_0, custId_1, rcDate_2, maxMainCode_3, payOffDate_4);
 
     return jcicZ054T.isPresent() ? jcicZ054T.get() : null;
   }

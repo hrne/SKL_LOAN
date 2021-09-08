@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.util.date.DateUtil;
 @Service
 @Repository
 public class BankAuthActComServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(BankAuthActComServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -41,7 +38,7 @@ public class BankAuthActComServiceImpl extends ASpringJpaParm implements Initial
 		sql = " ";
 		sql += " SELECT T.\"EntryDate\""; // F0:入帳日
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -79,7 +76,7 @@ public class BankAuthActComServiceImpl extends ASpringJpaParm implements Initial
 		sql += "   group by F0                         ";
 		sql += "   order by F0                         ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

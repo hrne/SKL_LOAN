@@ -938,7 +938,7 @@ public class NegCom extends CommBuffer {
 		tNegAppr01Upd.setExportDate(0);// 製檔日期
 		tNegAppr01Upd.setApprDate(0);// 撥付日期
 		tNegAppr01Upd.setBringUpDate(0);// 提兌日
-		tNegAppr01Upd.setRemitBank(tNegFinShare.getFinCode());// 匯款銀行
+		tNegAppr01Upd.setRemitBank(tNegFinAcct.getRemitBank());// 匯款銀行
 		tNegAppr01Upd.setRemitAcct(tNegFinAcct.getRemitAcct());// 匯款帳號
 		tNegAppr01Upd.setDataSendUnit(tNegFinAcct.getDataSendSection());// 資料傳送單位
 		tNegAppr01Upd.setApprAcDate(0);// 撥付傳票日
@@ -1052,7 +1052,7 @@ public class NegCom extends CommBuffer {
 
 	public void DbJcicZ046(JcicZ046Id tJcicZ046Id, TitaVo titaVo) throws LogicException {
 		// 已報送過結案,則不再自動報送,改由人工建檔
-		Slice<JcicZ046> slJcicZ046 = sJcicZ046Service.HadZ046(tJcicZ046Id.getCustId(), tJcicZ046Id.getRcDate(),
+		Slice<JcicZ046> slJcicZ046 = sJcicZ046Service.hadZ046(tJcicZ046Id.getCustId(), tJcicZ046Id.getRcDate(),
 				tJcicZ046Id.getSubmitKey(), 0, Integer.MAX_VALUE, titaVo);
 		List<JcicZ046> lJcicZ046 = slJcicZ046 == null ? null : slJcicZ046.getContent();
 		if (lJcicZ046 != null) {

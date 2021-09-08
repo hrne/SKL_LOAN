@@ -38,14 +38,13 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[400,100,350,150];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,50,700,50];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8324]                                 (443)前置調解回報有擔保債權金額資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
+["#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],["#FdCustId+債務人IDN",#CustId],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
-[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
-[#<->#,"#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
+["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],["#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
 ["#FdAccount+帳號",#Account],["#FdGuarantyType+擔保品類別",#GuarantyType,#GuarantyTypeX],
 ["#FdLoanAmt+原借款金額",#LoanAmt],["#FdCreditAmt+授信餘額",#CreditAmt],
 ["#FdPrincipal+本金",#Principal],["#FdInterest+利息",#Interest],
@@ -277,11 +276,11 @@ C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
 
 ![債務人IDN]
-#CustId=X,10,L
+#CustId=X,60,L
 
 ![債權金融機構代號]
 #SubmitKey=X,3,L
-#SubmitKeyX=X,80,L
+#SubmitKeyX=X,60,L
 
 
 !調解申請日
@@ -305,7 +304,7 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@CourtCodeX,#L8r01JcicBankName)
 
-#CourtCodeX=X,80,L
+#CourtCodeX=X,50,L
 T(2,@RimJcicBankCode,#CourtCode)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
@@ -322,7 +321,7 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
-#MaxMainCodeX=X,80,L
+#MaxMainCodeX=X,50,L
 T(2,@RimJcicBankCode,#MaxMainCode)
 RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
@@ -342,7 +341,7 @@ HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
 !帳號
-#Account=X,50,L
+#Account=X,60,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@Account,#L8r41Account),$)
@@ -361,7 +360,7 @@ C(5,#TranKey,D,T(2,@GuarantyType,#L8r41GuarantyType),$)
 C(5,#TranKey,X,T(2,@GuarantyType,#L8r41GuarantyType),$)
 C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,s,$)
-HELP(#CollateralTypeHelp,cols:6)
+HELP(#CollateralTypeHelp,cols:1)!cols:6
 @V(H,#CollateralTypeHelp)
 
 #GuarantyTypeX=X,50,L
@@ -375,6 +374,17 @@ C(5,#TranKey,D,T(2,@LoanAmt,#L8r41LoanAmt),$)
 C(5,#TranKey,X,T(2,@LoanAmt,#L8r41LoanAmt),$)
 C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,s,$)
+
+!授信餘額
+#CreditAmt=m,12,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CreditAmt,#L8r41CreditAmt),$)
+C(5,#TranKey,X,T(2,@CreditAmt,#L8r41CreditAmt),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
+.
+
 !本金
 #Principal=m,10,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -407,18 +417,6 @@ C(5,#TranKey,D,T(2,@Other,#L8r41Other),$)
 C(5,#TranKey,X,T(2,@Other,#L8r41Other),$)
 C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,s,$)
-!授信餘額
-#CreditAmt=m,12,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey,D,T(2,@CreditAmt,#L8r41CreditAmt),$)
-C(5,#TranKey,X,T(2,@CreditAmt,#L8r41CreditAmt),$)
-C(5,#TranKey,D,s,$)
-C(5,#TranKey,X,s,$)
-#Total=m,14,S
-@E(0,#Principal+#Interest+#Penalty+#Other)
-IF(#CreditAmt!=#Total,$,S)
-V(P,授信餘額合計有誤，請重新輸入。〔本金＋利息＋違約金＋其他費用〕不等於〔授信餘額〕)
 
 !每期應付金額
 #TerminalPayAmt=m,10,I

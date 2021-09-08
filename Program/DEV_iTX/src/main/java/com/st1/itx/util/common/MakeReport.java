@@ -1296,7 +1296,7 @@ public class MakeReport extends CommBuffer {
 	private void setWatermark(PdfContentByte cb, Document document) throws IOException, DocumentException {
 
 		PdfGState graphicState = new PdfGState();
-		graphicState.setFillOpacity(0.3f);
+		graphicState.setFillOpacity(0.7f);
 		graphicState.setStrokeOpacity(1f);
 
 		BaseFont tmpBaseFont = this.setBaseFont("1");

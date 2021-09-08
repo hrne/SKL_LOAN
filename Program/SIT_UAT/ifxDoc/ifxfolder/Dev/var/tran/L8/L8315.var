@@ -227,7 +227,7 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
-#MaxMainCodeX=X,80,L
+#MaxMainCodeX=X,70,L
 T(2,@RimJcicBankCode,#MaxMainCode)
 RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)

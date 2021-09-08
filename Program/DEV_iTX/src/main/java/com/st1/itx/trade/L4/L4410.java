@@ -31,7 +31,6 @@ import com.st1.itx.util.common.BankAuthActCom;
 @Service("L4410")
 @Scope("prototype")
 public class L4410 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4410.class);
 
 	@Autowired
 	public BankAuthActCom bankAuthActCom;
@@ -40,13 +39,33 @@ public class L4410 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4410 ");
 		this.totaVo.init(titaVo);
-
 		bankAuthActCom.setTxBuffer(this.getTxBuffer());
-		int returnCode = 0;
 
-		returnCode = bankAuthActCom.acctCheck(titaVo);
+		// tita
+		String iCreateFlag = titaVo.getParam("CreateFlag");
+		// wk
 
-		this.info("returnCode :" + returnCode);
+		if ("1".equals(titaVo.getParam("FuncCode"))) {
+			bankAuthActCom.add(iCreateFlag, titaVo);
+
+			// 修改，新增授權A時授權成功，否則停止使用
+		} else if ("2".equals(titaVo.getParam("FuncCode"))) {
+			// 授權狀態未授權先刪除後新增
+			if ("".equals(titaVo.getParam("AuthStatus").trim())) {
+				bankAuthActCom.del("A", titaVo);
+				bankAuthActCom.add("A", titaVo);
+			} else {
+				if ("A".equals(iCreateFlag)) {
+					bankAuthActCom.mntAchAuth("0", titaVo);
+				} else {
+					bankAuthActCom.mntAchAuth("1", titaVo);
+				}
+			}
+
+		} else if ("4".equals(titaVo.getParam("FuncCode"))) {
+			bankAuthActCom.del(iCreateFlag, titaVo);
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

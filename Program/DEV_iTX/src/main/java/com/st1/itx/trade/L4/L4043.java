@@ -36,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4043 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4043.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -79,10 +78,16 @@ public class L4043 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 				OccursList occursList = new OccursList();
 				int authCreateDate = parse.stringToInteger(result.get("F11"));
-				int propDate = parse.stringToInteger(result.get("F12"));
-				int retrDate = parse.stringToInteger(result.get("F13"));
+				int propDate = parse.stringToInteger(result.get("F12")); // 提出
+				int retrDate = parse.stringToInteger(result.get("F13")); // 提回
 				int stampFinishDate = parse.stringToInteger(result.get("F19"));
 				int deleteDate = parse.stringToInteger(result.get("F20"));
+				String wkCreateFlag = result.get("F10");
+				String wkPostMediaCode = result.get("F16"); // 媒體檔
+				if (wkPostMediaCode == null) {
+					wkPostMediaCode = "";
+				}
+				String wkRetFlag = ""; // 是否顯示修改按鈕
 
 				if (authCreateDate > 19110000) {
 					authCreateDate = authCreateDate - 19110000;
@@ -99,6 +104,30 @@ public class L4043 extends TradeBuffer {
 				if (deleteDate > 19110000) {
 					deleteDate = deleteDate - 19110000;
 				}
+				if (deleteDate > 0) {
+//					1申請 2終止 9暫停
+					if ("00".equals(result.get("F15"))) {
+						wkCreateFlag = "9";
+					} else {
+						wkCreateFlag = "2";
+					}
+				}
+//				申請代號為申請			
+				if ("1".equals(wkCreateFlag)) {
+					// 授權成功時可修改
+					if ("00".equals(result.get("F15").trim())) {
+						wkRetFlag = "Y";
+					}
+					// 未授權未產生媒體檔可修改
+					if ("".equals(wkPostMediaCode)) {
+						wkRetFlag = "Y";
+					}
+
+				}
+				// 暫停授權可修改
+				if (deleteDate > 0) {
+					wkRetFlag = "Y";
+				}
 
 				occursList.putParam("OOCustNo", result.get("F0"));
 				occursList.putParam("OOFacmNo", result.get("F1"));
@@ -110,7 +139,7 @@ public class L4043 extends TradeBuffer {
 				occursList.putParam("OOLimitAmt", result.get("F7"));
 				occursList.putParam("OOAcctSeq", result.get("F8"));
 				occursList.putParam("OOCustId", result.get("F9"));
-				occursList.putParam("OOCreateFlag", result.get("F10"));
+				occursList.putParam("OOCreateFlag", wkCreateFlag);
 				occursList.putParam("OOAuthCreateDate", authCreateDate);
 				occursList.putParam("OOPropDate", propDate);
 				occursList.putParam("OORetrDate", retrDate);
@@ -123,17 +152,19 @@ public class L4043 extends TradeBuffer {
 				occursList.putParam("OODeleteDate", deleteDate);
 //				原為歷程於L4042僅最新一筆需有按鈕控制用，現無作用
 				occursList.putParam("OOButtenFlagA", result.get("F21"));
+				occursList.putParam("OORetFlag", wkRetFlag);
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
+
 		} else {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private Boolean hasNext() {
 		Boolean result = true;
 

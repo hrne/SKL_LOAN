@@ -1,0 +1,552 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4042)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,45)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!交易記號  0:交易,1:非交易
+#ORGFG=_,_,S
+E(0,0)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L4410; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增授權資料)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4042" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4042]                                 ACH授權資料查詢"],
+[#<->#,"#FdSearchFlag+查詢方式",#SearchFlag,#SearchFlagX],
+[#<->#,#LABELDATE,#DateFrom,"~",#DateTo],
+[#<->#,"#FdCustNo+戶號",#CustNo],
+[#<->#,"#FdRepayAcct+扣款帳號",#RepayAcct],
+[#<->#,"#FdRepayBank+扣款銀行",#RepayBank,#RepayBankX],
+]
+
+#FdSearchFlag=X,2,L
+T(3,*)
+#FdCustNo=X,2,L
+T(3,*)
+#FdRepayAcct=X,2,L
+T(3,*)
+#FdRepayBank=X,2,L
+T(3,*)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 銀行下拉選單
+#CDDEF01=x,50,S
+T(3,CdCode.BankCd)
+
+#BankCdHelp=x,1024,S
+
+! 查詢方式下拉選單
+#CDDEF02=x,20,S
+T(3,CdCode.SrchWay)
+
+#SearchFlagHelp=x,1024,S
+
+! 授權狀態下拉選單
+#CDDEF03=x,50,S
+T(3,CdCode.AuthStatusCode)
+#AuthStatusCodeHelp=x,1024,S
+
+! 扣款別選單
+#CDDEF04=x,20,S
+T(3,CdCode.AuthCode)
+
+! 授權狀態下拉選單
+#AuthStatusRimName=x,50,S
+T(3,CdCode.AuthStatus)
+#AuthStatusHelp=x,1024,S
+
+#AuthCodeHelp=x,1024,S
+
+! 媒體碼下拉選單
+#MediaCodeHelp2=x,50,S
+T(3,Y:已產生媒體; :未產生媒體)
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#AuthStatusRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@BankCdHelp,#HelpDesc1)
+T(2,@SearchFlagHelp,#HelpDesc2)
+T(2,@AuthStatusCodeHelp,#HelpDesc3)
+T(2,@AuthCodeHelp,#HelpDesc4)
+T(2,@AuthStatusHelp,#HelpDesc5)
+
+#LABELDATEHelp=x,50,S
+T(3,1:*    建檔日期;2:*    提出日期;3:*    提回日期)
+
+#RepayBankHelp=x,50,S 
+T(3,103:臺灣新光商銀;998:他行;999:全部)
+
+#MediaCodeHelp=x,50,S 
+T(3,N:N-新檔;O:O-舊檔;Y:Y)
+
+#NTXBUF=X,29,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@SearchFlag,#NTXBUF,1,1)
+T(1,@DateFrom,#NTXBUF,2,7)
+T(1,@DateTo,#NTXBUF,2,7)
+T(1,@CustNo,#NTXBUF,9,7)
+T(1,@RepayAcct,#NTXBUF,16,14)
+INVOKEJS(SHOW,p1,02,02,1)
+
+#PREVALUE=A,1,S
+E(0,@DateFrom,#SYSCDATE)
+E(0,@DateTo,#SYSCDATE)
+E(0,@RepayBank,999)
+
+! <交易明細>
+#BufferCreate=X,1,S
+T(2,1)
+
+! 查詢方式
+#SearchFlag=A,1,I
+HELP(#SearchFlagHelp)
+@V(H,#SearchFlagHelp)
+SWITCH(#SearchFlag,1,INVOKEJS(SHOW,L4042_2,1)INVOKEJS(SHOW,L4042_3,0)INVOKEJS(SHOW,L4042_4,0),
+                   2,INVOKEJS(SHOW,L4042_2,1)INVOKEJS(SHOW,L4042_3,0)INVOKEJS(SHOW,L4042_4,0),
+                   3,INVOKEJS(SHOW,L4042_2,1)INVOKEJS(SHOW,L4042_3,0)INVOKEJS(SHOW,L4042_4,0),
+                   4,INVOKEJS(SHOW,L4042_2,0)INVOKEJS(SHOW,L4042_3,1)INVOKEJS(SHOW,L4042_4,0)T(2,@FdCustNo,*),
+                   5,INVOKEJS(SHOW,L4042_2,0)INVOKEJS(SHOW,L4042_3,0)INVOKEJS(SHOW,L4042_4,1))
+
+! 查詢方式中文
+#SearchFlagX=X,8,L
+T(H,#SearchFlag,#SearchFlagHelp)
+
+#LABELDATE=U,12,L
+T(3,)T(H,#SearchFlag,#LABELDATEHelp)
+!SWITCH(#SearchFlag,1,T(3,建檔日期),
+!                2,T(3,提出日期),
+!                3,T(3,提回日期))
+
+! 日期
+#DateFrom=D,7,I
+C(3,#CHAIN,0,$,s)
+C(2,#SearchFlag,s,$,$,$,s,s)
+@V(7)A(DATE,0,#DateFrom)
+
+#DateTo=D,7,I
+C(3,#CHAIN,0,$,s)
+C(2,#SearchFlag,s,$,$,$,s,s)
+@V(7)A(DATE,0,#DateTo)
+
+! 戶號
+#CustNo=A,7,I
+C(3,#CHAIN,0,$,s)
+C(2,#SearchFlag,s,s,s,s,$,s)
+@V(2,0)
+
+#MRKEY=_,_,S
+C(3,#CustNo,0,S,T(2,#CustNo)) 
+
+! 扣款帳號
+#RepayAcct=A,14,I
+C(3,#CHAIN,0,$,s)
+C(2,#SearchFlag,s,s,s,s,s,$)
+@V(2,0)
+
+! 1:建檔日 2.提出日 3.提回日 4.皆無
+#RPTFG=A,1,S
+SWITCH(#SearchFlag,1,E(0,1),2,E(0,2),3,E(0,3),4,E(0,4),5,E(0,4))
+
+! 扣款銀行
+#RepayBank=A,3,I
+HELP(#RepayBankHelp)
+@V(H,#RepayBankHelp)
+! 扣款銀行中文
+#RepayBankX=X,12,L
+T(3,)T(H,#RepayBank,#RepayBankHelp)
+!SWITCH(#RepayBank,103,T(3,臺灣新光商銀),
+!                  998,T(3,他行),
+!                  999,T(3,全部))
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4042 -----------
+<sub type="FORM" name="L4042">
+#SCRTIL=_,_,S
+T(3,[L4042] ACH授權資料)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+#OOCustNo=A,7,O
+
+#OOFacmNo=A,3,O
+
+#OOAuthType=m,2,O
+#OOAuthTypeX=x,4,O
+T(H,@OOAuthTypeX,#OOAuthType,#AuthCodeHelp)
+
+#OORepayBank=A,3,O
+#OORepayBankX=x,16,O
+T(2,)
+IF(#OOStatus=="9"||#OOStatus=="0"||#OOStatus=="2"||#OOStatus=="1",$,s)
+T(H,@OORepayBankX,#OORepayBank,#BankCdHelp)
+
+#OORepayAcct=A,14,O
+
+#OOStatus=x,1,O
+#OOStatusX=x,10,O
+T(2,)
+IF(#OOStatus=="9"||#OOStatus=="0"||#OOStatus=="2"||#OOStatus=="1",$,s)
+T(H,@OOStatusX,#OOStatus,#AuthStatusCodeHelp)
+
+#OORepayAcctX=X,14,O
+T(2,)
+IF(#OOStatus=="9"||#OOStatus=="0"||#OOStatus=="2"||#OOStatus=="1",$,s)
+T(2,@OORepayAcctX,#OORepayAcct)
+
+#OOLimitAmt=m,14,O
+
+#OOCreateFlag=x,1,O
+
+#OOCreateFlagX=X,20,O
+C(5,#OOCreateFlag,D,T(2,取消授權),C(5,#OOCreateFlag,A,T(2,新增授權),C(5,#OOCreateFlag,Z,T(2,暫停授權))))
+
+#OOAuthCreateDate=D,7,O
+
+#OOPropDate=D,7,O
+
+#OORetrDate=D,7,O
+
+#OOAuthStatus=X,1,O
+#OOAuthStatusX=X,24,O
+C(4,#OOAuthStatus,T(H,#OOAuthStatus,#AuthStatusHelp),$)
+C(4,#OOAuthStatus,s,$)
+! C(3,#OOAuthStatus,0,
+!     C(5,#OOCreateFlag,D,T(2,取消授權扣款),
+!         C(5,#OOCreateFlag,A,T(2,成功授權),C(5,#OOCreateFlag,Z,T(2,暫停授權),T(2,)))),
+T(3,)T(H,#OOAuthStatus,#AuthStatusHelp))
+
+#OOMediaCode=X,1,O
+#OOMediaCodeX=X,10,O
+T(H,@OOMediaCodeX,#OOMediaCode,#MediaCodeHelp2)
+
+
+
+#OOAmlRsp=X,1,O
+#OORepayAcctLog=A,14,O
+#OORepayBankLog=A,3,O
+#OORepayBankLogX=x,16,O
+T(H,@OORepayBankLogX,#OORepayBankLog,#BankCdHelp)
+
+#OOStampFinishDate=D,7,O
+#OODeleteDate=D,7,O
+#OOButtenFlagA=A,1,O
+
+! #OOBUF_CREAT=X,1,S
+! T(2,1)
+#OOBUF_EDIT=X,500,S
+T(2,2
++#OOCustNo
++#OOFacmNo
++#OORepayBankLog
++#OORepayAcctLog
++#OOLimitAmt
++#OOCreateFlag
++#OOAuthStatus
++#OOMediaCode
++#OOAmlRsp
++#OOAuthCreateDate
++#OOStampFinishDate
+)
+#OOBUF_DELETE=X,500,S
+T(2,4
++#OOCustNo
++#OOFacmNo
++#OORepayBankLog
++#OORepayAcctLog
++#OOLimitAmt
++#OOCreateFlag
++#OOAuthStatus
++#OOMediaCode
++#OOAmlRsp
++#OOAuthCreateDate
++#OOStampFinishDate
+)
+#OOBUF_SEARCH=X,500,S
+T(2,5
++#OOCustNo
++#OOFacmNo
++#OORepayBankLog
++#OORepayAcctLog
++#OOLimitAmt
++#OOCreateFlag
++#OOAuthStatus
++#OOMediaCode
++#OOAmlRsp
++#OOAuthCreateDate
++#OOStampFinishDate
+)
+
+! #OOBTN_CREAT=A,2,O 改為頁面上方新增
+! BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_CREAT})
+#OOBTN_EDIT=A,2,O
+C(4,#OOAuthStatus,IF(#OOMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT})),BIND(grid,cancel))
+IF(#OOCreateFlag=="D"||#OOCreateFlag=="Z",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT}))
+C(4,#OOAuthStatus,s,$)
+IF(#OOAuthStatus=="0",
+IF(#OOCreateFlag=="D",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT})),
+BIND(grid,cancel))
+
+#OOBTN_DELETE=A,2,O
+IF(#OOMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_DELETE}))
+IF(#OOMediaCode=="Y",s,$)
+
+#OOBTN_SEARCH=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_SEARCH})
+
+#OOBUF_CONNECT=X,500,S
+T(2,#OOCustNo+#OORepayAcctLog)
+
+#OOBTN_CONNECT=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L4940; ntxbuf=#OOBUF_CONNECT})
+
+#OOBUF_HISTORY=X,500,S
+T(2,#OOCustNo+#OOFacmNo)
+
+#OOBTN_HISTORY=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L4941; ntxbuf=#OOBUF_HISTORY})
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#SearchFlag
+#DateFrom
+#DateTo
+#CustNo
+#RepayAcct
+#RepayBank
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L4042
+#OOCustNo
+#OOFacmNo
+#OOAuthType
+#OORepayBank
+#OORepayAcct
+#OOStatus
+#OOLimitAmt
+#OOCreateFlag
+#OOAuthCreateDate
+#OOPropDate
+#OORetrDate
+#OOAuthStatus
+#OOMediaCode
+#OOAmlRsp
+#OORepayAcctLog
+#OORepayBankLog
+#OOStampFinishDate
+#OODeleteDate
+#OOButtenFlagA
+^
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4042A" layout="cols=1;screen.width=[100,900];order=1;">
+[
+["[L4042]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ACH授權資料查詢"],
+[""],
+]
+</sub>
+<sub type="SELECT">
+#RPTFG=1,QUERY.GRID,L4042A
+#any={detail:true, header:'L4042A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_EDIT=修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+#OOBTN_DELETE=刪除
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBTN_SEARCH=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+#OOCustNo=戶號
+{width:65,align:'center'}
+#OOFacmNo=額度
+{width:45,align:'center'}
+#OORepayBankX=扣款銀行
+{width:120}
+#OORepayAcct=扣款帳號
+{width:105}
+#OOCreateFlagX=申請代號
+{width:100}
+#OOAuthStatusX=授權狀態
+{width:100}
+#OOMediaCodeX=媒體碼
+{width:100}
+#OOAuthCreateDate=建檔日期
+{width:100}
+#OOPropDate=提出日期
+{width:100}
+#OORetrDate=提回日期
+{width:100}
+#OOBTN_CONNECT=帳號
+{search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
+#OOBTN_HISTORY=歷程
+{search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
+
+^
+#RPTFG=2,QUERY.GRID,L4042A
+#any={detail:true, header:'L4042A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_EDIT=修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+#OOBTN_DELETE=刪除
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBTN_SEARCH=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+#OOCustNo=戶號
+{width:65,align:'center'}
+#OOFacmNo=額度
+{width:45,align:'center'}
+
+#OORepayBankX=扣款銀行
+{width:120}
+#OORepayAcct=扣款帳號
+{width:105}
+#OOCreateFlagX=申請代號
+{width:100}
+#OOAuthStatusX=授權狀態
+{width:100}
+#OOMediaCodeX=媒體碼
+{width:100}
+#OOAuthCreateDate=建檔日期
+{width:100}
+#OOPropDate=提出日期
+{width:100}
+#OORetrDate=提回日期
+{width:100}
+#OOBTN_CONNECT=帳號
+{search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
+#OOBTN_HISTORY=歷程
+{search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
+^
+#RPTFG=3,QUERY.GRID,L4042A
+#any={detail:true, header:'L4042A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_EDIT=修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+#OOBTN_DELETE=刪除
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBTN_SEARCH=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+#OOCustNo=戶號
+{width:65,align:'center'}
+#OOFacmNo=額度
+{width:45,align:'center'}
+#OORepayBankX=扣款銀行
+{width:120}
+#OORepayAcct=扣款帳號
+{width:105}
+#OOCreateFlagX=申請代號
+{width:100}
+#OOAuthStatusX=授權狀態
+{width:100}
+#OOMediaCodeX=媒體碼
+{width:100}
+#OOAuthCreateDate=建檔日期
+{width:100}
+#OOPropDate=提出日期
+{width:100}
+#OORetrDate=提回日期
+{width:100}
+#OOBTN_CONNECT=帳號
+{search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
+#OOBTN_HISTORY=歷程
+{search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
+^
+#RPTFG=4,QUERY.GRID,L4042A
+#any={detail:true, header:'L4042A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_EDIT=修改
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+#OOBTN_DELETE=刪除
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBTN_SEARCH=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+#OOCustNo=戶號
+{width:65,align:'center'}
+#OOFacmNo=額度
+{width:45,align:'center'}
+#OORepayBankX=扣款銀行
+{width:120}
+#OORepayAcct=扣款帳號
+{width:105}
+#OOCreateFlagX=申請代號
+{width:100}
+#OOAuthStatusX=授權狀態
+{width:100}
+#OOMediaCodeX=媒體碼
+{width:100}
+#OOAuthCreateDate=建檔日期
+{width:100}
+#OOPropDate=提出日期
+{width:100}
+#OORetrDate=提回日期
+{width:100}
+#OOBTN_CONNECT=帳號
+{search:false,formatter:'cust:bind-button:帳號',align:'center',canExport:false,width:40}
+#OOBTN_HISTORY=歷程
+{search:false,formatter:'cust:bind-button:歷程',align:'center',canExport:false,width:40}
+^
+<include src="PRT.icf::INQ04.sel" map="i=L4042;cpi=15"/>
+#SearchFlag#DateFrom#DateTo#CustNo#RepayAcct#RepayBank
+%
+#OOCustNo
+#OOFacmNo
+#OOAuthType
+#OORepayBank
+#OORepayAcct
+#OOStatus
+#OOLimitAmt
+@^
+</sub>

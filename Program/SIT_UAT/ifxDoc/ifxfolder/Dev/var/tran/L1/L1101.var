@@ -64,24 +64,6 @@ E(0,0)
 [#<->#,"@@",#Curraddress],
 [#<->#,"#FdCurrZip3+通訊-郵遞區號",#CurrZip3,#CurrZip2],
 [#<->#,"#FdEmail+電子信箱",#Email],
-[#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
-[#<->#,"#FdIsRelated+是否為利害關係人",#IsRelatedX],
-[#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNearX],
-[#<->#,"#FdIsFinancial+是否為金控疑似準利害關係人",#IsFinancialX],
-[#<->#,"#FdEduCode+教育程度代號",#EduCode,#EduCodeX],
-[#<->#,"#FdOwnedHome+自有住宅有無",#OwnedHome,#OwnedHomeX],
-[#<->#,"#FdCurrCompId+任職機構統編",#CurrCompId],
-[#<->#,"#FdCurrCompName+任職機構名稱",#CurrCompName],
-[#<->#,"#FdCurrCompTel+任職機構電話",#CurrCompTel],
-[#<->#,"#FdJobTitle+職位名稱",#JobTitle],
-[#<->#,"#FdJobTenure+服務年資",#JobTenure],
-["#FdIncomeOfYearly+年收入",#IncomeOfYearly,"仟元"],
-["#FdIncomeDataDate+年收入資料年月",#IncomeDataDate],
-[#<->#,"#FdPassportNo+護照號碼",#PassportNo],
-["#FdAMLJobCode+AML職業別",#AMLJobCode,#AMLJobCodeX],
-["#FdAMLGroup+AML組織",#AMLGroup,#AMLGroupX],
-[#<->#,"#FdIndigenousName+原住民姓名",#IndigenousName],
-[#<->#,"#FdSubCompanyFg+交互運用同意書",#SubCompanyFg,#SubCompanyFgX],
 ]
 ![#<->#,"@",#BTN3Name],
 !---------- AP Button AREA ----------
@@ -95,6 +77,11 @@ E(0,0)
 <include src="ROM.icf::L2R08.dec"/>
 <include src="ROM.icf::L6R06.dec"/>
 
+#Init1=X,1,S
+HIDE(#FinancialBtn)
+
+#FinancialBtn=X,15,I,ui:button;value:明細查詢;enable:1;tabbable:0;title:L1909 疑似準利害關係人明細查詢;
+
 ! #BTN1=X,15,I,ui:button;value:L1105;enable:0;tabbable:0;title=顧客聯絡電話維護;
 !#BTN2=X,15,I,ui:button;value:行業別代號查詢;enable:1;tabbable:0;title=行業別代號查詢;
 !#BTN3Name=X,12,I,ui:button;value:;enable:1;tabbable:0;
@@ -102,7 +89,7 @@ E(0,0)
 ! #ENABLE1=X,42,S
 ! ENABLE(#BTN1)
 #Init=X,1,S
-INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p9,0)
 
 ![Buttom資料查詢]
 #BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
@@ -137,15 +124,11 @@ T(2,@CurrNum,#RegNum)
 T(2,@CurrNumDash,#RegNumDash)
 T(2,@CurrFloor,#RegFloor)
 T(2,@CurrFloorDash,#RegFloorDash)
-!INVOKEJS(SHOW,p1,15,15,0)
-!INVOKEJS(SHOW,p1,16,16,1)
 T(2,@Curraddress,#Regaddress)
 
 
 #INVK=@,1,S
 IF(#RegFg==0,$,s)
-!INVOKEJS(SHOW,p1,15,15,1)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 ! ENABLE(#BTN2)ENABLE(#BTN3)
 !---------- Required Input Setting ---------- 
@@ -171,6 +154,7 @@ IF(#RegFg==0,$,s)
 #FdIsRelated=X,2,L
 #FdIsLnrelNear=X,2,L
 #FdIsFinancial=X,2,L
+#FdIsFinancial2=X,2,L
 #FdEntCode=X,2,L
 #FdEmpNo=X,10,L
 T(3,*    員工代號)
@@ -328,9 +312,6 @@ T(2,@RimTxCode,#TXCD)
 
 #INIT=X,1,S
 INVOKEJS(SHOW,grd3,0)
-!INVOKEJS(SHOW,p1,12,12,0)
-!INVOKEJS(SHOW,p1,16,16,0)
-!HIDE(#CurrZip3Lb,#CurrZip2Lb)
 
 #NTXBUF=X,11,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -382,8 +363,6 @@ IF(#FunCd == 1 ,E(0,1),E(0,0))
 
 #IfFunCd5=X,1,S
 IF(#FunCd==5,INVOKEJS(SHOW,p1,3,65,0),INVOKEJS(SHOW,p1,3,65,1))
-!INVOKEJS(SHOW,p1,12,12,0)
-!INVOKEJS(SHOW,p1,16,16,0)
 
 #checkIdlen=A,2,S
 !-----
@@ -465,6 +444,7 @@ T(2,@FdIsRelated,#WKSPC)
 T(2,@FdIsLnrelNear,#WKSPC)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdIsFinancial,#Fd)
+T(2,@FdIsFinancial2,#Fd)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdEduCode,#Fd)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
@@ -575,6 +555,11 @@ T(4,BRN$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @V(7)
+
+
+#FinancialBind=X,1,S
+SHOW(#FinancialBtn)
+BIND(#FinancialBtn,click, {cmd=CHAIN; ntxcd=L1909; ntxbuf=#CustName;ntxbuf5=type<-1})
 
 !英文姓名
 #EName=x,50,I
@@ -728,8 +713,6 @@ T(2,#L6r03Result)
 C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
 HELP(#L6r03ResultArea,cols:5)
 @V(H,#L6r03ResultArea)
 
@@ -759,8 +742,6 @@ C(4,#RegCityCode,S,$)
 TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
 @V(7)
 
 !戶籍-段
@@ -768,31 +749,24 @@ C(3,#FunCd,5,s,$)
 C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,12,12,0)
 
 !戶籍-巷
 #RegAlley=X,5,I
 C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
 
 !戶籍-弄
 #RegLane=X,5,I
 C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
 
 !戶籍-號
 #RegNum=X,5,I
 C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
 
 !戶籍-號之
 #RegNumDash=X,5,I
@@ -800,16 +774,12 @@ C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#RegNum,S,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
 
 !戶籍-樓
 #RegFloor=X,5,I
 C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-!INVOKEJS(SHOW,p1,11,11,1)
-!INVOKEJS(SHOW,p1,12,12,0)
 
 !戶籍-樓之
 #RegFloorDash=X,5,I
@@ -860,7 +830,7 @@ C(3,#FunCd,5,s,$)
 C(4,#RegZip2,S,$)
 V(9)
 
-#Regaddress=X,115,L
+#Regaddress=X,100,L
 
 #SameRegHelp=X,100,S
 T(3,N:另行輸入;Y:同戶籍地址)
@@ -1035,7 +1005,7 @@ C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
 T(2,@Curraddress,#L1r12Address)
 
-#Curraddress=X,115,L
+#Curraddress=X,100,L
 
 !通訊-郵遞區號前三碼
 #CurrZip3=X,3,L
@@ -1057,25 +1027,42 @@ C(3,#FunCd,5,s,$)
 @
 IF(#FdEmail=="*",V(7),$)
 C(4,#Email,$,A(M,0,#Email))
+</sub>
 
+<sub type="DC" name="p2" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+[
+[""],
+[#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
+[#<->#,"#FdIsRelated+是否為利害關係人",#IsRelatedX],
+[#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNearX],
+["#FdIsFinancial+是否為金控「疑似準利害關係人」名單",#IsFinancialX,#FinancialBtn],
+["#FdIsFinancial2+是否為金控疑似準利害關係人",#IsFinancialCheck,#IsFinancialCheckX,#IsFinancialCheckType,#IsFinancialCheckTypeX],
+[#<->#,"#FdIsLimit+以上資訊日期",#IsDataDate],
+]
 <include src="ROM.icf::L1R16.dec"/>
 ! 調是否為關係人rim
 #RimL1R16=X,1,S
 ! T(2,@RimCustId,#CustId)
 RESET_RIM(#RimL1r16,L1R16)
-S(L1R16,1,#RimCustId)
+T(2,@RimCustName,#CustName)
+S(L1R16,1,#RimCustId,#RimCustName)
 R(1,L1R16)
 T(2,@IsLimit,#L1R16IsLimitYn)
 T(2,@IsRelated,#L1R16IsRelatedYn)
 T(2,@IsLnrelNear,#L1R16IsLnrelNearYn)
+T(2,@IsFinancial,#L1R16IsFinancialYn)
+T(2,@IsFinancialCheck,#L1R16IsFinancialYn)
+T(2,@IsDataDate,#L1R16DataDate)
 
-是否為授信限制對象
+#IsDataDate=D,7,L
+
+!是否為授信限制對象
 #IsLimit=X,1,S
 
 #IsLimitX=X,4,L
 T(H,#IsLimit,#YesNoHelp)
 
-是否為利害關係人
+!是否為利害關係人
 #IsRelated=X,1,S
 
 #IsRelatedX=X,4,L
@@ -1091,6 +1078,46 @@ T(H,#IsLnrelNear,#YesNoHelp)
 
 #IsFinancialX=X,4,L
 T(H,#IsFinancial,#YesNoHelp)
+
+#IsFinancialCheck=X,1,I
+HELP(#YesNoHelp)
+@
+V(H,#YesNoHelp)
+
+#IsFinancialCheckX=X,4,L
+T(H,#IsFinancialCheck,#YesNoHelp)
+
+#IsFinancialCheckTypeHelp=X,100,S
+T(3, :請選擇;Y:確認核對無誤)
+
+#IsFinancialCheckType=X,1,I
+HELP(#IsFinancialCheckTypeHelp)
+@
+V(7)
+V(H,#IsFinancialCheckTypeHelp)
+
+#IsFinancialCheckTypeX=X,4,L
+T(H,#IsFinancialCheckType,#IsFinancialCheckTypeHelp)
+
+</sub>
+<sub type="DC" name="p3" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+[
+[""],
+[#<->#,"#FdEduCode+教育程度代號",#EduCode,#EduCodeX],
+[#<->#,"#FdOwnedHome+自有住宅有無",#OwnedHome,#OwnedHomeX],
+[#<->#,"#FdCurrCompId+任職機構統編",#CurrCompId],
+[#<->#,"#FdCurrCompName+任職機構名稱",#CurrCompName],
+[#<->#,"#FdCurrCompTel+任職機構電話",#CurrCompTel],
+[#<->#,"#FdJobTitle+職位名稱",#JobTitle],
+[#<->#,"#FdJobTenure+服務年資",#JobTenure],
+["#FdIncomeOfYearly+年收入",#IncomeOfYearly,"仟元"],
+["#FdIncomeDataDate+年收入資料年月",#IncomeDataDate],
+[#<->#,"#FdPassportNo+護照號碼",#PassportNo],
+["#FdAMLJobCode+AML職業別",#AMLJobCode,#AMLJobCodeX],
+["#FdAMLGroup+AML組織",#AMLGroup,#AMLGroupX],
+[#<->#,"#FdIndigenousName+原住民姓名",#IndigenousName],
+[#<->#,"#FdSubCompanyFg+交互運用同意書",#SubCompanyFg,#SubCompanyFgX],
+]
 
 !教育程度代號
 #EduCode=X,1,I
@@ -1231,11 +1258,11 @@ C(4,#SubCompanyCode{n},INVOKEJS(SHOW,grd1,{n},{n},0),INVOKEJS(SHOW,grd1,{n},{n},
 ##end
 
 #ShowP2=X,1,S
-C(5,#SubCompanyFg,Y,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
+C(5,#SubCompanyFg,Y,INVOKEJS(SHOW,p9,1),INVOKEJS(SHOW,p9,0))
 
 </sub>
 
-<sub type="DC" name="p2" layout="cols=3;screen.width=[170,830];printer.width=[20,20,20,20];order=1">
+<sub type="DC" name="p9" layout="cols=3;screen.width=[170,830];printer.width=[20,20,20,20];order=1">
 [
 ["交互運用同意書"],
 ["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[150,300,100], p_cols:[15,15,15]}","","",
@@ -1295,8 +1322,6 @@ T(3,[L1101] 顧客基本資料維護-自然人)
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
 #checkhideinput=X,1,S
-!INVOKEJS(SHOW,p1,0)
-!! IF(#FunCd==5,INVOKEJS(SHOW,p1,0),$)
 
 !統編
 #OCustId=X,10,L
@@ -1534,6 +1559,9 @@ T(H,#OOEnable,#EnableHelp)
 #SubCompanyCode{n}
 #CrossUse{n}
 ##end
+#IsFinancial
+#IsFinancialCheck
+#IsFinancialCheckType
 </sub>
 
 !------ 下行電文TOM ------

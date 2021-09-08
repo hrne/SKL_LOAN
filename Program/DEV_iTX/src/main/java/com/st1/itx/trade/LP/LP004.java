@@ -21,7 +21,6 @@
 
 // public class LP004 extends TradeBuffer {
 // 	@SuppressWarnings("unused")
-// 	// private static final Logger logger = LoggerFactory.getLogger(LP004.class);
 
 // 	@Autowired
 // 	public LP004Report lp004report;
@@ -50,36 +49,33 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
 
-@Service("LP004")
-@Scope("step")
 /**
  * 
  * 
  * @author Eric Chang
  * @version 1.0.0
  */
-
-
+@Service("LP004")
+@Scope("step")
 public class LP004 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
-	LP004Report lp004report;
- 
+	LP004Report lP004Report;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LP004.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LP004 ");
-		lp004report.setTxBuffer(this.getTxBuffer());
-		lp004report.exec(titaVo);
+		lP004Report.setTxBuffer(this.getTxBuffer());
+		lP004Report.exec(titaVo);
 	}
 
 }

@@ -326,7 +326,7 @@ public class L2153 extends TradeBuffer {
 		}
 		// 銀扣授權帳號檔
 		if (titaVo.isActfgRelease()) {
-			bankAuthActCom.acctCheck(titaVo);
+			bankAuthActCom.add("A",titaVo);
 		}
 
 		// 額度與擔保品關聯檔變動處理
@@ -466,7 +466,7 @@ public class L2153 extends TradeBuffer {
 				tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
 				tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
 
-				bankAuthActCom.acctCheck(titaVo);
+				bankAuthActCom.add("A",titaVo);
 			}
 			try {
 				tFacMain = facMainService.update2(tFacMain, titaVo);

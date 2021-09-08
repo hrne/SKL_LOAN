@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4042ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -56,11 +53,11 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4920.findAll");
+		this.info("L4920.findAll");
 
 		int iSearchFlag = parse.stringToInteger(titaVo.get("SearchFlag"));
 		int iDateFrom = parse.stringToInteger(titaVo.get("DateFrom")) + 19110000;
@@ -68,9 +65,7 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		String iRepayAcct = FormatUtil.pad9(titaVo.get("RepayAcct").trim(), 14);
 
-
-
-        String sql = "";
+		String sql = "";
 		sql += " select * from (                                                             ";
 		sql += " select                                                                      ";
 		sql += "     act.\"CustNo\"            as F0                                         ";
@@ -87,27 +82,12 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ,act.\"AuthStatus\"        as F11                                        ";
 		sql += "    ,act.\"MediaCode\"         as F12                                        ";
 		sql += "    ,act.\"AmlRsp\"            as F13                                        ";
-		sql += "    ,his.\"RepayBank\"         as F14                                        ";
-		sql += "    ,his.\"RepayAcct\"         as F15                                        ";
+		sql += "    ,act.\"RepayBank\"         as F14                                        ";
+		sql += "    ,act.\"RepayAcct\"         as F15                                        ";
 		sql += "    ,act.\"StampFinishDate\"   as F16                                        ";
-		sql += "    ,his.\"DeleteDate\"        as F17                                        ";
+		sql += "    ,act.\"DeleteDate\"        as F17                                        ";
 		sql += "    ,case when row_number() over (partition by act.\"CustNo\",act.\"RepayBank\",act.\"RepayAcct\" order by act.\"CreateDate\" Desc) = 1 then 1 else 0 end as F18 ";
 		sql += "   from \"AchAuthLog\" act                                            ";
-		sql += "   left join (                                                             ";
-		sql += "       select                                                              ";
-		sql += "         \"AuthCreateDate\"                                                ";
-		sql += "        ,\"CustNo\"                                                        ";
-		sql += "        ,\"RepayBank\"                                                     ";
-		sql += "        ,\"RepayAcct\"                                                     ";
-		sql += "        ,\"CreateFlag\"                                                    ";
-		sql += "        ,\"CreateDate\"                                                    ";
-		sql += "        ,\"DeleteDate\"                                                    ";
-		sql += "       from \"AchAuthLogHistory\" ) his                                             ";
-		sql += "      on his.\"AuthCreateDate\" = act.\"AuthCreateDate\"                       ";
-		sql += "     and his.\"CustNo\"         = act.\"CustNo\"                               ";
-		sql += "     and his.\"RepayBank\"      = act.\"RepayBank\"                            ";
-		sql += "     and his.\"RepayAcct\"      = act.\"RepayAcct\"                            ";
-		sql += "     and his.\"CreateFlag\"     = act.\"CreateFlag\"                           ";
 		sql += "  where                                                                    ";
 		if (iSearchFlag == 1) {
 			sql += "            act.\"AuthCreateDate\" >= " + iDateFrom;
@@ -130,14 +110,14 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  order by act.\"CustNo\",act.\"FacmNo\",act.\"CreateDate\" Desc  ";
 		sql += " ) a where a.\"F18\" = 1                                          ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -150,7 +130,7 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

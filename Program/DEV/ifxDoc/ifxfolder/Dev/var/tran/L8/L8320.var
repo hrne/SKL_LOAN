@@ -253,7 +253,7 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 
 ! 類似的有L8308,L8320
 #PreValuePostAddr=X,76,S
-T(2,台北市中正區忠孝西路一段66號18樓)
+! T(2,台北市中正區忠孝西路一段66號18樓)
 IF(#L8r31PostAddr!="",s,T(2,@PostAddr,#PreValuePostAddr))
 
 !---------- AP TEXT AREA Variables ----------

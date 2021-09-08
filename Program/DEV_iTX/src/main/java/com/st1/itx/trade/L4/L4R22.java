@@ -27,7 +27,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R22 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R22.class);
 
 	@Autowired
 	public Parse parse;
@@ -42,6 +41,7 @@ public class L4R22 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4R22 ");
 		this.totaVo.init(titaVo);
+		int funCd = parse.stringToInteger(titaVo.get("RimFuncCode"));
 		int custNo = parse.stringToInteger(titaVo.get("RimCustNo"));
 		String bankNo = FormatUtil.pad9(titaVo.getParam("RimBankNo"), 3);
 		String acctNo = FormatUtil.pad9(titaVo.getParam("RimAcctNo"), 14);
@@ -52,6 +52,7 @@ public class L4R22 extends TradeBuffer {
 		String relationId = "";
 		int relAcctBirthday = 0;
 		String relAcctGender = "";
+		String wkNewCreateFlag = "";
 		BigDecimal limitAmt = BigDecimal.ZERO;
 
 		if ("700".equals(bankNo)) {
@@ -63,14 +64,13 @@ public class L4R22 extends TradeBuffer {
 				this.info("tPostAuthLog ... " + tPostAuthLog.toString());
 
 				int flag = 0;
-
-				if ("1".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
+				if ("1".equals(tPostAuthLog.getAuthApplCode()) && tPostAuthLog.getPropDate() == 0) {
+					flag = 8;
+				} else if ("1".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
 					flag = 1;
-				}
-				if ("9".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
+				} else if ("9".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
 					flag = 2;
-				}
-				if ("2".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
+				} else if ("2".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
 					flag = 9;
 				}
 
@@ -96,14 +96,13 @@ public class L4R22 extends TradeBuffer {
 				this.info("tAchAuthLog ... " + tAchAuthLog.toString());
 
 				int flag = 0;
-
-				if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) {
+				if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() > 0) { // 已提出
+					flag = 8;
+				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) { // 已提回授權成功
 					flag = 1;
-				}
-				if ("Z".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) {
+				} else if ("Z".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) { // 暫停授權
 					flag = 2;
-				}
-				if ("D".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) {
+				} else if ("D".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) { // 取消授權
 					flag = 9;
 				}
 //				塞不塞值為var檢核
@@ -114,6 +113,21 @@ public class L4R22 extends TradeBuffer {
 				relAcctBirthday = tAchAuthLog.getRelAcctBirthday();
 				relAcctGender = tAchAuthLog.getRelAcctGender();
 				limitAmt = tAchAuthLog.getLimitAmt();
+				wkNewCreateFlag = tAchAuthLog.getCreateFlag();
+				if (funCd == 2) {
+					if ("A".equals(tAchAuthLog.getCreateFlag())) {
+						if ("0".equals(tAchAuthLog.getAuthStatus())) {
+
+							// 刪除日期/暫停授權日期>0自動放A.新增授權 否則 Z.暫停授權
+							if (tAchAuthLog.getDeleteDate() > 0) {
+								wkNewCreateFlag = "A";
+							} else {
+								wkNewCreateFlag = "Z";
+							}
+						}
+					}
+				}
+
 			} else {
 				this.info("tAchAuthLog null... ");
 			}
@@ -126,6 +140,7 @@ public class L4R22 extends TradeBuffer {
 		totaVo.putParam("L4r22RelAcctBirthday", relAcctBirthday);
 		totaVo.putParam("L4r22RelAcctGender", relAcctGender);
 		totaVo.putParam("L4r22LimitAmt", limitAmt);
+		totaVo.putParam("L4r22NewCreateFlag", wkNewCreateFlag);
 
 		this.addList(this.totaVo);
 		return this.sendList();

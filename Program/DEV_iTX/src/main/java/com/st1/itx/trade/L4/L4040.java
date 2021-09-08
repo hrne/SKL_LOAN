@@ -49,7 +49,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4040 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4040.class);
 
 	private int aCnt = 0;
 	private int bCnt = 0;
@@ -94,6 +93,7 @@ public class L4040 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4040 ");
 		this.totaVo.init(titaVo);
+		txToDoCom.setTxBuffer(txBuffer);
 
 //		FunctionCode 執行動作
 //  	  1.篩選資料 -> 查詢條件A -> CustNo戶號 || PropDate提出日期 擇一輸入  => MediaCode=Y
@@ -161,7 +161,7 @@ public class L4040 extends TradeBuffer {
 				}
 
 				for (Map<String, String> result : resultList) {
-					setDate(result);
+					setData(result);
 
 					OccursList occursListOutput = new OccursList();
 					occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
@@ -200,7 +200,7 @@ public class L4040 extends TradeBuffer {
 			if (resultList != null && resultList.size() != 0) {
 				int cnt = 0;
 				for (Map<String, String> result : resultList) {
-					setDate(result);
+					setData(result);
 
 					this.info("For Loop Start !*!*!*! ");
 					this.info("!*!*!*! Size : " + resultList.size());
@@ -298,15 +298,15 @@ public class L4040 extends TradeBuffer {
 						tAchAuthLogId.setRepayAcct(result.get("F4"));
 						tAchAuthLogId.setCreateFlag(result.get("F5"));
 
-						AchAuthLog tempAchAuthLog = achAuthLogService.holdById(tAchAuthLogId);
+						AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId);
 
-						tempAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-						tempAchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
-						tempAchAuthLog.setMediaCode("Y");
+						tAchAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+						tAchAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
+						tAchAuthLog.setMediaCode("Y");
 						try {
 							// 送出到DB
-							if (tempAchAuthLog != null) {
-								achAuthLogService.update(tempAchAuthLog);
+							if (tAchAuthLog != null) {
+								achAuthLogService.update(tAchAuthLog);
 							}
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0007", "L4040 AchAuthLog update " + e.getErrorMsg());
@@ -335,10 +335,10 @@ public class L4040 extends TradeBuffer {
 
 //						2.回寫狀態
 						TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
-						tTxToDoDetailId.setCustNo(tempAchAuthLog.getCustNo());
-						tTxToDoDetailId.setFacmNo(tempAchAuthLog.getFacmNo());
+						tTxToDoDetailId.setCustNo(tAchAuthLog.getCustNo());
+						tTxToDoDetailId.setFacmNo(tAchAuthLog.getFacmNo());
 						tTxToDoDetailId.setBormNo(0);
-						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tempAchAuthLog.getRepayAcct(), 14));
+						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tAchAuthLog.getRepayAcct(), 14));
 						tTxToDoDetailId.setItemCode("ACHP00");
 
 						txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
@@ -455,7 +455,7 @@ public class L4040 extends TradeBuffer {
 				int cnt = 0;
 				for (Map<String, String> result : resultList) {
 					if ("".equals(result.get("F9").trim())) {
-						setDate(result);
+						setData(result);
 						cnt = cnt + 1;
 						OccursList occursListOutput = new OccursList();
 
@@ -480,24 +480,24 @@ public class L4040 extends TradeBuffer {
 						tAchAuthLogId.setRepayAcct(result.get("F4"));
 						tAchAuthLogId.setCreateFlag(result.get("F5"));
 
-						AchAuthLog tempAchAuthLog = achAuthLogService.holdById(tAchAuthLogId);
+						AchAuthLog tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId);
 
-						tempAchAuthLog.setProcessDate(0);
-						tempAchAuthLog.setPropDate(0);
-						tempAchAuthLog.setMediaCode("");
+						tAchAuthLog.setProcessDate(0);
+						tAchAuthLog.setPropDate(0);
+						tAchAuthLog.setMediaCode("");
 						try {
 							// 送出到DB
-							achAuthLogService.update(tempAchAuthLog);
+							achAuthLogService.update(tAchAuthLog);
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0007", "L4040 AchAuthLog update " + e.getErrorMsg());
 						}
 
 //						2.回寫狀態
 						TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
-						tTxToDoDetailId.setCustNo(tempAchAuthLog.getCustNo());
-						tTxToDoDetailId.setFacmNo(tempAchAuthLog.getFacmNo());
+						tTxToDoDetailId.setCustNo(tAchAuthLog.getCustNo());
+						tTxToDoDetailId.setFacmNo(tAchAuthLog.getFacmNo());
 						tTxToDoDetailId.setBormNo(0);
-						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tempAchAuthLog.getRepayAcct(), 14));
+						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tAchAuthLog.getRepayAcct(), 14));
 						tTxToDoDetailId.setItemCode("ACHP00");
 
 						txToDoCom.updDetailStatus(0, tTxToDoDetailId, titaVo);
@@ -541,7 +541,11 @@ public class L4040 extends TradeBuffer {
 		return result;
 	}
 
-	private void setDate(Map<String, String> result) throws LogicException {
+	private void setData(Map<String, String> result) throws LogicException {
+		// ID
+		if (result.get("F19") == null || result.get("F19").length() == 0) {
+			result.put("F19", result.get("F0"));
+		}
 		authCreateDate = parse.stringToInteger(result.get("F1"));
 		processDate = parse.stringToInteger(result.get("F7"));
 		stampFinishDate = parse.stringToInteger(result.get("F8"));

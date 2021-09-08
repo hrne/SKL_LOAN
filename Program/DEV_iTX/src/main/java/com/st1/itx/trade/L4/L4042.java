@@ -33,7 +33,6 @@ import com.st1.itx.db.service.springjpa.cm.L4042ServiceImpl;
 @Service("L4042")
 @Scope("prototype")
 public class L4042 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4042.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -79,6 +78,7 @@ public class L4042 extends TradeBuffer {
 				int retrDate = parse.stringToInteger(result.get("F10"));
 				int stampFinishDate = parse.stringToInteger(result.get("F16"));
 				int deleteDate = parse.stringToInteger(result.get("F17"));
+				String wkCreateFlag = result.get("F7");
 
 				if (authCreateDate > 19110000) {
 					authCreateDate = authCreateDate - 19110000;
@@ -92,9 +92,19 @@ public class L4042 extends TradeBuffer {
 				if (stampFinishDate > 19110000) {
 					stampFinishDate = stampFinishDate - 19110000;
 				}
+				this.info("deleteDate = " + deleteDate);
 				if (deleteDate > 19110000) {
 					deleteDate = deleteDate - 19110000;
 				}
+
+				if (deleteDate > 0) {
+					if ("0".equals(result.get("F11"))) {
+						wkCreateFlag = "Z";
+					} else {
+						wkCreateFlag = "Y";
+					}
+				}
+
 				occursList.putParam("OOCustNo", result.get("F0"));
 				occursList.putParam("OOFacmNo", result.get("F1"));
 				occursList.putParam("OOAuthType", result.get("F2"));
@@ -102,7 +112,7 @@ public class L4042 extends TradeBuffer {
 				occursList.putParam("OORepayAcct", result.get("F4"));
 				occursList.putParam("OOStatus", result.get("F5"));
 				occursList.putParam("OOLimitAmt", result.get("F6"));
-				occursList.putParam("OOCreateFlag", result.get("F7"));
+				occursList.putParam("OOCreateFlag", wkCreateFlag);
 				occursList.putParam("OOAuthCreateDate", authCreateDate);
 				occursList.putParam("OOPropDate", propDate);
 				occursList.putParam("OORetrDate", retrDate);

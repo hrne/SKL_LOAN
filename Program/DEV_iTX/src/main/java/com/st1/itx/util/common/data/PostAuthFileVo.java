@@ -63,24 +63,27 @@ public class PostAuthFileVo extends FileVo {
 //				4   OccMediaDate    媒體產生日期	8-16	X(8)	西元年月日YYYYMMDD	
 //				5   OccBatchNo  	批號			16-19	9(3)	固定值為001 	
 //				6   OccDataSeq  	流水號		19-25	9(6)	每批自000001序編	
-//				7   OccApprCode 	申請代號		25-26	X(1)	"委託機構送件：1：申請2：終止"	"郵局回送「帳戶至郵局辦理終止」檔：3：郵局終止4：誤終止-已回復為申請"
-//				8   OccAcctType 	帳戶別		26-27	X(1)	P：存簿    G：劃撥	
-//				9   OccRepayAcct    儲金帳號		27-41	9(14)	存簿：局帳號計14碼   劃撥：000000+8碼帳號	
+//				7   AuthApplCode    申請代號		25-26	X(1)	"委託機構送件：1：申請2：終止"	"郵局回送「帳戶至郵局辦理終止」檔：3：郵局終止4：誤終止-已回復為申請"
+//				8   PostDepCode 	帳戶別		26-27	X(1)	P：存簿    G：劃撥	
+//				9   RepayAcct       儲金帳號		27-41	9(14)	存簿：局帳號計14碼   劃撥：000000+8碼帳號	
 //				10  OccCustNo   	用戶編號		41-61	X(20)	"右靠左補空，大寫英數字，不得填寫中文由委託機構自行編給其客戶之編號"	
 //				11  OccCustId   	統一證號		61-71	X(10)	左靠右補空白	
-//				12  OccStatusCode   狀況代號		71-73	X(2)	初始值為空白，回送資料請參閱媒體資料不符代號一覽表	
-//				13  OccCheckInd 	核對註記		73-74	X(1)	初始值為空白，回送資料請參閱媒體資料不符代號一覽表	
+//				12  AuthErrorCode   狀況代號		71-73	X(2)	初始值為空白，回送資料請參閱媒體資料不符代號一覽表	
+//				13  StampCode    	核對註記		73-74	X(1)	初始值為空白，回送資料請參閱媒體資料不符代號一覽表	
 //				14  OccNoteB    	保留欄		74-100	X(26)	空白	
-
-//				
-//				OccMediaDate	媒體產生日期    
-//				OccDataSeq   	流水號
-//				OccOrgCode      委託機構代號
+//				CustNo = ,AND PostDepCode = ,AND RepayAcct = ,AND AuthCode = 
+// 用戶編號=	扣款人ID(1)+郵局存款別(1)+戶號(7)+帳號碼(文字2位) 
 				occursList.putParam("OccMediaDate", thisLine.substring(8, 16));
 				occursList.putParam("OccDataSeq", thisLine.substring(19, 25));
 				occursList.putParam("OccOrgCode", thisLine.substring(1, 4));
-//				ApprCode		申請代號1：申請2：終止
-				occursList.putParam("OccApprCode", thisLine.substring(25, 26));
+//				AuthApplCode		申請代號1：申請2：終止
+				occursList.putParam("AuthApplCode", thisLine.substring(25, 26));
+//				 戶號(7)
+				occursList.putParam("CustNo", thisLine.substring(52, 59));
+//				郵局存款別(1)
+				occursList.putParam("PostDepCode", thisLine.substring(26, 27));			
+//				儲金帳號(14)
+				occursList.putParam("RepayAcct", thisLine.substring(27, 41));
 
 //				StampCode		核印註記    
 				occursList.putParam("StampCode", thisLine.substring(73, 74));

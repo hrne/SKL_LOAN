@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /* 套件 */
@@ -15,7 +17,6 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ575;
 import com.st1.itx.db.domain.JcicZ575Id;
@@ -23,7 +24,7 @@ import com.st1.itx.db.domain.JcicZ575Log;
 import com.st1.itx.db.service.JcicZ575LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ575Service;
-
+import com.st1.itx.db.service.springjpa.cm.L8337ServiceImpl;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -51,6 +52,8 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8337 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public L8337ServiceImpl sL8337ServiceImpl;
 	@Autowired
 	public JcicZ575Service sJcicZ575Service;
 	@Autowired
@@ -81,7 +84,22 @@ public class L8337 extends TradeBuffer {
 		iJcicZ575Id.setCustId(iCustId);
 		iJcicZ575Id.setSubmitKey(iSubmitKey);
 		JcicZ575 chJcicZ575 = new JcicZ575();
-		
+		List<Map<String, String>> iL8337SqlReturn = new ArrayList<Map<String, String>>();
+		//檢核項目(D-78)
+		//三start
+		try {
+			iL8337SqlReturn = sL8337ServiceImpl.findData(this.index, this.limit, iCustId, iBankId, titaVo);
+		} catch (Exception e) {
+			// E5004 讀取DB語法發生問題
+			this.info("L5024 ErrorForSql=" + e);
+			throw new LogicException(titaVo, "E5004", "");
+		}
+		if (iL8337SqlReturn.size() == 0) {
+			throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
+		}
+		//三end
+		//檢核項目end
+
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ575

@@ -44,7 +44,7 @@ public interface JcicZ041Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ041 JcicZ041 of List
    */
-  public Slice<JcicZ041> CustIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ041> custIdEq(String custId_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * RcDate=
@@ -55,7 +55,7 @@ public interface JcicZ041Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ041 JcicZ041 of List
    */
-  public Slice<JcicZ041> RcDateEq(int rcDate_0, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ041> rcDateEq(int rcDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustId= , AND RcDate=
@@ -67,7 +67,7 @@ public interface JcicZ041Service {
    * @param titaVo Variable-Length Argument
    * @return Slice JcicZ041 JcicZ041 of List
    */
-  public Slice<JcicZ041> CustRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<JcicZ041> custRcEq(String custId_0, int rcDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * SubmitKey= , AND CustId= , AND RcDate=
