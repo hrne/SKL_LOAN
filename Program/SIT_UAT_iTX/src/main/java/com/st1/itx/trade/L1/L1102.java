@@ -219,10 +219,10 @@ public class L1102 extends TradeBuffer {
 		}
 
 		// 通訊地址
-		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain);
+		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
 		this.info("CurrAddres" + WkCurrAddres);
 		// 戶籍地址
-		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain);
+		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain, titaVo);
 		this.info("CurrAddres" + WkRegAddres);
 
 		this.totaVo.putParam("OCustId", tCustMain.getCustId());

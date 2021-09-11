@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.mon;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -11,7 +12,6 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
-import com.st1.itx.db.domain.InsuRenewMediaTempId;
 
 /**
  * Gen By Tool
@@ -19,14 +19,18 @@ import com.st1.itx.db.domain.InsuRenewMediaTempId;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface InsuRenewMediaTempRepositoryMon extends JpaRepository<InsuRenewMediaTemp, InsuRenewMediaTempId> {
+public interface InsuRenewMediaTempRepositoryMon extends JpaRepository<InsuRenewMediaTemp, Long> {
 
-	// FireInsuMonth >= ,AND FireInsuMonth <=
-	public Slice<InsuRenewMediaTemp> findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqual(String fireInsuMonth_0, String fireInsuMonth_1, Pageable pageable);
+  // FireInsuMonth >= ,AND FireInsuMonth <= 
+  public Slice<InsuRenewMediaTemp> findAllByFireInsuMonthGreaterThanEqualAndFireInsuMonthLessThanEqual(String fireInsuMonth_0, String fireInsuMonth_1, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<InsuRenewMediaTemp> findByInsuRenewMediaTempId(InsuRenewMediaTempId insuRenewMediaTempId);
+  // FireInsuMonth = ,AND ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND InsuNo =
+  public Optional<InsuRenewMediaTemp> findTopByFireInsuMonthIsAndClCode1IsAndClCode2IsAndClNoIsAndInsuNoIs(String fireInsuMonth_0, String clCode1_1, String clCode2_2, String clNo_3, String insuNo_4);
+
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<InsuRenewMediaTemp> findByLogNo(Long logNo);
 
 }
+

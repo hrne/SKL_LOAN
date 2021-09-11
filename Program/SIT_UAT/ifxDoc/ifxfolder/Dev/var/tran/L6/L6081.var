@@ -118,7 +118,7 @@ T(3,1)ASGN(LOOP$)
 ! 工作年月
 #OOWorkMonth=A,5,S
 
-!1:已停效
+!0:未生效;1:已生效;2:已停效
 #OOFlag=A,1,S
 
 ! 修改的按鈕
@@ -129,8 +129,8 @@ E(0,2)
 T(2,#OOFunc2+#OOWorkMonth)
 
 #OOBTN2=X,4,S
-C(3,#OOFlag,0,BIND(grid,{cmd=CHAIN;ntxcd=L6751;text=修改;ntxbuf=#OOBUF2}),
-							BIND(grid,cancel))
+IF(#OOFlag==0 || #OOFlag==1,BIND(grid,{cmd=CHAIN;ntxcd=L6751;text=修改;ntxbuf=#OOBUF2}),
+														BIND(grid,cancel))
 
 
 ! 複製的按鈕
@@ -149,7 +149,8 @@ E(0,4)
 T(2,#OOFunc4+#OOWorkMonth)
 
 #OOBTN4=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6751;text=刪除;ntxbuf=#OOBUF4})
+IF(#OOFlag==0 ,BIND(grid,{cmd=CHAIN;ntxcd=L6751;text=刪除;ntxbuf=#OOBUF4}),
+														BIND(grid,cancel))
 
 ! 查詢的按鈕
 #OOFunc5=A,1,S

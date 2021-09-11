@@ -72,7 +72,8 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iPropDate = iPropDate + 19110000;
 		}
 
-		// 1. 篩選 2.重新授權 3.取消
+		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
+		// iCreateFlag 1.新增授權 2.再次授權 3.取消授權
 		switch (iFunctionCode) {
 		case 1: // 篩選資料
 			switch (iCreateFlag) {
@@ -161,7 +162,9 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) a                                        ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = a.\"CustNo\" ";
 		sql += " where a.seq = 1                            ";
-		sql += "   and a.\"AuthStatus\" " + searchstatus;
+		sql += "   and  nvl(a.\"AuthStatus\", ' ') " + searchstatus;
+		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
+		// iCreateFlag 1.新增授權 2.再次授權 3.取消授權
 		switch (iFunctionCode) {
 		case 1:
 			sql += "   and a.\"MediaCode\" " + searchMediaCode;
@@ -169,14 +172,17 @@ public class L4040ServiceImpl extends ASpringJpaParm implements InitializingBean
 				sql += "   and a.\"CustNo\" = " + iCustNo;
 			}
 			if (iPropDate > 0) {
-				sql += "   and a.\"PropDate\" <= " + iPropDate;
+				sql += "   and a.\"PropDate\" >= " + iPropDate;
 			}
 			if (iPropDate == 0 && iCustNo == 0) {
 				sql += "   and a.\"PropDate\" != " + propDate;
 			}
+			if (iCreateFlag == 3) {
+				sql += "   and a.\"CreateFlag\" = 'A'";				
+			}
 			break;
 		case 2:
-			sql += "   and a.\"PropDate\" = " + propDate;
+			sql += "   and a.\"MediaCode\" " + searchMediaCode;
 			break;
 		case 3:
 			sql += "   and a.\"PropDate\" = " + propDate;

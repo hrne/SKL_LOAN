@@ -390,6 +390,7 @@ public class NegCom extends CommBuffer {
 		transIntEndDate = tNegTrans.getIntEndDate();// 繳息迄日
 		transRepayPeriod = tNegTrans.getRepayPeriod();// 還款期數
 		transRepayDate = tNegTrans.getRepayDate();// 入帳還款日期
+		int transEntryDate = tNegTrans.getEntryDate();//入帳日期
 
 		transOrgAccuOverAmt = tNegMain.getAccuOverAmt();// 累溢繳款(交易前)
 		transAccuOverAmt = tNegTrans.getAccuOverAmt();// 累溢繳款(交易後)
@@ -412,16 +413,23 @@ public class NegCom extends CommBuffer {
 
 		}
 
-		// 用日期去算到今天這戶頭應該還幾期
-		// NextPayDate 下次應繳日 與本次會計日相比差了多少個月
+		// 用客戶繳款日期去算到本期為止應該還幾期
 		if (mainNextPayDate == 0) {
 			// E5009 資料檢核錯誤
 			throw new LogicException(titaVo, "E5009", "[下次應繳日]未填寫.請至L5071查詢後維護.");
+		}
+		int lastpaydate = getRepayDate(mainNextPayDate, -1, titaVo);// 上個月應繳日
+		if (transEntryDate > mainNextPayDate) { // 客戶逾期繳款應收2期利息(上期與本期)
+			transShouldPayPeriod = 2;
+			int overyPeriod = DiffMonth(1, mainNextPayDate, Today) + 1;// 下次應繳日與本次會計日相比差了多少個月
+			if (overyPeriod > 2) {	//	超過二期未繳款-例測試資料
+				transShouldPayPeriod = overyPeriod;	
+			}
 		} else {
-			if (mainNextPayDate > Today) {
-				transShouldPayPeriod = 0;
+			if (transEntryDate > lastpaydate) { // 上個月已繳應收1期利息(本期)
+				transShouldPayPeriod = 1;
 			} else {
-				transShouldPayPeriod = DiffMonth(1, mainNextPayDate, Today) + 1;// 月份差異
+				transShouldPayPeriod = 0;
 			}
 		}
 		// -----
@@ -430,7 +438,7 @@ public class NegCom extends CommBuffer {
 		}
 
 		int DiffMonth = DiffMonth(1, mainFirstDueDate, Today) + 1;// 月份差異=首次應繳日 與 會計日的月份差+1
-		mainAccuDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(DiffMonth));// Main累應還金額=Main期金*Trans本次應還期數
+		mainAccuDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(DiffMonth));// Main累應還金額=Main期金*累計應還期數
 
 		// transTxKind 0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
 		// 0:正常-匯入款＋溢收款 >= 期款

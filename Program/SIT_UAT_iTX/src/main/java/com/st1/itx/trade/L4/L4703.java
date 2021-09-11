@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -49,7 +47,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4703 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4703.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -82,7 +79,7 @@ public class L4703 extends TradeBuffer {
 
 	@Autowired
 	public L9703ServiceImpl l9703ServiceImpl;
-	
+
 	private int noticeFlag = 0;
 	private String noticePhoneNo = "";
 	private String noticeEmail = "";
@@ -97,8 +94,7 @@ public class L4703 extends TradeBuffer {
 
 		iEntryDate = this.getTxBuffer().getTxCom().getTbsdyf();
 
-		sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
-				+ ("" + iEntryDate).substring(6);
+		sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/" + ("" + iEntryDate).substring(6);
 
 		TempVo tempVo = new TempVo();
 
@@ -117,14 +113,11 @@ public class L4703 extends TradeBuffer {
 		int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 
 		/*
-		 * L9703 titaVo 
-		 * ["#R1+@會計日期",#AcctDate],
-		 * ["#R2+@戶號",#CustNo,"-",#FacmNo],
+		 * L9703 titaVo ["#R1+@會計日期",#AcctDate], ["#R2+@戶號",#CustNo,"-",#FacmNo],
 		 * ["#R3+@滯繳條件",#UnpaidCond,#UnpaidCondx],
 		 * ["#R4+@滯繳期數",#UnpaidTermSt,"~",#UnpaidTermEd],
 		 * ["#R5+@滯繳日數",#UnpaidDaySt,"~",#UnpaidDayEd],
-		 * ["#R6+@繳款方式",#RepayType,#RepayTypex],
-		 * ["#R7+@戶別",#CustType,#CustTypex],
+		 * ["#R6+@繳款方式",#RepayType,#RepayTypex], ["#R7+@戶別",#CustType,#CustTypex],
 		 */
 
 		titaVo.putParam("AcctDate", this.getTxBuffer().getTxCom().getTbsdy());
@@ -140,7 +133,7 @@ public class L4703 extends TradeBuffer {
 //		1.個別
 		case 1:
 			tempVo = new TempVo();
-			tempVo = custNoticeCom.getReportCode("L9703", custNo, facmNo);
+			tempVo = custNoticeCom. getCustNotice("L9703", custNo, facmNo, titaVo);
 
 			noticeFlag = parse.stringToInteger(tempVo.getParam("ReportCode"));
 			noticePhoneNo = tempVo.getParam("ReportPhoneNo");
@@ -154,7 +147,7 @@ public class L4703 extends TradeBuffer {
 
 			if (!"".equals(noticePhoneNo)) {
 				setTextFileVO(custNo, facmNo, titaVo);
-			} else if(!"".equals(noticeEmail)) {
+			} else if (!"".equals(noticeEmail)) {
 				setEMailFileVO(custNo, facmNo, titaVo);
 			}
 
@@ -169,7 +162,7 @@ public class L4703 extends TradeBuffer {
 			} catch (Exception e) {
 				this.info("L9711ServiceImpl.LoanBorTx error = " + e.toString());
 			}
-			
+
 			if (L9703List != null && L9703List.size() != 0) {
 				for (Map<String, String> tL9703Vo : L9703List) {
 
@@ -177,12 +170,12 @@ public class L4703 extends TradeBuffer {
 					int facmNo1 = parse.stringToInteger(tL9703Vo.get("F5"));
 
 					tempVo = new TempVo();
-					tempVo = custNoticeCom.getReportCode("L9703", custNo1, facmNo1);
+					tempVo = custNoticeCom.getCustNotice("L9703", custNo1, facmNo1, titaVo);
 
-					noticeFlag = parse.stringToInteger(tempVo.getParam("ReportCode"));
-					noticePhoneNo = tempVo.getParam("ReportPhoneNo");
-					noticeEmail = tempVo.getParam("ReportEmailAd");
-					noticeAddress = tempVo.getParam("ReportAddress");
+					noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
+					noticePhoneNo = tempVo.getParam("MessagePhoneNo");
+					noticeEmail = tempVo.getParam("EmailAddress");
+					noticeAddress = tempVo.getParam("LetterAddress");
 
 					this.info("noticeFlag : " + parse.stringToInteger(tempVo.getParam("ReportCode")));
 					this.info("noticePhoneNo : " + tempVo.getParam("ReportPhoneNo"));
@@ -191,7 +184,7 @@ public class L4703 extends TradeBuffer {
 
 					if (!"".equals(noticePhoneNo)) {
 						setTextFileVO(custNo, facmNo, titaVo);
-					} else if(!"".equals(noticeEmail)) {
+					} else if (!"".equals(noticeEmail)) {
 						setEMailFileVO(custNo, facmNo, titaVo);
 					}
 				}
@@ -249,8 +242,7 @@ public class L4703 extends TradeBuffer {
 			for (CustNotice tCustNotice : lCustNoticeC) {
 
 				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getMsgNotice())) {
-					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo
-							+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
+					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
 					dataList.add(dataLines);
 
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
@@ -288,8 +280,7 @@ public class L4703 extends TradeBuffer {
 			for (CustNotice tCustNotice : lCustNoticeC) {
 
 				if ("L9703".equals(tCustNotice.getFormNo()) && "Y".equals(tCustNotice.getEmailNotice())) {
-					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticeEmail
-							+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
+					dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticeEmail + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
 					dataList.add(dataLines);
 
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();

@@ -18,7 +18,6 @@ import com.st1.itx.db.domain.CdBonusId;
 import com.st1.itx.db.domain.CdPfParms;
 import com.st1.itx.db.domain.CdPfParmsId;
 import com.st1.itx.db.domain.CdWorkMonth;
-import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.service.CdBonusService;
 import com.st1.itx.db.service.CdPfParmsService;
 import com.st1.itx.db.service.CdWorkMonthService;
@@ -74,21 +73,16 @@ public class L6751 extends TradeBuffer {
 
 		String iFuncCode = titaVo.getParam("FuncCode");
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
-		int iYear = Integer.valueOf(titaVo.getParam("WorkMonth").substring(0,3))+1911;
-		int iMonth = Integer.valueOf(titaVo.getParam("WorkMonth").substring(3,5));
-		this.info("iYear=" + iYear);
-		this.info("iMonth=" + iMonth);
 		
-		int AcDate = titaVo.getEntDyI();// 7碼
+		int AcDate = titaVo.getEntDyI()+19110000;
+		int iWoarkMonthAcDAte = 0;
 		
-		
-		CdWorkMonth tWorkMonth = iCdWorkMonthService.findById(new CdWorkMonthId(iYear,iMonth), titaVo);
-		
+		CdWorkMonth tWorkMonth = iCdWorkMonthService.findDateFirst(AcDate, AcDate, titaVo);
+		this.info("tWorkMonth=="+tWorkMonth);
 		if(tWorkMonth!=null) {
-			int MonthStart = tWorkMonth.getStartDate();
-			int MonthEnd = tWorkMonth.getEndDate();
-			if(MonthStart <= AcDate && AcDate<=MonthEnd) {
-				this.info("duringWorkMonth True");
+			iWoarkMonthAcDAte = Integer.parseInt(String.valueOf(tWorkMonth.getYear())+parse.IntegerToString(tWorkMonth.getMonth(), 2));
+			this.info("iWoarkMonthAcDAte=="+iWoarkMonthAcDAte);
+			if(iWorkMonth<=iWoarkMonthAcDAte) {
 				duringWorkMonth = true;
 			}
 		}
@@ -167,7 +161,7 @@ public class L6751 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L6751"); // 功能選擇錯誤
 		}
 		
-		if(("1").equals(iFuncCode) || ("2").equals(iFuncCode) || ("3").equals(iFuncCode) || ("4").equals(iFuncCode)) {
+		if(("1").equals(iFuncCode) || ("2").equals(iFuncCode) || ("4").equals(iFuncCode)) {
 			
 			if(duringWorkMonth==true) {
 				this.info("duringWorkMonth True");

@@ -62,7 +62,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4454 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4454.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -174,8 +173,7 @@ public class L4454 extends TradeBuffer {
 
 			Slice<BatxDetail> sBatxDetail = null;
 
-			sBatxDetail = batxDetailService.findL4454AEq(this.getTxBuffer().getTxCom().getTbsdyf(),
-					this.getTxBuffer().getTxCom().getTbsdyf(), 2, this.index, this.limit);
+			sBatxDetail = batxDetailService.findL4454AEq(this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), 2, this.index, this.limit);
 
 			lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 
@@ -205,8 +203,7 @@ public class L4454 extends TradeBuffer {
 		}
 		this.totaVo.putParam("ReportACnt", reportACnt);
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"L4454產生銀扣失敗通知 處理完畢，簡訊筆數：" + (custLoanFlag.size() + custFireFlag.size()), titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4454產生銀扣失敗通知 處理完畢，簡訊筆數：" + (custLoanFlag.size() + custFireFlag.size()), titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -261,8 +258,7 @@ public class L4454 extends TradeBuffer {
 
 			Slice<BankDeductDtl> sBankDeductDtl = null;
 
-			sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000,
-					tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), this.index, this.limit);
+			sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), this.index, this.limit);
 
 			lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
 
@@ -270,15 +266,13 @@ public class L4454 extends TradeBuffer {
 			if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
 				BankDeductDtl tBankDeductDtl = lBankDeductDtl.get(0);
 				if (tBankDeductDtl != null) {
-					insuMon = parse
-							.stringToInteger(FormatUtil.pad9("" + tBankDeductDtl.getPayIntDate(), 7).substring(0, 5));
+					insuMon = parse.stringToInteger(FormatUtil.pad9("" + tBankDeductDtl.getPayIntDate(), 7).substring(0, 5));
 				}
 			}
 		}
 
 //		1.不成功簡訊通知(ALL)	
-		unSuccText(tBatxDetail.getCustNo(), tBatxDetail.getFacmNo(), tBatxDetail.getRepayType(),
-				tBatxDetail.getRepayAmt(), custId, insuMon, titaVo);
+		unSuccText(tBatxDetail.getCustNo(), tBatxDetail.getFacmNo(), tBatxDetail.getRepayType(), tBatxDetail.getRepayAmt(), custId, insuMon, titaVo);
 
 		tmpFacm tmp = new tmpFacm(tBatxDetail.getCustNo(), tBatxDetail.getFacmNo(), 0);
 
@@ -344,15 +338,13 @@ public class L4454 extends TradeBuffer {
 		}
 	}
 
-	private void unSuccText(int custNo, int facmNo, int repayType, BigDecimal repayAmt, String custId, int insuM,
-			TitaVo titaVo) throws LogicException {
+	private void unSuccText(int custNo, int facmNo, int repayType, BigDecimal repayAmt, String custId, int insuM, TitaVo titaVo) throws LogicException {
 
 		TempVo tempVo = new TempVo();
-		tempVo = custNoticeCom.getReportCode("L4454", custNo, facmNo);
+		tempVo = custNoticeCom.getCustNotice("L4454", custNo, facmNo, titaVo);
 
-		String phoneNo = tempVo.getParam("ReportPhoneNo");
-		String emailAd = tempVo.getParam("ReportEmailAd");
-//		String address = tempVo.getParam("ReportAddress");
+		String phoneNo = tempVo.getParam("MessagePhoneNo");
+		String emailAd = tempVo.getParam("EmailAddress");
 
 //		寄送簡訊/電郵，若第一順位為書信，則找第二順位
 //		若為皆1則傳簡訊
@@ -365,8 +357,7 @@ public class L4454 extends TradeBuffer {
 		}
 	}
 
-	private void sendText(int custNo, int facmNo, int repayType, BigDecimal repayAmt, String phoneNo, String custId,
-			int insuM, TitaVo titaVo) throws LogicException {
+	private void sendText(int custNo, int facmNo, int repayType, BigDecimal repayAmt, String phoneNo, String custId, int insuM, TitaVo titaVo) throws LogicException {
 		if (repayType == 1) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
@@ -374,8 +365,7 @@ public class L4454 extends TradeBuffer {
 				tCustMain = custMainService.custNoFirst(custNo, custNo);
 
 				String dataLines = "";
-				dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + phoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\""
-						+ this.getTxBuffer().getTxCom().getTbsdy() + "\"";
+				dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + phoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + this.getTxBuffer().getTxCom().getTbsdy() + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(custNo);
@@ -404,8 +394,7 @@ public class L4454 extends TradeBuffer {
 				this.info("sInsuMonth ... " + toFullWidth("" + insuM));
 
 				String dataLines = "";
-				dataLines = "\"H1\",\"" + custId + "\",\"" + phoneNo + "\",\"您好：提醒您" + sInsuMonth
-						+ "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
+				dataLines = "\"H1\",\"" + custId + "\",\"" + phoneNo + "\",\"您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
 						+ dateSlashFormat(this.getTxBuffer().getMgBizDate().getTbsDy()) + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
@@ -429,8 +418,7 @@ public class L4454 extends TradeBuffer {
 		}
 	}
 
-	private void sendEmail(int custNo, int facmNo, int repayType, BigDecimal repayAmt, String emailAd, String custId,
-			int insuM, TitaVo titaVo) throws LogicException {
+	private void sendEmail(int custNo, int facmNo, int repayType, BigDecimal repayAmt, String emailAd, String custId, int insuM, TitaVo titaVo) throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setMail...");
 		if (repayType == 1) {
@@ -497,8 +485,7 @@ public class L4454 extends TradeBuffer {
 
 		Slice<BankDeductDtl> sBankDeductDtl = null;
 
-		sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000,
-				tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), this.index, this.limit);
+		sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), this.index, this.limit);
 
 		lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
 
@@ -563,16 +550,14 @@ public class L4454 extends TradeBuffer {
 
 		Slice<BankDeductDtl> sBankDeductDtl = null;
 
-		sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000,
-				tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), this.index, this.limit);
+		sBankDeductDtl = bankDeductDtlService.mediaSeqRng(tBatxDetail.getMediaDate() + 19110000, tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), this.index, this.limit);
 
 		lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
 
 //		Group By 戶號 額度 還款類別
 		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
 			for (BankDeductDtl tBankDeductDtl : lBankDeductDtl) {
-				tmpFacm tmp = new tmpFacm(tBankDeductDtl.getCustNo(), tBankDeductDtl.getFacmNo(),
-						tBankDeductDtl.getRepayType());
+				tmpFacm tmp = new tmpFacm(tBankDeductDtl.getCustNo(), tBankDeductDtl.getFacmNo(), tBankDeductDtl.getRepayType());
 //				計息起日取最小
 				if (startDate.containsKey(tmp)) {
 					if (tBankDeductDtl.getIntStartDate() < startDate.get(tmp)) {
@@ -679,8 +664,7 @@ public class L4454 extends TradeBuffer {
 			}
 
 //			若火險成功記號已上且本筆期款失敗則確認寄送通知
-			if (tBatxDetail.getRepayType() == 1 && shortFlag.get(tmp) == 9
-					&& !"00000".equals(tBatxDetail.getProcCode())) {
+			if (tBatxDetail.getRepayType() == 1 && shortFlag.get(tmp) == 9 && !"00000".equals(tBatxDetail.getProcCode())) {
 				shortFlag.put(tmp, 1);
 			}
 
@@ -853,9 +837,8 @@ public class L4454 extends TradeBuffer {
 		Slice<TxToDoDetail> sTxToDoDetail = null;
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 //		刪除未處理且為今天的
-		sTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0,
-				this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index,
-				this.limit, titaVo);
+		sTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0, this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index, this.limit,
+				titaVo);
 
 		lTxToDoDetail = sTxToDoDetail == null ? null : sTxToDoDetail.getContent();
 

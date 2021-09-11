@@ -20,10 +20,14 @@ import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClMovables;
 import com.st1.itx.db.domain.ClMovablesId;
+import com.st1.itx.db.domain.ClOwnerRelation;
+import com.st1.itx.db.domain.ClOwnerRelationId;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClMovablesService;
+import com.st1.itx.db.service.ClOwnerRelationService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
@@ -64,6 +68,10 @@ public class L2412 extends TradeBuffer {
 	public FacMainService sFacMainService;
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
+	
+	@Autowired
+	public ClOwnerRelationService sClOwnerRelationService;
+	
 	@Autowired
 	public DataLog dataLog;
 
@@ -202,58 +210,7 @@ public class L2412 extends TradeBuffer {
 				  clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
 					
 				} // if
-				
-//				// 依核准號碼建立一筆額度與擔保品關聯檔
-//				if( iApplNo > 0 ) { // 核准編號大於0才去做
-//				  ClFacId clFacId = new ClFacId();
-//				  clFacId.setClCode1(iClCode1);
-//				  clFacId.setClCode2(iClCode2);
-//				  clFacId.setClNo(iClNo);
-//				  clFacId.setApproveNo(iApplNo);
-//				  ClFac tClFac = sClFacService.findById(clFacId, titaVo);
-//
-//				  FacCaseAppl tFacCaseAppl = sFacCaseApplService.findById(iApplNo, titaVo);
-//				  if (tFacCaseAppl == null) {
-//					throw new LogicException("E2019", "申請號碼 = " + iApplNo); // 此申請號碼不存在案件申請檔
-//				  }
-//				  FacMain tFacMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
-//				  if (tFacMain == null) {
-//					tFacMain = new FacMain();
-//				  }
-//
-//				  // 新增資料重複
-//				  if (tClFac != null) {
-//					throw new LogicException("E0005", "額度與擔保品關聯檔"); // 新增資料時，發生錯誤
-//				  } else {
-//					tClFac = new ClFac();
-//					clFacId = new ClFacId();
-//					clFacId.setClCode1(iClCode1);
-//					clFacId.setClCode2(iClCode2);
-//					clFacId.setClNo(iClNo);
-//					clFacId.setApproveNo(iApplNo);
-//					tClFac.setApproveNo(iApplNo);
-//					tClFac.setClCode1(iClCode1);
-//					tClFac.setClCode2(iClCode2);
-//					tClFac.setClNo(iClNo);
-//					tClFac.setClFacId(clFacId);
-//					tClFac.setCustNo(tFacMain.getCustNo());
-//					tClFac.setFacmNo(tFacMain.getFacmNo());
-//					tClFac.setMainFlag("Y");
-//					tClFac.setShareAmt(BigDecimal.ZERO);
-//					tClFac.setFacShareFlag(0);
-//					tClFac.setOriSettingAmt(parse.stringToBigDecimal(titaVo.getParam("SettingAmt")));
-//
-//					// insert
-//					try {
-//						sClFacService.insert(tClFac, titaVo);
-//					} catch (DBException e) {
-//						throw new LogicException("E0005", "額度與擔保品關聯檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
-//					}
-//
-//					// 額度與擔保品關聯檔變動處理
-//					clFacCom.changeClFac(iApplNo, titaVo);
-//				  }
-//				} // if
+			
 				
 			} else if (iFunCd == 2) {
 				throw new LogicException("E0003", "擔保品主檔");
@@ -296,6 +253,48 @@ public class L2412 extends TradeBuffer {
 				dataLog.setEnv(titaVo, beforeClMovables, tClMovables);
 				dataLog.exec();
 
+				if( iApplNo > 0 ) {
+					  String iOwnerId = titaVo.getParam("OwnerId");
+							
+					  CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);						
+					  if( custMain != null) {						
+						String custUKey = custMain.getCustUKey().trim();
+						String relCode = titaVo.getParam("OwnerRelCode").trim();
+
+						FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
+						if (facMain == null) {
+							throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
+						}
+						
+						ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
+						clOwnerRelationId.setCreditSysNo(facMain.getCreditSysNo());
+						clOwnerRelationId.setCustNo(facMain.getCustNo());
+						clOwnerRelationId.setOwnerCustUKey(custUKey);
+
+						ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId, titaVo);
+						
+						if (clOwnerRelation == null) {
+							clOwnerRelation = new ClOwnerRelation();
+							clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
+							clOwnerRelation.setOwnerRelCode(relCode);
+							try {
+								sClOwnerRelationService.insert(clOwnerRelation, titaVo);
+							} catch (DBException e) {
+								throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+							}
+						} else {
+							clOwnerRelation.setOwnerRelCode(relCode);
+							try {
+								sClOwnerRelationService.update(clOwnerRelation, titaVo);
+							} catch (DBException e) {
+								throw new LogicException("E0007", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+							}
+						} // else 
+						
+					  } // if
+					  
+				} // if
+				
 			} else if (iFunCd == 4) {
 				/* 刪除 */
 				try {
@@ -319,7 +318,6 @@ public class L2412 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0008", "擔保品主檔");
 				}
-
 			}
 
 		}

@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 /* 套件 */
@@ -15,11 +17,14 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.domain.JcicZ448;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ454;
 import com.st1.itx.db.domain.JcicZ454Id;
 import com.st1.itx.db.domain.JcicZ454Log;
+import com.st1.itx.db.service.JcicZ446Service;
+import com.st1.itx.db.service.JcicZ448Service;
 import com.st1.itx.db.service.JcicZ454LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ454Service;
@@ -41,6 +46,10 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8331 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public JcicZ446Service sJcicZ446Service;
+	@Autowired
+	public JcicZ448Service sJcicZ448Service;
 	@Autowired
 	public JcicZ454Service sJcicZ454Service;
 	@Autowired
@@ -64,6 +73,7 @@ public class L8331 extends TradeBuffer {
 		String iMaxMainCode = titaVo.getParam("MaxMainCode");
 		String iPayOffResult = titaVo.getParam("PayOffResult");
 		int iPayOffDate = Integer.valueOf(titaVo.getParam("PayOffDate"));
+		int ixApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"))+19110000;
 		String iKey = "";
 		//JcicZ454
 		JcicZ454 iJcicZ454 = new JcicZ454();
@@ -74,7 +84,36 @@ public class L8331 extends TradeBuffer {
 		iJcicZ454Id.setSubmitKey(iSubmitKey);
 		iJcicZ454Id.setMaxMainCode(iMaxMainCode);
 		JcicZ454 chJcicZ454 = new JcicZ454();
-		
+		//檢核項目(D-62)
+		//需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否存在「'448'」前置調解無擔保債務還款分配表資料
+		//二start
+		Slice<JcicZ448> xJcicZ448 = sJcicZ448Service.otherEq(iSubmitKey,iCustId,ixApplyDate,iCourtCode,iMaxMainCode, this.index, this.limit, titaVo);
+		if (xJcicZ448 == null) {
+			throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否存在「'448':前置調解無擔保債務還款分配表資料」"); 
+		}
+		//二end
+		//欄位「單獨全數受清償日期」不得大於「資料報送日期」
+		//三start
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		int year = (cal.get(Calendar.YEAR)-1911)*10000;
+		int month = (cal.get(Calendar.MONTH) +1)*100;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int today = year+month+day;
+//		int today = Integer.valueOf(titaVo.get("ENTDY"));
+		this.info("today= " +today);
+		this.info("PayOffDate =" + iPayOffDate);
+		if(today<iPayOffDate) {
+			throw new LogicException(titaVo, "E0005", "「單獨全數受清償日期」不得大於「資料報送日期」");
+		}
+		//三end
+		//同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料
+		//四start
+		Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if (xJcicZ446 != null) {
+			throw new LogicException(titaVo, "E0005", "同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料"); 
+		}
+		//四end
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ454

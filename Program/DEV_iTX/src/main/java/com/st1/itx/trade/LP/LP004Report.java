@@ -38,7 +38,7 @@ public class LP004Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP004", "內網業績統計報表", "LP004_單位成績(內部網站)",
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP004", "內網業績統計報表", "LP004單位成績(內部網站)",
 				"LP004_底稿_單位成績(內部網站).xlsx", "區域中心");
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();
@@ -90,6 +90,7 @@ public class LP004Report extends MakeReport {
 		makeExcel.setValue(2, 1, "結算日期：" + iENTDY, "R");
 		setArea(titaVo, wkSsnVo);
 
+		// 同LP003之Sheet2
 		makeExcel.setSheet("房貸部專");
 		makeExcel.setValue(1, 1, iYYMM + "工作月房貸部專業績統計報表");
 		makeExcel.setValue(2, 1, "結算日期：" + iENTDY, "R");

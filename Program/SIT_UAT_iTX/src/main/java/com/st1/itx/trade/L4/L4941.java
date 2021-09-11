@@ -13,7 +13,9 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLogHistory;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AchAuthLogHistoryService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -38,6 +40,8 @@ public class L4941 extends TradeBuffer {
 
 	@Autowired
 	public AchAuthLogHistoryService achAuthLogHistoryService;
+	@Autowired
+	public CdEmpService cdEmpService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -53,6 +57,9 @@ public class L4941 extends TradeBuffer {
 
 		int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+
+		// wk
+		String wkUser = "";
 
 		Slice<AchAuthLogHistory> sAchAuthLogHistory = null;
 
@@ -71,6 +78,12 @@ public class L4941 extends TradeBuffer {
 						wkCreateFlag = "Y";
 					}
 				}
+				wkUser = tAchAuthLogHistory.getLastUpdateEmpNo();
+				CdEmp tCdEmp = cdEmpService.findById(wkUser, titaVo);
+				if (tCdEmp != null) {
+					wkUser = wkUser + " " + tCdEmp.getFullname();
+				}
+
 				occursList.putParam("OOCustNo", tAchAuthLogHistory.getCustNo());
 				occursList.putParam("OOFacmNo", tAchAuthLogHistory.getFacmNo());
 				occursList.putParam("OORepayBank", tAchAuthLogHistory.getRepayBank());
@@ -85,7 +98,7 @@ public class L4941 extends TradeBuffer {
 				occursList.putParam("OOAmlRsp", tAchAuthLogHistory.getAmlRsp());
 				occursList.putParam("OOStampFinishDate", tAchAuthLogHistory.getStampFinishDate());
 				occursList.putParam("OODeleteDate", tAchAuthLogHistory.getDeleteDate());
-				occursList.putParam("OOUser", tAchAuthLogHistory.getLastUpdateEmpNo());
+				occursList.putParam("OOUser", wkUser);
 				String sDate = tAchAuthLogHistory.getLastUpdate().toString().substring(0, 10).trim();
 				sDate = sDate.replace("-", "");
 				int iDate = parse.stringToInteger(sDate);

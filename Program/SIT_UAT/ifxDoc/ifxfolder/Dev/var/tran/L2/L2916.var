@@ -423,7 +423,7 @@ C(4,#OwnerId{i},CALL(#HIDE_LAND_{i}),CALL(#SHOW_LAND_{i}))
 ! [土地所有權人-與授信戶關係]
 #OwnerRelCode{i}=X,2,L
 
-#OwnerRelCodeX{i}=X,4,L
+#OwnerRelCodeX{i}=X,20,L
 T(3,)T(H,#OwnerRelCode{i},#RelationCodeHelp)
 
 ! [土地所有權人-持份比率(分子)]

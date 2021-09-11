@@ -2,8 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -43,7 +41,6 @@ import com.st1.itx.util.common.CustNoticeCom;
  * @version 1.0.0
  */
 public class L8101 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8101.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -103,7 +100,7 @@ public class L8101 extends TradeBuffer {
 			throw new LogicException("E0001", "客戶資料 " + custKey);
 		} else {
 			custAddr = custMain.getCurrZip2().trim() + custMain.getCurrZip3().trim() + custMain.getCurrRoad();
-			custAddr = custMain.getCurrZip3() + custMain.getCurrZip2() + custNoticeCom.getCurrAddress(custMain);
+			custAddr = custMain.getCurrZip3() + custMain.getCurrZip2() + custNoticeCom.getCurrAddress(custMain, titaVo);
 
 			custName = custMain.getCustName();
 
@@ -193,7 +190,8 @@ public class L8101 extends TradeBuffer {
 
 		Long pdfSno = 0L;
 
-		if ("2".equals(txAmlCredit.getProcessType()) && custMain.getCustNo() > 0 && "N".equals(titaVo.get("LogFlag").trim())) {
+		if ("2".equals(txAmlCredit.getProcessType()) && custMain.getCustNo() > 0
+				&& "N".equals(titaVo.get("LogFlag").trim())) {
 //			#AcctDate     會計日期
 //			#CustNo       戶號-1
 //			#FacmNo       戶號-2

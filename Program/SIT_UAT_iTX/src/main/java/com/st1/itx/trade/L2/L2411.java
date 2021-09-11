@@ -466,6 +466,56 @@ public class L2411 extends TradeBuffer {
 					// insert 土地所有權人檔
 					InsertClLandOwner(titaVo);
 				}
+				
+				if( iApplNo > 0 ) {
+					
+					for (int i = 1; i <= 20; i++) {
+						// 若該筆無資料就離開迴圈
+						if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
+							break;
+						}
+						
+					  String iOwnerId = titaVo.getParam("OwnerId" + i);
+							
+					  CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);						
+					  if( custMain != null) {						
+						String custUKey = custMain.getCustUKey().trim();
+						String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
+
+						FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
+						if (facMain == null) {
+							throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
+						}
+						
+						ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
+						clOwnerRelationId.setCreditSysNo(facMain.getCreditSysNo());
+						clOwnerRelationId.setCustNo(facMain.getCustNo());
+						clOwnerRelationId.setOwnerCustUKey(custUKey);
+
+						ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId, titaVo);
+						
+						if (clOwnerRelation == null) {
+							clOwnerRelation = new ClOwnerRelation();
+							clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
+							clOwnerRelation.setOwnerRelCode(relCode);
+							try {
+								sClOwnerRelationService.insert(clOwnerRelation, titaVo);
+							} catch (DBException e) {
+								throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+							}
+						} else {
+							clOwnerRelation.setOwnerRelCode(relCode);
+							try {
+								sClOwnerRelationService.update(clOwnerRelation, titaVo);
+							} catch (DBException e) {
+								throw new LogicException("E0007", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+							}
+						} // else 
+						
+					  } // if
+					} // for
+				} // if
+				
 			} else
 			/* 刪除 */
 			if (iFunCd == 4) {

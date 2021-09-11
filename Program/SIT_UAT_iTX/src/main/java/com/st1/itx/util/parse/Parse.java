@@ -184,13 +184,56 @@ public class Parse {
 			int year = dateI / 10000;
 			int mon = (dateI - (year * 10000)) / 100;
 			int day = dateI % 100;
-			return year + "/" + (mon < 10 ? "0" + mon : mon) + "/" + (day < 10 ? "0" + day : day) + " " + stf.format(value);
+			return year + "/" + (mon < 10 ? "0" + mon : mon) + "/" + (day < 10 ? "0" + day : day) + " "
+					+ stf.format(value);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			logger.warn("timesTampToString Erroe!!!");
 			logger.warn(errors.toString());
-			return null;
+			return "";
+		}
+	}
+
+	/**
+	 * TimeStamp To String
+	 * 
+	 * @param value TimeStamp
+	 * @return String yyy/MM/dd (民國年)
+	 */
+	public String timeStampToStringDate(Timestamp value) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		try {
+			int dateI = Integer.parseInt(sdf.format(value)) - 19110000;
+			int year = dateI / 10000;
+			int mon = (dateI - (year * 10000)) / 100;
+			int day = dateI % 100;
+			return year + "/" + (mon < 10 ? "0" + mon : mon) + "/" + (day < 10 ? "0" + day : day);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			logger.warn("timesTampToString Erroe!!!");
+			logger.warn(errors.toString());
+			return "";
+		}
+	}
+
+	/**
+	 * TimeStamp To String
+	 * 
+	 * @param value TimeStamp
+	 * @return String HH:mm:ss
+	 */
+	public String timeStampToStringTime(Timestamp value) {
+		SimpleDateFormat stf = new SimpleDateFormat("HH:mm:ss");
+		try {
+			return stf.format(value) + "";
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			logger.warn("timesTampToString Erroe!!!");
+			logger.warn(errors.toString());
+			return "";
 		}
 	}
 

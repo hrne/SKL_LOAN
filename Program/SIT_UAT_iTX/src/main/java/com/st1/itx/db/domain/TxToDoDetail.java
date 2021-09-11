@@ -60,6 +60,7 @@ public class TxToDoDetail implements Serializable {
   private int status = 0;
 
   // 處理事項說明
+  /* json format1.Note */
   @Column(name = "`ProcessNote`", length = 300)
   private String processNote;
 
@@ -237,7 +238,8 @@ public class TxToDoDetail implements Serializable {
 
 /**
 	* 處理事項說明<br>
-	* 
+	* json format
+1.Note
 	* @return String
 	*/
   public String getProcessNote() {
@@ -246,7 +248,8 @@ public class TxToDoDetail implements Serializable {
 
 /**
 	* 處理事項說明<br>
-	* 
+	* json format
+1.Note
   *
   * @param processNote 處理事項說明
 	*/

@@ -48,7 +48,7 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 public class CustNoticeCom extends TradeBuffer {
 
- 	private TitaVo titaVo;
+	private TitaVo titaVo;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -79,25 +79,28 @@ public class CustNoticeCom extends TradeBuffer {
 	@Autowired
 	public FacMainService facMainService;
 
-	private HashMap<tmpFacm, Integer> decuNoticeCheck = new HashMap<>();
+	private HashMap<tmpFacm, Integer> docuNoticeCheck = new HashMap<>();
 	private HashMap<tmpFacm, Integer> textNoticeCheck = new HashMap<>();
 	private HashMap<tmpFacm, Integer> mailNoticeCheck = new HashMap<>();
 
 	private int sendCode = 1;
 
-	private int decuCode = 0;
+	private int docuCode = 0;
 	private int textCode = 0;
 	private int mailCode = 0;
+	private String isLetter = "";
+	private String isMessage = "";
+	private String isEmail = "";
 
-	private String reportPhoneNo = "";
-	private String reportEmailAd = "";
-	private String reportAddress = "";
+	private String messagePhoneNo = "";
+	private String emailAddress = "";
+	private String letterAddress = "";
 
 	private int flag = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
- 		this.titaVo = titaVo;
+		this.titaVo = titaVo;
 		this.totaVo.init(titaVo);
 
 		this.addList(this.totaVo);
@@ -109,19 +112,25 @@ public class CustNoticeCom extends TradeBuffer {
 	 * @param formNo 程式ID or 報表ID
 	 * @param custNo 戶號
 	 * @param facmNo 額度
-	 * @return ReportCode = 1:書信 2:簡訊 3:電郵 9:皆為第一 0:皆無 <br>
-	 *         ReportPhoneNo = 電話 <br>
-	 *         ReportEmailAd = 電郵地址 <br>
-	 *         ReportAddress = 地址 <br>
+	 * @return NoticeFlag = 2:簡訊 ＞ 3:電郵 ＞ 1:書信 ＞ 4.不寄送 <br>
+	 *         isMessage Y.發送簡訊<br>
+	 *         isEmail Y.發送電郵<br>
+	 *         isLetter Y.寄送書信<br>
+	 *         MessagePhoneNo 簡訊號碼 <br>
+	 *         EmailAddress 電郵地址 <br>
+	 *         LetterAddress 書信地址 <br>
+	 * 
 	 * @throws LogicException ..
 	 */
-	public TempVo getReportCode(String formNo, int custNo, int facmNo) throws LogicException {
+	public TempVo getCustNotice(String formNo, int custNo, int facmNo, TitaVo titaVo) throws LogicException {
 		TempVo tempVo = new TempVo();
-		this.info("custNoticeCom.getReportCode Start ...");
+		this.info("custNoticeCom.getnoticeCode Start ...");
 
-		int reportCode = 9;
-
-		getNoticeCode(formNo);
+		int noticeCode = 9;
+		isLetter = "";
+		isMessage = "";
+		isEmail = "";
+		getNoticeCode(formNo, titaVo);
 
 //		1.找CdReport 判斷該寄送規則 & 各通知優先序列
 
@@ -131,11 +140,11 @@ public class CustNoticeCom extends TradeBuffer {
 //		預設優先順序   手機 > MAIL > 書信
 		switch (sendCode) {
 		case 0:
-			reportCode = 0;
+			noticeCode = 0;
 			break;
 		case 1:
 			CustMain tCustMain = new CustMain();
-			tCustMain = custMainService.custNoFirst(custNo, custNo,titaVo);
+			tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
 
 			FacMain tFacMain = new FacMain();
 			FacMainId tFacMainId = new FacMainId();
@@ -143,33 +152,36 @@ public class CustNoticeCom extends TradeBuffer {
 			tFacMainId.setCustNo(custNo);
 			tFacMainId.setFacmNo(facmNo);
 
-			tFacMain = facMainService.findById(tFacMainId,titaVo);
+			tFacMain = facMainService.findById(tFacMainId, titaVo);
 
-			reportCode = parse.stringToInteger(tFacMain.getRateAdjNoticeCode());
+			noticeCode = parse.stringToInteger(tFacMain.getRateAdjNoticeCode());
 
-//			reportCode 共用代碼檔
+//			noticeCode 共用代碼檔
 //			1:電子郵件 
 //			2:書面通知 
 //			3:簡訊通知
 
 //			flag 1:書信 2:簡訊 3:電郵
-			switch (reportCode) {
+			switch (noticeCode) {
 			case 1:
-				getEmail(tCustMain);
-				if (!"".equals(reportEmailAd)) {
+				getEmail(tCustMain, titaVo);
+				if (!"".equals(emailAddress)) {
+					isEmail = "Y";
 					flag = 3;
 				}
 				break;
 			case 2:
-				getAdress(tCustMain);
-				if (!"".equals(reportAddress)) {
+				getAdress(tCustMain, titaVo);
+				if (!"".equals(letterAddress)) {
+					isLetter = "Y";
 					flag = 1;
 				}
 				break;
 			case 3:
-				getPhone(tCustMain);
-				if (!"".equals(reportPhoneNo)) {
+				getPhone(tCustMain, titaVo);
+				if (!"".equals(messagePhoneNo)) {
 					flag = 2;
+					isMessage = "Y";
 				}
 				break;
 			}
@@ -184,71 +196,83 @@ public class CustNoticeCom extends TradeBuffer {
 			tmpFacm tmp = new tmpFacm(custNo, facmNo);
 			tmpFacm tmp2 = new tmpFacm(custNo, 0);
 
-			getResult(tmp);
+			getResult(tmp, titaVo);
 
 			if (flag == 0) {
-				getResult(tmp2);
+				getResult(tmp2, titaVo);
 			}
 
 			break;
 		default:
-			reportCode = 0;
+			noticeCode = 0;
 			break;
 		}
 
-		if (!"".equals(reportPhoneNo) && !"".equals(reportEmailAd) && !"".equals(reportAddress)) {
-			flag = 9;
-		}
+		// 未設定依 2:簡訊 > 3:電郵 > 1:書信
+		int noticeFlag = flag;
+		if (noticeFlag == 0) {
+			if (!"".equals(messagePhoneNo)) {
+				isMessage = "Y";
+				noticeFlag = 2;
+			} else if (!"".equals(emailAddress)) {
+				isEmail = "Y";
+				noticeFlag = 3;
 
-		tempVo.putParam("ReportCode", flag);
-		tempVo.putParam("ReportPhoneNo", reportPhoneNo);
-		tempVo.putParam("ReportEmailAd", reportEmailAd);
-		tempVo.putParam("ReportAddress", reportAddress);
+			} else {
+				isLetter = "Y";
+				noticeFlag = 1;
+			}
+		}
+		tempVo.putParam("NoticeFlag", noticeFlag);
+		tempVo.putParam("isMessage", isMessage);
+		tempVo.putParam("isEmail", isEmail);
+		tempVo.putParam("isLetter", isLetter);
+		tempVo.putParam("MessagePhoneNo", messagePhoneNo);
+		tempVo.putParam("EmailAddress", emailAddress);
+		tempVo.putParam("LetterAddress", letterAddress);
 
 		return tempVo;
 	}
 
-	private void getResult(tmpFacm tmp) {
+	private void getResult(tmpFacm tmp, TitaVo titaVo) {
 		flag = 0;
-		reportAddress = "";
-		reportPhoneNo = "";
-		reportEmailAd = "";
+		letterAddress = "";
+		messagePhoneNo = "";
+		emailAddress = "";
 
 		this.info("getResult ...");
 		CustMain tCustMain = new CustMain();
-		tCustMain = custMainService.custNoFirst(tmp.getCustNo(), tmp.getCustNo());
+		tCustMain = custMainService.custNoFirst(tmp.getCustNo(), tmp.getCustNo(),titaVo);
 
-		this.info("decuNoticeCheck ..." + decuNoticeCheck.get(tmp));
+		this.info("docuNoticeCheck ..." + docuNoticeCheck.get(tmp));
 		this.info("textNoticeCheck ..." + textNoticeCheck.get(tmp));
 		this.info("mailNoticeCheck ..." + mailNoticeCheck.get(tmp));
 
-		if (decuNoticeCheck.get(tmp) == null || textNoticeCheck.get(tmp) == null || mailNoticeCheck.get(tmp) == null) {
+		if (docuNoticeCheck.get(tmp) == null || textNoticeCheck.get(tmp) == null || mailNoticeCheck.get(tmp) == null) {
 			return;
 		}
 
-		if (decuNoticeCheck.get(tmp) == 1 || textNoticeCheck.get(tmp) == 1 || mailNoticeCheck.get(tmp) == 1) {
-			if (decuNoticeCheck.get(tmp) == 1) {
-
-				getAdress(tCustMain);
-
-				if (!"".equals(reportAddress)) {
+		if (docuNoticeCheck.get(tmp) == 1 || textNoticeCheck.get(tmp) == 1 || mailNoticeCheck.get(tmp) == 1) {
+			if (docuNoticeCheck.get(tmp) == 1) {
+				getAdress(tCustMain, titaVo);
+				if (!"".equals(letterAddress)) {
+					isLetter = "Y";
 					flag = 1;
-				}
-			}
-			if (textNoticeCheck.get(tmp) == 1) {
-
-				getPhone(tCustMain);
-
-				if (!"".equals(reportPhoneNo)) {
-					flag = 2;
 				}
 			}
 			if (mailNoticeCheck.get(tmp) == 1) {
-
-				getEmail(tCustMain);
-
-				if (!"".equals(reportEmailAd)) {
+				getEmail(tCustMain, titaVo);
+				if (!"".equals(emailAddress)) {
+					isEmail = "Y";
 					flag = 3;
+				}
+			}
+			if (textNoticeCheck.get(tmp) == 1) {
+				getPhone(tCustMain, titaVo);
+
+				if (!"".equals(messagePhoneNo)) {
+					isMessage = "Y";
+					flag = 2;
 				}
 			}
 
@@ -257,81 +281,77 @@ public class CustNoticeCom extends TradeBuffer {
 			}
 		}
 
-		if (decuNoticeCheck.get(tmp) == 2 || textNoticeCheck.get(tmp) == 2 || mailNoticeCheck.get(tmp) == 2) {
-			if (decuNoticeCheck.get(tmp) == 2) {
-
-				getAdress(tCustMain);
-
-				if (!"".equals(reportAddress)) {
+		if (docuNoticeCheck.get(tmp) == 2 || textNoticeCheck.get(tmp) == 2 || mailNoticeCheck.get(tmp) == 2) {
+			if (docuNoticeCheck.get(tmp) == 2) {
+				getAdress(tCustMain, titaVo);
+				if (!"".equals(letterAddress)) {
+					isLetter = "Y";
 					flag = 1;
 				}
 			}
-			if (textNoticeCheck.get(tmp) == 2) {
-
-				getPhone(tCustMain);
-
-				if (!"".equals(reportPhoneNo)) {
-					flag = 2;
-				}
-
-			}
 			if (mailNoticeCheck.get(tmp) == 2) {
-
-				getEmail(tCustMain);
-
-				if (!"".equals(reportEmailAd)) {
+				getEmail(tCustMain, titaVo);
+				if (!"".equals(emailAddress)) {
+					isEmail = "Y";
 					flag = 3;
 				}
-
+			}
+			if (textNoticeCheck.get(tmp) == 2) {
+				getPhone(tCustMain, titaVo);
+				if (!"".equals(messagePhoneNo)) {
+					isMessage = "Y";
+					flag = 2;
+				}
 			}
 			if (flag >= 1) {
 				return;
 			}
 		}
 
-		if (decuNoticeCheck.get(tmp) == 3) {
-
-			getAdress(tCustMain);
-
-			if (!"".equals(reportAddress)) {
-				flag = 1;
+		if (docuNoticeCheck.get(tmp) == 3 || textNoticeCheck.get(tmp) == 3 || mailNoticeCheck.get(tmp) == 3) {
+			if (docuNoticeCheck.get(tmp) == 3) {
+				getAdress(tCustMain, titaVo);
+				if (!"".equals(letterAddress)) {
+					isLetter = "Y";
+					flag = 1;
+				}
+			}
+			if (mailNoticeCheck.get(tmp) == 3) {
+				getEmail(tCustMain, titaVo);
+				if (!"".equals(emailAddress)) {
+					isEmail = "Y";
+					flag = 3;
+				}
+			}
+			if (textNoticeCheck.get(tmp) == 3) {
+				getPhone(tCustMain, titaVo);
+				if (!"".equals(messagePhoneNo)) {
+					isMessage = "Y";
+					flag = 2;
+				}
 			}
 		}
-		if (textNoticeCheck.get(tmp) == 3) {
-
-			getPhone(tCustMain);
-
-			if (!"".equals(reportPhoneNo)) {
-				flag = 2;
-			}
-
-		}
-		if (mailNoticeCheck.get(tmp) == 3) {
-
-			getEmail(tCustMain);
-
-			if (!"".equals(reportEmailAd)) {
-				flag = 3;
-			}
+		if (docuNoticeCheck.get(tmp) == 4 || textNoticeCheck.get(tmp) == 4 || mailNoticeCheck.get(tmp) == 4) {
+			flag = 4;
 		}
 	}
 
-	private void getAdress(CustMain tCustMain) {
+	private void getAdress(CustMain tCustMain, TitaVo titaVo) {
 		if (tCustMain != null) {
-			reportAddress = getCurrAddress(tCustMain);
+			letterAddress = getCurrAddress(tCustMain,titaVo);
 		}
 	}
 
 	/**
 	 * 
 	 * @param custMain 客戶主檔
-	 * @return regAddress = 通訊地址 <br>
+	 * @return currAddress = 通訊地址 <br>
 	 */
-	public String getCurrAddress(CustMain custMain) {
+	public String getCurrAddress(CustMain custMain, TitaVo titaVo) {
 		String currAddress = "";
 
 		if (!"".equals(custMain.getCurrCityCode())) {
-			CdCity cdCity = cdCityService.findById(custMain.getCurrCityCode());
+			CdCity cdCity = cdCityService.findById(custMain.getCurrCityCode(),titaVo);
 			if (cdCity != null) {
 				currAddress += cdCity.getCityItem();
 
@@ -339,7 +359,7 @@ public class CustNoticeCom extends TradeBuffer {
 					CdAreaId cdAreaId = new CdAreaId();
 					cdAreaId.setCityCode(custMain.getCurrCityCode());
 					cdAreaId.setAreaCode(custMain.getCurrAreaCode());
-					CdArea cdArea = cdAreaService.findById(cdAreaId);
+					CdArea cdArea = cdAreaService.findById(cdAreaId,titaVo);
 					if (cdArea != null) {
 						currAddress += cdArea.getAreaItem();
 					}
@@ -381,11 +401,11 @@ public class CustNoticeCom extends TradeBuffer {
 	 * @param custMain 客戶主檔
 	 * @return regAddress = 戶籍地址 <br>
 	 */
-	public String getRegAddress(CustMain custMain) {
+	public String getRegAddress(CustMain custMain,TitaVo titaVo) {
 		String regAddress = "";
 
 		if (!"".equals(custMain.getRegCityCode())) {
-			CdCity cdCity = cdCityService.findById(custMain.getRegCityCode());
+			CdCity cdCity = cdCityService.findById(custMain.getRegCityCode(),titaVo);
 			if (cdCity != null) {
 				regAddress += cdCity.getCityItem();
 
@@ -393,7 +413,7 @@ public class CustNoticeCom extends TradeBuffer {
 					CdAreaId cdAreaId = new CdAreaId();
 					cdAreaId.setCityCode(custMain.getRegCityCode());
 					cdAreaId.setAreaCode(custMain.getRegAreaCode());
-					CdArea cdArea = cdAreaService.findById(cdAreaId);
+					CdArea cdArea = cdAreaService.findById(cdAreaId,titaVo);
 					if (cdArea != null) {
 						regAddress += cdArea.getAreaItem();
 					}
@@ -430,11 +450,12 @@ public class CustNoticeCom extends TradeBuffer {
 		return regAddress;
 	}
 
-	private void getPhone(CustMain tCustMain) {
+	private void getPhone(CustMain tCustMain,TitaVo titaVo) {
 		if (tCustMain != null) {
 			List<CustTelNo> lCustTelNo = new ArrayList<CustTelNo>();
 
-			Slice<CustTelNo> slCustTelNo = custTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index, Integer.MAX_VALUE);
+			Slice<CustTelNo> slCustTelNo = custTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index,
+					Integer.MAX_VALUE,titaVo);
 			lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 			if (lCustTelNo != null && lCustTelNo.size() != 0) {
@@ -442,8 +463,8 @@ public class CustNoticeCom extends TradeBuffer {
 //					03:手機  05:簡訊
 					if ("05".equals(tCustTelNo.getTelTypeCode()) || "03".equals(tCustTelNo.getTelTypeCode())) {
 						if ("Y".equals(tCustTelNo.getEnable())) {
-							reportPhoneNo = tCustTelNo.getTelNo();
-							this.info("reportPhoneNo ..." + reportPhoneNo);
+							messagePhoneNo = tCustTelNo.getTelNo();
+							this.info("messagePhoneNo ..." + messagePhoneNo);
 						}
 					}
 				}
@@ -451,10 +472,10 @@ public class CustNoticeCom extends TradeBuffer {
 		}
 	}
 
-	private void getEmail(CustMain tCustMain) {
+	private void getEmail(CustMain tCustMain,TitaVo titaVo) {
 		if (tCustMain != null) {
-			reportEmailAd = tCustMain.getEmail();
-			this.info("reportEmailAd ..." + reportEmailAd);
+			emailAddress = tCustMain.getEmail();
+			this.info("emailAddress ..." + emailAddress);
 		}
 	}
 
@@ -464,10 +485,11 @@ public class CustNoticeCom extends TradeBuffer {
 		List<CustNotice> lCustNotice0 = new ArrayList<CustNotice>();
 		List<CustNotice> lCustNoticeX = new ArrayList<CustNotice>();
 
-		Slice<CustNotice> slCustNotice0 = custNoticeService.facmNoEq(custNo, 0, 0, this.index, Integer.MAX_VALUE);
+		Slice<CustNotice> slCustNotice0 = custNoticeService.facmNoEq(custNo, 0, 0, this.index, Integer.MAX_VALUE,titaVo);
 		lCustNotice0 = slCustNotice0 == null ? null : slCustNotice0.getContent();
 		if (facmNo != 0) {
-			Slice<CustNotice> slCustNoticeX = custNoticeService.facmNoEq(custNo, facmNo, facmNo, this.index, Integer.MAX_VALUE);
+			Slice<CustNotice> slCustNoticeX = custNoticeService.facmNoEq(custNo, facmNo, facmNo, this.index,
+					Integer.MAX_VALUE,titaVo);
 			lCustNoticeX = slCustNoticeX == null ? null : slCustNoticeX.getContent();
 		}
 
@@ -482,23 +504,29 @@ public class CustNoticeCom extends TradeBuffer {
 			for (CustNotice tCustNotice : lCustNoticeX) {
 				if (formNo.equals(tCustNotice.getFormNo())) {
 
-					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s PaperNotice : " + tCustNotice.getPaperNotice());
-					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s MsgNotice : " + tCustNotice.getMsgNotice());
-					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s EmailNotice : " + tCustNotice.getEmailNotice());
+					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
+							+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s PaperNotice : "
+							+ tCustNotice.getPaperNotice());
+					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
+							+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s MsgNotice : "
+							+ tCustNotice.getMsgNotice());
+					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
+							+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s EmailNotice : "
+							+ tCustNotice.getEmailNotice());
 
 					if (tCustNotice.getFacmNo() == facmNo) {
 						if ("N".equals(tCustNotice.getPaperNotice())) {
-							decuNoticeCheck.put(tmp, 0);
+							docuNoticeCheck.put(tmp, 4);
 						} else {
-							decuNoticeCheck.put(tmp, decuCode);
+							docuNoticeCheck.put(tmp, docuCode);
 						}
 						if ("N".equals(tCustNotice.getMsgNotice())) {
-							textNoticeCheck.put(tmp, 0);
+							textNoticeCheck.put(tmp, 4);
 						} else {
 							textNoticeCheck.put(tmp, textCode);
 						}
 						if ("N".equals(tCustNotice.getEmailNotice())) {
-							mailNoticeCheck.put(tmp, 0);
+							mailNoticeCheck.put(tmp, 4);
 						} else {
 							mailNoticeCheck.put(tmp, mailCode);
 						}
@@ -508,49 +536,51 @@ public class CustNoticeCom extends TradeBuffer {
 		} else if (lCustNotice0 != null && lCustNotice0.size() != 0) {
 			for (CustNotice tCustNotice : lCustNotice0) {
 
-				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s PaperNotice : " + tCustNotice.getPaperNotice());
-				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s MsgNotice : " + tCustNotice.getMsgNotice());
-				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s EmailNotice : " + tCustNotice.getEmailNotice());
+				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
+						+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s PaperNotice : "
+						+ tCustNotice.getPaperNotice());
+				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
+						+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s MsgNotice : "
+						+ tCustNotice.getMsgNotice());
+				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
+						+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s EmailNotice : "
+						+ tCustNotice.getEmailNotice());
 
 				if ("N".equals(tCustNotice.getPaperNotice())) {
-					decuNoticeCheck.put(tmp, 0);
+					docuNoticeCheck.put(tmp, 4);
 				} else {
-					decuNoticeCheck.put(tmp, decuCode);
+					docuNoticeCheck.put(tmp, docuCode);
 				}
 				if ("N".equals(tCustNotice.getMsgNotice())) {
-					textNoticeCheck.put(tmp, 0);
+					textNoticeCheck.put(tmp, 4);
 				} else {
 					textNoticeCheck.put(tmp, textCode);
 				}
 				if ("N".equals(tCustNotice.getEmailNotice())) {
-					mailNoticeCheck.put(tmp, 0);
+					mailNoticeCheck.put(tmp, 4);
 				} else {
 					mailNoticeCheck.put(tmp, mailCode);
 				}
 			}
 		} else {
 //			預設都沒設定L1109，就是要寄送
-			decuNoticeCheck.put(tmp, decuCode);
+			docuNoticeCheck.put(tmp, docuCode);
 			textNoticeCheck.put(tmp, textCode);
 			mailNoticeCheck.put(tmp, mailCode);
 		}
 
-		this.info("decuNoticeCheck : " + decuNoticeCheck.get(tmp));
+		this.info("docuNoticeCheck : " + docuNoticeCheck.get(tmp));
 		this.info("textNoticeCheck : " + textNoticeCheck.get(tmp));
 		this.info("mailNoticeCheck : " + mailNoticeCheck.get(tmp));
 	}
 
-	public void getNoticeCode(String txcd) {
+	public void getNoticeCode(String txcd,TitaVo titaVo) {
 		CdReport tCdReport = new CdReport();
-
-		tCdReport = cdReportService.findById(txcd);
-
+		tCdReport = cdReportService.findById(txcd,titaVo);
 		if (tCdReport != null) {
-
 			sendCode = tCdReport.getSendCode();
-
-			if (tCdReport.getSendCode() == 2) {
-				decuCode = tCdReport.getLetter();
+			if (tCdReport.getSendCode() == 2) { // 2:依設定優先序
+				docuCode = tCdReport.getLetter();
 				textCode = tCdReport.getMessage();
 				mailCode = tCdReport.getEmail();
 			}

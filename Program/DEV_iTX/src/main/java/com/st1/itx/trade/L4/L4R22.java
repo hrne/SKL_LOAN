@@ -96,7 +96,7 @@ public class L4R22 extends TradeBuffer {
 				this.info("tAchAuthLog ... " + tAchAuthLog.toString());
 
 				int flag = 0;
-				if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() > 0) { // 已提出
+				if ("A".equals(tAchAuthLog.getCreateFlag()) && tAchAuthLog.getPropDate() == 0) { // 已提出
 					flag = 8;
 				} else if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) { // 已提回授權成功
 					flag = 1;

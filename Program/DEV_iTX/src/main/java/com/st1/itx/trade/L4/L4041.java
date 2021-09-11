@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -17,6 +18,7 @@ import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.BankAuthActId;
 import com.st1.itx.db.domain.PostAuthLog;
 import com.st1.itx.db.domain.PostAuthLogId;
+import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.PostAuthLogService;
@@ -48,7 +50,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4041 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4041.class);
 
 	private int aCnt = 0;
 	private int bCnt = 0;
@@ -91,6 +92,7 @@ public class L4041 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4041 ");
 		this.totaVo.init(titaVo);
+		txToDoCom.setTxBuffer(this.txBuffer);
 //		FunctionCode 執行動作
 //		1.篩選資料 -> 查詢條件A -> CustNo戶號 || PropDate提出日期 擇一輸入  => MediaCode=Y
 //      2.產出媒體檔 -> MediaCode==Y && StampFinishDate ==0 => 寫txt並且產出媒體檔
@@ -124,6 +126,8 @@ public class L4041 extends TradeBuffer {
 		totaVo.put("PdfSno53N", "0");
 
 		int nPropDate = dateUtil.getNowIntegerForBC();
+		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+		TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
 
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
@@ -135,36 +139,26 @@ public class L4041 extends TradeBuffer {
 			throw new LogicException("E0013", e.getMessage());
 		}
 
+		if (resultList == null || resultList.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "查無資料");
+		}
+
 		switch (iFunctionCode) {
 		case 1:
-			if (resultList != null && resultList.size() != 0) {
-				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-				if (resultList.size() == this.limit && hasNext()) {
-					titaVo.setReturnIndex(this.setIndexNext());
-					/* 手動折返 */
-					this.totaVo.setMsgEndToEnter();
-				}
-				// 篩選資料 set MediaCode=Y ProcessDate = Today or SearchDate
-				for (Map<String, String> result : resultList) {
-					setDate(result);
-
-					OccursList occursListOutput = new OccursList();
-					occursListOutput.putParam("OOCustNo", result.get("F2"));
-					occursListOutput.putParam("OOFacmNo", result.get("F6"));
-					occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
-					occursListOutput.putParam("OOAuthApplCode", result.get("F1"));
-					occursListOutput.putParam("OOPostDepCode", result.get("F3"));
-					occursListOutput.putParam("OORepayAcct", result.get("F4"));
-					occursListOutput.putParam("OOPropDate", propDate);
-					occursListOutput.putParam("OORetrDate", retrDate);
-					occursListOutput.putParam("OOAuthCode", result.get("F5"));
-					occursListOutput.putParam("OOAuthErrorCode", result.get("F14"));
-
-					/* 將每筆資料放入Tota的OcList */
-					this.totaVo.addOccursList(occursListOutput);
-				}
-			} else {
-				throw new LogicException(titaVo, "CE001", "查無資料");
+			for (Map<String, String> result : resultList) {
+				setDate(result);
+				OccursList occursListOutput = new OccursList();
+				occursListOutput.putParam("OOCustNo", result.get("F2"));
+				occursListOutput.putParam("OOFacmNo", result.get("F6"));
+				occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
+				occursListOutput.putParam("OOAuthApplCode", result.get("F1"));
+				occursListOutput.putParam("OOPostDepCode", result.get("F3"));
+				occursListOutput.putParam("OORepayAcct", result.get("F4"));
+				occursListOutput.putParam("OOPropDate", propDate);
+				occursListOutput.putParam("OORetrDate", retrDate);
+				occursListOutput.putParam("OOAuthCode", result.get("F5"));
+				occursListOutput.putParam("OOAuthErrorCode", result.get("F14"));
+				this.totaVo.addOccursList(occursListOutput);
 			}
 			break;
 		case 2:
@@ -178,52 +172,45 @@ public class L4041 extends TradeBuffer {
 			ArrayList<OccursList> bTmp = new ArrayList<>();
 
 			int checkFlag = 0;
+			int cnt = 0;
+			String tempCheckAcctNo = "";
+			String tempCustNo = "";
+			String tempFacmNo = "";
 
-			if (resultList != null && resultList.size() != 0) {
-				this.info("For Loop Start !*!*!*! ");
-				int cnt = 0;
-				String tempCheckAcctNo = "";
-				String tempCustNo = "";
-				String tempFacmNo = "";
+			for (Map<String, String> result : resultList) {
+				setDate(result);
 
-				for (Map<String, String> result : resultList) {
-					setDate(result);
+				this.info("AuthCreateDate : " + authCreateDate);
+				this.info("CustNo : " + result.get("F2"));
+				this.info("RepayAcct : " + result.get("F4"));
+				this.info("AuthErrorCode : " + result.get("F14"));
+				this.info("PostMediaCode : " + result.get("F13"));
+				this.info("PropDate : " + propDate);
 
-					this.info("AuthCreateDate : " + authCreateDate);
-					this.info("CustNo : " + result.get("F2"));
-					this.info("RepayAcct : " + result.get("F4"));
-					this.info("AuthErrorCode : " + result.get("F14"));
-					this.info("PostMediaCode : " + result.get("F13"));
-					this.info("PropDate : " + propDate);
-
-					if ("1".equals(result.get("F5"))) {
-						checkFlag = 1;
-						tempCheckAcctNo = result.get("F4");
-						tempCustNo = FormatUtil.pad9(result.get("F2"), 7);
-						tempFacmNo = FormatUtil.pad9(result.get("F6"), 3);
+				if ("1".equals(result.get("F5"))) {
+					checkFlag = 1;
+					tempCheckAcctNo = result.get("F4");
+					tempCustNo = FormatUtil.pad9(result.get("F2"), 7);
+					tempFacmNo = FormatUtil.pad9(result.get("F6"), 3);
+				} else {
+					if (!tempCheckAcctNo.equals(result.get("F4"))) {
+						throw new LogicException(titaVo, "E0014",
+								"戶號:" + tempCustNo + "，額度:" + tempFacmNo + "，期款與火險需同時授權");
 					} else {
-						if (!tempCheckAcctNo.equals(result.get("F4"))) {
-							throw new LogicException(titaVo, "E0014",
-									"戶號:" + tempCustNo + "，額度:" + tempFacmNo + "，期款與火險需同時授權");
-						} else {
-							checkFlag = 0;
-						}
+						checkFlag = 0;
 					}
-
-					if (!"Y".equals(result.get("F13")) && propDate > 0) {
-						cnt = cnt + 1;
-
-						if ("1".equals(result.get("F5"))) {
-							aCnt++;
-						}
-						if ("2".equals(result.get("F5"))) {
-							bCnt++;
-						}
+				}
+				if ("1".equals(result.get("F5"))) {
+					aCnt++;
+				}
+				if ("2".equals(result.get("F5"))) {
+					bCnt++;
+				}
 //					this.info("!*!*!*! AuthStatus : " + tempPostAuthLog.getAuthStatus());
 
-						MediaDate = dateUtil.getNowIntegerForBC();
+				MediaDate = dateUtil.getNowIntegerForBC();
 
-						OccursList occursList = new OccursList();
+				OccursList occursList = new OccursList();
 //	1   OccDataClass    資料別		0-1		X(1)	固定值為1	
 //	2   OccOrgCode  	委託機構代號	1-4		X(3)	大寫英數字	
 //	3   OccNoteA    	保留欄		4-8		X(4)	空白	
@@ -239,144 +226,127 @@ public class L4041 extends TradeBuffer {
 //	13  OccCheckInd 	核對註記		73-74	X(1)	初始值為空白，回送資料請參閱媒體資料不符代號一覽表	
 //	14  OccNoteB    	保留欄		74-100	X(26)	空白	
 
-						occursList.putParam("OccDataClass", "1");
-						occursList.putParam("OccOrgCode", "846");
-						occursList.putParam("OccNoteA", FormatUtil.padX("", 4));
-						occursList.putParam("OccMediaDate", FormatUtil.pad9("" + MediaDate, 8));
-						occursList.putParam("OccBatchNo", FormatUtil.pad9("1", 3));
-						occursList.putParam("OccApprCode", result.get("F1"));
-						occursList.putParam("OccAcctType", result.get("F3"));
-						occursList.putParam("OccRepayAcct", FormatUtil.pad9("" + result.get("F4"), 14));
-//						扣款人ID+郵局存款別+戶號+(new)帳號碼(文字2位) 舊: null : 兩個空白
-//						                                                                                                  新: 從01起編
-						String acctSeq = "";
-						if (result.get("F8") != null && !"".equals(result.get("F8").trim())) {
-							acctSeq = FormatUtil.pad9("" + result.get("F8"), 2);
-						} else {
-							acctSeq = FormatUtil.padX("", 2);
-						}
-						occursList.putParam("OccCustNo", FormatUtil.padLeft(FormatUtil.padX(result.get("F7"), 10)
-								+ result.get("F3") + FormatUtil.pad9(result.get("F2"), 7) + acctSeq, 20));
-						occursList.putParam("OccCustId", FormatUtil.padX(result.get("F7"), 10));
-						occursList.putParam("OccStatusCode", FormatUtil.padX("", 2));
-						occursList.putParam("OccCheckInd", FormatUtil.padX("", 1));
-						occursList.putParam("OccNoteB", FormatUtil.padX("", 26));
+				occursList.putParam("OccDataClass", "1");
+				occursList.putParam("OccOrgCode", "846");
+				occursList.putParam("OccNoteA", FormatUtil.padX("", 4));
+				occursList.putParam("OccMediaDate", FormatUtil.pad9("" + MediaDate, 8));
+				occursList.putParam("OccBatchNo", FormatUtil.pad9("1", 3));
+				occursList.putParam("OccApprCode", result.get("F1"));
+				occursList.putParam("OccAcctType", result.get("F3"));
+				occursList.putParam("OccRepayAcct", FormatUtil.pad9("" + result.get("F4"), 14));
+//						扣款人ID(10)+郵局存款別(1)+戶號(7)+帳號碼(文字2位) 
+				String acctSeq = "";
+				if (result.get("F8") != null && !"".equals(result.get("F8").trim())) {
+					acctSeq = FormatUtil.pad9("" + result.get("F8"), 2);
+				} else {
+					acctSeq = FormatUtil.padX("", 2);
+				}
+				occursList.putParam("OccCustNo", FormatUtil.padLeft(FormatUtil.padX(result.get("F7"), 10)
+						+ result.get("F3") + FormatUtil.pad9(result.get("F2"), 7) + acctSeq, 20));
+				occursList.putParam("OccCustId", FormatUtil.padX(result.get("F7"), 10));
+				occursList.putParam("OccStatusCode", FormatUtil.padX("", 2));
+				occursList.putParam("OccCheckInd", FormatUtil.padX("", 1));
+				occursList.putParam("OccNoteB", FormatUtil.padX("", 26));
 
-						if ("1".equals(result.get("F5"))) {
-							occursList.putParam("OccDataSeq", FormatUtil.pad9("" + aCnt, 6));
-							aTmp.add(occursList);
-						}
-						if ("2".equals(result.get("F5"))) {
-							occursList.putParam("OccDataSeq", FormatUtil.pad9("" + bCnt, 6));
-							occursList.putParam("OccOrgCode", "53N");
-							bTmp.add(occursList);
-						}
+				if ("1".equals(result.get("F5"))) {
+					occursList.putParam("OccDataSeq", FormatUtil.pad9("" + aCnt, 6));
+					aTmp.add(occursList);
+				}
+				if ("2".equals(result.get("F5"))) {
+					occursList.putParam("OccDataSeq", FormatUtil.pad9("" + bCnt, 6));
+					occursList.putParam("OccOrgCode", "53N");
+					bTmp.add(occursList);
+				}
 
-						OccursList occursListOutput = new OccursList();
-						occursListOutput.putParam("OOCustNo", result.get("F2"));
-						occursListOutput.putParam("OOFacmNo", result.get("F6"));
-						occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
-						occursListOutput.putParam("OOAuthApplCode", result.get("F1"));
-						occursListOutput.putParam("OOPostDepCode", result.get("F3"));
-						occursListOutput.putParam("OORepayAcct", result.get("F4"));
-						occursListOutput.putParam("OOPropDate", propDate);
-						occursListOutput.putParam("OORetrDate", retrDate);
-						occursListOutput.putParam("OOAuthCode", result.get("F5"));
-						occursListOutput.putParam("OOAuthErrorCode", result.get("F14"));
+				OccursList occursListOutput = new OccursList();
+				occursListOutput.putParam("OOCustNo", result.get("F2"));
+				occursListOutput.putParam("OOFacmNo", result.get("F6"));
+				occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
+				occursListOutput.putParam("OOAuthApplCode", result.get("F1"));
+				occursListOutput.putParam("OOPostDepCode", result.get("F3"));
+				occursListOutput.putParam("OORepayAcct", result.get("F4"));
+				occursListOutput.putParam("OOPropDate", propDate);
+				occursListOutput.putParam("OORetrDate", retrDate);
+				occursListOutput.putParam("OOAuthCode", result.get("F5"));
+				occursListOutput.putParam("OOAuthErrorCode", result.get("F14"));
+				this.totaVo.addOccursList(occursListOutput);
+				//
+				PostAuthLogId tPostAuthLogId = new PostAuthLogId();
+				tPostAuthLogId.setAuthCreateDate(authCreateDate);
+				tPostAuthLogId.setAuthApplCode(result.get("F1"));
+				tPostAuthLogId.setCustNo(parse.stringToInteger(result.get("F2")));
+				tPostAuthLogId.setPostDepCode(result.get("F3"));
+				tPostAuthLogId.setRepayAcct(result.get("F4"));
+				tPostAuthLogId.setAuthCode(result.get("F5"));
 
-						/* 將每筆資料放入Tota的OcList */
-						this.totaVo.addOccursList(occursListOutput);
-						PostAuthLogId tPostAuthLogId = new PostAuthLogId();
-						tPostAuthLogId.setAuthCreateDate(authCreateDate);
-						tPostAuthLogId.setAuthApplCode(result.get("F1"));
-						tPostAuthLogId.setCustNo(parse.stringToInteger(result.get("F2")));
-						tPostAuthLogId.setPostDepCode(result.get("F3"));
-						tPostAuthLogId.setRepayAcct(result.get("F4"));
-						tPostAuthLogId.setAuthCode(result.get("F5"));
+				PostAuthLog tempPostAuthLog = postAuthLogService.holdById(tPostAuthLogId);
 
-						PostAuthLog tempPostAuthLog = postAuthLogService.holdById(tPostAuthLogId);
+				tempPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+				tempPostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
+				tempPostAuthLog.setPostMediaCode("Y");
 
-						tempPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-						tempPostAuthLog.setPropDate(dateUtil.getNowIntegerForBC());
-						tempPostAuthLog.setPostMediaCode("Y");
+				if ("1".equals(tempPostAuthLog.getAuthCode())) {
+					tempPostAuthLog.setFileSeq(aCnt);
+				}
+				if ("2".equals(tempPostAuthLog.getAuthCode())) {
+					tempPostAuthLog.setFileSeq(bCnt);
+				}
+				try {
+					if (tempPostAuthLog != null) {
+						postAuthLogService.update(tempPostAuthLog);
+					}
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
+				}
 
-						if ("1".equals(tempPostAuthLog.getAuthCode())) {
-							tempPostAuthLog.setFileSeq(aCnt);
-						}
-						if ("2".equals(tempPostAuthLog.getAuthCode())) {
-							tempPostAuthLog.setFileSeq(bCnt);
-						}
+				BankAuthAct tBankAuthAct = new BankAuthAct();
+				BankAuthActId tBankAuthActId = new BankAuthActId();
 
+				tBankAuthActId.setCustNo(parse.stringToInteger(result.get("F2")));
+				tBankAuthActId.setFacmNo(parse.stringToInteger(result.get("F6")));
+				tBankAuthActId.setAuthType(result.get("F5"));
+
+				tBankAuthAct = bankAuthActService.holdById(tBankAuthActId, titaVo);
+
+//						更新為已送出授權
+				if (tBankAuthAct != null) {
+					if ("".equals(tBankAuthAct.getStatus().trim())) {
+						tBankAuthAct.setStatus("9");
 						try {
-							// 送出到DB
-							if (tempPostAuthLog != null) {
-								postAuthLogService.update(tempPostAuthLog);
-							}
+							bankAuthActService.update(tBankAuthAct, titaVo);
 						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
+							throw new LogicException("E0007", "BankAuthAct update error : " + e.getErrorMsg());
 						}
-
-						BankAuthAct tBankAuthAct = new BankAuthAct();
-						BankAuthActId tBankAuthActId = new BankAuthActId();
-
-						tBankAuthActId.setCustNo(parse.stringToInteger(result.get("F2")));
-						tBankAuthActId.setFacmNo(parse.stringToInteger(result.get("F6")));
-						tBankAuthActId.setAuthType("01");
-
-						tBankAuthAct = bankAuthActService.holdById(tBankAuthActId, titaVo);
-
-//						更新為已送出授權
-						if (tBankAuthAct != null) {
-							if ("".equals(tBankAuthAct.getStatus().trim())) {
-								tBankAuthAct.setStatus("9");
-								try {
-									bankAuthActService.update(tBankAuthAct, titaVo);
-								} catch (DBException e) {
-									throw new LogicException("E0007", "BankAuthAct update error : " + e.getErrorMsg());
-								}
-							}
-						}
-
-						tBankAuthActId.setAuthType("02");
-
-						tBankAuthAct = bankAuthActService.holdById(tBankAuthActId, titaVo);
-
-//						更新為已送出授權
-						if (tBankAuthAct != null) {
-							if ("".equals(tBankAuthAct.getStatus().trim())) {
-								tBankAuthAct.setStatus("9");
-								try {
-									bankAuthActService.update(tBankAuthAct, titaVo);
-								} catch (DBException e) {
-									throw new LogicException("E0007", "BankAuthAct update error : " + e.getErrorMsg());
-								}
-							}
-						}
-
-						TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
-						tTxToDoDetailId.setCustNo(tempPostAuthLog.getCustNo());
-						tTxToDoDetailId.setFacmNo(tempPostAuthLog.getFacmNo());
-						tTxToDoDetailId.setBormNo(0);
-						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tempPostAuthLog.getRepayAcct(), 14));
-						tTxToDoDetailId.setItemCode("ACHP00");
-
-						txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
-
-					} else {
-						this.info("continue !*!*!*! ");
-						continue;
 					}
 				}
-				this.info("cnt = " + cnt);
 
-				if (cnt == 0) {
-					throw new LogicException(titaVo, "CE001", "查無資料");
+				tBankAuthActId.setAuthType("02");
+
+				tBankAuthAct = bankAuthActService.holdById(tBankAuthActId, titaVo);
+
+//						更新為已送出授權
+				if (tBankAuthAct != null) {
+					if ("".equals(tBankAuthAct.getStatus().trim())) {
+						tBankAuthAct.setStatus("9");
+						try {
+							bankAuthActService.update(tBankAuthAct, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0007", "BankAuthAct update error : " + e.getErrorMsg());
+						}
+					}
 				}
 
-				if (checkFlag == 1) {
-					throw new LogicException(titaVo, "E0014",
-							"戶號:" + tempCustNo + "-額度:" + tempFacmNo + "，期款與火險需同時授權");
-				}
+				tTxToDoDetailId = new TxToDoDetailId();
+				tTxToDoDetailId.setCustNo(tempPostAuthLog.getCustNo());
+				tTxToDoDetailId.setFacmNo(tempPostAuthLog.getFacmNo());
+				tTxToDoDetailId.setBormNo(0);
+				tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tempPostAuthLog.getRepayAcct(), 14));
+				tTxToDoDetailId.setItemCode("POSP00");
+				txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
+			}
+			if (checkFlag == 1) {
+				throw new LogicException(titaVo, "E0014", "戶號:" + tempCustNo + "-額度:" + tempFacmNo + "，期款與火險需同時授權");
+			}
 
 //				Footer
 //				1	FootDataClass   資料別		0-1		X(1)	固定值為2	
@@ -391,141 +361,155 @@ public class L4041 extends TradeBuffer {
 //				10	FootSuccsCnt    成功筆數		40-46	9(6)	初始值為0，回送時使用	
 //				11	FootNoteB   	保留欄		46-100	X(54)		
 
-				PostAuthFileVo postAuthFileVo846 = new PostAuthFileVo();
+			PostAuthFileVo postAuthFileVo846 = new PostAuthFileVo();
 
-				postAuthFileVo846.put("FootDataClass", "2");
-				postAuthFileVo846.put("FootOrgCode", "846");
-				postAuthFileVo846.put("FootNoteA", FormatUtil.padX("", 4));
-				postAuthFileVo846.put("FootMediaDate", FormatUtil.pad9((MediaDate) + "", 8));
-				postAuthFileVo846.put("FootBatchNo", FormatUtil.pad9("1", 3));
-				postAuthFileVo846.put("FootCreateFlag", "B");
-				postAuthFileVo846.put("FootDataCnt", FormatUtil.pad9("" + aCnt, 6));
-				postAuthFileVo846.put("FootCreateDate", FormatUtil.padX("", 8));
-				postAuthFileVo846.put("FootErrorCnt", FormatUtil.pad9("", 6));
-				postAuthFileVo846.put("FootSuccsCnt", FormatUtil.pad9("", 6));
-				postAuthFileVo846.put("FootNoteB", FormatUtil.padX("", 54));
+			postAuthFileVo846.put("FootDataClass", "2");
+			postAuthFileVo846.put("FootOrgCode", "846");
+			postAuthFileVo846.put("FootNoteA", FormatUtil.padX("", 4));
+			postAuthFileVo846.put("FootMediaDate", FormatUtil.pad9((MediaDate) + "", 8));
+			postAuthFileVo846.put("FootBatchNo", FormatUtil.pad9("1", 3));
+			postAuthFileVo846.put("FootCreateFlag", "B");
+			postAuthFileVo846.put("FootDataCnt", FormatUtil.pad9("" + aCnt, 6));
+			postAuthFileVo846.put("FootCreateDate", FormatUtil.padX("", 8));
+			postAuthFileVo846.put("FootErrorCnt", FormatUtil.pad9("", 6));
+			postAuthFileVo846.put("FootSuccsCnt", FormatUtil.pad9("", 6));
+			postAuthFileVo846.put("FootNoteB", FormatUtil.padX("", 54));
 
-				// 把明細資料容器裝到檔案資料容器內
-				postAuthFileVo846.setOccursList(aTmp);
-				// 轉換資料格式
-				ArrayList<String> aFile = postAuthFileVo846.toFile();
+			// 把明細資料容器裝到檔案資料容器內
+			postAuthFileVo846.setOccursList(aTmp);
+			// 轉換資料格式
+			ArrayList<String> aFile = postAuthFileVo846.toFile();
 
 //				String outputFilePath11 = outFolder + "PO$P11P_846授權出.txt";
 //				String outputFilePath12 = outFolder + "PO$P12P_53N授權出.txt";
 
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-						titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-郵局授權提出媒體檔846", "PO$P11P_846授權.txt", 2);
 
-				for (String line : aFile) {
-					makeFile.put(line);
-				}
-
-				long sno = makeFile.close();
-
-				this.info("sno : " + sno);
-
-				makeFile.toFile(sno);
-				totaVo.put("PdfSno846", "" + sno);
-
-				PostAuthFileVo postAuthFileVo53N = new PostAuthFileVo();
-
-				postAuthFileVo53N.put("FootDataClass", "2");
-				postAuthFileVo53N.put("FootOrgCode", "53N");
-				postAuthFileVo53N.put("FootNoteA", FormatUtil.padX("", 4));
-				postAuthFileVo53N.put("FootMediaDate", FormatUtil.pad9((MediaDate) + "", 8));
-				postAuthFileVo53N.put("FootBatchNo", FormatUtil.pad9("1", 3));
-				postAuthFileVo53N.put("FootCreateFlag", "B");
-				postAuthFileVo53N.put("FootDataCnt", FormatUtil.pad9("" + bCnt, 6));
-				postAuthFileVo53N.put("FootCreateDate", FormatUtil.padX("", 8));
-				postAuthFileVo53N.put("FootErrorCnt", FormatUtil.pad9("", 6));
-				postAuthFileVo53N.put("FootSuccsCnt", FormatUtil.pad9("", 6));
-				postAuthFileVo53N.put("FootNoteB", FormatUtil.padX("", 54));
-
-				// 把明細資料容器裝到檔案資料容器內
-				postAuthFileVo53N.setOccursList(bTmp);
-
-				// 轉換資料格式
-				ArrayList<String> bFile = postAuthFileVo53N.toFile();
-
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-						titaVo.getTxCode() + "-郵局授權提出媒體檔53N", "PO$P12P_53N授權出.txt", 2);
-
-				for (String line : bFile) {
-					makeFile.put(line);
-				}
-
-				sno = makeFile.close();
-
-				this.info("sno : " + sno);
-
-				makeFile.toFile(sno);
-				totaVo.put("PdfSno53N", "" + sno);
-
-			} else {
-				throw new LogicException(titaVo, "CE001", "查無資料");
+			for (String line : aFile) {
+				makeFile.put(line);
 			}
+
+			long sno = makeFile.close();
+
+			this.info("sno : " + sno);
+
+			makeFile.toFile(sno);
+			totaVo.put("PdfSno846", "" + sno);
+
+			PostAuthFileVo postAuthFileVo53N = new PostAuthFileVo();
+
+			postAuthFileVo53N.put("FootDataClass", "2");
+			postAuthFileVo53N.put("FootOrgCode", "53N");
+			postAuthFileVo53N.put("FootNoteA", FormatUtil.padX("", 4));
+			postAuthFileVo53N.put("FootMediaDate", FormatUtil.pad9((MediaDate) + "", 8));
+			postAuthFileVo53N.put("FootBatchNo", FormatUtil.pad9("1", 3));
+			postAuthFileVo53N.put("FootCreateFlag", "B");
+			postAuthFileVo53N.put("FootDataCnt", FormatUtil.pad9("" + bCnt, 6));
+			postAuthFileVo53N.put("FootCreateDate", FormatUtil.padX("", 8));
+			postAuthFileVo53N.put("FootErrorCnt", FormatUtil.pad9("", 6));
+			postAuthFileVo53N.put("FootSuccsCnt", FormatUtil.pad9("", 6));
+			postAuthFileVo53N.put("FootNoteB", FormatUtil.padX("", 54));
+
+			// 把明細資料容器裝到檔案資料容器內
+			postAuthFileVo53N.setOccursList(bTmp);
+
+			// 轉換資料格式
+			ArrayList<String> bFile = postAuthFileVo53N.toFile();
+
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-郵局授權提出媒體檔53N", "PO$P12P_53N授權出.txt", 2);
+
+			for (String line : bFile) {
+				makeFile.put(line);
+			}
+
+			sno = makeFile.close();
+
+			this.info("sno : " + sno);
+
+			makeFile.toFile(sno);
+			totaVo.put("PdfSno53N", "" + sno);
 			break;
 		case 3:
 			this.info("case3!!");
 			// 重製媒體碼 set MediaCode=" "
+			for (Map<String, String> result : resultList) {
+				if ("".equals(result.get("F14").trim())) {
+					setDate(result);
+					OccursList occursListOutput = new OccursList();
+					occursListOutput.putParam("OOCustNo", result.get("F2"));
+					occursListOutput.putParam("OOFacmNo", result.get("F6"));
+					occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
+					occursListOutput.putParam("OOAuthApplCode", result.get("F1"));
+					occursListOutput.putParam("OOPostDepCode", result.get("F3"));
+					occursListOutput.putParam("OORepayAcct", result.get("F4"));
+					occursListOutput.putParam("OOPropDate", propDate);
+					occursListOutput.putParam("OORetrDate", retrDate);
+					occursListOutput.putParam("OOAuthCode", result.get("F5"));
+					occursListOutput.putParam("OOAuthErrorCode", result.get("F14"));
+					this.totaVo.addOccursList(occursListOutput);
+					//
+					PostAuthLogId tPostAuthLogId = new PostAuthLogId();
+					tPostAuthLogId.setAuthCreateDate(authCreateDate);
+					tPostAuthLogId.setAuthApplCode(result.get("F1"));
+					tPostAuthLogId.setCustNo(parse.stringToInteger(result.get("F2")));
+					tPostAuthLogId.setPostDepCode(result.get("F3"));
+					tPostAuthLogId.setRepayAcct(result.get("F4"));
+					tPostAuthLogId.setAuthCode(result.get("F5"));
 
-			if (resultList != null && resultList.size() != 0) {
-				int cnt = 0;
-				for (Map<String, String> result : resultList) {
-					if ("".equals(result.get("F14").trim())) {
-						setDate(result);
-						cnt = cnt + 1;
+					PostAuthLog tPostAuthLog = postAuthLogService.holdById(tPostAuthLogId);
 
-						OccursList occursListOutput = new OccursList();
-						occursListOutput.putParam("OOCustNo", result.get("F2"));
-						occursListOutput.putParam("OOFacmNo", result.get("F6"));
-						occursListOutput.putParam("OOAuthCreateDate", authCreateDate);
-						occursListOutput.putParam("OOAuthApplCode", result.get("F1"));
-						occursListOutput.putParam("OOPostDepCode", result.get("F3"));
-						occursListOutput.putParam("OORepayAcct", result.get("F4"));
-						occursListOutput.putParam("OOPropDate", propDate);
-						occursListOutput.putParam("OORetrDate", retrDate);
-						occursListOutput.putParam("OOAuthCode", result.get("F5"));
-						occursListOutput.putParam("OOAuthErrorCode", result.get("F14"));
-
-						/* 將每筆資料放入Tota的OcList */
-						this.totaVo.addOccursList(occursListOutput);
-						PostAuthLogId tPostAuthLogId = new PostAuthLogId();
-						tPostAuthLogId.setAuthCreateDate(authCreateDate);
-						tPostAuthLogId.setAuthApplCode(result.get("F1"));
-						tPostAuthLogId.setCustNo(parse.stringToInteger(result.get("F2")));
-						tPostAuthLogId.setPostDepCode(result.get("F3"));
-						tPostAuthLogId.setRepayAcct(result.get("F4"));
-						tPostAuthLogId.setAuthCode(result.get("F5"));
-
-						PostAuthLog newPostAuthLog = postAuthLogService.holdById(tPostAuthLogId);
-
-						newPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
-						newPostAuthLog.setPropDate(0);
-						newPostAuthLog.setPostMediaCode("");
-						newPostAuthLog.setFileSeq(0);
-
+					tPostAuthLog.setProcessDate(dateUtil.getNowIntegerForBC());
+					// AuthErrorCode '':新增授權 ' ':再次授權
+					if (result.get("F14").isEmpty()) {
 						try {
-							postAuthLogService.update(newPostAuthLog);
+							postAuthLogService.delete(tPostAuthLog);
 						} catch (DBException e) {
-							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog update " + e.getErrorMsg());
+							throw new LogicException(titaVo, "E0006", "L4041 PostAuthLog" + e.getErrorMsg());
 						}
-
-						TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
-						tTxToDoDetailId.setCustNo(newPostAuthLog.getCustNo());
-						tTxToDoDetailId.setFacmNo(newPostAuthLog.getFacmNo());
+						tTxToDoDetail = new TxToDoDetail();
+						tTxToDoDetail.setItemCode("POSP00");
+						tTxToDoDetail.setCustNo(tPostAuthLog.getCustNo());
+						tTxToDoDetail.setFacmNo(tPostAuthLog.getFacmNo());
+						tTxToDoDetail.setDtlValue(FormatUtil.pad9(tPostAuthLog.getRepayAcct(), 14));
+						tTxToDoDetail.setStatus(0);
+						txToDoCom.addDetail(true, 1, tTxToDoDetail, titaVo);
+					} else {
+						tPostAuthLog.setPropDate(0);
+						tPostAuthLog.setPostMediaCode("");
+						tPostAuthLog.setFileSeq(0);
+						try {
+							postAuthLogService.update(tPostAuthLog);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", "L4041 PostAuthLog" + e.getErrorMsg());
+						}
+						tTxToDoDetailId = new TxToDoDetailId();
+						tTxToDoDetailId.setCustNo(tPostAuthLog.getCustNo());
+						tTxToDoDetailId.setFacmNo(tPostAuthLog.getFacmNo());
 						tTxToDoDetailId.setBormNo(0);
-						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(newPostAuthLog.getRepayAcct(), 14));
-						tTxToDoDetailId.setItemCode("ACHP00");
-
+						tTxToDoDetailId.setDtlValue(FormatUtil.pad9(tPostAuthLog.getRepayAcct(), 14));
+						tTxToDoDetailId.setItemCode("POSP00");
 						txToDoCom.updDetailStatus(0, tTxToDoDetailId, titaVo);
 					}
-					if (cnt == 0) {
-						throw new LogicException(titaVo, "CE001", "查無資料");
+					Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(tPostAuthLog.getCustNo(),
+							tPostAuthLog.getRepayAcct(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+					if (slBankAuthAct != null) {
+						for (BankAuthAct t1 : slBankAuthAct.getContent()) {
+							if ("700".equals(t1.getRepayBank())
+									&& t1.getPostDepCode().equals(tPostAuthLog.getPostDepCode())) {
+								BankAuthAct tBankAuthAct = bankAuthActService.holdById(t1, titaVo);
+								tBankAuthAct.setStatus(" ");
+								try {
+									bankAuthActService.update(tBankAuthAct, titaVo);
+								} catch (DBException e) {
+									throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
+								}
+							}
+						}
 					}
+
 				}
-			} else {
-				throw new LogicException(titaVo, "CE001", "查無資料");
 			}
 			break;
 		default:
@@ -533,26 +517,6 @@ public class L4041 extends TradeBuffer {
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	private Boolean hasNext() {
-		Boolean result = true;
-
-		int times = this.index + 1;
-		int cnt = l4041ServiceImpl.getSize();
-		int size = times * this.limit;
-
-		this.info("index ..." + this.index);
-		this.info("times ..." + times);
-		this.info("cnt ..." + cnt);
-		this.info("size ..." + size);
-
-		if (size == cnt) {
-			result = false;
-		}
-		this.info("result ..." + result);
-
-		return result;
 	}
 
 	private void setDate(Map<String, String> result) throws LogicException {

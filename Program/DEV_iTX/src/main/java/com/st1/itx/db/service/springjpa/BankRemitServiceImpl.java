@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("bankRemitService")
 @Repository
-public class BankRemitServiceImpl implements BankRemitService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(BankRemitServiceImpl.class);
-
+public class BankRemitServiceImpl extends ASpringJpaParm implements BankRemitService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class BankRemitServiceImpl implements BankRemitService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + bankRemitId);
+    this.info("findById " + dbName + " " + bankRemitId);
     Optional<BankRemit> bankRemit = null;
     if (dbName.equals(ContentName.onDay))
       bankRemit = bankRemitReposDay.findById(bankRemitId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "BatchNo", "TitaTlrNo", "TitaTxtNo"));
-    logger.info("findAll " + dbName);
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "TitaTlrNo", "TitaTxtNo"));
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = bankRemitReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = bankRemitReposHist.findAll(pageable);
     else 
       slice = bankRemitRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4001A " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1);
+    this.info("findL4001A " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = bankRemitReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(acDate_0, acDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = bankRemitReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(acDate_0, acDate_1, pageable);
     else 
       slice = bankRemitRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(acDate_0, acDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4901A " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findL4901A " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = bankRemitReposDay.findAllByCustNoIs(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = bankRemitReposHist.findAllByCustNoIs(custNo_0, pageable);
     else 
       slice = bankRemitRepos.findAllByCustNoIs(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4901B " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " drawdownCode_2 : " +  drawdownCode_2 + " drawdownCode_3 : " +  drawdownCode_3 + " statusCode_4 : " +  statusCode_4 + " statusCode_5 : " +  statusCode_5);
+    this.info("findL4901B " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " drawdownCode_2 : " +  drawdownCode_2 + " drawdownCode_3 : " +  drawdownCode_3 + " statusCode_4 : " +  statusCode_4 + " statusCode_5 : " +  statusCode_5);
     if (dbName.equals(ContentName.onDay))
       slice = bankRemitReposDay.findAllByAcDateIsAndBatchNoIsAndDrawdownCodeGreaterThanEqualAndDrawdownCodeLessThanEqualAndStatusCodeGreaterThanEqualAndStatusCodeLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(acDate_0, batchNo_1, drawdownCode_2, drawdownCode_3, statusCode_4, statusCode_5, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = bankRemitReposHist.findAllByAcDateIsAndBatchNoIsAndDrawdownCodeGreaterThanEqualAndDrawdownCodeLessThanEqualAndStatusCodeGreaterThanEqualAndStatusCodeLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(acDate_0, batchNo_1, drawdownCode_2, drawdownCode_3, statusCode_4, statusCode_5, pageable);
     else 
       slice = bankRemitRepos.findAllByAcDateIsAndBatchNoIsAndDrawdownCodeGreaterThanEqualAndDrawdownCodeLessThanEqualAndStatusCodeGreaterThanEqualAndStatusCodeLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(acDate_0, batchNo_1, drawdownCode_2, drawdownCode_3, statusCode_4, statusCode_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4901C " + dbName + " : " + "acDate_0 : " + acDate_0 + " drawdownCode_1 : " +  drawdownCode_1 + " drawdownCode_2 : " +  drawdownCode_2 + " statusCode_3 : " +  statusCode_3 + " statusCode_4 : " +  statusCode_4);
+    this.info("findL4901C " + dbName + " : " + "acDate_0 : " + acDate_0 + " drawdownCode_1 : " +  drawdownCode_1 + " drawdownCode_2 : " +  drawdownCode_2 + " statusCode_3 : " +  statusCode_3 + " statusCode_4 : " +  statusCode_4);
     if (dbName.equals(ContentName.onDay))
       slice = bankRemitReposDay.findAllByAcDateIsAndDrawdownCodeGreaterThanEqualAndDrawdownCodeLessThanEqualAndStatusCodeGreaterThanEqualAndStatusCodeLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(acDate_0, drawdownCode_1, drawdownCode_2, statusCode_3, statusCode_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -207,6 +215,9 @@ em = null;
     else 
       slice = bankRemitRepos.findAllByAcDateIsAndDrawdownCodeGreaterThanEqualAndDrawdownCodeLessThanEqualAndStatusCodeGreaterThanEqualAndStatusCodeLessThanEqualOrderByCustNoAscFacmNoAscBormNoAsc(acDate_0, drawdownCode_1, drawdownCode_2, statusCode_3, statusCode_4, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -215,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + bankRemitId);
+    this.info("Hold " + dbName + " " + bankRemitId);
     Optional<BankRemit> bankRemit = null;
     if (dbName.equals(ContentName.onDay))
       bankRemit = bankRemitReposDay.findByBankRemitId(bankRemitId);
@@ -233,7 +244,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + bankRemit.getBankRemitId());
+    this.info("Hold " + dbName + " " + bankRemit.getBankRemitId());
     Optional<BankRemit> bankRemitT = null;
     if (dbName.equals(ContentName.onDay))
       bankRemitT = bankRemitReposDay.findByBankRemitId(bankRemit.getBankRemitId());
@@ -255,7 +266,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + bankRemit.getBankRemitId());
+    this.info("Insert..." + dbName + " " + bankRemit.getBankRemitId());
     if (this.findById(bankRemit.getBankRemitId()) != null)
       throw new DBException(2);
 
@@ -284,7 +295,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + bankRemit.getBankRemitId());
+    this.info("Update..." + dbName + " " + bankRemit.getBankRemitId());
     if (!empNot.isEmpty())
       bankRemit.setLastUpdateEmpNo(empNot);
 
@@ -307,7 +318,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + bankRemit.getBankRemitId());
+    this.info("Update..." + dbName + " " + bankRemit.getBankRemitId());
     if (!empNot.isEmpty())
       bankRemit.setLastUpdateEmpNo(empNot);
 
@@ -327,7 +338,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + bankRemit.getBankRemitId());
+    this.info("Delete..." + dbName + " " + bankRemit.getBankRemitId());
     if (dbName.equals(ContentName.onDay)) {
       bankRemitReposDay.delete(bankRemit);	
       bankRemitReposDay.flush();
@@ -356,7 +367,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (BankRemit t : bankRemit){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -391,7 +402,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (bankRemit == null || bankRemit.size() == 0)
       throw new DBException(6);
 
@@ -420,7 +431,7 @@ em = null;
 
   @Override
   public void deleteAll(List<BankRemit> bankRemit, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

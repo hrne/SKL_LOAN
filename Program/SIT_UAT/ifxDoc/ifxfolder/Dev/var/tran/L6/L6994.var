@@ -229,8 +229,8 @@ E(0,2)
 T(2,#OOFunc2+#WorkMonth+#OOPieceCode)
 
 #OOBTN2=X,4,S
-C(3,#OOFlag,0,BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=修改;ntxbuf=#OOBUF2}),
-							BIND(grid,cancel))	
+IF(#OOFlag==0 || #OOFlag==1,BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=修改;ntxbuf=#OOBUF2}),
+														BIND(grid,cancel))	
 
 ! 刪除的按鈕
 #OOFunc4=A,1,S
@@ -240,7 +240,8 @@ E(0,4)
 T(2,#OOFunc4+#WorkMonth+#OOPieceCode)
 
 #OOBTN4=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=刪除;ntxbuf=#OOBUF4})
+IF(#OOFlag==0 ,BIND(grid,{cmd=CHAIN;ntxcd=L6754;text=刪除;ntxbuf=#OOBUF4}),
+							 BIND(grid,cancel))	
 
 ! 查詢的按鈕
 #OOFunc5=A,1,S
@@ -299,10 +300,10 @@ TXFORM=L6994
 #RPTFG=0,QUERY.GRID,L6994
 #any={detail:true, header:'L6994.part', caption:'', width:1000, rowNum:10, rowList:[20,40,60]}
 
-#OOBTN2=
+#OOBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 
-#OOBTN4=
+#OOBTN4=刪除
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
 !!#OOBTN5=

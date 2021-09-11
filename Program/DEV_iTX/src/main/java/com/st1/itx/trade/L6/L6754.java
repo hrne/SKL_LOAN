@@ -16,7 +16,6 @@ import com.st1.itx.db.domain.CdPerformanceId;
 import com.st1.itx.db.domain.CdPfParms;
 import com.st1.itx.db.domain.CdPfParmsId;
 import com.st1.itx.db.domain.CdWorkMonth;
-import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.service.CdPerformanceService;
 import com.st1.itx.db.service.CdPfParmsService;
 import com.st1.itx.db.service.CdWorkMonthService;
@@ -70,9 +69,7 @@ public class L6754 extends TradeBuffer {
 		// 取得輸入資料
 		int iFuncCode = this.iParse.stringToInteger(titaVo.getParam("FuncCode"));
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
-		int iYear = Integer.valueOf(titaVo.getParam("WorkMonth").substring(0,3))+1911;
-		int iMonth = Integer.valueOf(titaVo.getParam("WorkMonth").substring(3,5));
-		int AcDate = titaVo.getEntDyI();// 7碼
+		int AcDate = titaVo.getEntDyI()+19110000;
 		String iPieceCode = titaVo.getParam("PieceCode");
 		BigDecimal iUnitCnt = new BigDecimal(titaVo.getParam("UnitCnt"));
 		BigDecimal iUnitAmtCond = new BigDecimal(titaVo.getParam("UnitAmtCond"));
@@ -89,12 +86,12 @@ public class L6754 extends TradeBuffer {
 		BigDecimal iBsOffrPerccent = new BigDecimal(titaVo.getParam("BsOffrPerccent"));
 		
 		//檢查工作月區間
-		CdWorkMonth tWorkMonth = iCdWorkMonthService.findById(new CdWorkMonthId(iYear,iMonth), titaVo);
+		CdWorkMonth tWorkMonth = iCdWorkMonthService.findDateFirst(AcDate, AcDate, titaVo);
+		int iWoarkMonthAcDAte = 0;
 		if(tWorkMonth!=null) {
-			int MonthStart = tWorkMonth.getStartDate();
-			int MonthEnd = tWorkMonth.getEndDate();
-			if(MonthStart <= AcDate && AcDate<=MonthEnd) {
-				
+			iWoarkMonthAcDAte = Integer.parseInt(String.valueOf(tWorkMonth.getYear())+iParse.IntegerToString(tWorkMonth.getMonth(), 2));
+			this.info("iWoarkMonthAcDAte=="+iWoarkMonthAcDAte);
+			if(iWorkMonth<=iWoarkMonthAcDAte) {
 				duringWorkMonth = true;
 			}
 		}

@@ -1093,15 +1093,15 @@ public class L5706 extends TradeBuffer {
 		Slice<NegFinShare> slNegFinShare = sNegFinShareService.findFinCodeAll(tNegMain.getCustNo(),
 				tNegMain.getCaseSeq(), this.index, 30);
 		List<NegFinShare> lNegFinShare = slNegFinShare == null ? null : slNegFinShare.getContent();
-		BigDecimal PrincipalBal = new BigDecimal("0");
+		BigDecimal sumContractAmt = new BigDecimal("0");
 		if (lNegFinShare == null) {
 			throw new LogicException(titaVo, "E0001", "身分證字號[" + CustId + "] 戶號:[" + tNegMain.getCustNo() + "] 案件序號:["
 					+ tNegMain.getCaseSeq() + "] 債務協商債權分攤檔");
 		}
 		for (NegFinShare t1NegFinShare : lNegFinShare) {
-			PrincipalBal = PrincipalBal.add(t1NegFinShare.getContractAmt());// 累加簽約金額
+			sumContractAmt = sumContractAmt.add(t1NegFinShare.getContractAmt());// 累加簽約金額
 		}
-		if (PrincipalBal.compareTo(BigDecimal.ZERO) == 0) {//分攤檔簽約金額加總不應為0
+		if (sumContractAmt.compareTo(BigDecimal.ZERO) == 0) {//分攤檔簽約金額加總不應為0
 			throw new LogicException(titaVo, "E5009", "身分證字號[" + CustId + "] 戶號:[" + tNegMain.getCustNo() + "] 案件序號:["
 					+ tNegMain.getCaseSeq() + "] 簽約金額加總為0");
 		}
@@ -1132,9 +1132,9 @@ public class L5706 extends TradeBuffer {
 		tNegFinShareLog.setAmtRatio(tNegFinShare.getAmtRatio());
 		tNegFinShareLog.setDueAmt(tNegFinShare.getDueAmt());
 		tNegFinShareLog.setCancelDate(DateRocToDC(paydate, "單獨受償日期", titaVo));//註銷日期
-		//註銷金額=簽約金額/簽約總金額*總本金餘額 ; 先乘再除,四捨五入到整數
+		//註銷金額=簽約金額/簽約金額加總*總本金餘額 ; 先乘再除,四捨五入到整數
 		BigDecimal CancelAmt = tNegFinShare.getContractAmt().multiply(tNegMain.getPrincipalBal())
-				.divide(PrincipalBal, 0, BigDecimal.ROUND_HALF_UP);
+				.divide(sumContractAmt, 0, BigDecimal.ROUND_HALF_UP);
 		tNegFinShareLog.setCancelAmt(CancelAmt);
 
 		// 存到暫存檔

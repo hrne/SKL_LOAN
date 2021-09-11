@@ -161,80 +161,94 @@ public class TxToDoCom extends TradeBuffer {
 	 * @throws LogicException LogicException
 	 */
 	public void addDetail(boolean dupSkip, int HCode, TxToDoDetail tDetail, TitaVo titaVo) throws LogicException {
-		this.info("TxToDoCom ... addByDetail");
+		this.info("TxToDoCom ... addByDetail HCode =" + HCode);
 		// 放行時執行
-		if (titaVo.isActfgRelease()) {
-			tDetailId.setItemCode(tDetail.getItemCode());
-			tDetailId.setCustNo(tDetail.getCustNo());
-			tDetailId.setFacmNo(tDetail.getFacmNo());
-			tDetailId.setBormNo(tDetail.getBormNo());
-			if (tDetail.getDtlValue() == null || tDetail.getDtlValue().trim().length() == 0)
-				tDetailId.setDtlValue(" ");
-			else
-				tDetailId.setDtlValue(tDetail.getDtlValue());
-			// 重複跳過時，正常且找得到或訂定時找不到，跳過處理
-			boolean skip = false;
-			if (dupSkip) {
-				if (txToDoDetailService.holdById(tDetailId, titaVo) != null) {
-					if (HCode == 0)
-						skip = true;
+		if (!titaVo.isActfgRelease()) {
+			return;
+		}
+
+		tDetailId.setItemCode(tDetail.getItemCode());
+		tDetailId.setCustNo(tDetail.getCustNo());
+		tDetailId.setFacmNo(tDetail.getFacmNo());
+		tDetailId.setBormNo(tDetail.getBormNo());
+		tDetailId.setDtlValue(tDetail.getDtlValue());
+		if (tDetail.getDtlValue() == null || tDetail.getDtlValue().trim().length() == 0) {
+			tDetailId.setDtlValue(" ");
+		}
+		// 重複跳過時，正常且找得到或訂定時找不到，跳過處理
+		TxToDoDetail tTxToDoDetail = txToDoDetailService.holdById(tDetailId, titaVo);
+		if (tTxToDoDetail == null) {
+			if (HCode == 1) {
+				if (dupSkip) {
+					return;
 				} else {
-					if (HCode == 1)
-						skip = true;
+					throw new LogicException("E0015", "TxToDoDetail 刪除資料找不到" + tDetailId.toString()); // 檢查錯誤
 				}
 			}
-			if (!skip) {
-				tDetail.setTxToDoDetailId(tDetailId);
-				tDetail.setDataDate(this.txBuffer.getMgBizDate().getTbsDy());
-				// 應處理主檔
-				tMain = txToDoMainService.holdById(tDetail.getItemCode(), titaVo); // hold
-				if (tMain == null) {
-					this.info("***  ");
-					tMain = new TxToDoMain();
-					mntMainFixValue(tMain, tDetail.getItemCode(), titaVo);
-					if (HCode == 0) {
-						addMainCntValue(tMain, tDetail, titaVo);
-					} else {
-						subMainCntValue(tMain, tDetail, titaVo);
-					}
-					try {
-						txToDoMainService.insert(tMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", "TxToDoMain insert " + tMain + e.getErrorMsg());
-					}
-
+		} else {
+			if (HCode == 0) {
+				if (dupSkip) {
+					return;
 				} else {
-					mntMainFixValue(tMain, tDetail.getItemCode(), titaVo);
-					if (HCode == 0) {
-						addMainCntValue(tMain, tDetail, titaVo);
-					} else {
-						subMainCntValue(tMain, tDetail, titaVo);
-					}
-					try {
-						txToDoMainService.update(tMain, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", "TxToDoMain update " + tMain + e.getErrorMsg());
-					}
+					throw new LogicException("E0015", "TxToDoDetail 新增資料重複" + tDetailId.toString()); // 檢查錯誤
 				}
-				if (HCode == 0) { // 正常
-					// 執行交易
-					if (tDetail.getExcuteTxcd() == null || tDetail.getExcuteTxcd().trim().length() == 0)
-						tDetail.setExcuteTxcd(tMain.getExcuteTxcd());
-					// this.info("Add ="+tDetail.toString());
-					try {
-						txToDoDetailService.insert(tDetail, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", "TxToDoDetail insert " + tDetail + e.getErrorMsg());
-					}
+			} else {
+				tDetail.setStatus(tTxToDoDetail.getStatus());
+			}
+		}
+		if (HCode == 0) {
+			tDetail.setTxToDoDetailId(tDetailId);
+			tDetail.setDataDate(this.txBuffer.getMgBizDate().getTbsDy());
+		} else {
+			tDetail.setStatus(tTxToDoDetail.getStatus());
+			tDetail.setDataDate(tTxToDoDetail.getDataDate());
+		}
+		// 應處理主檔
+		tMain = txToDoMainService.holdById(tDetail.getItemCode(), titaVo); // hold
+		if (tMain == null) {
+			this.info("***  ");
+			tMain = new TxToDoMain();
+			mntMainFixValue(tMain, tDetail.getItemCode(), titaVo);
+			if (HCode == 0) {
+				addMainCntValue(tMain, tDetail, titaVo);
+			} else {
+				subMainCntValue(tMain, tDetail, titaVo);
+			}
+			try {
+				txToDoMainService.insert(tMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "TxToDoMain insert " + tMain + e.getErrorMsg());
+			}
 
-				} else { // 訂正
-					try {
-						txToDoDetailService.delete(tDetail, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008",
-								"TxToDoDetail deleteAll " + tDetail + e.getErrorMsg());
-					}
-				}
+		} else {
+			mntMainFixValue(tMain, tDetail.getItemCode(), titaVo);
+			if (HCode == 0) {
+				addMainCntValue(tMain, tDetail, titaVo);
+			} else {
+				subMainCntValue(tMain, tDetail, titaVo);
+			}
+			try {
+				txToDoMainService.update(tMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "TxToDoMain update " + tMain + e.getErrorMsg());
+			}
+		}
+		if (HCode == 0) { // 正常
+			// 執行交易
+			if (tDetail.getExcuteTxcd() == null || tDetail.getExcuteTxcd().trim().length() == 0) {
+				tDetail.setExcuteTxcd(tMain.getExcuteTxcd());
+			}
+			try {
+				txToDoDetailService.insert(tDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "TxToDoDetail " + tDetailId.toString() + e.getErrorMsg());
+			}
+
+		} else { // 訂正
+			try {
+				txToDoDetailService.delete(tTxToDoDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "TxToDoDetail " + tDetailId.toString() + e.getErrorMsg());
 			}
 		}
 		return;
@@ -610,8 +624,8 @@ public class TxToDoCom extends TradeBuffer {
 		case "EMEP00":
 			settingValue = "EMEP00;-;C;-;-;-;L698A;L4200;L4200;-;員工扣薪入帳作業";
 			break;
-		case "L4600":
-			settingValue = "L4603 ;Y;C;-;-;-;L698A;L4600;L4600;-;火險到期檔產生作業";
+		case "L4602":
+			settingValue = "L4602 ;Y;C;-;-;-;L698A;L4602;L4602;-;火險出單明細表作業";
 			break;
 		case "L4604":
 			settingValue = "L4604 ;Y;C;-;-;-;L698A;L4603;L4603;Y;火險保費未繳轉借支";

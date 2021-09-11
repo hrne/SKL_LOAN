@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8332]                                 (570)受理更生款項統一收付通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+款項統一收付申請日",#ApplyDate],["#FdAdjudicateDate+更生方案認可裁定日",#AdjudicateDate],
 [#<->#,"#FdBankCount+更生債權金融機構家數",#BankCount],
 [#<->#,"#FdBank1+債權金融機構代號1",#Bank1,#BankX1],[#<->#,"#FdBank2+債權金融機構代號2",#Bank2,#BankX2],

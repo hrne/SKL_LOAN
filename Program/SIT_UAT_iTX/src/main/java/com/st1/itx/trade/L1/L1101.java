@@ -250,10 +250,10 @@ public class L1101 extends TradeBuffer {
 			tCdIndustry = new CdIndustry();
 		}
 		// 通訊地址
-		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain);
+		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
 		this.info("CurrAddres" + WkCurrAddres);
 		// 戶籍地址
-		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain);
+		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain, titaVo);
 		this.info("CurrAddres" + WkRegAddres);
 
 		this.totaVo.putParam("OCustId", tCustMain.getCustId());
@@ -443,9 +443,9 @@ public class L1101 extends TradeBuffer {
 		// 分行別預設0000 --2021.8.6 Fegie
 		tCustMain.setBranchNo("0000");
 		
-		tCustMain.setIsSuspected(titaVo.getParam("IsFinancial"));
-		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsFinancialCheck"));
-		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsFinancialCheckType"));
+		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
+		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
+		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
 
 	}
 

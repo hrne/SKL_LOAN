@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8333]                                 (571)前置調解金融機構無擔保債務協議資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdBankId+受理款項統一收付之債權金融機構代號",#BankId,#BankIdX],
 ["#FdOwnerYn+是否為更生債權人",#OwnerYn],["#FdPayYn+債務人是否仍依更生方案正常還款予本金融機構",#PayYn],
 ["#FdOwnerAmt+本金融機構更生債權總金額",#OwnerAmt],["#FdAllotAmt+參與分配債權金額",#AllotAmt],
@@ -236,32 +237,41 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
-
-
+C(5,#OwnerYn,N,T(3,@PayYn,Y)E(0,@OwnerAmt,0)E(0,@AllotAmt,0)E(0,@UnallotAmt,0)
+T(F,@PayYn,0)T(F,@OwnerAmt,0)T(F,@AllotAmt,0)T(F,@UnallotAmt,0)
+T(2,@FdPayYn, )T(2,@FdOwnerAmt, )T(2,@FdAllotAmt, )T(2,@FdUnallotAmt, )
+,$)
+C(5,#OwnerYn,Y,T(3,@PayYn,Y)E(0,@OwnerAmt,0)E(0,@AllotAmt,0)E(0,@UnallotAmt,0)
+T(F,@PayYn,1)T(F,@OwnerAmt,1)T(F,@AllotAmt,1)T(F,@UnallotAmt,1)
+T(2,@FdPayYn,*)T(2,@FdOwnerAmt,*)T(2,@FdAllotAmt,*)T(2,@FdUnallotAmt,*)
+,$)
 !債務人是否仍依更生方案正常還款予本金融機構
 #PayYn=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#OwnerYn,N,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
-
+C(5,#PayYn,Y,E(0,@AllotAmt,0)T(F,@AllotAmt,0)T(2,@FdAllotAmt, ),$)
+C(5,#PayYn,N,E(0,@AllotAmt,0)T(F,@AllotAmt,1)T(2,@FdAllotAmt,*),$)
 !本金融機構更生債權總金額
 #OwnerAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#OwnerYn,N,S,$)
 
 !參與分配債權金額
 #AllotAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#OwnerYn,N,S,$)
+C(5,#PayYn,Y,s,$)
 
 !未參與分配債權金額
 #UnallotAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+C(5,#OwnerYn,N,S,$)
 
 
 !轉JCIC文字檔日期

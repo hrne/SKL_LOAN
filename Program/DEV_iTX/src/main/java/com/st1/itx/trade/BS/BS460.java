@@ -143,8 +143,8 @@ public class BS460 extends TradeBuffer {
 	public WebClient webClient;
 
 	private int iInsuEndMonth = 0;
-	private int insuStartDate = 0;
-	private int insuEndDate = 0;
+	private int insuEndDateFrom = 0;
+	private int insuEndDateTo = 0;
 	private ArrayList<OccursList> tmp = new ArrayList<>();
 	private int custNo = 0;
 	private int facmNo = 0;
@@ -181,8 +181,8 @@ public class BS460 extends TradeBuffer {
 	private void execute(TitaVo titaVo) throws LogicException {
 //		火險到期檔產生作業(到期前一個月)
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
-		insuStartDate = parse.stringToInteger(iInsuEndMonth + "01");
-		insuEndDate = parse.stringToInteger(iInsuEndMonth + "31");
+		insuEndDateFrom = parse.stringToInteger(iInsuEndMonth + "01");
+		insuEndDateTo = parse.stringToInteger(iInsuEndMonth + "31");
 
 //		檢核該月份是否做過詢價
 		check(titaVo);
@@ -230,7 +230,7 @@ public class BS460 extends TradeBuffer {
 	}
 
 	private void orignalToList(TitaVo titaVo) throws LogicException {
-		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.insuEndDateRange(insuStartDate, insuEndDate, 0,
+		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0,
 				Integer.MAX_VALUE, titaVo);
 		if (slInsuOrignal != null) {
 			for (InsuOrignal tInsuOrignal : slInsuOrignal.getContent()) {
@@ -269,12 +269,14 @@ public class BS460 extends TradeBuffer {
 				t.setFireInsuPrem(t.getFireInsuPrem().add(tInsuRenew.getFireInsuPrem()));
 				t.setEthqInsuCovrg(t.getEthqInsuCovrg().add(tInsuRenew.getEthqInsuCovrg()));
 				t.setEthqInsuPrem(t.getEthqInsuPrem().add(tInsuRenew.getEthqInsuPrem()));
+				t.setTotInsuPrem(t.getTotInsuPrem().add(tInsuRenew.getTotInsuPrem()));
 			}
 		}
 	}
 
 	private void renewToList(TitaVo titaVo) throws LogicException {
-		Slice<InsuRenew> slInsuRenew = insuRenewService.insuEndDateRange(insuStartDate, insuEndDate, 0, Integer.MAX_VALUE);
+		Slice<InsuRenew> slInsuRenew = insuRenewService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0,
+				Integer.MAX_VALUE);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
 				if ("".equals(tInsuRenew.getEndoInsuNo().trim())) {
@@ -318,7 +320,8 @@ public class BS460 extends TradeBuffer {
 			tInsuRenew.setClNo(t.getClNo());
 			tInsuRenew.setPrevInsuNo(t.getNowInsuNo());
 			tInsuRenew.setEndoInsuNo(" ");
-			tInsuRenew.setInsuRenewId(new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "));
+			tInsuRenew.setInsuRenewId(
+					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "));
 			tInsuRenew.setNowInsuNo("");
 			tInsuRenew.setOrigInsuNo(t.getOrigInsuNo());
 			tInsuRenew.setInsuYearMonth(iInsuEndMonth);
@@ -357,14 +360,19 @@ public class BS460 extends TradeBuffer {
 	}
 
 	private void findFacmNo(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
+		this.info("findFacmNo " + tInsuRenew.toString());
+
 		this.custNo = 0;
 		this.facmNo = 0;
 		this.repayCode = 0;
-//				1.戶況順序 0.正常>2.催收>7.部呆>6.呆帳，排除結案戶。
-//				2.若同戶況，原額度優先、其次根據申請序號最小者
+
+//	 1.排除結案戶、呆帳戶、未撥款戶。
+//   2.戶況順序 0.正常(4.逾期戶) > 2.催收> 7.部呆
+//	 3.戶況>原續保戶號額度>核准編號較小
 
 		int priorty = 9;
-		// 原額度
+		int approveNo = 9999999;
+		// 原額度為正常戶優先
 		Slice<LoanBorMain> slLoanBorMain;
 		if (tInsuRenew.getFacmNo() > 0) {
 			slLoanBorMain = loanBorMainService.bormCustNoEq(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(),
@@ -380,13 +388,13 @@ public class BS460 extends TradeBuffer {
 		}
 
 		if (priorty > 0) {
-			int priortyNow = 9;
 			Slice<ClFac> slClFac = clFacService.clNoEq(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(),
 					tInsuRenew.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 			if (slClFac != null) {
 				for (ClFac tClFac : slClFac.getContent()) {
 					slLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(),
 							tClFac.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
+					int priortyNow = 99;
 					if (slLoanBorMain != null) {
 						int status = facStatusCom.settingStatus(slLoanBorMain.getContent(),
 								tInsuRenew.getInsuEndDate());
@@ -396,21 +404,17 @@ public class BS460 extends TradeBuffer {
 							priortyNow = 2;
 						} else if (status == 7) {
 							priortyNow = 3;
-						} else if (status == 6) {
-							priortyNow = 4;
 						}
-					}
-					if (priortyNow <= priorty) {
-						this.custNo = tClFac.getCustNo();
-						this.facmNo = tClFac.getFacmNo();
-						priorty = priortyNow;
-						if (priortyNow == 1) {
-							break;
+						if (priortyNow < priorty || (priortyNow == priorty && tClFac.getApproveNo() < approveNo)) {
+							this.custNo = tClFac.getCustNo();
+							this.facmNo = tClFac.getFacmNo();
+							priorty = priortyNow;
 						}
 					}
 				}
 			}
 		}
+
 		if (priorty < 9) {
 			FacMain tFacMain = facMainService.findById(new FacMainId(custNo, facmNo), titaVo);
 			if (tFacMain != null) {
@@ -418,7 +422,8 @@ public class BS460 extends TradeBuffer {
 			}
 		}
 
-		this.info("CustNo=" + this.custNo + ", FacmNo=" + this.facmNo);
+		this.info("findFacmNo CustNo=" + this.custNo + ", FacmNo=" + this.facmNo + ", priorty=" + priorty
+				+ ", approveNo=" + approveNo);
 
 	}
 
@@ -612,7 +617,7 @@ public class BS460 extends TradeBuffer {
 			occursList.putParam("CustNo", FormatUtil.pad9("" + t.getCustNo(), 7));
 			occursList.putParam("FacmNo", FormatUtil.pad9("" + t.getFacmNo(), 3));
 			occursList.putParam("Space", FormatUtil.padX("", 4));
-			occursList.putParam("SendDate", FormatUtil.padLeft("" + this.getTxBuffer().getTxCom().getTbsdyf(), 14));
+			occursList.putParam("SendDate", FormatUtil.padLeft("" + titaVo.getCalDy() + 19110000, 14));
 //						SklSalesName 2.CdEmp.FullName
 //						SklUnitCode  2.CdEmp.CenterCodeAcc
 //						SklUnitName  2.CdEmp.CenterShortName
@@ -652,7 +657,7 @@ public class BS460 extends TradeBuffer {
 				occursList.putParam("RenewUnit", FormatUtil.padX("", 10));
 			}
 			occursList.putParam("Remark1", FormatUtil.padX("", 16));
-			occursList.putParam("MailingAddress", FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain), 60));
+			occursList.putParam("MailingAddress", FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain, titaVo), 60));
 			occursList.putParam("Remark2", FormatUtil.padX("", 39));
 			occursList.putParam("Space46", FormatUtil.padX("", 46));
 			tmp.add(occursList);

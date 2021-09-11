@@ -137,15 +137,16 @@ public class L2R23 extends TradeBuffer {
 			this.totaVo.putParam("L2r23FirstAmt" + i, "");
 		}
 		
-		int k = 0;
-		for (ClImmRankDetail tClImmRankDetail : lClImmRankDetail) {
+		if(lClImmRankDetail != null) {
+		  int k = 0;
+		  for (ClImmRankDetail tClImmRankDetail : lClImmRankDetail) {
 		
 			  this.totaVo.putParam("L2r23FirstCreditor" + k, tClImmRankDetail.getFirstCreditor());
 			  this.totaVo.putParam("L2r23FirstAmt" + k, tClImmRankDetail.getFirstAmt());
 
 			k++;
+		  }
 		}
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

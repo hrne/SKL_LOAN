@@ -32,7 +32,6 @@ public class LM036 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM036.class);
 		return this.exec(contribution, "M");
 	}
 

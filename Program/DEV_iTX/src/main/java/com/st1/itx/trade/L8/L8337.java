@@ -17,6 +17,7 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ575;
 import com.st1.itx.db.domain.JcicZ575Id;
@@ -99,7 +100,7 @@ public class L8337 extends TradeBuffer {
 		}
 		//三end
 		//檢核項目end
-
+		
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ575

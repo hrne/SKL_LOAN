@@ -172,8 +172,8 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01IndigenousName", tCustMain.getIndigenousName());
 		this.totaVo.putParam("L1r01Introducer", tCustMain.getIntroducer());
 		this.totaVo.putParam("L1r01TypeCode", tCustMain.getTypeCode());
-		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain));
-		this.totaVo.putParam("L1r01CurrAddress", custNoticeCom.getCurrAddress(tCustMain));
+		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain, titaVo));
+		this.totaVo.putParam("L1r01CurrAddress", custNoticeCom.getCurrAddress(tCustMain, titaVo));
 
 		this.addList(this.totaVo);
 		return this.sendList();

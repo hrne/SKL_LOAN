@@ -15,15 +15,17 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ570;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ571;
 import com.st1.itx.db.domain.JcicZ571Id;
 import com.st1.itx.db.domain.JcicZ571Log;
+import com.st1.itx.db.domain.JcicZ575;
+import com.st1.itx.db.service.JcicZ570Service;
 import com.st1.itx.db.service.JcicZ571LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ571Service;
-
+import com.st1.itx.db.service.JcicZ575Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -52,6 +54,10 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8333 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public JcicZ570Service sJcicZ570Service;
+	@Autowired
+	public JcicZ575Service sJcicZ575Service;
 	@Autowired
 	public JcicZ571Service sJcicZ571Service;
 	@Autowired
@@ -86,7 +92,47 @@ public class L8333 extends TradeBuffer {
 		iJcicZ571Id.setCustId(iCustId);
 		iJcicZ571Id.setSubmitKey(iSubmitKey);
 		JcicZ571 chJcicZ571 = new JcicZ571();
+		//檢核項目(D-73)
+		//同一更生款項統一收付案件若未曾報送'570'檔案資料，則予以剔退處理
+		//三start
+		Slice<JcicZ570> ixJcicZ570 = sJcicZ570Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if(ixJcicZ570 == null) {
+				throw new LogicException(titaVo, "E0005", "同一更生款項統一收付案件未曾報送'570'檔案資料");
+		}
+		//三end
+		//檢核金融機構報送本檔案資料日期，若超逾同一更生款項統一收付案件'575'檔案資料建檔日+7個工作日，且最大債權金融機構未曾報送'575'
+		//債務人通報債權金額異動檔者，予以剔退處理 Fegie處理
+		//四start
+		Slice<JcicZ575> ixJcicZ575 = sJcicZ575Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if (ixJcicZ575 == null) {
+			throw new LogicException(titaVo, "E0001", ""); 
+		}
+		for(JcicZ575 xJcicZ575 : ixJcicZ575) {
+			int jcicDay = xJcicZ575.getOutJcicTxtDate();
+			int today = Integer.valueOf(titaVo.get("ENTDY"));
+			if( today+7<jcicDay && jcicDay==0) {
+				throw new LogicException(titaVo, "E0005", "逾同一更生款項統一收付案件(575)檔案資料建檔日+7個工作日，且最大債權金融機構未曾報送'575'債務人通報債權金額異動檔者，予以剔退處理");
+			}
 		
+		//四end
+		//檢核金融機構報送本檔案資料日期，若超逾同一更生款項統一收付案件最大債權金融機構報送'575'資料建檔日+3個工作日者，予以剔退處理
+		//五start
+			if(today<jcicDay+3) {
+				throw new LogicException(titaVo, "E0005","若超逾同一更生款項統一收付案件最大債權金融機構報送'575'資料建檔日+3個工作日者，予以剔退處理");
+			}
+		}
+		//五end
+		//第7欄「是否為更生債權人」填報為'Y'者，第8-11欄為必要填報欄位
+		//六start
+		//var處理
+		//六end
+		//檢核第10、11欄位金額加總為第9欄「更生債權總金額」
+		//七start
+		if(iAllotAmt+iUnallotAmt != iOwnerAmt) {
+			throw new LogicException(titaVo, "E0005", "第10、11欄位金額加總為第9欄「更生債權總金額」");
+		}
+		//七end
+
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ571

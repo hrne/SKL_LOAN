@@ -1,0 +1,16 @@
+OOCustNo=9,7
+OOFacmNo=9,3
+OORepayBank=9,3
+OORepayAcct=9,14
+OOLimitAmt=9,14
+OOCreateFlag=X,1
+OOAuthCreateDate=9,7
+OOPropDate=9,7
+OORetrDate=9,7
+OOAuthStatus=X,1
+OOMediaCode=X,1
+OOAmlRsp=X,1
+OOStampFinishDate=9,7
+OODeleteDate=9,7
+OOUser=X,100
+OODate=9,7

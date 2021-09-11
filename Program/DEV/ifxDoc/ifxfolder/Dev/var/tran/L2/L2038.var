@@ -846,8 +846,8 @@ SWITCH(#OOClCode1,1,T(3,額度關聯;L2017 額度與擔保品關聯查詢),
 #ELSE_TXNM=X,50,S
 T(3,他項權利;L2918 擔保品他項權利查詢)
                   
-#COL_BUF=X,12,S
-T(2,#OOClCode1+#OOClCode2+#OOClNo)
+#COL_BUF=X,17,S
+T(2,#OOClCode1+#OOClCode2+#OOClNo+#OOApproveNo)
 
 #CHANGE_BUF=X,20,S
 T(2,#FUNC2+#OOApproveNo+#OOClNoX)

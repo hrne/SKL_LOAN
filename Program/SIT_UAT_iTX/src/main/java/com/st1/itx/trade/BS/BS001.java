@@ -3,8 +3,6 @@ package com.st1.itx.trade.BS;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -34,7 +32,7 @@ import com.st1.itx.util.parse.Parse;
  * 1.應處理清單－每日維護清檔 <br>
  * 2.總帳檔換日過帳(含年初損益類結轉)<br>
  * 3.新增當日應處理明細<br>
- * 3.1.每月21日(遇假日順延)，火險保費未繳轉借支<br>  
+ * 3.1.每月21日(遇假日順延)，火險保費未繳轉借支<br>
  * 3.2.每月第2營業日，到期明細表<br>
  * 3.2.1.L9710寬限到期明細表 每月第2營業日印後2個月<br>
  * 3.2.2.L9711 放款到期明細表及通知單 每月第2營業日印後4個月<br>
@@ -48,14 +46,13 @@ import com.st1.itx.util.parse.Parse;
  * 4.6 BS060 現金流量預估資料檔維護(月底前五個營業日)<br>
  * 4.7 BS600 放款戶帳冊別轉換(帳冊別帳務調整日期等於系統營業日時)<br>
  * 
-* @author Lai
+ * @author Lai
  * @version 1.0.0
  */
 
 @Component("BS001")
 @Scope("prototype")
 public class BS001 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(BS001.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -86,7 +83,7 @@ public class BS001 extends TradeBuffer {
 
 		txToDoCom.setTxBuffer(this.txBuffer);
 		acMainCom.setTxBuffer(this.txBuffer);
-		
+
 		/*---------- Step 1. 應處理清單－每日維護清檔 ------------------*/
 
 		txToDoCom.dailyHouseKeeping(titaVo);
@@ -97,8 +94,7 @@ public class BS001 extends TradeBuffer {
 		// 抓總帳檔(批次日期)
 		TxBizDate tTxBizDate = txBizDateService.findById("BATCH");
 
-		this.info(
-				"BatchDate =" + tTxBizDate.getTbsDyf() + ", OnlineDate=" + this.txBuffer.getMgBizDate().getTbsDyf());
+		this.info("BatchDate =" + tTxBizDate.getTbsDyf() + ", OnlineDate=" + this.txBuffer.getMgBizDate().getTbsDyf());
 		Slice<AcMain> slAcMain = acMainService.acmainAcDateEq(tTxBizDate.getTbsDyf(), this.index, Integer.MAX_VALUE);
 		List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
 
@@ -109,13 +105,13 @@ public class BS001 extends TradeBuffer {
 
 		// commitEnd
 		this.batchTransaction.commit();
-		
+
 		/*---------- Step 3. 新增當日應處理明細 --------------------------------*/
 
 		addTxToDo(titaVo);
 		// commitEnd
 		this.batchTransaction.commit();
-			
+
 		/*---------- Step 4.  啟動背景作業 -----------------------------------*/
 
 		// 啟動背景作業－BS004 新增應處理明細－員工資料異動更新
@@ -155,12 +151,22 @@ public class BS001 extends TradeBuffer {
 
 	// 新增應處理明細
 	private void addTxToDo(TitaVo titaVo) throws LogicException {
+		int processDate = 0;
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		TempVo tTempVo = new TempVo();
+		/* 1.每月15日(遇假日順延)，火險出單明細表作業 */
+		processDate = (this.txBuffer.getMgBizDate().getTbsDy() / 100) * 100 + 15;
+		if (this.txBuffer.getMgBizDate().getLbsDy() < processDate && this.txBuffer.getMgBizDate().getTbsDy() >= processDate) {
+			tTxToDoDetail = new TxToDoDetail();
+			tTxToDoDetail.setItemCode("L4602");
+			tTempVo.clear();
+			tTempVo.putParam("Note", "每月15日火險出單明細表作業");
+			tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
+			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
+		}
 		/* 1.每月21日(遇假日順延)，火險保費未繳轉借支 */
-		int processDate = (this.txBuffer.getMgBizDate().getTbsDy() / 100) * 100 + 21;
-		if (this.txBuffer.getMgBizDate().getLbsDy() < processDate
-				&& this.txBuffer.getMgBizDate().getTbsDy() >= processDate) {
+		processDate = (this.txBuffer.getMgBizDate().getTbsDy() / 100) * 100 + 21;
+		if (this.txBuffer.getMgBizDate().getLbsDy() < processDate && this.txBuffer.getMgBizDate().getTbsDy() >= processDate) {
 			tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setItemCode("L4604");
 			tTempVo.clear();
@@ -192,22 +198,17 @@ public class BS001 extends TradeBuffer {
 		}
 
 		/* 3.工作月結束次日，業績工作月結算啟動通知 */
-		CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findDateFirst(this.txBuffer.getTxBizDate().getTbsDyf(),
-				this.txBuffer.getTxBizDate().getLbsDyf(), titaVo);
+		CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findDateFirst(this.txBuffer.getTxBizDate().getTbsDyf(), this.txBuffer.getTxBizDate().getLbsDyf(), titaVo);
 		if (tCdWorkMonth == null) {
-			throw new LogicException(titaVo, "E0001",
-					"CdWorkMonth 放款業績工作月對照檔，業績日期=" + this.txBuffer.getTxBizDate().getLbsDyf()); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "CdWorkMonth 放款業績工作月對照檔，業績日期=" + this.txBuffer.getTxBizDate().getLbsDyf()); // 查詢資料不存在
 		}
 		// 終止日期 >= 本營業日 && 終止日期 < 下營業日
-		if (tCdWorkMonth.getEndDate() >= this.txBuffer.getTxBizDate().getLbsDy()
-				&& tCdWorkMonth.getEndDate() < this.txBuffer.getTxBizDate().getTbsDy()) {
+		if (tCdWorkMonth.getEndDate() >= this.txBuffer.getTxBizDate().getLbsDy() && tCdWorkMonth.getEndDate() < this.txBuffer.getTxBizDate().getTbsDy()) {
 			tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setItemCode("PFCL00");
 			tTempVo.clear();
-			tTempVo.putParam("Note",
-					parse.IntegerToString(tCdWorkMonth.getYear() - 1911, 3) + "-"
-							+ parse.IntegerToString(tCdWorkMonth.getMonth(), 2) + "工作月結束 "
-							+ tCdWorkMonth.getStartDate() + "~" + tCdWorkMonth.getEndDate() + "，請啟動業績工作月結算作業");
+			tTempVo.putParam("Note", parse.IntegerToString(tCdWorkMonth.getYear() - 1911, 3) + "-" + parse.IntegerToString(tCdWorkMonth.getMonth(), 2) + "工作月結束 " + tCdWorkMonth.getStartDate() + "~"
+					+ tCdWorkMonth.getEndDate() + "，請啟動業績工作月結算作業");
 			tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 		}

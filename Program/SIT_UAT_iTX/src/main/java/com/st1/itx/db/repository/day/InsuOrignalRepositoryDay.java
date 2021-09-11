@@ -31,6 +31,9 @@ public interface InsuOrignalRepositoryDay extends JpaRepository<InsuOrignal, Ins
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
   public Slice<InsuOrignal> findAllByClCode1IsAndClCode2IsAndClNoIs(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
+  // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND OrigInsuNo =
+  public Slice<InsuOrignal> findAllByClCode1IsAndClCode2IsAndClNoIsAndOrigInsuNoIs(int clCode1_0, int clCode2_1, int clNo_2, String origInsuNo_3, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

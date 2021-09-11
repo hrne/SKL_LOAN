@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -56,7 +54,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4603 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4603.class);
 	@Autowired
 	public InsuRenewService insuRenewService;
 
@@ -158,12 +155,12 @@ public class L4603 extends TradeBuffer {
 				resetAcReceivable(lInsuRenew, titaVo);
 				for (InsuRenew tInsuRenew : lInsuRenew) {
 					TempVo tempVo = new TempVo();
-					tempVo = custNoticeCom.getReportCode("L4603", tInsuRenew.getCustNo(), tInsuRenew.getFacmNo());
+					tempVo = custNoticeCom.getCustNotice("L4603", tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(), titaVo);
 
-					noticeFlag = parse.stringToInteger(tempVo.getParam("ReportCode"));
-					noticePhoneNo = tempVo.getParam("ReportPhoneNo");
-					noticeEmail = tempVo.getParam("ReportEmailAd");
-					noticeAddress = tempVo.getParam("ReportAddress");
+					noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
+					noticePhoneNo = tempVo.getParam("MessagePhoneNo");
+					noticeEmail = tempVo.getParam("EmailAddress");
+					noticeAddress = tempVo.getParam("LetterAddress");
 
 					this.info("noticeFlag : " + noticeFlag);
 					this.info("noticePhoneNo : " + noticePhoneNo);
@@ -222,18 +219,17 @@ public class L4603 extends TradeBuffer {
 					int Dd = findNextPayDate(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo());
 					iEntryDate = parse.stringToInteger("" + iInsuEndMonth + Dd);
 
-					sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
-							+ ("" + iEntryDate).substring(6);
+					sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/" + ("" + iEntryDate).substring(6);
 
 					this.info("iEntryDate : " + iEntryDate);
 
 					TempVo tempVo = new TempVo();
-					tempVo = custNoticeCom.getReportCode("L4603", tInsuRenew.getCustNo(), tInsuRenew.getFacmNo());
+					tempVo = custNoticeCom.getCustNotice("L4603", tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(), titaVo);
 
-					noticeFlag = parse.stringToInteger(tempVo.getParam("ReportCode"));
-					noticePhoneNo = tempVo.getParam("ReportPhoneNo");
-					noticeEmail = tempVo.getParam("ReportEmailAd");
-					noticeAddress = tempVo.getParam("ReportAddress");
+					noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
+					noticePhoneNo = tempVo.getParam("MessagePhoneNo");
+					noticeEmail = tempVo.getParam("EmailAddress");
+					noticeAddress = tempVo.getParam("LetterAddress");
 
 					this.info("noticeFlag : " + noticeFlag);
 					this.info("noticePhoneNo : " + noticePhoneNo);
@@ -289,8 +285,7 @@ public class L4603 extends TradeBuffer {
 				acReceivableCom.mnt(0, acReceivableList, titaVo); // 0-起帳 1-銷帳-刪除
 
 				if (dataListLatter.size() > 0) {
-					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-							titaVo.getTxCode() + "-火險通知作業", "LNM52P.txt", 2);
+					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險通知作業", "LNM52P.txt", 2);
 
 					for (String line : dataListLatter) {
 						makeFile.put(line);
@@ -329,25 +324,15 @@ public class L4603 extends TradeBuffer {
 		tCustMain = custMainService.custNoFirst(tInsuRenew.getCustNo(), tInsuRenew.getCustNo());
 		if (tCustMain != null) {
 //			QC 495 中文欄位前+半形空格
-			dataLines = " " + FormatUtil.padX(getZipCode(tCustMain), 9) + ", " + FormatUtil.padX(noticeAddress, 64)
-					+ "," + FormatUtil.padX("", 42) + "," + FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + ", "
-					+ FormatUtil.padX(tCustMain.getCustName().trim(), 12) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + "," + FormatUtil.padX("-", 1) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getFacmNo(), 3) + ", "
-					+ FormatUtil.padX(getRepayCode(tInsuRenew), 10) + ", "
-					+ FormatUtil.padX(tCustMain.getCustName().trim(), 42) + ", "
-					+ FormatUtil.padX(getBdLocation(tInsuRenew), 58) + ","
-					+ FormatUtil.padX(tInsuRenew.getNowInsuNo(), 16) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + "," + FormatUtil.padX("-", 1) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getInsuEndDate(), 8) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getFireInsuPrem(), 6) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getFireInsuCovrg(), 11) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getEthqInsuPrem(), 6) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getEthqInsuCovrg(), 7) + ","
-					+ FormatUtil.pad9("" + tInsuRenew.getTotInsuPrem(), 6) + ","
-					+ FormatUtil.pad9("" + (iEntryDate - 19110000), 8) + "," + "9510200"
-					+ FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + " ";
+			dataLines = " " + FormatUtil.padX(getZipCode(tCustMain), 9) + ", " + FormatUtil.padX(noticeAddress, 64) + "," + FormatUtil.padX("", 42) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + ", " + FormatUtil.padX(tCustMain.getCustName().trim(), 12) + "," + FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7) + ","
+					+ FormatUtil.padX("-", 1) + "," + FormatUtil.pad9("" + tInsuRenew.getFacmNo(), 3) + ", " + FormatUtil.padX(getRepayCode(tInsuRenew), 10) + ", "
+					+ FormatUtil.padX(tCustMain.getCustName().trim(), 42) + ", " + FormatUtil.padX(getBdLocation(tInsuRenew), 58) + "," + FormatUtil.padX(tInsuRenew.getNowInsuNo(), 16) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + "," + FormatUtil.pad9("" + tInsuRenew.getInsuStartDate(), 8) + "," + FormatUtil.padX("-", 1) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getInsuEndDate(), 8) + "," + FormatUtil.pad9("" + tInsuRenew.getFireInsuPrem(), 6) + "," + FormatUtil.pad9("" + tInsuRenew.getFireInsuCovrg(), 11)
+					+ "," + FormatUtil.pad9("" + tInsuRenew.getEthqInsuPrem(), 6) + "," + FormatUtil.pad9("" + tInsuRenew.getEthqInsuCovrg(), 7) + ","
+					+ FormatUtil.pad9("" + tInsuRenew.getTotInsuPrem(), 6) + "," + FormatUtil.pad9("" + (iEntryDate - 19110000), 8) + "," + "9510200" + FormatUtil.pad9("" + tInsuRenew.getCustNo(), 7)
+					+ " ";
 			dataListLatter.add(dataLines);
 		}
 	}
@@ -371,8 +356,7 @@ public class L4603 extends TradeBuffer {
 		this.info("Text... insuMonth = " + insuMonth);
 
 		this.info("CustNotice is not null...");
-		dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo + "\",\"您好：提醒您" + insuMonth
-				+ "月份，除期款外，另加收年度火險地震險費＄" + insuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
+		dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticePhoneNo + "\",\"您好：提醒您" + insuMonth + "月份，除期款外，另加收年度火險地震險費＄" + insuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
 				+ dateSlashFormat(this.getTxBuffer().getMgBizDate().getTbsDy()) + "\"";
 		dataList.add(dataLines);
 
@@ -402,8 +386,7 @@ public class L4603 extends TradeBuffer {
 		ArrayList<String> dataList = new ArrayList<String>();
 		String dataLines = "";
 
-		dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticeEmail + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\""
-				+ sEntryDate + "\"";
+		dataLines = "\"H1\",\"" + tCustMain.getCustId() + "\",\"" + noticeEmail + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
 		dataList.add(dataLines);
 
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
@@ -498,8 +481,7 @@ public class L4603 extends TradeBuffer {
 
 		if (tCustMain != null) {
 			if (tCustMain.getRegZip3() != null && tCustMain.getRegZip3().length() >= 3) {
-				zipCode = tCustMain.getRegZip3().substring(0, 1) + " " + tCustMain.getRegZip3().substring(1, 2) + " "
-						+ tCustMain.getRegZip3().substring(2, 3);
+				zipCode = tCustMain.getRegZip3().substring(0, 1) + " " + tCustMain.getRegZip3().substring(1, 2) + " " + tCustMain.getRegZip3().substring(2, 3);
 			}
 			if (tCustMain.getRegZip2() != null && tCustMain.getRegZip2().length() >= 2) {
 				zipCode += tCustMain.getRegZip2().substring(0, 1) + " " + tCustMain.getRegZip2().substring(1, 2);

@@ -12,18 +12,21 @@ import org.springframework.stereotype.Service;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ572;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ573Id;
 import com.st1.itx.db.domain.JcicZ573Log;
+import com.st1.itx.db.domain.JcicZ574;
+import com.st1.itx.db.service.JcicZ572LogService;
+import com.st1.itx.db.service.JcicZ572Service;
 import com.st1.itx.db.service.JcicZ573LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ573Service;
-
+import com.st1.itx.db.service.JcicZ574LogService;
+import com.st1.itx.db.service.JcicZ574Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -47,11 +50,21 @@ import com.st1.itx.util.data.DataLog;
 /**
  * 
  * 
- * @author Fegie
+ * @author Fegie / Mata
  * @version 1.0.0
  */
 public class L8335 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public JcicZ572LogService sJcicZ572LogService;
+	@Autowired
+	public JcicZ572Service sJcicZ572Service;
+	@Autowired
+	public JcicZ574Service sJcicZ574Service;
+	@Autowired
+	public JcicZ574LogService sJcicZ574LogService;
+	@Autowired
+	public JcicZ574Service iJcicZ574Service;
 	@Autowired
 	public JcicZ573Service sJcicZ573Service;
 	@Autowired
@@ -82,8 +95,32 @@ public class L8335 extends TradeBuffer {
 		iJcicZ573Id.setPayDate(iPayDate);
 		iJcicZ573Id.setCustId(iCustId);
 		iJcicZ573Id.setSubmitKey(iSubmitKey);
-		JcicZ573 chJcicZ573 = new JcicZ573();		
-		
+		JcicZ573 chJcicZ573 = new JcicZ573();
+		//同一更生款項統一收付案件尚未報送572檔案資料且已報送574結案資料者，予以剔退處裡
+		//檢核項目(D-76)
+		//三start
+		//JcicZ574
+		Slice<JcicZ574> ixJcicZ574 = sJcicZ574Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if(ixJcicZ574 != null) {
+				throw new LogicException(titaVo, "E0005", "已報送'574'結案資料");
+		}
+		Slice<JcicZ572> ixJcicZ572 = sJcicZ572Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if(ixJcicZ572 == null) {
+				throw new LogicException(titaVo, "E0005", "未報送'572'結案資料");
+		}
+		//三end
+		//若累計繳款金額不等於該IND所有已報送之繳款金額(含今日)，予以剔退處裡
+		//四start
+		//JcicZ573 ixJcicZ573 = new JcicZ573();
+		String ixCustId = iJcicZ573Id.getCustId();
+		int ixTotalPayAmt = iJcicZ573.getTotalPayAmt();
+		if(ixCustId == iCustId) {
+			if(ixTotalPayAmt + iPayAmt != iTotalPayAmt) {
+				throw new LogicException(titaVo, "E0005", "累計繳款金額不等於該IND所有已報送之繳款金額(含今日)");
+			}			
+		}
+		//四end
+		//檢核項目end
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複

@@ -55,7 +55,7 @@ public class L9724ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		query = em.createNativeQuery(sql);
 		String inputYearMonth = Integer.toString(Integer.parseInt(titaVo.getParam("inputYear")) + 1911) + titaVo.getParam("inputMonth");
-		this.info("l9724 input peko");
+		this.info("l9724 input");
 		this.info("inputYearMonth: " + inputYearMonth);
 		this.info("aging: " + Integer.toString(aging));
 		query.setParameter("inputYearMonth", inputYearMonth);

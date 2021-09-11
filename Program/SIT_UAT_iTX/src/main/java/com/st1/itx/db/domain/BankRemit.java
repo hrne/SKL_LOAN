@@ -29,7 +29,7 @@ public class BankRemit implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -8441112629613554987L;
+	private static final long serialVersionUID = -1985173344155262907L;
 
 @EmbeddedId
   private BankRemitId bankRemitId;
@@ -37,10 +37,6 @@ public class BankRemit implements Serializable {
   // 會計日期
   @Column(name = "`AcDate`", insertable = false, updatable = false)
   private int acDate = 0;
-
-  // 整批批號
-  @Column(name = "`BatchNo`", length = 6, insertable = false, updatable = false)
-  private String batchNo;
 
   // 經辦
   @Column(name = "`TitaTlrNo`", length = 8, insertable = false, updatable = false)
@@ -50,13 +46,17 @@ public class BankRemit implements Serializable {
   @Column(name = "`TitaTxtNo`", length = 8, insertable = false, updatable = false)
   private String titaTxtNo;
 
+  // 整批批號
+  @Column(name = "`BatchNo`", length = 6)
+  private String batchNo;
+
   // 撥款方式
-  /* 01:整批匯款02:單筆匯款04:退款台新(存款憑條)05:退款他行(整批匯款)11:退款新光(存款憑條) */
+  /* CdCode:DrawdownCode201:整批匯款02:單筆匯款04:退款台新(存款憑條)05:退款他行(整批匯款)11:退款新光(存款憑條) */
   @Column(name = "`DrawdownCode`")
   private int drawdownCode = 0;
 
   // 狀態
-  /* 0:正常1:產檔後修正2:產檔後訂正 */
+  /* CdCode:DrawdownStatus0:正常1:產檔後修正2:產檔後訂正 */
   @Column(name = "`StatusCode`")
   private int statusCode = 0;
 
@@ -101,9 +101,19 @@ public class BankRemit implements Serializable {
   private BigDecimal remitAmt = new BigDecimal("0");
 
   // AML回應碼
-  /* 1.正常2.可疑名單3.未確定4.逾時5.人工檢核-正常6.人工檢核-可疑7.人工檢核-未確定 */
+  /* CdCode:AmlCheckItem0.非可疑名單/已完成名單確認1.需審查/確認2.為凍結名單/未確定名單 */
   @Column(name = "`AmlRsp`", length = 1)
   private String amlRsp;
+
+  // 交易進行記號
+  /* 1STEP TX -&amp;gt; 0    (from eloan)2STEP TX -&amp;gt; 1 2 */
+  @Column(name = "`ActFg`")
+  private int actFg = 0;
+
+  // 產檔後修正後內容
+  /* jason 格式 */
+  @Column(name = "`ModifyContent`", length = 500)
+  private String modifyContent;
 
   // 建檔日期時間
   @CreatedDate
@@ -152,25 +162,6 @@ public class BankRemit implements Serializable {
   }
 
 /**
-	* 整批批號<br>
-	* 
-	* @return String
-	*/
-  public String getBatchNo() {
-    return this.batchNo == null ? "" : this.batchNo;
-  }
-
-/**
-	* 整批批號<br>
-	* 
-  *
-  * @param batchNo 整批批號
-	*/
-  public void setBatchNo(String batchNo) {
-    this.batchNo = batchNo;
-  }
-
-/**
 	* 經辦<br>
 	* 
 	* @return String
@@ -209,8 +200,28 @@ public class BankRemit implements Serializable {
   }
 
 /**
+	* 整批批號<br>
+	* 
+	* @return String
+	*/
+  public String getBatchNo() {
+    return this.batchNo == null ? "" : this.batchNo;
+  }
+
+/**
+	* 整批批號<br>
+	* 
+  *
+  * @param batchNo 整批批號
+	*/
+  public void setBatchNo(String batchNo) {
+    this.batchNo = batchNo;
+  }
+
+/**
 	* 撥款方式<br>
-	* 01:整批匯款
+	* CdCode:DrawdownCode2
+01:整批匯款
 02:單筆匯款
 04:退款台新(存款憑條)
 05:退款他行(整批匯款)
@@ -223,7 +234,8 @@ public class BankRemit implements Serializable {
 
 /**
 	* 撥款方式<br>
-	* 01:整批匯款
+	* CdCode:DrawdownCode2
+01:整批匯款
 02:單筆匯款
 04:退款台新(存款憑條)
 05:退款他行(整批匯款)
@@ -237,7 +249,8 @@ public class BankRemit implements Serializable {
 
 /**
 	* 狀態<br>
-	* 0:正常
+	* CdCode:DrawdownStatus
+0:正常
 1:產檔後修正
 2:產檔後訂正
 	* @return Integer
@@ -248,7 +261,8 @@ public class BankRemit implements Serializable {
 
 /**
 	* 狀態<br>
-	* 0:正常
+	* CdCode:DrawdownStatus
+0:正常
 1:產檔後修正
 2:產檔後訂正
   *
@@ -450,13 +464,10 @@ public class BankRemit implements Serializable {
 
 /**
 	* AML回應碼<br>
-	* 1.正常
-2.可疑名單
-3.未確定
-4.逾時
-5.人工檢核-正常
-6.人工檢核-可疑
-7.人工檢核-未確定
+	* CdCode:AmlCheckItem
+0.非可疑名單/已完成名單確認
+1.需審查/確認
+2.為凍結名單/未確定名單
 	* @return String
 	*/
   public String getAmlRsp() {
@@ -465,18 +476,55 @@ public class BankRemit implements Serializable {
 
 /**
 	* AML回應碼<br>
-	* 1.正常
-2.可疑名單
-3.未確定
-4.逾時
-5.人工檢核-正常
-6.人工檢核-可疑
-7.人工檢核-未確定
+	* CdCode:AmlCheckItem
+0.非可疑名單/已完成名單確認
+1.需審查/確認
+2.為凍結名單/未確定名單
   *
   * @param amlRsp AML回應碼
 	*/
   public void setAmlRsp(String amlRsp) {
     this.amlRsp = amlRsp;
+  }
+
+/**
+	* 交易進行記號<br>
+	* 1STEP TX -&amp;gt; 0    (from eloan)
+2STEP TX -&amp;gt; 1 2
+	* @return Integer
+	*/
+  public int getActFg() {
+    return this.actFg;
+  }
+
+/**
+	* 交易進行記號<br>
+	* 1STEP TX -&amp;gt; 0    (from eloan)
+2STEP TX -&amp;gt; 1 2
+  *
+  * @param actFg 交易進行記號
+	*/
+  public void setActFg(int actFg) {
+    this.actFg = actFg;
+  }
+
+/**
+	* 產檔後修正後內容<br>
+	* jason 格式
+	* @return String
+	*/
+  public String getModifyContent() {
+    return this.modifyContent == null ? "" : this.modifyContent;
+  }
+
+/**
+	* 產檔後修正後內容<br>
+	* jason 格式
+  *
+  * @param modifyContent 產檔後修正後內容
+	*/
+  public void setModifyContent(String modifyContent) {
+    this.modifyContent = modifyContent;
   }
 
 /**
@@ -558,9 +606,9 @@ public class BankRemit implements Serializable {
 
   @Override
   public String toString() {
-    return "BankRemit [bankRemitId=" + bankRemitId + ", drawdownCode=" + drawdownCode + ", statusCode=" + statusCode
+    return "BankRemit [bankRemitId=" + bankRemitId + ", batchNo=" + batchNo + ", drawdownCode=" + drawdownCode + ", statusCode=" + statusCode
            + ", remitBank=" + remitBank + ", remitBranch=" + remitBranch + ", remitAcctNo=" + remitAcctNo + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo
-           + ", custName=" + custName + ", remark=" + remark + ", currencyCode=" + currencyCode + ", remitAmt=" + remitAmt + ", amlRsp=" + amlRsp + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", custName=" + custName + ", remark=" + remark + ", currencyCode=" + currencyCode + ", remitAmt=" + remitAmt + ", amlRsp=" + amlRsp + ", actFg=" + actFg
+           + ", modifyContent=" + modifyContent + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

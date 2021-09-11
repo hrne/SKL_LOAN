@@ -422,12 +422,8 @@ TXFORM=L4043
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOCustNo=戶號
 {width:85}
-#OOFacmNo=額度
-{width:85}
 #OORepayAcctLog=扣款帳號
 {width:105}
-#OOAcctSeq=帳號碼
-{width:65}
 #OOPostDepCodeX=帳戶別
 {width:65}
 #OOAuthTypeX=扣款別
@@ -461,12 +457,8 @@ TXFORM=L4043
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOCustNo=戶號
 {width:85}
-#OOFacmNo=額度
-{width:85}
 #OORepayAcctLog=扣款帳號
 {width:105}
-#OOAcctSeq=帳號碼
-{width:65}
 #OOPostDepCodeX=帳戶別
 {width:65}
 #OOAuthTypeX=扣款別
@@ -499,12 +491,8 @@ TXFORM=L4043
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOCustNo=戶號
 {width:65}
-#OOFacmNo=額度
-{width:85}
 #OORepayAcctLog=扣款帳號
 {width:105}
-#OOAcctSeq=帳號碼
-{width:65}
 #OOPostDepCodeX=帳戶別
 {width:65}
 #OOAuthTypeX=扣款別
@@ -538,12 +526,8 @@ TXFORM=L4043
 
 #OOCustNo=戶號
 {width:65}
-#OOFacmNo=額度
-{width:85}
 #OORepayAcctLog=扣款帳號
 {width:105}
-#OOAcctSeq=帳號碼
-{width:65}
 #OOPostDepCodeX=帳戶別
 {width:65}
 #OOAuthTypeX=扣款別

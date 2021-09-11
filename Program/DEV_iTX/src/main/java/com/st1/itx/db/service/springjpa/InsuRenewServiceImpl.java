@@ -652,7 +652,7 @@ em = null;
   }
 
   @Override
-  public Slice<InsuRenew> findL4605A(int clCode1_0, int clCode2_1, int clNo_2, String prevInsuNo_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<InsuRenew> findPrevInsuNoEq(int clCode1_0, int clCode2_1, int clNo_2, String prevInsuNo_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<InsuRenew> slice = null;
     if (titaVo.length != 0)
@@ -663,7 +663,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findL4605A " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " prevInsuNo_3 : " +  prevInsuNo_3);
+    this.info("findPrevInsuNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " prevInsuNo_3 : " +  prevInsuNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = insuRenewReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndPrevInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, prevInsuNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))

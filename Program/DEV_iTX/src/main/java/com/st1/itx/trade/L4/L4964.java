@@ -43,7 +43,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4964 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4964.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -127,22 +126,11 @@ public class L4964 extends TradeBuffer {
 				this.info("getPrevInsuNo : " + tInsuRenew.getPrevInsuNo());
 				this.info("getRenewCode : " + tInsuRenew.getRenewCode());
 				this.info("getInsuEndDate : " + tInsuRenew.getInsuEndDate());
-
-				if (tInsuRenew.getPrevInsuNo() == null || "".equals(tInsuRenew.getPrevInsuNo())) {
-					selfInsuCode = 0;
-				} else {
-					if (tInsuRenew.getRenewCode() == 1) {
-						selfInsuCode = 1;
-					} else if (tInsuRenew.getRenewCode() == 2) {
-						selfInsuCode = 2;
-					}
-				}
-
+				selfInsuCode = tInsuRenew.getRenewCode();
 //				僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 				if (btnShowFlag.containsKey(tmp)) {
 					btnShowFlag.put(tmp, 0);
-					if (btnInsuNo.get(tmp).equals(tInsuRenew.getPrevInsuNo())
-							&& !"".equals(tInsuRenew.getEndoInsuNo().trim())) {
+					if (btnInsuNo.get(tmp).equals(tInsuRenew.getPrevInsuNo()) && !"".equals(tInsuRenew.getEndoInsuNo().trim())) {
 						this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuRenew.getEndoInsuNo());
 						btnShowFlag.put(tmp, 1);
 					}
@@ -158,6 +146,7 @@ public class L4964 extends TradeBuffer {
 					InsuYearMonth = InsuYearMonth - 191100;
 				}
 
+				// 自保、修改、刪除
 				this.info("tInsuRenew.getInsuEndDate : " + tInsuRenew.getInsuEndDate());
 				if (tInsuRenew.getInsuEndDate() >= threeMonthsB4Date && tInsuRenew.getAcDate() != 0) {
 					OccursList occursList = new OccursList();
@@ -220,8 +209,7 @@ public class L4964 extends TradeBuffer {
 //					僅第一筆有按鈕，或該筆相同的保單號碼且有批單號碼的
 					if (btnShowFlag.containsKey(tmp)) {
 						btnShowFlag.put(tmp, 0);
-						if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo())
-								&& !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
+						if (btnInsuNo.get(tmp).equals(tInsuOrignal.getOrigInsuNo()) && !"".equals(tInsuOrignal.getEndoInsuNo().trim())) {
 							this.info("tInsuRenew.getEndoInsuNo() ... " + tInsuOrignal.getEndoInsuNo());
 							btnShowFlag.put(tmp, 1);
 						}

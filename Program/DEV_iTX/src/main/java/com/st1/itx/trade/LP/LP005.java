@@ -20,7 +20,6 @@
 //  */
 // public class LP005 extends TradeBuffer {
 // 	@SuppressWarnings("unused")
-// 	// private static final Logger logger = LoggerFactory.getLogger(LP005.class);
 
 // 	@Autowired
 // 	public LP005Report lp005report;
@@ -36,6 +35,7 @@
 // 	}
 // }
 package com.st1.itx.trade.LP;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -47,36 +47,45 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
-
-@Service("LP005")
-@Scope("step")
 /**
  * 
  * 
  * @author Ted Lin
  * @version 1.0.0
  */
+@Service("LP005")
+@Scope("step")
 public class LP005 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
-	LP005Report lp005report;
+	LP005Report lP005Report;
+	
+	@Autowired
+	WebClient webClient;
+
+	@Autowired
+	DateUtil dDateUtil;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
- 
+
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LP005.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LP005 ");
-		lp005report.setTxBuffer(this.getTxBuffer());
-		lp005report.exec(titaVo);
+		lP005Report.setTxBuffer(this.getTxBuffer());
+		lP005Report.setParentTranCode(this.getParent());
+		lP005Report.exec(titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo(), "LP005協辦考核核算底稿", titaVo);
 	}
 
 }

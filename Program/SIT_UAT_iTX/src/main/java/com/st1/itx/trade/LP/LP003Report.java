@@ -98,7 +98,7 @@ public class LP003Report extends MakeReport {
 
 		this.info("LP003Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP003", "部專暨房專業績累計表", "LP003_部專暨房專業績累計表",
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP003", "部專暨房專業績累計表", "LP003部專暨房專業績累計表",
 				"LP003_底稿_部專暨房專業績累計表.xlsx", "部專");
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();

@@ -23,11 +23,14 @@ import com.st1.itx.db.domain.PostAuthLogHistory;
 import com.st1.itx.db.domain.AchAuthLogId;
 import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.BankAuthActId;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.PostAuthLogId;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AchAuthLogHistoryService;
 import com.st1.itx.db.service.AchAuthLogService;
 import com.st1.itx.db.service.BankAuthActService;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.PostAuthLogHistoryService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.db.service.springjpa.cm.BankAuthActComServiceImpl;
@@ -113,6 +116,9 @@ public class BankAuthActCom extends TradeBuffer {
 	public PostAuthLogHistoryService postAuthLogHistoryService;
 
 	@Autowired
+	public FacMainService facMainService;
+
+	@Autowired
 	public BankAuthActComServiceImpl bankAuthActComServiceImpl;
 
 	@Autowired
@@ -179,7 +185,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 		// 新增授權應處理明細
 		if (this.isNewLog || this.isDelLog) {
-			txToDoCom.setTxBuffer(this.getTxBuffer());
+			txToDoCom.setTxBuffer(this.txBuffer);
 			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 			if ("700".equals(iRepayBank)) {
 				tTxToDoDetail.setItemCode("POSP00");
@@ -224,7 +230,7 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 
 		// 新增授權應處理明細
-		txToDoCom.setTxBuffer(this.getTxBuffer());
+		txToDoCom.setTxBuffer(this.txBuffer);
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		if ("700".equals(iRepayBank)) {
 			tTxToDoDetail.setItemCode("POSP00");
@@ -258,6 +264,7 @@ public class BankAuthActCom extends TradeBuffer {
 		case "1": // 1.申請
 			if ("00".equals(t.getAuthErrorCode())) { // 00:成功
 				status = "0"; // 0:授權成功
+				updFacmRepayCode(t.getCustNo(), t.getFacmNo(),titaVo);
 				isUpdFac = true;
 			} else {
 				status = "8"; // 8.授權失敗
@@ -340,6 +347,7 @@ public class BankAuthActCom extends TradeBuffer {
 			if ("0".equals(t.getAuthStatus())) { // 0:成功
 				status = "0"; // 0:授權成功
 				isUpdFac = true;
+				updFacmRepayCode(t.getCustNo(), t.getFacmNo(),titaVo);
 			} else {
 				status = "8"; // 8.授權失敗
 				if (t.getRepayAcct().equals(tBankAuthAct.getRepayAcct())) {
@@ -372,6 +380,13 @@ public class BankAuthActCom extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 			}
+			tBankAuthAct.setRepayBank(t.getRepayBank());
+			tBankAuthAct.setRepayAcct(t.getRepayAcct());
+			tBankAuthAct.setPostDepCode(" ");
+			tBankAuthAct.setLimitAmt(t.getLimitAmt());
+			tBankAuthAct.setAcctSeq("  ");
+			tBankAuthAct.setStatus(status);
+
 		}
 
 		if (isUpdAct) {
@@ -380,7 +395,7 @@ public class BankAuthActCom extends TradeBuffer {
 			if (slBankAuthAct != null) {
 				for (BankAuthAct t1 : slBankAuthAct.getContent()) {
 					if (t1.getRepayBank().equals(t.getRepayBank())) {
-						tBankAuthAct = bankAuthActService.holdById(tBankAuthAct, titaVo);
+						tBankAuthAct = bankAuthActService.holdById(t1, titaVo);
 						tBankAuthAct.setStatus(status);
 						try {
 							bankAuthActService.update(tBankAuthAct, titaVo);
@@ -396,11 +411,28 @@ public class BankAuthActCom extends TradeBuffer {
 		insertAchHistory(t, titaVo);
 	}
 
+	private void updFacmRepayCode(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
+		this.info("bankAuthActCom updAchAcct ...");
+		FacMain tFacMain = facMainService.holdById(new FacMainId(custNo, facmNo), titaVo);
+		if (tFacMain == null) {
+			throw new LogicException("E0015", "額度檔找不到" + custNo + "-" + facmNo); // 檢查錯誤
+		}
+		if (tFacMain.getRepayCode() != 2) {
+			tFacMain.setRepayCode(2);
+			try {
+				tFacMain = facMainService.update(tFacMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "額度主檔" + e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
+
+		}
+	}
+
 	/**
 	 * 維護郵局授權檔
 	 * 
 	 * @param iStatus 1:停止使用 0:授權成功
-	 * @param titaVo ..
+	 * @param titaVo  ..
 	 * @throws LogicException ..
 	 */
 	public void mntPostAuth(String iStatus, TitaVo titaVo) throws LogicException {
@@ -409,7 +441,6 @@ public class BankAuthActCom extends TradeBuffer {
 		showLog();
 		this.info("iStatus = " + iStatus);
 
-		
 		PostAuthLogId tPostAuthLogId = new PostAuthLogId();
 		tPostAuthLogId.setAuthCreateDate(parse.stringToInteger(titaVo.getParam("AuthCreateDate")));
 		tPostAuthLogId.setAuthApplCode("1");
@@ -461,7 +492,7 @@ public class BankAuthActCom extends TradeBuffer {
 	 * 維護ACH授權檔
 	 * 
 	 * @param iStatus 1:停止使用 0:授權成功
-	 * @param titaVo ..
+	 * @param titaVo  ..
 	 * @throws LogicException ..
 	 */
 	public void mntAchAuth(String iStatus, TitaVo titaVo) throws LogicException {
@@ -520,6 +551,9 @@ public class BankAuthActCom extends TradeBuffer {
 	private void addAuth(TitaVo titaVo) throws LogicException {
 		// 新增帳號檔，同戶無該扣款帳號則新增授權檔
 		this.info("addAuth ...");
+		this.isNewLog = false;
+		this.isNewAct = false;
+		String status = " ";
 		// 該額度扣款帳號
 		BankAuthAct tBankAuthAct = bankAuthActService
 				.findById(new BankAuthActId(iCustNo, iFacmNo, "700".equals(iRepayBank) ? "01" : "00"), titaVo);
@@ -529,51 +563,76 @@ public class BankAuthActCom extends TradeBuffer {
 			if ("".equals(tBankAuthAct.getStatus().trim())) {
 				throw new LogicException("E0015", "該額度扣款帳號尚未提出授權 " + tBankAuthAct.getRepayAcct());
 			}
+			status = tBankAuthAct.getStatus();
 		}
 		// 同戶扣款帳號
 		tBankAuthAct = getRepayAcct(titaVo);
 		String acctSeq = "  ";
 		if (tBankAuthAct == null) {
-			this.isNewLog = true;
 			if ("700".equals(iRepayBank)) {
-				acctSeq = getNewAcctSeq(titaVo); // 新帳號碼
+				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, "01",
+						titaVo);
+				if (tPostAuthLog == null) {
+					this.isNewLog = true;
+					acctSeq = getNewAcctSeq(titaVo); // 新帳號碼
+				} else {
+					if ("1".equals(tPostAuthLog.getAuthApplCode()) && "00".equals(tPostAuthLog.getAuthErrorCode())) {
+						status = "0";
+						acctSeq = tPostAuthLog.getRepayAcctSeq();
+					} else {
+						this.isNewLog = true;
+					}
+				}
+			} else {
+				AchAuthLog tAchAuthLog = achAuthLogService.repayAcctFirst(iCustNo, iRepayBank, iRepayAcct, titaVo);
+				if (tAchAuthLog == null) {
+					this.isNewLog = true;
+				} else {
+					if ("A".equals(tAchAuthLog.getCreateFlag()) && "0".equals(tAchAuthLog.getAuthStatus())) {
+						status = "0";
+					} else {
+						this.isNewLog = true;
+					}
+				}
 			}
 		} else {
 			acctSeq = tBankAuthAct.getAcctSeq();
-			switch (tBankAuthAct.getStatus()) {
-			case " ": // ''未授權
-			case "0": // 0:授權成功
-				this.isNewLog = false;
-				break;
-			case "2": // 2.取消授權
-			case "8": // 8.授權失敗
-				this.isNewLog = true;
-				break;
-			case "1": // 1:停止使用
-				throw new LogicException("E0015", "此扣款帳號停止使用，請恢復使用"); // 檢查錯誤
-			case "9": // 9:已送出授權
-				throw new LogicException("E0015", "此扣款帳號已送出授權");
-			default:
-				throw new LogicException("E0015", "此扣款帳號狀態碼錯誤");
-			}
+			status = tBankAuthAct.getStatus();
+		}
+		switch (status) {
+		case " ": // ''未授權
+			break;
+		case "0": // 0:授權成功
+			this.isNewLog = false;
+			break;
+		case "2": // 2.取消授權
+		case "8": // 8.授權失敗
+			this.isNewLog = true;
+			break;
+		case "1": // 1:停止使用
+			throw new LogicException("E0015", "此扣款帳號停止使用，請恢復使用"); // 檢查錯誤
+		case "9": // 9:已送出授權
+			throw new LogicException("E0015", "此扣款帳號已送出授權");
+		default:
+			throw new LogicException("E0015", "此扣款帳號狀態碼錯誤");
 		}
 
 		if ("700".equals(iRepayBank)) {
 			if (this.isNewAct) {
-				tBankAuthAct = inserBankAuthAct("01", acctSeq, titaVo);
+				tBankAuthAct = inserBankAuthAct("01", acctSeq, status, titaVo);
 			}
 			if (this.isNewLog) {
 				insertPostLog("1", "1", acctSeq, titaVo);
 			}
 			if (this.isNewAct) {
-				tBankAuthAct = inserBankAuthAct("02", acctSeq, titaVo);
+				tBankAuthAct = inserBankAuthAct("02", acctSeq, status, titaVo);
 			}
 			if (this.isNewLog) {
 				insertPostLog("1", "2", acctSeq, titaVo);
 			}
 		} else {
 			if (this.isNewAct) {
-				tBankAuthAct = inserBankAuthAct("00", acctSeq, titaVo);
+				tBankAuthAct = inserBankAuthAct("00", acctSeq, status, titaVo);
 			}
 			if (this.isNewLog) {
 				insertAchLog("A", titaVo);
@@ -590,23 +649,24 @@ public class BankAuthActCom extends TradeBuffer {
 		if (tBankAuthAct != null && tBankAuthAct.getFacmNo() == iFacmNo) {
 			switch (tBankAuthAct.getStatus()) {
 			case " ": // ''未授權
+			case "0": // 0:授權成功
+			case "1": // 1:停止使用
+			case "8": // 8.授權失敗
 				this.isDelAct = true;
 				break;
 			case "2": // 2.取消授權
-			case "8": // 8.授權失敗
 				this.isDelAct = false;
 				break;
-			case "0": // 0:授權成功
-				throw new LogicException("E0015", "此扣款帳號已授權成功");
-			case "1": // 1:停止使用
-				throw new LogicException("E0015", "此扣款帳號已停止使用");
 			case "9": // 9:已送出授權
-				throw new LogicException("E0015", "此扣款帳號已送出授權");
+				throw new LogicException("E0015", "此額度扣款帳號已送出授權");
 			default:
-				throw new LogicException("E0015", "此扣款帳號狀態碼錯誤");
+				throw new LogicException("E0015", "此額度扣款帳號狀態碼錯誤");
 			}
 		}
-
+		String status = "";
+		if (tBankAuthAct != null) {
+			status = tBankAuthAct.getStatus();
+		}
 		if (this.isDelAct) {
 			BankAuthActId tBankAuthActId = new BankAuthActId();
 			tBankAuthActId.setCustNo(iCustNo);
@@ -624,8 +684,8 @@ public class BankAuthActCom extends TradeBuffer {
 		// 同戶扣款帳號
 		tBankAuthAct = getRepayAcct(titaVo);
 
-		// 同戶無該扣款帳號則刪除授權檔
-		if (tBankAuthAct == null) {
+		// 同戶無該扣款帳號、未授權
+		if (tBankAuthAct == null && " ".equals(status)) {
 			this.isDelLog = true;
 			if ("700".equals(iRepayBank)) {
 				deletePostAuthLog("1", "1", titaVo);
@@ -687,6 +747,7 @@ public class BankAuthActCom extends TradeBuffer {
 	private void insertPostLog(String authApplCode, String authCode, String acctSeq, TitaVo titaVo)
 			throws LogicException {
 		this.info("insertPostLog ....");
+		boolean isInsert = true;
 		PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, authCode,
 				titaVo);
 		if (tPostAuthLog != null) {
@@ -700,16 +761,20 @@ public class BankAuthActCom extends TradeBuffer {
 					}
 				}
 			}
+			isInsert = false;
 		}
-		PostAuthLogId tPostAuthLogId = new PostAuthLogId();
-		tPostAuthLogId.setAuthCreateDate(dateUtil.getNowIntegerRoc());
-		tPostAuthLogId.setAuthApplCode(authApplCode);
-		tPostAuthLogId.setCustNo(iCustNo);
-		tPostAuthLogId.setPostDepCode(iPostDepCode);
-		tPostAuthLogId.setRepayAcct(iRepayAcct);
-		tPostAuthLogId.setAuthCode(authCode);
-		tPostAuthLog = new PostAuthLog();
-		tPostAuthLog.setPostAuthLogId(tPostAuthLogId);
+
+		if (isInsert) {
+			PostAuthLogId tPostAuthLogId = new PostAuthLogId();
+			tPostAuthLogId.setAuthCreateDate(dateUtil.getNowIntegerRoc());
+			tPostAuthLogId.setAuthApplCode(authApplCode);
+			tPostAuthLogId.setCustNo(iCustNo);
+			tPostAuthLogId.setPostDepCode(iPostDepCode);
+			tPostAuthLogId.setRepayAcct(iRepayAcct);
+			tPostAuthLogId.setAuthCode(authCode);
+			tPostAuthLog = new PostAuthLog();
+			tPostAuthLog.setPostAuthLogId(tPostAuthLogId);
+		}
 		tPostAuthLog.setFacmNo(iFacmNo);
 		tPostAuthLog.setCustId(iCustId);
 		tPostAuthLog.setRepayAcctSeq(acctSeq);
@@ -809,7 +874,8 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	// 新增授權帳號檔
-	private BankAuthAct inserBankAuthAct(String authType, String acctSeq, TitaVo titaVo) throws LogicException {
+	private BankAuthAct inserBankAuthAct(String authType, String acctSeq, String status, TitaVo titaVo)
+			throws LogicException {
 		BankAuthAct tBankAuthAct = new BankAuthAct();
 		BankAuthActId tBankAuthActId = new BankAuthActId();
 		tBankAuthActId.setCustNo(iCustNo);
@@ -821,7 +887,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tBankAuthAct.setPostDepCode(iPostDepCode);
 		tBankAuthAct.setLimitAmt(iLimitAmt);
 		tBankAuthAct.setAcctSeq(acctSeq);
-		tBankAuthAct.setStatus(" ");
+		tBankAuthAct.setStatus(status);
 
 		try {
 			bankAuthActService.insert(tBankAuthAct, titaVo);

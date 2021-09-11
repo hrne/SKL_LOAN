@@ -1870,6 +1870,7 @@ E(0,@RelationGender,0))
 !未授權
 #AcctCheckFlagwaring=X,1,S
 C(3,#RepayCode,2,$,S)
+C(3,#AcctCheckFlag,8,S,$)
 C(3,#AcctCheckFlag,1,$,C(3,#AcctCheckFlag,0,$,V(P,此帳號未授權)))
 
 ![與借款人關係]

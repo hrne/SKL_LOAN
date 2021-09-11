@@ -56,8 +56,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXA"+r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSA"+r, aaCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R38WorkMonthEA"+r, aaCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R38WorkMonthSA"+r, Integer.valueOf(aaCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R38WorkMonthEA"+r, Integer.valueOf(aaCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}
@@ -78,8 +78,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXB"+r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSB"+r, bbCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R38WorkMonthEB"+r, bbCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R38WorkMonthSB"+r, Integer.valueOf(bbCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R38WorkMonthEB"+r, Integer.valueOf(bbCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}
@@ -100,8 +100,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXC"+r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSC"+r, ccCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R38WorkMonthEC"+r, ccCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R38WorkMonthSC"+r, Integer.valueOf(ccCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R38WorkMonthEC"+r, Integer.valueOf(ccCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}
@@ -122,8 +122,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXD"+r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSD"+r, ddCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R38WorkMonthED"+r, ddCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R38WorkMonthSD"+r, Integer.valueOf(ddCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R38WorkMonthED"+r, Integer.valueOf(ddCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}
@@ -144,8 +144,8 @@ public class L6R38 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R38ProdNoXE"+r, iFacProd.getProdName());
 				}
-				totaVo.putParam("L6R38WorkMonthSE"+r, eeCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R38WorkMonthEE"+r, eeCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R38WorkMonthSE"+r, Integer.valueOf(eeCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R38WorkMonthEE"+r, Integer.valueOf(eeCdPfParms.getWorkMonthStart())-191100);
 				r++;
 			}
 		}

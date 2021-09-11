@@ -12,14 +12,16 @@ import org.springframework.stereotype.Service;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.JcicZ571;
 
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ572;
 import com.st1.itx.db.domain.JcicZ572Id;
 import com.st1.itx.db.domain.JcicZ572Log;
+
+import com.st1.itx.db.service.JcicZ571Service;
 import com.st1.itx.db.service.JcicZ572LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ572Service;
@@ -35,11 +37,13 @@ import com.st1.itx.util.data.DataLog;
 /**
  * 
  * 
- * @author Luisito
+ * @author Luisito / Mata
  * @version 1.0.0
  */
 public class L8334 extends TradeBuffer {
 	/* DB服務注入 */
+	@Autowired
+	public JcicZ571Service sJcicZ571Service;
 	@Autowired
 	public JcicZ572Service sJcicZ572Service;
 	@Autowired
@@ -74,7 +78,26 @@ public class L8334 extends TradeBuffer {
 		iJcicZ572Id.setSubmitKey(iSubmitKey);
 		iJcicZ572Id.setPayDate(iPayDate);
 		JcicZ572 chJcicZ572 = new JcicZ572();
+		//檢核項目(D-74)
+		//571的是否為更生債權人為Y或債務人是否仍依更生方案正常還款予本金融機構為N，予以剔退處裡
+		//三start
+		//有對DB做動作就必須檢查存不存在
+		Slice<JcicZ571> ixJcicZ571 = sJcicZ571Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if (ixJcicZ571 == null) {
+			throw new LogicException(titaVo, "E0001", ""); 
+		}
+		for(JcicZ571 xJcicZ571 : ixJcicZ571) {
+			String payYn = xJcicZ571.getPayYn();
+			String ownerYn = xJcicZ571.getOwnerYn();
+			if(payYn.equals("Y")) {
+    			throw new LogicException(titaVo, "E0005", "(571)是否為更生債權人為Y");
+    		}
+    		if(ownerYn.equals("N")) {
+    			throw new LogicException(titaVo, "E0005", "(571)債務人是否仍依更生方案正常還款予本金融機構為N");
+    		}
+    	}
 		
+		//三end
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ572

@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -58,7 +56,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4611 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4611.class);
 
 	/* 日期工具 */
 	@Autowired
@@ -88,7 +85,7 @@ public class L4611 extends TradeBuffer {
 	private String endoInsuNo = "";
 	private BigDecimal totPrem = BigDecimal.ZERO;
 	private int renewCode = 0;
-	private int nullCode = 0;
+	private int noticeYearMonth = 0; // 已執行通知作業年月
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -106,14 +103,17 @@ public class L4611 extends TradeBuffer {
 		endoInsuNo = titaVo.getParam("EndoInsuNo");
 		renewCode = parse.stringToInteger(titaVo.getParam("RenewCode"));
 
+		// 已執行通知作業年月
+		InsuRenew t1InsuRenew = insuRenewService.findNotiTempFgFirst("Y", titaVo);
+		if (t1InsuRenew != null) {
+			noticeYearMonth = t1InsuRenew.getInsuYearMonth();
+		}
 		if ("".equals(endoInsuNo)) {
 			endoInsuNo = " ";
 		}
 
-		InsuRenew tInsuRenew = new InsuRenew();
-//		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
 		InsuRenewId tInsuRenewId = new InsuRenewId();
-
+		InsuRenew tInsuRenew = new InsuRenew();
 		tInsuRenewId.setClCode1(clCode1);
 		tInsuRenewId.setClCode2(clCode2);
 		tInsuRenewId.setClNo(clNo);
@@ -141,7 +141,11 @@ public class L4611 extends TradeBuffer {
 
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
-			tInsuRenew.setNotiTempFg("N");
+			if (insuYearMonth <= noticeYearMonth) {
+				tInsuRenew.setNotiTempFg("N"); // N:未入(通知作業後新增)				
+			} else {
+				tInsuRenew.setNotiTempFg(""); // null:待通知
+			}
 			tInsuRenew.setStatusCode(0);
 			tInsuRenew.setOvduDate(0);
 			tInsuRenew.setOvduNo(BigDecimal.ZERO);
@@ -164,7 +168,7 @@ public class L4611 extends TradeBuffer {
 		} else if ("2".equals(iFunctionCode)) {
 			tInsuRenew = insuRenewService.holdById(tInsuRenewId);
 			if (tInsuRenew != null) {
-				
+
 				if (tInsuRenew.getAcDate() > 0) {
 					throw new LogicException(titaVo, "E0007", "此筆已入帳，不可修改");
 				} else if (tInsuRenew.getRenewCode() == 3) {
@@ -316,7 +320,7 @@ public class L4611 extends TradeBuffer {
 	private void resetAcReceivable(int flag, InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
 		List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
 
-		if (!"Y".equals(tInsuRenew.getNotiTempFg())) {
+		if ("".equals(tInsuRenew.getNotiTempFg())) {
 			this.info("該筆未入通知，NotiTempFg : " + tInsuRenew.getNotiTempFg());
 			return;
 		}

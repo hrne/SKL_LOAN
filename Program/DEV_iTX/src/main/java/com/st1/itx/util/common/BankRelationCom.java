@@ -170,7 +170,7 @@ public class BankRelationCom extends TradeBuffer {
 					vo.setDataDate(this.parse.timeStampToString(t.getLastUpdate()));
 				}
 			}
-			vo.setIsFinancial("Y");
+			vo.setIsSuspected("Y");
 		}
 		
 		// 是否為15日薪員工

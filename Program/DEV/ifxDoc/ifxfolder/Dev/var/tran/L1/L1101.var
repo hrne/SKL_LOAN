@@ -153,8 +153,8 @@ IF(#RegFg==0,$,s)
 #FdIsLimit=X,2,L
 #FdIsRelated=X,2,L
 #FdIsLnrelNear=X,2,L
-#FdIsFinancial=X,2,L
-#FdIsFinancial2=X,2,L
+#FdIsSuspected=X,2,L
+#FdIsSuspected2=X,2,L
 #FdEntCode=X,2,L
 #FdEmpNo=X,10,L
 T(3,*    員工代號)
@@ -443,8 +443,8 @@ T(2,@FdIsLimit,#WKSPC)
 T(2,@FdIsRelated,#WKSPC)
 T(2,@FdIsLnrelNear,#WKSPC)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
-T(2,@FdIsFinancial,#Fd)
-T(2,@FdIsFinancial2,#Fd)
+T(2,@FdIsSuspected,#Fd)
+T(2,@FdIsSuspected2,#Fd)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdEduCode,#Fd)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
@@ -1035,8 +1035,8 @@ C(4,#Email,$,A(M,0,#Email))
 [#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
 [#<->#,"#FdIsRelated+是否為利害關係人",#IsRelatedX],
 [#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNearX],
-["#FdIsFinancial+是否為金控「疑似準利害關係人」名單",#IsFinancialX,#FinancialBtn],
-["#FdIsFinancial2+是否為金控疑似準利害關係人",#IsFinancialCheck,#IsFinancialCheckX,#IsFinancialCheckType,#IsFinancialCheckTypeX],
+["#FdIsSuspected+是否為金控「疑似準利害關係人」名單",#IsSuspectedX,#FinancialBtn],
+["#FdIsSuspected2+是否為金控疑似準利害關係人",#IsSuspectedCheck,#IsSuspectedCheckX,#IsSuspectedCheckType,#IsSuspectedCheckTypeX],
 [#<->#,"#FdIsLimit+以上資訊日期",#IsDataDate],
 ]
 <include src="ROM.icf::L1R16.dec"/>
@@ -1050,8 +1050,8 @@ R(1,L1R16)
 T(2,@IsLimit,#L1R16IsLimitYn)
 T(2,@IsRelated,#L1R16IsRelatedYn)
 T(2,@IsLnrelNear,#L1R16IsLnrelNearYn)
-T(2,@IsFinancial,#L1R16IsFinancialYn)
-T(2,@IsFinancialCheck,#L1R16IsFinancialYn)
+T(2,@IsSuspected,#L1R16IsSuspectedYn)
+T(2,@IsSuspectedCheck,#L1R16IsSuspectedYn)
 T(2,@IsDataDate,#L1R16DataDate)
 
 #IsDataDate=D,7,L
@@ -1074,30 +1074,30 @@ T(H,#IsRelated,#YesNoHelp)
 #IsLnrelNearX=X,4,L
 T(H,#IsLnrelNear,#YesNoHelp)
 
-#IsFinancial=X,1,L
+#IsSuspected=X,1,L
 
-#IsFinancialX=X,4,L
-T(H,#IsFinancial,#YesNoHelp)
+#IsSuspectedX=X,4,L
+T(H,#IsSuspected,#YesNoHelp)
 
-#IsFinancialCheck=X,1,I
+#IsSuspectedCheck=X,1,I
 HELP(#YesNoHelp)
 @
 V(H,#YesNoHelp)
 
-#IsFinancialCheckX=X,4,L
-T(H,#IsFinancialCheck,#YesNoHelp)
+#IsSuspectedCheckX=X,4,L
+T(H,#IsSuspectedCheck,#YesNoHelp)
 
-#IsFinancialCheckTypeHelp=X,100,S
+#IsSuspectedCheckTypeHelp=X,100,S
 T(3, :請選擇;Y:確認核對無誤)
 
-#IsFinancialCheckType=X,1,I
-HELP(#IsFinancialCheckTypeHelp)
+#IsSuspectedCheckType=X,1,I
+HELP(#IsSuspectedCheckTypeHelp)
 @
 V(7)
-V(H,#IsFinancialCheckTypeHelp)
+V(H,#IsSuspectedCheckTypeHelp)
 
-#IsFinancialCheckTypeX=X,4,L
-T(H,#IsFinancialCheckType,#IsFinancialCheckTypeHelp)
+#IsSuspectedCheckTypeX=X,4,L
+T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 </sub>
 <sub type="DC" name="p3" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
@@ -1559,9 +1559,9 @@ T(H,#OOEnable,#EnableHelp)
 #SubCompanyCode{n}
 #CrossUse{n}
 ##end
-#IsFinancial
-#IsFinancialCheck
-#IsFinancialCheckType
+#IsSuspected
+#IsSuspectedCheck
+#IsSuspectedCheckType
 </sub>
 
 !------ 下行電文TOM ------

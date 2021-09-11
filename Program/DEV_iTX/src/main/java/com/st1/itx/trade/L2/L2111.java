@@ -19,6 +19,7 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.data.DataLog;
 
 /*
  * L2111 案件申請登錄
@@ -62,6 +63,10 @@ public class L2111 extends TradeBuffer {
 	public CustMainService custMainService;
 	@Autowired
 	public CdGseqService cdGseqService;
+	
+	@Autowired
+	public DataLog iDataLog;
+
 
 	@Autowired
 	Parse parse;
@@ -128,6 +133,34 @@ public class L2111 extends TradeBuffer {
 		int wkApplNo = iApplNo;
 		switch (iFuncCode) {
 		case 1: // 新增
+			
+			//需確認eloan是否有送
+			if (!isEloan) {
+				String IsSuspectedCheckType = titaVo.get("IsSuspectedCheckType");
+				if (IsSuspectedCheckType != null && "Y".equals(IsSuspectedCheckType)) {
+					CustMain custMain = custMainService.holdById(tCustMain, titaVo);
+					if (custMain == null) {
+						throw new LogicException(titaVo, "E2003", "客戶資料主檔" + iGroupId); // 查無資料
+					}
+					// 變更前
+					CustMain beforeCustMain = (CustMain) iDataLog.clone(custMain);
+
+					custMain.setIsSuspected(titaVo.getParam("IsSuspected"));
+					custMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
+					custMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
+					
+					// 搬值
+
+					try {
+						custMain = custMainService.update2(custMain, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007", "客戶主檔" + e.getErrorMsg()); // 新增資料時，發生錯誤
+					}
+					// 紀錄變更前變更後
+					iDataLog.setEnv(titaVo, beforeCustMain, custMain);
+					iDataLog.exec();
+				}
+			}
 		case 3: // 拷貝
 			// 新增時由電腦產生,營業日之民國年(2位)+5位之流水號
 			wkApplNo = gGSeqCom.getSeqNo(WkTbsYy * 10000, 1, "L2", "0002", 99999, titaVo);

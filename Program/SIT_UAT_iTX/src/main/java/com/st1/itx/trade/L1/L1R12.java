@@ -115,7 +115,7 @@ public class L1R12 extends TradeBuffer {
 		custMain.setRegFloor(RimFloor);
 		custMain.setRegFloorDash(RimFloorDash);
 		
-		String Address = custNoticeCom.getRegAddress(custMain);
+		String Address = custNoticeCom.getRegAddress(custMain, titaVo);
 		
 		this.totaVo.putParam("L1r12Address", Address);
 

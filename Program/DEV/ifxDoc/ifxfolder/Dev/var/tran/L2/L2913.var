@@ -133,18 +133,20 @@ T(2,@JobTitleHelp,#HelpDesc8)
 T(2,@PositionHelp,#HelpDesc9)
 T(2,@EvaStandardHelp,#HelpDesc10)
 
-!StockCode
-#CDDEF0011=x,20,S
-T(3,CdCode.StockCode)
 
-#StockCodeHelp=x,1024,S 
+
+#CDDEF12=x,20,S
+T(3,CdGuarantor)
+
+#RelationCodeHelp=x,3000,S
 
 #Help2Rim=X,1,S
 RESET_RIM(#Help2Rim,XXR99)
-S(XXR99,01,#CDDEF0011)
+S(XXR99,01,#CDDEF12)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@StockCodeHelp,#HelpDesc1)
+T(2,@RelationCodeHelp,#HelpDesc1)
+
 
 #YNHelp=x,20,S
 T(3,Y:是;N:否)
@@ -155,11 +157,12 @@ T(3,3:股票;4:其他有價證券)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
-#NTXBUF=X,10,S
+#NTXBUF=X,17,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ClCode1,#NTXBUF,1,1)
 T(1,@ClCode2,#NTXBUF,2,2)
 T(1,@ClNo,#NTXBUF,4,7)
+T(1,@ApplNo,#NTXBUF,11,7)
 
 !擔保品別1
 #ClCode1=A,1,I
@@ -186,6 +189,8 @@ C(3,#ClCode1,3,T(3,股票),T(3,其他有價證券))
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
+#ApplNo=A,7,L
+
 #RimClCode1=A,1,S
 #RimClCode2=A,2,S
 #RimClNo=A,7,S
@@ -202,6 +207,28 @@ R(1,L2R17)
 E(0,@OGdRid1,#L2r17GdrId1)
 E(0,@OGdRid2,#L2r17GdrId2)
 E(0,@OGdRnum,#L2r17GdrNum)
+
+#FunCd=X,1,S
+
+#ApproveNo=A,7,L
+
+<include src="ROM.icf::L2R52.dec"/>
+#RimL2R52=X,1,S
+C(3,#ApplNo,0,S,$)
+RESET_RIM(#RimL2R52,L2R52)
+E(0,@ApproveNo,#ApplNo)
+E(0,@FunCd,5)
+S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
+R(1,L2R52)
+T(2,@OOwnerRelCode,#L2r52OwnerRelCode1)
+
+
+!與授信戶關係
+#OOwnerRelCode=X,2,L
+
+#OOwnerRelCodeX=X,40,L
+C(4,#OOwnerRelCode,S,$)
+T(H,#OOwnerRelCode,#RelationCodeHelp)
 
 #RPTFG=A,1,S
 
@@ -429,6 +456,7 @@ TXFORM=L2913
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R17.tom"/>
+<include src="ROM.icf::L2R52.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 
@@ -447,6 +475,7 @@ TXFORM=L2913
 ["前日收盤價",#OYdClosingPrice],["一個月平均價",#OMonthlyAvg],
 ["三個月平均價",#OThreeMonthAvg],["鑑定單價",#OEvaUnitPrice],
 ["股票持有人統編",#OOwnerId],["股票持有人姓名",#OOwnerName],
+[#<->#,"與授信戶關係",#OOwnerRelCode,#OOwnerRelCodeX],
 ["公司內部人職稱",#OInsiderJobTitle,#OInsiderJobTitleX],["公司內部人身分註記",#OInsiderPosition,#OInsiderPositionX],
 ["法定關係人統編",#OLegalPersonId],["貸放成數",#OLoanToValue,"%"],
 ["擔保維持率",#OClMtr,"%"],["通知追繳維持率",#ONoticeMtr,"%"],

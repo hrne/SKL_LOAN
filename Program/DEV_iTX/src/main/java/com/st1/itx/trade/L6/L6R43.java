@@ -60,8 +60,8 @@ public class L6R43 extends TradeBuffer {
 				}else {
 					totaVo.putParam("L6R43Email"+i, iCdEmp.getEmail());
 				}
-				totaVo.putParam("L6R43WorkMonthS"+i, rCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R43WorkMonthE"+i, rCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R43WorkMonthS"+i, Integer.valueOf(rCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R43WorkMonthE"+i, Integer.valueOf(rCdPfParms.getWorkMonthEnd())-191100);
 				i++;
 			}
 			while(i<=30) {

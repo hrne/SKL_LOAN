@@ -342,7 +342,7 @@ public class NegReportCom extends CommBuffer {
 		List<String[]> lTotalData = new ArrayList<String[]>();//
 //		String TlrNo = titaVo.getTlrNo();// 經辦
 
-		// 交易序號-CdGseqCom-getSeqNo-抓兩馬-+自己流水序號(2碼)
+		// 交易序號-CdGseqCom-getSeqNo-抓兩碼-+自己流水序號(2碼)
 		// param1: Date 編號日期
 		// param2: Code 編號方式 0:不分 1:年度編號 2:月份編號 3:日編號
 		// param3: Type 業務類別 L1, L2, L3, ...
@@ -572,6 +572,7 @@ public class NegReportCom extends CommBuffer {
 						// 帳戶ID Detail[10]
 						tNegAppr02.setCustId(CustId);
 						// 銷帳編號 Detail[11]
+						tNegAppr02.setTxKind(Detail[11].substring(0, 1));
 						String BatchTx02Detail12 = Detail[11];
 						BatchTx02Detail12.substring(0, 1);
 						switch (TransAccCode) {

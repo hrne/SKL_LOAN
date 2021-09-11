@@ -214,7 +214,7 @@ T(F,@DispDate,1)
 
 !FunCd=2 隱藏框線
 #WKTF=X,1,S
-IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0),$)
+IF (#FunCd==2,T(F,@CustId,0)T(F,@CustNo,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@ClTypeCode,0)T(F,@CityCode,0),$)
 
 #IF_FUNCD_4=X,1,S
 IF(#FunCd==4,$,S)
@@ -549,7 +549,7 @@ T(2,#L6r03Result)
 
 ! [地區別]
 #CityCode=X,2,I
-IF(#FunCd==4,s,$)
+IF(#FunCd==1,$,s)
 HELP(#L6r03ResultCity,cols:5)
 @C(4,#CityCode,S,$)V(H,#L6r03ResultCity)
 
@@ -557,6 +557,21 @@ HELP(#L6r03ResultCity,cols:5)
 #CityItem=X,6,L
 C(4,#CityCode,S,$)
 T(H,#CityCode,#L6r03ResultCity)
+
+#ApproveNo=A,7,L
+
+<include src="ROM.icf::L2R52.dec"/>
+#RimL2R52=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#FunCd,4,S,$)
+C(3,#ApplNo,0,S,$)
+RESET_RIM(#RimL2R52,L2R52)
+E(0,@ApproveNo,#ApplNo)
+S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
+R(1,L2R52)
+T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
+
+
 
 ! [鑑估日期]
 #EvaDate=D,7,I
@@ -1025,6 +1040,7 @@ TXFORM=L2414
 <include src="ROM.icf::L2R22.tom"/>
 <include src="ROM.icf::L2R26.tom"/>
 <include src="ROM.icf::L2R41.tom"/>
+<include src="ROM.icf::L2R52.tom"/>
 </sub>
 
 !---------- 單據輸出組合 ----------

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txToDoDetailService")
 @Repository
-public class TxToDoDetailServiceImpl implements TxToDoDetailService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(TxToDoDetailServiceImpl.class);
-
+public class TxToDoDetailServiceImpl extends ASpringJpaParm implements TxToDoDetailService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class TxToDoDetailServiceImpl implements TxToDoDetailService, Initializin
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + txToDoDetailId);
+    this.info("findById " + dbName + " " + txToDoDetailId);
     Optional<TxToDoDetail> txToDoDetail = null;
     if (dbName.equals(ContentName.onDay))
       txToDoDetail = txToDoDetailReposDay.findById(txToDoDetailId);
@@ -97,7 +93,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ItemCode", "CustNo", "FacmNo", "BormNo", "DtlValue"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = txToDoDetailReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = txToDoDetailReposHist.findAll(pageable);
     else 
       slice = txToDoDetailRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("detailStatusRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " status_1 : " +  status_1 + " status_2 : " +  status_2);
+    this.info("detailStatusRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " status_1 : " +  status_1 + " status_2 : " +  status_2);
     if (dbName.equals(ContentName.onDay))
       slice = txToDoDetailReposDay.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, status_1, status_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = txToDoDetailReposHist.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, status_1, status_2, pageable);
     else 
       slice = txToDoDetailRepos.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAscDtlValueAsc(itemCode_0, status_1, status_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("DtlValueRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " dtlValue_1 : " +  dtlValue_1 + " dtlValue_2 : " +  dtlValue_2);
+    this.info("DtlValueRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " dtlValue_1 : " +  dtlValue_1 + " dtlValue_2 : " +  dtlValue_2);
     if (dbName.equals(ContentName.onDay))
       slice = txToDoDetailReposDay.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = txToDoDetailReposHist.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
     else 
       slice = txToDoDetailRepos.findAllByItemCodeIsAndDtlValueGreaterThanEqualAndDtlValueLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, dtlValue_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("itemCodeRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " dtlValue_1 : " +  dtlValue_1 + " status_2 : " +  status_2 + " status_3 : " +  status_3 + " dataDate_4 : " +  dataDate_4 + " dataDate_5 : " +  dataDate_5);
+    this.info("itemCodeRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " dtlValue_1 : " +  dtlValue_1 + " status_2 : " +  status_2 + " status_3 : " +  status_3 + " dataDate_4 : " +  dataDate_4 + " dataDate_5 : " +  dataDate_5);
     if (dbName.equals(ContentName.onDay))
       slice = txToDoDetailReposDay.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = txToDoDetailReposHist.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
     else 
       slice = txToDoDetailRepos.findAllByItemCodeIsAndDtlValueIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, dtlValue_1, status_2, status_3, dataDate_4, dataDate_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("DataDateRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " status_1 : " +  status_1 + " status_2 : " +  status_2 + " dataDate_3 : " +  dataDate_3 + " dataDate_4 : " +  dataDate_4);
+    this.info("DataDateRange " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " status_1 : " +  status_1 + " status_2 : " +  status_2 + " dataDate_3 : " +  dataDate_3 + " dataDate_4 : " +  dataDate_4);
     if (dbName.equals(ContentName.onDay))
       slice = txToDoDetailReposDay.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -207,6 +215,37 @@ em = null;
     else 
       slice = txToDoDetailRepos.findAllByItemCodeIsAndStatusGreaterThanEqualAndStatusLessThanEqualAndDataDateGreaterThanEqualAndDataDateLessThanEqualOrderByStatusAscCustNoAscFacmNoAscBormNoAsc(itemCode_0, status_1, status_2, dataDate_3, dataDate_4, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<TxToDoDetail> findTxNoEq(String itemCode_0, int titaEntdy_1, String titaKinbr_2, String titaTlrNo_3, int titaTxtNo_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<TxToDoDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findTxNoEq " + dbName + " : " + "itemCode_0 : " + itemCode_0 + " titaEntdy_1 : " +  titaEntdy_1 + " titaKinbr_2 : " +  titaKinbr_2 + " titaTlrNo_3 : " +  titaTlrNo_3 + " titaTxtNo_4 : " +  titaTxtNo_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = txToDoDetailReposDay.findAllByItemCodeIsAndTitaEntdyIsAndTitaKinbrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByItemCodeAscCustNoAscBormNoAscDtlValueAsc(itemCode_0, titaEntdy_1, titaKinbr_2, titaTlrNo_3, titaTxtNo_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = txToDoDetailReposMon.findAllByItemCodeIsAndTitaEntdyIsAndTitaKinbrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByItemCodeAscCustNoAscBormNoAscDtlValueAsc(itemCode_0, titaEntdy_1, titaKinbr_2, titaTlrNo_3, titaTxtNo_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = txToDoDetailReposHist.findAllByItemCodeIsAndTitaEntdyIsAndTitaKinbrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByItemCodeAscCustNoAscBormNoAscDtlValueAsc(itemCode_0, titaEntdy_1, titaKinbr_2, titaTlrNo_3, titaTxtNo_4, pageable);
+    else 
+      slice = txToDoDetailRepos.findAllByItemCodeIsAndTitaEntdyIsAndTitaKinbrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByItemCodeAscCustNoAscBormNoAscDtlValueAsc(itemCode_0, titaEntdy_1, titaKinbr_2, titaTlrNo_3, titaTxtNo_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -215,7 +254,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + txToDoDetailId);
+    this.info("Hold " + dbName + " " + txToDoDetailId);
     Optional<TxToDoDetail> txToDoDetail = null;
     if (dbName.equals(ContentName.onDay))
       txToDoDetail = txToDoDetailReposDay.findByTxToDoDetailId(txToDoDetailId);
@@ -233,7 +272,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + txToDoDetail.getTxToDoDetailId());
+    this.info("Hold " + dbName + " " + txToDoDetail.getTxToDoDetailId());
     Optional<TxToDoDetail> txToDoDetailT = null;
     if (dbName.equals(ContentName.onDay))
       txToDoDetailT = txToDoDetailReposDay.findByTxToDoDetailId(txToDoDetail.getTxToDoDetailId());
@@ -254,13 +293,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + txToDoDetail.getTxToDoDetailId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		}
+    this.info("Insert..." + dbName + " " + txToDoDetail.getTxToDoDetailId());
     if (this.findById(txToDoDetail.getTxToDoDetailId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       txToDoDetail.setCreateEmpNo(empNot);
+
+    if(txToDoDetail.getLastUpdateEmpNo() == null || txToDoDetail.getLastUpdateEmpNo().isEmpty())
+      txToDoDetail.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return txToDoDetailReposDay.saveAndFlush(txToDoDetail);	
@@ -281,7 +323,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + txToDoDetail.getTxToDoDetailId());
+    this.info("Update..." + dbName + " " + txToDoDetail.getTxToDoDetailId());
     if (!empNot.isEmpty())
       txToDoDetail.setLastUpdateEmpNo(empNot);
 
@@ -304,7 +346,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + txToDoDetail.getTxToDoDetailId());
+    this.info("Update..." + dbName + " " + txToDoDetail.getTxToDoDetailId());
     if (!empNot.isEmpty())
       txToDoDetail.setLastUpdateEmpNo(empNot);
 
@@ -324,7 +366,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + txToDoDetail.getTxToDoDetailId());
+    this.info("Delete..." + dbName + " " + txToDoDetail.getTxToDoDetailId());
     if (dbName.equals(ContentName.onDay)) {
       txToDoDetailReposDay.delete(txToDoDetail);	
       txToDoDetailReposDay.flush();
@@ -353,11 +395,13 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (TxToDoDetail t : txToDoDetail) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+    for (TxToDoDetail t : txToDoDetail){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       txToDoDetail = txToDoDetailReposDay.saveAll(txToDoDetail);	
@@ -386,7 +430,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (txToDoDetail == null || txToDoDetail.size() == 0)
       throw new DBException(6);
 
@@ -415,7 +459,7 @@ em = null;
 
   @Override
   public void deleteAll(List<TxToDoDetail> txToDoDetail, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

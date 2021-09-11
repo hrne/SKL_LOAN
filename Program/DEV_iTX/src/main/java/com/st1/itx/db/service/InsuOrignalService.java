@@ -72,6 +72,20 @@ public interface InsuOrignalService {
   public Slice<InsuOrignal> clNoEqual(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND OrigInsuNo =
+   *
+   * @param clCode1_0 clCode1_0
+   * @param clCode2_1 clCode2_1
+   * @param clNo_2 clNo_2
+   * @param origInsuNo_3 origInsuNo_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuOrignal InsuOrignal of List
+   */
+  public Slice<InsuOrignal> findOrigInsuNoEq(int clCode1_0, int clCode2_1, int clNo_2, String origInsuNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By InsuOrignal
    * 
    * @param insuOrignalId key

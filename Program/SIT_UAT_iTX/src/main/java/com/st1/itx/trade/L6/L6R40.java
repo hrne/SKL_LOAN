@@ -61,8 +61,8 @@ public class L6R40 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R40DeptCodeXA"+r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSA"+r, aaCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R40WorkMonthEA"+r, aaCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R40WorkMonthSA"+r, Integer.valueOf(aaCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R40WorkMonthEA"+r, Integer.valueOf(aaCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}
@@ -83,8 +83,8 @@ public class L6R40 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R40DeptCodeXB"+r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSB"+r, bbCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R40WorkMonthEB"+r, bbCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R40WorkMonthSB"+r, Integer.valueOf(bbCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R40WorkMonthEB"+r, Integer.valueOf(bbCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}
@@ -105,8 +105,8 @@ public class L6R40 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R40DeptCodeXC"+r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSC"+r, ccCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R40WorkMonthEC"+r, ccCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R40WorkMonthSC"+r, Integer.valueOf(ccCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R40WorkMonthEC"+r, Integer.valueOf(ccCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}
@@ -127,8 +127,8 @@ public class L6R40 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R40DeptCodeXD"+r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSD"+r, ddCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R40WorkMonthED"+r, ddCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R40WorkMonthSD"+r, Integer.valueOf(ddCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R40WorkMonthED"+r, Integer.valueOf(ddCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}
@@ -149,8 +149,8 @@ public class L6R40 extends TradeBuffer {
 				} else {
 					totaVo.putParam("L6R40DeptCodeXE"+r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSE"+r, eeCdPfParms.getWorkMonthStart());
-				totaVo.putParam("L6R40WorkMonthEE"+r, eeCdPfParms.getWorkMonthEnd());
+				totaVo.putParam("L6R40WorkMonthSE"+r, Integer.valueOf(eeCdPfParms.getWorkMonthStart())-191100);
+				totaVo.putParam("L6R40WorkMonthEE"+r, Integer.valueOf(eeCdPfParms.getWorkMonthEnd())-191100);
 				r++;
 			}
 		}

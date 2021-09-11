@@ -298,7 +298,7 @@ public interface InsuRenewService {
    * @param titaVo Variable-Length Argument
    * @return Slice InsuRenew InsuRenew of List
    */
-  public Slice<InsuRenew> findL4605A(int clCode1_0, int clCode2_1, int clNo_2, String prevInsuNo_3, int index, int limit, TitaVo... titaVo);
+  public Slice<InsuRenew> findPrevInsuNoEq(int clCode1_0, int clCode2_1, int clNo_2, String prevInsuNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * NotiTempFg = 

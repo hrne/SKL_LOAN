@@ -55,6 +55,7 @@ T(3,*)
 #FdOClCode1=X,2,L
 #FdOClTypeCode=X,2,L
 #FdOOwnerId=X,2,L
+#FdOOwnerRelCode=X,2,L
 #FdOEvaDate=X,2,L
 #FdOServiceLife=X,2,L
 #FdOProductType=X,2,L
@@ -179,6 +180,7 @@ T(3,CdCode.SettingStatCode)
 
 #SettingStatHelp=x,1024,S
 
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
@@ -195,15 +197,19 @@ T(2,@ClStatusHelp,#HelpDesc8)
 T(2,@MtgCodeHelp,#HelpDesc9)
 T(2,@LicenseUsageHelp,#HelpDesc10)
 
+#RelationCodeHelp=x,3000,S
+
+#CDDEF13=x,20,S
+T(3,CdGuarantor)
 
 #HelpRim2=X,1,S
 RESET_RIM(#HelpRim2,XXR99)
-S(XXR99,01,#CDDEF11,#CDDEF12)
+S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClStatHelp,#HelpDesc1)
 T(2,@SettingStatHelp,#HelpDesc2)
-
+T(2,@RelationCodeHelp,#HelpDesc3)
 
 
 #YNHelp=x,20,S
@@ -212,11 +218,12 @@ T(3,Y:是;N:否)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
-#NTXBUF=X,10,S
+#NTXBUF=X,17,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ClCode1,#NTXBUF,1,1)
 T(1,@ClCode2,#NTXBUF,2,2)
 T(1,@ClNo,#NTXBUF,4,7)
+T(1,@ApplNo,#NTXBUF,11,7)
 
 !代號1
 #ClCode1=A,1,L
@@ -242,6 +249,8 @@ T(H,#COLIND,#ClCode2Help)
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
+#ApplNo=A,7,L
+
 #RimClCode1=A,1,S
 #RimClCode2=A,2,S
 #RimClNo=A,7,S
@@ -259,6 +268,27 @@ E(0,@OGdRid1,#L2r17GdrId1)
 E(0,@OGdRid2,#L2r17GdrId2)
 E(0,@OGdRnum,#L2r17GdrNum)
 
+#FunCd=X,1,S
+
+#ApproveNo=A,7,L
+
+<include src="ROM.icf::L2R52.dec"/>
+#RimL2R52=X,1,S
+C(3,#ApplNo,0,S,$)
+RESET_RIM(#RimL2R52,L2R52)
+E(0,@ApproveNo,#ApplNo)
+E(0,@FunCd,5)
+S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
+R(1,L2R52)
+T(2,@OOwnerRelCode,#L2r52OwnerRelCode1)
+
+
+!與授信戶關係
+#OOwnerRelCode=X,2,L
+
+#OOwnerRelCodeX=X,40,L
+C(4,#OOwnerRelCode,S,$)
+T(H,#OOwnerRelCode,#RelationCodeHelp)
 
 #RPTFG=A,1,S
 
@@ -532,6 +562,7 @@ TXFORM=L2912
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R17.tom"/>
+<include src="ROM.icf::L2R52.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 <sub type="PART" name="L2912" layout="cols=3;screen.width=[150,260,300,350];printer.width=[15,30,15,30];order=1">
@@ -540,6 +571,7 @@ TXFORM=L2912
 ["#FdOClCode1+擔保品編號",#OClCode1,"-",#OClCode2,"-",#OClNo],["#FdOGdRid+原擔保品編號",#OGdALL],
 ["#FdOClTypeCode+擔保品類別",#OClTypeCode,#OClTypeCodeX],["#FdOCityCode+地區別",#OCityCode,#OCityCodeX],
 ["#FdOOwnerId+所有權人統編",#OOwnerId],["#FdOOwnerName+所有權人姓名",#OOwnerName],
+[#<->#,"#FdOOwnerRelCode+與授信戶關係",#OOwnerRelCode,#OOwnerRelCodeX],
 ["#FdOEvaDate+鑑估日期",#OEvaDate],["#FdOEvaAmt+鑑價總值",#OEvaAmt],
 ["#FdOServiceLife+耐用年限",#OServiceLife],["#FdOProductSpec+型式+/+規格",#OProductSpec],
 ["#FdOProductType+產品代碼/型號",#OProductType],["#FdOProductBrand+品牌+/+廠牌+/+船名",#OProductBrand],

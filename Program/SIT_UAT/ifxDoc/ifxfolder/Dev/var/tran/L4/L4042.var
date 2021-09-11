@@ -328,6 +328,7 @@ T(2,5
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_CREAT})
 #OOBTN_EDIT=A,2,O
 C(4,#OOAuthStatus,IF(#OOMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT})),BIND(grid,cancel))
+C(4,#OOAuthStatus,IF(#OOMediaCode=="Y",s,$),$)
 IF(#OOCreateFlag=="D"||#OOCreateFlag=="Z",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT}))
 C(4,#OOAuthStatus,s,$)
 IF(#OOAuthStatus=="0",
@@ -411,8 +412,6 @@ TXFORM=L4042
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOCustNo=戶號
 {width:65,align:'center'}
-#OOFacmNo=額度
-{width:45,align:'center'}
 #OORepayBankX=扣款銀行
 {width:120}
 #OORepayAcct=扣款帳號
@@ -446,8 +445,6 @@ TXFORM=L4042
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOCustNo=戶號
 {width:65,align:'center'}
-#OOFacmNo=額度
-{width:45,align:'center'}
 
 #OORepayBankX=扣款銀行
 {width:120}
@@ -481,8 +478,6 @@ TXFORM=L4042
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOCustNo=戶號
 {width:65,align:'center'}
-#OOFacmNo=額度
-{width:45,align:'center'}
 #OORepayBankX=扣款銀行
 {width:120}
 #OORepayAcct=扣款帳號
@@ -515,8 +510,6 @@ TXFORM=L4042
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
 #OOCustNo=戶號
 {width:65,align:'center'}
-#OOFacmNo=額度
-{width:45,align:'center'}
 #OORepayBankX=扣款銀行
 {width:120}
 #OORepayAcct=扣款帳號

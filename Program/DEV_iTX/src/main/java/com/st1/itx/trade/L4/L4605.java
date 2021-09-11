@@ -37,7 +37,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4605 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4605.class);
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -75,8 +74,7 @@ public class L4605 extends TradeBuffer {
 
 //		吃檔
 //		String filePath1 = "D:\\temp\\test\\火險\\Test\\Return\\201912_final.txt";
-		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-				+ File.separatorChar + titaVo.getParam("FILENA").trim();
+		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		ArrayList<String> dataLineList = new ArrayList<>();
 
@@ -105,8 +103,7 @@ public class L4605 extends TradeBuffer {
 					newInsuNo = newInsuNo.trim();
 				}
 
-				tmpInsu tmp = new tmpInsu(parse.stringToInteger(tempOccursList.get("CustNo")),
-						parse.stringToInteger(tempOccursList.get("FacmNo")), insuNo, newInsuNo);
+				tmpInsu tmp = new tmpInsu(parse.stringToInteger(tempOccursList.get("CustNo")), parse.stringToInteger(tempOccursList.get("FacmNo")), insuNo, newInsuNo);
 //				Initial
 				error.put(tmp, 0);
 
@@ -121,8 +118,7 @@ public class L4605 extends TradeBuffer {
 
 //				續保檔若調整內容，增加有批單號碼的筆數。
 //				提出檔合為一筆，回傳時以List回頭update續保檔
-				sInsuRenew = insuRenewService.findL4605A(parse.stringToInteger(tempOccursList.get("ClCode1")),
-						parse.stringToInteger(tempOccursList.get("ClCode2")),
+				sInsuRenew = insuRenewService.findPrevInsuNoEq(parse.stringToInteger(tempOccursList.get("ClCode1")), parse.stringToInteger(tempOccursList.get("ClCode2")),
 						parse.stringToInteger(tempOccursList.get("ClNo")), insuNo, this.index, this.limit, titaVo);
 
 				lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
@@ -133,8 +129,7 @@ public class L4605 extends TradeBuffer {
 						tInsuRenew = insuRenewService.holdById(tInsuRenew.getInsuRenewId());
 
 						this.info("tInsuRenew : " + tInsuRenew.toString());
-						if (!"".equals(tInsuRenew.getNowInsuNo().trim())
-								&& !tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
+						if (!"".equals(tInsuRenew.getNowInsuNo().trim()) && !tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
 							error.put(tmp, 4);
 							alrdyInsu.put(tmp, newInsuNo);
 							continue;
@@ -158,35 +153,27 @@ public class L4605 extends TradeBuffer {
 							continue;
 						}
 
-						if (tInsuRenew.getInsuEndDate() + 19110000 != parse
-								.stringToInteger(tempOccursList.get("NewInsuEndDate").replace("/", ""))) {
+						if (tInsuRenew.getInsuEndDate() + 19110000 != parse.stringToInteger(tempOccursList.get("NewInsuEndDate").replace("/", ""))) {
 							this.info("InsuEndDate : " + tInsuRenew.getEthqInsuPrem() + 19110000);
-							this.info("NewInsuEndDate : "
-									+ parse.stringToInteger(tempOccursList.get("NewInsuEndDate").replace("/", "")));
+							this.info("NewInsuEndDate : " + parse.stringToInteger(tempOccursList.get("NewInsuEndDate").replace("/", "")));
 							error.put(tmp, 10);
 							continue;
 						}
-						if (tInsuRenew.getFireInsuCovrg()
-								.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewFireInsuAmt"))) != 0
-								|| tInsuRenew.getFireInsuPrem().compareTo(
-										parse.stringToBigDecimal(tempOccursList.get("NewFireInsuFee"))) != 0) {
+						if (tInsuRenew.getFireInsuCovrg().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewFireInsuAmt"))) != 0
+								|| tInsuRenew.getFireInsuPrem().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewFireInsuFee"))) != 0) {
 							error.put(tmp, 11);
 							continue;
 						}
-						if (tInsuRenew.getEthqInsuCovrg()
-								.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewEqInsuAmt"))) != 0
-								|| tInsuRenew.getEthqInsuPrem()
-										.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewEqInsuFee"))) != 0) {
+						if (tInsuRenew.getEthqInsuCovrg().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewEqInsuAmt"))) != 0
+								|| tInsuRenew.getEthqInsuPrem().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewEqInsuFee"))) != 0) {
 							error.put(tmp, 12);
 							continue;
 						}
-						if (tInsuRenew.getTotInsuPrem()
-								.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewTotalFee"))) != 0) {
+						if (tInsuRenew.getTotInsuPrem().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewTotalFee"))) != 0) {
 							error.put(tmp, 13);
 							continue;
 						}
-						if (!"".equals(tInsuRenew.getNowInsuNo().trim())
-								&& tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
+						if (!"".equals(tInsuRenew.getNowInsuNo().trim()) && tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
 							error.put(tmp, 14);
 							alrdyInsu.put(tmp, newInsuNo);
 							continue;

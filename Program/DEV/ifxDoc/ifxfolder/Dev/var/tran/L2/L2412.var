@@ -631,11 +631,10 @@ T(3,動產)
 C(3,#FunCd,1,$,s)
 HELP(#ClCode2Help)
 @V(H,#ClCode2Help)
-C(3,#ClCode2,02,INVOKEJS(SHOW,p2,6,11,0),INVOKEJS(SHOW,p2,6,11,1))
 
 #ClCode2X=X,13,L
 T(H,#ClCode2,#ClCode2Help)
-
+C(3,#ClCode2,02,INVOKEJS(SHOW,p2,6,11,0),INVOKEJS(SHOW,p2,6,11,1))
 ![擔保品編號]
 #ClNo=A,7,L
 
@@ -787,6 +786,18 @@ HELP(#L6r03ResultCity,cols:5)
 C(4,#CityCode,S,$)
 T(H,#CityCode,#L6r03ResultCity)
 
+#ApproveNo=A,7,L
+
+<include src="ROM.icf::L2R52.dec"/>
+#RimL2R52=X,1,S
+C(3,#FunCd,1,S,$)
+C(3,#FunCd,4,S,$)
+C(3,#ApplNo,0,S,$)
+RESET_RIM(#RimL2R52,L2R52)
+E(0,@ApproveNo,#ApplNo)
+S(L2R52,1,#FunCd,#ClCode1,#ClCode2,#ClNo,#ApproveNo)
+R(1,L2R52)
+T(2,@OwnerRelCode,#L2r52OwnerRelCode1)
 
 !所有權人統編
 #OwnerId=X,10,I
@@ -1050,6 +1061,7 @@ T(3,)T(H,#MtgCode,#MtgCodeHelp)
 
 !殘值
 #ScrapValue=m,14,I
+IF(#PageFg==2,$,CALL(#Show2))
 IF(#FunCd==4,s,$)
 
 
@@ -1345,6 +1357,7 @@ TXFORM=L2412
 <include src="ROM.icf::L2R22.tom"/>
 <include src="ROM.icf::L2R24.tom"/>
 <include src="ROM.icf::L2R41.tom"/>
+<include src="ROM.icf::L2R52.tom"/>
 <include src="ROM.icf::L6R03.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

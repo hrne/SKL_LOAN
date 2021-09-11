@@ -7,8 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,11 +19,10 @@ import com.st1.itx.util.common.MakeReport;
 @Component("LD009Report")
 @Scope("prototype")
 public class LD009Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LD009Report.class);
-	
+
 	@Autowired
 	LD009ServiceImpl lD009ServiceImpl;
-	
+
 	// ReportDate : 報表日期(帳務日)
 	// ReportCode : 報表編號
 	// ReportItem : 報表名稱
@@ -47,7 +44,7 @@ public class LD009Report extends MakeReport {
 	// 製表時間
 	@SuppressWarnings("unused")
 	private String nowTime;
-	
+
 	// length: 167
 	// usually we do print() with x at 1 instead of 0 so the last symbol output is
 	// actually at length-1;
@@ -56,17 +53,16 @@ public class LD009Report extends MakeReport {
 	// e.g. print(0, newBorder.length, s, "R");
 	private String newBorder = "====================================================================================================================================================================="
 			+ " ";
-	
+
 	private int thisMaxRow = 45;
-	
+
 	/**
 	 * Make sure there's space for <i>line</i> lines of output on current page.
+	 * 
 	 * @param line amount of lines
 	 */
-	private void MakeSpace(int line)
-	{
-		if (thisMaxRow - this.NowRow < line) 
-		{ 
+	private void MakeSpace(int line) {
+		if (thisMaxRow - this.NowRow < line) {
 			newPage();
 		}
 	}
@@ -78,18 +74,18 @@ public class LD009Report extends MakeReport {
 		this.info("LD009Report.printHeader");
 
 		this.print(-1, 1, "程式ID：" + this.getParentTranCode());
-		
+
 		this.print(-1, 150, "機密等級：" + this.security);
 		this.print(-2, 150, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, 150, "時　　間：" + showTime(this.nowTime));
 		this.print(-4, 150, "頁　　數：" + this.getNowPage());
 		this.print(-5, 150, "單　　位：元");
-		
+
 		this.print(-2, newBorder.length() / 2, "新光人壽保險股份有限公司", "C");
 		this.print(-3, newBorder.length() / 2, this.reportItem, "C");
-		
+
 		this.print(-5, newBorder.length() / 2, showRocDate(this.reportDate), "C");
-		
+
 		/**
 		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
 		 * ----------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -98,7 +94,7 @@ public class LD009Report extends MakeReport {
 		this.print(-8, 1, "　　　　　　　　　　　　----------------------------------------------　------------------------------------------------------------------------------------------");
 		this.print(-9, 1, "業務科目      　           前日　　加　　減　展入　展出　淨值　　本日　　　　前　　日　　　　　　　加　　　　　　　減　　　　淨增減　　　　本　　日　　　　　　展　期");
 		this.print(-10, 1, newBorder);
-		
+
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(11);
 
@@ -110,16 +106,15 @@ public class LD009Report extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-	
+
 	}
-	
-	private void fillData(TitaVo titaVo)
-	{
-		
+
+	private void fillData(TitaVo titaVo) {
+
 		this.newPage();
-		
+
 		List<Map<String, String>> lLD009 = null;
-		
+
 		try {
 			lLD009 = lD009ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
@@ -127,7 +122,7 @@ public class LD009Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.error("LD009ServiceImpl.findAll error = " + errors.toString());
 		}
-		
+
 		/**
 		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6-----
 		 * ----------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345
@@ -136,28 +131,22 @@ public class LD009Report extends MakeReport {
 //		this.print(-8, 1, "　　　　　　　　　　　 ----------------------------------------------　------------------------------------------------------------------------------------------");
 //		this.print(-9, 1, "業務科目                　前日　　加　　減　展入　展出　淨值　　本日　　　　前　　日　　　　　　　加　　　　　　　減　　　　淨增減　　　　本　　日　　　　　　展　期");
 
-	
-		
-		if (lLD009 != null && lLD009.size() != 0)
-		{
+		if (lLD009 != null && lLD009.size() != 0) {
 			BigDecimal[] totalArray = new BigDecimal[13];
 			Arrays.fill(totalArray, BigDecimal.ZERO);
-			
+
 			BigDecimal[] totalPerItem = new BigDecimal[13];
 			Arrays.fill(totalPerItem, BigDecimal.ZERO);
-			
-			String lastAcctItem = "this is a first output peko";
-			
-			for (Map<String, String> tLDVo : lLD009)
-			{
+
+			String lastAcctItem = null;
+
+			for (Map<String, String> tLDVo : lLD009) {
 				print(1, 0, "    ");
-				
+
 				// 每個 AcctItem 僅第一次出現時 print
-				if (!lastAcctItem.equals(tLDVo.get("F1")))
-				{
+				if (lastAcctItem == null || !lastAcctItem.equals(tLDVo.get("F1"))) {
 					// 避免最開頭出小計
-					if (!lastAcctItem.equals("this is a first output peko"))
-					{
+					if (lastAcctItem != null) {
 						// 小計
 						print(0, 18, "小　　計");
 						print(0, 32, totalPerItem[0].toString(), "R");
@@ -173,22 +162,22 @@ public class LD009Report extends MakeReport {
 						print(0, 132, formatAmt(totalPerItem[10], 0), "R");
 						print(0, 148, formatAmt(totalPerItem[11], 0), "R");
 						print(0, 166, formatAmt(totalPerItem[12], 0), "R");
-						
+
 						// 小計重置
 						totalPerItem = new BigDecimal[13];
 						Arrays.fill(totalPerItem, BigDecimal.ZERO);
-						
+
 						// 換行
 						print(1, 0, "    ");
 						print(1, 0, "    ");
 						print(1, 0, "    ");
 
+					}
+
+					lastAcctItem = tLDVo.get("F1");
+					print(0, 1, lastAcctItem);
 				}
-					
-				lastAcctItem = tLDVo.get("F1");
-				print(0, 1, lastAcctItem);
-				}
-				
+
 				print(0, 18, tLDVo.get("F3"));
 				print(0, 32, tLDVo.get("F4"), "R");
 				print(0, 38, tLDVo.get("F5"), "R");
@@ -203,15 +192,14 @@ public class LD009Report extends MakeReport {
 				print(0, 132, formatAmt(tLDVo.get("F14"), 0), "R");
 				print(0, 148, formatAmt(tLDVo.get("F15"), 0), "R");
 				print(0, 166, formatAmt(tLDVo.get("F16"), 0), "R");
-				
-				for (int i = 0; i < 13; i++)
-				{
-					totalArray[i] = totalArray[i].add( new BigDecimal(tLDVo.get("F"+(4+i)) ) );
-					totalPerItem[i] = totalPerItem[i].add( new BigDecimal(tLDVo.get("F"+(4+i)) ) );
+
+				for (int i = 0; i < 13; i++) {
+					totalArray[i] = totalArray[i].add(new BigDecimal(tLDVo.get("F" + (4 + i))));
+					totalPerItem[i] = totalPerItem[i].add(new BigDecimal(tLDVo.get("F" + (4 + i))));
 				}
-				
+
 			}
-			
+
 			// 最後一項的小計
 
 			print(1, 0, "   ");
@@ -229,7 +217,7 @@ public class LD009Report extends MakeReport {
 			print(0, 132, formatAmt(totalPerItem[10], 0), "R");
 			print(0, 148, formatAmt(totalPerItem[11], 0), "R");
 			print(0, 166, formatAmt(totalPerItem[12], 0), "R");
-			
+
 			MakeSpace(3);
 			this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 1, " 合　　計");
@@ -248,28 +236,24 @@ public class LD009Report extends MakeReport {
 			print(0, 166, formatAmt(totalArray[12], 0), "R");
 			this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-		}
-		else
-		{
+		} else {
 			print(1, 0, "本日無資料");
 		}
-		
+
 		print((thisMaxRow + 2) * -1, newBorder.length() / 2, "===== 報　表　結　束 =====", "C");
-		
+
 	}
-	
-	public void makePdf(TitaVo titaVo) throws LogicException
-	{				
-			this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
-			this.setCharSpaces(0);
-			
-			fillData(titaVo);
+	public void makePdf(TitaVo titaVo) throws LogicException {
+		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
-			this.toPdf(this.close(), reportCode+"_"+reportItem);
-		
-		}
+		this.setCharSpaces(0);
 
+		fillData(titaVo);
+
+		this.toPdf(this.close(), reportCode + "_" + reportItem);
+
+	}
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("LD009Report exec ...");
@@ -283,9 +267,9 @@ public class LD009Report extends MakeReport {
 
 		this.nowDate = dDateUtil.getNowStringRoc();
 		this.nowTime = dDateUtil.getNowStringTime();
-		
+
 		makePdf(titaVo);
-		
+
 		return true;
 	}
 }

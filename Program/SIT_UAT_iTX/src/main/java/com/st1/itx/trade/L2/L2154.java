@@ -239,7 +239,6 @@ public class L2154 extends TradeBuffer {
 	private int wkIdx;
 	private String sProdNo = "";
 	private TempVo tTempVo = new TempVo();
-	private TempVo t1TempVo = new TempVo();
 	private TxTemp tTxTemp;
 	private TxTempId tTxTempId;
 	private FacProd tFacProd;
@@ -391,6 +390,7 @@ public class L2154 extends TradeBuffer {
 			wkFacmNo = this.parse.stringToInteger(tx.getSeqNo().substring(7, 10));
 			wkIdx = this.parse.stringToInteger(tx.getSeqNo().substring(10, 13));
 			tTempVo = tTempVo.getVo(tx.getText());
+			this.info("   tTempVo = " + tTempVo.toString());
 			this.info("   wkCustNo = " + wkCustNo);
 			this.info("   wkFacmNo = " + wkFacmNo);
 			switch (iFuncCode) {
@@ -440,7 +440,8 @@ public class L2154 extends TradeBuffer {
 			wkCustNo = this.parse.stringToInteger(tx.getSeqNo().substring(0, 7));
 			wkFacmNo = this.parse.stringToInteger(tx.getSeqNo().substring(7, 10));
 			wkIdx = this.parse.stringToInteger(tx.getSeqNo().substring(10, 13));
-			t1TempVo = tTempVo.getVo(tx.getText());
+			tTempVo = tTempVo.getVo(tx.getText());
+			this.info("   tTempVo = " + tTempVo);
 			this.info("   wkCustNo = " + wkCustNo);
 			this.info("   wkFacmNo = " + wkFacmNo);
 			this.info("   wkIdx    = " + wkIdx);
@@ -639,14 +640,14 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("Breach", tFacMain.getBreachDescription());
 		tTempVo.putParam("CreditScore", tFacMain.getCreditScore());
 		tTempVo.putParam("RepayCode", tFacMain.getRepayCode());
-		tTempVo.putParam("RepayBank", titaVo.getParam("RepayBank"));
-		tTempVo.putParam("RepayAcctNo", titaVo.getParam("RepayAcctNo"));
-		tTempVo.putParam("PostCode", titaVo.getParam("PostCode"));
-		tTempVo.putParam("RelationCode", titaVo.getParam("RelationCode"));
-		tTempVo.putParam("RelationName", titaVo.getParam("RelationName"));
-		tTempVo.putParam("RelationId", titaVo.getParam("RelationId"));
-		tTempVo.putParam("RelationBirthday", titaVo.getParam("RelationBirthday"));
-		tTempVo.putParam("RelationGender", titaVo.getParam("RelationGender"));
+		tTempVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
+		tTempVo.putParam("RepayAcctNo", titaVo.getParam("OldAcctNo"));
+		tTempVo.putParam("PostCode", titaVo.getParam("OldPostCode"));
+		tTempVo.putParam("RelationCode", titaVo.getParam("OldRelationCode"));
+		tTempVo.putParam("RelationName", titaVo.getParam("OldRelationName"));
+		tTempVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
+		tTempVo.putParam("RelationBirthday", titaVo.getParam("OldRelationBirthday"));
+		tTempVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
 //		tTempVo.putParam("AchAuthCode", tFacMain.getAchAuthCode());
 //		tTempVo.putParam("AchBank", tFacMain.getAchBank());
 //		tTempVo.putParam("AchAuthNo", tFacMain.getAchAuthNo());
@@ -865,7 +866,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setAcDate(this.parse.stringToInteger(tTempVo.getParam("AcDate")));
 
 		try {
-			tFacMain = facMainService.update(tFacMain, titaVo);
+			tFacMain = facMainService.update2(tFacMain, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007",
 					"額度主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
@@ -983,38 +984,36 @@ public class L2154 extends TradeBuffer {
 	}
 
 	private void bankAuthActRoutine() throws LogicException {
-		if (titaVo.getParam("PostCode").equals(tTempVo.getParam("PostCode"))
-				&& titaVo.getParam("RepayAcctNo").equals(tTempVo.getParam("RepayAcctNo"))
-				&& titaVo.getParam("RelationCode").equals(tTempVo.getParam("RelationCode"))
-				&& titaVo.getParam("RelationName").equals(tTempVo.getParam("RelationName"))
-				&& titaVo.getParam("RelationBirthday").equals(tTempVo.getParam("RelationBirthday"))
-				&& titaVo.getParam("RelationGender").equals(tTempVo.getParam("RelationGender"))
-				&& titaVo.getParam("RelationId").equals(tTempVo.getParam("RelationId"))
-				&& titaVo.getParam("RepayBank").equals(tTempVo.getParam("RepayBank"))
-				&& titaVo.getParam("CustId").equals(tTempVo.getParam("CustId"))) {
+		if (titaVo.getParam("PostCode").equals(titaVo.getParam("OldPostCode"))
+				&& titaVo.getParam("RepayAcctNo").equals(titaVo.getParam("OldAcctNo"))
+				&& titaVo.getParam("RelationCode").equals(titaVo.getParam("OldRelationCode"))
+				&& titaVo.getParam("RelationName").equals(titaVo.getParam("OldRelationName"))
+				&& titaVo.getParam("RelationBirthday").equals(titaVo.getParam("OldRelationBirthday"))
+				&& titaVo.getParam("RelationGender").equals(titaVo.getParam("OldRelationGender"))
+				&& titaVo.getParam("RelationId").equals(titaVo.getParam("OldRelationId"))
+				&& titaVo.getParam("RepayBank").equals(titaVo.getParam("OldRepayBank"))
+				) {
 			return;
 		}
 
 		// 舊授權刪除
-		if ("02".equals(t1TempVo.getParam("RepayCode"))) {
+
+		if ("02".equals(titaVo.getParam("OldRepayCode")) || "2".equals(titaVo.getParam("OldRepayCode"))) {
 			txtitaVo = new TitaVo();
 			txtitaVo = (TitaVo) titaVo.clone();
-			txtitaVo.putParam("PostCode", t1TempVo.getParam("PostCode"));
-			txtitaVo.putParam("RepayAcctNo", t1TempVo.getParam("RepayAcctNo"));
-			txtitaVo.putParam("RelationCode", t1TempVo.getParam("RelationCode"));
-			txtitaVo.putParam("RelationName", t1TempVo.getParam("RelationName"));
-			txtitaVo.putParam("RelationBirthday", t1TempVo.getParam("RelationBirthday"));
-			txtitaVo.putParam("RelationGender", t1TempVo.getParam("RelationGender"));
-			txtitaVo.putParam("RelationId", t1TempVo.getParam("RelationId"));
-			txtitaVo.putParam("RepayBank", t1TempVo.getParam("RepayBank"));
-			txtitaVo.putParam("CustId", t1TempVo.getParam("CustId"));
-			txtitaVo.putParam("CustNo", iCustNo);
-			txtitaVo.putParam("FacmNo", iFacmNo);
+			txtitaVo.putParam("PostCode", titaVo.getParam("OldPostCode"));
+			txtitaVo.putParam("RepayAcctNo", titaVo.getParam("OldAcctNo"));
+			txtitaVo.putParam("RelationCode", titaVo.getParam("OldRelationCode"));
+			txtitaVo.putParam("RelationName", titaVo.getParam("OldRelationName"));
+			txtitaVo.putParam("RelationBirthday", titaVo.getParam("OldRelationBirthday"));
+			txtitaVo.putParam("RelationGender", titaVo.getParam("OldRelationGender"));
+			txtitaVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
+			txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
 			bankAuthActCom.del("A", txtitaVo);
 		}
 		// 新授權新增
 		if ("02".equals(titaVo.getParam("RepayCode"))) {
-			bankAuthActCom.add("A", txtitaVo);
+			bankAuthActCom.add("A", titaVo);
 		}
 	}
 

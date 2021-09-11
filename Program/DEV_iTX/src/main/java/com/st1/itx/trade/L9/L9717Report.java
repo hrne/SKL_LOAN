@@ -213,7 +213,7 @@ public class L9717Report extends MakeReport {
 			int itemAmt = 0;
 			int count = 0;
 
-			this.info("L9717 doing: " + currentSort + ", got results: " + lL9717.size() + " peko");
+			this.info("L9717 doing: " + currentSort + ", got results: " + lL9717.size());
 
 			int tempYear = 0;
 			String tempBsOfficer = "0";

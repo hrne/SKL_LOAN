@@ -1,8 +1,10 @@
 package com.st1.itx.trade.LP;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -10,198 +12,394 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdWorkMonth;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.service.springjpa.cm.LP005ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 
 @Component
 @Scope("prototype")
-
 public class LP005Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LP005Report.class);
 
 	@Autowired
-	LP005ServiceImpl LP005ServiceImpl;
+	LP005ServiceImpl lp005ServiceImpl;
+
+	@Autowired
+	CdWorkMonthService sCdWorkMonthService;
 
 	@Autowired
 	MakeExcel makeExcel;
 
-	@Override
-	public void printTitle() {
+	private List<Map<String, String>> listEmpClass = new ArrayList<>();
 
-	}
- 
 	public void exec(TitaVo titaVo) throws LogicException {
-		// 設定資料庫(必須的)
-//		LP005ServiceImpl.getEntityManager(titaVo);
-		try {
+		this.info("LP005Report exec ...");
 
-//			List<HashMap<String, String>> LP005List = LP005ServiceImpl.findAll();
-//			if(LP005List.size() > 0){
-			exportExcel(titaVo);
-//			  testExcel(titaVo, LP005List);
-//			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("LP005ServiceImpl.testExcel error = " + errors.toString());
+		// 系統會計日期
+		int iEntdy = titaVo.getEntDyI() + 19110000;
+
+		CdWorkMonth tCdWorkMonth = sCdWorkMonthService.findDateFirst(iEntdy, iEntdy, titaVo);
+
+		if (tCdWorkMonth == null) {
+			return;
 		}
-	}
 
-//	private void testExcel(TitaVo titaVo, List<HashMap<String, String>> LDList) throws LogicException {
-//		this.info("===========in testExcel");
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "房貸協辦人員考核核算底稿", "LP005協辦考核核算底稿",
-//				"協辦考核核算底稿.xlsx", "1月件數");
-//		makeExcel.setValue(5,1,"測試帳號");
-//		makeExcel.setValue(1,1,"測試2");
-//		String inf = "經辦;房貸專員;戶名;戶號;額度;"  // 24
-//				+ "撥款;撥款日;利率代碼;計件代碼;是否計件;"
-//				+ "撥款金額;部室代號;區部代號;單位代號;部室;"
-//				+ "區部;單位;員工代號;介紹人;處經理;"
-//				+ "區經理;換算業績;業務報酬;業績金額";
-//		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23";
-//		
-//		String inf1[] = inf.split(";");
-//		String txt1[] = txt.split(";") ;
-//		int i = 1;
-//		this.info("-----------------" + LDList);
-//		for (HashMap<String, String> tLDVo : LDList) {
-//			for( int j = 1 ; j <= tLDVo.size(); j++) {
-//				if( i == 1) {
-//					makeExcel.setValue(i, j, inf1[j-1]);
-//				} else {
-//					if(tLDVo.get(txt1[j-1]) == null) {
-//						makeExcel.setValue(i, j, "");
-//					} else {
-//						this.info("->" + tLDVo.get(txt1[j-1]));
-//						makeExcel.setValue(i, j, tLDVo.get(txt1[j-1]));
-//					}
-//				} // else 
-//			}		
-//			i++;
-//		}
+		// 業績年度
+		int pfYear = tCdWorkMonth.getYear();
 
-//		long sno = makeExcel.close();
-//		makeExcel.toExcel(sno);
-//	}
+		// 業績月份
+		int pfMonth = tCdWorkMonth.getMonth();
 
-	private void exportExcel(TitaVo titaVo) throws LogicException {
-		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "房貸協辦人員考核核算底稿", "LP005協辦考核核算底稿",
-				"協辦考核核算底稿.xlsx", "1月件數");
-		// makeExcel.setValue(5,1,"測試日期");
-//		makeExcel.setSheet("201903-固定");
-		makeExcel.setValue(2, 1, "5");
-		makeExcel.setValue(2, 2, "1445678");
-		makeExcel.setValue(2, 3, "陳水牛");
-		makeExcel.setValue(2, 4, "1000");
-		makeExcel.setValue(2, 5, "A0B000");
-		makeExcel.setValue(2, 6, "呂蓮花");
-		makeExcel.setValue(2, 7, "業務推展部");
-		makeExcel.setValue(2, 8, "彰化區部");
-		makeExcel.setValue(2, 9, "溪湖通－收");
-		makeExcel.setValue(2, 11, "呂蓮花");
+		int pfSeason = 0;
 
-		makeExcel.setSheet("1月金額");
-		makeExcel.setValue(2, 1, "1445678");
-		makeExcel.setValue(2, 2, "5");
-		makeExcel.setValue(2, 3, "500000");
-		makeExcel.setValue(2, 4, "1");
-		makeExcel.setValue(2, 5, "A0B000");
-		makeExcel.setValue(2, 6, "呂蓮花");
-		makeExcel.setValue(2, 7, "業務推展部");
-		makeExcel.setValue(2, 8, "彰化區部");
-		makeExcel.setValue(2, 9, "溪湖通－收");
+		// 判斷季度
+		if (pfMonth < 4) {
+			pfSeason = 1;
+		} else if (pfMonth < 7) {
+			pfSeason = 2;
+		} else if (pfMonth < 10) {
+			pfSeason = 3;
+		} else {
+			pfSeason = 4;
+		}
 
-		makeExcel.setSheet("2月件數");
-		makeExcel.setValue(2, 1, "5");
-		makeExcel.setValue(2, 2, "1445678");
-		makeExcel.setValue(2, 3, "陳水牛");
-		makeExcel.setValue(2, 4, "1000");
-		makeExcel.setValue(2, 5, "A0B000");
-		makeExcel.setValue(2, 6, "呂蓮花");
-		makeExcel.setValue(2, 7, "業務推展部");
-		makeExcel.setValue(2, 8, "彰化區部");
-		makeExcel.setValue(2, 9, "溪湖通－收");
-		makeExcel.setValue(2, 11, "呂蓮花");
+		this.info("pfYear = " + pfYear);
+		this.info("pfMonth = " + pfMonth);
+		this.info("pfSeason = " + pfSeason);
 
-		makeExcel.setSheet("2月金額");
-		makeExcel.setValue(2, 1, "1445678");
-		makeExcel.setValue(2, 2, "5");
-		makeExcel.setValue(2, 3, "500000");
-		makeExcel.setValue(2, 4, "1");
-		makeExcel.setValue(2, 5, "A0B000");
-		makeExcel.setValue(2, 6, "呂蓮花");
-		makeExcel.setValue(2, 7, "業務推展部");
-		makeExcel.setValue(2, 8, "彰化區部");
-		makeExcel.setValue(2, 9, "溪湖通－收");
-
-		makeExcel.setSheet("3月件數");
-		makeExcel.setValue(2, 1, "5");
-		makeExcel.setValue(2, 2, "1445678");
-		makeExcel.setValue(2, 3, "陳水牛");
-		makeExcel.setValue(2, 4, "1000");
-		makeExcel.setValue(2, 5, "A0B000");
-		makeExcel.setValue(2, 6, "呂蓮花");
-		makeExcel.setValue(2, 7, "業務推展部");
-		makeExcel.setValue(2, 8, "彰化區部");
-		makeExcel.setValue(2, 9, "溪湖通－收");
-		makeExcel.setValue(2, 11, "呂蓮花");
-
-		makeExcel.setSheet("3月金額");
-		makeExcel.setValue(2, 1, "1445678");
-		makeExcel.setValue(2, 2, "5");
-		makeExcel.setValue(2, 3, "500000");
-		makeExcel.setValue(2, 4, "1");
-		makeExcel.setValue(2, 5, "A0B000");
-		makeExcel.setValue(2, 6, "呂蓮花");
-		makeExcel.setValue(2, 7, "業務推展部");
-		makeExcel.setValue(2, 8, "彰化區部");
-		makeExcel.setValue(2, 9, "溪湖通－收");
-
-		makeExcel.setSheet("108Q1");
-		makeExcel.setValue(3, 2, "業務推展部");
-		makeExcel.setValue(3, 3, "彰化區部");
-		makeExcel.setValue(3, 4, "秀水收");
-		makeExcel.setValue(3, 5, "呂蓮花");
-		makeExcel.setValue(3, 6, "AFD123");
-		makeExcel.setValue(3, 7, "初級");
-		makeExcel.setValue(3, 8, "初級");
-
-		makeExcel.setSheet("營管");
-		makeExcel.setValue(4, 1, "彰化區部");
-		makeExcel.setValue(4, 2, "秀水收");
-		makeExcel.setValue(4, 3, "呂蓮花");
-		makeExcel.setValue(4, 4, "AFD123");
-
-		makeExcel.setSheet("營推");
-		makeExcel.setValue(4, 1, "彰化區部");
-		makeExcel.setValue(4, 2, "秀水收");
-		makeExcel.setValue(4, 3, "呂蓮花");
-		makeExcel.setValue(4, 4, "AFD123");
-
-		makeExcel.setSheet("業推");
-		makeExcel.setValue(4, 1, "彰化區部");
-		makeExcel.setValue(4, 2, "清水收");
-		makeExcel.setValue(4, 3, "呂蓮花");
-		makeExcel.setValue(4, 4, "AFD123");
-
-		makeExcel.setSheet("業開");
-		makeExcel.setValue(4, 1, "彰化區部");
-		makeExcel.setValue(4, 2, "大發收");
-		makeExcel.setValue(4, 3, "呂蓮花");
-		makeExcel.setValue(4, 4, "AFD123");
-
-		makeExcel.setSheet("108Q2稿");
-		makeExcel.setValue(3, 2, "營管部");
-		makeExcel.setValue(3, 3, "大新收");
-		makeExcel.setValue(3, 4, "士林區部");
-		makeExcel.setValue(3, 5, "呂蓮花");
-		makeExcel.setValue(3, 6, "AFD123");
+		exportExcel(pfYear, pfSeason, titaVo);
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
 
+	private void exportExcel(int pfYear, int pfSeason, TitaVo titaVo) throws LogicException {
+
+		this.info("exportExcel ... ");
+
+		int maxOfLoops = 3;
+
+		if (pfSeason == 4) {
+			maxOfLoops = 4;
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿",
+					"LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算_第四季特別版.xlsx", "1月件數");
+		} else {
+			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP005", "協辦考核核算底稿",
+					"LP005_" + (pfYear - 1911) + "Q" + pfSeason + "協辦考核核算底稿", "LP005_底稿_協辦考核核算.xlsx", "1月件數");
+		}
+
+		for (int i = 1; i <= maxOfLoops; i++) {
+
+			int inputWorkMonth = pfYear * 100 + (i + (3 * (pfSeason - 1)));
+
+			this.info("inputWorkMonth = " + inputWorkMonth);
+
+			setCounts(i, inputWorkMonth, titaVo);
+
+			setAmt(i, inputWorkMonth, titaVo);
+		}
+
+		listEmpClass = new ArrayList<>();
+
+		setDept("A0B000", "營管", pfYear, pfSeason, titaVo);
+		setDept("A0F000", "營推", pfYear, pfSeason, titaVo);
+		setDept("A0E000", "業推", pfYear, pfSeason, titaVo);
+		setDept("A0M000", "業開", pfYear, pfSeason, titaVo);
+
+		setEmpClassList(pfYear, pfSeason, 0);
+
+		setEmpClassList(pfYear, pfSeason, 1);
+	}
+
+	private void putDataToListEmpClass(Map<String, String> m, String deptSheetName, String oriEmpClass,
+			String afterEmpClass) {
+		this.info("putDataToListEmpClass ... ");
+
+		Map<String, String> mapEmpClass = new HashMap<>();
+
+		mapEmpClass.put("Dept", deptSheetName + "部"); // 部室
+		mapEmpClass.put("Dist", m.get("F0")); // 區部
+		mapEmpClass.put("Unit", m.get("F1")); // 單位
+		mapEmpClass.put("EmpName", m.get("F2")); // 姓名
+		mapEmpClass.put("EmpNo", m.get("F3")); // 員工代號
+		mapEmpClass.put("OriEmpClass", oriEmpClass); // 考核前職級
+		mapEmpClass.put("AfterEmpClass", afterEmpClass); // 考核後職級
+
+		listEmpClass.add(mapEmpClass);
+	}
+
+	private void setAmt(int i, int inputWorkMonth, TitaVo titaVo) throws LogicException {
+		this.info("setAmt ... ");
+		this.info("setAmt i = " + i);
+		this.info("setAmt inputWorkMonth = " + inputWorkMonth);
+
+		String month = String.valueOf(inputWorkMonth);
+
+		month = month.substring(month.length() - 2);
+
+		makeExcel.setSheet(i + "月金額", month + "月金額");
+
+		List<Map<String, String>> listAmt = lp005ServiceImpl.queryAmt(inputWorkMonth, titaVo);
+
+		if (listAmt == null || listAmt.isEmpty()) {
+			return;
+		}
+
+		int rowCursor = 2;
+
+		for (Map<String, String> m : listAmt) {
+
+			// 戶號
+			makeExcel.setValue(rowCursor, 1, Integer.valueOf(m.get("F0")));
+			// 額度
+			makeExcel.setValue(rowCursor, 2, Integer.valueOf(m.get("F1")));
+			// 撥款金額
+			makeExcel.setValue(rowCursor, 3, getBigDecimal(m.get("F2")), "#,##0");
+			// 計件代碼
+			makeExcel.setValue(rowCursor, 4, Integer.valueOf(m.get("F3")));
+			// 員工代碼
+			makeExcel.setValue(rowCursor, 5, m.get("F4"), "L");
+			// 員工姓名
+			makeExcel.setValue(rowCursor, 6, m.get("F5"), "L");
+			// 部室
+			makeExcel.setValue(rowCursor, 7, m.get("F6"), "L");
+			// 區部
+			makeExcel.setValue(rowCursor, 8, m.get("F7"), "L");
+			// 單位
+			makeExcel.setValue(rowCursor, 9, m.get("F8"), "L");
+
+			rowCursor++;
+		}
+	}
+
+	private void setCounts(int i, int inputWorkMonth, TitaVo titaVo) throws LogicException {
+		this.info("setCounts ... ");
+		this.info("setCounts i = " + i);
+		this.info("setCounts inputWorkMonth = " + inputWorkMonth);
+
+		String month = String.valueOf(inputWorkMonth);
+
+		month = month.substring(month.length() - 2);
+
+		makeExcel.setSheet(i + "月件數", month + "月件數");
+
+		List<Map<String, String>> listCnt1 = lp005ServiceImpl.queryCounts(inputWorkMonth, titaVo);
+
+		if (listCnt1 == null || listCnt1.isEmpty()) {
+			return;
+		}
+
+		int rowCursor = 2;
+
+		for (Map<String, String> m : listCnt1) {
+
+			// 獎金類別
+			makeExcel.setValue(rowCursor, 1, Integer.valueOf(m.get("F0")));
+			// 戶號
+			makeExcel.setValue(rowCursor, 2, Integer.valueOf(m.get("F1")));
+			// 戶名
+			makeExcel.setValue(rowCursor, 3, m.get("F2"), "L");
+			// 車馬費發放額
+			makeExcel.setValue(rowCursor, 4, getBigDecimal(m.get("F3")), "#,##0");
+			// 介紹人
+			makeExcel.setValue(rowCursor, 5, m.get("F4"), "L");
+			// 員工姓名
+			makeExcel.setValue(rowCursor, 6, m.get("F5"), "L");
+			// 部室
+			makeExcel.setValue(rowCursor, 7, m.get("F6"), "L");
+			// 區部
+			makeExcel.setValue(rowCursor, 8, m.get("F7"), "L");
+			// 單位
+			makeExcel.setValue(rowCursor, 9, m.get("F8"), "L");
+
+			rowCursor++;
+		}
+	}
+
+	private void setDept(String deptCode, String deptSheetName, int pfYear, int pfSeason, TitaVo titaVo)
+			throws LogicException {
+		this.info("setDept ... ");
+		this.info("setDept deptCode = " + deptCode);
+		this.info("setDept deptSheetName = " + deptSheetName);
+
+		makeExcel.setSheet(deptSheetName);
+
+		String title = (pfYear - 1911) + "年" + deptSheetName + "部第" + pfSeason + "季房貸協辦人員考核後職級明細表";
+
+		makeExcel.setValue(1, 1, title);
+
+		List<Map<String, String>> listDept = lp005ServiceImpl.queryDept(pfYear, pfSeason, deptCode, titaVo);
+
+		if (listDept == null || listDept.isEmpty()) {
+			return;
+		}
+
+		int rowCursor = 4;
+		int rowCursorTotal = 5;
+
+		if (listDept.size() > 1) {
+			makeExcel.setShiftRow(rowCursor + 1, listDept.size() - 1);
+			rowCursorTotal += listDept.size() - 1;
+		}
+
+		for (Map<String, String> m : listDept) {
+
+			// 區部
+			makeExcel.setValue(rowCursor, 1, m.get("F0"), "C");
+			// 單位
+			makeExcel.setValue(rowCursor, 2, m.get("F1"), "C");
+			// 姓名
+			makeExcel.setValue(rowCursor, 3, m.get("F2"), "C");
+			// 員工代號
+			makeExcel.setValue(rowCursor, 4, m.get("F3"), "C");
+			// 考核前400職級
+			String oriEmpClassCode = m.get("F4");
+			String oriEmpClass = "";
+			switch (oriEmpClassCode) {
+			case "1":
+				oriEmpClass = "初級";
+				break;
+			case "2":
+				oriEmpClass = "中級";
+				break;
+			case "3":
+				oriEmpClass = "高級";
+				break;
+			default:
+				break;
+			}
+			makeExcel.setValue(rowCursor, 5, oriEmpClass, "C");
+
+			makeExcel.setValue(rowCursor, 6, getBigDecimal(m.get("F5")), "#,##0");
+			makeExcel.setValue(rowCursor, 7, getBigDecimal(m.get("F6")), "#,##0");
+
+			makeExcel.setValue(rowCursor, 8, getBigDecimal(m.get("F7")), "#,##0");
+			makeExcel.setValue(rowCursor, 9, getBigDecimal(m.get("F8")), "#,##0");
+
+			makeExcel.setValue(rowCursor, 10, getBigDecimal(m.get("F9")), "#,##0");
+			makeExcel.setValue(rowCursor, 11, getBigDecimal(m.get("F10")), "#,##0");
+
+			int columnShift = 0;
+
+			if (pfSeason == 4) {
+				columnShift = 2;
+				makeExcel.setValue(rowCursor, 12, getBigDecimal(m.get("F11")), "#,##0");
+				makeExcel.setValue(rowCursor, 13, getBigDecimal(m.get("F12")), "#,##0");
+			}
+
+			// 合計 件數&金額
+			BigDecimal countTotal = getBigDecimal(m.get("F13"));
+			makeExcel.setValue(rowCursor, 12 + columnShift, countTotal, "#,##0");
+			makeExcel.setValue(rowCursor, 13 + columnShift, getBigDecimal(m.get("F14")), "#,##0");
+
+			// 考核後400職級
+			String afterEmpClass = "";
+			switch (oriEmpClassCode) {
+			case "3": // 原本是高級
+				if (countTotal.compareTo(getBigDecimal("5")) >= 0) {
+					afterEmpClass = "高級"; // 高級維持高級需合計五件以上(含五件)
+				} else {
+					afterEmpClass = "中級"; // 否則降至中級
+				}
+				break;
+			case "2": // 原本是中級
+				if (countTotal.compareTo(getBigDecimal("8")) >= 0) {
+					afterEmpClass = "高級"; // 中級若合計八件以上(含八件)，升級至高級
+				} else if (countTotal.compareTo(getBigDecimal("3")) >= 0) {
+					afterEmpClass = "中級"; // 中級維持中級需合計三件以上(含三件)
+				} else {
+					afterEmpClass = "初級"; // 否則降至初級
+				}
+				break;
+			case "1": // 原本是初級
+				if (countTotal.compareTo(getBigDecimal("8")) >= 0) {
+					afterEmpClass = "高級"; // 初級若合計八件以上(含八件)，升級至高級
+				} else if (countTotal.compareTo(getBigDecimal("5")) >= 0) {
+					afterEmpClass = "中級"; // 初級若合計五件以上(含五件)，升級至中級
+				} else {
+					afterEmpClass = "初級"; // 否則維持初級
+				}
+				break;
+			default:
+				break;
+			}
+			makeExcel.setValue(rowCursor, 15 + columnShift, afterEmpClass, "C");
+
+			putDataToListEmpClass(m, deptSheetName, oriEmpClass, afterEmpClass);
+
+			rowCursor++;
+		}
+
+		// 公式重新計算
+		for (int j = 0; j < 2; j++) {
+			for (int k = 6; k <= 15; k++) {
+				makeExcel.formulaCaculate(rowCursorTotal, k);
+			}
+			rowCursorTotal++;
+		}
+		for (int j = 0; j < 3; j++) {
+			for (int k = 6; k <= 14; k += 2) {
+				makeExcel.formulaCaculate(rowCursorTotal, k);
+			}
+			rowCursorTotal++;
+		}
+	}
+
+	private void setEmpClassList(int pfYear, int pfSeason, int type) throws LogicException {
+		this.info("setEmpClassList ... ");
+
+		String sheetName = "職級名冊";
+
+		if (type == 1) {
+			if (pfSeason == 4) {
+				pfYear++;
+				pfSeason = 1;
+			} else {
+				pfSeason++;
+			}
+			sheetName += "(稿)";
+		}
+
+		makeExcel.setSheet(sheetName, (pfYear - 1911) + "Q" + pfSeason);
+
+		makeExcel.setValue(1, 1, (pfYear - 1911) + "年第" + pfSeason + "季房貸協辦職級名冊");
+
+		if (listEmpClass == null || listEmpClass.isEmpty()) {
+			return;
+		}
+
+		int rowCursor = 3;
+
+		for (Map<String, String> m : listEmpClass) {
+
+			// 序號
+			makeExcel.setValue(rowCursor, 1, rowCursor - 2);
+			// 部室
+			makeExcel.setValue(rowCursor, 2, m.get("Dept"));
+			// 區部
+			makeExcel.setValue(rowCursor, 3, m.get("Dist"));
+			// 單位
+			makeExcel.setValue(rowCursor, 4, m.get("Unit"));
+			// 姓名
+			makeExcel.setValue(rowCursor, 5, m.get("EmpName"));
+			// 員工代號
+			makeExcel.setValue(rowCursor, 6, m.get("EmpNo"));
+
+			if (type == 1) {
+				// 考核後職級
+				makeExcel.setValue(rowCursor, 7, m.get("AfterEmpClass"));
+			} else {
+				// 考核前職級
+				makeExcel.setValue(rowCursor, 7, m.get("OriEmpClass"));
+			}
+
+			// 考核後職級
+			makeExcel.setValue(rowCursor, 8, m.get("AfterEmpClass"));
+
+			if (type == 0 && !m.get("OriEmpClass").equals(m.get("AfterEmpClass"))) {
+				makeExcel.setValue(rowCursor, 9, "Yes");
+			}
+		}
+	}
 }

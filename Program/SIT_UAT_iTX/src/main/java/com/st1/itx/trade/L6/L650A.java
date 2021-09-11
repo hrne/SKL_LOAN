@@ -54,6 +54,8 @@ public class L650A extends TradeBuffer {
 
 		CdPfParms iCdPfParams = new CdPfParms();
 		CdPfParmsId iCdPfParamsId = new CdPfParmsId();
+		CdPfParms rCdPfParms = new CdPfParms();
+		CdPfParmsId rCdPfParamsId = new CdPfParmsId();
 		//Input
 		String iProdNoA = "";
 		String iProdNoB = "";
@@ -69,8 +71,8 @@ public class L650A extends TradeBuffer {
 			if (iProdNoA.equals("") || iProdNoA.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSA"+i));
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEA"+i));
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSA"+i))+191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEA"+i))+191100;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("1");
 			iCdPfParamsId.setCondition(iProdNoA);
@@ -91,8 +93,8 @@ public class L650A extends TradeBuffer {
 			if (iProdNoB.equals("") || iProdNoB.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSB"+i));
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEB"+i));
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSB"+i))+191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEB"+i))+191100;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("2");
 			iCdPfParamsId.setCondition(iProdNoB);
@@ -114,8 +116,8 @@ public class L650A extends TradeBuffer {
 			if (iProdNoC.equals("") || iProdNoC.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSC"+i));
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEC"+i));
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSC"+i))+191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEC"+i))+191100;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("3");
 			iCdPfParamsId.setCondition(iProdNoC);
@@ -137,8 +139,8 @@ public class L650A extends TradeBuffer {
 			if (iProdNoD.equals("") || iProdNoD.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSD"+i));
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthED"+i));
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSD"+i))+191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthED"+i))+191100;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("4");
 			iCdPfParamsId.setCondition(iProdNoD);
@@ -160,8 +162,8 @@ public class L650A extends TradeBuffer {
 			if (iProdNoE.equals("") || iProdNoE.trim().isEmpty()) {
 				break;
 			}
-			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSE"+i));
-			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEE"+i));
+			iWorkMonthS = Integer.valueOf(titaVo.getParam("WorkMonthSE"+i))+191100;
+			iWorkMonthE = Integer.valueOf(titaVo.getParam("WorkMonthEE"+i))+191100;
 			iCdPfParamsId.setConditionCode1("1");
 			iCdPfParamsId.setConditionCode2("5");
 			iCdPfParamsId.setCondition(iProdNoE);
@@ -175,6 +177,18 @@ public class L650A extends TradeBuffer {
 			}
 			i++;
 		}
+//		int newWorkMonth =0;
+//		rCdPfParamsId.setCondition(" ");
+//		rCdPfParamsId.setConditionCode1("R");
+//		rCdPfParamsId.setConditionCode2(" ");
+//		rCdPfParms = iCdPfParmsService.holdById(rCdPfParamsId, titaVo);
+//		rCdPfParms.setWorkMonthEnd(0);
+//		rCdPfParms.setWorkMonthStart(newWorkMonth);
+//		try {
+//			iCdPfParmsService.udpate(iCdPfParams, titaVo);
+//		}catch (DBException e) {
+//			throw new LogicException("E0005", "排除商品別-協辦獎金");
+//		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -90,7 +90,7 @@ public class LP002Report extends MakeReport {
 
 		this.info("LP002Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP002", "部室、區部、通訊處業績", "LP002_部室、區部、通訊處業績",
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LP002", "部室、區部、通訊處業績", "LP002部室、區部、通訊處業績",
 				"LP002_底稿_推展_部室、區部、通訊處業績.xlsx", "部室");
 
 		List<Map<String, String>> wkSsnList = new ArrayList<>();

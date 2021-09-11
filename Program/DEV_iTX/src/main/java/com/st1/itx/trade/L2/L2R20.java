@@ -1,19 +1,27 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.RelsCompany;
-import com.st1.itx.db.domain.RelsCompanyId;
-import com.st1.itx.db.domain.RelsMain;
-import com.st1.itx.db.service.RelsCompanyService;
-import com.st1.itx.db.service.RelsMainService;
+import com.st1.itx.db.domain.CdInsurer;
+import com.st1.itx.db.domain.ClImm;
+import com.st1.itx.db.domain.ClImmId;
+import com.st1.itx.db.domain.ClMain;
+import com.st1.itx.db.domain.ClMainId;
+import com.st1.itx.db.service.CdInsurerService;
+import com.st1.itx.db.service.ClBuildingService;
+import com.st1.itx.db.service.ClImmService;
+import com.st1.itx.db.service.ClLandService;
+import com.st1.itx.db.service.ClMainService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -27,15 +35,29 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R20 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R20.class);
 
 	/* DB服務注入 */
 	@Autowired
-	public RelsCompanyService sRelsCompanyService;
+	public ClMainService sClMainService;
 
 	/* DB服務注入 */
 	@Autowired
-	public RelsMainService sRelsMainService;
+	public CustMainService sCustMainService;
+
+	/* DB服務注入 */
+	@Autowired
+	public ClImmService sClImmService;
+
+	/* DB服務注入 */
+	@Autowired
+	public ClBuildingService sClBuildingService;
+
+	/* DB服務注入 */
+	@Autowired
+	public ClLandService sClLandService;
+
+	@Autowired
+	public CdInsurerService sCdInsurerService;
 
 	/* 日期工具 */
 	@Autowired
@@ -45,66 +67,95 @@ public class L2R20 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2R20 ");
 		this.totaVo.init(titaVo);
 
-		// tita 統編
-		String iRelsId = titaVo.getParam("RimRelsId");
-		// 功能 1新增 2修改 4刪除 5查詢
-		int iFunCd = parse.stringToInteger(titaVo.getParam("RimFunCd"));
-		// 相關事業統編
-		String iCompanyId = titaVo.getParam("RimCompanyId");
 
-		// 利害關係人主檔找ReltUKey
-		RelsMain tRelsMain = new RelsMain();
-		tRelsMain = sRelsMainService.RelsIdFirst(iRelsId, titaVo);
-		String ReltUKey = tRelsMain.getRelsUKey();
-		// new PK TABLE
-		RelsCompanyId tRelsCompanyId = new RelsCompanyId();
-		// new TABLE
-		RelsCompany tRelsCompany = new RelsCompany();
-		// 組RelsCompanyId PK (ReltUKey,iCompanyId)
-		tRelsCompanyId.setRelsUKey(ReltUKey);
-		tRelsCompanyId.setCompanyId(iCompanyId);
-		tRelsCompany = sRelsCompanyService.findById(tRelsCompanyId, titaVo);
-		// 處理邏輯
-		if (iFunCd == 1 && tRelsCompany != null) {
-			// 若為新增，但資料已存在，拋錯
-			throw new LogicException("E0002", "L2R20(RelsCompany)");
-		} else if (tRelsCompany == null) {
-			switch (iFunCd) {
-			case 1: {
-				// 若為新增且資料不存在，存空值到totaVo
-				tRelsCompany = new RelsCompany();
-				break;
-			}
-			case 2:
-				// 若為修改，但資料不存在，拋錯
-				throw new LogicException("E0003", "L2R20(RelsCompany)");
-			case 4:
-				// 若為刪除，但資料不存在，拋錯
-				throw new LogicException("E0004", "L2R20(RelsCompany)");
-			case 5:
-				// 若為查詢，但資料不存在，拋錯
-				throw new LogicException("E0001", "L2R20(RelsCompany)");
-			default:
-				// funch不在以上範圍，拋錯
-				throw new LogicException("E0010", "L2R20(RelsCompany)");
-			}
+		int iClCode1 = parse.stringToInteger(titaVo.getParam("RimClCode1"));
+		int iClCode2 = parse.stringToInteger(titaVo.getParam("RimClCode2"));
+		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 
+		ClMainId ClMainId = new ClMainId();
+		ClImmId ClImmId = new ClImmId();
+
+		ClMainId.setClCode1(iClCode1);
+		ClMainId.setClCode2(iClCode2);
+		ClMainId.setClNo(iClNo);
+
+		ClImmId.setClCode1(iClCode1);
+		ClImmId.setClCode2(iClCode2);
+		ClImmId.setClNo(iClNo);
+
+		this.index = titaVo.getReturnIndex();
+
+		// *** 折返控制相關 ***
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = 100; // 129 * 400 = 51600
+
+		ClImm tClImm = sClImmService.findById(ClImmId, titaVo);
+		ClMain tClMain = sClMainService.findById(ClMainId, titaVo);
+		if (tClImm == null) {
+			throw new LogicException(titaVo, "E2003", "擔保品不動產檔"); // 查無資料
 		}
-		// UKEY找利害關係人主檔RelsId
-		tRelsMain = sRelsMainService.findById(ReltUKey, titaVo);
-		/* 存入Tota */
-		/* key 名稱需與L2R20.tom相同 */
-		this.totaVo.putParam("L2r20RelsId", tRelsMain.getRelsId());
-		this.totaVo.putParam("L2r20CompanyId", tRelsCompany.getCompanyId());
-		this.totaVo.putParam("L2r20CompanyName", tRelsCompany.getCompanyName());
-		this.totaVo.putParam("L2r20HoldingRatio", tRelsCompany.getHoldingRatio());
-		this.totaVo.putParam("L2r20JobTitle", tRelsCompany.getJobTitle());
+		if (tClMain == null) {
+			throw new LogicException(titaVo, "E2003", "擔保品主檔"); // 查無資料
+		}
 
+
+		// 查詢保險公司資料檔
+		Slice<CdInsurer> slCdInsurer;
+		slCdInsurer = sCdInsurerService.insurerTypeRange("1", "2", tClImm.getEvaCompanyCode(), tClImm.getEvaCompanyCode(), this.index, this.limit, titaVo);
+
+		List<CdInsurer> lCdInsurer = slCdInsurer == null ? null : slCdInsurer.getContent();
+
+		String OEvaCompanyX = "";
+		// 如有找到資料
+		if (lCdInsurer != null) {
+			for (CdInsurer tCdInsurer : lCdInsurer) {
+				OEvaCompanyX = tCdInsurer.getInsurerItem();
+			}
+		}
+
+		this.totaVo.putParam("L2r20ClTypeCode", tClMain.getClTypeCode());
+		this.totaVo.putParam("L2r20EvaDate", tClMain.getEvaDate());
+		this.totaVo.putParam("L2r20EvaAmt", tClMain.getEvaAmt());
+		this.totaVo.putParam("L2r20EvaNetWorth", tClImm.getEvaNetWorth());
+		this.totaVo.putParam("L2r20LVITax", tClImm.getLVITax());
+		this.totaVo.putParam("L2r20RentEvaValue", tClImm.getRentEvaValue());
+		this.totaVo.putParam("L2r20RentPrice", tClImm.getRentPrice());
+		this.totaVo.putParam("L2r20EvaCompany", tClImm.getEvaCompanyCode());
+		this.totaVo.putParam("L2r20EvaCompanyX", OEvaCompanyX);
+
+		this.totaVo.putParam("L2r20OwnershipCode", tClImm.getOwnershipCode());
+		this.totaVo.putParam("L2r20MtgCode", tClImm.getMtgCode());
+		this.totaVo.putParam("L2r20MtgCheck", tClImm.getMtgCheck());
+		this.totaVo.putParam("L2r20MtgLoan", tClImm.getMtgLoan());
+		this.totaVo.putParam("L2r20MtgPledge", tClImm.getMtgPledge());
+		this.totaVo.putParam("L2r20ClStatus", tClMain.getClStatus());
+		this.totaVo.putParam("L2r20ClStat", tClImm.getClStat());
+		this.totaVo.putParam("L2r20Agreement", tClImm.getAgreement());
+		this.totaVo.putParam("L2r20LimitCancelDate", tClImm.getLimitCancelDate());
+		this.totaVo.putParam("L2r20ClCode", tClImm.getClCode());
+		this.totaVo.putParam("L2r20LoanToValue", tClImm.getLoanToValue());
+		this.totaVo.putParam("L2r20OtherOwnerTotal", tClImm.getOtherOwnerTotal());
+		this.totaVo.putParam("L2r20CompensationCopy", tClImm.getCompensationCopy());
+		this.totaVo.putParam("L2r20BdRmk", tClImm.getBdRmk());
+		this.totaVo.putParam("L2r20DispPrice", tClMain.getDispPrice());
+		this.totaVo.putParam("L2r20DispDate", tClMain.getDispDate());
+		this.totaVo.putParam("L2r20MtgReasonCode", tClImm.getMtgReasonCode());
+		this.totaVo.putParam("L2r20ReceivedDate", tClImm.getReceivedDate());
+		this.totaVo.putParam("L2r20ReceivedNo", tClImm.getReceivedNo());
+		this.totaVo.putParam("L2r20CancelDate", tClImm.getCancelDate());
+		this.totaVo.putParam("L2r20CancelNo", tClImm.getCancelNo());
+		this.totaVo.putParam("L2r20SettingDate", tClImm.getSettingDate());
+		this.totaVo.putParam("L2r20SettingStat", tClImm.getSettingStat());
+		this.totaVo.putParam("L2r20SettingAmt", tClImm.getSettingAmt());
+		this.totaVo.putParam("L2r20ClaimDate", tClImm.getClaimDate());
+		this.totaVo.putParam("L2r20SettingSeq", tClImm.getSettingSeq());
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

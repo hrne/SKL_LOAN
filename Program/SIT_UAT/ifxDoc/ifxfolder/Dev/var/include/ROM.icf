@@ -31,7 +31,7 @@
 !    L2R17 : 尋找原擔保品編號資料
 !    L2R18 : 尋找股票代碼
 !    L2R19 : 尋找擔保品所有權人
-!    L2R20 : 尋找(準)利害關係人相關事業檔資料
+!    L2R20 : 尋找不動產擔保品資料查詢
 !    L2R21 : 尋找額度檔資料 ApplNo
 !    L2R22 : 尋找擔保品主檔 ClCode1,ClCode2,ClNo
 !    L2R23 : 尋找擔保品不動產檔 ClCode1,ClCode2,ClNo
@@ -2181,22 +2181,82 @@ TXFORM=L2R19
 #L2r19PublicBdOwnerId
 ^
 </L2R19.tom>
-!尋找(準)利害關係人相關事業檔資料
+!尋找不動產擔保品資料查詢
 <L2R20.dec>
-#L2r20RelsId=X,10,S
-#L2r20CompanyId=X,10,S
-#L2r20CompanyName=c,100,S
-#L2r20HoldingRatio=n,3.2,S
-#L2r20JobTitle=A,2,S
+#L2r20ClTypeCode=X,3,S
+#L2r20EvaDate=D,7,S
+#L2r20EvaAmt=m,14,S
+#L2r20EvaNetWorth=m,14,S
+#L2r20LVITax=m,14,S
+#L2r20RentEvaValue=m,14,S
+#L2r20RentPrice=m,14,S
+#L2r20EvaCompany=X,2,S
+#L2r20EvaCompanyX=X,40,S
+#L2r20OwnershipCode=A,1,S
+#L2r20MtgCode=A,1,S
+#L2r20MtgCheck=X,1,S
+#L2r20MtgLoan=X,1,S
+#L2r20MtgPledge=X,1,S
+#L2r20ClStatus=A,1,S
+#L2r20ClStat=X,1,S
+#L2r20Agreement=X,1,S
+#L2r20LimitCancelDate=D,7,S
+#L2r20ClCode=A,1,S
+#L2r20LoanToValue=m,3.2,S
+#L2r20OtherOwnerTotal=m,14,S
+#L2r20CompensationCopy=A,1,S
+#L2r20BdRmk=X,60,S
+#L2r20DispPrice=m,14,S
+#L2r20DispDate=D,7,S
+#L2r20MtgReasonCode=X,1,S
+#L2r20ReceivedDate=D,7,S
+#L2r20ReceivedNo=X,20,S
+#L2r20CancelDate=D,7,S
+#L2r20CancelNo=X,20,S
+#L2r20SettingDate=D,7,S
+#L2r20SettingStat=X,1,S
+#L2r20SettingAmt=m,14,S
+#L2r20ClaimDate=D,7,S
+#L2r20SettingSeq=A,1,S
 </L2R20.dec>
 
 <L2R20.tom>
 TXFORM=L2R20
-#L2r20RelsId
-#L2r20CompanyId
-#L2r20CompanyName
-#L2r20HoldingRatio
-#L2r20JobTitle
+#L2r20ClTypeCode
+#L2r20EvaDate
+#L2r20EvaAmt
+#L2r20EvaNetWorth
+#L2r20LVITax
+#L2r20RentEvaValue
+#L2r20RentPrice
+#L2r20EvaCompany
+#L2r20EvaCompanyX
+#L2r20OwnershipCode
+#L2r20MtgCode
+#L2r20MtgCheck
+#L2r20MtgLoan
+#L2r20MtgPledge
+#L2r20ClStatus
+#L2r20ClStat
+#L2r20Agreement
+#L2r20LimitCancelDate
+#L2r20ClCode
+#L2r20LoanToValue
+#L2r20OtherOwnerTotal
+#L2r20CompensationCopy
+#L2r20BdRmk
+#L2r20DispPrice
+#L2r20DispDate
+#L2r20MtgReasonCode
+#L2r20ReceivedDate
+#L2r20ReceivedNo
+#L2r20CancelDate
+#L2r20CancelNo
+#L2r20SettingDate
+#L2r20SettingStat
+#L2r20SettingAmt
+#L2r20ClaimDate
+#L2r20SettingSeq
 ^
 </L2R20.tom>
 !尋找額度檔資料 ApplNo
@@ -4427,7 +4487,7 @@ TXFORM=L1R15
 #L1R16IsLimitYn=X,1,S
 #L1R16IsRelatedYn=X,1,S
 #L1R16IsLnrelNearYn=X,1,S
-#L1R16IsFinancialYn=X,1,S
+#L1R16IsSuspectedYn=X,1,S
 #L1R16DataDate=D,7,S
 </L1R16.dec>
 
@@ -4436,7 +4496,7 @@ TXFORM=L1R16
 #L1R16IsLimitYn
 #L1R16IsRelatedYn
 #L1R16IsLnrelNearYn
-#L1R16IsFinancialYn
+#L1R16IsSuspectedYn
 #L1R16DataDate
 ^
 </L1R16.tom>
@@ -4939,7 +4999,7 @@ TXFORM=L4R24
 #L5r01ApplDate=D,7,S
 #L5r01DueAmt=m,14,S
 #L5r01TotalPeriod=A,3,S
-#L5r01IntRate=m,2.4,S
+#L5r01IntRate=m,2.2,S
 #L5r01FirstDueDate=D,7,S
 #L5r01LastDueDate=D,7,S
 #L5r01IsMainFin=X,1,S
@@ -4951,10 +5011,10 @@ TXFORM=L4R24
 #L5r01ChgCondDate=D,7,S
 #L5r01CourCode=X,3,S
 ##loop {times:30,i:1}
-#L5r01NegFinShareFinCode{i}=X,3,S
+#L5r01NegFinShareFinCode{i}=X,8,S
 #L5r01NegFinShareFinName{i}=X,100,S
 #L5r01NegFinShareContractAmt{i}=m,14,S
-#L5r01NegFinShareAmtRatio{i}=m,2.4,S
+#L5r01NegFinShareAmtRatio{i}=m,3.2,S
 #L5r01NegFinShareDueAmt{i}=m,14,S
 #L5r01NegFinShareCancelDate{i}=D,7,S
 #L5r01NegFinShareCancelAmt{i}=m,14,S

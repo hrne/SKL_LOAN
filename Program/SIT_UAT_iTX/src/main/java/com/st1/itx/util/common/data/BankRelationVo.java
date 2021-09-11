@@ -14,7 +14,7 @@ public class BankRelationVo {
 	 * IsLimit     = true 授信限制對象(1,5,8,9) <BR> 
 	 * IsRelated   = true 利害關係人(1,5) <BR>       
 	 * IsLnrelNear = true 準利害關係人(8) <BR>       
-	 * IsFinancial = true 是否為金控疑似準利害關係人   
+	 * IsSuspected = true 是否為金控疑似準利害關係人   
 	 * DataDate   資料日期
 	 */
 	private String LAW001 = " ";
@@ -26,15 +26,9 @@ public class BankRelationVo {
 	private String IsLimit = " ";
 	private String IsRelated = " ";
 	private String IsLnrelNear = " ";
-	private String IsFinancial = " ";
+	private String IsSuspected = " ";
 	private String DataDate = "";
 
-	@Override
-	public String toString() {
-		return "BankRelationVo [LAW001=" + LAW001 + ", LAW002=" + LAW002 + ", LAW003=" + LAW003 + ", LAW005=" + LAW005
-				+ ", LAW008=" + LAW008 + ", IsSalary=" + IsSalary + ", IsRelated=" + IsRelated + ", IsLnrelNear="
-				+ IsLnrelNear + ", IsLimit=" + IsLimit + ", IsFinancial=" + IsFinancial + "]";
-	}
 
 	/**
 	 * @return the lAW001
@@ -163,20 +157,6 @@ public class BankRelationVo {
 	}
 
 	/**
-	 * @return the isFinancial
-	 */
-	public String getIsFinancial() {
-		return IsFinancial;
-	}
-
-	/**
-	 * @param isFinancial the isFinancial to set
-	 */
-	public void setIsFinancial(String isFinancial) {
-		IsFinancial = isFinancial;
-	}
-
-	/**
 	 * @return the dataDate
 	 */
 	public String getDataDate() {
@@ -188,6 +168,21 @@ public class BankRelationVo {
 	 */
 	public void setDataDate(String dataDate) {
 		DataDate = dataDate;
+	}
+
+	public String getIsSuspected() {
+		return IsSuspected;
+	}
+
+	public void setIsSuspected(String isSuspected) {
+		IsSuspected = isSuspected;
+	}
+
+	@Override
+	public String toString() {
+		return "BankRelationVo [LAW001=" + LAW001 + ", LAW002=" + LAW002 + ", LAW003=" + LAW003 + ", LAW005=" + LAW005
+				+ ", LAW008=" + LAW008 + ", IsSalary=" + IsSalary + ", IsLimit=" + IsLimit + ", IsRelated=" + IsRelated
+				+ ", IsLnrelNear=" + IsLnrelNear + ", IsSuspected=" + IsSuspected + ", DataDate=" + DataDate + "]";
 	}
 
 

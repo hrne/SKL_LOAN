@@ -902,6 +902,10 @@ public class MakeReport extends CommBuffer {
 			throw new LogicException(titaVo, "EC001", "(MakeReport)輸出檔(TxFile)序號:" + pdfno);
 		}
 
+		if(tTxFile.getFileCode() != null) {
+			this.rptCode = tTxFile.getFileCode();
+		}
+		
 		try {
 			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
 		} catch (IOException e) {

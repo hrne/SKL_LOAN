@@ -27,7 +27,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4940 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4940.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -59,24 +58,45 @@ public class L4940 extends TradeBuffer {
 		Slice<BankAuthAct> sBankAuthAct = null;
 
 		sBankAuthAct = bankAuthActService.authCheck(custNo, repayAcct, 0, 999, this.index, this.limit, titaVo);
-
+//		sBankAuthAct = bankAuthActService.findCustNoEq(custNo, this.index, this.limit, titaVo);
 		lBankAuthAct = sBankAuthAct == null ? null : sBankAuthAct.getContent();
 
 		if (lBankAuthAct != null && lBankAuthAct.size() != 0) {
-			for(BankAuthAct tBankAuthAct : lBankAuthAct) {
-				OccursList occursList = new OccursList();
-				
-				occursList.putParam("OOCustNo", tBankAuthAct.getCustNo());
-				occursList.putParam("OOFacmNo", tBankAuthAct.getFacmNo());
-				occursList.putParam("OOAuthType", tBankAuthAct.getAuthType());
-				occursList.putParam("OORepayAcct", tBankAuthAct.getRepayAcct());
-				occursList.putParam("OORepayBank", tBankAuthAct.getRepayBank());
-				occursList.putParam("OOStatus", tBankAuthAct.getStatus());
-				occursList.putParam("OODepCode", tBankAuthAct.getPostDepCode());
-				occursList.putParam("OOAcctNoSeq", tBankAuthAct.getAcctSeq());
+			for (BankAuthAct tBankAuthAct : lBankAuthAct) {
+				if (repayAcct.equals(tBankAuthAct.getRepayAcct())) {
 
-				totaVo.addOccursList(occursList);
+					OccursList occursList = new OccursList();
+
+					occursList.putParam("OOCustNo", tBankAuthAct.getCustNo());
+					occursList.putParam("OOFacmNo", tBankAuthAct.getFacmNo());
+					occursList.putParam("OOAuthType", tBankAuthAct.getAuthType());
+					occursList.putParam("OORepayAcct", tBankAuthAct.getRepayAcct());
+					occursList.putParam("OORepayBank", tBankAuthAct.getRepayBank());
+					occursList.putParam("OOStatus", tBankAuthAct.getStatus());
+					occursList.putParam("OODepCode", tBankAuthAct.getPostDepCode());
+					occursList.putParam("OOAcctNoSeq", tBankAuthAct.getAcctSeq());
+
+					totaVo.addOccursList(occursList);
+				}
 			}
+			for (BankAuthAct tBankAuthAct : lBankAuthAct) {
+
+				if (!repayAcct.equals(tBankAuthAct.getRepayAcct())) {
+					OccursList occursList = new OccursList();
+
+					occursList.putParam("OOCustNo", tBankAuthAct.getCustNo());
+					occursList.putParam("OOFacmNo", tBankAuthAct.getFacmNo());
+					occursList.putParam("OOAuthType", tBankAuthAct.getAuthType());
+					occursList.putParam("OORepayAcct", tBankAuthAct.getRepayAcct());
+					occursList.putParam("OORepayBank", tBankAuthAct.getRepayBank());
+					occursList.putParam("OOStatus", tBankAuthAct.getStatus());
+					occursList.putParam("OODepCode", tBankAuthAct.getPostDepCode());
+					occursList.putParam("OOAcctNoSeq", tBankAuthAct.getAcctSeq());
+
+					totaVo.addOccursList(occursList);
+				}
+			}
+
 		} else {
 			throw new LogicException(titaVo, "E0001", "無符合資料");
 		}

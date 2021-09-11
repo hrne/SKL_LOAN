@@ -21,15 +21,11 @@ public class BankRemitId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3365059758603566551L;
+	private static final long serialVersionUID = -6427168503113686743L;
 
 // 會計日期
   @Column(name = "`AcDate`")
   private int acDate = 0;
-
-  // 整批批號
-  @Column(name = "`BatchNo`", length = 6)
-  private String batchNo = " ";
 
   // 經辦
   @Column(name = "`TitaTlrNo`", length = 8)
@@ -42,9 +38,8 @@ public class BankRemitId implements Serializable {
   public BankRemitId() {
   }
 
-  public BankRemitId(int acDate, String batchNo, String titaTlrNo, String titaTxtNo) {
+  public BankRemitId(int acDate, String titaTlrNo, String titaTxtNo) {
     this.acDate = acDate;
-    this.batchNo = batchNo;
     this.titaTlrNo = titaTlrNo;
     this.titaTxtNo = titaTxtNo;
   }
@@ -66,25 +61,6 @@ public class BankRemitId implements Serializable {
   * @throws LogicException when Date Is Warn	*/
   public void setAcDate(int acDate) throws LogicException {
     this.acDate = StaticTool.rocToBc(acDate);
-  }
-
-/**
-	* 整批批號<br>
-	* 
-	* @return String
-	*/
-  public String getBatchNo() {
-    return this.batchNo == null ? "" : this.batchNo;
-  }
-
-/**
-	* 整批批號<br>
-	* 
-  *
-  * @param batchNo 整批批號
-	*/
-  public void setBatchNo(String batchNo) {
-    this.batchNo = batchNo;
   }
 
 /**
@@ -128,7 +104,7 @@ public class BankRemitId implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(acDate, batchNo, titaTlrNo, titaTxtNo);
+    return Objects.hash(acDate, titaTlrNo, titaTxtNo);
   }
 
   @Override
@@ -138,11 +114,11 @@ public class BankRemitId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     BankRemitId bankRemitId = (BankRemitId) obj;
-    return acDate == bankRemitId.acDate && batchNo.equals(bankRemitId.batchNo) && titaTlrNo.equals(bankRemitId.titaTlrNo) && titaTxtNo.equals(bankRemitId.titaTxtNo);
+    return acDate == bankRemitId.acDate && titaTlrNo.equals(bankRemitId.titaTlrNo) && titaTxtNo.equals(bankRemitId.titaTxtNo);
   }
 
   @Override
   public String toString() {
-    return "BankRemitId [acDate=" + acDate + ", batchNo=" + batchNo + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + "]";
+    return "BankRemitId [acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + "]";
   }
 }

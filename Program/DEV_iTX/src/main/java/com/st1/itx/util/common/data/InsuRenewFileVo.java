@@ -11,7 +11,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.util.parse.Parse;
 
 /**
- * 
+ * 火險詢價檔(LNM01P)
  * @author Zi-Jun,Huang
  * @version 1.0.0
  */
@@ -56,9 +56,9 @@ public class InsuRenewFileVo extends FileVo {
 			if (i >= headerCounts && i <= (LastIndex - footerCounts)) {
 				OccursList occursList = new OccursList();
 
-				// 設定明細欄位的擷取位置
+//	         回傳更動	欄位擷取位置
 //				1	FireInsuMonth		火險到期年月	X	6	
-//				2	ReturnCode			回傳碼		X	2	 回傳碼(00:正常,01:失敗),目前無用:99
+//		        2	ReturnCode			回傳碼		X	2	 回傳碼(00:正常,01:失敗),目前無用:99
 //				3	InsuCampCode		保險公司代碼	X	2	(01:舊件,新產保單)
 //				4	InsuCustId			提供人統一編號	X	10	(iissu)
 //				5	InsuCustName		提供人姓名		X	12	(nissu) 右補空白
@@ -87,14 +87,14 @@ public class InsuRenewFileVo extends FileVo {
 //				28	FacmNo				額度編號		X	3	左補0
 //				29	Space				空白			X	4	
 //				30	SendDate			傳檔日期		X	14	左補空白
-//				31	NewInusNo			保單號碼(新)		X	16	空白
-//				32	NewInsuStartDate	保險起日(新)		X	10	(YYYY/MM/DD)
-//				33	NewInsuEndDate		保險迄日(新)		X	10	(YYYY/MM/DD)
-//				34	NewFireInsuAmt		火險保額(新)		X	11	左補0
-//				35	NewFireInsuFee		火險保費(新)		X	7	左補0
-//				36	NewEqInsuAmt		地震險保額(新)	X	8	左補0
-//				37	NewEqInsuFee		地震險保費(新)	X	6	左補0
-//				38	NewTotalFee			總保費(新)		X	7	左補0
+//			o	31	NewInusNo			保單號碼(新)		X	16	空白
+//			v	32	NewInsuStartDate	保險起日(新)		X	10	(YYYY/MM/DD)
+//			v	33	NewInsuEndDate		保險迄日(新)		X	10	(YYYY/MM/DD)
+//			v	34	NewFireInsuAmt		火險保額(新)		X	11	左補0
+//			v	35	NewFireInsuFee		火險保費(新)		X	7	左補0
+//			v	36	NewEqInsuAmt		地震險保額(新)	X	8	左補0
+//			v	37	NewEqInsuFee		地震險保費(新)	X	6	左補0
+//			v	38	NewTotalFee			總保費(新)		X	7	左補0
 //				39	Remark1				備註一		X	16	
 //				40	MailingAddress		通訊地址		X	60	
 //				41	Remark2				備註二		X	39	

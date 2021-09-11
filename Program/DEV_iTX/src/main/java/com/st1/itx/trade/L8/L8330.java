@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L8;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.UUID;
 
 
@@ -16,11 +18,14 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.domain.JcicZ447;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ451;
 import com.st1.itx.db.domain.JcicZ451Id;
 import com.st1.itx.db.domain.JcicZ451Log;
+import com.st1.itx.db.service.JcicZ446Service;
+import com.st1.itx.db.service.JcicZ447Service;
 import com.st1.itx.db.service.JcicZ451LogService;
 
 /*DB服務*/
@@ -55,6 +60,10 @@ import com.st1.itx.util.data.DataLog;
 public class L8330 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ446Service sJcicZ446Service;
+	@Autowired
+	public JcicZ447Service sJcicZ447Service;
+	@Autowired
 	public JcicZ451Service sJcicZ451Service;
 	@Autowired
 	public JcicZ451LogService sJcicZ451LogService;
@@ -76,6 +85,7 @@ public class L8330 extends TradeBuffer {
 		String iCourtCode=titaVo.getParam("CourtCode").trim();
 		int iDelayYM=Integer.valueOf(titaVo.getParam("DelayYM"));
 		String iDelayCode = titaVo.getParam("DelayCode");
+		int ixApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"))+19110000;
 		String iKey = "";
 		//JcicZ451
 		JcicZ451 iJcicZ451 = new JcicZ451();
@@ -86,7 +96,46 @@ public class L8330 extends TradeBuffer {
 		iJcicZ451Id.setSubmitKey(iSubmitKey); 
 		iJcicZ451Id.setDelayYM(iDelayYM);
 		JcicZ451 chJcicZ451 = new JcicZ451();
+		//檢核項目(D-60)
+		//需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號」是否存在「'447':金融機構無擔保債務協議資料」
+		//二start
+		Slice<JcicZ447> xJcicZ447 = sJcicZ447Service.otherEq(iSubmitKey,iCustId,ixApplyDate,iCourtCode, this.index, this.limit, titaVo);
+		if (xJcicZ447 == null) {
+			throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否存在「'447':前置調解無擔保債務還款分配表資料」"); 
+		}
+		//二end
+		//「延期繳款年月」不得小於「調解申請日」
+		//三start
+		int ioApplyDate = (int)Math.floor((iApplyDate/100));
+		this.info("ioApplyDate=" + ioApplyDate);
+		if(iDelayYM<ioApplyDate) {
+			throw new LogicException(titaVo, "E0005", "「延期繳款年月」不得小於「調解申請日」"); 
+		}
+		//三end
+		//延期繳款累積期數(月份)不得超過6期
+		//四start
+			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+			String istday = String.valueOf(ixApplyDate);
+			int cYear = Integer.valueOf(istday.substring(0,4));
+			int cMonth = Integer.valueOf(istday.substring(4,6));
+			int cDate = Integer.valueOf(istday) % 100;
+			Calendar calMonthLastDate = Calendar.getInstance();
+			calMonthLastDate.set(cYear,cMonth+6,cDate);
+			int ixoDelayYM = (Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()))/100)-191100;
+			this.info("iDelayYM"+iDelayYM);
+			this.info("ixoDelayYM"+ixoDelayYM);
+				if(iDelayYM>ixoDelayYM) {
+					throw new LogicException(titaVo, "E0005", "延期繳款累積期數(月份)不得超過6期"); 
+				}
 		
+		//四end
+		//同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料
+		//五start
+		Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if (xJcicZ446 != null) {
+			throw new LogicException(titaVo, "E0005", "同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料"); 
+		}
+		//五end
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ451

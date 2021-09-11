@@ -54,10 +54,10 @@ public class L1R16 extends TradeBuffer {
 		}
 
 		//2021.8.31 by eric
-		if ("Y".equals(vo.getIsFinancial())) {
-			totaVo.putParam("L1R16IsFinancialYn", "Y");
+		if ("Y".equals(vo.getIsSuspected())) {
+			totaVo.putParam("L1R16IsSuspectedYn", "Y");
 		} else {
-			totaVo.putParam("L1R16IsFinancialYn", "N");
+			totaVo.putParam("L1R16IsSuspectedYn", "N");
 		}
 		
 		totaVo.putParam("L1R16DataDate", vo.getDataDate());

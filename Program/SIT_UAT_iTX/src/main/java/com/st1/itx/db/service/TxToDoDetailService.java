@@ -93,6 +93,21 @@ public interface TxToDoDetailService {
   public Slice<TxToDoDetail> DataDateRange(String itemCode_0, int status_1, int status_2, int dataDate_3, int dataDate_4, int index, int limit, TitaVo... titaVo);
 
   /**
+   * ItemCode = ,AND TitaEntdy = ,AND TitaKinbr = ,AND TitaTlrNo = ,AND TitaTxtNo = 
+   *
+   * @param itemCode_0 itemCode_0
+   * @param titaEntdy_1 titaEntdy_1
+   * @param titaKinbr_2 titaKinbr_2
+   * @param titaTlrNo_3 titaTlrNo_3
+   * @param titaTxtNo_4 titaTxtNo_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice TxToDoDetail TxToDoDetail of List
+   */
+  public Slice<TxToDoDetail> findTxNoEq(String itemCode_0, int titaEntdy_1, String titaKinbr_2, String titaTlrNo_3, int titaTxtNo_4, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By TxToDoDetail
    * 
    * @param txToDoDetailId key

@@ -7,34 +7,57 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.Query;
+
+import org.hibernate.query.internal.NativeQueryImpl;
+import com.st1.itx.config.AliasToEntityLinkHashMapResultTransformer;
 import com.st1.itx.util.log.SysLogger;
 
 public class ASpringJpaParm extends SysLogger {
 
 	public List<Map<String, String>> convertToMap(List<Object> list) {
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+
 		try {
 			for (Iterator<Object> iter = list.iterator(); iter.hasNext();) {
 				Object[] values = (Object[]) iter.next();
 				Map<String, String> m = new LinkedHashMap<String, String>();
-				for (int i = 0; i < values.length; i++) {
-					String value = "";
-					if (values[i] == null)
-						value = "";
-					else {
-						String[] ss = values[i].toString().split("\\$n");
-						for (String s : ss)
-							value += s;
-					}
-					m.put("F" + Integer.toString(i), value);
-				}
+				for (int i = 0; i < values.length; i++)
+					m.put("F" + Integer.toString(i), values[i] == null ? "" : values[i].toString());
 				result.add(m);
 			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.error(errors.toString());
+		}
+		this.info("result:" + result.size());
+		return result;
+	}
+
+	public List<Map<String, String>> convertToMap(Query query) {
+		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+
+		query.unwrap(NativeQueryImpl.class).setResultTransformer(AliasToEntityLinkHashMapResultTransformer.INSTANCE);
+//		.setResultTransformer(Transformers.aliasToBean(new LinkedHashMap<String, Object>().getClass()));
+//		.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		List rows = query.getResultList();
+
+		for (Object obj : rows) {
+			Map<String, Object> row = (LinkedHashMap<String, Object>) obj;
+			Map<String, String> m = new LinkedHashMap<String, String>();
+			Set<String> set = row.keySet();
+			Iterator<String> it = set.iterator();
+			int i = 0;
+			while (it.hasNext()) {
+				String key = it.next();
+				m.put("F" + Integer.toString(i), row.get(key) == null ? "" : row.get(key).toString());
+				m.put(key, row.get(key) == null ? "" : row.get(key).toString());
+				i++;
+			}
+			result.add(m);
 		}
 		this.info("result:" + result.size());
 		return result;

@@ -48,6 +48,8 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 /**
  * 
@@ -61,6 +63,12 @@ public class LP004 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
 	LP004Report lP004Report;
+	
+	@Autowired
+	WebClient webClient;
+
+	@Autowired
+	DateUtil dDateUtil;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -75,7 +83,10 @@ public class LP004 extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LP004 ");
 		lP004Report.setTxBuffer(this.getTxBuffer());
+		lP004Report.setParentTranCode(this.getParent());
 		lP004Report.exec(titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo(), "LP004單位成績(內部網站)", titaVo);
 	}
 
 }

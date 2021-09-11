@@ -72,8 +72,10 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iPropDate = iPropDate + 19110000;
 		}
 
+		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
+		// iAuthApplCode 1.新增授權 2.再次授權 3.取消授權
 		switch (iFunctionCode) {
-		// 1. 篩選資料 2.產出媒體檔 3.重製媒體碼
+		// 篩選資料 
 		case 1:
 			switch (iAuthApplCode) {
 			case 1: // 1.申請
@@ -167,7 +169,9 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ) p                            ";
 		sql += " where seq = 1                ";
 
-		sql += "   and \"AuthErrorCode\""  + searchstatus ;
+		sql += "   and nvl(\"AuthErrorCode\", ' ')"  + searchstatus ;
+		// iFunctionCode 1.篩選資料 2.產出媒體 3.重製媒體碼
+		// iAuthApplCode 1.新增授權 2.再次授權 3.取消授權
 		switch (iFunctionCode) {
 		case 1:
 			sql += "   and \"PostMediaCode\" " + searchMediaCode;
@@ -175,14 +179,17 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 				sql += "   and \"CustNo\" = " + iCustNo;
 			}
 			if (iPropDate > 0) {
-				sql += "   and \"PropDate\" <= " + iPropDate;
+				sql += "   and \"PropDate\" >= " + iPropDate;
 			}
 			if (iPropDate == 0 && iCustNo == 0) {
 				sql += "   and \"PropDate\" != " + propDate;
 			}
+			if (iAuthApplCode == 3) {
+				sql += "   and a.\"AuthApplCode\" = '1'";				
+			}
 			break;
 		case 2:
-			sql += "   and \"PropDate\" = " + propDate;
+			sql += "   and \"PostMediaCode\" " + searchMediaCode;
 			break;
 		case 3:
 			sql += "   and \"PropDate\" = " + propDate;

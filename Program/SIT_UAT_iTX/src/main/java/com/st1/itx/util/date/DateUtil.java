@@ -81,10 +81,11 @@ public class DateUtil extends SysLogger {
 	 */
 
 	public int getDate_1Integer() throws LogicException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		if (this.bcFg)
-			return parse.stringToInteger(this.date_1.toString());
+			return parse.stringToInteger(sdf.format(this.date_1));
 		else
-			return parse.stringToInteger(this.date_1.toString()) - 19110000;
+			return parse.stringToInteger(sdf.format(this.date_1)) - 19110000;
 	}
 
 	/**
@@ -94,7 +95,8 @@ public class DateUtil extends SysLogger {
 	 * @throws LogicException LogicException
 	 */
 	public String getDate_1String() throws LogicException {
-		int temp = parse.stringToInteger(this.date_1.toString());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		int temp = parse.stringToInteger(sdf.format(this.date_1));
 		if (!this.bcFg)
 			temp = temp - 19110000;
 
@@ -141,10 +143,11 @@ public class DateUtil extends SysLogger {
 	 * @throws LogicException LogicException
 	 */
 	public int getDate_2Integer() throws LogicException {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		if (this.bcFg)
-			return parse.stringToInteger(this.date_2.toString());
+			return parse.stringToInteger(sdf.format(this.date_2));
 		else
-			return parse.stringToInteger(this.date_2.toString()) - 19110000;
+			return parse.stringToInteger(sdf.format(this.date_2)) - 19110000;
 	}
 
 	/**
@@ -154,7 +157,8 @@ public class DateUtil extends SysLogger {
 	 * @throws LogicException when go warng
 	 */
 	public String getDate_2String() throws LogicException {
-		int temp = parse.stringToInteger(this.date_2.toString());
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
+		int temp = parse.stringToInteger(sdf.format(this.date_2));
 		if (this.bcFg)
 			temp = temp - 19110000;
 

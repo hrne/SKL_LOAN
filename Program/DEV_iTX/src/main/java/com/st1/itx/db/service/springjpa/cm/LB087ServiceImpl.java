@@ -69,6 +69,6 @@ public class LB087ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		// 轉成 List<HashMap<String, String>>
 //    	return this.convertToMap(query.getResultList());
-		return this.convertToMap(null);
+		return this.convertToMap(query);
 	}
 }

@@ -12,7 +12,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBonus;
 import com.st1.itx.db.domain.CdWorkMonth;
-import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.service.CdBonusService;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -50,16 +49,19 @@ public class L6081 extends TradeBuffer {
 
 		// 取得輸入資料
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
-		
-		
-		int AcDate = titaVo.getEntDyI();// 7碼
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 200; // 53 * 200 = 10600
 		
-		
+		int AcDate = titaVo.getEntDyI()+19110000;
+		String tWorkMonthAcDate = "";
+		CdWorkMonth iCdWorkMonth = iCdWorkMonthService.findDateFirst(AcDate, AcDate, titaVo);
+		if(iCdWorkMonth!=null) {
+			tWorkMonthAcDate = String.valueOf(iCdWorkMonth.getYear())+parse.IntegerToString(iCdWorkMonth.getMonth(), 2);
+			this.info("tWorkMonthAcDate=="+tWorkMonthAcDate);
+		}
 		
 		
 
@@ -84,21 +86,30 @@ public class L6081 extends TradeBuffer {
 				workMonthList.add(0, tCdBonus.getWorkMonth());
 			}
 		}
-
+		
+		int tBonusAcDate =0;
+		//找生效中工作月	
+		if(!("").equals(tWorkMonthAcDate)) {
+			CdBonus iCdBonus  = sCdBonusService.findWorkMonthFirst(Integer.parseInt(tWorkMonthAcDate), titaVo);
+			if(iCdBonus!=null) {
+				tBonusAcDate = iCdBonus.getWorkMonth();
+				this.info("tBonusAcDate=="+tBonusAcDate);
+			}
+		}
+		
+		
 		for (int reWorkMonth : workMonthList) {
 			OccursList occursList = new OccursList();
-			int iYear = Integer.valueOf(String.valueOf(reWorkMonth).substring(0,4));
-			int iMonth = Integer.valueOf(String.valueOf(reWorkMonth).substring(4,6));
-			
-			occursList.putParam("OOFlag", 0);
-			
-			CdWorkMonth tWorkMonth = iCdWorkMonthService.findById(new CdWorkMonthId(iYear,iMonth), titaVo);
-			if(tWorkMonth!=null) {
-				int MonthEnd = tWorkMonth.getEndDate();
-				if( AcDate>MonthEnd) {//已停效
-					occursList.putParam("OOFlag", 1);
-				}
+			this.info("reWorkMonth=="+reWorkMonth);
+			if(reWorkMonth > tBonusAcDate) {//0:未生效
+				occursList.putParam("OOFlag", 0);
+			} else if(reWorkMonth == tBonusAcDate) {//1:生效中
+				occursList.putParam("OOFlag", 1);
+			} else {
+				occursList.putParam("OOFlag", 2);//2:已失效
 			}
+			
+			
 			occursList.putParam("OOWorkMonth", reWorkMonth - 191100);
 			this.totaVo.addOccursList(occursList);
 		}

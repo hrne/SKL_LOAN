@@ -1,0 +1,520 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L4611)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[180,320,180,320];printer.width=[20,20,20,20];order=1;">
+[
+["[L4611]                                 續約保單資料維護"],
+[#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,#CustNoX,"-",#FacmNo,#FacmNoX,#CustName],
+[#<->#,"#FdInsuYearMonth+年月份",#InsuYearMonth,#InsuYearMonthX],
+[#<->#,"#FdClCode1+擔保品編號",#ClCode1,#LableClCode1,"-",#ClCode2,#LableClCode2,"-",#ClNo,#LableClNo],
+[#<->#,"#FdPrevInsuNo+原保單號碼",#PrevInsuNo],
+["#FdEndoInsuNo+批單號碼",#EndoInsuNo,#EndoInsuNoX],[#LableA,#NowInsuNo,#NowInsuNoX],
+["#FdFireInsuCovrg+火險保額",#FireInsuCovrg],["#FdNewFireInsuCovrg+維護後-火險保額",#NewFireInsuCovrg],
+["#FdFireInsuPrem+火險保費",#FireInsuPrem],["#FdNewFireInsuPrem+維護後-火險保費",#NewFireInsuPrem],
+["#FdEthqInsuCovrg+地震險保額",#EthqInsuCovrg],["#FdNewEthqInsuCovrg+維護後-地震險保額",#NewEthqInsuCovrg],
+["#FdEthqInsuPrem+地震險保費",#EthqInsuPrem],["#FdNewEthqInsuPrem+維護後-地震險保費",#NewEthqInsuPrem],
+["#FdInsuStartDate+保險起日",#InsuStartDate],["#FdNewInsuStartDate+維護後-保險起日",#NewInsuStartDate],
+["#FdInsuEndDate+保險迄日",#InsuEndDate],["#FdNewInsuEndDate+維護後-保險迄日",#NewInsuEndDate],
+[#<->#,"@"],
+["#FdRenewCode+保險狀態",#RenewCode,#RenewCodeX],["#FdTotalPrem+總保費",#TotalPrem],
+["#FdInsuCompany+保險公司",#InsuCompany,#InsuCompanyX],["#FdInsuTypeCode+保險類別",#InsuTypeCode,#InsuTypeCodeX],
+["#FdAcDate+會計日期",#AcDate],["#FdNotiTempFg+入通知檔",#NotiTempFg],
+["#FdTitaTxtNo+交易序號",#TitaTxtNo],["#FdStatusCode+處理代碼",#StatusCode,#StatusCodeX],
+["#FdOvduDate+轉催收日",#OvduDate],["#FdOvduNo+轉催編號",#OvduNo],
+]
+
+
+#FdFunctionCodeX=X,2,L
+#FdCustNo=X,2,L
+#FdInsuYearMonth=X,2,L
+#FdClCode1=X,2,L
+#FdPrevInsuNo=X,2,L
+#FdEndoInsuNo=X,2,L
+#FdFireInsuCovrg=X,2,L
+#FdFireInsuPrem=X,2,L
+#FdEthqInsuCovrg=X,2,L
+#FdEthqInsuPrem=X,2,L
+#FdInsuStartDate=X,2,L
+#FdInsuEndDate=X,2,L
+#FdRenewCode=X,2,L
+#FdInsuCompany=X,2,L
+#FdAcDate=X,2,L
+#FdTitaTxtNo=X,2,L
+#FdOvduDate=X,2,L
+#FdNewFireInsuCovrg=X,2,L
+#FdNewFireInsuPrem=X,2,L
+#FdNewEthqInsuCovrg=X,2,L
+#FdNewEthqInsuPrem=X,2,L
+#FdNewInsuStartDate=X,2,L
+#FdNewInsuEndDate=X,2,L
+#FdTotalPrem=X,2,L
+#FdInsuTypeCode=X,2,L
+#FdNotiTempFg=X,2,L
+#FdStatusCode=X,2,L
+#FdOvduNo=X,2,L
+
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+
+!Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![保險公司]
+#CDDEF01=x,26,S
+T(3,CdCode.InsuCompany)
+
+#InsuCompanyHelp=x,1024,S
+
+![保險類別]
+#CDDEF02=x,26,S
+T(3,CdCode.InsuTypeCode)
+
+#InsuTypeCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@InsuCompanyHelp,#HelpDesc1)
+T(2,@InsuTypeCodeHelp,#HelpDesc2)
+
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L4960進入),$)
+
+
+#NTXBUF=x,50,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunctionCode,#NTXBUF,1,1)
+T(1,@ClCode1,#NTXBUF,2,1)
+T(1,@ClCode2,#NTXBUF,3,2)
+T(1,@ClNo,#NTXBUF,5,7)
+T(1,@LableClCode1,#NTXBUF,2,1)
+T(1,@LableClCode2,#NTXBUF,3,2)
+T(1,@LableClNo,#NTXBUF,5,7)
+T(1,@PrevInsuNo,#NTXBUF,12,16)
+T(1,@EndoInsuNo,#NTXBUF,28,16)
+T(1,@RenewCode,#NTXBUF,44,1)
+
+! 修改、刪除調Rim
+<include src="ROM.icf::L4R18.dec"/>
+
+! InsuRenew續保檔Key
+#RimClCode1=A,1,S
+#RimClCode2=A,2,S
+#RimClNo=A,7,S
+#RimPrevInsuNo=x,16,S
+#RimEndoInsuNo=x,16,S
+
+! 塞值調rim，無值提error
+#RimL4r18=X,1,S
+! C(3,#FunctionCode,1,s,$)
+T(1,@RimClCode1,#NTXBUF,2,1)
+T(1,@RimClCode2,#NTXBUF,3,2)
+T(1,@RimClNo,#NTXBUF,5,7)
+T(1,@RimPrevInsuNo,#NTXBUF,12,16)
+T(1,@RimEndoInsuNo,#NTXBUF,28,16)
+RESET_RIM(#RimL4r18,L4R18)
+S(L4R18,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo)
+R(1,L4R18)
+
+! 自保且新保單號碼不為空時，保單號碼&日期須調整
+#RimL4R18SetValue=A,1,S
+C(3,#L4r18CustNo,0,s,$)
+E(0,@CustNo,#L4r18CustNo)
+E(0,@FacmNo,#L4r18FacmNo)
+E(0,@InsuYearMonth,#L4r18InsuYearMonth)
+
+C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo),T(2,@PrevInsuNo,#L4r18NowInsuNo)),T(2,@NowInsuNo,#L4r18NowInsuNo))
+
+
+T(2,@EndoInsuNo,#L4r18EndoInsuNo)
+E(0,@FireInsuCovrg,#L4r18FireInsuCovrg)
+E(0,@FireInsuPrem,#L4r18FireInsuPrem)
+E(0,@EthqInsuCovrg,#L4r18EthqInsuCovrg)
+E(0,@EthqInsuPrem,#L4r18EthqInsuPrem)
+E(0,@InsuStartDate,#L4r18InsuStartDate)
+E(0,@InsuEndDate,#L4r18InsuEndDate)
+E(0,@AcDate,#L4r18AcDate)
+T(2,@NotiTempFg,#L4r18NotiTempFg)
+T(2,@TitaTxtNo,#L4r18TitaTxtNo)
+E(0,@StatusCode,#L4r18StatusCode)
+E(0,@OvduDate,#L4r18OvduDate)
+T(2,@OvduNo,#L4r18OvduNo)
+T(2,@InsuCompany,#L4r18InsuCompany)
+T(2,@InsuTypeCode,#L4r18InsuTypeCode)
+
+
+#SelfInsuCodeHelp2=x,30,S
+T(3,0:新保;1:自保;2:續保)
+
+! 自保續保
+#RenewCodeX=x,4,L
+T(3,)T(H,#RenewCode,#SelfInsuCodeHelp2)
+
+!功能 下拉式選單 2.修改 5.查詢
+#FunctionCode=A,1,S
+C(3,#CHAIN,0,E(0,1),$)
+C(2,#FunctionCode,$,s,$,s,$)
+HELP(1:新增;2:修改;4:刪除;5:查詢;6:自保)
+@V(1,1,2,4,5,6)
+C(3,#FunctionCode,6,s,$)
+ E(0,@FUNCIND,#FunctionCode)
+
+#FunctionCodeX=X,4,L
+C(2,#FunctionCode,T(3,),
+           T(3,新增),
+           T(3,修改),
+           T(3,),
+           T(3,刪除),
+           T(3,查詢),
+           T(3,自保),
+           T(3,))
+C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢),K(MODIFYBUTTON,自保),$)
+C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
+!顯示INPUT,LABEL
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunctionCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+#ShowFd=X,1,S
+C(2,#FunctionCode,T(3, ),T(3,*),T(3,*),T(3, ),T(3, ),T(3, ),T(3,*),T(3, ))
+T(2,@FdCustNo,#ShowFd)     
+T(2,@FdInsuYearMonth,#ShowFd)
+T(2,@FdNewInsuStartDate,#ShowFd)
+T(2,@FdNewInsuEndDate,#ShowFd)
+T(2,@FdInsuCompany,#ShowFd)
+T(2,@FdInsuTypeCode,#ShowFd)
+
+! 預先塞值
+#PreValue=A,1,S
+T(2,@LableA,     新保單號碼)
+E(0,@NewFireInsuCovrg,#FireInsuCovrg)
+E(0,@NewFireInsuPrem,#FireInsuPrem)
+E(0,@NewEthqInsuCovrg,#EthqInsuCovrg)
+E(0,@NewEthqInsuPrem,#EthqInsuPrem)
+C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,E(0,@NewInsuStartDate,#InsuStartDate),E(0,@NewInsuStartDate,#InsuEndDate)),E(0,@NewInsuStartDate,#InsuStartDate))
+C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,E(0,@NewInsuEndDate,#InsuEndDate),E(0,@NewInsuEndDate,#InsuEndDate+10000)),E(0,@NewInsuEndDate,#InsuEndDate))
+E(0,@CustNoX,#CustNo)
+E(0,@FacmNoX,#FacmNo)
+E(0,@InsuYearMonthX,#InsuYearMonth)
+T(2,@NowInsuNoX,#NowInsuNo)
+T(2,@EndoInsuNoX,#EndoInsuNo)
+E(0,@TotalPrem,#EthqInsuPrem+#FireInsuPrem)
+SWITCH(#StatusCode,0,T(3,@StatusCodeX,正常),1,T(3,@StatusCodeX,借支),2,T(3,@StatusCodeX,催收),3,T(3,@StatusCodeX,呆帳),T(3,@StatusCodeX, ))
+
+! 預先塞中文
+#InsuCompanyPreX=x,10,L
+C(3,#CHAIN,1,$,s)
+C(3,#InsuCompany,0,S,$)
+T(H,#InsuCompany,#InsuCompanyHelp)
+T(2,@InsuCompanyX,#InsuCompanyPreX)
+#InsuTypeCodePreX=x,14,L
+C(3,#CHAIN,1,$,s)
+C(3,#InsuTypeCode,0,S,$)
+T(H,#InsuTypeCode,#InsuTypeCodeHelp)
+T(2,@InsuTypeCodeX,#InsuTypeCodePreX)
+
+
+! 欄位變化
+! 狀態:自保能維護狀態
+#ColDisplay=A,1,S
+C(3,#L4r18CustNo,0,
+SHOW(#ClCode1,#ClCode2,#ClNo,#CustNo,#FacmNo,#InsuYearMonth,#NowInsuNo,#EndoInsuNo)
+HIDE(#LableClCode1,#LableClCode2,#LableClNo,#CustNoX,#FacmNoX,#InsuYearMonthX,#NowInsuNoX,#StatusCode,#EndoInsuNoX),
+HIDE(#ClCode1,#ClCode2,#ClNo,#CustNo,#FacmNo,#InsuYearMonth,#NowInsuNo,#EndoInsuNo)
+SHOW(#LableClCode1,#LableClCode2,#LableClNo,#CustNoX,#FacmNoX,#InsuYearMonthX,#NowInsuNoX,#StatusCode,#EndoInsuNoX))
+C(3,#FunctionCode,6,SHOW(#NowInsuNo)HIDE(#NowInsuNoX),IF(#FunctionCode==2&&#RenewCode==1,SHOW(#NowInsuNo)HIDE(#NowInsuNoX),SHOW(#NowInsuNoX)HIDE(#NowInsuNo)))
+C(3,#FunctionCode,2,SHOW(#RenewCode),HIDE(#RenewCode))
+C(3,#FunctionCode,4,
+T(F,#NewFireInsuCovrg,0)
+T(F,#NewFireInsuPrem,0)
+T(F,#NewEthqInsuCovrg,0)
+T(F,#NewEthqInsuPrem,0)
+T(F,#NewInsuStartDate,0)
+T(F,#NewInsuEndDate,0)
+HIDE(#InsuCompany,#InsuTypeCode,#StatusCode)
+,$)
+
+!借款人戶號 
+#CustNo=A,7,I
+C(3,#L4r18CustNo,0,$,s)
+@V(2,0)
+#CustNoX=A,7,L
+
+! 額度
+#FacmNo=A,3,I
+C(3,#L4r18CustNo,0,$,s)
+@V(2,0)
+#FacmNoX=A,3,L
+
+#CustName=X,10,L
+
+!年月份
+#InsuYearMonth=A,5,I
+C(3,#L4r18CustNo,0,$,s)
+@V(2,0)
+A(YM,1,#InsuYearMonth)
+#InsuYearMonthX=A,5,L
+
+!擔保品編號 
+#ClCode1=A,1,I
+IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
+C(3,#CHAIN,0,$,s)
+!擔保品編號 
+#LableClCode1=A,1,L
+
+!擔保品編號 
+#ClCode2=A,2,I
+IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
+C(3,#CHAIN,0,$,s)
+#LableClCode2=A,2,L
+
+!擔保品編號 
+#ClNo=A,7,I
+IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
+C(3,#CHAIN,0,$,s)
+#LableClNo=A,7,L
+
+!原保單號碼
+#PrevInsuNo=X,16,L
+
+!批單號碼
+!僅新增與可KeyIn(修改需先刪除後再新增)
+#EndoInsuNo=X,16,I
+C(3,#L4r18CustNo,0,$,s)
+
+#EndoInsuNoX=X,16,L
+
+#LableA=x,15,L
+
+!新保單號碼
+!僅新增與自保可KeyIn，或修改的自保件
+#NowInsuNo=X,16,I
+IF(#FunctionCode==1,$,IF(#FunctionCode==6,$,IF(#FunctionCode==2&&#RenewCode==1,$,s)))
+@
+IF(#FunctionCode==6,V(7),s)
+
+#NowInsuNoX=X,16,L
+
+!火險保額
+#FireInsuCovrg=m,14,L
+
+!新火險保額
+#NewFireInsuCovrg=m,14,I
+C(2,#FunctionCode,s,$,$,s,s,s,$)
+
+!火險保費
+#FireInsuPrem=m,14,L
+
+!新火險保費
+#NewFireInsuPrem=m,14,I
+C(2,#FunctionCode,s,$,$,s,s,s,$)
+
+!地震險保額
+#EthqInsuCovrg=m,14,L
+
+!新地震險保額
+#NewEthqInsuCovrg=m,14,I
+C(2,#FunctionCode,s,$,$,s,s,s,$)
+
+!檢查 地震險保險金額 + 火災險保險金額 > 0
+#CHECK_AMT=m,14.2,S
+E(2,#NewFireInsuCovrg+#NewEthqInsuCovrg)
+C(2,#FunctionCode,s,$,$,s,s,s,s)
+IF(#CHECK_AMT==0,V(P,保險金額不可皆為0),$)
+
+
+!地震險保費
+#EthqInsuPrem=m,14,L
+
+!新地震險保費
+#NewEthqInsuPrem=m,14,I
+C(2,#FunctionCode,s,$,$,s,s,s,$)
+
+!檢查 地震險保費 + 火災險保費 > 0
+#CHECK_FEE=m,14,S
+E(2,@TotalPrem,#NewFireInsuPrem+#NewEthqInsuPrem)
+C(2,#FunctionCode,s,$,$,s,s,s,s)
+IF(#TotalPrem==0,V(P,保費不可皆為0),$)
+
+!保險起日
+#InsuStartDate=D,7,L
+
+!新保險起日
+#NewInsuStartDate=D,7,I
+C(2,#FunctionCode,s,$,$,s,s,s,$)
+@V(7)A(DATE,0,#NewInsuStartDate)
+
+!保險迄日
+#InsuEndDate=D,7,L
+
+!新保險迄日
+#NewInsuEndDate=D,7,I
+C(2,#FunctionCode,s,$,$,s,s,s,$)
+@V(7)A(DATE,0,#NewInsuEndDate)
+
+! 自保續保
+#RenewCode=A,1,I
+C(3,#FunctionCode,2,$,s)
+HELP(#SelfInsuCodeHelp2)
+@V(H,#SelfInsuCodeHelp2)
+! 自保續保
+#RenewCodeX=_,_,L
+T(3,)T(H,#RenewCode,#SelfInsuCodeHelp2)
+
+!總保費
+#TotalPrem=m,14,L
+
+! 保險公司
+#InsuCompany=A,2,I
+C(2,#FunctionCode,s,$,$,s,s,s)
+HELP(#InsuCompanyHelp)
+@V(H,#InsuCompanyHelp)
+
+#InsuCompanyX=x,10,L
+C(4,#InsuCompany,S,$)
+T(H,#InsuCompany,#InsuCompanyHelp)
+
+! 保險類別
+#InsuTypeCode=A,2,I
+C(2,#FunctionCode,s,$,$,s,s,s)
+HELP(#InsuTypeCodeHelp)
+@C(4,#InsuTypeCode,S,$)       
+V(H,#InsuTypeCodeHelp)
+
+#InsuTypeCodeX=x,14,L
+C(4,#InsuTypeCode,S,$)
+T(H,#InsuTypeCode,#InsuTypeCodeHelp)
+
+
+!會計日期
+#AcDate=D,7,L
+C(2,#FunctionCode,s,$,$,s,s,s,s)
+
+!入通知檔
+#NotiTempFg=X,1,L
+C(2,#FunctionCode,s,$,$,s,s,s,s)
+
+!交易序號
+#TitaTxtNo=A,7,L
+C(2,#FunctionCode,s,$,$,s,s,s,s)
+
+! QC 497 可維護 & + 結案
+!處理代碼
+#StatusCode=A,1,I
+IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,s))
+HELP(0:正常;1:借支;2:催收;3:呆帳;4:結案)
+@V(1,0,1,2,3,4)
+#StatusCodeX=X,10,L
+SWITCH(#StatusCode,
+0,T(3,@StatusCodeX,正常),
+1,T(3,@StatusCodeX,借支),
+2,T(3,@StatusCodeX,催收),
+3,T(3,@StatusCodeX,呆帳),
+4,T(3,@StatusCodeX,結案),
+T(3,@StatusCodeX, ))
+
+!轉催收日
+#OvduDate=D,7,L
+C(2,#FunctionCode,s,$,$,s,s,s,s)
+
+!轉催編號
+#OvduNo=A,10,L
+C(2,#FunctionCode,s,$,$,s,s,s,s)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L4611 ----------
+<sub type="FORM" name="L4611">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L4611,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L4611] 火險保費資料查詢修改-依戶號)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunctionCode
+#CustNo
+#FacmNo
+#InsuYearMonth
+#ClCode1
+#ClCode2
+#ClNo
+#PrevInsuNo
+#EndoInsuNo
+#NowInsuNo
+#NewFireInsuCovrg
+#NewFireInsuPrem
+#NewEthqInsuCovrg
+#NewEthqInsuPrem
+#NewInsuStartDate
+#NewInsuEndDate
+#TotalPrem
+#InsuCompany
+#InsuTypeCode
+#AcDate
+#NotiTempFg
+#TitaTxtNo
+#StatusCode
+#OvduDate
+#OvduNo
+#RenewCode
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L4611^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L4R18.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

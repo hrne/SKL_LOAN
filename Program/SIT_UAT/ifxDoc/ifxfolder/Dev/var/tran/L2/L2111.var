@@ -39,7 +39,7 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[200,300,200,300];printer.width=[30,30,30,30];order=1">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,900];printer.width=[30,30,30,30];order=1">
 [
 ["[L2111]                                 案件申請登錄"],
 [#<->#,"#FdFuncCode+功能",#FuncCodeX],
@@ -50,19 +50,8 @@ E(0,0)
 [#<->#,"#FdProdNo+申請商品代碼",#ProdNo,#BTN3,#ProdName], 
 ! [#<->#,"#FdAcctCode+申請科目",#AcctCode,#AcctCodeX],
 [#<->#,"#FdCurrencyCode+申請幣別",#CurrencyCode],
-[#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimit,#IsLimitX],
-[#<->#,"#FdIsRelated+是否為利害關係人",#IsRelated,#IsRelatedX],
-[#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNear,#IsLnrelNearX],
 [#<->#,"#FdApplAmt+申請金額",#TwApplAmt,#UsApplAmt,#LbApplAmt],
 [#<->#,"#FdPieceCode+計件代碼",#PieceCode,#PieceCodeX],
-["#FdEstimate+估價人員",#Estimate,#BTN4,#EstimateX],          
-["#FdCreditOfficer+授信人員",#CreditOfficer,#BTN5,#CreditOfficerX],
-["#FdLoanOfficer+放款專員",#LoanOfficer,#BTN6,#LoanOfficerX],
-["#FdSupervisor+核決主管",#Supervisor,#BTN8,#SupervisorX],  
-["#FdCoorgnizer+協辦人",#Coorgnizer,#BTN9,#CoorgnizerX],  
-["#FdIntroducer+介紹人",#Introducer,#BTN7,#IntroducerX],     
-[#<->#,"#FdGroupId+團體戶統編",#GroupId,#BTN10,#GroupIdX],
-["#FdProcessCode+處理情形",#ProcessCodeX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -73,10 +62,16 @@ E(0,0)
 #BTN6=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
 #BTN7=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
 #BTN8=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BTN9=X,15,I,ui:button;value:協辦人員等級查詢;enable:1;tabbable:0;title:L5022 協辦人員資料查詢;
+#BTN9=X,15,I,ui:button;value:協辦人員查詢;enable:1;tabbable:0;title:L5022 協辦人員資料查詢;
 #BTN10=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
 #BUF1=X,42,S
 HIDE(#UsApplAmt)
+
+#Init1=X,1,S
+HIDE(#FinancialBtn)
+
+#FinancialBtn=X,15,I,ui:button;value:明細查詢;enable:1;tabbable:0;title:L1909 疑似準利害關係人明細查詢;
+
 !---------- AP TEXT AREA Variables ----------
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -141,6 +136,14 @@ E(0,1)ASGN(AGAIN$)
 !已作過准駁處理之案件不可刪除
 #FdFuncCode=X,2,L
 C(3,#CHAIN,1,T(3, ),T(3,*))
+
+#FdIsLimit=X,2,L
+#FdIsRelated=X,2,L
+#FdIsLnrelNear=X,2,L
+#FdIsSuspected=X,2,L
+T(3,*)
+#FdIsSuspected2=X,2,L
+T(3,*)
 
 #FuncCode=A,1,S
 C(3,#CHAIN,1,T(1,#NTXBUF,1,1),$)
@@ -335,6 +338,10 @@ R(1,L2R07)
 
 #CustIdX=X,100,L
 T(2,#L2r07CustName)
+
+#FinancialBind=X,1,S
+SHOW(#FinancialBtn)
+BIND(#FinancialBtn,click, {cmd=CHAIN; ntxcd=L1909; ntxbuf=#CustIdX;ntxbuf5=type<-1})
 
 #SendL2r12=X,1,S
 C(3,#UpdateCode,1,$,S)
@@ -653,42 +660,6 @@ IF(#FuncCode==1 || #FuncCode==3,T(2,#L2r01CurrencyCode),$)
 #Precision=N,1,S
 T(H,#CurrencyCode,#CurrPrecisionHelp)
 
-
-#FdIsLimit=X,2,L
-!是否為授信限制對象
-#IsLimit=X,1,L
-@C(4,#IsLimit,$,V(H,#YesNoHelp))
-
-#IsLimitX=X,4,L
-C(4,#IsLimit,S,$)
-T(H,#IsLimit,#YesNoHelp)
-
-#FdIsRelated=X,2,L
-!是否為利害關係人
-#IsRelated=X,1,L
-@C(4,#IsRelated,$,V(H,#YesNoHelp))
-
-#IsRelatedX=X,4,L
-C(4,#IsRelated,S,$)
-T(H,#IsRelated,#YesNoHelp)
-
-#FdIsLnrelNear=X,2,L
-! !是否為準利害關係人
-#IsLnrelNear=X,1,L
-@C(4,#IsLnrelNear,$,V(H,#YesNoHelp))
-
-#IsLnrelNearX=X,4,L
-C(4,#IsLnrelNear,S,$)
-T(H,#IsLnrelNear,#YesNoHelp)
-
-
-
-#WkDspAmt1=X,1,S
-C(3,#UpdateCode,1,$,S)
-C(3,#Precision,0,SHOW(#TwApplAmt)HIDE(#UsApplAmt)
-                ,HIDE(#TwApplAmt)SHOW(#UsApplAmt))
-C(3,#ApproveFlag,1,SHOW(#LbApplAmt)HIDE(#TwApplAmt,#UsApplAmt),$)
-                
 ![申請金額]
 #FdApplAmt=X,2,L
 
@@ -725,6 +696,78 @@ HELP(#PieceCodeHelp)
 
 #PieceCodeX=X,20,L
 T(H,#PieceCode,#PieceCodeHelp)
+
+<include src="ROM.icf::L1R16.dec"/>
+! 調是否為關係人rim
+#RimL1R16=X,1,S
+RESET_RIM(#RimL1r16,L1R16)
+T(2,@RimCustId,#CustId)
+T(2,@RimCustName,#CustIdX)
+S(L1R16,1,#RimCustId,#RimCustName)
+R(1,L1R16)
+T(2,@IsLimit,#L1R16IsLimitYn)
+T(2,@IsRelated,#L1R16IsRelatedYn)
+T(2,@IsLnrelNear,#L1R16IsLnrelNearYn)
+T(2,@IsSuspected,#L1R16IsSuspectedYn)
+T(2,@IsSuspectedCheck,#L1R16IsSuspectedYn)
+T(2,@IsDataDate,#L1R16DataDate)
+
+!是否為授信限制對象
+#IsLimit=X,1,L
+
+#IsLimitX=X,4,L
+C(4,#IsLimit,S,$)
+T(H,#IsLimit,#YesNoHelp)
+
+!是否為利害關係人
+#IsRelated=X,1,L
+
+#IsRelatedX=X,4,L
+C(4,#IsRelated,S,$)
+T(H,#IsRelated,#YesNoHelp)
+
+! !是否為準利害關係人
+#IsLnrelNear=X,1,L
+
+#IsLnrelNearX=X,4,L
+C(4,#IsLnrelNear,S,$)
+T(H,#IsLnrelNear,#YesNoHelp)
+
+#IsSuspected=X,1,L
+
+#IsSuspectedX=X,4,L
+T(H,#IsSuspected,#YesNoHelp)
+
+#IsSuspectedCheck=X,1,I
+HELP(#YesNoHelp)
+@
+V(H,#YesNoHelp)
+
+#IsSuspectedCheckX=X,4,L
+T(H,#IsSuspectedCheck,#YesNoHelp)
+
+#IsSuspectedCheckTypeHelp=X,100,S
+T(3, :請選擇;Y:確認核對無誤)
+
+#IsSuspectedCheckType=X,1,I
+HELP(#IsSuspectedCheckTypeHelp)
+@
+V(7)
+V(H,#IsSuspectedCheckTypeHelp)
+
+#IsSuspectedCheckTypeX=X,4,L
+T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
+
+#IsDataDate=D,7,L
+
+
+
+#WkDspAmt1=X,1,S
+C(3,#UpdateCode,1,$,S)
+C(3,#Precision,0,SHOW(#TwApplAmt)HIDE(#UsApplAmt)
+                ,HIDE(#TwApplAmt)SHOW(#UsApplAmt))
+C(3,#ApproveFlag,1,SHOW(#LbApplAmt)HIDE(#TwApplAmt,#UsApplAmt),$)
+                
 
 
 
@@ -1005,6 +1048,32 @@ V(P,修改時，必須至少修改一個項目)
 <include src="ROM.icf::L2R12.dec"/>
 <include src="ROM.icf::L2R13.dec"/>
 </sub>
+<sub type="DC" name="p2" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
+[
+[""],
+[#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimit,#IsLimitX],
+[#<->#,"#FdIsRelated+是否為利害關係人",#IsRelated,#IsRelatedX],
+[#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNear,#IsLnrelNearX],
+["#FdIsSuspected+是否為金控「疑似準利害關係人」名單",#IsSuspectedX,#FinancialBtn],
+["#FdIsSuspected2+是否為金控疑似準利害關係人",#IsSuspectedCheck,#IsSuspectedCheckX,#IsSuspectedCheckType,#IsSuspectedCheckTypeX],
+[#<->#,"#FdIsLimit+以上資訊日期",#IsDataDate],
+]
+</sub>
+
+<sub type="DC" name="p3" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
+[
+[""],
+["#FdEstimate+估價人員",#Estimate,#BTN4,#EstimateX],          
+["#FdCreditOfficer+授信人員",#CreditOfficer,#BTN5,#CreditOfficerX],
+["#FdLoanOfficer+放款專員",#LoanOfficer,#BTN6,#LoanOfficerX],
+["#FdSupervisor+核決主管",#Supervisor,#BTN8,#SupervisorX],  
+["#FdCoorgnizer+協辦人",#Coorgnizer,#BTN9,#CoorgnizerX],  
+["#FdIntroducer+介紹人",#Introducer,#BTN7,#IntroducerX],     
+[#<->#,"#FdGroupId+團體戶統編",#GroupId,#BTN10,#GroupIdX],
+["#FdProcessCode+處理情形",#ProcessCodeX],
+]
+
+</sub>
 
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
@@ -1029,14 +1098,15 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-
 #FuncCode#CustId#ApplNo#CreditSysNo#ApplDate#ProdNo#CurrencyCode
 #IsLimit#IsRelated#IsLnrelNear
 #TimApplAmt#Estimate
 #PieceCode#CreditOfficer#LoanOfficer#Introducer#Supervisor#Coorgnizer
 #ProcessCode#GroupId
+#IsSuspected
+#IsSuspectedCheck
+#IsSuspectedCheckType
 #END
-
 </sub>
 
 
@@ -1047,6 +1117,7 @@ TXFORM=L2111
 ^
 
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R16.tom"/>
 <include src="ROM.icf::L2R01.tom"/>
 <include src="ROM.icf::L2R02.tom"/>
 <include src="ROM.icf::L2R07.tom"/>

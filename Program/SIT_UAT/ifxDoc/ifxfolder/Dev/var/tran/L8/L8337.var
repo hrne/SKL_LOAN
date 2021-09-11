@@ -42,10 +42,12 @@ E(0,0)
 [
 ["[L8337]                                 (575)更生債權金額異動通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+款項統一收付申請日",#ApplyDate],["#FdModifyType+債權異動類別",#ModifyType,#ModifyTypeX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+["#FdApplyDate+款項統一收付申請日",#ApplyDate],
+[#<->#,"#FdModifyType+債權異動類別",#ModifyType,#ModifyTypeX],
 [#<->#,"#FdBankId+異動債權金融機構代號",#BankId,#BankIdX],
-[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -228,7 +230,7 @@ R(1,L8R01)
 T(2,@BankIdX,#L8r01JcicBankName)
 
 
-#BankIdX=X,80,L
+#BankIdX=X,70,L
 T(2,@RimJcicBankCode,#BankId)
 RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)

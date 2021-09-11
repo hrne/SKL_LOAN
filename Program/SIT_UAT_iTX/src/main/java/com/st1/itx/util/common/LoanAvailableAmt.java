@@ -114,8 +114,8 @@ public class LoanAvailableAmt extends TradeBuffer {
 			} else {
 				this.clShareFlag = "1"; 
 			}
-			this.limitFlag = "C"; // C-擔保品
-			this.availableAmt = this.availableCl;
+	// TEMP		this.limitFlag = "C"; // C-擔保品
+	// TEMP		this.availableAmt = this.availableCl;
 		}
 
 		this.info("caculate end ");

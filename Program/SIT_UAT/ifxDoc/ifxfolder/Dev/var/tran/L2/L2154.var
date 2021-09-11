@@ -932,9 +932,8 @@ E(0,@RimApplNo,#L2r05ApplNo)
 C(3,#UpdateCode,1,RESET_RIM(#SendL2r02,L2R02),$)
 S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
 R(1,L2R02)
-
-#RcvL2r05A=X,1,S
-IF(#FKEY==0 || #FKEY==7,$,s)
+! #RcvL2r05A=X,1,S
+! IF(#FKEY==0 || #FKEY==7,$,s)
 T(2,@ProdNo,#L2r05ProdNo)
 E(0,@ApplNo,#L2r05ApplNo)
 T(2,@BaseRateCode,#L2r05BaseRateCode)
@@ -972,7 +971,14 @@ T(2,@IrrevocableFlag,#L2r05IrrevocableFlag)
 T(2,@PieceCode,#L2r05PieceCode)
 E(0,@RateAdjNoticeCode,#L2r05RateAdjNoticeCode)
 E(0,@RepayCode,#L2r05RepayCode)
+E(0,@OldRepayCode,#L2r05RepayCode)
 E(0,@beforeRepaycode,#L2r05RepayCode)
+T(2,@RepayBank,#L2r05RepayBank)
+E(0,@OldRepayBank,#L2r05RepayBank)
+E(0,@RepayAcctNo,#L2r05RepayAcctNo)
+E(0,@OldAcctNo,#L2r05RepayAcctNo)
+T(2,@PostCode,#L2r05PostCode)
+T(2,@OldPostCode,#L2r05PostCode)
 T(2,@RepayBank,#L2r05RepayBank)
 E(0,@RepayAcctNo,#L2r05RepayAcctNo)
 T(2,@PostCode,#L2r05PostCode)
@@ -1004,11 +1010,21 @@ E(0,@CreditScore,#L2r05CreditScore)
 E(0,@GuaranteeDate,#L2r05GuaranteeDate)
 T(2,@ContractNo,#L2r05ContractNo)
 T(2,@CreditSysNo,#L2r05CreditSysNo)
-E(0,@RelationCode,#L2r05RelationCode)
+T(2,@RelationCode,#L2r05RelationCode)
 T(2,@RelationName,#L2r05RelationName)
 T(2,@RelationId,#L2r05RelationId)
 E(0,@RelationBirthday,#L2r05RelationBirthday)
 T(2,@RelationGender,#L2r05RelationGender)
+T(2,@RelationCode,#L2r05RelationCode)
+T(2,@OldRelationCode,#L2r05RelationCode)
+T(2,@RelationName,#L2r05RelationName)
+T(2,@OldRelationName,#L2r05RelationName)
+T(2,@RelationId,#L2r05RelationId)
+T(2,@OldRelationId,#L2r05RelationId)
+E(0,@RelationBirthday,#L2r05RelationBirthday)
+E(0,@OldRelationBirthday,#L2r05RelationBirthday)
+T(2,@RelationGender,#L2r05RelationGender)
+T(2,@OldRelationGender,#L2r05RelationGender)
 C(3,#FuncCode,5,E(0,@BaseRate,#L2r05BaseRate),$)
 ##loop{times:10,n:1}
 E(0,@StepMonthS{n},#L2r05StepRateMonths{n})
@@ -1020,6 +1036,23 @@ E(0,@StepMonthELb{n},#L2r05StepRateMonthE{n})
 E(0,@StepRateIncrLb{n},#L2r05StepRateIncr{n})
 T(3,@StepRatePer{n},%)
 ##end
+
+
+! 檢查該帳號是否授權 郵局檢查
+! 4R22
+#SendL4R22=X,1,S
+C(3,#L2r05RepayCode,02,$,S)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimAcctNo,#L2r05RepayAcctNo)
+E(0,@RimBankNo,#L2r05RepayBank)
+C(5,#RepayBank,700,T(2,@RimPostDepCode,#L2r05PostCode),$)
+S(L4R22,1,#RimCustNo,#RimAcctNo,#RimBankNo,#RimPostDepCode)
+R(1,L4R22)
+
+#SetValue=A,1,S
+C(3,#RepayCode,02,$,S)
+E(0,@BeforeAcctCheckFlag,#L4r22CheckCode)
+
 
 #RcvL2r05B=X,1,S
 E(0,@LbLoanTermYy,#L2r05LoanTermYy)
@@ -2455,11 +2488,15 @@ T(H,#RepayCode,#RepayCodeHelp)
 #RimFunCode=A,1,S
 
 #MainStatus=X,1,S
-
-#TempAcctNo=A,14,S
-#TempRepayBank=A,3,S
-#TempPostCode=X,1,S
-
+#OldRepayCode=A,2,S
+#OldAcctNo=A,14,S
+#OldRepayBank=A,3,S
+#OldPostCode=X,1,S
+#OldRelationCode=X,2,S
+#OldRelationName=x,100,S
+#OldRelationId=X,10,S
+#OldRelationBirthday=D,7,S
+#OldRelationGender=X,1,S
 
 #SendL2r44=X,1,S
 IF(#FKEY==0 || #FKEY==7,$,s)
@@ -2476,17 +2513,22 @@ IF(#FKEY==0 || #FKEY==7,$,s)
 E(0,@beforeRepaycode,#RepayCode)
 C(3,#RepayCode,2,$,S)
 T(2,@RepayBank,#L2r44RepayBank)
-E(0,@TempRepayBank,#L2r44RepayBank)
+E(0,@OldRepayBank,#L2r44RepayBank)
 E(0,@RepayAcctNo,#L2r44RepayAcctNo)
-E(0,@TempAcctNo,#L2r44RepayAcctNo)
+E(0,@OldAcctNo,#L2r44RepayAcctNo)
 T(2,@PostCode,#L2r44PostCode)
-T(2,@TempPostCode,#L2r44PostCode)
+T(2,@OldPostCode,#L2r44PostCode)
 !T(2,@AchAuthCode,#L2r44AchAuthCode)
-E(0,@RelationCode,#L2r44RelationCode)
+T(2,@RelationCode,#L2r44RelationCode)
+T(2,@OldRelationCode,#L2r44RelationCode)
 T(2,@RelationName,#L2r44RelationName)
+T(2,@OldRelationName,#L2r44RelationName)
 T(2,@RelationId,#L2r44RelationId)
+T(2,@OldRelationId,#L2r44RelationId)
 E(0,@RelationBirthday,#L2r44RelationBirthday)
+E(0,@OldRelationBirthday,#L2r44RelationBirthday)
 T(2,@RelationGender,#L2r44RelationGender)
+T(2,@OldRelationGender,#L2r44RelationGender)
 T(2,@MainStatus,#L2r44MainStatus)
 
 
@@ -2530,7 +2572,7 @@ HIDE(#LbRepayBank,#LbRepayAcctNo,#LbPostCode)
 
 #RepayBank=X,3,I
 C(3,#UpdateCode,1,$,s)
-C(3,#RepayCode,02,$,S)
+C(3,#RepayCode,2,$,S)
 IF(#FuncCode==2,$,s)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 HELP(#BankDeductCdHelp)
@@ -2539,6 +2581,7 @@ V(2,0)
 C(3,#UpdateCode,1,C(5,#RepayBank,700,T(3,@FdPostCode,*),T(3,@FdPostCode, )),$)
 
 #LbRepayBank=X,3,L
+C(3,#RepayCode,2,$,S)
 
 ! #SendL2r09=X,1,S
 ! C(3,#RepayCode,2,$,S)
@@ -2567,11 +2610,12 @@ C(5,#RepayBank,700,T(2,@FdPostCode,#WkStar),T(3,@FdPostCode, ))
 #RepayAcctNo=A,14,I
 C(3,#UpdateCode,1,$,s)
 C(3,#RepayCode,2,$,S)
-IF(#FuncCode==2 ,$,s)
+IF(#FuncCode==2,$,s)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 @V(2,0)
 
 #LbRepayAcctNo=A,14,L
+C(3,#RepayCode,2,$,S)
 
 
 #RimFindCode=A,1,S
@@ -2580,6 +2624,7 @@ C(3,#Hide5Fg,0,CALL(#HideP5),$)
 #RimBankNo=A,3,S
 
 #AcctCheckFlag=A,1,S
+#BeforeAcctCheckFlag=A,1,S
 
 ![郵局存款別]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
@@ -2596,6 +2641,7 @@ HELP(#PostCodeHelp)
 @V(7)V(H,#PostCodeHelp)
 
 #LbPostCode=X,1,L
+C(3,#RepayCode,2,$,S)
 
 #PostCodeX=X,4,L
 C(5,#RepayBank,700,$,S)
@@ -2615,7 +2661,7 @@ RESET_RIM(#SendL4R22A,L4R22)
 S(L4R22,1,#RimCustNo,#RimAcctNo,#RimBankNo,#RimPostDepCode)
 R(1,L4R22)
 
-#SetValue=A,1,S
+#SetValueA=A,1,S
 C(3,#RepayCode,02,$,S)
 E(0,@AcctCheckFlag,#L4r22CheckCode)
 C(3,#AcctCheckFlag,1,
@@ -2623,18 +2669,18 @@ T(2,@RelationCode,#L4r22RelationCode)
 T(2,@RelationName,#L4r22RelAcctName)
 T(2,@RelationId,#L4r22RelationId)
 E(0,@RelationBirthday,#L4r22RelAcctBirthday)
-T(2,@RelationGender,#L4r22RelAcctGender),
-E(0,@RelationCode,0)
-T(2,@RelationName,)
-T(2,@RelationId,)
-E(0,@RelationBirthday,0)
-E(0,@RelationGender,0))
+T(2,@RelationGender,#L4r22RelAcctGender),$)
+! T(2,@RelationCode,)
+! T(2,@RelationName,)
+! T(2,@RelationId,)
+! E(0,@RelationBirthday,0)
+! E(0,@RelationGender,0))
 
 #ChECKfLaG=A,1,S
 E(0,0)
-IF(#TempAcctNo==#RepayAcctNo,$,s)
-IF(#TempRepayBank==#RepayBank,$,s)
-IF(#TempPostCode==#PostCode,$,s)
+IF(#OldAcctNo==#RepayAcctNo,$,s)
+IF(#OldRepayBank==#RepayBank,$,s)
+IF(#OldPostCode==#PostCode,$,s)
 E(0,1)
 
 !未授權
@@ -2642,7 +2688,8 @@ E(0,1)
 C(3,#RepayCode,02,$,S)
 C(3,#UpdateCode,0,S,$)
 C(3,#ChECKfLaG,1,S,$)
-C(3,#AcctCheckFlag,1,$,V(P,此帳號未授權))
+C(3,#BeforeAcctCheckFlag,8,S,$)
+C(3,#AcctCheckFlag,1,$,V(P,此帳號未授權，請至L4042／L4043新增授權資料))
 
 
 
@@ -2650,7 +2697,7 @@ C(3,#AcctCheckFlag,1,$,V(P,此帳號未授權))
 !修改時自動顯示可修改,其他自動顯示不必須輸入
 #FdRelationCode=X,2,L
 
-#RelationCode=A,2,L
+#RelationCode=X,2,L
 C(3,#UpdateCode,1,$,s)
 C(3,#RepayCode,2,$,S)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
@@ -2658,6 +2705,7 @@ HELP(#RelationCodeHelp)
 @C(3,#RepayCode,2,s,V(H,#RelationCodeHelp))
 
 #RelationCodeX=X,4,L
+T(3,)
 T(H,#RelationCode,#RelationCodeHelp)
 
 #WkFDP5C=X,1,S
@@ -2729,10 +2777,6 @@ HELP(#SexHelp)
 #RelationGenderX=X,2,L
 C(3,#RelationCode,0,S,$)
 T(H,#RelationGender,#SexHelp)
-
-
-
-
 
 !---- P6 專員
 #INVK6=X,1,S
@@ -3561,6 +3605,9 @@ T(3,[L2154] 額度資料維護)
 ##end
 #END
 #TwApplAmt#UsApplAmt#TwAcctFee#UsAcctFee
+#OldRepayCode#OldAcctNo#OldRepayBank
+#OldPostCode#OldRelationCode#OldRelationName
+#OldRelationId#OldRelationBirthday#OldRelationGender
 
 
 </sub>
