@@ -91,6 +91,9 @@ public interface InsuRenewRepositoryHist extends JpaRepository<InsuRenew, InsuRe
   // CustNo = 
   public Slice<InsuRenew> findAllByCustNoIsOrderByInsuEndDateDescInsuStartDateAsc(int custNo_0, Pageable pageable);
 
+  // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND NowInsuNo = 
+  public Slice<InsuRenew> findAllByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int clCode1_0, int clCode2_1, int clNo_2, String nowInsuNo_3, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8329]                                 (450)前置調解債務人繳款資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 [#<->#,"#FdPayDate+繳款日期",#PayDate],
 ["#FdPayAmt+本次繳款金額",#PayAmt],["#FdSumRepayActualAmt+累計實際還款金額",#SumRepayActualAmt],
@@ -85,16 +86,20 @@ T(3,CdCode.YesNo)
 T(3,CdCode.Status50)
 #Status50Help=x,1024,S
 
-
+! CourtCode
+#CDDEF0004=x,20,S
+T(3,CdCode.CourtCode)
+#CourtCodeHelp=x,1024,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@YesNoHelp,#HelpDesc2)
 T(2,@Status50Help,#HelpDesc3)
+T(2,@CourtCodeHelp,#HelpDesc4)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -181,15 +186,11 @@ E(0,@OutJcicTxtDate,#L8r46OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(H,@PayStatusX,#PayStatus,#Status50Help)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r46TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
 ! 調Rim相關 結束
 
 ![交易代碼]
@@ -229,22 +230,17 @@ A(DATE,0,#ApplyDate)
 
 !受理調解機構代號-承審法院代碼OR郵遞區號
 #CourtCode=X,3,I
-C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(7)
-T(2,@RimJcicBankCode,#CourtCode)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+C(5,#TranKey,X,T(2,@CourtCode,#L8r46CourtCode),$)
+C(5,#TranKey,X,s,$)
+HELP(#CourtCodeHelp)
+@V(H,#CourtCodeHelp)
 
 
-#CourtCodeX=X,80,L
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+#CourtCodeX=X,20,L
+T(H,#CourtCode,#CourtCodeHelp)
+
 
 !繳款日期
 #PayDate=D,7,I

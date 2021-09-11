@@ -304,7 +304,6 @@ public class LM013Report extends MakeReport {
 						} else if (thisDataType == DataType.None) 
 						{
 							// 情況2A  : 兩種資料類型一樣, 正常資料, 同戶號   - 換行
-							
 							this.print(1, 0, " ");
 						} else if (thisDataType == DataType.Sum)
 						{
@@ -352,10 +351,18 @@ public class LM013Report extends MakeReport {
 						this.print(0, 68, formatAmt(tLDVo.get("F7"), 0), "R");
 						this.print(0, 159, formatAmt(tLDVo.get("F8"), 0), "R");
 						break;
+					case "5":
+						// 銀行保證
+						this.print(0, 83, formatAmt(tLDVo.get("F7"), 0), "R");
+						this.print(0, 174, formatAmt(tLDVo.get("F8"), 0), "R");
+						break;
+					case "9":
+						// 動產抵押
+						this.print(0, 53, formatAmt(tLDVo.get("F7"), 0), "R");
+						this.print(0, 144, formatAmt(tLDVo.get("F8"), 0), "R");
+						break;
 					default:
-						// 樣張中沒有動產抵押項
-						// 而銀行保證則是沒有資料
-						// 這些項目目前先跳過, 等之後確定條件
+						// 其餘情況, 不予輸出
 						break;
 					}
 

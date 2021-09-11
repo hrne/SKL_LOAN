@@ -321,6 +321,20 @@ public interface InsuRenewService {
   public Slice<InsuRenew> findCustEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND NowInsuNo = 
+   *
+   * @param clCode1_0 clCode1_0
+   * @param clCode2_1 clCode2_1
+   * @param clNo_2 clNo_2
+   * @param nowInsuNo_3 nowInsuNo_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuRenew InsuRenew of List
+   */
+  public Slice<InsuRenew> findNowInsuNoEq(int clCode1_0, int clCode2_1, int clNo_2, String nowInsuNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By InsuRenew
    * 
    * @param insuRenewId key

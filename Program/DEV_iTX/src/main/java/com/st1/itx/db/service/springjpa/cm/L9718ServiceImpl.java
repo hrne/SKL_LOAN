@@ -59,8 +59,8 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "SELECT ";
 		sql += "             EMP.\"Fullname\" AS F0";
 		sql += "            ," + Integer.parseInt(titaVo.getParam("inputYearMonth").substring(3)) + " AS F1";
-		sql += "            ,:inputEntryDateMin AS F2";
-		sql += "            ,:inputEntryDateMax AS F3";
+		sql += "            ,:inputEntryDateMin - 19110000 AS F2";
+		sql += "            ,:inputEntryDateMax - 19110000 AS F3";
 		sql += "            ,M.\"OvduTerm\" AS F4";
 		sql += "            ,M.\"CustNo\" AS F5";
 		sql += "            ,M.\"FacmNo\" AS F6";
@@ -81,15 +81,15 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "             END AS F11";
 		}
 		sql += "            ,M.\"OvduBal\" AS F12";
-		sql += "            ,M.\"PrevIntDate\" AS F13";
+		sql += "            ,M.\"PrevIntDate\" - 19110000 AS F13";
 		sql += "            ,CASE WHEN M.\"AcctCode\" = '990'";
 		sql += "             THEN NVL(TX.\"OvTxAmt\",0)";
 		sql += "             ELSE NVL(TX.\"LnTxAmt\",0)";
 		sql += "             END AS F14";
-		sql += "            ,CASE WHEN M.\"AcctCode\" = '990'";
+		sql += "            ,(CASE WHEN M.\"AcctCode\" = '990'";
 		sql += "                  THEN TX.\"OvEntryDate\"";
 		sql += "                  ELSE      TX.\"LnEntryDate\"";
-		sql += "             END AS F15";
+		sql += "             END) - 19110000 AS F15";
 		sql += "            ,0 AS F16";
 		sql += "            ,CASE WHEN NVL(COL.\"PrinBalance\",1) = 0";
 		sql += "                  THEN '結案'";
@@ -97,7 +97,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             END AS F17";
 		sql += "            ,LAW.\"LegalProg\" AS F18";
 		sql += "            ,CDL.\"Item\" AS F19";
-		sql += "            ,LAW.\"RecordDate\" AS F20";
+		sql += "            ,LAW.\"RecordDate\" - 19110000 AS F20";
 		sql += "            ,CITY.\"CityItem\" AS F21";
 		sql += "      FROM \"MonthlyFacBal\" M";
 		sql += "      LEFT JOIN \"CustMain\" CUS ON CUS.\"CustNo\" = M.\"CustNo\"";
@@ -155,7 +155,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  AND FAC.\"FirstDrawdownDate\" >= :inputDrawdownDate";
 
 		sql += "  AND M.\"AcctCode\"" + (findOvdu ? "=" : "!=") + " '990'";
-
+ 
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);

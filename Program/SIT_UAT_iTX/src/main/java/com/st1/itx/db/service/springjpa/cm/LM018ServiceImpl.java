@@ -96,6 +96,14 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT TO_CHAR('340') AS \"ProdNo\" ";
 		sql += "       ,'AA' AS \"ProdNoShow\" ";
 		sql += " FROM DUAL ";
+		sql += " UNION ALL ";
+		sql += " SELECT TO_CHAR('F15') AS \"ProdNo\" ";
+		sql += "       ,'ZZ' AS \"ProdNoShow\" ";
+		sql += " FROM DUAL ";
+		sql += " UNION ALL ";
+		sql += " SELECT TO_CHAR('F16') AS \"ProdNo\" ";
+		sql += "       ,'ZZ' AS \"ProdNoShow\" ";
+		sql += " FROM DUAL ";
 		sql += " ) ";
 		sql += " SELECT int.\"ProdNoShow\" F0";
 		sql += "       ,om.\"VisibleMonth\" F1";

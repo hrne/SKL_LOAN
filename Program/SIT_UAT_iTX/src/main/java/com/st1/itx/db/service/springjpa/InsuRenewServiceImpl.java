@@ -90,7 +90,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "PrevInsuNo", "EndoInsuNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "PrevInsuNo", "EndoInsuNo"));
     this.info("findAll " + dbName);
@@ -719,6 +719,34 @@ em = null;
       slice = insuRenewReposHist.findAllByCustNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
     else 
       slice = insuRenewRepos.findAllByCustNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<InsuRenew> findNowInsuNoEq(int clCode1_0, int clCode2_1, int clNo_2, String nowInsuNo_3, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<InsuRenew> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findNowInsuNoEq " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " nowInsuNo_3 : " +  nowInsuNo_3);
+    if (dbName.equals(ContentName.onDay))
+      slice = insuRenewReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, nowInsuNo_3, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = insuRenewReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, nowInsuNo_3, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = insuRenewReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, nowInsuNo_3, pageable);
+    else 
+      slice = insuRenewRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(clCode1_0, clCode2_1, clNo_2, nowInsuNo_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

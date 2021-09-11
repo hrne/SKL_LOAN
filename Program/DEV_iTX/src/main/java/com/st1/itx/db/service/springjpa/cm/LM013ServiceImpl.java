@@ -70,7 +70,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                   ,LPAD(D.\"FacmNo\", 3, '0') AS \"FacmNo\"  ";
 		sql += "                   ,C.\"CustId\" AS \"CustId\"  ";
 		sql += "                   ,C.\"CustName\" AS \"CustName\"  ";
-		sql += "                   ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" LIKE '8%' OR D.\"AcctCode\" = '340'  ";
+		sql += "                   ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" IN ('81','82','83') OR D.\"AcctCode\" = '340'  ";
 		sql += "                         THEN 0  ";
 		sql += "                    ELSE CASE CF.\"ClCode1\"  ";
 		sql += "                           WHEN 1  ";
@@ -128,7 +128,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                     ,LPAD(D.\"FacmNo\", 3, '0')  ";
 		sql += "                     ,C.\"CustId\"  ";
 		sql += "                     ,C.\"CustName\"  ";
-		sql += "                     ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" LIKE '8%' OR D.\"AcctCode\" = '340'  ";
+		sql += "                     ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" IN ('81','82','83') OR D.\"AcctCode\" = '340'  ";
 		sql += "                           THEN 0  ";
 		sql += "                      ELSE CASE CF.\"ClCode1\"  ";
 		sql += "                             WHEN 1  ";

@@ -156,6 +156,28 @@ public class L4602 extends TradeBuffer {
 				tInsuRenewMediaTemp.setNoticeFlag(noticeFlag);
 				lInsuRenewMediaTemp.add(tInsuRenewMediaTemp);
 				lInsuRenew.add(t);
+				this.info(occursList.toString());
+				this.info( t.toString());
+				this.info( tInsuRenewMediaTemp.toString());
+				OccursList occursListReport = new OccursList();
+				occursListReport.putParam("OOClCode1", t.getClCode1());
+				occursListReport.putParam("OOClCode2", t.getClCode2());
+				occursListReport.putParam("OOClNo", t.getClNo());
+				occursListReport.putParam("OOPrevInsuNo", t.getPrevInsuNo());
+				occursListReport.putParam("OOCustNo", t.getCustNo());
+				occursListReport.putParam("OOFacmNo", t.getFacmNo());
+				occursListReport.putParam("OORepayCodeX", t.getRepayCode());
+				occursListReport.putParam("OOCustName", tInsuRenewMediaTemp.getLoanCustName());
+				occursListReport.putParam("OONewInsuStartDate", t.getInsuStartDate());
+				occursListReport.putParam("OONewInsuEndDate", t.getInsuEndDate());
+				occursListReport.putParam("OOFireAmt", t.getFireInsuCovrg());
+				occursListReport.putParam("OOFireFee", t.getFireInsuPrem());
+				occursListReport.putParam("OOEthqAmt", t.getEthqInsuCovrg());
+				occursListReport.putParam("OOEthqFee", t.getEthqInsuPrem());
+				occursListReport.putParam("OOTotlFee", t.getTotInsuPrem());
+				occursListReport.putParam("OONoticeWay", tInsuRenewMediaTemp.getNoticeFlag());
+
+				this.totaVo.addOccursList(occursListReport);
 			}
 		}
 
@@ -165,30 +187,6 @@ public class L4602 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "InsuRenew : " + e.getErrorMsg());
 			}
-		}
-		if (lInsuRenewMediaTemp.size() > 0) {
-			for (InsuRenewMediaTemp t : lInsuRenewMediaTemp) {
-				OccursList occursListReport = new OccursList();
-				occursListReport.putParam("OOClCode1", t.getClCode1());
-				occursListReport.putParam("OOClCode2", t.getClCode2());
-				occursListReport.putParam("OOClNo", t.getClNo());
-				occursListReport.putParam("OOPrevInsuNo", t.getInsuNo());
-				occursListReport.putParam("OOCustNo", t.getCustNo());
-				occursListReport.putParam("OOFacmNo", t.getFacmNo());
-				occursListReport.putParam("OORepayCodeX", t.getRepayCode());
-				occursListReport.putParam("OOCustName", t.getLoanCustName());
-				occursListReport.putParam("OONewInsuStartDate", t.getNewInsuStartDate());
-				occursListReport.putParam("OONewInsuEndDate", t.getNewInsuEndDate());
-				occursListReport.putParam("OOFireAmt", t.getNewEqInsuAmt());
-				occursListReport.putParam("OOFireFee", t.getNewFireInsuFee());
-				occursListReport.putParam("OOEthqAmt", t.getNewEqInsuAmt());
-				occursListReport.putParam("OOEthqFee", t.getNewEqInsuFee());
-				occursListReport.putParam("OOTotlFee", t.getNewTotalFee());
-				occursListReport.putParam("OONoticeWay", t.getNoticeFlag());
-
-				this.totaVo.addOccursList(occursListReport);
-			}
-
 		}
 		// 把明細資料容器裝到檔案資料容器內
 		insuRenewFileVo.setOccursList(tmpList);
@@ -205,11 +203,14 @@ public class L4602 extends TradeBuffer {
 		long sno = makeFile.close();
 
 		this.info("sno : " + sno);
-
 		makeFile.toFile(sno);
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"L4602 已產生火險到期檔", titaVo);
+	//	webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+	//			"L4602 已產生火險到期檔", titaVo);
 
-		return null;
+		totaVo.put("PdfSnoM", "" + sno);
+
+		this.addList(this.totaVo);
+		return this.sendList();
+
 	}
 }

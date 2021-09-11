@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.UUID;
 
 /* 套件 */
@@ -16,11 +18,14 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.domain.JcicZ447;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ450;
 import com.st1.itx.db.domain.JcicZ450Id;
 import com.st1.itx.db.domain.JcicZ450Log;
+import com.st1.itx.db.service.JcicZ446Service;
+import com.st1.itx.db.service.JcicZ447Service;
 import com.st1.itx.db.service.JcicZ450LogService;
 
 /*DB服務*/
@@ -54,6 +59,10 @@ import com.st1.itx.util.data.DataLog;
 public class L8329 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ446Service sJcicZ446Service;
+	@Autowired
+	public JcicZ447Service sJcicZ447Service;
+	@Autowired
 	public JcicZ450Service sJcicZ450Service;
 	@Autowired
 	public JcicZ450LogService sJcicZ450LogService;
@@ -78,6 +87,7 @@ public class L8329 extends TradeBuffer {
 		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt"));
 		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt"));
 		String iPayStatus = titaVo.getParam("PayStatus");
+		int ixApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"))+19110000;
 		String iKey = "";
 		//JcicZ450
 		JcicZ450 iJcicZ450 = new JcicZ450();
@@ -88,8 +98,52 @@ public class L8329 extends TradeBuffer {
 		iJcicZ450Id.setCourtCode(iCourtCode);
 		iJcicZ450Id.setPayDate(iPayDate);
 		JcicZ450 chJcicZ450 = new JcicZ450();
-		
-		
+		//檢核項目(D-58)
+		//需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號」是否存在「'447':金融機構無擔保債務協議資料」
+		//二start
+		Slice<JcicZ447> xJcicZ447 = sJcicZ447Service.otherEq(iSubmitKey,iCustId,ixApplyDate,iCourtCode, this.index, this.limit, titaVo);
+		if (xJcicZ447 == null) {
+			throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否存在「'447':金融機構無擔保債務協議資料」"); 
+		}
+		//二end
+		//累計實際還款金額不等於該IDN所有已報送本檔案資料繳款金額之合計(含本次繳款金額)
+		//now PayAmt  count SumRepayActualAmt
+		//三start
+		Slice<JcicZ450> xJcicZ450 = sJcicZ450Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if (xJcicZ450 == null) {
+			throw new LogicException(titaVo, "E0001", ""); 
+		}
+		for(JcicZ450 xoJcicZ450:xJcicZ450) {
+		String ixCustId = iJcicZ450Id.getCustId();
+		int ixPayAmt = xoJcicZ450.getPayAmt();
+		this.info("ixPayAmt"+ixPayAmt);
+		this.info("iPayAmt"+iPayAmt);
+			if(ixCustId == iCustId) {
+				if((ixPayAmt + iPayAmt) != iSumRepayActualAmt) {
+					throw new LogicException(titaVo, "E0005", "累計繳款金額不等於該IND所有已報送之繳款金額(含今日)");
+					}			
+			}	
+		}
+		//三end
+		//「繳款日期」不得大於資料報送日期
+		//四start
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new Date());
+		int year = (cal.get(Calendar.YEAR)-1911)*10000;
+		int month = (cal.get(Calendar.MONTH) +1)*100;
+		int day = cal.get(Calendar.DAY_OF_MONTH);
+		int today = year+month+day;
+		if(iPayDate>today) {
+			throw new LogicException(titaVo, "E0005", "「繳款日期」不得大於資料報送日期"); 
+		}
+		//四end
+		//同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料
+		//五start
+		Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if (xJcicZ446 != null) {
+			throw new LogicException(titaVo, "E0005", "同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料"); 
+		}
+		//五end
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ450

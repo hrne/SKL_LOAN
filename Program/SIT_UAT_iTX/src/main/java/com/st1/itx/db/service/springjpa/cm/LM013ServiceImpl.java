@@ -70,7 +70,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                   ,LPAD(D.\"FacmNo\", 3, '0') AS \"FacmNo\"  ";
 		sql += "                   ,C.\"CustId\" AS \"CustId\"  ";
 		sql += "                   ,C.\"CustName\" AS \"CustName\"  ";
-		sql += "                   ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" LIKE '8%' OR D.\"AcctCode\" = '340'  ";
+		sql += "                   ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" IN ('81','82','83') OR D.\"AcctCode\" = '340'  ";
 		sql += "                         THEN 0  ";
 		sql += "                    ELSE CASE CF.\"ClCode1\"  ";
 		sql += "                           WHEN 1  ";
@@ -128,7 +128,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                     ,LPAD(D.\"FacmNo\", 3, '0')  ";
 		sql += "                     ,C.\"CustId\"  ";
 		sql += "                     ,C.\"CustName\"  ";
-		sql += "                     ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" LIKE '8%' OR D.\"AcctCode\" = '340'  ";
+		sql += "                     ,CASE WHEN D.\"ProdNo\" LIKE 'I%' OR D.\"ProdNo\" IN ('81','82','83') OR D.\"AcctCode\" = '340'  ";
 		sql += "                           THEN 0  ";
 		sql += "                      ELSE CASE CF.\"ClCode1\"  ";
 		sql += "                             WHEN 1  ";
@@ -168,7 +168,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,:IsRelsCondition AS \"IsRels\"  ";
 		sql += "        ,' ' AS \"CustNo\"  ";
 		sql += "        ,' ' AS \"FacmNo\"  ";
-		sql += "        ,'Everything_Above_Peko' AS \"CustId\"  ";
+		sql += "        ,'Everything_Above_Sum' AS \"CustId\"  ";
 		sql += "        ,u'以上合計' AS \"CustName\"  ";
 		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
 		sql += "        ,SUM(\"LineAmt\") AS \"LineAmt\"  ";
@@ -186,7 +186,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,:IsRelsCondition AS \"IsRels\"  ";
 		sql += "        ,' ' AS \"CustNo\"  ";
 		sql += "        ,' ' AS \"FacmNo\"  ";
-		sql += "        ,'Everything_Below_Peko' AS \"CustId\"  ";
+		sql += "        ,'Everything_Below_Sum' AS \"CustId\"  ";
 		sql += "        ,u'以下合計' AS \"CustName\"  ";
 		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
 		sql += "        ,SUM(\"LineAmt\") AS \"LineAmt\"  ";
@@ -204,7 +204,7 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,:IsRelsCondition AS \"IsRels\"  ";
 		sql += "        ,' ' AS \"CustNo\"  ";
 		sql += "        ,' ' AS \"FacmNo\"  ";
-		sql += "        ,'Everything_Miko' AS \"CustId\"  ";
+		sql += "        ,'Everything_Total' AS \"CustId\"  ";
 		sql += "        ,u'總計' AS \"CustName\"  ";
 		sql += "        ,\"ClCode1\" AS \"ClCode1\"  ";
 		sql += "        ,SUM(\"LineAmt\") AS \"LineAmt\"  ";

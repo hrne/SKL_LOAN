@@ -191,7 +191,7 @@ public class L4600Batch extends TradeBuffer {
 
 //		續保 -> 續保(新年度)
 //		step2 將續保檔內到期年月與tita相同者產出下一期
-		updateRenew(titaVo);
+		toRenewList(titaVo);
 		if (lInsuRenew.size() == 0) {
 			throw new LogicException("E0001", "查無資料");
 		}
@@ -215,6 +215,13 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 		long sno = makeFile.close();
+		
+		// INSERT 續保檔
+		try {
+			insuRenewService.insertAll(lInsuRenew);
+		} catch (DBException e) {
+			throw new LogicException("E0007", "InsuRenew : " + e.getErrorMsg());
+		}
 
 		this.info("sno : " + sno);
 
@@ -279,8 +286,9 @@ public class L4600Batch extends TradeBuffer {
 			}
 		}
 	}
+	
 
-	private void updateRenew(TitaVo titaVo) throws LogicException {
+	private void toRenewList(TitaVo titaVo) throws LogicException {
 
 		for (InsuRenew t : lInsuRenewTemp) {
 
@@ -341,13 +349,6 @@ public class L4600Batch extends TradeBuffer {
 			tInsuRenew.setOvduDate(0);
 			tInsuRenew.setOvduNo(BigDecimal.ZERO);
 			lInsuRenew.add(tInsuRenew);
-		}
-		if (lInsuRenew.size() > 0) {
-			try {
-				insuRenewService.insertAll(lInsuRenew);
-			} catch (DBException e) {
-				throw new LogicException("E0007", "InsuRenew : " + e.getErrorMsg());
-			}
 		}
 	}
 
@@ -613,7 +614,7 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 //		2.續保檔 = 原保險單號碼(t)=目前保險單號碼(t2)
-		Slice<InsuRenew> slInsuRenew = insuRenewService.findPrevInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(),
+		Slice<InsuRenew> slInsuRenew = insuRenewService.findNowInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(),
 				t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenew != null) {
 			for (InsuRenew t2 : slInsuRenew.getContent()) {
@@ -627,8 +628,8 @@ public class L4600Batch extends TradeBuffer {
 				eqthqInsuPrem = eqthqInsuPrem.add(t2.getEthqInsuPrem());
 			}
 		}
-		occursList.putParam("InsuStartDate", FormatUtil.pad9("" + b4StartDate + 19110000, 8));
-		occursList.putParam("InsuEndDate", FormatUtil.pad9("" + b4EndDate + 19110000, 8));
+		occursList.putParam("InsuStartDate", FormatUtil.pad9("" + (b4StartDate + 19110000), 8));
+		occursList.putParam("InsuEndDate", FormatUtil.pad9("" + (b4EndDate + 19110000), 8));
 		if ("L4600".equals(iTxCode)) {
 			occursList.putParam("FireInsuAmt", FormatUtil.pad9("" + t.getFireInsuCovrg(), 11));
 			occursList.putParam("FireInsuFee", FormatUtil.pad9("" + t.getFireInsuPrem(), 7));
@@ -648,8 +649,8 @@ public class L4600Batch extends TradeBuffer {
 			occursList.putParam("EqInsuAmt", FormatUtil.pad9("" + ethqInsuCovrg, 7));
 			occursList.putParam("EqInsuFee", FormatUtil.pad9("" + eqthqInsuPrem, 6));
 			occursList.putParam("NewInusNo", FormatUtil.padX(t.getNowInsuNo(), 16));
-			occursList.putParam("NewInsuStartDate", FormatUtil.pad9("" + t.getInsuStartDate() + 19110000, 10));
-			occursList.putParam("NewInsuEndDate", FormatUtil.pad9("" + t.getInsuEndDate() + 19110000, 10));
+			occursList.putParam("NewInsuStartDate", FormatUtil.pad9("" + (t.getInsuStartDate() + 19110000), 10));
+			occursList.putParam("NewInsuEndDate", FormatUtil.pad9("" + (t.getInsuEndDate() + 19110000), 10));
 			occursList.putParam("NewFireInsuAmt", FormatUtil.pad9("" + t.getFireInsuCovrg(), 11));
 			occursList.putParam("NewFireInsuFee", FormatUtil.pad9("" + t.getFireInsuPrem(), 7));
 			occursList.putParam("NewEqInsuAmt", FormatUtil.pad9("" + t.getEthqInsuCovrg(), 7));
@@ -660,7 +661,8 @@ public class L4600Batch extends TradeBuffer {
 		occursList.putParam("CustNo", FormatUtil.pad9("" + t.getCustNo(), 7));
 		occursList.putParam("FacmNo", FormatUtil.pad9("" + t.getFacmNo(), 3));
 		occursList.putParam("Space", FormatUtil.padX("", 4));
-		occursList.putParam("SendDate", FormatUtil.padLeft("" + titaVo.getCalDy() + 19110000, 14));
+		occursList.putParam("SendDate",
+				FormatUtil.padLeft("" + (parse.stringToInteger(titaVo.getCalDy()) + 19110000), 14));
 //				SklSalesName 2.CdEmp.FullName
 //				SklUnitCode  2.CdEmp.CenterCodeAcc
 //				SklUnitName  2.CdEmp.CenterShortName
