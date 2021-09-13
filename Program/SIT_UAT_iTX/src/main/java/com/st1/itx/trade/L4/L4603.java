@@ -590,7 +590,7 @@ public class L4603 extends TradeBuffer {
 				acReceivableList.add(acReceivable);
 
 				tInsuRenew = insuRenewService.holdById(tInsuRenew);
-				tInsuRenew.setNotiTempFg("N");
+				tInsuRenew.setNotiTempFg("");
 				try {
 					insuRenewService.update(tInsuRenew);
 				} catch (DBException e) {

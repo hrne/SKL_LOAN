@@ -920,8 +920,12 @@ public class MakeReport extends CommBuffer {
 
 		this.info("MakeReport.toPdf.filename =" + outfile);
 
+		if (this.rptCode == null) {
+			this.info("makeReport rptCode is null");
+		}
+		
 		// 檢查是否需浮水印
-		CdReport tCdReport = cdReportService.findById(this.rptCode, titaVo);
+		CdReport tCdReport = cdReportService.findById(this.rptCode);
 
 		watermarkFlag = false;
 

@@ -171,15 +171,15 @@ public class LM061Report extends MakeReport {
 					// 鑑價金額
 					F11 = tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11"));
 
-					// 代號 56 拍定金額   58 分配金額
+					// 代號 56 拍定金額 58 分配金額
 					if (tLDVo.get("F12").equals("056")) {
 
 						// 和上一個戶號不一樣就歸零 並直接附值
 						// 和上一個戶號一樣就累加 並 合併儲存格 再賦值
 						if (!tempCustNo2.equals(tLDVo.get("F0"))) {
-							
+
 							tempCustNo2 = tLDVo.get("F0");
-							
+
 							// 上一同戶號多額度跟這筆比較，如果有1筆以上就使用合併
 							if (tempCount > 1) {
 
@@ -189,11 +189,13 @@ public class LM061Report extends MakeReport {
 								// 同上方式，同戶號 累計轉催收金額 除以 鑑價金額 (LTV)
 								makeExcel.setValue(row - tempCount, 14, this.computeDivide(tempOvduBal, tempF11, 4),
 										"##0.0%");
+								this.info("2有相同戶號的累積金額"+tempOvduBal+",單筆金額"+ovduBal);
+								this.info("戶號：" + tLDVo.get("F0") + ",需合併：從" + (row - tempCount) + "到" + (row - 1));
 
 								// 賦值完後 合併
-								makeExcel.setMergedRegion(row - tempCount, row - 1, 13, 13);
+								makeExcel.setMergedRegion(row - tempCount, row -1, 13, 13);
 								// 賦值完後 合併
-								makeExcel.setMergedRegion(row - tempCount, row - 1, 14, 14);
+								makeExcel.setMergedRegion(row - tempCount, row -1, 14, 14);
 
 							}
 							// 暫存鑑價金額 歸零
@@ -225,7 +227,9 @@ public class LM061Report extends MakeReport {
 							tempCount++;
 
 							// 累加轉催收金額
+							
 							tempOvduBal = tempOvduBal.add(ovduBal);
+							this.info("1有相同戶號的累積金額"+tempOvduBal+",單筆金額"+ovduBal);
 
 							// BigDecimal的比較大小：-1 小於 0 等於 1 大於
 							if (tempF11.compareTo(F11) == -1) {
@@ -245,14 +249,14 @@ public class LM061Report extends MakeReport {
 									"##0.0%");
 
 							// 賦值完後 合併
-							makeExcel.setMergedRegion(row - tempCount, row - 1, 13, 13);
+							makeExcel.setMergedRegion(row - tempCount, row , 13, 13);
 							// 賦值完後 合併
-							makeExcel.setMergedRegion(row - tempCount, row - 1, 14, 14);
+							makeExcel.setMergedRegion(row - tempCount, row , 14, 14);
 
 						}
 
 					}
-					
+
 					// 代號 77 協議達成
 					if (tLDVo.get("F12").equals("077")) {
 						makeExcel.setValue(row, 18, " ", "C");

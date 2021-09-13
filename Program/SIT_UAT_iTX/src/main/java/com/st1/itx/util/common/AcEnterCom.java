@@ -361,7 +361,7 @@ public class AcEnterCom extends TradeBuffer {
 //        SlipBatNo 傳票批號 
 //         1.02:支票繳款 => 固定 11
 //         2.提存        >= 90
-//         2.其他        => 放款傳票批號
+//         2.其他        => 放款業務關帳 + 1
 //    業務類別  SecNo    傳票批號 SlipBatNo      傳票號碼 SlipNo
 //		01:撥款匯款               放款業務批號                 放款業務傳票號碼
 //		02:支票繳款               固定 11                          放款業務傳票號碼
@@ -403,7 +403,7 @@ public class AcEnterCom extends TradeBuffer {
 		} else if ("02".equals(SecNo)) {
 			SlipBatNo = 11;
 		} else {
-			SlipBatNo = tAcClose.getBatNo(); // 傳票批號
+			SlipBatNo = tAcClose.getClsNo() + 1; // 傳票批號
 			// 關帳狀態:0-開帳 1-關帳 2-關帳取消
 			if (tAcClose.getClsFg() == 1) {
 				throw new LogicException(titaVo, "E6003", "放款業務已關帳  ");

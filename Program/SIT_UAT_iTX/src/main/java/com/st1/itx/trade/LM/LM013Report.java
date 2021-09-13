@@ -52,7 +52,7 @@ public class LM013Report extends MakeReport {
 		
 		public static DataType getType(String s)
 		{
-			for (int i = 0; i < DataType.values().length; i++)
+			for (int i = 1; i < DataType.values().length; i++)
 			{
 				if (s.contains(DataType.values()[i].keyword))
 				{
