@@ -16,7 +16,6 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
-import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.BankRemitId;
@@ -77,16 +76,12 @@ public class AcPaymentCom extends TradeBuffer {
 
 	private List<AcDetail> acDetailList;
 	private AcDetail acDetail;
-	private BankRemit tBankRemit;
-	private BankRemitId tBankRemitId;
 	private AcClose tAcClose = new AcClose();
 	private int acDate;
 	private String titaTlrNo;
 	private String titaTxtNo;
-	private String batchNo;
 	private String RpFlag;
 	private TempVo tTempVo;
-	private String batchNoEmpty = "UnSend";
 
 	// initialize variable
 	@PostConstruct
@@ -94,12 +89,9 @@ public class AcPaymentCom extends TradeBuffer {
 		this.acDate = 0;
 		this.titaTlrNo = "";
 		this.titaTxtNo = "";
-		this.batchNo = "";
 		this.RpFlag = "";
 		this.acDetailList = new ArrayList<AcDetail>();
 		this.acDetail = new AcDetail();
-		this.tBankRemit = new BankRemit();
-		this.tBankRemitId = new BankRemitId();
 		this.tAcClose = new AcClose();
 		this.tTempVo = new TempVo();
 	}
@@ -391,10 +383,11 @@ public class AcPaymentCom extends TradeBuffer {
 	/* 取值與決定寫入資料庫之動作：正常、修改、訂正 */
 	private void procBankRemit(int i, TitaVo titaVo) throws LogicException {
 		/* 對BankRemit 撥款匯款檔查詢 */
+		BankRemitId tBankRemitId = new BankRemitId();
 		tBankRemitId.setAcDate(acDate);
 		tBankRemitId.setTitaTlrNo(titaTlrNo);
 		tBankRemitId.setTitaTxtNo(titaTxtNo);
-		tBankRemit = bankRemitService.findById(tBankRemitId, titaVo);
+		BankRemit tBankRemit = bankRemitService.findById(tBankRemitId, titaVo);
 		if (titaVo.isHcodeNormal() && titaVo.isActfgEntry()) {
 			if (tBankRemit != null) {
 				throw new LogicException("E0006", "撥款匯款檔已存在 " + tBankRemitId.toString());// 鎖定資料時，發生錯誤
@@ -410,8 +403,9 @@ public class AcPaymentCom extends TradeBuffer {
 		/* isHcodeNormal()正常交易且isActfgEntry() 登錄 */
 		// 寫一筆新的進資料庫。 */
 		if (titaVo.isHcodeNormal() && titaVo.isActfgEntry()) {
-			tBankRemit = moveTitaToBankRemit(i,tBankRemit, titaVo);// 搬BankRemit內容
-			tBankRemit.setBatchNo(batchNoEmpty);
+			tBankRemit = new BankRemit();
+			tBankRemit = moveTitaToBankRemit(i, tBankRemit, titaVo);// 搬BankRemit內容
+			tBankRemit.setBatchNo("");
 			tBankRemit.setStatusCode(0); // 正常
 			tBankRemit.setActFg(titaVo.getActFgI());
 			isInsert = true;
@@ -420,7 +414,7 @@ public class AcPaymentCom extends TradeBuffer {
 		/* isHcodeErase() 訂正交易 且 isActfgEntry() 登錄 */
 		// 已有批號，狀態= 2:產檔後訂正，並提示產檔後訂正警告訊息。 */
 		if (titaVo.isHcodeErase() && titaVo.isActfgEntry()) {
-			if (tBankRemit.getBatchNo().equals(batchNoEmpty)) {
+			if (tBankRemit.getBatchNo().isEmpty()) {
 				isDelete = true;
 			} else {
 				tBankRemit.setStatusCode(2); // 2:產檔後訂正
@@ -435,11 +429,13 @@ public class AcPaymentCom extends TradeBuffer {
 		// 未有批號,直接更新內容
 		// 已有批號，比對內容不同 ==> 狀態= 1:產檔後修正、內容放入產檔後修正後匯款單資料(jason)、提示產檔後修正警告訊息。
 		if (titaVo.isHcodeModify()) {
-			if (tBankRemit.getBatchNo().equals(batchNoEmpty)) {
+			if (tBankRemit.getBatchNo().isEmpty()) {
 				tBankRemit = moveTitaToBankRemit(i, tBankRemit, titaVo);// 搬BankRemit內容
 				isUpdate = true;
 			} else {
-				if (isModifyRemit(tBankRemit)) {
+				BankRemit t2BankRemit = new BankRemit();
+				t2BankRemit = moveTitaToBankRemit(i, t2BankRemit, titaVo);// 搬BankRemit內容
+				if (isModifyRemit(tBankRemit, t2BankRemit)) {
 					tBankRemit.setStatusCode(1);
 					tBankRemit.setModifyContent(tTempVo.getJsonString());
 					isUpdate = true;
@@ -524,8 +520,9 @@ public class AcPaymentCom extends TradeBuffer {
 		/* --------設定建值 End-------- */
 	}
 
-	/* 資料比對 */
-	private Boolean isModifyRemit(BankRemit t2BankRemit) throws LogicException {
+	/* 資料比對 tBankRemit:原內容 t2BankRemit新內容 */
+	private Boolean isModifyRemit(BankRemit tBankRemit, BankRemit t2BankRemit) throws LogicException {
+
 		tTempVo.clear();
 		Boolean isModify = true;
 		if (t2BankRemit.getDrawdownCode() == tBankRemit.getDrawdownCode()
@@ -539,25 +536,25 @@ public class AcPaymentCom extends TradeBuffer {
 		}
 		if (isModify) {
 			if (t2BankRemit.getDrawdownCode() != tBankRemit.getDrawdownCode()) {
-				tTempVo.putParam("DrawdownCode", tBankRemit.getDrawdownCode());
+				tTempVo.putParam("DrawdownCode", t2BankRemit.getDrawdownCode());
 			}
 			if (!t2BankRemit.getRemitBank().equals(tBankRemit.getRemitBank())) {
-				tTempVo.putParam("RemitBank", tBankRemit.getRemitBank());
+				tTempVo.putParam("RemitBank", t2BankRemit.getRemitBank());
 			}
 			if (!t2BankRemit.getRemitBranch().equals(tBankRemit.getRemitBranch())) {
-				tTempVo.putParam("RemitBranch", tBankRemit.getRemitBranch());
+				tTempVo.putParam("RemitBranch", t2BankRemit.getRemitBranch());
 			}
 			if (!t2BankRemit.getRemitAcctNo().equals(tBankRemit.getRemitAcctNo())) {
-				tTempVo.putParam("RemitAcctNo", tBankRemit.getRemitAcctNo());
+				tTempVo.putParam("RemitAcctNo", t2BankRemit.getRemitAcctNo());
 			}
 			if (!t2BankRemit.getCustName().equals(tBankRemit.getCustName())) {
-				tTempVo.putParam("CustName", tBankRemit.getCustName());
+				tTempVo.putParam("CustName", t2BankRemit.getCustName());
 			}
 			if (!t2BankRemit.getRemark().equals(tBankRemit.getRemark())) {
-				tTempVo.putParam("Remark", tBankRemit.getRemark());
+				tTempVo.putParam("Remark", t2BankRemit.getRemark());
 			}
 			if (!t2BankRemit.getRemitAmt().equals(tBankRemit.getRemitAmt())) {
-				tTempVo.putParam("RemitAmt", tBankRemit.getRemitAmt());
+				tTempVo.putParam("RemitAmt", t2BankRemit.getRemitAmt());
 			}
 		}
 		this.info("isModify=" + isModify + tTempVo.toString());
@@ -583,27 +580,7 @@ public class AcPaymentCom extends TradeBuffer {
 		acDate = this.txBuffer.getTxCom().getTbsdy();
 		titaTlrNo = this.txBuffer.getTxCom().getRelTlr();
 		titaTxtNo = String.format("%08d", this.txBuffer.getTxCom().getRelTno());
-		batchNo = "LN0101";
-
-		AcCloseId acCloseId = new AcCloseId();
-		acCloseId.setAcDate(acDate);
-		acCloseId.setBranchNo(titaVo.getAcbrNo());
-		acCloseId.setSecNo("09");
-		tAcClose = acCloseService.findById(acCloseId, titaVo);
-		if (tAcClose == null)
-			batchNo = "LN01";
-		else
-			batchNo = "LN" + parse.IntegerToString(tAcClose.getBatNo(), 2);
-
-		acCloseId.setSecNo(titaVo.getSecNo());
-		tAcClose = acCloseService.findById(acCloseId, titaVo);
-		if (tAcClose == null)
-			batchNo = batchNo + "01";
-		else
-			batchNo = batchNo + parse.IntegerToString(tAcClose.getBatNo(), 2);
-
 		tBankRemitId.setAcDate(acDate);
-		// tBankRemitId.setStatusCode(0);
 		tBankRemitId.setTitaTlrNo(titaTlrNo);
 		tBankRemitId.setTitaTxtNo(titaTxtNo);
 

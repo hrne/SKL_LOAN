@@ -40,7 +40,7 @@ E(0,1)ASGN(AGAIN$)
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 #FunCdHelp=x,50,S
-T(3,1:新增;2:修改;4:刪除)
+T(3,1:新增;2:修改;4:刪除;5:查詢)
 
 !ClCode1
 #CDDEF0001=x,20,S

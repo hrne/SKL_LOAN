@@ -34,23 +34,30 @@ public class LH001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// -- 表1:同一自然人或法人
 		// -- 同一自然人或同一法人（含二、同一關係人）3000萬元(含)以上明細。
 		// -- ??? 3000萬以上條件取消
-		sql += " SELECT CRD.\"RelName\" "; // -- 姓名、名稱
-		sql += "      , CRD.\"RelId\" "; // -- 身分證號碼/統一編號
+		sql += " SELECT ";
+		sql += "        CR.\"CustRelName\" "; // -- 姓名、名稱
+		sql += "      , CR.\"CustRelId\" "; // -- 身分證號碼/統一編號
 		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"LoanBal\" "; // -- 放款餘額
 		sql += "      , NVL(LBM.\"LoanBal\",0) AS \"GroupLoanBal\" "; // -- 放款餘額
-		sql += "      , CRM.\"Ukey\" ";
-		sql += " FROM \"CustRelMain\" CRM ";
-		sql += " LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
+		sql += "      , ' ' AS F4 ";
+		sql += " FROM ( SELECT CRM.\"CustRelId\" ";
+		sql += "             , CRM.\"CustRelName\"";
+		sql += "        FROM \"CustRelMain\" CRM ";
+		sql += "        UNION ";
+		sql += "        SELECT CRD.\"RelId\" ";
+		sql += "             , CRD.\"RelName\" ";
+		sql += "        FROM \"CustRelDetail\" CRD ";
+		sql += "      ) CR ";
 		sql += " LEFT JOIN ( SELECT CM.\"CustId\" ";
 		sql += "                  , SUM(LBM.\"LoanBal\") AS \"LoanBal\" ";
 		sql += "             FROM \"LoanBorMain\" LBM  ";
 		sql += "             LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = LBM.\"CustNo\" ";
 		sql += "             GROUP BY CM.\"CustId\" ";
-		sql += "           ) LBM ON LBM.\"CustId\" = CRD.\"RelId\" ";
+		sql += "           ) LBM ON LBM.\"CustId\" = CR.\"CustRelId\" ";
 		// sql += " WHERE NVL(LBM.\"LoanBal\",0) >= 30000000 "; // -- ??? 3000萬以上條件取消
 		sql += " WHERE NVL(LBM.\"LoanBal\",0) > 0 ";
 		sql += " ORDER BY NVL(LBM.\"LoanBal\",0) DESC ";
-		sql += "        , CRD.\"RelId\" ";
+		sql += "        , CR.\"CustRelId\" ";
 		this.info("sql=" + sql);
 
 		Query query;

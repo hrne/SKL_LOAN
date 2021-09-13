@@ -355,6 +355,8 @@ E(0,@OwnerPart{i},#L2r27OwnerPart{i})
 E(0,@OwnerTotal{i},#L2r27OwnerTotal{i})
 ##end
 
+#RimLandSeq=A,3,S
+
 <include src="ROM.icf::L2R28.dec"/>
 !RIM取擔保主檔
 #RimL2r28=X,1,S

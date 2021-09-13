@@ -162,7 +162,7 @@ public class BankAuthActCom extends TradeBuffer {
 	 * @throws LogicException ..
 	 */
 	public void add(String createFlag, TitaVo titaVo) throws LogicException {
-		this.info("bankAuthActCom add Start...");
+		this.info("bankAuthActCom add ...");
 		setVarValue(titaVo);
 		showLog();
 

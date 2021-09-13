@@ -184,9 +184,6 @@ public class L4041ServiceImpl extends ASpringJpaParm implements InitializingBean
 			if (iPropDate == 0 && iCustNo == 0) {
 				sql += "   and \"PropDate\" != " + propDate;
 			}
-			if (iAuthApplCode == 3) {
-				sql += "   and a.\"AuthApplCode\" = '1'";				
-			}
 			break;
 		case 2:
 			sql += "   and \"PostMediaCode\" " + searchMediaCode;

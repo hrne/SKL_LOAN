@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -48,21 +46,13 @@ public class L4942 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 500;
-
-		List<PostAuthLogHistory> lPostAuthLogHistory = new ArrayList<PostAuthLogHistory>();
-
 		int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 
-		Slice<PostAuthLogHistory> sPostAuthLogHistory = null;
+		Slice<PostAuthLogHistory> slPostAuthLogHistory= postAuthLogHistoryService.facmNoEq(custNo, facmNo, index, limit, titaVo);
 
-		sPostAuthLogHistory = postAuthLogHistoryService.facmNoEq(custNo, facmNo, index, limit, titaVo);
-
-		lPostAuthLogHistory = sPostAuthLogHistory == null ? null : sPostAuthLogHistory.getContent();
-
-		if (lPostAuthLogHistory != null && lPostAuthLogHistory.size() != 0) {
-
-			for (PostAuthLogHistory tPostAuthLogHistory : lPostAuthLogHistory) {
+		if (slPostAuthLogHistory != null ) {
+			for (PostAuthLogHistory tPostAuthLogHistory : slPostAuthLogHistory.getContent()) {
 
 				String wkCreateFlag = tPostAuthLogHistory.getAuthApplCode();
 				if (tPostAuthLogHistory.getDeleteDate() > 0) {

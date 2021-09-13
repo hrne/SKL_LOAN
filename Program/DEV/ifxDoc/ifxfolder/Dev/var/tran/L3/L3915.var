@@ -1,0 +1,932 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L3915)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,381)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,28)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#BtnInq=x,1,S
+K(MODIFYBUTTON,查詢)
+
+#InitValue=@,1,S
+T(3,@FdApplNo, )
+T(3,@FdFacmNo,*)
+T(3,@FdRptFg,*)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" prompt='{{#SCRTIL}} world' name="p1" layout="cols=1;screen.width=[130,970];printer.width=[20,20];">
+[
+["[L3915]                                 額度資料查詢"],
+["#FdMain+查詢條件","(案件編號、借款人戶號、統一編號、核准編號，需擇一輸入)"],
+["#FdCaseNo+案件編號",#CaseNo,"@@@",#CaseNoX],
+["#FdCustNo+借款人戶號",#CustNo,"@@@",#BTN2,#CustNoX],
+["#FdCustId+統一編號",#CustId,#BTN3,#CustIdX],
+["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN4,#ApplNoX],
+["#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN5],
+["#FdRptFg+顯示方式",
+<include src="COM.icf::RPTFG.scr"/>
+],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN2=X,15,I,ui:button;value:額度資料查詢;enable:0;tabbable:0;title:L2015 額度明細資料查詢;
+#BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title:L1001 顧客明細資料查詢;
+#BTN4=X,15,I,ui:button;value:核准號碼查詢;enable:0;tabbable:0;title:L2016 核准號碼明細資料查詢;
+#BTN5=X,15,I,ui:button;value:額度資料查詢;enable:0;tabbable:0;title:L2015 額度明細資料查詢;
+
+#WKHIDE=X,1,S
+HIDE(#BTN2,#BTN3,#BTN4,#BTN5)
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![業務科目]
+#CDDEF01=x,30,S
+T(3,CdCode.FacmAcctCode)
+
+#AcctCodeHelp=x,1024,S
+
+!資金來源
+#CDDEF02=x,20,S
+T(3,CdCode.AcSubBookCode)
+
+#CaptialSourceHelp=x,1024,S
+
+#CDDEF03=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S 
+
+![幣別名稱]
+#CDDEF04=x,30,S
+T(3,CdCode.Currency)
+
+#CurrencyCodeHelp=x,1024,S
+
+![指標利率代碼]
+#CDDEF05=x,30,S
+T(3,CdCode.BaseRate)
+
+#BaseRateCodeHelp=x,1024,S
+
+![利率區分]
+#CDDEF06=x,30,S
+T(3,CdCode.FacmRateCode)
+
+#RateCodeHelp=x,1024,S
+
+![攤還額異動碼]
+#CDDEF07=x,30,S
+T(3,CdCode.FacmExtraRepayCode)
+
+#ExtraRepayCodeHelp=x,1024,S
+
+![週期基準]
+#CDDEF08=x,30,S
+T(3,CdCode.FreqBase)
+
+#FreqBaseHelp=x,1024,S
+
+![循環動用]
+#CDDEF09=x,30,S
+T(3,CdCode.FacmRecycleCode)
+
+#RecycleCodeHelp=x,1024,S
+
+![違約適用方式]
+#CDDEF10=x,30,S
+T(3,CdCode.FacmBreachCode)
+
+#BreachCodeHelp=x,1024,S
+
+![資金用途別]
+#CDDEF11=x,30,S
+T(3,CdCode.UsageCode)
+
+#UsageCodeHelp=x,1024,S
+
+![客戶別]
+#CDDEF12=x,30,S
+T(3,CdCode.CustTypeCode)
+
+#CustTypeCodeHelp=x,1024,S
+
+!AmortizedCode 攤還方式
+#CDDEF13=x,25,S
+T(3,CdCode.FacmAmortizedCode)
+
+#AmortizedCodeHelp=x,1024,S
+
+![繳款方式]
+#CDDEF14=x,30,S
+T(3,CdCode.RepayCode)
+
+#RepayCodeHelp=x,1024,S
+
+![郵局存款別]
+#CDDEF15=x,30,S
+T(3,CdCode.PostCode)
+
+#PostCodeHelp=x,1024,S
+
+![與借款人關係]
+#CDDEF16=x,30,S
+T(3,CdCode.RelationCode)
+
+#RelationCodeHelp=x,1024,S
+
+!性別
+#CDDEF17=x,20,S
+T(3,CdCode.Sex)
+
+#SexHelp=x,1024,S
+
+!ProdIntCalcCode
+#CDDEF18=x,25,S
+T(3,CdCode.ProdIntCalcCode)
+
+#ProdIntCalcCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF08,#CDDEF09,#CDDEF10)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AcctCodeHelp,#HelpDesc1)
+T(2,@CaptialSourceHelp,#HelpDesc2)
+T(2,@CurrPrecisionHelp,#HelpDesc3)
+T(2,@CurrencyCodeHelp,#HelpDesc4)
+T(2,@BaseRateCodeHelp,#HelpDesc5)
+T(2,@RateCodeHelp,#HelpDesc6)
+T(2,@ExtraRepayCodeHelp,#HelpDesc7)
+T(2,@FreqBaseHelp,#HelpDesc8)
+T(2,@RecycleCodeHelp,#HelpDesc9)
+T(2,@BreachCodeHelp,#HelpDesc10)
+
+#HelpRim2=X,1,S
+RESET_RIM(#HelpRim2,XXR99)
+S(XXR99,01,#CDDEF11,#CDDEF12,#CDDEF13,#CDDEF14,#CDDEF15,#CDDEF16,#CDDEF17,#CDDEF18)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@UsageCodeHelp,#HelpDesc1)
+T(2,@CustTypeCodeHelp,#HelpDesc2)
+T(2,@AmortizedCodeHelp,#HelpDesc3)
+T(2,@RepayCodeHelp,#HelpDesc4)
+T(2,@PostCodeHelp,#HelpDesc5)
+T(2,@RelationCodeHelp,#HelpDesc6)
+T(2,@SexHelp,#HelpDesc7)
+T(2,@ProdIntCalcCodeHelp,#HelpDesc8)
+
+#YNHelp=x,20,S
+T(3,Y:是;N:否)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD) 
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,34,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#FdMain=X,2,L
+T(3,*)
+
+![案件編號]
+#FdCaseNo=X,2,L
+
+#CaseNo=A,7,I
+HIDE(#BTN5)
+CALL(#InitValue)
+! INVOKEJS(SHOW,p1,1,4,1)
+C(3,#CHAIN,1,T(1,#NTXBUF,1,7),$)
+C(3,#CHAIN,1,s,$)
+!SHOW(#BTN1)
+
+#SendL2r10=X,1,S
+C(3,#CaseNo,0,S,$)
+E(0,@RimCaseNo,#CaseNo)
+RESET_RIM(#SendL2r10,L2R10)
+S(L2R10,1,#RimCaseNo)
+R(1,L2R10)
+
+#SendL2r07A=X,1,S
+C(3,#CaseNo,0,S,$)
+T(2,@RimCustId, )
+E(0,@RimCustNo,#L2r10CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#WKBTN1=X,1,S
+!C(3,#CaseNo,0,HIDE(#BTN1),SHOW(#BTN1))
+! C(3,#CaseNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,4,0))
+
+#BIND1=X,1,S
+!BIND(#BTN1,click, {cmd=CHAIN; ntxcd=XW922; ntxbuf=#BUF1;ntxbuf5=type<-1:MSGTYP<-RECMSG:ENTSEQ<-RECSEQ})
+
+#CaseNoX=X,100,L
+C(3,#CaseNo,0,S,T(2,#L2r07CustName))
+
+#BUF2A=X,18,S
+T(3,00000019999999000)
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+
+![借款人戶號]
+!借款人戶號, 統一編號或核准編號擇一輸入
+#FdCustNo=X,2,L
+
+#CustNo=A,7,I
+HIDE(#BTN5)
+CALL(#InitValue)
+! INVOKEJS(SHOW,p1,2,4,1)
+C(3,#CHAIN,1,T(1,#NTXBUF,8,7),$)
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+SHOW(#BTN2)
+
+#WKBTN2=X,1,S
+C(3,#CustNo,0,HIDE(#BTN2),SHOW(#BTN2))
+! C(3,#CustNo,0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
+
+#BUF2B=X,18,S
+C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
+! T(2,#CustNo+9999999000)
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+
+#SendL2r07B=X,1,S
+C(3,#CustNo,0,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+T(2,@CustIdX,#L2r07CustName)
+
+#CustNoX=X,100,L
+C(3,#CustNo,0,S,T(2,#L2r07CustName))
+
+#BUF3A=X,100,S
+
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3A;ntxbuf5=type<-1:CustId<-OOCustId})
+
+![統一編號]
+#FdCustId=X,2,L
+
+#CustId=X,10,I
+HIDE(#BTN5)
+CALL(#InitValue)
+! INVOKEJS(SHOW,p1,3,4,1)
+C(3,#CHAIN,1,T(1,#NTXBUF,15,10),$)
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+C(3,#CustNo,0,$,S)
+SHOW(#BTN3)
+@C(4,#CustId,S,$)
+V(7)
+
+#BUF3B=X,100,S
+T(2,0000000+#CustId)
+
+#BIND3B=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3B;ntxbuf5=type<-1:CustId<-OOCustId})
+
+#CheckCustId=X,1,S
+C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+#WKBTN3=X,1,S
+C(4,#CustId,HIDE(#BTN3),SHOW(#BTN3))
+! C(4,#CustId,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
+
+#SendL2r07C=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07C,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustIdX=X,100,L
+C(4,#CustId,S,T(2,#L2r07CustName))
+
+#BUF4A=X,18,S
+T(3,000000199999990)
+
+#BIND4A=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4A;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+![核准編號]
+#FdApplNo=X,2,L
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+T(3,*)
+
+#ApplNo=A,7,I
+! INVOKEJS(SHOW,p1,4,4,1)
+C(3,#CHAIN,1,T(1,#NTXBUF,25,7),$)
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+SHOW(#BTN4)
+@C(3,#ApplNo,0,V(P,需擇一輸入),$)
+
+#WKBTN4=X,1,S
+C(3,#ApplNo,0,HIDE(#BTN4),SHOW(#BTN4))
+! C(3,#ApplNo,0,INVOKEJS(SHOW,p1,4,4,0),$)
+
+#BUF4B=X,18,S
+C(3,#ApplNo,0,T(3,000000199999990),T(2,#ApplNo+99999990))
+! T(2,#ApplNo+99999990)
+
+#BIND4B=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+#WKFacmNo=A,3,S
+
+#HIDEALLBTN=X,1,S
+C(3,#CHAIN,1,$,S)
+HIDE(#BTN2,#BTN3,#BTN4,#BTN5)
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+E(0,@FacmNo,#L2r05FacmNo)
+
+#SendL2r07D=X,1,S
+C(3,#ApplNo,0,S,$)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07D,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#ApplNoX=X,100,L
+C(3,#ApplNo,0,S,T(2,#L2r07CustName))
+
+#TimCustNo=A,7,S
+E(0,0)
+C(3,#CaseNo,0,$,E(0,#L2r10CustNo))
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+
+#BUF5A=X,18,S
+T(2,#TimCustNo+#TimCustNo+000)
+
+#BIND5A=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF5A;ntxbuf5=type<-1:FacmNo<-OOFacmNo})
+
+![額度編號]
+!必須輸入
+#FdFacmNo=X,2,L
+C(3,#ApplNo,0,T(3,*)T(F,@FacmNo,1)SHOW(#BTN5),
+              T(3, )T(F,@FacmNo,0)HIDE(#BTN5))
+
+#FacmNo=A,3,I
+C(3,#CHAIN,1,T(1,#NTXBUF,32,3),$)
+C(3,#CHAIN,1,s,$)
+C(3,#ApplNo,0,$,s)
+@V(2,0)
+HIDE(#BTN5)
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
+
+#FdRptFg=X,2,L
+T(3,*)
+
+<include src="COM.icf::RPTFG.dec"/>
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R10.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L3915 ----------
+<sub type="FORM" name="L3915">
+#SCRTIL=_,_,S
+T(3,[L3915] 額度資料)
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L3915,$,S)
+
+
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+![借款人戶號]
+#OCustNo=A,7,L
+
+#OFacmNo=A,3,L
+
+#OCustNoX=X,100,L
+C(3,#CaseNo,0,$,T(2,#CaseNoX))
+C(3,#CustNo,0,$,T(2,#CustNoX))
+C(4,#CustId,$,T(2,#CustIdX))
+C(3,#ApplNo,0,$,T(2,#ApplNoX))
+
+![業務科目]
+#AcctCode=A,3,S
+
+#AcctCodeX=X,12,L
+T(3,)T(H,#AcctCode,#AcctCodeHelp)
+
+![資金來源]
+#CaptialSource=X,3,S
+
+#CaptialSourceX=X,8,L
+T(3,)T(H,#CaptialSource,#CaptialSourceHelp)
+
+![核准號碼]
+#OApplNo=A,7,L
+
+![商品代碼]
+#ProdNo=X,5,L
+
+#ProdName=X,60,L
+
+![幣別]
+#CurrencyCode=X,3,L
+
+#Precision=N,1,S
+E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
+
+#CurrencyCodeX=X,10,S
+T(3,)T(H,#CurrencyCode,#CurrencyCodeHelp)  
+
+![核准額度]
+#LineAmt=m,14.2,S
+
+#LineAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#LineAmt,#LineAmtX)
+
+![貸款期間]
+#LoanTermYy=A,2,L
+
+#LoanTermMm=A,2,L 
+
+#LoanTermDd=A,3,L
+
+#MaturityDate=D,7,S
+
+#MaturityDateY=X,9,S
+CALL2(#AdjustDate,#MaturityDate,#MaturityDateY)
+
+#MaturityDateX=X,14,L
+C(3,#MaturityDate,0,T(3,[無到期日]),T(2,[到 +#MaturityDateY+]))
+
+![指標利率代碼]
+#BaseRateCode=X,2,L
+
+#BaseRateCodeX=X,30,L
+T(3,)T(H,#BaseRateCode,#BaseRateCodeHelp)            
+
+![商品利率]
+#ProdRate=n,2.4,L
+
+#ProdRateX=X,8,L
+X(#ProdRate)
+T(B,#ProdRateX+%)
+
+![利率加減碼]
+#RateIncr=n,2.4,L
+
+#RateIncrX=X,8,L
+X(#RateIncr)
+T(B,#RateIncrX+%)
+
+![個別加減碼]
+#IndividualIncr=n,2.4,L
+
+#IndividualIncrX=X,8,L
+X(#IndividualIncr)
+T(B,#IndividualIncrX+%)
+
+![核准利率]
+#ApproveRate=n,2.4,L
+
+#ApproveRateX=X,8,L
+X(#ApproveRate)
+T(B,#ApproveRateX+%)
+
+![禁領清償年限]
+#PROHIBITPERIOD=A,3,L
+
+![利率區分]
+#RateCode=A,1,S
+
+#RateCodeX=X,10,L
+T(3,)T(H,#RateCode,#RateCodeHelp)            
+
+![首次調整週期]
+#FirstRateAdjFreq=A,2,L
+
+![利率調整週期]
+#RateAdjFreq=A,2,L
+
+![攤還額異動碼]
+#ExtraRepayCode=A,1,S
+
+#ExtraRepayCodeX=X,4,L
+T(3,)T(H,#ExtraRepayCode,#ExtraRepayCodeHelp)
+
+![週期基準]
+#FreqBase=A,1,S
+
+#FreqBaseX=X,8,L
+T(3,)T(H,#FreqBase,#FreqBaseHelp)  
+
+![還本週期]
+#RepayFreq=A,2,L
+
+#RepayFreqX=X,8,L
+T(2,#FreqBaseX)
+
+![繳息週期]
+#PayIntFreq=A,2,L
+
+#PayIntFreqX=X,8,L
+T(2,#FreqBaseX)
+
+![循環動用]
+#RecycleCode=A,1,S
+
+#RecycleCodeX=X,10,L
+T(3,)T(H,#RecycleCode,#RecycleCodeHelp)
+
+![循環動用期限]
+#RecycleDeadline=D,7,S
+
+#RecycleWkA=X,9,S
+CALL2(#AdjustDate,#RecycleDeadline,#RecycleWkA)
+
+#RecycleDeadlineX=X,12,L
+C(3,#RecycleCode,0,T(2,#RecycleWkA),T(2,#RecycleWkA+ 前))
+
+![動支期限]
+#UtilDeadline=D,7,L
+
+![違約適用方式]
+#BreachCode=A,3,S
+
+#BreachCodeX=X,30,L
+T(3,)T(H,#BreachCode,#BreachCodeHelp)
+
+![用途別]
+#UsageCode=A,2,S
+
+#UsageCodeX=X,20,L
+T(3,)T(H,#UsageCode,#UsageCodeHelp) 
+
+![客戶別]
+#CustTypeCode=X,2,L
+
+#CustTypeCodeX=X,10,L
+T(3,)T(H,#CustTypeCode,#CustTypeCodeHelp)
+
+![代繳所得稅]
+#IncomeTaxFlag=X,1,S
+
+#IncomeTaxFlagX=X,6,L
+T(3,)T(H,#IncomeTaxFlag,#YNHelp) 
+
+![代償碼      : 9 [顯示名稱]
+#CompensateFlag=X,1,S
+
+#CompensateFlagX=X,8,L
+T(3,)T(H,#CompensateFlag,#YNHelp)
+
+!計息方式
+#IntCalcCode=X,1,L
+
+#IntCalcCodeX=X,8,L
+T(3,)T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
+
+![攤還方式]
+#AmortizedCode=A,1,S
+
+#AmortizedCodeX=X,12,L
+T(3,)T(H,#AmortizedCode,#AmortizedCodeHelp)            
+
+![寬限總月數]
+#GracePeriod=A,3,L
+
+![繳款方式]
+#RepayCode=A,2,S
+
+#RepayCodeX=X,16,L
+T(3,)T(H,#RepayCode,#RepayCodeHelp)  
+
+![扣款銀行]
+#RepayBank=A,4,S
+
+#RepayBankItem=X,20,L
+
+![扣款帳號]
+#RepayAcctNo=A,14,L
+
+![郵局存款別]
+#PostCode=X,1,S
+
+#PostCodeX=X,4,L
+C(3,#RepayBank,700,$,S)
+T(3,)T(H,#PostCode,#PostCodeHelp)  
+
+![與借款人關係]
+#RelationCode=X,2,S
+
+#RelationCodeX=X,4,L
+T(3,)T(H,#RelationCode,#RelationCodeHelp)  
+
+![帳戶戶名]
+#RelationName=X,100,L
+C(4,#RelationCode,S,$)
+
+![身份證字號]
+#RelationId=X,10,L
+C(4,#RelationCode,S,$)
+
+![出生日期]
+#RelationBirthday=D,7,S
+
+#RelationBirthdayX=X,9,L
+CALL2(#AdjustDate,#RelationBirthday,#RelationBirthdayX)
+
+![性別]
+#RelationGender=X,1,S
+
+#RelationGenderX=X,2,L
+C(4,#RelationCode,S,$)
+T(H,#RelationGender,#SexHelp)
+
+![擔保品]
+#Collateral=X,14,S
+
+![帳管費]
+#AcctFee=m,14.2,S
+
+#AcctFeeX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#AcctFee,#AcctFeeX)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOClKey1=A,1,S
+
+#OOClKey2=A,2,S
+
+#OOClKey3=A,7,S
+
+#OOClKey=X,12,O
+C(3,#OOClKey1,0,S,T(2,#OOClKey1+-+#OOClKey2+-+#OOClKey3))
+
+#OOApplNo=A,7,S
+
+#OOApplNoX=X,7,O
+C(3,#OOClKey1,0,S,T(2,#OOApplNo))
+
+#OOCustNo=A,7,S
+
+#OOCustNoX=X,7,O
+C(3,#OOClKey1,0,S,T(2,#OOCustNo))
+
+#OOFacmNo=A,3,S
+
+#OOFacmNoX=X,3,O
+C(3,#OOClKey1,0,S,T(2,#OOFacmNo))
+
+#OOMainFlag=X,1,O
+
+! 1: 房地         L2042 不動產建物明細資料查詢
+! 2: 土地         L2041 不動產土地明細資料查詢
+! 3: 股票         L2913 股票擔保品資料查詢
+! 4: 其他有價證券 L2914 其他擔保品資料查詢
+! 5: 銀行保證     L2914 其他擔保品資料查詢
+! 9: 動產         L2047 動產擔保品明細資料查詢
+
+#COLTXCD=X,5,S
+SWITCH(#OOClKey1,1,T(3,L2911),
+                 2,T(3,L2911),
+                 3,T(3,L2913),
+                 4,T(3,L2913),
+                 5,T(3,L2914),
+                 9,T(3,L2912),
+                 )
+                  
+#COLTXNM=X,50,S
+SWITCH(#OOClKey1,1,T(3,查詢;L2911 不動產擔保品資料查詢),
+                 2,T(3,查詢;L2911 不動產擔保品資料查詢),
+                 3,T(3,查詢;L2913 股票擔保品資料查詢),
+                 4,T(3,查詢;L2913 股票擔保品資料查詢),
+                 5,T(3,查詢;L2914 其他擔保品資料查詢),
+                 9,T(3,查詢;L2912 動產擔保品資料查詢),
+                 )                    
+
+#COLBUF=X,17,S
+T(2,#OOClKey1+#OOClKey2+#OOClKey3+#OOApplNo)
+
+#OOBTNCOL=X,1,S
+C(3,#OOClKey1,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=#COLTXCD;text=#COLTXNM;ntxbuf=#COLBUF}))
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+#CaseNo#TimCustNo#CustId#ApplNo#FacmNo
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L3915
+#OCustNo#OFacmNo#AcctCode#CaptialSource#OApplNo#ProdNo#ProdName
+#CurrencyCode#LineAmt#LoanTermYy#LoanTermMm#LoanTermDd#MaturityDate
+#BaseRateCode#ProdRate#RateIncr#IndividualIncr#ApproveRate#PROHIBITPERIOD
+#RateCode#FirstRateAdjFreq#RateAdjFreq#ExtraRepayCode#FreqBase#RepayFreq#PayIntFreq
+#RecycleCode#RecycleDeadline#UtilDeadline#BreachCode#UsageCode#CustTypeCode
+#IncomeTaxFlag#CompensateFlag#IntCalcCode#AmortizedCode#GracePeriod
+#RepayCode#RepayBank#RepayBankItem#RepayAcctNo#PostCode#Collateral#AcctFee
+#RelationCode#RelationName#RelationId#RelationBirthday#RelationGender
+#OOClKey1#OOClKey2#OOClKey3#OOApplNo#OOCustNo#OOFacmNo#OOMainFlag
+^
+
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R10.tom"/>
+</sub>
+
+<sub type="PART" name="L3915" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
+[
+["[L3915]                                 額度資料查詢"],
+[#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,#OCustNoX],
+[#<->#,"<font color=red>@金額、日期資料區","@"],
+["@幣別",#CurrencyCode], 
+["@核准額度",#LineAmtX],
+["@核准號碼",#OApplNo],
+["@業務科目",#AcctCodeX],
+["@區隔帳冊",#CaptialSourceX],
+["@貸款期間",#LoanTermYy,"@年",#LoanTermMm,"@月",#LoanTermDd,"@日 ",#MaturityDateX],
+["@計息方式",#IntCalcCodeX],
+["@攤還方式",#AmortizedCodeX],
+["@週期基準",#FreqBaseX],
+["@還本週期",#RepayFreq,#RepayFreqX],
+["@繳息週期",#PayIntFreq,#PayIntFreqX],
+["@循環動用",#RecycleCodeX],
+["@循環動用期限",#RecycleDeadlineX],
+["@動支期限",#UtilDeadline,"@前"],      
+["@寬限總月數",#GracePeriod],
+["@帳管費",#AcctFeeX],
+[#<->#,"<font color=red>@利率資料區","@"],
+[#<->#,"@商品代碼",#ProdNo,#ProdName],
+["@指標利率代碼",#BaseRateCode,#BaseRateCodeX],
+["@商品利率",#ProdRateX],  
+["@利率加減碼",#RateIncrX],
+["@個別加減碼",#IndividualIncrX],
+["@核准利率",#ApproveRateX],
+["@利率區分",#RateCodeX],
+["@首次調整週期",#FirstRateAdjFreq],
+["@利率調整週期",#RateAdjFreq],
+[#<->#,"<font color=red>@繳款資料區","@"],
+["@繳款方式",#RepayCodeX],
+["@扣款銀行",#RepayBankItem],
+["@扣款帳號",#RepayAcctNo],
+["@郵局存款別",#PostCodeX],
+[#<->#,"@與借款人關係",#RelationCodeX],
+[#<->#,"@帳戶戶名",#RelationName],
+["@身份證字號",#RelationId],
+["@出生日期",#RelationBirthdayX],
+["@性別",#RelationGenderX],
+[#<->#,"<font color=red>@其他資料區","@"],
+["@攤還額異動碼",#ExtraRepayCodeX], 
+["@違約適用方式",#BreachCodeX],    
+["@限制清償期間",#PROHIBITPERIOD],
+["@用途別",#UsageCodeX],
+["@客戶別",#CustTypeCodeX],
+["@代繳所得稅",#IncomeTaxFlagX],
+["@代償碼",#CompensateFlagX], 
+]
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L3915
+#any={detail:true, header:'L3915.PART', caption:'[L3915]額度資料', width:1000, rowNum:30, rowList:[10,20,40]}
+
+#OOBTNCOL=查詢
+{width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+
+#OOClKey=擔保品編號 
+{width:120,align:'center'}
+
+#OOApplNoX=核准號碼 
+{width:120,align:'center'}
+
+#OOCustNoX=借款人戶號 
+{width:120,align:'center'}
+
+#OOFacmNoX=額度編號 
+{width:120,align:'center'}
+
+#OOMainFlag=主要擔保品記號 
+{width:120,align:'center'}
+
+^
+<include src="PRT.icf::INQ01.sel" map="i=L3915"/>
+
+#OCustNo#OFacmNo#OCustNoX
+#CurrencyCode#LineAmtX
+#OApplNo#AcctCodeX
+#CaptialSourceX#LoanTermYy#LoanTermMm#LoanTermDd#MaturityDateX
+#IntCalcCodeX#AmortizedCodeX
+#FreqBaseX#RepayFreq#RepayFreqX
+#PayIntFreq#PayIntFreqX
+#RecycleCodeX#RecycleDeadlineX
+#UtilDeadline
+#GracePeriod#AcctFeeX
+#ProdNo#ProdName
+#BaseRateCodeX#ProdRateX 
+#RateIncrX#IndividualIncrX
+#ApproveRateX#RateCodeX
+#FirstRateAdjFreq#RateAdjFreq
+#RepayCodeX#RepayBankItem
+#RepayAcctNo#PostCodeX
+#RelationCodeX#RelationName
+#RelationId#RelationBirthdayX
+#RelationGenderX#ExtraRepayCodeX
+#BreachCodeX#PROHIBITPERIOD
+#UsageCodeX#CustTypeCodeX
+#IncomeTaxFlagX#CompensateFlagX
+%
+#OOClKey#OOApplNoX#OOCustNoX#OOFacmNoX#OOMainFlag
+@^
+</sub>

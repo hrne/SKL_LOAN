@@ -251,6 +251,7 @@ HIDE(#ClCode1,#ClCode2,#ClNo,#CustNo,#FacmNo,#InsuYearMonth,#NowInsuNo,#EndoInsu
 SHOW(#LableClCode1,#LableClCode2,#LableClNo,#CustNoX,#FacmNoX,#InsuYearMonthX,#NowInsuNoX,#StatusCode,#EndoInsuNoX))
 C(3,#FunctionCode,6,SHOW(#NowInsuNo)HIDE(#NowInsuNoX),IF(#FunctionCode==2&&#RenewCode==1,SHOW(#NowInsuNo)HIDE(#NowInsuNoX),SHOW(#NowInsuNoX)HIDE(#NowInsuNo)))
 C(3,#FunctionCode,2,SHOW(#RenewCode),HIDE(#RenewCode))
+C(3,#FunctionCode,1,T(F,#EndoInsuNo,0),$)
 C(3,#FunctionCode,4,
 T(F,#NewFireInsuCovrg,0)
 T(F,#NewFireInsuPrem,0)
@@ -285,20 +286,18 @@ A(YM,1,#InsuYearMonth)
 !擔保品編號 
 #ClCode1=A,1,I
 IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
-C(3,#CHAIN,0,$,s)
 !擔保品編號 
 #LableClCode1=A,1,L
 
 !擔保品編號 
 #ClCode2=A,2,I
 IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
-C(3,#CHAIN,0,$,s)
 #LableClCode2=A,2,L
 
 !擔保品編號 
 #ClNo=A,7,I
 IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
-C(3,#CHAIN,0,$,s)
+
 #LableClNo=A,7,L
 
 !原保單號碼
@@ -307,6 +306,7 @@ C(3,#CHAIN,0,$,s)
 !批單號碼
 !僅新增與可KeyIn(修改需先刪除後再新增)
 #EndoInsuNo=X,16,I
+C(3,#FunctionCode,1,S,$)
 C(3,#L4r18CustNo,0,$,s)
 
 #EndoInsuNoX=X,16,L

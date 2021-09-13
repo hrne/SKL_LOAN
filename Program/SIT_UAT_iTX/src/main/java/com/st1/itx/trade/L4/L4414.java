@@ -2,12 +2,9 @@ package com.st1.itx.trade.L4;
 
 import java.io.File;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -21,15 +18,14 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLog;
 import com.st1.itx.db.domain.AchAuthLogId;
-import com.st1.itx.db.domain.BankAuthAct;
-import com.st1.itx.db.domain.BankAuthActId;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.PostAuthLog;
+import com.st1.itx.db.domain.PostAuthLogId;
 import com.st1.itx.db.service.AchAuthLogService;
-import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.BankAuthActCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.data.AchAuthFileVo;
 import com.st1.itx.util.common.data.PostAuthFileVo;
@@ -51,7 +47,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4414 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4414.class);
 	@Autowired
 	DateUtil dateUtil;
 
@@ -81,7 +76,7 @@ public class L4414 extends TradeBuffer {
 	public TotaVo totaC;
 
 	@Autowired
-	public BankAuthActService bankAuthActService;
+	BankAuthActCom bankAuthActCom;
 
 	// 上傳預設目錄
 	@Value("${iTXInFolder}")
@@ -96,6 +91,8 @@ public class L4414 extends TradeBuffer {
 		this.info("active L4414 ");
 		this.info("active L4414 ");
 		this.totaVo.init(titaVo);
+
+		bankAuthActCom.setTxBuffer(txBuffer);
 
 		int achCnt = 0;
 		int postCnt = 0;
@@ -261,7 +258,7 @@ public class L4414 extends TradeBuffer {
 
 					this.info("tAchAuthLogId :" + tAchAuthLogId.toString());
 
-					tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId);
+					tAchAuthLog = achAuthLogService.holdById(tAchAuthLogId, titaVo);
 
 					if (tAchAuthLog != null) {
 						tAchAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
@@ -275,13 +272,12 @@ public class L4414 extends TradeBuffer {
 						}
 
 						try {
-							this.info("Update AchAuthLog !!!");
-							achAuthLogService.update(tAchAuthLog);
+							achAuthLogService.update(tAchAuthLog, titaVo);
 						} catch (DBException e) {
 							throw new LogicException("E0007", "L4414 AchAuthLog update " + e.getErrorMsg());
 						}
 //						變更帳號檔
-						achToBankAuthAct(tAchAuthLog, titaVo);
+						bankAuthActCom.updAchAcct(tAchAuthLog, titaVo);
 //						輸出
 						setOutput(tAchAuthLog, titaVo);
 
@@ -305,265 +301,119 @@ public class L4414 extends TradeBuffer {
 
 		if (uploadFile != null && uploadFile.size() != 0) {
 
-//			排序 終止需再新增前
-			uploadFile.sort((c1, c2) -> {
-				int result = 0;
-				if (c1.get("OccApprCode").compareTo(c2.get("OccApprCode")) != 0) {
-					result = c2.get("OccApprCode").compareTo(c1.get("OccApprCode"));
-				}
-				return result;
-			});
-
 //			9	FootErrorCnt    錯誤筆數		34-40	9(6)	初始值為0，回送時使用	
 //			10	FootSuccsCnt    成功筆數		40-46	9(6)	初始值為0，回送時使用	
 			int footErrorCnt = parse.stringToInteger("" + postAuthFileVo.get("FootErrorCnt"));
 			int footSuccsCnt = parse.stringToInteger("" + postAuthFileVo.get("FootSuccsCnt"));
-
+			if (footErrorCnt + footSuccsCnt == 0) {
+				throw new LogicException("E0014", "請確認是否為提回檔案");
+			}
 			for (OccursList tempOccursList : uploadFile) {
-				PostAuthLog tPostAuthLog = new PostAuthLog();
-
-				if (footErrorCnt + footSuccsCnt > 0) {
-					if ("846".equals(tempOccursList.get("OccOrgCode"))) {
-						authCode = "1";
-					} else if ("53N".equals(tempOccursList.get("OccOrgCode"))) {
-						authCode = "2";
+				if ("846".equals(tempOccursList.get("OccOrgCode"))) {
+					authCode = "1";
+				} else if ("53N".equals(tempOccursList.get("OccOrgCode"))) {
+					authCode = "2";
+				}
+				PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(
+						parse.stringToInteger(tempOccursList.get("CustNo")), tempOccursList.get("PostDepCode"),
+						tempOccursList.get("RepayAcct"), authCode, titaVo);
+				if (tPostAuthLog == null) {
+					throw new LogicException("E0014", "郵局授權記錄檔查無資料，請確認檔案");
+				}
+				tPostAuthLog = postAuthLogService.holdById(tPostAuthLog, titaVo);
+				switch (tempOccursList.get("AuthApplCode")) {
+				case "1": // 1.申請
+					if (!"1".equals(tPostAuthLog.getAuthApplCode())) {
+						throw new LogicException("E0014", "申請，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
 					}
+					tPostAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLog.setStampCode(FormatUtil.pad9(tempOccursList.get("StampCode"), 1));
+					tPostAuthLog.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
+					if ("00".equals(FormatUtil.pad9("" + tempOccursList.get("AuthErrorCode"), 2))) {
+						this.info("Update StampFinishDate !!!");
+						tPostAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
+					}
+					// 變更帳號檔
+					bankAuthActCom.updPostAcct(tPostAuthLog, titaVo);
+					try {
+						postAuthLogService.update(tPostAuthLog, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0007", "L4414 PostAuthLog update " + e.getErrorMsg());
+					}
+					break;
 
-					tPostAuthLog = postAuthLogService.fileSeqFirst(
-							parse.stringToInteger(tempOccursList.get("OccMediaDate")), authCode,
-							parse.stringToInteger(tempOccursList.get("OccDataSeq")));
+				case "2": // 2.終止
+					if (!"2".equals(tPostAuthLog.getAuthApplCode())) {
+						throw new LogicException("E0014", "終止，郵局授權記錄檔申請代號<>2，" + tPostAuthLog.getAuthApplCode());
+					}
+					tPostAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLog.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
+					// 變更帳號檔
+					bankAuthActCom.updPostAcct(tPostAuthLog, titaVo);
+					try {
+						postAuthLogService.update(tPostAuthLog, titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0007", "L4414 PostAuthLog update " + e.getErrorMsg());
+					}
+					break;
+				
+				case "3": // 3.郵局終止
+					if (!"1".equals(tPostAuthLog.getAuthApplCode())) {
+						throw new LogicException("E0014", "郵局終止，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
+					}
+					PostAuthLog tPostAuthLog2 = new PostAuthLog();
+					PostAuthLogId tPostAuthLogId= new PostAuthLogId();
+					tPostAuthLogId.setAuthCreateDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLogId.setAuthApplCode("3");
+					tPostAuthLogId.setCustNo(tPostAuthLog.getCustNo());
+					tPostAuthLogId.setPostDepCode(tPostAuthLog.getPostDepCode());
+					tPostAuthLogId.setRepayAcct(tPostAuthLog.getRepayAcct());
+					tPostAuthLogId.setAuthCode(tPostAuthLog.getAuthCode());
+					tPostAuthLog2.setAuthCreateDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLog2.setAuthApplCode("3");
+					tPostAuthLog2.setCustNo(tPostAuthLog.getCustNo());
+					tPostAuthLog2.setPostDepCode(tPostAuthLog.getPostDepCode());
+					tPostAuthLog2.setRepayAcct(tPostAuthLog.getRepayAcct());
+					tPostAuthLog2.setAuthCode(tPostAuthLog.getAuthCode());
+					tPostAuthLog2.setPostAuthLogId(tPostAuthLogId);
+					tPostAuthLog2.setFacmNo(tPostAuthLog.getFacmNo());
+					tPostAuthLog2.setCustId(tPostAuthLog.getCustId());
+					tPostAuthLog2.setRepayAcctSeq(tPostAuthLog.getRepayAcctSeq());
+					tPostAuthLog2.setProcessDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLog2.setRelationCode(tPostAuthLog.getRelationCode());
+					tPostAuthLog2.setRelAcctName(tPostAuthLog.getRelAcctName());
+					tPostAuthLog2.setRelationId(tPostAuthLog.getRelationId());
+					tPostAuthLog2.setRelAcctBirthday((tPostAuthLog.getRelAcctBirthday()));
+					tPostAuthLog2.setRelAcctGender(tPostAuthLog.getRelAcctGender());
+					tPostAuthLog2.setRetrDate(dateUtil.getNowIntegerForBC());
+					tPostAuthLog2.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
+				// 變更帳號檔
+					bankAuthActCom.updPostAcct(tPostAuthLog2, titaVo);
+					try {
+						postAuthLogService.insert(tPostAuthLog2,titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0005", "L4414 PostAuthLog " + e.getErrorMsg());
+					}
+					break;
 
-					if (tPostAuthLog != null) {
-						PostAuthLog t2PostAuthLog = postAuthLogService.holdById(tPostAuthLog);
+				case "4": // 4.誤終止
+					if (!"3".equals(tPostAuthLog.getAuthApplCode())) {
+						throw new LogicException("E0014", "誤終止，郵局授權記錄檔申請代號<>1，" + tPostAuthLog.getAuthApplCode());
+					}
+					tPostAuthLog.setAuthApplCode("4");
+				// 變更帳號檔
+					bankAuthActCom.updPostAcct(tPostAuthLog, titaVo);
+					try {
+						postAuthLogService.delete(tPostAuthLog,titaVo);
+					} catch (DBException e) {
+						throw new LogicException("E0005", "L4414 PostAuthLog " + e.getErrorMsg());
+					}
+					break;
+				}
 
-						t2PostAuthLog.setRetrDate(dateUtil.getNowIntegerForBC());
-						t2PostAuthLog.setStampCode(FormatUtil.pad9(tempOccursList.get("StampCode"), 1));
-						t2PostAuthLog.setAuthErrorCode(FormatUtil.pad9(tempOccursList.get("AuthErrorCode").trim(), 2));
-
-						if ("00".equals(FormatUtil.pad9("" + tempOccursList.get("AuthErrorCode"), 2))) {
-							this.info("Update StampFinishDate !!!");
-							t2PostAuthLog.setStampFinishDate(dateUtil.getNowIntegerForBC());
-						}
-
-						try {
-							this.info("Update PostAuthLog !!!");
-							postAuthLogService.update(t2PostAuthLog);
-						} catch (DBException e) {
-							throw new LogicException("E0007", "L4414 PostAuthLog update " + e.getErrorMsg());
-						}
-
-//						變更帳號檔
-						postToBankAuthAct(tPostAuthLog, titaVo);
 //						輸出
-						setOutput(tPostAuthLog, titaVo);
-					} else {
-						throw new LogicException("E0014", "郵局授權記錄檔查無資料，請確認檔案");
-					}
-
-				} else {
-					throw new LogicException("E0014", "請確認是否為提回檔案");
-				}
+				setOutput(tPostAuthLog, titaVo);
 			}
-		} else {
-			throw new LogicException("E0014", "請確認檔案");
-		}
-	}
-
-//	整批修改帳號
-	private void achToBankAuthAct(AchAuthLog tAchAuthLog, TitaVo titaVo) throws LogicException {
-		List<BankAuthAct> lBankAuthAct = new ArrayList<BankAuthAct>();
-
-		Slice<BankAuthAct> sBankAuthAct = bankAuthActService.authCheck(tAchAuthLog.getAchAuthLogId().getCustNo(),
-				tAchAuthLog.getAchAuthLogId().getRepayAcct(), 0, 999, this.index, this.limit, titaVo);
-
-		lBankAuthAct = sBankAuthAct == null ? null : sBankAuthAct.getContent();
-
-		if (lBankAuthAct != null && lBankAuthAct.size() != 0) {
-			for (BankAuthAct tBankAuthAct : lBankAuthAct) {
-				this.info("tAchAuthLog.getAchAuthLogId() : " + tAchAuthLog.getAchAuthLogId().toString());
-				this.info("tAchAuthLog.getRepayAcctNo() : " + tAchAuthLog.getAchAuthLogId().getRepayAcct());
-
-//				戶號 額度 授權類別 扣款銀行 郵局存款別 扣款帳號 狀態碼 每筆扣款限額 帳號碼 授權代號
-				updateBankAuthAct(tBankAuthAct.getBankAuthActId(), tAchAuthLog.getRepayBank(), "",
-						tAchAuthLog.getAchAuthLogId().getRepayAcct(), tAchAuthLog.getAuthStatus(),
-						tAchAuthLog.getLimitAmt(), "", tAchAuthLog.getAchAuthLogId().getCreateFlag(), titaVo);
-			}
-		} else {
-			this.info("查無此戶號、帳號");
-			if ("A".equals(tAchAuthLog.getAchAuthLogId().getCreateFlag())) {
-				BankAuthActId tBankAuthActId = new BankAuthActId();
-				tBankAuthActId.setCustNo(tAchAuthLog.getAchAuthLogId().getCustNo());
-				tBankAuthActId.setFacmNo(tAchAuthLog.getFacmNo());
-				tBankAuthActId.setAuthType("00");
-//				再次授權可為不同帳號，取消需有才更新
-//				戶號 額度 授權類別 扣款銀行 郵局存款別 扣款帳號 狀態碼 每筆扣款限額 帳號碼 授權代號
-				updateBankAuthAct(tBankAuthActId, tAchAuthLog.getRepayBank(), "",
-						tAchAuthLog.getAchAuthLogId().getRepayAcct(), tAchAuthLog.getAuthStatus(),
-						tAchAuthLog.getLimitAmt(), "", tAchAuthLog.getAchAuthLogId().getCreateFlag(), titaVo);
-
-			} else {
-				this.info("不為申請");
-			}
-		}
-	}
-
-//	整批修改帳號
-	private void postToBankAuthAct(PostAuthLog tPostAuthLog, TitaVo titaVo) throws LogicException {
-
-		Slice<BankAuthAct> sBankAuthAct = bankAuthActService.authCheck(tPostAuthLog.getPostAuthLogId().getCustNo(),
-				tPostAuthLog.getPostAuthLogId().getRepayAcct(), 0, 999, this.index, this.limit, titaVo);
-
-		List<BankAuthAct> lBankAuthAct = new ArrayList<BankAuthAct>();
-
-		lBankAuthAct = sBankAuthAct == null ? null : sBankAuthAct.getContent();
-
-		if (lBankAuthAct != null && lBankAuthAct.size() != 0) {
-			for (BankAuthAct tBankAuthAct : lBankAuthAct) {
-				this.info("tPostAuthLog.getPostAuthLogId() : " + tPostAuthLog.getPostAuthLogId().toString());
-				this.info("tPostAuthLog.getRepayAcctNo() : " + tPostAuthLog.getPostAuthLogId().getRepayAcct());
-
-//				戶號 額度 授權類別 扣款銀行 郵局存款別 扣款帳號 狀態碼 每筆扣款限額 帳號碼 授權代號
-				updateBankAuthAct(tBankAuthAct.getBankAuthActId(), "700", tPostAuthLog.getPostDepCode(),
-						tPostAuthLog.getPostAuthLogId().getRepayAcct(), tPostAuthLog.getAuthErrorCode(),
-						BigDecimal.ZERO, tPostAuthLog.getRepayAcctSeq(),
-						tPostAuthLog.getPostAuthLogId().getAuthApplCode(), titaVo);
-			}
-		} else {
-			this.info("查無此戶號、帳號");
-			if ("1".equals(tPostAuthLog.getPostAuthLogId().getAuthApplCode())) {
-				BankAuthActId tBankAuthActId = new BankAuthActId();
-				tBankAuthActId.setCustNo(tPostAuthLog.getPostAuthLogId().getCustNo());
-				tBankAuthActId.setFacmNo(tPostAuthLog.getFacmNo());
-				tBankAuthActId.setAuthType("01");
-
-//				再次授權可為不同帳號，取消需有才更新
-//				戶號 額度 授權類別 扣款銀行 郵局存款別 扣款帳號 狀態碼 每筆扣款限額 帳號碼 授權代號
-				updateBankAuthAct(tBankAuthActId, "700", tPostAuthLog.getPostDepCode(),
-						tPostAuthLog.getPostAuthLogId().getRepayAcct(), tPostAuthLog.getAuthErrorCode(),
-						BigDecimal.ZERO, tPostAuthLog.getRepayAcctSeq(),
-						tPostAuthLog.getPostAuthLogId().getAuthApplCode(), titaVo);
-
-				tBankAuthActId.setAuthType("02");
-
-//				戶號 額度 授權類別 扣款銀行 郵局存款別 扣款帳號 狀態碼 每筆扣款限額 帳號碼 授權代號
-				updateBankAuthAct(tBankAuthActId, "700", tPostAuthLog.getPostDepCode(),
-						tPostAuthLog.getPostAuthLogId().getRepayAcct(), tPostAuthLog.getAuthErrorCode(),
-						BigDecimal.ZERO, tPostAuthLog.getRepayAcctSeq(),
-						tPostAuthLog.getPostAuthLogId().getAuthApplCode(), titaVo);
-			} else {
-				this.info("不為申請");
-			}
-		}
-	}
-
-//	戶號 額度 授權類別 扣款銀行 郵局存款別 扣款帳號 狀態碼 每筆扣款限額 帳號碼 授權代號
-	private void updateBankAuthAct(BankAuthActId tBankAuthActId, String repayBank, String depCode, String repayAcct,
-			String errorCode, BigDecimal limitAmt, String seq, String flag, TitaVo titaVo) throws LogicException {
-
-		this.info("updateBankAuthAct Start ... ");
-		this.info("repayBank ... " + repayBank);
-		this.info("depCode ... " + depCode);
-		this.info("repayAcct ... " + repayAcct);
-		this.info("errorCode ... " + errorCode);
-		this.info("limitAmt ... " + limitAmt);
-		this.info("seq ... " + seq);
-		this.info("flag ... " + flag);
-
-		BankAuthAct tBankAuthAct = new BankAuthAct();
-		tBankAuthAct = bankAuthActService.holdById(tBankAuthActId, titaVo);
-
-		if (tBankAuthAct == null) {
-			this.info("查無此戶號、額度 1 ");
-			return;
-//			throw new LogicException("E0001", "BankAuthAct null");
-		}
-
-		int enterFlag = 0;
-		int checkFlag = 0;
-
-		if ("700".equals(tBankAuthAct.getRepayBank()) && "2".equals(flag) && "00".equals(errorCode)) {
-			enterFlag = 1;
-		}
-
-		if (!"700".equals(tBankAuthAct.getRepayBank()) && "D".equals(flag) && "0".equals(errorCode)) {
-			enterFlag = 1;
-		}
-
-		this.info("enterFlag ... " + enterFlag);
-
-		if (enterFlag == 0) {
-//			更換帳號 郵局換ACH 或ACH換郵局 需將舊的刪除，否則扣帳檔抓取會重複
-			checkFlag = checkBankAuthAct(tBankAuthAct, repayBank, titaVo);
-		}
-
-		this.info("checkFlag ... " + checkFlag);
-
-		if (checkFlag == 1) {
-			tBankAuthAct = new BankAuthAct();
-			tBankAuthAct = bankAuthActService.holdById(tBankAuthActId, titaVo);
-
-			if (tBankAuthAct == null) {
-				this.info("查無此戶號、額度 2 ");
-				return;
-			}
-		}
-
-		this.info("tBankAuthAct.getRepayBank() ... " + tBankAuthAct.getRepayBank());
-
-//		空白:未授權
-//		0:授權成功       授權提回更新      
-//		1:停止使用       0:授權成功時維護；恢復=>維護回0:授權成功
-//		2.取消授權       授權提回更新 
-//		9:已送出授權
-		if ("700".equals(tBankAuthAct.getRepayBank())) {
-			if ("00".equals(errorCode)) {
-				if ("2".equals(flag)) {
-					tBankAuthAct.setStatus("2");
-					tBankAuthAct.setRepayAcct(repayAcct);
-					tBankAuthAct.setRepayBank(repayBank);
-					if (seq != null) {
-						tBankAuthAct.setAcctSeq(seq);
-					}
-					tBankAuthAct.setPostDepCode(depCode);
-				} else {
-					tBankAuthAct.setStatus("0");
-					tBankAuthAct.setRepayAcct(repayAcct);
-					tBankAuthAct.setRepayBank(repayBank);
-					if (seq != null) {
-						tBankAuthAct.setAcctSeq(seq);
-					}
-					tBankAuthAct.setPostDepCode(depCode);
-				}
-			} else {
-				if ("9".equals(tBankAuthAct.getStatus())) {
-					tBankAuthAct.setStatus(" ");
-				}
-			}
-		} else {
-			if ("0".equals(errorCode)) {
-				if ("D".equals(flag)) {
-					tBankAuthAct.setStatus("2");
-					tBankAuthAct.setRepayAcct(repayAcct);
-					tBankAuthAct.setRepayBank(repayBank);
-					tBankAuthAct.setLimitAmt(limitAmt);
-				} else {
-					tBankAuthAct.setStatus("0");
-					tBankAuthAct.setRepayAcct(repayAcct);
-					tBankAuthAct.setRepayBank(repayBank);
-					tBankAuthAct.setLimitAmt(limitAmt);
-				}
-			} else {
-				if ("9".equals(tBankAuthAct.getStatus())) {
-					tBankAuthAct.setStatus(" ");
-				}
-			}
-		}
-
-		try {
-			this.info("tBankAuthAct ..." + tBankAuthAct.toString());
-			bankAuthActService.update(tBankAuthAct, titaVo);
-		} catch (DBException e) {
-			throw new LogicException("E0007", "BankAuthAct update error : " + e.getErrorMsg());
 		}
 	}
 
@@ -583,53 +433,6 @@ public class L4414 extends TradeBuffer {
 		}
 
 		return result;
-	}
-
-//	 更換帳號 郵局換ACH 或ACH換郵局 需將舊的刪除，否則扣帳檔抓取會重複
-	private int checkBankAuthAct(BankAuthAct tBankAuthAct, String repayBank, TitaVo titaVo) throws LogicException {
-		int flag = 0;
-		this.info("tBankAuthAct.getRepayBank() ... " + tBankAuthAct.getRepayBank());
-		this.info("repayBank ... " + repayBank);
-
-		if (tBankAuthAct.getRepayBank() == null || repayBank == null) {
-			this.info("null return ... ");
-			return 9;
-		}
-
-		Slice<BankAuthAct> sBankAuthAct = bankAuthActService.facmNoEq(tBankAuthAct.getCustNo(),
-				tBankAuthAct.getFacmNo(), this.index, this.limit, titaVo);
-
-		List<BankAuthAct> lBankAuthAct = new ArrayList<BankAuthAct>();
-
-		lBankAuthAct = sBankAuthAct == null ? null : sBankAuthAct.getContent();
-
-		if (lBankAuthAct != null && lBankAuthAct.size() != 0) {
-			for (BankAuthAct t2BankAuthAct : lBankAuthAct) {
-				if ("700".equals(t2BankAuthAct.getRepayBank())) {
-					if ("700".equals(repayBank)) {
-						this.info("同為郵局不刪除 ... ");
-						continue;
-					}
-				} else {
-					if (!"700".equals(repayBank)) {
-						this.info("同為ACH不刪除 ... ");
-						continue;
-					}
-				}
-
-				flag = 1;
-
-				try {
-					bankAuthActService.delete(t2BankAuthAct);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008", e.getErrorMsg());
-				}
-			}
-		} else {
-			this.info("lBankAuthAct null ... ");
-		}
-
-		return flag;
 	}
 
 	private void setOutput(AchAuthLog tAchAuthLog, TitaVo titaVo) throws LogicException {

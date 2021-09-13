@@ -23,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Component
 @Scope("prototype")
 public class L9715Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L9715Report.class);
 
 	@Autowired
 	L9715ServiceImpl l9715ServiceImpl;
@@ -58,26 +57,20 @@ public class L9715Report extends MakeReport {
 		this.setFontSize(8);
 		this.setCharSpaces(0);
 		this.print(-1, 170, "機密等級：機密");
-		this.print(-2, 170, "基　礎：" + dDateUtil.getNowStringBc().substring(0, 4) + "/"
-				+ dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6));
+		this.print(-2, 170, "基　礎：" + dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6));
 		this.print(-3, 8, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 100, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));
-		this.print(-3, 170, "日　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/"
-				+ dDateUtil.getNowStringBc().substring(2, 4));
+		this.print(-3, 170, "日　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/" + dDateUtil.getNowStringBc().substring(2, 4));
 		this.print(-4, 8, "報　表：" + this.getRptCode());
 		this.print(-4, 100, "業務專辦照顧十八個月明細表", "C");
-		this.print(-4, 170, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-4, 170, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-5, 170, "頁　數：　" + this.getNowPage());
 //		this.print(-6, 6, "經辦：" + name);
-		this.print(-6, 100, "撥款日期　" + dDateUtil.getNowStringBc().substring(0, 4) + "/"
-				+ dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6) + "　起",
-				"C");
+		this.print(-6, 100, "撥款日期　" + dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6) + "　起", "C");
 		this.print(-6, 170, "單　位：元");
 		this.print(-8, 6, " 押品　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　最近　　逾期");
-		this.print(-9, 6,
-				"地區別　繳款方式　　戶號　　　　戶名　　　　初貸日　　　本金餘額　 利率　 迄繳息日　 應繳日　日數　　　未收本息　　　　違約金　　溢短款　　　　合計　連絡人　　電話　　　　　　追蹤情形");
+		this.print(-9, 6, "地區別　繳款方式　　戶號　　　　戶名　　　　初貸日　　　本金餘額　 利率　 迄繳息日　 應繳日　日數　　　未收本息　　　　違約金　　溢短款　　　　合計　連絡人　　電話　　　　　　追蹤情形");
 		this.print(-10, 5,
 				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
@@ -126,9 +119,8 @@ public class L9715Report extends MakeReport {
 				try {
 					;
 					dBaTxCom.setTxBuffer(txbuffer);
-					listBaTxVo = dBaTxCom.settingUnPaid(parse.stringToInteger(titaVo.getParam("ENTDY")),
-							parse.stringToInteger(tL9Vo.get("F4").substring(0,7)), parse.stringToInteger(tL9Vo.get("F4").substring(8)), 0, 1,
-							BigDecimal.ZERO, titaVo);
+					listBaTxVo = dBaTxCom.settingUnPaid(parse.stringToInteger(titaVo.getParam("ENTDY")), parse.stringToInteger(tL9Vo.get("F4").substring(0, 7)),
+							parse.stringToInteger(tL9Vo.get("F4").substring(8)), 0, 1, BigDecimal.ZERO, titaVo);
 					this.info("listBaTxVo.size()-------->" + listBaTxVo.size());
 					this.info("listBaTxVo-------->" + listBaTxVo.toString());
 					int Principal = 0, Interest = 0;
@@ -157,23 +149,22 @@ public class L9715Report extends MakeReport {
 						if (openClose) {
 							this.print(-6, 6, "經辦：" + name);
 							openClose = false;
-						}else {
+						} else {
 							this.newPage();
 							this.print(-6, 6, "經辦：" + name);
-						}		
+						}
 					}
-					
+
 					this.print(1, 6, tL9Vo.get("F2"));
-					this.print(1,14,tL9Vo.get("F3"));
-					this.print(0, 24,tL9Vo.get("F4"));
+					this.print(1, 14, tL9Vo.get("F3"));
+					this.print(0, 24, tL9Vo.get("F4"));
 					this.print(0, 38, tL9Vo.get("F5"));
 
 					if ("0".equals(tL9Vo.get("F6")) || tL9Vo.get("F6") == null) {
 						this.print(0, 57, "", "R");
 					} else {
-						Yr = Integer.parseInt(tL9Vo.get("F5").toString()) - 19110000;
-						this.print(0, 57, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5)
-								+ "/" + String.valueOf(Yr).substring(5, 7), "R");
+						Yr = Integer.parseInt(tL9Vo.get("F6").toString()) - 19110000;
+						this.print(0, 57, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5) + "/" + String.valueOf(Yr).substring(5, 7), "R");
 					}
 
 					this.print(0, 70, String.format("%,d", Integer.parseInt(tL9Vo.get("F7").toString())), "R");
@@ -185,8 +176,7 @@ public class L9715Report extends MakeReport {
 						this.print(0, 86, "", "R");
 					} else {
 						Yr = Integer.parseInt(tL9Vo.get("F9").toString()) - 19110000;
-						this.print(0, 86, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5)
-								+ "/" + String.valueOf(Yr).substring(5, 7), "R");
+						this.print(0, 86, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5) + "/" + String.valueOf(Yr).substring(5, 7), "R");
 					}
 
 					if ("0".equals(tL9Vo.get("F10")) || tL9Vo.get("F10") == null) {
@@ -194,8 +184,7 @@ public class L9715Report extends MakeReport {
 					} else {
 
 						Yr = Integer.parseInt(tL9Vo.get("F10").toString()) - 19110000;
-						this.print(0, 97, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5)
-								+ "/" + String.valueOf(Yr).substring(5, 7), "R");
+						this.print(0, 97, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5) + "/" + String.valueOf(Yr).substring(5, 7), "R");
 					}
 
 					this.print(0, 102, tL9Vo.get("F9"), "R");

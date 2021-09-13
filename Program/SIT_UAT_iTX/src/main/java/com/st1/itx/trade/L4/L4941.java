@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -13,9 +11,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AchAuthLogHistory;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AchAuthLogHistoryService;
-import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -40,8 +36,6 @@ public class L4941 extends TradeBuffer {
 
 	@Autowired
 	public AchAuthLogHistoryService achAuthLogHistoryService;
-	@Autowired
-	public CdEmpService cdEmpService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -52,23 +46,13 @@ public class L4941 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 500;
-
-		List<AchAuthLogHistory> lAchAuthLogHistory = new ArrayList<AchAuthLogHistory>();
-
 		int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 
-		// wk
-		String wkUser = "";
+		Slice<AchAuthLogHistory> slAchAuthLogHistory = achAuthLogHistoryService.facmNoEq(custNo, facmNo, index, limit, titaVo);
 
-		Slice<AchAuthLogHistory> sAchAuthLogHistory = null;
-
-		sAchAuthLogHistory = achAuthLogHistoryService.facmNoEq(custNo, facmNo, index, limit, titaVo);
-
-		lAchAuthLogHistory = sAchAuthLogHistory == null ? null : sAchAuthLogHistory.getContent();
-
-		if (lAchAuthLogHistory != null && lAchAuthLogHistory.size() != 0) {
-			for (AchAuthLogHistory tAchAuthLogHistory : lAchAuthLogHistory) {
+		if (slAchAuthLogHistory != null) {
+			for (AchAuthLogHistory tAchAuthLogHistory : slAchAuthLogHistory.getContent()) {
 				OccursList occursList = new OccursList();
 				String wkCreateFlag = tAchAuthLogHistory.getCreateFlag();
 				if (tAchAuthLogHistory.getDeleteDate() > 0) {
@@ -78,12 +62,6 @@ public class L4941 extends TradeBuffer {
 						wkCreateFlag = "Y";
 					}
 				}
-				wkUser = tAchAuthLogHistory.getLastUpdateEmpNo();
-				CdEmp tCdEmp = cdEmpService.findById(wkUser, titaVo);
-				if (tCdEmp != null) {
-					wkUser = wkUser + " " + tCdEmp.getFullname();
-				}
-
 				occursList.putParam("OOCustNo", tAchAuthLogHistory.getCustNo());
 				occursList.putParam("OOFacmNo", tAchAuthLogHistory.getFacmNo());
 				occursList.putParam("OORepayBank", tAchAuthLogHistory.getRepayBank());
@@ -98,7 +76,7 @@ public class L4941 extends TradeBuffer {
 				occursList.putParam("OOAmlRsp", tAchAuthLogHistory.getAmlRsp());
 				occursList.putParam("OOStampFinishDate", tAchAuthLogHistory.getStampFinishDate());
 				occursList.putParam("OODeleteDate", tAchAuthLogHistory.getDeleteDate());
-				occursList.putParam("OOUser", wkUser);
+				occursList.putParam("OOUser", tAchAuthLogHistory.getLastUpdateEmpNo());
 				String sDate = tAchAuthLogHistory.getLastUpdate().toString().substring(0, 10).trim();
 				sDate = sDate.replace("-", "");
 				int iDate = parse.stringToInteger(sDate);

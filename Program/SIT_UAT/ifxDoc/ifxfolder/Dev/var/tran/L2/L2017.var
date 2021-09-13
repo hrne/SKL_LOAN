@@ -388,8 +388,8 @@ SWITCH(#OClCode1,1,T(3,擔保品;L2911 不動產擔保品資料查詢),
                  5,T(3,擔保品;L2914 其他擔保品資料查詢),
                  9,T(3,擔保品;L2912 動產擔保品資料查詢))
 
-#ColBuf=X,10,S
-T(2,#OClCode1+#OClCode2+#OClNo)
+#ColBuf=X,17,S
+T(2,#OClCode1+#OClCode2+#OClNo+#OOApplNo)
 
 #OOBtnCol=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#TxCd;text=#TxNm;ntxbuf=#ColBuf})

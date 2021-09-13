@@ -17,6 +17,7 @@ import com.st1.itx.db.domain.InsuRenewId;
 import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -56,6 +57,9 @@ public class L4610 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
+	@Autowired
+	public SendRsp sendRsp;
+	
 	@Autowired
 	public InsuOrignalService insuOrignalService;
 
@@ -245,6 +249,12 @@ public class L4610 extends TradeBuffer {
 
 		} else if (iFunctionCode.equals("4")) {
 			// 抓出要刪除的資料
+			
+			// 刪除須刷主管卡
+			if (titaVo.getEmpNos().trim().isEmpty()) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+			
 			InsuOrignal deleInsuOrignal = insuOrignalService.holdById(tInsuOrignalId);
 			if (deleInsuOrignal == null) {
 				throw new LogicException(titaVo, "E0004", "火險初保檔 ");

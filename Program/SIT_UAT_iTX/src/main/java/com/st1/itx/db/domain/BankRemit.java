@@ -56,7 +56,7 @@ public class BankRemit implements Serializable {
   private int drawdownCode = 0;
 
   // 狀態
-  /* CdCode:DrawdownStatus0:正常1:產檔後修正2:產檔後訂正 */
+  /* CdCode:DrawdownStatus0:正常1:產檔後修正2:產檔後訂正3.未放行(ActFg=時顯示用) */
   @Column(name = "`StatusCode`")
   private int statusCode = 0;
 
@@ -253,6 +253,7 @@ public class BankRemit implements Serializable {
 0:正常
 1:產檔後修正
 2:產檔後訂正
+3.未放行(ActFg=時顯示用)
 	* @return Integer
 	*/
   public int getStatusCode() {
@@ -265,6 +266,7 @@ public class BankRemit implements Serializable {
 0:正常
 1:產檔後修正
 2:產檔後訂正
+3.未放行(ActFg=時顯示用)
   *
   * @param statusCode 狀態
 	*/
