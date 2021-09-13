@@ -48,7 +48,7 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9715ServiceImpl UNPAY_DAY_ST = " + titaVo.getParam("UNPAY_DAY_ST"));
 		this.info("L9715ServiceImpl UNPAY_DAY_ED = " + titaVo.getParam("UNPAY_DAY_ED"));
 
-		approDate = Integer.parseInt(titaVo.getParam("APPRO_DAY"));
+		approDate = Integer.parseInt(titaVo.getParam("APPRO_DAY")) + 19110000;
 		int unpayTermSt = Integer.parseInt(titaVo.getParam("UNPAY_TERM_ST"));
 		int unpayTermEd = Integer.parseInt(titaVo.getParam("UNPAY_TERM_ED"));
 		int unpayDaySt = Integer.parseInt(titaVo.getParam("UNPAY_DAY_ST"));
@@ -153,10 +153,10 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE COLL.\"CaseCode\" = 1 ";
 		sql += "   AND COLL.\"Status\" IN (0,2,4,6) ";
 		sql += "   AND FAC.\"FirstDrawdownDate\" >= :approDate ";
-		sql += "   AND COLL.\"OvduTerm\" >= :ovduTermStart ";
-		sql += "   AND COLL.\"OvduTerm\" <= :ovduTermEnd ";
-		sql += "   AND COLL.\"OvduDays\" >= :ovduDaysStart ";
-		sql += "   AND COLL.\"OvduDays\" <= :ovduDaysEnd ";
+		sql += "   AND L.\"OvduTerm\" >= :ovduTermStart ";
+		sql += "   AND L.\"OvduTerm\" <= :ovduTermEnd ";
+		sql += "   AND L.\"OvduDays\" >= :ovduDaysStart ";
+		sql += "   AND L.\"OvduDays\" <= :ovduDaysEnd ";
 		sql += " ORDER BY F0 ";
 		sql += "        , F3 ";
 		sql += "        , F4 ";

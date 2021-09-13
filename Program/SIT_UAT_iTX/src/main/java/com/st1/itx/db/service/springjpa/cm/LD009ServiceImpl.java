@@ -118,6 +118,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND FAC.\"FacmNo\" = LTX.\"FacmNo\" ";
 		sql += "       WHERE LTX.\"AcDate\" = :today "; // 放款交易內容檔的會計日期為今日
 		sql += "         AND LTX.\"TitaHCode\" = 0 ";
+		sql += "         AND \"Principal\" + \"ExtraRepay\" > 0";
 		sql += "       GROUP BY LTX.\"CustNo\" ";
 		sql += "              , LTX.\"FacmNo\" ";
 		sql += "              , LTX.\"BormNo\" ";
@@ -260,7 +261,7 @@ public class LD009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("today", today.getYear() + String.format("%02d", today.getMonthValue()) + String.format("%02d", today.getDayOfMonth()));
 		query.setParameter("lastDay", yesterday.getYear() + String.format("%02d", yesterday.getMonthValue()) + String.format("%02d", yesterday.getDayOfMonth()));
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }
