@@ -450,8 +450,14 @@ public class LM048Report extends MakeReport {
 		mapTmp.put("IndustryItem", lastIndustry);
 		mapTmp.put("CustNo", "");
 		mapTmp.put("CustName", "單一行業小計");
-		mapTmp.put("LineAmt", industryTotal[0] == null ? "0" : industryTotal[0].toString());
-		mapTmp.put("LoanBal", industryTotal[1] == null ? "0" : industryTotal[1].toString());
+
+		if (industryTotal == null) {
+			mapTmp.put("LineAmt", "0");
+			mapTmp.put("LoanBal", "0");
+		} else {
+			mapTmp.put("LineAmt", industryTotal[0] == null ? "0" : industryTotal[0].toString());
+			mapTmp.put("LoanBal", industryTotal[1] == null ? "0" : industryTotal[1].toString());
+		}
 		mapTmp.put("StoreRate", "");
 		mapTmp.put("MaturityDate", "");
 		mapTmp.put("PrevPayIntDate", "");

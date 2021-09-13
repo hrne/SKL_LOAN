@@ -115,13 +115,13 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ,SUM(DECODE(ad.\"DbCr\", 'C', ad.\"TxAmt\", -ad.\"TxAmt\")) \"IntSum\" ";
 		sql += "            FROM \"AcDetail\" ad ";
 		sql += "            LEFT JOIN \"FacMain\" fm ON fm.\"CustNo\" = ad.\"CustNo\" ";
-		sql += "                                  AND fm.\"FacmNo\" = ad.\"FacmNo\" ";
-		sql += "            LEFT JOIN \"SubjectProdNo\" spn ON (spn.\"ProdNo\" = fm.\"ProdNo\" OR spn.\"ProdNo\" = fm.\"AcctCode\") ";
+		sql += "                                    AND (fm.\"FacmNo\" = ad.\"FacmNo\" OR ad.\"AcctCode\" IN ('F15', 'F16'))";
+		sql += "            LEFT JOIN \"SubjectProdNo\" spn ON (spn.\"ProdNo\" = fm.\"ProdNo\" OR spn.\"ProdNo\" = fm.\"AcctCode\" OR spn.\"ProdNo\" = ad.\"AcctCode\") ";
 		sql += "                                           AND fm.\"AcctCode\" IN ('310','320','330','340') ";
 		sql += "            LEFT JOIN \"OutputMonths\" om ON om.\"YearMonth\" = FLOOR(ad.\"RelDy\"/100) ";
 		sql += "            WHERE ad.\"RelDy\" BETWEEN TO_NUMBER(:entYear||'0101') AND TO_NUMBER(:entYear||'1231') ";
 		sql += "            AND spn.\"ProdNo\" is not null ";
-		sql += "            AND ad.\"AcctCode\" IN ('IC1','IC2','IC3','IC4','IOP','IOV') ";
+		sql += "            AND ad.\"AcctCode\" IN ('IC1','IC2','IC3','IC4','IOP','IOV','F15','F16') ";
 		sql += "            GROUP BY spn.\"ProdNoShow\" ";
 		sql += "                    ,om.\"YearMonth\" ";
 		sql += "           ) int ON int.\"YearMonth\" = om.\"YearMonth\" ";
@@ -149,9 +149,9 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entYearMonth", entdy.substring(0,6));
-		query.setParameter("entYear", entdy.substring(0,4));
-		return this.convertToMap(query.getResultList());
+		query.setParameter("entYearMonth", entdy.substring(0, 6));
+		query.setParameter("entYear", entdy.substring(0, 4));
+		return this.convertToMap(query);
 	}
 
 }

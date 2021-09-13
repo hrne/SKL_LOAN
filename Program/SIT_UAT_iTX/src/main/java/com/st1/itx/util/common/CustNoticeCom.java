@@ -48,8 +48,6 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 public class CustNoticeCom extends TradeBuffer {
 
-	private TitaVo titaVo;
-
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -82,9 +80,6 @@ public class CustNoticeCom extends TradeBuffer {
 	private HashMap<tmpFacm, Integer> docuNoticeCheck = new HashMap<>();
 	private HashMap<tmpFacm, Integer> textNoticeCheck = new HashMap<>();
 	private HashMap<tmpFacm, Integer> mailNoticeCheck = new HashMap<>();
-
-	private int sendCode = 1;
-
 	private int docuCode = 0;
 	private int textCode = 0;
 	private int mailCode = 0;
@@ -100,7 +95,6 @@ public class CustNoticeCom extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.titaVo = titaVo;
 		this.totaVo.init(titaVo);
 
 		this.addList(this.totaVo);
@@ -124,17 +118,19 @@ public class CustNoticeCom extends TradeBuffer {
 	 */
 	public TempVo getCustNotice(String formNo, int custNo, int facmNo, TitaVo titaVo) throws LogicException {
 		TempVo tempVo = new TempVo();
-		this.info("custNoticeCom.getnoticeCode Start ...");
+		this.info("custNoticeCom.getnoticeCode Start ...  CustNo=" + custNo + ", FacmNo=" + facmNo);
 
-		int noticeCode = 9;
+		int noticeCode = 0;
 		isLetter = "";
 		isMessage = "";
 		isEmail = "";
-		getNoticeCode(formNo, titaVo);
+		CustMain tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
+		if (tCustMain == null) {
+			return tempVo;
+		}
 
 //		1.找CdReport 判斷該寄送規則 & 各通知優先序列
-
-		this.info(formNo + "'s SendCode is : " + sendCode);
+		int sendCode = getSendCode(formNo, titaVo); // default = 1
 
 //		SendCode = 0:不送  1:依利率調整通知方式  2:依設定優先序
 //		預設優先順序   手機 > MAIL > 書信
@@ -143,18 +139,10 @@ public class CustNoticeCom extends TradeBuffer {
 			noticeCode = 0;
 			break;
 		case 1:
-			CustMain tCustMain = new CustMain();
-			tCustMain = custMainService.custNoFirst(custNo, custNo, titaVo);
-
-			FacMain tFacMain = new FacMain();
-			FacMainId tFacMainId = new FacMainId();
-
-			tFacMainId.setCustNo(custNo);
-			tFacMainId.setFacmNo(facmNo);
-
-			tFacMain = facMainService.findById(tFacMainId, titaVo);
-
-			noticeCode = parse.stringToInteger(tFacMain.getRateAdjNoticeCode());
+			if (facmNo > 0) {
+				FacMain tFacMain = facMainService.findById(new FacMainId(custNo, facmNo), titaVo);
+				noticeCode = parse.stringToInteger(tFacMain.getRateAdjNoticeCode());
+			}
 
 //			noticeCode 共用代碼檔
 //			1:電子郵件 
@@ -187,22 +175,24 @@ public class CustNoticeCom extends TradeBuffer {
 			}
 
 			break;
-		case 2:
 
+		case 2:
 //			改為+一個Method先By交易將Code找出來(1,2,3,9)
 //			後面再依Code將對應通知方式放入(書信:地址、簡訊:手機、電郵:Mail)
-			findNotice(formNo, custNo, facmNo);
+			findNotice(formNo, custNo, facmNo, titaVo);
 
+			// 依額度
 			tmpFacm tmp = new tmpFacm(custNo, facmNo);
-			tmpFacm tmp2 = new tmpFacm(custNo, 0);
+			getResult(tmp, tCustMain, titaVo);
 
-			getResult(tmp, titaVo);
-
+			// 依客戶
 			if (flag == 0) {
-				getResult(tmp2, titaVo);
+				tmpFacm tmp2 = new tmpFacm(custNo, 0);
+				getResult(tmp2, tCustMain, titaVo);
 			}
 
 			break;
+			
 		default:
 			noticeCode = 0;
 			break;
@@ -234,16 +224,13 @@ public class CustNoticeCom extends TradeBuffer {
 		return tempVo;
 	}
 
-	private void getResult(tmpFacm tmp, TitaVo titaVo) {
+	private void getResult(tmpFacm tmp, CustMain tCustMain, TitaVo titaVo) {
 		flag = 0;
 		letterAddress = "";
 		messagePhoneNo = "";
 		emailAddress = "";
 
 		this.info("getResult ...");
-		CustMain tCustMain = new CustMain();
-		tCustMain = custMainService.custNoFirst(tmp.getCustNo(), tmp.getCustNo(),titaVo);
-
 		this.info("docuNoticeCheck ..." + docuNoticeCheck.get(tmp));
 		this.info("textNoticeCheck ..." + textNoticeCheck.get(tmp));
 		this.info("mailNoticeCheck ..." + mailNoticeCheck.get(tmp));
@@ -338,7 +325,7 @@ public class CustNoticeCom extends TradeBuffer {
 
 	private void getAdress(CustMain tCustMain, TitaVo titaVo) {
 		if (tCustMain != null) {
-			letterAddress = getCurrAddress(tCustMain,titaVo);
+			letterAddress = getCurrAddress(tCustMain, titaVo);
 		}
 	}
 
@@ -351,7 +338,7 @@ public class CustNoticeCom extends TradeBuffer {
 		String currAddress = "";
 
 		if (!"".equals(custMain.getCurrCityCode())) {
-			CdCity cdCity = cdCityService.findById(custMain.getCurrCityCode(),titaVo);
+			CdCity cdCity = cdCityService.findById(custMain.getCurrCityCode(), titaVo);
 			if (cdCity != null) {
 				currAddress += cdCity.getCityItem();
 
@@ -359,7 +346,7 @@ public class CustNoticeCom extends TradeBuffer {
 					CdAreaId cdAreaId = new CdAreaId();
 					cdAreaId.setCityCode(custMain.getCurrCityCode());
 					cdAreaId.setAreaCode(custMain.getCurrAreaCode());
-					CdArea cdArea = cdAreaService.findById(cdAreaId,titaVo);
+					CdArea cdArea = cdAreaService.findById(cdAreaId, titaVo);
 					if (cdArea != null) {
 						currAddress += cdArea.getAreaItem();
 					}
@@ -401,11 +388,11 @@ public class CustNoticeCom extends TradeBuffer {
 	 * @param custMain 客戶主檔
 	 * @return regAddress = 戶籍地址 <br>
 	 */
-	public String getRegAddress(CustMain custMain,TitaVo titaVo) {
+	public String getRegAddress(CustMain custMain, TitaVo titaVo) {
 		String regAddress = "";
 
 		if (!"".equals(custMain.getRegCityCode())) {
-			CdCity cdCity = cdCityService.findById(custMain.getRegCityCode(),titaVo);
+			CdCity cdCity = cdCityService.findById(custMain.getRegCityCode(), titaVo);
 			if (cdCity != null) {
 				regAddress += cdCity.getCityItem();
 
@@ -413,7 +400,7 @@ public class CustNoticeCom extends TradeBuffer {
 					CdAreaId cdAreaId = new CdAreaId();
 					cdAreaId.setCityCode(custMain.getRegCityCode());
 					cdAreaId.setAreaCode(custMain.getRegAreaCode());
-					CdArea cdArea = cdAreaService.findById(cdAreaId,titaVo);
+					CdArea cdArea = cdAreaService.findById(cdAreaId, titaVo);
 					if (cdArea != null) {
 						regAddress += cdArea.getAreaItem();
 					}
@@ -450,12 +437,12 @@ public class CustNoticeCom extends TradeBuffer {
 		return regAddress;
 	}
 
-	private void getPhone(CustMain tCustMain,TitaVo titaVo) {
+	private void getPhone(CustMain tCustMain, TitaVo titaVo) {
 		if (tCustMain != null) {
 			List<CustTelNo> lCustTelNo = new ArrayList<CustTelNo>();
 
 			Slice<CustTelNo> slCustTelNo = custTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index,
-					Integer.MAX_VALUE,titaVo);
+					Integer.MAX_VALUE, titaVo);
 			lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 			if (lCustTelNo != null && lCustTelNo.size() != 0) {
@@ -472,24 +459,25 @@ public class CustNoticeCom extends TradeBuffer {
 		}
 	}
 
-	private void getEmail(CustMain tCustMain,TitaVo titaVo) {
+	private void getEmail(CustMain tCustMain, TitaVo titaVo) {
 		if (tCustMain != null) {
 			emailAddress = tCustMain.getEmail();
 			this.info("emailAddress ..." + emailAddress);
 		}
 	}
 
-	private void findNotice(String formNo, int custNo, int facmNo) {
-		this.info("findNotice ... ");
+	private void findNotice(String formNo, int custNo, int facmNo, TitaVo titaVo) {
+		this.info("findNotice ...");
 
 		List<CustNotice> lCustNotice0 = new ArrayList<CustNotice>();
 		List<CustNotice> lCustNoticeX = new ArrayList<CustNotice>();
 
-		Slice<CustNotice> slCustNotice0 = custNoticeService.facmNoEq(custNo, 0, 0, this.index, Integer.MAX_VALUE,titaVo);
+		Slice<CustNotice> slCustNotice0 = custNoticeService.facmNoEq(custNo, 0, 0, this.index, Integer.MAX_VALUE,
+				titaVo);
 		lCustNotice0 = slCustNotice0 == null ? null : slCustNotice0.getContent();
 		if (facmNo != 0) {
 			Slice<CustNotice> slCustNoticeX = custNoticeService.facmNoEq(custNo, facmNo, facmNo, this.index,
-					Integer.MAX_VALUE,titaVo);
+					Integer.MAX_VALUE, titaVo);
 			lCustNoticeX = slCustNoticeX == null ? null : slCustNoticeX.getContent();
 		}
 
@@ -574,9 +562,10 @@ public class CustNoticeCom extends TradeBuffer {
 		this.info("mailNoticeCheck : " + mailNoticeCheck.get(tmp));
 	}
 
-	public void getNoticeCode(String txcd,TitaVo titaVo) {
+	private int getSendCode(String txcd, TitaVo titaVo) {
+		int sendCode = 1;
 		CdReport tCdReport = new CdReport();
-		tCdReport = cdReportService.findById(txcd,titaVo);
+		tCdReport = cdReportService.findById(txcd, titaVo);
 		if (tCdReport != null) {
 			sendCode = tCdReport.getSendCode();
 			if (tCdReport.getSendCode() == 2) { // 2:依設定優先序
@@ -587,6 +576,9 @@ public class CustNoticeCom extends TradeBuffer {
 		} else {
 			this.info("tCdReport is null... ");
 		}
+
+		this.info(txcd + "'s SendCode is : " + sendCode);
+		return sendCode;
 	}
 
 	private class tmpFacm {

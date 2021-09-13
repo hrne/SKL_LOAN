@@ -37,6 +37,7 @@ public class L9715Report extends MakeReport {
 
 	private String fundDay = "";
 	private String approDay = "";
+	
 
 	@Override
 	public void printHeader() {
@@ -54,49 +55,88 @@ public class L9715Report extends MakeReport {
 	}
 
 	public void printHeaderL1() {
+		
+
 		this.setFontSize(8);
 		this.setCharSpaces(0);
-		this.print(-1, 170, "機密等級：機密");
-		this.print(-2, 170, "基　礎：" + dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6));
+		this.print(-1, 184, "機密等級：機密");
+		this.print(-2, 184, "基　礎：" + dDateUtil.getNowStringBc().substring(0, 4) + "/"
+				+ dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6));
 		this.print(-3, 8, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 100, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));
-		this.print(-3, 170, "日　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/" + dDateUtil.getNowStringBc().substring(2, 4));
+		this.print(-3, 184, "日　期：" + tim + "/" + dDateUtil.getNowStringBc().substring(6) + "/"
+				+ dDateUtil.getNowStringBc().substring(2, 4));
 		this.print(-4, 8, "報　表：" + this.getRptCode());
 		this.print(-4, 100, "業務專辦照顧十八個月明細表", "C");
-		this.print(-4, 170, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
-		this.print(-5, 170, "頁　數：　" + this.getNowPage());
-//		this.print(-6, 6, "經辦：" + name);
-		this.print(-6, 100, "撥款日期　" + dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6) + "　起", "C");
-		this.print(-6, 170, "單　位：元");
-		this.print(-8, 6, " 押品　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　最近　　逾期");
-		this.print(-9, 6, "地區別　繳款方式　　戶號　　　　戶名　　　　初貸日　　　本金餘額　 利率　 迄繳息日　 應繳日　日數　　　未收本息　　　　違約金　　溢短款　　　　合計　連絡人　　電話　　　　　　追蹤情形");
+		this.print(-4, 184, "時　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
+				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-5, 184, "頁　數：　" + this.getNowPage());
+		this.print(-6, 6, "經辦：");
+		this.print(-6, 100, "撥款日期　" + showBcDate(approDay, 0) + "　起", "C");
+//		this.print(-6, 100, "撥款日期　" + dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6) + "　起", "C");
+//		this.print(-6, 100, "撥款日期　" + dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6) + "　起", "C");
+		this.print(-6, 184, "單　位：元");
+//		this.print(-8, 6, " 押品　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　最近　　逾期");
+		this.print(-8, 7, "押品");
+		this.print(-9, 6, "地區別");
+		this.print(-9, 14, "繳款方式");
+		this.print(-9, 24, "戶號");
+		this.print(-9, 38, "戶名");
+		this.print(-9, 55, "初貸日");
+		this.print(-9, 65, "本金餘額");
+		this.print(-9, 75, "利率");
+		this.print(-9, 85, "繳息迄日");
+		this.print(-8, 95, "最近");
+		this.print(-9, 95, "應繳日");
+		this.print(-8, 105, "逾期");
+		this.print(-9, 105, "日數");
+		this.print(-9, 115, "未收本息");
+		this.print(-9, 125, "違約金");
+		this.print(-9, 135, "溢短繳");
+		this.print(-9, 150, "合計");
+		this.print(-9, 160, "連絡人");
+		this.print(-9, 170, "電話");
+		this.print(-9, 192, "追蹤情形");
+//		this.print(-9, 6,
+//				"地區別　繳款方式　　戶號　　　　戶名　　　　初貸日　　　本金餘額　 利率　 繳息迄日　   應繳日　  日數　　　  未收本息　　違約金　　溢短款　　　　合計　連絡人　　電話　　　　　　追蹤情形");
 		this.print(-10, 5,
-				"---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+				"------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9715", "放款到期明細表及通知單", "密", "A4", "L");
+
+		// 基礎日期
 		fundDay = titaVo.getParam("FUND_DAY");
+
+		// 撥款日期
 		approDay = titaVo.getParam("APPRO_DAY");
 
+		this.setFontSize(8);
+	
 		List<Map<String, String>> l9715List = null;
+
 		try {
+
 			l9715List = l9715ServiceImpl.findAll(titaVo);
+
 		} catch (Exception e) {
+
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L9715ServiceImpl.findall error = " + errors.toString());
-		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9715", "放款到期明細表及通知單", "密", "A4", "");
+		}
 
 		if (l9715List.size() != 0) {
 
 			int Yr = 0;
-			int money = 0;
-			int pi = 0, ba = 0, ua = 0, sum = 0;
-			for (Map<String, String> tL9Vo : l9715List) {
+			String nameNo = "";
+			boolean openClose = true;
+
+			for (Map<String, String> tL9715 : l9715List) {
 				// input:
 				// entryDate 入帳日期
 //					CustNo	       戶號
@@ -116,114 +156,160 @@ public class L9715Report extends MakeReport {
 
 				List<BaTxVo> listBaTxVo = new ArrayList<>();
 
+				dBaTxCom.setTxBuffer(txbuffer);
+
+				int custNo = parse.stringToInteger(tL9715.get("F3"));
+				int facmNo = parse.stringToInteger(tL9715.get("F4"));
+
+				int tbsdy = parse.stringToInteger(fundDay);
+
+				this.info("L9715Report1 tL9715.custNo = " + custNo);
+				this.info("L9715Report1 tL9715.facmNo = " + facmNo);
+				this.info("L9715Report1 fundDay = " + tbsdy);
+
 				try {
-					;
-					dBaTxCom.setTxBuffer(txbuffer);
-					listBaTxVo = dBaTxCom.settingUnPaid(parse.stringToInteger(titaVo.getParam("ENTDY")), parse.stringToInteger(tL9Vo.get("F4").substring(0, 7)),
-							parse.stringToInteger(tL9Vo.get("F4").substring(8)), 0, 1, BigDecimal.ZERO, titaVo);
-					this.info("listBaTxVo.size()-------->" + listBaTxVo.size());
-					this.info("listBaTxVo-------->" + listBaTxVo.toString());
-					int Principal = 0, Interest = 0;
-					int BreachAmt = 0;
-					int UnPaidAmt = 0;
-					double IntRate = 0.00;
-					// 未收本息 = 本金+利息 Principal + Interest
-					// 違約金 有 但要扣成 0 BreachAmt
-					// 溢短繳 UnPaidAmt
-					// 合計 = 未收本息 + 違約金 - 溢短繳
-
-					for (int i = 0; i < listBaTxVo.size(); i++) {
-						Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
-						Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
-						BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
-						UnPaidAmt = UnPaidAmt + listBaTxVo.get(i).getUnPaidAmt().intValue();
-						IntRate = listBaTxVo.get(i).getIntRate().doubleValue();
-					}
-
-					String nameNo = "";
-					boolean openClose = true;
-					name = tL9Vo.get("F1");
-					// 先產生有的
-					if (!nameNo.equals(tL9Vo.get("F0"))) {
-						nameNo = tL9Vo.get("F0");
-						if (openClose) {
-							this.print(-6, 6, "經辦：" + name);
-							openClose = false;
-						} else {
-							this.newPage();
-							this.print(-6, 6, "經辦：" + name);
-						}
-					}
-
-					this.print(1, 6, tL9Vo.get("F2"));
-					this.print(1, 14, tL9Vo.get("F3"));
-					this.print(0, 24, tL9Vo.get("F4"));
-					this.print(0, 38, tL9Vo.get("F5"));
-
-					if ("0".equals(tL9Vo.get("F6")) || tL9Vo.get("F6") == null) {
-						this.print(0, 57, "", "R");
-					} else {
-						Yr = Integer.parseInt(tL9Vo.get("F6").toString()) - 19110000;
-						this.print(0, 57, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5) + "/" + String.valueOf(Yr).substring(5, 7), "R");
-					}
-
-					this.print(0, 70, String.format("%,d", Integer.parseInt(tL9Vo.get("F7").toString())), "R");
-					money = money + Integer.parseInt(tL9Vo.get("F7").toString()); // 本金餘額
-					/**********************/
-					this.print(0, 79, padEnd(6, String.valueOf(IntRate)), "R");
-					/**********************/
-					if ("0".equals(tL9Vo.get("F9")) || tL9Vo.get("F9") == null) {
-						this.print(0, 86, "", "R");
-					} else {
-						Yr = Integer.parseInt(tL9Vo.get("F9").toString()) - 19110000;
-						this.print(0, 86, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5) + "/" + String.valueOf(Yr).substring(5, 7), "R");
-					}
-
-					if ("0".equals(tL9Vo.get("F10")) || tL9Vo.get("F10") == null) {
-						this.print(0, 97, "", "R");
-					} else {
-
-						Yr = Integer.parseInt(tL9Vo.get("F10").toString()) - 19110000;
-						this.print(0, 97, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5) + "/" + String.valueOf(Yr).substring(5, 7), "R");
-					}
-
-					this.print(0, 102, tL9Vo.get("F9"), "R");
-
-					/*********** calljava ***********/
-					this.print(0, 112, String.format("%,d", Principal + Interest), "R");
-					pi = pi + Principal + Interest;
-					this.print(0, 129, "0", "R");
-					ba = ba + 0;
-					this.print(0, 141, String.format("%,d", UnPaidAmt), "R");
-					ua = ua + UnPaidAmt;
-					this.print(0, 153, String.format("%,d", (Principal + Interest + BreachAmt - UnPaidAmt)), "R");
-					sum = sum + (Principal + Interest + BreachAmt - UnPaidAmt);
-					/**********************/
-
-					this.print(0, 156, tL9Vo.get("F15"));
-
-					this.print(0, 164, tL9Vo.get("F16"));
-					this.print(0, 172, tL9Vo.get("F13"));
-					this.print(1, 1, "　　　　 　　　　　 　　　　　　　其他電話： ");
-					if (tL9Vo.get("F16") != null) {
-						this.print(0, 37, tL9Vo.get("F16"));
-					} else {
-//							this.print(0, 42, "*");
-					}
+					listBaTxVo = dBaTxCom.settingUnPaid(tbsdy, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
 
 				} catch (LogicException e) {
 					this.info("baTxCom.setTxBuffer ErrorMsg :" + e.getMessage());
 				}
 
+				this.info("listBaTxVo.size()-------->" + listBaTxVo.size());
+				this.info("listBaTxVo-------->" + listBaTxVo.toString());
+
+				BigDecimal unpaidPriInt = BigDecimal.ZERO; // 未收本息
+				BigDecimal breachAmtAndDelayInt = BigDecimal.ZERO; // 違約金(報表最終產出的違約金包含違約金及延遲息)
+				BigDecimal overflow = BigDecimal.ZERO; // 溢短繳
+				BigDecimal total; // 合計
+
+				// 未收本息 = 本金+利息 baTxVo.Principal + baTxVo.Interest
+				// 違約金 有 但要扣成 0 baTxVo.BreachAmt
+				// 溢短繳 baTxVo.UnPaidAmt
+				for (BaTxVo baTxVo : listBaTxVo) {
+					int dataKind = baTxVo.getDataKind();
+					int repayType = baTxVo.getRepayType();
+
+					if (dataKind == 2 && repayType == 1) {
+						unpaidPriInt = unpaidPriInt.add(baTxVo.getPrincipal()); // 未收本
+						unpaidPriInt = unpaidPriInt.add(baTxVo.getInterest()); // 未收息
+						breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getBreachAmt()); // 違約金
+
+					}
+
+					// 溢短繳 = 溢繳 - 短繳
+
+					// 溢繳 dataKind = 3.暫收抵繳
+					if (dataKind == 3) {
+						overflow = overflow.add(baTxVo.getUnPaidAmt());
+					}
+
+					// 短繳
+					// dataKind = 1.應收費用+未收費用+短繳期金
+					// repayType = 01 期款
+					if (dataKind == 1 && repayType == 1) {
+						overflow = overflow.subtract(baTxVo.getUnPaidAmt());
+					}
+
+				}
+
+				total = unpaidPriInt.add(breachAmtAndDelayInt).add(overflow); // 合計
+
+		
+
+				name = tL9715.get("F0");
+
+				// 經辦 F0
+				if (!nameNo.equals(tL9715.get("F0"))) {
+					nameNo = tL9715.get("F0");
+					if (openClose) {
+						this.print(-6, 11,name);
+						this.print(-10, 10, "");
+						openClose = false;
+					} else {
+						this.newPage();
+						this.print(-6, 11,name);
+						this.print(-10, 10, "");
+					}
+				}
+
+				// 押品地區別 F1
+				this.print(1, 6, tL9715.get("F1"));
+				// 繳款方式 F2
+				this.print(0, 14, tL9715.get("F2"));
+				// 戶號 F3 + F4
+				this.print(0, 24, String.format("%07d", Integer.parseInt(tL9715.get("F3"))) + "-"
+						+ String.format("%03d", Integer.parseInt(tL9715.get("F4"))));
+				// 戶名 F5
+				this.print(0, 37, tL9715.get("F5"));
+
+				// 初貸日 F6
+				if ("0".equals(tL9715.get("F6")) || tL9715.get("F6") == null) {
+					this.print(0, 62, "", "R");
+				} else {
+					Yr = Integer.parseInt(tL9715.get("F6").toString()) - 19110000;
+					this.print(0, 62, showBcDate(Yr, 0), "R");
+				}
+
+				// 本金餘額 F7
+				this.print(0, 73, String.format("%,d", Integer.parseInt(tL9715.get("F7").toString())), "R");
+
+				// 利息 F8
+				this.print(0, 75, padEnd(6, tL9715.get("F8")));
+
+				// 繳息迄日 F9
+				if ("0".equals(tL9715.get("F9")) || tL9715.get("F9") == null) {
+					this.print(0, 93, "", "R");
+				} else {
+					Yr = Integer.parseInt(tL9715.get("F9").toString()) - 19110000;
+					this.print(0, 93, showBcDate(Yr, 0), "R");
+				}
+
+				// 最近應繳日 F10
+				if ("0".equals(tL9715.get("F10")) || tL9715.get("F10") == null) {
+					this.print(0, 104, "", "R");
+				} else {
+
+					Yr = Integer.parseInt(tL9715.get("F10").toString()) - 19110000;
+					this.print(0, 104, showBcDate(Yr, 0), "R");
+				}
+
+				// 逾期日數 F11
+				this.print(0, 109, tL9715.get("F11"), "R");
+
+				// 未收本息
+				this.print(0, 123, formatAmt(unpaidPriInt, 0), "R");
+
+				// 違約金
+				this.print(0, 131, formatAmt(breachAmtAndDelayInt, 0), "R");
+
+				// 溢短繳
+				this.print(0, 141, formatAmt(overflow, 0), "R");
+
+				// 合計
+				this.print(0, 154, formatAmt(total, 0), "R");
+
+				// 聯絡人 F12
+				this.print(0, 160, tL9715.get("F12"));
+				// 電話 F13
+				this.print(0, 170, tL9715.get("F13"));
+
+				// 其他電話 F14
+				this.print(1, 38, "其他電話：");
+				this.print(0, 49, tL9715.get("F14"));
+
+				this.print(1, 5,
+						"------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
 			} // for
 		} else {
+
 			this.print(-6, 6, "經辦：" + name);
 			this.print(1, 8, "本日無資料");
+
 		}
 
 		long sno = this.close();
 
-		// 測試用
 		this.toPdf(sno);
 
 	}
@@ -246,63 +332,4 @@ public class L9715Report extends MakeReport {
 		return input;
 	}
 
-//	
-//	this.print(1, 5, tL9Vo.get("F0"));
-////	  this.print(1,10,tL9Vo.get("F1"));
-//this.print(0, 24, padStart(7, tL9Vo.get("F2")) + "-" + padStart(3, tL9Vo.get("F3")));
-//this.print(0, 38, tL9Vo.get("F4"));
-//
-//if ("0".equals(tL9Vo.get("F5")) || tL9Vo.get("F5") == null) {
-//	this.print(0, 57, "", "R");
-//} else {
-//	Yr = Integer.parseInt(tL9Vo.get("F5").toString()) - 19110000;
-//	this.print(0, 57, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5)
-//			+ "/" + String.valueOf(Yr).substring(5, 7), "R");
-//}
-//
-//this.print(0, 70, String.format("%,d", Integer.parseInt(tL9Vo.get("F6").toString())), "R");
-//money = money + Integer.parseInt(tL9Vo.get("F6").toString()); // 本金餘額
-///**********************/
-//this.print(0, 79, padEnd(6, String.valueOf(IntRate)), "R");
-///**********************/
-//if ("0".equals(tL9Vo.get("F7")) || tL9Vo.get("F7") == null) {
-//	this.print(0, 86, "", "R");
-//} else {
-//	Yr = Integer.parseInt(tL9Vo.get("F7").toString()) - 19110000;
-//	this.print(0, 86, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5)
-//			+ "/" + String.valueOf(Yr).substring(5, 7), "R");
-//}
-//
-//if ("0".equals(tL9Vo.get("F8")) || tL9Vo.get("F8") == null) {
-//	this.print(0, 97, "", "R");
-//} else {
-//
-//	Yr = Integer.parseInt(tL9Vo.get("F8").toString()) - 19110000;
-//	this.print(0, 97, String.valueOf(Yr).substring(0, 3) + "/" + String.valueOf(Yr).substring(3, 5)
-//			+ "/" + String.valueOf(Yr).substring(5, 7), "R");
-//}
-//
-//this.print(0, 102, tL9Vo.get("F9"), "R");
-//
-///*********** calljava ***********/
-//this.print(0, 112, String.format("%,d", Principal + Interest), "R");
-//pi = pi + Principal + Interest;
-//this.print(0, 129, "0", "R");
-//ba = ba + 0;
-//this.print(0, 141, String.format("%,d", UnPaidAmt), "R");
-//ua = ua + UnPaidAmt;
-//this.print(0, 153, String.format("%,d", (Principal + Interest + BreachAmt - UnPaidAmt)), "R");
-//sum = sum + (Principal + Interest + BreachAmt - UnPaidAmt);
-///**********************/
-//
-//this.print(0, 156, tL9Vo.get("F10"));
-//
-//this.print(0, 160, tL9Vo.get("F11"));
-//this.print(0, 172, tL9Vo.get("F13"));
-//this.print(1, 1, "　　　　 　　　　　 　　　　　　　其他電話： ");
-//if (tL9Vo.get("F12") != null) {
-//	this.print(0, 37, tL9Vo.get("F12"));
-//} else {
-////		this.print(0, 42, "*");
-//}
 }

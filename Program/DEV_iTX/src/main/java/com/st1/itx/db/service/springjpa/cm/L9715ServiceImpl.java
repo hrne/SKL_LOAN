@@ -1,8 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -35,220 +32,149 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws LogicException {
 		// 產表條件：月底產表，往前回推18個月，初貸日包含在內的案件
 		// ex:202108月底產表，初貸日的範圍為20200301~20210831
-//		String appro_dy = Integer.toString(Integer.parseInt(titaVo.getParam("APPRO_DAY").toString()) + 19110000);
-//		String fund_dy = Integer.toString(Integer.parseInt(titaVo.getParam("FUND_DAY").toString()) + 19110000);
-		String day_st = "";
-		String day_ed = "";
-		String appro_dy = "";
 
-		int iEntdy = Integer.valueOf(titaVo.getParam("FUND_DAY").toString()) + 19110000;
-		int iYear = iEntdy / 10000;
-		int iMonth = (iEntdy / 100) % 100;
+		int approDate = 0;
+		int ovduTermStart = 0;
+		int ovduTermEnd = 999;
+		int ovduDaysStart = 0;
+		int ovduDaysEnd = 999999;
 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		// 當日(int)
-		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthDate = Calendar.getInstance();
-		// 設當年月底日
-		calMonthDate.set(iYear, iMonth, 0);
+		this.info("L9715ServiceImpl APPRO_DAY = " + titaVo.getParam("APPRO_DAY"));
+		this.info("L9715ServiceImpl UNPAY_TERM_ST = " + titaVo.getParam("UNPAY_TERM_ST"));
+		this.info("L9715ServiceImpl UNPAY_TERM_ED = " + titaVo.getParam("UNPAY_TERM_ED"));
+		this.info("L9715ServiceImpl UNPAY_DAY_ST = " + titaVo.getParam("UNPAY_DAY_ST"));
+		this.info("L9715ServiceImpl UNPAY_DAY_ED = " + titaVo.getParam("UNPAY_DAY_ED"));
 
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+		approDate = Integer.parseInt(titaVo.getParam("APPRO_DAY"));
+		int unpayTermSt = Integer.parseInt(titaVo.getParam("UNPAY_TERM_ST"));
+		int unpayTermEd = Integer.parseInt(titaVo.getParam("UNPAY_TERM_ED"));
+		int unpayDaySt = Integer.parseInt(titaVo.getParam("UNPAY_DAY_ST"));
+		int unpayDayEd = Integer.parseInt(titaVo.getParam("UNPAY_DAY_ED"));
 
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
+		if (unpayTermSt > 0) {
+			ovduTermStart = unpayTermSt;
+			ovduTermEnd = unpayTermEd;
+		} else if (unpayDaySt > 0) {
+			ovduDaysStart = unpayDaySt;
+			ovduDaysEnd = unpayDayEd;
 		}
 
-		// 設當年月底日
-		calMonthDate.set(iYear, iMonth, 0);
-		int monthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
-
-		day_ed = monthEndDate + "";
-		day_st = (monthEndDate / 100) + "01";
-
-		calMonthDate.set(iYear, iMonth - 18, 1);
-
-		appro_dy = Integer.valueOf(dateFormat.format(calMonthDate.getTime())) + "";
-//
-//		if ("00".equals(titaVo.getParam("UNPAY_TERM_ST"))) {
-//
-//			day_st = dateconvert(fund_dy, 2, Integer.parseInt(titaVo.getParam("UNPAY_DAY_ED").toString()));
-//			day_ed = dateconvert(fund_dy, 2, Integer.parseInt(titaVo.getParam("UNPAY_DAY_ST").toString()));
-//		} else {
-//			day_st = dateconvert(fund_dy, 1, Integer.parseInt(titaVo.getParam("UNPAY_TERM_ED").toString()));
-//			day_ed = dateconvert(fund_dy, 1, Integer.parseInt(titaVo.getParam("UNPAY_TERM_ST").toString()));
-//		}
-		this.info("day_st-" + day_st);
-		this.info("day_ed-" + day_ed);
-		this.info("appro_dy-" + appro_dy);
-		this.info("l9715.findAll");
+		this.info("L9715ServiceImpl queryOvdu");
+		this.info("L9715ServiceImpl approDate = " + approDate);
+		this.info("L9715ServiceImpl ovduTermStart = " + ovduTermStart);
+		this.info("L9715ServiceImpl ovduTermEnd = " + ovduTermEnd);
+		this.info("L9715ServiceImpl ovduDaysStart = " + ovduDaysStart);
+		this.info("L9715ServiceImpl ovduDaysEnd = " + ovduDaysEnd);
 
 		String sql = " ";
-		sql += "	SELECT E.\"EmployeeNo\" AS F0";
-		sql += "		  ,E.\"Fullname\" AS F1";
-		sql += "		  ,CD.\"CityItem\" AS F2";
-		sql += "		  ,CC.\"Item\" AS F3";
-		sql += "		  ,LPAD(TO_CHAR(D.\"CustNo\"),7,'0') || '-' || LPAD(TO_CHAR(D.\"FacmNo\"),3,'0') AS F4";
-		sql += "		  ,D.\"CustName\" AS F5";
-		sql += "		  ,D.\"FirstDrawdownDate\" AS F6";
-		sql += "		  ,D.\"PrinBalance\" AS F7";
-		sql += "		  ,D.\"StoreRate\" AS F8";
-		sql += "		  ,D.\"PrevIntDate\" AS F9";
-		sql += "		  ,D.\"NextIntDate\" AS F10";
-		sql += "		  ,D.\"OvduDays\" AS F11";
-		sql += "		  ,D.\"UnpaidLoan\" AS F12";
-		sql += "		  ,D.\"UnpaidBreachAmt\" AS F13";
-		sql += "		  ,D.\"OverShortAmt\" AS F14";
-		sql += "          ,CASE";
-		sql += "			 WHEN T1.\"Enable\" IS NOT NULL THEN T1.\"LiaisonName\"";
-		sql += "             ELSE T2.\"LiaisonName\"";
-		sql += "		   END AS F15";
-		sql += "	      ,CASE";
-		sql += "			 WHEN T1.\"Enable\" IS NOT NULL THEN DECODE(T1.\"TelArea\",NULL,' ',T1.\"TelArea\" || T1.\"TelNo\" || T1.\"TelExt\")";
-		sql += "             ELSE DECODE(T2.\"TelArea\",NULL,' ',T2.\"TelArea\" || T2.\"TelNo\" || T2.\"TelExt\")";
-		sql += "           END AS F16";
-		sql += "          ,CASE";
-		sql += "  		     WHEN T1.\"Enable\" IS NOT NULL THEN DECODE(T1.\"TelArea\",NULL,T1.\"TelNo\",' ')";
-		sql += "             ELSE DECODE(T2.\"TelArea\",NULL,T2.\"TelNo\",' ')";
-		sql += "   		   END AS F17";
-		sql += "	FROM(SELECT F.\"BusinessOfficer\"";
-		sql += "  			   ,L.\"CustNo\"";
-		sql += "  			   ,L.\"FacmNo\"";
-		sql += "  			   ,C.\"CustName\"";
-		sql += "   			   ,F.\"FirstDrawdownDate\"";
-		sql += "  			   ,L.\"PrinBalance\"";
-		sql += "			   ,L.\"PrevIntDate\"";
-		sql += "  			   ,L.\"NextIntDate\"";
-		sql += "  			   ,L.\"OvduDays\"";
-		sql += "  			   ,MF.\"StoreRate\"";
-		sql += "  			   ,MF.\"UnpaidPrincipal\" + MF.\"UnpaidInterest\" AS \"UnpaidLoan\"";
-		sql += "  			   ,MF.\"UnpaidBreachAmt\" + MF.\"UnpaidDelayInt\" AS \"UnpaidBreachAmt\"";
-		sql += "  			   ,MF.\"ShortfallPrin\" + MF.\"ShortfallInt\" - MF.\"TempAmt\" AS \"OverShortAmt\"";
-		sql += "  			   ,F.\"RepayCode\"";
-		sql += "  			   ,C.\"CustUKey\"";
-		sql += "  	     FROM \"CollList\" L";
-		sql += "  		 LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = L.\"CustNo\"";
-		sql += "  		 LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\"";
-		sql += "  								AND F.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "  		 LEFT JOIN \"MonthlyFacBal\" MF ON MF.\"CustNo\" = L.\"CustNo\"";
-		sql += "  								       AND MF.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "  							    	   AND MF.\"YearMonth\" = TRUNC( :appro_dy / 100 )";
-		sql += "  		 WHERE L.\"CaseCode\" = 1";
-		sql += "  		   AND L.\"OvduDays\" > 0";
-		sql += "  		   AND L.\"Status\" IN (0, 2, 4, 6)";
-		sql += "   		   AND L.\"NextIntDate\" <= :day_ed ";
-		sql += "   		   AND L.\"NextIntDate\" >= :day_st ";
-		sql += "  		   AND F. \"FirstDrawdownDate\" >= :appro_dy ) D";
-		sql += "	LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = D.\"BusinessOfficer\"";
-		sql += "  	LEFT JOIN \"ClFac\" F ON F.\"CustNo\" = D.\"CustNo\"";
-		sql += "  						 AND F.\"FacmNo\" = D.\"FacmNo\"";
-		sql += "  						 AND F.\"MainFlag\" = 'Y'";
-		sql += "	LEFT JOIN \"ClMain\" Cl ON Cl.\"ClCode1\" = F.\"ClCode1\"";
-		sql += "  						   AND Cl.\"ClCode2\" = F.\"ClCode2\"";
-		sql += "  						   AND Cl.\"ClNo\" = F.\"ClNo\"";
-		sql += "	LEFT JOIN \"CustTelNo\" T1 ON T1.\"CustUKey\" = D.\"CustUKey\"";
-		sql += "  							  AND T1.\"TelTypeCode\" = '06'";
-		sql += "  							  AND T1.\"Enable\" = 'Y'";
-		sql += "	LEFT JOIN \"CustTelNo\" T2 ON T2.\"CustUKey\" = D.\"CustUKey\"";
-		sql += "  							  AND T2.\"TelTypeCode\" = '01'";
-		sql += "  							  AND T2.\"Enable\" = 'Y'";
-		sql += "	LEFT JOIN \"CdCity\" CD ON CD.\"CityCode\" = CL.\"CityCode\"";
-		sql += "	LEFT JOIN \"CdCode\" CC ON CC.\"DefCode\" = 'RepayCode'";
-		sql += "  						   AND CC.\"Code\" = D.\"RepayCode\"";
-		sql += "	ORDER BY F0";
+		sql += " SELECT \"Fn_GetEmpName\"(FAC.\"BusinessOfficer\",1) ";
+		sql += "                                AS F0 "; // -- 經辦
+		sql += "      , CITY.\"CityItem\"         AS F1 "; // -- 擔保品地區別
+		sql += "      , \"Fn_GetCdCode\"('RepayCode', FAC.\"RepayCode\") ";
+		sql += "                                AS F2 "; // -- 繳款方式
+		sql += "      , COLL.\"CustNo\"           AS F3 "; // -- 戶號
+		sql += "      , COLL.\"FacmNo\"           AS F4 "; // -- 額度
+		sql += "      , CM.\"CustName\"           AS F5 "; // -- 額度
+		sql += "      , FAC.\"FirstDrawdownDate\" AS F6 "; // -- 初貸日
+		sql += "      , COLL.\"PrinBalance\"      AS F7 "; // -- 本金餘額
+		sql += "      , NVL(LBM.\"StoreRate\",0)  AS F8 "; // -- 利率
+		sql += "      , COLL.\"PrevIntDate\"      AS F9 "; // -- 繳息迄日
+		sql += "      , COLL.\"NextIntDate\"      AS F10 "; // -- 最近應繳日
+		sql += "      , COLL.\"OvduDays\"         AS F11 "; // -- 逾期日數
+		sql += "      , NVL(CTN.\"LiaisonName\",N' ') ";
+		sql += "                                AS F12 "; // -- 聯絡人
+		sql += "      , NVL(CTN.\"TelNoFirst\",' ') ";
+		sql += "                                AS F13 "; // -- 電話
+		sql += "      , NVL(CTN.\"TelNos\",' ')   AS F14 "; // -- 其他電話
+		sql += " FROM \"CollList\" COLL ";
+		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = COLL.\"CustNo\" ";
+		sql += "                        AND FAC.\"FacmNo\" = COLL.\"FacmNo\" ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = COLL.\"CustNo\" ";
+		sql += " LEFT JOIN \"ClFac\" CF ON CF.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "                     AND CF.\"FacmNo\" = FAC.\"FacmNo\" ";
+		sql += "                     AND CF.\"MainFlag\" = 'Y' ";
+		sql += " LEFT JOIN \"ClMain\" CL ON CL.\"ClCode1\" = CF.\"ClCode1\" ";
+		sql += "                      AND CL.\"ClCode2\" = CF.\"ClCode2\" ";
+		sql += "                      AND CL.\"ClNo\" = CF.\"ClNo\" ";
+		sql += " LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = CL.\"CityCode\" ";
+		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
+		sql += "                  , \"FacmNo\" ";
+		sql += "                  , \"StoreRate\" ";
+		sql += "                  , ROW_NUMBER() OVER (PARTITION BY \"CustNo\",\"FacmNo\" ORDER BY \"BormNo\") AS SEQ ";
+		sql += "             FROM \"LoanBorMain\" ";
+		sql += "             WHERE \"LoanBal\" > 0 ";
+		sql += "           ) LBM ON LBM.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "                AND LBM.\"FacmNo\" = FAC.\"FacmNo\" ";
+		sql += "                AND LBM.SEQ = 1 ";
+		sql += " LEFT JOIN ( SELECT CM.\"CustNo\" ";
+		sql += "                  , CTN.\"LiaisonName\" ";
+		sql += "                  , CTN.\"TelNoFirst\" ";
+		sql += "                  , CTN.\"TelNos\" ";
+		sql += "             FROM \"CustMain\" CM ";
+		sql += "             LEFT JOIN ( SELECT TMP.\"CustUKey\" ";
+		sql += "                              , MAX(CASE ";
+		sql += "                                      WHEN TMP.\"Seq\" = 1 ";
+		sql += "                                      THEN TMP.\"LiaisonName\" ";
+		sql += "                                    ELSE N' ' END ";
+		sql += "                                   ) AS \"LiaisonName\" ";
+		sql += "                              , MAX(CASE ";
+		sql += "                                      WHEN TMP.\"Seq\" = 1 ";
+		sql += "                                      THEN TMP.\"TelNo\" ";
+		sql += "                                    ELSE ' ' END ";
+		sql += "                                   ) AS \"TelNoFirst\" ";
+		sql += "                              , LISTAGG(TMP.\"TelNo\",' ') WITHIN GROUP (ORDER BY TMP.\"Seq\") AS \"TelNos\" ";
+		sql += "                         FROM ( SELECT \"CustUKey\" ";
+		sql += "                                     , \"LiaisonName\" ";
+		sql += "                                     , CASE ";
+		sql += "                                         WHEN \"TelArea\" IS NOT NULL THEN \"TelArea\" || '-' "; // --
+																													// 電話區碼
+		sql += "                                       ELSE '' END ";
+		sql += "                                       || CASE ";
+		sql += "                                            WHEN \"TelNo\" IS NOT NULL THEN \"TelNo\""; // -- 電話號碼
+		sql += "                                          ELSE '' END ";
+		sql += "                                       || CASE ";
+		sql += "                                            WHEN \"TelExt\" IS NOT NULL THEN '-' || \"TelExt\"  "; // --
+																													// 分機號碼
+		sql += "                                          ELSE '' END AS \"TelNo\" ";
+		sql += "                                     , ROW_NUMBER() OVER (PARTITION BY \"CustUKey\" ";
+		sql += "                                                          ORDER BY \"RelationCode\" ";
+		sql += "                                                                 , \"TelTypeCode\") AS \"Seq\" ";
+		sql += "                                FROM \"CustTelNo\" ";
+		sql += "                                WHERE \"Enable\" = 'Y' ";
+		sql += "                              ) TMP ";
+		sql += "                         WHERE TMP.\"Seq\" <= 4 ";
+		sql += "                         GROUP BY TMP.\"CustUKey\" ";
+		sql += "                       ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\" ";
+		sql += "             WHERE CM.\"CustNo\" > 0 ";
+		sql += "           ) CTN ON CTN.\"CustNo\" = COLL.\"CustNo\" ";
+		sql += " WHERE COLL.\"CaseCode\" = 1 ";
+		sql += "   AND COLL.\"Status\" IN (0,2,4,6) ";
+		sql += "   AND FAC.\"FirstDrawdownDate\" >= :approDate ";
+		sql += "   AND COLL.\"OvduTerm\" >= :ovduTermStart ";
+		sql += "   AND COLL.\"OvduTerm\" <= :ovduTermEnd ";
+		sql += "   AND COLL.\"OvduDays\" >= :ovduDaysStart ";
+		sql += "   AND COLL.\"OvduDays\" <= :ovduDaysEnd ";
+		sql += " ORDER BY F0 ";
+		sql += "        , F3 ";
+		sql += "        , F4 ";
+
 		this.info("sql=" + sql);
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+
 		query = em.createNativeQuery(sql);
-		query.setParameter("appro_dy", appro_dy);
-		query.setParameter("day_st", day_st);
-		query.setParameter("day_ed", day_ed);
-		return this.convertToMap(query.getResultList());
+
+		query.setParameter("approDate", approDate);
+		query.setParameter("ovduTermStart", ovduTermStart);
+		query.setParameter("ovduTermEnd", ovduTermEnd);
+		query.setParameter("ovduDaysStart", ovduDaysStart);
+		query.setParameter("ovduDaysEnd", ovduDaysEnd);
+
+		return this.convertToMap(query);
 	}
 
-	public String dateconvert(String str, int type, int day_or_term) throws Exception {
-
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		Date dt = sdf.parse(str);
-
-		Calendar rightNow = Calendar.getInstance();
-		rightNow.setTime(dt);
-
-		if (type == 1) {
-			rightNow.add(Calendar.MONTH, 0 - day_or_term);// 日期加3個月
-		} else if (type == 2) {
-			rightNow.add(Calendar.DAY_OF_YEAR, 0 - day_or_term);// 日期加10天
-		}
-
-		Date dt1 = rightNow.getTime();
-
-		String reStr = sdf.format(dt1);
-
-		return reStr;
-	}
-
-	// sql += " SELECT Cl.\"CityCode\" F0";
-	// sql += " ,E.\"Fullname\" F1";
-	// sql += " ,D.\"CustNo\" F2";
-	// sql += " ,D.\"FacmNo\" F3";
-	// sql += " ,D.\"CustName\" F4";
-	// sql += " ,D.\"FirstDrawdownDate\" F5";
-	// sql += " ,D.\"PrinBalance\" F6";
-	// sql += " ,D.\"PrevIntDate\" F7";
-	// sql += " ,D.\"NextIntDate\" F8";
-	// sql += " ,D.\"OvduDays\" F9";
-	// sql += " ,CASE";
-	// sql += " WHEN T1.\"Enable\" IS NOT NULL THEN T1.\"LiaisonName\"";
-	// sql += " ELSE T2.\"LiaisonName\"";
-	// sql += " END F10 ";
-	// sql += " ,CASE";
-	// sql += " WHEN T1.\"Enable\" IS NOT NULL THEN DECODE(T1.\"TelArea\",NULL,'
-	// ',T1.\"TelArea\" || T1.\"TelNo\" || T1.\"TelExt\")";
-	// sql += " ELSE DECODE(T2.\"TelArea\",NULL,' ',T2.\"TelArea\" || T2.\"TelNo\"
-	// || T2.\"TelExt\")";
-	// sql += " END F11";
-	// sql += " ,CASE";
-	// sql += " WHEN T1.\"Enable\" IS NOT NULL THEN
-	// DECODE(T1.\"TelArea\",NULL,T1.\"TelNo\",' ')";
-	// sql += " ELSE DECODE(T2.\"TelArea\",NULL,T2.\"TelNo\",' ')";
-	// sql += " END F12";
-	// sql += " FROM(SELECT F.\"BusinessOfficer\"";
-	// sql += " ,L.\"CustNo\"";
-	// sql += " ,L.\"FacmNo\"";
-	// sql += " ,C.\"CustName\"";
-	// sql += " ,F.\"FirstDrawdownDate\"";
-	// sql += " ,L.\"PrinBalance\"";
-	// sql += " ,L.\"PrevIntDate\"";
-	// sql += " ,L.\"NextIntDate\"";
-	// sql += " ,L.\"OvduDays\"";
-	// sql += " ,F.\"RepayCode\"";
-	// sql += " ,C.\"CustUKey\"";
-	// sql += " FROM \"CollList\" L";
-	// sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = L.\"CustNo\"";
-	// sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = L.\"CustNo\"";
-	// sql += " AND F.\"FacmNo\" = L.\"FacmNo\"";
-	// sql += " WHERE L.\"CaseCode\" = 1";
-	// sql += " AND L.\"Status\" IN (0, 2, 4, 6)";
-	// sql += " AND L.\"NextIntDate\" <= :day_ed ";
-	// sql += " AND L.\"NextIntDate\" >= :day_st ";
-	// sql += " AND F. \"FirstDrawdownDate\" >= :appro_dy ) D";
-	// sql += " LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = D.\"BusinessOfficer\"";
-	// sql += " LEFT JOIN \"ClFac\" F ON F.\"CustNo\" = D.\"CustNo\"";
-	// sql += " AND F.\"FacmNo\" = D.\"FacmNo\"";
-	// sql += " AND F.\"MainFlag\" = 'Y'";
-	// sql += " LEFT JOIN \"ClMain\" Cl ON Cl.\"ClCode1\" = F.\"ClCode1\"";
-	// sql += " AND Cl.\"ClCode2\" = F.\"ClCode2\"";
-	// sql += " AND Cl.\"ClNo\" = F.\"ClNo\"";
-	// sql += " LEFT JOIN \"CustTelNo\" T1 ON T1.\"CustUKey\" = D.\"CustUKey\"";
-	// sql += " AND T1.\"TelTypeCode\" = '06'";
-	// sql += " AND T1.\"Enable\" = 'Y'";
-	// sql += " LEFT JOIN \"CustTelNo\" T2 ON T2.\"CustUKey\" = D.\"CustUKey\"";
-	// sql += " AND T2.\"TelTypeCode\" = '01'";
-	// sql += " AND T2.\"Enable\" = 'Y'";
 }

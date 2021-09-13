@@ -6,8 +6,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -74,7 +72,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3230")
 @Scope("prototype")
 public class L3230 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3230.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -165,7 +162,7 @@ public class L3230 extends TradeBuffer {
 		iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("TempReasonCode"));
 		iTempItemCode = titaVo.getParam("TempItemCode");
 		iCurrencyCode = titaVo.getParam("CurrencyCode");
-		iRemoveNo = titaVo.getParam("RemoveNo");
+		iRemoveNo = titaVo.getParam("RemoveNo"); // 銷帳編號
 		wkTempBal = iTempAmt;
 
 		// 檢查輸入資料
@@ -243,11 +240,11 @@ public class L3230 extends TradeBuffer {
 			case "23": // 23.3200億傳統A
 				throw new LogicException(titaVo, "E0010", "請使用 L6201 其他傳票輸入"); // E0010 功能選擇錯誤
 
-			case "12": // 12.聯貸件 
+			case "12": // 12.聯貸件
 				wkAcctCode = "F10";
 				ItemAcDetailRoutine();
 				this.txBuffer.addAllAcDetailList(lAcDetail);
-				
+
 			case "22": // 22.88風災-保費 ???
 				throw new LogicException(titaVo, "E0010", "無對應之會計科目"); // E0010 功能選擇錯誤
 
@@ -331,13 +328,35 @@ public class L3230 extends TradeBuffer {
 		} catch (LogicException e) {
 			throw new LogicException(titaVo, "E0015", "查詢費用 " + e.getMessage()); // 檢查錯誤
 		}
+
+		if (baTxList == null || baTxList.size() == 0) {
+			throw new LogicException(titaVo, "E0019", "無該項目未銷費用"); // 查詢資料不存在
+		}
+		BigDecimal totalAmt = BigDecimal.ZERO;
+		// 單筆相同金額
 		boolean isFind = false;
-		if (baTxList != null && baTxList.size() > 0) {
+		for (BaTxVo ba : baTxList) {
+			if (acctCode.equals(ba.getAcctCode()) || "F09".equals(acctCode) && "TMI".equals(ba.getAcctCode())) {
+				totalAmt = totalAmt.add(ba.getAcctAmt());
+				if (iTempAmt.compareTo(ba.getUnPaidAmt()) == 0
+						&& ("0000000".equals(iRemoveNo) || iRemoveNo.equals(ba.getRvNo()))) {
+					acDetail = new AcDetail();
+					acDetail.setDbCr("C");
+					acDetail.setAcctCode(ba.getAcctCode());
+					acDetail.setTxAmt(ba.getAcctAmt());
+					acDetail.setCustNo(ba.getCustNo());
+					acDetail.setFacmNo(ba.getFacmNo());
+					acDetail.setReceivableFlag(ba.getReceivableFlag());
+					acDetail.setRvNo(ba.getRvNo());
+					lAcDetail.add(acDetail);
+					isFind = true;
+					break;
+				}
+			}
+		}
+		if (!isFind && iTempAmt.compareTo(totalAmt) == 0) {
 			for (BaTxVo ba : baTxList) {
-				if ((acctCode.equals(ba.getAcctCode()) || "F09".equals(acctCode) && "TMI".equals(ba.getAcctCode()))
-						&& iTempAmt.compareTo(ba.getUnPaidAmt()) == 0 && !isFind) {
-					if (!"0000000".equals(iRemoveNo) && !iRemoveNo.equals(ba.getRvNo()))
-						continue;
+				if (acctCode.equals(ba.getAcctCode()) || "F09".equals(acctCode) && "TMI".equals(ba.getAcctCode())) {
 					acDetail = new AcDetail();
 					acDetail.setDbCr("C");
 					acDetail.setAcctCode(ba.getAcctCode());

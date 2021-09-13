@@ -366,7 +366,7 @@ public class L4603 extends TradeBuffer {
 		tTxToDoDetail.setCustNo(tInsuRenew.getCustNo());
 		tTxToDoDetail.setFacmNo(tInsuRenew.getFacmNo());
 		tTxToDoDetail.setBormNo(0);
-		tTxToDoDetail.setDtlValue("<Text>-FireFee");
+		tTxToDoDetail.setDtlValue("<FireFee>" + tInsuRenew.getPrevInsuNo());
 		tTxToDoDetail.setItemCode("TEXT00");
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote(dataLines);
@@ -393,7 +393,7 @@ public class L4603 extends TradeBuffer {
 		tTxToDoDetail.setCustNo(tInsuRenew.getCustNo());
 		tTxToDoDetail.setFacmNo(tInsuRenew.getFacmNo());
 		tTxToDoDetail.setBormNo(0);
-		tTxToDoDetail.setDtlValue("<EMail>");
+		tTxToDoDetail.setDtlValue("<FireFee>" + tInsuRenew.getPrevInsuNo());
 		tTxToDoDetail.setItemCode("MAIL00");
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote(dataLines);

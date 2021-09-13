@@ -14,6 +14,7 @@ import com.st1.itx.db.service.springjpa.cm.LM013ServiceImpl.EntCodeCondition;
 import com.st1.itx.db.service.springjpa.cm.LM013ServiceImpl.IsRelsCondition;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.StringCut;
 
 @Component
 @Scope("prototype")
@@ -35,7 +36,8 @@ public class LM013Report extends MakeReport {
 	
 	private enum DataType {
 		None(null),
-		Sum("Sum"),
+		Below_Sum("Below_Sum"),
+		Above_Sum("Above_Sum"),
 		Total("Total");
 		
 		private String keyword;
@@ -240,17 +242,18 @@ public class LM013Report extends MakeReport {
 						lastDataType = DataType.getType(tLDVo.get("F4"));
 												
 						// 情況1A  : 兩種資料類型不同，前一筆是正常資料        - 出上一戶最後的合計（顯示名字）, 然後畫線換行
-						// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum) - 畫線換行
+						// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum)  - 換行
+						// 情況1C  : 兩種資料類型不同，這一筆是總計資料 (Total) - 畫線換行
 						
 						// 情況2A  : 兩種資料類型一樣, 正常資料, 同戶號   - 換行
 						// 情況2B  : 兩種資料類型一樣, 正常資料, 不同戶號 - 出上一戶/筆最後的合計（顯示名字）, 然後畫線換行
-						// 情況2C  : 兩種資料類型一樣，合計資料 (Sum)    - 換行
-						// 情況2D  : 兩種資料類型一樣，總計資料 (Total)    - 無處理
+						// 情況2C  : 兩種資料類型一樣，合計資料 (Sum)    - 無處理
+						// 情況2D  : 兩種資料類型一樣，合計資料 (Total)  - 無處理
 						
 						if ( lastDataType != thisDataType )
 						{
 							// 情況1A  : 兩種資料類型不同，前一筆是正常資料        - 出上一戶最後的合計（顯示名字）, 然後畫線換行
-							// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum) - 畫線換行
+							// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum) - 換行
 							
 							if (lastDataType == DataType.None)
 							{
@@ -259,8 +262,7 @@ public class LM013Report extends MakeReport {
 								this.print(1, 0, " ");
 								
 								this.print(0, 0, lastTLDVo.get("F2"), "L"); // 戶號
-								this.print(0, 8, lastTLDVo.get("F5"), "L"); // 姓名
-								this.print(0, 15, lastTLDVo.get("F4"), "L"); // 身分證	
+								this.print(0, 8, StringCut.stringCut(lastTLDVo.get("F5"), 0, 10) + " " + lastTLDVo.get("F4"), "L");
 							}
 							
 							// 出上一筆資料最後的合計
@@ -272,7 +274,16 @@ public class LM013Report extends MakeReport {
 							lineAmtTotal = BigDecimal.ZERO;
 							bookValueTotal = BigDecimal.ZERO;
 							
-							this.print(1, 0, newBorder);
+							if (lastDataType != DataType.Above_Sum) // 偷吃步，如果因為Above_Sum一定在Below_Sum之前，這裡這樣讓合計區不多畫線
+							{
+								this.print(1, 0, newBorder);
+							} else if (lastDataType != DataType.Total && thisDataType == DataType.Total)
+							{
+								// 情況1C  : 兩種資料類型不同，這一筆是總計資料 (Total) - 畫線換行
+								// 合計區畫線
+								this.print(1, 0, newBorder);
+							}
+
 							this.print(1, 0, " ");
 	
 						} 
@@ -286,8 +297,7 @@ public class LM013Report extends MakeReport {
 							this.print(1, 0, " ");
 								
 							this.print(0, 0, lastTLDVo.get("F2"), "L"); // 戶號
-							this.print(0, 8, lastTLDVo.get("F5"), "L"); // 姓名
-							this.print(0, 15, lastTLDVo.get("F4"), "L"); // 身分證	
+							this.print(0, 8, StringCut.stringCut(lastTLDVo.get("F5"), 0, 10) + " " + lastTLDVo.get("F4"), "L");
 							
 							// 出上一筆資料最後的合計
 							this.print(0, 113, formatAmt(lineAmtTotal, 0), "R"); // 核貸總值合計
@@ -304,10 +314,6 @@ public class LM013Report extends MakeReport {
 						} else if (thisDataType == DataType.None) 
 						{
 							// 情況2A  : 兩種資料類型一樣, 正常資料, 同戶號   - 換行
-							this.print(1, 0, " ");
-						} else if (thisDataType == DataType.Sum)
-						{
-							// 情況2C  : 兩種資料類型一樣，合計資料 (Sum)    - 換行
 							this.print(1, 0, " ");
 						}
 					}

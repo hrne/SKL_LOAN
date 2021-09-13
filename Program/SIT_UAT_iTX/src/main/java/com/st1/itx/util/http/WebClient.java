@@ -57,7 +57,7 @@ public class WebClient extends SysLogger {
 		url += FormatUtil.padX(txCode, 5);
 		url += params;
 		if (System.getProperty("ifx_LocalAddr") == null)
-			url = "http://192.168.6.8:7003/iFX/mvc/msw/systemTalk/host/" + to + "/" + url.trim();
+			url = "http://192.168.10.8:7003/iFX/mvc/msw/systemTalk/host/" + to + "/" + url.trim();
 		else
 			url = System.getProperty("ifx_LocalAddr") + "/mvc/msw/systemTalk/host/" + to + "/" + url.trim();
 		url = url.replaceAll(" ", "_");
