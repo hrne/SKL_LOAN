@@ -1,8 +1,8 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+//import java.util.Calendar;
+//import java.util.Date;
 import java.util.UUID;
 
 /* 套件 */
@@ -66,13 +66,13 @@ public class L8336 extends TradeBuffer {
 		String iCloseMark = titaVo.getParam("CloseMark");
 		String iPhoneNo = titaVo.getParam("PhoneNo");
 		//int iOutJcicTxtDate = Integer.valueOf(titaVo.getParam("OutJcicTxDate"));
-//		int today = Integer.valueOf(titaVo.get("ENTDY"));
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		int year = (cal.get(Calendar.YEAR)-1911)*10000;
-		int month = (cal.get(Calendar.MONTH) +1)*100;
-		int day = cal.get(Calendar.DAY_OF_MONTH);
-		int today = year+month+day;
+//		Calendar cal = Calendar.getInstance();
+//		cal.setTime(new Date());
+//		int year = (cal.get(Calendar.YEAR)-1911)*10000;
+//		int month = (cal.get(Calendar.MONTH) +1)*100;
+//		int day = cal.get(Calendar.DAY_OF_MONTH);
+//		int today = year+month+day;
+		int today = Integer.valueOf(titaVo.get("ENTDY"))+19110000;
 		String iKey = "";
 		//JcicZ574
 		JcicZ574 iJcicZ574 = new JcicZ574();

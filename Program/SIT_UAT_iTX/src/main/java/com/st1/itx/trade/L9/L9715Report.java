@@ -37,7 +37,6 @@ public class L9715Report extends MakeReport {
 
 	private String fundDay = "";
 	private String approDay = "";
-	
 
 	@Override
 	public void printHeader() {
@@ -55,7 +54,6 @@ public class L9715Report extends MakeReport {
 	}
 
 	public void printHeaderL1() {
-		
 
 		this.setFontSize(8);
 		this.setCharSpaces(0);
@@ -78,7 +76,7 @@ public class L9715Report extends MakeReport {
 //		this.print(-6, 100, "撥款日期　" + dDateUtil.getNowStringBc().substring(0, 4) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6) + "　起", "C");
 		this.print(-6, 184, "單　位：元");
 //		this.print(-8, 6, " 押品　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　最近　　逾期");
-		this.print(-8, 7, "押品");
+		this.print(-8, 6, "擔保品");
 		this.print(-9, 6, "地區別");
 		this.print(-9, 14, "繳款方式");
 		this.print(-9, 24, "戶號");
@@ -106,7 +104,7 @@ public class L9715Report extends MakeReport {
 
 	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9715", "放款到期明細表及通知單", "密", "A4", "L");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9715", "業務專辦照顧十八個月明細表", "密", "A4", "L");
 
 		// 基礎日期
 		fundDay = titaVo.getParam("FUND_DAY");
@@ -115,7 +113,7 @@ public class L9715Report extends MakeReport {
 		approDay = titaVo.getParam("APPRO_DAY");
 
 		this.setFontSize(8);
-	
+
 		List<Map<String, String>> l9715List = null;
 
 		try {
@@ -214,20 +212,18 @@ public class L9715Report extends MakeReport {
 
 				total = unpaidPriInt.add(breachAmtAndDelayInt).add(overflow); // 合計
 
-		
-
 				name = tL9715.get("F0");
 
 				// 經辦 F0
 				if (!nameNo.equals(tL9715.get("F0"))) {
 					nameNo = tL9715.get("F0");
 					if (openClose) {
-						this.print(-6, 11,name);
+						this.print(-6, 11, name);
 						this.print(-10, 10, "");
 						openClose = false;
 					} else {
 						this.newPage();
-						this.print(-6, 11,name);
+						this.print(-6, 11, name);
 						this.print(-10, 10, "");
 					}
 				}
@@ -246,22 +242,23 @@ public class L9715Report extends MakeReport {
 				if ("0".equals(tL9715.get("F6")) || tL9715.get("F6") == null) {
 					this.print(0, 62, "", "R");
 				} else {
-					Yr = Integer.parseInt(tL9715.get("F6").toString()) - 19110000;
-					this.print(0, 62, showBcDate(Yr, 0), "R");
+					Yr = Integer.parseInt(tL9715.get("F6"));
+					this.print(0, 62, showRocDate(Yr, 1), "R");
 				}
 
 				// 本金餘額 F7
-				this.print(0, 73, String.format("%,d", Integer.parseInt(tL9715.get("F7").toString())), "R");
+				this.print(0, 74, formatAmt(tL9715.get("F7"), 0), "R");
 
-				// 利息 F8
-				this.print(0, 75, padEnd(6, tL9715.get("F8")));
+				// 利率 F8
+				this.print(0, 82, formatAmt(tL9715.get("F8"), 4), "R");
 
+	
 				// 繳息迄日 F9
 				if ("0".equals(tL9715.get("F9")) || tL9715.get("F9") == null) {
 					this.print(0, 93, "", "R");
 				} else {
-					Yr = Integer.parseInt(tL9715.get("F9").toString()) - 19110000;
-					this.print(0, 93, showBcDate(Yr, 0), "R");
+					Yr = Integer.parseInt(tL9715.get("F9"));
+					this.print(0, 93, showRocDate(Yr, 1), "R");
 				}
 
 				// 最近應繳日 F10
@@ -269,8 +266,8 @@ public class L9715Report extends MakeReport {
 					this.print(0, 104, "", "R");
 				} else {
 
-					Yr = Integer.parseInt(tL9715.get("F10").toString()) - 19110000;
-					this.print(0, 104, showBcDate(Yr, 0), "R");
+					Yr = Integer.parseInt(tL9715.get("F10"));
+					this.print(0, 104, showRocDate(Yr, 1), "R");
 				}
 
 				// 逾期日數 F11
@@ -312,24 +309,6 @@ public class L9715Report extends MakeReport {
 
 		this.toPdf(sno);
 
-	}
-
-	private String padStart(int size, String input) {
-		for (int i = 0; i < size; i++) {
-			if (input.length() < size) {
-				input = "0" + input;
-			}
-		}
-		return input;
-	}
-
-	private String padEnd(int size, String input) {
-		for (int i = 0; i < size; i++) {
-			if (input.length() < size) {
-				input = input + "0";
-			}
-		}
-		return input;
 	}
 
 }

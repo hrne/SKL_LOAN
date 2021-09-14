@@ -15,16 +15,26 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ041;
+import com.st1.itx.db.domain.JcicZ440;
+import com.st1.itx.db.domain.JcicZ440Log;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ442;
 import com.st1.itx.db.domain.JcicZ442Id;
 import com.st1.itx.db.domain.JcicZ442Log;
+import com.st1.itx.db.domain.JcicZ443;
+import com.st1.itx.db.domain.JcicZ443Log;
+import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.service.JcicZ041Service;
+import com.st1.itx.db.service.JcicZ440LogService;
+import com.st1.itx.db.service.JcicZ440Service;
 import com.st1.itx.db.service.JcicZ442LogService;
 
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ442Service;
-
+import com.st1.itx.db.service.JcicZ443LogService;
+import com.st1.itx.db.service.JcicZ443Service;
+import com.st1.itx.db.service.JcicZ446Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -53,9 +63,21 @@ import com.st1.itx.util.data.DataLog;
 public class L8323 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ041Service sJcicZ041Service;
+	@Autowired
+	public JcicZ440Service sJcicZ440Service;
+	@Autowired
 	public JcicZ442Service sJcicZ442Service;
 	@Autowired
+	public JcicZ443Service sJcicZ443Service;
+	@Autowired
+	public JcicZ446Service sJcicZ446Service;
+	@Autowired
+	public JcicZ440LogService sJcicZ440LogService;
+	@Autowired
 	public JcicZ442LogService sJcicZ442LogService;
+	@Autowired
+	public JcicZ443LogService sJcicZ443LogService;
 	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
@@ -70,6 +92,7 @@ public class L8323 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");
 		String iSubmitKey = titaVo.getParam("SubmitKey");
 		int iApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"));
+		int ixApplyDate= Integer.valueOf(titaVo.getParam("ApplyDate"))+19110000;
 		String iIsMaxMain = titaVo.getParam("IsMaxMain");
 		String iIsClaims = titaVo.getParam("IsClaims");
 		String iCourtCode = titaVo.getParam("CourtCode");
@@ -105,7 +128,146 @@ public class L8323 extends TradeBuffer {
 		iJcicZ442Id.setCourtCode(iCourtCode);
 		iJcicZ442Id.setMaxMainCode(iMaxMainCode);	
 		JcicZ442 chJcicZ442 = new JcicZ442();
-
+		//檢核項目(D-47)
+		//若「IDN+調解申請日+受理調解機構代號+最大債權金融機構代號」未曾報送過「'440':前置調解受理申請暨請求回報債權通知資料」,予以剔退處理
+		//二start
+		this.info("iSubmitKey ="+iSubmitKey);
+		this.info("iCustId ="+iCustId);
+		this.info("ixApplyDate ="+ixApplyDate);
+		this.info("iCourtCode ="+iCourtCode);
+		
+		Slice<JcicZ440> ixJcic440 = sJcicZ440Service.otherEq(iSubmitKey, iCustId, ixApplyDate, iCourtCode, this.index, this.limit, titaVo);
+		if(ixJcic440==null) {
+			throw new LogicException(titaVo, "E0001","");
+		}
+		String ukeyEq="";
+		for(JcicZ440 ioJcic440:ixJcic440) {
+			ukeyEq=ioJcic440.getUkey();
+			Slice<JcicZ440Log> ixJcicZ440Log = sJcicZ440LogService.ukeyEq(ukeyEq, this.index, this.limit, titaVo);
+			if(ixJcicZ440Log == null) {
+				throw new LogicException(titaVo, "E0005", "「IDN+調解申請日+受理調解機構代號+最大債權金融機構代號」未曾報送過「'440':前置調解受理申請暨請求回報債權通知資料」");
+			}
+		}
+		//二end
+        //「債權金融機構代號」若非屬Z41「受理申請暨請求回報債權」之應回報金融機構代號，予以剔退處理
+        //三start
+		Slice<JcicZ041> ixJcicZ041 = sJcicZ041Service.otherEq(iSubmitKey,iCustId,ixApplyDate,this.index,this.limit,titaVo);
+		if(ixJcicZ041==null) {
+			throw new LogicException(titaVo, "E0001", "");
+		} 
+		for(JcicZ041 ioJcicZ041:ixJcicZ041) {
+			String ixSubmitKey = ioJcicZ041.getSubmitKey();
+			if(!ixSubmitKey.equals(iSubmitKey) ) {
+				throw new LogicException(titaVo, "E0005","「債權金融機構代號」非屬Z41「受理申請暨請求回報債權」之應回報金融機構代號");
+			}
+		}
+		//三end
+        //「是否為最大債權金融機構報送」填報為Y時，頭筆資料「報送單位代號」需與「最大債權金融機構代號」一致，否則予以剔退
+		//四start**會有問題
+		if(iIsMaxMain.equals("Y")) {
+			Slice<JcicZ442> ixJcicZ442 = sJcicZ442Service.custIdEq(iCustId,this.index,this.limit,titaVo);
+			if(ixJcicZ442!=null) {
+//				throw new LogicException(titaVo, "E0001", "");
+				for(JcicZ442 ioJcicZ442:ixJcicZ442) {
+					String ixCustId = ioJcicZ442.getCustId();
+					if(!ixCustId.equals(iCustId)) {
+						throw new LogicException(titaVo, "E0005", "「是否為最大債權金融機構報送」填報為Y時，頭筆資料「報送單位代號」需與「最大債權金融機構代號」一致");
+					}
+				}
+			} 
+		}
+		//四end
+        //除最大債權金融機構報送自行債權資料外，
+		//「'440':前置調解受理申請暨請求回報債權通知資料」的「協辦行是否需自行回報債權」填報為Y時，
+		//「是否為最大債權金融機構報送」需填報為N。凡之亦然
+		//五start**會有問題
+		if(iIsMaxMain.equals("N")) {
+			Slice<JcicZ440> ioJcicZ440 = sJcicZ440Service.otherEq(iSubmitKey,iCustId,ixApplyDate,iCourtCode, this.index, this.limit, titaVo);
+			if(ioJcicZ440==null) {
+				throw new LogicException(titaVo, "E0001", "");
+			} 
+			for(JcicZ440 ioxJcicZ440 : ioJcicZ440) {
+				String iReportYn = ioxJcicZ440.getReportYn();
+				if(iReportYn.equals("Y")) {
+					throw new LogicException(titaVo, "E0005","「是否為最大債權金融機構報送」需填報為N");
+				}
+				if(iReportYn.equals("N")) {
+					throw new LogicException(titaVo, "E0005", "「是否為最大債權金融機構報送」需填報為Y");
+				}
+			}
+		}
+		//五end
+        //最大債權金融機構報送自行債權資料時，「是否為最大債權金融機構報送」需填報為Y
+		//六start**會有問題
+			if(iIsMaxMain.equals("N")) {
+				throw new LogicException(titaVo, "E0005", "最大債權金融機構報送自行債權資料時，「是否為最大債權金融機構報送」需填報為Y");
+			}
+		//六end
+        //「是否為本金融機構債務人」填報'Y'，且「有擔保債權筆數」填報'0'者，
+		//檢核本檔案格式12+13+14+15 需大於0，否則予以剔退
+		// 依民法第323條計算之信用放款本息餘額
+		//+依民法第323條計算之現金卡放款本息餘額
+		//+依民法第323條計算之信用卡本息餘額
+		//+依民法第323條計算之保證債權本息餘額 >0
+		//七start
+		if(iIsClaims.equals("Y")&&iGuarLoanCnt==0) {
+			if((iCivil323ExpAmt+iCivil323CashAmt+iCivil323CreditAmt+iCivil323GuarAmt)<0) {
+				throw new LogicException(titaVo, "E0005", "「是否為本金融機構債務人」填報'Y'，且「有擔保債權筆數」填報'0'者，依民法第323條計算之信用放款本息餘額+依民法第323條計算之現金卡放款本息餘額+依民法第323條計算之信用卡本息餘額+依民法第323條計算之保證債權本息餘額需大於0");
+			}
+		}
+		//七end
+        //檢核「有擔保債權筆數」需等於報送「'443':回報有擔保債權金額資料」之筆數
+		//八start
+		Slice<JcicZ443> ixJcic443 = sJcicZ443Service.otherEq(iSubmitKey, iCustId, ixApplyDate, iMaxMainCode, iCourtCode, this.index, this.limit, titaVo);
+		if(ixJcic443==null) {
+			throw new LogicException(titaVo, "E0001","");
+		}
+		String ukeyEq443="";
+		int i=0;
+		for(JcicZ443 ioJcic443:ixJcic443) {
+			ukeyEq443=ioJcic443.getUkey();
+			Slice<JcicZ443Log> ixJcicZ443Log = sJcicZ443LogService.ukeyEq(ukeyEq443, this.index, this.limit, titaVo);
+			if(ixJcicZ443Log == null) {
+					throw new LogicException(titaVo, "E0005", "「有擔保債權筆數」需等於報送「'443':回報有擔保債權金額資料」之筆數");
+				}
+			i++;				
+			}
+		this.info("443Log筆數=" +i);
+			if(i!=iGuarLoanCnt) {
+				throw new LogicException(titaVo, "E0005", "「有擔保債權筆數」需等於報送「'443':回報有擔保債權金額資料」之筆數");
+			}
+		//八end
+        //檢核「信用放款本金」+「信用放款利息」+「信用放款違約金」+「信用放款其他費用」之金額總計需等於「依民法第323條計算之信用放款本息餘額」
+		//九start
+		if(iReceExpPrin+iReceExpInte+iReceExpPena+iReceExpOther!=iCivil323ExpAmt) {
+			throw new LogicException(titaVo, "E0005","「信用放款本金」+「信用放款利息」+「信用放款違約金」+「信用放款其他費用」之金額總計需等於「依民法第323條計算之信用放款本息餘額」");
+		}
+		//九end
+        //檢核「現金卡本金」+「現金卡利息」+「現金卡違約金」+「現金卡其他費用」之金額總計需等於「依民法第323條計算之現金卡放款本息餘額」
+		//十start
+		if(iCashCardPrin+iCashCardInte+iCashCardPena+iCashCardOther!=iCivil323CashAmt) {
+			throw new LogicException(titaVo, "E0005","「現金卡本金」+「現金卡利息」+「現金卡違約金」+「現金卡其他費用」之金額總計需等於「依民法第323條計算之現金卡放款本息餘額」");
+		}
+		//十end
+        //檢核「信用卡本金」+「信用卡利息」+「信用卡違約金」+「信用卡其他費用」之金額總計需等於「依民法第323條計算之信用卡本息餘額」
+		//十一start
+		if(iCreditCardPrin+iCreditCardInte+iCreditCardPena+iCreditCardOther!=iCivil323CreditAmt) {
+			throw new LogicException(titaVo, "E0005","「信用卡本金」+「信用卡利息」+「信用卡違約金」+「信用卡其他費用」之金額總計需等於「依民法第323條計算之信用卡本息餘額」");
+		}
+		//十一end
+        //檢核「保證債權本金」+「保證債權利息」+「保證債權違約金」+「保證債權其他費用」之金額總計需等於「依民法第323條計算之保證債權本息餘額」
+		//十二start
+		if(iGuarObliPrin+iGuarObliInte+iGuarObliPena+iGuarObliOther!=iCivil323GuarAmt) {
+			throw new LogicException(titaVo, "E0005","「保證債權本金」+「保證債權利息」+「保證債權違約金」+「保證債權其他費用」之金額總計需等於「依民法第323條計算之保證債權本息餘額」");
+		}
+		//十二end
+		//同一key值報送'446'檔案，且該結案資料未刪除前，不得新增、異動本檔案資料
+		//十三start
+		Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.otherEq(iSubmitKey,iCustId,ixApplyDate,iCourtCode, this.index, this.limit, titaVo);
+		if (xJcicZ446 != null) {
+			throw new LogicException(titaVo, "E0005","同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料");
+		}
+		//十三end
 		switch(iTranKey_Tmp) {
 		case "1":
 		    //檢核是否重複

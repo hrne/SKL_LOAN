@@ -3,7 +3,6 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +51,7 @@ public class LM023Report extends MakeReport {
 
 		}
 
-		DecimalFormat df1 = new DecimalFormat("#,##0");
+//		DecimalFormat df1 = new DecimalFormat("#,##0");
 
 		if (lM023List.size() != 0 && lM023List != null) {
 
@@ -62,8 +61,8 @@ public class LM023Report extends MakeReport {
 			BigDecimal total1 = BigDecimal.ZERO;
 			BigDecimal total2 = BigDecimal.ZERO;
 
-			BigDecimal resTotal = BigDecimal.ZERO;
-			BigDecimal percent = new BigDecimal("100");
+//			BigDecimal resTotal = BigDecimal.ZERO;
+//			BigDecimal percent = new BigDecimal("100");
 
 			int col = 0;
 
@@ -85,8 +84,8 @@ public class LM023Report extends MakeReport {
 
 				// 利息金額
 				tempAmt = lM023List.get(i).get("F3").isEmpty() ? BigDecimal.ZERO
-						: new BigDecimal(lM023List.get(i).get("F3")).divide(new BigDecimal("100000000"), 2,
-								BigDecimal.ROUND_HALF_UP);
+						: new BigDecimal(lM023List.get(i).get("F3"));
+
 				// 欄位(月份判斷)
 				col = Integer.valueOf(lM023List.get(i).get("F2")) + 1;
 
@@ -99,10 +98,10 @@ public class LM023Report extends MakeReport {
 					total0 = total0.add(tempAmt);
 
 					// 當年度
-					makeExcel.setValue(4, col, df1.format(tempAmt), "L");
+					makeExcel.setValue(4, col, tempAmt, "L");
 
 					// 息收合計
-					makeExcel.setValue(7, col, df1.format(total0), "L");
+					makeExcel.setValue(7, col, total0, "L");
 
 				}
 
@@ -110,7 +109,7 @@ public class LM023Report extends MakeReport {
 					total1 = total1.add(tempAmt);
 
 					// 預算
-					makeExcel.setValue(5, col, df1.format(tempAmt), "L");
+					makeExcel.setValue(5, col, tempAmt, "L");
 
 				}
 
@@ -118,27 +117,26 @@ public class LM023Report extends MakeReport {
 					total2 = total2.add(tempAmt);
 
 					// 上年度同期
-					makeExcel.setValue(6, col, df1.format(tempAmt), "L");
+					makeExcel.setValue(6, col, tempAmt, "L");
 
 				}
 
 			}
 
-			makeExcel.setValue(4, 14, df1.format(total0), "L");
-			makeExcel.setValue(5, 14, df1.format(total1), "L");
-			makeExcel.setValue(6, 14, df1.format(total2), "L");
+			makeExcel.setValue(4, 14, total0, "L");
+			makeExcel.setValue(5, 14, total1, "L");
+			makeExcel.setValue(6, 14, total2, "L");
 
-			resTotal = total0 == BigDecimal.ZERO || total2 == BigDecimal.ZERO ? BigDecimal.ZERO
-					: total0.divide(total2, 4, BigDecimal.ROUND_HALF_UP).multiply(percent);
-
-			makeExcel.setValue(8, 14, resTotal + "%", "L");
+//			resTotal = total0 == BigDecimal.ZERO || total2 == BigDecimal.ZERO ? BigDecimal.ZERO
+//					: total0.divide(total2, 4, BigDecimal.ROUND_HALF_UP).multiply(percent);
+//
+//			makeExcel.setValue(8, 14, resTotal + "%", "L");
 
 			makeExcel.setValue(11, 9, year + "年度預算" + total1 + "億。", "L");
 
-			
 //			makeExcel.formulaCaculate(4, 14);
 //			makeExcel.formulaCaculate(5, 14);
-//			makeExcel.formulaCaculate(6, 14);
+			makeExcel.formulaCaculate(14, 8);
 			makeExcel.formulaCaculate(12, 9);
 
 		}

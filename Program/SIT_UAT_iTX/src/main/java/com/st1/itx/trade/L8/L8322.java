@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
+//import java.util.Calendar;
+//import java.util.Date;
 import java.util.UUID;
 
 /* 套件 */
@@ -15,15 +17,17 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.CdCode;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ440;
 import com.st1.itx.db.domain.JcicZ440Id;
 import com.st1.itx.db.domain.JcicZ440Log;
+import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.JcicZ440LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ440Service;
-
+import com.st1.itx.db.service.JcicZ446Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -33,7 +37,7 @@ import com.st1.itx.util.data.DataLog;
 @Scope("prototype")
 /**
  * 
- * @author Luisito
+ * @author Luisito / Mata
  * @version 1.0.0
  */
 public class L8322 extends TradeBuffer {
@@ -41,12 +45,16 @@ public class L8322 extends TradeBuffer {
 	@Autowired
 	public JcicZ440Service sJcicZ440Service;
 	@Autowired
+	public JcicZ446Service sJcicZ446Service;
+	@Autowired
 	public JcicZ440LogService sJcicZ440LogService;
 	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
 	DataLog iDataLog;
-
+	@Autowired
+	public CdCodeService iCdCodeService;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8322 ");
@@ -69,6 +77,7 @@ public class L8322 extends TradeBuffer {
 		String iNotBankId4 = titaVo.getParam("NotBankId4");
 		String iNotBankId5 = titaVo.getParam("NotBankId5");
 		String iNotBankId6 = titaVo.getParam("NotBankId6");
+		int ixApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"))+19110000;
 		String iKey = "";
 		// JcicZ440
 		JcicZ440 iJcicZ440 = new JcicZ440();
@@ -78,7 +87,92 @@ public class L8322 extends TradeBuffer {
 		iJcicZ440Id.setCustId(iCustId);
 		iJcicZ440Id.setSubmitKey(iSubmitKey);
 		JcicZ440 chJcicZ440 = new JcicZ440();
-
+		//檢核項目(D-44)
+		//「調解申請日」不得大於「資料報送日」
+		//三start
+		int iTest = titaVo.getEntDyI();
+		
+		iTest = 20210913;
+		//先用固定的日期之後再轉為非固定日期
+		String today2  = titaVo.getCalDy();
+		this.info("today2 = "+ today2);
+//		this.info("today = "+ iTest);
+//		Calendar cal = Calendar.getInstance();
+//		cal.setTime(new Date());
+//		int year = (cal.get(Calendar.YEAR)-1911)*10000;
+//		int month = (cal.get(Calendar.MONTH) +1)*100;
+//		int day = cal.get(Calendar.DAY_OF_MONTH);
+//		int today = year+month+day;
+		if(iTest<iApplyDate+19110000) {
+			throw new LogicException(titaVo, "E0005","「調解申請日」不得大於「資料報送日」");
+		}
+		//三end
+		//「同意書取得日期」不得大於「資料報送日」
+		//四start
+		if(iTest<iAgreeDate+19110000) {
+			throw new LogicException(titaVo, "E0005","「同意書取得日期」不得大於「資料報送日」");
+		}
+		//四end
+		//「首次調解日」小於等於「同意書取得日期」時，「協辦行是否需自行債權」需填報N
+		//五start
+		if(iStartDate+19110000<=iAgreeDate+19110000) {
+			if(!iReportYn.equals("N")) {
+				throw new LogicException(titaVo, "E0005","「首次調解日」小於等於「同意書取得日期」時，「協辦行是否需自行債權」需填報N");
+			}
+		}
+		//五end
+		//檢核報送單位、「未揭露債權機構代號」，若不屬於有效消債條例金融機構代號，則予剔退
+		//六start
+			String ixCourtCode;
+	        String ixNotBankId1;
+	        String ixNotBankId2;
+	        String ixNotBankId3;
+	        String ixNotBankId4;
+	        String ixNotBankId5;
+	        String ixNotBankId6;
+	        	ixCourtCode=dealBankName(iCourtCode,titaVo);
+	        	ixNotBankId1=dealBankName(iNotBankId1,titaVo);
+	        	ixNotBankId2=dealBankName(iNotBankId2,titaVo);
+	        	ixNotBankId3=dealBankName(iNotBankId3,titaVo);
+	        	ixNotBankId4=dealBankName(iNotBankId4,titaVo);
+	        	ixNotBankId5=dealBankName(iNotBankId5,titaVo);
+	        	ixNotBankId6=dealBankName(iNotBankId6,titaVo);
+	        	if(ixNotBankId2==null) {
+	        		this.info("ixCourtCode 是 NULL");
+	        	}
+	        	if(ixNotBankId2.equals("")){
+	        		this.info("ixCourtCode 是 空白 值");
+	        	}
+	        	
+                if(!iCourtCode.equals("")&&ixCourtCode.equals("")){
+                    throw new LogicException("E0005", "報送單位、「未揭露債權機構代號」，不屬於有效消債條例金融機構代號");
+                    }
+                if(!iNotBankId1.equals("")&&ixNotBankId1.equals("")){
+                    throw new LogicException("E0005", "報送單位、「未揭露債權機構代號」，不屬於有效消債條例金融機構代號");
+                    }
+                if(!iNotBankId2.equals("")&&ixNotBankId2.equals("")){
+                    throw new LogicException("E0005", "報送單位、「未揭露債權機構代號」，不屬於有效消債條例金融機構代號");
+                    }
+                if(!iNotBankId3.equals("")&&ixNotBankId3.equals("")){
+                    throw new LogicException("E0005", "報送單位、「未揭露債權機構代號」，不屬於有效消債條例金融機構代號");
+                    }
+                if(!iNotBankId4.equals("")&&ixNotBankId4.equals("")){
+                    throw new LogicException("E0005", "報送單位、「未揭露債權機構代號」，不屬於有效消債條例金融機構代號");
+                    }
+                if(!iNotBankId5.equals("")&&ixNotBankId5.equals("")){
+                    throw new LogicException("E0005", "報送單位、「未揭露債權機構代號」，不屬於有效消債條例金融機構代號");
+                    }
+                if(!iNotBankId6.equals("")&&ixNotBankId6.equals("")){
+                    throw new LogicException("E0005", "報送單位、「未揭露債權機構代號」，不屬於有效消債條例金融機構代號");
+                    }
+		//六end
+		//同一key值報送'446'檔案，且該結案資料未刪除前，不得新增、異動本檔案資料
+		//七start
+		Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.otherEq(iSubmitKey,iCustId,ixApplyDate,iCourtCode, this.index, this.limit, titaVo);
+		if (xJcicZ446 != null) {
+			throw new LogicException(titaVo, "E0005","同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料");
+		}
+		//七end
 		switch (iTranKey_Tmp) {
 		case "1":
 			// 檢核是否重複，並寫入JcicZ440
@@ -182,5 +276,14 @@ public class L8322 extends TradeBuffer {
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	public String dealBankName(String iCourtCode,TitaVo titaVo) throws LogicException {
+		CdCode tCdCode = new CdCode();
+		tCdCode=iCdCodeService.getItemFirst(8, "JcicBankCode", iCourtCode,titaVo);
+		String JcicBankName="";//80碼長度
+		if(tCdCode!=null) {
+			JcicBankName=tCdCode.getItem();
+		}
+		return JcicBankName;
 	}
 }

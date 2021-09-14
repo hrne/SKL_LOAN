@@ -13,14 +13,14 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
-@Service("L9715p")
-@Scope("prototype")
 /**
+ * L9715p
  * 
- * 
- * @author Eric Chang
+ * @author Ted
  * @version 1.0.0
  */
+@Service("L9715p")
+@Scope("prototype")
 public class L9715p extends TradeBuffer {
 
 	@Autowired
@@ -37,7 +37,6 @@ public class L9715p extends TradeBuffer {
 		this.info("active L9715p ");
 		this.totaVo.init(titaVo);
 
-
 		this.info("L9715p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
@@ -46,7 +45,7 @@ public class L9715p extends TradeBuffer {
 		l9715report.exec(titaVo, this.getTxBuffer());
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), "L9715放款到期明細表及通知單已完成", titaVo);
+				titaVo.getParam("TLRNO"), "L9715業務專辦照顧十八個月明細表已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

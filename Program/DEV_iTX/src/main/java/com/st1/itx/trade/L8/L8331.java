@@ -1,8 +1,8 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+//import java.util.Calendar;
+//import java.util.Date;
 import java.util.UUID;
 
 /* 套件 */
@@ -94,13 +94,13 @@ public class L8331 extends TradeBuffer {
 		//二end
 		//欄位「單獨全數受清償日期」不得大於「資料報送日期」
 		//三start
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		int year = (cal.get(Calendar.YEAR)-1911)*10000;
-		int month = (cal.get(Calendar.MONTH) +1)*100;
-		int day = cal.get(Calendar.DAY_OF_MONTH);
-		int today = year+month+day;
-//		int today = Integer.valueOf(titaVo.get("ENTDY"));
+//		Calendar cal = Calendar.getInstance();
+//		cal.setTime(new Date());
+//		int year = (cal.get(Calendar.YEAR)-1911)*10000;
+//		int month = (cal.get(Calendar.MONTH) +1)*100;
+//		int day = cal.get(Calendar.DAY_OF_MONTH);
+//		int today = year+month+day;
+		int today = Integer.valueOf(titaVo.get("ENTDY"))+19110000;
 		this.info("today= " +today);
 		this.info("PayOffDate =" + iPayOffDate);
 		if(today<iPayOffDate) {

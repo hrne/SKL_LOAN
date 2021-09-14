@@ -171,7 +171,11 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r47TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-
+T(2,@RimJcicBankCode,#CourtCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 ! 受理調解機構代號 調rim塞值
 #Space1=X,1,S
 IF(#TranKey_Tmp == "2"|| #TranKey_Tmp=="4"|| #TranKey_Tmp=="5",$,S)

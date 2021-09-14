@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8328]                                 (448)前置調解無擔保債務分配表資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 [#<->#,"#FdMaxMainCode+債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
 ["#FdSignPrin+簽約金額-本金",#SignPrin],["#FdSignOther+簽約金額-利息、違約金及其他費用",#SignOther],
@@ -77,13 +78,18 @@ E(0,1)ASGN(AGAIN$)
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
+! CourtCode
+#CDDEF0002=x,20,S
+T(3,CdCode.CourtCode)
+#CourtCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
-
+T(2,@CourtCodeHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -179,16 +185,16 @@ E(0,@AcQuitAmt,#L8r45AcQuitAmt)
 E(0,@OutJcicTxtDate,#L8r45OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r45TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(2,@RimJcicBankCode,#CourtCode,#MaxMainCode)
 RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 ! 調Rim相關 結束
 
 
@@ -233,13 +239,12 @@ D(8)
 #CourtCode=X,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey_Tmp,2,s,$)
-@V(7)
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+C(5,#TranKey,D,T(2,@CourtCode,#L8r45CourtCode),$)
+C(5,#TranKey,X,T(2,@CourtCode,#L8r45CourtCode),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
+HELP(#CourtCodeHelp)
+@V(H,#CourtCodeHelp)
 
 #CourtCodeX=X,80,L
 T(2,@RimJcicBankCode,#CourtCode)
@@ -248,11 +253,16 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@CourtCodeX,#L8r01JcicBankName)
 
+
 !最大債權金融機構代號
 #MaxMainCode=X,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
+C(5,#TranKey,D,T(2,@MaxMainCode,#L8r45MaxMainCode),$)
+C(5,#TranKey,X,T(2,@MaxMainCode,#L8r45MaxMainCode),$)
+C(5,#TranKey,D,s,$)
+C(5,#TranKey,X,s,$)
 @V(7)
 T(2,@RimJcicBankCode,#MaxMainCode)
 RESET_RIM(#RimL8r01,L8R01)

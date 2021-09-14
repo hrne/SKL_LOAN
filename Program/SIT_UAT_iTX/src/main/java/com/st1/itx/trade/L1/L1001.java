@@ -311,6 +311,7 @@ public class L1001 extends TradeBuffer {
 				occursList.putParam("OOCustNo", aCustMain.getCustNo());
 				occursList.putParam("OOCustTypeCode", aCustMain.getCustTypeCode());
 				occursList.putParam("OOCustName", aCustMain.getCustName().replace("$n", "\n"));
+				occursList.putParam("OODataStatus", aCustMain.getDataStatus());
 				this.totaVo.addOccursList(occursList);
 			}
 			if (iCustMain1.hasNext()) {
@@ -482,6 +483,7 @@ public class L1001 extends TradeBuffer {
 			occursList2.putParam("OOCustNo", iCustMain2.getCustNo());
 			occursList2.putParam("OOCustTypeCode", iCustMain2.getCustTypeCode());
 			occursList2.putParam("OOCustName", iCustMain2.getCustName().replace("$n", "\n"));
+			occursList2.putParam("OODataStatus", iCustMain2.getDataStatus());
 			this.totaVo.addOccursList(occursList2);
 			break;
 		case 3:
@@ -651,6 +653,7 @@ public class L1001 extends TradeBuffer {
 				occursList3.putParam("OOCustNo", bCustMain.getCustNo());
 				occursList3.putParam("OOCustTypeCode", bCustMain.getCustTypeCode());
 				occursList3.putParam("OOCustName", bCustMain.getCustName().replace("$n", "\n"));
+				occursList3.putParam("OODataStatus", bCustMain.getDataStatus());
 				this.totaVo.addOccursList(occursList3);
 			}
 			if (iCustMain3.hasNext()) {
@@ -833,6 +836,8 @@ public class L1001 extends TradeBuffer {
 				occursList4.putParam("OOCustNo", dCustMain.getCustNo());
 				occursList4.putParam("OOCustTypeCode", dCustMain.getCustTypeCode());
 				occursList4.putParam("OOCustName", dCustMain.getCustName().replace("$n", "\n"));
+				
+				occursList4.putParam("OODataStatus", dCustMain.getDataStatus());
 				this.totaVo.addOccursList(occursList4);
 			}
 			if (iCustTelNo != null && iCustTelNo.hasNext()) {

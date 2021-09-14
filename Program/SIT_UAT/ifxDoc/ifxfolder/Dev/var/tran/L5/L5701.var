@@ -115,7 +115,6 @@ T(3,受理調解機構代號)
 
 #Hide=X,1,S
 INVOKEJS(SHOW,grd1,0)
-!INVOKEJS(SHOW,L5701_17,0)
 HIDE(#BtnDetail)
 HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ)
 !HIDE(#BtnBankCode)
@@ -324,7 +323,6 @@ IF(#IsMainFin=="N",HIDE(#BTND,#BTNJ),$)
 #TestShowNegFinShare=X,1,S
 IF(#IsMainFin=="Y",$,s)
 IF(#L5r01IsMainFin=="Y",$,s)
-!INVOKEJS(SHOW,L5701_17,1)
 INVOKEJS(SHOW,grd1,1)
 ##loop {times:30,i:1,j:2,k:3}
 IF(#NegFinShareFinCode{i} !="",INVOKEJS(SHOW,grd1,{i},{i},1),INVOKEJS(SHOW,grd1,{i},{j},0))
@@ -461,30 +459,30 @@ IF(#FunctionCode=="01"||#FunctionCode=="02",$,s)
 HELP(#YNHelp)
 @V(H,#YNHelp)
 C(5,#IsMainFin,Y,T(2,@FieldName,簽約總金額),T(2,@FieldName,新壽總金額))
-IF(#FunctionCode==02,IF(#MainFinCode!=#L5r01MainFinCode || #L5r01IsMainFin =="N",C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),s),$)
+IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,Y,T(2,@MainFinCode,458)T(2,@MainFinCodeName,),$),$)
+IF(#FunctionCode==02 || #FunctionCode==01,C(5,#IsMainFin,N,IF(#MainFinCode=="458",T(2,@MainFinCode,)T(2,@MainFinCodeName,),$),$),$)
+IF(#FunctionCode==02,IF(#MainFinCode!=#L5r01MainFinCode,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),s),$)
 IF(#FunctionCode==01,C(5,#IsMainFin,Y,CALL(#IsMainFinIsY),CALL(#IsMainFinIsN)),$)
-T(3,@MainFinCode,458)
-T(2,@MainFinCodeName,)
+
 
 #IsMainFinIsY=@,1,S
 INVOKEJS(SHOW,grd1,1)
 INVOKEJS(SHOW,grd1,3,31,0)
 
 
-
 #IsMainFinIsN=@,1,S
-T(2,@MainFinCode,)
-T(2,@MainFinCodeName,)
+
 INVOKEJS(SHOW,grd1,0)
+
 
 ##loop {times:30,i:1}
 T(2,@NegFinShareFinCode{i},)
 T(2,@FinCodeName{i},)
-! E(0,@NegFinShareContractAmt{i},0)
-! E(0,@NegFinShareAmtRatio{i},0)
-! E(0,@NegFinShareDueAmt{i},0)
-! T(2,@NegFinShareCancelDate{i},)
-! E(0,@NegFinShareCancelAmt{i},0)
+E(0,@NegFinShareContractAmt{i},0)
+E(0,@NegFinShareAmtRatio{i},0)
+E(0,@NegFinShareDueAmt{i},0)
+E(0,@NegFinShareCancelDate{i},0)
+E(0,@NegFinShareCancelAmt{i},0)
 ##end
 
 ! 案件種類
@@ -791,7 +789,7 @@ IF(#Test{i}=="0",S,$)
 IF({i}==1,$,C(4,#NegFinShareFinCode{j},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1)))
 @IF({i}==1,$,IF(#NegFinShareFinCode{i}=="",S,$))
 C(4,#NegFinShareFinCode1,V(7),$)
-!C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW,grd1_,{i},30,0),INVOKEJS(SHOW,grd1,{k},1))
+C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW,grd1,{i},0),INVOKEJS(SHOW,grd1,{k},1))
 !檢核不可重複債權機構
 C(3,{i},2,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1)),$)
 C(3,{i},3,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2)),$)
@@ -823,11 +821,6 @@ C(3,{i},28,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFin
 C(3,{i},29,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27,#NegFinShareFinCode28)),$)
 C(3,{i},30,C(4,#NegFinShareFinCode{j},$,V(4,#NegFinShareFinCode1,#NegFinShareFinCode2,#NegFinShareFinCode3,#NegFinShareFinCode4,#NegFinShareFinCode5,#NegFinShareFinCode6,#NegFinShareFinCode7,#NegFinShareFinCode8,#NegFinShareFinCode9,#NegFinShareFinCode10,#NegFinShareFinCode11,#NegFinShareFinCode12,#NegFinShareFinCode13,#NegFinShareFinCode14,#NegFinShareFinCode15,#NegFinShareFinCode16,#NegFinShareFinCode17,#NegFinShareFinCode18,#NegFinShareFinCode19,#NegFinShareFinCode20,#NegFinShareFinCode21,#NegFinShareFinCode22,#NegFinShareFinCode23,#NegFinShareFinCode24,#NegFinShareFinCode25,#NegFinShareFinCode26,#NegFinShareFinCode27,#NegFinShareFinCode28,#NegFinShareFinCode29)),$)
 
-#AMK{i}=X,1,S
-!IF(#Test{i}==1 && {i}<=30,$,S)
-!IF(#FunctionCode!="05",$,s)
-!C(4,#NegFinShareFinCode{i},INVOKEJS(SHOW,grd1,{i},30,0),INVOKEJS(SHOW,grd1_{k},1))
-
 #FinCodeName{i}=X,60,L
 IF(#NegFinShareFinCode{i}=="",S,$)
 
@@ -840,6 +833,7 @@ T(2,@FinCodeName{i},#L5r12BankItem)
 
 
 #NegFinShareContractAmt{i}=m,14,I
+C(4,#NegFinShareFinCode{i},S,$)
 IF(#CaseKindCode=="1",s,$)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#IsMainFin=="Y",$,S)
@@ -848,21 +842,31 @@ IF(#NegFinShareFinCode{i}=="",S,$)
 @V(2,0)
 
 #CountShareRatio{i}=X,1,S
+C(4,#NegFinShareFinCode{i},S,$)
+IF(#CaseKindCode=="1",s,$)
+IF(#IsMainFin=="Y",$,S)
 IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11",$,s)
 E(0,@NegFinShareAmtRatio{i},#NegFinShareContractAmt{i}*100/#TotalContrAmt)
 
 #NegFinShareAmtRatio{i}=m,3.2,I
 C(4,#NegFinShareFinCode{i},S,$)
+IF(#CaseKindCode=="1",s,$)
+IF(#IsMainFin=="Y",$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 @V(2,0)
 
 
 #CountShareDueAmt{i}=X,1,S
+C(4,#NegFinShareFinCode{i},S,$)
+IF(#CaseKindCode=="1",s,$)
+IF(#IsMainFin=="Y",$,S)
 IF(#FunctionCode=="01" || #FunctionCode=="09" || #FunctionCode=="11",$,s)
 E(0,@NegFinShareDueAmt{i},#NegFinShareContractAmt{i}*#DueAmt/#TotalContrAmt)
 
 
 #NegFinShareDueAmt{i}=m,14,I
+IF(#CaseKindCode=="1",s,$)
+IF(#IsMainFin=="Y",$,S)
 C(4,#NegFinShareFinCode{i},S,$)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 @V(2,0)
@@ -881,10 +885,9 @@ D(8)
 IF(#CaseKindCode=="1",s,$)
 IF(#NegFinShareCancelDate{i}>0,$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",E(0,#NegFinShareContractAmt{i}),$)
-IF(#FunctionCode=="02"||#FunctionCode=="06",E(0,#NegFinShareContractAmt{i}*#PrincipalBal/#RimContractAmtX),$)
+IF(#FunctionCode=="02"||#FunctionCode=="06",C(3,#RimContractAmtX,0,E(0,#NegFinShareContractAmt{i}),E(0,#NegFinShareContractAmt{i}*#PrincipalBal/#RimContractAmtX)),$)
 
-#AMKS{i}=X,1,S
-C(4,#NegFinShareFinCode{i},$,INVOKEJS(SHOW,grd1_{k},1))
+
 
 ##end
 
@@ -920,8 +923,8 @@ E(0,0)
 IF(#FunctionCode=="01"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",E(0,#TotalContrAmt),$)
 IF(#FunctionCode=="02",IF(#L5r01TotalContrAmt!=#TotalContrAmt,E(0,#TotalContrAmt),E(0,#RimContractAmtX)),$)
 
-##loop {times:30,i:1}
 
+##loop {times:30,i:1}
 !簽約金額計算(不包含註銷金額)
 #Amt1{i}=X,1,S
 IF(#IsMainFin=="Y",$,S)
@@ -934,7 +937,7 @@ E(0,@CountContractAmtX,#CountContractAmtX+#NegFinShareContractAmt{i})
 E(0,@CountCancelAmtX,#CountCancelAmtX+#NegFinShareCancelAmt{i})
 ##end
 
-##loop {times:30,i:1,j:0}
+##loop {times:30,i:1,j:0,k:2}
 
 #AmtRatioX{i}=X,1,S
 IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
@@ -947,10 +950,11 @@ E(0,#CountAmtRatioXX,#CountAmtRatioXX+#NegFinShareAmtRatio{i})
 #cAmtRatio{i}=X,1,S
 IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF({i}==1,s,$)
-C(4,#NegFinShareFinCode{i},$,s)
-C(4,#NegFinShareFinCode{j},s,$)
-E(0,#CountAmtRatioXX,#CountAmtRatioXX-#NegFinShareAmtRatio{j})
-E(0,@NegFinShareAmtRatio{j},100-#CountAmtRatioXX)
+IF({k}==31,s,$)
+C(4,#NegFinShareFinCode{i},s,$)
+C(4,#NegFinShareFinCode{k},$,s)
+C(3,#NegFinShareCancelDate{i},0,E(0,@NegFinShareAmtRatio{i},100+#NegFinShareAmtRatio{i}-#CountAmtRatioXX),E(0,@NegFinShareAmtRatio{j},100+#NegFinShareAmtRatio{j}-#CountAmtRatioXX))
+
 
 !計算期款
 #DueAmtX{i}=X,1,S
@@ -964,10 +968,10 @@ E(0,#CountDueAmtXX,#CountDueAmtXX+#NegFinShareDueAmt{i})
 #cDueAmtX{i}=X,1,S
 IF(#FunctionCode=="01"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF({i}==1,s,$)
-C(4,#NegFinShareFinCode{i},$,s)
-C(4,#NegFinShareFinCode{j},s,$)
-E(0,#CountDueAmtXX,#CountDueAmtXX-#NegFinShareDueAmt{j})
-E(0,#NegFinShareDueAmt{j},#DueAmt-#CountDueAmtXX)
+IF({k}==31,s,$)
+C(4,#NegFinShareFinCode{i},s,$)
+C(4,#NegFinShareFinCode{k},$,s)
+C(3,#NegFinShareCancelDate{i},0,E(0,#NegFinShareDueAmt{i},#DueAmt+#NegFinShareDueAmt{i}-#CountDueAmtXX),E(0,#NegFinShareDueAmt{j},#DueAmt+#NegFinShareDueAmt{j}-#CountDueAmtXX))
 
 ##end
 
@@ -985,27 +989,50 @@ E(0,@CountDueAmtX,#CountDueAmtX+#NegFinShareDueAmt{i})
 ##end
 
 
-#CContracAmt=X,1,S
+#CContracAmt1=X,1,S
 IF(#IsMainFin=="Y",$,S)
 IF(#CaseKindCode=="1",s,$)
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額錯誤),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,簽約金額合計錯誤),$))
+IF(#FunctionCode=="01"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額合計錯誤),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,簽約金額合計錯誤),$))
+
+#CContracAmt2=X,1,S
+IF(#FunctionCode=="02",$,s)
+IF(#L5r01TotalContrAmt!=#TotalContrAmt,$,s)
+C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額合計錯誤),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,簽約金額合計錯誤),$))
+
+
+#CContracAmt3=X,1,S
+IF(#FunctionCode=="02",$,s)
+##loop {times:30,i:1}
+C(3,#NegFinShareContractAmt{i},#L5r01NegFinShareContractAmt{i},$,C(3,#CountCancelAmtX,0,IF(#CountContractAmtX!=#ContractAmtX,V(P,簽約金額合計錯誤),$),IF(#CountContractAmtX!=#ContractAmtX-#CountCancelAmtX,V(P,簽約金額合計錯誤),$)))
+##end
+
 
 #CAmtRatio=X,1,S
 IF(#IsMainFin=="Y",$,S)
 IF(#CaseKindCode=="1",s,$)
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#CountAmtRatioX!=100,V(P,債權比例總和錯誤),$)
+
+
 
 #CAmtDueAmt=X,1,S
 IF(#IsMainFin=="Y",$,S)
 IF(#CaseKindCode=="1",s,$)
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="06"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
 IF(#CountDueAmtX!=#DueAmt,V(P,期款總和錯誤),$)
 
-#AKMS2=X,1,S
-IF(#IsMainFin=="N",$,S)
-INVOKEJS(SHOW,grd1,0)
+
+
+
+
+
+##loop {times:30,i:1}
+#Testc{i}=X,1,S
+C(4,#NegFinShareFinCode{i},$,s)
+INVOKEJS(SHOW,grd1,{i},{i},0)
+
+##end
 
 
 

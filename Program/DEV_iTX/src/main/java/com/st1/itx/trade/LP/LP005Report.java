@@ -31,8 +31,6 @@ public class LP005Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	private List<Map<String, String>> listEmpClass = new ArrayList<>();
-
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LP005Report exec ...");
 
@@ -100,20 +98,20 @@ public class LP005Report extends MakeReport {
 			setAmt(i, inputWorkMonth, titaVo);
 		}
 
-		listEmpClass = new ArrayList<>();
+		List<Map<String, String>> listEmpClass = new ArrayList<>();
 
-		setDept("A0B000", "營管", pfYear, pfSeason, titaVo);
-		setDept("A0F000", "營推", pfYear, pfSeason, titaVo);
-		setDept("A0E000", "業推", pfYear, pfSeason, titaVo);
-		setDept("A0M000", "業開", pfYear, pfSeason, titaVo);
+		listEmpClass = setDept(listEmpClass, "A0B000", "營管", pfYear, pfSeason, titaVo);
+		listEmpClass = setDept(listEmpClass, "A0F000", "營推", pfYear, pfSeason, titaVo);
+		listEmpClass = setDept(listEmpClass, "A0E000", "業推", pfYear, pfSeason, titaVo);
+		listEmpClass = setDept(listEmpClass, "A0M000", "業開", pfYear, pfSeason, titaVo);
 
-		setEmpClassList(pfYear, pfSeason, 0);
+		setEmpClassList(listEmpClass, pfYear, pfSeason, 0);
 
-		setEmpClassList(pfYear, pfSeason, 1);
+		setEmpClassList(listEmpClass, pfYear, pfSeason, 1);
 	}
 
-	private void putDataToListEmpClass(Map<String, String> m, String deptSheetName, String oriEmpClass,
-			String afterEmpClass) {
+	private List<Map<String, String>> putDataToListEmpClass(List<Map<String, String>> listEmpClass,
+			Map<String, String> m, String deptSheetName, String oriEmpClass, String afterEmpClass) {
 		this.info("putDataToListEmpClass ... ");
 
 		Map<String, String> mapEmpClass = new HashMap<>();
@@ -127,6 +125,8 @@ public class LP005Report extends MakeReport {
 		mapEmpClass.put("AfterEmpClass", afterEmpClass); // 考核後職級
 
 		listEmpClass.add(mapEmpClass);
+
+		return listEmpClass;
 	}
 
 	private void setAmt(int i, int inputWorkMonth, TitaVo titaVo) throws LogicException {
@@ -217,8 +217,8 @@ public class LP005Report extends MakeReport {
 		}
 	}
 
-	private void setDept(String deptCode, String deptSheetName, int pfYear, int pfSeason, TitaVo titaVo)
-			throws LogicException {
+	private List<Map<String, String>> setDept(List<Map<String, String>> listEmpClass, String deptCode,
+			String deptSheetName, int pfYear, int pfSeason, TitaVo titaVo) throws LogicException {
 		this.info("setDept ... ");
 		this.info("setDept deptCode = " + deptCode);
 		this.info("setDept deptSheetName = " + deptSheetName);
@@ -232,7 +232,7 @@ public class LP005Report extends MakeReport {
 		List<Map<String, String>> listDept = lp005ServiceImpl.queryDept(pfYear, pfSeason, deptCode, titaVo);
 
 		if (listDept == null || listDept.isEmpty()) {
-			return;
+			return listEmpClass;
 		}
 
 		int rowCursor = 4;
@@ -326,7 +326,7 @@ public class LP005Report extends MakeReport {
 			}
 			makeExcel.setValue(rowCursor, 15 + columnShift, afterEmpClass, "C");
 
-			putDataToListEmpClass(m, deptSheetName, oriEmpClass, afterEmpClass);
+			listEmpClass = putDataToListEmpClass(listEmpClass, m, deptSheetName, oriEmpClass, afterEmpClass);
 
 			rowCursor++;
 		}
@@ -344,9 +344,12 @@ public class LP005Report extends MakeReport {
 			}
 			rowCursorTotal++;
 		}
+
+		return listEmpClass;
 	}
 
-	private void setEmpClassList(int pfYear, int pfSeason, int type) throws LogicException {
+	private void setEmpClassList(List<Map<String, String>> listEmpClass, int pfYear, int pfSeason, int type)
+			throws LogicException {
 		this.info("setEmpClassList ... ");
 
 		String sheetName = "職級名冊";
@@ -371,6 +374,10 @@ public class LP005Report extends MakeReport {
 
 		int rowCursor = 3;
 
+		if (listEmpClass.size() > 1) {
+			makeExcel.setShiftRow(rowCursor + 1, listEmpClass.size() - 1);
+		}
+		
 		for (Map<String, String> m : listEmpClass) {
 
 			// 序號
@@ -397,9 +404,20 @@ public class LP005Report extends MakeReport {
 			// 考核後職級
 			makeExcel.setValue(rowCursor, 8, m.get("AfterEmpClass"));
 
-			if (type == 0 && !m.get("OriEmpClass").equals(m.get("AfterEmpClass"))) {
-				makeExcel.setValue(rowCursor, 9, "Yes");
+			if (type == 0) {
+				String oriEmpClass = m.get("OriEmpClass");
+				String afterEmpClass = m.get("AfterEmpClass");
+				this.info("oriEmpClass = " + oriEmpClass);
+				this.info("afterEmpClass = " + afterEmpClass);
+				if (oriEmpClass.equals(afterEmpClass)) {
+					this.info("EmpClass same");
+				} else {
+					this.info("EmpClass different");
+					makeExcel.setValue(rowCursor, 9, "Yes");
+				}
 			}
+
+			rowCursor++;
 		}
 	}
 }

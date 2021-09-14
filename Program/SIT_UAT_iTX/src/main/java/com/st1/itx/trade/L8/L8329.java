@@ -1,8 +1,8 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
+//import java.util.Calendar;
+//import java.util.Date;
 import java.util.UUID;
 
 /* 套件 */
@@ -127,12 +127,13 @@ public class L8329 extends TradeBuffer {
 		//三end
 		//「繳款日期」不得大於資料報送日期
 		//四start
-		Calendar cal = Calendar.getInstance();
-		cal.setTime(new Date());
-		int year = (cal.get(Calendar.YEAR)-1911)*10000;
-		int month = (cal.get(Calendar.MONTH) +1)*100;
-		int day = cal.get(Calendar.DAY_OF_MONTH);
-		int today = year+month+day;
+//		Calendar cal = Calendar.getInstance();
+//		cal.setTime(new Date());
+//		int year = (cal.get(Calendar.YEAR)-1911)*10000;
+//		int month = (cal.get(Calendar.MONTH) +1)*100;
+//		int day = cal.get(Calendar.DAY_OF_MONTH);
+//		int today = year+month+day;
+		int today = Integer.valueOf(titaVo.get("ENTDY"))+19110000;
 		if(iPayDate>today) {
 			throw new LogicException(titaVo, "E0005", "「繳款日期」不得大於資料報送日期"); 
 		}

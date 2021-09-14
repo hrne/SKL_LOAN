@@ -252,7 +252,10 @@ T(H,@GuarantyTypeX,#GuarantyType,#CollateralTypeHelp)
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r41TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-
+T(2,@RimJcicBankCode,#CourtCode)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I

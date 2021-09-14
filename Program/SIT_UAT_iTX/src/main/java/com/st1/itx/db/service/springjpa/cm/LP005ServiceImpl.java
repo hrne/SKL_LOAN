@@ -27,7 +27,6 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) {
 
 		this.info("LP005ServiceImpl findAll ");
@@ -40,10 +39,9 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryCounts(int inputWorkMonth, TitaVo titaVo) {
 
 		this.info("LP005ServiceImpl queryCounts inputWorkMonth = " + inputWorkMonth);
@@ -73,10 +71,9 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputWorkMonth", inputWorkMonth);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryAmt(int inputWorkMonth, TitaVo titaVo) {
 
 		this.info("LP005ServiceImpl queryAmt inputWorkMonth = " + inputWorkMonth);
@@ -105,10 +102,9 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputWorkMonth", inputWorkMonth);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryDept(int pfYear, int pfSeason, String inputDeptCode, TitaVo titaVo) {
 
 		int inputWorkMonth1 = pfYear * 100 + (1 + (3 * (pfSeason - 1)));
@@ -117,12 +113,12 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int inputWorkMonth4 = pfSeason == 4 ? pfYear * 100 + 13 : 0;
 		int inputWorkSeason = pfYear * 10 + pfSeason;
 
-		this.info("LP005ServiceImpl queryAmt inputWorkMonth1 = " + inputWorkMonth1);
-		this.info("LP005ServiceImpl queryAmt inputWorkMonth2 = " + inputWorkMonth2);
-		this.info("LP005ServiceImpl queryAmt inputWorkMonth3 = " + inputWorkMonth3);
-		this.info("LP005ServiceImpl queryAmt inputWorkMonth4 = " + inputWorkMonth4);
-		this.info("LP005ServiceImpl queryAmt inputWorkSeason = " + inputWorkSeason);
-		this.info("LP005ServiceImpl queryAmt inputDeptCode = " + inputDeptCode);
+		this.info("LP005ServiceImpl queryDept inputWorkMonth1 = " + inputWorkMonth1);
+		this.info("LP005ServiceImpl queryDept inputWorkMonth2 = " + inputWorkMonth2);
+		this.info("LP005ServiceImpl queryDept inputWorkMonth3 = " + inputWorkMonth3);
+		this.info("LP005ServiceImpl queryDept inputWorkMonth4 = " + inputWorkMonth4);
+		this.info("LP005ServiceImpl queryDept inputWorkSeason = " + inputWorkSeason);
+		this.info("LP005ServiceImpl queryDept inputDeptCode = " + inputDeptCode);
 
 		String sql = " ";
 		sql += " SELECT PCO.\"DistItem\"         AS Dist        "; // -- F0 區部
@@ -206,6 +202,6 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputWorkSeason", inputWorkSeason);
 		query.setParameter("inputDeptCode", inputDeptCode);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

@@ -572,7 +572,10 @@ public class L8403File extends MakeFile {
 		int iTotalCount = 0;
 		switch(trancode) {
 			case "040":
-				Slice<JcicZ040> xJcicZ040 = sJcicZ040Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ040> xJcicZ040 = sJcicZ040Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ040 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ040 iJcicZ040:xJcicZ040) {
 					if(iJcicZ040.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -583,7 +586,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "041":
-				Slice<JcicZ041> xJcicZ041 = sJcicZ041Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ041> xJcicZ041 = sJcicZ041Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ041 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ041 iJcicZ041:xJcicZ041) {
 					if(iJcicZ041.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -594,7 +600,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "042":
-				Slice<JcicZ042> xJcicZ042 = sJcicZ042Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ042> xJcicZ042 = sJcicZ042Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ042 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ042 iJcicZ042:xJcicZ042) {
 					if(iJcicZ042.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -605,7 +614,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "043":
-				Slice<JcicZ043> xJcicZ043 = sJcicZ043Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ043> xJcicZ043 = sJcicZ043Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ043 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ043 iJcicZ043:xJcicZ043) {
 					if(iJcicZ043.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -616,7 +628,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "044":
-				Slice<JcicZ044> xJcicZ044 = sJcicZ044Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ044> xJcicZ044 = sJcicZ044Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ044 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ044 iJcicZ044:xJcicZ044) {
 					if(iJcicZ044.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -627,7 +642,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "045":
-				Slice<JcicZ045> xJcicZ045 = sJcicZ045Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ045> xJcicZ045 = sJcicZ045Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ045 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ045 iJcicZ045:xJcicZ045) {
 					if(iJcicZ045.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -638,7 +656,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "046":
-				Slice<JcicZ046> xJcicZ046 = sJcicZ046Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ046> xJcicZ046 = sJcicZ046Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ046 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ046 iJcicZ046:xJcicZ046) {
 					if(iJcicZ046.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -649,7 +670,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "047":
-				Slice<JcicZ047> xJcicZ047 = sJcicZ047Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ047> xJcicZ047 = sJcicZ047Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ047 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ047 iJcicZ047:xJcicZ047) {
 					if(iJcicZ047.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -660,7 +684,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "048":
-				Slice<JcicZ048> xJcicZ048 = sJcicZ048Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ048> xJcicZ048 = sJcicZ048Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ048 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ048 iJcicZ048:xJcicZ048) {
 					if(iJcicZ048.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -671,7 +698,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "049":
-				Slice<JcicZ049> xJcicZ049 = sJcicZ049Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ049> xJcicZ049 = sJcicZ049Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ049 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ049 iJcicZ049:xJcicZ049) {
 					if(iJcicZ049.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -682,7 +712,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "050":
-				Slice<JcicZ050> xJcicZ050 = sJcicZ050Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ050> xJcicZ050 = sJcicZ050Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ050 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ050 iJcicZ050:xJcicZ050) {
 					if(iJcicZ050.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -693,7 +726,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "051":
-				Slice<JcicZ051> xJcicZ051 = sJcicZ051Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ051> xJcicZ051 = sJcicZ051Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ051 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ051 iJcicZ051:xJcicZ051) {
 					if(iJcicZ051.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -704,7 +740,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "052":
-				Slice<JcicZ052> xJcicZ052 = sJcicZ052Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ052> xJcicZ052 = sJcicZ052Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ052 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ052 iJcicZ052:xJcicZ052) {
 					if(iJcicZ052.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -715,7 +754,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "053":
-				Slice<JcicZ053> xJcicZ053 = sJcicZ053Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ053> xJcicZ053 = sJcicZ053Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ053 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ053 iJcicZ053:xJcicZ053) {
 					if(iJcicZ053.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -726,7 +768,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "054":
-				Slice<JcicZ054> xJcicZ054 = sJcicZ054Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ054> xJcicZ054 = sJcicZ054Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ054 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ054 iJcicZ054:xJcicZ054) {
 					if(iJcicZ054.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -737,7 +782,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "055":
-				Slice<JcicZ055> xJcicZ055 = sJcicZ055Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ055> xJcicZ055 = sJcicZ055Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ055 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ055 iJcicZ055:xJcicZ055) {
 					if(iJcicZ055.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -748,7 +796,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "056":
-				Slice<JcicZ056> xJcicZ056 = sJcicZ056Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ056> xJcicZ056 = sJcicZ056Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ056 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ056 iJcicZ056:xJcicZ056) {
 					if(iJcicZ056.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -759,7 +810,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "060":
-				Slice<JcicZ060> xJcicZ060 = sJcicZ060Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ060> xJcicZ060 = sJcicZ060Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ060 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ060 iJcicZ060:xJcicZ060) {
 					if(iJcicZ060.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -770,7 +824,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "061":
-				Slice<JcicZ061> xJcicZ061 = sJcicZ061Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ061> xJcicZ061 = sJcicZ061Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ061 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ061 iJcicZ061:xJcicZ061) {
 					if(iJcicZ061.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -781,7 +838,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "062":
-				Slice<JcicZ062> xJcicZ062 = sJcicZ062Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ062> xJcicZ062 = sJcicZ062Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ062 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ062 iJcicZ062:xJcicZ062) {
 					if(iJcicZ062.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -792,7 +852,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "063":
-				Slice<JcicZ063> xJcicZ063 = sJcicZ063Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ063> xJcicZ063 = sJcicZ063Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ063 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ063 iJcicZ063:xJcicZ063) {
 					if(iJcicZ063.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -803,7 +866,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "440":
-				Slice<JcicZ440> xJcicZ440 = sJcicZ440Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ440> xJcicZ440 = sJcicZ440Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ440 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ440 iJcicZ440:xJcicZ440) {
 					if(iJcicZ440.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -814,7 +880,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "442":
-				Slice<JcicZ442> xJcicZ442 = sJcicZ442Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ442> xJcicZ442 = sJcicZ442Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ442 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ442 iJcicZ442:xJcicZ442) {
 					if(iJcicZ442.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -825,7 +894,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "443":
-				Slice<JcicZ443> xJcicZ443 = sJcicZ443Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ443> xJcicZ443 = sJcicZ443Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ443 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ443 iJcicZ443:xJcicZ443) {
 					if(iJcicZ443.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -836,7 +908,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "444":
-				Slice<JcicZ444> xJcicZ444 = sJcicZ444Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ444> xJcicZ444 = sJcicZ444Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ444 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ444 iJcicZ444:xJcicZ444) {
 					if(iJcicZ444.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -847,7 +922,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "446":
-				Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ446 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ446 iJcicZ446:xJcicZ446) {
 					if(iJcicZ446.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -858,7 +936,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "447":
-				Slice<JcicZ447> xJcicZ447 = sJcicZ447Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ447> xJcicZ447 = sJcicZ447Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ447 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ447 iJcicZ447:xJcicZ447) {
 					if(iJcicZ447.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -869,7 +950,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "448":
-				Slice<JcicZ448> xJcicZ448 = sJcicZ448Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ448> xJcicZ448 = sJcicZ448Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ448 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ448 iJcicZ448:xJcicZ448) {
 					if(iJcicZ448.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -880,7 +964,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "450":
-				Slice<JcicZ450> xJcicZ450 = sJcicZ450Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ450> xJcicZ450 = sJcicZ450Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ450 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ450 iJcicZ450:xJcicZ450) {
 					if(iJcicZ450.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -891,7 +978,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "451":
-				Slice<JcicZ451> xJcicZ451 = sJcicZ451Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ451> xJcicZ451 = sJcicZ451Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ451 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ451 iJcicZ451:xJcicZ451) {
 					if(iJcicZ451.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -902,7 +992,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "454":
-				Slice<JcicZ454> xJcicZ454 = sJcicZ454Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ454> xJcicZ454 = sJcicZ454Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ454 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ454 iJcicZ454:xJcicZ454) {
 					if(iJcicZ454.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -913,7 +1006,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "570":
-				Slice<JcicZ570> xJcicZ570 = sJcicZ570Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ570> xJcicZ570 = sJcicZ570Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ570 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ570 iJcicZ571:xJcicZ570) {
 					if(iJcicZ571.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -924,7 +1020,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "571":
-				Slice<JcicZ571> xJcicZ571 = sJcicZ571Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ571> xJcicZ571 = sJcicZ571Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ571 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ571 iJcicZ571:xJcicZ571) {
 					if(iJcicZ571.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -935,7 +1034,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "572":
-				Slice<JcicZ572> xJcicZ572 = sJcicZ572Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ572> xJcicZ572 = sJcicZ572Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ572 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ572 iJcicZ572:xJcicZ572) {
 					if(iJcicZ572.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -946,7 +1048,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "573":
-				Slice<JcicZ573> xJcicZ573 = sJcicZ573Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ573> xJcicZ573 = sJcicZ573Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ573 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ573 iJcicZ573:xJcicZ573) {
 					if(iJcicZ573.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -957,7 +1062,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "574":
-				Slice<JcicZ574> xJcicZ574 = sJcicZ574Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ574> xJcicZ574 = sJcicZ574Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ574 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ574 iJcicZ574:xJcicZ574) {
 					if(iJcicZ574.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;
@@ -968,7 +1076,10 @@ public class L8403File extends MakeFile {
 				}
 			break;
 			case "575":
-				Slice<JcicZ575> xJcicZ575 = sJcicZ575Service.findAll(this.index,this.limit, titaVo);
+				Slice<JcicZ575> xJcicZ575 = sJcicZ575Service.findAll(0,Integer.MAX_VALUE, titaVo);
+				if (xJcicZ575 == null) {
+					throw new LogicException(titaVo, "E2003", "查無可轉出資料");
+				}
 				for(JcicZ575 iJcicZ575:xJcicZ575) {
 					if(iJcicZ575.getOutJcicTxtDate()==0) {
 						iTotalCount += 1;

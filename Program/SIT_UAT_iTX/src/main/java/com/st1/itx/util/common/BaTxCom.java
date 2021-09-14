@@ -1009,18 +1009,27 @@ public class BaTxCom extends TradeBuffer {
 									break;
 								case "TMI": // 未收火險保費
 									baTxVo.setRepayType(5); // 05-火險費
-									// 0：fireFee(全部)、unOpenfireFee(續約保單起日 >=入帳日)，fireFee內含unOpenfireFee ==== 還款類別 =
-									// 03-結案, 99-費用全部
-									// 1：fireFee(續約保單起日 <= 入帳月)、 unOpenfireFee(續約保單起日 > 入帳月) ==== 還款類別 =
-									// 01-期款、02-部分部分償還、...
-									// 2：fireFee(續約保單起日 < 入帳日)、 unOpenfireFee(續約保單起日 >=入帳日) === 還款類別 = 05-火險費
-									if (isUnOpenfireFee == 0) {
+// 0. 還款類別 =	 03-結案, 99-費用全部									
+//   fireFee       : 全部
+//   unOpenfireFee : 續約保單起日 >=入帳日
+//    
+// 1. 還款類別 = 01-期款、02-部分部分償還
+//   fireFee       : 續約保單起日 <= 入帳月
+//   unOpenfireFee : 續約保單起日 > 入帳月
+//									
+// 2.還款類別 = 05-火險費								
+//   fireFee       : 全部
+//   unOpenfireFee : 續約保單起日 >=入帳日
+									switch (isUnOpenfireFee) {
+									case 0:
+									case 2:
 										baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 										this.fireFee = this.fireFee.add(rv.getRvBal());
 										if (rv.getOpenAcDate() >= iEntryDate) {
 											this.unOpenfireFee = this.unOpenfireFee.add(rv.getRvBal());
 										}
-									} else if (isUnOpenfireFee == 1) {
+										break;
+									case 1:
 										if ((rv.getOpenAcDate() / 100) <= (iEntryDate / 100)) {
 											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 											this.fireFee = this.fireFee.add(rv.getRvBal());
@@ -1028,14 +1037,7 @@ public class BaTxCom extends TradeBuffer {
 											baTxVo.setDataKind(6); // 6.另收欠款(未到期火險費用)
 											this.unOpenfireFee = this.unOpenfireFee.add(rv.getRvBal());
 										}
-									} else {
-										if (rv.getOpenAcDate() < iEntryDate) {
-											baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
-											this.fireFee = this.fireFee.add(rv.getRvBal());
-										} else {
-											baTxVo.setDataKind(6); // 6.另收欠款(未到期火險費用)
-											this.unOpenfireFee = this.unOpenfireFee.add(rv.getRvBal());
-										}
+										break;
 									}
 									break;
 								case "F09": // F09 暫付款－火險保費

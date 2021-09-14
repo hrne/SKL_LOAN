@@ -16,15 +16,21 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ442;
+import com.st1.itx.db.domain.JcicZ443;
+import com.st1.itx.db.domain.JcicZ446;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ448;
 import com.st1.itx.db.domain.JcicZ448Id;
 import com.st1.itx.db.domain.JcicZ448Log;
+import com.st1.itx.db.domain.JcicZ454;
+import com.st1.itx.db.service.JcicZ442Service;
+import com.st1.itx.db.service.JcicZ443Service;
+import com.st1.itx.db.service.JcicZ446Service;
 import com.st1.itx.db.service.JcicZ448LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ448Service;
-
+import com.st1.itx.db.service.JcicZ454Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -37,15 +43,23 @@ import com.st1.itx.util.data.DataLog;
 /**
  * 
  * 
- * @author Luisito
+ * @author Luisito / Mata
  * @version 1.0.0
  */
 public class L8328 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ442Service sJcicZ442Service;
+	@Autowired
+	public JcicZ443Service sJcicZ443Service;
+	@Autowired
+	public JcicZ446Service sJcicZ446Service;
+	@Autowired
 	public JcicZ448Service sJcicZ448Service;
 	@Autowired
 	public JcicZ448LogService sJcicZ448LogService;
+	@Autowired
+	public JcicZ454Service sJcicZ454Service;
 	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
@@ -67,6 +81,7 @@ public class L8328 extends TradeBuffer {
 		int iSignOther = Integer.valueOf(titaVo.getParam("SignOther"));
 		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage"));
 		int iAcQuitAmt = Integer.valueOf(titaVo.getParam("AcQuitAmt"));
+		int ixApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"))+19110000;
 		String iKey = "";
 		//JcicZ448
 		JcicZ448 iJcicZ448 = new JcicZ448();
@@ -77,7 +92,83 @@ public class L8328 extends TradeBuffer {
 		iJcicZ448Id.setCourtCode(iCourtCode);
 		iJcicZ448Id.setMaxMainCode(iMaxMainCode);
 		JcicZ448 chJcicZ448 = new JcicZ448();
+		//檢核項目(D-56)
+		//同一key值之「應回報債權金融機構」皆已回報「'442':回報無擔保債權金額資料」、「'443':回報有擔保債權金額資料」檔案資料(交易代碼為X不需檢核)
+		//二start
+		if (iTranKey.equals("X")) {
+		}else {
+			Slice<JcicZ442> xJcicZ442 = sJcicZ442Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+			if (xJcicZ442 == null) {
+				throw new LogicException(titaVo, "E0001", ""); 
+			}
+			for(JcicZ442 xoJcicZ442:xJcicZ442) {
+				String iSubmitKey442 = xoJcicZ442.getSubmitKey();
+				String iCustId442 = xoJcicZ442.getCustId();
+				if(iCustId == iCustId442) {
+					if(iSubmitKey != iSubmitKey442) {
+						throw new LogicException(titaVo, "E0005", "「應回報債權金融機構」未回報「'442':回報無擔保債權金額資料」"); 
+					}
+				}
+			}
+			Slice<JcicZ443> xJcicZ443 = sJcicZ443Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+			if (xJcicZ443 == null) {
+				throw new LogicException(titaVo, "E0001", ""); 
+			}
+			for(JcicZ443 xoJcicZ443:xJcicZ443) {
+				String iSubmitKey443 = xoJcicZ443.getSubmitKey();
+				String iCustId443 = xoJcicZ443.getCustId();
+				if(iCustId == iCustId443) {
+					if(iSubmitKey != iSubmitKey443) {
+						throw new LogicException(titaVo, "E0005", "「應回報債權金融機構」未回報「'443':回報有擔保債權金額資料」"); 
+					}
+				}
+			}
+		}
+		//二end
+		//「簽約金額-本金」需等於該債權金融機構報送之「'442'回報無擔保債權金額資料」之17(信用放款本金)+21(現金卡本金)+25(信用卡本金)+29(保證債權本金)欄位加總(交易代碼為X不需檢核)「」
+		//三start
+		if (iTranKey.equals("X")) {
+		}else {
+			Slice<JcicZ442> xJcicZ442 = sJcicZ442Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+			if (xJcicZ442 == null) {
+				throw new LogicException(titaVo, "E0001", ""); 
+			}
+			for(JcicZ442 xoJcicZ442:xJcicZ442) {
+				int iReceExpPrin442 = xoJcicZ442.getReceExpPrin();
+				int iCashCardPrin442 = xoJcicZ442.getCashCardPrin();
+				int iCreditCardPrin442 = xoJcicZ442.getCreditCardPrin();
+				int iGuarObliPrin442 = xoJcicZ442.getGuarObliPrin();
+				String iCustId442 = xoJcicZ442.getCustId();
+				String iSubmitKey442 = xoJcicZ442.getSubmitKey();
+				if(iCustId == iCustId442 && iSubmitKey442 == iSubmitKey) {
+					if((iReceExpPrin442+iCashCardPrin442+iCreditCardPrin442+iGuarObliPrin442) != iSignPrin) {
+						throw new LogicException(titaVo, "E0005","「簽約金額-本金」需等於該債權金融機構報送之「'442'回報無擔保債權金額資料」之17(信用放款本金)+21(現金卡本金)+25(信用卡本金)+29(保證債權本金)欄位加總");
+					}
+				}
+			}
+		}
+		//三end
+		//各債權金融機構「債權比例」加總需為100.00%
+		//四start OwnPercentage 需提問嘉榮
 		
+		//四end
+		//任一債權金融機構報送同一key值'454'單獨受償檔案資料後，本檔案資料不得異動、刪除或補件
+		//五start
+		if(iTranKey.equals("A")) {
+		}else {
+		Slice<JcicZ454> xJcicZ454 = sJcicZ454Service.custIdEq(iCustId, this.index, this.limit, titaVo);
+		if (xJcicZ454 != null) {
+			throw new LogicException(titaVo, "E0005","任一債權金融機構報送同一key值'454'單獨受償檔案資料後，本檔案資料不得異動、刪除或補件");
+			}
+		}
+		//五end
+		//同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料
+		//六start 
+		Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.otherEq(iSubmitKey,iCustId,ixApplyDate,iCourtCode, this.index, this.limit, titaVo);
+		if (xJcicZ446 != null) {
+			throw new LogicException(titaVo, "E0005","同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料");
+		}
+		//六end
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ448

@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8323]                                 (442)前置調解回報無擔保債權金額資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 [#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
 [#<->#,"#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
@@ -282,6 +283,10 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r40TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(2,@RimJcicBankCode,#CourtCode)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@CourtCodeX,#L8r01JcicBankName)
 ! 調Rim相關 結束
 
 ![交易代碼]

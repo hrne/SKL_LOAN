@@ -39,7 +39,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6903 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6903.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -89,9 +88,7 @@ public class L6903 extends TradeBuffer {
 		this.limit = 100; // 305 * 100 = 30,500
 
 		// 查詢會計總帳檔
-		AcMain tAcMain = sAcMainService.findById(
-				new AcMainId(iAcBookCode, iAcSubBookCode+"%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt),
-				titaVo);
+		AcMain tAcMain = sAcMainService.findById(new AcMainId(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt), titaVo);
 		if (tAcMain == null) {
 			// throw new LogicException(titaVo, "E0001", "會計總帳檔"); // 查無資料
 			wkBal = new BigDecimal(0);
@@ -101,8 +98,8 @@ public class L6903 extends TradeBuffer {
 
 		// 查詢會計帳務明細檔
 		Slice<AcDetail> slAcDetail;
-		slAcDetail = sAcDetailService.acdtlAcDateRange(iAcBookCode, iAcSubBookCode+"%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode,
-				iFAcDateSt, iFAcDateEd, this.index, this.limit, titaVo);
+		slAcDetail = sAcDetailService.acdtlAcDateRange(iAcBookCode, iAcSubBookCode + "%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iFAcDateSt, iFAcDateEd, this.index, this.limit,
+				titaVo);
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 		if (lAcDetail == null || lAcDetail.size() == 0) {
@@ -111,10 +108,8 @@ public class L6903 extends TradeBuffer {
 		// 如有找到資料
 		for (AcDetail tAcDetail : lAcDetail) {
 
-			this.info("L6903 AcNoCode : " + iAcBookCode + "-" + iAcNoCode + "-" + iAcSubCode + "-" + iAcDtlCode + "-"
-					+ tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-" + tAcDetail.getAcDtlCode() + "-"
-					+ tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-"
-					+ tAcDetail.getEntAc());
+			this.info("L6903 AcNoCode : " + iAcBookCode + "-" + iAcNoCode + "-" + iAcSubCode + "-" + iAcDtlCode + "-" + tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-"
+					+ tAcDetail.getAcDtlCode() + "-" + tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-" + tAcDetail.getEntAc());
 
 			// 不含未入帳,例如:未放行之交易
 			// 0:未入帳 1:已入帳 2:被沖正(隔日訂正) 3.沖正(隔日訂正)
@@ -167,6 +162,7 @@ public class L6903 extends TradeBuffer {
 
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOAcDate", tAcDetail.getAcDate());
+			occursList.putParam("OORelDy", tAcDetail.getRelDy());
 			occursList.putParam("OORelTxseq", tAcDetail.getRelTxseq());
 			iTranItem = "";
 			iTranItem = inqTxTranCode(tAcDetail.getTitaTxCd(), iTranItem, titaVo);

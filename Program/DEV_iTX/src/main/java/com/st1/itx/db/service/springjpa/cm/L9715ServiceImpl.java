@@ -73,11 +73,12 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT \"Fn_GetEmpName\"(FAC.\"BusinessOfficer\",1) ";
 		sql += "                                AS F0 "; // -- 經辦
 		sql += "      , CITY.\"CityItem\"         AS F1 "; // -- 擔保品地區別
-		sql += "      , \"Fn_GetCdCode\"('RepayCode', FAC.\"RepayCode\") ";
+		sql += "      , \"Fn_GetCdCode\"('RepayCode', LPAD(FAC.\"RepayCode\",2,'0')) ";
 		sql += "                                AS F2 "; // -- 繳款方式
 		sql += "      , COLL.\"CustNo\"           AS F3 "; // -- 戶號
 		sql += "      , COLL.\"FacmNo\"           AS F4 "; // -- 額度
-		sql += "      , CM.\"CustName\"           AS F5 "; // -- 額度
+		sql += "      , SUBSTR(CM.\"CustName\",0,10) ";
+		sql += "                                  AS F5 "; // -- 戶名
 		sql += "      , FAC.\"FirstDrawdownDate\" AS F6 "; // -- 初貸日
 		sql += "      , COLL.\"PrinBalance\"      AS F7 "; // -- 本金餘額
 		sql += "      , NVL(LBM.\"StoreRate\",0)  AS F8 "; // -- 利率

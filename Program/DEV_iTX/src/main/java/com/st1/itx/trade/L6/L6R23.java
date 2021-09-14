@@ -31,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R23 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R23.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -94,8 +93,8 @@ public class L6R23 extends TradeBuffer {
 				throw new LogicException(titaVo, "E6006", iRimAcNoCode + "-" + iRimAcSubCode + "-" + iRimAcDtlCode); // 資負明細科目不可經由[其他傳票輸入]交易入帳
 			} else if (iRimTxCode.equals("L6201") && iRimFuncCode == 5 && (tCdAcCode.getClassCode() != 0)) {
 				throw new LogicException(titaVo, "E6007", iRimAcNoCode + "-" + iRimAcSubCode + "-" + iRimAcDtlCode); // 非可入帳科目
-			} else if (iRimTxCode.equals("L6908") && iRimFuncCode == 5 && (tCdAcCode.getReceivableFlag() == 0) && (!(tCdAcCode.getAcctFlag() == 1))) {
-				throw new LogicException(titaVo, "E6009", iRimAcNoCode + "-" + iRimAcSubCode + "-" + iRimAcDtlCode); // 銷帳科目記號不符
+//			} else if (iRimTxCode.equals("L6908") && iRimFuncCode == 5 && (tCdAcCode.getReceivableFlag() == 0) && (!(tCdAcCode.getAcctFlag() == 1))) {
+//				throw new LogicException(titaVo, "E6009", iRimAcNoCode + "-" + iRimAcSubCode + "-" + iRimAcDtlCode); // 銷帳科目記號不符
 			} else {
 				/* 將每筆資料放入Tota */
 				moveTotaCdAcCode(tCdAcCode);
