@@ -22,11 +22,11 @@ E(0,0)
 [
 ["[L4611]                                 續約保單資料維護"],
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
-[#<->#,"#FdCustNo+借款人戶號",#CustNo,#CustNoX,"-",#FacmNo,#FacmNoX,#CustName],
-[#<->#,"#FdInsuYearMonth+年月份",#InsuYearMonth,#InsuYearMonthX],
-[#<->#,"#FdClCode1+擔保品編號",#ClCode1,#LableClCode1,"-",#ClCode2,#LableClCode2,"-",#ClNo,#LableClNo],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,#CustName],
+[#<->#,"#FdInsuYearMonth+年月份",#InsuYearMonth],
+[#<->#,"#FdClCode1+擔保品編號",#ClCode1,"-",#ClCode2,"-",#ClNo],
 [#<->#,"#FdPrevInsuNo+原保單號碼",#PrevInsuNo],
-["#FdEndoInsuNo+批單號碼",#EndoInsuNo,#EndoInsuNoX],[#LableA,#NowInsuNo,#NowInsuNoX],
+["#FdEndoInsuNo+批單號碼",#EndoInsuNo],[#LableA,#NowInsuNo],
 ["#FdFireInsuCovrg+火險保額",#FireInsuCovrg],["#FdNewFireInsuCovrg+維護後-火險保額",#NewFireInsuCovrg],
 ["#FdFireInsuPrem+火險保費",#FireInsuPrem],["#FdNewFireInsuPrem+維護後-火險保費",#NewFireInsuPrem],
 ["#FdEthqInsuCovrg+地震險保額",#EthqInsuCovrg],["#FdNewEthqInsuCovrg+維護後-地震險保額",#NewEthqInsuCovrg],
@@ -112,12 +112,76 @@ T(1,@FunctionCode,#NTXBUF,1,1)
 T(1,@ClCode1,#NTXBUF,2,1)
 T(1,@ClCode2,#NTXBUF,3,2)
 T(1,@ClNo,#NTXBUF,5,7)
-T(1,@LableClCode1,#NTXBUF,2,1)
-T(1,@LableClCode2,#NTXBUF,3,2)
-T(1,@LableClNo,#NTXBUF,5,7)
 T(1,@PrevInsuNo,#NTXBUF,12,16)
 T(1,@EndoInsuNo,#NTXBUF,28,16)
 T(1,@RenewCode,#NTXBUF,44,1)
+
+
+
+#INIT=X,1,S
+C(3,#FunctionCode,1,INVOKEJS(SHOW,p1,16,18,0),INVOKEJS(SHOW,p1,16,18,1))
+
+#Function1=X,1,S
+IF(#FunctionCode==1,$,S)
+T(F,@NowInsuNo,0)
+T(F,@NewFireInsuCovrg,0)
+T(F,@NewFireInsuPrem,0)
+T(F,@NewEthqInsuCovrg,0)
+T(F,@NewEthqInsuPrem,0)
+T(F,@NewInsuStartDate,0)
+T(F,@NewInsuEndDate,0)
+
+
+#Function2=X,1,S
+IF(#FunctionCode==2 || #FunctionCode==6,$,S)
+T(F,@CustNo,0)
+T(F,@FacmNo,0)
+T(F,@InsuYearMonth,0)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@PrevInsuNo,0)
+T(F,@EndoInsuNo,0)
+T(F,@FireInsuCovrg,0)
+T(F,@FireInsuPrem,0)
+T(F,@EthqInsuCovrg,0)
+T(F,@EthqInsuPrem,0)
+T(F,@InsuStartDate,0)
+T(F,@InsuEndDate,0)
+
+IF(#FunctionCode==6,$,S)
+T(F,@RenewCode,0)
+E(0,@RenewCode,1)
+
+#Function4=X,1,S
+IF(#FunctionCode==4,$,S)
+T(F,@CustNo,0)
+T(F,@FacmNo,0)
+T(F,@InsuYearMonth,0)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@PrevInsuNo,0)
+T(F,@EndoInsuNo,0)
+T(F,@NowInsuNo,0)
+T(F,@FireInsuCovrg,0)
+T(F,@FireInsuPrem,0)
+T(F,@EthqInsuCovrg,0)
+T(F,@EthqInsuPrem,0)
+T(F,@InsuStartDate,0)
+T(F,@InsuEndDate,0)
+T(F,@NewFireInsuCovrg,0)
+T(F,@NewFireInsuPrem,0)
+T(F,@NewEthqInsuCovrg,0)
+T(F,@NewEthqInsuPrem,0)
+T(F,@NewInsuStartDate,0)
+T(F,@NewInsuEndDate,0)
+T(F,@RenewCode,0)
+
+T(F,@InsuCompany,0)
+T(F,@InsuTypeCode,0)
+T(F,@StatusCode,0)
+
 
 ! 修改、刪除調Rim
 <include src="ROM.icf::L4R18.dec"/>
@@ -148,8 +212,8 @@ E(0,@CustNo,#L4r18CustNo)
 E(0,@FacmNo,#L4r18FacmNo)
 E(0,@InsuYearMonth,#L4r18InsuYearMonth)
 
-C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo),T(2,@PrevInsuNo,#L4r18NowInsuNo)),T(2,@NowInsuNo,#L4r18NowInsuNo))
-
+!C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo),T(2,@PrevInsuNo,#L4r18NowInsuNo)),T(2,@NowInsuNo,#L4r18NowInsuNo))
+C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,T(2,@NowInsuNo,#L4r18NowInsuNo)),T(2,@NowInsuNo,#L4r18NowInsuNo))
 
 T(2,@EndoInsuNo,#L4r18EndoInsuNo)
 E(0,@FireInsuCovrg,#L4r18FireInsuCovrg)
@@ -169,7 +233,7 @@ T(2,@InsuTypeCode,#L4r18InsuTypeCode)
 
 
 #SelfInsuCodeHelp2=x,30,S
-T(3,0:新保;1:自保;2:續保)
+T(3,1:自保;2:續保)
 
 ! 自保續保
 #RenewCodeX=x,4,L
@@ -220,11 +284,6 @@ E(0,@NewEthqInsuCovrg,#EthqInsuCovrg)
 E(0,@NewEthqInsuPrem,#EthqInsuPrem)
 C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,E(0,@NewInsuStartDate,#InsuStartDate),E(0,@NewInsuStartDate,#InsuEndDate)),E(0,@NewInsuStartDate,#InsuStartDate))
 C(3,#FunctionCode,6,C(4,#L4r18NowInsuNo,E(0,@NewInsuEndDate,#InsuEndDate),E(0,@NewInsuEndDate,#InsuEndDate+10000)),E(0,@NewInsuEndDate,#InsuEndDate))
-E(0,@CustNoX,#CustNo)
-E(0,@FacmNoX,#FacmNo)
-E(0,@InsuYearMonthX,#InsuYearMonth)
-T(2,@NowInsuNoX,#NowInsuNo)
-T(2,@EndoInsuNoX,#EndoInsuNo)
 E(0,@TotalPrem,#EthqInsuPrem+#FireInsuPrem)
 SWITCH(#StatusCode,0,T(3,@StatusCodeX,正常),1,T(3,@StatusCodeX,借支),2,T(3,@StatusCodeX,催收),3,T(3,@StatusCodeX,呆帳),T(3,@StatusCodeX, ))
 
@@ -241,38 +300,15 @@ T(H,#InsuTypeCode,#InsuTypeCodeHelp)
 T(2,@InsuTypeCodeX,#InsuTypeCodePreX)
 
 
-! 欄位變化
-! 狀態:自保能維護狀態
-#ColDisplay=A,1,S
-C(3,#L4r18CustNo,0,
-SHOW(#ClCode1,#ClCode2,#ClNo,#CustNo,#FacmNo,#InsuYearMonth,#NowInsuNo,#EndoInsuNo)
-HIDE(#LableClCode1,#LableClCode2,#LableClNo,#CustNoX,#FacmNoX,#InsuYearMonthX,#NowInsuNoX,#StatusCode,#EndoInsuNoX),
-HIDE(#ClCode1,#ClCode2,#ClNo,#CustNo,#FacmNo,#InsuYearMonth,#NowInsuNo,#EndoInsuNo)
-SHOW(#LableClCode1,#LableClCode2,#LableClNo,#CustNoX,#FacmNoX,#InsuYearMonthX,#NowInsuNoX,#StatusCode,#EndoInsuNoX))
-C(3,#FunctionCode,6,SHOW(#NowInsuNo)HIDE(#NowInsuNoX),IF(#FunctionCode==2&&#RenewCode==1,SHOW(#NowInsuNo)HIDE(#NowInsuNoX),SHOW(#NowInsuNoX)HIDE(#NowInsuNo)))
-C(3,#FunctionCode,2,SHOW(#RenewCode),HIDE(#RenewCode))
-C(3,#FunctionCode,1,T(F,#EndoInsuNo,0),$)
-C(3,#FunctionCode,4,
-T(F,#NewFireInsuCovrg,0)
-T(F,#NewFireInsuPrem,0)
-T(F,#NewEthqInsuCovrg,0)
-T(F,#NewEthqInsuPrem,0)
-T(F,#NewInsuStartDate,0)
-T(F,#NewInsuEndDate,0)
-HIDE(#InsuCompany,#InsuTypeCode,#StatusCode)
-,$)
-
 !借款人戶號 
 #CustNo=A,7,I
 C(3,#L4r18CustNo,0,$,s)
 @V(2,0)
-#CustNoX=A,7,L
 
 ! 額度
 #FacmNo=A,3,I
 C(3,#L4r18CustNo,0,$,s)
 @V(2,0)
-#FacmNoX=A,3,L
 
 #CustName=X,10,L
 
@@ -281,107 +317,113 @@ C(3,#L4r18CustNo,0,$,s)
 C(3,#L4r18CustNo,0,$,s)
 @V(2,0)
 A(YM,1,#InsuYearMonth)
-#InsuYearMonthX=A,5,L
+
 
 !擔保品編號 
 #ClCode1=A,1,I
-IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
-!擔保品編號 
-#LableClCode1=A,1,L
+C(3,#FunctionCode,1,$,s)
+@V(2,0)
+!IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
 
 !擔保品編號 
 #ClCode2=A,2,I
-IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
-#LableClCode2=A,2,L
+!IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
+C(3,#FunctionCode,1,$,s)
+@V(2,0)
 
 !擔保品編號 
 #ClNo=A,7,I
-IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
+!IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,C(3,#L4r18CustNo,0,$,s)))
+C(3,#FunctionCode,1,$,s)
+@V(2,0)
 
-#LableClNo=A,7,L
 
 !原保單號碼
-#PrevInsuNo=X,16,L
+#PrevInsuNo=X,16,I
+C(3,#FunctionCode,1,$,s)
+@V(7)
 
 !批單號碼
 !僅新增與可KeyIn(修改需先刪除後再新增)
-#EndoInsuNo=X,16,I
-C(3,#FunctionCode,1,S,$)
+#EndoInsuNo=X,16,L
 C(3,#L4r18CustNo,0,$,s)
-
-#EndoInsuNoX=X,16,L
 
 #LableA=x,15,L
 
 !新保單號碼
 !僅新增與自保可KeyIn，或修改的自保件
 #NowInsuNo=X,16,I
-IF(#FunctionCode==1,$,IF(#FunctionCode==6,$,IF(#FunctionCode==2&&#RenewCode==1,$,s)))
-@
-IF(#FunctionCode==6,V(7),s)
-
-#NowInsuNoX=X,16,L
+IF(#FunctionCode==2 || #FunctionCode==6,$,s)
+@IF(#FunctionCode==6,V(7),$)
 
 !火險保額
-#FireInsuCovrg=m,14,L
+#FireInsuCovrg=m,14,I
+C(3,#FunctionCode,1,$,s)
 
 !新火險保額
 #NewFireInsuCovrg=m,14,I
-C(2,#FunctionCode,s,$,$,s,s,s,$)
+IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 
 !火險保費
-#FireInsuPrem=m,14,L
+#FireInsuPrem=m,14,I
+C(3,#FunctionCode,1,$,s)
 
 !新火險保費
 #NewFireInsuPrem=m,14,I
-C(2,#FunctionCode,s,$,$,s,s,s,$)
+IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 
 !地震險保額
-#EthqInsuCovrg=m,14,L
+#EthqInsuCovrg=m,14,I
+C(3,#FunctionCode,1,$,s)
 
 !新地震險保額
 #NewEthqInsuCovrg=m,14,I
-C(2,#FunctionCode,s,$,$,s,s,s,$)
+IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 
 !檢查 地震險保險金額 + 火災險保險金額 > 0
 #CHECK_AMT=m,14.2,S
-E(2,#NewFireInsuCovrg+#NewEthqInsuCovrg)
-C(2,#FunctionCode,s,$,$,s,s,s,s)
+IF(#FunctionCode == 1,E(2,#FireInsuCovrg+#EthqInsuCovrg),E(2,#NewFireInsuCovrg+#NewEthqInsuCovrg))
+@
 IF(#CHECK_AMT==0,V(P,保險金額不可皆為0),$)
 
 
 !地震險保費
-#EthqInsuPrem=m,14,L
+#EthqInsuPrem=m,14,I
+C(3,#FunctionCode,1,$,s)
 
 !新地震險保費
 #NewEthqInsuPrem=m,14,I
-C(2,#FunctionCode,s,$,$,s,s,s,$)
+IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 
 !檢查 地震險保費 + 火災險保費 > 0
 #CHECK_FEE=m,14,S
-E(2,@TotalPrem,#NewFireInsuPrem+#NewEthqInsuPrem)
-C(2,#FunctionCode,s,$,$,s,s,s,s)
+IF(#FunctionCode == 1,E(2,@TotalPrem,#FireInsuPrem+#EthqInsuPrem),E(2,@TotalPrem,#NewFireInsuPrem+#NewEthqInsuPrem))
+@
 IF(#TotalPrem==0,V(P,保費不可皆為0),$)
 
 !保險起日
-#InsuStartDate=D,7,L
+#InsuStartDate=D,7,I
+C(3,#FunctionCode,1,$,s)
+@V(7)A(DATE,0,#InsuStartDate)
 
 !新保險起日
 #NewInsuStartDate=D,7,I
-C(2,#FunctionCode,s,$,$,s,s,s,$)
+IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 @V(7)A(DATE,0,#NewInsuStartDate)
 
 !保險迄日
-#InsuEndDate=D,7,L
+#InsuEndDate=D,7,I
+C(3,#FunctionCode,1,$,s)
+@V(7)A(DATE,0,#InsuEndDate)
 
 !新保險迄日
 #NewInsuEndDate=D,7,I
-C(2,#FunctionCode,s,$,$,s,s,s,$)
+IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 @V(7)A(DATE,0,#NewInsuEndDate)
 
 ! 自保續保
 #RenewCode=A,1,I
-C(3,#FunctionCode,2,$,s)
+IF(#FunctionCode==1 || #FunctionCode==2 ,$,s)
 HELP(#SelfInsuCodeHelp2)
 @V(H,#SelfInsuCodeHelp2)
 ! 自保續保
@@ -393,7 +435,7 @@ T(3,)T(H,#RenewCode,#SelfInsuCodeHelp2)
 
 ! 保險公司
 #InsuCompany=A,2,I
-C(2,#FunctionCode,s,$,$,s,s,s)
+IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 HELP(#InsuCompanyHelp)
 @V(H,#InsuCompanyHelp)
 
@@ -403,7 +445,7 @@ T(H,#InsuCompany,#InsuCompanyHelp)
 
 ! 保險類別
 #InsuTypeCode=A,2,I
-C(2,#FunctionCode,s,$,$,s,s,s)
+IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 HELP(#InsuTypeCodeHelp)
 @C(4,#InsuTypeCode,S,$)       
 V(H,#InsuTypeCodeHelp)
@@ -415,22 +457,22 @@ T(H,#InsuTypeCode,#InsuTypeCodeHelp)
 
 !會計日期
 #AcDate=D,7,L
-C(2,#FunctionCode,s,$,$,s,s,s,s)
 
 !入通知檔
 #NotiTempFg=X,1,L
-C(2,#FunctionCode,s,$,$,s,s,s,s)
 
 !交易序號
 #TitaTxtNo=A,7,L
-C(2,#FunctionCode,s,$,$,s,s,s,s)
 
 ! QC 497 可維護 & + 結案
 !處理代碼
 #StatusCode=A,1,I
-IF(#FunctionCode==1,$,IF(#FunctionCode==2,$,s))
+C(3,#FunctionCode,1,E(0,0),$)
+C(3,#FunctionCode,1,s,$)
+IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 HELP(0:正常;1:借支;2:催收;3:呆帳;4:結案)
 @V(1,0,1,2,3,4)
+
 #StatusCodeX=X,10,L
 SWITCH(#StatusCode,
 0,T(3,@StatusCodeX,正常),
@@ -442,11 +484,9 @@ T(3,@StatusCodeX, ))
 
 !轉催收日
 #OvduDate=D,7,L
-C(2,#FunctionCode,s,$,$,s,s,s,s)
 
 !轉催編號
 #OvduNo=A,10,L
-C(2,#FunctionCode,s,$,$,s,s,s,s)
 
 
 </sub>
@@ -486,6 +526,12 @@ T(3,[L4611] 火險保費資料查詢修改-依戶號)
 #PrevInsuNo
 #EndoInsuNo
 #NowInsuNo
+#FireInsuCovrg
+#FireInsuPrem
+#EthqInsuCovrg
+#EthqInsuPrem
+#InsuStartDate
+#InsuEndDate
 #NewFireInsuCovrg
 #NewFireInsuPrem
 #NewEthqInsuCovrg

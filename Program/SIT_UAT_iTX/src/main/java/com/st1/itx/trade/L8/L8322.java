@@ -90,12 +90,10 @@ public class L8322 extends TradeBuffer {
 		//檢核項目(D-44)
 		//「調解申請日」不得大於「資料報送日」
 		//三start
-		int iTest = titaVo.getEntDyI();
-		
-		iTest = 20210913;
+//		int iTest = titaVo.getEntDyI();
+//		
+//		iTest = 20210913;
 		//先用固定的日期之後再轉為非固定日期
-		String today2  = titaVo.getCalDy();
-		this.info("today2 = "+ today2);
 //		this.info("today = "+ iTest);
 //		Calendar cal = Calendar.getInstance();
 //		cal.setTime(new Date());
@@ -103,13 +101,14 @@ public class L8322 extends TradeBuffer {
 //		int month = (cal.get(Calendar.MONTH) +1)*100;
 //		int day = cal.get(Calendar.DAY_OF_MONTH);
 //		int today = year+month+day;
-		if(iTest<iApplyDate+19110000) {
+		int today = Integer.valueOf(titaVo.get("ENTDY"))+19110000;
+		if(today<iApplyDate+19110000) {
 			throw new LogicException(titaVo, "E0005","「調解申請日」不得大於「資料報送日」");
 		}
 		//三end
 		//「同意書取得日期」不得大於「資料報送日」
 		//四start
-		if(iTest<iAgreeDate+19110000) {
+		if(today<iAgreeDate+19110000) {
 			throw new LogicException(titaVo, "E0005","「同意書取得日期」不得大於「資料報送日」");
 		}
 		//四end

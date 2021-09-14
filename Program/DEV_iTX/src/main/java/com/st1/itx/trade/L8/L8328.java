@@ -99,7 +99,7 @@ public class L8328 extends TradeBuffer {
 		}else {
 			Slice<JcicZ442> xJcicZ442 = sJcicZ442Service.custIdEq(iCustId, this.index, this.limit, titaVo);
 			if (xJcicZ442 == null) {
-				throw new LogicException(titaVo, "E0001", ""); 
+				throw new LogicException(titaVo, "E0005", "查無(442)回報無擔保債權金額資料"); 
 			}
 			for(JcicZ442 xoJcicZ442:xJcicZ442) {
 				String iSubmitKey442 = xoJcicZ442.getSubmitKey();
@@ -112,7 +112,7 @@ public class L8328 extends TradeBuffer {
 			}
 			Slice<JcicZ443> xJcicZ443 = sJcicZ443Service.custIdEq(iCustId, this.index, this.limit, titaVo);
 			if (xJcicZ443 == null) {
-				throw new LogicException(titaVo, "E0001", ""); 
+				throw new LogicException(titaVo, "E0005", "查無(443)回報有擔保債權金額資料"); 
 			}
 			for(JcicZ443 xoJcicZ443:xJcicZ443) {
 				String iSubmitKey443 = xoJcicZ443.getSubmitKey();
@@ -131,7 +131,7 @@ public class L8328 extends TradeBuffer {
 		}else {
 			Slice<JcicZ442> xJcicZ442 = sJcicZ442Service.custIdEq(iCustId, this.index, this.limit, titaVo);
 			if (xJcicZ442 == null) {
-				throw new LogicException(titaVo, "E0001", ""); 
+				throw new LogicException(titaVo, "E0005", "查無(442)回報無擔保債權金額資料"); 
 			}
 			for(JcicZ442 xoJcicZ442:xJcicZ442) {
 				int iReceExpPrin442 = xoJcicZ442.getReceExpPrin();

@@ -111,7 +111,7 @@ public class L8329 extends TradeBuffer {
 		//三start
 		Slice<JcicZ450> xJcicZ450 = sJcicZ450Service.custIdEq(iCustId, this.index, this.limit, titaVo);
 		if (xJcicZ450 == null) {
-			throw new LogicException(titaVo, "E0001", ""); 
+			throw new LogicException(titaVo, "E0005", "查無(450)前置調解債務人繳款資料"); 
 		}
 		for(JcicZ450 xoJcicZ450:xJcicZ450) {
 		String ixCustId = iJcicZ450Id.getCustId();

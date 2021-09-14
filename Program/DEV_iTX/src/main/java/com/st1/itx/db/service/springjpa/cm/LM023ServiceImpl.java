@@ -124,7 +124,7 @@ public class LM023ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       		 SELECT 1          AS \"DataSeq\"";
 		sql += "            	   ,B.\"Year\"   AS \"Year\"";
 		sql += "            	   ,B.\"Month\"  AS \"Month\"";
-		sql += "            	   ,B.\"Budget\" AS \"Amt\"";
+		sql += "            	   ,B.\"Budget\" / 100000000 AS \"Amt\"";
 		sql += "       		 FROM \"CdBudget\" B";
 		sql += "       		 WHERE  B.\"Year\" = :thisYear ";
 		sql += "	  ORDER BY \"DataSeq\"";

@@ -1,10 +1,6 @@
 package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
-import java.util.List;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -40,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6908 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6908.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -91,16 +86,15 @@ public class L6908 extends TradeBuffer {
 		this.limit = 100; // 316 * 100 = 31,600
 
 		// 查詢會計帳務明細檔
-		Slice<AcDetail> slAcDetail = null;
-		slAcDetail = sAcDetailService.findL6908(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNo,
-				iFacmNo, iFAcDateSt, iFAcDateEd, this.index, this.limit, titaVo);
-		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
+		Slice<AcDetail> slAcDetail = sAcDetailService.findL6908(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo,
+				iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNo, iFacmNo, iFAcDateSt, iFAcDateEd, this.index,
+				this.limit, titaVo);
 
-		if (lAcDetail == null || lAcDetail.size() == 0) {
+		if (slAcDetail == null) {
 			throw new LogicException(titaVo, "E0001", "會計帳務明細檔"); // 查無資料
 		}
 		// 如有找到資料
-		for (AcDetail tAcDetail : lAcDetail) {
+		for (AcDetail tAcDetail : slAcDetail.getContent()) {
 
 			this.info("L6908 iRvNo : " + iRvNo + "-" + tAcDetail.getRvNo());
 			this.info("L6908 AcNoCode : " + iAcBookCode + "-" + iAcNoCode + "-" + iAcSubCode + "-" + iAcDtlCode + "-"
@@ -183,11 +177,12 @@ public class L6908 extends TradeBuffer {
 			if (tCdAcCode == null) {
 				throw new LogicException(titaVo, "E0001", "會計科子細目設定檔"); // 查無資料
 			}
-			if (tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
-				occursList.putParam("OOClsFlag", 0);
-			} else {
-				occursList.putParam("OOClsFlag", 1);
+			// 
+			int clsFlag = 1;
+			if (tCdAcCode.getReceivableFlag() > 0 && tAcDetail.getDbCr().equals(tCdAcCode.getDbCr())) {
+				clsFlag = 0;
 			}
+			occursList.putParam("OOClsFlag", clsFlag);
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

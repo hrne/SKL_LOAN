@@ -239,7 +239,7 @@ public class LM013Report extends MakeReport {
 					
 					if (lastTLDVo != null)
 					{
-						lastDataType = DataType.getType(tLDVo.get("F4"));
+						lastDataType = DataType.getType(lastTLDVo.get("F4"));
 												
 						// 情況1A  : 兩種資料類型不同，前一筆是正常資料        - 出上一戶最後的合計（顯示名字）, 然後畫線換行
 						// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum)  - 換行
@@ -277,7 +277,7 @@ public class LM013Report extends MakeReport {
 							if (lastDataType != DataType.Above_Sum) // 偷吃步，如果因為Above_Sum一定在Below_Sum之前，這裡這樣讓合計區不多畫線
 							{
 								this.print(1, 0, newBorder);
-							} else if (lastDataType != DataType.Total && thisDataType == DataType.Total)
+							} else if (thisDataType == DataType.Total)
 							{
 								// 情況1C  : 兩種資料類型不同，這一筆是總計資料 (Total) - 畫線換行
 								// 合計區畫線

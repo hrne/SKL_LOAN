@@ -257,9 +257,9 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append("             ,TO_CHAR(SUM(CASE WHEN monthWhole.\"LoanBalTotalMonthly\" > 0 ");
 			result.append("                               THEN ROUND(monthGroup.\"LoanBalSumMonthly\" / monthWhole.\"LoanBalTotalMonthly\" * 100, 1) ");
 			result.append("                          ELSE 0 END), 'FM990.0') ");
-			result.append("             ,TO_CHAR(SUM(CASE WHEN monthGroup.\"LoanBalSumMonthly\" > 0 ");
-			result.append("                               THEN ROUND(monthGroup.\"LoanBalWeightedSumMonthly\" / monthGroup.\"LoanBalSumMonthly\", 3) ");
-			result.append("                          ELSE 0 END), 'FM990.000') ");
+			result.append("             ,TO_CHAR(CASE WHEN SUM(monthGroup.\"LoanBalSumMonthly\") > 0 ");
+			result.append("                           THEN ROUND(SUM(monthGroup.\"LoanBalWeightedSumMonthly\") / SUM(monthGroup.\"LoanBalSumMonthly\"), 3) ");
+			result.append("                      ELSE 0 END, 'FM990.000') ");
 			result.append("             ,SUM(yearGroup.\"IntRcvSumYearly\") ");
 			result.append("             ,TO_CHAR(SUM(CASE WHEN yearWhole.\"IntRcvTotalYearly\" > 0 ");
 			result.append("                               THEN ROUND(yearGroup.\"IntRcvSumYearly\" / yearWhole.\"IntRcvTotalYearly\" * 100, 1) ");
@@ -267,9 +267,9 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append("             ,ROUND(SUM(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100))) \"YearlyAvgLoanBal\" ");
 			result.append(
 					"             ,TO_CHAR(SUM(ROUND(ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) / ROUND(yearWhole.\"LoanBalTotalYearly\" / MOD(:inputYearMonth, 100)) * 100, 1)), 'FM999.0') \"YearlyAvgLoanBalRatio\" ");
-			result.append("             ,TO_CHAR(SUM(CASE WHEN yearGroup.\"LoanBalSumYearly\" > 0 ");
-			result.append("                               THEN ROUND(yearGroup.\"LoanBalWeightedSumYearly\" / yearGroup.\"LoanBalSumYearly\", 3) ");
-			result.append("                          ELSE 0 END), 'FM990.000') ");
+			result.append("             ,TO_CHAR(CASE WHEN SUM(yearGroup.\"LoanBalSumYearly\") > 0 ");
+			result.append("                           THEN ROUND(SUM(yearGroup.\"LoanBalWeightedSumYearly\") / SUM(yearGroup.\"LoanBalSumYearly\"), 3) ");
+			result.append("                      ELSE 0 END, 'FM990.000') ");
 			result.append("             ,monthGroup.\"AcctCode\" ");
 			result.append(" 	        ,'ZZZ' ");
 			result.append(" 	        ,1 ");
@@ -310,7 +310,7 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append("     WHERE mlb.\"YearMonth\" BETWEEN :inputYear * 100 + 1 AND :inputYearMonth ");
 			result.append("       AND mlb.\"LoanBalance\" > 0 ");
 			result.append("       AND mlb.\"AcctCode\" BETWEEN 300 AND 390 ");
-			result.append("       AND mlb.\"EntCode\" LIKE :EntCodeCondition ");
+			result.append("       AND DECODE(mlb.\"EntCode\", 1, 1, 0) LIKE :EntCodeCondition ");
 			result.append("       AND NVL(mlb.\"DepartmentCode\", 0) LIKE :DepartmentCodeCondition ");
 			result.append("  ) ");
 			result.append(" ,ThisMonthDataGrouped AS ( ");
@@ -641,7 +641,7 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append("     WHERE mlb.\"YearMonth\" BETWEEN :inputYear * 100 + 1 AND :inputYearMonth ");
 			result.append("       AND mlb.\"LoanBalance\" > 0 ");
 			result.append("       AND mlb.\"AcctCode\" BETWEEN 300 AND 390 ");
-			result.append("       AND mlb.\"EntCode\" LIKE :EntCodeCondition ");
+			result.append("       AND DECODE(mlb.\"EntCode\", 1, 1, 0) LIKE :EntCodeCondition ");
 			result.append("       AND NVL(mlb.\"DepartmentCode\", 0) LIKE :DepartmentCodeCondition ");
 			result.append("  ) ");
 			result.append(" ,ThisMonthDataGrouped AS ( ");

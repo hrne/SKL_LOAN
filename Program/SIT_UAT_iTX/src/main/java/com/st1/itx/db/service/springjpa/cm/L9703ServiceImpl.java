@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -18,7 +19,6 @@ import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -31,8 +31,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> queryForDetail(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> queryForDetail(TitaVo titaVo) throws LogicException {
 
 		String icustno = titaVo.getParam("CustNo");
 		String ifacmno = titaVo.getParam("FacmNo");
@@ -60,7 +59,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L9703 custType   = " + custType);
 
 		String sql = "SELECT CC.\"CityItem\" F0";
-		sql += "            ,E.\"Fullname\" F1";
+		sql += "            ,\"Fn_GetEmpName\"(CC.\"AccCollPsn\",1) AS F1";
 		sql += "            ,D.\"CustNo\" AS F2";
 		sql += "            ,D.\"FacmNo\" AS F3";
 		sql += "            ,D.\"CustName\" AS F4";
@@ -72,9 +71,8 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,NVL(T1.\"LiaisonName\",' ') AS F10";
 		sql += "            ,\"Fn_GetTelNo\"(D.\"CustUKey\",'02',1)  AS F11";
 		sql += "            ,\"Fn_GetTelNo\"(D.\"CustUKey\",'03',1)  AS F12";
-		sql += "            ,Cd.\"Item\" AS F13";
-		sql += "      FROM (SELECT F.\"BusinessOfficer\"";
-		sql += "                  ,L.\"CustNo\"";
+		sql += "            ,\"Fn_GetCdCode\"('RepayCode',LPAD(D.\"RepayCode\",2,'0')) AS F13";
+		sql += "      FROM (SELECT L.\"CustNo\"";
 		sql += "                  ,L.\"FacmNo\"";
 		sql += "                  ,C.\"CustName\"";
 		sql += "                  ,F.\"FirstDrawdownDate\"";
@@ -92,7 +90,6 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              AND L.\"Status\" IN (0, 4)";
 		sql += queryCondition(icustno, ifacmno, unpay, repay, custType);// 在子查詢的where篩選
 		sql += "           ) D";
-		sql += "      LEFT JOIN \"CdEmp\" E ON  E.\"EmployeeNo\" = D.\"BusinessOfficer\"";
 		sql += "      LEFT JOIN \"ClFac\" F ON F.\"CustNo\" = D.\"CustNo\"";
 		sql += "                           AND F.\"FacmNo\" = D.\"FacmNo\"";
 		sql += "                           AND F.\"MainFlag\" = 'Y'";
@@ -100,8 +97,6 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                             AND Cl.\"ClCode2\" = F.\"ClCode2\"";
 		sql += "                             AND Cl.\"ClNo\"    = F.\"ClNo\"";
 		sql += "      LEFT JOIN \"CdCity\" CC ON CC.\"CityCode\" = Cl.\"CityCode\"";
-		sql += "      LEFT JOIN \"CdCode\" Cd ON Cd.\"Code\" = D.\"RepayCode\"";
-		sql += "                             AND Cd.\"DefCode\" = 'RepayCode'";
 		sql += "      LEFT JOIN (                              ";
 		sql += "          SELECT CTN.\"CustUKey\" ";
 		sql += "               , CASE";
@@ -140,7 +135,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 		}
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	private String queryCondition(String icustno, String ifacmno, String unpay, String repay, String custType) {
@@ -195,8 +190,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return condition;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> queryForNotice(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> queryForNotice(TitaVo titaVo) throws LogicException {
 
 		this.info("L9703 queryForPdf");
 
@@ -346,7 +340,7 @@ public class L9703ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		query.setParameter("tlrno", tlrno);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

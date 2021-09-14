@@ -13,14 +13,18 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuOrignalId;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.InsuRenewId;
+import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -66,10 +70,16 @@ public class L4611 extends TradeBuffer {
 	public Parse parse;
 
 	@Autowired
+	public SendRsp sendRsp;
+
+	@Autowired
 	public InsuOrignalService insuOrignalService;
 
 	@Autowired
 	public InsuRenewService insuRenewService;
+
+	@Autowired
+	public FacMainService facMainService;
 
 	@Autowired
 	public AcReceivableCom acReceivableCom;
@@ -103,6 +113,10 @@ public class L4611 extends TradeBuffer {
 		endoInsuNo = titaVo.getParam("EndoInsuNo");
 		renewCode = parse.stringToInteger(titaVo.getParam("RenewCode"));
 
+		BigDecimal TotalPrem = new BigDecimal("0");
+		int checkfg = 0;
+		int res = 0;
+
 		// 已執行通知作業年月
 		InsuRenew t1InsuRenew = insuRenewService.findNotiTempFgFirst("Y", titaVo);
 		if (t1InsuRenew != null) {
@@ -112,6 +126,12 @@ public class L4611 extends TradeBuffer {
 			endoInsuNo = " ";
 		}
 
+		// 額度
+		FacMain tFacMain = facMainService.findById(new FacMainId(custNo, facmNo), titaVo);
+		if (tFacMain == null) {
+			throw new LogicException(titaVo, "E0015", "額度檔不存在"); // 檢查錯誤
+		}
+
 		InsuRenewId tInsuRenewId = new InsuRenewId();
 		InsuRenew tInsuRenew = new InsuRenew();
 		tInsuRenewId.setClCode1(clCode1);
@@ -119,9 +139,22 @@ public class L4611 extends TradeBuffer {
 		tInsuRenewId.setClNo(clNo);
 		tInsuRenewId.setPrevInsuNo(prevInsuNo);
 		tInsuRenewId.setEndoInsuNo(endoInsuNo);
-
+		this.info("tInsuRenewId = " + tInsuRenewId);
+		tInsuRenew = insuRenewService.holdById(tInsuRenewId, titaVo);
 		if ("1".equals(iFunctionCode)) {
+			if (tInsuRenew != null) {
+				throw new LogicException(titaVo, "E0002", "InsuRenew"); // 新增資料已存在
+			}
+		} else {
+			if (tInsuRenew == null) {
+				throw new LogicException(titaVo, "E0006", "InsuRenew"); // 鎖定資料時，發生錯誤
+			}
+		}
+		InsuRenew oldInsuRenew = tInsuRenew;
 
+		switch (iFunctionCode) {
+		case "1": // 新增
+			tInsuRenew = new InsuRenew();
 			tInsuRenew.setInsuRenewId(tInsuRenewId);
 			tInsuRenew.setCustNo(custNo);
 			tInsuRenew.setFacmNo(facmNo);
@@ -131,186 +164,173 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setRenewCode(renewCode);
 			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
+			tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("FireInsuCovrg")));
+			tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem")));
+			tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("EthqInsuCovrg")));
+			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
+			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate")));
+			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate")));
+			tInsuRenew.setAcDate(0);
+			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
+			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
+			if (tInsuRenew.getRenewCode() == 2) {
+				if (insuYearMonth <= noticeYearMonth) {
+					tInsuRenew.setNotiTempFg("N"); // N:未入(通知作業後新增)
+				} else {
+					tInsuRenew.setNotiTempFg(""); // null:待通知
+				}
+			}
+			tInsuRenew.setStatusCode(0);
+			tInsuRenew.setOvduDate(0);
+			tInsuRenew.setOvduNo(BigDecimal.ZERO);
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem"))
+					.add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
+			tInsuRenew.setTotInsuPrem(totPrem);
+			tInsuRenew.setRepayCode(tFacMain.getRepayCode());
+			try {
+				insuRenewService.insert(tInsuRenew, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "L4611 InsuRenew insert " + e.getErrorMsg());
+			}
+
+			resetAcReceivable(0, tInsuRenew, titaVo); // 0-起帳
+			break;
+
+		case "2": // 修改
+
+			if (oldInsuRenew.getRenewCode() != parse.stringToInteger(titaVo.getParam("RenewCode"))) { // 保險狀態不同
+				checkfg = 1;
+			}
+
+			TotalPrem = TotalPrem.add(oldInsuRenew.getFireInsuPrem());
+			TotalPrem = TotalPrem.add(oldInsuRenew.getEthqInsuPrem());
+
+			res = TotalPrem.compareTo(parse.stringToBigDecimal(titaVo.getParam("TotalPrem"))); // // 總保費
+
+			if (res != 0) {
+				checkfg = 1;
+			}
+
+			if (tInsuRenew.getAcDate() > 0) {
+				if (checkfg != 0) {
+					throw new LogicException(titaVo, "E0015", "此筆已入帳，不可修改"); // 檢查錯誤
+				}
+			}
+			if (tInsuRenew.getStatusCode() == 1) {
+				if (checkfg != 0) {
+					throw new LogicException(titaVo, "E0015", "此筆已轉借支，不可修改"); // 檢查錯誤
+				}
+			}
+			if (tInsuRenew.getStatusCode() == 2) {
+				if (checkfg != 0) {
+					throw new LogicException(titaVo, "E0015", "此筆已轉催收，不可修改"); // 檢查錯誤
+				}
+			}
+
+			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
+			tInsuRenew.setClCode1(clCode1);
+			tInsuRenew.setClCode2(clCode2);
+			tInsuRenew.setClNo(clNo);
+			tInsuRenew.setCustNo(custNo);
+			tInsuRenew.setFacmNo(facmNo);
+			tInsuRenew.setInsuYearMonth(insuYearMonth);
+			tInsuRenew.setNowInsuNo(titaVo.getParam("NowInsuNo"));
+			tInsuRenew.setOrigInsuNo(getOrigInsuNo(titaVo));
+			tInsuRenew.setRenewCode(renewCode);
 			tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuCovrg")));
 			tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")));
 			tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuCovrg")));
 			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
 			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
-			tInsuRenew.setAcDate(parse.stringToInteger(titaVo.getParam("AcDate")));
-
-			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
-			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
-			if (insuYearMonth <= noticeYearMonth) {
-				tInsuRenew.setNotiTempFg("N"); // N:未入(通知作業後新增)				
-			} else {
-				tInsuRenew.setNotiTempFg(""); // null:待通知
-			}
-			tInsuRenew.setStatusCode(0);
-			tInsuRenew.setOvduDate(0);
-			tInsuRenew.setOvduNo(BigDecimal.ZERO);
-
+			tInsuRenew.setNotiTempFg(titaVo.getParam("NotiTempFg"));
+			tInsuRenew.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
+			tInsuRenew.setStatusCode(parse.stringToInteger(titaVo.getParam("StatusCode")));
+			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
+			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
 			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
 					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
-
 			tInsuRenew.setTotInsuPrem(totPrem);
 
 			try {
-				// 送出到DB
-				insuRenewService.insert(tInsuRenew, titaVo);
+				insuRenewService.update(tInsuRenew);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "L4611 InsuRenew insert " + e.getErrorMsg());
+				throw new LogicException(titaVo, "E0007", "L4611 InsuRenew update " + e.getErrorMsg());
 			}
 
-//			0-起帳 1-銷帳 2-起帳刪除
-			resetAcReceivable(0, tInsuRenew, titaVo);
+			resetAcReceivable(0, tInsuRenew, titaVo); // 0-起帳刪除
+			break;
 
-		} else if ("2".equals(iFunctionCode)) {
-			tInsuRenew = insuRenewService.holdById(tInsuRenewId);
-			if (tInsuRenew != null) {
+		case "4": // 刪除
+			if (tInsuRenew.getAcDate() > 0) {
+				throw new LogicException(titaVo, "E0015", "此筆已入帳，不可修改"); // 檢查錯誤
+			}
+			if (tInsuRenew.getStatusCode() == 1) {
+				throw new LogicException(titaVo, "E0015", "此筆已轉借支，不可修改"); // 檢查錯誤
+			}
+			if (tInsuRenew.getStatusCode() == 2) {
+				throw new LogicException(titaVo, "E0015", "此筆已轉催收，不可修改"); // 檢查錯誤
+			}
 
-				if (tInsuRenew.getAcDate() > 0) {
-					throw new LogicException(titaVo, "E0007", "此筆已入帳，不可修改");
-				} else if (tInsuRenew.getRenewCode() == 3) {
-					throw new LogicException(titaVo, "E0007", "此筆已轉借支，不可修改");
-				}
+			// 刪除須刷主管卡
+			if (titaVo.getEmpNos().trim().isEmpty()) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
 
-				tInsuRenew.setClCode1(clCode1);
-				tInsuRenew.setClCode2(clCode2);
-				tInsuRenew.setClNo(clNo);
-				tInsuRenew.setCustNo(custNo);
-				tInsuRenew.setFacmNo(facmNo);
-				tInsuRenew.setInsuYearMonth(insuYearMonth);
-				tInsuRenew.setNowInsuNo(titaVo.getParam("NowInsuNo"));
-				tInsuRenew.setOrigInsuNo(getOrigInsuNo(titaVo));
-				tInsuRenew.setRenewCode(renewCode);
-				tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuCovrg")));
-				tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")));
-				tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuCovrg")));
-				tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
-				tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
-				tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
-				tInsuRenew.setAcDate(parse.stringToInteger(titaVo.getParam("AcDate")));
-				tInsuRenew.setNotiTempFg(titaVo.getParam("NotiTempFg"));
-				tInsuRenew.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
-//				已入帳(AcDate>0)、轉借支不可變更狀態
-				tInsuRenew.setStatusCode(parse.stringToInteger(titaVo.getParam("StatusCode")));
+			try {
+				insuRenewService.delete(tInsuRenew);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+			}
+			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
+			break;
+		case "6": // 自保
 
-				tInsuRenew.setOvduDate(parse.stringToInteger(titaVo.getParam("OvduDate")));
-				tInsuRenew.setOvduNo(parse.stringToBigDecimal(titaVo.getParam("OvduNo")));
-				tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
-				tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
+			if (oldInsuRenew.getRenewCode() != parse.stringToInteger(titaVo.getParam("RenewCode"))) { // 保險狀態不同
+				checkfg = 1;
+			}
 
-				totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
-						.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			TotalPrem = TotalPrem.add(oldInsuRenew.getFireInsuPrem());
+			TotalPrem = TotalPrem.add(oldInsuRenew.getEthqInsuPrem());
 
-				tInsuRenew.setTotInsuPrem(totPrem);
+			res = TotalPrem.compareTo(parse.stringToBigDecimal(titaVo.getParam("TotalPrem"))); // // 總保費
 
-				try {
-					// 送出到DB
-					insuRenewService.update(tInsuRenew);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "L4611 InsuRenew update " + e.getErrorMsg());
-				}
+			if (res != 0) {
+				checkfg = 1;
+			}
 
-//				0-起帳 1-銷帳 2-起帳刪除
-				resetAcReceivable(2, tInsuRenew, titaVo);
-
-//				若結案則不必再起帳
-				if (parse.stringToInteger(titaVo.getParam("StatusCode")) != 4) {
-					resetAcReceivable(0, tInsuRenew, titaVo);
+			if (tInsuRenew.getAcDate() > 0) {
+				if (checkfg != 0) {
+					throw new LogicException(titaVo, "E0015", "此筆已入帳，不可修改"); // 檢查錯誤
 				}
 			}
-		} else if ("4".equals(iFunctionCode)) {
-			// 抓出要刪除的資料
-			tInsuRenew = insuRenewService.holdById(tInsuRenewId);
-			if (tInsuRenew != null) {
-				if (tInsuRenew.getAcDate() > 0) {
-					throw new LogicException(titaVo, "E0015", "該筆已入帳");
+			if (tInsuRenew.getStatusCode() == 1) {
+				if (checkfg != 0) {
+					throw new LogicException(titaVo, "E0015", "此筆已轉借支，不可修改"); // 檢查錯誤
 				}
-
-				try {
-					insuRenewService.delete(tInsuRenew);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0008", e.getErrorMsg());
-				}
-
-//				0-起帳 1-銷帳 2-起帳刪除
-				resetAcReceivable(2, tInsuRenew, titaVo);
-
 			}
-		}
-//		L4964連動L4611自保
-//	  	a.該筆狀態改為自保
-//		b.改AcReceivable檔該記號銷帳(若該筆未完成下期續保)
-		else if ("6".equals(iFunctionCode)) {
-//			1.新保待續保或已完成續保待產生下次續保 ... 新增一筆狀態為1.自保
-//			2.若該筆尚未續保 ... 變更狀態1.自保
-
-			tInsuRenew = insuRenewService.holdById(tInsuRenewId);
-
-//			新保單無續保 或 已續保過，未完成下期續保
-			if (tInsuRenew == null || !"".equals(tInsuRenew.getNowInsuNo())) {
-				InsuRenew t2InsuRenew = new InsuRenew();
-
-				t2InsuRenew.setInsuRenewId(tInsuRenewId);
-				t2InsuRenew.setCustNo(custNo);
-				t2InsuRenew.setFacmNo(facmNo);
-				t2InsuRenew.setInsuYearMonth(insuYearMonth);
-				t2InsuRenew.setNowInsuNo(titaVo.getParam("NowInsuNo"));
-				t2InsuRenew.setOrigInsuNo(getOrigInsuNo(titaVo));
-				t2InsuRenew.setRenewCode(1);
-				t2InsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
-				t2InsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
-				t2InsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuCovrg")));
-				t2InsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")));
-				t2InsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuCovrg")));
-				t2InsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
-				t2InsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
-				t2InsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
-				t2InsuRenew.setAcDate(parse.stringToInteger(titaVo.getParam("AcDate")));
-
-				t2InsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
-				t2InsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
-				t2InsuRenew.setNotiTempFg("N");
-				t2InsuRenew.setStatusCode(0);
-				t2InsuRenew.setOvduDate(0);
-				t2InsuRenew.setOvduNo(BigDecimal.ZERO);
-
-				totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
-						.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
-
-				t2InsuRenew.setTotInsuPrem(totPrem);
-
-				try {
-					// 送出到DB
-					insuRenewService.insert(t2InsuRenew, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "L4611 InsuRenew insert " + e.getErrorMsg());
+			if (tInsuRenew.getStatusCode() == 2) {
+				if (checkfg != 0) {
+					throw new LogicException(titaVo, "E0015", "此筆已轉催收，不可修改"); // 檢查錯誤
 				}
-			} else {
-				tInsuRenew.setRenewCode(1);
-				tInsuRenew.setNowInsuNo(titaVo.getParam("NowInsuNo"));
-				tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuCovrg")));
-				tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")));
-				tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuCovrg")));
-				tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
-				tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
-				tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
-				tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
-				tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
-
-				try {
-					insuRenewService.update(tInsuRenew, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-				}
-
-//					0-起帳 1-銷帳 2-起帳刪除
-				resetAcReceivable(2, tInsuRenew, titaVo);
 			}
-		} else {
-			throw new LogicException(titaVo, "E0010", "FunctionCode 錯誤!!");
+			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
+			tInsuRenew.setRenewCode(1);
+			tInsuRenew.setNowInsuNo(titaVo.getParam("NowInsuNo"));
+			tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuCovrg")));
+			tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")));
+			tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuCovrg")));
+			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
+			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
+			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
+			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
+			try {
+				insuRenewService.update(tInsuRenew, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			break;
 		}
 
 		this.addList(this.totaVo);
@@ -319,46 +339,42 @@ public class L4611 extends TradeBuffer {
 
 	private void resetAcReceivable(int flag, InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
 		List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
-
-		if ("".equals(tInsuRenew.getNotiTempFg())) {
-			this.info("該筆未入通知，NotiTempFg : " + tInsuRenew.getNotiTempFg());
+		if (tInsuRenew.getRenewCode() != 2) {
 			return;
 		}
 
-		if (tInsuRenew.getStatusCode() == 0) {
-			AcReceivable acReceivable = new AcReceivable();
-
-			acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
-			acReceivable.setAcctCode("TMI"); // 業務科目
-			acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
-			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
-			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
-			acReceivableList.add(acReceivable);
-
-			acReceivableCom.setTxBuffer(this.getTxBuffer());
-			acReceivableCom.mnt(flag, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除
-		} else {
-			throw new LogicException(titaVo, "E0015", "該筆狀態不為正常，Status : " + tInsuRenew.getStatusCode());
+		if (tInsuRenew.getStatusCode() >= 0) {
+			return;
 		}
+		// 尚未通知
+		if (insuYearMonth < noticeYearMonth) {
+			return;
+		}
+
+		AcReceivable acReceivable = new AcReceivable();
+		acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
+		acReceivable.setAcctCode("TMI"); // 業務科目
+		acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
+		acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
+		acReceivable.setFacmNo(tInsuRenew.getFacmNo());
+		acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+		acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
+		acReceivableList.add(acReceivable);
+		acReceivableCom.setTxBuffer(this.getTxBuffer());
+		acReceivableCom.mnt(flag, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除
 	}
 
-	private String getOrigInsuNo(TitaVo titaVo) {
+	private String getOrigInsuNo(TitaVo titaVo) throws LogicException {
 		String result = "";
-
-		InsuOrignal tInsuOrignal = new InsuOrignal();
-		InsuOrignalId tInsuOrignalId = new InsuOrignalId();
-
-		tInsuOrignalId.setClCode1(clCode1);
-		tInsuOrignalId.setClCode2(clCode2);
-		tInsuOrignalId.setClNo(clNo);
-		tInsuOrignalId.setOrigInsuNo(prevInsuNo);
-		tInsuOrignalId.setEndoInsuNo(" ");
-
-		tInsuOrignal = insuOrignalService.findById(tInsuOrignalId, titaVo);
-
-		if (tInsuOrignal != null) {
+		InsuOrignal tInsuOrignal = insuOrignalService
+				.findById(new InsuOrignalId(clCode1, clCode2, clNo, prevInsuNo, " "), titaVo);
+		if (tInsuOrignal == null) {
+			InsuRenew t2InsuRenew = insuRenewService.findL4600AFirst(clCode1, clCode2, clNo, prevInsuNo, titaVo);
+			if (t2InsuRenew == null) {
+				throw new LogicException(titaVo, "E0015", "無原保單資料，不可修改"); // 檢查錯誤
+			}
+			result = t2InsuRenew.getOrigInsuNo();
+		} else {
 			result = tInsuOrignal.getOrigInsuNo();
 		}
 

@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,11 +19,10 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM053ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
- 
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
@@ -35,7 +32,7 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
 		String iYYMM = iENTDY.substring(0, 6);
-		logger.info("lM053.findAll YYMM=" + iYYMM);
+		this.info("lM053.findAll YYMM=" + iYYMM);
 
 		String sql = "SELECT L.\"RecordDate058\" F0";
 		sql += "            ,Ci.\"CityItem\"     F1";
@@ -43,7 +40,7 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,L.\"FacmNo\"        F3";
 		sql += "            ,C.\"CustName\"      F4";
 		sql += "            ,L.\"Amount056\"     F5";
-		sql += "            ,L.\"Amount058\"     F6";
+		sql += "            ,DECODE(L.\"Amount058\",0,L.\"Amount058\",L.\"Amount060\")     F6";
 		sql += "            ,CASE WHEN M.\"PrinBalance\" < L.\"Amount901\" THEN L.\"Amount901\" - M.\"PrinBalance\"";
 		sql += "             ELSE 0 END          F7";
 		sql += "            ,L.\"AcDate060\"     F8";
@@ -99,7 +96,8 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                        WHERE L.\"LegalProg\" = '058') L";
 		sql += "                  LEFT JOIN \"CollLaw\" T ON T.\"CustNo\" = L.\"CustNo\"";
 		sql += "                                         AND T.\"FacmNo\" = L.\"FacmNo\"";
-		sql += "                                         AND T.\"LegalProg\" IN ('056', '060', '901')) L";
+		sql += "                                         AND T.\"LegalProg\" IN ('056', '060', '901')";
+		sql += "				   WHERE T.\"Amount\" > 0 ) L";
 		sql += "            WHERE L.\"SEQ\" = 1";
 		sql += "            GROUP BY L.\"RecordDate058\"";
 		sql += "                    ,L.\"CustNo\"";
@@ -115,8 +113,8 @@ public class LM053ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CdCity\" Ci ON Ci.\"CityCode\" = M.\"CityCode\"";
 		sql += "      LEFT JOIN \"CdEmp\"  E ON E.\"EmployeeNo\" = M.\"LegalPsn\"";
 
-		logger.info("sql=" + sql);
- 
+		this.info("sql=" + sql);
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);

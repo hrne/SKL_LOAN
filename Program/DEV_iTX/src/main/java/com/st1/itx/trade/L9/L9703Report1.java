@@ -137,7 +137,7 @@ public class L9703Report1 extends MakeReport {
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.error("L9703ServiceImpl.findAll error = " + errors.toString());
+			this.error("L9703ServiceImpl queryForDetail error = " + errors.toString());
 		}
 
 		int counts = 0;// 筆數計算
@@ -188,6 +188,7 @@ public class L9703Report1 extends MakeReport {
 					unpaidPriInt = unpaidPriInt.add(baTxVo.getPrincipal()); // 未收本
 					unpaidPriInt = unpaidPriInt.add(baTxVo.getInterest()); // 未收息
 					breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getBreachAmt()); // 違約金
+					breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getDelayInt()); // 延遲息
 
 					intRate = baTxVo.getIntRate();
 				}

@@ -105,7 +105,7 @@ public class L8333 extends TradeBuffer {
 		//四start
 		Slice<JcicZ575> ixJcicZ575 = sJcicZ575Service.custIdEq(iCustId, this.index, this.limit, titaVo);
 		if (ixJcicZ575 == null) {
-			throw new LogicException(titaVo, "E0001", ""); 
+			throw new LogicException(titaVo, "E0005", "查無(575)更生債權金額異動通知資料"); 
 		}
 		for(JcicZ575 xJcicZ575 : ixJcicZ575) {
 			int jcicDay = xJcicZ575.getOutJcicTxtDate();

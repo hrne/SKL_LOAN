@@ -58,8 +58,7 @@ public class L9715Report extends MakeReport {
 		this.setFontSize(8);
 		this.setCharSpaces(0);
 		this.print(-1, 184, "機密等級：機密");
-		this.print(-2, 184, "基　礎：" + dDateUtil.getNowStringBc().substring(0, 4) + "/"
-				+ dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(6));
+		this.print(-2, 184, "基　礎：" + showBcDate(fundDay, 0));
 		this.print(-3, 8, "程式ID：" + this.getParentTranCode());
 		this.print(-3, 100, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));
@@ -130,7 +129,6 @@ public class L9715Report extends MakeReport {
 
 		if (l9715List.size() != 0) {
 
-			int Yr = 0;
 			String nameNo = "";
 			boolean openClose = true;
 
@@ -191,6 +189,7 @@ public class L9715Report extends MakeReport {
 						unpaidPriInt = unpaidPriInt.add(baTxVo.getPrincipal()); // 未收本
 						unpaidPriInt = unpaidPriInt.add(baTxVo.getInterest()); // 未收息
 						breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getBreachAmt()); // 違約金
+						breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getDelayInt()); // 違約金
 
 					}
 
@@ -239,12 +238,7 @@ public class L9715Report extends MakeReport {
 				this.print(0, 37, tL9715.get("F5"));
 
 				// 初貸日 F6
-				if ("0".equals(tL9715.get("F6")) || tL9715.get("F6") == null) {
-					this.print(0, 62, "", "R");
-				} else {
-					Yr = Integer.parseInt(tL9715.get("F6"));
-					this.print(0, 62, showRocDate(Yr, 1), "R");
-				}
+				this.print(0, 62, showRocDate(tL9715.get("F6"), 1), "R");
 
 				// 本金餘額 F7
 				this.print(0, 74, formatAmt(tL9715.get("F7"), 0), "R");
@@ -252,23 +246,11 @@ public class L9715Report extends MakeReport {
 				// 利率 F8
 				this.print(0, 82, formatAmt(tL9715.get("F8"), 4), "R");
 
-	
 				// 繳息迄日 F9
-				if ("0".equals(tL9715.get("F9")) || tL9715.get("F9") == null) {
-					this.print(0, 93, "", "R");
-				} else {
-					Yr = Integer.parseInt(tL9715.get("F9"));
-					this.print(0, 93, showRocDate(Yr, 1), "R");
-				}
+				this.print(0, 93, showRocDate(tL9715.get("F9"), 1), "R");
 
 				// 最近應繳日 F10
-				if ("0".equals(tL9715.get("F10")) || tL9715.get("F10") == null) {
-					this.print(0, 104, "", "R");
-				} else {
-
-					Yr = Integer.parseInt(tL9715.get("F10"));
-					this.print(0, 104, showRocDate(Yr, 1), "R");
-				}
+				this.print(0, 104, showRocDate(tL9715.get("F10"), 1), "R");
 
 				// 逾期日數 F11
 				this.print(0, 109, tL9715.get("F11"), "R");
