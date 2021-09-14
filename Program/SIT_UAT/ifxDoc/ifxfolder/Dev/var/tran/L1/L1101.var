@@ -77,6 +77,19 @@ E(0,0)
 <include src="ROM.icf::L2R08.dec"/>
 <include src="ROM.icf::L6R06.dec"/>
 
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
+T(2,@RimTxCode,#TXCD)
+
+#NTXBUF=X,11,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_Funcd=A,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_CustId=X,10,S
+
 #Init1=X,1,S
 HIDE(#FinancialBtn)
 
@@ -304,23 +317,13 @@ R(1,L6R03)
 #L6r03ResultCity=X,10000,S
 T(2,#L6r03Result)
 
-#CHAIN=A,1,S
-T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
-T(2,@RimTxCode,#TXCD)
 
+T(1,@CustId,#NTXBUF,2,10)
 
 #INIT=X,1,S
 INVOKEJS(SHOW,grd3,0)
 
-#NTXBUF=X,11,S
-C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
-#CHAIN_Funcd=A,1,S
-T(1,#NTXBUF,1,1)
-
-#CHAIN_CustId=X,10,S
-T(1,@CustId,#NTXBUF,2,10)
 
 !功能
 #FunCd=A,1,S
@@ -817,9 +820,6 @@ T(2,@Regaddress,#L1r12Address)
 !戶籍-郵遞區號前三碼
 #RegZip3=X,3,L
 C(4,#RegCityCode,S,$)
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-@C(3,#RegZip3,0,S,$)
 
 !戶籍-郵遞區號後兩碼
 #RegZip2=X,3,I

@@ -153,10 +153,10 @@ public class L9715ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE COLL.\"CaseCode\" = 1 ";
 		sql += "   AND COLL.\"Status\" IN (0,2,4,6) ";
 		sql += "   AND FAC.\"FirstDrawdownDate\" >= :approDate ";
-		sql += "   AND L.\"OvduTerm\" >= :ovduTermStart ";
-		sql += "   AND L.\"OvduTerm\" <= :ovduTermEnd ";
-		sql += "   AND L.\"OvduDays\" >= :ovduDaysStart ";
-		sql += "   AND L.\"OvduDays\" <= :ovduDaysEnd ";
+		sql += "   AND COLL.\"OvduTerm\" >= :ovduTermStart ";
+		sql += "   AND COLL.\"OvduTerm\" <= :ovduTermEnd ";
+		sql += "   AND COLL.\"OvduDays\" >= :ovduDaysStart ";
+		sql += "   AND COLL.\"OvduDays\" <= :ovduDaysEnd ";
 		sql += " ORDER BY F0 ";
 		sql += "        , F3 ";
 		sql += "        , F4 ";

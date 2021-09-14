@@ -1,0 +1,1156 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L1104)
+
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,2)
+
+#ACTFG=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,1)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[150,400,50,400];printer.width=[20,20,20,20];order=1">
+[
+["[L1104]                                 顧客基本資料修改-法人"],
+[#<->#,"@統一編號",#CustId],
+["@","@變更前"],["@","@變更後"],
+["@統一編號",#CustIdBefore],[#CustIdInd,#CustIdAfter],
+["@公司名稱",#CustNameBefore],[#CustNameInd,#CustNameAft],
+["@設立日期",#BirthdayBefore],[#BirthdayInd,#BirthdayAft],
+["@客戶別",#CustTypeBefore,#CustTypeBeforeX],[#CustTypeInd,#CustTypeAft,#CustTypeAftX],
+["@行業別",#IndustryBefore,#IndustryBeforeX],[#IndustryInd,#IndustryAft,#BTN2,#IndustryAftX],
+["@國籍",#CountryBefore,#Countryx],[#CountryInd,#CountryAft,#CountryxAft],
+["@負責人身分證",#SpouseIdBefore],[#SpouseIdInd,#SpouseIdAft],
+["@負責人姓名",#SpouseNmBefore],[#SpouseNmInd,#SpouseNmAft],
+["@公司-郵遞區號前三碼",#RegZip3Before],[#RegZip3Ind,#RegZip3Aft],
+["@公司-郵遞區號後三碼",#RegZip2Before],[#RegZip2Ind,#RegZip2Aft],
+["@公司-縣市代碼",#RegCitycodeBefore,#RegCityBeforeItem],[#RegCitycodeInd,#RegCitycodeAft,#RegCityAftItem],
+["@公司-鄉鎮市區代碼",#RegAreacodeBefore,#RegAreaItemX],[#RegAreacodeInd,#RegAreacodeAft,#RegAreaItemXAft],
+["@公司-路名",#RegRoadBefore],[#RegRoadInd,#RegRoadAft],
+["@公司-段",#RegSectionBefore],[#RegSectionInd,#RegSectionAft],
+["@公司-巷",#RegAlleyBefore],[#RegAlleyInd,#RegAlleyAft],
+["@公司-弄",#RegLaneBefore],[#RegLaneInd,#RegLaneAft],
+["@公司-號",#RegNumBefore],[#RegNumInd,#RegNumAft],
+["@公司-號之",#RegNumdashsBefore],[#RegNumdashsInd,#RegNumdashsAft],
+["@公司-樓",#RegFloorBefore],[#RegFloorInd,#RegFloorAft],
+["@公司-樓之",#RegFloordashBefore],[#RegFloordashInd,#RegFloordashAft],
+["@通訊-郵遞區號前三碼",#CurrZipBefore3],[#CurrZip3Ind,#CurrZip3Aft],
+["@通訊-郵遞區號後三碼",#CurrZipBefore2],[#CurrZip2Ind,#CurrZip2Aft],
+["@通訊-縣市代碼",#CurrCitycodeBefore,#CurrCityItemX],[#CurrCitycodeInd,#CurrCitycodeAft,#CurrCityItemXAft],
+["@通訊-鄉鎮市區代碼",#CurrAreacodeBefore,#CurrAreaItemX],[#CurrAreacodeInd,#CurrAreacodeAft,#CurrAreaItemXAft],
+["@通訊-路名",#CurrRoadBefore],[#CurrRoadInd,#CurrRoadAft],
+["@通訊-段",#CurrSectionBefore],[#CurrSectionInd,#CurrSectionAft],
+["@通訊-巷",#CurrAlleyBefore],[#CurrAlleyInd,#CurrAlleyAft],
+["@通訊-弄",#CurrLaneBefore],[#CurrLaneInd,#CurrLaneAft],
+["@通訊-號",#CurrNumBefore],[#CurrNumInd,#CurrNumAft],
+["@通訊-號之",#CurrNumdashsBefore],[#CurrNumdashsInd,#CurrNumdashsAft],
+["@通訊-樓",#CurrFloorBefore],[#CurrFloorInd,#CurrFloorAft],
+["@通訊-樓之",#CurrFloordashBefore],[#CurrFloordashInd,#CurrFloordashAft],
+["@電子信箱",#EmailBefore],[#EmailInd,#EmailAft],
+["@企金別",#EntcodeBefore,#EntcodeBeforeX],[#EntcodeInd,#EntcodeAft,#EntcodeAftX],
+["@英文姓名",#EnameBefore],[#EnameInd,#EnameAft],
+["@年收入",#IncomeofyearlyBefore,"仟元"],[#IncomeofyearlyInd,#IncomeofyearlyAft,"仟元"],
+["@年收入資料年月",#IncomedatadateBefore],[#IncomedatadateInd,#IncomedatadateAft],
+]
+!["@是否為授信限制對象",#IsLimitX],[#IsLimitXInd,#IsLimitXAft],
+!["@是否為利害關係人",#IsRelatedX],[#IsRelatedXInd,#IsRelatedXAft],
+!["@是否為準利害關係人",#IsLnrelNearX],[#IsLnrelNearXInd,#IsLnrelNearXAft],
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BTN2=X,15,I,ui:button;value:行業別代號查詢;enable:1;tabbable:0;title=行業別代碼;
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BUF1=X,42,S
+!ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+
+#Submit=A,1,S
+K(MODIFYBUTTON,修改)
+!---------- AP TEXT AREA Variables ----------
+<include src="ROM.icf::L1R01.dec"/>
+<include src="ROM.icf::L1R17.dec"/>
+<include src="ROM.icf::L1R16.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R06.dec"/>
+<include src="ROM.icf::L6R03.dec"/>
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!CustTypeCode 客戶別
+#CDDEF01=x,20,S
+T(3,CdCode.CustTypeCode)
+
+#CustTypeCodeHelp=x,1024,S
+
+!NationalityCode 國籍
+#CDDEF02=x,25,S
+T(3,CdCode.NationalityCode)
+
+#NationalityCodeHelp=x,1024,S
+
+!EntCode 企金別
+#CDDEF03=x,20,S
+T(3,CdCode.EntCode)
+
+#EntCodeHelp=x,1024,S
+
+!是否下拉選單
+#CDDEF04=x,20,S
+T(3,CdCode.YesNo)
+
+#YesNoHelp=x,1024,S
+
+#CustTypeCodeHelpRim=X,1,S
+RESET_RIM(#CustTypeCodeHelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CustTypeCodeHelp,#HelpDesc1)
+T(2,@NationalityCodeHelp,#HelpDesc2)
+T(2,@EntCodeHelp,#HelpDesc3)
+T(2,@YesNoHelp,#HelpDesc4)
+
+!調RIM參數
+#RimCityCode=X,2,S
+#RimAreaCode=X,3,S
+
+! 調RIM取縣市代碼
+#RimL6r03City=X,1,S
+E(0,@RimFunCd,1)
+T(2,@RimCityCode,)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL6r03City,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+
+! 縣市代碼的下拉選單
+#L6r03ResultCity=X,10000,S
+T(2,#L6r03Result)
+
+
+!通訊-調RIM取縣市代碼
+#RimL6r03City1=X,1,S
+E(0,@RimFunCd,1)
+T(2,@RimCityCode,)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL6r03City1,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+!通訊-縣市代碼的下拉選單
+#L6r03ResultCity1Before=X,1000,S
+C(4,#L6r03ResultCity1Before,T(2,#L6r03Result),$)
+
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
+T(2,@RimTxCode,#TXCD)
+
+#NTXBUF=X,11,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustId,#NTXBUF,2,8)
+
+#TemFuncd=A,1,S
+E(0,2)
+
+#AGAIN=X,1,S
+C(2,#TemFuncd,$,$,E(0,1),$,E(0,1))
+ASGN(AGAIN$)
+
+!統一編號
+#CustId=X,8,I
+C(3,#CHAIN,1,s,$)
+@V(7)A(ID_UNINO,0,#CustId)
+
+#checkchain=X,1,S
+C(3,#CHAIN,1,T(F,@CustId,0),T(F,@CustId,1))
+
+
+#RimCustId=X,10,S
+
+#RimCustNo=A,7,S
+
+#RimFunCd=A,1,S
+
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+#RimL1r01=X,1,S
+C(2,#FKEY,$,s,s,s,s,s,s,s,s,s)
+T(2,@RimCustId,#CustId)
+E(0,@RimFunCd,5)
+RESET_RIM(#RimL1r01,L1R01)
+S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
+R(1,L1R01)
+T(2,@BranchNoBefore,#L1r01BranchNo)
+T(2,@CustIdBefore,#L1r01CustId)
+T(2,@CustIdAfter,#L1r01CustId)
+T(2,@CustNameBefore,#L1r01CustName)
+T(2,@CustNameAft,#L1r01CustName)
+E(0,@BirthdayBefore,#L1r01Birthday)
+E(0,@BirthdayAft,#L1r01Birthday)
+E(0,@CustTypeBefore,#L1r01CustTypeCode)
+E(0,@CustTypeAft,#L1r01CustTypeCode)
+T(2,@IndustryBefore,#L1r01IndustryCode)
+T(2,@IndustryAft,#L1r01IndustryCode)
+T(2,@CountryBefore,#L1r01NationalityCode)
+T(2,@CountryAft,#L1r01NationalityCode)
+T(2,@SpouseIdBefore,#L1r01SpouseId)
+T(2,@SpouseIdAft,#L1r01SpouseId)
+T(2,@SpouseNmBefore,#L1r01SpouseName)
+T(2,@SpouseNmAft,#L1r01SpouseName)
+E(0,@RegZip3Before,#L1r01RegZip3)
+E(0,@RegZip3Aft,#L1r01RegZip3)
+E(0,@RegZip2Before,#L1r01RegZip2)
+E(0,@RegZip2Aft,#L1r01RegZip2)
+T(2,@RegCitycodeBefore,#L1r01RegCityCode)
+T(2,@RegCitycodeAft,#L1r01RegCityCode)
+T(2,@RegAreacodeBefore,#L1r01RegAreaCode)
+T(2,@RegAreacodeAft,#L1r01RegAreaCode)
+T(2,@RegRoadBefore,#L1r01RegRoad)
+T(2,@RegRoadAft,#L1r01RegRoad)
+T(2,@RegSectionBefore,#L1r01RegSection)
+T(2,@RegSectionAft,#L1r01RegSection)
+T(2,@RegAlleyBefore,#L1r01RegAlley)
+T(2,@RegAlleyAft,#L1r01RegAlley)
+T(2,@RegLaneBefore,#L1r01RegLane)
+T(2,@RegLaneAft,#L1r01RegLane)
+T(2,@RegNumBefore,#L1r01RegNum)
+T(2,@RegNumAft,#L1r01RegNum)
+T(2,@RegNumdashsBefore,#L1r01RegNumDash)
+T(2,@RegNumdashsAft,#L1r01RegNumDash)
+T(2,@RegFloorBefore,#L1r01RegFloor)
+T(2,@RegFloorAft,#L1r01RegFloor)
+T(2,@RegFloordashBefore,#L1r01RegFloorDash)
+T(2,@RegFloordashAft,#L1r01RegFloorDash)
+E(0,@CurrZipBefore3,#L1r01CurrZip3)
+E(0,@CurrZip3Aft,#L1r01CurrZip3)
+E(0,@CurrZipBefore2,#L1r01CurrZip2)
+E(0,@CurrZip2Aft,#L1r01CurrZip2)
+T(2,@CurrCitycodeBefore,#L1r01CurrCityCode)
+T(2,@CurrCitycodeAft,#L1r01CurrCityCode)
+T(2,@CurrAreacodeBefore,#L1r01CurrAreaCode)
+T(2,@CurrAreacodeAft,#L1r01CurrAreaCode)
+T(2,@CurrRoadBefore,#L1r01CurrRoad)
+T(2,@CurrRoadAft,#L1r01CurrRoad)
+T(2,@CurrSectionBefore,#L1r01CurrSection)
+T(2,@CurrSectionAft,#L1r01CurrSection)
+T(2,@CurrAlleyBefore,#L1r01CurrAlley)
+T(2,@CurrAlleyAft,#L1r01CurrAlley)
+T(2,@CurrLaneBefore,#L1r01CurrLane)
+T(2,@CurrLaneAft,#L1r01CurrLane)
+T(2,@CurrNumBefore,#L1r01CurrNum)
+T(2,@CurrNumAft,#L1r01CurrNum)
+T(2,@CurrNumdashsBefore,#L1r01CurrNumDash)
+T(2,@CurrNumdashsAft,#L1r01CurrNumDash)
+T(2,@CurrFloorBefore,#L1r01CurrFloor)
+T(2,@CurrFloorAft,#L1r01CurrFloor)
+T(2,@CurrFloordashBefore,#L1r01CurrFloorDash)
+T(2,@CurrFloordashAft,#L1r01CurrFloorDash)
+T(2,@EmailBefore,#L1r01EMail)
+T(2,@EmailAft,#L1r01EMail)
+T(2,@EntcodeBefore,#L1r01EntCode)
+T(2,@EntcodeAft,#L1r01EntCode)
+T(2,@EnameBefore,#L1r01EName)
+T(2,@EnameAft,#L1r01EName)
+E(0,@IncomeofyearlyBefore,#L1r01IncomeOfYearly)
+E(0,@IncomeofyearlyAft,#L1r01IncomeOfYearly)
+T(2,@IncomedatadateBefore,#L1r01IncomeDataDate)
+T(2,@IncomedatadateAft,#L1r01IncomeDataDate)
+T(H,@CustTypeBeforeX,#CustTypeBefore,#CustTypeCodeHelp)
+T(H,@Countryx,#CountryBefore,#NationalityCodeHelp)
+T(H,@CountryxAft,#CountryAft,#NationalityCodeHelp)
+T(H,@RegCityBeforeItem,#RegCitycodeBefore,#L6r03ResultCity)
+T(H,@RegCityAftItem,#RegCitycodeAft,#L6r03ResultCity)
+T(H,@CurrCityItemX,#CurrCitycodeBefore,#L6r03ResultCity)
+T(H,@CurrCityItemXAft,#CurrCitycodeAft,#L6r03ResultCity)
+T(H,@EntcodeBeforeX,#EntcodeBefore,#EntCodeHelp)
+T(H,@EntcodeAftX,#EntcodeAft,#EntCodeHelp)
+! 預先調rim塞值1
+#SendL6R06AA=X,1,S
+#RimIndustryCode=X,6,S
+! E(0,@RimFuncCode,5)
+! T(2,@RimIndustryCode,#IndustryBefore)
+! RESET_RIM(#SendL6R06A,L6R06)
+! S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
+! R(1,L6R06)
+! #RL6R06AA=X,1,S
+! T(2,@IndustryBeforeX,#L6R06IndustryItem) 
+! #SendL6R06BB=X,1,S
+! E(0,@RimFuncCode,5)
+! T(2,@RimIndustryCode,#IndustryAft)
+! RESET_RIM(#SendL6R06A,L6R06)
+! S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
+! R(1,L6R06)
+! #RL6R06BB=X,1,S
+! T(2,@IndustryAftX,#L6R06IndustryItem)
+
+! 預先調rim塞值2-1
+#SendL1R17=X,1,S
+! #RimCityCode2=X,2,S
+! T(2,#L1r01RegCityCode)
+! #RimAreaCode2=X,2,S
+! T(2,#L1r01RegAreaCode)
+! RESET_RIM(#SendL1R17,L1R17)
+! S(L1R17,1,#RimAreaCode2,#RimCityCode2)
+! R(1,L1R17)
+! T(2,@RegAreaItemX,#L1R17AreaItem)
+! T(2,@RegAreaItemXAft,#L1R17AreaItem)
+! ! 預先調rim塞值2-2
+! #Space22=X,1,S
+! T(2,@RimCityCode2,#L1r01CurrCityCode)
+! T(2,@RimAreaCode2,#L1r01CurrAreaCode)
+! RESET_RIM(#SendL1R17,L1R17)
+! S(L1R17,1,#RimAreaCode2,#RimCityCode2)
+! R(1,L1R17)
+! T(2,@CurrAreaItemX,#L1R17AreaItem)
+! T(2,@CurrAreaItemXAft,#L1R17AreaItem)
+! 預先調rim塞值3
+
+! 調是否為關係人rim
+#RimL1R16=X,1,S
+!RESET_RIM(#RimL1r16,L1R16)
+!S(L1R16,1,#RimCustId)
+!R(1,L1R16)
+!T(2,@IsLimit,#L1R16IsLimitYn)
+!T(2,@IsRelated,#L1R16IsRelatedYn)
+!T(2,@IsLnrelNear,#L1R16IsLnrelNearYn)
+!T(H,@IsLimitX,#IsLimit,#YesNoHelp)
+!T(H,@IsRelatedX,#IsRelated,#YesNoHelp)
+!T(H,@IsLnrelNearX,#IsLnrelNear,#YesNoHelp)
+!T(H,@IsLimitXAft,#IsLimit,#YesNoHelp)
+!T(H,@IsRelatedXAft,#IsRelated,#YesNoHelp)
+!T(H,@IsLnrelNearXAft,#IsLnrelNear,#YesNoHelp)
+! 單位別
+#BranchNoBefore=X,4,S
+
+#BranchNoInd=X,1,L
+
+#BranchNo=X,4,S
+T(4,BRN$)
+
+#BranchNoInd=_,_,L
+IF(#BranchNoBefore == #BranchNo,T(3,),T(3,X))
+
+
+!統一編號
+#CustIdBefore=X,10,L
+
+#CustIdInd=X,1,L
+
+#CustIdAfter=X,10,L
+T(2,@CustIdAfter,#CustIdBefore)
+@C(4,#CustIdAfter,S,A(ID_UNINO,0,#CustIdAfter))
+
+
+#CustIdInd=_,_,L
+IF(#CustIdAfter==#CustId || #CustIdAfter == "",T(3,),T(3,X))
+
+!公司名稱
+#CustNameBefore=c,2.50,L
+
+#CustNameInd=X,1,L
+
+#CustNameAft=c,2.50,I
+@V(7)
+#CustNameInd=_,_,L
+C(5,#CustNameAft,#CustNameBefore,T(3,),T(3,X))
+
+
+#DATE=D,8,S
+T(4,DATE$)
+
+#DT=D,7,S
+T(1,#DATE,2,7)
+
+!設立日期
+#BirthdayBefore=D,7,L
+
+
+#BirthdayInd=X,1,L
+
+#BirthdayAft=D,7,I
+@V(7)A(DATE,0,#BirthdayAft)
+
+
+!設立日期比較
+#BirthdayBefore8=N,8,S
+
+#BirthdayAft8=N,8,S
+
+#Birthdaydiff=N,8,S
+E(0,#BirthdayBefore-#BirthdayAft)
+
+#BirthdayInd=_,_,L
+IF(#Birthdaydiff == 0,T(3,),T(3,X))
+
+!客戶別
+#CustTypeBefore=A,2,L
+
+#CustTypeBeforeX=X,10,L
+T(H,#CustTypeBefore,#CustTypeCodeHelp)
+
+#CustTypeInd=X,1,L
+
+#CustTypeAft=A,2,I
+HELP(#CustTypeCodeHelp)
+@V(H,#CustTypeCodeHelp)
+
+#CustTypeAftX=X,10,L
+T(H,#CustTypeAft,#CustTypeCodeHelp)
+
+#CustTypeInd=_,_,L
+IF(#CustTypeAft==#CustTypeBefore,T(3,),T(3,X))
+
+
+!行業別查詢按鈕
+#BUF2=X,18,S
+
+#BIND2=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6062; ntxbuf=#BUF2;ntxbuf5=type<-1:IndustryAft<-OOIndustryCode})
+
+!行業別
+#IndustryBefore=X,6,L
+
+#SendL6R06A=X,1,S
+! E(0,@RimFuncCode,5)
+! T(2,@RimIndustryCode,#IndustryBefore)
+! RESET_RIM(#SendL6R06A,L6R06)
+! S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
+! R(1,L6R06)
+! T(2,@IndustryBeforeX,#L6R06IndustryItem)
+
+#IndustryBeforeX=X,60,L
+
+#IndustryInd=X,1,L
+
+#IndustryAft=X,6,I
+
+#SendL6R06B=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimIndustryCode,#IndustryAft)
+C(5,#IndustryAft,#IndustryBefore,S,$)
+RESET_RIM(#SendL6R06B,L6R06)
+S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
+R(1,L6R06)
+
+#RL6R06B=X,1,S
+T(2,@IndustryAftX,#L6R06IndustryItem)
+
+#IndustryAftX=X,60,L
+C(5,#IndustryAft,#IndustryBefore,T(2,@IndustryAftX,#IndustryBeforeX),$)
+#IndustryInd=_,_,L
+IF(#IndustryAft==#IndustryBefore || #IndustryAft == 0,T(3,),T(3,X))
+
+
+!國籍
+#CountryBefore=X,2,L
+
+#Countryx=X,50,L
+T(H,#CountryBefore,#NationalityCodeHelp)
+
+#CountryInd=X,1,L
+
+#CountryAft=X,2,I
+HELP(#NationalityCodeHelp)
+@V(H,#NationalityCodeHelp)
+
+#CountryxAft=X,50,L
+T(H,#CountryAft,#NationalityCodeHelp)
+
+#CountryInd=_,_,L
+IF(#CountryAft==#CountryBefore || #CountryAft == "",T(3,),T(3,X))
+
+!負責人身分證
+#SpouseIdBefore=X,10,L
+
+#SpouseIdInd=X,1,L
+
+#SpouseIdAft=X,10,I
+@C(4,#SpouseIdAft,S,A(ID_UNINO,0,#SpouseIdAft))
+
+#SpouseIdInd=_,_,L
+IF(#SpouseIdAft==#SpouseIdBefore ,T(3,),T(3,X))
+
+!負責人姓名
+#SpouseNmBefore=x,2.50,L
+
+#SpouseNmInd=X,1,L
+
+#SpouseNmAft=x,2.50,I
+
+#SpouseNmInd=_,_,L
+C(5,#SpouseNmAft,#SpouseNmBefore,T(3,),T(3,X))
+
+!公司-郵遞區號前三碼
+#RegZip3Before=A,3,L
+
+#RegZip3Ind=X,1,L
+
+#RegZip3Aft=A,3,I
+
+#RegZip3Ind=_,_,L
+IF(#RegZip3Aft==#RegZip3Before,T(3,),T(3,X))
+
+!公司-郵遞區號後兩碼
+#RegZip2Before=X,3,L
+
+#RegZip2Ind=X,1,L
+
+#RegZip2Aft=X,3,I
+
+#RegZip2Ind=_,_,L
+IF(#RegZip2Aft==#RegZip2Before,T(3,),T(3,X))
+
+
+
+
+
+!公司-縣市代碼
+#RegCitycodeBefore=X,2,L
+
+
+! 縣市代碼對應名稱
+#RegCityBeforeItem=X,10,L
+T(H,#RegCitycodeBefore,#L6r03ResultCity)
+
+
+! 調RIM取鄉鎮市區代碼
+#RimL6r03AreaBefore=X,1,S
+E(0,@RimFunCd,2)
+T(2,@RimCityCode,#RegCitycodeBefore)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL6r03AreaBefore,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+
+! 鄉鎮市區代碼的下拉選單
+#L6r03ResultAreaBefore=X,10000,S
+C(4,#L6r03ResultAreaBefore,T(2,#L6r03Result),$)
+
+#RegCitycodeInd=X,1,L
+
+#RegCitycodeAft=X,2,I
+HELP(#L6r03ResultCity,cols:5)
+@V(H,#L6r03ResultCity)
+
+
+! 縣市代碼對應名稱
+#RegCityAftItem=X,10,L
+T(H,#RegCitycodeAft,#L6r03ResultCity)
+
+#RegCitycodeInd=_,_,L
+IF(#RegCitycodeAft==#RegCitycodeBefore,T(3,),T(3,X))
+
+
+! 調RIM取鄉鎮市區代碼
+#RimL6r03Area=X,1,S
+E(0,@RimFunCd,2)
+T(2,@RimCityCode,#RegCitycodeAft)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL6r03Area,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+
+
+
+!公司-鄉鎮市區代碼
+#RegAreacodeBefore=X,3,L
+
+
+! 鄉鎮市區代碼的對應名稱
+#RegAreaItemX=X,20,L
+T(H,#RegAreacodeBefore,#L6r03ResultAreaBefore)
+
+#L6r03ResultArea=X,10000,S
+T(2,#L6r03Result)
+
+
+
+#RegAreacodeInd=X,1,L
+
+#RegAreacodeAft=X,3,I
+HELP(#L6r03ResultArea,cols:5)
+@V(H,#L6r03ResultArea)
+
+
+! 鄉鎮市區代碼的對應名稱
+#RegAreaItemXAft=X,20,L
+T(H,#RegAreacodeAft,#L6r03ResultArea)
+
+#RegAreacodeInd=_,_,L
+IF(#RegCitycodeInd=="X",T(3,X),IF(#RegAreacodeAft==#RegAreacodeBefore,T(3,),T(3,X)))
+! IF(#RegAreacodeAft==#RegAreacodeBefore,T(3,),T(3,X))
+
+
+
+!公司-路名
+#RegRoadBefore=c,40,L
+
+#RegRoadInd=X,1,L
+
+#RegRoadAft=c,40,I
+TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
+@C(4,#L1r01RegRoad,$,V(7))
+#RegRoadInd=_,_,L
+IF(#RegRoadAft==#RegRoadBefore,T(3,),T(3,X))
+
+!公司-段
+#RegSectionBefore=X,5,L
+
+#RegSectionInd=X,1,L
+
+#RegSectionAft=X,5,I
+
+#RegSectionInd=_,_,L
+IF(#RegSectionAft==#RegSectionBefore,T(3,),T(3,X))
+
+!公司-巷
+#RegAlleyBefore=X,5,L
+
+#RegAlleyInd=X,1,L
+
+#RegAlleyAft=X,5,I
+
+#RegAlleyInd=_,_,L
+IF(#RegAlleyAft==#RegAlleyBefore,T(3,),T(3,X))
+
+!公司-弄
+#RegLaneBefore=X,5,L
+
+#RegLaneInd=X,1,L
+
+#RegLaneAft=X,5,I
+
+#RegLaneInd=_,_,L
+IF(#RegLaneAft==#RegLaneBefore,T(3,),T(3,X))
+
+!公司-號
+#RegNumBefore=X,5,L
+
+#RegNumInd=X,1,L
+
+#RegNumAft=X,5,I
+
+#RegNumInd=_,_,L
+IF(#RegNumAft==#RegNumBefore,T(3,),T(3,X))
+
+!公司-號之
+#RegNumdashsBefore=X,5,L
+
+#RegNumdashsInd=X,1,L
+
+#RegNumdashsAft=X,5,I
+
+#RegNumdashsInd=_,_,L
+IF(#RegNumdashsAft==#RegNumdashsBefore,T(3,),T(3,X))
+
+!公司-樓
+#RegFloorBefore=X,5,L
+
+#RegFloorInd=X,1,L
+
+#RegFloorAft=X,5,I
+
+#RegFloorInd=_,_,L
+IF(#RegFloorAft==#RegFloorBefore,T(3,),T(3,X))
+
+!公司-樓之
+#RegFloordashBefore=X,5,L
+
+#RegFloordashInd=X,1,L
+
+#RegFloordashAft=X,5,I
+
+#RegFloordashInd=_,_,L
+IF(#RegFloordashAft==#RegFloordashBefore,T(3,),T(3,X))
+
+
+!通訊-郵遞區號前三碼
+#CurrZipBefore3=A,3,L
+
+#CurrZip3Ind=X,1,L
+
+#CurrZip3Aft=A,3,I
+
+#CurrZip3Ind=_,_,L
+IF(#CurrZip3Aft==#CurrZipBefore3,T(3,),T(3,X))
+
+!通訊-郵遞區號後兩碼
+#CurrZipBefore2=X,3,L
+
+#CurrZip2Ind=X,1,L
+
+#CurrZip2Aft=X,3,I
+
+#CurrZip2Ind=_,_,L
+IF(#CurrZip2Aft==#CurrZipBefore2,T(3,),T(3,X))
+
+
+
+!通訊-縣市代碼
+#CurrCitycodeBefore=X,2,L
+
+
+!通訊-縣市代碼對應名稱
+#CurrCityItemX=X,10,L
+T(H,#CurrCitycodeBefore,#L6r03ResultCity)
+
+
+!通訊-縣市代碼的下拉選單
+#L6r03ResultCity1=X,1000,S
+T(2,#L6r03Result)
+
+
+
+! 調RIM取鄉鎮市區代碼
+#RimL6r03Area1Before=X,1,S
+C(4,#CurrCitycodeBefore,S,$)
+E(0,@RimFunCd,2)
+T(2,@RimCityCode,#CurrCitycodeBefore)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL6r03Area1Before,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+!通訊-鄉鎮市區代碼的下拉選單
+#L6r03ResultArea1Before=X,1000,S
+C(4,#L6r03ResultArea1Before,T(2,#L6r03Result),$)
+
+#CurrCitycodeInd=X,1,L
+
+#CurrCitycodeAft=X,2,I
+HELP(#L6r03ResultCity,cols:5)
+@V(H,#L6r03ResultCity)
+
+
+!通訊-縣市代碼對應名稱
+#CurrCityItemXAft=X,10,L
+T(H,#CurrCitycodeAft,#L6r03ResultCity)
+
+#CurrCitycodeInd=_,_,L
+IF(#CurrCitycodeAft==#CurrCitycodeBefore,T(3,),T(3,X))
+
+
+! 調RIM取鄉鎮市區代碼
+#RimL6r03Area1=X,1,S
+E(0,@RimFunCd,2)
+T(2,@RimCityCode,#CurrCitycodeAft)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL6r03Area1,L6R03)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+
+
+
+!通訊-鄉鎮市區代碼
+#CurrAreacodeBefore=X,3,L
+
+
+!通訊 鄉鎮市區代碼的對應名稱
+#CurrAreaItemX=X,20,L
+T(H,#CurrAreacodeBefore,#L6r03ResultArea1Before)
+
+
+#CurrAreacodeInd=X,1,L
+
+
+!通訊-鄉鎮市區代碼的下拉選單
+#L6r03ResultArea1=X,1000,S
+T(2,#L6r03Result)
+
+#CurrAreacodeAft=X,3,I
+HELP(#L6r03ResultArea1,cols:5)
+@V(H,#L6r03ResultArea1)
+
+
+!通訊 鄉鎮市區代碼的對應名稱
+#CurrAreaItemXAft=X,20,L
+T(H,#CurrAreacodeAft,#L6r03ResultArea1)
+
+
+
+#CurrAreacodeInd=_,_,L
+IF(#CurrCitycodeInd=="X",T(3,X),IF(#CurrAreacodeAft==#CurrAreacodeBefore,T(3,),T(3,X)))
+! IF(#CurrAreacodeAft==#CurrAreacodeBefore,T(3,),T(3,X))
+
+
+
+!通訊-路名
+#CurrRoadBefore=c,40,L
+
+#CurrRoadInd=X,1,L
+
+#CurrRoadAft=c,40,I
+TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
+@
+C(4,#L1r01CurrRoad,$,V(7))
+
+#CurrRoadInd=_,_,L
+IF(#CurrRoadAft==#CurrRoadBefore,T(3,),T(3,X))
+
+!通訊-段
+#CurrSectionBefore=X,5,L
+
+#CurrSectionInd=X,1,L
+
+#CurrSectionAft=X,5,I
+
+#CurrSectionInd=_,_,L
+IF(#CurrSectionAft==#CurrSectionBefore,T(3,),T(3,X))
+
+!通訊-巷
+#CurrAlleyBefore=X,5,L
+
+#CurrAlleyInd=X,1,L
+
+#CurrAlleyAft=X,5,I
+
+#CurrAlleyInd=_,_,L
+IF(#CurrAlleyAft==#CurrAlleyBefore,T(3,),T(3,X))
+
+!通訊-弄
+#CurrLaneBefore=X,5,L
+
+#CurrLaneInd=X,1,L
+
+#CurrLaneAft=X,5,I
+
+#CurrLaneInd=_,_,L
+IF(#CurrLaneAft==#CurrLaneBefore,T(3,),T(3,X))
+
+!通訊-號
+#CurrNumBefore=X,5,L
+
+#CurrNumInd=X,1,L
+
+#CurrNumAft=X,5,I
+
+#CurrNumInd=_,_,L
+IF(#CurrNumAft==#CurrNumBefore,T(3,),T(3,X))
+
+!通訊-號之
+#CurrNumdashsBefore=X,5,L
+
+#CurrNumdashsInd=X,1,L
+
+#CurrNumdashsAft=X,5,I
+
+#CurrNumdashsInd=_,_,L
+IF(#CurrNumdashsAft==#CurrNumdashsBefore,T(3,),T(3,X))
+
+!通訊-樓
+#CurrFloorBefore=X,5,L
+
+#CurrFloorInd=X,1,L
+
+#CurrFloorAft=X,5,I
+
+#CurrFloorInd=_,_,L
+IF(#CurrFloorAft==#CurrFloorBefore,T(3,),T(3,X))
+
+!通訊-樓之
+#CurrFloordashBefore=X,5,L
+
+#CurrFloordashInd=X,1,L
+
+#CurrFloordashAft=X,5,I
+
+#CurrFloordashInd=_,_,L
+IF(#CurrFloordashAft==#CurrFloordashBefore,T(3,),T(3,X))
+
+
+!電子信箱
+#EmailBefore=x,50,L
+
+#EmailInd=X,1,L
+
+#EmailAft=x,50,I
+@
+C(4,#EmailAft,s,$)
+A(M,0,#EmailAft)
+
+#EmailInd=_,_,L
+IF(#EmailAft==#EmailBefore,T(3,),T(3,X))
+
+! 關係人欄位
+#IsLimit=X,1,S
+#IsRelated=X,1,S
+#IsLnrelNear=X,1,S
+
+#IsLimitXInd=X,1,L
+#IsRelatedXInd=X,1,L
+#IsLnrelNearXInd=X,1,L
+
+#IsLimitX=X,2,L
+#IsRelatedX=X,2,L
+#IsLnrelNearX=X,2,L
+#IsLimitXAft=X,2,L
+#IsRelatedXAft=X,2,L
+#IsLnrelNearXAft=X,2,L
+
+!企金別
+#EntcodeBefore=X,1,L
+
+#EntcodeBeforeX=X,10,L
+T(H,#EntcodeBefore,#EntCodeHelp)
+
+#EntcodeInd=X,1,L
+
+#EntcodeAft=X,1,L
+HELP(#EntCodeHelp)
+@V(H,#EntCodeHelp)
+
+
+#EntcodeAftX=X,10,L
+T(H,#EntcodeAft,#EntCodeHelp)
+
+#EntcodeInd=_,_,L
+IF(#EntcodeAft==#EntcodeBefore,T(3,),T(3,X))
+
+
+!英文姓名
+#EnameBefore=X,20,L
+
+#EnameInd=X,1,L
+
+#EnameAft=X,20,I
+
+#EnameInd=_,_,L
+IF(#EnameAft==#EnameBefore,T(3,),T(3,X))
+!年收入
+#IncomeofyearlyBefore=n,9,L
+
+#IncomeofyearlyInd=X,1,L
+
+#IncomeofyearlyAft=n,9,I
+
+#IncomeofyearlyInd=_,_,L
+IF(#IncomeofyearlyAft==#IncomeofyearlyBefore,T(3,),T(3,X))
+
+!年收入資料年月
+#IncomedatadateBefore=X,5,L
+
+#IncomedatadateInd=X,1,L
+
+#MANU_MM=A,2,S
+
+#IncomedatadateAft=X,5,I
+@C(4,#IncomedatadateAft,S,V(9))
+T(1,@MANU_MM,#IncomedatadateAft,4,5)
+IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式yyyMM),$)
+
+
+#IncomedatadateInd=_,_,L
+IF(#IncomedatadateAft==#IncomedatadateBefore,T(3,),T(3,X))
+
+
+
+!串IND IF空白跳ERROR
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L1104 ----------
+<sub type="FORM" name="L1104">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L1104,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L1104] 顧客基本資料變更-法人)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustId
+#BranchNoBefore
+#BranchNo
+#BranchNoInd
+#CustIdBefore
+#CustIdInd
+#CustIdAfter
+#CustNameBefore
+#CustNameInd
+#CustNameAft
+#BirthdayBefore
+#BirthdayInd
+#BirthdayAft
+#CustTypeBefore
+#CustTypeInd
+#CustTypeAft
+#IndustryBefore
+#IndustryInd
+#IndustryAft
+#CountryBefore
+#CountryInd
+#CountryAft
+#SpouseIdBefore
+#SpouseIdInd
+#SpouseIdAft
+#SpouseNmBefore
+#SpouseNmInd
+#SpouseNmAft
+#RegZip3Before
+#RegZip3Ind
+#RegZip3Aft
+#RegZip2Before
+#RegZip2Ind
+#RegZip2Aft
+#RegCitycodeBefore
+#RegCitycodeInd
+#RegCitycodeAft
+#RegAreacodeBefore
+#RegAreacodeInd
+#RegAreacodeAft
+#RegRoadBefore
+#RegRoadInd
+#RegRoadAft
+#RegSectionBefore
+#RegSectionInd
+#RegSectionAft
+#RegAlleyBefore
+#RegAlleyInd
+#RegAlleyAft
+#RegLaneBefore
+#RegLaneInd
+#RegLaneAft
+#RegNumBefore
+#RegNumInd
+#RegNumAft
+#RegNumdashsBefore
+#RegNumdashsInd
+#RegNumdashsAft
+#RegFloorBefore
+#RegFloorInd
+#RegFloorAft
+#RegFloordashBefore
+#RegFloordashInd
+#RegFloordashAft
+#CurrZipBefore3
+#CurrZip3Ind
+#CurrZip3Aft
+#CurrZipBefore2
+#CurrZip2Ind
+#CurrZip2Aft
+#CurrCitycodeBefore
+#CurrCitycodeInd
+#CurrCitycodeAft
+#CurrAreacodeBefore
+#CurrAreacodeInd
+#CurrAreacodeAft
+#CurrRoadBefore
+#CurrRoadInd
+#CurrRoadAft
+#CurrSectionBefore
+#CurrSectionInd
+#CurrSectionAft
+#CurrAlleyBefore
+#CurrAlleyInd
+#CurrAlleyAft
+#CurrLaneBefore
+#CurrLaneInd
+#CurrLaneAft
+#CurrNumBefore
+#CurrNumInd
+#CurrNumAft
+#CurrNumdashsBefore
+#CurrNumdashsInd
+#CurrNumdashsAft
+#CurrFloorBefore
+#CurrFloorInd
+#CurrFloorAft
+#CurrFloordashBefore
+#CurrFloordashInd
+#CurrFloordashAft
+#EmailBefore
+#EmailInd
+#EmailAft
+#EntcodeBefore
+#EntcodeInd
+#EntcodeAft
+#EnameBefore
+#EnameInd
+#EnameAft
+#IncomeofyearlyBefore
+#IncomeofyearlyInd
+#IncomeofyearlyAft
+#IncomedatadateBefore
+#IncomedatadateInd
+#IncomedatadateAft
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L1104
+^
+<include src="ROM.icf::L1R01.tom"/>
+<include src="ROM.icf::L1R16.tom"/>
+<include src="ROM.icf::L1R17.tom"/>
+<include src="ROM.icf::L6R03.tom"/>
+<include src="ROM.icf::L6R06.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -5,11 +5,11 @@
 <sub type="SYS" name="label">
 
 !#TXCD
-!T(3,L1101)
+!T(3,L1102)
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,996)ASGN(INQHD$)
+E(0,728)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -34,97 +34,70 @@ E(0,1)ASGN(INQPRT$)
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
-!T(3,@BTN3Name,  同戶籍地址)
-!JS(MOUSE,1)
+!T(3,@BTN3,  同公司地址)
+
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,450,250,350];printer.width=[20,20,20,20];order=1">
 [
-["[L1101]                                 顧客基本資料維護-自然人"],
+["[L1102]                                 顧客基本資料維護-法人"],
 [#<->#,"#FdFunCd+功能",#FunCdx],
-["#FdCustId+身分證字號",#CustId],
+["#FdCustId+統一編號",#CustId],
 ["#FdTypeCode+建檔身分別",#TypeCode,#TypeCodeX],
-[#<->#,"#FdCustName+戶名",#CustName],
-[#<->#,"#FdEName+英文姓名",#EName],
-["#FdBirthday+出生年月日",#Birthday],
-["#FdSex+性別",#Sex,#SexX],
-["#FdCustTypeCode+客戶別",#CustTypeCode,#CustTypeCodeX],
-["#FdEmpNo",#EmpNo,#BtnCdEmp,#EmployeeName],
+[#<->#,"#FdCustName+公司名稱",#CustName],
+[#<->#,"#FdEName+英文名稱",#EName],
+[#<->#,"#FdBirthday+設立日期",#Birthday],
+[#<->#,"#FdCustTypeCode+客戶別",#CustTypeCode,#CustTypeCodeX],
 ["#FdEntCode+企金別",#EntCode,#EntCodeX],
-["#FdIndustryCode+行業別",#IndustryCode,#IndustryCodeX],
-[#<->#,"#FdNationalityCode+國籍",#NationalityCode,#NationalityCodex],
-[#<->#,"#FdSpouseId+配偶身分證字號",#SpouseId],
-[#<->#,"#FdSpouseName+配偶姓名",#SpouseName],
-[#<->#,"#FdRegCityCode+戶籍-地址",#RegCityCode,#RegCityItem,#RegAreaCode,#RegAreaItem,"</br>",#RegRoad,"</br>",#RegSection,"段",#RegAlley,"巷",#RegLane,"弄",#RegNum,"號","之",#RegNumDash,",",#RegFloor,"樓","之",#RegFloorDash],
+["#FdIndustryCode+行業別",#IndustryCode,#BTN2,#IndustryCodeX],
+["#FdNationalityCode+公司註冊地",#NationalityCode,#NationalityCodex],
+["#FdBussNationalityCode+營業地國籍",#BussNationalityCode,#BussNationalityCodex],
+[#<->#,"#FdSpouseId+負責人身分證字號",#SpouseId],
+[#<->#,"#FdSpouseName+負責人姓名",#SpouseName],
+[#<->#,"#FdRegCityCode+公司-地址",#RegCityCode,#RegCityItem,#RegAreaCode,#RegAreaItem,"</br>",#RegRoad,"</br>",#RegSection,"段",#RegAlley,"巷",#RegLane,"弄",#RegNum,"號","之",#RegNumDash,",",#RegFloor,"樓","之",#RegFloorDash],
 [#<->#,"@@",#Regaddress],
-[#<->#,"#FdRegZip3+戶籍-郵遞區號",#RegZip3,#RegZip2],
+[#<->#,"#FdRegZip3+公司-郵遞區號",#RegZip3,#RegZip2],
 [#<->#,"#FdCurrCityCode+通訊-地址",#SameReg,#SameRegX],
 [#<->#,"@@",#CurrCityCode,#CurrCityItem,#CurrAreaCode,#CurrAreaItem,"</br>",#CurrRoad,"</br>",#CurrSection,"段",#CurrAlley,"巷",#CurrLane,"弄",#CurrNum,"號","之",#CurrNumDash,",",#CurrFloor,"樓","之",#CurrFloorDash],
 [#<->#,"@@",#Curraddress],
 [#<->#,"#FdCurrZip3+通訊-郵遞區號",#CurrZip3,#CurrZip2],
 [#<->#,"#FdEmail+電子信箱",#Email],
 ]
-![#<->#,"@",#BTN3Name],
+
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-
-<include src="HELPRIM.icf::HELPRIM.rtn"/>
-<include src="ROM.icf::L0Rim.dec"/>
-<include src="ROM.icf::L1R01.dec"/>
-<include src="ROM.icf::L1R10.dec"/>
-<include src="ROM.icf::L2Rim.dec"/>
-<include src="ROM.icf::L2R08.dec"/>
-<include src="ROM.icf::L6R06.dec"/>
-
-#CHAIN=A,1,S
-T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
-T(2,@RimTxCode,#TXCD)
-
-#NTXBUF=X,11,S
-C(3,#CHAIN,1,T(4,NTXBUF$),S)
-
-#CHAIN_Funcd=A,1,S
-T(1,#NTXBUF,1,1)
-
-#CHAIN_CustId=X,10,S
+! #BTN1=X,15,I,ui:button;value:L1105;enable:0;tabbable:0;title=顧客聯絡電話維護;
+#BTN2=X,15,I,ui:button;value:行業別代號查詢;enable:1;tabbable:0;title=行業別代號查詢;
+!#BTN3=X,15,I,ui:button;value:;enable:1;tabbable:0;
+! #ENABLE1=X,42,S
+! ENABLE(#BTN1)
 
 #Init1=X,1,S
 HIDE(#FinancialBtn)
 
 #FinancialBtn=X,15,I,ui:button;value:明細查詢;enable:1;tabbable:0;title:L1909 疑似準利害關係人明細查詢;
 
-! #BTN1=X,15,I,ui:button;value:L1105;enable:0;tabbable:0;title=顧客聯絡電話維護;
-!#BTN2=X,15,I,ui:button;value:行業別代號查詢;enable:1;tabbable:0;title=行業別代號查詢;
-!#BTN3Name=X,12,I,ui:button;value:;enable:1;tabbable:0;
+!行業別查詢按鈕
+#BUF2=X,18,S
 
-! #ENABLE1=X,42,S
-! ENABLE(#BTN1)
-#Init=X,1,S
-INVOKEJS(SHOW,p9,0)
+#BIND2=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6062; ntxbuf=#BUF2;ntxbuf5=type<-1:IndustryCode<-OOIndustryCode:IndustryCodeX<-OOIndustryItem})
 
-![Buttom資料查詢]
-#BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
-#BindCdEmp=X,1,S
-BIND(#BtnCdEmp,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=;ntxbuf5=type<-1:EmpNo<-OOEmployeeNo:EmpNo2<-OOEmployeeNo:EmployeeName<-OOFullname})
-
-
-! 複製戶籍地址
+! ENABLE(#BTN2)ENABLE(#BTN3)
+! 複製公司地址
 #RegFg=A,1,S
 E(0,0)
 
-
-#CopyReg=@,1,S
+!#CopyReg=@,1,S
 !IF(#RegFg==5,E(0,@RegFg,0),E(0,@RegFg,5))
-!IF(#RegFg==5,T(3,@BTN3Name,V同戶籍地址)!SHOW(#CurrZip3Lb,#CurrZip2Lb)HIDE(#CurrZip3,#CurrZip2),T(3,@BTN3Name,  同戶籍地址)HIDE(#CurrZip3Lb,#CurrZip2Lb)SHOW(#CurrZip3,#CurrZip2))
+!IF(#RegFg==5,T(3,@BTN3,V同公司地址)SHOW(#CurrZip3Lb,#CurrZip2Lb)HIDE(#CurrZip3,#CurrZip2),T(3,@BTN3,  同公司地址)HIDE(#CurrZip3Lb,#CurrZip2Lb)SHOW(#CurrZip3,#CurrZip2))
 !CALL(#PasteReg)
 !CALL(#INVK)
 
 #PasteReg=@,1,S
-!IF(#RegFg==5,$,s)
 E(0,@CurrZip3,#RegZip3)
-T(2,@CurrZip2,#RegZip2)
+E(0,@CurrZip2,#RegZip2)
 E(0,@CurrZip3Lb,#RegZip3)
 T(2,@CurrZip2Lb,#RegZip2)
 T(2,@CurrCityCode,#RegCityCode)
@@ -137,54 +110,67 @@ T(2,@CurrNum,#RegNum)
 T(2,@CurrNumDash,#RegNumDash)
 T(2,@CurrFloor,#RegFloor)
 T(2,@CurrFloorDash,#RegFloorDash)
+!INVOKEJS(SHOW,p1,14,14,0)
+!INVOKEJS(SHOW,p1,15,15,1)
 T(2,@Curraddress,#Regaddress)
 
 
 #INVK=@,1,S
 IF(#RegFg==0,$,s)
+!INVOKEJS(SHOW,p1,14,14,1)
+!INVOKEJS(SHOW,p1,15,15,0)
 
-! ENABLE(#BTN2)ENABLE(#BTN3)
-!---------- Required Input Setting ---------- 
+!---------- Required Input Setting ----------
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L1R01.dec"/>
+<include src="ROM.icf::L1R10.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L6R06.dec"/>
 <include src="ROM.icf::L6R11Rim.dec"/>
 
 ! 必輸欄位
 #FdCustName=X,2,L
 #FdBirthday=X,2,L
-#FdSex=X,2,L
 #FdCustTypeCode=X,2,L
 #FdIndustryCode=X,2,L
 #FdNationalityCode=X,2,L
+#FdBussNationalityCode=X,2,L
 #FdSpouseId=X,2,L
 #FdSpouseName=X,2,L
 #FdRegZip3=X,2,L
 #FdRegZip2=X,2,L
 #FdRegCityCode=X,2,L
+#FdRegAreaCode=X,2,L
+#FdRegRoad=X,2,L
+#FdRegSection=X,2,L
+#FdRegAlley=X,2,L
+#FdRegLane=X,2,L
+#FdRegNum=X,2,L
+#FdRegNumDash=X,2,L
+#FdRegFloor=X,2,L
+#FdRegFloorDash=X,2,L
 #FdCurrZip3=X,2,L
 #FdCurrZip2=X,2,L
 #FdCurrCityCode=X,2,L
+#FdCurrAreaCode=X,2,L
+#FdCurrRoad=X,2,L
+#FdCurrSection=X,2,L
+#FdCurrAlley=X,2,L
+#FdCurrLane=X,2,L
+#FdCurrNum=X,2,L
+#FdCurrNumDash=X,2,L
+#FdCurrFloor=X,2,L
+#FdCurrFloorDash=X,2,L
 #FdEmail=X,2,L
 #FdIsLimit=X,2,L
 #FdIsRelated=X,2,L
 #FdIsLnrelNear=X,2,L
-#FdIsSuspected=X,2,L
-#FdIsSuspected2=X,2,L
 #FdEntCode=X,2,L
-#FdEmpNo=X,10,L
-T(3,*    員工代號)
 #FdEName=X,2,L
-#FdEduCode=X,2,L
-#FdOwnedHome=X,2,L
-#FdCurrCompName=X,2,L
-#FdCurrCompId=X,2,L
-#FdCurrCompTel=X,2,L
-#FdJobTitle=X,2,L
-#FdJobTenure=X,2,L
 #FdIncomeOfYearly=X,2,L
 #FdIncomeDataDate=X,2,L
-#FdPassportNo=X,2,L
-#FdAMLJobCode=X,2,L
-#FdAMLGroup=X,2,L
-#FdIndigenousName=X,2,L
+#FdIsSuspected=X,2,L
+#FdIsSuspected2=X,2,L
 #FdSubCompanyFg=X,2,L
 
 ! 永遠為必輸欄位
@@ -197,106 +183,95 @@ T(3,*)
 T(3,*)
 
 !---------- AP TEXT AREA Variables ----------
+
 ! Help
 #TypeCodeHelp=x,100,S
 T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人)
 
-!Sex 性別
-#CDDEF0001=x,20,S
-T(3,CdCode.Sex)
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
+T(2,@RimTxCode,#TXCD)
 
-#SexHelp=x,1024,S
+#NTXBUF1=X,11,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
+#CHAIN_Funcd=A,1,S
+T(1,#NTXBUF1,1,1)
+
+#CHAIN_CustId=X,10,S
+T(1,#NTXBUF1,2,10)
+
+#Space=X,1,S
+C(4,#CHAIN_CustId,$,T(2,@CustId,#CHAIN_CustId))
+
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
 !CustTypeCode 客戶別
-#CDDEF0002=x,20,S
+#CDDEF0001=x,20,S
 T(3,CdCode.CustTypeCode)
 
 #CustTypeCodeHelp=x,1024,S
 
-
 !NationalityCode 國籍
-#CDDEF0003=x,25,S
+#CDDEF0002=x,25,S
 T(3,CdCode.NationalityCode)
 
 #NationalityCodeHelp=x,1024,S
 
 !EntCode 企金別
-#CDDEF0004=x,20,S
+#CDDEF0003=x,20,S
 T(3,CdCode.EntCode)
 
 #EntCodeHelp=x,1024,S
-T(3,0:個金;2:企金自然人)
-
-!EduCode 教育程度代號
-#CDDEF0005=x,20,S
-T(3,CdCode.EduCode)
-
-#EduCodeHelp=x,1024,S
-
-!AMLCode AML組織代號
-#CDDEF0006=x,20,S
-T(3,CdCode.AMLCode)
-
-
-#AMLCodeHelp=x,1024,S
-
-!YesNo YesNo
-#CDDEF0007=x,20,S
-T(3,CdCode.YesNo)
-
-#YesNoHelp=x,1024,S
-
-!AMLJobCode AML職業別代號
-#CDDEF0008=x,20,S
-T(3,CdCode.AMLJobCode)
-
-#AMLJobCodeHelp=x,1024,S
 
 !TelTypeCode
-#CDDEF0009=x,25,S
+#CDDEF0004=x,25,S
 T(3,CdCode.TelTypeCode)
 
 #TelTypeCodeHelp=x,1024,S
 
 !RelationCode
-#CDDEF0010=x,30,S
+#CDDEF0005=x,30,S
 T(3,CdCode.RelationCode)
 
 #RelationCodeHelp=x,1024,S
 
+!YesNo YesNo
+#CDDEF0006=x,20,S
+T(3,CdCode.YesNo)
+
+#YesNoHelp=x,1024,S
+
 !SubCompanyCode
-#CDDEF0011=x,30,S
+#CDDEF0007=x,30,S
 T(3,CdCode.SubCompanyCode)
 
 #SubCompanyCodeHelp=x,1024,S
 
 #HelpRim=X,1,S
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007,#CDDEF0008,#CDDEF0009,#CDDEF0010)
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@SexHelp,#HelpDesc1)
-T(2,@CustTypeCodeHelp,#HelpDesc2)
-!T(HELP,@CustTypeCodeHelp,#CustTypeCodeHelp,-,01;02)
-T(2,@NationalityCodeHelp,#HelpDesc3)
-! T(2,@EntCodeHelp,#HelpDesc4)
-T(2,@EduCodeHelp,#HelpDesc5)
-T(2,@AMLCodeHelp,#HelpDesc6)
-T(2,@YesNoHelp,#HelpDesc7)
-T(2,@AMLJobCodeHelp,#HelpDesc8)
-T(2,@TelTypeCodeHelp,#HelpDesc9)
-T(2,@RelationCodeHelp,#HelpDesc10)
+T(2,@CustTypeCodeHelp,#HelpDesc1)
+T(2,@NationalityCodeHelp,#HelpDesc2)
+T(2,@EntCodeHelp,#HelpDesc3)
+T(2,@TelTypeCodeHelp,#HelpDesc4)
+T(2,@RelationCodeHelp,#HelpDesc5)
+T(2,@YesNoHelp,#HelpDesc6)
+T(2,@SubCompanyCodeHelp,#HelpDesc7)
 
-#HelpRim1=X,1,S
-S(XXR99,01,,#CDDEF0011)
-R(1,XXR99)
-CALL(#HelpProc)
-T(2,@SubCompanyCodeHelp,#HelpDesc1)
+#X1=X,1,S
+T(HELP,@CustTypeCodeHelp,#CustTypeCodeHelp,-,01)
 
 #FunCdHelp=x,50,S
 T(3,1:新增;5:查詢)
 
 #EnableHelp=x,20,S
 T(3,Y:啟用;N:停用)
+
 
 <include src="ROM.icf::L6R03.dec"/>
 <include src="ROM.icf::L1R12.dec"/>
@@ -310,6 +285,7 @@ C(3,#FunCd,5,s,$)
 E(0,@RimFunCd,1)
 T(3,@RimCityCode,)
 T(3,@RimAreaCode,)
+RESET_RIM(#RimL6r03City,L6R03)
 S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
 R(1,L6R03)
 
@@ -318,11 +294,10 @@ R(1,L6R03)
 T(2,#L6r03Result)
 
 
-T(1,@CustId,#NTXBUF,2,10)
-
 #INIT=X,1,S
-INVOKEJS(SHOW,grd3,0)
-
+!INVOKEJS(SHOW,p1,11,11,0)
+!INVOKEJS(SHOW,p1,15,15,0)
+!HIDE(#CurrZip3Lb,#CurrZip2Lb)
 
 
 !功能
@@ -334,18 +309,8 @@ HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
 E(0,@FUNCIND,#FunCd)
 
-
-!FunCd=5,隱藏送出按鈕
-! #BTNCD=A,1,S
-! C(2,#FunCd,S,K(NOBUTTON,SHOW),S,S,K(NOBUTTON,SHOW),K(NOBUTTON,CLOSE))
-
-
-#showtel=X,1,S
-IF(#FunCd==1,INVOKEJS(SHOW,grd3,0),INVOKEJS(SHOW,grd3,1))
-
 #FunCdx=X,4,L
 C(4,#FunCd,S,$)
-! E(0,@FUNCIND,#FunCd)
 T(H,#FunCd,#FunCdHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 
@@ -353,125 +318,19 @@ C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增
 C(2,#FunCd,$,$,E(0,1),$,E(0,1),E(0,1))
 ASGN(AGAIN$)
 
+#ckecktel=X,1,S
+!IF(#FunCd==1,INVOKEJS(SHOW,grd3,0),INVOKEJS(SHOW,grd3,1))
 
-#WKSPC=X,2,S
 
-#WKSTAR=X,1,S
-C(2,#FunCd,S,T(3,*),S,S,S,S)
+!FunCd=1顯示框線
 
 #WKTFKEY=X,1,S
 IF(#FunCd == 1 ,E(0,1),E(0,0))
 
-
-
-#IfFunCd5=X,1,S
-IF(#FunCd==5,INVOKEJS(SHOW,p1,3,65,0),INVOKEJS(SHOW,p1,3,65,1))
-
-#checkIdlen=A,2,S
-!-----
-!身分證字號
-#CustId=X,10,I
-C(3,#FunCd,1,$,s)
-C(3,#FunCd,1,T(F,@CustId,1),T(F,@CustId,0))
-@
-V(7)
-P(1,@checkIdlen,#CustId)
-C(3,#checkIdlen,10,$,V(P,請輸入正確身分證字號))
-A(ID_UNINO,0,#CustId)
-
-#IdSTAT=A,1,S
-T(4,STAT$)
-C(3,#IdSTAT,4,T(2,@FdPassportNo,#WKSTAR),T(2,@FdPassportNo,#WKSPC))
-
-#checkSex=X,1,S
-C(3,#FunCd,1,$,S)
-T(1,#CustId,2,1)
-C(3,#checkSex,1,E(0,@Sex,1),$)
-C(3,#checkSex,8,E(0,@Sex,1),$)
-C(5,#checkSex,A,T(2,@Sex,1),$)
-C(5,#checkSex,C,T(2,@Sex,1),$)
-C(3,#checkSex,2,E(0,@Sex,2),$)
-C(3,#checkSex,9,E(0,@Sex,2),$)
-C(5,#checkSex,B,T(2,@Sex,2),$)
-C(5,#checkSex,D,T(2,@Sex,2),$)
-
-!#RimFunCd=A,1,S
-!#RimCustId=X,10,S
-
-!#RimCustNo=A,7,S
-
-#RimL1r01=X,1,S
-C(3,#FunCd,5,S,$)
-E(0,@RimFunCd,#FunCd)
-T(2,@RimCustId,#CustId)
-RESET_RIM(#RimL1r01,L1R01)
-S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
-R(1,L1R01)
-T(2,@CustName,#L1r01CustName)
-T(2,@TypeCode,#L1r01TypeCode)
-
-#TypeCode=A,1,I
-HELP(#TypeCodeHelp)
-@V(H,#TypeCodeHelp)
-
-#TypeCodeX=x,20,L
-T(H,#TypeCode,#TypeCodeHelp)
-
-
-! 
-#Fd=X,1,S
-T(2,@FdCustName,#WKSTAR)
-T(2,@FdEName,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
-T(2,@FdBirthday,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
-T(2,@FdSex,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
-T(2,@FdCustTypeCode,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
-T(2,@FdEntCode,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
-T(2,@FdNationalityCode,#Fd)
-T(2,@FdSpouseId,#WKSPC)
-T(2,@FdSpouseName,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
-T(2,@FdRegCityCode,#Fd)
-T(2,@FdRegZip2,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
-T(2,@FdCurrCityCode,#Fd)
-T(2,@FdCurrZip2,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
-T(2,@FdEmail,#Fd)
-T(2,@FdIsLimit,#WKSPC)
-T(2,@FdIsRelated,#WKSPC)
-T(2,@FdIsLnrelNear,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
-T(2,@FdIsSuspected,#Fd)
-T(2,@FdIsSuspected2,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
-T(2,@FdEduCode,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
-T(2,@FdOwnedHome,#Fd)
-T(2,@FdCurrCompName,#WKSPC)
-T(2,@FdCurrCompId,#WKSPC)
-T(2,@FdCurrCompTel,#WKSPC)
-T(2,@FdJobTitle,#WKSPC)
-T(2,@FdJobTenure,#WKSPC)
-T(2,@FdIncomeOfYearly,#WKSPC)
-T(2,@FdIncomeDataDate,#WKSPC)
-T(2,@FdPassportNo,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
-T(2,@FdAMLJobCode,#Fd)
-T(2,@FdAMLGroup,#Fd)
-T(2,@FdSubCompanyFg,#Fd)
-T(2,@FdIndigenousName,#WKSPC)
-
-!FunCd=1顯示框線
-
 #WKTF=X,1,S
-T(F,@CustName,#WKTFKEY)
+T(F,@CustName1,#WKTFKEY)
+T(F,@CustName2,#WKTFKEY)
 T(F,@Birthday,#WKTFKEY)
-T(F,@Sex,#WKTFKEY)
 T(F,@CustTypeCode,#WKTFKEY)
 T(F,@IndustryCode,#WKTFKEY)
 T(F,@NationalityCode,#WKTFKEY)
@@ -502,41 +361,83 @@ T(F,@CurrNumDash,#WKTFKEY)
 T(F,@CurrFloor,#WKTFKEY)
 T(F,@CurrFloorDash,#WKTFKEY)
 T(F,@Email,#WKTFKEY)
-T(F,@IsLimit,#WKTFKEY)
-T(F,@IsRelated,#WKTFKEY)
-T(F,@IsLnrelNear,#WKTFKEY)
-T(F,@EntCode,#WKTFKEY)
-T(F,@EmpNo,#WKTFKEY)
 T(F,@EName,#WKTFKEY)
-T(F,@EduCode,#WKTFKEY)
-T(F,@OwnedHome,#WKTFKEY)
-T(F,@CurrCompName,#WKTFKEY)
-T(F,@CurrCompId,#WKTFKEY)
-T(F,@CurrCompTel,#WKTFKEY)
-T(F,@JobTitle,#WKTFKEY)
-T(F,@JobTenure,#WKTFKEY)
 T(F,@IncomeOfYearly,#WKTFKEY)
 T(F,@IncomeDataDate,#WKTFKEY)
-T(F,@PassportNo,#WKTFKEY)
-T(F,@AMLJobCode,#WKTFKEY)
-T(F,@AMLGroup,#WKTFKEY)
-T(F,@IndigenousName,#WKTFKEY)
-
-!調Rim
-! <include src="ROM.icf::L1R08.dec"/>
-! !是否為授信限制對象IsLimit
-! !是否為利害關係人IsRelated
-! !是否為準利害關係人IsLnrelNear
-! #RimL1r08=X,1,S
-! RESET_RIM(#RimL1r08,L1R08)
-! S(L1R08,1,#CustId)
-! R(1,L1R08)
 
 
-! #check1r08=X,1,S
-! T(2,@IsRelated,#L1r08IsRelated)
-! T(2,@IsLnrelNear,#L1r08IsLnrelNear)
 
+#IfFunCd5=X,1,S
+!IF(#FunCd==5,INVOKEJS(SHOW,p1,3,20,0),INVOKEJS(SHOW,p1,3,20,1)))
+
+! !FunCd=5,隱藏送出按鈕
+! #BTNCD=A,1,S
+! C(2,#FunCd,S,K(,SHOW),S,S,K(NOBUTTON,SHOW),K(NOBUTTON,CLOSE))
+!-----
+!統一編號
+#CustId=X,8,I
+C(3,#FunCd,1,$,s)
+C(3,#FunCd,1,T(F,@CustId,1),T(F,@CustId,0))
+@V(7)A(ID_UNINO,0,#CustId))
+
+
+#chechCustId=X,1,S
+A(ID_UNINO,0,#CustId)
+
+
+!#RimFunCd=A,1,S
+!#RimCustId=X,10,S
+
+!#RimCustNo=A,7,S
+
+#RimL1r01=X,1,S
+C(3,#FunCd,5,S,$)
+E(0,@RimFunCd,#FunCd)
+T(2,@RimCustId,#CustId)
+RESET_RIM(#RimL1r01,L1R01)
+S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
+R(1,L1R01)
+T(2,@CustName,#L1r01CustName)
+T(2,@TypeCode,#L1r01TypeCode)
+
+#TypeCode=A,1,I
+HELP(#TypeCodeHelp)
+@V(H,#TypeCodeHelp)
+
+#TypeCodeX=x,20,L
+T(H,#TypeCode,#TypeCodeHelp)
+
+#WKSPC=X,2,S
+
+#WKSTAR=X,1,S
+C(2,#FunCd,S,T(3,*),S,S,S,S)
+
+#Fd=X,1,S
+T(2,@FdCustName,#WKSTAR)
+T(2,@FdEName,#WKSPC)
+T(2,@FdBirthday,#WKSTAR)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdCustTypeCode,#Fd)
+T(2,@FdEntCode,#WKSPC)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdIndustryCode,#Fd)
+T(2,@FdNationalityCode,#WKSTAR)
+T(2,@FdBussNationalityCode,#WKSTAR)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdSpouseId,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdSpouseName,#Fd)
+T(2,@FdRegZip3,#WKSPC)
+T(2,@FdRegZip2,#WKSPC)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdRegCityCode,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+T(2,@FdCurrCityCode,#Fd)
+T(2,@FdIncomeOfYearly,#WKSPC)
+T(2,@FdIncomeDataDate,#WKSPC)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+T(2,@FdIsSuspected,#Fd)
+T(2,@FdIsSuspected2,#Fd)
 
 !調RIM參數
 #SeqStart=n,3,S
@@ -548,53 +449,35 @@ E(0,10)
 #ContrCd=A,1,S
 E(0,1)
 
-
 ! 單位別
 #BranchNo=X,4,S
 T(4,BRN$)
 
-!戶名
+!公司名稱
 #CustName=x,2.50,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@V(7)
-
+@
+V(7)
 
 #FinancialBind=X,1,S
 SHOW(#FinancialBtn)
 BIND(#FinancialBtn,click, {cmd=CHAIN; ntxcd=L1909; ntxbuf=#CustName;ntxbuf5=type<-1})
 
-!英文姓名
+!英文名稱
 #EName=x,50,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 
-! #CustName1=c,50,S
-! C(3,#FunCd,4,s,$)
-! C(3,#FunCd,5,s,$)
-! @V(7)
 
-! #CustName2=c,50,S
-! C(3,#FunCd,4,s,$)
-! C(3,#FunCd,5,s,$)
-
-!出生年月日
+!設立日期
 #Birthday=D,7,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
-IF(#FdBirthday=="*",V(7),$)
-A(DATE,0,#Birthday)
+C(5,#FdBirthday,*,V(7),$)
+C(3,#Birthday,0,$,A(DATE,0,#Birthday))
 
-!性別
-#Sex=A,1,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-HELP(#SexHelp)
-@V(H,#SexHelp)
-
-#SexX=X,2,L
-T(H,#Sex,#SexHelp)
 
 !客戶別
 #CustTypeCode=X,2,I
@@ -603,103 +486,131 @@ C(3,#FunCd,5,s,$)
 C(4,#CustTypeCode,T(3,00),$)
 HELP(#CustTypeCodeHelp)
 @
-IF(#FdCustTypeCode=="*",$,s)
-V(H,#CustTypeCodeHelp)
+C(5,#FdCustTypeCode,*,V(7),$)
+C(4,#CustTypeCode,$,V(H,#CustTypeCodeHelp))
 
 #CustTypeCodeX=X,10,L
 T(H,#CustTypeCode,#CustTypeCodeHelp)
 
-#t1=X,1,S
-C(5,#CustTypeCode,01,SHOW(#FdEmpNo,#EmpNo,#EmployeeName,#BtnCdEmp),HIDE(#FdEmpNo,#EmpNo,#EmployeeName,#BtnCdEmp))
-
-#EmpNo2=X,6,S
-
-!員工代號
-#EmpNo=X,6,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-C(5,#CustTypeCode,01,$,S)
-@
-V(7)
-
-#RIM_L2R08=X,1,S
-C(5,#EmpNo,#EmpNo2,S,$)
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-C(5,#CustTypeCode,01,$,S)
-RESET_RIM(#RIM_L2R08,L2R08)
-T(2,@RimEmployeeNo,#EmpNo)
-S(L2R08,1,#RimTxCode,#RimEmployeeNo)
-R(1,L2R08)
-T(2,@EmployeeName,#L2r08FullName)
-T(2,@EmpNo2,#EmpNo)
-
-#EmployeeName=x,40,L
 
 !企金別
-#EntCode=X,1,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-C(4,#EntCode,T(3,0),$)
-HELP(#EntCodeHelp)
-@
-IF(#FdEntCode=="*",V(7),$)
-C(4,#EntCode,$,V(H,#EntCodeHelp))
+#EntCode=X,1,L
+T(2,1)
 
 #EntCodeX=X,10,L
 T(H,#EntCode,#EntCodeHelp)
 
+
 !行業別
-#IndustryCode=X,6,L
-T(3,060000)
+#IndustryCode=X,6,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@
+C(5,#FdIndustryCode,*,V(7),$)
+C(4,#IndustryCode,$,V(2,60000)V(2,060000))
 
 
-#IndustryCodeX=x,20,L
-T(3,個人)
+#SendL6R06=X,1,S
+#RimIndustryCode=X,6,S
+!C(3,#FunCd,4,s,$)
+!C(3,#FunCd,5,S,$)
+C(4,#IndustryCode,S,$)
+E(0,@RimFuncCode,5)
+T(2,@RimIndustryCode,#IndustryCode)
+RESET_RIM(#SendL6R06,L6R06)
+S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
+R(1,L6R06)
 
-!國籍
+#RL6R06=X,1,S
+!C(3,#FunCd,5,S,$)
+C(4,#IndustryCode,S,$)
+T(2,@IndustryCodeX,#L6R06IndustryItem)
+
+#IndustryCodeX=x,2.50,L
+
+!公司註冊地
 #NationalityCode=X,2,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#NationalityCode,T(3,TW),$)
 HELP(#NationalityCodeHelp)
 @
-IF(#FdNationalityCode=="*",V(7),$)
+C(5,#FdNationalityCode,*,V(7),$)
 C(4,#NationalityCode,$,V(H,#NationalityCodeHelp))
 
 #NationalityCodex=X,50,L
 T(H,#NationalityCode,#NationalityCodeHelp)
 
-!配偶身分證字號
+#T1=X,1,S
+C(5,#NationalityCode,TW,C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC)),T(2,#WKSPC))
+T(2,@FdSpouseId,#T1)
+
+!公司營業地
+#BussNationalityCode=X,2,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+C(4,#BussNationalityCode,T(3,TW),$)
+HELP(#NationalityCodeHelp)
+@
+C(5,#FdBussNationalityCode,*,V(7),$)
+C(4,#BussNationalityCode,$,V(H,#NationalityCodeHelp))
+
+#BussNationalityCodex=X,40,L
+T(H,#BussNationalityCode,#NationalityCodeHelp)
+
+!負責人身分證字號
 #SpouseId=X,10,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
+@
+C(5,#FdSpouseId,*,V(7),$)
+C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
 
-!配偶姓名
+!負責人姓名
 #SpouseName=x,2.50,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+@
+C(5,#FdSpouseName,*,V(7),$)
+
+! 調RIM取鄉鎮市區代碼A
+#RimL1r10A=X,1,S
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+E(0,@RimZip3,#RegZip3)
+T(2,@RimCityCode,)
+T(2,@RimAreaCode,)
+RESET_RIM(#RimL1r10A,L1R10)
+S(L1R10,1,#RimZip3,#RimZip2,#RimCityCode,#RimAreaCode)
+R(1,L1R10)
+
+#checkL1r10A=X,1,S
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+T(2,@RegCityCode,#L1r10CityCode)
+T(2,@RegAreaCode,#L1r10AreaCode)
 
 
-!戶籍-縣市代碼
+!公司-縣市代碼
 #RegCityCode=X,2,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+!INVOKEJS(SHOW,p1,10,10,1)
+!INVOKEJS(SHOW,p1,11,11,0)
 HELP(#L6r03ResultCity,cols:5)
 @
-IF(#FdRegCityCode=="*",V(7),$)
+C(5,#FdRegCityCode,*,V(7),$)
 C(4,#RegCityCode,$,V(H,#L6r03ResultCity))
 
 ! 縣市代碼對應名稱
-#RegCityItem=X,8,L
+#RegCityItem=X,10,L
 T(H,#RegCityCode,#L6r03ResultCity)
 
 ! 調RIM取鄉鎮市區代碼
 #RimL6r03Area=X,1,S
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 E(0,@RimFunCd,2)
 T(2,@RimCityCode,#RegCityCode)
 T(2,@RimAreaCode,)
@@ -711,23 +622,24 @@ R(1,L6R03)
 #L6r03ResultArea=X,10000,S
 T(2,#L6r03Result)
 
-!戶籍-鄉鎮市區代碼
+!公司-鄉鎮市區代碼
 #RegAreaCode=X,3,I
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 HELP(#L6r03ResultArea,cols:5)
-@V(H,#L6r03ResultArea)
+@
+V(H,#L6r03ResultArea)
 
 ! 鄉鎮市區代碼的對應名稱
-#RegAreaItem=X,10,L
+#RegAreaItem=X,20,L
 T(H,#RegAreaCode,#L6r03ResultArea)
 
 ! 調RIM取鄉鎮市區代碼B
 #RimL1r10B=X,1,S
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 T(2,@RimCityCode,#RegCityCode)
 T(2,@RimAreaCode,#RegAreaCode)
 RESET_RIM(#RimL1r10B,L1R10)
@@ -739,63 +651,63 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 E(0,@RegZip3,#L1r10Zip3)
 
-!戶籍-路名
+!公司-路名
 #RegRoad=c,40,I
-C(4,#RegCityCode,S,$)
-TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
+TOOLTIP(請自行輸入完整路名，包含路／街／村)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@V(7)
-
-!戶籍-段
+C(4,#RegCityCode,S,$)
+@
+V(7)
+!公司-段
 #RegSection=X,5,I
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 
-!戶籍-巷
+!公司-巷
 #RegAlley=X,5,I
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 
-!戶籍-弄
+!公司-弄
 #RegLane=X,5,I
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 
-!戶籍-號
+!公司-號
 #RegNum=X,5,I
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 
-!戶籍-號之
+!公司-號之
 #RegNumDash=X,5,I
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 C(4,#RegNum,S,$)
 
-!戶籍-樓
+!公司-樓
 #RegFloor=X,5,I
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 
-!戶籍-樓之
+!公司-樓之
 #RegFloorDash=X,5,I
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 C(4,#RegFloor,S,$)
 
-!戶籍地址
+!公司地址
 #RimL1r12AddressA=X,1,S
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 T(2,@RimCityCode,#RegCityCode)
 T(2,@RimAreaCode,#RegAreaCode)
 T(2,@RimRoad,#RegRoad)
@@ -810,18 +722,20 @@ RESET_RIM(#RimL1r12AddressA,L1R12)
 S(L1R12,1,#RimCityCode,#RimAreaCode,#RimRoad,#RimSection,#RimAlley,#RimLane,#RimNum,#RimNumDash,#RimFloor,#RimFloorDash)
 R(1,L1R12)
 
-!戶籍地址
+!公司地址
 #CheckL1R12A=X,1,S
-C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(4,#RegCityCode,S,$)
 T(2,@Regaddress,#L1r12Address)
 
-!戶籍-郵遞區號前三碼
+#Regaddress=X,115,L
+
+!公司-郵遞區號前三碼
 #RegZip3=X,3,L
 C(4,#RegCityCode,S,$)
 
-!戶籍-郵遞區號後兩碼
+!公司-郵遞區號後兩碼
 #RegZip2=X,3,I
 C(4,#RegCityCode,S,$)
 C(3,#FunCd,4,s,$)
@@ -830,7 +744,34 @@ C(3,#FunCd,5,s,$)
 C(4,#RegZip2,S,$)
 V(9)
 
-#Regaddress=X,100,L
+!---- 同公司地址
+!#CopyRegaddress=X,1,S
+!BIND(#BTN3,click, {cmd=CALLSEND;DOCODE=CopyReg})
+!IF(#RegFg==5,$,S)
+!CALL(#PasteReg)
+!CALL(#INVK)
+
+!#CurrZip3Lb=A,3,L
+!#CurrZip2Lb=X,3,L
+
+! 調RIM取鄉鎮市區代碼A
+!#RimL1r10C=X,1,S
+!C(3,#FunCd,4,s,$)
+!C(3,#FunCd,5,s,$)
+!IF(#RegFg==5,s,$)
+!E(0,@RimZip3,#CurrZip3)
+!T(2,@RimCityCode,)
+!T(2,@RimAreaCode,)
+!RESET_RIM(#RimL1r10C,L1R10)
+!S(L1R10,1,#RimZip3,#RimZip2,#RimCityCode,#RimAreaCode)
+!R(1,L1R10)
+
+!#checkL1r10C=X,1,S
+!C(3,#FunCd,4,s,$)
+!C(3,#FunCd,5,s,$)
+!IF(#RegFg==5,s,$)
+!T(2,@CurrCityCode,#L1r10CityCode)
+!E(0,@CurrAreaCode,#L1r10AreaCode)
 
 #SameRegHelp=X,100,S
 T(3,N:另行輸入;Y:同戶籍地址)
@@ -873,10 +814,11 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
 HELP(#L6r03ResultCity,cols:5)
-@V(H,#L6r03ResultCity)
+@
+V(H,#L6r03ResultCity)
 
 !通訊-縣市代碼對應名稱
-#CurrCityItem=X,8,L
+#CurrCityItem=X,10,L
 T(H,#CurrCityCode,#L6r03ResultCity)
 
 ! 調RIM取鄉鎮市區代碼
@@ -893,7 +835,6 @@ R(1,L6R03)
 
 !通訊-鄉鎮市區代碼的下拉選單
 #L6r03ResultArea1=X,1000,S
-C(5,#SameReg,Y,s,$)
 T(2,#L6r03Result)
 
 !通訊-鄉鎮市區代碼
@@ -902,10 +843,11 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
 HELP(#L6r03ResultArea1,cols:5)
-@V(H,#L6r03ResultArea1)
+@
+V(H,#L6r03ResultArea1)
 
 !通訊 鄉鎮市區代碼的對應名稱
-#CurrAreaItem=X,10,L
+#CurrAreaItem=X,20,L
 T(H,#CurrAreaCode,#L6r03ResultArea1)
 
 ! 調RIM取鄉鎮市區代碼B
@@ -926,13 +868,12 @@ C(5,#SameReg,Y,s,$)
 E(0,@CurrZip3,#L1r10Zip3)
 
 !通訊-路名
-#CurrRoad=c,40,I
-TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
+#CurrRoad=x,40,I
+TOOLTIP(請自行輸入完整路名，包含路／街／村)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
 @V(7)
-
 !通訊-段
 #CurrSection=X,5,I
 C(3,#FunCd,4,s,$)
@@ -961,7 +902,6 @@ C(5,#SameReg,Y,s,$)
 #CurrNumDash=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-C(4,#CurrNum,S,$)
 C(5,#SameReg,Y,s,$)
 
 !通訊-樓
@@ -974,7 +914,6 @@ C(5,#SameReg,Y,s,$)
 #CurrFloorDash=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-C(4,#CurrFloor,S,$)
 C(5,#SameReg,Y,s,$)
 
 #FdCurraddress=X,2,L
@@ -1008,9 +947,9 @@ T(2,@Curraddress,#L1r12Address)
 #Curraddress=X,100,L
 
 !通訊-郵遞區號前三碼
-#CurrZip3=X,3,L
+#CurrZip3=A,3,L
 
-!通訊-郵遞區號後三碼
+!通訊-郵遞區號後兩碼
 #CurrZip2=X,3,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
@@ -1025,11 +964,11 @@ V(9)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @
-IF(#FdEmail=="*",V(7),$)
-C(4,#Email,$,A(M,0,#Email))
+C(4,#Email,S,$)
+A(M,0,#Email)
 </sub>
 
-<sub type="DC" name="p2" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+<sub type="DC" name="p2" layout="cols=3;screen.width=[250,450,250,380];printer.width=[20,20,20,20];order=1">
 [
 [""],
 [#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
@@ -1039,6 +978,7 @@ C(4,#Email,$,A(M,0,#Email))
 ["#FdIsSuspected2+是否為金控疑似準利害關係人",#IsSuspectedCheck,#IsSuspectedCheckX,#IsSuspectedCheckType,#IsSuspectedCheckTypeX],
 [#<->#,"#FdIsLimit+以上資訊日期",#IsDataDate],
 ]
+
 <include src="ROM.icf::L1R16.dec"/>
 ! 調是否為關係人rim
 #RimL1R16=X,1,S
@@ -1056,13 +996,13 @@ T(2,@IsDataDate,#L1R16DataDate)
 
 #IsDataDate=D,7,L
 
-!是否為授信限制對象
+! 是否為授信限制對象
 #IsLimit=X,1,S
 
 #IsLimitX=X,4,L
 T(H,#IsLimit,#YesNoHelp)
 
-!是否為利害關係人
+是否為利害關係人
 #IsRelated=X,1,S
 
 #IsRelatedX=X,4,L
@@ -1100,76 +1040,14 @@ V(H,#IsSuspectedCheckTypeHelp)
 T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 </sub>
-<sub type="DC" name="p3" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+
+<sub type="DC" name="p3" layout="cols=1;screen.width=[250,1090];printer.width=[20,20,20,20];order=1">
 [
 [""],
-[#<->#,"#FdEduCode+教育程度代號",#EduCode,#EduCodeX],
-[#<->#,"#FdOwnedHome+自有住宅有無",#OwnedHome,#OwnedHomeX],
-[#<->#,"#FdCurrCompId+任職機構統編",#CurrCompId],
-[#<->#,"#FdCurrCompName+任職機構名稱",#CurrCompName],
-[#<->#,"#FdCurrCompTel+任職機構電話",#CurrCompTel],
-[#<->#,"#FdJobTitle+職位名稱",#JobTitle],
-[#<->#,"#FdJobTenure+服務年資",#JobTenure],
-["#FdIncomeOfYearly+年收入",#IncomeOfYearly,"仟元"],
-["#FdIncomeDataDate+年收入資料年月",#IncomeDataDate],
-[#<->#,"#FdPassportNo+護照號碼",#PassportNo],
-["#FdAMLJobCode+AML職業別",#AMLJobCode,#AMLJobCodeX],
-["#FdAMLGroup+AML組織",#AMLGroup,#AMLGroupX],
-[#<->#,"#FdIndigenousName+原住民姓名",#IndigenousName],
+[#<->#,"#FdIncomeOfYearly+年收入",#IncomeOfYearly,"仟元"],
+[#<->#,"#FdIncomeDataDate+年收入資料年月",#IncomeDataDate],
 [#<->#,"#FdSubCompanyFg+交互運用同意書",#SubCompanyFg,#SubCompanyFgX],
 ]
-
-!教育程度代號
-#EduCode=X,1,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-HELP(#EduCodeHelp)
-@
-IF(#FdEduCode=="*",V(7),$)
-C(4,#EduCode,$,V(H,#EduCodeHelp))
-
-#EduCodeX=X,10,L
-T(H,#EduCode,#EduCodeHelp)
-
-!自有住宅有無
-#OwnedHome=X,1,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-HELP(#YesNoHelp)
-@
-IF(#FdOwnedHome=="*",V(7),$)
-C(4,#OwnedHome,$,V(H,#YesNoHelp))
-
-#OwnedHomeX=X,4,L
-T(H,#OwnedHome,#YesNoHelp)
-
-!任職機構統編
-#CurrCompId=X,8,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-@
-C(4,#CurrCompId,$,A(ID_UNINO,0,#CurrCompId))
-
-!任職機構名稱
-#CurrCompName=c,60,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-
-
-!任職機構電話
-#CurrCompTel=X,16,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-
-!職位名稱
-#JobTitle=c,20,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-
-!服務年資
-#JobTenure=X,2,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
 
 !年收入
 #IncomeOfYearly=n,9,I
@@ -1184,43 +1062,6 @@ C(3,#FunCd,5,s,$)
 @C(4,#IncomeDataDate,S,V(9))
 T(1,@MANU_MM,#IncomeDataDate,4,5)
 IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式yyyMM),$)
-
-
-!護照號碼
-#PassportNo=X,20,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-@
-C(3,#IdSTAT,4,C(4,#PassportNo,V(P,外國人使用稅籍編號建檔，需輸入護照號碼),$),$)
-
-!AML職業別
-#AMLJobCode=X,3,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-HELP(#AMLJobCodeHelp)
-@
-IF(#FdAMLJobCode=="*",V(7),$)
-C(4,#AMLJobCode,$,V(H,#AMLJobCodeHelp))
-
-#AMLJobCodeX=X,30,L
-T(H,#AMLJobCode,#AMLJobCodeHelp)
-
-!AML組織
-#AMLGroup=X,3,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-HELP(#AMLCodeHelp)
-@
-IF(#FdAMLGroup=="*",V(7),$)
-C(4,#AMLGroup,$,V(H,#AMLCodeHelp))
-
-#AMLGroupX=X,30,L
-T(H,#AMLGroup,#AMLCodeHelp)
-
-!原住民姓名
-#IndigenousName=x,2.50,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
 
 #SubCompanyFgHelp=X,200,S
 T(3,Y:同意提供申請人之帳務、信用、投資及保險資料作為共同行鎖之用;N:不同意)
@@ -1286,9 +1127,9 @@ C(5,#SubCompanyFg,Y,$,s)
 ##end
 
 
-#NTXBUF1=X,18,S
+#NTXBUF=X,18,S
 C(3,#FunCd,5,S,$)
-T(2,1+#CustId+0000000)ASGN(NTXBUF$)
+T(2,1+#CustId+  0000000)ASGN(NTXBUF$)
 
 #TmpNTXCD=X,5,S
 IF(#FunCd == 1,$,S)
@@ -1310,64 +1151,63 @@ IF(#FunCd==5,XMT(),$)
 </sub>
 
 
-!---------- TXFORM = L1101 ----------
-<sub type="FORM" name="L1101">
+!---------- TXFORM = L1102 ----------
+<sub type="FORM" name="L1102">
 
 !#SCRPRT=_,_,S
-!C(5,#TXFORM,L1101,$,S)
+!C(5,#TXFORM,L1102,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L1101] 顧客基本資料維護-自然人)
+T(3,[L1102] 顧客基本資料維護-法人)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
-
 #checkhideinput=X,1,S
+!INVOKEJS(SHOW,p1,0)
+! IF(#FunCd==5,INVOKEJS(SHOW,p1,0),$)
 
 !統編
 #OCustId=X,10,L
 !戶號
-#OCustNo=A,7,L
+#OCustNo=n,7,L
 
 !戶名
 #OCustName=X,2.50,L
 !出生年月日
 #OBirthday=D,7,L
-!性別
-#OSex=X,1,L
-#OSexX=X,2,L
-T(H,#OSex,#SexHelp)
 !客戶別
 #OCustTypeCode=X,2,L
 #OCustTypeCodeX=X,10,L
 T(H,#OCustTypeCode,#CustTypeCodeHelp)
 !行業別
 #OIndustryCode=X,6,L
-#OIndustryCodeX=x,100,L
+#OIndustryCodeX=c,100,L
 !國籍
 #ONationalityCode=X,2,L
 #ONationalityCodex=X,50,L
 T(H,#ONationalityCode,#NationalityCodeHelp)
+#OBussNationalityCode=X,2,L
+#OBussNationalityCodex=X,50,L
+T(H,#OBussNationalityCode,#NationalityCodeHelp)
 !配偶身分證字號
 #OSpouseId=X,10,L
 !配偶姓名
 #OSpouseName=x,2.50,L
-!戶籍-郵遞區號前三碼
+!公司-郵遞區號前三碼
 #ORegZip3=X,3,L
-!戶籍-郵遞區號後兩碼
+!公司-郵遞區號後兩碼
 #ORegZip2=X,3,L
-!戶籍地址
-#ORegaddress=X,115,L
-
+!公司地址
+#ORegaddress=X,100,L
 
 !通訊-郵遞區號前三碼
-#OCurrZip3=A,3,L
-!通訊-郵遞區號後兩碼
+#OCurrZip3=X,3,L
+!通訊-郵遞區號後三碼
 #OCurrZip2=X,3,L
 !通訊地址
 #OCurraddress=X,115,L
 
 !電子信箱
-#OEMail=x,50,L
+#OEmail=X,50,L
 !是否為授信限制對象
 #OIsLimit=X,1,L
 #OIsLimitX=X,4,L
@@ -1384,66 +1224,24 @@ T(H,#OIsLnrelNear,#YesNoHelp)
 #OEntCode=X,1,L
 #OEntCodeX=X,10,L
 T(H,#OEntCode,#EntCodeHelp)
-!員工代號
-#OEmpNo=X,6,L
 !英文姓名
-#OEName=X,50,L
-!教育程度代號
-#OEduCode=X,1,L
-#OEduCodeX=X,10,L
-T(H,#OEduCode,#EduCodeHelp)
-!自有住宅有無
-#OOwnedHome=X,1,L
-#OOwnedHomeX=X,4,L
-T(H,#OOwnedHome,#YesNoHelp)
-!任職機構名稱
-#OCurrCompName=c,60,L
-!任職機構統編
-#OCurrCompId=X,8,L
-!任職機構電話
-#OCurrCompTel=X,16,L
-!職位名稱
-#OJobTitle=c,20,L
-!服務年資
-#OJobTenure=X,2,L
+#OEName=X,20,L
 !年收入
 #OIncomeOfYearly=n,9,L
 !年收入資料年月
-#OIncomeDataDate=X,5,L
-!護照號碼
-#OPassportNo=X,20,L
-!AML職業別
-#OAMLJobCode=X,3,L
-#OAMLJobCodeX=X,30,L
-T(H,#OAMLJobCode,#AMLJobCodeHelp)
-!AML組織
-#OAMLGroup=X,3,L
-#OAMLGroupX=X,30,L
-T(H,#OAMLGroup,#AMLCodeHelp)
-!原住民姓名
-#OIndigenousName=c,100,L
-!介紹人
-#OIntroducerX=X,20,L
+#OIncomeDataDate=X,6,L
 
-! 交互運用同意選項
-#OCustCross=X,1,L
-! 交互運用同意中文
-#OCustCrossX=x,60,L
-IF(#OCustCross=="Y",T(3,同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用),
-T(3,不同意)
-)
-
+#HideGrid=X,1,S
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}=A,2,L
-#OSubCompanyItem{n}=x,60,L
+#OSubCompanyItem{n}=X,60,L
 T(H,#OSubCompanyCode{n},#SubCompanyCodeHelp)
 #OCrossUse{n}=X,1,L
-#OCrossUseX{n}=X,6,L
+#OCrossUseX{n}=X,2,L
 T(H,#OCrossUse{n},#YesNoHelp)
+C(4,#OSubCompanyCode{n},HIDE(#OSubCompanyCode{n})HIDE(#OSubCompanyItem{n})HIDE(#OCrossUse{n}),$)
 ##end
-
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
 
@@ -1462,6 +1260,7 @@ T(H,#OOTelTypeCode,#TelTypeCodeHelp)
 !電話分機
 #OOTelExt=x,5,L
 
+
 !電話
 #OONuber=x,30,L
 IF(#OOTelArea!=""&&#OOTelNo!=""&&#OOTelExt!="",T(B,#OOTelArea+-+#OOTelNo+-+#OOTelExt),$)
@@ -1478,12 +1277,8 @@ T(H,#OORelationCode,#RelationCodeHelp)
 
 !聯絡人姓名
 #OOLiaisonName=c,100,S
-T(1,@OOLiaisonNameA,#OOLiaisonName,1,50)
-T(1,@OOLiaisonNameB,#OOLiaisonName,51,100)
 
-#OOLiaisonNameA=c,50,L
 
-#OOLiaisonNameB=c,50,L
 
 !啟用記號
 #OOEnable=X,1,S
@@ -1491,6 +1286,7 @@ T(1,@OOLiaisonNameB,#OOLiaisonName,51,100)
 #OOEnableX=X,4,L
 T(H,#OOEnable,#EnableHelp)
              
+
 !備註
 #OORmk=X,40,L
 
@@ -1503,14 +1299,13 @@ T(H,#OOEnable,#EnableHelp)
 <sub type="TIM">
 #FunCd
 #CustId
-#TypeCode
 #BranchNo
 #CustName
 #Birthday
-#Sex
 #CustTypeCode
 #IndustryCode
 #NationalityCode
+#BussNationalityCode
 #SpouseId
 #SpouseName
 #RegZip3
@@ -1539,43 +1334,30 @@ T(H,#OOEnable,#EnableHelp)
 #CurrFloorDash
 #Email
 #EntCode
-#EmpNo
 #EName
-#EduCode
-#OwnedHome
-#CurrCompName
-#CurrCompId
-#CurrCompTel
-#JobTitle
-#JobTenure
 #IncomeOfYearly
 #IncomeDataDate
-#PassportNo
-#AMLJobCode
-#AMLGroup
-#IndigenousName
+#IsSuspected
+#IsSuspectedCheck
+#IsSuspectedCheckType
 #SubCompanyFg
 ##loop{times:20,n:1}
 #SubCompanyCode{n}
 #CrossUse{n}
 ##end
-#IsSuspected
-#IsSuspectedCheck
-#IsSuspectedCheckType
 </sub>
 
 !------ 下行電文TOM ------
 <sub type="TOM">
-TXFORM=L1101
+TXFORM=L1102
 #OCustId
-#OCustNo
 #OCustName
 #OBirthday
-#OSex
 #OCustTypeCode
 #OIndustryCode
 #OIndustryCodeX
 #ONationalityCode
+#OBussNationalityCode
 #OSpouseId
 #OSpouseName
 #ORegZip3
@@ -1584,28 +1366,14 @@ TXFORM=L1101
 #OCurrZip3
 #OCurrZip2
 #OCurraddress
-#OEMail
+#OEmail
 #OIsLimit
 #OIsRelated
 #OIsLnrelNear
 #OEntCode
-#OEmpNo
 #OEName
-#OEduCode
-#OOwnedHome
-#OCurrCompName
-#OCurrCompId
-#OCurrCompTel
-#OJobTitle
-#OJobTenure
 #OIncomeOfYearly
 #OIncomeDataDate
-#OPassportNo
-#OAMLJobCode
-#OAMLGroup
-#OIndigenousName
-#OIntroducerX
-#OCustCross
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}
 #OCrossUse{n}
@@ -1620,65 +1388,52 @@ TXFORM=L1101
 #OORmk
 ^
 <include src="ROM.icf::L1R01.tom"/>
+<include src="ROM.icf::L1R16.tom"/>
 <include src="ROM.icf::L1R05.tom"/>
-<include src="ROM.icf::L1R06.tom"/>
 <include src="ROM.icf::L1R10.tom"/>
 <include src="ROM.icf::L1R12.tom"/>
-<include src="ROM.icf::L1R16.tom"/>
 <include src="ROM.icf::L6R03.tom"/>
 <include src="ROM.icf::L6R06.tom"/>
-<include src="ROM.icf::L2R08.tom"/>
-<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L1R06.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
+
 !--------- OUTPUT畫面 --------
-<sub type="PART" name="O1" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+<sub type="PART" name="O1" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
 [
-["[L1101]                                 顧客基本資料維護-自然人"],
-[#<->#,"身分證字號",#OCustId],
-[#<->#,"戶名",#OCustName],
-[#<->#,"英文姓名",#OEName],
-["出生年月日",#OBirthday],
-["性別",#OSexX],
+["[L1102]                                 顧客基本資料維護-法人"],
+[#<->#,"統一編號",#OCustId],
+[#<->#,"公司名稱",#OCustName],
+[#<->#,"設立日期",#OBirthday],
 ["客戶別",#OCustTypeCodeX],
-["員工代號",#OEmpNo],
-["企金別",#OEntCodeX],
 ["行業別",#OIndustryCode,#OIndustryCodeX],
-[#<->#,"國籍",#ONationalityCodex],
-[#<->#,"配偶身分證字號",#OSpouseId],
-[#<->#,"配偶姓名",#OSpouseName],
-[#<->#,"戶籍-郵遞區號",#ORegZip3,#ORegZip2],
-[#<->#,"戶籍-地址",#ORegaddress],
-[#<->#,"通訊-郵遞區號",#OCurrZip3,#OCurrZip2],
+[#<->#,"公司註冊地",#ONationalityCodex],
+[#<->#,"營業地國籍",#OBussNationalityCodex],
+[#<->#,"負責人身分證字號",#OSpouseId],
+[#<->#,"負責人姓名",#OSpouseName],
+[#<->#,"公司-郵遞區號",#ORegZip3,"-",#ORegZip2],
+[#<->#,"公司-地址",#ORegaddress],
+[#<->#,"通訊-郵遞區號",#OCurrZip3,"-",#OCurrZip2],
 [#<->#,"通訊-地址",#OCurraddress],
-[#<->#,"電子信箱",#OEMail],
+[#<->#,"電子信箱",#OEmail],
 [#<->#,"是否為授信限制對象",#OIsLimitX],
 [#<->#,"是否為利害關係人",#OIsRelatedX],
 [#<->#,"是否為準利害關係人",#OIsLnrelNearX],
-[#<->#,"教育程度代號",#OEduCodeX],
-[#<->#,"自有住宅有無",#OOwnedHomeX],
-[#<->#,"任職機構名稱",#OCurrCompName],
-[#<->#,"任職機構統編",#OCurrCompId],
-[#<->#,"任職機構電話",#OCurrCompTel],
-["職位名稱",#OJobTitle],
-[#<->#,"服務年資",#OJobTenure],
-["年收入",#OIncomeOfYearly,"仟元"],
-["年收入資料年月",#OIncomeDataDate],
-[#<->#,"護照號碼",#OPassportNo],
-["AML職業別",#OAMLJobCodeX],
-["AML組織",#OAMLGroupX],
-[#<->#,"原住民姓名",#OIndigenousName],
-[#<->#,"介紹人",#OIntroducerX],
-[#<->#,"同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用",#OSubCompanyItem1,#OCrossUseX1,"<br>",#OSubCompanyItem2,#OCrossUseX2,
-            "<br>",#OSubCompanyItem3,#OCrossUseX3,"<br>",#OSubCompanyItem4,#OCrossUseX4,
-            "<br>",#OSubCompanyItem5,#OCrossUseX5,"<br>",#OSubCompanyItem6,#OCrossUseX6,
-            "<br>",#OSubCompanyItem7,#OCrossUseX7,"<br>",#OSubCompanyItem8,#OCrossUseX8,
-            "<br>",#OSubCompanyItem9,#OCrossUseX9,"<br>",#OSubCompanyItem10,#OCrossUseX10,
-            "<br>",#OSubCompanyItem11,#OCrossUseX11,"<br>",#OSubCompanyItem12,#OCrossUseX12, 
-            "<br>",#OSubCompanyItem13,#OCrossUseX13,"<br>",#OSubCompanyItem14,#OCrossUseX14, 
-            "<br>",#OSubCompanyItem15,#OCrossUseX15,"<br>",#OSubCompanyItem16,#OCrossUseX16,
-            "<br>",#OSubCompanyItem17,#OCrossUseX17,"<br>",#OSubCompanyItem18,#OCrossUseX18,
-            "<br>",#OSubCompanyItem19,#OCrossUseX19,"<br>",#OSubCompanyItem20,#OCrossUseX20,],
+[#<->#,"企金別",#OEntCodeX],
+[#<->#,"英文名稱",#OEName],
+[#<->#,"年收入",#OIncomeOfYearly,"仟元"],
+[#<->#,"年收入資料年月",#OIncomeDataDate],
+[#<->#,"同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用",#OSubCompanyItem1,#OCrossUseX1,#OSubCompanyItem2,#OCrossUseX2,
+            "</br>",#OSubCompanyItem3,#OCrossUseX3,#OSubCompanyItem4,#OCrossUseX4,
+            "</br>",#OSubCompanyItem5,#OCrossUseX5,#OSubCompanyItem6,#OCrossUseX6,
+            "</br>",#OSubCompanyItem7,#OCrossUseX7,#OSubCompanyItem8,#OCrossUseX8,
+            "</br>",#OSubCompanyItem9,#OCrossUseX9,#OSubCompanyItem10,#OCrossUseX10,
+            "</br>",#OSubCompanyItem11,#OCrossUseX11,#OSubCompanyItem12,#OCrossUseX12, 
+            "</br>",#OSubCompanyItem13,#OCrossUseX13,#OSubCompanyItem14,#OCrossUseX14, 
+            "</br>",#OSubCompanyItem15,#OCrossUseX15,#OSubCompanyItem16,#OCrossUseX16,
+            "</br>",#OSubCompanyItem17,#OCrossUseX17,#OSubCompanyItem18,#OCrossUseX18,
+            "</br>",#OSubCompanyItem19,#OCrossUseX19,#OSubCompanyItem20,#OCrossUseX20,],
 ]
 </sub>
 !---------- 單據輸出組合 ----------

@@ -28,7 +28,7 @@ public class CustMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2581908358507189783L;
+	private static final long serialVersionUID = 2538300766429574661L;
 
 // 客戶識別碼
   @Id
@@ -75,6 +75,11 @@ public class CustMain implements Serializable {
   /* 國籍對照檔 */
   @Column(name = "`NationalityCode`", length = 2)
   private String nationalityCode;
+
+  // 法人:營業地國籍
+  /* 國籍對照檔比照ELOAN(2021/08/27上DB)by eric */
+  @Column(name = "`BussNationalityCode`", length = 2)
+  private String bussNationalityCode;
 
   // 配偶身份證號/負責人身分證
   @Column(name = "`SpouseId`", length = 10)
@@ -533,6 +538,29 @@ public class CustMain implements Serializable {
 	*/
   public void setNationalityCode(String nationalityCode) {
     this.nationalityCode = nationalityCode;
+  }
+
+/**
+	* 法人:營業地國籍<br>
+	* 國籍對照檔
+比照ELOAN
+(2021/08/27上DB)by eric
+	* @return String
+	*/
+  public String getBussNationalityCode() {
+    return this.bussNationalityCode == null ? "" : this.bussNationalityCode;
+  }
+
+/**
+	* 法人:營業地國籍<br>
+	* 國籍對照檔
+比照ELOAN
+(2021/08/27上DB)by eric
+  *
+  * @param bussNationalityCode 法人:營業地國籍
+	*/
+  public void setBussNationalityCode(String bussNationalityCode) {
+    this.bussNationalityCode = bussNationalityCode;
   }
 
 /**
@@ -1660,16 +1688,16 @@ N:否
   @Override
   public String toString() {
     return "CustMain [custUKey=" + custUKey + ", custId=" + custId + ", custNo=" + custNo + ", branchNo=" + branchNo + ", custName=" + custName + ", birthday=" + birthday
-           + ", sex=" + sex + ", custTypeCode=" + custTypeCode + ", industryCode=" + industryCode + ", nationalityCode=" + nationalityCode + ", spouseId=" + spouseId + ", spouseName=" + spouseName
-           + ", regZip3=" + regZip3 + ", regZip2=" + regZip2 + ", regCityCode=" + regCityCode + ", regAreaCode=" + regAreaCode + ", regRoad=" + regRoad + ", regSection=" + regSection
-           + ", regAlley=" + regAlley + ", regLane=" + regLane + ", regNum=" + regNum + ", regNumDash=" + regNumDash + ", regFloor=" + regFloor + ", regFloorDash=" + regFloorDash
-           + ", currZip3=" + currZip3 + ", currZip2=" + currZip2 + ", currCityCode=" + currCityCode + ", currAreaCode=" + currAreaCode + ", currRoad=" + currRoad + ", currSection=" + currSection
-           + ", currAlley=" + currAlley + ", currLane=" + currLane + ", currNum=" + currNum + ", currNumDash=" + currNumDash + ", currFloor=" + currFloor + ", currFloorDash=" + currFloorDash
-           + ", entCode=" + entCode + ", empNo=" + empNo + ", eName=" + eName + ", eduCode=" + eduCode + ", ownedHome=" + ownedHome + ", currCompName=" + currCompName
-           + ", currCompId=" + currCompId + ", currCompTel=" + currCompTel + ", jobTitle=" + jobTitle + ", jobTenure=" + jobTenure + ", incomeOfYearly=" + incomeOfYearly + ", incomeDataDate=" + incomeDataDate
-           + ", passportNo=" + passportNo + ", aMLJobCode=" + aMLJobCode + ", aMLGroup=" + aMLGroup + ", indigenousName=" + indigenousName + ", lastFacmNo=" + lastFacmNo + ", lastSyndNo=" + lastSyndNo
-           + ", allowInquire=" + allowInquire + ", email=" + email + ", actFg=" + actFg + ", introducer=" + introducer + ", isSuspected=" + isSuspected + ", isSuspectedCheck=" + isSuspectedCheck
-           + ", isSuspectedCheckType=" + isSuspectedCheckType + ", dataStatus=" + dataStatus + ", typeCode=" + typeCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", sex=" + sex + ", custTypeCode=" + custTypeCode + ", industryCode=" + industryCode + ", nationalityCode=" + nationalityCode + ", bussNationalityCode=" + bussNationalityCode + ", spouseId=" + spouseId
+           + ", spouseName=" + spouseName + ", regZip3=" + regZip3 + ", regZip2=" + regZip2 + ", regCityCode=" + regCityCode + ", regAreaCode=" + regAreaCode + ", regRoad=" + regRoad
+           + ", regSection=" + regSection + ", regAlley=" + regAlley + ", regLane=" + regLane + ", regNum=" + regNum + ", regNumDash=" + regNumDash + ", regFloor=" + regFloor
+           + ", regFloorDash=" + regFloorDash + ", currZip3=" + currZip3 + ", currZip2=" + currZip2 + ", currCityCode=" + currCityCode + ", currAreaCode=" + currAreaCode + ", currRoad=" + currRoad
+           + ", currSection=" + currSection + ", currAlley=" + currAlley + ", currLane=" + currLane + ", currNum=" + currNum + ", currNumDash=" + currNumDash + ", currFloor=" + currFloor
+           + ", currFloorDash=" + currFloorDash + ", entCode=" + entCode + ", empNo=" + empNo + ", eName=" + eName + ", eduCode=" + eduCode + ", ownedHome=" + ownedHome
+           + ", currCompName=" + currCompName + ", currCompId=" + currCompId + ", currCompTel=" + currCompTel + ", jobTitle=" + jobTitle + ", jobTenure=" + jobTenure + ", incomeOfYearly=" + incomeOfYearly
+           + ", incomeDataDate=" + incomeDataDate + ", passportNo=" + passportNo + ", aMLJobCode=" + aMLJobCode + ", aMLGroup=" + aMLGroup + ", indigenousName=" + indigenousName + ", lastFacmNo=" + lastFacmNo
+           + ", lastSyndNo=" + lastSyndNo + ", allowInquire=" + allowInquire + ", email=" + email + ", actFg=" + actFg + ", introducer=" + introducer + ", isSuspected=" + isSuspected
+           + ", isSuspectedCheck=" + isSuspectedCheck + ", isSuspectedCheckType=" + isSuspectedCheckType + ", dataStatus=" + dataStatus + ", typeCode=" + typeCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

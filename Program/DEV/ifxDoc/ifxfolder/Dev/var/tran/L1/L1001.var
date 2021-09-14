@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,233)ASGN(INQLEN$)
+E(0,234)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -40,7 +40,6 @@ T(4,CHAIN$)
 
 #BUF2=X,11,S
 T(2,1+          )
-
 
 #button=x,100,S
 T(2,{ cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF2})ASGN(BTN_NEW1$)
@@ -265,6 +264,8 @@ T(3,1)ASGN(LOOP$)
 T(H,#OOCustTypeCode,#CustTypeCodeHelp)
 #OOCustName=x,200,L
 
+#OODataStatus=X,1,S
+
 #custidlen=X,2,S
 P(1,#OOCustId)
 
@@ -272,7 +273,7 @@ P(1,#OOCustId)
 IF(#custidlen==8,T(3,L1102),T(3,L1101))
 
 #CUSTCHANGE=X,5,S
-IF(#custidlen==8,T(3,L1104),T(3,L1103))
+IF(#custidlen==8,C(5,#OODataStatus,1,T(3,L1102),T(3,L1104)),C(5,#OODataStatus,1,T(3,L1101),T(3,L1103)))
 
 !顧客
 #OO_FUNCD=X,1,S
@@ -346,10 +347,6 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2018; ntxbuf=#OOBUF8})
 IF(#OOFacShareApplBTNFg==0,BIND(grid,cancel),$)
 
 
-
-
-
-
 !關聯戶
 #OOBUF11=X,7,S
 T(2,#OOCustNo)
@@ -377,7 +374,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L1905;text=已設定; ntxbuf=#OOBUF14}))
 !變更修改
 
 #OOBUF13=X,11,S
-T(2,#OOCustId)
+T(2,1+#OOCustId)
 
 #OOBTN13=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; ntxbuf=#OOBUF13})
@@ -419,6 +416,7 @@ TXFORM=L1001
 #OOCustNo
 #OOCustTypeCode
 #OOCustName
+#OODataStatus
 ^
 
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -465,11 +463,14 @@ TXFORM=L1001
 #OOBTN11=關聯戶
 {width:55,search:false,formatter:'cust:bind-button:關聯戶',align:'center',canExport:false}
 
-#OOBTN12=交互運用
-{width:85,search:false,formatter:'cust:bind-button:#OOBTN12',align:'center',canExport:false}
+#OOBTN12=交互</br>運用
+{width:60,search:false,formatter:'cust:bind-button:#OOBTN12',align:'center',canExport:false}
 
-#OOBTN14=客戶電話
-{width:85,search:false,formatter:'cust:bind-button:#OOBTN14',align:'center',canExport:false}
+#OOBTN14=客戶</br>電話
+{width:60,search:false,formatter:'cust:bind-button:#OOBTN14',align:'center',canExport:false}
+
+#OOBTN13=基本</br>資料
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 
 #OOCustId=統一編號
 {width:80,align:'center'}
@@ -478,10 +479,8 @@ TXFORM=L1001
 {width:80,align:'center'}
 
 #OOCustName=戶名
-{width:300,align:'left'}
+{width:400,align:'left'}
 
-#OOBTN13=修改
-{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
 ^
 
 
@@ -495,7 +494,7 @@ TXFORM=L1001
 {width:80,align:'center'}
 
 #OOCustName=戶名
-{width:300,align:'left'}
+{width:400,align:'left'}
 
 ^
 

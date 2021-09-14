@@ -8,6 +8,7 @@ L1r01Sex=X,1
 L1r01CustTypeCode=X,2
 L1r01IndustryCode=X,6
 L1r01NationalityCode=X,2
+L1r01BussNationalityCode=X,2
 L1r01SpouseId=X,10
 L1r01SpouseName=X,100
 L1r01RegZip3=X,3

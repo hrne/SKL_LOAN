@@ -28,7 +28,6 @@ public class LM018ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("lM018.findAll ");
 

@@ -52,7 +52,7 @@ E(0,0)
 ["[L1103]                                 顧客基本資料修改-自然人"],
 [#<->#,"#FdCustId+身分證字號",#CustId],
 ["@","@修改前"],["@","@修改後"],
-!["#FdCustIdBef+身分證字號",#CustIdBef],[#CustIdInd,#CustIdAft],
+["#FdCustIdBef+身分證字號",#CustIdBef],[#CustIdInd,#CustIdAft],
 ["#FdTypeCode+建檔身分別",#TypeCodeBef,#TypeCodeXBef],[#TypeCodeInd,#TypeCodeAft,#TypeCodeXAft],
 ["#FdCustNameBef1+戶名",#CustNameBef],[#CustNameInd,#CustNameAft],
 ["#FdEnameBef+英文姓名",#EnameBef],[#EnameInd,#EnameAft],
@@ -220,7 +220,7 @@ T(2,@RimTxCode,#TXCD)
 
 #NTXBUF=X,11,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(2,@CustId,#NTXBUF,1,10)
+T(1,@CustId,#NTXBUF,2,10)
 
 #TemFuncd=A,1,S
 E(0,2)
@@ -228,6 +228,8 @@ E(0,2)
 #AGAIN=X,1,S
 C(2,#TemFuncd,$,$,E(0,1),$,E(0,1))
 ASGN(AGAIN$)
+
+#CustUKey=x,32,S
 
 !身分證字號
 #CustId=X,10,I
@@ -244,6 +246,7 @@ E(0,@RimFunCd,5)
 RESET_RIM(#RimL1r01,L1R01)
 S(L1R01,1,#RimCustId,#RimCustNo,#RimFunCd)
 R(1,L1R01)
+T(2,@CustUKey,#L1r01CustUKey)
 T(2,@BranchNoBef,#L1r01BranchNo)
 T(2,@CustIdBef,#L1r01CustId)
 T(2,@CustIdAft,#L1r01CustId)
@@ -455,8 +458,10 @@ IF(#BranchNoBef == #BranchNo,T(3,),T(3,X))
 
 #CustIdInd=X,1,L
 
-#CustIdAft=X,10,L
-@C(4,#CustIdAft,S,A(ID_UNINO,0,#CustIdAft))
+#CustIdAft=X,10,I
+@
+V(7)
+A(ID_UNINO,0,#CustIdAft)
 
 #CustIdInd=_,_,L
 IF(#CustIdAft==#CustId || #CustIdAft == "",T(3,),T(3,X))
@@ -661,14 +666,14 @@ T(2,@EmpnameAft,#L2r08FullName)
 C(5,#CustTypeAft,01,$,S)
 
 !企金別
-#EntcodeBef=A,1,L
+#EntcodeBef=X,1,L
 
 #EntcodeBefX=X,10,L
 T(H,#EntcodeBef,#EntCodeHelp)
 
 #EntcodeInd=X,1,L
 
-#EntcodeAft=A,1,I
+#EntcodeAft=X,1,I
 HELP(#EntCodeHelp)
 @
 C(5,#TypeCodeInd,X,$,C(3,#EntcodeBef,#EntcodeAft,s,$))
@@ -705,7 +710,7 @@ T(2,@IndustryBefX,#L6R06IndustryItem)
 
 #IndustryInd=X,1,L
 
-#IndustryAft=A,6,L
+#IndustryAft=X,6,L
 
 
 !#SendL6R06B=X,1,S
@@ -1503,6 +1508,7 @@ T(3,[L1103] 顧客基本資料變更-自然人)
 
 !------ 上行電文 ------
 <sub type="TIM">
+#CustUKey
 #CustId
 #BranchNoBef
 #BranchNo

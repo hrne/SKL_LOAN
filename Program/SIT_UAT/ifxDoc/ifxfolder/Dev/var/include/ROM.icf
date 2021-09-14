@@ -4067,6 +4067,7 @@ TXFORM=L3R14
 #L1r01CustTypeCode=X,2,S
 #L1r01IndustryCode=X,6,S
 #L1r01NationalityCode=X,2,S
+#L1r01BussNationalityCode=X,2,S
 #L1r01SpouseId=X,10,S
 #L1r01SpouseName=x,100,S
 #L1r01RegZip3=X,3,S
@@ -4128,6 +4129,7 @@ TXFORM=L1R01
 #L1r01CustTypeCode
 #L1r01IndustryCode
 #L1r01NationalityCode
+#L1r01BussNationalityCode
 #L1r01SpouseId
 #L1r01SpouseName
 #L1r01RegZip3

@@ -233,11 +233,11 @@ public class LM018Report extends MakeReport {
 
 					// Output: year-to-be-ended group int total
 
-					this.print(-27, xPivot + xShift - 6, this.GetGroupIntTotal(subjects).divide(new BigDecimal(100000000), 4, BigDecimal.ROUND_HALF_UP).toString(), "C");
+					this.print(-27, xPivot + xShift - 6, this.GetGroupIntTotal(subjects).divide(new BigDecimal(100000000), 3, BigDecimal.ROUND_HALF_UP).toString(), "C");
 
 					// Output: year-to-be-ended sums
 					this.print(-41, xPivot + xShift - 18, this.GetBalTotal(subjects).divide(new BigDecimal(100000000), 3, BigDecimal.ROUND_HALF_UP).toString(), "C");
-					this.print(-41, xPivot + xShift - 6, this.GetIntTotal(subjects).divide(new BigDecimal(100000000), 4, BigDecimal.ROUND_HALF_UP).toString(), "C");
+					this.print(-41, xPivot + xShift - 6, this.GetIntTotal(subjects).divide(new BigDecimal(100000000), 3, BigDecimal.ROUND_HALF_UP).toString(), "C");
 
 					}
 
@@ -295,10 +295,10 @@ public class LM018Report extends MakeReport {
 
 			// last yearMonth's GroupInt, totalSum and total Int
 
-			this.print(-27, xPivot + xShift - 6, this.GetGroupIntTotal(subjects).divide(new BigDecimal(100000000), 4, BigDecimal.ROUND_HALF_UP).toString(), "C");
+			this.print(-27, xPivot + xShift - 6, this.GetGroupIntTotal(subjects).divide(new BigDecimal(100000000), 3, BigDecimal.ROUND_HALF_UP).toString(), "C");
 
 			this.print(-41, xPivot + xShift - 18, this.GetBalTotal(subjects).divide(new BigDecimal(100000000), 3, BigDecimal.ROUND_HALF_UP).toString(), "C");
-			this.print(-41, xPivot + xShift - 6, this.GetIntTotal(subjects).divide(new BigDecimal(100000000), 4, BigDecimal.ROUND_HALF_UP).toString(), "C");
+			this.print(-41, xPivot + xShift - 6, this.GetIntTotal(subjects).divide(new BigDecimal(100000000), 3, BigDecimal.ROUND_HALF_UP).toString(), "C");
 
 		} else {
 			this.print(-6, 1, "本日無資料");

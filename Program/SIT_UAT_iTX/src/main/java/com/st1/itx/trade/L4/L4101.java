@@ -7,18 +7,19 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdAcCode;
@@ -30,6 +31,7 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CdAcCodeService;
@@ -58,13 +60,12 @@ import com.st1.itx.util.report.RemitForm;
 @Service("L4101")
 @Scope("prototype")
 /**
- * 
+ * 撥款匯款作業
  * 
  * @author Zi-Jun,Huang
  * @version 1.0.0
  */
 public class L4101 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4101.class);
 
 	@Autowired
 	public Parse parse;
@@ -103,6 +104,9 @@ public class L4101 extends TradeBuffer {
 	public CdBcmService cdBcmService;
 
 	@Autowired
+	public AcCloseService acCloseService;
+
+	@Autowired
 	public MakeFile makeFile;
 
 	@Autowired
@@ -119,7 +123,6 @@ public class L4101 extends TradeBuffer {
 
 	int acDate = 0;
 	String batchNo = "";
-	String branchNo = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -131,49 +134,93 @@ public class L4101 extends TradeBuffer {
 		 */
 		this.index = titaVo.getReturnIndex();
 
-		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500;
-
+		/* 設定每筆分頁的資料筆數 預設Max筆 總長不可超過六萬 */
+		this.limit = Integer.MAX_VALUE;
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
-		batchNo = titaVo.getParam("BatchNo");
-		branchNo = titaVo.getParam("KINBR");
+		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, " ", 00, 99, 0, 0, this.index, this.limit,titaVo);
+		if (slBankRemit == null) {
+			throw new LogicException(titaVo, "E0001", "查無資料");
+		}
 
+		int unReleaseCnt = 0;
+		for (BankRemit t : slBankRemit.getContent()) {
+			if (t.getActFg() == 1) {
+				unReleaseCnt++;
+			} else {
+				lBankRemit.add(t);
+			}
+		}
+		if ("Y".equals(titaVo.get("ReleaseCheck"))) {
+			if (unReleaseCnt > 0) {
+				throw new LogicException(titaVo, "E0015", "未放行筆數：" + unReleaseCnt + " , 已放行筆數：" + lBankRemit.size()); // 檢查錯誤
+			}
+
+		}
+
+		if (lBankRemit.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "查無資料 ，未放行筆數：" + unReleaseCnt);
+		}
+
+		// 更新批號
+		batchNo = updBatchNo(titaVo);
+		for (BankRemit tBankRemit : lBankRemit) {
+			tBankRemit.setBatchNo(batchNo);
+		}
+
+		try {
+			bankRemitService.updateAll(lBankRemit, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "BankRemit " + e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+
+		// 更新批號
+		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+		for (BankRemit tBankRemit : lBankRemit) {
+			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
+					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), acDate, this.index,
+					this.limit,titaVo);
+			if (slAcDetail != null) {
+				for (AcDetail tAcDetail : slAcDetail.getContent()) {
+					tAcDetail.setTitaBatchNo(batchNo);
+					lAcDetail.add(tAcDetail);
+				}
+			}
+		}
+		if (lAcDetail.size() > 0) {
+			try {
+				acDetailService.updateAll(lAcDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "AcDetail " + e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
+		}
 		totaVo.put("PdfSnoM", "");
 		totaVo.put("PdfSnoF", "");
 
-		Slice<BankRemit> sBankRemit = null;
-
-		sBankRemit = bankRemitService.findL4901B(acDate, batchNo, 1, 5, 0, 0, this.index, this.limit);
-		List<BankRemit> lBankRemit = sBankRemit == null ? null : sBankRemit.getContent();
-
-		if (lBankRemit != null && lBankRemit.size() != 0) {
 //			step1.產出媒體檔
-			setBankRemitMedia(titaVo, lBankRemit);
+		procBankRemitMedia(lBankRemit, titaVo);
 
 //			step2產出撥款傳票
-			totaA.init(titaVo);
-			setReportA();
+		totaA.init(titaVo);
+		procReportA(lAcDetail, titaVo);
 
 //			step3產出整批匯款單
-			totaB.init(titaVo);
+		totaB.init(titaVo);
 //			1.匯款申請書
-			long snoF = printRemitForm(lBankRemit, titaVo);
+		long snoF = printRemitForm(lBankRemit, titaVo);
 
-			this.info("snoF : " + snoF);
+		this.info("snoF : " + snoF);
 
-			totaVo.put("PdfSnoF", "" + snoF);
+		totaVo.put("PdfSnoF", "" + snoF);
 
 //			2.匯款明細
-			setReportB(lBankRemit);
-		} else {
-			throw new LogicException(titaVo, "E0001", "L4101 查無資料 ");
-		}
+		procReportB(lBankRemit, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
-	private void setBankRemitMedia(TitaVo titaVo, List<BankRemit> lBankRemit) throws LogicException {
+	private void procBankRemitMedia(List<BankRemit> lBankRemit, TitaVo titaVo) throws LogicException {
 
 //		String path = outFolder + "LNM24p.txt";
 
@@ -182,7 +229,7 @@ public class L4101 extends TradeBuffer {
 		int seq = 0;
 
 		for (BankRemit tBankRemit : lBankRemit) {
-			
+
 			if (tBankRemit.getDrawdownCode() == 2 || tBankRemit.getDrawdownCode() == 4
 					|| tBankRemit.getDrawdownCode() == 11) {
 				this.info("Continue... DrawdownCode = " + tBankRemit.getDrawdownCode());
@@ -238,25 +285,43 @@ public class L4101 extends TradeBuffer {
 
 	}
 
-	private void setReportA() {
+	// 更新批號
+	private String updBatchNo(TitaVo titaVo) throws LogicException {
+		String batchNo = "";
+		AcCloseId tAcCloseId = new AcCloseId();
+		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
+		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
+		if (tAcClose == null) {
+			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
+		}
+		batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2);
+		tAcCloseId.setSecNo("01"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
+		tAcClose = acCloseService.holdById(tAcCloseId,titaVo);
+		if (tAcClose == null) {
+			throw new LogicException(titaVo, "E0001", "無撥款帳務資料"); // 查詢資料不存在
+		}
+		batchNo = batchNo + parse.IntegerToString(tAcClose.getBatNo(), 2);
+		tAcClose.setBatNo(tAcClose.getBatNo() + 1);
+		try {
+			acCloseService.update(tAcClose,titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+		return batchNo;
+	}
+
+	private void procReportA(List<AcDetail> lAcDetail, TitaVo titaVo) {
 		HashMap<String, BigDecimal> dbAmt = new HashMap<>();
 		HashMap<String, BigDecimal> crAmt = new HashMap<>();
 		HashMap<String, String> relTxSeq = new HashMap<>();
 		HashMap<String, String> slipNo = new HashMap<>();
 		HashMap<String, Integer> cntR = new HashMap<>();
 		int cnt = 0;
-
-		Slice<AcDetail> sAcDetail = null;
-
-		sAcDetail = acDetailService.acdtlTitaBatchNo(branchNo, "TWD", acDate, batchNo, this.index, this.limit);
-//		sAcDetail = acDetailService.findL4101(branchNo, "TWD", acDate, batchNo, this.index, this.limit);
-
-		List<AcDetail> lAcDetail = sAcDetail == null ? null : sAcDetail.getContent();
-
-		if (lAcDetail != null && lAcDetail.size() != 0) {
+		if (lAcDetail.size() > 0) {
 			for (AcDetail tAcDetail : lAcDetail) {
-				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 8) + FormatUtil.padX(tAcDetail.getAcSubCode(), 5)
-						+ FormatUtil.padX(tAcDetail.getAcDtlCode(), 2);
+				String acNo = FormatUtil.padX(tAcDetail.getAcNoCode(), 11) + FormatUtil.padX(tAcDetail.getAcSubCode(), 5);
 				String slip = parse.IntegerToString(tAcDetail.getSlipBatNo(), 2)
 						+ parse.IntegerToString(tAcDetail.getSlipNo(), 6);
 
@@ -298,12 +363,8 @@ public class L4101 extends TradeBuffer {
 //				sort by acNoCode, acSubCode, acDtlCode
 				tempList.sort((c1, c2) -> {
 					int result = 0;
-					if (c1.substring(0, 8).compareTo(c2.substring(0, 8)) != 0) {
-						result = c1.substring(0, 8).compareTo(c2.substring(0, 8));
-					} else if (c1.substring(8, 13).compareTo(c2.substring(8, 13)) != 0) {
-						result = c1.substring(8, 13).compareTo(c2.substring(8, 13));
-					} else if (c1.substring(13, 15).compareTo(c2.substring(13, 15)) != 0) {
-						result = c1.substring(13, 15).compareTo(c2.substring(13, 15));
+					if (c1.substring(0, 16).compareTo(c2.substring(0, 16)) != 0) {
+						result = c1.substring(0, 16).compareTo(c2.substring(0, 16));
 					}
 					return result;
 				});
@@ -313,18 +374,10 @@ public class L4101 extends TradeBuffer {
 
 				for (String tempL4101Vo : tempList) {
 					OccursList occursList = new OccursList();
-					String acNoCode = tempL4101Vo.substring(0, 8);
-					String acSubCode = tempL4101Vo.substring(8, 13);
-					String acDtlCode = tempL4101Vo.substring(13, 15);
-
-					CdAcCode tCdAcCode = new CdAcCode();
-					CdAcCodeId tCdAcCodeId = new CdAcCodeId();
-					tCdAcCodeId.setAcNoCode(acNoCode);
-					tCdAcCodeId.setAcSubCode(acSubCode);
-					tCdAcCodeId.setAcDtlCode(acDtlCode);
-
-					tCdAcCode = cdAcCodeService.findById(tCdAcCodeId);
-
+					String acNoCode = tempL4101Vo.substring(0,11);
+					String acSubCode = tempL4101Vo.substring(11, 16);
+					String acDtlCode = "  ";
+					CdAcCode tCdAcCode = cdAcCodeService.findById(new CdAcCodeId(acNoCode,acSubCode,acDtlCode ), titaVo);
 					occursList.putParam("ReportAAcDate", acDate - 19110000);
 					occursList.putParam("ReportAAcNoCode", tempL4101Vo);
 					if (tCdAcCode != null) {
@@ -365,7 +418,7 @@ public class L4101 extends TradeBuffer {
 		long sno = 0;
 		int cnt = 0;
 
-		if (lBankRemit != null && lBankRemit.size() != 0) {
+		if (lBankRemit.size() > 0) {
 			RemitFormVo remitformVo = new RemitFormVo();
 
 			// 報表代號(交易代號)
@@ -475,8 +528,8 @@ public class L4101 extends TradeBuffer {
 		return sno;
 	}
 
-//	產出明細報表
-	private void setReportB(List<BankRemit> lBankRemit) {
+//	整批匯款單明細報表
+	private void procReportB(List<BankRemit> lBankRemit, TitaVo titaVo) {
 		this.info("setReportB .... ");
 
 		HashMap<tmpFacm, BigDecimal> remitAmt = new HashMap<>();
@@ -497,23 +550,18 @@ public class L4101 extends TradeBuffer {
 				this.info("Continue... DrawdownCode = " + tBankRemit.getDrawdownCode());
 				continue;
 			}
-			
+
 			tmpFacm tmp = new tmpFacm(tBankRemit.getCustNo(), tBankRemit.getFacmNo());
 
 			OccursList occursList = new OccursList();
 
 			CustMain tCustMain = new CustMain();
-			tCustMain = custMainService.custNoFirst(tBankRemit.getCustNo(), tBankRemit.getCustNo());
+			tCustMain = custMainService.custNoFirst(tBankRemit.getCustNo(), tBankRemit.getCustNo(),titaVo);
 
-			FacMain tFacMain = new FacMain();
-			FacMainId tFacMainId = new FacMainId();
-			tFacMainId.setCustNo(tBankRemit.getCustNo());
-			tFacMainId.setFacmNo(tBankRemit.getFacmNo());
-			tFacMain = facMainService.findById(tFacMainId);
+			FacMain tFacMain = facMainService.findById(new FacMainId(tBankRemit.getCustNo(), tBankRemit.getFacmNo()),titaVo);
 			CdBcm tCdBcm = new CdBcm();
-
 			if (tFacMain != null) {
-				tCdBcm = cdBcmService.distCodeFirst(tFacMain.getDistrict());
+				tCdBcm = cdBcmService.distCodeFirst(tFacMain.getDistrict(),titaVo);
 			}
 
 			if (rounds == 1) {
@@ -542,17 +590,14 @@ public class L4101 extends TradeBuffer {
 				}
 			}
 
-			Slice<AcDetail> sAcDetail = null;
-
-			sAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
-					branchNo + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), acDate, this.index, this.limit);
-
-			List<AcDetail> l2AcDetail = sAcDetail == null ? null : sAcDetail.getContent();
+			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
+					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), acDate, this.index,
+					this.limit,titaVo);
 
 //			沖轉 1.是 0.否
 			int corFlag = 1;
 
-			if (l2AcDetail != null) {
+			if (slAcDetail != null) {
 				corFlag = 0;
 			} else {
 				corCnt = corCnt + 1;
