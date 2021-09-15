@@ -20,6 +20,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -33,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L4001")
 @Scope("prototype")
 public class L4001 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4001.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -43,11 +43,16 @@ public class L4001 extends TradeBuffer {
 	@Autowired
 	public DateUtil dateUtil;
 
-	/* 日期工具 */
+	@Autowired
+	DataLog datalog;
+
 	@Autowired
 	public BankRemitService bankRemitService;
 
 	private BigDecimal oRemitAmt = new BigDecimal(0);
+	private HashMap<L4001Vo, Integer> L4001VoCnt = new HashMap<>();
+
+	private HashMap<L4001Vo, BigDecimal> L4001VoSum = new HashMap<>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -65,71 +70,71 @@ public class L4001 extends TradeBuffer {
 		int acDateFrom = parse.stringToInteger(titaVo.getParam("AcDateFrom")) + 19110000;
 		int acDateTo = parse.stringToInteger(titaVo.getParam("AcDateTo")) + 19110000;
 
-		Slice<BankRemit> sBankRemit = null;
+		Slice<BankRemit> slBankRemit = bankRemitService.findL4001A(acDateFrom, acDateTo, this.index, this.limit);
 
-		sBankRemit = bankRemitService.findL4001A(acDateFrom, acDateTo, this.index, this.limit);
-		List<BankRemit> lBankRemit = sBankRemit == null ? null : sBankRemit.getContent();
-
-		if (lBankRemit != null && lBankRemit.size() != 0) {
-
-			HashMap<L4001Vo, Integer> L4001VoCnt = new HashMap<>();
-
-			HashMap<L4001Vo, BigDecimal> L4001VoSum = new HashMap<>();
-
-			for (BankRemit tBankRemit : lBankRemit) {
-
-				oRemitAmt = tBankRemit.getRemitAmt();
-
-				L4001Vo tmpL4001 = new L4001Vo(tBankRemit.getAcDate(), tBankRemit.getBatchNo(), tBankRemit.getDrawdownCode(), tBankRemit.getStatusCode());
-
-				if (L4001VoCnt.containsKey(tmpL4001)) {
-					L4001VoCnt.put(tmpL4001, L4001VoCnt.get(tmpL4001) + 1);
-				} else {
-					L4001VoCnt.put(tmpL4001, 1);
-				}
-
-				if (L4001VoSum.containsKey(tmpL4001)) {
-					oRemitAmt = oRemitAmt.add(L4001VoSum.get(tmpL4001));
-				}
-				L4001VoSum.put(tmpL4001, oRemitAmt);
-
-			}
-			Set<L4001Vo> tempSet = L4001VoCnt.keySet();
-
-			List<L4001Vo> tempList = new ArrayList<>();
-
-			for (Iterator<L4001Vo> it = tempSet.iterator(); it.hasNext();) {
-				L4001Vo tempL4001Vo = it.next();
-				tempList.add(tempL4001Vo);
-			}
-
-			tempList.sort((c1, c2) -> {
-				return c1.compareTo(c2);
-			});
-
-			for (L4001Vo tempL4001Vo : tempList) {
-
-				BigDecimal sum = L4001VoSum.get(tempL4001Vo);
-
-				OccursList occursList = new OccursList();
-				occursList.putParam("OOAcDate", tempL4001Vo.getoAcDate());
-				occursList.putParam("OOBatchNo", tempL4001Vo.getoBatchNo());
-				occursList.putParam("OODrawdownCode", tempL4001Vo.getoDrawdownCode());
-				occursList.putParam("OOStatusCode", tempL4001Vo.getoStatusCode());
-				occursList.putParam("OOCount", L4001VoCnt.get(tempL4001Vo));
-				occursList.putParam("OOCurName", titaVo.getCurName());
-				occursList.putParam("OORemitAmt", sum);
-
-				/* 將每筆資料放入Tota的OcList */
-				this.totaVo.addOccursList(occursList);
-			}
-		} else {
+		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
+
+		// put
+		for (BankRemit tBankRemit : slBankRemit.getContent()) {
+			if (tBankRemit.getActFg() == 1) {
+				add(3, tBankRemit, titaVo);
+			} else {
+				add(tBankRemit.getStatusCode(), tBankRemit, titaVo);
+			}
+		}
+
+		// get & sort
+		Set<L4001Vo> tempSet = L4001VoCnt.keySet();
+		List<L4001Vo> tempList = new ArrayList<>();
+		for (Iterator<L4001Vo> it = tempSet.iterator(); it.hasNext();) {
+			L4001Vo tempL4001Vo = it.next();
+			tempList.add(tempL4001Vo);
+		}
+
+		tempList.sort((c1, c2) -> {
+			return c1.compareTo(c2);
+		});
+
+		// output
+		for (L4001Vo tempL4001Vo : tempList) {
+			BigDecimal sum = L4001VoSum.get(tempL4001Vo);
+			OccursList occursList = new OccursList();
+			occursList.putParam("OOAcDate", tempL4001Vo.getoAcDate());
+			occursList.putParam("OOBatchNo", tempL4001Vo.getoBatchNo().trim());
+			occursList.putParam("OODrawdownCode", tempL4001Vo.getoDrawdownCode());
+			occursList.putParam("OOStatusCode", tempL4001Vo.getoStatusCode());
+			occursList.putParam("OOCount", L4001VoCnt.get(tempL4001Vo));
+			occursList.putParam("OOCurName", titaVo.getCurName());
+			occursList.putParam("OORemitAmt", sum);
+
+			/* 將每筆資料放入Tota的OcList */
+			this.totaVo.addOccursList(occursList);
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
 
+	private void add(int statusCode, BankRemit tBankRemit, TitaVo titaVo) throws LogicException {
+		oRemitAmt = tBankRemit.getRemitAmt();
+
+		L4001Vo tmpL4001 = new L4001Vo(tBankRemit.getAcDate(), tBankRemit.getBatchNo(), tBankRemit.getDrawdownCode(),
+				statusCode);
+
+		if (L4001VoCnt.containsKey(tmpL4001)) {
+			L4001VoCnt.put(tmpL4001, L4001VoCnt.get(tmpL4001) + 1);
+		} else {
+			L4001VoCnt.put(tmpL4001, 1);
+		}
+
+		if (L4001VoSum.containsKey(tmpL4001)) {
+			oRemitAmt = oRemitAmt.add(L4001VoSum.get(tmpL4001));
+		}
+
+		L4001VoSum.put(tmpL4001, oRemitAmt);
+	}
 }
 
 class L4001Vo implements Comparable<L4001Vo> {
@@ -183,7 +188,8 @@ class L4001Vo implements Comparable<L4001Vo> {
 		if (obj == null || getClass() != obj.getClass())
 			return false;
 		L4001Vo l4001Vo = (L4001Vo) obj;
-		return oAcDate == l4001Vo.getoAcDate() && oBatchNo.equals(l4001Vo.getoBatchNo()) && oDrawdownCode == l4001Vo.getoDrawdownCode() && oStatusCode == l4001Vo.getoStatusCode();
+		return oAcDate == l4001Vo.getoAcDate() && oBatchNo.equals(l4001Vo.getoBatchNo())
+				&& oDrawdownCode == l4001Vo.getoDrawdownCode() && oStatusCode == l4001Vo.getoStatusCode();
 	}
 
 	public int hashCode() {

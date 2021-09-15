@@ -411,6 +411,7 @@ T(2,@CustName,#L1r01CustName)
 T(2,@TypeCode,#L1r01TypeCode)
 
 #TypeCode=A,1,I
+C(3,#FunCd,5,s,$)
 HELP(#TypeCodeHelp)
 @V(H,#TypeCodeHelp)
 
@@ -1080,6 +1081,7 @@ T(H,#IsLnrelNear,#YesNoHelp)
 T(H,#IsSuspected,#YesNoHelp)
 
 #IsSuspectedCheck=X,1,I
+C(3,#FunCd,5,s,$)
 HELP(#YesNoHelp)
 @
 V(H,#YesNoHelp)
@@ -1091,6 +1093,7 @@ T(H,#IsSuspectedCheck,#YesNoHelp)
 T(3, :請選擇;Y:確認核對無誤)
 
 #IsSuspectedCheckType=X,1,I
+C(3,#FunCd,5,s,$)
 HELP(#IsSuspectedCheckTypeHelp)
 @
 V(7)
@@ -1318,6 +1321,11 @@ IF(#FunCd==5,XMT(),$)
 
 #SCRTIL=_,_,S
 T(3,[L1101] 顧客基本資料維護-自然人)
+
+INVOKEJS(SHOW,p1,0)
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+INVOKEJS(SHOW,p9,0)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 

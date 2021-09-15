@@ -125,6 +125,7 @@ K(MODIFYBUTTON,修改)
 
 #FdCustId=X,2,L
 #FdCustIdBef=X,2,L
+T(3,*)
 
 #FdTypeCode=X,2,L
 T(3,*)
@@ -197,8 +198,6 @@ T(2,@YesNoHelp,#HelpDesc4)
 T(2,@EduCodeHelp,#HelpDesc6)
 T(2,@AMLCodeHelp,#HelpDesc7)
 T(2,@AMLJobCodeHelp,#HelpDesc8)
-
-
 
 ! 調RIM取縣市代碼
 #RimL6r03City=X,1,S
@@ -853,6 +852,7 @@ IF(#RegCityCodeInd=="X",T(3,X),IF(#RegAreaCodeAft==#RegAreaCodeBef,T(3,),T(3,X))
 ! 調RIM取鄉鎮市區代碼B
 #RimL1r10A=X,1,S
 C(4,#RegCityCodeAft,S,$)
+C(4,#RegAreaCodeAft,S,$)
 T(2,@RimCityCode,#RegCityCodeAft)
 T(2,@RimAreaCode,#RegAreaCodeAft)
 RESET_RIM(#RimL1r10A,L1R10)
@@ -865,7 +865,7 @@ E(0,@RegZip3Aft,#L1r10Zip3)
 
 #RegRoadInd=X,1,L
 
-#RegRoadAft=c,40,I
+#RegRoadAft=x,40,I
 C(4,#RegCityCodeAft,S,$)
 TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
 @

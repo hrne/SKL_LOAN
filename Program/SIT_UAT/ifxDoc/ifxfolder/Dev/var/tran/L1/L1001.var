@@ -377,7 +377,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L1905;text=已設定; ntxbuf=#OOBUF14}))
 T(2,1+#OOCustId)
 
 #OOBTN13=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; ntxbuf=#OOBUF13})
+C(5,#OODataStatus,1,BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; text=補建; ntxbuf=#OOBUF13}),BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; text=修改; ntxbuf=#OOBUF13}))
 
 
 </sub>
@@ -470,7 +470,7 @@ TXFORM=L1001
 {width:60,search:false,formatter:'cust:bind-button:#OOBTN14',align:'center',canExport:false}
 
 #OOBTN13=基本</br>資料
-{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN13',align:'center',canExport:false}
 
 #OOCustId=統一編號
 {width:80,align:'center'}

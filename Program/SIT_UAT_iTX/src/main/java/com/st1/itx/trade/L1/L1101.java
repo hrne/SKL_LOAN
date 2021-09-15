@@ -250,10 +250,10 @@ public class L1101 extends TradeBuffer {
 			tCdIndustry = new CdIndustry();
 		}
 		// 通訊地址
-		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
+		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain,titaVo);
 		this.info("CurrAddres" + WkCurrAddres);
 		// 戶籍地址
-		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain, titaVo);
+		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain,titaVo);
 		this.info("CurrAddres" + WkRegAddres);
 
 		this.totaVo.putParam("OCustId", tCustMain.getCustId());
@@ -446,6 +446,8 @@ public class L1101 extends TradeBuffer {
 		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
 		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
+		
+		tCustMain.setDataStatus(0);
 
 	}
 

@@ -19,24 +19,24 @@ import com.st1.itx.util.parse.Parse;
 /**
  * Tita<br>
  * CustId=X,10 CustIdInd=X,1 CustIdAfter=X,10 CustNameInd=X,1 CustName1Aft=X,50
- * CustName2Aft=X,50 BirthdayInd=X,1 BirthdayBefore=9,7 CustTypeInd=X,1
- * CustTypeAft=9,2 IndustryInd=X,1 IndustryAft=9,6 CountryInd=X,1 CountryAft=X,2
- * SpouseIdInd=X,1 SpouseIdAft=X,10 SpouseNmInd=X,1 SpouseNmAft=X,14
- * RegZip3Ind=X,1 RegZip3Aft=9,3 RegZip2Ind=X,1 RegZip2Aft=9,2
- * RegCitycodeInd=X,1 RegCitycodeAft=X,10 RegAreacodeInd=X,1 RegAreacodeAft=X,2
+ * CustName2Aft=X,50 BirthdayInd=X,1 BirthdayBef=9,7 CustTypeInd=X,1
+ * CustTypeAft=9,2 IndustryInd=X,1 IndustryAft=9,6 NationalityCodeInd=X,1
+ * CountryAft=X,2 SpouseIdInd=X,1 SpouseIdAft=X,10 SpouseNameInd=X,1
+ * SpouseNameAft=X,14 RegZip3Ind=X,1 RegZip3Aft=9,3 RegZip2Ind=X,1 RegZip2Aft=9,2
+ * RegCityCodeInd=X,1 RegCityCodeAft=X,10 RegAreaCodeInd=X,1 RegAreaCodeAft=X,2
  * RegIrcodeInd=X,1 RegIrcodeAft=X,4 RegRoadInd=X,1 RegRoadAft=X,40
  * RegSctionInd=X,1 RegSctionAft=X,5 RegAlleyInd=X,1 RegAlleyAft=X,5
- * RegLaneInd=X,1 RegLaneAft=X,5 RegNumInd=X,1 RegNumAft=X,5 RegNumdashsInd=X,1
- * RegNumdashsAft=X,5 RegFloorInd=X,1 RegFloorAft=X,5 RegFloordashInd=X,1
- * RegFloordashAft=X,5 CurrZip3Ind=X,1 CurrZip3Aft=X,3 CurrZip2Ind=X,1
- * CurrZip2Aft=X,2 CurrCitycodeInd=X,1 CurrCitycodeAft=X,10 CurrAreacodeInd=X,1
- * CurrAreacodeAft=X,2 CurrIrcodeInd=X,1 CurrIrcodeAft=X,4 CurrRoadInd=X,1
+ * RegLaneInd=X,1 RegLaneAft=X,5 RegNumInd=X,1 RegNumAft=X,5 #RegNumDashInd=X,1
+ * #RegNumDashAft=X,5 RegFloorInd=X,1 RegFloorAft=X,5 RegFloorDashInd=X,1
+ * RegFloorDashAft=X,5 CurrZip3Ind=X,1 CurrZip3Aft=X,3 CurrZip2Ind=X,1
+ * CurrZip2Aft=X,2 CurrCityCodeInd=X,1 CurrCityCodeAft=X,10 CurrAreaCodeInd=X,1
+ * CurrAreaCodeAft=X,2 CurrIrcodeInd=X,1 CurrIrcodeAft=X,4 CurrRoadInd=X,1
  * CurrRoadAft=X,40 CurrSectionInd=X,1 CurrSectionAft=X,5 CurrAlleyInd=X,1
  * CurrAlleyAft=X,5 CurrLaneInd=X,1 CurrLaneAft=X,5 CurrNumInd=X,1
- * CurrNumAft=X,5 CurrNumdashsInd=X,1 CurrNumdashsAft=X,5 CurrFloorInd=X,1
- * CurrFloorAft=X,5 CurrFloordashInd=X,1 CurrFloordashAft=X,5 EntcodeInd=X,1
+ * CurrNumAft=X,5 CurrNumDashInd=X,1 CurrNumDashAft=X,5 CurrFloorInd=X,1
+ * CurrFloorAft=X,5 CurrFloorDashInd=X,1 CurrFloorDashAft=X,5 EntcodeInd=X,1
  * EntcodeAft=9,1 EnameInd=X,1 EnameAft=X,20 IncomeofyearlyInd=X,1
- * IncomeofyearlyAft=9,9 IncomedatadateInd=X,1 IncomedatadateAft=X,6
+ * IncomeofyearlyAft=9,9 IncomeDataDateInd=X,1 IncomeDataDateAft=X,6
  */
 
 @Service("L1104")
@@ -73,7 +73,7 @@ public class L1104 extends TradeBuffer {
 		if (titaVo.isActfgEntry()) {
 
 			// 變更前
-			CustMain beforeCustMain = (CustMain) iDataLog.clone(tCustMain);
+			CustMain BefCustMain = (CustMain) iDataLog.clone(tCustMain);
 
 			// 若該欄位有被修改,更新該欄位資料
 
@@ -120,7 +120,7 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 紀錄變更前變更後
-			iDataLog.setEnv(titaVo, beforeCustMain, tCustMain);
+			iDataLog.setEnv(titaVo, BefCustMain, tCustMain);
 			iDataLog.exec();
 		}
 
@@ -158,9 +158,14 @@ public class L1104 extends TradeBuffer {
 				tCustMain.setIndustryCode(titaVo.getParam("IndustryAft"));
 			}
 
-			// 國籍
-			if (titaVo.getParam("CountryInd").equals("X")) {
-				tCustMain.setNationalityCode(titaVo.getParam("CountryAft"));
+			// 公司註冊地
+			if (titaVo.getParam("NationalityCodeInd").equals("X")) {
+				tCustMain.setNationalityCode(titaVo.getParam("NationalityCodeAft"));
+			}
+
+			// 營業地國籍
+			if (titaVo.getParam("BussNationalityCodeInd").equals("X")) {
+				tCustMain.setBussNationalityCode(titaVo.getParam("BussNationalityCodeAft"));
 			}
 
 			// 負責人身分證
@@ -169,8 +174,8 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 負責人姓名
-			if (titaVo.getParam("SpouseNmInd").equals("X")) {
-				tCustMain.setSpouseName(titaVo.getParam("SpouseNmAft"));
+			if (titaVo.getParam("SpouseNameInd").equals("X")) {
+				tCustMain.setSpouseName(titaVo.getParam("SpouseNameAft"));
 			}
 
 			// 戶籍-郵遞區號前三碼
@@ -184,13 +189,13 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 戶籍-縣市代碼
-			if (titaVo.getParam("RegCitycodeInd").equals("X")) {
-				tCustMain.setRegCityCode(titaVo.getParam("RegCitycodeAft"));
+			if (titaVo.getParam("RegCityCodeInd").equals("X")) {
+				tCustMain.setRegCityCode(titaVo.getParam("RegCityCodeAft"));
 			}
 
 			// 戶籍-鄉鎮市區代碼
-			if (titaVo.getParam("RegAreacodeInd").equals("X")) {
-				tCustMain.setRegAreaCode(titaVo.getParam("RegAreacodeAft"));
+			if (titaVo.getParam("RegAreaCodeInd").equals("X")) {
+				tCustMain.setRegAreaCode(titaVo.getParam("RegAreaCodeAft"));
 			}
 
 			// 戶籍-路名
@@ -219,8 +224,8 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 戶籍-號之
-			if (titaVo.getParam("RegNumdashsInd").equals("X")) {
-				tCustMain.setRegNumDash(titaVo.getParam("RegNumdashsAft"));
+			if (titaVo.getParam("RegNumDashInd").equals("X")) {
+				tCustMain.setRegNumDash(titaVo.getParam("RegNumDashAft"));
 			}
 
 			// 戶籍-樓
@@ -229,8 +234,8 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 戶籍-樓之
-			if (titaVo.getParam("RegFloordashInd").equals("X")) {
-				tCustMain.setRegFloorDash(titaVo.getParam("RegFloordashAft"));
+			if (titaVo.getParam("RegFloorDashInd").equals("X")) {
+				tCustMain.setRegFloorDash(titaVo.getParam("RegFloorDashAft"));
 			}
 
 			// 通訊-郵遞區號前三碼
@@ -244,13 +249,13 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 通訊-縣市代碼
-			if (titaVo.getParam("CurrCitycodeInd").equals("X")) {
-				tCustMain.setCurrCityCode(titaVo.getParam("CurrCitycodeAft"));
+			if (titaVo.getParam("CurrCityCodeInd").equals("X")) {
+				tCustMain.setCurrCityCode(titaVo.getParam("CurrCityCodeAft"));
 			}
 
 			// 通訊-鄉鎮市區代碼
-			if (titaVo.getParam("CurrAreacodeInd").equals("X")) {
-				tCustMain.setCurrAreaCode(titaVo.getParam("CurrAreacodeAft"));
+			if (titaVo.getParam("CurrAreaCodeInd").equals("X")) {
+				tCustMain.setCurrAreaCode(titaVo.getParam("CurrAreaCodeAft"));
 			}
 
 			// 通訊-路名
@@ -279,8 +284,8 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 通訊-號之
-			if (titaVo.getParam("CurrNumdashsInd").equals("X")) {
-				tCustMain.setCurrNumDash(titaVo.getParam("CurrNumdashsAft"));
+			if (titaVo.getParam("CurrNumDashInd").equals("X")) {
+				tCustMain.setCurrNumDash(titaVo.getParam("CurrNumDashAft"));
 			}
 
 			// 通訊-樓
@@ -289,8 +294,8 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 通訊-樓之
-			if (titaVo.getParam("CurrFloordashInd").equals("X")) {
-				tCustMain.setCurrFloorDash(titaVo.getParam("CurrFloordashAft"));
+			if (titaVo.getParam("CurrFloorDashInd").equals("X")) {
+				tCustMain.setCurrFloorDash(titaVo.getParam("CurrFloorDashAft"));
 			}
 
 			// 電子信箱
@@ -314,11 +319,12 @@ public class L1104 extends TradeBuffer {
 			}
 
 			// 年收入資料年月
-			if (titaVo.getParam("IncomedatadateInd").equals("X")) {
-				if (titaVo.getParam("IncomedatadateAft").equals("")) {
+			if (titaVo.getParam("IncomeDataDateInd").equals("X")) {
+				if (titaVo.getParam("IncomeDataDateAft").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateAft")) + 191100));
+					tCustMain.setIncomeDataDate(
+							"" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateAft")) + 191100));
 				}
 
 			}
@@ -339,185 +345,191 @@ public class L1104 extends TradeBuffer {
 			// 公司名稱
 			if (titaVo.getParam("CustNameInd").equals("X")) {
 				// if (!titaVo.getParam("CUSTNM_IND").isEmpty()) {
-				tCustMain.setCustName(titaVo.getParam("CustNameBefore"));
+				tCustMain.setCustName(titaVo.getParam("CustNameBef"));
 			}
 
 			// 設立日期
 			if (titaVo.getParam("BirthdayInd").equals("X")) {
-				tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("BirthdayBefore")));
+				tCustMain.setBirthday(iParse.stringToInteger(titaVo.getParam("BirthdayBef")));
 			}
 
 			// 客戶別
 			if (titaVo.getParam("CustTypeInd").equals("X")) {
-				tCustMain.setCustTypeCode(titaVo.getParam("CustTypeBefore"));
+				tCustMain.setCustTypeCode(titaVo.getParam("CustTypeBef"));
 			}
 
 			// 行業別
 			if (titaVo.getParam("IndustryInd").equals("X")) {
-				tCustMain.setIndustryCode(titaVo.getParam("IndustryBefore"));
+				tCustMain.setIndustryCode(titaVo.getParam("IndustryBef"));
 			}
 
-			// 國籍
-			if (titaVo.getParam("CountryInd").equals("X")) {
-				tCustMain.setNationalityCode(titaVo.getParam("CountryBefore"));
+			// 公司註冊地
+			if (titaVo.getParam("NationalityCodeInd").equals("X")) {
+				tCustMain.setNationalityCode(titaVo.getParam("NationalityCodeBef"));
+			}
+
+			// 營業地國籍
+			if (titaVo.getParam("BussNationalityCodeInd").equals("X")) {
+				tCustMain.setBussNationalityCode(titaVo.getParam("BussNationalityCodeBef"));
 			}
 
 			// 負責人身分證
 			if (titaVo.getParam("SpouseIdInd").equals("X")) {
-				tCustMain.setSpouseId(titaVo.getParam("SpouseIdBefore"));
+				tCustMain.setSpouseId(titaVo.getParam("SpouseIdBef"));
 			}
 
 			// 負責人姓名
-			if (titaVo.getParam("SpouseNmInd").equals("X")) {
-				tCustMain.setSpouseName(titaVo.getParam("SpouseNmBefore"));
+			if (titaVo.getParam("SpouseNameInd").equals("X")) {
+				tCustMain.setSpouseName(titaVo.getParam("SpouseNameBef"));
 			}
 
 			// 戶籍-郵遞區號前三碼
 			if (titaVo.getParam("RegZip3Ind").equals("X")) {
-				tCustMain.setRegZip3(titaVo.getParam("RegZip3Before"));
+				tCustMain.setRegZip3(titaVo.getParam("RegZip3Bef"));
 			}
 
 			// 戶籍-郵遞區號後兩碼
 			if (titaVo.getParam("RegZip2Ind").equals("X")) {
-				tCustMain.setRegZip2(titaVo.getParam("RegZip2Before"));
+				tCustMain.setRegZip2(titaVo.getParam("RegZip2Bef"));
 			}
 
 			// 戶籍-縣市代碼
-			if (titaVo.getParam("RegCitycodeInd").equals("X")) {
-				tCustMain.setRegCityCode(titaVo.getParam("RegCitycodeBefore"));
+			if (titaVo.getParam("RegCityCodeInd").equals("X")) {
+				tCustMain.setRegCityCode(titaVo.getParam("RegCityCodeBef"));
 			}
 
 			// 戶籍-鄉鎮市區代碼
-			if (titaVo.getParam("RegAreacodeInd").equals("X")) {
-				tCustMain.setRegAreaCode(titaVo.getParam("RegAreacodeBefore"));
+			if (titaVo.getParam("RegAreaCodeInd").equals("X")) {
+				tCustMain.setRegAreaCode(titaVo.getParam("RegAreaCodeBef"));
 			}
 
 			// 戶籍-路名
 			if (titaVo.getParam("RegRoadInd").equals("X")) {
-				tCustMain.setRegRoad(titaVo.getParam("RegRoadBefore"));
+				tCustMain.setRegRoad(titaVo.getParam("RegRoadBef"));
 			}
 
 			// 戶籍-段
 			if (titaVo.getParam("RegSectionInd").equals("X")) {
-				tCustMain.setRegSection(titaVo.getParam("RegSectionBefore"));
+				tCustMain.setRegSection(titaVo.getParam("RegSectionBef"));
 			}
 
 			// 戶籍-巷
 			if (titaVo.getParam("RegAlleyInd").equals("X")) {
-				tCustMain.setRegAlley(titaVo.getParam("RegAlleyBefore"));
+				tCustMain.setRegAlley(titaVo.getParam("RegAlleyBef"));
 			}
 
 			// 戶籍-弄
 			if (titaVo.getParam("RegLaneInd").equals("X")) {
-				tCustMain.setRegLane(titaVo.getParam("RegLaneBefore"));
+				tCustMain.setRegLane(titaVo.getParam("RegLaneBef"));
 			}
 
 			// 戶籍-號
 			if (titaVo.getParam("RegNumInd").equals("X")) {
-				tCustMain.setRegNum(titaVo.getParam("RegNumBefore"));
+				tCustMain.setRegNum(titaVo.getParam("RegNumBef"));
 			}
 
 			// 戶籍-號之
-			if (titaVo.getParam("RegNumdashsInd").equals("X")) {
-				tCustMain.setRegNumDash(titaVo.getParam("RegNumdashsBefore"));
+			if (titaVo.getParam("RegNumDashInd").equals("X")) {
+				tCustMain.setRegNumDash(titaVo.getParam("RegNumDashBef"));
 			}
 
 			// 戶籍-樓
 			if (titaVo.getParam("RegFloorInd").equals("X")) {
-				tCustMain.setRegFloor(titaVo.getParam("RegFloorBefore"));
+				tCustMain.setRegFloor(titaVo.getParam("RegFloorBef"));
 			}
 
 			// 戶籍-樓之
-			if (titaVo.getParam("RegFloordashInd").equals("X")) {
-				tCustMain.setRegFloorDash(titaVo.getParam("RegFloordashBefore"));
+			if (titaVo.getParam("RegFloorDashInd").equals("X")) {
+				tCustMain.setRegFloorDash(titaVo.getParam("RegFloorDashBef"));
 			}
 
 			// 通訊-郵遞區號前三碼
 			if (titaVo.getParam("CurrZip3Ind").equals("X")) {
-				tCustMain.setCurrZip3(titaVo.getParam("CurrZip3Before"));
+				tCustMain.setCurrZip3(titaVo.getParam("CurrZip3Bef"));
 			}
 
 			// 通訊-郵遞區號後兩碼
 			if (titaVo.getParam("CurrZip2Ind").equals("X")) {
-				tCustMain.setCurrZip2(titaVo.getParam("CurrZip2Before"));
+				tCustMain.setCurrZip2(titaVo.getParam("CurrZip2Bef"));
 			}
 
 			// 通訊-縣市代碼
-			if (titaVo.getParam("CurrCitycodeInd").equals("X")) {
-				tCustMain.setCurrCityCode(titaVo.getParam("CurrCitycodeBefore"));
+			if (titaVo.getParam("CurrCityCodeInd").equals("X")) {
+				tCustMain.setCurrCityCode(titaVo.getParam("CurrCityCodeBef"));
 			}
 
 			// 通訊-鄉鎮市區代碼
-			if (titaVo.getParam("CurrAreacodeInd").equals("X")) {
-				tCustMain.setCurrAreaCode(titaVo.getParam("CurrAreacodeBefore"));
+			if (titaVo.getParam("CurrAreaCodeInd").equals("X")) {
+				tCustMain.setCurrAreaCode(titaVo.getParam("CurrAreaCodeBef"));
 			}
 
 			// 通訊-路名
 			if (titaVo.getParam("CurrRoadInd").equals("X")) {
-				tCustMain.setCurrRoad(titaVo.getParam("CurrRoadBefore"));
+				tCustMain.setCurrRoad(titaVo.getParam("CurrRoadBef"));
 			}
 
 			// 通訊-段
 			if (titaVo.getParam("CurrSectionInd").equals("X")) {
-				tCustMain.setCurrSection(titaVo.getParam("CurrSectionBefore"));
+				tCustMain.setCurrSection(titaVo.getParam("CurrSectionBef"));
 			}
 
 			// 通訊-巷
 			if (titaVo.getParam("CurrAlleyInd").equals("X")) {
-				tCustMain.setCurrAlley(titaVo.getParam("CurrAlleyBefore"));
+				tCustMain.setCurrAlley(titaVo.getParam("CurrAlleyBef"));
 			}
 
 			// 通訊-弄
 			if (titaVo.getParam("CurrLaneInd").equals("X")) {
-				tCustMain.setCurrLane(titaVo.getParam("CurrLaneBefore"));
+				tCustMain.setCurrLane(titaVo.getParam("CurrLaneBef"));
 			}
 
 			// 通訊-號
 			if (titaVo.getParam("CurrNumInd").equals("X")) {
-				tCustMain.setCurrNum(titaVo.getParam("CurrNumBefore"));
+				tCustMain.setCurrNum(titaVo.getParam("CurrNumBef"));
 			}
 
 			// 通訊-號之
-			if (titaVo.getParam("CurrNumdashsInd").equals("X")) {
-				tCustMain.setCurrNumDash(titaVo.getParam("CurrNumdashsBefore"));
+			if (titaVo.getParam("CurrNumDashInd").equals("X")) {
+				tCustMain.setCurrNumDash(titaVo.getParam("CurrNumDashBef"));
 			}
 
 			// 通訊-樓
 			if (titaVo.getParam("CurrFloorInd").equals("X")) {
-				tCustMain.setCurrFloor(titaVo.getParam("CurrFloorBefore"));
+				tCustMain.setCurrFloor(titaVo.getParam("CurrFloorBef"));
 			}
 
 			// 通訊-樓之
-			if (titaVo.getParam("CurrFloordashInd").equals("X")) {
-				tCustMain.setCurrFloorDash(titaVo.getParam("CurrFloordashBefore"));
+			if (titaVo.getParam("CurrFloorDashInd").equals("X")) {
+				tCustMain.setCurrFloorDash(titaVo.getParam("CurrFloorDashBef"));
 			}
 
 			// 電子信箱
 			if (titaVo.getParam("EmailInd").equals("X")) {
-				tCustMain.setEmail(titaVo.getParam("EmailBefore"));
+				tCustMain.setEmail(titaVo.getParam("EmailBef"));
 			}
 
 			// 企金別
 			if (titaVo.getParam("EntcodeInd").equals("X")) {
-				tCustMain.setEntCode(titaVo.getParam("EntcodeBefore"));
+				tCustMain.setEntCode(titaVo.getParam("EntcodeBef"));
 			}
 
 			// 英文姓名
 			if (titaVo.getParam("EnameInd").equals("X")) {
-				tCustMain.setEName(titaVo.getParam("EnameBefore"));
+				tCustMain.setEName(titaVo.getParam("EnameBef"));
 			}
 
 			// 年收入
 			if (titaVo.getParam("IncomeofyearlyInd").equals("X")) {
-				tCustMain.setIncomeOfYearly(iParse.stringToInteger(titaVo.getParam("IncomeofyearlyBefore")));
+				tCustMain.setIncomeOfYearly(iParse.stringToInteger(titaVo.getParam("IncomeofyearlyBef")));
 			}
 
 			// 年收入資料年月
-			if (titaVo.getParam("IncomedatadateInd").equals("X")) {
-				if (titaVo.getParam("IncomedatadateBefore").equals("")) {
+			if (titaVo.getParam("IncomeDataDateInd").equals("X")) {
+				if (titaVo.getParam("IncomeDataDateBef").equals("")) {
 					tCustMain.setIncomeDataDate("");
 				} else {
-					tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomedatadateBefore")) + 191100));
+					tCustMain.setIncomeDataDate(
+							"" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDateBef")) + 191100));
 				}
 
 			}

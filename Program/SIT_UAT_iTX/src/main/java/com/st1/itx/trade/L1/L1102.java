@@ -377,6 +377,8 @@ public class L1102 extends TradeBuffer {
 		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
 		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
+		
+		tCustMain.setDataStatus(0);
 	}
 
 	// 查詢放款主檔

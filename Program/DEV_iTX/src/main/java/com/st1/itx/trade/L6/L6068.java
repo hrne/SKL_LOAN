@@ -52,9 +52,9 @@ public class L6068 extends TradeBuffer {
 		// 查詢報表代號對照檔
 		Slice<CdReport> slCdReport;
 		if (iFormName.isEmpty()) {
-			slCdReport = sCdReportService.formNoLike("%" + iFormNo.trim() + "%", this.index, this.limit, titaVo);
+			slCdReport = sCdReportService.formNoLike(iFormNo.trim() + "%", this.index, this.limit, titaVo);
 		} else {
-			slCdReport = sCdReportService.formNameLike("%" + iFormName.trim() + "%", this.index, this.limit, titaVo);
+			slCdReport = sCdReportService.formNameLike(iFormName.trim() + "%", this.index, this.limit, titaVo);
 		}
 		List<CdReport> lCdReport = slCdReport == null ? null : slCdReport.getContent();
 

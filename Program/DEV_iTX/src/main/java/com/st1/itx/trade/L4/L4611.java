@@ -125,7 +125,6 @@ public class L4611 extends TradeBuffer {
 		if ("".equals(endoInsuNo)) {
 			endoInsuNo = " ";
 		}
-
 		// 額度
 		FacMain tFacMain = facMainService.findById(new FacMainId(custNo, facmNo), titaVo);
 		if (tFacMain == null) {
@@ -156,6 +155,11 @@ public class L4611 extends TradeBuffer {
 		case "1": // 新增
 			tInsuRenew = new InsuRenew();
 			tInsuRenew.setInsuRenewId(tInsuRenewId);
+			tInsuRenew.setClCode1(clCode1);
+			tInsuRenew.setClCode2(clCode2);
+			tInsuRenew.setClNo(clNo);
+			tInsuRenew.setPrevInsuNo(prevInsuNo);
+			tInsuRenew.setEndoInsuNo(endoInsuNo);
 			tInsuRenew.setCustNo(custNo);
 			tInsuRenew.setFacmNo(facmNo);
 			tInsuRenew.setInsuYearMonth(insuYearMonth);
@@ -325,6 +329,9 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
 			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
+					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			tInsuRenew.setTotInsuPrem(totPrem);
 			try {
 				insuRenewService.update(tInsuRenew, titaVo);
 			} catch (DBException e) {
@@ -338,16 +345,20 @@ public class L4611 extends TradeBuffer {
 	}
 
 	private void resetAcReceivable(int flag, InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
+		this.info("resetAcReceivable.." + flag + ", " + noticeYearMonth + ", " + tInsuRenew.toString());
 		List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
 		if (tInsuRenew.getRenewCode() != 2) {
+			this.info("resetAcReceivable RenewCode");
 			return;
 		}
 
-		if (tInsuRenew.getStatusCode() >= 0) {
+		if (tInsuRenew.getStatusCode() > 0) {
+			this.info("resetAcReceivable StatusCode");
 			return;
 		}
 		// 尚未通知
 		if (insuYearMonth < noticeYearMonth) {
+			this.info("resetAcReceivable insuYearMonth");
 			return;
 		}
 
