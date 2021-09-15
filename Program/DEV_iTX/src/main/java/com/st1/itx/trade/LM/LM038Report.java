@@ -53,7 +53,7 @@ public class LM038Report extends MakeReport {
 		if (LDList.size() == 0) {
 			makeExcel.setValue(4, 1, "本日無資料");
 		}
-		int row = 4;
+		int row = 2;
 
 		BigDecimal total_DataCount = BigDecimal.ZERO;
 		BigDecimal total_LoanBal = BigDecimal.ZERO;

@@ -103,6 +103,14 @@ public class L1R01 extends TradeBuffer {
 			if (tCustMain.getActFg() == 1) {
 				throw new LogicException("E0021", "");
 			}
+			
+			if (tCustMain.getDataStatus() == 1 && "L1103".equals(txcd)) {
+				throw new LogicException("E0003", "請先至L1103補建基本資料");
+			}
+			
+			if (tCustMain.getDataStatus() == 1 && "L1104".equals(txcd)) {
+				throw new LogicException("E0003", "請先至L1104補建基本資料");
+			}
 		}
 
 		/* 存入Tota */
@@ -117,6 +125,7 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01CustTypeCode", tCustMain.getCustTypeCode());
 		this.totaVo.putParam("L1r01IndustryCode", tCustMain.getIndustryCode());
 		this.totaVo.putParam("L1r01NationalityCode", tCustMain.getNationalityCode());
+		this.totaVo.putParam("L1r01BussNationalityCode", tCustMain.getBussNationalityCode());
 		this.totaVo.putParam("L1r01SpouseId", tCustMain.getSpouseId());
 		this.totaVo.putParam("L1r01SpouseName", tCustMain.getSpouseName());
 		this.totaVo.putParam("L1r01RegZip3", tCustMain.getRegZip3());
@@ -172,8 +181,8 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01IndigenousName", tCustMain.getIndigenousName());
 		this.totaVo.putParam("L1r01Introducer", tCustMain.getIntroducer());
 		this.totaVo.putParam("L1r01TypeCode", tCustMain.getTypeCode());
-		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain, titaVo));
-		this.totaVo.putParam("L1r01CurrAddress", custNoticeCom.getCurrAddress(tCustMain, titaVo));
+		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain,titaVo));
+		this.totaVo.putParam("L1r01CurrAddress", custNoticeCom.getCurrAddress(tCustMain,titaVo));
 
 		this.addList(this.totaVo);
 		return this.sendList();

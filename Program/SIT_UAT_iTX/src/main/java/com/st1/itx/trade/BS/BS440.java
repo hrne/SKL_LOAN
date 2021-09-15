@@ -322,6 +322,12 @@ public class BS440 extends TradeBuffer {
 					continue;
 				}
 
+				// 本金利息 = 0
+				if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPrincipal().add(tBaTxVo.getInterest())
+						.add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()).compareTo(BigDecimal.ZERO) == 0) {
+					continue;
+				}
+
 //				短繳後方合計第一筆欠款
 				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 1) {
 					this.info("continue... 短繳期金");

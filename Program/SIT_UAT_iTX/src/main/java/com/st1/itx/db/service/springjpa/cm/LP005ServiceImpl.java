@@ -63,6 +63,7 @@ public class LP005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                              AND TRUNC(PCO.\"EffectiveDate\" / 100) <= :inputWorkMonth ";
 		sql += "                              AND TRUNC(PCO.\"IneffectiveDate\" / 100) >= :inputWorkMonth ";
 		sql += " WHERE PR.\"CoorgnizerBonus\" > 0 ";
+		sql += "   AND PR.\"CoorgnizerBonusDate\" > 0 ";
 		sql += "   AND PR.\"WorkMonth\" = :inputWorkMonth ";
 		this.info("sql=" + sql);
 

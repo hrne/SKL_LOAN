@@ -769,7 +769,7 @@ public class L2154 extends TradeBuffer {
 		}
 
 		try {
-			facMainService.update(tFacMain, titaVo);
+			facMainService.update2(tFacMain, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E2010", "額度主檔"); // 更新資料時，發生錯誤
 		}

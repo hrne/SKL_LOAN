@@ -35,6 +35,7 @@ import com.st1.itx.db.service.PostAuthLogHistoryService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.db.service.springjpa.cm.BankAuthActComServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
@@ -126,6 +127,9 @@ public class BankAuthActCom extends TradeBuffer {
 
 	@Autowired
 	public TxAmlCom txAmlCom;
+	
+	@Autowired
+	DataLog datalog;
 
 	private String iCreateFlag = "A";
 
@@ -418,13 +422,15 @@ public class BankAuthActCom extends TradeBuffer {
 			throw new LogicException("E0015", "額度檔找不到" + custNo + "-" + facmNo); // 檢查錯誤
 		}
 		if (tFacMain.getRepayCode() != 2) {
+			FacMain beforeFacMain = (FacMain) datalog.clone(tFacMain);
 			tFacMain.setRepayCode(2);
 			try {
-				tFacMain = facMainService.update(tFacMain, titaVo);
+				tFacMain = facMainService.update2(tFacMain, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "額度主檔" + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
-
+			datalog.setEnv(titaVo, beforeFacMain, tFacMain);
+			datalog.exec();
 		}
 	}
 
