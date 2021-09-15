@@ -29,13 +29,6 @@ public class L6R36 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		/*
-		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		 */
-		this.index = titaVo.getReturnIndex();
-
-		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500;
 
 		this.info("active L6R36 ");
 		this.totaVo.init(titaVo);
@@ -43,7 +36,7 @@ public class L6R36 extends TradeBuffer {
 		int iWorkMonth = Integer.valueOf(titaVo.getParam("RimWorkMonth")) + 191100;
 
 		Slice<CdBonusCo> iCdBonusCo = null;
-		iCdBonusCo = iCdBonusCoService.findYearMonth(iWorkMonth, iWorkMonth, this.index, this.limit, titaVo);
+		iCdBonusCo = iCdBonusCoService.findYearMonth(iWorkMonth, iWorkMonth, 0,Integer.MAX_VALUE, titaVo);
 
 		if (iCdBonusCo == null) {
 			throw new LogicException(titaVo, "E0001", "該工作月尚無資料");
@@ -64,10 +57,12 @@ public class L6R36 extends TradeBuffer {
 					totaVo.putParam("L6R36ConditionAmt", rCdBonusCo.getConditionAmt());
 				}
 				iPieceCode++;
-			} else {
+			} else if (rCdBonusCo.getConditionCode() == 2){
 				totaVo.putParam("L6R36Bonus" + String.valueOf(iCondition), rCdBonusCo.getBonus());
 				totaVo.putParam("L6R36ClassPassBonus" + String.valueOf(iCondition), rCdBonusCo.getClassPassBonus());
 				iCondition++;
+			} else {
+				totaVo.putParam("L6R36PrizeAmt", rCdBonusCo.getBonus());
 			}
 		}
 

@@ -178,7 +178,7 @@ public class LM061Report extends MakeReport {
 						// 和上一個戶號一樣就累加 並 合併儲存格 再賦值
 						if (!tempCustNo2.equals(tLDVo.get("F0"))) {
 
-							tempCustNo2 = tLDVo.get("F0");
+						
 
 							// 上一同戶號多額度跟這筆比較，如果有1筆以上就使用合併
 							if (tempCount > 1) {
@@ -237,6 +237,8 @@ public class LM061Report extends MakeReport {
 							}
 
 						}
+						
+						tempCustNo2 = tLDVo.get("F0");
 
 						// 最後一筆時如果是需要合併，且同戶號多額度有1筆以上就使用合併。
 						if (count == tLDVo.size() && tempCount > 1) {

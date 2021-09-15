@@ -8442,6 +8442,7 @@ TXFORM=L6R35
 #L6R36ClassPassBonus1=n,14,S
 #L6R36Bonus2=n,14,S
 #L6R36ClassPassBonus2=n,14,S
+#L6R36PrizeAmt=n,14,S
 </L6R36.dec>
 
 <L6R36.tom>
@@ -8473,6 +8474,7 @@ TXFORM=L6R36
 #L6R36ClassPassBonus1
 #L6R36Bonus2
 #L6R36ClassPassBonus2
+#L6R36PrizeAmt
 ^
 </L6R36.tom>
 

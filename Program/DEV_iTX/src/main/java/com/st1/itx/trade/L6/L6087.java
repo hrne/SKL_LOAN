@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -11,68 +13,87 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBonusCo;
+import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.service.CdBonusCoService;
+import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
-
 
 @Service("L6087")
 @Scope("prototype")
 public class L6087 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6087.class);
 
 	/* DB服務注入 */
 	/* 轉換工具 */
 	@Autowired
-	public Parse parse;
+	public CdBonusCoService iCdBonusCoService;
 	
 	@Autowired
-	public CdBonusCoService iCdBonusCoService;
+	public CdWorkMonthService iCdWorkMonthService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6087 ");
 		this.totaVo.init(titaVo);
 
-		/*
-		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		 */
-		this.index = titaVo.getReturnIndex();
-
-		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 200; // 229 * 200 = 45800
-		
-		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth"))+191100;
-	
+		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
+		int iEntdy = titaVo.getEntDyI()+19110000;
+		int nWorkMonth = 0; //當前工作月
 		Slice<CdBonusCo> tCdBonusCo = null;
-		
+		ArrayList<Integer> workMonth_list = new ArrayList<>();
 		if (Integer.valueOf(titaVo.getParam("WorkMonth")) == 0) {
 			tCdBonusCo = iCdBonusCoService.findAll(this.index, this.limit, titaVo);
-		}else {
+		} else {
 			tCdBonusCo = iCdBonusCoService.findYearMonth(iWorkMonth, iWorkMonth, this.index, this.limit, titaVo);
 		}
-		ArrayList<Integer> workMonth_list = new ArrayList<>();
 		if (tCdBonusCo == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料"); // 查無資料
 		}
-		for(CdBonusCo iCdBonusCo :tCdBonusCo) {
+		
+		//取當前工作月
+		CdWorkMonth iCdWorkMonth = new CdWorkMonth();
+		iCdWorkMonth = iCdWorkMonthService.findDateFirst(iEntdy, iEntdy, titaVo);
+		if (iCdWorkMonth == null) {
+			throw new LogicException(titaVo, "E0001", "查無工作月資料"); // 查無資料
+		}
+		String iYear = StringUtils.leftPad(String.valueOf(iCdWorkMonth.getYear()-1911), 3,"0");
+		String iMonth = StringUtils.leftPad(String.valueOf(iCdWorkMonth.getMonth()), 2,"0");
+		nWorkMonth = Integer.valueOf(iYear+iMonth);
+		
+		
+		for (CdBonusCo iCdBonusCo : tCdBonusCo) {
 			int cWorkMonth = iCdBonusCo.getWorkMonth();
 			if (workMonth_list.contains(cWorkMonth)) {
 				continue;
-			}else {
-				workMonth_list.add(0,cWorkMonth);
+			} else {
+				workMonth_list.add(0, cWorkMonth);
 			}
 		}
-		for(int reWorkMonth:workMonth_list) {
+//		for (int reWorkMonth : workMonth_list) {	
+		for (int i = 0 ; i<workMonth_list.size();i++) {
 			OccursList occursList = new OccursList();
-			occursList.putParam("OOWorkMonth", reWorkMonth-191100);
+			int reWorkMonth = workMonth_list.get(i);
+			if (i+1 < workMonth_list.size()) {
+				occursList.putParam("OOWorkMonth", reWorkMonth - 191100);
+				if (reWorkMonth-191100 > nWorkMonth) {
+					occursList.putParam("OOBtnFg", 1); //開啟修改、刪除按鈕
+				}else if (reWorkMonth-191100 == nWorkMonth){
+					occursList.putParam("OOBtnFg", 2); //開啟修改、關閉刪除按鈕
+				}else if (reWorkMonth-191100 < nWorkMonth && workMonth_list.get(i+1) > nWorkMonth || workMonth_list.get(i+1) == nWorkMonth) {
+					occursList.putParam("OOBtnFg", 2); //開啟修改、關閉刪除按鈕
+				}else {
+					occursList.putParam("OOBtnFg", 0); //關閉修改、刪除按鈕
+				}
+			}else {
+				occursList.putParam("OOWorkMonth", reWorkMonth - 191100);
+				if (reWorkMonth-191100 > nWorkMonth) {
+					occursList.putParam("OOBtnFg", 1); //開啟修改、刪除按鈕
+				}else if (reWorkMonth-191100 == nWorkMonth){
+					occursList.putParam("OOBtnFg", 2); //開啟修改、關閉刪除按鈕
+				}else {
+					occursList.putParam("OOBtnFg", 0); //關閉修改、刪除按鈕
+				}
+			}
 			this.totaVo.addOccursList(occursList);
-		}	
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (tCdBonusCo != null && tCdBonusCo.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			/* 手動折返 */
-			this.totaVo.setMsgEndToEnter();
 		}
 
 		this.addList(this.totaVo);

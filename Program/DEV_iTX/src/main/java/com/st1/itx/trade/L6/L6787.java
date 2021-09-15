@@ -15,56 +15,58 @@ import com.st1.itx.db.domain.CdBonusCo;
 import com.st1.itx.db.domain.CdBonusCoId;
 import com.st1.itx.db.service.CdBonusCoService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
-
+import com.st1.itx.util.common.SendRsp;
 
 @Service("L6787")
 @Scope("prototype")
 public class L6787 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6787.class);
 
 	/* DB服務注入 */
 	/* 轉換工具 */
-	@Autowired
-	public Parse parse;
-	
+
 	@Autowired
 	public CdBonusCoService iCdBonusCoService;
-
+	@Autowired
+	SendRsp iSendRsp;
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6787 ");
 		this.totaVo.init(titaVo);
 
 		int iFuncd = Integer.valueOf(titaVo.getParam("FuncCode"));
-		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth"))+191100;
+		int iWorkMonth = Integer.valueOf(titaVo.getParam("WorkMonth")) + 191100;
 		int iConditionCode = 0;
+		int iBtnFg = Integer.valueOf(titaVo.getParam("BtnFg")); //等於2時需主管授權
 		
-		//有值計件代碼list
+		if (!titaVo.getHsupCode().equals("1") && iBtnFg ==2) {
+			iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
+		}
+		// 有值計件代碼list
 		ArrayList<String> iPieceCodeList = new ArrayList<>();
-		for (int i = 0 ; i<20 ; i++) {
-			String iPieceCode = titaVo.getParam("PieceCode"+i);
+		for (int i = 0; i < 20; i++) {
+			String iPieceCode = titaVo.getParam("PieceCode" + i);
 			if (iPieceCodeList.contains(iPieceCode)) {
 				continue;
-			}else {
+			} else {
 				if (!iPieceCode.equals("")) {
 					iPieceCodeList.add(iPieceCode);
 				}
 			}
 		}
-		this.info("計件代碼list==="+iPieceCodeList);
-		//協辦等級list
+		this.info("計件代碼list===" + iPieceCodeList);
+		// 協辦等級list
 		ArrayList<Integer> iClassPassCodeList = new ArrayList<>();
 		iClassPassCodeList.add(1);
 		iClassPassCodeList.add(2);
 		iClassPassCodeList.add(3);
-	
-		BigDecimal iConditionAmt = new BigDecimal(titaVo.getParam("ConditionAmt"));		
-		if (iFuncd == 4) { //刪除
-			//計件代碼處理區塊
+
+		BigDecimal iConditionAmt = new BigDecimal(titaVo.getParam("ConditionAmt"));
+		BigDecimal iPrizeAmt = new BigDecimal(titaVo.getParam("PrizeAmt"));
+		if (iFuncd == 4) { // 刪除
+			// 計件代碼處理區塊
 			iConditionCode = 1;
 			for (String iCondition : iPieceCodeList) {
-				//init
+				// init
 				CdBonusCo iCdBonusCo = new CdBonusCo();
 				CdBonusCoId iCdBonusCoId = new CdBonusCoId();
 				iCdBonusCoId.setWorkMonth(iWorkMonth);
@@ -72,17 +74,17 @@ public class L6787 extends TradeBuffer {
 				iCdBonusCoId.setCondition(iCondition);
 				iCdBonusCo = iCdBonusCoService.holdById(iCdBonusCoId, titaVo);
 				if (iCdBonusCo == null) {
-					throw new LogicException(titaVo, "E2007", "計件代碼: "+iCondition+"查無資料"); //刪除資料時發生錯誤
+					throw new LogicException(titaVo, "E2007", "計件代碼: " + iCondition + "查無資料"); // 刪除資料時發生錯誤
 				}
-				try{
-					iCdBonusCoService.delete(iCdBonusCo,titaVo);
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); //刪除資料時發生錯誤
+				try {
+					iCdBonusCoService.delete(iCdBonusCo, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時發生錯誤
 				}
-			}	
-			//協辦等級處理區塊
+			}
+			// 協辦等級處理區塊
 			iConditionCode = 2;
-			for (int j =1 ; j<4 ;j++) {
+			for (int j = 1; j < 4; j++) {
 				CdBonusCo aCdBonusCo = new CdBonusCo();
 				CdBonusCoId aCdBonusCoId = new CdBonusCoId();
 				aCdBonusCoId.setConditionCode(iConditionCode);
@@ -90,36 +92,52 @@ public class L6787 extends TradeBuffer {
 				aCdBonusCoId.setCondition(String.valueOf(j));
 				aCdBonusCo = iCdBonusCoService.holdById(aCdBonusCoId, titaVo);
 				if (aCdBonusCo == null) {
-					throw new LogicException(titaVo, "E2007", "協辦等級查無相同資料"); //刪除資料時發生錯誤
+					throw new LogicException(titaVo, "E2007", "協辦等級查無相同資料"); // 刪除資料時發生錯誤
 				}
-				try{
-					iCdBonusCoService.delete(aCdBonusCo,titaVo);
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); //刪除資料時發生錯誤
+				try {
+					iCdBonusCoService.delete(aCdBonusCo, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時發生錯誤
 				}
 			}
-		}else {
-			if (iFuncd==2) { //先刪除後新增
+			// 專業獎金處理區塊
+			iConditionCode = 3;
+			CdBonusCo dCdBonusCo = new CdBonusCo();
+			CdBonusCoId dCdBonusCoId = new CdBonusCoId();
+			dCdBonusCoId.setConditionCode(iConditionCode);
+			dCdBonusCoId.setWorkMonth(iWorkMonth);
+			dCdBonusCoId.setCondition(" ");
+			dCdBonusCo = iCdBonusCoService.holdById(dCdBonusCoId, titaVo);
+			if (dCdBonusCo == null) {
+				throw new LogicException(titaVo, "E2007", "協辦等級查無相同資料"); // 刪除資料時發生錯誤
+			}
+			try {
+				iCdBonusCoService.delete(dCdBonusCo, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時發生錯誤
+			}
+		} else {
+			if (iFuncd == 2) { // 先刪除後新增
 				CdBonusCo delCdBonusCo = new CdBonusCo();
 				Slice<CdBonusCo> slCdBonusCo = null;
 				CdBonusCoId delCdBonusCoId = new CdBonusCoId();
 				slCdBonusCo = iCdBonusCoService.findYearMonth(iWorkMonth, iWorkMonth, this.index, this.limit, titaVo);
-				
+
 				for (CdBonusCo xxCdBonus : slCdBonusCo) {
 					delCdBonusCoId = xxCdBonus.getCdBonusCoId();
 					delCdBonusCo = iCdBonusCoService.holdById(delCdBonusCoId, titaVo);
-					try{
-						iCdBonusCoService.delete(delCdBonusCo,titaVo);
-					}catch(DBException e) {
-						throw new LogicException(titaVo, "E0008", e.getErrorMsg()); //刪除資料時發生錯誤
+					try {
+						iCdBonusCoService.delete(delCdBonusCo, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時發生錯誤
 					}
 				}
 			}
-			//新增
-			//計件代碼處理區塊
+			// 新增
+			// 計件代碼處理區塊
 			iConditionCode = 1;
 			for (String bCondition : iPieceCodeList) {
-				//init
+				// init
 				CdBonusCo bCdBonusCo = new CdBonusCo();
 				CdBonusCoId bCdBonusCoId = new CdBonusCoId();
 				bCdBonusCoId.setWorkMonth(iWorkMonth);
@@ -127,42 +145,56 @@ public class L6787 extends TradeBuffer {
 				bCdBonusCoId.setCondition(bCondition);
 				bCdBonusCo = iCdBonusCoService.findById(bCdBonusCoId, titaVo);
 				if (bCdBonusCo != null) {
-					throw new LogicException(titaVo, "E0005", "計件代碼: "+bCondition+"已有相同工作月資料"); //新增資料時發生錯誤
+					throw new LogicException(titaVo, "E0005", "計件代碼: " + bCondition + "已有相同工作月資料"); // 新增資料時發生錯誤
 				}
-				//init
+				// init
 				bCdBonusCo = new CdBonusCo();
 				bCdBonusCo.setCdBonusCoId(bCdBonusCoId);
-				bCdBonusCo.setConditionAmt(iConditionAmt);	
-				try{
-					iCdBonusCoService.insert(bCdBonusCo,titaVo);
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); //新增資料時發生錯誤
+				bCdBonusCo.setConditionAmt(iConditionAmt);
+				try {
+					iCdBonusCoService.insert(bCdBonusCo, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時發生錯誤
 				}
-			}	
-			//協辦等級處理區塊
+			}
+			// 協辦等級處理區塊
 			iConditionCode = 2;
-			for (int j =1 ; j<4 ;j++) {
+			for (int j = 1; j < 4; j++) {
 				CdBonusCo zCdBonusCo = new CdBonusCo();
 				CdBonusCoId zCdBonusCoId = new CdBonusCoId();
-				BigDecimal iBonus = new BigDecimal(titaVo.getParam("Bonus"+String.valueOf(j-1)));
-				BigDecimal iClassPassBonus = new BigDecimal(titaVo.getParam("ClassPassBonus"+String.valueOf(j-1)));
+				BigDecimal iBonus = new BigDecimal(titaVo.getParam("Bonus" + String.valueOf(j - 1)));
+				BigDecimal iClassPassBonus = new BigDecimal(titaVo.getParam("ClassPassBonus" + String.valueOf(j - 1)));
 				zCdBonusCoId.setConditionCode(iConditionCode);
 				zCdBonusCoId.setWorkMonth(iWorkMonth);
 				zCdBonusCoId.setCondition(String.valueOf(j));
 				zCdBonusCo = iCdBonusCoService.findById(zCdBonusCoId, titaVo);
 				if (zCdBonusCo != null) {
-					throw new LogicException(titaVo, "E0005", "協辦等級已有相同工作月資料"); //新增資料時發生錯誤
+					throw new LogicException(titaVo, "E0005", "協辦等級已有相同工作月資料"); // 新增資料時發生錯誤
 				}
-				//init
+				// init
 				zCdBonusCo = new CdBonusCo();
 				zCdBonusCo.setCdBonusCoId(zCdBonusCoId);
 				zCdBonusCo.setBonus(iBonus);
 				zCdBonusCo.setClassPassBonus(iClassPassBonus);
-				try{
-					iCdBonusCoService.insert(zCdBonusCo,titaVo);
-				}catch(DBException e) {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); //新增資料時發生錯誤
+				try {
+					iCdBonusCoService.insert(zCdBonusCo, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時發生錯誤
 				}
+			}
+			//專業獎勵金
+			iConditionCode = 3;
+			CdBonusCo bCdBonusCo = new CdBonusCo();
+			CdBonusCoId bCdBonusCoId = new CdBonusCoId();
+			bCdBonusCoId.setConditionCode(3);
+			bCdBonusCoId.setCondition(" ");
+			bCdBonusCoId.setWorkMonth(iWorkMonth);
+			bCdBonusCo.setCdBonusCoId(bCdBonusCoId);
+			bCdBonusCo.setBonus(iPrizeAmt);
+			try {
+				iCdBonusCoService.insert(bCdBonusCo, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時發生錯誤
 			}
 		}
 		this.addList(this.totaVo);

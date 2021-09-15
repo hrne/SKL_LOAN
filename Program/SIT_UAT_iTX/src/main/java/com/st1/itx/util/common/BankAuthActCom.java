@@ -127,7 +127,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 	@Autowired
 	public TxAmlCom txAmlCom;
-	
+
 	@Autowired
 	DataLog datalog;
 
@@ -268,7 +268,7 @@ public class BankAuthActCom extends TradeBuffer {
 		case "1": // 1.申請
 			if ("00".equals(t.getAuthErrorCode())) { // 00:成功
 				status = "0"; // 0:授權成功
-				updFacmRepayCode(t.getCustNo(), t.getFacmNo(),titaVo);
+				updFacmRepayCode(t.getCustNo(), t.getFacmNo(), titaVo);
 				isUpdFac = true;
 			} else {
 				status = "8"; // 8.授權失敗
@@ -326,6 +326,9 @@ public class BankAuthActCom extends TradeBuffer {
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 						}
+						if ("0".equals(status)) {
+							updPostAcctDelAch(tBankAuthAct, titaVo); // 郵局授權成功刪除ACH舊帳號檔
+						}
 					}
 				}
 			}
@@ -351,7 +354,7 @@ public class BankAuthActCom extends TradeBuffer {
 			if ("0".equals(t.getAuthStatus())) { // 0:成功
 				status = "0"; // 0:授權成功
 				isUpdFac = true;
-				updFacmRepayCode(t.getCustNo(), t.getFacmNo(),titaVo);
+				updFacmRepayCode(t.getCustNo(), t.getFacmNo(), titaVo);
 			} else {
 				status = "8"; // 8.授權失敗
 				if (t.getRepayAcct().equals(tBankAuthAct.getRepayAcct())) {
@@ -384,13 +387,6 @@ public class BankAuthActCom extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 			}
-			tBankAuthAct.setRepayBank(t.getRepayBank());
-			tBankAuthAct.setRepayAcct(t.getRepayAcct());
-			tBankAuthAct.setPostDepCode(" ");
-			tBankAuthAct.setLimitAmt(t.getLimitAmt());
-			tBankAuthAct.setAcctSeq("  ");
-			tBankAuthAct.setStatus(status);
-
 		}
 
 		if (isUpdAct) {
@@ -406,6 +402,9 @@ public class BankAuthActCom extends TradeBuffer {
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 						}
+						if ("0".equals(status)) {
+							updAchAcctDelPost(tBankAuthAct, titaVo); // ACH授權成功刪除舊郵局帳號檔
+						}
 					}
 				}
 			}
@@ -413,6 +412,42 @@ public class BankAuthActCom extends TradeBuffer {
 
 		// 新增ACH授權記錄歷史檔
 		insertAchHistory(t, titaVo);
+	}
+
+	// ACH授權成功刪除舊郵局帳號檔
+	public void updAchAcctDelPost(BankAuthAct t, TitaVo titaVo) throws LogicException {
+		this.info("bankAuthActCom updAchAcct ...");
+		BankAuthAct tBankAuthAct = null;
+		tBankAuthAct = bankAuthActService.holdById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "01"), titaVo);
+		if (tBankAuthAct != null) {
+			try {
+				bankAuthActService.delete(tBankAuthAct, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0006", e.getErrorMsg());
+			}
+		}
+		tBankAuthAct = bankAuthActService.holdById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "02"), titaVo);
+		if (tBankAuthAct != null) {
+			try {
+				bankAuthActService.delete(tBankAuthAct, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0006", e.getErrorMsg());
+			}
+		}
+	}
+
+	// 郵局授權成功刪除ACH舊帳號檔
+	public void updPostAcctDelAch(BankAuthAct t, TitaVo titaVo) throws LogicException {
+		this.info("bankAuthActCom updAchAcct ...");
+		BankAuthAct tBankAuthAct = null;
+		tBankAuthAct = bankAuthActService.holdById(new BankAuthActId(t.getCustNo(), t.getFacmNo(), "00"), titaVo);
+		if (tBankAuthAct != null) {
+			try {
+				bankAuthActService.delete(tBankAuthAct, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0006", e.getErrorMsg());
+			}
+		}
 	}
 
 	private void updFacmRepayCode(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
