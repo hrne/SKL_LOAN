@@ -93,6 +93,8 @@ public class BS442 extends TradeBuffer {
 
 	private Boolean checkFlag = true;
 	private String sendMsg = "";
+	String noticePhoneNo = "";
+	String noticeEmail = "";
 
 //	寄送筆數
 	private int commitCnt = 200;
@@ -116,9 +118,11 @@ public class BS442 extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(), "L4453 銀扣扣款前通知 處理完畢，送出筆數：" + (custLoanFlag.size() + custFireFlag.size()), titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L6001", titaVo.getTlrNo(),
+					"L4453 銀扣扣款前通知 處理完畢，送出筆數：" + (custLoanFlag.size() + custFireFlag.size()), titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4453", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4453", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -127,24 +131,26 @@ public class BS442 extends TradeBuffer {
 
 	private void execute(TitaVo titaVo) throws LogicException {
 //		刪除TxToDoDetail
-		dele("TEXT00", "<Text>-LoanAmt", titaVo);
-		dele("TEXT00", "<Text>-FireFee", titaVo);
-		dele("MAIL00", "<Mail>-LoanAmt", titaVo);
-		dele("MAIL00", "<Mail>-FireFee", titaVo);
+		dele("TEXT00", "<TermAmt>", titaVo);
+		dele("TEXT00", "<FireAmt>", titaVo);
+		dele("MAIL00", "<TermAmt>", titaVo);
+		dele("MAIL00", "<FireAmt>", titaVo);
 
 		Slice<BankDeductDtl> sBankDeductDtl = null;
 
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 
-		sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/" + ("" + iEntryDate).substring(6);
+		sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
+				+ ("" + iEntryDate).substring(6);
 
 //		條件 : 入帳日 or 銀行代號
 		List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
 		if (iRepayBank == 999) {
 			sBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate, iEntryDate, this.index, this.limit);
 		} else {
-			sBankDeductDtl = bankDeductDtlService.repayBankEq(FormatUtil.pad9("" + iRepayBank, 3), iEntryDate, iEntryDate, this.index, this.limit);
+			sBankDeductDtl = bankDeductDtlService.repayBankEq(FormatUtil.pad9("" + iRepayBank, 3), iEntryDate,
+					iEntryDate, this.index, this.limit);
 		}
 
 		lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
@@ -167,43 +173,41 @@ public class BS442 extends TradeBuffer {
 				}
 
 				TempVo tempVo = new TempVo();
-				tempVo = custNoticeCom.getCustNotice("L4453", tBankDeductDtl.getCustNo(), tBankDeductDtl.getFacmNo(), titaVo);
+				tempVo = custNoticeCom.getCustNotice("L4453", tBankDeductDtl.getCustNo(), tBankDeductDtl.getFacmNo(),
+						titaVo);
 
 				CustMain tCustMain = new CustMain();
 				tCustMain = custMainService.custNoFirst(tBankDeductDtl.getCustNo(), tBankDeductDtl.getCustNo());
 
-				int sendCode = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
-				String phoneNo = "";
-				String emailAd = "";
-
-				phoneNo = tempVo.getParam("MessagePhoneNo");
-				emailAd = tempVo.getParam("EmailAddress");
+//				int sendCode = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
+				noticePhoneNo = tempVo.getParam("MessagePhoneNo");
+				noticeEmail = tempVo.getParam("EmailAddress");
 
 				this.info("CustNo ... " + tBankDeductDtl.getCustNo());
 				this.info("FacmNo ... " + tBankDeductDtl.getFacmNo());
-				this.info("phoneNo ... " + phoneNo);
-				this.info("emailAd ... " + emailAd);
-				this.info("sendCode ... " + sendCode);
+				this.info("phoneNo ... " + noticePhoneNo);
+				this.info("emailAd ... " + noticeEmail);
 //				寄送簡訊/電郵，若第一順位為書信，則找第二順位
 //				若為皆1則傳簡訊
 //				若為皆0則傳簡訊
-				tmpFacm tmp = new tmpFacm(tBankDeductDtl.getCustNo(), tBankDeductDtl.getFacmNo(), tBankDeductDtl.getRepayType());
+				tmpFacm tmp = new tmpFacm(tBankDeductDtl.getCustNo(), tBankDeductDtl.getFacmNo(),
+						tBankDeductDtl.getRepayType());
 
 				int insuMon = 0;
 				if (tBankDeductDtl.getRepayType() == 5) {
 					if (tBankDeductDtl.getPayIntDate() > 0) {
-						insuMon = parse.stringToInteger(FormatUtil.pad9("" + tBankDeductDtl.getPayIntDate(), 7).substring(0, 5));
+						insuMon = parse.stringToInteger(
+								FormatUtil.pad9("" + tBankDeductDtl.getPayIntDate(), 7).substring(0, 5));
 					}
 					insuMonth.put(tmp, insuMon);
 					insuFee.put(tmp, tBankDeductDtl.getRepayAmt());
 				}
 				custId.put(tmp, tCustMain.getCustId());
-				custPhone.put(tmp, phoneNo);
-				sendFlag.put(tmp, sendCode);
-
-				if (!"".equals(phoneNo)) {
+				custPhone.put(tmp, noticePhoneNo);
+				if ("Y".equals(tempVo.getParam("isMessage"))) {
 					setText(tmp, titaVo);
-				} else if (!"".equals(emailAd)) {
+				} 
+				if ("Y".equals(tempVo.getParam("isEmail"))) {
 					setMail(tmp, titaVo);
 				}
 			}
@@ -215,17 +219,18 @@ public class BS442 extends TradeBuffer {
 	private void setText(tmpFacm tmp, TitaVo titaVo) throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setText...");
+		String dataLines = "<" + noticePhoneNo + ">";	
 		if (tmp.getRepayType() == 1) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(tmp.getCustNo())) {
-				String dataLines = "";
-				dataLines = "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp) + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
+				dataLines += "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp)
+						+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<Text>-LoanAmt");
+				tTxToDoDetail.setDtlValue("<TermAmt>");
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
@@ -245,15 +250,15 @@ public class BS442 extends TradeBuffer {
 				String sInsuAmt = toFullWidth("" + insuFee.get(tmp));
 				String sInsuMonth = FormatUtil.pad9(toFullWidth("" + insuMonth.get(tmp)), 5).substring(3, 5);
 
-				String dataLines = "";
-				dataLines = "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp) + "\",\"您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
+				dataLines += "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp) + "\",\"您好：提醒您" + sInsuMonth
+						+ "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。　　\",\""
 						+ dateSlashFormat(this.getTxBuffer().getMgBizDate().getTbsDy()) + "\"";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<Text>-FireFee");
+				tTxToDoDetail.setDtlValue("<FireAmt>");
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
@@ -274,17 +279,17 @@ public class BS442 extends TradeBuffer {
 	private void setMail(tmpFacm tmp, TitaVo titaVo) throws LogicException {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setMail...");
+		String dataLines = "<" + noticeEmail + ">";
 		if (tmp.getRepayType() == 1) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(tmp.getCustNo())) {
-				String dataLines = "";
-				dataLines = "親愛的客戶，繳款通知；新光人壽關心您。";
+				dataLines += "親愛的客戶，繳款通知；新光人壽關心您。";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<Mail>-LoanAmt");
+				tTxToDoDetail.setDtlValue("<TermAmt>");
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
@@ -303,14 +308,13 @@ public class BS442 extends TradeBuffer {
 				String sInsuAmt = toFullWidth("" + insuFee.get(tmp));
 				String sInsuMonth = FormatUtil.pad9(toFullWidth("" + insuMonth.get(tmp)), 5).substring(3, 5);
 
-				String dataLines = "";
-				dataLines = "您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。";
+				dataLines += "您好：提醒您" + sInsuMonth + "月份，除期款外，另加收年度火險地震險費＄" + sInsuAmt + "，請留意帳戶餘額。新光人壽關心您。";
 				// Step3. send L6001
 				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<Mail>-FireFee");
+				tTxToDoDetail.setDtlValue("<FireAmt>");
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
@@ -432,17 +436,14 @@ public class BS442 extends TradeBuffer {
 
 //	刪除TxToDoDetail 同L4454 須同步更改
 	private void dele(String itemCode, String dtlValue, TitaVo titaVo) {
-		Slice<TxToDoDetail> sTxToDoDetail = null;
-		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 //		刪除未處理且為今天的
-		sTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0, this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index, this.limit,
-				titaVo);
-
-		lTxToDoDetail = sTxToDoDetail == null ? null : sTxToDoDetail.getContent();
-		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0,
+				this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index,
+				this.limit, titaVo);
+		if (slTxToDoDetail != null) {
 			try {
 				this.info("DeleteAll...");
-				txToDoCom.addByDetailList(false, 1, lTxToDoDetail, titaVo);
+				txToDoCom.addByDetailList(false, 1, slTxToDoDetail.getContent(), titaVo);
 			} catch (LogicException e) {
 				this.info("DeleteAll Error : " + e.getErrorMsg());
 			}

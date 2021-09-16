@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -34,7 +36,7 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R05")
 @Scope("prototype")
 public class L3R05 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3R05.class);
+	private static final Logger logger = LoggerFactory.getLogger(L3R05.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -45,7 +47,7 @@ public class L3R05 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L3R05 ");
+		logger.info("active L3R05 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -53,39 +55,50 @@ public class L3R05 extends TradeBuffer {
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 		int iTempReasonCode = this.parse.stringToInteger(titaVo.getParam("RimTempReasonCode"));
+		int iTempItemCode = this.parse.stringToInteger(titaVo.get("RimTempItemCode"));
 
 		// work area
 		BigDecimal wkTempAmt = new BigDecimal(0);
 
 		// 查詢會計銷帳檔
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, 0,
+				Integer.MAX_VALUE, titaVo);
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 		if (lAcReceivable != null && lAcReceivable.size() > 0) {
 			for (AcReceivable tAcReceivable : lAcReceivable) {
-				if (iFacmNo == 0 || iFacmNo == tAcReceivable.getFacmNo()) {
-					switch (iTempReasonCode) {
-					case 1: // 放款暫收款
-						if (tAcReceivable.getAcctCode().equals("TAV") || tAcReceivable.getAcctCode().equals("TLD")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
-					case 2: // 債協暫收款
-						if (tAcReceivable.getAcctCode().substring(0, 2).equals("T1")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
-					case 3: // 債協退還款
-						if (tAcReceivable.getAcctCode().substring(0, 2).equals("T2")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
-					case 4: // AML暫收款
-						if (tAcReceivable.getAcctCode().equals("TAM")) {
-							wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
-						}
-						break;
+				if ((iTempItemCode == 06)) {
+					if (iFacmNo != tAcReceivable.getFacmNo()) {
+						continue;
+					}
+				} else {
+					if (iFacmNo > 0 && iFacmNo != tAcReceivable.getFacmNo()) {
+						continue;
 					}
 				}
+
+				switch (iTempReasonCode) {
+				case 1: // 放款暫收款
+					if (tAcReceivable.getAcctCode().equals("TAV") || tAcReceivable.getAcctCode().equals("TLD")) {
+						wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
+					}
+					break;
+				case 2: // 債協暫收款
+					if (tAcReceivable.getAcctCode().substring(0, 2).equals("T1")) {
+						wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
+					}
+					break;
+				case 3: // 債協退還款
+					if (tAcReceivable.getAcctCode().substring(0, 2).equals("T2")) {
+						wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
+					}
+					break;
+				case 4: // AML暫收款
+					if (tAcReceivable.getAcctCode().equals("TAM")) {
+						wkTempAmt = tAcReceivable.getRvBal().add(wkTempAmt);
+					}
+					break;
+				}
+
 			}
 		}
 

@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8305]                                 (44)請求同意債務清償方案通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdRcDate+協商申請日",#RcDate],
 [#<->#,"#FdDebtCode+負債主因",#DebtCode,#DebtCodeX],
 ["#FdNonGageAmt+無擔保金融債務協商總金額",#NonGageAmt],["#FdPeriod+期數",#Period],
@@ -421,6 +422,8 @@ C(5,#TranKey,X,T(2,@MonthPayAmt,#L8r15MonthPayAmt),$)
 C(5,#TranKey,X,s,$)
 
 #CheckMonthPayAmt=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 IF(#TranKey!="X",$,s)
 IF(#MonthPayAmt==0,$,s)
 V(P,協商方案估計月付金不可為空！)
@@ -434,6 +437,8 @@ C(5,#TranKey,X,T(2,@ReceYearIncome,#L8r15ReceYearIncome),$)
 C(5,#TranKey,X,s,$)
 
 #CheckReceYearIncome=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 IF(#ReceYearIncome==0,$,S)
 V(P,最近年度綜合所得總額不可為空！)
 
@@ -458,6 +463,8 @@ C(5,#TranKey,X,T(2,@ReceYear2Income,#L8r15ReceYear2Income),$)
 C(5,#TranKey,X,s,$)
 
 #CheckReceYear2Income=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 IF(#ReceYear2Income==0,$,S)
 V(P,前二年度綜合所得總額不可為空！)
 
@@ -480,6 +487,8 @@ C(5,#TranKey,X,T(2,@CurrentMonthIncome,#L8r15CurrentMonthIncome),$)
 C(5,#TranKey,X,s,$)
 
 #CheckCurrentMonthIncome=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 IF(#CurrentMonthIncome==0,$,S)
 V(P,目前每月收入不可為空！)
 
@@ -491,6 +500,8 @@ C(5,#TranKey,X,T(2,@LivingCost,#L8r15LivingCost),$)
 C(5,#TranKey,X,s,$)
 
 #CheckLivingCost=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 IF(#LivingCost==0,$,S)
 V(P,生活支出總額不可為空！)
 

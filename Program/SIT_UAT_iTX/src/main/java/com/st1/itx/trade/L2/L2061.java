@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -37,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2061 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2061.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -74,8 +71,7 @@ public class L2061 extends TradeBuffer {
 		// new ArrayList
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 
-		Slice<AcReceivable> slAcReceivable = acReceivableService.useL2062Eq("F29", iCustNo, iFacmNo, iFacmNo, ClsFlag,
-				ClsFlag, this.index, this.limit, titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.useL2062Eq("F29", iCustNo, iFacmNo, iFacmNo, ClsFlag, ClsFlag, this.index, this.limit, titaVo);
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slAcReceivable != null && slAcReceivable.hasNext()) {
@@ -98,7 +94,7 @@ public class L2061 extends TradeBuffer {
 			this.info("tTempVo = " + tTempVo);
 
 			int contractChgCode = parse.stringToInteger(tTempVo.getParam("ContractChgCode"));
-
+			occursList.putParam("OOAcDate", tmpAcReceivable.getLastAcDate());
 			occursList.putParam("OOContractChgDate", tmpAcReceivable.getOpenAcDate());
 			occursList.putParam("OOCustNo", tmpAcReceivable.getCustNo());
 			occursList.putParam("OOFacmNo", tmpAcReceivable.getFacmNo());

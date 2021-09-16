@@ -192,7 +192,7 @@ public class CustNoticeCom extends TradeBuffer {
 			}
 
 			break;
-			
+
 		default:
 			noticeCode = 0;
 			break;
@@ -220,6 +220,7 @@ public class CustNoticeCom extends TradeBuffer {
 		tempVo.putParam("MessagePhoneNo", messagePhoneNo);
 		tempVo.putParam("EmailAddress", emailAddress);
 		tempVo.putParam("LetterAddress", letterAddress);
+		this.info("tempVo=" + tempVo.toString());
 
 		return tempVo;
 	}

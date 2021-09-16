@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -37,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2062 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2062.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -75,8 +72,7 @@ public class L2062 extends TradeBuffer {
 		// new ArrayList
 		List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 
-		Slice<AcReceivable> slAcReceivable = acReceivableService.useL2062Eq("F29", iCustNo, iFacmNo, iFacmNo, ClsFlagSt,
-				ClsFlagEd, this.index, this.limit,titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.useL2062Eq("F29", iCustNo, iFacmNo, iFacmNo, ClsFlagSt, ClsFlagEd, this.index, this.limit, titaVo);
 
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
@@ -105,7 +101,7 @@ public class L2062 extends TradeBuffer {
 
 			String entryfg = "";
 			if (tmpAcReceivable.getClsFlag() == 1) {
-				entryfg = "A";
+				entryfg = "Y";
 			}
 
 			occursList.putParam("OOCustNo", tmpAcReceivable.getCustNo());

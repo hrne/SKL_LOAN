@@ -18,8 +18,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.AcReceivableService;
-
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.data.DataLog;
@@ -39,8 +40,10 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2670 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2670.class);
 
+	@Autowired
+	public CdEmpService sCdEmpService;
+	
 	// 銷帳處理
 	@Autowired
 	public AcReceivableCom acReceivableCom;
@@ -64,6 +67,7 @@ public class L2670 extends TradeBuffer {
 	@Autowired
 	public DataLog dataLog;
 	public long doRpt;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2670 ");
@@ -134,7 +138,6 @@ public class L2670 extends TradeBuffer {
 
 //			變更理由由acReceivableCom寫入
 
-
 			acReceivableList = new ArrayList<AcReceivable>();
 			tAcReceivable = new AcReceivable();
 
@@ -154,7 +157,6 @@ public class L2670 extends TradeBuffer {
 
 			acReceivableCom.mnt(3, acReceivableList, titaVo); // 0-起帳 1-銷帳 2起帳刪除 3變更
 
-
 			// 刪除
 		} else if (iFunCd == 4) {
 			tmpAcReceivable = acReceivableService.findById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo));
@@ -172,15 +174,15 @@ public class L2670 extends TradeBuffer {
 
 			// 列印
 		} else if (iFunCd == 7) {
-			 doRpt = doRpt(titaVo);
-			 
+			doRpt = doRpt(titaVo);
+
 			// 鎖定這筆
 			tAcReceivable = acReceivableService.holdById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo));
-			 
+
 			tTempVo = tTempVo.getVo(tAcReceivable.getJsonFields());
-			
-			if(!"1".equals(tTempVo.getParam("PrintCode"))) {
-				
+
+			if (!"1".equals(tTempVo.getParam("PrintCode"))) {
+
 				tTempVo = tTempVo.getVo(tAcReceivable.getJsonFields());
 				tTempVo.putParam("PrintCode", "1"); // 列印
 				tAcReceivable.setJsonFields(tTempVo.getJsonString());
@@ -188,18 +190,16 @@ public class L2670 extends TradeBuffer {
 					acReceivableService.update(tAcReceivable, titaVo); // update
 				} catch (DBException e) {
 					e.printStackTrace();
-					throw new LogicException(titaVo, "E6003",
-							"AcReceivable update " + tAcReceivable + e.getErrorMsg());
+					throw new LogicException(titaVo, "E6003", "AcReceivable update " + tAcReceivable + e.getErrorMsg());
 				}
-				
+
 				try {
-					acReceivableService.update2(tAcReceivable, titaVo); 
+					acReceivableService.update2(tAcReceivable, titaVo);
 				} catch (DBException e) {
 					e.printStackTrace();
-					throw new LogicException(titaVo, "E6003",
-							"AcReceivable.mnt delete " + tAcReceivable + e.getErrorMsg());
+					throw new LogicException(titaVo, "E6003", "AcReceivable.mnt delete " + tAcReceivable + e.getErrorMsg());
 				}
-			}	
+			}
 		}
 		if (iFunCd != 4) {
 			tmpAcReceivable = acReceivableService.findById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo));
@@ -226,7 +226,17 @@ public class L2670 extends TradeBuffer {
 			this.totaVo.putParam("OAcDate", 0);
 			this.totaVo.putParam("OTitaTxtNo", 0);
 		}
+		
+		
 		this.totaVo.putParam("OTlrNo", tmpAcReceivable.getTitaTlrNo());
+		this.totaVo.putParam("OEmpName", "");
+		
+		CdEmp tCdEmp = new CdEmp();	
+		tCdEmp = sCdEmpService.findById(tmpAcReceivable.getTitaTlrNo(), titaVo);	
+		if( tCdEmp != null) {
+			this.totaVo.putParam("OEmpName", tCdEmp.getFullname()); // 建檔人員姓名
+		}
+		
 		this.totaVo.putParam("OModifyDate", parse.stringToInteger(createDate) - 19110000);
 		this.totaVo.putParam("OModifyTime", createTime);
 		this.totaVo.putParam("PdfSno", doRpt);
