@@ -36,22 +36,22 @@ public class LQ003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , CC.\"CityItem\" AS F1 ";
 		sql += "      , ROUND(SUM(M.\"PrinBalance\") / 1000000,8) AS F2 "; // 總額
 		sql += "      , ROUND(SUM(CASE ";
-		sql += "                    WHEN M.\"AcctCode\" = 990 ";
+		sql += "                    WHEN M.\"AcctCode\" = '990' ";
 		sql += "                    THEN M.\"PrinBalance\"";
-		sql += "                    WHEN M.\"AcctCode\" <> 990 ";
+		sql += "                    WHEN M.\"AcctCode\" != '990' ";
 		sql += "                     AND M.\"OvduTerm\" >= 3 ";
 		sql += "                    THEN M.\"PrinBalance\" ";
 		sql += "                  ELSE 0 END ";
 		sql += "                 ) / 1000000,8)  AS F3 ";// 逾放
 		sql += "      , ROUND(SUM(CASE ";
-		sql += "                    WHEN M.\"AcctCode\" = 990 ";
+		sql += "                    WHEN M.\"AcctCode\" = '990' ";
 		sql += "                    THEN M.\"PrinBalance\" ";
 		sql += "                  ELSE 0 END ";
 		sql += "                 ) / 1000000,8) AS F4 ";// 催收
 		sql += "      , SUM(CASE ";
-		sql += "              WHEN M.\"AcctCode\" = 990 ";
+		sql += "              WHEN M.\"AcctCode\" = '990' ";
 		sql += "              THEN M.\"Cnt\"";
-		sql += "              WHEN M.\"AcctCode\" <> 990 ";
+		sql += "              WHEN M.\"AcctCode\" != '990' ";
 		sql += "               AND M.\"OvduTerm\" >= 3 ";
 		sql += "              THEN M.\"Cnt\" ";
 		sql += "            ELSE 0 END ";
@@ -59,15 +59,15 @@ public class LQ003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"CdCity\" CC";
 		sql += " LEFT JOIN (SELECT M.\"AcctCode\" ";
 		sql += "                 , M.\"OvduTerm\" ";
-		sql += "                 , DECODE(M.\"EntCode\", '1', 1, 0) AS \"EntCode\" ";
+		sql += "                 , NVL(M.\"EntCode\", '1') AS \"EntCode\" ";
 		sql += "                 , LPAD(M.\"CityCode\",2,0) AS \"CityCode\" ";
 		sql += "                 , 1 AS \"Cnt\" ";
 		sql += "                 , M.\"PrinBalance\" ";
 		sql += "            FROM \"MonthlyFacBal\" M ";
 		sql += "            WHERE M.\"YearMonth\" = :inputYearMonth ";
 		sql += "              AND M.\"PrinBalance\" > 0 ";
-		sql += "              AND M.\"EntCode\" = 0 ";
-		sql += "              AND M.\"CityCode\" <> 0 ";
+		sql += "              AND NVL(M.\"EntCode\", '1') != '1' ";
+		sql += "              AND M.\"CityCode\" != 0 ";
 		sql += "           ) M ON M.\"CityCode\" = CC.\"CityCode\" ";
 		sql += " GROUP BY CC.\"CityItem\" ";
 		sql += "        , CC.\"CityCode\" ";

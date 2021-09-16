@@ -10,8 +10,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.AcReceivableId;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
@@ -21,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Component("L2670Report")
 @Scope("prototype")
 public class L2670Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L2670Report.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -30,6 +31,9 @@ public class L2670Report extends MakeReport {
 	@Autowired
 	public CustMainService sCustMainService;
 
+	@Autowired
+	public CdEmpService sCdEmpService;
+	
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -78,7 +82,15 @@ public class L2670Report extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo());
+		
+		CdEmp tCdEmp = new CdEmp();	
+		String EmpName = "";
+		tCdEmp = sCdEmpService.findById(this.titaVo.getTlrNo(), titaVo);	
+		if( tCdEmp != null) {
+			EmpName = tCdEmp.getFullname(); // 建檔人員姓名
+		}
+		
+		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo() + "  " + EmpName);
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -182,8 +194,7 @@ public class L2670Report extends MakeReport {
 		 * --------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
 		this.print(1, 8, "　戶號　　　　　　　　　　　　　　　借款人　　　　　　　　　　　日期");
-		String custNoX = FormatUtil.pad9(String.valueOf(iCustNo), 7) + "-"
-				+ FormatUtil.pad9(String.valueOf(iFacmNo), 3);
+		String custNoX = FormatUtil.pad9(String.valueOf(iCustNo), 7) + "-" + FormatUtil.pad9(String.valueOf(iFacmNo), 3);
 		this.print(0, 27, custNoX);
 		this.print(0, 55, custName);
 		this.print(0, 85, acDate);

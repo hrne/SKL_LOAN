@@ -26,6 +26,7 @@ import com.st1.itx.db.domain.BankAuthActId;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.PostAuthLogId;
+import com.st1.itx.db.domain.RepayActChangeLog;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AchAuthLogHistoryService;
 import com.st1.itx.db.service.AchAuthLogService;
@@ -33,6 +34,7 @@ import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.PostAuthLogHistoryService;
 import com.st1.itx.db.service.PostAuthLogService;
+import com.st1.itx.db.service.RepayActChangeLogService;
 import com.st1.itx.db.service.springjpa.cm.BankAuthActComServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
@@ -117,6 +119,9 @@ public class BankAuthActCom extends TradeBuffer {
 	public PostAuthLogHistoryService postAuthLogHistoryService;
 
 	@Autowired
+	public RepayActChangeLogService repayActChangeLogService;;
+
+	@Autowired
 	public FacMainService facMainService;
 
 	@Autowired
@@ -135,6 +140,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 	private String iAuthApplCode = "1";
 	private String iPostDepCode = " ";
+	private int iRepayCode = 0;
 	private String iRepayAcct = "";
 	private String iRelationCode = "0";
 	private String iRelAcctName = "0";
@@ -170,6 +176,17 @@ public class BankAuthActCom extends TradeBuffer {
 		setVarValue(titaVo);
 		showLog();
 
+		// 還款方式為非銀扣時新增還款帳號變更(含還款方式)紀錄檔
+		if (iRepayCode != 2) {
+			if (titaVo.isHcodeNormal()) {
+				addRepayActChangeLog("", titaVo);
+			}
+			if (titaVo.isHcodeErase()) {
+				addRepayActChangeLogDelete(titaVo);
+			}
+			return;
+		}
+
 		if ("A".equals(createFlag)) {
 			if (titaVo.isHcodeNormal()) {
 				addAuth(titaVo);
@@ -178,6 +195,7 @@ public class BankAuthActCom extends TradeBuffer {
 				addAuthDelete(titaVo);
 			}
 		}
+
 		if ("D".equals(createFlag)) {
 			if (titaVo.isHcodeNormal()) {
 				addCancel(titaVo);
@@ -215,6 +233,17 @@ public class BankAuthActCom extends TradeBuffer {
 		this.info("bankAuthActCom del Start...");
 		setVarValue(titaVo);
 		showLog();
+
+		// 還款方式為非銀扣時刪除還款帳號變更(含還款方式)紀錄檔
+		if (iRepayCode != 2) {
+			if (titaVo.isHcodeNormal()) {
+				addRepayActChangeLogDelete(titaVo);
+			}
+			if (titaVo.isHcodeErase()) {
+				addRepayActChangeLog("", titaVo);
+			}
+			return;
+		}
 
 		if ("A".equals(createFlag)) {
 			if (titaVo.isHcodeNormal()) {
@@ -326,6 +355,9 @@ public class BankAuthActCom extends TradeBuffer {
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 						}
+
+						insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
+
 						if ("0".equals(status)) {
 							updPostAcctDelAch(tBankAuthAct, titaVo); // 郵局授權成功刪除ACH舊帳號檔
 						}
@@ -402,6 +434,9 @@ public class BankAuthActCom extends TradeBuffer {
 						} catch (DBException e) {
 							throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 						}
+
+						insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
+
 						if ("0".equals(status)) {
 							updAchAcctDelPost(tBankAuthAct, titaVo); // ACH授權成功刪除舊郵局帳號檔
 						}
@@ -524,6 +559,7 @@ public class BankAuthActCom extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 					}
+					insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
 				}
 			}
 		}
@@ -573,7 +609,6 @@ public class BankAuthActCom extends TradeBuffer {
 		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(iCustNo, iRepayAcct, 0, 999, 0,
 				Integer.MAX_VALUE, titaVo);
 		if (slBankAuthAct != null) {
-
 			for (BankAuthAct t : slBankAuthAct.getContent()) {
 				if (iRepayBank.equals(t.getRepayBank())) {
 					BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
@@ -583,6 +618,7 @@ public class BankAuthActCom extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008", "BankAuthAct" + e.getErrorMsg());
 					}
+					insertRepayActChangeLog(tBankAuthAct, titaVo); // 新增還款帳號變更(含還款方式)紀錄檔
 				}
 			}
 		}
@@ -657,6 +693,8 @@ public class BankAuthActCom extends TradeBuffer {
 		default:
 			throw new LogicException("E0015", "此扣款帳號狀態碼錯誤");
 		}
+
+		addRepayActChangeLog(status, titaVo);// 新增還款帳號變更(含還款方式)紀錄檔
 
 		if ("700".equals(iRepayBank)) {
 			if (this.isNewAct) {
@@ -735,6 +773,9 @@ public class BankAuthActCom extends TradeBuffer {
 				deleteAchAuthLog("A", titaVo);
 			}
 		}
+
+		addRepayActChangeLogDelete(titaVo);// 刪除還款帳號變更(含還款方式)紀錄檔
+
 	}
 
 	// 取消授權帳號
@@ -935,6 +976,7 @@ public class BankAuthActCom extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "授權帳號檔");
 		}
+
 		return tBankAuthAct;
 	}
 
@@ -1065,6 +1107,62 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 	}
 
+	// 新增還款帳號變更(含還款方式)紀錄檔
+	private void addRepayActChangeLog(String status, TitaVo titaVo) throws LogicException {
+		RepayActChangeLog tRepayActChangeLog = new RepayActChangeLog();
+		tRepayActChangeLog.setCustNo(iCustNo);
+		tRepayActChangeLog.setFacmNo(iFacmNo);
+		tRepayActChangeLog.setRepayCode(iRepayCode);
+		tRepayActChangeLog.setRepayBank(iRepayBank);
+		tRepayActChangeLog.setRepayAcct(iRepayAcct);
+		tRepayActChangeLog.setPostDepCode(iPostDepCode);
+		tRepayActChangeLog.setStatus(status);
+		tRepayActChangeLog.setRelDy(this.txBuffer.getTxCom().getReldy());
+		tRepayActChangeLog.setRelTxseq(this.txBuffer.getTxCom().getRelNo());
+		try {
+			repayActChangeLogService.insert(tRepayActChangeLog, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "還款帳號變更(含還款方式)紀錄檔");
+		}
+	}
+
+	// 刪除還款帳號變更(含還款方式)紀錄檔
+	private void addRepayActChangeLogDelete(TitaVo titaVo) throws LogicException {
+		RepayActChangeLog tRepayActChangeLog = repayActChangeLogService.findRelTxseqFirst(
+				this.txBuffer.getTxCom().getReldy() + 19110000, this.txBuffer.getTxCom().getRelNo(), titaVo);
+		if (tRepayActChangeLog == null) {
+			return;
+		}
+		tRepayActChangeLog = repayActChangeLogService.holdById(tRepayActChangeLog, titaVo);
+		try {
+			repayActChangeLogService.delete(tRepayActChangeLog, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0008", "還款帳號變更(含還款方式)紀錄檔");
+		}
+	}
+
+	// 新增還款帳號變更(含還款方式)紀錄檔
+	private void insertRepayActChangeLog(BankAuthAct t, TitaVo titaVo) throws LogicException {
+		if (t.getAuthType().equals("02")) {
+			return;
+		}
+		RepayActChangeLog tRepayActChangeLog = new RepayActChangeLog();
+		tRepayActChangeLog.setCustNo(t.getCustNo());
+		tRepayActChangeLog.setFacmNo(t.getFacmNo());
+		tRepayActChangeLog.setRepayCode(2);
+		tRepayActChangeLog.setRepayBank(t.getRepayBank());
+		tRepayActChangeLog.setRepayAcct(t.getRepayAcct());
+		tRepayActChangeLog.setPostDepCode(t.getPostDepCode());
+		tRepayActChangeLog.setStatus(t.getStatus());
+		tRepayActChangeLog.setRelDy(this.txBuffer.getTxCom().getReldy());
+		tRepayActChangeLog.setRelTxseq(this.txBuffer.getTxCom().getRelNo());
+		try {
+			repayActChangeLogService.insert(tRepayActChangeLog, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0005", "還款帳號變更(含還款方式)紀錄檔");
+		}
+	}
+
 	private void setVarValue(TitaVo titaVo) throws LogicException {
 		if ("L2".equals(titaVo.getTxcd().substring(0, 2))) {
 			iPostDepCode = titaVo.get("PostCode");
@@ -1089,6 +1187,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		iRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
 		iRepayBank = FormatUtil.pad9(titaVo.getParam("RepayBank"), 3);
 		iRelationId = titaVo.getParam("RelationId");
 

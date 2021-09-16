@@ -331,7 +331,14 @@ public class LM013Report extends MakeReport {
 						this.print(0, 15, tLDVo.get("F4"), "L"); // 身分證	
 					} else
 					{
-						this.print(0, 15, tLDVo.get("F5"), "L"); // 姓名 - Sum與Total類資料的此欄為"以上合計/以下合計/總計"
+						// 姓名 - Sum與Total類資料的此欄為"以上合計/以下合計/總計"
+						// 只有在前一筆資料與這一筆資料種類不同時, 才出字樣
+						// 避免多次重覆輸出疊字
+
+						if (lastTLDVo != null && lastDataType != thisDataType)
+						{
+							this.print(0, 15, tLDVo.get("F5"), "L");
+						}
 					}
 					
 					// 計算合計用

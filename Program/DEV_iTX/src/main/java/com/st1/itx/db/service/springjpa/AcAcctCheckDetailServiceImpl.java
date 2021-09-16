@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,332 +33,359 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("acAcctCheckDetailService")
 @Repository
-public class AcAcctCheckDetailServiceImpl implements AcAcctCheckDetailService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(AcAcctCheckDetailServiceImpl.class);
+public class AcAcctCheckDetailServiceImpl extends ASpringJpaParm implements AcAcctCheckDetailService, InitializingBean {
+  @Autowired
+  private BaseEntityManager baseEntityManager;
 
-	@Autowired
-	private BaseEntityManager baseEntityManager;
+  @Autowired
+  private AcAcctCheckDetailRepository acAcctCheckDetailRepos;
 
-	@Autowired
-	private AcAcctCheckDetailRepository acAcctCheckDetailRepos;
+  @Autowired
+  private AcAcctCheckDetailRepositoryDay acAcctCheckDetailReposDay;
 
-	@Autowired
-	private AcAcctCheckDetailRepositoryDay acAcctCheckDetailReposDay;
+  @Autowired
+  private AcAcctCheckDetailRepositoryMon acAcctCheckDetailReposMon;
 
-	@Autowired
-	private AcAcctCheckDetailRepositoryMon acAcctCheckDetailReposMon;
+  @Autowired
+  private AcAcctCheckDetailRepositoryHist acAcctCheckDetailReposHist;
 
-	@Autowired
-	private AcAcctCheckDetailRepositoryHist acAcctCheckDetailReposHist;
+  @Override
+  public void afterPropertiesSet() throws Exception {
+    org.junit.Assert.assertNotNull(acAcctCheckDetailRepos);
+    org.junit.Assert.assertNotNull(acAcctCheckDetailReposDay);
+    org.junit.Assert.assertNotNull(acAcctCheckDetailReposMon);
+    org.junit.Assert.assertNotNull(acAcctCheckDetailReposHist);
+  }
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		org.junit.Assert.assertNotNull(acAcctCheckDetailRepos);
-		org.junit.Assert.assertNotNull(acAcctCheckDetailReposDay);
-		org.junit.Assert.assertNotNull(acAcctCheckDetailReposMon);
-		org.junit.Assert.assertNotNull(acAcctCheckDetailReposHist);
-	}
+  @Override
+  public AcAcctCheckDetail findById(AcAcctCheckDetailId acAcctCheckDetailId, TitaVo... titaVo) {
+    String dbName = "";
 
-	@Override
-	public AcAcctCheckDetail findById(AcAcctCheckDetailId acAcctCheckDetailId, TitaVo... titaVo) {
-		String dbName = "";
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findById " + dbName + " " + acAcctCheckDetailId);
+    Optional<AcAcctCheckDetail> acAcctCheckDetail = null;
+    if (dbName.equals(ContentName.onDay))
+      acAcctCheckDetail = acAcctCheckDetailReposDay.findById(acAcctCheckDetailId);
+    else if (dbName.equals(ContentName.onMon))
+      acAcctCheckDetail = acAcctCheckDetailReposMon.findById(acAcctCheckDetailId);
+    else if (dbName.equals(ContentName.onHist))
+      acAcctCheckDetail = acAcctCheckDetailReposHist.findById(acAcctCheckDetailId);
+    else 
+      acAcctCheckDetail = acAcctCheckDetailRepos.findById(acAcctCheckDetailId);
+    AcAcctCheckDetail obj = acAcctCheckDetail.isPresent() ? acAcctCheckDetail.get() : null;
+      if(obj != null) {
+        EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
+        em.detach(obj);
+em = null;
+}
+    return obj;
+  }
 
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + acAcctCheckDetailId);
-		Optional<AcAcctCheckDetail> acAcctCheckDetail = null;
-		if (dbName.equals(ContentName.onDay))
-			acAcctCheckDetail = acAcctCheckDetailReposDay.findById(acAcctCheckDetailId);
-		else if (dbName.equals(ContentName.onMon))
-			acAcctCheckDetail = acAcctCheckDetailReposMon.findById(acAcctCheckDetailId);
-		else if (dbName.equals(ContentName.onHist))
-			acAcctCheckDetail = acAcctCheckDetailReposHist.findById(acAcctCheckDetailId);
-		else
-			acAcctCheckDetail = acAcctCheckDetailRepos.findById(acAcctCheckDetailId);
-		AcAcctCheckDetail obj = acAcctCheckDetail.isPresent() ? acAcctCheckDetail.get() : null;
-		if (obj != null) {
-			EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
-			em.detach(obj);
-			em = null;
-		}
-		return obj;
-	}
+  @Override
+  public Slice<AcAcctCheckDetail> findAll(int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcAcctCheckDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    Pageable pageable = null;
+    if(limit == Integer.MAX_VALUE)
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "BranchNo", "CurrencyCode", "AcctCode", "CustNo", "FacmNo", "BormNo", "AcSubBookCode"));
+    else
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "BranchNo", "CurrencyCode", "AcctCode", "CustNo", "FacmNo", "BormNo", "AcSubBookCode"));
+    this.info("findAll " + dbName);
+    if (dbName.equals(ContentName.onDay))
+      slice = acAcctCheckDetailReposDay.findAll(pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acAcctCheckDetailReposMon.findAll(pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acAcctCheckDetailReposHist.findAll(pageable);
+    else 
+      slice = acAcctCheckDetailRepos.findAll(pageable);
 
-	@Override
-	public Slice<AcAcctCheckDetail> findAll(int index, int limit, TitaVo... titaVo) {
-		String dbName = "";
-		Slice<AcAcctCheckDetail> slice = null;
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "BranchNo", "CurrencyCode", "AcctCode", "CustNo", "FacmNo", "BormNo"));
-		if (limit == Integer.MAX_VALUE)
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcAcctCheckDetail> findAcDate(int acDate_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcAcctCheckDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
-		if (dbName.equals(ContentName.onDay))
-			slice = acAcctCheckDetailReposDay.findAll(pageable);
-		else if (dbName.equals(ContentName.onMon))
-			slice = acAcctCheckDetailReposMon.findAll(pageable);
-		else if (dbName.equals(ContentName.onHist))
-			slice = acAcctCheckDetailReposHist.findAll(pageable);
-		else
-			slice = acAcctCheckDetailRepos.findAll(pageable);
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findAcDate " + dbName + " : " + "acDate_0 : " + acDate_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = acAcctCheckDetailReposDay.findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(acDate_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acAcctCheckDetailReposMon.findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(acDate_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acAcctCheckDetailReposHist.findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(acDate_0, pageable);
+    else 
+      slice = acAcctCheckDetailRepos.findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(acDate_0, pageable);
 
-		return slice != null && !slice.isEmpty() ? slice : null;
-	}
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
-	@Override
-	public Slice<AcAcctCheckDetail> findAcDate(int acDate_0, int index, int limit, TitaVo... titaVo) {
-		String dbName = "";
-		Slice<AcAcctCheckDetail> slice = null;
-		if (titaVo.length != 0)
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public AcAcctCheckDetail holdById(AcAcctCheckDetailId acAcctCheckDetailId, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Hold " + dbName + " " + acAcctCheckDetailId);
+    Optional<AcAcctCheckDetail> acAcctCheckDetail = null;
+    if (dbName.equals(ContentName.onDay))
+      acAcctCheckDetail = acAcctCheckDetailReposDay.findByAcAcctCheckDetailId(acAcctCheckDetailId);
+    else if (dbName.equals(ContentName.onMon))
+      acAcctCheckDetail = acAcctCheckDetailReposMon.findByAcAcctCheckDetailId(acAcctCheckDetailId);
+    else if (dbName.equals(ContentName.onHist))
+      acAcctCheckDetail = acAcctCheckDetailReposHist.findByAcAcctCheckDetailId(acAcctCheckDetailId);
+    else 
+      acAcctCheckDetail = acAcctCheckDetailRepos.findByAcAcctCheckDetailId(acAcctCheckDetailId);
+    return acAcctCheckDetail.isPresent() ? acAcctCheckDetail.get() : null;
+  }
+
+  @Override
+  public AcAcctCheckDetail holdById(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Hold " + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
+    Optional<AcAcctCheckDetail> acAcctCheckDetailT = null;
+    if (dbName.equals(ContentName.onDay))
+      acAcctCheckDetailT = acAcctCheckDetailReposDay.findByAcAcctCheckDetailId(acAcctCheckDetail.getAcAcctCheckDetailId());
+    else if (dbName.equals(ContentName.onMon))
+      acAcctCheckDetailT = acAcctCheckDetailReposMon.findByAcAcctCheckDetailId(acAcctCheckDetail.getAcAcctCheckDetailId());
+    else if (dbName.equals(ContentName.onHist))
+      acAcctCheckDetailT = acAcctCheckDetailReposHist.findByAcAcctCheckDetailId(acAcctCheckDetail.getAcAcctCheckDetailId());
+    else 
+      acAcctCheckDetailT = acAcctCheckDetailRepos.findByAcAcctCheckDetailId(acAcctCheckDetail.getAcAcctCheckDetailId());
+    return acAcctCheckDetailT.isPresent() ? acAcctCheckDetailT.get() : null;
+  }
+
+  @Override
+  public AcAcctCheckDetail insert(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) throws DBException {
+     String dbName = "";
+		String empNot = "";
+
+		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		Pageable pageable = PageRequest.of(index, limit);
-		if (limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-		logger.info("findAcDate " + dbName + " : " + "acDate_0 : " + acDate_0);
-		if (dbName.equals(ContentName.onDay))
-			slice = acAcctCheckDetailReposDay.findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(acDate_0, pageable);
-		else if (dbName.equals(ContentName.onMon))
-			slice = acAcctCheckDetailReposMon.findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(acDate_0, pageable);
-		else if (dbName.equals(ContentName.onHist))
-			slice = acAcctCheckDetailReposHist.findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(acDate_0, pageable);
-		else
-			slice = acAcctCheckDetailRepos.findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(acDate_0, pageable);
+			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
+         empNot = empNot.isEmpty() ? "System" : empNot;		}
+    this.info("Insert..." + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
+    if (this.findById(acAcctCheckDetail.getAcAcctCheckDetailId()) != null)
+      throw new DBException(2);
 
-		return slice != null && !slice.isEmpty() ? slice : null;
-	}
+    if (!empNot.isEmpty())
+      acAcctCheckDetail.setCreateEmpNo(empNot);
 
-	@Override
-	public AcAcctCheckDetail holdById(AcAcctCheckDetailId acAcctCheckDetailId, TitaVo... titaVo) {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + acAcctCheckDetailId);
-		Optional<AcAcctCheckDetail> acAcctCheckDetail = null;
-		if (dbName.equals(ContentName.onDay))
-			acAcctCheckDetail = acAcctCheckDetailReposDay.findByAcAcctCheckDetailId(acAcctCheckDetailId);
-		else if (dbName.equals(ContentName.onMon))
-			acAcctCheckDetail = acAcctCheckDetailReposMon.findByAcAcctCheckDetailId(acAcctCheckDetailId);
-		else if (dbName.equals(ContentName.onHist))
-			acAcctCheckDetail = acAcctCheckDetailReposHist.findByAcAcctCheckDetailId(acAcctCheckDetailId);
-		else
-			acAcctCheckDetail = acAcctCheckDetailRepos.findByAcAcctCheckDetailId(acAcctCheckDetailId);
-		return acAcctCheckDetail.isPresent() ? acAcctCheckDetail.get() : null;
-	}
+    if(acAcctCheckDetail.getLastUpdateEmpNo() == null || acAcctCheckDetail.getLastUpdateEmpNo().isEmpty())
+      acAcctCheckDetail.setLastUpdateEmpNo(empNot);
 
-	@Override
-	public AcAcctCheckDetail holdById(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
-		Optional<AcAcctCheckDetail> acAcctCheckDetailT = null;
-		if (dbName.equals(ContentName.onDay))
-			acAcctCheckDetailT = acAcctCheckDetailReposDay.findByAcAcctCheckDetailId(acAcctCheckDetail.getAcAcctCheckDetailId());
-		else if (dbName.equals(ContentName.onMon))
-			acAcctCheckDetailT = acAcctCheckDetailReposMon.findByAcAcctCheckDetailId(acAcctCheckDetail.getAcAcctCheckDetailId());
-		else if (dbName.equals(ContentName.onHist))
-			acAcctCheckDetailT = acAcctCheckDetailReposHist.findByAcAcctCheckDetailId(acAcctCheckDetail.getAcAcctCheckDetailId());
-		else
-			acAcctCheckDetailT = acAcctCheckDetailRepos.findByAcAcctCheckDetailId(acAcctCheckDetail.getAcAcctCheckDetailId());
-		return acAcctCheckDetailT.isPresent() ? acAcctCheckDetailT.get() : null;
-	}
+    if (dbName.equals(ContentName.onDay))
+      return acAcctCheckDetailReposDay.saveAndFlush(acAcctCheckDetail);	
+    else if (dbName.equals(ContentName.onMon))
+      return acAcctCheckDetailReposMon.saveAndFlush(acAcctCheckDetail);
+    else if (dbName.equals(ContentName.onHist))
+      return acAcctCheckDetailReposHist.saveAndFlush(acAcctCheckDetail);
+    else 
+    return acAcctCheckDetailRepos.saveAndFlush(acAcctCheckDetail);
+  }
 
-	@Override
-	public AcAcctCheckDetail insert(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+  @Override
+  public AcAcctCheckDetail update(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
-		if (this.findById(acAcctCheckDetail.getAcAcctCheckDetailId()) != null)
-			throw new DBException(2);
+    this.info("Update..." + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
+    if (!empNot.isEmpty())
+      acAcctCheckDetail.setLastUpdateEmpNo(empNot);
 
-		if (!empNot.isEmpty())
-			acAcctCheckDetail.setCreateEmpNo(empNot);
+    if (dbName.equals(ContentName.onDay))
+      return acAcctCheckDetailReposDay.saveAndFlush(acAcctCheckDetail);	
+    else if (dbName.equals(ContentName.onMon))
+      return acAcctCheckDetailReposMon.saveAndFlush(acAcctCheckDetail);
+    else if (dbName.equals(ContentName.onHist))
+      return acAcctCheckDetailReposHist.saveAndFlush(acAcctCheckDetail);
+    else 
+    return acAcctCheckDetailRepos.saveAndFlush(acAcctCheckDetail);
+  }
 
-		if (dbName.equals(ContentName.onDay))
-			return acAcctCheckDetailReposDay.saveAndFlush(acAcctCheckDetail);
-		else if (dbName.equals(ContentName.onMon))
-			return acAcctCheckDetailReposMon.saveAndFlush(acAcctCheckDetail);
-		else if (dbName.equals(ContentName.onHist))
-			return acAcctCheckDetailReposHist.saveAndFlush(acAcctCheckDetail);
-		else
-			return acAcctCheckDetailRepos.saveAndFlush(acAcctCheckDetail);
-	}
-
-	@Override
-	public AcAcctCheckDetail update(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+  @Override
+  public AcAcctCheckDetail update2(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
-		if (!empNot.isEmpty())
-			acAcctCheckDetail.setLastUpdateEmpNo(empNot);
+    this.info("Update..." + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
+    if (!empNot.isEmpty())
+      acAcctCheckDetail.setLastUpdateEmpNo(empNot);
 
-		if (dbName.equals(ContentName.onDay))
-			return acAcctCheckDetailReposDay.saveAndFlush(acAcctCheckDetail);
-		else if (dbName.equals(ContentName.onMon))
-			return acAcctCheckDetailReposMon.saveAndFlush(acAcctCheckDetail);
-		else if (dbName.equals(ContentName.onHist))
-			return acAcctCheckDetailReposHist.saveAndFlush(acAcctCheckDetail);
-		else
-			return acAcctCheckDetailRepos.saveAndFlush(acAcctCheckDetail);
-	}
+    if (dbName.equals(ContentName.onDay))
+      acAcctCheckDetailReposDay.saveAndFlush(acAcctCheckDetail);	
+    else if (dbName.equals(ContentName.onMon))
+      acAcctCheckDetailReposMon.saveAndFlush(acAcctCheckDetail);
+    else if (dbName.equals(ContentName.onHist))
+        acAcctCheckDetailReposHist.saveAndFlush(acAcctCheckDetail);
+    else 
+      acAcctCheckDetailRepos.saveAndFlush(acAcctCheckDetail);	
+    return this.findById(acAcctCheckDetail.getAcAcctCheckDetailId());
+  }
 
-	@Override
-	public AcAcctCheckDetail update2(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) throws DBException {
-		String dbName = "";
+  @Override
+  public void delete(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) throws DBException {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("Delete..." + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
+    if (dbName.equals(ContentName.onDay)) {
+      acAcctCheckDetailReposDay.delete(acAcctCheckDetail);	
+      acAcctCheckDetailReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      acAcctCheckDetailReposMon.delete(acAcctCheckDetail);	
+      acAcctCheckDetailReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      acAcctCheckDetailReposHist.delete(acAcctCheckDetail);
+      acAcctCheckDetailReposHist.flush();
+    }
+    else {
+      acAcctCheckDetailRepos.delete(acAcctCheckDetail);
+      acAcctCheckDetailRepos.flush();
+    }
+   }
+
+  @Override
+  public void insertAll(List<AcAcctCheckDetail> acAcctCheckDetail, TitaVo... titaVo) throws DBException {
+    if (acAcctCheckDetail == null || acAcctCheckDetail.size() == 0)
+      throw new DBException(6);
+     String dbName = "";
+		String empNot = "";
+
+		if (titaVo.length != 0) {
+			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+    for (AcAcctCheckDetail t : acAcctCheckDetail){ 
+      if (!empNot.isEmpty())
+        t.setCreateEmpNo(empNot);
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
+
+    if (dbName.equals(ContentName.onDay)) {
+      acAcctCheckDetail = acAcctCheckDetailReposDay.saveAll(acAcctCheckDetail);	
+      acAcctCheckDetailReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      acAcctCheckDetail = acAcctCheckDetailReposMon.saveAll(acAcctCheckDetail);	
+      acAcctCheckDetailReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      acAcctCheckDetail = acAcctCheckDetailReposHist.saveAll(acAcctCheckDetail);
+      acAcctCheckDetailReposHist.flush();
+    }
+    else {
+      acAcctCheckDetail = acAcctCheckDetailRepos.saveAll(acAcctCheckDetail);
+      acAcctCheckDetailRepos.flush();
+    }
+    }
+
+  @Override
+  public void updateAll(List<AcAcctCheckDetail> acAcctCheckDetail, TitaVo... titaVo) throws DBException {
+     String dbName = "";
 		String empNot = "";
 
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
-		if (!empNot.isEmpty())
-			acAcctCheckDetail.setLastUpdateEmpNo(empNot);
+    this.info("UpdateAll...");
+    if (acAcctCheckDetail == null || acAcctCheckDetail.size() == 0)
+      throw new DBException(6);
 
-		if (dbName.equals(ContentName.onDay))
-			acAcctCheckDetailReposDay.saveAndFlush(acAcctCheckDetail);
-		else if (dbName.equals(ContentName.onMon))
-			acAcctCheckDetailReposMon.saveAndFlush(acAcctCheckDetail);
-		else if (dbName.equals(ContentName.onHist))
-			acAcctCheckDetailReposHist.saveAndFlush(acAcctCheckDetail);
-		else
-			acAcctCheckDetailRepos.saveAndFlush(acAcctCheckDetail);
-		return this.findById(acAcctCheckDetail.getAcAcctCheckDetailId());
-	}
+    for (AcAcctCheckDetail t : acAcctCheckDetail) 
+    if (!empNot.isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+		
 
-	@Override
-	public void delete(AcAcctCheckDetail acAcctCheckDetail, TitaVo... titaVo) throws DBException {
-		String dbName = "";
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + acAcctCheckDetail.getAcAcctCheckDetailId());
-		if (dbName.equals(ContentName.onDay)) {
-			acAcctCheckDetailReposDay.delete(acAcctCheckDetail);
-			acAcctCheckDetailReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			acAcctCheckDetailReposMon.delete(acAcctCheckDetail);
-			acAcctCheckDetailReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			acAcctCheckDetailReposHist.delete(acAcctCheckDetail);
-			acAcctCheckDetailReposHist.flush();
-		} else {
-			acAcctCheckDetailRepos.delete(acAcctCheckDetail);
-			acAcctCheckDetailRepos.flush();
-		}
-	}
+    if (dbName.equals(ContentName.onDay)) {
+      acAcctCheckDetail = acAcctCheckDetailReposDay.saveAll(acAcctCheckDetail);	
+      acAcctCheckDetailReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      acAcctCheckDetail = acAcctCheckDetailReposMon.saveAll(acAcctCheckDetail);	
+      acAcctCheckDetailReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      acAcctCheckDetail = acAcctCheckDetailReposHist.saveAll(acAcctCheckDetail);
+      acAcctCheckDetailReposHist.flush();
+    }
+    else {
+      acAcctCheckDetail = acAcctCheckDetailRepos.saveAll(acAcctCheckDetail);
+      acAcctCheckDetailRepos.flush();
+    }
+    }
 
-	@Override
-	public void insertAll(List<AcAcctCheckDetail> acAcctCheckDetail, TitaVo... titaVo) throws DBException {
-		if (acAcctCheckDetail == null || acAcctCheckDetail.size() == 0)
-			throw new DBException(6);
-		String dbName = "";
-		String empNot = "";
+  @Override
+  public void deleteAll(List<AcAcctCheckDetail> acAcctCheckDetail, TitaVo... titaVo) throws DBException {
+    this.info("DeleteAll...");
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (acAcctCheckDetail == null || acAcctCheckDetail.size() == 0)
+      throw new DBException(6);
+    if (dbName.equals(ContentName.onDay)) {
+      acAcctCheckDetailReposDay.deleteAll(acAcctCheckDetail);	
+      acAcctCheckDetailReposDay.flush();
+    }
+    else if (dbName.equals(ContentName.onMon)) {
+      acAcctCheckDetailReposMon.deleteAll(acAcctCheckDetail);	
+      acAcctCheckDetailReposMon.flush();
+    }
+    else if (dbName.equals(ContentName.onHist)) {
+      acAcctCheckDetailReposHist.deleteAll(acAcctCheckDetail);
+      acAcctCheckDetailReposHist.flush();
+    }
+    else {
+      acAcctCheckDetailRepos.deleteAll(acAcctCheckDetail);
+      acAcctCheckDetailRepos.flush();
+    }
+  }
 
-		if (titaVo.length != 0) {
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-		logger.info("InsertAll...");
-		for (AcAcctCheckDetail t : acAcctCheckDetail)
-			if (!empNot.isEmpty())
-				t.setCreateEmpNo(empNot);
-
-		if (dbName.equals(ContentName.onDay)) {
-			acAcctCheckDetail = acAcctCheckDetailReposDay.saveAll(acAcctCheckDetail);
-			acAcctCheckDetailReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			acAcctCheckDetail = acAcctCheckDetailReposMon.saveAll(acAcctCheckDetail);
-			acAcctCheckDetailReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			acAcctCheckDetail = acAcctCheckDetailReposHist.saveAll(acAcctCheckDetail);
-			acAcctCheckDetailReposHist.flush();
-		} else {
-			acAcctCheckDetail = acAcctCheckDetailRepos.saveAll(acAcctCheckDetail);
-			acAcctCheckDetailRepos.flush();
-		}
-	}
-
-	@Override
-	public void updateAll(List<AcAcctCheckDetail> acAcctCheckDetail, TitaVo... titaVo) throws DBException {
-		String dbName = "";
-		String empNot = "";
-
-		if (titaVo.length != 0) {
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-		logger.info("UpdateAll...");
-		if (acAcctCheckDetail == null || acAcctCheckDetail.size() == 0)
-			throw new DBException(6);
-
-		for (AcAcctCheckDetail t : acAcctCheckDetail)
-			if (!empNot.isEmpty())
-				t.setLastUpdateEmpNo(empNot);
-
-		if (dbName.equals(ContentName.onDay)) {
-			acAcctCheckDetail = acAcctCheckDetailReposDay.saveAll(acAcctCheckDetail);
-			acAcctCheckDetailReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			acAcctCheckDetail = acAcctCheckDetailReposMon.saveAll(acAcctCheckDetail);
-			acAcctCheckDetailReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			acAcctCheckDetail = acAcctCheckDetailReposHist.saveAll(acAcctCheckDetail);
-			acAcctCheckDetailReposHist.flush();
-		} else {
-			acAcctCheckDetail = acAcctCheckDetailRepos.saveAll(acAcctCheckDetail);
-			acAcctCheckDetailRepos.flush();
-		}
-	}
-
-	@Override
-	public void deleteAll(List<AcAcctCheckDetail> acAcctCheckDetail, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
-		String dbName = "";
-
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		if (acAcctCheckDetail == null || acAcctCheckDetail.size() == 0)
-			throw new DBException(6);
-		if (dbName.equals(ContentName.onDay)) {
-			acAcctCheckDetailReposDay.deleteAll(acAcctCheckDetail);
-			acAcctCheckDetailReposDay.flush();
-		} else if (dbName.equals(ContentName.onMon)) {
-			acAcctCheckDetailReposMon.deleteAll(acAcctCheckDetail);
-			acAcctCheckDetailReposMon.flush();
-		} else if (dbName.equals(ContentName.onHist)) {
-			acAcctCheckDetailReposHist.deleteAll(acAcctCheckDetail);
-			acAcctCheckDetailReposHist.flush();
-		} else {
-			acAcctCheckDetailRepos.deleteAll(acAcctCheckDetail);
-			acAcctCheckDetailRepos.flush();
-		}
-	}
-
-	@Override
-	public void Usp_L6_AcAcctCheckDetail_Ins(int tbsdyf, String empNo, TitaVo... titaVo) {
-		String dbName = "";
-
-		if (titaVo.length != 0)
-			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		if (dbName.equals(ContentName.onDay))
-			acAcctCheckDetailReposDay.uspL6AcacctcheckdetailIns(tbsdyf, empNo);
-		else if (dbName.equals(ContentName.onMon))
-			acAcctCheckDetailReposMon.uspL6AcacctcheckdetailIns(tbsdyf, empNo);
-		else if (dbName.equals(ContentName.onHist))
-			acAcctCheckDetailReposHist.uspL6AcacctcheckdetailIns(tbsdyf, empNo);
-		else
-			acAcctCheckDetailRepos.uspL6AcacctcheckdetailIns(tbsdyf, empNo);
-	}
+  @Override
+  public void Usp_L6_AcAcctCheckDetail_Ins(int tbsdyf,  String empNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      acAcctCheckDetailReposDay.uspL6AcacctcheckdetailIns(tbsdyf,  empNo);
+    else if (dbName.equals(ContentName.onMon))
+      acAcctCheckDetailReposMon.uspL6AcacctcheckdetailIns(tbsdyf,  empNo);
+    else if (dbName.equals(ContentName.onHist))
+      acAcctCheckDetailReposHist.uspL6AcacctcheckdetailIns(tbsdyf,  empNo);
+   else
+      acAcctCheckDetailRepos.uspL6AcacctcheckdetailIns(tbsdyf,  empNo);
+  }
 
 }

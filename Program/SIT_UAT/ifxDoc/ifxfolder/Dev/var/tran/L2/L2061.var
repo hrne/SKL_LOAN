@@ -83,6 +83,17 @@ T(2,@CurrPrecisionHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+
+#NTXBUF=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@FacmNo,#NTXBUF,8,3)
+
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
 #BUF1=X,42,S
 
 #BIND1=X,1,S
@@ -90,6 +101,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-
 
 !借款人戶號
 #CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
 @V(2,0)
 
 <include src="ROM.icf::L2Rim.dec"/>
@@ -114,13 +126,20 @@ T(2,@CustName,#L1r01CustName)
 
 !額度編號
 #FacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
 @V(2,0)
 
 #RPTFG=A,1,S
 
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
 
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,XMT(),$)
 
 </sub>
 
@@ -182,10 +201,13 @@ T(H,#OOCurrencyCode,#CurrPrecisionHelp)
 
 #OOFeeAmt=m,14.2,L
 
-#OOFeeAmtX=X,22,L
-CALL2(#ADJUSTDOT,#Precision,#OOFeeAmt,#OOFeeAmtX)
-P(R,#OOFeeAmtX)
+#OOFeeAmt1=m,14,L
+E(0,#OOFeeAmt)
 
+#OOFeeAmtX=X,22,L
+!CALL2(#ADJUSTDOT,#Precision,#OOFeeAmt,#OOFeeAmtX)
+!P(R,#OOFeeAmtX)
+X(#OOFeeAmt1)
 
 
 !修改
@@ -265,7 +287,7 @@ TXFORM=L2061
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 
-#RPTFG=0,QUERY.GRID,L2061
+#RPTFG2=1,QUERY.GRID,L2061
 #any={detail:true, header:'L2061.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOBTN2=修改
@@ -293,11 +315,30 @@ TXFORM=L2061
 {width:80,align:'center'}
 
 #OOFeeAmtX=貸後契變手續費
-{width:180,align:'center'}
+{width:180,align:'right'}
 
 
 ^
+#RPTFG2=2,QUERY.GRID,L2061
+#any={detail:true, header:'L2061.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
+#OOContractChgDate=契變日期
+{width:100,align:'center'}
+
+#OOContractChgNo=契變序號
+{width:100,align:'center'}
+
+#OOCCIND=貸後契變項目
+{width:200,align:'center'}
+
+#OOCurrencyCode=幣別
+{width:80,align:'center'}
+
+#OOFeeAmtX=貸後契變手續費
+{width:180,align:'right'}
+
+
+^
 <include src="PRT.icf::INQ01.sel" map="i=L2061;cpi=15"/>
 
 <include src="PRT.icf::INQ01.sel"/>

@@ -72,10 +72,11 @@ public class LD004Report extends MakeReport {
 				this.print(1, 2, "傳票號碼　.....　");
 				this.print(0, 19, LD4Vo.get("F0"), "L");
 
-				if ("1".equals(An)) {
+				if (titaVo.getParam("inputOption").equals("1")) {
 					this.print(0, 41, "還本收據");
 				} else {
 					this.print(0, 41, "繳息收據");
+
 				}
 
 				this.print(1, 2, "交易序號　.....　");
@@ -108,7 +109,7 @@ public class LD004Report extends MakeReport {
 				this.print(0, 39, showDate(LD4Vo.get("F5").toString(), 1), "C");
 				this.print(1, 1, "├──────────┼──────────────────┼─────────┤");
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
-				if (!LD4Vo.get("F16").equals("11"))
+				if (!LD4Vo.get("F16").equals("11") && !titaVo.getParam("inputOption").equals("1")) // 20210916 從現有樣張上推測 還本收據不出此字樣
 				{
 					this.print(0, 55, "非支票");
 				}

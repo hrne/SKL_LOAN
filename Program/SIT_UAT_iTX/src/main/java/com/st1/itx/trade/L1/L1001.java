@@ -32,7 +32,6 @@ import com.st1.itx.db.service.CustCrossService;
 import com.st1.itx.db.service.CustFinService;
 /* DB服務 */
 import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.CustRelDetailService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
@@ -78,9 +77,6 @@ public class L1001 extends TradeBuffer {
 
 	@Autowired
 	public ReltMainService iReltMainService;
-
-	@Autowired
-	public CustRelDetailService iCustRelDetailService;
 
 	@Autowired
 	public GuarantorService sGuarantorService;

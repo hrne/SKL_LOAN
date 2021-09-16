@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +23,17 @@ import com.st1.itx.db.domain.AcAcctCheckId;
  */
 public interface AcAcctCheckRepositoryHist extends JpaRepository<AcAcctCheck, AcAcctCheckId> {
 
-	// AcDate =
-	public Slice<AcAcctCheck> findAllByAcDateIsOrderByAcctCodeAsc(int acDate_0, Pageable pageable);
+  // AcDate = 
+  public Slice<AcAcctCheck> findAllByAcDateIsOrderByAcctCodeAsc(int acDate_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<AcAcctCheck> findByAcAcctCheckId(AcAcctCheckId acAcctCheckId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<AcAcctCheck> findByAcAcctCheckId(AcAcctCheckId acAcctCheckId);
 
-	// (放款關帳 )維護 AcAcctCheck 會計業務檢核檔
-	@Procedure(value = "\"Usp_L6_AcAcctCheck_Upd\"")
-	public void uspL6AcacctcheckUpd(int tbsdyf, String empNo);
+  // (放款關帳 )維護 AcAcctCheck 會計業務檢核檔
+  @Procedure(value = "\"Usp_L6_AcAcctCheck_Upd\"")
+  public void uspL6AcacctcheckUpd(int tbsdyf,  String empNo);
 
 }
+

@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +23,17 @@ import com.st1.itx.db.domain.AcAcctCheckDetailId;
  */
 public interface AcAcctCheckDetailRepositoryHist extends JpaRepository<AcAcctCheckDetail, AcAcctCheckDetailId> {
 
-	// AcDate =
-	public Slice<AcAcctCheckDetail> findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(int acDate_0, Pageable pageable);
+  // AcDate = 
+  public Slice<AcAcctCheckDetail> findAllByAcDateIsOrderByAcDateAscBranchNoAscCurrencyCodeAscAcctCodeAscCustNoAscFacmNoAscBormNoAsc(int acDate_0, Pageable pageable);
 
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<AcAcctCheckDetail> findByAcAcctCheckDetailId(AcAcctCheckDetailId acAcctCheckDetailId);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<AcAcctCheckDetail> findByAcAcctCheckDetailId(AcAcctCheckDetailId acAcctCheckDetailId);
 
-	// (放款關帳 )維護AcAcctCheckDetail會計業務檢核明細檔
-	@Procedure(value = "\"Usp_L6_AcAcctCheckDetail_Ins\"")
-	public void uspL6AcacctcheckdetailIns(int tbsdyf, String empNo);
+  // (放款關帳 )維護AcAcctCheckDetail會計業務檢核明細檔
+  @Procedure(value = "\"Usp_L6_AcAcctCheckDetail_Ins\"")
+  public void uspL6AcacctcheckdetailIns(int tbsdyf,  String empNo);
 
 }
+

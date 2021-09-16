@@ -119,6 +119,15 @@ public interface ReltMainService {
   public Slice<ReltMain> findByBoth(int caseNo_0, int custNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * ReltName =
+   *
+   * @param reltName_0 reltName_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice ReltMain ReltMain of List
+   */
+  public ReltMain reltnameFirst(String reltName_0, TitaVo... titaVo);
+
+  /**
    * hold By ReltMain
    * 
    * @param reltMainId key

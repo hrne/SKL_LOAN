@@ -79,6 +79,8 @@ public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,CdC.\"Item\" AS \"AcSubBookItem\"";
 		sql += "            ,SUM(S1.\"Count\") AS \"Count\"";
 		sql += "            ,SUM(\"Interest\") AS \"Interest\"";
+		sql += "            ,S1.\"AcctCode\" F4";
+		sql += "            ,S1.\"AcSubBookCode\" F5";
 		sql += "      FROM (SELECT A.\"AcctCode\" AS \"AcctCode\"";
 		sql += "                  ,A.\"AcSubBookCode\" AS \"AcSubBookCode\"";
 		sql += "                  ,1 AS \"Count\"";
@@ -92,16 +94,18 @@ public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CdAcCode\" C ON C.\"AcctCode\" = DECODE(S1.\"AcctCode\", 'IC1', '310', 'IC2', '320', 'IC3', '330', 'IC4', '340')";
 		sql += "      LEFT JOIN \"CdCode\" CdC ON CdC.\"DefCode\" = 'AcSubBookCode' AND CdC.\"Code\" = S1.\"AcSubBookCode\"";
 		sql += "      GROUP BY C.\"AcctItem\"";
+		sql += "              ,S1.\"AcctCode\"";
 		sql += "              ,CdC.\"Item\"";
-		sql += "      ORDER BY C.\"AcctItem\"";
-		sql += "              ,CdC.\"Item\"";
+		sql += "              ,S1.\"AcSubBookCode\"";
+		sql += "      ORDER BY S1.\"AcctCode\"";
+		sql += "              ,S1.\"AcSubBookCode\"";
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iyemo", iYRMO);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

@@ -347,6 +347,9 @@ public class L4611 extends TradeBuffer {
 	private void resetAcReceivable(int flag, InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
 		this.info("resetAcReceivable.." + flag + ", " + noticeYearMonth + ", " + tInsuRenew.toString());
 		List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
+		if (noticeYearMonth == 0) {
+			return;
+		}
 		if (tInsuRenew.getRenewCode() != 2) {
 			this.info("resetAcReceivable RenewCode");
 			return;

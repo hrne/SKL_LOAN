@@ -298,6 +298,25 @@ em = null;
   }
 
   @Override
+  public ReltMain reltnameFirst(String reltName_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("reltnameFirst " + dbName + " : " + "reltName_0 : " + reltName_0);
+    Optional<ReltMain> reltMainT = null;
+    if (dbName.equals(ContentName.onDay))
+      reltMainT = reltMainReposDay.findTopByReltNameIs(reltName_0);
+    else if (dbName.equals(ContentName.onMon))
+      reltMainT = reltMainReposMon.findTopByReltNameIs(reltName_0);
+    else if (dbName.equals(ContentName.onHist))
+      reltMainT = reltMainReposHist.findTopByReltNameIs(reltName_0);
+    else 
+      reltMainT = reltMainRepos.findTopByReltNameIs(reltName_0);
+
+    return reltMainT.isPresent() ? reltMainT.get() : null;
+  }
+
+  @Override
   public ReltMain holdById(ReltMainId reltMainId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("yearlyHouseLoanIntService")
 @Repository
-public class YearlyHouseLoanIntServiceImpl implements YearlyHouseLoanIntService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(YearlyHouseLoanIntServiceImpl.class);
-
+public class YearlyHouseLoanIntServiceImpl extends ASpringJpaParm implements YearlyHouseLoanIntService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class YearlyHouseLoanIntServiceImpl implements YearlyHouseLoanIntService,
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + yearlyHouseLoanIntId);
+    this.info("findById " + dbName + " " + yearlyHouseLoanIntId);
     Optional<YearlyHouseLoanInt> yearlyHouseLoanInt = null;
     if (dbName.equals(ContentName.onDay))
       yearlyHouseLoanInt = yearlyHouseLoanIntReposDay.findById(yearlyHouseLoanIntId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo", "UsageCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "YearMonth", "CustNo", "FacmNo", "UsageCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = yearlyHouseLoanIntReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = yearlyHouseLoanIntReposHist.findAll(pageable);
     else 
       slice = yearlyHouseLoanIntRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findYearMonth " + dbName + " : " + "yearMonth_0 : " + yearMonth_0);
+    this.info("findYearMonth " + dbName + " : " + "yearMonth_0 : " + yearMonth_0);
     if (dbName.equals(ContentName.onDay))
       slice = yearlyHouseLoanIntReposDay.findAllByYearMonthIsOrderByYearMonthAscCustNoAscFacmNoAsc(yearMonth_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = yearlyHouseLoanIntReposHist.findAllByYearMonthIsOrderByYearMonthAscCustNoAscFacmNoAsc(yearMonth_0, pageable);
     else 
       slice = yearlyHouseLoanIntRepos.findAllByYearMonthIsOrderByYearMonthAscCustNoAscFacmNoAsc(yearMonth_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = yearlyHouseLoanIntReposDay.findAllByCustNoIsOrderByYearMonthAscCustNoAscFacmNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = yearlyHouseLoanIntReposHist.findAllByCustNoIsOrderByYearMonthAscCustNoAscFacmNoAsc(custNo_0, pageable);
     else 
       slice = yearlyHouseLoanIntRepos.findAllByCustNoIsOrderByYearMonthAscCustNoAscFacmNoAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findYearCustNo " + dbName + " : " + "yearMonth_0 : " + yearMonth_0 + " custNo_1 : " +  custNo_1);
+    this.info("findYearCustNo " + dbName + " : " + "yearMonth_0 : " + yearMonth_0 + " custNo_1 : " +  custNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = yearlyHouseLoanIntReposDay.findAllByYearMonthIsAndCustNoIsOrderByYearMonthAscCustNoAscFacmNoAsc(yearMonth_0, custNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -182,6 +187,9 @@ em = null;
     else 
       slice = yearlyHouseLoanIntRepos.findAllByYearMonthIsAndCustNoIsOrderByYearMonthAscCustNoAscFacmNoAsc(yearMonth_0, custNo_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -190,7 +198,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + yearlyHouseLoanIntId);
+    this.info("Hold " + dbName + " " + yearlyHouseLoanIntId);
     Optional<YearlyHouseLoanInt> yearlyHouseLoanInt = null;
     if (dbName.equals(ContentName.onDay))
       yearlyHouseLoanInt = yearlyHouseLoanIntReposDay.findByYearlyHouseLoanIntId(yearlyHouseLoanIntId);
@@ -208,7 +216,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
+    this.info("Hold " + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
     Optional<YearlyHouseLoanInt> yearlyHouseLoanIntT = null;
     if (dbName.equals(ContentName.onDay))
       yearlyHouseLoanIntT = yearlyHouseLoanIntReposDay.findByYearlyHouseLoanIntId(yearlyHouseLoanInt.getYearlyHouseLoanIntId());
@@ -230,7 +238,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
+    this.info("Insert..." + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
     if (this.findById(yearlyHouseLoanInt.getYearlyHouseLoanIntId()) != null)
       throw new DBException(2);
 
@@ -259,7 +267,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
+    this.info("Update..." + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
     if (!empNot.isEmpty())
       yearlyHouseLoanInt.setLastUpdateEmpNo(empNot);
 
@@ -282,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
+    this.info("Update..." + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
     if (!empNot.isEmpty())
       yearlyHouseLoanInt.setLastUpdateEmpNo(empNot);
 
@@ -302,7 +310,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
+    this.info("Delete..." + dbName + " " + yearlyHouseLoanInt.getYearlyHouseLoanIntId());
     if (dbName.equals(ContentName.onDay)) {
       yearlyHouseLoanIntReposDay.delete(yearlyHouseLoanInt);	
       yearlyHouseLoanIntReposDay.flush();
@@ -331,7 +339,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (YearlyHouseLoanInt t : yearlyHouseLoanInt){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -366,7 +374,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (yearlyHouseLoanInt == null || yearlyHouseLoanInt.size() == 0)
       throw new DBException(6);
 
@@ -395,7 +403,7 @@ em = null;
 
   @Override
   public void deleteAll(List<YearlyHouseLoanInt> yearlyHouseLoanInt, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

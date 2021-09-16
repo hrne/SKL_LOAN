@@ -44,7 +44,7 @@ public class BankAuthActComServiceImpl extends ASpringJpaParm implements Initial
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -82,7 +82,7 @@ public class BankAuthActComServiceImpl extends ASpringJpaParm implements Initial
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

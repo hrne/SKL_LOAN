@@ -95,7 +95,7 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("inputYear", Integer.toString(Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000).substring(0, 4));
 			query.setParameter("inputYearMonth", Integer.toString(Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000).substring(0, 6));
 
-			return this.convertToMap(query.getResultList());
+			return this.convertToMap(query);
 		} else {
 			return null;
 		}
