@@ -89,7 +89,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ApplNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ApplNo"));
     this.info("findAll " + dbName);
@@ -207,6 +207,25 @@ em = null;
       facCaseApplT = facCaseApplReposHist.findTopByGroupUKeyIsAndApplNoGreaterThanEqualAndApplNoLessThanEqualOrderByApplNoDesc(groupUKey_0, applNo_1, applNo_2);
     else 
       facCaseApplT = facCaseApplRepos.findTopByGroupUKeyIsAndApplNoGreaterThanEqualAndApplNoLessThanEqualOrderByApplNoDesc(groupUKey_0, applNo_1, applNo_2);
+
+    return facCaseApplT.isPresent() ? facCaseApplT.get() : null;
+  }
+
+  @Override
+  public FacCaseAppl CreditSysNoFirst(int creditSysNo_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("CreditSysNoFirst " + dbName + " : " + "creditSysNo_0 : " + creditSysNo_0);
+    Optional<FacCaseAppl> facCaseApplT = null;
+    if (dbName.equals(ContentName.onDay))
+      facCaseApplT = facCaseApplReposDay.findTopByCreditSysNoIsOrderByApplDateAsc(creditSysNo_0);
+    else if (dbName.equals(ContentName.onMon))
+      facCaseApplT = facCaseApplReposMon.findTopByCreditSysNoIsOrderByApplDateAsc(creditSysNo_0);
+    else if (dbName.equals(ContentName.onHist))
+      facCaseApplT = facCaseApplReposHist.findTopByCreditSysNoIsOrderByApplDateAsc(creditSysNo_0);
+    else 
+      facCaseApplT = facCaseApplRepos.findTopByCreditSysNoIsOrderByApplDateAsc(creditSysNo_0);
 
     return facCaseApplT.isPresent() ? facCaseApplT.get() : null;
   }

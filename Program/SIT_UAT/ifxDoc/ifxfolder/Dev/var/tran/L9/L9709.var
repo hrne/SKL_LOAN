@@ -1,0 +1,139 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L9709)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L9709]                                 暫收放貸核心傳票檔資料"],
+["#R1+@會計日期",#StartDate," ~ ","#EndDate],
+["@"],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+! 必輸欄位
+##loop{times:1,i:1}
+#R{i}=X,1,L
+INVOKEJS(SHOW,#R{i},0)
+K(LIGHT,#R{i},TXTRED,0)
+##end
+
+! 永遠為必輸欄位
+#ALWAYS_HIGHLIGHT=@,1,S
+T(3,@R1,*)
+
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#INIT=X,1,S
+CALL(#ALWAYS_HIGHLIGHT)
+
+#DT1=D,8,S
+T(4,DATE$)
+
+#DT2=D,7,S
+T(1,#DT1,2,7)
+
+!會計日期-起
+#StartDate=D,7,I
+T(2,#DT2)
+@V(7)A(DATE,0,#StartDate)
+V(5,0,#DT2)
+
+!會計日期-迄
+#EndDate=D,7,I
+T(2,#DT2)
+@V(7)A(DATE,0,#EndDate)
+V(5,#StartDate,#DT2)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L9709 ----------
+<sub type="FORM" name="L9709">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L9709,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L9709] 暫收放貸核心傳票檔資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#StartDate
+#EndDate
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L9709^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L9709" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L9709]                                 暫收放貸核心傳票檔資料"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

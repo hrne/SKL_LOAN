@@ -213,7 +213,7 @@ V(7)A(DATE,0,#EntryDateFm)
 
 ! 入帳日期
 #EntryDateTo=D,7,I
-E(0,#SYSDATE)
+E(0,#EntryDateFm)
 C(3,#FunctionCode,1,$,s)
 @IF(#EntryDateTo<#EntryDateFm,V(P,起日不可大於迄日),$)
 

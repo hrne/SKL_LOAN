@@ -19,7 +19,7 @@ public class ReltMainId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -4561118716496303221L;
+	private static final long serialVersionUID = 1830131390365117846L;
 
 // eLoan案件編號
   @Column(name = "`CaseNo`")
@@ -29,17 +29,17 @@ public class ReltMainId implements Serializable {
   @Column(name = "`CustNo`")
   private int custNo = 0;
 
-  // 關係人身分證字號
-  @Column(name = "`ReltId`", length = 10)
-  private String reltId = " ";
+  // 關係人客戶識別碼
+  @Column(name = "`ReltUKey`", length = 32)
+  private String reltUKey = " ";
 
   public ReltMainId() {
   }
 
-  public ReltMainId(int caseNo, int custNo, String reltId) {
+  public ReltMainId(int caseNo, int custNo, String reltUKey) {
     this.caseNo = caseNo;
     this.custNo = custNo;
-    this.reltId = reltId;
+    this.reltUKey = reltUKey;
   }
 
 /**
@@ -81,28 +81,28 @@ public class ReltMainId implements Serializable {
   }
 
 /**
-	* 關係人身分證字號<br>
+	* 關係人客戶識別碼<br>
 	* 
 	* @return String
 	*/
-  public String getReltId() {
-    return this.reltId == null ? "" : this.reltId;
+  public String getReltUKey() {
+    return this.reltUKey == null ? "" : this.reltUKey;
   }
 
 /**
-	* 關係人身分證字號<br>
+	* 關係人客戶識別碼<br>
 	* 
   *
-  * @param reltId 關係人身分證字號
+  * @param reltUKey 關係人客戶識別碼
 	*/
-  public void setReltId(String reltId) {
-    this.reltId = reltId;
+  public void setReltUKey(String reltUKey) {
+    this.reltUKey = reltUKey;
   }
 
 
   @Override
   public int hashCode() {
-    return Objects.hash(caseNo, custNo, reltId);
+    return Objects.hash(caseNo, custNo, reltUKey);
   }
 
   @Override
@@ -112,11 +112,11 @@ public class ReltMainId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     ReltMainId reltMainId = (ReltMainId) obj;
-    return caseNo == reltMainId.caseNo && custNo == reltMainId.custNo && reltId.equals(reltMainId.reltId);
+    return caseNo == reltMainId.caseNo && custNo == reltMainId.custNo && reltUKey.equals(reltMainId.reltUKey);
   }
 
   @Override
   public String toString() {
-    return "ReltMainId [caseNo=" + caseNo + ", custNo=" + custNo + ", reltId=" + reltId + "]";
+    return "ReltMainId [caseNo=" + caseNo + ", custNo=" + custNo + ", reltUKey=" + reltUKey + "]";
   }
 }

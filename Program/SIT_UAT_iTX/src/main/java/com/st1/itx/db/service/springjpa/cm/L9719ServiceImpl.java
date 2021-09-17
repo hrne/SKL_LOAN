@@ -1,5 +1,6 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+//import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -26,15 +28,11 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo) throws LogicException {
 		this.info("l9719.findAll ");
 
-//		LocalDate inputYearMonth = LocalDate.of(Integer.parseInt(titaVo.getParam("inputYear")) + 1911, Integer.parseInt(titaVo.getParam("inputMonth")), 1);
-//		LocalDate inputlastYearMonth = inputYearMonth.minusMonths(1);
-
-		int iYear = Integer.valueOf(titaVo.getParam("inputYear")) + 1911;
-		int iMonth = Integer.valueOf(titaVo.getParam("inputMonth"));
+		int iYear = Integer.parseInt(titaVo.getParam("inputYear")) + 1911;
+		int iMonth = Integer.parseInt(titaVo.getParam("inputMonth"));
 
 		boolean isMonthZero = iMonth - 1 == 0;
 
@@ -169,7 +167,7 @@ public class L9719ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		query.setParameter("lastYearMonth", Integer.toString(inputlastYearMonth.getYear()) + String.format("%02d", inputlastYearMonth.getMonthValue()));
 		query.setParameter("inputYearMonth", iYear * 100 + iMonth);
 		query.setParameter("lastYearMonth", ilYear * 100 + ilMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

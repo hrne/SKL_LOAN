@@ -31,28 +31,29 @@ public class L9709ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	public List<Map<String, String>> findAll(TitaVo titaVo) {
+	public List<Map<String, String>> findAll(String startDate, String endDate, TitaVo titaVo) {
 
-		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
+		this.info("L9709ServiceImpl findAll startDate = " + startDate);
+		this.info("L9709ServiceImpl findAll endDate = " + endDate);
 
-		this.info("L9709ServiceImpl findAll iDAY = " + iDAY);
-
-		String sql = "  SELECT   A.\"AcNoCode\" F0";
-		sql += "              , SUM(A.\"DbAmt\") F1";
-		sql += "              , SUM(A.\"CrAmt\") F2";
-		sql += "              , SUM(A.\"TdBal\") F3";
-		sql += "         FROM   \"AcMain\" A";
-		sql += "         WHERE A.\"AcDate\"      = :iday ";
-		sql += "           AND A.\"AcNoCode\" IN ('20222180000', '20222180100' , '20222180200')";
-		sql += "         GROUP BY A.\"AcNoCode\"";
-		sql += "         ORDER BY A.\"AcNoCode\"";
+		String sql = " ";
+		sql += " SELECT A.\"AcNoCode\"          AS F0";
+		sql += "      , SUM(NVL(A.\"DbAmt\",0)) AS F1 ";
+		sql += "      , SUM(NVL(A.\"CrAmt\",0)) AS F2 ";
+		sql += " FROM   \"AcMain\" A ";
+		sql += " WHERE A.\"AcDate\" >= :startDate ";
+		sql += "   AND A.\"AcDate\" <= :endDate ";
+		sql += "   AND A.\"AcNoCode\" IN ('20222180000', '20222180100', '20222180200') ";
+		sql += " GROUP BY A.\"AcNoCode\" ";
+		sql += " ORDER BY A.\"AcNoCode\" ";
 
 		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("iday", iDAY);
+		query.setParameter("startDate", startDate);
+		query.setParameter("endDate", endDate);
 		return this.convertToMap(query);
 	}
 

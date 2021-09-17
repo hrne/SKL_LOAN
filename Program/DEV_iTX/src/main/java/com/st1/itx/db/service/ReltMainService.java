@@ -36,24 +36,24 @@ public interface ReltMainService {
   public Slice<ReltMain> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * ReltId =
+   * ReltUKey =
    *
-   * @param reltId_0 reltId_0
+   * @param reltUKey_0 reltUKey_0
    * @param titaVo Variable-Length Argument
    * @return Slice ReltMain ReltMain of List
    */
-  public ReltMain reltIdFirst(String reltId_0, TitaVo... titaVo);
+  public ReltMain ReltUKeyFirst(String reltUKey_0, TitaVo... titaVo);
 
   /**
-   * ReltId =
+   * ReltUKey =
    *
-   * @param reltId_0 reltId_0
+   * @param reltUKey_0 reltUKey_0
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ReltMain ReltMain of List
    */
-  public Slice<ReltMain> reltIdEq(String reltId_0, int index, int limit, TitaVo... titaVo);
+  public Slice<ReltMain> ReltUKeyEq(String reltUKey_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseNo =

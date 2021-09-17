@@ -15,6 +15,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LD009ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.format.StringCut;
 
 @Component("LD009Report")
 @Scope("prototype")
@@ -178,7 +179,7 @@ public class LD009Report extends MakeReport {
 					print(0, 1, lastAcctItem);
 				}
 
-				print(0, 18, tLDVo.get("F3"));
+				print(0, 18, StringCut.stringCut(tLDVo.get("F3"), 0, 8));
 				print(0, 32, tLDVo.get("F4"), "R");
 				print(0, 38, tLDVo.get("F5"), "R");
 				print(0, 44, tLDVo.get("F6"), "R");

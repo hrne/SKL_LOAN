@@ -55,6 +55,9 @@ public interface FacMainRepositoryDay extends JpaRepository<FacMain, FacMainId> 
   // ProdNo =
   public Optional<FacMain> findTopByProdNoIsOrderByCustNoAscFacmNoAsc(String prodNo_0);
 
+  // RepayCode = 
+  public Slice<FacMain> findAllByRepayCodeIsOrderByCustNoAscFacmNoAsc(int repayCode_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

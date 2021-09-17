@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,187)ASGN(INQLEN$)
+E(0,197)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -199,6 +199,7 @@ IF(#OODeleteDate==0,T(2,),T(2,Y))
 
 #OOUser=x,100,O
 #OODate=D,7,O
+#OOLastUpdateTime=X,10,O
 
 ! #OOBUF_CREAT=X,1,S
 ! T(2,1)
@@ -282,6 +283,7 @@ TXFORM=L4941
 #OODeleteDate
 #OOUser
 #OODate
+#OOLastUpdateTime
 ^
 </sub>
 !---------- 單據輸出組合 ----------
@@ -315,6 +317,8 @@ TXFORM=L4941
 #OOUser=最後修改員編
 {width:100}
 #OODate=最後修改日期
+{width:100,align:'center'}
+#OOLastUpdateTime=最後修改時間
 {width:100,align:'center'}
 
 </sub>

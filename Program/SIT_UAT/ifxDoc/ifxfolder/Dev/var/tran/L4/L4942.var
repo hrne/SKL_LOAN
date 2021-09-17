@@ -212,8 +212,9 @@ IF(#OOCreateFlag=="3"||#OOCreateFlag=="4",S,$)
 #OODeleteDate=D,7,O
 #Deleted=x,1,O
 IF(#OODeleteDate==0,T(2,),T(2,Y))
-#OOUser=x,6,O
+#OOUser=x,100,O
 #OODate=D,7,O
+#OOLastUpdateTime=X,10,O
 
 ! #OOBUF_CREAT=X,1,S 改由上方畫面新增
 ! T(2,1)
@@ -331,6 +332,7 @@ TXFORM=L4942
 #OODeleteDate
 #OOUser
 #OODate
+#OOLastUpdateTime
 ^
 </sub>
 
@@ -373,4 +375,8 @@ TXFORM=L4942
 {width:100}
 #OODate=最後修改日期
 {width:100}
+#OOLastUpdateTime=最後修改時間
+{width:100}
+
+
 </sub>

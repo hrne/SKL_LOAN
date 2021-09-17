@@ -2114,7 +2114,6 @@ TXFORM=L2R14
 
 !以統一編號尋找利害關係人主檔資料
 <L2R15.dec>
-#L2r15ReltName=c,100,S
 #L2r15PosInd=A,2,S
 #L2r15RemarkType=A,1,S
 #L2r15Remark=c,100,S
@@ -2122,7 +2121,6 @@ TXFORM=L2R14
 
 <L2R15.tom>
 TXFORM=L2R15
-#L2r15ReltName
 #L2r15PosInd
 #L2r15RemarkType
 #L2r15Remark

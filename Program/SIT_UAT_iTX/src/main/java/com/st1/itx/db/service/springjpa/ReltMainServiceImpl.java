@@ -90,9 +90,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CaseNo", "CustNo", "ReltId"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CaseNo", "CustNo", "ReltUKey"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CaseNo", "CustNo", "ReltId"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CaseNo", "CustNo", "ReltUKey"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = reltMainReposDay.findAll(pageable);
@@ -110,26 +110,26 @@ em = null;
   }
 
   @Override
-  public ReltMain reltIdFirst(String reltId_0, TitaVo... titaVo) {
+  public ReltMain ReltUKeyFirst(String reltUKey_0, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("reltIdFirst " + dbName + " : " + "reltId_0 : " + reltId_0);
+    this.info("ReltUKeyFirst " + dbName + " : " + "reltUKey_0 : " + reltUKey_0);
     Optional<ReltMain> reltMainT = null;
     if (dbName.equals(ContentName.onDay))
-      reltMainT = reltMainReposDay.findTopByReltIdIs(reltId_0);
+      reltMainT = reltMainReposDay.findTopByReltUKeyIs(reltUKey_0);
     else if (dbName.equals(ContentName.onMon))
-      reltMainT = reltMainReposMon.findTopByReltIdIs(reltId_0);
+      reltMainT = reltMainReposMon.findTopByReltUKeyIs(reltUKey_0);
     else if (dbName.equals(ContentName.onHist))
-      reltMainT = reltMainReposHist.findTopByReltIdIs(reltId_0);
+      reltMainT = reltMainReposHist.findTopByReltUKeyIs(reltUKey_0);
     else 
-      reltMainT = reltMainRepos.findTopByReltIdIs(reltId_0);
+      reltMainT = reltMainRepos.findTopByReltUKeyIs(reltUKey_0);
 
     return reltMainT.isPresent() ? reltMainT.get() : null;
   }
 
   @Override
-  public Slice<ReltMain> reltIdEq(String reltId_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<ReltMain> ReltUKeyEq(String reltUKey_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ReltMain> slice = null;
     if (titaVo.length != 0)
@@ -140,15 +140,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("reltIdEq " + dbName + " : " + "reltId_0 : " + reltId_0);
+    this.info("ReltUKeyEq " + dbName + " : " + "reltUKey_0 : " + reltUKey_0);
     if (dbName.equals(ContentName.onDay))
-      slice = reltMainReposDay.findAllByReltIdIs(reltId_0, pageable);
+      slice = reltMainReposDay.findAllByReltUKeyIs(reltUKey_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = reltMainReposMon.findAllByReltIdIs(reltId_0, pageable);
+      slice = reltMainReposMon.findAllByReltUKeyIs(reltUKey_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = reltMainReposHist.findAllByReltIdIs(reltId_0, pageable);
+      slice = reltMainReposHist.findAllByReltUKeyIs(reltUKey_0, pageable);
     else 
-      slice = reltMainRepos.findAllByReltIdIs(reltId_0, pageable);
+      slice = reltMainRepos.findAllByReltUKeyIs(reltUKey_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

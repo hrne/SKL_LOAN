@@ -314,7 +314,7 @@ public class L1101 extends TradeBuffer {
 		}
 
 		this.totaVo.putParam("OIntroducerX", wkIntroducerX);
-		this.totaVo.putParam("OCustCross", "Y");
+//		this.totaVo.putParam("OCustCross", "Y"); 此欄位移除 --Fegie 0917
 
 //		交互運用
 		Slice<CdCode> iCdCode = iCdCodeService.getCodeList(1, "SubCompanyCode", this.index, this.limit, titaVo);

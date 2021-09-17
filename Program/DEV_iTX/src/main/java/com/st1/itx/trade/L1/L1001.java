@@ -2,6 +2,7 @@ package com.st1.itx.trade.L1;
 
 import java.util.ArrayList;
 import java.util.List;
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -77,6 +78,7 @@ public class L1001 extends TradeBuffer {
 
 	@Autowired
 	public ReltMainService iReltMainService;
+
 
 	@Autowired
 	public GuarantorService sGuarantorService;
@@ -258,7 +260,7 @@ public class L1001 extends TradeBuffer {
 					FacShareApplBTNFg = 1;
 				}
 				// 關聯戶按鈕fg
-				ReltMain stmpReltMain = iReltMainService.reltIdFirst(aCustMain.getCustId(), titaVo);
+				ReltMain stmpReltMain = iReltMainService.ReltUKeyFirst(aCustMain.getCustUKey(), titaVo);
 				this.info("關聯戶 =" + stmpReltMain);
 				if (stmpReltMain != null) {
 					CustRelBTNFg = 1;
@@ -430,7 +432,7 @@ public class L1001 extends TradeBuffer {
 				FacShareApplBTNFg2 = 1;
 			}
 			// 關聯戶按鈕fg
-			ReltMain stmpReltMain2 = iReltMainService.reltIdFirst(iCustMain2.getCustId(), titaVo);
+			ReltMain stmpReltMain2 = iReltMainService.ReltUKeyFirst(iCustMain2.getCustUKey(), titaVo);
 			this.info("關聯戶 =" + stmpReltMain2);
 			if (stmpReltMain2 != null) {
 				CustRelBTNFg2 = 1;
@@ -600,7 +602,7 @@ public class L1001 extends TradeBuffer {
 				}
 				
 				// 關聯戶按鈕fg
-				ReltMain stmpReltMain3 = iReltMainService.reltIdFirst(bCustMain.getCustId(), titaVo);
+				ReltMain stmpReltMain3 = iReltMainService.ReltUKeyFirst(bCustMain.getCustUKey(), titaVo);
 				this.info("關聯戶 =" + stmpReltMain3);
 				if (stmpReltMain3 != null) {
 					CustRelBTNFg3 = 1;
@@ -781,7 +783,7 @@ public class L1001 extends TradeBuffer {
 				
 
 				// 關聯戶按鈕fg
-				ReltMain stmpReltMain4 = iReltMainService.reltIdFirst(dCustMain.getCustId(), titaVo);
+				ReltMain stmpReltMain4 = iReltMainService.ReltUKeyFirst(dCustMain.getCustUKey(), titaVo);
 				this.info("關聯戶 =" + stmpReltMain4);
 				if (stmpReltMain4 != null) {
 					CustRelBTNFg4 = 1;

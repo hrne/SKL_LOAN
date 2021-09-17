@@ -28,7 +28,7 @@ public class ReltMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -289501039403663992L;
+	private static final long serialVersionUID = 1373285610123497469L;
 
 @EmbeddedId
   private ReltMainId reltMainId;
@@ -41,13 +41,9 @@ public class ReltMain implements Serializable {
   @Column(name = "`CustNo`", insertable = false, updatable = false)
   private int custNo = 0;
 
-  // 關係人身分證字號
-  @Column(name = "`ReltId`", length = 10, insertable = false, updatable = false)
-  private String reltId;
-
-  // 關係人姓名
-  @Column(name = "`ReltName`", length = 100)
-  private String reltName;
+  // 關係人客戶識別碼
+  @Column(name = "`ReltUKey`", length = 32, insertable = false, updatable = false)
+  private String reltUKey;
 
   // 關係
   /* 共用代碼檔(CustRelationType)01 本人02 配偶03 祖(外祖)父母04 父母05 兄弟姊妹06 子女07 孫(外孫)子女08 有控制與從屬關係09 相互投資關係10 董事長11 董事12 監察人99 其他 */
@@ -137,41 +133,22 @@ public class ReltMain implements Serializable {
   }
 
 /**
-	* 關係人身分證字號<br>
+	* 關係人客戶識別碼<br>
 	* 
 	* @return String
 	*/
-  public String getReltId() {
-    return this.reltId == null ? "" : this.reltId;
+  public String getReltUKey() {
+    return this.reltUKey == null ? "" : this.reltUKey;
   }
 
 /**
-	* 關係人身分證字號<br>
+	* 關係人客戶識別碼<br>
 	* 
   *
-  * @param reltId 關係人身分證字號
+  * @param reltUKey 關係人客戶識別碼
 	*/
-  public void setReltId(String reltId) {
-    this.reltId = reltId;
-  }
-
-/**
-	* 關係人姓名<br>
-	* 
-	* @return String
-	*/
-  public String getReltName() {
-    return this.reltName == null ? "" : this.reltName;
-  }
-
-/**
-	* 關係人姓名<br>
-	* 
-  *
-  * @param reltName 關係人姓名
-	*/
-  public void setReltName(String reltName) {
-    this.reltName = reltName;
+  public void setReltUKey(String reltUKey) {
+    this.reltUKey = reltUKey;
   }
 
 /**
@@ -384,8 +361,8 @@ public class ReltMain implements Serializable {
 
   @Override
   public String toString() {
-    return "ReltMain [reltMainId=" + reltMainId + ", reltName=" + reltName + ", reltCode=" + reltCode + ", remarkType=" + remarkType
-           + ", reltmark=" + reltmark + ", finalFg=" + finalFg + ", applDate=" + applDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "ReltMain [reltMainId=" + reltMainId + ", reltCode=" + reltCode + ", remarkType=" + remarkType + ", reltmark=" + reltmark
+           + ", finalFg=" + finalFg + ", applDate=" + applDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

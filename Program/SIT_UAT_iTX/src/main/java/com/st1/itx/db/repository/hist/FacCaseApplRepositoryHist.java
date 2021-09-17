@@ -33,6 +33,9 @@ public interface FacCaseApplRepositoryHist extends JpaRepository<FacCaseAppl, In
   // GroupUKey = ,AND ApplNo >= ,AND ApplNo <=
   public Optional<FacCaseAppl> findTopByGroupUKeyIsAndApplNoGreaterThanEqualAndApplNoLessThanEqualOrderByApplNoDesc(String groupUKey_0, int applNo_1, int applNo_2);
 
+  // CreditSysNo =
+  public Optional<FacCaseAppl> findTopByCreditSysNoIsOrderByApplDateAsc(int creditSysNo_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

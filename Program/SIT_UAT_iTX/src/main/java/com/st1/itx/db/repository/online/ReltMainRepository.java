@@ -22,11 +22,11 @@ import com.st1.itx.db.domain.ReltMainId;
  */
 public interface ReltMainRepository extends JpaRepository<ReltMain, ReltMainId> {
 
-  // ReltId =
-  public Optional<ReltMain> findTopByReltIdIs(String reltId_0);
+  // ReltUKey =
+  public Optional<ReltMain> findTopByReltUKeyIs(String reltUKey_0);
 
-  // ReltId =
-  public Slice<ReltMain> findAllByReltIdIs(String reltId_0, Pageable pageable);
+  // ReltUKey =
+  public Slice<ReltMain> findAllByReltUKeyIs(String reltUKey_0, Pageable pageable);
 
   // CaseNo =
   public Optional<ReltMain> findTopByCaseNoIs(int caseNo_0);

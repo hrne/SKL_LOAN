@@ -171,6 +171,17 @@ public interface FacMainService {
   public FacMain findProdNoFirst(String prodNo_0, TitaVo... titaVo);
 
   /**
+   * RepayCode = 
+   *
+   * @param repayCode_0 repayCode_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice FacMain FacMain of List
+   */
+  public Slice<FacMain> findRepayCodeEq(int repayCode_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By FacMain
    * 
    * @param facMainId key

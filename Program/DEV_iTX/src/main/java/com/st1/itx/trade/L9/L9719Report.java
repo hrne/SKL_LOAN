@@ -38,10 +38,8 @@ public class L9719Report extends MakeReport {
 	private String pageOrientation = "L";
 
 	// 製表日期
-	@SuppressWarnings("unused")
 	private String nowDate;
 	// 製表時間
-	@SuppressWarnings("unused")
 	private String nowTime;
 
 	// number with commas
@@ -171,18 +169,18 @@ public class L9719Report extends MakeReport {
 				for (int i = 0; i <= 2; i++) {
 					print(-10 - i * 2, 26, tLDVo.get("F" + Integer.toString(2 + i * 4)), "C");
 					print(-10 - i * 2, 50, tLDVo.get("F" + Integer.toString(3 + i * 4)), "C");
-					print(-10 - i * 2, 99, nfNum.format(tLDVo.get("F" + Integer.toString(0 + i * 4))), "R");
-					print(-10 - i * 2, 124, nfNum.format(tLDVo.get("F" + Integer.toString(1 + i * 4))), "R");
+					print(-10 - i * 2, 99, formatAmt(tLDVo.get("F" + (0 + i * 4)), 0), "R");
+					print(-10 - i * 2, 124, formatAmt(tLDVo.get("F" + (1 + i * 4)), 0), "R");
 					print(-10 - i * 2, 143, tLDVo.get("F14"), "C");
 				}
 
-				print(-16, 99, nfNum.format(Integer.parseInt(tLDVo.get("F0")) + Integer.parseInt(tLDVo.get("F4"))
-						+ Integer.parseInt(tLDVo.get("F8"))), "R");
-				print(-16, 124, nfNum.format(Integer.parseInt(tLDVo.get("F1")) + Integer.parseInt(tLDVo.get("F5"))
-						+ Integer.parseInt(tLDVo.get("F9"))), "R");
+				print(-16, 99, formatAmt(getBigDecimal(tLDVo.get("F0")).add(getBigDecimal(tLDVo.get("F4")))
+						.add(getBigDecimal(tLDVo.get("F8"))), 0), "R");
+				print(-16, 124, formatAmt(getBigDecimal(tLDVo.get("F1")).add(getBigDecimal(tLDVo.get("F5")))
+						.add(getBigDecimal(tLDVo.get("F9"))), 0), "R");
 
-				F12 = nfNum.format(Integer.parseInt(tLDVo.get("F12")));
-				F13 = nfNum.format(Integer.parseInt(tLDVo.get("F13")));
+				F12 = formatAmt(tLDVo.get("F12"), 0);
+				F13 = formatAmt(tLDVo.get("F13"), 0);
 			}
 
 		}

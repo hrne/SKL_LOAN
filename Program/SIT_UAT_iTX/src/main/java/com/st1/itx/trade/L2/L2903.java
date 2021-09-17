@@ -117,8 +117,8 @@ public class L2903 extends TradeBuffer {
 				}
 				for( ReltMain tReltMain: tmplReltMain) {
 					
-					String RelId = tReltMain.getReltId();
-					CustMain tmpCustMain = sCustMainService.custIdFirst(RelId, titaVo);
+					String ReltUKey = tReltMain.getReltUKey();
+					CustMain tmpCustMain = sCustMainService.findById(ReltUKey, titaVo);
 					if (tmpCustMain == null) {
 						continue;
 					} // if
@@ -184,8 +184,8 @@ public class L2903 extends TradeBuffer {
 			
 			tmplReltMain = slReltMain == null ? null : slReltMain.getContent();
 			for( ReltMain tReltMain: tmplReltMain) {
-				String RelId = tReltMain.getReltId();
-				CustMain tmpCustMain = sCustMainService.custIdFirst(RelId, titaVo);
+				String ReltUKey = tReltMain.getReltUKey();
+				CustMain tmpCustMain = sCustMainService.findById(ReltUKey, titaVo);
 				if (tmpCustMain == null) {
 					continue;
 				} // if

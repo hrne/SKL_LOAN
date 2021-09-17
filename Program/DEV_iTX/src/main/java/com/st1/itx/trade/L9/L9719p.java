@@ -13,16 +13,15 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
-@Service("L9719p")
-@Scope("prototype")
 /**
- * 
+ * L9719p
  * 
  * @author ChihWei
  * @version 1.0.0
  */
+@Service("L9719p")
+@Scope("prototype")
 public class L9719p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9719p.class);
 
 	@Autowired
 	L9719Report l9719Report;
@@ -31,29 +30,29 @@ public class L9719p extends TradeBuffer {
 	DateUtil dDateUtil;
 
 	@Autowired
-	public WebClient webClient;
-	
-	String TXCD = "L9719";
-	String TXName = "放款利息法折溢價攤銷表";
+	WebClient webClient;
+
+	String tranCode = "L9719";
+	String tranName = "放款利息法折溢價攤銷表";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active " + TXCD + "p");
+		this.info("active " + tranCode + "p");
 		this.totaVo.init(titaVo);
 
-		this.info(TXCD + "p titaVo.getTxcd() = " + titaVo.getTxcd());
+		this.info(tranCode + "p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
 		l9719Report.setParentTranCode(parentTranCode);
-		
+
 		boolean isFinish = l9719Report.exec(titaVo);
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+					titaVo.getParam("TLRNO"), tranCode + tranName + "已完成", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+					titaVo.getParam("TLRNO"), tranCode + tranName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

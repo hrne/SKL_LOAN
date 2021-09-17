@@ -71,26 +71,31 @@ D(7,2,#tmpEntryDateMax,1,0)
 D(6,3,#tmpEntryDateMax,1)
 
 #defaultEntryDateMax=D,7,S
-T(1,#tmpEntryDateMax,1,7)
+T(1,#tmpEntryDateMax,2,7)
 ! i don't know either but it works this way instead of ,2,7
 
+! 年月份
 #inputYearMonth=N,5,I
 T(1,#SYSDATE,2,5)
 @V(7)
 
+! 入帳日期範圍
 #inputEntryDateMin=D,7,I
 E(0,#defaultEntryDateMin)
 @V(7)
 
+! 入帳日期範圍
 #inputEntryDateMax=D,7,I
 E(0,#defaultEntryDateMax)
 @V(7)
 
+! 催收人員
 #inputCollectorShow=X,6,I
 
 #inputCollector=X,6,S
 @C(4,#inputCollectorShow,T(3,999999),T(2,#inputCollectorShow))
 
+! 撥款日期
 #inputDrawdownDate=D,7,I
 T(3,0700101)
 @V(7)

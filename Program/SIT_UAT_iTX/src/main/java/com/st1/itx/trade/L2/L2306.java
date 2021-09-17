@@ -1,19 +1,24 @@
 package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.List;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.ReltMain;
 import com.st1.itx.db.domain.ReltMainId;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.ReltMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
@@ -33,12 +38,14 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2306 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2306.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public ReltMainService sReltMainService;
 
+	@Autowired
+	public FacCaseApplService sFacCaseApplService;
+	
 	@Autowired
 	public CustMainService sCustMainService;
 
@@ -65,91 +72,130 @@ public class L2306 extends TradeBuffer {
 			this.isEloan = true;
 		}
 
-		// tita功能1新增 2修改 4刪除 5查詢
 		int iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 
-		// tita借戶戶號CustId
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 
-		// tita案件編號CaseNo
 		int iCaseNo = parse.stringToInteger(titaVo.getParam("CaseNo"));
 
-		// tita統一編號CustId
 		String iRelId = titaVo.getParam("RelId");
-
+		String Ukey = "";
+		CustMain lCustMain = new CustMain();
+		
+		
+		
 		ReltMain tReltMain = new ReltMain();
-//		ReltMain tReltMain1 = new ReltMain();
+		List<ReltMain> tmplReltMain = new ArrayList<ReltMain>();
 
-//		tReltMain = sReltMainService.ReltIdFirst(iRelId, titaVo);
-//		tReltMain = sReltMainService.CaseNoFirst(iCaseNo, titaVo);
-		
-		//eloan resend
-		if (isEloan && iFunCd == 1) {
-			ReltMainId ReltMainIdVo = new ReltMainId();
-			ReltMainIdVo.setCaseNo(iCaseNo);
-			ReltMainIdVo.setCustNo(iCustNo);
-			ReltMainIdVo.setReltId(iRelId);
-			tReltMain.setReltMainId(ReltMainIdVo);
-			tReltMain = sReltMainService.findById(ReltMainIdVo);
-			if (tReltMain !=null) {
-				iFunCd = 2;
-			}
-		}
-		
+//		// eloan resend
+//		if (isEloan && iFunCd == 1) {
+//			ReltMainId ReltMainIdVo = new ReltMainId();
+//			ReltMainIdVo.setCaseNo(iCaseNo);
+//			ReltMainIdVo.setCustNo(iCustNo);
+//			ReltMainIdVo.setReltId(iRelId);
+//			tReltMain.setReltMainId(ReltMainIdVo);
+//			tReltMain = sReltMainService.findById(ReltMainIdVo);
+//			if (tReltMain != null) {
+//				iFunCd = 2;
+//			}
+//		}
+
 		// 新增
 		if (iFunCd == 1) {
 
-//			if (tReltMain != null) {
-//				throw new LogicException(titaVo, "E0002", "L2306 該案件編號" + iCaseNo + "已存在於關係人主檔。");
-//			}
-//			
-//			if (tReltMain != null) {
-//				throw new LogicException(titaVo, "E0002", "L2306 該統編" + iCustId + "已存在於關係人主檔。");
-//			}
+			lCustMain  = sCustMainService.custIdFirst(iRelId, titaVo);
+			
+			if( lCustMain == null ) {  // 沒在客戶檔 同步新增資料到客戶檔
+	    		Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+	    		// PK
+	    		
+	    		tReltMain = new ReltMain();
 
-			tReltMain = new ReltMain();
+				ReltMainId ReltMainIdVo = new ReltMainId();
+				ReltMainIdVo.setCaseNo(iCaseNo);
+				ReltMainIdVo.setCustNo(iCustNo);
+				ReltMainIdVo.setReltUKey(Ukey);
+				tReltMain.setReltMainId(ReltMainIdVo);
 
-			ReltMainId ReltMainIdVo = new ReltMainId();
-			ReltMainIdVo.setCaseNo(iCaseNo);
-			ReltMainIdVo.setCustNo(iCustNo);
-			ReltMainIdVo.setReltId(iRelId);
-			tReltMain.setReltMainId(ReltMainIdVo);
+				tReltMain.setReltCode(titaVo.getParam("PosInd"));
+				tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
+				tReltMain.setReltmark(titaVo.getParam("Remark"));
+				/* 存入DB */
 
-			// tita值塞進table
-			tReltMain.setReltId(titaVo.getParam("RelId"));
-			tReltMain.setReltName(titaVo.getParam("RelName"));
-			tReltMain.setReltCode(titaVo.getParam("PosInd"));
-			tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
-			tReltMain.setReltmark(titaVo.getParam("Remark"));
+				try {
+					sReltMainService.insert(tReltMain);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
+				}
+	    		
+	    		// new table 
+	    		CustMain tCustMain = new CustMain();
+	    		tCustMain.setCustUKey(Ukey);
+	    		tCustMain.setCustId(iRelId);
+	    		tCustMain.setCustName(titaVo.getParam("RelName"));
+	    		tCustMain.setDataStatus(1);
+	    		tCustMain.setTypeCode(4);
+	    		try {
+	    			sCustMainService.insert(tCustMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "客戶資料主檔");
+				}
+	    		
+//	    		/*需加丟訊息  要至客戶資料主檔補件資料*/
+//	    		this.totaVo.putParam("OWarningMsg", "需至顧客明細資料補件資料");
+	    		
+	    	} else { // 有在客戶檔 
+	    		Ukey = lCustMain.getCustUKey();
+	    		tReltMain = new ReltMain();
 
-			/* 存入DB */
+				ReltMainId ReltMainIdVo = new ReltMainId();
+				ReltMainIdVo.setCaseNo(iCaseNo);
+				ReltMainIdVo.setCustNo(iCustNo);
+				ReltMainIdVo.setReltUKey(Ukey);
+				tReltMain.setReltMainId(ReltMainIdVo);
+				tReltMain.setCaseNo(iCaseNo);
+				tReltMain.setCustNo(iCustNo);
+				tReltMain.setReltUKey(Ukey);
+				tReltMain.setReltCode(titaVo.getParam("PosInd"));
+				tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
+				tReltMain.setReltmark(titaVo.getParam("Remark"));
+				/* 存入DB */
 
-			try {
-				sReltMainService.insert(tReltMain);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
-			}
+				try {
+					sReltMainService.insert(tReltMain);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
+				}
+	    		
+	    	} // else
+			
 			// 修改
 		} else if (iFunCd == 2) {
-			// 找ReltUKey
-//			tReltMain = sReltMainService.CaseNoFirst(iCaseNo, titaVo);
 
+			lCustMain  = sCustMainService.custIdFirst(iRelId, titaVo);
+			
+			if( lCustMain == null ) {
+				throw new LogicException("E0001", "客戶資料主檔");
+			} 
+			
+			Ukey = lCustMain.getCustUKey();
+			
 			ReltMainId ReltMainIdVo = new ReltMainId();
 			ReltMainIdVo.setCaseNo(iCaseNo);
 			ReltMainIdVo.setCustNo(iCustNo);
-			ReltMainIdVo.setReltId(iRelId);
+			ReltMainIdVo.setReltUKey(Ukey);
 			tReltMain.setReltMainId(ReltMainIdVo);
 			tReltMain = sReltMainService.holdById(ReltMainIdVo);
-			
+
 			if (tReltMain == null) {
 				throw new LogicException(titaVo, "E0003", "關係人主檔");
 			}
 
 			// 變更前
 			ReltMain beforeReltMain = (ReltMain) dataLog.clone(tReltMain);
-
-			tReltMain.setReltId(titaVo.getParam("RelId"));
-			tReltMain.setReltName(titaVo.getParam("RelName"));
+			tReltMain.setCaseNo(iCaseNo);
+			tReltMain.setCustNo(iCustNo);
+			tReltMain.setReltUKey(Ukey);
 			tReltMain.setReltCode(titaVo.getParam("PosInd"));
 			tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
 			tReltMain.setReltmark(titaVo.getParam("Remark"));
@@ -168,13 +214,18 @@ public class L2306 extends TradeBuffer {
 			// 刪除
 		} else if (iFunCd == 4) {
 
-			// 找ReltUKey
-//			tReltMain = sReltMainService.CaseNoFirst(iCaseNo, titaVo);
-
+			lCustMain  = sCustMainService.custIdFirst(iRelId, titaVo);
+			
+			if( lCustMain == null ) {
+				throw new LogicException("E0001", "客戶資料主檔");
+			}
+			
+			Ukey = lCustMain.getCustUKey();
+			
 			ReltMainId ReltMainIdVo = new ReltMainId();
 			ReltMainIdVo.setCaseNo(iCaseNo);
 			ReltMainIdVo.setCustNo(iCustNo);
-			ReltMainIdVo.setReltId(iRelId);
+			ReltMainIdVo.setReltUKey(Ukey);
 			tReltMain.setReltMainId(ReltMainIdVo);
 			tReltMain = sReltMainService.holdById(ReltMainIdVo);
 
@@ -187,11 +238,53 @@ public class L2306 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
-			// FunCd==5,查詢 無處理
-		} else if (iFunCd == 5) {
+			
+		} 
+		// 抓該戶號所有資料更新Finalfg
+		
+		int CreatDate = 0;
+		int tempcase = 0;
+		FacCaseAppl tFacCaseAppl = new FacCaseAppl();
+		Slice<ReltMain> slReltMain = sReltMainService.custNoEq(iCustNo, index, limit, titaVo);
+		tmplReltMain = slReltMain == null ? null : slReltMain.getContent();		
+		if(tmplReltMain != null) {
+		  for(ReltMain ttReltMain:tmplReltMain) {
+		    tFacCaseAppl = sFacCaseApplService.CreditSysNoFirst(ttReltMain.getCaseNo(), titaVo);
+		    if(tFacCaseAppl != null) {
+		      if(CreatDate < tFacCaseAppl.getApplDate()) {
+		        CreatDate = tFacCaseAppl.getApplDate();
+		        tempcase = ttReltMain.getCaseNo();
+		      }
+		    }
+		    tFacCaseAppl = new FacCaseAppl();
+		  }
+		  // 先全部清空再把最新的案件編號上"Y"
+		  for(ReltMain ttReltMain:tmplReltMain) {
+			
+			ReltMainId ReltMainIdVo = new ReltMainId();
+			ReltMainIdVo = ttReltMain.getReltMainId();
+			tReltMain = sReltMainService.holdById(ReltMainIdVo);
 
-		}
+			if (tReltMain == null) {
+				throw new LogicException(titaVo, "E0003", "關係人主檔案件記號錯誤");
+			}
 
+			tReltMain.setFinalFg("");
+			if(tempcase == tReltMain.getCaseNo()) {
+				tReltMain.setFinalFg("Y");
+			}
+
+			try {
+				// 修改
+				sReltMainService.update(tReltMain);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			
+			
+		  } // for
+		} // if
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

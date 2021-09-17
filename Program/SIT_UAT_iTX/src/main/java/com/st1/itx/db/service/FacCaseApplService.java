@@ -86,6 +86,15 @@ public interface FacCaseApplService {
   public FacCaseAppl caseApplGroupUKeyFirst(String groupUKey_0, int applNo_1, int applNo_2, TitaVo... titaVo);
 
   /**
+   * CreditSysNo =
+   *
+   * @param creditSysNo_0 creditSysNo_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice FacCaseAppl FacCaseAppl of List
+   */
+  public FacCaseAppl CreditSysNoFirst(int creditSysNo_0, TitaVo... titaVo);
+
+  /**
    * hold By FacCaseAppl
    * 
    * @param applNo key

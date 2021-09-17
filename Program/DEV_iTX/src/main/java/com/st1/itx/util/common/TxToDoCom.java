@@ -619,7 +619,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "MAIL00;Y;Y;Y;Y;-;L698A;     ;L4711;-;電子郵件";
 			break;
 		case "L4510":
-			settingValue = "L4510 ;-;C;-;-;Y;L698A;L4511;L4511;-;員工扣薪媒體製作";
+			settingValue = "L4510 ;-;C;-;-;Y;L698A;L4510;L4511;-;員工扣薪媒體製作";
 			break;
 		case "EMEP00":
 			settingValue = "EMEP00;-;C;-;-;-;L698A;L4200;L4200;-;員工扣薪入帳作業";

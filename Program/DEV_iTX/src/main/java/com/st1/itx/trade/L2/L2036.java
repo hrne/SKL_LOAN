@@ -10,7 +10,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.ReltMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ReltMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 
@@ -33,6 +35,10 @@ public class L2036 extends TradeBuffer {
 	@Autowired
 	public ReltMainService iReltMainService;
 
+	@Autowired
+	public CustMainService sCustMainService;
+
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2036 ");
@@ -50,6 +56,9 @@ public class L2036 extends TradeBuffer {
 		// 取tita案件編號
 		int iCaseNo =Integer.valueOf(titaVo.getParam("CaseNo"));
 		
+		CustMain lCustMain = new CustMain();
+		
+		String Ukey = "";
 		
 		Slice<ReltMain> iReltMain = null;
 		if (iCustNo != 0) {
@@ -66,8 +75,18 @@ public class L2036 extends TradeBuffer {
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOCaseNo", rReltMain.getCaseNo());
 			occursList.putParam("OOCustNo", rReltMain.getCustNo());
-			occursList.putParam("OOReltId", rReltMain.getReltId());
-			occursList.putParam("OORelName", rReltMain.getReltName());
+			
+			Ukey = rReltMain.getReltUKey();
+			
+			lCustMain  = sCustMainService.findById(Ukey, titaVo);
+			
+			if( lCustMain == null ) {
+				throw new LogicException("E0001", "客戶資料主檔");
+			}
+			
+			occursList.putParam("OOReltId", lCustMain.getCustId());
+			occursList.putParam("OORelName", lCustMain.getCustName());
+			
 			occursList.putParam("OOPosInd", rReltMain.getReltCode());
 			occursList.putParam("OORemarkType", rReltMain.getRemarkType());
 			occursList.putParam("OORemark", rReltMain.getReltmark());

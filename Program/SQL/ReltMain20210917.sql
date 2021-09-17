@@ -3,8 +3,7 @@ drop table "ReltMain" purge;
 create table "ReltMain" (
   "CaseNo" decimal(7, 0) default 0 not null,
   "CustNo" decimal(7, 0) default 0 not null,
-  "ReltId" varchar2(10),
-  "ReltName" nvarchar2(100),
+  "ReltUKey" varchar2(32),
   "ReltCode" varchar2(2),
   "RemarkType" nvarchar2(1),
   "Reltmark" nvarchar2(100),
@@ -16,19 +15,18 @@ create table "ReltMain" (
   "LastUpdateEmpNo" varchar2(6)
 );
 
-alter table "ReltMain" add constraint "ReltMain_PK" primary key("CaseNo", "CustNo", "ReltId");
+alter table "ReltMain" add constraint "ReltMain_PK" primary key("CaseNo", "CustNo", "ReltUKey");
 
 create index "ReltMain_Index1" on "ReltMain"("CaseNo" asc);
 
 create index "ReltMain_Index2" on "ReltMain"("CustNo" asc);
 
-create index "ReltMain_Index3" on "ReltMain"("ReltId" asc);
+create index "ReltMain_Index3" on "ReltMain"("ReltUKey" asc);
 
 comment on table "ReltMain" is '借款戶關係人/關係企業主檔';
 comment on column "ReltMain"."CaseNo" is 'eLoan案件編號';
 comment on column "ReltMain"."CustNo" is '借戶人戶號';
-comment on column "ReltMain"."ReltId" is '關係人身分證字號';
-comment on column "ReltMain"."ReltName" is '關係人姓名';
+comment on column "ReltMain"."ReltUKey" is '關係人客戶識別碼';
 comment on column "ReltMain"."ReltCode" is '關係';
 comment on column "ReltMain"."RemarkType" is '備註類型';
 comment on column "ReltMain"."Reltmark" is '備註';
