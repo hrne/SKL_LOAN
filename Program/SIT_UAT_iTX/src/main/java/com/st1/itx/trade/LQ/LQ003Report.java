@@ -112,7 +112,7 @@ public class LQ003Report extends MakeReport {
 
 		try {
 			// 當季
-			findList = LQ003ServiceImpl.findAll(titaVo, inputYearMonth1);
+			findList = LQ003ServiceImpl.findAll(titaVo, inputYearMonth2);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -120,7 +120,7 @@ public class LQ003Report extends MakeReport {
 		}
 		try {
 			// 上季
-			findList2 = LQ003ServiceImpl.findAll(titaVo, inputYearMonth2);
+			findList2 = LQ003ServiceImpl.findAll(titaVo, inputYearMonth1);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));

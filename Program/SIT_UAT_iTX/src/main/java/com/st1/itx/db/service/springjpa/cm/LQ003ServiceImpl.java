@@ -59,15 +59,14 @@ public class LQ003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"CdCity\" CC";
 		sql += " LEFT JOIN (SELECT M.\"AcctCode\" ";
 		sql += "                 , M.\"OvduTerm\" ";
-		sql += "                 , NVL(M.\"EntCode\", '1') AS \"EntCode\" ";
-		sql += "                 , LPAD(M.\"CityCode\",2,0) AS \"CityCode\" ";
+		sql += "                 , LPAD(M.\"CityCode\",2,'0') AS \"CityCode\" ";
 		sql += "                 , 1 AS \"Cnt\" ";
 		sql += "                 , M.\"PrinBalance\" ";
 		sql += "            FROM \"MonthlyFacBal\" M ";
 		sql += "            WHERE M.\"YearMonth\" = :inputYearMonth ";
 		sql += "              AND M.\"PrinBalance\" > 0 ";
-		sql += "              AND NVL(M.\"EntCode\", '1') != '1' ";
-		sql += "              AND M.\"CityCode\" != 0 ";
+		sql += "              AND NVL(M.\"EntCode\", '0') != '1' ";
+		sql += "              AND LPAD(M.\"CityCode\",2,'0') != '00' ";
 		sql += "           ) M ON M.\"CityCode\" = CC.\"CityCode\" ";
 		sql += " GROUP BY CC.\"CityItem\" ";
 		sql += "        , CC.\"CityCode\" ";

@@ -198,7 +198,7 @@ T(H,#OORepayCode,#RepayCodeHelp)
 E(0,2)
 
 #OOBUF2=X,100,S
-T(2,2+#OOYearMonth+#OOCustNo+#OOFacmNo+#OOUsageCode+#OOAcctCode+#OORepayCode+#OOLoanAmt+#OOLoanBal+#OOFirstDrawdownDate+#OOMaturityDate+#OOYearlyInt+#OOHouseBuyDate)
+T(2,2+#OOYearMonth+#OOCustNo+#OOFacmNo+#OOUsageCode)
 
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L5812;text=修改;ntxbuf=#OOBUF2})
@@ -208,7 +208,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L5812;text=修改;ntxbuf=#OOBUF2})
 E(0,4)
 
 #OOBUF4=X,100,S
-T(2,4+#OOYearMonth+#OOCustNo+#OOFacmNo+#OOUsageCode+#OOAcctCode+#OORepayCode+#OOLoanAmt+#OOLoanBal+#OOFirstDrawdownDate+#OOMaturityDate+#OOYearlyInt+#OOHouseBuyDate)
+T(2,4+#OOYearMonth+#OOCustNo+#OOFacmNo+#OOUsageCode)
 
 #OOBTN4=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L5812;text=刪除;ntxbuf=#OOBUF4})

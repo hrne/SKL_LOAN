@@ -76,17 +76,6 @@ public interface ReltMainService {
   public Slice<ReltMain> custNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CaseNo = ,AND CustNo = ,AND ReltId = 
-   *
-   * @param caseNo_0 caseNo_0
-   * @param custNo_1 custNo_1
-   * @param reltId_2 reltId_2
-   * @param titaVo Variable-Length Argument
-   * @return Slice ReltMain ReltMain of List
-   */
-  public ReltMain caseNoCustNoReltIdFirst(int caseNo_0, int custNo_1, String reltId_2, TitaVo... titaVo);
-
-  /**
    * CustNo =
    *
    * @param custNo_0 custNo_0
@@ -117,15 +106,6 @@ public interface ReltMainService {
    * @return Slice ReltMain ReltMain of List
    */
   public Slice<ReltMain> findByBoth(int caseNo_0, int custNo_1, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * ReltName =
-   *
-   * @param reltName_0 reltName_0
-   * @param titaVo Variable-Length Argument
-   * @return Slice ReltMain ReltMain of List
-   */
-  public ReltMain reltnameFirst(String reltName_0, TitaVo... titaVo);
 
   /**
    * hold By ReltMain

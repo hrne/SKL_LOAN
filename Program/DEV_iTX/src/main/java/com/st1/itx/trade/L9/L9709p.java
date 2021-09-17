@@ -13,25 +13,24 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
-@Service("L9709p")
-@Scope("prototype")
 /**
  * 
  * 
  * @author Eric Chang
  * @version 1.0.0
  */
+@Service("L9709p")
+@Scope("prototype")
 public class L9709p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9709p.class);
 
 	@Autowired
 	public L9709Report l9709Report;
 
 	@Autowired
 	DateUtil dDateUtil;
-  
+
 	@Autowired
-	public WebClient webClient;
+	WebClient webClient;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -45,8 +44,8 @@ public class L9709p extends TradeBuffer {
 
 		l9709Report.exec(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), "L9709暫收放貸核心傳票檔資料已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				"L9709暫收放貸核心傳票檔資料已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

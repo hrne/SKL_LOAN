@@ -10,24 +10,23 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 
-@Service("L9709")
-@Scope("prototype")
 /**
- * 
+ * L9709
  * 
  * @author Eric Chang
  * @version 1.0.0
  */
+@Service("L9709")
+@Scope("prototype")
 public class L9709 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9709.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L9709 ");
 		this.totaVo.init(titaVo);
- 
+
 		MySpring.newTask("L9709p", this.txBuffer, titaVo);
- 
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

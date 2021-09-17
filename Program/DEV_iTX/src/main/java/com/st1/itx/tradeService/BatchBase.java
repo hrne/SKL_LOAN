@@ -103,6 +103,10 @@ public abstract class BatchBase {
 			logger = LoggerFactory.getLogger(name);
 		this.loggerFg = loggerFg != null && loggerFg.equals("1") ? true : false;
 	}
+	
+	public void mustInfo(String msg) {
+		logger.info(msg);
+	}
 
 	public void info(String msg) {
 		if (loggerFg)

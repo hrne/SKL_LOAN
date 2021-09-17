@@ -111,46 +111,12 @@ T(1,#NTXBUF,14,3)
 #CHAIN_UsageCode=A,2,S
 T(1,#NTXBUF,17,2)
 
-#CHAIN_AcctCode=A,3,S
-T(1,#NTXBUF,19,3)
-
-#CHAIN_RepayCode=A,2,S
-T(1,#NTXBUF,22,2)
-
-#CHAIN_LoanAmt=m,14,S
-T(1,#NTXBUF,24,14)
-
-#CHAIN_LoanBal=m,14,S
-T(1,#NTXBUF,38,14)
-
-#CHAIN_FirstDrawdownDate=D,7,S
-T(1,#NTXBUF,52,7)
-
-#CHAIN_MaturityDate=D,7,S
-T(1,#NTXBUF,59,7)
-
-#CHAIN_YearlyInt=M,14,S
-T(1,#NTXBUF,66,14)
-
-#CHAIN_HouseBuyDate=D,7,S
-T(1,#NTXBUF,80,7)
-
 #CHAINSET=X,1,S
-C(3,#CHAIN,1,$,S)
-T(2,@FuncCode,#CHAIN_FuncCode)
-C(3,#FuncCode,1,S,$)
-T(2,@YearMonth,#CHAIN_YearMonth)
-T(2,@CustNo,#CHAIN_CustNo)
-T(2,@FacmNo,#CHAIN_FacmNo)
+E(0,@FuncCode,#CHAIN_FuncCode)
+E(0,@YearMonth,#CHAIN_YearMonth)
+E(0,@CustNo,#CHAIN_CustNo)
+E(0,@FacmNo,#CHAIN_FacmNo)
 T(2,@UsageCode,#CHAIN_UsageCode)
-T(2,@AcctCode,#CHAIN_AcctCode)
-T(2,@RepayCode,#CHAIN_RepayCode)
-T(2,@LoanAmt,#CHAIN_LoanAmt)
-T(2,@LoanBal,#CHAIN_LoanBal)
-T(2,@FirstDrawdownDate,#CHAIN_FirstDrawdownDate)
-T(2,@MaturityDate,#CHAIN_MaturityDate)
-T(2,@YearlyInt,#CHAIN_YearlyInt)
-T(2,@HouseBuyDate,#CHAIN_HouseBuyDate)
 
 
 #CHK=X,1,S
@@ -199,12 +165,32 @@ T(2,@FdHouseBuyDate,#WKSTAR1)
                                
 #YearMonth=A,5,L
 #CustNo=A,7,L
-#FacmNo=9,3,L
+#FacmNo=A,3,L
 
 #UsageCode=X,3,L
 
 #UsageCodeX=X,20,L
 T(H,#UsageCode,#UsageCodeHelp)
+
+#SendL5R41=X,1,S
+E(0,@RimFuncCode,5)
+E(0,@RimYearMonth,#CHAIN_YearMonth)
+E(0,@RimCustNo,#CHAIN_CustNo)
+E(0,@RimFacmNo,#CHAIN_FacmNo)
+T(2,@RimUsageCode,#CHAIN_UsageCode)
+RESET_RIM(#SendL5R41,L5R41)
+S(L5R41,1,#RimFuncCode,#RimYearMonth,#RimCustNo,#RimFacmNo,#RimUsageCode)
+R(1,L5R41)
+
+#RIMSET=X,1,S
+E(0,@AcctCode,#L5R41AcctCode)
+E(0,@RepayCode,#L5R41RepayCode)
+E(0,@LoanAmt,#L5R41LoanAmt)
+E(0,@LoanBal,#L5R41LoanBal)
+E(0,@FirstDrawdownDate,#L5R41FirstDrawdownDate)
+E(0,@MaturityDate,#L5R41MaturityDate)
+E(0,@YearlyInt,#L5R41YearlyInt)
+E(0,@HouseBuyDate,#L5R41HouseBuyDate)
 
 !業務科目
 #AcctCode=A,3,I
@@ -263,13 +249,14 @@ E(0,1)ASGN(AGAIN$)
 #RPTFG=A,1,S
 E(0,0)
 
-<include src="ROM.icf::L0Rim.dec"/>
-
+<include src="ROM.icf::L5R41.dec"/>
+<include src="ROM.icf::L5R41Rim.dec"/>
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
+
 </sub>
 
 !---------- TXFORM = L5812 ----------
@@ -310,6 +297,7 @@ TXFORM=L5812
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L5R41.tom"/>
 
 </sub>
 

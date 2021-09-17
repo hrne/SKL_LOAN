@@ -2,13 +2,9 @@ package com.st1.itx.trade.L9;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +17,7 @@ import com.st1.itx.util.common.MakeReport;
 @Component
 @Scope("prototype")
 public class L9709Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9709Report.class);
+
 	@Autowired
 	L9709ServiceImpl l9709ServiceImpl;
 
@@ -29,7 +25,7 @@ public class L9709Report extends MakeReport {
 	private String nowDate;
 	// 製表時間
 	private String nowTime;
- 
+
 	@Override
 	public void printHeader() {
 
@@ -62,7 +58,10 @@ public class L9709Report extends MakeReport {
 			this.info("L9709Report findAll =" + l9709List.toString());
 
 			for (Map<String, String> tL9709Vo : l9709List) {
-				report1(tL9709Vo);
+				this.print(1, 1, tL9709Vo.get("F0"));
+				this.print(0, 27, formatAmt(tL9709Vo.get("F1"), 0), "R");
+				this.print(0, 45, formatAmt(tL9709Vo.get("F2"), 0), "R");
+				this.print(0, 63, formatAmt(tL9709Vo.get("F3"), 0), "R");
 			}
 
 		} catch (Exception e) {
@@ -75,16 +74,6 @@ public class L9709Report extends MakeReport {
 
 		// 測試用
 		this.toPdf(sno);
-	}
-
-	private void report1(Map<String, String> tL9709Vo) throws LogicException {
-		DecimalFormat df = new DecimalFormat("#,##0");
-		BigDecimal tdAmt = tL9709Vo.get("F3") == null || tL9709Vo.get("F3").length() == 0 ? BigDecimal.ZERO
-				: new BigDecimal(tL9709Vo.get("F3"));
-		this.print(1, 1, tL9709Vo.get("F0"));
-		this.print(0, 27, showAmt(tL9709Vo.get("F1")), "R");
-		this.print(0, 45, showAmt(tL9709Vo.get("F2")), "R");
-		this.print(0, 63, df.format(tdAmt), "R");
 	}
 
 	// 顯示民國年
@@ -114,15 +103,6 @@ public class L9709Report extends MakeReport {
 		} else {
 			return rocdatex;
 		}
-	}
-
-	private String showAmt(String xamt) {
-		this.info("MakeReport.toPdf showRocDate1 = " + xamt);
-		if (xamt == null || xamt.equals("") || xamt.equals("0")) {
-			return "";
-		}
-		int amt = Integer.valueOf(xamt);
-		return String.format("%,d", amt);
 	}
 
 }

@@ -41,7 +41,7 @@ K(MODIFYBUTTON,查詢)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L4923]                                 還款帳號變更含還款方式紀錄查詢"],
+["[L4923]                                 還款帳號及還款方式變更紀錄查詢"],
 ["#FdCustNo+借款人戶號",#CustNo,#CustNoX],
 ["#FdCustId+額度編號",#FacmNo],
 ]
@@ -147,7 +147,7 @@ XMT()
 
 
 #SCRTIL=_,_,S
-T(3,[L4923] 還款帳號變更含還款方式紀錄查詢)
+T(3,[L4923] 還款帳號及還款方式變更紀錄查詢)
 
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
@@ -212,7 +212,7 @@ TXFORM=L4923
 </sub>
 <sub type="PART" name="L4923" layout="cols=1;screen.width=[200,800];printer.width=[15,30,15,30]">
 [
-["[L4923]                                 還款帳號變更含還款方式紀錄查詢"],
+["[L4923]                                 還款帳號及還款方式變更紀錄查詢"],
 [#<->#,"@借款人戶號",#OCustNo,#OCustNoX],
 [#<->#,"@額度編號",#OFacmNo],
 ]

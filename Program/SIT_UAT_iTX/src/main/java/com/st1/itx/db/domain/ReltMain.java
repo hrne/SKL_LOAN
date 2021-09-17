@@ -28,7 +28,7 @@ public class ReltMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -9059326639063348120L;
+	private static final long serialVersionUID = -289501039403663992L;
 
 @EmbeddedId
   private ReltMainId reltMainId;
@@ -62,6 +62,10 @@ public class ReltMain implements Serializable {
   // 備註
   @Column(name = "`Reltmark`", length = 100)
   private String reltmark;
+
+  // 最新案件記號
+  @Column(name = "`FinalFg`", length = 1)
+  private String finalFg;
 
   // 申請日期
   @Column(name = "`ApplDate`")
@@ -264,6 +268,25 @@ public class ReltMain implements Serializable {
   }
 
 /**
+	* 最新案件記號<br>
+	* 
+	* @return String
+	*/
+  public String getFinalFg() {
+    return this.finalFg == null ? "" : this.finalFg;
+  }
+
+/**
+	* 最新案件記號<br>
+	* 
+  *
+  * @param finalFg 最新案件記號
+	*/
+  public void setFinalFg(String finalFg) {
+    this.finalFg = finalFg;
+  }
+
+/**
 	* 申請日期<br>
 	* 
 	* @return Integer
@@ -362,7 +385,7 @@ public class ReltMain implements Serializable {
   @Override
   public String toString() {
     return "ReltMain [reltMainId=" + reltMainId + ", reltName=" + reltName + ", reltCode=" + reltCode + ", remarkType=" + remarkType
-           + ", reltmark=" + reltmark + ", applDate=" + applDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", reltmark=" + reltmark + ", finalFg=" + finalFg + ", applDate=" + applDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -88,84 +88,235 @@ public class L2903 extends TradeBuffer {
 		
 		CustMain tCustMain = new CustMain();
 		
-		ReltMain tReltMain = new ReltMain();
-		
 		// new ArrayList
+		List<CustMain> tmplCustMain = new ArrayList<CustMain>();
+		List<ReltMain> tmplReltMain = new ArrayList<ReltMain>();
 		List<LoanBorMain> tmplLoanBorMain = new ArrayList<LoanBorMain>();
 		
-		// 必須輸入,不得為空白且須存在於顧客檔,不存在,拋錯
-		Boolean inflag = false;
+
+		Boolean checkfg = true;
 		if ("".equals(iCustId)) {
-
-			tReltMain = sReltMainService.reltnameFirst(iCustName, titaVo);
+			Slice<CustMain> slCustMain = sCustMainService.custNameEq(iCustName, index, limit, titaVo);
+			tmplCustMain = slCustMain == null ? null : slCustMain.getContent();
 			
-			if (tReltMain == null) {
-				throw new LogicException("E0001", "借款戶關係人/關係企業主檔");
+			if(tmplCustMain == null) {
+				throw new LogicException("E0001", "客戶資料主檔");
 			}
+			
+			for(CustMain ttCustMain : tmplCustMain) {
+				String tCustId = ttCustMain.getCustId();
+				
+				tCustMain = sCustMainService.custIdFirst(tCustId, titaVo);
+				
+				int tCustNo = tCustMain.getCustNo();
+				
+				Slice<ReltMain> slReltMain = sReltMainService.custNoEq(tCustNo, index, limit, titaVo);
+				tmplReltMain = slReltMain == null ? null : slReltMain.getContent();
+				if(tmplReltMain == null) {
+					continue;
+				}
+				for( ReltMain tReltMain: tmplReltMain) {
+					
+					String RelId = tReltMain.getReltId();
+					CustMain tmpCustMain = sCustMainService.custIdFirst(RelId, titaVo);
+					if (tmpCustMain == null) {
+						continue;
+					} // if
+					
+					// 存在檢查放款主檔
+					int custNo = tmpCustMain.getCustNo();
+		
+					if (custNo > 0) {
+						// 取放款主檔所有該戶號資料
+						Slice<LoanBorMain> stmplLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 900, 0, Integer.MAX_VALUE, titaVo);
+						tmplLoanBorMain = stmplLoanBorMain == null ? null : stmplLoanBorMain.getContent();
+					}
+		
+					// 查無資料拋錯
+					if (tmplLoanBorMain == null || custNo == 0) {
+						continue;
+					}
+		
+					this.info("custNo = " + custNo);
+					this.info("tmplLoanBorMain SIZE  = " + tmplLoanBorMain.size());
+					for (LoanBorMain tmpLoanBorMain : tmplLoanBorMain) {
+						checkfg = false;
+						// new TABLE
+						tCustMain = new CustMain();
+		
+						// 取額度主檔資料
+						tFacMain = sFacMainService.findById(new FacMainId(tmpLoanBorMain.getCustNo(), tmpLoanBorMain.getFacmNo()), titaVo);
+						if (tFacMain == null) {
+							tFacMain = new FacMain();
+						}
+						// 取關聯戶統編 姓名
+						tCustMain = sCustMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
+						if (tCustMain == null) {
+							tCustMain = new CustMain();
+						}
+		
+						// new occurs
+						OccursList occurslist = new OccursList();
+		
+						occurslist.putParam("OOCustId", tmpCustMain.getCustId());
+						occurslist.putParam("OOCustName", tmpCustMain.getCustName());
+						occurslist.putParam("OOApplNo", tFacMain.getApplNo());
+						occurslist.putParam("OOCustNo", tFacMain.getCustNo());
+						occurslist.putParam("OOFacmNo", tFacMain.getFacmNo());
+						occurslist.putParam("OOBormNo", tmpLoanBorMain.getBormNo());
+						occurslist.putParam("OOLineAmt", tFacMain.getLineAmt());
+						occurslist.putParam("OORate", tmpLoanBorMain.getApproveRate());
+						occurslist.putParam("OOLoanBal", tmpLoanBorMain.getLoanBal());
+		
+						/* 將每筆資料放入Tota的OcList */
+						this.totaVo.addOccursList(occurslist);
+					} // for
+					
+				} // for
+			} // for
 		} else {
-			tReltMain = sReltMainService.reltIdFirst(iCustId, titaVo);
-			if (tReltMain == null) {
-				throw new LogicException("E0001", "借款戶關係人/關係企業主檔");
-			}
-		}
-
-		String RelId = tReltMain.getReltId();
-		CustMain tmpCustMain = sCustMainService.custIdFirst(RelId, titaVo);
-
-		// 多筆關聯人統編是否存在於客戶資料主檔
-		if (tmpCustMain == null) {
-			throw new LogicException("E0001", "客戶資料主檔");
-		} // if
+			
+			tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+			
+			int tCustNo = tCustMain.getCustNo();
+			
+			Slice<ReltMain> slReltMain = sReltMainService.custNoEq(tCustNo, index, limit, titaVo);
+			
+			tmplReltMain = slReltMain == null ? null : slReltMain.getContent();
+			for( ReltMain tReltMain: tmplReltMain) {
+				String RelId = tReltMain.getReltId();
+				CustMain tmpCustMain = sCustMainService.custIdFirst(RelId, titaVo);
+				if (tmpCustMain == null) {
+					continue;
+				} // if
+				
+				// 存在檢查放款主檔
+				int custNo = tmpCustMain.getCustNo();
+	
+				if (custNo > 0) {
+					// 取放款主檔所有該戶號資料
+					Slice<LoanBorMain> stmplLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 900, 0, Integer.MAX_VALUE, titaVo);
+					tmplLoanBorMain = stmplLoanBorMain == null ? null : stmplLoanBorMain.getContent();
+				}
+	
+				// 查無資料拋錯
+				if (tmplLoanBorMain == null || custNo == 0) {
+					continue;
+				}
+	
+				this.info("custNo = " + custNo);
+				this.info("tmplLoanBorMain SIZE  = " + tmplLoanBorMain.size());
+				for (LoanBorMain tmpLoanBorMain : tmplLoanBorMain) {
+					// new TABLE
+					checkfg = false;
+					tCustMain = new CustMain();
+	
+					// 取額度主檔資料
+					tFacMain = sFacMainService.findById(new FacMainId(tmpLoanBorMain.getCustNo(), tmpLoanBorMain.getFacmNo()), titaVo);
+					if (tFacMain == null) {
+						tFacMain = new FacMain();
+					}
+					// 取關聯戶統編 姓名
+					tCustMain = sCustMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
+					if (tCustMain == null) {
+						tCustMain = new CustMain();
+					}
+	
+					// new occurs
+					OccursList occurslist = new OccursList();
+	
+					occurslist.putParam("OOCustId", tmpCustMain.getCustId());
+					occurslist.putParam("OOCustName", tmpCustMain.getCustName());
+					occurslist.putParam("OOApplNo", tFacMain.getApplNo());
+					occurslist.putParam("OOCustNo", tFacMain.getCustNo());
+					occurslist.putParam("OOFacmNo", tFacMain.getFacmNo());
+					occurslist.putParam("OOBormNo", tmpLoanBorMain.getBormNo());
+					occurslist.putParam("OOLineAmt", tFacMain.getLineAmt());
+					occurslist.putParam("OORate", tmpLoanBorMain.getApproveRate());
+					occurslist.putParam("OOLoanBal", tmpLoanBorMain.getLoanBal());
+	
+					/* 將每筆資料放入Tota的OcList */
+					this.totaVo.addOccursList(occurslist);
+				} // for
+				
+			} // for
+		} // else 
 		
-		// 存在檢查放款主檔
-		int custNo = tmpCustMain.getCustNo();
-
-		if (custNo > 0) {
-			// 取放款主檔所有該戶號資料
-			Slice<LoanBorMain> stmplLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 900, 0, Integer.MAX_VALUE, titaVo);
-			tmplLoanBorMain = stmplLoanBorMain == null ? null : stmplLoanBorMain.getContent();
-		}
-		
-		// 查無資料拋錯
-		if (tmplLoanBorMain == null || custNo == 0) {
+		if(checkfg) {
 			throw new LogicException("E0001", "放款主檔");
 		}
 		
-		this.info("custNo = " + custNo);
-		this.info("tmplLoanBorMain SIZE  = " + tmplLoanBorMain.size());
-		inflag = true;
-		for (LoanBorMain tmpLoanBorMain : tmplLoanBorMain) {
-			// new TABLE
-			tCustMain = new CustMain();
-
-			// 取額度主檔資料
-			tFacMain = sFacMainService.findById(new FacMainId(tmpLoanBorMain.getCustNo(), tmpLoanBorMain.getFacmNo()), titaVo);
-			if (tFacMain == null) {
-				tFacMain = new FacMain();
-			}
-			// 取關聯戶統編 姓名
-			tCustMain = sCustMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
-			if (tCustMain == null) {
-				tCustMain = new CustMain();
-			}
-
-			// new occurs
-			OccursList occurslist = new OccursList();
-
-			occurslist.putParam("OOCustId", tmpCustMain.getCustId());
-			occurslist.putParam("OOCustName", tmpCustMain.getCustName());
-			occurslist.putParam("OOApplNo", tFacMain.getApplNo());
-			occurslist.putParam("OOCustNo", tFacMain.getCustNo());
-			occurslist.putParam("OOFacmNo", tFacMain.getFacmNo());
-			occurslist.putParam("OOBormNo", tmpLoanBorMain.getBormNo());
-			occurslist.putParam("OOLineAmt", tFacMain.getLineAmt());
-			occurslist.putParam("OORate", tmpLoanBorMain.getApproveRate());
-			occurslist.putParam("OOLoanBal", tmpLoanBorMain.getLoanBal());
-
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occurslist);
-		} // for
 		
+//		if ("".equals(iCustId)) {
+//
+//			tReltMain = sReltMainService.reltnameFirst(iCustName, titaVo);
+//			
+//			if (tReltMain == null) {
+//				throw new LogicException("E0001", "借款戶關係人/關係企業主檔");
+//			}
+//		} else {
+//			tReltMain = sReltMainService.reltIdFirst(iCustId, titaVo);
+//			if (tReltMain == null) {
+//				throw new LogicException("E0001", "借款戶關係人/關係企業主檔");
+//			}
+//		}
+//
+//		String RelId = tReltMain.getReltId();
+//		CustMain tmpCustMain = sCustMainService.custIdFirst(RelId, titaVo);
+//
+//		// 多筆關聯人統編是否存在於客戶資料主檔
+//		if (tmpCustMain == null) {
+//			throw new LogicException("E0001", "客戶資料主檔");
+//		} // if
+//		
+//		// 存在檢查放款主檔
+//		int custNo = tmpCustMain.getCustNo();
+//
+//		if (custNo > 0) {
+//			// 取放款主檔所有該戶號資料
+//			Slice<LoanBorMain> stmplLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 900, 0, Integer.MAX_VALUE, titaVo);
+//			tmplLoanBorMain = stmplLoanBorMain == null ? null : stmplLoanBorMain.getContent();
+//		}
+//		
+//		// 查無資料拋錯
+//		if (tmplLoanBorMain == null || custNo == 0) {
+//			throw new LogicException("E0001", "放款主檔");
+//		}
+//		
+//		this.info("custNo = " + custNo);
+//		this.info("tmplLoanBorMain SIZE  = " + tmplLoanBorMain.size());
+//		for (LoanBorMain tmpLoanBorMain : tmplLoanBorMain) {
+//			// new TABLE
+//			tCustMain = new CustMain();
+//
+//			// 取額度主檔資料
+//			tFacMain = sFacMainService.findById(new FacMainId(tmpLoanBorMain.getCustNo(), tmpLoanBorMain.getFacmNo()), titaVo);
+//			if (tFacMain == null) {
+//				tFacMain = new FacMain();
+//			}
+//			// 取關聯戶統編 姓名
+//			tCustMain = sCustMainService.custNoFirst(tFacMain.getCustNo(), tFacMain.getCustNo(), titaVo);
+//			if (tCustMain == null) {
+//				tCustMain = new CustMain();
+//			}
+//
+//			// new occurs
+//			OccursList occurslist = new OccursList();
+//
+//			occurslist.putParam("OOCustId", tmpCustMain.getCustId());
+//			occurslist.putParam("OOCustName", tmpCustMain.getCustName());
+//			occurslist.putParam("OOApplNo", tFacMain.getApplNo());
+//			occurslist.putParam("OOCustNo", tFacMain.getCustNo());
+//			occurslist.putParam("OOFacmNo", tFacMain.getFacmNo());
+//			occurslist.putParam("OOBormNo", tmpLoanBorMain.getBormNo());
+//			occurslist.putParam("OOLineAmt", tFacMain.getLineAmt());
+//			occurslist.putParam("OORate", tmpLoanBorMain.getApproveRate());
+//			occurslist.putParam("OOLoanBal", tmpLoanBorMain.getLoanBal());
+//
+//			/* 將每筆資料放入Tota的OcList */
+//			this.totaVo.addOccursList(occurslist);
+//		} // for
+//		
 
 //
 //		for (CustRelDetail tmpCustRelDetail : lCustRelDetail) {

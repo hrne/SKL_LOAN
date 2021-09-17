@@ -16,9 +16,8 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 
-@Service("l9709ServiceImpl")
+@Service
 @Repository
-/* 逾期放款明細 */
 public class L9709ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -32,12 +31,11 @@ public class L9709ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-
-		this.info("L9709.findAll");
+	public List<Map<String, String>> findAll(TitaVo titaVo) {
 
 		String iDAY = String.valueOf(Integer.valueOf(titaVo.get("ACCTDATE")) + 19110000);
+
+		this.info("L9709ServiceImpl findAll iDAY = " + iDAY);
 
 		String sql = "  SELECT   A.\"AcNoCode\" F0";
 		sql += "              , SUM(A.\"DbAmt\") F1";
@@ -45,7 +43,7 @@ public class L9709ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              , SUM(A.\"TdBal\") F3";
 		sql += "         FROM   \"AcMain\" A";
 		sql += "         WHERE A.\"AcDate\"      = :iday ";
-		sql += "           AND A.\"AcNoCode\" IN ('20232020000', '20232180000' , '20232181000', '20232182000')";
+		sql += "           AND A.\"AcNoCode\" IN ('20222180000', '20222180100' , '20222180200')";
 		sql += "         GROUP BY A.\"AcNoCode\"";
 		sql += "         ORDER BY A.\"AcNoCode\"";
 
@@ -55,7 +53,7 @@ public class L9709ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iday", iDAY);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

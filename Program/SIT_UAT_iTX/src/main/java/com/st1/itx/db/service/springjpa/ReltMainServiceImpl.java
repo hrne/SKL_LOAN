@@ -204,25 +204,6 @@ em = null;
   }
 
   @Override
-  public ReltMain caseNoCustNoReltIdFirst(int caseNo_0, int custNo_1, String reltId_2, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("caseNoCustNoReltIdFirst " + dbName + " : " + "caseNo_0 : " + caseNo_0 + " custNo_1 : " +  custNo_1 + " reltId_2 : " +  reltId_2);
-    Optional<ReltMain> reltMainT = null;
-    if (dbName.equals(ContentName.onDay))
-      reltMainT = reltMainReposDay.findTopByCaseNoIsAndCustNoIsAndReltIdIs(caseNo_0, custNo_1, reltId_2);
-    else if (dbName.equals(ContentName.onMon))
-      reltMainT = reltMainReposMon.findTopByCaseNoIsAndCustNoIsAndReltIdIs(caseNo_0, custNo_1, reltId_2);
-    else if (dbName.equals(ContentName.onHist))
-      reltMainT = reltMainReposHist.findTopByCaseNoIsAndCustNoIsAndReltIdIs(caseNo_0, custNo_1, reltId_2);
-    else 
-      reltMainT = reltMainRepos.findTopByCaseNoIsAndCustNoIsAndReltIdIs(caseNo_0, custNo_1, reltId_2);
-
-    return reltMainT.isPresent() ? reltMainT.get() : null;
-  }
-
-  @Override
   public ReltMain custNoFirst(int custNo_0, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
@@ -295,25 +276,6 @@ em = null;
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public ReltMain reltnameFirst(String reltName_0, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("reltnameFirst " + dbName + " : " + "reltName_0 : " + reltName_0);
-    Optional<ReltMain> reltMainT = null;
-    if (dbName.equals(ContentName.onDay))
-      reltMainT = reltMainReposDay.findTopByReltNameIs(reltName_0);
-    else if (dbName.equals(ContentName.onMon))
-      reltMainT = reltMainReposMon.findTopByReltNameIs(reltName_0);
-    else if (dbName.equals(ContentName.onHist))
-      reltMainT = reltMainReposHist.findTopByReltNameIs(reltName_0);
-    else 
-      reltMainT = reltMainRepos.findTopByReltNameIs(reltName_0);
-
-    return reltMainT.isPresent() ? reltMainT.get() : null;
   }
 
   @Override

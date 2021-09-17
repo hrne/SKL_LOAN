@@ -75,7 +75,7 @@ public class L4922 extends TradeBuffer {
 		}
 
 		// 戶號查所有額度資料
-		slFacMain = facMainService.CustNoAll(wkCustNo, this.index, this.limit, titaVo);
+		slFacMain = facMainService.facmCustNoRange(wkCustNo, wkCustNo, 0, 999, this.index, this.limit, titaVo);
 		lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		// 如沒有找到資料
 		if (lFacMain == null || lFacMain.size() == 0) {
