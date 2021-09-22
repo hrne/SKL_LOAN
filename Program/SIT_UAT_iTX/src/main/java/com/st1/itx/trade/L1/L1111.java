@@ -15,6 +15,7 @@ import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.common.SendRsp;
 
 @Component("L1111")
 @Scope("prototype")
@@ -35,38 +36,51 @@ public class L1111 extends TradeBuffer {
 	
 	@Autowired
 	public DataLog iDataLog;
+	
+	@Autowired
+	public SendRsp sendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
+		
+		if (!titaVo.getHsupCode().equals("1")) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0101", "");
+		}
+		
 		String iCustIdBefore = titaVo.getParam("CustIdBefore");
 		String iCustIdAfter = titaVo.getParam("CustIdAfter");
 		String iMark = titaVo.getParam("Mark");
-		CustMain iCustMain = new CustMain();
-		CustMain uCustMain = new CustMain();
+		String iMarkX = titaVo.getParam("MarkX");
+
 		CdCode iCdCode = new CdCode();
 		String iItem = "";
-		iCustMain = iCustMainService.custIdFirst(iCustIdBefore, titaVo);
+		CustMain iCustMain = iCustMainService.custIdFirst(iCustIdBefore, titaVo);
 		if (iCustMain == null) {
-			throw new LogicException(titaVo, "E00071", "查無該統一編號");
+			throw new LogicException(titaVo, "E0003", "查無身份證號/統一編號 : " + iCustIdBefore);
 		}
 		
-		uCustMain = iCustMainService.holdById(iCustMain.getCustUKey(), titaVo);
+		CustMain iCustMain2 = iCustMainService.custIdFirst(iCustIdAfter, titaVo);
+		if (iCustMain2 != null) {
+			throw new LogicException(titaVo, "E0012", "調整後身份證號/統一編號 : " + iCustIdAfter);
+		}
+		
+		CustMain uCustMain = iCustMainService.holdById(iCustMain.getCustUKey(), titaVo);
 		CustMain beforeCustMain = (CustMain) iDataLog.clone(iCustMain);
 		uCustMain.setCustId(iCustIdAfter);
 		try {
-			iCustMainService.update(uCustMain, titaVo);
+			uCustMain = iCustMainService.update2(uCustMain, titaVo);
 		} catch (DBException e) {
-			throw new LogicException("E0007", "客戶聯絡電話檔");
+			throw new LogicException("E0007", "客戶主檔");
 		}
 		
-		iCdCode = iCdCodeService.getItemFirst(1, "CustMark", iMark, titaVo);
-		if (iCdCode != null) {
-			iItem = iCdCode.getItem();	
-		}
+//		iCdCode = iCdCodeService.getItemFirst(1, "CustMark", iMark, titaVo);
+//		if (iCdCode != null) {
+//			iItem = iCdCode.getItem();	
+//		}
 		// 紀錄變更前變更後
 		iDataLog.setEnv(titaVo, beforeCustMain, uCustMain);
-		iDataLog.exec(iItem);
+		iDataLog.exec(iMarkX);
 
 		this.addList(this.totaVo);
 		return this.sendList();

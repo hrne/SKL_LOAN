@@ -26,7 +26,6 @@ import com.st1.itx.db.domain.EmpDeductDtlId;
 import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.domain.EmpDeductMediaId;
 import com.st1.itx.db.domain.EmpDeductSchedule;
-import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
@@ -52,7 +51,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4510 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4510.class);
 
 	/* 日期工具 */
 	@Autowired
@@ -225,16 +223,13 @@ public class L4510 extends TradeBuffer {
 			this.info("iN15EntryDate ... " + iN15EntryDate);
 			this.info("iY15EntryDate ... " + iY15EntryDate);
 
-//			刪除應處理事項清單
-//			0.新增 1.刪除
-			txToDo(titaVo, 1);
 		} else {
 			throw new LogicException("E0001 ", "查無資料");
 		}
 
 //		先刪除舊資料
-		deleEmpDeductDtl(procCodeUn15, iN15EntryDate);
-		deleEmpDeductDtl(procCodeIs15, iY15EntryDate);
+		deleEmpDeductDtl(procCodeUn15, iN15EntryDate, titaVo);
+		deleEmpDeductDtl(procCodeIs15, iY15EntryDate, titaVo);
 
 		if (iY15EntryDate > 19110000) {
 			calculateY15BaTxCom(titaVo);
@@ -254,9 +249,9 @@ public class L4510 extends TradeBuffer {
 		Slice<EmpDeductDtl> sun15EmpDeductDtl = null;
 
 		sun15EmpDeductDtl = empDeductDtlService.entryDateRng(iN15EntryDate, iN15EntryDate, procCodeUn15, this.index,
-				this.limit);
+				this.limit, titaVo);
 		sis15EmpDeductDtl = empDeductDtlService.entryDateRng(iY15EntryDate, iY15EntryDate, procCodeIs15, this.index,
-				this.limit);
+				this.limit, titaVo);
 
 		is15EmpDeductDtl = sis15EmpDeductDtl == null ? null : sis15EmpDeductDtl.getContent();
 		un15EmpDeductDtl = sun15EmpDeductDtl == null ? null : sun15EmpDeductDtl.getContent();
@@ -264,7 +259,7 @@ public class L4510 extends TradeBuffer {
 		if (un15EmpDeductDtl != null && un15EmpDeductDtl.size() != 0) {
 			this.info("Un15 Dtl Start...");
 //			4.寫入EmpDeductMedia (彙總by戶號) 5:非15日
-			setEmpDeductMedia(un15EmpDeductDtl, 5);
+			setEmpDeductMedia(un15EmpDeductDtl, 5, titaVo);
 //			A B C
 //			火險費
 			try {
@@ -292,7 +287,7 @@ public class L4510 extends TradeBuffer {
 		if (is15EmpDeductDtl != null && is15EmpDeductDtl.size() != 0) {
 			this.info("Is15 Dtl Start...");
 //			4.寫入EmpDeductMedia (彙總by戶號) 4:15日
-			setEmpDeductMedia(is15EmpDeductDtl, 4);
+			setEmpDeductMedia(is15EmpDeductDtl, 4, titaVo);
 //			D E F
 //			火險費
 			try {
@@ -324,9 +319,6 @@ public class L4510 extends TradeBuffer {
 		totaVo.put("OReportD", "" + reportD);
 		totaVo.put("OReportE", "" + reportE);
 		totaVo.put("OReportF", "" + reportF);
-
-//		0.新增 1.刪除
-		txToDo(titaVo, 0);
 
 		sendMsg = "L4510-報表已完成";
 
@@ -529,10 +521,10 @@ public class L4510 extends TradeBuffer {
 //			暫收抵繳放入欠款之第一個撥款
 
 			CustMain tCustMain = new CustMain();
-			tCustMain = custMainService.custNoFirst(tmp.getCustNo(), tmp.getCustNo());
+			tCustMain = custMainService.custNoFirst(tmp.getCustNo(), tmp.getCustNo(), titaVo);
 
 			CdEmp tCdEmp = new CdEmp();
-			tCdEmp = cdEmpService.findById(tCustMain.getEmpNo());
+			tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);
 			this.info("tCdEmp.getAgType1() : " + tCdEmp.getAgType1());
 
 			CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tCdEmp.getAgType1(), titaVo);
@@ -608,7 +600,7 @@ public class L4510 extends TradeBuffer {
 //					jsonField.put(tmp2, jsonField.get(tmp2) + tempVo.getJsonString());
 //				} else {
 //					this.info("tempVo ... " + tempVo.getJsonString());
-					jsonField.put(tmp2, tempVo.getJsonString());
+				jsonField.put(tmp2, tempVo.getJsonString());
 //				}
 			}
 
@@ -702,7 +694,7 @@ public class L4510 extends TradeBuffer {
 			}
 
 			try {
-				empDeductDtlService.insert(tEmpDeductDtl);
+				empDeductDtlService.insert(tEmpDeductDtl, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "員工扣薪檔新增失敗 :" + e.getErrorMsg());
 			}
@@ -732,7 +724,7 @@ public class L4510 extends TradeBuffer {
 	}
 
 //		[flag = 4:15日 ; 5:非15日]
-	private void setEmpDeductMedia(List<EmpDeductDtl> lEmpDeductDtl, int flag) throws LogicException {
+	private void setEmpDeductMedia(List<EmpDeductDtl> lEmpDeductDtl, int flag, TitaVo titaVo) throws LogicException {
 
 		this.info("setEmpDeductMedia Start... ");
 
@@ -789,7 +781,7 @@ public class L4510 extends TradeBuffer {
 		Slice<EmpDeductMedia> delesEmpDeductMedia = null;
 
 		delesEmpDeductMedia = empDeductMediaService.mediaDateRng(this.getTxBuffer().getTxCom().getTbsdyf(),
-				this.getTxBuffer().getTxCom().getTbsdyf(), "" + flag, this.index, this.limit);
+				this.getTxBuffer().getTxCom().getTbsdyf(), "" + flag, this.index, this.limit, titaVo);
 
 		deleEmpDeductMedia = delesEmpDeductMedia == null ? null : delesEmpDeductMedia.getContent();
 
@@ -798,7 +790,7 @@ public class L4510 extends TradeBuffer {
 				throw new LogicException("E0008", "已入帳");
 			}
 			try {
-				empDeductMediaService.deleteAll(deleEmpDeductMedia);
+				empDeductMediaService.deleteAll(deleEmpDeductMedia, titaVo);
 			} catch (DBException e1) {
 				throw new LogicException("E0008", e1.getErrorMsg());
 			}
@@ -824,7 +816,7 @@ public class L4510 extends TradeBuffer {
 					tEmpDeductDtl.getEmpDeductDtlId().getCustNo(), rpcd);
 
 			if (empCnt.containsKey(tmp)) {
-				updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq);
+				updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq, titaVo);
 				this.info("tmp 已進入 continue ..." + tmp);
 				continue;
 			} else {
@@ -855,16 +847,16 @@ public class L4510 extends TradeBuffer {
 			tEmpDeductMedia.setDetailSeq(0);
 
 			try {
-				empDeductMediaService.insert(tEmpDeductMedia);
+				empDeductMediaService.insert(tEmpDeductMedia, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "員工扣薪檔新增失敗 :" + e.getErrorMsg());
 			}
 
-			updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq);
+			updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq, titaVo );
 		}
 	}
 
-	private void updateEmpDeductDtl(EmpDeductDtl tEmpDeductDtl, int todayF, int flag, int seq) throws LogicException {
+	private void updateEmpDeductDtl(EmpDeductDtl tEmpDeductDtl, int todayF, int flag, int seq, TitaVo titaVo)  throws LogicException {
 		EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
 		tEmpDeductDtlId.setAcctCode(tEmpDeductDtl.getEmpDeductDtlId().getAcctCode());
 		tEmpDeductDtlId.setAchRepayCode(tEmpDeductDtl.getEmpDeductDtlId().getAchRepayCode());
@@ -877,14 +869,14 @@ public class L4510 extends TradeBuffer {
 		tEmpDeductDtlId.setBormNo(tEmpDeductDtl.getEmpDeductDtlId().getBormNo());
 
 		EmpDeductDtl t2EmpDeductDtl = new EmpDeductDtl();
-		t2EmpDeductDtl = empDeductDtlService.findById(tEmpDeductDtlId);
+		t2EmpDeductDtl = empDeductDtlService.findById(tEmpDeductDtlId, titaVo);
 
-		empDeductDtlService.holdById(t2EmpDeductDtl.getEmpDeductDtlId());
+		empDeductDtlService.holdById(t2EmpDeductDtl.getEmpDeductDtlId(), titaVo);
 		t2EmpDeductDtl.setMediaDate(todayF);
 		t2EmpDeductDtl.setMediaKind("" + flag);
 		t2EmpDeductDtl.setMediaSeq(seq);
 		try {
-			empDeductDtlService.update(t2EmpDeductDtl);
+			empDeductDtlService.update(t2EmpDeductDtl, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0005", "員工扣薪檔更新失敗 :" + e.getErrorMsg());
 		}
@@ -971,20 +963,20 @@ public class L4510 extends TradeBuffer {
 		}
 	}
 
-	private void deleEmpDeductDtl(List<String> procCode, int iEntryDate) throws LogicException {
+	private void deleEmpDeductDtl(List<String> procCode, int iEntryDate,TitaVo titaVo) throws LogicException {
 		List<EmpDeductDtl> lEmpDeductDtl = new ArrayList<EmpDeductDtl>();
 
 		Slice<EmpDeductDtl> sEmpDeductDtl = null;
 
-		sEmpDeductDtl = empDeductDtlService.entryDateRng(iEntryDate, iEntryDate, procCode, this.index, this.limit);
+		sEmpDeductDtl = empDeductDtlService.entryDateRng(iEntryDate, iEntryDate, procCode, this.index, this.limit, titaVo);
 
 		lEmpDeductDtl = sEmpDeductDtl == null ? null : sEmpDeductDtl.getContent();
 
 		if (lEmpDeductDtl != null && lEmpDeductDtl.size() != 0) {
 			for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
-				tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtl.getEmpDeductDtlId());
+				tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtl.getEmpDeductDtlId(), titaVo);
 				try {
-					empDeductDtlService.delete(tEmpDeductDtl);
+					empDeductDtlService.delete(tEmpDeductDtl, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0008", "員工扣薪檔刪除失敗 :" + e.getErrorMsg());
 				}
@@ -1140,17 +1132,6 @@ public class L4510 extends TradeBuffer {
 		} else {
 			this.info("listBaTxVo is null");
 		}
-	}
-
-//	0.新增 1.刪除
-	private void txToDo(TitaVo titaVo, int flag) throws LogicException {
-		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-		tTxToDoDetail.setItemCode("L4510"); // L4510 員工媒體 寫一筆提醒
-		tTxToDoDetail.setCustNo(0);
-		tTxToDoDetail.setFacmNo(0);
-		tTxToDoDetail.setBormNo(0);
-		tTxToDoDetail.setDtlValue("");
-		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 	}
 
 	private int delayTerms(int terms, int date) throws LogicException {

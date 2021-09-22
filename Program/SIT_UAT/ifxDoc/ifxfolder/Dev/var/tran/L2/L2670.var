@@ -342,7 +342,7 @@ C(3,#FunCd,7,s,$)
 ![會計日期] 
 !自動顯示不需輸入
 #AcDate=D,7,L
-! E(0,#SYSDATE)
+!E(0,#SYSDATE)
 
 ![交易序號]
 #TitaTxtNo=A,7,L

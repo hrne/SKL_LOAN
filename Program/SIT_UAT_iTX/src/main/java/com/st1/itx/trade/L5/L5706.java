@@ -817,7 +817,7 @@ public class L5706 extends TradeBuffer {
 				CustTypeCode.add("05");
 				// 戶別
 				if (CustTypeCode.contains(tCustMain.getCustTypeCode())) {
-					// 是保代戶
+					// 是保貸戶
 					CustLoanKind = "2";
 				} else {
 					CustLoanKind = "1";

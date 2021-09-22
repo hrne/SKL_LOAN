@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
@@ -30,11 +28,14 @@ import com.st1.itx.db.domain.BatxDetail;
 import com.st1.itx.db.domain.BatxDetailId;
 import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.domain.PostDeductMedia;
 import com.st1.itx.db.domain.TxBizDate;
+import com.st1.itx.db.domain.TxErrCode;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.AchDeductMediaService;
@@ -43,11 +44,13 @@ import com.st1.itx.db.service.BankRmtfService;
 import com.st1.itx.db.service.BatxChequeService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.PostDeductMediaService;
+import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.FileCom;
@@ -76,7 +79,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS420 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(BS420.class);
 	@Autowired
 	public FileCom fileCom;
 
@@ -148,12 +150,17 @@ public class BS420 extends TradeBuffer {
 	public AcReceivableService acReceivableService;
 
 	@Autowired
+	public TxErrCodeService txErrCodeService;
+
+	@Autowired
+	public CdCodeService cdCodeService;
+
+	@Autowired
 	public WebClient webClient;
 
 	private int iAcDate = 0;
 	private String iBatchNo = "";
 	private String iTlrNo = "";
-	private String iTxtNo = "";
 
 	private int tableSize = 0;
 	private BigDecimal bigDe100 = new BigDecimal("100");
@@ -201,7 +208,6 @@ public class BS420 extends TradeBuffer {
 	int chequeFailCnt = 0;
 //	檢核成功金額
 	BigDecimal chequeSuccAmt = BigDecimal.ZERO;
-	private HashMap<tmpCheque, BigDecimal> chequeAmtMap = new HashMap<>();
 
 //	檢核成功筆數
 	private int totSuccCnt = 0;
@@ -255,7 +261,6 @@ public class BS420 extends TradeBuffer {
 		iBatchNo = titaVo.getParam("BatchNo");
 
 		iTlrNo = titaVo.getTlrNo();
-		iTxtNo = titaVo.getTxtNo();
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -292,7 +297,7 @@ public class BS420 extends TradeBuffer {
 			tBatxHead.setTitaTxCd(titaVo.getTxcd());
 			try {
 				this.info("Insert BatxHead !!!");
-				batxHeadService.insert(tBatxHead);
+				batxHeadService.insert(tBatxHead, titaVo);
 			} catch (DBException e) {
 				sendMsg = e.getMessage();
 				checkFlag = false;
@@ -591,7 +596,8 @@ public class BS420 extends TradeBuffer {
 						|| posiDepo.containsKey(tempOccursList.get("OccVirAcctNo"))) {
 				} else {
 					BatxHead tBatxHead = new BatxHead();
-					tBatxHead = batxHeadService.titaTxCdFirst(this.txBuffer.getTxCom().getLbsdyf(), "L4210", "8");
+					tBatxHead = batxHeadService.titaTxCdFirst(this.txBuffer.getTxCom().getLbsdyf(), "L4210", "8",
+							titaVo);
 					String batchNo = "";
 					if (tBatxHead != null) {
 						batchNo = tBatxHead.getBatchNo();
@@ -604,7 +610,7 @@ public class BS420 extends TradeBuffer {
 
 //					上營業日 戶號 金額 相同者
 					err103 = batxDetailService.findL4200BFirst(this.txBuffer.getTxCom().getLbsdyf(), batchNo, intCustNo,
-							parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt")), err103List);
+							parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt")), err103List, titaVo);
 					if (err103 != null) {
 						err103map.put(iBatchNo, 1);
 					}
@@ -729,7 +735,7 @@ public class BS420 extends TradeBuffer {
 
 				} else if ("00110".equals(errorCode)) {
 					tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-					tempVo.putParam("ReturnMsg", setProcCodeX(errorCode));
+					tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
 				} else {
 					if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
 						if (tempOccursList.get("OccDepositAmt").indexOf("p") >= 0) {
@@ -738,24 +744,24 @@ public class BS420 extends TradeBuffer {
 									.divide(bigDe100);
 
 							tempVo.putParam("CheckMsg", "-" + nDepositAmt);
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
 
 						} else if (parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt"))
 								.compareTo(BigDecimal.ZERO) == 0) {
 							tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
 						} else {
 							tempVo.putParam("CheckMsg",
 									parse.stringToBigDecimal("" + negaDepo.get(tempOccursList.get("OccVirAcctNo"))));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
 						}
 					} else {
 						if ("".equals(tempOccursList.get("OccVirAcctNo").trim())) {
 							tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
 						} else {
 							tempVo.putParam("CheckMsg", tempOccursList.get("OccVirAcctNo"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
 						}
 					}
 				}
@@ -821,13 +827,13 @@ public class BS420 extends TradeBuffer {
 
 //				F.insert BankRmtf、BatxDetail
 				try {
-					bankRmtfService.insert(tBankRmtf);
+					bankRmtfService.insert(tBankRmtf, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "tBankRmtf Insert Fail : " + e.getErrorMsg());
 				}
 
 				try {
-					batxDetailService.insert(tBatxDetail);
+					batxDetailService.insert(tBatxDetail, titaVo);
 				} catch (DBException e) {
 					e.printStackTrace();
 					throw new LogicException("E0005", "BatxDetail Insert Fail");
@@ -887,7 +893,7 @@ public class BS420 extends TradeBuffer {
 //				}
 
 				tAchDeductMedia = achDeductMediaService.reseiveCheckFirst(reCustNo, reFacmNo, "" + reRepayCode,
-						reIntEndDate, reRepayAmt);
+						reIntEndDate, reRepayAmt, titaVo);
 
 //				C.寫入Detail & 回寫媒體檔(second check) 
 				BatxDetail tBatxDetail = new BatxDetail();
@@ -924,13 +930,13 @@ public class BS420 extends TradeBuffer {
 //					}
 
 //					回寫媒體檔
-					tAchDeductMedia = achDeductMediaService.holdById(tAchDeductMedia);
+					tAchDeductMedia = achDeductMediaService.holdById(tAchDeductMedia, titaVo);
 					tAchDeductMedia.setReturnCode(tempOccursList.get("OccReturnCode"));
 					tAchDeductMedia.setAcDate(iAcDate);
 					tAchDeductMedia.setBatchNo(iBatchNo);
 					tAchDeductMedia.setDetailSeq(i + 1);
 					try {
-						achDeductMediaService.update(tAchDeductMedia);
+						achDeductMediaService.update(tAchDeductMedia, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0007", "AchDeductMedia update Fail");
 					}
@@ -983,15 +989,15 @@ public class BS420 extends TradeBuffer {
 
 				if ("00000".equals(procCode)) {
 //					tempVo.putParam("Note", tempOccursList.get("OccReturnCode"));
-					updateBankDeductDtlMediaCode(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
+					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
 							tAchDeductMedia.getMediaSeq(), procCode, titaVo);
 				} else if ("E4200".equals(procCode)) {
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 				} else {
 //					回傳碼中文 code+cdCode.item
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 //					回傳碼不為0者更新媒體碼為E
-					updateBankDeductDtlMediaCode(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
+					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
 							tAchDeductMedia.getMediaSeq(), procCode, titaVo);
 				}
 
@@ -1007,7 +1013,7 @@ public class BS420 extends TradeBuffer {
 					tBatxDetail.setMediaSeq(tAchDeductMedia.getMediaSeq());
 				}
 				try {
-					batxDetailService.insert(tBatxDetail);
+					batxDetailService.insert(tBatxDetail, titaVo);
 				} catch (DBException e) {
 					e.printStackTrace();
 					throw new LogicException("E0005", "BatxDetail Insert Fail");
@@ -1072,7 +1078,7 @@ public class BS420 extends TradeBuffer {
 //				PostUserNo = ,AND RepayAmt = ,AND OutsrcRemark = 
 				tPostDeductMedia = postDeductMediaService.receiveCheckFirst(
 						FormatUtil.padLeft(tempOccursList.get("OccCustMemo").trim(), 20), reRepayAmt,
-						FormatUtil.padX(tempOccursList.get("OccRemark"), 20));
+						FormatUtil.padX(tempOccursList.get("OccRemark"), 20), titaVo);
 
 //			C.寫入Detail檔(second check) 
 				BatxDetail tBatxDetail = new BatxDetail();
@@ -1096,13 +1102,13 @@ public class BS420 extends TradeBuffer {
 					tBatxDetail.setProcCode(procCode);
 
 //					回寫媒體檔
-					tPostDeductMedia = postDeductMediaService.holdById(tPostDeductMedia);
+					tPostDeductMedia = postDeductMediaService.holdById(tPostDeductMedia, titaVo);
 					tPostDeductMedia.setProcNoteCode(tempOccursList.get("OccReturnCode"));
 					tPostDeductMedia.setAcDate(iAcDate);
 					tPostDeductMedia.setBatchNo(iBatchNo);
 					tPostDeductMedia.setDetailSeq(i + 1);
 					try {
-						postDeductMediaService.update(tPostDeductMedia);
+						postDeductMediaService.update(tPostDeductMedia, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0007", "PostDeductMedia update Fail");
 					}
@@ -1156,17 +1162,17 @@ public class BS420 extends TradeBuffer {
 				tBatxDetail.setProcCode(procCode);
 
 				if ("00000".equals(procCode)) {
-					updateBankDeductDtlMediaCode(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(),
-							procCode, titaVo);
+					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(), procCode,
+							titaVo);
 				} else if ("E4300".equals(procCode)) {
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 
 				} else {
 //					回傳碼中文 code+cdCode.item
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 //					回傳碼不為0者更新媒體碼為E
-					updateBankDeductDtlMediaCode(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(),
-							procCode, titaVo);
+					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(), procCode,
+							titaVo);
 				}
 
 				tBatxDetail.setProcNote(tempVo.getJsonString());
@@ -1179,7 +1185,7 @@ public class BS420 extends TradeBuffer {
 				}
 
 				try {
-					batxDetailService.insert(tBatxDetail);
+					batxDetailService.insert(tBatxDetail, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "BatxDetail Insert Fail");
 				}
@@ -1243,7 +1249,7 @@ public class BS420 extends TradeBuffer {
 
 				tEmpDeductMedia = empDeductMediaService.receiveCheckFirst(mediaType,
 						parse.stringToInteger(tempOccursList.get("OccCustNo")),
-						parse.stringToInteger(tempOccursList.get("OccEntryDate")), reRepayCode, reRepayAmt);
+						parse.stringToInteger(tempOccursList.get("OccEntryDate")), reRepayCode, reRepayAmt, titaVo);
 
 //			C.寫入Detail檔(second check) 
 				BatxDetail tBatxDetail = new BatxDetail();
@@ -1260,14 +1266,14 @@ public class BS420 extends TradeBuffer {
 						procCode = "004" + tempOccursList.get("OccReturnCode");
 					}
 //					回寫媒體檔
-					tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMedia);
+					tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMedia, titaVo);
 					tEmpDeductMedia.setErrorCode(tempOccursList.get("OccReturnCode"));
 					tEmpDeductMedia.setAcDate(iAcDate);
 					tEmpDeductMedia.setBatchNo(iBatchNo);
 					tEmpDeductMedia.setDetailSeq(i + 1);
 
 					try {
-						empDeductMediaService.update(tEmpDeductMedia);
+						empDeductMediaService.update(tEmpDeductMedia, titaVo);
 					} catch (DBException e) {
 						e.printStackTrace();
 						throw new LogicException("E0007", "EmpDeductMedia update Fail");
@@ -1348,12 +1354,12 @@ public class BS420 extends TradeBuffer {
 				} else if ("E4401".equals(procCode)) {
 					tempVo = new TempVo();
 					tempVo.putParam("Note", "撥款序號 " + strBormNo + "為最後一期請人工處理");
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 
 					tBatxDetail.setProcNote(tempVo.getJsonString());
 				} else {
 					tempVo = new TempVo();
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 					tBatxDetail.setProcNote(tempVo.getJsonString());
 
 				}
@@ -1367,7 +1373,7 @@ public class BS420 extends TradeBuffer {
 				}
 
 				try {
-					batxDetailService.insert(tBatxDetail);
+					batxDetailService.insert(tBatxDetail, titaVo);
 				} catch (DBException e) {
 					e.printStackTrace();
 					throw new LogicException("E0005", "BatxDetail Insert Fail");
@@ -1436,7 +1442,7 @@ public class BS420 extends TradeBuffer {
 				LoanCheque tLoanCheque = new LoanCheque();
 				tLoanChequeId.setChequeAcct(chequeAcct);
 				tLoanChequeId.setChequeNo(chequeNo);
-				tLoanCheque = loanChequeService.findById(tLoanChequeId);
+				tLoanCheque = loanChequeService.findById(tLoanChequeId, titaVo);
 
 				this.info("Cheque ReturnCode : " + tempOccursList.get("ReturnCode"));
 
@@ -1460,7 +1466,7 @@ public class BS420 extends TradeBuffer {
 //					若相等則利用銷帳檔之戶號額度找尋相關欄位
 
 					sAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), rvno, this.index,
-							this.limit);
+							this.limit, titaVo);
 					lAcReceivable = sAcReceivable == null ? null : sAcReceivable.getContent();
 
 					BigDecimal acrvCheqAmt = BigDecimal.ZERO;
@@ -1480,11 +1486,11 @@ public class BS420 extends TradeBuffer {
 						chequeSuccCnt = chequeSuccCnt + 1;
 						chequeSuccAmt = chequeSuccAmt.add(chequeAmt);
 						// update LoanCheque
-						LoanCheque t2LoanCheque = loanChequeService.holdById(tLoanCheque.getLoanChequeId());
+						LoanCheque t2LoanCheque = loanChequeService.holdById(tLoanCheque.getLoanChequeId(), titaVo);
 						t2LoanCheque.setStatusCode("4");
 						t2LoanCheque.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")) + 19110000);
 						try {
-							loanChequeService.update(t2LoanCheque);
+							loanChequeService.update(t2LoanCheque, titaVo);
 						} catch (DBException e) {
 							throw new LogicException("E0007", "LoanCheque update error : " + e.getErrorMsg());
 						}
@@ -1548,7 +1554,7 @@ public class BS420 extends TradeBuffer {
 						tBatxDetail.setProcNote(tempVo.getJsonString());
 
 						try {
-							batxDetailService.insert(tBatxDetail);
+							batxDetailService.insert(tBatxDetail, titaVo);
 						} catch (DBException e) {
 							throw new LogicException("E0005", "BatxDetail Insert Fail : " + e.getErrorMsg());
 						}
@@ -1577,7 +1583,7 @@ public class BS420 extends TradeBuffer {
 
 					tBatxDetail.setProcStsCode(procStsCode);
 					tempVo.putParam("ReturnMsg", chequeNo + " " + chequeAmt);
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 
 					tBatxDetail.setProcCode(procCode);
 					tBatxDetail.setProcNote(tempVo.getJsonString());
@@ -1589,7 +1595,7 @@ public class BS420 extends TradeBuffer {
 					tBatxDetail.setMediaSeq(0);
 
 					try {
-						batxDetailService.insert(tBatxDetail);
+						batxDetailService.insert(tBatxDetail, titaVo);
 					} catch (DBException e) {
 						e.printStackTrace();
 						throw new LogicException("E0005", "BatxDetail Insert Fail");
@@ -1612,7 +1618,7 @@ public class BS420 extends TradeBuffer {
 		lStatus.add("0"); // 0: 未處理
 		lStatus.add("4"); // 4: 兌現未入帳
 
-		sLoanCheque = loanChequeService.statusCodeRange(lStatus, 0, LbsDy, this.index, this.limit);
+		sLoanCheque = loanChequeService.statusCodeRange(lStatus, 0, LbsDy, this.index, this.limit, titaVo);
 
 		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
 
@@ -1697,181 +1703,30 @@ public class BS420 extends TradeBuffer {
 		}
 	}
 
-	private String setProcCodeX(String procCode) {
+	private String setProcCodeX(String procCode, TitaVo titaVo) {
 		String result = "";
-
-		switch (procCode) {
-		case "00003":
-			result = "溢繳";
-			break;
-		case "00004":
-			result = "不足利息[可跨額度暫收抵用]";
-			break;
-		case "00005":
-			result = "積欠期款[可跨額度暫收抵用]";
-			break;
-		case "00101":
-			result = "正負對沖";
-			break;
-		case "00102":
-			result = "提款(借方)";
-			break;
-		case "00103":
-			result = "預先作業";
-			break;
-		case "00104":
-			result = "ACH手續費";
-			break;
-		case "00105":
-			result = "銀扣清算";
-			break;
-		case "00106":
-			result = "特殊摘要";
-			break;
-		case "00110":
-			result = "更正轉帳";
-			break;
-		case "00120":
-			result = "法院";
-			break;
-		case "00201":
-			result = "存款不足";
-			break;
-		case "00202":
-			result = "非委託用戶";
-			break;
-		case "00203":
-			result = "已終止委託用戶";
-			break;
-		case "00204":
-			result = "無此帳號";
-			break;
-		case "00205":
-			result = "收受者統編錯誤";
-			break;
-		case "00206":
-			result = "無此用戶號碼";
-			break;
-		case "00207":
-			result = "用戶號碼不符";
-			break;
-		case "00208":
-			result = "信用卡額度不足";
-			break;
-		case "00209":
-			result = "未開卡";
-			break;
-		case "00210":
-			result = "部分存款不足";
-			break;
-		case "00211":
-			result = "超過扣款限額";
-			break;
-		case "00222":
-			result = "帳戶已結清";
-			break;
-		case "00223":
-			result = "靜止戶";
-			break;
-		case "00224":
-			result = "凍結戶";
-			break;
-		case "00225":
-			result = "帳戶存款遭法院強制執行";
-			break;
-		case "00226":
-			result = "警示戶";
-			break;
-		case "00227":
-			result = "該用戶已死亡";
-			break;
-		case "00228":
-			result = "發動行申請停止入扣帳";
-			break;
-		case "00291":
-			result = "請參考備註一";
-			break;
-		case "00299":
-			result = "其他";
-			break;
-		case "00303":
-			result = "已終止代繳 ";
-			break;
-		case "00306":
-			result = "凍結警示戶 ";
-			break;
-		case "00307":
-			result = "支票專戶 ";
-			break;
-		case "00308":
-			result = "帳號錯誤 ";
-			break;
-		case "00309":
-			result = "終止戶 ";
-			break;
-		case "00310":
-			result = "身分證不符";
-			break;
-		case "00311":
-			result = "轉出戶 ";
-			break;
-		case "00312":
-			result = "拒絕往來戶 ";
-			break;
-		case "00313":
-			result = "無此編號 ";
-			break;
-		case "00314":
-			result = "編號已存在 ";
-			break;
-		case "00316":
-			result = "管制帳戶 ";
-			break;
-		case "00317":
-			result = "掛失戶 ";
-			break;
-		case "00318":
-			result = "異常帳戶 ";
-			break;
-		case "00319":
-			result = "編號非英數 ";
-			break;
-		case "00391":
-			result = "期限未扣款 ";
-			break;
-		case "00398":
-			result = "其他";
-			break;
-		case "00401":
-			result = "員工扣薪失敗";
-			break;
-		case "00416":
-			result = "扣款失敗";
-			break;
-		case "00417":
-			result = "扣款不足";
-			break;
-		case "00501":
-			result = "退票(支票號碼、支票面額)";
-			break;
-		case "E4400":
-			result = "員工扣薪提出媒體檔無此資料";
-			break;
-		case "E4200":
-			result = "ACH銀扣提出媒體檔無此資料";
-			break;
-		case "E4300":
-			result = "POST銀扣提出媒體檔無此資料";
-			break;
-		case "E4500":
-			result = "支票檢核有誤";
-			break;
-		case "E4501":
-			result = "銷帳檔支票金額不合";
-			break;
-		default:
-			result = "" + procCode;
-			break;
+		if (procCode.isEmpty()) {
+			return result;
+		}
+		if ("00000".equals(procCode)) {
+			return result;
+		}
+		//
+		if ("E".equals(procCode.substring(0, 1))) {
+			TxErrCode tTxErrCode = txErrCodeService.findById(procCode, titaVo);
+			if (tTxErrCode == null) {
+				result = procCode;
+			} else {
+				result = tTxErrCode.getErrContent();
+			}
+			return result;
+		}
+		// 
+		CdCode tCdCode = cdCodeService.findById(new CdCodeId("ProcCode", procCode), titaVo);
+		if (tCdCode == null) {
+			result = procCode;
+		} else {
+			result = tCdCode.getItem();
 		}
 		return result;
 	}
@@ -1885,19 +1740,22 @@ public class BS420 extends TradeBuffer {
 		batxChequeFileVo.setOccursList(occursList);
 	}
 
-	private void updateBankDeductDtlMediaCode(int mediaDate, String mediaKind, int mediaSeq, String procCode,
-			TitaVo titaVo) throws LogicException {
+	private void updateBankDeductDtl(int mediaDate, String mediaKind, int mediaSeq, String procCode, TitaVo titaVo)
+			throws LogicException {
 		sBankDeductDtl = bankDeductDtlService.mediaSeqRng(mediaDate + 19110000, mediaKind, mediaSeq, this.index,
-				this.limit);
+				this.limit, titaVo);
 		lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
 
 		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
 			for (BankDeductDtl tB : lBankDeductDtl) {
 				BankDeductDtl tBankDeductDtl = new BankDeductDtl();
 				tBankDeductDtl = bankDeductDtlService.holdById(tB, titaVo);
-
 				if (!"00000".equals(procCode)) {
 					tBankDeductDtl.setMediaCode("E");
+					TempVo t1TempVo = new TempVo();
+					t1TempVo = t1TempVo.getVo(tBankDeductDtl.getJsonFields());
+					t1TempVo.putParam("ProcCode", procCode);
+					tBankDeductDtl.setJsonFields(t1TempVo.getJsonString());
 				}
 
 				// 銀扣期款應繳
@@ -1913,42 +1771,6 @@ public class BS420 extends TradeBuffer {
 			}
 
 		}
-
-	}
-
-	private int setRepayType(int rpType) {
-//		共用代碼檔
-//		1.期款
-//		2.部分償還
-//		3.結案
-//		4.帳管費
-//		5.火險費
-//		6.契變手續費
-//		7.法務費
-//		9.其他
-//
-//		銀扣用
-//		1.火險費 
-//		2.帳管費 
-//		3.期款 
-//		4.貸後契變手續費
-
-		switch (rpType) {
-		case 1:
-			rpType = 5;
-			break;
-		case 2:
-			rpType = 4;
-			break;
-		case 3:
-			rpType = 1;
-			break;
-		case 4:
-			rpType = 6;
-			break;
-		}
-
-		return rpType;
 
 	}
 
@@ -2110,7 +1932,7 @@ public class BS420 extends TradeBuffer {
 		String batxNoFin = tBatxHeadId.getBatchNo();
 
 		if (totSuccCnt + totFailCnt > 0) {
-			tBatxHead = batxHeadService.holdById(tBatxHeadId);
+			tBatxHead = batxHeadService.holdById(tBatxHeadId, titaVo);
 			tBatxHead.setBatxTotAmt(totAmt);
 			tBatxHead.setBatxTotCnt(totSuccCnt + totFailCnt);
 //  		status 皆為0.未檢核 放入放0.未處理 其他則放入1.檢核有誤
@@ -2125,7 +1947,7 @@ public class BS420 extends TradeBuffer {
 
 			try {
 				this.info("Insert BatxHead !!!");
-				batxHeadService.update(tBatxHead);
+				batxHeadService.update(tBatxHead, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "BS420 BatxHead update " + e.getErrorMsg());
 			}
@@ -2145,7 +1967,7 @@ public class BS420 extends TradeBuffer {
 
 		BatxHead todayBatxHead = new BatxHead();
 		BatxHeadId todayBatxHeadId = new BatxHeadId();
-		stodayBatxHeadList = batxHeadService.acDateRange(tbsdyf, tbsdyf, this.index, this.limit);
+		stodayBatxHeadList = batxHeadService.acDateRange(tbsdyf, tbsdyf, this.index, this.limit, titaVo);
 
 		toBatxHeadList = stodayBatxHeadList == null ? null : stodayBatxHeadList.getContent();
 
@@ -2177,7 +1999,7 @@ public class BS420 extends TradeBuffer {
 		String sBatchNo = "BATX" + FormatUtil.pad9("" + toBatxNo.get(tbsdyf), 2);
 		todayBatxHeadId.setAcDate(tbsdyf);
 		todayBatxHeadId.setBatchNo(sBatchNo);
-		todayBatxHead = batxHeadService.findById(todayBatxHeadId);
+		todayBatxHead = batxHeadService.findById(todayBatxHeadId, titaVo);
 
 		lbsdyf = this.getTxBuffer().getTxCom().getLbsdyf();
 		this.info("Lbsdyf : " + lbsdyf);
@@ -2192,7 +2014,7 @@ public class BS420 extends TradeBuffer {
 
 		BatxHead yesterdayBatxHead = new BatxHead();
 		BatxHeadId yesterdayBatxHeadId = new BatxHeadId();
-		syesterdayBatxHeadList = batxHeadService.acDateRange(lbsdyf, lbsdyf, this.index, this.limit);
+		syesterdayBatxHeadList = batxHeadService.acDateRange(lbsdyf, lbsdyf, this.index, this.limit, titaVo);
 
 		yesterdayBatxHeadList = syesterdayBatxHeadList == null ? null : syesterdayBatxHeadList.getContent();
 
@@ -2217,7 +2039,7 @@ public class BS420 extends TradeBuffer {
 		sBatchNo = "BATX" + FormatUtil.pad9("" + yesBatxNo.get(lbsdyf), 2);
 		yesterdayBatxHeadId.setAcDate(lbsdyf);
 		yesterdayBatxHeadId.setBatchNo(sBatchNo);
-		yesterdayBatxHead = batxHeadService.findById(yesterdayBatxHeadId);
+		yesterdayBatxHead = batxHeadService.findById(yesterdayBatxHeadId, titaVo);
 
 //	上上營業日之最後一批
 		List<BatxHead> dayB4BatxHeadList = new ArrayList<BatxHead>();
@@ -2225,7 +2047,7 @@ public class BS420 extends TradeBuffer {
 
 		BatxHead dayB4BatxHead = new BatxHead();
 		BatxHeadId dayB4BatxHeadId = new BatxHeadId();
-		sdayB4BatxHeadList = batxHeadService.acDateRange(lLbsdyf, lLbsdyf, this.index, this.limit);
+		sdayB4BatxHeadList = batxHeadService.acDateRange(lLbsdyf, lLbsdyf, this.index, this.limit, titaVo);
 
 		dayB4BatxHeadList = sdayB4BatxHeadList == null ? null : sdayB4BatxHeadList.getContent();
 
@@ -2250,7 +2072,7 @@ public class BS420 extends TradeBuffer {
 		String sdayB4BatchNo = "BATX" + FormatUtil.pad9("" + dayB4BatxNo.get(lLbsdyf), 2);
 		dayB4BatxHeadId.setAcDate(lLbsdyf);
 		dayB4BatxHeadId.setBatchNo(sdayB4BatchNo);
-		dayB4BatxHead = batxHeadService.findById(dayB4BatxHeadId);
+		dayB4BatxHead = batxHeadService.findById(dayB4BatxHeadId, titaVo);
 
 		if (yesterdayBatxHead != null) {
 			sendMsg = sendMsg + "L4200" + " - " + iBatchNo + "整批處理完成。與批號 : " + yesterdayBatxHead.getAcDate() + "，"

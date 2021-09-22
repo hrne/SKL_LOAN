@@ -16,29 +16,26 @@ import com.st1.itx.tradeService.BatchBase;
 @Scope("step")
 /**
  * 
- * 
  * @author Eric Chang
  * @version 1.0.0
  */
 public class LM054 extends BatchBase implements Tasklet, InitializingBean {
-
+ 
 	@Autowired
-	public LM054Report LM054report;
+	public LM054Report lM054report;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		;
 	}
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM054.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM054 ");
-		LM054report.exec(titaVo);
+		lM054report.exec(titaVo);
 	}
 }

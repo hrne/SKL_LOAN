@@ -439,24 +439,31 @@ public class CustNoticeCom extends TradeBuffer {
 	}
 
 	private void getPhone(CustMain tCustMain, TitaVo titaVo) {
-		if (tCustMain != null) {
-			List<CustTelNo> lCustTelNo = new ArrayList<CustTelNo>();
+		String messPhone = "";
+		String cellPhone = "";
 
+//					03:手機  05:簡訊(優先)			
+		if (tCustMain != null) {
 			Slice<CustTelNo> slCustTelNo = custTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index,
 					Integer.MAX_VALUE, titaVo);
-			lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
-			if (lCustTelNo != null && lCustTelNo.size() != 0) {
-				for (CustTelNo tCustTelNo : lCustTelNo) {
-//					03:手機  05:簡訊
-					if ("05".equals(tCustTelNo.getTelTypeCode()) || "03".equals(tCustTelNo.getTelTypeCode())) {
-						if ("Y".equals(tCustTelNo.getEnable())) {
-							messagePhoneNo = tCustTelNo.getTelNo();
-							this.info("messagePhoneNo ..." + messagePhoneNo);
-						}
+			if (slCustTelNo != null) {
+				for (CustTelNo tCustTelNo : slCustTelNo.getContent()) {
+					if ("05".equals(tCustTelNo.getTelTypeCode()) && "Y".equals(tCustTelNo.getEnable())) {
+						messPhone = tCustTelNo.getTelNo();
+					}
+					if ("03".equals(tCustTelNo.getTelTypeCode()) && "Y".equals(tCustTelNo.getEnable())) {
+						cellPhone = tCustTelNo.getTelNo();
 					}
 				}
 			}
+		}
+
+		if (!cellPhone.isEmpty()) {
+			messagePhoneNo = cellPhone;
+		}
+		if (!messPhone.isEmpty()) {
+			messagePhoneNo = messPhone;
 		}
 	}
 

@@ -38,17 +38,22 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[200,1500];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,300,50,500];printer.width=[20,20,20,20];order=1">
 [
-["[L1111]                                 顧客基本資料維護-編號變更"],
-[#<->#,"#FdBefore+修改前統一編號",#CustIdBefore],
+["[L1111]                                 顧客基本資料維護-身份證號／統一編號變更"],
+["@","@修改前"],["@","@修改後"],
+["#FdAfter+身份證號／統一編號",#CustIdBefore],["@",#CustIdAfter],
 [#<->#,"#FdCustName+戶名",#CustName],
-[#<->#,"#FdAfter+修改後統一編號",#CustIdAfter],
 [#<->#,"#FdMark+註記",#Mark,#MarkX],
 ]
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 <include src="ROM.icf::L1R18.dec"/>
+
+#AGAIN=X,1,S
+E(0,1)
+ASGN(AGAIN$)
+
 #CDDEF0001=x,20,S
 T(3,CdCode.CustMark)
 #CustMarkHelp=x,1024,S
@@ -72,6 +77,9 @@ K(MODIFYBUTTON,修改)
 @V(7)
 A(ID_UNINO,0,#CustIdBefore)
 
+#IdStatBef=A,1,S
+T(4,STAT$)
+
 #RimL1R18=X,1,S
 #RimCustNo=A,7,S
 #RimCustId=X,10,S
@@ -83,11 +91,19 @@ R(1,L1R18)
 T(2,@CustName,#L1R18CustName)
 
 ! 戶名
-#CustName=X,2.50,L
+#CustName=x,2.50,L
 ! 修改後統一編號
 #CustIdAfter=X,10,I
-@V(7)
+@
+V(2,#CustIdBefore)
+V(7)
 A(ID_UNINO,0,#CustIdAfter)
+
+#IdStatAft=A,1,S
+T(4,STAT$)
+IF(#IdStatBef==2 && #IdStatAft!=2,V(P,請輸入正確統一編號),$)
+IF(#IdStatBef!=2 && #IdStatAft==2,V(P,不可變更為統一編號),$)
+
 ! 註記
 #Mark=X,1,I
 HELP(#CustMarkHelp)
@@ -113,7 +129,7 @@ T(H,#MarkX,#Mark,#CustMarkHelp)
 !C(5,#TXFORM,L1111,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L1111] 顧客聯絡電話維護)
+T(3,[L1111] 顧客基本資料維護-身份證號／統一編號變更)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -128,6 +144,7 @@ T(3,1)ASGN(LOOP$)
 #CustIdBefore
 #CustIdAfter
 #Mark
+#MarkX
 </sub>
 
 
@@ -143,5 +160,5 @@ TXFORM=L1111
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
-<include src="PRT.icf::INQ01.sel"/>
+<include src="PRT.icf::UPD01.sel"/>
 </sub>

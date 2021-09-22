@@ -9,7 +9,7 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,728)ASGN(INQHD$)
+E(0,715)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -1176,7 +1176,7 @@ INVOKEJS(SHOW,p9,0)
 !統編
 #OCustId=X,10,L
 !戶號
-#OCustNo=n,7,L
+#OCustNo=A,7,L
 
 !戶名
 #OCustName=X,2.50,L

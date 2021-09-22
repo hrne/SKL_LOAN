@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L1108]                                 申請不列印書面通知書維護"],
 ["#FdFunCdX+功能",#FunCdX],
-["#FdCustNo+戶號",#CustNo,"-",#FacmNo,#BTN1,#CustName],
+["#FdCustNo2+戶號-額度（複雜來源）",#CustNo2,"-",#FacmNo2],
+["#FdCustNo+戶號-額度",#CustNo,"-",#FacmNo,#BTN1,#CustName],
 ["#FdApplyDt+申請日期",#ApplyDt],
 ["#grid#,{id:1,expand:true,loop:40,row_height:1}","","","","",
 [[#Paper0,"不寄送書面"],[#Msg0,"不發送簡訊"],[#EMail0,"不發送EMail"],"通知書名稱"],
@@ -50,9 +51,13 @@ E(0,0)
 ],
 ]
 
+#Init1=X,1,S
+INVOKEJS(SHOW,p1,2,2,0)
+
 #FdFunCdX=X,2,L
 #FdCustNo=X,2,L
 T(2,*)
+#FdCustNo2=X,2,L
 #FdApplyDt=X,2,L
 T(2,*)
 !---------- AP Button AREA ----------
@@ -73,6 +78,10 @@ T(1,@FunCd,#NTXBUF,1,1)
 C(3,#FunCd,1,S,$)
 T(1,@CustNo,#NTXBUF,2,7)
 T(1,@FacmNo,#NTXBUF,9,3)
+
+#Init2=X,1,S
+C(3,#FunCd,3,$,S)
+INVOKEJS(SHOW,p1,2,2,1)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 #CDDEF0001=x,40,S
@@ -103,9 +112,9 @@ T(2,@FunCdHelp,#HelpDesc1)
 #FunCd=A,1,S
 
 #FunCdX=X,4,L
-T(H,#FunCd,#FunCdHelp)
+C(3,#FunCd,3,T(3,複製),T(H,#FunCd,#FunCdHelp))
 
-C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,複製),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
 #BUF1=X,1,S
 #BIND1=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo})
@@ -148,6 +157,13 @@ T(2,@EMail{i},#L1r04EMail{i})
 C(4,#Notice{i},INVOKEJS(SHOW,grd1,{j},{j},0),INVOKEJS(SHOW,grd1,{j},{j},1))
 ##end
 
+!複製來源
+#CustNo2=A,7,L
+E(0,#CustNo)
+
+#FacmNo2=A,3,L
+E(0,#FacmNo)
+
 !戶號
 #CustNo=A,7,I
 C(2,#FunCd,s,$,s,$)
@@ -155,7 +171,11 @@ C(2,#FunCd,s,$,s,$)
 
 #FacmNo=A,3,I
 C(2,#FunCd,s,$,s,$)
-@V(2,0)
+@
+V(2,0)
+
+#C1=X,1,S
+IF(#FunCd==3 && #CustNo==#CustNo2 && #FacmNo==#FacmNo2,V(P,請輸入不同戶號額度),$)
 
 !戶名
 #CustName=X,100,L
@@ -274,11 +294,13 @@ C(5,#EmailFg,0,T(3,Y),$)
 @
 C(5,#EmailFg,0,C(4,#EMail{i},V(P,此客戶尚未設定信箱，故不可設定為發送),$),$)
 C(4,#EMail{i},$,IF(#EMail{i} == #CheckY,$,V(P,限輸入Y或空白)))
+C(5,#SendCode{i},1,$,s)
+C(4,#Paper{i},$,C(4,#Msg{i},$,C(4,#EMail{i},$,V(P,不可申請全部不寄送))))
 
 ! 記號檢核
-#CheckSendCode{i}=X,1,S
-C(5,#SendCode{i},1,$,S)
-C(4,#Paper{i},$,C(4,#Msg{i},$,C(4,#EMail{i},$,V(P,不可申請全部不寄送))))
+!#CheckSendCode{i}=X,1,S
+!C(5,#SendCode{i},1,$,S)
+!C(4,#Paper{i},$,C(4,#Msg{i},$,C(4,#EMail{i},$,V(P,不可申請全部不寄送))))
 ##end
 
 

@@ -421,10 +421,10 @@ public class NegCom extends CommBuffer {
 		int lastpaydate = getRepayDate(mainNextPayDate, -1, titaVo);// 上個月應繳日
 		if (transEntryDate > mainNextPayDate) { // 客戶逾期繳款應收2期利息(上期與本期)
 			transShouldPayPeriod = 2;
-			int overyPeriod = DiffMonth(1, mainNextPayDate, Today) + 1;// 下次應繳日與本次會計日相比差了多少個月
-			if (overyPeriod > 2) {	//	超過二期未繳款-例測試資料
-				transShouldPayPeriod = overyPeriod;	
-			}
+			//int overyPeriod = DiffMonth(1, mainNextPayDate, Today) + 1;// 下次應繳日與本次會計日相比差了多少個月
+			//if (overyPeriod > 2) {	//	超過二期未繳款
+			//	transShouldPayPeriod = overyPeriod;	
+			//}
 		} else {
 			if (transEntryDate > lastpaydate) { // 上個月已繳應收1期利息(本期)
 				transShouldPayPeriod = 1;
@@ -569,8 +569,10 @@ public class NegCom extends CommBuffer {
 			calInterestAmt(rePayAmt, transRepayPeriod , titaVo);
 		}
 
-		mainRepayPrincipal = mainRepayPrincipal.add(transPrincipalAmt);// 還本本金
-		mainRepayInterest = mainRepayInterest.add(transInterestAmt); // 還本利息
+		//mainRepayPrincipal = mainRepayPrincipal.add(transPrincipalAmt);// 還本本金
+		//mainRepayInterest = mainRepayInterest.add(transInterestAmt); // 還本利息
+		mainRepayPrincipal = transPrincipalAmt;// 還本本金-紀錄當次還本本金
+		mainRepayInterest = transInterestAmt; // 還本利息-紀錄當次還本利息
 		mainPrincipalBal = mainPrincipalBal.subtract(transPrincipalAmt);
 		if (mainPrincipalBal.compareTo(BigDecimal.ZERO) < 0) {
 			throw new LogicException(titaVo, "E5009", "[本金餘額]不可為負值.");// E5009 資料檢核錯誤

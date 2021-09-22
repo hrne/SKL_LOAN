@@ -8,8 +8,8 @@
 !T(3,L1101)
 
 ![資料表頭(HEADER)長度]
-#INQHD=n,3,S
-E(0,996)ASGN(INQHD$)
+#INQHD=n,4,S
+E(0,1025)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -1433,16 +1433,8 @@ T(H,#OAMLGroup,#AMLCodeHelp)
 !介紹人
 #OIntroducerX=X,20,L
 
-! 交互運用同意選項
-#OCustCross=X,1,L
-! 交互運用同意中文
-#OCustCrossX=x,60,L
-IF(#OCustCross=="Y",T(3,同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用),
-T(3,不同意)
-)
-
 ##loop{times:20,n:1}
-#OSubCompanyCode{n}=A,2,L
+#OSubCompanyCode{n}=X,2,L
 #OSubCompanyItem{n}=x,60,L
 T(H,#OSubCompanyCode{n},#SubCompanyCodeHelp)
 #OCrossUse{n}=X,1,L
@@ -1456,7 +1448,8 @@ T(H,#OCrossUse{n},#YesNoHelp)
 T(3,1)ASGN(LOOP$)
 
 !電話種類
-#OOTelTypeCode=x,2,L
+#OOTelTypeCode=X,2,L
+!ALERT(#OOTelTypeCode)
 
 #OOTelLb=X,8,L
 T(H,#OOTelTypeCode,#TelTypeCodeHelp)
@@ -1500,7 +1493,7 @@ T(1,@OOLiaisonNameB,#OOLiaisonName,51,100)
 T(H,#OOEnable,#EnableHelp)
              
 !備註
-#OORmk=X,40,L
+#OORmk=c,40,L
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -1613,7 +1606,6 @@ TXFORM=L1101
 #OAMLGroup
 #OIndigenousName
 #OIntroducerX
-#OCustCross
 ##loop{times:20,n:1}
 #OSubCompanyCode{n}
 #OCrossUse{n}
