@@ -380,6 +380,10 @@ C(4,#L4r22NewCreateFlag,T(2,A),T(2,#L4r22NewCreateFlag))
 C(4,#CreateFlag,S,$)
 T(H,#CreateFlag,#CreateFlagHelp)
 
+#Submit=A,1,S
+IF(#FuncCode==2,$,S)
+IF(#CreateFlag=="A",K(MODIFYBUTTON,恢復授權),K(MODIFYBUTTON,暫停授權))
+
 #AcctCheckFlag23=A,1,S
 E(0,@AcctCheckFlag23,#L4r23CheckCode)
 C(3,#FuncCode,1,$,s)

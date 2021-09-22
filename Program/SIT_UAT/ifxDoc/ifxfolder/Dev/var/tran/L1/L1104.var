@@ -123,7 +123,7 @@ T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人)
 
 #FdCustId=X,2,L
 #FdCustId2=X,2,L
-T(3,*)
+T(3, )
 #FdTypeCode=X,2,L
 T(3,*)
 
@@ -132,6 +132,8 @@ T(3,*)
 T(3,CdCode.CustTypeCode)
 
 #CustTypeCodeHelp=x,1024,S
+T(3,00:一般;02:首購;03:關企公司;05:保戶;06:團體戶)
+
 
 !NationalityCode 國籍
 #CDDEF02=x,25,S
@@ -156,7 +158,7 @@ RESET_RIM(#CustTypeCodeHelpRim,XXR99)
 S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@CustTypeCodeHelp,#HelpDesc1)
+!T(2,@CustTypeCodeHelp,#HelpDesc1)
 T(2,@NationalityCodeHelp,#HelpDesc2)
 T(2,@EntCodeHelp,#HelpDesc3)
 T(2,@YesNoHelp,#HelpDesc4)
@@ -467,7 +469,9 @@ T(1,#DATE,2,7)
 #BirthdayInd=X,1,L
 
 #BirthdayAft=D,7,I
-@V(7)A(DATE,0,#BirthdayAft)
+@
+V(7)
+A(DATE,0,#BirthdayAft)
 
 
 !設立日期比較
@@ -847,7 +851,7 @@ IF(#RegZip2Aft==#RegZip2Bef,T(3,),T(3,X))
 #CurrCityItem=X,10,L
 
 #SameRegHelp=X,100,S
-T(3,N:另行輸入;Y:同戶籍地址)
+T(3,N:另行輸入;Y:同公司地址)
 
 !---- 同戶籍地址
 #SameReg=X,1,I

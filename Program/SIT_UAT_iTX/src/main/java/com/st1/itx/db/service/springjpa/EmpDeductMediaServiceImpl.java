@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -37,9 +35,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("empDeductMediaService")
 @Repository
-public class EmpDeductMediaServiceImpl implements EmpDeductMediaService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(EmpDeductMediaServiceImpl.class);
-
+public class EmpDeductMediaServiceImpl extends ASpringJpaParm implements EmpDeductMediaService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -69,7 +65,7 @@ public class EmpDeductMediaServiceImpl implements EmpDeductMediaService, Initial
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + empDeductMediaId);
+    this.info("findById " + dbName + " " + empDeductMediaId);
     Optional<EmpDeductMedia> empDeductMedia = null;
     if (dbName.equals(ContentName.onDay))
       empDeductMedia = empDeductMediaReposDay.findById(empDeductMediaId);
@@ -96,10 +92,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "MediaDate", "MediaKind", "MediaSeq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "MediaDate", "MediaKind", "MediaSeq"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductMediaReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -109,6 +105,9 @@ em = null;
     else 
       slice = empDeductMediaRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -117,7 +116,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("detailSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " detailSeq_2 : " +  detailSeq_2);
+    this.info("detailSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " detailSeq_2 : " +  detailSeq_2);
     Optional<EmpDeductMedia> empDeductMediaT = null;
     if (dbName.equals(ContentName.onDay))
       empDeductMediaT = empDeductMediaReposDay.findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(acDate_0, batchNo_1, detailSeq_2);
@@ -127,6 +126,7 @@ em = null;
       empDeductMediaT = empDeductMediaReposHist.findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(acDate_0, batchNo_1, detailSeq_2);
     else 
       empDeductMediaT = empDeductMediaRepos.findTopByAcDateIsAndBatchNoIsAndDetailSeqIs(acDate_0, batchNo_1, detailSeq_2);
+
     return empDeductMediaT.isPresent() ? empDeductMediaT.get() : null;
   }
 
@@ -135,7 +135,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("receiveCheckFirst " + dbName + " : " + "mediaKind_0 : " + mediaKind_0 + " custNo_1 : " +  custNo_1 + " entryDate_2 : " +  entryDate_2 + " repayCode_3 : " +  repayCode_3 + " repayAmt_4 : " +  repayAmt_4);
+    this.info("receiveCheckFirst " + dbName + " : " + "mediaKind_0 : " + mediaKind_0 + " custNo_1 : " +  custNo_1 + " entryDate_2 : " +  entryDate_2 + " repayCode_3 : " +  repayCode_3 + " repayAmt_4 : " +  repayAmt_4);
     Optional<EmpDeductMedia> empDeductMediaT = null;
     if (dbName.equals(ContentName.onDay))
       empDeductMediaT = empDeductMediaReposDay.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIs(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
@@ -145,6 +145,7 @@ em = null;
       empDeductMediaT = empDeductMediaReposHist.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIs(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
     else 
       empDeductMediaT = empDeductMediaRepos.findTopByMediaKindIsAndCustNoIsAndEntryDateIsAndRepayCodeIsAndRepayAmtIs(mediaKind_0, custNo_1, entryDate_2, repayCode_3, repayAmt_4);
+
     return empDeductMediaT.isPresent() ? empDeductMediaT.get() : null;
   }
 
@@ -160,7 +161,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("mediaDateRng " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaDate_1 : " +  mediaDate_1 + " mediaKind_2 : " +  mediaKind_2);
+    this.info("mediaDateRng " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaDate_1 : " +  mediaDate_1 + " mediaKind_2 : " +  mediaKind_2);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductMediaReposDay.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualAndMediaKindIsOrderByMediaSeqAsc(mediaDate_0, mediaDate_1, mediaKind_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -169,6 +170,9 @@ em = null;
       slice = empDeductMediaReposHist.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualAndMediaKindIsOrderByMediaSeqAsc(mediaDate_0, mediaDate_1, mediaKind_2, pageable);
     else 
       slice = empDeductMediaRepos.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqualAndMediaKindIsOrderByMediaSeqAsc(mediaDate_0, mediaDate_1, mediaKind_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -185,7 +189,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4520A " + dbName + " : " + "acDate_0 : " + acDate_0 + " perfMonth_1 : " +  perfMonth_1 + " flowCode_2 : " +  flowCode_2);
+    this.info("findL4520A " + dbName + " : " + "acDate_0 : " + acDate_0 + " perfMonth_1 : " +  perfMonth_1 + " flowCode_2 : " +  flowCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = empDeductMediaReposDay.findAllByAcDateIsAndPerfMonthIsAndFlowCodeIsOrderByMediaSeqAsc(acDate_0, perfMonth_1, flowCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -195,7 +199,29 @@ em = null;
     else 
       slice = empDeductMediaRepos.findAllByAcDateIsAndPerfMonthIsAndFlowCodeIsOrderByMediaSeqAsc(acDate_0, perfMonth_1, flowCode_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public EmpDeductMedia lastMediaSeqFirst(int mediaDate_0, String mediaKind_1, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("lastMediaSeqFirst " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaKind_1 : " +  mediaKind_1);
+    Optional<EmpDeductMedia> empDeductMediaT = null;
+    if (dbName.equals(ContentName.onDay))
+      empDeductMediaT = empDeductMediaReposDay.findTopByMediaDateIsAndMediaKindIsOrderByMediaSeqDesc(mediaDate_0, mediaKind_1);
+    else if (dbName.equals(ContentName.onMon))
+      empDeductMediaT = empDeductMediaReposMon.findTopByMediaDateIsAndMediaKindIsOrderByMediaSeqDesc(mediaDate_0, mediaKind_1);
+    else if (dbName.equals(ContentName.onHist))
+      empDeductMediaT = empDeductMediaReposHist.findTopByMediaDateIsAndMediaKindIsOrderByMediaSeqDesc(mediaDate_0, mediaKind_1);
+    else 
+      empDeductMediaT = empDeductMediaRepos.findTopByMediaDateIsAndMediaKindIsOrderByMediaSeqDesc(mediaDate_0, mediaKind_1);
+
+    return empDeductMediaT.isPresent() ? empDeductMediaT.get() : null;
   }
 
   @Override
@@ -203,7 +229,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + empDeductMediaId);
+    this.info("Hold " + dbName + " " + empDeductMediaId);
     Optional<EmpDeductMedia> empDeductMedia = null;
     if (dbName.equals(ContentName.onDay))
       empDeductMedia = empDeductMediaReposDay.findByEmpDeductMediaId(empDeductMediaId);
@@ -221,7 +247,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + empDeductMedia.getEmpDeductMediaId());
+    this.info("Hold " + dbName + " " + empDeductMedia.getEmpDeductMediaId());
     Optional<EmpDeductMedia> empDeductMediaT = null;
     if (dbName.equals(ContentName.onDay))
       empDeductMediaT = empDeductMediaReposDay.findByEmpDeductMediaId(empDeductMedia.getEmpDeductMediaId());
@@ -243,7 +269,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
+    this.info("Insert..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
     if (this.findById(empDeductMedia.getEmpDeductMediaId()) != null)
       throw new DBException(2);
 
@@ -272,7 +298,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
+    this.info("Update..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
     if (!empNot.isEmpty())
       empDeductMedia.setLastUpdateEmpNo(empNot);
 
@@ -295,7 +321,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
+    this.info("Update..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
     if (!empNot.isEmpty())
       empDeductMedia.setLastUpdateEmpNo(empNot);
 
@@ -315,7 +341,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
+    this.info("Delete..." + dbName + " " + empDeductMedia.getEmpDeductMediaId());
     if (dbName.equals(ContentName.onDay)) {
       empDeductMediaReposDay.delete(empDeductMedia);	
       empDeductMediaReposDay.flush();
@@ -344,7 +370,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (EmpDeductMedia t : empDeductMedia){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -379,7 +405,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (empDeductMedia == null || empDeductMedia.size() == 0)
       throw new DBException(6);
 
@@ -408,7 +434,7 @@ em = null;
 
   @Override
   public void deleteAll(List<EmpDeductMedia> empDeductMedia, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

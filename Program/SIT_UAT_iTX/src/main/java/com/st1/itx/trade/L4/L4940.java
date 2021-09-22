@@ -13,9 +13,12 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankAuthAct;
+import com.st1.itx.db.domain.PostAuthLog;
 import com.st1.itx.db.service.BankAuthActService;
+import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4940")
@@ -38,6 +41,8 @@ public class L4940 extends TradeBuffer {
 
 	@Autowired
 	public BankAuthActService bankAuthActService;
+	@Autowired
+	public PostAuthLogService postAuthLogService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -60,7 +65,13 @@ public class L4940 extends TradeBuffer {
 		sBankAuthAct = bankAuthActService.authCheck(custNo, repayAcct, 0, 999, this.index, this.limit, titaVo);
 //		sBankAuthAct = bankAuthActService.findCustNoEq(custNo, this.index, this.limit, titaVo);
 		lBankAuthAct = sBankAuthAct == null ? null : sBankAuthAct.getContent();
-
+		String wkCustNoSeq = "";
+		String wksubBankAuth = "";
+		String wkCustId = "";
+		String wkPostDepCode = "";
+		String wkCustNo = "";
+		String wkAcctSeq = "";
+		PostAuthLog tPostAuthLog = new PostAuthLog();
 		if (lBankAuthAct != null && lBankAuthAct.size() != 0) {
 			for (BankAuthAct tBankAuthAct : lBankAuthAct) {
 				if (repayAcct.equals(tBankAuthAct.getRepayAcct())) {
@@ -74,24 +85,23 @@ public class L4940 extends TradeBuffer {
 					occursList.putParam("OORepayBank", tBankAuthAct.getRepayBank());
 					occursList.putParam("OOStatus", tBankAuthAct.getStatus());
 					occursList.putParam("OODepCode", tBankAuthAct.getPostDepCode());
-					occursList.putParam("OOAcctNoSeq", tBankAuthAct.getAcctSeq());
+					if ("700".equals(tBankAuthAct.getRepayBank())) {
+						wksubBankAuth = tBankAuthAct.getAuthType();
+						if (wksubBankAuth.length() > 1) {
+							wksubBankAuth = tBankAuthAct.getAuthType().substring(1, 2);
+						}
+						tPostAuthLog = postAuthLogService.repayAcctFirst(tBankAuthAct.getCustNo(),
+								tBankAuthAct.getPostDepCode(), tBankAuthAct.getRepayAcct(), wksubBankAuth, titaVo);
+						if (tPostAuthLog != null) {
+							wkCustId = tPostAuthLog.getCustId();
+						}
 
-					totaVo.addOccursList(occursList);
-				}
-			}
-			for (BankAuthAct tBankAuthAct : lBankAuthAct) {
-
-				if (!repayAcct.equals(tBankAuthAct.getRepayAcct())) {
-					OccursList occursList = new OccursList();
-
-					occursList.putParam("OOCustNo", tBankAuthAct.getCustNo());
-					occursList.putParam("OOFacmNo", tBankAuthAct.getFacmNo());
-					occursList.putParam("OOAuthType", tBankAuthAct.getAuthType());
-					occursList.putParam("OORepayAcct", tBankAuthAct.getRepayAcct());
-					occursList.putParam("OORepayBank", tBankAuthAct.getRepayBank());
-					occursList.putParam("OOStatus", tBankAuthAct.getStatus());
-					occursList.putParam("OODepCode", tBankAuthAct.getPostDepCode());
-					occursList.putParam("OOAcctNoSeq", tBankAuthAct.getAcctSeq());
+						wkPostDepCode = tBankAuthAct.getPostDepCode();
+						wkCustNo = FormatUtil.pad9("" + tBankAuthAct.getCustNo(), 7);
+						wkAcctSeq = tBankAuthAct.getAcctSeq();
+						wkCustNoSeq = wkCustId + wkPostDepCode + wkCustNo + wkAcctSeq;
+					}
+					occursList.putParam("OOAcctNoSeq", wkCustNoSeq);
 
 					totaVo.addOccursList(occursList);
 				}

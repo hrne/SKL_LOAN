@@ -1,5 +1,6 @@
 OCustId=X,10
 OCustNo=9,7
+OTypeCode=X,1
 OCustName=X,2.50
 OBirthday=9,7
 OSex=X,1
@@ -19,6 +20,8 @@ OEMail=X,50
 OIsLimit=X,1
 OIsRelated=X,1
 OIsLnrelNear=X,1
+OIsSuspected=X,1
+OIsDataDate=9,7
 OEntCode=X,1
 OEmpNo=X,6
 OEName=X,50

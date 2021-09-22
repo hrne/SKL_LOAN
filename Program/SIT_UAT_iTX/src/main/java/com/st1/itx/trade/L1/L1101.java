@@ -103,6 +103,8 @@ public class L1101 extends TradeBuffer {
 	private String wkIsLimit = "N";
 	private String wkIsRelated = "N";
 	private String wkIsLnrelNear = "N";
+	private String wkIsSuspected = "N";
+	private String wkIsDataDate = "";
 	CustMain beforeCustMain = new CustMain();
 
 	@Override
@@ -226,6 +228,10 @@ public class L1101 extends TradeBuffer {
 			if ("Y".equals(vo.getIsLnrelNear())) {
 				wkIsLnrelNear = "Y"; // 是否為準利害關係人
 			}
+			if ("Y".equals(vo.getIsSuspected())) {
+				wkIsSuspected = "Y"; // 是否為金控疑似準利害關係人
+			}
+			wkIsDataDate = vo.getDataDate();
 
 			break;
 		}
@@ -259,6 +265,8 @@ public class L1101 extends TradeBuffer {
 		this.totaVo.putParam("OCustId", tCustMain.getCustId());
 		this.totaVo.putParam("OCustNo", tCustMain.getCustNo());
 
+		this.totaVo.putParam("OTypeCode", tCustMain.getTypeCode());
+		
 		this.totaVo.putParam("OCustName", tCustMain.getCustName().replace("$n", "\n"));
 		this.totaVo.putParam("OBirthday", tCustMain.getBirthday());
 		this.totaVo.putParam("OSex", tCustMain.getSex());
@@ -278,6 +286,10 @@ public class L1101 extends TradeBuffer {
 		this.totaVo.putParam("OIsLimit", wkIsLimit);
 		this.totaVo.putParam("OIsRelated", wkIsRelated);
 		this.totaVo.putParam("OIsLnrelNear", wkIsLnrelNear);
+		this.totaVo.putParam("OIsSuspected", wkIsSuspected);
+		this.totaVo.putParam("OIsDataDate", wkIsDataDate);
+		
+		
 		this.totaVo.putParam("OEntCode", tCustMain.getEntCode());
 		this.totaVo.putParam("OEmpNo", tCustMain.getEmpNo());
 		this.totaVo.putParam("OEName", tCustMain.getEName());

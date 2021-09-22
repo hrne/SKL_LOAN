@@ -88,6 +88,16 @@ public interface EmpDeductMediaService {
   public Slice<EmpDeductMedia> findL4520A(int acDate_0, int perfMonth_1, String flowCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * MediaDate = ,AND MediaKind = 
+   *
+   * @param mediaDate_0 mediaDate_0
+   * @param mediaKind_1 mediaKind_1
+   * @param titaVo Variable-Length Argument
+   * @return Slice EmpDeductMedia EmpDeductMedia of List
+   */
+  public EmpDeductMedia lastMediaSeqFirst(int mediaDate_0, String mediaKind_1, TitaVo... titaVo);
+
+  /**
    * hold By EmpDeductMedia
    * 
    * @param empDeductMediaId key

@@ -153,6 +153,7 @@ public class L4043 extends TradeBuffer {
 //				原為歷程於L4042僅最新一筆需有按鈕控制用，現無作用
 				occursList.putParam("OOButtenFlagA", result.get("F21"));
 				occursList.putParam("OORetFlag", wkRetFlag);
+				occursList.putParam("OOTitaTxCd", result.get("F22"));
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

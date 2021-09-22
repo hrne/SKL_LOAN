@@ -1795,13 +1795,14 @@ C(3,#Hide5Flag,0,CALL(#HideP5),$)
 HELP(#BankDeductCdHelp)
 @V(H,#BankDeductCdHelp)
 V(2,0)
-
-! #SendL2r09=X,1,S
-! C(3,#RepayCode,2,$,S)
-! T(2,@RimBankCode,#RepayBank)
-! RESET_RIM(#SendL2r09,L2R09)
-! S(L2R09,1,#RimTxCode,#RimBankCode)
-! R(1,L2R09)
+#RimRepayBank=X,3,S
+#SendL2r53=X,1,S
+C(3,#RepayCode,2,$,S)
+T(2,@RimCustNo,#CustNo)
+T(2,@RimRepayBank,#RepayBank)
+RESET_RIM(#SendL2r53,L2R53)
+S(L2R53,1,#RimCustNo,#RimRepayBank)
+R(1,L2R53)
 
 #RepayBankX=X,30,L
 C(3,#RepayCode,2,$,S)
@@ -1816,7 +1817,8 @@ C(3,#RepayBank,700,T(2,@FdPostCode,#WkStar),T(3,@FdPostCode, ))
 #FdRepayAcctNo=X,2,L
 
 #RepayAcctNo=A,14,I
-C(3,#RepayCode,2,$,S)
+! ALERT(#L2r53Help1)
+C(3,#RepayCode,2,C(4,#L2r53Help1,$,HELP(#L2r53Help1)),S)
 C(3,#Hide5Flag,0,CALL(#HideP5),$)
 @V(2,0)
 
@@ -2366,6 +2368,7 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 <include src="ROM.icf::L2R09.dec"/>
 <include src="ROM.icf::L2R11.dec"/>
 <include src="ROM.icf::L2R50.dec"/>
+<include src="ROM.icf::L2R53.dec"/>
 <include src="ROM.icf::L2R13.dec"/>
 <include src="ROM.icf::L4R22.dec"/>
 <include src="ROM.icf::L6R28.dec"/>
@@ -2549,6 +2552,7 @@ TXFORM=L2153
 <include src="ROM.icf::L2R11.tom"/>
 <include src="ROM.icf::L2R13.tom"/>
 <include src="ROM.icf::L2R50.tom"/>
+<include src="ROM.icf::L2R53.tom"/>
 <include src="ROM.icf::L4R22.tom"/>
 <include src="ROM.icf::L6R28.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

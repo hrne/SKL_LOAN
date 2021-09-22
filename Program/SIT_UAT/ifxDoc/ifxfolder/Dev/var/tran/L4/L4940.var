@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,16)ASGN(INQLEN$)
+E(0,56)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -86,8 +86,11 @@ T(2,@PostDepCodeHelp,#HelpDesc3)
 
 #NTXBUF=X,500,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@CustNo,#NTXBUF,1,7)
-T(1,@RepayAcct,#NTXBUF,8,14)
+T(1,@ChainTxCd,#NTXBUF,1,5)
+T(1,@CustNo,#NTXBUF,6,7)
+T(1,@RepayAcct,#NTXBUF,13,14)
+
+#ChainTxCd=X,5,S
 
 ! 會計日期
 #CustNo=A,7,L
@@ -95,6 +98,8 @@ T(1,@RepayAcct,#NTXBUF,8,14)
 
 #RPTFG=A,1,S
 E(0,0)
+C(5,#ChainTxCd,L4042,E(0,0),$)
+C(5,#ChainTxCd,L4043,E(0,2),$)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
@@ -110,6 +115,8 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 <sub type="FORM" name="L4940">
 #SCRTIL=_,_,S
 T(3,[L4940] 帳號授權檔查詢)
+
+
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
@@ -131,7 +138,7 @@ T(H,@OOStatusX,#OOStatus,#AuthStatusCodeHelp)
 #OODepCodeX=x,10,O
 T(3,)
 T(H,@OODepCodeX,#OODepCode,#PostDepCodeHelp)
-#OOAcctNoSeq=X,2,O
+#OOAcctNoSeq=X,25,O
 
 </sub>
 
@@ -184,10 +191,8 @@ TXFORM=L4940
 {width:105}
 #OODepCodeX=帳戶別
 {width:105}
-#OOAcctNoSeq=帳號碼
-{width:65}
 
-</sub>
+^
 
 #RPTFG=2,QUERY.GRID,L4940
 #any={detail:true, header:'L4940.part', caption:'', rowNum:20, rowList:[20,40,60]}
@@ -206,8 +211,8 @@ TXFORM=L4940
 {width:105}
 #OODepCodeX=帳戶別
 {width:105}
-#OOAcctNoSeq=帳號碼
-{width:65}
+#OOAcctNoSeq=用戶編號
+{width:250}
 
 
 </sub>

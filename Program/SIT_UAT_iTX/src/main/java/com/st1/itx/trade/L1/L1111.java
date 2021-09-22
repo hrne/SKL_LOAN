@@ -62,7 +62,7 @@ public class L1111 extends TradeBuffer {
 		
 		CustMain iCustMain2 = iCustMainService.custIdFirst(iCustIdAfter, titaVo);
 		if (iCustMain2 != null) {
-			throw new LogicException(titaVo, "E0012", "調整後身份證號/統一編號 : " + iCustIdAfter);
+			throw new LogicException(titaVo, "E0012", "變更後身份證號/統一編號 : " + iCustIdAfter);
 		}
 		
 		CustMain uCustMain = iCustMainService.holdById(iCustMain.getCustUKey(), titaVo);

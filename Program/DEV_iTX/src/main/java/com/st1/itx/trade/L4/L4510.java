@@ -193,20 +193,12 @@ public class L4510 extends TradeBuffer {
 //		根據輸入之入帳日查詢BORM(ACDATE)->FACM(REPAYCODE:03)寫入empdtl
 		mediaDate = parse.stringToInteger(titaVo.get("MediaDate")) + 19110000;
 
-		List<EmpDeductSchedule> lEmpDeductSchedule = new ArrayList<EmpDeductSchedule>();
-
-		Slice<EmpDeductSchedule> sEmpDeductSchedule = null;
-
 //		抓取媒體日為今日者
-		sEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate, this.index, this.limit,
-				titaVo);
-
-		lEmpDeductSchedule = sEmpDeductSchedule == null ? null : sEmpDeductSchedule.getContent();
-
-		if (lEmpDeductSchedule != null && lEmpDeductSchedule.size() != 0) {
-			for (EmpDeductSchedule tEmpDeductSchedule : lEmpDeductSchedule) {
+		Slice<EmpDeductSchedule> slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate,
+				this.index, this.limit, titaVo);
+		if (slEmpDeductSchedule != null) {
+			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
 				perfMonth.put(tEmpDeductSchedule.getAgType1(), tEmpDeductSchedule.getWorkMonth());
-
 				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
 						titaVo);
 //				1.15日薪 2.非15日薪
@@ -363,7 +355,7 @@ public class L4510 extends TradeBuffer {
 				listBaTxVo = baTxCom.settingUnPaid(iY15EntryDate - 19110000, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
 			}
-			setBatxValue(listBaTxVo, result.get("F2"), result.get("F3"));
+			setBatxValue(listBaTxVo, result.get("F3"));
 		}
 
 //		各個repaycode寫入BankDeductDtl
@@ -733,17 +725,17 @@ public class L4510 extends TradeBuffer {
 		lEmpDeductDtl.sort((c1, c2) -> {
 			int result = 0;
 //			入帳順序: 入帳日ASC > 戶號ASC > 扣款類別ASC (火險往前，因其他費用包含在期款內)
-			if (c1.getEmpDeductDtlId().getEntryDate() - c2.getEmpDeductDtlId().getEntryDate() != 0) {
-				result = c1.getEmpDeductDtlId().getEntryDate() - c2.getEmpDeductDtlId().getEntryDate();
-			} else if (c1.getEmpDeductDtlId().getCustNo() - c2.getEmpDeductDtlId().getCustNo() != 0) {
-				result = c1.getEmpDeductDtlId().getCustNo() - c2.getEmpDeductDtlId().getCustNo();
-			} else if (c1.getEmpDeductDtlId().getAchRepayCode() != c2.getEmpDeductDtlId().getAchRepayCode()) {
-				if (c1.getEmpDeductDtlId().getAchRepayCode() == 5) {
+			if (c1.getEntryDate() - c2.getEntryDate() != 0) {
+				result = c1.getEntryDate() - c2.getEntryDate();
+			} else if (c1.getCustNo() - c2.getCustNo() != 0) {
+				result = c1.getCustNo() - c2.getCustNo();
+			} else if (c1.getAchRepayCode() != c2.getAchRepayCode()) {
+				if (c1.getAchRepayCode() == 5) {
 					result = -1;
-				} else if (c2.getEmpDeductDtlId().getAchRepayCode() == 5) {
+				} else if (c2.getAchRepayCode() == 5) {
 					result = 1;
 				} else {
-					result = c1.getEmpDeductDtlId().getAchRepayCode() - c2.getEmpDeductDtlId().getAchRepayCode();
+					result = c1.getAchRepayCode() - c2.getAchRepayCode();
 				}
 			} else {
 				result = 0;
@@ -753,20 +745,19 @@ public class L4510 extends TradeBuffer {
 
 //		合計金額 火險、期款(其他費用)
 		for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
-			this.info("tEmpDeductDtl.getEntryDate() : " + tEmpDeductDtl.getEmpDeductDtlId().getEntryDate());
-			this.info("tEmpDeductDtl.getCustNo() : " + tEmpDeductDtl.getEmpDeductDtlId().getCustNo());
-			this.info("tEmpDeductDtl.getAchRepayCode() : " + tEmpDeductDtl.getEmpDeductDtlId().getAchRepayCode());
+			this.info("tEmpDeductDtl.getEntryDate() : " + tEmpDeductDtl.getEntryDate());
+			this.info("tEmpDeductDtl.getCustNo() : " + tEmpDeductDtl.getCustNo());
+			this.info("tEmpDeductDtl.getAchRepayCode() : " + tEmpDeductDtl.getAchRepayCode());
 
 			String rpcd = "";
 
-			if (tEmpDeductDtl.getEmpDeductDtlId().getAchRepayCode() == 5) {
+			if (tEmpDeductDtl.getAchRepayCode() == 5) {
 				rpcd = "92";
 			} else {
 				rpcd = "XH";
 			}
 
-			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getEmpDeductDtlId().getEntryDate(),
-					tEmpDeductDtl.getEmpDeductDtlId().getCustNo(), rpcd);
+			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getEntryDate(), tEmpDeductDtl.getCustNo(), rpcd);
 			this.info("tmp : " + tmp.toString());
 
 			if (repayAmt.containsKey(tmp)) {
@@ -806,14 +797,13 @@ public class L4510 extends TradeBuffer {
 //			group by CustNo, RepayCode
 			String rpcd = "";
 
-			if (tEmpDeductDtl.getEmpDeductDtlId().getAchRepayCode() == 5) {
+			if (tEmpDeductDtl.getAchRepayCode() == 5) {
 				rpcd = "92";
 			} else {
 				rpcd = "XH";
 			}
 
-			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getEmpDeductDtlId().getEntryDate(),
-					tEmpDeductDtl.getEmpDeductDtlId().getCustNo(), rpcd);
+			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getEntryDate(), tEmpDeductDtl.getCustNo(), rpcd);
 
 			if (empCnt.containsKey(tmp)) {
 				updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq, titaVo);
@@ -830,18 +820,22 @@ public class L4510 extends TradeBuffer {
 			tEmpDeductMediaId.setMediaSeq(seq);
 
 			tEmpDeductMedia.setEmpDeductMediaId(tEmpDeductMediaId);
-			tEmpDeductMedia.setCustNo(tEmpDeductDtl.getEmpDeductDtlId().getCustNo());
-			tEmpDeductMedia.setRepayCode(tEmpDeductDtl.getEmpDeductDtlId().getAchRepayCode());
-			tEmpDeductMedia.setPerfRepayCode(parse.stringToInteger(tEmpDeductDtl.getEmpDeductDtlId().getRepayCode()));
+			tEmpDeductMedia.setCustNo(tEmpDeductDtl.getCustNo());
+			tEmpDeductMedia.setRepayCode(tEmpDeductDtl.getAchRepayCode());
+			tEmpDeductMedia.setPerfRepayCode(parse.stringToInteger(tEmpDeductDtl.getRepayCode()));
 			tEmpDeductMedia.setRepayAmt(repayAmt.get(tmp));
-			tEmpDeductMedia.setPerfMonth(tEmpDeductDtl.getEmpDeductDtlId().getPerfMonth());
-			tEmpDeductMedia.setFlowCode(tEmpDeductDtl.getEmpDeductDtlId().getProcCode());
+			tEmpDeductMedia.setPerfMonth(tEmpDeductDtl.getPerfMonth());
+			tEmpDeductMedia.setFlowCode(tEmpDeductDtl.getProcCode());
 			tEmpDeductMedia.setUnitCode(tEmpDeductDtl.getUnitCode());
 			tEmpDeductMedia.setCustId(tEmpDeductDtl.getCustId());
-			tEmpDeductMedia.setEntryDate(tEmpDeductDtl.getEmpDeductDtlId().getEntryDate());
+			tEmpDeductMedia.setEntryDate(tEmpDeductDtl.getEntryDate());
 			tEmpDeductMedia.setTxAmt(BigDecimal.ZERO);
 			tEmpDeductMedia.setErrorCode("");
-			tEmpDeductMedia.setAcctCode(tEmpDeductDtl.getEmpDeductDtlId().getAcctCode());
+			if (tEmpDeductDtl.getAchRepayCode() <= 3) {
+				tEmpDeductMedia.setAcctCode(tEmpDeductDtl.getAcctCode());
+			} else {
+				tEmpDeductMedia.setAcctCode("000");
+			}
 			tEmpDeductMedia.setAcDate(0);
 			tEmpDeductMedia.setBatchNo("");
 			tEmpDeductMedia.setDetailSeq(0);
@@ -852,21 +846,22 @@ public class L4510 extends TradeBuffer {
 				throw new LogicException("E0005", "員工扣薪檔新增失敗 :" + e.getErrorMsg());
 			}
 
-			updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq, titaVo );
+			updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq, titaVo);
 		}
 	}
 
-	private void updateEmpDeductDtl(EmpDeductDtl tEmpDeductDtl, int todayF, int flag, int seq, TitaVo titaVo)  throws LogicException {
+	private void updateEmpDeductDtl(EmpDeductDtl tEmpDeductDtl, int todayF, int flag, int seq, TitaVo titaVo)
+			throws LogicException {
 		EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
-		tEmpDeductDtlId.setAcctCode(tEmpDeductDtl.getEmpDeductDtlId().getAcctCode());
-		tEmpDeductDtlId.setAchRepayCode(tEmpDeductDtl.getEmpDeductDtlId().getAchRepayCode());
-		tEmpDeductDtlId.setCustNo(tEmpDeductDtl.getEmpDeductDtlId().getCustNo());
-		tEmpDeductDtlId.setEntryDate(tEmpDeductDtl.getEmpDeductDtlId().getEntryDate());
-		tEmpDeductDtlId.setPerfMonth(tEmpDeductDtl.getEmpDeductDtlId().getPerfMonth());
-		tEmpDeductDtlId.setProcCode(tEmpDeductDtl.getEmpDeductDtlId().getProcCode());
-		tEmpDeductDtlId.setRepayCode(tEmpDeductDtl.getEmpDeductDtlId().getRepayCode());
-		tEmpDeductDtlId.setFacmNo(tEmpDeductDtl.getEmpDeductDtlId().getFacmNo());
-		tEmpDeductDtlId.setBormNo(tEmpDeductDtl.getEmpDeductDtlId().getBormNo());
+		tEmpDeductDtlId.setAcctCode(tEmpDeductDtl.getAcctCode());
+		tEmpDeductDtlId.setAchRepayCode(tEmpDeductDtl.getAchRepayCode());
+		tEmpDeductDtlId.setCustNo(tEmpDeductDtl.getCustNo());
+		tEmpDeductDtlId.setEntryDate(tEmpDeductDtl.getEntryDate());
+		tEmpDeductDtlId.setPerfMonth(tEmpDeductDtl.getPerfMonth());
+		tEmpDeductDtlId.setProcCode(tEmpDeductDtl.getProcCode());
+		tEmpDeductDtlId.setRepayCode(tEmpDeductDtl.getRepayCode());
+		tEmpDeductDtlId.setFacmNo(tEmpDeductDtl.getFacmNo());
+		tEmpDeductDtlId.setBormNo(tEmpDeductDtl.getBormNo());
 
 		EmpDeductDtl t2EmpDeductDtl = new EmpDeductDtl();
 		t2EmpDeductDtl = empDeductDtlService.findById(tEmpDeductDtlId, titaVo);
@@ -963,17 +958,13 @@ public class L4510 extends TradeBuffer {
 		}
 	}
 
-	private void deleEmpDeductDtl(List<String> procCode, int iEntryDate,TitaVo titaVo) throws LogicException {
-		List<EmpDeductDtl> lEmpDeductDtl = new ArrayList<EmpDeductDtl>();
+	private void deleEmpDeductDtl(List<String> procCode, int iEntryDate, TitaVo titaVo) throws LogicException {
 
-		Slice<EmpDeductDtl> sEmpDeductDtl = null;
+		Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.entryDateRng(iEntryDate, iEntryDate, procCode,
+				this.index, this.limit, titaVo);
 
-		sEmpDeductDtl = empDeductDtlService.entryDateRng(iEntryDate, iEntryDate, procCode, this.index, this.limit, titaVo);
-
-		lEmpDeductDtl = sEmpDeductDtl == null ? null : sEmpDeductDtl.getContent();
-
-		if (lEmpDeductDtl != null && lEmpDeductDtl.size() != 0) {
-			for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
+		if (slEmpDeductDtl != null) {
+			for (EmpDeductDtl tEmpDeductDtl : slEmpDeductDtl.getContent()) {
 				tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtl.getEmpDeductDtlId(), titaVo);
 				try {
 					empDeductDtlService.delete(tEmpDeductDtl, titaVo);
@@ -985,7 +976,7 @@ public class L4510 extends TradeBuffer {
 	}
 
 //	flag 1:15日薪 2:非15日薪
-	private void setBatxValue(List<BaTxVo> listBaTxVo, String acctCode, String flag) throws LogicException {
+	private void setBatxValue(List<BaTxVo> listBaTxVo, String flag) throws LogicException {
 		this.info("setBatxValue Start ...");
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
@@ -1007,12 +998,7 @@ public class L4510 extends TradeBuffer {
 					mapFlag.put(tmp, 1);
 				}
 
-//				QC.462 期款科目->抓取額度檔
-				if (tBaTxVo.getRepayType() == 1) {
-					rpAcCodeMap.put(tmp, acctCode);
-				} else {
-					rpAcCodeMap.put(tmp, tBaTxVo.getAcctCode());
-				}
+				rpAcCodeMap.put(tmp, tBaTxVo.getAcctCode());
 
 				this.info("DataKind : " + tBaTxVo.getDataKind());
 				this.info("RepayType : " + tBaTxVo.getRepayType());

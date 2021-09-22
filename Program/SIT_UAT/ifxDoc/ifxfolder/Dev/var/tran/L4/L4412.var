@@ -127,6 +127,7 @@ T(2,@AmlRspHelp,#HelpDesc8)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FuncCode,#NTXBUF,1,1)
 T(1,@CustId,#NTXBUF,2,10)
+T(1,@CustIdTemp2,#NTXBUF,2,10)
 T(1,@CustNo,#NTXBUF,12,7)
 T(1,@FacmNo,#NTXBUF,19,3)
 T(1,@PostDepCode,#NTXBUF,22,1)
@@ -276,7 +277,7 @@ E(0,@RimCustNo,#CustNo)
 RESET_RIM(#RimL4r03A,L4R03)
 S(L4R03,1,#RimCustNo)
 R(1,L4R03)
-T(2,@CustId,#L4r03CustId)
+! T(2,@CustId,#L4r03CustId)
 T(2,@CustIdTemp,#L4r03CustId)
 
 ! 額度
@@ -457,12 +458,14 @@ C(3,#checkFlag,1,T(F,@CustId,0)T(F,@RelationCode,0),T(F,@CustId,1)T(F,@RelationC
 
 ! 扣款人ＩＤ
 #CustIdTemp=X,10,S
+#CustIdTemp2=X,10,S
 #CustId=X,10,I
 IF(#FuncCode==1 || #FuncCode==2,$,s)
 C(3,#checkFlag,1,s,$)
 @
 V(7)
 A(ID_UNINO,0,#CustId)
+IF(#CustId==#CustIdTemp,s,$)
 C(5,#CustId,#CustIdTemp,$,V(P,與主檔設定ID不合))
 C(5,#CustId,#L4r03CustId,E(0,@checkFlag,0),E(0,@checkFlag,1))
 ! C(3,#FuncCode,1,$,C(3,#checkFlag,0,V(P,至少修改一個項目),$))

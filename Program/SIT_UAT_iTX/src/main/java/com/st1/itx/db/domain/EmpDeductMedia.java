@@ -39,7 +39,7 @@ public class EmpDeductMedia implements Serializable {
   private int mediaDate = 0;
 
   // 媒體別
-  /* 1:ACH新光2:ACH他行3:郵局4:15日5:非15日 */
+  /* 4:15日5:非15日 */
   @Column(name = "`MediaKind`", length = 1, insertable = false, updatable = false)
   private String mediaKind;
 
@@ -52,12 +52,12 @@ public class EmpDeductMedia implements Serializable {
   private int custNo = 0;
 
   // 還款類別
-  /* 0.債協暫收款1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他11.債協匯入款(虛擬帳號為9510500NNNNNNN) */
+  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他11.債協匯入款(虛擬帳號為9510500NNNNNNN) */
   @Column(name = "`RepayCode`")
   private int repayCode = 0;
 
   // 扣款代碼
-  /* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件 */
+  /* CdCode:PerfRepayCode1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件 */
   @Column(name = "`PerfRepayCode`")
   private int perfRepayCode = 0;
 
@@ -158,10 +158,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 媒體別<br>
-	* 1:ACH新光
-2:ACH他行
-3:郵局
-4:15日
+	* 4:15日
 5:非15日
 	* @return String
 	*/
@@ -171,10 +168,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 媒體別<br>
-	* 1:ACH新光
-2:ACH他行
-3:郵局
-4:15日
+	* 4:15日
 5:非15日
   *
   * @param mediaKind 媒體別
@@ -223,7 +217,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -241,7 +235,7 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.債協暫收款
+	* CdCode:RepayType
 1.期款
 2.部分償還
 3.結案
@@ -260,7 +254,8 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 扣款代碼<br>
-	* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
+	* CdCode:PerfRepayCode
+1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
 	* @return Integer
 	*/
   public int getPerfRepayCode() {
@@ -269,7 +264,8 @@ public class EmpDeductMedia implements Serializable {
 
 /**
 	* 扣款代碼<br>
-	* 1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
+	* CdCode:PerfRepayCode
+1:扣薪件;2:特約件;3:滯繳件;4:人事特約件;5:房貸扣薪件
   *
   * @param perfRepayCode 扣款代碼
 	*/

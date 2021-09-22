@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,111)ASGN(INQLEN$)
+E(0,116)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -266,6 +266,13 @@ T(3,)T(H,#OOPostMediaCode,#MediaCodeHelp2)
 #OODeleteDate=D,7,O
 #OOButtenFlagA=A,1,O
 #OORetFlag=X,1,O
+#OOTitaTxCd=X,5,O
+
+
+#OOTitaTxType=X,2,S
+T(1,#OOTitaTxCd,1,2)
+
+
 ! #OOBUF_CREAT=X,1,S 改由上方畫面新增
 ! T(2,1)
 #OOBUF_EDIT=X,500,S
@@ -324,6 +331,8 @@ T(2,5
 
 
 #OOBTN_EDIT=A,2,O
+C(5,#OOTitaTxType,L2,BIND(grid,cancel),$)
+C(5,#OOTitaTxType,L2,s,$)
 C(4,#OORetFlag,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_EDIT}))
 C(4,#OORetFlag,s,$)
 C(4,#OOAuthErrorCode,IF(#OOPostMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT})),BIND(grid,cancel))
@@ -336,6 +345,8 @@ BIND(grid,cancel))
 
 
 #OOBTN_DELETE=A,2,O
+C(5,#OOTitaTxType,L2,BIND(grid,cancel),$)
+C(5,#OOTitaTxType,L2,s,$)
 ! IF(#OOButtenFlagA=="1",$,BIND(grid,cancel))
 ! IF(#OOButtenFlagA=="1",$,s)
 ! IF(#OODeleteDate>0,BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_DELETE}),$)
@@ -347,7 +358,7 @@ IF(#OOPostMediaCode=="Y",s,$)
 BIND(grid,{ cmd=CHAIN; ntxcd=L4412; ntxbuf=#OOBUF_SEARCH})
 
 #OOBUF_CONNECT=X,500,S
-T(2,#OOCustNo+#OORepayAcctLog)
+T(2,#TXCD+#OOCustNo+#OORepayAcctLog)
 
 #OOBTN_CONNECT=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4940; ntxbuf=#OOBUF_CONNECT})
@@ -397,6 +408,7 @@ TXFORM=L4043
 #OODeleteDate
 #OOButtenFlagA
 #OORetFlag
+#OOTitaTxCd
 
 ^
 </sub>

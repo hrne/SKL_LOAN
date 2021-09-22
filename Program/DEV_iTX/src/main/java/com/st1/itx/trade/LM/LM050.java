@@ -11,19 +11,27 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
-@Service("LM050")
-@Scope("step")
 /**
+ * LM050
  * 
- * 
- * @author Eric Chang
+ * @author Chih Wei
  * @version 1.0.0
  */
+@Service("LM050")
+@Scope("step")
 public class LM050 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
-	public LM050Report LM050report;
+	LM050Report lM050Report;
+
+	@Autowired
+	DateUtil dDateUtil;
+
+	@Autowired
+	WebClient webClient;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -32,13 +40,15 @@ public class LM050 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM050.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM050 ");
-		LM050report.exec(titaVo);
+		lM050Report.exec(titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo(), "LM050放款保險法第3條利害關係人放款餘額表_限額控管已完成", titaVo);
+
 	}
 }

@@ -1,0 +1,249 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4512)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4512" layout="cols=3;screen.width=[150,350,150,350];printer.width=[20,80];order=1">
+[
+["[L4512]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@員工扣薪媒體檔維護"],
+[#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
+[#<->#,"#FdMediaDate+媒體日期",#MediaDate],
+[#<->#,"#FdCustNo+戶號",#CustNo],
+["#FdRepayCode+入帳扣款別",#RepayCode,#RepayCodeX],["#FdPerfRepayCode+扣款代碼",#PerfRepayCode,#PerfRepayCodeX],
+["#FdPerfMonth+業績年月",#PerfMonth],["#FdTellerNo+員工編號",#TellerNo],
+["#FdTellerId+統一編號",#TellerId],["#FdTellerName+員工姓名",#TellerName],
+["#FdRepayAmt+應扣金額",#RepayAmt],
+]
+
+#FdFunctionCodeX=X,2,L
+#FdCustNo=X,2,L
+#FdRepayCode=X,2,L
+#FdPerfMonth=X,2,L
+#FdTellerId=X,2,L
+#FdRepayAmt=X,2,L
+#FdPerfRepayCode=X,2,L
+#FdTellerNo=X,2,L
+#FdTellerName=X,2,L
+#FdMediaDate=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L4951進入),$)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 功能下拉選單
+#FunctionCdRimName=x,20,S
+T(3,CdCode.FuncCode)
+#FunctionCdHelp=x,1024,S
+
+! 入帳扣款別
+#RepayCodeXRimName=x,20,S
+T(3,CdCode.RepayCodeX)
+#RepayCodeXHelp=x,1024,S
+
+! 扣款代碼
+#PerfRepayCodeRimName=x,20,S
+T(3,CdCode.PerfRepayCode)
+#PerfRepayCodeHelp=x,1024,S
+
+#FunctionCdHelpRim=X,1,S
+RESET_RIM(#FunctionCdHelpRim,XXR99)
+S(XXR99,01,#FunctionCdRimName,#RepayCodeXRimName,#PerfRepayCodeRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FunctionCdHelp,#HelpDesc1)
+T(2,@RepayCodeXHelp,#HelpDesc2)
+T(2,@PerfRepayCodeHelp,#HelpDesc3)
+
+
+#NTXBUF=X,500,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunctionCode,#NTXBUF,1,1)
+T(1,@MediaDate,#NTXBUF,2,7)
+C(3,#FunctionCode,1,s,$)
+T(1,@MediaKind,#NTXBUF,9,1)
+T(1,@MediaSeq,#NTXBUF,10,6)
+T(1,@CustNo,#NTXBUF,16,7)
+T(1,@RepayCode,#NTXBUF,23,2)
+T(1,@PerfMonth,#NTXBUF,25,5)
+T(1,@PerfRepayCode,#NTXBUF,30,1)
+T(1,@TellerNo,#NTXBUF,31,6)
+T(1,@TellerId,#NTXBUF,37,10)
+T(1,@TellerName,#NTXBUF,47,100)
+T(1,@RepayAmt,#NTXBUF,147,14)
+! 預先塞中文內容
+T(H,@RepayCodeX,#RepayCode,#RepayCodeXHelp)
+T(H,@PerfRepayCodeX,#PerfRepayCode,#PerfRepayCodeHelp)
+
+! #Pre_RepayAmt=m,16,S
+! E(2,@RepayAmt,#Pre_RepayAmt/100)
+
+! 功能
+#FunctionCode=A,1,S
+C(3,#CHAIN,0,E(0,#FunctionCode,5),s)
+E(0,@FUNCIND,#FunctionCode)
+
+#FunctionCodeX=X,4,L
+T(H,#FunctionCode,#FunctionCdHelp)
+C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunctionCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+#ShowFd=X,1,S
+C(2,#FunctionCode,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+T(2,@FdCustNo,#ShowFd)     
+T(2,@FdRepayCode,#ShowFd)
+T(2,@FdPerfMonth,#ShowFd)
+T(2,@FdRepayAmt,#ShowFd)
+T(2,@FdPerfRepayCode,#ShowFd)
+
+!刪除時關閉框線
+#WKTF=X,1,S
+IF(#FunctionCode==4,
+T(F,@CustNo,0)
+T(F,@RepayCode,0)
+T(F,@PerfMonth,0)
+T(F,@PerfRepayCode,0)
+T(F,@RepayAmt,0)
+HIDE(#RepayCode,#PerfRepayCode)
+,$)
+
+#MediaDate=D,7,L
+#MediaKind=X,1,S
+#MediaSeq=m,6,S
+
+#SetValue=A,1,S
+C(3,#FunctionCode,1,$,s)
+T(1,@PerfMonth,#SYSDATE,2,5)
+
+! 戶號
+#CustNo=A,7,I
+C(3,#FunctionCode,4,s,$)
+@V(2,0)
+
+#RimFindCode=A,1,S
+#RimCustNo=A,7,S
+#RimFacmNo=A,3,S
+#RimAcctNo=x,14,S
+#RimBankNo=A,3,S
+
+! 4R21
+#SendL4R21A=X,1,S
+E(0,@RimFindCode,1)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL4R21A,L4R21)
+S(L4R21,1,#RimFindCode,#RimCustNo)
+R(1,L4R21)
+
+#CustCheck=A,1,S
+IF(#L4r21CheckCode==1,$,V(P,該戶號不存在於客戶檔))
+
+<include src="ROM.icf::L4R21.dec"/>
+<include src="ROM.icf::L4R03.dec"/>
+
+! 入帳扣款別
+#RepayCode=A,2,I
+C(3,#FunctionCode,4,s,$)
+HELP(#RepayCodeXHelp)
+@V(H,#RepayCodeXHelp)
+
+#RepayCodeX=X,10,L
+T(H,#RepayCode,#RepayCodeXHelp)
+
+! 扣款代碼
+#PerfRepayCode=A,1,I
+C(3,#FunctionCode,4,s,$)
+HELP(#PerfRepayCodeHelp)
+@V(H,#PerfRepayCodeHelp)
+
+#PerfRepayCodeX=X,10,L
+T(H,#PerfRepayCode,#PerfRepayCodeHelp)
+
+! 4R03
+#SendL4R03A=X,1,S
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL4r03,L4R03)
+S(L4R03,1,#RimCustNo)
+R(1,L4R03)
+T(2,@TellerName,#L4r03CustName)
+T(2,@TellerId,#L4r03CustId)
+T(2,@TellerNo,#L4r03EmpNo)
+
+! 業績年月
+#PerfMonth=A,5,I
+C(3,#FunctionCode,4,s,$)
+@A(YM13,1,#PerfMonth)
+
+! 員工編號
+#TellerNo=X,6,L
+
+! 統一編號
+#TellerId=X,10,L
+
+! 員工姓名
+#TellerName=X,10,L
+
+! 應扣金額
+#RepayAmt=m,14,I
+C(3,#FunctionCode,4,s,$)
+@V(2,0)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4512 -----------
+<sub type="FORM" name="L4512">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCode
+#CustNo
+#RepayCode
+#PerfMonth
+#PerfRepayCode
+#RepayAmt
+#MediaDate
+#MediaKind
+#MediaSeq
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L4R21.tom"/>
+<include src="ROM.icf::L4R03.tom"/>
+
+TXFORM=L4512
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+
+</sub>

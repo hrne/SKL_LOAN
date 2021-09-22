@@ -18,9 +18,7 @@ import com.st1.itx.util.common.MakeReport;
 
 @Component
 @Scope("prototype")
-
 public class LM050Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM050Report.class);
 
 	@Autowired
 	LM050ServiceImpl lM050ServiceImpl;
@@ -28,17 +26,33 @@ public class LM050Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
+	// 淨值
 	BigDecimal equity = BigDecimal.ZERO;
-	BigDecimal empbal = BigDecimal.ZERO;
-	BigDecimal loanbal = BigDecimal.ZERO;
-	BigDecimal divamt = BigDecimal.ZERO;
-	BigDecimal tot = BigDecimal.ZERO;
+
+	// 取千元
+	BigDecimal thousand = getBigDecimal("1000");
+
+	// 明細加總
+	BigDecimal detailTotal = BigDecimal.ZERO;
+
+	// 職員放款總額
+	BigDecimal empLoanBal = BigDecimal.ZERO;
+
+	// 關係人放款總額
+	BigDecimal relLoanBal = BigDecimal.ZERO;
+
+	// 一般客戶合計
+	BigDecimal custLoanBal = BigDecimal.ZERO;
+
+	// 放款總額
+	BigDecimal total = BigDecimal.ZERO;
+
 	int row = 3;
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM050", "放款保險法第3條利害關係人放款餘額表_限額控管",
-				"LM050_放款保險法第3條利害關係人放款餘額表_限額控管", "LM050放款保險法第3條利害關係人放款餘額表_限額控管.xlsx", "108.04");
+				"LM050放款保險法第3條利害關係人放款餘額表_限額控管", "LM050_底稿_放款保險法第3條利害關係人放款餘額表_限額控管.xlsx", "108.04");
 
 		// 取得民國年帳務日
 		String entdy = titaVo.getEntDy();
@@ -60,17 +74,16 @@ public class LM050Report extends MakeReport {
 			this.error("LM050ServiceImpl.fnEquity error = " + errors.toString());
 		}
 
-		if (equityList.size() > 0) {
+		if (equityList != null && equityList.size() > 0) {
 
 			String value = equityList.get(0).get("F0");
 
-			BigDecimal amt = value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value);
+			BigDecimal amt = getBigDecimal(value);
 
 			equity = amt;
-			makeExcel.setValue(2, 6, amt, "#,##0");
-		}
 
-		divamt = equity;
+			makeExcel.setValue(2, 6, formatThousand(amt), "#,##0");
+		}
 
 		fnAll(titaVo);
 
@@ -79,12 +92,17 @@ public class LM050Report extends MakeReport {
 		makeExcel.toExcel(sno);
 	}
 
+	private BigDecimal formatThousand(BigDecimal amt) {
+
+		return this.computeDivide(amt, thousand, 3);
+	}
+
 	private void fnAll(TitaVo titaVo) throws LogicException {
 
 		List<Map<String, String>> listLM050 = null;
+
 		try {
 			listLM050 = lM050ServiceImpl.findAll(titaVo);
-
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -97,111 +115,75 @@ public class LM050Report extends MakeReport {
 	private void exportExcel(List<Map<String, String>> listLM050) throws LogicException {
 		this.info("LM050Report exportExcel");
 
-		if (listLM050.size() == 0) {
+		if (listLM050 == null || listLM050.isEmpty()) {
 			makeExcel.setValue(4, 1, "本日無資料");
+			return;
 		}
 
-		String type = "";
+		for (Map<String, String> tLM050 : listLM050) {
+			String rptType = tLM050.get("F0");
+			BigDecimal loanBal = getBigDecimal(tLM050.get("F3"));
 
-		for (Map<String, String> tLDVo : listLM050) {
-			type = tLDVo.get("F6");
+			if (rptType.equals("1")) { // 保險業利害關係人放款管理辦法第3條利害關係人
+				String custNo = tLM050.get("F1");
+				String custName = tLM050.get("F2");
 
-			if (type.equals("1")) {
+				makeExcel.setValue(row, 2, custNo);
+				makeExcel.setValue(row, 3, custName);
+				makeExcel.setValue(row, 4, formatThousand(loanBal), "#,##0");
+				makeExcel.setValue(row, 5, this.computeDivide(loanBal, equity, 4), "#,##0.00%");
+				makeExcel.setValue(row, 6, "2%"); // 限額標準 ???
 
-				empbal = tLDVo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
-
-			} else if (type.equals("0")) {
-
-				loanbal = tLDVo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
-
-			} else {
+				relLoanBal = relLoanBal.add(loanBal);
 				row++;
-
-				for (int i = 0; i < tLDVo.size(); i++) {
-
-					String value = tLDVo.get("F" + i);
-
-					switch (i) {
-					case 0:
-
-						makeExcel.setValue(row, i + 2, value);
-
-						break;
-					case 2:
-
-						BigDecimal amt = value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value);
-
-						makeExcel.setValue(row, i + 2, this.computeDivide(amt, new BigDecimal("1000"), 0), "#,##0");
-
-						tot = tot.add(amt);
-
-						break;
-					case 3:
-
-						String tmpValue = tLDVo.get("F2");
-
-						BigDecimal tmpAmt = tmpValue == null || tmpValue.isEmpty() ? BigDecimal.ZERO
-								: new BigDecimal(tmpValue);
-
-						makeExcel.setValue(row, i + 2, this.computeDivide(tmpAmt, divamt, 4), "##0.00%");
-
-						break;
-					case 4:
-						if (value.equals("1")) {
-							makeExcel.setValue(row, i + 2, "10%");
-						} else {
-							makeExcel.setValue(row, i + 2, "2%");
-						}
-						break;
-					case 6:
-					case 7:
-						break;
-					default:
-						makeExcel.setValue(row, i + 2, value);
-						break;
-					}
-				}
+			} else if (rptType.equals("2")) { // 職員
+				empLoanBal = empLoanBal.add(loanBal);
+			} else if (rptType.equals("3")) { // 一般客戶
+				custLoanBal = custLoanBal.add(loanBal);
 			}
 		}
+
+		relLoanBal = relLoanBal.add(empLoanBal);
+
+		total = relLoanBal.add(custLoanBal);
+
 		printTotal();
 
 	}
 
 	private void printTotal() throws LogicException {
+
 		row++;
 		makeExcel.setValue(row, 2, "合     計");
-		makeExcel.setValue(row, 4, tot, "#,##0");
-		makeExcel.setValue(row, 5, this.computeDivide(tot, divamt, 4), "##0.00%");
+		makeExcel.setValue(row, 4, formatThousand(detailTotal), "#,##0");
+		makeExcel.setValue(row, 5, computeDivide(detailTotal, equity, 4), "##0.00%");
 		makeExcel.setValue(row, 6, "30%", "R");
 
 		row++;
 		makeExcel.setValue(row, 2, "職    員");
-		makeExcel.setValue(row, 4, empbal, "#,##0");
+		makeExcel.setValue(row, 4, formatThousand(empLoanBal), "#,##0");
 
 		row++;
-		tot = tot.add(empbal);
 		makeExcel.setValue(row, 2, "關 係 人 放 款 總 額");
-		makeExcel.setValue(row, 4, tot, "#,##0");
-		makeExcel.setValue(row, 5, this.computeDivide(tot, divamt, 4), "##0.00%");
+		makeExcel.setValue(row, 4, formatThousand(relLoanBal), "#,##0");
+		makeExcel.setValue(row, 5, computeDivide(relLoanBal, equity, 4), "##0.00%");
 		makeExcel.setValue(row, 6, "150%", "R");
 
 		row++;
-		divamt = loanbal;
-		divamt = divamt.add(tot);
-		makeExcel.setValue(row, 2, "關 係 人 放 款 總 額");
-		makeExcel.setValue(row, 4, this.computeDivide(tot, divamt, 4), "##0.00%");
+		makeExcel.setValue(row, 2, "佔 總 放 款 比");
+		makeExcel.setValue(row, 4, computeDivide(relLoanBal, total, 4), "##0.00%");
 
 		row++;
 		makeExcel.setValue(row, 2, "一 般 客 戶合計");
-		makeExcel.setValue(row, 4, loanbal, "#,##0");
+		makeExcel.setValue(row, 4, formatThousand(custLoanBal), "#,##0");
 
 		row++;
 		makeExcel.setValue(row, 2, "佔 總 放 款 比");
-		makeExcel.setValue(row, 4, this.computeDivide(loanbal, divamt, 4), "##0.00%");
+		makeExcel.setValue(row, 4, computeDivide(custLoanBal, total, 4), "##0.00%");
 
 		row++;
 		makeExcel.setValue(row, 2, "放 款 總 額  ＊");
-		makeExcel.setValue(row, 4, divamt, "#,##0");
+		makeExcel.setValue(row, 4, formatThousand(total), "#,##0");
 
 	}
 

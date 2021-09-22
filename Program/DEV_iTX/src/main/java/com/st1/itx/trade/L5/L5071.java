@@ -17,6 +17,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 /*DB服務*/
 import com.st1.itx.db.service.CustMainService;
 /*DB服務*/
@@ -93,15 +94,21 @@ public class L5071 extends TradeBuffer {
 			// this.totaVo.setMsgEndToAuto();// 自動折返
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-
+		String CustName = "";
 		if (listL5071 == null || listL5071.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "債務協商案件主檔");
 		} else {
-
+			CustMain tCustMain = new CustMain();
 			for (Map<String, String> t5071 : listL5071) {
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOCustId", t5071.get("F0"));
+				tCustMain = sCustMainService.custIdFirst(t5071.get("F0"), titaVo);
+				
+				if(tCustMain!=null) {
+					CustName = tCustMain.getCustName();
+				}
+				occursList.putParam("OOCustName", CustName);
 				occursList.putParam("OOCaseKindCode", t5071.get("F1"));
 				occursList.putParam("OOCustLoanKind", t5071.get("F2"));
 				occursList.putParam("OOStatus", t5071.get("F3"));

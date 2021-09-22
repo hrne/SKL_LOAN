@@ -84,14 +84,19 @@ T(2,@RimTxCode,#TXCD)
 
 #NTXBUF=X,11,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-
-#CHAIN_Funcd=A,1,S
-T(1,#NTXBUF,1,1)
+!#CHAIN_Funcd=A,1,S
+T(1,@FunCd,#NTXBUF,1,1)
 
 #CHAIN_CustId=X,10,S
 
 #Init1=X,1,S
 HIDE(#FinancialBtn)
+INVOKEJS(SHOW,p9,0)
+C(3,#FunCd,5,$,s)
+INVOKEJS(SHOW,p1,0)
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+
 
 #FinancialBtn=X,15,I,ui:button;value:明細查詢;enable:1;tabbable:0;title:L1909 疑似準利害關係人明細查詢;
 
@@ -101,8 +106,6 @@ HIDE(#FinancialBtn)
 
 ! #ENABLE1=X,42,S
 ! ENABLE(#BTN1)
-#Init=X,1,S
-INVOKEJS(SHOW,p9,0)
 
 ![Buttom資料查詢]
 #BtnCdEmp=X,15,I,ui:button;value:員工資料查詢;enable:1;tabbable:0;title:L190A 員工資料檔查詢;
@@ -169,7 +172,7 @@ IF(#RegFg==0,$,s)
 #FdIsSuspected=X,2,L
 #FdIsSuspected2=X,2,L
 #FdEntCode=X,2,L
-#FdEmpNo=X,10,L
+#FdEmpNo=X,14,L
 T(3,*    員工代號)
 #FdEName=X,2,L
 #FdEduCode=X,2,L
@@ -199,7 +202,7 @@ T(3,*)
 !---------- AP TEXT AREA Variables ----------
 ! Help
 #TypeCodeHelp=x,100,S
-T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人)
+T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係人／關係企業)
 
 !Sex 性別
 #CDDEF0001=x,20,S
@@ -327,7 +330,7 @@ INVOKEJS(SHOW,grd3,0)
 
 !功能
 #FunCd=A,1,S
-C(3,#CHAIN,1,E(0,#CHAIN_Funcd),$)
+!C(3,#CHAIN,1,E(0,#CHAIN_Funcd),$)
 C(3,#CHAIN,1,T(F,@FunCd,0),T(F,@FunCd,1))
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp)
@@ -415,7 +418,7 @@ C(3,#FunCd,5,s,$)
 HELP(#TypeCodeHelp)
 @V(H,#TypeCodeHelp)
 
-#TypeCodeX=x,20,L
+#TypeCodeX=x,30,L
 T(H,#TypeCode,#TypeCodeHelp)
 
 
@@ -423,35 +426,35 @@ T(H,#TypeCode,#TypeCodeHelp)
 #Fd=X,1,S
 T(2,@FdCustName,#WKSTAR)
 T(2,@FdEName,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdBirthday,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdSex,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdCustTypeCode,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdEntCode,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdNationalityCode,#Fd)
 T(2,@FdSpouseId,#WKSPC)
 T(2,@FdSpouseName,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdRegCityCode,#Fd)
 T(2,@FdRegZip2,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdCurrCityCode,#Fd)
 T(2,@FdCurrZip2,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdEmail,#Fd)
 T(2,@FdIsLimit,#WKSPC)
 T(2,@FdIsRelated,#WKSPC)
 T(2,@FdIsLnrelNear,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdIsSuspected,#Fd)
 T(2,@FdIsSuspected2,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdEduCode,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdOwnedHome,#Fd)
 T(2,@FdCurrCompName,#WKSPC)
 T(2,@FdCurrCompId,#WKSPC)
@@ -461,7 +464,7 @@ T(2,@FdJobTenure,#WKSPC)
 T(2,@FdIncomeOfYearly,#WKSPC)
 T(2,@FdIncomeDataDate,#WKSPC)
 T(2,@FdPassportNo,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdAMLJobCode,#Fd)
 T(2,@FdAMLGroup,#Fd)
 T(2,@FdSubCompanyFg,#Fd)
@@ -1333,8 +1336,16 @@ INVOKEJS(SHOW,p9,0)
 
 !統編
 #OCustId=X,10,L
+
 !戶號
 #OCustNo=A,7,L
+
+!建檔身分別
+#OTypeCode=X,1,L
+
+#OTypeCodeX=x,20,L
+T(H,#TypeCode,#TypeCodeHelp)
+
 
 !戶名
 #OCustName=X,2.50,L
@@ -1388,6 +1399,13 @@ T(H,#OIsRelated,#YesNoHelp)
 #OIsLnrelNear=X,1,L
 #OIsLnrelNearX=X,4,L
 T(H,#OIsLnrelNear,#YesNoHelp)
+!
+#OIsSuspected=X,1,L
+#OIsSuspectedX=X,4,L
+T(H,#OIsSuspected,#YesNoHelp)
+
+#OIsDataDate=D,7,L
+
 !企金別
 #OEntCode=X,1,L
 #OEntCodeX=X,10,L
@@ -1570,6 +1588,7 @@ T(H,#OOEnable,#EnableHelp)
 TXFORM=L1101
 #OCustId
 #OCustNo
+#OTypeCode
 #OCustName
 #OBirthday
 #OSex
@@ -1589,6 +1608,8 @@ TXFORM=L1101
 #OIsLimit
 #OIsRelated
 #OIsLnrelNear
+#OIsSuspected
+#OIsDataDate
 #OEntCode
 #OEmpNo
 #OEName
@@ -1632,10 +1653,11 @@ TXFORM=L1101
 <include src="COM.icf::TRCTL.tom"/>
 </sub>
 !--------- OUTPUT畫面 --------
-<sub type="PART" name="O1" layout="cols=3;screen.width=[250,250,150,350];printer.width=[20,20,20,20];order=1">
+<sub type="PART" name="O1" layout="cols=3;screen.width=[300,250,150,250];printer.width=[20,20,20,20];order=1">
 [
-["[L1101]                                 顧客基本資料維護-自然人"],
-[#<->#,"身分證字號",#OCustId],
+["[L1101]                                 顧客基本資料-自然人"],
+["身分證字號",#OCustId],
+["建檔身分別",#OTypeCodeX],
 [#<->#,"戶名",#OCustName],
 [#<->#,"英文姓名",#OEName],
 ["出生年月日",#OBirthday],
@@ -1652,9 +1674,11 @@ TXFORM=L1101
 [#<->#,"通訊-郵遞區號",#OCurrZip3,#OCurrZip2],
 [#<->#,"通訊-地址",#OCurraddress],
 [#<->#,"電子信箱",#OEMail],
-[#<->#,"是否為授信限制對象",#OIsLimitX],
-[#<->#,"是否為利害關係人",#OIsRelatedX],
-[#<->#,"是否為準利害關係人",#OIsLnrelNearX],
+[#<->#,"「是否為」資訊日期",#OIsDataDate],
+[#<->#,"．是否為授信限制對象",#OIsLimitX],
+[#<->#,"．是否為利害關係人",#OIsRelatedX],
+[#<->#,"．是否為準利害關係人",#OIsLnrelNearX],
+[#<->#,"．是否為金控疑似準利害關係人",#OIsSuspectedX],
 [#<->#,"教育程度代號",#OEduCodeX],
 [#<->#,"自有住宅有無",#OOwnedHomeX],
 [#<->#,"任職機構名稱",#OCurrCompName],
@@ -1673,12 +1697,7 @@ TXFORM=L1101
             "<br>",#OSubCompanyItem3,#OCrossUseX3,"<br>",#OSubCompanyItem4,#OCrossUseX4,
             "<br>",#OSubCompanyItem5,#OCrossUseX5,"<br>",#OSubCompanyItem6,#OCrossUseX6,
             "<br>",#OSubCompanyItem7,#OCrossUseX7,"<br>",#OSubCompanyItem8,#OCrossUseX8,
-            "<br>",#OSubCompanyItem9,#OCrossUseX9,"<br>",#OSubCompanyItem10,#OCrossUseX10,
-            "<br>",#OSubCompanyItem11,#OCrossUseX11,"<br>",#OSubCompanyItem12,#OCrossUseX12, 
-            "<br>",#OSubCompanyItem13,#OCrossUseX13,"<br>",#OSubCompanyItem14,#OCrossUseX14, 
-            "<br>",#OSubCompanyItem15,#OCrossUseX15,"<br>",#OSubCompanyItem16,#OCrossUseX16,
-            "<br>",#OSubCompanyItem17,#OCrossUseX17,"<br>",#OSubCompanyItem18,#OCrossUseX18,
-            "<br>",#OSubCompanyItem19,#OCrossUseX19,"<br>",#OSubCompanyItem20,#OCrossUseX20,],
+            "<br>",#OSubCompanyItem9,#OCrossUseX9,"<br>",#OSubCompanyItem10,#OCrossUseX10,],
 ]
 </sub>
 !---------- 單據輸出組合 ----------
@@ -1686,7 +1705,6 @@ TXFORM=L1101
 
 #RPTFG=0,QUERY.GRID,L1101
 #any={detail:true, header:'O1.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
-
 
 
 #OOTelLb=電話種類
@@ -1706,7 +1724,6 @@ TXFORM=L1101
 
 #OORmk=備註
 {width:200,align:'left'}
-
 
 
 ^

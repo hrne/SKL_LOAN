@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4043ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -60,14 +57,13 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4920.findAll");
+		this.info("L4920.findAll");
 
 		int iSearchFlag = parse.stringToInteger(titaVo.get("SearchFlag"));
 		int iDateFrom = parse.stringToInteger(titaVo.get("DateFrom")) + 19110000;
 		int iDateTo = parse.stringToInteger(titaVo.get("DateTo")) + 19110000;
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		String iRepayAcct = FormatUtil.pad9(titaVo.get("RepayAcct").trim(), 14);
-
 
 		String sql = " select * from ( select                                         ";
 		sql += "  p.\"CustNo\"            as F0                                       ";
@@ -92,7 +88,8 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,p.\"StampFinishDate\"   as F19                                      ";
 		sql += " ,p.\"DeleteDate\"        as F20                                      ";
 		sql += " ,row_number() over (partition by p.\"CustNo\",p.\"RepayAcct\",p.\"AuthCode\",p.\"PostDepCode\" order by p.\"CreateDate\" Desc) as F21 ";
-		sql += " from \"PostAuthLog\" p                                             ";
+		sql += " ,p.\"TitaTxCd\"          as F22                                      ";
+		sql += " from \"PostAuthLog\" p                                               ";
 		sql += " where                                                                ";
 		if (iSearchFlag == 1) {
 			sql += "            \"AuthCreateDate\" >= " + iDateFrom;
@@ -113,16 +110,16 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "            \"RepayAcct\" = " + iRepayAcct;
 		}
 		sql += " order by p.\"CustNo\", p.\"FacmNo\", p.\"CreateDate\" Desc , p.\"AuthCode\" ";
-        sql += " ) a where a.\"F21\" = 1 ";
+		sql += " ) a where a.\"F21\" = 1 ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -135,7 +132,7 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

@@ -35,6 +35,9 @@ public interface EmpDeductMediaRepositoryDay extends JpaRepository<EmpDeductMedi
   // AcDate = ,AND PerfMonth = ,AND FlowCode = 
   public Slice<EmpDeductMedia> findAllByAcDateIsAndPerfMonthIsAndFlowCodeIsOrderByMediaSeqAsc(int acDate_0, int perfMonth_1, String flowCode_2, Pageable pageable);
 
+  // MediaDate = ,AND MediaKind = 
+  public Optional<EmpDeductMedia> findTopByMediaDateIsAndMediaKindIsOrderByMediaSeqDesc(int mediaDate_0, String mediaKind_1);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

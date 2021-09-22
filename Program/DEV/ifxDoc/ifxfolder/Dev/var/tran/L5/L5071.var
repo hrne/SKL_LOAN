@@ -197,6 +197,9 @@ T(3,1)ASGN(LOOP$)
 ! 身分證字號
 #OOCustId=X,10,O
 
+!戶名
+#OOCustName=X,100,O
+
 ! 案件種類
 #OOCaseKindCode=X,1,O
 #OOCaseKindCodeX=X,4,O
@@ -314,6 +317,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5971; ntxbuf=#BufDetail})
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5071
 #OOCustId
+#OOCustName
 #OOCaseKindCode
 #OOCustLoanKind
 #OOStatus
@@ -354,6 +358,8 @@ TXFORM=L5071
 
 #OOCustId=身分證字號
 {width:120,align:'center'}
+#OOCustName=戶名
+{width:200,align:'left'}
 #OOCaseKindCodeX=案件種類
 {width:95,align:'center'}
 #OOCustLoanKindX=債權戶別

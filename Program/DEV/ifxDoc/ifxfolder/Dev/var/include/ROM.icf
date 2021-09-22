@@ -61,6 +61,7 @@
 !    L2R48 : 依擔保品代號1取出擔保品代號2help
 !    L2R49 : 依主要戶號及主要案件編號尋找共用額度主檔
 !    L2R50 : 依戶號及案件編號額度主檔
+!    L2R53 : 依戶號尋找扣款帳號help
 !    L1R01 : 尋找客戶檔資料
 !    L1R02 : 尋找客戶關聯戶資料
 !    L1R03 : 尋找客戶額度檔資料
@@ -2658,6 +2659,11 @@ TXFORM=L2R26
 #L2r27ParkingProperty=X,1,S
 #L2r27HouseTaxNo=X,12,S
 #L2r27HouseBuyDate=D,7,S
+##loop{times:5,i:1}
+#L2r27ParkingTypeCodeA{i}=A,1,S
+#L2r27ParkingQtyA{i}=A,5,S
+#L2r27ParkingAreaA{i}=A,8.2,S
+##end
 ##loop{times:10,i:1}
 #L2r27PublicBdNoA{i}=X,5,S
 #L2r27PublicBdNoB{i}=X,3,S
@@ -2733,6 +2739,11 @@ TXFORM=L2R27
 #L2r27ParkingProperty
 #L2r27HouseTaxNo
 #L2r27HouseBuyDate
+##loop{times:5,i:1}
+#L2r27ParkingTypeCodeA{i}
+#L2r27ParkingQtyA{i}
+#L2r27ParkingAreaA{i}
+##end
 ##loop{times:10,i:1}
 #L2r27PublicBdNoA{i}
 #L2r27PublicBdNoB{i}
@@ -2764,10 +2775,7 @@ TXFORM=L2R27
 ##end
 ^
 </L2R27.tom>
-!#L2r27ParkingBdNoA{i}
-!#L2r27ParkingBdNoB{i}
-!#L2r27ParkingArea{i}
-!#L2r27ParkingAmt{i}
+
 
 !    L2R28 : 尋找擔保品-不動產土地資料檔 ClCode1,ClCode2,ClNo
 <L2R28.dec>
@@ -3463,6 +3471,15 @@ TXFORM=L2R52
 </L2R52.tom>
 
 
+<L2R53.dec>
+#L2r53Help1=X,20480,S
+</L2R53.dec>
+
+<L2R53.tom>
+TXFORM=L2R53
+#L2r53Help1
+^
+</L2R53.tom>
 
 
 ------------------------------------------------------------

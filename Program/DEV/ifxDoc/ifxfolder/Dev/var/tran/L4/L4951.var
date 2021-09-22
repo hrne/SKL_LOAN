@@ -1,0 +1,242 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4951)
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,80)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#SDate=D,7,S
+E(0,#SYSDATE)
+
+#BUF0=X,500,S
+T(2,1+#SDate)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L4512; ntxbuf=1;ntxbuf=#BUF0; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4951" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4951]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@員工扣薪媒體檔查詢"],
+[#<->#,"#FdMediaDate+媒體日期",#MediaDate],
+[#<->#,"#FdMediaType+查詢選項",#MediaType,#MediaTypeX],
+] 
+
+#FdMediaDate=X,2,L
+T(3,*)
+#FdMediaType=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 入帳扣款別
+#RepayCodeXRimName=x,20,S
+T(3,CdCode.RepayCodeX)
+#RepayCodeXHelp=x,1024,S
+
+! 扣款代碼
+#PerfRepayCodeRimName=x,20,S
+T(3,CdCode.PerfRepayCode)
+#PerfRepayCodeHelp=x,1024,S
+
+#RepayCodeXHelpRim=X,1,S
+RESET_RIM(#RepayCodeXHelpRim,XXR99)
+S(XXR99,01,#RepayCodeXRimName,#PerfRepayCodeRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@RepayCodeXHelp,#HelpDesc1)
+T(2,@PerfRepayCodeHelp,#HelpDesc2)
+
+#MediaTypeHelp=x,30,S
+T(3,1:15日薪;2:非15日薪)
+
+
+#NEXT_DATE=D,8,S
+T(4,NBSDY$)
+
+! 會計日期
+#MediaDate=D,7,I
+E(0,#SYSDATE)
+@V(7)A(DATE,0,#MediaDate)
+T(2,@BUF0,1+#MediaDate)
+
+
+#MediaType=A,1,I
+HELP(#MediaTypeHelp)
+@V(H,#MediaTypeHelp)
+!HELP(1:15日薪;2:非15日薪)
+!@V(1,1,2)
+#MediaTypeX=X,8,L
+T(3,)T(H,#MediaType,#MediaTypeHelp)
+!SWITCH(#MediaType,1,T(2,15日薪),2,T(2,非15日薪),3,T(2,))
+
+#RPTFG=A,1,S
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+</sub>
+
+!------------ TXFORM = L4951 -----------
+<sub type="FORM" name="L4951">
+#SCRTIL=_,_,S
+T(3,[L4951] 員工扣薪媒體檔資料)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+
+#OOCustNo=A,7,O
+#OORepayCode=A,2,O
+#OORepayCodeX=X,10,O
+T(H,#OORepayCode,#RepayCodeXHelp)
+! SWITCH(#OORepayCode,
+! 0,T(2,債協暫收款),
+! 1,T(2,期款),
+! 2,T(2,部分償還),
+! 3,T(2,結案),
+! 4,T(2,帳管費),
+! 5,T(2,火險費),
+! 6,T(2,契變手續費),
+! 7,T(2,法務費),
+! 9,T(2,其他))
+#OOPerfMonth=A,5,O
+#OOPerfRepayCode=A,1,O
+#OOPerfRepayCodeX=X,10,O
+T(H,#OOPerfRepayCode,#PerfRepayCodeHelp)
+! SWITCH(#OOPerfRepayCode,
+! 1,T(2,扣薪件),
+! 2,T(2,特約件),
+! 3,T(2,滯繳件),
+! 4,T(2,人事特約件),
+! 5,T(2,房貸扣薪件))
+#OOTellerNo=X,6,O
+#OOTellerId=X,10,O
+#OOTellerName=X,100,O
+#OORepayAmt=m,14,O
+#OOMediaDate=D,7,O
+#OOMediaKind=X,1,O
+#OOMediaSeq=m,6,O
+
+
+#OOBUF_Edit=X,500,S
+T(2,2+#OOMediaDate+#OOMediaKind+#OOMediaSeq+#OOCustNo+#OORepayCode+#OOPerfMonth+#OOPerfRepayCode+#OOTellerNo+#OOTellerId+#OOTellerName+#OORepayAmt)
+
+#OOBUF_Delete=X,500,S
+T(2,4+#OOMediaDate+#OOMediaKind+#OOMediaSeq+#OOCustNo+#OORepayCode+#OOPerfMonth+#OOPerfRepayCode+#OOTellerNo+#OOTellerId+#OOTellerName+#OORepayAmt)
+
+#OOBTN_Edit=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Edit})
+#OOBTN_Delete=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L4512; ntxbuf=#OOBUF_Delete})
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#MediaDate
+#MediaType
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L4951
+#OOCustNo
+#OORepayCode
+#OOPerfMonth
+#OOPerfRepayCode
+#OOTellerNo
+#OOTellerId
+#OOTellerName
+#OORepayAmt
+#OOMediaDate
+#OOMediaKind
+#OOMediaSeq
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4951" layout="cols=1;screen.width=[130,870];order=1;">
+[
+["[L4951]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@員工扣薪媒體檔查詢"],
+[""],
+! [#<->#,"@媒體日期",#MediaDate],
+! [#<->#,"@查詢選項",#MediaType,#MediaTypeX],
+]
+
+</sub>
+
+<sub type="SELECT">
+#RPTFG=0,QUERY.GRID,L4951
+#any={detail:true, header:'L4951.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_Edit=
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:35}
+#OOBTN_Delete=
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:35}
+#OOCustNo=戶號
+{width:80,align:'center'}
+#OORepayCodeX=入帳扣款別
+{width:80}
+#OOPerfMonth=業績年月
+{width:80,align:'center'}
+#OOPerfRepayCodeX=扣款代碼
+{width:80}
+#OOTellerNo=員工編號
+{width:80,align:'center'}
+#OOTellerId=統一編號
+{width:85,align:'center'}
+#OOTellerName=員工姓名
+{width:80,align:'center'}
+#OORepayAmt=應扣金額
+{width:90,align:'right'}
+
+#OOMediaDate=
+{width:1,hidden:true}
+#OOMediaKind=
+{width:1,hidden:true}
+#OOMediaSeq=
+{width:1,hidden:true}
+^
+</sub>

@@ -87,6 +87,7 @@ public class L4042ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    ,act.\"StampFinishDate\"   as F16                                        ";
 		sql += "    ,act.\"DeleteDate\"        as F17                                        ";
 		sql += "    ,case when row_number() over (partition by act.\"CustNo\",act.\"RepayBank\",act.\"RepayAcct\" order by act.\"CreateDate\" Desc) = 1 then 1 else 0 end as F18 ";
+		sql += "    ,act.\"TitaTxCd\"          as F19                                        ";
 		sql += "   from \"AchAuthLog\" act                                            ";
 		sql += "  where                                                                    ";
 		if (iSearchFlag == 1) {

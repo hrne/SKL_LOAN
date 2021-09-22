@@ -153,6 +153,7 @@ public class BankAuthActCom extends TradeBuffer {
 	private BigDecimal iLimitAmt = BigDecimal.ZERO;
 	private String iCustId = "";
 	private String iRelationId = "";
+	private String iTitaTxCd = "";
 	private String txType = "";
 	private boolean isNewAct = false;
 	private boolean isNewLog = false;
@@ -867,6 +868,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tPostAuthLog.setRelationId(iRelationId);
 		tPostAuthLog.setRelAcctBirthday(parse.stringToInteger(iRelAcctBirthday));
 		tPostAuthLog.setRelAcctGender(iRelAcctGender);
+		tPostAuthLog.setTitaTxCd(iTitaTxCd);
 		try {
 			postAuthLogService.insert(tPostAuthLog, titaVo);
 		} catch (DBException e) {
@@ -908,6 +910,7 @@ public class BankAuthActCom extends TradeBuffer {
 		tAchAuthLog.setRelationId(iRelationId);
 		tAchAuthLog.setRelAcctBirthday(parse.stringToInteger(iRelAcctBirthday));
 		tAchAuthLog.setRelAcctGender(iRelAcctGender);
+		tAchAuthLog.setTitaTxCd(iTitaTxCd);
 		try {
 			achAuthLogService.insert(tAchAuthLog, titaVo);
 		} catch (DBException e) {
@@ -1190,6 +1193,8 @@ public class BankAuthActCom extends TradeBuffer {
 		iRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
 		iRepayBank = FormatUtil.pad9(titaVo.getParam("RepayBank"), 3);
 		iRelationId = titaVo.getParam("RelationId");
+		iTitaTxCd = titaVo.getTxcd();
+
 
 		if (titaVo.get("LimitAmt") != null) {
 			iLimitAmt = parse.stringToBigDecimal(titaVo.get("LimitAmt"));
@@ -1231,6 +1236,7 @@ public class BankAuthActCom extends TradeBuffer {
 		this.info("iRelAcctGender : " + iRelAcctGender);
 		this.info("iRelationId : " + iRelationId);
 		this.info("iLimitAmt : " + iLimitAmt);
+		this.info("iTitaTxCd : " + iTitaTxCd);
 		this.info("txType : " + txType);
 	}
 

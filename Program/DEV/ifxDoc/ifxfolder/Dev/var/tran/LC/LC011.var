@@ -42,7 +42,7 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[LC011]                                 交易明細查詢"],
-["*@會計日期",#iEntdy],
+["*@會計日期",#iEntdySt,"~",#iEntdyEd],
 ["@@使用單位",#iBrNo],
 ["@@經@@@@辦",#iTlrNo],
 ["@@交易代碼",#iTranNo],
@@ -57,11 +57,17 @@ T(4,CHAIN$)
 T(2,@iTlrNo,#TLRNO)
 #NTXBUF=X,3,S
 
-#iEntdy=D,7,I
+#iEntdySt=D,7,I
 E(0,#SYSDATE)
 D(8)
-@V(7)A(DATE,0,#iEntdy)
+@V(7)A(DATE,0,#iEntdySt)
 V(5,0010101,#SYSDATE)
+
+#iEntdyEd=D,7,I
+E(0,#SYSDATE)
+D(8)
+@V(7)A(DATE,0,#iEntdyEd)
+V(5,#iEntdySt,#SYSDATE)
 
 #iBrNo=X,4,L
 T(2,#KINBR) 
@@ -194,7 +200,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L6901; ntxbuf=#RimData2; text=分錄; visible=#btn_
 
 !------ 上行電文 ------
 <sub type="TIM">
-#iEntdy#iBrNo#iTlrNo#iTranNo#iStatus
+#iEntdySt#iEntdyEd#iBrNo#iTlrNo#iTranNo#iStatus
 #END
 </sub>
 

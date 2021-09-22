@@ -125,7 +125,7 @@ K(MODIFYBUTTON,修改)
 
 #FdCustId=X,2,L
 #FdCustIdBef=X,2,L
-T(3,*)
+
 
 #FdTypeCode=X,2,L
 T(3,*)
@@ -133,7 +133,7 @@ T(3,*)
 ! Help
 
 #TypeCodeHelp=x,100,S
-T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人)
+T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係人／關係企業)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 !Sex 性別
@@ -457,13 +457,18 @@ IF(#BranchNoBef == #BranchNo,T(3,),T(3,X))
 
 #CustIdInd=X,1,L
 
-#CustIdAft=X,10,I
-@
-V(7)
+#CustIdAft=X,10,L
+!@
+!V(7)
 A(ID_UNINO,0,#CustIdAft)
 
+#IdSTAT=A,1,S
+T(4,STAT$)
+C(3,#IdSTAT,4,T(2,@FdPassportNoBef,#WKSTAR),T(2,@FdPassportNoBef,#WKSPC))
+
+
 #CustIdInd=_,_,L
-IF(#CustIdAft==#CustId || #CustIdAft == "",T(3,),T(3,X))
+!IF(#CustIdAft==#CustId || #CustIdAft == "",T(3,),T(3,X))
 
 
 #TypeCodeBef=A,1,L
@@ -472,11 +477,11 @@ IF(#CustIdAft==#CustId || #CustIdAft == "",T(3,),T(3,X))
 T(H,#TypeCodeBef,#TypeCodeHelp)
 
 #TypeCodeAft=A,1,I
-C(2,#TypeCodeBef,s,$,$,$)
+C(2,#TypeCodeBef,s,$,$,$,$)
 HELP(#TypeCodeHelp)
 @
 C(3,#TypeCodeBef,#TypeCodeAft,s,$)
-C(2,#TypeCodeBef,$,V(1,0),V(1,0,1,3),V(1,0,1,2))
+C(2,#TypeCodeBef,V(1,0),V(1,0,1),V(1,0,1,2,3,4),V(1,0,1,2,3,4),V(1,0,1,2,3,4))
 !V(H,#TypeCodeHelp)
 
 #TypeCodeXAft=x,20,L
@@ -1423,6 +1428,9 @@ IF(#IncomedatadateAft==#IncomedatadateBef,T(3,),T(3,X))
 #PassportnoInd=X,1,L
 
 #PassportnoAft=X,20,I
+@
+C(5,#PassportnoBef,#PassportnoAft,s,$)
+C(3,#IdSTAT,4,C(4,#PassportnoAft,V(P,外國人使用稅籍編號建檔，需輸入護照號碼),$),$)
 
 #PassportnoInd=_,_,L
 IF(#PassportnoAft==#PassportnoBef,T(3,),T(3,X))

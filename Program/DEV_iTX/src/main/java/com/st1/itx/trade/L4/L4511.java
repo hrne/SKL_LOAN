@@ -13,7 +13,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.EmpDeductMedia;
-import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -34,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4511 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4511.class);
 
 	/* 日期工具 */
 	@Autowired
@@ -97,8 +95,7 @@ public class L4511 extends TradeBuffer {
 
 		slis15EmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "4", this.index, this.limit);
 
-		lis15EmpDeductMedia = slis15EmpDeductMedia == null ? null
-				: new ArrayList<EmpDeductMedia>(slis15EmpDeductMedia.getContent());
+		lis15EmpDeductMedia = slis15EmpDeductMedia == null ? null : new ArrayList<EmpDeductMedia>(slis15EmpDeductMedia.getContent());
 
 		if (lis15EmpDeductMedia != null && lis15EmpDeductMedia.size() != 0) {
 			setFile(lis15EmpDeductMedia, titaVo, 1);
@@ -111,8 +108,7 @@ public class L4511 extends TradeBuffer {
 
 		sun15EmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "5", this.index, this.limit);
 
-		lun15EmpDeductMedia = sun15EmpDeductMedia == null ? null
-				: new ArrayList<EmpDeductMedia>(sun15EmpDeductMedia.getContent());
+		lun15EmpDeductMedia = sun15EmpDeductMedia == null ? null : new ArrayList<EmpDeductMedia>(sun15EmpDeductMedia.getContent());
 
 //		String pathun15 = outFolder + "LNM617P非15日.txt";
 
@@ -134,8 +130,7 @@ public class L4511 extends TradeBuffer {
 //		0.新增 1.刪除
 //		txToDo(titaVo, 1);
 
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				sendMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), sendMsg, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -160,11 +155,9 @@ public class L4511 extends TradeBuffer {
 
 			fileName = centerCodeAcc + "_" + empNo + "_" + empName + "_" + entryDate + ".txt";
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-					titaVo.getTxCode() + "-產出員工扣薪媒體檔-15日薪", fileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-產出員工扣薪媒體檔-15日薪", fileName, 2);
 		} else if (flag == 2) {
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
-					titaVo.getTxCode() + "-產出員工扣薪媒體檔-非15日", "LNM617P.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-產出員工扣薪媒體檔-非15日", "LNM617P.txt", 2);
 		}
 
 		if (lEmpDeductMedia != null && lEmpDeductMedia.size() != 0) {
@@ -217,8 +210,7 @@ public class L4511 extends TradeBuffer {
 				}
 
 				occursList.putParam("OccUnknowC", FormatUtil.padX("", 11));
-				occursList.putParam("OccRepayAmt",
-						FormatUtil.padX("-" + FormatUtil.pad9("" + tEmpDeductMedia.getRepayAmt(), 9), 10));
+				occursList.putParam("OccRepayAmt", FormatUtil.padX("-" + FormatUtil.pad9("" + tEmpDeductMedia.getRepayAmt(), 9), 10));
 				occursList.putParam("OccUnknowD", FormatUtil.padX("", 40));
 				occursList.putParam("OccUnknowE", "Y");
 				occursList.putParam("OccEntryDate", tEmpDeductMedia.getEntryDate() + 19110000);
@@ -248,17 +240,6 @@ public class L4511 extends TradeBuffer {
 		} else {
 			throw new LogicException("E0001 ", "查無資料");
 		}
-	}
-
-//	0.新增 1.刪除
-	private void txToDo(TitaVo titaVo, int flag) throws LogicException {
-		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-		tTxToDoDetail.setItemCode("L4510"); // L4510 員工媒體 寫一筆提醒
-		tTxToDoDetail.setCustNo(0);
-		tTxToDoDetail.setFacmNo(0);
-		tTxToDoDetail.setBormNo(0);
-		tTxToDoDetail.setDtlValue("");
-		txToDoCom.addDetail(true, flag, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 	}
 
 	private String setFormatMonth(int month) {

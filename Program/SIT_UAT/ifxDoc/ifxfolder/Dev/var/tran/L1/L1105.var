@@ -86,8 +86,8 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1905進入),$)
 #NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,#FunCd,#NTXBUF,1,1)
-T(1,#CustNo,#NTXBUF,12,7)
 T(1,#CustId,#NTXBUF,2,10)
+T(1,#CustNo,#NTXBUF,12,7)
 C(3,#FunCd,2,$,S)
 T(1,#TelNoUKey,#NTXBUF,19,32)
 
@@ -158,7 +158,9 @@ T(3, )
 #FdRmk=X,1,L
 T(3, )
 #FdEnable=X,1,L
-T(3,*)
+C(3,#FunCd,1,$,T(3,*))
+C(3,#FunCd,1,T(F,#Enable,0),$)
+
 #FdStopReason=X,1,L
 T(3, )
 INVOKEJS(SHOW,p1,12,12,0)
@@ -319,6 +321,7 @@ IF(#RelationCode == "00" ,$,V(7))
 ! 啟用記號
 #Enable=X,1,I
 C(4,#Enable,T(3,Y),$)
+C(3,#FunCd,1,s,$)
 HELP(#EnableFgHelp)
 @V(H,#EnableFgHelp)
 

@@ -55,11 +55,8 @@ K(MODIFYBUTTON,1,新增)
 [
 ["[L1908]                                 申請不列印書面通知書查詢"],
 ["#FdMain+查詢條件","@(戶號、統一編號，需擇一輸入)"],
-["#FdCustNo+．戶號",#CustNo,"-",#FacmNo,"（000=全部額度）",#BTN2,#CustName],
-["#FdCustId+．統一編號",#CustId,#BTN3,#CustName],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+["#FdCustNo+．戶號",#CustNo,"-",#FacmNo,"（000=全部額度）",#BTN2,#CustNameA],
+["#FdCustId+．統一編號",#CustId,#BTN3,#CustNameB],
 ]
 #FdMain=X,2,L
 T(3,*)
@@ -70,19 +67,14 @@ T(3,*)
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
-! #BTN1=X,15,I,ui:button;value:新增;enable:0;tabbable:0;title:L1108 申請不列印書面通知書維護
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
 #BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
-!#BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
-! #BUF1=X,42,S
-! ENABLE(#BTN1)
-!ENABLE(#BTN2)ENABLE(#BTN3)
 #Submit=A,1,S
 K(MODIFYBUTTON,查詢)
 !---------- AP TEXT AREA Variables ----------
-!調RIM參數
-#RimFunCd=A,1,S
-
+<include src="ROM.icf::L1R18.dec"/>
+#RimCustId=X,10,S
+#RimCustNo=A,7,S
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
@@ -98,26 +90,38 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFA;ntxbuf5=type<-1:CustId<-
 
 !戶號
 #CustNo=A,7,I
-! INVOKEJS(SHOW,p1,1,2,1)
-C(3,#FirstIn,1,E(0,@CHAIN,1),$)
-C(3,#FirstIn,1,S,$)
-@C(3,#CustNo,0,T(2,@BTNADDBUF,1+0000000+000+          ),T(2,@BTNADDBUF,1+#CustNo+000+          ))
+@C(3,#CustNo,0,T(2,@BTNADDBUF,1+0000000+000+          )T(2,@CustNameA, ),T(2,@BTNADDBUF,1+#CustNo+000+          )T(2,@CustNameB, )T(2,@CustId, ))
+
+#RimL1R18=X,1,S
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1R18,L1R18)
+C(3,#CustNo,0,S,$)
+S(L1R18,1,#RimCustNo,#RimCustId)
+R(1,L1R18)
+T(2,@CustNameA,#L1R18CustName)
 !戶名
-#CustName=X,100,L
+#CustNameA=X,100,L
 
 !額度編號
 #FacmNo=A,3,I
-C(3,#FirstIn,1,E(0,@CHAIN,1),$)
-C(3,#FirstIn,1,S,$)
 C(3,#CustNo,0,S,$)
 @C(3,#FacmNo,0,T(2,@BTNADDBUF,1+#CustNo+000+          ),T(2,@BTNADDBUF,1+#CustNo+#FacmNo+          ))
 ! 統編
 #CustId=X,10,I
-! C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,2,0))
 C(3,#CustNo,0,$,S)
 @
 C(3,#CustNo,0,C(4,#CustId,V(P,需擇一輸入查詢條件),$),S)
-C(3,#CustNo,0,V(7)A(ID_UNINO,0,#CustId),$)
+C(3,#CustNo,0,V(7)A(ID_UNINO,0,#CustId)T(2,@CustNameB, ),$)
+
+#Space=X,1,S
+T(2,@RimCustId,#CustId)
+RESET_RIM(#RimL1R18,L1R18)
+C(4,#CustId,S,$)
+S(L1R18,1,#RimCustNo,#RimCustId)
+R(1,L1R18)
+T(2,@CustNameB,#L1R18CustName)
+!戶名
+#CustNameB=X,100,L
 
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
@@ -128,30 +132,10 @@ E(0,0)
 ![折返KEY]
 #RTNTXT=X,9,S
 
-#FunCd1=A,1,S
-T(3,1)
-#FunCd2=A,1,S
-T(3,2)
-#FunCd3=A,1,S
-T(3,3)
-#FunCd4=A,1,S
-T(3,4)
-#FunCd5=A,1,S
-T(3,5)
 
-
-#FunCd=A,1,S
-E(0,2)
-E(0,@FirstIn,0)
-
-! #BUF1=X,11,S
-! C(3,#CustNo,0,HIDE(#BTN1),SHOW(#BTN1))
-! T(2,#FunCd1+#CustNo+#FacmNo)
-
-! #BIND1=X,1,S
-! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1108; ntxbuf=#BUF1})
-
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
+#RPTFG=A,1,S
+E(0,0)
 
 </sub>
 
@@ -163,9 +147,6 @@ E(0,@FirstIn,0)
 
 !---------- TXFORM = L1908 ----------
 <sub type="FORM" name="L1908">
-
-!#SCRPRT=_,_,S
-!C(5,#TXFORM,L1908,$,S)
 
 #SCRTIL=_,_,S
 T(3,[L1908] 申請不列印書面通知書)
@@ -179,7 +160,8 @@ T(2,#CustNo)
 T(2,#FacmNo)
 
 #OCustName=X,100,L
-T(2,#CustName)
+C(3,#CustNo,0,T(2,#CustNameB),$)
+C(4,#CustId,T(2,#CustNameA),$)
 
 #LOOP=X,1,S
 E(0,1)ASGN(LOOP$)
@@ -223,9 +205,10 @@ T(2,#OOLastUpdateEmpNo+ +#OOLastUpdateEmpNoName)
 
 !修改
 #OOBUF1=X,11,S
-T(2,#FunCd2+#OOCustNo+#OOFacmNo)
+T(2,2+#OOCustNo+#OOFacmNo)
+!複製
 #OOBUF2=X,11,S
-T(2,#FunCd3+#OOCustNo+#OOFacmNo)
+T(2,3+#OOCustNo+#OOFacmNo)
 #OOBTN1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L1108; ntxbuf=#OOBUF1})
 #OOBTN2=X,1,S
@@ -245,6 +228,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L1108; ntxbuf=#OOBUF2})
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R18.tom"/>
 TXFORM=L1908
 #OOCustNo
 #OOFacmNo
@@ -302,7 +286,7 @@ TXFORM=L1908
 {width:80,align:'center'}
 
 #OOLastUpdate_Combine=異動人員
-{width:80,align:'center'}
+{width:100,align:'center'}
 
 #OOLastUpdate=異動日期
 {width:80,align:'center'}

@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4043ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -60,7 +57,7 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4920.findAll");
+		this.info("L4920.findAll");
 
 		int iSearchFlag = parse.stringToInteger(titaVo.get("SearchFlag"));
 		int iDateFrom = parse.stringToInteger(titaVo.get("DateFrom")) + 19110000;
@@ -68,15 +65,15 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		String iRepayAcct = FormatUtil.pad9(titaVo.get("RepayAcct").trim(), 14);
 
-		String sql = " select                                                         ";
+		String sql = " select * from ( select                                         ";
 		sql += "  p.\"CustNo\"            as F0                                       ";
 		sql += " ,p.\"FacmNo\"            as F1                                       ";
 		sql += " ,p.\"AuthCode\"          as F2                                       ";
-		sql += " ,''      as F3                                       ";
+		sql += " ,'700'                   as F3                                       ";
 		sql += " ,p.\"PostDepCode\"       as F4                                       ";
-		sql += " ,''      as F5                                       ";
-		sql += " ,''      as F6                                       ";
-		sql += " ,''      as F7                                       ";
+		sql += " ,p.\"RepayAcct\"         as F5                                       ";
+		sql += " ,''                      as F6                                       ";
+		sql += " ,''                      as F7                                       ";
 		sql += " ,p.\"RepayAcctSeq\"      as F8                                       ";
 		sql += " ,p.\"CustId\"            as F9                                       ";
 		sql += " ,p.\"AuthApplCode\"      as F10                                      ";
@@ -88,56 +85,41 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ,p.\"PostMediaCode\"     as F16                                      ";
 		sql += " ,p.\"AmlRsp\"            as F17                                      ";
 		sql += " ,p.\"RepayAcct\"         as F18                                      ";
-		sql += "  from (                                                              ";
-		sql += "     select                                                           ";
-		sql += "       \"CustNo\"                                                     ";
-		sql += "      ,\"FacmNo\"                                                     ";
-		sql += "      ,\"RepayAcct\"                                                  ";
-		sql += "      ,\"CustId\"                                                     ";
-		sql += "      ,\"AuthCode\"                                                   ";
-		sql += "      ,\"AuthApplCode\"                                               ";
-		sql += "      ,\"AuthCreateDate\"                                             ";
-		sql += "      ,\"PropDate\"                                                   ";
-		sql += "      ,\"RetrDate\"                                                   ";
-		sql += "      ,\"StampCode\"                                                  ";
-		sql += "      ,\"AuthErrorCode\"                                              ";
-		sql += "      ,\"PostMediaCode\"                                              ";
-		sql += "      ,\"RepayAcctSeq\"                                               ";
-		sql += "      ,\"PostDepCode\"                                                ";
-		sql += "      ,\"AmlRsp\"                                                     ";
-		sql += "      ,row_number() over (partition by \"CustNo\",\"RepayAcct\",\"AuthCode\",\"PostDepCode\" order by \"CreateDate\" Desc) as seq         ";
-		sql += "       from \"PostAuthLog\"                                           ";
-		sql += "      where \"DeleteDate\" = 0                                        ";
+		sql += " ,p.\"StampFinishDate\"   as F19                                      ";
+		sql += " ,p.\"DeleteDate\"        as F20                                      ";
+		sql += " ,row_number() over (partition by p.\"CustNo\",p.\"RepayAcct\",p.\"AuthCode\",p.\"PostDepCode\" order by p.\"CreateDate\" Desc) as F21 ";
+		sql += " ,p.\"TitaTxCd\"          as F22                                      ";
+		sql += " from \"PostAuthLog\" p                                               ";
+		sql += " where                                                                ";
 		if (iSearchFlag == 1) {
-			sql += "        and \"AuthCreateDate\" >= " + iDateFrom;
+			sql += "            \"AuthCreateDate\" >= " + iDateFrom;
 			sql += "        and \"AuthCreateDate\" <= " + iDateTo;
 		}
 		if (iSearchFlag == 2) {
-			sql += "        and \"PropDate\" >= " + iDateFrom;
+			sql += "            \"PropDate\" >= " + iDateFrom;
 			sql += "        and \"PropDate\" <= " + iDateTo;
 		}
 		if (iSearchFlag == 3) {
-			sql += "        and \"RetrDate\" >= " + iDateFrom;
+			sql += "            \"RetrDate\" >= " + iDateFrom;
 			sql += "        and \"RetrDate\" <= " + iDateTo;
 		}
 		if (iSearchFlag == 4) {
-			sql += "        and \"CustNo\" = " + iCustNo;
+			sql += "            \"CustNo\" = " + iCustNo;
 		}
 		if (iSearchFlag == 5) {
-			sql += "        and \"RepayAcct\" = " + iRepayAcct;
+			sql += "            \"RepayAcct\" = " + iRepayAcct;
 		}
-		sql += " ) p                                                                  ";
-		sql += " where p.seq = 1                                                      ";
-		sql += " order by p.\"CustNo\", p.\"FacmNo\", p.\"RepayAcct\", p.\"AuthCode\" ";
+		sql += " order by p.\"CustNo\", p.\"FacmNo\", p.\"CreateDate\" Desc , p.\"AuthCode\" ";
+		sql += " ) a where a.\"F21\" = 1 ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -150,7 +132,7 @@ public class L4043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

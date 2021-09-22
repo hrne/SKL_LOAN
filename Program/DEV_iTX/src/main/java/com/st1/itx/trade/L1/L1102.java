@@ -93,6 +93,7 @@ public class L1102 extends TradeBuffer {
 	private String wkIsLimit = "N";
 	private String wkIsRelated = "N";
 	private String wkIsLnrelNear = "N";
+	private String wkIsDataDate = "";
 	private boolean isEloan = false;
 
 	@Override
@@ -201,6 +202,7 @@ public class L1102 extends TradeBuffer {
 			if ("Y".equals(vo.getIsLnrelNear())) {
 				wkIsLnrelNear = "Y"; // 是否為準利害關係人
 			}
+			wkIsDataDate = vo.getDataDate();
 		}
 
 //			刪除功能
@@ -235,6 +237,7 @@ public class L1102 extends TradeBuffer {
 
 		this.totaVo.putParam("OCustId", tCustMain.getCustId());
 		this.totaVo.putParam("OCustNo", tCustMain.getCustNo());
+		this.totaVo.putParam("OTypeCode", tCustMain.getTypeCode());
 		this.totaVo.putParam("OCustName", tCustMain.getCustName().replace("$n", "\n"));
 		this.totaVo.putParam("OBirthday", tCustMain.getBirthday());
 		this.totaVo.putParam("OCustTypeCode", tCustMain.getCustTypeCode());
@@ -254,6 +257,7 @@ public class L1102 extends TradeBuffer {
 		this.totaVo.putParam("OIsLimit", wkIsLimit);
 		this.totaVo.putParam("OIsRelated", wkIsRelated);
 		this.totaVo.putParam("OIsLnrelNear", wkIsLnrelNear);
+		this.totaVo.putParam("OIsDataDate", wkIsDataDate);
 		this.totaVo.putParam("OEntCode", tCustMain.getEntCode());
 		this.totaVo.putParam("OEName", tCustMain.getEName());
 		this.totaVo.putParam("OIncomeOfYearly", tCustMain.getIncomeOfYearly());

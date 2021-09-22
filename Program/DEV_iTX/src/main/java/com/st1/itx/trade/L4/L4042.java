@@ -125,6 +125,7 @@ public class L4042 extends TradeBuffer {
 				occursList.putParam("OODeleteDate", deleteDate);
 //				暫無用處
 				occursList.putParam("OOButtenFlagA", result.get("F18"));
+				occursList.putParam("OOTitaTxCd", result.get("F19"));
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

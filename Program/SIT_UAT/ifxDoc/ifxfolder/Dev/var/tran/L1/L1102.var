@@ -73,10 +73,32 @@ E(0,0)
 ! #ENABLE1=X,42,S
 ! ENABLE(#BTN1)
 
-#Init1=X,1,S
-HIDE(#FinancialBtn)
 
-#FinancialBtn=X,15,I,ui:button;value:明細查詢;enable:1;tabbable:0;title:L1909 疑似準利害關係人明細查詢;
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
+T(2,@RimTxCode,#TXCD)
+
+#NTXBUF1=X,11,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+!#CHAIN_Funcd=A,1,S
+T(1,@FunCd,#NTXBUF1,1,1)
+
+#CHAIN_CustId=X,10,S
+T(1,#NTXBUF1,2,10)
+
+#Space=X,1,S
+C(4,#CHAIN_CustId,$,T(2,@CustId,#CHAIN_CustId))
+
+#Init1=X,1,S
+!HIDE(#FinancialBtn)
+INVOKEJS(SHOW,p9,0)
+C(3,#FunCd,5,$,s)
+INVOKEJS(SHOW,p1,0)
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+
+!#FinancialBtn=X,15,I,ui:button;value:明細查詢;enable:1;tabbable:0;title:L1909 疑似準利害關係人明細查詢;
 
 !行業別查詢按鈕
 #BUF2=X,18,S
@@ -170,7 +192,7 @@ IF(#RegFg==0,$,s)
 #FdIncomeOfYearly=X,2,L
 #FdIncomeDataDate=X,2,L
 #FdIsSuspected=X,2,L
-#FdIsSuspected2=X,2,L
+#FdIsSuspected2=X,2,S
 #FdSubCompanyFg=X,2,L
 
 ! 永遠為必輸欄位
@@ -186,24 +208,7 @@ T(3,*)
 
 ! Help
 #TypeCodeHelp=x,100,S
-T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人)
-
-#CHAIN=A,1,S
-T(4,CHAIN$)
-IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1001進入),$)
-T(2,@RimTxCode,#TXCD)
-
-#NTXBUF1=X,11,S
-C(3,#CHAIN,1,T(4,NTXBUF$),S)
-
-#CHAIN_Funcd=A,1,S
-T(1,#NTXBUF1,1,1)
-
-#CHAIN_CustId=X,10,S
-T(1,#NTXBUF1,2,10)
-
-#Space=X,1,S
-C(4,#CHAIN_CustId,$,T(2,@CustId,#CHAIN_CustId))
+T(3,0:借戶;1:保證人;2:擔保品提供人;3:交易關係人;4:借戶關係人／關係企業)
 
 
 ! Help
@@ -213,6 +218,8 @@ C(4,#CHAIN_CustId,$,T(2,@CustId,#CHAIN_CustId))
 T(3,CdCode.CustTypeCode)
 
 #CustTypeCodeHelp=x,1024,S
+T(3,00:一般;02:首購;03:關企公司;05:保戶;06:團體戶)
+
 
 !NationalityCode 國籍
 #CDDEF0002=x,25,S
@@ -255,7 +262,7 @@ RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006,#CDDEF0007)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@CustTypeCodeHelp,#HelpDesc1)
+!T(2,@CustTypeCodeHelp,#HelpDesc1)
 T(2,@NationalityCodeHelp,#HelpDesc2)
 T(2,@EntCodeHelp,#HelpDesc3)
 T(2,@TelTypeCodeHelp,#HelpDesc4)
@@ -302,7 +309,7 @@ T(2,#L6r03Result)
 
 !功能
 #FunCd=A,1,S
-C(3,#CHAIN,1,E(0,#CHAIN_Funcd),$)
+!C(3,#CHAIN,1,E(0,#CHAIN_Funcd),$)
 C(3,#CHAIN,1,T(F,@FunCd,0),T(F,@FunCd,1))
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp)
@@ -461,9 +468,9 @@ C(3,#FunCd,5,s,$)
 @
 V(7)
 
-#FinancialBind=X,1,S
-SHOW(#FinancialBtn)
-BIND(#FinancialBtn,click, {cmd=CHAIN; ntxcd=L1909; ntxbuf=#CustName;ntxbuf5=type<-1})
+!#FinancialBind=X,1,S
+!SHOW(#FinancialBtn)
+!BIND(#FinancialBtn,click, {cmd=CHAIN; ntxcd=L1909; ntxbuf=#CustName;ntxbuf5=type<-1})
 
 !英文名稱
 #EName=x,50,I
@@ -775,7 +782,7 @@ V(9)
 !E(0,@CurrAreaCode,#L1r10AreaCode)
 
 #SameRegHelp=X,100,S
-T(3,N:另行輸入;Y:同戶籍地址)
+T(3,N:另行輸入;Y:同公司地址)
 
 !---- 同戶籍地址
 #SameReg=X,1,I
@@ -975,10 +982,10 @@ A(M,0,#Email)
 [#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
 [#<->#,"#FdIsRelated+是否為利害關係人",#IsRelatedX],
 [#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNearX],
-["#FdIsSuspected+是否為金控「疑似準利害關係人」名單",#IsSuspectedX,#FinancialBtn],
-["#FdIsSuspected2+是否為金控疑似準利害關係人",#IsSuspectedCheck,#IsSuspectedCheckX,#IsSuspectedCheckType,#IsSuspectedCheckTypeX],
 [#<->#,"#FdIsLimit+以上資訊日期",#IsDataDate],
 ]
+!["#FdIsSuspected+是否為金控「疑似準利害關係人」名單",#IsSuspectedX,#FinancialBtn],
+!["#FdIsSuspected2+是否為金控疑似準利害關係人",#IsSuspectedCheck,#IsSuspectedCheckX,#IsSuspectedCheckType,#IsSuspectedCheckTypeX],
 
 <include src="ROM.icf::L1R16.dec"/>
 ! 調是否為關係人rim
@@ -1020,27 +1027,27 @@ T(H,#IsLnrelNear,#YesNoHelp)
 #IsSuspectedX=X,4,L
 T(H,#IsSuspected,#YesNoHelp)
 
-#IsSuspectedCheck=X,1,I
-C(3,#FunCd,5,s,$)
-HELP(#YesNoHelp)
-@
-V(H,#YesNoHelp)
+#IsSuspectedCheck=X,1,S
+!C(3,#FunCd,5,s,$)
+!HELP(#YesNoHelp)
+!@
+!V(H,#YesNoHelp)
 
-#IsSuspectedCheckX=X,4,L
-T(H,#IsSuspectedCheck,#YesNoHelp)
+#IsSuspectedCheckX=X,4,S
+!T(H,#IsSuspectedCheck,#YesNoHelp)
 
 #IsSuspectedCheckTypeHelp=X,100,S
 T(3, :請選擇;Y:確認核對無誤)
 
-#IsSuspectedCheckType=X,1,I
-C(3,#FunCd,5,s,$)
-HELP(#IsSuspectedCheckTypeHelp)
-@
-V(7)
-V(H,#IsSuspectedCheckTypeHelp)
+#IsSuspectedCheckType=X,1,S
+!C(3,#FunCd,5,s,$)
+!HELP(#IsSuspectedCheckTypeHelp)
+!@
+!V(7)
+!V(H,#IsSuspectedCheckTypeHelp)
 
-#IsSuspectedCheckTypeX=X,4,L
-T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
+#IsSuspectedCheckTypeX=X,4,S
+!T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 </sub>
 
@@ -1178,6 +1185,12 @@ INVOKEJS(SHOW,p9,0)
 !戶號
 #OCustNo=A,7,L
 
+!建檔身分別
+#OTypeCode=X,1,L
+
+#OTypeCodeX=x,20,L
+T(H,#TypeCode,#TypeCodeHelp)
+
 !戶名
 #OCustName=X,2.50,L
 !出生年月日
@@ -1188,13 +1201,13 @@ INVOKEJS(SHOW,p9,0)
 T(H,#OCustTypeCode,#CustTypeCodeHelp)
 !行業別
 #OIndustryCode=X,6,L
-#OIndustryCodeX=c,100,L
+#OIndustryCodeX=x,2.50,L
 !國籍
 #ONationalityCode=X,2,L
-#ONationalityCodex=X,50,L
+#ONationalityCodex=X,40,L
 T(H,#ONationalityCode,#NationalityCodeHelp)
 #OBussNationalityCode=X,2,L
-#OBussNationalityCodex=X,50,L
+#OBussNationalityCodex=X,40,L
 T(H,#OBussNationalityCode,#NationalityCodeHelp)
 !配偶身分證字號
 #OSpouseId=X,10,L
@@ -1228,6 +1241,9 @@ T(H,#OIsRelated,#YesNoHelp)
 #OIsLnrelNear=X,1,L
 #OIsLnrelNearX=X,4,L
 T(H,#OIsLnrelNear,#YesNoHelp)
+
+#OIsDataDate=D,7,L
+
 !企金別
 #OEntCode=X,1,L
 #OEntCodeX=X,10,L
@@ -1307,6 +1323,7 @@ T(H,#OOEnable,#EnableHelp)
 <sub type="TIM">
 #FunCd
 #CustId
+#OTypeCode
 #BranchNo
 #CustName
 #Birthday
@@ -1378,6 +1395,7 @@ TXFORM=L1102
 #OIsLimit
 #OIsRelated
 #OIsLnrelNear
+#OIsDataDate
 #OEntCode
 #OEName
 #OIncomeOfYearly
@@ -1408,16 +1426,22 @@ TXFORM=L1102
 </sub>
 
 !--------- OUTPUT畫面 --------
-<sub type="PART" name="O1" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">
+![#<->#,"是否為授信限制對象",#OIsLimitX],
+![#<->#,"是否為利害關係人",#OIsRelatedX],
+![#<->#,"是否為準利害關係人",#OIsLnrelNearX],
+<sub type="PART" name="O1" layout="cols=3;screen.width=[250,250,150,250];printer.width=[20,20,20,20];order=1">
 [
-["[L1102]                                 顧客基本資料維護-法人"],
-[#<->#,"統一編號",#OCustId],
+["[L1102]                                 顧客基本資料-法人"],
+["統一編號",#OCustId],
+["建檔身分別",#OTypeCodeX],
 [#<->#,"公司名稱",#OCustName],
+[#<->#,"英文名稱",#OEName],
 [#<->#,"設立日期",#OBirthday],
-["客戶別",#OCustTypeCodeX],
+[#<->#,"客戶別",#OCustTypeCodeX],
+["企金別",#OEntCodeX],
 ["行業別",#OIndustryCode,#OIndustryCodeX],
-[#<->#,"公司註冊地",#ONationalityCodex],
-[#<->#,"營業地國籍",#OBussNationalityCodex],
+["公司註冊地",#ONationalityCodex],
+["營業地國籍",#OBussNationalityCodex],
 [#<->#,"負責人身分證字號",#OSpouseId],
 [#<->#,"負責人姓名",#OSpouseName],
 [#<->#,"公司-郵遞區號",#ORegZip3,"-",#ORegZip2],
@@ -1425,23 +1449,17 @@ TXFORM=L1102
 [#<->#,"通訊-郵遞區號",#OCurrZip3,"-",#OCurrZip2],
 [#<->#,"通訊-地址",#OCurraddress],
 [#<->#,"電子信箱",#OEmail],
-[#<->#,"是否為授信限制對象",#OIsLimitX],
-[#<->#,"是否為利害關係人",#OIsRelatedX],
-[#<->#,"是否為準利害關係人",#OIsLnrelNearX],
-[#<->#,"企金別",#OEntCodeX],
-[#<->#,"英文名稱",#OEName],
+[#<->#,"「是否為」資訊日期",#OIsDataDate],
+[#<->#,"．是否為授信限制對象",#OIsLimitX],
+[#<->#,"．是否為利害關係人",#OIsRelatedX],
+[#<->#,"．是否為準利害關係人",#OIsLnrelNearX],
 [#<->#,"年收入",#OIncomeOfYearly,"仟元"],
 [#<->#,"年收入資料年月",#OIncomeDataDate],
-[#<->#,"同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用",#OSubCompanyItem1,#OCrossUseX1,#OSubCompanyItem2,#OCrossUseX2,
-            "</br>",#OSubCompanyItem3,#OCrossUseX3,#OSubCompanyItem4,#OCrossUseX4,
-            "</br>",#OSubCompanyItem5,#OCrossUseX5,#OSubCompanyItem6,#OCrossUseX6,
-            "</br>",#OSubCompanyItem7,#OCrossUseX7,#OSubCompanyItem8,#OCrossUseX8,
-            "</br>",#OSubCompanyItem9,#OCrossUseX9,#OSubCompanyItem10,#OCrossUseX10,
-            "</br>",#OSubCompanyItem11,#OCrossUseX11,#OSubCompanyItem12,#OCrossUseX12, 
-            "</br>",#OSubCompanyItem13,#OCrossUseX13,#OSubCompanyItem14,#OCrossUseX14, 
-            "</br>",#OSubCompanyItem15,#OCrossUseX15,#OSubCompanyItem16,#OCrossUseX16,
-            "</br>",#OSubCompanyItem17,#OCrossUseX17,#OSubCompanyItem18,#OCrossUseX18,
-            "</br>",#OSubCompanyItem19,#OCrossUseX19,#OSubCompanyItem20,#OCrossUseX20,],
+[#<->#,"同意提供申請人之帳務、信用、投資及保險資料作為共同行銷之用",#OSubCompanyItem1,#OCrossUseX1,"<br>",#OSubCompanyItem2,#OCrossUseX2,
+            "<br>",#OSubCompanyItem3,#OCrossUseX3,"<br>",#OSubCompanyItem4,#OCrossUseX4,
+            "<br>",#OSubCompanyItem5,#OCrossUseX5,"<br>",#OSubCompanyItem6,#OCrossUseX6,
+            "<br>",#OSubCompanyItem7,#OCrossUseX7,"<br>",#OSubCompanyItem8,#OCrossUseX8,
+            "<br>",#OSubCompanyItem9,#OCrossUseX9,"<br>",#OSubCompanyItem10,#OCrossUseX10,],
 ]
 </sub>
 !---------- 單據輸出組合 ----------

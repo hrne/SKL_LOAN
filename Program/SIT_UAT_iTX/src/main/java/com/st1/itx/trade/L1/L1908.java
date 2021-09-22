@@ -151,10 +151,10 @@ public class L1908 extends TradeBuffer {
 			}
 			occursList.putParam("OOApplyDt", tCustNotice.getApplyDate());
 			occursList.putParam("OOLastUpdateEmpNo", tCustNotice.getLastUpdateEmpNo());
-			iCdEmp = iCdEmpService.findAgentIdFirst(tCustNotice.getLastUpdateEmpNo(), titaVo);
+			iCdEmp = iCdEmpService.findById(tCustNotice.getLastUpdateEmpNo(), titaVo);
 			if (tCustNotice.getLastUpdateEmpNo().equals("")) {
 				occursList.putParam("OOLastUpdateEmpNoName", "");
-			}else {
+			} else {
 				if (iCdEmp == null) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

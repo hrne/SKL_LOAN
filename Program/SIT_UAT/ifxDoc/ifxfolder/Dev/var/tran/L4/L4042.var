@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,45)ASGN(INQLEN$)
+E(0,106)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -261,7 +261,9 @@ C(4,#OOAuthStatus,s,$)
 ! C(3,#OOAuthStatus,0,
 !     C(5,#OOCreateFlag,D,T(2,取消授權扣款),
 !         C(5,#OOCreateFlag,A,T(2,成功授權),C(5,#OOCreateFlag,Z,T(2,暫停授權),T(2,)))),
-T(3,)T(H,#OOAuthStatus,#AuthStatusHelp))
+T(3,)T(H,#OOAuthStatus,#AuthStatusHelp)
+C(3,#OOAuthStatus,0,C(5,#OOCreateFlag,A,T(3,成功新增授權),$),$)
+C(3,#OOAuthStatus,0,C(5,#OOCreateFlag,D,T(3,成功取消授權),$),$)
 
 #OOMediaCode=X,1,O
 #OOMediaCodeX=X,10,O
@@ -278,6 +280,13 @@ T(H,@OORepayBankLogX,#OORepayBankLog,#BankCdHelp)
 #OOStampFinishDate=D,7,O
 #OODeleteDate=D,7,O
 #OOButtenFlagA=A,1,O
+#OOTitaTxCd=X,5,O
+ALERT(#OOTitaTxCd)
+
+#OOTitaTxType=X,2,S
+T(1,#OOTitaTxCd,1,2)
+ALERT(#OOTitaTxType)
+
 
 ! #OOBUF_CREAT=X,1,S
 ! T(2,1)
@@ -327,6 +336,8 @@ T(2,5
 ! #OOBTN_CREAT=A,2,O 改為頁面上方新增
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_CREAT})
 #OOBTN_EDIT=A,2,O
+C(5,#OOTitaTxType,L2,BIND(grid,cancel),$)
+C(5,#OOTitaTxType,L2,s,$)
 C(4,#OOAuthStatus,IF(#OOMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT})),BIND(grid,cancel))
 C(4,#OOAuthStatus,IF(#OOMediaCode=="Y",s,$),$)
 IF(#OOCreateFlag=="D"||#OOCreateFlag=="Z",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_EDIT}))
@@ -336,6 +347,8 @@ IF(#OOCreateFlag=="D",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxb
 BIND(grid,cancel))
 
 #OOBTN_DELETE=A,2,O
+C(5,#OOTitaTxType,L2,BIND(grid,cancel),$)
+C(5,#OOTitaTxType,L2,s,$)
 IF(#OOMediaCode=="Y",BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_DELETE}))
 IF(#OOMediaCode=="Y",s,$)
 
@@ -343,7 +356,7 @@ IF(#OOMediaCode=="Y",s,$)
 BIND(grid,{ cmd=CHAIN; ntxcd=L4410; ntxbuf=#OOBUF_SEARCH})
 
 #OOBUF_CONNECT=X,500,S
-T(2,#OOCustNo+#OORepayAcctLog)
+T(2,#TXCD+#OOCustNo+#OORepayAcctLog)
 
 #OOBTN_CONNECT=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L4940; ntxbuf=#OOBUF_CONNECT})
@@ -391,6 +404,7 @@ TXFORM=L4042
 #OOStampFinishDate
 #OODeleteDate
 #OOButtenFlagA
+#OOTitaTxCd
 ^
 </sub>
 !---------- 單據輸出組合 ----------
