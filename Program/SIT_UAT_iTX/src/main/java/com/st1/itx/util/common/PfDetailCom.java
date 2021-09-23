@@ -52,7 +52,6 @@ import com.st1.itx.db.service.PfDetailService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.PfRewardService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.PfDetailVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.mail.MailService;

@@ -2,6 +2,7 @@ package com.st1.itx.trade.L9;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.text.NumberFormat;
@@ -101,8 +102,8 @@ public class L9717Report extends MakeReport {
 
 			// 明細表頭
 			/**
-			 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-			 * ----------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
+			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
 			this.print(-6, 1,
 					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
@@ -121,8 +122,8 @@ public class L9717Report extends MakeReport {
 
 			// 明細表頭
 			/**
-			 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-			 * ----------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
+			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
 			this.print(-6, 1,
 					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
@@ -141,8 +142,8 @@ public class L9717Report extends MakeReport {
 
 			// 明細表頭
 			/**
-			 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-			 * ----------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
+			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
 			this.print(-6, 1,
 					" 　　　　　 　      　　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
@@ -162,8 +163,8 @@ public class L9717Report extends MakeReport {
 
 			// 明細表頭
 			/**
-			 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-			 * ----------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
+			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
 			this.print(-6, 1, "        經辦　　　　　　　戶號　　　戶名　　期別　　　　　　　　金額");
 			this.print(-7, 1, newBorder);
@@ -202,162 +203,185 @@ public class L9717Report extends MakeReport {
 
 		if (lL9717 != null && lL9717.size() != 0) {
 
-			int[] cnt = new int[7];
-			int[] amt = new int[7];
-
-			int amtTotal = 0;
-			int cntTotal = 0;
-
-			int ovduterm = 0;
-			int itemCnt = 0;
-			int itemAmt = 0;
-			int count = 0;
-
-			this.info("L9717 doing: " + currentSort + ", got results: " + lL9717.size());
-
-			int tempYear = 0;
-			String tempBsOfficer = "0";
+			int[] outputPosArray = null;
+			String[] outputSortArray = null;
+			Boolean[] isAmountArray = null;
+			
+			BigDecimal totalCount = BigDecimal.ZERO;
+			BigDecimal totalAmt = BigDecimal.ZERO;
 
 			for (Map<String, String> tLDVo : lL9717) {
-				count++;
+				
+				this.print(1, 1, newBorder);
+				this.print(1, 0, "");
 
 				switch (currentSort) {
 				case Year:
-					// 明細資料新的一行
-					if (tempYear != Integer.parseInt(tLDVo.get("F0"))) {
+					// F0 年度 2 L
+					// F1 一期件數 26 C
+					// F2 一期金額 38 R
+					// F3 二期件數 44 C
+					// F4 二期金額 56 R
+					// F5 三期件數 62 C
+					// F6 三期金額 74 R
+					// F7 四期件數 80 C
+					// F8 四期金額 92 R
+					// F9 五期件數 98 C
+					// F10 五期金額 110 R
+					// F11 六期件數 116 C
+					// F12 六期金額 128 R
+					// F13 轉催收件數 134 C
+					// F14 轉催收金額 146 R
+					// F15 合計件數 152 C
+					// F16 合計金額 164 R
+					// 總計筆數 152 R
+					// 總計金額 164 R
 
-						tempYear = Integer.parseInt(tLDVo.get("F0"));
-
-						print(1, 1, "    ");
-
-						print(0, 2, Integer.parseInt(tLDVo.get("F0")) - 1911 + " 年撥款件");
-
-					}
-
-					ovduterm = Integer.parseInt(tLDVo.get("F1")) == 990 ? 7 : Integer.parseInt(tLDVo.get("F1"));
-					itemCnt = Integer.parseInt(tLDVo.get("F2"));
-					itemAmt = Integer.parseInt(tLDVo.get("F3"));
-
-					print(0, 26 + ovduterm * 18, nfNum.format(itemCnt), "R");
-					print(0, 39 + ovduterm * 18, nfNum.format(itemAmt), "R");
-
-					cntTotal += itemCnt;
-					amtTotal += itemAmt;
-
+					outputPosArray = new int[] { 2, 26, 38, 44, 56, 62, 74, 80, 92, 98, 110, 116, 128, 134, 146, 152,
+							164 };
+					outputSortArray = new String[] { "L", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R",
+							"C", "R", "C", "R" };
+					isAmountArray = new Boolean[] { false, false, true, false, true, false, true, false, true, false,
+							true, false, true, false, true, false, true };
+					
+					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F15")));
+					totalAmt = totalCount.add(new BigDecimal(tLDVo.get("F16")));
+					
 					break;
 
 				case Agent:
-					// 明細資料新的一行
-					if (tempBsOfficer != tLDVo.get("F0")) {
+					// F0 員編 2 L
+					// F1 員工姓名 15 R
+					// F2 一期件數 26 C
+					// F3 一期金額 38 R
+					// F4 二期件數 44 C
+					// F5 二期金額 56 R
+					// F6 三期件數 62 C
+					// F7 三期金額 74 R
+					// F8 四期件數 80 C
+					// F9 四期金額 92 R
+					// F10 五期件數 98 C
+					// F11 五期金額 110 R
+					// F12 六期件數 116 C
+					// F13 六期金額 128 R
+					// F14 轉催收件數 134 C
+					// F15 轉催收金額 146 R
+					// F16 合計件數 152 C
+					// F17 合計金額 164 R
+					// 總計筆數 152 R
+					// 總計金額 164 R
 
-						tempBsOfficer = tLDVo.get("F0") == null ? " " : tLDVo.get("F0").toString();
-
-						print(1, 1, "    ");
-
-						print(0, 5, tempBsOfficer, "C");
-
-						print(0, 15, tLDVo.get("F4") == null ? " " : tLDVo.get("F4").toString(), "C");
-
-					}
-
-					ovduterm = Integer.parseInt(tLDVo.get("F1")) == 990 ? 7 : Integer.parseInt(tLDVo.get("F1"));
-					itemCnt = Integer.parseInt(tLDVo.get("F2"));
-					itemAmt = Integer.parseInt(tLDVo.get("F3"));
-
-					print(0, 26 + ovduterm * 18, nfNum.format(itemCnt), "R");
-					print(0, 39 + ovduterm * 18, nfNum.format(itemAmt), "R");
+					outputPosArray = new int[] { 2, 15, 26, 38, 44, 56, 62, 74, 80, 92, 98, 110, 116, 128, 134, 146,
+							152, 164 };
+					outputSortArray = new String[] { "L", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C",
+							"R", "C", "R", "C", "R" };
+					isAmountArray = new Boolean[] { false, false, false, true, false, true, false, true, false, true,
+							false, true, false, true, false, true, false, true };
 					
-					cnt[ovduterm - 1] += itemCnt;
-					amt[ovduterm - 1] += itemAmt;
-
-					cntTotal += itemCnt;
-					amtTotal += itemAmt;
+					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F16")));
+					totalAmt = totalCount.add(new BigDecimal(tLDVo.get("F17")));
 
 					break;
 				case LargeAmt_Customer:
-					// 因目前無資料 無格式 比對
-					print(0, 2, tLDVo.get("F0"));
-					print(0, 15, tLDVo.get("F1"), "C");
-					print(0, 29, tLDVo.get("F2"), "C");
-					print(0, 38, tLDVo.get("F3"), "C");
-					print(0, 46, tLDVo.get("F4"), "C");
-					print(0, 70, nfNum.format(Integer.parseInt(tLDVo.get("F5"))), "R");
+					// F0 員編 2 L
+					// F1 員工姓名 12 R
+					// F2 戶號 28 C
+					// F3 戶名 40 R
+					// F4 期別 48 R
+					// F5 餘額 70 R
+
+					outputPosArray = new int[] { 2, 12, 28, 40, 48, 70 };
+					outputSortArray = new String[] { "L", "R", "C", "R", "R", "R" };
+					isAmountArray = new Boolean[] { false, false, false, false, false, true };
+					
+					totalCount = totalCount.add(new BigDecimal(1));
+					totalAmt = totalCount.add(new BigDecimal(tLDVo.get("F15")));
+					
 					break;
 				case LargeAmt_Agent:
-					// 明細資料新的一行
-					if (tempBsOfficer != tLDVo.get("F0")) {
+					// F0 員編 2 L
+					// F1 員工姓名 15 R
+					// F2 一期件數 26 C
+					// F3 一期金額 38 R
+					// F4 二期件數 44 C
+					// F5 二期金額 56 R
+					// F6 三期件數 62 C
+					// F7 三期金額 74 R
+					// F8 四期件數 80 C
+					// F9 四期金額 92 R
+					// F10 五期件數 98 C
+					// F11 五期金額 110 R
+					// F12 六期件數 116 C
+					// F13 六期金額 128 R
+					// F14 轉催收件數 134 C
+					// F15 轉催收金額 146 R
+					// F16 合計件數 152 C
+					// F17 合計金額 164 R
+					// 總計筆數 152 R
+					// 總計金額 164 R
 
-						tempBsOfficer = tLDVo.get("F0") == null ? " " : tLDVo.get("F0").toString();
-
-						print(1, 1, "    ");
-
-						print(0, 5, tempBsOfficer, "C");
-
-						print(0, 13, tLDVo.get("F4") == null ? " " : tLDVo.get("F4").toString(), "C");
-
-					}
-
-					ovduterm = Integer.parseInt(tLDVo.get("F1")) == 990 ? 7 : Integer.parseInt(tLDVo.get("F1"));
-					itemCnt = Integer.parseInt(tLDVo.get("F2"));
-					itemAmt = Integer.parseInt(tLDVo.get("F3"));
-
-					print(0, 26 + ovduterm * 18, nfNum.format(itemCnt), "R");
-					print(0, 39 + ovduterm * 18, nfNum.format(itemAmt), "R");
-
+					outputPosArray = new int[] { 2, 15, 26, 38, 44, 56, 62, 74, 80, 92, 98, 110, 116, 128, 134, 146,
+							152, 164 };
+					outputSortArray = new String[] { "L", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C",
+							"R", "C", "R", "C", "R" };
+					isAmountArray = new Boolean[] { false, false, false, true, false, true, false, true, false, true,
+							false, true, false, true, false, true, false, true };
 					
-					cntTotal += itemCnt;
-					amtTotal += itemAmt;
-
-
+					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F16")));
+					totalAmt = totalCount.add(new BigDecimal(tLDVo.get("F17")));
+					
 					break;
 				default:
 					break;
 				}
 
-				print(1, 1, newBorder);
+				for (int i = 0; i < outputPosArray.length; i++) {
+					this.print(0, outputPosArray[i], isAmountArray[i] == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i), outputSortArray[i]);
+				}
+
 			}
-
-			if (count == lL9717.size()) {
-
-				switch (currentSort) {
+			
+			// 總計
+			
+			this.print(1, 1, newBorder);
+			this.print(1, 0, "");
+			
+			int countX = 0;
+			int amtX = 0;
+			
+			switch(currentSort)
+			{
 				case Agent:
-					print(1, 2, "各期小計");
-
-					for (int i = 0; i < 7; i++) {
-
-						print(0, 26 + i * 18, nfNum.format(cnt[i]), "R");
-						print(0, 39 + i * 18, nfNum.format(amt[i]), "R");
-
-					}
-
-					print(1, 1, newBorder);
-					print(1, newBorder.length(), "總計：" + nfNum.format(cntTotal) + " 筆　" + nfNum.format(amtTotal), "R");
-					print(1, 1, newBorder);
-					print(1, 2, "備註：『因組織變動因素，經辦人員逾期案件統計基準：94 年元月前以授信人員為統計對象，94 年元月起則更改為放款專員。");
+					countX = 152;
+					amtX = 164;
 					break;
 				case Year:
-					print(1, newBorder.length(), "總計：" + nfNum.format(cntTotal) + " 筆　" + nfNum.format(amtTotal), "R");
-					print(1, 1, newBorder);
-
+					countX = 152;
+					amtX = 164;
 					break;
 				case LargeAmt_Agent:
-					print(1, newBorder.length(), "總計：" + nfNum.format(cntTotal) + " 筆　" + nfNum.format(amtTotal), "R");
-					print(1, 1, newBorder);
+					countX = 152;
+					amtX = 164;
 					break;
 				case LargeAmt_Customer:
-					print(1, 27, "總計： " + nfNum.format(cntTotal) + "筆　" + nfNum.format(amtTotal), "L");
-					print(1, 1, newBorder);
+					countX = 48;
+					amtX = 70;
 					break;
 				default:
 					break;
-				}
-
-				this.print(-46, 88, "===== 報　表　結　束 =====", "C");
-
-				cntTotal = 0;
-				amtTotal = 0;
-
 			}
+			
+			this.print(0, countX, "總計：　　" + formatAmt(totalCount, 0) + " 筆", "R");
+			this.print(0, amtX, formatAmt(totalAmt, 0), "R");
+			this.print(1, 1, newBorder);
+			
+			if (currentSort == OutputSortBy.Agent)
+			{
+				this.print(1, 1, "『因組織變動因素，經辦人員餘期案件統計基準：94年元月前以授信人員為統計對象，94年元月起則更改為放款專員。』");
+			}
+
+			this.print(-46, 88, "===== 報　表　結　束 =====", "C");
+
 		} else {
 			print(1, 1, "本日無資料!!!");
 		}

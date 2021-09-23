@@ -26,7 +26,6 @@ import com.st1.itx.db.service.TxAgentService;
  * @version 1.0.0
  */
 public class L6104 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6104.class);
 
 	@Autowired
 	public TxAgentService txAgentService;
@@ -42,7 +41,7 @@ public class L6104 extends TradeBuffer {
 
 		for (int i = 1; i <= 5; i++) {
 			String AgentTlrno = titaVo.getParam("AgentTlrno" + i).trim();
-			if (!"".equals(AgentTlrno)) {
+			if (!"".equals(AgentTlrno)&& ("1").equals(FunCode)) {
 				addOne(titaVo, AgentTlrno);
 			}
 		}

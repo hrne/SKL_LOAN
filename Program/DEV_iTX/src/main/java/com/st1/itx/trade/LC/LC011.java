@@ -1,5 +1,8 @@
 package com.st1.itx.trade.LC;
 
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,6 +12,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
@@ -103,6 +107,16 @@ public class LC011 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "交易明細資料");
 		} else {
 			for (TxRecord tTxRecord : lTxRecord) {
+				/* 20210923 Adam 新增查詢交易不撈出 效率不好再直接改DB查詢 */
+				try {
+					TitaVo tiTemp = new ObjectMapper().readValue(tTxRecord.getTranData(), TitaVo.class);
+					if (tiTemp.isFuncindInquire())
+						continue;
+				} catch (IOException e) {
+					StringWriter errors = new StringWriter();
+					e.printStackTrace(new PrintWriter(errors));
+					this.error(errors.toString());
+				}
 				OccursList occursList = new OccursList();
 				occursList.putParam("CalDate", tTxRecord.getCalDate());
 				occursList.putParam("CalTime", tTxRecord.getCalTime());

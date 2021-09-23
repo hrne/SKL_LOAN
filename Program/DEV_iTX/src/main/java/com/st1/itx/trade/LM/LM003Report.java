@@ -17,44 +17,233 @@ import com.st1.itx.util.common.MakeReport;
 @Component
 @Scope("prototype")
 public class LM003Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM003Report.class);
 
 	@Autowired
 	LM003ServiceImpl lM003ServiceImpl;
 
-	String dataYear = "";
-	String dataMonth = "";
-
 	// 四捨五入
 	RoundingMode roundingModeLM003 = RoundingMode.HALF_UP;
-	
-	BigDecimal sumF2 = BigDecimal.ZERO;
-	BigDecimal sumF3 = BigDecimal.ZERO;
-	BigDecimal sumF4 = BigDecimal.ZERO;
-	BigDecimal sumF5 = BigDecimal.ZERO;
-	BigDecimal sumF6 = BigDecimal.ZERO;
-	BigDecimal sumF7 = BigDecimal.ZERO;
-	BigDecimal sumF8 = BigDecimal.ZERO;
-	BigDecimal sumF9 = BigDecimal.ZERO;
-	
-	private void resetSum() {
-		
-		sumF2 = BigDecimal.ZERO;
-		sumF3 = BigDecimal.ZERO;
-		sumF4 = BigDecimal.ZERO;
-		sumF5 = BigDecimal.ZERO;
-		sumF6 = BigDecimal.ZERO;
-		sumF7 = BigDecimal.ZERO;
-		sumF8 = BigDecimal.ZERO;
-		sumF9 = BigDecimal.ZERO;
-	
+
+	private enum Columns {
+
+		// 這裡的宣告順序建議和輸出順序一樣
+
+		// 期間 44 L ; 57 R
+
+		// 撥款金額 73 R
+
+		// 結清:利率高轉貸 91 R
+		// 結清:買賣 107 R
+		// 結清:自行還款等 119 R
+		// 結清小計 133 R
+
+		// 非結清:部分還款 149 R
+		// 非結清:本金攤提 162 R
+		// 非結清:轉催收 175 R
+		// 非結清小計: 191 R
+
+		// 合計: 209 R
+		// 淨增減: 224 R
+		// 餘額: 240 R
+
+		yearMonth("F0", 59, 44), drawdownAmt("F1", 76), highRate("F2", 94, true, 86), trade("F3", 106, true, 101),
+		others("F4", 120, true, 114), closedRepaySum("F5", 134, true, 128), partlyRepay("F6", 150, true, 143), tenty("F7", 162, true, 157),
+		turnOvdu("F8", 178, true, 171), unclosedRepaySum("F9", 192, true, 186), repayTotal("F10", 212, true, 203), net("F16", 228),
+		EOMBalance("F11", 242);
+
+		private String keyword = "";
+		private int outputXPosR = 0;
+		private int outputXPosL = 0;
+		private int outputXPosC = 0;
+		private BigDecimal sum = BigDecimal.ZERO;
+		private Boolean hasRatioOutput = false;
+
+		Columns(String _keyword, int _outputXPosR) {
+			this.keyword = _keyword;
+			this.outputXPosR = _outputXPosR;
+		}
+
+		Columns(String _keyword, int _outputXPosR, Boolean _hasRatioOutput, int _outputXPosC) {
+			this.keyword = _keyword;
+			this.outputXPosR = _outputXPosR;
+			this.outputXPosC = _outputXPosC;
+			this.hasRatioOutput = _hasRatioOutput;
+		}
+
+		Columns(String _keyword, int _outputXPosR, int _outputXPosL) {
+			this.keyword = _keyword;
+			this.outputXPosR = _outputXPosR;
+			this.outputXPosL = _outputXPosL;
+		}
+
+		public static void resetAllSum() {
+			for (int i = 0; i < Columns.values().length; i++) {
+				Columns.values()[i].sum = BigDecimal.ZERO;
+			}
+		}
+
+		public String getKeyword() {
+			return this.keyword;
+		}
+
+		public int getOutputXPosR() {
+			return this.outputXPosR;
+		}
+
+		public int getOutputXPosL() {
+			return this.outputXPosL;
+		}
+
+		public BigDecimal getSum() {
+			return this.sum;
+		}
 	}
+
+	private class ColumnOutput {
+
+		public LM003Report lm003Report = null;
+
+		/**
+		 * 
+		 * @param tLDVo current tLDVo
+		 */
+		public void dealSingleMonth(Map<String, String> tLDVo) {
+			// 單月輸出
+
+			for (int i = 0; i < Columns.values().length; i++) {
+				Columns c = Columns.values()[i];
+				String v = tLDVo.get(c.getKeyword());
+
+				switch (c) {
+				case yearMonth:
+					// 年月份輸出
+					if (v.length() >= 6) {
+						lm003Report.print(0, c.getOutputXPosR(),
+								(Integer.valueOf(v.substring(0, 4)) - 1911) + "年" + v.substring(4, 6) + "月", "R");
+					}
+					break;
+				default:
+					// 金額輸出與加總
+					lm003Report.print(0, c.getOutputXPosR(), formatAmt(getBillionAmt(v), 2), "R");
+					c.getSum().add(new BigDecimal(v));
+					break;
+				}
+			}
+		}
+
+		/**
+		 * 
+		 * @param lastF0 F0 lof lastTLDVo
+		 */
+		public void printYearlyTotal(String lastF0) {
+			// 年合計輸出
+			for (int i = 0; i < Columns.values().length; i++) {
+				Columns c = Columns.values()[i];
+
+				switch (c) {
+				case yearMonth:
+					// 年月份輸出
+					if (lastF0.length() >= 6) {
+						lm003Report.print(0, c.getOutputXPosL(),
+								(Integer.valueOf(lastF0.substring(0, 4)) - 1911) + "年合計", "L");
+					}
+					break;
+				default:
+					// 年合計金額輸出
+					lm003Report.print(0, c.getOutputXPosR(), formatAmt(getBillionAmt(c.getSum()), 2), "R");
+					break;
+				}
+			}
+		}
+
+		/**
+		 * 
+		 * @param lastF0 F0 of lastTLDVo
+		 */
+		public void printYearlyAverage(String lastF0) {
+			// 月平均輸出
+			for (int i = 0; i < Columns.values().length; i++) {
+				Columns c = Columns.values()[i];
+				BigDecimal monthCount = null;
+
+				if (lastF0.length() >= 6) {
+					monthCount = new BigDecimal(lastF0.substring(4, 6));
+				} else {
+					monthCount = new BigDecimal(1);
+				}
+
+				switch (c) {
+				case yearMonth:
+					// 年月份輸出
+					if (lastF0.length() >= 6) {
+						lm003Report.print(0, c.getOutputXPosL(),
+								(Integer.valueOf(lastF0.substring(0, 4)) - 1911) + "年月平均", "L");
+					}
+					break;
+				default:
+					// 月平均金額輸出
+					if (c.sum.compareTo(BigDecimal.ZERO) != 0) {
+						lm003Report.print(0, c.getOutputXPosR(),
+								formatAmt(getBillionAmt(c.getSum().divide(monthCount, 2, roundingModeLM003)), 2), "R");
+					} else {
+						lm003Report.print(0, c.getOutputXPosR(), formatAmt(BigDecimal.ZERO, 2), "R");
+					}
+					break;
+				}
+			}
+		}
+
+		/**
+		 * 
+		 * @param finalTLDVo the last tLDVo (latest month in this output)
+		 */
+		public void printRepayRatios(Map<String, String> finalTLDVo) {
+			// 分母與分子
+			BigDecimal divisor = BigDecimal.ZERO;
+			BigDecimal dividend = BigDecimal.ZERO;
+
+			// 取分母
+			// 當月還款分布, 所以是取TLDVo中的數字
+			try {
+				divisor = new BigDecimal(finalTLDVo.get(Columns.repayTotal.keyword)); // hard coded...
+			} catch (Exception e) {
+				lm003Report.error("LM003Report.printRepayRatios() - divisor");
+				lm003Report.error("received weird " + Columns.repayTotal.getKeyword() + ": "
+						+ finalTLDVo.get(Columns.repayTotal.getKeyword()));
+			}
+
+			for (int i = 0; i < Columns.values().length; i++) {
+				// 只有設定為hasRatioOutput的欄位需要輸出
+				if (Columns.values()[i].hasRatioOutput) {
+					// 取分子
+
+					try {
+						dividend = new BigDecimal(finalTLDVo.get(Columns.values()[i].getKeyword()));
+					} catch (Exception e) {
+						lm003Report.error("LM003Report.printRepayRatios() - dividend");
+						lm003Report.error("Received weird " + Columns.values()[i].getKeyword() + ": "
+								+ finalTLDVo.get(Columns.values()[i].getKeyword()));
+					}
+
+					if (dividend.compareTo(BigDecimal.ZERO) > 0 && divisor.compareTo(BigDecimal.ZERO) > 0) {
+						lm003Report.print(0, Columns.values()[i].outputXPosC, formatAmt(getBillionAmt(dividend.divide(divisor, 2, roundingModeLM003)) + "%", 2), "R");
+					} else
+					{
+						lm003Report.print(0, Columns.values()[i].outputXPosC, "---", "C");
+					}
+				}
+			}
+		}
+	}
+
+	ColumnOutput columnOutput = new ColumnOutput();
 
 	@Override
 	public void printHeader() {
 
 		this.setFontSize(16);
-		this.print(-2, 52, dataYear + "年" + dataMonth + "月個人房貸戶 - 撥款/還款金額比較月報表", "C");
+		this.print(-2, 52, titaVo.get("inputYearEnd") + "年" + titaVo.get("inputMonthEnd") + "月個人房貸戶 - 撥款/還款金額比較月報表",
+				"C");
 		this.setFontSize(7);
 		this.print(-4, 243, "機密等級：密", "R");
 		this.setFontSize(8);
@@ -66,13 +255,10 @@ public class LM003Report extends MakeReport {
 	}
 
 	public Boolean exec(TitaVo titaVo) throws LogicException {
+
+		columnOutput.lm003Report = this;
+
 		this.setCharSpaces(0);
-		int iEntdy = Integer.parseInt(titaVo.getParam("ENTDY"));
-
-		String.valueOf(iEntdy);
-
-		dataYear = titaVo.getParam("inputDateEnd").substring(0,3);
-		dataMonth = titaVo.getParam("inputDateEnd").substring(3);
 
 		/*
 		 * 抓SQL資料
@@ -86,24 +272,31 @@ public class LM003Report extends MakeReport {
 		}
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM003",
-				dataYear + "年" + dataMonth + "月個人房貸戶 - 撥款／還款金額比較月報表", "", "A4", "L");
+				titaVo.get("inputYearEnd") + "年" + titaVo.get("inputMonthEnd") + "月個人房貸戶 - 撥款／還款金額比較月報表", "", "A4",
+				"L");
 
 		print(1, 1, "");
-		print(1, 42, "╔════════╦═══════╦═══════════════════════════════════════════════════════════════════╦═══════╦══════╗");
-		print(1, 42, "║　　　　 　　 　║　　　　　　　║　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　║　　　　　　　║　　　　　　║");
+		print(1, 42,
+				"╔════════╦═══════╦═══════════════════════════════════════════════════════════════════╦═══════╦══════╗");
+		print(1, 42,
+				"║　　　　 　　 　║　　　　　　　║　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　║　　　　　　　║　　　　　　║");
 
 		print(0, 136, "還款(b)");
-		print(1, 42, "║　　　　　　　  ║　　　　　　　╠════════════════════════════╦════════════════════════════╦═════════╣　　　　　　  ║　　　　　　║");
+		print(1, 42,
+				"║　　　　　　　  ║　　　　　　　╠════════════════════════════╦════════════════════════════╦═════════╣　　　　　　  ║　　　　　　║");
 		print(0, 218, "淨增減");
 		print(0, 234, "月底");
-		print(1, 42, "║　　　　　　　  ║ 　　　　　 　║　　　　　　　　    　　　　　　　　　　　　　　　　　  ║　　　　　　　　　　　　　　　　　　　　　　　　　　    ║　　 　　　　     ║　　　　　　　║　　　　　　║");
+		print(1, 42,
+				"║　　　　　　　  ║ 　　　　　 　║　　　　　　　　    　　　　　　　　　　　　　　　　　  ║　　　　　　　　　　　　　　　　　　　　　　　　　　    ║　　 　　　　     ║　　　　　　　║　　　　　　║");
 		print(0, 50, "期間");
 		print(0, 66, "撥款(a) ");
 		print(0, 101, "結清");
-		print(0, 160 , "非結清");
-		print(1, 42, "║　　　　　　　　║　　　　　　　╠════════╦═════╦══════╦══════╬═══════╦═════╦═══════╦══════╣　　　　　　　　　║　　　　　　　║　　　　　　║");
+		print(0, 160, "非結清");
+		print(1, 42,
+				"║　　　　　　　　║　　　　　　　╠════════╦═════╦══════╦══════╬═══════╦═════╦═══════╦══════╣　　　　　　　　　║　　　　　　　║　　　　　　║");
 		print(0, 202, "合計");
-		print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+		print(1, 42,
+				"║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
 
 		print(0, 81, "利率高轉貸");
 		print(0, 99, "買賣");
@@ -116,248 +309,129 @@ public class LM003Report extends MakeReport {
 		print(0, 168, "轉催收");
 		print(0, 184, "小計");
 
-		print(0, 217, "(c=a-b)");
+		print(0, 221, "（ｃ＝ａ－ｂ）", "C");
 
-		print(0, 233, "餘額");
+		print(0, 234, "餘額");
+
+		// 期間 44 L ; 57 R
+
+		// 撥款金額 73 R
+
+		// 結清:利率高轉貸 91 R
+		// 結清:買賣 107 R
+		// 結清:自行還款等 119 R
+		// 結清小計 133 R
+
+		// 非結清:部分還款 149 R
+		// 非結清:本金攤提 162 R
+		// 非結清:轉催收 175 R
+		// 非結清小計: 191 R
+
+		// 合計: 209 R
+		// 淨增減: 224 R
+		// 餘額: 240 R
 
 		Map<String, String> lastTLDVo = null;
-		
+
 		if (listLM003 != null && listLM003.size() != 0) {
-			
-		String lastOutputYear = "";
-		String thisOutputYear = "";
-		Boolean firstFlag = true;
-		Boolean firstOfThisYearFlag = false;
-		BigDecimal dataMonthsCounter = BigDecimal.ZERO;
-		
-		BigDecimal yearlyLoanTotal = BigDecimal.ZERO;
 
-		BigDecimal yearlyReturnTotalA = BigDecimal.ZERO;
-		BigDecimal yearlyReturnTotalB = BigDecimal.ZERO;
-		BigDecimal yearlyReturnTotal = BigDecimal.ZERO;
-		
-		dataMonthsCounter = BigDecimal.ZERO;
-		
-		
-		for (Map<String, String> tLDVo : listLM003)
-		{
-			
-			if (firstFlag)
-			{
-				lastOutputYear = tLDVo.get("F0");
-				firstFlag = false;
-				firstOfThisYearFlag = true;
-			}
-			
-			thisOutputYear = tLDVo.get("F0");
-			
-			if (!firstFlag && !thisOutputYear.equals(lastOutputYear))
-			{
-				print(1, 42, "╠════════╬═══════╬════════╬═════╬══════╬══════╬═══════╬═════╬═══════╬══════╬═════════╬═══════╬══════╣");
-				print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
-				print(0, 59, (Integer.parseInt(lastOutputYear)-1911) + "年合計", "R");
-				print(0, 75, formatAmt(getBillionAmt(sumF2), 2), "R");
-				
-				yearlyLoanTotal = yearlyLoanTotal.add(sumF2);
-				
-				print(0, 93, formatAmt(getBillionAmt(sumF3), 2), "R");
-				print(0, 106, formatAmt(getBillionAmt(sumF4), 2), "R");
-				print(0, 118, formatAmt(getBillionAmt(sumF5), 2), "R");
-				
-				yearlyReturnTotalA = yearlyReturnTotalA.add(sumF3.add(sumF4).add(sumF5));
-				yearlyReturnTotalB = yearlyReturnTotalB.add(sumF6.add(sumF7).add(sumF8));
-				yearlyReturnTotal = yearlyReturnTotalA.add(yearlyReturnTotalB);
-				
-				print(0, 133, formatAmt(getBillionAmt(yearlyReturnTotalA), 2), "R");
-				print(0, 148, formatAmt(getBillionAmt(sumF6), 2), "R");
-				print(0, 160, formatAmt(getBillionAmt(sumF7), 2), "R");
-				print(0, 178, formatAmt(getBillionAmt(sumF8), 2), "R");
-				print(0, 190, formatAmt(getBillionAmt(yearlyReturnTotalB), 2), "R");
-				print(0, 210, formatAmt(getBillionAmt(yearlyReturnTotal), 2), "R");
-				print(0, 225, formatAmt(getBillionAmt(yearlyLoanTotal.subtract(yearlyReturnTotal)), 2), "R");
-		
-				print(1, 42, "╠════════╬═══════╬════════╬═════╬══════╬══════╬═══════╬═════╬═══════╬══════╬═════════╬═══════╬══════╣");
-				print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
-				print(0, 59, (Integer.parseInt(lastOutputYear)-1911) + "年月平均", "R");
-				print(0, 75, formatAmt(getAverage(sumF2, dataMonthsCounter), 2), "R");
-				print(0, 93, formatAmt(getAverage(sumF3, dataMonthsCounter), 2), "R");
-				print(0, 106, formatAmt(getAverage(sumF4, dataMonthsCounter), 2), "R");
-				print(0, 118, formatAmt(getAverage(sumF5, dataMonthsCounter), 2), "R");
-				print(0, 133, formatAmt(getAverage(yearlyReturnTotalA, dataMonthsCounter), 2), "R");
-				print(0, 148, formatAmt(getAverage(sumF6, dataMonthsCounter), 2), "R");
-				print(0, 160, formatAmt(getAverage(sumF7, dataMonthsCounter), 2), "R");
-				print(0, 178, formatAmt(getAverage(sumF8, dataMonthsCounter), 2), "R");
-				print(0, 190, formatAmt(getAverage(yearlyReturnTotalB, dataMonthsCounter), 2), "R");
-				print(0, 210, formatAmt(getAverage(yearlyReturnTotal, dataMonthsCounter), 2), "R");
-				print(0, 225, formatAmt(getAverage(yearlyLoanTotal.subtract(yearlyReturnTotal), dataMonthsCounter), 2), "R");
-				
-				resetSum();
-				
-				yearlyLoanTotal = BigDecimal.ZERO;
-				
-				yearlyReturnTotalA = BigDecimal.ZERO;
-				yearlyReturnTotalB = BigDecimal.ZERO;
-				yearlyReturnTotal = BigDecimal.ZERO;
-				
-				dataMonthsCounter = BigDecimal.ZERO;
-				
-				firstOfThisYearFlag = true;
-			}
-			
-			// 非今年的明細只出平均
-			if (thisOutputYear.equals(Integer.toString(Integer.valueOf(titaVo.getParam("inputDateEnd").substring(0,3)) + 1911)))
-			{
-			print(1, 42, "╠════════╬═══════╬════════╬═════╬══════╬══════╬═══════╬═════╬═══════╬══════╬═════════╬═══════╬══════╣");
-			print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
-			
-			if (thisOutputYear.equals(lastOutputYear) && !firstOfThisYearFlag)
-			{
-				print(0, 59, "　　 " + tLDVo.get("F1") + "月", "R");
-			}
-			else
-			{
-				print(0, 59, Integer.parseInt(tLDVo.get("F0"))-1911 + "年" + tLDVo.get("F1") + "月", "R");
-				firstOfThisYearFlag = false;
-			}
+			// 每月輸出
+			// 偵測到年份更換時 先出合計與月平均
+			// 重置所有累計器
 
+			// 初始化
+			Columns.resetAllSum();
 
-				BigDecimal f2 = getBillionAmt(tLDVo.get("F2"));
-				BigDecimal f3 = getBillionAmt(tLDVo.get("F3"));
-				BigDecimal f4 = getBillionAmt(tLDVo.get("F4"));
-				BigDecimal f5 = getBillionAmt(tLDVo.get("F5"));
-				BigDecimal f6 = getBillionAmt(tLDVo.get("F6"));
-				BigDecimal f7 = getBillionAmt(tLDVo.get("F7"));
-				BigDecimal f8 = getBillionAmt(tLDVo.get("F8"));
-				BigDecimal f9 = getBillionAmt(tLDVo.get("F9"));
-				
-				print(0, 75, formatAmt(f2, 2), "R");
-				print(0, 93, formatAmt(f3, 2), "R");
-				print(0, 106, formatAmt(f4, 2), "R");
-				print(0, 118, formatAmt(f5, 2), "R");
-				print(0, 133, formatAmt(f3.add(f4).add(f5), 2), "R");
-				print(0, 148, formatAmt(f6, 2), "R");
-				print(0, 160, formatAmt(f7, 2), "R");
-				print(0, 178, formatAmt(f8, 2), "R");
-				print(0, 190, formatAmt(f6.add(f7).add(f8), 2), "R");
-				print(0, 210, formatAmt(f3.add(f4).add(f5).add(f6).add(f7).add(f8), 2), "R");
-				print(0, 225, formatAmt(f2.subtract(f3.add(f4).add(f5).add(f6).add(f7).add(f8)), 2), "R");
-				print(0, 242, formatAmt(f9, 2), "R");
-				
-			}
+			for (Map<String, String> tLDVo : listLM003) {
+				if (lastTLDVo != null) {
+					// 上一筆資料年份與這一筆資料年份不同時
+					// 出上一筆資料的年的合計與月平均
 
-			    lastOutputYear = tLDVo.get("F0");
-			    
-				doSummary(tLDVo);
-				dataMonthsCounter = dataMonthsCounter.add(new BigDecimal(1));
-				
+					if (!lastTLDVo.get("F0").substring(0, 4).equals(tLDVo.get("F0").substring(0, 4))) {
+						print(1, 42,
+								"╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
+						print(1, 42,
+								"║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+
+						columnOutput.printYearlyTotal(lastTLDVo.get("F0"));
+
+						print(1, 42,
+								"╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
+						print(1, 42,
+								"║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+
+						columnOutput.printYearlyAverage(lastTLDVo.get("F0"));
+
+						Columns.resetAllSum(); // 每次發生年份變動就重置所有累計
+					}
+				}
+
+				print(1, 42,
+						"╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
+				print(1, 42,
+						"║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+
+				columnOutput.dealSingleMonth(tLDVo);
+
 				lastTLDVo = tLDVo;
-				
+
 			}
-		
-			// 最後一筆資料的小計
-			print(1, 42, "╠════════╬═══════╬════════╬═════╬══════╬══════╬═══════╬═════╬═══════╬══════╬═════════╬═══════╬══════╣");
-			print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
-			print(0, 59, (Integer.parseInt(lastOutputYear)-1911) + "年合計", "R");
-			print(0, 75, formatAmt(getBillionAmt(sumF2), 2), "R");
-			
-			yearlyLoanTotal = yearlyLoanTotal.add(sumF2);
-			
-			print(0, 93, formatAmt(getBillionAmt(sumF3), 2), "R");
-			print(0, 106, formatAmt(getBillionAmt(sumF4), 2), "R");
-			print(0, 118, formatAmt(getBillionAmt(sumF5), 2), "R");
-			
-			yearlyReturnTotalA = yearlyReturnTotalA.add(sumF3.add(sumF4).add(sumF5));
-			yearlyReturnTotalB = yearlyReturnTotalB.add(sumF6.add(sumF7).add(sumF8));
-			yearlyReturnTotal = yearlyReturnTotalA.add(yearlyReturnTotalB);
-			
-			print(0, 133, formatAmt(getBillionAmt(yearlyReturnTotalA), 2), "R");
-			print(0, 148, formatAmt(getBillionAmt(sumF6), 2), "R");
-			print(0, 160, formatAmt(getBillionAmt(sumF7), 2), "R");
-			print(0, 178, formatAmt(getBillionAmt(sumF8), 2), "R");
-			print(0, 190, formatAmt(getBillionAmt(yearlyReturnTotalB), 2), "R");
-			print(0, 210, formatAmt(getBillionAmt(yearlyReturnTotal), 2), "R");
-			print(0, 225, formatAmt(getBillionAmt(yearlyLoanTotal.subtract(yearlyReturnTotal)), 2), "R");
-	
-			print(1, 42, "╠════════╬═══════╬════════╬═════╬══════╬══════╬═══════╬═════╬═══════╬══════╬═════════╬═══════╬══════╣");
-			print(1, 42, "║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
-			print(0, 59, (Integer.parseInt(lastOutputYear)-1911) + "年月平均", "R");
-			print(0, 75, formatAmt(getAverage(sumF2, dataMonthsCounter), 2), "R");
-			print(0, 93, formatAmt(getAverage(sumF3, dataMonthsCounter), 2), "R");
-			print(0, 106, formatAmt(getAverage(sumF4, dataMonthsCounter), 2), "R");
-			print(0, 118, formatAmt(getAverage(sumF5, dataMonthsCounter), 2), "R");
-			print(0, 133, formatAmt(getAverage(yearlyReturnTotalA, dataMonthsCounter), 2), "R");
-			print(0, 148, formatAmt(getAverage(sumF6, dataMonthsCounter), 2), "R");
-			print(0, 160, formatAmt(getAverage(sumF7, dataMonthsCounter), 2), "R");
-			print(0, 178, formatAmt(getAverage(sumF8, dataMonthsCounter), 2), "R");
-			print(0, 190, formatAmt(getAverage(yearlyReturnTotalB, dataMonthsCounter), 2), "R");
-			print(0, 210, formatAmt(getAverage(yearlyReturnTotal, dataMonthsCounter), 2), "R");
-			print(0, 225, formatAmt(getAverage(yearlyLoanTotal.subtract(yearlyReturnTotal), dataMonthsCounter), 2), "R");
 
-		}
-		else if (listLM003 == null || listLM003.size() == 0) 
-		{
-			print(0, 70, "本日無資料", "R");
+			// 出最後一年的年月
+
+			print(1, 42,
+					"╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
+			print(1, 42,
+					"║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+
+			columnOutput.printYearlyTotal(lastTLDVo.get("F0"));
+
+			print(1, 42,
+					"╟────────╫───────╫────────╫─────╫──────╫──────╫───────╫─────╫───────╫──────╫─────────╫───────╫──────╢");
+			print(1, 42,
+					"║　　　　　　　　║　　　　　　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+
+			columnOutput.printYearlyAverage(lastTLDVo.get("F0"));
+
+		} else if (listLM003 == null || listLM003.size() == 0) {
+			print(0, 50, "本日無資料!!", "C");
 		}
 
-		print(1, 42, "╚════════╩═══════╩════════╩═════╩══════╩══════╩═══════╩═════╩═══════╩══════╩═════════╩═══════╩══════╝");
+		print(1, 42,
+				"╚════════╩═══════╩════════╩═════╩══════╩══════╩═══════╩═════╩═══════╩══════╩═════════╩═══════╩══════╝");
+
+		print(1, 42,
+				"╔════════════════╦════════╦═════╦══════╦══════╦═══════╦═════╦═══════╦══════╦═════════╦═══════╦══════╗");
+		print(1, 42,
+				"║　　　　當月還款分布%　　　 　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
 		
-		print(1, 42, "╔════════════════╦════════╦═════╦══════╦══════╦═══════╦═════╦═══════╦══════╦═════════╦═══════╦══════╗");
-		print(1, 42, "║　　　　當月還款分布%　　　 　　║　　　　　　　　║　　　　　║　　　　　　║　　　　　　║　　　　　　　║　　　　　║　　　　　　　║　　　　　　║　　　　　　　　　║　　　　　　　║　　　　　　║");
+		// 無資料時這個會是null
+		// 有資料時會是最後一個tLDVo
+		if (lastTLDVo != null) {
+			this.info("LM003Report do printRepayRatios()");
+			columnOutput.printRepayRatios(lastTLDVo);
+		}
+
+		print(1, 42,
+				"╚════════════════╩════════╩═════╩══════╩══════╩═══════╩═════╩═══════╩══════╩═════════╩═══════╩══════╝");
 		
-		BigDecimal f3 = getBillionAmt(lastTLDVo.get("F3"));
-		BigDecimal f4 = getBillionAmt(lastTLDVo.get("F4"));
-		BigDecimal f5 = getBillionAmt(lastTLDVo.get("F5"));
-		BigDecimal f6 = getBillionAmt(lastTLDVo.get("F6"));
-		BigDecimal f7 = getBillionAmt(lastTLDVo.get("F7"));
-		BigDecimal f8 = getBillionAmt(lastTLDVo.get("F8"));
-		BigDecimal f9 = getBillionAmt(lastTLDVo.get("F9"));
-		BigDecimal f10 = getBillionAmt(lastTLDVo.get("F10"));
-		BigDecimal f11 = getBillionAmt(lastTLDVo.get("F11"));
-		BigDecimal f12 = getBillionAmt(lastTLDVo.get("F12"));
-		
-		BigDecimal total = f3.add(f4).add(f5).add(f6).add(f7).add(f8);
-		
-		print(0, 93, formatAmt(f3.divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)), 2) + "%", "R");
-		print(0, 106, formatAmt(f4.divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)), 2) + "%", "R");
-		print(0, 118, formatAmt(f5.divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)), 2) + "%", "R");
-		print(0, 133, formatAmt(f3.add(f4).add(f5).divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)), 2) + "%", "R");
-		print(0, 148, formatAmt(f6.divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)), 2) + "%", "R");
-		print(0, 160, formatAmt(f7.divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)), 2) + "%", "R");
-		print(0, 178, "---", "R");
-		print(0, 190, formatAmt(f6.add(f7).add(f8).divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)), 2) + "%", "R");
-		print(0, 210, formatAmt(total.divide(total, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)), 2) + "%", "R");
-		
-		print(1, 42, "╚════════════════╩════════╩═════╩══════╩══════╩═══════╩═════╩═══════╩══════╩═════════╩═══════╩══════╝");
+		if (lastTLDVo != null) {
+			
 		print(1, 1, "");
-		print(1, 42, " ●"+(Integer.parseInt(lastTLDVo.get("F0"))-1911)+"年"+lastTLDVo.get("F1")+"月底貸款總餘額："+formatAmt(f10,2)+"億元 ●企金："+formatAmt(f11,2)+"億元 ●房貸："+formatAmt(f9,2)+"億元");				
+		print(1, 42, " ●" + (Integer.valueOf(lastTLDVo.get("F0").substring(0,4))-1911) + "年" + lastTLDVo.get("F0").substring(4,6) + "月底貸款總餘額："
+				+ formatAmt(getBillionAmt(lastTLDVo.get("F11")), 2) + "億元 ●企金：" + formatAmt(getBillionAmt(lastTLDVo.get("F12")), 2) + "億元 ●房貸：" + formatAmt(getBillionAmt(lastTLDVo.get("F13")), 2) + "億元");
 		print(1, 42, " ●依報表：LN6361編制：撥款金額含催收回復，還款金額含轉催收。");
-		print(1, 42, " ●自行還款含內部代償、借新還舊、大額還款（1月~"+lastTLDVo.get("F1")+"月累積數　）。");
+		print(1, 42, " ●自行還款含內部代償、借新還舊、大額還款（1月~" + Integer.valueOf(lastTLDVo.get("F0").substring(4,6)) + "月累積數　）。");
+
+		print(1, 42, " ●"+ lastTLDVo.get("F0").substring(4,6) + "月實際還款數：" + formatAmt(getBillionAmt(Columns.repayTotal.getSum()), 2) + "（帳載）" + formatAmt(getBillionAmt(lastTLDVo.get("F15")), 2) + "（內部轉帳）-" + formatAmt(getBillionAmt(Columns.turnOvdu.getSum()), 2) + "（轉催收）-"
+				+ formatAmt(getBillionAmt(lastTLDVo.get("F14")), 2) + "（企金件以自然人申貸還款）＝" + formatAmt(Columns.repayTotal.getSum().add(new BigDecimal(lastTLDVo.get("F15")).subtract(Columns.turnOvdu.getSum()).subtract(new BigDecimal(lastTLDVo.get("F14")))), 2) + "億");
 		
-		BigDecimal monthlyReturnOutput = total.subtract(f8).subtract(f12);
-		print(1, 42, " ●月實際還款數："+formatAmt(total,2)+"（帳載）　（內部轉帳）-"+formatAmt(f8,2)+"（轉催收）-"+formatAmt(f12,2)+"（企金件以自然人申貸還款）＝"+ formatAmt(monthlyReturnOutput,2) +"億");
+		}
+		
 		long sno = this.close();
 		this.toPdf(sno);
-		
+
 		return true;
-	}
-
-	/**
-	 * 先取平均後再取到億元
-	 * 
-	 * @param inputAmt
-	 * @param dataMonths
-	 * @return
-	 */
-	private BigDecimal getAverage(BigDecimal inputAmt, BigDecimal dataMonths) {
-		BigDecimal result = BigDecimal.ZERO;
-
-		if (inputAmt == null || dataMonths.compareTo(BigDecimal.ZERO) <= 0) {
-			return result;
-		}
-
-		result = inputAmt.divide(dataMonths, 2, roundingModeLM003);
-
-		return getBillionAmt(result);
 	}
 
 	/**
@@ -366,8 +440,8 @@ public class LM003Report extends MakeReport {
 	 * @param inputBigDeicmal 從DB撈到的數值
 	 * @return 處理後的數值
 	 */
-	private BigDecimal getBillionAmt(BigDecimal inputBigDeicmal) {
-		return getBillionAmt(inputBigDeicmal.toString());
+	private BigDecimal getBillionAmt(BigDecimal inputBigDecimal) {
+		return getBillionAmt(inputBigDecimal.toString());
 	}
 
 	/**
@@ -378,47 +452,19 @@ public class LM003Report extends MakeReport {
 	 */
 	private BigDecimal getBillionAmt(String inputAmt) {
 		BigDecimal result = BigDecimal.ZERO;
-
-		if (inputAmt == null || inputAmt.isEmpty()) {
-			return result;
-		}
-
 		BigDecimal billion = new BigDecimal("100000000");
 
-		result = new BigDecimal(inputAmt).divide(billion, 2, roundingModeLM003);
-
-		return result;
-	}
-
-	private void doSummary(Map<String, String> map) {
-
-		BigDecimal f2 = getAmt(map.get("F2"));
-		BigDecimal f3 = getAmt(map.get("F3"));
-		BigDecimal f4 = getAmt(map.get("F4"));
-		BigDecimal f5 = getAmt(map.get("F5"));
-		BigDecimal f6 = getAmt(map.get("F6"));
-		BigDecimal f7 = getAmt(map.get("F7"));
-		BigDecimal f8 = getAmt(map.get("F8"));
-		BigDecimal f9 = getAmt(map.get("F9"));
-
-		sumF2 = sumF2.add(f2);
-		sumF3 = sumF3.add(f3);
-		sumF4 = sumF4.add(f4);
-		sumF5 = sumF5.add(f5);
-		sumF6 = sumF6.add(f6);
-		sumF7 = sumF7.add(f7);
-		sumF8 = sumF8.add(f8);
-		sumF9 = sumF9.add(f9);
-	}
-
-	private BigDecimal getAmt(String inputAmt) {
-		BigDecimal result = BigDecimal.ZERO;
-
 		if (inputAmt == null || inputAmt.isEmpty()) {
 			return result;
 		}
 
-		result = new BigDecimal(inputAmt);
+		try {
+			result = new BigDecimal(inputAmt).divide(billion, 2, roundingModeLM003);
+		} catch (Exception e)
+		{
+			this.error("LM003Report.getBillionAmt(): Tried to turn string " + inputAmt + " into BigDecimal and failed miserably.");
+			return result;
+		}
 
 		return result;
 	}

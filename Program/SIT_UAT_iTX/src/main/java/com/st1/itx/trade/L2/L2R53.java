@@ -83,7 +83,7 @@ public class L2R53 extends TradeBuffer {
 				int listSize = lPostAuthLog.size();
 				int i = 1;
 				for (PostAuthLog t : lPostAuthLog) {
-
+					deleteFg = false;
 					if (!wkOldRepayAcct.equals(t.getRepayAcct())) {
 						wkOldRepayAcct = t.getRepayAcct();
 						deleteFg = true;

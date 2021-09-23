@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -28,7 +26,6 @@ import com.st1.itx.db.service.TxAgentService;
  * @version 1.0.0
  */
 public class L6104 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6104.class);
 
 	@Autowired
 	public TxAgentService txAgentService;
@@ -44,7 +41,7 @@ public class L6104 extends TradeBuffer {
 
 		for (int i = 1; i <= 5; i++) {
 			String AgentTlrno = titaVo.getParam("AgentTlrno" + i).trim();
-			if (!"".equals(AgentTlrno)) {
+			if (!"".equals(AgentTlrno)&& ("1").equals(FunCode)) {
 				addOne(titaVo, AgentTlrno);
 			}
 		}

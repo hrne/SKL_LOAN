@@ -411,12 +411,24 @@ public class L2R27 extends TradeBuffer {
 			this.info("DATE2 " + CreateDate4);
 			l++;
 		}
-		int m = 1;
-		for (ClParkingType tClParkingType : lClParkingType) {	
+		
+		// 修改原因
+		if (lClParkingType == null) {
+			lClParkingType = new ArrayList<ClParkingType>();
+			for(int i = 1 ; i <=5 ; i++) {
+				this.totaVo.putParam("L2r27ParkingTypeCodeA" + i, "");
+				this.totaVo.putParam("L2r27ParkingQtyA" + i, "");
+				this.totaVo.putParam("L2r27ParkingAreaA" + i, "");
+			}
+		} else {
+				
+		  int m = 1;
+		  for (ClParkingType tClParkingType : lClParkingType) {	
 			this.totaVo.putParam("L2r27ParkingTypeCodeA" + m, tClParkingType.getParkingTypeCode());
 			this.totaVo.putParam("L2r27ParkingQtyA" + m, tClParkingType.getParkingQty());
 			this.totaVo.putParam("L2r27ParkingAreaA" + m, tClParkingType.getParkingArea());
 			m++;
+		  }
 		}
 		
 		this.addList(this.totaVo);

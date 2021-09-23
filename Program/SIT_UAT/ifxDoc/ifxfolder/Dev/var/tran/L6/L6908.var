@@ -122,13 +122,17 @@ T(1,#NTXBUF,39,3)
 #CHAIN_RvNo=X,30,S
 T(1,#NTXBUF,45,30)
 
-#CHAIN_AcDateSt=X,7,S
+#CHAIN_AcDateSt=D,7,S
 T(1,#NTXBUF,75,7)
-IF(#CHAIN_AcDateSt>#DT,T(2,#DT),$)
+IF(#CHAIN_AcDateSt==0,T(2,#DT),s)
 
-#CHAIN_AcDateEd=X,7,S
+#CHAIN_AcDateEd=D,7,S
 T(1,#NTXBUF,82,7)
-IF(#CHAIN_AcDateEd>#DT,T(2,#DT),$)
+IF(#CHAIN_AcDateEd==0,T(2,#DT),s)
+
+#CHAIN_Date=X,1,S
+IF(#CHAIN_AcDateSt > #CHAIN_AcDateEd,T(2,@CHAIN_AcDateSt,#DT),$)
+
 
 C(3,#CHAIN,1,T(2,@AcBookCode,#CHAIN_AcBookCode),)
 C(3,#CHAIN,1,T(2,@AcSubBookCode,#CHAIN_AcSubBookCode),)

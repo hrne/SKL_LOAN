@@ -70,7 +70,7 @@ public class LM054Report extends MakeReport {
 		try {
 			fnAllList = lM054ServiceImpl.findAll(titaVo, "N");
 
-			makeExcel.setShiftRow(row, fnAllList.size() + 1);
+			makeExcel.setShiftRow(row + 1, fnAllList.size() + 1);
 
 			this.info("size=" + fnAllList.size());
 
@@ -97,6 +97,8 @@ public class LM054Report extends MakeReport {
 
 		for (Map<String, String> lM054Vo : lM054tLDVo) {
 			row++;
+			// 項目(戶號+額度)
+			makeExcel.setValue(row, 1, lM054Vo.get("F25"), "C");
 			// 放款代號(戶號)
 			makeExcel.setValue(row, 2, lM054Vo.get("F0"), "C");
 			// 放款種類
@@ -120,15 +122,15 @@ public class LM054Report extends MakeReport {
 			// 放款年利率
 			makeExcel.setValue(row, 12, lM054Vo.get("F10"), "R");
 			// 放款餘額
-			makeExcel.setValue(row, 13, new BigDecimal(lM054Vo.get("F11")), "#,##0", "R");
+			makeExcel.setValue(row, 13, new BigDecimal(lM054Vo.get("F11")), "#,##0");
 			// 應收利息
-			makeExcel.setValue(row, 14, new BigDecimal(lM054Vo.get("F12")), "#,##0", "R");
+			makeExcel.setValue(row, 14, new BigDecimal(lM054Vo.get("F12")), "#,##0");
 			// 擔保品設定順位
 			makeExcel.setValue(row, 15, lM054Vo.get("F13"), "C");
 			// 擔保品估計總值
-			makeExcel.setValue(row, 16, new BigDecimal(lM054Vo.get("F14")), "#,##0", "R");
+			makeExcel.setValue(row, 16, new BigDecimal(lM054Vo.get("F14")), "#,##0");
 			// 擔保品核貸金額
-			makeExcel.setValue(row, 17, new BigDecimal(lM054Vo.get("F15")), "#,##0", "R");
+			makeExcel.setValue(row, 17, new BigDecimal(lM054Vo.get("F15")), "#,##0");
 			// 轉催收日期
 			makeExcel.setValue(row, 18, lM054Vo.get("F16"), "C");
 			// 催收狀態
@@ -150,7 +152,7 @@ public class LM054Report extends MakeReport {
 			} else if (lM054Vo.get("F20").equals("5")) {
 				allowanceForLose = new BigDecimal(lM054Vo.get("F11"));
 			}
-			makeExcel.setValue(row, 21, allowanceForLose, "#,##0", "R");
+			makeExcel.setValue(row, 21, allowanceForLose.intValue(), "#,##0");
 
 			// 評估分類
 			makeExcel.setValue(row, 22, lM054Vo.get("F20"), "C");
@@ -173,16 +175,16 @@ public class LM054Report extends MakeReport {
 
 			if (tempNo.equals(lM054Vo.get("F0"))) {
 
-				tempNo = lM054Vo.get("F0");
-
 				memo += "  同一擔保品";
 			}
 
+			tempNo = lM054Vo.get("F0");
 			// 備註
 			makeExcel.setValue(row, 24, memo, "C");
 
 			// 逾期天數
-			makeExcel.setValue(row, 25, lM054Vo.get("F24"), "C");
+			makeExcel.setValue(row, 25,
+					Integer.valueOf(lM054Vo.get("F24")) == -1 ? 0 : Integer.valueOf(lM054Vo.get("F24")), "C");
 
 		}
 

@@ -130,9 +130,7 @@ public class LQ005Report extends MakeReport {
 				rowCursor++;
 			}
 		} else {
-			makeExcel.setValue(rowCursor, 1, "本日無資料");
-			
-			makeExcel.setMergedRegion(rowCursor, rowCursor, 1, 10);
+			makeExcel.setValue(rowCursor, 1, "本日無資料", "L");
 		}
 
 		// 印合計

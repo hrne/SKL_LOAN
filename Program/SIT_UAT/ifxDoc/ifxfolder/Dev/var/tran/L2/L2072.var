@@ -167,7 +167,7 @@ T(3,1)ASGN(LOOP$)
 
 #OORmkNo=A,3,L
 
-#OORmkCode=A,2,S
+#OORmkCode=A,3,S
 
 #OORmkDesc=X,120,L
 
@@ -191,21 +191,21 @@ T(2,#OOUpdateEmpNo+  +#OOUpdateEmpName)
 
 
 !修改
-#OOBUF2=X,155,S
+#OOBUF2=X,156,S
 T(2,#FUNC2+#OOCustNo+          +#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2702; ntxbuf=#OOBUF2})
 
 !複製
-#OOBUF3=X,155,S
+#OOBUF3=X,156,S
 T(2,#FUNC3+#OOCustNo+#OOEmpName+#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN3=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2702; ntxbuf=#OOBUF3})
 
 !刪除
-#OOBUF4=X,155,S
+#OOBUF4=X,156,S
 T(2,#FUNC4+#OOCustNo+          +#OORmkNo+#OORmkCode+#OORmkDesc)
 
 #OOBTN4=X,1,S

@@ -168,12 +168,12 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setRenewCode(renewCode);
 			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
-			tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("FireInsuCovrg")));
-			tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem")));
-			tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("EthqInsuCovrg")));
-			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
-			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate")));
-			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate")));
+			tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuCovrg")));
+			tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")));
+			tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuCovrg")));
+			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
+			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
 			tInsuRenew.setAcDate(0);
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());

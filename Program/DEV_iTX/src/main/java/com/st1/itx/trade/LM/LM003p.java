@@ -22,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class LM003p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LM003p.class);
 
 	@Autowired
 	LM003Report lM003Report;
@@ -46,11 +45,9 @@ public class LM003p extends TradeBuffer {
 		boolean isFinish = lM003Report.exec(titaVo);
 
 		if (isFinish) {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "LM003個人房貸戶 - 撥款／還款金額比較月報表表已完成", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM003個人房貸戶 - 撥款／還款金額比較月報表已完成", titaVo);
 		} else {
-			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), "LM003個人房貸戶 - 撥款／還款金額比較月報表查無資料", titaVo);
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009", titaVo.getParam("TLRNO"), "LM003個人房貸戶 - 撥款／還款金額比較月報表查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

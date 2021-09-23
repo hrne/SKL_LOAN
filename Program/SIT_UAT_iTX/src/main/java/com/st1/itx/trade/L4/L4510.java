@@ -26,7 +26,6 @@ import com.st1.itx.db.domain.EmpDeductDtlId;
 import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.domain.EmpDeductMediaId;
 import com.st1.itx.db.domain.EmpDeductSchedule;
-import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;

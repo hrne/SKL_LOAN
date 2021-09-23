@@ -38,18 +38,19 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[300,200,300,200];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[400,100,300,200];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8313]                                 (52)前置協商相關資料報送例外處理"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdRcDate+協商申請日",#RcDate],
-["#FdBankCode1+同意報送債權機構代號1",#BankCode1,#BankCodeX1],["#FdDataCode1+同意報送檔案格式資料別1",#DataCode1,#DataCodeX1],
-["#FdBankCode2+同意報送債權機構代號2",#BankCode2,#BankCodeX2],["#FdDataCode2+同意報送檔案格式資料別2",#DataCode2,#DataCodeX2],
-["#FdBankCode3+同意報送債權機構代號3",#BankCode3,#BankCodeX3],["#FdDataCode3+同意報送檔案格式資料別3",#DataCode3,#DataCodeX3],
-["#FdBankCode4+同意報送債權機構代號4",#BankCode4,#BankCodeX4],["#FdDataCode4+同意報送檔案格式資料別4",#DataCode4,#DataCodeX4],
-["#FdBankCode5+同意報送債權機構代號5",#BankCode5,#BankCodeX5],["#FdDataCode5+同意報送檔案格式資料別5",#DataCode5,#DataCodeX5],
-["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+[#<->#,"#FdBankCode1+同意報送債權機構代號1",#BankCode1,#BankCodeX1],[#<->#,"#FdDataCode1+同意報送檔案格式資料別1",#DataCode1,#DataCodeX1],
+[#<->#,"#FdBankCode2+同意報送債權機構代號2",#BankCode2,#BankCodeX2],[#<->#,"#FdDataCode2+同意報送檔案格式資料別2",#DataCode2,#DataCodeX2],
+[#<->#,"#FdBankCode3+同意報送債權機構代號3",#BankCode3,#BankCodeX3],[#<->#,"#FdDataCode3+同意報送檔案格式資料別3",#DataCode3,#DataCodeX3],
+[#<->#,"#FdBankCode4+同意報送債權機構代號4",#BankCode4,#BankCodeX4],[#<->#,"#FdDataCode4+同意報送檔案格式資料別4",#DataCode4,#DataCodeX4],
+[#<->#,"#FdBankCode5+同意報送債權機構代號5",#BankCode5,#BankCodeX5],[#<->#,"#FdDataCode5+同意報送檔案格式資料別5",#DataCode5,#DataCodeX5],
+[#<->#,"#FdChangePayDate+申請變更還款條件日",#ChangePayDate],[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
 #FdTranKey=X,2,L
@@ -291,6 +292,7 @@ C(5,#TranKey_Tmp,4,s,$)
 
 D(8)
 @A(DATE,0,#ChangePayDate)
+V(7)
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

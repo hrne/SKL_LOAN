@@ -124,12 +124,12 @@ C(3,#FunctionCode,1,INVOKEJS(SHOW,p1,16,18,0),INVOKEJS(SHOW,p1,16,18,1))
 #Function1=X,1,S
 IF(#FunctionCode==1,$,S)
 T(F,@NowInsuNo,0)
-T(F,@NewFireInsuCovrg,0)
-T(F,@NewFireInsuPrem,0)
-T(F,@NewEthqInsuCovrg,0)
-T(F,@NewEthqInsuPrem,0)
-T(F,@NewInsuStartDate,0)
-T(F,@NewInsuEndDate,0)
+!T(F,@NewFireInsuCovrg,0)
+!T(F,@NewFireInsuPrem,0)
+!T(F,@NewEthqInsuCovrg,0)
+!T(F,@NewEthqInsuPrem,0)
+!T(F,@NewInsuStartDate,0)
+!T(F,@NewInsuEndDate,0)
 
 
 #Function2=X,1,S
@@ -152,6 +152,8 @@ T(F,@InsuEndDate,0)
 IF(#FunctionCode==6,$,S)
 T(F,@RenewCode,0)
 E(0,@RenewCode,1)
+INVOKEJS(SHOW,p1,16,18,0)
+
 
 #Function4=X,1,S
 IF(#FunctionCode==4,$,S)
@@ -224,7 +226,7 @@ E(0,@InsuStartDate,#L4r18InsuStartDate)
 E(0,@InsuEndDate,#L4r18InsuEndDate)
 E(0,@AcDate,#L4r18AcDate)
 T(2,@NotiTempFg,#L4r18NotiTempFg)
-T(2,@TitaTxtNo,#L4r18TitaTxtNo)
+C(3,#AcDate,0000000,$,T(2,@TitaTxtNo,#L4r18TitaTxtNo))
 E(0,@StatusCode,#L4r18StatusCode)
 E(0,@OvduDate,#L4r18OvduDate)
 T(2,@OvduNo,#L4r18OvduNo)
@@ -357,68 +359,66 @@ IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 @IF(#FunctionCode==6,V(7),$)
 
 !火險保額
-#FireInsuCovrg=m,14,I
-C(3,#FunctionCode,1,$,s)
+#FireInsuCovrg=m,14,L
+
 
 !新火險保額
 #NewFireInsuCovrg=m,14,I
-IF(#FunctionCode==2 || #FunctionCode==6,$,s)
+IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 
 !火險保費
-#FireInsuPrem=m,14,I
-C(3,#FunctionCode,1,$,s)
+#FireInsuPrem=m,14,L
+
 
 !新火險保費
 #NewFireInsuPrem=m,14,I
-IF(#FunctionCode==2 || #FunctionCode==6,$,s)
+IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 
 !地震險保額
-#EthqInsuCovrg=m,14,I
-C(3,#FunctionCode,1,$,s)
+#EthqInsuCovrg=m,14,L
+
 
 !新地震險保額
 #NewEthqInsuCovrg=m,14,I
-IF(#FunctionCode==2 || #FunctionCode==6,$,s)
+IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 
 !檢查 地震險保險金額 + 火災險保險金額 > 0
 #CHECK_AMT=m,14.2,S
-IF(#FunctionCode == 1,E(2,#FireInsuCovrg+#EthqInsuCovrg),E(2,#NewFireInsuCovrg+#NewEthqInsuCovrg))
+E(2,#NewFireInsuCovrg+#NewEthqInsuCovrg)
 @
 IF(#CHECK_AMT==0,V(P,保險金額不可皆為0),$)
 
 
 !地震險保費
-#EthqInsuPrem=m,14,I
-C(3,#FunctionCode,1,$,s)
+#EthqInsuPrem=m,14,L
+
 
 !新地震險保費
 #NewEthqInsuPrem=m,14,I
-IF(#FunctionCode==2 || #FunctionCode==6,$,s)
+IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 
 !檢查 地震險保費 + 火災險保費 > 0
 #CHECK_FEE=m,14,S
-IF(#FunctionCode == 1,E(2,@TotalPrem,#FireInsuPrem+#EthqInsuPrem),E(2,@TotalPrem,#NewFireInsuPrem+#NewEthqInsuPrem))
+E(2,@TotalPrem,#NewFireInsuPrem+#NewEthqInsuPrem)
 @
 IF(#TotalPrem==0,V(P,保費不可皆為0),$)
 
 !保險起日
-#InsuStartDate=D,7,I
-C(3,#FunctionCode,1,$,s)
-@V(7)A(DATE,0,#InsuStartDate)
+#InsuStartDate=D,7,L
+!@V(7)A(DATE,0,#InsuStartDate)
 
 !新保險起日
 #NewInsuStartDate=D,7,I
-IF(#FunctionCode==2 || #FunctionCode==6,$,s)
+IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 @V(7)A(DATE,0,#NewInsuStartDate)
 
 !保險迄日
-#InsuEndDate=D,7,I
-C(3,#FunctionCode,1,$,s)
-@V(7)A(DATE,0,#InsuEndDate)
+#InsuEndDate=D,7,L
+!@V(7)A(DATE,0,#InsuEndDate)
 
 !新保險迄日
 #NewInsuEndDate=D,7,I
-IF(#FunctionCode==2 || #FunctionCode==6,$,s)
+IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 @V(7)A(DATE,0,#NewInsuEndDate)
 
 ! 自保續保
@@ -469,7 +469,8 @@ T(H,#InsuTypeCode,#InsuTypeCodeHelp)
 #StatusCode=A,1,I
 C(3,#FunctionCode,1,E(0,0),$)
 C(3,#FunctionCode,1,s,$)
-IF(#FunctionCode==2 || #FunctionCode==6,$,s)
+C(3,#FunctionCode,6,s,$)
+IF(#FunctionCode==2,$,s)
 HELP(0:正常;1:借支;2:催收;3:呆帳;4:結案)
 @V(1,0,1,2,3,4)
 

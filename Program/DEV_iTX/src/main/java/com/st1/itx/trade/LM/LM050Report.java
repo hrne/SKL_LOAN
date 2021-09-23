@@ -47,8 +47,6 @@ public class LM050Report extends MakeReport {
 	// 放款總額
 	BigDecimal total = BigDecimal.ZERO;
 
-	int row = 3;
-
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM050", "放款保險法第3條利害關係人放款餘額表_限額控管",
@@ -120,6 +118,8 @@ public class LM050Report extends MakeReport {
 			return;
 		}
 
+		int rowCursor = 4;
+
 		for (Map<String, String> tLM050 : listLM050) {
 			String rptType = tLM050.get("F0");
 			BigDecimal loanBal = getBigDecimal(tLM050.get("F3"));
@@ -128,14 +128,14 @@ public class LM050Report extends MakeReport {
 				String custNo = tLM050.get("F1");
 				String custName = tLM050.get("F2");
 
-				makeExcel.setValue(row, 2, custNo);
-				makeExcel.setValue(row, 3, custName);
-				makeExcel.setValue(row, 4, formatThousand(loanBal), "#,##0");
-				makeExcel.setValue(row, 5, this.computeDivide(loanBal, equity, 4), "#,##0.00%");
-				makeExcel.setValue(row, 6, "2%"); // 限額標準 ???
+				makeExcel.setValue(rowCursor, 2, custNo);
+				makeExcel.setValue(rowCursor, 3, custName);
+				makeExcel.setValue(rowCursor, 4, formatThousand(loanBal), "#,##0");
+				makeExcel.setValue(rowCursor, 5, this.computeDivide(loanBal, equity, 4), "#,##0.00%");
+				makeExcel.setValue(rowCursor, 6, "2%"); // 限額標準 ???
 
-				relLoanBal = relLoanBal.add(loanBal);
-				row++;
+				detailTotal = detailTotal.add(loanBal);
+				rowCursor++;
 			} else if (rptType.equals("2")) { // 職員
 				empLoanBal = empLoanBal.add(loanBal);
 			} else if (rptType.equals("3")) { // 一般客戶
@@ -143,47 +143,47 @@ public class LM050Report extends MakeReport {
 			}
 		}
 
+		relLoanBal = relLoanBal.add(detailTotal);
 		relLoanBal = relLoanBal.add(empLoanBal);
 
 		total = relLoanBal.add(custLoanBal);
 
-		printTotal();
+		printTotal(rowCursor);
 
 	}
 
-	private void printTotal() throws LogicException {
+	private void printTotal(int rowCursor) throws LogicException {
 
-		row++;
-		makeExcel.setValue(row, 2, "合     計");
-		makeExcel.setValue(row, 4, formatThousand(detailTotal), "#,##0");
-		makeExcel.setValue(row, 5, computeDivide(detailTotal, equity, 4), "##0.00%");
-		makeExcel.setValue(row, 6, "30%", "R");
+		makeExcel.setValue(rowCursor, 2, "合     計");
+		makeExcel.setValue(rowCursor, 4, formatThousand(detailTotal), "#,##0");
+		makeExcel.setValue(rowCursor, 5, computeDivide(detailTotal, equity, 4), "##0.00%");
+		makeExcel.setValue(rowCursor, 6, "30%", "R");
 
-		row++;
-		makeExcel.setValue(row, 2, "職    員");
-		makeExcel.setValue(row, 4, formatThousand(empLoanBal), "#,##0");
+		rowCursor++;
+		makeExcel.setValue(rowCursor, 2, "職    員");
+		makeExcel.setValue(rowCursor, 4, formatThousand(empLoanBal), "#,##0");
 
-		row++;
-		makeExcel.setValue(row, 2, "關 係 人 放 款 總 額");
-		makeExcel.setValue(row, 4, formatThousand(relLoanBal), "#,##0");
-		makeExcel.setValue(row, 5, computeDivide(relLoanBal, equity, 4), "##0.00%");
-		makeExcel.setValue(row, 6, "150%", "R");
+		rowCursor++;
+		makeExcel.setValue(rowCursor, 2, "關 係 人 放 款 總 額");
+		makeExcel.setValue(rowCursor, 4, formatThousand(relLoanBal), "#,##0");
+		makeExcel.setValue(rowCursor, 5, computeDivide(relLoanBal, equity, 4), "##0.00%");
+		makeExcel.setValue(rowCursor, 6, "150%", "R");
 
-		row++;
-		makeExcel.setValue(row, 2, "佔 總 放 款 比");
-		makeExcel.setValue(row, 4, computeDivide(relLoanBal, total, 4), "##0.00%");
+		rowCursor++;
+		makeExcel.setValue(rowCursor, 2, "佔 總 放 款 比");
+		makeExcel.setValue(rowCursor, 4, computeDivide(relLoanBal, total, 4), "##0.00%");
 
-		row++;
-		makeExcel.setValue(row, 2, "一 般 客 戶合計");
-		makeExcel.setValue(row, 4, formatThousand(custLoanBal), "#,##0");
+		rowCursor++;
+		makeExcel.setValue(rowCursor, 2, "一 般 客 戶合計");
+		makeExcel.setValue(rowCursor, 4, formatThousand(custLoanBal), "#,##0");
 
-		row++;
-		makeExcel.setValue(row, 2, "佔 總 放 款 比");
-		makeExcel.setValue(row, 4, computeDivide(custLoanBal, total, 4), "##0.00%");
+		rowCursor++;
+		makeExcel.setValue(rowCursor, 2, "佔 總 放 款 比");
+		makeExcel.setValue(rowCursor, 4, computeDivide(custLoanBal, total, 4), "##0.00%");
 
-		row++;
-		makeExcel.setValue(row, 2, "放 款 總 額  ＊");
-		makeExcel.setValue(row, 4, formatThousand(total), "#,##0");
+		rowCursor++;
+		makeExcel.setValue(rowCursor, 2, "放 款 總 額  ＊");
+		makeExcel.setValue(rowCursor, 4, formatThousand(total), "#,##0");
 
 	}
 
