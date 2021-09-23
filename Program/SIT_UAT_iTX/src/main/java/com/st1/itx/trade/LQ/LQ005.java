@@ -21,7 +21,6 @@
 //  */
 //public class LQ005 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	private static final Logger logger = LoggerFactory.getLogger(LQ005.class);
 //
 //	@Autowired
 //	public LQ005Report lq005report;
@@ -37,6 +36,7 @@
 //	}
 //}
 package com.st1.itx.trade.LQ;
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -48,20 +48,27 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
-
-@Service("LQ005")
-@Scope("step")
 /**
+ * LQ005
  * 
- * 
- * @author  Ted Lin
+ * @author Ted Lin
  * @version 1.0.0
  */
+@Service("LQ005")
+@Scope("step")
 public class LQ005 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
-	LQ005Report lq005report;
+	LQ005Report lQ005Report;
+
+	@Autowired
+	DateUtil dDateUtil;
+
+	@Autowired
+	WebClient webClient;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -70,16 +77,16 @@ public class LQ005 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LQ005.class);
 		return this.exec(contribution, "M");
 	}
 
 	@Override
 	public void run() throws LogicException {
 		this.info("active LQ005 ");
-		lq005report.setTxBuffer(this.getTxBuffer());
-		lq005report.exec(titaVo);
+		lQ005Report.setTxBuffer(this.getTxBuffer());
+		lQ005Report.exec(titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				"LQ005表A18_會計部申報表已完成", titaVo);
 	}
 
 }
-

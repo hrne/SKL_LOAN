@@ -72,7 +72,7 @@ public class L8033 extends TradeBuffer  {
 				occursListA.putParam("OOCreditCardInte", rJcicZ042.getCreditCardInte());
 				occursListA.putParam("OOCreditCardPena", rJcicZ042.getCreditCardPena());
 				occursListA.putParam("OOCreditCardOther", rJcicZ042.getCreditCardOther());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -122,7 +122,7 @@ public class L8033 extends TradeBuffer  {
 				occursList.putParam("OOCreditCardInte", rrJcicZ042Log.getCreditCardInte());
 				occursList.putParam("OOCreditCardPena", rrJcicZ042Log.getCreditCardPena());
 				occursList.putParam("OOCreditCardOther", rrJcicZ042Log.getCreditCardOther());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

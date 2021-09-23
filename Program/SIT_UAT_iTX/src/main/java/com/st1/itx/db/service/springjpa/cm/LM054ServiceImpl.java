@@ -160,7 +160,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	LEFT JOIN \"FacMain\" F2 ON F2.\"CustNo\" = MLB.\"CustNo\"";
 			sql += "						    AND F2.\"FacmNo\" = MLB.\"FacmNo\"";
 			sql += "						    AND F2.\"LastBormNo\" = MLB.\"BormNo\"";
-			sql += "	LEFT JOIN \"ReltMain\" R ON R.\"ReltUKey\" = C.\"CustId\"";
+			sql += "	LEFT JOIN \"ReltMain\" R ON R.\"CustNo\" = C.\"CustNo\"";
 			sql += "	LEFT JOIN ( SELECT \"CustNo\"";
 			sql += "					  ,\"FacmNo\"";
 			sql += "					  ,\"TelDate\"";
@@ -174,7 +174,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "									  AND CT.\"SEQ\" = 1 ";
 			sql += "	WHERE MLB.\"YearMonth\" = :yymm";
 			sql += "	  AND MLB.\"LoanBalance\" > 0 ";
-			sql += "      AND ((MFB.\"OvduTerm\" >= 3 AND MFB.\"OvduTerm\" <= 5 AND MFB.\"Status\" IN (0,2,6,7) AND MFB.\"ProdNo\" IN ('60','61','62')";// --逾期12345
+			sql += "      AND ((MFB.\"OvduTerm\" >= 3 AND MFB.\"OvduTerm\" <= 5 AND MFB.\"Status\" IN (0,2,6,7) AND MFB.\"ProdNo\" NOT IN ('60','61','62')";// --逾期12345
 			sql += "	   OR ( MFB.\"OvduTerm\" >= 1 AND MFB.\"OvduTerm\" <= 5 AND MFB.\"Status\" = 0 AND MFB.\"ProdNo\" IN ('60','61','62'))"; // --協12345
 			sql += "	   OR ( MFB.\"OvduTerm\" = 0 AND MFB.\"OvduDays\" = 0 AND MFB.\"Status\" = 0 AND MFB.\"ProdNo\" IN ('60','61','62'))"; // --協
 			sql += "	   OR ( MFB.\"OvduDays\" < 30 AND MFB.\"OvduDays\" > 0 AND MFB.\"Status\" = 0 AND MFB.\"ProdNo\" IN ('60','61','62'))"; // --協*

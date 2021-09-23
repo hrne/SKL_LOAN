@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.FacMain;
@@ -48,7 +48,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3120")
 @Scope("prototype")
 public class L3120 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3120.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -66,7 +65,7 @@ public class L3120 extends TradeBuffer {
 	public TxToDoCom txToDoCom;
 	@Autowired
 	DateUtil dDateUtil;
-	
+
 	@Autowired
 	SendRsp sendRsp;
 
@@ -109,10 +108,10 @@ public class L3120 extends TradeBuffer {
 			this.addList(this.totaVo);
 			return this.sendList();
 		}
-		// 預約撥款刪除，需主管核可
+		// 交易需主管核可
 		if (iFuncFg == 4) {
 			if (!titaVo.getHsupCode().equals("1")) {
-				sendRsp.addvReason(this.txBuffer, titaVo, "0010", "");
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 		}
 

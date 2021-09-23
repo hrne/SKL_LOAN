@@ -54,7 +54,7 @@ public class L8063 extends TradeBuffer  {
                 occursListA.putParam("OOOwnerAmt", rJcicZ571.getOwnerAmt());
                 occursListA.putParam("OOAllotAmt", rJcicZ571.getAllotAmt());
                 occursListA.putParam("OOUnallotAmt", rJcicZ571.getUnallotAmt());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if(iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -86,7 +86,7 @@ public class L8063 extends TradeBuffer  {
                 occursList.putParam("OOOwnerAmt", rrJcicZ571Log.getOwnerAmt());
                 occursList.putParam("OOAllotAmt", rrJcicZ571Log.getAllotAmt());
                 occursList.putParam("OOUnallotAmt", rrJcicZ571Log.getUnallotAmt());			
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if(iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

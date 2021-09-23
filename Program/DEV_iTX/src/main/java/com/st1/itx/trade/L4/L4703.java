@@ -249,7 +249,7 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setCustNo(custNo);
 					tTxToDoDetail.setFacmNo(facmNo);
 					tTxToDoDetail.setBormNo(0);
-					tTxToDoDetail.setDtlValue("<Text>");
+					tTxToDoDetail.setDtlValue("<滯繳通知>");
 					tTxToDoDetail.setItemCode("TEXT00");
 					tTxToDoDetail.setStatus(0);
 					tTxToDoDetail.setProcessNote(dataLines);
@@ -287,7 +287,7 @@ public class L4703 extends TradeBuffer {
 					tTxToDoDetail.setCustNo(custNo);
 					tTxToDoDetail.setFacmNo(facmNo);
 					tTxToDoDetail.setBormNo(0);
-					tTxToDoDetail.setDtlValue("<EMail>");
+					tTxToDoDetail.setDtlValue("<滯繳通知>");
 					tTxToDoDetail.setItemCode("MAIL00");
 					tTxToDoDetail.setStatus(0);
 					tTxToDoDetail.setProcessNote(dataLines);

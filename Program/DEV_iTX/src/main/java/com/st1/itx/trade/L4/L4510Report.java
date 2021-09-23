@@ -25,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class L4510Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L4510Report.class);
 
 	@Autowired
 	public L4510RServiceImpl l4510RServiceImpl;
@@ -58,24 +57,20 @@ public class L4510Report extends MakeReport {
 	}
 
 	public void printHeaderP() {
-		this.print(-1, 1, "程式ID：" + "L4510");
+		this.print(-1, 1, "程式ID：" + "L4510Report");
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
-		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
-				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
-		this.print(-2, 1, "報　表：" + "L4510");
+		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-2, 1, "報　表：" + "L4510Report");
 		this.print(-2, 70, "火險費扣薪明細表", "C");
-		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
 		this.print(-4, 1, "業績年月：" + perfMonth);
 		this.print(-4, 30, "流程別：" + procCode);
 		this.print(-4, 60, "入帳日期：" + formatDate(entryDate));
-		this.print(-5, 1,
-				"員工代號  身分證字號   戶號    戶名             額度編號  押品資料                    火險保費           地震險保費            總保費");
-		this.print(-6, 1,
-				"--------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-5, 1, "員工代號  身分證字號   戶號    戶名             額度編號  擔保品資料                  火險保費           地震險保費            總保費");
+		this.print(-6, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public long exec(TitaVo titaVo1) throws LogicException {
@@ -122,9 +117,9 @@ public class L4510Report extends MakeReport {
 				i = j - 1;
 
 				this.info("fnAllList.get(i)-------->" + fnAllList.get(i).toString());
-				
+
 				int lengthF6 = 8;
-				if(fnAllList.get(i).get("F6").length() < 8) {
+				if (fnAllList.get(i).get("F6").length() < 8) {
 					lengthF6 = fnAllList.get(i).get("F6").length();
 				}
 
@@ -158,10 +153,8 @@ public class L4510Report extends MakeReport {
 					if (!fnAllList.get(i).get("F1").equals(fnAllList.get(j).get("F1"))) {
 						this.info("RepayBank Not Match...");
 
-						this.print(1, 1,
-								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
-						this.print(1, 1,
-								"         總　計：           筆                                                                                                  ");
+						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1, "         總　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeAs), "R");
 						this.print(0, 128, df1.format(sumA1), "R");
 						this.print(1, 70, "=====續下頁=====", "C");
@@ -188,10 +181,8 @@ public class L4510Report extends MakeReport {
 				} else {
 //				3.若為最後一筆，則固定產出小計、總計、報表合計
 					if (total == fnAllList.size()) {
-						this.print(1, 1,
-								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
-						this.print(1, 1,
-								"         總　計：           筆                                                                                                  ");
+						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1, "         總　計：           筆                                                                                                  ");
 						this.print(0, 27, String.format("%,d", timeAs), "R");
 						this.print(0, 128, df1.format(sumA1), "R");
 					}

@@ -852,11 +852,12 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setRvNo(" ");
 		baTxVo.setAcctCode("TAV");
 		// 暫收款金額(存入暫收為正、暫收抵繳為負)
-		this.tempAmt = this.tempAmt.add(this.xxBal);
 		// 可償還餘額xxBal正值取回收餘額txBal，否則取可償還餘額(正值)
 		if (this.xxBal.compareTo(BigDecimal.ZERO) >= 0) {
 			baTxVo.setDbCr("C");
 			baTxVo.setUnPaidAmt(this.txBal);
+			baTxVo.setAcctAmt(this.txBal);
+			this.tempAmt = this.tempAmt.add(this.txBal);
 			this.info("溢繳金額= " + baTxVo.getUnPaidAmt());
 		} else {
 			baTxVo.setDbCr("D");
@@ -911,11 +912,16 @@ public class BaTxCom extends TradeBuffer {
 
 	/* Load UnPaid */
 	public void loadUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo) throws LogicException {
-		// 銷帳科目記號ReceivableFlag = 3-未收款
+// 銷帳科目記號ReceivableFlag = 1,2
+		// F09 暫付款－火險保費
+		// F25 催收款項－火險費用
+		// F07 暫付法務費
+		// F24 催收款項－法務費用
+// 銷帳科目記號ReceivableFlag = 3-未收款
 		// F10 帳管費
 		// TMI 火險保費
 		// F29 契變手續費
-		// 銷帳科目記號ReceivableFlag = 4-短繳期金
+// 銷帳科目記號ReceivableFlag = 4-短繳期金
 		// Z10 短期擔保放款 310 短期擔保放款
 		// Z20 中期擔保放款 320 中期擔保放款
 		// Z30 長期擔保放款 330 長期擔保放款
@@ -925,6 +931,7 @@ public class BaTxCom extends TradeBuffer {
 		// IC3 長擔息
 		// IC4 三十年房貸息
 		// YOP 清償違約金 IOP 違約金
+
 		Slice<AcReceivable> srvList = acReceivableService.acrvFacmNoRange(0, iCustNo, 0, 0, 999, this.index,
 				Integer.MAX_VALUE, titaVo); // 銷帳記號 0-未銷, 業務科目記號 0: 一般科目
 		rvList = srvList == null ? null : srvList.getContent();

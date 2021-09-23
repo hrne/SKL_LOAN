@@ -17,7 +17,6 @@ import com.st1.itx.db.service.PfCoOfficerService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Component("L5407")
 @Scope("prototype")
@@ -31,8 +30,6 @@ import com.st1.itx.util.parse.Parse;
 
 public class L5407 extends TradeBuffer {
 	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
 
 	@Autowired
 	public PfCoOfficerService iPfCoOfficerService;
@@ -68,16 +65,8 @@ public class L5407 extends TradeBuffer {
 		String iDistItem = titaVo.getParam("DistCodeX");
 		String iDeptItem = titaVo.getParam("DeptCodeX");
 
-//		dateUtil.init();
-//		dateUtil.setDate_1(iEffectiveDate);
-//		dateUtil.setDays(-1);
-//		iBeforeEffective = dateUtil.getCalenderDay();
-//		this.info("生效日前一天==="+iBeforeEffective);
-
 		PfCoOfficer iPfCoOfficer, nPfCoOfficer = new PfCoOfficer();
-//		PfCoOfficer oPfCoOfficer  = new PfCoOfficer();
 		PfCoOfficerId nPfCoOfficerId = new PfCoOfficerId();
-//		PfCoOfficerId oPfCoOfficerId = new PfCoOfficerId();
 		switch (iFunctionCd) {
 		case "1": // 1跟3為類似的 新增 ，2是修改，4是刪除
 			Slice<PfCoOfficer> xPfCoOfficer = null;
@@ -138,9 +127,6 @@ public class L5407 extends TradeBuffer {
 
 			break;
 		case "3":
-			// 更新時，該協辦人員生效日最近一筆資料更新停效日
-			// findByEmpNoFirst為生效日由大到小排列回傳故抓第一筆
-			// iPfCoOfficer = iPfCoOfficerService.findByEmpNoFirst(iEmpNo, titaVo);
 			Slice<PfCoOfficer> x3PfCoOfficer = null;
 			x3PfCoOfficer = iPfCoOfficerService.findByEmpNo(iEmpNo, this.index, this.limit, titaVo);
 			if (x3PfCoOfficer != null) {
@@ -162,7 +148,9 @@ public class L5407 extends TradeBuffer {
 			nPfCoOfficer.setPfCoOfficerId(nPfCoOfficerId);
 			nPfCoOfficer.setEmpClass(iEmpClass);
 			nPfCoOfficer.setClassPass(iClassPass);
-			nPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
+			if (iIneffectiveDate != 19110000) {
+				nPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
+			}
 			nPfCoOfficer.setAreaCode(iAreaCode);
 			nPfCoOfficer.setDistCode(iDistCode);
 			nPfCoOfficer.setDeptCode(iDeptCode);

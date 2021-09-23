@@ -25,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R13 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R13.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,12 +46,11 @@ public class L2R13 extends TradeBuffer {
 		int iFunCode = parse.stringToInteger(titaVo.getParam("RimFunCd"));
 		tPfCoOfficer = new PfCoOfficer();
 
-
 		// 查詢員工檔
 		CdEmp tCdEmp = sCdEmpService.findById(iEmployeeNo, titaVo);
-		
-		//查詢 刪除 列印時 純顯示
-		if (iFunCode == 4 || iFunCode == 5|| iFunCode == 7) {
+
+		// 查詢 刪除 列印時 純顯示
+		if (iFunCode == 4 || iFunCode == 5 || iFunCode == 7) {
 
 			if (tCdEmp == null) {
 				this.totaVo.putParam("OFullName", "");
@@ -72,8 +70,7 @@ public class L2R13 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "員工資料檔  員工編號=" + iEmployeeNo); // 查無資料
 			} else {
 //				檢查是否為協辦人員
-				tPfCoOfficer = sPfCoOfficerService.EffectiveDateFirst(tCdEmp.getEmployeeNo(), 0, Integer.MAX_VALUE,
-						titaVo);
+				tPfCoOfficer = sPfCoOfficerService.effectiveDateFirst(tCdEmp.getEmployeeNo(), 0, Integer.MAX_VALUE, titaVo);
 				if (tPfCoOfficer == null) {
 					throw new LogicException(titaVo, "E0001", "協辦人員檔  員工編號=" + tCdEmp.getEmployeeNo()); // 查無資料
 				}
@@ -84,7 +81,7 @@ public class L2R13 extends TradeBuffer {
 
 			}
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

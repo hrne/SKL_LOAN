@@ -286,7 +286,7 @@ T(3,@SellerName,)
 E(0,@ContractPrice,0)
 E(0,@ContractDate,0)
 E(0,@BdUsageCode,0)
-E(0,@ParkingTypeCode,0)
+!E(0,@ParkingTypeCode,0)
 T(3,@ParkingProperty,)
 T(3,@HouseTaxNo,)
 E(0,@HouseBuyDate,0)
@@ -307,10 +307,19 @@ T(F,@SellerName,#LbCONTROL_FG)
 T(F,@ContractPrice,#LbCONTROL_FG)
 T(F,@ContractDate,#LbCONTROL_FG)
 T(F,@BdUsageCode,#LbCONTROL_FG)
-T(F,@ParkingTypeCode,#LbCONTROL_FG)
 T(F,@ParkingProperty,#LbCONTROL_FG)
 T(F,@HouseTaxNo,#LbCONTROL_FG)
 T(F,@HouseBuyDate,#LbCONTROL_FG)
+##loop{times:5,i:1}
+T(F,@ParkingTypeCodeA{i},#LbCONTROL_FG)
+#ParkingTypeCodeA{i}=A,1,S
+E(0,{i})
+#ParkingTypeCodeXA{i}=X,13,L
+T(H,#ParkingTypeCodeA{i},#ParkingTypeCodeHelp)
+T(F,@ParkingQtyA{i},#LbCONTROL_FG)
+T(F,@ParkingAreaA{i},#LbCONTROL_FG)
+##end
+
 ##loop{times:10,i:1}
 CALL(#HIDE_PE_ROW_{i})
 CALL(#HIDE_PP_ROW_{i})
@@ -407,10 +416,15 @@ T(F,@SellerName,#LbCONTROL_FG)
 T(F,@ContractPrice,#LbCONTROL_FG)
 T(F,@ContractDate,#LbCONTROL_FG)
 T(F,@BdUsageCode,#LbCONTROL_FG)
-T(F,@ParkingTypeCode,#LbCONTROL_FG)
 T(F,@ParkingProperty,#LbCONTROL_FG)
 T(F,@HouseTaxNo,#LbCONTROL_FG)
 T(F,@HouseBuyDate,#LbCONTROL_FG)
+
+##loop{times:5,i:1}
+T(F,@ParkingTypeCodeA{i},#LbCONTROL_FG)
+T(F,@ParkingQtyA{i},#LbCONTROL_FG)
+T(F,@ParkingAreaA{i},#LbCONTROL_FG)
+##end
 
 ##loop{times:10,i:1}
 T(F,@PublicBdNoA{i},#LbCONTROL_FG)
@@ -557,10 +571,14 @@ T(2,@SellerName,#L2r27SellerName)
 E(0,@ContractPrice,#L2r27ContractPrice)
 E(0,@ContractDate,#L2r27ContractDate)
 E(0,@BdUsageCode,#L2r27BdUsageCode)
-E(0,@ParkingTypeCode,#L2r27ParkingTypeCode)
 T(2,@ParkingProperty,#L2r27ParkingProperty)
 T(2,@HouseTaxNo,#L2r27HouseTaxNo)
 E(0,@HouseBuyDate,#L2r27HouseBuyDate)
+##loop{times:5,i:1}
+E(0,@ParkingTypeCodeA{i},#L2r27ParkingTypeCodeA{i})
+E(0,@ParkingQtyA{i},#L2r27ParkingQtyA{i})
+E(0,@ParkingAreaA{i},#L2r27ParkingAreaA{i})
+##end
 ##loop{times:10,i:1}
 E(0,@PublicBdNoA{i},#L2r27PublicBdNoA{i})
 E(0,@PublicBdNoB{i},#L2r27PublicBdNoB{i})
@@ -569,10 +587,23 @@ T(2,@PublicBdOwnerId{i},#L2r27PublicBdOwnerId{i})
 T(2,@PublicBdOwnerName{i},#L2r27PublicBdOwnerName{i})
 T(2,@Reason{i},#L2r27Reason{i})
 T(2,@OtherReason{i},#L2r27OtherReason{i})
-
 T(2,@CreateEmpNo{i},#L2r27CreateEmpNo{i})
 E(0,@CreateDate{i},#L2r27CreateDate{i})
 ##end
+##loop{times:100,i:1}
+T(2,@ParkingNo{i},#L2r27ParkingNo{i})
+E(0,@ParkingQty{i},#L2r27ParkingQty{i})
+T(2,@ParkingTypeCode{i},#L2r27ParkingTypeCode{i})
+E(0,@ParkingOwnerPart{i},#L2r27ParkingOwnerPart{i})
+E(0,@ParkingOwnerTotal{i},#L2r27ParkingOwnerTotal{i})
+C(4,#L2r27ParkingLandNoA{i},E(0,@ParkingLandNoA{i},0),T(2,@ParkingLandNoA{i},#L2r27ParkingLandNoA{i}))
+C(4,#L2r27ParkingLandNoB{i},E(0,@ParkingLandNoB{i},0),T(2,@ParkingLandNoB{i},#L2r27ParkingLandNoB{i}))
+E(0,@ParkingArea{i},#L2r27ParkingArea{i})
+C(4,#L2r27ParkingBdNoA{i},E(0,@ParkingBdNoA{i},0),T(2,@ParkingBdNoA{i},#L2r27ParkingBdNoA{i}))
+C(4,#L2r27ParkingBdNoB{i},E(0,@ParkingBdNoB{i},0),T(2,@ParkingBdNoB{i},#L2r27ParkingBdNoB{i}))
+E(0,@ParkingAmount{i},#L2r27ParkingAmount{i})
+##end
+
 
 
 !RIM取擔保主檔
@@ -608,10 +639,10 @@ T(2,@SellerName,#L2r27SellerName)
 E(0,@ContractPrice,#L2r27ContractPrice)
 E(0,@ContractDate,#L2r27ContractDate)
 E(0,@BdUsageCode,#L2r27BdUsageCode)
-E(0,@ParkingTypeCode,#L2r27ParkingTypeCode)
 T(2,@ParkingProperty,#L2r27ParkingProperty)
 T(2,@HouseTaxNo,#L2r27HouseTaxNo)
 E(0,@HouseBuyDate,#L2r27HouseBuyDate)
+
 ##loop{times:10,i:1}
 E(0,@PublicBdNoA{i},#L2r27PublicBdNoA{i})
 E(0,@PublicBdNoB{i},#L2r27PublicBdNoB{i})
@@ -620,26 +651,9 @@ T(2,@PublicBdOwnerId{i},#L2r27PublicBdOwnerId{i})
 T(2,@PublicBdOwnerName{i},#L2r27PublicBdOwnerName{i})
 T(2,@Reason{i},#L2r27Reason{i})
 T(2,@OtherReason{i},#L2r27OtherReason{i})
-
 T(2,@CreateEmpNo{i},#L2r27CreateEmpNo{i})
 E(0,@CreateDate{i},#L2r27CreateDate{i})
 ##end
-
-#T1=x,1,S
-##loop{times:100,i:1}
-T(2,@ParkingNo{i},#L2r27ParkingNo{i})
-E(0,@ParkingQty{i},#L2r27ParkingQty{i})
-T(2,@ParkingTypeCode{i},#L2r27ParkingTypeCode{i})
-E(0,@ParkingOwnerPart{i},#L2r27ParkingOwnerPart{i})
-E(0,@ParkingOwnerTotal{i},#L2r27ParkingOwnerTotal{i})
-C(4,#L2r27ParkingLandNoA{i},E(0,@ParkingLandNoA{i},0),T(2,@ParkingLandNoA{i},#L2r27ParkingLandNoA{i}))
-C(4,#L2r27ParkingLandNoB{i},E(0,@ParkingLandNoB{i},0),T(2,@ParkingLandNoB{i},#L2r27ParkingLandNoB{i}))
-E(0,@ParkingArea{i},#L2r27ParkingArea{i})
-C(4,#L2r27ParkingBdNoA{i},E(0,@ParkingBdNoA{i},0),T(2,@ParkingBdNoA{i},#L2r27ParkingBdNoA{i}))
-C(4,#L2r27ParkingBdNoB{i},E(0,@ParkingBdNoB{i},0),T(2,@ParkingBdNoB{i},#L2r27ParkingBdNoB{i}))
-E(0,@ParkingAmount{i},#L2r27ParkingAmount{i})
-##end
-
 
 ![擔保品類別]
 #ClTypeCode=X,3,L
@@ -827,17 +841,16 @@ HELP(#BdUsageCodeHelp)
 #BdUsageCodeX=X,15,L
 T(H,#BdUsageCode,#BdUsageCodeHelp)
 
-! [停車位型式]
-#ParkingTypeCode=A,1,I
-IF(#FunCd==4,s,$)
-HELP(#ParkingTypeCodeHelp)
-@V(H,#ParkingTypeCodeHelp)
 
-#ParkingTypeCodeX=X,13,L
-T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
+##loop{times:5,i:1,j:0,rowSeq:2}
+#PT{i}=X,1,S
+E(0,@ParkingTypeCodeA{i},{i})
 
-#ParkingArea=m,9.2,I
-C(3,#ParkingTypeCode,5,S,$)
+#ParkingQtyA{i}=m,5,I
+
+#ParkingAreaA{i}=m,8.2,I
+
+##end
 
 ! [獨立產權車位註記]
 #ParkingProperty=X,1,L
@@ -1132,8 +1145,11 @@ E(0,1)
 ["#FdSELLER_ID+賣方統編",#SellerId],["#FdSELLER_NAME+賣方姓名",#SellerName],
 ["#FdCONTRACT_PRICE+買賣契約價格",#ContractPrice],["#FdCONTRACT_DT+買賣契約日期",#ContractDate],
 [#<->#,"#FdBD_USE+建物使用別",#BdUsageCode,#BdUsageCodeX],
-["#FdPARKING_TYPE+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
-["#FdPARKING_AREA+停車位面積",#ParkingArea],
+
+["#grid#,{id:0,expand:true,loop:5,row_height:1,s_cols:[200,100,100,200], p_cols:[20,20,20]}","","","",
+["停車位型式","停車位數量","停車位面積"],
+[[#ParkingTypeCodeXA1],#ParkingQtyA1,#ParkingAreaA1]
+],
 ["#FdHOUSE_TAX_SN+房屋稅籍號碼",#HouseTaxNo],["#FdHOUSE_BUY_DT+房屋取得日期",#HouseBuyDate],
 ]
 </sub>
@@ -1221,11 +1237,14 @@ ALERT(#OResultX);
 #ContractPrice
 #ContractDate
 #BdUsageCode
-#ParkingTypeCode
-#ParkingProperty
-#ParkingArea
 #HouseTaxNo
 #HouseBuyDate
+#ParkingProperty
+##loop{times:5,i:1}
+#ParkingTypeCodeA{i}
+#ParkingQtyA{i}
+#ParkingAreaA{i}
+##end
 ##loop{times:10,i:1}
 #PublicBdNoA{i}
 #PublicBdNoB{i}

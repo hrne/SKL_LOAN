@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -246,8 +247,7 @@ public class L4603 extends TradeBuffer {
 				titaVo);
 		if (slTxToDoDetail != null) {
 			for (TxToDoDetail t : slTxToDoDetail.getContent()) {
-				this.info("deleteTxToDo" + t.toString());
-				if (t.getDtlValue().substring(0, 9).equals("<FireFee>")) {
+				if (t.getDtlValue().length() >= 6 && t.getDtlValue().substring(0, 6).equals("<火險保費>")) {
 					lTxToDoDetail.add(t);
 				}
 			}
@@ -317,7 +317,7 @@ public class L4603 extends TradeBuffer {
 		tTxToDoDetail.setCustNo(tInsuRenew.getCustNo());
 		tTxToDoDetail.setFacmNo(tInsuRenew.getFacmNo());
 		tTxToDoDetail.setBormNo(0);
-		tTxToDoDetail.setDtlValue("<FireFee>" + tInsuRenew.getPrevInsuNo());
+		tTxToDoDetail.setDtlValue("<火險保費>" + tInsuRenew.getPrevInsuNo());
 		tTxToDoDetail.setItemCode("TEXT00");
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote(dataLines);
@@ -345,7 +345,7 @@ public class L4603 extends TradeBuffer {
 		tTxToDoDetail.setCustNo(tInsuRenew.getCustNo());
 		tTxToDoDetail.setFacmNo(tInsuRenew.getFacmNo());
 		tTxToDoDetail.setBormNo(0);
-		tTxToDoDetail.setDtlValue("<FireFee>" + tInsuRenew.getPrevInsuNo());
+		tTxToDoDetail.setDtlValue("<火險保費>" + tInsuRenew.getPrevInsuNo());
 		tTxToDoDetail.setItemCode("MAIL00");
 		tTxToDoDetail.setStatus(0);
 		tTxToDoDetail.setProcessNote(dataLines);

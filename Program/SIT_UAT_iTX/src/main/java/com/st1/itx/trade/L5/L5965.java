@@ -78,7 +78,8 @@ public class L5965 extends TradeBuffer {
 				occursList.putParam("OOEditTime", reCollRemind.getEditTime());
 				occursList.putParam("OORemindCode", reCollRemind.getRemindCode());
 				occursList.putParam("OORemark", reCollRemind.getRemark());
-				CdEmp iCdEmp = iCdEmpService.findAgentIdFirst(reCollRemind.getLastUpdateEmpNo(),titaVo);
+				occursList.putParam("OOEditEmpNo", reCollRemind.getLastUpdateEmpNo());
+				CdEmp iCdEmp = iCdEmpService.findById(reCollRemind.getLastUpdateEmpNo(),titaVo);
 				if (iCdEmp == null) {
 					occursList.putParam("OOEditEmpNoX", "");
 				}else {

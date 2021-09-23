@@ -74,7 +74,7 @@ public class L8038 extends TradeBuffer  {
 				occursListA.putParam("OORate2", rJcicZ047.getRate2());
 				occursListA.putParam("OOMonthPayAmt2", rJcicZ047.getMonthPayAmt2());
 				occursListA.putParam("OOPayLastAmt2", rJcicZ047.getPayLastAmt2());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -126,7 +126,7 @@ public class L8038 extends TradeBuffer  {
 				occursList.putParam("OOPayLastAmt2", rrJcicZ047Log.getPayLastAmt2());
 				occursList.putParam("OOPeriod", rrJcicZ047Log.getPeriod());
 				
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

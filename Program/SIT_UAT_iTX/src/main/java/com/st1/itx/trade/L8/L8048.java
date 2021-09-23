@@ -52,7 +52,7 @@ public class L8048 extends TradeBuffer  {
 				CdEmp iCdEmp = new CdEmp();
 				occursListA.putParam("OOTranKey", rJcicZ060.getTranKey());
 				occursListA.putParam("OOYM", rJcicZ060.getYM());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -80,7 +80,7 @@ public class L8048 extends TradeBuffer  {
 				CdEmp iCdEmp = new CdEmp();
 				occursList.putParam("OOTranKey", rrJcicZ060Log.getTranKey());
 				occursList.putParam("OOYM", rrJcicZ060Log.getYM());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

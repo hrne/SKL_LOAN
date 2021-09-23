@@ -51,7 +51,7 @@ public class L8036 extends TradeBuffer  {
 				CdEmp iCdEmp = new CdEmp();
 				occursListA.putParam("OOTranKey", rJcicZ045.getTranKey());
 				occursListA.putParam("OOAgreeCode", rJcicZ045.getAgreeCode());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -81,7 +81,7 @@ public class L8036 extends TradeBuffer  {
 				occursList.putParam("OOAgreeCode", rrJcicZ045Log.getAgreeCode());
 				occursList.putParam("OOOutJcicTxtDate", rrJcicZ045Log.getOutJcicTxtDate());
 				
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

@@ -2,8 +2,6 @@ package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L420C extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L420C.class);
 	@Autowired
 	public Parse parse;
 
@@ -80,36 +77,39 @@ public class L420C extends TradeBuffer {
 		tBatxDetailId.setDetailSeq(detailSeq);
 
 		tBatxDetail = batxDetailService.findById(tBatxDetailId);
+		if (tBatxDetail == null) {
+			throw new LogicException("E0014", tBatxDetailId + " hold not exist"); // 檔案錯誤
+		}
 
 //		1.訂正
 //		2.虛擬轉暫收  7.虛擬轉暫收改為6.批次入帳，未入帳則執行L3210
+		if (functionCode == 1 && "5".equals(tBatxDetail.getProcStsCode())) {
+			throw new LogicException("E0015", tBatxDetailId + "非整批入帳，請執行交易訂正"); // 檢查錯誤
+		}
+		if (functionCode == 2 && "7".equals(tBatxDetail.getProcStsCode())) {
+			tBatxDetail = batxDetailService.holdById(tBatxDetailId);
+			tBatxDetail.setProcStsCode("6");
+			finishCnt++;
+			try {
+				batxDetailService.update(tBatxDetail);
+			} catch (DBException e) {
+				e.printStackTrace();
+			}
+			updateHeadRoutine(titaVo);
+		} else {
+			// 組入帳交易電文
+			TitaVo txTitaVo = new TitaVo();
+			txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, titaVo); // 1:訂正 2:虛擬轉暫收改
 
-		if (tBatxDetail != null) {
-			if (functionCode == 2 && "7".equals(tBatxDetail.getProcStsCode())) {
-				tBatxDetail = batxDetailService.holdById(tBatxDetailId);
-				tBatxDetail.setProcStsCode("6");
-				finishCnt++;
-				try {
-					batxDetailService.update(tBatxDetail);
-				} catch (DBException e) {
-					e.printStackTrace();
-				}
-				updateHeadRoutine(titaVo);
-			} else {
-				// 組入帳交易電文
-				TitaVo txTitaVo = new TitaVo();
-				txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, titaVo); // 1:訂正 2:虛擬轉暫收改
+			// 執行入帳交易
+			this.info("L420c excuteTx " + txTitaVo);
+			// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
+			TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
 
-				// 執行入帳交易
-				this.info("L420c excuteTx " + txTitaVo);
-				// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
-				TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
-
-				/* 錯誤 */
-				if (totaVoList != null && totaVoList.size() > 0) {
-					if (totaVoList.get(0).isError())
-						throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
-				}
+			/* 錯誤 */
+			if (totaVoList != null && totaVoList.size() > 0) {
+				if (totaVoList.get(0).isError())
+					throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
 			}
 		}
 

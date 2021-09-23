@@ -104,7 +104,7 @@ public class L5961 extends TradeBuffer {
 				occursList.putParam("OOResultCode", returnVo.getResultCode());
 				occursList.putParam("OORemark", returnVo.getRemark());
 				occursList.putParam("OOEditEmpNo", returnVo.getLastUpdateEmpNo());
-				iCdEmp = iCdEmpService.findAgentIdFirst(returnVo.getLastUpdateEmpNo(),titaVo);
+				iCdEmp = iCdEmpService.findById(returnVo.getLastUpdateEmpNo(),titaVo);
 				if (iCdEmp == null) {
 					occursList.putParam("OOEditEmpNoX", "");
 				}else {

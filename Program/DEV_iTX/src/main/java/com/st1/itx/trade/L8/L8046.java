@@ -66,7 +66,7 @@ public class L8046 extends TradeBuffer  {
 				occursListA.putParam("OOIsImplement", rJcicZ055.getIsImplement());
 				occursListA.putParam("OOInspectName", rJcicZ055.getInspectName());
 				
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -108,7 +108,7 @@ public class L8046 extends TradeBuffer  {
 				occursList.putParam("OOSaveEndDate", rrJcicZ055Log.getSaveEndDate());
 				occursList.putParam("OOIsImplement", rrJcicZ055Log.getIsImplement());
 				occursList.putParam("OOInspectName", rrJcicZ055Log.getInspectName());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

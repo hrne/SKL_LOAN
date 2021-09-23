@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class L4510Report3 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L4510Report3.class);
 
 	@Autowired
 	public L4510R3ServiceImpl l4510R3ServiceImpl;
@@ -71,12 +68,10 @@ public class L4510Report3 extends MakeReport {
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
-		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
-				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-2, 1, "報　表：" + "L4510Report3");
 		this.print(-2, 70, "扣薪媒體印表", "C");
-		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
 		this.print(-4, 70, formatDateRoc(entryDate), "C");
 		this.print(-5, 1, "業績年月：" + perfMonth);
@@ -85,10 +80,8 @@ public class L4510Report3 extends MakeReport {
 		this.print(-5, 60, repayCodeX(repayCode));
 		this.print(-6, 1, "業績科目：" + acctCode);
 		this.print(-6, 20, acctItem);
-		this.print(-7, 1,
-				"戶號            戶名             員工代號    計息起迄日           扣款金額       本金      利息    違約金   欠繳本金   欠繳利息  暫收抵繳");
-		this.print(-8, 1,
-				"--------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-7, 1, "戶號            戶名             員工代號    計息起迄日           扣款金額       本金      利息    違約金   欠繳本金   欠繳利息  暫收抵繳");
+		this.print(-8, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public long exec(TitaVo titaVo1) throws LogicException {
@@ -159,7 +152,7 @@ public class L4510Report3 extends MakeReport {
 				ovduAmt = BigDecimal.ZERO;
 				ovduBal = BigDecimal.ZERO;
 				tempAmt = BigDecimal.ZERO;
-				
+
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(fnAllList.get(i).get("F16"));
 
@@ -175,9 +168,9 @@ public class L4510Report3 extends MakeReport {
 				if (tempVo.get("TempAmt") != null && tempVo.get("TempAmt").length() > 0) {
 					tempAmt = parse.stringToBigDecimal(tempVo.get("TempAmt"));
 				}
-				
+
 				int lengthF9 = 8;
-				if(fnAllList.get(i).get("F9").length() < 8) {
+				if (fnAllList.get(i).get("F9").length() < 8) {
 					lengthF9 = fnAllList.get(i).get("F9").length();
 				}
 
@@ -233,21 +226,39 @@ public class L4510Report3 extends MakeReport {
 //				2.再與下一筆比較，決定是否換行或換頁
 				if (j != fnAllList.size()) {
 //					年月不同則跳頁，並且累計歸零
-					if (!fnAllList.get(i).get("F1").equals(fnAllList.get(j).get("F1"))
-							|| !fnAllList.get(i).get("F2").equals(fnAllList.get(j).get("F2"))
+					if (!fnAllList.get(i).get("F1").equals(fnAllList.get(j).get("F1")) || !fnAllList.get(i).get("F2").equals(fnAllList.get(j).get("F2"))
 							|| !fnAllList.get(i).get("F3").equals(fnAllList.get(j).get("F3"))) {
 						this.info("RepayBank Not Match...");
-
+						this.info("F1 = " + fnAllList.get(i).get("F1") + "," + fnAllList.get(j).get("F1"));
+						this.info("F2 = " + fnAllList.get(i).get("F2") + "," + fnAllList.get(j).get("F2"));
+						this.info("F3 = " + fnAllList.get(i).get("F3") + "," + fnAllList.get(j).get("F3"));
+//						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+//						this.print(1, 51, FormatUtil.pad9("" + timeAs, 7));
+//						this.print(0, 72, format4Amt(sumA1), "R");// 扣款金額
+//						this.print(0, 82, format4Amt(sumA2), "R");// 本金
+//						this.print(0, 92, format4Amt(sumA3), "R");// 利息
+//						this.print(0, 102, format4Amt(sumA4), "R");// 違約金
+//						this.print(0, 112, format4Amt(sumA5), "R");// 欠繳本金
+//						this.print(0, 122, format4Amt(sumA6), "R");// 欠繳利息
+//						this.print(0, 132, format4Amt(sumA7), "R");// 暫收抵繳
+						
+						
+						
 						this.print(1, 1,
 								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
-						this.print(1, 51, FormatUtil.pad9("" + timeAs, 7));
-						this.print(0, 72, format4Amt(sumA1), "R");// 扣款金額
-						this.print(0, 82, format4Amt(sumA2), "R");// 本金
-						this.print(0, 92, format4Amt(sumA3), "R");// 利息
-						this.print(0, 102, format4Amt(sumA4), "R");// 違約金
-						this.print(0, 112, format4Amt(sumA5), "R");// 欠繳本金
-						this.print(0, 122, format4Amt(sumA6), "R");// 欠繳利息
-						this.print(0, 132, format4Amt(sumA7), "R");// 暫收抵繳
+
+						this.print(1, 44, "總　計：");
+						this.print(0, 15, "" + perfMonth);
+						this.print(0, 25, procCode);
+						this.print(0, 51, FormatUtil.pad9("" + timeBs, 7));
+						this.print(0, 72, format4Amt(sumB1), "R");// 扣款金額
+						this.print(0, 82, format4Amt(sumB2), "R");// 本金
+						this.print(0, 92, format4Amt(sumB3), "R");// 利息
+						this.print(0, 102, format4Amt(sumB4), "R");// 違約金
+						this.print(0, 112, format4Amt(sumB5), "R");// 欠繳本金
+						this.print(0, 122, format4Amt(sumB6), "R");// 欠繳利息
+						this.print(0, 132, format4Amt(sumB7), "R");// 暫收抵繳 this.print(1, 1,
+						
 //						扣除合計的行數
 						this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
 
@@ -260,35 +271,37 @@ public class L4510Report3 extends MakeReport {
 						sumA6 = BigDecimal.ZERO;
 						sumA7 = BigDecimal.ZERO;
 
+						
+						
 //						若流程別相同則需出總計
-						if (!fnAllList.get(i).get("F1").equals(fnAllList.get(j).get("F1"))) {
-							this.print(1, 1,
-									"--------------------------------------------------------------------------------------------------------------------------------------------------------");
-
-							this.print(1, 44, "總　計：");
-							this.print(0, 15, "" + perfMonth);
-							this.print(0, 25, procCode);
-							this.print(0, 51, FormatUtil.pad9("" + timeBs, 7));
-							this.print(0, 72, format4Amt(sumB1), "R");// 扣款金額
-							this.print(0, 82, format4Amt(sumB2), "R");// 本金
-							this.print(0, 92, format4Amt(sumB3), "R");// 利息
-							this.print(0, 102, format4Amt(sumB4), "R");// 違約金
-							this.print(0, 112, format4Amt(sumB5), "R");// 欠繳本金
-							this.print(0, 122, format4Amt(sumB6), "R");// 欠繳利息
-							this.print(0, 132, format4Amt(sumB7), "R");// 暫收抵繳 this.print(1, 1,
-//							扣除總計合計的行數 +1 
-							this.print(pageIndex - pageCnt - 2, 70, "=====報表結束=====", "C");
-
-							timeBs = 0;
-							sumB1 = BigDecimal.ZERO;
-							sumB2 = BigDecimal.ZERO;
-							sumB3 = BigDecimal.ZERO;
-							sumB4 = BigDecimal.ZERO;
-							sumB5 = BigDecimal.ZERO;
-							sumB6 = BigDecimal.ZERO;
-							sumB7 = BigDecimal.ZERO;
-
-						}
+//						if (!fnAllList.get(i).get("F1").equals(fnAllList.get(j).get("F1"))) {
+//							this.print(1, 1,
+//									"--------------------------------------------------------------------------------------------------------------------------------------------------------");
+//
+//							this.print(1, 44, "總　計：");
+//							this.print(0, 15, "" + perfMonth);
+//							this.print(0, 25, procCode);
+//							this.print(0, 51, FormatUtil.pad9("" + timeBs, 7));
+//							this.print(0, 72, format4Amt(sumB1), "R");// 扣款金額
+//							this.print(0, 82, format4Amt(sumB2), "R");// 本金
+//							this.print(0, 92, format4Amt(sumB3), "R");// 利息
+//							this.print(0, 102, format4Amt(sumB4), "R");// 違約金
+//							this.print(0, 112, format4Amt(sumB5), "R");// 欠繳本金
+//							this.print(0, 122, format4Amt(sumB6), "R");// 欠繳利息
+//							this.print(0, 132, format4Amt(sumB7), "R");// 暫收抵繳 this.print(1, 1,
+////							扣除總計合計的行數 +1 
+//							this.print(pageIndex - pageCnt - 2, 70, "=====報表結束=====", "C");
+//
+//							timeBs = 0;
+//							sumB1 = BigDecimal.ZERO;
+//							sumB2 = BigDecimal.ZERO;
+//							sumB3 = BigDecimal.ZERO;
+//							sumB4 = BigDecimal.ZERO;
+//							sumB5 = BigDecimal.ZERO;
+//							sumB6 = BigDecimal.ZERO;
+//							sumB7 = BigDecimal.ZERO;
+//
+//						}
 
 						perfMonth = parse.stringToInteger(fnAllList.get(j).get("F0")) - 191100;
 						procCode = fnAllList.get(j).get("F1");
@@ -300,7 +313,7 @@ public class L4510Report3 extends MakeReport {
 						pageCnt = 0;
 						this.newPage();
 						continue;
-					}
+					} // if
 
 //					每頁第38筆 跳頁 
 					if (pageCnt == pageIndex) {
@@ -313,8 +326,7 @@ public class L4510Report3 extends MakeReport {
 				} else {
 //				3.若為最後一筆，則固定產出小計、總計、報表合計
 					if (total == fnAllList.size()) {
-						this.print(1, 1,
-								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 51, FormatUtil.pad9("" + timeAs, 7));
 						this.print(0, 72, format4Amt(sumA1), "R");// 扣款金額
 						this.print(0, 82, format4Amt(sumA2), "R");// 本金
@@ -323,8 +335,7 @@ public class L4510Report3 extends MakeReport {
 						this.print(0, 112, format4Amt(sumA5), "R");// 欠繳本金
 						this.print(0, 122, format4Amt(sumA6), "R");// 欠繳利息
 						this.print(0, 132, format4Amt(sumA7), "R");// 暫收抵繳
-						this.print(1, 1,
-								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 						this.print(1, 44, "總　計：");
 						this.print(0, 15, "" + perfMonth);

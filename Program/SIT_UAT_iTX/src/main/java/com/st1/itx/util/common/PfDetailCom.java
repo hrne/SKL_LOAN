@@ -52,6 +52,7 @@ import com.st1.itx.db.service.PfDetailService;
 import com.st1.itx.db.service.PfItDetailService;
 import com.st1.itx.db.service.PfRewardService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.common.data.PfDetailVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.mail.MailService;
@@ -1027,7 +1028,7 @@ public class PfDetailCom extends TradeBuffer {
 	private PfDetail procCoBonus(PfDetail pf) throws LogicException {
 		this.info("PfDetailCom compCoBonus ");
 		// 生效日期<=撥款日<停效日期
-		PfCoOfficer tPfCoOfficer = pfCoOfficerService.EffectiveDateFirst(pf.getCoorgnizer(), 0,
+		PfCoOfficer tPfCoOfficer = pfCoOfficerService.effectiveDateFirst(pf.getCoorgnizer(), 0,
 				pf.getDrawdownDate() + 19110000, titaVo);
 		if (tPfCoOfficer == null || pf.getDrawdownDate() >= tPfCoOfficer.getIneffectiveDate()) {
 			return pf;

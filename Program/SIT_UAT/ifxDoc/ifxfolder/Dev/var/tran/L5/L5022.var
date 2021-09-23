@@ -169,8 +169,6 @@ C(3,#OOIneffectiveDate,0,S,$)
 T(H,#OOEmpClass,#ClassTypeHelp)
 ! 初階授信通過
 #OOClassPass=X,1,O
-! 歷程按鈕開啟Fg
-#OOReturnFg=A,1,S
 ! 狀態Fg 1:已生效 2:已停效 3:未生效
 #OOStatusFg=A,1,S
 
@@ -189,32 +187,22 @@ T(2,#OOEmpNo)
 
 
 #OOBTN_EDIT=A,2,O
-C(2,#OOStatusFg,$,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}),
-                  BIND(grid,cancel),
-                  BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}))
+C(3,#OOStatusFg,2,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}))
+! C(2,#OOStatusFg,$,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}),
+!                   BIND(grid,cancel),
+!                   BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}))
 #OOBTN_COPY=A,2,O
-C(2,#OOStatusFg,$,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_COPY}),
-                  BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_COPY}),
-                  BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_COPY}),)
-#OOBTN_DELETE=A,2,O                
-C(2,#OOStatusFg,$,BIND(grid,cancel),
-                 BIND(grid,cancel),
-                  BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_DELETE}))
+BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_COPY})
+
+#OOBTN_DELETE=A,2,O    
+C(3,#OOStatusFg,3,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_DELETE}),BIND(grid,cancel))   
+! C(2,#OOStatusFg,$,BIND(grid,cancel),
+!                   BIND(grid,cancel),
+!                   BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_DELETE}))
 #OOBTN_SEARCH=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5022; ntxbuf=#OOBUF_SEARCH})
 
 
-!#OOBTN_EDIT=A,2,O
-!C(3,#OOReturnFg,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_EDIT}),
-!                        BIND(grid,cancel))
-!#OOBTN_COPY=A,2,O
-!C(3,#OOReturnFg,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_COPY}),
-!                        BIND(grid,cancel))
-!#OOBTN_DELETE=A,2,O
-!C(3,#OOReturnFg,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_DELETE}),
-!                        BIND(grid,cancel))
-!#OOBTN_SEARCH=A,2,O
-!BIND(grid,{ cmd=CHAIN; ntxcd=L5022; ntxbuf=#OOBUF_SEARCH})
 
 </sub>
 
@@ -232,7 +220,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5022; ntxbuf=#OOBUF_SEARCH})
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5022
-#OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOIneffectiveDate#OOEmpClass#OOClassPass#OOReturnFg#OOStatusFg
+#OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOIneffectiveDate#OOEmpClass#OOClassPass#OOStatusFg
 ^
 </sub>
 
@@ -355,6 +343,6 @@ TXFORM=L5022
 <include src="PRT.icf::INQ04.sel" map="i=L5022;cpi=15"/>
 #EmpNo
 %
-#OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOEmpClass#OOClassPass#OOReturnFg
+#OOEmpNo#OOFullname#OOUnitCode#OOUnitCodeX#OODistCode#OODistCodeX#OODeptCode#OODeptCodeX#OOEffectiveDate#OOEmpClass#OOClassPass
 @^
 </sub>

@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8311]                                 (50)債務人繳款資料檔案"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],["#FdPayDate+繳款日期",#PayDate],
 ["#FdPayAmt+本次繳款金額",#PayAmt],["#FdSumRepayActualAmt+累計實際還款金額",#SumRepayActualAmt],
 ["#FdSumRepayShouldAmt+累計應還款金額",#SumRepayShouldAmt],["#FdStatus+債權結案註記",#Status,#StatusX],
@@ -112,8 +113,8 @@ C(5,#TranKey_Tmp,1,$,S)
 ! T(2,@TranKey,A)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@RcDate,0)T(F,@PayDate,0)
-T(F,@PayAmt,0)T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@Status,0)T(F,@SecondRepayYM,0)
+T(F,@RcDate,1)T(F,@PayDate,1)
+T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdPayDate,*)
@@ -126,7 +127,7 @@ T(2,@FdSecondRepayYM,*)
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
-T(F,@TranKey,1)T(F,@PayAmt,0)T(F,@SumRepayActualAmt,0)T(F,@SumRepayShouldAmt,0)T(F,@Status,0)T(F,@SecondRepayYM,0)
+T(F,@TranKey,1)T(F,@PayAmt,1)T(F,@SumRepayActualAmt,1)T(F,@SumRepayShouldAmt,1)T(F,@Status,1)T(F,@SecondRepayYM,1)
 T(1,@Ukey,#NTXBUF,3,32)
 T(2,@FdPayAmt,*)
 T(2,@FdSumRepayActualAmt,*)
@@ -274,17 +275,12 @@ HELP(#Status50Help)
 T(H,#Status,#Status50Help)
 
 !進入第二階梯還款年月
-#SecondRepayYM=X,5,I
+#SecondRepayYM=A,5,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@SecondRepayYM,#L8r22SecondRepayYM),$)
 C(5,#TranKey,D,s,$)
-
-
-#CheckSecondRepayYM=D,7,S
-IF(#SecondRepayYM!="" && #SecondRepayYM>0,$,S)
-T(2,#SecondRepayYM+01)
-@A(DATE,0,#CheckSecondRepayYM)
+@A(YM13,1,#SecondRepayYM)
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

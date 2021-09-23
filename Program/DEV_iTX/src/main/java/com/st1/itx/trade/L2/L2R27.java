@@ -19,6 +19,7 @@ import com.st1.itx.db.domain.ClBuildingParking;
 import com.st1.itx.db.domain.ClBuildingPublic;
 import com.st1.itx.db.domain.ClBuildingReason;
 import com.st1.itx.db.domain.ClParking;
+import com.st1.itx.db.domain.ClParkingType;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.CustMain;
@@ -29,6 +30,7 @@ import com.st1.itx.db.service.ClBuildingPublicService;
 import com.st1.itx.db.service.ClBuildingReasonService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClParkingService;
+import com.st1.itx.db.service.ClParkingTypeService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -72,6 +74,10 @@ public class L2R27 extends TradeBuffer {
 	@Autowired
 	public ClParkingService sClParkingService;
 
+	/* DB服務注入 */
+	@Autowired
+	public ClParkingTypeService sClParkingTypeService;
+	
 	@Autowired
 	public CustMainService sCustMainService;
 	
@@ -101,6 +107,7 @@ public class L2R27 extends TradeBuffer {
 		List<ClBuildingPublic> lClBuildingPublic = new ArrayList<ClBuildingPublic>();
 		List<ClBuildingParking> lClBuildingParking = new ArrayList<ClBuildingParking>();
 		List<ClParking> lClParking = new ArrayList<ClParking>();
+		List<ClParkingType> lClParkingType = new ArrayList<ClParkingType>();
 		List<ClBuildingOwner> lClBuildingOwner = new ArrayList<ClBuildingOwner>();
 		List<ClBuildingReason> lClBuildingReason = new ArrayList<ClBuildingReason>();
 		// new pk
@@ -125,6 +132,9 @@ public class L2R27 extends TradeBuffer {
 		Slice<ClParking> slClParking = sClParkingService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClParking = slClParking == null ? null : new ArrayList<ClParking>(slClParking.getContent());
 
+		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		lClParkingType = slClParkingType == null ? null : new ArrayList<ClParkingType>(slClParkingType.getContent());
+		
 		Slice<ClBuildingOwner> slClBuildingOwner = sClBuildingOwnerService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
 		lClBuildingOwner = slClBuildingOwner == null ? null : new ArrayList<ClBuildingOwner>(slClBuildingOwner.getContent());
 		Slice<ClBuildingReason> slClBuildingReason = sClBuildingReasonService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
@@ -287,31 +297,6 @@ public class L2R27 extends TradeBuffer {
 			int dataSize2 = lClBuildingParking.size();
 			this.info("L2R27 lClBuildingParking size in DB = " + dataSize2);
 
-//			// 暫時只抓前10筆,把第11筆之後的刪除
-//			if (dataSize2 > 10) {
-//				for (int j = dataSize2 + 1; j <= dataSize2; j++) {
-//					lClBuildingParking.remove(j);
-//				}
-//			} else if (dataSize2 <= 10) {
-//				// 若不足10筆,補足10筆
-//				for (int j = dataSize2 + 1; j <= 10; j++) {
-//					ClBuildingParking tClBuildingParking = new ClBuildingParking();
-//					lClBuildingParking.add(tClBuildingParking);
-//				}
-//			}
-//
-//			int j = 1;
-//			for (ClBuildingParking tClBuildingParking : lClBuildingParking) {
-//				this.info("tClBuildingParkingL2416 " + tClBuildingParking);
-//
-//				// 判斷是否有資料 無資料new table給tota
-//				this.totaVo.putParam("L2r27ParkingBdNoA" + j, tClBuildingParking.getParkingBdNo1() == 0 ? "" : tClBuildingParking.getParkingBdNo1());
-//				this.totaVo.putParam("L2r27ParkingBdNoB" + j, tClBuildingParking.getParkingBdNo2());
-//				this.totaVo.putParam("L2r27ParkingArea" + j, tClBuildingParking.getArea());
-//				this.totaVo.putParam("L2r27ParkingAmt" + j, tClBuildingParking.getAmt());
-//				j++;
-//				
-//			}
 			int j = 1;
 			if (lClParking != null) {
 				for (ClParking tClParking : lClParking) {
@@ -320,15 +305,6 @@ public class L2R27 extends TradeBuffer {
 						break;
 					}
 					OccursList occursList = new OccursList();
-
-//					this.totaVo.putParam("L2r27ParkingNo" + j, tClParking.getParkingNo());
-//					this.totaVo.putParam("L2r27ParkingQty" + j, tClParking.getParkingQty());
-//					this.totaVo.putParam("L2r27ParkingTypeCode" + j, tClParking.getParkingTypeCode());
-//					this.totaVo.putParam("L2r27ParkingOwnerPart" + j, tClParking.getOwnerPart());
-//					this.totaVo.putParam("L2r27ParkingOwnerTotal" + j, tClParking.getOwnerTotal());
-//					this.totaVo.putParam("L2r27ParkingLandNoA" + j, tClParking.getLandNo1());
-//					this.totaVo.putParam("L2r27ParkingLandNoB" + j, tClParking.getLandNo2());
-//					this.totaVo.putParam("L2r27ParkingArea" + j, tClParking.getParkingArea());
 
 					occursList.putParam("L2r27ParkingNo", tClParking.getParkingNo());
 					occursList.putParam("L2r27ParkingQty", tClParking.getParkingQty());
@@ -346,16 +322,7 @@ public class L2R27 extends TradeBuffer {
 					j++;
 				}
 			}
-//			for (int k = j; k <= 100; k++) {
-//				this.totaVo.putParam("L2r27ParkingNo" + k, "");
-//				this.totaVo.putParam("L2r27ParkingQty" + k, 0);
-//				this.totaVo.putParam("L2r27ParkingTypeCode" + k, 0);
-//				this.totaVo.putParam("L2r27ParkingOwnerPart" + k, 0);
-//				this.totaVo.putParam("L2r27ParkingOwnerTotal" + k, 0);
-//				this.totaVo.putParam("L2r27ParkingLandNoA" + k, "0000");
-//				this.totaVo.putParam("L2r27ParkingLandNoB" + k, "0000");
-//				this.totaVo.putParam("L2r27ParkingArea" + k, 0);
-//			}
+
 		}
 		// 建物所有權人
 		if (lClBuildingOwner == null) {
@@ -444,7 +411,14 @@ public class L2R27 extends TradeBuffer {
 			this.info("DATE2 " + CreateDate4);
 			l++;
 		}
-
+		int m = 1;
+		for (ClParkingType tClParkingType : lClParkingType) {	
+			this.totaVo.putParam("L2r27ParkingTypeCodeA" + m, tClParkingType.getParkingTypeCode());
+			this.totaVo.putParam("L2r27ParkingQtyA" + m, tClParkingType.getParkingQty());
+			this.totaVo.putParam("L2r27ParkingAreaA" + m, tClParkingType.getParkingArea());
+			m++;
+		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -71,7 +71,7 @@ public class L8052 extends TradeBuffer  {
 				occursListA.putParam("OONotBankId5X", dealBankName(rJcicZ440.getNotBankId5(),titaVo));
 				occursListA.putParam("OONotBankId6", rJcicZ440.getNotBankId6());			
 				occursListA.putParam("OONotBankId6X", dealBankName(rJcicZ440.getNotBankId6(),titaVo));
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -115,7 +115,7 @@ public class L8052 extends TradeBuffer  {
 				occursList.putParam("OONotBankId4X", dealBankName(rrJcicZ440Log.getNotBankId4(),titaVo));
 				occursList.putParam("OONotBankId5X", dealBankName(rrJcicZ440Log.getNotBankId5(),titaVo));
 				occursList.putParam("OONotBankId6X", dealBankName(rrJcicZ440Log.getNotBankId6(),titaVo));
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

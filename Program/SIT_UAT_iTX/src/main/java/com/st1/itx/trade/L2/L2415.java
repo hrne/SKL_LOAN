@@ -27,6 +27,8 @@ import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClParking;
 import com.st1.itx.db.domain.ClParkingId;
+import com.st1.itx.db.domain.ClParkingType;
+import com.st1.itx.db.domain.ClParkingTypeId;
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClBuildingOwnerService;
@@ -37,6 +39,7 @@ import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClImmService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClParkingService;
+import com.st1.itx.db.service.ClParkingTypeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
@@ -84,6 +87,10 @@ public class L2415 extends TradeBuffer {
 	@Autowired
 	public ClParkingService sClParkingService;
 
+	/* DB服務注入 */
+	@Autowired
+	public ClParkingTypeService sClParkingTypeService;
+	
 	/* DB服務注入 */
 	@Autowired
 	public ClBuildingOwnerService sClBuildingOwnerService;
@@ -213,6 +220,11 @@ public class L2415 extends TradeBuffer {
 				throw new LogicException("E0007", "擔保品不動產建物檔" + e.getErrorMsg());
 			}
 
+			// delete 停車位形式
+			deleteClParkingType(titaVo);
+			// insert 停車位形式
+			insertClParkingType(titaVo);
+			
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeClBuilding, tClBuilding);
 			dataLog.exec();
@@ -245,6 +257,10 @@ public class L2415 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0007", "擔保品不動產建物檔" + e.getErrorMsg());
 			}
+			
+			// delete 停車位形式
+			deleteClParkingType(titaVo);
+						
 			// delete 公設建號
 			deleteClBuildingPublic(titaVo);
 
@@ -284,9 +300,9 @@ public class L2415 extends TradeBuffer {
 			tClBuilding.setContractPrice(BigDecimal.ZERO);
 			tClBuilding.setContractDate(0);
 			tClBuilding.setBdUsageCode("");
-			tClBuilding.setParkingTypeCode("");
-			tClBuilding.setParkingProperty("");
-			tClBuilding.setParkingArea(BigDecimal.ZERO);
+//			tClBuilding.setParkingTypeCode("");
+//			tClBuilding.setParkingProperty("");
+//			tClBuilding.setParkingArea(BigDecimal.ZERO);
 			tClBuilding.setHouseTaxNo("");
 			tClBuilding.setHouseBuyDate(0);
 		} else {
@@ -307,14 +323,69 @@ public class L2415 extends TradeBuffer {
 			tClBuilding.setContractPrice(parse.stringToBigDecimal(titaVo.getParam("ContractPrice")));
 			tClBuilding.setContractDate(parse.stringToInteger(titaVo.getParam("ContractDate")));
 			tClBuilding.setBdUsageCode(titaVo.getParam("BdUsageCode"));
-			tClBuilding.setParkingTypeCode(titaVo.getParam("ParkingTypeCode"));
-			tClBuilding.setParkingArea(parse.stringToBigDecimal(titaVo.getParam("ParkingArea")));
-			tClBuilding.setParkingProperty(titaVo.getParam("ParkingProperty"));
+//			tClBuilding.setParkingTypeCode(titaVo.getParam("ParkingTypeCode"));
+//			tClBuilding.setParkingArea(parse.stringToBigDecimal(titaVo.getParam("ParkingArea")));
+//			tClBuilding.setParkingProperty(titaVo.getParam("ParkingProperty"));
 			tClBuilding.setHouseTaxNo(titaVo.getParam("HouseTaxNo"));
 			tClBuilding.setHouseBuyDate(parse.stringToInteger(titaVo.getParam("HouseBuyDate")));
 		}
 	}
 
+	
+	private void insertClParkingType(TitaVo titaVo) throws LogicException {
+
+		for (int i = 1; i <= 5; i++) {
+			// 若該筆無資料就離開迴圈
+			String publicTypeCode = titaVo.get("ParkingTypeCodeA" + i);
+
+			// 若該筆無資料就離開迴圈
+			if (publicTypeCode == null || "".equals(publicTypeCode.trim())) {
+				break;
+			}
+
+			ClParkingType tClParkingType = new ClParkingType();
+
+			this.info("iParkingNo L2415 " + publicTypeCode);
+			ClParkingTypeId clParkingTypeId = new ClParkingTypeId();
+
+			clParkingTypeId.setClCode1(iClCode1);
+			clParkingTypeId.setClCode2(iClCode2);
+			clParkingTypeId.setClNo(iClNo);
+			clParkingTypeId.setParkingTypeCode(publicTypeCode);
+			this.info("ClParkingId L2415 " + clParkingTypeId);
+
+			tClParkingType.setClParkingTypeId(clParkingTypeId);
+			tClParkingType.setClCode1(iClCode1);
+			tClParkingType.setClCode2(iClCode2);
+			tClParkingType.setClNo(iClNo);
+			tClParkingType.setParkingTypeCode(publicTypeCode);
+			tClParkingType.setParkingQty(parse.stringToInteger(titaVo.get("ParkingQtyA"+i)));
+			tClParkingType.setParkingArea(parse.stringToBigDecimal(titaVo.get("ParkingAreaA"+i)));
+			this.info("tClParking L2415" + tClParkingType);
+			try {
+				sClParkingTypeService.insert(tClParkingType, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "擔保品停車位型式檔" + e.getErrorMsg());
+			}
+		}
+		
+	}
+	
+	// delete 車位
+		private void deleteClParkingType(TitaVo titaVo) throws LogicException {
+			this.info("L2415 deleteClParkingType");
+			Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
+			List<ClParkingType> lClParkingType = slClParkingType == null ? null : slClParkingType.getContent();
+			if (lClParkingType != null) {
+				try {
+					sClParkingTypeService.deleteAll(lClParkingType);
+				} catch (DBException e) {
+					throw new LogicException("E0008", "擔保品停車位型式檔" + e.getErrorMsg());
+				}
+			}
+		}
+		
+	
 	// insert 公設建號
 	private void insertClBuildingPublic(TitaVo titaVo) throws LogicException {
 		for (int i = 1; i <= 10; i++) {

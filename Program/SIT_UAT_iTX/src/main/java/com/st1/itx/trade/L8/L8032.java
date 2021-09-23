@@ -52,7 +52,7 @@ public class L8032 extends TradeBuffer  {
                 occursListA.putParam("OOScDate", rJcicZ041.getScDate());
                 occursListA.putParam("OONegoStartDate", rJcicZ041.getNegoStartDate());
                 occursListA.putParam("OONonFinClaimAmt", rJcicZ041.getNonFinClaimAmt());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -82,7 +82,7 @@ public class L8032 extends TradeBuffer  {
                 occursList.putParam("OOScDate", rrJcicZ041Log.getScDate());
                 occursList.putParam("OONegoStartDate", rrJcicZ041Log.getNegoStartDate());
                 occursList.putParam("OONonFinClaimAmt", rrJcicZ041Log.getNonFinClaimAmt());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

@@ -131,10 +131,10 @@ public class BS442 extends TradeBuffer {
 
 	private void execute(TitaVo titaVo) throws LogicException {
 //		刪除TxToDoDetail
-		dele("TEXT00", "<TermAmt>", titaVo);
-		dele("TEXT00", "<FireAmt>", titaVo);
-		dele("MAIL00", "<TermAmt>", titaVo);
-		dele("MAIL00", "<FireAmt>", titaVo);
+		dele("TEXT00", "<期款扣款通知>", titaVo);
+		dele("TEXT00", "<火險扣款通知>", titaVo);
+		dele("MAIL00", "<期款扣款通知>", titaVo);
+		dele("MAIL00", "<火險扣款通知>", titaVo);
 
 		Slice<BankDeductDtl> sBankDeductDtl = null;
 
@@ -220,8 +220,8 @@ public class BS442 extends TradeBuffer {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setText...");
 		String dataLines = "<" + noticePhoneNo + ">";	
-		if (tmp.getRepayType() == 1) {
-			this.info("RepayType() == 1...");
+		if (tmp.getRepayType() == 1 || tmp.getRepayType() == 3 ) {
+			this.info("RepayType() == 1 3...");
 			if (!custLoanFlag.containsKey(tmp.getCustNo())) {
 				dataLines += "\"H1\",\"" + custId.get(tmp) + "\",\"" + custPhone.get(tmp)
 						+ "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\"" + sEntryDate + "\"";
@@ -230,7 +230,7 @@ public class BS442 extends TradeBuffer {
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<TermAmt>");
+				tTxToDoDetail.setDtlValue("<期款扣款通知>");
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
@@ -258,7 +258,7 @@ public class BS442 extends TradeBuffer {
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<FireAmt>");
+				tTxToDoDetail.setDtlValue("<火險扣款通知>");
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
@@ -280,8 +280,8 @@ public class BS442 extends TradeBuffer {
 //		RepayType = 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他
 		this.info("setMail...");
 		String dataLines = "<" + noticeEmail + ">";
-		if (tmp.getRepayType() == 1) {
-			this.info("RepayType() == 1...");
+		if (tmp.getRepayType() == 1 || tmp.getRepayType() == 3 ) {
+			this.info("RepayType() == 1 3...");
 			if (!custLoanFlag.containsKey(tmp.getCustNo())) {
 				dataLines += "親愛的客戶，繳款通知；新光人壽關心您。";
 				// Step3. send L6001
@@ -289,7 +289,7 @@ public class BS442 extends TradeBuffer {
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<TermAmt>");
+				tTxToDoDetail.setDtlValue("<期款扣款通知>");
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
@@ -314,7 +314,7 @@ public class BS442 extends TradeBuffer {
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<FireAmt>");
+				tTxToDoDetail.setDtlValue("<火險扣款通知>");
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);

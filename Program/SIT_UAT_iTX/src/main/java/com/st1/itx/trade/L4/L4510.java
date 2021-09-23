@@ -26,6 +26,7 @@ import com.st1.itx.db.domain.EmpDeductDtlId;
 import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.domain.EmpDeductMediaId;
 import com.st1.itx.db.domain.EmpDeductSchedule;
+import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
@@ -806,7 +807,7 @@ public class L4510 extends TradeBuffer {
 			tmpCustRpCd tmp = new tmpCustRpCd(tEmpDeductDtl.getEntryDate(), tEmpDeductDtl.getCustNo(), rpcd);
 
 			if (empCnt.containsKey(tmp)) {
-				updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq, titaVo);
+				updateEmpDeductDtl(tEmpDeductDtl.getEmpDeductDtlId(), todayF, flag, seq, titaVo);
 				this.info("tmp 已進入 continue ..." + tmp);
 				continue;
 			} else {
@@ -818,8 +819,6 @@ public class L4510 extends TradeBuffer {
 			tEmpDeductMediaId.setMediaDate(todayF);
 			tEmpDeductMediaId.setMediaKind("" + flag);
 			tEmpDeductMediaId.setMediaSeq(seq);
-
-			tEmpDeductMedia.setEmpDeductMediaId(tEmpDeductMediaId);
 			tEmpDeductMedia.setCustNo(tEmpDeductDtl.getCustNo());
 			tEmpDeductMedia.setRepayCode(tEmpDeductDtl.getAchRepayCode());
 			tEmpDeductMedia.setPerfRepayCode(parse.stringToInteger(tEmpDeductDtl.getRepayCode()));
@@ -846,27 +845,13 @@ public class L4510 extends TradeBuffer {
 				throw new LogicException("E0005", "員工扣薪檔新增失敗 :" + e.getErrorMsg());
 			}
 
-			updateEmpDeductDtl(tEmpDeductDtl, todayF, flag, seq, titaVo);
+			updateEmpDeductDtl(tEmpDeductDtl.getEmpDeductDtlId(), todayF, flag, seq, titaVo);
 		}
 	}
 
-	private void updateEmpDeductDtl(EmpDeductDtl tEmpDeductDtl, int todayF, int flag, int seq, TitaVo titaVo)
+	private void updateEmpDeductDtl(EmpDeductDtlId tEmpDeductDtlId, int todayF, int flag, int seq, TitaVo titaVo)
 			throws LogicException {
-		EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
-		tEmpDeductDtlId.setAcctCode(tEmpDeductDtl.getAcctCode());
-		tEmpDeductDtlId.setAchRepayCode(tEmpDeductDtl.getAchRepayCode());
-		tEmpDeductDtlId.setCustNo(tEmpDeductDtl.getCustNo());
-		tEmpDeductDtlId.setEntryDate(tEmpDeductDtl.getEntryDate());
-		tEmpDeductDtlId.setPerfMonth(tEmpDeductDtl.getPerfMonth());
-		tEmpDeductDtlId.setProcCode(tEmpDeductDtl.getProcCode());
-		tEmpDeductDtlId.setRepayCode(tEmpDeductDtl.getRepayCode());
-		tEmpDeductDtlId.setFacmNo(tEmpDeductDtl.getFacmNo());
-		tEmpDeductDtlId.setBormNo(tEmpDeductDtl.getBormNo());
-
-		EmpDeductDtl t2EmpDeductDtl = new EmpDeductDtl();
-		t2EmpDeductDtl = empDeductDtlService.findById(tEmpDeductDtlId, titaVo);
-
-		empDeductDtlService.holdById(t2EmpDeductDtl.getEmpDeductDtlId(), titaVo);
+		EmpDeductDtl t2EmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtlId, titaVo);
 		t2EmpDeductDtl.setMediaDate(todayF);
 		t2EmpDeductDtl.setMediaKind("" + flag);
 		t2EmpDeductDtl.setMediaSeq(seq);

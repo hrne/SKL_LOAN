@@ -1,10 +1,11 @@
 package com.st1.itx.trade.L6;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -32,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L698A extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L698A.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -154,7 +154,14 @@ public class L698A extends TradeBuffer {
 
 				OccursList occursList = new OccursList();
 
-				occursList.putParam("OOAcDate", tTxToDoDetail.getDataDate());
+				int createDate = tTxToDoDetail.getDataDate();
+				if (tTxToDoDetail.getCreateDate() != null) {
+					Timestamp ts = tTxToDoDetail.getCreateDate();
+					DateFormat sdfdate = new SimpleDateFormat("yyyyMMdd");
+					String sCreateDate = sdfdate.format(ts);
+					createDate = parse.stringToInteger(sCreateDate) - 19110000;
+				}
+				occursList.putParam("OOAcDate", createDate);
 				occursList.putParam("OOStatus", tTxToDoDetail.getStatus());
 				occursList.putParam("OOCustNo", custno);
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());

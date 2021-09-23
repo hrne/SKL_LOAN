@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
+import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.BankRemitId;
@@ -123,8 +124,10 @@ public class AcPaymentCom extends TradeBuffer {
 		}
 
 		/* 將處理完的AcDetail List 放回txBuffer */
-		this.info("AcPaymentCom AcDetailList : " + acDetailList.toString());
 		this.txBuffer.addAllAcDetailList(acDetailList);
+		for (int i = 0; i < this.txBuffer.getAcDetailList().size(); i++) {
+			this.info("AcPaymentCom AcDetailList = " + i + this.txBuffer.getAcDetailList().get(i));
+		}
 		return null;
 	}
 
@@ -383,6 +386,7 @@ public class AcPaymentCom extends TradeBuffer {
 	/* 取值與決定寫入資料庫之動作：正常、修改、訂正 */
 	private void procBankRemit(int i, TitaVo titaVo) throws LogicException {
 		/* 對BankRemit 撥款匯款檔查詢 */
+		String batchNo = "";
 		BankRemitId tBankRemitId = new BankRemitId();
 		tBankRemitId.setAcDate(acDate);
 		tBankRemitId.setTitaTlrNo(titaTlrNo);
@@ -392,11 +396,16 @@ public class AcPaymentCom extends TradeBuffer {
 			if (tBankRemit != null) {
 				throw new LogicException("E0006", "撥款匯款檔已存在 " + tBankRemitId.toString());// 鎖定資料時，發生錯誤
 			}
+			batchNo = this.getBatchNo(parse.stringToInteger(titaVo.getParam("RpCode" + i)), titaVo);
 		} else {
 			if (tBankRemit == null) {
 				throw new LogicException("E0006", "撥款匯款檔不存在 " + tBankRemitId.toString());// 鎖定資料時，發生錯誤
 			}
+			batchNo = tBankRemit.getBatchNo();
 		}
+		// set tita BatchNo
+		titaVo.setBatchNo(batchNo);
+		//
 		boolean isUpdate = false;
 		boolean isInsert = false;
 		boolean isDelete = false;
@@ -405,7 +414,7 @@ public class AcPaymentCom extends TradeBuffer {
 		if (titaVo.isHcodeNormal() && titaVo.isActfgEntry()) {
 			tBankRemit = new BankRemit();
 			tBankRemit = moveTitaToBankRemit(i, tBankRemit, titaVo);// 搬BankRemit內容
-			tBankRemit.setBatchNo("");
+			tBankRemit.setBatchNo(batchNo);
 			tBankRemit.setStatusCode(0); // 正常
 			tBankRemit.setActFg(titaVo.getActFgI());
 			isInsert = true;
@@ -414,14 +423,14 @@ public class AcPaymentCom extends TradeBuffer {
 		/* isHcodeErase() 訂正交易 且 isActfgEntry() 登錄 */
 		// 已有批號，狀態= 2:產檔後訂正，並提示產檔後訂正警告訊息。 */
 		if (titaVo.isHcodeErase() && titaVo.isActfgEntry()) {
-			if (tBankRemit.getBatchNo().isEmpty()) {
-				isDelete = true;
-			} else {
+			if (isDoL4101(tBankRemit, titaVo)) {
 				tBankRemit.setStatusCode(2); // 2:產檔後訂正
 				tBankRemit.setActFg(titaVo.getActFgI());
 				isUpdate = true;
 				this.totaVo.setWarnMsg("產檔後訂正，批號=" + tBankRemit.getBatchNo());
 				this.addList(this.totaVo);
+			} else {
+				isDelete = true;
 			}
 		}
 
@@ -429,10 +438,7 @@ public class AcPaymentCom extends TradeBuffer {
 		// 未有批號,直接更新內容
 		// 已有批號，比對內容不同 ==> 狀態= 1:產檔後修正、內容放入產檔後修正後匯款單資料(jason)、提示產檔後修正警告訊息。
 		if (titaVo.isHcodeModify()) {
-			if (tBankRemit.getBatchNo().isEmpty()) {
-				tBankRemit = moveTitaToBankRemit(i, tBankRemit, titaVo);// 搬BankRemit內容
-				isUpdate = true;
-			} else {
+			if (isDoL4101(tBankRemit, titaVo)) {
 				BankRemit t2BankRemit = new BankRemit();
 				t2BankRemit = moveTitaToBankRemit(i, t2BankRemit, titaVo);// 搬BankRemit內容
 				if (isModifyRemit(tBankRemit, t2BankRemit)) {
@@ -442,6 +448,9 @@ public class AcPaymentCom extends TradeBuffer {
 					this.totaVo.setWarnMsg("該筆匯款產檔後修正，批號=" + tBankRemit.getBatchNo());
 					this.addList(this.totaVo);
 				}
+			} else {
+				tBankRemit = moveTitaToBankRemit(i, tBankRemit, titaVo);// 搬BankRemit內容
+				isUpdate = true;
 			}
 		}
 
@@ -461,7 +470,7 @@ public class AcPaymentCom extends TradeBuffer {
 		if (titaVo.isHcodeErase() && titaVo.isActfgSuprele()) {
 			isUpdate = true;
 			tBankRemit.setActFg(1);
-			if (tBankRemit.getStatusCode() == 1) {
+			if (isDoL4101(tBankRemit, titaVo)) {
 				this.totaVo.setWarnMsg("該筆匯款資料已產檔，批號=" + tBankRemit.getBatchNo());
 				this.addList(this.totaVo);
 			}
@@ -490,6 +499,40 @@ public class AcPaymentCom extends TradeBuffer {
 			}
 		}
 
+	}
+
+	// 是否已執行L4101-撥款匯款作業
+	private boolean isDoL4101(BankRemit tBankRemit, TitaVo titaVo) throws LogicException {
+		// LN+ 傳票批號 + 撥款批號 (整批匯款:' '、單筆匯款:'00')
+		String remitBatchNo = tBankRemit.getBatchNo().substring(4, 6);
+		if ("  ".equals(remitBatchNo) || "00".equals(remitBatchNo)) {
+			return false;
+
+		} else {
+			return true;
+		}
+	}
+
+	// 取得批號
+	private String getBatchNo(int drawdownCode, TitaVo titaVo) throws LogicException {
+		// LN+ 傳票批號 + 撥款批號 (整批匯款:' '、單筆匯款:'00')
+		String batchNo = "LN";
+		AcCloseId tAcCloseId = new AcCloseId();
+		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
+		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
+		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
+		if (tAcClose == null) {
+			batchNo += "01";
+		} else {
+			batchNo += parse.IntegerToString(tAcClose.getClsNo() + 1, 2);
+		}
+		if (drawdownCode == 1 || drawdownCode == 5) {
+			batchNo += "  ";
+		} else {
+			batchNo += "00";
+		}
+		return batchNo;
 	}
 
 	/* 搬BankRemit內容 */

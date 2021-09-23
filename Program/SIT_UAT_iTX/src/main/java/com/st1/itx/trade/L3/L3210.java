@@ -338,16 +338,17 @@ public class L3210 extends TradeBuffer {
 				// 貸方
 				if (titaVo.isTrmtypBatch()) {
 					acDetailSettleUnpaid();
+				} else {
+					acDetail = new AcDetail();
+					acDetail.setDbCr("C");
+					acDetail.setAcctCode("TAV");
+					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+					acDetail.setTxAmt(wkTempAmt);
+					acDetail.setCustNo(iCustNo);
+					acDetail.setFacmNo(iFacmNo);
+					acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
+					lAcDetail.add(acDetail);
 				}
-				acDetail = new AcDetail();
-				acDetail.setDbCr("C");
-				acDetail.setAcctCode("TAV");
-				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-				acDetail.setTxAmt(wkTempAmt);
-				acDetail.setCustNo(iCustNo);
-				acDetail.setFacmNo(iFacmNo);
-				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
-				lAcDetail.add(acDetail);
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;
 			case 10: // AML凍結／未確定
@@ -372,33 +373,30 @@ public class L3210 extends TradeBuffer {
 				// 整批入帳自動收回費用
 				if (titaVo.isTrmtypBatch()) {
 					acDetailSettleUnpaid();
+				} else {
+					acDetail = new AcDetail();
+					acDetail.setDbCr("C");
+					acDetail.setAcctCode("TAV");
+					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+					acDetail.setTxAmt(wkTempAmt);
+					acDetail.setCustNo(iCustNo);
+					acDetail.setFacmNo(iFacmNo);
+					acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
+					lAcDetail.add(acDetail);
 				}
-				acDetail = new AcDetail();
-				acDetail.setDbCr("C");
-				acDetail.setAcctCode("TAV");
-				acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-				acDetail.setTxAmt(wkTempAmt);
-				acDetail.setCustNo(iCustNo);
-				acDetail.setFacmNo(iFacmNo);
-				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
-				lAcDetail.add(acDetail);
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;
 			}
-			this.info("L3210 AcDetailRoutine  " + lAcDetail.toString());
-			this.info("L3210 AcDetailCom.... : acListsize=" + this.txBuffer.getAcDetailList().size());
 
 			// 產生會計分錄
 			acDetailCom.setTxBuffer(this.txBuffer);
 			acDetailCom.run(titaVo);
-			this.setTxBuffer(acDetailCom.getTxBuffer());
 		}
 	}
 
 	// 貸方費用帳務處理
 	private void acDetailSettleUnpaid() throws LogicException {
 		this.baTxList = new ArrayList<BaTxVo>();
-		BigDecimal acctAmt = BigDecimal.ZERO;
 		int iRepayType = parse.stringToInteger(titaVo.getParam("RpType1"));
 		if (iRepayType <= 3) {
 			iRepayType = 9; // 09-其他
@@ -407,9 +405,9 @@ public class L3210 extends TradeBuffer {
 		this.baTxList = baTxCom.settingUnPaid(iEntryDate, iCustNo, iFacmNo, 0, iRepayType, iTempAmt, titaVo);
 		if (this.baTxList != null) {
 			for (BaTxVo ba : this.baTxList) {
-				if (ba.getDataKind() == 1 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
+				if (ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
+					acDetail.setDbCr(ba.getDbCr());
 					acDetail.setAcctCode(ba.getAcctCode());
 					acDetail.setTxAmt(ba.getAcctAmt());
 					acDetail.setCustNo(ba.getCustNo());
@@ -418,12 +416,11 @@ public class L3210 extends TradeBuffer {
 					acDetail.setRvNo(ba.getRvNo());
 					acDetail.setReceivableFlag(ba.getReceivableFlag());
 					lAcDetail.add(acDetail);
-					acctAmt = acctAmt.add(ba.getAcctAmt());
 				}
 			}
 		}
 		// 暫收款金額
-		wkTempAmt = iTempAmt.subtract(acctAmt);
+		wkTempAmt = baTxCom.getTempAmt();
 	}
 
 	// 新增放款交易內容檔

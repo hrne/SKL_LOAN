@@ -57,7 +57,7 @@ public class L8049 extends TradeBuffer  {
 				occursListA.putParam("OOMaxMainNote", rJcicZ061.getMaxMainNote());
 				occursListA.putParam("OOIsGuarantor", rJcicZ061.getIsGuarantor());
 				occursListA.putParam("OOIsChangePayment", rJcicZ061.getIsChangePayment());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -90,7 +90,7 @@ public class L8049 extends TradeBuffer  {
 				occursList.putParam("OOMaxMainNote", rrJcicZ061Log.getMaxMainNote());
 				occursList.putParam("OOIsGuarantor", rrJcicZ061Log.getIsGuarantor());
 				occursList.putParam("OOIsChangePayment", rrJcicZ061Log.getIsChangePayment());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

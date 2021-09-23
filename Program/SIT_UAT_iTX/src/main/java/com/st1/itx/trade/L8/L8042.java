@@ -52,7 +52,7 @@ public class L8042 extends TradeBuffer  {
 				occursListA.putParam("OOTranKey", rJcicZ051.getTranKey());
 				occursListA.putParam("OODelayCode", rJcicZ051.getDelayCode());
 				occursListA.putParam("OODelayDesc", rJcicZ051.getDelayDesc());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -81,7 +81,7 @@ public class L8042 extends TradeBuffer  {
 				occursList.putParam("OOTranKey", rrJcicZ051Log.getTranKey());
 				occursList.putParam("OODelayCode", rrJcicZ051Log.getDelayCode());
 				occursList.putParam("OODelayDesc", rrJcicZ051Log.getDelayDesc());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {

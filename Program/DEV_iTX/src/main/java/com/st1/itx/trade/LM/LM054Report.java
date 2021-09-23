@@ -70,10 +70,10 @@ public class LM054Report extends MakeReport {
 		try {
 			fnAllList = lM054ServiceImpl.findAll(titaVo, "N");
 
-			makeExcel.setShiftRow(row, fnAllList.size()+1);
+			makeExcel.setShiftRow(row, fnAllList.size() + 1);
 
-			this.info("size="+fnAllList.size());
-			
+			this.info("size=" + fnAllList.size());
+
 			exportExcel(fnAllList);
 
 			fnAllList = lM054ServiceImpl.findAll(titaVo, "Y");
@@ -116,19 +116,19 @@ public class LM054Report extends MakeReport {
 			// 放款日期
 			makeExcel.setValue(row, 10, lM054Vo.get("F8"), "C");
 			// 到期日期
-			makeExcel.setValue(row, 11, lM054Vo.get("F9"), "C"); 
+			makeExcel.setValue(row, 11, lM054Vo.get("F9"), "C");
 			// 放款年利率
 			makeExcel.setValue(row, 12, lM054Vo.get("F10"), "R");
 			// 放款餘額
-			makeExcel.setValue(row, 13, Integer.valueOf(lM054Vo.get("F11")), "#,##0", "R");
+			makeExcel.setValue(row, 13, new BigDecimal(lM054Vo.get("F11")), "#,##0", "R");
 			// 應收利息
-			makeExcel.setValue(row, 14, Integer.valueOf(lM054Vo.get("F12")), "#,##0", "R");
+			makeExcel.setValue(row, 14, new BigDecimal(lM054Vo.get("F12")), "#,##0", "R");
 			// 擔保品設定順位
 			makeExcel.setValue(row, 15, lM054Vo.get("F13"), "C");
 			// 擔保品估計總值
-			makeExcel.setValue(row, 16, Integer.valueOf(lM054Vo.get("F14")), "#,##0", "R");
+			makeExcel.setValue(row, 16, new BigDecimal(lM054Vo.get("F14")), "#,##0", "R");
 			// 擔保品核貸金額
-			makeExcel.setValue(row, 17, Integer.valueOf(lM054Vo.get("F15")), "#,##0", "R");
+			makeExcel.setValue(row, 17, new BigDecimal(lM054Vo.get("F15")), "#,##0", "R");
 			// 轉催收日期
 			makeExcel.setValue(row, 18, lM054Vo.get("F16"), "C");
 			// 催收狀態
@@ -136,21 +136,21 @@ public class LM054Report extends MakeReport {
 			// 催收狀態執行日期
 			makeExcel.setValue(row, 20, lM054Vo.get("F18"), "C");
 
-			int allowanceForLose = 0;
+			BigDecimal allowanceForLose = BigDecimal.ZERO;
 			// 備抵損失總額
 			// 參考報表中公式
 			if (lM054Vo.get("F20").equals("1")) {
-				allowanceForLose = new BigDecimal(Integer.valueOf(lM054Vo.get("F11")) * 0.005).intValue();
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.005"));
 			} else if (lM054Vo.get("F20").equals("2")) {
-				allowanceForLose = new BigDecimal(Integer.valueOf(lM054Vo.get("F11")) * 0.02).intValue();
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.02"));
 			} else if (lM054Vo.get("F20").equals("3")) {
-				allowanceForLose = new BigDecimal(Integer.valueOf(lM054Vo.get("F11")) * 0.1).intValue();
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.1"));
 			} else if (lM054Vo.get("F20").equals("4")) {
-				allowanceForLose = new BigDecimal(Integer.valueOf(lM054Vo.get("F11")) * 0.5).intValue();
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11")).multiply(new BigDecimal("0.5"));
 			} else if (lM054Vo.get("F20").equals("5")) {
-				allowanceForLose = new BigDecimal(Integer.valueOf(lM054Vo.get("F11")) * 1).intValue();
+				allowanceForLose = new BigDecimal(lM054Vo.get("F11"));
 			}
-			makeExcel.setValue(row, 21, new BigDecimal(allowanceForLose), "#,##0", "R");
+			makeExcel.setValue(row, 21, allowanceForLose, "#,##0", "R");
 
 			// 評估分類
 			makeExcel.setValue(row, 22, lM054Vo.get("F20"), "C");

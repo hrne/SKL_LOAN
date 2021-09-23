@@ -36,6 +36,7 @@ import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.ClOwnerRelation;
 import com.st1.itx.db.domain.ClOwnerRelationId;
+import com.st1.itx.db.domain.ClParkingType;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.CdAreaService;
@@ -50,6 +51,7 @@ import com.st1.itx.db.service.ClLandOwnerService;
 import com.st1.itx.db.service.ClLandService;
 import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.ClOwnerRelationService;
+import com.st1.itx.db.service.ClParkingTypeService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
@@ -104,6 +106,10 @@ public class L2411 extends TradeBuffer {
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
 
+	/* DB服務注入 */
+	@Autowired
+	public ClParkingTypeService sClParkingTypeService;
+	
 	@Autowired
 	public ClOwnerRelationService sClOwnerRelationService;
 
@@ -570,6 +576,8 @@ public class L2411 extends TradeBuffer {
 					deleteClLandOwner(titaVo);
 				}
 
+				deleteClParkingType(titaVo);
+				
 				// 擔保品主檔
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
 				if (tClMain == null) {
@@ -1011,6 +1019,20 @@ public class L2411 extends TradeBuffer {
 		}
 	}
 
+	// delete 車位
+	private void deleteClParkingType(TitaVo titaVo) throws LogicException {
+		this.info("L2415 deleteClParkingType");
+		Slice<ClParkingType> slClParkingType = sClParkingTypeService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
+		List<ClParkingType> lClParkingType = slClParkingType == null ? null : slClParkingType.getContent();
+		if (lClParkingType != null) {
+			try {
+				sClParkingTypeService.deleteAll(lClParkingType);
+			} catch (DBException e) {
+				throw new LogicException("E0008", "擔保品停車位型式檔" + e.getErrorMsg());
+			}
+		}
+	}
+			
 	private String getBdLocation(TitaVo titaVo) throws LogicException {
 
 		String result = "";

@@ -2684,6 +2684,11 @@ TXFORM=L2R26
 #L2r27CreateEmpNo{i}=X,6,S
 #L2r27CreateDate{i}=D,7,S
 ##end
+##loop{times:5,i:1}
+#L2r27ParkingTypeCodeA{i}=A,1,S
+#L2r27ParkingQtyA{i}=m,5,S
+#L2r27ParkingAreaA{i}=m,8.2,S
+##end
 ##loop{times:100,i:1}
 #L2r27ParkingNo{i}=x,20,S
 #L2r27ParkingQty{i}=A,5,S
@@ -2759,6 +2764,11 @@ TXFORM=L2R27
 #L2r27OtherReason{i}
 #L2r27CreateEmpNo{i}
 #L2r27CreateDate{i}
+##end
+##loop{times:5,i:1}
+#L2r27ParkingTypeCodeA{i}
+#L2r27ParkingQtyA{i}
+#L2r27ParkingAreaA{i}
 ##end
 ##loop{times:100,i:1}
 #L2r27ParkingNo{i}

@@ -62,8 +62,10 @@ E(0,40)ASGN(INQPRT$)
 ["#FdContractPrice+買賣契約價格",#ContractPrice],
 ["#FdContractDate+買賣契約日期",#ContractDate],
 ["#FdBdUsageCode+建物使用別",#BdUsageCode,#BdUsageCodeX],
-["#FdParkingTypeCode+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
-["#FdPARKING_AREA+停車位面積",#ParkingArea],
+["#grid#,{id:0,expand:true,loop:5,row_height:1,s_cols:[200,100,100,200], p_cols:[20,20,20]}","","","",
+["停車位型式","停車位數量","停車位面積"],
+[[#ParkingTypeCodeXA1],#ParkingQtyA1,#ParkingAreaA1]
+],
 ["#FdHouseTaxNo+房屋稅籍號碼",#HouseTaxNo],
 ["#FdHouseBuyDate+房屋取得日期",#HouseBuyDate],
 ["#FdClStatus+押品狀況碼",#ClStatus,#ClStatusX],
@@ -391,10 +393,30 @@ E(0,@Lgtseq,#L2r17LgtSeq)
 C(3,#GdRid1,0,S,$)
 T(2,#GdRid1+-+#GdRid2+-+#GdRnum+-+#Lgtseq)
 
+
 !調RIM參數
 #RimClCode1=A,1,S
 #RimClCode2=A,2,S
 #RimClNo=A,7,S
+#RimFunCd=A,1,S
+
+<include src="ROM.icf::L2R27.dec"/>
+!RIM取擔保主檔
+#RimL2r27A=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,5)
+RESET_RIM(#RimL2r27A,L2R27)
+S(L2R27,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R27)
+
+#checkL2r27A=X,1,S
+##loop{times:5,i:1}
+E(0,@ParkingTypeCodeA{i},#L2r27ParkingTypeCodeA{i})
+E(0,@ParkingQtyA{i},#L2r27ParkingQtyA{i})
+E(0,@ParkingAreaA{i},#L2r27ParkingAreaA{i})
+##end
 
 !RIM取擔保品別
 #RimL2915=X,1,S
@@ -478,14 +500,20 @@ T(3,)T(H,#BdSubUsageCode,#BdSubUsageCodeHelp)
 #BdUsageCodeX=X,15,L
 T(3,)T(H,#BdUsageCode,#BdUsageCodeHelp)
 
-! [停車位型式]
-#ParkingTypeCode=A,1,L
 
-#ParkingTypeCodeX=X,13,L
-T(3,)T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
+##loop{times:5,i:1}
 
-#ParkingArea=m,9.2,L
-C(3,#ParkingTypeCode,5,S,$)
+#ParkingTypeCodeA{i}=A,1,L
+!E(0,{i})
+
+#ParkingTypeCodeXA{i}=X,13,L
+T(H,#ParkingTypeCodeA{i},#ParkingTypeCodeHelp)
+
+#ParkingQtyA{i}=m,5,L
+
+#ParkingAreaA{i}=m,8.2,L
+
+##end
 
 
 ! [獨立產權車位註記]
@@ -769,8 +797,6 @@ TXFORM=L2915
 #ContractPrice
 #ContractDate
 #BdUsageCode
-#ParkingTypeCode
-#ParkingArea
 #ParkingProperty
 #HouseTaxNo
 #HouseBuyDate
@@ -807,6 +833,7 @@ TXFORM=L2915
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R17.tom"/>
+<include src="ROM.icf::L2R27.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

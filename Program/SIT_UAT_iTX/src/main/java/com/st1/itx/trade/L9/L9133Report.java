@@ -3,8 +3,6 @@ package com.st1.itx.trade.L9;
 import java.math.BigDecimal;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -24,7 +22,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class L9133Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9133Report.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -85,7 +82,7 @@ public class L9133Report extends MakeReport {
 		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * ----------------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		this.print(-5, 1, "科目　　　　　　　　　　　　　　　　會計帳餘額　　　　　　　　　　　　　銷帳檔餘額　　　　　　　　　　　　　　主檔餘額　　　　　　　　　　　　　　　　差額");
+		this.print(-5, 1, "區隔帳冊　科目　　　　　　　　　　　會計帳餘額　　　　　　　　　　　　　銷帳檔餘額　　　　　　　　　　　　　　主檔餘額　　　　　　　　　　　　　　　　差額");
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(6);
@@ -129,9 +126,13 @@ public class L9133Report extends MakeReport {
 			// 明細資料新的一行
 			print(1, 1, "　　");
 
+			// 區隔帳冊
+			String acSubBookCode = tAcAcctCheck.getAcSubBookCode();
+			print(0, 1, acSubBookCode);
+
 			// 科目
 			String acctItem = tAcAcctCheck.getAcctItem();
-			print(0, 1, acctItem);
+			print(0, 11, acctItem);
 
 			// 會計帳餘額
 			String acMainBal = formatAmt(tAcAcctCheck.getTdBal(), 0);

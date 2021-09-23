@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.PfCoOfficer;
@@ -44,7 +46,7 @@ public interface PfCoOfficerService {
    * @param titaVo Variable-Length Argument
    * @return Slice PfCoOfficer PfCoOfficer of List
    */
-  public PfCoOfficer EffectiveDateFirst(String empNo_0, int effectiveDate_1, int effectiveDate_2, TitaVo... titaVo);
+  public PfCoOfficer effectiveDateFirst(String empNo_0, int effectiveDate_1, int effectiveDate_2, TitaVo... titaVo);
 
   /**
    * EmpNo = 
@@ -65,6 +67,64 @@ public interface PfCoOfficerService {
    * @return Slice PfCoOfficer PfCoOfficer of List
    */
   public PfCoOfficer findByEmpNoFirst(String empNo_0, TitaVo... titaVo);
+
+  /**
+   * EffectiveDate &gt;= ,AND EffectiveDate &lt;=
+   *
+   * @param effectiveDate_0 effectiveDate_0
+   * @param effectiveDate_1 effectiveDate_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfCoOfficer PfCoOfficer of List
+   */
+  public Slice<PfCoOfficer> findByEffectiveDateDate(int effectiveDate_0, int effectiveDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * EmpNo = ,AND EffectiveDate &gt;= ,AND EffectiveDate &lt;=
+   *
+   * @param empNo_0 empNo_0
+   * @param effectiveDate_1 effectiveDate_1
+   * @param effectiveDate_2 effectiveDate_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfCoOfficer PfCoOfficer of List
+   */
+  public Slice<PfCoOfficer> effectiveDateEq(String empNo_0, int effectiveDate_1, int effectiveDate_2, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * EffectiveDate &gt;
+   *
+   * @param effectiveDate_0 effectiveDate_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfCoOfficer PfCoOfficer of List
+   */
+  public Slice<PfCoOfficer> findNotYet(int effectiveDate_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * IneffectiveDate &lt;
+   *
+   * @param ineffectiveDate_0 ineffectiveDate_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfCoOfficer PfCoOfficer of List
+   */
+  public Slice<PfCoOfficer> findOutOf(int ineffectiveDate_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * EffectiveDate &gt;= 
+   *
+   * @param effectiveDate_0 effectiveDate_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfCoOfficer PfCoOfficer of List
+   */
+  public Slice<PfCoOfficer> findIng(int effectiveDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By PfCoOfficer

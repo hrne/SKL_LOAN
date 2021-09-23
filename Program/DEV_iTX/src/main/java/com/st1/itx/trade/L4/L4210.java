@@ -59,7 +59,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4210 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4210.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -123,8 +122,7 @@ public class L4210 extends TradeBuffer {
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		iRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
 		iRepayType = parse.stringToInteger(titaVo.getParam("RepayType"));
-		iAcCode = FormatUtil.padX(titaVo.getParam("AcNoCode"), 8) + FormatUtil.padX(titaVo.getParam("AcSubCode"), 5)
-				+ FormatUtil.padX(titaVo.getParam("AcDtlCode"), 2);
+		iAcCode = FormatUtil.padX(titaVo.getParam("AcNoCode"), 11) + FormatUtil.padX(titaVo.getParam("AcSubCode"), 5) + FormatUtil.padX(titaVo.getParam("AcDtlCode"), 2);
 		iRepayAmt = parse.stringToBigDecimal(titaVo.getParam("RepayAmt"));
 		iRepayId = titaVo.getParam("RepayId");
 		iRepayName = titaVo.getParam("RepayName");
@@ -191,8 +189,7 @@ public class L4210 extends TradeBuffer {
 					iRvNo = "";
 					iNote = "一般債權撥付轉入";
 					// remark =Bank:(5)+債權機構代號(8) + 資料檔交易序號(10) + (1) + 提兌日(7)
-					wkRemark = "Bank:" + FormatUtil.padX(ng.getFinCode(), 8) + FormatUtil.padX(ng.getTxSeq(), 10) + " "
-							+ titaVo.getParam("BringUpDate");
+					wkRemark = "Bank:" + FormatUtil.padX(ng.getFinCode(), 8) + FormatUtil.padX(ng.getTxSeq(), 10) + " " + titaVo.getParam("BringUpDate");
 					wkTxAmt = wkTxAmt.add(ng.getTxAmt());
 					cnt++;
 					// insert record
@@ -208,17 +205,15 @@ public class L4210 extends TradeBuffer {
 			}
 		}
 		if (wkTxAmt.compareTo(iTxAmt) != 0) {
-			throw new LogicException("E0019",
-					"一般債權撥付資料筆數=" + lNegAppr02.size() + ",未轉入筆數=" + cnt + ",金額=" + wkTxAmt + ",輸入金額=" + iTxAmt); // E0019
-																													// 輸入資料錯誤
+			throw new LogicException("E0019", "一般債權撥付資料筆數=" + lNegAppr02.size() + ",未轉入筆數=" + cnt + ",金額=" + wkTxAmt + ",輸入金額=" + iTxAmt); // E0019
+																																			// 輸入資料錯誤
 		}
 	}
 
 	// 一般債權撥付資料檔轉入
 	private void deleteFromNegAppr02(TitaVo titaVo) throws LogicException {
 		iBringUpDate = parse.stringToInteger(wkRemark.substring(24, 31)) + 19110000;
-		NegAppr02 tNegAppr02 = negAppr02Service.holdById(
-				new NegAppr02Id(iBringUpDate, wkRemark.substring(5, 13).trim(), wkRemark.substring(13, 23).trim()));
+		NegAppr02 tNegAppr02 = negAppr02Service.holdById(new NegAppr02Id(iBringUpDate, wkRemark.substring(5, 13).trim(), wkRemark.substring(13, 23).trim()));
 		if (tNegAppr02 != null) {
 			tNegAppr02.setAcDate(0);
 			try {
@@ -278,7 +273,7 @@ public class L4210 extends TradeBuffer {
 		}
 		// head
 		updateBatxHead(iRepayAmt, titaVo);
-        // Detail
+		// Detail
 		tBatxDetailId.setAcDate(iAcDate);
 		tBatxDetailId.setBatchNo(iBatchNo);
 		tBatxDetailId.setDetailSeq(wkDetailSeq);
@@ -306,7 +301,7 @@ public class L4210 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "L4210 BatxDetail insert " + e.getErrorMsg());
 		}
-		
+
 //		 大額匯款手工增入入帳
 		if (iRepayCode == 11 && titaVo.getEmpNos().trim().isEmpty()) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0502", "");
@@ -371,8 +366,7 @@ public class L4210 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxDetail 無此資料");
 		}
 
-		if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode())
-				|| "7".equals(tBatxDetail.getProcStsCode())) {
+		if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode()) || "7".equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException(titaVo, "E0010", "已入帳，請先訂正該筆資料"); // E0010 功能選擇錯誤
 		}
 
@@ -454,11 +448,11 @@ public class L4210 extends TradeBuffer {
 		tBatxOthersId.setAcDate(iAcDate);
 		tBatxOthersId.setBatchNo(iBatchNo);
 		tBatxOthersId.setDetailSeq(iDetailSeq);
-		tBatxOthers =  batxOthersService.holdById(tBatxOthersId);
+		tBatxOthers = batxOthersService.holdById(tBatxOthersId);
 		if (tBatxOthers == null) {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxOthers 無此資料");
 		}
-		
+
 		try {
 			batxOthersService.delete(tBatxOthers);
 		} catch (DBException e) {

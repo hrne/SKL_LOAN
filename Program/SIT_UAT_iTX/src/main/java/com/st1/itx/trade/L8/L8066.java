@@ -53,7 +53,7 @@ public class L8066 extends TradeBuffer  {
 				occursListA.putParam("OOCloseDate", rJcicZ574.getCloseDate());
 				occursListA.putParam("OOCloseMark", rJcicZ574.getCloseMark());
 				occursListA.putParam("OOPhoneNo", rJcicZ574.getPhoneNo());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursListA.putParam("OOLastUpdateEmpNoName", "");
 				}else {
@@ -83,7 +83,7 @@ public class L8066 extends TradeBuffer  {
 				occursList.putParam("OOCloseDate", rrJcicZ574Log.getCloseDate());
 				occursList.putParam("OOCloseMark", rrJcicZ574Log.getCloseMark());
 				occursList.putParam("OOPhoneNo", rrJcicZ574Log.getPhoneNo());
-				iCdEmp = iCdEmpService.findAgentIdFirst(iLastUpdateEmpNo, titaVo);
+				iCdEmp = iCdEmpService.findById(iLastUpdateEmpNo, titaVo);
 				if (iLastUpdateEmpNo.equals("")) {
 					occursList.putParam("OOLastUpdateEmpNoName", "");
 				}else {
