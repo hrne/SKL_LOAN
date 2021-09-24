@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4943ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -60,7 +57,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int flag, TitaVo titaVo) throws Exception {
 
-		logger.info("L4943.findAll");
+		this.info("L4943.findAll");
 
 //		會計日期    #AcDate
 //		整批批號    #BatchNo
@@ -80,14 +77,14 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		BigDecimal singleLimitAmt = parse.stringToBigDecimal(titaVo.getParam("SingleLimit"));
 		BigDecimal lowLimitAmt = parse.stringToBigDecimal(titaVo.getParam("LowLimit"));
 
-		logger.info("functionCode = " + functionCode);
-		logger.info("custNo = " + custNo);
-		logger.info("repayBank = " + repayBank);
-		logger.info("repayType = " + repayType);
-		logger.info("entryDateFm = " + entryDateFm);
-		logger.info("entryDateTo = " + entryDateTo);
-		logger.info("postLimitAmt = " + postLimitAmt);
-		logger.info("singleLimitAmt = " + singleLimitAmt);
+		this.info("functionCode = " + functionCode);
+		this.info("custNo = " + custNo);
+		this.info("repayBank = " + repayBank);
+		this.info("repayType = " + repayType);
+		this.info("entryDateFm = " + entryDateFm);
+		this.info("entryDateTo = " + entryDateTo);
+		this.info("postLimitAmt = " + postLimitAmt);
+		this.info("singleLimitAmt = " + singleLimitAmt);
 
 		String sql = "";
 //		flag 0.Part 1.All
@@ -106,6 +103,8 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,BDD.\"MediaCode\"   AS F10                              ";
 			sql += " ,BDD.\"AcDate\"      AS F11                              ";
 			sql += " ,BDD.\"JsonFields\"  AS F12                              ";
+			sql += " ,BDD.\"ReturnCode\"  AS F13                              ";
+			sql += " ,BDD.\"MediaKind\"   AS F14                              ";
 			sql += " from \"BankDeductDtl\" BDD                               ";
 		} else {
 			sql += " select                                                   ";
@@ -165,21 +164,21 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //		flag 0.Part 1.All
 		if (flag == 1) {
-			if(functionCode == 1) {
+			if (functionCode == 1) {
 				sql += "   GROUP BY BDD.\"CustNo\" ";
 			} else {
 				sql += "   GROUP BY BDD.\"EntryDate\" ";
 			}
 		}
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		if (flag == 0) {
 			// *** 折返控制相關 ***
@@ -194,7 +193,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

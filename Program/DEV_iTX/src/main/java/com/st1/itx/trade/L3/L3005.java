@@ -22,7 +22,6 @@ import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.service.CustRmkService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
-import com.st1.itx.db.service.LoanSyndService;
 import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
@@ -62,8 +61,6 @@ public class L3005 extends TradeBuffer {
 	@Autowired
 	public LoanBorMainService loanBorMainService;
 	@Autowired
-	public LoanSyndService loanSyndService;
-	@Autowired
 	public TxRecordService txRecordService;
 	@Autowired
 	BaTxCom baTxCom;
@@ -95,8 +92,8 @@ public class L3005 extends TradeBuffer {
 
 		String oCustRmkFlag = "N";
 		String loanIntDetailFg = "N";
-		String wkCurrencyCode = "";
-		String wkSyndFlag = "N";
+//		String wkCurrencyCode = "";
+//		String wkSyndFlag = "N";
 		String AcFg;
 		String FeeFg;
 		String mrKey1;
@@ -129,17 +126,17 @@ public class L3005 extends TradeBuffer {
 //		lCommitFeeFlag.add("Y"); // 是否有收承諾費
 //		lCommitFeeFlag.add("N");
 
-		slLoanSynd = loanSyndService.syndCustNoRange(iCustNo, iCustNo, "%", 0, 99991231, 0, 99991231, 0, 99991231, 0,
-				Integer.MAX_VALUE, titaVo);
-		lLoanSynd = slLoanSynd == null ? null : slLoanSynd.getContent();
-		if (lLoanSynd == null || lLoanSynd.size() == 0) {
-			wkSyndFlag = "N";
-		} else {
-			wkSyndFlag = "Y";
-			for (LoanSynd sn : lLoanSynd) {
-				wkCurrencyCode = sn.getCurrencyCode();
-			}
-		}
+//		slLoanSynd = loanSyndService.syndCustNoRange(iCustNo, iCustNo, "%", 0, 99991231, 0, 99991231, 0, 99991231, 0,
+//				Integer.MAX_VALUE, titaVo);
+//		lLoanSynd = slLoanSynd == null ? null : slLoanSynd.getContent();
+//		if (lLoanSynd == null || lLoanSynd.size() == 0) {
+//			wkSyndFlag = "N";
+//		} else {
+//			wkSyndFlag = "Y";
+//			for (LoanSynd sn : lLoanSynd) {
+//				wkCurrencyCode = sn.getCurrencyCode();
+//			}
+//		}
 		// 查詢顧客控管警訊檔
 		slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
 		lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();

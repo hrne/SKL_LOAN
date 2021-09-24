@@ -3,8 +3,6 @@ package com.st1.itx.trade.BS;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -40,7 +38,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS401 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(BS401.class);
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -85,9 +82,9 @@ public class BS401 extends TradeBuffer {
 		tBatxHeadId.setAcDate(iAcDate);
 		tBatxHeadId.setBatchNo(iBatchNo);
 		BatxHead tBatxHead = batxHeadService.holdById(tBatxHeadId);
-		if (tBatxHead == null)
+		if (tBatxHead == null) {
 			throw new LogicException("E0014", tBatxHeadId + " not exist"); // E0014 檔案錯誤
-
+		}
 		// update BatxStsCode 整批作業狀態
 		tBatxHead.setBatxStsCode("1"); // 0.正常 1.整批處理中
 		try {
@@ -106,16 +103,17 @@ public class BS401 extends TradeBuffer {
 		this.batchTransaction.commitEnd();
 		this.batchTransaction.init();
 		boolean isUpdate = false;
-		// 處理代碼 0:入帳 1:刪除 2:訂正 4.刪除回復
+		// functionCode 處理代碼 0:入帳 1:刪除 2:訂正 4.刪除回復
 		// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.虛擬轉暫收
 		// 訂正使用L420C
-		if (functionCode == 0) {
-			for (BatxDetail tDetail : lBatxDetail) {
-				if (isUpdate && ProcessCnt % commitCnt == 0) {
-					this.batchTransaction.commitEnd();
-					this.batchTransaction.init();
-					isUpdate = false;
-				}
+		for (BatxDetail tDetail : lBatxDetail) {
+			if (isUpdate && ProcessCnt % commitCnt == 0) {
+				this.batchTransaction.commitEnd();
+				this.batchTransaction.init();
+				isUpdate = false;
+			}
+			// 0:入帳
+			if (functionCode == 0) {
 				// 02.銀行扣款 03.員工扣款 => 1.整批檢核時設定檢核正常，整批入帳時才進行檢核 2.人工入帳則再檢核一次
 				if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
 					if ("4".equals(tDetail.getProcStsCode()) || "2".equals(tDetail.getProcStsCode())) {
@@ -138,11 +136,27 @@ public class BS401 extends TradeBuffer {
 					isUpdate = true;
 				}
 			}
+			// 4.刪除回復  3.檢核錯誤 4.檢核正常 ==> 0.未檢核
+			if (functionCode == 4) {
+				if ("3".equals(tDetail.getProcStsCode()) || "4".equals(tDetail.getProcStsCode())) {
+					ProcessCnt++;
+					tDetail.setProcStsCode("0");
+					try {
+						batxDetailService.update(tDetail);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0007",
+								"BS400 update batxDetail " + tDetail + e.getErrorMsg());
+					}
+					isUpdate = true;
+				}
+			}
+
 		}
 
 		// 更新作業狀態
 		this.batchTransaction.commitEnd();
 		this.batchTransaction.init();
+
 		String msg = updateHead(functionCode, iAcDate, iBatchNo, titaVo);
 		this.batchTransaction.commit();
 

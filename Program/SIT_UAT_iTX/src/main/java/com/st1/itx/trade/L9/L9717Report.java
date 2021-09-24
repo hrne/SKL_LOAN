@@ -115,7 +115,7 @@ public class L9717Report extends MakeReport {
 			this.setBeginRow(9);
 
 			// 設定明細列數(自訂亦必須)
-			this.setMaxRows(46);
+			this.setMaxRows(38);
 
 			break;
 		case Year:
@@ -135,7 +135,7 @@ public class L9717Report extends MakeReport {
 			this.setBeginRow(9);
 
 			// 設定明細列數(自訂亦必須)
-			this.setMaxRows(43);
+			this.setMaxRows(38);
 
 			break;
 		case LargeAmt_Agent:
@@ -156,7 +156,7 @@ public class L9717Report extends MakeReport {
 			this.setBeginRow(9);
 
 			// 設定明細列數(自訂亦必須)
-			this.setMaxRows(43);
+			this.setMaxRows(38);
 
 			break;
 		case LargeAmt_Customer:
@@ -173,7 +173,7 @@ public class L9717Report extends MakeReport {
 			this.setBeginRow(8);
 
 			// 設定明細列數(自訂亦必須)
-			this.setMaxRows(43);
+			this.setMaxRows(38);
 
 			break;
 		default:
@@ -212,12 +212,14 @@ public class L9717Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : lL9717) {
 				
-				this.print(1, 1, newBorder);
 				this.print(1, 0, "");
 
 				switch (currentSort) {
+				
+				// this part can be written MUCH more efficient...
+				
 				case Year:
-					// F0 年度 2 L
+					// F0 年度 14 R
 					// F1 一期件數 26 C
 					// F2 一期金額 38 R
 					// F3 二期件數 44 C
@@ -237,15 +239,15 @@ public class L9717Report extends MakeReport {
 					// 總計筆數 152 R
 					// 總計金額 164 R
 
-					outputPosArray = new int[] { 2, 26, 38, 44, 56, 62, 74, 80, 92, 98, 110, 116, 128, 134, 146, 152,
+					outputPosArray = new int[] { 14, 26, 38, 44, 56, 62, 74, 80, 92, 98, 110, 116, 128, 134, 146, 152,
 							164 };
-					outputSortArray = new String[] { "L", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R",
+					outputSortArray = new String[] { "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R",
 							"C", "R", "C", "R" };
 					isAmountArray = new Boolean[] { false, false, true, false, true, false, true, false, true, false,
 							true, false, true, false, true, false, true };
 					
 					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F15")));
-					totalAmt = totalCount.add(new BigDecimal(tLDVo.get("F16")));
+					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F16")));
 					
 					break;
 
@@ -279,9 +281,10 @@ public class L9717Report extends MakeReport {
 							false, true, false, true, false, true, false, true };
 					
 					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F16")));
-					totalAmt = totalCount.add(new BigDecimal(tLDVo.get("F17")));
+					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F17")));
 
 					break;
+					
 				case LargeAmt_Customer:
 					// F0 員編 2 L
 					// F1 員工姓名 12 R
@@ -295,7 +298,7 @@ public class L9717Report extends MakeReport {
 					isAmountArray = new Boolean[] { false, false, false, false, false, true };
 					
 					totalCount = totalCount.add(new BigDecimal(1));
-					totalAmt = totalCount.add(new BigDecimal(tLDVo.get("F15")));
+					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F5")));
 					
 					break;
 				case LargeAmt_Agent:
@@ -328,22 +331,26 @@ public class L9717Report extends MakeReport {
 							false, true, false, true, false, true, false, true };
 					
 					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F16")));
-					totalAmt = totalCount.add(new BigDecimal(tLDVo.get("F17")));
+					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F17")));
 					
 					break;
 				default:
 					break;
 				}
+				
+				this.info("L9717Report: " + currentSort);
 
 				for (int i = 0; i < outputPosArray.length; i++) {
+					this.info(currentSort + " ["+i+"]: " + tLDVo.get("F"+i));
 					this.print(0, outputPosArray[i], isAmountArray[i] == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i), outputSortArray[i]);
 				}
+				
+				this.print(1, 1, newBorder);
 
 			}
 			
 			// 總計
 			
-			this.print(1, 1, newBorder);
 			this.print(1, 0, "");
 			
 			int countX = 0;
@@ -380,7 +387,7 @@ public class L9717Report extends MakeReport {
 				this.print(1, 1, "『因組織變動因素，經辦人員餘期案件統計基準：94年元月前以授信人員為統計對象，94年元月起則更改為放款專員。』");
 			}
 
-			this.print(-46, 88, "===== 報　表　結　束 =====", "C");
+			this.print(2, 88, "===== 報　表　結　束 =====", "C");
 
 		} else {
 			print(1, 1, "本日無資料!!!");

@@ -335,8 +335,10 @@ C(3,#CHAIN,1,T(F,@FunCd,0),T(F,@FunCd,1))
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
-E(0,@FUNCIND,#FunCd)
 
+
+#Space1=X,1,S
+E(0,@FUNCIND,#FunCd)
 
 !FunCd=5,隱藏送出按鈕
 ! #BTNCD=A,1,S

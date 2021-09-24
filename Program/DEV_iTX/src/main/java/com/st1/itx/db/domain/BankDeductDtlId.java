@@ -40,7 +40,7 @@ public class BankDeductDtlId implements Serializable {
   private int bormNo = 0;
 
   // 還款類別
-  /* 1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
+  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
@@ -138,7 +138,8 @@ public class BankDeductDtlId implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 1.期款
+	* CdCode:RepayType
+1.期款
 2.部分償還
 3.結案
 4.帳管費
@@ -154,7 +155,8 @@ public class BankDeductDtlId implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 1.期款
+	* CdCode:RepayType
+1.期款
 2.部分償還
 3.結案
 4.帳管費

@@ -39,7 +39,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4921 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4921.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -119,7 +118,7 @@ public class L4921 extends TradeBuffer {
 		}
 
 		lBatxOthers = sBatxOthers == null ? null : sBatxOthers.getContent();
-
+		int i = 0;
 		if (lBatxOthers != null && lBatxOthers.size() != 0) {
 			this.info("L4921-A lBatxOthers.size()= " + lBatxOthers.size());
 
@@ -135,7 +134,9 @@ public class L4921 extends TradeBuffer {
 				tBatxDetailId.setDetailSeq(tBatxOthersVO.getDetailSeq());
 
 				tBatxDetail = batxDetailService.findById(tBatxDetailId, titaVo);
-
+				if (tBatxDetail == null) {
+					continue;
+				}
 				if (tBatxDetail.getProcStsCode().compareTo("5") == 1) {
 					flag = 0;
 				}
@@ -154,9 +155,12 @@ public class L4921 extends TradeBuffer {
 				occursList.putParam("OOCustNm", tBatxOthersVO.getCustNm());
 				occursList.putParam("OORemark", tBatxOthersVO.getNote());
 				occursList.putParam("OOBtnFlag", flag);
-
+				i++;
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
+			}
+			if (i == 0) {
+				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
 
 		} else {

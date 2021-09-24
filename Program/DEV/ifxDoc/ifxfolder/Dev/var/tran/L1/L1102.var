@@ -314,6 +314,8 @@ C(3,#CHAIN,1,T(F,@FunCd,0),T(F,@FunCd,1))
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp)
 @V(H,#FunCdHelp)
+
+#Space1=X,1,S
 E(0,@FUNCIND,#FunCd)
 
 #FunCdx=X,4,L

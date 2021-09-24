@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -818,6 +818,7 @@ public class L4510 extends TradeBuffer {
 			tEmpDeductMediaId.setMediaDate(todayF);
 			tEmpDeductMediaId.setMediaKind("" + flag);
 			tEmpDeductMediaId.setMediaSeq(seq);
+			tEmpDeductMedia.setEmpDeductMediaId(tEmpDeductMediaId);
 			tEmpDeductMedia.setCustNo(tEmpDeductDtl.getCustNo());
 			tEmpDeductMedia.setRepayCode(tEmpDeductDtl.getAchRepayCode());
 			tEmpDeductMedia.setPerfRepayCode(parse.stringToInteger(tEmpDeductDtl.getRepayCode()));

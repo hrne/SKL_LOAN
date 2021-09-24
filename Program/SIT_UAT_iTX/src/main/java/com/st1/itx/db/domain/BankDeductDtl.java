@@ -29,7 +29,7 @@ public class BankDeductDtl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 98592844902416120L;
+	private static final long serialVersionUID = 6483310037938509246L;
 
 @EmbeddedId
   private BankDeductDtlId bankDeductDtlId;
@@ -51,7 +51,7 @@ public class BankDeductDtl implements Serializable {
   private int bormNo = 0;
 
   // 還款類別
-  /* 1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
+  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
   @Column(name = "`RepayType`", insertable = false, updatable = false)
   private int repayType = 0;
 
@@ -69,7 +69,7 @@ public class BankDeductDtl implements Serializable {
   private String acctCode;
 
   // 扣款銀行
-  /* L4451建檔交易產生者，此欄位由額度檔抓取 */
+  /* L4451建檔交易產生者，此欄位由額度檔抓取CdCode:BankCdAppl */
   @Column(name = "`RepayBank`", length = 3)
   private String repayBank;
 
@@ -87,7 +87,7 @@ public class BankDeductDtl implements Serializable {
   @Column(name = "`UnpaidAmt`")
   private BigDecimal unpaidAmt = new BigDecimal("0");
 
-  // 暫收抵繳金額
+  // 暫收款抵繳金額
   @Column(name = "`TempAmt`")
   private BigDecimal tempAmt = new BigDecimal("0");
 
@@ -107,17 +107,17 @@ public class BankDeductDtl implements Serializable {
   private int intEndDate = 0;
 
   // 郵局存款別
-  /* L4451建檔交易產生者，此欄位由額度檔抓取G: 劃撥 P: 存簿 */
+  /* L4451建檔交易產生者，此欄位由額度檔抓取CdCode:PostDepCodeG: 劃撥 P: 存簿 */
   @Column(name = "`PostCode`", length = 1)
   private String postCode;
 
   // 媒體碼
-  /* NA:未產Y:已產N:已產，扣款金額為0E:已提回，回傳碼不為正常 */
+  /* NA:未產Y:已產N:已產，扣款金額為0 */
   @Column(name = "`MediaCode`", length = 1)
   private String mediaCode;
 
   // 與借款人關係
-  /* L4451建檔交易產生者，此欄位由額度檔抓取 */
+  /* L4451建檔交易產生者，此欄位由額度檔抓取CdCode:RelationCode */
   @Column(name = "`RelationCode`", length = 2)
   private String relationCode;
 
@@ -136,6 +136,7 @@ public class BankDeductDtl implements Serializable {
   private int relAcctBirthday = 0;
 
   // 第三人性別
+  /* CdCode:Sex */
   @Column(name = "`RelAcctGender`", length = 1)
   private String relAcctGender;
 
@@ -160,12 +161,16 @@ public class BankDeductDtl implements Serializable {
   private int acDate = 0;
 
   // AML回應碼
-  /* 0.非可疑名單/已完成名單確認1.需審查/確認2.為凍結名單/未確定名單 */
+  /* CdCode:AmlCheckItem0.非可疑名單/已完成名單確認1.需審查/確認2.為凍結名單/未確定名單 */
   @Column(name = "`AmlRsp`", length = 1)
   private String amlRsp;
 
+  // 回應代碼
+  /* 空白:未回 00:扣款成功 &amp;gt;00 :扣款失敗失敗原因 : ref. CdCode ProcCode 處理說明 ACH  : 002 + ReturnCode(2) 郵局 : 003 + ReturnCode(2) */
+  @Column(name = "`ReturnCode`", length = 2)
+  private String returnCode;
+
   // jason格式紀錄欄
-  /* L4450檢核錯誤，扣款帳號未授權等等 */
   @Column(name = "`JsonFields`", length = 300)
   private String jsonFields;
 
@@ -274,7 +279,8 @@ public class BankDeductDtl implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 1.期款
+	* CdCode:RepayType
+1.期款
 2.部分償還
 3.結案
 4.帳管費
@@ -290,7 +296,8 @@ public class BankDeductDtl implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 1.期款
+	* CdCode:RepayType
+1.期款
 2.部分償還
 3.結案
 4.帳管費
@@ -365,6 +372,7 @@ public class BankDeductDtl implements Serializable {
 /**
 	* 扣款銀行<br>
 	* L4451建檔交易產生者，此欄位由額度檔抓取
+CdCode:BankCdAppl
 	* @return String
 	*/
   public String getRepayBank() {
@@ -374,6 +382,7 @@ public class BankDeductDtl implements Serializable {
 /**
 	* 扣款銀行<br>
 	* L4451建檔交易產生者，此欄位由額度檔抓取
+CdCode:BankCdAppl
   *
   * @param repayBank 扣款銀行
 	*/
@@ -439,7 +448,7 @@ public class BankDeductDtl implements Serializable {
   }
 
 /**
-	* 暫收抵繳金額<br>
+	* 暫收款抵繳金額<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -448,10 +457,10 @@ public class BankDeductDtl implements Serializable {
   }
 
 /**
-	* 暫收抵繳金額<br>
+	* 暫收款抵繳金額<br>
 	* 
   *
-  * @param tempAmt 暫收抵繳金額
+  * @param tempAmt 暫收款抵繳金額
 	*/
   public void setTempAmt(BigDecimal tempAmt) {
     this.tempAmt = tempAmt;
@@ -519,6 +528,7 @@ public class BankDeductDtl implements Serializable {
 /**
 	* 郵局存款別<br>
 	* L4451建檔交易產生者，此欄位由額度檔抓取
+CdCode:PostDepCode
 G: 劃撥 P: 存簿
 	* @return String
 	*/
@@ -529,6 +539,7 @@ G: 劃撥 P: 存簿
 /**
 	* 郵局存款別<br>
 	* L4451建檔交易產生者，此欄位由額度檔抓取
+CdCode:PostDepCode
 G: 劃撥 P: 存簿
   *
   * @param postCode 郵局存款別
@@ -542,7 +553,6 @@ G: 劃撥 P: 存簿
 	* NA:未產
 Y:已產
 N:已產，扣款金額為0
-E:已提回，回傳碼不為正常
 	* @return String
 	*/
   public String getMediaCode() {
@@ -554,7 +564,6 @@ E:已提回，回傳碼不為正常
 	* NA:未產
 Y:已產
 N:已產，扣款金額為0
-E:已提回，回傳碼不為正常
   *
   * @param mediaCode 媒體碼
 	*/
@@ -565,6 +574,7 @@ E:已提回，回傳碼不為正常
 /**
 	* 與借款人關係<br>
 	* L4451建檔交易產生者，此欄位由額度檔抓取
+CdCode:RelationCode
 	* @return String
 	*/
   public String getRelationCode() {
@@ -574,6 +584,7 @@ E:已提回，回傳碼不為正常
 /**
 	* 與借款人關係<br>
 	* L4451建檔交易產生者，此欄位由額度檔抓取
+CdCode:RelationCode
   *
   * @param relationCode 與借款人關係
 	*/
@@ -640,7 +651,7 @@ E:已提回，回傳碼不為正常
 
 /**
 	* 第三人性別<br>
-	* 
+	* CdCode:Sex
 	* @return String
 	*/
   public String getRelAcctGender() {
@@ -649,7 +660,7 @@ E:已提回，回傳碼不為正常
 
 /**
 	* 第三人性別<br>
-	* 
+	* CdCode:Sex
   *
   * @param relAcctGender 第三人性別
 	*/
@@ -743,7 +754,8 @@ E:已提回，回傳碼不為正常
 
 /**
 	* AML回應碼<br>
-	* 0.非可疑名單/已完成名單確認
+	* CdCode:AmlCheckItem
+0.非可疑名單/已完成名單確認
 1.需審查/確認
 2.為凍結名單/未確定名單
 	* @return String
@@ -754,7 +766,8 @@ E:已提回，回傳碼不為正常
 
 /**
 	* AML回應碼<br>
-	* 0.非可疑名單/已完成名單確認
+	* CdCode:AmlCheckItem
+0.非可疑名單/已完成名單確認
 1.需審查/確認
 2.為凍結名單/未確定名單
   *
@@ -765,8 +778,33 @@ E:已提回，回傳碼不為正常
   }
 
 /**
+	* 回應代碼<br>
+	* 空白:未回 00:扣款成功 &amp;gt;00 :扣款失敗
+失敗原因 : ref. CdCode ProcCode 處理說明
+ ACH  : 002 + ReturnCode(2)
+ 郵局 : 003 + ReturnCode(2)
+	* @return String
+	*/
+  public String getReturnCode() {
+    return this.returnCode == null ? "" : this.returnCode;
+  }
+
+/**
+	* 回應代碼<br>
+	* 空白:未回 00:扣款成功 &amp;gt;00 :扣款失敗
+失敗原因 : ref. CdCode ProcCode 處理說明
+ ACH  : 002 + ReturnCode(2)
+ 郵局 : 003 + ReturnCode(2)
+  *
+  * @param returnCode 回應代碼
+	*/
+  public void setReturnCode(String returnCode) {
+    this.returnCode = returnCode;
+  }
+
+/**
 	* jason格式紀錄欄<br>
-	* L4450檢核錯誤，扣款帳號未授權等等
+	* 
 	* @return String
 	*/
   public String getJsonFields() {
@@ -775,7 +813,7 @@ E:已提回，回傳碼不為正常
 
 /**
 	* jason格式紀錄欄<br>
-	* L4450檢核錯誤，扣款帳號未授權等等
+	* 
   *
   * @param jsonFields jason格式紀錄欄
 	*/
@@ -866,7 +904,7 @@ E:已提回，回傳碼不為正常
            + ", prevIntDate=" + prevIntDate + ", acctCode=" + acctCode + ", repayBank=" + repayBank + ", repayAcctNo=" + repayAcctNo + ", repayAcctSeq=" + repayAcctSeq + ", unpaidAmt=" + unpaidAmt
            + ", tempAmt=" + tempAmt + ", repayAmt=" + repayAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", postCode=" + postCode + ", mediaCode=" + mediaCode
            + ", relationCode=" + relationCode + ", relCustName=" + relCustName + ", relCustId=" + relCustId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", mediaDate=" + mediaDate
-           + ", mediaKind=" + mediaKind + ", mediaSeq=" + mediaSeq + ", acDate=" + acDate + ", amlRsp=" + amlRsp + ", jsonFields=" + jsonFields + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", mediaKind=" + mediaKind + ", mediaSeq=" + mediaSeq + ", acDate=" + acDate + ", amlRsp=" + amlRsp + ", returnCode=" + returnCode + ", jsonFields=" + jsonFields
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

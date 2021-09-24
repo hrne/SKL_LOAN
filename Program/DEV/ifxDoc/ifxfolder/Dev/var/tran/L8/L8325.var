@@ -41,8 +41,9 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8325]                                 (444)前置調解債務人基本資料"],
-["#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ["#FdCustRegAddr+債務人戶籍之郵遞區號及地址",#CustRegAddr],
 ["#FdCustComAddr+債務人通訊地之郵遞區號及地址",#CustComAddr],
@@ -292,7 +293,7 @@ C(5,#TranKey,X,s,$)
 C(4,#CustRegTelNo,$,s)
 C(4,#CustComTelNo,$,s)
 C(4,#CustMobilNo,$,s)
-V(P,債務人戶籍電話、通訊電話及行動電話至少需則一報送。)
+V(P,債務人戶籍電話、通訊電話及行動電話至少需擇一報送。)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

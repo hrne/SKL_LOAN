@@ -903,13 +903,13 @@ public class BS420 extends TradeBuffer {
 
 				int achEntryDate = 0;
 				int achRepayType = 0;
-
+				String returnCode = tempOccursList.get("OccReturnCode");
 				if (tAchDeductMedia != null) {
-					tBatxDetail.setProcCode("002" + tempOccursList.get("OccReturnCode"));
-					if ("00".equals(tempOccursList.get("OccReturnCode"))) {
+					tBatxDetail.setProcCode("002" + returnCode);
+					if ("00".equals(returnCode)) {
 						procCode = "00000";
 					} else {
-						procCode = "002" + tempOccursList.get("OccReturnCode");
+						procCode = "002" + returnCode;
 					}
 
 					achEntryDate = tAchDeductMedia.getEntryDate();
@@ -990,7 +990,7 @@ public class BS420 extends TradeBuffer {
 				if ("00000".equals(procCode)) {
 //					tempVo.putParam("Note", tempOccursList.get("OccReturnCode"));
 					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
-							tAchDeductMedia.getMediaSeq(), procCode, titaVo);
+							tAchDeductMedia.getMediaSeq(), returnCode, titaVo);
 				} else if ("E4200".equals(procCode)) {
 					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 				} else {
@@ -998,7 +998,7 @@ public class BS420 extends TradeBuffer {
 					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 //					回傳碼不為0者更新媒體碼為E
 					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
-							tAchDeductMedia.getMediaSeq(), procCode, titaVo);
+							tAchDeductMedia.getMediaSeq(), returnCode, titaVo);
 				}
 
 				this.info("1132...");
@@ -1079,6 +1079,7 @@ public class BS420 extends TradeBuffer {
 				tPostDeductMedia = postDeductMediaService.receiveCheckFirst(
 						FormatUtil.padLeft(tempOccursList.get("OccCustMemo").trim(), 20), reRepayAmt,
 						FormatUtil.padX(tempOccursList.get("OccRemark"), 20), titaVo);
+				String returnCode = FormatUtil.pad9(tempOccursList.get("OccReturnCode").trim(), 2);
 
 //			C.寫入Detail檔(second check) 
 				BatxDetail tBatxDetail = new BatxDetail();
@@ -1093,11 +1094,10 @@ public class BS420 extends TradeBuffer {
 //					} else {
 					postRepayType = tPostDeductMedia.getRepayType();
 //					}
-
-					if ("00".equals(FormatUtil.pad9(tempOccursList.get("OccReturnCode").trim(), 2))) {
+					if ("00".equals(returnCode)) {
 						procCode = "00000";
 					} else {
-						procCode = "003" + FormatUtil.pad9(tempOccursList.get("OccReturnCode").trim(), 2);
+						procCode = "003" + returnCode;
 					}
 					tBatxDetail.setProcCode(procCode);
 
@@ -1162,8 +1162,8 @@ public class BS420 extends TradeBuffer {
 				tBatxDetail.setProcCode(procCode);
 
 				if ("00000".equals(procCode)) {
-					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(), procCode,
-							titaVo);
+					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(),
+							returnCode, titaVo);
 				} else if ("E4300".equals(procCode)) {
 					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 
@@ -1171,8 +1171,8 @@ public class BS420 extends TradeBuffer {
 //					回傳碼中文 code+cdCode.item
 					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
 //					回傳碼不為0者更新媒體碼為E
-					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(), procCode,
-							titaVo);
+					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(),
+							returnCode, titaVo);
 				}
 
 				tBatxDetail.setProcNote(tempVo.getJsonString());
@@ -1721,7 +1721,7 @@ public class BS420 extends TradeBuffer {
 			}
 			return result;
 		}
-		// 
+		//
 		CdCode tCdCode = cdCodeService.findById(new CdCodeId("ProcCode", procCode), titaVo);
 		if (tCdCode == null) {
 			result = procCode;
@@ -1740,7 +1740,7 @@ public class BS420 extends TradeBuffer {
 		batxChequeFileVo.setOccursList(occursList);
 	}
 
-	private void updateBankDeductDtl(int mediaDate, String mediaKind, int mediaSeq, String procCode, TitaVo titaVo)
+	private void updateBankDeductDtl(int mediaDate, String mediaKind, int mediaSeq, String returnCode, TitaVo titaVo)
 			throws LogicException {
 		sBankDeductDtl = bankDeductDtlService.mediaSeqRng(mediaDate + 19110000, mediaKind, mediaSeq, this.index,
 				this.limit, titaVo);
@@ -1748,25 +1748,16 @@ public class BS420 extends TradeBuffer {
 
 		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
 			for (BankDeductDtl tB : lBankDeductDtl) {
-				BankDeductDtl tBankDeductDtl = new BankDeductDtl();
-				tBankDeductDtl = bankDeductDtlService.holdById(tB, titaVo);
-				if (!"00000".equals(procCode)) {
-					tBankDeductDtl.setMediaCode("E");
-					TempVo t1TempVo = new TempVo();
-					t1TempVo = t1TempVo.getVo(tBankDeductDtl.getJsonFields());
-					t1TempVo.putParam("ProcCode", procCode);
-					tBankDeductDtl.setJsonFields(t1TempVo.getJsonString());
-				}
-
-				// 銀扣期款應繳
-				if (tBankDeductDtl.getRepayType() == 1) {
-					tempVo.putParam("PayIntDate", tBankDeductDtl.getPayIntDate());
-				}
-
+				BankDeductDtl tBankDeductDtl = bankDeductDtlService.holdById(tB, titaVo);
+				tBankDeductDtl.setReturnCode(returnCode);
 				try {
 					bankDeductDtlService.update(tBankDeductDtl, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0007", " BS420 bankDeductDtlService update " + e.getErrorMsg());
+				}
+				// 銀扣期款應繳日
+				if (tBankDeductDtl.getRepayType() == 1) {
+					tempVo.putParam("PayIntDate", tBankDeductDtl.getPayIntDate());
 				}
 			}
 

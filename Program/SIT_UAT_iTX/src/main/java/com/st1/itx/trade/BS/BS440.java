@@ -22,10 +22,12 @@ import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.BankAuthActId;
 import com.st1.itx.db.domain.BankDeductDtl;
 import com.st1.itx.db.domain.BankDeductDtlId;
+import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.service.AchDeductMediaService;
 import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.BankDeductDtlService;
 import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.db.service.PostDeductMediaService;
@@ -75,6 +77,8 @@ public class BS440 extends TradeBuffer {
 	@Autowired
 	public BankAuthActService bankAuthActService;
 	@Autowired
+	public LoanBookService loanBookService;
+	@Autowired
 	public L4450Report l4450Report;
 	@Autowired
 	public WebClient webClient;
@@ -119,6 +123,8 @@ public class BS440 extends TradeBuffer {
 	private HashMap<tmpBorm, BigDecimal> repAmtMap = new HashMap<>();
 //	短欠繳金額
 	private HashMap<tmpBorm, BigDecimal> ownAmtMap = new HashMap<>();
+//	暫收款占用金額 = 未到期約定還本金額 + 法務費金額 
+	private HashMap<tmpBorm, BigDecimal> bookAmtMap = new HashMap<>();
 
 	private HashMap<tmpBorm, String> rpAcCodeMap = new HashMap<>();
 //	預設true 若有錯誤改為 False 
@@ -273,8 +279,11 @@ public class BS440 extends TradeBuffer {
 //		預設暫收款=0
 		tmpAmtMap.put(tmp2, BigDecimal.ZERO);
 
+//		未到期約定還本金額
+		bookAmtMap.put(tmp2, this.getBookAmt(tmp2, titaVo));
+
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
-//			batxvo sort by CustNo, FacmNo, BormNo, 暫收款, PayIntDate , RepayType
+//			batxvo sort by CustNo, FacmNo, BormNo, 法務費, 暫收款, PayIntDate , RepayType
 			listBaTxVo.sort((c1, c2) -> {
 				int result = 0;
 				if (c1.getCustNo() - c2.getCustNo() != 0) {
@@ -283,6 +292,10 @@ public class BS440 extends TradeBuffer {
 					result = c1.getFacmNo() - c2.getFacmNo();
 				} else if (c1.getBormNo() - c2.getBormNo() != 0) {
 					result = c1.getBormNo() - c2.getBormNo();
+				} else if (c1.getRepayType() == 6 && c1.getRepayType() != c2.getRepayType()) {
+					result = -1;
+				} else if (c2.getRepayType() == 6 && c1.getRepayType() != c2.getRepayType()) {
+					result = 1;
 				} else if (c1.getDataKind() - c2.getDataKind() != 0) {
 					if (c1.getDataKind() == 3) {
 						result = -1;
@@ -314,6 +327,7 @@ public class BS440 extends TradeBuffer {
 				this.info("DataKind : " + tBaTxVo.getDataKind());
 				this.info("RepayType : " + tBaTxVo.getRepayType());
 				this.info("PayIntDate : " + tBaTxVo.getPayIntDate());
+// 
 
 //				因應此交易為提前做，故入帳日會大於應繳日，排除下一期之試算
 //				ex.3/16應繳日產出dtl檔，入帳日=3/17，list會產出3/16 & 4/16兩期
@@ -341,17 +355,38 @@ public class BS440 extends TradeBuffer {
 //					continue;
 //				}
 
-				if (tBaTxVo.getDataKind() >= 3) {
+				if (tBaTxVo.getDataKind() > 3) {
 					this.info("continue... getDataKind : " + tBaTxVo.getDataKind());
-//					處理暫收抵繳
-					if (tBaTxVo.getDataKind() == 3) {
-						if (!tmpAmtMap.containsKey(tmp2)) {
-							tmpAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt());
-						} else {
-							tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).add(tBaTxVo.getUnPaidAmt()));
-						}
-						this.info("tmpAmtMap : " + tmpAmtMap.get(tmp2));
+					continue;
+				}
+
+//          	暫收款占用金額 = 未到期約定還本金額 + 法務費金額 
+				if (tBaTxVo.getRepayType() == 6) {
+					if (bookAmtMap.containsKey(tmp2)) {
+						bookAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt().add(bookAmtMap.get(tmp2)));
+					} else {
+						bookAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt());
 					}
+				}
+
+				if (tBaTxVo.getDataKind() == 3) {
+					this.info("bookAmAmtMap : " + bookAmtMap.get(tmp2));
+					if (tBaTxVo.getUnPaidAmt().compareTo(bookAmtMap.get(tmp2)) > 0) {
+						if (tmpAmtMap.containsKey(tmp2)) {
+							tmpAmtMap.put(tmp2,
+									tmpAmtMap.get(tmp2).add(tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2))));
+						} else {
+							tmpAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt().subtract(bookAmtMap.get(tmp2)));
+						}
+						bookAmtMap.put(tmp2, BigDecimal.ZERO);
+					} else {
+						if (tmpAmtMap.containsKey(tmp2)) {
+							bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tBaTxVo.getUnPaidAmt()));
+						} else {
+							bookAmtMap.put(tmp2, bookAmtMap.get(tmp2).subtract(tBaTxVo.getUnPaidAmt()));
+						}
+					}
+					this.info("tmpAmtMap : " + tmpAmtMap.get(tmp2));
 					continue;
 				}
 //				應扣金額 shuAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
@@ -634,16 +669,11 @@ public class BS440 extends TradeBuffer {
 	private boolean isMediaSent(tmpBorm tmp, TitaVo titaVo) {
 		boolean result = false;
 
-		Slice<BankDeductDtl> sBankDeductDtl = null;
+		Slice<BankDeductDtl> slBankDeductDtl = bankDeductDtlService.findL4450Rng(tmp.getCustNo(), tmp.getFacmNo(),
+				tmp.getBormNo(), tmp.getRepayType(), tmp.getPayIntDate() + 19110000, this.index, this.limit, titaVo);
 
-		List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
-
-		sBankDeductDtl = bankDeductDtlService.findL4450Rng(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(),
-				tmp.getRepayType(), tmp.getPayIntDate() + 19110000, this.index, this.limit, titaVo);
-		lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
-
-		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
-			for (BankDeductDtl tBankDeductDtl : lBankDeductDtl) {
+		if (slBankDeductDtl != null) {
+			for (BankDeductDtl tBankDeductDtl : slBankDeductDtl.getContent()) {
 				if ("Y".equals(tBankDeductDtl.getMediaCode()) || "N".equals(tBankDeductDtl.getMediaCode())) {
 					result = true;
 				}
@@ -680,6 +710,23 @@ public class BS440 extends TradeBuffer {
 			relAcctGender.put(tmp2, fnAllList.get(i).get("F11"));
 		if (!repayAcctSeq.containsKey(tmp2))
 			repayAcctSeq.put(tmp2, fnAllList.get(i).get("F12"));
+	}
+
+	// 未到期約定還本金額
+	private BigDecimal getBookAmt(tmpBorm tmp, TitaVo titaVo) {
+		// 未到期約定還本金額
+		BigDecimal bookAmt = BigDecimal.ZERO;
+		Slice<LoanBook> loanBookList = loanBookService.bookCustNoRange(tmp.getCustNo(), tmp.getCustNo(),
+				tmp.getFacmNo(), tmp.getFacmNo(), 0, 990, this.index, Integer.MAX_VALUE, titaVo);
+		if (loanBookList != null) {
+			for (LoanBook tLoanBook : loanBookList.getContent()) {
+				if (tLoanBook.getStatus() == 0 && tLoanBook.getBookDate() >= titaVo.getEntDyI()) {
+					bookAmt = bookAmt.add(tLoanBook.getBookAmt());
+				}
+			}
+		}
+
+		return bookAmt;
 	}
 
 	private String checkAcctAuth(tmpBorm tmp2, TitaVo titaVo) {

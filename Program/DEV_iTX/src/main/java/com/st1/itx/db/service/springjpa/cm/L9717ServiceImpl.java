@@ -40,7 +40,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		switch (kind)
 		{
 		case Year:
-			sql += " SELECT \"FirstDrawdownYear\" \"FirstDrawdownYear\" "; 
+			sql += " SELECT \"FirstDrawdownYear\"-1911 || ' 年撥款件' \"FirstDrawdownYearShow\" "; 
 			sql += "       ,SUM(\"1TermCount\") \"1TermCount\" "; 
 			sql += "       ,SUM(\"1TermAmount\") \"1TermAmount\" "; 
 			sql += "       ,SUM(\"2TermCount\") \"2TermCount\" "; 
@@ -148,7 +148,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                                                    THEN FM.\"BusinessOfficer\" "; 
 			sql += "                                               ELSE FM.\"CreditOfficer\" END "; 
 			sql += " WHERE ((MFB.\"OvduTerm\" BETWEEN :ovduTermMin AND :ovduTermMax AND MFB.\"OvduDays\" > 0) "; 
-			sql += "        OR MFB.\"AcctCode\" = '990') "; 
+			sql += "        OR MFB.\"AcctCode\" = '990') ";
 			sql += "   AND MFB.\"PrinBalance\" > 0 "; 
 			sql += "   AND MFB.\"YearMonth\" = :entYearMonth "; 
 			sql += "   AND NVL(CASE WHEN FM.\"FirstDrawdownDate\" >= 20050101 "; 
@@ -255,6 +255,13 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 		{
 			query.setParameter("entYear", Integer.toString(lastYearMonth.getYear()));
 		}
+		
+		this.info("L9717ServiceImpl inputs:");
+		this.info("entYearMonth: " + Integer.toString(lastYearMonth.getYear()) + String.format("%02d", lastYearMonth.getMonthValue()));
+		this.info("ovduTermMin: " + titaVo.getParam("inputOverdueTermMin"));
+		this.info("ovduTermMax: " + titaVo.getParam("inputOverdueTermMax"));
+		this.info("businessOfficer: '" + (titaVo.getParam("inputBusinessOfficer").trim().isEmpty() ? " " : titaVo.getParam("inputBusinessOfficer")) + "'");
+		this.info("entYear: " + Integer.toString(lastYearMonth.getYear()));
 
 		
 		return this.convertToMap(query);

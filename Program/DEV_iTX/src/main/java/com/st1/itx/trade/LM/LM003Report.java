@@ -46,7 +46,7 @@ public class LM003Report extends MakeReport {
 		// 淨增減: 224 R
 		// 餘額: 240 R
 
-		yearMonth("F0", 59, 44), drawdownAmt("F1", 76), highRate("F2", 94, true, 86), trade("F3", 106, true, 101),
+		yearMonth("F0", 60, 44), drawdownAmt("F1", 76), highRate("F2", 94, true, 86), trade("F3", 106, true, 101),
 		others("F4", 120, true, 114), closedRepaySum("F5", 134, true, 128), partlyRepay("F6", 150, true, 143), tenty("F7", 162, true, 157),
 		turnOvdu("F8", 178, true, 171), unclosedRepaySum("F9", 192, true, 186), repayTotal("F10", 212, true, 203), net("F16", 228),
 		EOMBalance("F11", 242);
@@ -57,6 +57,9 @@ public class LM003Report extends MakeReport {
 		private int outputXPosC = 0;
 		private BigDecimal sum = BigDecimal.ZERO;
 		private Boolean hasRatioOutput = false;
+		
+		// 邊做表邊弄constructors, 顯亂
+		// 之後需更新時可整合成統一格式
 
 		Columns(String _keyword, int _outputXPosR) {
 			this.keyword = _keyword;
@@ -97,6 +100,10 @@ public class LM003Report extends MakeReport {
 		public BigDecimal getSum() {
 			return this.sum;
 		}
+		
+		public void setSum(BigDecimal result) {
+			this.sum = result;
+		}
 	}
 
 	private class ColumnOutput {
@@ -125,7 +132,7 @@ public class LM003Report extends MakeReport {
 				default:
 					// 金額輸出與加總
 					lm003Report.print(0, c.getOutputXPosR(), formatAmt(getBillionAmt(v), 2), "R");
-					c.getSum().add(new BigDecimal(v));
+					c.setSum(c.getSum().add(new BigDecimal(v)));
 					break;
 				}
 			}
@@ -423,9 +430,9 @@ public class LM003Report extends MakeReport {
 		print(1, 42, " ●依報表：LN6361編制：撥款金額含催收回復，還款金額含轉催收。");
 		print(1, 42, " ●自行還款含內部代償、借新還舊、大額還款（1月~" + Integer.valueOf(lastTLDVo.get("F0").substring(4,6)) + "月累積數　）。");
 
-		print(1, 42, " ●"+ lastTLDVo.get("F0").substring(4,6) + "月實際還款數：" + formatAmt(getBillionAmt(Columns.repayTotal.getSum()), 2) + "（帳載）" + formatAmt(getBillionAmt(lastTLDVo.get("F15")), 2) + "（內部轉帳）-" + formatAmt(getBillionAmt(Columns.turnOvdu.getSum()), 2) + "（轉催收）-"
-				+ formatAmt(getBillionAmt(lastTLDVo.get("F14")), 2) + "（企金件以自然人申貸還款）＝" + formatAmt(Columns.repayTotal.getSum().add(new BigDecimal(lastTLDVo.get("F15")).subtract(Columns.turnOvdu.getSum()).subtract(new BigDecimal(lastTLDVo.get("F14")))), 2) + "億");
-		
+		print(1, 42, " ●"+ Integer.valueOf(lastTLDVo.get("F0").substring(4,6)) + "月實際還款數：" + formatAmt(getBillionAmt(Columns.repayTotal.getSum()), 2) + "（帳載）-" + formatAmt(getBillionAmt(lastTLDVo.get("F15")), 2) + "（內部轉帳）-" + formatAmt(getBillionAmt(Columns.turnOvdu.getSum()), 2) + "（轉催收）-"
+				+ formatAmt(getBillionAmt(lastTLDVo.get("F14")), 2) + "（企金件以自然人申貸還款）＝" + formatAmt(getBillionAmt(Columns.repayTotal.getSum().subtract(new BigDecimal(lastTLDVo.get("F15")).subtract(Columns.turnOvdu.getSum()).subtract(new BigDecimal(lastTLDVo.get("F14"))))), 2) + "億");
+		print(1, 42, " ●撥款金額包含企金件以自然人申貸撥款" + formatAmt(getBillionAmt(new BigDecimal(lastTLDVo.get("F15"))), 2) + "億");		
 		}
 		
 		long sno = this.close();

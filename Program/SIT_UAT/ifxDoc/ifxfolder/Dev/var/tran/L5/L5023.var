@@ -64,7 +64,7 @@ T(4,CHAIN$)
 ! 案件編號
 #CreditSysNo=A,7,I
 C(3,#CustNo,0,$,S)
-@C(3,#CustNo,0,C(3,#CreditSysNo,0,V(P,戶號與案件編號需則一輸入),$),$)
+@C(3,#CustNo,0,C(3,#CreditSysNo,0,V(P,戶號與案件編號需擇一輸入),$),$)
 
 #MRKEY=_,_,S
 C(3,#CustNo,0,S,$)

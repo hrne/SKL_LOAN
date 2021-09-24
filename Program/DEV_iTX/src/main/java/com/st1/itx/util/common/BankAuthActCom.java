@@ -633,11 +633,12 @@ public class BankAuthActCom extends TradeBuffer {
 		this.isNewAct = false;
 		String status = " ";
 		// 該額度扣款帳號
-		BankAuthAct tBankAuthAct = bankAuthActService
-				.findById(new BankAuthActId(iCustNo, iFacmNo, "700".equals(iRepayBank) ? "01" : "00"), titaVo);
-		if (tBankAuthAct == null) {
+		BankAuthAct tBankAuthAct = null;
+		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.facmNoEq(iCustNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
+		if (slBankAuthAct == null) {
 			this.isNewAct = true;
 		} else {
+			tBankAuthAct = slBankAuthAct.getContent().get(0);
 			if ("".equals(tBankAuthAct.getStatus().trim())) {
 				throw new LogicException("E0015", "該額度扣款帳號尚未提出授權 " + tBankAuthAct.getRepayAcct());
 			}
@@ -1194,7 +1195,6 @@ public class BankAuthActCom extends TradeBuffer {
 		iRepayBank = FormatUtil.pad9(titaVo.getParam("RepayBank"), 3);
 		iRelationId = titaVo.getParam("RelationId");
 		iTitaTxCd = titaVo.getTxcd();
-
 
 		if (titaVo.get("LimitAmt") != null) {
 			iLimitAmt = parse.stringToBigDecimal(titaVo.get("LimitAmt"));

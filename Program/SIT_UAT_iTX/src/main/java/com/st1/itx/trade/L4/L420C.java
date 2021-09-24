@@ -84,7 +84,7 @@ public class L420C extends TradeBuffer {
 //		1.訂正
 //		2.虛擬轉暫收  7.虛擬轉暫收改為6.批次入帳，未入帳則執行L3210
 		if (functionCode == 1 && "5".equals(tBatxDetail.getProcStsCode())) {
-			throw new LogicException("E0015", tBatxDetailId + "非整批入帳，請執行交易訂正"); // 檢查錯誤
+			throw new LogicException("E0015", tBatxDetail.getDetailSeq() + "非整批入帳，請執行交易訂正"); // 檢查錯誤
 		}
 		if (functionCode == 2 && "7".equals(tBatxDetail.getProcStsCode())) {
 			tBatxDetail = batxDetailService.holdById(tBatxDetailId);

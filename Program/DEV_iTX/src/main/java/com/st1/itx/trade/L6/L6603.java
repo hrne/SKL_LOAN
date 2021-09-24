@@ -12,7 +12,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCl;
 import com.st1.itx.db.domain.CdClId;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.service.CdClService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -31,11 +34,12 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6603 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6603.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdClService sCdClService;
+	@Autowired
+	public CdCodeService sCdCodeService;
 	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
@@ -115,14 +119,19 @@ public class L6603 extends TradeBuffer {
 	}
 
 	private void moveCdCl(CdCl mCdCl, CdClId mCdClId, int mFuncCode, int mClCode1, int mClCode2, TitaVo titaVo) throws LogicException {
-
+		String tCdClIItem="";
+		CdCode tCdCode = sCdCodeService.findById(new CdCodeId("ClCode1",String.valueOf(mClCode1)), titaVo);
+		if(tCdCode!=null) {
+			tCdClIItem = tCdCode.getItem();
+		}
+		
 		mCdClId.setClCode1(mClCode1);
 		mCdClId.setClCode2(mClCode2);
 		mCdCl.setCdClId(mCdClId);
 
 		mCdCl.setClCode1(this.parse.stringToInteger(titaVo.getParam("ClCode1")));
 		mCdCl.setClCode2(this.parse.stringToInteger(titaVo.getParam("ClCode2")));
-		mCdCl.setClItem(titaVo.getParam("ClItem"));
+		mCdCl.setClItem(tCdClIItem+"－"+titaVo.getParam("ClItem"));
 		mCdCl.setClTypeJCIC(titaVo.getParam("ClTypeJCIC"));
 
 		if (mFuncCode != 2) {

@@ -92,9 +92,9 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	SELECT LPAD(MLB.\"CustNo\",7,0) AS F0";
 			sql += "		  ,(CASE";
 			sql += "			  WHEN MLB.\"ClCode1\" IN (1,2) THEN 'C'";
-			sql += "			  WHEN MLB.\"ClCode1\" IN (1,2) THEN 'D'";
-			sql += "			  WHEN MLB.\"ClCode1\" IN (1,2) THEN 'A'";
-			sql += "			  WHEN MLB.\"ClCode1\" IN (1,2) THEN 'B'";
+			sql += "			  WHEN MLB.\"ClCode1\" IN (3,4) THEN 'D'";
+			sql += "			  WHEN MLB.\"ClCode1\" = 5 THEN 'A'";
+			sql += "			  WHEN MLB.\"ClCode1\" = 9  THEN 'B'";
 			sql += "			ELSE 'Z' END ) AS F1";
 			sql += "		  ,C.\"CustName\" AS F2";
 			sql += "		  ,(CASE";
@@ -108,7 +108,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  WHEN R.\"ReltCode\" IS NOT NULL AND MLB.\"EntCode\" <> 0 THEN 'A'";
 			sql += "			ELSE ' ' END ) AS F4";
 			sql += "		  ,(CASE";
-			sql += "			  WHEN MFB.\"ProdNo\" LIKE 'I%' OR MFB.\"FacAcctCode\" = 340 THEN 'Y'";
+			sql += "			  WHEN REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]') OR MFB.\"FacAcctCode\" = 340 THEN 'Y'";
 			sql += "			ELSE 'N' END ) AS F5";
 			sql += "		  ,DECODE(L.\"SyndNo\",0,'N','Y') AS F6";
 			sql += "		  ,'TWD' AS F7";
@@ -133,7 +133,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "			  WHEN MFB.\"Status\" IN (2,6,7) AND MFB.\"ProdNo\" IN ('60','61','62') THEN '協議戶'";
 			sql += "			ELSE ' ' END ) AS F22";
 			sql += "		  ,(CASE";
-			sql += "			  WHEN MFB.\"ProdNo\" LIKE 'I%' OR MFB.\"FacAcctCode\" = 340 THEN '資金專案運用'";
+			sql += "			  WHEN  REGEXP_LIKE(MFB.\"ProdNo\",'I[A-Z]') OR MFB.\"FacAcctCode\" = 340 THEN '資金專案運用'";
 			sql += "			ELSE ' ' END ) AS F23";
 			sql += "		  ,MFB.\"OvduDays\" AS F24";
 			sql += "		  ,MLB.\"CustNo\" || MLB.\"FacmNo\" || L.\"BormNo\" AS F25";
@@ -184,6 +184,7 @@ public class LM054ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "	   OR   MLB2.\"LineAmt\" > 100000000 ))"; // --非以上條件
 			sql += "	ORDER BY MFB.\"CustNo\"";
 			sql += "			,MFB.\"FacmNo\"";
+			sql += "			,L.\"BormNo\"";
 		} else {
 
 			sql += "	SELECT :eymd  AS F0";

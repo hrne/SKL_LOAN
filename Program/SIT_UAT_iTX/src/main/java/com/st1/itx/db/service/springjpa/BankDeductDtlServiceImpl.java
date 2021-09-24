@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("bankDeductDtlService")
 @Repository
-public class BankDeductDtlServiceImpl implements BankDeductDtlService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(BankDeductDtlServiceImpl.class);
-
+public class BankDeductDtlServiceImpl extends ASpringJpaParm implements BankDeductDtlService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class BankDeductDtlServiceImpl implements BankDeductDtlService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + bankDeductDtlId);
+    this.info("findById " + dbName + " " + bankDeductDtlId);
     Optional<BankDeductDtl> bankDeductDtl = null;
     if (dbName.equals(ContentName.onDay))
       bankDeductDtl = bankDeductDtlReposDay.findById(bankDeductDtlId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "EntryDate", "CustNo", "FacmNo", "BormNo", "RepayType", "PayIntDate"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "EntryDate", "CustNo", "FacmNo", "BormNo", "RepayType", "PayIntDate"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAll(pageable);
     else 
       slice = bankDeductDtlRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("sortByAll " + dbName + " : " + "custNo_0 : " + custNo_0 + " entryDate_1 : " +  entryDate_1 + " entryDate_2 : " +  entryDate_2);
+    this.info("sortByAll " + dbName + " : " + "custNo_0 : " + custNo_0 + " entryDate_1 : " +  entryDate_1 + " entryDate_2 : " +  entryDate_2);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByCustNoIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAsc(custNo_0, entryDate_1, entryDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByCustNoIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAsc(custNo_0, entryDate_1, entryDate_2, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByCustNoIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAsc(custNo_0, entryDate_1, entryDate_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByCustNoIsOrderByEntryDateAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByCustNoIsOrderByEntryDateAsc(custNo_0, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByCustNoIsOrderByEntryDateAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("entryDateRng " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1);
+    this.info("entryDateRng " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(entryDate_0, entryDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(entryDate_0, entryDate_1, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(entryDate_0, entryDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("mediaSeqRng " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaKind_1 : " +  mediaKind_1 + " mediaSeq_2 : " +  mediaSeq_2);
+    this.info("mediaSeqRng " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaKind_1 : " +  mediaKind_1 + " mediaSeq_2 : " +  mediaSeq_2);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByMediaDateIsAndMediaKindIsAndMediaSeqIsOrderByMediaKindAscMediaSeqAsc(mediaDate_0, mediaKind_1, mediaSeq_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -206,6 +214,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByMediaDateIsAndMediaKindIsAndMediaSeqIsOrderByMediaKindAscMediaSeqAsc(mediaDate_0, mediaKind_1, mediaSeq_2, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByMediaDateIsAndMediaKindIsAndMediaSeqIsOrderByMediaKindAscMediaSeqAsc(mediaDate_0, mediaKind_1, mediaSeq_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -222,7 +233,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("repayBankEq " + dbName + " : " + "repayBank_0 : " + repayBank_0 + " entryDate_1 : " +  entryDate_1 + " entryDate_2 : " +  entryDate_2);
+    this.info("repayBankEq " + dbName + " : " + "repayBank_0 : " + repayBank_0 + " entryDate_1 : " +  entryDate_1 + " entryDate_2 : " +  entryDate_2);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqual(repayBank_0, entryDate_1, entryDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -231,6 +242,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqual(repayBank_0, entryDate_1, entryDate_2, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqual(repayBank_0, entryDate_1, entryDate_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -247,7 +261,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("deductNoticeA " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " repayType_2 : " +  repayType_2);
+    this.info("deductNoticeA " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " repayType_2 : " +  repayType_2);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRepayTypeIs(entryDate_0, entryDate_1, repayType_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -256,6 +270,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRepayTypeIs(entryDate_0, entryDate_1, repayType_2, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRepayTypeIs(entryDate_0, entryDate_1, repayType_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -272,7 +289,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("facmNoRange " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " repayType_3 : " +  repayType_3 + " payIntDate_4 : " +  payIntDate_4);
+    this.info("facmNoRange " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " repayType_3 : " +  repayType_3 + " payIntDate_4 : " +  payIntDate_4);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByEntryDateIsAndCustNoIsAndFacmNoIsAndRepayTypeIsAndPayIntDateIs(entryDate_0, custNo_1, facmNo_2, repayType_3, payIntDate_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -281,6 +298,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByEntryDateIsAndCustNoIsAndFacmNoIsAndRepayTypeIsAndPayIntDateIs(entryDate_0, custNo_1, facmNo_2, repayType_3, payIntDate_4, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByEntryDateIsAndCustNoIsAndFacmNoIsAndRepayTypeIsAndPayIntDateIs(entryDate_0, custNo_1, facmNo_2, repayType_3, payIntDate_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -297,7 +317,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4943Eq " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " repayBank_2 : " +  repayBank_2 + " repayType_3 : " +  repayType_3);
+    this.info("findL4943Eq " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " repayBank_2 : " +  repayBank_2 + " repayType_3 : " +  repayType_3);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRepayBankIsAndRepayTypeIs(entryDate_0, entryDate_1, repayBank_2, repayType_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -306,6 +326,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRepayBankIsAndRepayTypeIs(entryDate_0, entryDate_1, repayBank_2, repayType_3, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRepayBankIsAndRepayTypeIs(entryDate_0, entryDate_1, repayBank_2, repayType_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -322,7 +345,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4452Rng " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaDate_1 : " +  mediaDate_1);
+    this.info("findL4452Rng " + dbName + " : " + "mediaDate_0 : " + mediaDate_0 + " mediaDate_1 : " +  mediaDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqual(mediaDate_0, mediaDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -331,6 +354,9 @@ em = null;
       slice = bankDeductDtlReposHist.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqual(mediaDate_0, mediaDate_1, pageable);
     else 
       slice = bankDeductDtlRepos.findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqual(mediaDate_0, mediaDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -347,7 +373,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4450Rng " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " repayType_3 : " +  repayType_3 + " payIntDate_4 : " +  payIntDate_4);
+    this.info("findL4450Rng " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " repayType_3 : " +  repayType_3 + " payIntDate_4 : " +  payIntDate_4);
     if (dbName.equals(ContentName.onDay))
       slice = bankDeductDtlReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndRepayTypeIsAndPayIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, bormNo_2, repayType_3, payIntDate_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -357,6 +383,9 @@ em = null;
     else 
       slice = bankDeductDtlRepos.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndRepayTypeIsAndPayIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, bormNo_2, repayType_3, payIntDate_4, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -365,7 +394,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findL4451First " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " mediaKind_2 : " +  mediaKind_2);
+    this.info("findL4451First " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " mediaKind_2 : " +  mediaKind_2);
     Optional<BankDeductDtl> bankDeductDtlT = null;
     if (dbName.equals(ContentName.onDay))
       bankDeductDtlT = bankDeductDtlReposDay.findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByMediaSeqDesc(entryDate_0, entryDate_1, mediaKind_2);
@@ -375,6 +404,7 @@ em = null;
       bankDeductDtlT = bankDeductDtlReposHist.findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByMediaSeqDesc(entryDate_0, entryDate_1, mediaKind_2);
     else 
       bankDeductDtlT = bankDeductDtlRepos.findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByMediaSeqDesc(entryDate_0, entryDate_1, mediaKind_2);
+
     return bankDeductDtlT.isPresent() ? bankDeductDtlT.get() : null;
   }
 
@@ -383,7 +413,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + bankDeductDtlId);
+    this.info("Hold " + dbName + " " + bankDeductDtlId);
     Optional<BankDeductDtl> bankDeductDtl = null;
     if (dbName.equals(ContentName.onDay))
       bankDeductDtl = bankDeductDtlReposDay.findByBankDeductDtlId(bankDeductDtlId);
@@ -401,7 +431,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + bankDeductDtl.getBankDeductDtlId());
+    this.info("Hold " + dbName + " " + bankDeductDtl.getBankDeductDtlId());
     Optional<BankDeductDtl> bankDeductDtlT = null;
     if (dbName.equals(ContentName.onDay))
       bankDeductDtlT = bankDeductDtlReposDay.findByBankDeductDtlId(bankDeductDtl.getBankDeductDtlId());
@@ -423,7 +453,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + bankDeductDtl.getBankDeductDtlId());
+    this.info("Insert..." + dbName + " " + bankDeductDtl.getBankDeductDtlId());
     if (this.findById(bankDeductDtl.getBankDeductDtlId()) != null)
       throw new DBException(2);
 
@@ -452,7 +482,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + bankDeductDtl.getBankDeductDtlId());
+    this.info("Update..." + dbName + " " + bankDeductDtl.getBankDeductDtlId());
     if (!empNot.isEmpty())
       bankDeductDtl.setLastUpdateEmpNo(empNot);
 
@@ -475,7 +505,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + bankDeductDtl.getBankDeductDtlId());
+    this.info("Update..." + dbName + " " + bankDeductDtl.getBankDeductDtlId());
     if (!empNot.isEmpty())
       bankDeductDtl.setLastUpdateEmpNo(empNot);
 
@@ -495,7 +525,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + bankDeductDtl.getBankDeductDtlId());
+    this.info("Delete..." + dbName + " " + bankDeductDtl.getBankDeductDtlId());
     if (dbName.equals(ContentName.onDay)) {
       bankDeductDtlReposDay.delete(bankDeductDtl);	
       bankDeductDtlReposDay.flush();
@@ -524,7 +554,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (BankDeductDtl t : bankDeductDtl){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -559,7 +589,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (bankDeductDtl == null || bankDeductDtl.size() == 0)
       throw new DBException(6);
 
@@ -588,7 +618,7 @@ em = null;
 
   @Override
   public void deleteAll(List<BankDeductDtl> bankDeductDtl, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

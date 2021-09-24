@@ -40,7 +40,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4943 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4943.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -145,23 +144,31 @@ public class L4943 extends TradeBuffer {
 				occursList.putParam("OOMediaCode", result.get("F10"));
 				occursList.putParam("OOAcDate", acDate);
 
-				TempVo tempVo = new TempVo();
-				tempVo = tempVo.getVo(result.get("F12"));
-
 				String procNote = "";
+				String returnCode = result.get("F13");
+				String mediaKind = result.get("F14");
+				if (returnCode == null || returnCode.trim().isEmpty()) {
+					TempVo tempVo = new TempVo();
+					tempVo = tempVo.getVo(result.get("F12"));
+					if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
+						procNote = "Aml檢核訊息：" + amlX(tempVo.get("Aml"), titaVo) + "。";
+					}
 
-				if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
-					procNote = "Aml檢核訊息：" + amlX(tempVo.get("Aml"), titaVo) + "。";
+					if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
+						procNote = procNote + "帳號授權檢核：" + authX(tempVo.get("Auth"), titaVo) + "。";
+					}
+
+					if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
+						procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
+					}
+				} else {
+					if ("00".equals(returnCode)) {
+						procNote = "扣款成功";
+					} else {
+						procNote = "扣款失敗："
+								+ procCodeX("3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
+					}
 				}
-
-				if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
-					procNote = procNote + "帳號授權檢核：" + authX(tempVo.get("Auth"), titaVo) + "。";
-				}
-
-				if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
-					procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
-				}
-
 				occursList.putParam("OOAmlRsp", " ");
 
 				occursList.putParam("OOProcNote", procNote);
@@ -200,6 +207,18 @@ public class L4943 extends TradeBuffer {
 		String result = "";
 
 		CdCode cdCode = cdCodeService.getItemFirst(4, "AmlCheckItem", aml, titaVo);
+
+		if (cdCode != null) {
+			result = cdCode.getItem();
+		}
+
+		return result;
+	}
+
+	private String procCodeX(String procCode, TitaVo titaVo) {
+		String result = "";
+
+		CdCode cdCode = cdCodeService.getItemFirst(4, "ProcCode", procCode, titaVo);
 
 		if (cdCode != null) {
 			result = cdCode.getItem();

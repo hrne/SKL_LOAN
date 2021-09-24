@@ -36,8 +36,8 @@ E(0,0)
 [#<->#,"@"],
 ["#FdRenewCode+保險狀態",#RenewCode,#RenewCodeX],["#FdTotalPrem+總保費",#TotalPrem],
 ["#FdInsuCompany+保險公司",#InsuCompany,#InsuCompanyX],["#FdInsuTypeCode+保險類別",#InsuTypeCode,#InsuTypeCodeX],
-["#FdAcDate+會計日期",#AcDate],["#FdNotiTempFg+入通知檔",#NotiTempFg],
-["#FdTitaTxtNo+交易序號",#TitaTxtNo],["#FdStatusCode+處理代碼",#StatusCode,#StatusCodeX],
+["#FdStatusCode+處理代碼",#StatusCode,#StatusCodeX],["#FdNotiTempFg+入通知檔",#NotiTempFg],
+["#FdAcDate+會計日期",#AcDate],["#FdTitaTxtNo+交易序號",#TitaTxtNo],
 ["#FdOvduDate+轉催收日",#OvduDate],["#FdOvduNo+轉催編號",#OvduNo],
 ]
 
@@ -455,14 +455,6 @@ C(4,#InsuTypeCode,S,$)
 T(H,#InsuTypeCode,#InsuTypeCodeHelp)
 
 
-!會計日期
-#AcDate=D,7,L
-
-!入通知檔
-#NotiTempFg=X,1,L
-
-!交易序號
-#TitaTxtNo=A,7,L
 
 ! QC 497 可維護 & + 結案
 !處理代碼
@@ -482,6 +474,17 @@ SWITCH(#StatusCode,
 3,T(3,@StatusCodeX,呆帳),
 4,T(3,@StatusCodeX,結案),
 T(3,@StatusCodeX, ))
+
+!入通知檔
+#NotiTempFg=X,1,L
+
+
+!會計日期
+#AcDate=D,7,L
+
+
+!交易序號
+#TitaTxtNo=A,7,L
 
 !轉催收日
 #OvduDate=D,7,L

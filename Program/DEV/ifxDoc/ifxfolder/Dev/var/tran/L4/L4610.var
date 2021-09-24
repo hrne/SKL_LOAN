@@ -40,17 +40,23 @@ E(0,0)
 T(3,*)
 #FdInsuCompany=X,2,L
 T(3,*)
+
+! 20210911 xiangwei
+! 這裡的星號顯示判定改在下方做
 #FdFireInsuCovrg=X,2,L
 #FdEthqInsuCovrg=X,2,L
-T(3,*)
+
 #FdInsuStartDate=X,2,L
 T(3,*)
 #FdEndoInsuNo=X,2,L
 #FdInsuTypeCode=X,2,L
 T(3,*)
+
+! 20210911 xiangwei
+! 這裡的星號顯示判定改在下方做
 #FdFireInsuPrem=X,2,L
 #FdEthqInsuPrem=X,2,L
-T(3,*)
+
 #FdInsuEndDate=X,2,L
 T(3,*)
 
@@ -78,14 +84,21 @@ T(3,CdCode.InsuTypeCode)
 
 #InsuTypeCodeHelp=x,1024,S
 
+![代號1]
+#CDDEF04=x,26,S
+T(3,CdCode.ClCode1)
+
+#ClCode1Help=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ClCode2Help,#HelpDesc1)
 T(2,@InsuCompanyHelp,#HelpDesc2)
 T(2,@InsuTypeCodeHelp,#HelpDesc3)
+T(2,@ClCode1Help,#HelpDesc4)
 
 #FunctionHelp=x,50,S
 T(3,1:新增;2:修改;4:刪除;5:查詢)
@@ -131,6 +144,7 @@ E(0,@EthqInsuPrem,#EthqInsuPremX)
 
 
 
+
 !隱藏INPUT,LABEL
 
 ! 新保:1 、 自保:2
@@ -170,15 +184,22 @@ C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
 C(3,#FunctionCode,1,S,$)
 E(0,1)ASGN(AGAIN$)
 
+! 20210911 xiangwei
+! 地震險/火險: 這裡改為預設將星號放在火險上
 #ShowFd=X,1,S
 C(2,#FunctionCode,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
 T(2,@FdPrevInsuNo,#ShowFd)     
 T(2,@FdInsuCompany,#ShowFd)
-T(2,@FdEthqInsuCovrg,#ShowFd)
 T(2,@FdInsuStartDate,#ShowFd)
 T(2,@FdInsuTypeCode,#ShowFd)
-T(2,@FdEthqInsuPrem,#ShowFd)
 T(2,@FdInsuEndDate,#ShowFd)
+T(2,@FdFireInsuCovrg,#ShowFd)
+T(2,@FdFireInsuPrem,#ShowFd)
+
+#Function2=X,1,S
+IF(#FunctionCode==2,
+T(F,#PrevInsuNo,0)
+T(F,#EndoInsuNo,0),$)
 
 #Border=A,1,S
 C(3,#FunctionCode,4,
@@ -203,9 +224,11 @@ C(3,#FunctionCode,1,SHOW(#EndoInsuNo),HIDE(#EndoInsuNoX))
 
 !代號1 固定為房地,不需輸入
 #ClCode1=A,1,L
-E(0,1)
+T(1,@ClCode1,#NTXBUF,2,1)
+T(1,@ClCode2,#NTXBUF,3,2)
+
 #ClCode1X=X,4,L
-T(3,房地)
+T(3,)T(H,#ClCode1,#ClCode1Help)
 
 !代號2 下拉式選單 必須輸入且檢核
 #ClCode2=A,2,L
@@ -278,8 +301,13 @@ T(H,#InsuTypeCode,#InsuTypeCodeHelp)
 
 
 !火災險保險金額 新增、修改時必須輸入,其他自動顯示不必輸入
+! 20210911 xiangwei
+! 當火險輸入完金額仍為0時, 將星號放到地震險那裏去
+! 同時也改變保費星號的顯示
 #FireInsuCovrg=m,14,I
 C(2,#FunctionCode,s,$,$,s,s,s)
+@IF(#FireInsuCovrg==0,T(2,@FdFireInsuCovrg, )T(2,@FdEthqInsuCovrg,#ShowFd)T(2,@FdFireInsuPrem, )T(2,@FdEthqInsuPrem,#ShowFd),T(2,@FdFireInsuCovrg,#ShowFd)T(2,@FdEthqInsuCovrg, )T(2,@FdFireInsuPrem,#ShowFd)T(2,@FdEthqInsuPrem, ))
+
 #FireInsuCovrgL=m,14,L
 
 !火災險保費
@@ -292,11 +320,14 @@ C(3,#FireInsuCovrg,0,S,$)
 !地震險保險金額
 #EthqInsuCovrg=m,14,I
 C(2,#FunctionCode,s,$,$,s,s,s)
+
 #EthqInsuCovrgL=m,14,L
 
 !檢查 地震險保險金額 + 火災險保險金額 > 0
+! 20210911 xiangwei
+! 加上@號, 否則原本好像不會實際判定
 #CHECK_AMT=m,14,S
-E(2,#FireInsuCovrg+#EthqInsuCovrg)
+@E(2,#FireInsuCovrg+#EthqInsuCovrg)
 C(2,#FunctionCode,s,$,$,s,s,s)
 IF(#CHECK_AMT==0,V(P,保險金額不可皆為0),$)
 
