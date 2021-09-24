@@ -50,7 +50,7 @@ K(MODIFYBUTTON,查詢)
 ["#FdBankCode+銀行別",#BankCode,#BankCodeX],
 ["#FdRepayType+還款類別",#RepayType,#RepayTypeX],
 ["#FdEntryDateFm+入帳日期",#EntryDateFm,"~",#EntryDateTo],
-["#FdOperationItem+作業項目",#OperationItem,#OperationItemX],
+["#FdOpItem+作業項目",#OpItem,#OpItemX],
 ["#FdPostLimitAmt+郵局同戶超過限額",#PostLimitAmt,"@@0為全部"],
 ["#FdSingleLimit+單筆超過限額",#SingleLimit,"@@0為全部"],
 ["#FdLowLimit+單筆低於金額",#LowLimit],
@@ -68,14 +68,14 @@ T(3,*)
 T(3,*)
 #FdEntryDateFm=X,2,L
 T(3,*)
-#FdOperationItem=X,2,L
+#FdOpItem=X,2,L
 T(3,*)
 #FdPostLimitAmt=X,2,L
 #FdSingleLimit=X,2,L
 #FdLowLimit=X,2,L
 T(3,*)
 
-#OperationItemHelp=x,40,S
+#OpItemHelp=x,40,S
 T(3,1:ACH扣款;2:郵局扣款;9:全部)
 
 ! Help
@@ -236,13 +236,13 @@ V(7)A(DATE,0,#EntryDateFm)
 E(0,#EntryDateFm)
 @IF(#EntryDateTo<#EntryDateFm,V(P,起日不可大於迄日),$)
 
-#OperationItem=A,1,I
+#OpItem=A,1,I
 IF(#FunctionCode == 2 || #FunctionCode == 3 ,$,S)
-HELP(#OperationItemHelp)
-@V(H,#OperationItemHelp)
+HELP(#OpItemHelp)
+@V(H,#OpItemHelp)
 
-#OperationItemX=X,10,L
-T(3,)T(H,#OperationItem,#OperationItemHelp)
+#OpItemX=X,10,L
+T(3,)T(H,#OpItem,#OpItemHelp)
 
 ! 郵局同戶超過限額
 #PostLimitAmt=m,14,I
@@ -374,7 +374,7 @@ T(3,)T(H,#OOAmlRsp,#AmlRspHelp)
 #PostLimitAmt
 #SingleLimit
 #LowLimit
-#OperationItem
+#OpItem
 #END
 </sub>
 

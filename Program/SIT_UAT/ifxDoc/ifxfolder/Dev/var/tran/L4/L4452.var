@@ -28,13 +28,13 @@ E(0,0)
 [
 ["[L4452]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@銀行扣款(媒體製作)"],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate],
-[#<->#,"#FdOperationItem+作業項目",#OperationItem,#OperationItemX],
+[#<->#,"#FdOpItem+作業項目",#OpItem,#OpItemX],
 ]
 
 #FdEntryDate=X,2,L
 T(3,*)
 
-#FdOperationItem=X,2,L
+#FdOpItem=X,2,L
 T(3,*)
 
 #CHAIN=A,1,S
@@ -43,7 +43,7 @@ T(4,CHAIN$)
 #NextDay=D,7,S
 ! E(0,#SYSNDATE)
 
-#OperationItemHelp=x,40,S
+#OpItemHelp=x,40,S
 T(3,1:ACH扣款;2:郵局扣款;9:全部)
 
 ! 調rim
@@ -66,12 +66,12 @@ V(7)
 
 C(3,#CHAIN,0,$,s)
 
-#OperationItem=A,1,I
-HELP(#OperationItemHelp)
-@V(H,#OperationItemHelp)
+#OpItem=A,1,I
+HELP(#OpItemHelp)
+@V(H,#OpItemHelp)
 
-#OperationItemX=X,10,L
-T(3,)T(H,#OperationItem,#OperationItemHelp)
+#OpItemX=X,10,L
+T(3,)T(H,#OpItem,#OpItemHelp)
 
 </sub>
 
@@ -90,7 +90,7 @@ T(3,)T(H,#OperationItem,#OperationItemHelp)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 #EntryDate
-#OperationItem
+#OpItem
 </sub>
 
 !------ 下行電文TOM ------

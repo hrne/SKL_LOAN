@@ -156,9 +156,12 @@ public class LM003Report extends MakeReport {
 					}
 					break;
 				default:
-					// 年合計金額輸出
-					lm003Report.print(0, c.getOutputXPosR(), formatAmt(getBillionAmt(c.getSum()), 2), "R");
-					break;
+					if (c.hasRatioOutput)
+					{
+						// 年合計金額輸出
+						lm003Report.print(0, c.getOutputXPosR(), formatAmt(getBillionAmt(c.getSum()), 2), "R");
+						break;
+					}
 				}
 			}
 		}
@@ -188,12 +191,16 @@ public class LM003Report extends MakeReport {
 					}
 					break;
 				default:
-					// 月平均金額輸出
-					if (c.sum.compareTo(BigDecimal.ZERO) != 0) {
-						lm003Report.print(0, c.getOutputXPosR(),
-								formatAmt(getBillionAmt(c.getSum().divide(monthCount, 2, roundingModeLM003)), 2), "R");
-					} else {
-						lm003Report.print(0, c.getOutputXPosR(), formatAmt(BigDecimal.ZERO, 2), "R");
+					if (c.hasRatioOutput)
+					{
+						// 月平均金額輸出
+						if (c.sum.compareTo(BigDecimal.ZERO) != 0) {
+							lm003Report.print(0, c.getOutputXPosR(),
+									formatAmt(getBillionAmt(c.getSum().divide(monthCount, 2, roundingModeLM003)), 2),
+									"R");
+						} else {
+							lm003Report.print(0, c.getOutputXPosR(), formatAmt(BigDecimal.ZERO, 2), "R");
+						}
 					}
 					break;
 				}
@@ -233,7 +240,7 @@ public class LM003Report extends MakeReport {
 					}
 
 					if (dividend.compareTo(BigDecimal.ZERO) > 0 && divisor.compareTo(BigDecimal.ZERO) > 0) {
-						lm003Report.print(0, Columns.values()[i].outputXPosC, formatAmt(getBillionAmt(dividend.divide(divisor, 2, roundingModeLM003)) + "%", 2), "R");
+						lm003Report.print(0, Columns.values()[i].outputXPosC, formatAmt(getBillionAmt(dividend.divide(divisor, 2, roundingModeLM003)), 2) + "%", "C");
 					} else
 					{
 						lm003Report.print(0, Columns.values()[i].outputXPosC, "---", "C");
@@ -428,11 +435,11 @@ public class LM003Report extends MakeReport {
 		print(1, 42, " ●" + (Integer.valueOf(lastTLDVo.get("F0").substring(0,4))-1911) + "年" + lastTLDVo.get("F0").substring(4,6) + "月底貸款總餘額："
 				+ formatAmt(getBillionAmt(lastTLDVo.get("F11")), 2) + "億元 ●企金：" + formatAmt(getBillionAmt(lastTLDVo.get("F12")), 2) + "億元 ●房貸：" + formatAmt(getBillionAmt(lastTLDVo.get("F13")), 2) + "億元");
 		print(1, 42, " ●依報表：LN6361編制：撥款金額含催收回復，還款金額含轉催收。");
-		print(1, 42, " ●自行還款含內部代償、借新還舊、大額還款（1月~" + Integer.valueOf(lastTLDVo.get("F0").substring(4,6)) + "月累積數　）。");
+		print(1, 42, " ●自行還款含內部代償、借新還舊、大額還款（1月~" + Integer.valueOf(lastTLDVo.get("F0").substring(4,6)) + "月累積數"+formatAmt(getBillionAmt(lastTLDVo.get("F15")), 2)+"億）。");
 
 		print(1, 42, " ●"+ Integer.valueOf(lastTLDVo.get("F0").substring(4,6)) + "月實際還款數：" + formatAmt(getBillionAmt(Columns.repayTotal.getSum()), 2) + "（帳載）-" + formatAmt(getBillionAmt(lastTLDVo.get("F15")), 2) + "（內部轉帳）-" + formatAmt(getBillionAmt(Columns.turnOvdu.getSum()), 2) + "（轉催收）-"
 				+ formatAmt(getBillionAmt(lastTLDVo.get("F14")), 2) + "（企金件以自然人申貸還款）＝" + formatAmt(getBillionAmt(Columns.repayTotal.getSum().subtract(new BigDecimal(lastTLDVo.get("F15")).subtract(Columns.turnOvdu.getSum()).subtract(new BigDecimal(lastTLDVo.get("F14"))))), 2) + "億");
-		print(1, 42, " ●撥款金額包含企金件以自然人申貸撥款" + formatAmt(getBillionAmt(new BigDecimal(lastTLDVo.get("F15"))), 2) + "億");		
+		print(1, 42, " ●撥款金額包含企金件以自然人申貸撥款" + formatAmt(getBillionAmt(new BigDecimal(lastTLDVo.get("F14"))), 2) + "億");		
 		}
 		
 		long sno = this.close();

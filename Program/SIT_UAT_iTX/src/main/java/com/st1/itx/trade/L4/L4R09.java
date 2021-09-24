@@ -2,8 +2,6 @@ package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -26,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R09 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4R09.class);
 	@Autowired
 	public Parse parse;
 
@@ -57,12 +54,12 @@ public class L4R09 extends TradeBuffer {
 
 		if (tBatxOthers != null) {
 
-			if (tBatxOthers.getRepayAcCode().length() >= 8)
-				AcNoCode = tBatxOthers.getRepayAcCode().substring(0, 8);
-			if (tBatxOthers.getRepayAcCode().length() >= 13)
-				AcSubCode = tBatxOthers.getRepayAcCode().substring(8, 13);
-			if (tBatxOthers.getRepayAcCode().length() >= 15)
-				AcDtlCode = tBatxOthers.getRepayAcCode().substring(13);
+			if (tBatxOthers.getRepayAcCode().length() >= 11)
+				AcNoCode = tBatxOthers.getRepayAcCode().substring(0, 11);
+			if (tBatxOthers.getRepayAcCode().length() >= 16)
+				AcSubCode = tBatxOthers.getRepayAcCode().substring(11, 16);
+			if (tBatxOthers.getRepayAcCode().length() >= 18)
+				AcDtlCode = tBatxOthers.getRepayAcCode().substring(16);
 
 			this.totaVo.putParam("L4r09RepayType", tBatxOthers.getRepayType());
 			this.totaVo.putParam("L4r09RepayCode", tBatxOthers.getRepayCode());

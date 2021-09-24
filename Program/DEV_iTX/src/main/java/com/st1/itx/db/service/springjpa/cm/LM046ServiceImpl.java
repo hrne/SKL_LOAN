@@ -32,7 +32,7 @@ public class LM046ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String entYearMonth = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 100);
 
-		this.info("lM046.findAll entYearMonth =" + entYearMonth);
+		this.info("lM046.findAll entYearMonth = " + entYearMonth);
 
 		String sql = "";
 		sql += " WITH AllMonthOrSeasons AS ( ";

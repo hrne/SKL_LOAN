@@ -120,8 +120,8 @@ T(2,@ContractChgCodeHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2)
 
 
-#FunCdHelp=x,50,S
-T(3,1:新增;2:修改;4:刪除;5:查詢;7:列印)
+#FunCdHelp=x,60,S
+T(3,1:新增;2:修改;4:刪除;5:查詢;7:列印;8:補列印)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -145,7 +145,7 @@ T(1,@ContractChgCode,#NTXBUF,21,2)
 
 
 ![功能] 
-!下拉式選單 1.新增  2.修改  4.刪除  5.查詢  7.列印
+!下拉式選單 1.新增  2.修改  4.刪除  5.查詢  7.列印  8.補列印
 #FunCd=A,1,S
 C(3,#CHAIN,1,s,$)
 HELP(#FunCdHelp)
@@ -155,13 +155,13 @@ E(0,@FUNCIND,#FunCd)
 #SetSysPar1=X,1,S
 C(3,#FunCd,1,E(0,0)ASGN(AGAIN$),$)
 
-#FunCdX=X,4,L
+#FunCdX=X,6,L
 C(4,#FunCd,S,$)
 T(H,#FunCd,#FunCdHelp)
-C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY),$,K(MODIFYBUTTON,列印))
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY),$,K(MODIFYBUTTON,列印),K(MODIFYBUTTON,補列印))
 
 #ShowFd=X,1,S
-C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ),T(3, ),T(3, ))
+C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ),T(3, ),T(3, ),T(3, ))
 T(2,@FdFUNCD,#ShowFd)     
 T(2,@FdCUSTNO,#ShowFd)
 T(2,@FdFACMNO,#ShowFd)
@@ -298,6 +298,7 @@ T(2,@EmpName,#L2r08FullName)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(3,#FunCd,7,s,$)
+C(3,#FunCd,8,s,$)
 HELP(#ContractChgCodeHelp)
 @
 C(3,#FunCd,2,IF (#ContractChgCode==#L2r37ContractChgCode,s,$),$)
@@ -321,12 +322,14 @@ C(3,#PRECISION,0,$,s)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(3,#FunCd,7,s,$)
+C(3,#FunCd,8,s,$)
 
 #UsFeeAmt=m,14.2,I
 C(3,#PRECISION,0,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(3,#FunCd,7,s,$)
+C(3,#FunCd,8,s,$)
 
 #TimFeeAmt=m,14.2,S
 C(3,#PRECISION,0,E(0,#TwFeeAmt),E(0,#UsFeeAmt))
@@ -337,6 +340,7 @@ C(3,#PRECISION,0,E(0,#TwFeeAmt),E(0,#UsFeeAmt))
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(3,#FunCd,7,s,$)
+C(3,#FunCd,8,s,$)
 @V(2,0)
 
 ![會計日期] 
@@ -459,6 +463,7 @@ T(1,#OModifyTime,5,2)
 C(3,#FunCd,4,S,$)
 C(3,#FunCd,5,S,$)
 C(3,#FunCd,7,S,$)
+C(3,#FunCd,8,s,$)
 T(2,#OTIME1+:+#OTIME2+:+#OTIME3)
 T(2,@ModifyTime,#OModifyTimeX)
 

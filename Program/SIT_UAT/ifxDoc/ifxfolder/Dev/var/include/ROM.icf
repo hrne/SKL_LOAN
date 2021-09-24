@@ -4648,7 +4648,7 @@ TXFORM=L4R08
 <L4R09.dec>
 #L4r09RepayType=A,2,S
 #L4r09RepayCode=A,2,S
-#L4r09AcNo=X,15,S
+#L4r09AcNo=X,18,S
 #L4r09RepayAmt=m,14.2,S
 #L4r09RepayId=X,10,S
 #L4r09RepayName=c,100,S

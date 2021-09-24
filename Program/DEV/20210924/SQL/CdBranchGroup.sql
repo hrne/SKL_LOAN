@@ -2,7 +2,7 @@ drop table "CdBranchGroup" purge;
 
 create table "CdBranchGroup" (
   "BranchNo" varchar2(4),
-  "GroupNo" varchar2(1),
+  "GroupNo" decimal(2, 0) default 0 not null,
   "GroupItem" nvarchar2(10),
   "CreateDate" timestamp,
   "CreateEmpNo" varchar2(6),

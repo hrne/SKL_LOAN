@@ -19,20 +19,20 @@ public class CdBranchGroupId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 9124650593231042671L;
+	private static final long serialVersionUID = 7977579853393126705L;
 
 // 單位別
   @Column(name = "`BranchNo`", length = 4)
   private String branchNo = " ";
 
   // 課組別代號
-  @Column(name = "`GroupNo`", length = 1)
-  private String groupNo = " ";
+  @Column(name = "`GroupNo`")
+  private int groupNo = 0;
 
   public CdBranchGroupId() {
   }
 
-  public CdBranchGroupId(String branchNo, String groupNo) {
+  public CdBranchGroupId(String branchNo, int groupNo) {
     this.branchNo = branchNo;
     this.groupNo = groupNo;
   }
@@ -59,10 +59,10 @@ public class CdBranchGroupId implements Serializable {
 /**
 	* 課組別代號<br>
 	* 
-	* @return String
+	* @return Integer
 	*/
-  public String getGroupNo() {
-    return this.groupNo == null ? "" : this.groupNo;
+  public int getGroupNo() {
+    return this.groupNo;
   }
 
 /**
@@ -71,7 +71,7 @@ public class CdBranchGroupId implements Serializable {
   *
   * @param groupNo 課組別代號
 	*/
-  public void setGroupNo(String groupNo) {
+  public void setGroupNo(int groupNo) {
     this.groupNo = groupNo;
   }
 
@@ -88,7 +88,7 @@ public class CdBranchGroupId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     CdBranchGroupId cdBranchGroupId = (CdBranchGroupId) obj;
-    return branchNo.equals(cdBranchGroupId.branchNo) && groupNo.equals(cdBranchGroupId.groupNo);
+    return branchNo.equals(cdBranchGroupId.branchNo) && groupNo == cdBranchGroupId.groupNo;
   }
 
   @Override

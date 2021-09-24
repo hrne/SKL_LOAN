@@ -163,10 +163,11 @@ public class L9717Report extends MakeReport {
 
 			// 明細表頭
 			/**
-			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
-			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
+			 * ----------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
+			 * -------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1, "        經辦　　　　　　　戶號　　　戶名　　期別　　　　　　　　金額");
+			this.print(-6, 1, 
+                          "          經辦　　　 　　戶號　　　戶名　　期別　　　　　　　　金額");
 			this.print(-7, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -221,26 +222,26 @@ public class L9717Report extends MakeReport {
 				case Year:
 					// F0 年度 14 R
 					// F1 一期件數 26 C
-					// F2 一期金額 38 R
+					// F2 一期金額 39 R
 					// F3 二期件數 44 C
-					// F4 二期金額 56 R
+					// F4 二期金額 57 R
 					// F5 三期件數 62 C
-					// F6 三期金額 74 R
+					// F6 三期金額 75 R
 					// F7 四期件數 80 C
-					// F8 四期金額 92 R
+					// F8 四期金額 93 R
 					// F9 五期件數 98 C
-					// F10 五期金額 110 R
+					// F10 五期金額 111 R
 					// F11 六期件數 116 C
-					// F12 六期金額 128 R
+					// F12 六期金額 129 R
 					// F13 轉催收件數 134 C
-					// F14 轉催收金額 146 R
+					// F14 轉催收金額 147 R
 					// F15 合計件數 152 C
-					// F16 合計金額 164 R
+					// F16 合計金額 165 R
 					// 總計筆數 152 R
-					// 總計金額 164 R
+					// 總計金額 165 R
 
-					outputPosArray = new int[] { 14, 26, 38, 44, 56, 62, 74, 80, 92, 98, 110, 116, 128, 134, 146, 152,
-							164 };
+					outputPosArray = new int[] { 14, 26, 39, 44, 57, 62, 75, 80, 93, 98, 111, 116, 129, 134, 147, 152,
+							165 };
 					outputSortArray = new String[] { "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R",
 							"C", "R", "C", "R" };
 					isAmountArray = new Boolean[] { false, false, true, false, true, false, true, false, true, false,
@@ -255,26 +256,26 @@ public class L9717Report extends MakeReport {
 					// F0 員編 2 L
 					// F1 員工姓名 15 R
 					// F2 一期件數 26 C
-					// F3 一期金額 38 R
+					// F3 一期金額 39 R
 					// F4 二期件數 44 C
-					// F5 二期金額 56 R
+					// F5 二期金額 57 R
 					// F6 三期件數 62 C
-					// F7 三期金額 74 R
+					// F7 三期金額 75 R
 					// F8 四期件數 80 C
-					// F9 四期金額 92 R
+					// F9 四期金額 93 R
 					// F10 五期件數 98 C
-					// F11 五期金額 110 R
+					// F11 五期金額 111 R
 					// F12 六期件數 116 C
-					// F13 六期金額 128 R
+					// F13 六期金額 129 R
 					// F14 轉催收件數 134 C
-					// F15 轉催收金額 146 R
+					// F15 轉催收金額 147 R
 					// F16 合計件數 152 C
-					// F17 合計金額 164 R
+					// F17 合計金額 165 R
 					// 總計筆數 152 R
-					// 總計金額 164 R
+					// 總計金額 165 R
 
-					outputPosArray = new int[] { 2, 15, 26, 38, 44, 56, 62, 74, 80, 92, 98, 110, 116, 128, 134, 146,
-							152, 164 };
+					outputPosArray = new int[] { 2, 15, 26, 39, 44, 57, 62, 75, 80, 93, 98, 111, 116, 129, 134, 147,
+							152, 165 };
 					outputSortArray = new String[] { "L", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C",
 							"R", "C", "R", "C", "R" };
 					isAmountArray = new Boolean[] { false, false, false, true, false, true, false, true, false, true,
@@ -287,13 +288,13 @@ public class L9717Report extends MakeReport {
 					
 				case LargeAmt_Customer:
 					// F0 員編 2 L
-					// F1 員工姓名 12 R
+					// F1 員工姓名 16 R
 					// F2 戶號 28 C
-					// F3 戶名 40 R
-					// F4 期別 48 R
-					// F5 餘額 70 R
+					// F3 戶名 42 R
+					// F4 期別 49 R
+					// F5 餘額 69 R
 
-					outputPosArray = new int[] { 2, 12, 28, 40, 48, 70 };
+					outputPosArray = new int[] { 2, 16, 28, 42, 49, 69 };
 					outputSortArray = new String[] { "L", "R", "C", "R", "R", "R" };
 					isAmountArray = new Boolean[] { false, false, false, false, false, true };
 					
@@ -305,26 +306,26 @@ public class L9717Report extends MakeReport {
 					// F0 員編 2 L
 					// F1 員工姓名 15 R
 					// F2 一期件數 26 C
-					// F3 一期金額 38 R
+					// F3 一期金額 39 R
 					// F4 二期件數 44 C
-					// F5 二期金額 56 R
+					// F5 二期金額 57 R
 					// F6 三期件數 62 C
-					// F7 三期金額 74 R
+					// F7 三期金額 75 R
 					// F8 四期件數 80 C
-					// F9 四期金額 92 R
+					// F9 四期金額 93 R
 					// F10 五期件數 98 C
-					// F11 五期金額 110 R
+					// F11 五期金額 111 R
 					// F12 六期件數 116 C
-					// F13 六期金額 128 R
+					// F13 六期金額 129 R
 					// F14 轉催收件數 134 C
-					// F15 轉催收金額 146 R
+					// F15 轉催收金額 147 R
 					// F16 合計件數 152 C
-					// F17 合計金額 164 R
+					// F17 合計金額 165 R
 					// 總計筆數 152 R
-					// 總計金額 164 R
+					// 總計金額 165 R
 
-					outputPosArray = new int[] { 2, 15, 26, 38, 44, 56, 62, 74, 80, 92, 98, 110, 116, 128, 134, 146,
-							152, 164 };
+					outputPosArray = new int[] { 2, 15, 26, 39, 44, 57, 62, 75, 80, 93, 98, 111, 116, 129, 134, 147,
+						152, 165 };
 					outputSortArray = new String[] { "L", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C",
 							"R", "C", "R", "C", "R" };
 					isAmountArray = new Boolean[] { false, false, false, true, false, true, false, true, false, true,
@@ -360,15 +361,15 @@ public class L9717Report extends MakeReport {
 			{
 				case Agent:
 					countX = 152;
-					amtX = 164;
+					amtX = 165;
 					break;
 				case Year:
 					countX = 152;
-					amtX = 164;
+					amtX = 165;
 					break;
 				case LargeAmt_Agent:
 					countX = 152;
-					amtX = 164;
+					amtX = 165;
 					break;
 				case LargeAmt_Customer:
 					countX = 48;

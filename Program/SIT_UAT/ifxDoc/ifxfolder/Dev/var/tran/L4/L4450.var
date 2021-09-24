@@ -40,7 +40,7 @@ E(0,0)
 [
 ["[L4450]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@產出銀行扣帳檔"],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate,#BTN],
-[#<->#,"#FdOperationItem+作業項目",#OperationItem,#OperationItemX],
+[#<->#,"#FdOpItem+作業項目",#OpItem,#OpItemX],
 ["#FdPostSpecificDd+郵局扣款應繳日",#PostSpecificDd],["#FdPostSecondSpecificDd+二扣應繳日",#PostSecondSpecificDd],
 ["#FdAchSpecificDdFrom+ACH扣款應繳日",#AchSpecificDdFrom," ~ ",#AchSpecificDdTo],["#FdAchSecondSpecificDdFrom+二扣應繳日",#AchSecondSpecificDdFrom," ~ ",#AchSecondSpecificDdTo],
 [#<->#,"#FdTerms+追加逾期扣款期數",#Terms,"期",#LabelC,#DeductDate],
@@ -49,7 +49,7 @@ E(0,0)
 
 #FdEntryDate=X,2,L
 T(3,*)
-#FdOperationItem=X,2,L
+#FdOpItem=X,2,L
 T(3,*)
 #FdPostSpecificDd=X,2,L
 T(3,)
@@ -64,7 +64,7 @@ T(3,)
 #Today=D,7,S
 T(1,#SYSDATE,2,7)
 
-#OperationItemHelp=x,40,S
+#OpItemHelp=x,40,S
 T(3,1:ACH扣款;2:郵局扣款;9:全部)
 
 ! 調rim
@@ -99,17 +99,17 @@ BIND(#BTN,click, {cmd=CHAIN; ntxcd=L4943; ntxbuf=#BUF})
 T(2, 應繳日)
 ! 應繳日
 
-#OperationItem=A,1,I
-HELP(#OperationItemHelp)
-@V(H,#OperationItemHelp)
-IF(#OperationItem == 1 ,INVOKEJS(SHOW,L4450,3,3,0),INVOKEJS(SHOW,L4450,3,3,1))
-IF(#OperationItem == 2 ,INVOKEJS(SHOW,L4450,4,4,0),INVOKEJS(SHOW,L4450,4,4,1))
+#OpItem=A,1,I
+HELP(#OpItemHelp)
+@V(H,#OpItemHelp)
+IF(#OpItem == 1 ,INVOKEJS(SHOW,L4450,3,3,0),INVOKEJS(SHOW,L4450,3,3,1))
+IF(#OpItem == 2 ,INVOKEJS(SHOW,L4450,4,4,0),INVOKEJS(SHOW,L4450,4,4,1))
 
-#OperationItemX=X,10,L
-T(3,)T(H,#OperationItem,#OperationItemHelp)
+#OpItemX=X,10,L
+T(3,)T(H,#OpItem,#OpItemHelp)
 
 #PostSpecificDd=D,7,I
-C(3,#OperationItem,1,s,$)
+C(3,#OpItem,1,s,$)
 @A(DATE,2,#PostSpecificDd)
 
 
@@ -119,7 +119,7 @@ HIDE(#LabelC,#DeductDate)
 
 ! 二扣應繳日
 #PostSecondSpecificDd=D,7,I
-C(3,#OperationItem,1,s,$)
+C(3,#OpItem,1,s,$)
 @A(DATE,2,#PostSecondSpecificDd)
 
 #LabelE=X,2,L
@@ -127,22 +127,22 @@ T(2,~)
 
 ! 應繳日頭
 #AchSpecificDdFrom=D,7,I
-C(3,#OperationItem,2,s,$)
+C(3,#OpItem,2,s,$)
 @A(DATE,2,#AchSpecificDdFrom)
 
 ! 應繳日尾
 #AchSpecificDdTo=D,7,I
-C(3,#OperationItem,2,s,$)
+C(3,#OpItem,2,s,$)
 @A(DATE,2,#AchSpecificDdTo)
 
 ! 每日扣款二扣頭
 #AchSecondSpecificDdFrom=D,7,I
-C(3,#OperationItem,2,s,$)
+C(3,#OpItem,2,s,$)
 @A(DATE,2,#AchSecondSpecificDdFrom)
 
 ! 每日扣款二扣尾
 #AchSecondSpecificDdTo=D,7,I
-C(3,#OperationItem,2,s,$)
+C(3,#OpItem,2,s,$)
 @A(DATE,2,#AchSecondSpecificDdTo)
 
 #Terms=A,1,I
@@ -193,7 +193,7 @@ C(3,#Terms,0,E(0,0),$)
 #AchSecondSpecificDdFrom
 #AchSecondSpecificDdTo
 #DeductDate
-#OperationItem
+#OpItem
 </sub>
 
 !------ 下行電文TOM ------

@@ -26,7 +26,7 @@ public class CdBranchGroup implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6355476243473682872L;
+	private static final long serialVersionUID = -6091258869828365240L;
 
 @EmbeddedId
   private CdBranchGroupId cdBranchGroupId;
@@ -36,8 +36,8 @@ public class CdBranchGroup implements Serializable {
   private String branchNo;
 
   // 課組別代號
-  @Column(name = "`GroupNo`", length = 1, insertable = false, updatable = false)
-  private String groupNo;
+  @Column(name = "`GroupNo`", insertable = false, updatable = false)
+  private int groupNo = 0;
 
   // 課組別說明
   @Column(name = "`GroupItem`", length = 10)
@@ -92,10 +92,10 @@ public class CdBranchGroup implements Serializable {
 /**
 	* 課組別代號<br>
 	* 
-	* @return String
+	* @return Integer
 	*/
-  public String getGroupNo() {
-    return this.groupNo == null ? "" : this.groupNo;
+  public int getGroupNo() {
+    return this.groupNo;
   }
 
 /**
@@ -104,7 +104,7 @@ public class CdBranchGroup implements Serializable {
   *
   * @param groupNo 課組別代號
 	*/
-  public void setGroupNo(String groupNo) {
+  public void setGroupNo(int groupNo) {
     this.groupNo = groupNo;
   }
 

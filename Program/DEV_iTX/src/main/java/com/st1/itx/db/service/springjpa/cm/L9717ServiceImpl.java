@@ -169,7 +169,7 @@ public class L9717ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " SELECT FM.\"CreditOfficer\" \"Officer\" "; 
 			sql += "       ,CE.\"Fullname\" \"EmpName\" "; 
 			sql += "       ,MFB.\"CustNo\" \"CustNo\" "; 
-			sql += "       ,CM.\"CustName\" \"CustName\" "; 
+			sql += "       ,SUBSTR(CM.\"CustName\", 1, 5) \"CustName\" "; 
 			sql += "       ,DECODE(MFB.\"AcctCode\", '990', 990, MFB.\"OvduTerm\") \"Term\" "; 
 			sql += "       ,SUM(MFB.\"PrinBalance\") \"PrinBal\" "; 
 			sql += " FROM \"MonthlyFacBal\" MFB "; 

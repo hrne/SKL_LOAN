@@ -159,7 +159,9 @@ E(0,5)
 !列印
 #FUNC7=A,1,S
 E(0,7)
-
+!補列印
+#FUNC8=A,1,S
+E(0,8)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
@@ -214,12 +216,15 @@ T(2,#FUNC5+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractCh
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2670; ntxbuf=#OOBUF5})
 !列印
-#OOBUF7=X,30,S
-T(2,#FUNC7+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode)
 
 #BTNNAME=X,1,S
 T(3,@OOBTN7,列印)
 C(3,#OOPrintCode,1,T(3,@OOBTN7,補列印),$)
+
+#OOBUF7=X,30,S
+C(3,#OOPrintCode,1,T(2,#FUNC8+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode),
+                   T(2,#FUNC7+#OOCustNo+#OOFacmNo+#OOContractChgDate+#OOContractChgNo+#OOContractChgCode))
+
 
 #OOBTN7=X,10,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2670;text=#OOBTN7; ntxbuf=#OOBUF7})
