@@ -26,12 +26,7 @@ import com.st1.itx.Exception.LogicException;
 public class BankDeductDtl implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 6483310037938509246L;
-
-@EmbeddedId
+  @EmbeddedId
   private BankDeductDtlId bankDeductDtlId;
 
   // 入帳日期
@@ -146,7 +141,7 @@ public class BankDeductDtl implements Serializable {
   private int mediaDate = 0;
 
   // 媒體別
-  /* 1:ACH新光2:ACH他行3:郵局4:15日5:非15日 */
+  /* 1:ACH新光2:ACH他行3:郵局 */
   @Column(name = "`MediaKind`", length = 1)
   private String mediaKind;
 
@@ -692,8 +687,6 @@ CdCode:RelationCode
 	* 1:ACH新光
 2:ACH他行
 3:郵局
-4:15日
-5:非15日
 	* @return String
 	*/
   public String getMediaKind() {
@@ -705,8 +698,6 @@ CdCode:RelationCode
 	* 1:ACH新光
 2:ACH他行
 3:郵局
-4:15日
-5:非15日
   *
   * @param mediaKind 媒體別
 	*/

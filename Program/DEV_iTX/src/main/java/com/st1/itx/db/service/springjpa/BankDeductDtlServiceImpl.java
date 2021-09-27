@@ -235,13 +235,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("repayBankEq " + dbName + " : " + "repayBank_0 : " + repayBank_0 + " entryDate_1 : " +  entryDate_1 + " entryDate_2 : " +  entryDate_2);
     if (dbName.equals(ContentName.onDay))
-      slice = bankDeductDtlReposDay.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqual(repayBank_0, entryDate_1, entryDate_2, pageable);
+      slice = bankDeductDtlReposDay.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(repayBank_0, entryDate_1, entryDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = bankDeductDtlReposMon.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqual(repayBank_0, entryDate_1, entryDate_2, pageable);
+      slice = bankDeductDtlReposMon.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(repayBank_0, entryDate_1, entryDate_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = bankDeductDtlReposHist.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqual(repayBank_0, entryDate_1, entryDate_2, pageable);
+      slice = bankDeductDtlReposHist.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(repayBank_0, entryDate_1, entryDate_2, pageable);
     else 
-      slice = bankDeductDtlRepos.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqual(repayBank_0, entryDate_1, entryDate_2, pageable);
+      slice = bankDeductDtlRepos.findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(repayBank_0, entryDate_1, entryDate_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -406,6 +406,34 @@ em = null;
       bankDeductDtlT = bankDeductDtlRepos.findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByMediaSeqDesc(entryDate_0, entryDate_1, mediaKind_2);
 
     return bankDeductDtlT.isPresent() ? bankDeductDtlT.get() : null;
+  }
+
+  @Override
+  public Slice<BankDeductDtl> repayBankNotEq(String repayBank_0, int entryDate_1, int entryDate_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BankDeductDtl> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("repayBankNotEq " + dbName + " : " + "repayBank_0 : " + repayBank_0 + " entryDate_1 : " +  entryDate_1 + " entryDate_2 : " +  entryDate_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = bankDeductDtlReposDay.findAllByRepayBankNotAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(repayBank_0, entryDate_1, entryDate_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = bankDeductDtlReposMon.findAllByRepayBankNotAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(repayBank_0, entryDate_1, entryDate_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = bankDeductDtlReposHist.findAllByRepayBankNotAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(repayBank_0, entryDate_1, entryDate_2, pageable);
+    else 
+      slice = bankDeductDtlRepos.findAllByRepayBankNotAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(repayBank_0, entryDate_1, entryDate_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override

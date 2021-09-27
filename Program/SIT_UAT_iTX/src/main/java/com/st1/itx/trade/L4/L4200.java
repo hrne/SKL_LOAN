@@ -2,8 +2,6 @@ package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +24,6 @@ import com.st1.itx.util.MySpring;
  * @version 1.0.0
  */
 public class L4200 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4200.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -43,7 +40,7 @@ public class L4200 extends TradeBuffer {
 //		E.回寫Head檔 總金額與總筆數(if與前兩天相同，則丟Warning)
 
 		// 執行交易
-		MySpring.newTask("BS420", this.txBuffer, titaVo);
+		MySpring.newTask("L4200Batch", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

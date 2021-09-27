@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,6 @@ import com.st1.itx.util.common.MakeReport;
  * @version 1.0.0
  */
 public class LM055Report1 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM055Report1.class);
 
 	@Autowired
 	LM055ServiceImpl LM055ServiceImpl;
@@ -40,6 +37,7 @@ public class LM055Report1 extends MakeReport {
 	public void printTitle() {
 
 	}
+
 	BigDecimal tot = new BigDecimal("0");
 	String fdnm = "";
 	int row = 1;
@@ -53,7 +51,7 @@ public class LM055Report1 extends MakeReport {
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_手搞)", "LM055-A042放款餘額彙總表_手搞", "LM055-A042放款餘額彙總表_手搞.xlsx", "LNM34AP");
 
 		try {
-			fnAllList_1 = LM055ServiceImpl.findAll_1(titaVo);
+			fnAllList_1 = LM055ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -67,7 +65,7 @@ public class LM055Report1 extends MakeReport {
 			}
 			this.info("tot = " + tot);
 			makeExcel.setValue(1, 6, tot, "#,##0");
-		}else {
+		} else {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}
 
@@ -97,7 +95,7 @@ public class LM055Report1 extends MakeReport {
 				// 金額
 				if (tLDVo.get(fdnm).equals("")) {
 					makeExcel.setValue(row, i + 2, BigDecimal.ZERO, "#,##0");
-				} else if(tLDVo.get(fdnm).equals(" ")) {
+				} else if (tLDVo.get(fdnm).equals(" ")) {
 					makeExcel.setValue(row, i + 2, BigDecimal.ZERO, "#,##0");
 				} else {
 					makeExcel.setValue(row, i + 2, tLDVo.get(fdnm) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "#,##0");

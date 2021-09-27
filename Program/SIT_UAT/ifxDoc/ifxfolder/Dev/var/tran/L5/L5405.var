@@ -19,7 +19,7 @@ E(0,0)
 [
 ["[L5405]                                 更改目標金額、累計目標金額"],
 [#<->#,"#FdFunctionCdX+功能",#FunctionCdX],
-["#FdMain+輸入條件","@單位代號、區部代號、部室代號請擇一輸入"],
+["#FdMain+請選擇輸入條件",#Director],
 ["#FdUnitCode+單位代號",#UnitCode,#UnitCodeBTN],["#FdUnitItem+單位中文",#UnitItem],
 ["#FdDistCode+區部代號",#DistCode,#DistCodeBTN],["#FdDistItem+區部中文",#DistItem],
 ["#FdDeptCode+部室代號",#DeptCode,#DeptCodeBTN],["#FdDeptItem+部室中文",#DeptItem],
@@ -47,9 +47,6 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncHelp,#HelpDesc1)
 T(2,@DirectorCodeHelp,#HelpDesc2)
-
-
-
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -111,12 +108,17 @@ T(2, )
 #FdSumGoalAmt=X,1,L
 T(2, )
 
-IF(#FunctionCd==2 ,T(2,@FdUnitCode, )T(2,@FdDistCode, )T(2,@FdDeptCode, ),$)
-IF(#FunctionCd==4 ,T(2,@FdUnitCode, )T(2,@FdDistCode, )T(2,@FdDeptCode, )T(2,@FdEmpNo, ),$)
 ! 作業項目
 #FunctionCd=A,1,S
+E(0,@FUNCIND,#FunctionCd)
+T(H,@FunctionCdX,#FunctionCd,#FuncHelp)
 
 #FunctionCdX=X,4,L
+
+
+#Init=X,1,S
+IF(#FunctionCd==2 ,T(2,@FdUnitCode, )T(2,@FdDistCode, )T(2,@FdDeptCode, ),$)
+IF(#FunctionCd==4 ,T(2,@FdUnitCode, )T(2,@FdDistCode, )T(2,@FdDeptCode, )T(2,@FdEmpNo, ),$)
 
 
 !刪除隱藏重新交易按鈕
@@ -127,9 +129,23 @@ E(0,1)ASGN(AGAIN$)
 !顯示框線
 #WKTF=X,1,S
 C(3,#FunctionCd,2,T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0),$)
-C(3,#FunctionCd,4,T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0)
-                  T(F,@EmpNo,0)T(F,@EmpName,0)T(F,@DepartOfficer,0)T(F,@GoalCnt,0)
+C(3,#FunctionCd,4,T(F,@UnitCode,0)T(F,@DistCode,0)T(F,@DeptCode,0)T(F,@DirectorCode,0)
+                  T(F,@EmpNo,0)T(F,@EmpName,0)T(F,@DepartOfficer,0)T(F,@WorkMonth,0)T(F,@GoalCnt,0)
                   T(F,@SumGoalCnt,0)T(F,@GoalAmt,0)T(F,@SumGoalAmt,0),$)
+
+#OpenDirsctor=X,1,S
+C(3,#FunctionCd,1,INVOKEJS(SHOW,L5405,02,02,1),INVOKEJS(SHOW,L5405,02,02,0))
+
+! 輸入條件
+#Director=X,1,I
+C(3,#FunctionCd,1,$,S)
+T(2,@UnitCode, )T(2,@UnitItem, )T(2,@DistCode, )T(2,@DistItem, )T(2,@DeptCode, )T(2,@DeptItem, )
+C(3,#FunctionCd,1,INVOKEJS(SHOW,L5405,03,08,0),$)
+HELP(#DirectorCodeHelp)
+@V(H,#DirectorCodeHelp)
+C(5,#Director,M,INVOKEJS(SHOW,L5405,03,04,1),$)
+C(5,#Director,B,INVOKEJS(SHOW,L5405,05,06,1),$)
+C(5,#Director,D,INVOKEJS(SHOW,L5405,07,08,1),$)
 ! 單位代號
 #UnitCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
 #UnitCodeBUF=X,6,S
@@ -138,9 +154,8 @@ BIND(#UnitCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#UnitCodeBUF;ntxbuf5=ty
 
 #UnitCode=X,6,I
 C(2,#FunctionCd,s,$,s,s,s)
-SHOW(#UnitCodeBTN)HIDE(#DistCodeBTN)HIDE(#DeptCodeBTN)
-@C(4,#UnitCode,HIDE(#UnitCodeBTN),$)
-
+C(5,#Director,M,$,s)
+@V(7)
 <include src="ROM.icf::L5R14.dec"/>     
 #RimAreaCode=X,6,S
 #RimChoose=X,1,S
@@ -163,7 +178,7 @@ T(2,@DirectorCode,#L5R14DirectorCode)
 T(H,@DirectorCodeX,#DirectorCode,#DirectorCodeHelp)
 ! 單位中文
 #UnitItem=x,40,L
-C(4,#UnitCode,S,s)
+
 ! 區部代號
 #DistCodeBTN=X,1,I,ui:button;value:區部代號查詢;enable:1;tabbable:0
 #DistCodeBUF=X,6,S
@@ -172,9 +187,8 @@ BIND(#DistCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DistCodeBUF;ntxbuf5=ty
 
 #DistCode=X,6,I
 C(2,#FunctionCd,s,$,s,s,s)
-C(4,#UnitCode,$,s)
-SHOW(#DistCodeBTN)HIDE(#UnitCodeBTN)HIDE(#DeptCodeBTN)
-@C(4,#DistCode,HIDE(#DistCodeBTN),$)
+C(5,#Director,B,$,s)
+@V(7)
 #RimDistCode=X,6,S
 T(2,@RimDistCode,#DistCode)
 T(2,@RimChoose,2)
@@ -195,7 +209,7 @@ T(2,@DirectorCode,#L5R14DirectorCode)
 T(H,@DirectorCodeX,#DirectorCode,#DirectorCodeHelp)
 ! 區部中文
 #DistItem=x,40,L  
-C(4,#DistCode,S,s) 
+
 ! 部室代號
 #DeptCodeBTN=X,1,I,ui:button;value:部室代號查詢;enable:1;tabbable:0
 #DeptCodeBUF=X,6,S
@@ -204,11 +218,8 @@ BIND(#DeptCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#DeptCodeBUF;ntxbuf5=ty
 
 #DeptCode=X,6,I
 C(2,#FunctionCd,s,$,s,s,s)
-C(4,#UnitCode,$,s)
-C(4,#DistCode,$,s)
-SHOW(#DeptCodeBTN)HIDE(#UnitCodeBTN)HIDE(#DistCodeBTN)
-@C(4,#DeptCode,V(P,單位代號、區部代號、部室代號請擇一輸入),$)
-
+C(5,#Director,D,$,s)
+@V(7)
 #RimDeptCode=X,6,S
 T(2,@RimDeptCode,#DeptCode)
 T(2,@RimChoose,3)
@@ -230,7 +241,7 @@ T(2,@DirectorCode,#L5R14DirectorCode)
 T(H,@DirectorCodeX,#DirectorCode,#DirectorCodeHelp)
 ! 部室中文
 #DeptItem=x,40,L
-C(4,#DeptCode,S,s) 
+
 ! 處長主任別
 #DirectorCode=X,1,L
 
@@ -252,7 +263,6 @@ T(2,@EmpName,#L5R06FullName)
 
 ! 員工姓名
 #EmpName=X,8,L
-C(3,#FunctionCd,4,s,$)
 
 #BTNB=X,1,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
 #BTNBBUF=X,7,S

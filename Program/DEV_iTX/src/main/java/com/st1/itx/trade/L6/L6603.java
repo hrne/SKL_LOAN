@@ -131,7 +131,7 @@ public class L6603 extends TradeBuffer {
 
 		mCdCl.setClCode1(this.parse.stringToInteger(titaVo.getParam("ClCode1")));
 		mCdCl.setClCode2(this.parse.stringToInteger(titaVo.getParam("ClCode2")));
-		mCdCl.setClItem(tCdClIItem+"－"+titaVo.getParam("ClItem"));
+		mCdCl.setClItem(titaVo.getParam("ClItem"));
 		mCdCl.setClTypeJCIC(titaVo.getParam("ClTypeJCIC"));
 
 		if (mFuncCode != 2) {

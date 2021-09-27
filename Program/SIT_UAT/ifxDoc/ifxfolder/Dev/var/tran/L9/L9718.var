@@ -93,7 +93,7 @@ E(0,#defaultEntryDateMax)
 #inputCollectorShow=X,6,I
 
 #inputCollector=X,6,S
-@C(4,#inputCollectorShow,T(3,999999),T(2,#inputCollectorShow))
+@C(4,#inputCollectorShow,T(3, ),T(2,#inputCollectorShow))
 
 ! 撥款日期
 #inputDrawdownDate=D,7,I

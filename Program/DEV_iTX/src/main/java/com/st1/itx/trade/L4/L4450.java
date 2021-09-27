@@ -29,7 +29,6 @@ import com.st1.itx.util.MySpring;
  * @version 1.0.0
  */
 public class L4450 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4450.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -37,7 +36,7 @@ public class L4450 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 執行交易
-		MySpring.newTask("BS440", this.txBuffer, titaVo);
+		MySpring.newTask("L4450Batch", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

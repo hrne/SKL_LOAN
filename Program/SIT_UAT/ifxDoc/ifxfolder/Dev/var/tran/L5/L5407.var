@@ -111,7 +111,7 @@ IF(#FunctionCd == 4 ,T(2,@FdEmpNo, )T(2,@FdEffectiveDate, )T(2,@FdEmpClass, ),$)
 
 ! 功能
 #FunctionCd=A,1,S
-
+E(0,@FUNCIND,#FunctionCd)
 #FunctionCdX=X,4,L
 T(H,#FunctionCd,#FuncCodeHelp)
 

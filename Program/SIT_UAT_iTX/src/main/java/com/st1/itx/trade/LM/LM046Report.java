@@ -105,6 +105,15 @@ public class LM046Report extends MakeReport {
 
 			// 第二區塊
 
+			StringBuilder sb = new StringBuilder("LM046 result check: ");
+
+			for (int i = 0; i < 13; i++)
+			{
+				sb.append("F" + i + ": " + tLDVo.get("F" + i) + "; ");
+			}
+			
+			this.info(sb.toString());
+
 			// 法人
 			makeExcel.setValue(19 + count * 3, 1, tLDVo.get("F0"));
 			makeExcel.setValue(19 + count * 3, 3, new BigDecimal(tLDVo.get("F1")), "#,##0");
@@ -133,31 +142,25 @@ public class LM046Report extends MakeReport {
 			// 小計
 			BigDecimal[] totals = new BigDecimal[6];
 			totals[0] = new BigDecimal(tLDVo.get("F1")).add(new BigDecimal(tLDVo.get("F7")));
-			totals[1] = safelyDivide(new BigDecimal(tLDVo.get("F2")).add(new BigDecimal(tLDVo.get("F8"))), 1000, 0);
+			totals[1] = new BigDecimal(tLDVo.get("F2")).add(new BigDecimal(tLDVo.get("F8")));
 			totals[2] = new BigDecimal(tLDVo.get("F3")).add(new BigDecimal(tLDVo.get("F9")));
-			totals[3] = safelyDivide(new BigDecimal(tLDVo.get("F4")).add(new BigDecimal(tLDVo.get("F10"))), 1000, 0);
+			totals[3] = new BigDecimal(tLDVo.get("F4")).add(new BigDecimal(tLDVo.get("F10")));
 			totals[4] = new BigDecimal(tLDVo.get("F5")).add(new BigDecimal(tLDVo.get("F11")));
-			totals[5] = safelyDivide(new BigDecimal(tLDVo.get("F6")).add(new BigDecimal(tLDVo.get("F12"))), 1000, 0);
+			totals[5] = new BigDecimal(tLDVo.get("F6")).add(new BigDecimal(tLDVo.get("F12")));
 
 			makeExcel.setValue(19 + count * 3 + 2, 3, totals[0], "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 4, totals[1]);
+			makeExcel.setValue(19 + count * 3 + 2, 4, safelyDivide(totals[1], 1000, 0));
 			makeExcel.setValue(19 + count * 3 + 2, 5, totals[2], "#,##0");
 			makeExcel.setValue(19 + count * 3 + 2, 6, safelyDivide(totals[2], totals[0], 5), "0.00%");
-			makeExcel.setValue(19 + count * 3 + 2, 7, totals[3], "#,##0");
+			makeExcel.setValue(19 + count * 3 + 2, 7, safelyDivide(totals[3], 1000, 0), "#,##0");
 			makeExcel.setValue(19 + count * 3 + 2, 8, safelyDivide(totals[3], totals[1], 5), "0.00%");
 			makeExcel.setValue(19 + count * 3 + 2, 9, totals[4], "#,##0");
 			makeExcel.setValue(19 + count * 3 + 2, 10, safelyDivide(totals[4], totals[0], 5), "0.00%");
-			makeExcel.setValue(19 + count * 3 + 2, 11, totals[5], "#,##0");
+			makeExcel.setValue(19 + count * 3 + 2, 11, safelyDivide(totals[5], 1000, 0), "#,##0");
 			makeExcel.setValue(19 + count * 3 + 2, 12, safelyDivide(totals[5], totals[1], 5), "0.00%");
 
 			// 結束
 			count++;
-		}
-
-		for (int r = 21; r <= 51; r += 3) {
-			for (int c = 3; c <= 12; c++) {
-				makeExcel.formulaCaculate(r, c);
-			}
 		}
 
 	}

@@ -1,10 +1,11 @@
 package com.st1.itx.trade.LM;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -22,119 +23,207 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM056Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM056Report.class);
 
 	@Autowired
-	LM056ServiceImpl lm056ServiceImpl;
+	LM056ServiceImpl lM056ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
 
-	@Override
-	public void printTitle() {
-
-	}
+	public String dateF = "";
+	public int yearMon = 0;
 
 	public void exec(TitaVo titaVo) throws LogicException {
-		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		this.info("LM056Report exec");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-5會計部申報表", "LM056-表14-5會計部申報表", "LM056-表14-5會計部申報表.xlsx", "10804工作表");
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-5會計部申報表", "LM056、LM057_表14-5、表14-5 xls_會計部申報表", "LM056、LM057_表14-5、表14-5 xls_會計部申報表.xlsx", "10804工作表");
-		makeExcel.setSheet("10804工作表", titaVo.get("ENTDY").substring(1, 6) + "工作表");
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthDate = Calendar.getInstance();
+		// 設當年月底日 0是月底
+		calMonthDate.set(iYear, iMonth, 0);
 
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
 
+		boolean isMonthZero = iMonth - 1 == 0;
 
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+
+		int iDay = iEntdy % 100;
+
+		String date = iYear + "/" + iMonth + "/" + iDay;
+
+		dateF = date;
+
+		yearMon = (Integer.valueOf(titaVo.get("ENTDY")) - 19110000) / 100;
+
+		List<Map<String, String>> findList = new ArrayList<>();
+		List<Map<String, String>> findList2 = new ArrayList<>();
+		List<Map<String, String>> findList3 = new ArrayList<>();
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM056", "表14-1、14-2會計部申報表",
+				"LM056-表14-1、14-2_會計部申報表", "LM056_底稿_表14-1、14-2_會計部申報表.xlsx", "YYYMM");
 
 		try {
-			fnAllList = lm056ServiceImpl.findAll(titaVo);
-//			excelUnit();
+
+			// YYYMM工作表
+			findList = lM056ServiceImpl.findAll(titaVo, "Y");
+			// 14-1工作表
+			findList2 = lM056ServiceImpl.findAll(titaVo, "N");
+			// 14-2工作表
+			findList3 = lM056ServiceImpl.findAll2(titaVo);
+
 		} catch (Exception e) {
+
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM056ServiceImpl.findAll error = " + errors.toString());
+
 		}
 
-		if (fnAllList.size() > 0) {
-			String fdnm = "";
-			int row = 1;
-			BigDecimal tot = new BigDecimal("0");
+		reportExcel(findList);
+		reportExcel14_1(findList2);
+		reportExcel14_2(findList3);
 
-			for (Map<String, String> tLDVo : fnAllList) {
-//				this.info("tLDVo-------->" + tLDVo.toString());
-				row++;
-				for (int i = 0; i < tLDVo.size(); i++) {
-					
-					fdnm = "F" + String.valueOf(i);
-					switch (i) {
-					case 1:
-					case 2:
-					case 3:
-						// 戶號(數字右靠)
-						if (tLDVo.get(fdnm).equals("")) {
-							makeExcel.setValue(row, i + 4, 0);
-						} else {
-							makeExcel.setValue(row, i + 4, Integer.valueOf(tLDVo.get(fdnm)));
-						}
-						break;
-					case 5:
-						// 金額
-						if (tLDVo.get(fdnm).equals("")) {
-							makeExcel.setValue(row, i + 4, 0, "#,##0");
-						} else {
-							makeExcel.setValue(row, i + 4, Float.valueOf(tLDVo.get(fdnm)), "#,##0");
-							tot = tot.add(new BigDecimal(tLDVo.get(fdnm)));
-						}
-						break;
-					default:
-						// 字串左靠
-						makeExcel.setValue(row, i + 4, tLDVo.get(fdnm));
-						break;
-					}
-				}
-			}
-			makeExcel.setValue(1, 8, row - 1);
-			makeExcel.setValue(1, 9, tot, "#,##0");
-		}
-		
-		makeExcel.setSheet("14-5申報表");
-//		String wDay=String.valueOf(this.txBuffer.getTxCom().getTbsdyf());
-//		String date=wDay.substring(0, 4).replaceFirst("^0", "")+"/"+wDay.substring(4,6).replaceFirst("^0", "")+"/"+wDay.substring(6, 8).replaceFirst("^0", "");
-		String wDay=String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) );
-		String date=wDay.substring(0, 4).replaceFirst("^0", "")+"/"+wDay.substring(4,6).replaceFirst("^0", "")+"/"+wDay.substring(6, 8).replaceFirst("^0", "");
-		makeExcel.setValue(2, 4, date);
-
-
-		
-		
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
-	
-	public void excelUnit() throws IOException {
-//		String path="C:\\SKL\\excel\\LM056-表14-5會計部申報表.xlsx";
-//		FileInputStream stream = new FileInputStream(path);
-//		@SuppressWarnings("resource")
-//		HSSFWorkbook workbook = new HSSFWorkbook(stream);
-//		HSSFSheet sheet= workbook.getSheet("14-5申報表");
-//		HSSFRow row=sheet.createRow(0);
-//		HSSFCell cell=row.createCell(0);
-//		cell.setCellValue("合併列");
-//		CellRangeAddress region=new CellRangeAddress(0, 0, 0, 5);
-//		sheet.addMergedRegion(region);
-//		
-//		cell=row.createCell(6);
-//		cell.setCellValue("合併行");
-//		region=new CellRangeAddress(0, 5, 6, 6);
-//		sheet.addMergedRegion(region);
-//		HSSFSheet sheet = workbook.createSheet("Test");
-//		HSSFRow row=sheet.createRow(2);
-//		HSSFCell cell=row.createCell(4);
-//		HSSFCellStyle style=workbook.createCellSty
-//		cell.setCellStyle(style.getAlignment().RIGHT);
+
+	private void reportExcel(List<Map<String, String>> listData) throws LogicException {
+
+		this.info("LM056report.reportExcel");
+
+		makeExcel.setSheet("YYYMM", yearMon + "");
+
+		BigDecimal tempAmt = BigDecimal.ZERO;
+
+		int row = 1;
+
+		if (listData.size() > 0) {
+
+			for (Map<String, String> lM056Vo : listData) {
+
+				row++;
+
+				// 戶號
+				makeExcel.setValue(row, 1, lM056Vo.get("F0"));
+
+				// 戶名
+				makeExcel.setValue(row, 2, lM056Vo.get("F1"), "L");
+
+				tempAmt = new BigDecimal(lM056Vo.get("F2"));
+
+				// 放款額逾
+				makeExcel.setValue(row, 3, tempAmt, "#,##0");
+
+				// 種類
+				makeExcel.setValue(row, 4, lM056Vo.get("F3"), "C");
+
+				// 利害關係人
+				makeExcel.setValue(row, 5, lM056Vo.get("F4"), "L");
+			}
+
+		} else {
+
+			makeExcel.setValue(2, 1, "本日無資料");
+
+		}
+	}
+
+	private void reportExcel14_1(List<Map<String, String>> listData) throws LogicException {
+
+		this.info("LM056report.reportExcel14_1");
+
+		makeExcel.setSheet("表14-1");
+
+		int row = 5;
+
+		BigDecimal tempAmt = BigDecimal.ZERO;
+
+		if (listData.size() > 0) {
+
+			for (Map<String, String> lM056Vo : listData) {
+
+				row++;
+
+				tempAmt = new BigDecimal(lM056Vo.get("F2"));
+
+				// 放款額逾
+				makeExcel.setValue(row, 19, tempAmt, "#,##0");
+
+				// 繳還情形??
+				makeExcel.setValue(row, 23, "A", "C");
+			}
+
+		}
+	}
+
+	private void reportExcel14_2(List<Map<String, String>> listData) throws LogicException {
+
+		this.info("LM056report.reportExcel14_2");
+
+		makeExcel.setSheet("表14-2");
+
+		int row = 0;
+		int col = 0;
+		BigDecimal tempAmt = BigDecimal.ZERO;
+		BigDecimal tempTotal = BigDecimal.ZERO;
+
+		// 參考 LM057的表14-5
+		for (Map<String, String> lM056Vo : listData) {
+
+			// 金額
+			tempAmt = new BigDecimal(lM056Vo.get("F1"));
+
+			// H37 放款總計
+			// D40 甲類逾期放款金額
+			// D41 乙類逾期放款金額
+			// D44 逾期放款比率%
+			if (lM056Vo.get("F0") == "B") {
+
+				row = 40;
+				col = 4;
+
+			} else if (lM056Vo.get("F0") == "C") {
+
+				row = 41;
+				col = 4;
+
+			} else if (lM056Vo.get("F0") == "TOTAL") {
+				row = 37;
+				col = 8;
+
+				tempTotal = new BigDecimal(lM056Vo.get("F1"));
+
+			} else if (lM056Vo.get("F0") == "NTOTAL") {
+				row = 44;
+				col = 4;
+
+				tempAmt = tempAmt.divide(tempTotal).setScale(4);
+
+			}
+
+			if (lM056Vo.get("F0") == "NTOTAL") {
+				makeExcel.setValue(row, col, tempAmt, "R");
+			}
+
+			makeExcel.setValue(row, col, tempAmt, "#,##0", "R");
+
+		}
+		// 重整
+		// D42 甲類逾期放款比率%
+		makeExcel.formulaCaculate(42, 4);
+		// D43 乙類逾期放款比率%
+		makeExcel.formulaCaculate(43, 4);
+
 	}
 
 }

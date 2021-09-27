@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -27,7 +25,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L420A extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L420A.class);
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -55,7 +52,7 @@ public class L420A extends TradeBuffer {
 		checkHead(tBatxHead, titaVo);
 
 		// 啟動背景作業－整批檢核
-		MySpring.newTask("BS400", this.txBuffer, titaVo);
+		MySpring.newTask("L420ABatch", this.txBuffer, titaVo);
 
 		// end
 		this.addList(this.totaVo);

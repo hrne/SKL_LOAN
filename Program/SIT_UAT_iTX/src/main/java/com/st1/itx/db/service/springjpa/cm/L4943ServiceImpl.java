@@ -70,6 +70,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode").trim());
 		int custNo = parse.stringToInteger(titaVo.getParam("CustNo").trim());
 		String repayBank = titaVo.getParam("BankCode");
+		int opItem = parse.stringToInteger(titaVo.getParam("OpItem"));
 		int repayType = parse.stringToInteger(titaVo.getParam("RepayType").trim());
 		int entryDateFm = parse.stringToInteger(titaVo.getParam("EntryDateFm").trim()) + 19110000;
 		int entryDateTo = parse.stringToInteger(titaVo.getParam("EntryDateTo").trim()) + 19110000;
@@ -80,6 +81,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("functionCode = " + functionCode);
 		this.info("custNo = " + custNo);
 		this.info("repayBank = " + repayBank);
+		this.info("opItem = " + opItem);
 		this.info("repayType = " + repayType);
 		this.info("entryDateFm = " + entryDateFm);
 		this.info("entryDateTo = " + entryDateTo);
@@ -128,37 +130,59 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += " where BDD.\"EntryDate\" >= " + entryDateFm;
 		sql += "   and BDD.\"EntryDate\" <= " + entryDateTo;
+		switch (repayBank) {
+		case "": // none
+			break;
+		case "999": // all
+			break;
+		case "998": // ach
+			sql += "   and BDD.\"RepayBank\" <> 700 ";
+			break;
+		default:
+			sql += "   and BDD.\"RepayBank\" = " + repayBank;
+			break;
+		}
 
+		switch (opItem) {
+		case 1: // ach
+			sql += "   and BDD.\"RepayBank\" <> 700 ";
+			break;
+		case 2: // post
+			sql += "   and BDD.\"RepayBank\" = 700 ";
+			break;
+		default:
+			break;
+		}
+		switch (repayType) {
+		case 0:
+			break;
+		case 99:
+			break;
+		default:
+			sql += "   and BDD.\"RepayType\" = " + repayType;
+			break;
+		}
 		switch (functionCode) {
-		case 1:
-//		---------戶號---------------
+		case 1: // 戶號
 			sql += "   and BDD.\"CustNo\" = " + custNo;
 			break;
-//		---------上限金額-----------
-		case 2:
+		case 2: // 上限金額
 			sql += "   and (postLimit.\"RepayAmt\" >= " + postLimitAmt;
 			sql += "        or BDD.\"RepayAmt\" >= " + singleLimitAmt + " )      ";
 			break;
-//		---------下限金額-----------
-		case 3:
+		case 3: // 下限金額-
 			sql += "   and BDD.\"RepayAmt\" <= " + lowLimitAmt;
 			break;
-//		---------檢核不正常---------
-		case 4:
-//			sql += "   and BDD.\"AmlRsp\" != 0                                ";
+		case 4: // 檢核不正常
 			sql += "   and BDD.\"JsonFields\" is not null                     ";
-			if (!"999".equals(repayBank)) {
-				sql += "   and BDD.\"RepayBank\" = " + repayBank;
-			}
 			break;
-//		---------整批--------------
-		case 9:
-			if (!"999".equals(repayBank)) {
-				sql += "   and BDD.\"RepayBank\" = " + repayBank;
-			}
-			if (repayType != 99) {
-				sql += "   and BDD.\"RepayType\" = " + repayType;
-			}
+		case 5: // 扣款金額為0
+			sql += "   and BDD.\"JsonFields\" is not null                     ";
+			break;
+		case 6: // 媒體檔總金額
+			sql += "   and BDD.\"MediaCode\" = 'Y' ";
+			break;
+		case 9: // 整批
 			break;
 		}
 

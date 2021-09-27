@@ -226,6 +226,9 @@ public class LM003Report extends MakeReport {
 						+ finalTLDVo.get(Columns.repayTotal.getKeyword()));
 			}
 
+			lm003Report.info("lm003 Report doing printRepayRatios");
+			lm003Report.info("divisor: " + divisor.toString());
+
 			for (int i = 0; i < Columns.values().length; i++) {
 				// 只有設定為hasRatioOutput的欄位需要輸出
 				if (Columns.values()[i].hasRatioOutput) {
@@ -239,8 +242,11 @@ public class LM003Report extends MakeReport {
 								+ finalTLDVo.get(Columns.values()[i].getKeyword()));
 					}
 
+					lm003Report.info(Columns.values()[i].toString());
+					lm003Report.info("dividend: " + dividend.toString());
+
 					if (dividend.compareTo(BigDecimal.ZERO) > 0 && divisor.compareTo(BigDecimal.ZERO) > 0) {
-						lm003Report.print(0, Columns.values()[i].outputXPosC, formatAmt(getBillionAmt(dividend.divide(divisor, 2, roundingModeLM003)), 2) + "%", "C");
+						lm003Report.print(0, Columns.values()[i].outputXPosC, dividend.divide(divisor, 5, roundingModeLM003).multiply(new BigDecimal(100)).setScale(2, roundingModeLM003) + "%", "C");
 					} else
 					{
 						lm003Report.print(0, Columns.values()[i].outputXPosC, "---", "C");
@@ -423,6 +429,13 @@ public class LM003Report extends MakeReport {
 		// 有資料時會是最後一個tLDVo
 		if (lastTLDVo != null) {
 			this.info("LM003Report do printRepayRatios()");
+			StringBuilder sb = new StringBuilder("lastTLDVo content: ");
+			
+			for (int i = 0; i < Columns.values().length; i++)
+			{
+				sb.append("F"+i+" :" + lastTLDVo.get(Columns.values()[i].getKeyword()));
+			}
+
 			columnOutput.printRepayRatios(lastTLDVo);
 		}
 

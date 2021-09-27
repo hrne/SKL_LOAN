@@ -20,15 +20,14 @@ import com.st1.itx.util.MySpring;
  * @version 1.0.0
  */
 public class L4321 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4321.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4321 ");
 		this.totaVo.init(titaVo);
-		
-		// 執行交易 
-		MySpring.newTask("BS431", this.txBuffer, titaVo);
+
+		// 執行交易
+		MySpring.newTask("L4321Batch", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

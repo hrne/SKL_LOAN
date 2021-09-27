@@ -178,6 +178,19 @@ public interface BankDeductDtlService {
   public BankDeductDtl findL4451First(int entryDate_0, int entryDate_1, String mediaKind_2, TitaVo... titaVo);
 
   /**
+   * RepayBank &lt;&gt; , AND EntryDate &gt;= ,AND EntryDate &lt;= 
+   *
+   * @param repayBank_0 repayBank_0
+   * @param entryDate_1 entryDate_1
+   * @param entryDate_2 entryDate_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BankDeductDtl BankDeductDtl of List
+   */
+  public Slice<BankDeductDtl> repayBankNotEq(String repayBank_0, int entryDate_1, int entryDate_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By BankDeductDtl
    * 
    * @param bankDeductDtlId key

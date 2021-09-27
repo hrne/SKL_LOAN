@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,7 +21,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class BS430ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(BS430ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -150,8 +147,7 @@ public class BS430ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and case " + iTxKind;
 //  1.定期機動調整 ==>  1.撥款主檔的利率區分=3.定期機動，下次利率調整日為調整月份
 //	                    2.借戶利率檔的的利率區分=3.定期機動，指標利率種類=該指標利率種類抓，生效日期 <= 調整月份 
-		sql += "      when 1  then case when b.\"RateCode\" = '3' " + "    and  b.\"NextAdjRateDate\" >= "
-				+ iEffectDateS;
+		sql += "      when 1  then case when b.\"RateCode\" = '3' " + "    and  b.\"NextAdjRateDate\" >= " + iEffectDateS;
 		sql += "       and  b.\"NextAdjRateDate\" <= " + iEffectDateE;
 		sql += "                         and r.\"BaseRateCode\" = " + iBaseRateCode;
 		sql += "                         and r.\"RateCode\" = '3'                  ";
@@ -168,8 +164,7 @@ public class BS430ServiceImpl extends ASpringJpaParm implements InitializingBean
 // 3.機動利率調整 ==> 1.撥款主檔的利率區分=1.機動
 //                    2.借戶利率檔的利率區分=1.機動,指標利率種類=99，生效日期 = 調整月份，商品<>員工利率
 		sql += "      when 3  then case when b.\"RateCode\" = '1' and  p.\"EmpFlag\" <> 'Y' ";
-		sql += "                         and r.\"RateCode\" = '1' and r.\"BaseRateCode\" = 99 and  r.\"EffectDate\" >= "
-				+ iEffectDateS;
+		sql += "                         and r.\"RateCode\" = '1' and r.\"BaseRateCode\" = 99 and  r.\"EffectDate\" >= " + iEffectDateS;
 		sql += "	 	                 and r.\"EffectDate\" <= " + iEffectDateE;
 		sql += "                        then 1                                     ";
 		sql += "                        else 0                                     ";
@@ -190,13 +185,13 @@ public class BS430ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!"".equals(prodNoString)) {
 			sql += "   and p.\"ProdNo\" in ( " + prodNoString + " ) ";
 		}
-		
-		logger.info("sql=" + sql);
+
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	private String getProdNoString(TitaVo titaVo) throws LogicException {
@@ -211,12 +206,12 @@ public class BS430ServiceImpl extends ASpringJpaParm implements InitializingBean
 					result = "'" + titaVo.getParam(titaName) + "'";
 				}
 			} else {
-				logger.info("i ..." + i + " null...");
+				this.info("i ..." + i + " null...");
 				break;
 			}
 		}
 
-		logger.info("result ..." + result);
+		this.info("result ..." + result);
 
 		return result;
 	}

@@ -261,6 +261,8 @@ C(3,#FunctionCode,3,$,s)
 ! #CHAINXMT=X,1,S
 ! C(3,#SRHCD,1,$,E(0,@CHAIN,0)XMT())
 
+#CHECKFunction=A,1,S
+C(3,#FUNCIND,6,E(0,@RPTFG,1),E(0,@RPTFG,0))
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -453,6 +455,11 @@ TXFORM=L4943
 #OOProcNote=檢核結果
 {width:150}
 ^
+
+#RPTFG=1,QUERY.GRID,L4943
+#any={detail:false, header:'L4943.part', caption:'', rowNum:20, rowList:[20,40,60]}
+^
+
 <include src="PRT.icf::INQ04.sel" map="i=L4943;cpi=15"/>
 #CustNo
 #EntryDateFm

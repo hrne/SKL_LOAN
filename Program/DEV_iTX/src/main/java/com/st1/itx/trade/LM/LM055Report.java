@@ -3,7 +3,9 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -26,116 +28,152 @@ import com.st1.itx.util.common.MakeReport;
  * @version 1.0.0
  */
 public class LM055Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM055Report.class);
 
 	@Autowired
-	LM055ServiceImpl LM055ServiceImpl;
+	LM055ServiceImpl lM055ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
-
-	@Override
-	public void printTitle() {
-
-	}
 
 	String fdnm = "";
 	int row = 1;
 	BigDecimal tot = new BigDecimal("0");
 
+	/*
+	 * 用LM051的表 去分別做擔保品類別與： 1.逾期數的餘額表 2.資產五分類的餘額表
+	 * 
+	 * 放款種類： A.銀行保證放款 B.動產擔保放款 C.不動產抵押放款 D.有價證券質押放款 E.壽險貸款 F墊繳保費 Z.其他。
+	 */
+
 	public void exec(TitaVo titaVo) throws LogicException {
+		this.info("LM055Report exec");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
-		this.info("LM055Report exec");
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表)", "LM055-A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表_工作表.xlsx", "LNM34AP");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthDate = Calendar.getInstance();
+		// 設當年月底日 0是月底
+		calMonthDate.set(iYear, iMonth, 0);
+
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM055", "A042放款餘額彙總表_工作表", "LM055-A042放款餘額彙總表",
+				"LM055_底稿_A042放款餘額彙總表.xlsx", "A042放款餘額彙總表");
+
+		makeExcel.setValue(2, 3, iYear * 100 + iMonth);
+
 		try {
-			fnAllList = LM055ServiceImpl.findAll(titaVo);
+
+			fnAllList = lM055ServiceImpl.findAll(titaVo);
+
 		} catch (Exception e) {
+
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM055ServiceImpl.findAll error = " + errors.toString());
-		}
 
-		if (fnAllList.size() > 0) {
-			tot = new BigDecimal("0");
-			row = 1;
-			for (Map<String, String> tLDVo : fnAllList) {
-				exportExcel(tLDVo);
-			}
-			makeExcel.setValue(1, 14, tot, "#,##0");
-		}else {
-			makeExcel.setValue(2, 1, "本日無資料");
 		}
-		
-		int yearMonth = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100;
-		makeExcel.setSheet("A042放款餘額彙總表)");
-		makeExcel.setValue(2, 3, yearMonth);
+		exportExcel(fnAllList);
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 
 	}
 
-	private void exportExcel(Map<String, String> tLDVo) throws LogicException {
-		row++;
-		makeExcel.setValue(row, 1, tLDVo.get("F0") + tLDVo.get("F2"));
+	private void exportExcel(List<Map<String, String>> listData) throws LogicException {
 
-		for (int i = 0; i < tLDVo.size(); i++) {
-			fdnm = "F" + String.valueOf(i);
-			switch (i) {
-			case 1:
-			case 18:
-			case 19:
-			case 20:
-			case 23:
-			case 24:
-			case 25:
-			case 26:
-			case 28:
-			case 29:
-				// 字串左靠
-				makeExcel.setValue(row, i + 2, tLDVo.get(fdnm));
-				break;
-			case 11:
-			case 12:
-			case 13:
-			case 14:
-				// 金額
-				if (tLDVo.get(fdnm).equals("")) {
-					makeExcel.setValue(row, i + 2, 0, "#,##0");
-				} else {
-					makeExcel.setValue(row, i + 2, Float.valueOf(tLDVo.get(fdnm)), "#,##0");
-					if (i == 12) {
-						tot = tot.add(tLDVo.get(fdnm) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)));
-					}
-				}
-				break;
-			case 15:
-			case 21:
-				// 利率
-				if (tLDVo.get(fdnm).equals("")) {
-					makeExcel.setValue(row, i + 2, 0);
-				} else if(tLDVo.get(fdnm).equals(" ")) {
-					makeExcel.setValue(row, i + 2, 0);
-				} else {
-					makeExcel.setValue(row, i + 2, tLDVo.get(fdnm) == null ? "" : Float.valueOf(tLDVo.get(fdnm)));
-				}
-				break;
-			default:
-				// 戶號(數字右靠)
-				if (tLDVo.get(fdnm).equals("")) {
-					makeExcel.setValue(row, i + 2, 0);
-				} else if(tLDVo.get(fdnm).equals(" ")) {
-					makeExcel.setValue(row, i + 2, " ");
-				} else {
-					makeExcel.setValue(row, i + 2, tLDVo.get(fdnm));
-				}
-				
-				break;
+		int col = 0;
+		int colAllow = 0;
+		int row = 0;
+
+		int normalAmount = 0;
+		int specificAmount = 0;
+
+		BigDecimal amount = BigDecimal.ZERO;
+		BigDecimal allowAmount = BigDecimal.ZERO;
+
+		for (Map<String, String> lM054Vo : listData) {
+
+			/*
+			 * COL 1=逾期放款(F) 
+			 * 2=未列入逾期應予評估放款(G) 
+			 * 3=正常放款I(H) 
+			 * 4=應予注意II(I) 
+			 * 5=可望收回III(J)
+			 * 6=收回困難IV(K) 
+			 * 7=收回無望V(L)
+			 * 
+			 * 99=購置住宅+修繕貸款
+			 * 
+			 */
+
+			// 起始欄E欄位 + (1~7)
+			// (自訂 FIVE=五類資產、9=備呆子目)
+			if (lM054Vo.get("F0") == "FIVE" || lM054Vo.get("F0") == "9") {
+				col = 19;
+			} else if (lM054Vo.get("F0") != "99") {
+				col = 5 + Integer.valueOf(lM054Vo.get("F0"));
+				colAllow = 12 + Integer.valueOf(lM054Vo.get("F0"));
 			}
+
+			// 依放款種類 區分列數
+			// (自訂 FIVE=五類資產、AL=備呆子目)
+			row = lM054Vo.get("F1") == "C" ? 10
+					: (lM054Vo.get("F1") == "D" ? 11
+							: (lM054Vo.get("F1") == "FIVE" || lM054Vo.get("F1") == "AL" ? 16 : 12));
+
+			// 放款金額
+			if (lM054Vo.get("F0") != "99") {
+
+				amount = lM054Vo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(lM054Vo.get("F2"));
+				
+				makeExcel.setValue(row, col, amount, "#,##0");
+			}
+
+			// 備抵損失
+			if (lM054Vo.get("F0") == "3") {
+
+				normalAmount = Integer.valueOf(lM054Vo.get("F3"));
+
+			} else if (lM054Vo.get("F0") == "99") {
+
+				specificAmount = Integer.valueOf(lM054Vo.get("F3"));
+
+				allowAmount = new BigDecimal(normalAmount + specificAmount);
+
+				makeExcel.setValue(row, 13, allowAmount, "#,##0");
+
+			} else {
+
+				allowAmount = new BigDecimal(lM054Vo.get("F3"));
+
+				makeExcel.setValue(row, colAllow, allowAmount, "#,##0");
+
+			}
+
 		}
+
+		// F15~S15
+		for (int i = 6; i <= 19; i++) {
+			makeExcel.formulaCaculate(15, i);
+		}
+		// R16、R17
+		makeExcel.formulaCaculate(18, 16);
+		makeExcel.formulaCaculate(18, 17);
+
 	}
 
 }

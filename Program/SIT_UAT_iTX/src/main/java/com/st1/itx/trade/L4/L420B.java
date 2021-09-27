@@ -48,7 +48,7 @@ public class L420B extends TradeBuffer {
 		checkHead(functionCode, iAcDate, iBatchNo, titaVo);
 
 		// 啟動背景作業－整批入帳
-		MySpring.newTask("BS401", this.txBuffer, titaVo);
+		MySpring.newTask("L420BBatch", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

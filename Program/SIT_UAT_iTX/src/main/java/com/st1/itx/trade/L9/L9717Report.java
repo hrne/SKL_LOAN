@@ -167,7 +167,7 @@ public class L9717Report extends MakeReport {
 			 * -------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
 			this.print(-6, 1, 
-                          "          經辦　　　 　　戶號　　　戶名　　期別　　　　　　　　金額");
+                          "          經辦　　　 　　戶號　　  　戶名　期別　　　　　　　　金額");
 			this.print(-7, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -288,13 +288,13 @@ public class L9717Report extends MakeReport {
 					
 				case LargeAmt_Customer:
 					// F0 員編 2 L
-					// F1 員工姓名 16 R
-					// F2 戶號 28 C
+					// F1 員工姓名 15 R
+					// F2 戶號 27 C
 					// F3 戶名 42 R
-					// F4 期別 49 R
-					// F5 餘額 69 R
+					// F4 期別 47 R
+					// F5 餘額 68 R
 
-					outputPosArray = new int[] { 2, 16, 28, 42, 49, 69 };
+					outputPosArray = new int[] { 2, 15, 27, 42, 47, 68 };
 					outputSortArray = new String[] { "L", "R", "C", "R", "R", "R" };
 					isAmountArray = new Boolean[] { false, false, false, false, false, true };
 					
@@ -342,11 +342,17 @@ public class L9717Report extends MakeReport {
 				this.info("L9717Report: " + currentSort);
 
 				for (int i = 0; i < outputPosArray.length; i++) {
-					this.info(currentSort + " ["+i+"]: " + tLDVo.get("F"+i));
-					this.print(0, outputPosArray[i], isAmountArray[i] == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i), outputSortArray[i]);
+					this.info(currentSort + " [" + i + "]: " + tLDVo.get("F" + i));
+					this.print(0, outputPosArray[i],
+							isAmountArray[i] == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i),
+							outputSortArray[i]);
 				}
 				
-				this.print(1, 1, newBorder);
+				// 根據樣張，大額客戶別不做每筆資料換行畫線
+				if (currentSort != OutputSortBy.LargeAmt_Customer)
+				{
+					this.print(1, 1, newBorder);
+				}
 
 			}
 			
@@ -372,8 +378,8 @@ public class L9717Report extends MakeReport {
 					amtX = 165;
 					break;
 				case LargeAmt_Customer:
-					countX = 48;
-					amtX = 70;
+					countX = 47;
+					amtX = 68;
 					break;
 				default:
 					break;
@@ -383,6 +389,7 @@ public class L9717Report extends MakeReport {
 			this.print(0, amtX, formatAmt(totalAmt, 0), "R");
 			this.print(1, 1, newBorder);
 			
+			// 經辦別最後加這個
 			if (currentSort == OutputSortBy.Agent)
 			{
 				this.print(1, 1, "『因組織變動因素，經辦人員餘期案件統計基準：94年元月前以授信人員為統計對象，94年元月起則更改為放款專員。』");

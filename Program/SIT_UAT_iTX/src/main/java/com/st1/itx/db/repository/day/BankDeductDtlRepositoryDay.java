@@ -35,7 +35,7 @@ public interface BankDeductDtlRepositoryDay extends JpaRepository<BankDeductDtl,
   public Slice<BankDeductDtl> findAllByMediaDateIsAndMediaKindIsAndMediaSeqIsOrderByMediaKindAscMediaSeqAsc(int mediaDate_0, String mediaKind_1, int mediaSeq_2, Pageable pageable);
 
   // RepayBank = , AND EntryDate >= ,AND EntryDate <= 
-  public Slice<BankDeductDtl> findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqual(String repayBank_0, int entryDate_1, int entryDate_2, Pageable pageable);
+  public Slice<BankDeductDtl> findAllByRepayBankIsAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(String repayBank_0, int entryDate_1, int entryDate_2, Pageable pageable);
 
   // EntryDate >= ,AND EntryDate <= ,AND RepayType =
   public Slice<BankDeductDtl> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRepayTypeIs(int entryDate_0, int entryDate_1, int repayType_2, Pageable pageable);
@@ -54,6 +54,9 @@ public interface BankDeductDtlRepositoryDay extends JpaRepository<BankDeductDtl,
 
   // EntryDate >= ,AND EntryDate <= , AND MediaKind = 
   public Optional<BankDeductDtl> findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByMediaSeqDesc(int entryDate_0, int entryDate_1, String mediaKind_2);
+
+  // RepayBank <> , AND EntryDate >= ,AND EntryDate <= 
+  public Slice<BankDeductDtl> findAllByRepayBankNotAndEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByCustNoAscFacmNoAscPayIntDateAscRepayTypeDesc(String repayBank_0, int entryDate_1, int entryDate_2, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

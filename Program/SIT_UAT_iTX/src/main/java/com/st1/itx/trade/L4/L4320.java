@@ -2,8 +2,6 @@ package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,6 @@ import com.st1.itx.util.MySpring;
  * @version 1.0.0
  */
 public class L4320 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4320.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -30,8 +27,8 @@ public class L4320 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 執行交易
-		MySpring.newTask("BS430", this.txBuffer, titaVo);
-		
+		MySpring.newTask("L4320Batch", this.txBuffer, titaVo);
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
