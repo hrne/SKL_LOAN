@@ -62,6 +62,8 @@
 !    L2R49 : 依主要戶號及主要案件編號尋找共用額度主檔
 !    L2R50 : 依戶號及案件編號額度主檔
 !    L2R53 : 依戶號尋找扣款帳號help
+!    L2R54 : 依聯貸案編號尋找申請案件檔(已准)
+!    L2R55 : 依聯貸案編號尋找額度主檔
 !    L1R01 : 尋找客戶檔資料
 !    L1R02 : 尋找客戶關聯戶資料
 !    L1R03 : 尋找客戶額度檔資料
@@ -2657,6 +2659,7 @@ TXFORM=L2R26
 #L2r27BdUsageCode=A,1,S
 #L2r27ParkingTypeCode=A,1,S
 #L2r27ParkingProperty=X,1,S
+#L2r27ParkingArea=m,9.2,S
 #L2r27HouseTaxNo=X,12,S
 #L2r27HouseBuyDate=D,7,S
 ##loop{times:10,i:1}
@@ -2737,6 +2740,7 @@ TXFORM=L2R27
 #L2r27BdUsageCode
 #L2r27ParkingTypeCode
 #L2r27ParkingProperty
+#L2r27ParkingArea
 #L2r27HouseTaxNo
 #L2r27HouseBuyDate
 ##loop{times:10,i:1}
@@ -3482,6 +3486,56 @@ TXFORM=L2R53
 </L2R53.tom>
 
 
+<L2R54.dec>
+##loop{times:50,i:1}
+#L2r54ApplNo{i}=A,7,S
+#L2r54CreditSysNo{i}=A,7,S
+#L2r54CustId{i}=X,10,S
+#L2r54CustName{i}=x,200,S
+#L2r54CustNo{i}=A,7,S
+##end
+</L2R54.dec>
+
+<L2R54.tom>
+TXFORM=L2R54
+##loop{times:50,i:1}
+#L2r54ApplNo{i}
+#L2r54CreditSysNo{i}
+#L2r54CustId{i}
+#L2r54CustName{i}
+#L2r54CustNo{i}
+##end
+^
+</L2R54.tom>
+
+
+
+<L2R55.dec>
+##loop{times:50,i:1}
+#L2r55CustNo{i}=A,7,S
+#L2r55FacmNo{i}=A,3,S
+#L2r55BaseRate{i}=+n,2.4,S
+#L2r55RateIncr{i}=+n,2.4,S
+#L2r55Deadline{i}=D,7,S
+#L2r55MaturityDate{i}=D,7,S
+#L2r55GuaFg{i}=X,1,S
+##end
+</L2R55.dec>
+
+<L2R55.tom>
+TXFORM=L2R55
+##loop{times:50,i:1}
+#L2r55CustNo{i}
+#L2r55FacmNo{i}
+#L2r55BaseRate{i}
+#L2r55RateIncr{i}
+#L2r55Deadline{i}
+#L2r55MaturityDate{i}
+#L2r55GuaFg{i}
+##end
+^
+</L2R55.tom>
+
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -3494,7 +3548,7 @@ TXFORM=L2R53
 #RimEntryDate=D,7,S
 #RimCloseBreachAmt=m,14.2,S
 #RimSpecificDate=D,7,S
-#RimSyndNo=A,5,S
+#RimSyndNo=A,6,S
 #RimCaseCloseCode=A,1,S
 #RimFixAdjDd=9,2,S
 #RimRateAdjFreq=9,2,S
@@ -3876,54 +3930,40 @@ TXFORM=L3R09
 
 !查詢下次利率調整日期的放款利率變動檔
 <L3R10.dec>
-#L3r10CustNo=A,7,S
-#L3r10SyndNo=A,5,S
-#L3r10CustId=X,10,S
-#L3r10GuaId=X,10,S
+#L3r10SyndNo=A,6,S
 #L3r10LeadingBank=X,7,S
-#L3r10SigningDate=D,7,S
-#L3r10DrawdownStartDate=D,7,S
-#L3r10DrawdownEndDate=D,7,S
+#L3r10AgentBank=X,7,S
+#L3r10SigningDate=X,7,S
 #L3r10SyndTypeCodeFlag=X,1,S
 #L3r10PartRate=n,2.4,S
 #L3r10CurrencyCode=X,3,S
 #L3r10SyndAmt=m,14.2,S
 #L3r10PartAmt=m,14.2,S
-#L3r10AgentBank=X,7,S
-#L3r10CreditPeriod=A,3,S
-#L3r10CentralBankPercent=9,3,S
 ##loop{times:5,n:1}
 #L3r10Item{n}=x,10,S
-#L3r10Rate{n}=n,2.4,S
-#L3r10Incr{n}=n,2.4,S
-#L3r10UseDate{n}=D,7,S
-#L3r10MaturityDate{n}=D,7,S
+#L3r10SyndAmt{n}=m,14.2,S
+#L3r10SyndMark{n}=x,20,S
+#L3r10SyndBal{n}=m,14.2,S
 ##end
 </L3R10.dec>
 
+
 <L3R10.tom>
 TXFORM=L3R10
-#L3r10CustNo
 #L3r10SyndNo
-#L3r10CustId
-#L3r10GuaId
 #L3r10LeadingBank
+#L3r10AgentBank
 #L3r10SigningDate
-#L3r10DrawdownStartDate
-#L3r10DrawdownEndDate
+#L3r10SyndTypeCodeFlag
 #L3r10PartRate
 #L3r10CurrencyCode
 #L3r10SyndAmt
 #L3r10PartAmt
-#L3r10AgentBank
-#L3r10CreditPeriod
-#L3r10CentralBankPercent
 ##loop{times:5,n:1}
 #L3r10Item{n}
-#L3r10Rate{n}
-#L3r10Incr{n}
-#L3r10UseDate{n}
-#L3r10MaturityDate{n}
+#L3r10SyndAmt{n}
+#L3r10SyndMark{n}
+#L3r10SyndBal{n}
 ##end
 ^
 </L3R10.tom>
@@ -7633,6 +7673,46 @@ TXFORM=L6R01
 #L6R02Group8=x,20,S
 #L6R02Group9=x,20,S
 #L6R02Group10=x,20,S
+#L6R02Group11=x,20,S
+#L6R02Group12=x,20,S
+#L6R02Group13=x,20,S
+#L6R02Group14=x,20,S
+#L6R02Group15=x,20,S
+#L6R02Group16=x,20,S
+#L6R02Group17=x,20,S
+#L6R02Group18=x,20,S
+#L6R02Group19=x,20,S
+#L6R02Group20=x,20,S
+#L6R02Group21=x,20,S
+#L6R02Group22=x,20,S
+#L6R02Group23=x,20,S
+#L6R02Group24=x,20,S
+#L6R02Group25=x,20,S
+#L6R02Group26=x,20,S
+#L6R02Group27=x,20,S
+#L6R02Group28=x,20,S
+#L6R02Group29=x,20,S
+#L6R02Group30=x,20,S
+#L6R02Group31=x,20,S
+#L6R02Group32=x,20,S
+#L6R02Group33=x,20,S
+#L6R02Group34=x,20,S
+#L6R02Group35=x,20,S
+#L6R02Group36=x,20,S
+#L6R02Group37=x,20,S
+#L6R02Group38=x,20,S
+#L6R02Group39=x,20,S
+#L6R02Group40=x,20,S
+#L6R02Group41=x,20,S
+#L6R02Group42=x,20,S
+#L6R02Group43=x,20,S
+#L6R02Group44=x,20,S
+#L6R02Group45=x,20,S
+#L6R02Group46=x,20,S
+#L6R02Group47=x,20,S
+#L6R02Group48=x,20,S
+#L6R02Group49=x,20,S
+#L6R02Group50=x,20,S
 </L6R02.dec>
 
 <L6R02.tom>
@@ -8673,3 +8753,18 @@ TXFORM=L6R43
 ##end
 ^
 </L6R43.tom>
+
+! 查詢課組別檔 ; 組課組別清單
+<L6R44Rim.dec>
+#L6R44BranchNo=X,4,S
+</L6R44Rim.dec>
+
+<L6R44.dec>
+#L6r44GroupHelpList=x,50000,S
+</L6R44.dec>
+
+<L6R44.tom>
+TXFORM=L6R44
+#L6r44GroupHelpList
+^
+</L6R44.tom>

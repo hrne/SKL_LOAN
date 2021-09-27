@@ -26,7 +26,12 @@ import com.st1.itx.Exception.LogicException;
 public class BankDeductDtl implements Serializable {
 
 
-  @EmbeddedId
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6483310037938509246L;
+
+@EmbeddedId
   private BankDeductDtlId bankDeductDtlId;
 
   // 入帳日期

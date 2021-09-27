@@ -553,6 +553,15 @@ public class BankAuthActCom extends TradeBuffer {
 		if (slBankAuthAct != null) {
 			for (BankAuthAct t : slBankAuthAct.getContent()) {
 				if (iRepayBank.equals(t.getRepayBank())) {
+					// 有有效額度使用則不允許暫停
+					if ("1".equals(iStatus)) {
+						FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
+						if (tFacMain != null && tFacMain.getRepayCode() == 2
+								&& tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
+							throw new LogicException(titaVo, "E0015", "額度(" + t.getFacmNo() + ")使用中，不允許暫停"); // 檢查錯誤
+						}
+					}
+					// 更新授權帳號檔
 					BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
 					tBankAuthAct.setStatus(iStatus);
 					try {
@@ -612,6 +621,15 @@ public class BankAuthActCom extends TradeBuffer {
 		if (slBankAuthAct != null) {
 			for (BankAuthAct t : slBankAuthAct.getContent()) {
 				if (iRepayBank.equals(t.getRepayBank())) {
+					// 有有效額度使用則不允許暫停
+					if ("1".equals(iStatus)) {
+						FacMain tFacMain = facMainService.findById(new FacMainId(t.getCustNo(), t.getFacmNo()), titaVo);
+						if (tFacMain != null && tFacMain.getRepayCode() == 2
+								&& tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
+							throw new LogicException(titaVo, "E0015", "額度(" + t.getFacmNo() + ")使用中，不允許暫停"); // 檢查錯誤
+						}
+					}
+					// 更新授權帳號檔
 					BankAuthAct tBankAuthAct = bankAuthActService.holdById(t, titaVo);
 					tBankAuthAct.setStatus(iStatus);
 					try {

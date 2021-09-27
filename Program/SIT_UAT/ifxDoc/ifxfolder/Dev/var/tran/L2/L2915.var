@@ -62,17 +62,18 @@ E(0,40)ASGN(INQPRT$)
 ["#FdContractPrice+買賣契約價格",#ContractPrice],
 ["#FdContractDate+買賣契約日期",#ContractDate],
 ["#FdBdUsageCode+建物使用別",#BdUsageCode,#BdUsageCodeX],
-["#grid#,{id:0,expand:true,loop:5,row_height:1,s_cols:[200,100,100,200], p_cols:[20,20,20]}","","","",
-["停車位型式","停車位數量","停車位面積"],
-[[#ParkingTypeCodeXA1],#ParkingQtyA1,#ParkingAreaA1]
-],
+["#FdParkingTypeCode+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
+["#FdPARKING_AREA+停車位面積",#ParkingArea],
 ["#FdHouseTaxNo+房屋稅籍號碼",#HouseTaxNo],
 ["#FdHouseBuyDate+房屋取得日期",#HouseBuyDate],
 ["#FdClStatus+押品狀況碼",#ClStatus,#ClStatusX],
 ["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","@@@@@@公設建號","公共設施登記面積",#OOPUBBUILDAREA,"坪",
 ["建號","登記面積(坪)","所有權人統編","所有權人姓名"],
 [[[#PublicBdNoA1],["-"],[#PublicBdNoB1]],[#PublicArea1],[#PublicOwnerId1],[#PublicOwnerName1]]],
-
+["#grid#,{id:0,expand:true,loop:5,row_height:1,s_cols:[200,100,100,200], p_cols:[20,20,20]}","#FdPP+停車位型式","","",
+["停車位型式","停車位數量","停車位面積"],
+[[#ParkingTypeCodeXA1],#ParkingQtyA1,#ParkingAreaA1]
+],
 ["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[100,90,210,140,190,140,140,140], p_cols:[20,20,30,40,20,30,30,30]}","#FdPP+車位資料","","",
 ["車位編號","車位數","停車位類別","權利範圍","登記面積(坪)","建號","地號","價格(元)"],
 [#ParkingNo1,#ParkingQty1,[#ParkingTypeCode1,#ParkingTypeCodeX1],[#ParkingOwnerPart1,"/",#ParkingOwnerTotal1],#ParkingArea1,[#ParkingBdNoA1,"-",#ParkingBdNoB1],[#ParkingLandNoA1,"-",#ParkingLandNoB1],#ParkingAmount1]
@@ -500,21 +501,13 @@ T(3,)T(H,#BdSubUsageCode,#BdSubUsageCodeHelp)
 #BdUsageCodeX=X,15,L
 T(3,)T(H,#BdUsageCode,#BdUsageCodeHelp)
 
+! [停車位型式]
+#ParkingTypeCode=A,1,L
 
-##loop{times:5,i:1}
+#ParkingTypeCodeX=X,13,L
+T(3,)T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
 
-#ParkingTypeCodeA{i}=A,1,L
-!E(0,{i})
-
-#ParkingTypeCodeXA{i}=X,13,L
-T(H,#ParkingTypeCodeA{i},#ParkingTypeCodeHelp)
-
-#ParkingQtyA{i}=m,5,L
-
-#ParkingAreaA{i}=m,8.2,L
-
-##end
-
+#ParkingArea=m,9.2,L
 
 ! [獨立產權車位註記]
 #ParkingProperty=X,1,L
@@ -594,6 +587,22 @@ T(3,X)
 
 #ParkingNo0=x,20,S
 T(3,A)
+
+
+
+##loop{times:5,i:1}
+
+#ParkingTypeCodeA{i}=A,1,L
+!E(0,{i})
+
+#ParkingTypeCodeXA{i}=X,13,L
+T(H,#ParkingTypeCodeA{i},#ParkingTypeCodeHelp)
+
+#ParkingQtyA{i}=m,5,L
+
+#ParkingAreaA{i}=m,8.2,L
+
+##end
 
 ##loop{times:100,i:1,j:0,rowSeq:2}
 #HIDE_PP_ROW_{i}=@,1,S
@@ -797,7 +806,9 @@ TXFORM=L2915
 #ContractPrice
 #ContractDate
 #BdUsageCode
+#ParkingTypeCode
 #ParkingProperty
+#ParkingArea
 #HouseTaxNo
 #HouseBuyDate
 #ClStatus

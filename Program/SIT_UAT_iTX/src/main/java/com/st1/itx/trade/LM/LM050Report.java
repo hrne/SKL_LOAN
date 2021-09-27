@@ -119,6 +119,10 @@ public class LM050Report extends MakeReport {
 		}
 
 		int rowCursor = 4;
+		
+		if (listLM050.size() > 1) {
+			makeExcel.setShiftRow(rowCursor + 1, listLM050.size() - 1);
+		}
 
 		for (Map<String, String> tLM050 : listLM050) {
 			String rptType = tLM050.get("F0");

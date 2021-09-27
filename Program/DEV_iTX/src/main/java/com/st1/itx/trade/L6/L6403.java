@@ -134,7 +134,7 @@ public class L6403 extends TradeBuffer {
 			}
 		}
 		// L2
-		for (int i = 1; i <= 190; i++) {
+		for (int i = 1; i <= 100; i++) {
 			String iTranNo = titaVo.get("ApbCode" + i).trim();
 //			this.info("L6403 > InsertAllAuthority TranNo = " + iTranNo);
 			if (iTranNo.length() == 5) {

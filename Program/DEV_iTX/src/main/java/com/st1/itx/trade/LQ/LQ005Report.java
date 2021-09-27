@@ -19,7 +19,6 @@ import com.st1.itx.util.format.FormatUtil;
 
 @Component
 @Scope("prototype")
-
 public class LQ005Report extends MakeReport {
 
 	@Autowired
@@ -27,6 +26,9 @@ public class LQ005Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
+
+	BigDecimal highestLoanBalTotal = BigDecimal.ZERO;
+	BigDecimal loanBalTotal = BigDecimal.ZERO;
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
@@ -87,50 +89,14 @@ public class LQ005Report extends MakeReport {
 
 		int rowCursor = 8;
 
-		int seq = 1;
-
-		BigDecimal highestLoanBalTotal = BigDecimal.ZERO;
-		BigDecimal loanBalTotal = BigDecimal.ZERO;
+		highestLoanBalTotal = BigDecimal.ZERO;
+		loanBalTotal = BigDecimal.ZERO;
 
 		if (listLQ005 != null && listLQ005.size() > 0) {
-
-			if (listLQ005.size() > 1) {
-				// 將表格往下移，移出空間
-				makeExcel.setShiftRow(rowCursor + 1, listLQ005.size() - 1);
-			}
-
-			for (Map<String, String> tLQ005 : listLQ005) {
-
-				String outputSeq = FormatUtil.pad9("" + seq, 4);
-				makeExcel.setValue(rowCursor, 1, outputSeq); // 交易序號
-
-				makeExcel.setValue(rowCursor, 2, "02"); // 交易對象別代號
-				makeExcel.setValue(rowCursor, 3, "03458902"); // 交易對象名稱-統編
-				makeExcel.setValue(rowCursor, 4, "新光人壽"); // 交易對象名稱-姓名
-				makeExcel.setValue(rowCursor, 5, "B"); // 交易對象別代號
-
-				String custId = tLQ005.get("F0"); // F0 資金或信用收受者-統編
-				makeExcel.setValue(rowCursor, 6, custId);
-
-				String custName = tLQ005.get("F1"); // F1 資金或信用收受者-姓名
-				makeExcel.setValue(rowCursor, 7, custName);
-
-				makeExcel.setValue(rowCursor, 8, "放款02"); // 交易性質
-
-				BigDecimal highestLoanBal = getBigDecimal(tLQ005.get("F2")); // F2 當季最高餘額
-				makeExcel.setValue(rowCursor, 9, formatMillion(highestLoanBal));
-
-				BigDecimal loanBal = getBigDecimal(tLQ005.get("F3")); // F3 季底交易帳列餘額
-				makeExcel.setValue(rowCursor, 10, formatMillion(loanBal));
-
-				highestLoanBalTotal = highestLoanBalTotal.add(highestLoanBal);
-				loanBalTotal = loanBalTotal.add(loanBal);
-
-				seq++;
-				rowCursor++;
-			}
+			setDetail(rowCursor, listLQ005);
 		} else {
 			makeExcel.setValue(rowCursor, 1, "本日無資料", "L");
+			rowCursor++;
 		}
 
 		// 印合計
@@ -139,6 +105,49 @@ public class LQ005Report extends MakeReport {
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
+	}
+
+	private int setDetail(int rowCursor, List<Map<String, String>> list) throws LogicException {
+
+		if (list.size() > 1) {
+			// 將表格往下移，移出空間
+			makeExcel.setShiftRow(rowCursor + 1, list.size() - 1);
+		}
+
+		int seq = 1;
+
+		for (Map<String, String> tLQ005 : list) {
+
+			String outputSeq = FormatUtil.pad9("" + seq, 4);
+			makeExcel.setValue(rowCursor, 1, outputSeq); // 交易序號
+
+			makeExcel.setValue(rowCursor, 2, "02"); // 交易對象別代號
+			makeExcel.setValue(rowCursor, 3, "03458902"); // 交易對象名稱-統編
+			makeExcel.setValue(rowCursor, 4, "新光人壽"); // 交易對象名稱-姓名
+			makeExcel.setValue(rowCursor, 5, "B"); // 交易對象別代號
+
+			String custId = tLQ005.get("F0"); // F0 資金或信用收受者-統編
+			makeExcel.setValue(rowCursor, 6, custId);
+
+			String custName = tLQ005.get("F1"); // F1 資金或信用收受者-姓名
+			makeExcel.setValue(rowCursor, 7, custName);
+
+			makeExcel.setValue(rowCursor, 8, "放款02"); // 交易性質
+
+			BigDecimal highestLoanBal = getBigDecimal(tLQ005.get("F2")); // F2 當季最高餘額
+			makeExcel.setValue(rowCursor, 9, formatMillion(highestLoanBal));
+
+			BigDecimal loanBal = getBigDecimal(tLQ005.get("F3")); // F3 季底交易帳列餘額
+			makeExcel.setValue(rowCursor, 10, formatMillion(loanBal));
+
+			highestLoanBalTotal = highestLoanBalTotal.add(highestLoanBal);
+			loanBalTotal = loanBalTotal.add(loanBal);
+
+			seq++;
+			rowCursor++;
+		}
+
+		return rowCursor;
 	}
 
 	private BigDecimal million = getBigDecimal("1000000");

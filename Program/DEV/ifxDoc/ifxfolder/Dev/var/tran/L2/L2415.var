@@ -286,7 +286,7 @@ T(3,@SellerName,)
 E(0,@ContractPrice,0)
 E(0,@ContractDate,0)
 E(0,@BdUsageCode,0)
-!E(0,@ParkingTypeCode,0)
+E(0,@ParkingTypeCode,0)
 T(3,@ParkingProperty,)
 T(3,@HouseTaxNo,)
 E(0,@HouseBuyDate,0)
@@ -571,7 +571,9 @@ T(2,@SellerName,#L2r27SellerName)
 E(0,@ContractPrice,#L2r27ContractPrice)
 E(0,@ContractDate,#L2r27ContractDate)
 E(0,@BdUsageCode,#L2r27BdUsageCode)
+E(0,@ParkingTypeCode,#L2r27ParkingTypeCode)
 T(2,@ParkingProperty,#L2r27ParkingProperty)
+E(0,@ParkingArea,#L2r27ParkingArea)
 T(2,@HouseTaxNo,#L2r27HouseTaxNo)
 E(0,@HouseBuyDate,#L2r27HouseBuyDate)
 ##loop{times:5,i:1}
@@ -639,7 +641,9 @@ T(2,@SellerName,#L2r27SellerName)
 E(0,@ContractPrice,#L2r27ContractPrice)
 E(0,@ContractDate,#L2r27ContractDate)
 E(0,@BdUsageCode,#L2r27BdUsageCode)
+E(0,@ParkingTypeCode,#L2r27ParkingTypeCode)
 T(2,@ParkingProperty,#L2r27ParkingProperty)
+E(0,@ParkingArea,#L2r27ParkingArea)
 T(2,@HouseTaxNo,#L2r27HouseTaxNo)
 E(0,@HouseBuyDate,#L2r27HouseBuyDate)
 
@@ -841,16 +845,17 @@ HELP(#BdUsageCodeHelp)
 #BdUsageCodeX=X,15,L
 T(H,#BdUsageCode,#BdUsageCodeHelp)
 
+! [停車位型式]
+#ParkingTypeCode=A,1,I
+IF(#FunCd==4,s,$)
+HELP(#ParkingTypeCodeHelp)
+@V(H,#ParkingTypeCodeHelp)
 
-##loop{times:5,i:1,j:0,rowSeq:2}
-#PT{i}=X,1,S
-E(0,@ParkingTypeCodeA{i},{i})
+#ParkingTypeCodeX=X,13,L
+T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
 
-#ParkingQtyA{i}=m,5,I
-
-#ParkingAreaA{i}=m,8.2,I
-
-##end
+#ParkingArea=m,9.2,I
+C(3,#ParkingTypeCode,5,S,$)
 
 ! [獨立產權車位註記]
 #ParkingProperty=X,1,L
@@ -977,6 +982,19 @@ E(0,0)
 
 #ParkingNo0=x,20,S
 T(3,A)
+
+##loop{times:5,i:1,j:0,rowSeq:2}
+#PT{i}=X,1,S
+IF(#PageFg==3,$,CALL(#Show3))
+E(0,@ParkingTypeCodeA{i},{i})
+
+#ParkingQtyA{i}=m,5,I
+IF(#PageFg==3,$,CALL(#Show3))
+
+#ParkingAreaA{i}=m,8.2,I
+IF(#PageFg==3,$,CALL(#Show3))
+
+##end
 
 ##loop{times:100,i:1,j:0,rowSeq:2}
 #HIDE_PP_ROW_{i}=@,1,S
@@ -1145,11 +1163,8 @@ E(0,1)
 ["#FdSELLER_ID+賣方統編",#SellerId],["#FdSELLER_NAME+賣方姓名",#SellerName],
 ["#FdCONTRACT_PRICE+買賣契約價格",#ContractPrice],["#FdCONTRACT_DT+買賣契約日期",#ContractDate],
 [#<->#,"#FdBD_USE+建物使用別",#BdUsageCode,#BdUsageCodeX],
-
-["#grid#,{id:0,expand:true,loop:5,row_height:1,s_cols:[200,100,100,200], p_cols:[20,20,20]}","","","",
-["停車位型式","停車位數量","停車位面積"],
-[[#ParkingTypeCodeXA1],#ParkingQtyA1,#ParkingAreaA1]
-],
+["#FdPARKING_TYPE+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
+["#FdPARKING_AREA+停車位面積",#ParkingArea],
 ["#FdHOUSE_TAX_SN+房屋稅籍號碼",#HouseTaxNo],["#FdHOUSE_BUY_DT+房屋取得日期",#HouseBuyDate],
 ]
 </sub>
@@ -1167,6 +1182,10 @@ E(0,1)
 <sub type="DC" name="p4" layout="cols=1;screen.width=[200,1010];printer.width=[20,50,20,50];order=1">
 [
 ["車位資料"],
+["#grid#,{id:0,expand:true,loop:5,row_height:1,s_cols:[200,100,100,200], p_cols:[20,20,20]}","","","",
+["停車位型式","停車位數量","停車位面積"],
+[[#ParkingTypeCodeXA1],#ParkingQtyA1,#ParkingAreaA1]
+],
 ["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[100,90,210,140,140,100,100,140], p_cols:[20,20,30,40,20,30,30,30]}","","","",
 ["車位編號","車位數","停車位類別","權利範圍","登記面積(坪)","建號","地號","價格(元)"],
 [#ParkingNo1,#ParkingQty1,[#ParkingTypeCode1,#ParkingTypeCodeX1],[#ParkingOwnerPart1,"/",#ParkingOwnerTotal1],#ParkingArea1,[#ParkingBdNoA1,"-",#ParkingBdNoB1],[#ParkingLandNoA1,"-",#ParkingLandNoB1],#ParkingAmount1]
@@ -1239,7 +1258,9 @@ ALERT(#OResultX);
 #BdUsageCode
 #HouseTaxNo
 #HouseBuyDate
+#ParkingTypeCode
 #ParkingProperty
+#ParkingArea
 ##loop{times:5,i:1}
 #ParkingTypeCodeA{i}
 #ParkingQtyA{i}

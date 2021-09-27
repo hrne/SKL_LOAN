@@ -1,8 +1,6 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -32,34 +30,11 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo, boolean findOvdu) throws Exception {
 		this.info("l9718.findAll ");
-
-		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
-		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
-
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		// 當日(int)
-		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthLastDate = Calendar.getInstance();
-		// 設當年月底日
-		calMonthLastDate.set(iYear, iMonth, 0);
-
-		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
-
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		if (nowDate < monthLastDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
-
-		
-		
 		
 		String sql = "";
 		sql += " SELECT ";
 		sql += "        EMP.\"Fullname\" AS \"EmpName\" ";
-		sql += "       ,SUBSTR(:inputYearMonth, 1, 3) AS \"RocYear\" ";
+		sql += "       ,SUBSTR(TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYY') - 1911, 1, 3) AS \"RocYear\" ";
 		sql += "       ,:inputEntryDateMin - 19110000 AS \"RocEntryDateMin\" ";
 		sql += "       ,:inputEntryDateMax - 19110000 AS \"RocEntryDateMax\" ";
 		sql += "       ,M.\"OvduTerm\" AS \"OvduTerm\" ";
@@ -151,7 +126,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      GROUP BY \"CustNo\", \"FacmNo\" ";
 		sql += "     ) TX ON TX.\"CustNo\"  = M.\"CustNo\" ";
 		sql += "         AND TX.\"FacmNo\"  = M.\"FacmNo\" ";
-		sql += " WHERE M.\"YearMonth\" = :inputYearMonth ";
+		sql += " WHERE M.\"YearMonth\" = TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM') ";
 		sql += "   AND (NVL(:inputCollector, ' ') = ' ' OR NVL(M.\"AccCollPsn\",'X') = :inputCollector) ";
 		sql += "   AND FAC.\"FirstDrawdownDate\" >= :inputDrawdownDate ";
 		sql += "   AND ((:findOvdu = 'Y' AND M.\"AcctCode\" = '990') ";
@@ -172,7 +147,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		this.info("inputEntryDateMin=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
 		this.info("inputEntryDateMax=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
-		this.info("inputYearMonth=" + iYear + String.format("%02d", iMonth));
+		this.info("inputYearMonth=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputYearMonth")) + 191100));
 		this.info("inputCollectorShow=" + titaVo.getParam("inputCollector"));
 		this.info("inputDrawdownDate="	 +Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
 
@@ -180,7 +155,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputEntryDateMin", Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
 		query.setParameter("inputEntryDateMax", Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
-		query.setParameter("inputYearMonth", iYear + String.format("%02d", iMonth));
+		query.setParameter("inputYearMonth",  Integer.toString(Integer.parseInt(titaVo.getParam("inputYearMonth")) + 191100));
 		query.setParameter("inputCollector", titaVo.getParam("inputCollector"));
 		query.setParameter("inputDrawdownDate",
 				Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));

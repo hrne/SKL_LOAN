@@ -18,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class BankDeductDtlId implements Serializable {
 
 
-  // 入帳日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = -6543499970752575138L;
+
+// 入帳日期
   @Column(name = "`EntryDate`")
   private int entryDate = 0;
 

@@ -151,7 +151,7 @@ public class L4510 extends TradeBuffer {
 	private HashMap<String, Integer> perfMonth = new HashMap<>();
 
 	private HashMap<tmpFacm, String> errMsg = new HashMap<>();
-	private HashMap<tmpFacm, Integer> flagMap = new HashMap<>();
+	private HashMap<Integer, String> acctCode = new HashMap<>();
 	private TempVo tempVo = new TempVo();
 	private HashMap<tmpFacm, String> jsonField = new HashMap<>();
 	private HashMap<tmpFacm, Integer> mapSetFlag = new HashMap<>();
@@ -216,7 +216,7 @@ public class L4510 extends TradeBuffer {
 			this.info("iY15EntryDate ... " + iY15EntryDate);
 
 		} else {
-			throw new LogicException("E0001 ", "查無資料");
+			throw new LogicException("E0001", "查無資料");
 		}
 
 //		先刪除舊資料
@@ -348,6 +348,12 @@ public class L4510 extends TradeBuffer {
 				flagMap2.put(tmp2, 1);
 			}
 
+			// 業務科目(戶號第一筆)
+			if (!acctCode.containsKey(parse.stringToInteger(result.get("F0")))) {
+				acctCode.put(parse.stringToInteger(result.get("F0")), result.get("F2"));
+			}
+			
+			// 應繳試算
 			if ("2".equals(result.get("F3"))) {
 				listBaTxVo = baTxCom.settingUnPaid(iN15EntryDate - 19110000, parse.stringToInteger(result.get("F0")),
 						parse.stringToInteger(result.get("F1")), 0, 1, BigDecimal.ZERO, titaVo);
@@ -628,7 +634,7 @@ public class L4510 extends TradeBuffer {
 			tEmpDeductDtl.setAcctCode(tEmpDeductDtlId.getAcctCode());
 			tEmpDeductDtl.setFacmNo(tEmpDeductDtlId.getFacmNo());
 			tEmpDeductDtl.setBormNo(tEmpDeductDtlId.getBormNo());
-			
+
 			tEmpDeductDtl.setEmpNo(tCdEmp.getEmployeeNo());
 			tEmpDeductDtl.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tEmpDeductDtl.setCustId(tCustMain.getCustId());
@@ -840,10 +846,10 @@ public class L4510 extends TradeBuffer {
 			tEmpDeductMedia.setEntryDate(tEmpDeductDtl.getEntryDate());
 			tEmpDeductMedia.setTxAmt(BigDecimal.ZERO);
 			tEmpDeductMedia.setErrorCode("");
-			if (tEmpDeductDtl.getAchRepayCode() <= 3) {
-				tEmpDeductMedia.setAcctCode(tEmpDeductDtl.getAcctCode());
-			} else {
+			if (tEmpDeductDtl.getAchRepayCode() == 5) {
 				tEmpDeductMedia.setAcctCode("000");
+			} else {
+				tEmpDeductMedia.setAcctCode(acctCode.get(tEmpDeductDtl.getCustNo()));
 			}
 			tEmpDeductMedia.setAcDate(0);
 			tEmpDeductMedia.setBatchNo("");

@@ -175,15 +175,14 @@ public class TxAmlCom extends TradeBuffer {
 
 	/**
 	 * 撥款匯款 Call By L3220 暫收款退還
-	 * 
-	 * @param borxNo 交易內容檔序號
 	 * @param titaVo TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException ..
 	 */
-	public void remitL3220(int borxNo, TitaVo titaVo) throws LogicException {
+	public void remitL3220(TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom.remit .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
-		checkAmlVo.setTransactionId("03" + "-" + (titaVo.getEntDyI() + 19110000) + "-" + titaVo.getMrKey() + "-" + parse.IntegerToString(borxNo, 3));
+		// AML@交易序號：前兩碼03+會計日期+交易序號
+		checkAmlVo.setTransactionId("03" + "-" + (titaVo.getEntDyI() + 19110000) + "-" + titaVo.getTxSeq());
 		remitRp(checkAmlVo, titaVo);
 	}
 
@@ -233,7 +232,7 @@ public class TxAmlCom extends TradeBuffer {
 							checkAmlVo.setBirthEstDt("0" + titaVo.getParam("RemitBirthday")); // 出生日期
 					}
 					checkAmlVo.setAcctNo(titaVo.getMrKey()); // 放款案號：戶號-額度-撥款
-					checkAmlVo.setCaseNo(titaVo.getBacthNo()); // 案號：整批批號(ex.LN0101)
+					checkAmlVo.setCaseNo(titaVo.getBacthNo()); // 案號：整批批號(ex.LNnnnn)
 					// AML檢核
 					checkAmlVo = amlLogCheck(checkAmlVo, titaVo);
 					// AML檢核回應訊息
@@ -681,7 +680,7 @@ public class TxAmlCom extends TradeBuffer {
 		checkAmlVo.setRoleId("4"); // 保單角色： 4.借款人
 		checkAmlVo.setRefNo(parse.IntegerToString(custNo, 7)); // 相關編號
 		checkAmlVo.setAcctNo(parse.IntegerToString(custNo, 7)); // 放款案號：戶號
-		checkAmlVo.setCaseNo(batchNo); // 案號：整批批號
+		checkAmlVo.setCaseNo(batchNo); // 案號：整批批號 'BATXnn'
 		custMainMove(tCustMain, checkAmlVo, titaVo);
 		// AML檢核
 		checkAmlVo = amlLogCheck(checkAmlVo, titaVo);
@@ -698,7 +697,7 @@ public class TxAmlCom extends TradeBuffer {
 		checkAmlVo.setRoleId("7"); // 保單角色 7.轉帳委託人
 		checkAmlVo.setRefNo(parse.IntegerToString(tLoanCheque.getCustNo(), 7)); // 相關編號
 		checkAmlVo.setAcctNo(parse.IntegerToString(tLoanCheque.getCustNo(), 7)); // 放款案號：戶號
-		checkAmlVo.setCaseNo(batchNo); // 案號：整批批號
+		checkAmlVo.setCaseNo(batchNo); // 案號：整批批號  'BATXnn'
 		checkAmlVo.setName(tLoanCheque.getChequeName()); // 姓名
 		// default 身份別 1:自然人 2:法人 性別 : 空白
 		checkAmlVo.setIdentityCd("1");
@@ -730,7 +729,7 @@ public class TxAmlCom extends TradeBuffer {
 			checkAmlVo.setRoleId("7");
 		checkAmlVo.setRefNo(parse.IntegerToString(tBankRmtf.getCustNo(), 7)); // 相關編號
 		checkAmlVo.setAcctNo(parse.IntegerToString(tBankRmtf.getCustNo(), 7)); // 放款案號：戶號
-		checkAmlVo.setCaseNo(tBankRmtf.getBatchNo()); // 案號：整批批號
+		checkAmlVo.setCaseNo(tBankRmtf.getBatchNo()); // 案號：整批批號  'BATXnn'
 		checkAmlVo.setName(traderName); // 姓名
 		// default 身份別 1:自然人 2:法人 性別 : 空白
 		checkAmlVo.setIdentityCd("1");

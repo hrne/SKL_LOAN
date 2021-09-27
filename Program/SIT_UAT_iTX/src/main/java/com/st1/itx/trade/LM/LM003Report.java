@@ -292,7 +292,7 @@ public class LM003Report extends MakeReport {
 		}
 
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM003",
-				titaVo.get("inputYearEnd") + "年" + titaVo.get("inputMonthEnd") + "月個人房貸戶 - 撥款／還款金額比較月報表", "", "A4",
+				titaVo.get("inputYearEnd") + "年" + titaVo.get("inputMonthEnd") + "月個人房貸戶－撥款／還款金額比較月報表", "", "A4",
 				"L");
 
 		print(1, 1, "");

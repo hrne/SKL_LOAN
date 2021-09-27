@@ -11,19 +11,27 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
-@Service("LM036")
-@Scope("step")
 /**
+ * LM036
  * 
- * 
- * @author Eric Chang
+ * @author Chih Wei
  * @version 1.0.0
  */
+@Service("LM036")
+@Scope("step")
 public class LM036 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
-	public LM036Report lM036report;
+	LM036Report lM036Report;
+
+	@Autowired
+	WebClient webClient;
+
+	@Autowired
+	DateUtil dDateUtil;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -38,7 +46,10 @@ public class LM036 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM036 ");
-		lM036report.exec(titaVo);
+		lM036Report.exec(titaVo);
+
+		webClient.sendPost(dDateUtil.getNowStringBc(), dDateUtil.getNowStringTime(), titaVo.getTlrNo(), "Y", "LC009",
+				titaVo.getTlrNo(), "LM036第一類各項統計表", titaVo);
 	}
 
 }

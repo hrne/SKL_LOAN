@@ -848,6 +848,8 @@ public class L5706 extends TradeBuffer {
 			}
 			
 			t2NegMain.setLastDueDate(LastDueDate);// 還款結束日
+			t2NegMain.setPayIntDate(DateRocToDC(RECEIVE_DATE, "協商申請日" , titaVo));// 繳息迄日
+			
 			String IsMainFin = "";
 			if (("458").equals(MAIN_CODE)) {
 				IsMainFin = "Y";
@@ -1288,7 +1290,7 @@ public class L5706 extends TradeBuffer {
 
 		InserttNegMain.setNextPayDate(FirstDueDate);// 下次應繳日
 		InserttNegMain.setRepaidPeriod(0);// 已繳期數
-		InserttNegMain.setPayIntDate(0);// 繳息迄日
+		InserttNegMain.setPayIntDate(negCom.getRepayDate(InserttNegMain.getFirstDueDate(), -1, titaVo));// 繳息迄日=首次應繳日前一個月
 		InserttNegMain.setPrincipalBal(new BigDecimal(CHANGE_TOTAL_AMT));// 總本金餘額
 		InserttNegMain.setDeferYMStart(0);// 延期繳款年月(起)
 		InserttNegMain.setDeferYMEnd(0);// 延期繳款年月(訖)

@@ -1,5 +1,7 @@
 package com.st1.itx.trade.LM;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +33,7 @@ public class LM036Report extends MakeReport {
 	@Autowired
 	MonthlyLM036PortfolioService sMonthlyLM036PortfolioService;
 
-	@Override
-	public void printTitle() {
-
-	}
+	private BigDecimal million = getBigDecimal("1000000");
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
@@ -49,48 +48,85 @@ public class LM036Report extends MakeReport {
 		this.info("startMonth = " + startMonth);
 		this.info("endMonth = " + endMonth);
 
-//		this.dDateUtil.init();
-//		this.dDateUtil.setDate_1(entdy);
-//		this.dDateUtil.setMons(-12);
-//		this.dDateUtil.getCalenderDay();
-//		this.info("" + this.dDateUtil.getDate_2Integer());
-
 		Slice<MonthlyLM036Portfolio> sMonthlyLM036Portfolio = sMonthlyLM036PortfolioService
 				.findDataMonthBetween(startMonth, endMonth, 0, Integer.MAX_VALUE, titaVo);
 
-		if (sMonthlyLM036Portfolio == null || sMonthlyLM036Portfolio.isEmpty()) {
-			this.info("sMonthlyLM036Portfolio is null or empty");
-			makeExcel.setValue(3, 3, "本日無資料");
-		} else {
-			List<MonthlyLM036Portfolio> lMonthlyLM036Portfolio = new ArrayList<>(sMonthlyLM036Portfolio.getContent());
-			setPortfolio(titaVo, lMonthlyLM036Portfolio);
+		List<MonthlyLM036Portfolio> lMonthlyLM036Portfolio = new ArrayList<>(sMonthlyLM036Portfolio.getContent());
+
+		setPortfolio(lMonthlyLM036Portfolio);
+
+		List<Map<String, String>> listDelinquency = null;
+
+		try {
+			listDelinquency = lM036ServiceImpl.queryDelinquency(startMonth, endMonth, titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("lM012ServiceImpl.findAll error = " + errors.toString());
 		}
 
-//		makeExcel.setSheet("Bad Rate-房貸(by件數)");
-//		List<Map<String, String>> LM036List1 = null;
-//		exportExcel1(titaVo, LM036List1);
-//
-//		makeExcel.setSheet("Bad Rate-房貸(by金額)");
-//		List<Map<String, String>> LM036List2 = null;
-//		exportExcel2(titaVo, LM036List2);
-//
-//		makeExcel.setSheet("Deliquency ");
-//		List<Map<String, String>> LM036List3 = null;
-//		exportExcel3(titaVo, LM036List3);
-//
-//		makeExcel.setSheet("Collection");
-//		List<Map<String, String>> LM036List4 = null;
-//		exportExcel4(titaVo, LM036List4);
+		setDelinquency(listDelinquency);
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
 
-	private void setPortfolio(TitaVo titaVo, List<MonthlyLM036Portfolio> list) throws LogicException {
+	private void setDelinquency(List<Map<String, String>> list) throws LogicException {
+
+		// 指向工作表Deliquency
+		makeExcel.setSheet("Deliquency");
+
+		if (list == null || list.isEmpty()) {
+			this.info("list Deliquency is null or empty");
+			makeExcel.setValue(3, 3, "本日無資料");
+			return;
+		}
+
+		int columnCursor = 2;
+
+		for (Map<String, String> m : list) {
+
+			// 月份
+			makeExcel.setValue(2, columnCursor, formatMonth(Integer.parseInt(m.get("F0"))));
+			
+			// 法人
+			makeExcel.setValue(4, columnCursor, formatMillion(m.get("F1"))); // F1 法人正常
+			makeExcel.setValue(5, columnCursor, formatMillion(m.get("F2"))); // F2 法人逾1~2期
+			makeExcel.setValue(6, columnCursor, formatMillion(m.get("F3"))); // F3 法人逾3~6期
+			makeExcel.setValue(7, columnCursor, formatMillion(m.get("F4"))); // F4 法人催收
+			makeExcel.setValue(8, columnCursor, formatMillion("0")); 
+			makeExcel.setValue(9, columnCursor, formatMillion("0")); 
+			
+			// 自然人
+			makeExcel.setValue(11, columnCursor, formatMillion(m.get("F5"))); // F5 自然人正常
+			makeExcel.setValue(12, columnCursor, formatMillion(m.get("F6"))); // F6 自然人逾1~2期
+			makeExcel.setValue(13, columnCursor, formatMillion(m.get("F7"))); // F7 自然人逾3~6期
+			makeExcel.setValue(14, columnCursor, formatMillion(m.get("F8"))); // F8 自然人催收
+			makeExcel.setValue(15, columnCursor, formatMillion("0")); 
+			makeExcel.setValue(16, columnCursor, formatMillion("0")); 
+			
+			// 總額
+			makeExcel.setValue(18, columnCursor, formatMillion(m.get("F9"))); // F9 總額正常
+			makeExcel.setValue(19, columnCursor, formatMillion(m.get("F10"))); // F10 總額逾1~2期
+			makeExcel.setValue(20, columnCursor, formatMillion(m.get("F11"))); // F11 總額逾3~6期
+			makeExcel.setValue(21, columnCursor, formatMillion(m.get("F12"))); // F12 總額催收
+			makeExcel.setValue(22, columnCursor, formatMillion("0")); 
+			makeExcel.setValue(23, columnCursor, formatMillion("0")); 
+			makeExcel.setValue(24, columnCursor, formatMillion(m.get("F13"))); // F13 放款總餘額
+			makeExcel.setValue(25, columnCursor, formatMillion("0")); 
+
+			columnCursor++;
+		}
+
+	}
+
+	private void setPortfolio(List<MonthlyLM036Portfolio> list) throws LogicException {
 		this.info("setPortfolio");
 
 		if (list == null || list.isEmpty()) {
+			this.info("list MonthlyLM036Portfolio is null or empty");
 			makeExcel.setValue(3, 3, "本日無資料");
+			return;
 		}
 
 		int columnCursor = 3;
@@ -168,8 +204,12 @@ public class LM036Report extends MakeReport {
 		}
 	}
 
+	private BigDecimal formatMillion(String portfolioTotal) {
+		return formatMillion(getBigDecimal(portfolioTotal));
+	}
+
 	private BigDecimal formatMillion(BigDecimal portfolioTotal) {
-		return computeDivide(portfolioTotal, getBigDecimal("1000000"), 0);
+		return computeDivide(portfolioTotal, million, 0);
 	}
 
 	private String formatMonth(int dataMonth) {
@@ -216,152 +256,8 @@ public class LM036Report extends MakeReport {
 			break;
 		default:
 			break;
-
 		}
 		formatMonth += "-" + year % 100;
 		return formatMonth;
 	}
-
-	private void exportExcel1(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-		this.info("===========in testExcel");
-		if (LDList == null) {
-			makeExcel.setValue(4, 2, "本日無資料");
-		}
-		String entdy = titaVo.get("ENTDY");
-		int ym = Integer.parseInt(entdy) / 100;
-		for (int i = 0; i < 37; i++) {
-			makeExcel.setValue(2, 40 - i, ym);
-			makeExcel.setValue(43 - i, 1, ym);
-			if ((ym - 1) % 100 == 0) {
-				ym -= 89;
-			} else {
-				ym -= 1;
-			}
-		}
-		for (int i = 0; i < 3; i++) {
-			makeExcel.setValue(6 - i, 1, ym);
-			if ((ym - 1) % 100 == 0) {
-				ym -= 89;
-			} else {
-				ym -= 1;
-			}
-		}
-	}
-
-	private void exportExcel2(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-		this.info("===========in testExcel");
-		if (LDList == null) {
-			makeExcel.setValue(4, 2, "本日無資料");
-		}
-		String entdy = titaVo.get("ENTDY");
-		int ym = Integer.parseInt(entdy) / 100;
-		for (int i = 0; i < 37; i++) {
-			makeExcel.setValue(2, 40 - i, ym);
-			makeExcel.setValue(43 - i, 1, ym);
-			if ((ym - 1) % 100 == 0) {
-				ym -= 89;
-			} else {
-				ym -= 1;
-			}
-		}
-		for (int i = 0; i < 3; i++) {
-			makeExcel.setValue(6 - i, 1, ym);
-			if ((ym - 1) % 100 == 0) {
-				ym -= 89;
-			} else {
-				ym -= 1;
-			}
-		}
-	}
-
-	private void exportExcel3(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-		this.info("===========in testExcel");
-		if (LDList == null) {
-			makeExcel.setValue(3, 2, "本日無資料");
-		}
-		String entdy = titaVo.get("ENTDY");
-		int yy = Integer.parseInt(entdy) / 10000 + 1911;
-		int mm = Integer.parseInt(entdy) % 10000 / 100;
-		int dd[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-		makeExcel.setValue(2, 29, yy + "/" + mm + "/" + dd[mm - 1]);
-		int i = 1;
-		int col = 29;
-		while (i < 28) {
-			if (mm - i == 0) {
-				yy -= 1;
-				mm += 12;
-			}
-			makeExcel.setValue(2, col - i, yy + "/" + (mm - i) + "/" + dd[mm - i - 1]);
-			i++;
-		}
-	}
-
-	private void exportExcel4(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-		this.info("===========in testExcel");
-		if (LDList == null) {
-			makeExcel.setValue(4, 2, "本日無資料");
-		}
-	}
-//	private void testExcel(TitaVo titaVo) throws LogicException {
-//		this.info("===========in testExcel");
-//		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM036", "第一類各項統計表", "LM036-Dashboard_第一類各項統計表_5份", "Dashboard_第一類各項統計表_5份.xlsx", "Portfolio");
-//
-//		makeExcel.setValue(3, 3, "55,555");
-//		makeExcel.setValue(3, 4, "55,555");
-//		makeExcel.setValue(4, 3, "44,444");
-//		makeExcel.setValue(4, 4, "44,444");
-//		makeExcel.setValue(5, 3, "33,333");
-//		makeExcel.setValue(5, 4, "33,333");
-//		makeExcel.setValue(6, 3, "2,222");
-//		makeExcel.setValue(6, 4, "2,222");
-//		makeExcel.setValue(7, 3, "9");
-//		makeExcel.setValue(7, 4, "9");
-//		makeExcel.setValue(16, 3, "81%");
-//		makeExcel.setValue(16, 4, "81%");
-//
-//		makeExcel.setValue(31, 3, "1.66%");
-//		makeExcel.setValue(31, 4, "1.33%");
-//		makeExcel.setValue(32, 3, "1.08%");
-//		makeExcel.setValue(32, 4, "1.12%");
-//		makeExcel.setValue(33, 3, "1.13%");
-//		makeExcel.setValue(33, 4, "1.21%");
-//
-//		makeExcel.setSheet("Bad Rate-房貸(by件數)");
-//		makeExcel.setValue(4, 2, "100");
-//		makeExcel.setValue(5, 2, "100");
-//		makeExcel.setValue(6, 42, "200");
-//		makeExcel.setValue(44, 2, "100");
-//		makeExcel.setValue(44, 42, "200");
-//		makeExcel.setValue(46, 3, "1.66%");
-//
-//		makeExcel.setSheet("Bad Rate-房貸(by金額)");
-//		makeExcel.setValue(4, 2, "33,333,333,333");
-//		makeExcel.setValue(5, 2, "33,333,333,333");
-//		makeExcel.setValue(6, 42, "66,666,666,666");
-//		makeExcel.setValue(44, 2, "66,666,666,666");
-//		makeExcel.setValue(44, 42, "66,666,666,666");
-//		makeExcel.setValue(49, 4, "0.02%");
-//
-//		makeExcel.setSheet("Deliquency ");
-//		makeExcel.setValue(4, 2, "5,555,555");
-//		makeExcel.setValue(4, 3, "5,555,555");
-//		makeExcel.setValue(5, 2, "44,444");
-//		makeExcel.setValue(5, 3, "44,444");
-//		makeExcel.setValue(6, 2, "33,333");
-//		makeExcel.setValue(6, 3, "33,333");
-//		makeExcel.setValue(7, 2, "22,222,222");
-//		makeExcel.setValue(7, 3, "22,222,222");
-//
-//		makeExcel.setSheet("Collection");
-//		makeExcel.setValue(4, 2, "1.22%");
-//		makeExcel.setValue(4, 3, "2.13%");
-//		makeExcel.setValue(4, 26, "1.675%");
-//
-//		makeExcel.setValue(6, 2, "2.22%");
-//		makeExcel.setValue(6, 3, "0.89%");
-//		makeExcel.setValue(6, 26, "1.555%");
-//		long sno = makeExcel.close();
-//		makeExcel.toExcel(sno);
-//	}
-
 }

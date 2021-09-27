@@ -114,7 +114,7 @@ public class LM003ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM \"LoanBorTx\" lbtx "; 
 		sql += " WHERE lbtx.\"TitaTxCd\" = 'L3420' "; 
 		sql += "   AND lbtx.\"TitaHCode\" = 0 "; 
-		sql += "   AND JSON_VALUE(lbtx.\"OtherFields\", '$.CaseCloseCode') = 2 "; 
+		sql += "   AND JSON_VALUE(lbtx.\"OtherFields\", '$.CaseCloseCode') = 3 "; 
 		sql += " GROUP BY SUBSTR(lbtx.\"AcDate\", 1, 6) "; 
 		sql += " ) "; 
 		sql += "  ";

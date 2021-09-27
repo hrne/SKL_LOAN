@@ -96,7 +96,7 @@ public class LQ005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             GROUP BY MLB.\"YearMonth\" ";
 		sql += "           ) S4 ON S4.\"YearMonth\" = :inputYearMonthEnd ";
 		sql += " WHERE CASE ";
-		sql += "         WHEN NVL(S4.\"LoanBalTotal\",0) > 50000000 ";
+		sql += "         WHEN NVL(S4.\"LoanBalTotal\",0) > 10000000 ";
 		sql += "         THEN 1 ";
 		sql += "         WHEN NVL(S1.\"LoanBal\",0) > 50000000 ";
 		sql += "         THEN 1 ";

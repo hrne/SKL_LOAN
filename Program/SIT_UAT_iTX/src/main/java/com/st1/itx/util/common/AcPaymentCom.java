@@ -24,12 +24,14 @@ import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.LoanChequeId;
+import com.st1.itx.db.domain.TxAmlLog;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.BankRemitService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.LoanChequeService;
+import com.st1.itx.db.service.TxAmlLogService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.RemitFormVo;
 import com.st1.itx.util.format.FormatUtil;
@@ -74,6 +76,9 @@ public class AcPaymentCom extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService cdEmpService;
+
+	@Autowired
+	public TxAmlLogService txAmlLogService;
 
 	private List<AcDetail> acDetailList;
 	private AcDetail acDetail;
@@ -474,6 +479,23 @@ public class AcPaymentCom extends TradeBuffer {
 				this.totaVo.setWarnMsg("該筆匯款資料已產檔，批號=" + tBankRemit.getBatchNo());
 				this.addList(this.totaVo);
 			}
+		}
+
+		// 放行更新AML回應碼
+		if (titaVo.isHcodeNormal() && titaVo.isActfgRelease()) {
+			// AML@交易序號：前兩碼03+會計日期+交易序號
+			String transactionId = "03" + "-" + (tBankRemit.getAcDate() + 19110000) + "-";
+			if (titaVo.isActfgSuprele()) {
+				transactionId += titaVo.getOrgTxSeq();
+			} else {
+				transactionId += titaVo.getTxSeq();
+			}
+			TxAmlLog tTxAmlLog = txAmlLogService.findByTransactionIdFirst(tBankRemit.getAcDate() + 19110000,
+					transactionId, titaVo);
+			if (tTxAmlLog == null) {
+				throw new LogicException(titaVo, "E0014", "TxAmlLog not found"); // 檔案錯誤
+			}
+			tBankRemit.setAmlRsp(tTxAmlLog.getConfirmStatus());
 		}
 
 		if (isInsert) {

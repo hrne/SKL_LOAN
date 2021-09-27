@@ -39,7 +39,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5970 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5970.class);
 	@Autowired
 	Parse parse;
 
@@ -140,7 +139,12 @@ public class L5970 extends TradeBuffer {
 			// wkRepay = calcAmortize(iPrincipal, iFinalBal, iRate, wkFreqBaseConstant,
 			// iPayIntFreq, iLoanTerm,
 			// iGracePeriod);
-			wkRepay = LoanDueAmtCom.getDueAmt(iPrincipal, iRate, "3", iFreqBase, iLoanTerm, iGracePeriod, iPayIntFreq, iFinalBal, titaVo);
+			if (iRate.compareTo(BigDecimal.ZERO) == 0) {//利率為0時不使用本息平均法,改為[本金除以期數]
+				wkRepay = iPrincipal.divide(new BigDecimal(iLoanTerm), 0, RoundingMode.HALF_UP);
+			} else {
+				wkRepay = LoanDueAmtCom.getDueAmt(iPrincipal, iRate, "3", iFreqBase, iLoanTerm, iGracePeriod,
+						iPayIntFreq, iFinalBal, titaVo);
+			}
 			for (int i = 1; i <= iLoanTerm; i++) {
 				occursList = new OccursList();
 				wkInterest = wkBalance.multiply(iRate).divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP).multiply(new BigDecimal(iPayIntFreq)).setScale(0, RoundingMode.HALF_UP);
@@ -159,6 +163,7 @@ public class L5970 extends TradeBuffer {
 						occursList.putParam("OBalance", wkBalance);
 					}
 				}
+
 				// 將每筆資料放入Tota的OcList
 				this.totaVo.addOccursList(occursList);
 			}

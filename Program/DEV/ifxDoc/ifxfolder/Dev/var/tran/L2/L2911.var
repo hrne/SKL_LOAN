@@ -39,7 +39,7 @@ E(0,40)ASGN(INQPRT$)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[200,220,260,500];printer.width=[15,30,15,30];order=1">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,240,260,480];printer.width=[15,30,15,30];order=1">
 [
 ["[L2911]                                 不動產擔保品資料查詢"],
 [#<->#,"#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],

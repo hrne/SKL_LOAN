@@ -246,6 +246,7 @@ public class L2R27 extends TradeBuffer {
 			this.totaVo.putParam("L2r27BdUsageCode", tClBuilding.getBdUsageCode());
 			this.totaVo.putParam("L2r27ParkingTypeCode", tClBuilding.getParkingTypeCode());
 			this.totaVo.putParam("L2r27ParkingProperty", tClBuilding.getParkingProperty());
+			this.totaVo.putParam("L2r27ParkingArea", tClBuilding.getParkingArea());
 			this.totaVo.putParam("L2r27HouseTaxNo", tClBuilding.getHouseTaxNo());
 			this.totaVo.putParam("L2r27HouseBuyDate", tClBuilding.getHouseBuyDate());
 			this.totaVo.putParam("L2r27SellerName", tClBuilding.getSellerName());
