@@ -52,6 +52,7 @@ OEstimate=X,6
 OCreditOfficer=X,6
 OLoanOfficer=X,6
 OBusinessOfficer=X,6
+OApprovedLevel=X,1
 OSupervisor=X,6
 OInvestigateOfficer=X,6
 OEstimateReview=X,6

@@ -27,7 +27,7 @@ public class LoanSyndItem implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -4302287181076433446L;
 
 @EmbeddedId
   private LoanSyndItemId loanSyndItemId;

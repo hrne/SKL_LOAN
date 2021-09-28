@@ -130,4 +130,14 @@ public interface MonthlyLM036PortfolioService {
    */
   public void deleteAll(List<MonthlyLM036Portfolio> monthlyLM036Portfolio, TitaVo... titaVo) throws DBException;
 
+  /**
+   * Stored Procedure<br>
+   * 維護 MonthlyLM036Portfolio LM036Portfolio
+   * @param  TBSDYF int
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L9_MonthlyLM036Portfolio_Ins(int TBSDYF, String EmpNo, TitaVo... titaVo);
+
 }

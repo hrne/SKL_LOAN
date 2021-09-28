@@ -96,6 +96,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		sql += "	GROUP BY MLB.\"CustNo\"";
 		sql += "		    ,C.\"CustName\"";
+		sql += "		    ,C.\"CustId\"";
 		sql += "		    ,(CASE";
 		sql += "			    WHEN L.\"SyndNo\" <> 0 THEN '聯貸'";
 		sql += "			    WHEN MLB2.\"CustNo\" IS NOT NULL THEN '**'";

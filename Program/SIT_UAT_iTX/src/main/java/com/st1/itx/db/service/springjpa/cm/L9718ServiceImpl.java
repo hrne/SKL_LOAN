@@ -116,7 +116,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    AND CDL.\"Code\" = LAW.\"LegalProg\" ";
 			sql += "  LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = M.\"CityCode\" ";
 			sql += "  LEFT JOIN (SELECT lbtx.\"CustNo\" ";
-			sql += "       ,GREATEST(lbtx.\"FacmNo\", MGroup.\"FacmNo\") \"FacmNo\" ";
+			sql += "       ,DECODE(lbtx.\"FacmNo\", 0, MGroup.\"FacmNo\", lbtx.\"FacmNo\") \"FacmNo\" ";
 			sql += "       ,MAX(lbtx.\"IntEndDate\")  AS \"IntEndDate\" ";
 			sql += "       ,SUM(lbtx.\"TxAmt\") AS \"OvTxAmt\" ";
 			sql += "       ,MAX(lbtx.\"EntryDate\") AS \"OvEntryDate\" ";
@@ -141,7 +141,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " WHERE lbtx.\"TitaHCode\" = '0' ";
 			sql += "   AND lbtx.\"EntryDate\" >= :inputEntryDateMin ";
 			sql += "   AND lbtx.\"EntryDate\" <= :inputEntryDateMax ";
-			sql += " GROUP BY lbtx.\"CustNo\", GREATEST(lbtx.\"FacmNo\", MGroup.\"FacmNo\") ";
+			sql += " GROUP BY lbtx.\"CustNo\", DECODE(lbtx.\"FacmNo\", 0, MGroup.\"FacmNo\", lbtx.\"FacmNo\") ";
 			sql += "      ) TX ON TX.\"CustNo\"  = M.\"CustNo\" ";
 			sql += "    AND (TX.\"FacmNo\" = 0 OR TX.\"FacmNo\" = M.\"FacmNo\") ";
 			sql += "  WHERE M.\"YearMonth\" = TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM') ";
@@ -235,7 +235,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    AND CDL.\"Code\" = LAW.\"LegalProg\" ";
 			sql += "  LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = M.\"CityCode\" ";
 			sql += "  LEFT JOIN (SELECT lbtx.\"CustNo\" ";
-			sql += "       ,GREATEST(lbtx.\"FacmNo\", MGroup.\"FacmNo\") \"FacmNo\" ";
+			sql += "       ,DECODE(lbtx.\"FacmNo\", 0, MGroup.\"FacmNo\", lbtx.\"FacmNo\") \"FacmNo\" ";
 			sql += "       ,MAX(lbtx.\"IntEndDate\")  AS \"IntEndDate\" ";
 			sql += "       ,SUM(lbtx.\"TxAmt\") AS \"OvTxAmt\" ";
 			sql += "       ,MAX(lbtx.\"EntryDate\") AS \"OvEntryDate\" ";
@@ -262,7 +262,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " WHERE lbtx.\"TitaHCode\" = '0' ";
 			sql += "   AND lbtx.\"EntryDate\" >= :inputEntryDateMin ";
 			sql += "   AND lbtx.\"EntryDate\" <= :inputEntryDateMax ";
-			sql += " GROUP BY lbtx.\"CustNo\", GREATEST(lbtx.\"FacmNo\", MGroup.\"FacmNo\") ";
+			sql += " GROUP BY lbtx.\"CustNo\", DECODE(lbtx.\"FacmNo\", 0, MGroup.\"FacmNo\", lbtx.\"FacmNo\") ";
 			sql += "      ) TX ON TX.\"CustNo\"  = M.\"CustNo\" ";
 			sql += "    AND (TX.\"FacmNo\" = 0 OR TX.\"FacmNo\" = M.\"FacmNo\") ";
 			sql += "  WHERE M.\"YearMonth\" = TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM') ";

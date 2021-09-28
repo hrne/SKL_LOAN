@@ -19,7 +19,7 @@ public class LoanSyndItemId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -6747172815474963198L;
 
 // 聯貸案編號
   @Column(name = "`SyndNo`")

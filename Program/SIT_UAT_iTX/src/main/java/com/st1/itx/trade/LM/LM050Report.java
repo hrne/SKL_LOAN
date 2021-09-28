@@ -65,7 +65,6 @@ public class LM050Report extends MakeReport {
 
 		try {
 			equityList = lM050ServiceImpl.fnEquity(titaVo);
-
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -114,12 +113,12 @@ public class LM050Report extends MakeReport {
 		this.info("LM050Report exportExcel");
 
 		if (listLM050 == null || listLM050.isEmpty()) {
-			makeExcel.setValue(4, 1, "本日無資料");
+			makeExcel.setValue(4, 2, "本日無資料", "L");
 			return;
 		}
 
 		int rowCursor = 4;
-		
+
 		if (listLM050.size() > 1) {
 			makeExcel.setShiftRow(rowCursor + 1, listLM050.size() - 1);
 		}
@@ -153,42 +152,45 @@ public class LM050Report extends MakeReport {
 		total = relLoanBal.add(custLoanBal);
 
 		printTotal(rowCursor);
-
 	}
 
 	private void printTotal(int rowCursor) throws LogicException {
 
-		makeExcel.setValue(rowCursor, 2, "合     計");
+		// 合計
 		makeExcel.setValue(rowCursor, 4, formatThousand(detailTotal), "#,##0");
 		makeExcel.setValue(rowCursor, 5, computeDivide(detailTotal, equity, 4), "##0.00%");
 		makeExcel.setValue(rowCursor, 6, "30%", "R");
 
 		rowCursor++;
-		makeExcel.setValue(rowCursor, 2, "職    員");
+
+		// 職員
 		makeExcel.setValue(rowCursor, 4, formatThousand(empLoanBal), "#,##0");
 
 		rowCursor++;
-		makeExcel.setValue(rowCursor, 2, "關 係 人 放 款 總 額");
+
+		// 關係人放款總額
 		makeExcel.setValue(rowCursor, 4, formatThousand(relLoanBal), "#,##0");
 		makeExcel.setValue(rowCursor, 5, computeDivide(relLoanBal, equity, 4), "##0.00%");
 		makeExcel.setValue(rowCursor, 6, "150%", "R");
 
 		rowCursor++;
-		makeExcel.setValue(rowCursor, 2, "佔 總 放 款 比");
+
+		// 佔總放款比
 		makeExcel.setValue(rowCursor, 4, computeDivide(relLoanBal, total, 4), "##0.00%");
 
 		rowCursor++;
-		makeExcel.setValue(rowCursor, 2, "一 般 客 戶合計");
+
+		// 一般客戶合計
 		makeExcel.setValue(rowCursor, 4, formatThousand(custLoanBal), "#,##0");
 
 		rowCursor++;
-		makeExcel.setValue(rowCursor, 2, "佔 總 放 款 比");
+
+		// 佔總放款比
 		makeExcel.setValue(rowCursor, 4, computeDivide(custLoanBal, total, 4), "##0.00%");
 
 		rowCursor++;
-		makeExcel.setValue(rowCursor, 2, "放 款 總 額  ＊");
+
+		// 放款總額
 		makeExcel.setValue(rowCursor, 4, formatThousand(total), "#,##0");
-
 	}
-
 }

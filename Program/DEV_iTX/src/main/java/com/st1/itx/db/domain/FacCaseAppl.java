@@ -29,7 +29,7 @@ public class FacCaseAppl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1474532980073938537L;
 
 // 申請號碼
   @Id

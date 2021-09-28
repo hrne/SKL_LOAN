@@ -97,107 +97,110 @@ public class L9718Report extends MakeReport {
 					// is set in SQL
 					// notice it's 0-based for those names
 					String tmpValue = tLDVo.get("F" + i);
-					if (tmpValue == null)
-					{
+					if (tmpValue == null) {
 						tmpValue = "";
 					}
-					
+
 					BigDecimal output = BigDecimal.ZERO;
 
 					switch (reportType) {
-					case Acct990:
-						// F9,F10,F11,F12
-						// ,F14
-						// formatAmt
+						case Acct990:
+							// F9,F10,F11,F12
+							// ,F14
+							// formatAmt
 
-						// F16是百分比
-						// 用F22/F12 * 100 可算出來
+							// F16是百分比
+							// 用F22/F12 * 100 可算出來
 
-						switch (i) {
-						case 9:
-						case 10:
-						case 11:
-						case 12:
-						case 14:
-							output = BigDecimal.ZERO;
+							switch (i) {
+								case 9:
+								case 10:
+								case 11:
+								case 12:
+								case 14:
+									output = BigDecimal.ZERO;
 
-							try {
-								output = new BigDecimal(tmpValue);
-							} catch (Exception e) {
-								this.info("L9718Report-990, F" + i + ": " + tmpValue);
+									try {
+										output = new BigDecimal(tmpValue);
+									} catch (Exception e) {
+										this.info("L9718Report-990, F" + i + ": " + tmpValue);
+									}
+
+									makeExcel.setValue(row, col, formatAmt(output, 0));
+									break;
+								case 16:
+									output = BigDecimal.ZERO;
+									try {
+										output = new BigDecimal(tLDVo.get("F22"))
+												.divide(new BigDecimal(tLDVo.get("F12")), 2, RoundingMode.HALF_UP)
+												.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+									} catch (Exception e) {
+										this.info("L9718Report-990, F22: " + tLDVo.get("F22") + "; F12: "
+												+ tLDVo.get("F12"));
+									}
+
+									makeExcel.setValue(row, col, output + "%");
+									break;
+								default:
+									makeExcel.setValue(row, col, tmpValue);
 							}
 
-							makeExcel.setValue(row, col, formatAmt(output, 0));
 							break;
-						case 16:
-							output = BigDecimal.ZERO;
-							try {
-								output = new BigDecimal(tLDVo.get("F22"))
-										.divide(new BigDecimal(tLDVo.get("F12")), 2, RoundingMode.HALF_UP)
-										.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-							} catch (Exception e) {
-								this.info("L9718Report-990, F22: " + tLDVo.get("F22") + "; F12: " + tLDVo.get("F12"));
+						case AcctOthers:
+							// F9, F11
+							// formatAmt
+
+							// F14是百分比
+
+							// 用F11 / F9求出
+
+							switch (i) {
+
+								case 9:
+								case 11:
+
+									output = BigDecimal.ZERO;
+
+									try {
+										output = new BigDecimal(tmpValue);
+									} catch (Exception e) {
+										this.info("L9718Report-990, F" + i + ": " + tmpValue);
+									}
+
+									makeExcel.setValue(row, col, formatAmt(output, 0));
+
+									break;
+
+								case 14:
+
+									output = BigDecimal.ZERO;
+									try {
+										output = new BigDecimal(tLDVo.get("F11"))
+												.divide(new BigDecimal(tLDVo.get("F9")), 2, RoundingMode.HALF_UP)
+												.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+									} catch (Exception e) {
+										this.info("L9718Report-non990, F11: " + tLDVo.get("F11") + "; F8: "
+												+ tLDVo.get("F9"));
+									}
+
+									makeExcel.setValue(row, col, output + "%");
+									break;
+
+								default:
+									makeExcel.setValue(row, col, tmpValue);
+									break;
 							}
 
-							makeExcel.setValue(row, col, output + "%");
 							break;
+
 						default:
-							makeExcel.setValue(row, col, tmpValue);
-						}
-
-						break;
-					case AcctOthers:
-						// F9, F11
-						// formatAmt
-
-						// F14是百分比
-
-						// 用F11 / F9求出
-
-						switch (i) {
-
-						case 9:
-						case 11:
-
-							output = BigDecimal.ZERO;
-
-							try {
-								output = new BigDecimal(tmpValue);
-							} catch (Exception e) {
-								this.info("L9718Report-990, F" + i + ": " + tmpValue);
-							}
-
-							makeExcel.setValue(row, col, formatAmt(output, 0));
-
+							this.warn("L9718Report weird ReportType");
 							break;
-
-						case 14:
-
-							output = BigDecimal.ZERO;
-							try {
-								output = new BigDecimal(tLDVo.get("F11"))
-										.divide(new BigDecimal(tLDVo.get("F9")), 2, RoundingMode.HALF_UP)
-										.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-							} catch (Exception e) {
-								this.info("L9718Report-non990, F11: " + tLDVo.get("F11") + "; F8: " + tLDVo.get("F9"));
-							}
-
-							makeExcel.setValue(row, col, output + "%");
-							break;
-
-						default:
-							makeExcel.setValue(row, col, tmpValue);
-							break;
-						}
-						
-						break;
-
-					default:
-						this.warn("L9718Report weird ReportType");
-						break;
 					}
 
 				}
+
+				rowShift++;
 			}
 
 			if (reportType == ReportType.AcctOthers) {

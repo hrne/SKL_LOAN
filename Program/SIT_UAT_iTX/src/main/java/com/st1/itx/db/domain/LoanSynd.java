@@ -29,7 +29,7 @@ public class LoanSynd implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -6744512353542327223L;
 
 // 聯貸編號
   /* 自動編號民國年(3)+流水號(3) */

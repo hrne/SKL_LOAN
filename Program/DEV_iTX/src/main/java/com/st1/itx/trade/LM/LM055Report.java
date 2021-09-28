@@ -139,11 +139,11 @@ public class LM055Report extends MakeReport {
 				// 備抵損失
 				if (lM055Vo.get("F0").equals("3")) {
 
-					normalAmount = lM055Vo.get("F3") == null ? 0 : Integer.valueOf(lM055Vo.get("F3"));
+					normalAmount = Integer.valueOf(lM055Vo.get("F3")) == 0 ? 0 : Integer.valueOf(lM055Vo.get("F3"));
 
 				} else if (lM055Vo.get("F0").equals("99")) {
 
-					specificAmount = lM055Vo.get("F3") == null ? 0 : Integer.valueOf(lM055Vo.get("F3"));
+					specificAmount = Integer.valueOf(lM055Vo.get("F3")) == 0 ?  0 : Integer.valueOf(lM055Vo.get("F3"));
 
 					allowAmount = new BigDecimal(normalAmount + specificAmount);
 
@@ -151,7 +151,7 @@ public class LM055Report extends MakeReport {
 
 				} else {
 
-					allowAmount = lM055Vo.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
+					allowAmount = Integer.valueOf(lM055Vo.get("F3")) == 0 ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
 
 					makeExcel.setValue(row, colAllow, allowAmount, "#,##0");
 

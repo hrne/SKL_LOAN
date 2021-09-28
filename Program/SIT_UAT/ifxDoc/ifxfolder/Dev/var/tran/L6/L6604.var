@@ -28,7 +28,7 @@ E(0,0)
 ["#FdCode+代碼",#Code],
 ["#FdItem+說明",#Item],
 ["#FdDefType+業務類別",#DefType,#DefTypeX],
-["#FdEnable+啟用記號",#Enable],
+["#FdEnable+啟用記號",#Enable,#EnableX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -60,18 +60,21 @@ T(3,CdCode.CodeType)
 T(3,CdCode.MenuCode)
 #DefTypeH=x,1024,S
 
+!啟用停用
+#CODEStartStop=x,20,S
+T(3,CdCode.StartStop)
+#EnableH=x,1024,S
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDCODEFuncCode1,#CDCODEMenuCode)
+S(XXR99,01,#CDCODEFuncCode1,#CDCODEMenuCode,#CODEStartStop)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCodeHelp,#HelpDesc1)
 T(2,@DefTypeH,#HelpDesc2)
+T(2,@EnableH,#HelpDesc3)
 
-
-
-#EnableH=X,100,S
-T(3,Y:啟用;N:停用)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -171,7 +174,7 @@ R(1,L6R04)
 T(2,@Item,#L6R04Item)
 T(2,@Enable,#L6R04Enable)
 T(2,@DefType,#L6R04DefType)
-
+T(H,@EnableX,#Enable,#EnableH)
 
 !說明
 #Item=x,50,I
@@ -192,6 +195,9 @@ C(4,#DefType,S,T(H,#DefType,#DefTypeH))
 C(2,#FunCode,s,$,$,$,s,s)
 HELP(#EnableH)
 @V(3,Y,N,y,n)
+
+#EnableX=X,10,L
+T(H,#Enable,#EnableH)
 
 #RPTFG=A,1,S
 E(0,0)

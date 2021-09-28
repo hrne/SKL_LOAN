@@ -104,7 +104,7 @@ public class LM051Report extends MakeReport {
 
 		makeExcel.setSheet("總表");
 
-		makeExcel.setValue(14, 7, iMonth + "月月報表數", "C");
+		makeExcel.setValue(12, 9, iMonth + "月月報表數", "C");
 		makeExcel.setValue(14, 5, thisMonthEndDate, "C");
 		makeExcel.setValue(14, 6, lastMonthEndDate, "C");
 

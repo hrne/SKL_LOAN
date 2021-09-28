@@ -371,4 +371,20 @@ em = null;
     }
   }
 
+  @Override
+  public void Usp_L9_MonthlyLM036Portfolio_Ins(int TBSDYF, String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      monthlyLM036PortfolioReposDay.uspL9Monthlylm036portfolioIns(TBSDYF, EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      monthlyLM036PortfolioReposMon.uspL9Monthlylm036portfolioIns(TBSDYF, EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      monthlyLM036PortfolioReposHist.uspL9Monthlylm036portfolioIns(TBSDYF, EmpNo);
+   else
+      monthlyLM036PortfolioRepos.uspL9Monthlylm036portfolioIns(TBSDYF, EmpNo);
+  }
+
 }

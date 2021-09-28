@@ -8,6 +8,7 @@ import javax.persistence.LockModeType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,10 @@ public interface MonthlyLM036PortfolioRepositoryHist extends JpaRepository<Month
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
   public Optional<MonthlyLM036Portfolio> findByDataMonth(int dataMonth);
+
+  // 維護 MonthlyLM036Portfolio LM036Portfolio
+  @Procedure(value = "\"Usp_L9_MonthlyLM036Portfolio_Ins\"")
+  public void uspL9Monthlylm036portfolioIns(int TBSDYF, String EmpNo);
 
 }
 

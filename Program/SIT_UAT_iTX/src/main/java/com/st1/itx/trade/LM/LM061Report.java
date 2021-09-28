@@ -52,7 +52,6 @@ public class LM061Report extends MakeReport {
 		}
 
 		if (fnAllList.size() > 0) {
-		
 
 			String tempCustNo = "";
 
@@ -67,6 +66,7 @@ public class LM061Report extends MakeReport {
 
 			// 同戶號多額度 筆數
 			int tempCount = 0;
+			int tempCount2 = 0;
 
 			// 從第三列開始塞值
 			int row = 3;
@@ -91,8 +91,6 @@ public class LM061Report extends MakeReport {
 				if (!tempCustNo.equals(tLDVo.get("F0"))) {
 					num++;
 				}
-
-				
 
 				// 欄位：序列
 				makeExcel.setValue(row, 2, num);
@@ -162,13 +160,29 @@ public class LM061Report extends MakeReport {
 				// 鑑價金額
 				F11 = tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11"));
 
+	
 				// 代號 56 拍定金額 58 分配金額
 				if (tLDVo.get("F12").equals("056")) {
 
 					// 和上一個戶號不一樣就歸零 並直接附值
 					// 和上一個戶號一樣就累加 並 合併儲存格 再賦值
-					if (!tempCustNo.equals(tLDVo.get("F0"))) {
 
+					if (tempCustNo.equals(tLDVo.get("F0"))) {
+				
+						// 紀錄同戶號多額度的筆數
+						tempCount++;
+						this.info("1.tempCount=" + tempCount);
+						// 累加轉催收金額
+
+						tempOvduBal = tempOvduBal.add(ovduBal);
+						this.info("1有相同戶號的累積金額" + tempOvduBal + ",單筆金額" + ovduBal);
+
+						// BigDecimal的比較大小：-1 小於 0 等於 1 大於
+						if (tempF11.compareTo(F11) == -1) {
+							tempF11 = F11;
+						}
+
+					} else {
 						// 上一同戶號多額度跟這筆比較，如果有1筆以上就使用合併
 						if (tempCount > 1) {
 
@@ -186,6 +200,7 @@ public class LM061Report extends MakeReport {
 							// 賦值完後 合併
 							makeExcel.setMergedRegion(row - tempCount, row - 1, 14, 14);
 
+
 						}
 						// 暫存鑑價金額 歸零
 						tempF11 = BigDecimal.ZERO;
@@ -197,8 +212,7 @@ public class LM061Report extends MakeReport {
 						// 累加轉催收金額
 						tempOvduBal = tempOvduBal.add(ovduBal);
 
-						// 計數 歸零
-						tempCount = 0;
+						tempCount=0;
 						// 多筆額度計數
 						tempCount++;
 
@@ -210,21 +224,6 @@ public class LM061Report extends MakeReport {
 						makeExcel.setValue(row, 14, this.computeDivide(ovduBal, new BigDecimal(tLDVo.get("F11")), 4),
 								"##0.0%");
 
-					} else {
-
-						// 紀錄同戶號多額度的筆數
-						tempCount++;
-
-						// 累加轉催收金額
-
-						tempOvduBal = tempOvduBal.add(ovduBal);
-						this.info("1有相同戶號的累積金額" + tempOvduBal + ",單筆金額" + ovduBal);
-
-						// BigDecimal的比較大小：-1 小於 0 等於 1 大於
-						if (tempF11.compareTo(F11) == -1) {
-							tempF11 = F11;
-						}
-
 					}
 
 					// 暫存戶號
@@ -233,7 +232,7 @@ public class LM061Report extends MakeReport {
 					// 最後一筆時如果是需要合併，且同戶號多額度有1筆以上就使用合併。
 					if (count == tLDVo.size() && tempCount > 1) {
 
-						// 爛位的列數為多少筆額度減去當前列數
+						// 欄位的列數為多少筆額度減去當前列數
 						makeExcel.setValue(row - tempCount, 13, tempF11, "L");
 
 						// 同上方式，同戶號 累計轉催收金額 除以 鑑價金額 (LTV)
@@ -246,7 +245,6 @@ public class LM061Report extends MakeReport {
 
 					}
 
-					
 				}
 
 				// 代號 77 協議達成

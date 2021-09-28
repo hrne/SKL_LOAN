@@ -48,5 +48,5 @@ FunctionCode=9,1
 CustNo=9,7
 FacmNo=9,3
 AcDate=9,7
-BankCode=9,3
+RepayBank=9,3
 END=X,1
