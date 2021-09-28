@@ -142,7 +142,6 @@ public class L4510 extends TradeBuffer {
 	private HashMap<tmpFacm, Integer> mapFlag = new HashMap<>();
 	private HashMap<tmpFacm, Integer> mapFlag2 = new HashMap<>();
 
-	private HashMap<tmpFacm, String> rpAcCodeMap = new HashMap<>();
 	private HashMap<tmpFacm, String> insuNoMap = new HashMap<>();
 	private HashMap<tmpFacm, Integer> bormMap = new HashMap<>();
 
@@ -151,7 +150,9 @@ public class L4510 extends TradeBuffer {
 	private HashMap<String, Integer> perfMonth = new HashMap<>();
 
 	private HashMap<tmpFacm, String> errMsg = new HashMap<>();
-	private HashMap<Integer, String> acctCode = new HashMap<>();
+	
+	private HashMap<tmpFacm, String> facmAcctCode = new HashMap<>();
+	private HashMap<Integer, String> custAcctCode = new HashMap<>();
 	private TempVo tempVo = new TempVo();
 	private HashMap<tmpFacm, String> jsonField = new HashMap<>();
 	private HashMap<tmpFacm, Integer> mapSetFlag = new HashMap<>();
@@ -348,9 +349,12 @@ public class L4510 extends TradeBuffer {
 				flagMap2.put(tmp2, 1);
 			}
 
+			// 業務科目(額度)
+			facmAcctCode.put(tmp2,  result.get("F2"));
+
 			// 業務科目(戶號第一筆)
-			if (!acctCode.containsKey(parse.stringToInteger(result.get("F0")))) {
-				acctCode.put(parse.stringToInteger(result.get("F0")), result.get("F2"));
+			if (!custAcctCode.containsKey(parse.stringToInteger(result.get("F0")))) {
+				custAcctCode.put(parse.stringToInteger(result.get("F0")), result.get("F2"));
 			}
 			
 			// 應繳試算
@@ -620,7 +624,7 @@ public class L4510 extends TradeBuffer {
 			} else {
 				tEmpDeductDtlId.setRepayCode("1"); // ???
 			}
-			tEmpDeductDtlId.setAcctCode(rpAcCodeMap.get(tmp));
+			tEmpDeductDtlId.setAcctCode(facmAcctCode.get(tmp));
 			tEmpDeductDtlId.setFacmNo(tmp.getFacmNo());
 			tEmpDeductDtlId.setBormNo(tmp.getBormNo());
 
@@ -849,7 +853,7 @@ public class L4510 extends TradeBuffer {
 			if (tEmpDeductDtl.getAchRepayCode() == 5) {
 				tEmpDeductMedia.setAcctCode("000");
 			} else {
-				tEmpDeductMedia.setAcctCode(acctCode.get(tEmpDeductDtl.getCustNo()));
+				tEmpDeductMedia.setAcctCode(custAcctCode.get(tEmpDeductDtl.getCustNo()));
 			}
 			tEmpDeductMedia.setAcDate(0);
 			tEmpDeductMedia.setBatchNo("");
@@ -998,8 +1002,6 @@ public class L4510 extends TradeBuffer {
 				if (!mapFlag.containsKey(tmp)) {
 					mapFlag.put(tmp, 1);
 				}
-
-				rpAcCodeMap.put(tmp, tBaTxVo.getAcctCode());
 
 				this.info("DataKind : " + tBaTxVo.getDataKind());
 				this.info("RepayType : " + tBaTxVo.getRepayType());

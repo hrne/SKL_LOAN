@@ -14,7 +14,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanSynd;
@@ -22,11 +22,9 @@ import com.st1.itx.db.domain.LoanSyndId;
 import com.st1.itx.db.domain.LoanSyndItem;
 import com.st1.itx.db.domain.LoanSyndItemId;
 import com.st1.itx.db.service.CdGseqService;
-import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.LoanBorTxService;
+import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.LoanSyndItemService;
 import com.st1.itx.db.service.LoanSyndService;
-import com.st1.itx.db.service.TxTempService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.common.LoanCom;
@@ -74,16 +72,11 @@ public class L2600 extends TradeBuffer {
 	@Autowired
 	public CdGseqService cdGseqService;
 	@Autowired
-	public TxTempService txTempService;
-	@Autowired
 	public LoanSyndService loanSyndService;
 	@Autowired
 	public LoanSyndItemService loanSyndItemService;
-
 	@Autowired
-	public CustMainService custMainService;
-	@Autowired
-	public LoanBorTxService loanBorTxService;
+	public FacCaseApplService facCaseApplService;
 
 	@Autowired
 	Parse parse;
@@ -94,39 +87,19 @@ public class L2600 extends TradeBuffer {
 
 	private TitaVo titaVo = new TitaVo();
 	private int iFuncCode;
-	private String iCustId;
-	private int iCustNo;
 	private int iSyndNo;
 	private String iSyndTypeCode;
-	private String iGuaId;
 	private String iLeadingBank;
+	private String iAgentBank;
 	private int iSigningDate;
-	private int iDrawdownStartDate;
-	private int iDrawdownEndDate;
-	private String iCommitFeeFlag;
 	private String iCurrencyCode;
 	private BigDecimal iSyndAmt;
 	private BigDecimal iPartAmt;
-	private String iAgentBank;
-	private int iCentralBankPercent;
-	private String iMasterCustId;
-	private String iSubCustId1;
-	private String iSubCustId2;
-	private String iSubCustId3;
-	private String iSubCustId4;
-	private String iSubCustId5;
-	private String iSubCustId6;
 	private BigDecimal iPartRate;
-	private int iCreditPeriod;
 
 	// work area
-	private int wkCustNo = 0;
 	private int wkSyndNo = 0;
-	private int wkBorxNo = 1;
 	private int wkTbsDy;
-	private CustMain tCustMain;
-	// private TxTemp tTxTemp;
-	// private TxTempId tTxTempId;
 	private TempVo tTempVo = new TempVo();
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
@@ -144,37 +117,17 @@ public class L2600 extends TradeBuffer {
 		wkTbsDy = this.txBuffer.getTxCom().getTbsdy();
 
 		// 取得輸入資料
-		iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
-		iCustId = titaVo.getParam("CustId");
-		iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
-		iSyndNo = this.parse.stringToInteger(titaVo.getParam("SyndNo"));
-		iSyndTypeCode = titaVo.getParam("SyndTypeCode");
-		iGuaId = titaVo.getParam("GuaId");
-		iLeadingBank = titaVo.getParam("LeadingBank");
-		iSigningDate = this.parse.stringToInteger(titaVo.getParam("SigningDate"));
-		iDrawdownStartDate = this.parse.stringToInteger(titaVo.getParam("DrawdownStartDate"));
-		iDrawdownEndDate = this.parse.stringToInteger(titaVo.getParam("DrawdownEndDate"));
-		iCommitFeeFlag = titaVo.getParam("CommitFeeFlag");
-		iPartRate = this.parse.stringToBigDecimal(titaVo.getParam("PartRate"));
-		iCurrencyCode = titaVo.getParam("CurrencyCode");
-		iSyndAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimSyndAmt"));
-		iPartAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimPartAmt"));
-		iAgentBank = titaVo.getParam("AgentBank");
-		iCreditPeriod = this.parse.stringToInteger(titaVo.getParam("CreditPeriod"));
-		// iGuaId
-		// iPartRate
-		// iCreditPeriod
+		iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode")); // 功能
+		iSyndNo = this.parse.stringToInteger(titaVo.getParam("SyndNo")); // 聯貸案編號
+		iSyndTypeCode = titaVo.getParam("SyndTypeCode"); // 國內或國際聯貸
+		iLeadingBank = titaVo.getParam("LeadingBank"); // 主辦行
+		iAgentBank = titaVo.getParam("AgentBank"); // 擔保品管理行
+		iSigningDate = this.parse.stringToInteger(titaVo.getParam("SigningDate")); // 簽約日
+		iPartRate = this.parse.stringToBigDecimal(titaVo.getParam("PartRate")); // 參貸費率
+		iCurrencyCode = titaVo.getParam("CurrencyCode"); // 幣別
+		iSyndAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimSyndAmt")); // 聯貸總金額
+		iPartAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimPartAmt")); // 參貸金額
 
-		iCentralBankPercent = this.parse.stringToInteger(titaVo.getParam("CentralBankPercent"));
-		iMasterCustId = "";
-		iSubCustId1 = "";
-		iSubCustId2 = "";
-		iSubCustId3 = "";
-		iSubCustId4 = "";
-		iSubCustId5 = "";
-		iSubCustId6 = "";
-
-		wkCustNo = iCustNo;
 		wkSyndNo = iSyndNo;
 
 		// 檢查輸入資料
@@ -187,12 +140,9 @@ public class L2600 extends TradeBuffer {
 		case 1: // 新增
 		case 3: // 拷貝
 			GetSyndNoRoutine(); // 取的聯貸案序號
-			tLoanSyndId.setCustNo(wkCustNo);
 			tLoanSyndId.setSyndNo(wkSyndNo);
-			tLoanSynd.setCustNo(wkCustNo);
 			tLoanSynd.setSyndNo(wkSyndNo);
-			tLoanSynd.setLoanSyndId(tLoanSyndId);
-			wkBorxNo = 1;
+
 			moveLoanSynd();
 			try {
 				loanSyndService.insert(tLoanSynd);
@@ -201,32 +151,30 @@ public class L2600 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0002", e.getErrorMsg()); // 新增資料已存在
 				}
 			}
-			// 新增放款交易內容檔
-			addLoanBorTxRoutine();
 			break;
-		case 2: // 修改 商品參數生效,只允許修改商品狀態、商品截止日期
-			tLoanSynd = loanSyndService.holdById(new LoanSyndId(iCustNo, iSyndNo));
+		case 2: // 修改
+			tLoanSynd = loanSyndService.holdById(iSyndNo);
 			if (tLoanSynd == null) {
-				throw new LogicException(titaVo, "E0006", "聯貸訂約檔 戶號 = " + iCustNo + " 聯貸案序號 = " + iSyndNo); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006", "聯貸訂約檔  聯貸案序號 = " + iSyndNo); // 鎖定資料時，發生錯誤
 			}
-			wkBorxNo = tLoanSynd.getLastBorxNo() + 1;
 			moveLoanSynd();
 			try {
 				loanSyndService.update(tLoanSynd);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0003", e.getErrorMsg()); // 修改資料不存在
 			}
-			// 新增放款交易內容檔
-			addLoanBorTxRoutine();
 			break;
 		case 4: // 刪除
-			tLoanSynd = loanSyndService.holdById(new LoanSyndId(iCustNo, iSyndNo));
+			tLoanSynd = loanSyndService.holdById(iSyndNo);
 			if (tLoanSynd == null) {
-				throw new LogicException(titaVo, "E0006", "聯貸訂約檔 戶號 = " + iCustNo + " 聯貸案序號 = " + iSyndNo); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006", "聯貸訂約檔  聯貸案序號 = " + iSyndNo); // 鎖定資料時，發生錯誤
 			}
-			wkBorxNo = tLoanSynd.getLastBorxNo() + 1;
-			// 新增放款交易內容檔
-			addLoanBorTxRoutine();
+			// 刪除時 有案件申請使用時error
+			Slice<FacCaseAppl> slFacCaseAppl = facCaseApplService.syndNoEq(iSyndNo, 0, 1, titaVo);
+			if (slFacCaseAppl != null) {
+				throw new LogicException(titaVo, "E0008", "案件申請檔有使用此聯貸案編號 = " + iSyndNo); // 刪除資料時，發生錯誤
+			}
+			DeleteLoanSyndItemRoutine();
 			try {
 				loanSyndService.delete(tLoanSynd);
 			} catch (DBException e) {
@@ -237,7 +185,6 @@ public class L2600 extends TradeBuffer {
 			break;
 		}
 
-		this.totaVo.putParam("CustNo", wkCustNo);
 		this.totaVo.putParam("SyndNo", wkSyndNo);
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -247,63 +194,48 @@ public class L2600 extends TradeBuffer {
 	private void GetSyndNoRoutine() throws LogicException {
 		this.info("   GetSyndNoRoutine ...");
 
-		tCustMain = custMainService.holdById(loanCom.getCustUKey(iCustId, titaVo));
-		if (tCustMain == null) {
-			throw new LogicException(titaVo, "E0006", "客戶資料主檔 身份證字號/統一編號 = " + iCustId); // 鎖定資料時，發生錯誤
+		int WkTbsYy = this.txBuffer.getTxCom().getTbsdy() / 10000;
+		// 新增時由電腦產生,營業日之民國年(3位)+3位之流水號
+		if (wkSyndNo == 0) {
+			wkSyndNo = gGSeqCom.getSeqNo(0, 1, "L2", "0003", 999, titaVo);
+			wkSyndNo = (WkTbsYy % 1000) * 1000 + wkSyndNo;
 		}
-		if (tCustMain.getCustNo() == 0) {
-			wkCustNo = gGSeqCom.getSeqNo(0, 0, "L2", "0001", 9999999, titaVo);
-			tCustMain.setCustNo(wkCustNo);
-		}
-		wkSyndNo = tCustMain.getLastSyndNo() + 1;
-		tCustMain.setLastSyndNo(wkSyndNo);
-		try {
-			custMainService.update(tCustMain);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "客戶資料主檔 身份證字號/統一編號 = " + iCustId); // 更新資料時，發生錯誤
-		}
+
+		this.info("   SyndNo  =  " + wkSyndNo);
+
 	}
 
 	private void moveLoanSynd() throws LogicException {
-		tLoanSynd.setLastBorxNo(wkBorxNo);
-		tLoanSynd.setCustUKey(loanCom.getCustUKey(iCustId, titaVo));
-		tLoanSynd.setGuaUKey(loanCom.getCustUKey(iGuaId, titaVo));
 		tLoanSynd.setSyndTypeCodeFlag(iSyndTypeCode);
 		tLoanSynd.setLeadingBank(iLeadingBank);
 		tLoanSynd.setSigningDate(iSigningDate);
-		tLoanSynd.setDrawdownStartDate(iDrawdownStartDate);
-		tLoanSynd.setDrawdownEndDate(iDrawdownEndDate);
-		tLoanSynd.setCommitFeeFlag("");
 		tLoanSynd.setPartRate(iPartRate);
 		tLoanSynd.setCurrencyCode(iCurrencyCode);
 		tLoanSynd.setSyndAmt(iSyndAmt);
 		tLoanSynd.setPartAmt(iPartAmt);
 		tLoanSynd.setAgentBank(iAgentBank);
-		tLoanSynd.setCreditPeriod(iCreditPeriod);
-		tLoanSynd.setCentralBankPercent(iCentralBankPercent);
-		tLoanSynd.setMasterCustUkey("");
-		tLoanSynd.setSubCustUkey1("");
-		tLoanSynd.setSubCustUkey2("");
-		tLoanSynd.setSubCustUkey3("");
-		tLoanSynd.setSubCustUkey4("");
-		tLoanSynd.setSubCustUkey5("");
-		tLoanSynd.setSubCustUkey6("");
 
+		// 刪除聯貸案動撥條件檔
 		DeleteLoanSyndItemRoutine();
 		// 更新動撥條件檔
 		LoanSyndItem tLoanSyndItem = new LoanSyndItem();
-
+		int j = 0;
 		for (int i = 1; i <= 5; i++) {
 			this.info(("Item=" + titaVo.get("Item" + i)));
 
 			if (!"".equals(titaVo.getParam("Item" + i))) {
+				j++;
 				String Item = titaVo.get("Item" + i);
 				tLoanSyndItem = new LoanSyndItem();
-				tLoanSyndItem.setLoanSyndItemId(new LoanSyndItemId(wkCustNo, wkSyndNo, Item));
-				tLoanSyndItem.setRate(parse.stringToBigDecimal(titaVo.get("Rate" + i)));
-				tLoanSyndItem.setIncr(parse.stringToBigDecimal(titaVo.get("Incr" + i)));
-				tLoanSyndItem.setUseDate(parse.stringToInteger(titaVo.get("UseDate" + i)));
-				tLoanSyndItem.setMaturityDate(parse.stringToInteger(titaVo.get("MaturityDate" + i)));
+				LoanSyndItemId LoanSyndItemId = new LoanSyndItemId();
+				LoanSyndItemId.setSyndNo(wkSyndNo);
+				LoanSyndItemId.setSyndSeq(j);
+				tLoanSyndItem.setLoanSyndItemId(LoanSyndItemId);
+				tLoanSyndItem.setItem(Item);
+				tLoanSyndItem.setSyndAmt(parse.stringToBigDecimal(titaVo.get("Amt" + i)));
+				tLoanSyndItem.setSyndMark(titaVo.get("Mark" + i));
+				tLoanSyndItem.setSyndBal(parse.stringToBigDecimal(titaVo.get("Bal" + i)));
+
 				try {
 					loanSyndItemService.insert(tLoanSyndItem, titaVo);
 				} catch (DBException e) {
@@ -316,64 +248,11 @@ public class L2600 extends TradeBuffer {
 
 	}
 
-	// 新增放款交易內容檔
-	private void addLoanBorTxRoutine() throws LogicException {
-		this.info("addLoanBorTxRoutine ... ");
-
-		tLoanBorTx = new LoanBorTx();
-		tLoanBorTxId = new LoanBorTxId();
-		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, wkCustNo, 999, wkSyndNo, wkBorxNo, titaVo);
-		switch (iFuncCode) {
-		case 1: // 新增
-		case 3: // 拷貝
-			tLoanBorTx.setDesc("聯貸案訂約登錄－新增");
-			break;
-		case 2: // 修改
-			tLoanBorTx.setDesc("聯貸案訂約登錄－修改");
-			break;
-		case 4: // 刪除
-			tLoanBorTx.setDesc("聯貸案訂約登錄－刪除");
-			break;
-		}
-		// 其他欄位
-		tTempVo.clear();
-		tTempVo.putParam("FuncCode", iFuncCode);
-		tTempVo.putParam("GuaId", iGuaId);
-		tTempVo.putParam("LeadingBank", tLoanSynd.getLeadingBank());
-		tTempVo.putParam("SigningDate", tLoanSynd.getSigningDate());
-		tTempVo.putParam("DrawdownStartDate", tLoanSynd.getDrawdownStartDate());
-		tTempVo.putParam("DrawdownEndDate", tLoanSynd.getDrawdownEndDate());
-		tTempVo.putParam("PartRate", iPartRate);
-		tTempVo.putParam("SyndAmt", tLoanSynd.getSyndAmt());
-		tTempVo.putParam("PartAmt", tLoanSynd.getPartAmt());
-		tTempVo.putParam("AgentBank", tLoanSynd.getAgentBank());
-		tTempVo.putParam("CreditPeriod", tLoanSynd.getCreditPeriod());
-		tTempVo.putParam("CentralBankPercent", tLoanSynd.getCentralBankPercent());
-		for (int i = 1; i <= 5; i++) {
-			if (titaVo.get("Item" + i) != null) {
-				tTempVo.putParam("Item" + i, titaVo.get("Item" + i));
-				tTempVo.putParam("Rate" + i, titaVo.get("Rate" + i));
-				tTempVo.putParam("Incr" + i, titaVo.get("Incr" + i));
-				tTempVo.putParam("UseDate" + i, titaVo.get("UseDate" + i));
-				tTempVo.putParam("MaturityDate" + i, titaVo.get("MaturityDate" + i));
-			} else {
-				break;
-			}
-		}
-		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
-		try {
-			loanBorTxService.insert(tLoanBorTx);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
-		}
-	}
-
 	// 刪除聯貸案動撥條件檔
 	private void DeleteLoanSyndItemRoutine() throws LogicException {
 		this.info("DeleteLoanSyndItemRoutine ...");
 
-		Slice<LoanSyndItem> slLoanSyndItem = loanSyndItemService.findSyndNo(wkCustNo, wkSyndNo, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<LoanSyndItem> slLoanSyndItem = loanSyndItemService.findSyndNoEq(wkSyndNo, 0, Integer.MAX_VALUE, titaVo);
 		List<LoanSyndItem> lLoanSyndItem = slLoanSyndItem == null ? null : slLoanSyndItem.getContent();
 		if (lLoanSyndItem != null && lLoanSyndItem.size() > 0) {
 			try {

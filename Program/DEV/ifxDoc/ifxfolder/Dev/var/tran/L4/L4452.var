@@ -27,9 +27,13 @@ E(0,0)
 <sub type="DC" name="L4452" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L4452]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@銀行扣款(媒體製作)"],
+[#<->#,"#FdFunctionCode+功能",#FunctionCode,#FunctionCodeX],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate],
 [#<->#,"#FdOpItem+作業項目",#OpItem,#OpItemX],
 ]
+
+#FdFunctionCode=X,2,L
+T(3,*)
 
 #FdEntryDate=X,2,L
 T(3,*)
@@ -46,10 +50,22 @@ T(4,CHAIN$)
 #OpItemHelp=x,40,S
 T(3,1:ACH扣款;2:郵局扣款;9:全部)
 
+#FunctionHelp=x,50,S
+T(3,1:產出媒體檔;2:重製媒體碼)
+
 ! 調rim
 <include src="ROM.icf::L4R11.dec"/>
 
 #RimToday=D,7,S
+
+! 功能
+#FunctionCode=A,1,I
+HELP(#FunctionHelp)
+@V(H,#FunctionHelp)
+
+! 功能中文
+#FunctionCodeX=X,10,L
+T(3,)T(H,#FunctionCode,#FunctionHelp)
 
 #RimL4r11=X,1,S
 C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
@@ -89,6 +105,7 @@ T(3,)T(H,#OpItem,#OpItemHelp)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
+#FunctionCode
 #EntryDate
 #OpItem
 </sub>

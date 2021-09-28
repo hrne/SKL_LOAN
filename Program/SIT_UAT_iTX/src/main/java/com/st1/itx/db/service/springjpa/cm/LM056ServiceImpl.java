@@ -62,6 +62,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "	SELECT MLB.\"CustNo\"";
 		sql += "		  ,C.\"CustName\"";
+		sql += "		  ,C.\"CustId\"";
 		sql += "		  ,SUM(MLB.\"LoanBalance\") AS \"LoanBalance\"";
 		sql += "		  ,(CASE";
 		sql += "			  WHEN L.\"SyndNo\" <> 0 THEN '聯貸'";
@@ -143,6 +144,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 
 		String sql = " ";
+		sql += "SELECT * FROM(";
 		sql += "	SELECT ( CASE";
 		sql += "       	       WHEN ( M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6) OR (CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7)) THEN 'C'";
 		sql += "       	     ELSE 'B' END ) AS \"KIND\"";
@@ -186,6 +188,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	       FROM \"AcMain\"";
 		sql += "	       WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000,10601304000)";
 		sql += "	         AND \"MonthEndYm\" = :yymm )";
+		sql += "	GROUP BY 'TOTAL'";
 		sql += "	UNION";
 		sql += "	SELECT 'NTOTAL' AS \"KIND\"";
 		sql += "		  ,SUM(\"AMT\") AS \"AMT\"";
@@ -199,6 +202,7 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	       FROM \"AcMain\"";
 		sql += "	       WHERE \"AcNoCode\" IN (10601301000,10601302000,10601304000)";
 		sql += "	         AND \"MonthEndYm\" = :yymm )";
+		sql += "	GROUP BY 'NTOTAL'";
 		sql += ")";
 		this.info("sql=" + sql);
 

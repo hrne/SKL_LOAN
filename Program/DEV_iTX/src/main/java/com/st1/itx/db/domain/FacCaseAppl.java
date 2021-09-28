@@ -29,7 +29,7 @@ public class FacCaseAppl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -742136129801540318L;
+	private static final long serialVersionUID = 1L;
 
 // 申請號碼
   @Id
@@ -48,6 +48,10 @@ public class FacCaseAppl implements Serializable {
   /* 徵審系統案號(eLoan案件編號) */
   @Column(name = "`CreditSysNo`")
   private int creditSysNo = 0;
+
+  // 聯貸案編號
+  @Column(name = "`SyndNo`")
+  private int syndNo = 0;
 
   // 申請幣別
   @Column(name = "`CurrencyCode`", length = 3)
@@ -223,6 +227,25 @@ public class FacCaseAppl implements Serializable {
 	*/
   public void setCreditSysNo(int creditSysNo) {
     this.creditSysNo = creditSysNo;
+  }
+
+/**
+	* 聯貸案編號<br>
+	* 
+	* @return Integer
+	*/
+  public int getSyndNo() {
+    return this.syndNo;
+  }
+
+/**
+	* 聯貸案編號<br>
+	* 
+  *
+  * @param syndNo 聯貸案編號
+	*/
+  public void setSyndNo(int syndNo) {
+    this.syndNo = syndNo;
   }
 
 /**
@@ -705,10 +728,10 @@ N:否
 
   @Override
   public String toString() {
-    return "FacCaseAppl [applNo=" + applNo + ", custUKey=" + custUKey + ", applDate=" + applDate + ", creditSysNo=" + creditSysNo + ", currencyCode=" + currencyCode + ", applAmt=" + applAmt
-           + ", prodNo=" + prodNo + ", estimate=" + estimate + ", pieceCode=" + pieceCode + ", creditOfficer=" + creditOfficer + ", loanOfficer=" + loanOfficer + ", introducer=" + introducer
-           + ", coorgnizer=" + coorgnizer + ", interviewerA=" + interviewerA + ", interviewerB=" + interviewerB + ", supervisor=" + supervisor + ", processCode=" + processCode + ", approveDate=" + approveDate
-           + ", groupUKey=" + groupUKey + ", branchNo=" + branchNo + ", isLimit=" + isLimit + ", isRelated=" + isRelated + ", isLnrelNear=" + isLnrelNear + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "FacCaseAppl [applNo=" + applNo + ", custUKey=" + custUKey + ", applDate=" + applDate + ", creditSysNo=" + creditSysNo + ", syndNo=" + syndNo + ", currencyCode=" + currencyCode
+           + ", applAmt=" + applAmt + ", prodNo=" + prodNo + ", estimate=" + estimate + ", pieceCode=" + pieceCode + ", creditOfficer=" + creditOfficer + ", loanOfficer=" + loanOfficer
+           + ", introducer=" + introducer + ", coorgnizer=" + coorgnizer + ", interviewerA=" + interviewerA + ", interviewerB=" + interviewerB + ", supervisor=" + supervisor + ", processCode=" + processCode
+           + ", approveDate=" + approveDate + ", groupUKey=" + groupUKey + ", branchNo=" + branchNo + ", isLimit=" + isLimit + ", isRelated=" + isRelated + ", isLnrelNear=" + isLnrelNear
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

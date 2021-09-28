@@ -6,7 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 /**
- * LoanSyndItem 聯貸案動撥條件檔<br>
+ * LoanSyndItem 聯貸案費用檔<br>
  * Gen By Tool
  * 
  * @author AdamPan
@@ -15,106 +15,84 @@ import javax.persistence.Embeddable;
 @Embeddable
 public class LoanSyndItemId implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7873746275746543495L;
+	private static final long serialVersionUID = 1L;
 
-// 借款人戶號
-	@Column(name = "`CustNo`")
-	private int custNo = 0;
+// 聯貸案編號
+  @Column(name = "`SyndNo`")
+  private int syndNo = 0;
 
-	// 聯貸案序號
-	@Column(name = "`SyndNo`")
-	private int syndNo = 0;
+  // 聯貸案序號
+  @Column(name = "`SyndSeq`")
+  private int syndSeq = 0;
 
-	// 項別
-	@Column(name = "`Item`", length = 10)
-	private String item = " ";
+  public LoanSyndItemId() {
+  }
 
-	public LoanSyndItemId() {
-	}
+  public LoanSyndItemId(int syndNo, int syndSeq) {
+    this.syndNo = syndNo;
+    this.syndSeq = syndSeq;
+  }
 
-	public LoanSyndItemId(int custNo, int syndNo, String item) {
-		this.custNo = custNo;
-		this.syndNo = syndNo;
-		this.item = item;
-	}
+/**
+	* 聯貸案編號<br>
+	* 
+	* @return Integer
+	*/
+  public int getSyndNo() {
+    return this.syndNo;
+  }
 
-	/**
-	 * 借款人戶號<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getCustNo() {
-		return this.custNo;
-	}
+/**
+	* 聯貸案編號<br>
+	* 
+  *
+  * @param syndNo 聯貸案編號
+	*/
+  public void setSyndNo(int syndNo) {
+    this.syndNo = syndNo;
+  }
 
-	/**
-	 * 借款人戶號<br>
-	 * 
-	 *
-	 * @param custNo 借款人戶號
-	 */
-	public void setCustNo(int custNo) {
-		this.custNo = custNo;
-	}
+/**
+	* 聯貸案序號<br>
+	* 
+	* @return Integer
+	*/
+  public int getSyndSeq() {
+    return this.syndSeq;
+  }
 
-	/**
-	 * 聯貸案序號<br>
-	 * 
-	 * @return Integer
-	 */
-	public int getSyndNo() {
-		return this.syndNo;
-	}
+/**
+	* 聯貸案序號<br>
+	* 
+  *
+  * @param syndSeq 聯貸案序號
+	*/
+  public void setSyndSeq(int syndSeq) {
+    this.syndSeq = syndSeq;
+  }
 
-	/**
-	 * 聯貸案序號<br>
-	 * 
-	 *
-	 * @param syndNo 聯貸案序號
-	 */
-	public void setSyndNo(int syndNo) {
-		this.syndNo = syndNo;
-	}
 
-	/**
-	 * 項別<br>
-	 * 
-	 * @return String
-	 */
-	public String getItem() {
-		return this.item == null ? "" : this.item;
-	}
+  @Override
+  public int hashCode() {
+    return Objects.hash(syndNo, syndSeq);
+  }
 
-	/**
-	 * 項別<br>
-	 * 
-	 *
-	 * @param item 項別
-	 */
-	public void setItem(String item) {
-		this.item = item;
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if(this == obj)
+      return true;
+    if(obj == null || getClass() != obj.getClass())
+      return false;
+    LoanSyndItemId loanSyndItemId = (LoanSyndItemId) obj;
+    return syndNo == loanSyndItemId.syndNo && syndSeq == loanSyndItemId.syndSeq;
+  }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(custNo, syndNo, item);
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null || getClass() != obj.getClass())
-			return false;
-		LoanSyndItemId loanSyndItemId = (LoanSyndItemId) obj;
-		return custNo == loanSyndItemId.custNo && syndNo == loanSyndItemId.syndNo && item.equals(loanSyndItemId.item);
-	}
-
-	@Override
-	public String toString() {
-		return "LoanSyndItemId [custNo=" + custNo + ", syndNo=" + syndNo + ", item=" + item + "]";
-	}
+  @Override
+  public String toString() {
+    return "LoanSyndItemId [syndNo=" + syndNo + ", syndSeq=" + syndSeq + "]";
+  }
 }

@@ -8,7 +8,7 @@ import javax.persistence.EntityListeners;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import javax.persistence.EmbeddedId;
+import javax.persistence.Id;
 import javax.persistence.Column;
 import com.st1.itx.util.StaticTool;
 import com.st1.itx.Exception.LogicException;
@@ -29,56 +29,31 @@ public class LoanSynd implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6463359645184901022L;
+	private static final long serialVersionUID = 1L;
 
-@EmbeddedId
-  private LoanSyndId loanSyndId;
-
-  // 借款人戶號
-  @Column(name = "`CustNo`", insertable = false, updatable = false)
-  private int custNo = 0;
-
-  // 聯貸編號
-  @Column(name = "`SyndNo`", insertable = false, updatable = false)
+// 聯貸編號
+  /* 自動編號民國年(3)+流水號(3) */
+  @Id
+  @Column(name = "`SyndNo`")
   private int syndNo = 0;
-
-  // 已編BorTx流水號
-  @Column(name = "`LastBorxNo`")
-  private int lastBorxNo = 0;
-
-  // 借款人識別碼
-  @Column(name = "`CustUKey`", length = 32)
-  private String custUKey;
-
-  // 保證人識別碼
-  @Column(name = "`GuaUKey`", length = 32)
-  private String guaUKey;
 
   // 主辦行
   @Column(name = "`LeadingBank`", length = 7)
   private String leadingBank;
 
+  // 代理行
+  /* 擔保品管理行 */
+  @Column(name = "`AgentBank`", length = 7)
+  private String agentBank;
+
   // 簽約日
   @Column(name = "`SigningDate`")
   private int signingDate = 0;
-
-  // 動撥起日
-  @Column(name = "`DrawdownStartDate`")
-  private int drawdownStartDate = 0;
-
-  // 動撥迄日
-  @Column(name = "`DrawdownEndDate`")
-  private int drawdownEndDate = 0;
 
   // 國內或國際聯貸
   /* CdCode.SyndTypeCodeA:國內B:國際 */
   @Column(name = "`SyndTypeCodeFlag`", length = 1)
   private String syndTypeCodeFlag;
-
-  // 是否有收承諾費
-  /* Y:是 N:否刪除(L3600.L3010有使用一併修改) */
-  @Column(name = "`CommitFeeFlag`", length = 1)
-  private String commitFeeFlag;
 
   // 參貸費率
   @Column(name = "`PartRate`")
@@ -95,54 +70,6 @@ public class LoanSynd implements Serializable {
   // 參貸金額
   @Column(name = "`PartAmt`")
   private BigDecimal partAmt = new BigDecimal("0");
-
-  // 代理行
-  /* 擔保品管理行 */
-  @Column(name = "`AgentBank`", length = 7)
-  private String agentBank;
-
-  // 授信期間
-  @Column(name = "`CreditPeriod`")
-  private int creditPeriod = 0;
-
-  // 央行融資
-  @Column(name = "`CentralBankPercent`")
-  private int centralBankPercent = 0;
-
-  // 母公司識別碼
-  /* 刪除(L3600.L3010有使用一併修改) */
-  @Column(name = "`MasterCustUkey`", length = 32)
-  private String masterCustUkey;
-
-  // 聯貸動撥之子公司一
-  /* 刪除(L3600.L3010有使用一併修改) */
-  @Column(name = "`SubCustUkey1`", length = 32)
-  private String subCustUkey1;
-
-  // 聯貸動撥之子公司二
-  /* 刪除(L3600.L3010有使用一併修改) */
-  @Column(name = "`SubCustUkey2`", length = 32)
-  private String subCustUkey2;
-
-  // 聯貸動撥之子公司三
-  /* 刪除(L3600.L3010有使用一併修改) */
-  @Column(name = "`SubCustUkey3`", length = 32)
-  private String subCustUkey3;
-
-  // 聯貸動撥之子公司四
-  /* 刪除(L3600.L3010有使用一併修改) */
-  @Column(name = "`SubCustUkey4`", length = 32)
-  private String subCustUkey4;
-
-  // 聯貸動撥之子公司五
-  /* 刪除(L3600.L3010有使用一併修改) */
-  @Column(name = "`SubCustUkey5`", length = 32)
-  private String subCustUkey5;
-
-  // 聯貸動撥之子公司六
-  /* 刪除(L3600.L3010有使用一併修改) */
-  @Column(name = "`SubCustUkey6`", length = 32)
-  private String subCustUkey6;
 
   // 建檔日期時間
   @CreatedDate
@@ -163,36 +90,10 @@ public class LoanSynd implements Serializable {
   private String lastUpdateEmpNo;
 
 
-  public LoanSyndId getLoanSyndId() {
-    return this.loanSyndId;
-  }
-
-  public void setLoanSyndId(LoanSyndId loanSyndId) {
-    this.loanSyndId = loanSyndId;
-  }
-
-/**
-	* 借款人戶號<br>
-	* 
-	* @return Integer
-	*/
-  public int getCustNo() {
-    return this.custNo;
-  }
-
-/**
-	* 借款人戶號<br>
-	* 
-  *
-  * @param custNo 借款人戶號
-	*/
-  public void setCustNo(int custNo) {
-    this.custNo = custNo;
-  }
-
 /**
 	* 聯貸編號<br>
-	* 
+	* 自動編號
+民國年(3)+流水號(3)
 	* @return Integer
 	*/
   public int getSyndNo() {
@@ -201,69 +102,13 @@ public class LoanSynd implements Serializable {
 
 /**
 	* 聯貸編號<br>
-	* 
+	* 自動編號
+民國年(3)+流水號(3)
   *
   * @param syndNo 聯貸編號
 	*/
   public void setSyndNo(int syndNo) {
     this.syndNo = syndNo;
-  }
-
-/**
-	* 已編BorTx流水號<br>
-	* 
-	* @return Integer
-	*/
-  public int getLastBorxNo() {
-    return this.lastBorxNo;
-  }
-
-/**
-	* 已編BorTx流水號<br>
-	* 
-  *
-  * @param lastBorxNo 已編BorTx流水號
-	*/
-  public void setLastBorxNo(int lastBorxNo) {
-    this.lastBorxNo = lastBorxNo;
-  }
-
-/**
-	* 借款人識別碼<br>
-	* 
-	* @return String
-	*/
-  public String getCustUKey() {
-    return this.custUKey == null ? "" : this.custUKey;
-  }
-
-/**
-	* 借款人識別碼<br>
-	* 
-  *
-  * @param custUKey 借款人識別碼
-	*/
-  public void setCustUKey(String custUKey) {
-    this.custUKey = custUKey;
-  }
-
-/**
-	* 保證人識別碼<br>
-	* 
-	* @return String
-	*/
-  public String getGuaUKey() {
-    return this.guaUKey == null ? "" : this.guaUKey;
-  }
-
-/**
-	* 保證人識別碼<br>
-	* 
-  *
-  * @param guaUKey 保證人識別碼
-	*/
-  public void setGuaUKey(String guaUKey) {
-    this.guaUKey = guaUKey;
   }
 
 /**
@@ -286,6 +131,25 @@ public class LoanSynd implements Serializable {
   }
 
 /**
+	* 代理行<br>
+	* 擔保品管理行
+	* @return String
+	*/
+  public String getAgentBank() {
+    return this.agentBank == null ? "" : this.agentBank;
+  }
+
+/**
+	* 代理行<br>
+	* 擔保品管理行
+  *
+  * @param agentBank 代理行
+	*/
+  public void setAgentBank(String agentBank) {
+    this.agentBank = agentBank;
+  }
+
+/**
 	* 簽約日<br>
 	* 
 	* @return Integer
@@ -302,44 +166,6 @@ public class LoanSynd implements Serializable {
   * @throws LogicException when Date Is Warn	*/
   public void setSigningDate(int signingDate) throws LogicException {
     this.signingDate = StaticTool.rocToBc(signingDate);
-  }
-
-/**
-	* 動撥起日<br>
-	* 
-	* @return Integer
-	*/
-  public int getDrawdownStartDate() {
-    return StaticTool.bcToRoc(this.drawdownStartDate);
-  }
-
-/**
-	* 動撥起日<br>
-	* 
-  *
-  * @param drawdownStartDate 動撥起日
-  * @throws LogicException when Date Is Warn	*/
-  public void setDrawdownStartDate(int drawdownStartDate) throws LogicException {
-    this.drawdownStartDate = StaticTool.rocToBc(drawdownStartDate);
-  }
-
-/**
-	* 動撥迄日<br>
-	* 
-	* @return Integer
-	*/
-  public int getDrawdownEndDate() {
-    return StaticTool.bcToRoc(this.drawdownEndDate);
-  }
-
-/**
-	* 動撥迄日<br>
-	* 
-  *
-  * @param drawdownEndDate 動撥迄日
-  * @throws LogicException when Date Is Warn	*/
-  public void setDrawdownEndDate(int drawdownEndDate) throws LogicException {
-    this.drawdownEndDate = StaticTool.rocToBc(drawdownEndDate);
   }
 
 /**
@@ -363,27 +189,6 @@ B:國際
 	*/
   public void setSyndTypeCodeFlag(String syndTypeCodeFlag) {
     this.syndTypeCodeFlag = syndTypeCodeFlag;
-  }
-
-/**
-	* 是否有收承諾費<br>
-	* Y:是 N:否
-刪除(L3600.L3010有使用一併修改)
-	* @return String
-	*/
-  public String getCommitFeeFlag() {
-    return this.commitFeeFlag == null ? "" : this.commitFeeFlag;
-  }
-
-/**
-	* 是否有收承諾費<br>
-	* Y:是 N:否
-刪除(L3600.L3010有使用一併修改)
-  *
-  * @param commitFeeFlag 是否有收承諾費
-	*/
-  public void setCommitFeeFlag(String commitFeeFlag) {
-    this.commitFeeFlag = commitFeeFlag;
   }
 
 /**
@@ -460,196 +265,6 @@ B:國際
 	*/
   public void setPartAmt(BigDecimal partAmt) {
     this.partAmt = partAmt;
-  }
-
-/**
-	* 代理行<br>
-	* 擔保品管理行
-	* @return String
-	*/
-  public String getAgentBank() {
-    return this.agentBank == null ? "" : this.agentBank;
-  }
-
-/**
-	* 代理行<br>
-	* 擔保品管理行
-  *
-  * @param agentBank 代理行
-	*/
-  public void setAgentBank(String agentBank) {
-    this.agentBank = agentBank;
-  }
-
-/**
-	* 授信期間<br>
-	* 
-	* @return Integer
-	*/
-  public int getCreditPeriod() {
-    return this.creditPeriod;
-  }
-
-/**
-	* 授信期間<br>
-	* 
-  *
-  * @param creditPeriod 授信期間
-	*/
-  public void setCreditPeriod(int creditPeriod) {
-    this.creditPeriod = creditPeriod;
-  }
-
-/**
-	* 央行融資<br>
-	* 
-	* @return Integer
-	*/
-  public int getCentralBankPercent() {
-    return this.centralBankPercent;
-  }
-
-/**
-	* 央行融資<br>
-	* 
-  *
-  * @param centralBankPercent 央行融資
-	*/
-  public void setCentralBankPercent(int centralBankPercent) {
-    this.centralBankPercent = centralBankPercent;
-  }
-
-/**
-	* 母公司識別碼<br>
-	* 刪除(L3600.L3010有使用一併修改)
-	* @return String
-	*/
-  public String getMasterCustUkey() {
-    return this.masterCustUkey == null ? "" : this.masterCustUkey;
-  }
-
-/**
-	* 母公司識別碼<br>
-	* 刪除(L3600.L3010有使用一併修改)
-  *
-  * @param masterCustUkey 母公司識別碼
-	*/
-  public void setMasterCustUkey(String masterCustUkey) {
-    this.masterCustUkey = masterCustUkey;
-  }
-
-/**
-	* 聯貸動撥之子公司一<br>
-	* 刪除(L3600.L3010有使用一併修改)
-	* @return String
-	*/
-  public String getSubCustUkey1() {
-    return this.subCustUkey1 == null ? "" : this.subCustUkey1;
-  }
-
-/**
-	* 聯貸動撥之子公司一<br>
-	* 刪除(L3600.L3010有使用一併修改)
-  *
-  * @param subCustUkey1 聯貸動撥之子公司一
-	*/
-  public void setSubCustUkey1(String subCustUkey1) {
-    this.subCustUkey1 = subCustUkey1;
-  }
-
-/**
-	* 聯貸動撥之子公司二<br>
-	* 刪除(L3600.L3010有使用一併修改)
-	* @return String
-	*/
-  public String getSubCustUkey2() {
-    return this.subCustUkey2 == null ? "" : this.subCustUkey2;
-  }
-
-/**
-	* 聯貸動撥之子公司二<br>
-	* 刪除(L3600.L3010有使用一併修改)
-  *
-  * @param subCustUkey2 聯貸動撥之子公司二
-	*/
-  public void setSubCustUkey2(String subCustUkey2) {
-    this.subCustUkey2 = subCustUkey2;
-  }
-
-/**
-	* 聯貸動撥之子公司三<br>
-	* 刪除(L3600.L3010有使用一併修改)
-	* @return String
-	*/
-  public String getSubCustUkey3() {
-    return this.subCustUkey3 == null ? "" : this.subCustUkey3;
-  }
-
-/**
-	* 聯貸動撥之子公司三<br>
-	* 刪除(L3600.L3010有使用一併修改)
-  *
-  * @param subCustUkey3 聯貸動撥之子公司三
-	*/
-  public void setSubCustUkey3(String subCustUkey3) {
-    this.subCustUkey3 = subCustUkey3;
-  }
-
-/**
-	* 聯貸動撥之子公司四<br>
-	* 刪除(L3600.L3010有使用一併修改)
-	* @return String
-	*/
-  public String getSubCustUkey4() {
-    return this.subCustUkey4 == null ? "" : this.subCustUkey4;
-  }
-
-/**
-	* 聯貸動撥之子公司四<br>
-	* 刪除(L3600.L3010有使用一併修改)
-  *
-  * @param subCustUkey4 聯貸動撥之子公司四
-	*/
-  public void setSubCustUkey4(String subCustUkey4) {
-    this.subCustUkey4 = subCustUkey4;
-  }
-
-/**
-	* 聯貸動撥之子公司五<br>
-	* 刪除(L3600.L3010有使用一併修改)
-	* @return String
-	*/
-  public String getSubCustUkey5() {
-    return this.subCustUkey5 == null ? "" : this.subCustUkey5;
-  }
-
-/**
-	* 聯貸動撥之子公司五<br>
-	* 刪除(L3600.L3010有使用一併修改)
-  *
-  * @param subCustUkey5 聯貸動撥之子公司五
-	*/
-  public void setSubCustUkey5(String subCustUkey5) {
-    this.subCustUkey5 = subCustUkey5;
-  }
-
-/**
-	* 聯貸動撥之子公司六<br>
-	* 刪除(L3600.L3010有使用一併修改)
-	* @return String
-	*/
-  public String getSubCustUkey6() {
-    return this.subCustUkey6 == null ? "" : this.subCustUkey6;
-  }
-
-/**
-	* 聯貸動撥之子公司六<br>
-	* 刪除(L3600.L3010有使用一併修改)
-  *
-  * @param subCustUkey6 聯貸動撥之子公司六
-	*/
-  public void setSubCustUkey6(String subCustUkey6) {
-    this.subCustUkey6 = subCustUkey6;
   }
 
 /**
@@ -731,10 +346,8 @@ B:國際
 
   @Override
   public String toString() {
-    return "LoanSynd [loanSyndId=" + loanSyndId + ", lastBorxNo=" + lastBorxNo + ", custUKey=" + custUKey + ", guaUKey=" + guaUKey + ", leadingBank=" + leadingBank
-           + ", signingDate=" + signingDate + ", drawdownStartDate=" + drawdownStartDate + ", drawdownEndDate=" + drawdownEndDate + ", syndTypeCodeFlag=" + syndTypeCodeFlag + ", commitFeeFlag=" + commitFeeFlag + ", partRate=" + partRate
-           + ", currencyCode=" + currencyCode + ", syndAmt=" + syndAmt + ", partAmt=" + partAmt + ", agentBank=" + agentBank + ", creditPeriod=" + creditPeriod + ", centralBankPercent=" + centralBankPercent
-           + ", masterCustUkey=" + masterCustUkey + ", subCustUkey1=" + subCustUkey1 + ", subCustUkey2=" + subCustUkey2 + ", subCustUkey3=" + subCustUkey3 + ", subCustUkey4=" + subCustUkey4 + ", subCustUkey5=" + subCustUkey5
-           + ", subCustUkey6=" + subCustUkey6 + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "LoanSynd [syndNo=" + syndNo + ", leadingBank=" + leadingBank + ", agentBank=" + agentBank + ", signingDate=" + signingDate + ", syndTypeCodeFlag=" + syndTypeCodeFlag + ", partRate=" + partRate
+           + ", currencyCode=" + currencyCode + ", syndAmt=" + syndAmt + ", partAmt=" + partAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

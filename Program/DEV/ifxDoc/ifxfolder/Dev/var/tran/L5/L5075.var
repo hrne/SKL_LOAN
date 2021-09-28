@@ -210,9 +210,13 @@ BIND(grid,cancel)
 ! 已繳期金=>改為累繳金額
 #OOAccuTempAmt=m,14,O
 ! 延期年月(起)
-#OODeferYMStart=A,6,O
+#OODeferYMStart=A,6,S
+#OODeferYMStart1=X,6,O
+C(3,#OODeferYMStart,0,T(3, ),T(2,#OODeferYMStart))
 ! 延期年月(訖)
-#OODeferYMEnd=A,6,O
+#OODeferYMEnd=A,6,S
+#OODeferYMEnd1=X,6,O
+C(3,#OODeferYMEnd,0,T(3, ),T(2,#OODeferYMEnd))
 ! <電話>
 #OOBufB=X,18,S
 T(2,1+#OOCustId+#OOCustNo)
@@ -260,7 +264,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5972; ntxbuf=#OOBufC})
 
 !新增二欄判斷二階段新增用
 #OOTwoStepCode=X,1,O
-!到期日
+!還款結束日
 #OOLastDueDate=D,7,O
 !總本金餘額
 #OOPrincipalBal=m,14,O
@@ -369,11 +373,11 @@ TXFORM=L5075
 {width:110,align:'right'}
 #OOTimes=剩餘期數
 {width:95,align:'right'}
-#OOLastDueDate=到期日
+#OOLastDueDate=還款結束日
 {width:120,align:'center'}
-#OODeferYMStart=延期年月(起)
+#OODeferYMStart1=延期年月(起)
 {width:120,align:'center'}
-#OODeferYMEnd=延期年月(訖)
+#OODeferYMEnd1=延期年月(訖)
 {width:120,align:'center'}
 #OOBtnB=
 {search:false,formatter:'cust:bind-button:電話;L1905 顧客連絡電話查詢',align:'center',canExport:false,width:35}
@@ -400,7 +404,7 @@ TXFORM=L5075
 #OOOverDueAmt
 #OOAccuTempAmt
 #OOLastDueDate
-#OODeferYMStart
-#OODeferYMEnd
+#OODeferYMStart1
+#OODeferYMEnd1
 @^
 </sub>

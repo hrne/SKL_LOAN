@@ -1,0 +1,243 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+!#DefTypeH=x,150,S
+!T(3,01:顧客管理作業;02:業務作業;03:帳務作業;04:批次作業;05:管理性作業;06:共同作業;07:介接外部系統;08:遵循法令作業;09:報表作業)
+
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,60];">
+[
+["[L6604]                                 各類代碼檔維護"],
+["#FdFunCode+功能",#FunCodeX],
+["#FdDefCode+代碼檔代號",#DefCode,#DefCodeBTN],
+["#FdDefItem+代碼檔名稱",#DefItem],
+["#FdCode+代碼",#Code],
+["#FdItem+說明",#Item],
+["#FdDefType+業務類別",#DefType,#DefTypeX],
+["#FdEnable+啟用記號",#Enable],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=x,42,S
+
+#DefCodeBTN=X,15,I,ui:button;value:代碼檔代號查詢;enable:1;tabbable:0;title:L6069 代碼檔代號查詢;
+
+#b1=X,1,S
+BIND(#DefCodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:DefCode<-OOCode:DefItem<-OOItem})
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! <include src="ROM.icf::L0Rim.dec"/>
+! <include src="ROM.icf::L6R04Rim.dec"/>
+<include src="ROM.icf::L6R04.dec"/>
+
+!FuncCode1 (1:新增;2:修改;4:刪除;5:查詢)
+#CDCODEFuncCode1=x,20,S                  
+T(3,CdCode.FuncCode1)                  
+#FuncCodeHelp=x,100,S
+
+!代碼檔類別
+#CDCODECodeType=x,20,S
+T(3,CdCode.CodeType)
+
+
+!業務類別
+#CDCODEMenuCode=x,20,S                  
+T(3,CdCode.MenuCode)
+#DefTypeH=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode1,#CDCODEMenuCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCodeHelp,#HelpDesc1)
+T(2,@DefTypeH,#HelpDesc2)
+
+
+
+#EnableH=X,100,S
+T(3,Y:啟用;N:停用)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請由L6064連動進入),$)
+
+#NTXBUF=x,41,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCode,#NTXBUF,1,1)
+T(1,@DefCode,#NTXBUF,2,20)
+T(1,@Code,#NTXBUF,22,20)
+
+! 功能
+#FunCode=A,1,S
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCodeHelp)
+@V(H,#FuncCodeHelp)
+
+#FunCodeX=X,12,L
+T(H,#FunCode,#FuncCodeHelp)
+K(MODIFYBUTTON,#FunCodeX)
+IF(#FunCode==4 ||#FunCode==2,HIDE(#DefCodeBTN),SHOW(#DefCodeBTN))
+
+#AGAIN=X,1,S
+IF(#FunCode==4 || #FunCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FunCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+#EditMode=A,1,S
+C(2,#FunCode,T(3,0),T(3,1),T(3,1),T(3,1),T(3,0),T(3,0))
+
+! 永遠為必輸欄位
+#FdFunCode=x,2,L
+C(3,#CHAIN,1,S,C(3,#EditMode,1,T(3,*),S))
+
+#FdDefType=x,2,L
+T(3, )
+
+#FdDefCode=x,2,L
+C(3,#CHAIN,1,C(3,#FunCode,1,T(3,*),T(3, )),C(3,#EditMode,1,T(3,*),S))
+
+#FdDefItem=x,2,L
+T(3, )
+
+#FdCode=x,2,L
+C(3,#CHAIN,1,C(3,#FunCode,1,T(3,*),T(3, )),C(3,#EditMode,1,T(3,*),S))
+
+#FdItem=x,2,L
+C(3,#EditMode,1,T(3,*),S)
+
+#FdEnable=x,2,L
+C(3,#EditMode,1,T(3,*),S)
+
+!顯示框線
+#ShowFrame=A,1,S
+C(5,#FdFunCode,*,T(F,@FunCode,1),T(F,@FunCode,0))
+C(5,#FdDefType,*,T(F,@DefType,1),T(F,@DefType,0))
+C(5,#FdDefCode,*,T(F,@DefCode,1),T(F,@DefCode,0))
+C(5,#FdDefItem,*,T(F,@DefItem,1),T(F,@DefItem,0))
+C(5,#FdCode,*,T(F,@Code,1),T(F,@Code,0))
+C(5,#FdItem,*,T(F,@Item,1),T(F,@Item,0))
+C(5,#FdEnable,*,T(F,@Enable,1),T(F,@Enable,0))
+
+!代碼檔代號
+#DefCode=x,20,I
+C(3,#CHAIN,1,C(3,#FunCode,1,$,s),$)
+@V(7)
+
+#DefCodeH=X,80,S
+<include src="ROM.icf::L6R35.dec"/>
+#SendL6R35=x,1,S
+RESET_RIM(#SendL6R35,L6R35)
+S(L6R35,1,#FunCode,#DefCode)
+R(1,L6R35)
+T(2,@DefCodeH,#L6R35Item)
+
+!代碼檔名稱
+#DefItem=X,50,L
+T(2,#DefCodeH)
+
+#DefCodeT=A,1,S
+IF(#DefCode=="CodeType",C(3,#EditMode,1,E(0,1),E(0,0)),E(0,0))
+C(3,#DefCodeT,1,C(3,#EditMode,1,T(3,@FdDefType,*),T(3,@FdDefType, )),T(3,@FdDefType, ))
+C(3,#DefCodeT,1,C(3,#EditMode,1,T(F,@DefType,1),T(F,@DefType,0)),T(F,@DefType,0))
+
+!代碼
+#Code=x,20,I
+C(3,#CHAIN,1,C(3,#FunCode,1,$,s),$)
+@V(7)
+
+#SendL6R04=x,1,S
+RESET_RIM(#SendL6R04,L6R04)
+S(L6R04,1,#FunCode,#DefCode,#Code)
+R(1,L6R04)
+T(2,@Item,#L6R04Item)
+T(2,@Enable,#L6R04Enable)
+T(2,@DefType,#L6R04DefType)
+
+
+!說明
+#Item=x,50,I
+C(2,#FunCode,s,$,$,$,s,s)
+@V(7)
+
+!業務類別
+#DefType=X,2,I
+C(3,#DefCodeT,1,$,s)
+HELP(#DefTypeH)
+@V(H,#DefTypeH)
+
+#DefTypeX=x,50,L
+C(4,#DefType,S,T(H,#DefType,#DefTypeH))
+
+!啟用記號
+#Enable=X,1,I
+C(2,#FunCode,s,$,$,$,s,s)
+HELP(#EnableH)
+@V(3,Y,N,y,n)
+
+#RPTFG=A,1,S
+E(0,0)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6604 ----------
+<sub type="FORM" name="L6604">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6604,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6604] 各類代碼檔維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCode#DefType#DefCode#DefItem#Code#Item#Enable
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L6604
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R04.tom"/>
+<include src="ROM.icf::L6R35.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -55,6 +55,7 @@ T(3,*)
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 
+
 !TranKey
 #CDCODETranKey=x,20,S
 T(3,CdCode.TranKey)
@@ -106,6 +107,9 @@ T(2,@CourtCode56Help,#HelpDesc6)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+#NTXBUF=X,14,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
 !---------- 日期處理 ----------
 #VeiwSysDate=X,8,S
 D(7,2,#SYSDATE,0,0)
@@ -113,6 +117,8 @@ T(1,#VeiwSysDate,2,7)
 
 !交易編號
 #TranCode=A,3,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,3),$)
+C(3,#CHAIN,1,s,$)
 HELP(#TranCodeHelp,cols:3)
 @V(H,#TranCodeHelp)
 
@@ -124,6 +130,8 @@ T(H,#TranCode,#TranCodeHelp)
 
 ![身分證字號]
 #CustId=X,10,I
+C(3,#CHAIN,1,T(1,#NTXBUF,4,10),$)
+C(3,#CHAIN,1,s,$)
 @V(7)A(ID_UNINO,0,#CustId)
 <include src="ROM.icf::L2R07.dec"/>
 #RimTxCode=X,1,S
@@ -195,6 +203,9 @@ SWITCH(#TranCode,
     575,T(3,R),
     T(3,L)
 )
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

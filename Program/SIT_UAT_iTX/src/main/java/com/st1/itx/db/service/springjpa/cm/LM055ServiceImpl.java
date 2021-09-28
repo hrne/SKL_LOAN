@@ -115,6 +115,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "					  WHEN \"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 		sql += "					  WHEN \"ClCode1\" IN (1,2) THEN 'C'";
 		sql += "					  WHEN \"ClCode1\" IN (1,2) THEN 'D'";
+		sql += "					  ELSE 'N'";
 		sql += "					END ) AS \"KIND\"";
 		sql += "	             ,SUM(M.\"PrinBalance\") AS \"AMT\"";
 		sql += "	       FROM \"MonthlyFacBal\" M";
@@ -127,6 +128,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "					   WHEN \"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 		sql += "					   WHEN \"ClCode1\" IN (1,2) THEN 'C'";
 		sql += "					   WHEN \"ClCode1\" IN (1,2) THEN 'D'";
+		sql += "					   ELSE 'N'";
 		sql += "					 END )";
 		sql += "	       UNION";
 		sql += "	       SELECT 'C' AS \"KIND\"";

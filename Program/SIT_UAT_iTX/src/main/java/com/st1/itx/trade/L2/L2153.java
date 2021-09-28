@@ -356,7 +356,7 @@ public class L2153 extends TradeBuffer {
 			// 更新額度檔
 			tFacMain = facMainService.facmApplNoFirst(iApplNo, titaVo);
 			if (tFacCaseAppl == null) {
-				throw new LogicException(titaVo, "E0006", "案額度檔" + iApplNo); // 鎖定資料時，發生錯誤
+				throw new LogicException(titaVo, "E0006", "額度檔" + iApplNo); // 鎖定資料時，發生錯誤
 			}
 			wkCustNo = tFacMain.getCustNo();
 			wkFacmNo = tFacMain.getFacmNo();
@@ -613,6 +613,7 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setCreditOfficer(titaVo.getParam("CreditOfficer"));
 		tFacMain.setLoanOfficer(titaVo.getParam("BusinessOfficer"));
 		tFacMain.setBusinessOfficer(titaVo.getParam("BusinessOfficer"));
+		tFacMain.setApprovedLevel(titaVo.getParam("ApprovedLevel")); //TODO:9/27新增 
 		tFacMain.setSupervisor(titaVo.getParam("Supervisor"));
 		tFacMain.setInvestigateOfficer("");
 		tFacMain.setEstimateReview("");

@@ -568,6 +568,11 @@ T(3,CdCode.BankDeductCd)
 
 #BankDeductCdHelp=x,1024,S 
 
+!ApprovedLevel 核決層級
+#CDDEF24=x,25,S
+T(3,CdCode.ApprovedLevel)
+
+#ApprovedLevelHelp=x,1024,S 
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -603,12 +608,13 @@ T(2,@BaseRate0Help,#HelpDesc10)
 
 #HelpRim3=X,1,S
 RESET_RIM(#HelpRim3,XXR99)
-S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23)
+S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ProdIntCalcCodeHelp,#HelpDesc1)
 T(2,@RateTypeHelp,#HelpDesc2)
 T(2,@BankDeductCdHelp,#HelpDesc3)
+T(2,@ApprovedLevelHelp,#HelpDesc4)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -2123,6 +2129,20 @@ T(2,#L2r08FullName)
 #BUF17A=X,7,S
 T(3,      Y)
 
+
+!核准層級
+#FdApprovedLevel=X,2,L
+
+#ApprovedLevel=X,1,I
+HELP(#ApprovedLevelHelp)
+@V(H,#ApprovedLevelHelp)
+
+#ApprovedLevelX=X,20,L
+T(3,)
+T(H,#ApprovedLevel,#ApprovedLevelHelp)
+C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F,@Supervisor,1)T(3,@FdSupervisor,*))
+
+
 #BIND17A=X,1,S
 BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF17A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
 
@@ -2132,6 +2152,7 @@ BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF17A;ntxbuf5=type<-1:Super
 
 #Supervisor=X,6,I
 C(3,#Hide6Flag,0,CALL(#HideP6),$)
+C(3,#ApprovedLevel,9,S,$)
 
 #BUF17B=X,7,S
 T(2,#Supervisor+Y)
@@ -2461,8 +2482,9 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdEstimate+@估價人員",#Estimate,#BTN13,#EstimateX],
 ["#FdCreditOfficer+授信人員",#CreditOfficer,#BTN14,#CreditOfficerX],
 ["#FdBusinessOfficer+#BusinessOfficerItem",#BusinessOfficer,#BTN16,#BusinessOfficerX],
-["#FdSupervisor+核決主管",#Supervisor,#BTN17,#SupervisorX],
-["#FdCoorgnizer+@協辦人",#Coorgnizer,#BTN18,#CoorgnizerX],
+["#FdApprovedLevel+核准層級",#ApprovedLevel,#ApprovedLevelX],
+["#FdSupervisor+@核決主管",#Supervisor,#BTN17,#SupervisorX],
+["#FdCoorgnizer+協辦人",#Coorgnizer,#BTN18,#CoorgnizerX],
 ]
 </sub>
 
@@ -2518,7 +2540,8 @@ K(LIGHT,#FacmNo,TXTRED,0,1)
 #GracePeriod#TimAcctFee#ExtraRepayCode#IntCalcCode#CustTypeCode#RuleCode#RecycleCode#RecycleDeadline
 #UsageCode#DepartmentCode#IncomeTaxFlag#CompensateFlag#IrrevocableFlag#RateAdjNoticeCode
 #RepayCode#RepayBank#RepayAcctNo#PostCode#Introducer#District#FireOfficer
-#Estimate#CreditOfficer#BusinessOfficer#Supervisor#Coorgnizer
+#Estimate#CreditOfficer#BusinessOfficer
+#ApprovedLevel#Supervisor#Coorgnizer
 #GroupId#CreditScore#GuaranteeDate
 #RelationCode#RelationName#RelationId#RelationBirthday#RelationGender
 ##loop{times:10,n:1}

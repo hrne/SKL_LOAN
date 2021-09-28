@@ -2,8 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R07")
 @Scope("prototype")
 public class L2R07 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R07.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -93,6 +90,7 @@ public class L2R07 extends TradeBuffer {
 			this.totaVo.putParam("OCustNo", tCustMain.getCustNo());
 			this.totaVo.putParam("OCustName", tCustMain.getCustName());
 			this.totaVo.putParam("OCustTypeCode", tCustMain.getCustTypeCode());
+			this.totaVo.putParam("OEntCode", tCustMain.getEntCode());
 			this.totaVo.putParam("OPrevPayIntDate", 0);
 			this.totaVo.putParam("ONextPayIntDate", 0);
 			this.totaVo.putParam("OSpecificDd", 0);
@@ -104,14 +102,14 @@ public class L2R07 extends TradeBuffer {
 			this.totaVo.putParam("OFacmNo", 0);
 			this.totaVo.putParam("OBormNo", 0);
 			// AML使用
-			//身分證長度8為法人
-			//否則為自然人
+			// 身分證長度8為法人
+			// 否則為自然人
 			if (tCustMain.getCustId().length() == 8) {
 				this.totaVo.putParam("ORemitIdKind", 2);// 身份別 1:自然人 2:法人
-			}else {
+			} else {
 				this.totaVo.putParam("ORemitIdKind", 1);// 身份別 1:自然人 2:法人
 			}
-				
+
 			this.totaVo.putParam("ORemitId", tCustMain.getCustId());// 身份證/居留證號碼
 			this.totaVo.putParam("ORemitGender", tCustMain.getSex());// 性別
 			this.totaVo.putParam("ORemitBirthday", tCustMain.getBirthday());// 出生日期
@@ -153,8 +151,7 @@ public class L2R07 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, 1, 999, 1, 900, this.index,
-				this.limit, titaVo);
+		Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, 1, 999, 1, 900, this.index, this.limit, titaVo);
 		if (!(lLoanBorMain == null || lLoanBorMain.isEmpty())) {
 			for (LoanBorMain ln : lLoanBorMain.getContent()) {
 				if (ln.getStatus() == 0 || ln.getStatus() == 4) { // 0: 正常戶 4: 逾期戶
@@ -195,16 +192,13 @@ public class L2R07 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, 1, 999, this.index, this.limit,
-				titaVo);
+		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, 1, 999, this.index, this.limit, titaVo);
 		if (!(lFacMain == null || lFacMain.isEmpty())) {
 			for (FacMain t : lFacMain.getContent()) {
-				Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, t.getFacmNo(), t.getFacmNo(),
-						1, 900, this.index, this.limit, titaVo);
+				Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, t.getFacmNo(), t.getFacmNo(), 1, 900, this.index, this.limit, titaVo);
 				if (!(lLoanBorMain == null || lLoanBorMain.isEmpty())) {
 					for (LoanBorMain k : lLoanBorMain.getContent()) {
-						if ((k.getStatus() == 0 || k.getStatus() == 4)
-								&& ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
+						if ((k.getStatus() == 0 || k.getStatus() == 4) && ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
 							wkFacmCount++;
 							this.totaVo.putParam("OFacmNo", k.getFacmNo());
 							this.totaVo.putParam("OBormNo", k.getBormNo());
@@ -212,8 +206,7 @@ public class L2R07 extends TradeBuffer {
 						}
 					}
 					for (LoanBorMain k : lLoanBorMain) {
-						if ((k.getStatus() == 0 || k.getStatus() == 4)
-								&& ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
+						if ((k.getStatus() == 0 || k.getStatus() == 4) && ("3".equals(k.getAmortizedCode()) || "4".equals(k.getAmortizedCode()))) {
 							wkBormCount++;
 						}
 					}
@@ -242,8 +235,7 @@ public class L2R07 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, iFacmNo, FacmNoEnd, this.index,
-				this.limit, titaVo);
+		Slice<FacMain> lFacMain = facMainService.facmCustNoRange(custNo, custNo, iFacmNo, FacmNoEnd, this.index, this.limit, titaVo);
 		if (lFacMain == null || lFacMain.isEmpty()) {
 			throw new LogicException(titaVo, "E3085", "L2R07 額度主檔"); // 該戶號沒有額度編號，不可做內容變更
 		}
@@ -252,8 +244,7 @@ public class L2R07 extends TradeBuffer {
 			this.totaVo.putParam("OFacmNo", fac.getFacmNo());
 		}
 		for (FacMain fac : lFacMain.getContent()) {
-			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, fac.getFacmNo(), fac.getFacmNo(),
-					1, 900, this.index, this.limit, titaVo);
+			Slice<LoanBorMain> lLoanBorMain = loanBorMainService.bormCustNoEq(custNo, fac.getFacmNo(), fac.getFacmNo(), 1, 900, this.index, this.limit, titaVo);
 			if (!(lLoanBorMain == null || lLoanBorMain.isEmpty())) {
 				for (LoanBorMain ln : lLoanBorMain.getContent()) {
 					if (ln.getStatus() == 0 || ln.getStatus() == 2 || ln.getStatus() == 4 || ln.getStatus() == 7) {

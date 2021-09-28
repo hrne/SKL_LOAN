@@ -659,6 +659,7 @@ public class L2154 extends TradeBuffer {
 		tTempVo.putParam("CreditOfficer", tFacMain.getCreditOfficer());
 		tTempVo.putParam("LoanOfficer", tFacMain.getBusinessOfficer());
 		tTempVo.putParam("BusinessOfficer", tFacMain.getBusinessOfficer());
+		tTempVo.putParam("ApprovedLevel", tFacMain.getApprovedLevel());
 		tTempVo.putParam("Supervisor", tFacMain.getSupervisor());
 		tTempVo.putParam("InvestigateOfficer", tFacMain.getInvestigateOfficer());
 		tTempVo.putParam("EstimateReview", tFacMain.getEstimateReview());
@@ -746,6 +747,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setCreditOfficer(titaVo.getParam("CreditOfficer"));
 		tFacMain.setLoanOfficer(titaVo.getParam("BusinessOfficer"));
 		tFacMain.setBusinessOfficer(titaVo.getParam("BusinessOfficer"));
+		tFacMain.setApprovedLevel(titaVo.getParam("ApprovedLevel"));
 		tFacMain.setSupervisor(titaVo.getParam("Supervisor"));
 		tFacMain.setInvestigateOfficer("");
 		tFacMain.setEstimateReview("");
@@ -850,6 +852,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setCreditOfficer(tTempVo.getParam("CreditOfficer"));
 		tFacMain.setLoanOfficer(tTempVo.getParam("BusinessOfficer"));
 		tFacMain.setBusinessOfficer(tTempVo.getParam("BusinessOfficer"));
+		tFacMain.setApprovedLevel(tTempVo.getParam("ApprovedLevel"));
 		tFacMain.setSupervisor(tTempVo.getParam("Supervisor"));
 		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
@@ -961,6 +964,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setCreditOfficer(tTempVo.getParam("CreditOfficer"));
 		tFacMain.setLoanOfficer(tTempVo.getParam("BusinessOfficer"));
 		tFacMain.setBusinessOfficer(tTempVo.getParam("BusinessOfficer"));
+		tFacMain.setApprovedLevel(tTempVo.getParam("ApprovedLevel"));
 		tFacMain.setSupervisor(tTempVo.getParam("Supervisor"));
 		tFacMain.setInvestigateOfficer(tTempVo.getParam("InvestigateOfficer"));
 		tFacMain.setEstimateReview(tTempVo.getParam("EstimateReview"));
@@ -984,23 +988,23 @@ public class L2154 extends TradeBuffer {
 	}
 
 	private void bankAuthActRoutine() throws LogicException {
-		if (titaVo.getParam("PostCode").equals(titaVo.getParam("OldPostCode"))
+		if (titaVo.getParam("RepayCode").equals(titaVo.getParam("OldRepayCode"))
+				&& titaVo.getParam("PostCode").equals(titaVo.getParam("OldPostCode"))
 				&& titaVo.getParam("RepayAcctNo").equals(titaVo.getParam("OldAcctNo"))
 				&& titaVo.getParam("RelationCode").equals(titaVo.getParam("OldRelationCode"))
 				&& titaVo.getParam("RelationName").equals(titaVo.getParam("OldRelationName"))
 				&& titaVo.getParam("RelationBirthday").equals(titaVo.getParam("OldRelationBirthday"))
 				&& titaVo.getParam("RelationGender").equals(titaVo.getParam("OldRelationGender"))
 				&& titaVo.getParam("RelationId").equals(titaVo.getParam("OldRelationId"))
-				&& titaVo.getParam("RepayBank").equals(titaVo.getParam("OldRepayBank"))
-				) {
+				&& titaVo.getParam("RepayBank").equals(titaVo.getParam("OldRepayBank"))) {
 			return;
 		}
 
-		// 舊授權刪除
-
-		if ("02".equals(titaVo.getParam("OldRepayCode")) || "2".equals(titaVo.getParam("OldRepayCode"))) {
+		// 舊還款帳號(含還款方式)刪除
+		if ("02".equals(titaVo.getParam("OldRepayCode"))) {
 			txtitaVo = new TitaVo();
 			txtitaVo = (TitaVo) titaVo.clone();
+			txtitaVo.putParam("RepayCode", titaVo.getParam("OldRepayCode"));
 			txtitaVo.putParam("PostCode", titaVo.getParam("OldPostCode"));
 			txtitaVo.putParam("RepayAcctNo", titaVo.getParam("OldAcctNo"));
 			txtitaVo.putParam("RelationCode", titaVo.getParam("OldRelationCode"));
@@ -1011,7 +1015,7 @@ public class L2154 extends TradeBuffer {
 			txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
 			bankAuthActCom.del("A", txtitaVo);
 		}
-		// 新授權新增
+		// 新還款帳號(含還款方式)刪除
 		if ("02".equals(titaVo.getParam("RepayCode"))) {
 			bankAuthActCom.add("A", titaVo);
 		}

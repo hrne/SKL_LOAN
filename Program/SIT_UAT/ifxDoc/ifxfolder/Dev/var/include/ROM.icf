@@ -1778,6 +1778,7 @@ TXFORM=L2R04
 #L2r05CreditOfficer=X,6,S
 #L2r05LoanOfficer=X,6,S
 #L2r05BusinessOfficer=X,6,S
+#L2r05ApprovedLevel=X,1,S
 #L2r05Supervisor=X,6,S
 #L2r05InvestigateOfficer=X,6,S
 #L2r05EstimateReview=X,6,S
@@ -1887,6 +1888,7 @@ TXFORM=L2R05
 #L2r05CreditOfficer
 #L2r05LoanOfficer
 #L2r05BusinessOfficer
+#L2r05ApprovedLevel
 #L2r05Supervisor
 #L2r05InvestigateOfficer
 #L2r05EstimateReview
@@ -1960,6 +1962,7 @@ TXFORM=L2R06
 #L2r07CustNo=A,7,S
 #L2r07CustName=X,100,S
 #L2r07CustTypeCode=X,2,S
+#L2r07EntCode=X,1,S
 #L2r07PrevPayIntDate=D,7,S
 #L2r07NextPayIntDate=D,7,S
 #L2r07SpecificDd=A,2,S
@@ -1982,6 +1985,7 @@ TXFORM=L2R07
 #L2r07CustNo
 #L2r07CustName
 #L2r07CustTypeCode
+#L2r07EntCode
 #L2r07PrevPayIntDate
 #L2r07NextPayIntDate
 #L2r07SpecificDd

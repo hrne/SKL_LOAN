@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.nio.file.Files;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -35,9 +37,11 @@ import com.itextpdf.text.pdf.PdfWriter;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdReport;
 import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdReportService;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.db.service.TxTellerService;
@@ -74,6 +78,9 @@ public class MakeReport extends CommBuffer {
 
 	@Autowired
 	CdReportService cdReportService;
+	
+	@Autowired
+	CdEmpService cdEmpService;
 
 	@Autowired
 	public DateUtil dDateUtil;
@@ -891,6 +898,9 @@ public class MakeReport extends CommBuffer {
 		doToPdf(pdfno, filename);
 	}
 
+	private String rptTlrNo = "";
+	private Timestamp rptCreateDate = null;
+
 	@SuppressWarnings("unchecked")
 	private void doToPdf(long pdfno, String filename) throws LogicException {
 
@@ -902,10 +912,14 @@ public class MakeReport extends CommBuffer {
 			throw new LogicException(titaVo, "EC001", "(MakeReport)輸出檔(TxFile)序號:" + pdfno);
 		}
 
-		if(tTxFile.getFileCode() != null) {
+		if (tTxFile.getFileCode() != null) {
 			this.rptCode = tTxFile.getFileCode();
 		}
-		
+
+		rptTlrNo = tTxFile.getTlrNo();
+
+		rptCreateDate = tTxFile.getCreateDate();
+
 		try {
 			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
 		} catch (IOException e) {
@@ -923,7 +937,7 @@ public class MakeReport extends CommBuffer {
 		if (this.rptCode == null) {
 			this.info("makeReport rptCode is null");
 		}
-		
+
 		// 檢查是否需浮水印
 		CdReport tCdReport = cdReportService.findById(this.rptCode);
 
@@ -1311,13 +1325,22 @@ public class MakeReport extends CommBuffer {
 
 		String watermark = "";
 
-		watermark += titaVo.getTlrNo();
+		watermark += rptTlrNo;
 		watermark += " ";
-		watermark += titaVo.getEmpNm();
+		
+		CdEmp tCdEmp = cdEmpService.findById(rptTlrNo, titaVo);
+		
+		String empNm = "";
+		if (tCdEmp != null) {
+			empNm = tCdEmp.getFullname();
+		}		
+		watermark += empNm;
 		watermark += " ";
-		watermark += this.showRocDate(titaVo.getCalDy(), 2);
+		String rptDate = new SimpleDateFormat("yyyyMMdd").format(rptCreateDate);
+		String rptTime = new SimpleDateFormat("HHmmss").format(rptCreateDate);
+		watermark += this.showRocDate(rptDate, 2);
 		watermark += " ";
-		watermark += this.showTime(titaVo.getCalTm());
+		watermark += this.showTime(rptTime);
 
 		cb.setGState(graphicState);
 		cb.beginText();

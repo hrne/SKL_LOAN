@@ -135,8 +135,13 @@ public class L5075 extends TradeBuffer {
 				occursList.putParam("OOOverDueAmt", OOOverDueAmt);// 應催繳金額 由L5075-NegCom計算
 				//occursList.putParam("OOAccuDueAmt", NegMainVO.getAccuDueAmt());// 已繳期金
 				occursList.putParam("OOAccuTempAmt", NegMainVO.getAccuTempAmt());//累繳金額
-				occursList.putParam("OODeferYMStart", NegMainVO.getDeferYMStart());// 延期年月(起)
-				occursList.putParam("OODeferYMEnd", NegMainVO.getDeferYMEnd());// 延期年月(訖)
+				if (NegMainVO.getDeferYMStart() != 0) {
+					occursList.putParam("OODeferYMStart", NegMainVO.getDeferYMStart() - 191100);// 延期年月(起)
+					occursList.putParam("OODeferYMEnd", NegMainVO.getDeferYMEnd() - 191100);// 延期年月(訖)
+				} else {
+					occursList.putParam("OODeferYMStart", NegMainVO.getDeferYMStart());// 延期年月(起)
+					occursList.putParam("OODeferYMEnd", NegMainVO.getDeferYMEnd());// 延期年月(訖)
+				}
 				occursList.putParam("OOAcDate", NegTransAcDate);// 會計日期
 				occursList.putParam("OOTitaTlrNo", NegTransTitaTlrNo);// 經辦
 				occursList.putParam("OOTitaTxtNo", NegTransTitaTxtNo);// 交易序號

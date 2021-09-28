@@ -407,6 +407,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("OCreditOfficer", tFacMain.getCreditOfficer());
 		this.totaVo.putParam("OLoanOfficer", tFacMain.getLoanOfficer());
 		this.totaVo.putParam("OBusinessOfficer", tFacMain.getBusinessOfficer());
+		this.totaVo.putParam("OApprovedLevel", tFacMain.getApprovedLevel());
 		this.totaVo.putParam("OSupervisor", tFacMain.getSupervisor());
 		this.totaVo.putParam("OInvestigateOfficer", tFacMain.getInvestigateOfficer());
 		this.totaVo.putParam("OEstimateReview", tFacMain.getEstimateReview());

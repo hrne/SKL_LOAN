@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.LoanSynd;
-import com.st1.itx.db.domain.LoanSyndId;
 import com.st1.itx.db.repository.online.LoanSyndRepository;
 import com.st1.itx.db.repository.day.LoanSyndRepositoryDay;
 import com.st1.itx.db.repository.mon.LoanSyndRepositoryMon;
@@ -58,21 +57,21 @@ public class LoanSyndServiceImpl extends ASpringJpaParm implements LoanSyndServi
   }
 
   @Override
-  public LoanSynd findById(LoanSyndId loanSyndId, TitaVo... titaVo) {
+  public LoanSynd findById(int syndNo, TitaVo... titaVo) {
     String dbName = "";
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("findById " + dbName + " " + loanSyndId);
+    this.info("findById " + dbName + " " + syndNo);
     Optional<LoanSynd> loanSynd = null;
     if (dbName.equals(ContentName.onDay))
-      loanSynd = loanSyndReposDay.findById(loanSyndId);
+      loanSynd = loanSyndReposDay.findById(syndNo);
     else if (dbName.equals(ContentName.onMon))
-      loanSynd = loanSyndReposMon.findById(loanSyndId);
+      loanSynd = loanSyndReposMon.findById(syndNo);
     else if (dbName.equals(ContentName.onHist))
-      loanSynd = loanSyndReposHist.findById(loanSyndId);
+      loanSynd = loanSyndReposHist.findById(syndNo);
     else 
-      loanSynd = loanSyndRepos.findById(loanSyndId);
+      loanSynd = loanSyndRepos.findById(syndNo);
     LoanSynd obj = loanSynd.isPresent() ? loanSynd.get() : null;
       if(obj != null) {
         EntityManager em = this.baseEntityManager.getCurrentEntityManager(dbName);
@@ -90,9 +89,9 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "SyndNo"));
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "SyndNo"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "SyndNo"));
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "SyndNo"));
     this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = loanSyndReposDay.findAll(pageable);
@@ -110,7 +109,7 @@ em = null;
   }
 
   @Override
-  public Slice<LoanSynd> syndCustNoRange(int custNo_0, int custNo_1, String leadingBank_2, int signingDate_3, int signingDate_4, int drawdownStartDate_5, int drawdownStartDate_6, int drawdownEndDate_7, int drawdownEndDate_8, int index, int limit, TitaVo... titaVo) {
+  public Slice<LoanSynd> syndNoRange(int syndNo_0, int syndNo_1, String leadingBank_2, int signingDate_3, int signingDate_4, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<LoanSynd> slice = null;
     if (titaVo.length != 0)
@@ -121,15 +120,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("syndCustNoRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " leadingBank_2 : " +  leadingBank_2 + " signingDate_3 : " +  signingDate_3 + " signingDate_4 : " +  signingDate_4 + " drawdownStartDate_5 : " +  drawdownStartDate_5 + " drawdownStartDate_6 : " +  drawdownStartDate_6 + " drawdownEndDate_7 : " +  drawdownEndDate_7 + " drawdownEndDate_8 : " +  drawdownEndDate_8);
+    this.info("syndNoRange " + dbName + " : " + "syndNo_0 : " + syndNo_0 + " syndNo_1 : " +  syndNo_1 + " leadingBank_2 : " +  leadingBank_2 + " signingDate_3 : " +  signingDate_3 + " signingDate_4 : " +  signingDate_4);
     if (dbName.equals(ContentName.onDay))
-      slice = loanSyndReposDay.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualAndDrawdownStartDateGreaterThanEqualAndDrawdownStartDateLessThanEqualAndDrawdownEndDateGreaterThanEqualAndDrawdownEndDateLessThanEqualOrderByCustNoAscLeadingBankAscSigningDateAscDrawdownStartDateAsc(custNo_0, custNo_1, leadingBank_2, signingDate_3, signingDate_4, drawdownStartDate_5, drawdownStartDate_6, drawdownEndDate_7, drawdownEndDate_8, pageable);
+      slice = loanSyndReposDay.findAllBySyndNoGreaterThanEqualAndSyndNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(syndNo_0, syndNo_1, leadingBank_2, signingDate_3, signingDate_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanSyndReposMon.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualAndDrawdownStartDateGreaterThanEqualAndDrawdownStartDateLessThanEqualAndDrawdownEndDateGreaterThanEqualAndDrawdownEndDateLessThanEqualOrderByCustNoAscLeadingBankAscSigningDateAscDrawdownStartDateAsc(custNo_0, custNo_1, leadingBank_2, signingDate_3, signingDate_4, drawdownStartDate_5, drawdownStartDate_6, drawdownEndDate_7, drawdownEndDate_8, pageable);
+      slice = loanSyndReposMon.findAllBySyndNoGreaterThanEqualAndSyndNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(syndNo_0, syndNo_1, leadingBank_2, signingDate_3, signingDate_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanSyndReposHist.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualAndDrawdownStartDateGreaterThanEqualAndDrawdownStartDateLessThanEqualAndDrawdownEndDateGreaterThanEqualAndDrawdownEndDateLessThanEqualOrderByCustNoAscLeadingBankAscSigningDateAscDrawdownStartDateAsc(custNo_0, custNo_1, leadingBank_2, signingDate_3, signingDate_4, drawdownStartDate_5, drawdownStartDate_6, drawdownEndDate_7, drawdownEndDate_8, pageable);
+      slice = loanSyndReposHist.findAllBySyndNoGreaterThanEqualAndSyndNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(syndNo_0, syndNo_1, leadingBank_2, signingDate_3, signingDate_4, pageable);
     else 
-      slice = loanSyndRepos.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualAndDrawdownStartDateGreaterThanEqualAndDrawdownStartDateLessThanEqualAndDrawdownEndDateGreaterThanEqualAndDrawdownEndDateLessThanEqualOrderByCustNoAscLeadingBankAscSigningDateAscDrawdownStartDateAsc(custNo_0, custNo_1, leadingBank_2, signingDate_3, signingDate_4, drawdownStartDate_5, drawdownStartDate_6, drawdownEndDate_7, drawdownEndDate_8, pageable);
+      slice = loanSyndRepos.findAllBySyndNoGreaterThanEqualAndSyndNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(syndNo_0, syndNo_1, leadingBank_2, signingDate_3, signingDate_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -138,20 +137,76 @@ em = null;
   }
 
   @Override
-  public LoanSynd holdById(LoanSyndId loanSyndId, TitaVo... titaVo) {
+  public Slice<LoanSynd> signingDateRange(int signingDate_0, int signingDate_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LoanSynd> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("signingDateRange " + dbName + " : " + "signingDate_0 : " + signingDate_0 + " signingDate_1 : " +  signingDate_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = loanSyndReposDay.findAllBySigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(signingDate_0, signingDate_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = loanSyndReposMon.findAllBySigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(signingDate_0, signingDate_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = loanSyndReposHist.findAllBySigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(signingDate_0, signingDate_1, pageable);
+    else 
+      slice = loanSyndRepos.findAllBySigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(signingDate_0, signingDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<LoanSynd> leadingBankEq(String leadingBank_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LoanSynd> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("leadingBankEq " + dbName + " : " + "leadingBank_0 : " + leadingBank_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = loanSyndReposDay.findAllByLeadingBankIsOrderBySyndNoAsc(leadingBank_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = loanSyndReposMon.findAllByLeadingBankIsOrderBySyndNoAsc(leadingBank_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = loanSyndReposHist.findAllByLeadingBankIsOrderBySyndNoAsc(leadingBank_0, pageable);
+    else 
+      slice = loanSyndRepos.findAllByLeadingBankIsOrderBySyndNoAsc(leadingBank_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public LoanSynd holdById(int syndNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + loanSyndId);
+    this.info("Hold " + dbName + " " + syndNo);
     Optional<LoanSynd> loanSynd = null;
     if (dbName.equals(ContentName.onDay))
-      loanSynd = loanSyndReposDay.findByLoanSyndId(loanSyndId);
+      loanSynd = loanSyndReposDay.findBySyndNo(syndNo);
     else if (dbName.equals(ContentName.onMon))
-      loanSynd = loanSyndReposMon.findByLoanSyndId(loanSyndId);
+      loanSynd = loanSyndReposMon.findBySyndNo(syndNo);
     else if (dbName.equals(ContentName.onHist))
-      loanSynd = loanSyndReposHist.findByLoanSyndId(loanSyndId);
+      loanSynd = loanSyndReposHist.findBySyndNo(syndNo);
     else 
-      loanSynd = loanSyndRepos.findByLoanSyndId(loanSyndId);
+      loanSynd = loanSyndRepos.findBySyndNo(syndNo);
     return loanSynd.isPresent() ? loanSynd.get() : null;
   }
 
@@ -160,16 +215,16 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Hold " + dbName + " " + loanSynd.getLoanSyndId());
+    this.info("Hold " + dbName + " " + loanSynd.getSyndNo());
     Optional<LoanSynd> loanSyndT = null;
     if (dbName.equals(ContentName.onDay))
-      loanSyndT = loanSyndReposDay.findByLoanSyndId(loanSynd.getLoanSyndId());
+      loanSyndT = loanSyndReposDay.findBySyndNo(loanSynd.getSyndNo());
     else if (dbName.equals(ContentName.onMon))
-      loanSyndT = loanSyndReposMon.findByLoanSyndId(loanSynd.getLoanSyndId());
+      loanSyndT = loanSyndReposMon.findBySyndNo(loanSynd.getSyndNo());
     else if (dbName.equals(ContentName.onHist))
-      loanSyndT = loanSyndReposHist.findByLoanSyndId(loanSynd.getLoanSyndId());
+      loanSyndT = loanSyndReposHist.findBySyndNo(loanSynd.getSyndNo());
     else 
-      loanSyndT = loanSyndRepos.findByLoanSyndId(loanSynd.getLoanSyndId());
+      loanSyndT = loanSyndRepos.findBySyndNo(loanSynd.getSyndNo());
     return loanSyndT.isPresent() ? loanSyndT.get() : null;
   }
 
@@ -182,8 +237,8 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    this.info("Insert..." + dbName + " " + loanSynd.getLoanSyndId());
-    if (this.findById(loanSynd.getLoanSyndId()) != null)
+    this.info("Insert..." + dbName + " " + loanSynd.getSyndNo());
+    if (this.findById(loanSynd.getSyndNo()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
@@ -211,7 +266,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    this.info("Update..." + dbName + " " + loanSynd.getLoanSyndId());
+    this.info("Update..." + dbName + " " + loanSynd.getSyndNo());
     if (!empNot.isEmpty())
       loanSynd.setLastUpdateEmpNo(empNot);
 
@@ -234,7 +289,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    this.info("Update..." + dbName + " " + loanSynd.getLoanSyndId());
+    this.info("Update..." + dbName + " " + loanSynd.getSyndNo());
     if (!empNot.isEmpty())
       loanSynd.setLastUpdateEmpNo(empNot);
 
@@ -246,7 +301,7 @@ em = null;
         loanSyndReposHist.saveAndFlush(loanSynd);
     else 
       loanSyndRepos.saveAndFlush(loanSynd);	
-    return this.findById(loanSynd.getLoanSyndId());
+    return this.findById(loanSynd.getSyndNo());
   }
 
   @Override
@@ -254,7 +309,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("Delete..." + dbName + " " + loanSynd.getLoanSyndId());
+    this.info("Delete..." + dbName + " " + loanSynd.getSyndNo());
     if (dbName.equals(ContentName.onDay)) {
       loanSyndReposDay.delete(loanSynd);	
       loanSyndReposDay.flush();

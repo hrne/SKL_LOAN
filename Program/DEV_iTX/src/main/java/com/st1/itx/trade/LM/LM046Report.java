@@ -151,13 +151,13 @@ public class LM046Report extends MakeReport {
 			makeExcel.setValue(19 + count * 3 + 2, 3, totals[0], "#,##0");
 			makeExcel.setValue(19 + count * 3 + 2, 4, safelyDivide(totals[1], 1000, 0));
 			makeExcel.setValue(19 + count * 3 + 2, 5, totals[2], "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 6, safelyDivide(totals[2], totals[0], 5).multiply(new BigDecimal(100)), "0.00%");
+			makeExcel.setValue(19 + count * 3 + 2, 6, safelyDivide(totals[2], totals[0], 5).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP) + "%");
 			makeExcel.setValue(19 + count * 3 + 2, 7, safelyDivide(totals[3], 1000, 0), "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 8, safelyDivide(totals[3], totals[1], 5).multiply(new BigDecimal(100)), "0.00%");
+			makeExcel.setValue(19 + count * 3 + 2, 8, safelyDivide(totals[3], totals[1], 5).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP) + "%");
 			makeExcel.setValue(19 + count * 3 + 2, 9, totals[4], "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 10, safelyDivide(totals[4], totals[0], 5).multiply(new BigDecimal(100)), "0.00%");
+			makeExcel.setValue(19 + count * 3 + 2, 10, safelyDivide(totals[4], totals[0], 5).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP) + "%");
 			makeExcel.setValue(19 + count * 3 + 2, 11, safelyDivide(totals[5], 1000, 0), "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 12, safelyDivide(totals[5], totals[1], 5).multiply(new BigDecimal(100)), "0.00%");
+			makeExcel.setValue(19 + count * 3 + 2, 12, safelyDivide(totals[5], totals[1], 5).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP) + "%");
 
 			// 結束
 			count++;

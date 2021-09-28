@@ -184,7 +184,7 @@ public class L9703Report1 extends MakeReport {
 				int dataKind = baTxVo.getDataKind();
 				int repayType = baTxVo.getRepayType();
 
-				if (dataKind == 2 && repayType == 1) {
+				if (dataKind == 2) {
 					unpaidPriInt = unpaidPriInt.add(baTxVo.getPrincipal()); // 未收本
 					unpaidPriInt = unpaidPriInt.add(baTxVo.getInterest()); // 未收息
 					breachAmtAndDelayInt = breachAmtAndDelayInt.add(baTxVo.getBreachAmt()); // 違約金

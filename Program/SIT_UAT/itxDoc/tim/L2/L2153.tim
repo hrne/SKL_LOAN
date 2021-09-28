@@ -92,6 +92,7 @@ FireOfficer=X,6
 Estimate=X,6
 CreditOfficer=X,6
 BusinessOfficer=X,6
+ApprovedLevel=X,1
 Supervisor=X,6
 Coorgnizer=X,6
 GroupId=X,10

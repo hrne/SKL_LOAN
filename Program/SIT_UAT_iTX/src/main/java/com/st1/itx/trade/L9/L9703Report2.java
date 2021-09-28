@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -34,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
 @Component
 @Scope("prototype")
 public class L9703Report2 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9703Report2.class);
 
 	@Autowired
 	L9703ServiceImpl l9703ServiceImpl;
@@ -300,41 +297,46 @@ public class L9703Report2 extends MakeReport {
 		}
 
 		for (int i = 0; i < listBaTxVo.size(); i++) {
-			payIntDate = listBaTxVo.get(i).getPayIntDate();
-			// 同應繳日合算為一筆
+			if (listBaTxVo.get(i).getDataKind() == 2) {
 
-			if (principal.containsKey(payIntDate)) {
-				principal.put(payIntDate, principal.get(payIntDate).add(listBaTxVo.get(i).getPrincipal()));
-			} else {
-				principal.put(payIntDate, listBaTxVo.get(i).getPrincipal());
-			}
+				payIntDate = listBaTxVo.get(i).getPayIntDate();
+				// 同應繳日合算為一筆
 
-			if (interest.containsKey(payIntDate)) {
-				interest.put(payIntDate, interest.get(payIntDate).add(listBaTxVo.get(i).getInterest()));
-			} else {
-				interest.put(payIntDate, listBaTxVo.get(i).getInterest());
-			}
+				if (principal.containsKey(payIntDate)) {
+					principal.put(payIntDate, principal.get(payIntDate).add(listBaTxVo.get(i).getPrincipal()));
+				} else {
+					principal.put(payIntDate, listBaTxVo.get(i).getPrincipal());
+				}
 
-			if (breachAmt.containsKey(payIntDate)) {
-				breachAmt.put(payIntDate, breachAmt.get(payIntDate).add(listBaTxVo.get(i).getBreachAmt()));
-			} else {
-				breachAmt.put(payIntDate, listBaTxVo.get(i).getBreachAmt());
-			}
+				if (interest.containsKey(payIntDate)) {
+					interest.put(payIntDate, interest.get(payIntDate).add(listBaTxVo.get(i).getInterest()));
+				} else {
+					interest.put(payIntDate, listBaTxVo.get(i).getInterest());
+				}
 
-			if (delayInt.containsKey(payIntDate)) {
-				delayInt.put(payIntDate, delayInt.get(payIntDate).add(listBaTxVo.get(i).getDelayInt()));
-			} else {
-				delayInt.put(payIntDate, listBaTxVo.get(i).getDelayInt());
-			}
+				if (breachAmt.containsKey(payIntDate)) {
+					breachAmt.put(payIntDate, breachAmt.get(payIntDate).add(listBaTxVo.get(i).getBreachAmt()));
+				} else {
+					breachAmt.put(payIntDate, listBaTxVo.get(i).getBreachAmt());
+				}
 
+				if (delayInt.containsKey(payIntDate)) {
+					delayInt.put(payIntDate, delayInt.get(payIntDate).add(listBaTxVo.get(i).getDelayInt()));
+				} else {
+					delayInt.put(payIntDate, listBaTxVo.get(i).getDelayInt());
+				}
 //				本金為總和
-			loanBal = loanBal.add(listBaTxVo.get(i).getLoanBal());
-//				暫收金額為總和
-			if (listBaTxVo.get(i).getDataKind() == 4) {
+				loanBal = loanBal.add(listBaTxVo.get(i).getLoanBal());
+			}
+//			溢短繳 = 暫收款 - 短繳期金
+			if (listBaTxVo.get(i).getDataKind() == 3) {
 				unPaidAmt = unPaidAmt.add(listBaTxVo.get(i).getUnPaidAmt());
 			}
-//				04.帳管費(總和)
-			if (listBaTxVo.get(i).getRepayType() == 4) {
+			if (listBaTxVo.get(i).getDataKind() == 1 && listBaTxVo.get(i).getRepayType() == 2) {
+				unPaidAmt = unPaidAmt.subtract(listBaTxVo.get(i).getUnPaidAmt());
+			}
+//			04.帳管費(總和)，含06.契變手續費
+			if (listBaTxVo.get(i).getRepayType() == 4 || listBaTxVo.get(i).getRepayType() == 6) {
 				acctFee = acctFee.add(listBaTxVo.get(i).getUnPaidAmt());
 			}
 		}
@@ -344,10 +346,10 @@ public class L9703Report2 extends MakeReport {
 		String unPaidAmtX = "";
 		String acctFeeX = "";
 
-		if (unPaidAmt.compareTo(BigDecimal.ZERO) == 1) {
+		if (unPaidAmt.compareTo(BigDecimal.ZERO) != 0) {
 			unPaidAmtX = df1.format(unPaidAmt);
 		}
-		if (acctFee.compareTo(BigDecimal.ZERO) == 1) {
+		if (acctFee.compareTo(BigDecimal.ZERO) != 0) {
 			acctFeeX = df1.format(acctFee);
 		}
 
@@ -366,6 +368,10 @@ public class L9703Report2 extends MakeReport {
 		this.print(1, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 		for (int i = 0; i < listBaTxVo.size(); i++) {
+			// 本金、利息
+			if (listBaTxVo.get(i).getDataKind() != 2) {
+				continue;
+			}
 			payIntDate = listBaTxVo.get(i).getPayIntDate();
 
 //				同一日期者金額加總只顯示一筆

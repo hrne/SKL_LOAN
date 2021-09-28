@@ -36,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
 @Component
 @Scope("prototype")
 public class L9705Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L9705Report.class);
 
 	@Autowired
 	private L9705ServiceImpl l9705ServiceImpl;
@@ -187,15 +186,6 @@ public class L9705Report extends MakeReport {
 					this.info("times..." + times);
 					this.info("cnt..." + cnt);
 
-//				不同戶號額度跳頁
-					if (cnt >= 1) {
-						this.info("new page...");
-						this.newPage();
-//						continue;
-					}
-
-					cnt = cnt + 1;
-
 					// 未收本息 = 本金+利息 Principal + Interest
 					// 違約金 有 但要扣成 0 BreachAmt
 					// 溢短繳 UnPaidAmt
@@ -203,47 +193,64 @@ public class L9705Report extends MakeReport {
 					// 未還本金餘額
 //				金額欄位 同下繳日的加總
 					for (int i = 0; i < listBaTxVo.size(); i++) {
-						payIntDate = listBaTxVo.get(i).getPayIntDate();
-						this.info("loop-1 payIntDate ..." + payIntDate);
+						if (listBaTxVo.get(i).getDataKind() == 2) {
+							payIntDate = listBaTxVo.get(i).getPayIntDate();
+							if (principal.containsKey(payIntDate)) {
+								principal.put(payIntDate,
+										principal.get(payIntDate).add(listBaTxVo.get(i).getPrincipal()));
+							} else {
+								principal.put(payIntDate, listBaTxVo.get(i).getPrincipal());
+							}
 
-						if (principal.containsKey(payIntDate)) {
-							principal.put(payIntDate, principal.get(payIntDate).add(listBaTxVo.get(i).getPrincipal()));
-						} else {
-							principal.put(payIntDate, listBaTxVo.get(i).getPrincipal());
-						}
+							if (interest.containsKey(payIntDate)) {
+								interest.put(payIntDate, interest.get(payIntDate).add(listBaTxVo.get(i).getInterest()));
+							} else {
+								interest.put(payIntDate, listBaTxVo.get(i).getInterest());
+							}
 
-						if (interest.containsKey(payIntDate)) {
-							interest.put(payIntDate, interest.get(payIntDate).add(listBaTxVo.get(i).getInterest()));
-						} else {
-							interest.put(payIntDate, listBaTxVo.get(i).getInterest());
-						}
-
-						if (breachAmt.containsKey(payIntDate)) {
-							breachAmt.put(payIntDate, breachAmt.get(payIntDate).add(listBaTxVo.get(i).getBreachAmt()));
-						} else {
-							breachAmt.put(payIntDate, listBaTxVo.get(i).getBreachAmt());
-						}
+							if (breachAmt.containsKey(payIntDate)) {
+								breachAmt.put(payIntDate,
+										breachAmt.get(payIntDate).add(listBaTxVo.get(i).getBreachAmt()));
+							} else {
+								breachAmt.put(payIntDate, listBaTxVo.get(i).getBreachAmt());
+							}
 //					本金為總和
-						loanBal = loanBal.add(listBaTxVo.get(i).getLoanBal());
-//					暫收金額為總和
-						if (listBaTxVo.get(i).getDataKind() == 4) {
+							loanBal = loanBal.add(listBaTxVo.get(i).getLoanBal());
+						}
+//					溢短繳 = 暫收款 - 短繳期金
+						if (listBaTxVo.get(i).getDataKind() == 3) {
 							unPaidAmt = unPaidAmt.add(listBaTxVo.get(i).getUnPaidAmt());
 						}
-//					04.帳管費(總和)
-						if (listBaTxVo.get(i).getRepayType() == 4) {
+						if (listBaTxVo.get(i).getDataKind() == 1 && listBaTxVo.get(i).getRepayType() == 2) {
+							unPaidAmt = unPaidAmt.subtract(listBaTxVo.get(i).getUnPaidAmt());
+						}
+//					04.帳管費(總和)，含06.契變手續費
+						if (listBaTxVo.get(i).getRepayType() == 4 || listBaTxVo.get(i).getRepayType() == 6) {
 							acctFee = acctFee.add(listBaTxVo.get(i).getUnPaidAmt());
 						}
 					}
+					// 無計息資料
+					if (payIntDate == 0) {
+						continue;
+					}
+
+//					不同戶號額度跳頁
+					if (cnt >= 1) {
+						this.info("new page...");
+						this.newPage();
+					}
+
+					cnt = cnt + 1;
 
 					intRate = listBaTxVo.get(0).getIntRate();
 
 					String unPaidAmtX = "";
 					String acctFeeX = "";
 
-					if (unPaidAmt.compareTo(BigDecimal.ZERO) == 1) {
+					if (unPaidAmt.compareTo(BigDecimal.ZERO) != 0) {
 						unPaidAmtX = df1.format(unPaidAmt);
 					}
-					if (acctFee.compareTo(BigDecimal.ZERO) == 1) {
+					if (acctFee.compareTo(BigDecimal.ZERO) != 0) {
 						acctFeeX = df1.format(acctFee);
 					}
 
@@ -252,7 +259,7 @@ public class L9705Report extends MakeReport {
 					this.print(1, 1, "");
 					this.print(1, 10, "製發日期：　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 					this.print(0, 20,
-							entdy.substring(0, 3) + "/" + entdy.substring(3, 5) + "/" + entdy.substring(5, 7));
+							entdy.substring(1, 4) + "/" + entdy.substring(4, 6) + "/" + entdy.substring(6, 8));
 					this.print(0, 78, repayTypeX(repayType));
 					this.print(1, 10, "戶號：　　　　　　　目前利率：　　　　%");
 					this.print(0, 16, custNo + "-" + facmNo);
@@ -267,6 +274,10 @@ public class L9705Report extends MakeReport {
 					this.print(1, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
 					for (int i = 0; i < listBaTxVo.size(); i++) {
+						// 本金、利息
+						if (listBaTxVo.get(i).getDataKind() != 2) {
+							continue;
+						}
 						payIntDate = listBaTxVo.get(i).getPayIntDate();
 
 //					同一日期者金額加總只顯示一筆

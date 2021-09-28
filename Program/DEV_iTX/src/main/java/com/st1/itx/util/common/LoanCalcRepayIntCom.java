@@ -1188,7 +1188,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		vCalcRepayIntVo.setExtraRepayFlag(0); // 部分償還金額記號 0:否 1:是
 		// 預設分段計息記號 0:按日計息(零星日) 2:利率分段計息
 		vCalcRepayIntVo.setDuraFlag(isRateChange ? 2 : 0); // 分段計息記號 0: 未滿期 1:按週/月計息(滿期) 2:利率分段計息
-	 	vCalcRepayIntVo.setDueAmt(oDueAmt);  // 期金(調整後)
+		vCalcRepayIntVo.setDueAmt(oDueAmt); // 期金(調整後)
 		vCalcRepayIntVo.setRateCode(iRateCode); // 利率區分 1: 機動 2: 固定 3: 定期機動
 		lCalcRepayIntVo.add(vCalcRepayIntVo);
 		oCalcCount = wkCalcVoIndex + 1;
@@ -1313,8 +1313,9 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   Days              = " + lCalcRepayIntVo.get(wkIndex).getDays());
 		this.info("   MonthLimit        = " + lCalcRepayIntVo.get(wkIndex).getMonthLimit());
 		this.info("   termNo            = " + lCalcRepayIntVo.get(wkIndex).getTermNo());
-		this.info("   iAmortizedCode    = " + iAmortizedCode);
+		this.info("   wkLastTermNo      = " + wkLastTermNo);
 		this.info("   wkDuraInt         = " + wkDuraInt);
+		this.info("   iAmortizedCode    = " + iAmortizedCode);
 		this.info("   wkBeforeStoreRate = " + wkBeforeStoreRate);
 		this.info("   getStoreRate()    = " + lCalcRepayIntVo.get(wkIndex).getStoreRate());
 		this.info("   getInterestFlag   = " + lCalcRepayIntVo.get(wkIndex).getInterestFlag());
@@ -1330,6 +1331,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		if (wkIndex == 0) {
 			wkLastTermNo = vCalcRepayIntVo.getTermNo();
 		} else if (wkLastTermNo != vCalcRepayIntVo.getTermNo()) {
+			wkLastTermNo = vCalcRepayIntVo.getTermNo();
 			wkDuraInt = BigDecimal.ZERO;
 		}
 
@@ -1540,7 +1542,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			this.info("fillBreachInterestRoutine end 3");
 			return;
 		}
-	
+
 		// 計算逾期日數 = 計算違約金起算日 ~ 違約金生效日
 		dDateUtil.init();
 		dDateUtil.setDate_1(wkBreachStartDate);
@@ -1548,14 +1550,13 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		dDateUtil.dateDiff();
 		wkOdDays = dDateUtil.getDays();
 		this.info("   wkOdDays  逾期日數   = " + wkOdDays);
-	
+
 		// 4.逾期日數(違約金起算日到違約金生效日) <= 寬限期間(5個日曆日)，不處理
 		if (wkOdDays <= iBreachGraceDays) {
 			this.info("fillBreachInterestRoutine end 4");
 			return;
 		}
 
-		
 		// 計算寬限期間(5個營業日)的日數
 		wkBreachGraceDays = 0;
 		if (iBreachGraceDays > 0) {
@@ -1682,6 +1683,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   DelayDays    逾期計算日數              = " + wkDays);
 		this.info("   DelayIntBase 延遲息計算金額           = " + wkDelayBase);
 		this.info("   DelayInt     延遲息                        = " + vCalcRepayIntVo.getDelayInt());
+		this.info(wkDelayBase + " * " + vCalcRepayIntVo.getStoreRate() + " * " + wkDays + " / 36500");
 		this.info("   wkDaysLimitA 逾期6個月之實際日數  = " + wkDaysLimitA);
 		this.info("   wkDaysLimitB 逾期9個月之實際日數  = " + wkDaysLimitB);
 		this.info("   BreachAmt    違約金   = " + vCalcRepayIntVo.getBreachAmt());

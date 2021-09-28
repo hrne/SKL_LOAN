@@ -3,10 +3,13 @@ package com.st1.itx.trade.L9;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Map;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -14,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9718ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L9718ServiceImpl.ReportType;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 
@@ -21,182 +25,195 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class L9718Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L9718Report.class);
+	private static final Logger logger = LoggerFactory.getLogger(L9718Report.class);
 
 	@Autowired
 	L9718ServiceImpl l9718ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
-	
+
 	String TXCD = "L9718";
-	
+
 	// TXName非完整, 在exportExcel中加上種類前綴
 	String TXName = "放款催繳處理結果";
-	
+
 	// pivot position for data inputs
 	int pivotRow = 3; // 1-based
 	int pivotCol = 1; // 1-based
-	
+
 	int totalAmount = 0;
-	
+
 	// number with commas
 	NumberFormat nfNum = NumberFormat.getNumberInstance();
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
-		this.info(TXCD + "Report exec start ...");
+		logger.info(TXCD + "Report exec start ...");
 
 		List<Map<String, String>> lL9718Ovdu = null;
 		List<Map<String, String>> lL9718Others = null;
-		
+
 		try {
-			lL9718Ovdu = l9718ServiceImpl.findAll(titaVo, true);
-			lL9718Others = l9718ServiceImpl.findAll(titaVo, false);
+			lL9718Ovdu = l9718ServiceImpl.findAll(titaVo, ReportType.Acct990);
+			lL9718Others = l9718ServiceImpl.findAll(titaVo, ReportType.AcctOthers);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.error(TXCD + "ServiceImpl.findAll error = " + errors.toString());
+			logger.error(TXCD + "ServiceImpl.findAll error = " + errors.toString());
 		}
-
-		exportExcel(titaVo, lL9718Ovdu, "催收");
-		exportExcel(titaVo, lL9718Others, "逾期");
 		
+
+		exportExcel(titaVo, lL9718Ovdu, ReportType.Acct990);
+		exportExcel(titaVo, lL9718Others, ReportType.AcctOthers);
+
 		return true;
 
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lList, String typeText) throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lList, ReportType reportType)
+			throws LogicException {
 
-		
-		this.info(TXCD +"Report exportExcel");	
-		
+		logger.info(TXCD + "Report exportExcel");
+
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName,
-				TXCD + "_" + typeText + TXName,
-				TXCD + "_底稿_" + typeText+"成果統計表" + ".xlsx",
-				1, titaVo.getParam("inputYearMonth").substring(0,3)+"年"+titaVo.getParam("inputYearMonth").substring(3)+"月"+typeText);
+				TXCD + "_" + reportType.getDesc() + TXName, TXCD + "_底稿_" + reportType.getDesc() + "成果統計表" + ".xlsx", 1,
+				titaVo.getParam("inputYearMonth").substring(0, 3) + "年" + titaVo.getParam("inputYearMonth").substring(3)
+						+ "月" + reportType.getDesc());
 
 		if (lList != null && lList.size() != 0) {
-			
+
 			int rowShift = 0;
 
 			for (Map<String, String> tLDVo : lList) {
-				
+
 				int colShift = 0;
-				
+
 				for (int i = 0; i < tLDVo.size(); i++) {
 
 					int col = i + pivotCol + colShift; // 1-based
 					int row = pivotRow + rowShift; // 1-based
-					
-					// Query received will have column names in the format of F0, even if no alias is set in SQL
+
+					// Query received will have column names in the format of F0, even if no alias
+					// is set in SQL
 					// notice it's 0-based for those names
-					String tmpValue = tLDVo.get("F" + i); 
-					
-					if (typeText.equals("逾期"))
+					String tmpValue = tLDVo.get("F" + i);
+					if (tmpValue == null)
 					{
-						// switch by code of Column; i.e. Col A, Col B...
-						// breaks if more than 26 columns!
-						switch (String.valueOf((char)(65+i))) {
-						// if specific column needs special treatment, insert case here.
-						case "I":
-						    // only setValue if there is value.	
-							if (tmpValue != "")
-							{
-								makeExcel.setValue(row, col, tmpValue, "R");
+						tmpValue = "";
+					}
+					
+					BigDecimal output = BigDecimal.ZERO;
+
+					switch (reportType) {
+					case Acct990:
+						// F9,F10,F11,F12
+						// ,F14
+						// formatAmt
+
+						// F16是百分比
+						// 用F22/F12 * 100 可算出來
+
+						switch (i) {
+						case 9:
+						case 10:
+						case 11:
+						case 12:
+						case 14:
+							output = BigDecimal.ZERO;
+
+							try {
+								output = new BigDecimal(tmpValue);
+							} catch (Exception e) {
+								this.info("L9718Report-990, F" + i + ": " + tmpValue);
 							}
+
+							makeExcel.setValue(row, col, formatAmt(output, 0));
 							break;
-						case "J":
-							makeExcel.setValue(row, col, Integer.parseInt(tmpValue), "#,##0");
-							break;
-						case "L":
-							makeExcel.setValue(row, col, Integer.parseInt(tmpValue), "#,##0");
-							break;
-						case "O":
-							// percentage
-							if (Integer.parseInt(tLDVo.get("F9")) != 0)
-							{
-								makeExcel.setValue(row, col, Double.toString(Math.floor(Integer.parseInt(tLDVo.get("F11")) / Integer.parseInt(tLDVo.get("F9"))) * 100) + '%' , "R");
-							} else
-							{
-								makeExcel.setValue(row, col, "" , "R");	
+						case 16:
+							output = BigDecimal.ZERO;
+							try {
+								output = new BigDecimal(tLDVo.get("F22"))
+										.divide(new BigDecimal(tLDVo.get("F12")), 2, RoundingMode.HALF_UP)
+										.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+							} catch (Exception e) {
+								this.info("L9718Report-990, F22: " + tLDVo.get("F22") + "; F12: " + tLDVo.get("F12"));
 							}
+
+							makeExcel.setValue(row, col, output + "%");
 							break;
 						default:
+							makeExcel.setValue(row, col, tmpValue);
+						}
+
+						break;
+					case AcctOthers:
+						// F9, F11
+						// formatAmt
+
+						// F14是百分比
+
+						// 用F11 / F9求出
+
+						switch (i) {
+
+						case 9:
+						case 11:
+
+							output = BigDecimal.ZERO;
+
 							try {
-								makeExcel.setValue(row, col, new BigDecimal(tmpValue), "R");
-							} catch (Exception e)
-							{
-								makeExcel.setValue(row, col, tmpValue, "R");
+								output = new BigDecimal(tmpValue);
+							} catch (Exception e) {
+								this.info("L9718Report-990, F" + i + ": " + tmpValue);
 							}
+
+							makeExcel.setValue(row, col, formatAmt(output, 0));
+
+							break;
+
+						case 14:
+
+							output = BigDecimal.ZERO;
+							try {
+								output = new BigDecimal(tLDVo.get("F11"))
+										.divide(new BigDecimal(tLDVo.get("F9")), 2, RoundingMode.HALF_UP)
+										.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
+							} catch (Exception e) {
+								this.info("L9718Report-non990, F11: " + tLDVo.get("F11") + "; F8: " + tLDVo.get("F9"));
+							}
+
+							makeExcel.setValue(row, col, output + "%");
+							break;
+
+						default:
+							makeExcel.setValue(row, col, tmpValue);
 							break;
 						}
 						
-					} else if (typeText.equals("催收"))
-					{
-						// switch by code of Column; i.e. Col A, Col B...
-						// breaks if more than 26 columns!
-						switch (String.valueOf((char)(65+i))) {
-						// if specific column needs special treatment, insert case here.
-						case "I":
-						    // only setValue if there is value.	
-							if (tmpValue != "")
-							{
-								makeExcel.setValue(row, col, tmpValue, "R");
-							}
-							break;
-						case "J":
-							makeExcel.setValue(row, col, Integer.parseInt(tmpValue), "#,##0");
-							break;
-						case "K":
-							makeExcel.setValue(row, col, Integer.parseInt(tmpValue), "#,##0");
-							break;
-						case "L":
-							makeExcel.setValue(row, col, Integer.parseInt(tmpValue), "#,##0");
-							break;
-						case "M":
-							makeExcel.setValue(row, col, Integer.parseInt(tmpValue), "#,##0");
-							break;
-						case "Q":
-							// percentage
-							if (Integer.parseInt(tLDVo.get("F12")) != 0)
-							{
-								makeExcel.setValue(row, col, Double.toString(Math.floor(Integer.parseInt(tLDVo.get("F14")) / Integer.parseInt(tLDVo.get("F12"))) * 100) + '%' , "R");
-							} else
-							{
-								makeExcel.setValue(row, col, "" , "R");	
-							}
-							break;
-						default:
-							try {
-								makeExcel.setValue(row, col, new BigDecimal(tmpValue), "R");
-							} catch (Exception e)
-							{
-								makeExcel.setValue(row, col, tmpValue, "R");
-							}
-							break;
-						}
+						break;
+
+					default:
+						this.warn("L9718Report weird ReportType");
+						break;
 					}
-					
-					}
-					
-				rowShift++;
-				} // for
-			
-			if (typeText.equals("逾期"))
-			{
+
+				}
+			}
+
+			if (reportType == ReportType.AcctOthers) {
 				makeExcel.formulaCaculate(2, 6);
 				makeExcel.formulaCaculate(2, 8);
 				makeExcel.formulaCaculate(2, 9);
 				makeExcel.formulaCaculate(2, 10);
 				makeExcel.formulaCaculate(2, 12);
-			} else if (typeText.equals("催收"))
-			{
+			} else if (reportType == ReportType.Acct990) {
 				makeExcel.formulaCaculate(2, 6);
 				makeExcel.formulaCaculate(2, 8);
 				makeExcel.formulaCaculate(2, 9);
 				makeExcel.formulaCaculate(2, 13);
-				makeExcel.formulaCaculate(2, 15);	
+				makeExcel.formulaCaculate(2, 15);
 			}
+
 		} else {
 			makeExcel.setValue(pivotRow, pivotCol, "本月無資料");
 		}

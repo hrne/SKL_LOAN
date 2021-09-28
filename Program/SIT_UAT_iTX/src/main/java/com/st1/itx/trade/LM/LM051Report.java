@@ -2,6 +2,9 @@ package com.st1.itx.trade.LM;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +25,7 @@ public class LM051Report extends MakeReport {
 
 	@Autowired
 	LM051ServiceImpl lM051ServiceImpl;
- 
+
 	@Autowired
 	MakeExcel makeExcel;
 
@@ -31,8 +34,38 @@ public class LM051Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthDate = Calendar.getInstance();
+		// 設當年月底日 0是月底
+		calMonthDate.set(iYear, iMonth, 0);
+
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+
+		// 這個月底
+		calMonthDate.set(iYear, iMonth, 0);
+		thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+		// 上個月初
+		calMonthDate.set(iYear, iMonth - 2, 1);
+
+		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM051", "放款資產分類案件明細表_內部控管",
 				"LM051_放款資產分類案件明細表_內部控管", "LM051_底稿_放款資產分類案件明細表_內部控管.xlsx", "10804工作表");
+
 		makeExcel.setSheet("10804工作表", titaVo.get("ENTDY").substring(1, 6) + "工作表");
 
 		String mm = String.valueOf(Integer.valueOf(titaVo.get("ENTDY").substring(4, 6)));
@@ -41,8 +74,10 @@ public class LM051Report extends MakeReport {
 
 		List<Map<String, String>> lM051List = null;
 
+		int dataSize = 0;
+
 		// 有四種不同條件，要select 4次
-		for (int i = 1; i < 5; i++) {
+		for (int i = 1; i <= 4; i++) {
 			try {
 
 				lM051List = lM051ServiceImpl.findAll(titaVo, i);
@@ -53,12 +88,50 @@ public class LM051Report extends MakeReport {
 				e.printStackTrace(new PrintWriter(errors));
 				this.info("LM051ServiceImpl.findAll error = " + errors.toString());
 			}
-			exportExcel(lM051List);
+			dataSize += lM051List.size();
+
+			if (lM051List.size() > 0) {
+
+				exportExcel(lM051List);
+
+			}
+
+		}
+
+		if (dataSize == 0) {
+			makeExcel.setValue(3, 1, "本日無資料");
+		}
+
+		makeExcel.setSheet("總表");
+
+		makeExcel.setValue(14, 7, iMonth + "月月報表數", "C");
+		makeExcel.setValue(14, 5, thisMonthEndDate, "C");
+		makeExcel.setValue(14, 6, lastMonthEndDate, "C");
+
+		// 有3個表格，要select 3次
+		for (int i = 1; i <= 3; i++) {
+
+			try {
+
+				lM051List = lM051ServiceImpl.findAll2(titaVo, i);
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.info("LM051ServiceImpl.findAll error = " + errors.toString());
+			}
+			if (lM051List.size() > 0) {
+				exportExcel2(lM051List, i);
+			}
 		}
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
+
+	// YYYMM工作表
+
 	// F0+F1
 	// F0 戶號：2
 	// F1 額度：3
@@ -78,85 +151,208 @@ public class LM051Report extends MakeReport {
 
 	private void exportExcel(List<Map<String, String>> LDList) throws LogicException {
 		this.info("LM051Report exportExcel");
-		if (LDList.size() > 0) {
 
-			for (Map<String, String> tLDVo : LDList) {
-				row++;
-				// F0+F1:1
-				makeExcel.setValue(row, 1, tLDVo.get("F0") + tLDVo.get("F1"));
-				// F0 戶號：2
-				makeExcel.setValue(row, 2, Integer.valueOf(tLDVo.get("F0")));
-				// F1 額度：3
-				makeExcel.setValue(row, 3, Integer.valueOf(tLDVo.get("F1")), "C");
-				// F2 利變；4
-				makeExcel.setValue(row, 4,
-						tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? ' ' : tLDVo.get("F2"), "C");
-				// F3 戶名；5
-				makeExcel.setValue(row, 5, tLDVo.get("F3"), "L");
-				// F4 本金餘額；6
-				if (tLDVo.get("F4").equals("")) {
-					makeExcel.setValue(row, 6, 0);
-				} else {
-					makeExcel.setValue(row, 6, Float.valueOf(tLDVo.get("F4")), "#,##0");
-				}
-
-				// F5 科目；7
-				makeExcel.setValue(row, 7, Integer.valueOf(tLDVo.get("F5")), "L");
-				// F6 逾期數；8
-//				putTerm(row, tLDVo);
-
-				String ovduText = "";
-				if (!tLDVo.get("F18").isEmpty()) {
-					if (Integer.valueOf(tLDVo.get("F6")) == 99) {
-						// 協or協*or催協
-						ovduText = tLDVo.get("F18");
-					} else {
-						// *協-逾期數
-						ovduText = tLDVo.get("F18") + tLDVo.get("F6");
-					}
-				} else {
-					// 逾期數
-					ovduText = tLDVo.get("F6");
-				}
-
-				makeExcel.setValue(row, 8, ovduText, "C");
-				// F7 地區別；9
-				makeExcel.setValue(row, 9,
-						tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F7")),
-						"C");
-				// F8 繳息日期；10
-				makeExcel.setValue(row, 10,
-						tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")),
-						"C");
-				// F9分類項目:11
-//				makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
-				// F4 五類金額(用F16區分F4)=；12~17
-				putAsset(row, tLDVo.get("F4"), tLDVo.get("F16"));
-				// F10 分類標準(文字)；18
-				String classText = "";
-				if (tLDVo.get("F13") == "60" || tLDVo.get("F13") == "61" || tLDVo.get("F13") == "62") {
-					if(!tLDVo.get("F10").isEmpty()) {
-						classText = "協議戶 /" + tLDVo.get("F10");
-					}else {
-						classText = "協議戶 ";
-					}
-				} else {
-					classText = tLDVo.get("F10");
-				}
-				makeExcel.setValue(row, 17, tLDVo.get("F10").isEmpty() ? "核貸估價" : classText, "L");
-				// F11 金額 19
-				makeExcel.setValue(row, 18, Integer.valueOf(tLDVo.get("F11")), "#,##0");
-				// F12 備註；20
-				makeExcel.setValue(row, 19, tLDVo.get("F12"), "L");
-				// F13 基本利率代碼(商品代號)；21
-				makeExcel.setValue(row, 20, tLDVo.get("F13"), "C");
+		for (Map<String, String> tLDVo : LDList) {
+			row++;
+			// F0+F1:1
+			makeExcel.setValue(row, 1, tLDVo.get("F0") + tLDVo.get("F1"));
+			// F0 戶號：2
+			makeExcel.setValue(row, 2, Integer.valueOf(tLDVo.get("F0")));
+			// F1 額度：3
+			makeExcel.setValue(row, 3, Integer.valueOf(tLDVo.get("F1")), "C");
+			// F2 利變；4
+			makeExcel.setValue(row, 4, tLDVo.get("F2") == null || tLDVo.get("F2").length() == 0 ? ' ' : tLDVo.get("F2"),
+					"C");
+			// F3 戶名；5
+			makeExcel.setValue(row, 5, tLDVo.get("F3"), "L");
+			// F4 本金餘額；6
+			if (tLDVo.get("F4").equals("")) {
+				makeExcel.setValue(row, 6, 0);
+			} else {
+				makeExcel.setValue(row, 6, Float.valueOf(tLDVo.get("F4")), "#,##0");
 			}
-		} else
 
-		{
-			makeExcel.setValue(3, 1, "本日無資料");
+			// F5 科目；7
+			makeExcel.setValue(row, 7, Integer.valueOf(tLDVo.get("F5")), "L");
+			// F6 逾期數；8
+
+			String ovduText = "";
+			if (!tLDVo.get("F18").isEmpty()) {
+				if (Integer.valueOf(tLDVo.get("F6")) == 99) {
+					// 協or協*or催協
+					ovduText = tLDVo.get("F18");
+				} else {
+					// *協-逾期數
+					ovduText = tLDVo.get("F18") + tLDVo.get("F6");
+				}
+			} else {
+				// 逾期數
+				ovduText = tLDVo.get("F6");
+			}
+
+			makeExcel.setValue(row, 8, ovduText, "C");
+			// F7 地區別；9
+			makeExcel.setValue(row, 9,
+					tLDVo.get("F7") == null || tLDVo.get("F7").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F7")),
+					"C");
+			// F8 繳息日期；10
+			makeExcel.setValue(row, 10,
+					tLDVo.get("F8") == null || tLDVo.get("F8").length() == 0 ? 0 : Integer.valueOf(tLDVo.get("F8")),
+					"C");
+			// F9分類項目:11
+//				makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
+			// F4 五類金額(用F16區分F4)=；12~17
+			putAsset(row, tLDVo.get("F4"), tLDVo.get("F16"));
+			// F10 分類標準(文字)；18
+			String classText = "";
+			if (tLDVo.get("F13") == "60" || tLDVo.get("F13") == "61" || tLDVo.get("F13") == "62") {
+				if (!tLDVo.get("F10").isEmpty()) {
+					classText = "協議戶 /" + tLDVo.get("F10");
+				} else {
+					classText = "協議戶 ";
+				}
+			} else {
+				classText = tLDVo.get("F10");
+			}
+			makeExcel.setValue(row, 17, tLDVo.get("F10").isEmpty() ? "核貸估價" : classText, "L");
+			// F11 金額 19
+			makeExcel.setValue(row, 18, Integer.valueOf(tLDVo.get("F11")), "#,##0");
+			// F12 備註；20
+			makeExcel.setValue(row, 19, tLDVo.get("F12"), "L");
+			// F13 基本利率代碼(商品代號)；21
+			makeExcel.setValue(row, 20, tLDVo.get("F13"), "C");
+		}
+
+	}
+
+	// 總表
+	private void exportExcel2(List<Map<String, String>> LDList, int formNum) throws LogicException {
+		this.info("LM051Report exportExcel2");
+
+		int row = 0;
+		int col = 0;
+
+		BigDecimal tempAmt = BigDecimal.ZERO;
+
+		for (Map<String, String> tLDVo : LDList) {
+
+			switch (formNum) {
+			// F0
+			// 1 = 購置住宅+修繕貸款
+			// 2 = 建築貸款
+			// 3 = 100年後政策性貸款
+			// 4 = 股票質押
+			// 5 = 無意義
+			// TOTAL = 放款餘額
+			
+			case 1:
+				if (!tLDVo.get("F0").equals("99") && !tLDVo.get("F0").equals("5")) {
+
+					if (tLDVo.get("F0").equals("TOTAL")) {
+						row = 12;
+						col = 8;
+					} else if (tLDVo.get("F0").equals("1")) {
+						row = 7;
+						col = 3;
+					} else if (tLDVo.get("F0").equals("2")) {
+						row = 7;
+						col = 4;
+					} else if (tLDVo.get("F0").equals("3")) {
+						row = 7;
+						col = 5;
+					} else if (tLDVo.get("F0").equals("4")) {
+						row = 7;
+						col = 6;
+					}
+					tempAmt = tLDVo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
+					this.info("row=" + row + ",col=" + col + ",tempAmt=" + tempAmt);
+
+					makeExcel.setValue(row, col, tempAmt, "#,##0");
+
+				}
+				break;
+			case 2:
+				if (!tLDVo.get("F0").equals("99") || !tLDVo.get("F1").equals("99")) {
+
+					if (tLDVo.get("F0").equals("1")) {
+						row = 18;
+					} else {
+						row = 19;
+					}
+
+					if (tLDVo.get("F1").equals("1")) {
+						col = 3;
+					} else {
+						col = 4;
+					}
+
+					tempAmt = tLDVo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+
+					this.info("row=" + row + ",col=" + col + ",tempAmt=" + tempAmt);
+					
+					makeExcel.setValue(row, col, tempAmt, "#,##0");
+
+				}
+
+				break;
+
+			case 3:
+				if (!tLDVo.get("F0").equals("99") || !tLDVo.get("F1").equals("99")) {
+					if (tLDVo.get("F0").equals("C")) {
+						row = 27;
+					} else if (tLDVo.get("F0").equals("D")) {
+						row = 28;
+					} else {
+						row = 29;
+					}
+
+					if (tLDVo.get("F1").equals("1")) {
+						col = 3;
+					} else {
+						col = 4;
+					}
+
+					tempAmt = tLDVo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+
+					this.info("row=" + row + ",col=" + col + ",tempAmt=" + tempAmt);
+					
+					makeExcel.setValue(row, col, tempAmt, "#,##0");
+				}
+				break;
+			default:
+
+				break;
+			}
+			row = 0;
+			col = 0;
 
 		}
+		// 表格一
+		makeExcel.formulaCaculate(10, 3);// C10 特定放款資產 合計
+		makeExcel.formulaCaculate(10, 5);// E10 100年後政策性貸款 合計
+		makeExcel.formulaCaculate(7, 7);// G7 非特定-個金不動產抵押貸款
+		makeExcel.formulaCaculate(9, 3);// C9 特定放款資產 提存
+		makeExcel.formulaCaculate(9, 7);// G9 非特定放款資產 提存
+		makeExcel.formulaCaculate(4, 8);// H4 法定備呆提存總額1
+		makeExcel.formulaCaculate(7, 8);// H7 法定備呆提存總額2
+		makeExcel.formulaCaculate(8, 8);// H8 法定備呆提存總額3
+		makeExcel.formulaCaculate(11, 8);// H11 放款金額
+		// 表格二
+		makeExcel.formulaCaculate(20, 3);// C20 購置住宅+修繕貸款
+		makeExcel.formulaCaculate(20, 4);// D20 建築貸款
+		makeExcel.formulaCaculate(18, 5);// E18 一般
+		makeExcel.formulaCaculate(19, 5);// E19 利變
+		makeExcel.formulaCaculate(20, 5);// E20 縱向合計
+		makeExcel.formulaCaculate(20, 6);// F20 橫向合計
+		// 表格三
+		makeExcel.formulaCaculate(30, 3);// C30 購置住宅+修繕貸款
+		makeExcel.formulaCaculate(30, 4);// D30 建築貸款
+		makeExcel.formulaCaculate(27, 5);// E27 C
+		makeExcel.formulaCaculate(28, 5);// E28 D
+		makeExcel.formulaCaculate(29, 5);// E29 Z
+		makeExcel.formulaCaculate(30, 5);// E30 縱向合計
+		makeExcel.formulaCaculate(30, 6);// F31 橫向合計
+
 	}
 
 	/**
@@ -199,49 +395,5 @@ public class LM051Report extends MakeReport {
 		}
 	}
 
-	/**
-//	 * 逾期數
-//	 * 
-//	 * @param row 列數
-//	 * @param
-//	 */
-//	private void putTerm(int row, Map<String, String> tLDVo) throws LogicException {
-//		String tmp = "";
-//		if (tLDVo.get("F17").equals("2")) {
-//			tmp = "催";
-//			if (tLDVo.get("F14").equals("2")) {
-//				tmp = tmp + "協";
-//			}
-//		} else if (tLDVo.get("F14").equals("2")) {
-//			tmp = "協";
-//		} else {
-//			tmp = tLDVo.get("F6");
-//		}
-//		makeExcel.setValue(row, 8, tmp, "C");
-//	}
-
-//	private void memoText(int typeNum) {
-//		String one1 = "有足額擔保";
-//		String one2 = "有擔保";
-//		String one3 = "無擔保";
-//
-//		String two1 = "--但債信不良(" + typeNum + ")";
-//		String two2 = "--拍定後不足額(" + typeNum + ")";
-//		String two3 = "--逾繳12月以上(" + typeNum + ")";
-//		String two4 = "--逾繳7-12月(" + typeNum + ")";
-//		String two5 = "--協議後正常還款(" + typeNum + ")";
-//
-//		String three1 = "--逾期";
-//		String three2 = "--正常繳息";
-//		String three3 = "--逾期未滿30日";
-//
-//	}
-//
-//	private void regalText() {
-//		String one = "核貸估價";
-//
-//		String two = "協議戶";
-//
-//	}
 
 }

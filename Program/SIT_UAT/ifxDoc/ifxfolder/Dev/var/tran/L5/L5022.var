@@ -181,8 +181,8 @@ T(2,2+#OOEmpNo+#OOEffectiveDate+#OOStatusFg)
 T(2,3+#OOEmpNo+#OOEffectiveDate)
 #OOBUF_DELETE=X,34,S
 T(2,4+#OOEmpNo+#OOEffectiveDate)
-#OOBUF_SEARCH=X,6,S
-T(2,#OOEmpNo)
+#OOBUF_SEARCH=X,34,S
+T(2,#OOEmpNo+#OOEffectiveDate)
 
 
 
@@ -200,7 +200,7 @@ C(3,#OOStatusFg,3,BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_DELETE}),BIN
 !                   BIND(grid,cancel),
 !                   BIND(grid,{ cmd=CHAIN; ntxcd=L5407; ntxbuf=#OOBUF_DELETE}))
 #OOBTN_SEARCH=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L5022; ntxbuf=#OOBUF_SEARCH})
+BIND(grid,{ cmd=CHAIN; ntxcd=L5914; ntxbuf=#OOBUF_SEARCH})
 
 
 

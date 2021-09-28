@@ -57,13 +57,7 @@ public class LM056Report extends MakeReport {
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-		int iDay = iEntdy % 100;
-
-		String date = iYear + "/" + iMonth + "/" + iDay;
-
-		dateF = date;
-
-		yearMon = (Integer.valueOf(titaVo.get("ENTDY")) - 19110000) / 100;
+		yearMon = (iYear - 1911) * 100 + iMonth;
 
 		List<Map<String, String>> findList = new ArrayList<>();
 		List<Map<String, String>> findList2 = new ArrayList<>();
@@ -119,16 +113,19 @@ public class LM056Report extends MakeReport {
 				// 戶名
 				makeExcel.setValue(row, 2, lM056Vo.get("F1"), "L");
 
-				tempAmt = new BigDecimal(lM056Vo.get("F2"));
+				// 身分證
+				makeExcel.setValue(row, 3, lM056Vo.get("F2"));
+
+				tempAmt = lM056Vo.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F3"));
 
 				// 放款額逾
-				makeExcel.setValue(row, 3, tempAmt, "#,##0");
+				makeExcel.setValue(row, 4, tempAmt, "#,##0");
 
 				// 種類
-				makeExcel.setValue(row, 4, lM056Vo.get("F3"), "C");
+				makeExcel.setValue(row, 5, lM056Vo.get("F4"), "C");
 
 				// 利害關係人
-				makeExcel.setValue(row, 5, lM056Vo.get("F4"), "L");
+				makeExcel.setValue(row, 6, lM056Vo.get("F4"), "L");
 			}
 
 		} else {
@@ -154,7 +151,7 @@ public class LM056Report extends MakeReport {
 
 				row++;
 
-				tempAmt = new BigDecimal(lM056Vo.get("F2"));
+				tempAmt = lM056Vo.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F2"));
 
 				// 放款額逾
 				makeExcel.setValue(row, 19, tempAmt, "#,##0");
@@ -181,29 +178,29 @@ public class LM056Report extends MakeReport {
 		for (Map<String, String> lM056Vo : listData) {
 
 			// 金額
-			tempAmt = new BigDecimal(lM056Vo.get("F1"));
+			tempAmt = lM056Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F1"));
 
 			// H37 放款總計
 			// D40 甲類逾期放款金額
 			// D41 乙類逾期放款金額
 			// D44 逾期放款比率%
-			if (lM056Vo.get("F0") == "B") {
+			if (lM056Vo.get("F0").equals("B")) {
 
 				row = 40;
 				col = 4;
 
-			} else if (lM056Vo.get("F0") == "C") {
+			} else if (lM056Vo.get("F0").equals("C")) {
 
 				row = 41;
 				col = 4;
 
-			} else if (lM056Vo.get("F0") == "TOTAL") {
+			} else if (lM056Vo.get("F0").equals("TOTAL")) {
 				row = 37;
 				col = 8;
 
-				tempTotal = new BigDecimal(lM056Vo.get("F1"));
+				tempTotal = lM056Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F1"));
 
-			} else if (lM056Vo.get("F0") == "NTOTAL") {
+			} else if (lM056Vo.get("F0").equals("TOTAL")) {
 				row = 44;
 				col = 4;
 
@@ -211,7 +208,8 @@ public class LM056Report extends MakeReport {
 
 			}
 
-			if (lM056Vo.get("F0") == "NTOTAL") {
+			if (lM056Vo.get("F0").equals("NTOTAL")) {
+				
 				makeExcel.setValue(row, col, tempAmt, "R");
 			}
 

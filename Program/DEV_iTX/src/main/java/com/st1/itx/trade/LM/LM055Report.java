@@ -35,10 +35,6 @@ public class LM055Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	String fdnm = "";
-	int row = 1;
-	BigDecimal tot = new BigDecimal("0");
-
 	/*
 	 * 用LM051的表 去分別做擔保品類別與： 1.逾期數的餘額表 2.資產五分類的餘額表
 	 * 
@@ -105,16 +101,11 @@ public class LM055Report extends MakeReport {
 		BigDecimal amount = BigDecimal.ZERO;
 		BigDecimal allowAmount = BigDecimal.ZERO;
 
-		for (Map<String, String> lM054Vo : listData) {
+		for (Map<String, String> lM055Vo : listData) {
 
 			/*
-			 * COL 1=逾期放款(F) 
-			 * 2=未列入逾期應予評估放款(G) 
-			 * 3=正常放款I(H) 
-			 * 4=應予注意II(I) 
-			 * 5=可望收回III(J)
-			 * 6=收回困難IV(K) 
-			 * 7=收回無望V(L)
+			 * COL 1=逾期放款(F) 2=未列入逾期應予評估放款(G) 3=正常放款I(H) 4=應予注意II(I) 5=可望收回III(J)
+			 * 6=收回困難IV(K) 7=收回無望V(L)
 			 * 
 			 * 99=購置住宅+修繕貸款
 			 * 
@@ -122,46 +113,49 @@ public class LM055Report extends MakeReport {
 
 			// 起始欄E欄位 + (1~7)
 			// (自訂 FIVE=五類資產、9=備呆子目)
-			if (lM054Vo.get("F0") == "FIVE" || lM054Vo.get("F0") == "9") {
-				col = 19;
-			} else if (lM054Vo.get("F0") != "99") {
-				col = 5 + Integer.valueOf(lM054Vo.get("F0"));
-				colAllow = 12 + Integer.valueOf(lM054Vo.get("F0"));
-			}
+			if (!lM055Vo.get("F0").equals("N")) {
 
-			// 依放款種類 區分列數
-			// (自訂 FIVE=五類資產、AL=備呆子目)
-			row = lM054Vo.get("F1") == "C" ? 10
-					: (lM054Vo.get("F1") == "D" ? 11
-							: (lM054Vo.get("F1") == "FIVE" || lM054Vo.get("F1") == "AL" ? 16 : 12));
+				if (lM055Vo.get("F0").equals("FIVE") || lM055Vo.get("F0").equals("9")) {
+					col = 19;
+				} else if (!lM055Vo.get("F0").equals("99")) {
+					col = 5 + Integer.valueOf(lM055Vo.get("F0"));
+					colAllow = 12 + Integer.valueOf(lM055Vo.get("F0"));
+				}
 
-			// 放款金額
-			if (lM054Vo.get("F0") != "99") {
+				// 依放款種類 區分列數
+				// (自訂 FIVE=五類資產、AL=備呆子目)
+				row = lM055Vo.get("F1").equals("C") ? 10 : 
+					 (lM055Vo.get("F1").equals("D") ? 11 : 
+				     (lM055Vo.get("F1").equals("FIVE") || lM055Vo.get("F1").equals("AL") ? 16 : 12));
 
-				amount = lM054Vo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(lM054Vo.get("F2"));
-				
-				makeExcel.setValue(row, col, amount, "#,##0");
-			}
+				// 放款金額
+				if (!lM055Vo.get("F0").equals("99")) {
 
-			// 備抵損失
-			if (lM054Vo.get("F0") == "3") {
+					amount = lM055Vo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F2"));
 
-				normalAmount = Integer.valueOf(lM054Vo.get("F3"));
+					makeExcel.setValue(row, col, amount, "#,##0");
+				}
 
-			} else if (lM054Vo.get("F0") == "99") {
+				// 備抵損失
+				if (lM055Vo.get("F0").equals("3")) {
 
-				specificAmount = Integer.valueOf(lM054Vo.get("F3"));
+					normalAmount = lM055Vo.get("F3") == null ? 0 : Integer.valueOf(lM055Vo.get("F3"));
 
-				allowAmount = new BigDecimal(normalAmount + specificAmount);
+				} else if (lM055Vo.get("F0").equals("99")) {
 
-				makeExcel.setValue(row, 13, allowAmount, "#,##0");
+					specificAmount = lM055Vo.get("F3") == null ? 0 : Integer.valueOf(lM055Vo.get("F3"));
 
-			} else {
+					allowAmount = new BigDecimal(normalAmount + specificAmount);
 
-				allowAmount = new BigDecimal(lM054Vo.get("F3"));
+					makeExcel.setValue(row, 13, allowAmount, "#,##0");
 
-				makeExcel.setValue(row, colAllow, allowAmount, "#,##0");
+				} else {
 
+					allowAmount = lM055Vo.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
+
+					makeExcel.setValue(row, colAllow, allowAmount, "#,##0");
+
+				}
 			}
 
 		}

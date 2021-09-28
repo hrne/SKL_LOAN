@@ -29,7 +29,7 @@ public class FacMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -4220559053941206093L;
+	private static final long serialVersionUID = 1L;
 
 @EmbeddedId
   private FacMainId facMainId;
@@ -243,7 +243,7 @@ public class FacMain implements Serializable {
   private String pieceCode;
 
   // 繳款方式
-  /* 1: 匯款轉帳2: 銀行扣款3: 員工扣薪4: 支票5: 特約金6: 人事特約金7: 定存特約8: 劃撥存款 */
+  /* 共用代碼檔 RepayCode1: 匯款轉帳2: 銀行扣款3: 員工扣薪4: 支票5: 特約金6: 人事特約金7: 定存特約8: 劃撥存款 */
   @Column(name = "`RepayCode`")
   private int repayCode = 0;
 
@@ -363,11 +363,6 @@ public class FacMain implements Serializable {
   /* CdCode:ApprovedLevel(2021.8.27異動)by eric */
   @Column(name = "`ApprovedLevel`", length = 1)
   private String approvedLevel;
-
-  // 核准人員
-  /* CdEmp(2021.8.27異動)by eric */
-  @Column(name = "`ApprovedEmpNo`", length = 6)
-  private String approvedEmpNo;
 
   // 建檔日期時間
   @CreatedDate
@@ -1423,7 +1418,8 @@ E: 展期
 
 /**
 	* 繳款方式<br>
-	* 1: 匯款轉帳
+	* 共用代碼檔 RepayCode
+1: 匯款轉帳
 2: 銀行扣款
 3: 員工扣薪
 4: 支票
@@ -1439,7 +1435,8 @@ E: 展期
 
 /**
 	* 繳款方式<br>
-	* 1: 匯款轉帳
+	* 共用代碼檔 RepayCode
+1: 匯款轉帳
 2: 銀行扣款
 3: 員工扣薪
 4: 支票
@@ -1998,27 +1995,6 @@ N:否
   }
 
 /**
-	* 核准人員<br>
-	* CdEmp
-(2021.8.27異動)by eric
-	* @return String
-	*/
-  public String getApprovedEmpNo() {
-    return this.approvedEmpNo == null ? "" : this.approvedEmpNo;
-  }
-
-/**
-	* 核准人員<br>
-	* CdEmp
-(2021.8.27異動)by eric
-  *
-  * @param approvedEmpNo 核准人員
-	*/
-  public void setApprovedEmpNo(String approvedEmpNo) {
-    this.approvedEmpNo = approvedEmpNo;
-  }
-
-/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -2109,7 +2085,7 @@ N:否
            + ", businessOfficer=" + businessOfficer + ", supervisor=" + supervisor + ", investigateOfficer=" + investigateOfficer + ", estimateReview=" + estimateReview + ", coorgnizer=" + coorgnizer + ", advanceCloseCode=" + advanceCloseCode
            + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo + ", colSetFlag=" + colSetFlag
            + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo + ", acDate=" + acDate
-           + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", approvedEmpNo=" + approvedEmpNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

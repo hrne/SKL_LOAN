@@ -65,10 +65,10 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 			last4Month = iYear * 100 + (iMonth - 4);
 		}
 
-		this.info("lM057.findAll YYMM=" + iYear * 100 + iMonth + ",last4Mont" + last4Month);
+		this.info("lM057.findAll YYMM=" + iYear * 100 + iMonth + ",last4Mont=" + last4Month);
 
 		String sql = " ";
-		sql += "SELECT * FROM(";
+		sql += " SELECT * FROM(";
 		sql += "	SELECT ( CASE";
 		sql += "       	       WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C2'";
 		sql += "       	       WHEN TRUNC(L.\"MaturityDate\" / 100) = :l4mdy AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'B1'";
@@ -100,7 +100,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  AND M.\"AssetClass\" IS NOT NULL";
 		sql += "	GROUP BY (CASE";
 		sql += "       	        WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C2'";
-		sql += "       	        WHEN TRUNC(L.\"MaturityDate\" / 100) = :l4mdy AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'B1'";
+		sql += "       	        WHEN TRUNC(L.\"MaturityDate\" / 100) = :l4mdy  AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'B1'";
 		sql += "       	        WHEN CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'C5'";
 		sql += "       	      ELSE 'B3' END )";
 		sql += "	UNION";
@@ -116,7 +116,8 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	       FROM \"AcMain\"";
 		sql += "	       WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000,10601304000)";
 		sql += "	         AND \"MonthEndYm\" = :yymm )";
-		sql += ")";
+		sql += "	GROUP BY 'TOTAL'";
+		sql += " )";
 		info("sql=" + sql);
 
 		Query query;

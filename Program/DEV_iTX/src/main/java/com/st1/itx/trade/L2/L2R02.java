@@ -127,6 +127,7 @@ public class L2R02 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "L2R02 客戶資料主檔" + tFacCaseAppl.getCustUKey()); // 查無資料
 			}
 			this.totaVo.putParam("OCreditSysNo", tFacCaseAppl.getCreditSysNo());
+			this.totaVo.putParam("OSyndNo", tFacCaseAppl.getSyndNo());
 			this.totaVo.putParam("OApplDate", tFacCaseAppl.getApplDate());
 			this.totaVo.putParam("OProdNo", tFacCaseAppl.getProdNo());
 			this.totaVo.putParam("OAcctCode", "");

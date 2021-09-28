@@ -46,6 +46,7 @@ E(0,0)
 [#<->#,"#FdCustId+統一編號",#CustId,#BTN1,#CustIdX],
 [#<->#,"#FdApplNo+申請號碼",#ApplNo,"@@@"],
 [#<->#,"#FdCreditSysNo+案件編號",#CreditSysNo],
+[#<->#,"#FdSyndNo+聯貸案編號",#SyndNo],
 [#<->#,"#FdApplDate+申請日期",#ApplDate,#LbApplDate],
 [#<->#,"#FdProdNo+申請商品代碼",#ProdNo,#BTN3,#ProdName], 
 ! [#<->#,"#FdAcctCode+申請科目",#AcctCode,#AcctCodeX],
@@ -98,11 +99,13 @@ T(3,CdCode.CurrPrecision)
 
 #CurrPrecisionHelp=x,1024,S
 
+
 !YesNo YesNo
 #CDDEF05=x,20,S
 T(3,CdCode.YesNo)
 
 #YesNoHelp=x,1024,S
+
 
 
 #HelpRim=X,1,S
@@ -568,8 +571,26 @@ C(2,#FuncCode,S,$,$,$,s,s,S)
 @
 ! IF(#CreditSysNo==#L2r02CreditSysNo,s,$)
 V(2,0)
+![聯貸案編號]
+#FdSyndNo=X,2,L
 
-![@申請日期]
+#SyndNo=A,6,I
+C(2,#FuncCode,S,$,$,$,s,s,S)
+C(3,#ApproveFlag,1,s,$)
+
+
+!查詢聯貸訂約檔
+#SendL3r10A=X,1,S
+C(2,#FuncCode,S,$,$,$,S,S,S)
+C(3,#SyndNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimSyndNo,#SyndNo)
+! RESET_RIM(#SendL3r10A,L3R10)
+S(L3R10,1,#RimFuncCode,#RimTxCode,#RimSyndNo)
+R(1,L3R10)
+
+
+![申請日期]
 #FdApplDate=X,2,L
 
 #wkSysCDate=D,7,S
@@ -888,6 +909,7 @@ T(3,      Y)
 #BIND8A=X,1,S
 BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF8A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
 
+
 ![核決主管]
 !可不輸入
 #FdSupervisor=X,2,L
@@ -1041,7 +1063,9 @@ V(P,修改時，必須至少修改一個項目)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L3Rim.dec"/>
 <include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L3R10.dec"/>
 <include src="ROM.icf::L2R02.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L2R08.dec"/>
@@ -1098,7 +1122,7 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#FuncCode#CustId#ApplNo#CreditSysNo#ApplDate#ProdNo#CurrencyCode
+#FuncCode#CustId#ApplNo#CreditSysNo#SyndNo#ApplDate#ProdNo#CurrencyCode
 #IsLimit#IsRelated#IsLnrelNear
 #TimApplAmt#Estimate
 #PieceCode#CreditOfficer#LoanOfficer#Introducer#Supervisor#Coorgnizer
@@ -1124,6 +1148,7 @@ TXFORM=L2111
 <include src="ROM.icf::L2R08.tom"/>
 <include src="ROM.icf::L2R12.tom"/>
 <include src="ROM.icf::L2R13.tom"/>
+<include src="ROM.icf::L3R10.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

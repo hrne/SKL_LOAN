@@ -6,7 +6,6 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.LoanSynd;
 import org.springframework.data.domain.Slice;
-import com.st1.itx.db.domain.LoanSyndId;
 
 /**
  * Gen By Tool
@@ -19,11 +18,11 @@ public interface LoanSyndService {
   /**
    * findByPrimaryKey
    *
-   * @param loanSyndId PK
+   * @param syndNo PK
    * @param titaVo Variable-Length Argument
    * @return LoanSynd LoanSynd
    */
-  public LoanSynd findById(LoanSyndId loanSyndId, TitaVo... titaVo);
+  public LoanSynd findById(int syndNo, TitaVo... titaVo);
 
   /**
    * findAll
@@ -36,32 +35,51 @@ public interface LoanSyndService {
   public Slice<LoanSynd> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo &gt;= ,AND CustNo &lt;= ,AND LeadingBank % ,AND SigningDate &gt;= ,AND SigningDate &lt;= ,AND DrawdownStartDate &gt;= ,AND DrawdownStartDate &lt;= ,AND DrawdownEndDate &gt;= ,AND DrawdownEndDate &lt;= 
+   * SyndNo &gt;= ,AND SyndNo &lt;= ,AND LeadingBank % ,AND SigningDate &gt;= ,AND SigningDate &lt;=
    *
-   * @param custNo_0 custNo_0
-   * @param custNo_1 custNo_1
+   * @param syndNo_0 syndNo_0
+   * @param syndNo_1 syndNo_1
    * @param leadingBank_2 leadingBank_2
    * @param signingDate_3 signingDate_3
    * @param signingDate_4 signingDate_4
-   * @param drawdownStartDate_5 drawdownStartDate_5
-   * @param drawdownStartDate_6 drawdownStartDate_6
-   * @param drawdownEndDate_7 drawdownEndDate_7
-   * @param drawdownEndDate_8 drawdownEndDate_8
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice LoanSynd LoanSynd of List
    */
-  public Slice<LoanSynd> syndCustNoRange(int custNo_0, int custNo_1, String leadingBank_2, int signingDate_3, int signingDate_4, int drawdownStartDate_5, int drawdownStartDate_6, int drawdownEndDate_7, int drawdownEndDate_8, int index, int limit, TitaVo... titaVo);
+  public Slice<LoanSynd> syndNoRange(int syndNo_0, int syndNo_1, String leadingBank_2, int signingDate_3, int signingDate_4, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * SigningDate &gt;= ,AND SigningDate&lt;=
+   *
+   * @param signingDate_0 signingDate_0
+   * @param signingDate_1 signingDate_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice LoanSynd LoanSynd of List
+   */
+  public Slice<LoanSynd> signingDateRange(int signingDate_0, int signingDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * LeadingBank =
+   *
+   * @param leadingBank_0 leadingBank_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice LoanSynd LoanSynd of List
+   */
+  public Slice<LoanSynd> leadingBankEq(String leadingBank_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By LoanSynd
    * 
-   * @param loanSyndId key
+   * @param syndNo key
    * @param titaVo Variable-Length Argument
    * @return LoanSynd LoanSynd
    */
-  public LoanSynd holdById(LoanSyndId loanSyndId, TitaVo... titaVo);
+  public LoanSynd holdById(int syndNo, TitaVo... titaVo);
 
   /**
    * hold By LoanSynd

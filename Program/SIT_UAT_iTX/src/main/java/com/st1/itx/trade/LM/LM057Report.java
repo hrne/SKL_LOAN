@@ -222,7 +222,7 @@ public class LM057Report extends MakeReport {
 		makeExcel.formulaCaculate(20, 4);
 		makeExcel.formulaCaculate(21, 4);
 		makeExcel.formulaCaculate(22, 4);
-
+ 
 	}
 
 	private void exportExcel14_6() throws LogicException {

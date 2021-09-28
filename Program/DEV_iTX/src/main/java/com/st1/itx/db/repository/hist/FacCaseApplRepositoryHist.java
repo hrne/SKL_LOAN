@@ -36,6 +36,9 @@ public interface FacCaseApplRepositoryHist extends JpaRepository<FacCaseAppl, In
   // CreditSysNo =
   public Optional<FacCaseAppl> findTopByCreditSysNoIsOrderByApplDateAsc(int creditSysNo_0);
 
+  // SyndNo = 
+  public Slice<FacCaseAppl> findAllBySyndNoIsOrderByApplNoAsc(int syndNo_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -716,9 +716,16 @@ T(3,CdCode.BankCdAppl)
 
 #BankDeductCdHelp=x,1024,S 
 
+
+!ApprovedLevel 核決層級
+#CDDEF30=x,25,S
+T(3,CdCode.ApprovedLevel)
+
+#ApprovedLevelHelp=x,1024,S 
+
 #HelpRim3=X,1,S
 RESET_RIM(#HelpRim3,XXR99)
-S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24,#CDDEF25,#CDDEF26,#CDDEF27,#CDDEF28,#CDDEF29)
+S(XXR99,01,#CDDEF21,#CDDEF22,#CDDEF23,#CDDEF24,#CDDEF25,#CDDEF26,#CDDEF27,#CDDEF28,#CDDEF29,#CDDEF30)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@CancelCodeHelp,#HelpDesc1)
@@ -730,6 +737,7 @@ T(2,@RateTypeHelp,#HelpDesc6)
 T(2,@CurrencyHelp,#HelpDesc7)
 T(2,@CurrPrecisionHelp,#HelpDesc8)
 T(2,@BankDeductCdHelp,#HelpDesc9)
+T(2,@ApprovedLevelHelp,#HelpDesc10)
 
 #FuncCodeHelp=x,40,S
 T(3,1:新增;2:修改;4:刪除;5:查詢)
@@ -994,6 +1002,8 @@ T(2,@CreditOfficerLb,#L2r05CreditOfficer)
 ! T(2,@LoanOfficer,#L2r05LoanOfficer)
 T(2,@BusinessOfficer,#L2r05BusinessOfficer)
 T(2,@BusinessOfficerLb,#L2r05BusinessOfficer)
+T(2,@ApprovedLevel,#L2r05ApprovedLevel)
+T(2,@ApprovedLevel,#L2r05ApprovedLevel)
 T(2,@Supervisor,#L2r05Supervisor)
 T(2,@SupervisorLb,#L2r05Supervisor)
 T(2,@InvestigateOfficer,#L2r05InvestigateOfficer)
@@ -1266,6 +1276,14 @@ C(3,#UpdateCode,1,
     HIDE(#StepMonthS{i},#StepMonthE{i},#StepRateType{i},#StepRateIncr{i}))
 ##end
 C(3,#UpdateCode,1,T(F,@ProdNo,1)T(F,@AcctCode,1),T(F,@ProdNo,0)T(F,@AcctCode,0))
+
+#WKSHOWB=X,1,S
+C(3,#UpdateCode,1,SHOW(#ApprovedLevel)
+                  T(F,@ApprovedLevel,1)
+                  T(3,@FdApprovedLevel,*)
+                 ,HIDE(#ApprovedLevel)
+                  T(F,@ApprovedLevel,0)
+                  T(3,@FdApprovedLevel,))
 
 !核准號碼
 #FdApplNo=X,2,L
@@ -2580,6 +2598,17 @@ HELP(#BankDeductCdHelp)
 V(2,0)
 C(3,#UpdateCode,1,C(5,#RepayBank,700,T(3,@FdPostCode,*),T(3,@FdPostCode, )),$)
 
+#RimRepayBank=X,3,S
+#SendL2r53=X,1,S
+C(3,#RepayCode,2,$,S)
+T(2,@RimCustNo,#CustNo)
+T(2,@RimRepayBank,#RepayBank)
+RESET_RIM(#SendL2r53,L2R53)
+S(L2R53,1,#RimCustNo,#RimRepayBank)
+R(1,L2R53)
+
+
+
 #LbRepayBank=X,3,L
 C(3,#RepayCode,2,$,S)
 
@@ -2611,8 +2640,11 @@ C(5,#RepayBank,700,T(2,@FdPostCode,#WkStar),T(3,@FdPostCode, ))
 C(3,#UpdateCode,1,$,s)
 C(3,#RepayCode,2,$,S)
 IF(#FuncCode==2,$,s)
+C(3,#RepayCode,2,C(4,#L2r53Help1,$,HELP(#L2r53Help1)),S)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
-@V(2,0)
+@
+IF(#RepayAcctNo!=#OldAcctNo,C(3,#AcctCheckFlag,7,V(P,扣款帳號已提出授權待授權銀行回覆,不可變更),$),$)
+V(2,0)
 
 #LbRepayAcctNo=A,14,L
 C(3,#RepayCode,2,$,S)
@@ -2676,7 +2708,7 @@ T(2,@RelationGender,#L4r22RelAcctGender),$)
 ! E(0,@RelationBirthday,0)
 ! E(0,@RelationGender,0))
 
-#ChECKfLaG=A,1,S
+#CheckFlag=A,1,S
 E(0,0)
 IF(#OldAcctNo==#RepayAcctNo,$,s)
 IF(#OldRepayBank==#RepayBank,$,s)
@@ -2687,7 +2719,7 @@ E(0,1)
 #AcctCheckFlagwaring=X,1,S
 C(3,#RepayCode,02,$,S)
 C(3,#UpdateCode,0,S,$)
-C(3,#ChECKfLaG,1,S,$)
+C(3,#CheckFlag,1,S,$)
 C(3,#BeforeAcctCheckFlag,8,S,$)
 C(3,#AcctCheckFlag,1,$,V(P,此帳號未授權，請至L4042／L4043新增授權資料))
 
@@ -2805,6 +2837,11 @@ C(3,#UpdateCode,1,
    #IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb)
     HIDE(#BTN11,#BTN12,#BTN13,#BTN14,#BTN16,#BTN17,#BTN19,#BTN20,#BTN21)  
     HIDE(#Introducer,#District,#FireOfficer,#Estimate,#CreditOfficer,#BusinessOfficer,#Supervisor,#InvestigateOfficer,#EstimateReview,#Coorgnizer))
+
+
+
+#InitP6=X,1,S
+T(H,@ApprovedLevelX,#ApprovedLevel,#ApprovedLevelHelp)
 
 #BUF11A=X,7,S
 T(3,      Y)
@@ -2997,6 +3034,22 @@ T(3,      Y)
 #BIND17A=X,1,S
 BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF17A;ntxbuf5=type<-1:Supervisor<-OOEmployeeNo})
 
+
+!核決層級
+#FdApprovedLevel=X,2,L
+
+#ApprovedLevel=X,1,I
+C(3,#UpdateCode,1,$,s)
+HELP(#ApprovedLevelHelp)
+@V(H,#ApprovedLevelHelp)
+
+#ApprovedLevelX=X,20,L
+T(3,)
+T(H,#ApprovedLevel,#ApprovedLevelHelp)
+C(3,#UpdateCode,1,C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F,@Supervisor,1)T(3,@FdSupervisor,*)),$)
+
+
+
 ![核決主管]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
 #FdSupervisor=X,2,L
@@ -3004,6 +3057,7 @@ BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF17A;ntxbuf5=type<-1:Super
 #Supervisor=X,6,I
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide6Fg,0,CALL(#HideP6),$)
+C(3,#ApprovedLevel,9,S,$)
 
 #SupervisorLb=X,6,L
 
@@ -3433,6 +3487,7 @@ C(3,#CheckCode,0,$,S)
 <include src="ROM.icf::L2R06.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L2R08.dec"/>
+<include src="ROM.icf::L2R53.dec"/>
 <include src="ROM.icf::L2R09.dec"/>
 <include src="ROM.icf::L2R11.dec"/>
 <include src="ROM.icf::L2R13.dec"/>
@@ -3526,10 +3581,11 @@ C(3,#CheckCode,0,$,S)
 ["#FdEstimate+@估價人員",#Estimate,#BTN13,#EstimateLb,#EstimateX],
 ["#FdCreditOfficer+授信人員",#CreditOfficer,#BTN14,#CreditOfficerLb,#CreditOfficerX],
 ["#FdBusinessOfficer+#BusinessOfficerItem",#BusinessOfficer,#BTN16,#BusinessOfficerLb,#BusinessOfficerX],
-["#FdSupervisor+核決主管",#Supervisor,#BTN17,#SupervisorLb,#SupervisorX],
-["#FdInvestigateOfficer+@徵信人員",#InvestigateOfficer,#BTN19,#InvestigateOfficerLb,#InvestigateOfficerX],
-["#FdEstimateReview+估價覆核人員",#EstimateReview,#BTN20,#EstimateReviewLb,#EstimateReviewX],
-["#FdCoorgnizer+@協辦人",#Coorgnizer,#BTN21,#CoorgnizerLb,#CoorgnizerX],
+["#FdApprovedLevel+核決層級",#ApprovedLevel,#ApprovedLevelX],
+["#FdSupervisor+@核決主管",#Supervisor,#BTN17,#SupervisorLb,#SupervisorX],
+["#FdInvestigateOfficer+徵信人員",#InvestigateOfficer,#BTN19,#InvestigateOfficerLb,#InvestigateOfficerX],
+["#FdEstimateReview+@估價覆核人員",#EstimateReview,#BTN20,#EstimateReviewLb,#EstimateReviewX],
+["#FdCoorgnizer+協辦人",#Coorgnizer,#BTN21,#CoorgnizerLb,#CoorgnizerX],
 ]
 </sub>
 
@@ -3592,7 +3648,7 @@ T(3,[L2154] 額度資料維護)
 #RateAdjNoticeCode#PieceCode#RepayCode
 #RepayBank#RepayAcctNo#PostCode
 #Introducer#District#FireOfficer#Estimate
-#CreditOfficer#BusinessOfficer#Supervisor
+#CreditOfficer#BusinessOfficer#ApprovedLevel#Supervisor
 #InvestigateOfficer#EstimateReview#Coorgnizer
 #BreachFlag#ProdBreachFlag#Breach
 #CreditScore#ContractNo
@@ -3630,6 +3686,7 @@ TXFORM=L2154
 <include src="ROM.icf::L2R11.tom"/>
 <include src="ROM.icf::L2R13.tom"/>
 <include src="ROM.icf::L2R44.tom"/>
+<include src="ROM.icf::L2R53.tom"/>
 <include src="ROM.icf::L6R28.tom"/>
 <include src="ROM.icf::L4R22.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

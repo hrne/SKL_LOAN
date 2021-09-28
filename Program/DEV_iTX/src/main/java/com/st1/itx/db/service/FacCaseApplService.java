@@ -95,6 +95,17 @@ public interface FacCaseApplService {
   public FacCaseAppl CreditSysNoFirst(int creditSysNo_0, TitaVo... titaVo);
 
   /**
+   * SyndNo = 
+   *
+   * @param syndNo_0 syndNo_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice FacCaseAppl FacCaseAppl of List
+   */
+  public Slice<FacCaseAppl> syndNoEq(int syndNo_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By FacCaseAppl
    * 
    * @param applNo key

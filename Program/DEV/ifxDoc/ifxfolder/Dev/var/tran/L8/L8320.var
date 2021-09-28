@@ -145,7 +145,7 @@ T(2,@FdRate,*)
 T(2,@FdExpBalanceAmt,*)
 T(2,@FdCashBalanceAmt,*)
 T(2,@FdCreditBalanceAmt,*)
-T(2,@FdChaRepayAmt,*)
+! T(2,@FdChaRepayAmt,*)
 T(2,@FdChaRepayAgreeDate,*)
 T(2,@FdChaRepayViewDate,*)
 T(2,@FdChaRepayEndDate,*)
@@ -173,7 +173,7 @@ T(2,@FdRate,*)
 T(2,@FdExpBalanceAmt,*)
 T(2,@FdCashBalanceAmt,*)
 T(2,@FdCreditBalanceAmt,*)
-T(2,@FdChaRepayAmt,*)
+! T(2,@FdChaRepayAmt,*)
 T(2,@FdChaRepayAgreeDate,*)
 T(2,@FdChaRepayViewDate,*)
 T(2,@FdChaRepayEndDate,*)
@@ -316,21 +316,23 @@ C(5,#TranKey_Tmp,4,s,$)
 #ExpBalanceAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+@E(0,@ChaRepayAmt,#ExpBalanceAmt)
 
 !現金卡協商剩餘債務簽約餘額
 #CashBalanceAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+@E(0,@ChaRepayAmt,#ExpBalanceAmt+#CashBalanceAmt)
 !信用卡協商剩餘債務簽約餘額
 #CreditBalanceAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
+@E(0,@ChaRepayAmt,#ExpBalanceAmt+#CashBalanceAmt+#CreditBalanceAmt)
 !變更還款條件簽約總債務金額
-#ChaRepayAmt=M,10,I
+#ChaRepayAmt=M,10,L
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+
 
 !變更還款條件協議完成日
 #ChaRepayAgreeDate=D,7,I

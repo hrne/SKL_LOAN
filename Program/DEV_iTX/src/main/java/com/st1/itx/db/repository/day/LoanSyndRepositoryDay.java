@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.st1.itx.db.domain.LoanSynd;
-import com.st1.itx.db.domain.LoanSyndId;
 
 /**
  * Gen By Tool
@@ -20,15 +19,21 @@ import com.st1.itx.db.domain.LoanSyndId;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface LoanSyndRepositoryDay extends JpaRepository<LoanSynd, LoanSyndId> {
+public interface LoanSyndRepositoryDay extends JpaRepository<LoanSynd, Integer> {
 
-  // CustNo >= ,AND CustNo <= ,AND LeadingBank % ,AND SigningDate >= ,AND SigningDate <= ,AND DrawdownStartDate >= ,AND DrawdownStartDate <= ,AND DrawdownEndDate >= ,AND DrawdownEndDate <= 
-  public Slice<LoanSynd> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualAndDrawdownStartDateGreaterThanEqualAndDrawdownStartDateLessThanEqualAndDrawdownEndDateGreaterThanEqualAndDrawdownEndDateLessThanEqualOrderByCustNoAscLeadingBankAscSigningDateAscDrawdownStartDateAsc(int custNo_0, int custNo_1, String leadingBank_2, int signingDate_3, int signingDate_4, int drawdownStartDate_5, int drawdownStartDate_6, int drawdownEndDate_7, int drawdownEndDate_8, Pageable pageable);
+  // SyndNo >= ,AND SyndNo <= ,AND LeadingBank % ,AND SigningDate >= ,AND SigningDate <=
+  public Slice<LoanSynd> findAllBySyndNoGreaterThanEqualAndSyndNoLessThanEqualAndLeadingBankLikeAndSigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(int syndNo_0, int syndNo_1, String leadingBank_2, int signingDate_3, int signingDate_4, Pageable pageable);
+
+  // SigningDate >= ,AND SigningDate<=
+  public Slice<LoanSynd> findAllBySigningDateGreaterThanEqualAndSigningDateLessThanEqualOrderBySyndNoAsc(int signingDate_0, int signingDate_1, Pageable pageable);
+
+  // LeadingBank =
+  public Slice<LoanSynd> findAllByLeadingBankIsOrderBySyndNoAsc(String leadingBank_0, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
-  public Optional<LoanSynd> findByLoanSyndId(LoanSyndId loanSyndId);
+  public Optional<LoanSynd> findBySyndNo(int syndNo);
 
 }
 

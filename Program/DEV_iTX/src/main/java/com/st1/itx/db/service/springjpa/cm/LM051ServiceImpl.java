@@ -35,7 +35,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings({ "unchecked" })
-	public List<Map<String, String>> findAll(TitaVo titaVo, int i) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int groupNum) throws Exception {
 
 		this.info("lM051.findAll ");
 
@@ -103,6 +103,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,M.\"LawAmount\""; // F15
 		sql += "			,M.\"AssetClass\""; // F16
 		sql += "			,M.\"Status\""; // F17
+		sql += "		    ,M.\"OvduText\"";//F18
 		sql += "	  FROM(SELECT M.\"CustNo\"";
 		sql += "				 ,M.\"FacmNo\"";
 		sql += "				 ,NVL(M.\"AcSubBookCode\",' ') AS \"AcSubBookCode\"";
@@ -171,7 +172,7 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			AND CD.\"DefCode\" = 'LegalProg' ";
 
 		// 有四種不同條件分四次
-		switch (i) {
+		switch (groupNum) {
 		case 1:
 			sql += groupSelect1;
 			break;
@@ -195,7 +196,151 @@ public class LM051ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yymm", iYear * 100 + iMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
+	}
+
+	@SuppressWarnings({ "unchecked" })
+	public List<Map<String, String>> findAll2(TitaVo titaVo, int formNum) throws Exception {
+
+		this.info("lM051.findAll2");
+
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日(int)
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthLastDate = Calendar.getInstance();
+		// 設當年月底日
+		calMonthLastDate.set(iYear, iMonth, 0);
+
+		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < monthLastDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
+		}
+
+		this.info("yymm:" + iYear * 100 + iMonth);
+
+		String sql = " ";
+		if (formNum == 1) {
+			sql += "SELECT * FROM (";
+			sql += "	SELECT ( CASE";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
+			sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
+			sql += "			   ELSE '99'";
+			sql += "			 END ) AS \"KIND\"";
+			sql += "	      ,SUM(M.\"PrinBalance\") AS \"AMT\"";
+			sql += "	FROM \"MonthlyFacBal\" M";
+			sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
+			sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
+			sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = M.\"CustNo\"";
+			sql += "	LEFT JOIN \"CdIndustry\" CDI ON CDI.\"IndustryCode\" = CM.\"IndustryCode\"";
+			sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
+			sql += "	WHERE M.\"YearMonth\" = :yymm";
+			sql += "	  AND M.\"PrinBalance\" > 0";
+			sql += "	GROUP BY ( CASE";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"FirstDrawdownDate\" >= 20100101 AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN '3'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND F.\"UsageCode\" = '02' AND CDI.\"IndustryCode\" IS NULL THEN '1'";
+			sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN '4'";
+			sql += "			     ELSE '99'";
+			sql += "			   END )";
+			sql += "	UNION";
+			sql += "	SELECT 'TOTAL' AS \"KIND\"";
+			sql += "          ,SUM(\"AMT\") AS \"AMT\"";
+			sql += "	FROM ( SELECT SUM(M.\"PrinBalance\") AS \"AMT\"";
+			sql += "		   FROM \"MonthlyFacBal\" M";
+			sql += "		   LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
+			sql += "						   		  AND F.\"FacmNo\" = M.\"FacmNo\"";
+			sql += "		   WHERE M.\"YearMonth\" = :yymm";
+			sql += "	  	     AND M.\"PrinBalance\" > 0";
+			sql += "		   UNION";
+			sql += "	      SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
+			sql += "		  FROM \"AcMain\"";
+			sql += "		  WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000,10601304000)";
+			sql += "	  		AND \"MonthEndYm\" = :yymm ) ";
+			sql += ")ORDER BY \"KIND\" ASC";
+		} else if (formNum == 2) {
+			sql += "	SELECT ( CASE";
+			sql += "			   WHEN M.\"AcSubBookCode\" = '00A' THEN '1'";
+			sql += "			   WHEN M.\"AcSubBookCode\" = '201' THEN 'A'";
+			sql += "			   ELSE '99'";
+			sql += "			 END ) AS \"ASBC\"";
+			sql += "		  ,( CASE";
+			sql += "			   WHEN CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
+			sql += "			   WHEN CDI.\"IndustryCode\" IS NULL AND F.\"UsageCode\" = '02' THEN '1'";
+			sql += "			   ELSE '99'";
+			sql += "			 END ) AS \"KIND\"";
+			sql += "	      ,SUM(M.\"PrinBalance\") AS \"AMT\"";
+			sql += "	FROM \"MonthlyFacBal\" M";
+			sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
+			sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
+			sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = M.\"CustNo\"";
+			sql += "	LEFT JOIN \"CdIndustry\" CDI ON CDI.\"IndustryCode\" = CM.\"IndustryCode\"";
+			sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
+			sql += "	WHERE M.\"YearMonth\" = :yymm";
+			sql += "	  AND M.\"PrinBalance\" > 0";
+			sql += "	GROUP BY ( CASE";
+			sql += "			     WHEN M.\"AcSubBookCode\" = '00A' THEN '1'";
+			sql += "			     WHEN M.\"AcSubBookCode\" = '201' THEN 'A'";
+			sql += "			     ELSE '99'";
+			sql += "			   END )";
+			sql += "		    ,( CASE";
+			sql += "			     WHEN CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
+			sql += "			     WHEN CDI.\"IndustryCode\" IS NULL AND F.\"UsageCode\" = '02' THEN '1'";
+			sql += "			     ELSE '99'";
+			sql += "			   END )";
+			sql += "	ORDER BY \"KIND\" ASC";
+		} else if (formNum == 3) {
+			sql += "	SELECT ( CASE";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+			sql += "			   WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
+			sql += "			   WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
+			sql += "			   ELSE '99'";
+			sql += "			 END ) AS \"TYPE\"";
+			sql += "		  ,( CASE";
+			sql += "			   WHEN CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
+			sql += "			   WHEN CDI.\"IndustryCode\" IS NULL AND F.\"UsageCode\" = '02' THEN '1'";
+			sql += "			   ELSE '99'";
+			sql += "			 END ) AS \"KIND\"";
+			sql += "	      ,SUM(M.\"PrinBalance\") AS \"AMT\"";
+			sql += "	FROM \"MonthlyFacBal\" M";
+			sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
+			sql += "						   AND F.\"FacmNo\" = M.\"FacmNo\"";
+			sql += "	LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = M.\"CustNo\"";
+			sql += "	LEFT JOIN \"CdIndustry\" CDI ON CDI.\"IndustryCode\" = CM.\"IndustryCode\"";
+			sql += "							    AND (CDI.\"IndustryItem\" LIKE '不動產%' OR CDI.\"IndustryItem\" LIKE '建築%')";
+			sql += "	WHERE M.\"YearMonth\" = :yymm";
+			sql += "	  AND M.\"PrinBalance\" > 0";
+			sql += "	GROUP BY ( CASE";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
+			sql += "			     WHEN M.\"ClCode1\" IN (1,2) THEN 'C'";
+			sql += "			     WHEN M.\"ClCode1\" IN (3,4) THEN 'D'";
+			sql += "			     ELSE '99'";
+			sql += "			   END ) ";
+			sql += "		    ,( CASE";
+			sql += "			     WHEN CDI.\"IndustryCode\" IS NOT NULL THEN '2'";
+			sql += "			     WHEN CDI.\"IndustryCode\" IS NULL AND F.\"UsageCode\" = '02' THEN '1'";
+			sql += "			     ELSE '99'";
+			sql += "			   END )";
+			sql += "	ORDER BY \"KIND\" ASC";
+			
+		}
+
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("yymm", iYear * 100 + iMonth);
+		return this.convertToMap(query);
 	}
 
 }

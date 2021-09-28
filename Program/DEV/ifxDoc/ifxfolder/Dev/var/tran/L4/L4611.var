@@ -22,11 +22,11 @@ E(0,0)
 [
 ["[L4611]                                 續約保單資料維護"],
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
-[#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,#CustName],
+["#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,#CustName],["#FdNewCustNo+維護後-借款人戶號",#NewCustNo,#HIDECustNo,"-",#NewFacmNo,#HIDEFacmNo,#NewCustName],
 [#<->#,"#FdInsuYearMonth+年月份",#InsuYearMonth],
 [#<->#,"#FdClCode1+擔保品編號",#ClCode1,"-",#ClCode2,"-",#ClNo],
-[#<->#,"#FdPrevInsuNo+原保單號碼",#PrevInsuNo],
-["#FdEndoInsuNo+批單號碼",#EndoInsuNo],[#LableA,#NowInsuNo],
+["#FdPrevInsuNo+原保單號碼",#PrevInsuNo],[#LableA,#NowInsuNo],
+[#<->#,"#FdEndoInsuNo+批單號碼",#EndoInsuNo],
 ["#FdFireInsuCovrg+火險保額",#FireInsuCovrg],["#FdNewFireInsuCovrg+維護後-火險保額",#NewFireInsuCovrg],
 ["#FdFireInsuPrem+火險保費",#FireInsuPrem],["#FdNewFireInsuPrem+維護後-火險保費",#NewFireInsuPrem],
 ["#FdEthqInsuCovrg+地震險保額",#EthqInsuCovrg],["#FdNewEthqInsuCovrg+維護後-地震險保額",#NewEthqInsuCovrg],
@@ -44,6 +44,7 @@ E(0,0)
 
 #FdFunctionCodeX=X,2,L
 #FdCustNo=X,2,L
+#FdNewCustNo=X,2,L
 #FdInsuYearMonth=X,2,L
 #FdClCode1=X,2,L
 #FdPrevInsuNo=X,2,L
@@ -124,13 +125,8 @@ C(3,#FunctionCode,1,INVOKEJS(SHOW,p1,16,18,0),INVOKEJS(SHOW,p1,16,18,1))
 #Function1=X,1,S
 IF(#FunctionCode==1,$,S)
 T(F,@NowInsuNo,0)
-!T(F,@NewFireInsuCovrg,0)
-!T(F,@NewFireInsuPrem,0)
-!T(F,@NewEthqInsuCovrg,0)
-!T(F,@NewEthqInsuPrem,0)
-!T(F,@NewInsuStartDate,0)
-!T(F,@NewInsuEndDate,0)
-
+HIDE(#NewCustNo)
+HIDE(#NewFacmNo)
 
 #Function2=X,1,S
 IF(#FunctionCode==2 || #FunctionCode==6,$,S)
@@ -148,10 +144,16 @@ T(F,@EthqInsuCovrg,0)
 T(F,@EthqInsuPrem,0)
 T(F,@InsuStartDate,0)
 T(F,@InsuEndDate,0)
+HIDE(#HIDECustNo)
+HIDE(#HIDEFacmNo)
 
 IF(#FunctionCode==6,$,S)
 T(F,@RenewCode,0)
 E(0,@RenewCode,1)
+HIDE(#NewCustNo)
+HIDE(#NewFacmNo)
+SHOW(#HIDECustNo)
+SHOW(#HIDEFacmNo)
 INVOKEJS(SHOW,p1,16,18,0)
 
 
@@ -179,11 +181,11 @@ T(F,@NewEthqInsuPrem,0)
 T(F,@NewInsuStartDate,0)
 T(F,@NewInsuEndDate,0)
 T(F,@RenewCode,0)
-
 T(F,@InsuCompany,0)
 T(F,@InsuTypeCode,0)
 T(F,@StatusCode,0)
-
+HIDE(#NewCustNo)
+HIDE(#NewFacmNo)
 
 ! 修改、刪除調Rim
 <include src="ROM.icf::L4R18.dec"/>
@@ -313,6 +315,43 @@ C(3,#L4r18CustNo,0,$,s)
 @V(2,0)
 
 #CustName=X,10,L
+
+
+#InitId=A,1,L
+C(3,#FunctionCode,2,$,S)	
+E(0,@NewCustNo,#CustNo)
+E(0,@NewFacmNo,#FacmNo)
+
+!維護後-借款人戶號 
+#NewCustNo=A,7,I
+C(3,#FunctionCode,2,$,S)
+E(0,#CustNo)
+
+
+#HIDECustNo=A,7,L
+
+!維護後-額度
+#NewFacmNo=A,3,I
+C(3,#FunctionCode,2,$,S)
+E(0,#FacmNo)
+
+#HIDEFacmNo=A,3,L
+
+#RimCustNo=A,7,S
+#RimFacmNo=A,3,S
+
+<include src="ROM.icf::L2R14.dec"/>
+
+#RimL2r14=X,1,S
+C(3,#FunctionCode,2,$,s)
+E(0,@RimCustNo,#NewCustNo)
+E(0,@RimFacmNo,#NewFacmNo)
+S(L2R14,1,#RimCustNo,#RimFacmNo)
+R(1,L2R14)
+
+
+#NewCustName=X,10,L
+
 
 !年月份
 #InsuYearMonth=A,5,I
@@ -523,6 +562,8 @@ T(3,[L4611] 火險保費資料查詢修改-依戶號)
 #FunctionCode
 #CustNo
 #FacmNo
+#NewCustNo
+#NewFacmNo
 #InsuYearMonth
 #ClCode1
 #ClCode2
@@ -560,6 +601,7 @@ T(3,[L4611] 火險保費資料查詢修改-依戶號)
 TXFORM=L4611^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L4R18.tom"/>
+<include src="ROM.icf::L2R14.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

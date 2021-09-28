@@ -97,12 +97,13 @@ T(4,CHAIN$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
-#NTXBUF=X,31,S
+#NTXBUF=X,40,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CaseNo,#NTXBUF,1,7)
 T(1,@CustNo,#NTXBUF,8,7)
 T(1,@CustId,#NTXBUF,15,10)
 T(1,@ApplNo,#NTXBUF,25,7)
+T(1,@FacmNo,#NTXBUF,32,3)
 
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
@@ -219,6 +220,7 @@ C(4,#CustName2,$,T(2,#CustName2))
 
 ![額度編號]
 #FacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
 
 
 ![折返KEY]

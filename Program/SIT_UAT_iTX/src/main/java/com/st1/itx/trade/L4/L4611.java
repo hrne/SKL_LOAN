@@ -108,6 +108,7 @@ public class L4611 extends TradeBuffer {
 		clNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		
 		insuYearMonth = parse.stringToInteger(titaVo.getParam("InsuYearMonth")) + 191100;
 		prevInsuNo = titaVo.getParam("PrevInsuNo");
 		endoInsuNo = titaVo.getParam("EndoInsuNo");
@@ -232,6 +233,11 @@ public class L4611 extends TradeBuffer {
 			}
 
 			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
+			
+			
+			custNo = parse.stringToInteger(titaVo.getParam("NewCustNo"));
+			facmNo = parse.stringToInteger(titaVo.getParam("NewFacmNo"));
+			
 			tInsuRenew.setClCode1(clCode1);
 			tInsuRenew.setClCode2(clCode2);
 			tInsuRenew.setClNo(clNo);
