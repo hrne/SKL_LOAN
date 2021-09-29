@@ -131,7 +131,7 @@ public class LM055Report extends MakeReport {
 				// 放款金額
 				if (!lM055Vo.get("F0").equals("99")) {
 
-					amount = lM055Vo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F2"));
+					amount = Integer.valueOf(lM055Vo.get("F2")) == 0 ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F2"));
 
 					makeExcel.setValue(row, col, amount, "#,##0");
 				}

@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -37,9 +35,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("facProdAcctFeeService")
 @Repository
-public class FacProdAcctFeeServiceImpl implements FacProdAcctFeeService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(FacProdAcctFeeServiceImpl.class);
-
+public class FacProdAcctFeeServiceImpl extends ASpringJpaParm implements FacProdAcctFeeService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -69,7 +65,7 @@ public class FacProdAcctFeeServiceImpl implements FacProdAcctFeeService, Initial
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + facProdAcctFeeId);
+    this.info("findById " + dbName + " " + facProdAcctFeeId);
     Optional<FacProdAcctFee> facProdAcctFee = null;
     if (dbName.equals(ContentName.onDay))
       facProdAcctFee = facProdAcctFeeReposDay.findById(facProdAcctFeeId);
@@ -96,10 +92,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ProdNo", "FeeType", "LoanLow"));
     else
-         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ProdNo", "LoanLow"));
-    logger.info("findAll " + dbName);
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ProdNo", "FeeType", "LoanLow"));
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = facProdAcctFeeReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -109,11 +105,14 @@ em = null;
     else 
       slice = facProdAcctFeeRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override
-  public Slice<FacProdAcctFee> acctFeeProdNoEq(String prodNo_0, BigDecimal loanLow_1, BigDecimal loanLow_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<FacProdAcctFee> acctFeeProdNoEq(String prodNo_0, String feeType_1, BigDecimal loanLow_2, BigDecimal loanLow_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<FacProdAcctFee> slice = null;
     if (titaVo.length != 0)
@@ -124,15 +123,18 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acctFeeProdNoEq " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " loanLow_1 : " +  loanLow_1 + " loanLow_2 : " +  loanLow_2);
+    this.info("acctFeeProdNoEq " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " feeType_1 : " +  feeType_1 + " loanLow_2 : " +  loanLow_2 + " loanLow_3 : " +  loanLow_3);
     if (dbName.equals(ContentName.onDay))
-      slice = facProdAcctFeeReposDay.findAllByProdNoIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(prodNo_0, loanLow_1, loanLow_2, pageable);
+      slice = facProdAcctFeeReposDay.findAllByProdNoIsAndFeeTypeIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(prodNo_0, feeType_1, loanLow_2, loanLow_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = facProdAcctFeeReposMon.findAllByProdNoIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(prodNo_0, loanLow_1, loanLow_2, pageable);
+      slice = facProdAcctFeeReposMon.findAllByProdNoIsAndFeeTypeIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(prodNo_0, feeType_1, loanLow_2, loanLow_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = facProdAcctFeeReposHist.findAllByProdNoIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(prodNo_0, loanLow_1, loanLow_2, pageable);
+      slice = facProdAcctFeeReposHist.findAllByProdNoIsAndFeeTypeIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(prodNo_0, feeType_1, loanLow_2, loanLow_3, pageable);
     else 
-      slice = facProdAcctFeeRepos.findAllByProdNoIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(prodNo_0, loanLow_1, loanLow_2, pageable);
+      slice = facProdAcctFeeRepos.findAllByProdNoIsAndFeeTypeIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(prodNo_0, feeType_1, loanLow_2, loanLow_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -142,7 +144,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + facProdAcctFeeId);
+    this.info("Hold " + dbName + " " + facProdAcctFeeId);
     Optional<FacProdAcctFee> facProdAcctFee = null;
     if (dbName.equals(ContentName.onDay))
       facProdAcctFee = facProdAcctFeeReposDay.findByFacProdAcctFeeId(facProdAcctFeeId);
@@ -160,7 +162,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
+    this.info("Hold " + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
     Optional<FacProdAcctFee> facProdAcctFeeT = null;
     if (dbName.equals(ContentName.onDay))
       facProdAcctFeeT = facProdAcctFeeReposDay.findByFacProdAcctFeeId(facProdAcctFee.getFacProdAcctFeeId());
@@ -182,7 +184,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
+    this.info("Insert..." + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
     if (this.findById(facProdAcctFee.getFacProdAcctFeeId()) != null)
       throw new DBException(2);
 
@@ -211,7 +213,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
+    this.info("Update..." + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
     if (!empNot.isEmpty())
       facProdAcctFee.setLastUpdateEmpNo(empNot);
 
@@ -234,7 +236,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
+    this.info("Update..." + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
     if (!empNot.isEmpty())
       facProdAcctFee.setLastUpdateEmpNo(empNot);
 
@@ -254,7 +256,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
+    this.info("Delete..." + dbName + " " + facProdAcctFee.getFacProdAcctFeeId());
     if (dbName.equals(ContentName.onDay)) {
       facProdAcctFeeReposDay.delete(facProdAcctFee);	
       facProdAcctFeeReposDay.flush();
@@ -283,7 +285,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (FacProdAcctFee t : facProdAcctFee){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -318,7 +320,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (facProdAcctFee == null || facProdAcctFee.size() == 0)
       throw new DBException(6);
 
@@ -347,7 +349,7 @@ em = null;
 
   @Override
   public void deleteAll(List<FacProdAcctFee> facProdAcctFee, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

@@ -26,7 +26,7 @@ public class CdInsurerId implements Serializable {
   @Column(name = "`InsurerType`", length = 1)
   private String insurerType = " ";
 
-  // 公司統編
+  // 公司代號
   @Column(name = "`InsurerCode`", length = 2)
   private String insurerCode = " ";
 
@@ -60,7 +60,7 @@ public class CdInsurerId implements Serializable {
   }
 
 /**
-	* 公司統編<br>
+	* 公司代號<br>
 	* 
 	* @return String
 	*/
@@ -69,10 +69,10 @@ public class CdInsurerId implements Serializable {
   }
 
 /**
-	* 公司統編<br>
+	* 公司代號<br>
 	* 
   *
-  * @param insurerCode 公司統編
+  * @param insurerCode 公司代號
 	*/
   public void setInsurerCode(String insurerCode) {
     this.insurerCode = insurerCode;

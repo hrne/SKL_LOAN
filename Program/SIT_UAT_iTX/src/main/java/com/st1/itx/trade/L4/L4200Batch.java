@@ -573,6 +573,7 @@ public class L4200Batch extends TradeBuffer {
 
 				int intCustNo = 0;
 				int intRepayType = 0;
+				String procCodeX = "";
 
 				if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
 					intCustNo = parse.stringToInteger(tempOccursList.get("OccVirAcctNo").substring(7));
@@ -735,7 +736,7 @@ public class L4200Batch extends TradeBuffer {
 
 				} else if ("00110".equals(errorCode)) {
 					tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-					tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
+					tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
 				} else {
 					if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
 						if (tempOccursList.get("OccDepositAmt").indexOf("p") >= 0) {
@@ -744,24 +745,24 @@ public class L4200Batch extends TradeBuffer {
 									.divide(bigDe100);
 
 							tempVo.putParam("CheckMsg", "-" + nDepositAmt);
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
 
 						} else if (parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt"))
 								.compareTo(BigDecimal.ZERO) == 0) {
 							tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
 						} else {
 							tempVo.putParam("CheckMsg",
 									parse.stringToBigDecimal("" + negaDepo.get(tempOccursList.get("OccVirAcctNo"))));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
 						}
 					} else {
 						if ("".equals(tempOccursList.get("OccVirAcctNo").trim())) {
 							tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
 						} else {
 							tempVo.putParam("CheckMsg", tempOccursList.get("OccVirAcctNo"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, titaVo));
+							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
 						}
 					}
 				}
@@ -860,6 +861,7 @@ public class L4200Batch extends TradeBuffer {
 
 //			int reEntryDate = parse.stringToInteger("" + achDeductFileVo.get("HeadProcessDate"));
 			String procCode = "00000";
+			String procCodeX = "";
 
 			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, this.limit, titaVo);
 
@@ -904,7 +906,12 @@ public class L4200Batch extends TradeBuffer {
 				int achEntryDate = 0;
 				int achRepayType = 0;
 				String returnCode = tempOccursList.get("OccReturnCode");
-				if (tAchDeductMedia != null) {
+				if (tAchDeductMedia == null) {
+					// 媒體檔無此資料
+					tBatxDetail.setProcCode("E0014");
+					procCode = "E0014"; // 檔案錯誤
+					procCodeX = "媒體檔無此資料";
+				} else {
 					tBatxDetail.setProcCode("002" + returnCode);
 					if ("00".equals(returnCode)) {
 						procCode = "00000";
@@ -940,10 +947,6 @@ public class L4200Batch extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException("E0007", "AchDeductMedia update Fail");
 					}
-				} else {
-					// 媒體檔無此資料
-					tBatxDetail.setProcCode("E4200");
-					procCode = "E4200";
 				}
 
 				tBatxDetailId.setAcDate(iAcDate);
@@ -968,14 +971,9 @@ public class L4200Batch extends TradeBuffer {
 					procStsCode = "0";
 					achSuccCnt = achSuccCnt + 1;
 					achSuccAmt = achSuccAmt.add(reRepayAmt);
-				} else if ("E4200".equals(procCode)) {
-					tBatxDetail.setProcStsCode("1");
-//					無此提出媒體檔 --不處理
-					procStsCode = "2";
-					achFailCnt = achFailCnt + 1;
-				} else if ("E4201".equals(procCode)) {
+				} else if ("E".equals(procCode.substring(0, 1))) {
 					tBatxDetail.setProcStsCode("2");
-//					無此提出媒體檔 --人工處理
+//					資料錯誤  --人工處理
 					procStsCode = "2";
 					achFailCnt = achFailCnt + 1;
 				} else {
@@ -991,11 +989,11 @@ public class L4200Batch extends TradeBuffer {
 //					tempVo.putParam("Note", tempOccursList.get("OccReturnCode"));
 					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
 							tAchDeductMedia.getMediaSeq(), returnCode, titaVo);
-				} else if ("E4200".equals(procCode)) {
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
+				} else if ("E".equals(procCode.substring(0, 1))) {
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
 				} else {
 //					回傳碼中文 code+cdCode.item
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
 //					回傳碼不為0者更新媒體碼為E
 					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
 							tAchDeductMedia.getMediaSeq(), returnCode, titaVo);
@@ -1074,7 +1072,7 @@ public class L4200Batch extends TradeBuffer {
 				BigDecimal reRepayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt")).divide(bigDe100);
 				int reEntryDate = parse.stringToInteger(tempOccursList.get("OccTxDate"));
 				int postRepayType = 0;
-
+				String procCodeX = "";
 //				PostUserNo = ,AND RepayAmt = ,AND OutsrcRemark = 
 				tPostDeductMedia = postDeductMediaService.receiveCheckFirst(
 						FormatUtil.padLeft(tempOccursList.get("OccCustMemo").trim(), 20), reRepayAmt,
@@ -1115,8 +1113,10 @@ public class L4200Batch extends TradeBuffer {
 
 				} else {
 					// 媒體檔無此資料
-					tBatxDetail.setProcCode("E4300");
-					procCode = "E4300";
+					tBatxDetail.setProcCode("E0014"); // 檔案錯誤
+					procCode = "E0014";
+					procCodeX = "媒體檔無此資料";
+
 				}
 
 				tBatxDetailId.setAcDate(iAcDate);
@@ -1134,27 +1134,23 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setReconCode("P01");
 				tBatxDetail.setRepayAcCode("");
 				tBatxDetail.setRepayAmt(reRepayAmt);
-//				int intPayDate = 0;
 
+				// 扣款成功
 				if ("00000".equals(procCode)) {
-					tBatxDetail.setProcStsCode("0");
-//					未檢核
+					tBatxDetail.setProcStsCode("0"); // 未檢核
 					procStsCode = "0";
 					postSuccCnt = postSuccCnt + 1;
 					postSuccAmt = postSuccAmt.add(reRepayAmt);
-				} else if ("E4300".equals(procCode)) {
-					tBatxDetail.setProcStsCode("1");
-//					無此提出媒體檔 --不處理
+				}
+				// 資料有錯
+				else if ("E".equals(procCode.substring(0, 1))) {
+					tBatxDetail.setProcStsCode("2"); // 人工處理
 					procStsCode = "2";
 					postFailCnt = postFailCnt + 1;
-				} else if ("E4301".equals(procCode)) {
-					tBatxDetail.setProcStsCode("2");
-//					無此提出媒體檔 --人工處理
-					procStsCode = "2";
-					postFailCnt = postFailCnt + 1;
-				} else {
-					tBatxDetail.setProcStsCode("1");
-//					回應碼為00以外者 --不處理
+				}
+				// 扣款失敗
+				else {
+					tBatxDetail.setProcStsCode("1");// 不處理
 					procStsCode = "1";
 					postFailCnt = postFailCnt + 1;
 				}
@@ -1164,12 +1160,12 @@ public class L4200Batch extends TradeBuffer {
 				if ("00000".equals(procCode)) {
 					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(),
 							returnCode, titaVo);
-				} else if ("E4300".equals(procCode)) {
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
+				} else if ("E".equals(procCode.substring(0, 1))) {
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
 
 				} else {
 //					回傳碼中文 code+cdCode.item
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
 //					回傳碼不為0者更新媒體碼為E
 					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(),
 							returnCode, titaVo);
@@ -1214,7 +1210,7 @@ public class L4200Batch extends TradeBuffer {
 			ArrayList<OccursList> uploadFile = empDeductFileVo.getOccursList();
 
 			String procCode = "00000";
-
+			String procCodeX = "";
 			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, this.limit, titaVo);
 
 			lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
@@ -1237,8 +1233,8 @@ public class L4200Batch extends TradeBuffer {
 //			B.(first check)檢核資料與寫入檔是否相同  並回寫處理狀態(ProcStsCode)
 				EmpDeductMedia tEmpDeductMedia = new EmpDeductMedia();
 
-				BigDecimal reRepayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt"));
-				BigDecimal reAcctAmt = parse.stringToBigDecimal(tempOccursList.get("OccAcctAmt"));
+				BigDecimal reRepayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt")); // 扣款金額
+				BigDecimal reAcctAmt = parse.stringToBigDecimal(tempOccursList.get("OccAcctAmt")); // 實扣金額
 
 				int reRepayCode = 0;
 				if ("XH".equals(tempOccursList.get("OccUnknowC"))) {
@@ -1255,14 +1251,14 @@ public class L4200Batch extends TradeBuffer {
 				BatxDetail tBatxDetail = new BatxDetail();
 				BatxDetailId tBatxDetailId = new BatxDetailId();
 
-				String strBormNo = "";
-
-				if (tEmpDeductMedia != null) {
+				if (tEmpDeductMedia == null) {
+					procCode = "E0014"; // 檔案錯誤
+					procCodeX = "媒體檔無此資料";
+				} else {
 					if ("01".equals(tempOccursList.get("OccReturnCode"))) {
 						procCode = "00000";
-						tEmpDeductMedia.setTxAmt(reRepayAmt);
+						tEmpDeductMedia.setTxAmt(reAcctAmt);
 					} else {
-						tBatxDetail.setProcCode("004" + tempOccursList.get("OccReturnCode"));
 						procCode = "004" + tempOccursList.get("OccReturnCode");
 					}
 //					回寫媒體檔
@@ -1271,19 +1267,14 @@ public class L4200Batch extends TradeBuffer {
 					tEmpDeductMedia.setAcDate(iAcDate);
 					tEmpDeductMedia.setBatchNo(iBatchNo);
 					tEmpDeductMedia.setDetailSeq(i + 1);
-
 					try {
 						empDeductMediaService.update(tEmpDeductMedia, titaVo);
 					} catch (DBException e) {
 						e.printStackTrace();
 						throw new LogicException("E0007", "EmpDeductMedia update Fail");
 					}
-				} else {
-					// 媒體檔無此資料
-					tBatxDetail.setProcCode("E4400");
-					procCode = "E4400";
 				}
-
+				tBatxDetail.setProcCode(procCode);
 				tBatxDetailId.setAcDate(iAcDate);
 				tBatxDetailId.setBatchNo(iBatchNo);
 				tBatxDetailId.setDetailSeq(i + 1);
@@ -1301,68 +1292,47 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setRvNo("");
 				tBatxDetail.setRepayType(reRepayCode);
 				tBatxDetail.setReconCode("TEM");
-//				--待確認
 				tBatxDetail.setRepayAcCode("");
-				tBatxDetail.setRepayAmt(reAcctAmt);
-//				tBatxDetail.setAcctAmt(reAcctAmt);
-//				tBatxDetail.setDisacctAmt(reRepayAmt.subtract(reAcctAmt));
+				tBatxDetail.setRepayAmt(reAcctAmt); // 實扣金額
 
+				// 扣款成功 && 實扣金額>0
+				if ("00000".equals(procCode) && reAcctAmt.compareTo(BigDecimal.ZERO) > 0) {
+					procStsCode = "0"; // 檢核正常
+				}
+				// 資料有錯
+				else if ("E".equals(procCode.substring(0, 1))) {
+					procStsCode = "2"; // 人工處理
+				}
+				// 實扣金額=0、扣款失敗
+				else {
+					procStsCode = "1"; // 不處理
+				}
+
+				tBatxDetail.setProcStsCode(procStsCode);
+				tBatxDetail.setProcCode(procCode);
 				if ("4".equals(mediaType)) {
-					if ("00000".equals(procCode)) {
-						tBatxDetail.setProcStsCode("0");
-//						檢核正常
-						procStsCode = "0";
+					if ("0".equals(procStsCode)) {
 						empASuccCnt = empASuccCnt + 1;
-						empASuccAmt = empASuccAmt.add(reRepayAmt);
-					} else if ("E4401".equals(procCode)) {
-						tBatxDetail.setProcStsCode("2");
-//						人工處理
-						procStsCode = "2";
-						empAFailCnt = empAFailCnt + 1;
+						empASuccAmt = empASuccAmt.add(reAcctAmt);
 					} else {
-						tBatxDetail.setProcStsCode("1");
-//						回應碼為00以外者 --不處理
-						procStsCode = "2";
 						empAFailCnt = empAFailCnt + 1;
 					}
 				} else if ("5".equals(mediaType)) {
-					if ("00000".equals(procCode)) {
-						tBatxDetail.setProcStsCode("0");
-//						檢核正常
-						procStsCode = "0";
+					if ("0".equals(procStsCode)) {
 						empBSuccCnt = empBSuccCnt + 1;
-						empBSuccAmt = empBSuccAmt.add(reRepayAmt);
-					} else if ("E4401".equals(procCode)) {
-						tBatxDetail.setProcStsCode("2");
-//						人工處理
-						procStsCode = "2";
-						empAFailCnt = empAFailCnt + 1;
+						empBSuccAmt = empBSuccAmt.add(reAcctAmt);
 					} else {
-						tBatxDetail.setProcStsCode("1");
-//						回應碼為00以外者 --不處理
-						procStsCode = "2";
 						empAFailCnt = empAFailCnt + 1;
 					}
 				}
 
-				tBatxDetail.setProcCode(procCode);
-				if ("00000".equals(procCode)) {
-					tempVo = new TempVo();
-//					tempVo.putParam("Note", tempOccursList.get("OccReturnCode"));
-
-					tBatxDetail.setProcNote(tempVo.getJsonString());
-				} else if ("E4401".equals(procCode)) {
-					tempVo = new TempVo();
-					tempVo.putParam("Note", "撥款序號 " + strBormNo + "為最後一期請人工處理");
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
-
-					tBatxDetail.setProcNote(tempVo.getJsonString());
-				} else {
-					tempVo = new TempVo();
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
-					tBatxDetail.setProcNote(tempVo.getJsonString());
-
+				// Error Message
+				tempVo = new TempVo();
+				if (!"00000".equals(procCode)) {
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
 				}
+				tBatxDetail.setProcNote(tempVo.getJsonString());
+
 				tBatxDetail.setTitaTlrNo(iTlrNo);
 				tBatxDetail.setTitaTxtNo(iBatchNo.substring(6) + FormatUtil.pad9("" + (i + 1), 6));
 
@@ -1411,6 +1381,7 @@ public class L4200Batch extends TradeBuffer {
 				}
 
 				String procCode = "";
+				String procCodeX = "";
 				procStsCode = "0";
 				OccursList tempOccursList = new OccursList();
 				tempOccursList = uploadFile.get(i - tableSize);
@@ -1451,13 +1422,14 @@ public class L4200Batch extends TradeBuffer {
 					procCode = "00501";
 					procStsCode = "1";
 				}
-//				支票檢核有誤				
 				if ("0".equals(procStsCode) && tLoanCheque == null) {
-					procCode = "E4500";
+					procCode = "E0014"; // 檔案錯誤
+					procCodeX = "支票檔不存在";
 					procStsCode = "1";
 				}
 				if ("0".equals(procStsCode) && chequeAmt.compareTo(tLoanCheque.getChequeAmt()) != 0) {
-					procCode = "E4500";
+					procCode = "E0015"; // 檢查錯誤
+					procCodeX = "支票檔金額不合";
 					procStsCode = "1";
 				}
 
@@ -1479,7 +1451,8 @@ public class L4200Batch extends TradeBuffer {
 					}
 //					銷帳檔支票金額不合
 					if (lAcReceivable == null || lAcReceivable.size() == 0 || chequeAmt.compareTo(acrvCheqAmt) != 0) {
-						procCode = "E4501";
+						procCode = "E0015"; // 檢查錯誤
+						procCodeX = "銷帳檔支票金額不合";
 						procStsCode = "1";
 					} else {
 						procCode = "00000";
@@ -1535,7 +1508,11 @@ public class L4200Batch extends TradeBuffer {
 						tBatxDetail.setCustNo(tLoanCheque.getCustNo());
 						tBatxDetail.setFacmNo(tAcReceivable.getFacmNo());
 						tBatxDetail.setRvNo(rvno);
-						tBatxDetail.setRepayType(parse.stringToInteger(tLoanCheque.getUsageCode()));
+						if ("".equals(tLoanCheque.getUsageCode())) {
+							tBatxDetail.setRepayType(1);
+						} else {
+							tBatxDetail.setRepayType(parse.stringToInteger(tLoanCheque.getUsageCode()));
+						}
 						tBatxDetail.setReconCode("TCK");
 						tBatxDetail.setRepayAcCode("");
 						tBatxDetail.setRepayAmt(tAcReceivable.getRvAmt());
@@ -1583,7 +1560,7 @@ public class L4200Batch extends TradeBuffer {
 
 					tBatxDetail.setProcStsCode(procStsCode);
 					tempVo.putParam("ReturnMsg", chequeNo + " " + chequeAmt);
-					tempVo.putParam("CheckMsg", setProcCodeX(procCode, titaVo));
+					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
 
 					tBatxDetail.setProcCode(procCode);
 					tBatxDetail.setProcNote(tempVo.getJsonString());
@@ -1618,7 +1595,7 @@ public class L4200Batch extends TradeBuffer {
 		lStatus.add("0"); // 0: 未處理
 		lStatus.add("4"); // 4: 兌現未入帳
 
-		sLoanCheque = loanChequeService.statusCodeRange(lStatus, 0, LbsDy, this.index, this.limit, titaVo);
+		sLoanCheque = loanChequeService.statusCodeRange(lStatus, 0, LbsDy + 19110000, this.index, this.limit, titaVo);
 
 		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
 
@@ -1703,7 +1680,7 @@ public class L4200Batch extends TradeBuffer {
 		}
 	}
 
-	private String setProcCodeX(String procCode, TitaVo titaVo) {
+	private String setProcCodeX(String procCode, String procCodeX, TitaVo titaVo) {
 		String result = "";
 		if (procCode.isEmpty()) {
 			return result;
@@ -1727,6 +1704,10 @@ public class L4200Batch extends TradeBuffer {
 			result = procCode;
 		} else {
 			result = tCdCode.getItem();
+		}
+
+		if (!"".equals(procCodeX)) {
+			result += ", " + procCodeX;
 		}
 		return result;
 	}

@@ -116,7 +116,7 @@ public class LM056Report extends MakeReport {
 				// 身分證
 				makeExcel.setValue(row, 3, lM056Vo.get("F2"));
 
-				tempAmt = lM056Vo.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F3"));
+				tempAmt = Integer.valueOf(lM056Vo.get("F3")) == 0 ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F3"));
 
 				// 放款額逾
 				makeExcel.setValue(row, 4, tempAmt, "#,##0");
@@ -151,7 +151,7 @@ public class LM056Report extends MakeReport {
 
 				row++;
 
-				tempAmt = lM056Vo.get("F3") == null ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F2"));
+				tempAmt = Integer.valueOf(lM056Vo.get("F3")) == 0 ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F3"));
 
 				// 放款額逾
 				makeExcel.setValue(row, 19, tempAmt, "#,##0");
@@ -178,7 +178,7 @@ public class LM056Report extends MakeReport {
 		for (Map<String, String> lM056Vo : listData) {
 
 			// 金額
-			tempAmt = lM056Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F1"));
+			tempAmt = Integer.valueOf(lM056Vo.get("F1")) == 0 ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F1"));
 
 			// H37 放款總計
 			// D40 甲類逾期放款金額
@@ -198,7 +198,7 @@ public class LM056Report extends MakeReport {
 				row = 37;
 				col = 8;
 
-				tempTotal = lM056Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F1"));
+				tempTotal = Integer.valueOf(lM056Vo.get("F1")) == 0 ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F1"));
 
 			} else if (lM056Vo.get("F0").equals("TOTAL")) {
 				row = 44;

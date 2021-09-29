@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdInsurerService")
 @Repository
-public class CdInsurerServiceImpl implements CdInsurerService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdInsurerServiceImpl.class);
-
+public class CdInsurerServiceImpl extends ASpringJpaParm implements CdInsurerService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CdInsurerServiceImpl implements CdInsurerService, InitializingBean 
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdInsurerId);
+    this.info("findById " + dbName + " " + cdInsurerId);
     Optional<CdInsurer> cdInsurer = null;
     if (dbName.equals(ContentName.onDay))
       cdInsurer = cdInsurerReposDay.findById(cdInsurerId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "InsurerType", "InsurerCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "InsurerType", "InsurerCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdInsurerReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("insurerItemLike " + dbName + " : " + "insurerItem_0 : " + insurerItem_0);
+    this.info("insurerItemLike " + dbName + " : " + "insurerItem_0 : " + insurerItem_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdInsurerReposDay.findAllByInsurerItemLike(insurerItem_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -153,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("insurerTypeRange " + dbName + " : " + "insurerType_0 : " + insurerType_0 + " insurerType_1 : " +  insurerType_1 + " insurerCode_2 : " +  insurerCode_2 + " insurerCode_3 : " +  insurerCode_3);
+    this.info("insurerTypeRange " + dbName + " : " + "insurerType_0 : " + insurerType_0 + " insurerType_1 : " +  insurerType_1 + " insurerCode_2 : " +  insurerCode_2 + " insurerCode_3 : " +  insurerCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = cdInsurerReposDay.findAllByInsurerTypeGreaterThanEqualAndInsurerTypeLessThanEqualAndInsurerCodeGreaterThanEqualAndInsurerCodeLessThanEqualOrderByInsurerTypeAscInsurerCodeAsc(insurerType_0, insurerType_1, insurerCode_2, insurerCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -174,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdInsurerId);
+    this.info("Hold " + dbName + " " + cdInsurerId);
     Optional<CdInsurer> cdInsurer = null;
     if (dbName.equals(ContentName.onDay))
       cdInsurer = cdInsurerReposDay.findByCdInsurerId(cdInsurerId);
@@ -192,7 +188,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdInsurer.getCdInsurerId());
+    this.info("Hold " + dbName + " " + cdInsurer.getCdInsurerId());
     Optional<CdInsurer> cdInsurerT = null;
     if (dbName.equals(ContentName.onDay))
       cdInsurerT = cdInsurerReposDay.findByCdInsurerId(cdInsurer.getCdInsurerId());
@@ -214,7 +210,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdInsurer.getCdInsurerId());
+    this.info("Insert..." + dbName + " " + cdInsurer.getCdInsurerId());
     if (this.findById(cdInsurer.getCdInsurerId()) != null)
       throw new DBException(2);
 
@@ -243,7 +239,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdInsurer.getCdInsurerId());
+    this.info("Update..." + dbName + " " + cdInsurer.getCdInsurerId());
     if (!empNot.isEmpty())
       cdInsurer.setLastUpdateEmpNo(empNot);
 
@@ -266,7 +262,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdInsurer.getCdInsurerId());
+    this.info("Update..." + dbName + " " + cdInsurer.getCdInsurerId());
     if (!empNot.isEmpty())
       cdInsurer.setLastUpdateEmpNo(empNot);
 
@@ -286,7 +282,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdInsurer.getCdInsurerId());
+    this.info("Delete..." + dbName + " " + cdInsurer.getCdInsurerId());
     if (dbName.equals(ContentName.onDay)) {
       cdInsurerReposDay.delete(cdInsurer);	
       cdInsurerReposDay.flush();
@@ -315,7 +311,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdInsurer t : cdInsurer){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -350,7 +346,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdInsurer == null || cdInsurer.size() == 0)
       throw new DBException(6);
 
@@ -379,7 +375,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdInsurer> cdInsurer, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

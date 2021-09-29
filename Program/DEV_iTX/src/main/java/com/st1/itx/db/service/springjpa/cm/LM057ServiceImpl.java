@@ -65,16 +65,19 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 			last4Month = iYear * 100 + (iMonth - 4);
 		}
 
-		this.info("lM057.findAll YYMM=" + iYear * 100 + iMonth + ",last4Mon=" + last4Month);
+		this.info("lM057.findAll YYMM=" + ((iYear * 100) + iMonth) + ",last4Mon=" + last4Month);
 
 		String sql = " ";
-		sql += " SELECT * FROM(";
+		sql += " SELECT * FROM( ";
+		sql += " SELECT \"KIND\"";
+		sql += "       ,SUM(\"AMT\")";
+		sql += " FROM(";
 		sql += "	SELECT ( CASE";
 		sql += "       	       WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C2'";
 		sql += "       	       WHEN TRUNC(L.\"MaturityDate\" / 100) = :l4mdy AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'B1'";
 		sql += "       	       WHEN CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'C5'";
 		sql += "       	     ELSE 'B3' END ) AS \"KIND\"";
-		sql += "	      ,SUM(M.\"PrinBalance\") AS \"AMT\"";
+		sql += "	      ,M.\"PrinBalance\" AS \"AMT\"";
 		sql += "	FROM \"MonthlyLoanBal\" ML";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = ML.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = ML.\"FacmNo\"";
@@ -97,12 +100,8 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	 								  AND CL.\"SEQ\" = 1";
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  AND M.\"PrinBalance\" > 0";
-		sql += "	  AND M.\"AssetClass\" IS NOT NULL";
-		sql += "	GROUP BY (CASE";
-		sql += "       	        WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C2'";
-		sql += "       	        WHEN TRUNC(L.\"MaturityDate\" / 100) = :l4mdy AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'B1'";
-		sql += "       	        WHEN CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'C5'";
-		sql += "       	     ELSE 'B3' END ) ";
+		sql += "	  AND M.\"AssetClass\" IS NOT NULL)";
+		sql += "    GROUP BY \"KIND\"";
 		sql += "	UNION";
 		sql += "	SELECT 'TOTAL' AS \"KIND\"";
 		sql += "		  ,SUM(\"AMT\") AS \"AMT\"";
@@ -123,7 +122,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", iYear * 100 + iMonth);
+		query.setParameter("yymm", (iYear * 100) + iMonth);
 		query.setParameter("l4mdy", last4Month);
 
 		return this.convertToMap(query);

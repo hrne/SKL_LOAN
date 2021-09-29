@@ -23,8 +23,8 @@ import com.st1.itx.db.domain.FacProdAcctFeeId;
  */
 public interface FacProdAcctFeeRepositoryDay extends JpaRepository<FacProdAcctFee, FacProdAcctFeeId> {
 
-  // ProdNo =  ,AND LoanLow >= ,AND LoanLow <=
-  public Slice<FacProdAcctFee> findAllByProdNoIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(String prodNo_0, BigDecimal loanLow_1, BigDecimal loanLow_2, Pageable pageable);
+  // ProdNo = ,AND FeeType = ,AND LoanLow >= ,AND LoanLow <= 
+  public Slice<FacProdAcctFee> findAllByProdNoIsAndFeeTypeIsAndLoanLowGreaterThanEqualAndLoanLowLessThanEqual(String prodNo_0, String feeType_1, BigDecimal loanLow_2, BigDecimal loanLow_3, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

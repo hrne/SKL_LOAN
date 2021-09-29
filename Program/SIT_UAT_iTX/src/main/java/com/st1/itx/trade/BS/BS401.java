@@ -90,7 +90,7 @@ public class BS401 extends TradeBuffer {
 		try {
 			batxHeadService.update(tBatxHead);
 		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "BS400 update BatxHead " + tBatxHeadId + e.getErrorMsg());
+			throw new LogicException(titaVo, "E0007", "BS401 update BatxHead " + tBatxHeadId + e.getErrorMsg());
 		}
 
 		// findAll 整批入帳明細檔
@@ -124,7 +124,7 @@ public class BS401 extends TradeBuffer {
 								batxDetailService.update(tDetail);
 							} catch (DBException e) {
 								throw new LogicException(titaVo, "E0007",
-										"BS400 update batxDetail " + tDetail + e.getErrorMsg());
+										"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 							}
 							isUpdate = true;
 						}
@@ -145,7 +145,7 @@ public class BS401 extends TradeBuffer {
 						batxDetailService.update(tDetail);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007",
-								"BS400 update batxDetail " + tDetail + e.getErrorMsg());
+								"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 					}
 					isUpdate = true;
 				}

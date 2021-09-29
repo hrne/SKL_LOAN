@@ -26,7 +26,7 @@ public class CdInsurer implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7613184016345917928L;
+	private static final long serialVersionUID = -5095369183823036778L;
 
 @EmbeddedId
   private CdInsurerId cdInsurerId;
@@ -36,9 +36,13 @@ public class CdInsurer implements Serializable {
   @Column(name = "`InsurerType`", length = 1, insertable = false, updatable = false)
   private String insurerType;
 
-  // 公司統編
+  // 公司代號
   @Column(name = "`InsurerCode`", length = 2, insertable = false, updatable = false)
   private String insurerCode;
+
+  // 公司統編
+  @Column(name = "`InsurerId`", length = 10)
+  private String insurerId;
 
   // 公司名稱
   /* 目前最長19個中文字美商美國環球產物保險有限公司台灣分公司 */
@@ -62,7 +66,7 @@ public class CdInsurer implements Serializable {
   private String telExt;
 
   // 啟用記號
-  /* Y:啟用,N:未啟用 */
+  /* Y:啟用,N:停用 */
   @Column(name = "`Enable`", length = 1)
   private String enable;
 
@@ -115,7 +119,7 @@ public class CdInsurer implements Serializable {
   }
 
 /**
-	* 公司統編<br>
+	* 公司代號<br>
 	* 
 	* @return String
 	*/
@@ -124,13 +128,32 @@ public class CdInsurer implements Serializable {
   }
 
 /**
-	* 公司統編<br>
+	* 公司代號<br>
 	* 
   *
-  * @param insurerCode 公司統編
+  * @param insurerCode 公司代號
 	*/
   public void setInsurerCode(String insurerCode) {
     this.insurerCode = insurerCode;
+  }
+
+/**
+	* 公司統編<br>
+	* 
+	* @return String
+	*/
+  public String getInsurerId() {
+    return this.insurerId == null ? "" : this.insurerId;
+  }
+
+/**
+	* 公司統編<br>
+	* 
+  *
+  * @param insurerId 公司統編
+	*/
+  public void setInsurerId(String insurerId) {
+    this.insurerId = insurerId;
   }
 
 /**
@@ -232,7 +255,7 @@ public class CdInsurer implements Serializable {
 
 /**
 	* 啟用記號<br>
-	* Y:啟用,N:未啟用
+	* Y:啟用,N:停用
 	* @return String
 	*/
   public String getEnable() {
@@ -241,7 +264,7 @@ public class CdInsurer implements Serializable {
 
 /**
 	* 啟用記號<br>
-	* Y:啟用,N:未啟用
+	* Y:啟用,N:停用
   *
   * @param enable 啟用記號
 	*/
@@ -328,8 +351,8 @@ public class CdInsurer implements Serializable {
 
   @Override
   public String toString() {
-    return "CdInsurer [cdInsurerId=" + cdInsurerId + ", insurerItem=" + insurerItem + ", insurerShort=" + insurerShort + ", telArea=" + telArea + ", telNo=" + telNo
-           + ", telExt=" + telExt + ", enable=" + enable + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+    return "CdInsurer [cdInsurerId=" + cdInsurerId + ", insurerId=" + insurerId + ", insurerItem=" + insurerItem + ", insurerShort=" + insurerShort + ", telArea=" + telArea
+           + ", telNo=" + telNo + ", telExt=" + telExt + ", enable=" + enable + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

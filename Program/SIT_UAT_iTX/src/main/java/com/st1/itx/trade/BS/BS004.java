@@ -3,8 +3,6 @@ package com.st1.itx.trade.BS;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -46,7 +44,6 @@ import com.st1.itx.util.parse.Parse;
 @Component("BS004")
 @Scope("prototype")
 public class BS004 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(BS004.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -149,10 +146,9 @@ public class BS004 extends TradeBuffer {
 			for (BS004Vo bs : bS004VoList) {
 				tTxToDoDetail = new TxToDoDetail();
 				tTxToDoDetail.setItemCode("EMCU00"); // EMCU00 員工客戶別調整
-				tTxToDoDetail.setCustNo(0);
+				tTxToDoDetail.setCustNo(bs.getCustNo());
 				tTxToDoDetail.setFacmNo(0);
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue(bs.getCustId());
 				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 			}
 		}
@@ -163,8 +159,7 @@ public class BS004 extends TradeBuffer {
 //		 員工扣薪日程表的媒體日期 = 本日
 		int today = dateUtil.getNowIntegerRoc();
 
-		Slice<EmpDeductSchedule> sEmpDeductSchedule = empDeductScheduleService.mediaDateRange(today, today, index,
-				limit, titaVo);
+		Slice<EmpDeductSchedule> sEmpDeductSchedule = empDeductScheduleService.mediaDateRange(today, today, index, limit, titaVo);
 
 		List<EmpDeductSchedule> lEmpDeductSchedule = new ArrayList<EmpDeductSchedule>();
 
@@ -186,8 +181,7 @@ public class BS004 extends TradeBuffer {
 //		 員工扣薪日程表的入帳日期= 本日
 		int today = dateUtil.getNowIntegerRoc();
 
-		Slice<EmpDeductSchedule> sEmpDeductSchedule = empDeductScheduleService.entryDateRange(today, today, index,
-				limit, titaVo);
+		Slice<EmpDeductSchedule> sEmpDeductSchedule = empDeductScheduleService.entryDateRange(today, today, index, limit, titaVo);
 
 		List<EmpDeductSchedule> lEmpDeductSchedule = new ArrayList<EmpDeductSchedule>();
 

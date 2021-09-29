@@ -4,8 +4,6 @@ import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,7 +24,6 @@ import com.st1.itx.util.common.data.BS004Vo;
 @Service("bS004ServiceImpl")
 @Repository
 public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(BS004ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -65,13 +62,13 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += "left join CdEmp e on e.employeeNo = c.empNo ";
 		queryttext += "left join FacProd p on p.prodNo = f.prodNo ";
 		queryttext += "where a.status in (0,4) "; // 戶況 0: 正常戶, 4: 逾期戶
-		queryttext += "  and f.prodNo not in ('EO') "; // EO 員工利率-一般客戶 
+		queryttext += "  and f.prodNo not in ('EO') "; // EO 員工利率-一般客戶
 		queryttext += "  and p.empFlag = 'Y' "; // EmpFlag=Y 員工優惠貸款
 		queryttext += "  and e.commLineType is not null ";
 		queryttext += "  and (   (e.commLineType not in ('1','4')) ";
 		queryttext += "       or (e.commLineType ='5' and e.quitDate < " + quitDate + " ))";
 
-		logger.info("queryttext=" + queryttext);
+		this.info("queryttext=" + queryttext);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
@@ -105,11 +102,14 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String queryttext = "select NEW com.st1.itx.util.common.data.BS004Vo";
 		queryttext += "(c.custNo, 0, 0, c.custId) ";
 		queryttext += "from CustMain c ";
+		queryttext += "left join FacMain f on f.custNo = c.custNo ";
 		queryttext += "left join CdEmp e on e.employeeNo = c.empNo ";
 		queryttext += "where c.custTypeCode in ('01','09') ";
+		queryttext += "  and c.custNo > 0 ";
+		queryttext += "  and f.utilAmt > 0 ";
 		queryttext += "  and e.commLineType is not null";
 		queryttext += "  and not e.commLineType in ('1','4') ";
-		logger.info("queryttext=" + queryttext);
+		this.info("queryttext=" + queryttext);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createQuery(queryttext, BS004Vo.class);

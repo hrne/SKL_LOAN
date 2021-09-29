@@ -67,6 +67,12 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,M.\"LawFee\" AS \"LawFee\" ";
 			sql += "  ,0 AS \"OvduBal\" "; // 催收餘額 樣張為空白 ??
 			sql += "  ,M.\"OvduBal\" AS \"YetRetrievedBal\" ";
+			sql += "  ,NVL(TO_CHAR(GREATEST(MDate.\"PrevIntDate\" - 19110000, 0)), ' ') AS \"rocPrevIntDate\" ";
+            sql += " ,NVL(TX.\"LnTxAmt\",0) AS \"TxAmt\" ";
+            sql += " ,NVL(GREATEST((CASE WHEN M.\"AcctCode\" = '990' AND NVL(COL.\"PrinBalance\", 1) = 0  ";
+            sql += "                      THEN TX.\"OvEntryDate\"   ";
+            sql += "                 ELSE 0 ";
+            sql += "                 END) - 19110000, 0), 0) AS \"EntryDate\" ";
 			sql += "  ,0 AS \"RetrievedRatio\" "; // done in report
 			sql += "  ,CASE WHEN LBM.\"Status\" = 7 ";
 			sql += "        THEN '部份轉呆' ";
@@ -82,7 +88,6 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,CDL.\"Item\" AS \"LegalProgItem\" ";
 			sql += "  ,GREATEST(LAW.\"RecordDate\" - 19110000, 0) AS \"rocRecordDate\" ";
 			sql += "  ,CITY.\"CityItem\" AS \"CityItem\" ";
-			sql += "  ,NVL(TX.\"OvTxAmt\",0) AS \"RetrievedTotal\" "; // 舊樣張沒有的實收金額, 目前沒有輸出, 但算達成%要用到
 			sql += "  FROM \"MonthlyFacBal\" M ";
 			sql += "  LEFT JOIN (SELECT \"CustNo\" ";
 			sql += "             ,\"FacmNo\" ";

@@ -47,7 +47,7 @@ T(2,@FKEY,7)
 !Ap2: 100
 !Ap3: 50
 !Ap4: 100
-!Ap5: 100
+!Ap5: 120
 !Ap6: 110
 !Ap7: 20
 !Ap8: 150
@@ -86,7 +86,7 @@ INVOKEJS(SHOW,grd3_{i},0)
 ##loop {times:100,i:1}
 INVOKEJS(SHOW,grd4_{i},0)
 ##end
-##loop {times:100,i:1}
+##loop {times:120,i:1}
 INVOKEJS(SHOW,grd5_{i},0)
 ##end
 ##loop {times:110,i:1}
@@ -636,7 +636,7 @@ C(2,#ApdType{i},$,$,C(5,#ApdBtn{i},V,C(3,#ApdSno{i},#it1,T(2,@OidBtn{i},#it2),$)
 #Ap5ProcA=@,1,S
 T(1,@ApCount,#ApL5,1,3)
 E(0,@ApIdx,4)
-##loop {times:100,i:1,j:0}
+##loop {times:120,i:1,j:0}
 T(1,@ApeType{i},#ApL5,#ApIdx,1)
 E(0,@ApIdx,#ApIdx+1)
 T(1,@ApeSno{i},#ApL5,#ApIdx,2)
@@ -653,7 +653,7 @@ C(3,#ApCount,{i},s,$)
 ##end
 
 #Ap5ProcB=@,1,S
-##loop {times:100,i:1,j:0}
+##loop {times:120,i:1,j:0}
 C(2,#ApeAuth{i},T(3,@ApeBtn{i}, ),T(3,@ApeBtn{i},V),T(3,@ApeBtn{i},V))
 C(2,#ApeAuth{i},T(3,@OieBtn{i}, ),T(3,@OieBtn{i},V),T(3,@OieBtn{i}, ))
 C(2,#ApeType{i},T(3,@ApeTypeX{i},子選單),T(3,@ApeTypeX{i},查詢交易),T(3,@ApeTypeX{i},維護交易),$)
@@ -688,7 +688,7 @@ C(2,#ApeType{i},T(2,@OieBtn{i},#OieBtn0),$,C(5,#ApeBtn{i},V,T(2,@OieBtn{i},#OieB
 ##end
 
 !
-##loop {times:100,i:1}
+##loop {times:120,i:1}
 !權限勾選按鈕
 #ApeBtn{i}=X,1,I,ui:button;value:;enable:1;tabbable:0
 !限查詢按鈕
@@ -727,13 +727,13 @@ C(3,#ApeType{i},0,CALL(#OieSub,#ApeSno{i},#OieBtn{i}),$)
 ##end
 
 #ApeSub=@,1,S
-##loop {times:100,i:1}
+##loop {times:120,i:1}
 C(3,#ApeSno{i},#it1,T(2,@ApeBtn{i},#it2),$)
 C(5,#ApeBtn{i},V,C(3,#ApeType{i},1,T(3,@OieBtn{i},V),$),T(3,@OieBtn{i}, ))
 ##end
 
 #OieSub=@,1,S
-##loop {times:100,i:1}
+##loop {times:120,i:1}
 C(2,#ApeType{i},$,$,C(5,#ApeBtn{i},V,C(3,#ApeSno{i},#it1,T(2,@OieBtn{i},#it2),$),$)) 
 ##end
 
@@ -1382,7 +1382,7 @@ T(H,#LevelFg,#LevelHelp)
 [
 [],
 [#<->#,"L5.管理性作業"],
-["#grid#,{id:5,expand:true,loop:100,row_height:1}","　",
+["#grid#,{id:5,expand:true,loop:120,row_height:1}","　",
 [[#ApeBtn0,"執行權限"],[#OieBtn0,"限查詢"],"代號","名稱","類別"],
 [#ApeBtn1,#OieBtn1,#ApeCode1,#ApeDesc1,#ApeTypeX1]
 ],
@@ -1480,7 +1480,7 @@ T(H,#LevelFg,#LevelHelp)
 #ApdBtn{i}
 #OidBtn{i}
 ##end
-##loop {times:100,i:1}
+##loop {times:120,i:1}
 #ApeCode{i}
 #ApeBtn{i}
 #OieBtn{i}

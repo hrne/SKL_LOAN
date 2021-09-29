@@ -2,8 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -33,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2R04")
 @Scope("prototype")
 public class L2R04 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R04.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -88,13 +85,25 @@ public class L2R04 extends TradeBuffer {
 
 		// 查詢帳管費檔
 		this.totaVo.putParam("OAcctFee", 0);
-		Slice<FacProdAcctFee> lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, new BigDecimal(0.00),
-				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		Slice<FacProdAcctFee> lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "1",
+				new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFee == null || lFacProdAcctFee.isEmpty())) {
 			for (FacProdAcctFee tFacProdAcctFee : lFacProdAcctFee.getContent()) {
 				if (tFacProdAcctFee.getLoanLow().compareTo(iRimLoanAmt) != 1
 						&& tFacProdAcctFee.getLoanHigh().compareTo(iRimLoanAmt) != -1) {
 					this.totaVo.putParam("OAcctFee", tFacProdAcctFee.getAcctFee());
+				}
+			}
+		}
+		// 查詢手續費
+		this.totaVo.putParam("OHandlingFee", 0);
+		Slice<FacProdAcctFee> lFacProdAcctFeeB = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "2",
+				new BigDecimal(0.00), new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		if (!(lFacProdAcctFeeB == null || lFacProdAcctFeeB.isEmpty())) {
+			for (FacProdAcctFee tFacProdAcctFee : lFacProdAcctFeeB.getContent()) {
+				if (tFacProdAcctFee.getLoanLow().compareTo(iRimLoanAmt) != 1
+						&& tFacProdAcctFee.getLoanHigh().compareTo(iRimLoanAmt) != -1) {
+					this.totaVo.putParam("OHandlingFee", tFacProdAcctFee.getAcctFee());
 				}
 			}
 		}

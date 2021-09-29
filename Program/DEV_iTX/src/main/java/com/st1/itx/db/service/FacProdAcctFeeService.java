@@ -38,17 +38,18 @@ public interface FacProdAcctFeeService {
   public Slice<FacProdAcctFee> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * ProdNo =  ,AND LoanLow &gt;= ,AND LoanLow &lt;=
+   * ProdNo = ,AND FeeType = ,AND LoanLow &gt;= ,AND LoanLow &lt;= 
    *
    * @param prodNo_0 prodNo_0
-   * @param loanLow_1 loanLow_1
+   * @param feeType_1 feeType_1
    * @param loanLow_2 loanLow_2
+   * @param loanLow_3 loanLow_3
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice FacProdAcctFee FacProdAcctFee of List
    */
-  public Slice<FacProdAcctFee> acctFeeProdNoEq(String prodNo_0, BigDecimal loanLow_1, BigDecimal loanLow_2, int index, int limit, TitaVo... titaVo);
+  public Slice<FacProdAcctFee> acctFeeProdNoEq(String prodNo_0, String feeType_1, BigDecimal loanLow_2, BigDecimal loanLow_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By FacProdAcctFee

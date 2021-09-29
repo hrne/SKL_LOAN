@@ -68,6 +68,7 @@ public class L2R01 extends TradeBuffer {
 	private Slice<FacProdStepRate> lFacProdStepRate;
 	private Slice<FacProdPremium> lFacProdPremium;
 	private Slice<FacProdAcctFee> lFacProdAcctFee;
+	private Slice<FacProdAcctFee> lFacProdAcctFeeB;
 	private Slice<FacProdBreach> lFacProdBreach;
 
 	private String wkUseProdFg = "";
@@ -94,6 +95,7 @@ public class L2R01 extends TradeBuffer {
 		SetTotaFacProd();
 		SetTotaPremium();
 		SetTotaAcctFee();
+		SetTotaHandingFee();
 		SetTotaBreach();
 		wkUseProdFg = "";
 		// 查詢商品參數檔
@@ -128,7 +130,7 @@ public class L2R01 extends TradeBuffer {
 
 			}
 
-			 BreachDescription = loanCloseBreachCom.getBreachDescription(tFacProd.getProdNo(), titaVo);
+			BreachDescription = loanCloseBreachCom.getBreachDescription(tFacProd.getProdNo(), titaVo);
 			this.info("清償違約說明= " + BreachDescription);
 
 			/* 將每筆資料放入Tota */
@@ -176,12 +178,17 @@ public class L2R01 extends TradeBuffer {
 		}
 
 		// 查詢帳管費
-		lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, new BigDecimal(0.00),
+		lFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "1", new BigDecimal(0.00),
 				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
 		if (!(lFacProdAcctFee == null || lFacProdAcctFee.isEmpty())) {
 			SetTotaAcctFee();
 		}
-
+		// 查詢手續費
+		lFacProdAcctFeeB = facProdAcctFeeService.acctFeeProdNoEq(iRimProdNo, "2", new BigDecimal(0.00),
+				new BigDecimal(99999999999999.00), this.index, this.limit, titaVo);
+		if (!(lFacProdAcctFeeB == null || lFacProdAcctFeeB.isEmpty())) {
+			SetTotaHandingFee();
+		}
 		// 查詢清償金類型
 		wkBreachCode = tFacProd != null ? tFacProd.getBreachCode() : "0";
 		lFacProdBreach = facProdBreachService.breachNoEq(iRimProdNo, wkBreachCode, wkBreachCode, this.index, this.limit,
@@ -290,6 +297,25 @@ public class L2R01 extends TradeBuffer {
 			for (FacProdAcctFee tFacProdAcctFee : lFacProdAcctFee.getContent()) {
 				this.totaVo.putParam("LoanAmt" + i, tFacProdAcctFee.getLoanLow());
 				this.totaVo.putParam("AcctFee" + i, tFacProdAcctFee.getAcctFee());
+				i++;
+				if (i > 5)
+					break;
+			}
+		}
+	}
+
+	// 手續費
+	private void SetTotaHandingFee() throws LogicException {
+		if (lFacProdAcctFeeB == null || lFacProdAcctFeeB.isEmpty()) {
+			for (int i = 1; i <= 5; i++) {
+				this.totaVo.putParam("LoanAmtB" + i, 0);
+				this.totaVo.putParam("HandlingFee" + i, 0);
+			}
+		} else {
+			int i = 1;
+			for (FacProdAcctFee tFacProdAcctFee : lFacProdAcctFeeB.getContent()) {
+				this.totaVo.putParam("LoanAmtB" + i, tFacProdAcctFee.getLoanLow());
+				this.totaVo.putParam("HandlingFee" + i, tFacProdAcctFee.getAcctFee());
 				i++;
 				if (i > 5)
 					break;

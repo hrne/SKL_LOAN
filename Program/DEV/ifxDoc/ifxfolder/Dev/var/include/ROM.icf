@@ -1569,6 +1569,10 @@ TXFORM=CWAMX
 #L2r01AcctFeeLoanAmt{n}=m,14.2,S
 #L2r01AcctFeeAcctFee{n}=m,14.2,S
 ##end
+##loop{times:5,n:1}
+#L2r01HandlingFeeLoanAmt{n}=m,14.2,S
+#L2r01HandlingFee{n}=m,14.2,S
+##end
 #L2r01UseProdFg=X,1,S
 </L2R01.dec>
 
@@ -1630,6 +1634,10 @@ TXFORM=L2R01
 ##loop{times:5,n:1}
 #L2r01AcctFeeLoanAmt{n}
 #L2r01AcctFeeAcctFee{n}
+##end
+##loop{times:5,n:1}
+#L2r01HandlingFeeLoanAmt{n}
+#L2r01HandlingFee{n}
 ##end
 #L2r01UseProdFg
 ^
@@ -1714,11 +1722,13 @@ TXFORM=L2R03
 !尋找商品參數檔帳管費資料
 <L2R04.dec>
 #L2r04AcctFee=m,14.2,S
+#L2r04HandlingFee=m,14.2,S
 </L2R04.dec>
 
 <L2R04.tom>
 TXFORM=L2R04
 #L2r04AcctFee
+#L2r04HandlingFee
 ^
 </L2R04.tom>
 

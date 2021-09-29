@@ -1,0 +1,294 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4203)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4203" layout="cols=3;screen.width=[130,370,130,370];printer.width=[20,80];order=1">
+[
+["[L4203]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@郵局扣款-明細查詢"],
+[#<->#,"@會計日期",#AcDate],
+["@整批批號",#BatchNo],["@明細序號",#DetailSeq],
+[#<->#,"@戶號",#CustNo,#FacmNo,"@",#RepayCustName],
+["@還款類別",#RepayType,#RepayTypeX],["@還款金額",#RepayAmt],
+["@已作帳金額",#AcctAmt],["@入暫收金額",#DisacctAmt],
+["@處理狀態",#ProcStsCode,#ProcStsCodeX],["@處理代碼",#ProcCode,#ProcCodeX],
+["@處理說明",#ProcDscptCode],["@交易序號",#TxSn],
+[#<->#,"@快捷按鈕",#BTN_L3921,#BTN_L3200,#BTN_L3210,#BTN_L3922,#BTN_L3420],
+["@帳戶別",#AcctCode,#AcctCodeX],["@委託機構代號",#OutsrcCode],
+["@區處代號",#DistCode],["@轉帳日期",#TransDate],
+["@儲金帳號",#RepayAcctNo],["@用戶編號",#PostUserNo],
+["@委託機構使用欄",#OutsrcRemark],
+]
+
+#BTN_L3921=X,94,I,ui:button;value:回收試算;enable:1;tabbable:0
+#BTN_L3200=X,94,I,ui:button;value:回收登錄;enable:1;tabbable:0
+#BTN_L3210=X,94,I,ui:button;value:暫收款登錄;enable:1;tabbable:0
+#BTN_L3922=X,94,I,ui:button;value:結案試算;enable:1;tabbable:0
+#BTN_L3420=X,94,I,ui:button;value:結案登錄;enable:1;tabbable:0
+
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 還款類別
+#CDDEF01=x,50,S
+T(3,CdCode.RepayType)
+
+#RepayTypeHelp=x,1024,S
+
+! 處理狀態
+#CDDEF02=x,20,S
+T(3,CdCode.ProcStsCode)
+
+#ProcStsCodeHelp=x,1024,S
+
+#BtnControl=A,1,S
+K(NOBUTTON,CLOSEY)
+
+! 處理說明
+#CDDEF03=x,20,S
+T(3,CdCode.ProcCode)
+
+#ProcCodeHelp=x,1024,S
+
+! 帳戶別
+#CDDEF04=x,20,S
+T(3,CdCode.PostDepCode)
+
+#PostDepCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@RepayTypeHelp,#HelpDesc1)
+T(2,@ProcStsCodeHelp,#HelpDesc2)
+T(2,@ProcCodeHelp,#HelpDesc3)
+T(2,@PostDepCodeHelp,#HelpDesc4)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易),$)
+
+#NTXBUF=X,500,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@AcDate,#NTXBUF,1,7)
+T(1,@BatchNo,#NTXBUF,8,6)
+T(1,@DetailSeq,#NTXBUF,14,6)
+T(1,@CustNo,#NTXBUF,20,7)
+T(1,@FacmNo,#NTXBUF,27,3)
+T(1,@RepayType,#NTXBUF,30,2)
+T(1,@RepayAmtX,#NTXBUF,32,18)
+T(1,@AcctAmtX,#NTXBUF,50,18)
+T(1,@DisacctAmtX,#NTXBUF,68,18)
+T(1,@ProcStsCode,#NTXBUF,86,1)
+T(1,@ProcCode,#NTXBUF,96,5)
+T(1,@ProcDscptCode,#NTXBUF,101,60)
+T(1,@TxSn,#NTXBUF,161,14)
+INVOKEJS(SHOW,p1,02,02,1)
+
+#RepayAmtX=X,18,S
+#AcctAmtX=X,18,S
+#DisacctAmtX=X,18,S
+E(0,@RepayAmt,#RepayAmtX)
+E(0,@AcctAmt,#AcctAmtX)
+E(0,@DisacctAmt,#DisacctAmtX)
+
+! 會計日期
+#AcDate=D,7,L
+! 整批批號
+#BatchNo=X,6,L
+!明細序號
+#DetailSeq=A,6,L
+!戶號
+#CustNo=A,7,L
+#FacmNo=A,3,L
+E(0,@RimEntryCode,2)
+
+<include src="ROM.icf::L4R02.dec"/>
+
+#RimCustId=X,10,S
+
+#RimCustNo=A,7,S
+
+#ExistFlag=X,1,S
+
+#RimEntryCode=A,1,S
+
+#RimL4r02_CustNo=X,1,S
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL4r02_CustNo,L4R02)
+S(L4R02,1,#RimCustId,#RimCustNo,#RimEntryCode)
+R(1,L4R02)
+T(2,@RepayCustName,#L4r02CustName)
+
+!戶名
+#RepayCustName=X,60,L
+
+<include src="ROM.icf::L4R06.dec"/>
+
+! 會計日期
+#RimAcDate=D,7,S
+! 整批批號
+#RimBatchNo=X,6,L
+!明細序號
+#RimDetailSeq=A,6,L
+
+#RimL4r06=X,1,S
+E(0,@RimAcDate,#AcDate)
+T(2,@RimBatchNo,#BatchNo)
+E(0,@RimDetailSeq,#DetailSeq)
+RESET_RIM(#RimL4r06,L4R06)
+S(L4R06,1,#RimAcDate,#RimBatchNo,#RimDetailSeq)
+R(1,L4R06)
+T(2,@AcctCode,#L4r06AcctCode)
+T(2,@OutsrcCode,#L4r06OutsrcCode)
+T(2,@DistCode,#L4r06DistCode)
+E(0,@TransDate,#L4r06TransDate)
+E(0,@RepayAcctNo,#L4r06RepayAcctNo)
+T(2,@PostUserNo,#L4r06PostUserNo)
+T(2,@OutsrcRemark,#L4r06OutsrcRemark)
+
+
+#RepayType=A,2,L
+!HELP(01:期款;
+!     02:部分償還;
+!     03:結案;
+!     04:帳管費;
+!     05:火險費;
+!     06:契變手續費;
+!     07:法務費;
+!     09:其他)
+#RepayTypeX=X,10,L   
+T(3,)T(H,#RepayType,#RepayTypeHelp) 
+!SWITCH(#RepayType,01,T(3,期款),
+!                  02,T(3,部分償還),
+!                  03,T(3,結案),
+!                  04,T(3,帳管費),
+!                  05,T(3,火險費),
+!                  06,T(3,契變手續費),
+!                  07,T(3,法務費),
+!                  09,T(3,其他),
+!               T(3, ))
+!還款金額
+#RepayAmt=m,14,L
+!已作帳金額
+#AcctAmt=m,14,L
+!入暫收金額
+#DisacctAmt=m,14,L
+!處理狀態
+#ProcStsCode=X,1,L
+#ProcStsCodeX=X,10,L 
+T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)      
+!SWITCH(#ProcStsCode,0,T(3,未檢核),
+!                 1,T(3,不處理),
+!                 2,T(3,人工處理),
+!                 3,T(3,檢核錯誤),
+!                 4,T(3,檢核正常),
+!                 5,T(3,人工入帳),
+!                 6,T(3,批次入帳),
+!                 7,T(3,虛擬暫收),
+!                 A,T(3,全部),
+!                 B,T(3,扣除不處理),
+!                 C,T(3,未入帳))
+!處理說明
+#ProcCode=X,5,L
+#ProcCodeX=X,22,L
+T(3,)T(H,#ProcCode,#ProcCodeHelp)
+!T(A,#ProcCode,L4DEF,ProcCodeDef,ProcCode,ProcCodeX)
+
+#ProcDscptCode=X,60,L
+
+!交易序號
+#TxSn=X,14,L
+!<回收試算>
+#BUF_L3921=X,74,S
+T(2,L4201+#CustNo+000+000+TWD+0000000000000000+#TransDate)
+#BIND_L3921=X,1,S
+BIND(#BTN_L3921,click, {cmd=CHAIN; ntxcd=L3921; ntxbuf=#BUF_L3921})
+
+!<回收登錄>
+#BUF_L3200=X,74,S
+T(2,L4201+#CustNo+000+000+#TransDate)
+#BIND_L3200=X,1,S
+BIND(#BTN_L3200,click, {cmd=CHAIN; ntxcd=L3200; ntxbuf=#BUF_L3200})
+
+!<暫收款登錄>
+#BUF_L3210=X,74,S
+T(2,#CustNo+#FacmNo)
+#BIND_L3210=X,1,S
+BIND(#BTN_L3210,click, {cmd=CHAIN; ntxcd=L3210; ntxbuf=#BUF_L3210})
+
+!<結案試算>
+#BUF_L3922=X,74,S
+T(2,L4201+#CustNo+          +0000000+000+000+TWD+0+#TransDate)
+#BIND_L3922=X,1,S
+BIND(#BTN_L3922,click, {cmd=CHAIN; ntxcd=L3922; ntxbuf=#BUF_L3922})
+
+!<結案登錄>
+#BUF_L3420=X,74,S
+T(2,)
+#BIND_L3420=X,1,S
+BIND(#BTN_L3420,click, {cmd=CHAIN; ntxcd=L3420; ntxbuf=#BUF_L3420})
+
+! ------------------以下調RIM取值------------------
+!帳戶別
+#AcctCode=X,1,L
+!帳戶別
+#AcctCodeX=X,4,L
+T(3,)T(H,#AcctCode,#PostDepCodeHelp)
+!SWITCH(#AcctCode,P,T(2,存簿),G,T(2,劃撥),T(2,))
+!委託機構代號
+#OutsrcCode=X,3,L
+!區處代號
+#DistCode=X,4,L
+!轉帳日期
+#TransDate=D,7,L
+!儲金帳號
+#RepayAcctNo=A,14,L
+!用戶編號
+#PostUserNo=X,20,L
+!委託機構使用欄
+#OutsrcRemark=X,20,L
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4203 -----------
+<sub type="FORM" name="L4203">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4203
+^
+<include src="ROM.icf::L4R02.tom"/>
+<include src="ROM.icf::L4R06.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

@@ -77,14 +77,14 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "SELECT \"COL\"";
 		sql += "	  ,\"KIND\"";
 		sql += "	  ,\"AMT\"";
-		sql += "	  ,TO_CHAR( NVL(( CASE";
+		sql += "	  ,ROUND ( NVL (( CASE";
 		sql += "	      	   			WHEN \"COL\" = '3' THEN \"AMT\" * 0.005";
 		sql += "	       	   			WHEN \"COL\" = '4' THEN \"AMT\" * 0.02";
 		sql += "	       	   			WHEN \"COL\" = '5' THEN \"AMT\" * 0.1";
 		sql += "	       	   			WHEN \"COL\" = '6' THEN \"AMT\" * 0.5";
 		sql += "	       	  			WHEN \"COL\" = '7' THEN \"AMT\" * 1";
 		sql += "	       	   			WHEN \"COL\" = '99' THEN \"AMT\" * 0.01";
-		sql += "	   				END),0),'9999999999') AS \"Allowance\"";
+		sql += "	   				END),0),0) AS \"Allowance\"";
 		sql += "FROM(";
 		//--逾期放款和未列入逾期應予評估放款
 		sql += "	SELECT ( CASE";

@@ -109,8 +109,8 @@ public class L9718Report extends MakeReport {
 							// ,F14
 							// formatAmt
 
-							// F16是百分比
-							// 用F22/F12 * 100 可算出來
+							// F16是百分比	
+							// 用F14 / F12 * 100 可算出來
 
 							switch (i) {
 								case 9:
@@ -131,11 +131,11 @@ public class L9718Report extends MakeReport {
 								case 16:
 									output = BigDecimal.ZERO;
 									try {
-										output = new BigDecimal(tLDVo.get("F22"))
+										output = new BigDecimal(tLDVo.get("F14"))
 												.divide(new BigDecimal(tLDVo.get("F12")), 2, RoundingMode.HALF_UP)
 												.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
 									} catch (Exception e) {
-										this.info("L9718Report-990, F22: " + tLDVo.get("F22") + "; F12: "
+										this.info("L9718Report-990, F14: " + tLDVo.get("F14") + "; F12: "
 												+ tLDVo.get("F12"));
 									}
 

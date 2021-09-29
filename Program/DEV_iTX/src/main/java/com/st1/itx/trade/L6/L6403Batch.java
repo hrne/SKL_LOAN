@@ -137,7 +137,7 @@ public class L6403Batch extends TradeBuffer {
 			
 		}
 		// L2
-		for (int i = 1; i <= 100; i++) {
+		for (int i = 1; i <= 90; i++) {
 			String iTranNo = titaVo.get("ApbCode" + i);
 			if(iTranNo!=null) {
 				
@@ -176,7 +176,7 @@ public class L6403Batch extends TradeBuffer {
 			
 		}
 		// L5
-		for (int i = 1; i <= 100; i++) {
+		for (int i = 1; i <= 120; i++) {
 			String iTranNo = titaVo.get("ApeCode" + i);
 			if(iTranNo!=null) {
 				

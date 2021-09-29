@@ -27,7 +27,7 @@ public class FacProdAcctFee implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 5160815435009359391L;
+	private static final long serialVersionUID = -4841593016160744817L;
 
 @EmbeddedId
   private FacProdAcctFeeId facProdAcctFeeId;
@@ -35,6 +35,11 @@ public class FacProdAcctFee implements Serializable {
   // 商品代碼
   @Column(name = "`ProdNo`", length = 9, insertable = false, updatable = false)
   private String prodNo;
+
+  // 費用類別
+  /* 1:帳管費2:手續費 */
+  @Column(name = "`FeeType`", length = 1, insertable = false, updatable = false)
+  private String feeType;
 
   // 貸款金額(含)以上
   @Column(name = "`LoanLow`", insertable = false, updatable = false)
@@ -92,6 +97,27 @@ public class FacProdAcctFee implements Serializable {
 	*/
   public void setProdNo(String prodNo) {
     this.prodNo = prodNo;
+  }
+
+/**
+	* 費用類別<br>
+	* 1:帳管費
+2:手續費
+	* @return String
+	*/
+  public String getFeeType() {
+    return this.feeType == null ? "" : this.feeType;
+  }
+
+/**
+	* 費用類別<br>
+	* 1:帳管費
+2:手續費
+  *
+  * @param feeType 費用類別
+	*/
+  public void setFeeType(String feeType) {
+    this.feeType = feeType;
   }
 
 /**
@@ -230,7 +256,7 @@ public class FacProdAcctFee implements Serializable {
 
   @Override
   public String toString() {
-    return "FacProdAcctFee [facProdAcctFeeId=" + facProdAcctFeeId + ", loanHigh=" + loanHigh + ", acctFee=" + acctFee + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "FacProdAcctFee [facProdAcctFeeId=" + facProdAcctFeeId + ", loanHigh=" + loanHigh + ", acctFee=" + acctFee + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }
