@@ -26,7 +26,7 @@ public class CdArea implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2687293071100548723L;
+	private static final long serialVersionUID = -6153882300605388951L;
 
 @EmbeddedId
   private CdAreaId cdAreaId;
@@ -51,6 +51,16 @@ public class CdArea implements Serializable {
   // 鄉鎮簡稱
   @Column(name = "`AreaShort`", length = 8)
   private String areaShort;
+
+  // JCIC縣市碼
+  /* by eric 2021.9.29 */
+  @Column(name = "`JcicCityCode`", length = 1)
+  private String jcicCityCode;
+
+  // JCIC鄉鎮碼
+  /* by eric 2021.9.29 */
+  @Column(name = "`JcicAreaCode`", length = 2)
+  private String jcicAreaCode;
 
   // 地區類別
   @Column(name = "`CityType`", length = 2)
@@ -189,6 +199,44 @@ public class CdArea implements Serializable {
 	*/
   public void setAreaShort(String areaShort) {
     this.areaShort = areaShort;
+  }
+
+/**
+	* JCIC縣市碼<br>
+	* by eric 2021.9.29
+	* @return String
+	*/
+  public String getJcicCityCode() {
+    return this.jcicCityCode == null ? "" : this.jcicCityCode;
+  }
+
+/**
+	* JCIC縣市碼<br>
+	* by eric 2021.9.29
+  *
+  * @param jcicCityCode JCIC縣市碼
+	*/
+  public void setJcicCityCode(String jcicCityCode) {
+    this.jcicCityCode = jcicCityCode;
+  }
+
+/**
+	* JCIC鄉鎮碼<br>
+	* by eric 2021.9.29
+	* @return String
+	*/
+  public String getJcicAreaCode() {
+    return this.jcicAreaCode == null ? "" : this.jcicAreaCode;
+  }
+
+/**
+	* JCIC鄉鎮碼<br>
+	* by eric 2021.9.29
+  *
+  * @param jcicAreaCode JCIC鄉鎮碼
+	*/
+  public void setJcicAreaCode(String jcicAreaCode) {
+    this.jcicAreaCode = jcicAreaCode;
   }
 
 /**
@@ -346,8 +394,8 @@ public class CdArea implements Serializable {
 
   @Override
   public String toString() {
-    return "CdArea [cdAreaId=" + cdAreaId + ", areaItem=" + areaItem + ", cityShort=" + cityShort + ", areaShort=" + areaShort + ", cityType=" + cityType
-           + ", zip3=" + zip3 + ", departCode=" + departCode + ", cityGroup=" + cityGroup + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "CdArea [cdAreaId=" + cdAreaId + ", areaItem=" + areaItem + ", cityShort=" + cityShort + ", areaShort=" + areaShort + ", jcicCityCode=" + jcicCityCode
+           + ", jcicAreaCode=" + jcicAreaCode + ", cityType=" + cityType + ", zip3=" + zip3 + ", departCode=" + departCode + ", cityGroup=" + cityGroup + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

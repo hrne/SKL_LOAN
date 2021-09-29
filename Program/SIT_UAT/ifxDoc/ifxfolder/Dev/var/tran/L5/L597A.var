@@ -45,6 +45,7 @@ E(0,0)
 ["查詢細項",#SearchDetail,#SearchDetailX],
 ["是否製檔",#Export,#ExportX],
 ["是否為按鈕",#IsBtn,#IsBtnX],
+["試算交易別",#TransTxKind,#TransTxKindX],
 ]
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -100,6 +101,22 @@ T(3,
 16:放款暫收;
 17:本月放款
 )
+
+#TxKindCode=x,20,S
+T(3,CdCode.NegTxKind)
+#TxKindHelp=x,1024,S
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#TxKindCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TxKindHelp,#HelpDesc1)
+
+#TxKindHelp1=x,1024,S
+T(HELP,@TxKindHelp1,#TxKindHelp,-,9)
 
 ! 查詢選項  新增最大債權跟一般債權可輸入範圍限制
 #SearchOption=X,2,I
@@ -176,6 +193,16 @@ HELP(#HelpIsBtn)
 #IsBtnX=X,1,L
 T(H,#IsBtn,#HelpIsBtn)
 
+! 交易別
+#TransTxKind=X,1,I
+C(3,#CHAIN,0,$,s)
+IF(#SearchOption=="02" || #SearchOption=="03" || #SearchOption=="12",$,S)  
+HELP(#TxKindHelp1,cols:3)
+@C(4,#TransTxKind,$,V(H,#TxKindHelp1))
+
+#TransTxKindX=X,8,L
+C(4,#TransTxKind,S,T(H,#TransTxKind,#TxKindHelp1))
+
 #RPTFG=A,1,S
 IF(#SearchOption=="02" || #SearchOption=="12",E(0,0),IF(#SearchOption=="03",E(0,1),E(0,2)))
 
@@ -224,6 +251,21 @@ SWITCH(#OOTxSts,0,T(2,正常),
 				        6,T(2,待處理),
 				        9,T(2,未處理)
 				)
+
+#OOTxSts1=X,1,O
+#OOTxSts1X=X,10,O
+IF(#SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15" || #SearchOption=="11",S,$)
+C(4,#OOTxSts1,S,$)
+SWITCH(#OOTxSts1,0,T(2,正常),
+                1,T(2,溢繳),
+                2,T(2,短繳),
+                3,T(2,提前還本),
+                4,T(2,結清),
+                5,T(2,提前清償),
+				        6,T(2,待處理),
+				        9,T(2,未處理)
+				)
+				
 ! 備註
 #OORemark=X,100,O
 ! 會計日
@@ -352,10 +394,12 @@ T(6A,#TrialFunc+#AcDate+#IsMainFin+#SearchOption+#SearchDetail+#Export+#IsBtn+#O
 #SearchDetail
 #Export
 #IsBtn
+#TransTxKind
 </sub>
 
 !------ 下行電文TOM ------
 <sub type="TOM">
+<include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L597A
 #OOSeq
@@ -364,6 +408,7 @@ TXFORM=L597A
 #OOCaseSeq
 #OOCustName
 #OOTxSts
+#OOTxSts1
 #OOAcctDate
 #OOEntryDate
 #OORepayDate
@@ -427,6 +472,8 @@ ifxBatch:{
 {width:80,align:'center'}
 #OOTxStsX=交易別
 {width:60,align:'left'}
+#OOTxSts1X=試算交易別
+{width:85,align:'left'}
 #OORemark=備註
 {width:60,align:'left'}
 #OOBtnSearch=入帳還款
@@ -485,6 +532,8 @@ ifxBatch:{
 {width:80,align:'center'}
 #OOTxStsX=交易別
 {width:60,align:'left'}
+#OOTxSts1X=試算交易別
+{width:85,align:'left'}
 #OORemark=備註
 {width:60,align:'left'}
 #OOBtnSearch=入帳還款
@@ -533,6 +582,8 @@ ifxBatch:{
 {width:80,align:'center'}
 #OOTxStsX=交易別
 {width:60,align:'left'}
+#OOTxSts1X=試算交易別
+{width:85,align:'left'}
 #OORemark=備註
 {width:60,align:'left'}
 #OOBtnSearch=入帳還款
@@ -582,6 +633,7 @@ ifxBatch:{
 #OOCaseSeq
 #OOCustName
 #OOTxSts
+#OOTxSts1
 #OORemark
 #OOAcctDate
 #OOEntryDate

@@ -187,10 +187,10 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setSumNo(RpFlag + titaVo.getParam("RpCode" + i));
 			if ("1".equals(RpFlag)) {
 				acDetail.setAcctCode(titaVo.getParam("RpAcctCode" + i));
-				String rpAcCode = FormatUtil.padX(titaVo.getParam("RpAcCode" + i).trim(), 15);
-				acDetail.setAcNoCode(rpAcCode.substring(0, 8)); // 會科科子細目 8+5+2
-				acDetail.setAcSubCode(rpAcCode.substring(8, 13));
-				acDetail.setAcDtlCode(rpAcCode.substring(13, 15));
+				String rpAcCode = FormatUtil.padX(titaVo.getParam("RpAcCode" + i).trim(), 18);
+				acDetail.setAcNoCode(rpAcCode.substring(0, 11)); // 會科科子細目 11+5+2
+				acDetail.setAcSubCode(rpAcCode.substring(11, 16));
+				acDetail.setAcDtlCode(rpAcCode.substring(16, 18));
 			}
 		}
 

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdAreaService")
 @Repository
-public class CdAreaServiceImpl implements CdAreaService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdAreaServiceImpl.class);
-
+public class CdAreaServiceImpl extends ASpringJpaParm implements CdAreaService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CdAreaServiceImpl implements CdAreaService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdAreaId);
+    this.info("findById " + dbName + " " + cdAreaId);
     Optional<CdArea> cdArea = null;
     if (dbName.equals(ContentName.onDay))
       cdArea = cdAreaReposDay.findById(cdAreaId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CityCode", "AreaCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CityCode", "AreaCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdAreaReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = cdAreaReposHist.findAll(pageable);
     else 
       slice = cdAreaRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("cityCodeEq " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " cityCode_1 : " +  cityCode_1);
+    this.info("cityCodeEq " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " cityCode_1 : " +  cityCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdAreaReposDay.findAllByCityCodeGreaterThanEqualAndCityCodeLessThanEqualOrderByCityCodeAscAreaCodeAsc(cityCode_0, cityCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = cdAreaReposHist.findAllByCityCodeGreaterThanEqualAndCityCodeLessThanEqualOrderByCityCodeAscAreaCodeAsc(cityCode_0, cityCode_1, pageable);
     else 
       slice = cdAreaRepos.findAllByCityCodeGreaterThanEqualAndCityCodeLessThanEqualOrderByCityCodeAscAreaCodeAsc(cityCode_0, cityCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("areaCodeRange " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " cityCode_1 : " +  cityCode_1 + " areaCode_2 : " +  areaCode_2 + " areaCode_3 : " +  areaCode_3);
+    this.info("areaCodeRange " + dbName + " : " + "cityCode_0 : " + cityCode_0 + " cityCode_1 : " +  cityCode_1 + " areaCode_2 : " +  areaCode_2 + " areaCode_3 : " +  areaCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = cdAreaReposDay.findAllByCityCodeGreaterThanEqualAndCityCodeLessThanEqualAndAreaCodeGreaterThanEqualAndAreaCodeLessThanEqualOrderByCityCodeAscAreaCodeAsc(cityCode_0, cityCode_1, areaCode_2, areaCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +159,9 @@ em = null;
     else 
       slice = cdAreaRepos.findAllByCityCodeGreaterThanEqualAndCityCodeLessThanEqualAndAreaCodeGreaterThanEqualAndAreaCodeLessThanEqualOrderByCityCodeAscAreaCodeAsc(cityCode_0, cityCode_1, areaCode_2, areaCode_3, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Zip3First " + dbName + " : " + "zip3_0 : " + zip3_0);
+    this.info("Zip3First " + dbName + " : " + "zip3_0 : " + zip3_0);
     Optional<CdArea> cdAreaT = null;
     if (dbName.equals(ContentName.onDay))
       cdAreaT = cdAreaReposDay.findTopByZip3IsOrderByCityCodeAscAreaCodeAsc(zip3_0);
@@ -175,6 +180,7 @@ em = null;
       cdAreaT = cdAreaReposHist.findTopByZip3IsOrderByCityCodeAscAreaCodeAsc(zip3_0);
     else 
       cdAreaT = cdAreaRepos.findTopByZip3IsOrderByCityCodeAscAreaCodeAsc(zip3_0);
+
     return cdAreaT.isPresent() ? cdAreaT.get() : null;
   }
 
@@ -183,7 +189,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdAreaId);
+    this.info("Hold " + dbName + " " + cdAreaId);
     Optional<CdArea> cdArea = null;
     if (dbName.equals(ContentName.onDay))
       cdArea = cdAreaReposDay.findByCdAreaId(cdAreaId);
@@ -201,7 +207,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdArea.getCdAreaId());
+    this.info("Hold " + dbName + " " + cdArea.getCdAreaId());
     Optional<CdArea> cdAreaT = null;
     if (dbName.equals(ContentName.onDay))
       cdAreaT = cdAreaReposDay.findByCdAreaId(cdArea.getCdAreaId());
@@ -223,7 +229,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdArea.getCdAreaId());
+    this.info("Insert..." + dbName + " " + cdArea.getCdAreaId());
     if (this.findById(cdArea.getCdAreaId()) != null)
       throw new DBException(2);
 
@@ -252,7 +258,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdArea.getCdAreaId());
+    this.info("Update..." + dbName + " " + cdArea.getCdAreaId());
     if (!empNot.isEmpty())
       cdArea.setLastUpdateEmpNo(empNot);
 
@@ -275,7 +281,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdArea.getCdAreaId());
+    this.info("Update..." + dbName + " " + cdArea.getCdAreaId());
     if (!empNot.isEmpty())
       cdArea.setLastUpdateEmpNo(empNot);
 
@@ -295,7 +301,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdArea.getCdAreaId());
+    this.info("Delete..." + dbName + " " + cdArea.getCdAreaId());
     if (dbName.equals(ContentName.onDay)) {
       cdAreaReposDay.delete(cdArea);	
       cdAreaReposDay.flush();
@@ -324,7 +330,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdArea t : cdArea){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -359,7 +365,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdArea == null || cdArea.size() == 0)
       throw new DBException(6);
 
@@ -388,7 +394,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdArea> cdArea, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

@@ -81,9 +81,10 @@ E(0,0)
 ]
 
 !---------- 要新增交易時 -----------
-! 0. 找負責人處理, 有工具可以較方便產整個 var
-! 或是 ...
+! 有小工具可以比較方便完成
+! 請參考 NAS\SKL\雜項文件\xiangwei\小工具\定期報表產表介面修改說明.txt
 
+! 或是 ...
 ! 1. 交易畫面修改
 
 ! 2. 在 TRADE DICTIONARY 中依據格式新增交易
@@ -142,12 +143,10 @@ V(5,0,#DT2)
 !---------- TRADE DICTIONARY -----------
 ! TradeDic: The trade that button points to. Notice it's raw data for input only.
 ! format is [tradeCat]/[tradeNTX]/[tradeCode]/[tradeName] without brackets.
-! length is the total of all three elements' length.
 
-! 交易畫面上的順序和這裡要一樣
-! 所以要在中間插入新表時，後面的編號都要往後推移
-
-! 不可以跳過任何數字
+! 這裡的編號順序要跟畫面輸出一樣
+! 並且每種種類依序放在一起
+! 也不可以跳號
 
 #TradeDic1=X,33,S
 T(3,1/N/LM001/公會無自用住宅統計)

@@ -222,13 +222,13 @@ T(3,)T(H,#ProcCode,#ProcCodeHelp)
 
 !<回收試算>
 #BUF_L3921=X,74,S
-T(2,L4201+#CustNo+000+000+TWD+0000000000000000+#ChequeDate)
+T(2,L4201+#CustNo+#FacmNo+000+TWD+0000000000000000+#ChequeDate)
 #BIND_L3921=X,1,S
 BIND(#BTN_L3921,click, {cmd=CHAIN; ntxcd=L3921; ntxbuf=#BUF_L3921})
 
 !<回收登錄>
 #BUF_L3200=X,74,S
-T(2,L4201+#CustNo+000+000+#ChequeDate)
+T(2,L4201+#CustNo+#FacmNo+000+#ChequeDate+0000000000000000+ +000)
 #BIND_L3200=X,1,S
 BIND(#BTN_L3200,click, {cmd=CHAIN; ntxcd=L3200; ntxbuf=#BUF_L3200})
 
