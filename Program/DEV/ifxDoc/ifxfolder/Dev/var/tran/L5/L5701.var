@@ -22,11 +22,11 @@ E(0,0)
 [#<->#,"#FdCustId+身分證字號",#CustId,#BtnDetail],
 ["#FdCustNo+戶號",#CustNo],["#FdCaseSeq+案件序號",#CaseSeq],
 [#<->#,"#FdIsMainFin+最大債權",#IsMainFin],
-["#FdCaseKindCode+案件種類",#CaseKindCode,#CaseKindCodeX],["#FdCourCode+#CourCodeFildName",#CourCode],
+["#FdCaseKindCode+案件種類",#CaseKindCode,#CaseKindCodeX],["#FdCourCode+#CourCodeFildName",#CourCode,#CourCodeX],
 ["#FdCustLoanKind+債權戶別",#CustLoanKind,#CustLoanKindX],["#FdPayerCustNo+#PayerCustNoFildName",#PayerCustNo,#PayerCustName],
 [#<->#,"#FdStatus+債權戶況",#Status,#StatusX],
-[#<->#,"#FdDeferYMStart+延期繳款年月+(+起+)",#DeferYMStart],
-[#<->#,"#FdDeferYMEnd+延期繳款年月+(+訖+)",#DeferYMEnd],
+[#<->#,"#FdDeferYMStart+延期繳款年月+(+起+)",#DeferYMStartX],
+[#<->#,"#FdDeferYMEnd+延期繳款年月+(+訖+)",#DeferYMEndX],
 ["#FdApplDate+協商申請日",#ApplDate],["#FdChgCondDate+#ChgCondDateFildName",#ChgCondDate],
 [#<->#,"#FdDueAmt+期款",#DueAmt],
 ["#FdTotalPeriod+期數",#TotalPeriod],["#FdIntRate+計息條件",#IntRate,"%"],
@@ -34,7 +34,7 @@ E(0,0)
 ["#FdFieldName+#FieldName",#TotalContrAmt],
 [#<->#,"#FdMainFinCode+最大債權機構",#MainFinCode,#MainFinCodeName],
 ["#FdTwoStepCode+二階段註記",#TwoStepCode,#TwoStepCodeX],
-[#<->#,"@",#BtnConnect,#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ],
+[#<->#,"@",#BTNK,#BtnConnect,#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL],
 ["#grid#,{id:1,expand:true,loop:30,row_height:1,s_cols:[], p_cols:[]}","","",
 ["債權機構","","機構名稱","簽約金額","債權比例% ","期款","註銷日期","註銷本金"],
 [[#NegFinShareFinCode1],[#BtnBankCode1],[#FinCodeName1],[#NegFinShareContractAmt1],[#NegFinShareAmtRatio1],[#NegFinShareDueAmt1],[#NegFinShareCancelDate1],[#NegFinShareCancelAmt1],
@@ -53,9 +53,9 @@ SHOW(#FdChgCondDate,#ChgCondDateFildName,#ChgCondDate)
 
 !受理調解機構代號
 #HideCourCode=@,1,S
-HIDE(#FdCourCode,#CourCodeFildName,#CourCode)
+HIDE(#FdCourCode,#CourCodeFildName,#CourCode,#CourCodeX)
 #ShowCourCode=@,1,S
-SHOW(#FdCourCode,#CourCodeFildName,#CourCode)
+SHOW(#FdCourCode,#CourCodeFildName,#CourCode,#CourCodeX)
 
 
 #FdFunctionCodeX=X,2,L
@@ -128,7 +128,8 @@ HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ)
 #BTNH=X,1,S,ui:button;value:喘息期;enable:1;tabbable:0
 #BTNI=X,1,S,ui:button;value:二階段新增;enable:1;tabbable:0
 #BTNJ=X,1,S,ui:button;value:債權異動歷程;enable:1;tabbable:0
-
+#BTNK=X,1,S,ui:button;value:債務人聯絡電話;enable:1;tabbable:0
+#BTNL=X,1,S,ui:button;value:喘息期歷程;enable:1;tabbable:0
 
 ! 查詢銀行代碼
 #BUFBankCode=X,1,S
@@ -165,15 +166,20 @@ T(3,CdCode.CaseKindCode)
 T(3,CdCode.FunctionCode)
 #FunctionCodeHelp=x,1024,S
 
+#CourtCodeCode=x,20,S
+T(3,CdCode.CourtCode)
+#CourtCodeHelp=x,5000,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#StatusCode,#CustLoanKindCode,#CaseKindCodeCode,#FunctionCodeCode)
+S(XXR99,01,#StatusCode,#CustLoanKindCode,#CaseKindCodeCode,#FunctionCodeCode,#CourtCodeCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@StatusHelp,#HelpDesc1)
 T(2,@CustLoanKindHelp,#HelpDesc2)
 T(2,@CaseKindCodeHelp,#HelpDesc3)
 T(2,@FunctionCodeHelp,#HelpDesc4)
+T(2,@CourtCodeHelp,#HelpDesc5)
 
 !YN
 #YNHelp=X,50,S
@@ -203,6 +209,12 @@ CALL(#HideCourCode)
 !IF(#FunctionCode=="01",$,S)
 !T(1,@CustId,#ChainInsertNTXBUF,3,10)
 ! T(1,@CustNo,#ChainInsertNTXBUF,13,7)
+
+#DATE=D,8,S
+T(4,DATE$)
+
+#DT=D,7,S
+T(1,#DATE,2,7)
 
 #NTXBUF=X,22,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -239,8 +251,8 @@ E(0,@CaseSeq,#L5r01CaseSeq)
 T(2,@CaseKindCode,#L5r01CaseKindCode)
 T(2,@CustLoanKind,#L5r01CustLoanKind)
 T(2,@Status,#L5r01Status)
-T(2,@DeferYMStart,#L5r01DeferYMStart)
-T(2,@DeferYMEnd,#L5r01DeferYMEnd)
+C(3,#L5r01DeferYMStart,0,$,T(2,@DeferYMStartX,#L5r01DeferYMStart))
+C(3,#L5r01DeferYMEnd,0,$,T(2,@DeferYMEndX,#L5r01DeferYMEnd))
 T(2,@ApplDate,#L5r01ApplDate)
 E(0,@DueAmt,#L5r01DueAmt)
 E(0,@TotalPeriod,#L5r01TotalPeriod)
@@ -265,6 +277,8 @@ T(2,@NegFinShareCancelDate{i},#L5r01NegFinShareCancelDate{i})
 E(0,@NegFinShareCancelAmt{i},#L5r01NegFinShareCancelAmt{i})
 ##end
 T(H,@CaseKindCodeX,#CaseKindCode,#CaseKindCodeHelp)
+T(H,@CourCodeX,#CourCode,#CourtCodeHelp)
+T(H,@CustLoanKindX,#CustLoanKind,#CustLoanKindHelp)
 T(H,@StatusX,#Status,#StatusHelp)
 C(5,#IsMainFin,Y,T(2,@FieldName,簽約總金額),T(2,@FieldName,新壽總金額))
 ! 下方按鈕
@@ -314,7 +328,7 @@ SHOW(#BTNJ)
 IF(#Status=="0",SHOW(#BTND,#BTNF,#BTNG,#BTNH,#BTNI),$)
 IF(#Status=="2",SHOW(#BTNE),$)
 IF(#Status=="4",SHOW(#BTNF),$)
-IF(#CaseKindCode==1,HIDE(#BTND),$)
+IF(#CaseKindCode==1,HIDE(#BTND,#BTNG),$)
 IF(#TwoStepCode=="N",HIDE(#BTNI),$)
 IF(#IsMainFin=="N",HIDE(#BTND,#BTNJ),$)
 
@@ -396,16 +410,16 @@ T(2,@FdCourCode,#ShowFd)
 IF (#FunctionCode=="01",T(F,@CustId,1),T(F,@CustId,0))
 IF (#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",
                         T(F,@IsMainFin,1)T(F,@CaseKindCode,1)T(F,@CustLoanKind,1)T(F,@Status,1)
-                        T(F,@DeferYMStart,1)T(F,@DeferYMEnd,1)T(F,@ApplDate,1)T(F,@DueAmt,1)T(F,@TotalPeriod,1)
+                        T(F,@DeferYMStartX,1)T(F,@DeferYMEndX,1)T(F,@ApplDate,1)T(F,@DueAmt,1)T(F,@TotalPeriod,1)
                         T(F,@IntRate,1)T(F,@FirstDueDate,1)T(F,@LastDueDate,1)T(F,@TotalContrAmt,1)T(F,@MainFinCode,1)T(F,@TwoStepCode,1)T(F,@PayerCustNo,1)T(F,@ChgCondDate,1)T(F,@CourCode,1)
                         ,
                         T(F,@CustId,0)T(F,@IsMainFin,0)T(F,@CaseKindCode,0)T(F,@CustLoanKind,0)T(F,@Status,0)
-                        T(F,@DeferYMStart,0)T(F,@DeferYMEnd,0)T(F,@ApplDate,0)T(F,@DueAmt,0)T(F,@TotalPeriod,0)
+                        T(F,@DeferYMStartX,0)T(F,@DeferYMEndX,0)T(F,@ApplDate,0)T(F,@DueAmt,0)T(F,@TotalPeriod,0)
                         T(F,@IntRate,0)T(F,@FirstDueDate,0)T(F,@LastDueDate,0)T(F,@TotalContrAmt,0)T(F,@MainFinCode,0)T(F,@TwoStepCode,0)T(F,@PayerCustNo,0)T(F,@ChgCondDate,0)T(F,@CourCode,0))                       
 !新增時戶況不可輸入,固定=0
 IF (#FunctionCode=="01",T(F,@Status,0),$) 
 !喘息期只能改此二欄位
-IF (#FunctionCode=="10",T(F,@DeferYMStart,1)T(F,@DeferYMEnd,1),$) 
+IF (#FunctionCode=="10",T(F,@DeferYMStartX,1)T(F,@DeferYMEndX,1),$) 
 !變更還款條件&二階段新增:不能改的欄位
 IF (#FunctionCode=="09"||#FunctionCode=="11",T(F,@IsMainFin,0)T(F,@CaseKindCode,0)T(F,@Status,0)T(F,@ApplDate,0),$) 
 #WKTF2=A,1,S
@@ -501,7 +515,12 @@ IF(#CaseKindCode=="2",CALL(#ShowCourCode),CALL(#HideCourCode))
 #CourCode=X,3,I
 IF(#CaseKindCode=="2",$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
+HELP(#CourtCodeHelp)
 @V(7)
+
+#CourCodeX=X,50,L
+T(2,#CourCodeX, )
+T(H,#CourCode,#CourtCodeHelp)
 
 ! 債權戶別
 #CustLoanKind=X,1,I
@@ -553,21 +572,30 @@ HELP(#StatusHelp)
 T(H,#Status,#StatusHelp)
 
 !延期繳款年月(起)
-#DeferYMStart=A,5,I
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="10"||#FunctionCode=="11",$,s)
+#DeferYMStartX=X,5,I
+IF(#FunctionCode=="02"||#FunctionCode=="10",$,s)
 @
-A(YM,0,#DeferYMStart)
-IF(#FunctionCode=="10",$,s)
-A(YM,1,#DeferYMStart)
+A(YM,0,#DeferYMStartX)
+IF(#FunctionCode=="02"||#FunctionCode=="10",$,s)
+A(YM,1,#DeferYMStartX)
 ! @A(YM13,0,#DeferYMStart)
 
+#DeferYMStart=A,5,S
+C(4,#DeferYMStartX,s,$)
+E(0,#DeferYMStartX)
+
 !延期繳款年月(訖)
-#DeferYMEnd=A,5,I
-IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="10"||#FunctionCode=="11",$,s)
-IF(#DeferYMStart>0,$,E(0,0))
-IF(#DeferYMStart>0,$,s)
+#DeferYMEndX=X,5,I
+IF(#FunctionCode=="02"||#FunctionCode=="10",$,s)
+C(4,#DeferYMStartX,S,$)
 @
-A(YM,0,#DeferYMEnd)
+A(YM,0,#DeferYMEndX)
+
+#DeferYMEnd=A,5,S
+C(4,#DeferYMEndX,s,$)
+E(0,#DeferYMEndX)
+
+#DeferYMCheck=X,1,S
 IF(#DeferYMStart>#DeferYMEnd,V(P,[延期繳款年月-訖]不得小於[延期繳款年月-起]),s)
 ! @A(YM13,0,#DeferYMStart)
 
@@ -702,6 +730,15 @@ T(2,1+#CustId+#CustNo)
 BIND(#BtnConnect,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BufConnect})
 ! L1905 顧客聯絡電話查詢
 
+!債務人連絡電話
+#PhoneConnect=X,13,S
+T(2,048+#CustId)
+
+#BINDK=X,1,S
+BIND(#BTNK,click, {cmd=CHAIN; ntxcd=L8030; ntxbuf=#PhoneConnect})
+
+
+
 ! <刪除>
 ! #BUFC=X,22,S
 ! T(2,04+#BufKey)
@@ -763,6 +800,20 @@ T(2,#CustNo+#CaseSeq)
 
 #BINDJ=X,1,S
 BIND(#BTNJ,click, {cmd=CHAIN; ntxcd=L5981; ntxbuf=#BUFJ})
+
+#DT_MONTH=A,5,S
+T(1,#DATE,2,5)
+#DT_01=A,2,S
+E(0,1)
+#ST_DTS=D,7,S
+T(2,#DT_MONTH+#DT_01)
+
+!<喘息期歷程>
+#BUFL=X,69,S
+T(2,0010101+#DT+L5701+                  +#CustNo+000+000)
+
+#BINDL=X,1,S
+BIND(#BTNL,click, {cmd=CHAIN; ntxcd=L6932; ntxbuf=#BUFL})
 
 !RIM簽約金額
 #RimContractAmtX=m,14,S

@@ -74,6 +74,12 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		 *10601304000 催收款項-溢折價
 		 * */
 		String sql = " ";
+		sql += "SELECT RES.\"COL\"";
+		sql += "	  ,RES.\"KIND\"";
+		sql += "	  ,RES.\"AMT\"";
+		sql += "	  ,RES.\"Allowance\"";
+		sql += "	  +NVL(I.\"INT\",0) AS \"Allowance\"";
+		sql += "FROM( ";
 		sql += "SELECT \"COL\"";
 		sql += "	  ,\"KIND\"";
 		sql += "	  ,ROUND(\"AMT\",0) AS \"AMT\"";
@@ -114,7 +120,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	FROM ( SELECT ( CASE";
 		sql += "					  WHEN \"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 		sql += "					  WHEN \"ClCode1\" IN (1,2) THEN 'C'";
-		sql += "					  WHEN \"ClCode1\" IN (1,2) THEN 'D'";
+		sql += "					  WHEN \"ClCode1\" IN (3,4) THEN 'D'";
 		sql += "					  ELSE 'N'";
 		sql += "					END ) AS \"KIND\"";
 		sql += "	             ,SUM(M.\"PrinBalance\") AS \"AMT\"";
@@ -127,7 +133,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	       GROUP BY (CASE";
 		sql += "					   WHEN \"ClCode1\" IN (1,2) AND (M.\"FacAcctCode\" = 340 OR REGEXP_LIKE(M.\"ProdNo\",'I[A-Z]')) THEN 'Z'";
 		sql += "					   WHEN \"ClCode1\" IN (1,2) THEN 'C'";
-		sql += "					   WHEN \"ClCode1\" IN (1,2) THEN 'D'";
+		sql += "					   WHEN \"ClCode1\" IN (3,4) THEN 'D'";
 		sql += "					   ELSE 'N'";
 		sql += "					 END )";
 		sql += "	       UNION";
@@ -195,7 +201,8 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "		  					 ,'2',\"AMT\" * 0.02";
 		sql += "		  					 ,'3',\"AMT\" * 0.1";
 		sql += "		  					 ,'4',\"AMT\" * 0.5";
-		sql += "		  					 ,'5',\"AMT\" * 1)) AS \"AMT\"";
+		sql += "		  					 ,'5',\"AMT\" * 1";
+		sql += "		  					 ,'I',\"AMT\" * 0.02)) AS \"AMT\"";
 		sql += "	FROM ( SELECT DECODE(F.\"UsageCode\",'02','12','11') AS \"COL\"";
 		sql += "				 ,SUM(M.\"PrinBalance\") AS \"AMT\"";
 		sql += "		   FROM \"MonthlyFacBal\" M";
@@ -229,8 +236,22 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       	       		   WHEN M.\"OvduTerm\" >= 1 THEN '2'";
 		sql += "       	       		   WHEN M.\"ProdNo\" IN ('60','61','62') THEN '2'";
 		sql += "       	     	     END )";
+		sql += "	       UNION";
+		sql += "	       SELECT 'I' AS \"COL\"";
+		sql += "	       		 ,SUM(\"IntAmtAcc\") AS \"KIND\"";
+		sql += "	       FROM \"MonthlyLoanBal\'";
+		sql += "	       WHERE \"LoanBalance\" > 0";
+		sql += "	         AND \"YearMonth\" = :yymm ";
 		sql += "	     )";
-		sql += ")";	
+		sql += " )) RES ";
+		sql += "LEFT JOIN(";
+		sql += "	SELECT '4' AS \"COL\"";
+		sql += "		  ,'C' AS \"KIND\"";
+		sql += "		  ,SUM(\"IntAmtAcc\") * 0.02 AS \"INT\"";
+		sql += "	FROM \"MonthlyLoanBal\"";
+		sql += "	WHERE \"LoanBalance\" > 0";
+		sql += "	  AND \"YearMonth\" = :yymm ";
+		sql += ") I ON I.\"COL\" = RES.\"COL\" AND I.\"KIND\" = RES.\"KIND\"";
 		
 		
 		

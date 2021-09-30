@@ -15,16 +15,20 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ440;
+import com.st1.itx.db.domain.JcicZ440Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ444;
 import com.st1.itx.db.domain.JcicZ444Id;
 import com.st1.itx.db.domain.JcicZ444Log;
+import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.domain.JcicZ446Id;
+import com.st1.itx.db.service.JcicZ440Service;
 import com.st1.itx.db.service.JcicZ444LogService;
 
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ444Service;
-
+import com.st1.itx.db.service.JcicZ446Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -53,9 +57,13 @@ import com.st1.itx.util.data.DataLog;
 public class L8325 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ440Service sJcicZ440Service;
+	@Autowired
 	public JcicZ444Service sJcicZ444Service;
 	@Autowired
 	public JcicZ444LogService sJcicZ444LogService;
+	@Autowired
+	public JcicZ446Service sJcicZ446Service;
 	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
@@ -77,7 +85,7 @@ public class L8325 extends TradeBuffer {
 		String iCustComTelNo = titaVo.getParam("CustComTelNo");
 		String iCustMobilNo = titaVo.getParam("CustMobilNo");
 		String iKey = "";
-		//JcicZ444
+		//JcicZ444, JcicZ440, JcicZ446
 		JcicZ444 iJcicZ444 = new JcicZ444();
 		JcicZ444Id iJcicZ444Id = new JcicZ444Id();
 		iJcicZ444Id.setSubmitKey(iSubmitKey);
@@ -85,6 +93,42 @@ public class L8325 extends TradeBuffer {
 		iJcicZ444Id.setApplyDate(iApplyDate);
 		iJcicZ444Id.setCourtCode(iCourtCode);
 		JcicZ444 chJcicZ444 = new JcicZ444();
+		JcicZ440 iJcicZ440 = new JcicZ440();
+		JcicZ440Id iJcicZ440Id = new JcicZ440Id();
+		iJcicZ440Id.setSubmitKey(iSubmitKey);
+		iJcicZ440Id.setCustId(iCustId);		
+		iJcicZ440Id.setApplyDate(iApplyDate);
+		iJcicZ440Id.setCourtCode(iCourtCode);
+		JcicZ446 iJcicZ446 = new JcicZ446();
+		JcicZ446Id iJcicZ446Id = new JcicZ446Id();
+		iJcicZ446Id.setApplyDate(iApplyDate);
+		iJcicZ446Id.setCourtCode(iCourtCode);
+		iJcicZ446Id.setCustId(iCustId);
+		iJcicZ446Id.setSubmitKey(iSubmitKey);
+		
+		// 檢核項目(D-51)
+
+		// 2 「IDN+報送單位代號+調解申請日+受理調解機構代號」若未曾報送過「'440':前置調解受理申請暨請求回報債權通知資料」，予以剔退處理.(交易代碼為'X'者不檢核)
+		if(!"X".equals(iTranKey)) {
+			iJcicZ440 = sJcicZ440Service.findById(iJcicZ440Id, titaVo);
+			if(iJcicZ440 == null) {
+				throw new LogicException("E0005", "請先報送「'440':前置調解受理申請暨請求回報債權通知資料」.");
+			}
+		}// 2 end
+		
+		// 3 第10欄、第11欄及第12欄「債務人電話」之其中一欄，需為必要填報項目.
+		if(iCustRegTelNo.trim().isEmpty() && iCustComTelNo.trim().isEmpty() && iCustMobilNo.trim().isEmpty()) {
+			throw new LogicException("E0005", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
+		}// 3 end
+		
+		// 4  同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.
+		iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
+		if(iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+			throw new LogicException(titaVo, "E0005", "同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+		}// 4 end
+		
+		// 檢核條件 end	
+
 
 		switch(iTranKey_Tmp) {
 		case "1":

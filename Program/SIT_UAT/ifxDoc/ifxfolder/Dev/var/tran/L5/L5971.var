@@ -252,7 +252,20 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5972; ntxbuf=#OOBufNegTrans})
 #OOBufB=X,17,S
 T(2,#OOExportDate+#CustId)
 #OOBtnB=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L5973; ntxbuf=#OOBufB})
+C(3,#OOTxKind,9,BIND(grid,cancel)
+							 ,BIND(grid,{ cmd=CHAIN; ntxcd=L5973; ntxbuf=#OOBufB}))
+
+
+
+
+!<撥付金額調整>
+#OOBufC=X,21,S
+T(2,#CustId+#OCustNo+#CaseSeq)
+#OOBtnC=A,2,O
+C(3,#OOExportDate,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5711; ntxbuf=#OOBufC})
+									 ,BIND(grid,cancel))
+C(3,#OOTxKind,9,BIND(grid,cancel)
+							 ,$)
 
 ! ------OCCURS------
 
@@ -338,9 +351,10 @@ TXFORM=L5971
 {width:85}
 #OOExportDate=製檔日
 {width:65,align:'center'}
-#OOBtnB=
-{search:false,formatter:'cust:bind-button:撥付明細;L5973 最大債權撥付明細查詢',align:'center',canExport:false,width:65}
-
+#OOBtnB=撥付明細
+{search:false,formatter:'cust:bind-button:撥付明細;L5973 最大債權撥付明細查詢',align:'center',canExport:false,width:75}
+#OOBtnC=撥付金額調整
+{search:false,formatter:'cust:bind-button:撥付金額調整;L5711 撥付金額調整',align:'center',canExport:false,width:100}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5971;cpi=15"/>
 #CustId#EntryDateStart#EntryDateEnd

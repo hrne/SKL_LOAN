@@ -91,7 +91,8 @@ public class L4450Batch extends TradeBuffer {
 	private int commitCnt = 200;
 
 	private int iEntryDate = 0;
-	private int iOpItem = 0;
+
+	private int cnt = 0;
 
 //	重複註記
 	private HashMap<tmpBorm, Integer> flagMap = new HashMap<>();
@@ -144,117 +145,134 @@ public class L4450Batch extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4450Batch ");
-		this.totaVo.init(titaVo);
 		baTxCom.setTxBuffer(this.getTxBuffer());
-
-		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate"));
-		iOpItem = parse.stringToInteger(titaVo.getParam("OpItem"));
-//		於資料庫取出之日數為數字 須補0
-		int iAchSpecificDdFrom = parse.stringToInteger(titaVo.getParam("AchSpecificDdFrom")) + 19110000;
-		int iAchSpecificDdTo = parse.stringToInteger(titaVo.getParam("AchSpecificDdTo")) + 19110000;
-		int iAchSecondSpecificDdFrom = parse.stringToInteger(titaVo.getParam("AchSecondSpecificDdFrom")) + 19110000;
-		int iAchSecondSpecificDdTo = parse.stringToInteger(titaVo.getParam("AchSecondSpecificDdTo")) + 19110000;
-		int iDeductDate = parse.stringToInteger(titaVo.getParam("DeductDate")) + 19110000;
-		int iOpItem = parse.stringToInteger(titaVo.getParam("OpItem"));
-
-//		若特定輸入日為0者代表不與營業日相同，即不需輸入扣帳檔
-//		判斷二扣=是否有會計日
-		int today1 = 0;
-		int today2 = 0;
-
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
+		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate"));
+		// 整批
+		if ("L4450".equals(titaVo.getTxcd())) {
+			int iAchSpecificDdFrom = parse.stringToInteger(titaVo.getParam("AchSpecificDdFrom")) + 19110000;
+			int iAchSpecificDdTo = parse.stringToInteger(titaVo.getParam("AchSpecificDdTo")) + 19110000;
+			int iAchSecondSpecificDdFrom = parse.stringToInteger(titaVo.getParam("AchSecondSpecificDdFrom")) + 19110000;
+			int iAchSecondSpecificDdTo = parse.stringToInteger(titaVo.getParam("AchSecondSpecificDdTo")) + 19110000;
+			int iDeductDate = parse.stringToInteger(titaVo.getParam("DeductDate")) + 19110000;
+			int iOpItem = parse.stringToInteger(titaVo.getParam("OpItem"));
+
+//		若特定輸入日為0者代表不與營業日相同，即不需輸入扣帳檔
+//		判斷二扣=是否有會計日
+			int today1 = 0;
+			int today2 = 0;
 
 //		特殊日扣款
-		today1 = parse.stringToInteger(titaVo.getParam("PostSpecificDd")) + 19110000;
-		today2 = parse.stringToInteger(titaVo.getParam("PostSecondSpecificDd")) + 19110000;
+			today1 = parse.stringToInteger(titaVo.getParam("PostSpecificDd")) + 19110000;
+			today2 = parse.stringToInteger(titaVo.getParam("PostSecondSpecificDd")) + 19110000;
 
-		this.info("iAchSpecificDdFrom : " + iAchSpecificDdFrom);
-		this.info("iAchSpecificDdTo : " + iAchSpecificDdTo);
-		this.info("iAchSecondSpecificDdFrom : " + iAchSecondSpecificDdFrom);
-		this.info("iAchSecondSpecificDdTo : " + iAchSecondSpecificDdTo);
-		this.info("today1 : " + today1);
-		this.info("today2 : " + today2);
-		this.info("iDeductDate : " + iDeductDate);
+			this.info("iAchSpecificDdFrom : " + iAchSpecificDdFrom);
+			this.info("iAchSpecificDdTo : " + iAchSpecificDdTo);
+			this.info("iAchSecondSpecificDdFrom : " + iAchSecondSpecificDdFrom);
+			this.info("iAchSecondSpecificDdTo : " + iAchSecondSpecificDdTo);
+			this.info("today1 : " + today1);
+			this.info("today2 : " + today2);
+			this.info("iDeductDate : " + iDeductDate);
 
-		String ddp1 = ("" + today1).substring(6);
-		String ddp2 = ("" + today2).substring(6);
-		List<String> dda1 = findAchDD(iAchSpecificDdFrom, iAchSpecificDdTo);
-		List<String> dda2 = findAchDD(iAchSecondSpecificDdFrom, iAchSecondSpecificDdTo);
+			String ddp1 = ("" + today1).substring(6);
+			String ddp2 = ("" + today2).substring(6);
+			List<String> dda1 = findAchDD(iAchSpecificDdFrom, iAchSpecificDdTo);
+			List<String> dda2 = findAchDD(iAchSecondSpecificDdFrom, iAchSecondSpecificDdTo);
 
-		this.info("ddp1 : " + ddp1);
-		this.info("ddp2 : " + ddp2);
-		this.info("dda1 : " + dda1);
-		this.info("dda2 : " + dda2);
+			this.info("ddp1 : " + ddp1);
+			this.info("ddp2 : " + ddp2);
+			this.info("dda1 : " + dda1);
+			this.info("dda2 : " + dda2);
 
 //		清除扣帳日(EntryDate) 之資料
-		deleBankDeductDtl(iOpItem, titaVo);
-
-		if (checkFlag) {
-			try {
-				fnAllList = l4450ServiceImpl.findAll(titaVo);
-			} catch (Exception e) {
-				checkMsg = e.getMessage();
-				checkFlag = false;
+			deleBankDeductDtl(iOpItem, titaVo);
+			if (checkFlag) {
+				try {
+					fnAllList = l4450ServiceImpl.findAll(titaVo);
+				} catch (Exception e) {
+					checkMsg = e.getMessage();
+					checkFlag = false;
+				}
 			}
-		}
 
-		if (checkFlag) {
-			this.info("fnAllList.size() = " + fnAllList.size());
-			if (fnAllList.size() > 0) {
-				int i = 0;
-				for (int j = 1; j <= fnAllList.size(); j++) {
-					i = j - 1;
+			if (checkFlag) {
+				this.info("fnAllList.size() = " + fnAllList.size());
+				if (fnAllList.size() > 0) {
+					int i = 0;
+					for (int j = 1; j <= fnAllList.size(); j++) {
+						i = j - 1;
 
-					setFacmValue(fnAllList, i);
+						setFacmValue(fnAllList, i);
 
-//					累計金額、最近之日期
-					doBatxCom(parse.stringToInteger(fnAllList.get(i).get("F0")),
-							parse.stringToInteger(fnAllList.get(i).get("F1")), titaVo);
+						// 還款試算
+						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("F0")),
+								parse.stringToInteger(fnAllList.get(i).get("F1")), 1, titaVo); // 期款
 
-					if (i % commitCnt == 0) {
-						this.batchTransaction.commit();
+						if (i % commitCnt == 0) {
+							this.batchTransaction.commit();
+						}
+					}
+				} else {
+					checkMsg = "撥款檔查無資料";
+					checkFlag = false;
+				}
+				this.batchTransaction.commit();
+
+				if (checkFlag) {
+					setBankDeductDtl(shuAmtMap, titaVo);
+					if (cnt == 0) {
+						checkMsg = "E0001 查無資料";
+						checkFlag = false;
 					}
 				}
-			} else {
-				checkMsg = "撥款檔查無資料";
-				checkFlag = false;
+				this.batchTransaction.commit();
+				if (checkFlag) {
+					try {
+						l4450Report.exec(titaVo);
+					} catch (LogicException e) {
+						checkMsg = e.getMessage();
+						checkFlag = false;
+					}
+				}
+
+				if (checkFlag) {
+					checkMsg = "銀行扣款合計報表已完成，總筆數=" + cnt;
+				}
+
+				if (checkFlag) {
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+							titaVo.getTlrNo(), checkMsg, titaVo);
+				} else {
+					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450",
+							titaVo.getTlrNo(), checkMsg, titaVo);
+				}
 			}
 		}
-
-		if (checkFlag) {
+		// 單筆
+		if ("L4451".equals(titaVo.getTxcd())) {
+			// 還款試算
+			int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+			int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+			int repayType = parse.stringToInteger(titaVo.getParam("RepayType"));
+			doBatxCom(iEntryDate, custNo, facmNo, repayType, titaVo);
 			setBankDeductDtl(shuAmtMap, titaVo);
-		}
-
-		if (checkFlag) {
-			try {
-				l4450Report.exec(titaVo);
-			} catch (LogicException e) {
-				checkMsg = e.getMessage();
-				checkFlag = false;
+			if (cnt == 0) {
+				checkMsg = "無扣款資料";
+			} else {
+				checkMsg = "銀行扣款檔新增完成，筆數=" + cnt;
 			}
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", checkMsg, titaVo);
 		}
 
-		if (checkFlag) {
-			checkMsg = "銀行扣款合計報表已完成";
-		}
+		return null;
 
-		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-					checkMsg, titaVo);
-		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450", titaVo.getTlrNo(),
-					checkMsg, titaVo);
-		}
-
-		this.addList(this.totaVo);
-		return this.sendList();
 	}
 
 //	用既有之List for each 找出RepayCode 1.期款  4.帳管 5.火險 6.契變手續費 
-	private void doBatxCom(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
+	private void doBatxCom(int entryDate, int custNo, int facmNo, int repayType, TitaVo titaVo) throws LogicException {
 
 		tmpBorm tmp2 = new tmpBorm(custNo, facmNo, 0, 0, 0);
 
@@ -269,7 +287,7 @@ public class L4450Batch extends TradeBuffer {
 		}
 
 		try {
-			listBaTxVo = baTxCom.settingUnPaid(iEntryDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
+			listBaTxVo = baTxCom.settingUnPaid(entryDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
 		} catch (Exception e) {
 			this.info("Error : " + e.getMessage());
 		}
@@ -495,10 +513,8 @@ public class L4450Batch extends TradeBuffer {
 
 		List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
 
-		int i = 0;
-
 		for (tmpBorm tmp : tempList) {
-			i++;
+			cnt++;
 
 			tmpBorm tmp2 = new tmpBorm(tmp.getCustNo(), tmp.getFacmNo(), 0, 0, 0);
 
@@ -580,16 +596,8 @@ public class L4450Batch extends TradeBuffer {
 			tBankDeductDtl.setJsonFields(tTempVo.getJsonString());
 
 			lBankDeductDtl.add(tBankDeductDtl);
-
-			if (i % commitCnt == 0) {
-				this.batchTransaction.commit();
-			}
 		}
-		if (i == 0) {
-			checkMsg = "E0001 查無資料";
-			checkFlag = false;
-			return;
-		} else {
+		if (cnt > 0) {
 			try {
 				bankDeductDtlService.insertAll(lBankDeductDtl, titaVo);
 			} catch (DBException e) {

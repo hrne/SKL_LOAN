@@ -196,32 +196,20 @@ public class LM056Report extends MakeReport {
 
 			} else if (lM056Vo.get("F0").equals("TOTAL")) {
 				row = 37;
-				col = 8;
+				col = 8;			
 
-				tempTotal = lM056Vo.get("F1").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F1"));
-
-			} else if (lM056Vo.get("F0").equals("TOTAL")) {
-				row = 44;
-				col = 4;
-
-				tempAmt = tempAmt.divide(tempTotal).setScale(4);
-
-			}
-
-			if (lM056Vo.get("F0").equals("NTOTAL")) {
-				
-				makeExcel.setValue(row, col, tempAmt, "R");
 			}
 
 			makeExcel.setValue(row, col, tempAmt, "#,##0", "R");
 
 		}
 		// 重整
-		// D42 甲類逾期放款比率%
+		// D42 甲類逾期放款比率%(含壽險保單質押放款)
 		makeExcel.formulaCaculate(42, 4);
-		// D43 乙類逾期放款比率%
+		// D43 乙類逾期放款比率%(含壽險保單質押放款)
 		makeExcel.formulaCaculate(43, 4);
-
+		// D44 逾期放款比率%(含壽險保單質押放款)
+		makeExcel.formulaCaculate(44, 4);
 	}
 
 }

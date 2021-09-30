@@ -92,6 +92,9 @@ ASGN(CAUTO$)
 #SECNO=_,_,S
 T(3,03)
 
+#TXCDCHAIN=X,5,S
+T(2,L5702)
+
 #PreHide=X,1,S
 CALL(#ShowDataNew)
 
@@ -788,6 +791,7 @@ E(0,0)
 #TransAccuOverAmt
 #NewTransAccuOverAmt
 #TrialFunc
+#TXCDCHAIN
 </sub>
 
 !------ 下行電文TOM ------

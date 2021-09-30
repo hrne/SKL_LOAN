@@ -1290,7 +1290,7 @@ public class L5706 extends TradeBuffer {
 
 		InserttNegMain.setNextPayDate(FirstDueDate);// 下次應繳日
 		InserttNegMain.setRepaidPeriod(0);// 已繳期數
-		InserttNegMain.setPayIntDate(negCom.getRepayDate(InserttNegMain.getFirstDueDate(), -1, titaVo));// 繳息迄日=首次應繳日前一個月
+		InserttNegMain.setPayIntDate(chgCondDate);// 繳息迄日=申請變更還款條件日
 		InserttNegMain.setPrincipalBal(new BigDecimal(CHANGE_TOTAL_AMT));// 總本金餘額
 		InserttNegMain.setDeferYMStart(0);// 延期繳款年月(起)
 		InserttNegMain.setDeferYMEnd(0);// 延期繳款年月(訖)

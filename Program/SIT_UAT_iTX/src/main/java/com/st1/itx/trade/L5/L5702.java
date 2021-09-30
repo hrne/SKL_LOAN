@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.Exception.DBException;
 /* 錯誤處理 */
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
@@ -86,35 +87,93 @@ public class L5702 extends TradeBuffer {
 		String TransTitaTxtNo = "";
 
 		String TransTxKind = "";
+		String btnIndex = "";
+		String TrialFunc = "";
+		String TXCDCHAIN = titaVo.getParam("TXCDCHAIN");
+		
+		
+		
+		
+		if (titaVo.isHcodeNormal()) { // 正常交易
+			
+			if("L597A".equals(TXCDCHAIN)) {
+				
+				btnIndex = titaVo.getParam("btnIndex");
+				TrialFunc = titaVo.getParam("TrialFunc").trim();
+				TransAcDate = titaVo.getParam("OOAcctDate").trim();
+				TransTitaTlrNo = titaVo.getParam("OOTitaTlrNo").trim();
+				TransTitaTxtNo = titaVo.getParam("OOTitaTxtNo").trim();
+				TransTxKind = titaVo.getParam("OONewtransTxKind").trim();
+				
+			} else {
+			
+			  TrialFunc = titaVo.getParam("TrialFunc").trim();
+			  TransAcDate = titaVo.getParam("TransAcDate").trim();
+			  TransTitaTlrNo = titaVo.getParam("TransTitaTlrNo").trim();
+			  TransTitaTxtNo = titaVo.getParam("TransTitaTxtNo").trim();
+			  TransTxKind = titaVo.getParam("NewTransTxKind").trim();
 
-		String TrialFunc = titaVo.getParam("TrialFunc").trim();
-		TransAcDate = titaVo.getParam("TransAcDate").trim();
-		TransTitaTlrNo = titaVo.getParam("TransTitaTlrNo").trim();
-		TransTitaTxtNo = titaVo.getParam("TransTitaTxtNo").trim();
-		TransTxKind = titaVo.getParam("NewTransTxKind").trim();
+			}
+			
+			NegTransId tNegTransId = new NegTransId();
+			int AcDate = parse.stringToInteger(TransAcDate);
+			tNegTransId.setAcDate(AcDate);
+			tNegTransId.setTitaTlrNo(TransTitaTlrNo);
+			tNegTransId.setTitaTxtNo(parse.stringToInteger(TransTitaTxtNo));
+			tNegTrans = sNegTransService.findById(tNegTransId);
+			if (tNegTrans == null) {
+				throw new LogicException(titaVo, "E0001", "債務協商交易檔");
+			}
+			
+			
+			if("".equals(btnIndex) || "1".equals(btnIndex)) {
+			  sNegCom.trialNegtrans(tNegTrans, "2", TransTxKind, titaVo );
+			   // 會計帳
+			  if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
+			    UpdAcDB(tNegTransId, titaVo);
+			  }
+			} else {
+			  if (tNegTrans.getTxStatus() == 0) {
+				tNegTrans.setTxStatus(1); // 交易狀態0:未入帳;1:待處理;2:已入帳
 
-		NegTransId tNegTransId = new NegTransId();
-		int AcDate = parse.stringToInteger(TransAcDate);
-		tNegTransId.setAcDate(AcDate);
-		tNegTransId.setTitaTlrNo(TransTitaTlrNo);
-		tNegTransId.setTitaTxtNo(parse.stringToInteger(TransTitaTxtNo));
-		tNegTrans = sNegTransService.findById(tNegTransId);
-		if (tNegTrans == null) {
-			throw new LogicException(titaVo, "E0001", "債務協商交易檔");
-		}
+			  } else if (tNegTrans.getTxStatus() == 1) {
+				tNegTrans.setTxStatus(0); // 交易狀態0:未入帳;1:待處理;2:已入帳
 
-		// 入帳
-		// 正常
-		if (titaVo.isHcodeNormal()) {
-			sNegCom.trialNegtrans(tNegTrans, TrialFunc, TransTxKind, titaVo );
-		}
-		// 訂正
-		else {
-			sNegCom.NegRepayEraseRoutine(titaVo);
-		}
-		// 會計帳
-		if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
-			UpdAcDB(tNegTransId, titaVo);
+			  } else {
+				throw new LogicException(titaVo, "E0010", "已入帳，如需變更交易狀態請做訂正");
+			  }
+			  try {
+				sNegTransService.update(tNegTrans, titaVo);//
+			  } catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());// E0007 更新資料時，發生錯誤
+			  }
+			}
+		} else { // 訂正
+			
+			 TrialFunc = titaVo.getParam("TrialFunc").trim();
+			 TransAcDate = titaVo.getParam("TransAcDate").trim();
+			 TransTitaTlrNo = titaVo.getParam("TransTitaTlrNo").trim();
+			 TransTitaTxtNo = titaVo.getParam("TransTitaTxtNo").trim();
+			 TransTxKind = titaVo.getParam("NewTransTxKind").trim();
+			 
+			 NegTransId tNegTransId = new NegTransId();
+			 int AcDate = parse.stringToInteger(TransAcDate);
+			 tNegTransId.setAcDate(AcDate);
+			 tNegTransId.setTitaTlrNo(TransTitaTlrNo);
+			 tNegTransId.setTitaTxtNo(parse.stringToInteger(TransTitaTxtNo));
+			 tNegTrans = sNegTransService.findById(tNegTransId);
+			 if (tNegTrans == null) {
+				throw new LogicException(titaVo, "E0001", "債務協商交易檔");
+			 }
+
+			 this.info("TrialFunc = " + TrialFunc + "TransTxKind = " + TransTxKind );
+			 
+			 sNegCom.NegRepayEraseRoutine(titaVo);
+			 
+			 // 會計帳
+			 if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
+				UpdAcDB(tNegTransId, titaVo);
+			 }
 		}
 
 		this.addList(this.totaVo);
@@ -130,14 +189,15 @@ public class L5702 extends TradeBuffer {
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
 			this.info("NegTransAcYes");
 			NegTrans tNegTrans = sNegTransService.findById(tNegTransId);
-
+			
+			
 			List<AcDetail> acDetailList = new ArrayList<AcDetail>();
 			/* 借：債協暫收款科目 */
 			AcDetail acDetail = new AcDetail();
 			acDetail.setDbCr("D");
 			acDetail.setAcctCode(acNegCom.getAcctCode(tNegTrans.getCustNo(), titaVo));
 			acDetail.setTxAmt(tNegTrans.getSklShareAmt().add(tNegTrans.getReturnAmt())); // 新壽攤分金額 + 退還金額
-			acDetail.setCustNo(tNegTrans.getCustNo());// 戶號
+			acDetail.setCustNo(tNegTrans.getCustNo());// 客戶戶號
 			acDetailList.add(acDetail);
 			/* 貸：債協退還款科目 */
 			acDetail = new AcDetail();

@@ -979,6 +979,8 @@ public class TxBatchCom extends TradeBuffer {
 			for (BankDeductDtl tBankDeductDtl : lBankDeductDtl) {
 				tBankDeductDtl = bankDeductDtlService.holdById(tBankDeductDtl, titaVo);
 				tBankDeductDtl.setAcDate(acDate);
+				tBankDeductDtl.setTitaTlrNo(titaVo.getTlrNo());
+				tBankDeductDtl.setTitaTxtNo(titaVo.getTxtNo());
 				try {
 					bankDeductDtlService.update(tBankDeductDtl, titaVo);
 				} catch (DBException e) {
@@ -995,20 +997,19 @@ public class TxBatchCom extends TradeBuffer {
 	private void updEmpDeductDtl(int acDate, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
 
 //		BatxDetail's MediaDate MediaCode MediaSeq to find 15/un15 
-		Slice<EmpDeductDtl> sEmpDeductDtl = null;
 		List<EmpDeductDtl> lEmpDeductDtl = new ArrayList<EmpDeductDtl>();
-
-		sEmpDeductDtl = empDeductDtlService.mediaSeqEq(tBatxDetail.getMediaDate() + 19110000,
+		Slice<EmpDeductDtl>sEmpDeductDtl = empDeductDtlService.mediaSeqEq(tBatxDetail.getMediaDate() + 19110000,
 				tBatxDetail.getMediaKind(), tBatxDetail.getMediaSeq(), this.index, Integer.MAX_VALUE, titaVo);
-
+        BigDecimal txAmt = parse.stringToBigDecimal(titaVo.getTxAmt());
 		lEmpDeductDtl = sEmpDeductDtl == null ? null : sEmpDeductDtl.getContent();
-
 		if (lEmpDeductDtl != null && lEmpDeductDtl.size() != 0) {
 			for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
 				tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtl, titaVo);
 				tEmpDeductDtl.setAcdate(acDate);
 				tEmpDeductDtl.setTitaTlrNo(titaVo.getTlrNo());
 				tEmpDeductDtl.setTitaTxtNo(titaVo.getTxtNo());
+				tEmpDeductDtl.setTxAmt(txAmt);  // 實扣金額放第一筆
+				txAmt =  BigDecimal.ZERO;
 				try {
 					empDeductDtlService.update(tEmpDeductDtl, titaVo);
 				} catch (DBException e) {

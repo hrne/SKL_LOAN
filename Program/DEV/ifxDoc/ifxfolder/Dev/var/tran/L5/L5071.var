@@ -278,7 +278,7 @@ T(2,#OOCustId+#OOCustNo+#OOCaseSeq)
 T(2,05+#BufKey)
 
 #OOBtnSearch=X,1,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L5701; ntxbuf=#OOBufSearch})
+BIND(grid,{ cmd=CHAIN; ntxcd=L5976; ntxbuf=#OOBufSearch})
 
 ! 02:維護
 #OOBufMaintain=X,22,S
@@ -299,6 +299,15 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L5701; ntxbuf=#OOBufDelete})
 T(2,05+#BufKey)
 #OOBtnDeatail=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L5971; ntxbuf=#BufDetail})
+
+!撥付統計
+#CountDetail=X,13,S
+T(2,#OOCustId+#OOCaseSeq)
+
+#OOCountDetail=X,1,S
+IF(#OOIsMainFin=="N",BIND(grid,cancel)
+										,BIND(grid,{ cmd=CHAIN; ntxcd=L5977; ntxbuf=#CountDetail}))
+
 
 </sub>
 
@@ -355,6 +364,8 @@ TXFORM=L5071
 {search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:35}
 #OOBtnDeatail=
 {search:false,formatter:'cust:bind-button:交易明細',align:'center',canExport:false,width:65}
+#OOCountDetail=
+{search:false,formatter:'cust:bind-button:撥付統計',align:'center',canExport:false,width:65}
 
 #OOCustId=身分證字號
 {width:120,align:'center'}

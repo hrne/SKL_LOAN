@@ -57,12 +57,10 @@ public class L4510Report2 extends MakeReport {
 	}
 
 	public void printHeaderP() {
-		this.print(-1, 1, "程式ID：" + "L4510Report2");
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
 		this.print(-1, 130, "製表日期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
-		this.print(-2, 1, "報　表：" + "L4510Report2");
 		this.print(-2, 70, "帳管費扣薪明細表", "C");
 		this.print(-2, 130, "製表時間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");

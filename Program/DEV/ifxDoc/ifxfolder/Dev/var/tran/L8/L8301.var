@@ -147,6 +147,7 @@ T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
 T(1,@Ukey,#NTXBUF,3,32)
 T(2,@FdApplyType,*)
 T(2,@FdRefBankId,*)
+T(2,@FdTranKey,*)
 T(3,@TranKeyHelp,C:異動;R:請求提供債權人清冊))
 
 

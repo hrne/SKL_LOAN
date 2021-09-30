@@ -182,7 +182,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "           + M.\"ShortfallPrin\" ";
 			sql += "           + M.\"ShortfallInt\" ";
 			sql += "   END AS \"OvduBal\" "; // 非990(逾期)時, 用額度月報的欄位算
-			sql += "  ,GREATEST(MDate.\"PrevIntDate\" - 19110000, 0) AS \"rocPrevIntDate\" ";
+			sql += "  ,DECODE(M.\"PrevIntDate\", 0, GREATEST(MDate.\"PrevIntDate\" - 19110000, 0), M.\"PrevIntDate\" - 19110000) AS \"rocPrevIntDate\" ";
 			sql += "  ,CASE WHEN M.\"AcctCode\" = '990' ";
 			sql += "        THEN NVL(TO_CHAR(TX.\"OvTxAmt\"), ' ') ";
 			sql += "   ELSE NVL(TO_CHAR(TX.\"LnTxAmt\"), ' ') END  AS \"TxAmt\" ";

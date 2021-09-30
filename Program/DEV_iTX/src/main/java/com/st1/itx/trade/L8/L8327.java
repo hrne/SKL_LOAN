@@ -16,11 +16,13 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.domain.JcicZ446Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ447;
 import com.st1.itx.db.domain.JcicZ447Id;
 import com.st1.itx.db.domain.JcicZ447Log;
+import com.st1.itx.db.service.JcicZ446Service;
 import com.st1.itx.db.service.JcicZ447LogService;
 
 /*DB服務*/
@@ -54,6 +56,8 @@ import com.st1.itx.util.data.DataLog;
 public class L8327 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ446Service sJcicZ446Service;
+	@Autowired
 	public JcicZ447Service sJcicZ447Service;
 	@Autowired
 	public JcicZ447LogService sJcicZ447LogService;
@@ -81,7 +85,9 @@ public class L8327 extends TradeBuffer {
 		int iMonthPayAmt = Integer.valueOf(titaVo.getParam("MonthPayAmt"));
 		String iPayAccount = titaVo.getParam("PayAccount");
 		String iKey = "";
-		//JcicZ447
+		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD
+		
+		//JcicZ447, JcicZ446
 		JcicZ447 iJcicZ447 = new JcicZ447();
 		JcicZ447Id iJcicZ447Id = new JcicZ447Id();
 		iJcicZ447Id.setSubmitKey(iSubmitKey);
@@ -89,6 +95,39 @@ public class L8327 extends TradeBuffer {
 		iJcicZ447Id.setApplyDate(iApplyDate);
 		iJcicZ447Id.setCourtCode(iCourtCode);
 		JcicZ447 chJcicZ447 = new JcicZ447();
+		JcicZ446 iJcicZ446 = new JcicZ446();
+		JcicZ446Id iJcicZ446Id = new JcicZ446Id();
+		iJcicZ446Id.setApplyDate(iApplyDate);
+		iJcicZ446Id.setCourtCode(iCourtCode);
+		iJcicZ446Id.setCustId(iCustId);
+		iJcicZ446Id.setSubmitKey(iSubmitKey);
+		
+		// 檢核項目(D-55)
+
+			// 2 檢核第8欄「依民法第323條計算之債務總金額」需等於各金融機構回報之「'442':回報無擔保債權金融資料」檔案第[12+13+14+15]欄金額總和。(交易代碼X者不檢核).***
+		
+			// 3 檢核第9欄「簽約總債權金額」需等於「'448':前置調解無擔保債務還款分配資料」檔案各金融機構第9+10欄金額總和.***
+		
+			// 4 第10欄「簽約完成日期」不得大於「資料報送日」，否則予以剔退.
+		if ("A".equals(iTranKey)) {
+			if(iSignDate> txDate) {
+				throw new LogicException("E0005", "「簽約完成日期」不得大於資料報送日.");
+			}
+		}// 4 end
+		
+			// 5 第11欄「首期應繳款日」不得小於第10欄「簽約完成日」，否則予以剔退.
+		if(iFirstPayDate < iSignDate) {
+			throw new LogicException("E0005", "「首期應繳款日」不得小於「簽約完成日」.");
+		}// 5 end
+		
+			// 6 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.
+		iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
+		if(iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+			throw new LogicException(titaVo, "E0005", "同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+		}// 6 end
+		
+		// 檢核條件 end
+		
 
 		switch(iTranKey_Tmp) {
 		case "1":

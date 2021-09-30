@@ -309,7 +309,7 @@ TXFORM=L6064
 !#OOBTN4=刪除
 !{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
-#OODefCode=代碼檔代碼
+#OODefCode=代碼檔代號
 {width:150,align:'left'}
 
 #OODefItem=代碼檔說明

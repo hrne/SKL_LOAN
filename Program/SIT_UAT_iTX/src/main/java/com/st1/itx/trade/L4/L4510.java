@@ -640,7 +640,6 @@ public class L4510 extends TradeBuffer {
 			tEmpDeductDtl.setBormNo(tEmpDeductDtlId.getBormNo());
 
 			tEmpDeductDtl.setEmpNo(tCdEmp.getEmployeeNo());
-			tEmpDeductDtl.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tEmpDeductDtl.setCustId(tCustMain.getCustId());
 
 			this.info("tmp.getAchRepayCode() : " + tmp.getAchRepayCode());
@@ -665,12 +664,13 @@ public class L4510 extends TradeBuffer {
 				txAmt = rpAmt05Map.get(tmp);
 			}
 
-			tEmpDeductDtl.setTxAmt(txAmt);
+			tEmpDeductDtl.setTxAmt(BigDecimal.ZERO);
 			tEmpDeductDtl.setRepayAmt(txAmt);
 
 			tEmpDeductDtl.setErrMsg(errMsg.get(tmp));
 			tEmpDeductDtl.setAcdate(0);
-			tEmpDeductDtl.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
+			tEmpDeductDtl.setTitaTxtNo("");
+			tEmpDeductDtl.setTitaTlrNo("");
 			tEmpDeductDtl.setBatchNo("");
 			tEmpDeductDtl.setResignCode(tCdEmp.getAgStatusCode());
 			tEmpDeductDtl.setDeptCode(tCdEmp.getCenterCodeAcc2());

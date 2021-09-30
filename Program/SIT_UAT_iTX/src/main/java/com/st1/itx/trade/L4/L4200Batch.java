@@ -972,9 +972,9 @@ public class L4200Batch extends TradeBuffer {
 					achSuccCnt = achSuccCnt + 1;
 					achSuccAmt = achSuccAmt.add(reRepayAmt);
 				} else if ("E".equals(procCode.substring(0, 1))) {
-					tBatxDetail.setProcStsCode("2");
+					tBatxDetail.setProcStsCode("1");
 //					資料錯誤  --人工處理
-					procStsCode = "2";
+					procStsCode = "1";
 					achFailCnt = achFailCnt + 1;
 				} else {
 					tBatxDetail.setProcStsCode("1");
@@ -994,7 +994,7 @@ public class L4200Batch extends TradeBuffer {
 				} else {
 //					回傳碼中文 code+cdCode.item
 					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
-//					回傳碼不為0者更新媒體碼為E
+//					回傳碼
 					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
 							tAchDeductMedia.getMediaSeq(), returnCode, titaVo);
 				}
@@ -1144,8 +1144,8 @@ public class L4200Batch extends TradeBuffer {
 				}
 				// 資料有錯
 				else if ("E".equals(procCode.substring(0, 1))) {
-					tBatxDetail.setProcStsCode("2"); // 人工處理
-					procStsCode = "2";
+					tBatxDetail.setProcStsCode("1"); // 人工處理
+					procStsCode = "1";
 					postFailCnt = postFailCnt + 1;
 				}
 				// 扣款失敗
@@ -1166,7 +1166,7 @@ public class L4200Batch extends TradeBuffer {
 				} else {
 //					回傳碼中文 code+cdCode.item
 					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
-//					回傳碼不為0者更新媒體碼為E
+//					回傳碼
 					updateBankDeductDtl(tPostDeductMedia.getMediaDate(), "3", tPostDeductMedia.getMediaSeq(),
 							returnCode, titaVo);
 				}
@@ -1301,7 +1301,7 @@ public class L4200Batch extends TradeBuffer {
 				}
 				// 資料有錯
 				else if ("E".equals(procCode.substring(0, 1))) {
-					procStsCode = "2"; // 人工處理
+					procStsCode = "1"; // 人工處理
 				}
 				// 實扣金額=0、扣款失敗
 				else {

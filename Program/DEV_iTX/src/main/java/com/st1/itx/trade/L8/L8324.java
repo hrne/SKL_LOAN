@@ -21,11 +21,13 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ443;
 import com.st1.itx.db.domain.JcicZ443Id;
 import com.st1.itx.db.domain.JcicZ443Log;
+import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.domain.JcicZ446Id;
 import com.st1.itx.db.service.JcicZ443LogService;
 
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ443Service;
-
+import com.st1.itx.db.service.JcicZ446Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -57,6 +59,8 @@ public class L8324 extends TradeBuffer {
 	public JcicZ443Service sJcicZ443Service;
 	@Autowired
 	public JcicZ443LogService sJcicZ443LogService;
+	@Autowired
+	public JcicZ446Service sJcicZ446Service;
 	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
@@ -90,7 +94,9 @@ public class L8324 extends TradeBuffer {
 		int iBeginDate = Integer.valueOf(titaVo.getParam("BeginDate"));
 		int iEndDate = Integer.valueOf(titaVo.getParam("EndDate"));
 		String iKey = "";
-		//JcicZ443
+		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD
+		
+		//JcicZ443, JcicZ446
 		JcicZ443 iJcicZ443 = new JcicZ443();
 		JcicZ443Id iJcicZ443Id = new JcicZ443Id();
 		iJcicZ443Id.setSubmitKey(iSubmitKey);
@@ -100,6 +106,50 @@ public class L8324 extends TradeBuffer {
 		iJcicZ443Id.setMaxMainCode(iMaxMainCode);
 		iJcicZ443Id.setAccount(iAccount);
 		JcicZ443 chJcicZ443 = new JcicZ443();
+		JcicZ446 iJcicZ446 = new JcicZ446();
+		JcicZ446Id iJcicZ446Id = new JcicZ446Id();
+		iJcicZ446Id.setApplyDate(iApplyDate);
+		iJcicZ446Id.setCourtCode(iCourtCode);
+		iJcicZ446Id.setCustId(iCustId);
+		iJcicZ446Id.setSubmitKey(iSubmitKey);
+		
+		// 檢核項目(D-49)
+
+		// 2 「IDN+最大債權金融機構+調解申請日+受理調解機構代號」若未曾報送過「'440':前置調解受理申請暨請求回報債權通知資料」，予以剔退處理.***
+		
+		// 3 第3欄「債權金融機構代號」若非屬Z41「受理申請暨請求回報債權」之應回報金融機構代號，予以剔退處理.***
+		
+		// 4 start 檢核第14~17欄「本金、利息、違約金、其他費用」之金額合計需等於第13欄「授信餘額」.
+		if((iPrincipal.add(iInterest).add(iPenalty).add(iOther)).compareTo(iCreditAmt) != 0) {
+			throw new LogicException("E0005", "「本金」、「利息」、「違約金」、「其他費用」之金額合計需等於「授信餘額」.");
+		}// 4 end
+		
+		// 5 start 第20欄「最後繳息日」不可大於資料報送日.
+		if ("A".equals(iTranKey)) {
+			if(iFinalPayDay > txDate) {
+				throw new LogicException("E0005", "「最後繳息日」不可大於資料報送日.");
+			}
+		}// 5 end
+		
+		// 6 第23欄「契約起始年月」不可大於第24欄「契約截止年月」.
+		if(iBeginDate > iEndDate) {
+			throw new LogicException("E0005", "「契約起始年月」不可大於「契約截止年月」.");
+		}// 6 end
+		
+		// 7 除最大債權金融機構報送自行債權資料外，「'440':前置調解愛理申請暨請求回報債權通知資料」第12欄「協辦行是否需自行回報債權」填報為Y時，第9欄「是否為最大債權金融機構報送」需填報為N，反之亦然.***
+		
+		// 8 最大債權金融機構報送自行債權資料時，第9欄「是否為最大債權金融機構報送」需填報Y.***
+		
+		// 9 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動本檔案資料.
+		if ("A".equals(iTranKey) ||  "C".equals(iTranKey)) {
+			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
+			if(iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+				throw new LogicException(titaVo, "E0005", "同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動本檔案資料.");
+			}
+		}// 9 end
+		
+		// 檢核條件 end		
+		
 
 		switch(iTranKey_Tmp) {
 		case "1":

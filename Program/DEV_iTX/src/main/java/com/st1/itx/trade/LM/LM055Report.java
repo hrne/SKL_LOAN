@@ -119,7 +119,7 @@ public class LM055Report extends MakeReport {
 					col = 19;
 				} else if (!lM055Vo.get("F0").equals("99")) {
 					col = 5 + Integer.valueOf(lM055Vo.get("F0"));
-					colAllow = 12 + Integer.valueOf(lM055Vo.get("F0"));
+					colAllow = 10 + Integer.valueOf(lM055Vo.get("F0"));
 				}
 
 				// 依放款種類 區分列數
@@ -146,7 +146,7 @@ public class LM055Report extends MakeReport {
 					specificAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO
 							: new BigDecimal(lM055Vo.get("F3"));
 
-					allowAmount = allowAmount.add(normalAmount);
+					allowAmount = specificAmount.add(normalAmount);
 
 					makeExcel.setValue(row, 13, allowAmount, "#,##0");
 

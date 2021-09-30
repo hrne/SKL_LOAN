@@ -5,18 +5,12 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.domain.EmpDeductSchedule;
 import com.st1.itx.db.domain.TxToDoDetail;
-import com.st1.itx.db.service.CdCodeService;
-import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.EmpDeductScheduleService;
 import com.st1.itx.db.service.springjpa.cm.BS004ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.TxToDoCom;
@@ -59,15 +53,6 @@ public class BS004 extends TradeBuffer {
 	public BS004ServiceImpl bS004ServiceImpl;
 
 	@Autowired
-	public CustMainService custMainService;
-
-	@Autowired
-	public EmpDeductScheduleService empDeductScheduleService;
-
-	@Autowired
-	public CdCodeService cdCodeService;
-
-	@Autowired
 	public TxToDoCom txToDoCom;
 
 	@Override
@@ -90,14 +75,6 @@ public class BS004 extends TradeBuffer {
 
 		// 新增應處理明細－EMCU00 員工客戶別調整
 		empCustTyp(titaVo);
-
-		this.batchTransaction.commit();
-
-		// 新增應處理明細－L4510 員工扣薪媒體製作
-		empMediaNotice(titaVo);
-
-		// 新增應處理明細－EMEP00 員工扣薪入帳作業
-		empEntryNotice(titaVo);
 
 		this.batchTransaction.commit();
 
@@ -159,53 +136,4 @@ public class BS004 extends TradeBuffer {
 		}
 	}
 
-//	新增應處理明細－L4510 員工扣薪媒體製作
-	private void empMediaNotice(TitaVo titaVo) throws LogicException {
-//		 員工扣薪日程表的媒體日期 = 本日
-		int today = this.getTxBuffer().getMgBizDate().getTbsDyf();
-
-		Slice<EmpDeductSchedule> slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(today, today, index,
-				limit, titaVo);
-
-		if (slEmpDeductSchedule != null) {
-			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
-				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
-						titaVo);
-				if (tCdCode != null) {
-					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-					tTxToDoDetail.setItemCode("L4510");
-					tTxToDoDetail.setCustNo(0);
-					tTxToDoDetail.setFacmNo(0);
-					tTxToDoDetail.setBormNo(0);
-					tTxToDoDetail.setDtlValue(tCdCode.getItem()); // 1.15日薪 2.非15日薪
-					txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
-				}
-			}
-		}
-	}
-
-//	新增應處理明細－EMEP00 員工扣薪入帳作業
-	private void empEntryNotice(TitaVo titaVo) throws LogicException {
-//		 員工扣薪日程表的入帳日期= 本日
-		int today = this.getTxBuffer().getMgBizDate().getTbsDyf();
-
-		Slice<EmpDeductSchedule> slEmpDeductSchedule = empDeductScheduleService.entryDateRange(today, today, index,
-				limit, titaVo);
-
-		if (slEmpDeductSchedule != null) {
-			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
-				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
-						titaVo);
-				if (tCdCode != null) {
-					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-					tTxToDoDetail.setItemCode("EMEP00");
-					tTxToDoDetail.setCustNo(0);
-					tTxToDoDetail.setFacmNo(0);
-					tTxToDoDetail.setBormNo(0);
-					tTxToDoDetail.setDtlValue(tCdCode.getItem()); // 1.15日薪 2.非15日薪
-					txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
-				}
-			}
-		}
-	}
 }

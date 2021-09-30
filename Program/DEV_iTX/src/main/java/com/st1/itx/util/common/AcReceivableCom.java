@@ -634,10 +634,15 @@ public class AcReceivableCom extends TradeBuffer {
 					+ ac.getFacmNo() + "," + ac.getRvNo());
 		else {
 			tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
-			if (AcHCode == 0)
+			if (AcHCode == 0) {
 				tInsuRenew.setAcDate(bizTbsdy); // 1-已銷
-			else
+				tInsuRenew.setTitaTlrNo(titaVo.getTlrNo());
+				tInsuRenew.setTitaTxtNo(titaVo.getTxtNo());
+			} else {
 				tInsuRenew.setAcDate(0); // 0-未銷
+				tInsuRenew.setTitaTlrNo("");
+				tInsuRenew.setTitaTxtNo("");
+			}
 			try {
 				insuRenewService.update(tInsuRenew, titaVo);
 			} catch (DBException e) {
@@ -656,10 +661,11 @@ public class AcReceivableCom extends TradeBuffer {
 		if (tForeclosureFee == null)
 			throw new LogicException(titaVo, "E6003", " AcReceivableCom updForeclosureFee Notfound" + wkRvNo);
 		else {
-			if (tAcReceivable.getClsFlag() == 1)
+			if (tAcReceivable.getClsFlag() == 1) {
 				tForeclosureFee.setCloseDate(bizTbsdy); // 1-已銷
-			else
+			} else {
 				tForeclosureFee.setCloseDate(0); // 0-未銷
+			}
 			try {
 				foreclosureFeeService.update(tForeclosureFee, titaVo);
 			} catch (DBException e) {

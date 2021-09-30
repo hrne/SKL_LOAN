@@ -145,11 +145,15 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 
 		String sql = " ";
-		sql += "SELECT * FROM(";
+		sql += " SELECT \"KIND\"";
+		sql += "       ,SUM(\"AMT\") AS \"AMT\"";
+		sql += " FROM(";
 		sql += "	SELECT ( CASE";
-		sql += "       	       WHEN ( M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6) OR (CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7)) THEN 'C'";
+		sql += "       	       WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C'";
+		sql += "       	       WHEN TRUNC(L.\"MaturityDate\" / 100) = :l4mdy AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'B'";
+		sql += "       	       WHEN CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7) THEN 'C'";
 		sql += "       	     ELSE 'B' END ) AS \"KIND\"";
-		sql += "	      ,SUM(M.\"PrinBalance\") AS \"AMT\"";
+		sql += "	      ,M.\"PrinBalance\" AS \"AMT\"";
 		sql += "	FROM \"MonthlyLoanBal\" ML";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = ML.\"CustNo\"";
 		sql += "						   AND F.\"FacmNo\" = ML.\"FacmNo\"";
@@ -172,10 +176,8 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	 								  AND CL.\"SEQ\" = 1";
 		sql += "	WHERE M.\"YearMonth\" = :yymm";
 		sql += "	  AND M.\"PrinBalance\" > 0";
-		sql += "	  AND M.\"AssetClass\" IS NOT NULL";
-		sql += "	GROUP BY (CASE";
-		sql += "       	        WHEN ( M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6) OR (CL.\"LegalProg\" IN ('056','057','058','060') AND (M.\"OvduTerm\" > 3 OR M.\"PrinBalance\" = 1) AND L.\"Status\" IN (2,6,7)) THEN 'C'";
-		sql += "       	      ELSE 'B' END )";
+		sql += "	  AND M.\"AssetClass\" IS NOT NULL)";
+		sql += "    GROUP BY \"KIND\"";
 		sql += "	UNION";
 		sql += "	SELECT 'TOTAL' AS \"KIND\"";
 		sql += "		  ,SUM(\"AMT\") AS \"AMT\"";
@@ -190,21 +192,6 @@ public class LM056ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	       WHERE \"AcNoCode\" IN (10600304000,10601301000,10601302000,10601304000)";
 		sql += "	         AND \"MonthEndYm\" = :yymm )";
 		sql += "	GROUP BY 'TOTAL'";
-		sql += "	UNION";
-		sql += "	SELECT 'NTOTAL' AS \"KIND\"";
-		sql += "		  ,SUM(\"AMT\") AS \"AMT\"";
-		sql += "	FROM ( SELECT SUM(M.\"PrinBalance\") AS \"AMT\"";
-		sql += "	       FROM \"MonthlyFacBal\" M";
-		sql += "		   WHERE M.\"YearMonth\" = :yymm";
-		sql += "	  		 AND M.\"PrinBalance\" > 0";
-		sql += "	  		 AND M.\"AssetClass\" IS NULL";
-		sql += "	       UNION";
-		sql += "	       SELECT SUM(\"DbAmt\" - \"CrAmt\") AS \"AMT\"";
-		sql += "	       FROM \"AcMain\"";
-		sql += "	       WHERE \"AcNoCode\" IN (10601301000,10601302000,10601304000)";
-		sql += "	         AND \"MonthEndYm\" = :yymm )";
-		sql += "	GROUP BY 'NTOTAL'";
-		sql += ")";
 		this.info("sql=" + sql);
 
 		Query query;

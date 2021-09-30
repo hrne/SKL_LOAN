@@ -2,6 +2,7 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -14,6 +15,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.EmpDeductDtl;
+import com.st1.itx.db.domain.EmpDeductDtlId;
 import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.domain.EmpDeductMediaId;
 import com.st1.itx.db.domain.EmpDeductSchedule;
@@ -22,6 +25,7 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.EmpDeductScheduleService;
 import com.st1.itx.db.service.FacMainService;
@@ -61,6 +65,9 @@ public class L4512 extends TradeBuffer {
 
 	@Autowired
 	public EmpDeductScheduleService empDeductScheduleService;
+
+	@Autowired
+	public EmpDeductDtlService empDeductDtlService;
 
 	@Autowired
 	public CdCodeService cdCodeService;
@@ -126,6 +133,9 @@ public class L4512 extends TradeBuffer {
 			tEmpDeductMediaId.setMediaDate(iMediaDate);
 			tEmpDeductMediaId.setMediaKind(iMediaKind);
 			tEmpDeductMediaId.setMediaSeq(iMediaSeq);
+			tEmpDeductMedia.setMediaDate(iMediaDate);
+			tEmpDeductMedia.setMediaKind(iMediaKind);
+			tEmpDeductMedia.setMediaSeq(iMediaSeq);
 			tEmpDeductMedia.setEmpDeductMediaId(tEmpDeductMediaId);
 			tEmpDeductMedia.setCustNo(iCustNo);
 			tEmpDeductMedia.setRepayCode(iRepayCode);
@@ -156,6 +166,8 @@ public class L4512 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "EmpDeductMedia " + e.getErrorMsg());
 			}
+			// insert EmpDeduc
+			insertEmpDeductDtl(tEmpDeductMedia, tCustMain, tCdEmp, titaVo);
 			break;
 		case 2:
 			tEmpDeductMediaId.setMediaDate(iMediaDate);
@@ -179,17 +191,77 @@ public class L4512 extends TradeBuffer {
 			tEmpDeductMediaId.setMediaDate(iMediaDate);
 			tEmpDeductMediaId.setMediaKind(iMediaKind);
 			tEmpDeductMediaId.setMediaSeq(iMediaSeq);
-
 			tEmpDeductMedia = empDeductMediaService.holdById(tEmpDeductMediaId, titaVo);
 			try {
 				empDeductMediaService.delete(tEmpDeductMedia, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0008", "EmpDeductMedia : " + e.getErrorMsg());
 			}
+			// delete EmpDeductDtl
+			Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(iMediaDate + 19110000, iMediaKind,
+					iMediaSeq, this.index, Integer.MAX_VALUE, titaVo);
+			if (slEmpDeductDtl == null) {
+				throw new LogicException("E0006", "EmpDeductDtl"); // E0006 鎖定資料時，發生錯誤
+			}
+			try {
+				empDeductDtlService.deleteAll(slEmpDeductDtl.getContent(), titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "EmpDeductDtl : " + e.getErrorMsg());
+			}
+
 			break;
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
+
 	}
+
+	private void insertEmpDeductDtl(EmpDeductMedia t, CustMain tCustMain, CdEmp tCdEmp, TitaVo titaVo)
+			throws LogicException {
+		EmpDeductDtl tEmpDeductDtl = new EmpDeductDtl();
+		EmpDeductDtlId tEmpDeductDtlId = new EmpDeductDtlId();
+		tEmpDeductDtlId.setEntryDate(t.getEntryDate());
+		tEmpDeductDtlId.setCustNo(t.getCustNo());
+		tEmpDeductDtlId.setAchRepayCode(t.getRepayCode());
+		tEmpDeductDtlId.setPerfMonth(t.getPerfMonth());
+		tEmpDeductDtlId.setProcCode(t.getFlowCode());
+		tEmpDeductDtlId.setRepayCode(parse.IntegerToString(t.getPerfRepayCode(), 1));
+		tEmpDeductDtlId.setAcctCode(t.getAcctCode());
+		tEmpDeductDtlId.setFacmNo(0);
+		tEmpDeductDtlId.setBormNo(0);
+		tEmpDeductDtl.setEmpDeductDtlId(tEmpDeductDtlId);
+		tEmpDeductDtl.setEmpNo(tCustMain.getEmpNo());
+		tEmpDeductDtl.setCustId(tCustMain.getCustId());
+		tEmpDeductDtl.setTxAmt(BigDecimal.ZERO);
+		tEmpDeductDtl.setRepayAmt(t.getRepayAmt());
+		tEmpDeductDtl.setErrMsg("");
+		tEmpDeductDtl.setAcdate(0);
+		tEmpDeductDtl.setTitaTxtNo("");
+		tEmpDeductDtl.setTitaTlrNo("");
+		tEmpDeductDtl.setBatchNo("");
+		tEmpDeductDtl.setBatchNo("");
+		tEmpDeductDtl.setResignCode(tCdEmp.getAgStatusCode());
+		tEmpDeductDtl.setDeptCode(tCdEmp.getCenterCodeAcc2());
+		tEmpDeductDtl.setUnitCode(tCdEmp.getCenterCodeAcc());
+		tEmpDeductDtl.setIntStartDate(0);
+		tEmpDeductDtl.setIntEndDate(0);
+		tEmpDeductDtl.setPositCode(tCdEmp.getAgPost());
+		tEmpDeductDtl.setPrincipal(BigDecimal.ZERO);
+		tEmpDeductDtl.setCurrPrinAmt(BigDecimal.ZERO);
+		tEmpDeductDtl.setInterest(BigDecimal.ZERO);
+		tEmpDeductDtl.setCurrIntAmt(BigDecimal.ZERO);
+		tEmpDeductDtl.setSumOvpayAmt(BigDecimal.ZERO);
+		tEmpDeductDtl.setJsonFields("");
+		tEmpDeductDtl.setMediaDate(t.getMediaDate());
+		tEmpDeductDtl.setMediaKind(t.getMediaKind());
+		tEmpDeductDtl.setMediaSeq(t.getMediaSeq());
+
+		try {
+			empDeductDtlService.insert(tEmpDeductDtl, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0005", "員工扣薪檔新增失敗 :" + e.getErrorMsg());
+		}
+	}
+
 }

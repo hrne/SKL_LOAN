@@ -1,4 +1,5 @@
 package com.st1.itx.trade.L8;
+
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -14,29 +15,39 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.domain.JcicZ046;
+import com.st1.itx.db.domain.JcicZ047;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ060;
 import com.st1.itx.db.domain.JcicZ060Id;
 import com.st1.itx.db.domain.JcicZ060Log;
+import com.st1.itx.db.domain.JcicZ062;
+import com.st1.itx.db.domain.JcicZ062Id;
+import com.st1.itx.db.domain.JcicZ063;
+import com.st1.itx.db.domain.JcicZ063Id;
+import com.st1.itx.db.service.JcicZ046Service;
+import com.st1.itx.db.service.JcicZ047Service;
 import com.st1.itx.db.service.JcicZ060LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ060Service;
+import com.st1.itx.db.service.JcicZ062Service;
+import com.st1.itx.db.service.JcicZ063Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
+
 /**
  * Tita<br>
-* TranKey=X,1<br>
-* CustId=X,10<br>
-* SubmitKey=X,10<br>
-* RcDate=9,7<br>
-* ChangePayDate=9,7<br>
-* ClosedDate=9,7<br>
-* ClosedResult=9,1<br>
-* OutJcicTxtDate=9,7<br>
-*/
+ * TranKey=X,1<br>
+ * CustId=X,10<br>
+ * SubmitKey=X,10<br>
+ * RcDate=9,7<br>
+ * ChangePayDate=9,7<br>
+ * ClosedDate=9,7<br>
+ * ClosedResult=9,1<br>
+ * OutJcicTxtDate=9,7<br>
+ */
 
 @Service("L8318")
 @Scope("prototype")
@@ -49,19 +60,27 @@ import com.st1.itx.util.data.DataLog;
 public class L8318 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
+	public JcicZ046Service sJcicZ046Service;
+	@Autowired
+	public JcicZ047Service sJcicZ047Service;
+	@Autowired
 	public JcicZ060Service sJcicZ060Service;
 	@Autowired
 	public JcicZ060LogService sJcicZ060LogService;
 	@Autowired
+	public JcicZ062Service sJcicZ062Service;
+	@Autowired
+	public JcicZ063Service sJcicZ063Service;
+	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
 	DataLog iDataLog;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8318 ");
 		this.totaVo.init(titaVo);
-		
+
 		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
 		String iTranKey = titaVo.getParam("TranKey");
 		String iCustId = titaVo.getParam("CustId");
@@ -70,24 +89,107 @@ public class L8318 extends TradeBuffer {
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
 		int iYM = Integer.valueOf(titaVo.getParam("YM"));
 		String iKey = "";
-		//JcicZ060
+		// JcicZ060, JcicZ046, JcicZ047, JcicZ062,  JcicZ063
 		JcicZ060 iJcicZ060 = new JcicZ060();
 		JcicZ060Id iJcicZ060Id = new JcicZ060Id();
 		iJcicZ060Id.setSubmitKey(iSubmitKey);
-		iJcicZ060Id.setCustId(iCustId);		
+		iJcicZ060Id.setCustId(iCustId);
 		iJcicZ060Id.setRcDate(iRcDate);
 		iJcicZ060Id.setChangePayDate(iChangePayDate);
 		JcicZ060 chJcicZ060 = new JcicZ060();
+		JcicZ062 iJcicZ062 = new JcicZ062();
+		JcicZ062Id iJcicZ062Id = new JcicZ062Id();
+		iJcicZ062Id.setSubmitKey(iSubmitKey);
+		iJcicZ062Id.setCustId(iCustId);
+		iJcicZ062Id.setRcDate(iRcDate);
+		iJcicZ062Id.setChangePayDate(iChangePayDate);
+		JcicZ063 iJcicZ063 = new JcicZ063();
+		JcicZ063Id iJcicZ063Id = new JcicZ063Id();
+		iJcicZ063Id.setSubmitKey(iSubmitKey);
+		iJcicZ063Id.setCustId(iCustId);
+		iJcicZ063Id.setRcDate(iRcDate);
+		iJcicZ063Id.setChangePayDate(iChangePayDate);
+
+		// Date計算
+		int txDate = Integer.valueOf(titaVo.getEntDy());// 營業日 民國YYYMMDD
+		int txDayDate = DealDay(txDate);// 營業日DD(本檔案報送日)
+		int iChangePayYM = iChangePayDate / 100;// 申請變更還款條件年月
+		// Integer.valueOf(String.valueOf(iChangePayDate).substring(0,
+		// String.valueOf(iChangePayDate).length()-2));
+
+		// 檢核項目(D-32)
+		// 2 start KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)，不能重複，若有重複，且無'63'結案資料，則剔退處理.
+		if ("A".equals(iTranKey)) {
+			iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
+			if (iJcicZ060 != null) {
+				iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
+				if (iJcicZ063 == null) {
+					throw new LogicException("E0005", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)有重複，且無'63'結案資料.");
+				}
+			} // 2 end
+
+			// 3 start 本檔案報送日應為每月16-20日，否則予以剔退
+			if (txDayDate > 20 || txDayDate < 16) {
+				throw new LogicException("E0005", "本檔案報送日應為每月16-20日.");
+			}// 3 end
+
+			// 5 start 需檢核最大債權金融機構是否有報送「'47':金融機構無擔保債務協議資料」，且未曾報送「'46':結案通知資料」.
+			Slice<JcicZ047> sJcicZ047 = sJcicZ047Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
+					Integer.MAX_VALUE, titaVo);
+			if (sJcicZ047 == null) {
+				throw new LogicException("E0005", "需先報送「'47':金融機構無擔保債務協議資料」.");
+			} else {
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+						Integer.MAX_VALUE, titaVo);
+				if (sJcicZ046 != null) {
+					throw new LogicException("E0005", "已報送「'46':結案通知資料」.");
+				}
+			} // 5 end
+
+			// 8 start
+			// 除已報送'62'資料且「簽約完成日」有值之同一KEY值本檔案資料外，於本次報送本檔案('60')前皆須報送'63'結案(結案原因為A或B)，否則予以剔退.
+			iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
+			if (iJcicZ063 == null || (!"A".equals(iJcicZ063.getClosedResult()) && !"B".equals(iJcicZ063.getClosedResult()))) {
+				iJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id, titaVo);
+				if(iJcicZ062 == null) {
+					throw new LogicException("E0005", "須先報送'63'結案，且結案原因為A或B).");
+				}else if(iJcicZ062.getChaRepayEndDate() <= 0) {
+					throw new LogicException("E0005", "'62金融機構無擔保債務變更還款條件協議資料'「簽約完成日」須有值，或者可先報送'63'結案.");
+				}
+			} // 8 end
+		}
 		
-		switch(iTranKey_Tmp) {
+		// 4 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
+		iJcicZ060 = sJcicZ060Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
+		if ("C".equals(iTranKey) && iJcicZ060 == null) {
+			iTranKey_Tmp = "1";
+		}
+		// 4 end
+
+		// 6 start 第7欄「申請變更還款條件日」不得大於當月10日.
+		if (DealDay(iChangePayDate) > 10) {
+			throw new LogicException("E0005", "「申請變更還款條件日」不得大於當月10日.");
+		}
+		// 6 end
+
+		// 7 start 第8欄「已清分足月期付金年月」需小於等於第7欄「申請變更還款條件日」，否則予以剔退.
+		if (iYM > iChangePayYM) {
+			throw new LogicException("E0005", "「已清分足月期付金年月」需小於等於「申請變更還款條件日」.");
+		}
+		// 7 end
+
+		// 檢核項目 end
+
+		switch (iTranKey_Tmp) {
 		case "1":
-			//檢核是否重複
+			// 檢核是否重複
 			chJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
-			if (chJcicZ060!=null) {
+			if (chJcicZ060 != null) {
 				throw new LogicException("E0005", "已有相同資料");
 			}
-			
+
 			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+			iJcicZ060 = new JcicZ060();
 			iJcicZ060.setJcicZ060Id(iJcicZ060Id);
 			iJcicZ060.setUkey(iKey);
 			iJcicZ060.setRcDate(iRcDate);
@@ -98,7 +200,7 @@ public class L8318 extends TradeBuffer {
 			iJcicZ060.setYM(iYM);
 			try {
 				sJcicZ060Service.insert(iJcicZ060, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			break;
@@ -116,45 +218,52 @@ public class L8318 extends TradeBuffer {
 			JcicZ060 oldJcicZ060 = (JcicZ060) iDataLog.clone(uJcicZ060);
 			try {
 				sJcicZ060Service.update(uJcicZ060, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ060, uJcicZ060);
 			iDataLog.exec();
 			break;
-		case "4": //需刷主管卡
+		case "4": // 需刷主管卡
 			iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id);
 			if (iJcicZ060 == null) {
 				throw new LogicException("E0008", "");
 			}
 			if (!titaVo.getHsupCode().equals("1")) {
-				iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 			Slice<JcicZ060Log> dJcicLogZ060 = null;
 			dJcicLogZ060 = sJcicZ060LogService.ukeyEq(iJcicZ060.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ060 == null) {
-				//尚未開始寫入log檔之資料，主檔資料可刪除
+				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ060Service.delete(iJcicZ060, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
-			}else {//已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
-				//最近一筆之資料
-				JcicZ060Log iJcicZ060Log = dJcicLogZ060.getContent().get(0);				
+			} else {// 已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
+					// 最近一筆之資料
+				JcicZ060Log iJcicZ060Log = dJcicLogZ060.getContent().get(0);
 				iJcicZ060.setYM(iJcicZ060Log.getYM());
 				iJcicZ060.setTranKey(iJcicZ060Log.getTranKey());
 				iJcicZ060.setOutJcicTxtDate(iJcicZ060Log.getOutJcicTxtDate());
 				try {
 					sJcicZ060Service.update(iJcicZ060, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
 		default:
 			break;
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private int DealDay(int txDate) throws LogicException {
+		String txdateStr = String.valueOf(txDate);
+		String retxDayStr = txdateStr.substring(txdateStr.length() - 2, txdateStr.length());
+
+		return Integer.valueOf(retxDayStr);
 	}
 }
