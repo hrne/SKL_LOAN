@@ -29,7 +29,7 @@ public class BankDeductDtl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6483310037938509246L;
+	private static final long serialVersionUID = -5223139807856758461L;
 
 @EmbeddedId
   private BankDeductDtlId bankDeductDtlId;
@@ -159,6 +159,14 @@ public class BankDeductDtl implements Serializable {
   /* Default為0，整批入帳成功，回寫此欄位 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
+
+  // 經辦
+  @Column(name = "`TitaTlrNo`", length = 6)
+  private String titaTlrNo;
+
+  // 交易序號
+  @Column(name = "`TitaTxtNo`", length = 8)
+  private String titaTxtNo;
 
   // AML回應碼
   /* CdCode:AmlCheckItem0.非可疑名單/已完成名單確認1.需審查/確認2.為凍結名單/未確定名單 */
@@ -749,6 +757,44 @@ CdCode:RelationCode
   }
 
 /**
+	* 經辦<br>
+	* 
+	* @return String
+	*/
+  public String getTitaTlrNo() {
+    return this.titaTlrNo == null ? "" : this.titaTlrNo;
+  }
+
+/**
+	* 經辦<br>
+	* 
+  *
+  * @param titaTlrNo 經辦
+	*/
+  public void setTitaTlrNo(String titaTlrNo) {
+    this.titaTlrNo = titaTlrNo;
+  }
+
+/**
+	* 交易序號<br>
+	* 
+	* @return String
+	*/
+  public String getTitaTxtNo() {
+    return this.titaTxtNo == null ? "" : this.titaTxtNo;
+  }
+
+/**
+	* 交易序號<br>
+	* 
+  *
+  * @param titaTxtNo 交易序號
+	*/
+  public void setTitaTxtNo(String titaTxtNo) {
+    this.titaTxtNo = titaTxtNo;
+  }
+
+/**
 	* AML回應碼<br>
 	* CdCode:AmlCheckItem
 0.非可疑名單/已完成名單確認
@@ -900,7 +946,8 @@ CdCode:RelationCode
            + ", prevIntDate=" + prevIntDate + ", acctCode=" + acctCode + ", repayBank=" + repayBank + ", repayAcctNo=" + repayAcctNo + ", repayAcctSeq=" + repayAcctSeq + ", unpaidAmt=" + unpaidAmt
            + ", tempAmt=" + tempAmt + ", repayAmt=" + repayAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", postCode=" + postCode + ", mediaCode=" + mediaCode
            + ", relationCode=" + relationCode + ", relCustName=" + relCustName + ", relCustId=" + relCustId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", mediaDate=" + mediaDate
-           + ", mediaKind=" + mediaKind + ", mediaSeq=" + mediaSeq + ", acDate=" + acDate + ", amlRsp=" + amlRsp + ", returnCode=" + returnCode + ", jsonFields=" + jsonFields
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", mediaKind=" + mediaKind + ", mediaSeq=" + mediaSeq + ", acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", amlRsp=" + amlRsp
+           + ", returnCode=" + returnCode + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

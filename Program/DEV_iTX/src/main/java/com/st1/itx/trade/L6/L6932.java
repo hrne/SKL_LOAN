@@ -35,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6932 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6932.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -50,7 +49,6 @@ public class L6932 extends TradeBuffer {
 	@Autowired
 	Parse parse;
 
-	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6932 ");
@@ -72,29 +70,27 @@ public class L6932 extends TradeBuffer {
 		int FacmNo = Integer.parseInt(titaVo.getParam("FACM_NO").toString());
 		int BormNo = Integer.parseInt(titaVo.getParam("BORM_SEQ").toString());
 		String iTxtNo = titaVo.getParam("TxtNo").trim();
-		
-		this.info("sdt===="+sdt);
-		this.info("edt===="+edt);
-		this.info("iTxtNo===="+iTxtNo);
-		this.info("CustNo===="+CustNo);
-		this.info("FacmNo===="+FacmNo);
-		this.info("BormNo===="+BormNo);
-		
+		int iChainFlag = Integer.parseInt(titaVo.getParam("CHAINFlag"));
+
+		this.info("sdt====" + sdt);
+		this.info("edt====" + edt);
+		this.info("iTxtNo====" + iTxtNo);
+		this.info("CustNo====" + CustNo);
+		this.info("FacmNo====" + FacmNo);
+		this.info("BormNo====" + BormNo);
+
 		List<TxDataLog> lTxDataLog = null;
 		Slice<TxDataLog> slTxDataLog = null;
-		if (!iTxtNo.isEmpty() ) {
+		if (!iTxtNo.isEmpty()) {
 			slTxDataLog = txDataLogService.findTxSeq(sdt, edt, iTxtNo, this.index, this.limit, titaVo);
 		} else if (CustNo > 0 && FacmNo > 0 && BormNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo3(sdt, edt, TranNo+"%", CustNo, FacmNo, BormNo, this.index,
-					this.limit, titaVo);
+			slTxDataLog = txDataLogService.findByCustNo3(sdt, edt, TranNo + "%", CustNo, FacmNo, BormNo, this.index, this.limit, titaVo);
 		} else if (CustNo > 0 && FacmNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo2(sdt, edt, TranNo+"%", CustNo, FacmNo, this.index, this.limit,
-					titaVo);
+			slTxDataLog = txDataLogService.findByCustNo2(sdt, edt, TranNo + "%", CustNo, FacmNo, this.index, this.limit, titaVo);
 		} else if (CustNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo1(sdt, edt, TranNo+"%", CustNo, this.index, this.limit,
-					titaVo);
+			slTxDataLog = txDataLogService.findByCustNo1(sdt, edt, TranNo + "%", CustNo, this.index, this.limit, titaVo);
 		} else {
-			slTxDataLog = txDataLogService.findByCustNo0(sdt, edt, TranNo+"%" , this.index, this.limit, titaVo);
+			slTxDataLog = txDataLogService.findByCustNo0(sdt, edt, TranNo + "%", this.index, this.limit, titaVo);
 		}
 		lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
 
@@ -118,20 +114,27 @@ public class L6932 extends TradeBuffer {
 				String fld = map.get("f").toString();
 				String oval = map.get("o").toString();
 				String nval = map.get("n").toString();
-				if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld)
-						|| "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld)) {
+				if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld) || "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld)) {
 					continue;
 				}
-				
+				this.info("iChainFlag="+iChainFlag+",TranNo=="+TranNo);
+				if(iChainFlag==1 && ("L5701").equals(TranNo)) { //L5701 喘息期歷程特殊需求
+					if("延期繳款年月(起)".equals(fld) || "延期繳款年月(訖)".equals(fld)){
+						
+					} else {
+						continue;
+					}
+				}
+					
 				if (first) {
 					this.info("L6932 getReason = " + txDataLog.getReason().trim());
 					if (!"".equals(txDataLog.getReason().trim())) {
-						OccursList occursList = addOccurs(txDataLog,"變更理由","",txDataLog.getReason(),titaVo);
+						OccursList occursList = addOccurs(txDataLog, "變更理由", "", txDataLog.getReason(), titaVo);
 						this.totaVo.addOccursList(occursList);
 					}
 					first = false;
 				}
-				
+
 //				OccursList occursList = new OccursList();
 //				occursList.putParam("OO_TRN_DTTM", parse.timeStampToString(txDataLog.getCreateDate()));
 //				occursList.putParam("OO_TxDate", txDataLog.getTxDate());
@@ -153,9 +156,9 @@ public class L6932 extends TradeBuffer {
 //				occursList.putParam("OO_DATA_AFTER", nval);
 
 				/* 將每筆資料放入Tota的OcList */
-				
-				OccursList occursList = addOccurs(txDataLog,fld,oval,nval,titaVo);
-				
+
+				OccursList occursList = addOccurs(txDataLog, fld, oval, nval, titaVo);
+
 				this.totaVo.addOccursList(occursList);
 			}
 
@@ -171,7 +174,7 @@ public class L6932 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private OccursList addOccurs(TxDataLog txDataLog,String fld,String oval,String nval,TitaVo titaVo) throws LogicException {
+	private OccursList addOccurs(TxDataLog txDataLog, String fld, String oval, String nval, TitaVo titaVo) throws LogicException {
 		OccursList occursList = new OccursList();
 		occursList.putParam("OO_TRN_DTTM", parse.timeStampToString(txDataLog.getCreateDate()));
 		occursList.putParam("OO_TxDate", txDataLog.getTxDate());
@@ -192,7 +195,7 @@ public class L6932 extends TradeBuffer {
 
 		return occursList;
 	}
-	
+
 	// 查詢交易控制檔
 	private String inqTxTranCode(String uTranNo, TitaVo titaVo) throws LogicException {
 

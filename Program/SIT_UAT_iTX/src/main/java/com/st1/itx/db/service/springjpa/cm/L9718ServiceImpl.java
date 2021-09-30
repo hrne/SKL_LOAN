@@ -68,7 +68,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,0 AS \"OvduBal\" "; // 催收餘額 樣張為空白 ??
 			sql += "  ,M.\"OvduBal\" AS \"YetRetrievedBal\" ";
 			sql += "  ,NVL(TO_CHAR(GREATEST(MDate.\"PrevIntDate\" - 19110000, 0)), ' ') AS \"rocPrevIntDate\" ";
-            sql += " ,NVL(TX.\"LnTxAmt\",0) + NVL(TX.\"TempTotal\") AS \"TxAmt\" ";
+            sql += " ,NVL(TX.\"LnTxAmt\",0) + NVL(TX.\"TempTotal\", 0) AS \"TxAmt\" ";
             sql += " ,NVL(GREATEST((CASE WHEN M.\"AcctCode\" = '990' AND NVL(COL.\"PrinBalance\", 1) = 0  ";
             sql += "                      THEN TX.\"OvEntryDate\"   ";
             sql += "                 ELSE 0 ";
@@ -179,8 +179,8 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "           + M.\"UnpaidInterest\" ";
 			sql += "           + M.\"UnpaidBreachAmt\" ";
 			sql += "           + M.\"UnpaidDelayInt\" ";
-			sql += "           + M.\"ShortFallPrin\" ";
-			sql += "           + M.\"ShortFallInt\" ";
+			sql += "           + M.\"ShortfallPrin\" ";
+			sql += "           + M.\"ShortfallInt\" ";
 			sql += "   END AS \"OvduBal\" "; // 非990(逾期)時, 用額度月報的欄位算
 			sql += "  ,GREATEST(MDate.\"PrevIntDate\" - 19110000, 0) AS \"rocPrevIntDate\" ";
 			sql += "  ,CASE WHEN M.\"AcctCode\" = '990' ";

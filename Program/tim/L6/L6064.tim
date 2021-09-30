@@ -46,6 +46,7 @@ AGENT=X,6
 ORGEMPNM=X,8
 DefType=X,2
 DefCode=X,20
+DefItem=X,80
 Code=X,20
 CodeItem=X,50
 END=X,1

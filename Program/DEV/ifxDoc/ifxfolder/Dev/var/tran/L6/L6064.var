@@ -54,7 +54,7 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L6064]                                 各類代碼檔查詢"],
 ["#FdDefType+業務類別",#DefType,#DefTypeX],
-["#FdDefCode+代碼檔代號",#DefCode,#CodeBTN],
+["#FdDefCode+代碼檔代號",#DefCode,#CodeBTN,#DefItemX],
 ["#FdDefItem+代碼檔名稱",#DefItem],
 ["#FdCode+代碼",#Code],
 ["#FdCodeItem+代碼說明",#CodeItem],
@@ -78,7 +78,7 @@ K(MODIFYBUTTON,查詢)
 #CodeBTN=X,15,I,ui:button;value:代碼檔代號查詢;enable:1;tabbable:0;title:L6069 代碼檔代號查詢;
 
 #b1=X,1,S
-BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:DefCode<-OOCode:DefItem<-OOItem})
+BIND(#CodeBTN,click, {cmd=CHAIN; ntxcd=L6069; ntxbuf=#DefCode;ntxbuf5=type<-1:DefCode<-OOCode:DefItemX<-OOItem})
 
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -112,7 +112,7 @@ T(1,@Code,#NTXBUF,23,20)
 HIDE(#CodeBTN)
 
 #WKTF=X,1,S
-C(3,#CHAIN,1,T(F,@DefType,0)T(F,@DefCode,0)T(F,@DefItem,0),$)
+C(3,#CHAIN,1,T(F,@DefType,0)T(F,@DefCode,0)T(F,@DefItemX,0),$)
 
 !業務類別
 #DefType=X,2,I
@@ -127,8 +127,8 @@ C(4,#DefType,S,T(H,#DefType,#DefTypeH))
 #DefCode=x,20,I
 C(3,#CHAIN,1,s,$)
 !HELP(#DefCodeH)
-@C(4,#DefCode,$,V(H,#DefCodeH))
-IF(#DefType=="" & #DefCode=="",V(P,業務類別、代碼檔代號需擇一輸入),$)
+@
+C(4,#DefCode,$,V(H,#DefCodeH))
 
 #Rim6R33DefType=X,2,S
 
@@ -149,9 +149,14 @@ C(3,#RimFlag,0,V(P,業務類別有誤),S)
 
 
 !代碼檔名稱
-#DefItem=x,80,L
+#DefItemX=x,80,L
 !C(3,#CHAIN,1,s,$)
 C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
+
+#DefItem=x,80,I
+!C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
+@
+IF(#DefType=="" & #DefCode=="" & #DefItem== "",V(P,業務類別、代碼檔代號、代碼檔名稱需擇一輸入),$)
 
 !代碼
 #Code=x,20,I
@@ -160,6 +165,7 @@ C(4,#DefCode,S,T(H,#DefCode,#DefCodeH))
 #CodeItem=x,50,I
 
 #RPTFG=A,1,S
+C(4,#DefItem,E(0,0),E(0,1))
 
 !<include src="COM.icf::RPTFG.dec"/>
 <include src="ROM.icf::L6R33.dec"/>
@@ -233,7 +239,7 @@ BIND(grid,{cmd=CHAIN;ntxcd=L6604;text=刪除;ntxbuf=#OOBUF4})
 
 !------ 上行電文 ------
 <sub type="TIM">
-#DefType#DefCode#Code#CodeItem
+#DefType#DefCode#DefItem#Code#CodeItem
 #END
 </sub>
 
@@ -274,6 +280,37 @@ TXFORM=L6064
 
 #OODefCode=代碼檔代碼
 {width:150,hidden:true}
+
+#OODefItem=代碼檔說明
+{width:300,hidden:true}
+
+#OOCode=代碼
+{width:150,align:'left'}
+
+#OOItem=代碼說明
+{width:300,align:'left'}
+
+#OOType=業務類別
+{width:70,align:'center'}
+
+#OOTypeX=業務類別</br>說明
+{width:100,align:'left'}
+
+#OOEnable=啟用記號
+{width:70,align:'center'}
+
+^
+#RPTFG=1,QUERY.GRID,L6064
+#any={detail:true, header:'L6064.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+!#OOBTN4=刪除
+!{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+
+#OODefCode=代碼檔代碼
+{width:150,align:'left'}
 
 #OODefItem=代碼檔說明
 {width:300,hidden:true}

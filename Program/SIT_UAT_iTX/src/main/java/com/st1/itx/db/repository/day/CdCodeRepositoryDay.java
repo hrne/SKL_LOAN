@@ -47,6 +47,9 @@ public interface CdCodeRepositoryDay extends JpaRepository<CdCode, CdCodeId> {
   // DefCode = ,AND Item %
   public Slice<CdCode> findAllByDefCodeIsAndItemLikeOrderByCodeAsc(String defCode_0, String item_1, Pageable pageable);
 
+  // AND Item %
+  public Slice<CdCode> findAllByAndItemLikeOrderByCodeAsc(String item_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -134,6 +134,17 @@ public interface CdCodeService {
   public Slice<CdCode> defItemEq(String defCode_0, String item_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * AND Item %
+   *
+   * @param item_0 item_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdCode CdCode of List
+   */
+  public Slice<CdCode> defItemEq3(String item_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CdCode
    * 
    * @param cdCodeId key

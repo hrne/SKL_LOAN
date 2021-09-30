@@ -325,6 +325,34 @@ em = null;
   }
 
   @Override
+  public Slice<CdCode> defItemEq3(String item_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdCode> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("defItemEq3 " + dbName + " : " + "item_0 : " + item_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdCodeReposDay.findAllByAndItemLikeOrderByCodeAsc(item_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdCodeReposMon.findAllByAndItemLikeOrderByCodeAsc(item_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdCodeReposHist.findAllByAndItemLikeOrderByCodeAsc(item_0, pageable);
+    else 
+      slice = cdCodeRepos.findAllByAndItemLikeOrderByCodeAsc(item_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public CdCode holdById(CdCodeId cdCodeId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
