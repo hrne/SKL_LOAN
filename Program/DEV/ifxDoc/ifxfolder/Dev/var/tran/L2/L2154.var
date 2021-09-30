@@ -966,6 +966,8 @@ E(0,@UtilDeadline,#L2r05UtilDeadline)
 E(0,@GracePeriod,#L2r05GracePeriod)
 E(0,@TwAcctFee,#L2r05AcctFee)
 E(0,@UsAcctFee,#L2r05AcctFee)
+E(0,@TwHandlingFee,#L2r05HandlingFee)
+E(0,@UsHandlingFee,#L2r05HandlingFee)
 E(0,@ExtraRepayCode,#L2r05ExtraRepayCode)
 E(0,@IntCalcCode,#L2r05IntCalcCode)
 T(2,@CustTypeCode,#L2r05CustTypeCode)
@@ -1242,7 +1244,7 @@ T(2,@CoorgnizerX,#L2r13FullName)
 #WKSHOWLB=X,1,S
 C(3,#UpdateCode,1,
     SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX
-    ,#LbApproveRateX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee
+    ,#LbApproveRateX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#TwHandlingFee
     ,#CreditSysNo,#AmortizedCode,#AmortizedCodeX,#TwApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq
     ,#PayIntFreqX,#RepayFreq,#RepayFreqX,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate
     ,#GuaranteeDateX,#RepayCode,#RepayCodeX,#RepayBank,#RepayBankX,#RepayAcctNo,#PostCode,#PostCodeX,#RelationCode
@@ -1250,19 +1252,19 @@ C(3,#UpdateCode,1,
     ,#Introducer,#IntroducerX,#District,#DistrictX,#FireOfficer,#BTN12,#FireOfficerX,#Estimate,#EstimateX,#CreditOfficer,#CreditOfficerX,#BusinessOfficer,
     #BusinessOfficerX,#Supervisor,#SupervisorX,#InvestigateOfficer,#InvestigateOfficerX,#EstimateReview,#EstimateReviewX,#Coorgnizer,#CoorgnizerX)
     SHOW(#BTN11,#BTN12,#BTN13,#BTN14,#BTN16,#BTN17,#BTN19,#BTN20,#BTN21)
-    HIDE(#LbRateIncrX,#LbIndividualIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#LbCreditSysNo
+    HIDE(#LbRateIncrX,#LbIndividualIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee,#LbCreditSysNo
     ,#LbApplAmt,#UsApplAmt,#LbApplAmt,#LbLoanTermYyX,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq
     ,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline,#LbRepayBank,#LbPostCode,#LbRepayAcctNo
     ,#LbRelationName,#LbRelationId,#LbRelationBirthday,#IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb,
     #SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb)
    ,SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX
-   ,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbCreditSysNo,#AmortizedCodeX,#LbApplAmt,#LbApplAmt,#LbLoanTermYyX
+   ,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbHandlingFee,#LbCreditSysNo,#AmortizedCodeX,#LbApplAmt,#LbApplAmt,#LbLoanTermYyX
    ,#LbLoanTermMm,#LbLoanTermDd,#LbPayIntFreq,#LbRepayFreq,#LbUtilDeadline,#LbGracePeriod,#LbGuaranteeDate,#LbRecycleDeadline,#RepayCodeX
    ,#RepayBankX,#LbRepayAcctNo,#PostCodeX,#RelationCodeX,#LbRelationName,#LbRelationId,#LbRelationBirthday,#RelationGenderX
    ,#IntroducerX,#District,#DistrictX,#FireOfficerX,#EstimateX,#CreditOfficerX,#BusinessOfficerX,#SupervisorX,#InvestigateOfficerX,#EstimateReviewX,#CoorgnizerX,
    #IntroducerLb,#FireOfficerLb,#EstimateLb,#CreditOfficerLb,#BusinessOfficerLb,#SupervisorLb,#InvestigateOfficerLb,#EstimateReviewLb,#CoorgnizerLb)
     HIDE(#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX,#ApproveRate,#ApproveRateX,#RateCode
-    ,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#CreditSysNo,#AmortizedCode
+    ,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#TwHandlingFee,#UsHandlingFee,#CreditSysNo,#AmortizedCode
     ,#TwApplAmt,#UsApplAmt,#LoanTermYy,#LoanTermMm,#LoanTermDd,#FreqBase,#PayIntFreq,#PayIntFreqX,#RepayFreq,#RepayFreqX
     ,#UtilDeadline,#UtilDeadlineX,#GracePeriod,#GracePeriodX,#GuaranteeDate,#GuaranteeDateX,#RepayCode,#RepayBank
     ,#RepayAcctNo,#PostCode,#RelationCode,#RelationName,#RelationId,#RelationBirthday,#RelationGender
@@ -1368,7 +1370,7 @@ T(2,@FdIntCalcCode,#WkStar)
 #ShowP2=X,1,S
 C(3,#UpdateCode,1,
     SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#RateIncr,#RateIncrX,#LbApproveRateX,#RateCode,#RateCodeX,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#CreditSysNo)
-    HIDE(#LbRateIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#LbCreditSysNo)
+    HIDE(#LbRateIncrX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#UsAcctFee,#LbAcctFee,#UsHandlingFee,#LbHandlingFee,#LbCreditSysNo)
    ,SHOW(#BaseRateCodeX,#LbBaseRateX,#LbProdRateX,#LbRateIncrX,#LbIndividualIncrX,#LbApproveRateX,#RateCodeX,#LbFirstRateAdjFreq,#LbRateAdjFreq,#LbAcctFee,#LbCreditSysNo)
     HIDE(#RateIncr,#RateIncrX,#IndividualIncr,#IndividualIncrX,#ApproveRate,#ApproveRateX,#RateCode,#FirstRateAdjFreq,#FirstRateAdjFreqX,#RateAdjFreq,#RateAdjFreqX,#TwAcctFee,#UsAcctFee,#CreditSysNo))
 C(3,#UpdateCode,1,$,s)
@@ -1620,6 +1622,7 @@ T(2,@FdRepayFreq,#WkStar)
 T(2,@FdUtilDeadline,#WkStar)
 T(2,@FdGracePeriod, )
 T(2,@FdAcctFee, )
+T(2,@FdHandlingFee, )
 T(2,@FdGuaranteeDate,#WkStar)
 T(2,@PayIntFreqX,#WkUnitX)
 T(F,@PayIntFreqX,0)
@@ -2018,6 +2021,29 @@ P(L,#LbAcctFee)
 #TimAcctFee=m,14.2,S
 C(3,#Precision,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
 
+
+![手續費]          
+#FdHandlingFee=X,2,L
+C(3,#UpdateCode,1,$,s)
+C(3,#Precision,0,SHOW(#TwHandlingFee)HIDE(#UsHandlingFee)
+                ,HIDE(#TwHandlingFee)SHOW(#UsHandlingFee))
+
+#TwHandlingFee=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Precision,0,$,s)
+C(3,#Hide2Fg,0,CALL(#HideP2),$)
+
+#UsHandlingFee=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Precision,0,s,$)
+C(3,#Hide2Fg,0,CALL(#HideP2),$)
+
+#LbHandlingFee=X,21,L
+C(3,#Precision,0,X(#TwHandlingFee),X(#UsHandlingFee))
+P(L,#LbHandlingFee)
+
+#TimHandlingFee=m,14.2,S
+C(3,#Precision,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 
 #LbGuaranteeDate=D,7,L
 
@@ -2643,8 +2669,9 @@ IF(#FuncCode==2,$,s)
 C(3,#RepayCode,2,C(4,#L2r53Help1,$,HELP(#L2r53Help1)),S)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 @
-IF(#RepayAcctNo!=#OldAcctNo,C(3,#AcctCheckFlag,7,V(P,扣款帳號已提出授權待授權銀行回覆,不可變更),$),$)
+IF(#RepayAcctNo!=#OldAcctNo,C(3,#BeforeAcctCheckFlag,7,V(P,扣款帳號已提出授權待授權銀行回覆，不可變更),$),$)
 V(2,0)
+
 
 #LbRepayAcctNo=A,14,L
 C(3,#RepayCode,2,$,S)
@@ -3058,6 +3085,7 @@ C(3,#UpdateCode,1,C(3,#ApprovedLevel,9,T(F,@Supervisor,0)T(3,@FdSupervisor,),T(F
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide6Fg,0,CALL(#HideP6),$)
 C(3,#ApprovedLevel,9,S,$)
+@V(7)
 
 #SupervisorLb=X,6,L
 
@@ -3527,6 +3555,7 @@ C(3,#CheckCode,0,$,S)
 ["#FdUtilDeadline+動支期限",#UtilDeadline,#LbUtilDeadline,#UtilDeadlineX],
 ["#FdGracePeriod+寬限總月數",#GracePeriod,#LbGracePeriod,#GracePeriodX],
 ["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee,#LbAcctFee],
+["#FdHandlingFee+手續費",#TwHandlingFee,#UsHandlingFee,#LbHandlingFee],
 ]
 </sub>
 
@@ -3641,7 +3670,7 @@ T(3,[L2154] 額度資料維護)
 #ApproveRate#RateCode#FirstRateAdjFreq#RateAdjFreq#CurrencyCode#TimApplAmt
 #AcctCode#LoanTermYy#LoanTermMm#LoanTermDd#AmortizedCode#FreqBase
 #PayIntFreq#RepayFreq#UtilDeadline#GracePeriod
-#TimAcctFee#GuaranteeDate
+#TimAcctFee#TimHandlingFee#GuaranteeDate
 #ExtraRepayCode#CustTypeCode#RuleCode#RecycleCode#RecycleDeadline
 #UsageCode#DepartmentCode
 #IncomeTaxFlag#CompensateFlag#IrrevocableFlag
@@ -3660,7 +3689,7 @@ T(3,[L2154] 額度資料維護)
 #StepMonthS{n}#StepMonthE{n}#StepRateType{n}#StepRateIncr{n}
 ##end
 #END
-#TwApplAmt#UsApplAmt#TwAcctFee#UsAcctFee
+#TwApplAmt#UsApplAmt#TwAcctFee#UsAcctFee#TwHandlingFee#UsHandlingFee
 #OldRepayCode#OldAcctNo#OldRepayBank
 #OldPostCode#OldRelationCode#OldRelationName
 #OldRelationId#OldRelationBirthday#OldRelationGender

@@ -1328,7 +1328,7 @@ public class MakeReport extends CommBuffer {
 		watermark += rptTlrNo;
 		watermark += " ";
 		
-		CdEmp tCdEmp = cdEmpService.findById(rptTlrNo, titaVo);
+		CdEmp tCdEmp = cdEmpService.findById(rptTlrNo);
 		
 		String empNm = "";
 		if (tCdEmp != null) {

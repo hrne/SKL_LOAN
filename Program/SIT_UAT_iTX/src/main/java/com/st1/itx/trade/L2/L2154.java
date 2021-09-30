@@ -623,6 +623,7 @@ public class L2154 extends TradeBuffer {
 //		tTempVo.putParam("DuePayLimit", tFacMain.getDuePayLimit());
 //		tTempVo.putParam("PayIntLimit", tFacMain.getPayIntLimit());
 		tTempVo.putParam("AcctFee", tFacMain.getAcctFee());
+		tTempVo.putParam("HandlingFee", tFacMain.getHandlingFee());
 		tTempVo.putParam("GuaranteeDate", tFacMain.getGuaranteeDate());
 		tTempVo.putParam("ExtraRepayCode", tFacMain.getExtraRepayCode());
 		tTempVo.putParam("CustTypeCode", tFacMain.getCustTypeCode());
@@ -711,6 +712,7 @@ public class L2154 extends TradeBuffer {
 //		tFacMain.setDuePayLimit(this.parse.stringToBigDecimal(titaVo.getParam("TimDuePayLimit")));
 //		tFacMain.setPayIntLimit(this.parse.stringToBigDecimal(titaVo.getParam("TimPayIntLimit")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
+		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(titaVo.getParam("GuaranteeDate")));
 		tFacMain.setExtraRepayCode(titaVo.getParam("ExtraRepayCode"));
 		tFacMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));
@@ -816,6 +818,7 @@ public class L2154 extends TradeBuffer {
 //		tFacMain.setDuePayLimit(this.parse.stringToBigDecimal(tTempVo.getParam("DuePayLimit")));
 //		tFacMain.setPayIntLimit(this.parse.stringToBigDecimal(tTempVo.getParam("PayIntLimit")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(tTempVo.getParam("AcctFee")));
+		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(tTempVo.getParam("HandlingFee")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
 		tFacMain.setExtraRepayCode(tTempVo.getParam("ExtraRepayCode"));
 		tFacMain.setCustTypeCode(tTempVo.getParam("CustTypeCode"));
@@ -929,6 +932,7 @@ public class L2154 extends TradeBuffer {
 		tFacMain.setUtilDeadline(this.parse.stringToInteger(tTempVo.getParam("UtilDeadline")));
 		tFacMain.setGracePeriod(this.parse.stringToInteger(tTempVo.getParam("GracePeriod")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(tTempVo.getParam("AcctFee")));
+		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(tTempVo.getParam("HandlingFee")));
 		tFacMain.setGuaranteeDate(this.parse.stringToInteger(tTempVo.getParam("GuaranteeDate")));
 		tFacMain.setExtraRepayCode(tTempVo.getParam("ExtraRepayCode"));
 		tFacMain.setCustTypeCode(tTempVo.getParam("CustTypeCode"));

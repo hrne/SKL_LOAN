@@ -95,8 +95,8 @@ public class LM055Report extends MakeReport {
 		int colAllow = 0;
 		int row = 0;
 
-		int normalAmount = 0;
-		int specificAmount = 0;
+		BigDecimal normalAmount = BigDecimal.ZERO;
+		BigDecimal specificAmount = BigDecimal.ZERO;
 
 		BigDecimal amount = BigDecimal.ZERO;
 		BigDecimal allowAmount = BigDecimal.ZERO;
@@ -124,14 +124,14 @@ public class LM055Report extends MakeReport {
 
 				// 依放款種類 區分列數
 				// (自訂 FIVE=五類資產、AL=備呆子目)
-				row = lM055Vo.get("F1").equals("C") ? 10 : 
-					 (lM055Vo.get("F1").equals("D") ? 11 : 
-				     (lM055Vo.get("F1").equals("FIVE") || lM055Vo.get("F1").equals("AL") ? 16 : 12));
+				row = lM055Vo.get("F1").equals("C") ? 10
+						: (lM055Vo.get("F1").equals("D") ? 11
+								: (lM055Vo.get("F1").equals("FIVE") || lM055Vo.get("F1").equals("AL") ? 16 : 12));
 
 				// 放款金額
 				if (!lM055Vo.get("F0").equals("99")) {
 
-					amount = Integer.valueOf(lM055Vo.get("F2")) == 0 ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F2"));
+					amount = lM055Vo.get("F2").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F2"));
 
 					makeExcel.setValue(row, col, amount, "#,##0");
 				}
@@ -139,19 +139,20 @@ public class LM055Report extends MakeReport {
 				// 備抵損失
 				if (lM055Vo.get("F0").equals("3")) {
 
-					normalAmount = Integer.valueOf(lM055Vo.get("F3")) == 0 ? 0 : Integer.valueOf(lM055Vo.get("F3"));
-
+					normalAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
+					
 				} else if (lM055Vo.get("F0").equals("99")) {
 
-					specificAmount = Integer.valueOf(lM055Vo.get("F3")) == 0 ?  0 : Integer.valueOf(lM055Vo.get("F3"));
+					specificAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO
+							: new BigDecimal(lM055Vo.get("F3"));
 
-					allowAmount = new BigDecimal(normalAmount + specificAmount);
+					allowAmount = allowAmount.add(normalAmount);
 
 					makeExcel.setValue(row, 13, allowAmount, "#,##0");
 
 				} else {
 
-					allowAmount = Integer.valueOf(lM055Vo.get("F3")) == 0 ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
+					allowAmount = lM055Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM055Vo.get("F3"));
 
 					makeExcel.setValue(row, colAllow, allowAmount, "#,##0");
 

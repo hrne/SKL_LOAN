@@ -12,7 +12,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.PfCoOfficer;
 import com.st1.itx.db.domain.PfCoOfficerId;
+import com.st1.itx.db.domain.PfCoOfficerLog;
+import com.st1.itx.db.domain.PfCoOfficerLogId;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.PfCoOfficerLogService;
 import com.st1.itx.db.service.PfCoOfficerService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
@@ -33,6 +36,8 @@ public class L5407 extends TradeBuffer {
 
 	@Autowired
 	public PfCoOfficerService iPfCoOfficerService;
+	@Autowired
+	public PfCoOfficerLogService iPfCoOfficerLogService;
 	@Autowired
 	public CdEmpService iCdEmpService;
 	@Autowired
@@ -55,7 +60,6 @@ public class L5407 extends TradeBuffer {
 		String iEmpNo = titaVo.getParam("EmpNo");
 		int iEffectiveDate = Integer.valueOf(titaVo.getParam("EffectiveDate")) + 19110000;
 		int iIneffectiveDate = Integer.valueOf(titaVo.getParam("IneffectiveDate")) + 19110000;
-		this.info("TEST==" + iIneffectiveDate);
 		String iEmpClass = titaVo.getParam("EmpClass").trim();
 		String iClassPass = titaVo.getParam("ClassPass");
 		String iAreaCode = titaVo.getParam("UnitCode");
@@ -105,6 +109,7 @@ public class L5407 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "新增時發生錯誤，該生效日期已存在");
 			}
+			UpdateLog(titaVo);
 			break;
 		case "2":
 			PfCoOfficerId oPfCoOfficerId = new PfCoOfficerId();
@@ -124,7 +129,7 @@ public class L5407 extends TradeBuffer {
 			// 紀錄變更前變更後
 			iDataLog.setEnv(titaVo, cPfCoOfficer, oPfCoOfficer);
 			iDataLog.exec();
-
+			UpdateLog(titaVo);
 			break;
 		case "3":
 			Slice<PfCoOfficer> x3PfCoOfficer = null;
@@ -162,6 +167,7 @@ public class L5407 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "新增時發生錯誤，該生效日期已存在");
 			}
+			UpdateLog(titaVo);
 			break;
 		case "4":
 			PfCoOfficerId iPfCoOfficerId = new PfCoOfficerId();
@@ -177,11 +183,73 @@ public class L5407 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "刪除時發生錯誤");
 			}
+			UpdateLog(titaVo);
+			
 			break;
 		default:
 			break;
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private void UpdateLog(TitaVo titaVo) throws LogicException {
+		this.totaVo.init(titaVo);
+		String iFunctionCd = titaVo.getParam("FunctionCd");
+		String iEmpNo = titaVo.getParam("EmpNo");
+		int iEffectiveDate = Integer.valueOf(titaVo.getParam("EffectiveDate")) + 19110000;
+		int iIneffectiveDate = Integer.valueOf(titaVo.getParam("IneffectiveDate")) + 19110000;
+		String iEmpClass = titaVo.getParam("EmpClass").trim();
+		String iClassPass = titaVo.getParam("ClassPass");
+		String iAreaCode = titaVo.getParam("UnitCode");
+		String iDistCode = titaVo.getParam("DistCode");
+		String iDeptCode = titaVo.getParam("DeptCode");
+		String iAreaItem = titaVo.getParam("UnitCodeX");
+		String iDistItem = titaVo.getParam("DistCodeX");
+		String iDeptItem = titaVo.getParam("DeptCodeX");
+		int iSerialNo = 0;
+		PfCoOfficerLog iPfCoOfficerLog = new PfCoOfficerLog();
+		PfCoOfficerLogId iPfCoOfficerLogId = new PfCoOfficerLogId();
+		if (iFunctionCd.equals("4")){ //刪除
+			Slice<PfCoOfficerLog> dPfCoOfficerLog = null;
+			dPfCoOfficerLog = iPfCoOfficerLogService.otherEq(iEmpNo, iEffectiveDate, 0, Integer.MAX_VALUE, titaVo);
+			for (PfCoOfficerLog ddPfCoOfficerLog :dPfCoOfficerLog) {
+				try {
+					iPfCoOfficerLogService.delete(ddPfCoOfficerLog, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0005", "刪除歷程資料時發生錯誤");
+				}
+			}
+			
+		}else {
+			Slice<PfCoOfficerLog> rPfCoOfficerLog = null;
+			rPfCoOfficerLog = iPfCoOfficerLogService.otherEq(iEmpNo, iEffectiveDate, this.index, this.limit, titaVo);
+			if (rPfCoOfficerLog == null) {
+				iSerialNo = 0;
+			}else {
+				iSerialNo = rPfCoOfficerLog.getContent().size()+1;
+			}
+			if (iIneffectiveDate != 19110000) {
+				iPfCoOfficerLog.setIneffectiveDate(iIneffectiveDate);
+			}
+			iPfCoOfficerLog.setEmpClass(iEmpClass);
+			iPfCoOfficerLog.setClassPass(iClassPass);
+			iPfCoOfficerLog.setAreaCode(iAreaCode);
+			iPfCoOfficerLog.setAreaItem(iAreaItem);
+			iPfCoOfficerLog.setDeptCode(iDeptCode);
+			iPfCoOfficerLog.setDeptItem(iDeptItem);
+			iPfCoOfficerLog.setDistCode(iDistCode);
+			iPfCoOfficerLog.setDistItem(iDistItem);
+			iPfCoOfficerLogId.setEffectiveDate(iEffectiveDate);
+			iPfCoOfficerLogId.setEmpNo(iEmpNo);
+			iPfCoOfficerLogId.setSerialNo(iSerialNo);
+			iPfCoOfficerLog.setPfCoOfficerLogId(iPfCoOfficerLogId);
+			
+			try {
+				iPfCoOfficerLogService.insert(iPfCoOfficerLog, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "新增歷程資料時發生錯誤");
+			}	
+		}
 	}
 }

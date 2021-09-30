@@ -924,6 +924,7 @@ T(2,@FdRateCode,#WkStar)
 T(2,@FirstRateAdjFreqX,#WkMonthX)
 T(2,@RateAdjFreqX,#WkMonthX)
 T(2,@FdCreditOfficer,#WkStar)
+T(2,@FdApprovedLevel,#WkStar)
 T(2,@FdIntCalcCode,#WkStar)
 
 #SendL2r01=X,1,S
@@ -1097,6 +1098,7 @@ HELP(#FacmRateCodeHelp)
 
 #RateCodeX=X,10,L
 T(H,#RateCode,#FacmRateCodeHelp)
+C(3,#RateCode,3,T(3,@FdFirstRateAdjFreq,*)T(3,@FdRateAdjFreq,*),T(3,@FdFirstRateAdjFreq,)T(3,@FdRateAdjFreq,))
 
 ![首次利率調整週期]
 !商品不限制時,才須輸入,否則自動顯示不必輸入
@@ -1148,6 +1150,7 @@ T(2,@FdPayIntFreq,#WkStar)
 T(2,@FdRepayFreq,#WkStar)
 T(2,@FdUtilDeadline,#WkStar)
 T(2,@FdAcctFee, )
+T(2,@FdHandlingFee, )
 T(2,@PayIntFreqX,#WkUnitX)
 T(F,@PayIntFreqX,0)
 T(2,@RepayFreqX,#WkUnitX)
@@ -1170,10 +1173,10 @@ C(3,#L2r01GracePeriod,999,$,T(3,@FdGracePeriod, ))
 
 #Precision=N,1,S
 T(H,#CurrencyCode,#CurrPrecisionHelp)
-C(3,#Precision,0,SHOW(#TwApplAmt,#TwAcctFee)
-                 HIDE(#UsApplAmt,#UsAcctFee)
-                ,HIDE(#TwApplAmt,#TwAcctFee)
-                 SHOW(#UsApplAmt,#UsAcctFee))
+C(3,#Precision,0,SHOW(#TwApplAmt,#TwAcctFee,#TwHandlingFee)
+                 HIDE(#UsApplAmt,#UsAcctFee,#UsHandlingFee)
+                ,HIDE(#TwApplAmt,#TwAcctFee,#TwHandlingFee)
+                 SHOW(#UsApplAmt,#UsAcctFee,#UsHandlingFee))
 
 ![核准額度]
 #FdApplAmt=X,2,L
@@ -1200,6 +1203,8 @@ R(1,L2R04)
 #TMP3=X,1,S
 E(0,@TwAcctFee,#L2r04AcctFee)
 E(0,@UsAcctFee,#L2r04AcctFee)
+E(0,@TwHandlingFee,#L2r04HandlingFee)
+E(0,@UsHandlingFee,#L2r04HandlingFee)
 
 ![核准科目]
 !自動顯示不必輸入
@@ -1435,8 +1440,21 @@ C(3,#Precision,0,S,$)
 #TimAcctFee=m,14.2,S
 C(3,#Precision,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
 
+!手續費
+#FdHandlingFee=X,2,L
 
+#TwHandlingFee=m,14,I
+C(3,#Hide3Flag,0,CALL(#HideP3),$)
+C(3,#Precision,0,$,S)
+@I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
+#UsHandlingFee=m,14.2,I
+C(3,#Hide3Flag,0,CALL(#HideP3),$)
+C(3,#Precision,0,S,$)
+@I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#TimHandlingFee=m,14.2,S
+C(3,#Precision,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 !---- P9 階梯式利率
 
 #INVK9=X,1,S
@@ -2153,6 +2171,7 @@ BIND(#BTN17,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF17A;ntxbuf5=type<-1:Super
 #Supervisor=X,6,I
 C(3,#Hide6Flag,0,CALL(#HideP6),$)
 C(3,#ApprovedLevel,9,S,$)
+@V(7)
 
 #BUF17B=X,7,S
 T(2,#Supervisor+Y)
@@ -2425,6 +2444,7 @@ C(3,#ExpandFlag,0,CALL(#Expand),$)
 ["#FdUtilDeadline+動支期限",#UtilDeadline,"@前"],
 ["#FdGracePeriod+寬限總月數",#GracePeriod,#LbGracePeriod,#GracePeriodX],
 ["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee],
+["#FdHandlingFee+手續費",#TwHandlingFee,#UsHandlingFee],
 ]
 </sub>
 
@@ -2537,7 +2557,7 @@ K(LIGHT,#FacmNo,TXTRED,0,1)
 #ProdNo#BaseRateCode#RateIncr#ApproveRate#RateCode
 #FirstRateAdjFreq#RateAdjFreq#CurrencyCode#TimApplAmt#AcctCode#ApproveDate#LoanTermYy
 #LoanTermMm#LoanTermDd#AmortizedCode#FreqBase#PayIntFreq#RepayFreq#UtilDeadline
-#GracePeriod#TimAcctFee#ExtraRepayCode#IntCalcCode#CustTypeCode#RuleCode#RecycleCode#RecycleDeadline
+#GracePeriod#TimAcctFee#TimHandlingFee#ExtraRepayCode#IntCalcCode#CustTypeCode#RuleCode#RecycleCode#RecycleDeadline
 #UsageCode#DepartmentCode#IncomeTaxFlag#CompensateFlag#IrrevocableFlag#RateAdjNoticeCode
 #RepayCode#RepayBank#RepayAcctNo#PostCode#Introducer#District#FireOfficer
 #Estimate#CreditOfficer#BusinessOfficer
@@ -2553,6 +2573,7 @@ K(LIGHT,#FacmNo,TXTRED,0,1)
 #BreachFlag
 #TwApplAmt#UsApplAmt
 #TwAcctFee#UsAcctFee
+#TwHandlingFee#UsHandlingFee
 
 </sub>
 

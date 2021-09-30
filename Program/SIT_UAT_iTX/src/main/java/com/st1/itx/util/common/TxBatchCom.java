@@ -324,7 +324,8 @@ public class TxBatchCom extends TradeBuffer {
 
 		// 隔日訂正不處理(隔日訂正，來源科目回沖至暫收可抵繳，不處理)
 		if ("L3".equals(titaVo.getTxCode().substring(0, 2)) && titaVo.get("BATCHNO") != null
-				&& "BATX".equals(titaVo.get("BATCHNO").substring(0, 4)) && titaVo.getParam("RpDetailSeq1") != null) {
+				&& titaVo.get("BATCHNO").trim().length() == 6 && "BATX".equals(titaVo.get("BATCHNO").substring(0, 4))
+				&& titaVo.getParam("RpDetailSeq1") != null) {
 			// 隔日訂正，回沖至暫收可抵繳，不處理
 			if (titaVo.isHcodeErase() && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
 				this.info("TxBatchCom run  隔日訂正不處理 " + titaVo);
@@ -593,7 +594,6 @@ public class TxBatchCom extends TradeBuffer {
 		txTitaVo.putParam("RpDetailSeq1", tDetail.getDetailSeq());
 		txTitaVo.putParam("RpEntryDate1", tDetail.getEntryDate());
 		txTitaVo.putParam("RpRvno1", tDetail.getRvNo());
-		txTitaVo.putParam("RpAcCode1", tDetail.getRepayAcCode());
 		txTitaVo.putParam("RpDscpt1", this.tTempVo.get("DscptCode")); // 摘要代碼
 		txTitaVo.putParam("RpNote1", this.tTempVo.get("Note")); // 摘要 for 收付欄分錄之傳票摘要
 		txTitaVo.putParam("RpRemark1", this.tTempVo.get("Remark")); // 備註 for 暫收款分錄(暫收款登錄)之傳票摘要
@@ -1007,6 +1007,8 @@ public class TxBatchCom extends TradeBuffer {
 			for (EmpDeductDtl tEmpDeductDtl : lEmpDeductDtl) {
 				tEmpDeductDtl = empDeductDtlService.holdById(tEmpDeductDtl, titaVo);
 				tEmpDeductDtl.setAcdate(acDate);
+				tEmpDeductDtl.setTitaTlrNo(titaVo.getTlrNo());
+				tEmpDeductDtl.setTitaTxtNo(titaVo.getTxtNo());
 				try {
 					empDeductDtlService.update(tEmpDeductDtl, titaVo);
 				} catch (DBException e) {
@@ -1168,7 +1170,7 @@ public class TxBatchCom extends TradeBuffer {
 			String str = this.checkMsg.substring(2);
 			this.checkMsg = str;
 		}
-		this.info("BS400 settingprocStsCode end");
+		this.info("TxBatchCom settingprocStsCode end");
 		this.info("還款類別 repayType           = " + this.repayType);
 		this.info("還款額度 repayFacmNo         = " + this.repayFacmNo);
 		this.info("還款金額 RepayAmt            = " + tBatxDetail.getRepayAmt());

@@ -44,7 +44,7 @@ public interface TbJcicMu01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice TbJcicMu01 TbJcicMu01 of List
    */
-  public Slice<TbJcicMu01> EmpIdEq(String empId_0, int index, int limit, TitaVo... titaVo);
+  public Slice<TbJcicMu01> empIdEq(String empId_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * DataDate=
@@ -55,7 +55,7 @@ public interface TbJcicMu01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice TbJcicMu01 TbJcicMu01 of List
    */
-  public Slice<TbJcicMu01> DataDateEq(int dataDate_0, int index, int limit, TitaVo... titaVo);
+  public Slice<TbJcicMu01> dataDateEq(int dataDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * EmpId= , AND DataDate=
@@ -67,7 +67,7 @@ public interface TbJcicMu01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice TbJcicMu01 TbJcicMu01 of List
    */
-  public Slice<TbJcicMu01> EmpIdRcEq(String empId_0, int dataDate_1, int index, int limit, TitaVo... titaVo);
+  public Slice<TbJcicMu01> empIdRcEq(String empId_0, int dataDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * HeadOfficeCode= , AND BranchCode= , AND DataDate=
@@ -80,7 +80,7 @@ public interface TbJcicMu01Service {
    * @param titaVo Variable-Length Argument
    * @return Slice TbJcicMu01 TbJcicMu01 of List
    */
-  public Slice<TbJcicMu01> FindByKey(String headOfficeCode_0, String branchCode_1, int dataDate_2, int index, int limit, TitaVo... titaVo);
+  public Slice<TbJcicMu01> findByKey(String headOfficeCode_0, String branchCode_1, int dataDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By TbJcicMu01

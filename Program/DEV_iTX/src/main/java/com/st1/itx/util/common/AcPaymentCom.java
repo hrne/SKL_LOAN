@@ -182,9 +182,9 @@ public class AcPaymentCom extends TradeBuffer {
 //      095:轉債協退還款  (戶號)      T2x 債協退還款    
 
 		if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) >= 90) {
-			acDetail.setSumNo("0" + titaVo.getParam("RpCode" + i));
+			acDetail.setSumNo("0" + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
 		} else {
-			acDetail.setSumNo(RpFlag + titaVo.getParam("RpCode" + i));
+			acDetail.setSumNo(RpFlag + FormatUtil.pad9(titaVo.getParam("RpCode" + i), 2));
 			if ("1".equals(RpFlag)) {
 				acDetail.setAcctCode(titaVo.getParam("RpAcctCode" + i));
 				String rpAcCode = FormatUtil.padX(titaVo.getParam("RpAcCode" + i).trim(), 18);

@@ -29,7 +29,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L8950 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8950.class);
 	/* DB服務注入 */
 	@Autowired
 	public TbJcicMu01Service sTbJcicMu01Service;
@@ -61,11 +60,11 @@ public class L8950 extends TradeBuffer {
 		if (iEmpId.equals("") && iDataDate == 0) {
 			iTbJcicMu01 = sTbJcicMu01Service.findAll(this.index, this.limit, titaVo);
 		} else if (!iEmpId.equals("") && iDataDate == 0) {
-			iTbJcicMu01 = sTbJcicMu01Service.EmpIdEq(iEmpId, this.index, this.limit, titaVo);
+			iTbJcicMu01 = sTbJcicMu01Service.empIdEq(iEmpId, this.index, this.limit, titaVo);
 		} else if (iEmpId.equals("") && iDataDate != 0) {
-			iTbJcicMu01 = sTbJcicMu01Service.DataDateEq(iDataDate, this.index, this.limit, titaVo);
+			iTbJcicMu01 = sTbJcicMu01Service.dataDateEq(iDataDate, this.index, this.limit, titaVo);
 		} else {
-			iTbJcicMu01 = sTbJcicMu01Service.EmpIdRcEq(iEmpId, iDataDate, this.index, this.limit, titaVo);
+			iTbJcicMu01 = sTbJcicMu01Service.empIdRcEq(iEmpId, iDataDate, this.index, this.limit, titaVo);
 		}
 		if (iTbJcicMu01 == null) {
 			throw new LogicException(titaVo, "E0001", ""); // 主檔無資料錯誤訊息
@@ -74,10 +73,10 @@ public class L8950 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOEmpId", aTbJcicMu01.getEmpId());
 				occursList.putParam("OOEmpName", aTbJcicMu01.getEmpName());
-				if (aTbJcicMu01.getDataDate()==0){
+				if (aTbJcicMu01.getDataDate() == 0) {
 					occursList.putParam("OODataDate", "0");
-				}else{
-					occursList.putParam("OODataDate", Integer.valueOf(aTbJcicMu01.getDataDate())-19110000);
+				} else {
+					occursList.putParam("OODataDate", Integer.valueOf(aTbJcicMu01.getDataDate()) - 19110000);
 				}
 				this.totaVo.addOccursList(occursList);
 			}

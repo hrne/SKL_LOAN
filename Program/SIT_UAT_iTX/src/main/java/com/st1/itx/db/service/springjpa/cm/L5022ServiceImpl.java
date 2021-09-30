@@ -71,17 +71,21 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 * @throws Exception ...
 	 */
 	// 當輸入空白找尋最近的日期資料
-	public List<Map<String, String>> officerNoBlank(int cDate, int index, int limit, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findByStatus(int cDate,String empNo, int index, int limit, TitaVo titaVo) throws Exception {
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql = "select b.\"EmpNo\" , " + "       b.\"EffectiveDate\", " + "       b.\"EmpClass\", " + "       b.\"ClassPass\" , " + "       b.\"Fullname\", " + "       b.\"AreaItem\", "
-				+ "       b.\"AreaCode\", " + "       b.\"DistCode\", " + "	     b.\"DistItem\", " + "       b.\"DeptCode\", " + "       b.\"DeptItem\", " + "       b.\"IneffectiveDate\", "
-				+ "       ROW_NUMBER() OVER ( partition by a.\"EmpNo\"  order by a.\"EffectiveDate\" desc) as sort " + "from "
-				+ "(select distinct \"EmpNo\" , first_value (\"EffectiveDate\") over (partition by \"EmpNo\" order by \"EffectiveDate\" desc) \"EffectiveDate\" "
-				+ "from \"PfCoOfficer\" a where a.\"EffectiveDate\"<= :cDate and a.\"IneffectiveDate\" > :cDate or a.\"EffectiveDate\"<= :cDate and a.\"IneffectiveDate\" = '0'" + " order by a.\"EmpNo\") a "
-				+ "left join \"PfCoOfficer\" b on b.\"EmpNo\"=a.\"EmpNo\" and b.\"EffectiveDate\"=a.\"EffectiveDate\" " + "left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"EmpNo\" "
-				+ "left join \"CdBcm\" c on c.\"UnitCode\" = b.\"CenterCode\" ";
+		String sql = "select * from (select a.* , "
+							 + "case when a.\"EffectiveDate\" > '"+cDate+"' then '3'"
+							 + " when a.\"IneffectiveDate\" < '"+cDate+"' and a.\"IneffectiveDate\" !='0' then '2'"
+							 + " when (a.\"EffectiveDate\" <= '"+cDate+"' and a.\"IneffectiveDate\" = '0') or (a.\"IneffectiveDate\" > '"+cDate+"' and a.\"EffectiveDate\" <= '"+cDate+"')then '1' "
+							 + " else '9' end \"StatusFg\","
+							 + " b.\"Fullname\" from \"PfCoOfficer\" a left join \"CdEmp\" b on b.\"EmployeeNo\" = a.\"EmpNo\" ";
+							 if (!empNo.trim().isEmpty()) {
+								 sql += " where a.\"EmpNo\" = '"+empNo+"' ";
+							 }
+				sql  += "order by a.\"EmpNo\" ASC , \"EffectiveDate\" DESC) ";
+					
 		sql += sqlRow;
 		this.info("sql = " + sql);
 		// *** 折返控制相關 ***
@@ -91,7 +95,6 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		this.info("L5022Service officerNoBlank=" + query.toString());
 
-		query.setParameter("cDate", cDate);
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
 
@@ -103,21 +106,4 @@ public class L5022ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		return this.convertToMap(query);
 	}
-
-	public List<Map<String, String>> officerNo(String EmpNo, TitaVo titaVo) throws Exception {
-		Query query;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql = "select a.\"EmpNo\" ," + " a.\"EffectiveDate\"," + " a.\"EmpClass\"," + " a.\"ClassPass\" ," + " b.\"Fullname\"," + " a.\"AreaItem\"," + " a.\"AreaCode\"," + " a.\"DistCode\","
-				+ " a.\"DistItem\"," + " a.\"DeptCode\"," + " a.\"DeptItem\"," + " a.\"IneffectiveDate\"" + " from \"PfCoOfficer\" a" + " left join \"CdEmp\" b" + " on a.\"EmpNo\" = b.\"EmployeeNo\""
-				+ " left join \"CdBcm\" c" + " on b.\"CenterCode\" = c.\"UnitCode\"" + " where a.\"EmpNo\" = '" + EmpNo + "' order by a.\"EffectiveDate\" desc";
-
-		this.info("sql = " + sql);
-
-		query = em.createNativeQuery(sql);
-
-		this.info("L5022Service officerNo=" + query.toString());
-
-		return this.convertToMap(query);
-	}
-
 }

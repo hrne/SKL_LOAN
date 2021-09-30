@@ -29,7 +29,7 @@ public class FacMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7182152377356499308L;
+	private static final long serialVersionUID = 6398939364063758911L;
 
 @EmbeddedId
   private FacMainId facMainId;
@@ -182,6 +182,10 @@ public class FacMain implements Serializable {
   // 帳管費
   @Column(name = "`AcctFee`")
   private BigDecimal acctFee = new BigDecimal("0");
+
+  // 手續費
+  @Column(name = "`HandlingFee`")
+  private BigDecimal handlingFee = new BigDecimal("0");
 
   // 規定管制代碼
   /* 規定管制代碼 00:一般01:自然人第三戶(央行管制)02:自然人第三戶且為高價住宅(央行管制)03:自然人第四戶以上(央行管制)04:自然人第四戶以上且為高價住宅(央行管制)05:自然人購置高價住宅(央行管制)06:法人購置住宅第一戶(央行管制)07:法人購置住宅第二戶以上(央行管制)08:購地貸款(央行管制)09:餘屋貸款(央行管制)10:工業區閒置土地抵押貸款(央行管制)11:增貸管制戶(舊央行管制)12:自然人特定地區第2戶購屋貸款(舊央行管制)13:投資戶(內部規範) */
@@ -1082,6 +1086,25 @@ public class FacMain implements Serializable {
 	*/
   public void setAcctFee(BigDecimal acctFee) {
     this.acctFee = acctFee;
+  }
+
+/**
+	* 手續費<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getHandlingFee() {
+    return this.handlingFee;
+  }
+
+/**
+	* 手續費<br>
+	* 
+  *
+  * @param handlingFee 手續費
+	*/
+  public void setHandlingFee(BigDecimal handlingFee) {
+    this.handlingFee = handlingFee;
   }
 
 /**
@@ -2078,14 +2101,14 @@ N:否
            + ", emailIncr=" + emailIncr + ", graceIncr=" + graceIncr + ", rateCode=" + rateCode + ", firstRateAdjFreq=" + firstRateAdjFreq + ", rateAdjFreq=" + rateAdjFreq + ", currencyCode=" + currencyCode
            + ", lineAmt=" + lineAmt + ", utilAmt=" + utilAmt + ", utilBal=" + utilBal + ", acctCode=" + acctCode + ", loanTermYy=" + loanTermYy + ", loanTermMm=" + loanTermMm
            + ", loanTermDd=" + loanTermDd + ", firstDrawdownDate=" + firstDrawdownDate + ", maturityDate=" + maturityDate + ", intCalcCode=" + intCalcCode + ", amortizedCode=" + amortizedCode + ", freqBase=" + freqBase
-           + ", payIntFreq=" + payIntFreq + ", repayFreq=" + repayFreq + ", utilDeadline=" + utilDeadline + ", gracePeriod=" + gracePeriod + ", acctFee=" + acctFee + ", ruleCode=" + ruleCode
-           + ", extraRepayCode=" + extraRepayCode + ", custTypeCode=" + custTypeCode + ", recycleCode=" + recycleCode + ", recycleDeadline=" + recycleDeadline + ", usageCode=" + usageCode + ", departmentCode=" + departmentCode
-           + ", incomeTaxFlag=" + incomeTaxFlag + ", compensateFlag=" + compensateFlag + ", irrevocableFlag=" + irrevocableFlag + ", rateAdjNoticeCode=" + rateAdjNoticeCode + ", pieceCode=" + pieceCode + ", repayCode=" + repayCode
-           + ", introducer=" + introducer + ", district=" + district + ", fireOfficer=" + fireOfficer + ", estimate=" + estimate + ", creditOfficer=" + creditOfficer + ", loanOfficer=" + loanOfficer
-           + ", businessOfficer=" + businessOfficer + ", supervisor=" + supervisor + ", investigateOfficer=" + investigateOfficer + ", estimateReview=" + estimateReview + ", coorgnizer=" + coorgnizer + ", advanceCloseCode=" + advanceCloseCode
-           + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo + ", colSetFlag=" + colSetFlag
-           + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo + ", acDate=" + acDate
-           + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", payIntFreq=" + payIntFreq + ", repayFreq=" + repayFreq + ", utilDeadline=" + utilDeadline + ", gracePeriod=" + gracePeriod + ", acctFee=" + acctFee + ", handlingFee=" + handlingFee
+           + ", ruleCode=" + ruleCode + ", extraRepayCode=" + extraRepayCode + ", custTypeCode=" + custTypeCode + ", recycleCode=" + recycleCode + ", recycleDeadline=" + recycleDeadline + ", usageCode=" + usageCode
+           + ", departmentCode=" + departmentCode + ", incomeTaxFlag=" + incomeTaxFlag + ", compensateFlag=" + compensateFlag + ", irrevocableFlag=" + irrevocableFlag + ", rateAdjNoticeCode=" + rateAdjNoticeCode + ", pieceCode=" + pieceCode
+           + ", repayCode=" + repayCode + ", introducer=" + introducer + ", district=" + district + ", fireOfficer=" + fireOfficer + ", estimate=" + estimate + ", creditOfficer=" + creditOfficer
+           + ", loanOfficer=" + loanOfficer + ", businessOfficer=" + businessOfficer + ", supervisor=" + supervisor + ", investigateOfficer=" + investigateOfficer + ", estimateReview=" + estimateReview + ", coorgnizer=" + coorgnizer
+           + ", advanceCloseCode=" + advanceCloseCode + ", prodBreachFlag=" + prodBreachFlag + ", breachDescription=" + breachDescription + ", creditScore=" + creditScore + ", guaranteeDate=" + guaranteeDate + ", contractNo=" + contractNo
+           + ", colSetFlag=" + colSetFlag + ", actFg=" + actFg + ", lastAcctDate=" + lastAcctDate + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo
+           + ", acDate=" + acDate + ", l9110Flag=" + l9110Flag + ", branchNo=" + branchNo + ", approvedLevel=" + approvedLevel + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

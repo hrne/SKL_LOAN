@@ -592,6 +592,7 @@ public class L2153 extends TradeBuffer {
 //	tFacMain.setCancelCode(0); // 預設0正常,該欄位需進維護交易L2154維護
 		tFacMain.setGracePeriod(this.parse.stringToInteger(titaVo.getParam("GracePeriod")));
 		tFacMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
+		tFacMain.setHandlingFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee")));
 		tFacMain.setExtraRepayCode(titaVo.getParam("ExtraRepayCode"));
 		tFacMain.setIntCalcCode(titaVo.getParam("IntCalcCode"));
 		tFacMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));

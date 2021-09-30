@@ -586,7 +586,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "POSP00;Y;Y;-;-;-;L698A;L4041;L4041;-;產生郵局授權資料";
 			break;
 		case "CHCK00":
-			settingValue = "CHCK00;-;M;-;-;-;L698A;L698A;L618A;-;支票兌現檢核";
+			settingValue = "CHCK00;-;M;-;-;-;L698A;     ;     ;-;支票兌現檢核";
 			break;
 		case "CHJC00":
 			settingValue = "CHJC00;-;M;-;-;-;L698A;L698A;L8401;-;JCIC報送預先檢核";

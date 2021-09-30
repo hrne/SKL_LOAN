@@ -381,6 +381,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("OUtilDeadline", tFacMain.getUtilDeadline());
 		this.totaVo.putParam("OGracePeriod", tFacMain.getGracePeriod());
 		this.totaVo.putParam("OAcctFee", wkAcctFee);
+		this.totaVo.putParam("OHandlingFee", tFacMain.getHandlingFee());
 //		this.totaVo.putParam("ODuePayAmt", tFacMain.getDuePayAmt());
 //		this.totaVo.putParam("ODuePayLimit", tFacMain.getDuePayLimit());
 //		this.totaVo.putParam("OPayIntLimit", tFacMain.getPayIntLimit());

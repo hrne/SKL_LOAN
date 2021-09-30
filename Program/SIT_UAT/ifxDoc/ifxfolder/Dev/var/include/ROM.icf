@@ -1765,6 +1765,7 @@ TXFORM=L2R04
 #L2r05UtilDeadline=D,7,S
 #L2r05GracePeriod=A,3,S
 #L2r05AcctFee=m,14.2,S
+#L2r05HandlingFee=m,14.2,S
 #L2r05ExtraRepayCode=A,1,S
 #L2r05CustTypeCode=X,2,S
 #L2r05RuleCode=A,2,S
@@ -1875,6 +1876,7 @@ TXFORM=L2R05
 #L2r05UtilDeadline
 #L2r05GracePeriod
 #L2r05AcctFee
+#L2r05HandlingFee
 #L2r05ExtraRepayCode
 #L2r05CustTypeCode
 #L2r05RuleCode
@@ -6031,6 +6033,33 @@ TXFORM=L5R41
 #L5R41HouseBuyDate
 ^
 </L5R41.tom>
+
+<L5R42Rim.dec>
+#RimCustNo=N,7,S
+#RimCaseSeq=N,3,S
+</L5R42Rim.dec>
+
+<L5R42.dec>
+#L5R42CustName=X,100,S
+##loop {times:30,i:1}
+#L5R42FinCode{i}=X,3,S
+#L5R42FinCodeName{i}=X,100,S
+#L5R42ApprAmt{i}=m,14,S
+#L5R42AccuApprAmt{i}=m,14,S
+##end
+</L5R42.dec>
+
+<L5R42.tom>
+TXFORM=L5R42
+#L5R42CustName
+##loop {times:30,i:1}
+#L5R42FinCode{i}
+#L5R42FinCodeName{i}
+#L5R42ApprAmt{i}
+#L5R42AccuApprAmt{i}
+##end
+^
+</L5R42.tom>
 
 <L6R03.dec>
 #L6r03Result=x,50000,S

@@ -178,14 +178,13 @@ public class LM057Report extends MakeReport {
 		// D2 日期
 		makeExcel.setValue(2, 4, dateF);
 
-		int col = 0;
-		int row = 0;
+
 		BigDecimal amount = BigDecimal.ZERO;
 
 		// 可能可去掉這層，
 		for (Map<String, String> lM057Vo : listData) {
 
-			amount = lM057Vo.get("F1") == null ? BigDecimal.ZERO : new BigDecimal(lM057Vo.get("F1"));
+			amount = lM057Vo.get("F1").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM057Vo.get("F1"));
 
 			switch (lM057Vo.get("F0")) {
 			case "B1":

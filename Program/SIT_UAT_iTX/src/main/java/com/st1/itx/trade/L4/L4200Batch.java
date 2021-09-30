@@ -1593,7 +1593,6 @@ public class L4200Batch extends TradeBuffer {
 		int LLbsDy = bizDate.getLbsDy();
 		List<String> lStatus = new ArrayList<String>();
 		lStatus.add("0"); // 0: 未處理
-		lStatus.add("4"); // 4: 兌現未入帳
 
 		sLoanCheque = loanChequeService.statusCodeRange(lStatus, 0, LbsDy + 19110000, this.index, this.limit, titaVo);
 

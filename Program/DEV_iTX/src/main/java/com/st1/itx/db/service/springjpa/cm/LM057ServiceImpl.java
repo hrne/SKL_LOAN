@@ -70,7 +70,7 @@ public class LM057ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += " SELECT * FROM( ";
 		sql += " SELECT \"KIND\"";
-		sql += "       ,SUM(\"AMT\")";
+		sql += "       ,SUM(\"AMT\") AS \"AMT\"";
 		sql += " FROM(";
 		sql += "	SELECT ( CASE";
 		sql += "       	       WHEN M.\"OvduTerm\" > 3 AND M.\"OvduTerm\" <= 6 THEN 'C2'";

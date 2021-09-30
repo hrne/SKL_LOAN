@@ -29,6 +29,7 @@ ORepayFreq=9,2
 OUtilDeadline=9,7
 OGracePeriod=9,3
 OAcctFee=9,14.2
+OHandlingFee=9,14.2
 OExtraRepayCode=9,1
 OCustomerCode=X,2
 ORuleCode=9,2

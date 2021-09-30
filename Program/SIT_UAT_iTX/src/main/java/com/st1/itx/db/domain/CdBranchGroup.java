@@ -36,7 +36,7 @@ public class CdBranchGroup implements Serializable {
   private String branchNo;
 
   // 課組別代號
-  @Column(name = "`GroupNo`", length = 2, insertable = false, updatable = false)
+  @Column(name = "`GroupNo`", length = 1, insertable = false, updatable = false)
   private String groupNo;
 
   // 課組別說明

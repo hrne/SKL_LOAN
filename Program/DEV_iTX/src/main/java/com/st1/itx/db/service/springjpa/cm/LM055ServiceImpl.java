@@ -76,7 +76,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = " ";
 		sql += "SELECT \"COL\"";
 		sql += "	  ,\"KIND\"";
-		sql += "	  ,\"AMT\"";
+		sql += "	  ,ROUND(\"AMT\",0) AS \"AMT\"";
 		sql += "	  ,ROUND ( NVL (( CASE";
 		sql += "	      	   			WHEN \"COL\" = '3' THEN \"AMT\" * 0.005";
 		sql += "	       	   			WHEN \"COL\" = '4' THEN \"AMT\" * 0.02";
