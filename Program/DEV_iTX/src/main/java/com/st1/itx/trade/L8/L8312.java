@@ -108,51 +108,54 @@ public class L8312 extends TradeBuffer {
 		int sDelayYM = 0;// 延期繳款累計期數(「延期繳款原因」為非'L')
 
 		// 檢核項目(D-25)
-		// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退***
-		// 2.2 start 完整key值已報送結案則予以剔退
-		if ("A".equals(iTranKey)) {
-			Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-					Integer.MAX_VALUE, titaVo);
-			if (sJcicZ046 != null) {
-				throw new LogicException("E0005", "已報送結案.");
+		if (!"4".equals(iTranKey_Tmp)) {
+
+			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退***
+			// 2.2 start 完整key值已報送結案則予以剔退
+			if ("A".equals(iTranKey)) {
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+						Integer.MAX_VALUE, titaVo);
+				if (sJcicZ046 != null) {
+					throw new LogicException("E0005", "已報送結案.");
+				}
+			} // 2.2 end
+
+			// 3 最大債權金融機構於核準債務人申請喘息期後，最慢需於次月10日前報送此檔案，逾期將無法直接報送，需以公文方式行文本中心處理資料進檔.***J
+
+			// 4 start 若延期繳款原因為D'繳稅'者，延期繳款年月不能連續兩期
+			// 5 start 延期繳款累計期數(月份)不得超過6期，超過者以剔退處理.
+			// 7.2 第7欄「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核5的限制.
+			if ("L".equals(iDelayCode)) {
+				sCovDelayYM = 1;
+			} else {
+				sDelayYM = 1;
 			}
-		} // 2.2 end
+			Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+			if (sJcicZ051 != null) {
+				for (JcicZ051 xJcicZ051 : sJcicZ051) {
+					if ("D".equals(iDelayCode)
+							&& (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
+						throw new LogicException("E0005", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
+					}
+					if ("L".equals(xJcicZ051.getDelayCode())) {
+						sCovDelayYM++;
+					} else {
+						sDelayYM++;
+					}
+				}
+				if (sDelayYM > 6) {
+					throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
+				} else if (sCovDelayYM > 6) {
+					throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+				}
+			} // 4, 5, 7.2 end
 
-		// 3 最大債權金融機構於核準債務人申請喘息期後，最慢需於次月10日前報送此檔案，逾期將無法直接報送，需以公文方式行文本中心處理資料進檔.***J
+			// 6 若第7欄「延期繳款原因」為'F:放無薪假或減薪'，則檢核於98/06/30前僅可申請'一期喘息'.***J
 
-		// 4 start 若延期繳款原因為D'繳稅'者，延期繳款年月不能連續兩期
-		// 5 start 延期繳款累計期數(月份)不得超過6期，超過者以剔退處理.
-		// 7.2 第7欄「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核5的限制.
-		if ("L".equals(iDelayCode)) {
-			sCovDelayYM = 1;
-		} else {
-			sDelayYM = 1;
+			// 7.1 第7欄「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核3的限制.***J
+
+			// 檢核項目 end
 		}
-		Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-		if (sJcicZ051 != null) {
-			for (JcicZ051 xJcicZ051 : sJcicZ051) {
-				if ("D".equals(iDelayCode)
-						&& (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
-					throw new LogicException("E0005", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
-				}
-				if ("L".equals(xJcicZ051.getDelayCode())) {
-					sCovDelayYM++;
-				} else {
-					sDelayYM++;
-				}
-			}
-			if (sDelayYM > 6) {
-				throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
-			} else if (sCovDelayYM > 6) {
-				throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
-			}
-		} // 4, 5, 7.2 end
-
-		// 6 若第7欄「延期繳款原因」為'F:放無薪假或減薪'，則檢核於98/06/30前僅可申請'一期喘息'.***J
-
-		// 7.1 第7欄「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核3的限制.***J
-
-		// 檢核項目 end
 
 		switch (iTranKey_Tmp) {
 		case "1":

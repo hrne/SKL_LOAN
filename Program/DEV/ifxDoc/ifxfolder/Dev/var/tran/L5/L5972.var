@@ -213,7 +213,7 @@ T(H,#OOTxKind,#TxKindHelp)
 ! 本金
 #OOPrincipalAmt=m,14,O
 ! 利息
-#OOInterestAmt=m,14,O
+#OOInterestAmt=+m,14,O
 ! 轉入溢收
 #OOOverAmt=m,14,O
 ! 新壽攤分

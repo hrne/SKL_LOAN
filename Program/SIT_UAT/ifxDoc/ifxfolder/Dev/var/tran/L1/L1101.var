@@ -1676,7 +1676,7 @@ TXFORM=L1101
 [#<->#,"通訊-郵遞區號",#OCurrZip3,#OCurrZip2],
 [#<->#,"通訊-地址",#OCurraddress],
 [#<->#,"電子信箱",#OEMail],
-[#<->#,"「是否為」資訊日期",#OIsDataDate],
+[#<->#,"「以下四欄」資訊日期",#OIsDataDate],
 [#<->#,"．是否為授信限制對象",#OIsLimitX],
 [#<->#,"．是否為利害關係人",#OIsRelatedX],
 [#<->#,"．是否為準利害關係人",#OIsLnrelNearX],

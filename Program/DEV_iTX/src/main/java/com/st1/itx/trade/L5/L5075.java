@@ -149,16 +149,23 @@ public class L5075 extends TradeBuffer {
 				occursList.putParam("OOLastDueDate", NegMainVO.getLastDueDate());// 還款結束日
 
 				occursList.putParam("OOPrincipalBal", NegMainVO.getPrincipalBal());// 總本金餘額
-				// 剩餘期數 = (總本金餘額 - 累溢收) / 期款金額
+				// 剩餘期數 = (總本金餘額 - 累溢收) , 期款金額, 利率(年)
+				// sNegCom.nper(iPrincipal, iDueAmt, iRate);
 				BigDecimal Temptimes = new BigDecimal("0");
 				this.info("NegMainVO.getPrincipalBal=" + NegMainVO.getPrincipalBal());
 				this.info("NegMainVO.getAccuOverAmt=" + NegMainVO.getAccuOverAmt());
 				this.info("NegMainVO.getDueAmt=" + NegMainVO.getDueAmt());
 				Temptimes = NegMainVO.getPrincipalBal().subtract(NegMainVO.getAccuOverAmt());
 				// 餘數無條件進位
-				Temptimes = Temptimes.divide(NegMainVO.getDueAmt(), 2);
-				Temptimes = Temptimes.setScale(0, BigDecimal.ROUND_UP);
-				int times = Temptimes.intValue();
+//				Temptimes = Temptimes.divide(NegMainVO.getDueAmt(), 2);
+//				Temptimes = Temptimes.setScale(0, BigDecimal.ROUND_UP);
+//				int times = Temptimes.intValue();
+				BigDecimal DueAmt = NegMainVO.getDueAmt();
+				BigDecimal IntRate = NegMainVO.getIntRate();
+				int times = sNegCom.nper(Temptimes, DueAmt, IntRate);
+				this.info("Temptimes = " + Temptimes );
+				this.info("DueAmt = " + DueAmt );
+				this.info("IntRate = " + IntRate );
 				occursList.putParam("OOTimes", times);// 剩餘期數
 				
 				this.totaVo.addOccursList(occursList);

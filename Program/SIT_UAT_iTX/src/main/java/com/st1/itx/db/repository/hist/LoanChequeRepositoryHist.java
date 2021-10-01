@@ -41,6 +41,9 @@ public interface LoanChequeRepositoryHist extends JpaRepository<LoanCheque, Loan
   // ReceiveDate >= ,AND ReceiveDate <= ,AND StatusCode ^i 
   public Slice<LoanCheque> findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndStatusCodeIn(int receiveDate_0, int receiveDate_1, List<String> statusCode_2, Pageable pageable);
 
+  // CustNo = ,AND StatusCode ^i ,AND ChequeNo >= ,AND ChequeNo <= ,AND  ChequeDate >= ,AND ChequeDate <=
+  public Slice<LoanCheque> findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(int custNo_0, List<String> statusCode_1, int chequeNo_2, int chequeNo_3, int chequeDate_4, int chequeDate_5, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

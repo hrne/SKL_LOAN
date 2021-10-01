@@ -156,15 +156,17 @@ public class BankDeductDtl implements Serializable {
   private int mediaSeq = 0;
 
   // 會計日期
-  /* Default為0，整批入帳成功，回寫此欄位 */
+  /* 入帳時更新 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
   // 經辦
+  /* 入帳時更新 */
   @Column(name = "`TitaTlrNo`", length = 6)
   private String titaTlrNo;
 
   // 交易序號
+  /* 入帳時更新 */
   @Column(name = "`TitaTxtNo`", length = 8)
   private String titaTxtNo;
 
@@ -739,7 +741,7 @@ CdCode:RelationCode
 
 /**
 	* 會計日期<br>
-	* Default為0，整批入帳成功，回寫此欄位
+	* 入帳時更新
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -748,7 +750,7 @@ CdCode:RelationCode
 
 /**
 	* 會計日期<br>
-	* Default為0，整批入帳成功，回寫此欄位
+	* 入帳時更新
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/
@@ -758,7 +760,7 @@ CdCode:RelationCode
 
 /**
 	* 經辦<br>
-	* 
+	* 入帳時更新
 	* @return String
 	*/
   public String getTitaTlrNo() {
@@ -767,7 +769,7 @@ CdCode:RelationCode
 
 /**
 	* 經辦<br>
-	* 
+	* 入帳時更新
   *
   * @param titaTlrNo 經辦
 	*/
@@ -777,7 +779,7 @@ CdCode:RelationCode
 
 /**
 	* 交易序號<br>
-	* 
+	* 入帳時更新
 	* @return String
 	*/
   public String getTitaTxtNo() {
@@ -786,7 +788,7 @@ CdCode:RelationCode
 
 /**
 	* 交易序號<br>
-	* 
+	* 入帳時更新
   *
   * @param titaTxtNo 交易序號
 	*/

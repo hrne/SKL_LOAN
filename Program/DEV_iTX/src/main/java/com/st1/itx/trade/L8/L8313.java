@@ -118,27 +118,29 @@ public class L8313 extends TradeBuffer {
 		iJcicZ040Id.setRcDate(iRcDate);
 
 		// 檢核項目(D-28)
-		if ("A".equals(iTranKey)) {
-			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
-			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
-			if (iJcicZ040 == null) {
-				throw new LogicException("E0005", "未曾報送過'40':前置協商受理申請暨請求回報債權通知");
-			}
-		} // 2 end
+		if (!"4".equals(iTranKey_Tmp)) {
+			if ("A".equals(iTranKey)) {
+				// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
+				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+				if (iJcicZ040 == null) {
+					throw new LogicException("E0005", "未曾報送過'40':前置協商受理申請暨請求回報債權通知");
+				}
+			} // 2 end
 
-		// 3 後續需檢核補報送金融機構需於最大債權金融機構報送本檔案格式後3個營業日內補送資料，予以剔退處理.***J
+			// 3 後續需檢核補報送金融機構需於最大債權金融機構報送本檔案格式後3個營業日內補送資料，予以剔退處理.***J
 
-		// 4 第8,10,12,14,16欄「請求補報送資料檔案格式之資料別」僅限於"42", "43", "61"，其餘予以剔退處理.
-		for (String xDataCode : sDataCode) {
-			indexDataCode++;
-			if (xDataCode != null && !xDataCode.trim().isEmpty()) {
-				if (!Arrays.stream(acceptDataCode).anyMatch(xDataCode::equals)) {
-					throw new LogicException("E0005", "「請求補報送資料檔案格式之資料別」" + indexDataCode + "僅限於'42','43','61'.");
+			// 4 第8,10,12,14,16欄「請求補報送資料檔案格式之資料別」僅限於"42", "43", "61"，其餘予以剔退處理.
+			for (String xDataCode : sDataCode) {
+				indexDataCode++;
+				if (xDataCode != null && !xDataCode.trim().isEmpty()) {
+					if (!Arrays.stream(acceptDataCode).anyMatch(xDataCode::equals)) {
+						throw new LogicException("E0005", "「請求補報送資料檔案格式之資料別」" + indexDataCode + "僅限於'42','43','61'.");
+					}
 				}
 			}
+			// 4 end
+			// 檢核項目end
 		}
-		// 4 end
-		// 檢核項目end
 
 		switch (iTranKey_Tmp) {
 		case "1":

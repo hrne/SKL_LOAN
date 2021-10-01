@@ -95,6 +95,8 @@ public class L8317 extends TradeBuffer {
 		int iSaveEndDate = Integer.valueOf(titaVo.getParam("SaveEndDate"));
 		String iAdminName = titaVo.getParam("AdminName");
 		String iKey = "";
+		int txDate = Integer.valueOf(titaVo.getEntDy());// 營業日 民國YYYMMDD
+		
 		//JcicZ056
 		JcicZ056 iJcicZ056 = new JcicZ056();
 		JcicZ056Id iJcicZ056Id = new JcicZ056Id();
@@ -105,6 +107,15 @@ public class L8317 extends TradeBuffer {
 		iJcicZ056Id.setCourtCode(iCourtCode);//承審法院代碼
 		JcicZ056 chJcicZ056 = new JcicZ056();
 
+		// 檢核項目(D-68)
+		if (!"4".equals(iTranKey_Tmp)) {
+
+			if ("A".equals(iTranKey)) {
+
+			}
+		}
+		
+		
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ056

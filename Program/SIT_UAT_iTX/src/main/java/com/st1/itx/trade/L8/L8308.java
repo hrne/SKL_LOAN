@@ -128,8 +128,10 @@ public class L8308 extends TradeBuffer {
 		iJcicZ044Id.setCustId(iCustId);// 債務人IDN
 		iJcicZ044Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ044Id.setRcDate(iRcDate);
-		// 檢核項目(D-19)
 		
+		// 檢核項目(D-19)
+		if (!"4".equals(iTranKey_Tmp)) {
+			
 		// 1.3 start 完整key值未曾報送過'44':請求同意債務清償方案通知資料則予以剔退
 		if ("A".equals(iTranKey)) {
 			iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id, titaVo);
@@ -202,6 +204,7 @@ public class L8308 extends TradeBuffer {
 		// 2.本中心以第17欄「協議完成日」有值且第19欄「簽約完成日期」為空白時為產出協議書之依據，並於接獲報送'47'次日，將檔名為BBBYYYMMDD+(10碼債務人IDN).pdf按身份證排充電，並自動將當日產生之pdf壓縮成.zip傳輸至最大債權金融機構DTO報送帳號，最大債權金融機構次日即可下載協議書等相關文件。***
 
 		// 檢核項目end
+		}
 
 		switch (iTranKey_Tmp) {
 		case "1":

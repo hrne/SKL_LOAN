@@ -145,6 +145,19 @@ public interface CdCodeService {
   public Slice<CdCode> defItemEq3(String item_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * DefCode = ,AND Enable = ,AND EffectFlag = 
+   *
+   * @param defCode_0 defCode_0
+   * @param enable_1 enable_1
+   * @param effectFlag_2 effectFlag_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdCode CdCode of List
+   */
+  public Slice<CdCode> getCodeListWithFlag(String defCode_0, String enable_1, int effectFlag_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CdCode
    * 
    * @param cdCodeId key

@@ -98,8 +98,8 @@ public class L8301 extends TradeBuffer {
 		String iNotBankId5 = titaVo.getParam("NotBankId5");
 		String iNotBankId6 = titaVo.getParam("NotBankId6");
 		String iKey = "";
-		
-		String[] sNotBankId = {iNotBankId1, iNotBankId2, iNotBankId3, iNotBankId4, iNotBankId5, iNotBankId6}; // 未揭露債權機構代號
+
+		String[] sNotBankId = { iNotBankId1, iNotBankId2, iNotBankId3, iNotBankId4, iNotBankId5, iNotBankId6 }; // 未揭露債權機構代號
 		List<String> iL8301SqlReturn = new ArrayList<>(); // NegFinAcct有效消債條例金融機構代號集合
 
 		// JcicZ040, JcicZ046, NegFinAcct
@@ -109,59 +109,62 @@ public class L8301 extends TradeBuffer {
 		iJcicZ040Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ040Id.setRcDate(iRcDate);
 		JcicZ040 chJcicZ040 = new JcicZ040();
-	
+
 		// 檢核項目(D-3)
-		// 1.3 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
-		JcicZ040 jJcicZ040 = sJcicZ040Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
-		if ("C".equals(iTranKey) && jJcicZ040 == null) {
-			iTranKey_Tmp = "1";
-			iTranKey = "A";
-			
-		}
-		// 1.3 end
+		if (!"4".equals(iTranKey_Tmp)) {
+			// 1.3 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
+			JcicZ040 jJcicZ040 = sJcicZ040Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
+			if ("C".equals(iTranKey) && jJcicZ040 == null) {
+				iTranKey_Tmp = "1";
+				iTranKey = "A";
 
-		// 1.4 檢核該債務人IDN需於45日內申請過債權人清冊***J
-
-		// 1.5 檢核其第7欄止息基準日需等於協商申請日+25日(前端已檢核)
-
-		// 1.6  檢核該債務人IDN報送本通知資料之記錄.已存在尚未報送結案-剔退***
-		// 1.6 結案原因為協商不成立或毀諾案件者，不能再度申請前置協商,結案原因為視同未請求協商案件，結案未滿180天-剔退.***J
-
-		// 1.7 結案已經滿180天，再度申請前置協商，原結案資料不可再報送異動或刪除-->在L8030控制('46'結案通知資料表)***J
-		
-		// 1.8 債務人IDN是否於債權人清冊註明：曾參與銀行公會債務協商，且目前狀態為履約中或毀諾者-有則剔退***J
-
-		// 1.9 檢核中心建檔日期，若大於協商申請日(iRcDate)+2個營業日則剔退***J
-
-		// 1.10 start檢核債權機構代號，是否屬於有效消債條例金融機構代號--不是則剔退(NegFinAcct「債務協商債權機構帳戶檔」DataSendSection資料傳送單位)
-		try {
-			iL8301SqlReturn = sL8301ServiceImpl.findData(this.index, this.limit, titaVo);
-		} catch (Exception e) {
-			// E5004 讀取DB語法發生問題
-			this.info("NegFinAcct ErrorForSql=" + e);
-			throw new LogicException(titaVo, "E5004", "");
-		}
-		if (iL8301SqlReturn != null) {
-			int flagFind = 0;
-			for (String xNotBankId : sNotBankId) {
-				if (!xNotBankId.trim().isEmpty()) {
-					for (String xL8301SqlReturn : iL8301SqlReturn) {
-						if (xNotBankId.equals(xL8301SqlReturn)) {
-							flagFind = 1;
-							break;
-						}
-					}
-					if (flagFind == 0) {
-						throw new LogicException(titaVo, "E0005", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
-					}
-					flagFind = 0;
-				}
 			}
-		} // 1.10 end
-		
-		// 2.本中心於債務人提出協商申請日後第22日截止時，若尚未接獲各債權金融機構回報債權金額資料，本中心即將此部分揭露於Z99前前置協商相關作業提醒資訊.***J
+			// 1.3 end
 
-		// 檢核項目end
+			// 1.4 檢核該債務人IDN需於45日內申請過債權人清冊***J
+
+			// 1.5 檢核其第7欄止息基準日需等於協商申請日+25日(前端已檢核)
+
+			// 1.6 檢核該債務人IDN報送本通知資料之記錄.已存在尚未報送結案-剔退***
+			// 1.6 結案原因為協商不成立或毀諾案件者，不能再度申請前置協商,結案原因為視同未請求協商案件，結案未滿180天-剔退.***J
+
+			// 1.7 結案已經滿180天，再度申請前置協商，原結案資料不可再報送異動或刪除-->在L8030控制('46'結案通知資料表)***J
+
+			// 1.8 債務人IDN是否於債權人清冊註明：曾參與銀行公會債務協商，且目前狀態為履約中或毀諾者-有則剔退***J
+
+			// 1.9 檢核中心建檔日期，若大於協商申請日(iRcDate)+2個營業日則剔退***J
+
+			// 1.10
+			// start檢核債權機構代號，是否屬於有效消債條例金融機構代號--不是則剔退(NegFinAcct「債務協商債權機構帳戶檔」DataSendSection資料傳送單位)
+			try {
+				iL8301SqlReturn = sL8301ServiceImpl.findData(this.index, this.limit, titaVo);
+			} catch (Exception e) {
+				// E5004 讀取DB語法發生問題
+				this.info("NegFinAcct ErrorForSql=" + e);
+				throw new LogicException(titaVo, "E5004", "");
+			}
+			if (iL8301SqlReturn != null) {
+				int flagFind = 0;
+				for (String xNotBankId : sNotBankId) {
+					if (!xNotBankId.trim().isEmpty()) {
+						for (String xL8301SqlReturn : iL8301SqlReturn) {
+							if (xNotBankId.equals(xL8301SqlReturn)) {
+								flagFind = 1;
+								break;
+							}
+						}
+						if (flagFind == 0) {
+							throw new LogicException(titaVo, "E0005", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+						}
+						flagFind = 0;
+					}
+				}
+			} // 1.10 end
+
+			// 2.本中心於債務人提出協商申請日後第22日截止時，若尚未接獲各債權金融機構回報債權金額資料，本中心即將此部分揭露於Z99前前置協商相關作業提醒資訊.***J
+
+			// 檢核項目end
+		}
 
 		switch (iTranKey_Tmp)
 

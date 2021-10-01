@@ -582,11 +582,17 @@ public class NegCom extends CommBuffer {
 		transAccuOverAmt = mainAccuOverAmt;// 累溢繳款(交易後)
 		
 		if (mainPayIntDate == 0) {
-			mainPayIntDate = getRepayDate(mainFirstDueDate, -1, titaVo);
+			mainPayIntDate = tNegMain.getApplDate();//若為0則改為協商申請日
+			//mainPayIntDate = getRepayDate(mainFirstDueDate, -1, titaVo);
 		}
 		if (transRepayPeriod > 0) {
 			transIntStartDate = mainPayIntDate; // 繳息起日 = 繳息迄日(主檔)
-			transIntEndDate = getRepayDate(mainPayIntDate, transRepayPeriod, titaVo);
+			if (mainPayIntDate == tNegMain.getApplDate()) {//第一次繳款的繳息起日=協商申請日
+				int lastPayIntDate = getRepayDate(mainFirstDueDate, -1, titaVo);//首次繳款日的前一個月
+				transIntEndDate = getRepayDate(lastPayIntDate, transRepayPeriod, titaVo);
+			} else {
+				transIntEndDate = getRepayDate(mainPayIntDate, transRepayPeriod, titaVo);
+			}
 			mainPayIntDate = transIntEndDate; // 新繳息起日
 			mainNextPayDate = getRepayDate(mainPayIntDate, 1, titaVo); // 計算新下次繳款日
 		}
@@ -705,7 +711,6 @@ public class NegCom extends CommBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
-
 		tNegMainUpd = sNegMainService.holdById(tNegMain, titaVo);
 		NegMain tNegMainOrg = (NegMain) dataLog.clone(tNegMainUpd);// 資料異動前
 		tNegMainUpd.setPrincipalBal(mainPrincipalBal);// 總本金餘額
@@ -2028,7 +2033,7 @@ public class NegCom extends CommBuffer {
 		this.info("NegCom nper LoanAmt=[" + LoanAmt + "] DueAmt=[" + DueAmt + "] Rate=[" + Rate + "]");
 		int Period = 0;// 應繳期數
 		if (Rate.compareTo(BigDecimal.ZERO) != 0) {
-			BigDecimal Interest = LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 5, RoundingMode.HALF_UP);// 第一次的利息
+			BigDecimal Interest = LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 5, RoundingMode.CEILING);// 第一次的利息
 			if (Interest.compareTo(DueAmt) >= 0) {
 				// E5009 資料檢核錯誤
 				throw new LogicException(titaVo, "E5009", "期金小於等於利息,該公式為發散型無法計算期數");
@@ -2036,12 +2041,12 @@ public class NegCom extends CommBuffer {
 				while (LoanAmt.compareTo(BigDecimal.ZERO) > 0) {
 					// LoanAmt-(DueAmt-LoanAmt*Rate)
 					LoanAmt = LoanAmt.subtract(DueAmt
-							.subtract(LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 5, RoundingMode.HALF_UP)));
+							.subtract(LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 5, RoundingMode.CEILING)));
 					Period++;
 				}
 			}
 		} else {
-			Period = LoanAmt.divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP).intValue();
+			Period = LoanAmt.divide(DueAmt, 0, RoundingMode.CEILING).intValue();
 		}
 		if (Period <= 0) {
 			// E5009 資料檢核錯誤

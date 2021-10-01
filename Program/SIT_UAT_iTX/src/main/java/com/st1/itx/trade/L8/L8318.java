@@ -89,7 +89,7 @@ public class L8318 extends TradeBuffer {
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
 		int iYM = Integer.valueOf(titaVo.getParam("YM"));
 		String iKey = "";
-		// JcicZ060, JcicZ046, JcicZ047, JcicZ062,  JcicZ063
+		// JcicZ060, JcicZ046, JcicZ047, JcicZ062, JcicZ063
 		JcicZ060 iJcicZ060 = new JcicZ060();
 		JcicZ060Id iJcicZ060Id = new JcicZ060Id();
 		iJcicZ060Id.setSubmitKey(iSubmitKey);
@@ -118,67 +118,70 @@ public class L8318 extends TradeBuffer {
 		// String.valueOf(iChangePayDate).length()-2));
 
 		// 檢核項目(D-32)
-		// 2 start KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)，不能重複，若有重複，且無'63'結案資料，則剔退處理.
-		if ("A".equals(iTranKey)) {
-			iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
-			if (iJcicZ060 != null) {
-				iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
-				if (iJcicZ063 == null) {
-					throw new LogicException("E0005", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)有重複，且無'63'結案資料.");
-				}
-			} // 2 end
+		if (!"4".equals(iTranKey_Tmp)) {
+			// 2 start KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)，不能重複，若有重複，且無'63'結案資料，則剔退處理.
+			if ("A".equals(iTranKey)) {
+				iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
+				if (iJcicZ060 != null) {
+					iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
+					if (iJcicZ063 == null) {
+						throw new LogicException("E0005", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)有重複，且無'63'結案資料.");
+					}
+				} // 2 end
 
-			// 3 start 本檔案報送日應為每月16-20日，否則予以剔退
-			if (txDayDate > 20 || txDayDate < 16) {
-				throw new LogicException("E0005", "本檔案報送日應為每月16-20日.");
-			}// 3 end
+				// 3 start 本檔案報送日應為每月16-20日，否則予以剔退
+				if (txDayDate > 20 || txDayDate < 16) {
+					throw new LogicException("E0005", "本檔案報送日應為每月16-20日.");
+				} // 3 end
 
-			// 5 start 需檢核最大債權金融機構是否有報送「'47':金融機構無擔保債務協議資料」，且未曾報送「'46':結案通知資料」.
-			Slice<JcicZ047> sJcicZ047 = sJcicZ047Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
-					Integer.MAX_VALUE, titaVo);
-			if (sJcicZ047 == null) {
-				throw new LogicException("E0005", "需先報送「'47':金融機構無擔保債務協議資料」.");
-			} else {
-				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+				// 5 start 需檢核最大債權金融機構是否有報送「'47':金融機構無擔保債務協議資料」，且未曾報送「'46':結案通知資料」.
+				Slice<JcicZ047> sJcicZ047 = sJcicZ047Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
 						Integer.MAX_VALUE, titaVo);
-				if (sJcicZ046 != null) {
-					throw new LogicException("E0005", "已報送「'46':結案通知資料」.");
-				}
-			} // 5 end
+				if (sJcicZ047 == null) {
+					throw new LogicException("E0005", "需先報送「'47':金融機構無擔保債務協議資料」.");
+				} else {
+					Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+							Integer.MAX_VALUE, titaVo);
+					if (sJcicZ046 != null) {
+						throw new LogicException("E0005", "已報送「'46':結案通知資料」.");
+					}
+				} // 5 end
 
-			// 8 start
-			// 除已報送'62'資料且「簽約完成日」有值之同一KEY值本檔案資料外，於本次報送本檔案('60')前皆須報送'63'結案(結案原因為A或B)，否則予以剔退.
-			iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
-			if (iJcicZ063 == null || (!"A".equals(iJcicZ063.getClosedResult()) && !"B".equals(iJcicZ063.getClosedResult()))) {
-				iJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id, titaVo);
-				if(iJcicZ062 == null) {
-					throw new LogicException("E0005", "須先報送'63'結案，且結案原因為A或B).");
-				}else if(iJcicZ062.getChaRepayEndDate() <= 0) {
-					throw new LogicException("E0005", "'62金融機構無擔保債務變更還款條件協議資料'「簽約完成日」須有值，或者可先報送'63'結案.");
-				}
-			} // 8 end
-		}
-		
-		// 4 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
-		iJcicZ060 = sJcicZ060Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
-		if ("C".equals(iTranKey) && iJcicZ060 == null) {
-			iTranKey_Tmp = "1";
-		}
-		// 4 end
+				// 8 start
+				// 除已報送'62'資料且「簽約完成日」有值之同一KEY值本檔案資料外，於本次報送本檔案('60')前皆須報送'63'結案(結案原因為A或B)，否則予以剔退.
+				iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
+				if (iJcicZ063 == null
+						|| (!"A".equals(iJcicZ063.getClosedResult()) && !"B".equals(iJcicZ063.getClosedResult()))) {
+					iJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id, titaVo);
+					if (iJcicZ062 == null) {
+						throw new LogicException("E0005", "須先報送'63'結案，且結案原因為A或B).");
+					} else if (iJcicZ062.getChaRepayEndDate() <= 0) {
+						throw new LogicException("E0005", "'62金融機構無擔保債務變更還款條件協議資料'「簽約完成日」須有值，或者可先報送'63'結案.");
+					}
+				} // 8 end
+			}
 
-		// 6 start 第7欄「申請變更還款條件日」不得大於當月10日.
-		if (DealDay(iChangePayDate) > 10) {
-			throw new LogicException("E0005", "「申請變更還款條件日」不得大於當月10日.");
-		}
-		// 6 end
+			// 4 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
+			iJcicZ060 = sJcicZ060Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
+			if ("C".equals(iTranKey) && iJcicZ060 == null) {
+				iTranKey_Tmp = "1";
+			}
+			// 4 end
 
-		// 7 start 第8欄「已清分足月期付金年月」需小於等於第7欄「申請變更還款條件日」，否則予以剔退.
-		if (iYM > iChangePayYM) {
-			throw new LogicException("E0005", "「已清分足月期付金年月」需小於等於「申請變更還款條件日」.");
-		}
-		// 7 end
+			// 6 start 第7欄「申請變更還款條件日」不得大於當月10日.
+			if (DealDay(iChangePayDate) > 10) {
+				throw new LogicException("E0005", "「申請變更還款條件日」不得大於當月10日.");
+			}
+			// 6 end
 
-		// 檢核項目 end
+			// 7 start 第8欄「已清分足月期付金年月」需小於等於第7欄「申請變更還款條件日」，否則予以剔退.
+			if (iYM > iChangePayYM) {
+				throw new LogicException("E0005", "「已清分足月期付金年月」需小於等於「申請變更還款條件日」.");
+			}
+			// 7 end
+
+			// 檢核項目 end
+		}
 
 		switch (iTranKey_Tmp) {
 		case "1":

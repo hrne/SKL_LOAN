@@ -147,76 +147,80 @@ public class L8305 extends TradeBuffer {
 		iJcicZ047Id.setRcDate(iRcDate);
 
 		// 檢核項目(D-12)
-		if ("A".equals(iTranKey)) {
-			// 1.2 start 完整key值未曾報送過'40':「前置協商受理申請暨請求回報債權通知」則予以剔退
-			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
-			if (iJcicZ040 == null) {
-				throw new LogicException("E0005", "未曾報送過'40':「前置協商受理申請暨請求回報債權通知」.");
-			} // 1.2 end
-		}
-		
-		// 1.3 start 填報本表必須隨同填報'48':「債務人基本資料」，否則則予以剔退.***
-		
-		// 1.4 檢核全體債權金融機構均已回報債權後，最大債權金融機構才能報送本表('44':請求同意債務清償方案通知資料).***J
+		if (!"4".equals(iTranKey_Tmp)) {
+			if ("A".equals(iTranKey)) {
+				// 1.2 start 完整key值未曾報送過'40':「前置協商受理申請暨請求回報債權通知」則予以剔退
+				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+				if (iJcicZ040 == null) {
+					throw new LogicException("E0005", "未曾報送過'40':「前置協商受理申請暨請求回報債權通知」.");
+				} // 1.2 end
+			}
 
-		// 1.5 start 此檔案新增後，於報送'47'「金融機構無擔保債務協議資料」前，僅能異動1次。但若最大債權機構啟動'52'後，將不受此限.
-		if ("C".equals(iTranKey)) {
-			Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
-					Integer.MAX_VALUE, titaVo);
-			if (sJcicZ052 == null) {
-				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-				if (iJcicZ047 == null) {
-					Slice<JcicZ044Log> sJcicZ044Log = sJcicZ044LogService.ukeyEq(titaVo.getParam("Ukey"), 0,
-							Integer.MAX_VALUE, titaVo);
-					if (sJcicZ044Log != null) {
-						if (sJcicZ044Log.getSize() > 1) {
-							throw new LogicException("E0005", "報送'47':金融機構無擔保債務協議資料前，僅能異動1次.");
+			// 1.3 start 填報本表必須隨同填報'48':「債務人基本資料」，否則則予以剔退.***
+
+			// 1.4 檢核全體債權金融機構均已回報債權後，最大債權金融機構才能報送本表('44':請求同意債務清償方案通知資料).***J
+
+			// 1.5 start 此檔案新增後，於報送'47'「金融機構無擔保債務協議資料」前，僅能異動1次。但若最大債權機構啟動'52'後，將不受此限.
+			if ("C".equals(iTranKey)) {
+				Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
+						Integer.MAX_VALUE, titaVo);
+				if (sJcicZ052 == null) {
+					iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+					if (iJcicZ047 == null) {
+						Slice<JcicZ044Log> sJcicZ044Log = sJcicZ044LogService.ukeyEq(titaVo.getParam("Ukey"), 0,
+								Integer.MAX_VALUE, titaVo);
+						if (sJcicZ044Log != null) {
+							if (sJcicZ044Log.getSize() > 1) {
+								throw new LogicException("E0005", "報送'47':金融機構無擔保債務協議資料前，僅能異動1次.");
+							}
 						}
 					}
 				}
-			}
-		} // 1.5 end
+			} // 1.5 end
 
-		// 1.6, 1.7, 1.8, 1.10 start 若第31欄「屬二階段還款方案之階段註記」填報1者(第一階段)，4條件
-		if ("1".equals(iGradeType)) {
-			// 6.第9欄還款期數需填報固定值72.
-			if (iPeriod != 72) {
-				throw new LogicException("E0005", "屬二階段還款方案之第一階段，還款期數需填報固定值72.");
-			}
-			// 7.第10欄利率需填報固定值00.00.
-			if (iRate.compareTo(BigDecimal.ZERO) != 0) {
-				throw new LogicException("E0005", "屬二階段還款方案之第一階段，利率需填報固定值00.00.");
-			}
-			// 8.第32欄「第一階段最後一期應繳金額」需等於第8欄「無擔保金融債務協商總金額」減第11欄「協商方案估計月付金」乘以71期.
-			if (iPayLastAmt != (iNonGageAmt - iMonthPayAmt * 71)) {
-				throw new LogicException("E0005", "屬二階段還款方案之第一階段，「第一階段最後一期應繳金額」需等於「無擔保金融債務協商總金額」減「協商方案估計月付金」乘以71期.");
-			}
-			// 1.10.第33欄(含)以後需空白(屬第二階段相關內容).
-			if (iPeriod2 != 0 || (iRate2 != null && iRate2.compareTo(BigDecimal.ZERO) != 0) || iMonthPayAmt2 != 0
-					|| iPayLastAmt2 != 0) {
-				throw new LogicException("E0005", "屬二階段還款方案之第一階段，第二階段相關內容需空白.");
-			}
-		} // 1.6, 1.7, 1.8, 1.10 end
+			// 1.6, 1.7, 1.8, 1.10 start 若第31欄「屬二階段還款方案之階段註記」填報1者(第一階段)，4條件
+			if ("1".equals(iGradeType)) {
+				// 6.第9欄還款期數需填報固定值72.
+				if (iPeriod != 72) {
+					throw new LogicException("E0005", "屬二階段還款方案之第一階段，還款期數需填報固定值72.");
+				}
+				// 7.第10欄利率需填報固定值00.00.
+				if (iRate.compareTo(BigDecimal.ZERO) != 0) {
+					throw new LogicException("E0005", "屬二階段還款方案之第一階段，利率需填報固定值00.00.");
+				}
+				// 8.第32欄「第一階段最後一期應繳金額」需等於第8欄「無擔保金融債務協商總金額」減第11欄「協商方案估計月付金」乘以71期.
+				if (iPayLastAmt != (iNonGageAmt - iMonthPayAmt * 71)) {
+					throw new LogicException("E0005",
+							"屬二階段還款方案之第一階段，「第一階段最後一期應繳金額」需等於「無擔保金融債務協商總金額」減「協商方案估計月付金」乘以71期.");
+				}
+				// 1.10.第33欄(含)以後需空白(屬第二階段相關內容).
+				if (iPeriod2 != 0 || (iRate2 != null && iRate2.compareTo(BigDecimal.ZERO) != 0) || iMonthPayAmt2 != 0
+						|| iPayLastAmt2 != 0) {
+					throw new LogicException("E0005", "屬二階段還款方案之第一階段，第二階段相關內容需空白.");
+				}
+			} // 1.6, 1.7, 1.8, 1.10 end
 
-		// 1.9 start 若第31欄「屬二階段還款之階段註記」空白者，第32欄(含)以後需空白(屬第一/二階段相關內容).
-		if ((iGradeType.trim().isEmpty() || "0".equals(iGradeType))
-				&& (iPayLastAmt != 0 || iPeriod2 != 0 || (iRate2 != null && iRate2.compareTo(BigDecimal.ZERO) != 0)
-						|| iMonthPayAmt2 != 0 || iPayLastAmt2 != 0)) {
-			throw new LogicException("E0005", "未註記二階段還款方案，「第一階段最後一期應繳金額」及 二階段還款方案的相關內容需空白.");
-		} // 1.9 end
+			// 1.9 start 若第31欄「屬二階段還款之階段註記」空白者，第32欄(含)以後需空白(屬第一/二階段相關內容).
+			if ((iGradeType.trim().isEmpty() || "0".equals(iGradeType))
+					&& (iPayLastAmt != 0 || iPeriod2 != 0 || (iRate2 != null && iRate2.compareTo(BigDecimal.ZERO) != 0)
+							|| iMonthPayAmt2 != 0 || iPayLastAmt2 != 0)) {
+				throw new LogicException("E0005", "未註記二階段還款方案，「第一階段最後一期應繳金額」及 二階段還款方案的相關內容需空白.");
+			} // 1.9 end
 
-		// 1.11 若第31欄「屬二階段還款方案之階段註記」填報2者(第二階段)，第33欄(含)以後第二階段相關內容不可空白
-		if ("2".equals(iGradeType) && (iPeriod2 == 0 || iRate2 == null || iMonthPayAmt2 == 0 || iPayLastAmt2 == 0)) {
-			throw new LogicException("E0005", "屬二階段還款方案之第二階段，第二階段相關內容不可空白.");
-		} // 1.11 end
+			// 1.11 若第31欄「屬二階段還款方案之階段註記」填報2者(第二階段)，第33欄(含)以後第二階段相關內容不可空白
+			if ("2".equals(iGradeType)
+					&& (iPeriod2 == 0 || iRate2 == null || iMonthPayAmt2 == 0 || iPayLastAmt2 == 0)) {
+				throw new LogicException("E0005", "屬二階段還款方案之第二階段，第二階段相關內容不可空白.");
+			} // 1.11 end
 
-		// 2.最大債權金融機構於報送「協商開始暨停催通知資料」後，若超過15日仍未報送本檔案格式者，本中心即將此部分揭露於Z99前前置協商相關作業提醒資訊.***J
+			// 2.最大債權金融機構於報送「協商開始暨停催通知資料」後，若超過15日仍未報送本檔案格式者，本中心即將此部分揭露於Z99前前置協商相關作業提醒資訊.***J
 
-		// 3.因協商不成立致須回報本資料檔案格式時，則須以交易代碼「'X'補件」報送之，本中心即可接受金融機構報送之前已因協商不成立而結案之案件資料.***J
+			// 3.因協商不成立致須回報本資料檔案格式時，則須以交易代碼「'X'補件」報送之，本中心即可接受金融機構報送之前已因協商不成立而結案之案件資料.***J
 
-		// 4.當本資料檔案格式交易代碼為「'X'補件」時，則第11欄「協商方案估計月付金」、第25~30欄「扶養人」相關，為非必要填報欄位.***J
+			// 4.當本資料檔案格式交易代碼為「'X'補件」時，則第11欄「協商方案估計月付金」、第25~30欄「扶養人」相關，為非必要填報欄位.***J
 
-		// 檢核項目 end
+			// 檢核項目 end
+		}
 
 		switch (iTranKey_Tmp) {
 		case "1":

@@ -466,7 +466,6 @@ public class L2153 extends TradeBuffer {
 				tFacMain.setLastTlrNo(tTempVo.getParam("LastTlrNo"));
 				tFacMain.setLastTxtNo(tTempVo.getParam("LastTxtNo"));
 
-				bankAuthActCom.add("A",titaVo);
 			}
 			try {
 				tFacMain = facMainService.update2(tFacMain, titaVo);

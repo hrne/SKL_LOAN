@@ -1,0 +1,125 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4605)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4605" layout="cols=1;screen.width=[150,850];printer.width=[20,80];order=1">
+[
+["[L4605]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@火險最終保單上傳作業"],
+[#<->#,"#FdInsuEndMonth+火險到期年月",#InsuEndMonth],
+[#<->#,"@@@@@@選擇檔案","#BUTTON_FLD"],
+]
+
+#FdInsuEndMonth=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#FORE_MONTH=D,8,S
+D(7,3,#SYSDATE,1,0)
+
+#COLDIS=A,1,S
+T(1,@InsuEndMonth,#FORE_MONTH,2,5)
+
+! 火險到期年月
+#InsuEndMonth=A,5,I
+@A(YM,1,#InsuEndMonth)
+
+![一般數值 multiple:true 可上傳多個檔案]
+#BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:false;fieldName:#FILENA;width:600
+! 報表種類
+#FILENA=x,1000,S
+
+#ReportA=A,1,S
+E(0,1)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+![顯示註記]
+#L4605PRT=A,1,S
+C(4,#ReportA,E(0,0),E(0,1))
+![資料表頭(HEADER)長度]
+#L4605HD=n,3,S
+C(4,#ReportA,S,$)E(0,6)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L4605LN=n,3,S
+C(4,#ReportA,S,$)E(0,110)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L4605QPRT=n,2,S
+C(4,#ReportA,S,$)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L4605LOOP=n,3,S
+C(4,#ReportA,S,$)E(0,1)ASGN(LOOPHEIGHT$)
+</sub>
+
+!------------ TXFORM = L4605 -----------
+<sub type="FORM" name="L4605">
+
+#OCnt=m,6,O
+IF(#OCnt>=1,E(0,@L4605PRT,1),E(0,@L4605PRT,0))
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+#ReportCustNo=A,7,O
+#ReportFacmNo=A,3,O
+#ReportPrvInsuNo=X,20,O
+#ReportAlrInsuNo=X,20,O
+#ReportNewInsuNo=X,20,O
+#ErrorMsg=x,40,O
+IF(#ReportCustNo==0&&#ReportFacmNo==0&&#ErrorMsg=="",E(0,@L4605PRT,0),$)
+
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#InsuEndMonth
+#FILENA
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4605
+#OCnt
+#ReportCustNo
+#ReportFacmNo
+#ReportPrvInsuNo
+#ReportAlrInsuNo
+#ReportNewInsuNo
+#ErrorMsg
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+#L4605PRT=1,L4605,NA,,D,15
+#InsuEndMonth
+%
+#ReportCustNo
+#ReportFacmNo
+#ReportPrvInsuNo
+#ReportAlrInsuNo
+#ReportNewInsuNo
+#ErrorMsg
+@
+^
+</sub>

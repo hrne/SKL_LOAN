@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 
-
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ446;
+import com.st1.itx.db.domain.JcicZ446Id;
 import com.st1.itx.db.domain.JcicZ447;
+import com.st1.itx.db.domain.JcicZ447Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ450;
 import com.st1.itx.db.domain.JcicZ450Id;
@@ -38,15 +39,15 @@ import com.st1.itx.util.data.DataLog;
 
 /**
  * Tita<br>
-* TranKey=X,1<br>
-* CustId=X,10<br>
-* SubmitKey=X,10<br>
-* RcDate=9,7<br>
-* ChangePayDate=9,7<br>
-* ClosedDate=9,7<br>
-* ClosedResult=9,1<br>
-* OutJcicTxtDate=9,7<br>
-*/
+ * TranKey=X,1<br>
+ * CustId=X,10<br>
+ * SubmitKey=X,10<br>
+ * RcDate=9,7<br>
+ * ChangePayDate=9,7<br>
+ * ClosedDate=9,7<br>
+ * ClosedResult=9,1<br>
+ * OutJcicTxtDate=9,7<br>
+ */
 
 @Service("L8329")
 @Scope("prototype")
@@ -70,12 +71,12 @@ public class L8329 extends TradeBuffer {
 	SendRsp iSendRsp;
 	@Autowired
 	DataLog iDataLog;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8329 ");
 		this.totaVo.init(titaVo);
-				
+
 		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
 		String iTranKey = titaVo.getParam("TranKey");
 		String iCustId = titaVo.getParam("CustId");
@@ -87,9 +88,9 @@ public class L8329 extends TradeBuffer {
 		int iSumRepayActualAmt = Integer.valueOf(titaVo.getParam("SumRepayActualAmt"));
 		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt"));
 		String iPayStatus = titaVo.getParam("PayStatus");
-		int ixApplyDate = Integer.valueOf(titaVo.getParam("ApplyDate"))+19110000;
 		String iKey = "";
-		//JcicZ450
+		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD(檔案報送日)
+		// JcicZ450
 		JcicZ450 iJcicZ450 = new JcicZ450();
 		JcicZ450Id iJcicZ450Id = new JcicZ450Id();
 		iJcicZ450Id.setSubmitKey(iSubmitKey);
@@ -98,56 +99,66 @@ public class L8329 extends TradeBuffer {
 		iJcicZ450Id.setCourtCode(iCourtCode);
 		iJcicZ450Id.setPayDate(iPayDate);
 		JcicZ450 chJcicZ450 = new JcicZ450();
-		//檢核項目(D-58)
-		//需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號」是否存在「'447':金融機構無擔保債務協議資料」
-		//二start
-		Slice<JcicZ447> xJcicZ447 = sJcicZ447Service.otherEq(iSubmitKey,iCustId,ixApplyDate,iCourtCode, this.index, this.limit, titaVo);
-		if (xJcicZ447 == null) {
-			throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否存在「'447':金融機構無擔保債務協議資料」"); 
+		JcicZ447 iJcicZ447 = new JcicZ447();
+		JcicZ447Id iJcicZ447Id = new JcicZ447Id();
+		iJcicZ447Id.setSubmitKey(iSubmitKey);
+		iJcicZ447Id.setCustId(iCustId);
+		iJcicZ447Id.setApplyDate(iApplyDate);
+		iJcicZ447Id.setCourtCode(iCourtCode);
+		JcicZ446 iJcicZ446 = new JcicZ446();
+		JcicZ446Id iJcicZ446Id = new JcicZ446Id();
+		iJcicZ446Id.setSubmitKey(iSubmitKey);
+		iJcicZ446Id.setCustId(iCustId);
+		iJcicZ446Id.setApplyDate(iApplyDate);
+		iJcicZ446Id.setCourtCode(iCourtCode);
+
+		// 檢核項目(D-58)
+		if (!"4".equals(iTranKey_Tmp)) {
+			if ("A".equals(iTranKey)) {
+				// 2 start
+				// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否曾報送過「'447':金融機構無擔保債務協議資料」，若不存在或已報送結案，予以剔退處理。
+				iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
+				if (iJcicZ447 == null) {
+					throw new LogicException(titaVo, "E0005",
+							"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送「'447':金融機構無擔保債務協議資料」");
+				}
+				iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
+				if (iJcicZ446 != null) {
+					throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」已報送結案.");
+				} // 2 end
+
+				// 4 start「繳款日期」不得大於資料報送日期
+				if (iPayDate > txDate) {
+					throw new LogicException(titaVo, "E0005", "「繳款日期」不得大於資料報送日期");
+				}
+
+			}
+
+			// 3 start 累計實際還款金額不等於該IDN所有已報送本檔案資料繳款金額之合計(含本次繳款金額)
+			Slice<JcicZ450> sJcicZ450 = sJcicZ450Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+			int sPayAmt = 0;//IND所有已報送之繳款金額合計
+			if (sJcicZ450 != null) {
+				for (JcicZ450 xJcicZ450 : sJcicZ450) {
+					sPayAmt += xJcicZ450.getPayAmt();
+				}
+			}
+			if ((sPayAmt + iPayAmt) != iSumRepayActualAmt) {
+				throw new LogicException(titaVo, "E0005", "累計繳款金額不等於該IND所有已報送之繳款金額(含今日)");
+			}
+			// 3 end
 		}
-		//二end
-		//累計實際還款金額不等於該IDN所有已報送本檔案資料繳款金額之合計(含本次繳款金額)
-		//now PayAmt  count SumRepayActualAmt
-		//三start
-		Slice<JcicZ450> xJcicZ450 = sJcicZ450Service.custIdEq(iCustId, this.index, this.limit, titaVo);
-		if (xJcicZ450 == null) {
-			throw new LogicException(titaVo, "E0005", "查無(450)前置調解債務人繳款資料"); 
-		}
-		for(JcicZ450 xoJcicZ450:xJcicZ450) {
-		String ixCustId = iJcicZ450Id.getCustId();
-		int ixPayAmt = xoJcicZ450.getPayAmt();
-		this.info("ixPayAmt"+ixPayAmt);
-		this.info("iPayAmt"+iPayAmt);
-			if(ixCustId == iCustId) {
-				if((ixPayAmt + iPayAmt) != iSumRepayActualAmt) {
-					throw new LogicException(titaVo, "E0005", "累計繳款金額不等於該IND所有已報送之繳款金額(含今日)");
-					}			
-			}	
-		}
-		//三end
-		//「繳款日期」不得大於資料報送日期
-		//四start
-//		Calendar cal = Calendar.getInstance();
-//		cal.setTime(new Date());
-//		int year = (cal.get(Calendar.YEAR)-1911)*10000;
-//		int month = (cal.get(Calendar.MONTH) +1)*100;
-//		int day = cal.get(Calendar.DAY_OF_MONTH);
-//		int today = year+month+day;
-		int today = Integer.valueOf(titaVo.get("ENTDY"))+19110000;
-		if(iPayDate>today) {
-			throw new LogicException(titaVo, "E0005", "「繳款日期」不得大於資料報送日期"); 
-		}
-		//四end
-		//同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料
-		//五start
-		Slice<JcicZ446> xJcicZ446 = sJcicZ446Service.custIdEq(iCustId, this.index, this.limit, titaVo);
-		if (xJcicZ446 != null) {
-			throw new LogicException(titaVo, "E0005", "同一key值報送'446'檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料"); 
-		}
-		//五end
-		switch(iTranKey_Tmp) {
+
+		// 5 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
+		iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
+		if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+			throw new LogicException(titaVo, "E0005", "同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+		} // 5 end
+
+		// 檢核條件 end
+
+		switch (iTranKey_Tmp) {
 		case "1":
-			//檢核是否重複，並寫入JcicZ450
+			// 檢核是否重複，並寫入JcicZ450
 			chJcicZ450 = sJcicZ450Service.findById(iJcicZ450Id, titaVo);
 			if (chJcicZ450 != null) {
 				throw new LogicException("E0005", "已有相同資料存在");
@@ -162,10 +173,10 @@ public class L8329 extends TradeBuffer {
 			iJcicZ450.setUkey(iKey);
 			try {
 				sJcicZ450Service.insert(iJcicZ450, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
-			
+
 			break;
 		case "2":
 			iKey = titaVo.getParam("Ukey");
@@ -184,31 +195,31 @@ public class L8329 extends TradeBuffer {
 			JcicZ450 oldJcicZ450 = (JcicZ450) iDataLog.clone(uJcicZ450);
 			try {
 				sJcicZ450Service.update(iJcicZ450, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ450, uJcicZ450);
 			iDataLog.exec();
 			break;
-		case "4": //需刷主管卡
+		case "4": // 需刷主管卡
 			iJcicZ450 = sJcicZ450Service.findById(iJcicZ450Id);
 			if (iJcicZ450 == null) {
 				throw new LogicException("E0008", "");
 			}
 			if (!titaVo.getHsupCode().equals("1")) {
-				iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 			Slice<JcicZ450Log> dJcicLogZ450 = null;
 			dJcicLogZ450 = sJcicZ450LogService.ukeyEq(iJcicZ450.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ450 == null) {
-				//尚未開始寫入log檔之資料，主檔資料可刪除
+				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ450Service.delete(iJcicZ450, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
-			}else {//已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
-				//最近一筆之資料
+			} else {// 已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
+					// 最近一筆之資料
 				JcicZ450Log iJcicZ450Log = dJcicLogZ450.getContent().get(0);
 				iJcicZ450.setPayAmt(iJcicZ450Log.getPayAmt());
 				iJcicZ450.setSumRepayActualAmt(iJcicZ450Log.getSumRepayActualAmt());
@@ -218,14 +229,14 @@ public class L8329 extends TradeBuffer {
 				iJcicZ450.setOutJcicTxtDate(iJcicZ450Log.getOutJcicTxtDate());
 				try {
 					sJcicZ450Service.update(iJcicZ450, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
 		default:
 			break;
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

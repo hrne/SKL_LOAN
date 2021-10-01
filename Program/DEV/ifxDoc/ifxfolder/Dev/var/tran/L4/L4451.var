@@ -1,0 +1,297 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4451)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4451" layout="cols=3;screen.width=[150,350,150,350];printer.width=[20,80];order=1">
+[
+["[L4451]                                 銀行扣款檔資料維護"],
+[#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
+["#FdEntryDate+入帳日期",#EntryDate,#EntryDateL],["#FdCustNo+戶號",#CustNo,#CustNoL,"-",#FacmNo,#FacmNoL,"-",#BormNo,#BormNoL],
+["#FdRepayType+還款類別",#RepayType,#RepayTypeX],[#LabelA,#PrevIntDate,#PrevIntDateL],
+[#<->#,"#FdPayIntDate+應繳日",#PayIntDate,#PayIntDateL],
+[#<->#,"#FdUnpaidAmt+應扣金額",#UnpaidAmt],
+[#<->#,"#FdTempAmt+暫收抵繳金額",#TempAmt],
+]
+
+#FdFunctionCodeX=X,2,L
+#FdEntryDate=X,2,L
+#FdRepayType=X,2,L
+#FdPayIntDate=X,2,L
+#FdUnpaidAmt=X,2,L
+#FdTempAmt=X,2,L
+#FdCustNo=X,2,L
+
+
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 還款類別
+#CDDEF01=x,50,S
+T(3,CdCode.RepayType)
+
+#RepayTypeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@RepayTypeHelp,#HelpDesc1)
+
+!功能
+#FunctionHelp=x,20,S
+T(3,1:新增;2:修改;4:刪除)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L4943進入),$)
+
+
+#NTXBUF=X,90,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+C(4,#NTXBUF,S,$)
+T(1,@FunctionCode,#NTXBUF,1,1)
+T(1,@EntryDate,#NTXBUF,2,7)
+T(1,@CustNo,#NTXBUF,9,7)
+T(1,@FacmNo,#NTXBUF,16,3)
+T(1,@BormNo,#NTXBUF,19,3)
+T(1,@PrevIntDate,#NTXBUF,22,7)
+T(1,@PayIntDate,#NTXBUF,29,7)
+T(1,@RepayType,#NTXBUF,36,2)
+
+T(1,@EntryDateL,#NTXBUF,2,7)
+T(1,@CustNoL,#NTXBUF,9,7)
+T(1,@FacmNoL,#NTXBUF,16,3)
+T(1,@BormNoL,#NTXBUF,19,3)
+T(1,@PrevIntDateL,#NTXBUF,22,7)
+T(1,@PayIntDateL,#NTXBUF,29,7)
+
+T(1,@AcDate,#NTXBUF,38,7)
+T(1,@PRE_UnpaidAmt,#NTXBUF,45,20)
+T(1,@PRE_TempAmt,#NTXBUF,65,20)
+
+#PRE_UnpaidAmt=m,20,S
+E(0,@UnpaidAmt,#PRE_UnpaidAmt)
+#PRE_TempAmt=m,20,S
+E(0,@TempAmt,#PRE_TempAmt)
+T(2,@LabelA,     繳息迄日)
+
+! 新增為輸入欄位
+#PreCol_Chain_0=A,1,S
+C(3,#FunctionCode,0,s,$)
+SHOW(#EntryDate,#CustNo,#FacmNo,#BormNo,#PrevIntDate,#PayIntDate,#RepayType)
+HIDE(#EntryDateL,#CustNoL,#FacmNoL,#BormNoL,#PrevIntDateL,#PayIntDateL)
+
+! 修改刪除為顯示欄位
+#PreCol_Chain_1=A,1,S
+C(3,#FunctionCode,1,s,$)
+SHOW(#EntryDateL,#CustNoL,#FacmNoL,#BormNoL,#PrevIntDateL,#PayIntDateL)
+HIDE(#EntryDate,#CustNo,#FacmNo,#BormNo,#PrevIntDate,#PayIntDate,#RepayType)
+
+#PRE_RepayTypeX=X,10,L
+SWITCH(#RepayType,01,T(3,@RepayTypeX,期款),
+                  02,T(3,@RepayTypeX,部分償還),
+                  03,T(3,@RepayTypeX,結案),
+                  04,T(3,@RepayTypeX,帳管費),
+                  05,T(3,@RepayTypeX,火險費),
+                  06,T(3,@RepayTypeX,契變手續費),
+                  07,T(3,@RepayTypeX,法務費),
+                  09,T(3,@RepayTypeX,其他),
+                  T(3, ))
+
+! 功能
+#FunctionCode=A,1,S
+C(3,#CHAIN,0,E(0,1),s)
+! C(2,#FunctionCode,$,s,$,s,$)
+!HELP(2:修改;4:刪除)
+@C(3,#CHAIN,0,V(1,1),V(1,2,4))
+E(0,@FUNCIND,#FunctionCode)
+
+#FunctionCodeX=X,4,L
+T(3,)T(H,#FunctionCode,#FunctionHelp)
+C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
+!SWITCH(#FunctionCode,2,T(2,修改),
+!                   4,T(2,刪除),
+!                   1,T(2,新增))
+
+! 非新增隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunctionCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+
+#ShowFd=X,1,S
+C(2,#FunctionCode,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+T(2,@FdUnpaidAmt,#ShowFd)
+C(3,#FunctionCode,1,$,s)
+T(2,@FdEntryDate,#ShowFd)     
+T(2,@FdRepayType,#ShowFd)
+T(2,@FdPayIntDate,#ShowFd)
+T(2,@FdCustNo,#ShowFd)
+T(2,@LabelA,*    繳息迄日)
+
+! 刪除隱藏邊框
+#Border=X,1,S
+C(3,#FunctionCode,4,$,s)
+T(F,#UnpaidAmt,0)
+T(F,#TempAmt,0)
+
+! 明細序號
+#RPSEQ=A,6,S
+C(3,#FunctionCode,1,s,$)
+
+#Today=D,7,S
+T(1,#SYSDATE,2,7)
+
+<include src="ROM.icf::L4R11.dec"/>
+
+#RimToday=D,7,S
+
+! 若為連動交易且功能為新增時,調rim取下下營業日
+! 判斷入帳日期是否早於下下營業日,若是,入賬日期改為下下營業日
+#RimL4r11=X,1,S
+C(3,#CHAIN,1,$,S)
+C(3,#FunctionCode,1,$,s)
+E(0,@RimToday,#Today)
+RESET_RIM(#RimL4r11,L4R11)
+S(L4R11,1,#RimToday)
+R(1,L4R11)
+IF(#EntryDate < #L4r11EntryDate,$,s)
+E(0,@EntryDate,#L4r11EntryDate)
+
+! 入帳日期
+#EntryDateL=D,7,L
+#EntryDate=D,7,I
+C(3,#FunctionCode,1,$,s)
+E(0,@EntryDate,#SYSNDATE)
+@V(7)A(DATE,0,#EntryDate)
+
+! 戶號
+#CustNoL=A,7,L
+#CustNo=A,7,I
+C(3,#FunctionCode,1,$,s)
+@V(2,0)
+! 額度
+#FacmNoL=A,3,L
+#FacmNo=A,3,I
+C(3,#FunctionCode,1,$,s)
+@V(2,0)
+
+! 撥款
+#BormNoL=A,3,L
+#BormNo=A,3,I
+C(3,#FunctionCode,1,$,s)
+
+! 授權類別
+#RepayType=A,2,I
+C(3,#FunctionCode,1,$,s)
+HELP(#RepayTypeHelp)
+@V(H,#RepayTypeHelp)
+
+#RepayTypeX=X,10,L
+T(3,)T(H,#RepayType,#RepayTypeHelp)
+!SWITCH(#RepayType,01,T(3,期款),
+!                  02,T(3,部分償還),
+!                  03,T(3,結案),
+!                  04,T(3,帳管費),
+!                  05,T(3,火險費),
+!                  06,T(3,契變手續費),
+!                  07,T(3,法務費),
+!                  09,T(3,其他),
+!                  T(3, ))
+
+! 僅期款需要輸入繳息迄日
+! 修改及刪除才需顯示輸入欄位
+#Check_Col=A,1,S
+IF(#RepayType==1,C(3,#FunctionCode,1,SHOW(#LabelA,#PrevIntDate),HIDE(#PrevIntDate)),HIDE(#LabelA,#PrevIntDate))
+
+#LabelA=x,15,L
+
+! 繳息迄日
+#PrevIntDateL=D,7,L
+#PrevIntDate=D,7,I
+C(3,#FunctionCode,1,$,s)
+IF(#RepayType==1,$,S)
+@V(7)A(DATE,0,#PrevIntDate)
+
+! 應繳日
+#PayIntDateL=D,7,L
+#PayIntDate=D,7,I
+C(3,#FunctionCode,1,$,s)
+@V(7)A(DATE,0,#PayIntDate)
+
+! 扣款金額
+#UnpaidAmt=m,14,I
+C(3,#FunctionCode,4,s,$)
+@V(2,0)
+
+! 暫收抵繳金額
+#TempAmt=m,14,I
+C(3,#FunctionCode,4,s,$)
+
+! 會計日期
+#AcDate=D,7,O
+T(1,#SYSDATE,2,7)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4451 -----------
+<sub type="FORM" name="L4451">
+
+#OWarningMsg=x,200,O
+C(4,#OWarningMsg,$,ALERT(#OWarningMsg))
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCode
+#EntryDate
+#CustNo
+#FacmNo
+#BormNo
+#PrevIntDate
+#PayIntDate
+#RepayType
+#UnpaidAmt
+#TempAmt
+#AcDate
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L4R11.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L4451
+#OWarningMsg
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+
+</sub>

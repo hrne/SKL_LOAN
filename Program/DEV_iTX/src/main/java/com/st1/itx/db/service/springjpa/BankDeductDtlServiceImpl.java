@@ -390,6 +390,34 @@ em = null;
   }
 
   @Override
+  public Slice<BankDeductDtl> findL4450PrevIntDate(int custNo_0, int facmNo_1, int bormNo_2, int prevIntDate_3, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BankDeductDtl> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findL4450PrevIntDate " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " prevIntDate_3 : " +  prevIntDate_3);
+    if (dbName.equals(ContentName.onDay))
+      slice = bankDeductDtlReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndPrevIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, bormNo_2, prevIntDate_3, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = bankDeductDtlReposMon.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndPrevIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, bormNo_2, prevIntDate_3, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = bankDeductDtlReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndPrevIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, bormNo_2, prevIntDate_3, pageable);
+    else 
+      slice = bankDeductDtlRepos.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndPrevIntDateIsOrderByEntryDateDesc(custNo_0, facmNo_1, bormNo_2, prevIntDate_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public BankDeductDtl findL4451First(int entryDate_0, int entryDate_1, String mediaKind_2, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

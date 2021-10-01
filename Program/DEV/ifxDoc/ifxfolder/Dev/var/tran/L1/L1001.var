@@ -68,11 +68,12 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L1001]                                 顧客明細資料查詢"],
-["#FdMain+查詢條件","@(借款人戶號、統一編號、戶名、手機號碼，需擇一輸入)"],
+["#FdMain+查詢條件","@(借款人戶號、統一編號、戶名、手機號碼、行業別，需擇一輸入)"],
 ["#FdCustNoSt+．借款人戶號",#CustNoSt,"~",#CustNoEd],
 ["#FdCustId+．統一編號",#CustId],
 ["#FdCustName+．戶名",#CustName],
 ["#FdMobile+．手機號碼",#Mobile],
+["#FdIndustryCode+．行業別",#IndustryCode],
 ["#FdIdKind+身份別",#IdKind,#IdKindX],
 ]
 #FdMain=X,2,L
@@ -83,6 +84,7 @@ T(3,*)
 #FdMobile=X,2,L
 #FdIdKind=X,2,L
 T(3,*)
+#FdIndustryCode=X,2,L
 
 
 
@@ -173,13 +175,13 @@ C(4,#CustId,$,S)
 !手機號碼
 #Mobile=X,10,I
 !T(3,@FdMobile,*)
+
+#IndustryCode=X,6,I
 C(3,#CustNoEd,0,$,S)
 C(4,#CustId,$,S)
 C(4,#CustName,$,S)
-@C(4,#Mobile,V(P,需擇一輸入查詢條件),V(9))
-
-
-
+C(4,#Mobile,$,S)
+@C(4,#IndustryCode,V(P,需擇一輸入查詢條件),V(9))
 
 #IdKind=A,1,I
 HELP(#IdKindHelp)
@@ -434,7 +436,7 @@ TXFORM=L1001
 <sub type="SELECT">
 
 #RPTFG2=1,QUERY.GRID,L1001
-#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60]}
+#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:10, rowList:[20,40,60]}
 
 #OOBTN1=顧客
 {width:50,search:false,formatter:'cust:bind-button:顧客',align:'center',canExport:false}
@@ -458,7 +460,7 @@ TXFORM=L1001
 {width:55,search:false,formatter:'cust:bind-button:擔保品',align:'center',canExport:false}
 
 #OOBTN8=共同</br>借款人
-{width:55,search:false,formatter:'cust:bind-button:額度;L2018 共同借款人資料查詢',align:'center',canExport:false}
+{width:55,search:false,formatter:'cust:bind-button:查詢;L2018 共同借款人資料查詢',align:'center',canExport:false}
 
 #OOBTN11=關聯戶
 {width:55,search:false,formatter:'cust:bind-button:關聯戶',align:'center',canExport:false}
@@ -485,7 +487,7 @@ TXFORM=L1001
 
 
 #RPTFG2=2,QUERY.GRID,L1001
-#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:20, rowList:[20,40,60]}
+#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:10, rowList:[20,40,60]}
 
 #OOCustId=統一編號
 {width:80,align:'center'}

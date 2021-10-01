@@ -68,7 +68,7 @@ public class L4601 extends TradeBuffer {
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 //		this.limit = 500;
 		// 執行更新
-		if ( titaVo.getParam("FunCd").equals("1")) {
+		if (titaVo.getParam("FunCd").equals("1")) {
 			MySpring.newTask("L4601Batch", this.txBuffer, titaVo);
 			this.addList(this.totaVo);
 		}
@@ -140,6 +140,8 @@ public class L4601 extends TradeBuffer {
 			occursListReport.putParam("ReportAErrorMsg", "無此戶號額度");
 		} else if (errorCode == 13) {
 			occursListReport.putParam("ReportAErrorMsg", "已入通知檔");
+		} else if (errorCode == 14) {
+			occursListReport.putParam("ReportAErrorMsg", "處理代碼非0.正常");
 		} else {
 			occursListReport.putParam("ReportAErrorMsg", errorCode);
 		}
@@ -198,7 +200,9 @@ public class L4601 extends TradeBuffer {
 		occursListReport.putParam("ReportCEthqFee", t.getNewEqInsuFee());
 		occursListReport.putParam("ReportCTotlFee", t.getNewTotalFee());
 		if (errorCode == 31) {
-			occursListReport.putParam("ReportCErrMsg", "此額度無正常戶／催收戶之撥款");
+			occursListReport.putParam("ReportCErrMsg", "此額度已結案");
+		} else if (errorCode == 32) {
+			occursListReport.putParam("ReportCErrMsg", "此額度未撥款");
 		} else {
 			occursListReport.putParam("ReportCErrMsg", errorCode);
 		}

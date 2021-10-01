@@ -216,8 +216,8 @@ C(4,#CustId,T(2,#CustNo),T(2,#L2R47CustNo))
 <sub type="DC" name="p2" layout="cols=3;screen.width=[170,830];printer.width=[20,20,20,20];order=1">
 [
 ["交互運用同意書"],
-["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[150,300,100], p_cols:[15,15,15]}","","",
-["分公司代號","公司名稱","是否同意"],
+["#grid#,{id:1,expand:true,loop:20,row_height:1,s_cols:[150,300,200], p_cols:[15,15,15]}","","",
+["分公司代號","公司名稱","是否同意@(Y:同意/N:不同意)"],
 [[#SubCompanyCode1],[#SubCompanyItem1],[#CrossUse1],],
 ],
 ]

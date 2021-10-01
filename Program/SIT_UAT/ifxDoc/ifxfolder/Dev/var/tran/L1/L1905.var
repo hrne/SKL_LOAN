@@ -411,11 +411,6 @@ TXFORM=L1905
 #OOLiaisonName=聯絡人姓名
 {width:100,align:'left'}
 
-#OOLastUpdate=最後修改時間
-{width:140,align:'center'}
-
-#OOCombined=異動人員
-{width:100,align:'left'}
 
 #OOEnableX=啟用記號
 {width:90,align:'center'}
@@ -428,6 +423,12 @@ TXFORM=L1905
 
 #OOStopReason=停用原因
 {width:200,align:'left'}
+
+#OOCombined=異動人員
+{width:100,align:'left'}
+
+#OOLastUpdate=異動日期時間
+{width:140,align:'center'}
 
 ^
 
@@ -446,11 +447,6 @@ TXFORM=L1905
 #OOLiaisonName=聯絡人姓名
 {width:100,align:'left'}
 
-#OOLastUpdate=最後修改時間
-{width:140,align:'center'}
-
-#OOCombined=異動人員
-{width:100,align:'left'}
 
 #OOEnableX=啟用記號
 {width:90,align:'center'}
@@ -463,6 +459,12 @@ TXFORM=L1905
 
 #OOStopReason=停用原因
 {width:200,align:'left'}
+
+#OOCombined=異動人員
+{width:100,align:'left'}
+
+#OOLastUpdate=異動日期時間
+{width:140,align:'center'}
 
 #OOTelArea=
 {width:10,hidden:true}

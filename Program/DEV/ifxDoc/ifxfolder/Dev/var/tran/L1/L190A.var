@@ -41,14 +41,14 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L190A]                                 員工資料檔查詢"],
-["#FdMain+查詢條件","@(單位代號、員工編號、員工姓名，擇一輸入，不輸入查全部)"],
-["#FdCenterCode+．單位代號",#CenterCode,#BTNA,#CenterCodeName],
-["#FdEmployeeNo+．員工編號",#EmployeeNo],
-["#FdEmployeeNoX+．員工姓名",#EmployeeNoX],
-["#FdAgCurInd+．現職記號",#AgCurInd," (輸入空白查全部)"],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+!["#FdMain+查詢條件","@(單位代號、員工編號、員工姓名，擇一輸入，不輸入查全部)"],
+["#FdCenterCode+單位代號",#CenterCode,#BTNA,#CenterCodeName],
+["#FdEmployeeNo+員工編號",#EmployeeNo],
+["#FdEmployeeNoX+員工姓名",#EmployeeNoX],
+["#FdAgCurInd+現職記號",#AgCurInd,#AgCurIndX,"@(輸入空白查全部)"],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -80,8 +80,8 @@ T(2,@EmpIdentityHelp,#HelpDesc2)
 #FdEmployeeNo=X,2,L
 #FdEmployeeNoX=X,2,L
 #FdAgCurInd=X,2,L
-#FdRPTFG=X,2,L
-T(3,*)
+!#FdRPTFG=X,2,L
+!T(3,*)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -149,7 +149,12 @@ T(3,Y)
 HELP(#AgCurIndHelp)
 @C(4,#AgCurInd,$,V(H,#AgCurIndHelp))
 
-<include src="COM.icf::RPTFG.dec"/>
+#AgCurIndX=X,6,L
+T(H,#AgCurInd,#AgCurIndHelp)
+!<include src="COM.icf::RPTFG.dec"/>
+
+#RPTFG=A,1,S
+E(0,0)
 
 </sub>
 

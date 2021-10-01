@@ -239,7 +239,7 @@ public class LM055ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	       UNION";
 		sql += "	       SELECT 'I' AS \"COL\"";
 		sql += "	       		 ,SUM(\"IntAmtAcc\") AS \"KIND\"";
-		sql += "	       FROM \"MonthlyLoanBal\'";
+		sql += "	       FROM \"MonthlyLoanBal\"";
 		sql += "	       WHERE \"LoanBalance\" > 0";
 		sql += "	         AND \"YearMonth\" = :yymm ";
 		sql += "	     )";

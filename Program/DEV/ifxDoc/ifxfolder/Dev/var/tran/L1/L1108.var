@@ -42,7 +42,7 @@ E(0,0)
 [
 ["[L1108]                                 申請不列印書面通知書維護"],
 ["#FdFunCdX+功能",#FunCdX],
-["#FdCustNo2+戶號-額度（複雜來源）",#CustNo2,"-",#FacmNo2],
+["#FdCustNo2+戶號-額度（複製來源）",#CustNo2,"-",#FacmNo2],
 ["#FdCustNo+戶號-額度",#CustNo,"-",#FacmNo,#BTN1,#CustName],
 ["#FdApplyDt+申請日期",#ApplyDt],
 ["#grid#,{id:1,expand:true,loop:40,row_height:1}","","","","",

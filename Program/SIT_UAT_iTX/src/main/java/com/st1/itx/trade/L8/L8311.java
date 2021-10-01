@@ -114,39 +114,42 @@ public class L8311 extends TradeBuffer {
 		iJcicZ047Id.setRcDate(iRcDate);
 
 		// 檢核項目(D-24)
-		// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退@@@
-		// 2.2 start 完整key值已報送結案則予以剔退
-		if ("A".equals(iTranKey)) {
-			Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-					Integer.MAX_VALUE, titaVo);
-			if (sJcicZ046 != null) {
-				throw new LogicException("E0005", "已報送結案.");
-			} // 2.2 end
+		if (!"4".equals(iTranKey_Tmp)) {
 
-			// 5 start 同一協商案件首次報送本檔案時，若尚未報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期',則予以剔退
-			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-			if (iJcicZ047 == null) {
-				throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送'47':金融機構無擔保債務協議資料.");
-			} else if (iJcicZ047.getSignDate() == 0) {
-				throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期'.");
-			} // 5 end
-		}
+			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退@@@
+			// 2.2 start 完整key值已報送結案則予以剔退
+			if ("A".equals(iTranKey)) {
+				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+						Integer.MAX_VALUE, titaVo);
+				if (sJcicZ046 != null) {
+					throw new LogicException("E0005", "已報送結案.");
+				} // 2.2 end
 
-		// 3 start 若第9欄累計實際還款金額不等於該IDN所有已報送本檔案資料之第8欄繳款金額之合計，則予以剔退
-		Slice<JcicZ050> sJcicZ050 = sJcicZ050Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-		if (sJcicZ050 != null) {
-			for (JcicZ050 xJcicZ050 : sJcicZ050) {
-				sPayAmt += xJcicZ050.getPayAmt();
+				// 5 start 同一協商案件首次報送本檔案時，若尚未報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期',則予以剔退
+				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+				if (iJcicZ047 == null) {
+					throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送'47':金融機構無擔保債務協議資料.");
+				} else if (iJcicZ047.getSignDate() == 0) {
+					throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期'.");
+				} // 5 end
 			}
-		}
-		if (sPayAmt != iSumRepayActualAmt) {
-			throw new LogicException("E0005", "「累計實際還款金額」應等於該IDN所有已報送本檔案資料之「繳款金額」之合計.");
-		}
 
-		// ***4
-		// 若第11欄債權結案註記填報"Y":債務全數清償者，必須隨同報送'46'：結案通知資料,且第7欄結案原因代號必須填報'99':依債務清償方案履行完畢，否則予以剔退。***
+			// 3 start 若第9欄累計實際還款金額不等於該IDN所有已報送本檔案資料之第8欄繳款金額之合計，則予以剔退
+			Slice<JcicZ050> sJcicZ050 = sJcicZ050Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+			if (sJcicZ050 != null) {
+				for (JcicZ050 xJcicZ050 : sJcicZ050) {
+					sPayAmt += xJcicZ050.getPayAmt();
+				}
+			}
+			if (sPayAmt != iSumRepayActualAmt) {
+				throw new LogicException("E0005", "「累計實際還款金額」應等於該IDN所有已報送本檔案資料之「繳款金額」之合計.");
+			}
 
-		// 檢核項目 end
+			// ***4
+			// 若第11欄債權結案註記填報"Y":債務全數清償者，必須隨同報送'46'：結案通知資料,且第7欄結案原因代號必須填報'99':依債務清償方案履行完畢，否則予以剔退。***
+
+			// 檢核項目 end
+		}
 
 		switch (iTranKey_Tmp) {
 		case "1":

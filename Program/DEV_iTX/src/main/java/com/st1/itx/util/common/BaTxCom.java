@@ -15,9 +15,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
-
+import com.st1.itx.db.domain.LoanBook;
+import com.st1.itx.db.domain.LoanBookId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.AcReceivableService;
+import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.data.BaTxVo;
@@ -56,6 +58,8 @@ public class BaTxCom extends TradeBuffer {
 	public AcReceivableService acReceivableService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+	@Autowired
+	public LoanBookService loanBookService;
 
 	private BaTxVo baTxVo;
 	private ArrayList<BaTxVo> baTxList;
@@ -166,6 +170,10 @@ public class BaTxCom extends TradeBuffer {
 	public ArrayList<BaTxVo> settingUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType,
 			BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom settingUnPaid ...");
+		this.info("BaTxCom settingUnPaid EntryDate  入帳日=" + iEntryDate);
+		this.info("BaTxCom settingUnPaid 戶號=" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
+		this.info("BaTxCom settingUnPaid RepayType 還款類別=" + iRepayType);
+		this.info("BaTxCom settingUnPaid TxAmt 回收金額=" + iTxAmt);
 		init();
 		// STEP 1: 設定預設值
 		// isPayAllFee 費用是否全部回收->
@@ -610,11 +618,17 @@ public class BaTxCom extends TradeBuffer {
 						throw new LogicException(titaVo, "E3072", "部分償還前應先償還期款, 應繳息日 = " + ln.getNextPayIntDate()); // 該筆放款尚有未回收期款
 					}
 					wkTerms = 0;
-					loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
-					loancalcRepayIntCom.setExtraRepayFlag("Y"); // 是否內含利息 Y:是 N:否
-					loancalcRepayIntCom.setExtraRepay(iTxAmt);
-					lCalcRepayIntVo = loancalcRepayIntCom.getRepayInt(titaVo);
-					repayLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln, lCalcRepayIntVo);
+					// 放款約定還本檔
+					LoanBook tLoanBook = loanBookService.findById(
+							new LoanBookId(ln.getCustNo(), ln.getFacmNo(), ln.getBormNo(), iEntryDate + 19110000),
+							titaVo);
+					if (tLoanBook != null) {
+						loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
+						loancalcRepayIntCom.setExtraRepayFlag("Y"); // 是否內含利息 Y:是 N:否
+						loancalcRepayIntCom.setExtraRepay(tLoanBook.getBookAmt());
+						lCalcRepayIntVo = loancalcRepayIntCom.getRepayInt(titaVo);
+						repayLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln, lCalcRepayIntVo);
+					}
 					break;
 				case 3: // 結案
 					loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);

@@ -577,8 +577,8 @@ IF(#FunctionCode=="02"||#FunctionCode=="10",$,s)
 @
 A(YM,0,#DeferYMStartX)
 IF(#FunctionCode=="02"||#FunctionCode=="10",$,s)
+C(3,#L5r01DeferYMStart,0,s,$)
 A(YM,1,#DeferYMStartX)
-! @A(YM13,0,#DeferYMStart)
 
 #DeferYMStart=A,5,S
 C(4,#DeferYMStartX,s,$)

@@ -328,7 +328,7 @@ SHOW(#BTNJ)
 IF(#Status=="0",SHOW(#BTND,#BTNF,#BTNG,#BTNH,#BTNI),$)
 IF(#Status=="2",SHOW(#BTNE),$)
 IF(#Status=="4",SHOW(#BTNF),$)
-IF(#CaseKindCode==1,HIDE(#BTND,#BTNG),$)
+IF(#CaseKindCode==1,HIDE(#BTND,#BTNG,#BTNI),$)
 IF(#TwoStepCode=="N",HIDE(#BTNI),$)
 IF(#IsMainFin=="N",HIDE(#BTND,#BTNJ),$)
 

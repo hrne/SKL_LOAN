@@ -3,8 +3,6 @@ package com.st1.itx.trade.L4;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -37,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4604 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4604.class);
 
 	@Autowired
 	public InsuRenewService insuRenewService;
@@ -62,7 +59,7 @@ public class L4604 extends TradeBuffer {
 
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
-        // 未繳
+		// 未繳
 		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 0, 0, this.index, this.limit);
 
 		List<InsuRenew> lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
@@ -84,9 +81,11 @@ public class L4604 extends TradeBuffer {
 			openAcReceivable(lInsuRenew, titaVo);
 //			產出交易後報表
 			prodOutPut(lInsuRenew, titaVo);
-		} 
-		
-        // 已繳
+		} else {
+			throw new LogicException(titaVo, "E2003", "查無資料"); // 檢查錯誤
+		}
+
+		// 已繳
 		sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index, this.limit);
 
 		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
@@ -94,12 +93,12 @@ public class L4604 extends TradeBuffer {
 		if (lInsuRenew != null) {
 //		      已銷科目核心出帳
 			coreAcReceivable(lInsuRenew, titaVo);
-		} 
-		
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 	//
 	private void coreAcReceivable(List<InsuRenew> lInsuRenew, TitaVo titaVo) throws LogicException {
 		this.info("CloseAcReceivable Start...");
@@ -216,7 +215,7 @@ public class L4604 extends TradeBuffer {
 				break;
 			}
 			occursList.putParam("OOStatusCodeX", statusCodeX);
-			
+
 			this.totaVo.addOccursList(occursList);
 
 		}

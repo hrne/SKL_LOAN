@@ -978,7 +978,7 @@ C(4,#Email,S,$)
 A(M,0,#Email)
 </sub>
 
-<sub type="DC" name="p2" layout="cols=3;screen.width=[250,450,250,380];printer.width=[20,20,20,20];order=1">
+<sub type="DC" name="p2" layout="cols=1;screen.width=[250,1080];printer.width=[20,20,20,20];order=1">
 [
 [""],
 [#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimitX],
@@ -1451,7 +1451,7 @@ TXFORM=L1102
 [#<->#,"通訊-郵遞區號",#OCurrZip3,"-",#OCurrZip2],
 [#<->#,"通訊-地址",#OCurraddress],
 [#<->#,"電子信箱",#OEmail],
-[#<->#,"「是否為」資訊日期",#OIsDataDate],
+[#<->#,"「以下三欄」資訊日期",#OIsDataDate],
 [#<->#,"．是否為授信限制對象",#OIsLimitX],
 [#<->#,"．是否為利害關係人",#OIsRelatedX],
 [#<->#,"．是否為準利害關係人",#OIsLnrelNearX],

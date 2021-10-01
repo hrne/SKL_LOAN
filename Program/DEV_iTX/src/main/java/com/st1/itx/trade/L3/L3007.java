@@ -3,6 +3,8 @@ package com.st1.itx.trade.L3;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -46,7 +48,7 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3007")
 @Scope("prototype")
 public class L3007 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3007.class);
+	private static final Logger logger = LoggerFactory.getLogger(L3007.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -66,20 +68,27 @@ public class L3007 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L3007 ");
+		logger.info("active L3007 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iChequeDateStart = this.parse.stringToInteger(titaVo.getParam("ChequeDateStart"));
+		int iChequeNo = this.parse.stringToInteger(titaVo.getParam("ChequeNo"));
 		int iChequeDateEnd = this.parse.stringToInteger(titaVo.getParam("ChequeDateEnd"));
+		String iStatusCode = titaVo.getParam("StatusCode");
 
 		// work area
+		int wkChequeNoSt = 0;
+		int wkChequeNoEd = 9999999;
+		if (iChequeNo > 0) {
+			wkChequeNoSt = iChequeNo;
+			wkChequeNoEd = iChequeNo;
+		}
 		int wkChequeDateStart = 0;
 		int wkChequeDateEnd = 99991231;
 		String wkRvNo;
-		List<String> lStatusCode = new ArrayList<String>();
 
 		if (iChequeDateStart > 0) {
 			wkChequeDateStart = iChequeDateStart + 19110000;
@@ -87,7 +96,20 @@ public class L3007 extends TradeBuffer {
 		if (iChequeDateEnd > 0) {
 			wkChequeDateEnd = iChequeDateEnd + 19110000;
 		}
-		lStatusCode.add("0"); // 0: 未處理
+
+		List<String> lStatusCode = new ArrayList<String>();
+		if (iStatusCode.isEmpty()) {
+			logger.info("未輸入支票狀況");
+			lStatusCode.add("0"); // 0: 未處理
+			lStatusCode.add("1"); // 1: 兌現入帳
+			lStatusCode.add("2"); // 2: 退票
+			lStatusCode.add("3"); // 3: 抽票
+			lStatusCode.add("4"); // 4: 兌現未入帳
+			lStatusCode.add("5"); // 5: 即期票
+		} else {
+			logger.info("有輸入支票狀況");
+			lStatusCode.add(iStatusCode);
+		}
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -96,8 +118,10 @@ public class L3007 extends TradeBuffer {
 		this.limit = 100; // 113 * 500 = 56500
 
 		// 查詢放款主檔
-		slLoanCheque = loanChequeService.chequeCustNoEq(iCustNo, lStatusCode, wkChequeDateStart, wkChequeDateEnd,
-				this.index, this.limit, titaVo);
+//		slLoanCheque = loanChequeService.chequeCustNoEq(iCustNo, lStatusCode, wkChequeDateStart, wkChequeDateEnd,
+//				this.index, this.limit, titaVo);
+		slLoanCheque = loanChequeService.custNoChequeRange(iCustNo, lStatusCode, wkChequeNoSt, wkChequeNoEd,
+				wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
 		lLoanCheque = slLoanCheque == null ? null : slLoanCheque.getContent();
 		if (lLoanCheque == null || lLoanCheque.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "支票檔"); // 查詢資料不存在
@@ -161,6 +185,7 @@ public class L3007 extends TradeBuffer {
 			occursList.putParam("OOChequeBank", tCdBank.getBankItem());
 			occursList.putParam("OOChequeBranch", tCdBank.getBranchItem());
 		}
+		occursList.putParam("OOEntryDate", mLoanCheque.getEntryDate()); // TODO: 兌現入帳日
 
 		// 將每筆資料放入Tota的OcList
 		this.totaVo.addOccursList(occursList);

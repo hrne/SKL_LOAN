@@ -356,16 +356,16 @@ TXFORM=L5071
 
 #RPTFG=0,QUERY.GRID,L5071
 #any={detail:true, header:'L5071.part', caption:'', rowNum:20, rowList:[20,40,60]}
-#OOBtnSearch=
+#OOBtnSearch=查詢
 {search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
-#OOBtnMaintain=
+#OOBtnMaintain=修改
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:35}
-#OOBtnDelete=
+#OOBtnDelete=刪除
 {search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:35}
-#OOBtnDeatail=
+#OOBtnDeatail=交易明細
 {search:false,formatter:'cust:bind-button:交易明細',align:'center',canExport:false,width:65}
-#OOCountDetail=
-{search:false,formatter:'cust:bind-button:撥付統計',align:'center',canExport:false,width:65}
+#OOCountDetail=撥付統計
+{search:false,formatter:'cust:bind-button:撥付統計',align:'center',canExport:false,width:75}
 
 #OOCustId=身分證字號
 {width:120,align:'center'}

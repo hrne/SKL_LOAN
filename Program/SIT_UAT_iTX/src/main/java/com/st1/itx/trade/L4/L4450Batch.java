@@ -96,8 +96,8 @@ public class L4450Batch extends TradeBuffer {
 
 //	重複註記
 	private HashMap<tmpBorm, Integer> flagMap = new HashMap<>();
-//	繳息迄日 minNextPayIntDateList
-	private HashMap<tmpBorm, Integer> minNextPayIntDateList = new HashMap<>();
+//	繳息迄日 minIntStartDate
+	private HashMap<tmpBorm, Integer> minIntStartDate = new HashMap<>();
 //	計息起日 prevPayIntDateList
 	private HashMap<tmpBorm, Integer> intStartDate = new HashMap<>();
 //	計息止日 prevRepaidDateList
@@ -118,13 +118,13 @@ public class L4450Batch extends TradeBuffer {
 	private HashMap<tmpBorm, BigDecimal> repAmtFacMap = new HashMap<>();
 
 //	應扣金額 
-	private HashMap<tmpBorm, BigDecimal> shuAmtMap = new HashMap<>();
+	private HashMap<tmpBorm, BigDecimal> shPayAmtMap = new HashMap<>();
 //	暫收抵繳金額 
 	private HashMap<tmpBorm, BigDecimal> tmpAmtMap = new HashMap<>();
 //	扣款金額
 	private HashMap<tmpBorm, BigDecimal> repAmtMap = new HashMap<>();
 //	短欠繳金額
-	private HashMap<tmpBorm, BigDecimal> ownAmtMap = new HashMap<>();
+	private HashMap<tmpBorm, BigDecimal> shortAmtMap = new HashMap<>();
 //	暫收款占用金額 = 未到期約定還本金額 + 法務費金額 
 	private HashMap<tmpBorm, BigDecimal> bookAmtMap = new HashMap<>();
 
@@ -132,6 +132,9 @@ public class L4450Batch extends TradeBuffer {
 //	預設true 若有錯誤改為 False 
 	private Boolean checkFlag = true;
 	private String checkMsg = " ";
+//  是否有還款資料
+	private boolean isLoanRepay = false;
+
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 
 	private BigDecimal limitAmt = BigDecimal.ZERO;
@@ -144,13 +147,14 @@ public class L4450Batch extends TradeBuffer {
 //	二扣應繳日：會計日前五個營業日（含本日），為基準計算上述之該日應繳日
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L4450Batch ");
+		this.info("active L4450Batch  Call by " + titaVo.getTxcd());
 		baTxCom.setTxBuffer(this.getTxBuffer());
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate"));
+		int iRepayType = 1; // 期款
 		// 整批
 		if ("L4450".equals(titaVo.getTxcd())) {
 			int iAchSpecificDdFrom = parse.stringToInteger(titaVo.getParam("AchSpecificDdFrom")) + 19110000;
@@ -200,7 +204,10 @@ public class L4450Batch extends TradeBuffer {
 
 			if (checkFlag) {
 				this.info("fnAllList.size() = " + fnAllList.size());
-				if (fnAllList.size() > 0) {
+				if (fnAllList.size() == 0) {
+					checkMsg = "查無吻合之撥款檔資料";
+					checkFlag = false;
+				} else {
 					int i = 0;
 					for (int j = 1; j <= fnAllList.size(); j++) {
 						i = j - 1;
@@ -215,56 +222,98 @@ public class L4450Batch extends TradeBuffer {
 							this.batchTransaction.commit();
 						}
 					}
-				} else {
-					checkMsg = "撥款檔查無資料";
+				}
+				this.batchTransaction.commit();
+			}
+			if (checkFlag) {
+				setBankDeductDtl(shPayAmtMap, titaVo);
+				if (cnt == 0) {
+					checkMsg = "E0001 查無資料";
 					checkFlag = false;
 				}
-				this.batchTransaction.commit();
+			}
+			this.batchTransaction.commit();
+			if (checkFlag) {
+				try {
+					l4450Report.exec(titaVo);
+				} catch (LogicException e) {
+					checkMsg = e.getMessage();
+					checkFlag = false;
+				}
+			}
 
-				if (checkFlag) {
-					setBankDeductDtl(shuAmtMap, titaVo);
-					if (cnt == 0) {
-						checkMsg = "E0001 查無資料";
-						checkFlag = false;
-					}
-				}
-				this.batchTransaction.commit();
-				if (checkFlag) {
-					try {
-						l4450Report.exec(titaVo);
-					} catch (LogicException e) {
-						checkMsg = e.getMessage();
-						checkFlag = false;
-					}
-				}
+			if (checkFlag) {
+				checkMsg = "銀行扣款合計報表已完成，總筆數=" + cnt;
+			}
 
-				if (checkFlag) {
-					checkMsg = "銀行扣款合計報表已完成，總筆數=" + cnt;
-				}
-
-				if (checkFlag) {
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
-							titaVo.getTlrNo(), checkMsg, titaVo);
-				} else {
-					webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450",
-							titaVo.getTlrNo(), checkMsg, titaVo);
-				}
+			if (checkFlag) {
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
+						titaVo.getTlrNo(), checkMsg, titaVo);
+			} else {
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4450",
+						titaVo.getTlrNo(), checkMsg, titaVo);
 			}
 		}
 		// 單筆
 		if ("L4451".equals(titaVo.getTxcd())) {
-			// 還款試算
-			int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
-			int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
-			int repayType = parse.stringToInteger(titaVo.getParam("RepayType"));
-			doBatxCom(iEntryDate, custNo, facmNo, repayType, titaVo);
-			setBankDeductDtl(shuAmtMap, titaVo);
-			if (cnt == 0) {
-				checkMsg = "無扣款資料";
-			} else {
-				checkMsg = "銀行扣款檔新增完成，筆數=" + cnt;
+			iRepayType = parse.stringToInteger(titaVo.getParam("RepayType")); // 還款類別
+			try {
+				fnAllList = l4450ServiceImpl.findSingle(titaVo);
+			} catch (Exception e) {
+				checkMsg = e.getMessage();
+				checkFlag = false;
 			}
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", checkMsg, titaVo);
+			if (checkFlag) {
+				this.info("fnAllList.size() = " + fnAllList.size());
+				if (fnAllList.size() == 0) {
+					checkMsg = "E0001 查無吻合之撥款檔資料";
+					checkFlag = false;
+				} else {
+
+					int i = 0;
+					for (int j = 1; j <= fnAllList.size(); j++) {
+						i = j - 1;
+
+						setFacmValue(fnAllList, i);
+
+						// 還款試算
+						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("F0")),
+								parse.stringToInteger(fnAllList.get(i).get("F1")), iRepayType, titaVo); // 還款類別
+
+					}
+				}
+			}
+			if (checkFlag) {
+				// 是否有還款資料
+				if (iRepayType <= 3 && !isLoanRepay) {
+					checkFlag = false;
+					checkMsg = "E0001 查無還本利資料";
+					if (iRepayType == 2) {
+						checkMsg += ", 請先登錄約定部分償還";
+					}
+				}
+			}
+
+			if (checkFlag) {
+				setBankDeductDtl(shPayAmtMap, titaVo);
+				if (cnt == 0) {
+					checkMsg = "E0001 查無該還款類別資料";
+					checkFlag = false;
+				} else {
+					checkMsg = "銀行扣款檔新增完成，筆數=" + cnt;
+				}
+			}
+
+			this.batchTransaction.commit();
+
+			if (checkFlag) {
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4943",
+						"1" + titaVo.getParam("CustNo") + "00000" + titaVo.getParam("EntryDate")
+								+ titaVo.getParam("EntryDate"),
+						checkMsg, titaVo);
+			} else {
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", checkMsg, titaVo);
+			}
 		}
 
 		return null;
@@ -272,34 +321,25 @@ public class L4450Batch extends TradeBuffer {
 	}
 
 //	用既有之List for each 找出RepayCode 1.期款  4.帳管 5.火險 6.契變手續費 
-	private void doBatxCom(int entryDate, int custNo, int facmNo, int repayType, TitaVo titaVo) throws LogicException {
-
-		tmpBorm tmp2 = new tmpBorm(custNo, facmNo, 0, 0, 0);
+	private void doBatxCom(int entryDate, int custNo, int facmNo, int iRepayType, TitaVo titaVo) throws LogicException {
 
 		List<BaTxVo> listBaTxVo = new ArrayList<BaTxVo>();
 
-//		同戶號額度僅進入計算一次
-		if (flagMap.containsKey(tmp2)) {
-			this.info("custNo = " + custNo + " facmNo = " + facmNo + " 同戶號額度僅進入計算一次 return...");
-			return;
-		} else {
-			flagMap.put(tmp2, 1);
-		}
-
 		try {
-			listBaTxVo = baTxCom.settingUnPaid(entryDate, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
+			listBaTxVo = baTxCom.settingUnPaid(entryDate, custNo, facmNo, 0, iRepayType, BigDecimal.ZERO, titaVo);
 		} catch (Exception e) {
 			this.info("Error : " + e.getMessage());
 		}
 
-//		清除前一戶號額度list
-//		rpAmtMap = new HashMap<>();
+		tmpBorm tmp2 = new tmpBorm(custNo, facmNo, 0, 0, 0);
 
 //		預設暫收款=0
 		tmpAmtMap.put(tmp2, BigDecimal.ZERO);
 
-//		未到期約定還本金額
-		bookAmtMap.put(tmp2, this.getBookAmt(tmp2, titaVo));
+//		期款占用未到期約定還本金額
+		if (iRepayType == 1) {
+			bookAmtMap.put(tmp2, this.getLoanBookAmt(tmp2, titaVo));
+		}
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
 //			batxvo sort by CustNo, FacmNo, BormNo, 法務費, 暫收款, PayIntDate , RepayType
@@ -358,36 +398,58 @@ public class L4450Batch extends TradeBuffer {
 				// 本金利息 = 0
 				if (tBaTxVo.getDataKind() == 2 && tBaTxVo.getPrincipal().add(tBaTxVo.getInterest())
 						.add(tBaTxVo.getDelayInt()).add(tBaTxVo.getBreachAmt()).compareTo(BigDecimal.ZERO) == 0) {
+					this.info("continue...  本金利息 = 0");
 					continue;
 				}
-
-//				短繳後方合計第一筆欠款
-				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 1) {
-					this.info("continue... 短繳期金");
-					ownAmtMap.put(tmp3, tBaTxVo.getUnPaidAmt());
-					continue;
+				// 是否有還款資料
+				if (tBaTxVo.getDataKind() == 2) {
+					isLoanRepay = true;
 				}
-
-//				排除已送出未提回 :bankDeductDtl.mediaCode 需為空白orE
-//				if (isMediaSent(tmp, titaVo)) {
-//					this.info("continue 已送出未提回 : " + tmp.toString());
-//					continue;
-//				}
 
 				if (tBaTxVo.getDataKind() > 3) {
 					this.info("continue... getDataKind : " + tBaTxVo.getDataKind());
 					continue;
 				}
 
+//				短繳後方合計第一筆欠款
+				if (tBaTxVo.getDataKind() == 1 && tBaTxVo.getRepayType() == 1) {
+					this.info("continue... 短繳期金");
+					shortAmtMap.put(tmp3, tBaTxVo.getUnPaidAmt());
+					continue;
+				}
+
 //          	暫收款占用金額 = 未到期約定還本金額 + 法務費金額 
-				if (tBaTxVo.getRepayType() == 6) {
-					if (bookAmtMap.containsKey(tmp2)) {
-						bookAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt().add(bookAmtMap.get(tmp2)));
+				if (iRepayType == 1) {
+					if (tBaTxVo.getRepayType() == 6) {
+						if (bookAmtMap.containsKey(tmp2)) {
+							bookAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt().add(bookAmtMap.get(tmp2)));
+						} else {
+							bookAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt());
+						}
+					}
+				}
+//				1.期款、2.部分償還、3.結案 ==> 含 1. 應收 (1.短繳期金 4.帳管費 5.火險費 6.契變手續費)  2.本金、利息 
+//              4.帳管費 5.火險費 6.契變手續費 7.法務費 ==> 還款類別				
+				if (tBaTxVo.getDataKind() == 1) {
+					if (iRepayType <= 3) {
+						if (tBaTxVo.getRepayType() == 1 || tBaTxVo.getRepayType() == 4 || tBaTxVo.getRepayType() == 5
+								|| tBaTxVo.getRepayType() == 6) {
+						} else {
+							this.info("continue... DataKind=" + tBaTxVo.getDataKind() + ", RepayType="
+									+ tBaTxVo.getRepayType());
+							continue;
+						}
 					} else {
-						bookAmtMap.put(tmp2, tBaTxVo.getUnPaidAmt());
+						if (tBaTxVo.getRepayType() == iRepayType) {
+						} else {
+							this.info("continue... DataKind=" + tBaTxVo.getDataKind() + ", RepayType="
+									+ tBaTxVo.getRepayType());
+							continue;
+						}
 					}
 				}
 
+				// 暫收款
 				if (tBaTxVo.getDataKind() == 3) {
 					this.info("bookAmAmtMap : " + bookAmtMap.get(tmp2));
 					if (tBaTxVo.getUnPaidAmt().compareTo(bookAmtMap.get(tmp2)) > 0) {
@@ -408,56 +470,59 @@ public class L4450Batch extends TradeBuffer {
 					this.info("tmpAmtMap : " + tmpAmtMap.get(tmp2));
 					continue;
 				}
-//				應扣金額 shuAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
 
-//				1.期款 3.結案 4.帳管費 5.火險費 6.契變手續費
-				if (tBaTxVo.getRepayType() == 1 || tBaTxVo.getRepayType() == 3 || tBaTxVo.getRepayType() == 4
-						|| tBaTxVo.getRepayType() == 5 || tBaTxVo.getRepayType() == 6) {
-				} else {
-					this.info("continue getRepayType : " + tBaTxVo.getRepayType());
-					continue;
-				}
-
-				int minNextIntDate = tBaTxVo.getIntStartDate();
-
-				if (minNextPayIntDateList.containsKey(tmp)) {
-					if (minNextIntDate < minNextPayIntDateList.get(tmp)) {
-						minNextPayIntDateList.put(tmp, minNextIntDate);
+				if (minIntStartDate.containsKey(tmp)) {
+					if (tBaTxVo.getIntStartDate() < minIntStartDate.get(tmp)) {
+						minIntStartDate.put(tmp, tBaTxVo.getIntStartDate());
 					}
 				} else {
-					minNextPayIntDateList.put(tmp, minNextIntDate);
+					minIntStartDate.put(tmp, tBaTxVo.getIntStartDate());
 				}
 
-				if (shuAmtMap.containsKey(tmp)) {
-					shuAmtMap.put(tmp, tBaTxVo.getUnPaidAmt().add(shuAmtMap.get(tmp)));
+//				 已送出媒體未回或未製成媒體 1.與輸入還款來源相同 2.與輸入還款來源不相同
+				int sendCode = isMediaSent(tmp, iRepayType, minIntStartDate.get(tmp), titaVo);
+				if (sendCode > 0) {
+					if (sendCode == 1 && "L4451".equals(titaVo.getTxcd())) {
+						checkMsg = "已送出媒體未回或未製成媒體";
+						checkFlag = false;
+					} else {
+						this.info("continue 已送出未提回 : " + tmp.toString());
+						continue;
+					}
+				}
+
+//				應扣金額 shPayAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
+
+				if (shPayAmtMap.containsKey(tmp)) {
+					shPayAmtMap.put(tmp, tBaTxVo.getUnPaidAmt().add(shPayAmtMap.get(tmp)));
 				} else {
-					shuAmtMap.put(tmp, tBaTxVo.getUnPaidAmt());
+					shPayAmtMap.put(tmp, tBaTxVo.getUnPaidAmt());
 				}
 
 //				短繳合計於第一筆欠款
-				if (ownAmtMap.get(tmp3) != null && ownAmtMap.get(tmp3).compareTo(BigDecimal.ZERO) > 0) {
-					shuAmtMap.put(tmp, shuAmtMap.get(tmp).add(ownAmtMap.get(tmp3)));
-					ownAmtMap.put(tmp3, BigDecimal.ZERO);
+				if (shortAmtMap.get(tmp3) != null && shortAmtMap.get(tmp3).compareTo(BigDecimal.ZERO) > 0) {
+					shPayAmtMap.put(tmp, shPayAmtMap.get(tmp).add(shortAmtMap.get(tmp3)));
+					shortAmtMap.put(tmp3, BigDecimal.ZERO);
 				}
 
 //              期款可暫收抵繳
-//				應扣金額 shuAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
+//				應扣金額 shPayAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
 
 //				若應扣金額<=暫收款
 //				扣款金額=0
 //				暫收款(該扣款代碼)=應扣金額
 //				暫收款(目前額度下)=暫收款(目前額度下)-應扣金額
-				if (tBaTxVo.getRepayType() == 1 || tBaTxVo.getRepayType() == 3) {
-					if (shuAmtMap.get(tmp).compareTo(tmpAmtMap.get(tmp2)) <= 0) {
+				if (tBaTxVo.getRepayType() <= 3) {
+					if (shPayAmtMap.get(tmp).compareTo(tmpAmtMap.get(tmp2)) <= 0) {
 						repAmtMap.put(tmp, BigDecimal.ZERO);
-						tmpAmtMap.put(tmp, shuAmtMap.get(tmp));
-						tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).subtract(shuAmtMap.get(tmp)));
+						tmpAmtMap.put(tmp, shPayAmtMap.get(tmp));
+						tmpAmtMap.put(tmp2, tmpAmtMap.get(tmp2).subtract(shPayAmtMap.get(tmp)));
 					} else {
 //				若應扣金額>暫收款
 //				扣款金額=應扣金額-暫收款
 //				暫收款(該扣款代碼) = 暫收款(目前額度下)
 //				暫收款(目前額度下)
-						BigDecimal repayAmt = shuAmtMap.get(tmp).subtract(tmpAmtMap.get(tmp2));
+						BigDecimal repayAmt = shPayAmtMap.get(tmp).subtract(tmpAmtMap.get(tmp2));
 						repAmtMap.put(tmp, repayAmt);
 //					合計至額度，限額計算用
 						if (!repAmtFacMap.containsKey(tmp2)) {
@@ -469,17 +534,17 @@ public class L4450Batch extends TradeBuffer {
 						tmpAmtMap.put(tmp2, BigDecimal.ZERO);
 					}
 				} else {
-					repAmtMap.put(tmp, shuAmtMap.get(tmp));
+					repAmtMap.put(tmp, shPayAmtMap.get(tmp));
 					tmpAmtMap.put(tmp, BigDecimal.ZERO);
 //				合計至額度，限額計算用
 					if (!repAmtFacMap.containsKey(tmp2)) {
-						repAmtFacMap.put(tmp2, shuAmtMap.get(tmp));
+						repAmtFacMap.put(tmp2, shPayAmtMap.get(tmp));
 					} else {
-						repAmtFacMap.put(tmp2, repAmtFacMap.get(tmp2).add(shuAmtMap.get(tmp)));
+						repAmtFacMap.put(tmp2, repAmtFacMap.get(tmp2).add(shPayAmtMap.get(tmp)));
 					}
 				}
 //				費用才抓取BatxVo.AcctCode
-				if (tBaTxVo.getRepayType() == 4 || tBaTxVo.getRepayType() == 5 || tBaTxVo.getRepayType() == 6) {
+				if (tBaTxVo.getRepayType() >= 4) {
 					rpAcCodeMap.put(tmp, tBaTxVo.getAcctCode());
 				} else {
 					rpAcCodeMap.put(tmp, "");
@@ -487,20 +552,21 @@ public class L4450Batch extends TradeBuffer {
 				intStartDate.put(tmp, tBaTxVo.getIntStartDate());
 				intEndDate.put(tmp, tBaTxVo.getIntEndDate());
 
-				this.info("shuAmtMap : " + shuAmtMap.get(tmp));
+				this.info("shPayAmtMap : " + shPayAmtMap.get(tmp));
 				this.info("tmpAmtMap by facm : " + tmpAmtMap.get(tmp2));
 				this.info("tmpAmtMap by borm : " + tmpAmtMap.get(tmp));
 				this.info("repAmtMap : " + repAmtMap.get(tmp));
 				this.info("repAmtFacMap : " + repAmtFacMap.get(tmp2));
 			}
 		}
+
 	}
 
 //	寫入BankDeductDtl
-	private void setBankDeductDtl(HashMap<tmpBorm, BigDecimal> shuAmtMap, TitaVo titaVo) throws LogicException {
+	private void setBankDeductDtl(HashMap<tmpBorm, BigDecimal> shPayAmtMap, TitaVo titaVo) throws LogicException {
 		this.info("setBankDeductDtl...");
 
-		Set<tmpBorm> tempSet = shuAmtMap.keySet();
+		Set<tmpBorm> tempSet = shPayAmtMap.keySet();
 
 		List<tmpBorm> tempList = new ArrayList<>();
 
@@ -540,10 +606,10 @@ public class L4450Batch extends TradeBuffer {
 			}
 
 			tBankDeductDtl.setAcctCode(sAcctCode);
-			tBankDeductDtl.setPrevIntDate(minNextPayIntDateList.get(tmp));
+			tBankDeductDtl.setPrevIntDate(minIntStartDate.get(tmp));
 
-//			應扣金額 shuAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
-			tBankDeductDtl.setUnpaidAmt(shuAmtMap.get(tmp));
+//			應扣金額 shPayAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
+			tBankDeductDtl.setUnpaidAmt(shPayAmtMap.get(tmp));
 			tBankDeductDtl.setTempAmt(tmpAmtMap.get(tmp));
 			tBankDeductDtl.setRepayAmt(repAmtMap.get(tmp));
 
@@ -644,7 +710,7 @@ public class L4450Batch extends TradeBuffer {
 					break;
 				}
 
-//				NA:未產 Y:已產 N:已產，扣款金額為0 E:已提回，回傳碼不為正常
+//				NA:未產 Y:已產 N:已產
 				if (!"".equals(tBankDeductDtl.getMediaCode())) {
 					checkMsg = "已產生媒體";
 					checkFlag = false;
@@ -660,6 +726,36 @@ public class L4450Batch extends TradeBuffer {
 				}
 			}
 		}
+	}
+
+	// 已送出媒體未回或未製成媒體 1.與輸入還款來源相同 2.與輸入還款來源不相同
+	private int isMediaSent(tmpBorm tmp, int iRepayType, int prevIntDate, TitaVo titaVo) {
+		int result = 0;
+
+		Slice<BankDeductDtl> slBankDeductDtl = null;
+		if (tmp.getRepayType() <= 3) {
+			slBankDeductDtl = bankDeductDtlService.findL4450PrevIntDate(tmp.getCustNo(), tmp.getFacmNo(),
+					tmp.getBormNo(), prevIntDate + 19110000, this.index, this.limit, titaVo);
+
+		} else {
+			slBankDeductDtl = bankDeductDtlService.findL4450Rng(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(),
+					tmp.getRepayType(), tmp.getPayIntDate() + 19110000, this.index, this.limit, titaVo);
+		}
+		if (slBankDeductDtl != null) {
+			for (BankDeductDtl tBankDeductDtl : slBankDeductDtl.getContent()) {
+				if ("".equals(tBankDeductDtl.getMediaCode().trim())
+						|| "".equals(tBankDeductDtl.getReturnCode().trim())) {
+					if ((iRepayType <= 3 && tBankDeductDtl.getRepayType() <= 3)
+							|| iRepayType == tBankDeductDtl.getRepayType()) {
+						result = 1;
+					} else if (tmp.getRepayType() == tBankDeductDtl.getRepayType()) {
+						result = 2;
+					}
+				}
+			}
+		}
+
+		return result;
 	}
 
 	private List<String> findAchDD(int day1, int day2) throws LogicException {
@@ -689,6 +785,13 @@ public class L4450Batch extends TradeBuffer {
 
 		tmpBorm tmp2 = new tmpBorm(custNo, facmNo, 0, 0, 0);
 
+//		同戶號額度僅進入計算一次
+		if (flagMap.containsKey(tmp2)) {
+			return;
+		} else {
+			flagMap.put(tmp2, 1);
+		}
+
 		if (!acctCode.containsKey(tmp2))
 			acctCode.put(tmp2, fnAllList.get(i).get("F3"));
 		if (!repayBank.containsKey(tmp2))
@@ -712,7 +815,7 @@ public class L4450Batch extends TradeBuffer {
 	}
 
 	// 未到期約定還本金額
-	private BigDecimal getBookAmt(tmpBorm tmp, TitaVo titaVo) {
+	private BigDecimal getLoanBookAmt(tmpBorm tmp, TitaVo titaVo) {
 		// 未到期約定還本金額
 		BigDecimal bookAmt = BigDecimal.ZERO;
 		Slice<LoanBook> loanBookList = loanBookService.bookCustNoRange(tmp.getCustNo(), tmp.getCustNo(),

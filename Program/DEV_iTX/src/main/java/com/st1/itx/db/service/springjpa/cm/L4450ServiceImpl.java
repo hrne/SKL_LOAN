@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4450ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -30,43 +27,244 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
 
-	String sql = "";
-
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+		String iAchSpecificDdFrom = "0";
+		String iAchSpecificDdTo = "0";
+		String iAchSecondSpecificDdFrom = "0";
+		String iAchSecondSpecificDdTo = "0";
+		String iPostSpecificDd = "0";
+		String iPostSecondSpecificDd = "0";
+		int iDeductDate = 0; // 追繳
+		int nextPayIntDate = 0; //
 
-		int entryDate = Integer.valueOf(titaVo.get("EntryDate")) + 19110000;
+		if (Integer.parseInt(titaVo.getParam("AchSpecificDdFrom").trim()) > 0) {
+			iAchSpecificDdFrom = titaVo.getParam("AchSpecificDdFrom").trim().substring(5, 7);
+		}
+		if (Integer.parseInt(titaVo.getParam("AchSpecificDdTo").trim()) > 0) {
+			iAchSpecificDdTo = titaVo.getParam("AchSpecificDdTo").trim().substring(5, 7);
+		}
+		if (Integer.parseInt(titaVo.getParam("AchSecondSpecificDdFrom").trim()) > 0) {
+			iAchSecondSpecificDdFrom = titaVo.getParam("AchSecondSpecificDdFrom").trim().substring(5, 7);
+		}
+		if (Integer.parseInt(titaVo.getParam("AchSecondSpecificDdTo").trim()) > 0) {
+			iAchSecondSpecificDdTo = titaVo.getParam("AchSecondSpecificDdTo").trim().substring(5, 7);
+		}
+		if (Integer.parseInt(titaVo.getParam("PostSpecificDd").trim()) > 0) {
+			iPostSpecificDd = titaVo.getParam("PostSpecificDd").trim().substring(5, 7);
+		}
+		if (Integer.parseInt(titaVo.getParam("PostSecondSpecificDd").trim()) > 0) {
+			iPostSecondSpecificDd = titaVo.getParam("PostSecondSpecificDd").trim().substring(5, 7);
+		}
+		if (Integer.parseInt(titaVo.getParam("DeductDate").trim()) > 0) {
+			iDeductDate = Integer.parseInt(titaVo.getParam("DeductDate").trim()) + 19110000;
+		}
 
-		logger.info("l4450.findAll EntryDate=" + entryDate);
+//		僅輸入單一項目時需分開計算
+		if (Integer.parseInt(titaVo.getParam("AchSpecificDdTo").trim()) > 0) {
+			nextPayIntDate = Integer.parseInt(titaVo.getParam("AchSpecificDdTo").trim()) + 19110000;
+		} else if (Integer.parseInt(titaVo.getParam("PostSpecificDd").trim()) > 0) {
+			nextPayIntDate = Integer.parseInt(titaVo.getParam("PostSpecificDd").trim()) + 19110000;
+		} else if (Integer.parseInt(titaVo.getParam("PostSecondSpecificDd").trim()) > 0) {
+			nextPayIntDate = Integer.parseInt(titaVo.getParam("PostSecondSpecificDd").trim()) + 19110000;
+		}
 
-		sql = " SELECT  \"EntryDate\"    AS F0            ";
-		sql += "       , \"CustNo\"      AS F1            ";
-		sql += "       , \"FacmNo\"      AS F2            ";
-		sql += "       , \"BormNo\"      AS F3            ";
-		sql += "       , \"PrevIntDate\" AS F4            ";
-		sql += "       , \"PayIntDate\"  AS F5            ";
-		sql += "       , \"RepayType\"   AS F6            ";
-		sql += "       , \"UnpaidAmt\"   AS F7            ";
-		sql += "       , \"TempAmt\"     AS F8            ";
-		sql += "       , \"RepayAmt\"    AS F9            ";
-		sql += "       , \"MediaCode\"   AS F10           ";
-		sql += "       , \"AcDate\"      AS F11           ";
-		sql += "       , \"RepayBank\"   AS F12           ";
-		sql += "       , \"JsonFields\"  AS F13           ";
-		sql += " FROM \"BankDeductDtl\" BD                ";
-		sql += " WHERE \"EntryDate\" = " + entryDate;
-		sql += " ORDER BY \"RepayBank\", \"RepayType\" DESC, \"CustNo\", \"FacmNo\", \"BormNo\", \"PayIntDate\"";
-		logger.info("sql=" + sql);
+//		20210412 b.NextPayIntDate <= nextPayIntDate edited
+
+		String sql = "  select                                                          ";
+		sql += "  b.\"CustNo\"                                               AS F0       ";
+		sql += " ,b.\"FacmNo\"                                               AS F1       ";
+		sql += " ,b.\"BormNo\"                                               AS F2       ";
+		sql += " ,NVL(f.\"AcctCode\",' ')                                    AS F3       ";
+		sql += " ,NVL(ba.\"RepayBank\",' ')                                  AS F4       ";
+		sql += " ,NVL(ba.\"RepayAcct\",' ')                                  AS F5       ";
+		sql += " ,NVL(ba.\"PostDepCode\",' ')                                AS F6       ";
+		sql += " ,NVL(p.\"RelationCode\",NVL(a.\"RelationCode\",' '))        AS F7       ";
+		sql += " ,NVL(p.\"RelAcctName\",NVL(a.\"RelAcctName\",' '))          AS F8       ";
+		sql += " ,NVL(p.\"RelationId\",NVL(a.\"RelationId\",' '))            AS F9       ";
+		sql += " ,NVL(p.\"RelAcctBirthday\",NVL(a.\"RelAcctBirthday\", 0))   AS F10      ";
+		sql += " ,NVL(p.\"RelAcctGender\",NVL(a.\"RelAcctGender\",' '))      AS F11      ";
+		sql += " ,NVL(ba.\"AcctSeq\",' ')                                    AS F12      ";
+		sql += " ,NVL(ba.\"Status\",' ')                                     AS F13      ";
+		sql += "  from \"LoanBorMain\" b                                                 ";
+		sql += "  left join \"FacMain\" f on f.\"CustNo\" = b.\"CustNo\"                 ";
+		sql += "                      and f.\"FacmNo\" = b.\"FacmNo\"                    ";
+		sql += "  left join \"BankAuthAct\" ba on ba.\"CustNo\" = b.\"CustNo\"           ";
+		sql += "                      and ba.\"FacmNo\" = b.\"FacmNo\"                   ";
+		sql += "                  and ba.\"AuthType\" in ('00','01')                     ";
+		sql += "  left join (                                                            ";
+		sql += "   select                                                                ";
+		sql += "    \"CustNo\"                                                           ";
+		sql += "   ,\"AuthCode\"                                                           ";
+		sql += "   ,\"PostDepCode\"                                                        ";
+		sql += "   ,\"RepayAcct\"                                                        ";
+		sql += "   ,\"RelationCode\"                                                     ";
+		sql += "   ,\"RelAcctName\"                                                      ";
+		sql += "   ,\"RelationId\"                                                       ";
+		sql += "   ,\"RelAcctBirthday\"                                                  ";
+		sql += "   ,\"RelAcctGender\"                                                    ";
+		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
+		sql += "   from \"PostAuthLog\") p   on  ba.\"RepayBank\"   = 700               ";
+		sql += "                            and  p.\"CustNo\"       = ba.\"CustNo\"      ";
+		sql += "                            and  p.\"AuthCode\"     = '1'                ";
+		sql += "                            and  p.\"PostDepCode\"  = ba.\"PostDepCode\" ";
+		sql += "                            and  p.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
+		sql += "                            and  p.seq = 1                 ";
+		sql += "  left join (                                                            ";
+		sql += "   select                                                                ";
+		sql += "    \"RepayBank\"                                                        ";
+		sql += "   ,\"CustNo\"                                                           ";
+		sql += "   ,\"RepayAcct\"                                                        ";
+		sql += "   ,\"RelationCode\"                                                     ";
+		sql += "   ,\"RelAcctName\"                                                      ";
+		sql += "   ,\"RelationId\"                                                       ";
+		sql += "   ,\"RelAcctBirthday\"                                                  ";
+		sql += "   ,\"RelAcctGender\"                                                    ";
+		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
+		sql += "   from \"AchAuthLog\") a    on  ba.\"RepayBank\"   <> 700               ";
+		sql += "                            and  a.\"RepayBank\"    = ba.\"RepayBank\" ";
+		sql += "                            and  a.\"CustNo\"       = ba.\"CustNo\"      ";
+		sql += "                            and  a.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
+		sql += "                            and  a.seq = 1                 ";
+		sql += "  where b.\"Status\"= 0                                    ";
+		sql += "    and b.\"NextPayIntDate\" <= " + nextPayIntDate;
+//		追加逾期
+		sql += "    and b.\"NextPayIntDate\" >= " + iDeductDate;
+		sql += "    and f.\"RepayCode\" = 2                                ";
+		sql += "    and case                                               ";
+		sql += "          when b.\"AmortizedCode\" IN (3,4)                ";
+		sql += "          then                                             ";
+		sql += "            case                                           ";
+		sql += "              when b.\"DueAmt\" > 0                        ";
+		sql += "              then 1                                       ";
+		sql += "            else 0                                         ";
+		sql += "            end                                            ";
+		sql += "        else 1                                             ";
+		sql += "        end = 1                                            ";
+		sql += "    and nvl(ba.\"RepayBank\",'000') <> '000'               ";
+		sql += "    and case                                               ";
+		sql += "         when ba.\"RepayBank\" = 700                      ";
+		sql += "           then case                                        ";
+		sql += "                 when substr(b.\"NextPayIntDate\",-2,2) IN ( '" + iPostSpecificDd + "' , '"
+				+ iPostSecondSpecificDd + "') ";
+		sql += "                 then 1                                    ";
+		sql += "                    else 0                                 ";
+		sql += "               end                                         ";
+		sql += "         else case                                          ";
+		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSpecificDdFrom + " and "
+				+ iAchSpecificDdTo;
+		sql += "               then 1                                      ";
+		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSecondSpecificDdFrom + " and "
+				+ iAchSecondSpecificDdTo;
+		sql += "               then 1                                      ";
+		sql += "                  else 0                                   ";
+		sql += "             end                                           ";
+		sql += "        end = 1                                           ";
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		return this.convertToMap(query.getResultList());
+	}
 
+	public List<Map<String, String>> findSingle(TitaVo titaVo) throws Exception {
+		int custNo = Integer.parseInt(titaVo.getParam("CustNo").trim());
+		int facmNo = Integer.parseInt(titaVo.getParam("FacmNo").trim());
+		int bormNo = Integer.parseInt(titaVo.getParam("BormNo").trim());
+		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
+		int repayType = Integer.parseInt(titaVo.getParam("RepayType")); // 還款類別
+		String sql = "  select                                                          ";
+		sql += "  b.\"CustNo\"                                               AS F0       ";
+		sql += " ,b.\"FacmNo\"                                               AS F1       ";
+		sql += " ,b.\"BormNo\"                                               AS F2       ";
+		sql += " ,NVL(f.\"AcctCode\",' ')                                    AS F3       ";
+		sql += " ,NVL(ba.\"RepayBank\",' ')                                  AS F4       ";
+		sql += " ,NVL(ba.\"RepayAcct\",' ')                                  AS F5       ";
+		sql += " ,NVL(ba.\"PostDepCode\",' ')                                AS F6       ";
+		sql += " ,NVL(p.\"RelationCode\",NVL(a.\"RelationCode\",' '))        AS F7       ";
+		sql += " ,NVL(p.\"RelAcctName\",NVL(a.\"RelAcctName\",' '))          AS F8       ";
+		sql += " ,NVL(p.\"RelationId\",NVL(a.\"RelationId\",' '))            AS F9       ";
+		sql += " ,NVL(p.\"RelAcctBirthday\",NVL(a.\"RelAcctBirthday\", 0))   AS F10      ";
+		sql += " ,NVL(p.\"RelAcctGender\",NVL(a.\"RelAcctGender\",' '))      AS F11      ";
+		sql += " ,NVL(ba.\"AcctSeq\",' ')                                    AS F12      ";
+		sql += " ,NVL(ba.\"Status\",' ')                                     AS F13      ";
+		sql += "  from \"LoanBorMain\" b                                                 ";
+		sql += "  left join \"FacMain\" f on f.\"CustNo\" = b.\"CustNo\"                 ";
+		sql += "                      and f.\"FacmNo\" = b.\"FacmNo\"                    ";
+		sql += "  left join \"BankAuthAct\" ba on ba.\"CustNo\" = b.\"CustNo\"           ";
+		sql += "                      and ba.\"FacmNo\" = b.\"FacmNo\"                   ";
+		sql += "                  and ba.\"AuthType\" in ('00','01')                     ";
+		sql += "  left join (                                                            ";
+		sql += "   select                                                                ";
+		sql += "    \"CustNo\"                                                           ";
+		sql += "   ,\"AuthCode\"                                                           ";
+		sql += "   ,\"PostDepCode\"                                                        ";
+		sql += "   ,\"RepayAcct\"                                                        ";
+		sql += "   ,\"RelationCode\"                                                     ";
+		sql += "   ,\"RelAcctName\"                                                      ";
+		sql += "   ,\"RelationId\"                                                       ";
+		sql += "   ,\"RelAcctBirthday\"                                                  ";
+		sql += "   ,\"RelAcctGender\"                                                    ";
+		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
+		sql += "   from \"PostAuthLog\") p   on  ba.\"RepayBank\"   = 700               ";
+		sql += "                            and  p.\"CustNo\"       = ba.\"CustNo\"      ";
+		sql += "                            and  p.\"AuthCode\"     = '1'                ";
+		sql += "                            and  p.\"PostDepCode\"  = ba.\"PostDepCode\" ";
+		sql += "                            and  p.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
+		sql += "                            and  p.seq = 1                 ";
+		sql += "  left join (                                                            ";
+		sql += "   select                                                                ";
+		sql += "    \"RepayBank\"                                                        ";
+		sql += "   ,\"CustNo\"                                                           ";
+		sql += "   ,\"RepayAcct\"                                                        ";
+		sql += "   ,\"RelationCode\"                                                     ";
+		sql += "   ,\"RelAcctName\"                                                      ";
+		sql += "   ,\"RelationId\"                                                       ";
+		sql += "   ,\"RelAcctBirthday\"                                                  ";
+		sql += "   ,\"RelAcctGender\"                                                    ";
+		sql += "   ,row_number() over (partition by \"CustNo\", \"RepayAcct\" order by \"AuthCreateDate\" Desc) as seq ";
+		sql += "   from \"AchAuthLog\") a    on  ba.\"RepayBank\"   <> 700               ";
+		sql += "                            and  a.\"RepayBank\"    = ba.\"RepayBank\" ";
+		sql += "                            and  a.\"CustNo\"       = ba.\"CustNo\"      ";
+		sql += "                            and  a.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
+		sql += "                            and  a.seq = 1                 ";
+		sql += "   where f.\"RepayCode\" = 2                               ";
+		sql += "    and nvl(ba.\"RepayBank\",'000') <> '000'               ";
+		sql += "    and b.\"CustNo\"= " + custNo;
+		if (facmNo > 0) {
+			sql += "    and b.\"FacmNo\"= " + facmNo;
+		}
+		
+		if (bormNo > 0) {
+			sql += "    and b.\"BormNo\"= " + bormNo;
+		}
+		
+		if (repayType == 1) {
+			sql += "    and b.\"Status\"= 0                                    ";
+			sql += "    and b.\"NextPayIntDate\" <= " + entryDate;
+			sql += "    and case                                               ";
+			sql += "          when b.\"AmortizedCode\" IN (3,4)                ";
+			sql += "          then                                             ";
+			sql += "            case                                           ";
+			sql += "              when b.\"DueAmt\" > 0                        ";
+			sql += "              then 1                                       ";
+			sql += "            else 0                                         ";
+			sql += "            end                                            ";
+			sql += "        else 1                                             ";
+			sql += "        end = 1                                            ";
+		}
+		
+		this.info("sql=" + sql);
+
+		Query query;
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
 		return this.convertToMap(query.getResultList());
 	}
 

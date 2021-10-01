@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("loanChequeService")
 @Repository
-public class LoanChequeServiceImpl implements LoanChequeService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(LoanChequeServiceImpl.class);
-
+public class LoanChequeServiceImpl extends ASpringJpaParm implements LoanChequeService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class LoanChequeServiceImpl implements LoanChequeService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + loanChequeId);
+    this.info("findById " + dbName + " " + loanChequeId);
     Optional<LoanCheque> loanCheque = null;
     if (dbName.equals(ContentName.onDay))
       loanCheque = loanChequeReposDay.findById(loanChequeId);
@@ -92,9 +88,12 @@ em = null;
     Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ChequeAcct", "ChequeNo"));
+    Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();    logger.info("findAll " + dbName);
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ChequeAcct", "ChequeNo"));
+    else
+         pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ChequeAcct", "ChequeNo"));
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = loanChequeReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -103,6 +102,9 @@ em = null;
       slice = loanChequeReposHist.findAll(pageable);
     else 
       slice = loanChequeRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -113,9 +115,13 @@ em = null;
     Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = PageRequest.of(index, limit);
+     Pageable pageable = null;
+
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();    logger.info("chequeDateRange " + dbName + " : " + "chequeDate_0 : " + chequeDate_0 + " chequeDate_1 : " +  chequeDate_1 + " chequeAcct_2 : " +  chequeAcct_2 + " chequeAcct_3 : " +  chequeAcct_3 + " chequeNo_4 : " +  chequeNo_4 + " chequeNo_5 : " +  chequeNo_5);
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("chequeDateRange " + dbName + " : " + "chequeDate_0 : " + chequeDate_0 + " chequeDate_1 : " +  chequeDate_1 + " chequeAcct_2 : " +  chequeAcct_2 + " chequeAcct_3 : " +  chequeAcct_3 + " chequeNo_4 : " +  chequeNo_4 + " chequeNo_5 : " +  chequeNo_5);
     if (dbName.equals(ContentName.onDay))
       slice = loanChequeReposDay.findAllByChequeDateGreaterThanEqualAndChequeDateLessThanEqualAndChequeAcctGreaterThanEqualAndChequeAcctLessThanEqualAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualOrderByChequeDateAscCustNoAscChequeAcctAscChequeNoAsc(chequeDate_0, chequeDate_1, chequeAcct_2, chequeAcct_3, chequeNo_4, chequeNo_5, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -124,6 +130,9 @@ em = null;
       slice = loanChequeReposHist.findAllByChequeDateGreaterThanEqualAndChequeDateLessThanEqualAndChequeAcctGreaterThanEqualAndChequeAcctLessThanEqualAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualOrderByChequeDateAscCustNoAscChequeAcctAscChequeNoAsc(chequeDate_0, chequeDate_1, chequeAcct_2, chequeAcct_3, chequeNo_4, chequeNo_5, pageable);
     else 
       slice = loanChequeRepos.findAllByChequeDateGreaterThanEqualAndChequeDateLessThanEqualAndChequeAcctGreaterThanEqualAndChequeAcctLessThanEqualAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualOrderByChequeDateAscCustNoAscChequeAcctAscChequeNoAsc(chequeDate_0, chequeDate_1, chequeAcct_2, chequeAcct_3, chequeNo_4, chequeNo_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -134,9 +143,13 @@ em = null;
     Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = PageRequest.of(index, limit);
+     Pageable pageable = null;
+
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();    logger.info("chequeCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " statusCode_1 : " +  statusCode_1 + " chequeDate_2 : " +  chequeDate_2 + " chequeDate_3 : " +  chequeDate_3);
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("chequeCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " statusCode_1 : " +  statusCode_1 + " chequeDate_2 : " +  chequeDate_2 + " chequeDate_3 : " +  chequeDate_3);
     if (dbName.equals(ContentName.onDay))
       slice = loanChequeReposDay.findAllByCustNoIsAndStatusCodeInAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeDate_2, chequeDate_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -145,6 +158,9 @@ em = null;
       slice = loanChequeReposHist.findAllByCustNoIsAndStatusCodeInAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeDate_2, chequeDate_3, pageable);
     else 
       slice = loanChequeRepos.findAllByCustNoIsAndStatusCodeInAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeDate_2, chequeDate_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -155,9 +171,13 @@ em = null;
     Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = PageRequest.of(index, limit);
+     Pageable pageable = null;
+
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();    logger.info("acDateRange " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " statusCode_2 : " +  statusCode_2);
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("acDateRange " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " statusCode_2 : " +  statusCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = loanChequeReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndStatusCodeIn(acDate_0, acDate_1, statusCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -166,6 +186,9 @@ em = null;
       slice = loanChequeReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndStatusCodeIn(acDate_0, acDate_1, statusCode_2, pageable);
     else 
       slice = loanChequeRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndStatusCodeIn(acDate_0, acDate_1, statusCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -176,9 +199,13 @@ em = null;
     Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = PageRequest.of(index, limit);
+     Pageable pageable = null;
+
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();    logger.info("statusCodeRange " + dbName + " : " + "statusCode_0 : " + statusCode_0 + " chequeDate_1 : " +  chequeDate_1 + " chequeDate_2 : " +  chequeDate_2);
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("statusCodeRange " + dbName + " : " + "statusCode_0 : " + statusCode_0 + " chequeDate_1 : " +  chequeDate_1 + " chequeDate_2 : " +  chequeDate_2);
     if (dbName.equals(ContentName.onDay))
       slice = loanChequeReposDay.findAllByStatusCodeInAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeDateAscChequeAcctAscChequeNoAsc(statusCode_0, chequeDate_1, chequeDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -187,6 +214,9 @@ em = null;
       slice = loanChequeReposHist.findAllByStatusCodeInAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeDateAscChequeAcctAscChequeNoAsc(statusCode_0, chequeDate_1, chequeDate_2, pageable);
     else 
       slice = loanChequeRepos.findAllByStatusCodeInAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeDateAscChequeAcctAscChequeNoAsc(statusCode_0, chequeDate_1, chequeDate_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,9 +227,13 @@ em = null;
     Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = PageRequest.of(index, limit);
+     Pageable pageable = null;
+
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();    logger.info("forStatusCodeSelect " + dbName + " : " + "chequeDate_0 : " + chequeDate_0 + " chequeDate_1 : " +  chequeDate_1 + " chequeAcct_2 : " +  chequeAcct_2 + " chequeAcct_3 : " +  chequeAcct_3 + " chequeNo_4 : " +  chequeNo_4 + " chequeNo_5 : " +  chequeNo_5 + " statusCode_6 : " +  statusCode_6);
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("forStatusCodeSelect " + dbName + " : " + "chequeDate_0 : " + chequeDate_0 + " chequeDate_1 : " +  chequeDate_1 + " chequeAcct_2 : " +  chequeAcct_2 + " chequeAcct_3 : " +  chequeAcct_3 + " chequeNo_4 : " +  chequeNo_4 + " chequeNo_5 : " +  chequeNo_5 + " statusCode_6 : " +  statusCode_6);
     if (dbName.equals(ContentName.onDay))
       slice = loanChequeReposDay.findAllByChequeDateGreaterThanEqualAndChequeDateLessThanEqualAndChequeAcctGreaterThanEqualAndChequeAcctLessThanEqualAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndStatusCodeIsOrderByChequeDateAscCustNoAscChequeAcctAscChequeNoAsc(chequeDate_0, chequeDate_1, chequeAcct_2, chequeAcct_3, chequeNo_4, chequeNo_5, statusCode_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -208,6 +242,9 @@ em = null;
       slice = loanChequeReposHist.findAllByChequeDateGreaterThanEqualAndChequeDateLessThanEqualAndChequeAcctGreaterThanEqualAndChequeAcctLessThanEqualAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndStatusCodeIsOrderByChequeDateAscCustNoAscChequeAcctAscChequeNoAsc(chequeDate_0, chequeDate_1, chequeAcct_2, chequeAcct_3, chequeNo_4, chequeNo_5, statusCode_6, pageable);
     else 
       slice = loanChequeRepos.findAllByChequeDateGreaterThanEqualAndChequeDateLessThanEqualAndChequeAcctGreaterThanEqualAndChequeAcctLessThanEqualAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndStatusCodeIsOrderByChequeDateAscCustNoAscChequeAcctAscChequeNoAsc(chequeDate_0, chequeDate_1, chequeAcct_2, chequeAcct_3, chequeNo_4, chequeNo_5, statusCode_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -218,9 +255,13 @@ em = null;
     Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    Pageable pageable = PageRequest.of(index, limit);
+     Pageable pageable = null;
+
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();    logger.info("receiveDateRange " + dbName + " : " + "receiveDate_0 : " + receiveDate_0 + " receiveDate_1 : " +  receiveDate_1 + " statusCode_2 : " +  statusCode_2);
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("receiveDateRange " + dbName + " : " + "receiveDate_0 : " + receiveDate_0 + " receiveDate_1 : " +  receiveDate_1 + " statusCode_2 : " +  statusCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = loanChequeReposDay.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndStatusCodeIn(receiveDate_0, receiveDate_1, statusCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -230,6 +271,37 @@ em = null;
     else 
       slice = loanChequeRepos.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndStatusCodeIn(receiveDate_0, receiveDate_1, statusCode_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<LoanCheque> custNoChequeRange(int custNo_0, List<String> statusCode_1, int chequeNo_2, int chequeNo_3, int chequeDate_4, int chequeDate_5, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LoanCheque> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("custNoChequeRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " statusCode_1 : " +  statusCode_1 + " chequeNo_2 : " +  chequeNo_2 + " chequeNo_3 : " +  chequeNo_3 + " chequeDate_4 : " +  chequeDate_4 + " chequeDate_5 : " +  chequeDate_5);
+    if (dbName.equals(ContentName.onDay))
+      slice = loanChequeReposDay.findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeNo_2, chequeNo_3, chequeDate_4, chequeDate_5, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = loanChequeReposMon.findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeNo_2, chequeNo_3, chequeDate_4, chequeDate_5, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = loanChequeReposHist.findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeNo_2, chequeNo_3, chequeDate_4, chequeDate_5, pageable);
+    else 
+      slice = loanChequeRepos.findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeNo_2, chequeNo_3, chequeDate_4, chequeDate_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -238,7 +310,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + loanChequeId);
+    this.info("Hold " + dbName + " " + loanChequeId);
     Optional<LoanCheque> loanCheque = null;
     if (dbName.equals(ContentName.onDay))
       loanCheque = loanChequeReposDay.findByLoanChequeId(loanChequeId);
@@ -256,7 +328,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + loanCheque.getLoanChequeId());
+    this.info("Hold " + dbName + " " + loanCheque.getLoanChequeId());
     Optional<LoanCheque> loanChequeT = null;
     if (dbName.equals(ContentName.onDay))
       loanChequeT = loanChequeReposDay.findByLoanChequeId(loanCheque.getLoanChequeId());
@@ -277,13 +349,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + loanCheque.getLoanChequeId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		}
+    this.info("Insert..." + dbName + " " + loanCheque.getLoanChequeId());
     if (this.findById(loanCheque.getLoanChequeId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       loanCheque.setCreateEmpNo(empNot);
+
+    if(loanCheque.getLastUpdateEmpNo() == null || loanCheque.getLastUpdateEmpNo().isEmpty())
+      loanCheque.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return loanChequeReposDay.saveAndFlush(loanCheque);	
@@ -304,7 +379,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + loanCheque.getLoanChequeId());
+    this.info("Update..." + dbName + " " + loanCheque.getLoanChequeId());
     if (!empNot.isEmpty())
       loanCheque.setLastUpdateEmpNo(empNot);
 
@@ -327,7 +402,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + loanCheque.getLoanChequeId());
+    this.info("Update..." + dbName + " " + loanCheque.getLoanChequeId());
     if (!empNot.isEmpty())
       loanCheque.setLastUpdateEmpNo(empNot);
 
@@ -347,7 +422,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + loanCheque.getLoanChequeId());
+    this.info("Delete..." + dbName + " " + loanCheque.getLoanChequeId());
     if (dbName.equals(ContentName.onDay)) {
       loanChequeReposDay.delete(loanCheque);	
       loanChequeReposDay.flush();
@@ -376,11 +451,13 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (LoanCheque t : loanCheque) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+    for (LoanCheque t : loanCheque){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       loanCheque = loanChequeReposDay.saveAll(loanCheque);	
@@ -409,7 +486,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (loanCheque == null || loanCheque.size() == 0)
       throw new DBException(6);
 
@@ -438,7 +515,7 @@ em = null;
 
   @Override
   public void deleteAll(List<LoanCheque> loanCheque, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

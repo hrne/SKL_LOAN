@@ -25,6 +25,7 @@ import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.TxAmlCom;
 import com.st1.itx.util.common.data.CheckAmlVo;
@@ -156,6 +157,9 @@ public class L4451 extends TradeBuffer {
 		// 新增
 		switch (iFunctionCode) {
 		case "1":
+			// 執行產檔
+			MySpring.newTask("L4450Batch", this.txBuffer, titaVo);
+			totaVo.putParam("OWarningMsg", "處理中...");
 
 			break;
 			
