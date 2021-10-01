@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L5905 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5905.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -60,8 +57,6 @@ public class L5905 extends TradeBuffer {
 		int iFYearMonthS = iYearMonthS + 191100;
 		int iYearMonthE = this.parse.stringToInteger(titaVo.getParam("YearMonthE"));
 		int iFYearMonthE = iYearMonthE + 191100;
-		String iReChkMonth = titaVo.getParam("ReChkMonth");
-
 		this.info("L5905 iFYearMonth : " + iFYearMonth + "-" + iFYearMonthS + "-" + iFYearMonthE);
 		int wkFYearMonth = 0;
 		int wkFReChkYearMonth = 0;
@@ -78,30 +73,30 @@ public class L5905 extends TradeBuffer {
 		Slice<InnReCheck> slInnReCheck;
 		if (iInqFg == 1) {
 			if (iCustNo == 0) {
-				slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, 0000000, 9999999, this.index,
-						this.limit, titaVo);
+				slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, 0000000, 9999999, this.index, this.limit, titaVo);
 			} else {
-				slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, iCustNo, iCustNo, this.index,
-						this.limit, titaVo);
+				slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, iCustNo, iCustNo, this.index, this.limit, titaVo);
 			}
 		} else {
 			if (iCustNo == 0) {
-				slInnReCheck = sInnReCheckService.findYearMonth(iFYearMonthS, iFYearMonthE, 0000000, 9999999,
-						this.index, this.limit, titaVo);
+				slInnReCheck = sInnReCheckService.findYearMonth(iFYearMonthS, iFYearMonthE, 0000000, 9999999, this.index, this.limit, titaVo);
 			} else {
-				slInnReCheck = sInnReCheckService.findYearMonth(iFYearMonthS, iFYearMonthE, iCustNo, iCustNo,
-						this.index, this.limit, titaVo);
+				slInnReCheck = sInnReCheckService.findYearMonth(iFYearMonthS, iFYearMonthE, iCustNo, iCustNo, this.index, this.limit, titaVo);
 			}
 		}
-		List<InnReCheck> lInnReCheck = slInnReCheck == null ? null : slInnReCheck.getContent();
+//		List<InnReCheck> lInnReCheck = slInnReCheck == null ? null : slInnReCheck.getContent();
+		
 
-		if (lInnReCheck == null || lInnReCheck.size() == 0) {
+//		if (lInnReCheck == null || lInnReCheck.size() == 0) {
+//			throw new LogicException(titaVo, "E0001", "覆審案件明細檔"); // 查無資料
+//		}
+		if (slInnReCheck == null) {
 			throw new LogicException(titaVo, "E0001", "覆審案件明細檔"); // 查無資料
 		}
 		// 如有找到資料
-		for (InnReCheck tInnReCheck : lInnReCheck) {
+		for (InnReCheck tInnReCheck : slInnReCheck) {
 
-			wkYearMonth = this.parse.IntegerToString(tInnReCheck.getReChkYearMonth(), 6);		
+			wkYearMonth = this.parse.IntegerToString(tInnReCheck.getReChkYearMonth(), 6);
 			wkReChkMonth = FormatUtil.right(wkYearMonth, 2);
 			this.info("L5905 wkReChkMonth : " + wkReChkMonth);
 
@@ -151,7 +146,7 @@ public class L5905 extends TradeBuffer {
 		if (this.totaVo.getOccursList().size() == 0) {
 			throw new LogicException(titaVo, "E0001", "覆審案件明細"); // 查無資料
 		}
-		
+
 		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 		if (slInnReCheck != null && slInnReCheck.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());

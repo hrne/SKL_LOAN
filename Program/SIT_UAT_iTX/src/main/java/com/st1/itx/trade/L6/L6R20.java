@@ -1,11 +1,11 @@
 package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -14,6 +14,8 @@ import com.st1.itx.dataVO.TotaVo;
 //import com.st1.itx.db.service.CustMainService;
 //import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.domain.TxTellerAuth;
+import com.st1.itx.db.service.TxTellerAuthService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -28,11 +30,13 @@ import com.st1.itx.util.parse.Parse;
  * @description for L6401 rim
  */
 public class L6R20 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6R20.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public TxTellerService sTxTellerService;
+	
+	@Autowired
+	public TxTellerAuthService sTxTellerAuthService;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -49,8 +53,20 @@ public class L6R20 extends TradeBuffer {
 		this.info("FunCode = " + iFunCode);
 		this.info("TlrNO = " + iTlrNo);
 
-//		TxTeller ttxTeller = new TxTeller();
+		/*
+		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		 */
+		this.index = 0;
+
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = Integer.MAX_VALUE;
+		
 		TxTeller tTxTeller = sTxTellerService.findById(iTlrNo, titaVo);
+		
+		for(int i=1;i<=40;i++) {
+			this.totaVo.putParam("AuthNo"+i, "");
+		}
+		
 
 		if (tTxTeller == null) {
 			if ("2".equals(iFunCode)) {
@@ -64,6 +80,7 @@ public class L6R20 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0002", "使用者:" + iTlrNo);
 			}
 			MoveTota(iTlrNo, tTxTeller);
+			MoveGroup(iTlrNo, titaVo);
 		}
 
 		this.addList(this.totaVo);
@@ -85,18 +102,20 @@ public class L6R20 extends TradeBuffer {
 		this.totaVo.putParam("LtxTime", tTxTeller.getLtxTime());
 		this.totaVo.putParam("Desc", tTxTeller.getDesc());
 		this.totaVo.putParam("TlrItem", tTxTeller.getTlrItem());
-		
-		
 		this.totaVo.putParam("AmlHighFg", tTxTeller.getAmlHighFg());
-		this.totaVo.putParam("AuthNo1", tTxTeller.getAuthNo1());
-		this.totaVo.putParam("AuthNo2", tTxTeller.getAuthNo2());
-		this.totaVo.putParam("AuthNo3", tTxTeller.getAuthNo3());
-		this.totaVo.putParam("AuthNo4", tTxTeller.getAuthNo4());
-		this.totaVo.putParam("AuthNo5", tTxTeller.getAuthNo5());
-		this.totaVo.putParam("AuthNo6", tTxTeller.getAuthNo6());
-		this.totaVo.putParam("AuthNo7", tTxTeller.getAuthNo7());
-		this.totaVo.putParam("AuthNo8", tTxTeller.getAuthNo8());
-		this.totaVo.putParam("AuthNo9", tTxTeller.getAuthNo9());
-		this.totaVo.putParam("AuthNo10", tTxTeller.getAuthNo10());
+
 	}
+	private void MoveGroup(String iTlrNo, TitaVo titaVo) {
+		this.info("L6R20 MoveGroup");
+		int i = 1;
+		Slice <TxTellerAuth> tTxTellerAuth = sTxTellerAuthService.findByTlrNo(iTlrNo, this.index, this.limit, titaVo);
+		List<TxTellerAuth> lTxTellerAuth = tTxTellerAuth == null ? null : tTxTellerAuth.getContent();
+		
+		if(lTxTellerAuth!=null) {
+			for(TxTellerAuth mTxTellerAuth : lTxTellerAuth) {
+				this.totaVo.putParam("AuthNo"+i, mTxTellerAuth.getAuthNo());
+				i++;
+			}
+		}
+	}	
 }

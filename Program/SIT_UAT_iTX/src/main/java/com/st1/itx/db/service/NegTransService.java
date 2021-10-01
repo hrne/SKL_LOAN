@@ -193,6 +193,18 @@ public interface NegTransService {
   public Slice<NegTrans> backFunc(int thisEntdy_0, String thisKinbr_1, String thisTlrNo_2, String thisTxtNo_3, String thisSeqNo_4, int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcDate =, AND TitaTxtNo =
+   *
+   * @param acDate_0 acDate_0
+   * @param titaTxtNo_1 titaTxtNo_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegTrans NegTrans of List
+   */
+  public Slice<NegTrans> findbyTitaTxTno(int acDate_0, int titaTxtNo_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By NegTrans
    * 
    * @param negTransId key

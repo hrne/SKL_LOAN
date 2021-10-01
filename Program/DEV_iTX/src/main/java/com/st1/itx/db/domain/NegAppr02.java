@@ -29,7 +29,7 @@ public class NegAppr02 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3950772155843840135L;
+	private static final long serialVersionUID = 4073234137950652283L;
 
 @EmbeddedId
   private NegAppr02Id negAppr02Id;
@@ -101,6 +101,11 @@ public class NegAppr02 implements Serializable {
   /* 0:正常1:溢繳2:短繳3:大額還本4:結清 */
   @Column(name = "`TxKind`", length = 1)
   private String txKind;
+
+  // 交易狀態
+  /* 0:未入專戶1:已入客戶暫收2:已入帳 */
+  @Column(name = "`TxStatus`")
+  private int txStatus = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -456,6 +461,29 @@ public class NegAppr02 implements Serializable {
   }
 
 /**
+	* 交易狀態<br>
+	* 0:未入專戶
+1:已入客戶暫收
+2:已入帳
+	* @return Integer
+	*/
+  public int getTxStatus() {
+    return this.txStatus;
+  }
+
+/**
+	* 交易狀態<br>
+	* 0:未入專戶
+1:已入客戶暫收
+2:已入帳
+  *
+  * @param txStatus 交易狀態
+	*/
+  public void setTxStatus(int txStatus) {
+    this.txStatus = txStatus;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -536,7 +564,7 @@ public class NegAppr02 implements Serializable {
   public String toString() {
     return "NegAppr02 [negAppr02Id=" + negAppr02Id + ", sendUnit=" + sendUnit + ", recvUnit=" + recvUnit + ", entryDate=" + entryDate
            + ", transCode=" + transCode + ", txAmt=" + txAmt + ", consign=" + consign + ", finIns=" + finIns + ", remitAcct=" + remitAcct + ", custId=" + custId
-           + ", custNo=" + custNo + ", statusCode=" + statusCode + ", acDate=" + acDate + ", txKind=" + txKind + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", custNo=" + custNo + ", statusCode=" + statusCode + ", acDate=" + acDate + ", txKind=" + txKind + ", txStatus=" + txStatus + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

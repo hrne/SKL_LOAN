@@ -53,7 +53,37 @@ public class LM036Report extends MakeReport {
 
 		List<MonthlyLM036Portfolio> lMonthlyLM036Portfolio = new ArrayList<>(sMonthlyLM036Portfolio.getContent());
 
+		// 表一
 		setPortfolio(lMonthlyLM036Portfolio);
+
+		List<Map<String, String>> listBadRateCounts = null;
+
+		// 表二的範圍為三年，完整的12季
+		int startMonth12Seasons = getStartMonth12Seasons(endMonth);
+
+		try {
+			listBadRateCounts = lM036ServiceImpl.queryBadRateCounts(startMonth12Seasons, endMonth, titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("lM036ServiceImpl queryDelinquency error = " + errors.toString());
+		}
+
+		// 表二
+		setBadRateCount(listBadRateCounts);
+
+		List<Map<String, String>> listBadRateAmt = null;
+
+		try {
+			listBadRateAmt = lM036ServiceImpl.queryBadRateAmt(startMonth12Seasons, endMonth, titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("lM036ServiceImpl queryDelinquency error = " + errors.toString());
+		}
+
+		// 表三
+		setBadRateAmt(listBadRateAmt);
 
 		List<Map<String, String>> listDelinquency = null;
 
@@ -62,13 +92,237 @@ public class LM036Report extends MakeReport {
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.error("lM012ServiceImpl.findAll error = " + errors.toString());
+			this.error("lM036ServiceImpl queryDelinquency error = " + errors.toString());
 		}
 
+		// 表四
 		setDelinquency(listDelinquency);
+
+		List<Map<String, String>> listCollection = null;
+
+		try {
+			listCollection = lM036ServiceImpl.queryCollection(startMonth, endMonth, titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("lM036ServiceImpl queryCollection error = " + errors.toString());
+		}
+
+		// 表五
+		setCollection(listCollection);
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
+	}
+
+	private BigDecimal formatMillion(BigDecimal portfolioTotal) {
+		return computeDivide(portfolioTotal, million, 0);
+	}
+
+	private BigDecimal formatMillion(String portfolioTotal) {
+		return formatMillion(getBigDecimal(portfolioTotal));
+	}
+
+	private String formatMonth(int dataMonth) {
+		int year = dataMonth / 100;
+		int month = dataMonth % 100;
+
+		String formatMonth = "";
+		switch (month) {
+		case 1:
+			formatMonth = "Jan";
+			break;
+		case 2:
+			formatMonth = "Feb";
+			break;
+		case 3:
+			formatMonth = "Mar";
+			break;
+		case 4:
+			formatMonth = "Apr";
+			break;
+		case 5:
+			formatMonth = "May";
+			break;
+		case 6:
+			formatMonth = "Jun";
+			break;
+		case 7:
+			formatMonth = "Jul";
+			break;
+		case 8:
+			formatMonth = "Aug";
+			break;
+		case 9:
+			formatMonth = "Sep";
+			break;
+		case 10:
+			formatMonth = "Oct";
+			break;
+		case 11:
+			formatMonth = "Nov";
+			break;
+		case 12:
+			formatMonth = "Dec";
+			break;
+		default:
+			break;
+		}
+		formatMonth += "-" + year % 100;
+		return formatMonth;
+	}
+
+	private int getStartMonth12Seasons(int endMonth) throws LogicException {
+
+		// % 100 = 月份
+		// % 3 => 是否被3整除 = 是否為季底月
+		if (endMonth % 100 % 3 != 0) {
+			// 未被整除的情況，找出最近的季底月
+			if (endMonth % 100 >= 1 && endMonth % 100 <= 3) {
+				endMonth = ((endMonth / 100) - 1) * 100 + 12;
+			} else {
+				endMonth = endMonth - (endMonth % 100 % 3);
+			}
+		}
+		// 回推12季(36個月)
+		endMonth = endMonth * 100 + 1;
+
+		this.info("endMonth = " + endMonth);
+
+		dDateUtil.init();
+		dDateUtil.setDate_1(endMonth);
+		dDateUtil.setMons(-35); // 完整12季的季初月
+		int startdate = dDateUtil.getCalenderDay();
+
+		this.info("startdate = " + startdate);
+
+		return startdate / 100;
+	}
+
+	private void setBadRateAmt(List<Map<String, String>> list) throws LogicException {
+
+		// 指向工作表Bad Rate-房貸(by金額)
+		makeExcel.setSheet("Bad Rate-房貸(by金額)");
+
+		if (list == null || list.isEmpty()) {
+			this.info("list BadRateAmt is null or empty");
+			makeExcel.setValue(3, 2, "本日無資料");
+			return;
+		}
+
+		int rowCursor = 4;
+
+		BigDecimal total = BigDecimal.ZERO;
+
+		for (Map<String, String> m : list) {
+			String yearMonth = "" + (Integer.parseInt(m.get("F0")) - 191100); // 資料年月
+			BigDecimal amt = getBigDecimal(m.get("F1")); // 件數
+
+			makeExcel.setValue(rowCursor, 1, yearMonth);
+			makeExcel.setValue(rowCursor, 2, amt, "#,##0");
+
+			total = total.add(amt);
+
+			rowCursor++;
+		}
+		makeExcel.setValue(42, 2, total, "#,##0");
+	}
+
+	private void setBadRateCount(List<Map<String, String>> list) throws LogicException {
+
+		// 指向工作表Bad Rate-房貸(by件數)
+		makeExcel.setSheet("Bad Rate-房貸(by件數)");
+
+		if (list == null || list.isEmpty()) {
+			this.info("list BadRateCount is null or empty");
+			makeExcel.setValue(3, 2, "本日無資料");
+			return;
+		}
+
+		int rowCursor = 4;
+
+		BigDecimal total = BigDecimal.ZERO;
+
+		for (Map<String, String> m : list) {
+			String yearMonth = "" + (Integer.parseInt(m.get("F0")) - 191100); // 資料年月
+			BigDecimal counts = getBigDecimal(m.get("F1")); // 件數
+
+			makeExcel.setValue(rowCursor, 1, yearMonth);
+			makeExcel.setValue(rowCursor, 2, counts, "#,##0");
+
+			total = total.add(counts);
+
+			rowCursor++;
+		}
+		makeExcel.setValue(42, 2, total, "#,##0");
+	}
+
+	private void setCollection(List<Map<String, String>> list) throws LogicException {
+
+		// 指向工作表Collection
+		makeExcel.setSheet("Collection");
+
+		if (list == null || list.isEmpty()) {
+			this.info("list Collection is null or empty");
+			makeExcel.setValue(3, 2, "本日無資料");
+			return;
+		}
+
+		int columnCursor = 1;
+
+		int lastColumnMonth = 0;
+
+		for (Map<String, String> m : list) {
+
+			int thisColumnMonth = Integer.parseInt(m.get("F0"));
+
+			this.info("thisColumnMonth = " + thisColumnMonth);
+			this.info("lastColumnMonth = " + lastColumnMonth);
+
+			if (lastColumnMonth == 0 || lastColumnMonth != thisColumnMonth) {
+				lastColumnMonth = thisColumnMonth;
+				columnCursor++;
+			}
+
+			// 月份
+			makeExcel.setValue(2, columnCursor, formatMonth(thisColumnMonth));
+
+			// 種類
+			String type = m.get("F1");
+
+			// 滾動率
+			BigDecimal rollingRate = getBigDecimal(m.get("F5"));
+
+			int rowCursor = 0;
+
+			switch (type) {
+			case "2": // type 2 = M1 to M2
+				rowCursor = 4;
+				break;
+			case "3": // type 3 = M2 to M3
+				rowCursor = 6;
+				break;
+			case "4": // type 4 = M3 to M4
+				rowCursor = 8;
+				break;
+			case "5": // type 5 = M4 to M5
+				rowCursor = 10;
+				break;
+			case "6": // type 6 = M5 to M6
+				rowCursor = 12;
+				break;
+			case "7": // type 7 = M6 to 轉催收
+				rowCursor = 14;
+				break;
+			case "8": // type 8 = 轉催收 to Loss
+				rowCursor = 6;
+				break;
+			default:
+				continue;
+			}
+
+			makeExcel.setValue(rowCursor, columnCursor, rollingRate, "0.00%"); // 滾動率
+		}
 	}
 
 	private void setDelinquency(List<Map<String, String>> list) throws LogicException {
@@ -78,7 +332,7 @@ public class LM036Report extends MakeReport {
 
 		if (list == null || list.isEmpty()) {
 			this.info("list Deliquency is null or empty");
-			makeExcel.setValue(3, 3, "本日無資料");
+			makeExcel.setValue(3, 2, "本日無資料");
 			return;
 		}
 
@@ -88,32 +342,32 @@ public class LM036Report extends MakeReport {
 
 			// 月份
 			makeExcel.setValue(2, columnCursor, formatMonth(Integer.parseInt(m.get("F0"))));
-			
+
 			// 法人
 			makeExcel.setValue(4, columnCursor, formatMillion(m.get("F1"))); // F1 法人正常
 			makeExcel.setValue(5, columnCursor, formatMillion(m.get("F2"))); // F2 法人逾1~2期
 			makeExcel.setValue(6, columnCursor, formatMillion(m.get("F3"))); // F3 法人逾3~6期
 			makeExcel.setValue(7, columnCursor, formatMillion(m.get("F4"))); // F4 法人催收
-			makeExcel.setValue(8, columnCursor, formatMillion("0")); 
-			makeExcel.setValue(9, columnCursor, formatMillion("0")); 
-			
+			makeExcel.setValue(8, columnCursor, formatMillion("0"));
+			makeExcel.setValue(9, columnCursor, formatMillion("0"));
+
 			// 自然人
 			makeExcel.setValue(11, columnCursor, formatMillion(m.get("F5"))); // F5 自然人正常
 			makeExcel.setValue(12, columnCursor, formatMillion(m.get("F6"))); // F6 自然人逾1~2期
 			makeExcel.setValue(13, columnCursor, formatMillion(m.get("F7"))); // F7 自然人逾3~6期
 			makeExcel.setValue(14, columnCursor, formatMillion(m.get("F8"))); // F8 自然人催收
-			makeExcel.setValue(15, columnCursor, formatMillion("0")); 
-			makeExcel.setValue(16, columnCursor, formatMillion("0")); 
-			
+			makeExcel.setValue(15, columnCursor, formatMillion("0"));
+			makeExcel.setValue(16, columnCursor, formatMillion("0"));
+
 			// 總額
 			makeExcel.setValue(18, columnCursor, formatMillion(m.get("F9"))); // F9 總額正常
 			makeExcel.setValue(19, columnCursor, formatMillion(m.get("F10"))); // F10 總額逾1~2期
 			makeExcel.setValue(20, columnCursor, formatMillion(m.get("F11"))); // F11 總額逾3~6期
 			makeExcel.setValue(21, columnCursor, formatMillion(m.get("F12"))); // F12 總額催收
-			makeExcel.setValue(22, columnCursor, formatMillion("0")); 
-			makeExcel.setValue(23, columnCursor, formatMillion("0")); 
+			makeExcel.setValue(22, columnCursor, formatMillion("0"));
+			makeExcel.setValue(23, columnCursor, formatMillion("0"));
 			makeExcel.setValue(24, columnCursor, formatMillion(m.get("F13"))); // F13 放款總餘額
-			makeExcel.setValue(25, columnCursor, formatMillion("0")); 
+			makeExcel.setValue(25, columnCursor, formatMillion("0"));
 
 			columnCursor++;
 		}
@@ -202,62 +456,5 @@ public class LM036Report extends MakeReport {
 		for (int i = 2; i <= 33; i++) {
 			makeExcel.formulaCaculate(i, columnCursor);
 		}
-	}
-
-	private BigDecimal formatMillion(String portfolioTotal) {
-		return formatMillion(getBigDecimal(portfolioTotal));
-	}
-
-	private BigDecimal formatMillion(BigDecimal portfolioTotal) {
-		return computeDivide(portfolioTotal, million, 0);
-	}
-
-	private String formatMonth(int dataMonth) {
-		int year = dataMonth / 100;
-		int month = dataMonth % 100;
-
-		String formatMonth = "";
-		switch (month) {
-		case 1:
-			formatMonth = "Jan";
-			break;
-		case 2:
-			formatMonth = "Feb";
-			break;
-		case 3:
-			formatMonth = "Mar";
-			break;
-		case 4:
-			formatMonth = "Apr";
-			break;
-		case 5:
-			formatMonth = "May";
-			break;
-		case 6:
-			formatMonth = "Jun";
-			break;
-		case 7:
-			formatMonth = "Jul";
-			break;
-		case 8:
-			formatMonth = "Aug";
-			break;
-		case 9:
-			formatMonth = "Sep";
-			break;
-		case 10:
-			formatMonth = "Oct";
-			break;
-		case 11:
-			formatMonth = "Nov";
-			break;
-		case 12:
-			formatMonth = "Dec";
-			break;
-		default:
-			break;
-		}
-		formatMonth += "-" + year % 100;
-		return formatMonth;
 	}
 }

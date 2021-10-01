@@ -51,9 +51,7 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L6067]                                 保證人關係代碼查詢"],
 ["#FdGuaRelCode+保證人關係代碼",#GuaRelCode],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -73,8 +71,8 @@ T(4,CHAIN$)
 #NTXBUF=X,4,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
-!#RPTFG=A,1,S
-!E(0,0)
+#RPTFG=A,1,S
+E(0,0)
 
 !保證人關係代碼
 #GuaRelCode=X,2,I
@@ -95,7 +93,7 @@ T(2,1+#GuaRelCode)
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
 
 </sub>
 

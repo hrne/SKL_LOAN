@@ -14,7 +14,10 @@ import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxDetail;
+import com.st1.itx.db.domain.BatxHead;
+import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.service.BatxDetailService;
+import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -37,7 +40,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4925 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4925.class);
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -48,6 +50,9 @@ public class L4925 extends TradeBuffer {
 
 	@Autowired
 	public BatxDetailService batxDetailService;
+
+	@Autowired
+	public BatxHeadService batxHeadService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -110,9 +115,7 @@ public class L4925 extends TradeBuffer {
 					iRepayCode, iProcStsCode, this.index, this.limit, titaVo);
 		}
 
-		lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
-
-		if (lBatxDetail != null && lBatxDetail.size() != 0) {
+		if (sBatxDetail != null) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			if (sBatxDetail != null && sBatxDetail.hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
@@ -120,12 +123,18 @@ public class L4925 extends TradeBuffer {
 				this.totaVo.setMsgEndToEnter();
 			}
 
-			for (BatxDetail tBatxDetail : lBatxDetail) {
-
+			for (BatxDetail tBatxDetail : sBatxDetail.getContent()) {
+				// 已刪除不顯示
+				if (parse.isNumeric(tBatxDetail.getProcStsCode())
+						&& parse.stringToInteger(tBatxDetail.getProcStsCode()) <= 4) {
+					BatxHead tBatxHead = batxHeadService.findById(
+							new BatxHeadId(tBatxDetail.getAcDate() + 19110000, tBatxDetail.getBatchNo()), titaVo);
+					if (tBatxHead != null && "8".equals(tBatxHead.getBatxExeCode())) {
+						continue;
+					}
+				}
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(tBatxDetail.getProcNote());
-
-				this.info("tBatxDetail.getProcNote() : " + tBatxDetail.getProcNote());
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOAcDate", tBatxDetail.getAcDate());

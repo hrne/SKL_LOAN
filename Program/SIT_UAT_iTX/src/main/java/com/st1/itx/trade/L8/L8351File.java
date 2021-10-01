@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L8;
 
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -11,6 +9,7 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TbJcicMu01;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TbJcicMu01Service;
@@ -21,7 +20,6 @@ import com.st1.itx.util.date.DateUtil;
 @Scope("prototype")
 
 public class L8351File extends MakeFile {
-	private static final Logger logger = LoggerFactory.getLogger(L8351File.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -59,11 +57,20 @@ public class L8351File extends MakeFile {
 			// 組資料，條件getOutJcictxtDate=0，組完後回填今天日期
 			for (TbJcicMu01 aTbJcicMu01 : iTbJcicMu01) {
 				if (aTbJcicMu01.getOutJcictxtDate() == 0) {
+					String iEmpNo = aTbJcicMu01.getEmpId();
+					CdEmp iCdEmp = new CdEmp();
+					iCdEmp = sCdEmpService.findById(iEmpNo,titaVo);
+					String iEmpName = "";
+					if (iCdEmp != null) {
+						iEmpName = iCdEmp.getFullname();
+					}
+
+
 					// 產檔內容
 					int iDataDate = Integer.valueOf(aTbJcicMu01.getDataDate()) - 19110000;
 					int iAuthStartDay = Integer.valueOf(aTbJcicMu01.getAuthStartDay()) - 19110000;
 					String iContent = " " + StringUtils.rightPad(aTbJcicMu01.getHeadOfficeCode(), 3, " ") + StringUtils.rightPad(aTbJcicMu01.getBranchCode(), 4, " ")
-							+ StringUtils.leftPad(String.valueOf(iDataDate), 7, '0') + StringUtils.rightPad(aTbJcicMu01.getEmpName(), 38, " ") + StringUtils.rightPad(aTbJcicMu01.getEmpId(), 8, " ")
+							+ StringUtils.leftPad(String.valueOf(iDataDate), 7, '0') + StringUtils.rightPad(iEmpName, 38, " ") + StringUtils.rightPad(aTbJcicMu01.getEmpId(), 8, " ")
 							+ StringUtils.rightPad(aTbJcicMu01.getTitle(), 25, "　") + StringUtils.rightPad(aTbJcicMu01.getAuthQryType(), 1, " ")
 							+ StringUtils.rightPad(aTbJcicMu01.getQryUserId(), 18, " ") + "A  " + StringUtils.rightPad(String.valueOf(iAuthStartDay), 90, " ")
 							+ StringUtils.rightPad(aTbJcicMu01.getEmailAccount(), 4, " ");

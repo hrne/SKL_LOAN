@@ -28,7 +28,7 @@ public class TbJcicMu01 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7690830835569065802L;
+	private static final long serialVersionUID = 658045649307384226L;
 
 @EmbeddedId
   private TbJcicMu01Id tbJcicMu01Id;
@@ -48,10 +48,6 @@ public class TbJcicMu01 implements Serializable {
   // 員工代號
   @Column(name = "`EmpId`", length = 6, insertable = false, updatable = false)
   private String empId;
-
-  // 員工姓名
-  @Column(name = "`EmpName`", length = 42)
-  private String empName;
 
   // 職稱
   @Column(name = "`Title`", length = 50)
@@ -85,10 +81,6 @@ public class TbJcicMu01 implements Serializable {
   @Column(name = "`AuthMgrIdS`", length = 6)
   private String authMgrIdS;
 
-  // 起日授權主管中文姓名
-  @Column(name = "`AuthMgrNameS`", length = 42)
-  private String authMgrNameS;
-
   // 授權迄日
   @Column(name = "`AuthEndDay`")
   private int authEndDay = 0;
@@ -96,10 +88,6 @@ public class TbJcicMu01 implements Serializable {
   // 迄日授權主管員工代號
   @Column(name = "`AuthMgrIdE`", length = 6)
   private String authMgrIdE;
-
-  // 迄日授權主管中文姓名
-  @Column(name = "`AuthMgrNameE`", length = 42)
-  private String authMgrNameE;
 
   // E-mail信箱
   @Column(name = "`EmailAccount`", length = 50)
@@ -214,25 +202,6 @@ public class TbJcicMu01 implements Serializable {
 	*/
   public void setEmpId(String empId) {
     this.empId = empId;
-  }
-
-/**
-	* 員工姓名<br>
-	* 
-	* @return String
-	*/
-  public String getEmpName() {
-    return this.empName == null ? "" : this.empName;
-  }
-
-/**
-	* 員工姓名<br>
-	* 
-  *
-  * @param empName 員工姓名
-	*/
-  public void setEmpName(String empName) {
-    this.empName = empName;
   }
 
 /**
@@ -388,25 +357,6 @@ public class TbJcicMu01 implements Serializable {
   }
 
 /**
-	* 起日授權主管中文姓名<br>
-	* 
-	* @return String
-	*/
-  public String getAuthMgrNameS() {
-    return this.authMgrNameS == null ? "" : this.authMgrNameS;
-  }
-
-/**
-	* 起日授權主管中文姓名<br>
-	* 
-  *
-  * @param authMgrNameS 起日授權主管中文姓名
-	*/
-  public void setAuthMgrNameS(String authMgrNameS) {
-    this.authMgrNameS = authMgrNameS;
-  }
-
-/**
 	* 授權迄日<br>
 	* 
 	* @return Integer
@@ -442,25 +392,6 @@ public class TbJcicMu01 implements Serializable {
 	*/
   public void setAuthMgrIdE(String authMgrIdE) {
     this.authMgrIdE = authMgrIdE;
-  }
-
-/**
-	* 迄日授權主管中文姓名<br>
-	* 
-	* @return String
-	*/
-  public String getAuthMgrNameE() {
-    return this.authMgrNameE == null ? "" : this.authMgrNameE;
-  }
-
-/**
-	* 迄日授權主管中文姓名<br>
-	* 
-  *
-  * @param authMgrNameE 迄日授權主管中文姓名
-	*/
-  public void setAuthMgrNameE(String authMgrNameE) {
-    this.authMgrNameE = authMgrNameE;
   }
 
 /**
@@ -599,10 +530,9 @@ public class TbJcicMu01 implements Serializable {
 
   @Override
   public String toString() {
-    return "TbJcicMu01 [tbJcicMu01Id=" + tbJcicMu01Id + ", empName=" + empName + ", title=" + title
-           + ", authQryType=" + authQryType + ", qryUserId=" + qryUserId + ", authItemQuery=" + authItemQuery + ", authItemReview=" + authItemReview + ", authItemOther=" + authItemOther + ", authStartDay=" + authStartDay
-           + ", authMgrIdS=" + authMgrIdS + ", authMgrNameS=" + authMgrNameS + ", authEndDay=" + authEndDay + ", authMgrIdE=" + authMgrIdE + ", authMgrNameE=" + authMgrNameE + ", emailAccount=" + emailAccount
-           + ", modifyUserId=" + modifyUserId + ", outJcictxtDate=" + outJcictxtDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+    return "TbJcicMu01 [tbJcicMu01Id=" + tbJcicMu01Id + ", title=" + title + ", authQryType=" + authQryType
+           + ", qryUserId=" + qryUserId + ", authItemQuery=" + authItemQuery + ", authItemReview=" + authItemReview + ", authItemOther=" + authItemOther + ", authStartDay=" + authStartDay + ", authMgrIdS=" + authMgrIdS
+           + ", authEndDay=" + authEndDay + ", authMgrIdE=" + authMgrIdE + ", emailAccount=" + emailAccount + ", modifyUserId=" + modifyUserId + ", outJcictxtDate=" + outJcictxtDate + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

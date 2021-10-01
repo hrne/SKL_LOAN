@@ -122,20 +122,21 @@ public interface LoanChequeService {
   public Slice<LoanCheque> receiveDateRange(int receiveDate_0, int receiveDate_1, List<String> statusCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND StatusCode ^i ,AND ChequeNo &gt;= ,AND ChequeNo &lt;= ,AND  ChequeDate &gt;= ,AND ChequeDate &lt;=
+   * CustNo &gt;= ,AND CustNo &lt;= ,AND StatusCode ^i ,AND ChequeNo &gt;= ,AND ChequeNo &lt;= ,AND  ChequeDate &gt;= ,AND ChequeDate &lt;=
    *
    * @param custNo_0 custNo_0
-   * @param statusCode_1 statusCode_1
-   * @param chequeNo_2 chequeNo_2
+   * @param custNo_1 custNo_1
+   * @param statusCode_2 statusCode_2
    * @param chequeNo_3 chequeNo_3
-   * @param chequeDate_4 chequeDate_4
+   * @param chequeNo_4 chequeNo_4
    * @param chequeDate_5 chequeDate_5
+   * @param chequeDate_6 chequeDate_6
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice LoanCheque LoanCheque of List
    */
-  public Slice<LoanCheque> custNoChequeRange(int custNo_0, List<String> statusCode_1, int chequeNo_2, int chequeNo_3, int chequeDate_4, int chequeDate_5, int index, int limit, TitaVo... titaVo);
+  public Slice<LoanCheque> custNoChequeRange(int custNo_0, int custNo_1, List<String> statusCode_2, int chequeNo_3, int chequeNo_4, int chequeDate_5, int chequeDate_6, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By LoanCheque

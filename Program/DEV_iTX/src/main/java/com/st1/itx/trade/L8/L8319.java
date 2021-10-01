@@ -127,7 +127,7 @@ public class L8319 extends TradeBuffer {
 
 		// Date計算
 		int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// 營業日 放acdate
-		int iTxDate = DealDate(txDate, -3);// 報送日前3個營業日
+		int iTxDate = DealBussDate(txDate, -3);// 報送日前3個營業日
 
 		// 檢核項目(D-34)
 		if (!"4".equals(iTranKey_Tmp)) {
@@ -144,9 +144,6 @@ public class L8319 extends TradeBuffer {
 
 					// 4 start
 					// 除例外處理(報送過「'52':前置協商相關資料報送例外處理」且補報送檔案格式資料別為'61'),本檔案報送日不得超逾最大債權金融機構'60'資料報送日+3個營業日.
-					if (iDateUtil.getDayOfWeek(iTxDate) > 4) {
-						iTxDate = DealDate(iTxDate, -2);
-					}
 					if (TimestampToDate(iJcicZ060.getCreateDate()) < iTxDate) {
 						iJcicZ052 = sJcicZ052Service.findById(iJcicZ052Id, titaVo);
 						if (iJcicZ052 == null) {
@@ -284,17 +281,16 @@ public class L8319 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private int DealDate(int txDate, int iDays) throws LogicException {
+	// 計算：指定日期txDate加減營業日iDays
+	private int DealBussDate(int txDate, int iDays) throws LogicException {
 		int retxdate = 0;
-		iDateUtil.init();
-		iDateUtil.setDate_1(txDate);
-		iDateUtil.setDays(iDays);
-
+		iDateUtil.getbussDate(txDate, iDays);
 		retxdate = iDateUtil.getCalenderDay();
 
 		return retxdate;
 	}
 
+	// 轉換：Sql.Timestamp(創建日期)轉int(西元年YYYYMMDD)
 	private int TimestampToDate(Timestamp ts) throws LogicException {
 		int reTimestampToDate = 0;
 		String tsStr = "";

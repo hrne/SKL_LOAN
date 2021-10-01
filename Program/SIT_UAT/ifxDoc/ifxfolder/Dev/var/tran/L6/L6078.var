@@ -52,9 +52,9 @@ K(MODIFYBUTTON,查詢)
 ["[L6078]                                 利息收入預算數查詢"],
 ["#FdYear+預算年度",#Year],
 ["#FdMonth+預算月份",#Month],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -74,8 +74,8 @@ T(4,CHAIN$)
 #NTXBUF=X,4,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
-!#RPTFG=A,1,S
-!E(0,0)
+#RPTFG=A,1,S
+E(0,0)
 
 !預算年度
 #Year=A,3,I
@@ -100,7 +100,7 @@ C(3,#Year,0,S,$)
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
 
 </sub>
 

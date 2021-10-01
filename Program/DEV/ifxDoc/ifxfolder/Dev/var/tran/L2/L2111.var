@@ -171,8 +171,7 @@ IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
 C(2,#FuncCode,S,T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
 
 #WkFdName=X,1,S
-T(2,@FdCustId,#WkStar)
-IF(#FuncCode==1 || #FuncCode==3,T(3,@FdApplNo, ),T(2,@FdApplNo,#WkStar))
+IF(#FuncCode==1 || #FuncCode==3,T(3,@FdApplNo, )T(2,@FdCustId,*),T(2,@FdApplNo,#WkStar)T(2,@FdCustId,))
 T(2,@FdCreditSysNo,#WkStar)
 T(2,@FdApplDate,#WkStar)
 T(2,@FdProdNo,#WkStar)
@@ -342,6 +341,10 @@ R(1,L2R07)
 #CustIdX=X,100,L
 T(2,#L2r07CustName)
 
+#CustEntCode=A,1,S
+E(0,#L2r07EntCode)
+C(3,#CustEntCode,1,INVOKEJS(SHOW,p2,4,4,0),INVOKEJS(SHOW,p2,4,4,1))
+
 #FinancialBind=X,1,S
 SHOW(#FinancialBtn)
 BIND(#FinancialBtn,click, {cmd=CHAIN; ntxcd=L1909; ntxbuf=#CustIdX;ntxbuf5=type<-1})
@@ -356,6 +359,9 @@ C(3,#UpdateCode,1,$,S)
 T(2,@IsLimit,#L2r12IsLimit)
 T(2,@IsRelated,#L2r12IsRelated)
 T(2,@IsLnrelNear,#L2r12IsLnrelNear)
+T(H,@IsLimitX,#IsLimit,#YesNoHelp)
+T(H,@IsRelatedX,#IsRelated,#YesNoHelp)
+T(H,@IsLnrelNearX,#IsLnrelNear,#YesNoHelp)
 
 #WkStatus=A,1,S
 C(3,#FuncCode,4,E(0,0),E(0,9))
@@ -405,6 +411,9 @@ C(3,#FuncCode,2,S,$)
 T(2,@IsLimit,#L2r02IsLimit)
 T(2,@IsRelated,#L2r02IsRelated)
 T(2,@IsLnrelNear,#L2r02IsLnrelNear)
+T(H,@IsLimitX,#IsLimit,#YesNoHelp)
+T(H,@IsRelatedX,#IsRelated,#YesNoHelp)
+T(H,@IsLnrelNearX,#IsLnrelNear,#YesNoHelp)
 
 #RcvL2r07B=X,1,S
 C(3,#FuncCode,3,S,$)
@@ -552,6 +561,7 @@ T(F,#GroupId,0)
 C(3,#UpdateCode,1,S,$)
 T(F,#PieceCode,0)
 T(F,#CreditSysNo,0)
+T(F,#SyndNo,0)
 T(F,#ProdNo,0)
 T(F,#Estimate,0)
 T(F,#CreditOfficer,0)
@@ -760,6 +770,7 @@ T(H,#IsLnrelNear,#YesNoHelp)
 T(H,#IsSuspected,#YesNoHelp)
 
 #IsSuspectedCheck=X,1,I
+C(3,#CustEntCode,1,S,$)
 HELP(#YesNoHelp)
 @
 V(H,#YesNoHelp)
@@ -771,6 +782,7 @@ T(H,#IsSuspectedCheck,#YesNoHelp)
 T(3, :請選擇;Y:確認核對無誤)
 
 #IsSuspectedCheckType=X,1,I
+C(3,#CustEntCode,1,S,$)
 HELP(#IsSuspectedCheckTypeHelp)
 @
 V(7)
@@ -781,7 +793,7 @@ T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 #IsDataDate=D,7,L
 
-
+!-----
 
 #WkDspAmt1=X,1,S
 C(3,#UpdateCode,1,$,S)
@@ -1080,7 +1092,7 @@ V(P,修改時，必須至少修改一個項目)
 [#<->#,"#FdIsLnrelNear+是否為準利害關係人",#IsLnrelNear,#IsLnrelNearX],
 ["#FdIsSuspected+是否為金控「疑似準利害關係人」名單",#IsSuspectedX,#FinancialBtn],
 ["#FdIsSuspected2+是否為金控疑似準利害關係人",#IsSuspectedCheck,#IsSuspectedCheckX,#IsSuspectedCheckType,#IsSuspectedCheckTypeX],
-[#<->#,"#FdIsLimit+以上資訊日期",#IsDataDate],
+["#FdIsLimit+以上資訊日期",#IsDataDate],["@@","@@"]
 ]
 </sub>
 

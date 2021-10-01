@@ -52,9 +52,7 @@ K(MODIFYBUTTON,查詢)
 ["[L6063]                                 擔保品代號資料查詢"],
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1Item],
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2Item],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -95,8 +93,8 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 #NTXBUF5=X,10,S
 C(3,#CHAIN,1,T(4,NTXBUF5$),S)
 
-!#RPTFG=A,1,S
-!E(0,0)
+#RPTFG=A,1,S
+E(0,0)
 
 #RPTFG2=A,1,S
 C(3,#RPTFG,0,$,S)
@@ -149,7 +147,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 !#BIND1=X,1,S
 !BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6603; ntxbuf=#BUF1})
 
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L6R29Rim.dec"/>

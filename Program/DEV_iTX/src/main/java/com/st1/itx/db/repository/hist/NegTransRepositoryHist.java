@@ -61,6 +61,9 @@ public interface NegTransRepositoryHist extends JpaRepository<NegTrans, NegTrans
   // ThisEntdy = , AND ThisKinbr = , AND ThisTlrNo = , AND ThisTxtNo = , AND ThisSeqNo = 
   public Slice<NegTrans> findAllByThisEntdyIsAndThisKinbrIsAndThisTlrNoIsAndThisTxtNoIsAndThisSeqNoIsOrderByThisEntdyAscThisSeqNoAsc(int thisEntdy_0, String thisKinbr_1, String thisTlrNo_2, String thisTxtNo_3, String thisSeqNo_4, Pageable pageable);
 
+  // AcDate =, AND TitaTxtNo =
+  public Slice<NegTrans> findAllByAcDateIsAndTitaTxtNoIs(int acDate_0, int titaTxtNo_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

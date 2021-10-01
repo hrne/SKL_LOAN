@@ -2033,7 +2033,7 @@ public class NegCom extends CommBuffer {
 		this.info("NegCom nper LoanAmt=[" + LoanAmt + "] DueAmt=[" + DueAmt + "] Rate=[" + Rate + "]");
 		int Period = 0;// 應繳期數
 		if (Rate.compareTo(BigDecimal.ZERO) != 0) {
-			BigDecimal Interest = LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 5, RoundingMode.CEILING);// 第一次的利息
+			BigDecimal Interest = LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP);// 第一次的利息
 			if (Interest.compareTo(DueAmt) >= 0) {
 				// E5009 資料檢核錯誤
 				throw new LogicException(titaVo, "E5009", "期金小於等於利息,該公式為發散型無法計算期數");
@@ -2041,7 +2041,7 @@ public class NegCom extends CommBuffer {
 				while (LoanAmt.compareTo(BigDecimal.ZERO) > 0) {
 					// LoanAmt-(DueAmt-LoanAmt*Rate)
 					LoanAmt = LoanAmt.subtract(DueAmt
-							.subtract(LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 5, RoundingMode.CEILING)));
+							.subtract(LoanAmt.multiply(Rate).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP)));
 					Period++;
 				}
 			}

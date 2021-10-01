@@ -45,6 +45,9 @@ public interface CustMainRepositoryDay extends JpaRepository<CustMain, String> {
   // EmpNo >= 
   public Optional<CustMain> findTopByEmpNoGreaterThanEqualOrderByEmpNoDesc(String empNo_0);
 
+  // IndustryCode =
+  public Slice<CustMain> findAllByIndustryCodeIsOrderByCustIdAsc(String industryCode_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

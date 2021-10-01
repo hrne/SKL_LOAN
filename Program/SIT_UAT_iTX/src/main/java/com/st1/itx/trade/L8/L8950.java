@@ -12,13 +12,13 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TbJcicMu01;
+import com.st1.itx.db.service.CdEmpService;
 /*DB服務*/
 import com.st1.itx.db.service.TbJcicMu01Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L8950")
 @Scope("prototype")
@@ -32,14 +32,8 @@ public class L8950 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public TbJcicMu01Service sTbJcicMu01Service;
-
-	/* 日期工具 */
 	@Autowired
-	public DateUtil dateUtil;
-
-	/* 轉型共用工具 */
-	@Autowired
-	public Parse parse;
+	public CdEmpService iCdEmpService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -71,13 +65,18 @@ public class L8950 extends TradeBuffer {
 		} else {
 			for (TbJcicMu01 aTbJcicMu01 : iTbJcicMu01) {
 				OccursList occursList = new OccursList();
+				occursList.putParam("OOHeadOfficeCode", aTbJcicMu01.getHeadOfficeCode());
+				occursList.putParam("OOBranchCode", aTbJcicMu01.getBranchCode());
+				occursList.putParam("OODataDate", Integer.valueOf(aTbJcicMu01.getDataDate()));
 				occursList.putParam("OOEmpId", aTbJcicMu01.getEmpId());
-				occursList.putParam("OOEmpName", aTbJcicMu01.getEmpName());
-				if (aTbJcicMu01.getDataDate() == 0) {
-					occursList.putParam("OODataDate", "0");
-				} else {
-					occursList.putParam("OODataDate", Integer.valueOf(aTbJcicMu01.getDataDate()) - 19110000);
+				CdEmp iCdEmp = new CdEmp ();
+				iCdEmp = iCdEmpService.findById(aTbJcicMu01.getEmpId(), titaVo);
+				if (iCdEmp == null) {
+					occursList.putParam("OOEmpName", "");
+				}else {
+					occursList.putParam("OOEmpName", iCdEmp.getFullname());
 				}
+				
 				this.totaVo.addOccursList(occursList);
 			}
 		}

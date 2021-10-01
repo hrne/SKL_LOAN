@@ -14,7 +14,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.LoanCheque;
@@ -73,7 +72,6 @@ public class L3007 extends TradeBuffer {
 
 		// 取得輸入資料
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
-		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iChequeDateStart = this.parse.stringToInteger(titaVo.getParam("ChequeDateStart"));
 		int iChequeNo = this.parse.stringToInteger(titaVo.getParam("ChequeNo"));
 		int iChequeDateEnd = this.parse.stringToInteger(titaVo.getParam("ChequeDateEnd"));
@@ -85,6 +83,13 @@ public class L3007 extends TradeBuffer {
 		if (iChequeNo > 0) {
 			wkChequeNoSt = iChequeNo;
 			wkChequeNoEd = iChequeNo;
+		}
+
+		int wkCustNoSt = 0;
+		int wkCustNoEd = 9999999;
+		if (iCustNo > 0) {
+			wkCustNoSt = iCustNo;
+			wkCustNoEd = iCustNo;
 		}
 		int wkChequeDateStart = 0;
 		int wkChequeDateEnd = 99991231;
@@ -118,36 +123,40 @@ public class L3007 extends TradeBuffer {
 		this.limit = 100; // 113 * 500 = 56500
 
 		// 查詢放款主檔
-//		slLoanCheque = loanChequeService.chequeCustNoEq(iCustNo, lStatusCode, wkChequeDateStart, wkChequeDateEnd,
-//				this.index, this.limit, titaVo);
-		slLoanCheque = loanChequeService.custNoChequeRange(iCustNo, lStatusCode, wkChequeNoSt, wkChequeNoEd,
-				wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
+		slLoanCheque = loanChequeService.custNoChequeRange(wkCustNoSt, wkCustNoEd, lStatusCode, wkChequeNoSt,
+				wkChequeNoEd, wkChequeDateStart, wkChequeDateEnd, this.index, this.limit, titaVo);
+
 		lLoanCheque = slLoanCheque == null ? null : slLoanCheque.getContent();
 		if (lLoanCheque == null || lLoanCheque.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "支票檔"); // 查詢資料不存在
 		}
 		for (LoanCheque tLoanCheque : lLoanCheque) {
-			// 查詢會計銷帳檔
-			wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
-					+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
-			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", iCustNo, wkRvNo, 0,
-					Integer.MAX_VALUE, titaVo);
-			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
-			if (lAcReceivable != null && lAcReceivable.size() > 0) {
-				for (AcReceivable tAcReceivable : lAcReceivable) {
-					if (iFacmNo == 0 || iFacmNo == tAcReceivable.getFacmNo()) {
-						occursList = new OccursList();
-						occursList.putParam("OOFacmNo", tAcReceivable.getFacmNo());
-						moveOccursList(tLoanCheque, titaVo);
-					}
-				}
-			} else {
-				if (iFacmNo == 0) {
-					occursList = new OccursList();
-					occursList.putParam("OOFacmNo", 0);
-					moveOccursList(tLoanCheque, titaVo);
-				}
-			}
+//			 查詢會計銷帳檔
+//			wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
+//					+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
+//			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", iCustNo, wkRvNo, 0,
+//					Integer.MAX_VALUE, titaVo);
+//			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
+
+			occursList = new OccursList();
+//			occursList.putParam("OOFacmNo", tLoanCheque.getFacmNo());
+			moveOccursList(tLoanCheque, titaVo);
+
+//			if (lAcReceivable != null && lAcReceivable.size() > 0) {
+//				for (AcReceivable tAcReceivable : lAcReceivable) {
+//					if (iFacmNo == 0 || iFacmNo == tAcReceivable.getFacmNo()) {
+//						occursList = new OccursList();
+//						occursList.putParam("OOFacmNo", tAcReceivable.getFacmNo());
+//						moveOccursList(tLoanCheque, titaVo);
+//					}
+//				}
+//			} else {
+//				if (iFacmNo == 0) {
+//					occursList = new OccursList();
+//					occursList.putParam("OOFacmNo", 0);
+//					moveOccursList(tLoanCheque, titaVo);
+//				}
+//			}
 		}
 
 		if (wkTotalCount == 0) {

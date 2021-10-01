@@ -157,6 +157,19 @@ public interface NegAppr01Service {
   public Slice<NegAppr01> findTrans(int acDate_0, String titaTlrNo_1, int titaTxtNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = , AND CaseSeq = , AND ExportDate=
+   *
+   * @param custNo_0 custNo_0
+   * @param caseSeq_1 caseSeq_1
+   * @param exportDate_2 exportDate_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegAppr01 NegAppr01 of List
+   */
+  public Slice<NegAppr01> findByCustNoCaseSeq(int custNo_0, int caseSeq_1, int exportDate_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By NegAppr01
    * 
    * @param negAppr01Id key

@@ -52,6 +52,9 @@ public interface NegAppr01RepositoryHist extends JpaRepository<NegAppr01, NegApp
   // AcDate = , AND TitaTlrNo = ,AND TitaTxtNo=
   public Slice<NegAppr01> findAllByAcDateIsAndTitaTlrNoIsAndTitaTxtNoIs(int acDate_0, String titaTlrNo_1, int titaTxtNo_2, Pageable pageable);
 
+  // CustNo = , AND CaseSeq = , AND ExportDate=
+  public Slice<NegAppr01> findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDesc(int custNo_0, int caseSeq_1, int exportDate_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -119,6 +119,17 @@ public interface CustMainService {
   public CustMain empNoFirst(String empNo_0, TitaVo... titaVo);
 
   /**
+   * IndustryCode =
+   *
+   * @param industryCode_0 industryCode_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CustMain CustMain of List
+   */
+  public Slice<CustMain> IndustryCodeAll(String industryCode_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CustMain
    * 
    * @param custUKey key

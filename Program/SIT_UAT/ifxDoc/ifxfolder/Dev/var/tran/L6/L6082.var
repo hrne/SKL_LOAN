@@ -1,0 +1,224 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6082)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,19)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+!HIDE(#BTN1)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L6752; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增工作月)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6082]                                 放款業績工作月查詢"],
+["#FdYear+業績年度",#Year],
+!["#FdMonth+工作月份",#Month],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:新增工作月;EndDate:1;tabbable:0;title:L6752 放款業績工作月維護
+!#BUF1=X,42,S
+
+!---------- AP TEXT AREA Variables ----------
+
+#FdYear=X,2,L
+!#FdMonth=X,2,L
+#FdRPTFG=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,4,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#RPTFG=A,1,S
+E(0,0)
+
+!業績年度
+#Year=A,3,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
+C(3,#CHAIN,1,s,$)
+
+
+!工作月份
+!#Month=A,2,I
+!C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
+!C(3,#CHAIN,1,s,$)
+!C(3,#Year,0,S,$)
+!@C(3,#Month,0,$,V(5,1,13))
+
+#BUF1=X,4,S
+!C(4,#Month,HIDE(#BTN1),SHOW(#BTN1))
+!T(2,1+#Year)
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+!#BIND1=X,1,S
+!BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6752; ntxbuf=#BUF1})
+
+!<include src="COM.icf::RPTFG.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6082 ----------
+<sub type="FORM" name="L6082">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6082,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6082] 放款業績工作月)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 業績年度(TOTA)
+#OOYear=A,3,L
+
+! 工作月份(TOTA)
+!#OOMonth=A,2,L
+
+! 開始日期(TOTA)
+!#OOStartDate=D,7,L
+
+!#OOStartDateX=D,8,S
+!D(7,2,#OOStartDate,0,1)
+
+! 終止日期(TOTA)
+!#OOEndDate=D,7,L
+
+!#OOEndDateX=D,8,S
+!D(7,2,#OOEndDate,0,1)
+
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
+
+#OOBUF2=X,4,S
+T(2,#OOFunc2+#OOYear)
+
+#OOBTN2=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6752;text=修改;ntxbuf=#OOBUF2})
+
+! 刪除的按鈕
+#OOFunc4=A,1,S
+E(0,4)
+
+#OOBUF4=X,4,S
+T(2,#OOFunc4+#OOYear)
+
+#OOBTN4=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6752;text=刪除;ntxbuf=#OOBUF4})
+
+! 查詢的按鈕
+#OOBUF5=X,4,S
+T(2,5+#OOYear)
+
+#OOBTN5=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6752;text=查詢;ntxbuf=#OOBUF5})
+
+</sub>
+
+!------ 上行電文 ------
+<sub type="TIM">
+#Year
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L6082
+#OOYear
+
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+<sub type="PART" name="L6082" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6082]                                 放款業績工作月查詢                                             "],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6082
+#any={detail:true, header:'L6082.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+
+#OOBTN5=查詢
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN5',align:'center',canExport:false}
+
+#OOYear=業績年度
+{width:70,align:'center'}
+
+!#OOMonth=工作月份
+!{width:100,align:'center'}
+
+!#OOStartDate=開始日期
+!{width:100,align:'center'}
+
+!#OOEndDate=終止日期
+!{width:100,align:'center'}
+
+^
+
+</sub>

@@ -45,9 +45,7 @@ E(0,0)
 ["[L6068]                                 報表代號對照檔查詢"],
 ["#FdFormNo+報表代號",#FormNo],
 ["#FdFormName+報表名稱",#FormName],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+
 ]
 
 #FdFormNo=X,2,L
@@ -101,8 +99,8 @@ K(MODIFYBUTTON,查詢)
 C(3,#CHAIN,1,S,K(MODIFYBUTTON,1,新增報表代號))
 
 
-!#RPTFG=A,1,S
-!E(0,0)
+#RPTFG=A,1,S
+E(0,0)
 
 !報表代號
 #FormNo=X,10,I
@@ -112,7 +110,7 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,10),$)
 #FormName=x,80,I
 C(3,#CHAIN,1,T(1,#NTXBUF,11,80),$)
 
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
 
 </sub>
 

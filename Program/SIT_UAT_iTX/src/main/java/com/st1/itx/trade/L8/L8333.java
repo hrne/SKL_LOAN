@@ -16,11 +16,11 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ570;
+import com.st1.itx.db.domain.JcicZ570Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ571;
 import com.st1.itx.db.domain.JcicZ571Id;
 import com.st1.itx.db.domain.JcicZ571Log;
-import com.st1.itx.db.domain.JcicZ575;
 import com.st1.itx.db.service.JcicZ570Service;
 import com.st1.itx.db.service.JcicZ571LogService;
 /*DB服務*/
@@ -31,18 +31,17 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-
 /**
  * Tita<br>
-* TranKey=X,1<br>
-* CustId=X,10<br>
-* SubmitKey=X,10<br>
-* RcDate=9,7<br>
-* ChangePayDate=9,7<br>
-* ClosedDate=9,7<br>
-* ClosedResult=9,1<br>
-* OutJcicTxtDate=9,7<br>
-*/
+ * TranKey=X,1<br>
+ * CustId=X,10<br>
+ * SubmitKey=X,10<br>
+ * RcDate=9,7<br>
+ * ChangePayDate=9,7<br>
+ * ClosedDate=9,7<br>
+ * ClosedResult=9,1<br>
+ * OutJcicTxtDate=9,7<br>
+ */
 
 @Service("L8333")
 @Scope("prototype")
@@ -71,7 +70,7 @@ public class L8333 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8333 ");
 		this.totaVo.init(titaVo);
-		
+
 		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
 		String iTranKey = titaVo.getParam("TranKey");
 		String iCustId = titaVo.getParam("CustId");
@@ -84,7 +83,7 @@ public class L8333 extends TradeBuffer {
 		int iAllotAmt = Integer.valueOf(titaVo.getParam("AllotAmt"));
 		int iUnallotAmt = Integer.valueOf(titaVo.getParam("UnallotAmt"));
 		String iKey = "";
-		//JcicZ571
+		// JcicZ571
 		JcicZ571 iJcicZ571 = new JcicZ571();
 		JcicZ571Id iJcicZ571Id = new JcicZ571Id();
 		iJcicZ571Id.setApplyDate(iApplyDate);
@@ -92,56 +91,60 @@ public class L8333 extends TradeBuffer {
 		iJcicZ571Id.setCustId(iCustId);
 		iJcicZ571Id.setSubmitKey(iSubmitKey);
 		JcicZ571 chJcicZ571 = new JcicZ571();
-		//檢核項目(D-73)
-		//同一更生款項統一收付案件若未曾報送'570'檔案資料，則予以剔退處理
-		//三start
-		Slice<JcicZ570> ixJcicZ570 = sJcicZ570Service.custIdEq(iCustId, this.index, this.limit, titaVo);
-		if(ixJcicZ570 == null) {
-				throw new LogicException(titaVo, "E0005", "同一更生款項統一收付案件未曾報送'570'檔案資料");
-		}
-		//三end
-		//檢核金融機構報送本檔案資料日期，若超逾同一更生款項統一收付案件'575'檔案資料建檔日+7個工作日，且最大債權金融機構未曾報送'575'
-		//債務人通報債權金額異動檔者，予以剔退處理 Fegie處理
-		//四start
-		Slice<JcicZ575> ixJcicZ575 = sJcicZ575Service.custIdEq(iCustId, this.index, this.limit, titaVo);
-		if (ixJcicZ575 == null) {
-			throw new LogicException(titaVo, "E0005", "查無(575)更生債權金額異動通知資料"); 
-		}
-		for(JcicZ575 xJcicZ575 : ixJcicZ575) {
-			int jcicDay = xJcicZ575.getOutJcicTxtDate();
-			int today = Integer.valueOf(titaVo.get("ENTDY"));
-			if( today+7<jcicDay && jcicDay==0) {
-				throw new LogicException(titaVo, "E0005", "逾同一更生款項統一收付案件(575)檔案資料建檔日+7個工作日，且最大債權金融機構未曾報送'575'債務人通報債權金額異動檔者，予以剔退處理");
-			}
-		
-		//四end
-		//檢核金融機構報送本檔案資料日期，若超逾同一更生款項統一收付案件最大債權金融機構報送'575'資料建檔日+3個工作日者，予以剔退處理
-		//五start
-			if(today<jcicDay+3) {
-				throw new LogicException(titaVo, "E0005","若超逾同一更生款項統一收付案件最大債權金融機構報送'575'資料建檔日+3個工作日者，予以剔退處理");
-			}
-		}
-		//五end
-		//第7欄「是否為更生債權人」填報為'Y'者，第8-11欄為必要填報欄位
-		//六start
-		//var處理
-		//六end
-		//檢核第10、11欄位金額加總為第9欄「更生債權總金額」
-		//七start
-		if(iAllotAmt+iUnallotAmt != iOwnerAmt) {
-			throw new LogicException(titaVo, "E0005", "第10、11欄位金額加總為第9欄「更生債權總金額」");
-		}
-		//七end
+		JcicZ570 iJcicZ570 = new JcicZ570();
+		JcicZ570Id iJcicZ570Id = new JcicZ570Id();
+		iJcicZ570Id.setApplyDate(iApplyDate);
+		iJcicZ570Id.setCustId(iCustId);
+		iJcicZ570Id.setSubmitKey(iSubmitKey);
 
-		switch(iTranKey_Tmp) {
+		// 檢核項目(D-73)
+		if (!"4".equals(iTranKey_Tmp)) {
+
+			if ("A".equals(iTranKey)) {
+				// 二 start key值為「債務人IDN+報送單位代號+申請日期+受理款項統一收付之債權金融機構代號」，不可重複，重複者予以剔退
+				JcicZ571 jJcicZ571 = sJcicZ571Service.findById(iJcicZ571Id, titaVo);
+				if (jJcicZ571 != null) {
+					throw new LogicException("E0005", "key值「債務人IDN+報送單位代號+申請日期+受理款項統一收付之債權金融機構代號」，不可重複.");
+				} // 二 end
+
+				// 三 start 同一更生款項統一收付案件若未曾報送'570'檔案資料，則予以剔退處理
+				iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
+				if (iJcicZ570 == null) {
+					throw new LogicException(titaVo, "E0005", "同一更生款項統一收付案件未曾報送'570'檔案資料");
+				}
+				// 三end
+			}
+
+			// 四 檢核金融機構報送本檔案資料日期，若超逾同一更生款項統一收付案件'575'檔案資料建檔日+7個工作日，且最大債權金融機構未曾報送'575'***J
+			// 債務人通報債權金額異動檔者，予以剔退處理 處理***J
+
+			// 五 檢核金融機構報送本檔案資料日期，若超逾同一更生款項統一收付案件最大債權金融機構報送'575'資料建檔日+3個工作日者，予以剔退處理***J
+
+			// 六 start 第7欄「是否為更生債權人」填報為'Y'者，第8-11欄為必要填報欄位
+			if("Y".equals(iOwnerYn)) {
+				if(iPayYn.trim().isEmpty() || iOwnerAmt ==0 || iAllotAmt ==0 || iUnallotAmt ==0) {
+					throw new LogicException(titaVo, "E0005", "「是否為更生債權人」填報為'Y'者,後續欄位為必要填報欄位，不能為空.");
+				}
+			}// 六 end
+
+			// 七start 檢核第10、11欄位金額加總為第9欄「更生債權總金額」
+			if (iAllotAmt + iUnallotAmt != iOwnerAmt) {
+				throw new LogicException(titaVo, "E0005", "第10、11欄位金額加總為第9欄「更生債權總金額」");
+			}
+			// 七end
+
+			// 檢核項目 end
+		}
+
+		switch (iTranKey_Tmp) {
 		case "1":
-			//檢核是否重複，並寫入JcicZ571
+			// 檢核是否重複，並寫入JcicZ571
 			chJcicZ571 = sJcicZ571Service.findById(iJcicZ571Id, titaVo);
-			if (chJcicZ571!=null) {
+			if (chJcicZ571 != null) {
 				throw new LogicException("E0005", "已有相同資料");
 			}
-			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");          
-            iJcicZ571.setJcicZ571Id(iJcicZ571Id);
+			iKey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+			iJcicZ571.setJcicZ571Id(iJcicZ571Id);
 			iJcicZ571.setTranKey(iTranKey);
 			iJcicZ571.setOwnerYn(iOwnerYn);
 			iJcicZ571.setPayYn(iPayYn);
@@ -151,7 +154,7 @@ public class L8333 extends TradeBuffer {
 			iJcicZ571.setUkey(iKey);
 			try {
 				sJcicZ571Service.insert(iJcicZ571, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			break;
@@ -162,7 +165,7 @@ public class L8333 extends TradeBuffer {
 			uJcicZ571 = sJcicZ571Service.holdById(iJcicZ571.getJcicZ571Id(), titaVo);
 			if (uJcicZ571 == null) {
 				throw new LogicException("E0007", "無此更新資料");
-			}			
+			}
 			uJcicZ571.setTranKey(iTranKey);
 			uJcicZ571.setOwnerYn(iOwnerYn);
 			uJcicZ571.setPayYn(iPayYn);
@@ -173,31 +176,31 @@ public class L8333 extends TradeBuffer {
 			JcicZ571 oldJcicZ571 = (JcicZ571) iDataLog.clone(uJcicZ571);
 			try {
 				sJcicZ571Service.update(uJcicZ571, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ571, uJcicZ571);
 			iDataLog.exec();
 			break;
-		case "4": //需刷主管卡
+		case "4": // 需刷主管卡
 			iJcicZ571 = sJcicZ571Service.findById(iJcicZ571Id);
 			if (iJcicZ571 == null) {
 				throw new LogicException("E0008", "");
 			}
 			if (!titaVo.getHsupCode().equals("1")) {
-				iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 			Slice<JcicZ571Log> dJcicLogZ571 = null;
 			dJcicLogZ571 = sJcicZ571LogService.ukeyEq(iJcicZ571.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ571 == null) {
-				//尚未開始寫入log檔之資料，主檔資料可刪除
-			try {
-				sJcicZ571Service.delete(iJcicZ571, titaVo);
-			}catch (DBException e) {
-				throw new LogicException("E0008", "更生債權金額異動通知資料");
+				// 尚未開始寫入log檔之資料，主檔資料可刪除
+				try {
+					sJcicZ571Service.delete(iJcicZ571, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
-			}else {//已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
-				//最近一筆之資料
+			} else {// 已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
+					// 最近一筆之資料
 				JcicZ571Log iJcicZ571Log = dJcicLogZ571.getContent().get(0);
 				iJcicZ571.setOwnerYn(iJcicZ571Log.getOwnerYn());
 				iJcicZ571.setPayYn(iJcicZ571Log.getPayYn());
@@ -208,14 +211,14 @@ public class L8333 extends TradeBuffer {
 				iJcicZ571.setOutJcicTxtDate(iJcicZ571Log.getOutJcicTxtDate());
 				try {
 					sJcicZ571Service.update(iJcicZ571, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}
 		default:
 			break;
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

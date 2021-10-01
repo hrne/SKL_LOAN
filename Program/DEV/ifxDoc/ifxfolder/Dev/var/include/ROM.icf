@@ -6041,6 +6041,9 @@ TXFORM=L5R41
 
 <L5R42.dec>
 #L5R42CustName=X,100,S
+#L5R42AcDate=D,7,S
+#L5R42TlrNo=X,6,S
+#L5R42TxtNo=N,8,S
 ##loop {times:30,i:1}
 #L5R42FinCode{i}=X,3,S
 #L5R42FinCodeName{i}=X,100,S
@@ -6052,6 +6055,9 @@ TXFORM=L5R41
 <L5R42.tom>
 TXFORM=L5R42
 #L5R42CustName
+#L5R42AcDate
+#L5R42TlrNo
+#L5R42TxtNo
 ##loop {times:30,i:1}
 #L5R42FinCode{i}
 #L5R42FinCodeName{i}
@@ -7638,6 +7644,43 @@ TXFORM=L8R55
 ^
 </L8R55.tom>
 
+<L8R56.dec>
+#L8R56EmpName=X,42,S
+#L8R56Title=X,50,S
+#L8R56AuthQryType=X,1,S
+#L8R56QryUserId=X,8,S
+#L8R56AuthItemQuery=X,1,S
+#L8R56AuthItemReview=X,1,S
+#L8R56AuthItemOther=X,1,S
+#L8R56AuthStartDay=9,7,S
+#L8R56AuthMgrIdS=X,6,S
+#L8R56AuthMgrNameS=X,42,S
+#L8R56AuthEndDay=9,7,S
+#L8R56AuthMgrIdE=X,6,S
+#L8R56AuthMgrNameE=X,42,S
+#L8R56EmailAccount=x,50,S
+#L8R56OutJcictxtDate=9,7,S
+</L8R56.dec>
+
+<L8R56.tom>
+TXFORM=L8R56
+#L8R56EmpName
+#L8R56Title
+#L8R56AuthQryType
+#L8R56QryUserId
+#L8R56AuthItemQuery
+#L8R56AuthItemReview
+#L8R56AuthItemOther
+#L8R56AuthStartDay
+#L8R56AuthMgrIdS
+#L8R56AuthMgrNameS
+#L8R56AuthEndDay
+#L8R56AuthMgrIdE
+#L8R56AuthMgrNameE
+#L8R56EmailAccount
+#L8R56OutJcictxtDate
+^
+</L8R56.tom>
 
 <L5R38.rtn>
 #L5R38iCode=A,1,S

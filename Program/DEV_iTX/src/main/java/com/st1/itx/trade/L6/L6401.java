@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -12,6 +14,9 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.domain.TxTellerAuth;
+import com.st1.itx.db.domain.TxTellerAuthId;
+import com.st1.itx.db.service.TxTellerAuthService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -25,12 +30,12 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6401 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6401.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public TxTellerService txTellerService;
-
+	@Autowired
+	public TxTellerAuthService sTxTellerAuthService;
 	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
@@ -62,6 +67,7 @@ public class L6401 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料已存在
 			}
+			moveGroup(iTlrNo, iFunCode, titaVo);
 		} else {
 			if ("1".equals(iFunCode)) {
 				throw new LogicException(titaVo, "E0002", "使用者:" + iTlrNo);
@@ -82,6 +88,7 @@ public class L6401 extends TradeBuffer {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 				}
 			}
+			moveGroup(iTlrNo, iFunCode, titaVo);
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -97,26 +104,51 @@ public class L6401 extends TradeBuffer {
 		tTxTeller.setLevelFg(Integer.valueOf(titaVo.get("LevelFg")));
 		tTxTeller.setStatus(Integer.valueOf(titaVo.get("Status")));
 		tTxTeller.setGroupNo(titaVo.getParam("GroupNo"));
-		
-//		tTxTeller.setEntdy(Integer.valueOf(titaVo.get("Entdy")));
-//		tTxTeller.setTxtNo(Integer.valueOf(titaVo.get("TxtNo")));
 		tTxTeller.setDesc(titaVo.getParam("Desc"));
 		tTxTeller.setAmlHighFg(titaVo.getParam("AmlHighFg"));
-		
-		tTxTeller.setAuthNo(titaVo.getParam("AuthNo1"));
-		tTxTeller.setAuthNo1(titaVo.getParam("AuthNo1"));
-		tTxTeller.setAuthNo2(titaVo.getParam("AuthNo2"));
-		tTxTeller.setAuthNo3(titaVo.getParam("AuthNo3"));
-		tTxTeller.setAuthNo4(titaVo.getParam("AuthNo4"));
-		tTxTeller.setAuthNo5(titaVo.getParam("AuthNo5"));
-		tTxTeller.setAuthNo6(titaVo.getParam("AuthNo6"));
-		tTxTeller.setAuthNo7(titaVo.getParam("AuthNo7"));
-		tTxTeller.setAuthNo8(titaVo.getParam("AuthNo8"));
-		tTxTeller.setAuthNo9(titaVo.getParam("AuthNo9"));
-		tTxTeller.setAuthNo10(titaVo.getParam("AuthNo10"));
+
 
 		return tTxTeller;
 
 	}
+	private void moveGroup(String mTlrNo, String mFuncCode, TitaVo titaVo) throws LogicException {
+		
+		this.info("into moveGroup");
+		
+		if(("2").equals(mFuncCode) || ("4").equals(mFuncCode)) {
+			
+			Slice<TxTellerAuth> mTxTellerAuth = sTxTellerAuthService.findByTlrNo(mTlrNo, this.index, this.limit, titaVo);
+			List<TxTellerAuth> iTxTellerAuth = mTxTellerAuth == null ? null : mTxTellerAuth.getContent();
+			if(iTxTellerAuth != null) {
+				try {
+					sTxTellerAuthService.deleteAll(iTxTellerAuth);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
+				}
+			}
+		}
+		
+		if(("1").equals(mFuncCode) || ("2").equals(mFuncCode)) {
+			for(int i=1;i<=40;i++) {
+				
+				if(titaVo.getParam("AuthNo"+i) !=null && titaVo.getParam("AuthNo"+i).length()>0) {
+					TxTellerAuth tTxTellerAuth = new TxTellerAuth();
+					TxTellerAuthId tTxTellerAuthId = new TxTellerAuthId();
+					
+					tTxTellerAuthId.setTlrNo(mTlrNo);
+					tTxTellerAuthId.setAuthNo(titaVo.getParam("AuthNo"+i));
+					
+					tTxTellerAuth.setTxTellerAuthId(tTxTellerAuthId);
+					
+					try {
+						sTxTellerAuthService.insert(tTxTellerAuth, titaVo);
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 
+					}
+				}
+			}
+		}
+		
+	}
 }

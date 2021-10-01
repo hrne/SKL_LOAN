@@ -5,8 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -37,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4961 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4961.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -58,7 +55,7 @@ public class L4961 extends TradeBuffer {
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 400;
+		this.limit = 200;
 
 //		[查詢方式"],1:火險到期年月;2:未銷全部
 //		[火險到期年月],(1:火險到期年月)

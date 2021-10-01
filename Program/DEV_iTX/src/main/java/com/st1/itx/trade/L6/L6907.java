@@ -13,10 +13,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-//import com.st1.itx.db.domain.AcDetail;
-//import com.st1.itx.db.domain.AcDetailId;
 import com.st1.itx.db.domain.AcReceivable;
-//import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.service.AcReceivableService;
@@ -39,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6907 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6907.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -69,9 +65,9 @@ public class L6907 extends TradeBuffer {
 		// tita
 		// 帳冊別(必輸)
 		String iAcBookCode = titaVo.getParam("AcBookCode");
-		//區隔帳冊
+		// 區隔帳冊
 		String iAcSubBookCode = titaVo.getParam("AcSubBookCode");
-		
+
 		// 單位別(自動顯示)
 		String iBranchNo = titaVo.getParam("BranchNo");
 		// 幣別(自動顯示)
@@ -104,18 +100,29 @@ public class L6907 extends TradeBuffer {
 		// new ArrayList
 		List<AcReceivable> tmplAcReceivable = new ArrayList<AcReceivable>();
 		Slice<AcReceivable> slAcReceivable = null;
+
+		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		this.index = titaVo.getReturnIndex();
+
+		// 設定每筆分頁的資料筆數 預設100筆 總長不可超過六萬
+		this.limit = 100; // 166 * 100 = 16600
+
 		// 輸入科子細目
 		if (!iAcNoCode.isEmpty()) {
-				slAcReceivable = sAcReceivableService.acrvClsFlagSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNoStartAt, iCustNoEndAt, this.index, Integer.MAX_VALUE,titaVo);
-			
+			slAcReceivable = sAcReceivableService.acrvClsFlagSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%",
+					iBranchNo, iCurrencyCode, iAcNoCode, iAcSubCode, iAcDtlCode, iCustNoStartAt, iCustNoEndAt,
+					this.index, this.limit, titaVo);
+
 			// 業務科目有輸入
 		} else if (!iAcctCode.isEmpty()) {
-				slAcReceivable = sAcReceivableService.acctCodeSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim()+"%", iAcctCode, iCustNoStartAt, iCustNoEndAt, this.index, Integer.MAX_VALUE, titaVo);
-			
+			slAcReceivable = sAcReceivableService.acctCodeSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%",
+					iAcctCode, iCustNoStartAt, iCustNoEndAt, this.index, this.limit, titaVo);
+
 		} else {
-				slAcReceivable = sAcReceivableService.acrvFacmNoSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim()+"%", iCustNoStartAt, 0, iFacmNo, 999, this.index, Integer.MAX_VALUE, titaVo);
-			}
-			
+			slAcReceivable = sAcReceivableService.acrvFacmNoSubBook(iClsFlag, iAcBookCode, iAcSubBookCode.trim() + "%",
+					iCustNoStartAt, 0, iFacmNo, 999, this.index, this.limit, titaVo);
+		}
+
 		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 // 查無資料 拋錯
 		if (lAcReceivable == null) {
@@ -168,10 +175,16 @@ public class L6907 extends TradeBuffer {
 			occurslist.putParam("OO_SUM", rvBal);
 			occurslist.putParam("OOAcBookCode", tAcReceivable.getAcBookCode());
 			occurslist.putParam("OOAcSubBookCode", tAcReceivable.getAcSubBookCode());
-			
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
 
+		}
+		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+		if (slAcReceivable != null && slAcReceivable.hasNext()) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
 		}
 
 		this.addList(this.totaVo);

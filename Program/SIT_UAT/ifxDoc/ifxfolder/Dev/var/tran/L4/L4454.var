@@ -21,8 +21,9 @@ E(0,0)
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCode,#FunctionCodeX],
 [#<->#,"#FdCustNo+戶號",#CustNo,"-",#FacmNo],
 [#<->#,"#FdAcDate+會計日期",#AcDate],
-[#<->#,"#FdBankCode+銀行別",#BankCode,#BankCodeX],
+[#<->#,"#FdRepayBank+銀行別",#RepayBank,#RepayBankX],
 ] 
+
 ! #BTNA=X,1,I,ui:button;value:瀏覽;enable:1;tabbable:0
 
 #FdFunctionCodeX=X,2,L
@@ -30,7 +31,7 @@ E(0,0)
 T(3,*)
 #FdAcDate=X,2,L
 T(3,*)
-#FdBankCode=X,2,L
+#FdRepayBank=X,2,L
 T(3,*)
 
 #FunctionHelp=x,30,S
@@ -105,14 +106,14 @@ T(1,#SYSDATE,2,7)
 V(7)A(DATE,0,#AcDate)
 
 ! 銀行別
-#BankCode=A,3,I
+#RepayBank=A,3,I
 IF(#FunctionCode==2,$,S)
 HELP(#BankDeductCdHelp)
 @V(H,#BankDeductCdHelp)
 
-#BankCodeX=x,40,L
+#RepayBankX=x,40,L
 IF(#FunctionCode==2,$,S)
-T(H,#BankCode,#BankDeductCdHelp)
+T(H,#RepayBank,#BankDeductCdHelp)
 
 #FlagA=A,1,S
 E(0,1)
@@ -168,7 +169,7 @@ E(0,1)ASGN(LOOP$)
 #CustNo
 #FacmNo
 #AcDate
-#BankCode
+#RepayBank
 #END
 </sub>
 

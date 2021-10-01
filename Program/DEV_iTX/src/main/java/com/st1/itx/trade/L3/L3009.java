@@ -12,14 +12,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 /*
@@ -37,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3009")
 @Scope("prototype")
 public class L3009 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3009.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -110,23 +107,25 @@ public class L3009 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "支票檔"); // 查詢資料不存在
 		}
 		for (LoanCheque tLoanCheque : lLoanCheque) {
-			// 查詢會計銷帳檔
-			wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
-					+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
-			Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), wkRvNo,
-					0, Integer.MAX_VALUE, titaVo);
-			List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
-			if (lAcReceivable != null && lAcReceivable.size() > 0) {
-				for (AcReceivable tAcReceivable : lAcReceivable) {
-					occursList = new OccursList();
-					occursList.putParam("OOFacmNo", tAcReceivable.getFacmNo());
-					moveOccursList(tLoanCheque, titaVo);
-				}
+			occursList = new OccursList();
+			occursList.putParam("OOChequeDate", tLoanCheque.getChequeDate());
+			occursList.putParam("OOChequeAcct", tLoanCheque.getChequeAcct());
+			occursList.putParam("OOChequeNo", tLoanCheque.getChequeNo());
+			occursList.putParam("OOCurrencyCode", tLoanCheque.getCurrencyCode());
+			occursList.putParam("OOChequeAmt", tLoanCheque.getChequeAmt());
+			occursList.putParam("OOCustNo", tLoanCheque.getCustNo());
+			occursList.putParam("OOStatusCode", tLoanCheque.getStatusCode());
+			// 查詢客戶資料主檔
+			CustMain tCustMain = custMainService.custNoFirst(tLoanCheque.getCustNo(), tLoanCheque.getCustNo(), titaVo);
+			if (tCustMain == null) {
+				occursList.putParam("OOCustNoX", "");
 			} else {
-				occursList = new OccursList();
-				occursList.putParam("OOFacmNo", 0);
-				moveOccursList(tLoanCheque, titaVo);
+				occursList.putParam("OOCustNoX", tCustMain.getCustName());
 			}
+
+			// 將每筆資料放入Tota的OcList
+			this.totaVo.addOccursList(occursList);
+			wkTotalCount++;
 		}
 
 		if (wkTotalCount == 0) {
@@ -143,24 +142,4 @@ public class L3009 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void moveOccursList(LoanCheque mLoanCheque, TitaVo titaVo) {
-		occursList.putParam("OOChequeDate", mLoanCheque.getChequeDate());
-		occursList.putParam("OOChequeAcct", mLoanCheque.getChequeAcct());
-		occursList.putParam("OOChequeNo", mLoanCheque.getChequeNo());
-		occursList.putParam("OOCurrencyCode", mLoanCheque.getCurrencyCode());
-		occursList.putParam("OOChequeAmt", mLoanCheque.getChequeAmt());
-		occursList.putParam("OOCustNo", mLoanCheque.getCustNo());
-		occursList.putParam("OOStatusCode", mLoanCheque.getStatusCode());
-		// 查詢客戶資料主檔
-		CustMain tCustMain = custMainService.custNoFirst(mLoanCheque.getCustNo(), mLoanCheque.getCustNo(), titaVo);
-		if (tCustMain == null) {
-			occursList.putParam("OOCustNoX", "");
-		} else {
-			occursList.putParam("OOCustNoX", tCustMain.getCustName());
-		}
-
-		// 將每筆資料放入Tota的OcList
-		this.totaVo.addOccursList(occursList);
-		wkTotalCount++;
-	}
 }

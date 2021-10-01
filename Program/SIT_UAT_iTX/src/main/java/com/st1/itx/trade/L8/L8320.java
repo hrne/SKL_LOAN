@@ -134,7 +134,7 @@ public class L8320 extends TradeBuffer {
 
 		// Date計算
 		int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// 營業日 放acdate
-		int iTxDate = DealDate(txDate, -3);// 報送日前3日
+		int iTxDate = DealBussDate(txDate, -3);// 報送日前3個營業日
 
 		// 檢核項目(D-34)
 		if (!"4".equals(iTranKey_Tmp)) {
@@ -148,9 +148,6 @@ public class L8320 extends TradeBuffer {
 					throw new LogicException("E0005",
 							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過「'60':前置協商受理申請變更還款暨請求回報剩餘債權通知」.");
 				} else {
-					if (iDateUtil.getDayOfWeek(iTxDate) > 4) {
-						iTxDate = DealDate(iTxDate, -2);// 報送日前3個營業日，若為週四，再減2天
-					}
 					if (TimestampToDate(iJcicZ060.getCreateDate()) >= iTxDate) {
 						// throw new LogicException("E0005",
 						// "本檔案報送日需大於等於「'60':前置協商受理申請變更還款暨請求回報剩餘債權通知」資料報送日+3個營業日.");
@@ -164,7 +161,8 @@ public class L8320 extends TradeBuffer {
 
 			// 1.5 檢核第11-13欄若與所有協商剩餘金融機構回報'61'之回報協商剩餘債權金額不同時，則予剔退***J
 
-			// 1.6 檢核第14欄「變更還款條件簽約總債務金額」需為第11-13欄信用貸款、現金卡、信用卡之「協商剩餘債務簽約餘額」合計，否則予以剔退.前端已設為自動填入數字。
+			// 1.6
+			// 檢核第14欄「變更還款條件簽約總債務金額」需為第11-13欄信用貸款、現金卡、信用卡之「協商剩餘債務簽約餘額」合計，否則予以剔退.前端已設為自動填入數字。
 
 			// 1.7 start 變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日期
 			if (iChaRepayEndDate < iChaRepayAgreeDate) {
@@ -418,13 +416,11 @@ public class L8320 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	// 計算：指定日期txDate加減天數iDays
-	private int DealDate(int txDate, int iDays) throws LogicException {
+	// 計算：指定日期txDate加減營業日iDays
+	private int DealBussDate(int txDate, int iDays) throws LogicException {
 		int retxdate = 0;
-		iDateUtil.init();
-		iDateUtil.setDate_1(txDate);
-		iDateUtil.setDays(iDays);
-
+		iDateUtil.getbussDate(txDate, iDays);
+		
 		retxdate = iDateUtil.getCalenderDay();
 		return retxdate;
 	}

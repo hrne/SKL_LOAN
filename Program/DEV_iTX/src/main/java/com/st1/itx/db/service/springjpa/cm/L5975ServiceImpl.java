@@ -117,7 +117,7 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 	
-	public List<Map<String, String>> findbyCustNo(int CustNo, int CaseSeq, TitaVo titaVo, int index, int limit) throws Exception {
+	public List<Map<String, String>> findbyCustNoCaseSeq(int CustNo, int CaseSeq, TitaVo titaVo, int index, int limit) throws Exception {
 		this.info("L5975ServiceImpl.findAll ");
 
 		// *** 折返控制相關 ***
@@ -132,6 +132,43 @@ public class L5975ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , COUNT(\"FinCode\")                AS \"CNT\"                 "; // -- F2 總筆數
 		sql += " FROM \"NegAppr01\" ";
 		sql += "  WHERE \"CustNo\" = "+CustNo+" and \"CaseSeq\" = " + CaseSeq;
+		sql += "   GROUP BY  \"FinCode\" ";
+		sql += "   ORDER BY  \"FinCode\" ";
+		sql += sqlRow;
+
+		this.info("sql=" + sql);
+		Query query;
+
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+
+		query.setParameter("ThisIndex", index);
+		query.setParameter("ThisLimit", limit);
+
+		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
+
+		// *** 折返控制相關 ***
+		// 設定每次撈幾筆,需在createNativeQuery後設定
+		query.setMaxResults(this.limit);
+
+		return this.convertToMap(query);
+	}
+	
+	public List<Map<String, String>> findbyCustNo(int CustNo, TitaVo titaVo, int index, int limit) throws Exception {
+		this.info("L5975ServiceImpl.findAll ");
+
+		// *** 折返控制相關 ***
+		this.index = index;
+		// *** 折返控制相關 ***
+		this.limit = limit;
+
+		String sql = " ";
+
+		sql += " SELECT \"FinCode\"                                                  "; // -- F0 機構代碼
+		sql += "      , SUM(\"ApprAmt\")                  AS \"AMT\"                 "; // -- F1 總金額
+		sql += "      , COUNT(\"FinCode\")                AS \"CNT\"                 "; // -- F2 總筆數
+		sql += " FROM \"NegAppr01\" ";
+		sql += "  WHERE \"CustNo\" = "+CustNo ;
 		sql += "   GROUP BY  \"FinCode\" ";
 		sql += "   ORDER BY  \"FinCode\" ";
 		sql += sqlRow;

@@ -19,6 +19,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ442;
 import com.st1.itx.db.domain.JcicZ442Id;
 import com.st1.itx.db.domain.JcicZ442Log;
+import com.st1.itx.db.domain.JcicZ443;
 import com.st1.itx.db.domain.JcicZ446;
 import com.st1.itx.db.domain.JcicZ446Id;
 import com.st1.itx.db.service.JcicZ041Service;
@@ -153,7 +154,15 @@ public class L8323 extends TradeBuffer {
 				}
 			} // 7 end
 
-			// 8 檢核第11欄「有擔保債權筆數」需等於報送「'443':回報有擔保債權金額資料」之筆數.***J
+			// 8 檢核第11欄「有擔保債權筆數」需等於報送「'443':回報有擔保債權金額資料」之筆數.
+			Slice<JcicZ443> sJcicZ443 = sJcicZ443Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+			int sGuarLoanCnt = 0;
+			if(sJcicZ443 != null) {
+				sGuarLoanCnt = sJcicZ443.getSize();
+			}
+			if(iGuarLoanCnt != sGuarLoanCnt) {
+				throw new LogicException("E0005", "「有擔保債權筆數」需等於報送「'443':回報有擔保債權金額資料」之筆數.");
+			}
 
 			// 9 檢核第17~20欄之金額合計需等於第12欄「依民法第323條計算之信用放款本息餘額」.
 			if ((iReceExpPrin + iReceExpInte + iReceExpPena + iReceExpOther) != iCivil323ExpAmt) {

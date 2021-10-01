@@ -87,7 +87,12 @@ public class L5977 extends TradeBuffer {
 		List<Map<String, String>> listL5977 = null;
 		
 			try {
-				listL5977 = l5975ServiceImpl.findbyCustNo(iCustNo, iCaseSeq, titaVo, this.index, this.limit);
+				if(iCaseSeq==0) {
+					listL5977 = l5975ServiceImpl.findbyCustNo(iCustNo, titaVo, this.index, this.limit);
+				} else {
+					listL5977 = l5975ServiceImpl.findbyCustNoCaseSeq(iCustNo, iCaseSeq, titaVo, this.index, this.limit);
+				}
+				
 
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();

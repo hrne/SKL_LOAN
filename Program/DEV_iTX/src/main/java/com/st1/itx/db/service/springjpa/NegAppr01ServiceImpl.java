@@ -390,6 +390,34 @@ em = null;
   }
 
   @Override
+  public Slice<NegAppr01> findByCustNoCaseSeq(int custNo_0, int caseSeq_1, int exportDate_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<NegAppr01> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByCustNoCaseSeq " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1 + " exportDate_2 : " +  exportDate_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = negAppr01ReposDay.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDesc(custNo_0, caseSeq_1, exportDate_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = negAppr01ReposMon.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDesc(custNo_0, caseSeq_1, exportDate_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = negAppr01ReposHist.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDesc(custNo_0, caseSeq_1, exportDate_2, pageable);
+    else 
+      slice = negAppr01Repos.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDesc(custNo_0, caseSeq_1, exportDate_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public NegAppr01 holdById(NegAppr01Id negAppr01Id, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

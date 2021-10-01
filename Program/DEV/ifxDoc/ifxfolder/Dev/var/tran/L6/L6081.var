@@ -51,9 +51,9 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L6081]                                 介紹人加碼獎勵津貼標準設定數查詢"],
 ["#FdWorkMonth+工作年月",#WorkMonth,"(輸入0查全部)"],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -72,8 +72,8 @@ T(4,CHAIN$)
 #NTXBUF=X,4,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
-!#RPTFG=A,1,S
-!E(0,0)
+#RPTFG=A,1,S
+E(0,0)
 
 #DATE=D,8,S
 T(4,DATE$)
@@ -91,7 +91,7 @@ E(0,@FirstIn,0)
 !#BIND1=X,1,S
 !BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6751; ntxbuf=#BUF1})
 
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
 
 </sub>
 

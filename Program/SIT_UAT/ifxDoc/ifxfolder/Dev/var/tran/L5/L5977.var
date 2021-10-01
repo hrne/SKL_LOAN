@@ -42,14 +42,14 @@ E(0,0)
 <sub type="DC" name="L5977" layout="cols=1;screen.width=[150,850];printer.width=[20,80];order=1">
 [
 ["[L5977]                                 客戶最大債權撥付統計查詢"],
-[#<->#,"#FdCustId+身份證字號",#CustId],
+[#<->#,"#FdCustId+身分證字號",#CustId],
 [#<->#,"#FdCaseSeq+案件序號",#CaseSeq],
 ]
 
 #FdCustId=X,1,L
 T(3,*)
 #FdCaseSeq=X,1,L
-T(3,*)
+T(3, )
 
 
 #CHAIN=A,1,S
@@ -70,7 +70,7 @@ C(3,#CHAIN,1,s,$)
 #CaseSeq=A,3,I
 C(3,#CHAIN,1,T(1,#NTXBUF,11,3),$)
 C(3,#CHAIN,1,s,$)
-@V(2,0)
+
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)

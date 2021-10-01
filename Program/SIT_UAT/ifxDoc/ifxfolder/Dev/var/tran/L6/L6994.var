@@ -51,9 +51,9 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L6994]                                 業績件數及金額核算標準設定查詢"],
 ["#FdWorkMonth+工作月",#WorkMonth],
-["#FdOption+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+!["#FdOption+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -72,8 +72,8 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6084進入),$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 C(3,#CHAIN,1,T(2,@WorkMonth,#NTXBUF,1,5))
 
-!#RPTFG=A,1,S
-!E(0,0)
+#RPTFG=A,1,S
+E(0,0)
 
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -117,7 +117,7 @@ E(0,@FirstIn,0)
 !#BIND1=X,1,S
 !BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6754; ntxbuf=#BUF1})
 
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
 
 </sub>
 

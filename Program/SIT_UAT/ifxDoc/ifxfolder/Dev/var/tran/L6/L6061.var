@@ -1,0 +1,395 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6061)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,145)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+!HIDE(#BTN1)
+
+!#FirstIn=A,1,S
+!E(0,1)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6061]                                 會計科子細目查詢"],
+["#FdAcNoCode+科子細目",#AcNoCode,"－",#AcSubCode,"－",#AcDtlCode],
+["#FdAcNoItem+科目名稱",#AcNoItem],
+!["#FdRPTFG+顯示方式",
+!<include src="COM.icf::RPTFG.scr"/>
+!],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:新增會計科目;enable:1;tabbable:0;title:L6601 會計科子細目維護
+!#BUF1=X,42,S
+
+!---------- AP TEXT AREA Variables ----------
+
+#FdAcNoCode=X,2,L
+#FdAcNoItem=X,2,L
+#FdRPTFG=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+
+#NTXBUF=X,4,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L6601; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,查詢)
+C(3,#CHAIN,1,S,K(MODIFYBUTTON,1,新增會計科子細目))
+
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+
+!科子細目
+#AcNoCode=X,11,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
+C(3,#CHAIN,1,s,$)
+!C(3,#FirstIn,1,E(0,@CHAIN,1),$)
+!C(3,#FirstIn,1,S,$)
+
+#AcSubCode=X,5,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
+C(3,#CHAIN,1,s,$)
+C(4,#AcNoCode,s,$)
+!C(3,#FirstIn,1,E(0,@CHAIN,1),$)
+!C(3,#FirstIn,1,S,$)
+
+#AcDtlCode=X,2,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,4),$)
+C(3,#CHAIN,1,s,$)
+C(4,#AcNoCode,s,$)
+!C(3,#FirstIn,1,E(0,@CHAIN,1),$)
+!C(3,#FirstIn,1,S,$)
+
+
+#SendL6R23=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimAcNoCode,#AcNoCode)
+T(2,@RimAcSubCode,#AcSubCode)
+T(2,@RimAcDtlCode,#AcDtlCode)
+RESET_RIM(#SendL6R23,L6R23)
+S(L6R23,1,#RimFuncCode,#RimTxCode,#RimAcNoCode,#RimAcSubCode,#RimAcDtlCode)
+R(1,L6R23)
+
+#AcNoItem=x,80,L
+T(2,#L6R23AcNoItem)
+
+#BUF1=X,16,S
+!C(4,#AcNoCode,HIDE(#BTN1),SHOW(#BTN1))
+!T(2,1+#AcNoCode+#AcSubCode+#AcDtlCode)
+!E(0,@FirstIn,0)
+
+!#BIND1=X,1,S
+!BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6601; ntxbuf=#BUF1})
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+!<include src="COM.icf::RPTFG.dec"/>
+
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R23.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6061 ----------
+<sub type="FORM" name="L6061">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6061,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6061] 會計科子細目)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 科子細目(TOTA)
+#OOAcNoCode=X,11,S
+#OOAcSubCode=X,5,S
+#OOAcDtlCode=X,2,S
+#OOAcNoCodeX=X,19,L
+T(2,#OOAcNoCode+－+#OOAcSubCode+－+#OOAcDtlCode)
+
+! 科子細目名稱(TOTA)
+#OOAcNoItem=X,80,S
+
+! 業務科目代號(TOTA)
+#OOAcctCode=X,3,S
+#OOAcctItem=X,40,L
+
+! 科子目級別(TOTA)
+#OOClassCode=A,1,S
+#OOClassCodeX=X,10,L
+C(2,#OOClassCode,T(3,可入帳科目),
+                 T(3,下編子細目))
+
+! 帳冊別(TOTA)
+#OOAcBookFlag=A,1,S
+#OOAcBookFlagX=X,6,L
+C(2,#OOAcBookFlag,T(3,不細分),
+                  T(3,細分),
+                  T(3,中介))
+
+! 借貸(TOTA)
+#OODbCr=X,1,S
+#OODbCrX=X,2,L
+SWITCH(#OODbCr,D,T(3,借),
+               C,T(3,貸))
+
+! 業務科目記號(TOTA)
+#OOAcctFlag=A,1,S
+#OOAcctFlagX=X,12,L
+C(2,#OOAcctFlag,T(3,一般科目),
+                T(3,資負明細科目))
+
+! 銷帳科目記號(TOTA)
+#OOReceivableFlag=A,1,S
+#OOReceivableFlagX=X,14,L
+C(2,#OOReceivableFlag,T(3,非銷帳科目),
+                      T(3,會計銷帳科目),
+                      T(3,業務銷帳科目),T(3,),T(3,),T(3,),T(3,),T(3,),T(3,核心銷帳碼科目))
+
+! 日結餘額檢查(TOTA)
+#OOClsChkFlag=A,1,S
+#OOClsChkFlagX=X,12,L
+C(2,#OOClsChkFlag,T(3,不檢查),
+                  T(3,不過餘額),
+                  T(3,應大於等於零),
+                  T(3,應等於零),
+                  T(3,應小於等於零))
+
+! 放款部使用(TOTA)
+#OOInuseFlag=A,1,S
+#OOInuseFlagX=X,12,L
+C(2,#OOInuseFlag,T(3,可以使用),
+                 T(3,不可使用))
+
+#OOCHAIN=A,1,S
+T(4,CHAIN$)
+
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
+
+#OOBUF2=X,20,S
+T(2,#OOFunc2+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode)
+
+! 連結時隱藏按鈕
+#OOBTN2=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6601;text=修改;ntxbuf=#OOBUF2})
+IF(#OOCHAIN==1,BIND(grid,cancel),$)
+
+! 刪除的按鈕
+#OOFunc4=A,1,S
+E(0,4)
+
+#OOBUF4=X,20,S
+T(2,#OOFunc4+#OOAcNoCode+#OOAcSubCode+#OOAcDtlCode)
+
+! 連結時隱藏按鈕
+#OOBTN4=X,4,S
+BIND(grid,{cmd=CHAIN;ntxcd=L6601;text=刪除;ntxbuf=#OOBUF4})
+IF(#OOCHAIN==1,BIND(grid,cancel),$)
+
+</sub>
+
+!------ 上行電文 ------
+<sub type="TIM">
+#AcNoCode
+#AcSubCode
+#AcDtlCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R23.tom"/>
+
+TXFORM=L6061
+#OOAcNoCode
+#OOAcSubCode
+#OOAcDtlCode
+#OOAcNoItem
+#OOAcctCode
+#OOAcctItem
+#OOClassCode
+#OOAcBookFlag
+#OODbCr
+#OOAcctFlag
+#OOReceivableFlag
+#OOClsChkFlag
+#OOInuseFlag
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6061" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L6061]                                 會計科子細目查詢                                                                             "],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L6061
+#any={detail:true, header:'L6061.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
+
+#OOAcNoCode=
+{width:1,hidden:true}
+
+#OOAcSubCode=
+{width:1,hidden:true}
+
+#OOAcDtlCode=
+{width:1,hidden:true}
+
+#OOAcNoCode=科目
+{width:80,align:'center'}
+#OOAcSubCode=子目
+{width:50,align:'center'}
+#OOAcDtlCode=細目
+{width:50,align:'center'}
+
+#OOAcctItem=業務科目名稱
+{width:150,align:'left'}
+
+#OOClassCodeX=科子目級別
+{width:90,align:'center'}
+
+#OOAcBookFlagX=帳冊別
+{width:60,align:'left'}
+
+#OODbCrX=借貸
+{width:40,align:'center'}
+
+#OOAcctFlagX=業務科目
+{width:90,align:'left'}
+
+#OOReceivableFlagX=銷帳科目
+{width:110,align:'left'}
+
+#OOClsChkFlagX=日結餘額</br>檢查
+{width:90,align:'left'}
+
+#OOInuseFlagX=放款部</br>使用
+{width:70,align:'center'}
+
+#OOAcNoItem=科子細目名稱
+{width:300,align:'left'}
+^
+
+
+#RPTFG2=2,QUERY.GRID,L6061
+#any={detail:true, header:'L6061.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOAcNoCode=
+{width:1,hidden:true}
+
+#OOAcSubCode=
+{width:1,hidden:true}
+
+#OOAcDtlCode=
+{width:1,hidden:true}
+
+#OOAcNoCode=科目
+{width:80,align:'center'}
+#OOAcSubCode=子目
+{width:50,align:'center'}
+#OOAcDtlCode=細目
+{width:50,align:'center'}
+
+#OOAcctItem=業務科目
+{width:150,align:'left'}
+
+#OOClassCodeX=科子目級別
+{width:90,align:'center'}
+
+#OOAcBookFlagX=帳冊別
+{width:60,align:'left'}
+
+#OODbCrX=借貸
+{width:40,align:'center'}
+
+#OOAcctFlagX=業務科目
+{width:90,align:'left'}
+
+#OOReceivableFlagX=銷帳科目
+{width:110,align:'left'}
+
+#OOClsChkFlagX=日結餘額</br>檢查
+{width:90,align:'left'}
+
+#OOInuseFlagX=放款部</br>使用
+{width:70,align:'center'}
+
+#OOAcNoItem=科子細目名稱
+{width:300,align:'left'}
+^
+</sub>

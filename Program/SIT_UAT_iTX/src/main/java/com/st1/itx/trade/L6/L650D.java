@@ -15,7 +15,7 @@ import com.st1.itx.db.domain.CdPfParms;
 import com.st1.itx.db.domain.CdPfParmsId;
 import com.st1.itx.db.service.CdPfParmsService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.common.SendRsp;
 
 @Service("L650D")
 @Scope("prototype")
@@ -32,7 +32,7 @@ public class L650D extends TradeBuffer {
 	@Autowired
 	public CdPfParmsService iCdPfParmsService;
 	@Autowired
-	Parse iParse;
+	SendRsp iSendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -41,6 +41,9 @@ public class L650D extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		// 先刪除
 		Slice<CdPfParms> dCdPfParms = null;
+		if (!titaVo.getHsupCode().equals("1")) {
+			iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+		}
 		dCdPfParms = iCdPfParmsService.findConditionCode1Eq("4", 0, Integer.MAX_VALUE, titaVo);
 		if (dCdPfParms != null) {
 			for (CdPfParms xCdPfParms : dCdPfParms) {
@@ -55,9 +58,7 @@ public class L650D extends TradeBuffer {
 		CdPfParms iCdPfParams = new CdPfParms();
 		CdPfParmsId iCdPfParamsId = new CdPfParmsId();
 		String iEmpNo = "";
-		int iWorkMonthS = 0;
-		int iWorkMonthE = 0;
- 		for (int i = 1;i<=30;i++) {
+		for (int i = 1;i<=30;i++) {
  			iEmpNo = titaVo.getParam("EmpNo"+i);
  			if (iEmpNo.trim().isEmpty()) {
  				continue;

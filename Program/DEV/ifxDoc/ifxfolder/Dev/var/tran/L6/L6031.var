@@ -63,9 +63,7 @@ K(MODIFYBUTTON,2,新增指標利率種類)
 ["[L6031]                                 指標利率種類查詢"],
 !["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdBaseRateCode+指標利率種類",#BaseRateCode,#BaseRateItem],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
+
 ]
 !---------- AP Button AREA ----------
 
@@ -118,11 +116,13 @@ T(H,#BaseRateCode,#ApHelp)
 !T(2,1+#BaseRateCode)
 !E(0,@FirstIn,0)
 
+#RPTFG=A,1,S
+E(0,0)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
-<include src="COM.icf::RPTFG.dec"/>
+!<include src="COM.icf::RPTFG.dec"/>
 
 </sub>
 !---------- 輸出共用變數宣告區 ----------

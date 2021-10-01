@@ -1,0 +1,382 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,1000];printer.width=[20,80];">
+[
+["[L6702]                                 營業單位對照檔維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdBranchNo+單位別",#BranchNo],
+!["#FdAcBranchNo+核心會計單位別",#AcBranchNo],
+["#FdCRH+總分處",#CRH],
+["#FdBranchShort+單位簡稱",#BranchShort],
+["#FdBranchItem+單位名稱",#BranchItem],
+["#FdZip+郵遞區號",#Zip3,#Zip2,#Zip3Item],
+["#FdBranchAddress+單位地址",#BranchAddress],
+["#FdOwner+負責人",#Owner],
+["#FdBusinessID+營利統一編號",#BusinessID],
+!["#FdBranchStatusCode+單位控制碼",#BranchStatusCode],
+!["#FdRSOCode+稽核機關代號",#RSOCode],
+!["#FdMediaUnitCode+媒體單位代號",#MediaUnitCode],
+["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[], p_cols:[]}","","",
+["課組別名稱"],
+[[#Group1]],
+],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+
+! 永遠為必輸欄位
+#FdFuncCode=X,2,L
+T(3,*)
+#FdBranchNo=X,2,L
+T(3,*)
+#FdCRH=X,2,L
+T(3,*)
+#FdBranchShort=X,2,L
+T(3,*)
+#FdBranchItem=X,2,L
+T(3,*)
+#FdZip=X,2,L
+T(3,*)
+#FdBranchAddress=X,2,L
+T(3,*)
+#FdOwner=X,2,L
+T(3,*)
+#FdBusinessID=X,2,L
+T(3,*)
+#FdBranchStatusCode=X,2,L
+T(3,*)
+#FdRSOCode=X,2,L
+T(3,*)
+#FdMediaUnitCode=X,2,L
+T(3,*)
+
+
+
+!---------- AP TEXT AREA Variables ----------
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode1 (1:新增;2:修改;4:刪除;5:查詢)
+#CDCODEFuncCode1=x,20,S                  
+T(3,CdCode.FuncCode1)                  
+#FuncCodeHelp=x,50,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode1)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCodeHelp,#HelpDesc1)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6072進入),$)
+
+!#INIT=X,1,S
+!CALL(#ALWAYS_HIGHLIGHT)
+
+#NTXBUF=X,113,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+!ALERT(#NTXBUF)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_BranchNo=X,4,S
+T(1,#NTXBUF,2,4)
+
+#CHAIN_BranchShort=x,28,S
+T(1,#NTXBUF,6,28)
+
+#CHAIN_BranchItem=x,80,S
+T(1,#NTXBUF,34,80)
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+C(3,#FuncCode,1,S,$)
+T(2,@BranchNo,#CHAIN_BranchNo)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCodeHelp)
+@V(H,#FuncCodeHelp)
+
+!!CALL(#HIGHLIGHT_AFTER_FUNCD)
+#FuncCodeX=X,4,L
+C(4,#FuncCode,S,$)
+T(3, )
+T(H,#FuncCode,#FuncCodeHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+!拿掉重新交易按鈕
+#AGAIN=X,1,S
+IF(#FuncCode==4 ||#FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+#HIDE=X,1,S
+C(3,#FuncCode,1,INVOKEJS(SHOW,grd1,2,50,0),$)
+
+
+! 顯示框線
+#WKTF=X,1,S
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,@CRH,1)T(F,@BranchShort,1)T(F,@BranchItem,1)T(F,@Zip3,1)T(F,@Zip2,1)T(F,@BranchAddress,1)T(F,@Owner,1)T(F,@BusinessID,1)T(F,@BranchStatusCode,1)T(F,@RSOCode,1)T(F,@MediaUnitCode,1),
+                                  T(F,@CRH,0)T(F,@BranchShort,0)T(F,@BranchItem,0)T(F,@Zip3,0)T(F,@Zip2,0)T(F,@BranchAddress,0)T(F,@Owner,0)T(F,@BusinessID,0)T(F,@BranchStatusCode,0)T(F,@RSOCode,0)T(F,@MediaUnitCode,0))
+IF (#FuncCode==1 ,T(F,@BranchNo,1),T(F,@BranchNo,0))
+##loop{times:50,i:1}
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,@Group{i},1),T(F,@Group{i},0))
+##end
+
+#WKPSC=X,2,S
+
+#WKSTAR=X,2,S
+C(3,#CHAIN,1,S,T(3,*))
+
+#WKSTAR1=X,2,S
+C(3,#CHAIN,1,C(2,#FuncCode,S,T(3,*)),T(3,*))
+
+#WKSTAR2=X,2,S
+C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
+
+#WKNAME=X,1,S
+T(2,@FdFuncCode,#WKSTAR)
+T(2,@FdBranchNo,#WKSTAR1)
+T(2,@FdCRH,#WKSTAR2)
+T(2,@FdBranchShort,#WKSTAR2)
+T(2,@FdBranchItem,#WKSTAR2)
+T(2,@FdZip,#WKSTAR2)
+T(2,@FdBranchAddress,#WKSTAR2)
+T(2,@FdOwner,#WKSTAR2)
+T(2,@FdBusinessID,#WKSTAR2)
+T(2,@FdBranchStatusCode,#WKSTAR2)
+T(2,@FdRSOCode,#WKSTAR2)
+T(2,@FdMediaUnitCode,#WKSTAR2)
+
+
+
+
+
+! 單位別
+#BranchNo=A,4,I
+C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
+!!HELP(0000:放款部;
+!!0025:信託部;
+!!0036:台中;
+!!0047:高雄;
+!!0058:台南;
+!!0069:中壢;
+!!0070:花蓮;
+!!0081:板橋;
+!!0092:東台北;
+!!0106:鳳山;
+!!0117:新竹)
+!!@V(1,0,25,36,47,58,69,70,81,92,106,117)
+
+#SendL6R02=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimBranchNo,#BranchNo)
+RESET_RIM(#SendL6R02,L6R02)
+S(L6R02,1,#RimFuncCode,#RimTxCode,#RimBranchNo)
+R(1,L6R02)
+
+#RL6R02=X,1,S
+C(3,#FuncCode,1,s,$)
+!T(2,@AcBranchNo,#L6R02AcBranchNo)
+T(2,@CRH,#L6R02CRH)
+T(2,@BranchShort,#L6R02BranchShort)
+T(2,@BranchItem,#L6R02BranchItem)
+T(2,@Zip3,#L6R02Zip3)
+T(2,@Zip2,#L6R02Zip2)
+T(B,@BranchAddress,#L6R02BranchAddress1+#L6R02BranchAddress2)
+T(2,@Owner,#L6R02Owner)
+T(2,@BusinessID,#L6R02BusinessID)
+T(2,@BranchStatusCode,#L6R02BranchStatusCode)
+T(2,@RSOCode,#L6R02RSOCode)
+T(2,@MediaUnitCode,#L6R02MediaUnitCode)
+T(2,@Group1,#L6R02Group1)
+##loop{times:9,i:2}
+C(4,#L6R02Group{i},INVOKEJS(SHOW,grd1,{i},{i},0),T(2,@Group{i},#L6R02Group{i}))
+##end
+
+
+! 核心會計單位別
+!#AcBranchNo=A,4,S
+!C(2,#FuncCode,$,$,$,$,s,s)
+!@V(7)
+
+! 總分處
+#CRH=A,2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 單位簡稱
+#BranchShort=x,28,I
+C(3,#CHAIN,1,T(2,#CHAIN_BranchShort),)
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 單位名稱
+#BranchItem=x,80,I
+C(3,#CHAIN,1,T(2,#CHAIN_BranchItem),)
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 郵遞區號 3+2
+#Zip3=A,3,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+#Zip2=A,2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+#SendL6R32=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimL6R32Zip3,#Zip3)
+T(2,@RimL6R32Zip2,#Zip2)
+RESET_RIM(#SendL6R32,L6R32)
+S(L6R32,1,#RimFuncCode,#RimTxCode,#RimL6R32Zip3,#RimL6R32Zip2)
+R(1,L6R32)
+
+#RL6R32=X,1,S
+T(2,@CityItem,#L6R32CityItem)
+T(2,@AreaItem,#L6R32AreaItem)
+
+#CityItem=X,20,S
+#AreaItem=X,24,S
+#Zip3Item=X,44,L
+T(B,#CityItem+#AreaItem)
+
+! 單位地址 
+#BranchAddress=x,120,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 負責人
+#Owner=x,28,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 營利統一編號
+#BusinessID=A,8,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(2,0)A(ID_UNINO,0,#BusinessID))
+
+! 單位控制碼
+#BranchStatusCode=A,1,S
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 稽核機關代號
+#RSOCode=A,3,S
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 媒體單位代號
+#MediaUnitCode=A,4,S
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 課組別名稱
+#Group1=x,20,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+##loop{times:9,i:2,j:1}
+
+! 課組別名稱
+#Group{i}=x,20,I
+C(4,#Group{j},S,$)
+C(4,#Group{j},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
+T(2,#L6R02Group{i})
+C(2,#FuncCode,$,$,$,$,s,s)
+
+#showGroup{i}=X,1,S
+C(4,#Group{i},INVOKEJS(SHOW,grd1_{i},0),INVOKEJS(SHOW,grd1_{i},1))
+
+##end
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6Rim.dec"/>
+<include src="ROM.icf::L6R02.dec"/>
+<include src="ROM.icf::L6R32Rim.dec"/>
+<include src="ROM.icf::L6R32.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6702 ----------
+<sub type="FORM" name="L6702">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6702,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6702] 營業單位對照檔維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+#FuncCode#BranchNo#CRH#BranchShort#BranchItem#Zip3#Zip2#BranchAddress#Owner#BusinessID#BranchStatusCode#RSOCode#MediaUnitCode
+##loop{times:10,i:1}
+#Group{i}
+##end
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L6702
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R02.tom"/>
+<include src="ROM.icf::L6R32.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

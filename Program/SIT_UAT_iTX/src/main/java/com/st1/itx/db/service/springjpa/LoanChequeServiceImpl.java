@@ -278,7 +278,7 @@ em = null;
   }
 
   @Override
-  public Slice<LoanCheque> custNoChequeRange(int custNo_0, List<String> statusCode_1, int chequeNo_2, int chequeNo_3, int chequeDate_4, int chequeDate_5, int index, int limit, TitaVo... titaVo) {
+  public Slice<LoanCheque> custNoChequeRange(int custNo_0, int custNo_1, List<String> statusCode_2, int chequeNo_3, int chequeNo_4, int chequeDate_5, int chequeDate_6, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<LoanCheque> slice = null;
     if (titaVo.length != 0)
@@ -289,15 +289,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("custNoChequeRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " statusCode_1 : " +  statusCode_1 + " chequeNo_2 : " +  chequeNo_2 + " chequeNo_3 : " +  chequeNo_3 + " chequeDate_4 : " +  chequeDate_4 + " chequeDate_5 : " +  chequeDate_5);
+    this.info("custNoChequeRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " statusCode_2 : " +  statusCode_2 + " chequeNo_3 : " +  chequeNo_3 + " chequeNo_4 : " +  chequeNo_4 + " chequeDate_5 : " +  chequeDate_5 + " chequeDate_6 : " +  chequeDate_6);
     if (dbName.equals(ContentName.onDay))
-      slice = loanChequeReposDay.findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeNo_2, chequeNo_3, chequeDate_4, chequeDate_5, pageable);
+      slice = loanChequeReposDay.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, custNo_1, statusCode_2, chequeNo_3, chequeNo_4, chequeDate_5, chequeDate_6, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanChequeReposMon.findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeNo_2, chequeNo_3, chequeDate_4, chequeDate_5, pageable);
+      slice = loanChequeReposMon.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, custNo_1, statusCode_2, chequeNo_3, chequeNo_4, chequeDate_5, chequeDate_6, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanChequeReposHist.findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeNo_2, chequeNo_3, chequeDate_4, chequeDate_5, pageable);
+      slice = loanChequeReposHist.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, custNo_1, statusCode_2, chequeNo_3, chequeNo_4, chequeDate_5, chequeDate_6, pageable);
     else 
-      slice = loanChequeRepos.findAllByCustNoIsAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, statusCode_1, chequeNo_2, chequeNo_3, chequeDate_4, chequeDate_5, pageable);
+      slice = loanChequeRepos.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndStatusCodeInAndChequeNoGreaterThanEqualAndChequeNoLessThanEqualAndChequeDateGreaterThanEqualAndChequeDateLessThanEqualOrderByChequeAcctAscChequeNoAsc(custNo_0, custNo_1, statusCode_2, chequeNo_3, chequeNo_4, chequeDate_5, chequeDate_6, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

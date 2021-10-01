@@ -23,6 +23,7 @@ E(0,0)
 [#<->#,"#FdAcDate+會計日期",#AcDate],
 [#<->#,"#FdRepayBank+銀行別",#RepayBank,#RepayBankX],
 ] 
+
 ! #BTNA=X,1,I,ui:button;value:瀏覽;enable:1;tabbable:0
 
 #FdFunctionCodeX=X,2,L
