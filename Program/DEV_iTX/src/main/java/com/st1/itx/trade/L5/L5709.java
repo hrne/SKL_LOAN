@@ -87,6 +87,11 @@ public class L5709 extends TradeBuffer {
 			}
 		}
 
+		int successtimes = 0 ;
+		int falsetimes = 0 ;
+		int successamt = 0 ;
+		int falseamt = 0 ;
+		
 		// 路徑
 		String FilePath = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
 				+ File.separatorChar + titaVo.getParam("FILENA").trim();
@@ -144,22 +149,40 @@ public class L5709 extends TradeBuffer {
 			makeExcel.setValue(i, 9, Detail[10]);// 實際入扣帳日
 			if(("4001").equals(Detail[11])) {
 				Col11 = "4001:入/扣帳成功";
+				successtimes++;
+				successamt = successamt + Integer.parseInt(Detail[7])/100;
 			} else if(("4505").equals(Detail[11])) {
 				Col11 = "4505:存款不足";
+				falsetimes++;
+				falseamt = falseamt + Integer.parseInt(Detail[7])/100;
 			} else if(("4508").equals(Detail[11])) {
 				Col11 = "4508:非委託或已終止帳戶";
+				falsetimes++;
+				falseamt = falseamt + Integer.parseInt(Detail[7])/100;
 			} else 	if(("4806").equals(Detail[11])) {
 				Col11 = "4806:存戶查核資料錯誤";
+				falsetimes++;
+				falseamt = falseamt + Integer.parseInt(Detail[7])/100;
 			} else 	if(("4808").equals(Detail[11])) {
 				Col11 = "4808:無此帳戶或問題帳戶";
+				falsetimes++;
+				falseamt = falseamt + Integer.parseInt(Detail[7])/100;
 			} else 	if(("4405").equals(Detail[11])) {
 				Col11 = "4405:未開卡或額度不足";
+				falsetimes++;
+				falseamt = falseamt + Integer.parseInt(Detail[7])/100;
 			} else 	if(("4705").equals(Detail[11])) {
 				Col11 = "4705:剔除不轉帳";
+				falsetimes++;
+				falseamt = falseamt + Integer.parseInt(Detail[7])/100;
 			} else 	if(("2999").equals(Detail[11])) {
 				Col11 = "2999:其他錯誤";
+				falsetimes++;
+				falseamt = falseamt + Integer.parseInt(Detail[7])/100;
 			} else {
 				Col11 = Detail[11];
+				falsetimes++;
+				falseamt = falseamt + Integer.parseInt(Detail[7])/100;
 			}
 			makeExcel.setValue(i, 10, Col11);// 回應代碼
 			makeExcel.setValue(i, 11, Detail[12]);// 轉帳行代碼
@@ -255,6 +278,8 @@ public class L5709 extends TradeBuffer {
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 		totaVo.put("ExcelSnoM", "" + sno);
+		
+		totaVo.put("OSuccessFlag","成功筆數 = " + successtimes + "筆      總金額 = " + successamt + "\n" + "失敗筆數 = " + falsetimes + "筆      總金額 = " + falseamt);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

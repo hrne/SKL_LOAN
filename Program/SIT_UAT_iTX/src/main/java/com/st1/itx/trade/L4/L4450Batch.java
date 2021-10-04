@@ -313,6 +313,7 @@ public class L4450Batch extends TradeBuffer {
 								+ titaVo.getParam("EntryDate"),
 						checkMsg, titaVo);
 			} else {
+				checkMsg = "執行失敗，" + checkMsg;
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", checkMsg, titaVo);
 			}
 		}

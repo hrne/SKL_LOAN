@@ -116,7 +116,7 @@ T(3,受理調解機構代號)
 #Hide=X,1,S
 INVOKEJS(SHOW,grd1,0)
 HIDE(#BtnDetail)
-HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ)
+HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL)
 !HIDE(#BtnBankCode)
 
 #BtnDetail=X,1,S,ui:button;value:交易明細;enable:1;tabbable:0
@@ -324,11 +324,11 @@ IF(#FunctionCode=="05",$,S)
 !依戶況修改
 !SHOW(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ)
 HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI)
-SHOW(#BTNJ)
+SHOW(#BTNJ,#BTNL)
 IF(#Status=="0",SHOW(#BTND,#BTNF,#BTNG,#BTNH,#BTNI),$)
 IF(#Status=="2",SHOW(#BTNE),$)
 IF(#Status=="4",SHOW(#BTNF),$)
-IF(#CaseKindCode==1,HIDE(#BTND,#BTNG),$)
+IF(#CaseKindCode==1,HIDE(#BTND,#BTNG,#BTNI),$)
 IF(#TwoStepCode=="N",HIDE(#BTNI),$)
 IF(#IsMainFin=="N",HIDE(#BTND,#BTNJ),$)
 
@@ -410,7 +410,7 @@ T(2,@FdCourCode,#ShowFd)
 IF (#FunctionCode=="01",T(F,@CustId,1),T(F,@CustId,0))
 IF (#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",
                         T(F,@IsMainFin,1)T(F,@CaseKindCode,1)T(F,@CustLoanKind,1)T(F,@Status,1)
-                        T(F,@DeferYMStartX,1)T(F,@DeferYMEndX,1)T(F,@ApplDate,1)T(F,@DueAmt,1)T(F,@TotalPeriod,1)
+                        T(F,@DeferYMStartX,0)T(F,@DeferYMEndX,0)T(F,@ApplDate,1)T(F,@DueAmt,1)T(F,@TotalPeriod,1)
                         T(F,@IntRate,1)T(F,@FirstDueDate,1)T(F,@LastDueDate,1)T(F,@TotalContrAmt,1)T(F,@MainFinCode,1)T(F,@TwoStepCode,1)T(F,@PayerCustNo,1)T(F,@ChgCondDate,1)T(F,@CourCode,1)
                         ,
                         T(F,@CustId,0)T(F,@IsMainFin,0)T(F,@CaseKindCode,0)T(F,@CustLoanKind,0)T(F,@Status,0)
@@ -419,9 +419,10 @@ IF (#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode
 !新增時戶況不可輸入,固定=0
 IF (#FunctionCode=="01",T(F,@Status,0),$) 
 !喘息期只能改此二欄位
-IF (#FunctionCode=="10",T(F,@DeferYMStartX,1)T(F,@DeferYMEndX,1),$) 
+IF (#FunctionCode=="02" || #FunctionCode=="10",T(F,@DeferYMStartX,1)T(F,@DeferYMEndX,1),$) 
 !變更還款條件&二階段新增:不能改的欄位
-IF (#FunctionCode=="09"||#FunctionCode=="11",T(F,@IsMainFin,0)T(F,@CaseKindCode,0)T(F,@Status,0)T(F,@ApplDate,0),$) 
+IF (#FunctionCode=="09"||#FunctionCode=="11",T(F,@IsMainFin,0)T(F,@CaseKindCode,0)T(F,@Status,0)T(F,@ApplDate,0),$)
+ 
 #WKTF2=A,1,S
 IF (#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",E(0,1),E(0,0))
 #WKTF3=A,1,S

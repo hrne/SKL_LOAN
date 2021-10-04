@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("foreclosureFeeService")
 @Repository
-public class ForeclosureFeeServiceImpl implements ForeclosureFeeService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(ForeclosureFeeServiceImpl.class);
-
+public class ForeclosureFeeServiceImpl extends ASpringJpaParm implements ForeclosureFeeService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class ForeclosureFeeServiceImpl implements ForeclosureFeeService, Initial
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + recordNo);
+    this.info("findById " + dbName + " " + recordNo);
     Optional<ForeclosureFee> foreclosureFee = null;
     if (dbName.equals(ContentName.onDay))
       foreclosureFee = foreclosureFeeReposDay.findById(recordNo);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "RecordNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "RecordNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = foreclosureFeeReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +101,9 @@ em = null;
       slice = foreclosureFeeReposHist.findAll(pageable);
     else 
       slice = foreclosureFeeRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +120,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = foreclosureFeeReposDay.findAllByCustNoIsOrderByCustNoAscReceiveDateAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -130,6 +129,9 @@ em = null;
       slice = foreclosureFeeReposHist.findAllByCustNoIsOrderByCustNoAscReceiveDateAsc(custNo_0, pageable);
     else 
       slice = foreclosureFeeRepos.findAllByCustNoIsOrderByCustNoAscReceiveDateAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -146,7 +148,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("receiveDateBetween " + dbName + " : " + "receiveDate_0 : " + receiveDate_0 + " receiveDate_1 : " +  receiveDate_1);
+    this.info("receiveDateBetween " + dbName + " : " + "receiveDate_0 : " + receiveDate_0 + " receiveDate_1 : " +  receiveDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = foreclosureFeeReposDay.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
     else 
       slice = foreclosureFeeRepos.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -164,7 +169,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findRecordNoFirst " + dbName + " : " + "recordNo_0 : " + recordNo_0 + " recordNo_1 : " +  recordNo_1);
+    this.info("findRecordNoFirst " + dbName + " : " + "recordNo_0 : " + recordNo_0 + " recordNo_1 : " +  recordNo_1);
     Optional<ForeclosureFee> foreclosureFeeT = null;
     if (dbName.equals(ContentName.onDay))
       foreclosureFeeT = foreclosureFeeReposDay.findTopByRecordNoGreaterThanEqualAndRecordNoLessThanEqualOrderByRecordNoDesc(recordNo_0, recordNo_1);
@@ -174,6 +179,7 @@ em = null;
       foreclosureFeeT = foreclosureFeeReposHist.findTopByRecordNoGreaterThanEqualAndRecordNoLessThanEqualOrderByRecordNoDesc(recordNo_0, recordNo_1);
     else 
       foreclosureFeeT = foreclosureFeeRepos.findTopByRecordNoGreaterThanEqualAndRecordNoLessThanEqualOrderByRecordNoDesc(recordNo_0, recordNo_1);
+
     return foreclosureFeeT.isPresent() ? foreclosureFeeT.get() : null;
   }
 
@@ -189,7 +195,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectForL2078 " + dbName + " : " + "receiveDate_0 : " + receiveDate_0 + " receiveDate_1 : " +  receiveDate_1 + " custNo_2 : " +  custNo_2 + " custNo_3 : " +  custNo_3);
+    this.info("selectForL2078 " + dbName + " : " + "receiveDate_0 : " + receiveDate_0 + " receiveDate_1 : " +  receiveDate_1 + " custNo_2 : " +  custNo_2 + " custNo_3 : " +  custNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = foreclosureFeeReposDay.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, custNo_2, custNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -198,6 +204,9 @@ em = null;
       slice = foreclosureFeeReposHist.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, custNo_2, custNo_3, pageable);
     else 
       slice = foreclosureFeeRepos.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, custNo_2, custNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -214,7 +223,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("openAcDateBetween " + dbName + " : " + "openAcDate_0 : " + openAcDate_0 + " openAcDate_1 : " +  openAcDate_1);
+    this.info("openAcDateBetween " + dbName + " : " + "openAcDate_0 : " + openAcDate_0 + " openAcDate_1 : " +  openAcDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = foreclosureFeeReposDay.findAllByOpenAcDateGreaterThanEqualAndOpenAcDateLessThanEqualOrderByCustNoAscReceiveDateAsc(openAcDate_0, openAcDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -223,6 +232,9 @@ em = null;
       slice = foreclosureFeeReposHist.findAllByOpenAcDateGreaterThanEqualAndOpenAcDateLessThanEqualOrderByCustNoAscReceiveDateAsc(openAcDate_0, openAcDate_1, pageable);
     else 
       slice = foreclosureFeeRepos.findAllByOpenAcDateGreaterThanEqualAndOpenAcDateLessThanEqualOrderByCustNoAscReceiveDateAsc(openAcDate_0, openAcDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -239,7 +251,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("closeDateBetween " + dbName + " : " + "closeDate_0 : " + closeDate_0 + " closeDate_1 : " +  closeDate_1);
+    this.info("closeDateBetween " + dbName + " : " + "closeDate_0 : " + closeDate_0 + " closeDate_1 : " +  closeDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = foreclosureFeeReposDay.findAllByCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscReceiveDateAsc(closeDate_0, closeDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -248,6 +260,9 @@ em = null;
       slice = foreclosureFeeReposHist.findAllByCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscReceiveDateAsc(closeDate_0, closeDate_1, pageable);
     else 
       slice = foreclosureFeeRepos.findAllByCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscReceiveDateAsc(closeDate_0, closeDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -264,7 +279,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("overdueDateBetween " + dbName + " : " + "overdueDate_0 : " + overdueDate_0 + " overdueDate_1 : " +  overdueDate_1);
+    this.info("overdueDateBetween " + dbName + " : " + "overdueDate_0 : " + overdueDate_0 + " overdueDate_1 : " +  overdueDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = foreclosureFeeReposDay.findAllByOverdueDateGreaterThanEqualAndOverdueDateLessThanEqualOrderByCustNoAscReceiveDateAsc(overdueDate_0, overdueDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -273,6 +288,9 @@ em = null;
       slice = foreclosureFeeReposHist.findAllByOverdueDateGreaterThanEqualAndOverdueDateLessThanEqualOrderByCustNoAscReceiveDateAsc(overdueDate_0, overdueDate_1, pageable);
     else 
       slice = foreclosureFeeRepos.findAllByOverdueDateGreaterThanEqualAndOverdueDateLessThanEqualOrderByCustNoAscReceiveDateAsc(overdueDate_0, overdueDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -289,7 +307,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("selectForL2R32 " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " closeDate_2 : " +  closeDate_2);
+    this.info("selectForL2R32 " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " closeDate_2 : " +  closeDate_2);
     if (dbName.equals(ContentName.onDay))
       slice = foreclosureFeeReposDay.findAllByCustNoIsAndFacmNoIsAndCloseDateIsOrderByRecordNoAsc(custNo_0, facmNo_1, closeDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -299,6 +317,37 @@ em = null;
     else 
       slice = foreclosureFeeRepos.findAllByCustNoIsAndFacmNoIsAndCloseDateIsOrderByRecordNoAsc(custNo_0, facmNo_1, closeDate_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<ForeclosureFee> receiveDatecloseZero(int receiveDate_0, int receiveDate_1, int closeDate_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<ForeclosureFee> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("receiveDatecloseZero " + dbName + " : " + "receiveDate_0 : " + receiveDate_0 + " receiveDate_1 : " +  receiveDate_1 + " closeDate_2 : " +  closeDate_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = foreclosureFeeReposDay.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndCloseDateIsOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, closeDate_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = foreclosureFeeReposMon.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndCloseDateIsOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, closeDate_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = foreclosureFeeReposHist.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndCloseDateIsOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, closeDate_2, pageable);
+    else 
+      slice = foreclosureFeeRepos.findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndCloseDateIsOrderByCustNoAscReceiveDateAsc(receiveDate_0, receiveDate_1, closeDate_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -307,7 +356,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + recordNo);
+    this.info("Hold " + dbName + " " + recordNo);
     Optional<ForeclosureFee> foreclosureFee = null;
     if (dbName.equals(ContentName.onDay))
       foreclosureFee = foreclosureFeeReposDay.findByRecordNo(recordNo);
@@ -325,7 +374,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + foreclosureFee.getRecordNo());
+    this.info("Hold " + dbName + " " + foreclosureFee.getRecordNo());
     Optional<ForeclosureFee> foreclosureFeeT = null;
     if (dbName.equals(ContentName.onDay))
       foreclosureFeeT = foreclosureFeeReposDay.findByRecordNo(foreclosureFee.getRecordNo());
@@ -347,7 +396,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + foreclosureFee.getRecordNo());
+    this.info("Insert..." + dbName + " " + foreclosureFee.getRecordNo());
     if (this.findById(foreclosureFee.getRecordNo()) != null)
       throw new DBException(2);
 
@@ -376,7 +425,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + foreclosureFee.getRecordNo());
+    this.info("Update..." + dbName + " " + foreclosureFee.getRecordNo());
     if (!empNot.isEmpty())
       foreclosureFee.setLastUpdateEmpNo(empNot);
 
@@ -399,7 +448,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + foreclosureFee.getRecordNo());
+    this.info("Update..." + dbName + " " + foreclosureFee.getRecordNo());
     if (!empNot.isEmpty())
       foreclosureFee.setLastUpdateEmpNo(empNot);
 
@@ -419,7 +468,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + foreclosureFee.getRecordNo());
+    this.info("Delete..." + dbName + " " + foreclosureFee.getRecordNo());
     if (dbName.equals(ContentName.onDay)) {
       foreclosureFeeReposDay.delete(foreclosureFee);	
       foreclosureFeeReposDay.flush();
@@ -448,7 +497,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (ForeclosureFee t : foreclosureFee){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -483,7 +532,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (foreclosureFee == null || foreclosureFee.size() == 0)
       throw new DBException(6);
 
@@ -512,7 +561,7 @@ em = null;
 
   @Override
   public void deleteAll(List<ForeclosureFee> foreclosureFee, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

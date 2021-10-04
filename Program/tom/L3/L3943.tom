@@ -22,6 +22,4 @@ OUsageCode=9,2
 OServiceCenter=X,1
 OCreditorId=X,10
 OCreditorBankItem=X,20
-OKinbr=X,4
-OTellerNo=X,6
-OTxtNo=9,8
+ORelNo=X,18

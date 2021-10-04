@@ -464,7 +464,7 @@ A(ID_UNINO,0,#CustIdAft)
 
 #IdSTAT=A,1,S
 T(4,STAT$)
-C(3,#IdSTAT,4,T(2,@FdPassportNoBef,#WKSTAR),T(2,@FdPassportNoBef,#WKSPC))
+C(3,#IdSTAT,4,T(2,@FdPassportnoBef,*),T(2,@FdPassportnoBef, ))
 
 
 #CustIdInd=_,_,L

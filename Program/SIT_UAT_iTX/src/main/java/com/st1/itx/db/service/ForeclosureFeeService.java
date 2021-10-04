@@ -131,6 +131,19 @@ public interface ForeclosureFeeService {
   public Slice<ForeclosureFee> selectForL2R32(int custNo_0, int facmNo_1, int closeDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * ReceiveDate &gt;= ,AND ReceiveDate &lt;= , AND CloseDate =
+   *
+   * @param receiveDate_0 receiveDate_0
+   * @param receiveDate_1 receiveDate_1
+   * @param closeDate_2 closeDate_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice ForeclosureFee ForeclosureFee of List
+   */
+  public Slice<ForeclosureFee> receiveDatecloseZero(int receiveDate_0, int receiveDate_1, int closeDate_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By ForeclosureFee
    * 
    * @param recordNo key

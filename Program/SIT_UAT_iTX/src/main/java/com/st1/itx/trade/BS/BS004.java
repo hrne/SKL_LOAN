@@ -86,7 +86,7 @@ public class BS004 extends TradeBuffer {
 		List<BS004Vo> bS004VoList = null;
 		try {
 			// 員工利率產品比對不符清單
-			bS004VoList = bS004ServiceImpl.compareProdNo(quitDate); // 退休屆滿5年
+			bS004VoList = bS004ServiceImpl.compareProdNo(quitDate, titaVo); // 退休屆滿5年
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

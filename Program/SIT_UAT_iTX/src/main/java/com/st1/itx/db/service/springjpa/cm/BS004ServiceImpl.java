@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
@@ -38,7 +39,7 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	/* 員工利率產品比對不符清單 */
 	@SuppressWarnings("unchecked")
-	public List<BS004Vo> compareProdNo(int quitDate) throws Exception {
+	public List<BS004Vo> compareProdNo(int quitDate, TitaVo titaVo) throws Exception {
 // 商品代碼 ProdNo  VARCHAR2(5) 
 //  if 員工利率產品第一碼為'E' 
 //     if    1.身份變更        任用狀況碼 <> 1,4 
@@ -71,7 +72,7 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("queryttext=" + queryttext);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createQuery(queryttext, BS004Vo.class);
 		return query.getResultList();
 	}

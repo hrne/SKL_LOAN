@@ -125,6 +125,13 @@ public class L8313 extends TradeBuffer {
 				if (iJcicZ040 == null) {
 					throw new LogicException("E0005", "未曾報送過'40':前置協商受理申請暨請求回報債權通知");
 				}
+				
+				// extra項'消費者債務清理條例資料報送作業要點'(P167-12-D start
+				// 同一金融機構要求最大債權金融機構就同一債務人開啟'52'之次數，以一次為限
+				Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+				if(sJcicZ052 != null) {
+					throw new LogicException("E0005", "同一金融機構要求最大債權金融機構就同一債務人開啟'52'之次數，以一次為限");
+				}
 			} // 2 end
 
 			// 3 後續需檢核補報送金融機構需於最大債權金融機構報送本檔案格式後3個營業日內補送資料，予以剔退處理.***J
@@ -139,6 +146,8 @@ public class L8313 extends TradeBuffer {
 				}
 			}
 			// 4 end
+			
+			
 			// 檢核項目end
 		}
 

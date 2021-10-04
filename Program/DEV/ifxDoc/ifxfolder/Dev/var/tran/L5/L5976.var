@@ -116,7 +116,7 @@ T(3,受理調解機構代號)
 #Hide=X,1,S
 INVOKEJS(SHOW,grd1,0)
 HIDE(#BtnDetail)
-HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ)
+HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ,#BTNL)
 !HIDE(#BtnBankCode)
 
 #BtnDetail=X,1,S,ui:button;value:交易明細;enable:1;tabbable:0
@@ -324,7 +324,7 @@ IF(#FunctionCode=="05",$,S)
 !依戶況修改
 !SHOW(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI,#BTNJ)
 HIDE(#BTND,#BTNF,#BTNE,#BTNG,#BTNH,#BTNI)
-SHOW(#BTNJ)
+SHOW(#BTNJ,#BTNL)
 IF(#Status=="0",SHOW(#BTND,#BTNF,#BTNG,#BTNH,#BTNI),$)
 IF(#Status=="2",SHOW(#BTNE),$)
 IF(#Status=="4",SHOW(#BTNF),$)

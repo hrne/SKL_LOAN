@@ -14,7 +14,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 3.暫收抵繳 <BR>
 	 * 4.溢(C)短(D)繳 <BR>
 	 * 5.其他額度暫收可抵繳 <BR>
-	 * 6.另收欠款(未到期火險費用、掛帳利息) <BR>
+	 * 6.另收欠款(未到期火險費用、費用收取之短繳期金、清償違約金) <BR>
 	 */
 	private int dataKind = 0;
 
@@ -31,67 +31,148 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 */
 	private int repayType = 0;
 
-	private int custNo = 0; // 借款人戶號
+	/**
+	 * 借款人戶號
+	 */
+	private int custNo = 0;  
 
-	private int facmNo = 0; // 額度編號
+	/**
+	 * 額度編號
+	 */
+	private int facmNo = 0; 
 
-	private int bormNo = 0; // 撥款序號
+	/**
+	 * 撥款序號
+	 */
+	private int bormNo = 0; 
 
-	private int receivableFlag = 0; // 銷帳科目記號
+	/**
+	 * 銷帳科目記號
+	 */
+	private int receivableFlag = 0;  
 
-	private String rvNo = " "; // 銷帳編號
+	/**
+	 * 銷帳編號
+	 */
+	private String rvNo = " "; 
 
-	private int payIntDate = 0; // 應繳息日、應繳日
+	/**
+	 * 應繳息日、應繳日
+	 */
+	private int payIntDate = 0;  
 
-	private int paidTerms = 0; // 繳息期數
+	/**
+	 * 繳息期數
+	 */
+	private int paidTerms = 0;  
 
-	private BigDecimal unPaidAmt = BigDecimal.ZERO; // 未收金額
+	/**
+	 * 未收金額 
+	 */
+	private BigDecimal unPaidAmt = BigDecimal.ZERO;  
 
-	private int repayPriority; // 還款順序 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:已到期應繳本息 > 6.另收欠款> 7.未到期應繳本息
+	/**
+	 * 還款順序 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 >  5:已到期應繳本息 > 6.另收欠款> 7.未到期應繳本息
+	 */
+	private int repayPriority;  
 
-	private String acctCode = " "; // 業務科目 (利息、費用)
+	/**
+	 * 業務科目 (利息、費用)
+	 */
+	private String acctCode = " "; 
 
-	private String dbCr = " "; // 借貸別
+	/**
+	 * 借貸別
+	 */
+	private String dbCr = " "; 
 
-	private BigDecimal acctAmt = BigDecimal.ZERO; // 出帳金額
+	/**
+	 * 出帳金額
+	 */
+	private BigDecimal acctAmt = BigDecimal.ZERO;  
 
-	private BigDecimal loanBal = BigDecimal.ZERO; // 放款餘額(還款前、只放第一期)
+	/**
+	 * 放款餘額(還款前、只放第一期)
+	 */
+	private BigDecimal loanBal = BigDecimal.ZERO;
 
-	private BigDecimal extraAmt = BigDecimal.ZERO; // 提前還款金額
+	/**
+	 * 提前還款金額
+	 */
+	private BigDecimal extraAmt = BigDecimal.ZERO; 
 
 	/* ------------------- 計息明細 (按繳息期數) ---------------- */
 
-	private int intStartDate = 0; // 計息起日
+	/**
+	 * 計息起日
+	 */
+	private int intStartDate = 0;  
 
-	private int intEndDate = 0; // 計息止日
+	/**
+	 * 計息止日
+	 */
+	private int intEndDate = 0;   
 
-	private BigDecimal amount = BigDecimal.ZERO; // 計息本金
+	/**
+	 * 計息本金
+	 */
+	private BigDecimal amount = BigDecimal.ZERO;  
 
-	private BigDecimal intRate = BigDecimal.ZERO; // 計息利率
+	/**
+	 * 計息利率
+	 */
+	private BigDecimal intRate = BigDecimal.ZERO;  
 
-	private BigDecimal principal = BigDecimal.ZERO; // 本金、短繳本金
+	/**
+	 * 本金、短繳本金
+	 */
+	private BigDecimal principal = BigDecimal.ZERO;   
 
-	private BigDecimal interest = BigDecimal.ZERO; // 利息、短繳利息
+	/**
+	 * 利息、短繳利息
+	 */
+	private BigDecimal interest = BigDecimal.ZERO;  
 
-	private BigDecimal delayInt = BigDecimal.ZERO; // 延滯息
+	/**
+	 * 延滯息
+	 */
+	private BigDecimal delayInt = BigDecimal.ZERO;   
 
-	private BigDecimal breachAmt = BigDecimal.ZERO; // 違約金
+	/**
+	 * 違約金
+	 */
+	private BigDecimal breachAmt = BigDecimal.ZERO;   
+	
+	/**
+	 * 短繳清償違約金
+	 */
+	private BigDecimal closeBreachAmt = BigDecimal.ZERO;   
 
-	private BigDecimal closeBreachAmt = BigDecimal.ZERO; // 短繳清償違約金
+	/**
+	 * 加碼利率
+	 */
+	private BigDecimal rateIncr = BigDecimal.ZERO;  
 
-	private BigDecimal rateIncr = BigDecimal.ZERO; // 加碼利率
+	/**
+	 * 個別加碼利率
+	 */
+	private BigDecimal individualIncr = BigDecimal.ZERO;  
 
-	private BigDecimal individualIncr = BigDecimal.ZERO; // 個別加碼利率
-
-	private int closeFg = 0; // 結案記號 1.正常結案 2.提前結案
+	/**
+	 * 結案記號 1.正常結案 2.提前結案
+	 */
+	private int closeFg = 0; 
 
 	@Override
 	public String toString() {
-		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo="
-				+ rvNo + ", payIntDate=" + payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority=" + repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr
-				+ ", acctAmt=" + acctAmt + ", loanBal=" + loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", amount=" + amount + ", intRate="
-				+ intRate + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", rateIncr="
-				+ rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
+		return "BaTxVo [dataKind=" + dataKind + ", repayType=" + repayType + ", custNo=" + custNo + ", facmNo=" + facmNo
+				+ ", bormNo=" + bormNo + ", receivableFlag=" + receivableFlag + ", rvNo=" + rvNo + ", payIntDate="
+				+ payIntDate + ", paidTerms=" + paidTerms + ", unPaidAmt=" + unPaidAmt + ", repayPriority="
+				+ repayPriority + ", acctCode=" + acctCode + ", dbCr=" + dbCr + ", acctAmt=" + acctAmt + ", loanBal="
+				+ loanBal + ", extraAmt=" + extraAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate
+				+ ", amount=" + amount + ", intRate=" + intRate + ", principal=" + principal + ", interest=" + interest
+				+ ", delayInt=" + delayInt + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt
+				+ ", rateIncr=" + rateIncr + ", individualIncr=" + individualIncr + ", closeFg=" + closeFg + "]";
 	}
 
 	public int getDataKind() {

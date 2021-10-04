@@ -76,7 +76,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			yymm = lyymm;
 			
 			sql += "	SELECT DECODE(\"AssetClassNo\",'11','1','12','1',\"AssetClassNo\") AS \"AssetClassNo\"";
-			sql += "          ,SUM(\"LoanBal\")";
+			sql += "          ,SUM(\"LoanBal\") AS \"LoanBal\"";
 			sql += "    FROM \"MonthlyLM052AssetClass\"";
 			sql += "    WHERE \"YearMonth\" = :yymm ";
 			sql += "    GROUP BY DECODE(\"AssetClassNo\",'11','1','12','1',\"AssetClassNo\")";

@@ -1,5 +1,8 @@
 package com.st1.itx.trade.L8;
 
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -115,9 +118,15 @@ public class L8302 extends TradeBuffer {
 
 			// 3.1最大債權金融機構應於七項文件齊全後報送本檔案格式，此時需報送第9欄停催日(第7欄協商開始日可為空白)，並且於實際協商開始(最晚收件後第25日)時再度報送異動本檔案格式***
 
-			// 3.2 start (***此時異動，協商開始日iNegoStartDate和停催日iScDate必須有值***)
+			// 3.2 start (***此時異動，協商開始日iNegoStartDate和停催日iScDate必須有值)
 			if ("C".equals(iTranKey) && (iNegoStartDate == 0 || iScDate == 0)) {
-				throw new LogicException("E0005", "異動時，協商開始日和停催日必須有值");
+				JcicZ041 jJcicZ041 = sJcicZ041Service.findById(iJcicZ041Id, titaVo);
+				if(jJcicZ041 != null) {
+					int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// today(本檔案報送日 西元年)
+					if(txDate >= (TimestampToDate(jJcicZ041.getCreateDate()) + 24)) {
+						throw new LogicException("E0005", "異動時，協商開始日和停催日必須有值");						
+					}
+				}
 			} // 3.2 end
 
 			// 4 start 停催日大於協商開始日則予以剔退
@@ -206,5 +215,20 @@ public class L8302 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	// 轉換：Sql.Timestamp(創建日期)轉int(西元年YYYYMMDD)
+	private int TimestampToDate(Timestamp ts) throws LogicException {
+		int reTimestampToDate = 0;
+		String tsStr = "";
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		try {
+			tsStr = dateFormat.format(ts);
+			System.out.println(tsStr);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		reTimestampToDate = Integer.valueOf(tsStr);
+		return reTimestampToDate;
 	}
 }

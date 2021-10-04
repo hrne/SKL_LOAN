@@ -138,8 +138,10 @@ public class L2605 extends TradeBuffer {
 		CustMain tCustMain;
 		CdCity tCdCity;
 
-		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDateBetween(iReceiveDateStart, iReceiveDate, this.index, this.limit);
+		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDatecloseZero(iReceiveDateStart, iReceiveDate, 0,this.index, this.limit);
 		List<ForeclosureFee> lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
+		
+		
 		if (lForeclosureFee == null || lForeclosureFee.isEmpty()) {
 			throw new LogicException("E0001", "L2605該收件迄日在法拍費用檔無資料");
 		}
@@ -160,10 +162,10 @@ public class L2605 extends TradeBuffer {
 			// 本筆
 			ForeclosureFee tmpFF = lForeclosureFee.get(i);
 
-			if (tmpFF.getCloseDate() > 0) {
-				continue;
-			}
-			consiz++;
+//			if (tmpFF.getCloseDate() > 0) {
+//				continue;
+//			}
+		
 			// 與下一筆比較戶號(比到額度層)及收件日
 			int nextCustNo;
 			int nextFacmNo;
@@ -279,6 +281,8 @@ public class L2605 extends TradeBuffer {
 				occurslist.putParam("OOCollPsn", accCollPsn); // 催收人員
 				occurslist.putParam("OOOverdueCode", tmpFF.getOverdueDate() != 0 ? "Y" : " ");
 
+				consiz++;
+				
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occurslist);
 
@@ -288,9 +292,18 @@ public class L2605 extends TradeBuffer {
 			}
 		}
 
-		if( consiz == 0 ) {
-			throw new LogicException("E0001", "L2605該收件迄日在法拍費用檔無資料");
+		
+		
+		if (lForeclosureFee.size() == this.limit && slForeclosureFee.hasNext()) {
+			 titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+			 this.totaVo.setMsgEndToEnter();
 		}
+		
+//		if( consiz == 0 ) {
+//			throw new LogicException("E0001", "L2605該收件迄日在法拍費用檔無資料");
+//		}
+		
 		// Header資料
 		this.totaVo.putParam("OCnt", consiz);
 		this.totaVo.putParam("OFee", fee);

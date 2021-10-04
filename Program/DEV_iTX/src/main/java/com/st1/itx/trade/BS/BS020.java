@@ -3,6 +3,7 @@ package com.st1.itx.trade.BS;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -23,8 +24,8 @@ import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.springjpa.cm.BS020ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
-import com.st1.itx.util.common.data.BS020Vo;
 import com.st1.itx.util.common.data.BaTxVo;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("BS020")
@@ -34,13 +35,12 @@ import com.st1.itx.util.parse.Parse;
  * 執行時機：日始作業，系統換日後(BS001執行後)自動執行<br>
  * 1.保留成功的整批入帳明細，其餘刪除(程式可重複執行)<br>
  * 2.找正常戶、應繳日<=本日，且額度下有暫收可抵繳之戶號、額度<br>
- * 3.進行還款試算(戶號、額度)，若暫收可抵繳>= 期金(含費用)，則寫入整批入帳檔<br>
+ * 3.進行還款試算(戶號、額度)，若暫收可抵繳>= 期金 或 費用，則寫入整批入帳檔<br>
  * 
  * @author w.y.Lai
  * @version 1.0.0
  */
 public class BS020 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS020.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -91,8 +91,7 @@ public class BS020 extends TradeBuffer {
 			try {
 				batxDetailService.insertAll(lBatxDetail);
 			} catch (DBException e) {
-				throw new LogicException("E0005", "L4210 BatxDetail insertAll : " + e.getErrorMsg()); // E0005
-																										// 新增資料時，發生錯誤
+				throw new LogicException("E0005", "BS020 insertAll : " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
 		}
 
@@ -121,7 +120,8 @@ public class BS020 extends TradeBuffer {
 			dStatusCode.add("2");
 			dStatusCode.add("3");
 			dStatusCode.add("4");
-			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4920HEq(this.tbsdyf, this.batchNo, dStatusCode, this.index, Integer.MAX_VALUE);
+			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4920HEq(this.tbsdyf, this.batchNo, dStatusCode,
+					this.index, Integer.MAX_VALUE);
 			lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 			if (lBatxDetail != null) {
 				detailSeq = lBatxDetail.size();
@@ -139,58 +139,73 @@ public class BS020 extends TradeBuffer {
 			if (tBatxHead == null)
 				this.batchNo = "BATX01";
 			else
-				this.batchNo = "BATX" + parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
+				this.batchNo = "BATX"
+						+ parse.IntegerToString(parse.stringToInteger(tBatxHead.getBatchNo().substring(4)) + 1, 2);
 		}
 	}
 
 	private void findList(TitaVo titaVo) throws LogicException {
 		// 找正常戶、應繳日<=本日，且額度下有暫收可抵繳之戶號、額度
-		List<BS020Vo> BS020VoList = null;
+
+		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+
 		try {
-//			BS020VoList = bS020ServiceImpl.find(0, this.tbsdyf, 01); // 下次應繳日起日、下次應繳日止日、繳款方式 :01.匯款轉帳
-			BS020VoList = bS020ServiceImpl.find(0, this.tbsdyf, 00); // 下次應繳日起日、下次應繳日止日、繳款方式 :00.all
+			// *** 折返控制相關 ***
+			resultList = bS020ServiceImpl.findAll(titaVo);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			this.error("bS020ServiceImpl " + e.getMessage());
+			throw new LogicException("E0013", e.getMessage());
+		}
+		if (resultList == null || resultList.size() == 0) {
+			return;
 		}
 
-		this.info("BS020List=" + BS020VoList.toString());
-
-		int custNo = 0;
-		int facmNo = 0;
 		// 進行還款試算(戶號、額度)，若暫收可抵繳>= 期金(含費用)，則寫入整批入帳檔
-		if (BS020VoList != null && BS020VoList.size() > 0) {
-			for (BS020Vo bs : BS020VoList) {
-				// by 額度處理
-				if (bs.getCustNo() != custNo || bs.getFacmNo() != facmNo) {
-//EntryDate 入帳日, CustNo, FacmNo , BormNo, RepayType 還款類別, TxAmt 回收金額
-					custNo = bs.getCustNo();
-					facmNo = bs.getFacmNo();
-					ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
-					listBaTxVo = baTxCom.settingUnPaid(tbsdy, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
-					boolean isTermPay = false;
-					boolean isShortAmt = false;
-
-//dataKind = 0; // 資料類型
-//1.應收費用+未收費用+短繳期金
-//2.本金利息	
-//3.暫收抵繳
-//4.溢(C)短(D)繳
-//5.其他額度暫收可抵繳
-					if (listBaTxVo != null && listBaTxVo.size() != 0) {
-						for (BaTxVo ba : listBaTxVo) {
-							if (ba.getDataKind() == 2)
-								isTermPay = true;
-							if (ba.getDataKind() == 4) {
-								if ("D".equals(ba.getDbCr()) && ba.getUnPaidAmt().compareTo(BigDecimal.ZERO) > 0)
-									isShortAmt = true;
-							}
-						}
+		for (Map<String, String> result : resultList) {
+			// 期款款試算
+			ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
+			int custNo = parse.stringToInteger(result.get("F0"));
+			int facmNo = parse.stringToInteger(result.get("F1"));
+			BigDecimal tempAmt = parse.stringToBigDecimal(result.get("F2"));
+			try {
+				listBaTxVo = baTxCom.settingUnPaid(tbsdy, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
+			} catch (LogicException e) {
+				this.info("baTxCom.settingUnPaid" + e.getMessage());
+				continue;
+			}
+			boolean isTermPay = false;
+			boolean isShortAmt = false;
+			boolean isRecvPay = false;
+			// dataKind = 0; // 資料類型
+			// 1.應收費用+未收費用+短繳期金
+			// 2.本金利息
+			// 3.暫收抵繳
+			// 4.溢(C)短(D)繳
+			// 5.其他額度暫收可抵繳
+			// 暫收抵繳
+			if (listBaTxVo != null && listBaTxVo.size() != 0) {
+				for (BaTxVo ba : listBaTxVo) {
+					// 費用
+					if (ba.getRepayType() >= 4 && tempAmt.compareTo(ba.getUnPaidAmt()) >= 0) {
+						isRecvPay = true;
 					}
-					if (isTermPay && !isShortAmt)
-						addDetail(custNo, facmNo, titaVo);
+					// 期款
+					if (ba.getDataKind() == 2) {
+						isTermPay = true;
+					}
+					// 短繳
+					if (ba.getDataKind() == 4) {
+						if ("D".equals(ba.getDbCr()) && ba.getUnPaidAmt().compareTo(BigDecimal.ZERO) > 0)
+							isShortAmt = true;
+					}
 				}
-
+			}
+			if (isTermPay && !isShortAmt) {
+				addDetail(custNo, facmNo, 1, titaVo);
+			} else {
+				if (isRecvPay) {
+					addDetail(custNo, facmNo, 9, titaVo); // 其他
+				}
 			}
 		}
 	}
@@ -228,7 +243,7 @@ public class BS020 extends TradeBuffer {
 
 	}
 
-	private void addDetail(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
+	private void addDetail(int custNo, int facmNo, int repayType, TitaVo titaVo) throws LogicException {
 		tBatxDetail = new BatxDetail();
 		tBatxDetailId = new BatxDetailId();
 		tBatxDetailId.setAcDate(this.tbsdy);
@@ -244,12 +259,15 @@ public class BS020 extends TradeBuffer {
 		tBatxDetail.setEntryDate(this.tbsdy);
 		tBatxDetail.setFileName("BS020");
 		tBatxDetail.setReconCode("   ");
-		tBatxDetail.setRepayType(01); // 01.期款
+		tBatxDetail.setRepayType(repayType);
 		tBatxDetail.setRepayAmt(BigDecimal.ZERO);
 		tBatxDetail.setProcStsCode("0");
 		tBatxDetail.setProcCode("00000");
+		tBatxDetail.setTitaTlrNo(titaVo.getTlrNo());
+		tBatxDetail.setTitaTxtNo(this.batchNo.substring(6) + FormatUtil.pad9("" + detailSeq, 6));
+
 		TempVo tTempVo = new TempVo();
-		tTempVo.putParam("Note", "暫收抵繳期款");
+		tTempVo.putParam("Note", repayType == 01 ? "暫收抵繳期款" : "暫收抵繳費用");
 		tBatxDetail.setProcNote(tTempVo.getJsonString());
 
 		lBatxDetail.add(tBatxDetail);

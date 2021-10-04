@@ -63,9 +63,6 @@ K(MODIFYBUTTON,1,新增)
 ["#FdCustId+統一編號",#CustId,#BTN3,"@",#CustName1],
 ["#FdApplNo+核准號碼",#ApplNo,#BTN4,"@",#CustName2],
 ["#FdFacmNo+額度編號",#FacmNo,"@(000表示查詢全部額度)"],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
 ]
 
 #FdMain=X,2,L
@@ -252,25 +249,16 @@ T(2,#TimCustNo)
 <include src="ROM.icf::L2R07.dec"/>
 <include src="ROM.icf::L2R10.dec"/>
 <include src="ROM.icf::L2R21.dec"/>
-! #L2r42=X,1,S
 
-! #RimL2r42=X,1,S
-! RESET_RIM(#RimL2R42,L2R42)
-! S(L2R42,1,#L2r42)
-! R(1,L2R42)
-
-#RETURN=A,1,S
-! E(0,@FirstIn,0)
+#RPTFG=A,1,S
 E(0,0)
-
-! #CHAINXMT=X,1,S
-! C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
-
-<include src="COM.icf::RPTFG.dec"/>
 
 #RPTFG2=A,1,S
 C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 </sub>
 

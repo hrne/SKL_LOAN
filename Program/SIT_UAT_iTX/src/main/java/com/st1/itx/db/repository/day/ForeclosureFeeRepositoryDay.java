@@ -45,6 +45,9 @@ public interface ForeclosureFeeRepositoryDay extends JpaRepository<ForeclosureFe
   // CustNo =  ,And FacmNo = ,AND CloseDate = 
   public Slice<ForeclosureFee> findAllByCustNoIsAndFacmNoIsAndCloseDateIsOrderByRecordNoAsc(int custNo_0, int facmNo_1, int closeDate_2, Pageable pageable);
 
+  // ReceiveDate >= ,AND ReceiveDate <= , AND CloseDate =
+  public Slice<ForeclosureFee> findAllByReceiveDateGreaterThanEqualAndReceiveDateLessThanEqualAndCloseDateIsOrderByCustNoAscReceiveDateAsc(int receiveDate_0, int receiveDate_1, int closeDate_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

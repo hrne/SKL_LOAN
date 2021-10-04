@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM002ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,63 +30,53 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> doQuery(TitaVo titaVo) throws Exception {
-		logger.info("lM002.doQuery");
+		this.info("lM002.doQuery");
 
-		
 		// 資料前兩年一月起至當月
 		String startYM = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19090000).substring(0, 4) + "01";
 		String endYM = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000).substring(0, 6);
-	
 
 		String sql = "";
-		sql += "	SELECT S.\"F1\" AS F0";
-		sql += "	  	  ,S.\"F2\" AS F1";
-		sql += "	  	  ,S.\"F3\" AS F2";
-		sql += "	  	  ,SUM(S.\"F4\") AS F3";
-		sql += "	FROM( ";
-		sql += "	SELECT TRUNC(M.\"YearMonth\" / 100) AS F1 ";
-		sql += "	  	  ,1 AS F2 ";
-		sql += "	  	  ,MOD(M.\"YearMonth\",100) AS F3 ";
-		sql += "	  	  ,M.\"LoanBalance\" AS F4 ";
-		sql += "	FROM \"MonthlyLoanBal\" M ";
-		sql += "	WHERE M.\"YearMonth\" BETWEEN :startYM AND :endYM ";
-		sql += "  	  AND M.\"ProdNo\" IN ('81','82','83') ";
-                sql += "          AND M.\"AcctCode\" != '990' ";
-		sql += "	UNION ALL ";
-		sql += "	SELECT TRUNC(M.\"YearMonth\" / 100) AS F1 ";
-		sql += "	  	  ,2 AS F2 ";
-		sql += "	  	  ,MOD(M.\"YearMonth\",100) AS F3 ";
-		sql += "	  	  ,M.\"LoanBalance\" AS F4 ";
-		sql += "	FROM \"MonthlyLoanBal\" M ";
-                sql += "        LEFT JOIN \"FacProd\" FP ON FP.\"ProdNo\" = M.\"ProdNo\" ";
-                sql += "                                AND NVL(FP.\"GovOfferFlag\", 'N') = 'Y' ";
-		sql += "	WHERE M.\"YearMonth\" BETWEEN :startYM AND :endYM ";
-		sql += "  	  AND FP.\"ProdNo\" IS NOT NULL";
-                sql += "          AND M.\"AcctCode\" != '990' ";
-		sql += "	UNION ALL ";
-		sql += "	SELECT TRUNC(M.\"YearMonth\" / 100) AS F1 ";
-		sql += "	  	  ,3 AS F2 ";
-		sql += "	  	  ,MOD(M.\"YearMonth\",100) AS F3 ";
-		sql += "	  	  ,M.\"LoanBalance\" AS F4 ";
-		sql += "	FROM \"MonthlyLoanBal\" M ";
-		sql += "	WHERE M.\"YearMonth\" BETWEEN :startYM AND :endYM ";
-		sql += "  	  AND M.\"AcctCode\" = '340' ";
-		sql += "	UNION ALL ";
-		sql += "	SELECT TRUNC(M.\"YearMonth\" / 100) AS F1 ";
-		sql += "	  	  ,4 AS F2 ";
-		sql += "	  	  ,MOD(M.\"YearMonth\",100) AS F3 ";
-		sql += "	  	  ,M.\"LoanBalance\" AS F4 ";
-		sql += "	FROM \"MonthlyLoanBal\" M ";
-                sql += "        LEFT JOIN \"FacProd\" FP ON FP.\"ProdNo\" = M.\"ProdNo\" ";
-                sql += "                                AND NVL(FP.\"GovOfferFlag\", 'N') = 'Y' ";
-		sql += "	WHERE M.\"YearMonth\" BETWEEN :startYM AND :endYM ";
-		sql += "  	  AND M.\"AcctCode\" = '990' ";
-		sql += "  	  AND (    M.\"FacAcctCode\" = '340' ";
-		sql += "            OR FP.\"ProdNo\" IS NOT NULL) ";
-		sql += "	  ) S ";
-		sql += "	GROUP BY S.\"F1\",S.\"F2\",S.\"F3\" ";
+		// 為了排除掉不是出表範圍的資料，實際Query包進subquery，以便篩選掉DataType=0者
+		sql += " SELECT \"Year\" ";
+		sql += "       ,\"DataType\" ";
+		sql += "       ,\"Month\" ";
+		sql += "       ,SUM(\"LoanBalance\") \"LoanSum\" ";
 
-		logger.info("sql=" + sql);
+		sql += " FROM ( SELECT TRUNC(MLB.\"YearMonth\" / 100) AS \"Year\" ";
+		sql += "              ,CASE WHEN MLB.\"AcctCode\" != '990' ";
+		sql += "                    THEN CASE WHEN NVL(FP.\"GovOfferFlag\", 'N') = 'Y' ";
+		sql += "                              THEN 2 "; // 政府優惠: 非990; 政府優惠記號為Y
+		sql += "                              WHEN MLB.\"AcctCode\" = '340' ";
+		sql += "                              THEN 3 "; // 首購: 非990; 交易代號為340
+		sql += "                              WHEN MLB.\"ProdNo\" IN ('81','82','83') ";
+		sql += "                              THEN 1 "; // 921: 非990; 商品代號為81, 82, 83
+		sql += "                         ELSE 0 END "; // 非資料範圍者標記為0，在外層去除掉
+		sql += "                    WHEN NVL(FP.\"GovOfferFlag\", 'N') = 'Y' ";
+		sql += "                      OR MLB.\"FacAcctCode\" = '340' ";
+		sql += "                    THEN 4 "; // 催收款項: 是990; GovOfferFlag為Y 或 原會計科目為340者
+		sql += "               ELSE 0 END AS \"DataType\" "; // 非資料範圍者標記為0，在外層去除掉
+		// 非催收三種的子條件做成巢狀稍微難讀，但會使速度較快
+
+		sql += "              ,MOD(MLB.\"YearMonth\", 100) AS \"Month\" ";
+		sql += "              ,MLB.\"LoanBalance\" AS \"LoanBalance\" ";
+		sql += "        FROM \"MonthlyLoanBal\" MLB ";
+		sql += "        LEFT JOIN \"FacProd\" FP ON FP.\"ProdNo\" = MLB.\"ProdNo\" ";
+		sql += "        WHERE MLB.\"YearMonth\" BETWEEN :startYM AND :endYM ";
+		sql += "          AND MLB.\"LoanBalance\" > 0 ";
+		sql += "          AND NVL(FP.\"ProdNo\", 'XXX') != 'XXX' ";
+		sql += " ) ";
+		sql += " WHERE \"DataType\" != 0 ";
+		sql += " GROUP BY \"Year\" "; // 為了DRY，把GROUP BY拉出來外層做，否則DataType條件會需要寫兩次
+		sql += "         ,\"DataType\" "; // 對於效能並無顯著影響
+		sql += "         ,\"Month\" ";
+		// 方便debug時確認view用
+		// ORDER BY "Year" DESC
+		//         ,"Month" DESC
+		//         ,"DataType" ASC
+ 
+
+		this.info("sql=" + sql);
 
 		Query query;
 
@@ -98,8 +85,7 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("startYM", startYM);
 		query.setParameter("endYM", endYM);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
-
 
 }

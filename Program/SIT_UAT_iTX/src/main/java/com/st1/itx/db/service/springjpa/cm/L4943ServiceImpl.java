@@ -16,7 +16,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -198,7 +197,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();

@@ -74,6 +74,12 @@ public class L5710 extends TradeBuffer {
 		}
 		String FilePath = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
 		StringBuffer sbData = new StringBuffer();
+		
+		int successtimes = 0 ;
+		int falsetimes = 0 ;
+		int successamt = 0 ;
+		int falseamt = 0 ;
+		
 		try {
 			sbData = sNegReportNegService.BatchTx02(titaVo, FilePath, BringUpDate);
 
@@ -112,10 +118,16 @@ public class L5710 extends TradeBuffer {
 							makeExcel.setValue(i, 9, ThisLine.substring(59, 75));// 轉帳帳號
 							if(("4001").equals(ThisLine.substring(75, 79))) {
 								Col11 = "4001:入/扣帳成功";
+								successtimes++;
+								successamt = successamt + Integer.parseInt(ThisLine.substring(39, 52))/100;
 							} else if(("4808").equals(ThisLine.substring(75, 79))) {
 								Col11 = "4808:無此帳戶或問題帳戶";
+								falsetimes++;
+								falseamt = falseamt + Integer.parseInt(ThisLine.substring(39, 52))/100;
 							} else {
 								Col11 = ThisLine.substring(75, 79);
+								falsetimes++;
+								falseamt = falseamt + Integer.parseInt(ThisLine.substring(39, 52))/100;
 							}
 							
 							makeExcel.setValue(i, 10, Col11);// 回應代碼
@@ -144,6 +156,8 @@ public class L5710 extends TradeBuffer {
 		long sno1 = makeExcel.close();
 		makeExcel.toExcel(sno1);
 		totaVo.put("ExcelSnoM", "" + sno1);
+	
+		totaVo.put("OSuccessFlag","成功筆數 = " + successtimes + "筆      總金額 = " + successamt + "\n" + "失敗筆數 = " + falsetimes + "筆      總金額 = " + falseamt);
 		
 		long sno2 = 0L;
 		sno2 = sNegReportNegService.CreateTxt(titaVo, sbData, "BACHTX03");

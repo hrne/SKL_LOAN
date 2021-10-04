@@ -144,6 +144,8 @@ E(2,@SnoF,#ExcelSnoM)
 #ExcelPrtF=A,1,S
 C(3,#SnoF,0,E(0,0),E(0,1))
 
+#OSuccessFlag=X,100,O
+C(4,#OSuccessFlag,S,ALERT(#OSuccessFlag))
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -157,6 +159,7 @@ C(3,#SnoF,0,E(0,0),E(0,1))
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L5709
 #ExcelSnoM
+#OSuccessFlag
 ^
 </sub>
 

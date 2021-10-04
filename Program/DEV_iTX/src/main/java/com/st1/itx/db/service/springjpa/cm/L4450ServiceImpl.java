@@ -42,6 +42,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iPostSecondSpecificDd = "0";
 		int iDeductDate = 0; // 追繳
 		int nextPayIntDate = 0; //
+		int iOpItem = Integer.parseInt(titaVo.getParam("OpItem"));
 
 		if (Integer.parseInt(titaVo.getParam("AchSpecificDdFrom").trim()) > 0) {
 			iAchSpecificDdFrom = titaVo.getParam("AchSpecificDdFrom").trim().substring(5, 7);
@@ -146,7 +147,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            end                                            ";
 		sql += "        else 1                                             ";
 		sql += "        end = 1                                            ";
-		sql += "    and nvl(ba.\"RepayBank\",'000') <> '000'               ";
+		if (iOpItem == 1) {
+			sql += "    and nvl(ba.\"RepayBank\",'000') not in ('000','700') ";
+		} else if (iOpItem == 2) {
+			sql += "    and nvl(ba.\"RepayBank\",'000') in ('700')           ";
+		} else {
+			sql += "    and nvl(ba.\"RepayBank\",'000') not in ('000')       ";
+		}
 		sql += "    and case                                               ";
 		sql += "         when ba.\"RepayBank\" = 700                      ";
 		sql += "           then case                                        ";
@@ -240,11 +247,11 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (facmNo > 0) {
 			sql += "    and b.\"FacmNo\"= " + facmNo;
 		}
-		
+
 		if (bormNo > 0) {
 			sql += "    and b.\"BormNo\"= " + bormNo;
 		}
-		
+
 		if (repayType == 1) {
 			sql += "    and b.\"Status\"= 0                                    ";
 			sql += "    and b.\"NextPayIntDate\" <= " + entryDate;
@@ -259,7 +266,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        else 1                                             ";
 			sql += "        end = 1                                            ";
 		}
-		
+
 		this.info("sql=" + sql);
 
 		Query query;

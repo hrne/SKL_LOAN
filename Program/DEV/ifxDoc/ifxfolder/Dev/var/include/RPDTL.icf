@@ -188,7 +188,7 @@ CALL(#RP_BF)
 [[#RpCode1,":",#RpCodeX1],[#RpAmt1],
 [#GRD_COLL1,#GRD_COLM1,#RpCustNo1,#RpFacmNo1,#RpRemitAcctNo1
 ,#GRD_COLN1,#RpDetailSeq1,#BTN_GRD_B1,#GRD_COLO1,#RpEntryDate1
-,#BTN_GRD_A1,#RpRemitBankX1,#GRD_COLP1,#GRD_COLR1,#RpType1
+,#BTN_GRD_A1,#RpRemitBankX1,#GRD_COLP1,#GRD_COLR1
 ,#RpTypeX1,#RpCustName1,#GRD_COLQ1,#NOTE1,#RpRemark1]]],
 !-----5
 ["",#LABLE_TOT,#RPTOTF],
@@ -242,7 +242,10 @@ E(0,{i})
 
 ! 預設收付欄Grid第二行之後關閉
 #COLBGN=A,1,S
-INVOKEJS(SHOW,grd9_2,0)INVOKEJS(SHOW,grd9_3,0)INVOKEJS(SHOW,grd9_4,0)INVOKEJS(SHOW,grd9_5,0)
+INVOKEJS(SHOW,grd9_2,0)
+INVOKEJS(SHOW,grd9_3,0)
+INVOKEJS(SHOW,grd9_4,0)
+INVOKEJS(SHOW,grd9_5,0)
 
 ! #RpShortAmts=m,14,S
 ! #RpShortAmtsX=X,21,S
@@ -342,7 +345,7 @@ INVOKEJS(SHOW,RPDTL,1)
 ! 幾筆顯示幾欄
 ##loop{times:5,n:1,o:1}
 #RP_DISCOLC{n}=A,1,S
-C(3,#RPFG,8,IF(#RpAmt{n}>0,INVOKEJS(SHOW,grd9_{o},1)E(0,@RpCode{n},93),INVOKEJS(SHOW,grd9_{o},0)),s)
+C(3,#RPFG,8,IF(#RpAmt{n}>0,INVOKEJS(SHOW,grd9_{o},1)E(0,@RpCode{n},93),INVOKEJS(SHOW,grd9_{o},0)),s))
 ##end
 
 ##loop {times:5,i:1,j:2,k:3,z:0}
@@ -354,11 +357,11 @@ C(3,#RPFG,8,IF(#RpAmt{n}>0,INVOKEJS(SHOW,grd9_{o},1)E(0,@RpCode{n},93),INVOKEJS(
 ! Grid4-SkipFlag
 #GRD_SKFG{i}=A,1,S
 
+
 ! 餘額計算(不需輸入回收金額)
 #PRE_RPTOT{i}=m,14,S
 C(3,#RP_IND,0,s,$)
 IF(#RPFG==4||#RPFG==5||#RPFG==7||#RPFG==8,CALL(#RPTOT_CAL{i}),s)
-
 
 ! 餘額計算
 ! RPTOTF    輸入總金額 & 結算金額
@@ -417,7 +420,7 @@ E(0,@OverRpAmt,#RPTOTF)
 #RPTOT_DIS{i}=@,1,S
 C(3,#RP_IND,0,s,$)
 IF(#RPTOTF{z}>0&&#DF1=={i},
-   IF(#RPFG==1||#RPFG==2||#RPFG==6,INVOKEJS(SHOW,grd9_{j},1),INVOKEJS(SHOW,grd9_{i},1)),
+   IF(#RPFG==1||#RPFG==2||#RPFG==6,INVOKEJS(SHOW,grd9_{i},1),INVOKEJS(SHOW,grd9_{i},0)),
    IF(#RPTOTF{z}>0&&#RpAmt{i}>0,INVOKEJS(SHOW,grd9_{j},1),INVOKEJS(SHOW,grd9_{j},0)))
 
 ! IF(#RPTOTF>0,$,s)
