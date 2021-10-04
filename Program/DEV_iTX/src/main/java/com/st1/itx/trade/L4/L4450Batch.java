@@ -136,6 +136,7 @@ public class L4450Batch extends TradeBuffer {
 	private boolean isLoanRepay = false;
 
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
+	private List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
 
 	private BigDecimal limitAmt = BigDecimal.ZERO;
 
@@ -235,7 +236,7 @@ public class L4450Batch extends TradeBuffer {
 			this.batchTransaction.commit();
 			if (checkFlag) {
 				try {
-					l4450Report.exec(titaVo);
+					l4450Report.doReport(lBankDeductDtl, titaVo);
 				} catch (LogicException e) {
 					checkMsg = e.getMessage();
 					checkFlag = false;
@@ -323,6 +324,16 @@ public class L4450Batch extends TradeBuffer {
 //	用既有之List for each 找出RepayCode 1.期款  4.帳管 5.火險 6.契變手續費 
 	private void doBatxCom(int entryDate, int custNo, int facmNo, int iRepayType, TitaVo titaVo) throws LogicException {
 
+		tmpBorm tmp2 = new tmpBorm(custNo, facmNo, 0, 0, 0);
+
+//		同戶號額度僅進入計算一次
+		if (flagMap.containsKey(tmp2)) {
+			this.info("custNo = " + custNo + " facmNo = " + facmNo + " 同戶號額度僅進入計算一次 return...");
+			return;
+		} else {
+			flagMap.put(tmp2, 1);
+		}
+		
 		List<BaTxVo> listBaTxVo = new ArrayList<BaTxVo>();
 
 		try {
@@ -331,7 +342,6 @@ public class L4450Batch extends TradeBuffer {
 			this.info("Error : " + e.getMessage());
 		}
 
-		tmpBorm tmp2 = new tmpBorm(custNo, facmNo, 0, 0, 0);
 
 //		預設暫收款=0
 		tmpAmtMap.put(tmp2, BigDecimal.ZERO);
@@ -577,7 +587,6 @@ public class L4450Batch extends TradeBuffer {
 
 		this.info("tempList.size() = " + tempList.size());
 
-		List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
 
 		for (tmpBorm tmp : tempList) {
 			cnt++;
@@ -784,13 +793,6 @@ public class L4450Batch extends TradeBuffer {
 		int facmNo = parse.stringToInteger(fnAllList.get(i).get("F1"));
 
 		tmpBorm tmp2 = new tmpBorm(custNo, facmNo, 0, 0, 0);
-
-//		同戶號額度僅進入計算一次
-		if (flagMap.containsKey(tmp2)) {
-			return;
-		} else {
-			flagMap.put(tmp2, 1);
-		}
 
 		if (!acctCode.containsKey(tmp2))
 			acctCode.put(tmp2, fnAllList.get(i).get("F3"));

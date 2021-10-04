@@ -228,11 +228,6 @@ public class BaTxCom extends TradeBuffer {
 		settleAcctAmt(2);
 		settleAcctAmt(3);
 
-		// 費用全部， 收回4:短繳期金
-		if (iRepayType == 0 || iRepayType == 99) {
-			settleAcctAmt(4);
-		}
-
 		// 還放款時才收回4:短繳期金 5:已到期應繳本息
 		if (iRepayType >= 1 && iRepayType <= 3) {
 			settleAcctAmt(4);
@@ -339,11 +334,6 @@ public class BaTxCom extends TradeBuffer {
 		settleAcctAmt(1);
 		settleAcctAmt(2);
 		settleAcctAmt(3);
-
-		// 費用全部， 收回4:短繳期金
-		if (iRepayType == 0 || iRepayType == 99) {
-			settleAcctAmt(4);
-		}
 
 		// 放款時收回4:短繳期金 5:已到期應繳本息
 		if (iRepayType >= 1 && iRepayType <= 3) {
@@ -697,12 +687,8 @@ public class BaTxCom extends TradeBuffer {
 			ArrayList<CalcRepayIntVo> lCalcRepayIntVo) {
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(2); // 2.本金利息
-		// 還款類別 ==> 期款最後一期為結案
-		if (iRepayType == 1 && loancalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)) {
-			baTxVo.setRepayType(03);
-		} else {
-			baTxVo.setRepayType(iRepayType);
-		}
+		// 還款類別
+		baTxVo.setRepayType(iRepayType);
 		baTxVo.setReceivableFlag(0); // 銷帳科目記號 0:非銷帳科目
 		baTxVo.setCustNo(iCustNo); // 借款人戶號
 		baTxVo.setFacmNo(ln.getFacmNo()); // 額度編號

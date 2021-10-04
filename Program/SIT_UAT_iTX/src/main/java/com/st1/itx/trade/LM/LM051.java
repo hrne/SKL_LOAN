@@ -1,5 +1,6 @@
 package com.st1.itx.trade.LM;
 
+
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+
 import com.st1.itx.tradeService.BatchBase;
 
 @Service("LM051")
@@ -22,8 +24,11 @@ import com.st1.itx.tradeService.BatchBase;
  */
 public class LM051 extends BatchBase implements Tasklet, InitializingBean {
 
+
+
 	@Autowired
 	public LM051Report lM051report;
+
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -37,6 +42,11 @@ public class LM051 extends BatchBase implements Tasklet, InitializingBean {
 	@Override
 	public void run() throws LogicException {
 		this.info("active LM051 ");
+		
+		
 		lM051report.exec(titaVo);
+
 	}
 }
+	
+	

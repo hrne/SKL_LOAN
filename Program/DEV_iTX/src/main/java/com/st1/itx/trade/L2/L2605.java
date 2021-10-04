@@ -53,7 +53,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2605 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2605.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -139,8 +138,7 @@ public class L2605 extends TradeBuffer {
 		CustMain tCustMain;
 		CdCity tCdCity;
 
-		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDateBetween(iReceiveDateStart,
-				iReceiveDate, this.index, this.limit);
+		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDateBetween(iReceiveDateStart, iReceiveDate, this.index, this.limit);
 		List<ForeclosureFee> lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		if (lForeclosureFee == null || lForeclosureFee.isEmpty()) {
 			throw new LogicException("E0001", "L2605該收件迄日在法拍費用檔無資料");
@@ -194,8 +192,7 @@ public class L2605 extends TradeBuffer {
 			}
 
 			// 若此筆與下筆的戶號(比到額度層)或收件日不同,放入tota occurs
-			if (tmpFF.getCustNo() != nextCustNo || tmpFF.getFacmNo() != nextFacmNo
-					|| tmpFF.getReceiveDate() != nextReceiveDate) {
+			if (tmpFF.getCustNo() != nextCustNo || tmpFF.getFacmNo() != nextFacmNo || tmpFF.getReceiveDate() != nextReceiveDate) {
 
 				tCustMain = sCustMainService.custNoFirst(tmpFF.getCustNo(), tmpFF.getCustNo());
 
@@ -208,24 +205,20 @@ public class L2605 extends TradeBuffer {
 				// 取本戶累溢短收
 				BigDecimal overflowShortfall = BigDecimal.ZERO;
 
-				slLoanBorTx = sLoanBorTxService.borxFacmNoEq(tmpFF.getCustNo(), tmpFF.getFacmNo(), 0, 999, 0,
-						Integer.MAX_VALUE, titaVo);
+				slLoanBorTx = sLoanBorTxService.borxFacmNoEq(tmpFF.getCustNo(), tmpFF.getFacmNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
 				lLoanBorTx = slLoanBorTx == null ? null : slLoanBorTx.getContent();
 
 				if (lLoanBorTx != null && !lLoanBorTx.isEmpty()) {
 					// 累溢短收
 					for (LoanBorTx tmpLoanBorTx : lLoanBorTx) {
 
-						overflowShortfall = overflowShortfall.add(tmpLoanBorTx.getOverflow())
-								.subtract(tmpLoanBorTx.getShortfall());
-						this.info("原+溢收-短收 = " + overflowShortfall + "+" + tmpLoanBorTx.getOverflow() + "-"
-								+ tmpLoanBorTx.getShortfall());
+						overflowShortfall = overflowShortfall.add(tmpLoanBorTx.getOverflow()).subtract(tmpLoanBorTx.getShortfall());
+						this.info("原+溢收-短收 = " + overflowShortfall + "+" + tmpLoanBorTx.getOverflow() + "-" + tmpLoanBorTx.getShortfall());
 					}
 				}
 				this.info("累溢短收 = " + overflowShortfall);
 
-				sLoanBorMain = sLoanBorMainService.bormCustNoEq(tmpFF.getCustNo(), tmpFF.getFacmNo(), tmpFF.getFacmNo(),
-						0, 999, 0, Integer.MAX_VALUE, titaVo);
+				sLoanBorMain = sLoanBorMainService.bormCustNoEq(tmpFF.getCustNo(), tmpFF.getFacmNo(), tmpFF.getFacmNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
 				lLoanBorMain = sLoanBorMain == null ? null : sLoanBorMain.getContent();
 
 				if (lLoanBorMain != null && !lLoanBorMain.isEmpty()) {
@@ -295,6 +288,9 @@ public class L2605 extends TradeBuffer {
 			}
 		}
 
+		if( consiz == 0 ) {
+			throw new LogicException("E0001", "L2605該收件迄日在法拍費用檔無資料");
+		}
 		// Header資料
 		this.totaVo.putParam("OCnt", consiz);
 		this.totaVo.putParam("OFee", fee);

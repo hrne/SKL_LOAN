@@ -3,11 +3,11 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -22,11 +22,10 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM052Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM052Report.class);
 
 	@Autowired
-	LM052ServiceImpl LM052ServiceImpl;
- 
+	LM052ServiceImpl lM052ServiceImpl;
+
 	@Autowired
 	MakeExcel makeExcel;
 
@@ -37,133 +36,214 @@ public class LM052Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類案件明細表_呆提存比率15_內部控管",
-				"LM052_放款資產分類案件明細表_呆提存比率1.5%_內部控管", "LM052放款資產分類案件明細表_呆提存比率15_內部控管.xlsx", "la$w30p");
-		
-		List<Map<String, String>> LM052List = null;
-		
-		try {
-			LM052List = LM052ServiceImpl.findAll(titaVo);
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthDate = Calendar.getInstance();
+		// 設當年月底日 0是月底
+		calMonthDate.set(iYear, iMonth, 0);
 
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("LM052ServiceImpl.findAll error = " + errors.toString());
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-		
-		exportExcel(LM052List);
-		
-		
+		this.info("LM052Report exportExcel");
 
-		List<Map<String, String>> LM052List_1 = null;
-		try {
-			LM052List_1 = LM052ServiceImpl.findAll_1(titaVo);
-			
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("LM052ServiceImpl.findAll_1 error = " + errors.toString());
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM052", "放款資產分類-會計部備呆計提", "LM052_放款資產分類-會計部備呆計提",
+				"LM052_底稿_放款資產分類-會計部備呆計提.xlsx", "備呆總表");
+
+		String formTitle = "";
+
+		formTitle = (iYear - 1911) + "年 " + String.format("%02d", iMonth) + "    放款資產品質分類";
+		makeExcel.setValue(1, 1, formTitle);
+
+		formTitle = (iYear - 1911) + String.format("%02d", iMonth) + "\n" + "放款總額";
+		makeExcel.setValue(15, 3, formTitle, "C");
+
+		List<Map<String, String>> lM052List = null;
+
+		for (int formNum = 1; formNum <= 4; formNum++) {
+
+			try {
+
+				lM052List = lM052ServiceImpl.findAll(titaVo, formNum);
+
+			} catch (Exception e) {
+
+				// TODO Auto-generated catch block
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.info("LM052ServiceImpl.findAll error = " + errors.toString());
+
+			}
+
+			exportExcel(lM052List, formNum);
 		}
-		makeExcel.setSheet("LNM34AP");
-		
-		exportExcel_1(LM052List_1);
-		
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}
 
-	private void exportExcel(List<Map<String, String>> LDList) throws LogicException {
-		this.info("LM052Report exportExcel");
+	/*
+	 * 應收利息提列2%：用MonthlyFacBal的應收利息加總、前者*0.02
+	 * 
+	 * 五類資產評估合計：M13+M14 1-5類總額(含應收息)提列1%：F13+L14 *0.01 無擔保案件總金額：F11
+	 * 
+	 * 法定備抵損失提撥(含應收息1%)：特定和非特定資產的提存金額 (G28+L28)+ 應收利息提列2%(L14)
+	 * 
+	 * 
+	 * 問題： B30的 第三項 最後面金額 本月預期損失金額 30.89百萬元 (從IFRS9) 第四項 的4月份 十計提列 638.283百萬元
+	 * 
+	 * 
+	 */
+	private void exportExcel(List<Map<String, String>> LDList, int formNum) throws LogicException {
+
+	
 		
+		BigDecimal amt = BigDecimal.ZERO;
 
-
-		int row = 1;
-		String ad = "";
-		BigDecimal tot = new BigDecimal("0");
 		if (LDList.size() > 0) {
-	
-		for (Map<String, String> tLDVo : LDList) {
-			row++;
-			makeExcel.setValue(row, 1, Float.valueOf(tLDVo.get("F0") + tLDVo.get("F1") + tLDVo.get("F2")));
-			for (int i = 0; i < tLDVo.size(); i++) {
+			
+			int row = 0;
+			int col = 0;
+			
+			for (Map<String, String> tLDVo : LDList) {
 
-				ad = "F" + String.valueOf(i);
-				switch (i) {
-				case 0:
+				switch (formNum) {
 				case 1:
+					row = tLDVo.get("F0").equals("11") ? 4: 
+						  tLDVo.get("F0").equals("12") ? 5:
+						  tLDVo.get("F0").equals("21") ? 6:
+						  tLDVo.get("F0").equals("22") ? 7:
+						  tLDVo.get("F0").equals("23") ? 8:
+						  tLDVo.get("F0").equals("3") ? 9:
+						  tLDVo.get("F0").equals("4") ? 10:
+						  tLDVo.get("F0").equals("5") ? 11:
+						  tLDVo.get("F0").equals("6") ? 12 : 14;
+					
+					col = tLDVo.get("F1").equals("00A") ? 3:
+						  tLDVo.get("F1").equals("201") ? 4:
+						  tLDVo.get("F0").equals("6") && tLDVo.get("F1").equals("999") ? 6 : 13;
+					
+					
+					
+					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+					
+					break;
 				case 2:
-				case 6:
-				case 7:
-				case 8:
-				case 11:
-				case 13:
-					// 戶號(數字右靠)
-					if (tLDVo.get(ad).trim().equals("")) {
-						makeExcel.setValue(row, i + 2, 0);
-					} else {
-//						makeExcel.setValue(row, i + 2, Integer.valueOf(tLDVo.get(ad)));
-						makeExcel.setValue(row, i + 2, tLDVo.get(ad));
-					}
-					break;
-				case 10:
-					// 金額
-					if (tLDVo.get(ad).equals("")) {
-						makeExcel.setValue(row, i + 2, 0, "#,##0");
-					} else {
-						makeExcel.setValue(row, i + 2, Float.valueOf(tLDVo.get(ad)), "#,##0");
-						tot = tot.add(new BigDecimal((tLDVo.get(ad))));
-					}
-					break;
-				default:
-					makeExcel.setValue(row, i + 2, tLDVo.get(ad));
-					break;
-				}
-			}
-		}
-		}else {
-			makeExcel.setValue(2, 1, "本日無資料");
-	
-		}
-		makeExcel.setValue(1, 12, tot.floatValue(), "#,##0");
-	}
 
-	private void exportExcel_1(List<Map<String, String>> LDList) throws LogicException {
-		this.info("LM052Report exportExcel_1");
-		if (LDList.size() == 0) {
-			makeExcel.setValue(2, 1, "本日無資料");
-		}
-		int row = 1;
-		String ad = "";
+						row = tLDVo.get("F0").equals("1") ? 4 : 
+							  tLDVo.get("F0").equals("21") ? 5 :
+							  tLDVo.get("F0").equals("22") ? 6 :
+							  tLDVo.get("F0").equals("23") ? 7 :
+							  tLDVo.get("F0").equals("3") ? 8 :
+							  tLDVo.get("F0").equals("4") ? 9 :
+							  tLDVo.get("F0").equals("5") ? 10 : 11;			  
+						
+						col = 3 ;
+						
+						amt = tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
 
-		for (Map<String, String> tLDVo : LDList) {
-			row++;
-			makeExcel.setValue(row, 1, Float.valueOf(tLDVo.get("F0") + tLDVo.get("F2") + tLDVo.get("F4")));
-			for (int i = 0; i < tLDVo.size(); i++) {
-
-				ad = "F" + String.valueOf(i);
-				switch (i) {
-				case 0:
-				case 2:
+					break;
 				case 3:
-				case 4:
-				case 5:
-					// 戶號(數字右靠)
-					if (tLDVo.get(ad).equals("")) {
-						makeExcel.setValue(row, i + 2, 0);
-					} else {
-						makeExcel.setValue(row, i + 2, Integer.valueOf(tLDVo.get(ad)));
-					}
+					
+					row = tLDVo.get("F0").equals("1") ? 16 : 
+						  tLDVo.get("F0").equals("2") ? 17 : 18;
+						  					
+					col = tLDVo.get("F1").equals("310") ? 9 :
+						  tLDVo.get("F1").equals("320") ? 8 : 7 ; 
+					
+					
+					amt = tLDVo.get("F2").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
+					
 					break;
-				default:
-					makeExcel.setValue(row, i + 2, tLDVo.get(ad));
+
+				case 4:
+					row = 27;
+						  					
+					col = tLDVo.get("F0").equals("S1") ? 7 :
+						  tLDVo.get("F0").equals("S2") ? 8 :
+						  tLDVo.get("F0").equals("NS1") ? 9 :
+						  tLDVo.get("F0").equals("NS2") ? 11 : 12;
+						  
+					
+					amt = tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1"));
+					
+					
+					break;
+					
+
+				case 5:
+					row = 27;
+						  					
+					col = 15;
+					
+					amt = tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0"));
+					
+					
 					break;
 				}
+				
+				
+				makeExcel.setValue( row , col , amt , "#,##0");
+
 			}
+			
+			//C13 D13 E13
+			makeExcel.formulaCaculate(13,3);
+			makeExcel.formulaCaculate(13,4);
+			makeExcel.formulaCaculate(13,5);
+			
+			//F4~F11
+			for(int r = 4 ;r<=11; r++) {
+				makeExcel.formulaCaculate(r,6);				
+			}
+			
+			//J4~M13 M14
+			for(int r = 4 ;r<=13; r++) {
+				for(int c = 10;c<=13;c++) {					
+					makeExcel.formulaCaculate(r,c);				
+				}
+			}
+			
+			makeExcel.formulaCaculate(14,13);			
+			
+			//C25 D17~D25
+			makeExcel.formulaCaculate(25,3);
+			for(int r = 17 ;r<=25; r++) {
+				makeExcel.formulaCaculate(r,3);				
+			}
+			
+			//G19 H19 I19 G20
+			makeExcel.formulaCaculate(19,7);
+			makeExcel.formulaCaculate(19,8);
+			makeExcel.formulaCaculate(19,9);
+			makeExcel.formulaCaculate(20,7);
+			
+			//M16~18
+			makeExcel.formulaCaculate(16,13);
+			makeExcel.formulaCaculate(17,13);
+			makeExcel.formulaCaculate(18,13);
+
+			//G28 L28 M24
+			makeExcel.formulaCaculate(28,7);
+			makeExcel.formulaCaculate(28,12);
+			makeExcel.formulaCaculate(24,13);
+			
+			//B30
+			makeExcel.formulaCaculate(30,2);
 		}
+
 	}
+
 
 }

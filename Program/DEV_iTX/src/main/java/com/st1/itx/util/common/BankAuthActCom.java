@@ -367,7 +367,7 @@ public class BankAuthActCom extends TradeBuffer {
 			}
 		}
 		// 新增郵局授權記錄歷史檔
-		insertPostHistory(t, titaVo);
+		insertPostHistory(t, t.getAuthApplCode(), titaVo);
 
 	}
 
@@ -447,7 +447,7 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 
 		// 新增ACH授權記錄歷史檔
-		insertAchHistory(t, titaVo);
+		insertAchHistory(t, t.getCreateFlag(), titaVo);
 	}
 
 	// ACH授權成功刪除舊郵局帳號檔
@@ -508,7 +508,7 @@ public class BankAuthActCom extends TradeBuffer {
 	/**
 	 * 維護郵局授權檔
 	 * 
-	 * @param iStatus 1:停止使用 0:授權成功
+	 * @param iStatus 1:停止使用 0:授權成功(恢復授權)
 	 * @param titaVo  ..
 	 * @throws LogicException ..
 	 */
@@ -545,7 +545,7 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 
 		// 新增郵局授權記錄歷史檔
-		insertPostHistory(tPostAuthLog, titaVo);
+		insertPostHistory(tPostAuthLog, "1".equals(iStatus) ? "8" : "9", titaVo);
 
 		// 更新授權帳號檔
 		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(iCustNo, iRepayAcct, 0, 999, 0,
@@ -613,7 +613,7 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 
 		// 新增ACH授權記錄歷史檔
-		insertAchHistory(tAchAuthLog, titaVo);
+		insertAchHistory(tAchAuthLog, "0".equals(iStatus) ? "Y" : "Z", titaVo);
 
 		// 更新授權帳號檔
 		Slice<BankAuthAct> slBankAuthAct = bankAuthActService.authCheck(iCustNo, iRepayAcct, 0, 999, 0,
@@ -1063,13 +1063,13 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	// 新增郵局授權記錄歷史檔
-	private void insertPostHistory(PostAuthLog t, TitaVo titaVo) throws LogicException {
+	private void insertPostHistory(PostAuthLog t, String authApplCode, TitaVo titaVo) throws LogicException {
 		PostAuthLogHistory tPostAuthLogHistory = new PostAuthLogHistory();
 		tPostAuthLogHistory.setCustNo(t.getCustNo());
 		tPostAuthLogHistory.setFacmNo(t.getFacmNo());
 		tPostAuthLogHistory.setAuthCode(t.getAuthCode());
 		tPostAuthLogHistory.setAuthCreateDate(t.getAuthCreateDate());
-		tPostAuthLogHistory.setAuthApplCode(t.getAuthApplCode());
+		tPostAuthLogHistory.setAuthApplCode(authApplCode);
 		tPostAuthLogHistory.setPostDepCode(t.getPostDepCode());
 		tPostAuthLogHistory.setRepayAcct(t.getRepayAcct());
 		tPostAuthLogHistory.setCustId(t.getCustId());
@@ -1097,15 +1097,16 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 	}
 
+//	 * @param iStatus 1:停止使用 0:授權成功
 	// 新增ACH授權記錄歷史檔
-	private void insertAchHistory(AchAuthLog t, TitaVo titaVo) throws LogicException {
+	private void insertAchHistory(AchAuthLog t, String createFlag, TitaVo titaVo) throws LogicException {
 		AchAuthLogHistory tAchAuthLogHistory = new AchAuthLogHistory();
 		tAchAuthLogHistory.setCustNo(t.getCustNo());
 		tAchAuthLogHistory.setFacmNo(t.getFacmNo());
 		tAchAuthLogHistory.setAuthCreateDate(t.getAuthCreateDate());
 		tAchAuthLogHistory.setRepayBank(t.getRepayBank());
 		tAchAuthLogHistory.setRepayAcct(t.getRepayAcct());
-		tAchAuthLogHistory.setCreateFlag(t.getCreateFlag());
+		tAchAuthLogHistory.setCreateFlag(createFlag);
 		tAchAuthLogHistory.setProcessDate(t.getProcessDate());
 		tAchAuthLogHistory.setStampFinishDate(t.getStampFinishDate());
 		tAchAuthLogHistory.setAuthStatus(t.getAuthStatus());
@@ -1207,11 +1208,11 @@ public class BankAuthActCom extends TradeBuffer {
 			iPostDepCode = " ";
 		}
 
-		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
-		iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
-		iRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
-		iRepayBank = FormatUtil.pad9(titaVo.getParam("RepayBank"), 3);
-		iRelationId = titaVo.getParam("RelationId");
+		iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
+		iFacmNo = parse.stringToInteger(titaVo.get("FacmNo"));
+		iRepayCode = parse.stringToInteger(titaVo.get("RepayCode"));
+		iRepayBank = FormatUtil.pad9(titaVo.get("RepayBank"), 3);
+		iRelationId = titaVo.get("RelationId");
 		iTitaTxCd = titaVo.getTxcd();
 
 		if (titaVo.get("LimitAmt") != null) {

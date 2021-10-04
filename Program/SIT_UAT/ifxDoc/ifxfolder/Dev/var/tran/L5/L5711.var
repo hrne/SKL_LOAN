@@ -22,7 +22,7 @@ E(0,0)
 ["#FdCustId+身分證字號",#CustId],["#FdCustName+戶名",#CustName],
 ["#FdAmt+交易金額",#TxAmt],["#FdReturnAnt+退還金額",#ReturnAmt],
 ["#grid#,{id:1,expand:true,loop:30,row_height:1,s_cols:[], p_cols:[]}","","",
-["債權機構","機構名稱","撥付金額","累積撥付金額" ],
+["債權機構","機構名稱","撥付金額","累計撥付金額" ],
 [[#FinCode1],[#FinCodeName1],[#ApprAmt1],[#AccuApprAmt1],
 ]],
 ]
@@ -102,8 +102,9 @@ C(4,#FinCode{i},s,$)
 
 
 #AccuApprAmt{i}=m,14,L
-IF(#L5R42ApprAmt{i}>#ApprAmt{i},E(0,#AccuApprAmt{i}-(#L5R42ApprAmt{i}-#ApprAmt{i})),$)
-IF(#L5R42ApprAmt{i}<#ApprAmt{i},E(0,#AccuApprAmt{i}+(#ApprAmt{i}-#L5R42ApprAmt{i})),$)
+IF(#L5R42ApprAmt{i}>#ApprAmt{i},E(0,#L5R42AccuApprAmt{i}-(#L5R42ApprAmt{i}-#ApprAmt{i})),$)
+IF(#L5R42ApprAmt{i}<#ApprAmt{i},E(0,#L5R42AccuApprAmt{i}+(#ApprAmt{i}-#L5R42ApprAmt{i})),$)
+IF(#L5R42ApprAmt{i}==#ApprAmt{i},E(0,#AccuApprAmt{i},#L5R42AccuApprAmt{i}),$)
 ##end
 
 

@@ -2,6 +2,8 @@ package com.st1.itx.trade.L5;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
+
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -12,6 +14,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.NegAppr01;
 import com.st1.itx.db.domain.NegAppr01Id;
 import com.st1.itx.db.domain.NegMain;
@@ -171,6 +174,28 @@ public class L5711 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
+			
+			List<AcDetail> acDetailList = new ArrayList<AcDetail>();
+			/* 借：債協暫收款科目 */
+			AcDetail acDetail = new AcDetail();
+			acDetail.setDbCr("D");
+			acDetail.setAcctCode(acNegCom.getAcctCode(iNegTrans.getCustNo(), titaVo));
+			acDetail.setTxAmt(iNegTrans.getSklShareAmt()); //原DB金額
+			acDetail.setCustNo(iNegTrans.getCustNo());// 客戶戶號
+			acDetailList.add(acDetail);
+			/* 貸：債協退還款科目 */
+			acDetail = new AcDetail();
+			acDetail.setDbCr("C");
+			acDetail.setAcctCode(acNegCom.getReturnAcctCode(iNegTrans.getCustNo(), titaVo));//畫面金額
+			acDetail.setTxAmt(mApprAmt); // 新壽攤分金額
+			acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
+			acDetailList.add(acDetail);
+			
+			this.txBuffer.addAllAcDetailList(acDetailList);
+
+			
+			
+			
 		}
 	}
 	

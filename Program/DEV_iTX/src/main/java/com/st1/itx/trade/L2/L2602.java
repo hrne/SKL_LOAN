@@ -33,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2602 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2602.class);
 
 	// 銷帳處理
 	@Autowired
@@ -102,8 +101,8 @@ public class L2602 extends TradeBuffer {
 			// 銷帳
 			AcReceivable acReceivable = new AcReceivable();
 			List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
-			
-			if(iCloseDate == 0) {
+
+			if (iCloseDate == 0) {
 				acReceivable.setReceivableFlag(2); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
 				acReceivable.setAcctCode("F07"); // 業務科目
 				// 法拍費用
@@ -144,6 +143,11 @@ public class L2602 extends TradeBuffer {
 			if (tForeclosureFee == null) {
 				throw new LogicException("E0004", "L2602(ForeclosureFee)");
 			}
+			
+			if(iCloseDate != 0 ) {
+				throw new LogicException("E0008", "此筆已銷帳不可刪除");
+			}
+			
 			try {
 
 				ForeclosureFee tForeclosureFee4 = sForeclosureFeeService.holdById(iRecordNo);
@@ -156,7 +160,7 @@ public class L2602 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
 			// 銷帳
-			if(iCloseDate == 0) {
+			if (iCloseDate == 0) {
 				AcReceivable acReceivable = new AcReceivable();
 				List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
 				acReceivable.setReceivableFlag(2); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款

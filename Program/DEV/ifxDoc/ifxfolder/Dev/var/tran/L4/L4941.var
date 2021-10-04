@@ -184,9 +184,12 @@ T(2,@OORepayAcctX,#OORepayAcct)
 C(4,#OOAuthStatus,T(H,#OOAuthStatus,#AuthStatusHelp),$)
 C(4,#OOAuthStatus,s,$)
 C(3,#OOAuthStatus,0,
-    C(5,#OOCreateFlag,D,T(2,取消授權扣款),
-        C(5,#OOCreateFlag,A,T(2,成功新增),C(5,#OOCreateFlag,Z,T(2,暫停授權),T(2,)))),
-T(3,)T(H,#OOAuthStatus,#AuthStatusHelp))
+    C(5,#OOCreateFlag,D,T(2,取消授權扣款)
+    ,C(5,#OOCreateFlag,A,T(2,成功新增)
+    ,C(5,#OOCreateFlag,Z,T(2,暫停授權)
+    ,C(5,#OOCreateFlag,Y,T(2,恢復授權)
+    ,T(2,))))
+    ,T(3,)T(H,#OOAuthStatus,#AuthStatusHelp)))
 
 #OOMediaCode=X,1,O
 #OOMediaCodeX=X,10,O

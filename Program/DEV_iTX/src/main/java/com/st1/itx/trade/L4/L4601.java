@@ -89,14 +89,14 @@ public class L4601 extends TradeBuffer {
 						}
 					}
 					if (!"".equals(reportB) && !"".equals(t.getCheckResultB())) {
-						String[] checkResultB = t.getCheckResultA().split(",");
+						String[] checkResultB = t.getCheckResultB().split(",");
 						List<String> strListB = Arrays.asList(checkResultB);
-						for (String checkA : strListB) {
-							totaB = errorReportB(t, parse.stringToInteger(checkA), titaVo);
+						for (String checkB : strListB) {
+							totaB = errorReportB(t, parse.stringToInteger(checkB), titaVo);
 						}
 					}
 					if (!"".equals(reportC) && !"".equals(t.getCheckResultC())) {
-						String[] checkResultC = t.getCheckResultA().split(",");
+						String[] checkResultC = t.getCheckResultC().split(",");
 						List<String> strListC = Arrays.asList(checkResultC);
 						for (String checkC : strListC) {
 							totaC = errorReportC(t, parse.stringToInteger(checkC), titaVo);

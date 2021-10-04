@@ -1,10 +1,9 @@
 package com.st1.itx.trade.L2;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -18,6 +17,7 @@ import com.st1.itx.db.domain.ForeclosureFee;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
+import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -44,7 +44,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2601 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2601.class);
 
 	// 銷帳處理
 	@Autowired
@@ -63,18 +62,21 @@ public class L2601 extends TradeBuffer {
 	public Parse parse;
 	@Autowired
 	GSeqCom gGSeqCom;
+	@Autowired
+	BaTxCom baTxCom;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2601 ");
 		this.totaVo.init(titaVo);
+		baTxCom.setTxBuffer(txBuffer);
 
 		// new TABLE
 		ForeclosureFee tForeclosureFee = new ForeclosureFee();
-		
+
 		// 自動取號程式
 		int wkRecordNo = gGSeqCom.getSeqNo(0, 0, "L2", "2601", 9999999, titaVo);
-		
+
 		this.info("記錄號碼 : " + wkRecordNo);
 		tForeclosureFee.setRecordNo(wkRecordNo);
 		tForeclosureFee.setCustNo(parse.stringToInteger(titaVo.getParam("CustNo")));
@@ -99,6 +101,17 @@ public class L2601 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 		}
 
+		// 查詢各項費用
+		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), tForeclosureFee.getCustNo(), 000, 000, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
+		this.info("累溢收 = " + baTxCom.getExcessive());
+		this.info("法拍費 = " + tForeclosureFee.getFee());
+		if (baTxCom.getExcessive().compareTo(tForeclosureFee.getFee()) >= 0) {
+			this.info("可抵繳的未銷餘額足夠 = ");
+			this.totaVo.putParam("OWarningMsg", "此戶目前暫收款可抵繳餘額超過法拍費用");
+		} else {
+			this.totaVo.putParam("OWarningMsg", "");
+		}
+
 		AcReceivable acReceivable = new AcReceivable();
 		List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
 		acReceivable.setReceivableFlag(2); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
@@ -119,7 +132,7 @@ public class L2601 extends TradeBuffer {
 		acReceivableCom.mnt(0, acReceivableList, titaVo); // 0-起帳 1-銷帳
 
 		this.totaVo.putParam("OCloseNo", wkRecordNo);
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

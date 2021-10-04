@@ -75,14 +75,14 @@ public class L4942 extends TradeBuffer {
 			for (PostAuthLogHistory tPostAuthLogHistory : lPostAuthLogHistory) {
 
 				String wkCreateFlag = tPostAuthLogHistory.getAuthApplCode();
-				if (tPostAuthLogHistory.getDeleteDate() > 0) {
-//					1申請 2終止 9暫停
-					if ("00".equals(tPostAuthLogHistory.getAuthErrorCode())) {
-						wkCreateFlag = "9";
-					} else {
-						wkCreateFlag = "2";
-					}
-				}
+//				if (tPostAuthLogHistory.getDeleteDate() > 0) {
+////					1申請 2終止 9暫停
+//					if ("00".equals(tPostAuthLogHistory.getAuthErrorCode())) {
+//						wkCreateFlag = "9";
+//					} else {
+//						wkCreateFlag = "2";
+//					}
+//				}
 				wkUser = tPostAuthLogHistory.getLastUpdateEmpNo();
 				CdEmp tCdEmp = cdEmpService.findById(wkUser, titaVo);
 				if (tCdEmp != null) {

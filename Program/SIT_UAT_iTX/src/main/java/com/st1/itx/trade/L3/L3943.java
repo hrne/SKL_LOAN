@@ -1,21 +1,24 @@
 package com.st1.itx.trade.L3;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
+import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanChequeService;
@@ -38,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3943")
 @Scope("prototype")
 public class L3943 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3943.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,11 +49,16 @@ public class L3943 extends TradeBuffer {
 	public CustMainService custMainService;
 	@Autowired
 	public CdBankService cdBankService;
+	@Autowired
+	public AcReceivableService acReceivableService;
 
 	@Autowired
 	Parse parse;
 	@Autowired
 	DateUtil dDateUtil;
+
+	private OccursList occursList;
+	private int wkTotalCount = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -61,6 +68,9 @@ public class L3943 extends TradeBuffer {
 		// 取得輸入資料
 		int iChequeAcct = this.parse.stringToInteger(titaVo.getParam("ChequeAcct"));
 		int iChequeNo = this.parse.stringToInteger(titaVo.getParam("ChequeNo"));
+
+		// work area
+		String wkRvNo;
 
 		// 查詢支票檔
 		LoanCheque tLoanCheque = loanChequeService.findById(new LoanChequeId(iChequeAcct, iChequeNo), titaVo);
@@ -118,11 +128,37 @@ public class L3943 extends TradeBuffer {
 		}
 		this.totaVo.putParam("OOtherAcctCode", tLoanCheque.getOtherAcctCode());
 		this.totaVo.putParam("OReceiptNo", tLoanCheque.getReceiptNo());
-		this.totaVo.putParam("OKinbr", tLoanCheque.getKinbr());
-		this.totaVo.putParam("OTellerNo", tLoanCheque.getTellerNo());
-		this.totaVo.putParam("OTxtNo", tLoanCheque.getTxtNo());
+		if (tLoanCheque.getAcDate() == 0) {
+			this.totaVo.putParam("ORelNo", "");
+
+		} else {
+
+			this.totaVo.putParam("ORelNo", tLoanCheque.getKinbr() + tLoanCheque.getTellerNo() + tLoanCheque.getTxtNo());
+		}
+
+//		 查詢會計銷帳檔
+		wkRvNo = FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeAcct()), 9) + " "
+				+ FormatUtil.pad9(String.valueOf(tLoanCheque.getChequeNo()), 7);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), wkRvNo, 0,
+				Integer.MAX_VALUE, titaVo);
+		List<AcReceivable> lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
+
+		if (lAcReceivable != null && lAcReceivable.size() > 0) {
+			for (AcReceivable tAcReceivable : lAcReceivable) {
+//				if (iFacmNo == 0 || iFacmNo == tAcReceivable.getFacmNo()) {
+				occursList = new OccursList();
+				occursList.putParam("OOFacmNo", tAcReceivable.getFacmNo());
+				occursList.putParam("OORvAmt", tAcReceivable.getRvAmt());
+				occursList.putParam("OORvBal", tAcReceivable.getRvBal());
+//				}
+				// 將每筆資料放入Tota的OcList
+				this.totaVo.addOccursList(occursList);
+				wkTotalCount++;
+			}
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
 }

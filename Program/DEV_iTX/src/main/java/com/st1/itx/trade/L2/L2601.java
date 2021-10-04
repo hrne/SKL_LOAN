@@ -44,7 +44,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2601 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2601.class);
 
 	// 銷帳處理
 	@Autowired
@@ -103,13 +102,14 @@ public class L2601 extends TradeBuffer {
 		}
 
 		// 查詢各項費用
-		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), tForeclosureFee.getCustNo(), 000, 000, 99,
-				BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
+		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), tForeclosureFee.getCustNo(), 000, 000, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
 		this.info("累溢收 = " + baTxCom.getExcessive());
 		this.info("法拍費 = " + tForeclosureFee.getFee());
 		if (baTxCom.getExcessive().compareTo(tForeclosureFee.getFee()) >= 0) {
 			this.info("可抵繳的未銷餘額足夠 = ");
 			this.totaVo.putParam("OWarningMsg", "此戶目前暫收款可抵繳餘額超過法拍費用");
+		} else {
+			this.totaVo.putParam("OWarningMsg", "");
 		}
 
 		AcReceivable acReceivable = new AcReceivable();

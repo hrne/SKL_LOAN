@@ -300,6 +300,7 @@ T(2,@MainFinCodeX,#L5r12BankItem)
 #BtnShareAmt=X,1,S,ui:button;value:已撥付明細;enable:1;tabbable:0
 
 ! 先處理NegTrans的同戶號的第一筆,其他都顯示待處理
+#cover=X,100,O
 
 ! 身分證字號
 #CustId=X,10,L
@@ -574,7 +575,7 @@ T(H,@NewStatusX,#NewStatus,#StatusHelp)
 T(H,@CustLoanKindX,#CustLoanKind,#CustLoanKindHelp)
 
 #RimL5r12C=X,1,S
-T(2,@RimBankCode,#L5r03MainFinCode)
+T(2,@RimBankCode,#MainFinCode)
 S(L5R12,1,#RimBankCode)
 R(1,L5R12)
 T(2,@MainFinCodeX,#L5r12BankItem)

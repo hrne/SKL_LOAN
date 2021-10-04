@@ -427,15 +427,16 @@ T(2,@FdCustName,#WKSTAR)
 T(2,@FdEName,#WKSPC)
 T(2,@FdBirthday,#WKSTAR)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
-T(2,@FdCustTypeCode,#Fd)
+
 T(2,@FdEntCode,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdCustTypeCode,#Fd)
 T(2,@FdIndustryCode,#Fd)
 T(2,@FdNationalityCode,#WKSTAR)
 T(2,@FdBussNationalityCode,#WKSTAR)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+T(2,@FdSubCompanyFg,#Fd)
 T(2,@FdSpouseId,#Fd)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdSpouseName,#Fd)
 T(2,@FdRegZip3,#WKSPC)
 T(2,@FdRegZip2,#WKSPC)
@@ -500,6 +501,7 @@ C(5,#FdCustTypeCode,*,V(7),$)
 C(4,#CustTypeCode,$,V(H,#CustTypeCodeHelp))
 
 #CustTypeCodeX=X,10,L
+C(4,#CustTypeCode,S,$)
 T(H,#CustTypeCode,#CustTypeCodeHelp)
 
 

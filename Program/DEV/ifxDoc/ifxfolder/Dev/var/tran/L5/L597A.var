@@ -64,7 +64,7 @@ T(1,@IsBtn,#NTXBUF,13,1)
 ! 債權Help
 #HelpIsMainFin=X,31,S
 !T(3,0:一般債權;1:最大債權;2:無)
-T(3,0:一般債權;1:最大債權)
+T(3,N:一般債權;Y:最大債權)
 
 ! 會計日期
 #AcDate=D,7,S
@@ -72,7 +72,8 @@ C(3,#CHAIN,0,$,s)
 E(0,#SYSDATE)
 
 ! 債權區分
-#IsMainFin=A,1,I
+#IsMainFin=X,1,I
+C(3,#IsMainFin,1,T(2,Y),T(2,N))
 C(3,#CHAIN,0,$,s)
 HELP(#HelpIsMainFin)
 @V(H,#HelpIsMainFin)
@@ -237,9 +238,9 @@ E(0,1)ASGN(LOOP$)
 ! 身分證字號
 #OOCustId=X,10,O
 ! 戶號
-#OOCustNo=A,7,O
+#OOCustNo=X,7,O
 ! 案件序號
-#OOCaseSeq=X,3,O
+#OOCaseSeq=A,3,O
 
 ! 戶名
 #OOCustName=X,100,O
@@ -304,7 +305,7 @@ SWITCH(#OONewtransTxKind,0,T(2,正常),
 ! 經辦
 #OOTitaTlrNo=X,6,S
 ! 交易序號
-#OOTitaTxtNo=A,8,S
+#OOTitaTxtNo=X,8,S
 
 #OOStatus=X,1,S
 #OONewStatus=X,1,S
@@ -441,7 +442,7 @@ E(0,0)
 #NewTransReturnAmt=m,14,O
 E(0,0)
 #TrialFunc=A,1,L
-E(0,3)
+E(0,2)
 
 !訂正時顯示之欄位
 !參考編號
@@ -451,6 +452,12 @@ T(2,#OOCustId)
 #TXAMT=_,_,S
 E(0,#OOTransTxAmt)
 
+#CustId=X,10,S
+T(2,#OOCustId)
+#CaseSeq=A,3,S
+T(2,#OOCaseSeq)
+#CustNo=X,7,L
+T(2,#OOCustNo)
 #Status=X,1,S
 T(2,#OOStatus)
 #NewStatus=X,1,S
@@ -504,7 +511,7 @@ E(0,#OOOrgRepayInterest)
 #NewRepayInterest=m,14,L
 E(0,#OONewRepayInterest)
 #TwoStepCode=X,1,L
-E(0,#OOTwoStepCode)
+T(2,#OOTwoStepCode)
 #ChgCondDate=D,7,L
 T(2,#OOChgCondDate)
 #PayIntDate=D,7,L
@@ -609,8 +616,7 @@ T(6A,#TrialFunc+#AcDate+#IsMainFin+#SearchOption+#SearchDetail+#Export+#IsBtn+#O
 T(2,L597A)
 
 #L570ATITA=x,3000,S
-T(6A,#TrialFunc+#AcDate+#IsMainFin+#SearchOption+#SearchDetail+#Export+#IsBtn+#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo+#OONewtransTxKind+#TXCDCHAIN
-+#Status+#NewStatus+#CustLoanKind+#ApplDate+#MainDueAmt+#TotalPeriod+#IntRate+#RepaidPeriod+#NewRepaidPeriod+#MainFinCode
+T(6A,#CustId+#CaseSeq+#CustNo+#Status+#NewStatus+#CustLoanKind+#ApplDate+#MainDueAmt+#TotalPeriod+#IntRate+#RepaidPeriod+#NewRepaidPeriod+#IsMainFin+#MainFinCode
 +#OrgPrincipalBal+#NewPrincipalBal+#OrgAccuTempAmt+#NewAccuTempAmt+#OrgAccuOverAmt+#NewAccuOverAmt+#OrgAccuDueAmt
 +#NewAccuDueAmt+#OrgAccuSklShareAmt+#NewAccuSklShareAmt+#OrgNextPayDate+#NewNextPayDate+#OrgRepayPrincipal
 +#NewRepayPrincipal+#OrgRepayInterest+#NewRepayInterest+#TwoStepCode+#ChgCondDate+#PayIntDate+#NewPayIntDate+#OrgStatusDate+#NewStatusDate
@@ -620,7 +626,7 @@ T(6A,#TrialFunc+#AcDate+#IsMainFin+#SearchOption+#SearchDetail+#Export+#IsBtn+#O
 +#NewTransOverRepayAmt+#TransPrincipalAmt+#NewTransPrincipalAmt+#TransInterestAmt+#NewTransInterestAmt+#TransOverAmt+#NewTransOverAmt+#TransIntStartDate
 +#NewTransIntStartDate+#TransIntEndDate+#NewTransIntEndDate+#TransRepayPeriod+#NewTransRepayPeriod+#TransShouldPayPeriod+#NewTransShouldPayPeriod
 +#TransDueAmt+#NewTransDueAmt+#TransRepayDate+#NewTransRepayDate+#TransOrgAccuOverAmt+#NewTransOrgAccuOverAmt+#TransAccuOverAmt+#NewTransAccuOverAmt
-+#MRKEY+#TXAMT)
++#TrialFunc+#TXCDCHAIN+#MRKEY+#TXAMT+#AcDate+#SearchOption+#SearchDetail+#Export+#IsBtn+#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo+#OONewtransTxKind)
 
 
 #batch-detail=x,100000,S

@@ -66,17 +66,23 @@ public class L597A extends TradeBuffer {
 		this.info("active L597A ");
 		this.totaVo.init(titaVo);
 		int AcDate=Integer.parseInt(titaVo.getParam("AcDate").trim()); //
-		int IsMainFin=Integer.parseInt(titaVo.getParam("IsMainFin").trim()); //
 		int SearchOption=Integer.parseInt(titaVo.getParam("SearchOption").trim()); //
 		int SearchDetail=Integer.parseInt(titaVo.getParam("SearchDetail").trim()); //
 		int Export=Integer.parseInt(titaVo.getParam("Export").trim()); //
 		int IsBtn=Integer.parseInt(titaVo.getParam("IsBtn").trim()); //
 		String TransTxKind = titaVo.getParam("TransTxKind").trim(); //
+		
+		int IsMainFin = 0;
+		if("Y".equals(titaVo.getParam("IsMainFin").trim())) {
+			IsMainFin = 1;
+		} 
+		
 		Boolean selectfg = false;
 		Boolean timesfg = false;
 		if(!"".equals(TransTxKind)) {
 			selectfg = true;
 		}
+		
 		
 		/*設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值*/
 		this.index = titaVo.getReturnIndex();
@@ -250,9 +256,9 @@ public class L597A extends TradeBuffer {
 					 
 					 TransCustNo = Map.get("TransCustNo");
 					 TransCaseSeq = Map.get("TransCaseSeq");
-					 TransEntryDate = Map.get("TransEntryDate");
+					 TransEntryDate = Map.get("transEntryDate");
 					 TransTxStatus = Map.get("TransTxStatus");
-					 NewTransTxStatus = Map.get("NewTransTxStatus");
+					 NewTransTxStatus = Map.get("NewtransTxStatus");
 					 TransTxAmt = Map.get("transTxAmt");
 					 
 					 NewTransTxAmt = Map.get("NewtransTxAmt");
