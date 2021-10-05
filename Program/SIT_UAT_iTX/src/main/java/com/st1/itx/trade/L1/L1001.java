@@ -115,6 +115,7 @@ public class L1001 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");
 		String iCustNm = titaVo.get("CustName").trim();
 		String iMobile = titaVo.get("Mobile").trim();
+		String iIndustryCode = titaVo.getParam("IndustryCode");
 		int iCustType = iParse.stringToInteger(titaVo.getParam("IdKind"));
 		int iKind = 0;
 		if (iCustNoSt != 0 && iCustNoEd != 0) {
@@ -132,7 +133,9 @@ public class L1001 extends TradeBuffer {
 		} else if (!iMobile.equals("")) {
 			// find by telno
 			iKind = 4;
-		} else {
+		}else if (!iIndustryCode.equals("")) {
+			iKind = 5;
+		}else {
 			throw new LogicException(titaVo, "E0001", "查詢功能選擇錯誤");
 		}
 		/*
@@ -839,6 +842,179 @@ public class L1001 extends TradeBuffer {
 				this.totaVo.addOccursList(occursList4);
 			}
 			if (iCustTelNo != null && iCustTelNo.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				this.totaVo.setMsgEndToEnter(); // 手動折返
+			}
+			break;
+		case 5:
+			Slice<CustMain> iCustMain5 = null;
+			iCustMain5 = iCustMainService.industryCodeAll(iIndustryCode, this.index, this.limit, titaVo);
+			if (iCustMain5 == null) {
+				throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
+			}
+
+			for (CustMain eCustMain : iCustMain5) {
+				if (iCustType == 1) {
+					if (eCustMain.getCustId().length() != 10) {
+						continue;
+					}
+				} else if (iCustType == 2) {
+					if (eCustMain.getCustId().length() != 8) {
+						continue;
+					}
+				}
+				OccursList occursList = new OccursList();
+				// 顧客
+				int CustMainBTNFg5 = 0;
+				// 財報
+				int CustFinBTNFg5 = 0;
+				// 放款
+				int FacMainBTNFg5 = 0;
+				// 案件
+				int FacCaseApplBTNFg5 = 0;
+				// 未齊件
+				int LoanNotYetBTNFg5 = 0;
+				// 保證人
+				int GuarantorBTNFg5 = 0;
+				// 關聯戶
+				int CustRelBTNFg5 = 0;
+				// 擔保品
+				int ClMainBTNFg5 = 0;
+				// 共同借款人
+				int FacShareApplBTNFg5 = 0;
+				// 交互運用
+				int CustCrossBTNFg5 = 0;
+				// 客戶電話
+				int CustTleNoBTNFg5 = 0;
+				// new
+				CustMain tmpCustMain5 = new CustMain();
+				List<CustFin> tmpCustFin5 = new ArrayList<CustFin>();
+				List<FacMain> tmpFacMain5 = new ArrayList<FacMain>();
+				List<LoanNotYet> tmpLoanNotYet5 = new ArrayList<LoanNotYet>();
+				List<FacCaseAppl> tmplFacCaseAppl5 = new ArrayList<FacCaseAppl>();
+				List<ClFac> tmpClFac5 = new ArrayList<ClFac>(); // 擔保品
+				List<CustCross> tmpCustCross5 = new ArrayList<CustCross>();
+				List<CustTelNo> tmpCustTelNo5 = new ArrayList<CustTelNo>(); // 客戶電話
+				// ArrayList of 核准號碼
+				ArrayList<Integer> listApproveNo5 = new ArrayList<Integer>();
+				// 顧客按鈕fg
+				tmpCustMain5 = iCustMainService.custIdFirst(eCustMain.getCustId(), titaVo);
+				this.info("顧客" + tmpCustMain5);
+				if (tmpCustMain5 != null) {
+					CustMainBTNFg5 = 1;
+				}
+				// 財報按鈕fg
+				Slice<CustFin> stmpCustFin5 = sCustFinService.custUKeyEq(eCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
+				tmpCustFin5 = stmpCustFin5 == null ? null : stmpCustFin5.getContent();
+				this.info("財報" + tmpCustFin5);
+				if (tmpCustFin5 != null) {
+					CustFinBTNFg5 = 1;
+				}
+				// 放款按鈕fg
+				if (eCustMain.getCustNo() != 0) {
+					Slice<FacMain> stmpFacMain5 = sFacMainService.facmCustNoRange(eCustMain.getCustNo(), eCustMain.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+					tmpFacMain5 = stmpFacMain5 == null ? null : stmpFacMain5.getContent();
+					this.info("放款按鈕" + tmpFacMain5);
+					if (tmpFacMain5 != null) {
+						FacMainBTNFg5 = 1;
+					}
+				}
+				Slice<FacCaseAppl> stmplFacCaseAppl5 = sFacCaseApplService.caseApplCustUKeyEq(eCustMain.getCustUKey(), "0", "2", 0, Integer.MAX_VALUE, titaVo);
+				tmplFacCaseAppl5 = stmplFacCaseAppl5 == null ? null : stmplFacCaseAppl5.getContent();
+				this.info("案件=" + tmpLoanNotYet5);
+				// 案件按鈕
+				if (tmplFacCaseAppl5 != null) {
+					FacCaseApplBTNFg5 = 1;
+				}
+				// 未齊件按鈕fg
+				Slice<LoanNotYet> stmpLoanNotYet5 = sLoanNotYetService.findCustNoEq(eCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+				tmpLoanNotYet5 = stmpLoanNotYet5 == null ? null : stmpLoanNotYet5.getContent();
+				this.info("未齊件=" + tmpLoanNotYet5);
+				if (tmpLoanNotYet5 != null) {
+					LoanNotYetBTNFg5 = 1;
+				}
+				// 保證人按鈕fg
+				Slice<FacMain> slFacMain5 = sFacMainService.facmCustNoRange(eCustMain.getCustNo(), eCustMain.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+				List<FacMain> lFacMain5 = slFacMain5 == null ? null : slFacMain5.getContent();
+				if (lFacMain5 != null) {
+					for (FacMain tFacMain5 : lFacMain5) {
+						listApproveNo5.add(tFacMain5.getApplNo());
+					}
+					for (int approveNo5 : listApproveNo5) {
+						Slice<Guarantor> stmpListGuarantor5 = sGuarantorService.approveNoEq(approveNo5, 0, Integer.MAX_VALUE, titaVo);
+						List<Guarantor> tmpListGuarantor5 = stmpListGuarantor5 == null ? null : stmpListGuarantor5.getContent();
+						if (tmpListGuarantor5 != null) {
+							this.info("保證人=" + tmpListGuarantor5);
+							GuarantorBTNFg5 = 1;
+						}
+					}
+				}
+				// 擔保品按鈕fg
+				Slice<ClFac> stmpClFac5 = sClFacService.custNoEq(eCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+				tmpClFac5 = stmpClFac5 == null ? null : stmpClFac5.getContent();
+				this.info("擔保品=" + tmpClFac5);
+				if (tmpClFac5 != null) {
+					ClMainBTNFg5 = 1;
+				}
+				// 共同借款人
+				Slice<FacShareAppl> stmpFacShareAppl5 = sFacShareApplService.findCustNoEq(eCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+				if (stmpFacShareAppl5 != null) {
+					FacShareApplBTNFg5 = 1;
+				}
+				// 關聯戶按鈕fg
+				ReltMain stmpReltMain5 = iReltMainService.ReltUKeyFirst(eCustMain.getCustUKey(), titaVo);
+				this.info("關聯戶 =" + stmpReltMain5);
+				if (stmpReltMain5 != null) {
+					CustRelBTNFg5 = 1;
+				}else {
+					ReltMain stmpReltMain15 = iReltMainService.custNoFirst(eCustMain.getCustNo(), titaVo);
+					if (stmpReltMain15 != null) {
+						CustRelBTNFg5 = 1;
+					}
+				}
+				// 交互運用按鈕fg
+				Slice<CustCross> stmpCustCross5 = sCustCrossService.custUKeyEq(eCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
+				tmpCustCross5 = stmpCustCross5 == null ? null : stmpCustCross5.getContent();
+				if (tmpCustCross5 != null) {
+					CustCrossBTNFg5 = 1;
+				}
+
+				// 客戶電話按鈕fg
+				Slice<CustTelNo> stmpCustTelNo5 = iCustTelNoService.findCustUKey(eCustMain.getCustUKey(), this.index, this.limit, titaVo);
+				tmpCustTelNo5 = stmpCustTelNo5 == null ? null : stmpCustTelNo5.getContent();
+				if (tmpCustTelNo5 != null) {
+					CustTleNoBTNFg5 = 1;
+				}
+				// 顧客
+				occursList.putParam("OOCustMainBTNFg", CustMainBTNFg5);
+				// 財報
+				occursList.putParam("OOCustFinBTNFg", CustFinBTNFg5);
+				// 放款
+				occursList.putParam("OOFacMainBTNFg", FacMainBTNFg5);
+				// 案件
+				occursList.putParam("OOFacCaseApplBTNFg", FacCaseApplBTNFg5);
+				// 未齊件
+				occursList.putParam("OOLoanNotYetBTNFg", LoanNotYetBTNFg5);
+				// 保證人
+				occursList.putParam("OOGuarantorBTNFg", GuarantorBTNFg5);
+				// 擔保品
+				occursList.putParam("OOClMainBTNFg1", ClMainBTNFg5);
+				// 共同借款人
+				occursList.putParam("OOFacShareApplBTNFg", FacShareApplBTNFg5);
+				// 關聯戶
+				occursList.putParam("OOCustRelBTNFg", CustRelBTNFg5);
+				// 交互運用
+				occursList.putParam("OOCustCrossBTNFg", CustCrossBTNFg5);
+				// 電話
+				occursList.putParam("OOCustTelNoBTNFg", CustTleNoBTNFg5);
+				occursList.putParam("OOCustId", eCustMain.getCustId());
+				occursList.putParam("OOCustNo", eCustMain.getCustNo());
+				occursList.putParam("OOCustTypeCode", eCustMain.getCustTypeCode());
+				occursList.putParam("OOCustName", eCustMain.getCustName().replace("$n", "\n"));
+				occursList.putParam("OODataStatus", eCustMain.getDataStatus());
+				this.totaVo.addOccursList(occursList);
+			}
+			if (iCustMain5.hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				this.totaVo.setMsgEndToEnter(); // 手動折返
 			}

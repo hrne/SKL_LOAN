@@ -51,9 +51,9 @@ K(MODIFYBUTTON,查詢)
 ["#FdUnitCode+單位代號",#UnitCode],
 ["#FdDeptCode+部室代號",#DeptCode],
 ["#FdDistCode+區部代號",#DistCode],
-["#FdUnitManager+單位主管代號",#UnitManager],
-["#FdDeptManager+部室主管代號",#DeptManager],
-["#FdDistManager+區部主管代號",#DistManager],
+["#FdUnitManager+單位經理代號",#UnitManager],
+["#FdDeptManager+部室經理代號",#DeptManager],
+["#FdDistManager+區部經理代號",#DistManager],
 !["#FdRPTFG+顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
 !],
@@ -152,6 +152,9 @@ C(3,#InqFg,6,$,s)
 
 !<include src="COM.icf::RPTFG.dec"/>
 
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -208,6 +211,9 @@ T(2,#OODeptManager+ +#OODeptManagerNm)
 #OODistManagerNm=X,40,L
 #OODistManagerX=X,47,L
 T(2,#OODistManager+ +#OODistManagerNm)
+
+!啟用記號
+#OOEnable=X,1,L
 
 ! 修改的按鈕
 #OOFunc2=A,1,S
@@ -270,6 +276,7 @@ TXFORM=L6085
 #OODeptManagerNm
 #OODistManager
 #OODistManagerNm
+#OOEnable
 ^
 </sub>
 
@@ -304,15 +311,17 @@ TXFORM=L6085
 #OODistCodeX=區部名稱
 {width:250,align:'left'}
 
-#OOUnitManagerX=單位主管
+#OOUnitManagerX=單位經理
 {width:110,align:'left'}
 
-#OODeptManagerX=部室主管
+#OODeptManagerX=部室經理
 {width:110,align:'left'}
 
-#OODistManagerX=區部主管
+#OODistManagerX=區部經理
 {width:110,align:'left'}
 
+#OOEnable=啟用記號
+{width:70,align:'center'}
 ^
 
 </sub>

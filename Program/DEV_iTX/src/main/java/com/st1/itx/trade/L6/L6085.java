@@ -34,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6085 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6085.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -108,7 +107,7 @@ public class L6085 extends TradeBuffer {
 			occursList.putParam("OOUnitManager", tCdBcm.getUnitManager());
 			occursList.putParam("OODeptManager", tCdBcm.getDeptManager());
 			occursList.putParam("OODistManager", tCdBcm.getDistManager());
-
+			occursList.putParam("OOEnable", tCdBcm.getEnable());
 			unitManagerNm = "";
 			deptManagerNm = "";
 			distManagerNm = "";

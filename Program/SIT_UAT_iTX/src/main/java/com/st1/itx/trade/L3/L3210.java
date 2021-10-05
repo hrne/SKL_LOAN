@@ -280,31 +280,23 @@ public class L3210 extends TradeBuffer {
 				acDetail.setSlipNote(titaVo.getParam("RpRemark1"));
 				lAcDetail.add(acDetail);
 				this.info("SlipNote = " + acDetail.getSlipNote());
-				/* 5.找債協專戶的匯入款，為一般債權匯入款的戶號 for L3210暫收入帳 */
-				TempVo tTempVo = acNegCom.getNegAppr02CustNo(iEntryDate, iTempAmt, iCustNo, titaVo);
-				if (!"".equals(tTempVo.getParam("NegCustNo"))) {
-					int negCustNo = parse.stringToInteger(tTempVo.getParam("NegCustNo"));
-					acDetail = new AcDetail();
-					acDetail.setDbCr("D");
-					acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
-					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-					acDetail.setTxAmt(iTempAmt);
-					acDetail.setCustNo(iCustNo);
-					acDetail.setSlipNote("一般債權撥付");
-					lAcDetail.add(acDetail);
-					this.info("SlipNote1 = " + acDetail.getSlipNote());
-
-					acDetail = new AcDetail();
-					acDetail.setDbCr("C");
-					acDetail.setSumNo("094"); // 094 :轉債協暫收款
-					acDetail.setAcctCode(acNegCom.getAcctCode(negCustNo, titaVo));
-					acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
-					acDetail.setTxAmt(iTempAmt);
-					acDetail.setCustNo(negCustNo);
-					acDetail.setSlipNote("一般債權撥付");
-					acDetail.setJsonFields(tTempVo.getJsonString()); // for AcNegCom Updae
-					lAcDetail.add(acDetail);
-					this.info("SlipNote2 = " + acDetail.getSlipNote());
+				/* 5.找債協專戶的匯入款，為一般債權人撥付款 */
+				if (iCustNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+					List<AcDetail> lAcDetailApp02 = new ArrayList<AcDetail>();
+					lAcDetailApp02 = acNegCom.getNegAppr02CustNo(iEntryDate, iTempAmt, iCustNo, titaVo);
+					if (lAcDetailApp02.size() > 0) {
+						acDetail = new AcDetail();
+						acDetail.setDbCr("D");
+						acDetail.setAcctCode(acNegCom.getAcctCode(iCustNo, titaVo));
+						acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+						acDetail.setTxAmt(iTempAmt);
+						acDetail.setCustNo(iCustNo);
+						acDetail.setSlipNote("一般債權撥付");
+						lAcDetail.add(acDetail);
+						// 貸 : 一般債權人撥付款
+						lAcDetail.addAll(lAcDetailApp02);
+						this.info("SlipNote2 = " + acDetail.getSlipNote());
+					}
 				}
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;

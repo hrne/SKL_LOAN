@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,234)ASGN(INQLEN$)
+E(0,231)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -73,7 +73,7 @@ E(0,0)
 ["#FdCustId+．統一編號",#CustId],
 ["#FdCustName+．戶名",#CustName],
 ["#FdMobile+．手機號碼",#Mobile],
-["#FdIndustryCode+．行業別",#IndustryCode],
+["#FdIndustryCode+．行業別",#IndustryCode,#BTN2,#IndustryCodeX],
 ["#FdIdKind+身份別",#IdKind,#IdKindX],
 ]
 #FdMain=X,2,L
@@ -92,7 +92,7 @@ T(3,*)
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 !#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
-!#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BTN2=X,15,I,ui:button;value:行業別代號查詢;enable:1;tabbable:0;title=行業別代號查詢;
 !#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
 #BUF1=X,42,S
 !ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
@@ -100,6 +100,8 @@ T(3,*)
 
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L6R06.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
 !CustTypeCode 客戶別
 #CDDEF0001=x,20,S
 T(3,CdCode.CustTypeCode)
@@ -142,6 +144,12 @@ E(0,0)
 #RPTFG2=A,1,S
 C(4,#NTXBUF5,T(3,1),T(3,2))
 
+!行業別查詢按鈕
+#BUF3=X,18,S
+
+#BIND2=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L6062; ntxbuf=#BUF3;ntxbuf5=type<-1:IndustryCode<-OOIndustryCode:IndustryCodeX<-OOIndustryItem})
+
 !借款人戶號
 
 #CustNoSt=A,7,I
@@ -177,12 +185,29 @@ C(4,#CustId,$,S)
 @C(4,#Mobile,$,V(9))
 !T(3,@FdMobile,*)
 
+! 行業別
 #IndustryCode=X,6,I
 C(3,#CustNoEd,0,$,S)
 C(4,#CustId,$,S)
 C(4,#CustName,$,S)
 C(4,#Mobile,$,S)
 @C(4,#IndustryCode,V(P,需擇一輸入查詢條件),V(9))
+
+#SendL6R06=X,1,S
+#RimIndustryCode=X,6,S
+T(2,@RimTxCode,#TXCD)
+C(4,#IndustryCode,S,$)
+E(0,@RimFuncCode,5)
+T(2,@RimIndustryCode,#IndustryCode)
+RESET_RIM(#SendL6R06,L6R06)
+S(L6R06,1,#RimFuncCode,#RimTxCode,#RimIndustryCode)
+R(1,L6R06)
+
+#RL6R06=X,1,S
+C(4,#IndustryCode,S,$)
+T(2,@IndustryCodeX,#L6R06IndustryItem)
+
+#IndustryCodeX=x,2.50,L
 
 #IdKind=A,1,I
 HELP(#IdKindHelp)
@@ -393,6 +418,7 @@ C(5,#OODataStatus,1,BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; text=補建; ntxbu
 #CustId
 #CustName
 #Mobile
+#IndustryCode
 #IdKind
 #RETURN
 #END
@@ -421,7 +447,7 @@ TXFORM=L1001
 #OOCustName
 #OODataStatus
 ^
-
+<include src="ROM.icf::L6R06.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 </sub>

@@ -59,6 +59,7 @@ public class L6985 extends TradeBuffer {
 	private int selectCode = 0;
 	private int custNo = 0;
 	private int trasCollDate = 0;
+	private String iItemCode = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -74,7 +75,8 @@ public class L6985 extends TradeBuffer {
 
 		trasCollDate = parse.stringToInteger(titaVo.getParam("AcDate"));
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
-
+		iItemCode = titaVo.getParam("cItemCode");
+		
 		this.info("selectCode = " + selectCode);
 		this.info("trasCollDate = " + trasCollDate);
 		// 0.未處理
@@ -99,35 +101,35 @@ public class L6985 extends TradeBuffer {
 
 		switch (selectCode) {
 		case 1:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 3, this.index, this.limit, titaVo);
 			fallMessage = "昨日留存";
 			break;
 		case 2:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 3, this.index, this.limit, titaVo);
 			fallMessage = "本日新增";
 			break;
 		case 3:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL00", 0, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 3, this.index, this.limit, titaVo);
 			fallMessage = "全部";
 			break;
 		case 4:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL00", 2, 2, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 2, 2, this.index, this.limit, titaVo);
 			fallMessage = "本日處理";
 			break;
 		case 5:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL00", 3, 3, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 3, 3, this.index, this.limit, titaVo);
 			fallMessage = "本日刪除";
 			break;
 		case 6:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL00", 1, 1, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 1, 1, this.index, this.limit, titaVo);
 			fallMessage = "保留";
 			break;
 		case 7:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL00", 0, 0, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 0, this.index, this.limit, titaVo);
 			fallMessage = "未處理";
 			break;
 		case 9:
-			slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL00", 0, 0, this.index, this.limit, titaVo);
+			slTxToDoDetail = txToDoDetailService.detailStatusRange(iItemCode, 0, 0, this.index, this.limit, titaVo);
 			fallMessage = "未處理 (按鈕處理)";
 			break;
 		default:
@@ -175,7 +177,8 @@ public class L6985 extends TradeBuffer {
 				occursList.putParam("OOAcctItem", AcctItem); // 科目名稱
 				occursList.putParam("OOAcBookCode", AcBookCode + "/" + AcSubBookCode); // 帳冊別
 				occursList.putParam("OORmk", SlipNote); // 摘要
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
+						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 
 				occursList.putParam("OODbAmt", TxAmt); // 金額
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
@@ -188,6 +191,13 @@ public class L6985 extends TradeBuffer {
 			}
 		} else {
 			throw new LogicException(titaVo, "E0001", "查詢範圍: " + fallMessage + " 查無資料");
+		}
+
+		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+		if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
 		}
 
 		this.addList(this.totaVo);

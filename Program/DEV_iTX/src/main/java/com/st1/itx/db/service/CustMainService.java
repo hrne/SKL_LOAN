@@ -127,7 +127,7 @@ public interface CustMainService {
    * @param titaVo Variable-Length Argument
    * @return Slice CustMain CustMain of List
    */
-  public Slice<CustMain> IndustryCodeAll(String industryCode_0, int index, int limit, TitaVo... titaVo);
+  public Slice<CustMain> industryCodeAll(String industryCode_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By CustMain

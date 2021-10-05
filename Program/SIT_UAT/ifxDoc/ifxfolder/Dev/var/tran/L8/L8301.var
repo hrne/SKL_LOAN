@@ -139,6 +139,7 @@ T(2,@FdRefBankId,*)
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
+K(MODIFYBUTTON,異動)
 T(1,@Ukey,#NTXBUF,3,32)
 T(F,@TranKey,1)
 T(F,@ApplyType,1)T(F,@RefBankId,1)
@@ -286,7 +287,7 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,R,T(2,@RefBankId,#L8r11RefBankId),$)
 C(5,#TranKey,R,s,$)
 IF(#ApplyType=="A",S,$)
-@V(7)
+@V(7)V(NL)
 
 #RefBankIdRim=X,1,S
 C(5,#ApplyType,A,S,$)
@@ -311,6 +312,7 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,R,T(2,@RefBankId,#L8r11RefBankId),$)
 C(5,#TranKey,R,s,$)
 IF(#NotBankId{j}!="",$,s)
+@V(NL)
 
 #CheckNotBankId{i}=X,1,S
 IF(#NotBankId{i}=="",$,S)

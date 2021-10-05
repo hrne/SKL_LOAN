@@ -270,6 +270,7 @@ T(3,)T(H,#OOPostMediaCode,#MediaCodeHelp2)
 
 
 #OOTitaTxType=X,2,S
+C(4,#OOTitaTxCd,S,$)
 T(1,#OOTitaTxCd,1,2)
 
 

@@ -37,13 +37,16 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,800];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8302]                                 (41)協商開始暨停催通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdRcDate+協商申請日",#RcDate],["#FdScDate+停催日期",#ScDate],
-["#FdNegoStartDate+協商開始日",#NegoStartDate],["#FdNonFinClaimAmt+非金融機構債權金額",#NonFinClaimAmt],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdRcDate+協商申請日",#RcDate],
+[#<->#,"#FdNegoStartDate+協商開始日",#NegoStartDate],
+[#<->#,"#FdNonFinClaimAmt+非金融機構債權金額",#NonFinClaimAmt],
+[#<->#,"#FdScDate+停催日期",#ScDate],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
@@ -103,8 +106,6 @@ T(F,@RcDate,1)T(F,@ScDate,1)T(F,@NegoStartDate,1)T(F,@NonFinClaimAmt,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdScDate,*)
-T(2,@FdNegoStartDate,*)
-T(2,@FdNonFinClaimAmt,*)
 
 ! 異動進入
 #Deal_Update=X,1,S
@@ -113,8 +114,7 @@ T(1,@Ukey,#NTXBUF,3,32)
 T(F,@ScDate,1)T(F,@NegoStartDate,1)T(F,@NonFinClaimAmt,1)
 T(2,@FdScDate,*)
 T(2,@FdNegoStartDate,*)
-T(2,@FdNonFinClaimAmt,*)
-
+K(MODIFYBUTTON,異動)
 ! 查詢進入
 #Deal_Search=X,1,S
 C(5,#TranKey_Tmp,5,$,S)
@@ -190,20 +190,21 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#RcDate)
+@V(7)A(DATE,0,#RcDate)
 
+![協商開始日]
+#NegoStartDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+D(8)
+@C(4,#NegoStartDate,$,A(DATE,0,#NegoStartDate))
+C(5,#TranKey_Tmp,2,$,S)
+V(7)A(DATE,0,#NegoStartDate)
 
-
-#RcDateA25=D,8,S
-D(7,2,#RcDate,0,25)
-
-#RcDateA25X=D,7,S
-T(1,#RcDateA25,2,7)
-
-#CheckNegoStartDate=X,1,S
-IF(#NegoStartDate!=0,S,$)
-E(0,@NegoStartDate,#RcDateA25X)
+![非金融機構債權金額]
+#NonFinClaimAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
 
 ![停催日期]
 #ScDate=D,7,I
@@ -211,28 +212,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)
 @V(7)
-IF(#ScDate!=0,$,s)
-A(DATE,0,#ScDate)
-
-![協商開始日]
-#NegoStartDate=D,7,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-D(8)
-@A(DATE,0,#NegoStartDate)
-
-#TmpNegoStartDate=A,7,S
-E(0,#NegoStartDate)
-
-#TmpScDate=A,7,S
-E(0,#ScDate)
-IF(#TmpScDate<#TmpNegoStartDate,s,V(P,停催日期需小於協商開始日))
-
-
-![非金融機構債權金額]
-#NonFinClaimAmt=M,9,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
+C(4,#ScDate,$,A(DATE,0,#ScDate))
+C(4,#NegoStartDate,$,IF(#ScDate > #NegoStartDate,V(P,停催日不可大於協商開始日),$))
 
 ![轉出JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

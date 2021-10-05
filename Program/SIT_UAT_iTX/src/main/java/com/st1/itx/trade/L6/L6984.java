@@ -162,7 +162,7 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo()); // 預約序號
 				occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額
-				occursList.putParam("OORelNo", titaVo.getParam("KINBR") + tTxToDoDetail.getTitaTlrNo()
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()
 						+ parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8)); // 登放序號
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
@@ -239,6 +239,14 @@ public class L6984 extends TradeBuffer {
 		if (cnt == 0) {
 			throw new LogicException(titaVo, "E0001", "預約撥款到期作業"); // 查詢資料不存在
 		}
+
+		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+		if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

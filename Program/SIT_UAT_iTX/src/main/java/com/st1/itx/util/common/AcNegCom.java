@@ -2,6 +2,7 @@ package com.st1.itx.util.common;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -67,9 +68,10 @@ public class AcNegCom extends TradeBuffer {
 		for (AcDetail ac : this.txBuffer.getAcDetailList()) {
 			// 客戶債協暫收款
 			if (ac.getAcctCode().equals("T11") || ac.getAcctCode().equals("T12") || ac.getAcctCode().equals("T13")) {
-				// 債協專戶的匯入款，為一般債權匯入款的戶號 for L3210暫收入帳
+				// 債協專戶的匯入款，為一般債權撥付款 for L3210暫收入帳
 				if ("L3210".equals(titaVo.getTxcd()) && "094".equals(ac.getSumNo())) {
 					updateNegAppr02(ac, titaVo);
+					continue;
 				}
 				// 暫收存入、暫收轉入，產生債協入帳明細
 				if ("L3210".equals(titaVo.getTxcd()) || "L3230".equals(titaVo.getTxcd())) {
@@ -90,29 +92,35 @@ public class AcNegCom extends TradeBuffer {
 
 	/* 更新 NegAppr02一般債權撥付資料檔 */
 	private void updateNegAppr02(AcDetail ac, TitaVo titaVo) throws LogicException {
-		// NegAppr02一般債權撥付資料檔，提兌日 = 入帳日，金額相同，會計日=0
+		// NegAppr02一般債權撥付資料檔，提兌日 = 入帳日，金額相同，會計日=0，檢核成功
 		TempVo tTempVo = new TempVo();
 		tTempVo = tTempVo.getVo(ac.getJsonFields());
 		NegAppr02Id tNegAppr02Id = new NegAppr02Id();
+		if (!"".equals(tTempVo.getParam("BringUpDate"))) {
+			tNegAppr02Id.setBringUpDate(parse.stringToInteger(tTempVo.getParam("BringUpDate"))); // 提兌日
+			tNegAppr02Id.setFinCode(tTempVo.getParam("FinCode")); // 債權機構代號
+			tNegAppr02Id.setTxSeq(tTempVo.getParam("TxSeq")); // 資料檔交易序號
+			NegAppr02 tNegAppr02 = negAppr02Service.holdById(tNegAppr02Id, titaVo);
+			if (tNegAppr02 == null) {
+				throw new LogicException(titaVo, "E0006", " " + "一般債權撥付資料檔 " + tNegAppr02Id); // 鎖定資料時，發生錯誤
+			}
+			// 正常交易更新會計日期、訂正交易會計日期 = 0
+			if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.當日訂正 2.隔日訂正
+				tNegAppr02.setAcDate(this.txBuffer.getTxCom().getTbsdy());
+				tNegAppr02.setTxStatus(1);//已入客戶暫收
+			} else {
+				if (tNegAppr02.getTxStatus() == 2) {//已入帳,不可訂正
+					throw new LogicException(titaVo, "E0007", " " + "一般債權撥付資料檔已入帳不可訂正 " + tNegAppr02Id); // 
+				}
+				tNegAppr02.setAcDate(0);
+				tNegAppr02.setTxStatus(0);
+			}
 
-		tNegAppr02Id.setBringUpDate(parse.stringToInteger(tTempVo.getParam("BringUpDate"))); // 提兌日
-		tNegAppr02Id.setFinCode(tTempVo.getParam("FinCode")); // 債權機構代號
-		tNegAppr02Id.setTxSeq(tTempVo.getParam("TxSeq")); // 資料檔交易序號
-		NegAppr02 tNegAppr02 = negAppr02Service.holdById(tNegAppr02Id, titaVo);
-		if (tNegAppr02 == null) {
-			throw new LogicException(titaVo, "E0006", " " + "一般債權撥付資料檔 " + tNegAppr02Id); // 鎖定資料時，發生錯誤
-		}
-		// 正常交易更新會計日期、訂正交易會計日期 = 0
-		if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.當日訂正 2.隔日訂正
-			tNegAppr02.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		} else {
-			tNegAppr02.setAcDate(0);
-		}
-
-		try {
-			negAppr02Service.update(tNegAppr02);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔 + tNegAppr02Id)"); // 更新資料時，發生錯誤
+			try {
+				negAppr02Service.update(tNegAppr02);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔 + tNegAppr02Id)"); // 更新資料時，發生錯誤
+			}
 		}
 	}
 
@@ -324,27 +332,46 @@ public class AcNegCom extends TradeBuffer {
 	 * @return TempVo
 	 * @throws LogicException LogicException
 	 */
-	public TempVo getNegAppr02CustNo(int entryDate, BigDecimal txAmt, int custNo, TitaVo titaVo) throws LogicException {
+	public List<AcDetail> getNegAppr02CustNo(int entryDate, BigDecimal txAmt, int custNo, TitaVo titaVo)
+			throws LogicException {
 		this.info("NegAppr02 entryDate=" + entryDate + ", txAmt=" + txAmt);
+		BigDecimal appr02Amt = BigDecimal.ZERO;
+		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 		TempVo tTempVo = new TempVo();
-		// NegAppr02一般債權撥付資料檔，提兌日 = 入帳日，金額相同，會計日=0
-		if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
-			Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE,
-					titaVo);
-			if (slNegAppr02 != null) {
+		// NegAppr02一般債權撥付資料檔，提兌日 = 入帳日，金額相同，會計日=0，檢核成功
+		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(entryDate + 19110000, 0, Integer.MAX_VALUE,
+				titaVo);
+		if (slNegAppr02 != null) {
+			for (NegAppr02 tNegAppr02 : slNegAppr02.getContent()) {
+				if ( tNegAppr02.getAcDate() == 0 && ("4001".equals(tNegAppr02.getStatusCode()))) {//須為檢核成功之資料才累加
+					appr02Amt = appr02Amt.add(tNegAppr02.getTxAmt());
+				}
+			}
+			this.info("NegAppr02 txAmt="+txAmt +",appr02Amt="+appr02Amt);
+			if (appr02Amt.compareTo(txAmt) == 0) {
 				for (NegAppr02 tNegAppr02 : slNegAppr02.getContent()) {
-					if (tNegAppr02.getTxAmt().compareTo(txAmt) == 0 && tNegAppr02.getAcDate() == 0) {
+					if ( tNegAppr02.getAcDate() == 0 && "4001".equals(tNegAppr02.getStatusCode())) {
+						AcDetail acDetail = new AcDetail();
+						acDetail.setDbCr("C");
+						acDetail.setSumNo("094"); // 094 :轉債協暫收款
+						acDetail.setAcctCode(getAcctCode(tNegAppr02.getCustNo(), titaVo));
+						acDetail.setCurrencyCode(titaVo.getParam("CurrencyCode"));
+						acDetail.setTxAmt(tNegAppr02.getTxAmt());
+						acDetail.setCustNo(tNegAppr02.getCustNo());
+						acDetail.setSlipNote("一般債權撥付");
 						tTempVo.putParam("BringUpDate", tNegAppr02.getBringUpDate()); // 提兌日
 						tTempVo.putParam("FinCode", tNegAppr02.getFinCode()); // 債權機構代號
 						tTempVo.putParam("TxSeq", tNegAppr02.getTxSeq()); // 資料檔交易序號
 						tTempVo.putParam("NegCustNo", tNegAppr02.getCustNo()); // 債協戶號
 						this.info("NegAppr02 tempVo=" + tTempVo.toString());
-						break;
+						acDetail.setJsonFields(tTempVo.getJsonString()); // for AcNegCom Updae
+						lAcDetail.add(acDetail);
 					}
 				}
+
 			}
 		}
-		return tTempVo;
+		return lAcDetail;
 	}
 
 }

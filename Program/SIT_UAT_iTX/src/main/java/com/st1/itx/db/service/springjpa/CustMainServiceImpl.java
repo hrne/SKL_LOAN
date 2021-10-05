@@ -306,7 +306,7 @@ em = null;
   }
 
   @Override
-  public Slice<CustMain> IndustryCodeAll(String industryCode_0, int index, int limit, TitaVo... titaVo) {
+  public Slice<CustMain> industryCodeAll(String industryCode_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CustMain> slice = null;
     if (titaVo.length != 0)
@@ -317,7 +317,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("IndustryCodeAll " + dbName + " : " + "industryCode_0 : " + industryCode_0);
+    this.info("industryCodeAll " + dbName + " : " + "industryCode_0 : " + industryCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = custMainReposDay.findAllByIndustryCodeIsOrderByCustIdAsc(industryCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))

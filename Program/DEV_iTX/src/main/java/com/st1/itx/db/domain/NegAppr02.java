@@ -29,7 +29,7 @@ public class NegAppr02 implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 4073234137950652283L;
+	private static final long serialVersionUID = -439792206497594600L;
 
 @EmbeddedId
   private NegAppr02Id negAppr02Id;
@@ -83,7 +83,7 @@ public class NegAppr02 implements Serializable {
   private String custId;
 
   // 戶號
-  /* 要在BACHTX01那邊處理寫入 */
+  /* 要在BACHTX03寫入 */
   @Column(name = "`CustNo`")
   private int custNo = 0;
 
@@ -93,7 +93,7 @@ public class NegAppr02 implements Serializable {
   private String statusCode;
 
   // 會計日期
-  /* 會計日期+戶號 對應 NegTrans */
+  /* 做整批入帳連動L3210時寫入 */
   @Column(name = "`AcDate`")
   private int acDate = 0;
 
@@ -106,6 +106,21 @@ public class NegAppr02 implements Serializable {
   /* 0:未入專戶1:已入客戶暫收2:已入帳 */
   @Column(name = "`TxStatus`")
   private int txStatus = 0;
+
+  // 交易檔會計日
+  /* 暫收解入時寫入 */
+  @Column(name = "`NegTransAcDate`")
+  private int negTransAcDate = 0;
+
+  // 交易檔經辦
+  /* 暫收解入時寫入 */
+  @Column(name = "`NegTransTlrNo`", length = 6)
+  private String negTransTlrNo;
+
+  // 交易檔序號
+  /* 暫收解入時寫入 */
+  @Column(name = "`NegTransTxtNo`")
+  private int negTransTxtNo = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -364,7 +379,7 @@ public class NegAppr02 implements Serializable {
 
 /**
 	* 戶號<br>
-	* 要在BACHTX01那邊處理寫入
+	* 要在BACHTX03寫入
 	* @return Integer
 	*/
   public int getCustNo() {
@@ -373,7 +388,7 @@ public class NegAppr02 implements Serializable {
 
 /**
 	* 戶號<br>
-	* 要在BACHTX01那邊處理寫入
+	* 要在BACHTX03寫入
   *
   * @param custNo 戶號
 	*/
@@ -416,7 +431,7 @@ public class NegAppr02 implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 會計日期+戶號 對應 NegTrans
+	* 做整批入帳連動L3210時寫入
 	* @return Integer
 	*/
   public int getAcDate() {
@@ -425,7 +440,7 @@ public class NegAppr02 implements Serializable {
 
 /**
 	* 會計日期<br>
-	* 會計日期+戶號 對應 NegTrans
+	* 做整批入帳連動L3210時寫入
   *
   * @param acDate 會計日期
   * @throws LogicException when Date Is Warn	*/
@@ -481,6 +496,63 @@ public class NegAppr02 implements Serializable {
 	*/
   public void setTxStatus(int txStatus) {
     this.txStatus = txStatus;
+  }
+
+/**
+	* 交易檔會計日<br>
+	* 暫收解入時寫入
+	* @return Integer
+	*/
+  public int getNegTransAcDate() {
+    return StaticTool.bcToRoc(this.negTransAcDate);
+  }
+
+/**
+	* 交易檔會計日<br>
+	* 暫收解入時寫入
+  *
+  * @param negTransAcDate 交易檔會計日
+  * @throws LogicException when Date Is Warn	*/
+  public void setNegTransAcDate(int negTransAcDate) throws LogicException {
+    this.negTransAcDate = StaticTool.rocToBc(negTransAcDate);
+  }
+
+/**
+	* 交易檔經辦<br>
+	* 暫收解入時寫入
+	* @return String
+	*/
+  public String getNegTransTlrNo() {
+    return this.negTransTlrNo == null ? "" : this.negTransTlrNo;
+  }
+
+/**
+	* 交易檔經辦<br>
+	* 暫收解入時寫入
+  *
+  * @param negTransTlrNo 交易檔經辦
+	*/
+  public void setNegTransTlrNo(String negTransTlrNo) {
+    this.negTransTlrNo = negTransTlrNo;
+  }
+
+/**
+	* 交易檔序號<br>
+	* 暫收解入時寫入
+	* @return Integer
+	*/
+  public int getNegTransTxtNo() {
+    return this.negTransTxtNo;
+  }
+
+/**
+	* 交易檔序號<br>
+	* 暫收解入時寫入
+  *
+  * @param negTransTxtNo 交易檔序號
+	*/
+  public void setNegTransTxtNo(int negTransTxtNo) {
+    this.negTransTxtNo = negTransTxtNo;
   }
 
 /**
@@ -564,7 +636,8 @@ public class NegAppr02 implements Serializable {
   public String toString() {
     return "NegAppr02 [negAppr02Id=" + negAppr02Id + ", sendUnit=" + sendUnit + ", recvUnit=" + recvUnit + ", entryDate=" + entryDate
            + ", transCode=" + transCode + ", txAmt=" + txAmt + ", consign=" + consign + ", finIns=" + finIns + ", remitAcct=" + remitAcct + ", custId=" + custId
-           + ", custNo=" + custNo + ", statusCode=" + statusCode + ", acDate=" + acDate + ", txKind=" + txKind + ", txStatus=" + txStatus + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", custNo=" + custNo + ", statusCode=" + statusCode + ", acDate=" + acDate + ", txKind=" + txKind + ", txStatus=" + txStatus + ", negTransAcDate=" + negTransAcDate
+           + ", negTransTlrNo=" + negTransTlrNo + ", negTransTxtNo=" + negTransTxtNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

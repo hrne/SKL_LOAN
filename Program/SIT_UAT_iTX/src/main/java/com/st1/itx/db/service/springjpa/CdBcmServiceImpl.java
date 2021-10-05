@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdBcmService")
 @Repository
-public class CdBcmServiceImpl implements CdBcmService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdBcmServiceImpl.class);
-
+public class CdBcmServiceImpl extends ASpringJpaParm implements CdBcmService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class CdBcmServiceImpl implements CdBcmService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + unitCode);
+    this.info("findById " + dbName + " " + unitCode);
     Optional<CdBcm> cdBcm = null;
     if (dbName.equals(ContentName.onDay))
       cdBcm = cdBcmReposDay.findById(unitCode);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "UnitCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "UnitCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdBcmReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +101,9 @@ em = null;
       slice = cdBcmReposHist.findAll(pageable);
     else 
       slice = cdBcmRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +120,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findDeptCode " + dbName + " : " + "deptCode_0 : " + deptCode_0 + " deptCode_1 : " +  deptCode_1);
+    this.info("findDeptCode " + dbName + " : " + "deptCode_0 : " + deptCode_0 + " deptCode_1 : " +  deptCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdBcmReposDay.findAllByDeptCodeGreaterThanEqualAndDeptCodeLessThanEqualOrderByDeptCodeAsc(deptCode_0, deptCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -130,6 +129,9 @@ em = null;
       slice = cdBcmReposHist.findAllByDeptCodeGreaterThanEqualAndDeptCodeLessThanEqualOrderByDeptCodeAsc(deptCode_0, deptCode_1, pageable);
     else 
       slice = cdBcmRepos.findAllByDeptCodeGreaterThanEqualAndDeptCodeLessThanEqualOrderByDeptCodeAsc(deptCode_0, deptCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -146,7 +148,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findDistCode " + dbName + " : " + "distCode_0 : " + distCode_0 + " distCode_1 : " +  distCode_1);
+    this.info("findDistCode " + dbName + " : " + "distCode_0 : " + distCode_0 + " distCode_1 : " +  distCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdBcmReposDay.findAllByDistCodeGreaterThanEqualAndDistCodeLessThanEqualOrderByDistCodeAsc(distCode_0, distCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -155,6 +157,9 @@ em = null;
       slice = cdBcmReposHist.findAllByDistCodeGreaterThanEqualAndDistCodeLessThanEqualOrderByDistCodeAsc(distCode_0, distCode_1, pageable);
     else 
       slice = cdBcmRepos.findAllByDistCodeGreaterThanEqualAndDistCodeLessThanEqualOrderByDistCodeAsc(distCode_0, distCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -171,7 +176,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findUnitCode " + dbName + " : " + "unitCode_0 : " + unitCode_0 + " unitCode_1 : " +  unitCode_1);
+    this.info("findUnitCode " + dbName + " : " + "unitCode_0 : " + unitCode_0 + " unitCode_1 : " +  unitCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdBcmReposDay.findAllByUnitCodeGreaterThanEqualAndUnitCodeLessThanEqualOrderByUnitCodeAsc(unitCode_0, unitCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
     else 
       slice = cdBcmRepos.findAllByUnitCodeGreaterThanEqualAndUnitCodeLessThanEqualOrderByUnitCodeAsc(unitCode_0, unitCode_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -189,7 +197,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("deptCodeFirst " + dbName + " : " + "deptCode_0 : " + deptCode_0);
+    this.info("deptCodeFirst " + dbName + " : " + "deptCode_0 : " + deptCode_0);
     Optional<CdBcm> cdBcmT = null;
     if (dbName.equals(ContentName.onDay))
       cdBcmT = cdBcmReposDay.findTopByDeptCodeIsOrderByUnitCodeAsc(deptCode_0);
@@ -199,6 +207,7 @@ em = null;
       cdBcmT = cdBcmReposHist.findTopByDeptCodeIsOrderByUnitCodeAsc(deptCode_0);
     else 
       cdBcmT = cdBcmRepos.findTopByDeptCodeIsOrderByUnitCodeAsc(deptCode_0);
+
     return cdBcmT.isPresent() ? cdBcmT.get() : null;
   }
 
@@ -207,7 +216,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("distCodeFirst " + dbName + " : " + "distCode_0 : " + distCode_0);
+    this.info("distCodeFirst " + dbName + " : " + "distCode_0 : " + distCode_0);
     Optional<CdBcm> cdBcmT = null;
     if (dbName.equals(ContentName.onDay))
       cdBcmT = cdBcmReposDay.findTopByDistCodeIsOrderByUnitCodeAsc(distCode_0);
@@ -217,6 +226,7 @@ em = null;
       cdBcmT = cdBcmReposHist.findTopByDistCodeIsOrderByUnitCodeAsc(distCode_0);
     else 
       cdBcmT = cdBcmRepos.findTopByDistCodeIsOrderByUnitCodeAsc(distCode_0);
+
     return cdBcmT.isPresent() ? cdBcmT.get() : null;
   }
 
@@ -232,7 +242,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findUnitManager " + dbName + " : " + "unitManager_0 : " + unitManager_0);
+    this.info("findUnitManager " + dbName + " : " + "unitManager_0 : " + unitManager_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdBcmReposDay.findAllByUnitManagerIs(unitManager_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -241,6 +251,9 @@ em = null;
       slice = cdBcmReposHist.findAllByUnitManagerIs(unitManager_0, pageable);
     else 
       slice = cdBcmRepos.findAllByUnitManagerIs(unitManager_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -257,7 +270,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findDeptManager " + dbName + " : " + "deptManager_0 : " + deptManager_0);
+    this.info("findDeptManager " + dbName + " : " + "deptManager_0 : " + deptManager_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdBcmReposDay.findAllByDeptManagerIs(deptManager_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -266,6 +279,9 @@ em = null;
       slice = cdBcmReposHist.findAllByDeptManagerIs(deptManager_0, pageable);
     else 
       slice = cdBcmRepos.findAllByDeptManagerIs(deptManager_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -282,7 +298,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findDistManager " + dbName + " : " + "distManager_0 : " + distManager_0);
+    this.info("findDistManager " + dbName + " : " + "distManager_0 : " + distManager_0);
     if (dbName.equals(ContentName.onDay))
       slice = cdBcmReposDay.findAllByDistManagerIs(distManager_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -292,6 +308,9 @@ em = null;
     else 
       slice = cdBcmRepos.findAllByDistManagerIs(distManager_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -300,7 +319,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + unitCode);
+    this.info("Hold " + dbName + " " + unitCode);
     Optional<CdBcm> cdBcm = null;
     if (dbName.equals(ContentName.onDay))
       cdBcm = cdBcmReposDay.findByUnitCode(unitCode);
@@ -318,7 +337,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBcm.getUnitCode());
+    this.info("Hold " + dbName + " " + cdBcm.getUnitCode());
     Optional<CdBcm> cdBcmT = null;
     if (dbName.equals(ContentName.onDay))
       cdBcmT = cdBcmReposDay.findByUnitCode(cdBcm.getUnitCode());
@@ -340,7 +359,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdBcm.getUnitCode());
+    this.info("Insert..." + dbName + " " + cdBcm.getUnitCode());
     if (this.findById(cdBcm.getUnitCode()) != null)
       throw new DBException(2);
 
@@ -369,7 +388,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdBcm.getUnitCode());
+    this.info("Update..." + dbName + " " + cdBcm.getUnitCode());
     if (!empNot.isEmpty())
       cdBcm.setLastUpdateEmpNo(empNot);
 
@@ -392,7 +411,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdBcm.getUnitCode());
+    this.info("Update..." + dbName + " " + cdBcm.getUnitCode());
     if (!empNot.isEmpty())
       cdBcm.setLastUpdateEmpNo(empNot);
 
@@ -412,7 +431,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdBcm.getUnitCode());
+    this.info("Delete..." + dbName + " " + cdBcm.getUnitCode());
     if (dbName.equals(ContentName.onDay)) {
       cdBcmReposDay.delete(cdBcm);	
       cdBcmReposDay.flush();
@@ -441,7 +460,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdBcm t : cdBcm){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -476,7 +495,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdBcm == null || cdBcm.size() == 0)
       throw new DBException(6);
 
@@ -505,7 +524,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdBcm> cdBcm, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

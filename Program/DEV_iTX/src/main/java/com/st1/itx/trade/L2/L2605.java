@@ -106,6 +106,16 @@ public class L2605 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
+	private static int consiz = 0;
+	// 法拍費總計
+	private static BigDecimal fee = BigDecimal.ZERO;
+	// 催收法拍費總計
+	private static BigDecimal overdueFee = BigDecimal.ZERO;
+	// 同額度法拍費
+	private static BigDecimal facmFee = BigDecimal.ZERO;
+	// 同額度催收法拍費
+	private static BigDecimal facmOverdueFee = BigDecimal.ZERO;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2605 ");
@@ -117,7 +127,7 @@ public class L2605 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 100;
+		this.limit = 1;
 
 		// tita
 		// 收件迄日
@@ -138,6 +148,7 @@ public class L2605 extends TradeBuffer {
 		CustMain tCustMain;
 		CdCity tCdCity;
 
+				
 		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDatecloseZero(iReceiveDateStart, iReceiveDate, 0,this.index, this.limit);
 		List<ForeclosureFee> lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		
@@ -146,18 +157,10 @@ public class L2605 extends TradeBuffer {
 			throw new LogicException("E0001", "L2605該收件迄日在法拍費用檔無資料");
 		}
 
-		// 法拍費總計
-		BigDecimal fee = BigDecimal.ZERO;
-		// 催收法拍費總計
-		BigDecimal overdueFee = BigDecimal.ZERO;
+		
 		int listsize = lForeclosureFee.size();
-		// 同額度法拍費
-		BigDecimal facmFee = BigDecimal.ZERO;
-		// 同額度催收法拍費
-		BigDecimal facmOverdueFee = BigDecimal.ZERO;
 
 		this.info("listsize = " + listsize);
-		int consiz = 0;
 		for (int i = 0; i < listsize; i++) {
 			// 本筆
 			ForeclosureFee tmpFF = lForeclosureFee.get(i);
@@ -290,26 +293,21 @@ public class L2605 extends TradeBuffer {
 				facmFee = BigDecimal.ZERO;
 				facmOverdueFee = BigDecimal.ZERO;
 			} // if
-		} // for
+		} // for		
+		
+//		// Header資料
+		this.totaVo.putParam("OCnt", ""+consiz);
+		this.totaVo.putParam("OFee", ""+fee);
+		this.totaVo.putParam("OOverFee", ""+overdueFee);
+		this.totaVo.putParam("OFeeAmt", ""+fee.add(overdueFee));
 
-		
-		
 		if (lForeclosureFee.size() == this.limit && slForeclosureFee.hasNext()) {
 			 titaVo.setReturnIndex(this.setIndexNext());
+			 
 				/* 手動折返 */
 			 this.totaVo.setMsgEndToEnter();
 		}
 		
-//		if( consiz == 0 ) {
-//			throw new LogicException("E0001", "L2605該收件迄日在法拍費用檔無資料");
-//		}
-		
-		// Header資料
-		this.totaVo.putParam("OCnt", consiz);
-		this.totaVo.putParam("OFee", fee);
-		this.totaVo.putParam("OOverFee", overdueFee);
-		this.totaVo.putParam("OFeeAmt", fee.add(overdueFee));
-
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

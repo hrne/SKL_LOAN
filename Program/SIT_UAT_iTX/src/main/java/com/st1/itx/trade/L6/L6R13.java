@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -32,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R13 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6R13.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -118,6 +115,7 @@ public class L6R13 extends TradeBuffer {
 		this.totaVo.putParam("L6R13UnitManagerNm", unitManagerNm);
 		this.totaVo.putParam("L6R13DeptManagerNm", deptManagerNm);
 		this.totaVo.putParam("L6R13DistManagerNm", distManagerNm);
+		this.totaVo.putParam("L6R13Enable", mCdBcm.getEnable());
 
 	}
 

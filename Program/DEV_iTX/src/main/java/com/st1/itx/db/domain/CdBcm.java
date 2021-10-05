@@ -26,7 +26,7 @@ public class CdBcm implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -4540562971346089334L;
+	private static final long serialVersionUID = 7932779133216159298L;
 
 // 單位代號
   /* 10H200:放款審查課10H400:放款服務課10H600:放款管理課10H900:放款推展課10HC00:北部區域中心10HJ00:中部區域中心10HL00:南部區域中心 */
@@ -75,6 +75,11 @@ public class CdBcm implements Serializable {
   // 區部名稱簡寫
   @Column(name = "`ShortDistItem`", length = 6)
   private String shortDistItem;
+
+  // 啟用記號
+  /* Y:啟用 , N:未啟用 */
+  @Column(name = "`Enable`", length = 1)
+  private String enable;
 
   // 建檔日期時間
   @CreatedDate
@@ -335,6 +340,25 @@ public class CdBcm implements Serializable {
   }
 
 /**
+	* 啟用記號<br>
+	* Y:啟用 , N:未啟用
+	* @return String
+	*/
+  public String getEnable() {
+    return this.enable == null ? "" : this.enable;
+  }
+
+/**
+	* 啟用記號<br>
+	* Y:啟用 , N:未啟用
+  *
+  * @param enable 啟用記號
+	*/
+  public void setEnable(String enable) {
+    this.enable = enable;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -414,7 +438,7 @@ public class CdBcm implements Serializable {
   @Override
   public String toString() {
     return "CdBcm [unitCode=" + unitCode + ", unitItem=" + unitItem + ", deptCode=" + deptCode + ", deptItem=" + deptItem + ", distCode=" + distCode + ", distItem=" + distItem
-           + ", unitManager=" + unitManager + ", deptManager=" + deptManager + ", distManager=" + distManager + ", shortDeptItem=" + shortDeptItem + ", shortDistItem=" + shortDistItem + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", unitManager=" + unitManager + ", deptManager=" + deptManager + ", distManager=" + distManager + ", shortDeptItem=" + shortDeptItem + ", shortDistItem=" + shortDistItem + ", enable=" + enable
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

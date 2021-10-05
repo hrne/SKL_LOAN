@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R13 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R13.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -116,6 +115,7 @@ public class L6R13 extends TradeBuffer {
 		this.totaVo.putParam("L6R13UnitManagerNm", unitManagerNm);
 		this.totaVo.putParam("L6R13DeptManagerNm", deptManagerNm);
 		this.totaVo.putParam("L6R13DistManagerNm", distManagerNm);
+		this.totaVo.putParam("L6R13Enable", mCdBcm.getEnable());
 
 	}
 

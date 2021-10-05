@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -33,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6981 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6981.class);
 
 	@Autowired
 	public Parse parse;
@@ -57,7 +54,7 @@ public class L6981 extends TradeBuffer {
 	int ovduDay = 0; // 逾期日期-日
 	private TempVo tTempVo = new TempVo();
 	private int cnt = 0;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6981 ");
@@ -131,14 +128,17 @@ public class L6981 extends TradeBuffer {
 					continue;
 				}
 
-
 				CustMain tCustMain = new CustMain();
 				tCustMain = sCustMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo(), titaVo);
 
 				occursList.putParam("OOProcStatus", tTxToDoDetail.getStatus());
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
-				occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+				if (tCustMain != null) {
+					occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+				} else {
+					occursList.putParam("OOCustName", ""); // 戶名
+				}
 				tTempVo = tTempVo.getVo(tTxToDoDetail.getProcessNote());
 				occursList.putParam("OOOvduMonth", tTempVo.get("OvduMonth")); // 逾期日期-月
 				occursList.putParam("OOOvduDay", tTempVo.get("OvduDay")); // 逾期日期-日
@@ -160,11 +160,17 @@ public class L6981 extends TradeBuffer {
 		if (cnt == 0) {
 			throw new LogicException(titaVo, "E0001", "放款轉列催收作業"); // 查詢資料不存在
 		}
-		
+
+		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+		if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
+			titaVo.setReturnIndex(this.setIndexNext());
+			/* 手動折返 */
+			this.totaVo.setMsgEndToEnter();
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 
 	private Boolean selectCodeIsNotQualify(TxToDoDetail tTxToDoDetail) throws LogicException {
 		Boolean result = false;
@@ -184,8 +190,6 @@ public class L6981 extends TradeBuffer {
 		default:
 			break;
 		}
-
-		
 
 		return result;
 	}

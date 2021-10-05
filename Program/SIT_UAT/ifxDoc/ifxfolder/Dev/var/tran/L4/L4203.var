@@ -94,8 +94,8 @@ T(1,@AcctAmtX,#NTXBUF,50,18)
 T(1,@DisacctAmtX,#NTXBUF,68,18)
 T(1,@ProcStsCode,#NTXBUF,86,1)
 T(1,@ProcCode,#NTXBUF,96,5)
-T(1,@ProcDscptCode,#NTXBUF,101,60)
-T(1,@TxSn,#NTXBUF,161,14)
+T(1,@ProcDscptCode,#NTXBUF,101,300)
+T(1,@TxSn,#NTXBUF,305,14)
 INVOKEJS(SHOW,p1,02,02,1)
 
 #RepayAmtX=X,18,S
@@ -208,7 +208,7 @@ T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)
 T(3,)T(H,#ProcCode,#ProcCodeHelp)
 !T(A,#ProcCode,L4DEF,ProcCodeDef,ProcCode,ProcCodeX)
 
-#ProcDscptCode=X,60,L
+#ProcDscptCode=X,4.75,L
 
 !交易序號
 #TxSn=X,14,L

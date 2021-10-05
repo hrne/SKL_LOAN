@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -33,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6983 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6983.class);
 
 	@Autowired
 	public Parse parse;
@@ -82,6 +79,7 @@ public class L6983 extends TradeBuffer {
 		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
 		List<ForeclosureFee> lForeclosureFee = new ArrayList<ForeclosureFee>();
 		Slice<TxToDoDetail> slTxToDoDetail = null;
+		Slice<ForeclosureFee> slForeclosureFee = null;
 //		TRLW00 法務費轉列催收 F07
 
 //		! 1:昨日留存 
@@ -94,8 +92,7 @@ public class L6983 extends TradeBuffer {
 //		! 9:未處理 (按鈕處理)
 		if (custNo > 0) {
 			this.info("custno>0");
-			Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.custNoEq(custNo, this.index, this.limit,
-					titaVo);
+			slForeclosureFee = sForeclosureFeeService.custNoEq(custNo, this.index, this.limit, titaVo);
 			lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 			if (lForeclosureFee == null) {
 				throw new LogicException("E0001", "法拍費用檔");
@@ -117,7 +114,13 @@ public class L6983 extends TradeBuffer {
 					occursList.putParam("OOProcStatus", 0);
 					occursList.putParam("OOCustNo", tmpForeclosureFee.getCustNo());
 					occursList.putParam("OOFacmNo", tmpForeclosureFee.getFacmNo());
-					occursList.putParam("OOCustName", tCustMain.getCustName());
+					if (tCustMain != null) {
+
+						occursList.putParam("OOCustName", tCustMain.getCustName());
+					} else {
+
+						occursList.putParam("OOCustName", "");
+					}
 					occursList.putParam("OOEntryDate", tmpForeclosureFee.getDocDate()); // 入帳日期
 					occursList.putParam("OOFee", tmpForeclosureFee.getFee()); // 法拍費用
 					occursList.putParam("OOFeeCode", tmpForeclosureFee.getFeeCode()); // 科目名稱代號
@@ -126,7 +129,7 @@ public class L6983 extends TradeBuffer {
 					occursList.putParam("OORelNo", "");
 					occursList.putParam("OOItemCode", "TRLW00");
 					occursList.putParam("OOBormNo", "");
-					occursList.putParam("OODtlValue", parse.IntegerToString(tmpForeclosureFee.getRecordNo(),7));// 銷帳編號
+					occursList.putParam("OODtlValue", parse.IntegerToString(tmpForeclosureFee.getRecordNo(), 7));// 銷帳編號
 					cnt++;
 
 					this.totaVo.addOccursList(occursList);
@@ -208,6 +211,22 @@ public class L6983 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "法拍費用檔"); // 查詢資料不存在
 		}
 
+		if (custNo > 0) {
+			// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+			if (slForeclosureFee != null && slForeclosureFee.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
+		} else {
+			// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+			if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -243,7 +262,6 @@ public class L6983 extends TradeBuffer {
 				result = true;
 			}
 		}
-
 
 		return result;
 	}

@@ -403,13 +403,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findByCustNoCaseSeq " + dbName + " : " + "custNo_0 : " + custNo_0 + " caseSeq_1 : " +  caseSeq_1 + " exportDate_2 : " +  exportDate_2);
     if (dbName.equals(ContentName.onDay))
-      slice = negAppr01ReposDay.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDescFinCodeAsc(custNo_0, caseSeq_1, exportDate_2, pageable);
+      slice = negAppr01ReposDay.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByFinCodeAscCreateDateDesc(custNo_0, caseSeq_1, exportDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = negAppr01ReposMon.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDescFinCodeAsc(custNo_0, caseSeq_1, exportDate_2, pageable);
+      slice = negAppr01ReposMon.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByFinCodeAscCreateDateDesc(custNo_0, caseSeq_1, exportDate_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = negAppr01ReposHist.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDescFinCodeAsc(custNo_0, caseSeq_1, exportDate_2, pageable);
+      slice = negAppr01ReposHist.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByFinCodeAscCreateDateDesc(custNo_0, caseSeq_1, exportDate_2, pageable);
     else 
-      slice = negAppr01Repos.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByCreateDateDescFinCodeAsc(custNo_0, caseSeq_1, exportDate_2, pageable);
+      slice = negAppr01Repos.findAllByCustNoIsAndCaseSeqIsAndExportDateIsOrderByFinCodeAscCreateDateDesc(custNo_0, caseSeq_1, exportDate_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

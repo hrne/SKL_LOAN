@@ -281,11 +281,10 @@ T(H,@OORepayBankLogX,#OORepayBankLog,#BankCdHelp)
 #OODeleteDate=D,7,O
 #OOButtenFlagA=A,1,O
 #OOTitaTxCd=X,5,O
-ALERT(#OOTitaTxCd)
 
 #OOTitaTxType=X,2,S
+C(4,#OOTitaTxCd,S,$)
 T(1,#OOTitaTxCd,1,2)
-ALERT(#OOTitaTxType)
 
 
 ! #OOBUF_CREAT=X,1,S

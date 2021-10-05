@@ -37,7 +37,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6982 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6982.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -181,17 +180,28 @@ public class L6982 extends TradeBuffer {
 						tTxToDoDetail.getDtlValue().trim(), titaVo);
 
 				occursList.putParam("OOProcStatus", tTxToDoDetail.getStatus());
-				occursList.putParam("OOFireInsuMonth", tIsuRenew.getInsuYearMonth() - 191100);
+				if (tIsuRenew != null) {
+					occursList.putParam("OOFireInsuMonth", tIsuRenew.getInsuYearMonth() - 191100);
+					occursList.putParam("OOColNo",
+							tIsuRenew.getClCode1() + "-" + tIsuRenew.getClCode2() + "-" + tIsuRenew.getClNo());
+					occursList.putParam("OOInsuNo", tIsuRenew.getPrevInsuNo());
+					occursList.putParam("OOInsuFireFee", tIsuRenew.getFireInsuPrem());
+					occursList.putParam("OOEthqInsuFee", tIsuRenew.getEthqInsuPrem());
+					occursList.putParam("OOInsuStartDate", tIsuRenew.getInsuStartDate());
+					occursList.putParam("OOInsuEndDate", tIsuRenew.getInsuEndDate());
+					occursList.putParam("OOTransCollAmt", tIsuRenew.getTotInsuPrem());
+				} else {
+					occursList.putParam("OOFireInsuMonth", 0);
+					occursList.putParam("OOColNo", "");
+					occursList.putParam("OOInsuNo", "");
+					occursList.putParam("OOInsuFireFee", 0);
+					occursList.putParam("OOEthqInsuFee", 0);
+					occursList.putParam("OOInsuStartDate", 0);
+					occursList.putParam("OOInsuEndDate", 0);
+					occursList.putParam("OOTransCollAmt", 0);
+				}
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
-				occursList.putParam("OOColNo",
-						tIsuRenew.getClCode1() + "-" + tIsuRenew.getClCode2() + "-" + tIsuRenew.getClNo());
-				occursList.putParam("OOInsuNo", tIsuRenew.getPrevInsuNo());
-				occursList.putParam("OOInsuFireFee", tIsuRenew.getFireInsuPrem());
-				occursList.putParam("OOEthqInsuFee", tIsuRenew.getEthqInsuPrem());
-				occursList.putParam("OOInsuStartDate", tIsuRenew.getInsuStartDate());
-				occursList.putParam("OOInsuEndDate", tIsuRenew.getInsuEndDate());
-				occursList.putParam("OOTransCollAmt", tIsuRenew.getTotInsuPrem());
 				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
 						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
@@ -204,6 +214,23 @@ public class L6982 extends TradeBuffer {
 		if (cnt == 0) {
 			throw new LogicException(titaVo, "E0001", "火險單續保檔"); // 查詢資料不存在
 		}
+
+		if (custNo > 0) {
+			// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+			if (slInsuRenew != null && slInsuRenew.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
+		} else {
+			// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
+			if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
+		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -232,7 +259,6 @@ public class L6982 extends TradeBuffer {
 				result = true;
 			}
 		}
-
 
 		return result;
 	}

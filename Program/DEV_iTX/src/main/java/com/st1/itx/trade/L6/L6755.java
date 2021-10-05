@@ -32,7 +32,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6755 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6755.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -121,7 +120,8 @@ public class L6755 extends TradeBuffer {
 		mCdBcm.setUnitManager(titaVo.getParam("UnitManager"));
 		mCdBcm.setDeptManager(titaVo.getParam("DeptManager"));
 		mCdBcm.setDistManager(titaVo.getParam("DistManager"));
-
+		mCdBcm.setEnable(titaVo.getParam("Enable"));
+		
 		if (mFuncCode != 2) {
 			mCdBcm.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mCdBcm.setCreateEmpNo(titaVo.getTlrNo());

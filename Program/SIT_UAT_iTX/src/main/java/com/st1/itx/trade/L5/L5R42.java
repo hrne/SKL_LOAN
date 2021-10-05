@@ -97,22 +97,6 @@ public class L5R42 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 200;// 查全部 Integer.MAX_VALUE
 
-		Slice<NegAppr01> slNegAppr01 = null;
-	
-		
-			
-		slNegAppr01 = sNegAppr01Service.findByCustNoCaseSeq(iCustNo, iCaseSeq, 0, this.index, this.limit, titaVo);
-			
-		
-		List<NegAppr01> lNegAppr01 = slNegAppr01 == null ? null : slNegAppr01.getContent();
-
-		if (lNegAppr01 != null && lNegAppr01.size() >= this.limit) {
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			titaVo.setReturnIndex(this.setIndexNext());
-			// this.totaVo.setMsgEndToAuto();// 自動折返
-			this.totaVo.setMsgEndToEnter();// 手動折返
-		}
-		
 		for(int i=1; i<=30; i++) {
 			totaVo.putParam("L5R42FinCode"+i, "");
 			totaVo.putParam("L5R42FinCodeName"+i, "");
@@ -120,6 +104,9 @@ public class L5R42 extends TradeBuffer {
 			totaVo.putParam("L5R42AccuApprAmt"+i,0);
 		}
 		
+		 Slice<NegAppr01> slNegAppr01 = sNegAppr01Service.findByCustNoCaseSeq(iCustNo, iCaseSeq, 0, this.index, this.limit, titaVo);
+		List<NegAppr01> lNegAppr01 = slNegAppr01 == null ? null : slNegAppr01.getContent();
+
 		if(lNegAppr01==null) {
 			throw new LogicException(titaVo, "E0001", "最大債權撥付資料檔");
 		}

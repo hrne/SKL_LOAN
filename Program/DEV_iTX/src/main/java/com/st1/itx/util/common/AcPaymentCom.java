@@ -192,6 +192,10 @@ public class AcPaymentCom extends TradeBuffer {
 				acDetail.setAcSubCode(rpAcCode.substring(11, 16));
 				acDetail.setAcDtlCode(rpAcCode.substring(16, 18));
 			}
+			if ("2".equals(RpFlag)) {
+				moveTitaToTempVo(i, titaVo); // 匯款資料
+				acDetail.setJsonFields(tTempVo.getJsonString());
+			}
 		}
 
 		// 銷帳編號
@@ -286,6 +290,17 @@ public class AcPaymentCom extends TradeBuffer {
 		acDetail.setFacmNo(parse.stringToInteger(titaVo.getParam("OverRpFacmNo")));
 
 		acDetailList.add(acDetail);
+	}
+
+	/* 匯款內容 */
+	private void moveTitaToTempVo(int i, TitaVo titaVo) throws LogicException {
+		tTempVo.clear();
+		tTempVo.putParam("DrawdownCode", titaVo.getParam("RpCode" + i));
+		tTempVo.putParam("RemitBank", titaVo.getParam("RpRemitBank" + i));
+		tTempVo.putParam("RemitBranch", titaVo.getParam("RpRemitBranch" + i));
+		tTempVo.putParam("RemitAcctNo", titaVo.getParam("RpRemitAcctNo" + i));
+		tTempVo.putParam("CustName", titaVo.getParam("RpCustName" + i));
+		tTempVo.putParam("Remark", titaVo.getParam("RpRemark" + i));
 	}
 
 	/**

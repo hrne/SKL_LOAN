@@ -8054,6 +8054,7 @@ TXFORM=L6R12
 #L6R13UnitManagerNm=X,40,S
 #L6R13DeptManagerNm=X,40,S
 #L6R13DistManagerNm=X,40,S
+#L6R13Enable=X,1,S
 </L6R13.dec>
 
 <L6R13.tom>
@@ -8070,6 +8071,7 @@ TXFORM=L6R13
 #L6R13UnitManagerNm
 #L6R13DeptManagerNm
 #L6R13DistManagerNm
+#L6R13Enable
 ^
 </L6R13.tom>
 

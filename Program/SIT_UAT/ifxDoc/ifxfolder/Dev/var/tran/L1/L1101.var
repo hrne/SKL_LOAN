@@ -609,10 +609,10 @@ C(3,#FunCd,5,s,$)
 C(4,#CustTypeCode,T(3,00),$)
 HELP(#CustTypeCodeHelp)
 @
-IF(#FdCustTypeCode=="*",$,s)
-V(H,#CustTypeCodeHelp)
+IF(#FdCustTypeCode=="*",V(7)V(H,#CustTypeCodeHelp),C(4,#CustTypeCode,$,V(H,#CustTypeCodeHelp)))
 
 #CustTypeCodeX=X,10,L
+C(4,#CustTypeCode,S,$)
 T(H,#CustTypeCode,#CustTypeCodeHelp)
 
 #t1=X,1,S
