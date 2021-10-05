@@ -93,7 +93,7 @@ IF(#FinCode{i} !="",INVOKEJS(SHOW,grd1,{i},{i},1),INVOKEJS(SHOW,grd1,{i},30,0))
 
 ##loop {times:30,i:1}
 
-#FinCode{i}=X,3,L
+#FinCode{i}=X,8,L
 
 #FinCodeName{i}=X,60,L
 

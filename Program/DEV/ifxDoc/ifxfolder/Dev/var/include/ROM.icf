@@ -6045,7 +6045,7 @@ TXFORM=L5R41
 #L5R42TlrNo=X,6,S
 #L5R42TxtNo=N,8,S
 ##loop {times:30,i:1}
-#L5R42FinCode{i}=X,3,S
+#L5R42FinCode{i}=X,8,S
 #L5R42FinCodeName{i}=X,100,S
 #L5R42ApprAmt{i}=m,14,S
 #L5R42AccuApprAmt{i}=m,14,S

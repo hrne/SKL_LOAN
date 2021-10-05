@@ -34,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6985 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6985.class);
 
 	@Autowired
 	public Parse parse;
@@ -176,8 +175,7 @@ public class L6985 extends TradeBuffer {
 				occursList.putParam("OOAcctItem", AcctItem); // 科目名稱
 				occursList.putParam("OOAcBookCode", AcBookCode + "/" + AcSubBookCode); // 帳冊別
 				occursList.putParam("OORmk", SlipNote); // 摘要
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
-						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
 
 				occursList.putParam("OODbAmt", TxAmt); // 金額
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());

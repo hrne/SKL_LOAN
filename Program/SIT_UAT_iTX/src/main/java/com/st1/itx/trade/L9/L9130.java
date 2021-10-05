@@ -2,8 +2,6 @@ package com.st1.itx.trade.L9;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import com.st1.itx.util.http.WebClient;
 @Service("L9130")
 @Scope("prototype")
 public class L9130 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L9130.class);
 
 	/* 報表服務注入 */
 	@Autowired
@@ -33,6 +30,13 @@ public class L9130 extends TradeBuffer {
 	/* 報表服務注入 */
 	@Autowired
 	private L9130Report2022 l9130Report2022;
+
+	@Autowired
+	L9131 tranL9131;
+	@Autowired
+	L9132 tranL9132;
+	@Autowired
+	L9133 tranL9133;
 
 	@Autowired
 	WebClient webClient;
@@ -110,6 +114,15 @@ public class L9130 extends TradeBuffer {
 
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
 				"L9130核心傳票媒體檔產生已完成", titaVo);
+
+		tranL9131.run(titaVo);
+
+		tranL9132.run(titaVo);
+
+		String doL9133 = titaVo.getParam("DoL9133");
+		if (doL9133.equals("Y")) {
+			tranL9133.run(titaVo);
+		}
 
 		this.addList(this.totaVo);
 		return this.sendList();

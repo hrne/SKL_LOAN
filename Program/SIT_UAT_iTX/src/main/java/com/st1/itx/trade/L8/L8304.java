@@ -141,25 +141,25 @@ public class L8304 extends TradeBuffer {
 				if (iRcDate < imtxDate25) {// iRcDate協商申請日為民國年
 					throw new LogicException("E0005", "報送日不可大於協商申請日+25.");
 				} // 3 end
+				
+				// extra項<JcicZ053>(D-29之4) start
+				// '53'同意報送例外處理檔案第8欄「是否同意報送例外處理檔案格式」填報'Y'者，方可補報送'42'或'43'檔案格式，否則予以剔退處理
+				Slice<JcicZ053> sJcicZ053 = sJcicZ053Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE,
+						titaVo);
+				if (sJcicZ053 != null) {
+					for (JcicZ053 xJcicZ053 : sJcicZ053) {
+						if (!"Y".equals(xJcicZ053.getAgreeSend())) {
+							throw new LogicException("E0005", "已報送'53'同意報送例外處理檔案，則'53'中「是否同意報送例外處理檔案格式」必須填報'Y'.");
+						}
+					}
+				}// extra項 end
 			}
 
 			// 4 start 第9欄「擔保品類別」代號不可為'00'~'09'.
 			if (Arrays.stream(irCollateralType).anyMatch(iCollateralType::equals)) {
-				throw new LogicException("E0005", "第9欄「擔保品類別」代號不可為'00'~'09'.");
+				throw new LogicException("E0005", "「擔保品類別」代號不可為'00'~'09'.");
 			} // 4 end
-
-			// extra項<JcicZ053>(D-29之4) start
-			// '53'同意報送例外處理檔案第8欄「是否同意報送例外處理檔案格式」填報'Y'者，方可補報送'42'或'43'檔案格式，否則予以剔退處理
-			Slice<JcicZ053> sJcicZ053 = sJcicZ053Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE,
-					titaVo);
-			if (sJcicZ053 != null) {
-				for (JcicZ053 xJcicZ053 : sJcicZ053) {
-					if (!"Y".equals(xJcicZ053.getAgreeSend())) {
-						throw new LogicException("E0005", "已報送'53'同意報送例外處理檔案，則'53'中「是否同意報送例外處理檔案格式」必須填報'Y'.");
-					}
-				}
-			}
-			// extra項 end
+			
 			// 檢核項目 end
 		}
 

@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -30,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R06 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6R06.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,6 +44,13 @@ public class L6R06 extends TradeBuffer {
 		int iRimFuncCode = this.parse.stringToInteger(titaVo.getParam("RimFuncCode"));
 		String iRimTxCode = titaVo.getParam("RimTxCode");
 		String iRimIndustryCode = titaVo.getParam("RimIndustryCode");
+		String iErrCode = titaVo.get("ErrSkip");
+		int sErrCode = 0;
+		if (iErrCode == null) {
+			sErrCode = 0;
+		}else {
+			sErrCode = 1;
+		}
 
 		// 檢查輸入資料
 		if (iRimTxCode.isEmpty()) {
@@ -56,39 +60,33 @@ public class L6R06 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L6R06"); // 功能選擇錯誤
 		}
 
-		// 初始值Tota
-		moveTotaCdIndustry(new CdIndustry());
+
 
 		// 查詢行業別代號資料檔
 		CdIndustry tCdIndustry = sCdIndustryService.findById(iRimIndustryCode, titaVo);
 
 		/* 如有找到資料 */
-		if (tCdIndustry != null) {
+		if (tCdIndustry == null) {
+			if(sErrCode == 1) {
+				totaVo.putParam("L6R06IndustryCode", "");
+				totaVo.putParam("L6R06IndustryItem", "");
+				totaVo.putParam("L6R06MainType", "");
+			}else {
+				throw new LogicException(titaVo, "E0001", "行業別代號資料檔"); // 查無資料
+			}
+		}else {
 			if (iRimTxCode.equals("L6602") && iRimFuncCode == 1) {
 				throw new LogicException(titaVo, "E0002", titaVo.getParam("RimIndustryCode")); // 新增資料已存在
 			} else {
 				/* 將每筆資料放入Tota */
-				moveTotaCdIndustry(tCdIndustry);
-			}
-		} else {
-			if (iRimTxCode.equals("L6602") && iRimFuncCode == 1) {
-				this.addList(this.totaVo);
-				return this.sendList();
-			} else {
-				throw new LogicException(titaVo, "E0001", "行業別代號資料檔"); // 查無資料
+				totaVo.putParam("L6R06IndustryCode", tCdIndustry.getIndustryCode());
+				totaVo.putParam("L6R06IndustryItem", tCdIndustry.getIndustryItem());
+				totaVo.putParam("L6R06MainType", tCdIndustry.getMainType());
 			}
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	// 將每筆資料放入Tota
-	// 行業別代號資料檔
-	private void moveTotaCdIndustry(CdIndustry mCdIndustry) throws LogicException {
-		this.totaVo.putParam("L6R06IndustryCode", mCdIndustry.getIndustryCode());
-		this.totaVo.putParam("L6R06IndustryItem", mCdIndustry.getIndustryItem());
-		this.totaVo.putParam("L6R06MainType", mCdIndustry.getMainType());
 	}
 
 }

@@ -55,6 +55,10 @@ public class LM052Report extends MakeReport {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
+		
+		calMonthDate.set(iYear, iMonth - 1, 0);
+
+		int lyymm = (Integer.valueOf(dateFormat.format(calMonthDate.getTime()))-19110000)/100 ;
 
 		this.info("LM052Report exportExcel");
 
@@ -66,7 +70,7 @@ public class LM052Report extends MakeReport {
 		formTitle = (iYear - 1911) + "年 " + String.format("%02d", iMonth) + "    放款資產品質分類";
 		makeExcel.setValue(1, 1, formTitle);
 
-		formTitle = (iYear - 1911) + String.format("%02d", iMonth) + "\n" + "放款總額";
+		formTitle = lyymm + "\n" + "放款總額";
 		makeExcel.setValue(15, 3, formTitle, "C");
 
 		List<Map<String, String>> lM052List = null;
@@ -132,7 +136,7 @@ public class LM052Report extends MakeReport {
 					
 					col = tLDVo.get("F1").equals("00A") ? 3:
 						  tLDVo.get("F1").equals("201") ? 4:
-						  tLDVo.get("F0").equals("6") && tLDVo.get("F1").equals("999") ? 6 : 13;
+						  tLDVo.get("F0").equals("6") && tLDVo.get("F1").equals("999") ? 6 : 12;
 					
 					
 					
@@ -141,13 +145,13 @@ public class LM052Report extends MakeReport {
 					break;
 				case 2:
 
-						row = tLDVo.get("F0").equals("1") ? 4 : 
-							  tLDVo.get("F0").equals("21") ? 5 :
-							  tLDVo.get("F0").equals("22") ? 6 :
-							  tLDVo.get("F0").equals("23") ? 7 :
-							  tLDVo.get("F0").equals("3") ? 8 :
-							  tLDVo.get("F0").equals("4") ? 9 :
-							  tLDVo.get("F0").equals("5") ? 10 : 11;			  
+						row = tLDVo.get("F0").equals("1") ? 17 : 
+							  tLDVo.get("F0").equals("21") ? 18 :
+							  tLDVo.get("F0").equals("22") ? 19 :
+							  tLDVo.get("F0").equals("23") ? 20 :
+							  tLDVo.get("F0").equals("3") ? 21 :
+							  tLDVo.get("F0").equals("4") ? 22 :
+							  tLDVo.get("F0").equals("5") ? 23 : 24;			  
 						
 						col = 3 ;
 						
@@ -208,6 +212,9 @@ public class LM052Report extends MakeReport {
 				makeExcel.formulaCaculate(r,6);				
 			}
 			
+			//F13
+			makeExcel.formulaCaculate(13,6);				
+			
 			//J4~M13 M14
 			for(int r = 4 ;r<=13; r++) {
 				for(int c = 10;c<=13;c++) {					
@@ -241,6 +248,14 @@ public class LM052Report extends MakeReport {
 			
 			//B30
 			makeExcel.formulaCaculate(30,2);
+			//set hieght
+			
+			for(int r = 4 ; r <= 13 ; r++) {
+			
+				makeExcel.setHeight(r, 40);	
+			}
+			
+		
 		}
 
 	}

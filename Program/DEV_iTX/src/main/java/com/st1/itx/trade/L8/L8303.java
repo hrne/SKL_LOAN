@@ -158,6 +158,18 @@ public class L8303 extends TradeBuffer {
 				if (iDays25 > (iRcDate + 19110000)) {// iRcDate協商申請日為民國年
 					throw new LogicException("E0005", "報送日不可大於協商申請日+25");
 				} // 3 end
+				
+				// extra項<JcicZ053>(D-29之4) start
+				// '53'同意報送例外處理檔案第8欄「是否同意報送例外處理檔案格式」填報'Y'者，方可補報送'42'或'43'檔案格式，否則予以剔退處理
+				Slice<JcicZ053> sJcicZ053 = sJcicZ053Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE,
+						titaVo);
+				if (sJcicZ053 != null) {
+					for (JcicZ053 xJcicZ053 : sJcicZ053) {
+						if (!"Y".equals(xJcicZ053.getAgreeSend())) {
+							throw new LogicException("E0005", "已報送'53'同意報送例外處理檔案，則'53'中「是否同意報送例外處理檔案格式」必須填報'Y'.");
+						}
+					}
+				}// extra項 end	
 			}
 
 			// 4 start 本金融機構債務人必須填報'45':回報是否同意債務清償方案資料
@@ -203,19 +215,6 @@ public class L8303 extends TradeBuffer {
 			if (iCivil323CreditAmt != iCreditCardPrin + iCreditCardInte + iCreditCardPena + iCreditCardOther) {
 				throw new LogicException("E0005", "信用卡本金、利息、違約金、其他費用合計應等於「依民法第323條計算之信用卡本息餘額」.");
 			} // 10 end
-
-			// extra項<JcicZ053>(D-29之4) start
-			// '53'同意報送例外處理檔案第8欄「是否同意報送例外處理檔案格式」填報'Y'者，方可補報送'42'或'43'檔案格式，否則予以剔退處理
-			Slice<JcicZ053> sJcicZ053 = sJcicZ053Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE,
-					titaVo);
-			if (sJcicZ053 != null) {
-				for (JcicZ053 xJcicZ053 : sJcicZ053) {
-					if (!"Y".equals(xJcicZ053.getAgreeSend())) {
-						throw new LogicException("E0005", "已報送'53'同意報送例外處理檔案，則'53'中「是否同意報送例外處理檔案格式」必須填報'Y'.");
-					}
-				}
-			}
-			// extra項 end
 
 			// 檢核項目 end
 		}

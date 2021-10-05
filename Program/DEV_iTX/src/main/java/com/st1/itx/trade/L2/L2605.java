@@ -289,8 +289,8 @@ public class L2605 extends TradeBuffer {
 				// 因為下筆資料不同,將同額度法拍費用及同額度催收法拍費用歸零
 				facmFee = BigDecimal.ZERO;
 				facmOverdueFee = BigDecimal.ZERO;
-			}
-		}
+			} // if
+		} // for
 
 		
 		
