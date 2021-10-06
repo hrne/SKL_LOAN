@@ -124,7 +124,7 @@ public class L8302 extends TradeBuffer {
 				if(jJcicZ041 != null) {
 					int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// today(本檔案報送日 西元年)
 					if(txDate >= (TimestampToDate(jJcicZ041.getCreateDate()) + 24)) {
-						throw new LogicException("E0005", "異動時，協商開始日和停催日必須有值");						
+						throw new LogicException("E0007", "異動時，協商開始日和停催日必須有值");						
 					}
 				}
 			} // 3.2 end

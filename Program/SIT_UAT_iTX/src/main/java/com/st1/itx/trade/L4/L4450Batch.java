@@ -604,9 +604,13 @@ public class L4450Batch extends TradeBuffer {
 			tBankDeductDtlId.setPayIntDate(tmp.getPayIntDate());
 			tBankDeductDtlId.setRepayType(tmp.getRepayType());
 
+			tBankDeductDtl.setBankDeductDtlId(tBankDeductDtlId);
+			tBankDeductDtl.setEntryDate(iEntryDate);
 			tBankDeductDtl.setCustNo(tmp.getCustNo());
 			tBankDeductDtl.setFacmNo(tmp.getFacmNo());
-			tBankDeductDtl.setBankDeductDtlId(tBankDeductDtlId);
+			tBankDeductDtl.setBormNo(tmp.getBormNo());
+			tBankDeductDtl.setPayIntDate(tmp.getPayIntDate());
+			tBankDeductDtl.setRepayType(tmp.getRepayType());
 
 			String sAcctCode = "";
 			if ("".equals(rpAcCodeMap.get(tmp).trim())) {
@@ -615,6 +619,7 @@ public class L4450Batch extends TradeBuffer {
 				sAcctCode = rpAcCodeMap.get(tmp);
 			}
 
+			
 			tBankDeductDtl.setAcctCode(sAcctCode);
 			tBankDeductDtl.setPrevIntDate(minIntStartDate.get(tmp));
 

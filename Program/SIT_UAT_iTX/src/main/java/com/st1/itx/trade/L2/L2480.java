@@ -86,6 +86,8 @@ public class L2480 extends TradeBuffer {
 	public DataLog dataLog;
 	BigDecimal shareTotal = BigDecimal.ZERO;
 
+	String wkWarningMsg = "";
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2480 ");
@@ -209,7 +211,6 @@ public class L2480 extends TradeBuffer {
 			tClImm.setEvaNetWorth(parse.stringToBigDecimal(titaVo.getParam("EvaNetWorth")));
 			// 出租評估淨值
 			tClImm.setRentEvaValue(parse.stringToBigDecimal(titaVo.getParam("RentEvaValue")));
-			;
 
 			try {
 				tClImm = sClImmService.update(tClImm);
@@ -317,6 +318,7 @@ public class L2480 extends TradeBuffer {
 
 		}
 
+		this.totaVo.putParam("OWarningMsg", wkWarningMsg);
 		this.totaVo.putParam("OEvaNo", oEvaNo);
 
 		this.addList(this.totaVo);
@@ -380,10 +382,9 @@ public class L2480 extends TradeBuffer {
 		wkAvailable = loanAvailableAmt.checkClAvailable(iClCode1, iClCode2, iClNo, shareTotal, titaVo); // 可用額度
 
 		if (wkAvailable.compareTo(BigDecimal.ZERO) < 0) {
-			throw new LogicException("E3071", "可分配金額不足 ： = " + wkAvailable);
+			this.info("errormsg 可分配金額不足");
+			wkWarningMsg = "可分配金額不足 ： = " + wkAvailable;
 		}
-
-
 
 		Slice<ClFac> slClFac = sClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE);
 		List<ClFac> lClFac = slClFac == null ? null : slClFac.getContent();

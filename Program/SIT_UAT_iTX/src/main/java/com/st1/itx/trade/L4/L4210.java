@@ -2,11 +2,8 @@ package com.st1.itx.trade.L4;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -20,8 +17,6 @@ import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.BatxOthers;
 import com.st1.itx.db.domain.BatxOthersId;
-import com.st1.itx.db.domain.NegAppr02;
-import com.st1.itx.db.domain.NegAppr02Id;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.BatxOthersService;
@@ -122,7 +117,8 @@ public class L4210 extends TradeBuffer {
 		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
 		iRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
 		iRepayType = parse.stringToInteger(titaVo.getParam("RepayType"));
-		iAcCode = FormatUtil.padX(titaVo.getParam("AcNoCode"), 11) + FormatUtil.padX(titaVo.getParam("AcSubCode"), 5) + FormatUtil.padX(titaVo.getParam("AcDtlCode"), 2);
+		iAcCode = FormatUtil.padX(titaVo.getParam("AcNoCode"), 11) + FormatUtil.padX(titaVo.getParam("AcSubCode"), 5)
+				+ FormatUtil.padX(titaVo.getParam("AcDtlCode"), 2);
 		iRepayAmt = parse.stringToBigDecimal(titaVo.getParam("RepayAmt"));
 		iRepayId = titaVo.getParam("RepayId");
 		iRepayName = titaVo.getParam("RepayName");
@@ -141,87 +137,20 @@ public class L4210 extends TradeBuffer {
 			iReconCode = "C02";
 		else
 			iReconCode = "   ";
+		switch (iFunctionCode) {
+		case 1:
+			insertL4210(titaVo);
+			break;
+		case 2:
+			updateL4210(titaVo);
+			break;
+		case 4:
+			deleteL4210(titaVo);
+			break;
 
-		// 一般債權撥付資料檔轉入 (新增 & 07 ,代收款-債權協商 & 般債權提兌日 > 0)
-		if (iFunctionCode == 1 && parse.stringToInteger(titaVo.getParam("RepayCode")) == 7 && iBringUpDate > 19110000)
-			insertFromNegAppr02(titaVo); // NegAppr02 一般債權撥付資料檔
-		//
-		else {
-			switch (iFunctionCode) {
-			case 1:
-				insertL4210(titaVo);
-				break;
-			case 2:
-				updateL4210(titaVo);
-				break;
-			case 4:
-				deleteL4210(titaVo);
-				break;
-
-			}
 		}
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	// 一般債權撥付資料檔轉入
-	private void insertFromNegAppr02(TitaVo titaVo) throws LogicException {
-		// findAll 整批入帳明細檔
-		BigDecimal wkTxAmt = BigDecimal.ZERO;
-		BigDecimal iTxAmt = iRepayAmt;
-
-		int cnt = 0;
-		NegAppr02 tNegAppr02 = new NegAppr02();
-		Slice<NegAppr02> slNegAppr02 = negAppr02Service.bringUpDateEq(iBringUpDate, this.index, Integer.MAX_VALUE);
-		List<NegAppr02> lNegAppr02 = slNegAppr02 == null ? null : slNegAppr02.getContent();
-		if (lNegAppr02 != null) {
-			for (NegAppr02 ng : lNegAppr02) {
-				if ("4001".equals(ng.getStatusCode()) && ng.getAcDate() == 0) { // 4001:入/扣帳成功
-					iRepayCode = 07; // 07:代收款-債權協商
-					iRepayType = 11; // 11:債協匯入款
-					iAcCode = "";
-					iRepayAmt = ng.getTxAmt();
-					iRepayId = ng.getCustId();
-					iRepayName = "";
-					iCustNo = ng.getCustNo();
-					iFacmNo = 0;
-					iCustNm = "";
-					iRvNo = "";
-					iNote = "一般債權撥付轉入";
-					// remark =Bank:(5)+債權機構代號(8) + 資料檔交易序號(10) + (1) + 提兌日(7)
-					wkRemark = "Bank:" + FormatUtil.padX(ng.getFinCode(), 8) + FormatUtil.padX(ng.getTxSeq(), 10) + " " + titaVo.getParam("BringUpDate");
-					wkTxAmt = wkTxAmt.add(ng.getTxAmt());
-					cnt++;
-					// insert record
-					insertL4210(titaVo);
-					tNegAppr02 = negAppr02Service.holdById(ng.getNegAppr02Id());
-					tNegAppr02.setAcDate(iAcDate);
-					try {
-						negAppr02Service.update(tNegAppr02);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "L4210 NegAppr02 update : " + e.getErrorMsg());
-					}
-				}
-			}
-		}
-		if (wkTxAmt.compareTo(iTxAmt) != 0) {
-			throw new LogicException("E0019", "一般債權撥付資料筆數=" + lNegAppr02.size() + ",未轉入筆數=" + cnt + ",金額=" + wkTxAmt + ",輸入金額=" + iTxAmt); // E0019
-																																			// 輸入資料錯誤
-		}
-	}
-
-	// 一般債權撥付資料檔轉入
-	private void deleteFromNegAppr02(TitaVo titaVo) throws LogicException {
-		iBringUpDate = parse.stringToInteger(wkRemark.substring(24, 31)) + 19110000;
-		NegAppr02 tNegAppr02 = negAppr02Service.holdById(new NegAppr02Id(iBringUpDate, wkRemark.substring(5, 13).trim(), wkRemark.substring(13, 23).trim()));
-		if (tNegAppr02 != null) {
-			tNegAppr02.setAcDate(0);
-			try {
-				negAppr02Service.update(tNegAppr02);
-			} catch (DBException e) {
-				throw new LogicException("E0007", "L4210 NegAppr02 update : " + e.getErrorMsg());
-			}
-		}
 	}
 
 	private void insertL4210(TitaVo titaVo) throws LogicException {
@@ -309,15 +238,6 @@ public class L4210 extends TradeBuffer {
 	}
 
 	private void updateBatxHead(BigDecimal txAmt, TitaVo titaVo) throws LogicException {
-//					AcDate	會計日期
-//					BatchNo	批號
-//					BatxTotAmt	總金額
-//					BatxTotCnt	總筆數
-//					BatxExeCode	作業狀態
-//					BatxStsCode	整批作業狀態
-//					TitaTlrNo	經辦
-//					TitaTxCd	交易代號
-//					A.寫入Head檔			
 		BatxHead tBatxHead = new BatxHead();
 		BatxHeadId tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(iAcDate);
@@ -330,11 +250,16 @@ public class L4210 extends TradeBuffer {
 			tBatxHead.setBatxHeadId(tBatxHeadId);
 		}
 		tBatxHead.setBatxTotAmt(tBatxHead.getBatxTotAmt().add(txAmt));
-		if (txAmt.compareTo(BigDecimal.ZERO) < 0)
+		if (txAmt.compareTo(BigDecimal.ZERO) < 0) {
 			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() - 1);
-		else
+		} else {
 			tBatxHead.setBatxTotCnt(tBatxHead.getBatxTotCnt() + 1);
-		tBatxHead.setBatxExeCode("0");
+		}
+		if (tBatxHead.getBatxTotCnt() > 0) {
+			tBatxHead.setBatxExeCode("0");
+		} else {
+			tBatxHead.setBatxExeCode("8");			
+		}
 		tBatxHead.setBatxStsCode("0");
 		tBatxHead.setTitaTlrNo(titaVo.getTlrNo());
 		tBatxHead.setTitaTxCd(titaVo.getTxcd());
@@ -366,7 +291,8 @@ public class L4210 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "L4210 BatxDetail 無此資料");
 		}
 
-		if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode()) || "7".equals(tBatxDetail.getProcStsCode())) {
+		if ("5".equals(tBatxDetail.getProcStsCode()) || "6".equals(tBatxDetail.getProcStsCode())
+				|| "7".equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException(titaVo, "E0010", "已入帳，請先訂正該筆資料"); // E0010 功能選擇錯誤
 		}
 
@@ -479,13 +405,5 @@ public class L4210 extends TradeBuffer {
 		}
 
 		updateBatxHead(BigDecimal.ZERO.subtract(tBatxDetail.getRepayAmt()), titaVo);
-
-		TempVo tempVo = new TempVo();
-		tempVo = tempVo.getVo(tBatxDetail.getProcNote());
-		wkRemark = tempVo.get("Remark");
-		this.info("wkRemark=" + wkRemark);
-		if (wkRemark.length() >= 23 && "Bank:".equals(wkRemark.substring(0, 5))) {
-			deleteFromNegAppr02(titaVo);
-		}
 	}
 }

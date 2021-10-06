@@ -34,15 +34,13 @@ import com.st1.itx.util.parse.Parse;
  * 執行時機：1.經辦執行，應處理清單－各項提存啟動作業<br>
  * 
  * 1.讀取會計總帳檔檔(科目：暫收款－火險保費)餘額 <br>
- * 2.新增應處理明細－未付火險費提存入帳
- * 2.1 月底日，本月提存，傳票批號=95<br>
+ * 2.新增應處理明細－未付火險費提存入帳 2.1 月底日，本月提存，傳票批號=95<br>
  * 2.2 月初日，迴轉上月，傳票批號=94<br>
  * 
  * @author LAI
  * @version 1.0.0
  */
 public class BS901 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS901.class);
 	@Autowired
 	public Parse parse;
 
@@ -73,7 +71,7 @@ public class BS901 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("BS901 ......");
+		this.info("active BS901 ......");
 		int yearMonth = this.getTxBuffer().getMgBizDate().getTbsDyf() / 100; // 提存年月
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		iAcDate = this.getTxBuffer().getMgBizDate().getTbsDy();
@@ -94,8 +92,7 @@ public class BS901 extends TradeBuffer {
 			}
 			// 2.刪除處理清單留存檔 ACCL02-未付火險費提存 入帳 //
 			this.info("3.bs901 delete Reserve ACCL02");
-			slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL02", 0, 3, iAcDate + 19110000,
-					iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
+			slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL02", 0, 3, iAcDate + 19110000, iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
 			if (slTxToDoDetailReserve != null) {
 				try {
 					txToDoDetailReserveService.deleteAll(slTxToDoDetailReserve.getContent(), titaVo);
@@ -126,8 +123,7 @@ public class BS901 extends TradeBuffer {
 		if (iAcDateReverse > 0) {
 			// 3.迴轉上月
 			this.info("3.bs901 last month ACCL02");
-			slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL02", 0, 3, iAcDateReverse + 19110000,
-					iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
+			slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL02", 0, 3, iAcDateReverse + 19110000, iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
 			if (slTxToDoDetailReserve != null) {
 				for (TxToDoDetailReserve t2 : slTxToDoDetailReserve.getContent()) {
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
@@ -173,18 +169,14 @@ public class BS901 extends TradeBuffer {
 //	    摘要:yyy年xx月其它應收款火險保費
 
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC"
-				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(
-						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
-						6);
+		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
 		BigDecimal txAmt = BigDecimal.ZERO;
 		int yyy = this.txBuffer.getMgBizDate().getTbsDy() / 10000;
 		int mm = (this.txBuffer.getMgBizDate().getTbsDy() / 100) - yyy * 100;
 
 		// AcMain 會計總帳檔， TMI 暫收款－火險保費
-		Slice<AcMain> slAcMain = acMainService.acctCodeEq(this.getTxBuffer().getMgBizDate().getTbsDyf(), "TMI",
-				this.index, Integer.MAX_VALUE);
+		Slice<AcMain> slAcMain = acMainService.acctCodeEq(this.getTxBuffer().getMgBizDate().getTbsDyf(), "TMI", this.index, Integer.MAX_VALUE);
 		List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
 		// 計入已收，未收不計
 		if (lAcMain != null) {
@@ -199,10 +191,9 @@ public class BS901 extends TradeBuffer {
 				tTempVo.putParam("AcDate", iAcDate);
 				tTempVo.putParam("SlipBatNo", "95");
 				tTempVo.putParam("AcclType", "火險費提存");
-				tTempVo.putParam("AcBookCode", this.txBuffer.getSystemParas().getAcBookCode()); // 帳冊別 000 
+				tTempVo.putParam("AcBookCode", this.txBuffer.getSystemParas().getAcBookCode()); // 帳冊別 000
 				tTempVo.putParam("AcSubBookCode", this.txBuffer.getSystemParas().getAcSubBookCode()); // 區隔帳冊 00A
-				tTempVo.putParam("SlipNote",
-						parse.IntegerToString(yyy, 3) + "年" + parse.IntegerToString(mm, 2) + "月" + "其它應收款火險保費");
+				tTempVo.putParam("SlipNote", parse.IntegerToString(yyy, 3) + "年" + parse.IntegerToString(mm, 2) + "月" + "其它應收款火險保費");
 				tTempVo.putParam("DbAcctCode1", "ORI");
 				tTempVo.putParam("DbRvNo1", rvNo);
 				tTempVo.putParam("DbTxAmt1", txAmt);

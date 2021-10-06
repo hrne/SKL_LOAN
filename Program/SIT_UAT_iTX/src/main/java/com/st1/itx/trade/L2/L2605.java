@@ -106,15 +106,15 @@ public class L2605 extends TradeBuffer {
 	@Autowired
 	public Parse parse;
 
-	private static int consiz = 0;
+	int consiz = 0;
 	// 法拍費總計
-	private static BigDecimal fee = BigDecimal.ZERO;
+	BigDecimal fee = BigDecimal.ZERO;
 	// 催收法拍費總計
-	private static BigDecimal overdueFee = BigDecimal.ZERO;
+	BigDecimal overdueFee = BigDecimal.ZERO;
 	// 同額度法拍費
-	private static BigDecimal facmFee = BigDecimal.ZERO;
+	BigDecimal facmFee = BigDecimal.ZERO;
 	// 同額度催收法拍費
-	private static BigDecimal facmOverdueFee = BigDecimal.ZERO;
+	BigDecimal facmOverdueFee = BigDecimal.ZERO;
 	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -127,7 +127,7 @@ public class L2605 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 1;
+		this.limit = 100;
 
 		// tita
 		// 收件迄日
@@ -296,10 +296,27 @@ public class L2605 extends TradeBuffer {
 		} // for		
 		
 //		// Header資料
-		this.totaVo.putParam("OCnt", ""+consiz);
-		this.totaVo.putParam("OFee", ""+fee);
-		this.totaVo.putParam("OOverFee", ""+overdueFee);
-		this.totaVo.putParam("OFeeAmt", ""+fee.add(overdueFee));
+		if(this.index == 0 ) {
+			this.totaVo.putParam("OCnt", consiz);
+			this.totaVo.putParam("OFee", fee);
+			this.totaVo.putParam("OOverFee", overdueFee);
+			this.totaVo.putParam("OFeeAmt", fee.add(overdueFee));
+			titaVo.putParam("OCnt", consiz);
+			titaVo.putParam("OFee", fee);
+			titaVo.putParam("OOverFee", overdueFee);
+			titaVo.putParam("OFeeAmt", fee.add(overdueFee));
+		} else {
+			this.totaVo.putParam("OCnt", consiz + parse.stringToInteger(titaVo.getParam("OCnt")));
+			this.totaVo.putParam("OFee", fee.add(parse.stringToBigDecimal(titaVo.getParam("OFee"))));
+			this.totaVo.putParam("OOverFee", overdueFee.add(parse.stringToBigDecimal(titaVo.getParam("OOverFee"))));
+			this.totaVo.putParam("OFeeAmt", (fee.add(overdueFee).add(parse.stringToBigDecimal(titaVo.getParam("OFeeAmt")))));
+			
+			titaVo.putParam("OCnt", consiz + parse.stringToInteger(titaVo.getParam("OCnt")));
+			titaVo.putParam("OFee", fee.add(parse.stringToBigDecimal(titaVo.getParam("OFee"))));
+			titaVo.putParam("OOverFee", overdueFee.add(parse.stringToBigDecimal(titaVo.getParam("OOverFee"))));
+			titaVo.putParam("OFeeAmt", (fee.add(overdueFee).add(parse.stringToBigDecimal(titaVo.getParam("OFeeAmt")))));
+		}
+		
 
 		if (lForeclosureFee.size() == this.limit && slForeclosureFee.hasNext()) {
 			 titaVo.setReturnIndex(this.setIndexNext());

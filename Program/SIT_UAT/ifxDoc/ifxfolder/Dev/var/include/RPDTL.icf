@@ -420,7 +420,7 @@ E(0,@OverRpAmt,#RPTOTF)
 #RPTOT_DIS{i}=@,1,S
 C(3,#RP_IND,0,s,$)
 IF(#RPTOTF{z}>0&&#DF1=={i},
-   IF(#RPFG==1||#RPFG==2||#RPFG==6,INVOKEJS(SHOW,grd9_{i},1),INVOKEJS(SHOW,grd9_{i},0)),
+   IF(#RPFG==1||#RPFG==2||#RPFG==6,INVOKEJS(SHOW,grd9_{i},1),INVOKEJS(SHOW,grd9_{j},0)),
    IF(#RPTOTF{z}>0&&#RpAmt{i}>0,INVOKEJS(SHOW,grd9_{j},1),INVOKEJS(SHOW,grd9_{j},0)))
 
 ! IF(#RPTOTF>0,$,s)
@@ -710,15 +710,12 @@ IF(#DF1=={i},$,IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 #RpDetailSeq{i}=A,6,I
 C(3,#RP_IND,1,$,S)
 
-
-
-
 ! 入帳日期
 #RpEntryDate{i}=D,7,I
 IF(#RP_IND==1,$,S)
 
 ! 戶名
-#RpCustName{i}=c,100,I
+#RpCustName{i}=x,100,I
 C(3,#RP_IND,0,S,$)
 C(3,#RP_IND,2,$,C(3,#RP_IND,5,$,s))
 C(3,#RpCode{i},91,s,$)

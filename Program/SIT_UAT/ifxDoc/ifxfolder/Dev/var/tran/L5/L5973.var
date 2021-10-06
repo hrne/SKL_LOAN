@@ -172,7 +172,7 @@ T(2,#OOCustNo)
 ! C(3,#OORank,1,T(2,#OOCustName),T(2, ))
 
 ! 債權機構
-#OOFinCodeName=A,3,O
+#OOFinCodeName=X,8,O
 ! 機構名稱
 #OOFinCodeNameNM=X,100,O
 

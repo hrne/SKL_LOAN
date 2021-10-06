@@ -17,7 +17,7 @@ E(0,231)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
-E(0,40)ASGN(INQREC$)
+E(0,10)ASGN(INQREC$)
 
 ![畫面顯示的明細間的高度]
 #LOOPH=n,3,S
@@ -463,7 +463,7 @@ TXFORM=L1001
 <sub type="SELECT">
 
 #RPTFG2=1,QUERY.GRID,L1001
-#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:10, rowList:[20,40,60]}
+#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:10, rowList:[10,20,30]}
 
 #OOBTN1=顧客
 {width:50,search:false,formatter:'cust:bind-button:顧客',align:'center',canExport:false}
@@ -514,7 +514,7 @@ TXFORM=L1001
 
 
 #RPTFG2=2,QUERY.GRID,L1001
-#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:10, rowList:[20,40,60]}
+#any={detail:true, header:'L1001.part', caption:'', width:1005, rowNum:10, rowList:[10,20,30]}
 
 #OOCustId=統一編號
 {width:80,align:'center'}

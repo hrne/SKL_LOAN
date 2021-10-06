@@ -73,82 +73,60 @@ public class L5711 extends TradeBuffer {
 		this.info("active L5711 ");
 		this.totaVo.init(titaVo);
 		
-		
 		int iAcDAte = Integer.parseInt(titaVo.getParam("AcDate"))+19110000;
 		String iTlrNo = titaVo.getParam("TlrNo");
 		int iTxtNo = Integer.parseInt(titaVo.getParam("TxtNo"));
-		
-		this.info("iAcDAte=="+iAcDAte);
-		this.info("iTlrNo=="+iTlrNo);
-		this.info("iTxtNo=="+iTxtNo);
+		acDetailCom.setTxBuffer(this.txBuffer);
+		acNegCom.setTxBuffer(this.txBuffer);
+		this.info("iAcDAte=="+iAcDAte+",iTlrNo=="+iTlrNo+",iTxtNo=="+iTxtNo);
 		
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 200;// 查全部 Integer.MAX_VALUE
 		
+		
+		for (int i = 1; i <= 30; i++) {
+			String iFinCode = titaVo.getParam("FinCode" + i);
 
-//		Slice<NegAppr01> tNegAppr01 = sNegAppr01Service.findByCustNoCaseSeq(iCustNo, iCaseSeq, 0, this.index, this.limit, titaVo);
-//		List<NegAppr01> lNegAppr01 = tNegAppr01 == null ? null : tNegAppr01.getContent();
-//		int nAcDate = 0;
-//		String nTlrno = "";
-//		int nTxtno = 0;
-//
-//		if(lNegAppr01!=null) {
-//			NegAppr01 NegAppr01VO = lNegAppr01.get(0);
-//			nAcDate = NegAppr01VO.getAcDate()+19110000;
-//			nTlrno = NegAppr01VO.getTitaTlrNo();
-//			nTxtno = NegAppr01VO.getTitaTxtNo();			
-//		}
-		
-		
-		
-		for(int i =1;i<=30;i++) {
-			String iFinCode = titaVo.getParam("FinCode"+i);
-			this.info("iFinCode=="+titaVo.getParam("FinCode"+i));
-			
-			if(iFinCode.trim().isEmpty()) {
+			if (iFinCode.trim().isEmpty()) {
 				break;
 			}
-			
-			if(("458").equals(iFinCode)){
-				
-				BigDecimal ApprAmt = parse.stringToBigDecimal(titaVo.getParam("ApprAmt"+i));//分攤金額
+
+			if (("458").equals(iFinCode)) {
+
+				BigDecimal ApprAmt = parse.stringToBigDecimal(titaVo.getParam("ApprAmt" + i));// 分攤金額
 				updateNegTrans(iAcDAte, iTlrNo, iTxtNo, ApprAmt, titaVo);
-				
-				BigDecimal AccuApprAmt = parse.stringToBigDecimal(titaVo.getParam("AccuApprAmt"+i));//累積分攤金額
+
+				BigDecimal AccuApprAmt = parse.stringToBigDecimal(titaVo.getParam("AccuApprAmt" + i));// 累積分攤金額
 				updateNegMain(AccuApprAmt, titaVo);
-				
+
 			} else {
-				
-				NegAppr01 mNegAppr01 = sNegAppr01Service.holdById(new NegAppr01Id(iAcDAte,iTlrNo,iTxtNo,iFinCode), titaVo);
-				
-				if(mNegAppr01==null){
-					throw new LogicException(titaVo, "E0003", "會計日="+iAcDAte + ",經辦="+iTlrNo+",交易序號="+iTxtNo+",債權機構="+iFinCode); // 修改資料不存在
+
+				NegAppr01 mNegAppr01 = sNegAppr01Service.holdById(new NegAppr01Id(iAcDAte, iTlrNo, iTxtNo, iFinCode),
+						titaVo);
+
+				if (mNegAppr01 == null) {
+					throw new LogicException(titaVo, "E0003",
+							"會計日=" + iAcDAte + ",經辦=" + iTlrNo + ",交易序號=" + iTxtNo + ",債權機構=" + iFinCode); // 修改資料不存在
 				}
-				
+
 				try {
-					this.info("ApprAmt=="+titaVo.getParam("ApprAmt"+i));
-					this.info("AccuApprAmt=="+titaVo.getParam("AccuApprAmt"+i));
-					
-					
-					SumApprAmt = SumApprAmt.add(parse.stringToBigDecimal(titaVo.getParam("ApprAmt"+i)));
-					this.info("SumApprAmt=="+SumApprAmt);
-					
-					mNegAppr01.setApprAmt(parse.stringToBigDecimal(titaVo.getParam("ApprAmt"+i)));
-					mNegAppr01.setAccuApprAmt(parse.stringToBigDecimal(titaVo.getParam("AccuApprAmt"+i)));
-					
+					SumApprAmt = SumApprAmt.add(parse.stringToBigDecimal(titaVo.getParam("ApprAmt" + i)));
+
+					mNegAppr01.setApprAmt(parse.stringToBigDecimal(titaVo.getParam("ApprAmt" + i)));
+					mNegAppr01.setAccuApprAmt(parse.stringToBigDecimal(titaVo.getParam("AccuApprAmt" + i)));
+
 					sNegAppr01Service.update(mNegAppr01, titaVo);
-				} catch(DBException e) {
+				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
 				}
 			}
-			
-			
-		}
+		}		
 		
-		
-		
+		/* 產生會計分錄 */
+		acDetailCom.setTxBuffer(this.txBuffer);
+		acDetailCom.run(titaVo);
 		
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -159,12 +137,10 @@ public class L5711 extends TradeBuffer {
 		NegTrans iNegTrans = sNegTransService.findById(new NegTransId(mAcDAte,mTlrNo,mTxtNo), titaVo);
 		
 		if(iNegTrans != null) {
-			this.info("mApprAmt=="+mApprAmt);
-			this.info("SklShareAmt=="+iNegTrans.getSklShareAmt());
-			
 			if(mApprAmt.compareTo(iNegTrans.getSklShareAmt())==0) {
 				return;
 			}
+			BigDecimal  oldSklShareAmt = iNegTrans.getSklShareAmt();
 			
 			try {
 				iNegTrans.setSklShareAmt(mApprAmt);
@@ -172,30 +148,48 @@ public class L5711 extends TradeBuffer {
 				sNegTransService.update(iNegTrans, titaVo);
 				
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+				throw new LogicException(titaVo, "E0007", "債務協商交易檔"); // 更新資料時，發生錯誤
 			}
 			
-			List<AcDetail> acDetailList = new ArrayList<AcDetail>();
-			/* 借：債協暫收款科目 */
-			AcDetail acDetail = new AcDetail();
-			acDetail.setDbCr("D");
-			acDetail.setAcctCode(acNegCom.getAcctCode(iNegTrans.getCustNo(), titaVo));
-			acDetail.setTxAmt(iNegTrans.getSklShareAmt()); //原DB金額
-			acDetail.setCustNo(iNegTrans.getCustNo());// 客戶戶號
-			acDetailList.add(acDetail);
-			/* 貸：債協退還款科目 */
-			acDetail = new AcDetail();
-			acDetail.setDbCr("C");
-			acDetail.setAcctCode(acNegCom.getReturnAcctCode(iNegTrans.getCustNo(), titaVo));//畫面金額
-			acDetail.setTxAmt(mApprAmt); // 新壽攤分金額
-			acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
-			acDetailList.add(acDetail);
-			
-			this.txBuffer.addAllAcDetailList(acDetailList);
+			if (this.txBuffer.getTxCom().isBookAcYes()) {
+				List<AcDetail> acDetailList = new ArrayList<AcDetail>();
 
+				//先沖正原帳務
+				/* 借：債協退還款科目 */
+				AcDetail acDetail = new AcDetail();
+				acDetail = new AcDetail();
+				acDetail.setDbCr("D");
+				acDetail.setAcctCode(acNegCom.getReturnAcctCode(iNegTrans.getCustNo(), titaVo));
+				acDetail.setTxAmt(oldSklShareAmt); //原DB金額
+				acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
+				acDetailList.add(acDetail);
+				/* 貸：債協暫收款科目 */
+				acDetail = new AcDetail();
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode(acNegCom.getAcctCode(iNegTrans.getCustNo(), titaVo));
+				acDetail.setTxAmt(oldSklShareAmt); // 原DB金額
+				acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
+				acDetailList.add(acDetail);
+				
+				//寫本次新壽攤分金額
+				/* 借：債協暫收款科目 */
+				acDetail = new AcDetail();
+				acDetail.setDbCr("D");
+				acDetail.setAcctCode(acNegCom.getAcctCode(iNegTrans.getCustNo(), titaVo));
+				acDetail.setTxAmt(mApprAmt); // 新壽攤分金額
+				acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
+				acDetailList.add(acDetail);
+				/* 貸：債協退還款科目 */
+				acDetail = new AcDetail();
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode(acNegCom.getReturnAcctCode(iNegTrans.getCustNo(), titaVo));
+				acDetail.setTxAmt(mApprAmt); // 新壽攤分金額
+				acDetail.setCustNo(iNegTrans.getCustNo());// 戶號
+				acDetailList.add(acDetail);
 			
-			
-			
+				this.txBuffer.addAllAcDetailList(acDetailList);
+
+			}
 		}
 	}
 	
@@ -209,14 +203,13 @@ public class L5711 extends TradeBuffer {
 		
 		
 		if(tNegMain != null) {
-			this.info("mApprAmt=="+mAccuApprAmt);
-			this.info("AccuSklShareAmt=="+tNegMain.getAccuSklShareAmt());
 			
 			if(mAccuApprAmt.compareTo(tNegMain.getAccuSklShareAmt())==0) {
 				return;
 			}
 			
 			try {
+				this.info("mAccuApprAmt=="+mAccuApprAmt);
 				tNegMain.setAccuSklShareAmt(mAccuApprAmt);
 				sNegMainService.update(tNegMain, titaVo);
 				

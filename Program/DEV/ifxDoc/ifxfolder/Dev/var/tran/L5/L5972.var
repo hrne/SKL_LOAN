@@ -203,7 +203,7 @@ E(0,1)ASGN(LOOP$)
 T(H,#OOTxKind,#TxKindHelp)
 
 ! 交易金額
-#OOTxAmt=m,14,O
+#OOTxAmt=+m,14,O
 ! 繳息迄日
 #OOIntEndDate=D,7,O
 ! 暫收抵繳

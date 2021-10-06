@@ -227,7 +227,7 @@ public class LM052Report extends MakeReport {
 			//C25 D17~D25
 			makeExcel.formulaCaculate(25,3);
 			for(int r = 17 ;r<=25; r++) {
-				makeExcel.formulaCaculate(r,3);				
+				makeExcel.formulaCaculate(r,4);				
 			}
 			
 			//G19 H19 I19 G20
@@ -248,12 +248,16 @@ public class LM052Report extends MakeReport {
 			
 			//B30
 			makeExcel.formulaCaculate(30,2);
-			//set hieght
+			
+			//set height row 1,4~13,23,24
+			makeExcel.setHeight(1, 40);
 			
 			for(int r = 4 ; r <= 13 ; r++) {
-			
 				makeExcel.setHeight(r, 40);	
 			}
+			
+			makeExcel.setHeight(23, 20);
+			makeExcel.setHeight(24, 40);
 			
 		
 		}

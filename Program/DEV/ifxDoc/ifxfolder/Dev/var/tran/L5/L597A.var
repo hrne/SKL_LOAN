@@ -281,7 +281,7 @@ SWITCH(#OONewtransTxKind,0,T(2,正常),
 ! 入帳還款日
 #OORepayDate=D,7,O
 ! 暫收金額
-#OOTmpAmt=m,14,O
+#OOTmpAmt=+m,14,O
 ! 溢繳款
 #OOOverPayAmt=+m,13,O
 

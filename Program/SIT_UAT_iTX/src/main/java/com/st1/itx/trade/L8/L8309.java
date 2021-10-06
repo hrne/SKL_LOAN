@@ -97,6 +97,14 @@ public class L8309 extends TradeBuffer {
 		iJcicZ048Id.setRcDate(iRcDate);
 		JcicZ048 chJcicZ048 = new JcicZ048();
 
+		// 檢核項目(D-21)
+		if (!"4".equals(iTranKey_Tmp)) {
+			//start 第9欄、第10欄及第11欄「債務人電話」之其中一欄，需為必要填報項目.
+			if (iCustRegTelNo.trim().isEmpty() && iCustComTelNo.trim().isEmpty() && iCustMobilNo.trim().isEmpty()) {
+				throw new LogicException("E0005", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
+			} 
+		}//檢核項目 end
+		
 		switch(iTranKey_Tmp) {
 		case "1":
 			//檢核是否重複，並寫入JcicZ048

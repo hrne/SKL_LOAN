@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.JcicZ575;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.JcicZ575Service;
 import com.st1.itx.tradeService.TradeBuffer;
 
@@ -24,6 +26,8 @@ public class L8R38 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ575Service iJcicZ575Service;
+	@Autowired
+	public CdCodeService iCdCodeService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -41,6 +45,13 @@ public class L8R38 extends TradeBuffer {
 			totaVo.putParam("L8r38SubmitKey", iJcicZ575.getSubmitKey());
 			totaVo.putParam("L8r38ApplyDate", iJcicZ575.getApplyDate());
 			totaVo.putParam("L8r38BankId", iJcicZ575.getBankId());
+			CdCode tCdCode = new CdCode();
+			tCdCode = iCdCodeService.getItemFirst(8, "JcicBankCode", iJcicZ575.getBankId(), titaVo);
+			if (tCdCode == null) {
+				totaVo.putParam("L8r38BankIdX", "");
+			}else {
+				totaVo.putParam("L8r38BankIdX", tCdCode.getItem());
+			}
 			totaVo.putParam("L8r38ModifyType", iJcicZ575.getModifyType());
 			totaVo.putParam("L8r38OutJcicTxtDate", iJcicZ575.getOutJcicTxtDate());		
 		}

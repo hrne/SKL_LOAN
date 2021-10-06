@@ -39,14 +39,17 @@ E(0,0)
 T(4,CHAIN$)
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L5971進入),$)
 
+![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款 03:債協 09:放款
+#SECNO=_,_,S
+T(3,03)
 
-#NTXBUF=X,49,S
+#NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustId,#NTXBUF,1,10)
 T(1,@CustNo,#NTXBUF,11,7)
 T(1,@CaseSeq,#NTXBUF,18,3)
-T(1,@TxAmt,#NTXBUF,21,14)
-T(1,@ReturnAmt,#NTXBUF,35,14)
+T(1,@TxAmt,#NTXBUF,22,14)
+T(1,@ReturnAmt,#NTXBUF,36,14)
 
 !Rim撥付金額累計
 #SumRimApprAmt=m,14,S
@@ -130,11 +133,17 @@ E(0,1)ASGN(AGAIN$)
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
+<include src="PRT.icf::FM101.rtn"/>
 </sub>
-
 !------------ TXFORM = L5711 -----------
 <sub type="FORM" name="L5711">
 </sub>
+
+!---------- TXFORM = FM101 交易分錄----------
+<sub type="FORM" name="FM101">
+<include src="PRT.icf::FM101.form"/>
+</sub>
+
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
@@ -156,6 +165,7 @@ E(0,1)ASGN(AGAIN$)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L5R42.tom"/>
+<include src="PRT.icf::FM101.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5711
 
@@ -164,4 +174,5 @@ TXFORM=L5711
 
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
+<include src="PRT.icf::FM101.sel" map="landscape=1;size=830:1170" />
 </sub>

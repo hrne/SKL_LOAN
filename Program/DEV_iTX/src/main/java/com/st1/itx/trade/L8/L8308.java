@@ -1,6 +1,9 @@
 package com.st1.itx.trade.L8;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -19,7 +22,6 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ044;
-import com.st1.itx.db.domain.JcicZ044Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ047;
 import com.st1.itx.db.domain.JcicZ047Id;
@@ -123,87 +125,96 @@ public class L8308 extends TradeBuffer {
 		iJcicZ047Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ047Id.setRcDate(iRcDate);
 		JcicZ047 chJcicZ047 = new JcicZ047();
-		JcicZ044 iJcicZ044 = new JcicZ044();
-		JcicZ044Id iJcicZ044Id = new JcicZ044Id();
-		iJcicZ044Id.setCustId(iCustId);// 債務人IDN
-		iJcicZ044Id.setSubmitKey(iSubmitKey);// 報送單位代號
-		iJcicZ044Id.setRcDate(iRcDate);
 		
+
 		// 檢核項目(D-19)
 		if (!"4".equals(iTranKey_Tmp)) {
-			
-		// 1.3 start 完整key值未曾報送過'44':請求同意債務清償方案通知資料則予以剔退
-		if ("A".equals(iTranKey)) {
-			iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id, titaVo);
-			if (iJcicZ044 == null) {
-				throw new LogicException("E0005", "未曾報送過'44':請求同意債務清償方案通知資料.");
+
+			// 1.3 start 需檢核最大債權金融機構是否有報送過'44':請求同意債務清償方案通知資料，若無報送則予以剔退
+			if ("A".equals(iTranKey)) {
+				Slice<JcicZ044> sJcicZ044 = sJcicZ044Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+				if (sJcicZ044 == null) {
+					throw new LogicException("E0005", "最大債權金融機構未曾報送過'44':請求同意債務清償方案通知資料.");
+				}
+			} // 1.3 end
+
+			// 1.4 start 第7欄期數，第8欄利率需與最近一次'44':請求同意債務清償方案通知資料"對應值一致
+			Slice<JcicZ044> sJcicZ044 = sJcicZ044Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+			if (sJcicZ044 != null) {
+				int sPeriod = 0;
+				BigDecimal sRate = BigDecimal.ZERO;
+				int sLastUpdate = 0;
+				for (JcicZ044 xJcicZ044 : sJcicZ044) {
+					if (TimestampToTime(xJcicZ044.getLastUpdate()) > sLastUpdate) {
+						sLastUpdate = TimestampToTime(xJcicZ044.getLastUpdate());
+						sPeriod = xJcicZ044.getPeriod();
+						sRate = xJcicZ044.getRate();
+					}
+				}
+				if (iPeriod != sPeriod || iRate.compareTo(sRate) != 0) {
+					throw new LogicException("E0005", "期數，利率需與'44':請求同意債務清償方案通知資料對應值一致.");
+				}
+			} // 1.4 end
+
+			// 1.5 檢核第9~14欄若與所有原債權金融機構回報'42':「回報無擔保債權金額資料」債權金額不同時，則予剔退.***J
+
+			// 1.6.1 start 第15欄「依民法第323條計算之債務總金額」需等於信用貸款+現金卡+信用卡依民法第323條計算之債務金額合計
+			if (iCivil323Amt.compareTo(new BigDecimal(iCivil323ExpAmt + iCivil323CashAmt + iCivil323CreditAmt)) != 0) {
+				throw new LogicException("E0005", "「依民法第323條計算之債務總金額」需等於依民法第323條計算之信用貸款+現金卡+信用卡債務金額合計.");
 			}
-		} // 1.3 end
+			// 1.6.2 start 第16欄「簽約總債務金額」需等於信用貸款+現金卡+信用卡債務金額合計
+			if (iTotalAmt.compareTo(new BigDecimal(iExpLoanAmt + iCashCardAmt + iCreditCardAmt)) != 0) {
+				throw new LogicException("E0005", "「簽約總債務金額」需等於信用貸款+現金卡+信用卡債務金額合計.");
+			} // 1.6 end
 
-		// 1.4 start 第7欄期數，第8欄利率需與最近一次'44':請求同意債務清償方案通知資料"對應值一致
-		iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id, titaVo);
-		if ((iJcicZ044 != null) && (iPeriod != iJcicZ044.getPeriod() || iRate.compareTo(iJcicZ044.getRate()) != 0)) {
-			throw new LogicException("E0005", "期數，利率需與'44':請求同意債務清償方案通知資料對應值一致.");
-		} // 1.4 end
+			// 1.7 start 簽約完成日期需大於或等於協議完成日期
+			if (iSignDate < iPassDate) {
+				throw new LogicException("E0005", "簽約完成日期需大於或等於協議完成日期.");
+			} // 1.7 end
 
-		// 1.5 檢核第9~14欄若與所有原債權金融機構回報'42':「回報無擔保債權金額資料」債權金額不同時，則予剔退.***J
+			// 1.8 start 首期應繳款日需大於或等簽約完成日期
+			if (iFirstPayDate < iSignDate) {
+				throw new LogicException("E0005", "首期應繳款日需大於或等簽約完成日期.");
+			} // 1.8 end
 
-		// 1.6.1 start 第15欄「依民法第323條計算之債務總金額」需等於信用貸款+現金卡+信用卡依民法第323條計算之債務金額合計
-		if (iCivil323Amt.compareTo(new BigDecimal(iCivil323ExpAmt + iCivil323CashAmt + iCivil323CreditAmt)) != 0) {
-			throw new LogicException("E0005", "「依民法第323條計算之債務總金額」需等於依民法第323條計算之信用貸款+現金卡+信用卡債務金額合計.");
-		}
-		// 1.6.2 start 第16欄「簽約總債務金額」需等於信用貸款+現金卡+信用卡債務金額合計
-		if (iTotalAmt.compareTo(new BigDecimal(iExpLoanAmt + iCashCardAmt + iCreditCardAmt)) != 0) {
-			throw new LogicException("E0005", "「簽約總債務金額」需等於信用貸款+現金卡+信用卡債務金額合計.");
-		} // 1.6 end
+			// 1.9, 1.11, 1.13 start 若第25欄「屬二階段還款方案之階段註記」填報1者(第一階段)，3條件
+			if ("1".equals(iGradeType)) {
+				// 1.9.第7欄期數需填報固定值072.
+				if (iPeriod != 72) {
+					throw new LogicException("E0005", "屬二階段還款方案之第一階段，還款期數需填報固定值'072'.");
+				}
+				// 1.11.第26欄「第一階段最後一期應繳金額」需等於第16欄「簽約總債務金額」減第22欄「月付金」乘以71期.
+				if (iTotalAmt.compareTo(new BigDecimal(iPayLastAmt + iMonthPayAmt * 71)) != 0) {
+					throw new LogicException("E0005", "屬二階段還款方案之第一階段，「第一階段最後一期應繳金額」需等於「簽約總債務金額」減「月付金」乘以71期.");
+				}
+				// 1.13.第27欄(含)以後需空白(屬第二階段相關內容).
+				if (iPeriod2 != 0 || (iRate2 != null && iRate2.compareTo(BigDecimal.ZERO) != 0) || iMonthPayAmt2 != 0
+						|| iPayLastAmt2 != 0) {
+					throw new LogicException("E0005", "屬二階段還款方案之第一階段，第二階段相關內容需空白.");
+				}
+			} // 1.9, 1.11, 1.13 end
 
-		// 1.7 start 簽約完成日期需大於或等於協議完成日期
-		if (iSignDate < iPassDate) {
-			throw new LogicException("E0005", "簽約完成日期需大於或等於協議完成日期.");
-		} // 1.7 end
+			// 1.10 start 若第25欄「屬二階段還款方案之階段註記」填報1或2者，第8欄利率需填報固定值00.00.
+			if (("1".equals(iGradeType) || "2".equals(iGradeType)) && iRate.compareTo(BigDecimal.ZERO) != 0) {
+				throw new LogicException("E0005", "屬二階段還款方案之第一/二階段，利率需填報固定值00.00.");
+			} // 1.10 end
 
-		// 1.8 start 首期應繳款日需大於或等簽約完成日期
-		if (iFirstPayDate < iSignDate) {
-			throw new LogicException("E0005", "首期應繳款日需大於或等簽約完成日期.");
-		} // 1.8 end
+			// 1.12 start 若第25欄「屬二階段還款之階段註記」空白者，第26欄(含)以後需空白(屬第一/二階段相關內容).
+			if ((iGradeType.trim().isEmpty() || "0".equals(iGradeType))
+					&& (iPayLastAmt != 0 || iPeriod2 != 0 || (iRate2 != null && iRate2.compareTo(BigDecimal.ZERO) != 0)
+							|| iMonthPayAmt2 != 0 || iPayLastAmt2 != 0)) {
+				throw new LogicException("E0005", "未註記二階段還款方案，二階段還款方案的相關內容需空白.");
+			} // 1.12 end
 
-		// 1.9, 1.11, 1.13 start 若第25欄「屬二階段還款方案之階段註記」填報1者(第一階段)，3條件
-		if ("1".equals(iGradeType)) {
-			// 1.9.第7欄期數需填報固定值072.
-			if (iPeriod != 72) {
-				throw new LogicException("E0005", "屬二階段還款方案之第一階段，還款期數需填報固定值'072'.");
-			}
-			// 1.11.第26欄「第一階段最後一期應繳金額」需等於第16欄「簽約總債務金額」減第22欄「月付金」乘以71期.
-			if (iTotalAmt.compareTo(new BigDecimal(iPayLastAmt + iMonthPayAmt * 71)) != 0) {
-				throw new LogicException("E0005", "屬二階段還款方案之第一階段，「第一階段最後一期應繳金額」需等於「簽約總債務金額」減「月付金」乘以71期.");
-			}
-			// 1.13.第27欄(含)以後需空白(屬第二階段相關內容).
-			if (iPeriod2 != 0 || (iRate2 != null && iRate2.compareTo(BigDecimal.ZERO) != 0) || iMonthPayAmt2 != 0
-					|| iPayLastAmt2 != 0) {
-				throw new LogicException("E0005", "屬二階段還款方案之第一階段，第二階段相關內容需空白.");
-			}
-		} // 1.9, 1.11, 1.13 end
+			// 1.14 若第25欄「屬二階段還款方案之階段註記」填報2者(第二階段)，第27欄(含)以後第二階段相關內容不可空白
+			if ("2".equals(iGradeType)
+					&& (iPeriod2 == 0 || iRate2 == null || iMonthPayAmt2 == 0 || iPayLastAmt2 == 0)) {
+				throw new LogicException("E0005", "屬二階段還款方案之第二階段，第二階段相關內容不可空白.");
+			} // 1.14 end
 
-		// 1.10 start 若第25欄「屬二階段還款方案之階段註記」填報1或2者，第8欄利率需填報固定值00.00.
-		if (("1".equals(iGradeType) || "2".equals(iGradeType)) && iRate.compareTo(BigDecimal.ZERO) != 0) {
-			throw new LogicException("E0005", "屬二階段還款方案之第一/二階段，利率需填報固定值00.00.");
-		} // 1.10 end
+			// 2.本中心以第17欄「協議完成日」有值且第19欄「簽約完成日期」為空白時為產出協議書之依據，並於接獲報送'47'次日，將檔名為BBBYYYMMDD+(10碼債務人IDN).pdf按身份證排充電，並自動將當日產生之pdf壓縮成.zip傳輸至最大債權金融機構DTO報送帳號，最大債權金融機構次日即可下載協議書等相關文件。***
 
-		// 1.12 start 若第25欄「屬二階段還款之階段註記」空白者，第26欄(含)以後需空白(屬第一/二階段相關內容).
-		if ((iGradeType.trim().isEmpty() || "0".equals(iGradeType))
-				&& (iPayLastAmt != 0 || iPeriod2 != 0 || (iRate2 != null && iRate2.compareTo(BigDecimal.ZERO) != 0)
-						|| iMonthPayAmt2 != 0 || iPayLastAmt2 != 0)) {
-			throw new LogicException("E0005", "未註記二階段還款方案，二階段還款方案的相關內容需空白.");
-		} // 1.12 end
-
-		// 1.14 若第25欄「屬二階段還款方案之階段註記」填報2者(第二階段)，第27欄(含)以後第二階段相關內容不可空白
-		if ("2".equals(iGradeType) && (iPeriod2 == 0 || iRate2 == null || iMonthPayAmt2 == 0 || iPayLastAmt2 == 0)) {
-			throw new LogicException("E0005", "屬二階段還款方案之第二階段，第二階段相關內容不可空白.");
-		} // 1.14 end
-
-		// 2.本中心以第17欄「協議完成日」有值且第19欄「簽約完成日期」為空白時為產出協議書之依據，並於接獲報送'47'次日，將檔名為BBBYYYMMDD+(10碼債務人IDN).pdf按身份證排充電，並自動將當日產生之pdf壓縮成.zip傳輸至最大債權金融機構DTO報送帳號，最大債權金融機構次日即可下載協議書等相關文件。***
-
-		// 檢核項目end
+			// 檢核項目end
 		}
 
 		switch (iTranKey_Tmp) {
@@ -348,5 +359,20 @@ public class L8308 extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	// 轉換：Sql.Timestamp(創建日期)轉int(西元年YYYYMMDD)
+	private int TimestampToTime(Timestamp ts) throws LogicException {
+		int reTimestampToDate = 0;
+		String tsStr = "";
+		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
+		try {
+			tsStr = dateFormat.format(ts);
+			System.out.println(tsStr);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		reTimestampToDate = Integer.valueOf(tsStr);
+		return reTimestampToDate;
 	}
 }

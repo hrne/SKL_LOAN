@@ -38,12 +38,14 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,350,150];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,500];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8306]                                 (45)回報是否同意債務清償方案資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdRcDate+協商申請日",#RcDate],["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdRcDate+協商申請日",#RcDate],
+[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
 [#<->#,"#FdAgreeCode+是否同意債務清償方案",#AgreeCode],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
@@ -117,7 +119,7 @@ T(1,@Ukey,#NTXBUF,3,32)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@AgreeCode,1)
 T(2,@FdAgreeCode,*)
-
+K(MODIFYBUTTON,異動)
 ! 查詢進入
 #Deal_Search=X,1,S
 C(5,#TranKey_Tmp,5,$,S)
@@ -193,8 +195,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#RcDate)
+@V(7)A(DATE,0,#RcDate)
 
 
 ![最大債權金融機構代號]
@@ -202,19 +203,13 @@ D(8)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
+@V(7)V(NL)
 T(2,@RimJcicBankCode,#MaxMainCode)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 #MaxMainCodeX=X,80,L
-T(2,@RimJcicBankCode,#MaxMainCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@MaxMainCodeX,#L8r01JcicBankName)
-
 
 
 ![是否同意債務清償方案]

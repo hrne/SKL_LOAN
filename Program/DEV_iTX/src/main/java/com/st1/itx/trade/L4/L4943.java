@@ -65,10 +65,12 @@ public class L4943 extends TradeBuffer {
 		BigDecimal totTempAmt = BigDecimal.ZERO;
 		BigDecimal totRepayAmt = BigDecimal.ZERO;
 
+		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode").trim());
+		
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 150;
+		this.limit = 1;
 
 //		1.戶號 = 戶號+入帳日
 //		2.上限金額 = 入帳日+限額
@@ -107,7 +109,11 @@ public class L4943 extends TradeBuffer {
 			if (resulParttList.size() == this.limit && hasNext()) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
+				if(functionCode == 6) {
+				  this.totaVo.setMsgEndToAuto();
+				} else {
+				  this.totaVo.setMsgEndToEnter();
+				}
 			}
 
 			for (Map<String, String> result : resulParttList) {

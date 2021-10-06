@@ -88,7 +88,7 @@ public class L597A extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		//this.limit=Integer.MAX_VALUE;//查全部
-		this.limit=120;//查全部
+		this.limit=50;//查全部
 		
 		String sql="";
 		List<String[]> Data=null;

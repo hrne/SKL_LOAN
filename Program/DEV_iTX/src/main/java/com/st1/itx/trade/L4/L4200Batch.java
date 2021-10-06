@@ -34,9 +34,7 @@ import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
 import com.st1.itx.db.domain.PostDeductMedia;
-import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxErrCode;
-import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcReceivableService;
 import com.st1.itx.db.service.AchDeductMediaService;
 import com.st1.itx.db.service.BankDeductDtlService;
@@ -51,11 +49,12 @@ import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.db.service.TxErrCodeService;
+import com.st1.itx.trade.BS.BS001;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.FileCom;
 import com.st1.itx.util.common.TxAmlCom;
-import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.common.data.AchDeductFileVo;
 import com.st1.itx.util.common.data.BankRmtfFileVo;
 import com.st1.itx.util.common.data.BatxChequeFileVo;
@@ -141,9 +140,6 @@ public class L4200Batch extends TradeBuffer {
 	public BaTxCom baTxCom;
 
 	@Autowired
-	public TxToDoCom txToDoCom;
-
-	@Autowired
 	public LoanChequeService loanChequeService;
 
 	@Autowired
@@ -157,6 +153,9 @@ public class L4200Batch extends TradeBuffer {
 
 	@Autowired
 	public WebClient webClient;
+
+	@Autowired
+	public BS001 bs001;
 
 	private int iAcDate = 0;
 	private String iBatchNo = "";
@@ -222,9 +221,6 @@ public class L4200Batch extends TradeBuffer {
 
 	private List<BatxDetail> lBatxDetail = new ArrayList<BatxDetail>();
 	private Slice<BatxDetail> sBatxDetail = null;
-
-	private List<LoanCheque> lLoanCheque = new ArrayList<LoanCheque>();
-	private Slice<LoanCheque> sLoanCheque = null;
 
 	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 	private Slice<AcReceivable> sAcReceivable = null;
@@ -471,12 +467,12 @@ public class L4200Batch extends TradeBuffer {
 
 					try {
 						procCheque(filePath4, dataLineList4, titaVo);
-//						支票兌現檔整批入帳檢核，逾期未兌現時(本埠：到期日+一營業日 外埠：到期日+兩營業日)寫入應處理清單 
-						txToDoCheque(titaVo);
 					} catch (LogicException e) {
 						sendMsg = e.getMessage();
 						checkFlag = false;
 					}
+					// 支票兌現檢核
+					txToDoCheque(titaVo);
 				}
 			}
 
@@ -1414,7 +1410,6 @@ public class L4200Batch extends TradeBuffer {
 				tLoanChequeId.setChequeAcct(chequeAcct);
 				tLoanChequeId.setChequeNo(chequeNo);
 				tLoanCheque = loanChequeService.findById(tLoanChequeId, titaVo);
-
 				this.info("Cheque ReturnCode : " + tempOccursList.get("ReturnCode"));
 
 //              交換通過
@@ -1582,101 +1577,10 @@ public class L4200Batch extends TradeBuffer {
 		}
 	}
 
-	/* 支票兌現檔整批入帳檢核，逾期未兌現時(本埠：到期日+一營業日 外埠：到期日+兩營業日)寫入應處理清單 */
+	// 啟動背景作業－BS006 新增應處理明細－支票兌現檢核
 	private void txToDoCheque(TitaVo titaVo) throws LogicException {
-		txToDoCom.setTxBuffer(this.txBuffer);
-		dateUtil.setDate_1(this.txBuffer.getMgBizDate().getLbsDyf());
-		TxBizDate bizDate = dateUtil.getForTxBizDate();
-		// 前一營業日
-		int LbsDy = this.txBuffer.getMgBizDate().getLbsDy();
-		// 前二營業日
-		int LLbsDy = bizDate.getLbsDy();
-		List<String> lStatus = new ArrayList<String>();
-		lStatus.add("0"); // 0: 未處理
-
-		sLoanCheque = loanChequeService.statusCodeRange(lStatus, 0, LbsDy + 19110000, this.index, this.limit, titaVo);
-
-		lLoanCheque = sLoanCheque == null ? null : sLoanCheque.getContent();
-
-		if (lLoanCheque != null && lLoanCheque.size() != 0) {
-			for (LoanCheque c : lLoanCheque) {
-				// OutsideCode 本埠外埠 1: 本埠 2: 外埠
-				if (("1".equals(c.getOutsideCode()) && c.getChequeDate() <= LbsDy)
-						|| ("2".equals(c.getOutsideCode()) && c.getChequeDate() <= LLbsDy)) {
-					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-					tTxToDoDetail.setItemCode("CHCK00"); // 支票兌現檢核
-					tTxToDoDetail.setCustNo(c.getCustNo());
-					tTxToDoDetail.setDtlValue(c.getChequeAcct() + " " + c.getChequeNo()); // 支票帳號 + 支票號碼
-					if ("1".equals(c.getOutsideCode()))
-						tTxToDoDetail.setProcessNote("本埠票 到期日" + c.getChequeDate() + "<=" + LbsDy);
-					else
-						tTxToDoDetail.setProcessNote("外埠票 到期日" + c.getChequeDate() + "<=" + LLbsDy);
-					txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
-				}
-			}
-		}
-	}
-
-	private class tmpCheque {
-
-		private int chequeAcct = 0;
-		private int chequeNo = 0;
-
-		private tmpCheque(int chequeAcct, int chequeNo) {
-			this.setChequeAcct(chequeAcct);
-			this.setChequeNo(chequeNo);
-		}
-
-//		private BigDecimal getChequeAcct() {
-//			return chequeAcct;
-//		}
-
-		private void setChequeAcct(int chequeAcct) {
-			this.chequeAcct = chequeAcct;
-		}
-
-//		private int getChequeNo() {
-//			return chequeNo;
-//		}
-
-		private void setChequeNo(int chequeNo) {
-			this.chequeNo = chequeNo;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + chequeAcct;
-			result = prime * result + chequeNo;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpCheque other = (tmpCheque) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (chequeAcct == 0) {
-				if (other.chequeAcct != 0)
-					return false;
-			} else if (chequeAcct != other.chequeAcct)
-				return false;
-			if (chequeNo != other.chequeNo)
-				return false;
-			return true;
-		}
-
-		private L4200Batch getEnclosingInstance() {
-			return L4200Batch.this;
-		}
+		// 支票未兌現時(本埠：到期日+一營業日 外埠：到期日+兩營業日)
+		MySpring.newTask("BS006", this.txBuffer, titaVo);
 	}
 
 	private String setProcCodeX(String procCode, String procCodeX, TitaVo titaVo) {

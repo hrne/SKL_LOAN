@@ -7134,6 +7134,7 @@ TXFORM=L8R37
 #L8r38SubmitKey=X,3,S
 #L8r38ApplyDate=D,7,S
 #L8r38BankId=X,3,S
+#L8r38BankIdX=X,80,S
 #L8r38ModifyType=X,1,S
 #L8r38OutJcicTxtDate=D,7,S
 </L8R38.dec>
@@ -7145,6 +7146,7 @@ TXFORM=L8R38
 #L8r38SubmitKey
 #L8r38ApplyDate
 #L8r38BankId
+#L8r38BankIdX
 #L8r38ModifyType
 #L8r38OutJcicTxtDate
 ^
@@ -7996,6 +7998,8 @@ TXFORM=L6R10
 #L6R11Zip3=X,3,S
 #L6R11CityGroup=X,1,S
 #L6R11DepartCode=X,6,S
+#L6R11JcicCityCode=X,1
+#L6R11JcicAreaCode=X,2
 </L6R11.dec>
 
 <L6R11.tom>
@@ -8010,6 +8014,8 @@ TXFORM=L6R11
 #L6R11Zip3
 #L6R11CityGroup
 #L6R11DepartCode
+#L6R11JcicCityCode
+#L6R11JcicAreaCode
 ^
 </L6R11.tom>
 

@@ -80,7 +80,7 @@ T(4,DATE$)
 !收件日期 必須輸入
 #ReceiveDate=D,7,I
 T(1,#PostingDate,2,7)
-@A(DATE,0,#ReceiveDate)
+@A(DATE,0,#ReceiveDate)V(7)
 
 #RPTFG=A,1,S
 
@@ -115,6 +115,8 @@ T(3,[L2605] 法拍費用未銷明細查詢)
 
 !金額
 #OFeeAmt=m,14,L
+
+
 
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #LOOP=X,1,S

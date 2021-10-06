@@ -433,6 +433,36 @@ public class TxToDoCom extends TradeBuffer {
 	}
 
 	/**
+	 * 刪除項目
+	 * 
+	 * @param itemCode
+	 * @param titaVo
+	 * @throws LogicException
+	 */
+	public void delByItemCode(String itemCode, TitaVo titaVo) throws LogicException {
+		this.info("TxToDoCom delByItemCode" + itemCode);
+		TxToDoMain tTxToDoMain = txToDoMainService.holdById(itemCode, titaVo);
+		if (tTxToDoMain != null) {
+			try {
+				txToDoMainService.delete(tTxToDoMain, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "TxToDoMain" + e.getErrorMsg());
+			}
+		}
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange(itemCode, 0, 9, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slTxToDoDetail != null) {
+			try {
+				txToDoDetailService.deleteAll(slTxToDoDetail.getContent(), titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "TxToDoDetail" + e.getErrorMsg());
+			}
+		}
+
+		return;
+	}
+
+	/**
 	 * daily House Keeping
 	 * 
 	 * @param titaVo TitaVo
@@ -595,13 +625,13 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "CHRE00;Y;C;-;-;-;L698A;L698A;L2307;-;關係人資料撿核";
 			break;
 		case "ACCL01":
-			settingValue = "ACCL01;-;Y;-;-;-;L6985;L6985;L618D;Y;應收利息提存入帳";
+			settingValue = "ACCL01;Y;Y;-;-;-;L6985;L6985;L618D;Y;應收利息提存入帳";
 			break;
 		case "ACCL02":
-			settingValue = "ACCL02;-;Y;-;-;-;L6985;L6985;L618D;Y;未付火險費提存入帳";
+			settingValue = "ACCL02;Y;Y;-;-;-;L6985;L6985;L618D;Y;未付火險費提存入帳";
 			break;
 		case "ACCL03":
-			settingValue = "ACCL03;-;Y;-;-;-;L6985;L6985;L618D;Y;放款承諾提存入帳";
+			settingValue = "ACCL03;Y;Y;-;-;-;L6985;L6985;L618D;Y;放款承諾提存入帳";
 			break;
 		case "RVTX00":
 			settingValue = "RVTX00;-;C;-;-;Y;L698A;L6984;L3100;Y;預約撥款到期";
@@ -619,9 +649,9 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "MAIL00;Y;Y;Y;Y;-;L698A;     ;L4711;-;電子郵件";
 			break;
 		case "L45101":
-			settingValue = "L4510 ;-;C;-;-;Y;L698A;L4510;L4510;-;產出15日薪員工扣薪檔";
+			settingValue = "L45101;-;C;-;-;Y;L698A;L4510;L4510;-;產出15日薪員工扣薪檔";
 		case "L45102":
-			settingValue = "L4510 ;-;C;-;-;Y;L698A;L4510;L4510;-;產出非15日薪員工扣薪檔";
+			settingValue = "L45102;-;C;-;-;Y;L698A;L4510;L4510;-;產出非15日薪員工扣薪檔";
 			break;
 		case "EMEP00":
 			settingValue = "EMEP00;-;C;-;-;-;L698A;L4200;L4200;-;員工扣薪入帳作業";

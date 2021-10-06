@@ -222,7 +222,7 @@ E(0,1)ASGN(LOOP$)
 T(H,#OOTxKind,#TxKindHelp)
 
 ! 交易金額
-#OOTxAmt=m,14,O
+#OOTxAmt=+m,14,O
 ! 本金餘額
 #OOTransPrincipalBal=m,14,O
 ! 會計日期
@@ -258,9 +258,10 @@ C(3,#OOTxKind,9,BIND(grid,cancel)
 
 
 
+
 !<撥付金額調整>
-#OOBufC=X,21,S
-T(2,#CustId+#OCustNo+#CaseSeq)
+#OOBufC=X,50,S
+T(2,#CustId+#OCustNo+#CaseSeq+#OOTxAmt+#OOReturnAmt)
 #OOBtnC=A,2,O
 C(3,#OOExportDate,0,BIND(grid,{ cmd=CHAIN; ntxcd=L5711; ntxbuf=#OOBufC})
 									 ,BIND(grid,cancel))

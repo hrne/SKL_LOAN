@@ -144,7 +144,7 @@ public class L1001 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 250; // 232 * 40 = 9280
+		this.limit = 40; // 232 * 40 = 9280
 
 		switch (iKind) {
 		case 1:

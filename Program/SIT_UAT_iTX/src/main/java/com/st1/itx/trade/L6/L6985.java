@@ -57,7 +57,6 @@ public class L6985 extends TradeBuffer {
 	public CdAcCodeService cdAcCodeService;
 
 	private int selectCode = 0;
-	private int custNo = 0;
 	private int trasCollDate = 0;
 	private String iItemCode = "";
 
@@ -71,12 +70,12 @@ public class L6985 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 100;// 389*100 = 38900
+		this.limit = Integer.MAX_VALUE;
 
 		trasCollDate = parse.stringToInteger(titaVo.getParam("AcDate"));
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
 		iItemCode = titaVo.getParam("cItemCode");
-		
+
 		this.info("selectCode = " + selectCode);
 		this.info("trasCollDate = " + trasCollDate);
 		// 0.未處理
@@ -155,9 +154,11 @@ public class L6985 extends TradeBuffer {
 				String AcclType = tTempVo.getParam("AcclType");
 				String SlipNote = tTempVo.getParam("SlipNote");
 				BigDecimal TxAmt = parse.stringToBigDecimal(tTempVo.getParam("DbTxAmt1"));
-				String AcctCode = tTempVo.getParam("AcctCode") == null ? "" : tTempVo.getParam("AcctCode");
+				String AcctCode = tTempVo.getParam("AcctCode");
 				String AcBookCode = tTempVo.getParam("AcBookCode");
 				String AcSubBookCode = tTempVo.getParam("AcSubBookCode");
+				String AcDate = tTempVo.getParam("AcDate");
+				String SlipBatNo = tTempVo.getParam("SlipBatNo");
 				String AcctItem = "";
 				CdAcCode tCdAcCode = cdAcCodeService.acCodeAcctFirst(AcctCode, titaVo);
 				if (tCdAcCode != null) {
@@ -177,9 +178,9 @@ public class L6985 extends TradeBuffer {
 				occursList.putParam("OOAcctItem", AcctItem); // 科目名稱
 				occursList.putParam("OOAcBookCode", AcBookCode + "/" + AcSubBookCode); // 帳冊別
 				occursList.putParam("OORmk", SlipNote); // 摘要
-				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr()
-						+ tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
-
+				occursList.putParam("OORelNo", tTxToDoDetail.getTitaEntdy() + tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo() + parse.IntegerToString(tTxToDoDetail.getTitaTxtNo(), 8));
+				occursList.putParam("OOAcDate",AcDate); // 會計日期
+				occursList.putParam("OOSlipBatNo",SlipBatNo); // 會計日期
 				occursList.putParam("OODbAmt", TxAmt); // 金額
 				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
@@ -191,13 +192,6 @@ public class L6985 extends TradeBuffer {
 			}
 		} else {
 			throw new LogicException(titaVo, "E0001", "查詢範圍: " + fallMessage + " 查無資料");
-		}
-
-		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
-		if (slTxToDoDetail != null && slTxToDoDetail.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			/* 手動折返 */
-			this.totaVo.setMsgEndToEnter();
 		}
 
 		this.addList(this.totaVo);

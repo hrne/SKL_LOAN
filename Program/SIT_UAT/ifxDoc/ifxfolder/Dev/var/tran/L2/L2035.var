@@ -184,18 +184,21 @@ T(3,1)ASGN(LOOP$)
 
 #OOCaseNo=A,7,L
 
+#OOCustNo=A,7,L
+
 !複製
 #OOBUF3=X,228,S
-T(2,#OOCaseNo)
+T(2,#OOCaseNo+#OOCustNo)
 
 #OOBTN3=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2305; ntxbuf=#OOBUF3})
 
 #OOBUF5=X,228,S
-T(2,3+#OOCaseNo)
+C(3,#CustNo,0,T(2,#OOCaseNo+0000000),T(2,#OOCaseNo+#OOCustNo))
+
 
 #OOBTN5=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L2306; ntxbuf=#OOBUF5})
+BIND(grid,{ cmd=CHAIN; ntxcd=L2036; ntxbuf=#OOBUF5})
 
 
 
@@ -216,6 +219,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2306; ntxbuf=#OOBUF5})
 <sub type="TOM">
 TXFORM=L2035
 #OOCaseNo
+#OOCustNo
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -243,12 +247,18 @@ TXFORM=L2035
 #OOCaseNo=ELoan案件編號
 {width:150,align:'center'}
 
+#OOCustNo=借戶人戶號
+{width:150,align:'center'}
+
 ^
 
 #RPTFG2=2,QUERY.GRID,L2035
 #any={detail:true, header:'L2035.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOCaseNo=ELoan案件編號
+{width:150,align:'center'}
+
+#OOCustNo=借戶人戶號
 {width:150,align:'center'}
 
 ^

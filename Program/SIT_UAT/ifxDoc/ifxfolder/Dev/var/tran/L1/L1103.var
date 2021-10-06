@@ -509,7 +509,7 @@ T(3,*)
 #FdRegAdrBef=X,2,L
 #FdRegZipBef=X,2,L
 #FdRegAdrAft=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 #FdRegZipAft=X,2,L
 
 #FdCurrAdrBef=X,2,L
@@ -519,18 +519,18 @@ T(3,*)
 #FdCurrZipAft=X,2,L
 
 #FdEmailBef=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdEntcodeBef=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdEmpnoBef=X,2,L
 #FdEnameBef=X,2,L
 #FdEducodeBef=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdOwnedhomeBef=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdCurrcompnameBef=X,2,L
 #FdCurrcompidBef=X,2,L
@@ -541,10 +541,10 @@ C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
 #FdIncomedatadateBef=X,2,L
 #FdPassportnoBef=X,2,L
 #FdAmljobcodeBef=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdAmlgroupBef=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdIndigenousnameBef1=X,2,L
 #FdIsLimit=X,2,L

@@ -405,32 +405,32 @@ T(3,*)
 T(3,*)
 
 #FdCustType=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdEntcode=X,2,L
 #FdIndustry=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdNationalityCode=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdBussNationalityCode=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdSpouseId=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdSpouseName=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 
 #FdRegAdrBef=X,2,L
 #FdRegAdrAft=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 #FdRegZipBef=X,2,L
 
 #FdCurrAdrBef=X,2,L
 #FdCurrAdrAft=X,2,L
-C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*))
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 #FdCurrZipBef=X,2,L
 
 #FdEmail=X,2,L
@@ -575,13 +575,20 @@ T(H,#NationalityCodeBef,#NationalityCodeHelp)
 
 #NationalityCodeAft=X,2,I
 HELP(#NationalityCodeHelp)
-@V(H,#NationalityCodeHelp)
+@
+C(5,NationalityCodeAft,#NationalityCodeBef,s,$)
+C(5,#FdNationalityCode,*,V(7),$)
+C(4,#NationalityCodeAft,$,V(H,#NationalityCodeHelp))
 
 #NationalityCodeXAft=X,50,L
 T(H,#NationalityCodeAft,#NationalityCodeHelp)
 
 #NationalityCodeInd=_,_,L
 IF(#NationalityCodeAft==#NationalityCodeBef || #NationalityCodeAft == "",T(3,),T(3,X))
+
+#T1=X,1,S
+C(5,#NationalityCodeAft,TW,C(2,#TypeCodeAft,T(3,*),T(3,*),T(3, ),T(3, )),T(3, ))
+T(2,@FdSpouseId,#T1)
 
 !國籍
 #BussNationalityCodeBef=X,2,L
@@ -610,7 +617,9 @@ IF(#BussNationalityCodeAft==#BussNationalityCodeBef || #NationalityCodeAft == ""
 #SpouseIdInd=X,1,L
 
 #SpouseIdAft=X,10,I
-@C(4,#SpouseIdAft,S,A(ID_UNINO,0,#SpouseIdAft))
+@
+C(5,#FdSpouseId,*,V(7),$)
+C(4,#SpouseIdAft,S,A(ID_UNINO,0,#SpouseIdAft))
 
 #SpouseIdInd=_,_,L
 IF(#SpouseIdAft==#SpouseIdBef ,T(3,),T(3,X))
@@ -621,6 +630,8 @@ IF(#SpouseIdAft==#SpouseIdBef ,T(3,),T(3,X))
 #SpouseNameInd=X,1,L
 
 #SpouseNameAft=x,2.50,I
+@
+C(5,#FdSpouseId,*,V(7),$)
 
 #SpouseNameInd=_,_,L
 C(5,#SpouseNameAft,#SpouseNameBef,T(3,),T(3,X))
