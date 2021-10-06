@@ -1,0 +1,340 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,50];">
+[
+["[L6704]                                 地區別資料維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdCityCode+地區別",#CityCode],
+["#FdCityItem+地區別名稱",#CityItem],
+["#FdUnitCode+單位代號",#UnitCode,#UnitCodeBTN,#UnitItem],
+["#FdAccCollPsn+催收人員",#AccCollPsn,#AccCollPsnNm],
+["#FdLegalPsn+法務人員",#LegalPsn,#LegalPsnNm],
+]
+
+! ["#FdIntRateCeiling+利率上限",#IntRateCeiling,"%"],
+! ["#FdIntRateFloor+利率下限",#IntRateFloor,"%"],
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BUF1=X,42,S
+
+! 必輸欄位
+
+! 永遠為必輸欄位
+#FdFuncCode=X,2,L
+T(3,*)
+#FdCityCode=X,2,L
+T(3,*)
+#FdCityItem=X,2,L
+T(3,*)
+#FdUnitCode=X,2,L
+T(3,*)
+#FdAccCollPsn=X,2,L
+T(3,*)
+#FdLegalPsn=X,2,L
+T(3,*)
+! #FdIntRateCeiling=X,2,L
+! T(3,*)
+! #FdIntRateFloor=X,2,L
+! T(3,*)
+
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2(1:新增;2:修改;4:刪除)
+#CODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,50,S     
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode2)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6074進入),$)
+
+#NTXBUF=X,41,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_CityCode=X,2,S
+T(1,#NTXBUF,2,2)
+
+#CHAIN_CityItem=X,20,S
+T(1,#NTXBUF,4,20)
+
+#CHAIN_UnitCode=X,6,S
+T(1,#NTXBUF,24,6)
+
+#CHAIN_AccCollPsn=X,6,S
+T(1,#NTXBUF,30,6)
+
+#CHAIN_LegalPsn=X,6,S
+T(1,#NTXBUF,36,6)
+
+! #CHAIN_IntRateCeiling_1=X,2,S
+! T(1,#NTXBUF,41,2)
+
+! #CHAIN_IntRateCeiling_2=X,4,S
+! T(1,#NTXBUF,43,4)
+
+! #CHAIN_IntRateCeiling=X,7,S
+! T(2,#CHAIN_IntRateCeiling_1+.+#CHAIN_IntRateCeiling_2)
+
+! #CHAIN_IntRateFloor_1=X,2,S
+! T(1,#NTXBUF,47,2)
+
+! #CHAIN_IntRateFloor_2=X,4,S
+! T(1,#NTXBUF,49,4)
+
+! #CHAIN_IntRateFloor=X,7,S
+! T(2,#CHAIN_IntRateFloor_1+.+#CHAIN_IntRateFloor_2)
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+C(3,#FuncCode,1,S,$)
+T(2,@CityCode,#CHAIN_CityCode)
+T(2,@CityItem,#CHAIN_CityItem)
+T(2,@UnitCode,#CHAIN_UnitCode)
+T(2,@AccCollPsn,#CHAIN_AccCollPsn)
+T(2,@LegalPsn,#CHAIN_LegalPsn)
+! E(0,@IntRateCeiling,#CHAIN_IntRateCeiling)
+! E(0,@IntRateFloor,#CHAIN_IntRateFloor)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCode2Help)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+! !FuncCode=1,2 顯示框線
+! #WKTF=X,1,S
+! IF (#FuncCode==1 || #FuncCode==2 ,T(F,@CityItem,1)T(F,@UnitCode,1)T(F,@AccCollPsn,1)T(F,@LegalPsn,1)T(F,@IntRateCeiling,1)T(F,@IntRateFloor,1),
+!                                   T(F,@CityItem,0)T(F,@UnitCode,0)T(F,@AccCollPsn,0)T(F,@LegalPsn,0)T(F,@IntRateCeiling,0)T(F,@IntRateFloor,0))
+#WKTF=X,1,S
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,@CityItem,1)T(F,@UnitCode,1)T(F,@AccCollPsn,1)T(F,@LegalPsn,1),
+                                  T(F,@CityItem,0)T(F,@UnitCode,0)T(F,@AccCollPsn,0)T(F,@LegalPsn,0)
+)
+
+IF (#FuncCode==1 ,T(F,@CityCode,1),T(F,@CityCode,0))
+IF (#FuncCode==4 ,HIDE(#UnitCodeBTN),SHOW(#UnitCodeBTN))             
+#WKPSC=X,2,S
+
+#WKSTAR=X,2,S
+C(3,#CHAIN,1,S,T(3,*))
+
+#WKSTAR1=X,2,S
+C(3,#CHAIN,1,C(2,#FuncCode,S,T(3,*)),T(3,*))
+
+#WKSTAR2=X,2,S
+C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
+
+#WKNAME=X,1,S
+T(2,@FdFuncCode,#WKSTAR)
+T(2,@FdCityCode,#WKSTAR1)
+T(2,@FdCityItem,#WKSTAR2)
+T(2,@FdUnitCode,#WKSTAR2)
+T(2,@FdAccCollPsn,#WKSTAR2)
+T(2,@FdLegalPsn,#WKSTAR2)
+! T(2,@FdIntRateCeiling,#WKSTAR2)
+! T(2,@FdIntRateFloor,#WKSTAR2)
+
+! 地區別
+#CityCode=X,2,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+V(9)
+
+#SendL6R12=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimL6R12CityCode,#CityCode)
+RESET_RIM(#SendL6R12,L6R12)
+S(L6R12,1,#RimFuncCode,#RimTxCode,#RimL6R12CityCode)
+R(1,L6R12)
+
+#RecL6R12=X,1,S
+C(2,#FuncCode,s,s)
+T(2,@CityItem,#L6R12CityItem)
+T(2,@UnitCode,#L6R12UnitCode)
+T(2,@AccCollPsn,#L6R12AccCollPsn)
+T(2,@LegalPsn,#L6R12LegalPsn)
+! E(0,@IntRateCeiling,#L6R12IntRateCeiling)
+! E(0,@IntRateFloor,#L6R12IntRateFloor)
+
+! 地區別名稱
+#CityItem=x,20,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 單位代號
+#UnitCodeBTN=X,1,I,ui:button;value:單位代號查詢;enable:1;tabbable:0
+#UnitCodeBUF=X,6,S
+#UnitCodeBIND=X,1,S
+BIND(#UnitCodeBTN,click, {cmd=CHAIN; ntxcd=L6086; ntxbuf=#UnitCodeBUF;ntxbuf5=type<-1:UnitCode<-OOUnitCode})
+
+#UnitCode=X,6,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+#SendL6R13=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimUnitCode,#UnitCode)
+RESET_RIM(#SendL6R13,L6R13)
+S(L6R13,1,#RimFuncCode,#RimTxCode,#RimUnitCode)
+R(1,L6R13)
+
+T(2,@UnitItem,#L6R13UnitItem)
+
+! 單位名稱
+#UnitItem=X,40,L
+
+! 催收人員
+#AccCollPsn=X,6,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)V(NL)
+
+#cRimFuncCode=X,1,S
+C(2,#FuncCode,$,E(0,@RimFuncCode,1),E(0,@RimFuncCode,2),E(0,@RimFuncCode,3),E(0,@RimFuncCode,5),E(0,@RimFuncCode,5))
+
+! 催收人員名稱
+#AccCollPsnNm=X,40,L
+C(2,#FuncCode,$,$,$,$,s,s)
+#SendL6R17a=X,1,S
+T(2,@RimEmployeeNo,#AccCollPsn)
+RESET_RIM(#SendL6R17,L6R17)
+S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
+R(1,L6R17)
+T(2,@AccCollPsnNm,#L6R17Fullname)
+
+! 法務人員
+#LegalPsn=X,6,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)V(NL)
+
+! 法務人員名稱
+#LegalPsnNm=X,40,L
+C(2,#FuncCode,$,$,$,$,s,s)
+#SendL6R17b=X,1,S
+T(2,@RimEmployeeNo,#LegalPsn)
+RESET_RIM(#SendL6R17,L6R17)
+S(L6R17,1,#RimFuncCode,#RimTxCode,#RimEmployeeNo)
+R(1,L6R17)
+T(2,@LegalPsnNm,#L6R17Fullname)
+
+! ! 利率上限
+! #IntRateCeiling=m,2.4,I
+! C(2,#FuncCode,$,$,$,$,s,s)
+! @V(2,0)
+
+! ! 利率下限
+! #IntRateFloor=m,2.4,I
+! C(2,#FuncCode,$,$,$,$,s,s)
+! @V(2,0)V(5,0.0001,#IntRateCeiling)
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R12Rim.dec"/>
+<include src="ROM.icf::L6R12.dec"/>
+<include src="ROM.icf::L6R13Rim.dec"/>
+<include src="ROM.icf::L6R13.dec"/>
+<include src="ROM.icf::L6R17Rim.dec"/>
+<include src="ROM.icf::L6R17.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6704 ----------
+<sub type="FORM" name="L6704">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6704,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6704] 地區別資料維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+! #IntRateCeiling
+! #IntRateFloor
+<sub type="TIM">
+#FuncCode
+#CityCode
+#CityItem
+#UnitCode
+#AccCollPsn
+#LegalPsn
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L6704
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R12.tom"/>
+<include src="ROM.icf::L6R13.tom"/>
+<include src="ROM.icf::L6R17.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

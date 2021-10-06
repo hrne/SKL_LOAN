@@ -194,6 +194,34 @@ em = null;
   }
 
   @Override
+  public Slice<NegAppr02> NegTransEq(int negTransAcDate_0, String negTransTlrNo_1, int negTransTxtNo_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<NegAppr02> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("NegTransEq " + dbName + " : " + "negTransAcDate_0 : " + negTransAcDate_0 + " negTransTlrNo_1 : " +  negTransTlrNo_1 + " negTransTxtNo_2 : " +  negTransTxtNo_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = negAppr02ReposDay.findAllByNegTransAcDateIsAndNegTransTlrNoIsAndNegTransTxtNoIs(negTransAcDate_0, negTransTlrNo_1, negTransTxtNo_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = negAppr02ReposMon.findAllByNegTransAcDateIsAndNegTransTlrNoIsAndNegTransTxtNoIs(negTransAcDate_0, negTransTlrNo_1, negTransTxtNo_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = negAppr02ReposHist.findAllByNegTransAcDateIsAndNegTransTlrNoIsAndNegTransTxtNoIs(negTransAcDate_0, negTransTlrNo_1, negTransTxtNo_2, pageable);
+    else 
+      slice = negAppr02Repos.findAllByNegTransAcDateIsAndNegTransTlrNoIsAndNegTransTxtNoIs(negTransAcDate_0, negTransTlrNo_1, negTransTxtNo_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public NegAppr02 holdById(NegAppr02Id negAppr02Id, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

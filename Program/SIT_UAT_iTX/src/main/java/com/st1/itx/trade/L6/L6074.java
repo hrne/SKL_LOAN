@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6074 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6074.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -52,7 +49,6 @@ public class L6074 extends TradeBuffer {
 
 		// 取得輸入資料
 		String iCityCode = titaVo.getParam("CityCode");
-		
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -65,7 +61,7 @@ public class L6074 extends TradeBuffer {
 
 		if (iCityCode.isEmpty() || iCityCode.equals("00")) {
 			slCdCity = sCdCityService.findAll(this.index, this.limit, titaVo);
-			this.info("iCityCode isEmpty="+iCityCode);
+			this.info("iCityCode isEmpty=" + iCityCode);
 		} else {
 			slCdCity = sCdCityService.findCityCode(iCityCode, iCityCode, this.index, this.limit, titaVo);
 		}
@@ -88,14 +84,14 @@ public class L6074 extends TradeBuffer {
 //			occursList.putParam("OOIntRateFloor", tCdCity.getIntRateFloor());
 			sCdEmp = sCdEmpService.findById(tCdCity.getAccCollPsn(), titaVo);
 			iCdEmp = sCdEmpService.findById(tCdCity.getLegalPsn(), titaVo);
-			if(sCdEmp==null) {
+			if (sCdEmp == null) {
 				occursList.putParam("OOAccCollPsnX", "");
-			}else {
+			} else {
 				occursList.putParam("OOAccCollPsnX", sCdEmp.getFullname());
 			}
-			if(iCdEmp==null) {
+			if (iCdEmp == null) {
 				occursList.putParam("OOLegalPsnX", "");
-			}else {
+			} else {
 				occursList.putParam("OOLegalPsnX", iCdEmp.getFullname());
 			}
 			/* 將每筆資料放入Tota的OcList */

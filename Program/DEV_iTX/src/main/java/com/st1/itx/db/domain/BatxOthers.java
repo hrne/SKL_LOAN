@@ -53,13 +53,13 @@ public class BatxOthers implements Serializable {
   private int repayCode = 0;
 
   // 還款類別
-  /* 1:期款2:部分償還3:結案4:帳管費5:火險費6:契變手續費7:法務費9:其他 */
+  /* CdCode:RepayType1:期款2:部分償還3:結案4:帳管費5:火險費6:契變手續費7:法務費9:其他 */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
   // 來源會計科目
-  /* 8+5+2 */
-  @Column(name = "`RepayAcCode`", length = 15)
+  /* 11+5+2 */
+  @Column(name = "`RepayAcCode`", length = 18)
   private String repayAcCode;
 
   // 入帳日期
@@ -211,7 +211,8 @@ public class BatxOthers implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 1:期款
+	* CdCode:RepayType
+1:期款
 2:部分償還
 3:結案
 4:帳管費
@@ -227,7 +228,8 @@ public class BatxOthers implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 1:期款
+	* CdCode:RepayType
+1:期款
 2:部分償還
 3:結案
 4:帳管費
@@ -244,7 +246,7 @@ public class BatxOthers implements Serializable {
 
 /**
 	* 來源會計科目<br>
-	* 8+5+2
+	* 11+5+2
 	* @return String
 	*/
   public String getRepayAcCode() {
@@ -253,7 +255,7 @@ public class BatxOthers implements Serializable {
 
 /**
 	* 來源會計科目<br>
-	* 8+5+2
+	* 11+5+2
   *
   * @param repayAcCode 來源會計科目
 	*/

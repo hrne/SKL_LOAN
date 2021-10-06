@@ -192,11 +192,13 @@ public class L4601Batch extends TradeBuffer {
 					succesCnt = succesCnt + 1;
 					checkReportB(tInsuRenew, titaVo);
 					checkReportC(tInsuRenew, titaVo);
+				} else {
+					errorACnt = errorACnt + 1;
 				}
 
 				InsuRenewMediaTemp tInsuRenewMediaTemp = new InsuRenewMediaTemp();
 
-				tInsuRenewMediaTemp = getInsuRenewMediaTemp(t, tInsuRenewMediaTemp, titaVo);
+				tInsuRenewMediaTemp = this.getInsuRenewMediaTemp(t, tInsuRenewMediaTemp, titaVo);
 				// 檢核結果
 				tInsuRenewMediaTemp.setCheckResultA(checkResultA);
 				tInsuRenewMediaTemp.setCheckResultB(checkResultB);
@@ -225,6 +227,8 @@ public class L4601Batch extends TradeBuffer {
 	public InsuRenewMediaTemp getInsuRenewMediaTemp(OccursList occursList, InsuRenewMediaTemp t, TitaVo titaVo)
 			throws LogicException {
 
+//	FireInsuMonth		火險到期年月	X	6	
+		t.setFireInsuMonth(occursList.get("FireInsuMonth").trim());
 //	ReturnCode	回傳碼
 		t.setReturnCode(occursList.get("ReturnCode").trim());
 //	InsuCampCode	保險公司代碼
@@ -261,6 +265,8 @@ public class L4601Batch extends TradeBuffer {
 		t.setClNo(occursList.get("ClNo").trim());
 //	Seq	序號
 		t.setSeq(occursList.get("Seq").trim());
+//  InsuNo	保單號碼	
+		t.setInsuNo(occursList.get("InsuNo").trim());
 //	InsuStartDate	保險起日
 		t.setInsuStartDate(occursList.get("InsuStartDate").trim());
 //	InsuEndDate	保險迄日
@@ -352,19 +358,36 @@ public class L4601Batch extends TradeBuffer {
 				checkResultA += ",12";
 			}
 		}
-//		已入通知檔
+
 		if ("Y".equals(tInsuRenew.getNotiTempFg())) {
-			if ("".equals(checkResultB)) {
-				checkResultB += "13";
+			if ("".equals(checkResultA)) {
+				checkResultA += "13";
 			} else {
-				checkResultB += ",13";
+				checkResultA += ",13";
 			}
 			return;
 		}
 
-		if (!"".equals(checkResultA)) {
-			errorACnt = errorACnt + 1;
+//		已入通知檔
+		if ("Y".equals(tInsuRenew.getNotiTempFg())) {
+			if ("".equals(checkResultA)) {
+				checkResultA += "13";
+			} else {
+				checkResultA += ",13";
+			}
+			return;
 		}
+
+//		處理代碼非0.正常
+		if (tInsuRenew.getStatusCode() > 0) {
+			if ("".equals(checkResultA)) {
+				checkResultA += "14";
+			} else {
+				checkResultA += ",14";
+			}
+			return;
+		}
+
 	}
 
 	private void checkReportB(InsuRenew t, TitaVo titaVo) throws LogicException {
@@ -414,29 +437,46 @@ public class L4601Batch extends TradeBuffer {
 
 	}
 
+	/**
+	 * 檢核未撥款或已結案
+	 * 
+	 * @param t      InsuRenew
+	 * @param titaVo ..
+	 * @throws LogicException ..
+	 */
 	private void checkReportC(InsuRenew t, TitaVo titaVo) throws LogicException {
-
+		// 未撥款或已結案
+		boolean isClose = true;
+		boolean isUnLoan = true;
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(t.getCustNo(), t.getFacmNo(), t.getFacmNo(),
 				0, 900, 0, Integer.MAX_VALUE, titaVo);
-		boolean isFind = false;
 		if (slLoanBorMain != null) {
+			isUnLoan = false;
 			for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
-				if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 3 || tLoanBorMain.getStatus() == 7) {
-					isFind = true;
+				if (tLoanBorMain.getLoanBal().compareTo(BigDecimal.ZERO) > 0) {
+					isClose = false;
 				}
 			}
 		}
-//額度下無正常或催收之撥款//			
-		if (!isFind) {
-			if ("".equals(checkResultB)) {
+		// 已結案
+		if (isClose) {
+			if ("".equals(checkResultC)) {
 				checkResultC += "31";
 			} else {
 				checkResultC += ",31";
 			}
 		}
+		// 未撥款
+		if (isUnLoan) {
+			if ("".equals(checkResultC)) {
+				checkResultC += "32";
+			} else {
+				checkResultC += ",32";
+			}
+		}
 
 		if (!"".equals(checkResultC)) {
-			errorBCnt = errorCCnt + 1;
+			errorCCnt = errorCCnt + 1;
 		}
 
 	}

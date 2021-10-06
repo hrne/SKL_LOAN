@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("batxOthersService")
 @Repository
-public class BatxOthersServiceImpl implements BatxOthersService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(BatxOthersServiceImpl.class);
-
+public class BatxOthersServiceImpl extends ASpringJpaParm implements BatxOthersService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class BatxOthersServiceImpl implements BatxOthersService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + batxOthersId);
+    this.info("findById " + dbName + " " + batxOthersId);
     Optional<BatxOthers> batxOthers = null;
     if (dbName.equals(ContentName.onDay))
       batxOthers = batxOthersReposDay.findById(batxOthersId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "BatchNo", "DetailSeq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "BatchNo", "DetailSeq"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = batxOthersReposHist.findAll(pageable);
     else 
       slice = batxOthersRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("searchRuleA " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " batchNo_2 : " +  batchNo_2);
+    this.info("searchRuleA " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " batchNo_2 : " +  batchNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIs(acDate_0, acDate_1, batchNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIs(acDate_0, acDate_1, batchNo_2, pageable);
     else 
       slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIs(acDate_0, acDate_1, batchNo_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("searchRuleB " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " batchNo_2 : " +  batchNo_2 + " repayCode_3 : " +  repayCode_3);
+    this.info("searchRuleB " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " batchNo_2 : " +  batchNo_2 + " repayCode_3 : " +  repayCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIs(acDate_0, acDate_1, batchNo_2, repayCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIs(acDate_0, acDate_1, batchNo_2, repayCode_3, pageable);
     else 
       slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIs(acDate_0, acDate_1, batchNo_2, repayCode_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("searchRuleC " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " batchNo_2 : " +  batchNo_2 + " createEmpNo_3 : " +  createEmpNo_3);
+    this.info("searchRuleC " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " batchNo_2 : " +  batchNo_2 + " createEmpNo_3 : " +  createEmpNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndCreateEmpNoIs(acDate_0, acDate_1, batchNo_2, createEmpNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndCreateEmpNoIs(acDate_0, acDate_1, batchNo_2, createEmpNo_3, pageable);
     else 
       slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndCreateEmpNoIs(acDate_0, acDate_1, batchNo_2, createEmpNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("searchRuleD " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " batchNo_2 : " +  batchNo_2 + " repayCode_3 : " +  repayCode_3 + " createEmpNo_4 : " +  createEmpNo_4);
+    this.info("searchRuleD " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " batchNo_2 : " +  batchNo_2 + " repayCode_3 : " +  repayCode_3 + " createEmpNo_4 : " +  createEmpNo_4);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, batchNo_2, repayCode_3, createEmpNo_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -207,24 +215,28 @@ em = null;
     else 
       slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, batchNo_2, repayCode_3, createEmpNo_4, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override
-  public BatxOthers detSeqFirst(int acDate_0, TitaVo... titaVo) {
+  public BatxOthers detSeqFirst(int acDate_0, String batchNo_1, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("detSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0);
+    this.info("detSeqFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
     Optional<BatxOthers> batxOthersT = null;
     if (dbName.equals(ContentName.onDay))
-      batxOthersT = batxOthersReposDay.findTopByAcDateIsOrderByDetailSeqDesc(acDate_0);
+      batxOthersT = batxOthersReposDay.findTopByAcDateIsAndBatchNoIsOrderByDetailSeqDesc(acDate_0, batchNo_1);
     else if (dbName.equals(ContentName.onMon))
-      batxOthersT = batxOthersReposMon.findTopByAcDateIsOrderByDetailSeqDesc(acDate_0);
+      batxOthersT = batxOthersReposMon.findTopByAcDateIsAndBatchNoIsOrderByDetailSeqDesc(acDate_0, batchNo_1);
     else if (dbName.equals(ContentName.onHist))
-      batxOthersT = batxOthersReposHist.findTopByAcDateIsOrderByDetailSeqDesc(acDate_0);
+      batxOthersT = batxOthersReposHist.findTopByAcDateIsAndBatchNoIsOrderByDetailSeqDesc(acDate_0, batchNo_1);
     else 
-      batxOthersT = batxOthersRepos.findTopByAcDateIsOrderByDetailSeqDesc(acDate_0);
+      batxOthersT = batxOthersRepos.findTopByAcDateIsAndBatchNoIsOrderByDetailSeqDesc(acDate_0, batchNo_1);
+
     return batxOthersT.isPresent() ? batxOthersT.get() : null;
   }
 
@@ -240,7 +252,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("searchRuleE " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1);
+    this.info("searchRuleE " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(acDate_0, acDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -249,6 +261,9 @@ em = null;
       slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(acDate_0, acDate_1, pageable);
     else 
       slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(acDate_0, acDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -265,7 +280,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("searchRuleF " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " repayCode_2 : " +  repayCode_2);
+    this.info("searchRuleF " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " repayCode_2 : " +  repayCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIs(acDate_0, acDate_1, repayCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -274,6 +289,9 @@ em = null;
       slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIs(acDate_0, acDate_1, repayCode_2, pageable);
     else 
       slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIs(acDate_0, acDate_1, repayCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -290,7 +308,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("searchRuleG " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " createEmpNo_2 : " +  createEmpNo_2);
+    this.info("searchRuleG " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " createEmpNo_2 : " +  createEmpNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCreateEmpNoIs(acDate_0, acDate_1, createEmpNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -299,6 +317,9 @@ em = null;
       slice = batxOthersReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCreateEmpNoIs(acDate_0, acDate_1, createEmpNo_2, pageable);
     else 
       slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCreateEmpNoIs(acDate_0, acDate_1, createEmpNo_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -315,7 +336,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("searchRuleH " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " repayCode_2 : " +  repayCode_2 + " createEmpNo_3 : " +  createEmpNo_3);
+    this.info("searchRuleH " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " repayCode_2 : " +  repayCode_2 + " createEmpNo_3 : " +  createEmpNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = batxOthersReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, repayCode_2, createEmpNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -325,6 +346,9 @@ em = null;
     else 
       slice = batxOthersRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsAndCreateEmpNoIs(acDate_0, acDate_1, repayCode_2, createEmpNo_3, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -333,7 +357,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + batxOthersId);
+    this.info("Hold " + dbName + " " + batxOthersId);
     Optional<BatxOthers> batxOthers = null;
     if (dbName.equals(ContentName.onDay))
       batxOthers = batxOthersReposDay.findByBatxOthersId(batxOthersId);
@@ -351,7 +375,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + batxOthers.getBatxOthersId());
+    this.info("Hold " + dbName + " " + batxOthers.getBatxOthersId());
     Optional<BatxOthers> batxOthersT = null;
     if (dbName.equals(ContentName.onDay))
       batxOthersT = batxOthersReposDay.findByBatxOthersId(batxOthers.getBatxOthersId());
@@ -373,7 +397,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + batxOthers.getBatxOthersId());
+    this.info("Insert..." + dbName + " " + batxOthers.getBatxOthersId());
     if (this.findById(batxOthers.getBatxOthersId()) != null)
       throw new DBException(2);
 
@@ -402,7 +426,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + batxOthers.getBatxOthersId());
+    this.info("Update..." + dbName + " " + batxOthers.getBatxOthersId());
     if (!empNot.isEmpty())
       batxOthers.setLastUpdateEmpNo(empNot);
 
@@ -425,7 +449,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + batxOthers.getBatxOthersId());
+    this.info("Update..." + dbName + " " + batxOthers.getBatxOthersId());
     if (!empNot.isEmpty())
       batxOthers.setLastUpdateEmpNo(empNot);
 
@@ -445,7 +469,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + batxOthers.getBatxOthersId());
+    this.info("Delete..." + dbName + " " + batxOthers.getBatxOthersId());
     if (dbName.equals(ContentName.onDay)) {
       batxOthersReposDay.delete(batxOthers);	
       batxOthersReposDay.flush();
@@ -474,7 +498,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (BatxOthers t : batxOthers){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -509,7 +533,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (batxOthers == null || batxOthers.size() == 0)
       throw new DBException(6);
 
@@ -538,7 +562,7 @@ em = null;
 
   @Override
   public void deleteAll(List<BatxOthers> batxOthers, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

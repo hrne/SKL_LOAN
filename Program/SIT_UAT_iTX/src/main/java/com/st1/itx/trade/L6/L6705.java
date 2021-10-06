@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -35,7 +33,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6705 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6705.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -133,6 +130,8 @@ public class L6705 extends TradeBuffer {
 		mCdArea.setZip3(titaVo.getParam("Zip3"));
 		mCdArea.setCityGroup(titaVo.getParam("CityGroup"));
 		mCdArea.setDepartCode(titaVo.getParam("DepartCode"));
+		mCdArea.setJcicCityCode(titaVo.getParam("JcicCityCode"));
+		mCdArea.setJcicAreaCode(titaVo.getParam("JcicAreaCode"));
 
 		if (mFuncCode != 2) {
 			mCdArea.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));

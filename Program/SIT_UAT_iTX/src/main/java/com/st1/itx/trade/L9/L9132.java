@@ -2,8 +2,6 @@ package com.st1.itx.trade.L9;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -24,17 +22,16 @@ import com.st1.itx.util.http.WebClient;
  * @version 1.0.0
  */
 public class L9132 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L9132.class);
 
 	/* 報表服務注入 */
 	@Autowired
 	L9132Report l9132Report;
 
 	@Autowired
-	public WebClient webClient;
+	WebClient webClient;
 
 	@Autowired
-	public DateUtil dDateUtil;
+	DateUtil dDateUtil;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -50,15 +47,16 @@ public class L9132 extends TradeBuffer {
 
 		// 媒體類別 #MediaType=A,1,I
 		// 1: 出納票據; 2: 核心傳票; 3: 放款承諾;
-		int iMediaType = Integer.parseInt(titaVo.getParam("MediaType"));
+//		int iMediaType = Integer.parseInt(titaVo.getParam("MediaType"));
 
 		this.info("L9132 iAcDate = " + iAcDate);
 		this.info("L9132 iBatchNo = " + iBatchNo);
-		this.info("L9132 iMediaType = " + iMediaType);
+//		this.info("L9132 iMediaType = " + iMediaType);
 
 		doRpt(titaVo);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L9132傳票媒體明細表(核心)已完成", titaVo);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				"L9132傳票媒體明細表(核心)已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -70,7 +68,7 @@ public class L9132 extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9132Report.setParentTranCode(parentTranCode);
-		
+
 		// 撈資料組報表
 		l9132Report.exec(titaVo);
 

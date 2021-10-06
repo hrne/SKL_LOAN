@@ -19,7 +19,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Scope("prototype")
 
 public class L9131Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L9131Report.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -112,12 +111,11 @@ public class L9131Report extends MakeReport {
 
 		// 傳票批號 #BatchNo=A,2,I
 		int iBatchNo = Integer.parseInt(titaVo.getParam("BatchNo"));
-		
+
 		// 核心傳票媒體上傳序號 #MediaSeq=A,3,I
 		int iMediaSeq = Integer.parseInt(titaVo.getParam("MediaSeq"));
 
-		Slice<SlipMedia> sSlipMedia = sSlipMediaService.findMediaSeq(this.reportDate, iBatchNo, iMediaSeq, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia> sSlipMedia = sSlipMediaService.findMediaSeq(this.reportDate, iBatchNo, iMediaSeq, 0, Integer.MAX_VALUE, titaVo);
 		List<SlipMedia> lSlipMedia = sSlipMedia == null ? null : sSlipMedia.getContent();
 
 		if (lSlipMedia == null || lSlipMedia.isEmpty()) {
@@ -167,7 +165,7 @@ public class L9131Report extends MakeReport {
 			print(1, 1, "　　");
 			print(0, 1, FormatUtil.pad9(String.valueOf(tSlipMedia.getSeq()), 3));
 			print(0, 7, tSlipMedia.getAcNoCode());
-			print(0, 16, tSlipMedia.getAcSubCode());
+			print(0, 19, tSlipMedia.getAcSubCode());
 			print(0, 61, tSlipMedia.getCurrencyCode());
 
 			if (tSlipMedia.getDbCr().equals("D")) {

@@ -1,0 +1,329 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6705]                                 聯徵報送-地區別資料維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdCityCode+地區別",#CityCode],
+["#FdAreaCode+鄉鎮區",#AreaCode],
+["#FdCityItem+縣市名稱",#CityItem],
+["#FdCityShort+縣市簡稱",#CityShort],
+["#FdAreaItem+鄉鎮區名稱",#AreaItem],
+["#FdAreaShort+鄉鎮區簡稱",#AreaShort],
+["#FdJcicCityCode+JCIC縣市碼",#JcicCityCode],
+["#FdJcicAreaCode+JCIC鄉鎮碼",#JcicAreaCode],
+["#FdZip3+郵遞區號",#Zip3],
+!["#FdCityType+地區類別",#CityType],
+["#FdCityGroup+組合地區別",#CityGroup],
+["#FdDepartCode+部室代號",#DepartCode],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BUF1=X,42,S
+
+! 必輸欄位
+
+! 永遠為必輸欄位
+#FdFuncCode=X,2,L
+T(3,*)
+#FdCityCode=X,2,L
+T(3,*)
+#FdAreaCode=X,2,L
+T(3,*)
+#FdCityItem=X,2,L
+T(3,*)
+#FdCityShort=X,2,L
+T(3,*)
+#FdAreaItem=X,2,L
+T(3,*)
+#FdAreaShort=X,2,L
+T(3,*)
+#FdJcicCityCode=X,2,L
+T(3,*)
+#FdJcicAreaCode=X,2,L
+T(3,*)
+#FdCityType=X,2,L
+T(3,)
+#FdZip3=X,2,L
+T(3,*)
+#FdCityGroup=X,2,L
+T(3,*)
+#FdDepartCode=X,2,L
+T(3,*)
+
+!---------- AP TEXT AREA Variables ----------
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6075進入),$)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode1 (1:新增;2:修改;4:刪除;5:查詢)
+#CDCODEFuncCode1=x,20,S                  
+T(3,CdCode.FuncCode1)                  
+#FuncCodeHelp=x,100,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode1)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCodeHelp,#HelpDesc1)
+
+#RimFunCd=A,1,S
+!#RimCityCode=X,2,S
+!#RimAreaCode=X,3,S
+
+<include src="ROM.icf::L6R03.dec"/>
+#RimL6r03City=X,1,S
+E(0,@RimFunCd,1)
+T(3,@RimCityCode,)
+T(3,@RimAreaCode,)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 縣市代碼的下拉選單
+#CityHelp=X,10000,S
+T(2,#L6r03Result)
+
+
+#NTXBUF=X,5,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_CityCode=X,2,S
+T(1,#NTXBUF,2,2)
+
+#CHAIN_AreaCode=X,2,S
+T(1,#NTXBUF,4,2)
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+C(3,#FuncCode,1,S,$)
+T(2,@CityCode,#CHAIN_CityCode)
+T(2,@AreaCode,#CHAIN_AreaCode)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCodeHelp)
+@V(H,#FuncCodeHelp)
+
+#FuncCodeX=X,4,L
+C(4,#FuncCode,S,$)
+T(3, )
+T(H,#FuncCode,#FuncCodeHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+IF (#FuncCode==1 ||#FuncCode==2 ,T(F,@CityShort,1)T(F,@AreaItem,1)T(F,@AreaShort,1)T(F,@CityType,1)T(F,@Zip3,1)T(F,@CityGroup,1)T(F,@DepartCode,1)T(F,@JcicCityCode,1)T(F,@JcicAreaCode,1),
+                                 T(F,@CityShort,0)T(F,@AreaItem,0)T(F,@AreaShort,0)T(F,@CityType,0)T(F,@Zip3,0)T(F,@CityGroup,0)T(F,@DepartCode,0)T(F,@JcicCityCode,0)T(F,@JcicAreaCode,0))
+
+IF (#FuncCode==1 ,T(F,@CityCode,1)T(F,@AreaCode,1),
+                  T(F,@CityCode,0)T(F,@AreaCode,0))
+
+#WKPSC=X,2,S
+
+#WKSTAR=X,2,S
+C(3,#CHAIN,1,S,T(3,*))
+
+#WKSTAR1=X,2,S
+C(3,#CHAIN,1,C(2,#FuncCode,S,T(3,*)),T(3,*))
+
+#WKSTAR2=X,2,S
+C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
+
+#WKNAME=X,1,S
+T(2,@FdFuncCode,#WKSTAR)
+T(2,@FdCityCode,#WKSTAR1)
+T(2,@FdAreaCode,#WKSTAR1)
+T(2,@FdCityItem,#WKPSC)
+T(2,@FdCityShort,#WKSTAR2)
+T(2,@FdAreaItem,#WKSTAR2)
+T(2,@FdAreaShort,#WKSTAR2)
+T(2,@FdCityType,#WKSTAR2)
+T(2,@FdZip3,#WKSTAR2)
+T(2,@FdCityGroup,#WKSTAR2)
+T(2,@FdDepartCode,#WKSTAR2)
+T(2,@FdJcicCityCode,#WKSTAR2)
+T(2,@FdJcicAreaCode,#WKSTAR2)
+
+! 地區別
+#CityCode=X,2,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(2,#FuncCode,$,$,$,$,s,s)
+HELP(#CityHelp)
+@
+V(H,#CityHelp)
+
+#CityCodeX=x,20,L
+T(H,@CityItem,#CityCode,#CityHelp)
+
+! 鄉鎮區
+#AreaCode=X,2,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)V(9)
+
+#SendL6R11=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimCityCode,#CityCode)
+T(2,@RimAreaCode,#AreaCode)
+RESET_RIM(#SendL6R11,L6R11)
+S(L6R11,1,#RimFuncCode,#RimTxCode,#RimCityCode,#RimAreaCode)
+R(1,L6R11)
+
+#RecL6R11=X,1,S
+T(2,@CityItem,#L6R11CityItem)
+T(2,@CityShort,#L6R11CityShort)
+T(2,@AreaItem,#L6R11AreaItem)
+T(2,@AreaShort,#L6R11AreaShort)
+T(2,@CityType,#L6R11CityType)
+T(2,@Zip3,#L6R11Zip3)
+T(2,@CityGroup,#L6R11CityGroup)
+T(2,@DepartCode,#L6R11DepartCode)
+T(2,@JcicCityCode,#L6R11JcicCityCode)
+T(2,@JcicAreaCode,#L6R11JcicAreaCode)
+
+! 縣市名稱
+#CityItem=x,20,L
+
+! 縣市簡稱
+#CityShort=x,12,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@C(4,#CityShort,T(1,#CityItem,1,12),s)
+V(7)
+
+! 鄉鎮區名稱
+#AreaItem=x,24,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@V(7)
+
+! 鄉鎮區簡稱
+#AreaShort=x,16,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@C(4,#AreaShort,T(1,#AreaItem,1,16),s)
+V(7)
+
+#JcicCityCode=X,1,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@
+V(7)
+
+#JcicAreaCode=X,2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@
+V(7)
+
+! 地區類別
+#CityType=X,2,S
+C(2,#FuncCode,$,$,$,$,s,s)
+!@V(7)
+
+! 郵遞區號
+#Zip3=X,3,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@
+V(7)V(9)
+
+! 組合地區別
+#CityGroup=X,1,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@
+V(7)
+
+! 部室代號
+#DepartCode=X,6,I
+C(2,#FuncCode,$,$,$,$,s,s)
+@
+V(7)
+
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R11Rim.dec"/>
+<include src="ROM.icf::L6R11.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6705 ----------
+<sub type="FORM" name="L6705">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L6705,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6705] 聯徵報送-地區別資料維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode#CityCode#AreaCode#CityItem#CityShort#AreaItem#AreaShort#CityType#Zip3#CityGroup#DepartCode#JcicCityCode#JcicAreaCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="ROM.icf::L6R03.tom"/>
+
+TXFORM=L6705
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R11.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

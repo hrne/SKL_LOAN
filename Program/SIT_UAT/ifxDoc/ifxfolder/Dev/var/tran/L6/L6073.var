@@ -109,8 +109,10 @@ T(H,#InsurerType,#InsurerTypeHelp)
 #InsurerCode=X,2,I
 C(3,#CHAIN,1,T(1,#NTXBUF,2,2),$)
 C(3,#CHAIN,1,s,$)
+IF(#InsurerType==0,s,$)
 @
-!A(ID_UNINO,0,#InsurerCode)
+C(4,#InsurerCode,s,$)
+V(NL)
 
 #BUF1=X,4,S
 !C(4,#InsurerCode,HIDE(#BTN1),SHOW(#BTN1))
@@ -125,6 +127,9 @@ C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
 
 !<include src="COM.icf::RPTFG.dec"/>
+
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -164,6 +169,9 @@ T(2,#OOInsurerType+-+#OOInsurerTypeX)
 
 ! 公司簡稱(TOTA)
 #OOInsurerShort=X,20,L
+
+!統一編號
+#OOInsurerId=X,8,L
 
 ! 連絡電話區碼(TOTA)
 #OOTelArea=X,5,L
@@ -225,6 +233,7 @@ TXFORM=L6073
 #OOTelArea
 #OOTelNo
 #OOTelExt
+#OOInsurerId
 ^
 </sub>
 
@@ -260,6 +269,9 @@ TXFORM=L6073
 #OOInsurerShort=公司簡稱
 {width:130,align:'left'}
 
+#OOInsurerId=統一編號
+{width:80,align:'left'}
+
 #OOTelNoX=連絡電話號碼
 {width:150,align:'left'}
 
@@ -279,6 +291,9 @@ TXFORM=L6073
 
 #OOInsurerShort=公司簡稱
 {width:130,align:'left'}
+
+#OOInsurerId=統一編號
+{width:80,align:'left'}
 
 #OOTelNoX=連絡電話號碼
 {width:150,align:'left'}

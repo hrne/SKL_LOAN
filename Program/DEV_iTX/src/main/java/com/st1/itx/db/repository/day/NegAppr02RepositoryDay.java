@@ -31,6 +31,9 @@ public interface NegAppr02RepositoryDay extends JpaRepository<NegAppr02, NegAppr
   // BringUpDate =
   public Slice<NegAppr02> findAllByBringUpDateIsOrderByCustIdAsc(int bringUpDate_0, Pageable pageable);
 
+  // NegTransAcDate = , AND NegTransTlrNo = , AND NegTransTxtNo =
+  public Slice<NegAppr02> findAllByNegTransAcDateIsAndNegTransTlrNoIsAndNegTransTxtNoIs(int negTransAcDate_0, String negTransTlrNo_1, int negTransTxtNo_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

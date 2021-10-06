@@ -17,13 +17,17 @@ import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
+import com.st1.itx.db.domain.CdBank;
+import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
+import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.SlipMediaService;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component
@@ -40,6 +44,8 @@ public class L4101ReportC extends MakeReport {
 	AcCloseService acCloseService;
 	@Autowired
 	CdAcCodeService cdAcCodeService;
+	@Autowired
+	CdBankService cdBankService;
 	@Autowired
 	CustMainService custMainService;
 
@@ -60,11 +66,6 @@ public class L4101ReportC extends MakeReport {
 	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
-
-	// 帳冊別 TODO:待修改
-	private String nowAcBookCode = "000";
-	private String nowAcBookItem = "全帳冊";
-//	private String slipNo = "";
 
 	// 製表日期
 	private String nowDate;
@@ -110,9 +111,9 @@ public class L4101ReportC extends MakeReport {
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
 
-		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　借方金額　　　　　　貸方金額　");
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
+		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
+		print(1, 1, "　日期　　科子細目名稱　　　　　　　　　　　　　　　　　　戶號　　　　　　戶名　　　　　　借方金額　　　　貸方金額　　　銀行別　分行別　　　　　　　　　帳號　　　");
+		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－－－－－－－　－－－－－－－");
 
 	}
 
@@ -133,6 +134,11 @@ public class L4101ReportC extends MakeReport {
 		batchNo = titaVo.getBacthNo();
 		reportCode = reportCode + "-" + batchNo;
 		String wkName = "";
+		String wkBankCode = "";
+		String wkBranchCode = "";
+		String wkBankItem = "";
+		String wkBranchItem = "";
+		String wkAcctNo = "";
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 
@@ -149,6 +155,8 @@ public class L4101ReportC extends MakeReport {
 		}
 
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
+		// 統一大小
+		this.setFont(1, 10);
 
 		this.setCharSpaces(0);
 		String wkRelTxSeq = "";
@@ -159,56 +167,77 @@ public class L4101ReportC extends MakeReport {
 				wkRelTxSeq = tAcDetail.getRelTxseq();
 				cnt++;
 			}
-			print(1, 1, "　　　　　　           ");
+//			print(1, 1, "　　　　　　           ");
 
 			String acNoCode = tAcDetail.getAcNoCode();
 			String acSubCode = tAcDetail.getAcSubCode();
 			String acDtlCode = "  ";
 			CdAcCode tCdAcCode = cdAcCodeService.findById(new CdAcCodeId(acNoCode, acSubCode, acDtlCode), titaVo);
-			// 明細資料第一行
-//			print(1, 1, "　　");
-			print(0, 1, "" + (acDate - 19110000));
-			print(0, 11, acNoCode + acSubCode + " " + tCdAcCode.getAcNoItem());
-			if ("D".equals(tAcDetail.getDbCr())) {
-
-				print(0, 105, formatAmt(tAcDetail.getTxAmt(), 2), "R");
-				sumDbAmt = sumDbAmt.add(tAcDetail.getTxAmt());
-			}
-
-			if ("C".equals(tAcDetail.getDbCr())) {
-
-				print(0, 125, formatAmt(tAcDetail.getTxAmt(), 2), "R");
-				sumCrAmt = sumCrAmt.add(tAcDetail.getTxAmt());
-			}
-			// 如是第三人則下行顯示第三人名稱
 
 			TempVo tTempVo = new TempVo();
 			tTempVo = tTempVo.getVo(tAcDetail.getJsonFields());
-			if (tTempVo.getParam("CustName") != null) {
-				this.info("tTempVo = " + tTempVo);
-				wkName = tTempVo.getParam("CustName");
 
-				CustMain c = custMainService.custNoFirst(tAcDetail.getCustNo(), tAcDetail.getCustNo(), titaVo);
-				if (c != null) {
-					this.info("wkName = " + wkName);
-					this.info("c Name = " + c.getCustName());
-					if (!"".equals(wkName) && !wkName.equals(c.getCustName())) {
-						print(1, 1, "　　");
-						print(0, 80, "※非借款人帳號　 帳戶戶名：　" + wkName);
-					}
+			this.info("tTempVo = " + tTempVo);
+			wkName = tTempVo.getParam("CustName");
+			wkBankCode = tTempVo.getParam("RemitBank");
+			wkBranchCode = tTempVo.getParam("RemitBranch");
+			wkAcctNo = tTempVo.getParam("RemitAcctNo");
+			CustMain c = custMainService.custNoFirst(tAcDetail.getCustNo(), tAcDetail.getCustNo(), titaVo);
+			CdBank t = cdBankService.findById(new CdBankId(wkBankCode, wkBranchCode), titaVo);
+			if (t != null) {
+
+				wkBankItem = t.getBankItem();
+				wkBranchItem = t.getBranchItem();
+			} else {
+				wkBankItem = wkBankCode;
+				wkBranchItem = wkBranchCode;
+
+			}
+
+			// 明細資料第一行
+			print(1, 1, "　　");
+			print(0, 1, this.showRocDate(acDate, 1)); // 會計日期
+			print(0, 12, acNoCode + acSubCode); // 科子細目
+			print(0, 57, "" + FormatUtil.pad9("" + tAcDetail.getCustNo(), 7));// 戶號
+			if (c != null) {
+				print(0, 67, FormatUtil.padX("" + c.getCustName(), 20));// 戶名
+			}
+			if ("D".equals(tAcDetail.getDbCr())) {
+				print(0, 103, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 借方金額
+				sumDbAmt = sumDbAmt.add(tAcDetail.getTxAmt());
+			}
+			if ("C".equals(tAcDetail.getDbCr())) {
+
+				print(0, 119, formatAmt(tAcDetail.getTxAmt(), 0), "R");// 貸方金額
+				sumCrAmt = sumCrAmt.add(tAcDetail.getTxAmt());
+			}
+			print(0, 121, wkBankItem); // 銀行別
+			print(0, 149, wkAcctNo);// 帳號
+			// 明細資料第二行
+			print(1, 1, "");
+			print(0, 12, tCdAcCode.getAcNoItem());// 科子細目名稱
+			print(0, 121, wkBranchItem);// 分行別
+
+			// 如是第三人則第二行顯示第三人名稱
+			if (c != null) {
+				this.info("wkName = " + wkName);
+				this.info("c Name = " + c.getCustName());
+				if (!"".equals(wkName) && !wkName.equals(c.getCustName())) {
+					print(0, 1, "　　");
+					print(0, 59, "※非借款人帳號　 帳戶戶名：　" + wkName); // 第三人姓名
+				}
 //						※非借款人帳號　 帳戶戶名：　Name
 
-				}
 			}
 
 		}
 
-		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　");
+		print(1, 1, "－－－－　－－－－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－－－－－－　－－－－－－－　－－－－－－－　－－－－－－－－－－－－－　－－－－－－－");
 		print(1, 1, "　　　　　　       共　" + cnt + "　筆數");
 
 //		print(0, 61, currencyCode);
-		print(0, 105, formatAmt(sumDbAmt, 2), "R");
-		print(0, 125, formatAmt(sumCrAmt, 2), "R");
+		print(0, 103, formatAmt(sumDbAmt, 0), "R");
+		print(0, 119, formatAmt(sumCrAmt, 0), "R");
 
 	}
 

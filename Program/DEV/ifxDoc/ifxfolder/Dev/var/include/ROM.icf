@@ -1972,7 +1972,7 @@ TXFORM=L2R06
 <L2R07.dec>
 #L2r07CustId=X,10,S
 #L2r07CustNo=A,7,S
-#L2r07CustName=X,100,S
+#L2r07CustName=x,100,S
 #L2r07CustTypeCode=X,2,S
 #L2r07EntCode=X,1,S
 #L2r07PrevPayIntDate=D,7,S
@@ -7957,6 +7957,7 @@ TXFORM=L6R09
 #L6R10TelArea=X,5,S
 #L6R10TelNo=X,10,S
 #L6R10TelExt=X,5,S
+#L6R10InsurerId=X,8,S
 </L6R10.dec>
 
 <L6R10.tom>
@@ -7968,6 +7969,7 @@ TXFORM=L6R10
 #L6R10TelArea
 #L6R10TelNo
 #L6R10TelExt
+#L6R10InsurerId
 ^
 </L6R10.tom>
 
@@ -7998,8 +8000,8 @@ TXFORM=L6R10
 #L6R11Zip3=X,3,S
 #L6R11CityGroup=X,1,S
 #L6R11DepartCode=X,6,S
-#L6R11JcicCityCode=X,1
-#L6R11JcicAreaCode=X,2
+#L6R11JcicCityCode=X,1,S
+#L6R11JcicAreaCode=X,2,S
 </L6R11.dec>
 
 <L6R11.tom>

@@ -34,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6073 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6073.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -59,14 +58,14 @@ public class L6073 extends TradeBuffer {
 
 		// 查詢保險公司資料檔
 		Slice<CdInsurer> slCdInsurer;
-		if (iInsurerType.isEmpty() || iInsurerType.equals("0") ) {	
-			if(!iInsurerCode.isEmpty()){
+		if (iInsurerType.isEmpty() || iInsurerType.equals("0")) {
+			if (!iInsurerCode.isEmpty()) {
 				this.info("iInsurerCode Not Empty");
 				slCdInsurer = sCdInsurerService.insurerTypeRange("1", "2", iInsurerCode, iInsurerCode, this.index, this.limit, titaVo);
 			} else {
 				slCdInsurer = sCdInsurerService.findAll(this.index, this.limit, titaVo);
 			}
-			
+
 		} else {
 			if (iInsurerCode.isEmpty()) {
 				slCdInsurer = sCdInsurerService.insurerTypeRange(iInsurerType, iInsurerType, "00", "ZZ", this.index, this.limit, titaVo);
@@ -89,6 +88,7 @@ public class L6073 extends TradeBuffer {
 			occursList.putParam("OOTelArea", tCdInsurer.getTelArea());
 			occursList.putParam("OOTelNo", tCdInsurer.getTelNo());
 			occursList.putParam("OOTelExt", tCdInsurer.getTelExt());
+			occursList.putParam("OOInsurerId", tCdInsurer.getInsurerId());
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

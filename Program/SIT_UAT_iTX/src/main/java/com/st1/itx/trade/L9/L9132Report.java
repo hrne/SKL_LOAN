@@ -8,8 +8,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.TreeMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -29,7 +27,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Component
 @Scope("prototype")
 public class L9132Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9132Report.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -113,8 +110,7 @@ public class L9132Report extends MakeReport {
 		this.batchNo = FormatUtil.pad9(titaVo.getParam("BatchNo"), 2);
 
 		// 查AcDetail
-		Slice<AcDetail> slAcDetail = sAcDetailService.findL9RptData(this.reportDate, iBatchNo, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<AcDetail> slAcDetail = sAcDetailService.findL9RptData(this.reportDate, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 		if (lAcDetail == null || lAcDetail.size() == 0) {
@@ -202,8 +198,7 @@ public class L9132Report extends MakeReport {
 
 				String acNoCode = tmpEntry.getKey();
 				String acNoItem = "";
-				Slice<CdAcCode> slCdAcCode = sCdAcCodeService.findAcCode(acNoCode, acNoCode, "     ", "     ", "  ",
-						"  ", 0, Integer.MAX_VALUE, titaVo);
+				Slice<CdAcCode> slCdAcCode = sCdAcCodeService.findAcCode(acNoCode, acNoCode, "     ", "     ", "  ", "  ", 0, Integer.MAX_VALUE, titaVo);
 				List<CdAcCode> lCdAcCode = slCdAcCode == null ? null : slCdAcCode.getContent();
 				if (lCdAcCode == null || lCdAcCode.size() == 0) {
 					acNoItem = "";
@@ -226,12 +221,11 @@ public class L9132Report extends MakeReport {
 				print(0, 13, batchNo);
 				print(1, 1, "會計科目：");
 				print(0, 13, acNoCode);
-				print(0, 23, acNoItem);
+				print(0, 26, acNoItem);
 				print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　帳冊別　　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 				print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 
-				for (Iterator<Entry<AcSubCodeVo, L9132RptDataVo>> detailIt = acSubCodeMap.entrySet()
-						.iterator(); detailIt.hasNext();) {
+				for (Iterator<Entry<AcSubCodeVo, L9132RptDataVo>> detailIt = acSubCodeMap.entrySet().iterator(); detailIt.hasNext();) {
 					Entry<AcSubCodeVo, L9132RptDataVo> tmpDetailEntry = detailIt.next();
 
 					AcSubCodeVo tmpAcSubCodeVo = tmpDetailEntry.getKey();
@@ -259,11 +253,9 @@ public class L9132Report extends MakeReport {
 							print(0, 13, batchNo);
 							print(1, 1, "會計科目：");
 							print(0, 13, acNoCode);
-							print(0, 23, acNoItem);
-							print(1, 1,
-									"子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　帳冊別　　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
-							print(1, 1,
-									"－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
+							print(0, 26, acNoItem);
+							print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　帳冊別　　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
+							print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 						}
 
 						print(1, 1, "　　");
@@ -326,7 +318,7 @@ public class L9132Report extends MakeReport {
 						print(0, 13, batchNo);
 						print(1, 1, "會計科目：");
 						print(0, 13, acNoCode);
-						print(0, 23, acNoItem);
+						print(0, 26, acNoItem);
 						print(1, 1, "子目　　　　　　　　　　　　　　　　　　　　　傳票號碼　　　　帳冊別　　　　　　　戶號　　　　　　　　借方金額　　　　　　　　　貸方金額　　　　　　　經辦");
 						print(1, 1, "－－－－－－－－－－－－－－－－－－－－－　－－－－－－　－－－－－－－－　－－－－－－－－　－－－－－－－－－－－－　－－－－－－－－－－－－　－－－－－－");
 					}

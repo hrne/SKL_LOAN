@@ -243,17 +243,17 @@ public class L4101ReportB extends MakeReport {
 
 			// 明細資料第一行
 			print(1, 1, "　　");
-			print(0, 1, FormatUtil.pad9("" + rounds, 3));
-			print(0, 7, "" + custNo + "-" + facmNo + "-" + bormNo);
-			print(0, 26, FormatUtil.padX("" + custName, 20));
-			print(0, 50, remitBank);
-			print(0, 60, remitBranch);
-			print(0, 70, remitAcctNo);
-			print(0, 87, FormatUtil.padX("" + wkCustName, 20));
-			print(0, 126, formatAmt(remitAmt, 2), "R");
-			print(0, 146, formatAmt(wkLineAmt, 2), "R");
-			print(0, 150, wkBusinessOfficer);
-			print(0, 161, String.valueOf(wkCorFlag));
+			print(0, 1, FormatUtil.pad9("" + rounds, 3));// 序號
+			print(0, 7, "" + custNo + "-" + facmNo + "-" + bormNo);// 戶號
+			print(0, 26, FormatUtil.padX("" + custName, 20));// 戶名
+			print(0, 50, remitBank);// 銀行別
+			print(0, 60, remitBranch);// 分行別
+			print(0, 70, remitAcctNo);// 匯款帳號
+			print(0, 87, FormatUtil.padX("" + wkCustName, 20));// 收款戶名
+			print(0, 126, formatAmt(remitAmt, 0), "R");// 匯款金額
+			print(0, 146, formatAmt(wkLineAmt, 0), "R");// 核貸金額
+			print(0, 150, wkBusinessOfficer);// 專辦
+			print(0, 161, String.valueOf(wkCorFlag));// 沖轉
 
 			dbAmt = dbAmt.add(remitAmt);
 			crAmt = crAmt.add(wkLineAmt);

@@ -34,8 +34,8 @@ public interface BatxOthersRepositoryHist extends JpaRepository<BatxOthers, Batx
   // AcDate >= ,AND AcDate <= , AND BatchNo = , AND RepayCode = , AND CreateEmpNo = 
   public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndBatchNoIsAndRepayCodeIsAndCreateEmpNoIs(int acDate_0, int acDate_1, String batchNo_2, int repayCode_3, String createEmpNo_4, Pageable pageable);
 
-  // AcDate = 
-  public Optional<BatxOthers> findTopByAcDateIsOrderByDetailSeqDesc(int acDate_0);
+  // AcDate =  ,AND BatchNo =
+  public Optional<BatxOthers> findTopByAcDateIsAndBatchNoIsOrderByDetailSeqDesc(int acDate_0, String batchNo_1);
 
   // AcDate >= ,AND AcDate <= 
   public Slice<BatxOthers> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqual(int acDate_0, int acDate_1, Pageable pageable);

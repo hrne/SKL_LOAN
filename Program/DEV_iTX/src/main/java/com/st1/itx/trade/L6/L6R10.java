@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R10 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R10.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -94,6 +93,7 @@ public class L6R10 extends TradeBuffer {
 		this.totaVo.putParam("L6R10TelArea", mCdInsurer.getTelArea());
 		this.totaVo.putParam("L6R10TelNo", mCdInsurer.getTelNo());
 		this.totaVo.putParam("L6R10TelExt", mCdInsurer.getTelExt());
+		this.totaVo.putParam("L6R10InsurerId", mCdInsurer.getInsurerId());
 
 	}
 

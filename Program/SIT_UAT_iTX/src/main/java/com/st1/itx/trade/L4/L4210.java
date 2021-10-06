@@ -163,7 +163,7 @@ public class L4210 extends TradeBuffer {
 		// 第一筆從1開始
 		int wkDetailSeq = 1;
 
-		BatxOthers seqBatxOthers = batxOthersService.detSeqFirst(iAcDate);
+		BatxOthers seqBatxOthers = batxOthersService.detSeqFirst(iAcDate, iBatchNo);
 
 		// 第二筆後+1續編
 		if (seqBatxOthers != null) {
@@ -219,8 +219,8 @@ public class L4210 extends TradeBuffer {
 		tBatxDetail.setRepayAmt(iRepayAmt);
 		tBatxDetail.setProcStsCode("0");
 		tBatxDetail.setProcCode("00000");
-		tBatxDetail.setTitaTlrNo(titaVo.getTlrNo());
-		tBatxDetail.setTitaTxtNo(titaVo.getTxNo());
+		tBatxDetail.setTitaTlrNo("");
+		tBatxDetail.setTitaTxtNo("");
 		TempVo tempVo = new TempVo();
 		tempVo.putParam("Note", iNote);
 		tempVo.putParam("Remark", wkRemark);

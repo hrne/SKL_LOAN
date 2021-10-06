@@ -163,11 +163,11 @@ public class L4101ReportA extends MakeReport {
 			CdAcCode tCdAcCode = cdAcCodeService.findById(new CdAcCodeId(acNoCode, acSubCode, acDtlCode), titaVo);
 			// 明細資料第一行
 //			print(1, 1, "　　");
-			print(0, 1, "" + (acDate - 19110000));
-			print(0, 11, tempL4101Vo + " " + tCdAcCode.getAcNoItem());
+			print(0, 1, this.showRocDate(acDate, 1)); // 日期
+			print(0, 11, tempL4101Vo + " " + tCdAcCode.getAcNoItem()); // 科子細目+科子細目名稱
 
-			print(0, 105, formatAmt(dbAmt.get(tempL4101Vo), 2), "R");
-			print(0, 125, formatAmt(crAmt.get(tempL4101Vo), 2), "R");
+			print(0, 105, formatAmt(dbAmt.get(tempL4101Vo), 0), "R"); // 借方金額
+			print(0, 125, formatAmt(crAmt.get(tempL4101Vo), 0), "R");// 貸方金額
 
 			if (dbAmt.get(tempL4101Vo) != null) {
 				sumDbAmt = sumDbAmt.add(dbAmt.get(tempL4101Vo));
@@ -182,8 +182,8 @@ public class L4101ReportA extends MakeReport {
 		print(1, 1, "　　　　　　           ");
 
 //		print(0, 61, currencyCode);
-		print(0, 105, formatAmt(sumDbAmt, 2), "R");
-		print(0, 125, formatAmt(sumCrAmt, 2), "R");
+		print(0, 105, formatAmt(sumDbAmt, 2), "R");// 借方金額加總
+		print(0, 125, formatAmt(sumCrAmt, 2), "R");// 貸方金額加總
 
 	}
 

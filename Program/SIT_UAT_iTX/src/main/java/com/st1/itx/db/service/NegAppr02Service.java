@@ -70,6 +70,19 @@ public interface NegAppr02Service {
   public Slice<NegAppr02> bringUpDateEq(int bringUpDate_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * NegTransAcDate = , AND NegTransTlrNo = , AND NegTransTxtNo =
+   *
+   * @param negTransAcDate_0 negTransAcDate_0
+   * @param negTransTlrNo_1 negTransTlrNo_1
+   * @param negTransTxtNo_2 negTransTxtNo_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegAppr02 NegAppr02 of List
+   */
+  public Slice<NegAppr02> NegTransEq(int negTransAcDate_0, String negTransTlrNo_1, int negTransTxtNo_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By NegAppr02
    * 
    * @param negAppr02Id key

@@ -92,13 +92,14 @@ public interface BatxOthersService {
   public Slice<BatxOthers> searchRuleD(int acDate_0, int acDate_1, String batchNo_2, int repayCode_3, String createEmpNo_4, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = 
+   * AcDate =  ,AND BatchNo =
    *
    * @param acDate_0 acDate_0
+   * @param batchNo_1 batchNo_1
    * @param titaVo Variable-Length Argument
    * @return Slice BatxOthers BatxOthers of List
    */
-  public BatxOthers detSeqFirst(int acDate_0, TitaVo... titaVo);
+  public BatxOthers detSeqFirst(int acDate_0, String batchNo_1, TitaVo... titaVo);
 
   /**
    * AcDate &gt;= ,AND AcDate &lt;= 
