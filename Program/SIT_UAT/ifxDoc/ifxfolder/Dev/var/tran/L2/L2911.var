@@ -426,7 +426,7 @@ INVOKEJS(SHOW,grd3_{rowSeq},1)
 #OwnerId{i}=X,10,L
 C(4,#OwnerId{j},CALL(#HIDE_OWNER_ROW_{i}),CALL(#SHOW_OWNER_ROW_{i}))
 C(4,#OwnerId{j},S,$)
-@IF({i} == 1,V(7),$)
+@
 C(4,#OwnerId{i},CALL(#HIDE_OWNER_ROW_{i}),$)
 C(4,#OwnerId{i},s,$)
 V(7)A(ID_UNINO,0,#OwnerId{i})

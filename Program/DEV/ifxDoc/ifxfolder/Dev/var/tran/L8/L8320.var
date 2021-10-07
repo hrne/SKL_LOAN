@@ -167,6 +167,8 @@ T(F,@CashBalanceAmt,1)T(F,@CreditBalanceAmt,1)T(F,@ChaRepayAmt,1)T(F,@ChaRepayAg
 T(F,@ChaRepayEndDate,1)T(F,@ChaRepayFirstDate,1)T(F,@PayAccount,1)T(F,@PostAddr,1)T(F,@MonthPayAmt,1)T(F,@GradeType,1)
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(2,@FdCompletePeriod,*)
 T(2,@FdPeriod,*)
 T(2,@FdRate,*)

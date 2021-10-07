@@ -23,7 +23,7 @@ E(0,0)
 [#<->#,"@戶號",#CustNo,#CustName],
 ["@還款類別",#RepayTypeX],["@還款金額",#RepayAmt],
 ["@已作帳金額",#AcctAmt],["@入暫收金額",#DisacctAmt],
-["@處理狀態",#ProcStsCodeX],["@處理代碼",#ProcCode,#ProcCodeX],
+["@處理狀態",#ProcStsCode,#ProcStsCodeX],["@處理代碼",#ProcCode,#ProcCodeX],
 ["@處理說明",#ProcDscptCode],["@交易序號",#TxSn],
 [#<->#,"@快捷按鈕",#BTN_L3921,#BTN_L3200,#BTN_L3210,#BTN_L3922,#BTN_L3420],
 ["@存摺帳號",#DepAcctNo],["@入帳日期",#EntryDate],
@@ -85,10 +85,12 @@ T(1,@RepayAmtX,#NTXBUF,29,18)
 T(1,@AcctAmtX,#NTXBUF,47,18)
 T(1,@DisacctAmtX,#NTXBUF,65,18)
 T(1,@ProcStsCode,#NTXBUF,83,1)
+T(1,@ProcStsCodeTemp,#NTXBUF,83,1)
 T(1,@ProcCode,#NTXBUF,84,5)
 T(1,@ProcDscptCode,#NTXBUF,89,300)
 T(1,@TxSn,#NTXBUF,393,14)
 INVOKEJS(SHOW,p1,02,02,1)
+IF(#ProcStsCodeTemp == 4 || #ProcStsCodeTemp == 3 || #ProcStsCodeTemp == 2 || #ProcStsCodeTemp == 1 || #ProcStsCodeTemp == 0,T(F,@ProcStsCode,1),T(F,@ProcStsCode,0))
 
 #RepayAmtX=X,18,S
 #AcctAmtX=X,18,S
@@ -182,7 +184,14 @@ T(3,)T(H,#RepayType,#RepayTypeHelp)
 !入暫收金額
 #DisacctAmt=m,14,L
 !處理狀態
-#ProcStsCode=X,1,L
+#ProcStsCodeTemp=X,1,L
+
+#ProcStsCode=X,1,I
+HELP(#ProcStsCodeHelp)
+IF(#ProcStsCode == 4 || #ProcStsCode == 3 || #ProcStsCode == 2 || #ProcStsCode == 1 || #ProcStsCode == 0,$,s)
+@
+IF(#ProcStsCodeTemp == #ProcStsCode,s,IF(#ProcStsCodeTemp == 4 ,V(1,1),IF(#ProcStsCodeTemp == 3,V(1,1),IF(#ProcStsCodeTemp == 2,V(1,1),IF(#ProcStsCodeTemp == 0,V(1,1),V(1,0))))))
+
 #ProcStsCodeX=X,10,L
 T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)
 !SWITCH(#ProcStsCode,0,T(3,未檢核),
@@ -304,6 +313,7 @@ E(0,#CustNo)
 #DetailSeq
 #RepayTypeA
 #CustNoA
+#ProcStsCode
 #END
 </sub>
 

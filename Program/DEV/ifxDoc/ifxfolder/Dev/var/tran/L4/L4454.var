@@ -66,8 +66,7 @@ T(1,@L6001Code,#NTXBUF,1,1)
 ! 從外部點入，且值為9為整批
 #L6001Code=A,1,S
 C(3,#CHAIN,0,s,$)
-C(3,#L6001Code,9,$,s)
-E(0,@FunctionCode,2)
+C(3,#L6001Code,9,E(0,@FunctionCode,2),E(0,@FunctionCode,1))
 
 
 ! 下一營業日
@@ -79,7 +78,10 @@ T(4,NBSDY$)
 #FunctionCode=A,1,I
 C(3,#CHAIN,0,E(0,1),s)
 HELP(#FunctionHelp)
-@V(H,#FunctionHelp)C(3,#FunctionCode,2,INVOKEJS(SHOW,L4454,4,4,1),INVOKEJS(SHOW,L4454,4,4,0))
+@V(H,#FunctionHelp)
+
+#CHECK=X,1,S
+C(3,#FunctionCode,2,INVOKEJS(SHOW,L4454,4,4,1),INVOKEJS(SHOW,L4454,4,4,0))
 
 #FunctionCodeX=X,8,L
 T(3,)T(H,#FunctionCode,#FunctionHelp)

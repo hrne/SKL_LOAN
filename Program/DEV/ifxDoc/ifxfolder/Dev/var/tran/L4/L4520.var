@@ -89,54 +89,6 @@ C(4,#ReportA,S,$)E(0,1)ASGN(LOOPHEIGHT$)
 
 !------------ TXFORM = L4520 -----------
 <sub type="FORM" name="L452A" tota-mode="1">
-#OA_SuccCnt=m,6,O
-#OA_SuccRpAmt=m,14,O
-#OA_SuccTxAmt=m,14,O
-#OA_TotlCnt=m,6,O
-#OA_TotlRpAmt=m,14,O
-#OA_TotlTxAmt=m,14,O
-
-#L452A_LOOP=X,1,S
-E(0,1)ASGN(LOOP$)
-
-#OOA_CustNo=A,7,O
-#OOA_EmpName=x,20,O
-#OOA_FailMsg=x,20,O
-#OOA_RepayAmt=m,14,O
-#OOA_TxAmt=m,14,O
-#OOA_EmpNo=x,6,O
-#OOA_EmpId=x,10,O
-#OOA_AcDate=D,7,O
-#OOA_Remark=x,20,O
-![防止二次單據]
-E(0,@L452BPRT,0)
-
-</sub>
-
-<sub type="FORM" name="L452B" tota-mode="1">
-#OB_FailCnt=m,6,O
-#OB_FailRpAmt=m,14,O
-#OB_FailTxAmt=m,14,O
-#OB_TotlCnt=m,6,O
-#OB_TotlRpAmt=m,14,O
-#OB_TotlTxAmt=m,14,O
-
-#L452B_LOOP=X,1,S
-E(0,1)ASGN(LOOP$)
-
-#OOB_CustNo=A,7,O
-#OOB_EmpName=x,20,O
-#OOB_FailMsg=x,20,O
-#OOB_RepayAmt=m,14,O
-#OOB_TxAmt=m,14,O
-#OOB_EmpNo=x,6,O
-#OOB_EmpId=x,10,O
-#OOB_AcDate=D,7,O
-#OOB_Remark=x,20,O
-![防止二次單據]
-E(0,@L452APRT,0)
-
-
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -150,38 +102,6 @@ E(0,@L452APRT,0)
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
 TXFORM=L452A
-#OA_SuccCnt
-#OA_SuccRpAmt
-#OA_SuccTxAmt
-#OA_TotlCnt
-#OA_TotlRpAmt
-#OA_TotlTxAmt
-#OOA_CustNo
-#OOA_EmpName
-#OOA_FailMsg
-#OOA_RepayAmt
-#OOA_TxAmt
-#OOA_EmpNo
-#OOA_EmpId
-#OOA_AcDate
-#OOA_Remark
-^
-TXFORM=L452B
-#OB_FailCnt
-#OB_FailRpAmt
-#OB_FailTxAmt
-#OB_TotlCnt
-#OB_TotlRpAmt
-#OB_TotlTxAmt
-#OOB_CustNo
-#OOB_EmpName
-#OOB_FailMsg
-#OOB_RepayAmt
-#OOB_TxAmt
-#OOB_EmpNo
-#OOB_EmpId
-#OOB_AcDate
-#OOB_Remark
 ^
 
 </sub>
@@ -189,44 +109,6 @@ TXFORM=L452B
 !---------- 單據輸出組合 ----------
 <sub type="SELECT">
 <include src="PRT.icf::UPD01.sel"/>
-#L452APRT=1,L452A,NA,,D,15
-%
-#OOA_CustNo
-#OOA_EmpName
-#OOA_FailMsg
-#OOA_RepayAmt
-#OOA_TxAmt
-#OOA_EmpNo
-#OOA_EmpId
-#OOA_AcDate
-#OOA_Remark
-@
-#OA_SuccCnt
-#OA_SuccRpAmt
-#OA_SuccTxAmt
-#OA_TotlCnt
-#OA_TotlRpAmt
-#OA_TotlTxAmt
-^
-
-#L452BPRT=1,L452B,NA,,D,15
-%
-#OOB_CustNo
-#OOB_EmpName
-#OOB_FailMsg
-#OOB_RepayAmt
-#OOB_TxAmt
-#OOB_EmpNo
-#OOB_EmpId
-#OOB_AcDate
-#OOB_Remark
-@
-#OB_FailCnt
-#OB_FailRpAmt
-#OB_FailTxAmt
-#OB_TotlCnt
-#OB_TotlRpAmt
-#OB_TotlTxAmt
 ^
 
 </sub>

@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8317]                                 (56)消債條例清算案件資料報送"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdCaseStatus+案件狀態",#CaseStatus,#CaseStatusX],[#ClaimDateName,#ClaimDate],
 ["#FdCourtCode+承審法院代碼",#CourtCode,#CourtCodeX],["#FdYear+年度別",#Year,"</br>","以＂YYY表示＂。 年度別是以法院發文時之案號前段為主,例如105年度消債更字第221號,發文日期106/01/20,年度別應報送105。"],
 ["#FdCourtDiv+法院承審股別",#CourtDiv,"股"],["#FdCourtCaseNo+法院案號",#CourtCaseNo],
@@ -154,6 +155,8 @@ C(5,#TranKey_Tmp,2,$,S)
 ! T(2,@TranKey,C)
 T(F,@TranKey,1)T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@OutstandAmt,1)T(F,@ClaimStatus1,1)T(F,@SaveDate,1)T(F,@ClaimStatus2,1)T(F,@SaveEndDate,1)T(F,@SubAmt,1)T(F,@AdminName,1)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(2,@FdYear,*)
 T(2,@FdCourtDiv,*)
 T(2,@FdCourtCaseNo,*)

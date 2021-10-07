@@ -41,8 +41,9 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[300,300,200,200];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8327]                                 (447)前置調解金融機構無擔保債務協議資料"],
-["#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ["#FdCivil323Amt+依民法第323條計算之債權總金額",#Civil323Amt],["#FdTotalAmt+簽約總債權金額",#TotalAmt],
 ["#FdSignDate+簽約完成日期",#SignDate],["#FdFirstPayDate+首期應繳日",#FirstPayDate],
@@ -124,6 +125,8 @@ T(2,@FdPayAccount,*)
 C(5,#TranKey_Tmp,2,$,S)
 T(F,@TranKey,1)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(2,@FdCivil323Amt,*)
 T(2,@FdTotalAmt,*)
 T(2,@FdFirstPayDate,*)

@@ -2,8 +2,6 @@ package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -35,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4201 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4201.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -58,6 +55,7 @@ public class L4201 extends TradeBuffer {
 		int iDetailSeq = parse.stringToInteger(titaVo.getParam("DetailSeq"));
 		int iRepayTypeA = parse.stringToInteger(titaVo.getParam("RepayTypeA"));
 		int iCustNoA = parse.stringToInteger(titaVo.getParam("CustNoA"));
+		String iProcStsCode = titaVo.getParam("ProcStsCode");
 
 		BatxDetail tBatxDetail = new BatxDetail();
 		BatxDetailId tBatxDetailId = new BatxDetailId();
@@ -69,13 +67,14 @@ public class L4201 extends TradeBuffer {
 		tBatxDetail = batxDetailService.findById(tBatxDetailId);
 
 		if (tBatxDetail != null) {
-			if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA) {
+			if (tBatxDetail.getRepayType() == iRepayTypeA && tBatxDetail.getCustNo() == iCustNoA
+					&& iProcStsCode.equals(tBatxDetail.getProcStsCode())) {
 				throw new LogicException(titaVo, "E0012", "修改值與現有資料相同");
 			} else {
 				tBatxDetail = batxDetailService.holdById(tBatxDetailId);
 				tBatxDetail.setRepayType(iRepayTypeA);
 				tBatxDetail.setCustNo(iCustNoA);
-				tBatxDetail.setProcStsCode("0");
+				tBatxDetail.setProcStsCode(iProcStsCode);
 				try {
 					batxDetailService.update(tBatxDetail);
 				} catch (DBException e) {

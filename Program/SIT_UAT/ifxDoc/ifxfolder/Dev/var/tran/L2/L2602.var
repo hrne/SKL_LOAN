@@ -43,11 +43,12 @@ E(0,0)
 ["[L2602]                                 法拍費用維護"],
 [#<->#,"#FdFUNCD+功能",#FunCdX],
 [#<->#,"#FdCUSTNO+借款人戶號",#CustNo],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdREC_DT+收件日",#ReceiveDate],
 [#<->#,"#FdDOC_DT+單據日期",#DocDate],
 [#<->#,"#FdFEE+法拍費用",#TwFee,#UsFee],
 [#<->#,"#FdFEE_IND+科目",#FeeCode,#FeeCodeX],
-[#<->#,"#FdCASE_NO+案號",#CaseNo],
+![#<->#,"#FdCASE_NO+案號",#CaseNo],
 [#<->#,"#FdPAYMENT_DT+銷號日期",#CloseDate],
 [#<->#,"#FdRMK+備註",#Rmk],
 [#<->#,"#FdPAYMENT_NO+銷帳編號",#CloseNo],
@@ -60,6 +61,7 @@ E(0,0)
 ! 永遠為必輸欄位
 #FdFUNCD=X,2,L
 #FdCUSTNO=X,2,L
+#FdFacmNo=X,2,L
 #FdREC_DT=X,2,L
 #FdDOC_DT=X,2,L
 #FdFEE=X,2,L
@@ -116,6 +118,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@FunCd,#NTXBUF,1,1)
 T(1,@RecordNo,#NTXBUF,2,7)
 T(1,@CustNo,#NTXBUF,9,7)
+T(1,@FacmNo,#NTXBUF,16,3)
 
 ![功能] 
 !下拉式選單 1.新增 2.修改4.刪除 5.查詢
@@ -161,7 +164,7 @@ E(0,@DocDate,#L2r34DocDate)
 E(0,@TwFee,#L2r34Fee)
 E(0,@UsFee,#L2r34Fee)
 E(0,@FeeCode,#L2r34FeeCode)
-T(2,@CaseNo,#L2r34CaseNo)
+!T(2,@CaseNo,#L2r34CaseNo)
 E(0,@CloseDate,#L2r34CloseDate)
 T(2,@Rmk,#L2r34Rmk)
 E(0,@CloseNo,#L2r34CloseNo)
@@ -173,15 +176,21 @@ C(3,#L2r34CloseDate,0,T(3,N),T(3,Y))
 
 !刪除時關閉框線
 #WKTF=X,1,S
-IF (#FunCd==4 || #FunCd==5,T(F,@CustNo,0)T(F,@ReceiveDate,0)T(F,@DocDate,0)T(F,@TwFee,0)T(F,@FeeCode,0)T(F,@CaseNo,0)T(F,@CloseDate,0)T(F,@Rmk,0)T(F,@CloseNo,0)T(F,@OverdueDate,0)T(F,@,0)T(F,@,0),$)
-IF(#FunCd==2,T(F,@CustNo,0)T(F,@CloseDate,0),$)
-IF(#checkClose == "Y",T(F,@ReceiveDate,0)T(F,@TwFee,0)T(F,@FeeCode,0)T(F,@CaseNo,0)
+IF (#FunCd==4 || #FunCd==5,T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@ReceiveDate,0)T(F,@DocDate,0)T(F,@TwFee,0)T(F,@FeeCode,0)T(F,@CloseDate,0)T(F,@Rmk,0)T(F,@CloseNo,0)T(F,@OverdueDate,0)T(F,@,0)T(F,@,0),$)
+IF(#FunCd==2,T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@CloseDate,0),$)
+IF(#checkClose == "Y",T(F,@ReceiveDate,0)T(F,@TwFee,0)T(F,@FeeCode,0)
                       T(3,@FdREC_DT, )T(3,@FdFEE, )T(3,@FdFEE_IND, )T(3,@FdCASE_NO, ),$)           
               
 
 
 !借款人戶號 必須輸入
 #CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(2,0)
+
+#FacmNo=A,3,I
 C(3,#CHAIN,1,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
@@ -257,10 +266,10 @@ T(H,#FeeCode,#FeeCodeHelp)
 ! C(3,#FunCd,5,s,$)
 
 !案號 
-#CaseNo=X,3,I
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-C(5,#checkClose,Y,s,$)
+#CaseNo=X,3,L
+!C(3,#FunCd,4,s,$)
+!C(3,#FunCd,5,s,$)
+!C(5,#checkClose,Y,s,$)
 
 !銷號日期
 #CloseDate=D,7,I

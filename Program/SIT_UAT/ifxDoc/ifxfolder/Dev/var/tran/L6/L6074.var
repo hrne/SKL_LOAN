@@ -218,7 +218,7 @@ TXFORM=L6074
 !--------- OUTPUT畫面 --------
 <sub type="PART" name="L6074" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
 [
-["[L6074]                                 聯徵報送-地區別資料查詢                                             "],
+["[L6074]                                 地區別資料查詢                                             "],
 ]
 </sub>
 

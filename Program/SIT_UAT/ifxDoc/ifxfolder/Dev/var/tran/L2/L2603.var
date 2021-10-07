@@ -157,6 +157,9 @@ T(H,#OOFeeCode,#FeeCodeHelp)
 
 #OOCloseNo=A,6,L
 #OOLegalStaff=X,6,L
+#OOName=X,10,L
+#OOName1=X,18,L
+T(2,#OOLegalStaff+  +#OOName)
 #OORmk=X,60,L
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
@@ -183,6 +186,7 @@ TXFORM=L2603
 #OOFeeCode
 #OOCloseNo
 #OOLegalStaff
+#OOName
 #OORmk
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -222,11 +226,11 @@ TXFORM=L2603
 #OOCloseNo=銷帳編號
 {width:100,align:'center'}
 
-#OOLegalStaff=法務人員
-{width:100,align:'center'}
+#OOName1=法務人員
+{width:120,align:'left'}
 
 #OORmk=備註
-{width:100,align:'center'}
+{width:100,align:'left'}
 
 
 ^

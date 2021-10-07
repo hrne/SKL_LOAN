@@ -118,6 +118,8 @@ C(5,#TranKey_Tmp,2,$,S)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@ClosedDate,1)T(F,@ClosedResult,1)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(2,@FdClosedResult,*)
 T(2,@FdClosedDate,*)
 ! 查詢進入

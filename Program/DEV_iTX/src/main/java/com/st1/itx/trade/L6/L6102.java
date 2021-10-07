@@ -41,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6102 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6102.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -74,8 +73,7 @@ public class L6102 extends TradeBuffer {
 		}
 		// 查AcDetail by 傳票批號
 
-		Slice<AcDetail> slAcDetail = sAcDetailService.findL9RptData(iAcDate + 19110000, iBatchNo, 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<AcDetail> slAcDetail = sAcDetailService.findL9RptData(iAcDate + 19110000, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 		if (lAcDetail == null || lAcDetail.size() == 0) {
@@ -117,16 +115,19 @@ public class L6102 extends TradeBuffer {
 		this.totaVo.putParam("OOCoreSeqNo", tAcClose.getCoreSeqNo());
 
 		titaVo.putParam("MediaSeq", tAcClose.getCoreSeqNo()); // 核心傳票
-
+		titaVo.putParam("MediaType", tAcClose.getCoreSeqNo()); // 核心傳票
+		titaVo.putParam("DoL9133", "Y"); 
+		
+		//透過L9130 控制 L9130、L9131、L9132、L9133
 		tranL9130.run(titaVo);
 //		MySpring.newTask("L9130", this.txBuffer, titaVo);
 
-		tranL9131.run(titaVo);
+//		tranL9131.run(titaVo);
 //		MySpring.newTask("L9131", this.txBuffer, titaVo);
 
-		titaVo.putParam("MediaType", tAcClose.getCoreSeqNo()); // 核心傳票
+		
 
-		tranL9132.run(titaVo);
+//		tranL9132.run(titaVo);
 //		MySpring.newTask("L9132", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
