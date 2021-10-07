@@ -1,9 +1,0 @@
-BizDate      => 營業日檔
-Brinch       => 分行檔
-Curr         => 幣別檔
-HoliDay      => 假日檔
-TxCtrl       => XCSTXD
-Teller       => XCUSTR
-TxRecord     => XCXXDR
-TxRecordTota => tota紀錄
-TxProcess    => XCTTCR
