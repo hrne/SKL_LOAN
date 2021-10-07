@@ -264,7 +264,7 @@ T(H,#LevelFg,#LevelHelp)
 #AllowFg=A,1,I
 C(3,#LevelFg,1,$,S)
 @
-V(5,0,9)
+V(5,1,9)
 
 ![AD認證]
 !輸入後會將AD伺服器回傳的人員名稱傳到#Desc欄位

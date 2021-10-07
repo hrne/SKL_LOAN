@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8318]                                 (60)前置協商受理變更還款條件申請暨請求回報剩餘債權通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+原前置協商申請日",#RcDate],["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
 ["#FdYM+已清分足月期付金年月",#YM],["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
@@ -110,6 +111,8 @@ T(2,@FdYM,*)
 C(5,#TranKey_Tmp,2,$,S)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(F,@YM,1)
 T(2,@FdYM,*)
 

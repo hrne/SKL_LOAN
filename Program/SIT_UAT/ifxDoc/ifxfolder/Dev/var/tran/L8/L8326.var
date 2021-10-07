@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8326]                                 (446)前置調解結案通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 [#<->#,"#FdCloseCode+結案原因代號",#CloseCode,#CloseCodeX],
 [#<->#,"#FdCloseDate+結案日期",#CloseDate],
@@ -124,6 +125,8 @@ T(2,@FdCloseDate,*)
 C(5,#TranKey_Tmp,2,$,S)
 T(F,@TranKey,1)T(F,@CloseCode,1)T(F,@CloseDate,1)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(2,@FdCloseCode,*)
 T(2,@FdCloseDate,*)
 T(3,@TranKeyHelp,C:異動;D:刪除;X:補件))

@@ -42,11 +42,12 @@ E(0,0)
 [
 ["[L8312]                                 (51)延期繳款（喘息期）資料檔案"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],["#FdDelayCode+延期繳款原因",#DelayCode,#DelayCodeX],
 [#<->#,"#FdDelayYM+延期繳款年月",#DelayYM],
 [#<->#,"#FdDelayDesc+延期繳款案情說明",#DelayDesc],
-[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
 #FdTranKey=X,2,L
@@ -122,6 +123,8 @@ C(5,#TranKey_Tmp,2,$,S)
 ! T(2,@TranKey,C)
 T(F,@TranKey,1)T(F,@DelayCode,1)T(F,@DelayDesc,1)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(2,@FdDelayCode,*)
 T(2,@FdDelayDesc,*)
 T(3,@TranKeyHelp,C:異動;D:刪除))
@@ -236,14 +239,8 @@ T(H,#DelayCode,#DelayCodeHelp)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
-A(YM,1,#DelayYM)
-IF(#DelayYM>0,$,V(P,延期繳款年月不可小於零))
+@A(YM13,1,#DelayYM)
 
-#tDelayYM=X,6,S
-T(1,#tDelayYM,#RcDate,1,5)
-IF(#tDelayYM<=#DelayYM,s,$)
-V(P,延期繳款年月不得小於調解申請日)
 
 !延期繳款案情說明-20個中文字
 #DelayDesc=X,60,I

@@ -191,6 +191,8 @@ T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@Lim
 T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(2,@FdPeriod,*)
 T(2,@FdRate,*)
 T(2,@FdExpLoanAmt,*)

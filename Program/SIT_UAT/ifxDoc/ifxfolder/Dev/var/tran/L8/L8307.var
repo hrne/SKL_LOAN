@@ -42,11 +42,12 @@ E(0,0)
 [
 ["[L8307]                                 (46)結案通知資料檔案格式"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],
 [#<->#,"#FdCloseCode+結案原因代號",#CloseCode,#CloseCodeX],
-[#<->#,"#FdBreakCode+毀諾原因代號",#BreakCode,#BreakCodeX],
 [#<->#,"#FdCloseDate+結案日期",#CloseDate],
+[#<->#,"#FdBreakCode+毀諾原因代號",#BreakCode,#BreakCodeX],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
@@ -127,9 +128,11 @@ T(2,@FdCloseDate,*)
 C(5,#TranKey_Tmp,2,$,S)
 ! T(2,@TranKey,C)
 T(F,@TranKey,1)T(F,@CloseCode,1)T(F,@BreakCode,1)
+K(MODIFYBUTTON,異動)
 T(1,@Ukey,#NTXBUF,3,32)
 T(2,@FdCloseCode,*)
 T(2,@FdBreakCode,*)
+T(2,@FdTranKey,*)
 T(3,@TranKeyHelp,C:異動;D:刪除))
 
 ! 查詢進入
@@ -217,12 +220,11 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#RcDate)
+@V(7)A(DATE,0,#RcDate)
 
 
 !結案原因代號
-#CloseCode=A,2,I
+#CloseCode=X,2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CloseCode,#L8r17CloseCode),$)
@@ -230,31 +232,14 @@ C(5,#TranKey,D,s,$)
 HELP(#CloseCodeHelp,cols:3)
 @V(H,#CloseCodeHelp)
 
-#CheckCloseCode=X,1,S
-IF(#CloseCode=="",$,S)
-V(P,結案原因代號必須選擇！)
+#ReBreakCode=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,s,$)
+C(5,#CloseCode,00,T(2,@FdBreakCode,*)T(F,@BreakCode,1),T(2,@FdBreakCode, )T(F,@BreakCode,0)T(2,@BreakCode, )T(2,@BreakCodeX, ))
 
 #CloseCodeX=X,50,L
 T(H,#CloseCode,#CloseCodeHelp)
-
-!毀諾原因代號
-#BreakCode=X,2,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey,D,T(2,@BreakCode,#L8r17BreakCode),$)
-C(5,#TranKey,D,s,$)
-IF(#CloseCode=="00",$,S)
-HELP(#BreakCodeHelp,cols:3)
-@V(H,#BreakCodeHelp)
-
-#BreakCodeX=X,50,L
-C(4,#BreakCode,T(3,#BreakCodeX,),$)
-T(H,#BreakCode,#BreakCodeHelp)
-!T(A,#BreakCode,L8DEF,BreakCodeDef,BreakCode,BreakCodeX)
-
-#CheckCode=X,1,S
-IF(#CloseCode!="00" && #BreakCode!="" ,V(P,結案原因代號不為00毀諾，毀諾原因代號須為空值。),$)
-IF(#CloseCode=="00" && #BreakCode=="" ,V(P,結案原因代號為00毀諾，毀諾原因代號須有值。),$)
 
 
 !結案日期
@@ -263,19 +248,29 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#CloseDate)
-
+@V(7)A(DATE,0,#CloseDate)
 
 
 #CheckCloseDate=X,1,S
 IF(#CloseDate<#RcDate,$,S)
 V(P,結案日早於協商申請日)
 
+!毀諾原因代號
+#BreakCode=X,2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@BreakCode,#L8r17BreakCode),$)
+C(5,#TranKey,D,s,$)
+C(5,#CloseCode,00,$,S)
+HELP(#BreakCodeHelp)
+@V(H,#BreakCodeHelp)
+#BreakCodeX=X,50,L
+C(5,#CloseCode,00,$,S)
+T(H,#BreakCode,#BreakCodeHelp)
+
+
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L
-
-
 
 ! 流水號
 #Ukey=X,32,S

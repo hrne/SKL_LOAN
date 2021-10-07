@@ -41,11 +41,14 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8314]                                 (53)同意報送例外處理檔案"],
-["#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdRcDate+協商申請日",#RcDate],["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
-["#FdAgreeSend+是否同意報送例外處理檔案格式",#AgreeSend],
-["#FdAgreeSendData1+同意補報送檔案格式資料1",#AgreeSendData1,#AgreeSendDataX1],["#FdAgreeSendData2+同意補報送檔案格式資料別2",#AgreeSendData2,#AgreeSendDataX2],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdRcDate+協商申請日",#RcDate],
+[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+[#<->#,"#FdAgreeSend+是否同意報送例外處理檔案格式",#AgreeSend],
+[#<->#,"#FdAgreeSendData1+同意補報送檔案格式資料別1",#AgreeSendData1,#AgreeSendDataX1],
+[#<->#,"#FdAgreeSendData2+同意補報送檔案格式資料別2",#AgreeSendData2,#AgreeSendDataX2],
 ["#FdChangePayDate+申請變更還款方案日",#ChangePayDate],["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
@@ -143,6 +146,8 @@ T(2,@FdChangePayDate,*)
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@AgreeSend,1)
 T(F,@AgreeSendData1,1)

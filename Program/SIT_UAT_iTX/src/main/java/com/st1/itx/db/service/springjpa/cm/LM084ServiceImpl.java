@@ -36,7 +36,7 @@ public class LM084ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "SELECT ALI.\"Aging\"                AS F0 "; // 帳齡
  		sql += "           , LPAD(ALI.\"CustNo\",7,'0')   AS F1 "; // 戶號
 		sql += "           , SUBSTR(CM.\"CustName\",0,20) AS F2 "; // 戶名
-		sql += "           , MIN(ALI.\"IntEndDate\")      AS F3 "; // 繳息迄日
+		sql += "           , MIN(ALI.\"IntStartDate\")    AS F3 "; // 繳息迄日
 		sql += "           , MIN(ALI.\"PayIntDate\")      AS F4 "; // 應繳息日
 		sql += "           , SUM(ALI.\"Interest\")        AS F5 "; // 應收利息
 		sql += "      FROM \"AcLoanInt\" ALI ";

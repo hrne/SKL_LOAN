@@ -42,7 +42,8 @@ E(0,0)
 [
 ["[L8309]                                 (48)債務人基本資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdRcDate+協商申請日",#RcDate],
 [#<->#,"#FdCustRegAddr+債務人戶籍之郵遞區號及地址",#CustRegAddr],
 [#<->#,"#FdCustComAddr+債務人通訊地之郵遞區號及地址",#CustComAddr],
@@ -124,6 +125,8 @@ C(5,#TranKey_Tmp,2,$,S)
 T(F,@TranKey,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)
 T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(2,@FdCustRegAddr,*)
 T(2,@FdCustComAddr,*)
 T(2,@FdCustRegTelNo,*)

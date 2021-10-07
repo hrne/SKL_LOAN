@@ -236,7 +236,7 @@ T(2,#OOFeeCode+-+#OOFeeCodeX)
 
 !修改
 #OOBUF2=X,179,S
-T(2,#FUNC2+#OORecordNo+#OOCustNo+#OOReceiveDate+0000000+#OOFee+#OOFeeCode+#OOCaseCode+000+          +#OOCaseNo+#OOCloseDate+#SPC60+#OOCloseNo)
+T(2,#FUNC2+#OORecordNo+#OOCustNo+#OOFacmNo+#OOReceiveDate+0000000+#OOFee+#OOFeeCode+#OOCaseCode+000+          +#OOCaseNo+#OOCloseDate+#SPC60+#OOCloseNo)
 
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2602; ntxbuf=#OOBUF2})
@@ -252,7 +252,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2601; ntxbuf=#OOBUF3})
 
 !刪除
 #OOBUF4=X,179,S
-T(2,#FUNC4+#OORecordNo+#OOCustNo+#OOReceiveDate+0000000+#OOFee+#OOFeeCode+#OOCaseCode+000+          +#OOCaseNo+#OOCloseDate+#SPC60+#OOCloseNo)
+T(2,#FUNC4+#OORecordNo+#OOCustNo+#OOFacmNo+#OOReceiveDate+0000000+#OOFee+#OOFeeCode+#OOCaseCode+000+          +#OOCaseNo+#OOCloseDate+#SPC60+#OOCloseNo)
 
 #OOBTN4=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2602; ntxbuf=#OOBUF4})
@@ -260,7 +260,7 @@ IF(#OOCloseDate > 0,BIND(grid,cancel),$)
 
 !查詢
 #OOBUF5=X,179,S
-T(2,#FUNC5+#OORecordNo+#OOCustNo+#OOReceiveDate+0000000+#OOFee+#OOFeeCode+#OOCaseCode+000+          +#OOCaseNo+#OOCloseDate+#SPC60+#OOCloseNo)
+T(2,#FUNC5+#OORecordNo+#OOCustNo+#OOFacmNo+#OOReceiveDate+0000000+#OOFee+#OOFeeCode+#OOCaseCode+000+          +#OOCaseNo+#OOCloseDate+#SPC60+#OOCloseNo)
 
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2602; ntxbuf=#OOBUF5})
@@ -349,8 +349,8 @@ TXFORM=L2078
 !#OOUnit=單位
 !{width:50,align:'center'}
 
-#OOCaseNo=案號
-{width:50,align:'center'}
+!#OOCaseNo=案號
+!{width:50,align:'center'}
 
 #OOEntryDate=單據日期
 {width:100,align:'center'}
@@ -389,8 +389,8 @@ TXFORM=L2078
 !#OOUnit=單位
 !{width:50,align:'center'}
 
-#OOCaseNo=案號
-{width:50,align:'center'}
+!#OOCaseNo=案號
+!{width:50,align:'center'}
 
 #OOEntryDate=單據日期
 {width:110,align:'center'}

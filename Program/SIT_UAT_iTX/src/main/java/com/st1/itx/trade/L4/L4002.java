@@ -7,8 +7,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +33,6 @@ END=X,1
 @Service("L4002")
 @Scope("prototype")
 public class L4002 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4002.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -72,6 +69,7 @@ public class L4002 extends TradeBuffer {
 
 //		2020/11/17 增加search條件 by BatxHead檔狀態
 		Slice<BatxHead> sBatxHead = null;
+		String tlrNo = titaVo.getParam("TlrNo");
 		List<BatxHead> lBatxHead = new ArrayList<BatxHead>();
 
 		sBatxHead = batxHeadService.acDateRange(acDate, acDate, this.index, this.limit, titaVo);
@@ -80,6 +78,10 @@ public class L4002 extends TradeBuffer {
 
 		if (lBatxHead != null && lBatxHead.size() != 0) {
 			for (BatxHead tBatxHead : lBatxHead) {
+				if ("".equals(tlrNo) || tBatxHead.getTitaTlrNo().equals(tlrNo)) {
+				} else {
+					continue;
+				}
 //				若整批處理中畫面顯示處理中，反之顯示該批作業狀態
 				if ("1".equals(tBatxHead.getBatxStsCode())) {
 					batxStatus = "9";
@@ -100,19 +102,15 @@ public class L4002 extends TradeBuffer {
 						continue;
 					}
 				} else {
-//					if ("4".equals(tBatxHead.getBatxExeCode()) || "8".equals(tBatxHead.getBatxExeCode())) {
-//					} else {
-//						this.info("continue... ，procExeCode = " + procExeCode + "，BatxHead狀態 != 4,8 ，狀態 = "
-//								+ tBatxHead.getBatxExeCode());
-//						continue;
-//					}
 					setL4002Tota(tBatxHead.getAcDate(), tBatxHead.getBatchNo(), titaVo);
 				}
 			}
 			if (totalCnt == 0) {
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
-		} else {
+		} else
+
+		{
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 
@@ -121,16 +119,7 @@ public class L4002 extends TradeBuffer {
 	}
 
 	private void setL4002Tota(int acDate, String batchNo, TitaVo titaVo) throws LogicException {
-		Slice<BatxDetail> sBatxDetail = null;
-		String tlrNo = titaVo.getParam("TlrNo");
-
-//		acDate = acDate + 19110000;
-
-		if ("".equals(tlrNo)) {
-			sBatxDetail = batxDetailService.findL4002AEq(acDate, batchNo, this.index, this.limit, titaVo);
-		} else {
-			sBatxDetail = batxDetailService.findL4002BEq(acDate, batchNo, tlrNo, this.index, this.limit, titaVo);
-		}
+		Slice<BatxDetail> sBatxDetail = batxDetailService.findL4002AEq(acDate, batchNo, this.index, this.limit, titaVo);
 
 		List<BatxDetail> lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 
@@ -263,7 +252,7 @@ public class L4002 extends TradeBuffer {
 						virCnt.put(grp1, 1);
 					}
 				}
-				
+
 				// grp2虛擬轉暫收
 				if ("7".equals(tBatxDetail.getProcStsCode())) {
 					if (virCnt.containsKey(grp2)) {
@@ -272,7 +261,7 @@ public class L4002 extends TradeBuffer {
 						virCnt.put(grp2, 1);
 					}
 				}
-				
+
 				// grp3虛擬轉暫收
 				if ("7".equals(tBatxDetail.getProcStsCode())) {
 					if (virCnt.containsKey(grp3)) {

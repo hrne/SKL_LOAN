@@ -13,8 +13,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.ForeclosureFee;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -35,7 +37,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2603 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2603.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -45,6 +46,9 @@ public class L2603 extends TradeBuffer {
 	@Autowired
 	public CustMainService sCustMainService;
 
+	@Autowired
+	public CdEmpService sCdEmpService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -74,10 +78,8 @@ public class L2603 extends TradeBuffer {
 		// new ArrayList
 		List<ForeclosureFee> lForeclosureFee = new ArrayList<ForeclosureFee>();
 		// new table
-		ForeclosureFee tForeclosureFee = new ForeclosureFee();
 		// 測試該收件日是否存在法拍費用檔
-		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDateBetween(iReceiveDateS + 19110000,
-				iReceiveDateE + 19110000, this.index, this.limit);
+		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.receiveDateBetween(iReceiveDateS + 19110000, iReceiveDateE + 19110000, this.index, this.limit);
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		// 不存在拋錯
 		if (lForeclosureFee == null) {
@@ -113,7 +115,7 @@ public class L2603 extends TradeBuffer {
 
 			// 取筆數如法拍費為0則不記筆數
 			if (tmpForeclosureFee.getFee().compareTo(BigDecimal.ZERO) == 0) {
-				cnt = cnt- 1;
+				cnt = cnt - 1;
 			}
 
 			// 筆數
@@ -130,6 +132,15 @@ public class L2603 extends TradeBuffer {
 			occurslist.putParam("OOFeeCode", tmpForeclosureFee.getFeeCode());
 			occurslist.putParam("OOCloseNo", tmpForeclosureFee.getCloseNo());
 			occurslist.putParam("OOLegalStaff", tmpForeclosureFee.getLegalStaff());
+			
+			CdEmp tCdEmp = new CdEmp();
+			String tempEmpNo = tmpForeclosureFee.getLegalStaff();
+			tCdEmp = sCdEmpService.findById(tempEmpNo, titaVo);	
+			occurslist.putParam("OOName", ""); // 建檔人員姓名
+			if( tCdEmp != null) {
+				occurslist.putParam("OOName", tCdEmp.getFullname()); // 建檔人員姓名
+			}
+			
 			occurslist.putParam("OORmk", tmpForeclosureFee.getRmk());
 
 			/* 將每筆資料放入Tota的OcList */

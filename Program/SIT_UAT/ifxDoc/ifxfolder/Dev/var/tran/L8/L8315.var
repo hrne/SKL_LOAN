@@ -38,15 +38,16 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[200,300,200,300];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,300,400,100];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8315]                                 (54)單獨全數受清償資料檔案"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-["#FdCustId+債務人IDN",#CustId],["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdRcDate+協商申請日",#RcDate],["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdRcDate+協商申請日",#RcDate],
+[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
 [#<->#,"#FdPayOffResult+單獨全數受清償原因",#PayOffResult,#PayOffResultX],
-[#<->#,"#FdPayOffDate+單獨全數受清償日期 ",#PayOffDate],
-[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+["#FdPayOffDate+單獨全數受清償日期 ",#PayOffDate],["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
 #FdTranKey=X,2,L
@@ -121,6 +122,8 @@ T(2,@FdPayOffDate,*)
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@PayOffResult,1)
 T(2,@FdPayOffResult,*)
@@ -241,7 +244,7 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#PayOffResultHelp)
 @V(H,#PayOffResultHelp)
 
-#PayOffResultX=X,100,L
+#PayOffResultX=X,80,L
 T(H,#PayOffResult,#PayOffResultHelp)
 
 !單獨全數受清償日期 

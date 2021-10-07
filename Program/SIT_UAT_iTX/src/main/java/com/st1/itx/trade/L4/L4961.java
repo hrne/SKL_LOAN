@@ -116,8 +116,19 @@ public class L4961 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
 
-			this.totaVo.putParam("OtotalCnt", totalCnt);
-			this.totaVo.putParam("OtotalAmt", totalAmt);
+			if(this.index == 0 ) {
+			  this.totaVo.putParam("OtotalCnt", totalCnt);
+			  this.totaVo.putParam("OtotalAmt", totalAmt);
+			  titaVo.putParam("OtotalCnt",totalCnt);
+			  titaVo.putParam("OtotalAmt",totalAmt);
+			} else {
+			  this.totaVo.putParam("OtotalCnt", totalCnt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalCnt"))));
+			  this.totaVo.putParam("OtotalAmt", totalAmt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalAmt"))));
+			  titaVo.putParam("OtotalCnt",totalCnt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalCnt"))));
+			  titaVo.putParam("OtotalAmt",totalAmt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalAmt"))));
+			}
+
+			
 		} else {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}

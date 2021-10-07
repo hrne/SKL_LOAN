@@ -14,11 +14,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.AcMain;
+import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailReserve;
 import com.st1.itx.db.domain.TxToDoDetailReserveId;
-import com.st1.itx.db.service.AcMainService;
+import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -54,7 +54,7 @@ public class BS901 extends TradeBuffer {
 	private TxToDoDetailReserveService txToDoDetailReserveService;
 
 	@Autowired
-	public AcMainService acMainService;
+	public InsuRenewService insuRenewService;
 
 	@Autowired
 	public TxToDoCom txToDoCom;
@@ -62,8 +62,8 @@ public class BS901 extends TradeBuffer {
 	@Autowired
 	public GSeqCom gSeqCom;
 
-	private int iAcDate;
-	private int iAcDateReverse;
+	private int iAcDate = 0;
+	private int iAcDateReverse = 0;
 	private List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();;
 	private List<TxToDoDetailReserve> lTxToDoDetailReserve = new ArrayList<TxToDoDetailReserve>();
 	private Slice<TxToDoDetail> slTxToDoDetail;
@@ -92,7 +92,8 @@ public class BS901 extends TradeBuffer {
 			}
 			// 2.刪除處理清單留存檔 ACCL02-未付火險費提存 入帳 //
 			this.info("3.bs901 delete Reserve ACCL02");
-			slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL02", 0, 3, iAcDate + 19110000, iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
+			slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL02", 0, 3, iAcDate + 19110000,
+					iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
 			if (slTxToDoDetailReserve != null) {
 				try {
 					txToDoDetailReserveService.deleteAll(slTxToDoDetailReserve.getContent(), titaVo);
@@ -123,7 +124,8 @@ public class BS901 extends TradeBuffer {
 		if (iAcDateReverse > 0) {
 			// 3.迴轉上月
 			this.info("3.bs901 last month ACCL02");
-			slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL02", 0, 3, iAcDateReverse + 19110000, iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
+			slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL02", 0, 3, iAcDateReverse + 19110000,
+					iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
 			if (slTxToDoDetailReserve != null) {
 				for (TxToDoDetailReserve t2 : slTxToDoDetailReserve.getContent()) {
 					TxToDoDetail tTxToDoDetail = new TxToDoDetail();
@@ -169,50 +171,60 @@ public class BS901 extends TradeBuffer {
 //	    摘要:yyy年xx月其它應收款火險保費
 
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
+		String rvNo = "AC"
+				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(
+						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
+						6);
 		BigDecimal txAmt = BigDecimal.ZERO;
 		int yyy = this.txBuffer.getMgBizDate().getTbsDy() / 10000;
 		int mm = (this.txBuffer.getMgBizDate().getTbsDy() / 100) - yyy * 100;
 
-		// AcMain 會計總帳檔， TMI 暫收款－火險保費
-		Slice<AcMain> slAcMain = acMainService.acctCodeEq(this.getTxBuffer().getMgBizDate().getTbsDyf(), "TMI", this.index, Integer.MAX_VALUE);
-		List<AcMain> lAcMain = slAcMain == null ? null : slAcMain.getContent();
+		int insuYearMonth = this.getTxBuffer().getMgBizDate().getTbsDyf() / 100;
 		// 計入已收，未收不計
-		if (lAcMain != null) {
-			for (AcMain ac : lAcMain) {
-				txAmt = ac.getTdBal(); // 本日餘額
-				this.info("procTxToDoThisMonth  txAmt =" + txAmt);
-				TxToDoDetail tTxToDoDetail = new TxToDoDetail();
-				tTxToDoDetail.setItemCode("ACCL02");
-				tTxToDoDetail.setDtlValue(rvNo);
-				TempVo tTempVo = new TempVo();
-				tTempVo.clear();
-				tTempVo.putParam("AcDate", iAcDate);
-				tTempVo.putParam("SlipBatNo", "95");
-				tTempVo.putParam("AcclType", "火險費提存");
-				tTempVo.putParam("AcBookCode", this.txBuffer.getSystemParas().getAcBookCode()); // 帳冊別 000
-				tTempVo.putParam("AcSubBookCode", this.txBuffer.getSystemParas().getAcSubBookCode()); // 區隔帳冊 00A
-				tTempVo.putParam("SlipNote", parse.IntegerToString(yyy, 3) + "年" + parse.IntegerToString(mm, 2) + "月" + "其它應收款火險保費");
-				tTempVo.putParam("DbAcctCode1", "ORI");
-				tTempVo.putParam("DbRvNo1", rvNo);
-				tTempVo.putParam("DbTxAmt1", txAmt);
-				tTempVo.putParam("CrAcctCode1", "OPO");
-				tTempVo.putParam("CrRvNo1", rvNo);
-				tTempVo.putParam("CrTxAmt1", txAmt);
-				tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
-				lTxToDoDetail.add(tTxToDoDetail);
-
-				// 應處理明細留存檔
-				TxToDoDetailReserve tTxToDoDetailReserve = new TxToDoDetailReserve();
-				TxToDoDetailReserveId tTxToDoDetailReserveId = new TxToDoDetailReserveId();
-				tTxToDoDetailReserveId.setItemCode(tTxToDoDetail.getItemCode());
-				tTxToDoDetailReserveId.setDtlValue(tTxToDoDetail.getDtlValue());
-				tTxToDoDetailReserve.setTxToDoDetailReserveId(tTxToDoDetailReserveId);
-				tTxToDoDetailReserve.setDataDate(iAcDate);
-				tTxToDoDetailReserve.setProcessNote(tTxToDoDetail.getProcessNote());
-				lTxToDoDetailReserve.add(tTxToDoDetailReserve);
+		// 本月到期已繳火險保費
+		Slice<InsuRenew> slInsuRenew = insuRenewService.findL4604A(insuYearMonth, 2, 1, 99999999, this.index,
+				Integer.MAX_VALUE);
+		if (slInsuRenew != null) {
+			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
+				if (tInsuRenew.getStatusCode() == 0) {
+					txAmt = txAmt.add(tInsuRenew.getTotInsuPrem());
+				}
 			}
+		}
+		this.info("procTxToDoThisMonth  txAmt =" + txAmt);
+		if (txAmt.compareTo(BigDecimal.ZERO) > 0) {
+			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
+			tTxToDoDetail.setItemCode("ACCL02");
+			tTxToDoDetail.setDtlValue(rvNo);
+			TempVo tTempVo = new TempVo();
+			tTempVo.clear();
+			tTempVo.putParam("AcDate", iAcDate);
+			tTempVo.putParam("SlipBatNo", "95");
+			tTempVo.putParam("AcclType", "火險費提存");
+			tTempVo.putParam("AcBookCode", this.txBuffer.getSystemParas().getAcBookCode()); // 帳冊別 000
+			tTempVo.putParam("AcSubBookCode", this.txBuffer.getSystemParas().getAcSubBookCode()); // 區隔帳冊 00A
+			tTempVo.putParam("AcctCode", "ORI");
+			tTempVo.putParam("SlipNote",
+					parse.IntegerToString(yyy, 3) + "年" + parse.IntegerToString(mm, 2) + "月" + "其它應收款火險保費");
+			tTempVo.putParam("DbAcctCode1", "ORI");
+			tTempVo.putParam("DbRvNo1", rvNo);
+			tTempVo.putParam("DbTxAmt1", txAmt);
+			tTempVo.putParam("CrAcctCode1", "OPO");
+			tTempVo.putParam("CrRvNo1", rvNo);
+			tTempVo.putParam("CrTxAmt1", txAmt);
+			tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
+			lTxToDoDetail.add(tTxToDoDetail);
+
+			// 應處理明細留存檔
+			TxToDoDetailReserve tTxToDoDetailReserve = new TxToDoDetailReserve();
+			TxToDoDetailReserveId tTxToDoDetailReserveId = new TxToDoDetailReserveId();
+			tTxToDoDetailReserveId.setItemCode(tTxToDoDetail.getItemCode());
+			tTxToDoDetailReserveId.setDtlValue(tTxToDoDetail.getDtlValue());
+			tTxToDoDetailReserve.setTxToDoDetailReserveId(tTxToDoDetailReserveId);
+			tTxToDoDetailReserve.setDataDate(iAcDate);
+			tTxToDoDetailReserve.setProcessNote(tTxToDoDetail.getProcessNote());
+			lTxToDoDetailReserve.add(tTxToDoDetailReserve);
 		}
 	}
 }

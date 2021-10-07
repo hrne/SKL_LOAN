@@ -68,6 +68,7 @@ public class L4R09 extends TradeBuffer {
 			this.totaVo.putParam("L4r09RepayId", tBatxOthers.getRepayId());
 			this.totaVo.putParam("L4r09RepayName", tBatxOthers.getRepayName());
 			this.totaVo.putParam("L4r09CustNo", tBatxOthers.getCustNo());
+			this.totaVo.putParam("L4r09FacmNo", tBatxOthers.getFacmNo());
 			this.totaVo.putParam("L4r09CustNm", tBatxOthers.getCustNm());
 			this.totaVo.putParam("L4r09RvNo", tBatxOthers.getRvNo());
 			this.totaVo.putParam("L4r09Note", tBatxOthers.getNote());
