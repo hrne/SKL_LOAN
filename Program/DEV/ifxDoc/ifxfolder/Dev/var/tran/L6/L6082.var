@@ -99,6 +99,7 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 !<include src="COM.icf::RPTFG.dec"/>
 
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

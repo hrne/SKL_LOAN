@@ -197,8 +197,7 @@ public class L4210 extends TradeBuffer {
 		try {
 			batxOthersService.insert(tBatxOthers, titaVo);
 		} catch (DBException e) {
-			if (e.getErrorId() == 2)
-				throw new LogicException(titaVo, "E0005", "L4210 BatxOthers insert " + e.getErrorMsg());
+			throw new LogicException(titaVo, "E0005", "L4210 BatxOthers insert " + e.getErrorMsg());
 		}
 		// head
 		updateBatxHead(iRepayAmt, titaVo);
@@ -258,7 +257,7 @@ public class L4210 extends TradeBuffer {
 		if (tBatxHead.getBatxTotCnt() > 0) {
 			tBatxHead.setBatxExeCode("0");
 		} else {
-			tBatxHead.setBatxExeCode("8");			
+			tBatxHead.setBatxExeCode("8");
 		}
 		tBatxHead.setBatxStsCode("0");
 		tBatxHead.setTitaTlrNo(titaVo.getTlrNo());

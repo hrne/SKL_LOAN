@@ -45,7 +45,7 @@ public class LP001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("iday", iENTDY);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -75,8 +75,9 @@ public class LP001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             FROM \"PfBsDetail\" PD";
 		sql += "             LEFT JOIN \"PfBsOfficer\" PO ON PO.\"EmpNo\" = PD.\"BsOfficer\" ";
 		sql += "                                         AND PO.\"WorkMonth\" = PD.\"WorkMonth\" ";
-		sql += "             WHERE PO.\"AreaCode\" IN ('10HC00','10HJ00','10HL00') ";
+		sql += "             WHERE NVL(PO.\"AreaCode\",' ') IN ('10HC00','10HJ00','10HL00') ";
 		sql += "               AND TRUNC(PD.\"WorkMonth\" / 100) = :iyear ";
+		sql += "               AND PD.\"PerfAmt\" >= 0 "; 
 		// sql += " AND PD.\"PerfDate\" <= :iday";
 		sql += "             GROUP BY PO.\"AreaCode\" ";
 		sql += "                    , PD.\"WorkMonth\" ";
@@ -115,6 +116,6 @@ public class LP001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("iyear", iYEAR);
 		// query.setParameter("iday", iENTDY);
 		query.setParameter("imm", iMM);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

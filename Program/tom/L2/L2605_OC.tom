@@ -1,0 +1,16 @@
+OOCustNo=9,7
+OOFacmNo=9,3
+OOCustName=X,100
+OOReceiveDate=9,7
+OOFee=9,14
+OOFee1=9,14
+OOFeeAmt=9,14
+OOShortfallOverflow=+9,14
+OOClMainType=9,1
+OOCityCode=X,2
+OOCityCodeX=X,10
+OOStatus=X,2
+OOPrevPayIntDate=9,7
+OOCollPsn=X,6
+OOName=X,10
+OOOverdueCode=X,1

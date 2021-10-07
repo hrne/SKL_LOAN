@@ -1,11 +1,11 @@
 package com.st1.itx.trade.LC;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -34,7 +34,6 @@ import com.st1.itx.db.service.springjpa.cm.LC001ServiceImpl;
  * @version 1.0.0
  */
 public class LC001 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LC001.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -156,11 +155,11 @@ public class LC001 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500;
-		
+		this.limit = 300;
+
 		try {
 
-			List<Map<String, String>> lc001List = lc001ServiceImpl.findAll(titaVo,index,limit);
+			List<Map<String, String>> lc001List = lc001ServiceImpl.findAll(titaVo, index, limit);
 
 			if (lc001List != null && lc001List.size() != 0) {
 				int cnt = 0;
@@ -168,10 +167,10 @@ public class LC001 extends TradeBuffer {
 					String flds = "";
 					for (int i = 0; i < lc001Vo.size(); i++) {
 						String fname = "F" + String.valueOf(i);
-						flds+=lc001Vo.get(fname)+",";
+						flds += lc001Vo.get(fname) + ",";
 					}
 					this.info("LC001 count = " + ++cnt + "/" + flds);
-					
+
 					int daCalDate = X2N(lc001Vo.get("F0")) - 19110000; // sql = "SELECT A.\"CalDate\"";
 					String daCalTime = lc001Vo.get("F1"); // sql += ",A.\"CalTime\"";
 					int daEntdy = X2N(lc001Vo.get("F2")) - 19110000; // sql += ",A.\"Entdy\"";
@@ -214,20 +213,25 @@ public class LC001 extends TradeBuffer {
 					this.totaVo.addOccursList(occursList);
 
 				}
-
-			}
+			} else
+				throw new LogicException(titaVo, "E0001", "訂正資料");
 
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			if (lc001List != null && lc001List.size()>=this.limit) {
+			if (lc001List != null && lc001List.size() >= this.limit) {
 				titaVo.setReturnIndex(this.setIndexNext());
 				this.totaVo.setMsgEndToEnter();// 手動折返
 			}
+		} catch (LogicException e) {
+			throw e;
 		} catch (Exception e) {
-			this.error("C001ServiceImpl error");
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
+			throw new LogicException(titaVo, "E0000", errors.toString());
 		}
-		
+
 	}
-	
+
 	private int X2N(String x) {
 		int r = 0;
 		if (!"".equals(x.trim())) {

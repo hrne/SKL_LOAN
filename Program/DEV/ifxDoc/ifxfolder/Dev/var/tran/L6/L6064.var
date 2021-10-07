@@ -169,6 +169,9 @@ C(4,#DefItem,E(0,0),E(0,1))
 
 !<include src="COM.icf::RPTFG.dec"/>
 <include src="ROM.icf::L6R33.dec"/>
+
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

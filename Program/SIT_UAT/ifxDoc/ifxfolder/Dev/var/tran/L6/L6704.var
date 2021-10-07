@@ -323,7 +323,6 @@ T(3,[L6704] 地區別資料維護)
 <sub type="TOM">
 
 TXFORM=L6704
-
 ^
 
 <include src="COM.icf::TRCTL.tom"/>

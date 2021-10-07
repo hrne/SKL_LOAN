@@ -15,14 +15,21 @@ import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankRemit;
+import com.st1.itx.db.domain.CdBank;
+import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.domain.CdBcm;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
+import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.CdBcmService;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.SlipMediaService;
@@ -51,6 +58,12 @@ public class L4101ReportB extends MakeReport {
 
 	@Autowired
 	AcCloseService acCloseService;
+	@Autowired
+	CdBankService cdBankService;
+	@Autowired
+	public CdEmpService cdEmpService;
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	public Parse parse;
@@ -115,8 +128,8 @@ public class L4101ReportB extends MakeReport {
 		 * 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
 		print(2, 1, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
-		print(1, 1, "編號　戶號　　　　　　　　　　　　　　　　　　　銀行別　　分行別　　　　匯款帳號　　　　　　　收款人　　　　　　　匯款金額　　　　　　核貸金額　　　　專辦　　沖轉　　");
-		print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－－－－－　－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　");
+		print(1, 1, "編號　戶號　　　　　　　　　　銀行別／分行別　　　　　匯款帳號　　　　　　　收款人　　　　　AML檢查狀態　　　　匯款金額／核貸金額　　　　　小計　　　　　專辦　　　沖轉　");
+		print(1, 1, "－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　");
 //		print(1, 1, "編號　戶號　　　　　　　　　　　　　　　　　　　銀行別　　分行別　　　匯款帳號　　　　　收款人　　　　　　　　匯款金額　　核貸金額　　　　　站別　　　　專辦　　　沖轉　　　　　　");
 
 	}
@@ -162,9 +175,13 @@ public class L4101ReportB extends MakeReport {
 			return;
 		}
 
-		// 合計容器(以借貸方區分)
-		BigDecimal dbAmt = BigDecimal.ZERO;
-		BigDecimal crAmt = BigDecimal.ZERO;
+		// 合計容器
+		BigDecimal subTotal = BigDecimal.ZERO;
+		BigDecimal total = BigDecimal.ZERO;
+		String wkBankItem = "";
+		String wkBranchItem = "";
+		String wkFullName = "";
+		String wkAmlRspItem = "";
 		String currencyCode = lBankRemit.get(0).getCurrencyCode();
 
 //		this.nowAcBookCode = lAcDetail.get(0).getSlipMediaId().getAcBookCode();
@@ -174,10 +191,19 @@ public class L4101ReportB extends MakeReport {
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
 		this.setCharSpaces(0);
+		this.setFont(1, 10);
 
 		int rounds = 1;
+		int oldCustNo = 0;
+		int oldFacmNo = 0;
+		int i = 1;
+		this.info("總數 = " + lBankRemit.size());
 		for (BankRemit tBankRemit : lBankRemit) {
-
+			if (tBankRemit.getCustNo() != oldCustNo && tBankRemit.getFacmNo() != oldFacmNo) {
+				oldCustNo = tBankRemit.getCustNo();
+				oldFacmNo = tBankRemit.getFacmNo();
+				subTotal = BigDecimal.ZERO;
+			}
 //			if (!this.nowAcBookCode.equals(tAcDetail.getAcBookCode())) {
 //				// 修改表頭的帳冊別欄位
 //				this.nowAcBookCode = tSlipMedia.getAcBookCode();
@@ -225,6 +251,7 @@ public class L4101ReportB extends MakeReport {
 			String facmNo = FormatUtil.pad9("" + tBankRemit.getFacmNo(), 3); // 戶號額度
 			String bormNo = FormatUtil.pad9("" + tBankRemit.getBormNo(), 3); // 戶號撥款序號
 			String custName = ""; // 戶名
+			// 客戶主檔找戶名
 			CustMain tCustMain = custMainService.custNoFirst(tBankRemit.getCustNo(), tBankRemit.getCustNo(), titaVo);
 			if (tCustMain != null) {
 				custName = tCustMain.getCustName();
@@ -234,44 +261,77 @@ public class L4101ReportB extends MakeReport {
 			String remitBank = tBankRemit.getRemitBank(); // 銀行別
 			String remitBranch = tBankRemit.getRemitBranch(); // 分行別
 			String remitAcctNo = tBankRemit.getRemitAcctNo(); // 匯款帳號
+			// 取銀行中文
+			CdBank t = cdBankService.findById(new CdBankId(remitBank, remitBranch), titaVo);
+			if (t != null) {
+				wkBankItem = t.getBankItem();// 銀行別中文
+				wkBranchItem = t.getBranchItem();// 分行別中文
+			} else {
+				wkBankItem = remitBank;
+				wkBranchItem = remitBranch;
+
+			}
 
 			String wkCustName = tBankRemit.getCustName(); // 收款戶名
+			String amlRsp = tBankRemit.getAmlRsp();// Aml回應碼
+			// 尋找Aml回應碼中文
+			CdCode tCdCode = cdCodeService.getItemFirst(8, "ConfirmStatus", tBankRemit.getAmlRsp(), titaVo);
+			if (tCdCode != null) {
+				wkAmlRspItem = tCdCode.getItem();
+			} else {
+				this.info("tCdCode = null ");
+
+				wkAmlRspItem = tBankRemit.getAmlRsp();
+			}
+			this.info("wkAmlRspItem = " + wkAmlRspItem);
 			BigDecimal remitAmt = tBankRemit.getRemitAmt(); // 匯款金額
 			BigDecimal wkLineAmt = lineAmt;// 核貸金額
 			String wkBusinessOfficer = businessOfficer;// 專辦
+			// 尋找員工姓名
+			CdEmp tCdEmp = cdEmpService.findById(wkBusinessOfficer, titaVo);
+			if (tCdEmp != null) {
+				wkFullName = tCdEmp.getFullname(); // 專辦姓名
+			} else {
+				wkFullName = wkBusinessOfficer;
+			}
 			int wkCorFlag = corFlag; // 沖轉
 
 			// 明細資料第一行
 			print(1, 1, "　　");
 			print(0, 1, FormatUtil.pad9("" + rounds, 3));// 序號
-			print(0, 7, "" + custNo + "-" + facmNo + "-" + bormNo);// 戶號
-			print(0, 26, FormatUtil.padX("" + custName, 20));// 戶名
-			print(0, 50, remitBank);// 銀行別
-			print(0, 60, remitBranch);// 分行別
-			print(0, 70, remitAcctNo);// 匯款帳號
-			print(0, 87, FormatUtil.padX("" + wkCustName, 20));// 收款戶名
-			print(0, 126, formatAmt(remitAmt, 0), "R");// 匯款金額
-			print(0, 146, formatAmt(wkLineAmt, 0), "R");// 核貸金額
-			print(0, 150, wkBusinessOfficer);// 專辦
-			print(0, 161, String.valueOf(wkCorFlag));// 沖轉
+			print(0, 7, custNo + "-" + facmNo + "-" + bormNo);// 戶號
+			print(0, 29, wkBankItem);// 銀行別
+			print(0, 52, remitAcctNo);// 匯款帳號
+			print(0, 69, FormatUtil.padX("" + wkCustName, 20));// 收款戶名
+			print(0, 91, wkAmlRspItem);// AML回應碼
+			print(0, 131, formatAmt(remitAmt, 0), "R");// 匯款金額
+			print(0, 154, FormatUtil.padX("" + tCdEmp.getFullname(), 20));// 專辦
+			print(0, 165, String.valueOf(wkCorFlag));// 沖轉
 
-			dbAmt = dbAmt.add(remitAmt);
-			crAmt = crAmt.add(wkLineAmt);
+			subTotal = subTotal.add(remitAmt);
+			total = total.add(remitAmt);
 
 			// 明細資料第二行
-//			print(1, 1, "　　");
-//			print(0, 7, tSlipMedia.getAcNoItem());
-//			print(0, 111, tSlipMedia.getSlipRmk());
+			print(1, 1, "　　");
+			print(0, 7, FormatUtil.padX("" + custName, 20));// 戶名
+			print(0, 29, wkBranchItem);// 分行別
+			print(0, 131, formatAmt(wkLineAmt, 0), "R");// 核貸金額
+			this.info("i  " + i);
+			this.info("lBankRemit size =   " + lBankRemit.size());
+			if (i == lBankRemit.size() || lBankRemit.get(i) != null
+					&& (oldCustNo != lBankRemit.get(i).getCustNo() && oldFacmNo != lBankRemit.get(i).getFacmNo())) {
+				print(0, 151, formatAmt(subTotal, 0), "R");// 核貸金額
+			}
 			rounds++;
+			i++;
 		}
 
-		print(1, 1, "－－　－－－－－－－－－－－－－－－－－－－　－－－－　－－－－－　－－－－－－－－　－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　");
+		print(1, 1, "－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－　－－－－－－－－－－　－－－－－－－－－－　－－－－－－－－－　－－－－－－－－－　－－－－　－－－　");
 		print(1, 1, "　　　　　　           ");
 
 //		print(0, 61, currencyCode);
-		print(0, 126, formatAmt(dbAmt, 2), "R");
-		print(0, 146, formatAmt(crAmt, 2), "R");
-
+		print(0, 151, formatAmt(total, 0), "R");
+//		print(0, 146, formatAmt(crAmt, 2), "R");
 	}
 
 	private String getBatchNo(TitaVo titaVo) throws LogicException {

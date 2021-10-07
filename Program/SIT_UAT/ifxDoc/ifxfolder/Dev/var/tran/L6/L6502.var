@@ -27,8 +27,6 @@ E(0,0)
 ["#FdNoGurTotalLmt+無擔保限額（保留欄位）",#NoGurTotalLmt],
 ["#FdTotalequity+股東權益（淨值）",#Totalequity],
 ]
-
-
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
 !#BUF1=X,42,S

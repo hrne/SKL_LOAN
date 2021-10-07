@@ -80,37 +80,60 @@ public class L420C extends TradeBuffer {
 		if (tBatxDetail == null) {
 			throw new LogicException("E0014", tBatxDetailId + " hold not exist"); // 檔案錯誤
 		}
-
+		boolean isUpdate = false;
+		String procStsCode = tBatxDetail.getProcStsCode();
 //		1.訂正
-//		2.虛擬轉暫收  7.虛擬轉暫收改為6.批次入帳，未入帳則執行L3210
+//		2.轉暫收  7.虛擬轉暫收改為6.批次入帳，未入帳則執行L3210
 		if (functionCode == 1 && "5".equals(tBatxDetail.getProcStsCode())) {
 			throw new LogicException("E0015", tBatxDetail.getDetailSeq() + "非整批入帳，請執行交易訂正"); // 檢查錯誤
 		}
-		if (functionCode == 2 && "7".equals(tBatxDetail.getProcStsCode())) {
+
+		// 2.轉暫收 7.虛擬轉暫收改為6、 BS020 暫收抵繳 改為1
+		if (functionCode == 2) {
+			if ("7".equals(tBatxDetail.getProcStsCode())) {
+				isUpdate = true;
+				procStsCode = "6";
+				finishCnt++;
+			}
+			if ("BS020".equals(tBatxDetail.getFileName())) {
+				isUpdate = true;
+				procStsCode = "6";
+				finishCnt++;
+			}
+		}
+
+		if (functionCode == 1) {
+			if ("BS020".equals(tBatxDetail.getFileName()) && "".equals(tBatxDetail.getTitaTxtNo())) {
+				isUpdate = true;
+				procStsCode = "0";
+				finishCnt--;
+			} else {
+				// 組入帳交易電文
+				TitaVo txTitaVo = new TitaVo();
+				txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, titaVo); // 1:訂正 2:虛擬轉暫收改
+
+				// 執行入帳交易
+				this.info("L420c excuteTx " + txTitaVo);
+				// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
+				TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
+
+				/* 錯誤 */
+				if (totaVoList != null && totaVoList.size() > 0) {
+					if (totaVoList.get(0).isError())
+						throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
+				}
+			}
+		}
+
+		if (isUpdate) {
 			tBatxDetail = batxDetailService.holdById(tBatxDetailId);
-			tBatxDetail.setProcStsCode("6");
-			finishCnt++;
+			tBatxDetail.setProcStsCode(procStsCode);
 			try {
 				batxDetailService.update(tBatxDetail);
 			} catch (DBException e) {
 				e.printStackTrace();
 			}
 			updateHeadRoutine(titaVo);
-		} else {
-			// 組入帳交易電文
-			TitaVo txTitaVo = new TitaVo();
-			txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, titaVo); // 1:訂正 2:虛擬轉暫收改
-
-			// 執行入帳交易
-			this.info("L420c excuteTx " + txTitaVo);
-			// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
-			TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
-
-			/* 錯誤 */
-			if (totaVoList != null && totaVoList.size() > 0) {
-				if (totaVoList.get(0).isError())
-					throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
-			}
 		}
 
 		this.addList(this.totaVo);

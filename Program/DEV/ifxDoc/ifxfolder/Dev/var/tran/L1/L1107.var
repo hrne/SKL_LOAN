@@ -499,6 +499,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue01=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem01,S,$)
 @
 CALL(#FlowAssetProc)
 
@@ -507,6 +508,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue02=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem02,S,$)
 @
 CALL(#FlowAssetProc)
 
@@ -515,6 +517,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue03=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem03,S,$)
 @
 CALL(#FlowAssetProc)
 
@@ -572,6 +575,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue04=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem04,S,$)
 @
 CALL(#OtherAssetProc)
 
@@ -580,6 +584,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue05=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem05,S,$)
 @
 CALL(#OtherAssetProc)
 
@@ -588,6 +593,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue06=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem06,S,$)
 @
 CALL(#OtherAssetProc)
 !-----------
@@ -654,6 +660,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue07=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem06,S,$)
 @
 CALL(#FlowDebtProc)
 
@@ -662,10 +669,12 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue08=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem08,S,$)
 @
 CALL(#FlowDebtProc)
 
 #AccountItem09=x,20,S
+
 #AccountValue09=+m,18,S
 
 #LongDebt=+m,18,I
@@ -717,6 +726,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue10=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem10,S,$)
 @
 CALL(#NetValueProc)
 
@@ -725,6 +735,7 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue11=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#AccountItem11,S,$)
 @
 CALL(#NetValueProc)
 </sub>
@@ -857,12 +868,14 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #CashAccountValue01=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#CashAccountItem01,S,$)
 
 #CashAccountItem02=x,20,I
 C(2,#FunCd,$,$,$,$,s,s)
 
 #CashAccountValue02=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+C(4,#CashAccountItem02,S,$)
 
 #EndCash=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
@@ -1014,7 +1027,6 @@ HELP(#ReportTypeHelp)
 C(4,#ReportType,$,V(H,#ReportTypeHelp))
 
 #ReportTypeX=X,30,L
-HIDE(#ReportType)
 T(H,#ReportType,#ReportTypeHelp)
 
 #Opinion=X,1,I
@@ -1075,6 +1087,7 @@ T(H,#ChangeReason,#ChangeReasonHelp)
 
 #init6=x,1,S
 IF(#FunCd==1 || #FunCd==2,s,$)
+HIDE(#ReportType)
 HIDE(#Opinion)
 HIDE(#IsCheck)
 HIDE(#IsChange)

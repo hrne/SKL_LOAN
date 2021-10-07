@@ -124,21 +124,66 @@ public class L4101Batch extends TradeBuffer {
 		String wkbatchNo = titaVo.getBacthNo();
 		this.info("L4101 Batch batchNo = " + batchNo);
 
-		// 批號查全部
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
 				titaVo);
+
+		for (BankRemit t : slBankRemit.getContent()) {
+			if (t.getActFg() != 1) {
+				lBankRemit.add(t);
+			}
+		}
+
+		// 更新批號
+		batchNo = this.updBatchNo(batchNo, titaVo);
+		this.info("L4101 batchNo = " + batchNo);
+		this.info("L4101 lBankRemit = " + lBankRemit);
+		for (BankRemit tBankRemit : lBankRemit) {
+			this.info("L4101 tBankRemit = " + tBankRemit);
+			tBankRemit.setBatchNo(batchNo);
+			this.info("L4101 setBatchNo = " + tBankRemit.getBatchNo());
+		}
+
+		this.info("L4101 lBankRemit -2 = " + lBankRemit);
+		try {
+			bankRemitService.updateAll(lBankRemit, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "BankRemit " + e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+
+		// 更新批號
+		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+		for (BankRemit tBankRemit : lBankRemit) {
+			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
+					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), acDate, 0,
+					Integer.MAX_VALUE, titaVo);
+			if (slAcDetail != null) {
+				for (AcDetail tAcDetail : slAcDetail.getContent()) {
+					tAcDetail.setTitaBatchNo(batchNo);
+					lAcDetail.add(tAcDetail);
+				}
+			}
+		}
+		if (lAcDetail.size() > 0) {
+			try {
+				acDetailService.updateAll(lAcDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "AcDetail " + e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
+		}
+		// commit
+
+		this.batchTransaction.commit();
+		titaVo.setBatchNo(batchNo);
+
+		// 批號查全部
+		lBankRemit = new ArrayList<BankRemit>();
+		slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 		lBankRemit = slBankRemit == null ? null : new ArrayList<BankRemit>(slBankRemit.getContent());
 
-		// 分錄
-		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
-
-		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
-				batchNo, 0, Integer.MAX_VALUE, titaVo);
-		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		totaVo.put("PdfSnoM", "");
 		totaVo.put("PdfSnoF", "");
@@ -161,11 +206,10 @@ public class L4101Batch extends TradeBuffer {
 
 //			2.匯款明細
 		doRptB(titaVo);
-//		procReportB(lBankRemit, titaVo);
 //			3.傳票明細表
 		doRptC(titaVo);
 
-		String checkMsg = "撥款匯款產檔已完成。   批號 = " + wkbatchNo;
+		String checkMsg = "撥款匯款產檔已完成。   批號 = " + batchNo;
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
 				checkMsg, titaVo);

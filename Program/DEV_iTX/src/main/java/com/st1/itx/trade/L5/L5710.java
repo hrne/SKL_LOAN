@@ -157,7 +157,11 @@ public class L5710 extends TradeBuffer {
 		makeExcel.toExcel(sno1);
 		totaVo.put("ExcelSnoM", "" + sno1);
 	
-		totaVo.put("OSuccessFlag","成功筆數 = " + successtimes + "筆      總金額 = " + successamt + "\n" + "失敗筆數 = " + falsetimes + "筆      總金額 = " + falseamt);
+		if (titaVo.isHcodeNormal()) {
+		  totaVo.put("OSuccessFlag","成功筆數 = " + successtimes + "筆      總金額 = " + successamt + "\n" + "失敗筆數 = " + falsetimes + "筆      總金額 = " + falseamt);
+		} else {
+		  totaVo.put("OSuccessFlag","");
+		}
 		
 		long sno2 = 0L;
 		sno2 = sNegReportNegService.CreateTxt(titaVo, sbData, "BACHTX03");

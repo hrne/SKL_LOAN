@@ -93,6 +93,7 @@ public class L6R20 extends TradeBuffer {
 		this.totaVo.putParam("BrNo", tTxTeller.getBrNo());
 		this.totaVo.putParam("AdFg", tTxTeller.getAdFg());
 		this.totaVo.putParam("LevelFg", tTxTeller.getLevelFg());
+		this.totaVo.putParam("AllowFg", tTxTeller.getAllowFg());
 		this.totaVo.putParam("Status", tTxTeller.getStatus());
 		this.totaVo.putParam("GroupNo", tTxTeller.getGroupNo());
 		this.totaVo.putParam("Entdy", tTxTeller.getEntdy());
@@ -103,7 +104,7 @@ public class L6R20 extends TradeBuffer {
 		this.totaVo.putParam("Desc", tTxTeller.getDesc());
 		this.totaVo.putParam("TlrItem", tTxTeller.getTlrItem());
 		this.totaVo.putParam("AmlHighFg", tTxTeller.getAmlHighFg());
-
+		
 	}
 	private void MoveGroup(String iTlrNo, TitaVo titaVo) {
 		this.info("L6R20 MoveGroup");

@@ -40,11 +40,11 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,300,200];printer.width=[20,20,20,20];order=1;">
 [
-["[L8334]                                 (572)前置調解無擔保債務分配表資料"],
+["[L8334]                                 (572)更生款項統一收款及撥付款項分配表資料檔案"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdStartDate+生效日期",#StartDate],
+["#FdApplyDate+款項統一收付申請日",#ApplyDate],["#FdStartDate+生效日期",#StartDate],
 ["#FdPayDate+本分配表首繳日",#PayDate],["#FdBankId+債權金融機構代號",#BankId,#BankIdX],
 ["#FdAllotAmt+參與分配債權金額",#AllotAmt],["#FdOwnPercentage+債權比例",#OwnPercentage],
 ["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
@@ -204,7 +204,7 @@ HELP(#TranKeyHelp)
 #SubmitKeyX=X,80,L
 
 
-!調解申請日
+!款項統一收付申請日
 #ApplyDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -284,7 +284,7 @@ E(0,0)
 !C(5,#TXFORM,L8334,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L8334] 前置調解無擔保債務分配表資料)
+T(3,[L8334] 更生款項統一收款及撥付款項分配表資料檔案)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------

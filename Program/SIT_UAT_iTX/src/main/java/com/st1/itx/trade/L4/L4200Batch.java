@@ -763,8 +763,8 @@ public class L4200Batch extends TradeBuffer {
 					}
 				}
 
-				tBatxDetail.setTitaTlrNo(iTlrNo);
-				tBatxDetail.setTitaTxtNo(iBatchNo.substring(6) + FormatUtil.pad9("" + (i + 1), 6));
+				tBatxDetail.setTitaTlrNo("");
+				tBatxDetail.setTitaTxtNo("");
 				tBatxDetail.setMediaDate(0);
 				tBatxDetail.setMediaKind("");
 				tBatxDetail.setMediaSeq(0);
@@ -999,8 +999,8 @@ public class L4200Batch extends TradeBuffer {
 
 				tBatxDetail.setProcNote(tempVo.getJsonString());
 
-				tBatxDetail.setTitaTlrNo(iTlrNo);
-				tBatxDetail.setTitaTxtNo(iBatchNo.substring(6) + FormatUtil.pad9("" + (i + 1), 6));
+				tBatxDetail.setTitaTlrNo("");
+				tBatxDetail.setTitaTxtNo("");
 				if (tAchDeductMedia != null) {
 					tBatxDetail.setMediaDate(tAchDeductMedia.getMediaDate());
 					tBatxDetail.setMediaKind(tAchDeductMedia.getMediaKind());
@@ -1168,8 +1168,8 @@ public class L4200Batch extends TradeBuffer {
 				}
 
 				tBatxDetail.setProcNote(tempVo.getJsonString());
-				tBatxDetail.setTitaTlrNo(iTlrNo);
-				tBatxDetail.setTitaTxtNo(iBatchNo.substring(6) + FormatUtil.pad9("" + (i + 1), 6));
+				tBatxDetail.setTitaTlrNo("");
+				tBatxDetail.setTitaTxtNo("");
 				if (tPostDeductMedia != null) {
 					tBatxDetail.setMediaDate(tPostDeductMedia.getMediaDate());
 					tBatxDetail.setMediaKind("3");
@@ -1329,8 +1329,8 @@ public class L4200Batch extends TradeBuffer {
 				}
 				tBatxDetail.setProcNote(tempVo.getJsonString());
 
-				tBatxDetail.setTitaTlrNo(iTlrNo);
-				tBatxDetail.setTitaTxtNo(iBatchNo.substring(6) + FormatUtil.pad9("" + (i + 1), 6));
+				tBatxDetail.setTitaTlrNo("");
+				tBatxDetail.setTitaTxtNo("");
 
 				if (tEmpDeductMedia != null) {
 					tBatxDetail.setMediaDate(tEmpDeductMedia.getMediaDate());
@@ -1515,8 +1515,8 @@ public class L4200Batch extends TradeBuffer {
 						tBatxDetail.setProcStsCode(procStsCode);
 						tBatxDetail.setProcCode(procCode);
 						tBatxDetail.setProcNote(tempVo.getJsonString());
-						tBatxDetail.setTitaTlrNo(iTlrNo);
-						tBatxDetail.setTitaTxtNo(iBatchNo.substring(4) + FormatUtil.pad9("" + (i + 1), 6));
+						tBatxDetail.setTitaTlrNo("");
+						tBatxDetail.setTitaTxtNo("");
 						tBatxDetail.setMediaDate(0);
 						tBatxDetail.setMediaKind("");
 						tBatxDetail.setMediaSeq(0);
@@ -1560,8 +1560,8 @@ public class L4200Batch extends TradeBuffer {
 					tBatxDetail.setProcCode(procCode);
 					tBatxDetail.setProcNote(tempVo.getJsonString());
 
-					tBatxDetail.setTitaTlrNo(iTlrNo);
-					tBatxDetail.setTitaTxtNo(iBatchNo.substring(4) + FormatUtil.pad9("" + (i + 1), 6));
+					tBatxDetail.setTitaTlrNo("");
+					tBatxDetail.setTitaTxtNo("");
 					tBatxDetail.setMediaDate(0);
 					tBatxDetail.setMediaKind("");
 					tBatxDetail.setMediaSeq(0);

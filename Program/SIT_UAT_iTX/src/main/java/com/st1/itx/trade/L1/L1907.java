@@ -78,6 +78,7 @@ public class L1907 extends TradeBuffer {
 		} else {
 			for (FinReportDebt tFinReportDebt : lFinReportDebt) {
 				OccursList occursList = new OccursList();
+				
 				occursList.putParam("OCustUKey", tFinReportDebt.getCustUKey());
 				occursList.putParam("OUKey", tFinReportDebt.getUKey());
 				occursList.putParam("OCustId", iCustId);
@@ -86,8 +87,13 @@ public class L1907 extends TradeBuffer {
 				occursList.putParam("OLastUpdate", parse.timeStampToString(tFinReportDebt.getLastUpdate()));
 
 				CdEmp cdEmp = cdEmpService.findById(tFinReportDebt.getLastUpdateEmpNo(), titaVo);
-				this.totaVo.addOccursList(occursList);
+				if (cdEmp == null) {
+					cdEmp = new CdEmp();
+					cdEmp.setFullname("");
+				}
 				occursList.putParam("OLastEmp", tFinReportDebt.getLastUpdateEmpNo() + " " + cdEmp.getFullname());
+				
+				this.totaVo.addOccursList(occursList);
 			}
 		}
 

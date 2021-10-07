@@ -275,7 +275,6 @@ public class L4452Batch extends TradeBuffer {
 			tmp.setPayIntDate(tBankDeductDtl.getPayIntDate());
 
 			if (!"".equals(tBankDeductDtl.getJsonFields())) {
-				rpAmtMap.put(tmp, BigDecimal.ZERO);
 				this.info("有問題不計算...");
 				continue;
 			}
@@ -405,8 +404,8 @@ public class L4452Batch extends TradeBuffer {
 				if (!tBankDeductDtl.getRepayAcctSeq().isEmpty()) {
 					repayAcctSeq = tBankDeductDtl.getRepayAcctSeq();
 				}
-				tPostDeductMedia.setPostUserNo(FormatUtil.padX(tCustMain.getCustId(), 10) + tBankDeductDtl.getPostCode()
-						+ FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7) + repayAcctSeq);
+				// 左靠又補空白
+				tPostDeductMedia.setPostUserNo(FormatUtil.padLeft(FormatUtil.padX(tCustMain.getCustId(), 10) + tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7) + repayAcctSeq, 20));
 
 // 				計息迄日+額度編號+入帳扣款別
 				int entryDate = 0;
@@ -685,7 +684,7 @@ public class L4452Batch extends TradeBuffer {
 				occursList.putParam("OccRepayAmt", FormatUtil.pad9(tPostDeductMedia.getRepayAmt() + "00", 11));
 
 				occursList.putParam("OccCustMemo", FormatUtil.padLeft(tPostDeductMedia.getPostUserNo(), 20));
-				occursList.putParam("OccPrtCustNo", "1");
+				occursList.putParam("OccPrtCustNo",FormatUtil.padX("", 1));;
 				occursList.putParam("OccPostNote2", FormatUtil.padX("", 1));
 				occursList.putParam("OccMaskFlag", FormatUtil.padX("", 1));
 				occursList.putParam("OccChgFlag", FormatUtil.padX("", 1));

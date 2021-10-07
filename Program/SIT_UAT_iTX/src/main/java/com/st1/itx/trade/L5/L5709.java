@@ -283,6 +283,7 @@ public class L5709 extends TradeBuffer {
 		} else {
 		  totaVo.put("OSuccessFlag","");
 		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

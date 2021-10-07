@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClMain;
 import com.st1.itx.db.domain.ClMainId;
@@ -277,11 +278,19 @@ public class L2605 extends TradeBuffer {
 				occurslist.putParam("OOFeeAmt", facmOverdueFee.add(facmFee));
 				// 本戶累溢短收
 				occurslist.putParam("OOShortfallOverflow", overflowShortfall);
+				occurslist.putParam("OOClMainType", clcode1); // 擔保品大類
 				occurslist.putParam("OOCityCode", cityCode);
 				occurslist.putParam("OOCityCodeX", cityItem);
 				occurslist.putParam("OOStatus", parse.IntegerToString(test[0], 2)); // 戶況
 				occurslist.putParam("OOPrevPayIntDate", test[1]); // 繳息迄日
 				occurslist.putParam("OOCollPsn", accCollPsn); // 催收人員
+				
+				CdEmp tCdEmp = new CdEmp();
+				tCdEmp = sCdEmpService.findById(accCollPsn, titaVo);	
+				occurslist.putParam("OOName", ""); // 建檔人員姓名
+				if( tCdEmp != null) {
+					occurslist.putParam("OOName", tCdEmp.getFullname()); // 建檔人員姓名
+				}
 				occurslist.putParam("OOOverdueCode", tmpFF.getOverdueDate() != 0 ? "Y" : " ");
 
 				consiz++;

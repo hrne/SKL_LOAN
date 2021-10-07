@@ -13,7 +13,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.ForeclosureFee;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.ForeclosureFeeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -33,12 +35,15 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2942 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2942.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public ForeclosureFeeService sForeclosureFeeService;
 
+	/* DB服務注入 */
+	@Autowired
+	public CustMainService sCustMainService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -71,8 +76,7 @@ public class L2942 extends TradeBuffer {
 		ForeclosureFee tForeclosureFee = new ForeclosureFee();
 
 		// 測試該會計日期是否存在法拍費用檔
-		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.openAcDateBetween(iAccDateStart, iAccDateEnd,
-				this.index, this.limit, titaVo);
+		Slice<ForeclosureFee> slForeclosureFee = sForeclosureFeeService.openAcDateBetween(iAccDateStart, iAccDateEnd, this.index, this.limit, titaVo);
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		if (lForeclosureFee == null) {
 			throw new LogicException("E0001", "L2942該會計日期在法拍費用檔無資料");
@@ -135,6 +139,12 @@ public class L2942 extends TradeBuffer {
 			occurslist.putParam("OOENTRYDATE", tmpForeclosureFee.getDocDate());
 			occurslist.putParam("OOCustNo", tmpForeclosureFee.getCustNo());
 			occurslist.putParam("OOFacmNo", tmpForeclosureFee.getFacmNo());
+			occurslist.putParam("OOCustName", "");
+			CustMain tCustMain = new CustMain();
+			tCustMain = sCustMainService.custNoFirst(tmpForeclosureFee.getCustNo(), tmpForeclosureFee.getCustNo(), titaVo);	
+			if(tCustMain != null) {
+				occurslist.putParam("OOCustName", tCustMain.getCustName());	
+			}
 			occurslist.putParam("OOFEEAMT", tmpForeclosureFee.getFee());
 			occurslist.putParam("OOFeeCode", tmpForeclosureFee.getFeeCode());
 			occurslist.putParam("OOReceiveDate", tmpForeclosureFee.getReceiveDate());

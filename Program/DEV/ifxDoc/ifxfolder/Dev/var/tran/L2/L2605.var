@@ -145,7 +145,18 @@ T(2,#OOCustNo+-+#OOFacmNo)
 !本戶累溢短收
 #OOShortfallOverflow=+m,14,L
 !地區別
-#OOCityCode=A,2,L
+#OOClMainType=A,1,L
+!擔保品大類
+#OOClMainTypeX=X,10,L
+SWITCH(#OOClMainType,1,T(3,不動產),
+                  2,T(3,不動產),
+                  3,T(3,股票),
+                  4,T(3,股票),
+                  5,T(3,其他擔保品),
+                  9,T(3,動產),
+                  0,T(3, ))
+!地區別
+#OOCityCode=X,2,L
 !地區別名稱
 #OOCityCodeX=X,10,L
 !戶況
@@ -156,7 +167,11 @@ T(H,#OOStatus,#StatusHelp)
 !繳息迄日
 #OOPrevPayIntDate=D,7,L
 !催收人員
-#OOCollPsn=X,10,L
+#OOCollPsn=X,6,L
+#OOName=X,10,L
+#OOName1=X,18,L
+T(2,#OOCollPsn+  +#OOName)
+
 !轉催收註記
 #OOOverdueCode=X,1,L
 
@@ -188,11 +203,13 @@ TXFORM=L2605
 #OOFee1
 #OOFeeAmt
 #OOShortfallOverflow
+#OOClMainType
 #OOCityCode
 #OOCityCodeX
 #OOStatus
 #OOPrevPayIntDate
 #OOCollPsn
+#OOName
 #OOOverdueCode
 ^
 <include src="COM.icf::TRCTL.tom"/>
@@ -236,11 +253,14 @@ TXFORM=L2605
 #OOShortfallOverflow=本戶累溢短收
 {width:100,align:'right'}
 
+#OOClMainTypeX=擔保品大類
+{width:100,align:'left'}
+
 #OOCityCode=地區別
-{width:100,align:'center'}
+{width:60,align:'center'}
 
 #OOCityCodeX=地區別名稱
-{width:100,align:'center'}
+{width:70,align:'center'}
 
 #OOStatusX=戶況
 {width:100,align:'center'}
@@ -248,8 +268,8 @@ TXFORM=L2605
 #OOPrevPayIntDate=繳息迄日
 {width:100,align:'center'}
 
-#OOCollPsn=催收人員
-{width:100,align:'center'}
+#OOName1=催收人員
+{width:120,align:'left'}
 
 #OOOverdueCode=轉催收註記
 {width:100,align:'center'}

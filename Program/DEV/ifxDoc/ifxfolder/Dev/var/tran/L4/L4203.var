@@ -93,9 +93,9 @@ T(1,@RepayAmtX,#NTXBUF,32,18)
 T(1,@AcctAmtX,#NTXBUF,50,18)
 T(1,@DisacctAmtX,#NTXBUF,68,18)
 T(1,@ProcStsCode,#NTXBUF,86,1)
-T(1,@ProcCode,#NTXBUF,96,5)
-T(1,@ProcDscptCode,#NTXBUF,101,300)
-T(1,@TxSn,#NTXBUF,305,14)
+T(1,@ProcCode,#NTXBUF,87,5)
+T(1,@ProcDscptCode,#NTXBUF,92,300)
+T(1,@TxSn,#NTXBUF,396,14)
 INVOKEJS(SHOW,p1,02,02,1)
 
 #RepayAmtX=X,18,S

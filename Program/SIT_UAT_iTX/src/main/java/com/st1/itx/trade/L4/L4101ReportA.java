@@ -182,8 +182,8 @@ public class L4101ReportA extends MakeReport {
 		print(1, 1, "　　　　　　           ");
 
 //		print(0, 61, currencyCode);
-		print(0, 105, formatAmt(sumDbAmt, 2), "R");// 借方金額加總
-		print(0, 125, formatAmt(sumCrAmt, 2), "R");// 貸方金額加總
+		print(0, 105, formatAmt(sumDbAmt, 0), "R");// 借方金額加總
+		print(0, 125, formatAmt(sumCrAmt, 0), "R");// 貸方金額加總
 
 	}
 

@@ -187,8 +187,6 @@ T(2,#OOFunc4+#OOCityCode+#OOCityItem+#OOUnitCode+#OOAccCollPsn+#OOLegalPsn)
 #OOBTN4=X,4,S
 C(3,#CHAIN,1,HIDE(#OOBTN4),SHOW(#OOBTN4))
 BIND(grid,{cmd=CHAIN;ntxcd=L6704;text=刪除;ntxbuf=#OOBUF4})
-
-
 </sub>
 
 

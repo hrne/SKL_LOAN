@@ -70,7 +70,7 @@ public class L4943 extends TradeBuffer {
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 1;
+		this.limit = 100;
 
 //		1.戶號 = 戶號+入帳日
 //		2.上限金額 = 入帳日+限額

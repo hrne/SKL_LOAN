@@ -272,7 +272,7 @@ public class LM051Report extends MakeReport {
 				}
 				break;
 			case 2:
-				if (!tLDVo.get("F0").equals("99") || !tLDVo.get("F1").equals("99")) {
+				if ( !tLDVo.get("F1").equals("99")) {
 
 					if (tLDVo.get("F0").equals("1")) {
 						row = 18;

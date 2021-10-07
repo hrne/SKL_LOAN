@@ -37,18 +37,6 @@ public class L9711Report2 extends MakeReport {
 
 	String ENTDY = "";
 
-//	String name = "";
-	// 自訂表頭
-//	@Override
-//	public void printHeader() {
-//		
-//		
-//		//明細起始列(自訂亦必須)
-//		this.setBeginRow(10);
-//		
-//		//設定明細列數(自訂亦必須)
-//		this.setMaxRows(35);
-//	}
 
 	@Override
 	public void printHeader() {
@@ -60,7 +48,7 @@ public class L9711Report2 extends MakeReport {
 		this.setBeginRow(3);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(50);
+		this.setMaxRows(40);
 
 	}
 
@@ -72,7 +60,6 @@ public class L9711Report2 extends MakeReport {
 		String f5 = "";
 		int count = 0;
 		// 製表人
-//		name = titaVo.getParam("NAME").toString();
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9711", "放款本息攤還表暨繳息通知單", "密", "A4", "P");
 
 		if (L9711List.size() > 0) {
@@ -83,7 +70,7 @@ public class L9711Report2 extends MakeReport {
 
 					report(tL9711Vo, txbuffer);
 
-					// 否則
+	
 				} else {
 					if (count != 0) {
 						this.newPage();
@@ -102,10 +89,6 @@ public class L9711Report2 extends MakeReport {
 			this.info("L9711List.reportEmpty");
 			reportEmpty();
 		}
-		
-//		if (this.getNowPage() == 0) {
-//			this.print(1, 20, "*******    查無資料   ******");
-//		}
 
 		long sno = this.close();
 
@@ -147,7 +130,6 @@ public class L9711Report2 extends MakeReport {
 		this.print(-36, 82, "製表人 ");
 		this.print(1, 1, " ");
 		
-		this.newPage();
 
 	}
 
@@ -163,14 +145,13 @@ public class L9711Report2 extends MakeReport {
 
 //		this.info("listBaTxVo.size()-------->" + listBaTxVo.size());
 //		this.info("listBaTxVo-------->" + listBaTxVo.toString());
+		
 		int Principal = 0;
 		int Interest = 0;
 		int BreachAmt = 0;
 		int UnPaidAmt = 0;
 		int LoanBal = 0;
 		double IntRate = 0.00;
-
-//		int colNum = 2;
 		
 		// 未收本息 = 本金+利息 Principal + Interest
 		// 違約金 有 但要扣成 0 BreachAmt
@@ -185,38 +166,7 @@ public class L9711Report2 extends MakeReport {
 		this.print(-7, 10, tranNum(tL9711Vo.get("F17")) + tranNum(tL9711Vo.get("F18")));
 
 		String tmp = "";
-//		if (tL9711Vo.get("F19") != null || tL9711Vo.get("F19").length() == 0) {
-//			tmp = tmp + tL9711Vo.get("F19");
-//		}
-//		if (tL9711Vo.get("F20") != null || tL9711Vo.get("F20").length() == 0) {
-//			tmp = tmp + tL9711Vo.get("F20");
-//		}
-//		if (tL9711Vo.get("F21") != null || tL9711Vo.get("F21").length() == 0) {
-//
-//			tmp = tmp + tL9711Vo.get("F21");
-//		}
-//		if (tL9711Vo.get("F22") != null || tL9711Vo.get("F22").length() == 0) {
-//			tmp = tmp + tL9711Vo.get("F22") + "段";
-//		}
-//		if (tL9711Vo.get("F23") != null || tL9711Vo.get("F23").length() == 0) {
-//			tmp = tmp + tL9711Vo.get("F23") + "巷";
-//		}
-//		if (tL9711Vo.get("F24") != null || tL9711Vo.get("F24").length() == 0) {
-//			tmp = tmp + tL9711Vo.get("F24") + "弄";
-//		}
-//		if (tL9711Vo.get("F25") != null || tL9711Vo.get("F25").length() == 0) {
-//			tmp = tmp + tL9711Vo.get("F25") + "號";
-//		}
-//		if (tL9711Vo.get("F26") != null || tL9711Vo.get("F26").length() == 0) {
-//			tmp = tmp + "之" + tL9711Vo.get("F26");
-//			tmp = tmp + "之" + tL9711Vo.get("F26") + "，";
-//		}
-//		if (tL9711Vo.get("F27") != null || tL9711Vo.get("F19").length() == 0) {
-//			tmp = tmp + tL9711Vo.get("F27") + "樓";
-//		}
-//		if (tL9711Vo.get("F28") != null || tL9711Vo.get("F28").length() == 0) {
-//			tmp = tmp + "之" + tL9711Vo.get("F28");
-//		}
+		
 		this.print(-9, 10, tL9711Vo.get("F19"));
 
 		this.print(-11, 10, String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + "   " + tL9711Vo.get("F6"));
@@ -244,8 +194,10 @@ public class L9711Report2 extends MakeReport {
 		this.print(-28, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 		String TempDate = String.valueOf(listBaTxVo.get(0).getPayIntDate());
 		int dataRow = -29;
+		int tempCustNo=0;
+		int tempFacmNo=0;
 		if (listBaTxVo.size() > 0) {
-
+			
 			for (int i = 0; i < listBaTxVo.size(); i++) {
 				String PayIntDate = String.valueOf(listBaTxVo.get(i).getPayIntDate());
 				if (PayIntDate.equals(TempDate) && i != listBaTxVo.size() - 1) {
@@ -313,8 +265,13 @@ public class L9711Report2 extends MakeReport {
 
 					TempDate = String.valueOf(listBaTxVo.get(i).getPayIntDate());
 				}
-
-				dataRow--;
+			
+				if(tempCustNo!=listBaTxVo.get(i).getCustNo() && tempCustNo!=listBaTxVo.get(i).getFacmNo()) {
+					dataRow--;					
+					tempCustNo=listBaTxVo.get(i).getCustNo();
+					tempFacmNo=listBaTxVo.get(i).getFacmNo();
+				}
+		
 			}
 		}
 
@@ -338,6 +295,7 @@ public class L9711Report2 extends MakeReport {
 		this.print(dataRow--, 82, "製表人 " + tmp);
 
 		this.newPage();
+	
 	}
 
 

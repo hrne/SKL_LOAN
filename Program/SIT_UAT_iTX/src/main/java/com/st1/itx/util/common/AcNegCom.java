@@ -107,13 +107,15 @@ public class AcNegCom extends TradeBuffer {
 			// 正常交易更新會計日期、訂正交易會計日期 = 0
 			if (this.txBuffer.getTxCom().getBookAcHcode() == 0) { // 帳務訂正記號 AcHCode 0.正常 1.當日訂正 2.隔日訂正
 				tNegAppr02.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-				tNegAppr02.setTxStatus(1);//已入客戶暫收
 			} else {
-				if (tNegAppr02.getTxStatus() == 2) {//已入帳,不可訂正
-					throw new LogicException(titaVo, "E0007", " " + "一般債權撥付資料檔已入帳不可訂正 " + tNegAppr02Id); // 
+				if (tNegAppr02.getTxStatus() != 0) {// 已做暫收解入或入帳,不可訂正
+					if (tNegAppr02.getTxStatus() == 2) {
+						throw new LogicException(titaVo, "E0007", " " + "一般債權撥付資料檔已入帳，不可訂正 " + tNegAppr02Id); //
+					} else {
+						throw new LogicException(titaVo, "E0007", " " + "一般債權撥付資料檔已作暫收解入，不可訂正 " + tNegAppr02Id); //
+					}
 				}
 				tNegAppr02.setAcDate(0);
-				tNegAppr02.setTxStatus(0);
 			}
 
 			try {

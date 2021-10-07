@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.hist;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,16 +21,15 @@ import com.st1.itx.db.domain.TxTellerAuthId;
  */
 public interface TxTellerAuthRepositoryHist extends JpaRepository<TxTellerAuth, TxTellerAuthId> {
 
-  // TlrNo = 
-  public Slice<TxTellerAuth> findAllByTlrNoIsOrderByTlrNoAscAuthNoAsc(String tlrNo_0, Pageable pageable);
+	// TlrNo =
+	public Slice<TxTellerAuth> findAllByTlrNoIsOrderByTlrNoAscAuthNoAsc(String tlrNo_0, Pageable pageable);
 
-  // AuthNo =
-  public Slice<TxTellerAuth> findAllByAuthNoIsOrderByTlrNoAscAuthNoAsc(String authNo_0, Pageable pageable);
+	// AuthNo =
+	public Slice<TxTellerAuth> findAllByAuthNoIsOrderByTlrNoAscAuthNoAsc(String authNo_0, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<TxTellerAuth> findByTxTellerAuthId(TxTellerAuthId txTellerAuthId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<TxTellerAuth> findByTxTellerAuthId(TxTellerAuthId txTellerAuthId);
 
 }
-
