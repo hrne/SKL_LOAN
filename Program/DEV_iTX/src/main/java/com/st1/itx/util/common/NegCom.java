@@ -1723,7 +1723,7 @@ public class NegCom extends CommBuffer {
 			// E5009 資料檢核錯誤
 			throw new LogicException(titaVo, "E5009", "[債權區分(" + IsMainFin + ")]輸入有誤");
 		}
-		if (1 <= State && State <= 17) {
+		if (1 <= State && State <= 18) {
 
 		} else {
 			// E5009 資料檢核錯誤

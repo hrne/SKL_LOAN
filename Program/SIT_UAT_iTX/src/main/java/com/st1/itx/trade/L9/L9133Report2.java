@@ -107,7 +107,8 @@ public class L9133Report2 extends MakeReport {
 				: slAcAcctCheckDetail.getContent();
 
 		if (lAcAcctCheckDetail == null || lAcAcctCheckDetail.size() == 0) {
-			throw new LogicException("E0001", "會計業務檢核明細檔");
+//			throw new LogicException("E0001", "會計業務檢核明細檔");
+			this.error("L9133Report2 lAcAcctCheckDetail IS NULL.");
 		}
 
 		for (AcAcctCheckDetail tAcAcctCheckDetail : lAcAcctCheckDetail) {

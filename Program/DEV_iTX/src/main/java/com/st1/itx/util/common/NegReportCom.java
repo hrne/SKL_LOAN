@@ -531,7 +531,7 @@ public class NegReportCom extends CommBuffer {
 						// 提兌日
 						tNegAppr02Id.setBringUpDate(parse.stringToInteger(BringUpDate));
 						// 債權機構代號(8)
-						tNegAppr02Id.setFinCode(FromFinCode);
+						tNegAppr02Id.setFinCode(FromFinCode.trim());
 						// 資料交易序號
 						tNegAppr02Id.setTxSeq(TxSeq);
 

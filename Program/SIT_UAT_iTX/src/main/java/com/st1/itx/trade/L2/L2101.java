@@ -324,7 +324,8 @@ public class L2101 extends TradeBuffer {
 		}
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 10; i++) {
-				if (this.parse.stringToDouble(titaVo.getParam("StepMonthS" + i)) >= 0) {
+				if (titaVo.get("StepMonthS" + i) != null
+						&& this.parse.stringToDouble(titaVo.get("StepMonthS" + i)) >= 0) {
 					if (this.parse.stringToDouble(titaVo.getParam("StepMonthS" + i)) == 0 && i > 1) {
 						break;
 					}
@@ -376,7 +377,8 @@ public class L2101 extends TradeBuffer {
 		}
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 10; i++) {
-				if (this.parse.stringToDouble(titaVo.getParam("TimPremium" + i)) > 0) {
+				if (titaVo.get("TimPremium" + i) != null
+						&& this.parse.stringToDouble(titaVo.get("TimPremium" + i)) > 0) {
 					tFacProdPremium.setProdNo(iProdNo);
 					tFacProdPremium.setPremiumLow(this.parse.stringToBigDecimal(titaVo.getParam("TimPremium" + i)));
 					tFacProdPremium.setFacProdPremiumId(new FacProdPremiumId(iProdNo,
@@ -422,7 +424,8 @@ public class L2101 extends TradeBuffer {
 		}
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 5; i++) {
-				if (this.parse.stringToDouble(titaVo.getParam("TimLoanAmt" + i)) > 0) {
+				if (titaVo.get("TimLoanAmt" + i) != null
+						&& this.parse.stringToDouble(titaVo.get("TimLoanAmt" + i)) > 0) {
 					tFacProdAcctFee.setProdNo(iProdNo);
 					tFacProdAcctFee.setLoanLow(this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmt" + i)));
 					tFacProdAcctFee.setFacProdAcctFeeId(new FacProdAcctFeeId(iProdNo, "1",
@@ -463,7 +466,8 @@ public class L2101 extends TradeBuffer {
 		}
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 5; i++) {
-				if (this.parse.stringToDouble(titaVo.getParam("TimHandlingFee" + i)) > 0) {
+				if (titaVo.get("TimHandlingFee" + i) != null
+						&& this.parse.stringToDouble(titaVo.get("TimHandlingFee" + i)) > 0) {
 					tFacProdAcctFee.setProdNo(iProdNo);
 					tFacProdAcctFee.setLoanLow(this.parse.stringToBigDecimal(titaVo.getParam("TimLoanAmtB" + i)));
 					tFacProdAcctFee.setFacProdAcctFeeId(new FacProdAcctFeeId(iProdNo, "2",

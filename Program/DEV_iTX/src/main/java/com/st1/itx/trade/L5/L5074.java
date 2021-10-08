@@ -74,9 +74,9 @@ public class L5074 extends TradeBuffer {
 	String ColB[] = { "", "前日匯入", "本日匯入", "撥入筆數", "檢核成功", "檢核失敗" };
 	String ColC[] = { "", "未入帳", "待處理", "本日入帳", "放款暫收" };
 	String ColD[] = { "", "撥付金額", "放款攤分", "保單攤分", "結清退還款" };
-	String ColE[] = { "", "本月入帳", "本月放款", "本月保單", "累計未退還餘額" };
+	String ColE[] = { "", "本月入帳", "本月放款", "本月保單", "累計未退還餘額" ,"暫收解入"};
 	String ColDetail[] = { "債協", "調解", "更生", "清算" };
-	String Issue[] = { "", "入帳還款", "撥付製檔", "撥付出帳", "撥付提兌" };// 製檔日,傳票日,提兌日
+	String Issue[] = { "", "入帳還款", "撥付製檔", "撥付出帳", "撥付提兌" ,"暫收解入"};// 製檔日,傳票日,提兌日
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -128,9 +128,11 @@ public class L5074 extends TradeBuffer {
 			String BufSummary = "";
 			String BufIssue = "";
 			String BtnCode = "0";// 處理事項是否顯示 0不顯示 1:導入L597A 2:撥付產檔日(L5707) 3:撥付傳票日(L5708) 4:撥付提兌日(L5709)
+									// 5:暫收解入(L5712)
 
 			int IsMainFin = 0;// 最大債權 0否 1是
-			int State = 0;// 01:前日匯入,02:未入帳,03:待處理,04:已入帳,05:本月入帳,06:放款攤分,07:保單攤分,08:結清退還,09:本月放款,10:本月保單,11:累計未退還餘額,12:本日匯入,13:撥入筆數,14:檢核成功,15:檢核失敗,16:放款暫收
+			int State = 0;// 01:前日匯入,02:未入帳,03:待處理,04:已入帳,05:本月入帳,06:放款攤分,07:保單攤分,08:結清退還,09:本月放款,10:本月保單,
+							//11:累計未退還餘額,12:本日匯入,13:撥入筆數,14:檢核成功,15:檢核失敗,16:放款暫收,17:本月放款,18:暫收解入
 			int Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 			int ExportDateYN = 0;// 0:無(左側),1:已製檔,2:未製檔
 			int IsBtn = 0;
@@ -497,8 +499,9 @@ public class L5074 extends TradeBuffer {
 					TodayWorkAmt = Data[1];// 金額
 					BufToday = BufValue(IsMainFin, State, Detail, ExportDateYN, 0);
 				} else if (i == 20) {
-					// 檢核成功(左)
 					LabelB = ColB[4];
+					LabelE = ColE[5];
+					// 檢核成功(左)
 					State = 14;
 					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 					ExportDateYN = 0;
@@ -512,6 +515,27 @@ public class L5074 extends TradeBuffer {
 					TodayWorkCnt = Data[0];// 筆數
 					TodayWorkAmt = Data[1];// 金額
 					BufToday = BufValue(IsMainFin, State, Detail, ExportDateYN, 0);
+					// 暫收解入(右)
+					State = 18;
+					Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
+					ExportDateYN = 0;
+					try {
+						Data = NegCom.NegServiceList1(IntAcDate, IsMainFin, State, Detail, ExportDateYN, IsBtn, titaVo);
+					} catch (LogicException e) {
+						// E5004 讀取DB時發生問題
+						this.info("L5051 ErrorForDB=" + e);
+						throw new LogicException(titaVo, "E5004", "");
+					}
+					SummaryWorkCnt = Data[0];// 筆數
+					SummaryWorkAmt = Data[1];// 金額
+					BufSummary = BufValue(IsMainFin, State, Detail, ExportDateYN, 0);
+					BufIssue = BufValue(IsMainFin, State, Detail, ExportDateYN, 1);
+					ThisIssue = Issue[5];// 處理事項
+					if (SummaryWorkAmt != null && Integer.parseInt(SummaryWorkAmt) > 0) {
+						BtnCode = "1";
+					} else {
+						BtnCode = "0";
+					}
 				} else if (i == 21) {
 					// 檢核失敗(左)
 					LabelB = ColB[5];
@@ -603,7 +627,8 @@ public class L5074 extends TradeBuffer {
 			occursList1.putParam("OOBufToday", BufToday);// 本日_數字按鈕-傳送的資料
 			occursList1.putParam("OOBufSummary", BufSummary);// 累計_數字按鈕-傳送的資料
 			occursList1.putParam("OOBufIssue", BufIssue);// 處理事項按鈕-傳送的資料
-			occursList1.putParam("OOBtnCode", BtnCode);// 處理事項是否顯示 0不顯示 1:導入L597A 2:撥付產檔日(L5707) 3:撥付傳票日(L5708) 4:撥付提兌日(L5709)
+			occursList1.putParam("OOBtnCode", BtnCode);// 處理事項是否顯示 0不顯示 1:導入L597A 2:撥付產檔日(L5707) 3:撥付傳票日(L5708)
+														// 4:撥付提兌日(L5709) 5:暫收解入(L5712)
 			this.totaVo.addOccursList(occursList1);
 		}
 
@@ -620,14 +645,14 @@ public class L5074 extends TradeBuffer {
 	}
 
 	public String HadDo(int IntAcDate, String BtnCode, TitaVo titaVo) throws LogicException {
-		// 處理事項是否顯示 0不顯示 1:導入L597A 2:撥付產檔日(L5707) 3:撥付傳票日(L5708) 4:撥付提兌日(L5709)
+		// 處理事項是否顯示 0不顯示 1:導入L597A 2:撥付產檔日(L5707) 3:撥付傳票日(L5708) 4:撥付提兌日(L5709) 5:暫收解入(L5712)
 		Boolean TF = false;
 		Slice<NegTrans> slNegTrans = null;
 		this.info("HadDo BtnCode=[" + BtnCode + "]");
 		switch (BtnCode) {
 		case "1":
 			// 導入L597A
-			// 入賬還款
+			// 入帳還款
 //				slNegTrans = sNegTransService.RepayDateEq(IntAcDate, 0, 1,titaVo);
 //				if(slNegTrans!=null && slNegTrans.getSize()!=0) {
 //					TF=true;
@@ -654,6 +679,8 @@ public class L5074 extends TradeBuffer {
 				TF = true;
 			}
 			break;
+		case "5":
+			// 暫收解入(L5712)
 		}
 		if (TF) {
 			BtnCode = "0";

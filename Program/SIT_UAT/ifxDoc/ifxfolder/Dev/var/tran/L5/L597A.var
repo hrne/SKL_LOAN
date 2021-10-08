@@ -100,7 +100,8 @@ T(3,
 14:檢核成功;
 15:檢核失敗;
 16:放款暫收;
-17:本月放款
+17:本月放款;
+18:暫收解入
 )
 
 ![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款 03:債協 09:放款
@@ -128,7 +129,7 @@ T(HELP,@TxKindHelp1,#TxKindHelp,-,9)
 C(3,#CHAIN,0,$,s)
 HELP(#HelpSearchOption,cols:2)
 @V(H,#HelpSearchOption)
-@IF(#IsMainFin==0,V(3,02,03,04,05,13,14,15,16,17),V(3,02,03,04,05,06,07,08,09,10,11,12))
+@IF(#IsMainFin=="N",V(3,02,03,04,05,13,14,15,16,17,18),V(3,02,03,04,05,06,07,08,09,10,11,12))
 
 #SearchOptionX=X,14,L
 T(H,#SearchOption,#HelpSearchOption)
@@ -138,7 +139,7 @@ T(H,#SearchOption,#HelpSearchOption)
 T(2,最大債權才可選擇+#SearchOptionX)
 
 #CheckSearchOptio=X,1,S
-IF(#IsMainFin==0,$,S)
+IF(#IsMainFin=="N",$,S)
 IF(#SearchOption==06 || #SearchOption==07 || #SearchOption==08 || #SearchOption==09 || #SearchOption==10 || #SearchOption==11 || #SearchOption==12,$,S)
 V(P,#WarnMsg)
 
@@ -209,7 +210,7 @@ HELP(#TxKindHelp1,cols:3)
 C(4,#TransTxKind,S,T(H,#TransTxKind,#TxKindHelp1))
 
 #RPTFG=A,1,S
-IF(#SearchOption=="02" || #SearchOption=="12",E(0,0),IF(#SearchOption=="03",E(0,1),E(0,2)))
+IF(#SearchOption=="02" || #SearchOption=="12",E(0,0),IF(#SearchOption=="03",E(0,1),IF(#SearchOption=="18",E(0,2),E(0,3))))
 
 
 #CHAINXMT=X,1,S
@@ -247,7 +248,7 @@ E(0,1)ASGN(LOOP$)
 ! 交易別
 #OOTxSts=A,1,O
 #OOTxStsX=X,10,O
-IF(#SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15" || #SearchOption=="11",S,$)
+IF(#SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15" || #SearchOption=="11" || #SearchOption=="18",S,$)
 SWITCH(#OOTxSts,0,T(2,正常),
                 1,T(2,溢繳),
                 2,T(2,短繳),
@@ -260,7 +261,7 @@ SWITCH(#OOTxSts,0,T(2,正常),
 
 #OONewtransTxKind=X,1,O
 #OONewtransTxKindX=X,10,O
-IF(#SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15" || #SearchOption=="11",S,$)
+IF(#SearchOption=="13" || #SearchOption=="14" || #SearchOption=="15" || #SearchOption=="11" || #SearchOption=="18",S,$)
 C(4,#OONewtransTxKind,S,$)
 SWITCH(#OONewtransTxKind,0,T(2,正常),
                 1,T(2,溢繳),
@@ -274,6 +275,8 @@ SWITCH(#OONewtransTxKind,0,T(2,正常),
 				
 ! 備註
 #OORemark=X,100,O
+#OORemarkS=X,100,O
+T(2,)
 ! 會計日
 #OOAcctDate=D,7,O
 ! 入帳日
@@ -404,6 +407,9 @@ IF(#SearchOption=="11" || #SearchOption=="13" || #SearchOption=="14" || #SearchO
 	)
 )
 
+#OOBtnSearchValue2=X,8,O
+T(2,暫收解入)
+
 ! 入帳還款,撥付製檔,撥付出帳
 ! <入帳>         L5702-債務協商作業－暫收入帳
 ! <訂正>         L5702-債務協商作業－暫收入帳
@@ -418,12 +424,19 @@ T(2,#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo)
 
 #OOBufSearch=X,21,O
 T(2,#OONegTransKey)
+!暫收解入,#OORemark=FinCode+TxSeq : 項目18執行L5712使用
+#Remark2=X,18,S
+T(1,#OORemark,1,18)
+#OOBufSearch2=X,156,O
+T(2,#OOCustId+#OOCustNo+#OOEntryDate+#Remark2+#OOPayAmt+#OOCustName)
 
 ! IF(#OOSeq==1,BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch}),BIND(grid,cancel))
 #OOBtnSearch=A,1,O
-BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch})
+IF (#SearchOption=="18",BIND(grid,{ cmd=CHAIN;ntxcd=L5712; text=#OOBtnSearchValue2; ntxbuf=#OOBufSearch2}),
+    BIND(grid,{ cmd=CHAIN;ntxcd=L5702; text=#OOBtnSearchValue; ntxbuf=#OOBufSearch}) )
 ! BIND(grid,{ cmd=CHAIN; ntxcd=L5702; ntxbuf=#OOBufSearch})
 IF (#OOTxSts==9,S,$)
+IF (#SearchOption=="18",S,$)
 BIND(grid,cancel)
 
 
@@ -448,9 +461,10 @@ E(0,2)
 !參考編號
 #MRKEY=_,_,S
 T(2,#OOCustId)
+
 ![交易金額]
 #TXAMT=_,_,S
-E(0,#OOTransTxAmt)
+IF (#SearchOption=="18",E(0,#OOPayAmt),E(0,#OOTransTxAmt))
 
 #CustId=X,10,S
 T(2,#OOCustId)
@@ -606,6 +620,11 @@ E(0,#OONewTransOrgAccuOverAmt)
 E(0,#OOTransAccuOverAmt)
 #NewTransAccuOverAmt=m,14,L
 E(0,#OONewTransAccuOverAmt)
+!暫收解入欄位
+#FinCode=X,8,L
+T(1,#OORemark,1,8)
+#TxSeq=X,10,L
+T(1,#OORemark,9,10)
 
 ! 逐筆傳送的資料
 #secret-no=x,1000,S
@@ -628,6 +647,9 @@ T(6A,#CustId+#CaseSeq+#CustNo+#Status+#NewStatus+#CustLoanKind+#ApplDate+#MainDu
 +#TransDueAmt+#NewTransDueAmt+#TransRepayDate+#NewTransRepayDate+#TransOrgAccuOverAmt+#NewTransOrgAccuOverAmt+#TransAccuOverAmt+#NewTransAccuOverAmt
 +#TrialFunc+#TXCDCHAIN+#MRKEY+#TXAMT+#AcDate+#SearchOption+#SearchDetail+#Export+#IsBtn+#OOAcctDate+#OOTitaTlrNo+#OOTitaTxtNo+#OONewtransTxKind)
 
+
+#L5712TITA=x,200,S
+T(6A,#OOEntryDate+#FinCode+#TxSeq+#CustId+#CustNo+#OOPayAmt+#OOCustName)
 
 #batch-detail=x,100000,S
 
@@ -771,6 +793,7 @@ TXFORM=L597A
 #OONewTransOrgAccuOverAmt
 #OOTransAccuOverAmt
 #OONewTransAccuOverAmt
+#OORemark
 ^
 </sub>
 
@@ -822,7 +845,7 @@ ifxBatch:{
 {width:60,align:'left'}
 #OONewtransTxKindX=試算交易別
 {width:85,align:'left'}
-#OORemark=備註
+#OORemarkS=備註
 {width:60,align:'left'}
 #OOBtnSearch=入帳還款
 {search:false,formatter:'cust:bind-button:',align:'center',canExport:false,width:80}
@@ -883,7 +906,7 @@ ifxBatch:{
 {width:60,align:'left'}
 #OONewtransTxKindX=試算交易別
 {width:85,align:'left'}
-#OORemark=備註
+#OORemarkS=備註
 {width:60,align:'left'}
 #OOBtnSearch=入帳還款
 {search:false,formatter:'cust:bind-button:',align:'center',canExport:false,width:80}
@@ -918,6 +941,67 @@ ifxBatch:{
 
 ^
 #RPTFG=2,QUERY.GRID,L597A
+#any={header:'L597A.part',caption:'',width:1000,rowNum:40, ifxDisplay:'1',
+ifxBatch:{
+	name:'整批暫收解入',
+	type:'5',
+	rim:'L5712',
+	txtno:'#L5712TITA',
+	pfnx:'L597A.PFNX',
+	col_captions:["身分證字號","戶號","還款金額","放行傳輸序號       ","放行狀態"],
+	col_names:["#OOCustId","#OOCustNo","#OOPayAmt","#batch-row-txtno","#batch-row-status"]
+	}
+}
+#secret-no
+#L5712TITA
+
+#OOCustId=身分證字號
+{width:100,align:'center'}
+#OOCustNo=戶號
+{width:60,align:'right'}
+#OOCaseSeq=案件序號
+{width:80,align:'right'}
+#OOCustName=戶名
+{width:80,align:'center'}
+#OOTxStsX=交易別
+{width:60,align:'left'}
+#OONewtransTxKindX=試算交易別
+{width:85,align:'left'}
+#OORemarkS=備註
+{width:60,align:'left'}
+#OOBtnSearch=暫收解入
+{search:false,formatter:'cust:bind-button:',align:'center',canExport:false,width:80}
+#OOAcctDate=會計日
+{width:70,align:'center'}
+#OOEntryDate=入帳日
+{width:70,align:'center'}
+#OORepayDate=入帳還款日
+{width:70,align:'center'}
+#OOTmpAmt=暫收金額
+{width:90,align:'right'}
+#OOOverPayAmt=溢繳款
+{width:70,align:'right'}
+#OOPayPeriod=繳期數
+{width:70,align:'right'}
+#OOPayAmt=還款金額
+{width:90,align:'right'}
+#OORevivPeriod=應還期數
+{width:90,align:'right'}
+#OORevivAmt=應還金額
+{width:90,align:'right'}
+#OOAcumTmpAmt=累溢收
+{width:90,align:'right'}
+#OOSklShareAmt=新壽攤分
+{width:90,align:'right'}
+#OOApprAmt=撥付金額
+{width:90,align:'right'}
+#OOReturnAmt=退還金額
+{width:90,align:'right'}
+#OOShowTitaTxtNo=交易序號
+{width:120,align:'right'}
+
+^
+#RPTFG=3,QUERY.GRID,L597A
 #any={header:'L597A.part',caption:'',width:1000,rowNum:40, ifxDisplay:'0'}
 #secret-no
 
@@ -933,7 +1017,7 @@ ifxBatch:{
 {width:60,align:'left'}
 #OONewtransTxKindX=試算交易別
 {width:85,align:'left'}
-#OORemark=備註
+#OORemarkS=備註
 {width:60,align:'left'}
 #OOBtnSearch=入帳還款
 {search:false,formatter:'cust:bind-button:',align:'center',canExport:false,width:80}

@@ -1028,7 +1028,7 @@ public class LP002Report extends MakeReport {
 			amtColTotal3 = amtColTotal3.add(amt);
 
 			cntArr[2] = cntColTotal3;
-			amtArr[2] = cntColTotal3;
+			amtArr[2] = amtColTotal3;
 
 			size = 4;
 			break;

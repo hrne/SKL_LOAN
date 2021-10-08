@@ -115,7 +115,7 @@ C(3,#OOSummaryWorkCnt,0,T(2, ),X(#OOSummaryWorkCnt))
 #OOSummaryWorkAmtX=X,21,O
 C(3,#OOSummaryWorkAmt,0,T(2, ),X(#OOSummaryWorkAmt))
 
-! 處理事項 BTN名稱-入帳還款,撥付製檔,撥付出帳
+! 處理事項 BTN名稱-入帳還款,撥付製檔,撥付出帳,暫收解入
 #OOIssue=x,60,O
 
 ! Y-本日應處理 (Y/OK)
@@ -204,7 +204,7 @@ C(1,#OOSummaryWorkCnt,BIND(grid,cancel),BIND(grid,cancel),
 !   M,E(0,@OOBtnCode,1),
 !   E(0,0)
 ! )
-! String Issue[]= {"","入帳還款","撥付製檔","撥付出帳","撥付提兌"};//製檔日,傳票日,提兌日
+! String Issue[]= {"","入帳還款","撥付製檔","撥付出帳","撥付提兌","暫收解入"};//製檔日,傳票日,提兌日
 #OOBtnIssue=A,1,O
 C(2,#OOBtnCode,
     BIND(grid,cancel),
@@ -212,6 +212,7 @@ C(2,#OOBtnCode,
     BIND(grid,{ cmd=CHAIN; ntxcd=L5707;text=#OOIssue;ntxbuf=#OOBufIssue}),
     BIND(grid,{ cmd=CHAIN; ntxcd=L5708;text=#OOIssue;ntxbuf=#OOBufIssue}),
     BIND(grid,{ cmd=CHAIN; ntxcd=L5709;text=#OOIssue;ntxbuf=#OOBufIssue})
+    BIND(grid,{ cmd=CHAIN; ntxcd=L5712;text=#OOIssue;ntxbuf=#OOBufIssue})
 )
 </sub>
 

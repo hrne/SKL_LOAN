@@ -85,14 +85,14 @@ public class L9711Report extends MakeReport {
 		this.print(rowNum, startPos + 12, "房貸專員", "L");
 		this.print(rowNum, startPos + 22, "戶號", "L");
 		this.print(rowNum, startPos + 35, "戶名", "L");
-		this.print(rowNum, startPos + 50, "核准號碼", "L");
-		this.print(rowNum, startPos + 60, "到期日", "L");
-		this.print(rowNum, startPos + 73, "貸放餘額", "L");
-		this.print(rowNum, startPos + 84, "上次繳息日", "L");
-		this.print(rowNum, startPos + 97, "計息利率", "L");
-		this.print(rowNum, startPos + 109, "聯絡電話", "L");
-		this.print(rowNum, startPos + 120, "聯絡人", "L");
-		this.print(rowNum, startPos + 129, "是否本利攤", "L");
+		this.print(rowNum, startPos + 52, "核准號碼", "L");
+		this.print(rowNum, startPos + 62, "到期日", "L");
+		this.print(rowNum, startPos + 75, "貸放餘額", "L");
+		this.print(rowNum, startPos + 86, "上次繳息日", "L");
+		this.print(rowNum, startPos + 98, "計息利率", "L");
+		this.print(rowNum, startPos + 110, "聯絡電話", "L");
+		this.print(rowNum, startPos + 125, "聯絡人", "L");
+		this.print(rowNum, startPos + 133, "是否本利攤", "L");
 //		this.print(-6, 0, "　 站別　　 押品地區別　房貸專員　　　戶號　　　　　戶名　　　　核准號碼　　　　到期日　　　　貸放餘額　 上次繳息日　 計息利率　聯絡電話　　　　　聯絡人　　　是否本利攤");
 
 		this.print(-7, 0,
@@ -174,31 +174,31 @@ public class L9711Report extends MakeReport {
 		this.print(0, startPos + 35, tL9711Vo.get("F6"), "L");
 
 		// 核准號碼
-		this.print(0, startPos + 50, tL9711Vo.get("F7") == null || tL9711Vo.get("F7").length() == 0 ? "0000000"
+		this.print(0, startPos + 53, tL9711Vo.get("F7") == null || tL9711Vo.get("F7").length() == 0 ? "0000000"
 				: String.format("%07d", Integer.valueOf(tL9711Vo.get("F7"))), "L");
 
 		// 到期日
-		this.print(0, startPos + 60, showRocDate(tL9711Vo.get("F8"), 1), "L");
+		this.print(0, startPos + 62, showRocDate(tL9711Vo.get("F8"), 1), "L");
 
 		// 貸放餘額
-		this.print(0, startPos + 81, showAmt(tL9711Vo.get("F10")), "R");
+		this.print(0, startPos + 83, showAmt(tL9711Vo.get("F10")), "R");
 
 		// 上次繳息日
-		this.print(0, startPos + 84, showRocDate(tL9711Vo.get("F12"), 1), "L");
+		this.print(0, startPos + 86, showRocDate(tL9711Vo.get("F12"), 1), "L");
 
 		// 計息利率
-		this.print(0, startPos + 105, String.format("%.4f", Double.valueOf(tL9711Vo.get("F13"))), "R");
+		this.print(0, startPos + 106, String.format("%.4f", Double.valueOf(tL9711Vo.get("F13"))), "R");
 
 		// 聯絡電話
-		this.print(0, startPos + 107,
+		this.print(0, startPos + 108,
 				tL9711Vo.get("F14") == null || tL9711Vo.get("F14").length() == 0 ? "" : tL9711Vo.get("F14"), "L");
 
 		// 聯絡人
-		this.print(0, startPos + 120,
+		this.print(0, startPos + 125,
 				tL9711Vo.get("F15") == null || tL9711Vo.get("F15").length() == 0 ? "" : tL9711Vo.get("F15"), "L");
 
 		// 是否本利攤
-		this.print(0, startPos + 135, "3".equals(tL9711Vo.get("F21")) || "4".equals(tL9711Vo.get("F21")) ? "Y" : "N",
+		this.print(0, startPos + 139, "3".equals(tL9711Vo.get("F21")) || "4".equals(tL9711Vo.get("F21")) ? "Y" : "N",
 				"R");
 	}
 

@@ -411,8 +411,11 @@ HIDE(#MtgPledgefg)
 #FdGdRid=X,2,L
 #FdSubType=X,2,L
 #FdADDRESS_1=X,2,L
+T(3,*)
 #FdLD_1=X,2,L
+T(3,*)
 #FdOWNER=X,2,L
+T(3,*)
 #FdEvaDate=X,2,L
 #FdEvaAmt=X,2,L
 #FdEvaNetWorth=X,2,L
@@ -626,6 +629,9 @@ SHOW(#MtgPledgefg)
 ! (2) 顯示INPUT欄位
 #FunCd12=X,1,S
 IF(#FunCd == 1 || #FunCd == 2,$,S)
+T(3,@FdADDRESS_1,*)
+T(3,@FdLD_1,*)
+T(3,@FdOWNER,*)
 T(3,@FdSubType,*)
 T(3,@FdEvaDate,*)
 T(3,@FdEvaAmt,*)

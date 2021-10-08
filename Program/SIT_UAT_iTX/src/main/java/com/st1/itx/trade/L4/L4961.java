@@ -75,11 +75,6 @@ public class L4961 extends TradeBuffer {
 
 		if (resultList != null && resultList.size() > 0) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			if (resultList.size() == this.limit && hasNext()) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				this.totaVo.setMsgEndToEnter();
-			}
 
 			for (Map<String, String> result : resultList) {
 
@@ -128,7 +123,11 @@ public class L4961 extends TradeBuffer {
 			  titaVo.putParam("OtotalAmt",totalAmt.add(parse.stringToBigDecimal(titaVo.getParam("OtotalAmt"))));
 			}
 
-			
+			if (resultList.size() == this.limit && hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
 		} else {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}

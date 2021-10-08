@@ -7,6 +7,7 @@ import java.util.List;
 /* 套件 */
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -15,6 +16,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcDetail;
+import com.st1.itx.db.domain.NegAppr02;
 /* DB容器 */
 import com.st1.itx.db.domain.NegTrans;
 import com.st1.itx.db.domain.NegTransId;
@@ -23,6 +25,7 @@ import com.st1.itx.util.common.AcNegCom;
 /*DB服務*/
 import com.st1.itx.util.common.NegCom;
 import com.st1.itx.db.service.NegTransService;
+import com.st1.itx.db.service.NegAppr02Service;
 import com.st1.itx.db.service.NegMainService;
 
 /* 交易共用組件 */
@@ -67,6 +70,9 @@ public class L5702 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
+	@Autowired
+	public NegAppr02Service sNegAppr02Service;
+	
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -132,6 +138,8 @@ public class L5702 extends TradeBuffer {
 			  if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
 			    UpdAcDB(tNegTransId, titaVo);
 			  }
+			    updateNegAppr02(tNegTransId, titaVo);//維護NegAppr02
+			    
 			} else {
 			  if (tNegTrans.getTxStatus() == 0) {
 				tNegTrans.setTxStatus(1); // 交易狀態0:未入帳;1:待處理;2:已入帳
@@ -174,6 +182,8 @@ public class L5702 extends TradeBuffer {
 			 if (Arrays.asList(new String[] { "0", "1", "2", "3", "4", "5" }).contains(TransTxKind)) {
 				UpdAcDB(tNegTransId, titaVo);
 			 }
+			   updateNegAppr02(tNegTransId, titaVo);//維護NegAppr02
+
 		}
 
 		this.addList(this.totaVo);
@@ -222,4 +232,38 @@ public class L5702 extends TradeBuffer {
 		}
 		return;
 	}
+	
+	/* 更新 NegAppr02一般債權撥付資料檔 */
+	private void updateNegAppr02(NegTransId tNegTransId, TitaVo titaVo) throws LogicException {
+		// NegAppr02一般債權撥付資料檔，有找到NegTrans的KEY值相同才維護
+		NegTrans tNegTrans = sNegTransService.findById(tNegTransId);
+
+		if (tNegTrans == null) {
+			throw new LogicException(titaVo, "E0001", "債務協商交易檔");
+		}
+		Slice<NegAppr02> slNegAppr02 = sNegAppr02Service.NegTransEq(tNegTrans.getAcDate()+19110000, tNegTrans.getTitaTlrNo(),
+				tNegTrans.getTitaTxtNo(), 0, 500, titaVo);
+		List<NegAppr02> lNegAppr02 = slNegAppr02 == null ? null : slNegAppr02.getContent();
+
+		NegAppr02 tNegAppr02 = new NegAppr02();
+		if (lNegAppr02 != null) {
+			for (NegAppr02 cNegAppr02 : lNegAppr02) {// 應該只有一筆
+
+				tNegAppr02 = sNegAppr02Service.holdById(cNegAppr02.getNegAppr02Id(), titaVo);
+				if (titaVo.isHcodeNormal()) {
+					tNegAppr02.setTxStatus(2);
+				} else {
+					tNegAppr02.setTxStatus(1);
+				}
+				try {
+					sNegAppr02Service.update(tNegAppr02);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "一般債權撥付資料檔 + tNegAppr02Id)"); // 更新資料時，發生錯誤
+				}
+
+				break;
+			}
+		}
+	}
+
 }

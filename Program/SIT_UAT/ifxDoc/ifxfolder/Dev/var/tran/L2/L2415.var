@@ -854,7 +854,7 @@ HELP(#ParkingTypeCodeHelp)
 #ParkingTypeCodeX=X,13,L
 T(H,#ParkingTypeCode,#ParkingTypeCodeHelp)
 
-#ParkingArea=m,9.2,I
+#ParkingArea=m,9.2,S
 C(3,#ParkingTypeCode,5,S,$)
 
 ! [獨立產權車位註記]
@@ -1164,7 +1164,8 @@ E(0,1)
 ["#FdCONTRACT_PRICE+買賣契約價格",#ContractPrice],["#FdCONTRACT_DT+買賣契約日期",#ContractDate],
 [#<->#,"#FdBD_USE+建物使用別",#BdUsageCode,#BdUsageCodeX],
 ["#FdPARKING_TYPE+停車位型式",#ParkingTypeCode,#ParkingTypeCodeX],
-["#FdPARKING_AREA+停車位面積",#ParkingArea],
+["@","@"],
+!["#FdPARKING_AREA+停車位面積",#ParkingArea],
 ["#FdHOUSE_TAX_SN+房屋稅籍號碼",#HouseTaxNo],["#FdHOUSE_BUY_DT+房屋取得日期",#HouseBuyDate],
 ]
 </sub>
@@ -1260,12 +1261,6 @@ ALERT(#OResultX);
 #HouseBuyDate
 #ParkingTypeCode
 #ParkingProperty
-#ParkingArea
-##loop{times:5,i:1}
-#ParkingTypeCodeA{i}
-#ParkingQtyA{i}
-#ParkingAreaA{i}
-##end
 ##loop{times:10,i:1}
 #PublicBdNoA{i}
 #PublicBdNoB{i}
@@ -1276,6 +1271,11 @@ ALERT(#OResultX);
 #OtherReason{i}
 #CreateEmpNo{i}
 #CreateDate{i}
+##end
+##loop{times:5,i:1}
+#ParkingTypeCodeA{i}
+#ParkingQtyA{i}
+#ParkingAreaA{i}
 ##end
 ##loop{times:100,i:1}
 #ParkingNo{i}

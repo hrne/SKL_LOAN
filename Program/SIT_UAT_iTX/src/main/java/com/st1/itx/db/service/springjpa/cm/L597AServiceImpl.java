@@ -177,10 +177,11 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlWhere += "AND acRec.\"RvBal\">0 ";
 
 			sqlOrder += "";
-		} else if (State == 13 || State == 14 || State == 15) {
+		} else if (State == 13 || State == 14 || State == 15 || State == 18) {
 			// 撥入筆數 13
 			// 檢核成功 14
 			// 檢核失敗 15
+			// 檢核成功-暫收解入 18
 			sqlSelect += "SELECT ";
 			sqlSelect += "'NegAppr02' AS \"使用表格\",";
 			sqlSelect += "NegAp02.\"TxAmt\" AS \"合計資料\",";
@@ -189,12 +190,12 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegAp02.\"CustNo\" AS \"戶號\",";
 			sqlSelect += "c.\"CustName\" AS \"戶名\",";
 			sqlSelect += "' ' AS \"交易別\",";
-			sqlSelect += "' ' AS \"備註\",";
+			sqlSelect += "RPAD(NegAp02.\"FinCode\",8,' ') || NegAp02.\"TxSeq\" AS \"備註\",";
 			sqlSelect += "NegAp02.\"AcDate\" AS \"會計日\",";
-			sqlSelect += "'' AS \"入帳日\",";
+			sqlSelect += "NegAp02.\"BringUpDate\" AS \"入帳日\",";
 			sqlSelect += "'' AS \"入帳還款日\",";
 			sqlSelect += "'' AS \"暫收金額\",";
-			sqlSelect += "'' AS \"溢繳款\",";	
+			sqlSelect += "'' AS \"溢繳款\",";
 			sqlSelect += "'' AS \"繳期數\",";
 			sqlSelect += "NegAp02.\"TxAmt\" AS \"還款金額\",";
 			sqlSelect += "'' AS \"應還期數\",";
@@ -212,8 +213,14 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON NegAp02.\"CustId\"=c.\"CustId\" ";
 //			sqlLeftJoin += "LEFT JOIN \"NegTrans\" NegTran ON NegTran.\"CustNo\"=c.\"CustNo\" AND NegAp02.\"AcDate\"=NegTran.\"AcDate\" ";
 			sqlWhere += "WHERE 1=1 ";
-			//sqlWhere += "AND NegAp02.\"AcDate\" = 0 ";
-			sqlWhere += "AND NegAp02.\"BringUpDate\" = (SELECT MAX(\"BringUpDate\") FROM \"NegAppr02\" WHERE \"BringUpDate\" > 0  )";
+
+			if (State == 18) {//暫收解入:已做L4002整批入帳入一筆總金額到專戶
+				sqlWhere += "AND NegAp02.\"AcDate\" > 0 ";
+				sqlWhere += "AND NegAp02.\"StatusCode\" IN ('4001') ";
+				sqlWhere += "AND NegAp02.\"TxStatus\" = 0 ";
+			} else {
+				sqlWhere += "AND NegAp02.\"BringUpDate\" = (SELECT MAX(\"BringUpDate\") FROM \"NegAppr02\" WHERE \"BringUpDate\" > 0  )";
+			}
 			if (State == 13) {
 				// 撥入筆數 13
 			} else if (State == 14) {
@@ -257,7 +264,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegTran.\"EntryDate\" AS \"入帳日\",";
 			sqlSelect += "NegTran.\"RepayDate\" AS \"入帳還款日\",";
 			sqlSelect += "NegTran.\"TxAmt\" AS \"暫收金額\",";
-			sqlSelect += "(NVL(NegTran.\"OverAmt\",0)-NVL(NegTran.\"OverRepayAmt\",0)) AS \"溢繳款\",";	//轉入溢收金額 - 溢收抵繳金
+			sqlSelect += "(NVL(NegTran.\"OverAmt\",0)-NVL(NegTran.\"OverRepayAmt\",0)) AS \"溢繳款\","; // 轉入溢收金額 - 溢收抵繳金
 			sqlSelect += "NegTran.\"RepayPeriod\" AS \"繳期數\",";
 			sqlSelect += "(NVL(NegTran.\"PrincipalAmt\",0)+NVL(NegTran.\"InterestAmt\",0)) AS \"還款金額\",";
 			sqlSelect += "NegTran.\"ShouldPayPeriod\" AS \"應還期數\",";
@@ -445,7 +452,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 		return sql;
 	}
 
-	public List<Object> FindData(int index, int limit, String sql, TitaVo titaVo, int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn) throws LogicException {
+	public List<Map<String, String>> FindData(int index, int limit, String sql, TitaVo titaVo, int AcDate, int IsMainFin, int State, int Detail, int ExportDateYN, int IsBtn) throws LogicException {
 		this.info("FindData");
 
 		// *** 折返控制相關 ***
@@ -468,8 +475,8 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		this.info("L597AServiceImpl strAcDate=[" + strAcDate + "]");
 //		if(State==1 || State==2 || State==6 || State==7 || State==8 || State==12 || State==16 || (!titaVo.isHcodeNormal() && (ExportDateYN==3 || ExportDateYN==4))) {
-		if (State == 1 || (State == 2 && (IsMainFin == 1)) || (State == 4 && Detail == 0 && ExportDateYN == 0) || State == 6 || State == 7 || State == 8 || State == 12  
-				 || State == 16 || (!titaVo.isHcodeNormal() && (ExportDateYN == 3 || ExportDateYN == 4))) {
+		if (State == 1 || (State == 2 && (IsMainFin == 1)) || (State == 4 && Detail == 0 && ExportDateYN == 0) || State == 6 || State == 7 || State == 8 || State == 12 || State == 16
+				|| (!titaVo.isHcodeNormal() && (ExportDateYN == 3 || ExportDateYN == 4))) {
 
 			if (strAcDate != null && strAcDate.length() != 0) {
 				if (Integer.parseInt(strAcDate) == 0) {
@@ -479,7 +486,7 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 			query.setParameter("AcDate", strAcDate);
 			this.info("L597A query AcDate=[" + strAcDate + "]");
-		} else if (State == 5 || State == 9 || State == 10 || State == 17 ) {
+		} else if (State == 5 || State == 9 || State == 10 || State == 17) {
 			String ThisMothStart = strAcDate.substring(0, 6) + "01";
 			String ThisMothEnd = strAcDate.substring(0, 6) + "31";
 			query.setParameter("ThisMothStart", ThisMothStart);
@@ -498,13 +505,10 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
 
-		@SuppressWarnings("unchecked")
-		List<Object> lObject = this.convertToMap(query.getResultList());
-
-		return lObject;
+		return this.convertToMap(query);
 	}
 
-	public List<String[]> FindL597A(List<Object> lObject, String UseSerch) throws LogicException {
+	public List<String[]> FindL597A(List<Map<String, String>> lObject, String UseSerch) throws LogicException {
 		List<String[]> data = new ArrayList<String[]>();
 		int slectDataHeaderNameL = 0;
 		if ("L597A".equals(UseSerch)) {

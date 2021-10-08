@@ -816,6 +816,14 @@ public class TitaVo extends LinkedHashMap<String, String> {
 		return this.get(ContentName.txamt) == null ? "" : this.get(ContentName.txamt);
 	}
 
+		/**
+	 * 
+	 * @param txAmt TXAMT
+	 */
+	public void setTxAmt(Object txAmt) {
+		this.putParam(ContentName.txamt, txAmt);
+	}
+
 	/**
 	 * 
 	 * @return String EMPNOT
