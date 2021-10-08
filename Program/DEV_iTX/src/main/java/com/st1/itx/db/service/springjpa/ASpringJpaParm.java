@@ -2,6 +2,8 @@ package com.st1.itx.db.service.springjpa;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.sql.Clob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -37,6 +39,7 @@ public class ASpringJpaParm extends SysLogger {
 		return result;
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<Map<String, String>> convertToMap(Query query) {
 		List<Map<String, String>> result = new ArrayList<Map<String, String>>();
 
@@ -53,8 +56,23 @@ public class ASpringJpaParm extends SysLogger {
 			int i = 0;
 			while (it.hasNext()) {
 				String key = it.next();
-				m.put("F" + Integer.toString(i), row.get(key) == null ? "" : row.get(key).toString());
-				m.put(key, row.get(key) == null ? "" : row.get(key).toString());
+				String value = "";
+
+				if (row.get(key) != null && row.get(key) instanceof Clob) {
+					Clob c = (Clob) row.get(key);
+					try {
+						value = c.getSubString(1, (int) c.length());
+					} catch (SQLException e) {
+						m.put(key, "");
+						StringWriter errors = new StringWriter();
+						e.printStackTrace(new PrintWriter(errors));
+						this.error(errors.toString());
+					}
+				} else if (row.get(key) != null)
+					value = row.get(key).toString();
+
+				m.put("F" + Integer.toString(i), value);
+				m.put(key, value);
 				i++;
 			}
 			result.add(m);
