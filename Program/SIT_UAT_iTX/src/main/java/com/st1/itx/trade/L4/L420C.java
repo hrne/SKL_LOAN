@@ -107,21 +107,6 @@ public class L420C extends TradeBuffer {
 				isUpdate = true;
 				procStsCode = "0";
 				finishCnt--;
-			} else {
-				// 組入帳交易電文
-				TitaVo txTitaVo = new TitaVo();
-				txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, titaVo); // 1:訂正 2:虛擬轉暫收改
-
-				// 執行入帳交易
-				this.info("L420c excuteTx " + txTitaVo);
-				// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
-				TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
-
-				/* 錯誤 */
-				if (totaVoList != null && totaVoList.size() > 0) {
-					if (totaVoList.get(0).isError())
-						throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
-				}
 			}
 		}
 
@@ -134,6 +119,21 @@ public class L420C extends TradeBuffer {
 				e.printStackTrace();
 			}
 			updateHeadRoutine(titaVo);
+		} else {
+			// 組入帳交易電文
+			TitaVo txTitaVo = new TitaVo();
+			txTitaVo = txBatchCom.txTita(functionCode, tBatxDetail, titaVo); // 1:訂正 2:虛擬轉暫收改
+
+			// 執行入帳交易
+			this.info("L420c excuteTx " + txTitaVo);
+			// MySpring.newTask("apControl", this.txBuffer, txTitaVo);
+			TotaVoList totaVoList = MySpring.newTaskFuture("apControl", this.txBuffer, txTitaVo);
+
+			/* 錯誤 */
+			if (totaVoList != null && totaVoList.size() > 0) {
+				if (totaVoList.get(0).isError())
+					throw new LogicException(totaVoList.get(0).getMsgId(), totaVoList.get(0).getErrorMsg());
+			}
 		}
 
 		this.addList(this.totaVo);

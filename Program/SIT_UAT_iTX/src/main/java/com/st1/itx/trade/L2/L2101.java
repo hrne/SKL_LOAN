@@ -229,6 +229,7 @@ public class L2101 extends TradeBuffer {
 	DateUtil dDateUtil;
 	@Autowired
 	public DataLog datalog;
+	private FacProd beforeFacProd;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -261,7 +262,7 @@ public class L2101 extends TradeBuffer {
 			logger.info("funcd =  3");
 			moveFacProd(iFuncCode, tFacProd, titaVo);
 			try {
-				facProdService.insert(tFacProd);
+				facProdService.insert(tFacProd, titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
 					throw new LogicException(titaVo, "E0002", "商品代碼 = " + iProdNo + " " + e.getErrorMsg()); // 新增資料已存在
@@ -270,7 +271,7 @@ public class L2101 extends TradeBuffer {
 			break;
 		case 2: // 修改 商品參數生效,只允許修改商品狀態、商品截止日期
 			tFacProd = facProdService.holdById(iProdNo);
-			FacProd bFacProd = tFacProd;
+			beforeFacProd = (FacProd) datalog.clone(tFacProd);
 			if (tFacProd == null) {
 				throw new LogicException(titaVo, "E0003", "商品代碼 = " + iProdNo); // 修改資料不存在
 			} else {
@@ -281,13 +282,12 @@ public class L2101 extends TradeBuffer {
 					moveFacProd(iFuncCode, tFacProd, titaVo);
 				}
 			}
-			FacProd aFacProd = tFacProd;
 			try {
-				facProdService.update(tFacProd);
+				tFacProd = facProdService.update2(tFacProd, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "商品代碼 = " + iProdNo + " " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
-			datalog.setEnv(titaVo, bFacProd, aFacProd);
+			datalog.setEnv(titaVo, beforeFacProd, tFacProd);
 			datalog.exec();
 			break;
 		case 4: // 刪除 商品參數生效後禁止刪除
@@ -297,7 +297,7 @@ public class L2101 extends TradeBuffer {
 					if (tFacProd.getStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
 						throw new LogicException(titaVo, "E2056", ""); // 商品參數生效後禁止刪除
 					}
-				facProdService.delete(tFacProd);
+				facProdService.delete(tFacProd, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0004", "商品代碼 = " + iProdNo + " " + e.getErrorMsg()); // 刪除資料不存在
 			}

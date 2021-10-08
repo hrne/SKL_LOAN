@@ -1020,12 +1020,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				vCalcRepayIntVo = lCalcRepayIntVo.get(wkCalcVoIndex);
 				vCalcRepayIntVo.setDuraFlag(1);
 				lCalcRepayIntVo.set(wkCalcVoIndex, vCalcRepayIntVo);
+				this.info("   wkFlag == 1 " + wkIntStartDate + "~" + wkIntEndDate );
 			}
 			dDateUtil.init();
 			dDateUtil.setDate_1(wkIntStartDate);
 			dDateUtil.setDate_2(wkIntEndDate);
 			dDateUtil.dateDiff();
 			wkDays = dDateUtil.getDays();
+			this.info("   wkFlag == 0 " + wkIntStartDate + "~" + wkIntEndDate );
 			wkType = 2;
 			moveCalcDataRoutine();
 			wkIntStartDate = iMaturityDate;

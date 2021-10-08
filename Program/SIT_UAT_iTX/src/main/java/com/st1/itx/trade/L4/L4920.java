@@ -6,8 +6,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -46,7 +44,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4920 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4920.class);
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -72,6 +69,10 @@ public class L4920 extends TradeBuffer {
 		BigDecimal oSumPayAmt = new BigDecimal("0");
 		BigDecimal oSumAccAmt = new BigDecimal("0");
 		BigDecimal oSumDisAmt = new BigDecimal("0");
+		List<String> enterList = new ArrayList<String>();
+		enterList.add("5");
+		enterList.add("6");
+		enterList.add("7");
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -131,7 +132,7 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OORepayAmt", result.get("F8"));
 				occursList.putParam("OOAcctAmt", result.get("F9"));
 
-				if ("1".equals(result.get("F10"))) {
+				if (enterList.contains(result.get("F10"))) {
 					occursList.putParam("OODisacctAmt", BigDecimal.ZERO);
 				} else {
 					occursList.putParam("OODisacctAmt", parse.stringToBigDecimal(result.get("F8"))

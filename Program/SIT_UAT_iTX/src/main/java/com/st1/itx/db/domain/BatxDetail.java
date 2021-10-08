@@ -48,7 +48,7 @@ public class BatxDetail implements Serializable {
   private int detailSeq = 0;
 
   // 還款來源
-  /* 01.匯款轉帳02.銀行扣款03.員工扣款04.支票兌現05.法院扣薪06.理賠金07.代收款-債權協商09.其他11.匯款轉帳預先作業90.暫收抵繳 */
+  /* CdCode:BatchRepayCode01.匯款轉帳02.銀行扣款03.員工扣款04.支票兌現05.法院扣薪06.理賠金07.代收款-債權協商09.其他11.匯款轉帳預先作業90.暫收抵繳 */
   @Column(name = "`RepayCode`")
   private int repayCode = 0;
 
@@ -74,22 +74,22 @@ public class BatxDetail implements Serializable {
   private String rvNo;
 
   // 還款類別
-  /* 1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他11.債協匯入款(虛擬帳號為9510500NNNNNNN) */
+  /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他11.債協匯入款(虛擬帳號為9510500NNNNNNN) */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
   // 對帳類別
-  /* P01銀行存款－郵局P02銀行存款－新光P03銀行存款－新光匯款轉帳P04銀行存款－台新TEM員工扣薪15/非15???TCK支票 */
+  /* CdCode:ReconCodeP01銀行存款－郵局P02銀行存款－新光P03銀行存款－新光匯款轉帳P04銀行存款－台新TEM員工扣薪15/非15???TCK支票 */
   @Column(name = "`ReconCode`", length = 3)
   private String reconCode;
 
   // 來源會計科目
-  /* 8+5+2 */
-  @Column(name = "`RepayAcCode`", length = 15)
+  /* 11+5+2L4210 其他來源建檔 */
+  @Column(name = "`RepayAcCode`", length = 18)
   private String repayAcCode;
 
-  // 應還金額
-  /* 還款時，回寫目前之應還金額 */
+  // 還款總金額
+  /* 還款時，回寫目前還款總金額 */
   @Column(name = "`AcquiredAmt`")
   private BigDecimal acquiredAmt = new BigDecimal("0");
 
@@ -106,12 +106,12 @@ public class BatxDetail implements Serializable {
   private BigDecimal disacctAmt = new BigDecimal("0");
 
   // 處理狀態
-  /* 0.未檢核1.不處理2.人工處理3.檢核錯誤4.檢核正常5.人工入帳6.批次入帳7.虛擬轉暫收 */
+  /* CdCode:ProcStsCode0.未檢核1.不處理2.人工處理3.檢核錯誤4.檢核正常5.人工入帳6.批次入帳7.虛擬轉暫收 */
   @Column(name = "`ProcStsCode`", length = 1)
   private String procStsCode;
 
   // 處理代碼
-  /* 參照規格書 */
+  /* 參照ProcCode分頁 */
   @Column(name = "`ProcCode`", length = 5)
   private String procCode;
 
@@ -228,7 +228,8 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 還款來源<br>
-	* 01.匯款轉帳
+	* CdCode:BatchRepayCode
+01.匯款轉帳
 02.銀行扣款
 03.員工扣款
 04.支票兌現
@@ -246,7 +247,8 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 還款來源<br>
-	* 01.匯款轉帳
+	* CdCode:BatchRepayCode
+01.匯款轉帳
 02.銀行扣款
 03.員工扣款
 04.支票兌現
@@ -360,7 +362,8 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 1.期款
+	* CdCode:RepayType
+1.期款
 2.部分償還
 3.結案
 4.帳管費
@@ -377,7 +380,8 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 1.期款
+	* CdCode:RepayType
+1.期款
 2.部分償還
 3.結案
 4.帳管費
@@ -395,7 +399,8 @@ public class BatxDetail implements Serializable {
 
 /**
 	* 對帳類別<br>
-	* P01銀行存款－郵局
+	* CdCode:ReconCode
+P01銀行存款－郵局
 P02銀行存款－新光
 P03銀行存款－新光匯款轉帳
 P04銀行存款－台新
@@ -409,7 +414,8 @@ TCK支票
 
 /**
 	* 對帳類別<br>
-	* P01銀行存款－郵局
+	* CdCode:ReconCode
+P01銀行存款－郵局
 P02銀行存款－新光
 P03銀行存款－新光匯款轉帳
 P04銀行存款－台新
@@ -424,7 +430,8 @@ TCK支票
 
 /**
 	* 來源會計科目<br>
-	* 8+5+2
+	* 11+5+2
+L4210 其他來源建檔
 	* @return String
 	*/
   public String getRepayAcCode() {
@@ -433,7 +440,8 @@ TCK支票
 
 /**
 	* 來源會計科目<br>
-	* 8+5+2
+	* 11+5+2
+L4210 其他來源建檔
   *
   * @param repayAcCode 來源會計科目
 	*/
@@ -442,8 +450,8 @@ TCK支票
   }
 
 /**
-	* 應還金額<br>
-	* 還款時，回寫目前之應還金額
+	* 還款總金額<br>
+	* 還款時，回寫目前還款總金額
 	* @return BigDecimal
 	*/
   public BigDecimal getAcquiredAmt() {
@@ -451,10 +459,10 @@ TCK支票
   }
 
 /**
-	* 應還金額<br>
-	* 還款時，回寫目前之應還金額
+	* 還款總金額<br>
+	* 還款時，回寫目前還款總金額
   *
-  * @param acquiredAmt 應還金額
+  * @param acquiredAmt 還款總金額
 	*/
   public void setAcquiredAmt(BigDecimal acquiredAmt) {
     this.acquiredAmt = acquiredAmt;
@@ -519,7 +527,8 @@ TCK支票
 
 /**
 	* 處理狀態<br>
-	* 0.未檢核
+	* CdCode:ProcStsCode
+0.未檢核
 1.不處理
 2.人工處理
 3.檢核錯誤
@@ -535,7 +544,8 @@ TCK支票
 
 /**
 	* 處理狀態<br>
-	* 0.未檢核
+	* CdCode:ProcStsCode
+0.未檢核
 1.不處理
 2.人工處理
 3.檢核錯誤
@@ -552,7 +562,7 @@ TCK支票
 
 /**
 	* 處理代碼<br>
-	* 參照規格書
+	* 參照ProcCode分頁
 	* @return String
 	*/
   public String getProcCode() {
@@ -561,7 +571,7 @@ TCK支票
 
 /**
 	* 處理代碼<br>
-	* 參照規格書
+	* 參照ProcCode分頁
   *
   * @param procCode 處理代碼
 	*/

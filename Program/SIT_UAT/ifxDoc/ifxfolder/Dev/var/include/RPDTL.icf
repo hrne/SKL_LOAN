@@ -70,7 +70,7 @@
 ! #RPSHORTAMT=m,14,S
 
 ! 會計科目
-#RP_ACNO=x,15,S
+#RP_ACNO=x,18,S
 
 ! ----------1:還款、2:結案，需輸入----------
 ! 明細序號
@@ -345,7 +345,7 @@ INVOKEJS(SHOW,RPDTL,1)
 ! 幾筆顯示幾欄
 ##loop{times:5,n:1,o:1}
 #RP_DISCOLC{n}=A,1,S
-C(3,#RPFG,8,IF(#RpAmt{n}>0,INVOKEJS(SHOW,grd9_{o},1)E(0,@RpCode{n},93),INVOKEJS(SHOW,grd9_{o},0)),s))
+C(3,#RPFG,8,IF(#RpAmt{n}>0,INVOKEJS(SHOW,grd9_{o},1)E(0,@RpCode{n},93),INVOKEJS(SHOW,grd9_{o},0)),s)
 ##end
 
 ##loop {times:5,i:1,j:2,k:3,z:0}
@@ -707,11 +707,11 @@ IF(#DF1=={i},$,IF(#GRD_SKFG{i}==1&&#RpAmt{i}>0,$,s))
 #RpRemitBankX{i}=X,40,L
 
 ! 明細序號
-#RpDetailSeq{i}=A,6,I
+#RpDetailSeq{i}=A,6,L
 C(3,#RP_IND,1,$,S)
 
 ! 入帳日期
-#RpEntryDate{i}=D,7,I
+#RpEntryDate{i}=D,7,O
 IF(#RP_IND==1,$,S)
 
 ! 戶名
@@ -725,7 +725,7 @@ C(4,#RpCustName{i},s,T(2,@RP_AmlCheckName,#RpCustName{i}))
 
 
 ! 還款類別
-#RpType{i}=A,2,S
+#RpType{i}=A,2,O
 C(3,#RP_IND,1,$,S)
 
 ! 還款類別中文
@@ -775,8 +775,8 @@ IF(#RPFG==1||#RPFG==2||#RPFG==8,E(0,1),E(0,2))
 IF(#RPFG==1||#RPFG==2,$,s)
 IF(#RpCode{i}< 90,$,s)
 
-! 會科科目 其他來源建檔(09) (8+5+2) AcNoCode+AcSubCode+AcDtlCode 同上
-#RpAcCode{i}=X,15,S
+! 會科科目 其他來源建檔(09) (11+5+2) AcNoCode+AcSubCode+AcDtlCode 同上
+#RpAcCode{i}=X,18,S
 
 ! 銷帳編號
 ! 1).來源：

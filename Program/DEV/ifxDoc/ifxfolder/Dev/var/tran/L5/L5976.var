@@ -143,6 +143,7 @@ HIDE(#BtnBankCode{i})
 
 <include src="ROM.icf::L5R12.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L6R04.dec"/>
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -224,6 +225,13 @@ T(1,@CustId,#NTXBUF,3,10)
 T(1,@CustNo,#NTXBUF,13,7)
 T(1,@CaseSeq,#NTXBUF,20,3)
 
+!L6R04
+#FunCode=A,1,S
+E(0,5)
+#DefCode=X,9,S
+T(2,CourtCode)
+#Code=X,3,S
+
 
 #RimCustId=X,10,S
 T(2,#CustId)
@@ -283,6 +291,13 @@ T(H,@StatusX,#Status,#StatusHelp)
 C(5,#IsMainFin,Y,T(2,@FieldName,簽約總金額),T(2,@FieldName,新壽總金額))
 ! 下方按鈕
 T(2,@BufConnect,#CustId)
+
+#Send2L6R04=x,1,S
+RESET_RIM(#Send2L6R04,L6R04)
+T(2,@Code,#L5r01CourCode)
+S(L6R04,1,#FunCode,#DefCode,#Code)
+R(1,L6R04)
+T(2,@CourCodeX,#L6R04Item)
 
 ! 案件種類-調解才需要填寫受理調解機構代號
 #CheckCourCode1=X,1,S
@@ -1139,6 +1154,7 @@ INVOKEJS(SHOW,grd1,{i},{i},0)
 <include src="ROM.icf::L5R01.tom"/>
 <include src="ROM.icf::L5R12.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L6R04.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5701
 #CustNo

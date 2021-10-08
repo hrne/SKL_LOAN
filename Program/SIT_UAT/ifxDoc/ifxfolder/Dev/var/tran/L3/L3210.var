@@ -482,8 +482,8 @@ T(2,#TimCustNo+#FacmNo+#RepayCode)
 
 #BIND4A=X,1,S
 BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF4A;ntxbuf5=type<-1
-:EntryDate<-OOEntryDate
 :FacmNo<-OOFacmNo
+:EntryDate<-OOEntryDate
 :DetailSeq<-OODetailSeq
 :DetailNote<-OOProcNote
 :TwTempAmt<-OORepayAmt
@@ -498,9 +498,11 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF4A;ntxbuf5=type<-1
 :RpRvno1<-OORvNo
 :RP_ACNO<-OOAcNo
 :RP_ACCTCODE<-OOAcctCode
+:RP_REPCAT<-OORepayType
 :TempSourceCode<-OORepayCode})
 
-#BTN4=X,15,I,ui:button;value:已入帳未還款查詢;enable:1;tabbable:1;title:L492A 已入帳未還款查詢
+!backNext=true 當值帶回原本畫面將會自動往下執行
+#BTN4=X,16,I,ui:button;value:已入帳未還款查詢;enable:0;tabbable:1;backNext:true;title:L492A 已入帳未還款查詢
 
 
 ![入帳日期]
@@ -935,6 +937,7 @@ E(0,@RP_ENTRYDATE,#EntryDate)
 
 ! 還款類別  1:期款 2:部分償還
 #TempREPCAT=X,1,S
+C(3,#RP_REPCAT,0,$,s)
 E(0,@RP_REPCAT,1)
 
 ! 額度

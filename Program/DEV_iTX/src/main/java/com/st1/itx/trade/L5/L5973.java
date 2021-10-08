@@ -146,8 +146,6 @@ public class L5973 extends TradeBuffer {
 
 				int ThisCustNo = NegAppr01VO.getCustNo();
 				
-				
-				
 				CustMainVO = sCustMainService.custNoFirst(ThisCustNo, ThisCustNo, titaVo);
 			
 

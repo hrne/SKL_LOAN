@@ -84,7 +84,7 @@ public class L9711Report extends MakeReport {
 		this.print(rowNum, startPos, "押品地區別", "L");
 		this.print(rowNum, startPos + 12, "房貸專員", "L");
 		this.print(rowNum, startPos + 22, "戶號", "L");
-		this.print(rowNum, startPos + 35, "戶名", "L");
+		this.print(rowNum, startPos + 34, "戶名", "L");
 		this.print(rowNum, startPos + 52, "核准號碼", "L");
 		this.print(rowNum, startPos + 62, "到期日", "L");
 		this.print(rowNum, startPos + 75, "貸放餘額", "L");
@@ -118,7 +118,7 @@ public class L9711Report extends MakeReport {
 
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9711", "放款到期明細表及通知單", "密", "A4", "P");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9711", "放款到期明細表", "密", "A4", "P");
 
 		if (l9711List.size() > 0) {
 
@@ -171,7 +171,7 @@ public class L9711Report extends MakeReport {
 		this.print(0, startPos + 22, String.format("%07d", Integer.valueOf(tL9711Vo.get("F4"))) + " "
 				+ String.format("%03d", Integer.valueOf(tL9711Vo.get("F5"))), "L");
 		// 戶名
-		this.print(0, startPos + 35, tL9711Vo.get("F6"), "L");
+		this.print(0, startPos + 34, tL9711Vo.get("F6"), "L");
 
 		// 核准號碼
 		this.print(0, startPos + 53, tL9711Vo.get("F7") == null || tL9711Vo.get("F7").length() == 0 ? "0000000"

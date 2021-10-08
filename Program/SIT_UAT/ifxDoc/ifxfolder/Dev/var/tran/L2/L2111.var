@@ -570,7 +570,8 @@ T(F,#Introducer,0)
 T(F,#Supervisor,0)
 T(F,#Coorgnizer,0)
 T(F,#GroupId,0)
-
+T(F,#IsSuspectedCheck,0)
+T(F,#IsSuspectedCheckType,0)
 
 !案件編號
 #FdCreditSysNo=X,2,L
@@ -770,6 +771,7 @@ T(H,#IsLnrelNear,#YesNoHelp)
 T(H,#IsSuspected,#YesNoHelp)
 
 #IsSuspectedCheck=X,1,I
+C(3,#UpdateCode,1,$,S)
 C(3,#CustEntCode,1,S,$)
 HELP(#YesNoHelp)
 @
@@ -782,13 +784,15 @@ T(H,#IsSuspectedCheck,#YesNoHelp)
 T(3, :請選擇;Y:確認核對無誤)
 
 #IsSuspectedCheckType=X,1,I
+C(3,#UpdateCode,1,$,S)
 C(3,#CustEntCode,1,S,$)
 HELP(#IsSuspectedCheckTypeHelp)
 @
 V(7)
 V(H,#IsSuspectedCheckTypeHelp)
 
-#IsSuspectedCheckTypeX=X,4,L
+#IsSuspectedCheckTypeX=X,12,L
+C(3,#UpdateCode,1,$,S)
 T(H,#IsSuspectedCheckType,#IsSuspectedCheckTypeHelp)
 
 #IsDataDate=D,7,L
@@ -1066,6 +1070,8 @@ IF(#Coorgnizer!=#L2r02Coorgnizer,E(0,12),$)
 IF(#ProcessCode!=#L2r02ProcessCode,E(0,13),$) 
 IF(#GroupId!=#L2r02GroupId,E(0,13),$) 
 ! IF(#AcctCode!=#L2r02AcctCode,E(0,3),$) 
+IF(#IsSuspected!=#L1R16IsSuspectedYn,E(0,14),$)
+IF(#IsSuspectedCheck!=#L1R16IsSuspectedYn,E(0,15),$)
 
 #MSGERR=X,1,S
 @
@@ -1084,7 +1090,7 @@ V(P,修改時，必須至少修改一個項目)
 <include src="ROM.icf::L2R12.dec"/>
 <include src="ROM.icf::L2R13.dec"/>
 </sub>
-<sub type="DC" name="p2" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
+<sub type="DC" name="p2" layout="cols=3;screen.width=[300,350,300,250];printer.width=[30,30,30,30];order=1">
 [
 [""],
 [#<->#,"#FdIsLimit+是否為授信限制對象",#IsLimit,#IsLimitX],

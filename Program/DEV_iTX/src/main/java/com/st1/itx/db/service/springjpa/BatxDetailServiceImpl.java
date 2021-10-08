@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -37,9 +35,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("batxDetailService")
 @Repository
-public class BatxDetailServiceImpl implements BatxDetailService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(BatxDetailServiceImpl.class);
-
+public class BatxDetailServiceImpl extends ASpringJpaParm implements BatxDetailService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -69,7 +65,7 @@ public class BatxDetailServiceImpl implements BatxDetailService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + batxDetailId);
+    this.info("findById " + dbName + " " + batxDetailId);
     Optional<BatxDetail> batxDetail = null;
     if (dbName.equals(ContentName.onDay))
       batxDetail = batxDetailReposDay.findById(batxDetailId);
@@ -96,10 +92,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcDate", "BatchNo", "DetailSeq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcDate", "BatchNo", "DetailSeq"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -108,6 +104,9 @@ em = null;
       slice = batxDetailReposHist.findAll(pageable);
     else 
       slice = batxDetailRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -124,7 +123,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492AAEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " repayCode_2 : " +  repayCode_2);
+    this.info("findL492AAEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " repayCode_2 : " +  repayCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByCustNoIsAndFacmNoIsAndRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -133,6 +132,9 @@ em = null;
       slice = batxDetailReposHist.findAllByCustNoIsAndFacmNoIsAndRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayCode_2, pageable);
     else 
       slice = batxDetailRepos.findAllByCustNoIsAndFacmNoIsAndRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -149,7 +151,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492ABEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
+    this.info("findL492ABEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -158,6 +160,9 @@ em = null;
       slice = batxDetailReposHist.findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, pageable);
     else 
       slice = batxDetailRepos.findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -174,7 +179,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492ACEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findL492ACEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByCustNoIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -183,6 +188,9 @@ em = null;
       slice = batxDetailReposHist.findAllByCustNoIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, pageable);
     else 
       slice = batxDetailRepos.findAllByCustNoIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -199,7 +207,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492ADEq " + dbName + " : " + "repayCode_0 : " + repayCode_0);
+    this.info("findL492ADEq " + dbName + " : " + "repayCode_0 : " + repayCode_0);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -208,6 +216,9 @@ em = null;
       slice = batxDetailReposHist.findAllByRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayCode_0, pageable);
     else 
       slice = batxDetailRepos.findAllByRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayCode_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -224,7 +235,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492AEEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " repayCode_1 : " +  repayCode_1);
+    this.info("findL492AEEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " repayCode_1 : " +  repayCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByCustNoIsAndRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -233,6 +244,9 @@ em = null;
       slice = batxDetailReposHist.findAllByCustNoIsAndRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayCode_1, pageable);
     else 
       slice = batxDetailRepos.findAllByCustNoIsAndRepayCodeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -249,7 +263,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492AFEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " repayCode_2 : " +  repayCode_2 + " repayType_3 : " +  repayType_3);
+    this.info("findL492AFEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " repayCode_2 : " +  repayCode_2 + " repayType_3 : " +  repayType_3);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByCustNoIsAndFacmNoIsAndRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayCode_2, repayType_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -258,6 +272,9 @@ em = null;
       slice = batxDetailReposHist.findAllByCustNoIsAndFacmNoIsAndRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayCode_2, repayType_3, pageable);
     else 
       slice = batxDetailRepos.findAllByCustNoIsAndFacmNoIsAndRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayCode_2, repayType_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -274,7 +291,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492AGEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " repayType_2 : " +  repayType_2);
+    this.info("findL492AGEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " repayType_2 : " +  repayType_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByCustNoIsAndFacmNoIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayType_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -283,6 +300,9 @@ em = null;
       slice = batxDetailReposHist.findAllByCustNoIsAndFacmNoIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayType_2, pageable);
     else 
       slice = batxDetailRepos.findAllByCustNoIsAndFacmNoIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, facmNo_1, repayType_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -299,7 +319,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492AHEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " repayType_1 : " +  repayType_1);
+    this.info("findL492AHEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " repayType_1 : " +  repayType_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByCustNoIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayType_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -308,6 +328,9 @@ em = null;
       slice = batxDetailReposHist.findAllByCustNoIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayType_1, pageable);
     else 
       slice = batxDetailRepos.findAllByCustNoIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayType_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -324,7 +347,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492AIEq " + dbName + " : " + "repayCode_0 : " + repayCode_0 + " repayType_1 : " +  repayType_1);
+    this.info("findL492AIEq " + dbName + " : " + "repayCode_0 : " + repayCode_0 + " repayType_1 : " +  repayType_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayCode_0, repayType_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -333,6 +356,9 @@ em = null;
       slice = batxDetailReposHist.findAllByRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayCode_0, repayType_1, pageable);
     else 
       slice = batxDetailRepos.findAllByRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayCode_0, repayType_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -349,7 +375,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492AJEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " repayCode_1 : " +  repayCode_1 + " repayType_2 : " +  repayType_2);
+    this.info("findL492AJEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " repayCode_1 : " +  repayCode_1 + " repayType_2 : " +  repayType_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByCustNoIsAndRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayCode_1, repayType_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -358,6 +384,9 @@ em = null;
       slice = batxDetailReposHist.findAllByCustNoIsAndRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayCode_1, repayType_2, pageable);
     else 
       slice = batxDetailRepos.findAllByCustNoIsAndRepayCodeIsAndRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(custNo_0, repayCode_1, repayType_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -374,7 +403,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL492AKEq " + dbName + " : " + "repayType_0 : " + repayType_0);
+    this.info("findL492AKEq " + dbName + " : " + "repayType_0 : " + repayType_0);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayType_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -383,6 +412,9 @@ em = null;
       slice = batxDetailReposHist.findAllByRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayType_0, pageable);
     else 
       slice = batxDetailRepos.findAllByRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(repayType_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -399,7 +431,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4002AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
+    this.info("findL4002AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIs(acDate_0, batchNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -408,6 +440,9 @@ em = null;
       slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIs(acDate_0, batchNo_1, pageable);
     else 
       slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIs(acDate_0, batchNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -424,7 +459,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4002BEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " titaTlrNo_2 : " +  titaTlrNo_2);
+    this.info("findL4002BEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " titaTlrNo_2 : " +  titaTlrNo_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndTitaTlrNoIs(acDate_0, batchNo_1, titaTlrNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -434,205 +469,8 @@ em = null;
     else 
       slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndTitaTlrNoIs(acDate_0, batchNo_1, titaTlrNo_2, pageable);
 
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<BatxDetail> findL4920AEq(int acDate_0, String batchNo_1, int repayCode_2, String reconCode_3, String fileName_4, String procStsCode_5, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BatxDetail> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4920AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " repayCode_2 : " +  repayCode_2 + " reconCode_3 : " +  reconCode_3 + " fileName_4 : " +  fileName_4 + " procStsCode_5 : " +  procStsCode_5);
-    if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndFileNameIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, fileName_4, procStsCode_5, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndFileNameIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, fileName_4, procStsCode_5, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndFileNameIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, fileName_4, procStsCode_5, pageable);
-    else 
-      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndFileNameIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, fileName_4, procStsCode_5, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<BatxDetail> findL4920BEq(int acDate_0, String batchNo_1, int repayCode_2, String reconCode_3, String fileName_4, List<String> procStsCode_5, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BatxDetail> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4920BEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " repayCode_2 : " +  repayCode_2 + " reconCode_3 : " +  reconCode_3 + " fileName_4 : " +  fileName_4 + " procStsCode_5 : " +  procStsCode_5);
-    if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndFileNameIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, fileName_4, procStsCode_5, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndFileNameIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, fileName_4, procStsCode_5, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndFileNameIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, fileName_4, procStsCode_5, pageable);
-    else 
-      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndFileNameIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, fileName_4, procStsCode_5, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<BatxDetail> findL4920CEq(int acDate_0, String batchNo_1, int repayCode_2, String reconCode_3, String procStsCode_4, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BatxDetail> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4920CEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " repayCode_2 : " +  repayCode_2 + " reconCode_3 : " +  reconCode_3 + " procStsCode_4 : " +  procStsCode_4);
-    if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, procStsCode_4, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, procStsCode_4, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, procStsCode_4, pageable);
-    else 
-      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, procStsCode_4, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<BatxDetail> findL4920DEq(int acDate_0, String batchNo_1, int repayCode_2, String reconCode_3, List<String> procStsCode_4, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BatxDetail> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4920DEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " repayCode_2 : " +  repayCode_2 + " reconCode_3 : " +  reconCode_3 + " procStsCode_4 : " +  procStsCode_4);
-    if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, procStsCode_4, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, procStsCode_4, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, procStsCode_4, pageable);
-    else 
-      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndRepayCodeIsAndReconCodeIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, repayCode_2, reconCode_3, procStsCode_4, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<BatxDetail> findL4920EEq(int acDate_0, String batchNo_1, String fileName_2, String procStsCode_3, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BatxDetail> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4920EEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " fileName_2 : " +  fileName_2 + " procStsCode_3 : " +  procStsCode_3);
-    if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndFileNameIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, fileName_2, procStsCode_3, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndFileNameIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, fileName_2, procStsCode_3, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndFileNameIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, fileName_2, procStsCode_3, pageable);
-    else 
-      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndFileNameIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, fileName_2, procStsCode_3, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<BatxDetail> findL4920FEq(int acDate_0, String batchNo_1, String fileName_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BatxDetail> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4920FEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " fileName_2 : " +  fileName_2 + " procStsCode_3 : " +  procStsCode_3);
-    if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndFileNameIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, fileName_2, procStsCode_3, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndFileNameIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, fileName_2, procStsCode_3, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndFileNameIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, fileName_2, procStsCode_3, pageable);
-    else 
-      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndFileNameIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, fileName_2, procStsCode_3, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<BatxDetail> findL4920GEq(int acDate_0, String batchNo_1, String procStsCode_2, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BatxDetail> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4920GEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " procStsCode_2 : " +  procStsCode_2);
-    if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
-    else 
-      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndProcStsCodeIsOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public Slice<BatxDetail> findL4920HEq(int acDate_0, String batchNo_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<BatxDetail> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    logger.info("findL4920HEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " procStsCode_2 : " +  procStsCode_2);
-    if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
-    else 
-      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -649,7 +487,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4925AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " custNo_3 : " +  custNo_3 + " repayCode_4 : " +  repayCode_4 + " repayCode_5 : " +  repayCode_5 + " procStsCode_6 : " +  procStsCode_6);
+    this.info("findL4925AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " custNo_2 : " +  custNo_2 + " custNo_3 : " +  custNo_3 + " repayCode_4 : " +  repayCode_4 + " repayCode_5 : " +  repayCode_5 + " procStsCode_6 : " +  procStsCode_6);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndRepayCodeGreaterThanEqualAndRepayCodeLessThanEqualAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, acDate_1, custNo_2, custNo_3, repayCode_4, repayCode_5, procStsCode_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -658,6 +496,9 @@ em = null;
       slice = batxDetailReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndRepayCodeGreaterThanEqualAndRepayCodeLessThanEqualAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, acDate_1, custNo_2, custNo_3, repayCode_4, repayCode_5, procStsCode_6, pageable);
     else 
       slice = batxDetailRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndRepayCodeGreaterThanEqualAndRepayCodeLessThanEqualAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(acDate_0, acDate_1, custNo_2, custNo_3, repayCode_4, repayCode_5, procStsCode_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -674,7 +515,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4200AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
+    this.info("findL4200AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsOrderByMediaDateAscMediaKindAscMediaSeqAsc(acDate_0, batchNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -684,6 +525,9 @@ em = null;
     else 
       slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsOrderByMediaDateAscMediaKindAscMediaSeqAsc(acDate_0, batchNo_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -692,7 +536,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findL4200BFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " custNo_2 : " +  custNo_2 + " repayAmt_3 : " +  repayAmt_3 + " procStsCode_4 : " +  procStsCode_4);
+    this.info("findL4200BFirst " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " custNo_2 : " +  custNo_2 + " repayAmt_3 : " +  repayAmt_3 + " procStsCode_4 : " +  procStsCode_4);
     Optional<BatxDetail> batxDetailT = null;
     if (dbName.equals(ContentName.onDay))
       batxDetailT = batxDetailReposDay.findTopByAcDateIsAndBatchNoIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByDetailSeqAsc(acDate_0, batchNo_1, custNo_2, repayAmt_3, procStsCode_4);
@@ -702,11 +546,12 @@ em = null;
       batxDetailT = batxDetailReposHist.findTopByAcDateIsAndBatchNoIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByDetailSeqAsc(acDate_0, batchNo_1, custNo_2, repayAmt_3, procStsCode_4);
     else 
       batxDetailT = batxDetailRepos.findTopByAcDateIsAndBatchNoIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByDetailSeqAsc(acDate_0, batchNo_1, custNo_2, repayAmt_3, procStsCode_4);
+
     return batxDetailT.isPresent() ? batxDetailT.get() : null;
   }
 
   @Override
-  public Slice<BatxDetail> findL4930A(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<BatxDetail> findL4930CAEq(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<BatxDetail> slice = null;
     if (titaVo.length != 0)
@@ -717,7 +562,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4930A " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " custNo_2 : " +  custNo_2 + " procStsCode_3 : " +  procStsCode_3);
+    this.info("findL4930CAEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " custNo_2 : " +  custNo_2 + " procStsCode_3 : " +  procStsCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, custNo_2, procStsCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -726,6 +571,93 @@ em = null;
       slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, custNo_2, procStsCode_3, pageable);
     else 
       slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, custNo_2, procStsCode_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxDetail> findL4930CHEq(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findL4930CHEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " custNo_2 : " +  custNo_2 + " procStsCode_3 : " +  procStsCode_3);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(acDate_0, batchNo_1, custNo_2, procStsCode_3, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(acDate_0, batchNo_1, custNo_2, procStsCode_3, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(acDate_0, batchNo_1, custNo_2, procStsCode_3, pageable);
+    else 
+      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(acDate_0, batchNo_1, custNo_2, procStsCode_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxDetail> findL4930BAEq(int acDate_0, String batchNo_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findL4930BAEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " procStsCode_2 : " +  procStsCode_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
+    else 
+      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(acDate_0, batchNo_1, procStsCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxDetail> findL4930BHEq(int acDate_0, String batchNo_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findL4930BHEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " batchNo_1 : " +  batchNo_1 + " procStsCode_2 : " +  procStsCode_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxDetailReposDay.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(acDate_0, batchNo_1, procStsCode_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxDetailReposMon.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(acDate_0, batchNo_1, procStsCode_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxDetailReposHist.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(acDate_0, batchNo_1, procStsCode_2, pageable);
+    else 
+      slice = batxDetailRepos.findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(acDate_0, batchNo_1, procStsCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -742,7 +674,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4454AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " repayCode_2 : " +  repayCode_2);
+    this.info("findL4454AEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " repayCode_2 : " +  repayCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsOrderByBatchNoDescDetailSeqAsc(acDate_0, acDate_1, repayCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -751,6 +683,9 @@ em = null;
       slice = batxDetailReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsOrderByBatchNoDescDetailSeqAsc(acDate_0, acDate_1, repayCode_2, pageable);
     else 
       slice = batxDetailRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsOrderByBatchNoDescDetailSeqAsc(acDate_0, acDate_1, repayCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -767,7 +702,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("fileCheck " + dbName + " : " + "acDate_0 : " + acDate_0 + " fileName_1 : " +  fileName_1);
+    this.info("fileCheck " + dbName + " : " + "acDate_0 : " + acDate_0 + " fileName_1 : " +  fileName_1);
     if (dbName.equals(ContentName.onDay))
       slice = batxDetailReposDay.findAllByAcDateIsAndFileNameIsOrderByBatchNoDesc(acDate_0, fileName_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -777,6 +712,9 @@ em = null;
     else 
       slice = batxDetailRepos.findAllByAcDateIsAndFileNameIsOrderByBatchNoDesc(acDate_0, fileName_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -785,7 +723,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + batxDetailId);
+    this.info("Hold " + dbName + " " + batxDetailId);
     Optional<BatxDetail> batxDetail = null;
     if (dbName.equals(ContentName.onDay))
       batxDetail = batxDetailReposDay.findByBatxDetailId(batxDetailId);
@@ -803,7 +741,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + batxDetail.getBatxDetailId());
+    this.info("Hold " + dbName + " " + batxDetail.getBatxDetailId());
     Optional<BatxDetail> batxDetailT = null;
     if (dbName.equals(ContentName.onDay))
       batxDetailT = batxDetailReposDay.findByBatxDetailId(batxDetail.getBatxDetailId());
@@ -825,7 +763,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + batxDetail.getBatxDetailId());
+    this.info("Insert..." + dbName + " " + batxDetail.getBatxDetailId());
     if (this.findById(batxDetail.getBatxDetailId()) != null)
       throw new DBException(2);
 
@@ -854,7 +792,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + batxDetail.getBatxDetailId());
+    this.info("Update..." + dbName + " " + batxDetail.getBatxDetailId());
     if (!empNot.isEmpty())
       batxDetail.setLastUpdateEmpNo(empNot);
 
@@ -877,7 +815,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + batxDetail.getBatxDetailId());
+    this.info("Update..." + dbName + " " + batxDetail.getBatxDetailId());
     if (!empNot.isEmpty())
       batxDetail.setLastUpdateEmpNo(empNot);
 
@@ -897,7 +835,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + batxDetail.getBatxDetailId());
+    this.info("Delete..." + dbName + " " + batxDetail.getBatxDetailId());
     if (dbName.equals(ContentName.onDay)) {
       batxDetailReposDay.delete(batxDetail);	
       batxDetailReposDay.flush();
@@ -926,7 +864,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (BatxDetail t : batxDetail){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -961,7 +899,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (batxDetail == null || batxDetail.size() == 0)
       throw new DBException(6);
 
@@ -990,7 +928,7 @@ em = null;
 
   @Override
   public void deleteAll(List<BatxDetail> batxDetail, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

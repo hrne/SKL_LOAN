@@ -850,6 +850,8 @@ IF(#RegZip3Aft==#RegZip3Bef,T(3,),T(3,X))
 
 #RegZip2Aft=X,3,I
 C(4,#RegCityCodeAft,S,$)
+@
+C(4,#RegZip2Aft,$,V(9))
 
 #RegZip2Ind=_,_,L
 IF(#RegZip2Aft==#RegZip2Bef,T(3,),T(3,X))
@@ -1103,6 +1105,8 @@ IF(#CurrZip3Aft==#CurrZip3Bef,T(3,),T(3,X))
 #CurrZip2Aft=X,3,I
 C(4,#CurrCityCodeAft,S,$)
 C(5,#SameReg,Y,S,$)
+@
+C(4,#CurrZip2Aft,$,V(9))
 
 #CurrZip2Ind=_,_,L
 IF(#CurrZip2Aft==#CurrZip2Bef,T(3,),T(3,X))

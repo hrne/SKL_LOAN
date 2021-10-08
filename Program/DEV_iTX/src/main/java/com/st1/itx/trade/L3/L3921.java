@@ -153,14 +153,21 @@ public class L3921 extends TradeBuffer {
 		}
 		Collections.sort(lLoanBorMain, new Comparator<LoanBorMain>() {
 			public int compare(LoanBorMain c1, LoanBorMain c2) {
+				// status
+				if (c1.getStatus() != c2.getStatus()) {
+					return c1.getStatus() - c2.getStatus();
+				}
 				// 部分償還金額 > 0時排序,依利率順序由大到小 else 依應繳日順序由小到大
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
-						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? 1 : -1);
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
 				} else {
 					if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
 						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
+					}
+					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
 				}
 				if (c1.getFacmNo() != c2.getFacmNo()) {

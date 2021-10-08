@@ -7,14 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.LoanBookId;
 import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -40,16 +41,18 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3130")
 @Scope("prototype")
 public class L3130 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3130.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public LoanBookService loanBookService;
+	@Autowired
+	DataLog datalog;
 
 	@Autowired
 	Parse parse;
 	@Autowired
 	DateUtil dDateUtil;
+	private LoanBook beforeLoanBook;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -61,6 +64,7 @@ public class L3130 extends TradeBuffer {
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
+		String iCurrencyCode = titaVo.getParam("CurrencyCode");
 		int iBookDate = this.parse.stringToInteger(titaVo.getParam("BookDate"));
 		BigDecimal iBookAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimBookAmt"));
 
@@ -84,15 +88,11 @@ public class L3130 extends TradeBuffer {
 			tLoanBook.setBookDate(iBookDate);
 			tLoanBook.setLoanBookId(tLoanBookId);
 			tLoanBook.setStatus(0); // 0: 未回收 1: 已回收
-			tLoanBook.setCurrencyCode(titaVo.getCurName());
+			tLoanBook.setCurrencyCode(iCurrencyCode);
 			tLoanBook.setBookAmt(iBookAmt);
 			tLoanBook.setRepayAmt(new BigDecimal(0));
 			try {
-				tLoanBook.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-				tLoanBook.setCreateEmpNo(titaVo.getTlrNo());
-				tLoanBook.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-				tLoanBook.setLastUpdateEmpNo(titaVo.getTlrNo());
-				loanBookService.insert(tLoanBook);
+				loanBookService.insert(tLoanBook, titaVo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
 					throw new LogicException(titaVo, "E0005", "放款約定還本檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
@@ -101,6 +101,7 @@ public class L3130 extends TradeBuffer {
 			break;
 		case 2: // 修改
 			tLoanBook = loanBookService.holdById(tLoanBookId);
+			beforeLoanBook = (LoanBook) datalog.clone(tLoanBook);
 			if (tLoanBook == null) {
 				throw new LogicException(titaVo, "E0006", "放款約定還本檔"); // 鎖定資料時，發生錯誤
 			}
@@ -109,12 +110,14 @@ public class L3130 extends TradeBuffer {
 			}
 			tLoanBook.setBookAmt(iBookAmt);
 			try {
-				tLoanBook.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-				tLoanBook.setLastUpdateEmpNo(titaVo.getTlrNo());
-				loanBookService.update(tLoanBook);
+				tLoanBook = loanBookService.update2(tLoanBook, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "放款約定還本檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
 			}
+
+			datalog.setEnv(titaVo, beforeLoanBook, tLoanBook);
+			datalog.exec();
+
 			break;
 		case 4: // 刪除
 			tLoanBook = loanBookService.holdById(tLoanBookId);
@@ -125,7 +128,7 @@ public class L3130 extends TradeBuffer {
 				throw new LogicException(titaVo, "E3056", "放款約定還本檔"); // 該筆資料已回收
 			}
 			try {
-				loanBookService.delete(tLoanBook);
+				loanBookService.delete(tLoanBook, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "放款約定還本檔 " + e.getErrorMsg()); // 刪除資料時，發生錯誤
 			}

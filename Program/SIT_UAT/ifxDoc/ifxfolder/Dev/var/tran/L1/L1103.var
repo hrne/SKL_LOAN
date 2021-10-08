@@ -358,6 +358,15 @@ T(H,@TypeCodeXAft,#L1r01TypeCode,#TypeCodeHelp)
 T(2,@RegAddressBef,#L1r01RegAddress)
 T(2,@CurrAddressBef,#L1r01CurrAddress)
 
+#RIM_L2R08a=X,1,S
+C(4,#EmpnoBef,S,$)
+RESET_RIM(#RIM_L2R08a,L2R08)
+T(2,@RimEmployeeNo,#EmpnoBef)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo)
+R(1,L2R08)
+T(2,@EmpnameBef,#L2r08FullName)
+T(2,@EmpnameAft,#L2r08FullName)
+
 ! 預先調rim塞值1
 #SendL6R06AA=X,1,S
 #RimIndustryCode=X,6,S
@@ -500,7 +509,7 @@ T(3,*)
 #FdCustTypeBef=X,2,L
 
 #FdIndustryBef=X,2,L
-T(3,*)
+T(3,)
 #FdCountryBef=X,2,L
 T(3,*)
 #FdSpouseIdBef=X,2,L
@@ -634,7 +643,9 @@ T(H,#CustTypeBef,#CustTypeCodeHelp)
 
 #CustTypeAft=A,2,I
 HELP(#CustTypeCodeHelp)
-@V(H,#CustTypeCodeHelp)
+@
+C(5,#TypeCodeInd,X,$,C(3,#CustTypeAft,#CustTypeBef,s,$))
+V(H,#CustTypeCodeHelp)
 
 #CustTypeCodeAftX=X,10,L
 T(H,#CustTypeAft,#CustTypeCodeHelp)
@@ -653,13 +664,14 @@ IF(#CustTypeAft==#CustTypeBef,T(3,),T(3,X))
 #EmpnoAft=X,6,I
 C(5,#CustTypeAft,01,$,S)
 @
-V(7)
+C(5,#CustTypeBef,#CustTypeAft,C(5,#EmpnoBef,#EmpnoAft,$,V(7)))
 
 #EmpnoInd=_,_,L
 IF(#EmpnoAft==#EmpnoBef,T(3,),T(3,X))
 
 #RIM_L2R08=X,1,S
 C(5,#CustTypeAft,01,$,S)
+C(5,#CustTypeBef,#CustTypeAft,C(5,#EmpnoBef,#EmpnoAft,S,$))
 RESET_RIM(#RIM_L2R08,L2R08)
 T(2,@RimEmployeeNo,#EmpnoAft)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo)
@@ -1000,6 +1012,8 @@ IF(#RegZip3Aft==#RegZip3Bef,T(3,),T(3,X))
 
 #RegZip2Aft=X,3,I
 C(4,#RegCityCodeAft,S,$)
+@
+C(4,#RegZip2Aft,$,V(9))
 
 #RegZip2Ind=_,_,L
 IF(#RegZip2Aft==#RegZip2Bef,T(3,),T(3,X))
@@ -1273,6 +1287,9 @@ IF(#CurrZip3Aft==#CurrZip3Bef,T(3,),T(3,X))
 #CurrZip2Aft=X,3,I
 C(5,#SameReg,Y,s,$)
 C(4,#CurrCityCodeAft,S,$)
+@
+C(4,#CurrZip2Aft,$,V(9))
+
 
 #CurrZip2Ind=_,_,L
 IF(#CurrZip2Aft==#CurrZip2Bef,T(3,),T(3,X))
@@ -1393,6 +1410,8 @@ IF(#JobtitleAft==#JobtitleBef,T(3,),T(3,X))
 #JobTenureInd=X,1,L
 
 #JobTenureAft=X,2,I
+@
+C(4,#JobTenureAft,$,V(9))
 
 #JobTenureInd=_,_,L
 IF(#JobTenureAft==#JobTenureBef,T(3,),T(3,X))

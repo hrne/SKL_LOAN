@@ -1085,7 +1085,7 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 HELP(#SubCompanyFgHelp)
 @
-IF(#FdSubCompanyFg=="*",V(7),s)
+IF(#FdSubCompanyFg=="*",V(7),$)
 C(4,#SubCompanyFg,$,V(H,#SubCompanyFgHelp))
 
 #SubCompanyFgX=X,60,L

@@ -52,9 +52,10 @@ public class L8080 extends TradeBuffer {
 		 */
 		this.index = titaVo.getReturnIndex();
 
-		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		/* 設定每筆分頁的資料筆數 預設200筆 總長不可超過六萬 */
 		this.limit = 200;
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
+		String oName = "";
 
 		try {
 			resultList = l8080ServiceImpl.findAll(this.index, this.limit, titaVo);
@@ -84,7 +85,9 @@ public class L8080 extends TradeBuffer {
 				Document doc = checkAml.convertStringToXml(result.get("MsgRg"));
 				this.info("result.get(\"F5\") = " + result.get("MsgRg"));
 				this.info("doc = " + doc);
-				String oName = checkAml.getXmlValue(doc, "Name");
+				if (doc != null) {
+					oName = checkAml.getXmlValue(doc, "Name");
+				}
 
 				occursList.putParam("oName", oName);
 
@@ -124,5 +127,5 @@ public class L8080 extends TradeBuffer {
 
 		return result;
 	}
-	
+
 }

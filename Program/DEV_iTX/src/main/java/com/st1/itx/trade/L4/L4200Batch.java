@@ -1140,7 +1140,7 @@ public class L4200Batch extends TradeBuffer {
 				}
 				// 資料有錯
 				else if ("E".equals(procCode.substring(0, 1))) {
-					tBatxDetail.setProcStsCode("1"); // 人工處理
+					tBatxDetail.setProcStsCode("1"); // 不處理
 					procStsCode = "1";
 					postFailCnt = postFailCnt + 1;
 				}
@@ -1297,7 +1297,7 @@ public class L4200Batch extends TradeBuffer {
 				}
 				// 資料有錯
 				else if ("E".equals(procCode.substring(0, 1))) {
-					procStsCode = "1"; // 人工處理
+					procStsCode = "1"; // 不處理
 				}
 				// 實扣金額=0、扣款失敗
 				else {

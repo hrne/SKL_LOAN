@@ -71,7 +71,7 @@ public class L4943 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100;
-
+		
 //		1.戶號 = 戶號+入帳日
 //		2.上限金額 = 入帳日+限額
 //		3.下限金額 = 入帳日+限額
@@ -89,109 +89,108 @@ public class L4943 extends TradeBuffer {
 			throw new LogicException("E0013", e.getMessage());
 		}
 		if (resulAlltList != null && resulAlltList.size() > 0) {
-//			先將應收金額、暫收金額、還款金額加總
 			totUnpaidAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("F0"));
 			totTempAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("F1"));
 			totRepayAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("F2"));
 		}
 
-		try {
-			// *** 折返控制相關 ***
-			resulParttList = l4943ServiceImpl.findAll(0, this.index, this.limit, titaVo);
-		} catch (Exception e) {
-			this.error("l4943ServiceImpl findByCondition " + e.getMessage());
-			throw new LogicException("E0013", e.getMessage());
-		}
-
-		if (resulParttList != null && resulParttList.size() > 0) {
-
-			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-			if (resulParttList.size() == this.limit && hasNext()) {
-				titaVo.setReturnIndex(this.setIndexNext());
-				/* 手動折返 */
-				if(functionCode == 6) {
-				  this.totaVo.setMsgEndToAuto();
-				} else {
-				  this.totaVo.setMsgEndToEnter();
-				}
-			}
-
-			for (Map<String, String> result : resulParttList) {
-				int entryDate = parse.stringToInteger(result.get("F0"));
-				int prevIntDate = parse.stringToInteger(result.get("F4"));
-				int payIntDate = parse.stringToInteger(result.get("F5"));
-				int acDate = parse.stringToInteger(result.get("F11"));
-
-				if (entryDate > 19110000) {
-					entryDate = entryDate - 19110000;
-				}
-				if (prevIntDate > 19110000) {
-					prevIntDate = prevIntDate - 19110000;
-				}
-				if (payIntDate > 19110000) {
-					payIntDate = payIntDate - 19110000;
-				}
-				if (acDate > 19110000) {
-					acDate = acDate - 19110000;
-				}
-
-				OccursList occursList = new OccursList();
-
-				occursList.putParam("OOEntryDate", entryDate);
-				occursList.putParam("OOCustNo", result.get("F1"));
-				occursList.putParam("OOFacmNo", result.get("F2"));
-				occursList.putParam("OOBormNo", result.get("F3"));
-				occursList.putParam("OOPrevIntDate", prevIntDate);
-				occursList.putParam("OOPayIntDate", payIntDate);
-				occursList.putParam("OORepayType", result.get("F6"));
-				occursList.putParam("OOUnpaidAmt", result.get("F7"));
-				occursList.putParam("OOTempAmt", result.get("F8"));
-				occursList.putParam("OORepayAmt", result.get("F9"));
-				occursList.putParam("OOMediaCode", result.get("F10"));
-				occursList.putParam("OOAcDate", acDate);
-
-				String procNote = "";
-				String returnCode = result.get("F13");
-				String mediaKind = result.get("F14");
-				if (returnCode == null || returnCode.trim().isEmpty()) {
-					TempVo tempVo = new TempVo();
-					tempVo = tempVo.getVo(result.get("F12"));
-					if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
-						procNote = "Aml檢核訊息：" + amlX(tempVo.get("Aml"), titaVo) + "。";
-					}
-
-					if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
-						procNote = procNote + "帳號授權檢核：" + authX(tempVo.get("Auth"), titaVo) + "。";
-					}
-
-					if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
-						procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
-					}
-				} else {
-					if ("00".equals(returnCode)) {
-						procNote = "扣款成功";
-					} else {
-						procNote = "扣款失敗："
-								+ procCodeX("3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
-					}
-				}
-				occursList.putParam("OOAmlRsp", " ");
-
-				occursList.putParam("OOProcNote", procNote);
-//					 將每筆資料放入Tota的OcList 
-				this.totaVo.addOccursList(occursList);
-			}
-
+		if(functionCode == 6) {
 			totaVo.putParam("OTotalUnpaidAmt", totUnpaidAmt);
 			totaVo.putParam("OTotalTempAmt", totTempAmt);
 			totaVo.putParam("OTotalRepayAmt", totRepayAmt);
-
 		} else {
-			throw new LogicException(titaVo, "E0001", "查無資料");
-		}
-
-//		this.totaVo.putParam("OTotCnt", singleCnt);
-//		this.totaVo.putParam("OTotAmt", totAmt);
+			
+			try {
+				// *** 折返控制相關 ***
+				resulParttList = l4943ServiceImpl.findAll(0, this.index, this.limit, titaVo);
+			} catch (Exception e) {
+				this.error("l4943ServiceImpl findByCondition " + e.getMessage());
+				throw new LogicException("E0013", e.getMessage());
+			}
+			
+			if (resulParttList != null && resulParttList.size() > 0) {
+				
+				for (Map<String, String> result : resulParttList) {
+					int entryDate = parse.stringToInteger(result.get("F0"));
+					int prevIntDate = parse.stringToInteger(result.get("F4"));
+					int payIntDate = parse.stringToInteger(result.get("F5"));
+					int acDate = parse.stringToInteger(result.get("F11"));
+					
+					if (entryDate > 19110000) {
+						entryDate = entryDate - 19110000;
+					}
+					if (prevIntDate > 19110000) {
+						prevIntDate = prevIntDate - 19110000;
+					}
+					if (payIntDate > 19110000) {
+						payIntDate = payIntDate - 19110000;
+					}
+					if (acDate > 19110000) {
+						acDate = acDate - 19110000;
+					}
+					
+					OccursList occursList = new OccursList();
+					
+					occursList.putParam("OOEntryDate", entryDate);
+					occursList.putParam("OOCustNo", result.get("F1"));
+					occursList.putParam("OOFacmNo", result.get("F2"));
+					occursList.putParam("OOBormNo", result.get("F3"));
+					occursList.putParam("OOPrevIntDate", prevIntDate);
+					occursList.putParam("OOPayIntDate", payIntDate);
+					occursList.putParam("OORepayType", result.get("F6"));
+					occursList.putParam("OOUnpaidAmt", result.get("F7"));
+					occursList.putParam("OOTempAmt", result.get("F8"));
+					occursList.putParam("OORepayAmt", result.get("F9"));
+					occursList.putParam("OOMediaCode", result.get("F10"));
+					occursList.putParam("OOAcDate", acDate);
+					
+					String procNote = "";
+					String returnCode = result.get("F13");
+					String mediaKind = result.get("F14");
+					if (returnCode == null || returnCode.trim().isEmpty()) {
+						TempVo tempVo = new TempVo();
+						tempVo = tempVo.getVo(result.get("F12"));
+						if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
+							procNote = "Aml檢核訊息：" + amlX(tempVo.get("Aml"), titaVo) + "。";
+						}
+						
+						if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
+							procNote = procNote + "帳號授權檢核：" + authX(tempVo.get("Auth"), titaVo) + "。";
+						}
+						
+						if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
+							procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
+						}
+					} else {
+						if ("00".equals(returnCode)) {
+							procNote = "扣款成功";
+						} else {
+							procNote = "扣款失敗："
+									+ procCodeX("3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
+						}
+					}
+					occursList.putParam("OOAmlRsp", " ");
+					
+					occursList.putParam("OOProcNote", procNote);
+//					 將每筆資料放入Tota的OcList 
+					this.totaVo.addOccursList(occursList);
+				}
+				
+				totaVo.putParam("OTotalUnpaidAmt", totUnpaidAmt);
+				totaVo.putParam("OTotalTempAmt", totTempAmt);
+				totaVo.putParam("OTotalRepayAmt", totRepayAmt);
+				
+				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+				if (resulParttList.size() == this.limit && hasNext()) {
+					titaVo.setReturnIndex(this.setIndexNext());
+					/* 手動折返 */
+					this.totaVo.setMsgEndToEnter();		
+				}
+				
+			} else {
+				throw new LogicException(titaVo, "E0001", "查無資料");
+			}
+		} // else 
 
 		this.addList(this.totaVo);
 		return this.sendList();

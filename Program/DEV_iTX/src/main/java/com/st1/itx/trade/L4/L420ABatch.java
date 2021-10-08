@@ -93,8 +93,8 @@ public class L420ABatch extends TradeBuffer {
 			int cntTrans = 0;
 			this.info("lBatxDetail, size=" + lBatxDetail.size());
 			for (BatxDetail tDetail : lBatxDetail) {
-				// 0.未檢核 3.檢核錯誤
-				if ("0".equals(tDetail.getProcStsCode()) || "3".equals(tDetail.getProcStsCode())) {
+				// 0.未檢核 2.人工處理 3.檢核錯誤
+				if ("0".equals(tDetail.getProcStsCode()) || "2".equals(tDetail.getProcStsCode()) || "3".equals(tDetail.getProcStsCode())) {
 					// 逐筆 call BaTxCom 計算並寫入提息明細檔 //
 					if (cntTrans > this.commitCnt) {
 						cntTrans = 0;

@@ -190,7 +190,8 @@ T(3,)T(H,#RepayType,#RepayTypeHelp)
 HELP(#ProcStsCodeHelp)
 IF(#ProcStsCode == 4 || #ProcStsCode == 3 || #ProcStsCode == 2 || #ProcStsCode == 1 || #ProcStsCode == 0,$,s)
 @
-IF(#ProcStsCodeTemp == #ProcStsCode,s,IF(#ProcStsCodeTemp == 4 ,V(1,1),IF(#ProcStsCodeTemp == 3,V(1,1),IF(#ProcStsCodeTemp == 2,V(1,1),IF(#ProcStsCodeTemp == 0,V(1,1),V(1,0))))))
+C(3,#ProcStsCode,1,T(F,@CustNoA,0)T(F,@RepayTypeA,0),T(F,@CustNoA,1)T(F,@RepayTypeA,1))
+IF(#ProcStsCodeTemp == #ProcStsCode,s,IF(#ProcStsCodeTemp == 4 ,V(1,0,1),IF(#ProcStsCodeTemp == 3,V(1,1),IF(#ProcStsCodeTemp == 2,V(1,0,1),IF(#ProcStsCodeTemp == 0,V(1,1),V(1,0))))))
 
 #ProcStsCodeX=X,10,L
 T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)
@@ -271,6 +272,7 @@ T(A,#RemintBank,L4DEF,BANKCDDEF,BANKCD,BANKCDX)
 
 #RepayTypeA=A,2,I
 E(0,#RepayType)
+C(3,#ProcStsCode,1,s,$)
 HELP(#RepayTypeHelp)
 @V(H,#RepayTypeHelp)
 !HELP(01:期款;
@@ -295,6 +297,7 @@ T(3,)T(H,#RepayTypeA,#RepayTypeHelp)
 !戶號
 #CustNoA=A,7,I
 E(0,#CustNo)
+C(3,#ProcStsCode,1,s,$)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

@@ -158,6 +158,7 @@ T(F,@BrNo,#ShowFrame)
 T(F,@GroupNo,#ShowFrame)
 T(F,@Desc,#ShowFrame)
 T(F,@TlrItem,#ShowFrame)
+T(F,@AllowFg,#ShowFrame)
 ##loop {times:40,i:1}
 T(F,@AuthNo{i},#ShowFrame)
 ##end
@@ -2423,7 +2424,7 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNo),T(2,#EMPNOS))
 
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
-#FunCode#TlrNo#LevelFg#Status#BrNo#GroupNo#AdFg#Desc
+#FunCode#TlrNo#LevelFg#AllowFg#Status#BrNo#GroupNo#AdFg#Desc
 #LtxDate#LtxTime#TxtNo#Entdy#LogonFg#TlrItem
 #AmlHighFg
 ##loop {times:40,i:1}
@@ -2444,6 +2445,7 @@ TXFORM=L6R20
 #BrNo
 #AdFg
 #LevelFg
+#AllowFg
 #Status
 #GroupNo
 #Entdy

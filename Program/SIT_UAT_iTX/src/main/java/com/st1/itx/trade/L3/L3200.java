@@ -576,13 +576,13 @@ public class L3200 extends TradeBuffer {
 						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
 					}
 					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
-						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? 1 : -1);
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
 				}
 				// 部分償還金額 > 0時排序,依利率順序由大到小
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
-						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? 1 : -1);
+						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
 				}
 				if (c1.getFacmNo() != c2.getFacmNo()) {

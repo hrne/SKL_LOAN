@@ -197,122 +197,6 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4002BEq(int acDate_0, String batchNo_1, String titaTlrNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = , AND RepayCode = , AND ReconCode = , AND FileName = , AND ProcStsCode = 
-   *
-   * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
-   * @param repayCode_2 repayCode_2
-   * @param reconCode_3 reconCode_3
-   * @param fileName_4 fileName_4
-   * @param procStsCode_5 procStsCode_5
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL4920AEq(int acDate_0, String batchNo_1, int repayCode_2, String reconCode_3, String fileName_4, String procStsCode_5, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * AcDate = , AND BatchNo = , AND RepayCode = , AND ReconCode = , AND FileName = , AND ProcStsCode ^i 
-   *
-   * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
-   * @param repayCode_2 repayCode_2
-   * @param reconCode_3 reconCode_3
-   * @param fileName_4 fileName_4
-   * @param procStsCode_5 procStsCode_5
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL4920BEq(int acDate_0, String batchNo_1, int repayCode_2, String reconCode_3, String fileName_4, List<String> procStsCode_5, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * AcDate = , AND BatchNo = , AND RepayCode = , AND ReconCode = , AND ProcStsCode = 
-   *
-   * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
-   * @param repayCode_2 repayCode_2
-   * @param reconCode_3 reconCode_3
-   * @param procStsCode_4 procStsCode_4
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL4920CEq(int acDate_0, String batchNo_1, int repayCode_2, String reconCode_3, String procStsCode_4, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * AcDate = , AND BatchNo = , AND RepayCode = , AND ReconCode = , AND ProcStsCode ^i
-   *
-   * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
-   * @param repayCode_2 repayCode_2
-   * @param reconCode_3 reconCode_3
-   * @param procStsCode_4 procStsCode_4
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL4920DEq(int acDate_0, String batchNo_1, int repayCode_2, String reconCode_3, List<String> procStsCode_4, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * AcDate = , AND BatchNo = , AND FileName = , AND ProcStsCode = 
-   *
-   * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
-   * @param fileName_2 fileName_2
-   * @param procStsCode_3 procStsCode_3
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL4920EEq(int acDate_0, String batchNo_1, String fileName_2, String procStsCode_3, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * AcDate = , AND BatchNo = , AND FileName = , AND ProcStsCode ^i 
-   *
-   * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
-   * @param fileName_2 fileName_2
-   * @param procStsCode_3 procStsCode_3
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL4920FEq(int acDate_0, String batchNo_1, String fileName_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * AcDate = , AND BatchNo = , AND ProcStsCode = 
-   *
-   * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
-   * @param procStsCode_2 procStsCode_2
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL4920GEq(int acDate_0, String batchNo_1, String procStsCode_2, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * AcDate = , AND BatchNo = , AND ProcStsCode ^i
-   *
-   * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
-   * @param procStsCode_2 procStsCode_2
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice BatxDetail BatxDetail of List
-   */
-  public Slice<BatxDetail> findL4920HEq(int acDate_0, String batchNo_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo);
-
-  /**
    * AcDate &gt;= , AND AcDate &lt;= , AND CustNo &gt;= , AND CustNo &lt;= , AND RepayCode &gt;= , AND RepayCode &lt;= , AND ProcStsCode ^i 
    *
    * @param acDate_0 acDate_0
@@ -366,7 +250,47 @@ public interface BatxDetailService {
    * @param titaVo Variable-Length Argument
    * @return Slice BatxDetail BatxDetail of List
    */
-  public Slice<BatxDetail> findL4930A(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo);
+  public Slice<BatxDetail> findL4930CAEq(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate = , AND BatchNo = , AND CustNo = , AND ProcStsCode ^i
+   *
+   * @param acDate_0 acDate_0
+   * @param batchNo_1 batchNo_1
+   * @param custNo_2 custNo_2
+   * @param procStsCode_3 procStsCode_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxDetail BatxDetail of List
+   */
+  public Slice<BatxDetail> findL4930CHEq(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate = , AND BatchNo = , AND ProcStsCode ^i
+   *
+   * @param acDate_0 acDate_0
+   * @param batchNo_1 batchNo_1
+   * @param procStsCode_2 procStsCode_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxDetail BatxDetail of List
+   */
+  public Slice<BatxDetail> findL4930BAEq(int acDate_0, String batchNo_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate = , AND BatchNo = , AND ProcStsCode ^i
+   *
+   * @param acDate_0 acDate_0
+   * @param batchNo_1 batchNo_1
+   * @param procStsCode_2 procStsCode_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxDetail BatxDetail of List
+   */
+  public Slice<BatxDetail> findL4930BHEq(int acDate_0, String batchNo_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * AcDate &gt;= , AND AcDate &lt;= , AND RepayCode = 

@@ -172,6 +172,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  else 0                                   ";
 		sql += "             end                                           ";
 		sql += "        end = 1                                           ";
+		sql += "   order by \"F4\",\"F3\",\"F0\",\"F1\",\"F2\"                              ";
 		this.info("sql=" + sql);
 
 		Query query;
@@ -267,6 +268,8 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        end = 1                                            ";
 		}
 
+		sql += "   order by \"F4\",\"F3\",\"F0\",\"F1\",\"F2\"                              ";
+		
 		this.info("sql=" + sql);
 
 		Query query;

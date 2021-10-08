@@ -65,10 +65,12 @@ public class L4930 extends TradeBuffer {
 		List<BatxDetail> lBatxDetail = new ArrayList<BatxDetail>();
 
 		List<String> func2 = new ArrayList<String>();
+		// 整批轉暫收
 		func2.add("2");
 		func2.add("3");
 		func2.add("4");
 		func2.add("7");
+		// 整批訂正
 		List<String> func1 = new ArrayList<String>();
 		func1.add("5");
 		func1.add("6");
@@ -76,15 +78,17 @@ public class L4930 extends TradeBuffer {
 
 		if (iFunctionCode == 2) {
 			if (iCustNo == 0) {
-				sBatxDetail = batxDetailService.findL4920HEq(iAcDate, iBatchNo, func2, this.index, this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930BAEq(iAcDate, iBatchNo, func2, this.index, this.limit, titaVo);
 			} else {
-				sBatxDetail = batxDetailService.findL4930A(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930CAEq(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit,
+						titaVo);
 			}
 		} else if (iFunctionCode == 1) {
 			if (iCustNo == 0) {
-				sBatxDetail = batxDetailService.findL4920HEq(iAcDate, iBatchNo, func1, this.index, this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930BHEq(iAcDate, iBatchNo, func1, this.index, this.limit, titaVo);
 			} else {
-				sBatxDetail = batxDetailService.findL4930A(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit, titaVo);
+				sBatxDetail = batxDetailService.findL4930CHEq(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit,
+						titaVo);
 			}
 		}
 
@@ -114,7 +118,6 @@ public class L4930 extends TradeBuffer {
 				occursList.putParam("OORepayAmt", tBatxDetail.getRepayAmt());
 				occursList.putParam("OOAcctAmt", tBatxDetail.getAcctAmt());
 				occursList.putParam("OODisAcctAmt", tBatxDetail.getRepayAmt().subtract(tBatxDetail.getAcctAmt()));
-
 				occursList.putParam("OOProcCode", tBatxDetail.getProcCode());
 				occursList.putParam("OOProcStsCode", tBatxDetail.getProcStsCode());
 				occursList.putParam("OOEntryDate", tBatxDetail.getEntryDate());
@@ -136,30 +139,29 @@ public class L4930 extends TradeBuffer {
 					}
 //					當吃檔進去時不會寫入還款類別，檢核後才會寫入。
 //					若該筆無還款類別且為數字型態，顯示虛擬帳號
-					if (tempVo.get("VirtualAcctNo") != null && tBatxDetail.getRepayType() == 0 && isNumeric(tempVo.get("VirtualAcctNo"))) {
+					if (tempVo.get("VirtualAcctNo") != null && tBatxDetail.getRepayType() == 0
+							&& isNumeric(tempVo.get("VirtualAcctNo"))) {
 						procNote = procNote + "虛擬帳號:" + tempVo.get("VirtualAcctNo");
 					}
 				}
 
 				occursList.putParam("OOProcNote", procNote);
 
-				if (iFunctionCode == 2) {
-					if (tBatxDetail.getProcStsCode().equals("7")) {
-						occursList.putParam("OOTxSn", titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
-					} else {
-						occursList.putParam("OOTxSn", "");
-					}
+				if ("".equals(tBatxDetail.getTitaTxtNo())) {
+					occursList.putParam("OOTxSn", "");
 				} else {
-					occursList.putParam("OOTxSn", titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
+					occursList.putParam("OOTxSn",
+							titaVo.getKinbr() + tBatxDetail.getTitaTlrNo() + tBatxDetail.getTitaTxtNo());
 				}
+
 				this.totaVo.addOccursList(occursList);
 			}
 
 			if (iFunctionCode == 2 && lBatxDetail.size() != 0 && cnt == 0) {
-				throw new LogicException("E0001", "資料狀態皆不為 : 2.人工處理 3.檢核錯誤 4.檢核正常 7.虛擬轉暫收");
+				throw new LogicException("E0001", "資料狀態皆不為 : 2.人工處理 3.檢核錯誤 4.檢核正常 7.轉暫收");
 			}
 			if (iFunctionCode == 1 && lBatxDetail.size() != 0 && cnt == 0) {
-				throw new LogicException("E0001", "資料狀態皆不為 :5.人工入帳 6.批次入帳 7.虛擬轉暫收");
+				throw new LogicException("E0001", "資料狀態皆不為 :5.人工入帳 6.批次入帳 7.轉暫收");
 			}
 		} else {
 			throw new LogicException("E0001", "查無資料");

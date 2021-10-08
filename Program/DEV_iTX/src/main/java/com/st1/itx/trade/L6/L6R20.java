@@ -67,7 +67,6 @@ public class L6R20 extends TradeBuffer {
 			this.totaVo.putParam("AuthNo"+i, "");
 		}
 		
-
 		if (tTxTeller == null) {
 			if ("2".equals(iFunCode)) {
 				throw new LogicException(titaVo, "E0003", "使用者:" + iTlrNo);

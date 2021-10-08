@@ -25,13 +25,12 @@ import com.st1.itx.db.service.springjpa.cm.BS020ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.data.BaTxVo;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("BS020")
 @Scope("prototype")
 /**
- * 新增整批入帳明細－暫收抵繳期款<br>
+ * 新增整批入帳明細－暫收抵繳<br>
  * 執行時機：日始作業，系統換日後(BS001執行後)自動執行<br>
  * 1.保留成功的整批入帳明細，其餘刪除(程式可重複執行)<br>
  * 2.找正常戶、應繳日<=本日，且額度下有暫收可抵繳之戶號、額度<br>
@@ -120,7 +119,7 @@ public class BS020 extends TradeBuffer {
 			dStatusCode.add("2");
 			dStatusCode.add("3");
 			dStatusCode.add("4");
-			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4920HEq(this.tbsdyf, this.batchNo, dStatusCode,
+			Slice<BatxDetail> slBatxDetail = batxDetailService.findL4930BAEq(this.tbsdyf, this.batchNo, dStatusCode,
 					this.index, Integer.MAX_VALUE);
 			lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 			if (lBatxDetail != null) {
@@ -190,7 +189,7 @@ public class BS020 extends TradeBuffer {
 						isRecvPay = true;
 					}
 					// 期款
-					if (ba.getDataKind() == 2) {
+					if (ba.getDataKind() == 2 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						isTermPay = true;
 					}
 					// 短繳
@@ -263,8 +262,8 @@ public class BS020 extends TradeBuffer {
 		tBatxDetail.setRepayAmt(BigDecimal.ZERO);
 		tBatxDetail.setProcStsCode("0");
 		tBatxDetail.setProcCode("00000");
-		tBatxDetail.setTitaTlrNo(titaVo.getTlrNo());
-		tBatxDetail.setTitaTxtNo(this.batchNo.substring(6) + FormatUtil.pad9("" + detailSeq, 6));
+		tBatxDetail.setTitaTlrNo("");
+		tBatxDetail.setTitaTxtNo("");
 
 		TempVo tTempVo = new TempVo();
 		tTempVo.putParam("Note", repayType == 01 ? "暫收抵繳期款" : "暫收抵繳費用");
