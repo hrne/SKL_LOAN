@@ -133,10 +133,11 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOAcctAmt", result.get("F9"));
 
 				if (enterList.contains(result.get("F10"))) {
-					occursList.putParam("OODisacctAmt", BigDecimal.ZERO);
-				} else {
 					occursList.putParam("OODisacctAmt", parse.stringToBigDecimal(result.get("F8"))
 							.subtract(parse.stringToBigDecimal(result.get("F9"))));
+					occursList.putParam("OODisacctAmt", BigDecimal.ZERO);
+				} else {
+					occursList.putParam("OODisacctAmt", BigDecimal.ZERO);
 				}
 				occursList.putParam("OOProcStsCode", result.get("F10"));
 				occursList.putParam("OOProcCode", result.get("F11"));

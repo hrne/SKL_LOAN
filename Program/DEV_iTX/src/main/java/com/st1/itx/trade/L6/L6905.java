@@ -40,7 +40,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6905 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6905.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -71,6 +70,7 @@ public class L6905 extends TradeBuffer {
 		String iAcNoCodeE = "";
 		String iAcSubCode = titaVo.getParam("AcSubCode").trim();
 		String iAcDtlCode = titaVo.getParam("AcDtlCode").trim();
+		String iRvNo = titaVo.getParam("RvNo").trim();
 		int iAcDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		int iFAcDate = iAcDate + 19110000;
 		String iTlrItem = "";
@@ -115,32 +115,59 @@ public class L6905 extends TradeBuffer {
 		Slice<AcDetail> slAcDetail = null;
 		switch (iInqType) {
 		case 0: // 全部彙計方式
-			slAcDetail = sAcDetailService.SubBookAcNoCodeRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE,
-					this.index, this.limit, titaVo);
+			if(iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookAcNoCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, this.index, this.limit, titaVo);
+			} else {
+				slAcDetail = sAcDetailService.SubBookAcNoCodeRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iRvNo+"%", this.index, this.limit, titaVo);
+			}
+			
 			break;
 		case 1: // 彙總別
-			slAcDetail = sAcDetailService.SubBookSumNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE,
-					iSumNo, iSumNo, this.index, this.limit, titaVo);
+			if(iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookSumNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSumNo, iSumNo, this.index,this.limit, titaVo);
+			} else {
+				slAcDetail = sAcDetailService.SubBookSumNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSumNo, iSumNo, iRvNo+"%", this.index,this.limit, titaVo);
+			}
 			break;
 		case 2: // 經辦別
-			slAcDetail = sAcDetailService.SubBookTitaTlrNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, iTitaTlrNo, iTitaTlrNo, this.index, this.limit, titaVo);
+			if(iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookTitaTlrNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaTlrNo, iTitaTlrNo, this.index, this.limit, titaVo);
+			} else {
+				slAcDetail = sAcDetailService.SubBookTitaTlrNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaTlrNo, iTitaTlrNo,iRvNo+"%", this.index, this.limit, titaVo);			
+			}
+			
 			break;
 		case 3: // 整批批號
-			slAcDetail = sAcDetailService.SubBookTitaBatchNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, iTitaBatchNo, iTitaBatchNo, this.index, this.limit, titaVo);
+			if(iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookTitaBatchNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaBatchNo, iTitaBatchNo, this.index, this.limit, titaVo);
+			} else {
+				slAcDetail = sAcDetailService.SubBookTitaBatchNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaBatchNo, iTitaBatchNo,iRvNo+"%", this.index, this.limit, titaVo);
+			}
+						
 			break;
 		case 4: // 摘要代號
-			slAcDetail = sAcDetailService.SubBookDscptCodeRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, iDscptCode, iDscptCode, this.index, this.limit, titaVo);
+			if(iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookDscptCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iDscptCode, iDscptCode, this.index, this.limit, titaVo);
+			} else {
+				slAcDetail = sAcDetailService.SubBookDscptCodeRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iDscptCode, iDscptCode,iRvNo+"%", this.index, this.limit, titaVo);
+			}
+						
 			break;
 		case 5: // 傳票批號
-			slAcDetail = sAcDetailService.SubBookSlipBatNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, iSlipBatNo, iSlipBatNo, this.index, this.limit, titaVo);
+			if(iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookSlipBatNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSlipBatNo, iSlipBatNo, this.index, this.limit, titaVo);
+			} else {
+				slAcDetail = sAcDetailService.SubBookSlipBatNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iSlipBatNo, iSlipBatNo,iRvNo+"%", this.index, this.limit, titaVo);
+							}
+			
 			break;
 		case 6: // 業務類別
-			slAcDetail = sAcDetailService.SubBookTitaSecNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, iTitaSecNo, iTitaSecNo, this.index, this.limit, titaVo);
+			if(iRvNo.trim().isEmpty()) {
+				slAcDetail = sAcDetailService.SubBookTitaSecNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaSecNo, iTitaSecNo, this.index, this.limit, titaVo);
+			} else {
+				slAcDetail = sAcDetailService.SubBookTitaSecNoRange1(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, iTitaSecNo, iTitaSecNo,iRvNo+"%", this.index, this.limit, titaVo);
+			}
+						
 			break;
 		}
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
@@ -151,10 +178,8 @@ public class L6905 extends TradeBuffer {
 		// 如有找到資料
 		for (AcDetail tAcDetail : lAcDetail) {
 
-			this.info("L6905 AcNoCode : " + iAcBookCode + "-" + iAcNoCodeS + "-" + iAcSubCode + "-" + iAcDtlCode + "-"
-					+ tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-" + tAcDetail.getAcDtlCode() + "-"
-					+ tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-"
-					+ tAcDetail.getEntAc());
+			this.info("L6905 AcNoCode : " + iAcBookCode + "-" + iAcNoCodeS + "-" + iAcSubCode + "-" + iAcDtlCode + "-" + tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-"
+					+ tAcDetail.getAcDtlCode() + "-" + tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-" + tAcDetail.getEntAc());
 
 			// 不含未入帳,例如:未放行之交易
 			// 0:未入帳 1:已入帳 2:被沖正(隔日訂正) 3.沖正(隔日訂正)
@@ -180,8 +205,7 @@ public class L6905 extends TradeBuffer {
 			}
 
 			// 0:全部;1:借;2:貸 -> 不等時找下一筆
-			if ((iDbCr.equals("1") && !(tAcDetail.getDbCr().equals("D")))
-					|| (iDbCr.equals("2") && !(tAcDetail.getDbCr().equals("C")))) {
+			if ((iDbCr.equals("1") && !(tAcDetail.getDbCr().equals("D"))) || (iDbCr.equals("2") && !(tAcDetail.getDbCr().equals("C")))) {
 				this.info("L6905 DC ");
 				continue;
 			}
@@ -255,9 +279,7 @@ public class L6905 extends TradeBuffer {
 			occursList.putParam("OOLastTime", Time);
 
 			// 查詢會計科子細目設定檔
-			CdAcCode tCdAcCode = sCdAcCodeService.findById(
-					new CdAcCodeId(tAcDetail.getAcNoCode(), tAcDetail.getAcSubCode(), tAcDetail.getAcDtlCode()),
-					titaVo);
+			CdAcCode tCdAcCode = sCdAcCodeService.findById(new CdAcCodeId(tAcDetail.getAcNoCode(), tAcDetail.getAcSubCode(), tAcDetail.getAcDtlCode()), titaVo);
 			if (tCdAcCode == null) {
 				occursList.putParam("OOAcNoItem", "");
 			} else {

@@ -100,6 +100,27 @@ public interface AcDetailRepositoryHist extends JpaRepository<AcDetail, AcDetail
   // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND TitaSecNo >= ,AND TitaSecNo <= 
   public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaSecNo_7, String titaSecNo_8, Pageable pageable);
 
+  // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND RvNo %
+  public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String rvNo_7, Pageable pageable);
+
+  // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND SumNo >= ,AND SumNo <= ,AND RvNo %
+  public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String sumNo_7, String sumNo_8, String rvNo_9, Pageable pageable);
+
+  // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND TitaTlrNo >= ,AND TitaTlrNo <= ,AND RvNo %
+  public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaTlrNo_7, String titaTlrNo_8, String rvNo_9, Pageable pageable);
+
+  // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND TitaBatchNo >= ,AND TitaBatchNo <= ,AND RvNo %
+  public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaBatchNo_7, String titaBatchNo_8, String rvNo_9, Pageable pageable);
+
+  // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND DscptCode >= ,AND DscptCode <= ,AND RvNo %
+  public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String dscptCode_7, String dscptCode_8, String rvNo_9, Pageable pageable);
+
+  // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND SlipBatNo >= ,AND SlipBatNo <= ,AND RvNo %
+  public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, int slipBatNo_7, int slipBatNo_8, String rvNo_9, Pageable pageable);
+
+  // AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode >= ,AND AcNoCode <= ,AND TitaSecNo >= ,AND TitaSecNo <= ,AND RvNo %
+  public Slice<AcDetail> findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaSecNo_7, String titaSecNo_8, String rvNo_9, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

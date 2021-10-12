@@ -1146,7 +1146,7 @@ public class TxBatchCom extends TradeBuffer {
 			// 提前結案需先執行 L2631-清償作業
 			// 處理狀態:2.人工處理
 			// 處理說明:提前結案請先執行 L2631-清償作業(L2077)
-			if (this.closeFg == 2 && tBatxDetail.getRepayCode() != 1) {
+			if (this.closeFg == 2) {
 				facCloseRepayType(tBatxDetail, titaVo);
 				if (this.closeReasonCode == null) {
 					this.checkMsg = "提前結案請先執行 L2631-清償作業(L2077)";
@@ -1172,6 +1172,14 @@ public class TxBatchCom extends TradeBuffer {
 				this.procStsCode = "2"; // 2.人工處理
 				break;
 			}
+			// 檢核正常
+			if (this.closeFg == 1) {
+				this.checkMsg = "正常結案 ";
+			} else {
+				this.checkMsg = "提前結案 ";
+			}
+			apendcheckMsgAmounts(tBatxDetail, titaVo);
+			this.procStsCode = "4"; // 4.檢核正常
 			break;
 
 		// 04-帳管費 05-火險費 06-契變手續費 07-法務費
@@ -1201,6 +1209,8 @@ public class TxBatchCom extends TradeBuffer {
 			if (this.repayTypeFee.compareTo(BigDecimal.ZERO) == 0) {
 				this.checkMsg = "金額不足: "
 						+ this.unPayRepayTypeFee.subtract(tBatxDetail.getRepayAmt().subtract(this.tavAmt));
+				apendcheckMsgAmounts(tBatxDetail, titaVo);
+				this.procStsCode = "2"; // 2.人工處理
 				break;
 			}
 			break;

@@ -462,6 +462,144 @@ public interface AcDetailService {
   public Slice<AcDetail> SubBookTitaSecNoRange(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaSecNo_7, String titaSecNo_8, int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND RvNo %
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acDate_4 acDate_4
+   * @param acNoCode_5 acNoCode_5
+   * @param acNoCode_6 acNoCode_6
+   * @param rvNo_7 rvNo_7
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> SubBookAcNoCodeRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String rvNo_7, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND SumNo &gt;= ,AND SumNo &lt;= ,AND RvNo %
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acDate_4 acDate_4
+   * @param acNoCode_5 acNoCode_5
+   * @param acNoCode_6 acNoCode_6
+   * @param sumNo_7 sumNo_7
+   * @param sumNo_8 sumNo_8
+   * @param rvNo_9 rvNo_9
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> SubBookSumNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String sumNo_7, String sumNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND TitaTlrNo &gt;= ,AND TitaTlrNo &lt;= ,AND RvNo %
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acDate_4 acDate_4
+   * @param acNoCode_5 acNoCode_5
+   * @param acNoCode_6 acNoCode_6
+   * @param titaTlrNo_7 titaTlrNo_7
+   * @param titaTlrNo_8 titaTlrNo_8
+   * @param rvNo_9 rvNo_9
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> SubBookTitaTlrNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaTlrNo_7, String titaTlrNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND TitaBatchNo &gt;= ,AND TitaBatchNo &lt;= ,AND RvNo %
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acDate_4 acDate_4
+   * @param acNoCode_5 acNoCode_5
+   * @param acNoCode_6 acNoCode_6
+   * @param titaBatchNo_7 titaBatchNo_7
+   * @param titaBatchNo_8 titaBatchNo_8
+   * @param rvNo_9 rvNo_9
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> SubBookTitaBatchNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaBatchNo_7, String titaBatchNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND DscptCode &gt;= ,AND DscptCode &lt;= ,AND RvNo %
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acDate_4 acDate_4
+   * @param acNoCode_5 acNoCode_5
+   * @param acNoCode_6 acNoCode_6
+   * @param dscptCode_7 dscptCode_7
+   * @param dscptCode_8 dscptCode_8
+   * @param rvNo_9 rvNo_9
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> SubBookDscptCodeRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String dscptCode_7, String dscptCode_8, String rvNo_9, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND SlipBatNo &gt;= ,AND SlipBatNo &lt;= ,AND RvNo %
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acDate_4 acDate_4
+   * @param acNoCode_5 acNoCode_5
+   * @param acNoCode_6 acNoCode_6
+   * @param slipBatNo_7 slipBatNo_7
+   * @param slipBatNo_8 slipBatNo_8
+   * @param rvNo_9 rvNo_9
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> SubBookSlipBatNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, int slipBatNo_7, int slipBatNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcBookCode = ,AND AcSubBookCode % ,AND BranchNo = ,AND CurrencyCode = ,AND AcDate = ,AND AcNoCode &gt;= ,AND AcNoCode &lt;= ,AND TitaSecNo &gt;= ,AND TitaSecNo &lt;= ,AND RvNo %
+   *
+   * @param acBookCode_0 acBookCode_0
+   * @param acSubBookCode_1 acSubBookCode_1
+   * @param branchNo_2 branchNo_2
+   * @param currencyCode_3 currencyCode_3
+   * @param acDate_4 acDate_4
+   * @param acNoCode_5 acNoCode_5
+   * @param acNoCode_6 acNoCode_6
+   * @param titaSecNo_7 titaSecNo_7
+   * @param titaSecNo_8 titaSecNo_8
+   * @param rvNo_9 rvNo_9
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcDetail AcDetail of List
+   */
+  public Slice<AcDetail> SubBookTitaSecNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaSecNo_7, String titaSecNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By AcDetail
    * 
    * @param acDetailId key

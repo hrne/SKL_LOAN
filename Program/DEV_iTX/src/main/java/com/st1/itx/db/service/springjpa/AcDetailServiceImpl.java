@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("acDetailService")
 @Repository
-public class AcDetailServiceImpl implements AcDetailService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(AcDetailServiceImpl.class);
-
+public class AcDetailServiceImpl extends ASpringJpaParm implements AcDetailService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class AcDetailServiceImpl implements AcDetailService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + acDetailId);
+    this.info("findById " + dbName + " " + acDetailId);
     Optional<AcDetail> acDetail = null;
     if (dbName.equals(ContentName.onDay))
       acDetail = acDetailReposDay.findById(acDetailId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "RelDy", "RelTxseq", "AcSeq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "RelDy", "RelTxseq", "AcSeq"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = acDetailReposHist.findAll(pageable);
     else 
       slice = acDetailRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlRelTxseqEq " + dbName + " : " + "relDy_0 : " + relDy_0 + " relTxseq_1 : " +  relTxseq_1 + " acDate_2 : " +  acDate_2);
+    this.info("acdtlRelTxseqEq " + dbName + " : " + "relDy_0 : " + relDy_0 + " relTxseq_1 : " +  relTxseq_1 + " acDate_2 : " +  acDate_2);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByRelDyIsAndRelTxseqIsAndAcDateIsOrderByAcSeqAsc(relDy_0, relTxseq_1, acDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = acDetailReposHist.findAllByRelDyIsAndRelTxseqIsAndAcDateIsOrderByAcSeqAsc(relDy_0, relTxseq_1, acDate_2, pageable);
     else 
       slice = acDetailRepos.findAllByRelDyIsAndRelTxseqIsAndAcDateIsOrderByAcSeqAsc(relDy_0, relTxseq_1, acDate_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlAcDateRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acNoCode_4 : " +  acNoCode_4 + " acSubCode_5 : " +  acSubCode_5 + " acDtlCode_6 : " +  acDtlCode_6 + " acDate_7 : " +  acDate_7 + " acDate_8 : " +  acDate_8);
+    this.info("acdtlAcDateRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acNoCode_4 : " +  acNoCode_4 + " acSubCode_5 : " +  acSubCode_5 + " acDtlCode_6 : " +  acDtlCode_6 + " acDate_7 : " +  acDate_7 + " acDate_8 : " +  acDate_8);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, acDate_7, acDate_8, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, acDate_7, acDate_8, pageable);
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, acDate_7, acDate_8, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlSumNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " sumNo_5 : " +  sumNo_5 + " sumNo_6 : " +  sumNo_6);
+    this.info("acdtlSumNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " sumNo_5 : " +  sumNo_5 + " sumNo_6 : " +  sumNo_6);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, sumNo_5, sumNo_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, sumNo_5, sumNo_6, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, sumNo_5, sumNo_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlTitaTlrNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " titaTlrNo_5 : " +  titaTlrNo_5 + " titaTlrNo_6 : " +  titaTlrNo_6);
+    this.info("acdtlTitaTlrNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " titaTlrNo_5 : " +  titaTlrNo_5 + " titaTlrNo_6 : " +  titaTlrNo_6);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaTlrNo_5, titaTlrNo_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -206,6 +214,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaTlrNo_5, titaTlrNo_6, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaTlrNo_5, titaTlrNo_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -222,7 +233,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlTitaBatchNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " titaBatchNo_5 : " +  titaBatchNo_5 + " titaBatchNo_6 : " +  titaBatchNo_6);
+    this.info("acdtlTitaBatchNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " titaBatchNo_5 : " +  titaBatchNo_5 + " titaBatchNo_6 : " +  titaBatchNo_6);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaBatchNo_5, titaBatchNo_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -231,6 +242,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaBatchNo_5, titaBatchNo_6, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaBatchNo_5, titaBatchNo_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -247,7 +261,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlDscptCodeRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " dscptCode_5 : " +  dscptCode_5 + " dscptCode_6 : " +  dscptCode_6);
+    this.info("acdtlDscptCodeRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " dscptCode_5 : " +  dscptCode_5 + " dscptCode_6 : " +  dscptCode_6);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, dscptCode_5, dscptCode_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -256,6 +270,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, dscptCode_5, dscptCode_6, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, dscptCode_5, dscptCode_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -272,7 +289,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlSlipBatNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " slipBatNo_5 : " +  slipBatNo_5 + " slipBatNo_6 : " +  slipBatNo_6);
+    this.info("acdtlSlipBatNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " slipBatNo_5 : " +  slipBatNo_5 + " slipBatNo_6 : " +  slipBatNo_6);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, slipBatNo_5, slipBatNo_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -281,6 +298,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, slipBatNo_5, slipBatNo_6, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, slipBatNo_5, slipBatNo_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -297,7 +317,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlTitaSecNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " titaSecNo_5 : " +  titaSecNo_5 + " titaSecNo_6 : " +  titaSecNo_6);
+    this.info("acdtlTitaSecNoRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4 + " titaSecNo_5 : " +  titaSecNo_5 + " titaSecNo_6 : " +  titaSecNo_6);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaSecNo_5, titaSecNo_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -306,6 +326,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaSecNo_5, titaSecNo_6, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, titaSecNo_5, titaSecNo_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -322,7 +345,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlAcNoCodeRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4);
+    this.info("acdtlAcNoCodeRange " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " acNoCode_3 : " +  acNoCode_3 + " acNoCode_4 : " +  acNoCode_4);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -331,6 +354,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(branchNo_0, currencyCode_1, acDate_2, acNoCode_3, acNoCode_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -347,7 +373,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlCustNo " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " custNo_3 : " +  custNo_3);
+    this.info("acdtlCustNo " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " custNo_3 : " +  custNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndCustNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, custNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -356,6 +382,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndCustNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, custNo_3, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndCustNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, custNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -372,7 +401,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlTitaTlrNo " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " titaTlrNo_3 : " +  titaTlrNo_3);
+    this.info("acdtlTitaTlrNo " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " titaTlrNo_3 : " +  titaTlrNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaTlrNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaTlrNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -381,6 +410,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaTlrNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaTlrNo_3, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaTlrNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaTlrNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -397,7 +429,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlTitaBatchNo " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " titaBatchNo_3 : " +  titaBatchNo_3);
+    this.info("acdtlTitaBatchNo " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " titaBatchNo_3 : " +  titaBatchNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaBatchNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaBatchNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -406,6 +438,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaBatchNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaBatchNo_3, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaBatchNoIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaBatchNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -422,7 +457,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("acdtlTitaTxCd " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " titaTxCd_3 : " +  titaTxCd_3);
+    this.info("acdtlTitaTxCd " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " titaTxCd_3 : " +  titaTxCd_3);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaTxCdIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaTxCd_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -431,6 +466,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaTxCdIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaTxCd_3, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaTxCdIsOrderByRelTxseqAscAcSeqAsc(branchNo_0, currencyCode_1, acDate_2, titaTxCd_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -447,7 +485,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL9RptData " + dbName + " : " + "acDate_0 : " + acDate_0 + " slipBatNo_1 : " +  slipBatNo_1);
+    this.info("findL9RptData " + dbName + " : " + "acDate_0 : " + acDate_0 + " slipBatNo_1 : " +  slipBatNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcDateIsAndSlipBatNoIsOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acDate_0, slipBatNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -456,6 +494,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcDateIsAndSlipBatNoIsOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acDate_0, slipBatNo_1, pageable);
     else 
       slice = acDetailRepos.findAllByAcDateIsAndSlipBatNoIsOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acDate_0, slipBatNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -472,7 +513,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL2613 " + dbName + " : " + "acDate_0 : " + acDate_0 + " rvNo_1 : " +  rvNo_1 + " titaTxCd_2 : " +  titaTxCd_2);
+    this.info("findL2613 " + dbName + " : " + "acDate_0 : " + acDate_0 + " rvNo_1 : " +  rvNo_1 + " titaTxCd_2 : " +  titaTxCd_2);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcDateIsAndRvNoIsAndTitaTxCdIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acDate_0, rvNo_1, titaTxCd_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -481,6 +522,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcDateIsAndRvNoIsAndTitaTxCdIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acDate_0, rvNo_1, titaTxCd_2, pageable);
     else 
       slice = acDetailRepos.findAllByAcDateIsAndRvNoIsAndTitaTxCdIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acDate_0, rvNo_1, titaTxCd_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -497,7 +541,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findTxtNoEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaKinbr_1 : " +  titaKinbr_1 + " titaTlrNo_2 : " +  titaTlrNo_2 + " titaTxtNo_3 : " +  titaTxtNo_3);
+    this.info("findTxtNoEq " + dbName + " : " + "acDate_0 : " + acDate_0 + " titaKinbr_1 : " +  titaKinbr_1 + " titaTlrNo_2 : " +  titaTlrNo_2 + " titaTxtNo_3 : " +  titaTxtNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcDateIsAndTitaKinbrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByAcSeqAsc(acDate_0, titaKinbr_1, titaTlrNo_2, titaTxtNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -506,6 +550,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcDateIsAndTitaKinbrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByAcSeqAsc(acDate_0, titaKinbr_1, titaTlrNo_2, titaTxtNo_3, pageable);
     else 
       slice = acDetailRepos.findAllByAcDateIsAndTitaKinbrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByAcSeqAsc(acDate_0, titaKinbr_1, titaTlrNo_2, titaTxtNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -522,7 +569,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4101 " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " titaBatchNo_3 : " +  titaBatchNo_3);
+    this.info("findL4101 " + dbName + " : " + "branchNo_0 : " + branchNo_0 + " currencyCode_1 : " +  currencyCode_1 + " acDate_2 : " +  acDate_2 + " titaBatchNo_3 : " +  titaBatchNo_3);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaBatchNoIsOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(branchNo_0, currencyCode_1, acDate_2, titaBatchNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -531,6 +578,9 @@ em = null;
       slice = acDetailReposHist.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaBatchNoIsOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(branchNo_0, currencyCode_1, acDate_2, titaBatchNo_3, pageable);
     else 
       slice = acDetailRepos.findAllByBranchNoIsAndCurrencyCodeIsAndAcDateIsAndTitaBatchNoIsOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(branchNo_0, currencyCode_1, acDate_2, titaBatchNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -547,7 +597,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL6908 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acNoCode_4 : " +  acNoCode_4 + " acSubCode_5 : " +  acSubCode_5 + " acDtlCode_6 : " +  acDtlCode_6 + " custNo_7 : " +  custNo_7 + " facmNo_8 : " +  facmNo_8 + " acDate_9 : " +  acDate_9 + " acDate_10 : " +  acDate_10);
+    this.info("findL6908 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acNoCode_4 : " +  acNoCode_4 + " acSubCode_5 : " +  acSubCode_5 + " acDtlCode_6 : " +  acDtlCode_6 + " custNo_7 : " +  custNo_7 + " facmNo_8 : " +  facmNo_8 + " acDate_9 : " +  acDate_9 + " acDate_10 : " +  acDate_10);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoIsAndFacmNoIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, custNo_7, facmNo_8, acDate_9, acDate_10, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -556,6 +606,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoIsAndFacmNoIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, custNo_7, facmNo_8, acDate_9, acDate_10, pageable);
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoIsAndFacmNoIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acNoCode_4, acSubCode_5, acDtlCode_6, custNo_7, facmNo_8, acDate_9, acDate_10, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -572,7 +625,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("bormNoAcDateRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " acctFlag_3 : " +  acctFlag_3 + " acDate_4 : " +  acDate_4 + " acDate_5 : " +  acDate_5);
+    this.info("bormNoAcDateRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2 + " acctFlag_3 : " +  acctFlag_3 + " acDate_4 : " +  acDate_4 + " acDate_5 : " +  acDate_5);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndAcctFlagIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateDescSlipNoDesc(custNo_0, facmNo_1, bormNo_2, acctFlag_3, acDate_4, acDate_5, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -581,6 +634,9 @@ em = null;
       slice = acDetailReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndAcctFlagIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateDescSlipNoDesc(custNo_0, facmNo_1, bormNo_2, acctFlag_3, acDate_4, acDate_5, pageable);
     else 
       slice = acDetailRepos.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndAcctFlagIsAndAcDateGreaterThanEqualAndAcDateLessThanEqualOrderByAcDateDescSlipNoDesc(custNo_0, facmNo_1, bormNo_2, acctFlag_3, acDate_4, acDate_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -597,7 +653,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SubBookAcNoCodeRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6);
+    this.info("SubBookAcNoCodeRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -606,6 +662,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, pageable);
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -622,7 +681,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SubBookSumNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " sumNo_7 : " +  sumNo_7 + " sumNo_8 : " +  sumNo_8);
+    this.info("SubBookSumNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " sumNo_7 : " +  sumNo_7 + " sumNo_8 : " +  sumNo_8);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, sumNo_7, sumNo_8, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -631,6 +690,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, sumNo_7, sumNo_8, pageable);
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, sumNo_7, sumNo_8, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -647,7 +709,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SubBookTitaTlrNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaTlrNo_7 : " +  titaTlrNo_7 + " titaTlrNo_8 : " +  titaTlrNo_8);
+    this.info("SubBookTitaTlrNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaTlrNo_7 : " +  titaTlrNo_7 + " titaTlrNo_8 : " +  titaTlrNo_8);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaTlrNo_7, titaTlrNo_8, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -656,6 +718,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaTlrNo_7, titaTlrNo_8, pageable);
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaTlrNo_7, titaTlrNo_8, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -672,7 +737,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SubBookTitaBatchNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaBatchNo_7 : " +  titaBatchNo_7 + " titaBatchNo_8 : " +  titaBatchNo_8);
+    this.info("SubBookTitaBatchNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaBatchNo_7 : " +  titaBatchNo_7 + " titaBatchNo_8 : " +  titaBatchNo_8);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaBatchNo_7, titaBatchNo_8, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -681,6 +746,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaBatchNo_7, titaBatchNo_8, pageable);
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaBatchNo_7, titaBatchNo_8, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -697,7 +765,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SubBookDscptCodeRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " dscptCode_7 : " +  dscptCode_7 + " dscptCode_8 : " +  dscptCode_8);
+    this.info("SubBookDscptCodeRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " dscptCode_7 : " +  dscptCode_7 + " dscptCode_8 : " +  dscptCode_8);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, dscptCode_7, dscptCode_8, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -706,6 +774,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, dscptCode_7, dscptCode_8, pageable);
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, dscptCode_7, dscptCode_8, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -722,7 +793,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SubBookSlipBatNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " slipBatNo_7 : " +  slipBatNo_7 + " slipBatNo_8 : " +  slipBatNo_8);
+    this.info("SubBookSlipBatNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " slipBatNo_7 : " +  slipBatNo_7 + " slipBatNo_8 : " +  slipBatNo_8);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, slipBatNo_7, slipBatNo_8, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -731,6 +802,9 @@ em = null;
       slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, slipBatNo_7, slipBatNo_8, pageable);
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, slipBatNo_7, slipBatNo_8, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -747,7 +821,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("SubBookTitaSecNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaSecNo_7 : " +  titaSecNo_7 + " titaSecNo_8 : " +  titaSecNo_8);
+    this.info("SubBookTitaSecNoRange " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaSecNo_7 : " +  titaSecNo_7 + " titaSecNo_8 : " +  titaSecNo_8);
     if (dbName.equals(ContentName.onDay))
       slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaSecNo_7, titaSecNo_8, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -757,6 +831,205 @@ em = null;
     else 
       slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaSecNo_7, titaSecNo_8, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> SubBookAcNoCodeRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String rvNo_7, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("SubBookAcNoCodeRange1 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " rvNo_7 : " +  rvNo_7);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, rvNo_7, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, rvNo_7, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, rvNo_7, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, rvNo_7, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> SubBookSumNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String sumNo_7, String sumNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("SubBookSumNoRange1 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " sumNo_7 : " +  sumNo_7 + " sumNo_8 : " +  sumNo_8 + " rvNo_9 : " +  rvNo_9);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, sumNo_7, sumNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, sumNo_7, sumNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, sumNo_7, sumNo_8, rvNo_9, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSumNoGreaterThanEqualAndSumNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSumNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, sumNo_7, sumNo_8, rvNo_9, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> SubBookTitaTlrNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaTlrNo_7, String titaTlrNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("SubBookTitaTlrNoRange1 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaTlrNo_7 : " +  titaTlrNo_7 + " titaTlrNo_8 : " +  titaTlrNo_8 + " rvNo_9 : " +  rvNo_9);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaTlrNo_7, titaTlrNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaTlrNo_7, titaTlrNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaTlrNo_7, titaTlrNo_8, rvNo_9, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaTlrNoGreaterThanEqualAndTitaTlrNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaTlrNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaTlrNo_7, titaTlrNo_8, rvNo_9, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> SubBookTitaBatchNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaBatchNo_7, String titaBatchNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("SubBookTitaBatchNoRange1 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaBatchNo_7 : " +  titaBatchNo_7 + " titaBatchNo_8 : " +  titaBatchNo_8 + " rvNo_9 : " +  rvNo_9);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaBatchNo_7, titaBatchNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaBatchNo_7, titaBatchNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaBatchNo_7, titaBatchNo_8, rvNo_9, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaBatchNoGreaterThanEqualAndTitaBatchNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaBatchNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaBatchNo_7, titaBatchNo_8, rvNo_9, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> SubBookDscptCodeRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String dscptCode_7, String dscptCode_8, String rvNo_9, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("SubBookDscptCodeRange1 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " dscptCode_7 : " +  dscptCode_7 + " dscptCode_8 : " +  dscptCode_8 + " rvNo_9 : " +  rvNo_9);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, dscptCode_7, dscptCode_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, dscptCode_7, dscptCode_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, dscptCode_7, dscptCode_8, rvNo_9, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndDscptCodeGreaterThanEqualAndDscptCodeLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscDscptCodeAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, dscptCode_7, dscptCode_8, rvNo_9, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> SubBookSlipBatNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, int slipBatNo_7, int slipBatNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("SubBookSlipBatNoRange1 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " slipBatNo_7 : " +  slipBatNo_7 + " slipBatNo_8 : " +  slipBatNo_8 + " rvNo_9 : " +  rvNo_9);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, slipBatNo_7, slipBatNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, slipBatNo_7, slipBatNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, slipBatNo_7, slipBatNo_8, rvNo_9, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndSlipBatNoGreaterThanEqualAndSlipBatNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscSlipBatNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, slipBatNo_7, slipBatNo_8, rvNo_9, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<AcDetail> SubBookTitaSecNoRange1(String acBookCode_0, String acSubBookCode_1, String branchNo_2, String currencyCode_3, int acDate_4, String acNoCode_5, String acNoCode_6, String titaSecNo_7, String titaSecNo_8, String rvNo_9, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<AcDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("SubBookTitaSecNoRange1 " + dbName + " : " + "acBookCode_0 : " + acBookCode_0 + " acSubBookCode_1 : " +  acSubBookCode_1 + " branchNo_2 : " +  branchNo_2 + " currencyCode_3 : " +  currencyCode_3 + " acDate_4 : " +  acDate_4 + " acNoCode_5 : " +  acNoCode_5 + " acNoCode_6 : " +  acNoCode_6 + " titaSecNo_7 : " +  titaSecNo_7 + " titaSecNo_8 : " +  titaSecNo_8 + " rvNo_9 : " +  rvNo_9);
+    if (dbName.equals(ContentName.onDay))
+      slice = acDetailReposDay.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaSecNo_7, titaSecNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = acDetailReposMon.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaSecNo_7, titaSecNo_8, rvNo_9, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = acDetailReposHist.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaSecNo_7, titaSecNo_8, rvNo_9, pageable);
+    else 
+      slice = acDetailRepos.findAllByAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcDateIsAndAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndTitaSecNoGreaterThanEqualAndTitaSecNoLessThanEqualAndRvNoLikeOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAscTitaSecNoAsc(acBookCode_0, acSubBookCode_1, branchNo_2, currencyCode_3, acDate_4, acNoCode_5, acNoCode_6, titaSecNo_7, titaSecNo_8, rvNo_9, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -765,7 +1038,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + acDetailId);
+    this.info("Hold " + dbName + " " + acDetailId);
     Optional<AcDetail> acDetail = null;
     if (dbName.equals(ContentName.onDay))
       acDetail = acDetailReposDay.findByAcDetailId(acDetailId);
@@ -783,7 +1056,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + acDetail.getAcDetailId());
+    this.info("Hold " + dbName + " " + acDetail.getAcDetailId());
     Optional<AcDetail> acDetailT = null;
     if (dbName.equals(ContentName.onDay))
       acDetailT = acDetailReposDay.findByAcDetailId(acDetail.getAcDetailId());
@@ -805,7 +1078,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + acDetail.getAcDetailId());
+    this.info("Insert..." + dbName + " " + acDetail.getAcDetailId());
     if (this.findById(acDetail.getAcDetailId()) != null)
       throw new DBException(2);
 
@@ -834,7 +1107,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + acDetail.getAcDetailId());
+    this.info("Update..." + dbName + " " + acDetail.getAcDetailId());
     if (!empNot.isEmpty())
       acDetail.setLastUpdateEmpNo(empNot);
 
@@ -857,7 +1130,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + acDetail.getAcDetailId());
+    this.info("Update..." + dbName + " " + acDetail.getAcDetailId());
     if (!empNot.isEmpty())
       acDetail.setLastUpdateEmpNo(empNot);
 
@@ -877,7 +1150,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + acDetail.getAcDetailId());
+    this.info("Delete..." + dbName + " " + acDetail.getAcDetailId());
     if (dbName.equals(ContentName.onDay)) {
       acDetailReposDay.delete(acDetail);	
       acDetailReposDay.flush();
@@ -906,7 +1179,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (AcDetail t : acDetail){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -941,7 +1214,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (acDetail == null || acDetail.size() == 0)
       throw new DBException(6);
 
@@ -970,7 +1243,7 @@ em = null;
 
   @Override
   public void deleteAll(List<AcDetail> acDetail, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

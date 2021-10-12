@@ -581,7 +581,7 @@ public class BaTxCom extends TradeBuffer {
 							return c1.getNextPayIntDate() - c2.getNextPayIntDate();
 						}
 						if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
-							return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? 1 : -1);
+							return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 						}
 					}
 					// 部分償還時排序,依利率順序由大到小
@@ -795,13 +795,13 @@ public class BaTxCom extends TradeBuffer {
 				baTxVo.setIntEndDate(ca.getEndDate()); // 計息止日
 				// 期款最後一期
 				if (baTxVo.getRepayType() == 1 && ca.getEndDate() >= ln.getMaturityDate()) {
-					baTxVo.setCloseFg(2); // 1.正常結案
+					baTxVo.setCloseFg(1); // 1.正常結案
 				}
 				if (baTxVo.getRepayType() == 3) {
 					if (ca.getEndDate() >= ln.getMaturityDate()) {
-						baTxVo.setCloseFg(2); // 1.正常結案
+						baTxVo.setCloseFg(1); // 1.正常結案
 					} else {
-						baTxVo.setCloseFg(1); // 2.提前結案
+						baTxVo.setCloseFg(2); // 2.提前結案
 					}
 				}
 			}
