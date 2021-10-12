@@ -244,6 +244,17 @@ public class L9711Report2 extends MakeReport {
 				} else { // 當筆日期與之前不同
 					
 					tempDate = PayIntDate;
+					
+					BreachAmt = 0;
+					Principal = 0;
+					Interest = 0;
+					LoanBal = 0;
+					
+					BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
+					Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
+					Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
+					LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
+					
 					// 應繳日
 //					if (!PayIntDate.equals(tempDate)) {
 						this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/"
@@ -264,14 +275,8 @@ public class L9711Report2 extends MakeReport {
 					// 應繳淨額
 					this.print(dataRow, 100, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
 
-					BreachAmt = 0;
-					Principal = 0;
-					Interest = 0;
-					LoanBal = 0;
-					BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
-					Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
-					Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
-					LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
+					
+				
 
 			
 				}

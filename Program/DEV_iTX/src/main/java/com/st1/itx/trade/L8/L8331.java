@@ -97,6 +97,7 @@ public class L8331 extends TradeBuffer {
 		iJcicZ448Id.setCustId(iCustId);
 		iJcicZ448Id.setApplyDate(iApplyDate);
 		iJcicZ448Id.setCourtCode(iCourtCode);
+		iJcicZ448Id.setMaxMainCode(iMaxMainCode);
 
 		// 檢核項目(D-62)
 		if (!"4".equals(iTranKey_Tmp)) {

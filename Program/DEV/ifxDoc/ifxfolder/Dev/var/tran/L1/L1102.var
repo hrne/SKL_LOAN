@@ -1253,7 +1253,7 @@ T(H,#OIsLnrelNear,#YesNoHelp)
 #OEntCodeX=X,10,L
 T(H,#OEntCode,#EntCodeHelp)
 !英文姓名
-#OEName=X,20,L
+#OEName=X,50,L
 !年收入
 #OIncomeOfYearly=n,9,L
 !年收入資料年月

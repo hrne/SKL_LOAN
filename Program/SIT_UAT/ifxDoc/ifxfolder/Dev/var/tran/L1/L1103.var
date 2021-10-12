@@ -664,14 +664,14 @@ IF(#CustTypeAft==#CustTypeBef,T(3,),T(3,X))
 #EmpnoAft=X,6,I
 C(5,#CustTypeAft,01,$,S)
 @
-C(5,#CustTypeBef,#CustTypeAft,C(5,#EmpnoBef,#EmpnoAft,$,V(7)))
+C(5,#CustTypeBef,#CustTypeAft,C(5,#EmpnoBef,#EmpnoAft,$,V(7)),$)
 
 #EmpnoInd=_,_,L
 IF(#EmpnoAft==#EmpnoBef,T(3,),T(3,X))
 
 #RIM_L2R08=X,1,S
 C(5,#CustTypeAft,01,$,S)
-C(5,#CustTypeBef,#CustTypeAft,C(5,#EmpnoBef,#EmpnoAft,S,$))
+C(5,#CustTypeBef,#CustTypeAft,C(5,#EmpnoBef,#EmpnoAft,S,$),$)
 RESET_RIM(#RIM_L2R08,L2R08)
 T(2,@RimEmployeeNo,#EmpnoAft)
 S(L2R08,1,#RimTxCode,#RimEmployeeNo)

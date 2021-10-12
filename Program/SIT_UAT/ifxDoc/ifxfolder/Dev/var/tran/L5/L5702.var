@@ -381,8 +381,8 @@ T(2,@MainFinCodeX,#L5r12BankItem)
 #OrgRepayPrincipal=m,14,L
 #NewRepayPrincipal=m,14,L
 ! Org還本利息
-#OrgRepayInterest=m,14,L
-#NewRepayInterest=m,14,L
+#OrgRepayInterest=+m,14,L
+#NewRepayInterest=+m,14,L
 ! Org二階段註記
 #TwoStepCode=X,1,L
 ! 申請變更還款條件日
@@ -614,8 +614,8 @@ BIND(#BtnShareAmt,click, {cmd=CHAIN; ntxcd=L5973; ntxbuf=#BufL5973})
 #TransPrincipalAmt=m,14,L
 #NewTransPrincipalAmt=m,14,L
 ! 沖銷利息
-#TransInterestAmt=m,14,L
-#NewTransInterestAmt=m,14,L
+#TransInterestAmt=+m,14,L
+#NewTransInterestAmt=+m,14,L
 ! 還款金額=TransPrincipalAmt+TransInterestAmt
 #SunPrincInter=m,14,L
 E(0,#TransPrincipalAmt+#TransInterestAmt)

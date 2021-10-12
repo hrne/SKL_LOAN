@@ -57,6 +57,7 @@ public class LM084ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                    AND ALI.\"BormNo\"    = ALIfirst.\"BormNo\" ";
 		sql += " WHERE ALIfirst.\"IntStartDate\" != 0 "; // 確保繳息迄日不會顯示為0 (滯繳息)
 		sql += "   AND ALI.\"Interest\"           > 0 "; // 樣張未顯示總利息為0者
+		sql += "   AND ALIfirst.\"YearMonth\" = :inputYearMonth";
 		sql += " GROUP BY ALIfirst.\"Aging\" ";
 		sql += "         ,LPAD(ALIfirst.\"CustNo\", 7, '0') ";
 		sql += "         ,SUBSTR(CM.\"CustName\", 0, 20) ";

@@ -125,12 +125,17 @@ public class L8326 extends TradeBuffer {
 				}
 			} // 1.2 end
 
-			// 1.3 結案日期不可早於調解申請日，亦不可晚於報送本檔案日期.
+			// 1.3.2 結案日期不可晚於報送本檔案日期.
 			if ("A".equals(iTranKey)) {
-				if (iCloseDate < iApplyDate || iCloseDate > txDate) {
-					throw new LogicException("E0005", "結案日期不可早於調解申請日，亦不可晚於報送本檔案日期.");
+				if (iCloseDate > txDate) {
+					throw new LogicException("E0005", "結案日期不可晚於報送本檔案日期.");
 				}
-			} // 1.3 end
+			} // 1.3.2 end
+			
+			// 1.3.1 結案日期不可早於調解申請日.
+			if(iCloseDate < iApplyDate) {
+				throw new LogicException("E0005", "結案日期不可早於調解申請日.");
+			}// 1.3.1 end
 
 			// 1.4
 			// 同一KEY值報送「'447':金融機構無擔保債務協議資料」後，若再報送本檔案資料時，結案理由代碼僅能報送'00','01','90'及'99'，其餘結案理由皆以剔退處理.

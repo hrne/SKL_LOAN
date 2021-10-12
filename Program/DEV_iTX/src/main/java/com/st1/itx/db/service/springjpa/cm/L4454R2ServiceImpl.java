@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -26,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4454R2ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -50,12 +47,12 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("銀扣失敗五萬元以上報表 findAll...");
+		this.info("銀扣失敗五萬元以上報表 findAll...");
 
 		entdy = titaVo.getEntDyI() + 19110000;
 
-		logger.info("entdy = " + entdy);
-		
+		this.info("entdy = " + entdy);
+
 		String sql = " select                                                                ";
 		sql += "     bdd.\"RepayAcctNo\"                       AS F0                         ";
 		sql += "   , LPAD(bd.\"CustNo\", 7 , '0')              AS F1                         ";
@@ -89,7 +86,7 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "   left join \"CustMain\" cm       on cm.\"CustNo\"     = bd.\"CustNo\"      ";
 		sql += "   left join (                                                               ";
 		sql += "          select                                                             ";
-		sql += "           \"CustUKey\"                                                      ";
+		sql += "           Distinct \"CustUKey\"                                                      ";
 		sql += "          ,\"LiaisonName\"                                                   ";
 		sql += "          ,\"Enable\"                                                        ";
 		sql += "          ,NVL(\"TelArea\" || '-', '') || NVL(\"TelNo\", '') || NVL('-' || \"TelExt\", '') as \"PhoneNo\" ";
@@ -109,13 +106,13 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "     and (bd.\"ProcCode\" <> '00000' and substr(bd.\"ProcCode\",1,1) <> 'E') ";
 		sql += "     and bd.\"RepayAmt\" >= 50000                                            ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 //
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	private int calDate(int today, int year, int month, int day) throws LogicException {

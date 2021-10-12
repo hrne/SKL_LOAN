@@ -88,17 +88,22 @@ public class L8321 extends TradeBuffer {
 			// 1.2 KEY值為IDN+報送單位wakg+dr前置協商申請日+申請變更還款條件日.***J
 
 			if ("1".equals(iTranKey_Tmp)) {
-				// 1.3 start 同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日，亦不可晚於本檔案資料報送日期
-				if (iClosedDate < iChangePayDate || iClosedDate > txDate) {
-					throw new LogicException("E0005", "同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日，亦不可晚於本檔案資料報送日期.");
+				// 1.3.2 start 同一KEY值資料變更還款條件結案日期不可晚於本檔案資料報送日期
+				if (iClosedDate > txDate) {
+					throw new LogicException("E0005", "同一KEY值資料變更還款條件結案日期不可晚於本檔案資料報送日期.");
 				}
-				// 1.3 end
+				// 1.3.2 end
 
 				// 1.4 報送本結案檔案後，同一KEY值不可再報送相關檔案之異動.***J
 
 				// 1.5 第9欄「結案原因」為'C'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須有值.***
 				// ***與「L8320(JcicZ062)檢核1.14和1.17是同一檢核，併同報送相關，在'62'-1.17處理
 			}
+			
+			// 1.3.1 start 同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日
+			if(iClosedDate < iChangePayDate) {
+				throw new LogicException("E0005", "同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日.");
+			}//1.3.1 end
 			
 			// 1.6 start
 			// 第9欄「結案原因」為'A'及'B'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須空白.

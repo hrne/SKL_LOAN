@@ -167,6 +167,7 @@ public class NegCom extends CommBuffer {
 	private int mainNextPayDate = 0;// 下次應繳日
 	private int mainPayIntDate = 0;// 繳息迄日
 	private int newStatusDate = 0;// 戶況日期
+	private int mainLastDueDate = 0;//還款結束日
 
 	private BigDecimal mainPrincipalBal = BigDecimal.ZERO;// 總本金餘額
 	private BigDecimal mainRepayPrincipal = BigDecimal.ZERO;// 累償還本金
@@ -193,6 +194,7 @@ public class NegCom extends CommBuffer {
 	private int transIntEndDate = 0;// 繳息迄日
 	private int transRepayPeriod = 0;// 還款期數
 	private int transRepayDate = 0;// 入帳還款日期
+	private int transEntryDate = 0;//入帳日期
 
 	private BigDecimal transOrgAccuOverAmt = BigDecimal.ZERO;// 累溢繳款(交易前)
 	private BigDecimal transAccuOverAmt = BigDecimal.ZERO;// 累溢繳款(交易後)
@@ -358,6 +360,7 @@ public class NegCom extends CommBuffer {
 		mainNextPayDate = tNegMain.getNextPayDate();// 下次應繳日
 		mainPayIntDate = tNegMain.getPayIntDate();// 繳息迄日
 		newStatusDate = tNegMain.getStatusDate();// 戶況日期
+		mainLastDueDate = tNegMain.getLastDueDate();//還款結束日
 
 		mainPrincipalBal = tNegMain.getPrincipalBal();// 總本金餘額
 		if (mainPrincipalBal.compareTo(BigDecimal.ZERO) == 0) {
@@ -390,7 +393,7 @@ public class NegCom extends CommBuffer {
 		transIntEndDate = tNegTrans.getIntEndDate();// 繳息迄日
 		transRepayPeriod = tNegTrans.getRepayPeriod();// 還款期數
 		transRepayDate = tNegTrans.getRepayDate();// 入帳還款日期
-		int transEntryDate = tNegTrans.getEntryDate();//入帳日期
+		transEntryDate = tNegTrans.getEntryDate();//入帳日期
 
 		transOrgAccuOverAmt = tNegMain.getAccuOverAmt();// 累溢繳款(交易前)
 		transAccuOverAmt = tNegTrans.getAccuOverAmt();// 累溢繳款(交易後)
@@ -413,25 +416,53 @@ public class NegCom extends CommBuffer {
 
 		}
 
+		//喘息期間繳款-同步調整下次繳款日,還款結束日,繳息迄日
+		if (tNegMain.getDeferYMStart() > 0) {
+			int dayst = tNegMain.getDeferYMStart() * 100 - 19110000 + 01;
+			int dayend = tNegMain.getDeferYMEnd() * 100 - 19110000 + 31;
+			int dayend10 = tNegMain.getDeferYMEnd() * 100 - 19110000 + 10;
+			String itransEntryDate = String.valueOf(transEntryDate).substring(0,5)+"10";
+			int daynext = Integer.valueOf(itransEntryDate);// 需取繳款日當月10號
+			int oldNextPayDate = tNegMain.getNextPayDate();//原始下次繳款日
+			if (transEntryDate >= dayst && transEntryDate <= dayend && mainNextPayDate > dayend && mainPayIntDate < dayend10) {
+				if (transEntryDate <= daynext) {// 繳款日小於等於當月10號
+					mainNextPayDate = daynext;
+				} else {
+					mainNextPayDate = getRepayDate(daynext, 1, titaVo);// 下個月10號
+				}
+				mainPayIntDate = getRepayDate(mainNextPayDate, -1, titaVo);//上次繳息迄日為下次繳款日往前推一個月
+				int period = DiffMonth(1, mainNextPayDate,oldNextPayDate ) ;//往前推幾期
+				mainLastDueDate = getRepayDate(mainLastDueDate, 0 - period , titaVo);
+			}
+		}
+		
 		// 用客戶繳款日期去算到本期為止應該還幾期
 		if (mainNextPayDate == 0) {
 			// E5009 資料檢核錯誤
 			throw new LogicException(titaVo, "E5009", "[下次應繳日]未填寫.請至L5071查詢後維護.");
 		}
 		int lastpaydate = getRepayDate(mainNextPayDate, -1, titaVo);// 上個月應繳日
-		if (transEntryDate > mainNextPayDate) { // 客戶逾期繳款應收2期利息(上期與本期)
-			transShouldPayPeriod = 2;
-			//int overyPeriod = DiffMonth(1, mainNextPayDate, Today) + 1;// 下次應繳日與本次會計日相比差了多少個月
-			//if (overyPeriod > 2) {	//	超過二期未繳款
-			//	transShouldPayPeriod = overyPeriod;	
-			//}
+
+		if (remainPeriod == 1) {//剩最後一期
+			transShouldPayPeriod = 1;
 		} else {
-			if (transEntryDate > lastpaydate) { // 上個月已繳應收1期利息(本期)
-				transShouldPayPeriod = 1;
+			if (transEntryDate > mainNextPayDate) { // 客戶逾期繳款應收2期利息(上期與本期)或以上
+				String itransEntryDatex = String.valueOf(transEntryDate).substring(5);
+				int itransEntryDatedd = Integer.valueOf(itransEntryDatex);
+				if (itransEntryDatedd == 10) {//繳款日為10號
+					transShouldPayPeriod = DiffMonth(1,mainNextPayDate , transEntryDate) + 1;
+				} else {
+					transShouldPayPeriod = DiffMonth(1,mainNextPayDate , transEntryDate) + 2;
+				}
 			} else {
-				transShouldPayPeriod = 0;
+				if (transEntryDate > lastpaydate) { // 上個月已繳應收1期利息(本期)
+					transShouldPayPeriod = 1;
+				} else {
+					transShouldPayPeriod = 0;
+				}
 			}
 		}
+
 		// -----
 		if (transShouldPayPeriod != 0) {
 			newTransDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(transShouldPayPeriod));// Trans 本次應還金額
@@ -439,6 +470,83 @@ public class NegCom extends CommBuffer {
 
 		int DiffMonth = DiffMonth(1, mainFirstDueDate, Today) + 1;// 月份差異=首次應繳日 與 會計日的月份差+1
 		mainAccuDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(DiffMonth));// Main累應還金額=Main期金*累計應還期數
+
+		//計算剩餘本利和,提前清償最後一期需以天數計算利息(含利息倒扣)
+		int accuday = 0;
+		BigDecimal accuInterest = BigDecimal.ZERO;//月利息
+		BigDecimal accuPrincipal = BigDecimal.ZERO;//本金餘額
+		BigDecimal accudayInt = BigDecimal.ZERO;//日利息
+		BigDecimal CloseAmt = BigDecimal.ZERO;//剩餘本利和
+		BigDecimal sumInterest= BigDecimal.ZERO;
+		int accuperiod = 0;//幾期利息
+		int lastday = 0;//離繳款日最近的10號
+		boolean intsubtract= false ;//利息倒扣記號
+		BigDecimal lastint = BigDecimal.ZERO;//最後一期月利息
+		// 剩餘本利和=總本金餘額(1+年利率/12/100)
+		if (remainPeriod == 1) {// 剩最後一期
+			sumInterest = calAccuDueAmt(mainDueAmt, mainPrincipalBal, mainIntRate, 1, 1);// 最後一位參數傳1代表計算利息加總
+			CloseAmt = mainPrincipalBal.add(sumInterest);
+		} else {// 提前清償
+			//lastpaydate = getRepayDate(mainNextPayDate, -1, titaVo);// 上個月應繳日
+			if (transEntryDate >= mainNextPayDate) {
+				accuperiod = DiffMonth(1, mainNextPayDate, transEntryDate) + 1;// 收幾期利息+剩餘天數利息
+			} else {
+				accuperiod = DiffMonth(1, transEntryDate, lastpaydate) + 1;// 退(剩餘天數利息 - 已收幾期利息)
+			}
+			if (transEntryDate >= mainNextPayDate) {
+				lastday = getRepayDate(mainNextPayDate, accuperiod - 1, titaVo);// 繳到哪一期的10號
+				accuday = diffday(lastday,transEntryDate);
+				accuInterest = calAccuDueAmt(mainDueAmt, mainPrincipalBal, mainIntRate, accuperiod, 1);// 幾期利息加總
+				accuPrincipal = mainPrincipalBal
+						.subtract(calAccuDueAmt(mainDueAmt, mainPrincipalBal, mainIntRate, accuperiod, 2));// 總本金餘額減掉幾期本金加總=剩餘本金
+				this.info("transEntryDate >= mainNextPayDate : accuInterest="+accuInterest+",accuPrincipal="+accuPrincipal);
+				this.info("accuday="+accuday+",lastday="+lastday+",transEntryDate="+transEntryDate);
+			} else {
+				if (transEntryDate >= lastpaydate) { // 上一期已繳,當期算到繳款日
+					lastday = lastpaydate;
+					accuperiod = 0;
+					accuday = diffday(lastpaydate, transEntryDate);
+					accuPrincipal = mainPrincipalBal;
+					this.info("transEntryDate >= lastpaydate : accuInterest="+accuInterest+",accuPrincipal="+accuPrincipal);
+					this.info("accuday="+accuday+",lastpaydate="+lastpaydate+",transEntryDate="+transEntryDate);
+				} else {// 已收利息倒扣
+					lastday = getRepayDate(lastpaydate, 0 - accuperiod, titaVo);// 已繳到哪一期往前推算繳款日前一個10號
+					accuday= diffday(lastday , transEntryDate);
+					// 新本金餘額=原總本金餘額 - (期款-利息) , 推算繳款日前之本金餘額
+					BigDecimal irate = mainIntRate.divide(new BigDecimal(1200), 15, RoundingMode.HALF_UP);
+					accuPrincipal = mainPrincipalBal;
+					for (int i = 0; i < accuperiod; i++) {
+						accuPrincipal = (accuPrincipal.add(mainDueAmt)).divide(new BigDecimal(1).add(irate), 0,
+								RoundingMode.HALF_UP);// 前一期總本金餘額
+						accuInterest = accuInterest.add(calAccuDueAmt(mainDueAmt, accuPrincipal, mainIntRate, 1, 1));// 已收幾個月利息加總
+						this.info("accuPrincipal=" + accuPrincipal + ",accuInterest=" + accuInterest);
+					}
+					intsubtract = true;
+					accuperiod = 0;
+					this.info("transEntryDate < lastpaydate : accuInterest="+accuInterest+",accuPrincipal="+accuPrincipal);
+					this.info("accuday="+accuday+",lastday="+lastday+",transEntryDate="+transEntryDate);
+				}
+			}
+			// 當期算到繳款日:日利息加總=本金餘額*年利率/100*天/365(最後才四捨五入)
+			lastint = calAccuDueAmt(mainDueAmt, accuPrincipal, mainIntRate, 1, 1);// 預估最後一期月利息
+			accudayInt = accuPrincipal.multiply(mainIntRate.divide(new BigDecimal(100)))
+					.multiply(new BigDecimal(accuday)).divide(new BigDecimal(365), 0, RoundingMode.HALF_UP);
+			this.info("lastint=" + lastint + ",accudayInt=" + accudayInt);
+			if (accudayInt.compareTo(lastint) > 0) {// 最後一期日利息大於月利息,則以月利息計算
+				accudayInt = lastint;
+			}
+			if (intsubtract == true) {
+				if (accuInterest.compareTo(accudayInt) >= 0) {
+					sumInterest = accudayInt.subtract(accuInterest);// 利息倒扣為負數
+				} else {
+					sumInterest = BigDecimal.ZERO;
+				}
+			} else {
+				sumInterest = accuInterest.add(accudayInt);
+			}
+			CloseAmt = mainPrincipalBal.add(sumInterest);// 利息算到繳息日當天
+		}
+		this.info("sumInterest="+sumInterest+",CloseAmt="+CloseAmt);
 
 		// transTxKind 0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
 		// 0:正常-匯入款＋溢收款 >= 期款
@@ -455,13 +563,9 @@ public class NegCom extends CommBuffer {
 
 		// 可抵繳金額=交易金額+累溢收
 		BigDecimal CanCountAmt = transTxAmt.add(mainAccuOverAmt);
-
-		// 剩餘本利和=總本金餘額(1+年利率/12/100) ,依期數計算
-		BigDecimal sumInterest = calAccuDueAmt(tNegMain, transShouldPayPeriod , 1);//最後一位參數傳1代表計算利息加總
-		BigDecimal CloseAmt = mainPrincipalBal.add(sumInterest);
-
+		
 		// 剩餘本利和<=可分配金額
-		if (CloseAmt.compareTo(CanCountAmt) <= 0) {
+		if (CloseAmt.compareTo(CanCountAmt) <= 0 ) {
 			// 5:提前清償
 			// 4:結清
 			transRepayPeriod = remainPeriod;
@@ -470,7 +574,7 @@ public class NegCom extends CommBuffer {
 			if (remainPeriod > 1) {
 				// 5:提前清償
 				transTxKind = "5";
-				transRepayPeriod = transShouldPayPeriod;//計算幾期利息
+				transRepayPeriod = accuperiod;//計算幾期利息
 			} else {
 				// 4:結清
 				transTxKind = "4";
@@ -545,14 +649,14 @@ public class NegCom extends CommBuffer {
 		if (transTxAmt.compareTo(rePayAmt) > 0) {
 			transTempRepayAmt = rePayAmt;// 暫收抵繳金額 = 還款金額
 			transOverRepayAmt = BigDecimal.ZERO;// 溢收抵繳金額
-			transOverAmt = transTxAmt.subtract(rePayAmt).subtract(transReturnAmt);// 轉入溢收金額= 暫收金額減還款金額減退還金額，為正時
+			transOverAmt = transTxAmt.subtract(rePayAmt);// 轉入溢收金額= 暫收金額減還款金額，為正時
 		} else {
 			transTempRepayAmt = transTxAmt;// 暫收抵繳金額 = 暫收金額
 			transOverRepayAmt = rePayAmt.subtract(transTxAmt); // 溢收抵繳金額 = 暫收金額減還款金額，為負時
 			transOverAmt = BigDecimal.ZERO;// 轉入溢收金額
 		}
 
-		mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt);// Main累繳金額
+		mainAccuTempAmt = mainAccuTempAmt.add(transTxAmt).subtract(transReturnAmt);// Main累繳金額減退還金額
 		mainAccuOverAmt = mainAccuOverAmt.add(transOverAmt).subtract(transOverRepayAmt); // Main累溢收金額=Main累溢收金額+轉入溢收金額-溢收抵繳金額
 		mainAccuOverAmt = mainAccuOverAmt.subtract(transReturnAmt); // 累溢收金額減退還金額
 		transSklShareAmt = BigDecimal.ZERO; // 新壽攤分
@@ -564,13 +668,15 @@ public class NegCom extends CommBuffer {
 			transSklShareAmt = transTxAmt;
 		}
 
-		// 計算本利(非短繳)
-		if (!"2".equals(transTxKind)) {
+		// 計算本利(正常,溢繳,提前還本),短繳不還款故金額為0不需計算
+		if ("0".equals(transTxKind) || "1".equals(transTxKind) || "3".equals(transTxKind)) {
 			calInterestAmt(rePayAmt, transRepayPeriod , titaVo);
 		}
-
-		//mainRepayPrincipal = mainRepayPrincipal.add(transPrincipalAmt);// 還本本金
-		//mainRepayInterest = mainRepayInterest.add(transInterestAmt); // 還本利息
+		if ("4".equals(transTxKind) || "5".equals(transTxKind)) {//結清或提前清償
+			transInterestAmt = sumInterest;//可能為負值
+			transPrincipalAmt = mainPrincipalBal;
+		}
+		
 		mainRepayPrincipal = transPrincipalAmt;// 還本本金-紀錄當次還本本金
 		mainRepayInterest = transInterestAmt; // 還本利息-紀錄當次還本利息
 		mainPrincipalBal = mainPrincipalBal.subtract(transPrincipalAmt);
@@ -583,12 +689,11 @@ public class NegCom extends CommBuffer {
 		
 		if (mainPayIntDate == 0) {
 			mainPayIntDate = tNegMain.getApplDate();//若為0則改為協商申請日
-			//mainPayIntDate = getRepayDate(mainFirstDueDate, -1, titaVo);
 		}
 		if (transRepayPeriod > 0) {
 			transIntStartDate = mainPayIntDate; // 繳息起日 = 繳息迄日(主檔)
-			if (mainPayIntDate == tNegMain.getApplDate()) {//第一次繳款的繳息起日=協商申請日
-				int lastPayIntDate = getRepayDate(mainFirstDueDate, -1, titaVo);//首次繳款日的前一個月
+			int lastPayIntDate = getRepayDate(mainFirstDueDate, -1, titaVo);// 首次繳款日的前一個月
+			if (mainRepaidPeriod == 0 && mainPayIntDate != lastPayIntDate && mainPayIntDate != lastpaydate) {// 第一次繳款,繳息起日為協商申請日或申請變更還款日
 				transIntEndDate = getRepayDate(lastPayIntDate, transRepayPeriod, titaVo);
 			} else {
 				transIntEndDate = getRepayDate(mainPayIntDate, transRepayPeriod, titaVo);
@@ -599,10 +704,13 @@ public class NegCom extends CommBuffer {
 
 		if ("3".equals(status)) {	//結案
 			transRepayPeriod = remainPeriod;
-			transIntEndDate = tNegMain.getLastDueDate();
+			if ("5".equals(transTxKind)) {//提前清償時利息算到繳款日
+				transIntStartDate=lastday;
+				transIntEndDate = transEntryDate;
+			} 
 			mainPayIntDate = transIntEndDate;
 			mainNextPayDate = 0;	// 下次應繳日 歸零
-			mainAccuDueAmt = mainAccuTempAmt.subtract(transReturnAmt);//結清時等於累繳金額減退還金額
+			mainAccuDueAmt = mainAccuTempAmt;//結清時等於累繳金額
 		}
 
 		mainRepaidPeriod = mainRepaidPeriod + transRepayPeriod;// 已繳期數
@@ -633,24 +741,29 @@ public class NegCom extends CommBuffer {
 		BigDecimal principal = BigDecimal.ZERO;
 
 		int count = 0;
-		for (int i = 0; i < iLoanTerm; i++) {
-			count++;
-			if (balance.compareTo(BigDecimal.ZERO) <= 0) {
-				break;
+		if (iLoanTerm > 0) {
+			for (int i = 0; i < iLoanTerm; i++) {
+				count++;
+				if (balance.compareTo(BigDecimal.ZERO) <= 0) {
+					break;
+				}
+				// iDueAmt 期金
+				interest = (balance.multiply(mainIntRate)).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP);// 應繳利息
+				principal = mainDueAmt.subtract(interest);
+				if (balance.compareTo(principal) <= 0) {
+					principal = balance;
+				}
+				balance = balance.subtract(principal);
+				transInterestAmt = transInterestAmt.add(interest);// 利息金額=應繳利息
+				this.info("NegCom Count=" + count + " ,principal=" + principal + " ,interest=" + interest
+						+ " , balance=" + balance);
 			}
-			// iDueAmt 期金
-			interest = (balance.multiply(mainIntRate)).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP);// 應繳利息
-			principal = mainDueAmt.subtract(interest);
-			balance = balance.subtract(principal);
-			transInterestAmt = transInterestAmt.add(interest);// 利息金額=應繳利息
-			this.info("NegCom Count=" + count + " ,principal=" + principal + " ,interest=" + interest + " , balance=" + balance);
 		}
-
-		if (rePayAmt.compareTo(transPrincipalAmt.add(transInterestAmt)) < 0) {
-			throw new LogicException(titaVo, "E0013",
-					"還款金額計算有誤" + rePayAmt + "," + transPrincipalAmt + "," + transInterestAmt);// 程式邏輯有誤
-		}
-
+		//if (rePayAmt.compareTo(transPrincipalAmt.add(transInterestAmt)) < 0) {
+		//	throw new LogicException(titaVo, "E0013",
+		//			"還款金額計算有誤" + rePayAmt + "," + transPrincipalAmt + "," + transInterestAmt);// 程式邏輯有誤
+		//}
+		
 		// 本金金額 = 還本息金額 - 利息金額
 		transPrincipalAmt = rePayAmt.subtract(transInterestAmt);
 
@@ -724,6 +837,7 @@ public class NegCom extends CommBuffer {
 		tNegMainUpd.setRepayInterest(mainRepayInterest);// 還本利息
 		tNegMainUpd.setAccuSklShareAmt(mainAccuSklShareAmt);// 累新壽攤分
 		tNegMainUpd.setStatus(status);// 戶況
+		tNegMainUpd.setLastDueDate(mainLastDueDate);// 還款結束日 
 		tNegMainUpd.setThisAcDate(titaVo.getEntDyI());// AcDate 本次會計日期
 		tNegMainUpd.setThisTitaTlrNo(titaVo.getTlrNo());// TitaTlrNo 本次經辦
 		tNegMainUpd.setThisTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));// TitaTxtNo 本次交易序號
@@ -995,15 +1109,10 @@ public class NegCom extends CommBuffer {
 		tJcicZ573Id.setPayDate(tNegTrans.getEntryDate());
 		tJcicZ573Id.setSubmitKey(tNegMain.getMainFinCode());
 		JcicZ573 tJcicZ573 = sJcicZ573Service.holdById(tJcicZ573Id, titaVo);
-//		if (tJcicZ573 != null) {	//點掉,改為曾報送過則再報異動
-//			if (tJcicZ573.getOutJcicTxtDate() != 0) {
-//				// E5009 資料檢核錯誤
-//				throw new LogicException(titaVo, "E5009", "已報送聯徵更生債務人繳款資料");
-//			}
-//		}
+
 		String tranKey = "";
 		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
-		BigDecimal totalPayAmt = tNegMain.getAccuTempAmt().subtract(transReturnAmt);// 累計實際還款金額:累繳金額減退還金額
+		BigDecimal totalPayAmt = mainAccuTempAmt;// 累計實際還款金額:累繳金額
 		if (titaVo.isHcodeNormal()) {
 			// 正向
 			if (tJcicZ573 != null) {
@@ -1153,16 +1262,11 @@ public class NegCom extends CommBuffer {
 		tJcicZ450Id.setSubmitKey(tNegMain.getMainFinCode());
 
 		JcicZ450 tJcicZ450 = sJcicZ450Service.holdById(tJcicZ450Id, titaVo);
-//		if (tJcicZ450 != null) {	//點掉,改為曾報送過則再報異動
-//			if (tJcicZ450.getOutJcicTxtDate() != 0) {
-//				// E5009 資料檢核錯誤
-//				throw new LogicException(titaVo, "E5009", "已報送聯徵前置調解債務人繳款資料");
-//			}
-//		}
+
 		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
 		String payStatus = ""; // 債權結案註記 Y N
-		BigDecimal sumRepayActualAmt = tNegMain.getAccuTempAmt().subtract(transReturnAmt);// 累計實際還款金額:累繳金額減退還金額
-		BigDecimal sumRepayShouldAmt = tNegMain.getAccuDueAmt();// 截至目前累計應還款金額-累期款金額
+		BigDecimal sumRepayActualAmt = mainAccuTempAmt;// 累計實際還款金額:累繳金額
+		BigDecimal sumRepayShouldAmt = mainAccuDueAmt;// 截至目前累計應還款金額:累期款金額
 		String tranKey = "";// 交易代碼
 		if (("3").equals(tNegMain.getStatus())) {
 			// 結案
@@ -1263,18 +1367,11 @@ public class NegCom extends CommBuffer {
 		tJcicZ050Id.setRcDate(tNegMain.getApplDate()); // 協商申請日-NegMain協商申請日
 		tJcicZ050Id.setSubmitKey(tNegMain.getMainFinCode());
 		JcicZ050 tJcicZ050 = sJcicZ050Service.holdById(tJcicZ050Id, titaVo);
-//		if (tJcicZ050 != null) {	//點掉,改為曾報送過則再報異動
-//			// Status = tJcicZ050.getStatus();
-//			if (tJcicZ050.getOutJcicTxtDate() != 0) {
-//				// E5009 資料檢核錯誤
-//				throw new LogicException(titaVo, "E5009", "已報送聯徵債務人繳款資料");
-//			}
-//		}
 
 		BigDecimal payAmt = tNegTrans.getTxAmt().subtract(transReturnAmt); // 本次繳款金額減退還金額
 		String payStatus = ""; // 債權結案註記 Y N
-		BigDecimal sumRepayActualAmt = tNegMain.getAccuTempAmt().subtract(transReturnAmt);// 累計實際還款金額:累繳金額減退還金額
-		BigDecimal sumRepayShouldAmt = tNegMain.getAccuDueAmt();// 截至目前累計應還款金額-累期款金額
+		BigDecimal sumRepayActualAmt = mainAccuTempAmt;// 累計實際還款金額:累繳金額
+		BigDecimal sumRepayShouldAmt = mainAccuDueAmt;// 截至目前累計應還款金額:累期款金額
 		String tranKey = ""; // 交易代碼
 		int CloseDate = tNegTrans.getEntryDate(); // 結案日期
 
@@ -1841,8 +1938,9 @@ public class NegCom extends CommBuffer {
 		int diffPeriod = DiffMonth(1, nextPayDate, finallDate) + 1;
 		OOPayTerm = String.valueOf(diffPeriod);
 		//OOPayAmt = String.valueOf(dueAmt.multiply(BigDecimal.valueOf(diffPeriod)));
-		//計算應繳金額
-		BigDecimal accuDueAmt = calAccuDueAmt(tNegMain, diffPeriod , 0);//最後一位參數傳0代表計算本利和
+		// 計算應繳金額
+		BigDecimal accuDueAmt = calAccuDueAmt(tNegMain.getDueAmt(), tNegMain.getPrincipalBal(), tNegMain.getIntRate(),
+				diffPeriod, 0);// 最後一位參數傳0代表計算本利和
 		OOPayAmt = String.valueOf(accuDueAmt);
 
 		OOOverDueAmt = String.valueOf(BigDecimal.valueOf(Double.parseDouble(OOPayAmt)).subtract(accuOverAmt));
@@ -1853,16 +1951,14 @@ public class NegCom extends CommBuffer {
 		return Data;
 	}
 
-	public BigDecimal calAccuDueAmt(NegMain tNegMain, int diffPeriod , int type) {
-		//type=0 本利和 , 1=利息加總
-		BigDecimal dueAmt = tNegMain.getDueAmt();// 月付金(期款)
-		BigDecimal oBalance = tNegMain.getPrincipalBal();// 剩餘本金
-		BigDecimal irate = tNegMain.getIntRate();// 利率
+	public BigDecimal calAccuDueAmt(BigDecimal dueAmt,BigDecimal oBalance,BigDecimal irate, int diffPeriod , int type) {
+		//type=0 本利和 , 1=利息加總  ,2=本金加總
 		BigDecimal oPrincipal = BigDecimal.ZERO;// 應繳本金
 		BigDecimal oInterest = BigDecimal.ZERO;// 應繳利息
 		BigDecimal osum = BigDecimal.ZERO;// 本利和
 		BigDecimal accuDueAmt = BigDecimal.ZERO; // 應繳金額
 		BigDecimal sumInterest = BigDecimal.ZERO;// 利息加總
+		BigDecimal sumPrincipal = BigDecimal.ZERO;// 本金加總
 
 		if (diffPeriod > 0) {
 			for (int i = 0; i < diffPeriod; i++) {
@@ -1870,29 +1966,25 @@ public class NegCom extends CommBuffer {
 					break;
 				}
 				oInterest = (oBalance.multiply(irate)).divide(new BigDecimal(1200), 0, RoundingMode.HALF_UP);// 應繳利息
-				if (oBalance.compareTo(dueAmt) <= 0) {
+				oPrincipal = dueAmt.subtract(oInterest);// 應繳本金
+				if (oBalance.compareTo(oPrincipal) <= 0) {
 					oPrincipal = oBalance;
-				} else {
-					oPrincipal = dueAmt.subtract(oInterest);// 應繳本金
-				}
+				} 
 				osum = oInterest.add(oPrincipal);// 本利合計
 				sumInterest = sumInterest.add(oInterest);	//利息加總
-				if (osum.compareTo(dueAmt) < 0) {
-					oPrincipal = oBalance;
-					oBalance = BigDecimal.ZERO;
-					osum = oPrincipal.add(oInterest);
-				} else {
-					oBalance = oBalance.subtract(oPrincipal);
-				}
+				oBalance = oBalance.subtract(oPrincipal);
 				accuDueAmt = accuDueAmt.add(osum);// 應繳金額
+				sumPrincipal = sumPrincipal.add(oPrincipal);//本金加總
 			}
 			if(type==1) {//回傳利息加總
 				accuDueAmt = sumInterest;
 			}
+			if(type==2) {//回傳本金加總
+				accuDueAmt = sumPrincipal;
+			}
 		}
 		return accuDueAmt;
 	}
-	
 	
 	public int DcToRoc(Integer Ymd) {
 		if (Ymd != null && Ymd != 0) {
@@ -1919,6 +2011,22 @@ public class NegCom extends CommBuffer {
 		dateUtil.setDate_2(Date2 > Date1 ? Date2 : Date1);
 		dateUtil.dateDiff();
 		return dateUtil.getMons();
+	}
+
+	/**
+	 * 計算日差
+	 * 
+	 * @param date1     日期1
+	 * @param date2     日期2
+	 * @return 日差
+	 * @throws LogicException 交易程式需承接LogicException
+	 */
+	public int diffday(int date1, int date2) throws LogicException {
+		dateUtil.init();
+		dateUtil.setDate_1(date1 < date2 ? date1 : date2);
+		dateUtil.setDate_2(date2 > date1 ? date2 : date1);
+		dateUtil.dateDiff();
+		return dateUtil.getDays();
 	}
 
 	public String NegTransKeyValue(NegTrans tNegTrans) throws LogicException {
@@ -2020,7 +2128,7 @@ public class NegCom extends CommBuffer {
 	}
 
 	/**
-	 * nper 找出我需要繳幾期
+	 * nper 找出需要繳幾期
 	 * 
 	 * @param LoanAmt 本金
 	 * @param DueAmt  期金

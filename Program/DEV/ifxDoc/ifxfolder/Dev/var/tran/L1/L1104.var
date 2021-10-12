@@ -449,11 +449,11 @@ C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,*),T(3,*),T(3,*))
 C(5,#CustNameAft,#CustNameBef,T(3,),T(3,X))
 
 !英文姓名
-#EnameBef=X,20,L
+#EnameBef=X,50,L
 
 #EnameInd=X,1,L
 
-#EnameAft=X,20,I
+#EnameAft=X,50,I
 
 #EnameInd=_,_,L
 IF(#EnameAft==#EnameBef,T(3,),T(3,X))
