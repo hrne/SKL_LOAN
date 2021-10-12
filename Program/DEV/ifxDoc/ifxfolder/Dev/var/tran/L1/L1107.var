@@ -738,6 +738,9 @@ C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem11,S,$)
 @
 CALL(#NetValueProc)
+
+#x1=X,1,S
+CALL(#FinBtnProc2)
 </sub>
 
 <sub type="DC" name="p2" layout="cols=1;screen.width=[250,750];printer.width=[20,20,20,20];order=1">
@@ -839,6 +842,8 @@ CALL(#ParentCompanyRightProc)
 !每股盈餘EPS(元)
 #EPS=+m,14.4,I
 C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#FinBtnProc3)
 
 
 </sub>
@@ -879,6 +884,8 @@ C(4,#CashAccountItem02,S,$)
 
 #EndCash=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#FinBtnProc4)
 </sub>
 
 <sub type="DC" name="p4" layout="cols=1;screen.width=[250,750];printer.width=[20,20,20,20];order=1">
@@ -953,6 +960,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #RatePayAccount=+m,18.4,I
 C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#FinBtnProc5)
 </sub>
 
 <sub type="DC" name="p5" layout="cols=1;screen.width=[250,750];printer.width=[20,20,20,20];order=1">
@@ -991,6 +1000,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #CashGuar=+m,18.4,I
 C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#FinBtnProc6)
 
 </sub>
 

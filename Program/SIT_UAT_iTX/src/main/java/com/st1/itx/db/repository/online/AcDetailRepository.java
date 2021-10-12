@@ -64,8 +64,8 @@ public interface AcDetailRepository extends JpaRepository<AcDetail, AcDetailId> 
   // AcDate = ,AND SlipBatNo = 
   public Slice<AcDetail> findAllByAcDateIsAndSlipBatNoIsOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(int acDate_0, int slipBatNo_1, Pageable pageable);
 
-  // AcDate = ,AND RvNo = ,AND TitaTxCd =
-  public Slice<AcDetail> findAllByAcDateIsAndRvNoIsAndTitaTxCdIsOrderByRelDyAscRelTxseqAscAcSeqAsc(int acDate_0, String rvNo_1, String titaTxCd_2, Pageable pageable);
+  // AcctCode = ,AND CustNo = ,AND RvNo = ,
+  public Slice<AcDetail> findAllByAcctCodeIsAndCustNoIsAndRvNoIsOrderByRelDyAscRelTxseqAscAcSeqAsc(String acctCode_0, int custNo_1, String rvNo_2, Pageable pageable);
 
   // AcDate = ,AND TitaKinbr = ,AND TitaTlrNo = ,AND TitaTxtNo = 
   public Slice<AcDetail> findAllByAcDateIsAndTitaKinbrIsAndTitaTlrNoIsAndTitaTxtNoIsOrderByAcSeqAsc(int acDate_0, String titaKinbr_1, String titaTlrNo_2, int titaTxtNo_3, Pageable pageable);

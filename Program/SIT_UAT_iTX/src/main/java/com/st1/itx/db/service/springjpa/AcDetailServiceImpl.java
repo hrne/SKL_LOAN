@@ -502,7 +502,7 @@ em = null;
   }
 
   @Override
-  public Slice<AcDetail> findL2613(int acDate_0, String rvNo_1, String titaTxCd_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<AcDetail> findL2613(String acctCode_0, int custNo_1, String rvNo_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<AcDetail> slice = null;
     if (titaVo.length != 0)
@@ -513,15 +513,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findL2613 " + dbName + " : " + "acDate_0 : " + acDate_0 + " rvNo_1 : " +  rvNo_1 + " titaTxCd_2 : " +  titaTxCd_2);
+    this.info("findL2613 " + dbName + " : " + "acctCode_0 : " + acctCode_0 + " custNo_1 : " +  custNo_1 + " rvNo_2 : " +  rvNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = acDetailReposDay.findAllByAcDateIsAndRvNoIsAndTitaTxCdIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acDate_0, rvNo_1, titaTxCd_2, pageable);
+      slice = acDetailReposDay.findAllByAcctCodeIsAndCustNoIsAndRvNoIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acctCode_0, custNo_1, rvNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = acDetailReposMon.findAllByAcDateIsAndRvNoIsAndTitaTxCdIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acDate_0, rvNo_1, titaTxCd_2, pageable);
+      slice = acDetailReposMon.findAllByAcctCodeIsAndCustNoIsAndRvNoIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acctCode_0, custNo_1, rvNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = acDetailReposHist.findAllByAcDateIsAndRvNoIsAndTitaTxCdIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acDate_0, rvNo_1, titaTxCd_2, pageable);
+      slice = acDetailReposHist.findAllByAcctCodeIsAndCustNoIsAndRvNoIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acctCode_0, custNo_1, rvNo_2, pageable);
     else 
-      slice = acDetailRepos.findAllByAcDateIsAndRvNoIsAndTitaTxCdIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acDate_0, rvNo_1, titaTxCd_2, pageable);
+      slice = acDetailRepos.findAllByAcctCodeIsAndCustNoIsAndRvNoIsOrderByRelDyAscRelTxseqAscAcSeqAsc(acctCode_0, custNo_1, rvNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度](tota-body-occurs的長度)
 #INQLEN=n,3,S
-E(0,35)ASGN(INQLEN$)
+E(0,136)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -136,6 +136,9 @@ E(0,0)
 !<include src="COM.icf::RPTFG.dec"/>
 #RPTFG=A,1,S
 E(0,0)
+
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
 
 </sub>
 

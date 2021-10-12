@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -19,6 +17,9 @@ import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 
 import com.st1.itx.db.domain.CdBranch;
+import com.st1.itx.db.domain.CdBranchGroup;
+import com.st1.itx.db.domain.CdBranchGroupId;
+import com.st1.itx.db.service.CdBranchGroupService;
 import com.st1.itx.db.service.CdBranchService;
 
 @Service("L6041")
@@ -30,7 +31,6 @@ import com.st1.itx.db.service.CdBranchService;
  * @version 1.0.0
  */
 public class L6041 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6041.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -39,6 +39,9 @@ public class L6041 extends TradeBuffer {
 	@Autowired
 	CdBranchService cdBranchService;
 
+	@Autowired
+	CdBranchGroupService cdBranchGroupService;
+	
 	boolean first = true;
 
 	@Override
@@ -64,39 +67,29 @@ public class L6041 extends TradeBuffer {
 			throw new LogicException("E0001", "");
 		} else {
 			CdBranch cdBranch = null;
+			CdBranchGroup cdBranchGroup = null;
 			for (TxTeller tTxTeller : lTxTeller) {
 				if (first) {
 					cdBranch = cdBranchService.findById(iBrNo, titaVo);
 					first = false;
 				}
-
+				
+				
+				
 				OccursList occursList = new OccursList();
 				occursList.putParam("OTlrNo", tTxTeller.getTlrNo());
 				occursList.putParam("OTlrItem", tTxTeller.getTlrItem());
 				occursList.putParam("OBrNo", tTxTeller.getBrNo());
 				occursList.putParam("OBrItem", cdBranch.getBranchItem());
 				occursList.putParam("OGroupNo", tTxTeller.getGroupNo());
-				if ("1".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup1());
-				} else if ("2".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup2());
-				} else if ("3".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup3());
-				} else if ("4".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup4());
-				} else if ("5".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup5());
-				} else if ("6".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup6());
-				} else if ("7".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup7());
-				} else if ("8".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup8());
-				} else if ("9".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup9());
-				} else if ("A".equals(tTxTeller.getGroupNo())) {
-					occursList.putParam("OGroupItem", cdBranch.getGroup10());
+				
+				cdBranchGroup = cdBranchGroupService.findById(new CdBranchGroupId(iBrNo, tTxTeller.getGroupNo()),titaVo);
+				
+				if(cdBranchGroup!=null) {
+				occursList.putParam("OGroupItem", cdBranchGroup.getGroupItem());
+					
 				}
+				
 //				occursList.putParam("OAuthNo", tTxTeller.getAuthNo());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

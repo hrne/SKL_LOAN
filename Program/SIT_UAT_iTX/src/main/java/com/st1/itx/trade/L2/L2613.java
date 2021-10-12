@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -44,7 +42,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2613 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2613.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -91,8 +88,7 @@ public class L2613 extends TradeBuffer {
 		// new table
 		CustMain tCustMain = new CustMain();
 
-		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.overdueDateBetween(iOverdueDateStart,
-				iOverdueDateEnd, this.index, this.limit);
+		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.overdueDateBetween(iOverdueDateStart, iOverdueDateEnd, this.index, this.limit);
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 		if (lForeclosureFee == null) {
 			// 法拍費用檔無資料
@@ -104,7 +100,7 @@ public class L2613 extends TradeBuffer {
 			tCustMain = new CustMain();
 			lAcDetail = new ArrayList<AcDetail>();
 			tCustMain = custMainService.custNoFirst(tForeclosureFee.getCustNo(), tForeclosureFee.getCustNo());
-
+			int custno = tForeclosureFee.getCustNo();
 			int acDate = tForeclosureFee.getOverdueDate() + 19110000;
 			String rvNo = parse.IntegerToString(tForeclosureFee.getRecordNo(), 7);
 			this.info("acDate = " + acDate);
@@ -112,7 +108,7 @@ public class L2613 extends TradeBuffer {
 			int dSlipNo = 0;
 			int cSlipNo = 0;
 
-			Slice<AcDetail> slAcDetail = acDetailService.findL2613(acDate, rvNo, "L618C", this.index, this.limit);
+			Slice<AcDetail> slAcDetail = acDetailService.findL2613("F24",custno ,rvNo, this.index, this.limit);
 			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 			if (lAcDetail == null) {
 				lAcDetail = new ArrayList<AcDetail>();

@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -37,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2614 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2614.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -85,8 +82,7 @@ public class L2614 extends TradeBuffer {
 		CustMain tCustMain = new CustMain();
 		CdAcCode tmpCdAcCode = new CdAcCode();
 
-		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.overdueDateBetween(iOverdueDate, iOverdueDate,
-				this.index, this.limit);
+		Slice<ForeclosureFee> slForeclosureFee = foreclosureFeeService.overdueDateBetween(iOverdueDate, iOverdueDate, this.index, this.limit);
 		lForeclosureFee = slForeclosureFee == null ? null : slForeclosureFee.getContent();
 
 		if (lForeclosureFee == null) {
@@ -98,9 +94,9 @@ public class L2614 extends TradeBuffer {
 		for (ForeclosureFee tForeclosureFee : lForeclosureFee) {
 			// new ArrayList
 			lAcDetail = new ArrayList<AcDetail>();
-
+			int Custno = tForeclosureFee.getCustNo();
 			String rvNo = parse.IntegerToString(tForeclosureFee.getRecordNo(), 7);
-			Slice<AcDetail> slAcDetail = acDetailService.findL2613(iOverdueDate, rvNo, "L618C", this.index, this.limit);
+			Slice<AcDetail> slAcDetail = acDetailService.findL2613("F24", Custno, rvNo, this.index, this.limit);
 			lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
 
 			this.info("lAcDetail = " + lAcDetail);

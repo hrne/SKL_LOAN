@@ -343,11 +343,15 @@ IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_A}),BI
 ! <刪除> 6+7+7+3+7+1+16+7=54
 #OOBUF_B=X,90,S
 T(2,4+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX)
+
+! <查詢> 6+7+7+3+7+1+16+7=54
+#OOBUF_C=X,90,S
+T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX)
 #OOBTN_B=A,2,O
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_B}),BIND(grid,cancel))
 
 #OOBTN_C=A,2,O
-IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_B}),BIND(grid,cancel))
+IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_C}),BIND(grid,cancel))
 
 #OOMediaCode=X,1,O
 
@@ -426,8 +430,8 @@ TXFORM=L4943
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:35}
 #OOBTN_B=刪除
 {search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:35}
-#OOBTN_C=明細
-{search:false,formatter:'cust:bind-button:明細',align:'center',canExport:false,width:35}
+#OOBTN_C=查詢
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:35}
 #OOEntryDate=入帳日期
 {width:95}
 #OOCustNo=戶號　

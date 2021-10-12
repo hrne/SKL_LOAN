@@ -1902,13 +1902,13 @@ public class L8030 extends TradeBuffer {
 		if (sJcicZ055 != null) {
 			for (JcicZ055 xJcicZ055:sJcicZ055) {
 				OccursList occursListB = new OccursList();
-				//575 layout回傳
+				//055 layout回傳
 				occursListB.putParam("OOChainTxCd", "L8316");
 				occursListB.putParam("OOHistoryTxCd", "L8046");
 				occursListB.putParam("OOUkey", xJcicZ055.getUkey());
 				occursListB.putParam("OOCustId", xJcicZ055.getCustId());
 				occursListB.putParam("OOCourtCode", xJcicZ055.getCourtCode());
-				occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ055.getCourtCode(),titaVo));
+				occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ055.getCourtCode(),titaVo));
 				occursListB.putParam("OOClaimDate", xJcicZ055.getClaimDate());
 				occursListB.putParam("OOCaseStatus", xJcicZ055.getCaseStatus());
 				occursListB.putParam("OOSubmitKey", xJcicZ055.getSubmitKey());
@@ -2007,7 +2007,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOUkey", xJcicZ056.getUkey());
 				occursListB.putParam("OOCustId", xJcicZ056.getCustId());
 				occursListB.putParam("OOCourtCode", xJcicZ056.getCourtCode());
-				occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ056.getCourtCode(),titaVo));
+				occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ056.getCourtCode(),titaVo));
 				occursListB.putParam("OOClaimDate", xJcicZ056.getClaimDate());
 				occursListB.putParam("OOCaseStatus", xJcicZ056.getCaseStatus());
 				occursListB.putParam("OOSubmitKey", xJcicZ056.getSubmitKey());
@@ -2503,7 +2503,7 @@ public class L8030 extends TradeBuffer {
 				occursListB.putParam("OOSubmitKey", xJcicZ440.getSubmitKey());
 				occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ440.getSubmitKey(),titaVo));
 				occursListB.putParam("OOCourtCode", xJcicZ440.getCourtCode());
-				occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ440.getCourtCode(),titaVo));
+				occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ440.getCourtCode(),titaVo));
 				occursListB.putParam("OOTranKey", xJcicZ440.getTranKey());
 				int iOutJcicTxtDate = 0;
 				iOutJcicTxtDate = xJcicZ440.getOutJcicTxtDate();
@@ -2602,7 +2602,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ442.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ442.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ442.getCourtCode());
-	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ442.getCourtCode(),titaVo));
+	            occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ442.getCourtCode(),titaVo));
 	            occursListB.putParam("OOMaxMainCode", xJcicZ442.getMaxMainCode());
 	            occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ442.getMaxMainCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ442.getTranKey());
@@ -2704,7 +2704,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ443.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ443.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ443.getCourtCode());
-	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ443.getCourtCode(),titaVo));
+	            occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ443.getCourtCode(),titaVo));
 	    	    occursListB.putParam("OOMaxMainCode", xJcicZ443.getMaxMainCode());
 	    	    occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ443.getMaxMainCode(),titaVo));
 	    	    occursListB.putParam("OOAccount", xJcicZ443.getAccount());
@@ -2803,7 +2803,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ444.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ444.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ444.getCourtCode());
-	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ444.getCourtCode(),titaVo));
+	            occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ444.getCourtCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ444.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ444.getOutJcicTxtDate();
@@ -2900,7 +2900,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ446.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ446.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ446.getCourtCode());
-	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ446.getCourtCode(),titaVo));
+	            occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ446.getCourtCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ446.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ446.getOutJcicTxtDate();
@@ -2997,7 +2997,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ447.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ447.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ447.getCourtCode());
-	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ447.getCourtCode(),titaVo));
+	            occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ447.getCourtCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ447.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ447.getOutJcicTxtDate();
@@ -3094,7 +3094,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ448.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ448.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ448.getCourtCode());
-	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ448.getCourtCode(),titaVo));
+	            occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ448.getCourtCode(),titaVo));
 	            occursListB.putParam("OOMaxMainCode", xJcicZ448.getMaxMainCode());
 	            occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ448.getMaxMainCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ448.getTranKey());
@@ -3193,7 +3193,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OORcDate", xJcicZ450.getApplyDate());
 	    	    occursListB.putParam("OOPayDate", xJcicZ450.getPayDate());
 	    	    occursListB.putParam("OOCourtCode", xJcicZ450.getCourtCode());
-	    	    occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ450.getCourtCode(),titaVo));
+	    	    occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ450.getCourtCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ450.getTranKey());
 	            int iOutJcicTxtDate = 0;
 	            iOutJcicTxtDate = xJcicZ450.getOutJcicTxtDate();
@@ -3291,7 +3291,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ451.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ451.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ451.getCourtCode());
-	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ451.getCourtCode(),titaVo));
+	            occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ451.getCourtCode(),titaVo));
 	            occursListB.putParam("OODelayYM", xJcicZ451.getDelayYM());
 	            occursListB.putParam("OOTranKey", xJcicZ451.getTranKey());
 	            int iOutJcicTxtDate = 0;
@@ -3391,7 +3391,7 @@ public class L8030 extends TradeBuffer {
 	            occursListB.putParam("OOSubmitKeyX", dealBankName(xJcicZ454.getSubmitKey(),titaVo));
 	            occursListB.putParam("OORcDate", xJcicZ454.getApplyDate());
 	            occursListB.putParam("OOCourtCode", xJcicZ454.getCourtCode());
-	            occursListB.putParam("OOCourtCodeX", dealBankName(xJcicZ454.getCourtCode(),titaVo));
+	            occursListB.putParam("OOCourtCodeX", dealCourtName(xJcicZ454.getCourtCode(),titaVo));
 	            occursListB.putParam("OOMaxMainCode", xJcicZ454.getMaxMainCode());
 	            occursListB.putParam("OOMaxMainCodeX", dealBankName(xJcicZ454.getMaxMainCode(),titaVo));
 	            occursListB.putParam("OOTranKey", xJcicZ454.getTranKey());
@@ -4047,5 +4047,14 @@ public class L8030 extends TradeBuffer {
 			JcicBankName=tCdCode.getItem();
 		}
 		return JcicBankName;
+	}
+	public String dealCourtName(String CourtId,TitaVo titaVo) throws LogicException {
+		CdCode tCdCode = new CdCode();
+		tCdCode=iCdCodeService.getItemFirst(8, "CourtCode", CourtId,titaVo);
+		String JcicCourtName="";//80碼長度
+		if(tCdCode!=null) {
+			JcicCourtName=tCdCode.getItem();
+		}
+		return JcicCourtName;
 	}
 }

@@ -162,7 +162,7 @@
 #RP_REMACCT=A,14,S
 
 ! 戶名
-#RP_CUSTNM=X,100,S
+#RP_CUSTNM=x,100,S
 
 ! 附言
 #RP_MEMO=X,100,S

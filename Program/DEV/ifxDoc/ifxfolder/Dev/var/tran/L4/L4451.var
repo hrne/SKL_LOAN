@@ -20,7 +20,8 @@ E(0,0)
 ["[L4451]                                 銀行扣款檔資料維護"],
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
 ["#FdEntryDate+入帳日期",#EntryDate,#EntryDateL],["#FdCustNo+戶號",#CustNo,#CustNoL,"-",#FacmNo,#FacmNoL,"-",#BormNo,#BormNoL],
-["#FdRepayType+還款類別",#RepayType,#RepayTypeX],[#LabelA,#PrevIntDate,#PrevIntDateL],
+["#FdRepayType+還款類別",#RepayType,#RepayTypeX],
+[#<->#,#LabelA,#PrevIntDate,#PrevIntDateL],
 [#<->#,"#FdPayIntDate+應繳日",#PayIntDate,#PayIntDateL],
 [#<->#,"#FdUnpaidAmt+應扣金額",#UnpaidAmt],
 [#<->#,"#FdTempAmt+暫收抵繳金額",#TempAmt],
@@ -51,8 +52,8 @@ CALL(#HelpProc)
 T(2,@RepayTypeHelp,#HelpDesc1)
 
 !功能
-#FunctionHelp=x,20,S
-T(3,1:新增;2:修改;4:刪除)
+#FunctionHelp=x,40,S
+T(3,1:新增;2:修改;4:刪除;5:查詢)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -116,13 +117,17 @@ SWITCH(#RepayType,01,T(3,@RepayTypeX,期款),
 C(3,#CHAIN,0,E(0,1),s)
 ! C(2,#FunctionCode,$,s,$,s,$)
 !HELP(2:修改;4:刪除)
-@C(3,#CHAIN,0,V(1,1),V(1,2,4))
+@C(3,#CHAIN,0,V(1,1),V(1,2,4,5))
 E(0,@FUNCIND,#FunctionCode)
 
 #FunctionCodeX=X,4,L
 T(3,)T(H,#FunctionCode,#FunctionHelp)
-C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+C(2,#FunctionCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
+C(3,#FunctionCode,1,INVOKEJS(SHOW,L4451,4,7,0)
+                   ,INVOKEJS(SHOW,L4451,4,7,1))
+
+
 !SWITCH(#FunctionCode,2,T(2,修改),
 !                   4,T(2,刪除),
 !                   1,T(2,新增))
@@ -146,6 +151,12 @@ T(2,@LabelA,*    繳息迄日)
 ! 刪除隱藏邊框
 #Border=X,1,S
 C(3,#FunctionCode,4,$,s)
+T(F,#UnpaidAmt,0)
+T(F,#TempAmt,0)
+
+! 查詢隱藏邊框
+#Border1=X,1,S
+C(3,#FunctionCode,5,$,s)
 T(F,#UnpaidAmt,0)
 T(F,#TempAmt,0)
 
@@ -198,6 +209,7 @@ C(3,#FunctionCode,1,$,s)
 ! 授權類別
 #RepayType=A,2,I
 C(3,#FunctionCode,1,$,s)
+T(HELP,@RepayTypeHelp,#RepayTypeHelp,-,09;11;12)
 HELP(#RepayTypeHelp)
 @V(H,#RepayTypeHelp)
 
@@ -223,25 +235,28 @@ IF(#RepayType==1,C(3,#FunctionCode,1,SHOW(#LabelA,#PrevIntDate),HIDE(#PrevIntDat
 ! 繳息迄日
 #PrevIntDateL=D,7,L
 #PrevIntDate=D,7,I
-C(3,#FunctionCode,1,$,s)
+C(3,#FunctionCode,1,s,s)
 IF(#RepayType==1,$,S)
 @V(7)A(DATE,0,#PrevIntDate)
 
 ! 應繳日
 #PayIntDateL=D,7,L
 #PayIntDate=D,7,I
-C(3,#FunctionCode,1,$,s)
+C(3,#FunctionCode,1,s,s)
 @V(7)A(DATE,0,#PayIntDate)
 
 ! 扣款金額
 #UnpaidAmt=m,14,I
+C(3,#FunctionCode,1,s,$)
 C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
 @V(2,0)
 
 ! 暫收抵繳金額
 #TempAmt=m,14,I
+C(3,#FunctionCode,1,s,$)
 C(3,#FunctionCode,4,s,$)
-
+C(3,#FunctionCode,5,s,$)
 ! 會計日期
 #AcDate=D,7,O
 T(1,#SYSDATE,2,7)

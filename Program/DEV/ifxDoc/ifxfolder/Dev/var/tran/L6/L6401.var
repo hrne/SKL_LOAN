@@ -208,15 +208,25 @@ T(2,@AuthGroupT,#H2+#BrNo+#LevelFg)
 #X2=X,1,S
 C(3,#FunCode,2,$,S)
 RESET_RIM(#X2,XXR99)
-S(XXR99,01,#GroupT2,#AuthGroupT)
+S(XXR99,01,#AuthGroupT)
 R(1,XXR99)
 CALL(#HelpProc)
-T(2,@GroupHelp,#HelpDesc1)
-T(2,@AuthGroupH,#HelpDesc2)
-T(H,@GroupNoX,#GroupNo,#GroupHelp)
+T(2,@AuthGroupH,#HelpDesc1)
 ##loop {times:40, i:1}
 T(H,@AuthNoX{i},#AuthNo{i},#AuthGroupH)
 ##end
+
+#GroupHelp=x,50000,S
+
+#RimL6r44=X,1,S
+C(4,#BrNo,s,$)
+T(2,@L6R44BranchNo,#BrNo)
+S(L6R44,1,#L6R44BranchNo)
+R(1,L6R44)
+T(2,@GroupHelp,#L6r44GroupHelpList)
+T(H,@GroupNoX,#GroupNo,#GroupHelp)
+
+
 
 #LtxDatetmp=A,7,S
 T(1,#LtxDate,2,7)
@@ -313,14 +323,7 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@AuthGroupH,#HelpDesc1)
 
-#RimL6r44=X,1,S
-C(4,#BrNo,s,$)
-T(2,@L6R44BranchNo,#BrNo)
-S(L6R44,1,#L6R44BranchNo)
-R(1,L6R44)
-T(2,@GroupHelp,#L6r44GroupHelpList)
 
-#GroupHelp=x,50000,S
 
 ![課組別]
 #GroupNo=X,1,I

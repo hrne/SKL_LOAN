@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -22,28 +20,17 @@ import com.st1.itx.db.domain.LoanBorTx;
 import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
-import com.st1.itx.db.service.FacCloseService;
-import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanBorTxService;
-import com.st1.itx.db.service.LoanChequeService;
-import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.LoanOverdueService;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.AcDetailCom;
-import com.st1.itx.util.common.AcPaymentCom;
-import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.BaTxCom;
-import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
-import com.st1.itx.util.common.PfDetailCom;
-import com.st1.itx.util.common.SendRsp;
-import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.parse.Parse;
 
 /*
- * L3731 呆帳戶轉呆帳結案戶
+ * L3731 呆帳戶改呆帳結案戶
  * a.正常結案時不可短繳
  * b.展期時,需輸入新核准號碼
  * c.原則上舊額度之期款利息應繳齊才可辦展期。
@@ -57,7 +44,7 @@ import com.st1.itx.util.parse.Parse;
  * BormNo=9,3
  */
 /**
- * L3731 結案登錄-不可欠繳
+ * L3731 呆帳戶改呆帳結案戶
  * 
  * @author iza
  * @version 1.0.0
@@ -65,46 +52,23 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3731")
 @Scope("prototype")
 public class L3731 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3731.class);
 
 	/* DB服務注入 */
-	@Autowired
-	public FacMainService facMainService;
 	@Autowired
 	public LoanBorTxService loanBorTxService;
 	@Autowired
 	public LoanOverdueService loanOverdueService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
-	@Autowired
-	public LoanIntDetailService loanIntDetailService;
-	@Autowired
-	public LoanChequeService loanChequeService;
-	@Autowired
-	public FacCloseService facCloseService;
 
 	@Autowired
 	Parse parse;
-	@Autowired
-	SendRsp sendRsp;
-	@Autowired
-	DataLog datalog;
-	@Autowired
-	AcDetailCom acDetailCom;
-	@Autowired
-	AcPaymentCom acPaymentCom;
 	@Autowired
 	BaTxCom baTxCom;
 	@Autowired
 	LoanCom loanCom;
 	@Autowired
 	LoanSetRepayIntCom loanSetRepayIntCom;
-	@Autowired
-	LoanCalcRepayIntCom loanCalcRepayIntCom;
-	@Autowired
-	AcReceivableCom acReceivableCom;
-	@Autowired
-	PfDetailCom pfDetailCom;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
@@ -196,7 +160,7 @@ public class L3731 extends TradeBuffer {
 			wkFacmNo = od.getFacmNo();
 			wkBormNo = od.getBormNo();
 			wkOvduNo = od.getOvduNo();
-			// 鎖定催收呆帳檔、撥款主檔、額度檔
+			// 鎖定催收呆帳檔、撥款主檔
 			holdByOverdueRoutine(od);
 			wkBorxNo = tLoanBorMain.getLastBorxNo() + 1;
 			tTempVo.clear();
@@ -280,7 +244,7 @@ public class L3731 extends TradeBuffer {
 	// 更新撥款主檔
 	private void UpdLoanBorMainRoutine() throws LogicException {
 		this.info("updLoanBorMainRoutine ... ");
-		tLoanBorMain.setStatus(5);        // 9: 呆帳結案戶
+		tLoanBorMain.setStatus(9);        // 9: 呆帳結案戶
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setLastEntDy(titaVo.getEntDyI());
 		tLoanBorMain.setLastKinbr(titaVo.getKinbr());

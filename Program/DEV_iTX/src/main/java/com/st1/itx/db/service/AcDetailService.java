@@ -253,17 +253,17 @@ public interface AcDetailService {
   public Slice<AcDetail> findL9RptData(int acDate_0, int slipBatNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = ,AND RvNo = ,AND TitaTxCd =
+   * AcctCode = ,AND CustNo = ,AND RvNo = ,
    *
-   * @param acDate_0 acDate_0
-   * @param rvNo_1 rvNo_1
-   * @param titaTxCd_2 titaTxCd_2
+   * @param acctCode_0 acctCode_0
+   * @param custNo_1 custNo_1
+   * @param rvNo_2 rvNo_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice AcDetail AcDetail of List
    */
-  public Slice<AcDetail> findL2613(int acDate_0, String rvNo_1, String titaTxCd_2, int index, int limit, TitaVo... titaVo);
+  public Slice<AcDetail> findL2613(String acctCode_0, int custNo_1, String rvNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * AcDate = ,AND TitaKinbr = ,AND TitaTlrNo = ,AND TitaTxtNo = 

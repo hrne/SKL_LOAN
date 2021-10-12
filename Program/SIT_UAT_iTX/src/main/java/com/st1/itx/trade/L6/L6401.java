@@ -100,7 +100,7 @@ public class L6401 extends TradeBuffer {
 		tTxTeller.setTlrNo(iTlrNo);
 		tTxTeller.setTlrItem(titaVo.getParam("TlrItem"));
 		tTxTeller.setBrNo(titaVo.getParam("BrNo"));
-		tTxTeller.setAdFg(Integer.valueOf(titaVo.get("AdFg")));
+//		tTxTeller.setAdFg(Integer.valueOf(titaVo.get("AdFg")));
 		tTxTeller.setLevelFg(Integer.valueOf(titaVo.get("LevelFg")));
 		tTxTeller.setStatus(Integer.valueOf(titaVo.get("Status")));
 		tTxTeller.setGroupNo(titaVo.getParam("GroupNo"));
