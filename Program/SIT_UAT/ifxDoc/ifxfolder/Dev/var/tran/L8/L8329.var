@@ -193,10 +193,7 @@ IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@RimJcicBankCode,#CourtCode)
 T(2,@TranKey,#L8r46TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 ! 調Rim相關 結束
 
 ![交易代碼]
@@ -245,13 +242,7 @@ HELP(#CourtCodeHelp)
 
 
 #CourtCodeX=X,80,L
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
-
-
+T(H,#CourtCode,#CourtCodeHelp)
 !繳款日期
 #PayDate=D,7,I
 C(5,#TranKey_Tmp,2,s,$)

@@ -78,14 +78,20 @@ T(3,CdCode.TranKey)
 T(3,CdCode.DelayCode)
 #DelayCodeHelp=x,2024,S
 
+! CourtCode
+#CODEF0003=x,20,S
+T(3,CdCode.CourtCode)
+#CourtCodeHelp=x,1024,S
+
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CODEF0002)
+S(XXR99,01,#CDDEF0001,#CODEF0002,#CODEF0003)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@DelayCodeHelp,#HelpDesc2)
-
+T(2,@CourtCodeHelp,#HelpDesc3)
 
 
 
@@ -169,23 +175,7 @@ T(2,@OutJcicTxtDate,#L8r47OutJcicTxtDate)
 ![下拉選單的值]
 T(2,@TranKey,#L8r47TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-#Space=X,1,S
-IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
-T(2,@TranKey,#L8r47TranKey)
-T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
-! 受理調解機構代號 調rim塞值
-#Space1=X,1,S
-IF(#TranKey_Tmp == "2"|| #TranKey_Tmp=="4"|| #TranKey_Tmp=="5",$,S)
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 
 
 
@@ -231,18 +221,12 @@ A(DATE,0,#ApplyDate)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(7)
-T(2,@RimJcicBankCode,#CourtCode)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+HELP(#CourtCodeHelp)
+@V(H,#CourtCodeHelp)
+
 
 #CourtCodeX=X,80,L
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+T(H,#CourtCode,#CourtCodeHelp)
 !延期繳款原因
 
 #DelayCode=X,1,I

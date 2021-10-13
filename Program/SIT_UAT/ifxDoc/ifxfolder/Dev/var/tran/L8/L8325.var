@@ -79,13 +79,18 @@ E(0,1)ASGN(AGAIN$)
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
+!CourtCode
+#CDDEF0002=x,20,S
+T(3,CdCode.CourtCode)
+#CourtCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
-
+T(2,@CourtCodeHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic444連動進入),$)
@@ -183,10 +188,7 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r42TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(2,@RimJcicBankCode,#CourtCode)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 ! 調Rim相關 結束
 
 ![交易代碼]
@@ -228,18 +230,12 @@ A(DATE,0,#ApplyDate)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(7)
-T(2,@RimJcicBankCode,#CourtCode)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+HELP(#CourtCodeHelp)
+@V(H,#CourtCodeHelp)
 
 #CourtCodeX=X,80,L
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+T(H,#CourtCode,#CourtCodeHelp)
+
 
 !債務人戶籍之郵遞區號及地址
 #CustRegAddr=C,76,I

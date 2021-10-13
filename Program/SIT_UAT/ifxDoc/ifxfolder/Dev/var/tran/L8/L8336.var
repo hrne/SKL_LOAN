@@ -44,7 +44,7 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+款項統一收付申請日",#ApplyDate],["#FdCloseDate+結案日期",#CloseDate],
+["#FdApplyDate+申請日期",#ApplyDate],["#FdCloseDate+結案日期",#CloseDate],
 [#<->#,"#FdCloseMark+結案原因",#CloseMark,#CloseMarkX],
 [#<->#,"#FdPhoneNo+通訊電話",#PhoneNo],
 [#<->#,"#FdTranKey","室內電話與行動電話請擇一填報。室內電話建議格式：02－28225252","＃1688。行動電話建議","格式：0951－123456"],
@@ -189,7 +189,7 @@ T(H,#TranKey,#TranKeyHelp)
 #SubmitKey=X,3,L
 
 #SubmitKeyX=X,80,L
-!款項統一收付申請日
+!申請日期
 #ApplyDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -205,6 +205,17 @@ C(5,#TranKey,D,T(2,@CloseDate,#L8r37CloseDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @V(7)A(DATE,0,#CloseDate)
+
+#SysDate=D,8,S
+T(4,#SYSCDATE)
+#ApplyDt=D,7,S
+T(1,#SysDate,2,7)
+
+#CheckDate=X,1,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#CloseDate < #ApplyDate ,V(P,結案日期不可早於申請日期),$)
+IF(#CloseDate > #ApplyDt , V(P,結案日期不可晚於本檔案報送日期),$)
 
 !結案原因
 #CloseMark=A,2,I

@@ -40,11 +40,11 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[50,50,600,300];printer.width=[20,20,20,20];order=1;">
 [
-["[L8333]                                 (571)前置調解金融機構無擔保債務協議資料"],
+["[L8333]                                 (571)更生款項統一收付回報債權資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdBankId+受理款項統一收付之債權金融機構代號",#BankId,#BankIdX],
+["#FdApplyDate+申請日期",#ApplyDate],["#FdBankId+受理款項統一收付之債權金融機構代號",#BankId,#BankIdX],
 ["#FdOwnerYn+是否為更生債權人",#OwnerYn],["#FdPayYn+債務人是否仍依更生方案正常還款予本金融機構",#PayYn],
 ["#FdOwnerAmt+本金融機構更生債權總金額",#OwnerAmt],["#FdAllotAmt+參與分配債權金額",#AllotAmt],
 ["#FdUnallotAmt+未參與分配債權金額",#UnallotAmt],
@@ -206,7 +206,7 @@ HELP(#TranKeyHelp)
 #SubmitKey=X,3,L
 #SubmitKeyX=X,80,L
 
-!調解申請日
+!申請日期
 #ApplyDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -221,6 +221,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 @V(7)
+
+#RimL8r01A=X,1,S
 T(2,@RimJcicBankCode,#BankId)
 RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
@@ -228,11 +230,7 @@ R(1,L8R01)
 T(2,@BankIdX,#L8r01JcicBankName)
 
 #BankIdX=X,80,L
-T(2,@RimJcicBankCode,#BankId)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@BankIdX,#L8r01JcicBankName)
+
 !是否為更生債權人
 #OwnerYn=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -299,7 +297,7 @@ E(0,0)
 !C(5,#TXFORM,L8333,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L8333] 前置調解金融機構無擔保債務協議資料)
+T(3,[L8333] 更生款項統一收付回報債權資料)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------

@@ -63,21 +63,27 @@ C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 <include src="ROM.icf::L8R01.dec"/>
-#CDDEF0001=x,20,S
+#CODEF0001=x,20,S
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
-#CDDEF0002=x,25,S
+#CODEF0002=x,25,S
 T(3,CdCode.CollateralType)
 #CollateralTypeHelp=x,10000,S
 
+! CourtCode
+#CODEF0003=x,20,S
+T(3,CdCode.CourtCode)
+#CourtCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002)
+S(XXR99,01,#CODEF0001,#CODEF0002,#CODEF0003)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@CollateralTypeHelp,#HelpDesc2)
+T(2,@CourtCodeHelp,#HelpDesc3)
 
 ! 預設值
 #Default=X,1,S
@@ -98,7 +104,7 @@ T(1,@Ukey,#NTXBUF,6,32)
 #CustId=X,10,L
 #RcDate=D,7,L
 #SubmitKey=X,3,L
-#CourtCode=D,7,L
+#CourtCode=X,3,L
 #MaxMainCode=X,3,L
 #Account=X,50,L
 #MaxMainCodeX=X,80,L
@@ -115,18 +121,13 @@ R(1,L8R55)
 T(2,@CustId,#L8r55CustId)
 T(2,@SubmitKey,#L8r55SubmitKey)
 E(0,@RcDate,#L8r55ApplyDate)
-E(0,@CourtCode,#L8r55CourtCode)
-E(0,@MaxMainCode,#L8r55MaxMainCode)
-E(0,@Account,#L8r55Account)
+T(2,@CourtCode,#L8r55CourtCode)
+T(2,@MaxMainCode,#L8r55MaxMainCode)
+T(2,@Account,#L8r55Account)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 #ChainCd=X,5,S
 #Ukey=X,32,S
 #RPTFG=A,1,S
-
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)

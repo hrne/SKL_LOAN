@@ -38,13 +38,13 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[250,300,250,300];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,750];printer.width=[20,20,20,20];order=1;">
 [
-["[L8337]                                 (575)更生債權金額異動通知資料"],
+["[L8337]                                 (575)債權金額異動通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+款項統一收付申請日",#ApplyDate],
+["#FdApplyDate+申請日期",#ApplyDate],
 [#<->#,"#FdModifyType+債權異動類別",#ModifyType,#ModifyTypeX],
 [#<->#,"#FdBankId+異動債權金融機構代號",#BankId,#BankIdX],
 ["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
@@ -112,8 +112,10 @@ T(2,@FdBankId,*)
 C(5,#TranKey_Tmp,2,$,S)
 ! T(2,@TranKey,C)
 T(F,@TranKey,1)T(F,@ModifyType,1)
+K(MODIFYBUTTON,異動)
 T(1,@Ukey,#NTXBUF,3,32)
 T(2,@FdModifyType,*)
+T(2,@FdTranKey,*)
 T(3,@TranKeyHelp,C:異動;D:刪除))
 
 ! 查詢進入
@@ -197,7 +199,7 @@ T(H,#TranKey,#TranKeyHelp)
 
 #SubmitKeyX=X,80,L
 
-!款項統一收付申請日
+!申請日期
 #ApplyDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -224,12 +226,6 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 @V(7)V(NL)
-T(2,@RimJcicBankCode,#BankId)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@BankIdX,#L8r01JcicBankName)
-
 
 #BankIdX=X,70,L
 T(2,@RimJcicBankCode,#BankId)

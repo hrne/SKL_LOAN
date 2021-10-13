@@ -71,21 +71,27 @@ E(0,1)ASGN(AGAIN$)
 !---------- AP TEXT AREA Variables ----------
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 <include src="ROM.icf::L8R01.dec"/>
-#CDDEF0001=x,20,S
+#CODEF0001=x,20,S
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
-#CDDEF0002=x,20,S
+#CODEF0002=x,20,S
 T(3,CdCode.PayOffResult1)
 #PayOffResultHelp=x,1024,S
 
+! CourtCode
+#CODEF0003=x,20,S
+T(3,CdCode.CourtCode)
+#CourtCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002)
+S(XXR99,01,#CODEF0001,#CODEF0002,#CODEF0003)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@PayOffResultHelp,#HelpDesc2)
+T(2,@CourtCodeHelp,#HelpDesc3)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -171,15 +177,15 @@ E(0,@OutJcicTxtDate,#L8r48OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(H,@PayOffResultX,#PayOffResult,#PayOffResultHelp)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r48TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(2,@RimJcicBankCode,#CourtCode,#MaxMainCode)
+T(2,@RimJcicBankCode,#MaxMainCode)
 RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 ! 調Rim相關 結束
 
@@ -225,19 +231,12 @@ A(DATE,0,#ApplyDate)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
-@V(7)
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+HELP(#CourtCodeHelp)
+@V(H,#CourtCodeHelp)
+
 
 #CourtCodeX=X,80,L
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+T(H,#CourtCode,#CourtCodeHelp)
 
 !最大債權金融機構代號
 #MaxMainCode=X,3,I

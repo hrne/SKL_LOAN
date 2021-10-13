@@ -174,7 +174,7 @@ TXFORM=L8048
 
 <sub type="SELECT">
 #RPTFG=0,QUERY.GRID,L8048
-#any={detail:true, header:'L8031.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+#any={detail:true, header:'L8048.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 #OOTranKeyX=交易代碼
 {width:100,align:'center'}
 !L8318(6O)

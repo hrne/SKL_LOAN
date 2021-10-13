@@ -1,6 +1,7 @@
 package com.st1.itx.trade.L9;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
@@ -47,7 +48,7 @@ public class L9711Report2 extends MakeReport {
 		this.setBeginRow(3);
 
 		// 設定明細列數(自訂亦必須)
-		this.setMaxRows(40);
+		this.setMaxRows(60);
 
 	}
 
@@ -193,106 +194,131 @@ public class L9711Report2 extends MakeReport {
 
 		String tempDate = "";
 
-//		String tempExportDate=ENTDY.substring(0, 7);
 		int dataRow = -29;
-		int tempCustNo = 0;
-		int tempFacmNo = 0;
+
 		if (listBaTxVo.size() > 0) {
+			List<Map<String, Integer>> tempList = new ArrayList<Map<String, Integer>>();
 
+			Map<String, Integer> tempMap = 	new HashMap<String, Integer>();
+
+			String payIntDate = "";
+			int a = 1;
 			for (int i = 0; i < listBaTxVo.size(); i++) {
-
-				String PayIntDate = String.valueOf(listBaTxVo.get(i).getPayIntDate());
-
-				if (PayIntDate.equals(tempDate) && i != listBaTxVo.size() - 1) {
-
-					// 正常
-					// 違約金
-					// 本金
-					// 利息
-					// 未還本金餘額
-					BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
-					Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
-					Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
-					LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
-
-				} else if (i == listBaTxVo.size() - 1) { // 最後一筆
-					
-					BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
-					Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
-					Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
-					LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
-					// 應繳日
-//					if (!PayIntDate.equals(tempDate)) {
-						this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/"
-								+ tempDate.substring(5, 7));
-//					}
-					// 違約金
-					this.print(dataRow, 26, String.format("%,d", BreachAmt), "R");
-					// 本金
-					this.print(dataRow, 38, String.format("%,d", Principal), "R");
-					// 利息
-					this.print(dataRow, 52, String.format("%,d", Interest), "R");
-					// 應繳合計
-					this.print(dataRow, 66, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
-					// 未還 本金餘額
-					this.print(dataRow, 78, String.format("%,d", LoanBal), "R");
-					// 暫付 所得稅
-					this.print(dataRow, 88, "0", "R");
-					// 應繳淨額
-					this.print(dataRow, 100, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
-
-				} else { // 當筆日期與之前不同
-					
-					tempDate = PayIntDate;
-					
-					BreachAmt = 0;
-					Principal = 0;
-					Interest = 0;
-					LoanBal = 0;
-					
-					BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
-					Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
-					Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
-					LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
-					
-					// 應繳日
-//					if (!PayIntDate.equals(tempDate)) {
-						this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/"
-								+ tempDate.substring(5, 7));
-//					}
-					// 違約金
-					this.print(dataRow, 26, String.format("%,d", BreachAmt), "R");
-					// 本金
-					this.print(dataRow, 38, String.format("%,d", Principal), "R");
-					// 利息
-					this.print(dataRow, 52, String.format("%,d", Interest), "R");
-					// 應繳合計
-					this.print(dataRow, 66, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
-					// 未還 本金餘額
-					this.print(dataRow, 78, String.format("%,d", LoanBal), "R");
-					// 暫付 所得稅
-					this.print(dataRow, 88, "0", "R");
-					// 應繳淨額
-					this.print(dataRow, 100, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
-
-					
-				
-
 			
+				this.info("No." + i);
+				this.info("getCustNo=" + listBaTxVo.get(i).getCustNo());
+				this.info("getFacmNo=" + listBaTxVo.get(i).getFacmNo());
+				this.info("getPayIntDate=" + listBaTxVo.get(i).getPayIntDate());
+				this.info("getBreachAmt=" + listBaTxVo.get(i).getBreachAmt());
+				this.info("getPrincipal=" + listBaTxVo.get(i).getPrincipal());
+				this.info("getInterest=" + listBaTxVo.get(i).getInterest());
+				this.info("getLoanBal=" + listBaTxVo.get(i).getLoanBal());
+
+				payIntDate = String.valueOf(listBaTxVo.get(i).getPayIntDate());
+
+				if (!payIntDate.equals(tempDate)) {
+
+					// 防第一次沒資料就加入
+					if (i > 0 && !payIntDate.equals(tempDate)) {
+
+
+						tempList.add(tempMap);
+
+						tempMap = 	new HashMap<String, Integer>();
+						
+//						this.info(a + " count join list");
+//						a++;
+						
+						BreachAmt = 0;
+						Principal = 0;
+						Interest = 0;
+						LoanBal = 0;
+					}
+					tempDate = payIntDate;
+
+					// 違約金
+					BreachAmt = listBaTxVo.get(i).getBreachAmt().intValue();
+
+					// 本金
+					Principal = listBaTxVo.get(i).getPrincipal().intValue();
+
+					// 利息
+					Interest = listBaTxVo.get(i).getInterest().intValue();
+
+					// 未還本金餘額
+					LoanBal = listBaTxVo.get(i).getLoanBal().intValue();
+
+					tempMap.put("pday", Integer.valueOf(payIntDate));
+					tempMap.put("bAmt", BreachAmt);
+					tempMap.put("pAmt", Principal);
+					tempMap.put("iAmt", Interest);
+					tempMap.put("lAmt", LoanBal);
+
+				} else {
+
+					this.info("isRepeat" + a);
+
+					// 違約金
+					BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
+
+					// 本金
+					Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
+
+					// 利息
+					Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
+
+					// 未還本金餘額
+					LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
+
+					tempMap.put("bAmt", BreachAmt);
+					tempMap.put("pAmt", Principal);
+					tempMap.put("iAmt", Interest);
+					tempMap.put("lAmt", LoanBal);
+
 				}
-				dataRow--;
-//				this.info("originCust"+tempCustNo + "=changeCust"+listBaTxVo.get(i).getCustNo());
-//				this.info("originFacm"+tempFacmNo + "=changeFacm"+listBaTxVo.get(i).getFacmNo());
-//				if(tempCustNo!=listBaTxVo.get(i).getCustNo() && tempCustNo!=listBaTxVo.get(i).getFacmNo()) {
 
-//					tempCustNo=listBaTxVo.get(i).getCustNo();
-//					tempFacmNo=listBaTxVo.get(i).getFacmNo();
-//				}
-
+				// 最後一筆需加入
+				if (listBaTxVo.size() - 1 == i) {
+		
+					tempList.add(tempMap);
+				}
 			}
+
+//			this.info("tempList=" + tempList.toString());
+			for (Map<String, Integer> listData : tempList) {
+				
+				
+				
+				tempDate = listData.get("pday").toString();
+				//應繳日
+				this.print(dataRow, 7,
+						tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/" + tempDate.substring(5, 7));
+				// 違約金
+				this.print(dataRow, 26, String.format("%,d", listData.get("bAmt")), "R");
+				// 本金
+				this.print(dataRow, 38, String.format("%,d", listData.get("pAmt")), "R");
+				// 利息
+				this.print(dataRow, 52, String.format("%,d", listData.get("iAmt")), "R");
+				// 應繳合計
+				this.print(dataRow, 66,
+						String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
+						"R");
+				// 未還 本金餘額
+				this.print(dataRow, 78, String.format("%,d", listData.get("lAmt")), "R");
+				// 暫付 所得稅
+				this.print(dataRow, 88, "0", "R");
+				// 應繳淨額
+				this.print(dataRow, 100,
+						String.format("%,d", (listData.get("bAmt") + listData.get("pAmt") + listData.get("iAmt"))),
+						"R");
+
+				dataRow--;
+			}
+
 		}
 
 		dataRow--;
+
 		this.print(dataRow--, 8, "＊＊舊繳息通知單作廢（以最新製發日期為準）。");
 		this.print(dataRow--, 8, "＊＊貴戶所借款項如業已屆期，本公司雖經收取利息及違約金但並無同意延期清償之意 , 貴戶仍需依約履行");
 		if (tL9711Vo.get("F8").equals("0")) {
@@ -376,3 +402,81 @@ public class L9711Report2 extends MakeReport {
 		return tmp2;
 	}
 }
+
+//if (PayIntDate.equals(tempDate) && i != listBaTxVo.size() - 1) {
+//
+//	// 正常
+//	// 違約金
+//	// 本金
+//	// 利息
+//	// 未還本金餘額
+//	BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
+//	Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
+//	Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
+//	LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
+//
+//} else if (i == listBaTxVo.size() - 1) { // 最後一筆
+//	
+//	BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
+//	Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
+//	Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
+//	LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
+//	// 應繳日
+////	if (!PayIntDate.equals(tempDate)) {
+//		this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/"
+//				+ tempDate.substring(5, 7));
+////	}
+//	// 違約金
+//	this.print(dataRow, 26, String.format("%,d", BreachAmt), "R");
+//	// 本金
+//	this.print(dataRow, 38, String.format("%,d", Principal), "R");
+//	// 利息
+//	this.print(dataRow, 52, String.format("%,d", Interest), "R");
+//	// 應繳合計
+//	this.print(dataRow, 66, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
+//	// 未還 本金餘額
+//	this.print(dataRow, 78, String.format("%,d", LoanBal), "R");
+//	// 暫付 所得稅
+//	this.print(dataRow, 88, "0", "R");
+//	// 應繳淨額
+//	this.print(dataRow, 100, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
+//
+//} else { // 當筆日期與之前不同
+//	
+//	tempDate = PayIntDate;
+//	
+//	BreachAmt = 0;
+//	Principal = 0;
+//	Interest = 0;
+//	LoanBal = 0;
+//	
+//	BreachAmt = BreachAmt + listBaTxVo.get(i).getBreachAmt().intValue();
+//	Principal = Principal + listBaTxVo.get(i).getPrincipal().intValue();
+//	Interest = Interest + listBaTxVo.get(i).getInterest().intValue();
+//	LoanBal = LoanBal + listBaTxVo.get(i).getLoanBal().intValue();
+//	
+//	// 應繳日
+//	if (!PayIntDate.equals(tempDate)) {
+//		this.print(dataRow, 7, tempDate.substring(0, 3) + "/" + tempDate.substring(3, 5) + "/"
+//				+ tempDate.substring(5, 7));
+//	}
+//	// 違約金
+//	this.print(dataRow, 26, String.format("%,d", BreachAmt), "R");
+//	// 本金
+//	this.print(dataRow, 38, String.format("%,d", Principal), "R");
+//	// 利息
+//	this.print(dataRow, 52, String.format("%,d", Interest), "R");
+//	// 應繳合計
+//	this.print(dataRow, 66, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
+//	// 未還 本金餘額
+//	this.print(dataRow, 78, String.format("%,d", LoanBal), "R");
+//	// 暫付 所得稅
+//	this.print(dataRow, 88, "0", "R");
+//	// 應繳淨額
+//	this.print(dataRow, 100, String.format("%,d", (BreachAmt + Principal + Interest)), "R");
+//
+//	
+//
+//
+//
+//}

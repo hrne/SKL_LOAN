@@ -81,12 +81,18 @@ E(0,1)ASGN(AGAIN$)
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
+!CourtCode
+#CDDEF0002=x,20,S
+T(3,CdCode.CourtCode)
+#CourtCodeHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
+T(2,@CourtCodeHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -186,14 +192,7 @@ E(0,@Rate,#L8r44Rate)
 E(0,@MonthPayAmt,#L8r44MonthPayAmt)
 T(2,@PayAccount,#L8r44PayAccount)
 E(0,@OutJcicTxtDate,#L8r44OutJcicTxtDate)
-! 受理調解機構代號 調rim塞值
-#Space1=X,1,S
-IF(#TranKey_Tmp == "2"|| #TranKey_Tmp=="4"|| #TranKey_Tmp=="5",$,S)
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
 
 ! 調Rim相關 結束
 
@@ -227,26 +226,19 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#ApplyDate)
+@V(7)A(DATE,0,#ApplyDate)
 
 !受理調解機構代號-承審法院代碼OR郵遞區號
 #CourtCode=X,3,I
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(7)
-T(2,@RimJcicBankCode,#CourtCode)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+HELP(#CourtCodeHelp)
+@V(H,#CourtCodeHelp)
 
 #CourtCodeX=X,80,L
-T(2,@RimJcicBankCode,#CourtCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@CourtCodeX,#L8r01JcicBankName)
+T(H,#CourtCode,#CourtCodeHelp)
+
 !依民法第323條計算之債權總金額
 #Civil323Amt=m,10,I
 C(5,#TranKey_Tmp,5,s,$)

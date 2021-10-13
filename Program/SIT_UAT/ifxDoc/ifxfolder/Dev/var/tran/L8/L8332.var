@@ -44,7 +44,7 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+款項統一收付申請日",#ApplyDate],["#FdAdjudicateDate+更生方案認可裁定日",#AdjudicateDate],
+["#FdApplyDate+申請日期",#ApplyDate],["#FdAdjudicateDate+更生方案認可裁定日",#AdjudicateDate],
 [#<->#,"#FdBankCount+更生債權金融機構家數",#BankCount],
 [#<->#,"#FdBank1+債權金融機構代號1",#Bank1,#BankX1],[#<->#,"#FdBank2+債權金融機構代號2",#Bank2,#BankX2],
 [#<->#,"#FdBank3+債權金融機構代號3",#Bank3,#BankX3],[#<->#,"#FdBank4+債權金融機構代號4",#Bank4,#BankX4],
@@ -327,6 +327,7 @@ IF(#Bank{j}!="",$,S)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,s,$)
+@V(NL)
 
 #RimL8r01{i}=X,1,S
 IF(#Bank{i}=="",S,$)
