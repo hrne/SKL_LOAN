@@ -169,7 +169,7 @@ T(3,1)ASGN(LOOP$)
 
 #OORmkCode=A,3,S
 
-#OORmkDesc=X,120,L
+#OORmkDesc=x,120,L
 
 #OOEmpNo=X,6,L
 #OOEmpName=X,10,L

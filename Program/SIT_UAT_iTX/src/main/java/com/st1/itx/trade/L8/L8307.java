@@ -127,10 +127,10 @@ public class L8307 extends TradeBuffer {
 		// 檢核項目(D-15)
 		if (!"4".equals(iTranKey_Tmp)) {
 			if ("A".equals(iTranKey)) {
-				// 1.3 結案日期不可早於協商申請日，亦不可晚於報送本檔案日期。
-				if (iCloseDate < iRcDate || iCloseDate > txDate) {
-					throw new LogicException("E0005", "結案日期不可早於協商申請日，亦不可晚於報送本檔案日期.");
-				} // 1.3 end
+				// 1.3.2 結案日期不可晚於報送本檔案日期。
+				if (iCloseDate > txDate) {
+					throw new LogicException("E0005", "結案日期不可晚於報送本檔案日期.");
+				} // 1.3.2 end
 
 				// 1.4.1 結案原因代號為協商不成立或毀諾案件者，不能再度申請前置協商-->同L8301(檢核JcicZ040)-1.6.2
 				// 1.4.2 結案原因代號為視同未請求協商案件，且結案未滿180天，不能再度申請前置協商-->同L8301(檢核JcicZ040)-1.6.3
@@ -145,6 +145,11 @@ public class L8307 extends TradeBuffer {
 					}
 				} // 1.5 end
 			}
+			
+			// 1.3.1 結案日期不可早於協商申請日。
+			if (iCloseDate < iRcDate) {
+				throw new LogicException("E0005", "結案日期不可早於協商申請日.");
+			} // 1.3.1 end
 
 			// 1.6 start 同一key值於'51':延期繳款(喘息期)期間不可報送'00'毀諾
 			if ("00".equals(iCloseCode)) {
@@ -160,7 +165,7 @@ public class L8307 extends TradeBuffer {
 					// 日期格式不一致， xJcicZ051.getDelayYM()是YYYMM，日期設31-->不合理，但不影響檢核
 					int formateDelayYM = Integer.parseInt(sDelayYM + "31");
 					if (txDate <= formateDelayYM) {
-						throw new LogicException("E0005", "於'51':延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
+						throw new LogicException("E0005", "於(51)延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
 					}
 				} // 1.6 end
 
@@ -184,10 +189,10 @@ public class L8307 extends TradeBuffer {
 			// 4 start 'D'刪除僅限毀諾資料，且刪除需為結案日當月
 			if ("D".equals(iTranKey)) {
 				if (!"00".equals(iCloseCode)) {
-					throw new LogicException("E0005", "'D'刪除功能僅限毀諾資料.");
+					throw new LogicException("E0007", "'D'刪除功能僅限毀諾資料.");
 				}
 				if (GetRocYYYMM(iCloseDate) != GetRocYYYMM(txDate)) {
-					throw new LogicException("E0005", "'D'刪除毀諾資料需在結案日當月.");
+					throw new LogicException("E0007", "'D'刪除毀諾資料需在結案日當月.");
 				}
 			} // 4 end
 

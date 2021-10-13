@@ -26,7 +26,7 @@ public class TxTranCode implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7560448221904982067L;
+	private static final long serialVersionUID = 6414848136303016600L;
 
 // 交易代號
   @Id
@@ -83,6 +83,11 @@ public class TxTranCode implements Serializable {
   /* 0.不控管 1.控管 */
   @Column(name = "`CustDataCtrlFg`")
   private int custDataCtrlFg = 0;
+
+  // 顯示顧客控管警訊記號
+  /* 0.不顯示 1.顯示 */
+  @Column(name = "`CustRmkFg`")
+  private int custRmkFg = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -332,6 +337,25 @@ public class TxTranCode implements Serializable {
   }
 
 /**
+	* 顯示顧客控管警訊記號<br>
+	* 0.不顯示 1.顯示
+	* @return Integer
+	*/
+  public int getCustRmkFg() {
+    return this.custRmkFg;
+  }
+
+/**
+	* 顯示顧客控管警訊記號<br>
+	* 0.不顯示 1.顯示
+  *
+  * @param custRmkFg 顯示顧客控管警訊記號
+	*/
+  public void setCustRmkFg(int custRmkFg) {
+    this.custRmkFg = custRmkFg;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -412,6 +436,6 @@ public class TxTranCode implements Serializable {
   public String toString() {
     return "TxTranCode [tranNo=" + tranNo + ", tranItem=" + tranItem + ", desc=" + desc + ", typeFg=" + typeFg + ", cancelFg=" + cancelFg + ", modifyFg=" + modifyFg
            + ", menuNo=" + menuNo + ", subMenuNo=" + subMenuNo + ", menuFg=" + menuFg + ", submitFg=" + submitFg + ", status=" + status + ", custDataCtrlFg=" + custDataCtrlFg
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", custRmkFg=" + custRmkFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

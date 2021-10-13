@@ -43,7 +43,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,1100];printer.width=[20,20];">
 [
 ["[L2902]                                 保證人保證資料查詢"],
-["#FdCustId+保證人統編",#CustId,#BTN1],
+["#FdCustId+保證人統編",#CustId,#BTN1,#CustName],
 ["#FdBorrowerx+借戶否",#Borrower],
 ]
 !---------- AP Button AREA ----------

@@ -151,7 +151,7 @@ public class L8303 extends TradeBuffer {
 			if ("A".equals(iTranKey)) {
 				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
 				if (iJcicZ040 == null) {
-					throw new LogicException("E0005", "未曾報送過'40':前置協商受理申請暨請求回報債權通知.");
+					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
 				} // 2 end
 
 				// 3 start 金融機構報送日大於協商申請日+25則予以剔退
@@ -166,7 +166,7 @@ public class L8303 extends TradeBuffer {
 				if (sJcicZ053 != null) {
 					for (JcicZ053 xJcicZ053 : sJcicZ053) {
 						if (!"Y".equals(xJcicZ053.getAgreeSend())) {
-							throw new LogicException("E0005", "已報送'53'同意報送例外處理檔案，則'53'中「是否同意報送例外處理檔案格式」必須填報'Y'.");
+							throw new LogicException("E0005", "已報送(53)同意報送例外處理，則(53)中[是否同意報送例外處理檔案格式]必須填報'Y'.");
 						}
 					}
 				}// extra項 end	
@@ -176,18 +176,18 @@ public class L8303 extends TradeBuffer {
 			if ("Y".equals(iIsClaims)) {
 				Slice<JcicZ045> sJcicZ045 = sJcicZ045Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ045 == null) {
-					throw new LogicException("E0005", "本金融機構債務人必須先填報'45':回報是否同意債務清償方案資料.");
+					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
 				}
 				// 5 start 本金融機構債務人+有擔保債權筆數0，則信用貸款+現金卡放款+信用卡 本息餘額應大於0
 				if ((iGuarLoanCnt == 0) && (sTotalAmt <= 0)) {
-					throw new LogicException("E0005", "本金融機構債務人有擔保債權筆數為0，則信用貸款+現金卡放款+信用卡 本息餘額應大於0.");
+					throw new LogicException("E0005", "本金融機構債務人有擔保債權筆數為0，則[信用貸款本息餘額]+[現金卡放款本息餘額]+[信用卡本息餘額]合計應大於0.");
 				}
 			} else {
 				// 7 start 非本金融機構債務人，有擔保債權筆數必須為0，信用貸款+現金卡放款+信用卡 本息餘額應等於0
 				if (iGuarLoanCnt != 0) {
 					throw new LogicException("E0005", "非本金融機構債務人，有擔保債權筆數應為0.");
 				} else if (sTotalAmt != 0) {
-					throw new LogicException("E0005", "非本金融機構債務人，信用貸款+現金卡放款+信用卡 本息餘額應等於0.");
+					throw new LogicException("E0005", "非本金融機構債務人，[信用貸款本息餘額]+[現金卡放款本息餘額]+[信用卡本息餘額]合計應等於0.");
 				}
 			} // 4,5,7 end
 
@@ -195,26 +195,11 @@ public class L8303 extends TradeBuffer {
 			if (iGuarLoanCnt != 0) {
 				Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ043 == null) {
-					throw new LogicException("E0005", "有擔保債權筆數需等於報送'43':回報有擔保債權金額資料之筆數.");
+					throw new LogicException("E0005", "有擔保債權筆數需等於報送(43)回報有擔保債權金額資料之筆數.");
 				} else if (iGuarLoanCnt != sJcicZ043.getSize()) {
-					throw new LogicException("E0005", "有擔保債權筆數需等於報送'43':回報有擔保債權金額資料之筆數.");
+					throw new LogicException("E0005", "有擔保債權筆數需等於報送(43)回報有擔保債權金額資料之筆數.");
 				}
 			} // 6 end
-
-			// 8 start 第20~23欄金額合計需等於第11欄「依民法第323條計算之信用貸款本息餘額」
-			if (iCivil323ExpAmt != iReceExpPrin + iReceExpInte + iReceExpPena + iReceExpOther) {
-				throw new LogicException("E0005", "信用貸款本金、利息、違約金、其他費用合計應等於「依民法第323條計算之信用貸款本息餘額」.");
-			} // 8 end
-
-			// 9 start 第24~27欄金額合計需等於第14欄「依民法第323條計算之現金卡放款本息餘額」
-			if (iCivil323CashAmt != iCashCardPrin + iCashCardInte + iCashCardPena + iCashCardOther) {
-				throw new LogicException("E0005", "現金卡本金、利息、違約金、其他費用合計應等於「依民法第323條計算之現金卡放款本息餘額」.");
-			} // 9 end
-
-			// 10 start 第28~31欄金額合計需等於第17欄「依民法第323條計算之信用卡本息餘額」
-			if (iCivil323CreditAmt != iCreditCardPrin + iCreditCardInte + iCreditCardPena + iCreditCardOther) {
-				throw new LogicException("E0005", "信用卡本金、利息、違約金、其他費用合計應等於「依民法第323條計算之信用卡本息餘額」.");
-			} // 10 end
 
 			// 檢核項目 end
 		}

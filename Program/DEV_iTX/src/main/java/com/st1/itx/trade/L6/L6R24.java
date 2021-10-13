@@ -23,7 +23,6 @@ import com.st1.itx.db.service.TxTranCodeService;
  * @description for L6402 rim
  */
 public class L6R24 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R24.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -73,6 +72,7 @@ public class L6R24 extends TradeBuffer {
 		this.totaVo.putParam("MenuFg", tTxTranCode.getMenuFg());
 		this.totaVo.putParam("SubmitFg", tTxTranCode.getSubmitFg());
 		this.totaVo.putParam("CustDataCtrlFg", tTxTranCode.getCustDataCtrlFg());
+		this.totaVo.putParam("CustRmkFg", tTxTranCode.getCustRmkFg());
 	}
 
 }

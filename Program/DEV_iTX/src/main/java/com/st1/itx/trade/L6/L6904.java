@@ -36,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6904 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6904.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -80,6 +79,10 @@ public class L6904 extends TradeBuffer {
 		BigDecimal dbAmt = new BigDecimal(0);
 		BigDecimal crAmt = new BigDecimal(0);
 
+		this.index = titaVo.getReturnIndex();
+
+		this.limit = Integer.MAX_VALUE;
+		
 		if (iAcNoCodeS.isEmpty()) {
 			iAcNoCodeS = "           ";
 			iAcNoCodeE = "ZZZZZZZZZZZ";
@@ -103,32 +106,31 @@ public class L6904 extends TradeBuffer {
 		Slice<AcDetail> slAcDetail = null;
 		switch (iInqType) {
 		case 0: // 全部彙計方式
-			slAcDetail = sAcDetailService.SubBookAcNoCodeRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE,
-					this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.SubBookAcNoCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, this.index, this.limit, titaVo);
 			break;
 		case 1: // 彙總別
-			slAcDetail = sAcDetailService.SubBookSumNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE,
-					"   ", "ZZZ", this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.SubBookSumNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "   ", "ZZZ", this.index, this.limit,
+					titaVo);
 			break;
 		case 2: // 經辦別
-			slAcDetail = sAcDetailService.SubBookTitaTlrNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, "      ", "ZZZZZZ", this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.SubBookTitaTlrNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "      ", "ZZZZZZ", this.index,
+					this.limit, titaVo);
 			break;
 		case 3: // 整批批號
-			slAcDetail = sAcDetailService.SubBookTitaBatchNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, "      ", "ZZZZZZ", this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.SubBookTitaBatchNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "      ", "ZZZZZZ", this.index,
+					this.limit, titaVo);
 			break;
 		case 4: // 摘要代號
-			slAcDetail = sAcDetailService.SubBookDscptCodeRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, "    ", "ZZZZ", this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.SubBookDscptCodeRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "    ", "ZZZZ", this.index,
+					this.limit, titaVo);
 			break;
 		case 5: // 傳票批號
-			slAcDetail = sAcDetailService.SubBookSlipBatNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, 00, 99, this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.SubBookSlipBatNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, 00, 99, this.index, this.limit,
+					titaVo);
 			break;
 		case 6: // 業務類別
-			slAcDetail = sAcDetailService.SubBookTitaSecNoRange(iAcBookCode, iAcSubBookCode.trim()+"%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS,
-					iAcNoCodeE, "  ", "ZZ", this.index, this.limit, titaVo);
+			slAcDetail = sAcDetailService.SubBookTitaSecNoRange(iAcBookCode, iAcSubBookCode.trim() + "%", iBranchNo, iCurrencyCode, iFAcDate, iAcNoCodeS, iAcNoCodeE, "  ", "ZZ", this.index,
+					this.limit, titaVo);
 			break;
 		}
 		List<AcDetail> lAcDetail = slAcDetail == null ? null : slAcDetail.getContent();
@@ -140,10 +142,8 @@ public class L6904 extends TradeBuffer {
 		// 如有找到資料
 		for (AcDetail tAcDetail : lAcDetail) {
 
-			this.info("L6904 AcNoCode : " + iAcBookCode + "-" + iAcNoCodeS + "-" + iAcSubCode + "-" + iAcDtlCode + "-"
-					+ tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-" + tAcDetail.getAcDtlCode() + "-"
-					+ tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-"
-					+ tAcDetail.getEntAc());
+			this.info("L6904 AcNoCode : " + iAcBookCode + "-" + iAcNoCodeS + "-" + iAcSubCode + "-" + iAcDtlCode + "-" + tAcDetail.getAcNoCode() + "-" + tAcDetail.getAcSubCode() + "-"
+					+ tAcDetail.getAcDtlCode() + "-" + tAcDetail.getTxAmt() + "-" + tAcDetail.getAcBookFlag() + "-" + tAcDetail.getAcBookCode() + "-" + tAcDetail.getEntAc());
 
 			// 不含未入帳,例如:未放行之交易
 			// 0:未入帳 1:已入帳 2:被沖正(隔日訂正) 3.沖正(隔日訂正)
@@ -217,14 +217,10 @@ public class L6904 extends TradeBuffer {
 			}
 
 			// 條件一樣小計
-			if (acNoCode.equals(tAcDetail.getAcNoCode()) && acSubCode.equals(tAcDetail.getAcSubCode())
-					&& acDtlCode.equals(tAcDetail.getAcDtlCode())
-					&& ((iInqType == 0) || (iInqType == 1 && sumNo.equals(tAcDetail.getSumNo()))
-							|| (iInqType == 2 && titaTlrNo.equals(tAcDetail.getTitaTlrNo()))
-							|| (iInqType == 3 && titaBatchNo.equals(tAcDetail.getTitaBatchNo()))
-							|| (iInqType == 4 && dscptCode.equals(tAcDetail.getDscptCode()))
-							|| (iInqType == 5 && slipBatNo == tAcDetail.getSlipBatNo())
-							|| (iInqType == 6 && titaSecNo.equals(tAcDetail.getTitaSecNo())))) {
+			if (acNoCode.equals(tAcDetail.getAcNoCode()) && acSubCode.equals(tAcDetail.getAcSubCode()) && acDtlCode.equals(tAcDetail.getAcDtlCode())
+					&& ((iInqType == 0) || (iInqType == 1 && sumNo.equals(tAcDetail.getSumNo())) || (iInqType == 2 && titaTlrNo.equals(tAcDetail.getTitaTlrNo()))
+							|| (iInqType == 3 && titaBatchNo.equals(tAcDetail.getTitaBatchNo())) || (iInqType == 4 && dscptCode.equals(tAcDetail.getDscptCode()))
+							|| (iInqType == 5 && slipBatNo == tAcDetail.getSlipBatNo()) || (iInqType == 6 && titaSecNo.equals(tAcDetail.getTitaSecNo())))) {
 				if (tAcDetail.getDbCr().equals("D")) {
 					dbAmt = dbAmt.add(tAcDetail.getTxAmt());
 					dbCnt = dbCnt + 1;
@@ -303,7 +299,7 @@ public class L6904 extends TradeBuffer {
 			}
 
 		}
-		
+
 		// 最後一筆資料放入Tota的OcList
 		if (!(dbAmt.compareTo(BigDecimal.ZERO) == 0 && crAmt.compareTo(BigDecimal.ZERO) == 0)) {
 

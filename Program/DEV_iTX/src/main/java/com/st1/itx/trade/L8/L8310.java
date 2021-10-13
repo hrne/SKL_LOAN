@@ -115,10 +115,10 @@ public class L8310 extends TradeBuffer {
 			if ("A".equals(iTranKey)) {
 				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
 				if (iJcicZ047 == null) {
-					throw new LogicException("E0005", "未曾報送過'47':金融機構無擔保債務協議資料檔案.");
+					throw new LogicException("E0005", "未曾報送過(47)金融機構無擔保債務協議資料.");
 				} else { // 3.2 start '47':金融機構無擔保債務協議資料檔案第19欄「簽約完成日期」空白則予以剔退
 					if (iJcicZ047.getSignDate() == 0) {
-						throw new LogicException("E0005", "表'47':金融機構無擔保債務協議資料檔案「簽約完成日期」空白.");
+						throw new LogicException("E0005", "(47)金融機構無擔保債務協議資料之「簽約完成日期」不可空白.");
 					}
 				}
 			} // 3 end
@@ -137,7 +137,7 @@ public class L8310 extends TradeBuffer {
 			// 5.2 start遞狀日期需大於或等於簽約日期
 			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
 			if (iJcicZ047 != null && iApplyDate < iJcicZ047.getSignDate()) {
-				throw new LogicException("E0005", "遞狀日期需大於或等於簽約日期.");
+				throw new LogicException("E0005", "遞狀日期需大於或等於(47)金融機構無擔保債務協議資料之「簽約完成日期」.");
 			} // 5.2 end
 
 			// 檢核項目end

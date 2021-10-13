@@ -70,6 +70,7 @@ public class L8080 extends TradeBuffer {
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
 			}
+			int wkAcDate = 0;
 
 			for (Map<String, String> result : resultList) {
 				this.info("result = " + result);
@@ -77,7 +78,14 @@ public class L8080 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 
 				occursList.putParam("oLogNo", result.get("LogNo"));
-				occursList.putParam("oEntdy", result.get("Entdy"));
+				if (parse.stringToInteger(result.get("Entdy")) > 0
+						&& parse.stringToInteger(result.get("Entdy")) > 19110000) {
+
+					wkAcDate = parse.stringToInteger(result.get("Entdy")) - 19110000;
+				} else {
+					wkAcDate = parse.stringToInteger(result.get("Entdy"));
+				}
+				occursList.putParam("oEntdy", wkAcDate);
 				occursList.putParam("oTransactionId", result.get("TransactionId"));
 				occursList.putParam("oAcctNo", result.get("AcctNo"));
 				occursList.putParam("oCaseNo", result.get("CaseNo"));

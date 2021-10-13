@@ -280,7 +280,7 @@ E(0,@ApplNo,#L2r05ApplNo)
 
 
 #FIRSTDRAWDATE=D,7,S
-C(3,#L2r05FirstDrawdownDate,0,E(0,#SYSDATE),E(0,#L2r05FirstDrawdownDate))
+C(3,#L2r05FirstDrawdownDate,0,E(0,#SYSCDATE),E(0,#L2r05FirstDrawdownDate))
 
 #WkYetDate=D,8,S
 E(0,#FIRSTDRAWDATE+19110000)

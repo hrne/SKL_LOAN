@@ -102,6 +102,7 @@ public class L6402 extends TradeBuffer {
 		tTxTranCode.setMenuFg(Integer.valueOf(titaVo.get("MenuFg")));
 		tTxTranCode.setSubmitFg(Integer.valueOf(titaVo.get("SubmitFg")));
 		tTxTranCode.setCustDataCtrlFg(Integer.valueOf(titaVo.getParam("CustDataCtrlFg")));
+		tTxTranCode.setCustRmkFg(Integer.parseInt(titaVo.getParam("CustRmkFg")));
 
 		return tTxTranCode;
 

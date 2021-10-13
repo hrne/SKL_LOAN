@@ -522,6 +522,10 @@ E(0,@RP_CHQUENO,#ChequeNo)
 #TempChequeAmt=X,1,S
 E(0,@RP_CHQUEAMT,#ChequeAmt)
 
+#WK1=X,1,S
+C(3,#RPFG,0,$,T(3,@BATCHNO,LN01))
+
+
 <include src="RPDTL.icf::RPCOL.dec"/>
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>

@@ -125,7 +125,6 @@ public class L8308 extends TradeBuffer {
 		iJcicZ047Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ047Id.setRcDate(iRcDate);
 		JcicZ047 chJcicZ047 = new JcicZ047();
-		
 
 		// 檢核項目(D-19)
 		if (!"4".equals(iTranKey_Tmp)) {
@@ -134,7 +133,7 @@ public class L8308 extends TradeBuffer {
 			if ("A".equals(iTranKey)) {
 				Slice<JcicZ044> sJcicZ044 = sJcicZ044Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ044 == null) {
-					throw new LogicException("E0005", "最大債權金融機構未曾報送過'44':請求同意債務清償方案通知資料.");
+					throw new LogicException("E0005", "最大債權金融機構未曾報送過(44)請求同意債務清償方案通知資料.");
 				}
 			} // 1.3 end
 
@@ -152,7 +151,7 @@ public class L8308 extends TradeBuffer {
 					}
 				}
 				if (iPeriod != sPeriod || iRate.compareTo(sRate) != 0) {
-					throw new LogicException("E0005", "期數，利率需與'44':請求同意債務清償方案通知資料對應值一致.");
+					throw new LogicException("E0005", "期數，利率需與(44)請求同意債務清償方案通知資料最近一筆報送的資料對應值一致.");
 				}
 			} // 1.4 end
 
@@ -168,15 +167,16 @@ public class L8308 extends TradeBuffer {
 			} // 1.6 end
 
 			// 1.7 start 簽約完成日期需大於或等於協議完成日期
-			if (iSignDate < iPassDate) {
-				throw new LogicException("E0005", "簽約完成日期需大於或等於協議完成日期.");
-			} // 1.7 end
+			if (iSignDate > 0) {
+				if (iSignDate < iPassDate) {
+					throw new LogicException("E0005", "簽約完成日期需大於或等於協議完成日期.");
+				} // 1.7 end
 
-			// 1.8 start 首期應繳款日需大於或等簽約完成日期
-			if (iFirstPayDate < iSignDate) {
-				throw new LogicException("E0005", "首期應繳款日需大於或等簽約完成日期.");
-			} // 1.8 end
-
+				// 1.8 start 首期應繳款日需大於或等簽約完成日期
+				if (iFirstPayDate < iSignDate) {
+					throw new LogicException("E0005", "首期應繳款日需大於或等簽約完成日期.");
+				} // 1.8 end
+			}
 			// 1.9, 1.11, 1.13 start 若第25欄「屬二階段還款方案之階段註記」填報1者(第一階段)，3條件
 			if ("1".equals(iGradeType)) {
 				// 1.9.第7欄期數需填報固定值072.

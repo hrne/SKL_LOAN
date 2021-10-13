@@ -173,14 +173,13 @@ public class L2670 extends TradeBuffer {
 			acReceivableCom.mnt(2, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除
 
 			// 列印
-		} else if (iFunCd == 7) {
-			doRpt = doRpt(titaVo);
+		} else if (iFunCd == 7 || iFunCd == 8) {
 
 			// 鎖定這筆
 			tAcReceivable = acReceivableService.holdById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo));
 
 			tTempVo = tTempVo.getVo(tAcReceivable.getJsonFields());
-
+			int PrintCode = 0; 
 			if (!"1".equals(tTempVo.getParam("PrintCode"))) {
 
 				tTempVo = tTempVo.getVo(tAcReceivable.getJsonFields());
@@ -199,7 +198,10 @@ public class L2670 extends TradeBuffer {
 					e.printStackTrace();
 					throw new LogicException(titaVo, "E6003", "AcReceivable.mnt delete " + tAcReceivable + e.getErrorMsg());
 				}
+			} else {
+				PrintCode = 1;
 			}
+			doRpt = doRpt(titaVo, PrintCode);
 		}
 		if (iFunCd != 4) {
 			tmpAcReceivable = acReceivableService.findById(new AcReceivableId("F29", iCustNo, iFacmNo, iRvNo));
@@ -245,11 +247,11 @@ public class L2670 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	public long doRpt(TitaVo titaVo) throws LogicException {
+	public long doRpt(TitaVo titaVo, int PrintCode) throws LogicException {
 		this.info("L2670 doRpt started.");
 
 		// 撈資料組報表
-		L2670Rpt.exec(titaVo);
+		L2670Rpt.exec(titaVo, PrintCode);
 
 		// 寫產檔記錄到TxReport
 		long rptNo = L2670Rpt.close();

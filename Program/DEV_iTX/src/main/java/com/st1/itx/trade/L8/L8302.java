@@ -112,7 +112,7 @@ public class L8302 extends TradeBuffer {
 			if ("A".equals(iTranKey)) {
 				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
 				if (iJcicZ040 == null) {
-					throw new LogicException("E0005", "未曾報送過'40':前置協商受理申請暨請求回報債權通知");
+					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
 				}
 			} // 2 end
 

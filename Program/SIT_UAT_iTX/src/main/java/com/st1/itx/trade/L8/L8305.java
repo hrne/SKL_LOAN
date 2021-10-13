@@ -156,7 +156,7 @@ public class L8305 extends TradeBuffer {
 				// 1.2 start 完整key值未曾報送過'40':「前置協商受理申請暨請求回報債權通知」則予以剔退
 				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
 				if (iJcicZ040 == null) {
-					throw new LogicException("E0005", "未曾報送過'40':「前置協商受理申請暨請求回報債權通知」.");
+					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
 				} // 1.2 end
 			}
 
@@ -175,7 +175,7 @@ public class L8305 extends TradeBuffer {
 								Integer.MAX_VALUE, titaVo);
 						if (sJcicZ044Log != null) {
 							if (sJcicZ044Log.getSize() > 1) {
-								throw new LogicException("E0005", "報送'47':金融機構無擔保債務協議資料前，僅能異動1次.");
+								throw new LogicException("E0007", "報送(47)金融機構無擔保債務協議資料前，僅能異動1次.");
 							}
 						}
 					}

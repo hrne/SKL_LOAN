@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txTranCodeService")
 @Repository
-public class TxTranCodeServiceImpl implements TxTranCodeService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(TxTranCodeServiceImpl.class);
-
+public class TxTranCodeServiceImpl extends ASpringJpaParm implements TxTranCodeService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class TxTranCodeServiceImpl implements TxTranCodeService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + tranNo);
+    this.info("findById " + dbName + " " + tranNo);
     Optional<TxTranCode> txTranCode = null;
     if (dbName.equals(ContentName.onDay))
       txTranCode = txTranCodeReposDay.findById(tranNo);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "TranNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "TranNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = txTranCodeReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +101,9 @@ em = null;
       slice = txTranCodeReposHist.findAll(pageable);
     else 
       slice = txTranCodeRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +120,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("TranNoLike " + dbName + " : " + "tranNo_0 : " + tranNo_0);
+    this.info("TranNoLike " + dbName + " : " + "tranNo_0 : " + tranNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = txTranCodeReposDay.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
     else 
       slice = txTranCodeRepos.findAllByTranNoLikeOrderByTranNoAsc(tranNo_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -139,7 +141,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + tranNo);
+    this.info("Hold " + dbName + " " + tranNo);
     Optional<TxTranCode> txTranCode = null;
     if (dbName.equals(ContentName.onDay))
       txTranCode = txTranCodeReposDay.findByTranNo(tranNo);
@@ -157,7 +159,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + txTranCode.getTranNo());
+    this.info("Hold " + dbName + " " + txTranCode.getTranNo());
     Optional<TxTranCode> txTranCodeT = null;
     if (dbName.equals(ContentName.onDay))
       txTranCodeT = txTranCodeReposDay.findByTranNo(txTranCode.getTranNo());
@@ -179,7 +181,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + txTranCode.getTranNo());
+    this.info("Insert..." + dbName + " " + txTranCode.getTranNo());
     if (this.findById(txTranCode.getTranNo()) != null)
       throw new DBException(2);
 
@@ -208,7 +210,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + txTranCode.getTranNo());
+    this.info("Update..." + dbName + " " + txTranCode.getTranNo());
     if (!empNot.isEmpty())
       txTranCode.setLastUpdateEmpNo(empNot);
 
@@ -231,7 +233,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + txTranCode.getTranNo());
+    this.info("Update..." + dbName + " " + txTranCode.getTranNo());
     if (!empNot.isEmpty())
       txTranCode.setLastUpdateEmpNo(empNot);
 
@@ -251,7 +253,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + txTranCode.getTranNo());
+    this.info("Delete..." + dbName + " " + txTranCode.getTranNo());
     if (dbName.equals(ContentName.onDay)) {
       txTranCodeReposDay.delete(txTranCode);	
       txTranCodeReposDay.flush();
@@ -280,7 +282,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (TxTranCode t : txTranCode){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,7 +317,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (txTranCode == null || txTranCode.size() == 0)
       throw new DBException(6);
 
@@ -344,7 +346,7 @@ em = null;
 
   @Override
   public void deleteAll(List<TxTranCode> txTranCode, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

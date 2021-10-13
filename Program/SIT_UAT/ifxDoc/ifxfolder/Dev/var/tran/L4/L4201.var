@@ -256,9 +256,9 @@ BIND(#BTN_L3420,click, {cmd=CHAIN; ntxcd=L3420; ntxbuf=#BUF_L3420})
 !虛擬帳號
 #VirtualAcctNo=x,14,L
 !提款
-#WithdrawAmt=m,14,L
+#WithdrawAmt=+m,14,L
 !存款
-#DepositAmt=m,14,L
+#DepositAmt=+m,14,L
 !結餘
 #Balance=m,14,L
 !匯款銀行代碼

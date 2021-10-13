@@ -64,6 +64,7 @@
 !    L2R53 : 依戶號尋找扣款帳號help
 !    L2R54 : 依聯貸案編號尋找申請案件檔(已准)
 !    L2R55 : 依聯貸案編號尋找額度主檔
+!    L2R56 : 商品建檔時組出清償說明 
 !    L1R01 : 尋找客戶檔資料
 !    L1R02 : 尋找客戶關聯戶資料
 !    L1R03 : 尋找客戶額度檔資料
@@ -3552,6 +3553,17 @@ TXFORM=L2R55
 ^
 </L2R55.tom>
 
+!    L2R56 : 商品建檔時組出清償說明 
+
+<L2R56.dec>
+#L2r56Breach=x,200,S
+</L2R56.dec>
+
+<L2R56.tom>
+TXFORM=L2R56
+#L2r56Breach
+^
+</L2R56.tom>
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -4554,6 +4566,16 @@ TXFORM=L1R18
 ^
 </L1R18.tom>
 
+<L1R19.dec>
+#L1R19GrowRate=+m,18.2,S
+</L1R19.dec>
+
+<L1R19.tom>
+TXFORM=L1R19
+#L1R19GrowRate
+^
+</L1R19.tom>
+
 
 
 --------------------------------------------------------------
@@ -4604,8 +4626,8 @@ TXFORM=L4R03
 #L4r04EntryDate=D,7,S
 #L4r04DscptCode=X,50,S
 #L4r04VirtualAcctNo=x,14,S
-#L4r04WithdrawAmt=m,14,S
-#L4r04DepositAmt=m,14,S
+#L4r04WithdrawAmt=+m,14,S
+#L4r04DepositAmt=+m,14,S
 #L4r04Balance=m,14,S
 #L4r04RemintBank=A,7,S
 #L4r04TraderInfo=X,40,S

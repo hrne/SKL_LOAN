@@ -256,6 +256,11 @@ public class L2605 extends TradeBuffer {
 								cityItem = tCdCity.getCityItem();
 								this.info("縣市 = " + cityItem);
 							}
+							
+							if( "00".equals(cityCode))  {
+								cityCode = "  ";
+							} 
+
 						}
 					}
 				}

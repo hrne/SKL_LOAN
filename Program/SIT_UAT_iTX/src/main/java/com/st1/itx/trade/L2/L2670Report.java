@@ -55,12 +55,13 @@ public class L2670Report extends MakeReport {
 	private String security = "";
 	private String pageSize = "A4";
 	private String pageOrientation = "P";
-
+//	private String reprint = "✽✽✽重印✽✽✽";
+	private String reprint = "******重印******";
 	// 製表日期
 	private String NowDate;
 	// 製表時間
 	private String NowTime;
-
+	private int sPrintCode = 0;
 	// 自訂表頭
 	@Override
 	public void printHeader() {
@@ -68,6 +69,9 @@ public class L2670Report extends MakeReport {
 		this.info("L2670Report.printHeader");
 
 		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
+		if(sPrintCode != 0) {
+		  this.print(-2, 110, reprint, "R");
+		}
 		this.print(-3, 55, this.reportItem, "C");
 		this.print(-4, 6, "茲收到", "L");
 
@@ -93,9 +97,9 @@ public class L2670Report extends MakeReport {
 		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo() + "  " + EmpName);
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
+	public void exec(TitaVo titaVo, int PrintCode) throws LogicException {
 		this.info("L2670Report exec ...");
-
+		sPrintCode = PrintCode;
 		// 設定字體1:標楷體 字體大小12
 		this.setFont(1, 12);
 

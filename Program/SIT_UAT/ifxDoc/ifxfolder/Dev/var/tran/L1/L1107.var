@@ -198,12 +198,38 @@ C(3,#FunCd,1,$,HIDE(#BTN1))
 T(3,CdCode.FunctionCd)
 #FunCdHelp=x,1024,S
 
+#CDDEF0002=x,20,S
+T(3,CdCode.YesNo)
+#YesNoHelp=x,1024,S
+
+#CDDEF0003=x,30,S
+T(3,CdCode.CustReportType)
+#ReportTypeHelp=x,1024,S
+
+#CDDEF0004=x,20,S
+T(3,CdCode.Opinion)
+#OpinionHelp=x,1024,S
+
+#CDDEF0005=x,20,S
+T(3,CdCode.OfficeType)
+#OfficeTypeHelp=x,1024,S
+
+#CDDEF0006=x,20,S
+T(3,CdCode.ChangeReason)
+#ChangeReasonHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001)
-R(1,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CDDEF0005,#CDDEF0006)
+R(1,XXR99)  
 CALL(#HelpProc)
 T(2,@FunCdHelp,#HelpDesc1)
+T(2,@YesNoHelp,#HelpDesc2)
+T(2,@ReportTypeHelp,#HelpDesc3)
+T(2,@OpinionHelp,#HelpDesc4)
+T(2,@OfficeTypeHelp,#HelpDesc5)
+T(2,@ChangeReasonHelp,#HelpDesc6)
+
 
 !功能 下拉式選單 1: 新增 2:修改 4:刪除;5:查詢
 #FunCd=A,1,S
@@ -360,6 +386,7 @@ A(ID_UNINO,0,#CustId)
 
 
 <include src="ROM.icf::L1R01.dec"/>
+<include src="ROM.icf::L1R19.dec"/>
 
 #RimL1r01=X,1,S
 C(3,#FunCd,1,$,S)
@@ -747,7 +774,7 @@ CALL(#FinBtnProc2)
 [
 ["損益表"],
 ["@@@@@@@@@@@@@@@@營業收入",#BusIncome],
-["@@@@<font color=red>較去年同期營收成長率",#GrowRate],
+["@@@@<font color=red>較去年同期營收成長率(%)",#GrowRate],
 ["@@@@@@@@@@@@@減:營業成本",#BusCost],
 ["@@@@@@@@@@@@@@@@營業毛利",#BusGrossProfit],
 ["@@@@@@@@@@@@@減:管銷費用",#ManageFee],
@@ -770,6 +797,18 @@ CALL(#FinBtnProc2)
 C(2,#FunCd,$,$,$,$,s,s)
 @
 CALL(#BusGrossProfitProc)
+
+#RimL1R19=X,1,S
+#RimYear=9,3,S
+E(0,@RimYear,#StartYY)
+#RimBusIncome=+m,18,S
+E(0,#BusIncome)
+RESET_RIM(#RimL1r19,L1R19)
+T(2,@RimCustId,#CustId)
+S(L1R19,1,#RimCustId,#RimYear,#RimBusIncome)
+R(1,L1R19)
+E(0,@GrowRate,#L1R19GrowRate)
+
 
 #GrowRate=+m,16.2,L
 
@@ -1014,20 +1053,7 @@ CALL(#FinBtnProc6)
 ["會計師懲戒紀錄",#PunishRecord,#PunishRecordX],["更換會計師原因",#ChangeReason,#ChangeReasonX],
 ]
 
-#YesNoHelp=X,100,S
-T(3,Y:是;N:否)
 
-#ReportTypeHelp=X,1024,S
-T(3,1:合併報表;2:個體報表;3:營利事業所得稅結算申報書;4:自結報表)
-
-#OpinionHelp=X,1024,S
-T(3,1:無保留意見;2:修正式無保留意見;3:保留意見;4:否定意見;5:無法表示意見)
-
-#OfficeTypeHelp=X,1024,S
-T(3,1:四大聯合會計師事務所;2:非四大之聯合會計師事務所;3:會計師事務所)
-
-#ChangeReasonHelp=X,1024,S
-T(3,1:更換會計師事務所;2:會計師輪簽;3:其他)
 
 #FinYear=A,3,L
 
@@ -1276,7 +1302,7 @@ TXFORM=L1107^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L1R01.tom"/>
-
+<include src="ROM.icf::L1R19.tom"/>
 TXFORM=L1R03
 #CustId
 #CustName
