@@ -17,6 +17,8 @@ import com.st1.itx.db.service.TxRecordService;
 import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.domain.TxFlowId;
 import com.st1.itx.db.service.TxFlowService;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.CommBuffer;
 import com.st1.itx.util.common.AcEnterCom;
 import com.st1.itx.util.common.LockControl;
@@ -24,6 +26,7 @@ import com.st1.itx.util.common.TxAmlCom;
 import com.st1.itx.util.common.TxBatchCom;
 import com.st1.itx.util.common.TxToDoCom;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.common.CustRmkCom;
 import com.st1.itx.dataVO.TotaVo;
 
 @Component("cs80UpDBS")
@@ -39,6 +42,9 @@ public class Cs80UpDBS extends CommBuffer {
 	public TxRecordService txRecordService;
 
 	@Autowired
+	public CustMainService custMainService;
+
+	@Autowired
 	public LockControl lockControl;
 
 	@Autowired
@@ -52,6 +58,9 @@ public class Cs80UpDBS extends CommBuffer {
 
 	@Autowired
 	public TxAmlCom txAmlCom;
+
+	@Autowired
+	CustRmkCom custRmkCom;
 
 	@Autowired
 	public Parse parse;
@@ -122,6 +131,12 @@ public class Cs80UpDBS extends CommBuffer {
 				this.mntTxFlow();
 			}
 
+			// 2021.10.13 by eric
+			this.info("CS80 before custRmk = " + this.titaVo.isTrmtypBatch() + "/" + tota.isError() + "/" + titaVo.getReturnIndex());
+			if (this.txBuffer.getTxCom().getCustRmkFg() == 1 && !this.titaVo.isTrmtypBatch() && !tota.isError() && titaVo.getReturnIndex() == 0) {
+				this.custRmk();
+			}
+
 			if (!(this.titaVo.isTrmtypBatch() && this.titaVo.isHcodeErase()) && !this.titaVo.isHcodeSendOut() && !this.titaVo.isHcodeReject()) {
 				this.insTxRecord(tota);
 			}
@@ -146,6 +161,27 @@ public class Cs80UpDBS extends CommBuffer {
 			this.txAmlCom.nameCheckInsert(titaVo);
 		}
 
+	}
+
+	// 2021.10.13 by eric
+	private void custRmk() throws LogicException {
+		this.info("CS80 custRmk = " + this.titaVo.get("CustNo") + "/" + this.titaVo.get("CustId"));
+		int custNo9 = 0;
+		if (titaVo.getMrKey().trim().length() >= 7 && parse.isNumeric(titaVo.getMrKey().trim().substring(0, 7))) {
+			custNo9 = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));
+		} else {
+			String custId = this.titaVo.get("CustId");
+			if (custId != null) {
+				CustMain custMain = custMainService.custIdFirst(custId, titaVo);
+				if (custMain != null) {
+					custNo9 = custMain.getCustNo();
+				}
+			}
+		}
+
+		if (custNo9 > 0) {
+			this.totaVoList.addAll(custRmkCom.getCustRmk(titaVo, custNo9));
+		}
 	}
 
 	private void updTxTeller() throws LogicException {

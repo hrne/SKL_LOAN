@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("loanNotYetService")
 @Repository
-public class LoanNotYetServiceImpl implements LoanNotYetService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(LoanNotYetServiceImpl.class);
-
+public class LoanNotYetServiceImpl extends ASpringJpaParm implements LoanNotYetService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class LoanNotYetServiceImpl implements LoanNotYetService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + loanNotYetId);
+    this.info("findById " + dbName + " " + loanNotYetId);
     Optional<LoanNotYet> loanNotYet = null;
     if (dbName.equals(ContentName.onDay))
       loanNotYet = loanNotYetReposDay.findById(loanNotYetId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo", "NotYetCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo", "NotYetCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = loanNotYetReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -125,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("notYetCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2 + " yetDate_3 : " +  yetDate_3 + " yetDate_4 : " +  yetDate_4 + " closeDate_5 : " +  closeDate_5 + " closeDate_6 : " +  closeDate_6);
+    this.info("notYetCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2 + " yetDate_3 : " +  yetDate_3 + " yetDate_4 : " +  yetDate_4 + " closeDate_5 : " +  closeDate_5 + " closeDate_6 : " +  closeDate_6);
     if (dbName.equals(ContentName.onDay))
       slice = loanNotYetReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndYetDateGreaterThanEqualAndYetDateLessThanEqualAndCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscFacmNoAscNotYetCodeAsc(custNo_0, facmNo_1, facmNo_2, yetDate_3, yetDate_4, closeDate_5, closeDate_6, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -153,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = loanNotYetReposDay.findAllByCustNoIsOrderByFacmNoAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("notYetCodeFisrt " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " notYetCode_2 : " +  notYetCode_2);
+    this.info("notYetCodeFisrt " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " notYetCode_2 : " +  notYetCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = loanNotYetReposDay.findAllByCustNoIsAndFacmNoIsAndNotYetCodeIs(custNo_0, facmNo_1, notYetCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -198,11 +194,39 @@ em = null;
   }
 
   @Override
+  public Slice<LoanNotYet> allNoClose(int closeDate_0, int yetDate_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<LoanNotYet> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("allNoClose " + dbName + " : " + "closeDate_0 : " + closeDate_0 + " yetDate_1 : " +  yetDate_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = loanNotYetReposDay.findAllByCloseDateIsAndYetDateLessThanEqualOrderByCustNoAscFacmNoAscYetDateAsc(closeDate_0, yetDate_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = loanNotYetReposMon.findAllByCloseDateIsAndYetDateLessThanEqualOrderByCustNoAscFacmNoAscYetDateAsc(closeDate_0, yetDate_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = loanNotYetReposHist.findAllByCloseDateIsAndYetDateLessThanEqualOrderByCustNoAscFacmNoAscYetDateAsc(closeDate_0, yetDate_1, pageable);
+    else 
+      slice = loanNotYetRepos.findAllByCloseDateIsAndYetDateLessThanEqualOrderByCustNoAscFacmNoAscYetDateAsc(closeDate_0, yetDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public LoanNotYet holdById(LoanNotYetId loanNotYetId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + loanNotYetId);
+    this.info("Hold " + dbName + " " + loanNotYetId);
     Optional<LoanNotYet> loanNotYet = null;
     if (dbName.equals(ContentName.onDay))
       loanNotYet = loanNotYetReposDay.findByLoanNotYetId(loanNotYetId);
@@ -220,7 +244,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + loanNotYet.getLoanNotYetId());
+    this.info("Hold " + dbName + " " + loanNotYet.getLoanNotYetId());
     Optional<LoanNotYet> loanNotYetT = null;
     if (dbName.equals(ContentName.onDay))
       loanNotYetT = loanNotYetReposDay.findByLoanNotYetId(loanNotYet.getLoanNotYetId());
@@ -242,7 +266,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + loanNotYet.getLoanNotYetId());
+    this.info("Insert..." + dbName + " " + loanNotYet.getLoanNotYetId());
     if (this.findById(loanNotYet.getLoanNotYetId()) != null)
       throw new DBException(2);
 
@@ -271,7 +295,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + loanNotYet.getLoanNotYetId());
+    this.info("Update..." + dbName + " " + loanNotYet.getLoanNotYetId());
     if (!empNot.isEmpty())
       loanNotYet.setLastUpdateEmpNo(empNot);
 
@@ -294,7 +318,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + loanNotYet.getLoanNotYetId());
+    this.info("Update..." + dbName + " " + loanNotYet.getLoanNotYetId());
     if (!empNot.isEmpty())
       loanNotYet.setLastUpdateEmpNo(empNot);
 
@@ -314,7 +338,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + loanNotYet.getLoanNotYetId());
+    this.info("Delete..." + dbName + " " + loanNotYet.getLoanNotYetId());
     if (dbName.equals(ContentName.onDay)) {
       loanNotYetReposDay.delete(loanNotYet);	
       loanNotYetReposDay.flush();
@@ -343,7 +367,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (LoanNotYet t : loanNotYet){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -378,7 +402,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (loanNotYet == null || loanNotYet.size() == 0)
       throw new DBException(6);
 
@@ -407,7 +431,7 @@ em = null;
 
   @Override
   public void deleteAll(List<LoanNotYet> loanNotYet, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

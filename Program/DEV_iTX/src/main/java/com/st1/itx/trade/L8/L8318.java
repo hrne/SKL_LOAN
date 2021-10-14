@@ -121,11 +121,11 @@ public class L8318 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)，不能重複，若有重複，且無'63'結案資料，則剔退處理.
 			if ("A".equals(iTranKey)) {
-				iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
-				if (iJcicZ060 != null) {
+				JcicZ060 jJcicZ060  = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
+				if (jJcicZ060 != null) {
 					iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
 					if (iJcicZ063 == null) {
-						throw new LogicException("E0005", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)有重複，且無'63'結案資料.");
+						throw new LogicException("E0005", "KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)有重複，且無(63)變更還款方案結案通知資料.");
 					}
 				} // 2 end
 
@@ -138,12 +138,12 @@ public class L8318 extends TradeBuffer {
 				Slice<JcicZ047> sJcicZ047 = sJcicZ047Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
 						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ047 == null) {
-					throw new LogicException("E0005", "需先報送「'47':金融機構無擔保債務協議資料」.");
+					throw new LogicException("E0005", "最大債權金融機構需先報送(47)金融機構無擔保債務協議資料.");
 				} else {
 					Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
 							Integer.MAX_VALUE, titaVo);
 					if (sJcicZ046 != null) {
-						throw new LogicException("E0005", "已報送「'46':結案通知資料」.");
+						throw new LogicException("E0005", "最大債權金融機構已報送(46)結案通知資料.");
 					}
 				} // 5 end
 
@@ -154,16 +154,16 @@ public class L8318 extends TradeBuffer {
 						|| (!"A".equals(iJcicZ063.getClosedResult()) && !"B".equals(iJcicZ063.getClosedResult()))) {
 					iJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id, titaVo);
 					if (iJcicZ062 == null) {
-						throw new LogicException("E0005", "須先報送'63'結案，且結案原因為A或B).");
+						throw new LogicException("E0005", "須先報送(63)變更還款方案結案通知資料，且結案原因為A或B.");
 					} else if (iJcicZ062.getChaRepayEndDate() <= 0) {
-						throw new LogicException("E0005", "'62金融機構無擔保債務變更還款條件協議資料'「簽約完成日」須有值，或者可先報送'63'結案.");
+						throw new LogicException("E0005", "(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」不能為空，或者亦可先報送(63)變更還款方案結案通知資料.");
 					}
 				} // 8 end
 			}
 
 			// 4 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
-			iJcicZ060 = sJcicZ060Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
-			if ("C".equals(iTranKey) && iJcicZ060 == null) {
+			JcicZ060 jJcicZ060 = sJcicZ060Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
+			if ("C".equals(iTranKey) && jJcicZ060 == null) {
 				iTranKey_Tmp = "1";
 			}
 			// 4 end

@@ -176,6 +176,9 @@ public class TxCom {
 	// 修改屬性
 	private int txModifyFg = 0;
 
+	// 顯示顧客控管警訊 2021.10.13 by eric
+	private int custRmkFg = 0;
+
 	public TxCom(TxBizDate txBizDate) {
 		this.setTbsdy(txBizDate.getTbsDy());
 		this.setNbsdy(txBizDate.getNbsDy());
@@ -1171,6 +1174,14 @@ public class TxCom {
 		SubmitFg = submitFg;
 	}
 
+	public int getCustRmkFg() {
+		return custRmkFg;
+	}
+
+	public void setCustRmkFg(int custRmkFg) {
+		this.custRmkFg = custRmkFg;
+	}
+
 	@Override
 	public String toString() {
 		return "TxCom [FlowEntday=" + FlowEntday + ", FlowNo=" + FlowNo + ", ConfirmBrNo=" + ConfirmBrNo + ", ConfirmGroupNo=" + ConfirmGroupNo + ", CanCancel=" + CanCancel + ", CanModify="
@@ -1180,7 +1191,7 @@ public class TxCom {
 				+ ", tmndy=" + tmndy + ", mfbsdy=" + mfbsdy + ", tbsdyf=" + tbsdyf + ", nbsdyf=" + nbsdyf + ", nnbsdyf=" + nnbsdyf + ", lbsdyf=" + lbsdyf + ", lmndyf=" + lmndyf + ", tmndyf=" + tmndyf
 				+ ", mfbsdyf=" + mfbsdyf + ", reldy=" + reldy + ", orgEntdy=" + orgEntdy + ", orgTxSeq=" + orgTxSeq + ", orgKin=" + orgKin + ", orgTlr=" + orgTlr + ", orgTno=" + orgTno + ", scanCd="
 				+ scanCd + ", oTxSeq=" + oTxSeq + ", orgCalDy=" + orgCalDy + ", orgCalTm=" + orgCalTm + ", txRsut=" + txRsut + ", msgId=" + msgId + ", errorMsg=" + errorMsg + ", txHcode=" + txHcode
-				+ ", txModifyFg=" + txModifyFg + "]";
+				+ ", txModifyFg=" + txModifyFg + ", custRmkFg=" + custRmkFg + "]";
 	}
 
 }

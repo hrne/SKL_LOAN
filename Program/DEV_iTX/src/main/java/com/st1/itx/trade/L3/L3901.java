@@ -41,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3901")
 @Scope("prototype")
 public class L3901 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3901.class);
 
 	@Autowired
 	Parse parse;
@@ -83,7 +82,9 @@ public class L3901 extends TradeBuffer {
 		int wkTerm = 0;
 
 		OccursList occursList;
-		if (iFreqBase == 3) {
+		if (iFreqBase == 1) {
+			wkFreqBaseConstant = new BigDecimal(36500);
+		} else if (iFreqBase == 3) {
 			wkFreqBaseConstant = new BigDecimal(5200);
 		} else {
 			wkFreqBaseConstant = new BigDecimal(1200);
@@ -114,9 +115,9 @@ public class L3901 extends TradeBuffer {
 					iRate = parse.stringToBigDecimal(titaVo.getParam("Rate" + i));
 					wkTerm = parse.stringToInteger(titaVo.getParam("ETerm" + i))
 							- parse.stringToInteger(titaVo.getParam("STerm" + i)) + 1;
-					wkInterest = wkInterest.add(iPrincipal.multiply(iRate)
-							.divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP)
-							.multiply(new BigDecimal(wkTerm)).setScale(0, RoundingMode.HALF_UP));
+					wkInterest = wkInterest
+							.add(iPrincipal.multiply(iRate).divide(wkFreqBaseConstant, 5, RoundingMode.HALF_UP)
+									.multiply(new BigDecimal(wkTerm)).setScale(0, RoundingMode.HALF_UP));
 				}
 			}
 			occursList = new OccursList();

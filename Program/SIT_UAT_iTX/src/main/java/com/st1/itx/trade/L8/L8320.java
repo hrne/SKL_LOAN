@@ -146,11 +146,11 @@ public class L8320 extends TradeBuffer {
 				iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
 				if (iJcicZ060 == null) {
 					throw new LogicException("E0005",
-							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過「'60':前置協商受理申請變更還款暨請求回報剩餘債權通知」.");
+							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
 				} else {
 					if (TimestampToDate(iJcicZ060.getCreateDate()) >= iTxDate) {
-						// throw new LogicException("E0005",
-						// "本檔案報送日需大於等於「'60':前置協商受理申請變更還款暨請求回報剩餘債權通知」資料報送日+3個營業日.");
+						 throw new LogicException("E0005",
+						 "本檔案報送日需大於等於(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料報送日+3個營業日.");
 					}
 				}
 				// 1.2, 1.3 end
@@ -165,8 +165,8 @@ public class L8320 extends TradeBuffer {
 			// 檢核第14欄「變更還款條件簽約總債務金額」需為第11-13欄信用貸款、現金卡、信用卡之「協商剩餘債務簽約餘額」合計，否則予以剔退.前端已設為自動填入數字。
 
 			// 1.7 start 變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日期
-			if (iChaRepayEndDate < iChaRepayAgreeDate) {
-				// throw new LogicException("E0005", "變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日期.");
+			if (iChaRepayEndDate > 0 && iChaRepayEndDate < iChaRepayAgreeDate) {
+				 throw new LogicException("E0005", "「變更還款條件簽約完成日期」需大於或等於「變更還款條件協議完成日期」.");
 			}
 			// 1.7 end
 
@@ -244,19 +244,19 @@ public class L8320 extends TradeBuffer {
 			if ((iJcicZ047 == null) || ((iJcicZ047 != null) && (iRate2.compareTo(iJcicZ047.getRate()) != 0))) {
 				iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
 				if (iJcicZ063 != null) {
-					throw new LogicException("E0005", "「第二階梯利率」須與「'47':無擔保債務協議資料」之「利率」相同.");
+					throw new LogicException("E0005", "「第二階梯利率」須與(47)金融機構無擔保債務協議資料之「利率」相同.");
 				} else {
 					jJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id, titaVo);
 					if (jJcicZ062 == null) {
-						throw new LogicException("E0005", "「第二階梯利率」須與「'47':無擔保債務協議資料」之「利率」相同.");
+						throw new LogicException("E0005", "「第二階梯利率」須與(47)金融機構無擔保債務協議資料之「利率」相同.");
 					} else {
 						if (("Y".equals(jJcicZ062.getGradeType())) && (iRate2.compareTo(jJcicZ062.getRate2()) != 0)) {
 							throw new LogicException("E0005",
-									"「第二階梯利率」須與「'47':無擔保債務協議資料」之「利率」相同或前次報送'62'且未報'63'結案者「第二階梯利率」(前次變更還款條件屬階梯式還款者)相同.");
+									"「第二階梯利率」須與(47)金融機構無擔保債務協議資料之「利率」相同或前次報送(62)金融機構無擔保債務變更還款條件協議資料且未報(63)變更還款方案結案通知資料者「第二階梯利率」(前次變更還款條件屬階梯式還款者)相同.");
 						} else if ((!"Y".equals(jJcicZ062.getGradeType()))
 								&& (iRate2.compareTo(jJcicZ062.getRate()) != 0)) {
 							throw new LogicException("E0005",
-									"「第二階梯利率」須與「'47':無擔保債務協議資料」之「利率」相同或前次報送'62'且未報'63'結案者「第一階梯利率」相同.");
+									"「第二階梯利率」須與(47)金融機構無擔保債務協議資料之「利率」相同或前次報送(62)金融機構無擔保債務變更還款條件協議資料且未報(63)變更還款方案結案通知資料者「第一階梯利率」相同.");
 						}
 					}
 				}
@@ -266,7 +266,7 @@ public class L8320 extends TradeBuffer {
 			// 第17欄「變更還款條件簽約完成日」有值後，同一筆key值資料即不得報送'63'結案，否則予以剔退.***與1.17和「L8321(JcicZ063)檢核1.5是同一檢核，併同報送相關.***
 
 			// 1.15 start第18欄「變更還款條件首期應繳款日」需大於或等於第17欄「變更還款條件簽約完成日」，否則予以剔退.
-			if (iChaRepayFirstDate < iChaRepayEndDate) {
+			if (iChaRepayEndDate > 0 && iChaRepayFirstDate < iChaRepayEndDate) {
 				throw new LogicException("E0005", "「變更還款條件首期應繳款日」需大於或等於「變更還款條件簽約完成日」.");
 			}
 			// 1.15 end
@@ -277,7 +277,7 @@ public class L8320 extends TradeBuffer {
 				this.info("NextMonth10Date(TimestampToDate(iJcicZ060.getCreateDate()))++"
 						+ NextMonth10Date(TimestampToDate(iJcicZ060.getCreateDate())));
 				if (iChaRepayFirstDate != NextMonth10Date(TimestampToDate(iJcicZ060.getCreateDate()))) {
-					throw new LogicException("E0005", "「變更還款條件首期應繳款日」需為「'60':前置協商受理變更還款申請暨請求回報債權通知資料」報送日之次月10日.");
+					throw new LogicException("E0005", "「變更還款條件首期應繳款日」需為(60)前置協商受理變更還款申請暨請求回報債權通知資料報送日之次月10日.");
 				}
 			} // 1.16 end
 

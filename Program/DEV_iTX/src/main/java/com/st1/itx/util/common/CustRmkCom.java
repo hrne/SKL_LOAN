@@ -1,6 +1,8 @@
 package com.st1.itx.util.common;
 
 import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -50,23 +52,33 @@ public class CustRmkCom extends TradeBuffer {
 		return null;
 	}
 
-	/**
-	 * 顧客控管警訊通知訊息
-	 * 
-	 * @param iCustNo 戶號
-	 * @param titaVo  通知訊息
-	 * @throws LogicException ..
-	 */
-	public void getCustRmk(int iCustNo, TitaVo titaVo) throws LogicException {
-		this.info("CustRmkCom.getCustRmk ...");
+	public ArrayList<TotaVo> getCustRmk(TitaVo titaVo, int iCustNo) throws LogicException {
+		this.info("CustRmkCom.getCustRmk = " + iCustNo);
 
 		// 查詢顧客控管警訊檔
+
 		Slice<CustRmk> slCustRmk = custRmkService.findCustNo(iCustNo, 0, Integer.MAX_VALUE, titaVo);
-		if (slCustRmk != null) {
-			webClient.sendPost(dateUtil.getNowStringBc(), parse.IntegerToString(dateUtil.getNowIntegerTime() / 100 + 3, 4), titaVo.getTlrNo(), "Y", "L2072", parse.IntegerToString(iCustNo, 7),
-					"該戶有顧客控管警訊", titaVo);
-			this.info("time=" + parse.IntegerToString(dateUtil.getNowIntegerTime() / 100 + 3, 4));
+		List<CustRmk> lCustRmk = slCustRmk == null ? null : slCustRmk.getContent();
+		if (lCustRmk != null && lCustRmk.size() > 0) {
+			String s = "{red-s}{b-s}顧客控管警訊：{b-e}{red-e}<br><br>";
+			for (CustRmk custRmk : lCustRmk) {
+				s += custRmk.getRmkDesc() + "<br>";
+			}
+
+//			this.info("CustRmkCom.setHtmlContent = " + s);
+
+			this.totaVo.init(titaVo);
+
+			this.totaVo.setHtmlContent(s);
+
+			this.addList(totaVo);
+
+//			webClient.sendPost(dateUtil.getNowStringBc(), parse.IntegerToString(dateUtil.getNowIntegerTime() / 100 + 3, 4), titaVo.getTlrNo(), "Y", "L2072", parse.IntegerToString(iCustNo, 7),
+//					"該戶有顧客控管警訊", titaVo);
+//			this.info("time=" + parse.IntegerToString(dateUtil.getNowIntegerTime() / 100 + 3, 4));
+
 		}
 
+		return this.sendList();
 	}
 }

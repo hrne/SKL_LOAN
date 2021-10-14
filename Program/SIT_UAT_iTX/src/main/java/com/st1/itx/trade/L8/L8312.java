@@ -116,7 +116,7 @@ public class L8312 extends TradeBuffer {
 				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
 						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
-					throw new LogicException("E0005", "已報送結案.");
+					throw new LogicException("E0005", "Key值(IDN+報送單位代號+協商申請日)已報送(46)結案通知資料.");
 				}
 			} // 2.2 end
 

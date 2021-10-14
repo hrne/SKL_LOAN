@@ -112,7 +112,7 @@ public class L8315 extends TradeBuffer {
 				// 2 start KEY值(IDN+報送單位代號+協商申請日+最大債權金融機構代號)未曾報送過'47':金融機構無擔保債務協議資料，予以剔退處理.
 				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
 				if (iJcicZ047 == null) {
-					throw new LogicException("E0005", "未曾報送過'47':金融機構無擔保債務協議資料.");
+					throw new LogicException("E0005", "未曾報送過(47)金融機構無擔保債務協議資料.");
 				}
 			} // 2 end
 

@@ -31,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L5060 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5060.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -39,7 +38,7 @@ public class L5060 extends TradeBuffer {
 	/* 日期工具 */
 	@Autowired
 	public L5060ServiceImpl l5060ServiceImpl;
-	
+
 	@Autowired
 	public CdEmpService iCdEmpService;
 
@@ -56,17 +55,17 @@ public class L5060 extends TradeBuffer {
 		String iAccCollPsn = "";
 		String iLegalPsn = "";
 		String iTxCode = titaVo.getParam("TxCode");
-		this.info("身分別="+iIdentity+".");
+		this.info("身分別=" + iIdentity + ".");
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 40;
-		List<Map<String, String>> lL5060Vo = new ArrayList<Map<String,String>>();
-		
-		switch(iIdentity) {
+		this.limit = 200;
+		List<Map<String, String>> lL5060Vo = new ArrayList<Map<String, String>>();
+
+		switch (iIdentity) {
 		case 0:
 			this.info("查全部");
 			break;
@@ -93,39 +92,36 @@ public class L5060 extends TradeBuffer {
 		}
 		try {
 //			l5060ServiceImpl.getEntityManager(titaVo);
-			if(iOprionCd.equals("1")) {
-				lL5060Vo = l5060ServiceImpl.load(this.index,this.limit,titaVo.getParam("CaseCode"), Integer.valueOf(titaVo.getParam("Ovdtrmfm")), Integer.valueOf(titaVo.getParam("Ovdtrmto")),
-						 titaVo.getParam("Ovdamtfm"), titaVo.getParam("Ovdamtto"), Integer.valueOf(titaVo.getParam("Status")),
-						 this.getTxBuffer().getTxBizDate().getTbsDyf(),iIdentity,iCustNo,iCustName,iCustId,iAccCollPsn,	iLegalPsn,iTxCode,titaVo);
-			}
-			else {
-				lL5060Vo = l5060ServiceImpl.load(this.index,this.limit,titaVo.getParam("CaseCode"), Integer.valueOf(titaVo.getParam("Ovddayfm")), Integer.valueOf(titaVo.getParam("Ovddayto")),
-						 titaVo.getParam("Ovdamtfm"), titaVo.getParam("Ovdamtto"), Integer.valueOf(titaVo.getParam("Status")),
-						 this.getTxBuffer().getTxBizDate().getTbsDyf(),iIdentity,iCustNo,iCustName,iCustId,iAccCollPsn,iLegalPsn, iTxCode,titaVo);
+			if (iOprionCd.equals("1")) {
+				lL5060Vo = l5060ServiceImpl.load(this.index, this.limit, titaVo.getParam("CaseCode"), Integer.valueOf(titaVo.getParam("Ovdtrmfm")), Integer.valueOf(titaVo.getParam("Ovdtrmto")),
+						titaVo.getParam("Ovdamtfm"), titaVo.getParam("Ovdamtto"), Integer.valueOf(titaVo.getParam("Status")), this.getTxBuffer().getTxBizDate().getTbsDyf(), iIdentity, iCustNo,
+						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, titaVo);
+			} else {
+				lL5060Vo = l5060ServiceImpl.load(this.index, this.limit, titaVo.getParam("CaseCode"), Integer.valueOf(titaVo.getParam("Ovddayfm")), Integer.valueOf(titaVo.getParam("Ovddayto")),
+						titaVo.getParam("Ovdamtfm"), titaVo.getParam("Ovdamtto"), Integer.valueOf(titaVo.getParam("Status")), this.getTxBuffer().getTxBizDate().getTbsDyf(), iIdentity, iCustNo,
+						iCustName, iCustId, iAccCollPsn, iLegalPsn, iTxCode, titaVo);
 			}
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.warn(errors.toString());
-			throw new LogicException(titaVo, "E0006","loadCollListServiceImpl Exception= " + e); // 讀資料時，發生錯誤
+			throw new LogicException(titaVo, "E0006", "loadCollListServiceImpl Exception= " + e); // 讀資料時，發生錯誤
 		}
-		
-		
-		if(lL5060Vo!=null && lL5060Vo.size()>=this.limit) {
+
+		if (lL5060Vo != null && lL5060Vo.size() >= this.limit) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			titaVo.setReturnIndex(this.setIndexNext());
-			//this.totaVo.setMsgEndToAuto();// 自動折返
+			// this.totaVo.setMsgEndToAuto();// 自動折返
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		
-		
+
 		this.info("L5060List=" + lL5060Vo.toString());
-		if(lL5060Vo.size()==0 ||lL5060Vo == null) {
-			throw new LogicException(titaVo, "E0001","法催作業清單檔查無資料");
+		if (lL5060Vo.size() == 0 || lL5060Vo == null) {
+			throw new LogicException(titaVo, "E0001", "法催作業清單檔查無資料");
 		}
 		ArrayList<String> clCustList = new ArrayList<String>();
 //		ArrayList<Integer> clFacmNoList = new ArrayList<Integer>();
-		
+
 //		for (Map<String, String> thisL5060Vo:lL5060Vo) {
 //			boolean iSwitch = false;
 //			String iTxCode = titaVo.getParam("TxCode");
@@ -186,58 +182,58 @@ public class L5060 extends TradeBuffer {
 //				occursList.putParam("OOClCustNo", thisL5060Vo.getClCustNo());		
 //				occursList.putParam("OOClFacmNo", thisL5060Vo.getClFacmNo());
 //			
-			for (Map<String, String> thisL5060Vo:lL5060Vo) {
-				OccursList occursList = new OccursList();
-				if(clCustList.contains(StringUtils.leftPad(thisL5060Vo.get("F15"), 3)+StringUtils.leftPad(thisL5060Vo.get("F16"), 3))) {
-					//有同擔保品情況
-					occursList.putParam("OOClFlag", 0);
-					occursList.putParam("OOClFlagA", 1);
-				}else {
-					//無同擔保品情況或第一次
-					clCustList.add(StringUtils.leftPad(thisL5060Vo.get("F15"), 3)+StringUtils.leftPad(thisL5060Vo.get("F16"), 3));
-					occursList.putParam("OOClFlag", 1);
-					occursList.putParam("OOClFlagA", 0);
-				}
-				int previntdate = Integer.valueOf(thisL5060Vo.get("F5"));
-				int txdate = Integer.valueOf(thisL5060Vo.get("F2"));
-				if(txdate==0) {
-					occursList.putParam("OOTxDate", txdate);
-				}else {
-					occursList.putParam("OOTxDate", txdate-19110000);
-				}
-				occursList.putParam("OOTxCode", thisL5060Vo.get("F3")); //上次作業項目
-				occursList.putParam("OOCustNo", thisL5060Vo.get("F0"));
-				occursList.putParam("OOFacmNo", thisL5060Vo.get("F1"));
-				if (previntdate==0) {
-					occursList.putParam("OOPrevIntDate", previntdate);
-				}else {
-					occursList.putParam("OOPrevIntDate", previntdate-19110000);
-				}
-				occursList.putParam("OOOverDueterm", thisL5060Vo.get("F6"));
-				occursList.putParam("OOOvduDays", thisL5060Vo.get("F7"));
-				occursList.putParam("OOCurrencyCode", thisL5060Vo.get("F8"));
-				occursList.putParam("OOPrinBalance", thisL5060Vo.get("F9"));
-				occursList.putParam("OOAccCollPsn", thisL5060Vo.get("F10"));
-				occursList.putParam("OOLegalPsn", thisL5060Vo.get("F11"));
-				occursList.putParam("OOAccCollPsnX", thisL5060Vo.get("F12"));//催收人員姓名
-				occursList.putParam("OOLegalPsnX", thisL5060Vo.get("F13"));//法務人員姓名
-				occursList.putParam("OOIsSpecify", thisL5060Vo.get("F18")); //是否指定
-				occursList.putParam("OOStatus", thisL5060Vo.get("F14")); //戶況
-				if(Integer.valueOf(thisL5060Vo.get("F4"))==0) {
-					occursList.putParam("OOAlertDate", 0);
-				}else {
-					occursList.putParam("OOAlertDate", Integer.valueOf(thisL5060Vo.get("F4"))-19110000);
-				}
-				if(Integer.valueOf(thisL5060Vo.get("F4"))<this.getTxBuffer().getTxBizDate().getTbsDyf()) {
-					occursList.putParam("OOClFlagB", 1);//提醒日按鈕
-				}else {
-					occursList.putParam("OOClFlagB", 1);//測試用設為1:開
-				}
-				occursList.putParam("OOClCustNo", thisL5060Vo.get("F15"));		
-				occursList.putParam("OOClFacmNo", thisL5060Vo.get("F16"));
-				
-				this.totaVo.addOccursList(occursList);
+		for (Map<String, String> thisL5060Vo : lL5060Vo) {
+			OccursList occursList = new OccursList();
+			if (clCustList.contains(StringUtils.leftPad(thisL5060Vo.get("F15"), 3) + StringUtils.leftPad(thisL5060Vo.get("F16"), 3))) {
+				// 有同擔保品情況
+				occursList.putParam("OOClFlag", 0);
+				occursList.putParam("OOClFlagA", 1);
+			} else {
+				// 無同擔保品情況或第一次
+				clCustList.add(StringUtils.leftPad(thisL5060Vo.get("F15"), 3) + StringUtils.leftPad(thisL5060Vo.get("F16"), 3));
+				occursList.putParam("OOClFlag", 1);
+				occursList.putParam("OOClFlagA", 0);
 			}
+			int previntdate = Integer.valueOf(thisL5060Vo.get("F5"));
+			int txdate = Integer.valueOf(thisL5060Vo.get("F2"));
+			if (txdate == 0) {
+				occursList.putParam("OOTxDate", txdate);
+			} else {
+				occursList.putParam("OOTxDate", txdate - 19110000);
+			}
+			occursList.putParam("OOTxCode", thisL5060Vo.get("F3")); // 上次作業項目
+			occursList.putParam("OOCustNo", thisL5060Vo.get("F0"));
+			occursList.putParam("OOFacmNo", thisL5060Vo.get("F1"));
+			if (previntdate == 0) {
+				occursList.putParam("OOPrevIntDate", previntdate);
+			} else {
+				occursList.putParam("OOPrevIntDate", previntdate - 19110000);
+			}
+			occursList.putParam("OOOverDueterm", thisL5060Vo.get("F6"));
+			occursList.putParam("OOOvduDays", thisL5060Vo.get("F7"));
+			occursList.putParam("OOCurrencyCode", thisL5060Vo.get("F8"));
+			occursList.putParam("OOPrinBalance", thisL5060Vo.get("F9"));
+			occursList.putParam("OOAccCollPsn", thisL5060Vo.get("F10"));
+			occursList.putParam("OOLegalPsn", thisL5060Vo.get("F11"));
+			occursList.putParam("OOAccCollPsnX", thisL5060Vo.get("F12"));// 催收人員姓名
+			occursList.putParam("OOLegalPsnX", thisL5060Vo.get("F13"));// 法務人員姓名
+			occursList.putParam("OOIsSpecify", thisL5060Vo.get("F18")); // 是否指定
+			occursList.putParam("OOStatus", thisL5060Vo.get("F14")); // 戶況
+			if (Integer.valueOf(thisL5060Vo.get("F4")) == 0) {
+				occursList.putParam("OOAlertDate", 0);
+			} else {
+				occursList.putParam("OOAlertDate", Integer.valueOf(thisL5060Vo.get("F4")) - 19110000);
+			}
+			if (Integer.valueOf(thisL5060Vo.get("F4")) < this.getTxBuffer().getTxBizDate().getTbsDyf()) {
+				occursList.putParam("OOClFlagB", 1);// 提醒日按鈕
+			} else {
+				occursList.putParam("OOClFlagB", 1);// 測試用設為1:開
+			}
+			occursList.putParam("OOClCustNo", thisL5060Vo.get("F15"));
+			occursList.putParam("OOClFacmNo", thisL5060Vo.get("F16"));
+
+			this.totaVo.addOccursList(occursList);
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

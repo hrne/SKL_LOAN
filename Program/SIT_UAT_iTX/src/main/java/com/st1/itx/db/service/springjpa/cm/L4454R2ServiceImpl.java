@@ -16,7 +16,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -49,17 +48,17 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 
 		this.info("銀扣失敗五萬元以上報表 findAll...");
 
-		entdy = titaVo.getEntDyI() + 19110000;
+		entdy = Integer.parseInt(titaVo.getParam("AcDate")) + 19110000;
 
 		this.info("entdy = " + entdy);
 
 		String sql = " select                                                                ";
 		sql += "     bdd.\"RepayAcctNo\"                       AS F0                         ";
-		sql += "   , LPAD(bd.\"CustNo\", 7 , '0')              AS F1                         ";
-		sql += "   , LPAD(bd.\"FacmNo\", 3 , '0')              AS F2                         ";
+		sql += "   , MIN(LPAD(bd.\"CustNo\", 7 , '0'))              AS F1                         ";
+		sql += "   , MIN(LPAD(bd.\"FacmNo\", 3 , '0'))              AS F2                         ";
 		sql += "   , cm.\"CustName\"                           AS F3                         ";
 		sql += "   , bd.\"RepayAmt\"                           AS F4                         ";
-		sql += "   , NVL(ctl.\"PhoneNo\", '')                  AS F5                         ";
+		sql += "   , MIN(NVL(ctl.\"PhoneNo\", ''))             AS F5                         ";
 		sql += "   , NVL(bdd.\"RelCustName\", cm.\"CustName\") AS F6                         ";
 		sql += "   , case when lbm.\"PrevPayIntDate\" < 19110000 then lbm.\"PrevPayIntDate\" ";
 		sql += "          else lbm.\"PrevPayIntDate\" - 19110000 end     AS F7               ";
@@ -86,7 +85,7 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "   left join \"CustMain\" cm       on cm.\"CustNo\"     = bd.\"CustNo\"      ";
 		sql += "   left join (                                                               ";
 		sql += "          select                                                             ";
-		sql += "           Distinct \"CustUKey\"                                                      ";
+		sql += "           Distinct \"CustUKey\"                                             ";
 		sql += "          ,\"LiaisonName\"                                                   ";
 		sql += "          ,\"Enable\"                                                        ";
 		sql += "          ,NVL(\"TelArea\" || '-', '') || NVL(\"TelNo\", '') || NVL('-' || \"TelExt\", '') as \"PhoneNo\" ";
@@ -100,18 +99,27 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "   left join \"CdEmp\" ce          on ce.\"EmployeeNo\" = fm.\"FireOfficer\" ";
 		sql += "   left join \"BatxHead\" bh       on bh.\"AcDate\"     = bd.\"AcDate\"      ";
 		sql += "                                and bh.\"BatchNo\"    = bd.\"BatchNo\"       ";
-		sql += "   where bd.\"AcDate\" = " + entdy;
+		sql += "   where bd.\"AcDate\" = :entdy                                               ";
 		sql += "     and bd.\"RepayCode\"    = 2                                             ";
 		sql += "     and bh.\"BatxExeCode\" <> 8                                             ";
 		sql += "     and (bd.\"ProcCode\" <> '00000' and substr(bd.\"ProcCode\",1,1) <> 'E') ";
 		sql += "     and bd.\"RepayAmt\" >= 50000                                            ";
-
+		sql += "group by bdd.\"RepayAcctNo\", cm.\"CustName\", bd.\"RepayAmt\", nvl(bdd.\"RelCustName\", cm.\"CustName\"), "
+				+ "CASE WHEN lbm.\"PrevPayIntDate\" < 19110000 "
+				+ "then lbm.\"PrevPayIntDate\" "
+				+ "ELSE lbm.\"PrevPayIntDate\" - 19110000 end, " + 
+				"CASE WHEN fm.\"FirstDrawdownDate\" < 19110000 "
+				+ "then fm.\"FirstDrawdownDate\" "
+				+ "ELSE fm.\"FirstDrawdownDate\" - 19110000 "
+				+ "end, cc.\"CityItem\", ce.\"Fullname\"";
+		sql += "   order by \"F0\",\"F1\", \"F2\"                                           "; 
+		
 		this.info("sql=" + sql);
 		Query query;
-//
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
-		query = em.createNativeQuery(sql);
 
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		query = em.createNativeQuery(sql);
+		query.setParameter("entdy", entdy);
 		return this.convertToMap(query);
 	}
 

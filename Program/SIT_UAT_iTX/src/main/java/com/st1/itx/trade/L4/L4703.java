@@ -124,6 +124,7 @@ public class L4703 extends TradeBuffer {
 		titaVo.putParam("UnpaidCond", 2); // 2 滯繳日數
 		titaVo.putParam("UnpaidDaySt", 7);
 		titaVo.putParam("UnpaidDayEd", 30);
+		titaVo.putParam("UnpaidTermSt", 0);
 		titaVo.putParam("UnpaidTermEd", 0);
 		titaVo.putParam("RepayType", 0);
 		titaVo.putParam("CustType", 0);

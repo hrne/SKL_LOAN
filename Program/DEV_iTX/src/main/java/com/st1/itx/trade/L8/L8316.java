@@ -155,11 +155,7 @@ public class L8316 extends TradeBuffer {
 					}
 				}// 2 end
 
-				// 3.1 start key值為「債務人IDN+報送單位代號+案件狀態+裁定日期+承審法院代碼」，不可重複，重複者予以剔退
-				JcicZ055 jJcicZ055 = sJcicZ055Service.findById(iJcicZ055Id, titaVo);
-				if(jJcicZ055 != null) {
-					throw new LogicException("E0005", "key值「債務人IDN+報送單位代號+案件狀態+裁定日期+承審法院代碼」，不可重複.");
-				}// 3.1 end
+				// 3.1 key值為「債務人IDN+報送單位代號+案件狀態+裁定日期+承審法院代碼」，不可重複，重複者予以剔退-case "1"檢核
 				
 				// 3.2 若非key值欄位資料需要更新，請以交易代碼'C'異動處理***
 				

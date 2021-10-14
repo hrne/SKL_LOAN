@@ -128,10 +128,9 @@ public class MainProcess extends SysLogger {
 
 			ThreadVariable.setObject(ContentName.dataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);
+
 			txBuffer.init(titaVo);
 			txTeller = tTxTeller;
-			
-			this.titaVo.put(ContentName.empnm, this.txTeller.getTlrItem());
 		} else
 			txBuffer.init(titaVo);
 	}
@@ -182,6 +181,10 @@ public class MainProcess extends SysLogger {
 
 		if (this.titaVo.getFbrNo() == null || this.titaVo.getFbrNo().trim().isEmpty())
 			this.titaVo.putParam(ContentName.fbrno, this.titaVo.getKinbr());
+
+		// 交易員名稱
+		if (this.txTeller != null)
+			this.titaVo.put(ContentName.empnm, this.txTeller.getTlrItem());
 
 		// 預設交易類別(0.查詢類別交易1.更新類別交易2.特殊類別交易)
 		if (this.titaVo.isTxcdInq())
@@ -480,13 +483,12 @@ public class MainProcess extends SysLogger {
 		TxCom txCom = this.txBuffer.getTxCom();
 
 		/* 交易控制 */
-		TxTranCode tTxTranCode2 = null;
+		TxTranCode tTxTranCode = txTranCodeService.findById(this.titaVo.getTxCode());
 
 		if (this.titaVo.isTxcdSpecial() || this.titaVo.isTxcdInq()) {
 			txCom.setCanCancel(0);
 			txCom.setCanModify(0);
 		} else {
-			TxTranCode tTxTranCode = txTranCodeService.findById(this.titaVo.getTxCode());
 			if (tTxTranCode == null)
 				throw new LogicException("EC001", "交易控制檔(TxTranCode):" + this.titaVo.getTxCode());
 
@@ -497,15 +499,16 @@ public class MainProcess extends SysLogger {
 			txCom.setCanModify(tTxTranCode.getModifyFg());
 			txCom.setSubmitFg(tTxTranCode.getSubmitFg());
 
+			// 2021.10.13 by eric
+			txCom.setCustRmkFg(tTxTranCode.getCustRmkFg());
+
 			int funcode = Integer.parseInt(this.titaVo.getFuncind());
 			if (!checkAuth.isCan(this.titaVo, this.titaVo.getTlrNo(), this.titaVo.getAgent(), this.titaVo.getAuthNo(), this.titaVo.getTxCode(), this.titaVo.getActFgI(), funcode)) {
 				throw new LogicException("EC008", "經辦 [" + this.titaVo.getTlrNo() + "] 無交易 [" + this.titaVo.getTxCode() + "] 執行權限");
 			}
-
-			tTxTranCode2 = tTxTranCode;
 		}
 
-		if (tTxTranCode2 != null && tTxTranCode2.getCustDataCtrlFg() == 1 && titaVo.getEmpNos().trim().isEmpty())
+		if (tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && titaVo.getEmpNos().trim().isEmpty())
 			if (titaVo.getMrKey().length() >= 7 && parse.isNumeric(titaVo.getMrKey().substring(0, 7))) {
 				CustDataCtrl tCustDataCtrl = sCustDataCtrlService.findById(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
 				if (tCustDataCtrl != null && "Y".equals(tCustDataCtrl.getEnable()))

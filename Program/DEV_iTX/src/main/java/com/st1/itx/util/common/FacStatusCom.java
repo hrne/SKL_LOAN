@@ -27,8 +27,8 @@ public class FacStatusCom {
 	 * 設定額度戶況
 	 * 
 	 * @param lLoanBorMain List of LoanBorMain
-	 * @param tbsdy        會計日期
-	 * @return status
+	 * @param tbsdy        會計日期 
+	 * @return status 0.正常戶  1.展期戶 2.催收戶 3.結案戶 4.逾期戶(正常戶逾期超過一個月) 6.呆帳戶 7.部分轉呆戶 8.債權轉讓戶 9.呆帳結案戶
 	 * @throws LogicException LogicException
 	 */
 	public int settingStatus(List<LoanBorMain> lLoanBorMain, int tbsdy) throws LogicException {
@@ -44,9 +44,9 @@ public class FacStatusCom {
 //		  7  --  8.債權轉讓戶
 //		  8  --  9.呆帳結案戶
 //		  9  --  3.結案戶
-//       10  --  1.展期
+//       10  --  1.展期戶
 		for (LoanBorMain tmpLoanBorMain : lLoanBorMain) {
-			if (tmpLoanBorMain.getStatus() > 1 && tmpLoanBorMain.getStatus() < 90) {
+			if (tmpLoanBorMain.getStatus() < 90) {
 				switch (tmpLoanBorMain.getStatus()) {
 				case 6:
 					status = 6;

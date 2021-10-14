@@ -199,7 +199,7 @@ public class L3001 extends TradeBuffer {
 		}
 		// 顧客控管警訊通知訊息
 		if (titaVo.getReturnIndex() == 0) {
-			custRmkCom.getCustRmk(wkCustNo, titaVo);
+			custRmkCom.getCustRmk(titaVo, wkCustNo);
 		}
 		// end
 		this.addList(this.totaVo);

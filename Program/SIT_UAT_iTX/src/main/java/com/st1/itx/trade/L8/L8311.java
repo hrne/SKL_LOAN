@@ -122,15 +122,15 @@ public class L8311 extends TradeBuffer {
 				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
 						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
-					throw new LogicException("E0005", "已報送結案.");
+					throw new LogicException("E0005", "Key值(IDN+報送單位代號+協商申請日)已報送(46)結案通知資料.");
 				} // 2.2 end
 
 				// 5 start 同一協商案件首次報送本檔案時，若尚未報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期',則予以剔退
 				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
 				if (iJcicZ047 == null) {
-					throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送'47':金融機構無擔保債務協議資料.");
+					throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料.");
 				} else if (iJcicZ047.getSignDate() == 0) {
-					throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期'.");
+					throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料，且「簽約完成日期」欄不能為空.");
 				} // 5 end
 			}
 
@@ -142,7 +142,7 @@ public class L8311 extends TradeBuffer {
 				}
 			}
 			if (sPayAmt != iSumRepayActualAmt) {
-				throw new LogicException("E0005", "「累計實際還款金額」應等於該IDN所有已報送本檔案資料之「繳款金額」之合計.");
+				throw new LogicException("E0005", "「累計實際還款金額」應等於該IDN所有已報送本檔案資料之「繳款金額」合計.");
 			}
 
 			// ***4

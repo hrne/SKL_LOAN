@@ -52,6 +52,8 @@ public class L2035 extends TradeBuffer {
 		
 		Slice<ReltMain> sReltMain = null;
 		OccursList occursList = new OccursList();
+		int tempCaseNo = 0;
+		int tempCustNo = 0;
 		if (iCustNo == 0) {
 			sReltMain = sReltMainService.caseNoEq(iCaseNo,this.index,this.limit, titaVo);
 			if (sReltMain == null) {
@@ -59,10 +61,14 @@ public class L2035 extends TradeBuffer {
 			}
 			for (ReltMain s1ReltMain:sReltMain) {
 				occursList = new OccursList();
-				occursList.putParam("OOCaseNo", s1ReltMain.getCaseNo());
-				occursList.putParam("OOCustNo", s1ReltMain.getCustNo());
-				this.totaVo.addOccursList(occursList);
-			}
+				if( tempCaseNo != s1ReltMain.getCaseNo() || tempCustNo != s1ReltMain.getCustNo() ) {
+					occursList.putParam("OOCaseNo", s1ReltMain.getCaseNo());
+					occursList.putParam("OOCustNo", s1ReltMain.getCustNo());
+					tempCaseNo = s1ReltMain.getCaseNo();
+					tempCustNo = s1ReltMain.getCustNo();
+					this.totaVo.addOccursList(occursList);
+				} // if
+			} // for
 		}else {
 			sReltMain = sReltMainService.custNoEq(iCustNo,this.index,this.limit, titaVo);
 			if (sReltMain == null) {
@@ -70,10 +76,15 @@ public class L2035 extends TradeBuffer {
 			}
 			for (ReltMain s2ReltMain:sReltMain) {
 				occursList = new OccursList();
-				occursList.putParam("OOCaseNo", s2ReltMain.getCaseNo());
-				occursList.putParam("OOCustNo", s2ReltMain.getCustNo());
-				this.totaVo.addOccursList(occursList);				
-			}
+				
+				if( tempCaseNo != s2ReltMain.getCaseNo() || tempCustNo != s2ReltMain.getCustNo() ) {
+					occursList.putParam("OOCaseNo", s2ReltMain.getCaseNo());
+					occursList.putParam("OOCustNo", s2ReltMain.getCustNo());
+					this.totaVo.addOccursList(occursList);
+					tempCaseNo = s2ReltMain.getCaseNo();
+					tempCustNo = s2ReltMain.getCustNo();
+				} // if	
+			} // for
 		}
 		
 		

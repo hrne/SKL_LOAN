@@ -442,26 +442,26 @@ public class NegCom extends CommBuffer {
 			throw new LogicException(titaVo, "E5009", "[下次應繳日]未填寫.請至L5071查詢後維護.");
 		}
 		int lastpaydate = getRepayDate(mainNextPayDate, -1, titaVo);// 上個月應繳日
-
-		if (remainPeriod == 1) {//剩最後一期
-			transShouldPayPeriod = 1;
-		} else {
-			if (transEntryDate > mainNextPayDate) { // 客戶逾期繳款應收2期利息(上期與本期)或以上
+		
+		if (transEntryDate > mainNextPayDate) { // 客戶逾期繳款應收2期利息(上期與本期)或以上
+			if (transEntryDate > mainLastDueDate) {
+				transShouldPayPeriod = DiffMonth(1, mainNextPayDate, mainLastDueDate) + 1;//期數計算到還款結束日
+			} else {
 				String itransEntryDatex = String.valueOf(transEntryDate).substring(5);
 				int itransEntryDatedd = Integer.valueOf(itransEntryDatex);
-				if (itransEntryDatedd == 10) {//繳款日為10號
-					transShouldPayPeriod = DiffMonth(1,mainNextPayDate , transEntryDate) + 1;
+				if (itransEntryDatedd == 10) {// 繳款日為10號
+					transShouldPayPeriod = DiffMonth(1, mainNextPayDate, transEntryDate) + 1;
 				} else {
-					transShouldPayPeriod = DiffMonth(1,mainNextPayDate , transEntryDate) + 2;
-				}
-			} else {
-				if (transEntryDate > lastpaydate) { // 上個月已繳應收1期利息(本期)
-					transShouldPayPeriod = 1;
-				} else {
-					transShouldPayPeriod = 0;
+					transShouldPayPeriod = DiffMonth(1, mainNextPayDate, transEntryDate) + 2;
 				}
 			}
-		}
+		} else {
+			if (transEntryDate > lastpaydate) { // 上個月已繳應收1期利息(本期)
+				transShouldPayPeriod = 1;
+			} else {
+				transShouldPayPeriod = 0;
+			}
+		}		
 
 		// -----
 		if (transShouldPayPeriod != 0) {
@@ -471,82 +471,28 @@ public class NegCom extends CommBuffer {
 		int DiffMonth = DiffMonth(1, mainFirstDueDate, Today) + 1;// 月份差異=首次應繳日 與 會計日的月份差+1
 		mainAccuDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(DiffMonth));// Main累應還金額=Main期金*累計應還期數
 
-		//計算剩餘本利和,提前清償最後一期需以天數計算利息(含利息倒扣)
-		int accuday = 0;
-		BigDecimal accuInterest = BigDecimal.ZERO;//月利息
-		BigDecimal accuPrincipal = BigDecimal.ZERO;//本金餘額
-		BigDecimal accudayInt = BigDecimal.ZERO;//日利息
+		//計算剩餘本利和(含利息倒扣)
+		int accuday = 0;//計息天數
 		BigDecimal CloseAmt = BigDecimal.ZERO;//剩餘本利和
 		BigDecimal sumInterest= BigDecimal.ZERO;
-		int accuperiod = 0;//幾期利息
-		int lastday = 0;//離繳款日最近的10號
 		boolean intsubtract= false ;//利息倒扣記號
-		BigDecimal lastint = BigDecimal.ZERO;//最後一期月利息
-		// 剩餘本利和=總本金餘額(1+年利率/12/100)
-		if (remainPeriod == 1) {// 剩最後一期
-			sumInterest = calAccuDueAmt(mainDueAmt, mainPrincipalBal, mainIntRate, 1, 1);// 最後一位參數傳1代表計算利息加總
-			CloseAmt = mainPrincipalBal.add(sumInterest);
-		} else {// 提前清償
-			//lastpaydate = getRepayDate(mainNextPayDate, -1, titaVo);// 上個月應繳日
-			if (transEntryDate >= mainNextPayDate) {
-				accuperiod = DiffMonth(1, mainNextPayDate, transEntryDate) + 1;// 收幾期利息+剩餘天數利息
-			} else {
-				accuperiod = DiffMonth(1, transEntryDate, lastpaydate) + 1;// 退(剩餘天數利息 - 已收幾期利息)
-			}
-			if (transEntryDate >= mainNextPayDate) {
-				lastday = getRepayDate(mainNextPayDate, accuperiod - 1, titaVo);// 繳到哪一期的10號
-				accuday = diffday(lastday,transEntryDate);
-				accuInterest = calAccuDueAmt(mainDueAmt, mainPrincipalBal, mainIntRate, accuperiod, 1);// 幾期利息加總
-				accuPrincipal = mainPrincipalBal
-						.subtract(calAccuDueAmt(mainDueAmt, mainPrincipalBal, mainIntRate, accuperiod, 2));// 總本金餘額減掉幾期本金加總=剩餘本金
-				this.info("transEntryDate >= mainNextPayDate : accuInterest="+accuInterest+",accuPrincipal="+accuPrincipal);
-				this.info("accuday="+accuday+",lastday="+lastday+",transEntryDate="+transEntryDate);
-			} else {
-				if (transEntryDate >= lastpaydate) { // 上一期已繳,當期算到繳款日
-					lastday = lastpaydate;
-					accuperiod = 0;
-					accuday = diffday(lastpaydate, transEntryDate);
-					accuPrincipal = mainPrincipalBal;
-					this.info("transEntryDate >= lastpaydate : accuInterest="+accuInterest+",accuPrincipal="+accuPrincipal);
-					this.info("accuday="+accuday+",lastpaydate="+lastpaydate+",transEntryDate="+transEntryDate);
-				} else {// 已收利息倒扣
-					lastday = getRepayDate(lastpaydate, 0 - accuperiod, titaVo);// 已繳到哪一期往前推算繳款日前一個10號
-					accuday= diffday(lastday , transEntryDate);
-					// 新本金餘額=原總本金餘額 - (期款-利息) , 推算繳款日前之本金餘額
-					BigDecimal irate = mainIntRate.divide(new BigDecimal(1200), 15, RoundingMode.HALF_UP);
-					accuPrincipal = mainPrincipalBal;
-					for (int i = 0; i < accuperiod; i++) {
-						accuPrincipal = (accuPrincipal.add(mainDueAmt)).divide(new BigDecimal(1).add(irate), 0,
-								RoundingMode.HALF_UP);// 前一期總本金餘額
-						accuInterest = accuInterest.add(calAccuDueAmt(mainDueAmt, accuPrincipal, mainIntRate, 1, 1));// 已收幾個月利息加總
-						this.info("accuPrincipal=" + accuPrincipal + ",accuInterest=" + accuInterest);
-					}
-					intsubtract = true;
-					accuperiod = 0;
-					this.info("transEntryDate < lastpaydate : accuInterest="+accuInterest+",accuPrincipal="+accuPrincipal);
-					this.info("accuday="+accuday+",lastday="+lastday+",transEntryDate="+transEntryDate);
-				}
-			}
-			// 當期算到繳款日:日利息加總=本金餘額*年利率/100*天/365(最後才四捨五入)
-			lastint = calAccuDueAmt(mainDueAmt, accuPrincipal, mainIntRate, 1, 1);// 預估最後一期月利息
-			accudayInt = accuPrincipal.multiply(mainIntRate.divide(new BigDecimal(100)))
-					.multiply(new BigDecimal(accuday)).divide(new BigDecimal(365), 0, RoundingMode.HALF_UP);
-			this.info("lastint=" + lastint + ",accudayInt=" + accudayInt);
-			if (accudayInt.compareTo(lastint) > 0) {// 最後一期日利息大於月利息,則以月利息計算
-				accudayInt = lastint;
-			}
-			if (intsubtract == true) {
-				if (accuInterest.compareTo(accudayInt) >= 0) {
-					sumInterest = accudayInt.subtract(accuInterest);// 利息倒扣為負數
-				} else {
-					sumInterest = BigDecimal.ZERO;
-				}
-			} else {
-				sumInterest = accuInterest.add(accudayInt);
-			}
-			CloseAmt = mainPrincipalBal.add(sumInterest);// 利息算到繳息日當天
+
+		//結清利息一律以天數計算
+		if (transEntryDate >= lastpaydate) {
+			accuday = diffday(lastpaydate,transEntryDate);//計息區間:上次繳息止日~本次繳款日(含滯納息)
+		} else {
+			accuday = diffday(transEntryDate,lastpaydate);//利息倒扣區間:本次繳款日~上次繳息止日
+			intsubtract = true;
 		}
-		this.info("sumInterest="+sumInterest+",CloseAmt="+CloseAmt);
+		// 結清:利息=總本金餘額*利率/100*計息天數/365
+		sumInterest = mainPrincipalBal.multiply(mainIntRate.divide(new BigDecimal(100)))
+				.multiply(new BigDecimal(accuday)).divide(new BigDecimal(365), 0, RoundingMode.HALF_UP);
+		// 剩餘本利和=總本金餘額+利息
+		if (intsubtract == true) {
+			sumInterest = sumInterest.multiply(new BigDecimal(-1));//利息倒扣
+		}
+		CloseAmt = mainPrincipalBal.add(sumInterest);
+		this.info("sumInterest="+sumInterest+",CloseAmt="+CloseAmt+",accuday="+accuday);
 
 		// transTxKind 0:正常;1:溢繳;2:短繳;3:提前還本;4:結清;5:提前清償;6:待處理
 		// 0:正常-匯入款＋溢收款 >= 期款
@@ -574,7 +520,6 @@ public class NegCom extends CommBuffer {
 			if (remainPeriod > 1) {
 				// 5:提前清償
 				transTxKind = "5";
-				transRepayPeriod = accuperiod;//計算幾期利息
 			} else {
 				// 4:結清
 				transTxKind = "4";
@@ -639,7 +584,7 @@ public class NegCom extends CommBuffer {
 			newStatusDate = Today;
 			rePayAmt = CloseAmt;
 			transReturnAmt = CanCountAmt.subtract(CloseAmt); // 退還金額
-			mainNextPayDate = 0; 
+			transRepayPeriod = 0;
 			break;
 		}
 		transTxStatus = 2;// 交易狀態 0:未入帳;1:待處理;2:已入帳;
@@ -690,6 +635,7 @@ public class NegCom extends CommBuffer {
 		if (mainPayIntDate == 0) {
 			mainPayIntDate = tNegMain.getApplDate();//若為0則改為協商申請日
 		}
+		int lastday = mainPayIntDate;//原繳息迄日
 		if (transRepayPeriod > 0) {
 			transIntStartDate = mainPayIntDate; // 繳息起日 = 繳息迄日(主檔)
 			int lastPayIntDate = getRepayDate(mainFirstDueDate, -1, titaVo);// 首次繳款日的前一個月
@@ -703,14 +649,12 @@ public class NegCom extends CommBuffer {
 		}
 
 		if ("3".equals(status)) {	//結案
-			transRepayPeriod = remainPeriod;
-			if ("5".equals(transTxKind)) {//提前清償時利息算到繳款日
-				transIntStartDate=lastday;
-				transIntEndDate = transEntryDate;
-			} 
+			transIntStartDate = lastday;
+			transIntEndDate = transEntryDate;
 			mainPayIntDate = transIntEndDate;
-			mainNextPayDate = 0;	// 下次應繳日 歸零
-			mainAccuDueAmt = mainAccuTempAmt;//結清時等於累繳金額
+			mainNextPayDate = 0; // 下次應繳日 歸零
+			mainAccuDueAmt = mainAccuTempAmt;// 結清時等於累繳金額
+			transOverAmt = BigDecimal.ZERO;//轉入溢收金額  歸零
 		}
 
 		mainRepaidPeriod = mainRepaidPeriod + transRepayPeriod;// 已繳期數

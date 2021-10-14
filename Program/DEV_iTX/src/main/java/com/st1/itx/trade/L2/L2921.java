@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanNotYet;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
@@ -45,15 +46,14 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2921 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2921.class);
 
 	/* DB服務注入 */
 //	@Autowired
 //	public TxTellerService txTellerService;
-	
+
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	/* DB服務注入 */
 	@Autowired
 	public FacMainService sFacMainService;
@@ -110,15 +110,21 @@ public class L2921 extends TradeBuffer {
 		int YetDate2 = parse.stringToInteger(titaVo.getParam("YetDate2"));
 		int CloseDate1 = parse.stringToInteger(titaVo.getParam("CloseDate1"));
 		int CloseDate2 = parse.stringToInteger(titaVo.getParam("CloseDate2"));
-		
-		if(YetDate1 == 0 ) {
-			YetDate2 = 99999999; 
-		} 
-		
-		if(CloseDate1 == 0 ) {
-			CloseDate2 = 99999999;
+
+		if (YetDate1 == 0) {
+			YetDate2 = 99999999;
+		} else {
+			YetDate1 = YetDate1 + 19110000;
+			YetDate2 = YetDate2 + 19110000;
 		}
-		
+
+		if (CloseDate1 == 0) {
+			CloseDate2 = 99999999;
+		} else {
+			CloseDate1 = CloseDate1 + 19110000;
+			CloseDate2 = CloseDate2 + 19110000;
+		}
+
 		// 銷號狀態 0:全部 1:已銷 2:未銷
 		int iCloseCode = parse.stringToInteger(titaVo.getParam("CloseCode"));
 
@@ -126,7 +132,7 @@ public class L2921 extends TradeBuffer {
 		List<FacMain> lFacMain = new ArrayList<FacMain>();
 		List<LoanNotYet> lLoanNotYet = new ArrayList<LoanNotYet>();
 		Slice<FacMain> slFacMain = null;
-		
+
 		// 調所有經辦號碼跟名稱
 		List<CdEmp> lCdEmp = new ArrayList<CdEmp>();
 		Slice<CdEmp> slCdEmp = null;
@@ -210,30 +216,31 @@ public class L2921 extends TradeBuffer {
 
 					lLoanNotYet = new ArrayList<LoanNotYet>();
 				}
-				
+
 				for (LoanNotYet tmpLoanNotYet : lLoanNotYet) {
 					// new occurs
 					OccursList occurslist = new OccursList();
 					if (iCloseCode == 1) {
-					  
+
 						if (tmpLoanNotYet.getCloseDate() > 0) {
 							occurslist.putParam("OOCaseNo", tFacMain.getCreditSysNo()); // 案號
 							occurslist.putParam("OOCustNo", tCustMain.getCustNo()); // 戶號
-                            occurslist.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+							occurslist.putParam("OOCustName", tCustMain.getCustName()); // 戶名
 							occurslist.putParam("OOCustId", tCustMain.getCustId()); // 統編
 							occurslist.putParam("OOApplNo", tFacMain.getApplNo()); // 核准號碼
 							occurslist.putParam("OOFacmNo", tmpLoanNotYet.getFacmNo()); // 額度號碼
 							occurslist.putParam("OOFirstDrawdownDate", tFacMain.getFirstDrawdownDate()); // 首撥日期
 							occurslist.putParam("OOEmpNo", tFacMain.getBusinessOfficer()); // 經辦(房貸專員)
 							EmployeeNo = tFacMain.getBusinessOfficer();
-							slCdEmp = sCdEmpService.findEmployeeNo(EmployeeNo, EmployeeNo, this.index, this.limit, titaVo);
+							slCdEmp = sCdEmpService.findEmployeeNo(EmployeeNo, EmployeeNo, this.index, this.limit,
+									titaVo);
 							lCdEmp = slCdEmp == null ? null : slCdEmp.getContent();
-							
+
 							if (lCdEmp == null) {
-								occurslist.putParam("OOEmpName","          ");
+								occurslist.putParam("OOEmpName", "          ");
 							} else {
-								for(CdEmp tCdEmp: lCdEmp) {
-									occurslist.putParam("OOEmpName",tCdEmp.getFullname());
+								for (CdEmp tCdEmp : lCdEmp) {
+									occurslist.putParam("OOEmpName", tCdEmp.getFullname());
 								}
 							}
 
@@ -247,31 +254,31 @@ public class L2921 extends TradeBuffer {
 							/* 將每筆資料放入Tota的OcList */
 							this.totaVo.addOccursList(occurslist);
 						}
-                      
+
 					} else if (iCloseCode == 2) {
 						if (tmpLoanNotYet.getCloseDate() == 0) {
 							occurslist.putParam("OOCaseNo", tFacMain.getCreditSysNo()); // 案號
 							occurslist.putParam("OOCustNo", tCustMain.getCustNo()); // 戶號
-                            occurslist.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+							occurslist.putParam("OOCustName", tCustMain.getCustName()); // 戶名
 							occurslist.putParam("OOCustId", tCustMain.getCustId()); // 統編
 							occurslist.putParam("OOApplNo", tFacMain.getApplNo()); // 核准號碼
 							occurslist.putParam("OOFacmNo", tmpLoanNotYet.getFacmNo()); // 額度號碼
 							occurslist.putParam("OOFirstDrawdownDate", tFacMain.getFirstDrawdownDate()); // 首撥日期
-							occurslist.putParam("OOEmpNo", tFacMain.getBusinessOfficer()); // 經辦(房貸專員)				
-							
+							occurslist.putParam("OOEmpNo", tFacMain.getBusinessOfficer()); // 經辦(房貸專員)
+
 							EmployeeNo = tFacMain.getBusinessOfficer();
-							slCdEmp = sCdEmpService.findEmployeeNo(EmployeeNo, EmployeeNo, this.index, this.limit, titaVo);
+							slCdEmp = sCdEmpService.findEmployeeNo(EmployeeNo, EmployeeNo, this.index, this.limit,
+									titaVo);
 							lCdEmp = slCdEmp == null ? null : slCdEmp.getContent();
-							
+
 							if (lCdEmp == null) {
-								occurslist.putParam("OOEmpName","          ");
+								occurslist.putParam("OOEmpName", "          ");
 							} else {
-								for(CdEmp tCdEmp: lCdEmp) {
-									occurslist.putParam("OOEmpName",tCdEmp.getFullname());
+								for (CdEmp tCdEmp : lCdEmp) {
+									occurslist.putParam("OOEmpName", tCdEmp.getFullname());
 								}
 							}
 
-							
 							occurslist.putParam("OONotYetCode", tmpLoanNotYet.getNotYetCode()); // 未齊件代碼
 							occurslist.putParam("OONotYetItemX", tmpLoanNotYet.getNotYetItem()); // 未齊件說明
 							occurslist.putParam("OOYetDate", tmpLoanNotYet.getYetDate()); // 齊件日期
@@ -285,22 +292,22 @@ public class L2921 extends TradeBuffer {
 					} else if (iCloseCode == 0) {
 						occurslist.putParam("OOCaseNo", tFacMain.getCreditSysNo()); // 案號
 						occurslist.putParam("OOCustNo", tCustMain.getCustNo()); // 戶號
-                        occurslist.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+						occurslist.putParam("OOCustName", tCustMain.getCustName()); // 戶名
 						occurslist.putParam("OOCustId", tCustMain.getCustId()); // 統編
 						occurslist.putParam("OOApplNo", tFacMain.getApplNo()); // 核准號碼
 						occurslist.putParam("OOFacmNo", tmpLoanNotYet.getFacmNo()); // 額度號碼
 						occurslist.putParam("OOFirstDrawdownDate", tFacMain.getFirstDrawdownDate()); // 首撥日期
-						occurslist.putParam("OOEmpNo", tFacMain.getBusinessOfficer()); // 經辦(房貸專員)			
-						
+						occurslist.putParam("OOEmpNo", tFacMain.getBusinessOfficer()); // 經辦(房貸專員)
+
 						EmployeeNo = tFacMain.getBusinessOfficer();
 						slCdEmp = sCdEmpService.findEmployeeNo(EmployeeNo, EmployeeNo, this.index, this.limit, titaVo);
 						lCdEmp = slCdEmp == null ? null : slCdEmp.getContent();
-						
+
 						if (lCdEmp == null) {
-							occurslist.putParam("OOEmpName","          ");
+							occurslist.putParam("OOEmpName", "          ");
 						} else {
-							for(CdEmp tCdEmp: lCdEmp) {
-								occurslist.putParam("OOEmpName",tCdEmp.getFullname());
+							for (CdEmp tCdEmp : lCdEmp) {
+								occurslist.putParam("OOEmpName", tCdEmp.getFullname());
 							}
 						}
 
@@ -317,13 +324,53 @@ public class L2921 extends TradeBuffer {
 
 				} // for
 			}
+		} else if (YetDate2 > 0) {
+			Slice<LoanNotYet> slLoanNotYet = sLoanNotYetService.allNoClose(0, YetDate2, this.index, this.limit, titaVo);
+			lLoanNotYet = slLoanNotYet == null ? null : slLoanNotYet.getContent();
+			for (LoanNotYet loanNotYet : lLoanNotYet) {
+				FacMainId facMainId = new FacMainId();
+				facMainId.setCustNo(loanNotYet.getCustNo());	
+				facMainId.setFacmNo(loanNotYet.getFacmNo());
+				FacMain facMain = sFacMainService.findById(facMainId, titaVo);
+				if (facMain != null) {
+					putTota(titaVo, tCustMain, facMain, loanNotYet);
+				}
+				
+			}
 		}
 
-		if(this.totaVo.getOccursList().size() == 0) {
+		if (this.totaVo.getOccursList().size() == 0) {
 			throw new LogicException(titaVo, "E2003", "查無未齊件資料"); // 查無資料
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void putTota(TitaVo titaVo, CustMain tCustMain, FacMain tFacMain, LoanNotYet tmpLoanNotYet) {
+		OccursList occurslist = new OccursList();
+		occurslist.putParam("OOCaseNo", tFacMain.getCreditSysNo()); // 案號
+		occurslist.putParam("OOCustNo", tCustMain.getCustNo()); // 戶號
+		occurslist.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+		occurslist.putParam("OOCustId", tCustMain.getCustId()); // 統編
+		occurslist.putParam("OOApplNo", tFacMain.getApplNo()); // 核准號碼
+		occurslist.putParam("OOFacmNo", tmpLoanNotYet.getFacmNo()); // 額度號碼
+		occurslist.putParam("OOFirstDrawdownDate", tFacMain.getFirstDrawdownDate()); // 首撥日期
+		occurslist.putParam("OOEmpNo", tFacMain.getBusinessOfficer()); // 經辦(房貸專員)
+		String EmployeeNo = tFacMain.getBusinessOfficer();
+		CdEmp cdEmp = sCdEmpService.findById(EmployeeNo, titaVo);
+		if (cdEmp != null) {
+			occurslist.putParam("OOEmpName", cdEmp.getFullname());
+		} else {
+			occurslist.putParam("OOEmpName", "");
+		}
+		occurslist.putParam("OONotYetCode", tmpLoanNotYet.getNotYetCode()); // 未齊件代碼
+		occurslist.putParam("OONotYetItemX", tmpLoanNotYet.getNotYetItem()); // 未齊件說明
+		occurslist.putParam("OOYetDate", tmpLoanNotYet.getYetDate()); // 齊件日期
+		occurslist.putParam("OOCloseDate", tmpLoanNotYet.getCloseDate()); // 銷號日期
+		occurslist.putParam("OOReMark", tmpLoanNotYet.getReMark()); // 備註
+
+		/* 將每筆資料放入Tota的OcList */
+		this.totaVo.addOccursList(occurslist);
 	}
 }

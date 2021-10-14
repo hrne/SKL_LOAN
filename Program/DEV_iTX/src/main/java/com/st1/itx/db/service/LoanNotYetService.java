@@ -77,6 +77,18 @@ public interface LoanNotYetService {
   public Slice<LoanNotYet> notYetCodeFisrt(int custNo_0, int facmNo_1, String notYetCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CloseDate = ,AND YetDate &lt;=
+   *
+   * @param closeDate_0 closeDate_0
+   * @param yetDate_1 yetDate_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice LoanNotYet LoanNotYet of List
+   */
+  public Slice<LoanNotYet> allNoClose(int closeDate_0, int yetDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By LoanNotYet
    * 
    * @param loanNotYetId key

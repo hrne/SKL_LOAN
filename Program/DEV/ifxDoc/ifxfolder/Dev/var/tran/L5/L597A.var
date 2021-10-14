@@ -64,7 +64,7 @@ T(1,@IsBtn,#NTXBUF,13,1)
 ! 債權Help
 #HelpIsMainFin=X,31,S
 !T(3,0:一般債權;1:最大債權;2:無)
-T(3,N:一般債權;Y:最大債權)
+T(3,Y:最大債權;N:一般債權)
 
 ! 會計日期
 #AcDate=D,7,S
@@ -73,7 +73,7 @@ E(0,#SYSDATE)
 
 ! 債權區分
 #IsMainFin=X,1,I
-C(3,#IsMainFin,1,T(2,Y),T(2,N))
+C(3,#IsMainFin,0,T(2,N),T(2,Y))
 C(3,#CHAIN,0,$,s)
 HELP(#HelpIsMainFin)
 @V(H,#HelpIsMainFin)

@@ -44,7 +44,7 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+款項統一收付申請日",#ApplyDate],["#FdStartDate+生效日期",#StartDate],
+["#FdApplyDate+申請日期",#ApplyDate],["#FdStartDate+生效日期",#StartDate],
 ["#FdPayDate+本分配表首繳日",#PayDate],["#FdBankId+債權金融機構代號",#BankId,#BankIdX],
 ["#FdAllotAmt+參與分配債權金額",#AllotAmt],["#FdOwnPercentage+債權比例",#OwnPercentage],
 ["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
@@ -203,7 +203,7 @@ HELP(#TranKeyHelp)
 #SubmitKeyX=X,80,L
 
 
-!款項統一收付申請日
+!申請日期
 #ApplyDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)

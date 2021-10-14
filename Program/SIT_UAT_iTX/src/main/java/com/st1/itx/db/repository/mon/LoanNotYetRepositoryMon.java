@@ -31,6 +31,9 @@ public interface LoanNotYetRepositoryMon extends JpaRepository<LoanNotYet, LoanN
   // CustNo = ,AND FacmNo = ,AND NotYetCode =
   public Slice<LoanNotYet> findAllByCustNoIsAndFacmNoIsAndNotYetCodeIs(int custNo_0, int facmNo_1, String notYetCode_2, Pageable pageable);
 
+  // CloseDate = ,AND YetDate <=
+  public Slice<LoanNotYet> findAllByCloseDateIsAndYetDateLessThanEqualOrderByCustNoAscFacmNoAscYetDateAsc(int closeDate_0, int yetDate_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

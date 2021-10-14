@@ -110,7 +110,7 @@ public class L8314 extends TradeBuffer {
 				Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
 						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ052 == null) {
-					throw new LogicException("E0005", "未曾報送過'52':前置協商相關資料報送例外處理檔案格式.");
+					throw new LogicException("E0005", "未曾報送過(52)前置協商相關資料報送例外處理.");
 				}
 			} // 2 end
 
