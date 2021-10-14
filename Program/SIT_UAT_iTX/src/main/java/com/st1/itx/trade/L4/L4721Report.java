@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +33,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Component("L4721Report")
 @Scope("prototype")
 public class L4721Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L4721Report.class);
 
 	@Autowired
 	public BankStatementServiceImpl bankStatementServiceImpl;
@@ -159,8 +156,7 @@ public class L4721Report extends MakeReport {
 		Slice<BatxRateChange> sBatxRateChange = null;
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 
-		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 1,
-				this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4321Report(adjDate, adjDate, custType1, custType2, txKind, 2, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -286,8 +282,7 @@ public class L4721Report extends MakeReport {
 		}
 	}
 
-	private Map<String, BigDecimal> doBatxCom(int custNo, int facmNo, int nextPayIntDate, TitaVo titaVo)
-			throws LogicException {
+	private Map<String, BigDecimal> doBatxCom(int custNo, int facmNo, int nextPayIntDate, TitaVo titaVo) throws LogicException {
 
 		Map<String, BigDecimal> mapResult = new HashMap<String, BigDecimal>();
 
@@ -329,8 +324,7 @@ public class L4721Report extends MakeReport {
 		return mapResult;
 	}
 
-	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo)
-			throws NumberFormatException, LogicException {
+	private void setHead(Map<String, String> headerBankStatement, int custNo, int facmNo) throws NumberFormatException, LogicException {
 		headerCustName = headerBankStatement.get("F10");
 		headerCustNo = headerBankStatement.get("F11");
 		headerPrintDate = showRocDate(titaVo.getEntDyI(), 1);

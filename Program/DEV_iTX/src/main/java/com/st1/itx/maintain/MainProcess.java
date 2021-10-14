@@ -509,8 +509,8 @@ public class MainProcess extends SysLogger {
 		}
 
 		if (tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && titaVo.getEmpNos().trim().isEmpty())
-			if (titaVo.getMrKey().length() >= 7 && parse.isNumeric(titaVo.getMrKey().substring(0, 7))) {
-				CustDataCtrl tCustDataCtrl = sCustDataCtrlService.findById(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
+			if (titaVo.getMrKey().trim().length() >= 7 && parse.isNumeric(titaVo.getMrKey().trim().substring(0, 7))) {
+				CustDataCtrl tCustDataCtrl = sCustDataCtrlService.findById(parse.stringToInteger(titaVo.getMrKey().trim().substring(0, 7)));
 				if (tCustDataCtrl != null && "Y".equals(tCustDataCtrl.getEnable()))
 					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "結清客戶個人資料控管戶");
 

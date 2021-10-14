@@ -1,0 +1,772 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4931)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,565)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4931" layout="cols=3;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4931]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@個別利率調整作業"],
+[#<->#,"@@@@@@@@@戶別",#CustType,#CustTypeX],
+[#<->#,"@@@@@作業項目",#TxKind,#TxKindX],
+[#<->#,"@@@@@@@@@註記",#AdjCode,#AdjCodeX],
+[#<->#,"@@@@@@@@@狀態",#InqCode,#InqCodeX],
+[#<->#,"@@@@@調整日期",#AdjDate],
+]
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![戶別]
+#CDDEF01=x,26,S
+T(3,CdCode.EntCode2)
+
+#EntCode2Help=x,1024,S 
+
+![作業項目]
+#CDDEF02=x,26,S
+T(3,CdCode.TxKind)
+
+#TxKindHelp=x,1024,S 
+
+![戶別]
+#CDDEF03=x,26,S
+T(3,CdCode.EntCode)
+
+#EntCodeHelp=x,1024,S 
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@EntCode2Help,#HelpDesc1)
+T(2,@TxKindHelp,#HelpDesc2)  
+T(2,@EntCodeHelp,#HelpDesc3) 
+
+#AdjCodeHelp=x,120,S
+T(3,1:按合約自動調整;2:按地區別自動調整;3:人工調整-未調整;4:人工調整-待輸入;5:人工調整-已調整;9:檢核有誤;A:全部)
+
+#InqCodeHelp=x,120,S
+T(3,0:正常;2:檢核有誤)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,20,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustType,#NTXBUF,1,1)
+T(1,@TxKind,#NTXBUF,2,1)
+T(1,@AdjCode,#NTXBUF,3,1)
+T(1,@InqCode,#NTXBUF,4,1)
+T(1,@AdjDate,#NTXBUF,5,7)
+
+#ColDispaly=A,1,S
+C(3,#CHAIN,1,$,S)
+
+! 戶別
+#CustType=A,1,I
+C(3,#CHAIN,0,$,s)
+HELP(#EntCode2Help)
+@V(H,#EntCode2Help)
+#CustTypeX=X,30,L
+T(3,)T(H,#CustType,#EntCode2Help)
+!SWITCH(#CustType,1,T(3,個金),2,T(3,企金（含企金自然人）),T(3,))
+
+! 作業項目
+#TxKind=m,2,I
+C(3,#CHAIN,0,$,s)
+HELP(#TxKindHelp)
+@V(H,#TxKindHelp)
+
+#TxKindX=X,28,L
+T(3,)T(H,#TxKind,#TxKindHelp)
+!SWITCH(#TxKind,1,T(2,定期機動調整),
+!                 2,T(2,指數型利率調整),
+!                 3,T(2,機動利率調整),
+!                 4,T(2,員工利率調整),
+!                 5,T(2,按商品別調整),T(3,))
+
+#AdjCode=X,1,I
+C(3,#CHAIN,0,$,s) 
+HELP(#AdjCodeHelp)
+@V(H,#AdjCodeHelp)
+!HELP(1:按合約自動調整;
+!     2:按地區別自動調整;
+!     3:人工調整-未調整;
+!     4:人工調整-待輸入;
+!     5:人工調整-已調整;
+!     9:檢核有誤;
+!     A:全部)
+!@V(3,1,2,3,4,5,9,A)
+
+#AdjCodeX=X,30,L
+T(3,)T(H,#AdjCode,#AdjCodeHelp)
+!SWITCH(#AdjCode,1,T(3,按合約自動調整),
+!                2,T(3,按地區別自動調整),
+!                3,T(3,人工調整-未調整),
+!                4,T(3,人工調整-待輸入),
+!                5,T(3,人工調整-已調整),
+!                9,T(3,檢核有誤),
+!                A,T(3,全部),
+!                    T(3,))
+
+! [#<->#,"@是否輸入利率",#InqCode,#InqCodeX],
+! 查詢區分
+#InqCode=A,1,I
+C(3,#CHAIN,0,$,s)
+HELP(#InqCodeHelp)
+@V(H,#InqCodeHelp)
+
+! C(3,#CHAIN,0,$,s)
+! C(3,#AdjCode,5,$,S)
+! HELP(1:已輸入;
+!      2:未輸入;
+!      0:全部)
+! @V(1,1,2,0)
+#InqCodeX=X,14,L
+T(3,)T(H,#InqCode,#InqCodeHelp)
+! SWITCH(#InqCode,1,T(3,已輸入),
+!               2,T(3,未輸入),
+!               0,T(3,全部))
+
+! 利率區分
+#RateCode=A,1,S
+! C(3,#CHAIN,0,$,s)
+! HELP(1:機動-指數;2:機動-非指數;3:定期機動;9:全部)
+! @V(1,1,2,3,9)
+
+#RateCodeX=X,11,L
+! SWITCH(#RateCode,1,T(3,機動-指數),
+!                 2,T(3,機動-非指數),
+!                 3,T(3,定期機動),
+!                 9,T(3,全部))
+
+! 年月
+#AdjDate=D,7,I
+C(3,#CHAIN,0,$,s)
+E(0,#SYSDATE)
+
+! 1:按合約自動調整           RPTFG = 5(只有目前&調後，無取消調整)
+! 2:按地區別自動調整         RPTFG = 6(只有目前&調後&上下限，無取消調整)
+! 3:人工調整(未調整)         RPTFG = 3(全部欄位，可選擇4種調整方式) 若為機動利率調整則為7
+! 4:人工調整(已調整)         RPTFG = 4(全部欄位，可取消調整)
+! 9:上次繳息日大於利率生效日  RPTFG = 2(全部欄位，無取消調整)
+! A:全部                    RPTFG = 4(全部欄位，可取消調整)
+#RPTFG=A,1,S
+C(3,#InqCode,2,E(0,2),$)
+C(3,#InqCode,2,s,$)
+SWITCH(#AdjCode,1,E(0,5),
+                2,E(0,6),
+                3,C(3,#TxKind,3,E(0,7),E(0,3)),
+                9,E(0,2),
+                  E(0,4))
+
+
+
+! 現在利率
+#NowRate=m,2.4,L
+! 生效日
+#NowEffectDate=D,7,L
+
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4931 -----------
+<sub type="FORM" name="L4931">
+#SCRTIL=_,_,S
+T(3,[L4931]利率調整清單)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+! 地區別
+#OOCityItem=X,8,O
+! 鄉鎮區
+#OOAreaItem=X,8,O
+! 調整記號
+#OOAdjCode=A,1,O
+! #OOAdjCodeX=X,16,O
+! SWITCH(#OOAdjCode,1,T(2,1-按合約利率調整),
+!                    2,T(2,2-按預定利率調整),
+!                    3,T(2,3-按上期利率調整),
+!                    4,T(2,4-按輸入利率調整),
+!                      T(2,))
+
+
+! 戶號-額度-撥款
+! 戶號
+#OOCustNo=A,7,O
+! 額度
+#OOFacmNo=A,3,O
+! 撥款序號
+#OOBormNo=A,3,O
+! 13碼戶號
+#OOCustNumber=X,15,O
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+! 戶名
+#OOCustName=X,100,O
+! 全戶餘額
+#OOTotalLoanBal=m,14,O
+! 撥款金額
+#OODrawdownAmt=m,14,O
+! 放款餘額
+#OOLoanBal=m,14,O
+
+! 目前生效日
+#OOPresEffDate=D,7,O
+! 本次生效日
+#OOCurtEffDate=D,7,O
+! 繳息迄日
+#OOPrevIntDate=D,7,O
+! 客戶別
+#OOCustCode=A,1,O
+#OOCustCodeX=X,6,O
+T(3,)T(H,#OOCustCode,#EntCodeHelp)
+!SWITCH(#OOCustCode,0,T(3,個金),1,T(3,企金),2,T(3,企金自然人),T(3,))
+! 商品代碼
+#OOProdNo=X,5,O
+! 利率加減碼
+#OORateIncr=m,2.4,O
+
+#XXRateIncr=X,7,O
+X(@XXRateIncr,#OORateIncr)
+#STARSYM=X,2,S
+T(3, *)
+! 合約利率
+#OOContractRate=m,2.4,O
+! 目前利率
+#OOPresentRate=m,2.4,O
+! 擬調利率
+#OOProposalRate=m,2.4,O
+
+! 調整後利率
+#OOAdjustedRate=m,2.4,O
+
+! 調整後利率
+#XOAdjustedRate=X,7,O
+X(#OOAdjustedRate)
+! #OOAdjustedRateX=X,7,O
+
+#XXAdjustedRate=X,7,O
+IF(#OOAdjCode==0,T(2,),T(2,#XOAdjustedRate))
+
+! 合約指標利率
+#OOContrIndexRate=m,2.4,O
+
+! 合約加減碼
+#OOContrRateIncr=m,2.4,O
+
+! 擬調指標利率
+#OOPropIndexRate=m,2.4,O
+
+! 個別加減碼
+#OOIndividualIncr=m,2.4,O
+
+! 地區別上限利率
+#OOUpperLimitRate=m,2.4,O
+
+! 地區別下限利率
+#OOLowerLimitRate=m,2.4,O
+
+#OORateIncrX=X,9,O
+C(3,#OOContrRateIncr,#OOIndividualIncr,T(2,#XXRateIncr),T(2,#XXRateIncr+#STARSYM))
+
+#OOProcNote=x,300,O
+
+! 擬調利率生效日
+#OONextAdjDate=D,7,O
+! 擬調利率
+#OONextAdjRate=m,2.4,O
+
+
+! 查詢利率歷程
+#OOBUF_L3932=X,20,S
+T(2,00000+#OOCustNo+#OOFacmNo+#OOBormNo)
+
+#OOBTN_L3932=A,2,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L3932; ntxbuf=#OOBUF_L3932})
+
+! 已輸入註記*************
+
+#secret-no=x,1000,S
+T(6A,#AdjDate+#TxKind+#OOAdjCode+#OOCustNo+#OOFacmNo+#OOBormNo+#OOCurtEffDate)
+
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
+
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CustType
+#TxKind
+#AdjCode
+#InqCode
+#AdjDate
+#END
+
+
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4931
+#OOCityItem
+#OOAreaItem
+#OOAdjCode
+#OOCustNo
+#OOFacmNo
+#OOBormNo
+#OOCustName
+#OOTotalLoanBal
+#OODrawdownAmt
+#OOLoanBal
+#OOPresEffDate
+#OOCurtEffDate
+#OOPrevIntDate
+#OOCustCode
+#OOProdNo
+#OORateIncr
+#OOContractRate
+#OOPresentRate
+#OOProposalRate
+#OOAdjustedRate
+#OOContrIndexRate
+#OOContrRateIncr
+#OOPropIndexRate
+#OOIndividualIncr
+#OOUpperLimitRate
+#OOLowerLimitRate
+#OOProcNote
+#OONextAdjDate
+#OONextAdjRate
+
+^
+<include src="ROM.icf::L4R12.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+</sub>
+
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4931" layout="cols=1;screen.width=[];order=1;">
+[
+["[L4931]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@個別利率調整作業"],
+["調整記號:  1.按合約自動調整@@@@@2.按地區別自動調整@@@@@3.人工調整-未調整@@@@@4.人工調整-待輸入@@@@@5.人工調整-已調整@@@@@9.檢核有誤"],
+]
+</sub>
+
+<sub type="SELECT">
+
+
+
+#batch-print=1,L4931.PFNX,NA,,,,,,1169:827
+^
+#batch-print=2,L4931.PFNX,NA,,,,,,1169:827
+^
+#batch-print=3,L4931.PFNX,NA,,,,,,1169:827
+^
+#batch-print=4,L4931.PFNX,NA,,,,,,1169:827
+^
+#batch-print=5,L4931.PFNX,NA,,,,,,1169:827
+^
+#batch-print=6,L4931.PFNX,NA,,,,,,1169:827
+^
+#batch-print=7,L4931.PFNX,NA,,,,,,1169:827
+^
+
+#RPTFG=7,QUERY.GRID,L4931
+#any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
+ifxBatch:{
+     	name:'按目前利率調整;按擬調利率調整;按輸入利率調整',
+	     type:'5',
+	     rim:'L431A',
+	     txtno:'#secret-no',
+	pfnx:"L4931.PFNX",
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號","放行狀態"],
+	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
+}
+}
+#secret-no
+
+#OOBTN_L3932=
+{search:false,formatter:'cust:bind-button:利率',align:'center',canExport:false,width:65}
+
+#OOCityItem=地區別
+{width:120,align:'center'}
+#OOAreaItem=鄉鎮區
+{width:120,align:'center'}
+#OOCustNumber=戶號
+{width:120,align:'center'}
+#OOCustName=戶名
+{width:120,align:'left'}
+#OOTotalLoanBal=全戶餘額
+{width:120}
+#OODrawdownAmt=撥款金額
+{width:120}
+#OOLoanBal=放款餘額
+{width:120}
+#OOPresEffDate=目前生效日
+{width:120,align:'right'}
+#OOCurtEffDate=本次生效日
+{width:120,align:'right'}
+#OOPrevIntDate=繳息迄日
+{width:120,align:'right'}
+#OOCustCodeX=客戶別
+{width:120}
+#OOProdNo=商品代碼
+{width:120}
+!#OONextAdjDate=擬調利率生效日
+!{width:120}
+!#OONextAdjRate=擬調利率
+!{width:120}
+#OOPresentRate=目前利率
+{width:120,align:'right'}
+#OOProposalRate=擬調利率
+{width:120,align:'right'}
+#XXAdjustedRate=調整後利率
+{width:120,align:'right'}
+#OOLowerLimitRate=地區別下限
+{width:120,align:'right'}
+#OOUpperLimitRate=地區別上限
+{width:120,align:'right'}
+#OOProcNote=檢核訊息
+{width:240}
+#OOAdjCode=調整記號
+{width:120,align:'center'}
+^
+
+#RPTFG=6,QUERY.GRID,L4931
+#any={detail:true, header:'L4931.part', caption:'', rowNum:20, rowList:[20,40,60],ifxDisplay:0,
+}
+#OOBTN_L3932=
+{search:false,formatter:'cust:bind-button:利率',align:'center',canExport:false,width:65}
+#OOCityItem=地區別
+{width:120,align:'center'}
+#OOAreaItem=鄉鎮區
+{width:120,align:'center'}
+#OOCustNumber=戶號
+{width:120,align:'center'}
+#OOCustName=戶名
+{width:120,align:'left'}
+#OOTotalLoanBal=全戶餘額
+{width:120}
+#OODrawdownAmt=撥款金額
+{width:120}
+#OOLoanBal=放款餘額
+{width:120}
+#OOPresEffDate=目前生效日
+{width:120,align:'right'}
+#OOCurtEffDate=本次生效日
+{width:120,align:'right'}
+#OOPrevIntDate=繳息迄日
+{width:120,align:'right'}
+#OOCustCodeX=企金別
+{width:120}
+#OOProdNo=商品代碼
+{width:120}
+#OOContractRate=合約利率
+{width:120,align:'right'}
+#OOPresentRate=目前利率
+{width:120,align:'right'}
+#XXAdjustedRate=調整後利率
+{width:120,align:'right'}
+#OOLowerLimitRate=地區別下限
+{width:120,align:'right'}
+#OOUpperLimitRate=地區別上限
+{width:120,align:'right'}
+#OOAdjCode=調整記號
+{width:120,align:'center'}
+
+^
+
+#RPTFG=5,QUERY.GRID,L4931
+#any={detail:true, header:'L4931.part', caption:'', rowNum:20, rowList:[20,40,60],ifxDisplay:0,
+}
+#OOBTN_L3932=
+{search:false,formatter:'cust:bind-button:利率',align:'center',canExport:false,width:65}
+#OOCityItem=地區別
+{width:120,align:'center'}
+#OOAreaItem=鄉鎮區
+{width:120,align:'center'}
+#OOCustNumber=戶號
+{width:120,align:'center'}
+#OOCustName=戶名
+{width:120,align:'left'}
+#OOTotalLoanBal=全戶餘額
+{width:120}
+#OODrawdownAmt=撥款金額
+{width:120}
+#OOLoanBal=放款餘額
+{width:120}
+#OOPresEffDate=目前生效日
+{width:120,align:'right'}
+#OOCurtEffDate=本次生效日
+{width:120,align:'right'}
+#OOPrevIntDate=繳息迄日
+{width:120,align:'right'}
+#OOCustCodeX=客戶別
+{width:120}
+#OOProdNo=商品代碼
+{width:120}
+#OOPresentRate=目前利率
+{width:120,align:'right'}
+#XXAdjustedRate=調整後利率
+{width:120,align:'right'}
+#OOAdjCode=調整記號
+{width:120,align:'center'}
+^
+
+#RPTFG=4,QUERY.GRID,L4931
+#any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
+ifxBatch:{
+     	name:'取消調整',
+	     type:'5',
+	     rim:'L431A',
+	     txtno:'#secret-no',
+	pfnx:"L4931.PFNX",
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號","放行狀態"],
+	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
+}
+}
+#secret-no
+#OOBTN_L3932=
+{search:false,formatter:'cust:bind-button:利率',align:'center',canExport:false,width:65}
+#OOCityItem=地區別
+{width:120,align:'center'}
+#OOAreaItem=鄉鎮區
+{width:120,align:'center'}
+#OOCustNumber=戶號
+{width:120,align:'center'}
+#OOCustName=戶名
+{width:120,align:'left'}
+#OOTotalLoanBal=全戶餘額
+{width:120}
+#OODrawdownAmt=撥款金額
+{width:120}
+#OOLoanBal=放款餘額
+{width:120}
+#OOPresEffDate=目前生效日
+{width:120,align:'right'}
+#OOCurtEffDate=本次生效日
+{width:120,align:'right'}
+#OOPrevIntDate=繳息迄日
+{width:120,align:'right'}
+#OOCustCodeX=客戶別
+{width:120}
+#OOProdNo=商品代碼
+{width:120}
+#OORateIncrX=利率加減碼
+{width:120,align:'right'}
+#OOContractRate=合約利率
+{width:120,align:'right'}
+#OOPresentRate=目前利率
+{width:120,align:'right'}
+#OOProposalRate=擬調利率
+{width:120,align:'right'}
+#XXAdjustedRate=調整後利率
+{width:120,align:'right'}
+#OOContrIndexRate=合約指標利率
+{width:120,align:'right'}
+#OOContrRateIncr=合約加減碼
+{width:120,align:'right'}
+#OOIndividualIncr=個別加減碼
+{width:120,align:'right'}
+#OOAdjCode=調整記號
+{width:120,align:'center'}
+^
+
+#RPTFG=3,QUERY.GRID,L4931
+#any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
+ifxBatch:{
+     	name:'按合約加碼利率調整;按目前利率調整;按擬調利率調整;按輸入利率調整',
+	     type:'5',
+	     rim:'L431A',
+	     txtno:'#secret-no',
+	pfnx:"L4931.PFNX",
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號","放行狀態"],
+	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
+}
+}
+#secret-no
+
+#OOBTN_L3932=
+{search:false,formatter:'cust:bind-button:利率',align:'center',canExport:false,width:65}
+#OOCityItem=地區別
+{width:120,align:'center'}
+#OOAreaItem=鄉鎮區
+{width:120,align:'center'}
+#OOCustNumber=戶號
+{width:120,align:'center'}
+#OOCustName=戶名
+{width:120,align:'left'}
+#OOTotalLoanBal=全戶餘額
+{width:120}
+#OODrawdownAmt=撥款金額
+{width:120}
+#OOLoanBal=放款餘額
+{width:120}
+#OOPresEffDate=目前生效日
+{width:120,align:'right'}
+#OOCurtEffDate=本次生效日
+{width:120,align:'right'}
+#OOPrevIntDate=繳息迄日
+{width:120,align:'right'}
+#OOCustCodeX=客戶別
+{width:120}
+#OOProdNo=商品代碼
+{width:120}
+!#OONextAdjDate=擬調利率生效日
+!{width:120}
+!#OONextAdjRate=擬調利率
+!{width:120}
+#OORateIncrX=利率加減碼
+{width:120,align:'right'}
+#OOContractRate=合約利率
+{width:120,align:'right'}
+#OOPresentRate=目前利率
+{width:120,align:'right'}
+#OOProposalRate=擬調利率
+{width:120,align:'right'}
+#XXAdjustedRate=調整後利率
+{width:120,align:'right'}
+#OOContrIndexRate=合約指標利率
+{width:120,align:'right'}
+#OOContrRateIncr=合約加減碼
+{width:120,align:'right'}
+#OOIndividualIncr=個別加減碼
+{width:120,align:'right'}
+#OOProcNote=檢核訊息
+{width:240}
+#OOAdjCode=調整記號
+{width:120,align:'center'}
+^
+
+#RPTFG=2,QUERY.GRID,L4931
+#any={detail:true, header:'L4931.part', caption:'', rowNum:20, rowList:[20,40,60],ifxDisplay:0,
+}
+#OOBTN_L3932=
+{search:false,formatter:'cust:bind-button:利率',align:'center',canExport:false,width:65}
+#OOCustNumber=戶號
+{width:120,align:'center'}
+#OOCustName=戶名
+{width:120,align:'left'}
+#OOTotalLoanBal=全戶餘額
+{width:120}
+#OODrawdownAmt=撥款金額
+{width:120}
+#OOLoanBal=放款餘額
+{width:120}
+#OOPresEffDate=目前生效日
+{width:120,align:'right'}
+#OOCurtEffDate=本次生效日
+{width:120,align:'right'}
+#OOPrevIntDate=繳息迄日
+{width:120,align:'right'}
+#OOProcNote=檢核訊息
+{width:240}
+#OOCustCodeX=客戶別
+{width:120}
+#OOProdNo=商品代碼
+{width:120}
+#OOAdjCode=調整記號
+{width:120,align:'center'}
+
+^
+
+<include src="PRT.icf::INQ04.sel" map="i=L4931;cpi=15"/>
+#CustType
+#TxKind
+#AdjCode
+#InqCode
+#RateCode
+#AdjDate
+%
+#OOCityItem
+#OOAreaItem
+#OOAdjCode
+#OOCustNo
+#OOFacmNo
+#OOBormNo
+#OOCustName
+#OOTotalLoanBal
+#OODrawdownAmt
+#OOLoanBal
+#OOPresEffDate
+#OOCurtEffDate
+#OOPrevIntDate
+#OOCustCode
+#OOProdNo
+#OORateIncr
+#OOContractRate
+#OOPresentRate
+#OOProposalRate
+#OOAdjustedRate
+#OOContrIndexRate
+#OOContrRateIncr
+#OOPropIndexRate
+#OOIndividualIncr
+#OOProcNote
+@^
+</sub>

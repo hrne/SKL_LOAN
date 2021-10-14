@@ -156,6 +156,9 @@ T(H,#AgCurInd,#AgCurIndHelp)
 #RPTFG=A,1,S
 E(0,0)
 
+#TXMT=A,1,S
+!C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

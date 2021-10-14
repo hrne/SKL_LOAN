@@ -177,10 +177,11 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlWhere += "AND acRec.\"RvBal\">0 ";
 
 			sqlOrder += "";
-		} else if (State == 13 || State == 14 || State == 15) {
+		} else if (State == 13 || State == 14 || State == 15 || State == 18) {
 			// 撥入筆數 13
 			// 檢核成功 14
 			// 檢核失敗 15
+			// 檢核成功-暫收解入 18
 			sqlSelect += "SELECT ";
 			sqlSelect += "'NegAppr02' AS \"使用表格\",";
 			sqlSelect += "NegAp02.\"TxAmt\" AS \"合計資料\",";
@@ -189,9 +190,9 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlSelect += "NegAp02.\"CustNo\" AS \"戶號\",";
 			sqlSelect += "c.\"CustName\" AS \"戶名\",";
 			sqlSelect += "' ' AS \"交易別\",";
-			sqlSelect += "' ' AS \"備註\",";
+			sqlSelect += "RPAD(NegAp02.\"FinCode\",8,' ') || NegAp02.\"TxSeq\" AS \"備註\",";
 			sqlSelect += "NegAp02.\"AcDate\" AS \"會計日\",";
-			sqlSelect += "'' AS \"入帳日\",";
+			sqlSelect += "NegAp02.\"BringUpDate\" AS \"入帳日\",";
 			sqlSelect += "'' AS \"入帳還款日\",";
 			sqlSelect += "'' AS \"暫收金額\",";
 			sqlSelect += "'' AS \"溢繳款\",";
@@ -212,8 +213,14 @@ public class L597AServiceImpl extends ASpringJpaParm implements InitializingBean
 			sqlLeftJoin += "LEFT JOIN \"CustMain\" c ON NegAp02.\"CustId\"=c.\"CustId\" ";
 //			sqlLeftJoin += "LEFT JOIN \"NegTrans\" NegTran ON NegTran.\"CustNo\"=c.\"CustNo\" AND NegAp02.\"AcDate\"=NegTran.\"AcDate\" ";
 			sqlWhere += "WHERE 1=1 ";
-			// sqlWhere += "AND NegAp02.\"AcDate\" = 0 ";
-			sqlWhere += "AND NegAp02.\"BringUpDate\" = (SELECT MAX(\"BringUpDate\") FROM \"NegAppr02\" WHERE \"BringUpDate\" > 0  )";
+
+			if (State == 18) {//暫收解入:已做L4002整批入帳入一筆總金額到專戶
+				sqlWhere += "AND NegAp02.\"AcDate\" > 0 ";
+				sqlWhere += "AND NegAp02.\"StatusCode\" IN ('4001') ";
+				sqlWhere += "AND NegAp02.\"TxStatus\" = 0 ";
+			} else {
+				sqlWhere += "AND NegAp02.\"BringUpDate\" = (SELECT MAX(\"BringUpDate\") FROM \"NegAppr02\" WHERE \"BringUpDate\" > 0  )";
+			}
 			if (State == 13) {
 				// 撥入筆數 13
 			} else if (State == 14) {
