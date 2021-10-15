@@ -28,7 +28,7 @@ E(0,0)
 [#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
 ["#FdTelDate+電催日期",#TelDate],["#FdTelTime+電催時間",#TelTime],
 ["#FdContactCode+電催對象",#ContactCode,#ContactCodeX],["#FdRecvrCode+接話人",#RecvrCode,#RecvrCodeX],
-[#<->#,"#FdTelPhone+連絡電話",#TelArea,#TelNo,#TelExt,#LiaisonName],
+[#<->#,"#FdTelPhone+聯絡電話",#TelArea,#TelNo,#TelExt,#LiaisonName],
 [#<->#,#BTNF],
 ["#FdResultCode+通話結果",#ResultCode,#ResultCodeX],["#FdCallDate+提醒日期",#CallDate],
 [#<->#,"#FdRemark+其他記錄",#Remark],
@@ -342,13 +342,13 @@ T(2,@CustId,#L5R23CustId)
 @C(4,#CustId,S,$)
 A(ID_UNINO,0,#CustId)
 
-!<顧客連絡電話維護>
+!<顧客聯絡電話維護>
 #BUFF=X,30,S
 T(2,1+          +#CustNo)
 #BINDF=X,1,S
 BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L1905; ntxbuf=#BUFF;ntxbuf5=type<-1:TelArea<-OOTelArea:TelNo<-OOTelNo:TelExt<-OOTelExt})
 
-! 連絡電話
+! 聯絡電話
 #TelArea=X,5,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 @C(4,#TelArea,S,V(9))

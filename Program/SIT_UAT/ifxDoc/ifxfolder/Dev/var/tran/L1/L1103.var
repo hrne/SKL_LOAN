@@ -526,7 +526,7 @@ C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 #FdCurrAdrBef=X,2,L
 #FdCurrZipBef=X,2,L
 #FdCurrAdrAft=X,2,L
-T(3,*)
+C(2,#TypeCodeAft,T(3,*),T(3,*),T(3,),T(3,),T(3,))
 #FdCurrZipAft=X,2,L
 
 #FdEmailBef=X,2,L

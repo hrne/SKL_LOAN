@@ -45,6 +45,8 @@ public class L4600Report extends MakeReport {
 	// [L4600火險到期檔產生作業]產生LN5811P.CSV
 	String fileName = "LN5811P.csv";
 
+	final String fileHeader = "到期年月,戶號,額度,姓名,保單號碼,保險起日,保險迄日,火險保額,地震險保額,坪數(含建築物、公設等),建議火險保額 (e-loan),備註";
+
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		this.info("L4600Report exec start");
@@ -73,6 +75,9 @@ public class L4600Report extends MakeReport {
 		this.info("L4600Report getData start");
 
 		List<String> result = new ArrayList<>();
+
+		// 加入表頭
+		result.add(fileHeader);
 
 		List<Map<String, String>> list = null;
 
@@ -115,6 +120,7 @@ public class L4600Report extends MakeReport {
 
 			this.info(line);
 
+			// 加入明細
 			result.add(line);
 		}
 

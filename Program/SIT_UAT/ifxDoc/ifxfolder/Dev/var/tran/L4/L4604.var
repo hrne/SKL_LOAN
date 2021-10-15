@@ -32,8 +32,8 @@ T(4,CHAIN$)
 D(7,3,#SYSDATE,1,0)
 T(1,@InsuEndMonth,#FORE_MONTH,2,5)
 
-#BUFA=X,8,S
-T(2,1+#InsuEndMonth+9+0)
+#BUFA=X,9,S
+T(2,1+#InsuEndMonth+99+0)
 #BINDA=X,1,S
 BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L4961; ntxbuf=#BUFA})
 

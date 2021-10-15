@@ -114,6 +114,7 @@ T(H,#CaseCode,#CaseCodeHelp)
 ! 額度編號
 #FacmNo=A,3,I
 ! C(3,#CHAIN,0,$,s)
+C(3,#CaseCode,2,S,$)
 @V(2,0)
 
 #MRKEY=_,_,S
@@ -175,7 +176,7 @@ T(2, )
 @C(4,#OOTelExt,S,V(9))
 
 
-! 連絡電話
+! 聯絡電話
 #OOTelPhone=X,22,O
 T(2,#OOTelArea+#SPACE+#OOTelNo+#SPACE+#OOTelExt)
 
@@ -293,7 +294,7 @@ TXFORM=L5961
 {width:80}
 #OORecvrCodeX=接話人
 {width:65}
-#OOTelPhone=連絡電話
+#OOTelPhone=聯絡電話
 {width:150}
 #OOResultCodeX=通話結果
 {width:80}

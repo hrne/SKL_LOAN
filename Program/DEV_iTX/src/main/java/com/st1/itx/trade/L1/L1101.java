@@ -292,6 +292,16 @@ public class L1101 extends TradeBuffer {
 		
 		this.totaVo.putParam("OEntCode", tCustMain.getEntCode());
 		this.totaVo.putParam("OEmpNo", tCustMain.getEmpNo());
+		//2021.10.15 by eric
+		String OEmpNoX = "";
+		if (!"".equals(tCustMain.getEmpNo())) {
+			CdEmp tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);
+			if (tCdEmp != null) {
+				OEmpNoX = tCdEmp.getFullname();
+			}
+		}
+		this.totaVo.putParam("OEmpNoX", OEmpNoX);
+		//
 		this.totaVo.putParam("OEName", tCustMain.getEName());
 		this.totaVo.putParam("OEduCode", tCustMain.getEduCode());
 		this.totaVo.putParam("OOwnedHome", tCustMain.getOwnedHome());

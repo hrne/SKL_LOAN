@@ -172,7 +172,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTxAmt     入帳金額
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException 
 	 */
 	public ArrayList<BaTxVo> settingUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType,
 			BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
@@ -294,7 +294,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTxAmt      入帳金額
 	 * @param titaVo      TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException 
 	 */
 	public ArrayList<BaTxVo> settleUnPaid(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
 			int iRepayCode, int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
@@ -424,7 +424,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iBormNo     撥款
 	 * @param titaVo      TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException 
 	 */
 	public ArrayList<BaTxVo> acLoanInt(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
 			TitaVo titaVo) throws LogicException {
@@ -469,7 +469,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTerms     期數
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException 
 	 */
 	public ArrayList<BaTxVo> termsPay(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iTerms, TitaVo titaVo)
 			throws LogicException {
@@ -507,7 +507,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iBormNo    撥款
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException 
 	 */
 	public ArrayList<BaTxVo> cashFlow(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo)
 			throws LogicException {

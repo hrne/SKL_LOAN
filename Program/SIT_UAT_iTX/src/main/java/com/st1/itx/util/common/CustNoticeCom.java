@@ -106,6 +106,7 @@ public class CustNoticeCom extends TradeBuffer {
 	 * @param formNo 程式ID or 報表ID
 	 * @param custNo 戶號
 	 * @param facmNo 額度
+	 * @param titaVo 
 	 * @return NoticeFlag = 2:簡訊 ＞ 3:電郵 ＞ 1:書信 ＞ 4.不寄送 <br>
 	 *         isMessage Y.發送簡訊<br>
 	 *         isEmail Y.發送電郵<br>
@@ -113,6 +114,7 @@ public class CustNoticeCom extends TradeBuffer {
 	 *         MessagePhoneNo 簡訊號碼 <br>
 	 *         EmailAddress 電郵地址 <br>
 	 *         LetterAddress 書信地址 <br>
+	 * @throws LogicException 
 	 * 
 	 * @throws LogicException ..
 	 */
@@ -333,6 +335,7 @@ public class CustNoticeCom extends TradeBuffer {
 	/**
 	 * 
 	 * @param custMain 客戶主檔
+	 * @param titaVo 
 	 * @return currAddress = 通訊地址 <br>
 	 */
 	public String getCurrAddress(CustMain custMain, TitaVo titaVo) {
@@ -387,6 +390,7 @@ public class CustNoticeCom extends TradeBuffer {
 	/**
 	 * 
 	 * @param custMain 客戶主檔
+	 * @param titaVo 
 	 * @return regAddress = 戶籍地址 <br>
 	 */
 	public String getRegAddress(CustMain custMain, TitaVo titaVo) {

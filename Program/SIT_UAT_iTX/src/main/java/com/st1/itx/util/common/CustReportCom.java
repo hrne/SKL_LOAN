@@ -107,7 +107,7 @@ public class CustReportCom extends TradeBuffer {
 	 *         ReportPhoneNo = 電話 <br>
 	 *         ReportEmailAd = 電郵地址 <br>
 	 *         ReportAddress = 地址 <br>
-	 * @throws LogicException ..
+	 * @throws LogicException 
 	 */
 	public TempVo getReportCode(String formNo, int custNo, int facmNo, int rank) throws LogicException {
 		TempVo tempVo = new TempVo();

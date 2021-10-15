@@ -176,7 +176,7 @@ public class TxAmlCom extends TradeBuffer {
 	/**
 	 * 撥款匯款 Call By L3220 暫收款退還
 	 * @param titaVo TitaVo
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public void remitL3220(TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom.remit .....");

@@ -81,7 +81,7 @@ public class LoanAvailableAmt extends TradeBuffer {
 	 * @param tFacMain 額度檔
 	 * @param titaVo   ..
 	 * @return 可用額度
-	 * @throws LogicException ..
+	 * @throws LogicException 
 	 */
 	public BigDecimal caculate(FacMain tFacMain, TitaVo titaVo) throws LogicException {
 		this.info("LoanAvailableAmt caculate ... ");

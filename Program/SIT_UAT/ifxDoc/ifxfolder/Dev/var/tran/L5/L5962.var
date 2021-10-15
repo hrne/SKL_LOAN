@@ -120,6 +120,7 @@ T(H,#CaseCode,#CaseCodeHelp)
 ! 額度編號
 #FacmNo=A,3,I
 ! C(3,#CHAIN,0,$,s)
+C(3,#CaseCode,2,S,$)
 @V(2,0)
 
 #MRKEY=_,_,S

@@ -136,14 +136,29 @@ public class L2022 extends TradeBuffer {
 
 		int iCreditSysNo = parse.stringToInteger(titaVo.getParam("CreditSysNo"));
 
+		/*
+		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		 */
+		this.index = titaVo.getReturnIndex();
+
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = 15; // 9 * 15 * 376 = 50760  1次最多9筆occurs
+		
 		findAllCdGuarantor();
 
 		findAllCdCode();
 
 		if (iCreditSysNo > 0) {
-			Slice<FacMain> slFacMain = sFacMainService.facmCreditSysNoRange(iCreditSysNo, iCreditSysNo, 0, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacMain> slFacMain = sFacMainService.facmCreditSysNoRange(iCreditSysNo, iCreditSysNo, 0, 999, this.index, this.limit, titaVo);
 			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			if (slFacMain != null && slFacMain.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
+			
 			if (lFacMain != null && lFacMain.size() > 0) {
 				for (FacMain tFacMain : lFacMain) {
 					facMainRelation(titaVo, tFacMain);
@@ -166,23 +181,31 @@ public class L2022 extends TradeBuffer {
 			}
 
 		} else if (iCustNo > 0) {
-			Slice<FacMain> slFacMain = sFacMainService.CustNoAll(iCustNo, 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacMain> slFacMain = sFacMainService.CustNoAll(iCustNo, this.index, this.limit, titaVo);
 
 			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
 
+			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
+			if (slFacMain != null && slFacMain.hasNext()) {
+				titaVo.setReturnIndex(this.setIndexNext());
+				/* 手動折返 */
+				this.totaVo.setMsgEndToEnter();
+			}
+			
 			int oCreditSysNo = 0;
 			if (lFacMain != null && lFacMain.size() > 0) {
 				for (FacMain tFacMain : lFacMain) {
-					if (oCreditSysNo > 0 && oCreditSysNo != tFacMain.getCreditSysNo()) {
-						getfacRelation(titaVo, tFacMain.getCreditSysNo());
-					}
 
 					cnt++;
 					facMainRelation(titaVo, tFacMain);
 
 					oCreditSysNo = tFacMain.getCreditSysNo();
+					
+					if (oCreditSysNo > 0 && oCreditSysNo != tFacMain.getCreditSysNo()) {
+						getfacRelation(titaVo, tFacMain.getCreditSysNo());
+					}
 				}
-				getfacRelation(titaVo, oCreditSysNo);
+//				getfacRelation(titaVo, oCreditSysNo);
 			}
 
 		} else if (iApplNo > 0) {

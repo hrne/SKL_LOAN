@@ -173,7 +173,7 @@ IF(#RegFg==0,$,s)
 #FdIsSuspected2=X,2,L
 #FdEntCode=X,2,L
 #FdEmpNo=X,14,L
-T(3,*    員工代號)
+T(3,     員工代號)
 #FdEName=X,2,L
 #FdEduCode=X,2,L
 #FdOwnedHome=X,2,L
@@ -443,7 +443,7 @@ T(2,@FdSpouseName,#WKSPC)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdRegCityCode,#Fd)
 T(2,@FdRegZip2,#WKSPC)
-C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdCurrCityCode,#Fd)
 T(2,@FdCurrZip2,#WKSPC)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
@@ -883,7 +883,9 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
 HELP(#L6r03ResultCity,cols:5)
-@V(H,#L6r03ResultCity)
+@
+C(5,FdCurrCityCode,*,V(7),$)
+C(4,#CurrCityCode,S,V(H,#L6r03ResultCity))
 
 !通訊-縣市代碼對應名稱
 #CurrCityItem=X,8,L
@@ -891,9 +893,10 @@ T(H,#CurrCityCode,#L6r03ResultCity)
 
 ! 調RIM取鄉鎮市區代碼
 #RimL6r03Area1=X,1,S
-C(3,#FunCd,4,s,$)
-C(3,#FunCd,5,s,$)
-C(5,#SameReg,Y,s,$)
+C(3,#FunCd,4,S,$)
+C(3,#FunCd,5,S,$)
+C(5,#SameReg,Y,S,$)
+C(4,#CurrCityCode,S,$)
 E(0,@RimFunCd,2)
 T(2,@RimCityCode,#CurrCityCode)
 T(2,@RimAreaCode,)
@@ -911,6 +914,7 @@ T(2,#L6r03Result)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 HELP(#L6r03ResultArea1,cols:5)
 @V(H,#L6r03ResultArea1)
 
@@ -923,6 +927,7 @@ T(H,#CurrAreaCode,#L6r03ResultArea1)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 T(2,@RimCityCode,#CurrCityCode)
 T(2,@RimAreaCode,#CurrAreaCode)
 RESET_RIM(#RimL1r10D,L1R10)
@@ -941,6 +946,7 @@ TOOLTIP(請自行輸入完整路名，包含路／街／村／里／鄰)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 @V(7)
 
 !通訊-段
@@ -948,24 +954,28 @@ C(5,#SameReg,Y,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-巷
 #CurrAlley=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-弄
 #CurrLane=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-號
 #CurrNum=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-號之
 #CurrNumDash=X,5,I
@@ -973,12 +983,14 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#CurrNum,S,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-樓
 #CurrFloor=X,5,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 
 !通訊-樓之
 #CurrFloorDash=X,5,I
@@ -986,6 +998,7 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(4,#CurrFloor,S,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 
 #FdCurraddress=X,2,L
 
@@ -994,6 +1007,7 @@ C(5,#SameReg,Y,s,$)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 T(2,@RimCityCode,#CurrCityCode)
 T(2,@RimAreaCode,#CurrAreaCode)
 T(2,@RimRoad,#CurrRoad)
@@ -1013,6 +1027,7 @@ R(1,L1R12)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 T(2,@Curraddress,#L1r12Address)
 
 #Curraddress=X,100,L
@@ -1025,6 +1040,7 @@ T(2,@Curraddress,#L1r12Address)
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 C(5,#SameReg,Y,s,$)
+C(4,#CurrCityCode,S,$)
 @
 C(4,#CurrZip2,S,$)
 V(9)
@@ -1187,6 +1203,7 @@ C(3,#FunCd,5,s,$)
 #IncomeOfYearly=n,9,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
+C(3,#IncomeOfYearly,0,E(0,0),$)
 
 #MANU_MM=A,2,S
 !年收入資料年月
@@ -1424,8 +1441,9 @@ T(H,#OIsSuspected,#YesNoHelp)
 T(H,#OEntCode,#EntCodeHelp)
 !員工代號
 #OEmpNo=X,6,L
+#OEmpNoX=x,40,L
 !英文姓名
-#OEName=X,50,L
+#OEName=x,50,L
 !教育程度代號
 #OEduCode=X,1,L
 #OEduCodeX=X,10,L
@@ -1624,6 +1642,7 @@ TXFORM=L1101
 #OIsDataDate
 #OEntCode
 #OEmpNo
+#OEmpNoX
 #OEName
 #OEduCode
 #OOwnedHome
@@ -1675,7 +1694,7 @@ TXFORM=L1101
 ["出生年月日",#OBirthday],
 ["性別",#OSexX],
 ["客戶別",#OCustTypeCodeX],
-["員工代號",#OEmpNo],
+["員工代號",#OEmpNo,#OEmpNoX],
 ["企金別",#OEntCodeX],
 ["行業別",#OIndustryCode,#OIndustryCodeX],
 [#<->#,"國籍",#ONationalityCodex],
