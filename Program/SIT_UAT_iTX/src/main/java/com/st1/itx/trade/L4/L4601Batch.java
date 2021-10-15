@@ -18,7 +18,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuRenew;
-import com.st1.itx.db.domain.InsuRenewId;
 import com.st1.itx.db.domain.InsuRenewMediaTemp;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.ClBuildingService;
@@ -158,15 +157,8 @@ public class L4601Batch extends TradeBuffer {
 //		1.火險詢價上傳檔轉檔作業(檢核清單)
 //			1.總保費=0) 
 //			2.無資料(無此戶號額度、擔保品號碼
-				InsuRenewId tInsuRenewId = new InsuRenewId();
-				InsuRenew tInsuRenew = new InsuRenew();
-
-				tInsuRenewId.setClCode1(parse.stringToInteger(t.get("ClCode1").trim()));
-				tInsuRenewId.setClCode2(parse.stringToInteger(t.get("ClCode2").trim()));
-				tInsuRenewId.setClNo(parse.stringToInteger(t.get("ClNo").trim()));
-				tInsuRenewId.setPrevInsuNo(t.get("InsuNo").trim());
-				tInsuRenewId.setEndoInsuNo(" ");
-				tInsuRenew = insuRenewService.holdById(tInsuRenewId);
+				InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(parse.stringToInteger(t.get("CustNo").trim()),
+						parse.stringToInteger(t.get("FacmNo").trim()), t.get("InsuNo").trim(), titaVo);
 //				無此保單號碼
 				if (tInsuRenew == null) {
 					checkResultA += "10";
@@ -175,8 +167,6 @@ public class L4601Batch extends TradeBuffer {
 				}
 //					a.檢核
 				if ("".equals(checkResultA)) {
-					tInsuRenew.setCustNo(parse.stringToInteger(t.get("CustNo").trim()));
-					tInsuRenew.setFacmNo(parse.stringToInteger(t.get("FacmNo").trim()));
 					tInsuRenew.setFireInsuCovrg(parse.stringToBigDecimal(t.get("NewFireInsuAmt").trim()));
 					tInsuRenew.setEthqInsuCovrg(parse.stringToBigDecimal(t.get("NewEqInsuAmt").trim()));
 					tInsuRenew.setFireInsuPrem(parse.stringToBigDecimal(t.get("NewFireInsuFee").trim()));

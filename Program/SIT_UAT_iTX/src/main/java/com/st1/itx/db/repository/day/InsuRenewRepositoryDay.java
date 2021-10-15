@@ -94,6 +94,9 @@ public interface InsuRenewRepositoryDay extends JpaRepository<InsuRenew, InsuRen
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND NowInsuNo = 
   public Slice<InsuRenew> findAllByClCode1IsAndClCode2IsAndClNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int clCode1_0, int clCode2_1, int clNo_2, String nowInsuNo_3, Pageable pageable);
 
+  // CustNo = ,AND FacmNo = ,AND NowInsuNo = 
+  public Optional<InsuRenew> findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(int custNo_0, int facmNo_1, String nowInsuNo_2);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

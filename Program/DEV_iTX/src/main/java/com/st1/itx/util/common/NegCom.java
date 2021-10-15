@@ -308,7 +308,7 @@ public class NegCom extends CommBuffer {
 	 * @param iNewTxKind 異動後交易別
 	 * @param titaVo       TitaVo
 	 * @return MapNeg
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public Map<String, String> trialNegtrans(NegTrans tNegTrans, String iTrialFunc, String iNewTxKind, TitaVo titaVo)
 			throws LogicException {
@@ -1797,6 +1797,7 @@ public class NegCom extends CommBuffer {
 	 * 
 	 * @param payIntDate   繳息迄日
 	 * @param repaidPeriod 繳期數
+	 * @param titaVo 
 	 * @return 應繳日
 	 * @throws LogicException
 	 */
@@ -2078,7 +2079,7 @@ public class NegCom extends CommBuffer {
 	 * @param DueAmt  期金
 	 * @param Rate    利率(年)
 	 * @return int 要繳幾期
-	 * @throws LogicException ..
+	 * @throws LogicException 
 	 */
 	public int nper(BigDecimal LoanAmt, BigDecimal DueAmt, BigDecimal Rate) throws LogicException {
 		// L5970使用

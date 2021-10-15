@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -27,7 +25,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service("L5060ServiceImpl")
 @Repository
 public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5060ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -39,7 +36,7 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
-	
+
 	// *** 折返控制相關 ***
 	private int index;
 
@@ -47,19 +44,19 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-	
 
 	/* load 法催紀錄清單檔 */
-	public List<Map<String, String>> load(int index,int limit,String iCaseCode, int sOvduTerm, int eOvduTerm, String iOvdamtfm, String iOvdamtto, int iStatus, int iBizDateF,int iIdentity,int iCustNo,String iCustName,String iCustId,String iAccCollPsn,String iLegalPsn,String iTxCode, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> load(int index, int limit, String iCaseCode, int sOvduTerm, int eOvduTerm, String iOvdamtfm, String iOvdamtto, int iStatus, int iBizDateF, int iIdentity,
+			int iCustNo, String iCustName, String iCustId, String iAccCollPsn, String iLegalPsn, String iTxCode, TitaVo titaVo) throws Exception {
 
 		Query query;
 		// *** 折返控制相關 ***
 		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
-		
+
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		
+
 		String iOprionCd = titaVo.getParam("OprionCd");
 		String queryttext = "select ";
 		queryttext += "s.\"CustNo\""; // 戶號
@@ -80,19 +77,19 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += ",s.\"ClCustNo\""; // 同擔保品戶號
 		queryttext += ",s.\"ClFacmNo\""; // 同擔保品額度
 		queryttext += ",s.\"ClRowNo\""; // 同擔保品序列號
-		queryttext += ",s.\"IsSpecify\"";//是否為指定
+		queryttext += ",s.\"IsSpecify\"";// 是否為指定
 //		queryttext += ") ";
 		queryttext += " from \"CollList\" s "; // 法催紀錄清單檔
 //		queryttext += "left join \"CollList\" c on s.\"ClCustNo\" = s.\"ClCustNo\" and s.\"ClFacmNo\" = s.\"ClFacmNo\" "; // 法催紀錄清單檔
 //		queryttext += "left join select \"CollRemind\" r on r.\"CaseCode\" = " + iCaseCode + " and r.\"CustNo\" = s.\"CustNo\" and r.\"FacmNo\" = s.\"FacmNo\" ";
 //		queryttext += "                       and r.\"RemindDate\" <=  " + iBizDateF + " and r.\"CondCode\" = '1' "; // 法催紀錄提醒事項檔 (暫時不作判斷給user測)
 		queryttext += "left join (select \"CaseCode\", \"CustNo\", \"FacmNo\", \"RemindDate\" , \"CondCode\" ,ROW_NUMBER() Over (Partition By \"CaseCode\", \"CustNo\" , \"FacmNo\" ";
-		queryttext += "Order By \"RemindDate\" ASC ) as \"Row_Number\" from \"CollRemind\" where \"RemindDate\" <= "+iBizDateF+ " and \"CondCode\" = '1' )";
+		queryttext += "Order By \"RemindDate\" ASC ) as \"Row_Number\" from \"CollRemind\" where \"RemindDate\" >= " + iBizDateF + " and \"CondCode\" = '1' )";
 		queryttext += " r on r.\"Row_Number\" = 1 and r.\"CaseCode\" = s.\"CaseCode\" and r.\"CustNo\" = s.\"CustNo\" and r.\"FacmNo\" = s.\"FacmNo\" ";
 		queryttext += "left join \"CdEmp\" e on e.\"EmployeeNo\" = s.\"AccCollPsn\" ";
 		queryttext += "left join \"CdEmp\" f on f.\"EmployeeNo\" = s.\"LegalPsn\" ";
 		queryttext += "left join \"CustMain\" m on m.\"CustNo\" = s.\"CustNo\" ";
-		logger.info("系統日期=" + iBizDateF);
+		this.info("系統日期=" + iBizDateF);
 		queryttext += "where s.\"CaseCode\" =  '" + iCaseCode + "'"; // 案件種類
 		switch (iStatus) {
 //		case 0:
@@ -119,43 +116,43 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 			queryttext += " and (s.\"OvduDays\" >= " + sOvduTerm + " and s.\"OvduDays\" <= " + eOvduTerm + ") "; // 逾期天數
 			break;
 		}
-		switch(iIdentity) {
+		switch (iIdentity) {
 		case 0:
 			break;
-		case 1:	
-			queryttext += " and s.\"CustNo\" = '"+ iCustNo + "' ";
+		case 1:
+			queryttext += " and s.\"CustNo\" = '" + iCustNo + "' ";
 			break;
 		case 2:
-			queryttext += " and m.\"CustName\" = '"+ iCustName + "' ";
+			queryttext += " and m.\"CustName\" = '" + iCustName + "' ";
 			break;
 		case 3:
-			queryttext += " and m.\"CustId\" = '"+ iCustId + "' ";
+			queryttext += " and m.\"CustId\" = '" + iCustId + "' ";
 			break;
 		case 4:
-			queryttext += " and s.\"AccCollPsn\" = '"+ iAccCollPsn + "' ";
+			queryttext += " and s.\"AccCollPsn\" = '" + iAccCollPsn + "' ";
 			break;
 		case 5:
-			queryttext += " and s.\"LegalPsn\" = '"+ iLegalPsn + "' ";
+			queryttext += " and s.\"LegalPsn\" = '" + iLegalPsn + "' ";
 			break;
 		}
 		queryttext += "order by s.\"ClCustNo\", s.\"ClFacmNo\", s.\"ClRowNo\", s.\"CustNo\", s.\"FacmNo\" "; // 01: 逾期/催收戶
-		
+
 		queryttext += sqlRow;
-		
-		logger.info("Sql == "+queryttext);
-		
+
+		this.info("Sql == " + queryttext);
+
 		query = em.createNativeQuery(queryttext);
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
+
 		query.setFirstResult(0);// 因為已經在語法中下好限制條件(筆數),所以每次都從新查詢即可
 
 		// *** 折返控制相關 ***
 		// 設定每次撈幾筆,需在createNativeQuery後設定
 		query.setMaxResults(this.limit);
-		
-		logger.info("L5060Service FindData=" + query.toString());
-		return this.convertToMap(query.getResultList());
+
+		this.info("L5060Service FindData=" + query.toString());
+		return this.convertToMap(query);
 	}
 
 }

@@ -755,6 +755,25 @@ em = null;
   }
 
   @Override
+  public InsuRenew findNowInsuNoFirst(int custNo_0, int facmNo_1, String nowInsuNo_2, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("findNowInsuNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " nowInsuNo_2 : " +  nowInsuNo_2);
+    Optional<InsuRenew> insuRenewT = null;
+    if (dbName.equals(ContentName.onDay))
+      insuRenewT = insuRenewReposDay.findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, nowInsuNo_2);
+    else if (dbName.equals(ContentName.onMon))
+      insuRenewT = insuRenewReposMon.findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, nowInsuNo_2);
+    else if (dbName.equals(ContentName.onHist))
+      insuRenewT = insuRenewReposHist.findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, nowInsuNo_2);
+    else 
+      insuRenewT = insuRenewRepos.findTopByCustNoIsAndFacmNoIsAndNowInsuNoIsOrderByInsuEndDateDescInsuStartDateAsc(custNo_0, facmNo_1, nowInsuNo_2);
+
+    return insuRenewT.isPresent() ? insuRenewT.get() : null;
+  }
+
+  @Override
   public InsuRenew holdById(InsuRenewId insuRenewId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

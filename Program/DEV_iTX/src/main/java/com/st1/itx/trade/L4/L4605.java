@@ -12,7 +12,6 @@ import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -74,7 +73,8 @@ public class L4605 extends TradeBuffer {
 
 //		吃檔
 //		String filePath1 = "D:\\temp\\test\\火險\\Test\\Return\\201912_final.txt";
-		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
+		String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
+				+ File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		ArrayList<String> dataLineList = new ArrayList<>();
 
@@ -103,7 +103,8 @@ public class L4605 extends TradeBuffer {
 					newInsuNo = newInsuNo.trim();
 				}
 
-				tmpInsu tmp = new tmpInsu(parse.stringToInteger(tempOccursList.get("CustNo")), parse.stringToInteger(tempOccursList.get("FacmNo")), insuNo, newInsuNo);
+				tmpInsu tmp = new tmpInsu(parse.stringToInteger(tempOccursList.get("CustNo")),
+						parse.stringToInteger(tempOccursList.get("FacmNo")), insuNo, newInsuNo);
 //				Initial
 				error.put(tmp, 0);
 
@@ -112,84 +113,81 @@ public class L4605 extends TradeBuffer {
 					continue;
 				}
 
-				Slice<InsuRenew> sInsuRenew = null;
+				InsuRenew tInsuRenew = insuRenewService.prevInsuNoFirst(
+						parse.stringToInteger(tempOccursList.get("CustNo").trim()),
+						parse.stringToInteger(tempOccursList.get("FacmNo").trim()), insuNo, titaVo);
 
-				List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
-
-//				續保檔若調整內容，增加有批單號碼的筆數。
-//				提出檔合為一筆，回傳時以List回頭update續保檔
-				sInsuRenew = insuRenewService.findPrevInsuNoEq(parse.stringToInteger(tempOccursList.get("ClCode1")), parse.stringToInteger(tempOccursList.get("ClCode2")),
-						parse.stringToInteger(tempOccursList.get("ClNo")), insuNo, this.index, this.limit, titaVo);
-
-				lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-
-				if (lInsuRenew != null && lInsuRenew.size() != 0) {
-					for (InsuRenew tInsuRenew : lInsuRenew) {
-
-						tInsuRenew = insuRenewService.holdById(tInsuRenew.getInsuRenewId());
-
-						this.info("tInsuRenew : " + tInsuRenew.toString());
-						if (!"".equals(tInsuRenew.getNowInsuNo().trim()) && !tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
-							error.put(tmp, 4);
-							alrdyInsu.put(tmp, newInsuNo);
-							continue;
-						}
-						if (tInsuRenew.getRenewCode() == 1) {
-							error.put(tmp, 5);
-							continue;
-						}
-						if (tInsuRenew.getTotInsuPrem().compareTo(BigDecimal.ZERO) == 0) {
-							error.put(tmp, 6);
-							continue;
-						}
-						BigDecimal totFee = tInsuRenew.getEthqInsuPrem().add(tInsuRenew.getFireInsuPrem());
-
-						if (tInsuRenew.getTotInsuPrem().compareTo(totFee) != 0) {
-							this.info("EthqInsuPrem : " + tInsuRenew.getEthqInsuPrem());
-							this.info("FireInsuPrem : " + tInsuRenew.getFireInsuPrem());
-							this.info("totFee : " + totFee);
-							this.info("NewTotalFee : " + parse.stringToBigDecimal(tempOccursList.get("NewTotalFee")));
-							error.put(tmp, 7);
-							continue;
-						}
-
-						if (tInsuRenew.getInsuEndDate() + 19110000 != parse.stringToInteger(tempOccursList.get("NewInsuEndDate").replace("/", ""))) {
-							this.info("InsuEndDate : " + tInsuRenew.getEthqInsuPrem() + 19110000);
-							this.info("NewInsuEndDate : " + parse.stringToInteger(tempOccursList.get("NewInsuEndDate").replace("/", "")));
-							error.put(tmp, 10);
-							continue;
-						}
-						if (tInsuRenew.getFireInsuCovrg().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewFireInsuAmt"))) != 0
-								|| tInsuRenew.getFireInsuPrem().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewFireInsuFee"))) != 0) {
-							error.put(tmp, 11);
-							continue;
-						}
-						if (tInsuRenew.getEthqInsuCovrg().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewEqInsuAmt"))) != 0
-								|| tInsuRenew.getEthqInsuPrem().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewEqInsuFee"))) != 0) {
-							error.put(tmp, 12);
-							continue;
-						}
-						if (tInsuRenew.getTotInsuPrem().compareTo(parse.stringToBigDecimal(tempOccursList.get("NewTotalFee"))) != 0) {
-							error.put(tmp, 13);
-							continue;
-						}
-						if (!"".equals(tInsuRenew.getNowInsuNo().trim()) && tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
-							error.put(tmp, 14);
-							alrdyInsu.put(tmp, newInsuNo);
-							continue;
-						}
-
-						tInsuRenew.setNowInsuNo(newInsuNo);
-
-						try {
-							insuRenewService.update(tInsuRenew);
-						} catch (DBException e) {
-							throw new LogicException("E0007", e.getErrorMsg());
-						}
-					}
-				} else {
+				if (tInsuRenew == null) {
 					error.put(tmp, 3);
 					continue;
+				}
+
+				tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
+
+				this.info("tInsuRenew : " + tInsuRenew.toString());
+				if (!"".equals(tInsuRenew.getNowInsuNo().trim()) && !tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
+					error.put(tmp, 4);
+					alrdyInsu.put(tmp, newInsuNo);
+					continue;
+				}
+				if (tInsuRenew.getRenewCode() == 1) {
+					error.put(tmp, 5);
+					continue;
+				}
+				if (tInsuRenew.getTotInsuPrem().compareTo(BigDecimal.ZERO) == 0) {
+					error.put(tmp, 6);
+					continue;
+				}
+				BigDecimal totFee = tInsuRenew.getEthqInsuPrem().add(tInsuRenew.getFireInsuPrem());
+
+				if (tInsuRenew.getTotInsuPrem().compareTo(totFee) != 0) {
+					this.info("EthqInsuPrem : " + tInsuRenew.getEthqInsuPrem());
+					this.info("FireInsuPrem : " + tInsuRenew.getFireInsuPrem());
+					this.info("totFee : " + totFee);
+					this.info("NewTotalFee : " + parse.stringToBigDecimal(tempOccursList.get("NewTotalFee")));
+					error.put(tmp, 7);
+					continue;
+				}
+
+				if (tInsuRenew.getInsuEndDate() + 19110000 != parse
+						.stringToInteger(tempOccursList.get("NewInsuEndDate").replace("/", ""))) {
+					this.info("InsuEndDate : " + tInsuRenew.getEthqInsuPrem() + 19110000);
+					this.info("NewInsuEndDate : "
+							+ parse.stringToInteger(tempOccursList.get("NewInsuEndDate").replace("/", "")));
+					error.put(tmp, 10);
+					continue;
+				}
+				if (tInsuRenew.getFireInsuCovrg()
+						.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewFireInsuAmt"))) != 0
+						|| tInsuRenew.getFireInsuPrem()
+								.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewFireInsuFee"))) != 0) {
+					error.put(tmp, 11);
+					continue;
+				}
+				if (tInsuRenew.getEthqInsuCovrg()
+						.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewEqInsuAmt"))) != 0
+						|| tInsuRenew.getEthqInsuPrem()
+								.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewEqInsuFee"))) != 0) {
+					error.put(tmp, 12);
+					continue;
+				}
+				if (tInsuRenew.getTotInsuPrem()
+						.compareTo(parse.stringToBigDecimal(tempOccursList.get("NewTotalFee"))) != 0) {
+					error.put(tmp, 13);
+					continue;
+				}
+				if (!"".equals(tInsuRenew.getNowInsuNo().trim()) && tInsuRenew.getNowInsuNo().equals(newInsuNo)) {
+					error.put(tmp, 14);
+					alrdyInsu.put(tmp, newInsuNo);
+					continue;
+				}
+
+				tInsuRenew.setNowInsuNo(newInsuNo);
+
+				try {
+					insuRenewService.update(tInsuRenew);
+				} catch (DBException e) {
+					throw new LogicException("E0007", e.getErrorMsg());
 				}
 			}
 			Set<tmpInsu> tempSet = error.keySet();

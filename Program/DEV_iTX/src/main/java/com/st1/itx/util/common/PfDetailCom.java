@@ -161,6 +161,8 @@ public class PfDetailCom extends TradeBuffer {
 	 * 
 	 * @param iPf    PfDetailVo
 	 * @param titaVo ..
+	 * @return 
+	 * @throws LogicException 
 	 * @throws LogicException ..
 	 */
 	public ArrayList<PfDetail> addDetail(PfDetailVo iPf, TitaVo titaVo) throws LogicException {

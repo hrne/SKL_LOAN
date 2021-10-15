@@ -208,8 +208,9 @@ C(3,#Identity,5,$,S)
 #Ovdamtfm=M,14,I
 #Ovdamtto=M,14,I
 #OvdamCount=m,14,S
-E(0,#Ovdamtto-#Ovdamtfm)
-C(1,#OvdamCount,V(P,結束金額不可小於起始金額),$,$)
+! E(0,#Ovdamtto-#Ovdamtfm)
+! C(1,#OvdamCount,V(P,結束金額不可小於起始金額),$,$)
+IF(#Ovdamtto<#Ovdamtfm,V(P,結束金額不可小於起始金額),$)
 ! 期數/天數
 #OprionCd=A,1,I
 HELP(#OprionCdHelp)
@@ -259,6 +260,7 @@ C(3,#OprionCd,1,C(3,#Ovdtrmfm,0,$,s),C(3,#Ovddayfm,0,$,s))
 T(H,#Status,#StatusHelp)
 
 #RPTFG=A,1,S
+C(3,#CaseCode,1,E(0,0),E(0,1))
 
 </sub>
 
@@ -461,7 +463,53 @@ TXFORM=L5060
 #RPTFG=0,QUERY.GRID,L5060
 #any={header:'L5060.part',caption:'[L5060]案件處理清單',width:1000,rowNum:40,ifxDisplay:1,
 ifxBatch:{
-	name:'列印逾催通知單;列印存證信函',
+	name:'存證信函;延遲繳款通知函;繳款通知函',
+	type:'5',
+	rim:'L560A',
+	txtno:'#secret-no',
+	pfnx:"L4040.PFNX",
+	col_captions:["總筆數","勾選之筆數","傳送成功筆數","傳送失敗筆數","放行傳輸序號","放行狀態"],
+	col_names:["#batch-rows","#batch-rows-selected","#batch-rows-ok","#batch-rows-error","#batch-row-txtno","#batch-row-status"]
+	}
+}
+#secret-no
+#OOBtnEntry=
+{search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:35}
+#OOTxDate=上次作業日期
+{width:65}
+#OOTxCodeX=上次作業項目
+{width:95}
+#OOBtnAlert=提醒日
+{search:false,formatter:'cust:bind-button:#XXAlertDate',align:'center',canExport:false,width:80}
+#OOCustNo=戶號
+{width:65}
+#OOFacmNo=額度
+{width:40,align:'center'}
+#OOPrevIntDate=繳息迄日
+{width:65}
+#OOOverDueterm=逾期數
+{width:50}
+#OOOvduDays=逾期天數
+{width:50}
+#OOCurrencyCode=幣別
+{width:35}
+#OOPrinBalance=本金餘額
+{width:95}
+#EditAccCollPsn=催收人員
+{width:95}
+#EditLegalPsn=法務人員
+{width:95}
+#OOBtnEntryB=同擔保品
+{search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:95}
+#OOIsSpecify=是否指定
+{width:95,align:'center'}
+#OOStatusX=戶況
+{width:45}
+^
+#RPTFG=1,QUERY.GRID,L5060
+#any={header:'L5060.part',caption:'[L5060]案件處理清單',width:1000,rowNum:40,ifxDisplay:1,
+ifxBatch:{
+	name:'前置協商毀諾通知函;前置協商逾期繳款通知函',
 	type:'5',
 	rim:'L560A',
 	txtno:'#secret-no',

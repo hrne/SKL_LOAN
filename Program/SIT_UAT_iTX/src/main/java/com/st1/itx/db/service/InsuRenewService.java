@@ -335,6 +335,17 @@ public interface InsuRenewService {
   public Slice<InsuRenew> findNowInsuNoEq(int clCode1_0, int clCode2_1, int clNo_2, String nowInsuNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = ,AND NowInsuNo = 
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param nowInsuNo_2 nowInsuNo_2
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuRenew InsuRenew of List
+   */
+  public InsuRenew findNowInsuNoFirst(int custNo_0, int facmNo_1, String nowInsuNo_2, TitaVo... titaVo);
+
+  /**
    * hold By InsuRenew
    * 
    * @param insuRenewId key
