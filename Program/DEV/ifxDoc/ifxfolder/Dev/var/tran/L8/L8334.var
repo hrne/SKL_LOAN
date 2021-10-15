@@ -108,8 +108,6 @@ T(2,@FdApplyDate,*)
 T(2,@FdStartDate,*)
 T(2,@FdPayDate,*)
 T(2,@FdBankId,*)
-T(2,@FdAllotAmt,*)
-T(2,@FdOwnPercentage,*)
 
 ! 異動進入
 #Deal_Update=X,1,S
@@ -119,8 +117,6 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(F,@StartDate,1)T(F,@AllotAmt,1)T(F,@OwnPercentage,1)
 K(MODIFYBUTTON,異動)
 T(2,@FdStartDate,*)
-T(2,@FdAllotAmt,*)
-T(2,@FdOwnPercentage,*)
 
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -233,11 +229,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 @V(7)
-T(2,@RimJcicBankCode,#BankId)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@BankIdX,#L8r01JcicBankName)
+
 
 #BankIdX=X,80,L
 T(2,@RimJcicBankCode,#BankId)
@@ -247,17 +239,14 @@ R(1,L8R01)
 T(2,@BankIdX,#L8r01JcicBankName)
 
 !參與分配債權金額
-#AllotAmt=M,9,I
+#AllotAmt=M,9,L
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
-@V(2,0)
 
 !債權比例
 #OwnPercentage=m,3.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(2,0)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

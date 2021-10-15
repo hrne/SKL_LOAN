@@ -37,7 +37,7 @@ public class L8301ServiceImpl  extends ASpringJpaParm implements InitializingBea
 		// *** 折返控制相關 ***
 		this.limit = limit;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
-		String sql  = "select \"DataSendSection\" from  \"NegFinAcct\" ";
+		String sql  = "select \"FinCode\" from  \"NegFinAcct\" ";
 		
 		this.info("sql===="+sql);
 		query = em.createNativeQuery(sql);

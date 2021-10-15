@@ -64,7 +64,8 @@
 !    L2R53 : 依戶號尋找扣款帳號help
 !    L2R54 : 依聯貸案編號尋找申請案件檔(已准)
 !    L2R55 : 依聯貸案編號尋找額度主檔
-!    L2R56 : 商品建檔時組出清償說明 
+!    L2R56 : 商品建檔時組出清償說明
+!    L2R57 : 依企金使用記號組出商品下拉式選單
 !    L1R01 : 尋找客戶檔資料
 !    L1R02 : 尋找客戶關聯戶資料
 !    L1R03 : 尋找客戶額度檔資料
@@ -1519,6 +1520,7 @@ TXFORM=CWAMX
 #L2r01EndDate=D,7,S
 #L2r01StatusCode=A,1,S
 #L2r01AgreementFg=X,1,S
+#L2r01EnterpriseFg=X,1,S
 #L2r01CharCode=X,1,S
 #L2r01AcctCode=X,3,S
 #L2r01AcctAcno=A,5,S
@@ -1585,6 +1587,7 @@ TXFORM=L2R01
 #L2r01EndDate
 #L2r01StatusCode
 #L2r01AgreementFg
+#L2r01EnterpriseFg
 #L2r01CharCode
 #L2r01AcctCode
 #L2r01AcctAcno
@@ -1650,6 +1653,7 @@ TXFORM=L2R01
 #L2r02ApplNo=A,7,S
 #L2r02CustId=X,10,S
 #L2r02ApplDate=D,7,S
+#L2r02DepartmentCode=A,1,S
 #L2r02ProdNo=X,5,S
 #L2r02AcctCode=A,3,S
 #L2r02CurrencyCode=X,3,S
@@ -1675,6 +1679,7 @@ TXFORM=L2R02
 #L2r02ApplNo
 #L2r02CustId
 #L2r02ApplDate
+#L2r02DepartmentCode
 #L2r02ProdNo
 #L2r02AcctCode
 #L2r02CurrencyCode
@@ -3564,6 +3569,16 @@ TXFORM=L2R56
 #L2r56Breach
 ^
 </L2R56.tom>
+
+<L2R57.dec>
+#L2r57Help1=X,20480,S
+</L2R57.dec>
+
+<L2R57.tom>
+TXFORM=L2R57
+#L2r57Help1
+^
+</L2R57.tom>
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -5066,7 +5081,7 @@ TXFORM=L4R24
 #L5r01TwoStepCode=X,1,S
 #L5r01PayerCustNo=9,7,S
 #L5r01ChgCondDate=D,7,S
-#L5r01CourCode=X,3,S
+#L5r01CourtCode=X,3,S
 ##loop {times:30,i:1}
 #L5r01NegFinShareFinCode{i}=X,8,S
 #L5r01NegFinShareFinName{i}=X,100,S
@@ -5101,7 +5116,7 @@ TXFORM=L5R01
 #L5r01TwoStepCode
 #L5r01PayerCustNo
 #L5r01ChgCondDate
-#L5r01CourCode
+#L5r01CourtCode
 ##loop {times:30,i:1}
 #L5r01NegFinShareFinCode{i}
 #L5r01NegFinShareFinName{i}
@@ -6068,6 +6083,7 @@ TXFORM=L5R41
 #L5R42AcDate=D,7,S
 #L5R42TlrNo=X,6,S
 #L5R42TxtNo=N,8,S
+#L5R42TxAmt=m,14,S
 ##loop {times:30,i:1}
 #L5R42FinCode{i}=X,8,S
 #L5R42FinCodeName{i}=X,100,S
@@ -6082,6 +6098,7 @@ TXFORM=L5R42
 #L5R42AcDate
 #L5R42TlrNo
 #L5R42TxtNo
+#L5R42TxAmt
 ##loop {times:30,i:1}
 #L5R42FinCode{i}
 #L5R42FinCodeName{i}
@@ -6090,6 +6107,20 @@ TXFORM=L5R42
 ##end
 ^
 </L5R42.tom>
+
+!尋找共用代碼檔與地區資料
+<L5R43Rim.dec>
+</L5R43Rim.dec>
+
+<L5R43.dec>
+#L5R43CourtItem=X,50,S
+</L5R43.dec>
+
+<L5R43.tom>
+TXFORM=L5R43
+#L5R43CourtItem
+^
+</L5R43.tom>
 
 <L6R03.dec>
 #L6r03Result=x,50000,S

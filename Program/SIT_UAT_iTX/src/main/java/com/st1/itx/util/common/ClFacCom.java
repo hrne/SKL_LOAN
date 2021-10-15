@@ -64,7 +64,7 @@ public class ClFacCom extends TradeBuffer {
 	public ClMainService sClMainService;
 	@Autowired
 	public FacShareApplService facShareApplService;
-	
+
 	@Autowired
 	public ClImmService sClImmService;
 	@Autowired
@@ -77,7 +77,7 @@ public class ClFacCom extends TradeBuffer {
 	public FacCaseApplService sFacCaseApplService;
 	@Autowired
 	public ClOwnerRelationService sClOwnerRelationService;
-	
+
 	@Autowired
 	public DataLog dataLog;
 
@@ -86,24 +86,26 @@ public class ClFacCom extends TradeBuffer {
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 	/**
 	 * 新增一筆擔保品與額度關連檔
+	 * 
 	 * @param titaVo   titaVo
-	 * @param iClCode1  擔保品代號1
-	 * @param iClCode2  擔保品代號2
+	 * @param iClCode1 擔保品代號1
+	 * @param iClCode2 擔保品代號2
 	 * @param iClNo    擔保品編號
 	 * @param iApplNo  核准號碼
 	 * @param ownerMap 擔保品提供人CustUKey＆與授信戶關係
 	 * @throws LogicException LogicException
 	 */
-	public void insertClFac(TitaVo titaVo, int iClCode1, int iClCode2, int iClNo, int iApplNo, List<HashMap<String, String>> ownerMap) throws LogicException {
+	public void insertClFac(TitaVo titaVo, int iClCode1, int iClCode2, int iClNo, int iApplNo,
+			List<HashMap<String, String>> ownerMap) throws LogicException {
 		ClFacId clFacId = new ClFacId();
 		clFacId.setClCode1(iClCode1);
 		clFacId.setClCode2(iClCode2);
 		clFacId.setClNo(iClNo);
 		clFacId.setApproveNo(iApplNo);
-		
+
 		// 查該核准號碼是否存在案件申請檔
 		FacCaseAppl tFacCaseAppl = sFacCaseApplService.findById(iApplNo, titaVo);
 
@@ -115,12 +117,12 @@ public class ClFacCom extends TradeBuffer {
 		if (!tFacCaseAppl.getProcessCode().equals("1")) {
 			throw new LogicException("E2021", "該核准號碼尚未核准");// 此核准號碼尚未核准
 		}
-		
+
 		ClFac clFac = sClFacService.findById(clFacId, titaVo);
 		if (clFac != null) {
 			throw new LogicException("E0002", "擔保品與額度關聯檔");// 新增資料已存在
 		}
-		
+
 		ClFac tClFac = new ClFac();
 
 		// 新增塞table
@@ -130,38 +132,39 @@ public class ClFacCom extends TradeBuffer {
 		tClFac.setClNo(iClNo);
 		tClFac.setApproveNo(iApplNo);
 		tClFac.setMainFlag("Y");
-		
+
 		BigDecimal settingAmt = settingAmt(titaVo, iClCode1, iClCode2, iClNo);
-		
+
 		tClFac.setOriSettingAmt(settingAmt);
-		
+
 		try {
 			sClFacService.insert(tClFac, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0005", "擔保品與額度關聯檔");// 新增資料時，發生錯誤
 		}
-		
-		//擔保品提供人與授信戶關係
-		if (ownerMap != null && ownerMap.size()>0) {
+
+		// 擔保品提供人與授信戶關係
+		if (ownerMap != null && ownerMap.size() > 0) {
 			updateClOwnerRelation(titaVo, iApplNo, ownerMap);
 		}
-		
+
 		// 額度與擔保品關聯檔變動處理
 		changeClFac(iApplNo, titaVo);
 	}
-	
+
 	/**
 	 * 計算擔保品與額度關聯檔的 OriSettingAmt 設定金額
-	 * @param titaVo titaVo
+	 * 
+	 * @param titaVo   titaVo
 	 * @param iClCode1 擔保品代號1
 	 * @param iClCode2 擔保品代號21
 	 * @param iClNo    擔保品編號
 	 * @return 設定金額
 	 */
-	
+
 	public BigDecimal settingAmt(TitaVo titaVo, int iClCode1, int iClCode2, int iClNo) {
 		BigDecimal settingAmt = BigDecimal.ZERO;
-		
+
 		// 依據擔保品代號1查不同Table
 		switch (iClCode1) {
 		case 1:
@@ -212,12 +215,13 @@ public class ClFacCom extends TradeBuffer {
 			settingAmt = tClMovables.getSettingAmt();
 			break;
 		}
-		
+
 		return settingAmt;
 	}
 
-	//擔保品提供人與授信戶關係
-	private void updateClOwnerRelation(TitaVo titaVo, int iApplNo, List<HashMap<String, String>> ownerMap) throws LogicException {
+	// 擔保品提供人與授信戶關係
+	private void updateClOwnerRelation(TitaVo titaVo, int iApplNo, List<HashMap<String, String>> ownerMap)
+			throws LogicException {
 		FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
 		if (facMain == null) {
 			throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
@@ -225,7 +229,7 @@ public class ClFacCom extends TradeBuffer {
 
 		for (HashMap<String, String> map : ownerMap) {
 			String custUKey = map.get("OwnerCustUKey").toString().trim();
-			String relCode  = map.get("OwnerRelCode").toString().trim();
+			String relCode = map.get("OwnerRelCode").toString().trim();
 			if (!"".equals(custUKey)) {
 
 				ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
@@ -264,7 +268,7 @@ public class ClFacCom extends TradeBuffer {
 	 * 3.更新額度主檔設定擔保品記號 4.自動建立共同借款人之額度與擔保品關聯檔
 	 * 
 	 * @param iApproveNo iApproveNo
-	 * @param titaVo titaVo
+	 * @param titaVo     titaVo
 	 * @throws LogicException ...
 	 */
 	public void changeClFac(int iApproveNo, TitaVo titaVo) throws LogicException {
@@ -336,7 +340,7 @@ public class ClFacCom extends TradeBuffer {
 		// 共同借款人全部
 		Slice<FacShareAppl> slFacShareAppl = facShareApplService.findMainApplNo(tFacShareAppl.getMainApplNo(), 0,
 				Integer.MAX_VALUE, titaVo);
-		// 第一筆登錄的核准號碼，刪除自動的建立額度與擔保品關聯檔
+		// 登錄者為主核准號碼(主額度)，刪除其他(非主額度)自動建立的額度與擔保品關聯檔
 		if (iApproveNo == tFacShareAppl.getMainApplNo()) {
 			for (FacShareAppl facShareAppl : slFacShareAppl.getContent()) {
 				if (facShareAppl.getApplNo() != facShareAppl.getMainApplNo()) {
@@ -351,8 +355,9 @@ public class ClFacCom extends TradeBuffer {
 					}
 				}
 			}
-		} else {
-			// 刪除該核准號碼下額度與擔保品關聯檔
+		}
+		// 登錄者非主核准號碼，刪除該核准號碼下額度與擔保品關聯檔
+		else {
 			this.info("ClFac 2  deleteAll " + iApproveNo);
 			Slice<ClFac> slClFac = sClFacService.approveNoEq(iApproveNo, this.index, this.limit);
 			if (slClFac != null) {
@@ -364,7 +369,7 @@ public class ClFacCom extends TradeBuffer {
 			}
 		}
 
-		// 以第一筆登錄的核准號碼建立該核准號碼下額度與擔保品關聯檔
+		// 以主核准號碼建立全部共同借款人下額度與擔保品關聯檔
 		Slice<ClFac> slClFacMain = sClFacService.approveNoEq(tFacShareAppl.getMainApplNo(), 0, Integer.MAX_VALUE);
 		if (slClFacMain != null) {
 			for (FacShareAppl facShareAppl : slFacShareAppl.getContent()) {
@@ -375,6 +380,8 @@ public class ClFacCom extends TradeBuffer {
 				}
 			}
 		}
+		// 更新戶號及額度編號
+		upDateFacShareApplFacmNo(iApproveNo, titaVo);
 	}
 
 	// 共同借款人自動建立
@@ -396,4 +403,21 @@ public class ClFacCom extends TradeBuffer {
 		}
 	}
 
+	// 更新共同借款人戶號額度編號
+	private void upDateFacShareApplFacmNo(int iApproveNo, TitaVo titaVo) throws LogicException {
+		this.info("upDateFacshareApplFacmNo ... " + iApproveNo);
+		//更新此核准號碼共同借款人的戶號核准號碼
+		FacMain nFacMain = sFacMainService.facmApplNoFirst(iApproveNo, titaVo);
+		if (nFacMain != null) {
+			FacShareAppl updaFacShareAppl = facShareApplService.holdById(iApproveNo, titaVo);
+			updaFacShareAppl.setCustNo(nFacMain.getCustNo());
+			updaFacShareAppl.setFacmNo(nFacMain.getFacmNo());
+			try {
+				facShareApplService.update(updaFacShareAppl, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0005", "共同借款人檔" + updaFacShareAppl.toString());// 新增資料時，發生錯誤
+			}
+		}
+
+	}
 }

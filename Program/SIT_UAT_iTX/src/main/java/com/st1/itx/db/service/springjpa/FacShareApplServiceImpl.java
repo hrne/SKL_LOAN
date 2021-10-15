@@ -89,7 +89,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ApplNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ApplNo"));
     this.info("findAll " + dbName);
@@ -162,6 +162,25 @@ em = null;
 			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public FacShareAppl mApplNoFirst(int mainApplNo_0, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("mApplNoFirst " + dbName + " : " + "mainApplNo_0 : " + mainApplNo_0);
+    Optional<FacShareAppl> facShareApplT = null;
+    if (dbName.equals(ContentName.onDay))
+      facShareApplT = facShareApplReposDay.findTopByMainApplNoIsOrderByKeyinSeqDesc(mainApplNo_0);
+    else if (dbName.equals(ContentName.onMon))
+      facShareApplT = facShareApplReposMon.findTopByMainApplNoIsOrderByKeyinSeqDesc(mainApplNo_0);
+    else if (dbName.equals(ContentName.onHist))
+      facShareApplT = facShareApplReposHist.findTopByMainApplNoIsOrderByKeyinSeqDesc(mainApplNo_0);
+    else 
+      facShareApplT = facShareApplRepos.findTopByMainApplNoIsOrderByKeyinSeqDesc(mainApplNo_0);
+
+    return facShareApplT.isPresent() ? facShareApplT.get() : null;
   }
 
   @Override

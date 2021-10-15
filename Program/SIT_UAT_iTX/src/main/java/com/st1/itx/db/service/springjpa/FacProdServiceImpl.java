@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("facProdService")
 @Repository
-public class FacProdServiceImpl implements FacProdService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(FacProdServiceImpl.class);
-
+public class FacProdServiceImpl extends ASpringJpaParm implements FacProdService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class FacProdServiceImpl implements FacProdService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + prodNo);
+    this.info("findById " + dbName + " " + prodNo);
     Optional<FacProd> facProd = null;
     if (dbName.equals(ContentName.onDay))
       facProd = facProdReposDay.findById(prodNo);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ProdNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ProdNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = facProdReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -105,6 +101,9 @@ em = null;
       slice = facProdReposHist.findAll(pageable);
     else 
       slice = facProdRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -121,7 +120,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("prodNoLike " + dbName + " : " + "prodNo_0 : " + prodNo_0);
+    this.info("prodNoLike " + dbName + " : " + "prodNo_0 : " + prodNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = facProdReposDay.findAllByProdNoLikeOrderByProdNoAsc(prodNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -130,6 +129,9 @@ em = null;
       slice = facProdReposHist.findAllByProdNoLikeOrderByProdNoAsc(prodNo_0, pageable);
     else 
       slice = facProdRepos.findAllByProdNoLikeOrderByProdNoAsc(prodNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -146,7 +148,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("fildStatus " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " statusCode_1 : " +  statusCode_1);
+    this.info("fildStatus " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " statusCode_1 : " +  statusCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = facProdReposDay.findAllByProdNoLikeAndStatusCodeInOrderByProdNoAsc(prodNo_0, statusCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,65 @@ em = null;
     else 
       slice = facProdRepos.findAllByProdNoLikeAndStatusCodeInOrderByProdNoAsc(prodNo_0, statusCode_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<FacProd> fildentCode(List<String> enterpriseFg_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<FacProd> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("fildentCode " + dbName + " : " + "enterpriseFg_0 : " + enterpriseFg_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = facProdReposDay.findAllByEnterpriseFgInOrderByProdNoAsc(enterpriseFg_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = facProdReposMon.findAllByEnterpriseFgInOrderByProdNoAsc(enterpriseFg_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = facProdReposHist.findAllByEnterpriseFgInOrderByProdNoAsc(enterpriseFg_0, pageable);
+    else 
+      slice = facProdRepos.findAllByEnterpriseFgInOrderByProdNoAsc(enterpriseFg_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<FacProd> fildProdNo(String prodNo_0, List<String> statusCode_1, List<String> enterpriseFg_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<FacProd> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("fildProdNo " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " statusCode_1 : " +  statusCode_1 + " enterpriseFg_2 : " +  enterpriseFg_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = facProdReposDay.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = facProdReposMon.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = facProdReposHist.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, pageable);
+    else 
+      slice = facProdRepos.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -164,7 +225,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + prodNo);
+    this.info("Hold " + dbName + " " + prodNo);
     Optional<FacProd> facProd = null;
     if (dbName.equals(ContentName.onDay))
       facProd = facProdReposDay.findByProdNo(prodNo);
@@ -182,7 +243,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + facProd.getProdNo());
+    this.info("Hold " + dbName + " " + facProd.getProdNo());
     Optional<FacProd> facProdT = null;
     if (dbName.equals(ContentName.onDay))
       facProdT = facProdReposDay.findByProdNo(facProd.getProdNo());
@@ -204,7 +265,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + facProd.getProdNo());
+    this.info("Insert..." + dbName + " " + facProd.getProdNo());
     if (this.findById(facProd.getProdNo()) != null)
       throw new DBException(2);
 
@@ -233,7 +294,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + facProd.getProdNo());
+    this.info("Update..." + dbName + " " + facProd.getProdNo());
     if (!empNot.isEmpty())
       facProd.setLastUpdateEmpNo(empNot);
 
@@ -256,7 +317,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + facProd.getProdNo());
+    this.info("Update..." + dbName + " " + facProd.getProdNo());
     if (!empNot.isEmpty())
       facProd.setLastUpdateEmpNo(empNot);
 
@@ -276,7 +337,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + facProd.getProdNo());
+    this.info("Delete..." + dbName + " " + facProd.getProdNo());
     if (dbName.equals(ContentName.onDay)) {
       facProdReposDay.delete(facProd);	
       facProdReposDay.flush();
@@ -305,7 +366,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (FacProd t : facProd){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -340,7 +401,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (facProd == null || facProd.size() == 0)
       throw new DBException(6);
 
@@ -369,7 +430,7 @@ em = null;
 
   @Override
   public void deleteAll(List<FacProd> facProd, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

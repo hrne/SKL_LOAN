@@ -733,6 +733,7 @@ E(0,@AcctCode,#L2r02AcctCode)
 T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
 T(2,@CurrencyCode,#L2r02CurrencyCode)
 T(H,@Precision,#CurrencyCode,#CurrPrecisionHelp)
+E(0,@DepartmentCode,#L2r02DepartmentCode)
 E(0,@TwApplAmt,#L2r02ApplAmt)
 E(0,@UsApplAmt,#L2r02ApplAmt)
 T(2,@Estimate,#L2r02Estimate)
@@ -742,6 +743,7 @@ T(2,@FireOfficer,#L2r02Introducer)
 T(2,@Supervisor,#L2r02Supervisor)
 T(2,@Coorgnizer,#L2r02Coorgnizer)
 T(2,@GroupId,#L2r02GroupId)
+C(4,#L2r07CustTypeCode,$,T(2,@CustTypeCode,#L2r07CustTypeCode))
 C(4,#L2r02GroupId,$,T(2,@CustTypeCode,06))
 E(0,@ExtraRepayCode,1)
 
@@ -863,7 +865,6 @@ E(0,@RuleCode,#L2r50RuleCode)
 E(0,@RecycleCode,#L2r50RecycleCode)
 E(0,@RecycleDeadline,#L2r50RecycleDeadline)
 E(0,@UsageCode,#L2r50UsageCode)
-E(0,@DepartmentCode,#L2r50DepartmentCode)
 E(0,@CompensateFlag,#L2r50CompensateFlag)
 E(0,@IrrevocableFlag,#L2r50IrrevocableFlag)
 E(0,@RateAdjNoticeCode,#L2r50RateAdjNoticeCode)
@@ -1647,6 +1648,7 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 #FdCustTypeCode=X,2,L
 
 #CustTypeCode=X,2,I
+C(4,#CustTypeCode,T(3,00),$)
 HELP(#CustTypeCodeHelp)
 @V(H,#CustTypeCodeHelp)
 
@@ -2312,7 +2314,7 @@ T(H,#ProdBreachFlag,#YesNoHelp)
 
 ! #Breach1=x,200,L
 
-#Breach=X,4.50,I
+#Breach=x,4.50,I
 C(3,#Hide7Flag,0,CALL(#HideP7),$)
 ! IF(#ProdBreachFlag=="Y"||#ProdBreachFlag=="",T(F,@Breach,0),T(F,@Breach,1))
 IF(#BreachFlag=="N",S,$)
@@ -2552,29 +2554,82 @@ K(LIGHT,#FacmNo,TXTRED,0,1)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-
-#CustId#ApplNo#CustNo#FacmNo#CreditSysNo
-#ProdNo#BaseRateCode#RateIncr#ApproveRate#RateCode
-#FirstRateAdjFreq#RateAdjFreq#CurrencyCode#TimApplAmt#AcctCode#ApproveDate#LoanTermYy
-#LoanTermMm#LoanTermDd#AmortizedCode#FreqBase#PayIntFreq#RepayFreq#UtilDeadline
-#GracePeriod#TimAcctFee#TimHandlingFee#ExtraRepayCode#IntCalcCode#CustTypeCode#RuleCode#RecycleCode#RecycleDeadline
-#UsageCode#DepartmentCode#IncomeTaxFlag#CompensateFlag#IrrevocableFlag#RateAdjNoticeCode
-#RepayCode#RepayBank#RepayAcctNo#PostCode#Introducer#District#FireOfficer
-#Estimate#CreditOfficer#BusinessOfficer
-#ApprovedLevel#Supervisor#Coorgnizer
-#GroupId#CreditScore#GuaranteeDate
-#RelationCode#RelationName#RelationId#RelationBirthday#RelationGender
+#CustId
+#ApplNo
+#CustNo
+#FacmNo
+#CreditSysNo
+#ProdNo
+#BaseRateCode
+#RateIncr
+#ApproveRate
+#RateCode
+#FirstRateAdjFreq
+#RateAdjFreq
+#CurrencyCode
+#TimApplAmt
+#AcctCode
+#ApproveDate
+#LoanTermYy
+#LoanTermMm
+#LoanTermDd
+#AmortizedCode
+#FreqBase
+#PayIntFreq
+#RepayFreq
+#UtilDeadline
+#GracePeriod
+#TimAcctFee
+#TimHandlingFee
+#ExtraRepayCode
+#IntCalcCode
+#CustTypeCode
+#RuleCode
+#RecycleCode
+#RecycleDeadline
+#UsageCode
+#DepartmentCode
+#IncomeTaxFlag
+#CompensateFlag
+#IrrevocableFlag
+#RateAdjNoticeCode
+#RepayCode
+#RepayBank
+#RepayAcctNo
+#PostCode
+#Introducer
+#District
+#FireOfficer
+#Estimate
+#CreditOfficer
+#BusinessOfficer
+#ApprovedLevel
+#Supervisor
+#Coorgnizer
+#GroupId
+#CreditScore
+#GuaranteeDate
+#RelationCode
+#RelationName
+#RelationId
+#RelationBirthday
+#RelationGender
 ##loop{times:10,n:1}
-#StepMonthS{n}#StepMonthE{n}#StepRateType{n}#StepRateIncr{n}
+#StepMonthS{n}
+#StepMonthE{n}
+#StepRateType{n}
+#StepRateIncr{n}
 ##end
 #ProdBreachFlag
 #Breach
 #END
 #BreachFlag
-#TwApplAmt#UsApplAmt
-#TwAcctFee#UsAcctFee
-#TwHandlingFee#UsHandlingFee
-
+#TwApplAmt
+#UsApplAmt
+#TwAcctFee
+#UsAcctFee
+#TwHandlingFee
+#UsHandlingFee
 </sub>
 
 

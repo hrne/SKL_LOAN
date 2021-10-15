@@ -30,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R13 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R13.class);
 
 	@Autowired
 	public Parse parse;
@@ -71,8 +70,7 @@ public class L4R13 extends TradeBuffer {
 
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 //		調出AdjCode = 5 者 上限100筆
-		sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, txKind, txKind, 4, 4, adjDate,
-				adjDate, this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, txKind, txKind, 4, 4, adjDate, adjDate, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -92,8 +90,7 @@ public class L4R13 extends TradeBuffer {
 				}
 
 				CustMain tCustMain = new CustMain();
-				tCustMain = custMainService.custNoFirst(tBatxRateChange.getBatxRateChangeId().getCustNo(),
-						tBatxRateChange.getBatxRateChangeId().getCustNo());
+				tCustMain = custMainService.custNoFirst(tBatxRateChange.getBatxRateChangeId().getCustNo(), tBatxRateChange.getBatxRateChangeId().getCustNo());
 
 				FacProd tFacProd = facProdService.findById(tBatxRateChange.getProdNo());
 

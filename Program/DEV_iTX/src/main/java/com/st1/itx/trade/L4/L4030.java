@@ -16,10 +16,15 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.FacMain;
+import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
+import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -42,7 +47,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4030 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4030.class);
 
 	@Autowired
 	public Parse parse;
@@ -59,6 +63,12 @@ public class L4030 extends TradeBuffer {
 	@Autowired
 	public CustMainService custMainService;
 
+	@Autowired
+	public FacMainService facMainService;
+	
+	@Autowired
+	public FacProdService facProdService;
+	
 	@Autowired
 	public CdEmpService cdEmpService;
 
@@ -138,8 +148,7 @@ public class L4030 extends TradeBuffer {
 
 					List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 
-					sLoanBorMain = loanBorMainService.bormCustNoEq(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(),
-							tTxToDoDetail.getFacmNo(), 0, 999, this.index, this.limit);
+					sLoanBorMain = loanBorMainService.bormCustNoEq(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo(), tTxToDoDetail.getFacmNo(), 0, 999, this.index, this.limit);
 
 					lLoanBorMain = sLoanBorMain == null ? null : sLoanBorMain.getContent();
 
@@ -161,21 +170,45 @@ public class L4030 extends TradeBuffer {
 			}
 
 			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
-				tmpFacm tmp = new tmpFacm(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo());
+				int custno = tTxToDoDetail.getCustNo();
+				int facmno = tTxToDoDetail.getFacmNo();
+				
+				tmpFacm tmp = new tmpFacm(custno, facmno);
 
 				CustMain tCustMain = new CustMain();
-				tCustMain = custMainService.custNoFirst(tTxToDoDetail.getCustNo(), tTxToDoDetail.getCustNo());
-
+				tCustMain = custMainService.custNoFirst(custno, custno);
+				String CustTypeCode = "";
+				
+				if (tCustMain != null && tCustMain.getCustTypeCode() != null) {
+					CustTypeCode = tCustMain.getCustTypeCode();
+				}
+				
 				CdEmp tCdEmp = new CdEmp();
 				if (tCustMain != null && tCustMain.getEmpNo() != null) {
 					tCdEmp = cdEmpService.findById(tCustMain.getEmpNo());
 				}
 
+				FacMainId tFacMainId = new FacMainId();
+				tFacMainId.setCustNo(custno);
+				tFacMainId.setFacmNo(facmno);
+				
+				FacMain tFacMain = facMainService.findById(tFacMainId, titaVo);
+				
+				String prodno = "";
+				String prodname = "";
+				if(tFacMain != null && tFacMain.getProdNo() != null) {
+					prodno = tFacMain.getProdNo();
+					FacProd tFacProd = facProdService.findById(prodno, titaVo);
+					if(tFacProd != null && tFacProd.getProdName() != null) {
+						prodname = tFacProd.getProdName();
+					}
+				}
+				
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOStatus", tTxToDoDetail.getStatus());
 				occursList.putParam("OOProcessDate", tTxToDoDetail.getDataDate());
-				occursList.putParam("OOCustNo", tTxToDoDetail.getCustNo());
-				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
+				occursList.putParam("OOCustNo", custno);
+				occursList.putParam("OOFacmNo", facmno);
 				occursList.putParam("OOLoanBalance", loanBal.get(tmp));
 				occursList.putParam("OOMaturityDate", maturityDateM.get(tmp));
 
@@ -188,8 +221,9 @@ public class L4030 extends TradeBuffer {
 					occursList.putParam("OOQuitDate", " ");
 					occursList.putParam("OOOriAgType2X", " ");
 				}
-				occursList.putParam("OOOriRateKind", " ");
-				occursList.putParam("OONewAgType2X", " ");
+				
+				occursList.putParam("OOOriRateKind", prodno + "  " + prodname);
+				occursList.putParam("OONewAgType2", CustTypeCode);
 				occursList.putParam("OONewRateKind", " ");
 
 				this.totaVo.addOccursList(occursList);

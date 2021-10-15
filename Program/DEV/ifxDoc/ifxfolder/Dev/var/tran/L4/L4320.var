@@ -200,7 +200,7 @@ IF(#TxKind==1,E(0,1),IF(#TxKind==2,E(0,2),s))
 !IF(#TxKind==2,$,s)
 !@V(2,1,99)
 
-#BaseRateCodeX=X,16,L
+#BaseRateCodeX=X,24,L
 T(3,)T(H,#BaseRateCode,#BaseRateHelp)
 !SWITCH(#BaseRateCode
 !,01,T(2,保單分紅利率)

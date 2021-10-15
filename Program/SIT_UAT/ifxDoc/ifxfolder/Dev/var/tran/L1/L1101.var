@@ -653,6 +653,7 @@ IF(#FdEntCode=="*",V(7),$)
 C(4,#EntCode,$,V(H,#EntCodeHelp))
 
 #EntCodeX=X,10,L
+C(4,#EntCode,S,$)
 T(H,#EntCode,#EntCodeHelp)
 
 !行業別
@@ -680,13 +681,16 @@ T(H,#NationalityCode,#NationalityCodeHelp)
 #SpouseId=X,10,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-@C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
+@
+C(4,#SpouseId,$,A(ID_UNINO,0,#SpouseId))
+C(4,#SpouseId,$,T(3,@FdSpouseName,*))
 
 !配偶姓名
 #SpouseName=x,2.50,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
-
+@
+C(4,#SpouseId,$,V(7))
 
 !戶籍-縣市代碼
 #RegCityCode=X,2,I
@@ -1191,7 +1195,7 @@ C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
 @C(4,#IncomeDataDate,S,V(9))
 T(1,@MANU_MM,#IncomeDataDate,4,5)
-IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式yyyMM),$)
+IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式YYYMM),$)
 
 
 !護照號碼
@@ -1293,6 +1297,12 @@ C(5,#SubCompanyFg,Y,$,s)
 @V(3,Y,N)
 ##end
 
+#Check=X,1,S
+C(5,#SubCompanyFg,Y,$,S)
+##loop{times:20,n:1}
+C(5,#CrossUse{n},Y,S,$)
+##end
+V(P,至少勾選一筆同意)
 
 #NTXBUF1=X,18,S
 C(3,#FunCd,5,S,$)
@@ -1350,7 +1360,7 @@ T(H,#TypeCode,#TypeCodeHelp)
 
 
 !戶名
-#OCustName=X,2.50,L
+#OCustName=x,100,L
 !出生年月日
 #OBirthday=D,7,L
 !性別
@@ -1449,7 +1459,7 @@ T(H,#OAMLJobCode,#AMLJobCodeHelp)
 #OAMLGroupX=X,30,L
 T(H,#OAMLGroup,#AMLCodeHelp)
 !原住民姓名
-#OIndigenousName=c,100,L
+#OIndigenousName=x,100,L
 !介紹人
 #OIntroducerX=X,20,L
 

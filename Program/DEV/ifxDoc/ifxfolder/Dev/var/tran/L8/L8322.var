@@ -44,9 +44,11 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+["#FdApplyDate+調解申請日",#ApplyDate],
+[#<->#,"#FdApplyType+受理方式",#ApplyType,#ApplyTypeX],
+[#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ["#FdAgreeDate+同意書取得日期",#AgreeDate],["#FdStartDate+首次調解日",#StartDate],
-["#FdRemindDate+債權計算基準日",#RemindDate],["#FdApplyType+受理方式",#ApplyType,#ApplyTypeX],
+["#FdRemindDate+債權計算基準日",#RemindDate],
 [#<->#,"#FdReportYn+協辦行是否需自行回報債權",#ReportYn],
 [#<->#,"#FdNotBankId1+未揭露債權機構代號1",#NotBankId1,#NotBankIdX1],
 [#<->#,"#FdNotBankId2+未揭露債權機構代號2",#NotBankId2,#NotBankIdX2],
@@ -272,6 +274,16 @@ C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)A(DATE,0,#ApplyDate)
 
+!受理方式
+#ApplyType=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#ApplyTypeHelp)
+@V(H,#ApplyTypeHelp)
+
+#ApplyTypeX=X,40,L
+T(H,#ApplyType,#ApplyTypeHelp)
+
 !受理調解機構代號-承審法院代碼OR郵遞區號
 #CourtCode=X,3,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -304,19 +316,6 @@ C(5,#TranKey_Tmp,4,s,$)
 D(8)
 @V(7)A(DATE,0,#RemindDate)
 
-!受理方式
-#ApplyType=X,1,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-HELP(#ApplyTypeHelp)
-@V(H,#ApplyTypeHelp)
-
-#ApplyTypeX=X,40,L
-T(H,#ApplyType,#ApplyTypeHelp)
-
-!#RimJcicCourtZipCode=X,3,S
-#RimApplyType=X,1,S
-T(2,#ApplyType)
 
 !協辦行是否需自行回報債權
 #ReportYn=X,1,I

@@ -41,52 +41,34 @@ public class L6R04 extends TradeBuffer {
 		String iDefCode = titaVo.getParam("DefCode");
 		String iCode = titaVo.getParam("Code");
 
-		this.info("Txcd=="+titaVo.getTxcd());
-		if(("L5701").equals(titaVo.getTxcd()) || ("L5976").equals(titaVo.getTxcd())) {
-			moveTotaCdDef(new CdCode());
-			CdCode tCdCode2 = sCdCodeService.findById(new CdCodeId("CodeType", "CourtCode"), titaVo);
+		CdCodeId tCdCodeId2 = new CdCodeId("CodeType", iDefCode);
+		CdCode tCdCode2 = sCdCodeService.findById(tCdCodeId2, titaVo);
 
-			if (tCdCode2 != null) {
-				CdCodeId tCdCodeId = new CdCodeId("CourtCode", iCode);
-				CdCode tCdCode = sCdCodeService.findById(tCdCodeId, titaVo);
-				if(tCdCode != null) {
-					moveTotaCdDef(tCdCode);
-				}
-			}
-			
-			
-			
-		} else {
-			CdCodeId tCdCodeId2 = new CdCodeId("CodeType", iDefCode);
-			CdCode tCdCode2 = sCdCodeService.findById(tCdCodeId2, titaVo);
-
-			if (tCdCode2 == null) {
-				throw new LogicException(titaVo, "E0001", "代碼檔代碼:CodeType/" + iDefCode);
-			}
-
-			CdCodeId tCdCodeId = new CdCodeId(iDefCode, iCode);
-			CdCode tCdCode = sCdCodeService.findById(tCdCodeId, titaVo);
-
-			if (tCdCode == null) {
-				if (iFunCode == 1) {
-					tCdCode = new CdCode();
-					tCdCode.setCdCodeId(tCdCodeId);
-					tCdCode.setDefType(tCdCode2.getDefType());
-					tCdCode.setItem("");
-					tCdCode.setEnable("Y");
-					moveTotaCdDef(tCdCode);
-				} else {
-					throw new LogicException(titaVo, "E0001", "代碼:" + iDefCode + "/" + iCode);
-				}
-			} else {
-				if (iFunCode == 1) {
-					throw new LogicException(titaVo, "E0002", "代碼:" + iDefCode + "/" + iCode);
-				}
-				tCdCode.setDefType(tCdCode.getDefType());
-				moveTotaCdDef(tCdCode);
-			}
+		if (tCdCode2 == null) {
+			throw new LogicException(titaVo, "E0001", "代碼檔代碼:CodeType/" + iDefCode);
 		}
-		
+
+		CdCodeId tCdCodeId = new CdCodeId(iDefCode, iCode);
+		CdCode tCdCode = sCdCodeService.findById(tCdCodeId, titaVo);
+
+		if (tCdCode == null) {
+			if (iFunCode == 1) {
+				tCdCode = new CdCode();
+				tCdCode.setCdCodeId(tCdCodeId);
+				tCdCode.setDefType(tCdCode2.getDefType());
+				tCdCode.setItem("");
+				tCdCode.setEnable("Y");
+				moveTotaCdDef(tCdCode);
+			} else {
+				throw new LogicException(titaVo, "E0001", "代碼:" + iDefCode + "/" + iCode);
+			}
+		} else {
+			if (iFunCode == 1) {
+				throw new LogicException(titaVo, "E0002", "代碼:" + iDefCode + "/" + iCode);
+			}
+			tCdCode.setDefType(tCdCode.getDefType());
+			moveTotaCdDef(tCdCode);
+		}
 
 		// 初始值Tota
 

@@ -2,6 +2,7 @@ OCreditSysNo=9,7
 OApplNo=9,7
 OCustId=X,10
 OApplDate=9,7
+ODepartmentCode=9,1
 OProdNo=X,5
 OAcctCode=9,3
 OCurrencyCode=X,3

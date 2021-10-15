@@ -584,6 +584,7 @@ public class L2101 extends TradeBuffer {
 
 		mFacProd.setStatusCode(titaVo.getParam("StatusCode"));
 		mFacProd.setAgreementFg(titaVo.getParam("AgreementFg"));
+		mFacProd.setEnterpriseFg(titaVo.getParam("EnterpriseFg"));
 //		mFacProd.setCharCode(titaVo.getParam("CharCode"));
 //		mFacProd.setPayIntLimit(parse.stringToInteger(titaVo.getParam("PayIntLimit")));
 //		mFacProd.setAcctCode(titaVo.getParam("AcctCode"));

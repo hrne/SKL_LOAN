@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -32,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2001")
 @Scope("prototype")
 public class L2001 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2001.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -41,6 +38,8 @@ public class L2001 extends TradeBuffer {
 	Parse parse;
 
 	private List<String> lStatusCode = new ArrayList<String>();
+	private List<String> lEnterpriseFg = new ArrayList<String>();
+
 	private boolean inflag = false;
 
 	@Override
@@ -50,12 +49,13 @@ public class L2001 extends TradeBuffer {
 
 		String iProdNo = titaVo.getParam("ProdNo");
 		String iStatusCode = titaVo.getParam("ProdStatus");
+		String iEnterpriseFg = titaVo.getParam("EnterpriseFg");
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100; // 80 * 500 = 400000
-
+		Slice<FacProd> slFacProd = null;
 		// 0 全部 1生效 2未生效 3已截止 4停用
 		if ("0".equals(iStatusCode)) {
 			lStatusCode.add("0");
@@ -69,10 +69,16 @@ public class L2001 extends TradeBuffer {
 		} else {
 			lStatusCode.add("1");
 		}
+		// 空白為全部 Y企金可使用
+		if ("Y".equals(iEnterpriseFg)) {
+			lEnterpriseFg.add("Y");
+			slFacProd = facProdService.fildProdNo(iProdNo.trim() + "%", lStatusCode, lEnterpriseFg, this.index,
+					this.limit, titaVo);
+		} else {
+			slFacProd = facProdService.fildStatus(iProdNo.trim() + "%", lStatusCode, this.index, this.limit, titaVo);
+		}
 
 		// 查詢商品參數檔
-		Slice<FacProd> slFacProd = facProdService.fildStatus(iProdNo.trim() + "%", lStatusCode, this.index, this.limit,
-				titaVo);
 		List<FacProd> lFacProd = slFacProd == null ? null : slFacProd.getContent();
 		if (lFacProd == null || lFacProd.size() == 0) {
 			throw new LogicException(titaVo, "E2003", "商品參數檔"); // 查無資料
@@ -98,8 +104,7 @@ public class L2001 extends TradeBuffer {
 				continue;
 			}
 			this.inflag = true;
-			
-			
+
 			OccursList occursList = new OccursList();
 			occursList.putParam("OOProdNo", tFacProd.getProdNo());
 			occursList.putParam("OOStartDate", tFacProd.getStartDate());
@@ -116,7 +121,7 @@ public class L2001 extends TradeBuffer {
 			/* 手動折返 */
 			this.totaVo.setMsgEndToEnter();
 		}
-		if(!this.inflag) {
+		if (!this.inflag) {
 			throw new LogicException(titaVo, "E2003", "商品參數檔"); // 查無資料
 		}
 

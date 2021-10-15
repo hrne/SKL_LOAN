@@ -195,6 +195,13 @@ C(4,#L1r06CrossUse{n},S,$)
 @V(3,Y,N)
 ##end
 
+#Check=X,1,S
+C(5,#SubCompanyFg,Y,$,S)
+##loop{times:20,n:1}
+C(5,#CrossUse{n},Y,S,$)
+##end
+V(P,至少勾選一筆同意)
+
 
 !統一編號找戶號
 <include src="ROM.icf::L2R47.dec"/>

@@ -52,11 +52,12 @@ K(MODIFYBUTTON,1,新增)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+<sub type="DC" name="p1" layout="cols=1;screen.width=[180,820];printer.width=[20,20];">
 [
 ["[L2001]                                 商品參數明細資料查詢"],
 ["#FdProdNo+商品代碼",#ProdNo],
 ["#FdProdStatus+商品狀態",#ProdStatus,#ProdStatusX],
+["#FdEnterpriseFg+企金可使用記號",#EnterpriseFg,#EnterpriseFgX],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -80,18 +81,19 @@ T(2,@StatusCodeHelp,#HelpDesc1)
 #ProdStatusHelp=x,1024,S
 T(3,0:全部;1:已生效;2:待生效;3:已失效)
 
+#EnterpriseFgHelp=x,1024,S
+T(3,:空白為查全部;Y:是)
 
 #FdProdNo=X,2,L
 #FdProdStatus=X,2,L
 T(3,*)
-#FdRptFg=X,2,L
-T(3,*)
+#FdEnterpriseFg=X,2,L
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
 
-#NTXBUF=X,6,S
+#NTXBUF=X,7,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #NTXBUF5=X,10,S
@@ -131,6 +133,17 @@ V(H,#ProdStatusHelp)
 
 #ProdStatusX=X,10,L
 T(H,#ProdStatus,#ProdStatusHelp)
+
+!企金可使用記號
+#EnterpriseFg=X,1,I
+C(3,#CHAIN,1,T(1,#NTXBUF,7,1),$)
+C(3,#CHAIN,1,s,$)
+HELP(#EnterpriseFgHelp)
+@
+V(H,#EnterpriseFgHelp)
+
+#EnterpriseFgX=X,20,L
+T(3,)T(H,#EnterpriseFg,#EnterpriseFgHelp)
 
 !#BIND1=X,1,S
 !BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2101; ntxbuf=#BUF1})
@@ -257,7 +270,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L2101; ntxbuf=#OOBUF5})
 !------ 上行電文 ------
 <sub type="TIM">
 
-#ProdNo#ProdStatus#END
+#ProdNo#ProdStatus#EnterpriseFg#END
 
 </sub>
 

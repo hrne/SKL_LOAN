@@ -115,7 +115,7 @@ public class L4454 extends TradeBuffer {
 	public WebClient webClient;
 
 //	火險成功期款失敗記號
-//	private HashMap<tmpFacm, Integer> shortFlag = new HashMap<>();
+	private HashMap<tmpFacm, Integer> shortFlag = new HashMap<>();
 	private int reportACnt = 0;
 	private HashMap<Integer, Integer> custLoanFlag = new HashMap<>();
 	private HashMap<Integer, Integer> custFireFlag = new HashMap<>();
@@ -125,7 +125,6 @@ public class L4454 extends TradeBuffer {
 	private int payDayB1 = 0;
 	private TempVo tTempVo = new TempVo();
 	private List<BatxDetail> lBatxDetail = new ArrayList<BatxDetail>();
-	private List<BatxDetail> tempBatxDetail = new ArrayList<BatxDetail>();
 	private int iCustNo = 0;
 	private int iFacmNo = 0;
 	private int iAcDate = 0;
@@ -155,36 +154,18 @@ public class L4454 extends TradeBuffer {
 			throw new LogicException("E0001", ""); // 查詢資料不存在
 		}
 
-//      0.未檢核                    05       01
-//		1.不處理     V   扣款失敗             V
-//		2.人工處理 X
-//		3.檢核錯誤 X
-//		4.檢核正常 X
-//		5.單筆入帳   V   扣款成功   V
-//		6.批次入帳   V   扣款成功   V
-//		7.待轉暫收 X
-		
-		Boolean deduct = false;
 // 單筆作業		
 		if (functionCode == 1) {
 			lBatxDetail = slBatxDetail.getContent();
-			
-//			檢查期款失敗
-			deduct = deductCheck(lBatxDetail);
-			
-			if(deduct) {
-			// 進一扣二扣判斷
-			this.info("期款失敗存在進入檢核一扣二扣");
-			// 存火險成功期款失敗
-			  tempsave(lBatxDetail);
-			  this.info("存火險成功期款失敗");
-			  for (BatxDetail tBatxDetail : tempBatxDetail) {
+//				檢查火險成功期款失敗
+			deductCheck(lBatxDetail);
+			// 逐筆出表
+			for (BatxDetail tBatxDetail : lBatxDetail) {
 				if (iCustNo == tBatxDetail.getCustNo() && iFacmNo == tBatxDetail.getFacmNo()) {
 					exec("",tBatxDetail, titaVo);
 				}
-			  }
-		    } // if
-//			二扣繳息還本通知單
+			}
+//				二扣繳息還本通知單
 			if (reportACnt > 0) {
 				reportB(titaVo);
 			}
@@ -214,21 +195,15 @@ public class L4454 extends TradeBuffer {
 				}
 			}
 
-//			檢查期款失敗
-			deduct = deductCheck(lBatxDetail);
-			
-			if(deduct) {
-			this.info("期款失敗存在進入檢核一扣二扣");
-			// 存火險成功期款失敗
-			  tempsave(lBatxDetail);
-			  this.info("存火險成功期款失敗");
-			  for (BatxDetail tBatxDetail : lBatxDetail) {
+//				檢查火險成功期款失敗
+			deductCheck(lBatxDetail);
+			for (BatxDetail tBatxDetail : lBatxDetail) {
 				tTempVo = this.tTempVo.getVo(tBatxDetail.getProcNote());
-				exec(tTempVo.get("RepayBank"),tBatxDetail, titaVo);
-			  }
-			} // if
-			
-//			二扣繳息還本通知單
+				if (!"00000".equals(tBatxDetail.getProcCode())) {
+					exec(tTempVo.get("RepayBank"),tBatxDetail, titaVo);
+				}
+			}
+//				二扣繳息還本通知單
 			if (reportACnt > 0) {
 				reportB(titaVo);
 			}
@@ -247,6 +222,12 @@ public class L4454 extends TradeBuffer {
 	}
 
 	private void exec(String repayBank, BatxDetail tBatxDetail, TitaVo titaVo) throws LogicException {
+
+//		檢查回傳碼
+		if (!isReturnCodeError(tBatxDetail)) {
+			this.info("此筆回傳碼正常 ...");
+			return;
+		}
 
 //		火險成功期款失敗報表-入帳日需放一個月後
 		titaVo.putParam("EntryDate", caculateDate(tBatxDetail.getEntryDate(), 0, 1, 0));
@@ -321,13 +302,13 @@ public class L4454 extends TradeBuffer {
 		this.info("AchDeductFlag... " + tSystemParas.getAchDeductFlag());
 		this.info("iType... " + iType);
 		this.info("PostDeductFlag... " + tSystemParas.getPostDeductFlag());
-//		this.info("shortFlag ... " + shortFlag.get(tmp));
+		this.info("shortFlag ... " + shortFlag.get(tmp));
 		this.info("RepayType ... " + tBatxDetail.getRepayType());
 
 		if (iType == 1) {
-//			if (shortFlag.get(tmp) == 9 || shortFlag.get(tmp) == 1 ) {
+			if (shortFlag.get(tmp) == 1 && tBatxDetail.getRepayType() == 1) {
 				reportA(tBatxDetail, titaVo);
-//			}
+			}
 		} else if (iType == 2) {
 			reportC(titaVo);
 		}
@@ -638,45 +619,45 @@ public class L4454 extends TradeBuffer {
 		}
 	}
 
-//	檢查期款失敗
-	private Boolean deductCheck(List<BatxDetail> lBatxDetail) throws LogicException {
+//	檢查火險成功期款失敗
+	private void deductCheck(List<BatxDetail> lBatxDetail) throws LogicException {
 		for (BatxDetail tBatxDetail : lBatxDetail) {
 			this.info("...deductCheck Start... ");
+
+//			每組KEY為戶號額度 不含扣款類別
+			tmpFacm tmp = new tmpFacm(tBatxDetail.getCustNo(), tBatxDetail.getFacmNo(), 0);
+
 			this.info("CustNo... " + tBatxDetail.getCustNo());
 			this.info("FacmNo... " + tBatxDetail.getFacmNo());
 			this.info("RepayType... " + tBatxDetail.getRepayType());
-			this.info("ProcStsCode... " + tBatxDetail.getProcStsCode());
+			this.info("ProcCode... " + tBatxDetail.getProcCode());
 
-//			期款失敗上記號
-			if (tBatxDetail.getRepayType() == 1 && "1".equals(tBatxDetail.getProcStsCode())) {
-				return true;
+//			第一筆先放0
+			if (!shortFlag.containsKey(tmp)) {
+				shortFlag.put(tmp, 0);
 			}
-		}
-		
-		return false ;
-	}
 
-	
-	
-	
-//	檢查期款失敗
-	private void tempsave(List<BatxDetail> lBatxDetail) throws LogicException {
-		for (BatxDetail tBatxDetail : lBatxDetail) {
-//			火險成功存
-			if (tBatxDetail.getRepayType() == 5 && "5".equals(tBatxDetail.getProcStsCode()) ||
-					tBatxDetail.getRepayType() == 5 && "6".equals(tBatxDetail.getProcStsCode())) {
-				tempBatxDetail.add(tBatxDetail);
-			}
-		}
-		
-		for (BatxDetail tBatxDetail : lBatxDetail) {
+//			找出扣款失敗者(不為00000)
+//			若該筆有火險並且>火險那筆之金額
 
-//			期款失敗存
-			if (tBatxDetail.getRepayType() == 1 && "1".equals(tBatxDetail.getProcStsCode())) {
-				tempBatxDetail.add(tBatxDetail);
+//			銀扣吃檔已排序，火險先扣
+
+//			火險成功上記號
+			if (tBatxDetail.getRepayType() == 5 && "00000".equals(tBatxDetail.getProcCode())) {
+				shortFlag.put(tmp, 9);
 			}
+
+//			若火險成功記號已上且本筆期款失敗則確認寄送通知
+			if (tBatxDetail.getRepayType() == 1 && shortFlag.get(tmp) == 9
+					&& !"00000".equals(tBatxDetail.getProcCode())) {
+				shortFlag.put(tmp, 1);
+			}
+
+			this.info("shortFlag... " + shortFlag.get(tmp));
+			this.info("...end... ");
 		}
 	}
+
 	private class tmpFacm {
 
 		@Override
@@ -788,6 +769,16 @@ public class L4454 extends TradeBuffer {
 		return today;
 	}
 
+	private boolean isReturnCodeError(BatxDetail tBatxDetail) {
+		boolean result = false;
+
+//		回傳碼不為正常 且不為媒體碼異常
+		if (!"00000".equals(tBatxDetail.getProcCode()) && !"E".equals(tBatxDetail.getProcCode().substring(0, 1))) {
+			result = true;
+		}
+
+		return result;
+	}
 
 	private String dateSlashFormat(int today) {
 		String slashedDate = "";

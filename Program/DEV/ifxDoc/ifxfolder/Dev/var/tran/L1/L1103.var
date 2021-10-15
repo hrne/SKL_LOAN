@@ -80,8 +80,8 @@ E(0,0)
 ["#FdEmailBef+電子信箱",#EmailBef],[#EmailInd,#EmailAft],
 ["#FdEducodeBef+教育程度代號",#EducodeBef,#EducodeBefX],[#EducodeInd,#EducodeAft,#EducodeAftX],
 ["#FdOwnedhomeBef+自有住宅有無",#OwnedhomeBef],[#OwnedhomeInd,#OwnedhomeAft],
-["#FdCurrcompnameBef+任職機構名稱",#CurrcompnameBef],[#CurrcompnameInd,#CurrcompnameAft],
 ["#FdCurrcompidBef+任職機構統編",#CurrcompidBef],[#CurrcompidInd,#CurrcompidAft],
+["#FdCurrcompnameBef+任職機構名稱",#CurrcompnameBef],[#CurrcompnameInd,#CurrcompnameAft],
 ["#FdCurrcomptelBef+任職機構電話",#CurrcomptelBef],[#CurrcomptelInd,#CurrcomptelAft],
 ["#FdJobtitleBef+職位名稱",#JobtitleBef],[#JobtitleInd,#JobtitleAft],
 ["#FdJobTenureBef+服務年資",#JobTenureBef],[#JobTenureInd,#JobTenureAft],
@@ -124,6 +124,8 @@ K(MODIFYBUTTON,修改)
 <include src="ROM.icf::L6R03.dec"/>
 
 #FdCustId=X,2,L
+HIDE(#BtnCdEmp)
+
 #FdCustIdBef=X,2,L
 
 
@@ -647,6 +649,10 @@ HELP(#CustTypeCodeHelp)
 C(5,#TypeCodeInd,X,$,C(3,#CustTypeAft,#CustTypeBef,s,$))
 V(H,#CustTypeCodeHelp)
 
+#ii=X,1,S
+C(3,#CustTypeAft,1,T(F,@EmpnoAft,1),T(F,@EmpnoAft,0))
+C(3,#CustTypeAft,1,SHOW(#BtnCdEmp),HIDE(#BtnCdEmp))
+
 #CustTypeCodeAftX=X,10,L
 T(H,#CustTypeAft,#CustTypeCodeHelp)
 C(5,#CustTypeAft,01,T(3,@FdEmpnoBef,*),T(3,@FdEmpnoBef,))
@@ -785,6 +791,9 @@ IF(#SpouseIdAft==#SpouseIdBef ,T(3,),T(3,X))
 #SpouseNmInd=X,1,L
 
 #SpouseNmAft=x,2.50,I
+@
+C(5,#SpouseIdAft,#SpouseIdBef,C(5,#SpouseNmAft,#SpouseNmBef,s,$),$)
+C(4,#SpouseIdAft,$,V(7))
 
 #SpouseNmInd=_,_,L
 C(5,#SpouseNmAft,#SpouseNmBef,T(3,),T(3,X))
@@ -1363,16 +1372,6 @@ C(4,#OwnedhomeAft,$,V(H,#YesNoHelp))
 #OwnedhomeInd=_,_,L
 IF(#OwnedhomeAft==#OwnedhomeBef,T(3,),T(3,X))
 
-!任職機構名稱
-#CurrcompnameBef=c,60,L
-
-#CurrcompnameInd=X,1,L
-
-#CurrcompnameAft=c,60,I
-
-#CurrcompnameInd=_,_,L
-IF(#CurrcompnameAft==#CurrcompnameBef,T(3,),T(3,X))
-
 !任職機構統編
 #CurrcompidBef=X,8,L
 
@@ -1383,6 +1382,17 @@ IF(#CurrcompnameAft==#CurrcompnameBef,T(3,),T(3,X))
 
 #CurrcompidInd=_,_,L
 IF(#CurrcompidAft==#CurrcompidBef,T(3,),T(3,X))
+
+!任職機構名稱
+#CurrcompnameBef=c,60,L
+
+#CurrcompnameInd=X,1,L
+
+#CurrcompnameAft=c,60,I
+
+#CurrcompnameInd=_,_,L
+IF(#CurrcompnameAft==#CurrcompnameBef,T(3,),T(3,X))
+
 
 !任職機構電話
 #CurrcomptelBef=X,16,L
@@ -1436,7 +1446,7 @@ IF(#IncomeofyearlyAft==#IncomeofyearlyBef,T(3,),T(3,X))
 #IncomedatadateAft=X,5,I
 @C(4,#IncomedatadateAft,S,V(9))
 T(1,@MANU_MM,#IncomedatadateAft,4,5)
-IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式yyyMM),$)
+IF(#MANU_MM==0 || #MANU_MM >= 13,V(P,請輸入年月，格式YYYMM),$)
 
 #IncomedatadateInd=_,_,L
 IF(#IncomedatadateAft==#IncomedatadateBef,T(3,),T(3,X))

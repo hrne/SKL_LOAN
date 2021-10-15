@@ -28,6 +28,12 @@ public interface FacProdRepositoryHist extends JpaRepository<FacProd, String> {
   // ProdNo % ,AND StatusCode ^i
   public Slice<FacProd> findAllByProdNoLikeAndStatusCodeInOrderByProdNoAsc(String prodNo_0, List<String> statusCode_1, Pageable pageable);
 
+  // EnterpriseFg ^i
+  public Slice<FacProd> findAllByEnterpriseFgInOrderByProdNoAsc(List<String> enterpriseFg_0, Pageable pageable);
+
+  // ProdNo % ,AND StatusCode ^i ,AND EnterpriseFg ^i
+  public Slice<FacProd> findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(String prodNo_0, List<String> statusCode_1, List<String> enterpriseFg_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

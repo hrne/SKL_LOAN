@@ -29,7 +29,7 @@ public class NegMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -681891023233608536L;
+	private static final long serialVersionUID = -3354707088890972407L;
 
 @EmbeddedId
   private NegMainId negMainId;
@@ -115,15 +115,17 @@ public class NegMain implements Serializable {
   private BigDecimal principalBal = new BigDecimal("0");
 
   // 累繳金額
+  /* 結清時須減掉退還金額 */
   @Column(name = "`AccuTempAmt`")
   private BigDecimal accuTempAmt = new BigDecimal("0");
 
   // 累溢繳金額
+  /* 結清時須減掉退還金額 */
   @Column(name = "`AccuOverAmt`")
   private BigDecimal accuOverAmt = new BigDecimal("0");
 
   // 累應還金額
-  /* 繳款時更新,結清時等於累繳金額減退還金額,其他等於期款乘以(首次應繳日至會計日之月差) */
+  /* 繳款時更新,結清時等於累繳金額,其他等於期款乘以(首次應繳日至會計日之月差) */
   @Column(name = "`AccuDueAmt`")
   private BigDecimal accuDueAmt = new BigDecimal("0");
 
@@ -154,11 +156,13 @@ public class NegMain implements Serializable {
   @Column(name = "`PayIntDate`")
   private int payIntDate = 0;
 
-  // 累償還本金
+  // 償還本金
+  /* 最後一次的還本本金,非累計 */
   @Column(name = "`RepayPrincipal`")
   private BigDecimal repayPrincipal = new BigDecimal("0");
 
-  // 累償還利息
+  // 償還利息
+  /* 最後一次的還本利息,非累計 */
   @Column(name = "`RepayInterest`")
   private BigDecimal repayInterest = new BigDecimal("0");
 
@@ -168,8 +172,8 @@ public class NegMain implements Serializable {
 
   // 受理調解機構代號
   /* 調解案件必須輸入,JCIC申報使用 */
-  @Column(name = "`CourCode`", length = 3)
-  private String courCode;
+  @Column(name = "`CourtCode`", length = 3)
+  private String courtCode;
 
   // 本次會計日期
   /* NegTrans */
@@ -600,7 +604,7 @@ N
 
 /**
 	* 累繳金額<br>
-	* 
+	* 結清時須減掉退還金額
 	* @return BigDecimal
 	*/
   public BigDecimal getAccuTempAmt() {
@@ -609,7 +613,7 @@ N
 
 /**
 	* 累繳金額<br>
-	* 
+	* 結清時須減掉退還金額
   *
   * @param accuTempAmt 累繳金額
 	*/
@@ -619,7 +623,7 @@ N
 
 /**
 	* 累溢繳金額<br>
-	* 
+	* 結清時須減掉退還金額
 	* @return BigDecimal
 	*/
   public BigDecimal getAccuOverAmt() {
@@ -628,7 +632,7 @@ N
 
 /**
 	* 累溢繳金額<br>
-	* 
+	* 結清時須減掉退還金額
   *
   * @param accuOverAmt 累溢繳金額
 	*/
@@ -638,7 +642,7 @@ N
 
 /**
 	* 累應還金額<br>
-	* 繳款時更新,結清時等於累繳金額減退還金額,其他等於期款乘以(首次應繳日至會計日之月差)
+	* 繳款時更新,結清時等於累繳金額,其他等於期款乘以(首次應繳日至會計日之月差)
 	* @return BigDecimal
 	*/
   public BigDecimal getAccuDueAmt() {
@@ -647,7 +651,7 @@ N
 
 /**
 	* 累應還金額<br>
-	* 繳款時更新,結清時等於累繳金額減退還金額,其他等於期款乘以(首次應繳日至會計日之月差)
+	* 繳款時更新,結清時等於累繳金額,其他等於期款乘以(首次應繳日至會計日之月差)
   *
   * @param accuDueAmt 累應還金額
 	*/
@@ -774,8 +778,8 @@ N
   }
 
 /**
-	* 累償還本金<br>
-	* 
+	* 償還本金<br>
+	* 最後一次的還本本金,非累計
 	* @return BigDecimal
 	*/
   public BigDecimal getRepayPrincipal() {
@@ -783,18 +787,18 @@ N
   }
 
 /**
-	* 累償還本金<br>
-	* 
+	* 償還本金<br>
+	* 最後一次的還本本金,非累計
   *
-  * @param repayPrincipal 累償還本金
+  * @param repayPrincipal 償還本金
 	*/
   public void setRepayPrincipal(BigDecimal repayPrincipal) {
     this.repayPrincipal = repayPrincipal;
   }
 
 /**
-	* 累償還利息<br>
-	* 
+	* 償還利息<br>
+	* 最後一次的還本利息,非累計
 	* @return BigDecimal
 	*/
   public BigDecimal getRepayInterest() {
@@ -802,10 +806,10 @@ N
   }
 
 /**
-	* 累償還利息<br>
-	* 
+	* 償還利息<br>
+	* 最後一次的還本利息,非累計
   *
-  * @param repayInterest 累償還利息
+  * @param repayInterest 償還利息
 	*/
   public void setRepayInterest(BigDecimal repayInterest) {
     this.repayInterest = repayInterest;
@@ -835,18 +839,18 @@ N
 	* 調解案件必須輸入,JCIC申報使用
 	* @return String
 	*/
-  public String getCourCode() {
-    return this.courCode == null ? "" : this.courCode;
+  public String getCourtCode() {
+    return this.courtCode == null ? "" : this.courtCode;
   }
 
 /**
 	* 受理調解機構代號<br>
 	* 調解案件必須輸入,JCIC申報使用
   *
-  * @param courCode 受理調解機構代號
+  * @param courtCode 受理調解機構代號
 	*/
-  public void setCourCode(String courCode) {
-    this.courCode = courCode;
+  public void setCourtCode(String courtCode) {
+    this.courtCode = courtCode;
   }
 
 /**
@@ -1047,7 +1051,7 @@ N
            + ", firstDueDate=" + firstDueDate + ", lastDueDate=" + lastDueDate + ", isMainFin=" + isMainFin + ", totalContrAmt=" + totalContrAmt + ", mainFinCode=" + mainFinCode + ", principalBal=" + principalBal
            + ", accuTempAmt=" + accuTempAmt + ", accuOverAmt=" + accuOverAmt + ", accuDueAmt=" + accuDueAmt + ", accuSklShareAmt=" + accuSklShareAmt + ", repaidPeriod=" + repaidPeriod + ", twoStepCode=" + twoStepCode
            + ", chgCondDate=" + chgCondDate + ", nextPayDate=" + nextPayDate + ", payIntDate=" + payIntDate + ", repayPrincipal=" + repayPrincipal + ", repayInterest=" + repayInterest + ", statusDate=" + statusDate
-           + ", courCode=" + courCode + ", thisAcDate=" + thisAcDate + ", thisTitaTlrNo=" + thisTitaTlrNo + ", thisTitaTxtNo=" + thisTitaTxtNo + ", lastAcDate=" + lastAcDate + ", lastTitaTlrNo=" + lastTitaTlrNo
+           + ", courtCode=" + courtCode + ", thisAcDate=" + thisAcDate + ", thisTitaTlrNo=" + thisTitaTlrNo + ", thisTitaTxtNo=" + thisTitaTxtNo + ", lastAcDate=" + lastAcDate + ", lastTitaTlrNo=" + lastTitaTlrNo
            + ", lastTitaTxtNo=" + lastTitaTxtNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

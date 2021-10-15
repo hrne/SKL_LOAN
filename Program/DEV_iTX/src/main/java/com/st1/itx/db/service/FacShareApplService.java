@@ -57,6 +57,15 @@ public interface FacShareApplService {
   public Slice<FacShareAppl> findCustNoEq(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
+   * MainApplNo = 
+   *
+   * @param mainApplNo_0 mainApplNo_0
+   * @param titaVo Variable-Length Argument
+   * @return Slice FacShareAppl FacShareAppl of List
+   */
+  public FacShareAppl mApplNoFirst(int mainApplNo_0, TitaVo... titaVo);
+
+  /**
    * hold By FacShareAppl
    * 
    * @param applNo key

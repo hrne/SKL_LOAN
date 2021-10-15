@@ -196,7 +196,6 @@ RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
-T(2,@CourtCodeX,#L8r01JcicBankName)
 ! 調Rim相關 結束
 
 
@@ -250,11 +249,6 @@ HELP(#CourtCodeHelp)
 
 #CourtCodeX=X,80,L
 T(H,#CourtCode,#CourtCodeHelp)
-! T(2,@RimJcicBankCode,#CourtCode)
-! RESET_RIM(#RimL8r01,L8R01)
-! S(L8R01,1,#RimJcicBankCode)
-! R(1,L8R01)
-! T(2,@CourtCodeX,#L8r01JcicBankName)
 
 
 !最大債權金融機構代號
@@ -274,11 +268,6 @@ R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 #MaxMainCodeX=X,80,L
-T(2,@RimJcicBankCode,#MaxMainCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 
 !簽約金額-本金

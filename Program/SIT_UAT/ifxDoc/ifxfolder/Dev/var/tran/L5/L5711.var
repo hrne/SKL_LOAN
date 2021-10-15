@@ -48,8 +48,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustId,#NTXBUF,1,10)
 T(1,@CustNo,#NTXBUF,11,7)
 T(1,@CaseSeq,#NTXBUF,18,3)
-T(1,@TxAmt,#NTXBUF,22,14)
-T(1,@ReturnAmt,#NTXBUF,36,14)
+T(1,@ReturnAmt,#NTXBUF,22,14)
 
 !Rim撥付金額累計
 #SumRimApprAmt=m,14,S
@@ -66,6 +65,7 @@ T(2,@CustName,#L5R42CustName)
 T(2,@AcDate,#L5R42AcDate)
 T(2,@TlrNo,#L5R42TlrNo)
 T(2,@TxtNo,#L5R42TxtNo)
+T(2,@TxAmt,#L5R42TxAmt)
 ##loop{times:30,i:1}
 T(2,@FinCode{i},#L5R42FinCode{i})
 T(2,@FinCodeName{i},#L5R42FinCodeName{i})

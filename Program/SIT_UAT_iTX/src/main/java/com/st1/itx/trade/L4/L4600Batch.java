@@ -134,6 +134,9 @@ public class L4600Batch extends TradeBuffer {
 	@Autowired
 	public WebClient webClient;
 
+	@Autowired
+	L4600Report l4600Report;
+
 	private int iInsuEndMonth = 0;
 	private int insuEndDateFrom = 0;
 	private int insuEndDateTo = 0;
@@ -165,6 +168,9 @@ public class L4600Batch extends TradeBuffer {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(),
 					sendMsg, titaVo);
 		}
+
+		// 2021-10-15 智偉新增
+		l4600Report.exec(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -215,7 +221,7 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 		long sno = makeFile.close();
-		
+
 		// INSERT 續保檔
 		try {
 			insuRenewService.insertAll(lInsuRenew);
@@ -286,7 +292,6 @@ public class L4600Batch extends TradeBuffer {
 			}
 		}
 	}
-	
 
 	private void toRenewList(TitaVo titaVo) throws LogicException {
 

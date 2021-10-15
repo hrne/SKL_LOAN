@@ -29,7 +29,7 @@ public class FacProd implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -895297524415297749L;
+	private static final long serialVersionUID = -8930057707413740796L;
 
 // 商品代碼
   @Id
@@ -59,11 +59,17 @@ public class FacProd implements Serializable {
   @Column(name = "`AgreementFg`", length = 1)
   private String agreementFg;
 
+  // 企金可使用記號
+  /* Y:是 N:否 */
+  @Column(name = "`EnterpriseFg`", length = 1)
+  private String enterpriseFg;
+
   // 幣別
   @Column(name = "`CurrencyCode`", length = 3)
   private String currencyCode;
 
   // 指標利率代碼
+  /* 共用代碼檔(CdCode.BaseRate)01: 保單分紅利率 02: 郵政儲金利率99: 自訂利率 */
   @Column(name = "`BaseRateCode`", length = 2)
   private String baseRateCode;
 
@@ -283,6 +289,25 @@ public class FacProd implements Serializable {
   }
 
 /**
+	* 企金可使用記號<br>
+	* Y:是 N:否
+	* @return String
+	*/
+  public String getEnterpriseFg() {
+    return this.enterpriseFg == null ? "" : this.enterpriseFg;
+  }
+
+/**
+	* 企金可使用記號<br>
+	* Y:是 N:否
+  *
+  * @param enterpriseFg 企金可使用記號
+	*/
+  public void setEnterpriseFg(String enterpriseFg) {
+    this.enterpriseFg = enterpriseFg;
+  }
+
+/**
 	* 幣別<br>
 	* 
 	* @return String
@@ -303,7 +328,10 @@ public class FacProd implements Serializable {
 
 /**
 	* 指標利率代碼<br>
-	* 
+	* 共用代碼檔(CdCode.BaseRate)
+01: 保單分紅利率 
+02: 郵政儲金利率
+99: 自訂利率
 	* @return String
 	*/
   public String getBaseRateCode() {
@@ -312,7 +340,10 @@ public class FacProd implements Serializable {
 
 /**
 	* 指標利率代碼<br>
-	* 
+	* 共用代碼檔(CdCode.BaseRate)
+01: 保單分紅利率 
+02: 郵政儲金利率
+99: 自訂利率
   *
   * @param baseRateCode 指標利率代碼
 	*/
@@ -747,9 +778,10 @@ B = 浮動階梯
   @Override
   public String toString() {
     return "FacProd [prodNo=" + prodNo + ", prodName=" + prodName + ", startDate=" + startDate + ", endDate=" + endDate + ", statusCode=" + statusCode + ", agreementFg=" + agreementFg
-           + ", currencyCode=" + currencyCode + ", baseRateCode=" + baseRateCode + ", prodIncr=" + prodIncr + ", lowLimitRate=" + lowLimitRate + ", incrFlag=" + incrFlag + ", rateCode=" + rateCode
-           + ", govOfferFlag=" + govOfferFlag + ", financialFlag=" + financialFlag + ", empFlag=" + empFlag + ", breachFlag=" + breachFlag + ", breachCode=" + breachCode + ", breachGetCode=" + breachGetCode
-           + ", prohibitMonth=" + prohibitMonth + ", breachPercent=" + breachPercent + ", breachDecreaseMonth=" + breachDecreaseMonth + ", breachDecrease=" + breachDecrease + ", breachStartPercent=" + breachStartPercent + ", ifrsStepProdCode=" + ifrsStepProdCode
-           + ", ifrsProdCode=" + ifrsProdCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", enterpriseFg=" + enterpriseFg + ", currencyCode=" + currencyCode + ", baseRateCode=" + baseRateCode + ", prodIncr=" + prodIncr + ", lowLimitRate=" + lowLimitRate + ", incrFlag=" + incrFlag
+           + ", rateCode=" + rateCode + ", govOfferFlag=" + govOfferFlag + ", financialFlag=" + financialFlag + ", empFlag=" + empFlag + ", breachFlag=" + breachFlag + ", breachCode=" + breachCode
+           + ", breachGetCode=" + breachGetCode + ", prohibitMonth=" + prohibitMonth + ", breachPercent=" + breachPercent + ", breachDecreaseMonth=" + breachDecreaseMonth + ", breachDecrease=" + breachDecrease + ", breachStartPercent=" + breachStartPercent
+           + ", ifrsStepProdCode=" + ifrsStepProdCode + ", ifrsProdCode=" + ifrsProdCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

@@ -156,7 +156,7 @@ public class L5R01 extends TradeBuffer {
 			totaVo.putParam("L5r01TwoStepCode", NegMainVO.getTwoStepCode());//
 			totaVo.putParam("L5r01PayerCustNo", NegMainVO.getPayerCustNo());//
 			totaVo.putParam("L5r01ChgCondDate", NegMainVO.getChgCondDate());//
-			totaVo.putParam("L5r01CourCode", NegMainVO.getCourCode());//
+			totaVo.putParam("L5r01CourtCode", NegMainVO.getCourtCode());//
 		} else {
 			// E0001 查詢資料不存在
 			throw new LogicException(titaVo, "E0001", "查無資料");

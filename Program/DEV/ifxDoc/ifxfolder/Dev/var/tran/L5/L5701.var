@@ -22,7 +22,7 @@ E(0,0)
 [#<->#,"#FdCustId+身分證字號",#CustId,#BtnDetail],
 ["#FdCustNo+戶號",#CustNo],["#FdCaseSeq+案件序號",#CaseSeq],
 [#<->#,"#FdIsMainFin+最大債權",#IsMainFin],
-["#FdCaseKindCode+案件種類",#CaseKindCode,#CaseKindCodeX],["#FdCourCode+#CourCodeFildName",#CourCode,#CourCodeX],
+["#FdCaseKindCode+案件種類",#CaseKindCode,#CaseKindCodeX],["#FdCourtCode+#CourtCodeFildName",#CourtCode,#CourtCodeX],
 ["#FdCustLoanKind+債權戶別",#CustLoanKind,#CustLoanKindX],["#FdPayerCustNo+#PayerCustNoFildName",#PayerCustNo,#PayerCustName],
 [#<->#,"#FdStatus+債權戶況",#Status,#StatusX],
 [#<->#,"#FdDeferYMStart+延期繳款年月+(+起+)",#DeferYMStartX],
@@ -52,10 +52,10 @@ HIDE(#FdChgCondDate,#ChgCondDateFildName,#ChgCondDate)
 SHOW(#FdChgCondDate,#ChgCondDateFildName,#ChgCondDate)
 
 !受理調解機構代號
-#HideCourCode=@,1,S
-HIDE(#FdCourCode,#CourCodeFildName,#CourCode,#CourCodeX)
-#ShowCourCode=@,1,S
-SHOW(#FdCourCode,#CourCodeFildName,#CourCode,#CourCodeX)
+#HideCourtCode=@,1,S
+HIDE(#FdCourtCode,#CourtCodeFildName,#CourtCode,#CourtCodeX)
+#ShowCourtCode=@,1,S
+SHOW(#FdCourtCode,#CourtCodeFildName,#CourtCode,#CourtCodeX)
 
 
 #FdFunctionCodeX=X,2,L
@@ -88,7 +88,7 @@ T(3,*)
 #FdPayerCustNo=X,1,L
 T(3,*)
 !受理調解機構代號
-#FdCourCode=X,1,L
+#FdCourtCode=X,1,L
 T(3,*)
 
 #FdPrincipalBal=X,2,L
@@ -105,7 +105,7 @@ T(3,*)
 T(3,付款人戶號)
 #ChgCondDateFildName=X,18,L
 T(3,申請變更還款條件日)
-#CourCodeFildName=X,16,L
+#CourtCodeFildName=X,16,L
 T(3,受理調解機構代號)
 
 
@@ -143,7 +143,8 @@ HIDE(#BtnBankCode{i})
 
 <include src="ROM.icf::L5R12.dec"/>
 <include src="ROM.icf::L2R07.dec"/>
-<include src="ROM.icf::L6R04.dec"/>
+<include src="ROM.icf::L5R43.dec"/>
+<include src="ROM.icf::L5R43Rim.dec"/>
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
 ! Status1
@@ -166,20 +167,18 @@ T(3,CdCode.CaseKindCode)
 T(3,CdCode.FunctionCode)
 #FunctionCodeHelp=x,1024,S
 
-#CourtCodeCode=x,20,S
-T(3,CdCode.CourtCode)
-#CourtCodeHelp=x,5000,S
+
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#StatusCode,#CustLoanKindCode,#CaseKindCodeCode,#FunctionCodeCode,#CourtCodeCode)
+S(XXR99,01,#StatusCode,#CustLoanKindCode,#CaseKindCodeCode,#FunctionCodeCode)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@StatusHelp,#HelpDesc1)
 T(2,@CustLoanKindHelp,#HelpDesc2)
 T(2,@CaseKindCodeHelp,#HelpDesc3)
 T(2,@FunctionCodeHelp,#HelpDesc4)
-T(2,@CourtCodeHelp,#HelpDesc5)
+
 
 !YN
 #YNHelp=X,50,S
@@ -198,7 +197,7 @@ ASGN(CAUTO$)
 #PreValue=A,1,S
 T(2,@Status,0)
 CALL(#HidePayerCustNo)
-CALL(#HideCourCode)
+CALL(#HideCourtCode)
 ! CALL(#HideChgCondDate)
 ! 新增
 
@@ -224,12 +223,10 @@ T(1,@CustId,#NTXBUF,3,10)
 T(1,@CustNo,#NTXBUF,13,7)
 T(1,@CaseSeq,#NTXBUF,20,3)
 
-!L6R04
-#FunCode=A,1,S
+!L5R43
+#FuncCode=A,1,S
 E(0,5)
-#DefCode=X,9,S
-T(2,CourtCode)
-#Code=X,3,S
+
 
 
 
@@ -274,7 +271,7 @@ E(0,@PrincipalBal,#L5r01PrincipalBal)
 T(2,@TwoStepCode,#L5r01TwoStepCode)
 T(2,@PayerCustNo,#L5r01PayerCustNo)
 T(2,@ChgCondDate,#L5r01ChgCondDate)
-T(2,@CourCode,#L5r01CourCode)
+T(2,@CourtCode,#L5r01CourtCode)
 ##loop {times:30,i:1}
 T(2,@NegFinShareFinCode{i},#L5r01NegFinShareFinCode{i})
 T(2,@FinCodeName{i},#L5r01NegFinShareFinName{i})
@@ -285,25 +282,23 @@ T(2,@NegFinShareCancelDate{i},#L5r01NegFinShareCancelDate{i})
 E(0,@NegFinShareCancelAmt{i},#L5r01NegFinShareCancelAmt{i})
 ##end
 T(H,@CaseKindCodeX,#CaseKindCode,#CaseKindCodeHelp)
-!T(H,@CourCodeX,#CourCode,#CourtCodeHelp)
 T(H,@CustLoanKindX,#CustLoanKind,#CustLoanKindHelp)
 T(H,@StatusX,#Status,#StatusHelp)
 C(5,#IsMainFin,Y,T(2,@FieldName,簽約總金額),T(2,@FieldName,新壽總金額))
 ! 下方按鈕
 T(2,@BufConnect,#CustId)
 
-#Send2L6R04=x,1,S
-RESET_RIM(#Send2L6R04,L6R04)
-T(2,@Code,#L5r01CourCode)
-S(L6R04,1,#FunCode,#DefCode,#Code)
-R(1,L6R04)
-T(2,@CourCodeX,#L6R04Item)
+#Send2L5R43=x,1,S
+RESET_RIM(#Send2L5R43,L5R43)
+S(L5R43,1,#FuncCode,#CourtCode)
+R(1,L5R43)
+T(2,@CourtCodeX,#L5R43CourtItem)
 
 
 ! 案件種類-調解才需要填寫受理調解機構代號
-#CheckCourCode1=X,1,S
+#CheckCourtCode1=X,1,S
 C(4,L5r01CaseKindCode,s,$)
-IF(#CaseKindCode=="2",CALL(#ShowCourCode),CALL(#HideCourCode))
+IF(#CaseKindCode=="2",CALL(#ShowCourtCode),CALL(#HideCourtCode))
 
 #CheckCustLoanKind1=X,1,S
 C(4,#L5r01PayerCustNo,s,$)
@@ -417,7 +412,7 @@ T(2,@FdStatus,#ShowFd)
 T(2,@FdCustLoanKind,#ShowFd)
 T(2,@FdPayerCustNo,#ShowFd)
 T(2,@FdChgCondDate,#ShowFd)
-T(2,@FdCourCode,#ShowFd)
+T(2,@FdCourtCode,#ShowFd)
 
 
 
@@ -427,11 +422,11 @@ IF (#FunctionCode=="01",T(F,@CustId,1),T(F,@CustId,0))
 IF (#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",
                         T(F,@IsMainFin,1)T(F,@CaseKindCode,1)T(F,@CustLoanKind,1)T(F,@Status,1)
                         T(F,@DeferYMStartX,0)T(F,@DeferYMEndX,0)T(F,@ApplDate,1)T(F,@DueAmt,1)T(F,@TotalPeriod,1)
-                        T(F,@IntRate,1)T(F,@FirstDueDate,1)T(F,@LastDueDate,1)T(F,@TotalContrAmt,1)T(F,@MainFinCode,1)T(F,@TwoStepCode,1)T(F,@PayerCustNo,1)T(F,@ChgCondDate,1)T(F,@CourCode,1)T(F,@LastDueDate,1)
+                        T(F,@IntRate,1)T(F,@FirstDueDate,1)T(F,@LastDueDate,1)T(F,@TotalContrAmt,1)T(F,@MainFinCode,1)T(F,@TwoStepCode,1)T(F,@PayerCustNo,1)T(F,@ChgCondDate,1)T(F,@CourtCode,1)T(F,@LastDueDate,1)
                         ,
                         T(F,@CustId,0)T(F,@IsMainFin,0)T(F,@CaseKindCode,0)T(F,@CustLoanKind,0)T(F,@Status,0)
                         T(F,@DeferYMStartX,0)T(F,@DeferYMEndX,0)T(F,@ApplDate,0)T(F,@DueAmt,0)T(F,@TotalPeriod,0)
-                        T(F,@IntRate,0)T(F,@FirstDueDate,0)T(F,@LastDueDate,0)T(F,@TotalContrAmt,0)T(F,@MainFinCode,0)T(F,@TwoStepCode,0)T(F,@PayerCustNo,0)T(F,@ChgCondDate,0)T(F,@CourCode,0)T(F,@LastDueDate,0))                       
+                        T(F,@IntRate,0)T(F,@FirstDueDate,0)T(F,@LastDueDate,0)T(F,@TotalContrAmt,0)T(F,@MainFinCode,0)T(F,@TwoStepCode,0)T(F,@PayerCustNo,0)T(F,@ChgCondDate,0)T(F,@CourtCode,0)T(F,@LastDueDate,0))                       
 !新增時戶況不可輸入,固定=0
 IF (#FunctionCode=="01",T(F,@Status,0),$) 
 !喘息期只能改此二欄位
@@ -526,28 +521,25 @@ HELP(#CaseKindCodeHelp)
 T(H,#CaseKindCode,#CaseKindCodeHelp)
 
 ! 案件種類-調解才需要填寫受理調解機構代號
-#CheckCourCode=X,1,S
-IF(#CaseKindCode=="2",CALL(#ShowCourCode),CALL(#HideCourCode))
+#CheckCourtCode=X,1,S
+IF(#CaseKindCode=="2",CALL(#ShowCourtCode),CALL(#HideCourtCode))
 
-#CourCode=X,3,I
+#CourtCode=X,3,I
 IF(#CaseKindCode=="2",$,S)
 IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=="11",$,s)
-!HELP(#CourtCodeHelp)
+
 @V(7)
 
 
 
-#Send1L6R04=x,1,S
-C(4,#CourCode,s,$)
-T(2,@Code,#CourCode)
-RESET_RIM(#Send1L6R04,L6R04)
-S(L6R04,1,#FunCode,#DefCode,#Code)
-R(1,L6R04)
-T(2,@CourCodeX,#L6R04Item)
+#Send1L5R43=x,1,S
+C(4,#CourtCode,s,$)
+RESET_RIM(#Send1L5R43,L5R43)
+S(L5R43,1,#FuncCode,#CourtCode)
+R(1,L5R43)
+T(2,@CourtCodeX,#L5R43CourtItem)
 
-#CourCodeX=X,50,L
-!T(2,#CourCodeX, )
-!T(H,#CourCode,#CourtCodeHelp)
+#CourtCodeX=X,50,L
 
 ! 債權戶別
 #CustLoanKind=X,1,I
@@ -1132,7 +1124,7 @@ INVOKEJS(SHOW,grd1,{i},{i},0)
 #DeferYMStart
 #DeferYMEnd
 #CaseKindCode
-#CourCode
+#CourtCode
 #CustLoanKind
 #PayerCustNo
 #CustNo
@@ -1166,7 +1158,7 @@ INVOKEJS(SHOW,grd1,{i},{i},0)
 <include src="ROM.icf::L5R01.tom"/>
 <include src="ROM.icf::L5R12.tom"/>
 <include src="ROM.icf::L2R07.tom"/>
-<include src="ROM.icf::L6R04.tom"/>
+<include src="ROM.icf::L5R43.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5701
 #CustNo

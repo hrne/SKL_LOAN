@@ -59,13 +59,13 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		this.info("lastYearEntdy = " + lastYearEntdy);
 
 		String sql = " select                                                                ";
-		sql += "     bdd.\"RepayAcctNo\"                       AS F0                         ";
+		sql += "     MIN(bdd.\"RepayAcctNo\")                       AS F0                         ";
 		sql += "   , MIN(LPAD(bd.\"CustNo\", 7 , '0'))              AS F1                         ";
 		sql += "   , MIN(LPAD(bd.\"FacmNo\", 3 , '0'))              AS F2                         ";
-		sql += "   , cm.\"CustName\"                           AS F3                         ";
-		sql += "   , bd.\"RepayAmt\"                           AS F4                         ";
+		sql += "   , MIN(cm.\"CustName\")                           AS F3                         ";
+		sql += "   , MIN(bd.\"RepayAmt\")                           AS F4                         ";
 		sql += "   , MIN(NVL(ctl.\"PhoneNo\", ''))                  AS F5                         ";
-		sql += "   , NVL(bdd.\"RelCustName\", cm.\"CustName\") AS F6                         ";
+		sql += "   , MIN(NVL(bdd.\"RelCustName\", cm.\"CustName\")) AS F6                         ";
 		sql += "   , case when lbm.\"PrevPayIntDate\" < 19110000 then lbm.\"PrevPayIntDate\" ";
 		sql += "          else lbm.\"PrevPayIntDate\" - 19110000 end     AS F7               ";
 		sql += "   , case when fm.\"FirstDrawdownDate\" < 19110000 then fm.\"FirstDrawdownDate\" ";
@@ -104,8 +104,16 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "     and (fm.\"FirstDrawdownDate\" >= :lastYearEntdy";
 		sql += "           and  fm.\"FirstDrawdownDate\" <= :entdy ";
 		sql += "           )                                                                 ";
-		sql += "   group by bdd.\"RepayAcctNo\", cm.\"CustName\", bd.\"RepayAmt\", nvl(bdd.\"RelCustName\", cm.\"CustName\"), CASE WHEN lbm.\"PrevPayIntDate\" < 19110000 THEN lbm.\"PrevPayIntDate\" ELSE lbm.\"PrevPayIntDate\" - 19110000 END, " + 
-				"CASE WHEN fm.\"FirstDrawdownDate\" < 19110000 THEN fm.\"FirstDrawdownDate\" ELSE fm.\"FirstDrawdownDate\" - 19110000 END, ce.\"Fullname\"";
+		sql += "   group by CASE WHEN                                                        ";
+		sql += "                 lbm.\"PrevPayIntDate\" < 19110000 ";
+		sql += "                 THEN lbm.\"PrevPayIntDate\" ";
+		sql += "                 ELSE lbm.\"PrevPayIntDate\" - 19110000 ";
+		sql += "            END, ";
+		sql += "            CASE WHEN fm.\"FirstDrawdownDate\" < 19110000 ";
+		sql += "                 THEN fm.\"FirstDrawdownDate\" ";
+		sql += "                 ELSE fm.\"FirstDrawdownDate\" - 19110000 ";
+		sql += "            END, ";
+		sql += "ce.\"Fullname\"";
 		sql += "   order by \"F0\",\"F1\", \"F2\"                                           "; 
 		this.info("sql=" + sql);
 		Query query;

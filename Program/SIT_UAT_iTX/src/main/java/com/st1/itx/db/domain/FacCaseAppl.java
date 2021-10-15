@@ -29,7 +29,7 @@ public class FacCaseAppl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1474532980073938537L;
+	private static final long serialVersionUID = -8383136191290903732L;
 
 // 申請號碼
   @Id
@@ -68,6 +68,11 @@ public class FacCaseAppl implements Serializable {
   // 估價
   @Column(name = "`Estimate`", length = 6)
   private String estimate;
+
+  // 案件隸屬單位
+  /* 共用代碼檔0:非企金單位  1:企金推展課 */
+  @Column(name = "`DepartmentCode`", length = 1)
+  private String departmentCode;
 
   // 計件代碼
   /* 共用代碼檔A:新貸件B:其他額度C:原額度D:新增額度E:展期1:新貸件2:其他額度3:原額度4:新增額度5:展期件6:六個月動支7:服務件8:特殊件9:固特利契轉 */
@@ -322,6 +327,29 @@ public class FacCaseAppl implements Serializable {
 	*/
   public void setEstimate(String estimate) {
     this.estimate = estimate;
+  }
+
+/**
+	* 案件隸屬單位<br>
+	* 共用代碼檔
+0:非企金單位  
+1:企金推展課
+	* @return String
+	*/
+  public String getDepartmentCode() {
+    return this.departmentCode == null ? "" : this.departmentCode;
+  }
+
+/**
+	* 案件隸屬單位<br>
+	* 共用代碼檔
+0:非企金單位  
+1:企金推展課
+  *
+  * @param departmentCode 案件隸屬單位
+	*/
+  public void setDepartmentCode(String departmentCode) {
+    this.departmentCode = departmentCode;
   }
 
 /**
@@ -729,9 +757,9 @@ N:否
   @Override
   public String toString() {
     return "FacCaseAppl [applNo=" + applNo + ", custUKey=" + custUKey + ", applDate=" + applDate + ", creditSysNo=" + creditSysNo + ", syndNo=" + syndNo + ", currencyCode=" + currencyCode
-           + ", applAmt=" + applAmt + ", prodNo=" + prodNo + ", estimate=" + estimate + ", pieceCode=" + pieceCode + ", creditOfficer=" + creditOfficer + ", loanOfficer=" + loanOfficer
-           + ", introducer=" + introducer + ", coorgnizer=" + coorgnizer + ", interviewerA=" + interviewerA + ", interviewerB=" + interviewerB + ", supervisor=" + supervisor + ", processCode=" + processCode
-           + ", approveDate=" + approveDate + ", groupUKey=" + groupUKey + ", branchNo=" + branchNo + ", isLimit=" + isLimit + ", isRelated=" + isRelated + ", isLnrelNear=" + isLnrelNear
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", applAmt=" + applAmt + ", prodNo=" + prodNo + ", estimate=" + estimate + ", departmentCode=" + departmentCode + ", pieceCode=" + pieceCode + ", creditOfficer=" + creditOfficer
+           + ", loanOfficer=" + loanOfficer + ", introducer=" + introducer + ", coorgnizer=" + coorgnizer + ", interviewerA=" + interviewerA + ", interviewerB=" + interviewerB + ", supervisor=" + supervisor
+           + ", processCode=" + processCode + ", approveDate=" + approveDate + ", groupUKey=" + groupUKey + ", branchNo=" + branchNo + ", isLimit=" + isLimit + ", isRelated=" + isRelated
+           + ", isLnrelNear=" + isLnrelNear + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

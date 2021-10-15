@@ -316,10 +316,6 @@ C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 @V(7)
-T(2,@RimJcicBankCode,#MaxMainCode)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 #MaxMainCodeX=X,50,L
 T(2,@RimJcicBankCode,#MaxMainCode)

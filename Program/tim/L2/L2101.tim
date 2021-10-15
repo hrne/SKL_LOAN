@@ -51,6 +51,7 @@ StartDate=9,7
 EndDate=9,7
 StatusCode=X,1
 AgreementFg=X,1
+EnterpriseFg=X,1
 CurrencyCode=X,3
 BaseRateCode=X,2
 ProdIncr=+9,2.4

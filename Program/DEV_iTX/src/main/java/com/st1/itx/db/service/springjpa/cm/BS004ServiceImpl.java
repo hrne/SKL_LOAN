@@ -41,9 +41,9 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<BS004Vo> compareProdNo(int quitDate, TitaVo titaVo) throws Exception {
 // 商品代碼 ProdNo  VARCHAR2(5) 
-//  if 員工利率產品第一碼為'E' 
-//     if    1.身份變更        任用狀況碼 <> 1,4 
-//       ||  2. 退休屆滿5年    任用狀況碼 = 5 &  QUIT_DATE 離職/停約日 <  本日減5年
+//  if 產品為員工優惠貸款
+//     if    1.身份變更        任用狀況碼 <> 1,4
+//       ||  2. 退休屆滿5年    任用狀況碼 = 5 & QUIT_DATE 離職/停約日 <  本日減5年
 //                        
 // 業務線別 CommLineType	VARCHAR2(1)	 			 
 //      0:單位報備
@@ -66,7 +66,7 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += "  and f.prodNo not in ('EO') "; // EO 員工利率-一般客戶
 		queryttext += "  and p.empFlag = 'Y' "; // EmpFlag=Y 員工優惠貸款
 		queryttext += "  and e.commLineType is not null ";
-		queryttext += "  and (   (e.commLineType not in ('1','4')) ";
+		queryttext += "  and (   (e.commLineType not in ('1','4','5')) ";
 		queryttext += "       or (e.commLineType ='5' and e.quitDate < " + quitDate + " ))";
 
 		this.info("queryttext=" + queryttext);

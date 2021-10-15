@@ -448,6 +448,10 @@ T(3,1:新增;2:修改;4:刪除;5:查詢)
 #YesNoHelp=x,20,S
 T(3,Y:是;N:否)
 
+!企金可使用記號
+#EnterpriseHELP=x,1024,S
+T(3,Y:是;N:否)
+
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2001進入),$)
@@ -529,6 +533,7 @@ T(2,@FdProdNo,#ShowFd)
 #UpdateCode=N,1,S
 IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
 
+!是否有額度使用此商品記號 Y=有
 #UseProdFg=X,1,S
 
 #BUF1=X,6,S
@@ -604,6 +609,7 @@ E(0,@StartDate,#L2r01StartDate)
 E(0,@EndDate,#L2r01EndDate)
 T(2,@StatusCode,#L2r01StatusCode)
 T(2,@AgreementFg,#L2r01AgreementFg)
+T(2,@EnterpriseFg,#L2r01EnterpriseFg)
 T(2,@CurrencyCode,#L2r01CurrencyCode)
 T(H,@Precision,#CurrencyCode,#CurrPrecisionHelp)
 T(2,@BaseRateCode,#L2r01BaseRateCode)
@@ -666,6 +672,7 @@ T(3,@StepRateTypeX{n}, )
 T(H,@StepRateTypeX{n},#StepRateType{n},#RateTypeHelp)
 ##end
 T(H,@AgreementFgX,#AgreementFg,#YesNoHelp) 
+T(H,@EnterpriseFgX,#EnterpriseFg,#EnterpriseHELP)
 T(H,@GovOfferFlagX,#GovOfferFlag,#YesNoHelp) 
 T(H,@FinancialFlagX,#FinancialFlag,#YesNoHelp) 
 T(H,@BreachGetCodeX,#BreachGetCode,#BreachGetCodeHelp)
@@ -762,23 +769,50 @@ BIND(#BTNEXPAND,click, {cmd=CALLSEND;DOCODE=EXPAND})
 #FdP2=X,1,S
 T(2,@FdProdName,#WkStar)
 T(2,@FdStartDate,#WkStar)
-T(2,@FdEndDate,#WkSpc)
-T(2,@FdStatusCode,#WkStar2)
-T(2,@FdCurrencyCode,#WkSpc)
-C(3,#Effective,1,$,S)
-T(2,@FdProdName,#WkSpc)
-T(2,@FdStartDate,#WkSpc)
-T(2,@FdEndDate,#WkStar)
-T(2,@FdStatusCode,#WkStar2)
+T(2,@FdStatusCode,#WkSpc)
+T(2,@FdAgreementFg,#WkStar)
+T(2,@FdEnterpriseFg,#WkStar)
 T(2,@FdCurrencyCode,#WkSpc)
 T(2,@FdGovOfferFlag,#WkStar)
 T(2,@FdFinancialFlag,#WkStar)
 T(2,@FdEmpFlag,#WkStar)
-T(2,@FdAgreementFg,#WkStar)
-C(3,#Effective,1,
-    T(2,@FdGovOfferFlag,#WkSpc)
-    T(2,@FdFinancialFlag,#WkSpc)
-    T(2,@FdEmpFlag,#WkSpc),$)
+T(2,@FdBaseRateCode,#WkStar)
+T(2,@FdBaseRate,#WkSpc)
+T(2,@FdProdIncr,#WkSpc)
+T(2,@FdProdRate,#WkSpc)
+T(2,@FdLowLimitRate,#WkSpc)
+T(2,@FdRateCode,#WkStar)
+T(2,@FdBreachFlag,#WkStar)
+T(2,@FdBreachCode,#WkSpc)
+T(2,@FdProhibitMonth,#WkSpc)
+T(2,@FdBreachGetCode,#WkSpc)
+T(2,@FdBreachPercent,#WkSpc)
+T(2,@FdBreachDecreaseMonth,#WkSpc)
+T(2,@FdBreachDecrease,#WkSpc)
+T(2,@FdBreachStartPercent,#WkSpc)
+C(3,#Effective,1,$,S)
+T(2,@FdProdName,#WkSpc)
+T(2,@FdStatusCode,#WkSpc)
+T(2,@FdAgreementFg,#WkSpc)
+T(2,@FdEnterpriseFg,#WkSpc)
+T(2,@FdCurrencyCode,#WkSpc)
+T(2,@FdGovOfferFlag,#WkSpc)
+T(2,@FdFinancialFlag,#WkSpc)
+T(2,@FdEmpFlag,#WkSpc)
+T(2,@FdBaseRateCode,#WkSpc)
+T(2,@FdBaseRate,#WkSpc)
+T(2,@FdProdIncr,#WkSpc)
+T(2,@FdProdRate,#WkSpc)
+T(2,@FdLowLimitRate,#WkSpc)
+T(2,@FdRateCode,#WkSpc)
+T(2,@FdBreachFlag,#WkSpc)
+T(2,@FdBreachCode,#WkSpc)
+T(2,@FdProhibitMonth,#WkSpc)
+T(2,@FdBreachGetCode,#WkSpc)
+T(2,@FdBreachPercent,#WkSpc)
+T(2,@FdBreachDecreaseMonth,#WkSpc)
+T(2,@FdBreachDecrease,#WkSpc)
+T(2,@FdBreachStartPercent,#WkSpc)
 
 #TEXTONP2=X,1,S
 C(3,#UpdateCode,1,$,S)
@@ -790,6 +824,7 @@ T(F,@EndDate,1)
 T(F,@StatusCode,1)
 SHOW(#GovOfferFlag,#FinancialFlag,#EmpFlag)
 T(F,@AgreementFg,1)
+T(F,@EnterpriseFg,1)
 T(F,@GovOfferFlag,1)
 T(F,@FinancialFlag,1)
 T(F,@EmpFlag,1)
@@ -807,9 +842,10 @@ HIDE(#GovOfferFlag,#FinancialFlag,#EmpFlag)
 T(F,@ProdName,0)
 T(F,@ProdName,0)
 IF(#UpdateCode==1 && #Effective==1,C(5,#UseProdFg,Y,T(F,@StartDate,0),T(F,@StartDate,1)),T(F,@StartDate,0))
-T(F,@EndDate,0)
+C(3,#UpdateCode,1,T(F,@EndDate,1),T(F,@EndDate,0))
 T(F,@StatusCode,0)
 T(F,@AgreementFg,0)
+T(F,@EnterpriseFg,0)
 T(F,@GovOfferFlag,0)
 T(F,@FinancialFlag,0)
 T(F,@BreachCode,0)
@@ -946,6 +982,21 @@ HELP(#YesNoHelp)
 
 #AgreementFgX=X,2,L
 T(H,#AgreementFg,#YesNoHelp)
+
+!企金使用記號
+#FdEnterpriseFg=X,2,L
+
+#EnterpriseFg=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Effective,1,s,$)
+C(3,#FuncCode,1,C(4,#EnterpriseFg,T(3,N),$),$)
+HELP(#EnterpriseHELP)
+@V(H,#EnterpriseHELP)
+
+
+#EnterpriseFgX=x,20,L
+T(3,)T(H,#EnterpriseFg,#EnterpriseHELP)
+
 
 ! 2020-11-17 Wei修改
 ! 欄位"商品截止日期"需保留可輸入空白的功能,但需與#L2r01EndDate比較,故另外開立此欄位
@@ -1834,21 +1885,21 @@ ENABLE(#BTNHIDEP8)
 C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
 
 
-#FdP8=X,1,S
-T(2,@FdBreachFlag,#WkStar)
-T(2,@FdBreachGetCode,#WkStar)
-T(2,@FdBreachCode,#WkStar)
-T(2,@FdBreachPercent,#WkStar)
-T(2,@FdBreachPercent,#WkStar)
-T(2,@FdBreachDecreaseMonth,#WkStar)
-T(2,@FdBreachDecrease,#WkStar)
-C(3,#Effective,1,$,S)
-T(2,@FdBreachFlag,#WkSpc)
-T(2,@FdBreachCode,#WkSpc)
-T(2,@FdBreachGetCode,#WkSpc)
-T(2,@FdBreachPercent,#WkSpc)
-T(2,@FdBreachDecreaseMonth,#WkSpc)
-T(2,@FdBreachDecrease,#WkSpc)
+! #FdP8=X,1,S
+! T(2,@FdBreachFlag,#WkStar)
+! T(2,@FdBreachGetCode,#WkStar)
+! T(2,@FdBreachCode,#WkStar)
+! T(2,@FdBreachPercent,#WkStar)
+! T(2,@FdBreachPercent,#WkStar)
+! T(2,@FdBreachDecreaseMonth,#WkStar)
+! T(2,@FdBreachDecrease,#WkStar)
+! C(3,#Effective,1,$,S)
+! T(2,@FdBreachFlag,#WkSpc)
+! T(2,@FdBreachCode,#WkSpc)
+! T(2,@FdBreachGetCode,#WkSpc)
+! T(2,@FdBreachPercent,#WkSpc)
+! T(2,@FdBreachDecreaseMonth,#WkSpc)
+! T(2,@FdBreachDecrease,#WkSpc)
 
 
 #INITP8=X,1,S
@@ -1873,13 +1924,28 @@ HELP(#YesNoHelp)
 
 #BreachFlagX=X,10,L
 T(H,#BreachFlag,#YesNoHelp)
-C(5,#BreachFlag,Y,INVOKEJS(SHOW,p8,2,9,1),INVOKEJS(SHOW,p8,2,9,0))
-
-#BreachFlag_SKIP=X,1,S
-C(3,#UpdateCode,1,$,s)
+C(5,#BreachFlag,Y,INVOKEJS(SHOW,p6,2,8,1),INVOKEJS(SHOW,p6,2,8,0))
 C(3,#Effective,1,s,$)
-IF(#BreachFlag=="N",T(2,@FdBreachCode,#WkSpc)
-                   ,T(2,@FdProhibitMonth,#WkStar)T(2,@FdBreachCode,#WkStar))
+IF(#BreachFlag=="Y",T(2,@FdBreachCode,#WkStar)
+                    T(2,@FdProhibitMonth,#WkStar)
+                    T(2,@FdBreachGetCode,#WkStar)
+                    T(2,@FdBreachPercent,#WkStar)
+                    T(2,@FdBreachDecreaseMonth,#WkStar)
+                    T(2,@FdBreachDecrease,#WkSpc)
+                    T(2,@FdBreachStartPercent,#WkStar)
+                   ,T(2,@FdBreachCode,#WkSpc)
+                    T(2,@FdProhibitMonth,#WkSpc)
+                    T(2,@FdBreachGetCode,#WkSpc)
+                    T(2,@FdBreachPercent,#WkSpc)
+                    T(2,@FdBreachDecreaseMonth,#WkSpc)
+                    T(2,@FdBreachDecrease,#WkSpc)
+                    T(2,@FdBreachStartPercent,#WkSpc))
+
+! #BreachFlag_SKIP=X,1,S
+! C(3,#UpdateCode,1,$,s)
+! C(3,#Effective,1,s,$)
+! IF(#BreachFlag=="N",T(2,@FdBreachCode,#WkSpc)
+!                    ,T(2,@FdProhibitMonth,#WkStar)T(2,@FdBreachCode,#WkStar))
 
 
 ![違約適用方式]
@@ -1900,12 +1966,12 @@ HELP(#ProdBreachCodeHelp)
 T(H,#BreachCode,#ProdBreachCodeHelp)
 C(5,#BreachFlag,N,T(3,無),$)
 
-#BreachCode_SKIP=X,1,S
-C(3,#UpdateCode,1,$,S)
-IF(#BreachFlag=="N",T(2,@FdBreachGetCode,#WkSpc)
-                                      HIDE(#BreachGetCode)
-                                     ,T(2,@FdBreachGetCode,#WkStar)
-                                      SHOW(#BreachGetCode))
+! #BreachCode_SKIP=X,1,S
+! C(3,#UpdateCode,1,$,S)
+! IF(#BreachFlag=="N",T(2,@FdBreachGetCode,#WkSpc)
+!                                       HIDE(#BreachGetCode)
+!                                      ,T(2,@FdBreachGetCode,#WkStar)
+!                                       SHOW(#BreachGetCode))
 
 
 ![綁約年限]
@@ -1977,11 +2043,21 @@ C(3,#UpdateCode,1,$,s)
 C(3,#Effective,1,s,$)
 @V(5,0,100)
 
+
+#RcvL2r56=X,1,S
+C(3,#UpdateCode,1,$,S)
+! C(5,#BreachFlag,Y,$,S)
+RESET_RIM(#RcvL2r56,L2R56)
+S(L2R56,1,#BreachFlag,#BreachCode,#ProhibitMonth,#BreachGetCode,#BreachPercent,#BreachDecreaseMonth,#BreachDecrease,#BreachStartPercent)
+R(1,L2R56)
+T(2,@Breach1,#L2r56Breach)
+
+
 #Breach=x,200,L
 C(5,#BreachFlag,N,S,$)
 
 #Breach1=X,4.50,L
-C(5,#BreachFlag,N,S,$)
+C(5,#BreachFlag,N,s,$)
 
 
 
@@ -2035,15 +2111,17 @@ C(3,#EndDate,0,HIDE(#EndDate),SHOW(#EndDate))
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L2R01.dec"/>
 <include src="ROM.icf::L2R06.dec"/>
+<include src="ROM.icf::L2R56.dec"/>
 </sub>
 
 <sub type="DC" name="p2" layout="cols=2;screen.width=[200,300,200,300];printer.width=[15,30];order=1;">
 [
 ["<font color=red>@商品　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 "], 
-[#<->#,"#FdProdName+商品名稱",#ProdName], 
-["#FdStartDate+商品生效日期",#StartDate], 
+[#<->#,"#FdProdName+商品名稱",#ProdName],
+["#FdStartDate+商品生效日期",#StartDate],
 ["#FdEndDate+商品截止日期",#EndDate],
 ["#FdStatusCode+商品狀態",#StatusCodeX],["#FdAgreementFg+是否為協議商品",#AgreementFg,#AgreementFgX],
+[#<->#,"#FdEnterpriseFg+企金使用記號",#EnterpriseFg,#EnterpriseFgX],
 [#<->#,"#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdGovOfferFlag+政府優惠房貸",#GovOfferFlag,#GovOfferFlagX],
 ["#FdFinancialFlag+理財型房貸",#FinancialFlag,#FinancialFlagX],
@@ -2114,7 +2192,7 @@ C(3,#EndDate,0,HIDE(#EndDate),SHOW(#EndDate))
 [#<->#,"#FdBreachDecreaseMonth+違約金分段月數",#BreachDecreaseMonth],
 [#<->#,"#FdBreachDecrease+分段遞減百分比",#BreachDecrease,"@%"],
 [#<->#,"#FdBreachStartPercent+還款起算比例",#BreachStartPercent,"@%"],
-[#<->#,"@",#Breach1],
+[#<->#,"@@@@@清償說明",#Breach1],
 ]
 </sub>
 
@@ -2139,7 +2217,7 @@ T(3,[L2101] 商品參數維護)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#FuncCode#ProdNo#ProdName#StartDate#EndDate#StatusCode#AgreementFg
+#FuncCode#ProdNo#ProdName#StartDate#EndDate#StatusCode#AgreementFg#EnterpriseFg
 #CurrencyCode#BaseRateCode#ProdIncr#RateCode
 #LowLimitRate#IncrFlag
 #BreachFlag
@@ -2169,6 +2247,7 @@ TXFORM=L2101^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R01.tom"/>
 <include src="ROM.icf::L2R06.tom"/>
+<include src="ROM.icf::L2R56.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

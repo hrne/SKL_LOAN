@@ -129,6 +129,7 @@ public class L2R02 extends TradeBuffer {
 			this.totaVo.putParam("OCreditSysNo", tFacCaseAppl.getCreditSysNo());
 			this.totaVo.putParam("OSyndNo", tFacCaseAppl.getSyndNo());
 			this.totaVo.putParam("OApplDate", tFacCaseAppl.getApplDate());
+			this.totaVo.putParam("ODepartmentCode", tFacCaseAppl.getDepartmentCode());
 			this.totaVo.putParam("OProdNo", tFacCaseAppl.getProdNo());
 			this.totaVo.putParam("OAcctCode", "");
 			this.totaVo.putParam("OCurrencyCode", tFacCaseAppl.getCurrencyCode());

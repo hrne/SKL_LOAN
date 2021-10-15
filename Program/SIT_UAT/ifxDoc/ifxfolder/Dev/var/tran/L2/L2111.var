@@ -48,6 +48,7 @@ E(0,0)
 [#<->#,"#FdCreditSysNo+案件編號",#CreditSysNo],
 [#<->#,"#FdSyndNo+聯貸案編號",#SyndNo],
 [#<->#,"#FdApplDate+申請日期",#ApplDate,#LbApplDate],
+[#<->#,"#FdDepartmentCode+案件隸屬單位",#DepartmentCode,#DepartmentCodeX],
 [#<->#,"#FdProdNo+申請商品代碼",#ProdNo,#BTN3,#ProdName], 
 ! [#<->#,"#FdAcctCode+申請科目",#AcctCode,#AcctCodeX],
 [#<->#,"#FdCurrencyCode+申請幣別",#CurrencyCode],
@@ -99,18 +100,21 @@ T(3,CdCode.CurrPrecision)
 
 #CurrPrecisionHelp=x,1024,S
 
-
 !YesNo YesNo
 #CDDEF05=x,20,S
 T(3,CdCode.YesNo)
 
 #YesNoHelp=x,1024,S
 
+!DepartmentCode 案件隸屬單位
+#CDDEF06=x,25,S
+T(3,CdCode.DepartmentCode)
 
+#DepartmentCodeHelp=x,1024,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@FuncCodeHelp,#HelpDesc1)
@@ -118,12 +122,26 @@ T(2,@PieceCodeHelp,#HelpDesc2)
 T(2,@ProcessCodeHelp,#HelpDesc3)
 T(2,@CurrPrecisionHelp,#HelpDesc4)
 T(2,@YesNoHelp,#HelpDesc5)
+T(2,@DepartmentCodeHelp,#HelpDesc6)
+
+#Rim1=A,1,S
+
+#SendL2r57=X,1,S
+E(0,@Rim1,1)
+S(L2R57,1,#Rim1)
+R(1,L2R57)
+
+#EntProdNo=x,2480,S
+T(2,#L2r57Help1)
+
+
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2010進入),$)
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
+C(5,#EMPNOT,ELTEST,INVOKEJS(SHOW,p4,1),INVOKEJS(SHOW,p4,0))
 
 #NTXBUF=X,18,S
 C(3,#CHAIN,1,$,S)
@@ -140,6 +158,26 @@ E(0,1)ASGN(AGAIN$)
 #FdFuncCode=X,2,L
 C(3,#CHAIN,1,T(3, ),T(3,*))
 
+#FdCustId=X,2,L
+#FdApplNo=X,2,L
+#FdCreditSysNo=X,2,L
+#FdSyndNo=X,2,L
+#FdApplDate=X,2,L
+#FdDepartmentCode=X,2,L
+#FdProdNo=X,2,L
+#FdCurrencyCode=X,2,L
+#FdApplAmt=X,2,L
+#FdPieceCode=X,2,L
+#FdEstimate=X,2,L
+#FdCreditOfficer=X,2,L
+#FdLoanOfficer=X,2,L
+#FdSupervisor=X,2,L
+#FdCoorgnizer=X,2,L
+#FdIntroducer=X,2,L
+#FdProcessCode=X,2,L
+#FdGroupId=X,2,L
+#FdFacShareApplNo=X,2,L
+#FdJcicMergeFlag=X,2,L
 #FdIsLimit=X,2,L
 #FdIsRelated=X,2,L
 #FdIsLnrelNear=X,2,L
@@ -174,6 +212,7 @@ C(2,#FuncCode,S,T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
 IF(#FuncCode==1 || #FuncCode==3,T(3,@FdApplNo, )T(2,@FdCustId,*),T(2,@FdApplNo,#WkStar)T(2,@FdCustId,))
 T(2,@FdCreditSysNo,#WkStar)
 T(2,@FdApplDate,#WkStar)
+T(2,@FdDepartmentCode,#WkStar)
 T(2,@FdProdNo,#WkStar)
 ! T(2,@FdAcctCode,#WkStar)
 T(2,@FdCurrencyCode, )
@@ -207,6 +246,7 @@ C(3,#FuncCode,3,$,S)
 E(0,@CreditSysNo,#L2r02CreditSysNo)
 E(0,@ApplDate,#L2r02ApplDate)
 E(0,@LbApplDate,#L2r02ApplDate)
+E(0,@DepartmentCode,#L2r02DepartmentCode)
 T(2,@ProdNo,#L2r02ProdNo)
 ! E(0,@AcctCode,#L2r02AcctCode)
 T(2,@CurrencyCode,#L2r02CurrencyCode)
@@ -322,7 +362,6 @@ T(2,@CoorgnizerX,#L2r13FullName)
 
 
 ![統一編號]
-#FdCustId=X,2,L
 
 #CustId=X,10,I
 IF(#FuncCode ==1 || #FuncCode == 3, T(F,#CustId,1),T(F,#CustId,0)HIDE(#BTN1))
@@ -371,9 +410,7 @@ E(0,0)
 
 ![申請號碼]
 !新增時不必輸入由電腦自動給號,其他必須輸入
-#FdApplNo=X,2,L
-C(3,#CHAIN,1,T(3, ),$)
-IF(#FuncCode==1 || #FuncCode==3,T(3, ),$)
+
 
 #ApplNo=A,7,L
 
@@ -393,6 +430,7 @@ C(3,#FuncCode,1,S,$)
 E(0,@CreditSysNo,#L2r02CreditSysNo)
 E(0,@ApplDate,#L2r02ApplDate)
 E(0,@LbApplDate,#L2r02ApplDate)
+E(0,@DepartmentCode,#L2r02DepartmentCode)
 T(2,@ProdNo,#L2r02ProdNo)
 ! E(0,@AcctCode,#L2r02AcctCode)
 T(2,@CurrencyCode,#L2r02CurrencyCode)
@@ -504,6 +542,7 @@ R(1,L2R13)
 T(2,@CoorgnizerX,#L2r13FullName)
 
 !案件核准後,只可修改專辦,協辦, 核決主管,介紹人及駐區資料
+!受理中為0 其他為1
 #ApproveFlag=A,1,S
 E(0,0)
 C(3,#FuncCode,2,$,S)
@@ -514,6 +553,7 @@ C(3,#ApproveFlag,1,$,S)
 T(3,@FdCustId, )
 T(3,@FdCreditSysNo, )
 T(3,@FdApplDate, )
+T(3,@FdDepartmentCode, )
 T(3,@FdProdNo, )
 T(3,@FdApplAmt, )
 T(3,@FdPieceCode, )
@@ -544,6 +584,7 @@ C(3,#UpdateCode,1,
 #TextOnOff=X,1,S
 T(F,#CreditSysNo,1)
 T(F,#ApplDate,1)
+T(F,#DepartmentCode,1)
 T(F,#Estimate,1)
 T(F,#CreditOfficer,1)
 T(F,#GroupId,1)
@@ -551,6 +592,7 @@ C(3,#ApproveFlag,1,$,S)
 HIDE(#BTN3,#BTN4,#BTN5,#BTN10)
 T(F,#PieceCode,0)
 T(F,#CreditSysNo,0)
+T(F,#DepartmentCode,0)
 T(F,#ApplDate,0)
 T(F,#ProdNo,0)
 T(F,#Estimate,0)
@@ -561,6 +603,7 @@ T(F,#GroupId,0)
 C(3,#UpdateCode,1,S,$)
 T(F,#PieceCode,0)
 T(F,#CreditSysNo,0)
+T(F,#DepartmentCode,0)
 T(F,#SyndNo,0)
 T(F,#ProdNo,0)
 T(F,#Estimate,0)
@@ -574,8 +617,6 @@ T(F,#IsSuspectedCheck,0)
 T(F,#IsSuspectedCheckType,0)
 
 !案件編號
-#FdCreditSysNo=X,2,L
-
 #CreditSysNo=A,7,I
 C(3,#ApproveFlag,1,s,$)
 C(2,#FuncCode,S,$,$,$,s,s,S)
@@ -583,7 +624,6 @@ C(2,#FuncCode,S,$,$,$,s,s,S)
 ! IF(#CreditSysNo==#L2r02CreditSysNo,s,$)
 V(2,0)
 ![聯貸案編號]
-#FdSyndNo=X,2,L
 
 #SyndNo=A,6,I
 C(2,#FuncCode,S,$,$,$,s,s,S)
@@ -602,7 +642,6 @@ R(1,L3R10)
 
 
 ![申請日期]
-#FdApplDate=X,2,L
 
 #wkSysCDate=D,7,S
 E(0,#SYSCDATE)
@@ -619,21 +658,33 @@ IF(#ApplDate>#wkSysCDate,V(P,申請日期不可大於日曆日),$)
 
 #LbApplDate=D,7,L
 
+
+!案件隸屬單位
+#DepartmentCode=A,1,I
+C(2,#FuncCode,S,$,$,$,s,s,S)
+C(3,#ApproveFlag,1,s,$)
+HELP(#DepartmentCodeHelp)
+@V(H,#DepartmentCodeHelp)
+C(3,#DepartmentCode,1,T(2,@BUF3,#ProdNo+1+Y),T(2,@BUF3,#ProdNo+1))
+
+#DepartmentCodeX=X,10,L
+T(H,#DepartmentCode,#DepartmentCodeHelp)
+
 #BUF3=X,9,S
-T(2,#ProdNo+1)
+C(3,#DepartmentCode,1,T(2,@BUF3,#ProdNo+1+Y),T(2,@BUF3,#ProdNo+1))
 
 #BIND3A=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF3;ntxbuf5=type<-1:ProdNo<-OOProdNo})
 
 ![申請商品代碼]
-#FdProdNo=X,2,L
 
 #ProdNo=X,5,I
 C(3,#UpdateCode,1,$,s)
 C(3,#ApproveFlag,1,s,$)
+C(3,#DepartmentCode,1,HELP(#EntProdNo),$)
 @
-T(2,@BUF3,#ProdNo+1)
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2001; ntxbuf=#BUF3;ntxbuf5=type<-1:ProdNo<-OOProdNo})
+C(3,#DepartmentCode,1,V(H,#EntProdNo),$)
+C(3,#DepartmentCode,1,T(2,@BUF3,#ProdNo+1+Y),T(2,@BUF3,#ProdNo+1))
 V(7)
 
 #BIND3B=X,1,S
@@ -682,7 +733,6 @@ T(2,@CurrencyCode,#L2r01CurrencyCode)
 ! T(A,#AcctCode,L2DEF,FacmAcctCodeDef,FacmAcctCode,FacmAcctCodeX)
 
 ![申請幣別]
-#FdCurrencyCode=X,2,L
 
 #CurrencyCode=X,3,L
 IF(#FuncCode==1 || #FuncCode==3,T(2,#L2r01CurrencyCode),$)
@@ -693,7 +743,6 @@ IF(#FuncCode==1 || #FuncCode==3,T(2,#L2r01CurrencyCode),$)
 T(H,#CurrencyCode,#CurrPrecisionHelp)
 
 ![申請金額]
-#FdApplAmt=X,2,L
 
 #TwApplAmt=m,14,I
 C(3,#UpdateCode,1,$,s)
@@ -715,10 +764,8 @@ C(3,#Precision,0,X(#TwApplAmt),X(#UsApplAmt))
 P(L,#LbApplAmt)
 
 
-
 ![計件代碼]
 !必須輸入
-#FdPieceCode=X,2,L
 
 #PieceCode=X,1,I
 C(3,#UpdateCode,1,$,s)
@@ -816,7 +863,6 @@ BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF4A;ntxbuf5=type<-1:Estimat
 
 ![估價]
 !可不輸入
-#FdEstimate=X,2,L
 
 #Estimate=X,6,I
 C(3,#UpdateCode,1,$,s)
@@ -849,9 +895,6 @@ T(3,      Y)
 BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF5A;ntxbuf5=type<-1:CreditOfficer<-OOEmployeeNo})
 
 ![授信]
-#FdCreditOfficer=X,2,L
-C(3,#UpdateCode,1,$,S)
-C(3,#ApproveFlag,1,S,$)
 
 #CreditOfficer=X,6,I
 C(3,#UpdateCode,1,$,s)
@@ -886,7 +929,6 @@ BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF6A;ntxbuf5=type<-1:LoanOff
 
 ![放款專員]
 !可不輸入
-#FdLoanOfficer=X,2,L
 
 #LoanOfficer=X,6,I
 C(3,#UpdateCode,1,$,s)
@@ -928,7 +970,6 @@ BIND(#BTN8,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUF8A;ntxbuf5=type<-1:Supervi
 
 ![核決主管]
 !可不輸入
-#FdSupervisor=X,2,L
 
 #Supervisor=X,6,I
 C(3,#UpdateCode,1,$,s)
@@ -962,7 +1003,6 @@ BIND(#BTN9,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BUF9A;ntxbuf5=type<-1:Coorgni
 
 ![協辦]
 !可不輸入
-#FdCoorgnizer=X,2,L
 
 #Coorgnizer=X,6,I
 C(3,#UpdateCode,1,$,s)
@@ -991,7 +1031,6 @@ T(2,#L2r13FullName)
 
 ![介紹人]
 !可不輸入
-#FdIntroducer=X,2,L
 
 #Introducer=X,6,I
 C(3,#UpdateCode,1,$,s)
@@ -1018,7 +1057,6 @@ T(2,#L2r08FullName)
 
 ![處理情形]
 !新增時自動顯示受理中,其他自動顯示不必輸入
-#FdProcessCode=X,2,L
 
 #ProcessCode=A,1,S
 C(2,#FuncCode,S,E(0,0),$,E(0,0),s,s,S)
@@ -1030,7 +1068,6 @@ BIND(#BTN10,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1A;ntxbuf5=type<-1:GroupI
 
 ![團體戶]
 !可不輸入
-#FdGroupId=X,2,L
 
 #GroupId=X,10,I
 IF(#FuncCode ==4 || #FuncCode == 5, HIDE(#BTN10),$)
@@ -1054,6 +1091,20 @@ T(2,#L2r07CustName)
 #ProcessCodeX=X,10,L
 ! T(A,#ProcessCode,L2DEF,ApplProcessCodeDef,ApplProcessCode,ApplProcessCodeX)
 
+!申報戶的核准號碼
+#FacShareApplNo=A,7,I
+C(5,#EMPNOT,ELTEST,$,S)
+!是否合併申報
+#JcicMergeFlag=X,1,I
+C(5,#EMPNOT,ELTEST,$,S)
+T(2,Y)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
+
+#JcicMergeFlagX=X,2,L
+T(H,#JcicMergeFlag,#YesNoHelp)
+
+
 #CheckMod=N,2,S
 C(3,#FuncCode,2,$,S)
 E(0,0)
@@ -1072,6 +1123,7 @@ IF(#GroupId!=#L2r02GroupId,E(0,13),$)
 ! IF(#AcctCode!=#L2r02AcctCode,E(0,3),$) 
 IF(#IsSuspected!=#L1R16IsSuspectedYn,E(0,14),$)
 IF(#IsSuspectedCheck!=#L1R16IsSuspectedYn,E(0,15),$)
+IF(#DepartmentCode!=#DepartmentCode,E(0,16),$)
 
 #MSGERR=X,1,S
 @
@@ -1089,6 +1141,7 @@ V(P,修改時，必須至少修改一個項目)
 <include src="ROM.icf::L2R08.dec"/>
 <include src="ROM.icf::L2R12.dec"/>
 <include src="ROM.icf::L2R13.dec"/>
+<include src="ROM.icf::L2R57.dec"/>
 </sub>
 <sub type="DC" name="p2" layout="cols=3;screen.width=[300,350,300,250];printer.width=[30,30,30,30];order=1">
 [
@@ -1117,6 +1170,15 @@ V(P,修改時，必須至少修改一個項目)
 
 </sub>
 
+<sub type="DC" name="p4" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
+[
+["<font color=red>@共同借款人"],
+["#FdFacShareApplNo+核准號碼",#FacShareApplNo],          
+["#FdJcicMergeFlag+是否合併申報",#JcicMergeFlag,#JcicMergeFlagX],
+]
+
+</sub>
+
 !---------- 輸出共用變數宣告區 ----------
 <sub type="RTN" name="AFXMT">
 <include src="PRT.icf::PRTHEAD.rtn"/>
@@ -1140,7 +1202,7 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#FuncCode#CustId#ApplNo#CreditSysNo#SyndNo#ApplDate#ProdNo#CurrencyCode
+#FuncCode#CustId#ApplNo#CreditSysNo#SyndNo#ApplDate#DepartmentCode#ProdNo#CurrencyCode
 #IsLimit#IsRelated#IsLnrelNear
 #TimApplAmt#Estimate
 #PieceCode#CreditOfficer#LoanOfficer#Introducer#Supervisor#Coorgnizer
@@ -1148,6 +1210,8 @@ T(H,@ProcessCodeX,#ProcessCode,#ProcessCodeHelp)
 #IsSuspected
 #IsSuspectedCheck
 #IsSuspectedCheckType
+#FacShareApplNo
+#JcicMergeFlag
 #END
 </sub>
 
@@ -1166,6 +1230,7 @@ TXFORM=L2111
 <include src="ROM.icf::L2R08.tom"/>
 <include src="ROM.icf::L2R12.tom"/>
 <include src="ROM.icf::L2R13.tom"/>
+<include src="ROM.icf::L2R57.tom"/>
 <include src="ROM.icf::L3R10.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

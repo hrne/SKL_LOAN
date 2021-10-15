@@ -27,6 +27,9 @@ public interface FacShareApplRepositoryMon extends JpaRepository<FacShareAppl, I
   // CustNo = 
   public Slice<FacShareAppl> findAllByCustNoIsOrderByMainApplNoAscKeyinSeqAsc(int custNo_0, Pageable pageable);
 
+  // MainApplNo = 
+  public Optional<FacShareAppl> findTopByMainApplNoIsOrderByKeyinSeqDesc(int mainApplNo_0);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

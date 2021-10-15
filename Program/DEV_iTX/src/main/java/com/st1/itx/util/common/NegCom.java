@@ -1200,7 +1200,7 @@ public class NegCom extends CommBuffer {
 	public void DbJcicZ450(String CustId, NegMain tNegMain, NegTrans tNegTrans, TitaVo titaVo) throws LogicException {
 		JcicZ450Id tJcicZ450Id = new JcicZ450Id();
 		tJcicZ450Id.setApplyDate(tNegMain.getApplDate());
-		tJcicZ450Id.setCourtCode(tNegMain.getCourCode());
+		tJcicZ450Id.setCourtCode(tNegMain.getCourtCode());
 		tJcicZ450Id.setCustId(CustId);
 		tJcicZ450Id.setPayDate(tNegTrans.getEntryDate());
 		tJcicZ450Id.setSubmitKey(tNegMain.getMainFinCode());

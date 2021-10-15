@@ -450,7 +450,7 @@ public class L5701 extends TradeBuffer {
 		String TwoStepCode = titaVo.getParam("TwoStepCode").trim(); // 二階段註記
 		String ChgCondDate = titaVo.getParam("ChgCondDate").trim(); // 申請變更還款條件日
 		String PayerCustNo = titaVo.getParam("PayerCustNo").trim(); // 付款人戶號
-		String CourCode = titaVo.getParam("CourCode").trim(); // 受理調解機構代號
+		String CourtCode = titaVo.getParam("CourtCode").trim(); // 受理調解機構代號
 
 		NegMain InputNegMain = new NegMain();
 
@@ -481,7 +481,7 @@ public class L5701 extends TradeBuffer {
 		InputNegMain.setTwoStepCode(TwoStepCode);// 二階段註記
 		InputNegMain.setPayerCustNo(parse.stringToInteger(PayerCustNo));// 付款人戶號
 		InputNegMain.setChgCondDate(parse.stringToInteger(ChgCondDate));// 申請變更還款條件日
-		InputNegMain.setCourCode(CourCode);// 受理調解機構代號
+		InputNegMain.setCourtCode(CourtCode);// 受理調解機構代號
 
 		return InputNegMain;
 	}

@@ -1,6 +1,5 @@
 package com.st1.itx.db.repository.day;
 
-
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -22,13 +21,12 @@ import com.st1.itx.db.domain.FacProdStepRateId;
  */
 public interface FacProdStepRateRepositoryDay extends JpaRepository<FacProdStepRate, FacProdStepRateId> {
 
-  // ProdNo =  ,AND MonthStart >= ,AND MonthStart <=
-  public Slice<FacProdStepRate> findAllByProdNoIsAndMonthStartGreaterThanEqualAndMonthStartLessThanEqual(String prodNo_0, int monthStart_1, int monthStart_2, Pageable pageable);
+	// ProdNo = ,AND MonthStart >= ,AND MonthStart <=
+	public Slice<FacProdStepRate> findAllByProdNoIsAndMonthStartGreaterThanEqualAndMonthStartLessThanEqual(String prodNo_0, int monthStart_1, int monthStart_2, Pageable pageable);
 
-  // Hold
-  @Lock(value = LockModeType.PESSIMISTIC_READ)
-  @Transactional(readOnly = false)
-  public Optional<FacProdStepRate> findByFacProdStepRateId(FacProdStepRateId facProdStepRateId);
+	// Hold
+	@Lock(value = LockModeType.PESSIMISTIC_READ)
+	@Transactional(readOnly = false)
+	public Optional<FacProdStepRate> findByFacProdStepRateId(FacProdStepRateId facProdStepRateId);
 
 }
-

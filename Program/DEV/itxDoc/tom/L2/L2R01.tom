@@ -4,6 +4,7 @@ OStartDate=9,7
 OEndDate=9,7
 OStatusCode=9,1
 OAgreementFg=X,1
+OEnterpriseFg=X,1
 OCharCode=X,1
 OAcctCode=X,3
 OAcctAcno=9,5

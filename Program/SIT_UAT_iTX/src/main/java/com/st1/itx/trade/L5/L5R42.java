@@ -165,6 +165,7 @@ public class L5R42 extends TradeBuffer {
 						totaVo.putParam("L5R42FinCode"+row, "458");
 						totaVo.putParam("L5R42FinCodeName"+row, sNegCom.FindNegFinAcc("458", titaVo)[0]);// 債權機構名稱
 						totaVo.putParam("L5R42ApprAmt"+row, mNegTrans.getSklShareAmt());
+						totaVo.putParam("L5R42TxAmt", mNegTrans.getTxAmt());
 					}
 				}
 				
