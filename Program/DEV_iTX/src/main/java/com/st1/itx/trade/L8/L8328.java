@@ -31,8 +31,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-
-
 @Service("L8328")
 @Scope("prototype")
 /**
@@ -53,12 +51,12 @@ public class L8328 extends TradeBuffer {
 	SendRsp iSendRsp;
 	@Autowired
 	DataLog iDataLog;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8328 ");
 		this.totaVo.init(titaVo);
-			
+
 		String iTranKey_Tmp = titaVo.getParam("TranKey_Tmp");
 		String iTranKey = titaVo.getParam("TranKey");
 		String iCustId = titaVo.getParam("CustId");
@@ -71,7 +69,7 @@ public class L8328 extends TradeBuffer {
 		BigDecimal iOwnPercentage = new BigDecimal(titaVo.getParam("OwnPercentage"));
 		int iAcQuitAmt = Integer.valueOf(titaVo.getParam("AcQuitAmt"));
 		String iKey = "";
-		//JcicZ448
+		// JcicZ448
 		JcicZ448 iJcicZ448 = new JcicZ448();
 		JcicZ448Id iJcicZ448Id = new JcicZ448Id();
 		iJcicZ448Id.setApplyDate(iApplyDate);
@@ -86,28 +84,31 @@ public class L8328 extends TradeBuffer {
 		iJcicZ446Id.setCourtCode(iCourtCode);
 		iJcicZ446Id.setCustId(iCustId);
 		iJcicZ446Id.setSubmitKey(iSubmitKey);
-		
-		
-		// 檢核項目(D-56)
 
-		// 2 檢核同一key值之「應回報債權金融機構」皆已回報「'442':回報無擔保債權金融資料」、「'443':回報有擔保債權金融資料」檔案資料，否則予以剔退。(交易代碼X者不檢核).***J
-	
-		// 3 檢核第9欄「簽約金額-本金」需等於該債權金融機構報送之「'442':回報無擔保債權金融資料」之17+21+25+29欄位金額加總.(交易代碼X者不檢核)***
-		
-		// 4 各債權金融機構「債權比例」加總需為100.00%，否則予以剔退.***J
-		
-		// 5 任一債權金融機構報送同一KEY值454單獨受償檔案資料後，本檔案資料不得異動、刪除或補件.***J
-		
-		// 6  同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.
-		iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
-		if(iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
-			throw new LogicException(titaVo, "E0005", "同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
-		}// 6 end
-		
+		// 檢核項目(D-56)
+		if (!"4".equals(iTranKey_Tmp)) {
+
+			// 2
+			// 檢核同一key值之「應回報債權金融機構」皆已回報「'442':回報無擔保債權金融資料」、「'443':回報有擔保債權金融資料」檔案資料，否則予以剔退。(交易代碼X者不檢核).***J
+
+			// 3
+			// 檢核第9欄「簽約金額-本金」需等於該債權金融機構報送之「'442':回報無擔保債權金融資料」之17+21+25+29欄位金額加總.(交易代碼X者不檢核)***J
+
+			// 4 各債權金融機構「債權比例」加總需為100.00%，否則予以剔退.***J
+
+			// 5 任一債權金融機構報送同一KEY值454單獨受償檔案資料後，本檔案資料不得異動、刪除或補件.***J
+
+			// 6 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.
+			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
+			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+			} // 6 end
+		}
 		// 檢核條件 end
-		switch(iTranKey_Tmp) {
+
+		switch (iTranKey_Tmp) {
 		case "1":
-			//檢核是否重複，並寫入JcicZ448
+			// 檢核是否重複，並寫入JcicZ448
 			chJcicZ448 = sJcicZ448Service.findById(iJcicZ448Id, titaVo);
 			if (chJcicZ448 != null) {
 				throw new LogicException("E0005", "已有相同資料存在");
@@ -122,10 +123,10 @@ public class L8328 extends TradeBuffer {
 			iJcicZ448.setUkey(iKey);
 			try {
 				sJcicZ448Service.insert(iJcicZ448, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
-			
+
 			break;
 		case "2":
 			iKey = titaVo.getParam("Ukey");
@@ -144,32 +145,32 @@ public class L8328 extends TradeBuffer {
 			JcicZ448 oldJcicZ448 = (JcicZ448) iDataLog.clone(uJcicZ448);
 			try {
 				sJcicZ448Service.update(uJcicZ448, titaVo);
-			}catch (DBException e) {
+			} catch (DBException e) {
 				throw new LogicException("E0005", "更生債權金額異動通知資料");
 			}
 			iDataLog.setEnv(titaVo, oldJcicZ448, uJcicZ448);
 			iDataLog.exec();
 			break;
-		case "4": //需刷主管卡
+		case "4": // 需刷主管卡
 			iJcicZ448 = sJcicZ448Service.findById(iJcicZ448Id);
 			if (iJcicZ448 == null) {
 				throw new LogicException("E0008", "");
 			}
 			if (!titaVo.getHsupCode().equals("1")) {
-				iSendRsp.addvReason(this.txBuffer,titaVo,"0004","");
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 			Slice<JcicZ448Log> dJcicLogZ448 = null;
 			dJcicLogZ448 = sJcicZ448LogService.ukeyEq(iJcicZ448.getUkey(), 0, Integer.MAX_VALUE, titaVo);
 			if (dJcicLogZ448 == null) {
-				//尚未開始寫入log檔之資料，主檔資料可刪除
+				// 尚未開始寫入log檔之資料，主檔資料可刪除
 				try {
 					sJcicZ448Service.delete(iJcicZ448, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
-			}else {//已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
-				//最近一筆之資料
-				JcicZ448Log iJcicZ448Log = dJcicLogZ448.getContent().get(0);			
+			} else {// 已開始寫入log檔之資料，主檔資料還原成最近一筆之內容
+					// 最近一筆之資料
+				JcicZ448Log iJcicZ448Log = dJcicLogZ448.getContent().get(0);
 				iJcicZ448.setSignPrin(iJcicZ448Log.getSignPrin());
 				iJcicZ448.setSignOther(iJcicZ448Log.getSignOther());
 				iJcicZ448.setOwnPercentage(iJcicZ448Log.getOwnPercentage());
@@ -178,7 +179,7 @@ public class L8328 extends TradeBuffer {
 				iJcicZ448.setOutJcicTxtDate(iJcicZ448Log.getOutJcicTxtDate());
 				try {
 					sJcicZ448Service.update(iJcicZ448, titaVo);
-				}catch (DBException e) {
+				} catch (DBException e) {
 					throw new LogicException("E0008", "更生債權金額異動通知資料");
 				}
 			}

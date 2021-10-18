@@ -75,17 +75,13 @@ public class L8336 extends TradeBuffer {
 		// 檢核項目(D-77)
 		if (!"4".equals(iTranKey_Tmp)) {
 
-			if ("A".equals(iTranKey)) {
-				// 二 start key值為「債務人IDN+報送單位代號+申請日期」，不可重複，重複者予以剔退
-				JcicZ574 jJcicZ574 = sJcicZ574Service.findById(iJcicZ574Id, titaVo);
-				if (jJcicZ574 != null) {
-					throw new LogicException("E0005", "key值「債務人IDN+報送單位代號+申請日期」，不可重複.");
-				} // 二 end
+			// 二 key值為「債務人IDN+報送單位代號+申請日期」，不可重複，重複者予以剔退--->檢核在case "1"
 
-				// 三 start 結案日期不可早於申請日期，亦不可晚於報送本檔案日期
-				if (iCloseDate < iApplyDate) {
-					throw new LogicException(titaVo, "E0005", "結案日期不可早於申請日期");
-				}
+			// 三 start 結案日期不可早於申請日期，亦不可晚於報送本檔案日期
+			if (iCloseDate < iApplyDate) {
+				throw new LogicException(titaVo, "E0005", "結案日期不可早於申請日期");
+			}
+			if ("A".equals(iTranKey)) {
 				if (iCloseDate > txDate) {
 					throw new LogicException(titaVo, "E0005", "結案日期不可晚於報送日期");
 				}

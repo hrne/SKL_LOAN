@@ -93,14 +93,15 @@ IF(#FunCode==4,T(F,@FinCode,0)T(F,@FinCodeX,0)T(F,@RemitBank,0)T(F,@RemitAcct,0)
 
 #RimFinCode=X,8,S
 #RimBankCode=X,8,S
-
+#FunctionCode=X,2,S
+T(2,#FunctionCode,0+#FunCode)
 
 #RimL5r12=X,1,S
 C(3,#CHAIN,1,$,s)
 C(4,#FinCode,S,$)
 C(3,#FunCode,1,s,$)
 T(2,@RimBankCode,#FinCode)
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@FinCodeX,#L5r12BankItem)
 
@@ -122,7 +123,7 @@ C(3,#CHAIN,1,$,s)
 C(4,#FinCode,S,$)
 C(3,#FunCode,1,s,$)
 T(2,@RimBankCode,#RemitBank)
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@RemitBankX,#L5r12BankItem)
 
@@ -134,7 +135,7 @@ IF(#FunCode==1,$,s)
 #RimL5r12B=X,1,S
 C(3,#FunCode,1,s,$)
 T(2,@RimBankCode,#RemitBank)
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@RemitBankX,#L5r12BankItem)
 
@@ -155,7 +156,7 @@ T(2,@DataSendSection,#L5r04DataSendSection)
 C(3,#FunCode,1,s,$)
 IF(#DataSendSection!="",$,s)
 T(2,@RimBankCode,#DataSendSection)
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@DataSendSectionX,#L5r12BankItem)
 
@@ -171,7 +172,7 @@ IF(#FunCode==4,s,$)
 
 #RimL5r12D=X,1,S
 T(2,@RimBankCode,#RemitBank)
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@RemitBankX,#L5r12BankItem)
 
@@ -191,7 +192,7 @@ IF(#FunCode==4,s,$)
 #RimL5r12E=X,1,S
 IF(#DataSendSection!="",$,s)
 T(2,@RimBankCode,#DataSendSection)
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@DataSendSectionX,#L5r12BankItem)
 

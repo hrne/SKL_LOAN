@@ -113,8 +113,8 @@ C(3,#ApplNo,0,$,S)
 @IF(#CustNo == 0 && #ApplNo == 0 && #CreditSysNo == 0,V(P,戶號、核准號碼、案件編號，需擇一輸入),$)
 
 
-#CHAINXMT=X,1,S
-C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+!#CHAINXMT=X,1,S
+!C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 #RPTFG=A,1,S
 #RPTFG2=A,1,S

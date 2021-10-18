@@ -25,17 +25,12 @@ import com.st1.itx.db.domain.JcicZ044;
 import com.st1.itx.db.domain.JcicZ044Id;
 import com.st1.itx.db.domain.JcicZ044Log;
 import com.st1.itx.db.domain.JcicZ046;
-import com.st1.itx.db.domain.JcicZ047;
-import com.st1.itx.db.domain.JcicZ047Id;
-import com.st1.itx.db.domain.JcicZ052;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ040Service;
 import com.st1.itx.db.service.JcicZ044Service;
 import com.st1.itx.db.service.JcicZ046Service;
 import com.st1.itx.db.service.JcicZ044LogService;
-import com.st1.itx.db.service.JcicZ047Service;
 import com.st1.itx.db.service.JcicZ048Service;
-import com.st1.itx.db.service.JcicZ052Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -80,11 +75,7 @@ public class L8305 extends TradeBuffer {
 	@Autowired
 	public JcicZ046Service sJcicZ046Service;
 	@Autowired
-	public JcicZ047Service sJcicZ047Service;
-	@Autowired
 	public JcicZ048Service sJcicZ048Service;
-	@Autowired
-	public JcicZ052Service sJcicZ052Service;
 	@Autowired
 	public JcicZ044LogService sJcicZ044LogService;
 	@Autowired
@@ -144,43 +135,20 @@ public class L8305 extends TradeBuffer {
 		iJcicZ040Id.setCustId(iCustId);// 債務人IDN
 		iJcicZ040Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ040Id.setRcDate(iRcDate);
-		JcicZ047 iJcicZ047 = new JcicZ047();
-		JcicZ047Id iJcicZ047Id = new JcicZ047Id();
-		iJcicZ047Id.setCustId(iCustId);// 債務人IDN
-		iJcicZ047Id.setSubmitKey(iSubmitKey);// 報送單位代號
-		iJcicZ047Id.setRcDate(iRcDate);
 
 		// 檢核項目(D-12)
 		if (!"4".equals(iTranKey_Tmp)) {
-			if ("A".equals(iTranKey)) {
-				// 1.2 start 完整key值未曾報送過'40':「前置協商受理申請暨請求回報債權通知」則予以剔退
-				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
-				if (iJcicZ040 == null) {
-					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
-				} // 1.2 end
-			}
+			// 1.2 start 完整key值未曾報送過'40':「前置協商受理申請暨請求回報債權通知」則予以剔退
+			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+			if (iJcicZ040 == null) {
+				throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+			} // 1.2 end
 
 			// 1.3 start 填報本表必須隨同填報'48':「債務人基本資料」，否則則予以剔退.***
 
 			// 1.4 檢核全體債權金融機構均已回報債權後，最大債權金融機構才能報送本表('44':請求同意債務清償方案通知資料).***J
 
-			// 1.5 start 此檔案新增後，於報送'47'「金融機構無擔保債務協議資料」前，僅能異動1次。但若最大債權機構啟動'52'後，將不受此限.
-			if ("C".equals(iTranKey)) {
-				Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
-						Integer.MAX_VALUE, titaVo);
-				if (sJcicZ052 == null) {
-					iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-					if (iJcicZ047 == null) {
-						Slice<JcicZ044Log> sJcicZ044Log = sJcicZ044LogService.ukeyEq(titaVo.getParam("Ukey"), 0,
-								Integer.MAX_VALUE, titaVo);
-						if (sJcicZ044Log != null) {
-							if (sJcicZ044Log.getSize() > 1) {
-								throw new LogicException("E0007", "報送(47)金融機構無擔保債務協議資料前，僅能異動1次.");
-							}
-						}
-					}
-				}
-			} // 1.5 end
+			// 1.5 此檔案新增後，於報送'47'「金融機構無擔保債務協議資料」前，僅能異動1次。但若最大債權機構啟動'52'後，將不受此限.***J
 
 			// 1.6, 1.7, 1.8, 1.10 start 若第31欄「屬二階段還款方案之階段註記」填報1者(第一階段)，4條件
 			if ("1".equals(iGradeType)) {

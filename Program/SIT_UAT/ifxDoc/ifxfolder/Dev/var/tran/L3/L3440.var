@@ -580,7 +580,7 @@ E(0,@RPTYPZ,90)
 
 !應收付總金額,轉暫收金額
 #TotalRepayAmt=m,14.2,S
-E(0,#L3r06Principal+#L3r06Interest+#L3r06DelayInt+#L3r06BreachAmt+#L3r06AcctFee+#L3r06ModifyFee+#L3r06FireFee+#L3r06LawFee+#Shortfall-#TimReduceAmt-#OvduRepaid)
+E(0,#L3r06Principal+#L3r06Interest+#L3r06DelayInt+#L3r06BreachAmt+#L3r06AcctFee+#L3r06ModifyFee+#L3r06FireFee+#L3r06CollFireFee+#L3r06LawFee+#L3r06CollLawFee+#Shortfall-#TimReduceAmt-#OvduRepaid)
 E(0,@RPTOT,#TotalRepayAmt)
 ! C(1,#TotalRepayAmt,E(0,@RPTOT,0)E(0,@TotalRepayAmt,0),$,$)
 

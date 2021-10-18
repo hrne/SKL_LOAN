@@ -112,16 +112,15 @@ public class L8310 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 
 			// 3.1 start 完整key值未曾報送過'47':金融機構無擔保債務協議資料檔案則予以剔退
-			if ("A".equals(iTranKey)) {
-				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-				if (iJcicZ047 == null) {
-					throw new LogicException("E0005", "未曾報送過(47)金融機構無擔保債務協議資料.");
-				} else { // 3.2 start '47':金融機構無擔保債務協議資料檔案第19欄「簽約完成日期」空白則予以剔退
-					if (iJcicZ047.getSignDate() == 0) {
-						throw new LogicException("E0005", "(47)金融機構無擔保債務協議資料之「簽約完成日期」不可空白.");
-					}
+			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+			if (iJcicZ047 == null) {
+				throw new LogicException("E0005", "需先報送過(47)金融機構無擔保債務協議資料.");
+			} else { // 3.2 start '47':金融機構無擔保債務協議資料檔案第19欄「簽約完成日期」空白則予以剔退
+				if ("D".equals(iJcicZ047.getTranKey()) || iJcicZ047.getSignDate() == 0) {
+					throw new LogicException("E0005", "需先報送過(47)金融機構無擔保債務協議資料，且「簽約完成日期」不可空白.");
 				}
-			} // 3 end
+			}
+			// 3 end
 
 			// 4 start第7欄案件進度填報2:最大債權金融機構接獲法院裁定書，則第9-14欄承審法院相關內容必須有值，不能空白，否則則予以剔退
 			if (iClaimStatus == 2 && (iCourtCode.trim().isEmpty() || iYear == 0 || iCourtDiv.trim().isEmpty()

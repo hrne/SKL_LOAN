@@ -30,7 +30,6 @@ import com.st1.itx.util.format.FormatUtil;
  * @version 1.0.0
  */
 public class LC100 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LC100.class);
 
 	@Autowired
 	public TxTellerService txTellerService;
@@ -113,20 +112,20 @@ public class LC100 extends TradeBuffer {
 				}
 				this.totaVo.putParam("TXTNO", tTxTeller.getTxtNo());
 				// MODE 0.本日 1.次日
-				if (tTxTeller.getEntdy() == this.txBuffer.getMgBizDate().getNbsDy()) {
-					this.totaVo.putParam("MODE", "1");
-					this.totaVo.putParam("TXDATE", txBuffer.getMgBizDate().getNbsDy());
-					this.totaVo.putParam("NBSDY", txBuffer.getMgBizDate().getNnbsDy());
-					this.totaVo.putParam("NNBSDY", dDateUtil.getbussDate(txBuffer.getMgBizDate().getNnbsDy(), -1));
-					this.totaVo.putParam("LBSDY", txBuffer.getMgBizDate().getTbsDy());
-				} else {
-					this.totaVo.putParam("MODE", "0");
-					tTxTeller.setEntdy(this.txBuffer.getMgBizDate().getTbsDy());
-					this.totaVo.putParam("TXDATE", txBuffer.getMgBizDate().getTbsDy());
-					this.totaVo.putParam("NBSDY", txBuffer.getMgBizDate().getNbsDy());
-					this.totaVo.putParam("NNBSDY", txBuffer.getMgBizDate().getNnbsDy());
-					this.totaVo.putParam("LBSDY", txBuffer.getMgBizDate().getLbsDy());
-				}
+//				if (tTxTeller.getEntdy() == this.txBuffer.getMgBizDate().getNbsDy()) {
+				this.totaVo.putParam("MODE", "1");
+				this.totaVo.putParam("TXDATE", txBuffer.getMgBizDate().getNbsDy());
+				this.totaVo.putParam("NBSDY", txBuffer.getMgBizDate().getNnbsDy());
+				this.totaVo.putParam("NNBSDY", dDateUtil.getbussDate(txBuffer.getMgBizDate().getNnbsDy(), -1));
+				this.totaVo.putParam("LBSDY", txBuffer.getMgBizDate().getTbsDy());
+//				} else {
+//					this.totaVo.putParam("MODE", "0");
+//					tTxTeller.setEntdy(this.txBuffer.getMgBizDate().getTbsDy());
+//					this.totaVo.putParam("TXDATE", txBuffer.getMgBizDate().getTbsDy());
+//					this.totaVo.putParam("NBSDY", txBuffer.getMgBizDate().getNbsDy());
+//					this.totaVo.putParam("NNBSDY", txBuffer.getMgBizDate().getNnbsDy());
+//					this.totaVo.putParam("LBSDY", txBuffer.getMgBizDate().getLbsDy());
+//				}
 
 				this.totaVo.putParam("DBTO", tTxTeller.getReportDb());
 				this.totaVo.putParam("SWFCD", "");

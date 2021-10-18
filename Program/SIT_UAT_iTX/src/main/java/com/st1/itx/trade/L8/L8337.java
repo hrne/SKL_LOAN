@@ -89,13 +89,7 @@ public class L8337 extends TradeBuffer {
 		// 檢核項目(D-78)
 		if (!"4".equals(iTranKey_Tmp)) {
 
-//			if ("A".equals(iTranKey)) {
-//				// 二 start key值為「債務人IDN+報送單位代號+申請日期+異動債權金機構代號」，不可重複，重複者予以剔退
-//				JcicZ575 jJcicZ575 = sJcicZ575Service.findById(iJcicZ575Id, titaVo);
-//				if (jJcicZ575 != null) {
-//					throw new LogicException("E0005", "key值「債務人IDN+報送單位代號+申請日期」，不可重複.");
-//				} // 二 end
-//			}
+			// 二  key值為「債務人IDN+報送單位代號+申請日期+異動債權金機構代號」，不可重複，重複者予以剔退--->檢核在case "1"
 
 			// 三 start 若異動債權金融機構代號不存在同一更生款項統一收付案件'570'檔案之債權金融機構代號者，予以剔退
 			try {

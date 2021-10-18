@@ -80,14 +80,8 @@ public class L8334 extends TradeBuffer {
 		// 檢核項目(D-74)
 		if (!"4".equals(iTranKey_Tmp)) {
 
-			if ("A".equals(iTranKey)) {
-				// 二 start key值為「債務人IDN+報送單位代號+申請日期+本分配表首繳日+債權金融機構代號」，不可重複，重複者予以剔退
-				JcicZ572 jJcicZ572 = sJcicZ572Service.findById(iJcicZ572Id, titaVo);
-				if (jJcicZ572 != null) {
-					throw new LogicException("E0005", "key值「債務人IDN+報送單位代號+申請日期+本分配表首繳日+債權金融機構代號」，不可重複.");
-				}
-			} // 二 end
-
+			// 二 key值為「債務人IDN+報送單位代號+申請日期+本分配表首繳日+債權金融機構代號」，不可重複，重複者予以剔退--->檢核在case "1"
+				
 			// 三
 			// 同一更生款項統一收付案件，若其一相關債權金融機構('571'第7欄填報為Y者),'571'檔案資料第8欄「債務人是否仍依更生方案正常還款予本金融機構」填報為N，則本檔案資料予以剔退處裡.***J
 			

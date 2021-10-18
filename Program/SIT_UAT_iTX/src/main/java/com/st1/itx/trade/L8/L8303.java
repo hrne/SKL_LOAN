@@ -25,14 +25,14 @@ import com.st1.itx.db.domain.JcicZ042Id;
 import com.st1.itx.db.domain.JcicZ042Log;
 import com.st1.itx.db.domain.JcicZ043;
 import com.st1.itx.db.domain.JcicZ045;
-import com.st1.itx.db.domain.JcicZ053;
+import com.st1.itx.db.domain.JcicZ045Id;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ040Service;
 import com.st1.itx.db.service.JcicZ042Service;
 import com.st1.itx.db.service.JcicZ042LogService;
 import com.st1.itx.db.service.JcicZ043Service;
 import com.st1.itx.db.service.JcicZ045Service;
-import com.st1.itx.db.service.JcicZ053Service;
+
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -82,8 +82,6 @@ public class L8303 extends TradeBuffer {
 	@Autowired
 	public JcicZ045Service sJcicZ045Service;
 	@Autowired
-	public JcicZ053Service sJcicZ053Service;
-	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
 	public DataLog iDataLog;
@@ -127,7 +125,7 @@ public class L8303 extends TradeBuffer {
 		String iKey = "";
 		int sTotalAmt = iExpLoanAmt + iCivil323ExpAmt + iCashCardAmt + iCivil323CashAmt + iCreditCardAmt
 				+ iCivil323CreditAmt;// 信用貸款+現金卡放款+信用卡 本息餘額
-		// JcicZ042, JcicZ040, JcicZ043, JcicZ045, JcicZ053
+		// JcicZ042, JcicZ040, JcicZ043, JcicZ045
 		JcicZ042 iJcicZ042 = new JcicZ042();
 		JcicZ042Id iJcicZ042Id = new JcicZ042Id();
 		iJcicZ042Id.setCustId(iCustId);// 債務人IDN
@@ -140,6 +138,11 @@ public class L8303 extends TradeBuffer {
 		iJcicZ040Id.setCustId(iCustId);// 債務人IDN
 		iJcicZ040Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ040Id.setRcDate(iRcDate);
+		JcicZ045 iJcicZ045 = new JcicZ045();
+		JcicZ045Id iJcicZ045Id = new JcicZ045Id();
+		iJcicZ045Id.setCustId(iCustId);// 債務人IDN
+		iJcicZ045Id.setSubmitKey(iSubmitKey);// 報送單位代號
+		iJcicZ045Id.setRcDate(iRcDate);
 
 		// Date計算
 		int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// 營業日 放acdate
@@ -148,34 +151,22 @@ public class L8303 extends TradeBuffer {
 		// 檢核項目(D-7)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
-			if ("A".equals(iTranKey)) {
-				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
-				if (iJcicZ040 == null) {
-					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
-				} // 2 end
+			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+			if (iJcicZ040 == null) {
+				throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+			} // 2 end
 
-				// 3 start 金融機構報送日大於協商申請日+25則予以剔退
+			// 3 start 金融機構報送日大於協商申請日+25則予以剔退
+			if ("A".equals(iTranKey)) {
 				if (iDays25 > (iRcDate + 19110000)) {// iRcDate協商申請日為民國年
 					throw new LogicException("E0005", "報送日不可大於協商申請日+25");
-				} // 3 end
-				
-				// extra項<JcicZ053>(D-29之4) start
-				// '53'同意報送例外處理檔案第8欄「是否同意報送例外處理檔案格式」填報'Y'者，方可補報送'42'或'43'檔案格式，否則予以剔退處理
-				Slice<JcicZ053> sJcicZ053 = sJcicZ053Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE,
-						titaVo);
-				if (sJcicZ053 != null) {
-					for (JcicZ053 xJcicZ053 : sJcicZ053) {
-						if (!"Y".equals(xJcicZ053.getAgreeSend())) {
-							throw new LogicException("E0005", "已報送(53)同意報送例外處理，則(53)中[是否同意報送例外處理檔案格式]必須填報'Y'.");
-						}
-					}
-				}// extra項 end	
-			}
+				}
+			} // 3 end
 
 			// 4 start 本金融機構債務人必須填報'45':回報是否同意債務清償方案資料
 			if ("Y".equals(iIsClaims)) {
-				Slice<JcicZ045> sJcicZ045 = sJcicZ045Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-				if (sJcicZ045 == null) {
+				iJcicZ045 = sJcicZ045Service.findById(iJcicZ045Id, titaVo);
+				if (iJcicZ045 == null) {
 					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
 				}
 				// 5 start 本金融機構債務人+有擔保債權筆數0，則信用貸款+現金卡放款+信用卡 本息餘額應大於0
@@ -192,14 +183,24 @@ public class L8303 extends TradeBuffer {
 			} // 4,5,7 end
 
 			// 6 start 有擔保債權筆數需等於報送'43':回報有擔保債權金額資料之筆數
-			if (iGuarLoanCnt != 0) {
-				Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-				if (sJcicZ043 == null) {
-					throw new LogicException("E0005", "有擔保債權筆數需等於報送(43)回報有擔保債權金額資料之筆數.");
-				} else if (iGuarLoanCnt != sJcicZ043.getSize()) {
-					throw new LogicException("E0005", "有擔保債權筆數需等於報送(43)回報有擔保債權金額資料之筆數.");
+			Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.coutCollaterals(iCustId, iRcDate + 19110000, iSubmitKey, iMaxMainCode, 0,
+					Integer.MAX_VALUE, titaVo);
+			if (sJcicZ043 == null) {
+				if (iGuarLoanCnt != 0) {
+					throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(43)回報有擔保債權金額資料之筆數.");
 				}
-			} // 6 end
+			} else {
+				int sGuarLoanCnt = 0;
+				for (JcicZ043 xJcicZ043 : sJcicZ043) {
+					if (!"D".equals(xJcicZ043.getTranKey())) {
+						sGuarLoanCnt++;
+					}
+				}
+				if (iGuarLoanCnt != sGuarLoanCnt) {
+					throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(43)回報有擔保債權金額資料之筆數.");
+				}
+			}
+			// 6 end
 
 			// 檢核項目 end
 		}

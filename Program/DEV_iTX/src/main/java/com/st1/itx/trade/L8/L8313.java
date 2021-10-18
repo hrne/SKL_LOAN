@@ -119,17 +119,17 @@ public class L8313 extends TradeBuffer {
 
 		// 檢核項目(D-28)
 		if (!"4".equals(iTranKey_Tmp)) {
+			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
+			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+			if (iJcicZ040 == null) {
+				throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+			}
+
+			// extra項'消費者債務清理條例資料報送作業要點'(P167-12-D start
+			// 同一金融機構要求最大債權金融機構就同一債務人開啟'52'之次數，以一次為限
 			if ("A".equals(iTranKey)) {
-				// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
-				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
-				if (iJcicZ040 == null) {
-					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
-				}
-				
-				// extra項'消費者債務清理條例資料報送作業要點'(P167-12-D start
-				// 同一金融機構要求最大債權金融機構就同一債務人開啟'52'之次數，以一次為限
 				Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-				if(sJcicZ052 != null) {
+				if (sJcicZ052 != null) {
 					throw new LogicException("E0005", "同一金融機構要求最大債權金融機構就同一債務人開啟(52) 前置協商相關資料報送例外處理之次數，以一次為限.");
 				}
 			} // 2 end
@@ -146,8 +146,7 @@ public class L8313 extends TradeBuffer {
 				}
 			}
 			// 4 end
-			
-			
+
 			// 檢核項目end
 		}
 

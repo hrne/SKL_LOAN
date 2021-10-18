@@ -194,6 +194,7 @@ public class AcMainCom extends TradeBuffer {
 
 		// 1.<000:全帳冊>記到子目
 		tAcMainId.setAcBookCode("000");
+		tAcMainId.setAcSubBookCode(ac.getAcSubBookCode());
 		tAcMainId.setBranchNo(ac.getBranchNo());
 		tAcMainId.setCurrencyCode(ac.getCurrencyCode());
 		tAcMainId.setAcNoCode(ac.getAcNoCode());
@@ -212,7 +213,7 @@ public class AcMainCom extends TradeBuffer {
 	 * @param acDate   會計日期
 	 * @param acList   List of AcMain
 	 * @param titaVo   TitaVo
-	 * @throws LogicException 
+	 * @throws LogicException
 	 */
 	public void changeDate(int LbizDate, int acDate, List<AcMain> acList, TitaVo titaVo) throws LogicException {
 		for (AcMain ac : acList) {
@@ -223,6 +224,7 @@ public class AcMainCom extends TradeBuffer {
 				if (profLossList.contains(tAcMainId.getAcNoCode().substring(0, 1)))
 					txAmt = BigDecimal.ZERO;
 			tAcMainId.setAcBookCode(ac.getAcBookCode());
+			tAcMainId.setAcSubBookCode(ac.getAcSubBookCode());
 			tAcMainId.setBranchNo(ac.getBranchNo());
 			tAcMainId.setCurrencyCode(ac.getCurrencyCode());
 			tAcMainId.setAcNoCode(ac.getAcNoCode());

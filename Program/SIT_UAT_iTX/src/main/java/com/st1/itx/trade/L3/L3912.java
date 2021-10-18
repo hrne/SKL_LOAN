@@ -2,8 +2,6 @@ package com.st1.itx.trade.L3;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3912")
 @Scope("prototype")
 public class L3912 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3912.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -66,11 +63,6 @@ public class L3912 extends TradeBuffer {
 		TempVo tTempVo = new TempVo();
 		int RPTFG = 8;
 		BigDecimal wkReduceAmt = BigDecimal.ZERO;
-		BigDecimal wkOvduPaidPrin = BigDecimal.ZERO;
-		BigDecimal wkOvduPaidInt = BigDecimal.ZERO;
-		BigDecimal wkOvduPaidBreach = BigDecimal.ZERO;
-		BigDecimal wkOvduReduceInt = BigDecimal.ZERO;
-		BigDecimal wkOvduReduceBreach = BigDecimal.ZERO;
 
 		// 查詢放款交易內容檔
 		if (iCustNo == 0) {
@@ -139,11 +131,6 @@ public class L3912 extends TradeBuffer {
 		this.info("RPTFG      =" + RPTFG);
 		// Put Tota
 		wkReduceAmt = this.parse.stringToBigDecimal(tTempVo.getParam("ReduceAmt"));
-		wkOvduPaidPrin = this.parse.stringToBigDecimal(tTempVo.getParam("OvduPaidPrin"));
-		wkOvduPaidInt = this.parse.stringToBigDecimal(tTempVo.getParam("OvduPaidInt"));
-		wkOvduPaidBreach = this.parse.stringToBigDecimal(tTempVo.getParam("OvduPaidBreach"));
-		wkOvduReduceInt = this.parse.stringToBigDecimal(tTempVo.getParam("OvduReduceInt"));
-		wkOvduReduceBreach = this.parse.stringToBigDecimal(tTempVo.getParam("OvduReduceBreach"));
 		this.totaVo.putParam("ORPTFG", RPTFG); // rptfg
 		this.totaVo.putParam("OCustNo", tLoanBorTx.getCustNo());
 		this.totaVo.putParam("OFacmNo", tLoanBorTx.getFacmNo());
@@ -204,12 +191,8 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("ONewDueAmt", tTempVo.getParam("NewDueAmt"));
 		this.totaVo.putParam("ONewTotalPeriod", tTempVo.getParam("NewTotalPeriod"));
 		this.totaVo.putParam("ORepayTerms", tLoanBorTx.getRepaidPeriod());
-		this.totaVo.putParam("ORepayAmt",
-				tLoanBorTx.getPrincipal().add(tLoanBorTx.getInterest()).add(tLoanBorTx.getDelayInt())
-						.add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt().subtract(wkReduceAmt))
-						.subtract(tLoanBorTx.getUnpaidPrincipal()).subtract(tLoanBorTx.getUnpaidInterest())
-						.subtract(wkOvduPaidPrin).subtract(wkOvduPaidInt).subtract(wkOvduPaidBreach)
-						.subtract(wkOvduReduceInt).subtract(wkOvduReduceBreach));
+		this.totaVo.putParam("ORepayAmt", tLoanBorTx.getPrincipal().add(tLoanBorTx.getInterest())
+				.add(tLoanBorTx.getDelayInt()).add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()));
 		this.totaVo.putParam("OCloseBreachAmt", tLoanBorTx.getCloseBreachAmt());
 		this.totaVo.putParam("OCloseBreachAmtUnpaid", tTempVo.getParam("CloseBreachAmtUnpaid"));
 		this.totaVo.putParam("OExtraRepay", tLoanBorTx.getExtraRepay());
@@ -238,7 +221,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OAcctFee", tTempVo.getParam("AcctFee"));
 		this.totaVo.putParam("OModifyFee", tTempVo.getParam("ModifyFee"));
 		this.totaVo.putParam("OFireFee", tTempVo.getParam("FireFee"));
-		this.totaVo.putParam("OLawFee", tTempVo.getParam("LawFee"));				
+		this.totaVo.putParam("OLawFee", tTempVo.getParam("LawFee"));
 		this.totaVo.putParam("OOvduPaidPrin", tTempVo.getParam("OvduPaidPrin"));
 		this.totaVo.putParam("OOvduPaidInt", tTempVo.getParam("OvduPaidInt"));
 		this.totaVo.putParam("OOvduPaidBreach", tTempVo.getParam("OvduPaidBreach"));

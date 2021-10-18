@@ -207,6 +207,7 @@ C(3,#HIDE9FG,1,CALL(#HIDEP9),$)
 CALL(#KLIGHT)
 CALL(#showgrd2)
 CALL(#showgrd3)
+CALL(#showgrd4)
 
 !--- P3 利率
 #HIDEP3=@,1,S
@@ -278,12 +279,6 @@ C(3,#HIDE8FG,1,E(0,@HIDE8FG,0),E(0,@HIDE8FG,1))
 INVOKEJS(SHOW,p6,#HIDE8FG)
 C(3,#FuncCode,5,INVOKEJS(SHOW,p8,9,9,#HIDE8FG),$)
 C(5,#BreachFlag,N,INVOKEJS(SHOW,p8,2,9,0),$)
-! INVOKEJS(SHOW,p1,#P8S1,#P6E,0)
-! C(5,#BreachCode,001,INVOKEJS(SHOW,p1,#P8S1,#P8E1,#HIDE8FG),$)
-! C(5,#BreachCode,002,INVOKEJS(SHOW,p1,#P8S2,#P8E2,#HIDE8FG),$)
-! C(5,#BreachCode,003,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
-! C(5,#BreachCode,004,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
-! C(5,#BreachCode,005,INVOKEJS(SHOW,p1,#P8S3,#P8E3,#HIDE8FG),$)
 C(3,#HIDE8FG,1,K(LIGHT,#BTNHIDEP8,TXTRED,0),K(LIGHT,#BTNHIDEP8,TXTRED,-1))
 C(3,#HIDE8FG,1,$,s)
 C(3,#HIDE2FG,1,CALL(#HIDEP2),$)
@@ -659,7 +654,7 @@ E(0,@TwLoanAmtB{n},#L2r01HandlingFeeLoanAmt{n})
 E(0,@UsLoanAmtB{n},#L2r01HandlingFeeLoanAmt{n})
 E(0,@TwHandlingFee{n},#L2r01HandlingFee{n})
 E(0,@UsHandlingFee{n},#L2r01HandlingFee{n})
-C(3,#Precision,0,E(0,@TimLoanAmt{n},#TwLoanAmtB{n}),E(0,@TimLoanAmt{n},#UsLoanAmtB{n}))
+C(3,#Precision,0,E(0,@TimLoanAmtB{n},#TwLoanAmtB{n}),E(0,@TimLoanAmtB{n},#UsLoanAmtB{n}))
 ##end
 T(H,@StatusCodeX,#StatusCode,#StatusCodeHelp)
 C(3,#StatusCode,0,IF(#StartDate <= #wksyscdate,T(3,@StatusCodeX,已生效),T(3,@StatusCodeX,待生效)),$)
@@ -790,7 +785,8 @@ T(2,@FdBreachPercent,#WkSpc)
 T(2,@FdBreachDecreaseMonth,#WkSpc)
 T(2,@FdBreachDecrease,#WkSpc)
 T(2,@FdBreachStartPercent,#WkSpc)
-C(3,#Effective,1,$,S)
+! C(3,#Effective,1,$,S)
+C(3,#Effective,1,C(5,#UseProdFg,Y,$,S),S)
 T(2,@FdProdName,#WkSpc)
 T(2,@FdStatusCode,#WkSpc)
 T(2,@FdAgreementFg,#WkSpc)
@@ -818,7 +814,6 @@ T(2,@FdBreachStartPercent,#WkSpc)
 C(3,#UpdateCode,1,$,S)
 C(3,#FuncCode,2,SHOW(#StatusCode),HIDE(#StatusCode))
 T(F,@ProdName,1)
-T(F,@ProdName,1)
 T(F,@StartDate,1)
 T(F,@EndDate,1)
 T(F,@StatusCode,1)
@@ -838,11 +833,11 @@ T(F,@ProhibitMonth,1)
 #TEXTOFFP2=X,1,S
 C(3,#UpdateCode,0,HIDE(#StatusCode),$)
 IF(#UpdateCode==0 || #Effective==1,$,S)
-HIDE(#GovOfferFlag,#FinancialFlag,#EmpFlag)
-T(F,@ProdName,0)
-T(F,@ProdName,0)
 IF(#UpdateCode==1 && #Effective==1,C(5,#UseProdFg,Y,T(F,@StartDate,0),T(F,@StartDate,1)),T(F,@StartDate,0))
 C(3,#UpdateCode,1,T(F,@EndDate,1),T(F,@EndDate,0))
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
+HIDE(#GovOfferFlag,#FinancialFlag,#EmpFlag)
+T(F,@ProdName,0)
 T(F,@StatusCode,0)
 T(F,@AgreementFg,0)
 T(F,@EnterpriseFg,0)
@@ -884,9 +879,6 @@ T(F,@UsHandlingFee{n},0)
 
 
 #INITP2=X,1,S
-! T(3,@LowAmtTill, ~ )
-! T(3,@LbWKTILL, ~ )
-! T(H,@StatusCodeX,#StatusCode,#StatusCodeHelp)
 T(H,@GovOfferFlagX,#GovOfferFlag,#YesNoHelp) 
 T(H,@FinancialFlagX,#FinancialFlag,#YesNoHelp) 
 T(H,@EmpFlagX,#EmpFlag,#YesNoHelp) 
@@ -896,7 +888,7 @@ T(H,@EmpFlagX,#EmpFlag,#YesNoHelp)
 
 #ProdName=c,60,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 @V(7)
 
 ![商品生效日期]
@@ -975,7 +967,7 @@ IF(#EndDate < #wksyscdate,T(3,已失效),$)
 #FdAgreementFg=X,2,L
 #AgreementFg=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#FuncCode,1,C(4,#AgreementFg,T(3,N),$),$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
@@ -988,10 +980,12 @@ T(H,#AgreementFg,#YesNoHelp)
 
 #EnterpriseFg=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#FuncCode,1,C(4,#EnterpriseFg,T(3,N),$),$)
 HELP(#EnterpriseHELP)
-@V(H,#EnterpriseHELP)
+@
+C(3,#FuncCode,2,C(5,#EnterpriseFg,#L2r01EnterpriseFg,s,$),$)
+V(H,#EnterpriseHELP)
 
 
 #EnterpriseFgX=x,20,L
@@ -1031,7 +1025,7 @@ T(H,#CurrencyCode,#CurrPrecisionHelp)
 
 #GovOfferFlag=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 HELP(#YesNoHelp)
 C(3,#FuncCode,1,C(4,#GovOfferFlag,T(3,N),$),$)
@@ -1046,7 +1040,7 @@ T(H,#GovOfferFlag,#YesNoHelp)
 
 #FinancialFlag=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 HELP(#YesNoHelp)
 C(3,#FuncCode,1,C(4,#FinancialFlag,T(3,N),$),$)
@@ -1061,7 +1055,7 @@ T(H,#FinancialFlag,#YesNoHelp)
 
 #EmpFlag=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE2FG,0,CALL(#HIDEP2),$)
 HELP(#YesNoHelp)
 C(3,#FuncCode,1,C(4,#EmpFlag,T(3,N),$),$)
@@ -1085,7 +1079,8 @@ T(2,@FdProdIncr,#WkSpc)
 T(2,@FdLowLimitRate,#WkSpc)
 T(2,@FdIncrFlag,#WkStar)
 T(2,@FdRateCode,#WkStar)
-C(3,#Effective,1,$,S)
+! C(3,#Effective,1,$,S)
+C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S)
 T(2,@FdBaseRateCode,#WkSpc)
 T(2,@FdBaseRate,#WkSpc)
 T(2,@FdProdRate,#WkSpc)
@@ -1106,6 +1101,7 @@ T(F,@RateCode,1)
 
 #TEXTOFFP3=X,1,S
 IF(#UpdateCode==0 || #Effective==1,$,S)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
 SHOW(#LbProdIncr,#LbLowLimitRate)
 HIDE(#ProdIncr,#ProdIncrX,#LowLimitRate,#LowLimitRateX)
 T(F,@BaseRateCode,0)
@@ -1124,7 +1120,7 @@ T(H,@RateCodeX,#RateCode,#FacmRateCodeHelp)
 
 #BaseRateCode=X,2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 HELP(#BaseRate0Help)
 @V(H,#BaseRate0Help)
@@ -1165,7 +1161,7 @@ T(B,@ProdRateX,#ProdRateX+#WkPercent)
 
 #ProdIncr=+n,2.4,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(5,#BaseRateCode,99,S,$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 C(3,#FuncCode,1,C(3,#ProdIncr,E(0,0),$),$)
@@ -1209,7 +1205,7 @@ T(B,#ProdRateX+#WkPercent)
 
 #LowLimitRate=n,2.4,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 C(3,#FuncCode,1,C(3,#LowLimitRate,0,E(0,0),$),$)
 @V(5,0,99.9999)
@@ -1228,7 +1224,7 @@ T(B,#LbLowLimitRate+#WkPercent)
 
 #RateCode=A,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 HELP(#FacmRateCodeHelp)
 @V(H,#FacmRateCodeHelp)
@@ -1256,6 +1252,7 @@ T(F,@StepRateIncr1,1)
 
 #TEXT_OFF_P4_1=X,1,S
 IF(#UpdateCode==0 || #Effective==1,$,S)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
 HIDE(#StepRateType1)
 T(F,@StepMonthS1,0)
 T(F,@StepMonthE1,0)
@@ -1266,12 +1263,12 @@ T(F,@StepRateIncr1,0)
 C(3,#FuncCode,1,S,$)
 ##loop{times:10,n:1}
 T(3,@StepRateTypeX{n}, )
-T(H,#StepRateType{n},#RateTypeHelp)
+T(H,@StepRateTypeX{n},#StepRateType{n},#RateTypeHelp)
 ##end
 
 #StepMonthS1=N,3,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 INVOKEJS(SHOW,grd1_1,1)
 @
@@ -1280,7 +1277,7 @@ IF(#StepMonthS1!=1,V(P,僅可輸入0，空白及1),$)
 
 #StepMonthE1=N,3,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#StepMonthS1,0,S,$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 @
@@ -1293,7 +1290,7 @@ T(2,#Month1)
 
 #StepRateType1=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#StepMonthE1,0,S,$)
 C(3,#BaseRateCode,99,E(0,1),$)
 HELP(#RateTypeHelp)
@@ -1306,7 +1303,7 @@ T(H,#StepRateType1,#RateTypeHelp)
 
 #StepRateIncr1=+n,2.4,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 C(3,#StepMonthE1,0,S,$)
 @
@@ -1326,7 +1323,9 @@ T(F,@StepRateIncr{n},1)
 
 #TEXT_OFF_P4{n}=X,1,S
 IF(#UpdateCode==0 || #Effective==1,$,S)
-IF(#StepMonthS{n} > 0,SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n})HIDE(#StepRateType{n}),$)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
+IF(#StepMonthS{n} > 0,SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n}),$)
+HIDE(#StepRateType{n})
 T(F,@StepMonthS{n},0)
 T(F,@StepMonthE{n},0)
 T(F,@StepRateIncr{n},0)
@@ -1336,7 +1335,7 @@ T(B,僅可輸入0，空白及+#Month{m})
 
 #StepMonthS{n}=N,3,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 IF({m}==1,$,C(3,#StepMonthS{m},0,S,$))
 C(3,#StepMonthE{m},0,S,$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
@@ -1350,7 +1349,7 @@ C(3,#StepMonthE{m},0,S,IF(#StepMonthS{n}!=#Month{m},V(P,#test{n}),$))
 
 #StepMonthE{n}=N,3,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#StepMonthS{n},0,S,$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 SHOW(#StepMonthS{n},#StepMonthE{n},#StepRateType{n},#StepRateTypeX{n},#StepRateIncr{n},#StepRatePer{n})
@@ -1361,7 +1360,7 @@ E(0,#StepMonthE{n}+1)
 
 #StepRateType{n}=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#StepMonthE{n},0,S,$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 HELP(#RateTypeHelp)
@@ -1375,7 +1374,7 @@ T(H,#StepRateType{n},#RateTypeHelp)
 
 #StepRateIncr{n}=+n,2.4,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE3FG,0,CALL(#HIDEP3),$)
 C(3,#StepMonthE{n},0,S,$)
 @
@@ -1431,13 +1430,14 @@ T(F,@PremiumIncr1,1)
 
 #TEXT_OFF_P6_1=X,1,S
 IF(#UpdateCode==0 || #Effective==1,$,S)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
 T(F,@TwPremium1,0)
 T(F,@UsPremium1,0)
 T(F,@PremiumIncr1,0)
 
 #TwPremium1=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,s)
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 SHOW(#TwPremium1,#PremiumIncr1,#PremiumPer1)
@@ -1447,7 +1447,7 @@ INVOKEJS(SHOW,grd2_1,1)
 
 #UsPremium1=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,s,$)
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 SHOW(#UsPremium1,#PremiumIncr1,#PremiumPer1)
@@ -1461,7 +1461,7 @@ IF(#TimPremium1==0,INVOKEJS(SHOW,grd2_2,0),INVOKEJS(SHOW,grd2_2,1))
 
 #PremiumIncr1=+n,2.4,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 IF(#Precision==0,C(3,#TwPremium1,0,S,$),C(3,#UsPremium1,0,S,$))
 SHOW(#TwPremium1,#PremiumIncr1,#PremiumPer1)
@@ -1488,13 +1488,14 @@ T(F,@UsPremium{n},1)
 #TEXT_OFF_P6{n}=X,1,S
 IF(#TimPremium{m}==0,S,$)
 IF(#UpdateCode==0 || #Effective==1,$,S)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
 T(F,@PremiumIncr{n},0)
 T(F,@TwPremium{n},0)
 T(F,@UsPremium{n},0)
 
 #TwPremium{n}=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,s)
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 IF(#TimPremium{m}==0,S,$)
@@ -1504,7 +1505,7 @@ I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #UsPremium{n}=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,s,$)
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 IF(#TimPremium{m}==0,S,$)
@@ -1518,7 +1519,7 @@ IF(#TimPremium{n}==0,INVOKEJS(SHOW,grd2_{k},0),INVOKEJS(SHOW,grd2_{k},1))
 
 #PremiumIncr{n}=+n,2.4,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE6FG,0,CALL(#HIDEP6),$)
 IF(#Precision==0,C(3,#TwPremium{n},0,S,$),C(3,#UsPremium{n},0,S,$))
 @V(5,-9.9999,-0.0001)
@@ -1571,6 +1572,7 @@ T(F,@UsAcctFee1,1)
 
 #TEXT_OFF_P7_1=X,1,S
 IF(#UpdateCode==0 || #Effective==1,$,S)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
 T(F,@TwLoanAmt1,0)
 T(F,@UsLoanAmt1,0)
 T(F,@TwAcctFee1,0)
@@ -1578,7 +1580,7 @@ T(F,@UsAcctFee1,0)
 
 #TwLoanAmt1=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,S)
 C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
 INVOKEJS(SHOW,grd3_1,1)
@@ -1588,7 +1590,7 @@ C(3,#Precision,0,SHOW(#TwLoanAmt1,#TwAcctFee1)HIDE(#UsLoanAmt1,#UsAcctFee1)
 
 #UsLoanAmt1=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,S,$)
 C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
 INVOKEJS(SHOW,grd3_1,1)
@@ -1601,7 +1603,7 @@ C(3,#Precision,0,E(0,#TwLoanAmt1),E(0,#UsLoanAmt1))
 
 #TwAcctFee1=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,S)
 C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
 C(3,#TwLoanAmt1,0,S,$)
@@ -1612,7 +1614,7 @@ I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #UsAcctFee1=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,S,$)
 C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
 C(3,#UsLoanAmt1,0,S,$)
@@ -1640,6 +1642,7 @@ T(F,@UsAcctFee{n},1)
 
 #TEXT_OFF_P7{n}=X,1,S
 IF(#UpdateCode==0 || #Effective==1,$,S)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
 T(F,@TwLoanAmt{n},0)
 T(F,@UsLoanAmt{n},0)
 T(F,@TwAcctFee{n},0)
@@ -1647,7 +1650,7 @@ T(F,@UsAcctFee{n},0)
 
 #TwLoanAmt{n}=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,S)
 C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
 IF(#TimLoanAmt{m}==0,S,$)
@@ -1658,7 +1661,7 @@ I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #UsLoanAmt{n}=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,S,$)
 C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
 IF(#TimLoanAmt{m}==0,S,$)
@@ -1672,7 +1675,7 @@ C(3,#Precision,0,E(0,#TwLoanAmt{n}),E(0,#UsLoanAmt{n}))
 
 #TwAcctFee{n}=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,S)
 C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
 C(3,#TwLoanAmt{n},0,S,$)
@@ -1681,7 +1684,7 @@ I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #UsAcctFee{n}=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,S,$)
 C(3,#HIDE7FG,0,CALL(#HIDEP7),$)
 C(3,#UsLoanAmt{n},0,S,$)
@@ -1726,6 +1729,7 @@ T(F,@TwHandlingFee{n},1)
 T(F,@UsHandlingFee{n},1)
 ##end
 
+
 #Wk_HIDE_P9_1=@,1,S
 C(3,#Precision,0,SHOW(#TwLoanAmtB1,#TwHandlingFee1)HIDE(#UsLoanAmtB1,#UsHandlingFee1)
                 ,SHOW(#UsLoanAmtB1,#UsHandlingFee1)HIDE(#TwLoanAmtB1,#TwHandlingFee1))
@@ -1739,6 +1743,7 @@ T(F,@UsHandlingFee1,1)
 
 #TEXT_OFF_P9_1=X,1,S
 IF(#UpdateCode==0 || #Effective==1,$,S)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
 T(F,@TwLoanAmtB1,0)
 T(F,@UsLoanAmtB1,0)
 T(F,@TwHandlingFee1,0)
@@ -1746,7 +1751,7 @@ T(F,@UsHandlingFee1,0)
 
 #TwLoanAmtB1=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,S)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
 INVOKEJS(SHOW,grd4_1,1)
@@ -1756,7 +1761,7 @@ C(3,#Precision,0,SHOW(#TwLoanAmtB1,#TwHandlingFee1)HIDE(#UsLoanAmtB1,#UsHandling
 
 #UsLoanAmtB1=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,S,$)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
 INVOKEJS(SHOW,grd4_1,1)
@@ -1769,7 +1774,7 @@ C(3,#Precision,0,E(0,#TwLoanAmtB1),E(0,#UsLoanAmtB1))
 
 #TwHandlingFee1=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,S)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
 C(3,#TwLoanAmtB1,0,S,$)
@@ -1780,7 +1785,7 @@ I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #UsHandlingFee1=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,S,$)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
 C(3,#UsLoanAmtB1,0,S,$)
@@ -1808,6 +1813,7 @@ T(F,@UsHandlingFee{n},1)
 
 #TEXT_OFF_P9{n}=X,1,S
 IF(#UpdateCode==0 || #Effective==1,$,S)
+C(3,#UpdateCode,1,C(3,#Effective,1,C(5,#UseProdFg,Y,$,s),S),$)
 T(F,@TwLoanAmtB{n},0)
 T(F,@UsLoanAmtB{n},0)
 T(F,@TwHandlingFee{n},0)
@@ -1815,7 +1821,7 @@ T(F,@UsHandlingFee{n},0)
 
 #TwLoanAmtB{n}=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,S)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
 IF(#TimLoanAmtB{m}==0,S,$)
@@ -1826,7 +1832,7 @@ I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #UsLoanAmtB{n}=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,S,$)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
 IF(#TimLoanAmtB{m}==0,S,$)
@@ -1840,7 +1846,7 @@ C(3,#Precision,0,E(0,#TwLoanAmtB{n}),E(0,#UsLoanAmtB{n}))
 
 #TwHandlingFee{n}=m,14,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,$,S)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
 C(3,#TwLoanAmtB{n},0,S,$)
@@ -1849,7 +1855,7 @@ I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #UsHandlingFee{n}=m,14.2,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#Precision,0,S,$)
 C(3,#HIDE9FG,0,CALL(#HIDEP9),$)
 C(3,#UsLoanAmtB{n},0,S,$)
@@ -1858,7 +1864,7 @@ I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #TimHandlingFee{n}=m,14.2,S
 C(3,#Precision,0,E(0,#TwHandlingFee{n}),E(0,#UsHandlingFee{n}))
-IF(#TimLoanAmt{n}==0,INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
+IF(#TimLoanAmtB{n}==0,INVOKEJS(SHOW,grd4_{k},0),INVOKEJS(SHOW,grd4_{k},1))
 
 #HIDE_HandlingFee{n}=X,1,S
 IF(#TimHandlingFee{n}==0,HIDE(#TwLoanAmtB{n},#UsLoanAmtB{n},#TwHandlingFee{n},#UsHandlingFee{n}),$)
@@ -1917,7 +1923,7 @@ C(5,#BreachFlag,N,T(3,@BreachCodeX,無)
 
 #BreachFlag=X,1,I
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
@@ -1925,7 +1931,7 @@ HELP(#YesNoHelp)
 #BreachFlagX=X,10,L
 T(H,#BreachFlag,#YesNoHelp)
 C(5,#BreachFlag,Y,INVOKEJS(SHOW,p6,2,8,1),INVOKEJS(SHOW,p6,2,8,0))
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 IF(#BreachFlag=="Y",T(2,@FdBreachCode,#WkStar)
                     T(2,@FdProhibitMonth,#WkStar)
                     T(2,@FdBreachGetCode,#WkStar)
@@ -1957,7 +1963,7 @@ C(5,#BreachFlag,N,HIDE(#BreachCode,#BreachGetCode)
 #BreachCode=X,3,I
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
 HELP(#ProdBreachCodeHelp)
 @V(H,#ProdBreachCodeHelp)
@@ -1980,7 +1986,7 @@ C(5,#BreachFlag,N,T(3,無),$)
 #ProhibitMonth=A,3,I
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
 @
 V(2,0)
@@ -1994,7 +2000,7 @@ V(2,0)
 #BreachGetCode=X,1,I
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 C(3,#HIDE8FG,0,CALL(#HIDEP8),$)
 HELP(#BreachGetCodeHelp)
 @V(H,#BreachGetCodeHelp)
@@ -2010,7 +2016,7 @@ C(5,#BreachGetCode,0,T(3,@BreachGetCodeX,無),$)
 #BreachPercent=n,3.2,I
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 @V(2,0)
 V(5,0,100)
 
@@ -2020,7 +2026,7 @@ V(5,0,100)
 #BreachDecreaseMonth=n,3,I
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 @V(2,0)
 
 !分段遞減百分比
@@ -2029,7 +2035,7 @@ C(3,#Effective,1,s,$)
 #BreachDecrease=n,3.2,I
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 @V(2,0)
 V(5,0,100)
 IF(#BreachDecrease>#BreachPercent,V(P,不可大於違約金百分比),$)
@@ -2040,7 +2046,7 @@ IF(#BreachDecrease>#BreachPercent,V(P,不可大於違約金百分比),$)
 #BreachStartPercent=n,3,I
 C(5,#BreachFlag,N,S,$)
 C(3,#UpdateCode,1,$,s)
-C(3,#Effective,1,s,$)
+C(3,#Effective,1,C(5,#UseProdFg,Y,s,$),$)
 @V(5,0,100)
 
 
@@ -2096,7 +2102,8 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 @
 C(3,#FuncCode,2,$,S)
 IF(#CHECKMOD0==1 || #CHECKMODP4==1 || #CHECKMODP6==1 || #CHECKMODP7==1 || #CHECKMODP8==1 || #CHECKMODP9==1,S,$)
-C(3,#Effective,1,C(5,#UseProdFg,Y,V(P,該商品已生效，只能修改商品截止日期),V(P,該商品已生效，只能修改商品生效日及商品截止日期)),V(P,修改時，必須至少修改一個項目))
+V(P,修改時，必須至少修改一個項目)
+! C(3,#Effective,1,C(5,#UseProdFg,Y,V(P,該商品已生效，只能修改商品截止日期),V(P,該商品已生效，只能修改商品生效日及商品截止日期)),V(P,修改時，必須至少修改一個項目))
 
 #checkenddate=X,1,S
 C(3,#EndDate,0,HIDE(#EndDate),SHOW(#EndDate))

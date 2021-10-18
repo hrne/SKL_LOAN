@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 
 /* 套件 */
@@ -92,7 +91,7 @@ public class L8314 extends TradeBuffer {
 		String iAgreeSendData2 = titaVo.getParam("AgreeSendData2");
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
 		String iKey = "";
-		String[] acceptDataCode = { "42", "43", "61" };// 同意報送檔案格式資料別
+		
 
 		// JcicZ053
 		JcicZ053 iJcicZ053 = new JcicZ053();
@@ -106,27 +105,21 @@ public class L8314 extends TradeBuffer {
 		// 檢核項目(D-29)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start KEY值(IDN+報送單位代號+協商申請日)未曾報送過'52':前置協商相關資料報送例外處理則予以剔退
-			if ("A".equals(iTranKey)) {
-				Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
+			Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.otherEq(iSubmitKey, iCustId, iRcDate + 19110000, 0,
 						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ052 == null) {
 					throw new LogicException("E0005", "未曾報送過(52)前置協商相關資料報送例外處理.");
 				}
-			} // 2 end
+			 // 2 end
 
 			// 3
 			// 後續需檢核補報送金融機構需於最大債權金融機構報送'52':前置協商相關資料報送例外處理檔案格式後3個營業日內回報送本檔案格式並補送相關資料，否則予以剔退處理.***J
 
 			// 4
-			// 檢核第8欄「是否同意報送例外處理檔案格式」填報'Y'者，方可補報送'42'或'43'檔案格式，否則予以剔退處理.-->檢核做在L8303和L8304最後extra項
+			// 檢核第8欄「是否同意報送例外處理檔案格式」填報'Y'者，方可補報送'42'或'43'檔案格式，否則予以剔退處理.***J
 
-			// 5 檢核第9，10欄「同意補報送資料檔案格式之資料別」僅限於"42", "43", "61"，其餘予以剔退處理.
-			if (("Y".equals(iAgreeSend)) && (!Arrays.stream(acceptDataCode).anyMatch(iAgreeSendData1::equals)
-					|| !Arrays.stream(acceptDataCode).anyMatch(iAgreeSendData2::equals))) {
-				throw new LogicException("E0005", "「「同意補報送資料檔案格式資料別」僅限於'42','43','61'.");
-			}
-			// 5 end
-
+			// 5 檢核第9，10欄「同意補報送資料檔案格式之資料別」僅限於"42", "43", "61"，其餘予以剔退處理--->前端處理
+				
 			// 6 本中心將以第8欄「是否同意報送例外處理檔案格式」填報'Y'之筆數，計算該債權金融機構應支付最大債權金融機構之服務費.***J
 
 			// 檢核項目 end

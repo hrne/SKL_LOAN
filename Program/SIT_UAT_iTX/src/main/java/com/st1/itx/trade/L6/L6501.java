@@ -2,8 +2,6 @@ package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,6 @@ import com.st1.itx.util.common.SendRsp;
  * @version 1.0.0
  */
 public class L6501 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6501.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -133,8 +130,8 @@ public class L6501 extends TradeBuffer {
 		mSystemParas.setBusinessType(titaVo.getParam("BusinessType"));
 		mSystemParas.setGraceDays(this.parse.stringToInteger(titaVo.getParam("GraceDays")));
 		mSystemParas.setAchAuthOneTime(titaVo.getParam("AchAuthOneTime"));
-		
-		mSystemParas.setAchDeductFlag(this.parse.stringToInteger(titaVo.getParam("AchDeductFlag")));		
+
+		mSystemParas.setAchDeductFlag(this.parse.stringToInteger(titaVo.getParam("AchDeductFlag")));
 		mSystemParas.setAchDeductDD1(this.parse.stringToInteger(titaVo.getParam("AchDeductDD1")));
 		mSystemParas.setAchDeductDD2(this.parse.stringToInteger(titaVo.getParam("AchDeductDD2")));
 		mSystemParas.setAchDeductDD3(this.parse.stringToInteger(titaVo.getParam("AchDeductDD3")));
@@ -142,7 +139,7 @@ public class L6501 extends TradeBuffer {
 		mSystemParas.setAchDeductDD5(this.parse.stringToInteger(titaVo.getParam("AchDeductDD5")));
 		mSystemParas.setAchSecondDeductDays(this.parse.stringToInteger(titaVo.getParam("AchSecondDeductDays")));
 		mSystemParas.setAchDeductMethod(this.parse.stringToInteger(titaVo.getParam("AchDeductMethod")));
-		
+
 		mSystemParas.setPostDeductFlag(this.parse.stringToInteger(titaVo.getParam("PostDeductFlag")));
 		mSystemParas.setPostDeductDD1(this.parse.stringToInteger(titaVo.getParam("PostDeductDD1")));
 		mSystemParas.setPostDeductDD2(this.parse.stringToInteger(titaVo.getParam("PostDeductDD2")));
@@ -151,7 +148,7 @@ public class L6501 extends TradeBuffer {
 		mSystemParas.setPostDeductDD5(this.parse.stringToInteger(titaVo.getParam("PostDeductDD5")));
 		mSystemParas.setPostSecondDeductDays(this.parse.stringToInteger(titaVo.getParam("PostSecondDeductDays")));
 		mSystemParas.setPostDeductMethod(this.parse.stringToInteger(titaVo.getParam("PostDeductMethod")));
-		
+
 		mSystemParas.setLoanDeptCustNo(this.parse.stringToInteger(titaVo.getParam("LoanDeptCustNo")));
 		mSystemParas.setNegDeptCustNo(this.parse.stringToInteger(titaVo.getParam("NegDeptCustNo")));
 		mSystemParas.setPerfBackRepayAmt(this.parse.stringToBigDecimal(titaVo.getParam("PerfBackRepayAmt")));
@@ -165,6 +162,7 @@ public class L6501 extends TradeBuffer {
 		mSystemParas.setAcctCode330B(this.parse.stringToInteger(titaVo.getParam("AcctCode330B")));
 		mSystemParas.setReduceAmtLimit(this.parse.stringToInteger(titaVo.getParam("ReduceAmtLimit")));
 		mSystemParas.setPreRepayTerms(this.parse.stringToInteger(titaVo.getParam("PreRepayTerms")));
+		mSystemParas.setPreRepayTermsBatch(this.parse.stringToInteger(titaVo.getParam("PreRepayTermsBatch")));
 		mSystemParas.setShortPrinPercent(this.parse.stringToInteger(titaVo.getParam("ShortPrinPercent")));
 		mSystemParas.setShortIntPercent(this.parse.stringToInteger(titaVo.getParam("ShortIntPercent")));
 		mSystemParas.setAmlFg(this.parse.stringToInteger(titaVo.getParam("AmlFg")));

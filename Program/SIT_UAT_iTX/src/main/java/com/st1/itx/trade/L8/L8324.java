@@ -146,7 +146,7 @@ public class L8324 extends TradeBuffer {
 			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
 				iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 				if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
-					throw new LogicException(titaVo, "E0005", "同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動本檔案資料.");
+					throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動本檔案資料.");
 				}
 			} // 9 end
 

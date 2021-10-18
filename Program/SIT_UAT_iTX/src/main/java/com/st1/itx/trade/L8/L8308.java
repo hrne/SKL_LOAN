@@ -1,9 +1,6 @@
 package com.st1.itx.trade.L8;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -22,6 +19,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ044;
+import com.st1.itx.db.domain.JcicZ044Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ047;
 import com.st1.itx.db.domain.JcicZ047Id;
@@ -118,42 +116,32 @@ public class L8308 extends TradeBuffer {
 		int iPayLastAmt2 = Integer.valueOf(titaVo.getParam("PayLastAmt2"));
 
 		String iKey = "";
-		// JcicZ047
+		// JcicZ047,  JcicZ044
 		JcicZ047 iJcicZ047 = new JcicZ047();
 		JcicZ047Id iJcicZ047Id = new JcicZ047Id();
 		iJcicZ047Id.setCustId(iCustId);// 債務人IDN
 		iJcicZ047Id.setSubmitKey(iSubmitKey);// 報送單位代號
 		iJcicZ047Id.setRcDate(iRcDate);
 		JcicZ047 chJcicZ047 = new JcicZ047();
+		JcicZ044 iJcicZ044 = new JcicZ044();
+		JcicZ044Id iJcicZ044Id = new JcicZ044Id();
+		iJcicZ044Id.setCustId(iCustId);// 債務人IDN
+		iJcicZ044Id.setSubmitKey(iSubmitKey);// 報送單位代號
+		iJcicZ044Id.setRcDate(iRcDate);
 
 		// 檢核項目(D-19)
 		if (!"4".equals(iTranKey_Tmp)) {
 
 			// 1.3 start 需檢核最大債權金融機構是否有報送過'44':請求同意債務清償方案通知資料，若無報送則予以剔退
-			if ("A".equals(iTranKey)) {
-				Slice<JcicZ044> sJcicZ044 = sJcicZ044Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-				if (sJcicZ044 == null) {
+				iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id, titaVo);
+				if (iJcicZ044 == null) {
 					throw new LogicException("E0005", "最大債權金融機構未曾報送過(44)請求同意債務清償方案通知資料.");
-				}
-			} // 1.3 end
-
-			// 1.4 start 第7欄期數，第8欄利率需與最近一次'44':請求同意債務清償方案通知資料"對應值一致
-			Slice<JcicZ044> sJcicZ044 = sJcicZ044Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-			if (sJcicZ044 != null) {
-				int sPeriod = 0;
-				BigDecimal sRate = BigDecimal.ZERO;
-				int sLastUpdate = 0;
-				for (JcicZ044 xJcicZ044 : sJcicZ044) {
-					if (TimestampToTime(xJcicZ044.getLastUpdate()) > sLastUpdate) {
-						sLastUpdate = TimestampToTime(xJcicZ044.getLastUpdate());
-						sPeriod = xJcicZ044.getPeriod();
-						sRate = xJcicZ044.getRate();
-					}
-				}
-				if (iPeriod != sPeriod || iRate.compareTo(sRate) != 0) {
+				}// 1.3 end
+				// 1.4 start 第7欄期數，第8欄利率需與最近一次'44':請求同意債務清償方案通知資料"對應值一致
+				else if (iPeriod != iJcicZ044.getPeriod() || iRate.compareTo(iJcicZ044.getRate()) != 0) {
 					throw new LogicException("E0005", "期數，利率需與(44)請求同意債務清償方案通知資料最近一筆報送的資料對應值一致.");
 				}
-			} // 1.4 end
+			// 1.4 end
 
 			// 1.5 檢核第9~14欄若與所有原債權金融機構回報'42':「回報無擔保債權金額資料」債權金額不同時，則予剔退.***J
 
@@ -361,18 +349,4 @@ public class L8308 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	// 轉換：Sql.Timestamp(創建日期)轉int(西元年YYYYMMDD)
-	private int TimestampToTime(Timestamp ts) throws LogicException {
-		int reTimestampToDate = 0;
-		String tsStr = "";
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
-		try {
-			tsStr = dateFormat.format(ts);
-			System.out.println(tsStr);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		reTimestampToDate = Integer.valueOf(tsStr);
-		return reTimestampToDate;
-	}
 }

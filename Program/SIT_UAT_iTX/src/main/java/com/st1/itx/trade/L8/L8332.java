@@ -19,7 +19,6 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ570;
 import com.st1.itx.db.domain.JcicZ570Id;
 import com.st1.itx.db.domain.JcicZ570Log;
-import com.st1.itx.db.domain.JcicZ572;
 import com.st1.itx.db.service.JcicZ570LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ570Service;
@@ -106,7 +105,7 @@ public class L8332 extends TradeBuffer {
 		String iBank29 = titaVo.getParam("Bank29");
 		String iBank30 = titaVo.getParam("Bank30");
 		String iKey = "";
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 營業日 民國YYYMMDD(報送日期)
+
 		JcicZ570 iJcicZ570 = new JcicZ570();
 		JcicZ570Id iJcicZ570Id = new JcicZ570Id();
 		iJcicZ570Id.setApplyDate(iApplyDate);
@@ -117,20 +116,9 @@ public class L8332 extends TradeBuffer {
 		// 檢核項目(D-71)
 		if (!"4".equals(iTranKey_Tmp)) {
 
-			if ("A".equals(iTranKey)) {
-				// 二 start key值為「債務人IDN+報送單位代號+申請日期」，不可重複，重複者予以剔退
-				JcicZ570 jJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
-				if (jJcicZ570 != null) {
-					throw new LogicException("E0005", "key值「債務人IDN+報送單位代號+申請日期」，不可重複.");
-				} // 二 end
-			}
+			// 二 key值為「債務人IDN+報送單位代號+申請日期」，不可重複，重複者予以剔退--->檢核在case "1"
 
-			// 三 start 本檔案報送日為每月11~15日，不符合者剔退（X補件者不在此限)
-			if (!"X".equals(iTranKey)) {
-				if ((txDate % 100) < 11 || (txDate % 100) > 15) {
-					throw new LogicException("E0005", "本檔案報送日為每月11~15日.");
-				}
-			} // 三 end
+			// 三 本檔案報送日為每月11~15日，不符合者剔退（X補件者不在此限)--->1014會議通知不需檢核
 
 			// 四 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
 			if ("C".equals(iTranKey)) {
@@ -140,31 +128,31 @@ public class L8332 extends TradeBuffer {
 					iTranKey = "A";
 				}
 			} // 四 end
-
-			// 七 檢核第7欄「更生債權金融機構家數」與所報送債權金融機構代號筆數是否一致，否則予以剔退******
-			int countBank = 0;// 所報送債權金融機構代號筆數
-			String[] sBank = { iBank1, iBank2, iBank3, iBank4, iBank5, iBank6, iBank7, iBank8, iBank9, iBank10, iBank11,
-					iBank12, iBank13, iBank14, iBank15, iBank16, iBank17, iBank18, iBank19, iBank20, iBank21, iBank22,
-					iBank23, iBank24, iBank25, iBank26, iBank27, iBank28, iBank29, iBank30 };//所報送債權金融機構代號集合
-			for (String xBank : sBank) {
-				if (!xBank.trim().isEmpty()) {
-					countBank++;
-				}
-			}
-			if (iBankCount != countBank) {
-				throw new LogicException("E0005", "「更生債權金融機構家數」與所報送債權金融機構代號筆數不一致.");
-			}
-			// 七 end
 		}
 
-		// 八 同一更生案件「'572'檔案資料建檔完成，不得再異動或刪除本檔案資料，否則予以剔退處理」
-		if ("C".equals(iTranKey) || "D".equals(iTranKey)) {
-			Slice<JcicZ572> sJcicZ572 = sJcicZ572Service.custRcEq(iCustId, iApplyDate + 19110000, 0, Integer.MAX_VALUE,
-					titaVo);
-			if (sJcicZ572 != null) {
-				throw new LogicException("E0005", "同一更生案件「'572'檔案資料建檔完成，不得再異動或刪除本檔案資料.");
-			}
-		}
+		// 七 檢核第7欄「更生債權金融機構家數」與所報送債權金融機構代號筆數是否一致，否則予以剔退--->1014會議通知不需檢核
+//			int countBank = 0;// 所報送債權金融機構代號筆數
+//			String[] sBank = { iBank1, iBank2, iBank3, iBank4, iBank5, iBank6, iBank7, iBank8, iBank9, iBank10, iBank11,
+//					iBank12, iBank13, iBank14, iBank15, iBank16, iBank17, iBank18, iBank19, iBank20, iBank21, iBank22,
+//					iBank23, iBank24, iBank25, iBank26, iBank27, iBank28, iBank29, iBank30 };//所報送債權金融機構代號集合
+//			for (String xBank : sBank) {
+//				if (!xBank.trim().isEmpty()) {
+//					countBank++;
+//				}
+//			}
+//			if (iBankCount != countBank) {
+//				throw new LogicException("E0005", "「更生債權金融機構家數」與所報送債權金融機構代號筆數不一致.");
+//			}
+//			// 七 end
+
+		// 八 同一更生案件「'572'檔案資料建檔完成，不得再異動或刪除本檔案資料，否則予以剔退處理」--->1014會議通知不需檢核
+//		if ("C".equals(iTranKey) || "D".equals(iTranKey)) {
+//			Slice<JcicZ572> sJcicZ572 = sJcicZ572Service.custRcEq(iCustId, iApplyDate + 19110000, 0, Integer.MAX_VALUE,
+//					titaVo);
+//			if (sJcicZ572 != null) {
+//				throw new LogicException("E0005", "同一更生案件「'572'檔案資料建檔完成，不得再異動或刪除本檔案資料.");
+//			}
+//		}
 		// 五 若key值欄位輸入錯誤請以574檔結案後重新新增進件.***J
 
 		// 六 以交易代碼C或D異動/刪除本檔案資料後，系統將自動刪除同一更生統一收付案件相關債權金融機構報送之571檔案資料.***J

@@ -28,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R28 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R28.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -116,6 +115,7 @@ public class L6R28 extends TradeBuffer {
 		this.totaVo.putParam("L6R28AcctCode330B", mSystemParas.getAcctCode330B());
 		this.totaVo.putParam("L6R28ReduceAmtLimit", mSystemParas.getReduceAmtLimit());
 		this.totaVo.putParam("L6R28PreRepayTerms", mSystemParas.getPreRepayTerms());
+		this.totaVo.putParam("L6R28PreRepayTermsBatch", mSystemParas.getPreRepayTermsBatch());
 		this.totaVo.putParam("L6R28ShortPrinPercent", mSystemParas.getShortPrinPercent());
 		this.totaVo.putParam("L6R28ShortIntPercent", mSystemParas.getShortIntPercent());
 		this.totaVo.putParam("L6R28AmlFg", mSystemParas.getAmlFg());

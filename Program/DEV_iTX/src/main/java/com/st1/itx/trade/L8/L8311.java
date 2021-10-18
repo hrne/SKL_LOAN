@@ -115,30 +115,39 @@ public class L8311 extends TradeBuffer {
 
 		// 檢核項目(D-24)
 		if (!"4".equals(iTranKey_Tmp)) {
-
-			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退@@@
+			// 2.1 KEY值（CustId+SubmitKey+RcDate）不存在則予以剔退***不能為空
 			// 2.2 start 完整key值已報送結案則予以剔退
 			if ("A".equals(iTranKey)) {
 				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
 						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
-					throw new LogicException("E0005", "Key值(IDN+報送單位代號+協商申請日)已報送(46)結案通知資料.");
-				} // 2.2 end
+					int sTranKey = 0;
+					for (JcicZ046 xJcicZ046 : sJcicZ046) {
+						if (!"D".equals(xJcicZ046.getTranKey())) {
+							sTranKey = 1;
+						}
+					}
+					if (sTranKey == 1) {
+						throw new LogicException("E0005", "Key值(IDN+報送單位代號+協商申請日)已報送(46)結案通知資料.");
+					}
+				}
+			} // 2.2 end
 
-				// 5 start 同一協商案件首次報送本檔案時，若尚未報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期',則予以剔退
-				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-				if (iJcicZ047 == null) {
-					throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料.");
-				} else if (iJcicZ047.getSignDate() == 0) {
-					throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料，且「簽約完成日期」欄不能為空.");
-				} // 5 end
-			}
+			// 5 start 同一協商案件首次報送本檔案時，若尚未報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期',則予以剔退
+			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+			if (iJcicZ047 == null) {
+				throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料.");
+			} else if ("D".equals(iJcicZ047.getTranKey()) || iJcicZ047.getSignDate() == 0) {
+				throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料，且「簽約完成日期」欄不能為空.");
+			} // 5 end
 
 			// 3 start 若第9欄累計實際還款金額不等於該IDN所有已報送本檔案資料之第8欄繳款金額之合計，則予以剔退
 			Slice<JcicZ050> sJcicZ050 = sJcicZ050Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ050 != null) {
 				for (JcicZ050 xJcicZ050 : sJcicZ050) {
-					sPayAmt += xJcicZ050.getPayAmt();
+					if (!"D".equals(xJcicZ050.getTranKey())) {
+						sPayAmt += xJcicZ050.getPayAmt();
+					}
 				}
 			}
 			if (sPayAmt != iSumRepayActualAmt) {
@@ -151,7 +160,9 @@ public class L8311 extends TradeBuffer {
 			// 檢核項目 end
 		}
 
-		switch (iTranKey_Tmp) {
+		switch (iTranKey_Tmp)
+
+		{
 		case "1":
 			// 檢核是否重複，並寫入JcicZ050
 			chJcicZ050 = sJcicZ050Service.findById(iJcicZ050Id, titaVo);

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("systemParasService")
 @Repository
-public class SystemParasServiceImpl implements SystemParasService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(SystemParasServiceImpl.class);
-
+public class SystemParasServiceImpl extends ASpringJpaParm implements SystemParasService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class SystemParasServiceImpl implements SystemParasService, InitializingB
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + businessType);
+    this.info("findById " + dbName + " " + businessType);
     Optional<SystemParas> systemParas = null;
     if (dbName.equals(ContentName.onDay))
       systemParas = systemParasReposDay.findById(businessType);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "BusinessType"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "BusinessType"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = systemParasReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -117,7 +113,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + businessType);
+    this.info("Hold " + dbName + " " + businessType);
     Optional<SystemParas> systemParas = null;
     if (dbName.equals(ContentName.onDay))
       systemParas = systemParasReposDay.findByBusinessType(businessType);
@@ -135,7 +131,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + systemParas.getBusinessType());
+    this.info("Hold " + dbName + " " + systemParas.getBusinessType());
     Optional<SystemParas> systemParasT = null;
     if (dbName.equals(ContentName.onDay))
       systemParasT = systemParasReposDay.findByBusinessType(systemParas.getBusinessType());
@@ -157,7 +153,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + systemParas.getBusinessType());
+    this.info("Insert..." + dbName + " " + systemParas.getBusinessType());
     if (this.findById(systemParas.getBusinessType()) != null)
       throw new DBException(2);
 
@@ -186,7 +182,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + systemParas.getBusinessType());
+    this.info("Update..." + dbName + " " + systemParas.getBusinessType());
     if (!empNot.isEmpty())
       systemParas.setLastUpdateEmpNo(empNot);
 
@@ -209,7 +205,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + systemParas.getBusinessType());
+    this.info("Update..." + dbName + " " + systemParas.getBusinessType());
     if (!empNot.isEmpty())
       systemParas.setLastUpdateEmpNo(empNot);
 
@@ -229,7 +225,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + systemParas.getBusinessType());
+    this.info("Delete..." + dbName + " " + systemParas.getBusinessType());
     if (dbName.equals(ContentName.onDay)) {
       systemParasReposDay.delete(systemParas);	
       systemParasReposDay.flush();
@@ -258,7 +254,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (SystemParas t : systemParas){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -293,7 +289,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (systemParas == null || systemParas.size() == 0)
       throw new DBException(6);
 
@@ -322,7 +318,7 @@ em = null;
 
   @Override
   public void deleteAll(List<SystemParas> systemParas, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

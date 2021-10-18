@@ -131,21 +131,21 @@ public class L8307 extends TradeBuffer {
 				if (iCloseDate > txDate) {
 					throw new LogicException("E0005", "結案日期不可晚於報送本檔案日期.");
 				} // 1.3.2 end
-
-				// 1.4.1 結案原因代號為協商不成立或毀諾案件者，不能再度申請前置協商-->同L8301(檢核JcicZ040)-1.6.2
-				// 1.4.2 結案原因代號為視同未請求協商案件，且結案未滿180天，不能再度申請前置協商-->同L8301(檢核JcicZ040)-1.6.3
-
-				// 1.5 start 報送'47':金融機構無擔保債務協議資料簽約完成後，本檔案結案原因代號僅能報送00，01，99
-				if (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals)) {
-					iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-					if (iJcicZ047 != null) {
-						if (iJcicZ047.getSignDate() > 0 && iJcicZ047.getSignDate() <= txDate) {
-							throw new LogicException("E0005", "金融機構無擔保債務協議資料已經簽約完成，本檔案結案原因代號僅能報送00，01或99.");
-						}
-					}
-				} // 1.5 end
 			}
-			
+
+			// 1.4.1 結案原因代號為協商不成立或毀諾案件者，不能再度申請前置協商-->同L8301(檢核JcicZ040)-1.6.2
+			// 1.4.2 結案原因代號為視同未請求協商案件，且結案未滿180天，不能再度申請前置協商-->同L8301(檢核JcicZ040)-1.6.3
+
+			// 1.5 start 報送'47':金融機構無擔保債務協議資料簽約完成後，本檔案結案原因代號僅能報送00，01，99
+			if (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals)) {
+				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+				if (iJcicZ047 != null && !"D".equals(iJcicZ047.getTranKey())) {
+					if (iJcicZ047.getSignDate() > 0 && iJcicZ047.getSignDate() <= txDate) {
+						throw new LogicException("E0005", "金融機構無擔保債務協議資料已經簽約完成，本檔案結案原因代號僅能報送00，01或99.");
+					}
+				}
+			} // 1.5 end
+
 			// 1.3.1 結案日期不可早於協商申請日。
 			if (iCloseDate < iRcDate) {
 				throw new LogicException("E0005", "結案日期不可早於協商申請日.");
@@ -153,19 +153,21 @@ public class L8307 extends TradeBuffer {
 
 			// 1.6 start 同一key值於'51':延期繳款(喘息期)期間不可報送'00'毀諾
 			if ("00".equals(iCloseCode)) {
-				Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-						Integer.MAX_VALUE, titaVo);
-				if (sJcicZ051 != null) {
-					int sDelayYM = 0;// 最晚「延期繳款年月」
-					for (JcicZ051 xJcicZ051 : sJcicZ051) {
-						if (xJcicZ051.getDelayYM() > sDelayYM) {
-							sDelayYM = xJcicZ051.getDelayYM();
+				if ("A".equals(iTranKey)) {
+					Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0,
+							Integer.MAX_VALUE, titaVo);
+					if (sJcicZ051 != null) {
+						int sDelayYM = 0;// 最晚「延期繳款年月」
+						for (JcicZ051 xJcicZ051 : sJcicZ051) {
+							if (!"D".equals(xJcicZ051.getTranKey()) && xJcicZ051.getDelayYM() > sDelayYM) {
+								sDelayYM = xJcicZ051.getDelayYM();
+							}
 						}
-					}
-					// 日期格式不一致， xJcicZ051.getDelayYM()是YYYMM，日期設31-->不合理，但不影響檢核
-					int formateDelayYM = Integer.parseInt(sDelayYM + "31");
-					if (txDate <= formateDelayYM) {
-						throw new LogicException("E0005", "於(51)延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
+						// 日期格式不一致， xJcicZ051.getDelayYM()是YYYMM，日期設31-->不合理，但不影響檢核
+						int formateDelayYM = Integer.parseInt(sDelayYM + "31");
+						if (txDate <= formateDelayYM) {
+							throw new LogicException("E0005", "於(51)延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
+						}
 					}
 				} // 1.6 end
 

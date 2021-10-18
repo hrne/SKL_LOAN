@@ -109,29 +109,36 @@ public class L8302 extends TradeBuffer {
 		// 檢核項目(D-4)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
-			if ("A".equals(iTranKey)) {
-				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
-				if (iJcicZ040 == null) {
+			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+			if (iJcicZ040 == null) {
+				if ("1".equals(iTranKey_Tmp)) {
 					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+				} else {
+					throw new LogicException("E0007", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
 				}
-			} // 2 end
+			}
+			// 2 end
 
-			// 3.1最大債權金融機構應於七項文件齊全後報送本檔案格式，此時需報送第9欄停催日(第7欄協商開始日可為空白)，並且於實際協商開始(最晚收件後第25日)時再度報送異動本檔案格式***
+			// 3.1最大債權金融機構應於七項文件齊全後報送本檔案格式，此時需報送第9欄停催日(第7欄協商開始日可為空白)，並且於實際協商開始(最晚收件後第25日)時再度報送異動本檔案格式***J
 
 			// 3.2 start (***此時異動，協商開始日iNegoStartDate和停催日iScDate必須有值)
 			if ("C".equals(iTranKey) && (iNegoStartDate == 0 || iScDate == 0)) {
 				JcicZ041 jJcicZ041 = sJcicZ041Service.findById(iJcicZ041Id, titaVo);
-				if(jJcicZ041 != null) {
+				if (jJcicZ041 != null) {
 					int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// today(本檔案報送日 西元年)
-					if(txDate >= (TimestampToDate(jJcicZ041.getCreateDate()) + 24)) {
-						throw new LogicException("E0007", "異動時，協商開始日和停催日必須有值");						
+					if (txDate >= (TimestampToDate(jJcicZ041.getCreateDate()) + 24)) {
+						throw new LogicException("E0007", "異動時，協商開始日和停催日必須有值");
 					}
 				}
 			} // 3.2 end
 
 			// 4 start 停催日大於協商開始日則予以剔退
 			if (iNegoStartDate != 0 && iScDate > iNegoStartDate) {
-				throw new LogicException("E0005", "停催日不可大於協商開始日");
+				if ("1".equals(iTranKey_Tmp)) {
+					throw new LogicException("E0005", "停催日不可大於協商開始日");
+				} else {
+					throw new LogicException("E0007", "停催日不可大於協商開始日");
+				}
 			} // 4 end
 				// 檢核項目 end
 		}
@@ -216,7 +223,7 @@ public class L8302 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	// 轉換：Sql.Timestamp(創建日期)轉int(西元年YYYYMMDD)
 	private int TimestampToDate(Timestamp ts) throws LogicException {
 		int reTimestampToDate = 0;

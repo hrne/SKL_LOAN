@@ -121,14 +121,14 @@ public class L8327 extends TradeBuffer {
 			if (iFirstPayDate < iSignDate) {
 				throw new LogicException("E0005", "「首期應繳款日」不得小於「簽約完成日」.");
 			} // 5 end
-		}
 
 		// 6 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.
 		iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 		if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
-			throw new LogicException(titaVo, "E0005", "同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+			throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
 		} // 6 end
 
+		}
 		// 檢核條件 end
 
 		switch (iTranKey_Tmp) {

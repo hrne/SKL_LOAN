@@ -2,11 +2,12 @@ package com.st1.itx.trade.LY;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,14 +18,13 @@ import com.st1.itx.db.service.springjpa.cm.LY002ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
 
-@Component("LY002Report")
+@Component
 @Scope("prototype")
 
 public class LY002Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LY002Report.class);
 
 	@Autowired
-	public LY002ServiceImpl LY002ServiceImpl;
+	public LY002ServiceImpl lY002ServiceImpl;
 
 	@Autowired
 	public MakeExcel makeExcel;
@@ -34,109 +34,371 @@ public class LY002Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo) throws LogicException {
-//		String iPage = titaVo.getParam("Page").trim();
-		// 設定資料庫(必須的)
-//		LY002ServiceImpl.getEntityManager(titaVo);
+	List<Map<String, Object>> mergeEva = new ArrayList<Map<String, Object>>();
+	Map<String, Object> mergeEvaMap = null;
+	int countEva = 1;
+
+	List<Map<String, Object>> mergeLine =  new ArrayList<Map<String, Object>>();
+	Map<String, Object> mergeLineMap = null;
+	int countLine = 1;
+
+	public boolean exec(TitaVo titaVo) throws LogicException {
+		this.info("LY002.exportExcel active");
+
+		List<Map<String, String>> lY002List = null;
+
+		// 年月底
+		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
+
 		try {
 
-//			List<HashMap<String, String>> LY002List = LY002ServiceImpl.findAll();
-//			if(LY002List.size() > 0){
-			testExcel(titaVo);
-//			  testExcel(titaVo, LY002List);
-//			}
+			lY002List = lY002ServiceImpl.findAll(titaVo, endOfYearMonth);
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
-			this.info("LY002ServiceImpl.testExcel error = " + errors.toString());
+			this.info("LY002ServiceImpl.exportExcel error = " + errors.toString());
 		}
-	}
 
-	private void testExcel(TitaVo titaVo, List<HashMap<String, String>> LDList) throws LogicException {
-		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表", "LY002-非RBC_表14-1_會計部年度檢查報表", "非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
-//		makeExcel.setValue(5,1,"測試帳號");
-//		makeExcel.setValue(1,1,"測試2");
-//		String inf = "經辦;房貸專員;戶名;戶號;額度;"  // 24
-//				+ "撥款;撥款日;利率代碼;計件代碼;是否計件;"
-//				+ "撥款金額;部室代號;區部代號;單位代號;部室;"
-//				+ "區部;單位;員工代號;介紹人;處經理;"
-//				+ "區經理;換算業績;業務報酬;業績金額";
-//		String txt = "F0;F1;F2;F3;F4;F5;F6;F7;F8;F9;F10;F11;F12;F13;F14;F15;F16;F17;F18;F19;F20;F21;F22;F23";
-//		
-//		String inf1[] = inf.split(";");
-//		String txt1[] = txt.split(";") ;
-//		int i = 1;
-//		this.info("-----------------" + LDList);
-//		for (HashMap<String, String> tLDVo : LDList) {
-//			for( int j = 1 ; j <= tLDVo.size(); j++) {
-//				if( i == 1) {
-//					makeExcel.setValue(i, j, inf1[j-1]);
-//				} else {
-//					if(tLDVo.get(txt1[j-1]) == null) {
-//						makeExcel.setValue(i, j, "");
-//					} else {
-//						this.info("->" + tLDVo.get(txt1[j-1]));
-//						makeExcel.setValue(i, j, tLDVo.get(txt1[j-1]));
-//					}
-//				} // else 
-//			}		
-//			i++;
-//		}
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表",
+				"LY002_非RBC_表14-1_會計部年度檢查報表", "LY002_底稿_非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
+
+		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
+		int rocMonth = 12;
+
+		makeExcel.setValue(1, 2, "新光人壽保險股份有矽公司 " + rocYear + "年度(" + rocMonth + ")報表");
+
+		if (lY002List.size() > 0) {
+
+			exportExcel(lY002List);
+
+		} else {
+
+			makeExcel.setValue(7, 3, "本日無資料");
+
+		}
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
+
+		if (lY002List.size() > 0) {
+
+			return true;
+
+		} else {
+
+			return false;
+
+		}
+
 	}
 
-	private void testExcel(TitaVo titaVo) throws LogicException {
-		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LY002", "非RBC_表14-1_會計部年度檢查報表", "LY002-非RBC_表14-1_會計部年度檢查報表", "非RBC_表14-1_會計部年度檢查報表.xlsx", "表14-1");
-		// makeExcel.setValue(5,1,"測試日期");
-//		makeExcel.setSheet("201903-固定");
+	/*
+	 * F0 戶號 F1 ID 統編或身分證 F2 客戶名稱 F3 利害關係人 F4 與本公司之關係 F5 放款種類 F6 放款科目 F7 放款年月日 F8
+	 * 放款到期年月日 F9 放款年利率% F10 付息方式 F11 最後腳昔日 F12 提供人代號(統編或身分證) F13 提供人姓名 F14 設定順位 F15
+	 * 估計總值 F16 核貸金額 F17 NTD F18 放款餘額 F19 應收利息 F20 資產分類
+	 * 
+	 */
+	private void exportExcel(List<Map<String, String>> lDList) throws LogicException {
 
-		makeExcel.setValue(7, 3, "2XXXXX22");
-		makeExcel.setValue(7, 4, "拉X建設股份有限公司");
-		makeExcel.setValue(7, 5, "C");
-		makeExcel.setValue(7, 6, "E");
-		makeExcel.setValue(7, 7, "C");
-		makeExcel.setValue(7, 8, "B2");
-		makeExcel.setValue(7, 9, "20200701");
-		makeExcel.setValue(7, 10, "20300701");
-		makeExcel.setValue(7, 11, "1,6666");
-		makeExcel.setValue(7, 12, "E");
-		makeExcel.setValue(7, 13, "20290501");
-		makeExcel.setValue(7, 14, "2XXXXX22");
-		makeExcel.setValue(7, 15, "拉X建設股份有限公司");
-		makeExcel.setValue(7, 16, "1");
-		makeExcel.setValue(7, 17, "7,777,777,777");
-		makeExcel.setValue(7, 18, "4,000,000,000");
-		makeExcel.setValue(7, 19, "NTD");
-		makeExcel.setValue(7, 20, "3,333,333,333");
-		makeExcel.setValue(7, 21, "0.16%");
-		makeExcel.setValue(7, 22, "4.44%");
-		makeExcel.setValue(7, 23, "-");
-		makeExcel.setValue(7, 33, "V");
-		makeExcel.setValue(7, 37, "666666");
+		int row = 6;
 
-		makeExcel.setValue(16, 17, "7,777,777,777");
-		makeExcel.setValue(16, 18, "4,000,000,000");
-		makeExcel.setValue(16, 20, "3,333,333,333");
-		makeExcel.setValue(16, 21, "0.16%");
-		makeExcel.setValue(16, 22, "4.44%");
+		int count = 0;
 
-		makeExcel.setValue(20, 17, "7,777,777,777");
-		makeExcel.setValue(20, 18, "4,000,000,000");
-		makeExcel.setValue(20, 20, "3,333,333,333");
-		makeExcel.setValue(20, 21, "0.16%");
-		makeExcel.setValue(20, 22, "4.44%");
-		makeExcel.setValue(21, 17, "7,777,777,777");
-		makeExcel.setValue(21, 18, "4,000,000,000");
-		makeExcel.setValue(21, 20, "55,555,555");
-		makeExcel.setValue(21, 22, "2,255,555,555");
+		String tempId = "";
 
-		long sno = makeExcel.close();
-		makeExcel.toExcel(sno);
+		BigDecimal tempEvaAmt = BigDecimal.ZERO;
+		BigDecimal tempLineAmt = BigDecimal.ZERO;
+		BigDecimal tempLoanAmt = BigDecimal.ZERO;
+
+		String custNo = "";
+		String facmNo = "";
+		String clNo = "";
+
+		for (Map<String, String> tLDVo : lDList) {
+
+			row++;
+
+			makeExcel.setShiftRow(row, 1);
+
+			if (!tempId.equals(tLDVo.get("F1").toString())) {
+				count++;
+				tempId = tLDVo.get("F1").toString();
+			}
+
+
+			// 列號
+			makeExcel.setValue(row, 2, count, "C");
+
+			// F1 代號(統一編號或身分證)
+			makeExcel.setValue(row, 3, tempId, "L");
+
+			// F2 名稱
+			makeExcel.setValue(row, 4, tLDVo.get("F2"), "L");
+
+			// F3 是否為關係人
+			makeExcel.setValue(row, 5, tLDVo.get("F3"), "C");
+
+			// F4 與本公司之關係
+			makeExcel.setValue(row, 6, tLDVo.get("F4"), "C");
+
+			// F5 放款種類
+			makeExcel.setValue(row, 7, tLDVo.get("F5"), "C");
+
+			// F6 放款科目
+			makeExcel.setValue(row, 8, tLDVo.get("F6"), "C");
+
+			// F7 放款年月日 (設定格式)
+			makeExcel.setValue(row, 9, tLDVo.get("F7"), "C");
+
+			// F8 到期年月日 (設定格式)
+			makeExcel.setValue(row, 10, tLDVo.get("F8"), "C");
+
+			// F9 放款年利率% (設定格式)
+			makeExcel.setValue(row, 11, tLDVo.get("F9"), "C");
+
+			// F10 付息方式
+			makeExcel.setValue(row, 12, tLDVo.get("F10"), "C");
+
+			// F11 最後繳息日 (設定格式)
+			makeExcel.setValue(row, 13, tLDVo.get("F11"), "C");
+
+			// F12 提供人代號
+			makeExcel.setValue(row, 14, tLDVo.get("F12"), "L");
+
+			// F13 提供人名稱
+			makeExcel.setValue(row, 15, tLDVo.get("F13"), "L");
+
+			// F14 設定順位
+			makeExcel.setValue(row, 16, tLDVo.get("F14"), "C");
+
+			// F15 估計總值
+			tempEvaAmt = tLDVo.get("F15").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F15"));
+
+			// F16 核貸金額
+			tempLineAmt = tLDVo.get("F16").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F16"));
+			
+			// F0 戶號
+			custNo = tLDVo.get("F0");
+			// F21 額度
+			facmNo = tLDVo.get("F21");
+			// F22 擔保品號碼
+			clNo = tLDVo.get("F22");
+			
+			//合併另外做處理
+			checkMergeRegionValue(custNo, facmNo, clNo, tempEvaAmt, tempLineAmt);
+
+			//			對照用
+//			makeExcel.setValue(row, 25, custNo, "C");
+//			makeExcel.setValue(row, 26, facmNo, "C");
+//			makeExcel.setValue(row, 27, clNo, "C");
+//			makeExcel.setValue(row, 28, tempEvaAmt, "C");
+//			makeExcel.setValue(row, 29, tempLineAmt, "C");
+
+			// F17 幣別
+			makeExcel.setValue(row, 19, tLDVo.get("F17"), "C");
+
+			// F18 放款餘額
+			tempLoanAmt = tLDVo.get("F18").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F18"));
+			makeExcel.setValue(row, 20, tempLoanAmt, "#,##0");
+
+			// 占資金總額比率
+			makeExcel.setValue(row, 21, 0, "#,##0");
+
+			// 占上年度業主權益比率
+			makeExcel.setValue(row, 22, 0, "#,##0");
+
+			// F19 應收利息
+			tempLoanAmt = tLDVo.get("F18").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F18"));
+			makeExcel.setValue(row, 23, tempLoanAmt, "#,##0");
+
+			// F20 資產分類
+			int col = tLDVo.get("F20").isEmpty() ? 31 : 30 + Integer.valueOf(tLDVo.get("F20").substring(0, 1));
+			makeExcel.setValue(row, col, "V", "C");
+
+		}
+
+		makeExcel.setValue(row+1, 2, count+1, "C");
+		makeExcel.setValue(row+2, 2, count+2, "C");
+		makeExcel.setValue(row+3, 2, count+3, "C");
+		makeExcel.setValue(row+4, 2, count+4, "C");
+		makeExcel.setValue(row+5, 2, count+5, "C");
+
+		this.info("mergeEva=" + mergeEva.toString());
+
+		this.info("mergeLine=" + mergeLine.toString());
+
+		int sRow = 7;
+		int eRow = 0;
+		this.info("eva-----");
+		for (Map<String, Object> eva : mergeEva) {
+
+			tempEvaAmt = new BigDecimal(eva.get("eva").toString());
+
+			eRow = sRow + Integer.valueOf(eva.get("count").toString()) - 1;
+
+//			this.info("merge=" + sRow + "," + eRow);
+			
+			if(sRow==eRow) {
+				
+				makeExcel.setValue(sRow, 17, tempEvaAmt, "#,##0");
+				
+			}else {
+				
+				makeExcel.setMergedRegionValue(sRow, eRow, 17, 17, tempEvaAmt, "#,##0");
+				
+			}
+			
+			sRow = eRow + 1;
+		}
+
+		sRow = 7;
+		eRow = 0;
+		for (Map<String, Object> line : mergeLine) {
+
+			tempLineAmt = new BigDecimal(line.get("line").toString());
+
+			eRow = sRow + Integer.valueOf(line.get("count").toString()) - 1;
+
+//			this.info("merge=" + sRow + "," + eRow);
+
+			if(sRow==eRow) {
+				
+				makeExcel.setValue(sRow, 18, tempLineAmt, "#,##0");
+				
+			}else {
+				
+			makeExcel.setMergedRegionValue(sRow, eRow, 18, 18, tempLineAmt, "#,##0");
+
+			}
+			
+			sRow = eRow + 1;
+
+		}
+
+	}
+
+	
+	
+	
+	/**
+	 * 估計總值和核貸金額 格式合併處理
+	 * @param custNo  戶號
+	 * @param facmNo  額度
+	 * @param clNo    擔保品號碼
+	 * @param evaAmt  估計總值
+	 * @param lineAmt 核貸金額
+	 * 
+	 * */
+	
+	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt,
+			BigDecimal lineAmt) {
+
+		String tempClNo = "";
+		String tempCustNo = "";
+		String tempFacmNo = "";
+		
+		mergeEvaMap = new HashMap<String, Object>();
+		mergeLineMap = new HashMap<String, Object>();
+	
+		if (mergeEva.size() > 0 && mergeLine.size() > 0 ) {
+		
+			int e = mergeEva.size() - 1;
+			int l = mergeLine.size() - 1;
+			
+//			this.info("e.size="+e);
+//			this.info("l.size="+l);
+
+	
+			BigDecimal tempLine = new BigDecimal(mergeLine.get(l).get("line").toString());
+
+		
+			tempCustNo = mergeLine.get(l).get("cust").toString();
+			tempFacmNo = mergeLine.get(l).get("facm").toString();
+
+			// 與前一筆  戶號額度是否一樣
+			if (tempCustNo.equals(custNo) && tempFacmNo.equals(facmNo)) {
+				
+				countLine++;
+				countEva++;
+							
+				mergeLineMap.put("count", countLine);
+				mergeLineMap.put("cust", custNo);
+				mergeLineMap.put("facm", facmNo);
+				// 核貸 與前一筆金額是否一樣
+				if (tempLine.compareTo(lineAmt) == 0) {
+					mergeLineMap.put("line", lineAmt);
+				}else {	
+					mergeLineMap.put("line", tempLine.add(lineAmt));
+				}
+				mergeLine.set(l, mergeLineMap);
+
+				
+				BigDecimal tempEva = new BigDecimal(mergeEva.get(e).get("eva").toString());
+				tempClNo = mergeEva.get(e).get("clno").toString();
+				
+				// 和前一筆 是否為同一擔保品號碼
+				if (tempClNo.equals(clNo)) {
+
+					mergeEvaMap.put("count", countEva);
+					mergeEvaMap.put("clno", clNo);
+					// 估計  與前一筆金額是否一樣(一樣為同一擔保品)
+					if (tempEva.compareTo(evaAmt) == 0) {
+						mergeEvaMap.put("eva", evaAmt);
+					}else {
+						mergeEvaMap.put("eva", tempLine.add(evaAmt));
+					}
+					mergeEva.set(l,mergeEvaMap);
+
+				} else {
+					countEva = 1;
+
+					mergeEvaMap.put("count", countEva);
+					mergeEvaMap.put("clno", clNo);
+					mergeEvaMap.put("eva", evaAmt);
+					mergeEva.add(mergeEvaMap);
+
+				}
+
+			} else {
+
+				countEva = 1;
+
+				mergeEvaMap.put("count", countEva);
+				mergeEvaMap.put("clno", clNo);
+				mergeEvaMap.put("eva", evaAmt);
+				mergeEva.add(mergeEvaMap);
+				
+				countLine = 1;
+
+				mergeLineMap.put("count", countLine);
+				mergeLineMap.put("cust", custNo);
+				mergeLineMap.put("facm", facmNo);
+				mergeLineMap.put("line", lineAmt);
+				mergeLine.add(mergeLineMap);
+
+			}
+
+		} else {
+
+			countEva = 1;
+
+			mergeEvaMap.put("count", countEva);
+			mergeEvaMap.put("clno", clNo);
+			mergeEvaMap.put("eva", evaAmt);
+			mergeEva.add(mergeEvaMap);
+
+			countLine = 1;
+
+			mergeLineMap.put("count", countLine);
+			mergeLineMap.put("cust", custNo);
+			mergeLineMap.put("facm", facmNo);
+			mergeLineMap.put("line", lineAmt);
+			mergeLine.add(mergeLineMap);
+
+		}
+
 	}
 
 }

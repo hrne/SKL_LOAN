@@ -25,18 +25,17 @@ import com.st1.itx.db.domain.JcicZ040Id;
 import com.st1.itx.db.domain.JcicZ043;
 import com.st1.itx.db.domain.JcicZ043Id;
 import com.st1.itx.db.domain.JcicZ043Log;
-import com.st1.itx.db.domain.JcicZ053;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ040Service;
 import com.st1.itx.db.service.JcicZ043Service;
-import com.st1.itx.db.service.JcicZ053Service;
+
 import com.st1.itx.db.service.JcicZ043LogService;
 
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
-import com.st1.itx.util.date.DateUtil;
+
 
 /**
  * Tita<br>
@@ -77,13 +76,9 @@ public class L8304 extends TradeBuffer {
 	@Autowired
 	public JcicZ043LogService sJcicZ043LogService;
 	@Autowired
-	public JcicZ053Service sJcicZ053Service;
-	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
 	public DataLog iDataLog;
-	@Autowired
-	public DateUtil iDateUtil;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -124,42 +119,21 @@ public class L8304 extends TradeBuffer {
 		iJcicZ040Id.setRcDate(iRcDate);
 		String[] irCollateralType = { "00", "01", "02", "03", "04", "05", "06", "07", "08", "09" };// 不合規的「擔保品類別」代號集合
 
-		// Date計算
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD
-		int imtxDate25 = Dealdate(txDate, -25);// 報送日前25天
-
 		// 檢核項目(D-9)
 		if (!"4".equals(iTranKey_Tmp)) {
-			if ("A".equals(iTranKey)) {
-				// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
-				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
-				if (iJcicZ040 == null) {
-					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
-				} // 2 end
+			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
+			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+			if (iJcicZ040 == null) {
+				throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+			} // 2 end
 
-				// 3 start 金融機構報送日大於協商申請日+25則予以剔退
-				if (iRcDate < imtxDate25) {// iRcDate協商申請日為民國年
-					throw new LogicException("E0005", "報送日不可大於協商申請日+25.");
-				} // 3 end
-				
-				// extra項<JcicZ053>(D-29之4) start
-				// '53'同意報送例外處理檔案第8欄「是否同意報送例外處理檔案格式」填報'Y'者，方可補報送'42'或'43'檔案格式，否則予以剔退處理
-				Slice<JcicZ053> sJcicZ053 = sJcicZ053Service.custRcEq(iCustId, iRcDate + 19110000, 0, Integer.MAX_VALUE,
-						titaVo);
-				if (sJcicZ053 != null) {
-					for (JcicZ053 xJcicZ053 : sJcicZ053) {
-						if (!"Y".equals(xJcicZ053.getAgreeSend())) {
-							throw new LogicException("E0005", "已報送(53)同意報送例外處理檔案，則(53)中「是否同意報送例外處理檔案格式」必須填報'Y'.");
-						}
-					}
-				}// extra項 end
-			}
+			// 3 金融機構報送日大於協商申請日+25則予以剔退***J
 
 			// 4 start 第9欄「擔保品類別」代號不可為'00'~'09'.
 			if (Arrays.stream(irCollateralType).anyMatch(iCollateralType::equals)) {
 				throw new LogicException("E0005", "「擔保品類別」代號不可為'00'~'09'.");
 			} // 4 end
-			
+
 			// 檢核項目 end
 		}
 
@@ -265,13 +239,5 @@ public class L8304 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private int Dealdate(int txDate, int iDays) throws LogicException {
-		int retxdate = 0;
-		iDateUtil.init();
-		iDateUtil.setDate_1(txDate);
-		iDateUtil.setDays(iDays);
-		retxdate = iDateUtil.getCalenderDay();
 
-		return retxdate;
-	}
 }

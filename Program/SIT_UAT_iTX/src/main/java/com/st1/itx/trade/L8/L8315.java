@@ -17,13 +17,11 @@ import com.st1.itx.Exception.DBException;
 //import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.JcicZ047;
-import com.st1.itx.db.domain.JcicZ047Id;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ054;
 import com.st1.itx.db.domain.JcicZ054Id;
 import com.st1.itx.db.domain.JcicZ054Log;
-import com.st1.itx.db.service.JcicZ047Service;
 import com.st1.itx.db.service.JcicZ054LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ054Service;
@@ -70,8 +68,6 @@ public class L8315 extends TradeBuffer {
 	@Autowired
 	public JcicZ054LogService sJcicZ054LogService;
 	@Autowired
-	public JcicZ047Service sJcicZ047Service;
-	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
 	public DataLog iDataLog;
@@ -90,7 +86,7 @@ public class L8315 extends TradeBuffer {
 		String iPayOffResult = titaVo.getParam("PayOffResult");
 		int iPayOffDate = Integer.valueOf(titaVo.getParam("PayOffDate"));
 		String iKey = "";
-		// JcicZ054, JcicZ047
+		// JcicZ054
 		JcicZ054 iJcicZ054 = new JcicZ054();
 		JcicZ054Id iJcicZ054Id = new JcicZ054Id();
 		iJcicZ054Id.setCustId(iCustId);// 債務人IDN
@@ -99,23 +95,12 @@ public class L8315 extends TradeBuffer {
 		iJcicZ054Id.setMaxMainCode(iMaxMainCode);
 		iJcicZ054Id.setPayOffDate(iPayOffDate);
 		JcicZ054 chJcicZ054 = new JcicZ054();
-		JcicZ047 iJcicZ047 = new JcicZ047();
-		JcicZ047Id iJcicZ047Id = new JcicZ047Id();
-		iJcicZ047Id.setCustId(iCustId);// 債務人IDN
-		iJcicZ047Id.setRcDate(iRcDate);//// 協商申請日 西元YYYYMMDD
-		iJcicZ047Id.setSubmitKey(iSubmitKey);// 報送單位代號
+		
 
 		// 檢核項目(D-31)
 		if (!"4".equals(iTranKey_Tmp)) {
 
-			if ("A".equals(iTranKey)) {
-				// 2 start KEY值(IDN+報送單位代號+協商申請日+最大債權金融機構代號)未曾報送過'47':金融機構無擔保債務協議資料，予以剔退處理.
-				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-				if (iJcicZ047 == null) {
-					throw new LogicException("E0005", "未曾報送過(47)金融機構無擔保債務協議資料.");
-				}
-			} // 2 end
-
+			// 2 KEY值(IDN+報送單位代號+協商申請日+最大債權金融機構代號)未曾報送過'47':金融機構無擔保債務協議資料，予以剔退處理.***1014會議(不做檢核)
 			// 檢核項目 end
 		}
 

@@ -128,6 +128,10 @@ public class LM056Report extends MakeReport {
 				makeExcel.setValue(row, 6, lM056Vo.get("F4"), "L");
 			}
 
+			
+			makeExcel.formulaCaculate(1, 3);
+			makeExcel.formulaCaculate(1, 4);
+			
 		} else {
 
 			makeExcel.setValue(2, 1, "本日無資料");
@@ -172,7 +176,7 @@ public class LM056Report extends MakeReport {
 		int row = 0;
 		int col = 0;
 		BigDecimal tempAmt = BigDecimal.ZERO;
-		BigDecimal tempTotal = BigDecimal.ZERO;
+		
 
 		// 參考 LM057的表14-5
 		for (Map<String, String> lM056Vo : listData) {

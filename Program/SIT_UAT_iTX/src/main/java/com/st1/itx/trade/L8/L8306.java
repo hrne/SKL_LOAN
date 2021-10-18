@@ -106,13 +106,12 @@ public class L8306 extends TradeBuffer {
 
 		// 檢核項目(D-14)
 		if (!"4".equals(iTranKey_Tmp)) {
-			if ("A".equals(iTranKey)) {
-				// 2 start 完整key值未曾報送過'44':請求同意債務清償方案通知資料則予以剔退
-				iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id, titaVo);
-				if (iJcicZ044 == null) {
-					throw new LogicException("E0005", "未曾報送過(44)請求同意債務清償方案通知資料.");
-				}
-			} // 2 end
+			// 2 start 完整key值未曾報送過'44':請求同意債務清償方案通知資料則予以剔退
+			iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id, titaVo);
+			if (iJcicZ044 == null) {
+				throw new LogicException("E0005", "未曾報送過(44)請求同意債務清償方案通知資料.");
+			}
+			// 2 end
 
 			// 3 若各金融機構超過3天尚未回報是否同意，將揭露於Z99前置協商相關作業提醒資訊之「逾3日尚未回報是否同意債務清停方案提醒通知」.***J
 

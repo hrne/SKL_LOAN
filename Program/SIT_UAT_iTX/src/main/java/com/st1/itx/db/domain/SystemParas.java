@@ -29,7 +29,7 @@ public class SystemParas implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 6798230198533543856L;
+	private static final long serialVersionUID = 5020843128575229586L;
 
 // 業務類型
   /* LN */
@@ -143,12 +143,12 @@ public class SystemParas implements Serializable {
   private BigDecimal perfBackRepayAmt = new BigDecimal("0");
 
   // 業績追回之起期數
-  /* L6501維護預設值:1 */
+  /* L6501維護預設值:1                                                  追回[繳納1期]但[未繳足3期]期款即結清（含部分還款達60萬之案件)，未曾繳款者則同時追回房貸專員業績 */
   @Column(name = "`PerfBackPeriodS`")
   private int perfBackPeriodS = 0;
 
   // 業績追回之止期數
-  /* L6501維護預設值:3 */
+  /* L6501維護預設值:3                                                  追回[繳納1期]但[未繳足3期]期款即結清（含部分還款達60萬之案件)，未曾繳款者則同時追回房貸專員業績 */
   @Column(name = "`PerfBackPeriodE`")
   private int perfBackPeriodE = 0;
 
@@ -187,10 +187,14 @@ public class SystemParas implements Serializable {
   @Column(name = "`ReduceAmtLimit`")
   private int reduceAmtLimit = 0;
 
-  // 預收期數
+  // 單筆預收期數
   /* L6501維護預設值:0 */
   @Column(name = "`PreRepayTerms`")
   private int preRepayTerms = 0;
+
+  // 批次預收期數
+  @Column(name = "`PreRepayTermsBatch`")
+  private int preRepayTermsBatch = 0;
 
   // 回收時可短繳本金金額之百分比
   @Column(name = "`ShortPrinPercent`")
@@ -746,7 +750,7 @@ N:一日多批
 /**
 	* 業績追回之起期數<br>
 	* L6501維護
-預設值:1
+預設值:1                                                  追回[繳納1期]但[未繳足3期]期款即結清（含部分還款達60萬之案件)，未曾繳款者則同時追回房貸專員業績
 	* @return Integer
 	*/
   public int getPerfBackPeriodS() {
@@ -756,7 +760,7 @@ N:一日多批
 /**
 	* 業績追回之起期數<br>
 	* L6501維護
-預設值:1
+預設值:1                                                  追回[繳納1期]但[未繳足3期]期款即結清（含部分還款達60萬之案件)，未曾繳款者則同時追回房貸專員業績
   *
   * @param perfBackPeriodS 業績追回之起期數
 	*/
@@ -767,7 +771,7 @@ N:一日多批
 /**
 	* 業績追回之止期數<br>
 	* L6501維護
-預設值:3
+預設值:3                                                  追回[繳納1期]但[未繳足3期]期款即結清（含部分還款達60萬之案件)，未曾繳款者則同時追回房貸專員業績
 	* @return Integer
 	*/
   public int getPerfBackPeriodE() {
@@ -777,7 +781,7 @@ N:一日多批
 /**
 	* 業績追回之止期數<br>
 	* L6501維護
-預設值:3
+預設值:3                                                  追回[繳納1期]但[未繳足3期]期款即結清（含部分還款達60萬之案件)，未曾繳款者則同時追回房貸專員業績
   *
   * @param perfBackPeriodE 業績追回之止期數
 	*/
@@ -933,7 +937,7 @@ N:一日多批
   }
 
 /**
-	* 預收期數<br>
+	* 單筆預收期數<br>
 	* L6501維護
 預設值:0
 	* @return Integer
@@ -943,14 +947,33 @@ N:一日多批
   }
 
 /**
-	* 預收期數<br>
+	* 單筆預收期數<br>
 	* L6501維護
 預設值:0
   *
-  * @param preRepayTerms 預收期數
+  * @param preRepayTerms 單筆預收期數
 	*/
   public void setPreRepayTerms(int preRepayTerms) {
     this.preRepayTerms = preRepayTerms;
+  }
+
+/**
+	* 批次預收期數<br>
+	* 
+	* @return Integer
+	*/
+  public int getPreRepayTermsBatch() {
+    return this.preRepayTermsBatch;
+  }
+
+/**
+	* 批次預收期數<br>
+	* 
+  *
+  * @param preRepayTermsBatch 批次預收期數
+	*/
+  public void setPreRepayTermsBatch(int preRepayTermsBatch) {
+    this.preRepayTermsBatch = preRepayTermsBatch;
   }
 
 /**
@@ -1246,8 +1269,9 @@ N:一日多批
            + ", postDeductDD1=" + postDeductDD1 + ", postDeductDD2=" + postDeductDD2 + ", postDeductDD3=" + postDeductDD3 + ", postDeductDD4=" + postDeductDD4 + ", postDeductDD5=" + postDeductDD5 + ", postSecondDeductDays=" + postSecondDeductDays
            + ", postDeductMethod=" + postDeductMethod + ", loanDeptCustNo=" + loanDeptCustNo + ", negDeptCustNo=" + negDeptCustNo + ", perfBackRepayAmt=" + perfBackRepayAmt + ", perfBackPeriodS=" + perfBackPeriodS + ", perfBackPeriodE=" + perfBackPeriodE
            + ", acctCode310A=" + acctCode310A + ", acctCode310B=" + acctCode310B + ", acctCode320A=" + acctCode320A + ", acctCode320B=" + acctCode320B + ", acctCode330A=" + acctCode330A + ", acctCode330B=" + acctCode330B
-           + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", shortPrinPercent=" + shortPrinPercent + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg + ", amlUrl=" + amlUrl
-           + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg + ", ebsUrl=" + ebsUrl
-           + ", ebsAuth=" + ebsAuth + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", reduceAmtLimit=" + reduceAmtLimit + ", preRepayTerms=" + preRepayTerms + ", preRepayTermsBatch=" + preRepayTermsBatch + ", shortPrinPercent=" + shortPrinPercent + ", shortIntPercent=" + shortIntPercent + ", amlFg=" + amlFg
+           + ", amlUrl=" + amlUrl + ", perfDate=" + perfDate + ", acBookCode=" + acBookCode + ", acSubBookCode=" + acSubBookCode + ", acBookAdjDate=" + acBookAdjDate + ", ebsFg=" + ebsFg
+           + ", ebsUrl=" + ebsUrl + ", ebsAuth=" + ebsAuth + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

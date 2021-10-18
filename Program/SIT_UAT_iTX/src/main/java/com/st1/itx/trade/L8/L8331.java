@@ -19,14 +19,12 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.JcicZ446;
 import com.st1.itx.db.domain.JcicZ446Id;
-import com.st1.itx.db.domain.JcicZ448;
-import com.st1.itx.db.domain.JcicZ448Id;
+
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ454;
 import com.st1.itx.db.domain.JcicZ454Id;
 import com.st1.itx.db.domain.JcicZ454Log;
 import com.st1.itx.db.service.JcicZ446Service;
-import com.st1.itx.db.service.JcicZ448Service;
 import com.st1.itx.db.service.JcicZ454LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ454Service;
@@ -48,8 +46,6 @@ public class L8331 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public JcicZ446Service sJcicZ446Service;
-	@Autowired
-	public JcicZ448Service sJcicZ448Service;
 	@Autowired
 	public JcicZ454Service sJcicZ454Service;
 	@Autowired
@@ -91,38 +87,26 @@ public class L8331 extends TradeBuffer {
 		iJcicZ446Id.setCustId(iCustId);
 		iJcicZ446Id.setApplyDate(iApplyDate);
 		iJcicZ446Id.setCourtCode(iCourtCode);
-		JcicZ448 iJcicZ448 = new JcicZ448();
-		JcicZ448Id iJcicZ448Id = new JcicZ448Id();
-		iJcicZ448Id.setSubmitKey(iSubmitKey);
-		iJcicZ448Id.setCustId(iCustId);
-		iJcicZ448Id.setApplyDate(iApplyDate);
-		iJcicZ448Id.setCourtCode(iCourtCode);
-		iJcicZ448Id.setMaxMainCode(iMaxMainCode);
-
+		
 		// 檢核項目(D-62)
 		if (!"4".equals(iTranKey_Tmp)) {
-			if ("A".equals(iTranKey)) {
-				// 2 start 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否存在「'448'」前置調解無擔保債務還款分配表資料
-				iJcicZ448 = sJcicZ448Service.findById(iJcicZ448Id, titaVo);
-				if (iJcicZ448 == null) {
-					throw new LogicException(titaVo, "E0005",
-							"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」尚未報送「'448':前置調解無擔保債務還款分配表資料」");
-				}
-				// 2 end
+			// 2
+			// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否存在「'448'」前置調解無擔保債務還款分配表資料--->1014會議通知不需檢核
 
-				// 3 start 「單獨全數受清償日期」不得大於「資料報送日期」
+			// 3 start 「單獨全數受清償日期」不得大於「資料報送日期」
+			if ("A".equals(iTranKey)) {
 				if (iPayOffDate > txDate) {
 					throw new LogicException(titaVo, "E0005", "「單獨全數受清償日期」不得大於「資料報送日期」");
 				} // 3 end
 			}
 
-		}
-		// 4 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
-		iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
-		if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
-			throw new LogicException(titaVo, "E0005", "同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
-		} // 4 end
+			// 4 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
+			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
+			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+			} // 4 end
 
+		}
 		// 檢核條件 end
 
 		switch (iTranKey_Tmp) {

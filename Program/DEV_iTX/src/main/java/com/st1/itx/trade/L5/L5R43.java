@@ -45,22 +45,24 @@ public class L5R43 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
-		String iFuncCode = titaVo.getParam("FuncCode");
+		String iFunctionCode = titaVo.getParam("FunctionCode");
 		String iCourtCode = titaVo.getParam("CourtCode");
+		int iFlag = Integer.parseInt(titaVo.getParam("L5R43Flag"));//0:不需錯誤訊息,1:需錯誤訊息
 		String iCity="";
 		String iArea="";
 		this.totaVo.putParam("L5R43CourtItem", "");
 			
-			
+		CdCode tCdCode = null;
+		CdCity tCdCity = null;
 		CdArea tCdArea = sCdAreaService.Zip3First(iCourtCode, titaVo);
 			
 		if(tCdArea!=null) {
 					
-			CdCity tCdCity = sCdCityService.findById(tCdArea.getCityCode(), titaVo);
+			tCdCity = sCdCityService.findById(tCdArea.getCityCode(), titaVo);
 			if(tCdCity!=null) {
 				iCity = tCdCity.getCityItem();
 				iArea = tCdArea.getAreaItem();
-				this.totaVo.putParam("L5R43CourtItem", iCity+iArea+"調解委員會");
+				this.totaVo.putParam("L5R43CourtItem", iCity+iArea+"公所調解委員會");
 			}
 					
 				
@@ -70,7 +72,7 @@ public class L5R43 extends TradeBuffer {
 			
 			if (tCdCode2 != null) {
 				CdCodeId tCdCodeId = new CdCodeId("CourtCode", iCourtCode);
-				CdCode tCdCode = sCdCodeService.findById(tCdCodeId, titaVo);
+			    tCdCode = sCdCodeService.findById(tCdCodeId, titaVo);
 				
 					if(tCdCode != null) {
 					this.totaVo.putParam("L5R43CourtItem", tCdCode.getItem());
@@ -79,7 +81,15 @@ public class L5R43 extends TradeBuffer {
 			}
 		}
 		
-			
+			if(tCdCity==null && tCdCode==null && iFlag==1) {
+				this.info("FunctionCode="+iFunctionCode);
+				if(("01").equals(iFunctionCode) || ("02").equals(iFunctionCode) || ("09").equals(iFunctionCode) || ("11").equals(iFunctionCode)) {
+					
+						throw new LogicException(titaVo, "E0001", ""); // 查無資料
+					
+
+				}
+			}
 
 		this.addList(this.totaVo);
 		return this.sendList();

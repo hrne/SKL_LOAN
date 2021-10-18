@@ -19,23 +19,18 @@ import com.st1.itx.Exception.DBException;
 
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.JcicZ047;
-import com.st1.itx.db.domain.JcicZ047Id;
 import com.st1.itx.db.domain.JcicZ060;
 import com.st1.itx.db.domain.JcicZ060Id;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ062;
 import com.st1.itx.db.domain.JcicZ062Id;
 import com.st1.itx.db.domain.JcicZ062Log;
-import com.st1.itx.db.domain.JcicZ063;
-import com.st1.itx.db.domain.JcicZ063Id;
 import com.st1.itx.db.service.JcicZ047Service;
 import com.st1.itx.db.service.JcicZ060Service;
 import com.st1.itx.db.service.JcicZ061Service;
 import com.st1.itx.db.service.JcicZ062LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ062Service;
-import com.st1.itx.db.service.JcicZ063Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -63,8 +58,6 @@ public class L8320 extends TradeBuffer {
 	public JcicZ062Service sJcicZ062Service;
 	@Autowired
 	public JcicZ062LogService sJcicZ062LogService;
-	@Autowired
-	public JcicZ063Service sJcicZ063Service;
 	@Autowired
 	SendRsp iSendRsp;
 	@Autowired
@@ -117,47 +110,24 @@ public class L8320 extends TradeBuffer {
 		iJcicZ060Id.setCustId(iCustId);
 		iJcicZ060Id.setRcDate(iRcDate);
 		iJcicZ060Id.setChangePayDate(iChangePayDate);
-		JcicZ047 iJcicZ047 = new JcicZ047();
-		JcicZ047Id iJcicZ047Id = new JcicZ047Id();
-		iJcicZ047Id.setCustId(iCustId);
-		iJcicZ047Id.setRcDate(iRcDate);
-		iJcicZ047Id.setSubmitKey(iSubmitKey);
-		JcicZ063 iJcicZ063 = new JcicZ063();
-		JcicZ063Id iJcicZ063Id = new JcicZ063Id();
-		iJcicZ063Id.setCustId(iCustId);
-		iJcicZ063Id.setRcDate(iRcDate);
-		iJcicZ063Id.setSubmitKey(iSubmitKey);
-		iJcicZ063Id.setChangePayDate(iChangePayDate);
-		JcicZ062 jJcicZ062 = new JcicZ062();
-
 		BigDecimal xMonthPayAmt = BigDecimal.ZERO;// 「月付金」
-
-		// Date計算
-		int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// 營業日 放acdate
-		int iTxDate = DealBussDate(txDate, -3);// 報送日前3個營業日
-
+		
 		// 檢核項目(D-34)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.2 start
 			// 檢核KEY值(IDN+報送單位代號+協商申請日+申請變更還款條件日)是否存在「'60':前置協商受理申請變更還款暨請求回報剩餘債權通知資料」.
-
-			// 1.3 start 本檔案報送日需大於等於「'60':前置協商受理申請變更還款暨請求回報剩餘債權通知」資料報送日+3個營業日.
-			if ("1".equals(iTranKey_Tmp)) {
-				iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
-				if (iJcicZ060 == null) {
-					throw new LogicException("E0005",
-							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
-				} else {
-					if (TimestampToDate(iJcicZ060.getCreateDate()) >= iTxDate) {
-						 throw new LogicException("E0005",
-						 "本檔案報送日需大於等於(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料報送日+3個營業日.");
-					}
-				}
-				// 1.2, 1.3 end
-
-				// 1.4檢核所有債權金融機構均已回報(或由最大債權金融機構代為回報)'61':回報協商剩餘債權金額資料，
-				// 且第14欄「是否同意債務人申請變更還款條件方案」皆回報為'Y'，否則予以剔退.***J
+			iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
+			if (iJcicZ060 == null) {
+				throw new LogicException("E0005",
+						"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
 			}
+			// 1.2 end
+
+			// 1.3 start
+			// 本檔案報送日需大於等於「'60':前置協商受理申請變更還款暨請求回報剩餘債權通知」資料報送日+3個營業日.--->1014會議通知不需檢核
+
+			// 1.4檢核所有債權金融機構均已回報(或由最大債權金融機構代為回報)'61':回報協商剩餘債權金額資料，
+			// 且第14欄「是否同意債務人申請變更還款條件方案」皆回報為'Y'，否則予以剔退.***J
 
 			// 1.5 檢核第11-13欄若與所有協商剩餘金融機構回報'61'之回報協商剩餘債權金額不同時，則予剔退***J
 
@@ -166,7 +136,7 @@ public class L8320 extends TradeBuffer {
 
 			// 1.7 start 變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日期
 			if (iChaRepayEndDate > 0 && iChaRepayEndDate < iChaRepayAgreeDate) {
-				 throw new LogicException("E0005", "「變更還款條件簽約完成日期」需大於或等於「變更還款條件協議完成日期」.");
+				throw new LogicException("E0005", "「變更還款條件簽約完成日期」需大於或等於「變更還款條件協議完成日期」.");
 			}
 			// 1.7 end
 
@@ -238,29 +208,8 @@ public class L8320 extends TradeBuffer {
 			}
 			// 1.12 end
 
-			// 1.13
-			// start第24欄「第二階梯利率」須與「'47':無擔保債務協議資料」第8欄「利率」相同或前次報送'62'且未報'63'結案者，第10欄「第一階梯利率」(若前次變更還款條件屬階梯式還款者，則為前次報送'62'第24欄「第二階梯利率」)，否則予以剔退
-			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-			if ((iJcicZ047 == null) || ((iJcicZ047 != null) && (iRate2.compareTo(iJcicZ047.getRate()) != 0))) {
-				iJcicZ063 = sJcicZ063Service.findById(iJcicZ063Id, titaVo);
-				if (iJcicZ063 != null) {
-					throw new LogicException("E0005", "「第二階梯利率」須與(47)金融機構無擔保債務協議資料之「利率」相同.");
-				} else {
-					jJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id, titaVo);
-					if (jJcicZ062 == null) {
-						throw new LogicException("E0005", "「第二階梯利率」須與(47)金融機構無擔保債務協議資料之「利率」相同.");
-					} else {
-						if (("Y".equals(jJcicZ062.getGradeType())) && (iRate2.compareTo(jJcicZ062.getRate2()) != 0)) {
-							throw new LogicException("E0005",
-									"「第二階梯利率」須與(47)金融機構無擔保債務協議資料之「利率」相同或前次報送(62)金融機構無擔保債務變更還款條件協議資料且未報(63)變更還款方案結案通知資料者「第二階梯利率」(前次變更還款條件屬階梯式還款者)相同.");
-						} else if ((!"Y".equals(jJcicZ062.getGradeType()))
-								&& (iRate2.compareTo(jJcicZ062.getRate()) != 0)) {
-							throw new LogicException("E0005",
-									"「第二階梯利率」須與(47)金融機構無擔保債務協議資料之「利率」相同或前次報送(62)金融機構無擔保債務變更還款條件協議資料且未報(63)變更還款方案結案通知資料者「第一階梯利率」相同.");
-						}
-					}
-				}
-			} // 1.13 end
+			// 1.13--->1014會議通知不需檢核
+			// 第24欄「第二階梯利率」須與「'47':無擔保債務協議資料」第8欄「利率」相同或前次報送'62'且未報'63'結案者，第10欄「第一階梯利率」(若前次變更還款條件屬階梯式還款者，則為前次報送'62'第24欄「第二階梯利率」)，否則予以剔退
 
 			// 1.14
 			// 第17欄「變更還款條件簽約完成日」有值後，同一筆key值資料即不得報送'63'結案，否則予以剔退.***與1.17和「L8321(JcicZ063)檢核1.5是同一檢核，併同報送相關.***
@@ -290,6 +239,7 @@ public class L8320 extends TradeBuffer {
 
 			// 檢核項目 end
 		}
+
 		switch (iTranKey_Tmp) {
 		case "1":
 			// 檢核是否重複，並寫入JcicZ062
@@ -416,14 +366,6 @@ public class L8320 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	// 計算：指定日期txDate加減營業日iDays
-	private int DealBussDate(int txDate, int iDays) throws LogicException {
-		int retxdate = 0;
-		iDateUtil.getbussDate(txDate, iDays);
-		
-		retxdate = iDateUtil.getCalenderDay();
-		return retxdate;
-	}
 
 	// 轉換：Sql.Timestamp(創建日期)轉int(西元年YYYYMMDD)
 	private int TimestampToDate(Timestamp ts) throws LogicException {

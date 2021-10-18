@@ -7739,6 +7739,16 @@ TXFORM=L8R56
 ^
 </L8R56.tom>
 
+<L8R57.dec>
+#L8R57CustName=X,100,S
+</L8R57.dec>
+
+<L8R57.tom>
+TXFORM=L8R57
+#L8R57CustName
+^
+</L8R57.tom>
+
 <L5R38.rtn>
 #L5R38iCode=A,1,S
 #L5R38iDate=D,7,S
@@ -8488,6 +8498,7 @@ TXFORM=L6R27
 #L6R28AcctCode330B=N,3,S
 #L6R28ReduceAmtLimit=N,5,S
 #L6R28PreRepayTerms=N,3,S
+#L6R28PreRepayTermsBatch=N,3,S
 #L6R28ShortPrinPercent=N,3,S
 #L6R28ShortIntPercent=N,3,S
 #L6R28AmlFg=N,1,S
@@ -8529,6 +8540,7 @@ TXFORM=L6R28
 #L6R28AcctCode330B
 #L6R28ReduceAmtLimit
 #L6R28PreRepayTerms
+#L6R28PreRepayTermsBatch
 #L6R28ShortPrinPercent
 #L6R28ShortIntPercent
 #L6R28AmlFg

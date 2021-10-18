@@ -223,12 +223,11 @@ T(1,@CustId,#NTXBUF,3,10)
 T(1,@CustNo,#NTXBUF,13,7)
 T(1,@CaseSeq,#NTXBUF,20,3)
 
-!L5R43
-#FuncCode=A,1,S
-E(0,5)
 
 
-
+!控制錯誤訊息0:不報錯;1:報錯
+#L5R43Flag=A,1,S
+E(0,0)
 
 #RimCustId=X,10,S
 T(2,#CustId)
@@ -290,7 +289,7 @@ T(2,@BufConnect,#CustId)
 
 #Send2L5R43=x,1,S
 RESET_RIM(#Send2L5R43,L5R43)
-S(L5R43,1,#FuncCode,#CourtCode)
+S(L5R43,1,#FunctionCode,#L5R43Flag,#CourtCode)
 R(1,L5R43)
 T(2,@CourtCodeX,#L5R43CourtItem)
 
@@ -326,7 +325,7 @@ IF(#ChgCondDate!=0,CALL(#ShowChgCondDate),
 #RimL5r12A=X,1,S
 IF(#MainFinCode!="",$,s)
 T(2,@RimBankCode,#MainFinCode)
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@MainFinCodeName,#L5r12BankItem)
 
@@ -534,8 +533,9 @@ IF(#FunctionCode=="01"||#FunctionCode=="02"||#FunctionCode=="09"||#FunctionCode=
 
 #Send1L5R43=x,1,S
 C(4,#CourtCode,s,$)
+E(0,@L5R43Flag,1)
 RESET_RIM(#Send1L5R43,L5R43)
-S(L5R43,1,#FuncCode,#CourtCode)
+S(L5R43,1,#FunctionCode,#L5R43Flag,#CourtCode)
 R(1,L5R43)
 T(2,@CourtCodeX,#L5R43CourtItem)
 
@@ -709,7 +709,7 @@ V(P,最大債權機構不可為458)
 #RimL5r12B=X,1,S
 IF(#MainFinCode!="",$,S)
 T(2,@RimBankCode,#MainFinCode)
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@MainFinCodeName,#L5r12BankItem)
 
@@ -897,7 +897,7 @@ IF(#NegFinShareFinCode{i}=="",S,$)
 #RimL5r12C{i}=X,1,S
 IF(#NegFinShareFinCode{i}=="",S,$)
 T(2,@RimBankCode,#NegFinShareFinCode{i})
-S(L5R12,1,#RimBankCode)
+S(L5R12,1,#RimBankCode,#FunctionCode)
 R(1,L5R12)
 T(2,@FinCodeName{i},#L5r12BankItem)
 

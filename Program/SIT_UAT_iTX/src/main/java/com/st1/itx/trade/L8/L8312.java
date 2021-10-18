@@ -116,7 +116,15 @@ public class L8312 extends TradeBuffer {
 				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
 						Integer.MAX_VALUE, titaVo);
 				if (sJcicZ046 != null) {
-					throw new LogicException("E0005", "Key值(IDN+報送單位代號+協商申請日)已報送(46)結案通知資料.");
+					int sTranKey = 0;
+					for (JcicZ046 xJcicZ046 : sJcicZ046) {
+						if (!"D".equals(xJcicZ046.getTranKey())) {
+							sTranKey = 1;
+						}
+					}
+					if (sTranKey == 1) {
+						throw new LogicException("E0005", "Key值(IDN+報送單位代號+協商申請日)已報送(46)結案通知資料.");
+					}
 				}
 			} // 2.2 end
 
@@ -133,14 +141,16 @@ public class L8312 extends TradeBuffer {
 			Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ051 != null) {
 				for (JcicZ051 xJcicZ051 : sJcicZ051) {
-					if ("D".equals(iDelayCode)
-							&& (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
-						throw new LogicException("E0005", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
-					}
-					if ("L".equals(xJcicZ051.getDelayCode())) {
-						sCovDelayYM++;
-					} else {
-						sDelayYM++;
+					if (!"D".equals(xJcicZ051.getTranKey())) {
+						if (("D".equals(iDelayCode) && "D".equals(xJcicZ051.getDelayCode()))
+								&& (iaDelayYM == xJcicZ051.getDelayYM() || imDelayYM == xJcicZ051.getDelayYM())) {
+							throw new LogicException("E0005", "延期繳款原因為'D繳稅'者，延期繳款年月不能連續兩期.");
+						}
+						if ("L".equals(xJcicZ051.getDelayCode())) {
+							sCovDelayYM++;
+						} else {
+							sDelayYM++;
+						}
 					}
 				}
 				if (sDelayYM > 6) {

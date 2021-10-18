@@ -125,7 +125,7 @@ public class L8301 extends TradeBuffer {
 
 			// 1.5 檢核其第7欄止息基準日需等於協商申請日+25日(前端已檢核)
 
-			// 1.6 檢核該債務人IDN報送本通知資料之記錄.已存在尚未報送結案-剔退***
+			// 1.6 檢核該債務人IDN報送本通知資料之記錄.已存在尚未報送結案-剔退***J
 			// 1.6 結案原因為協商不成立或毀諾案件者，不能再度申請前置協商,結案原因為視同未請求協商案件，結案未滿180天-剔退.***J
 
 			// 1.7 結案已經滿180天，再度申請前置協商，原結案資料不可再報送異動或刪除-->在L8030控制('46'結案通知資料表)***J
@@ -135,7 +135,7 @@ public class L8301 extends TradeBuffer {
 			// 1.9 檢核中心建檔日期，若大於協商申請日(iRcDate)+2個營業日則剔退***J
 
 			// 1.10
-			// start檢核債權機構代號，是否屬於有效消債條例金融機構代號--不是則剔退(NegFinAcct「債務協商債權機構帳戶檔」DataSendSection資料傳送單位)
+			// start檢核債權機構代號，是否屬於有效消債條例金融機構代號--不是則剔退(NegFinAcct「債務協商債權機構帳戶檔」FinCode)
 			try {
 				iL8301SqlReturn = sL8301ServiceImpl.findData(this.index, this.limit, titaVo);
 			} catch (Exception e) {
