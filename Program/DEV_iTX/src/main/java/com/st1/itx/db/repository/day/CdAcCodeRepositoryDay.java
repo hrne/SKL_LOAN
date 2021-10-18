@@ -28,6 +28,9 @@ public interface CdAcCodeRepositoryDay extends JpaRepository<CdAcCode, CdAcCodeI
   // AcNoCode >= ,AND AcNoCode <= ,AND AcSubCode >= ,AND AcSubCode <= ,AND AcDtlCode >= ,AND AcDtlCode <= 
   public Slice<CdAcCode> findAllByAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(String acNoCode_0, String acNoCode_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, Pageable pageable);
 
+  // AcNoCodeOld >= ,AND AcNoCodeOld <= ,AND AcSubCode >= ,AND AcSubCode <= ,AND AcDtlCode >= ,AND AcDtlCode <= 
+  public Slice<CdAcCode> findAllByAcNoCodeOldGreaterThanEqualAndAcNoCodeOldLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeOldAscAcSubCodeAscAcDtlCodeAsc(String acNoCodeOld_0, String acNoCodeOld_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

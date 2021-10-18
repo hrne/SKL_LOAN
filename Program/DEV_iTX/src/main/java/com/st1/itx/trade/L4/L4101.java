@@ -9,13 +9,11 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
-import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
@@ -109,6 +107,7 @@ public class L4101 extends TradeBuffer {
 
 	int acDate = 0;
 	String batchNo = "";
+	String newBatchNo = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -136,58 +135,19 @@ public class L4101 extends TradeBuffer {
 			if (unReleaseCnt > 0) {
 				throw new LogicException(titaVo, "E0015", "未放行筆數：" + unReleaseCnt + " , 已放行筆數：" + lBankRemit.size()); // 檢查錯誤
 			}
-
 		}
-
 		if (lBankRemit.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 
-		// 更新批號
-		batchNo = this.updBatchNo(batchNo, titaVo);
-		this.info("L4101 batchNo = " + batchNo);
-		this.info("L4101 lBankRemit = " + lBankRemit);
-		for (BankRemit tBankRemit : lBankRemit) {
-			this.info("L4101 tBankRemit = " + tBankRemit);
-			tBankRemit.setBatchNo(batchNo);
-			this.info("L4101 setBatchNo = " + tBankRemit.getBatchNo());
-		}
-
-		this.info("L4101 lBankRemit -2 = " + lBankRemit);
-		try {
-			bankRemitService.updateAll(lBankRemit, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "BankRemit " + e.getErrorMsg()); // 更新資料時，發生錯誤
-		}
-
-		// 更新批號
-		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
-		for (BankRemit tBankRemit : lBankRemit) {
-			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
-					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), acDate, 0,
-					Integer.MAX_VALUE, titaVo);
-			if (slAcDetail != null) {
-				for (AcDetail tAcDetail : slAcDetail.getContent()) {
-					tAcDetail.setTitaBatchNo(batchNo);
-					lAcDetail.add(tAcDetail);
-				}
-			}
-		}
-		if (lAcDetail.size() > 0) {
-			try {
-				acDetailService.updateAll(lAcDetail, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "AcDetail " + e.getErrorMsg()); // 更新資料時，發生錯誤
-			}
-		}
-
 		// 執行交易
-		titaVo.setBatchNo(batchNo);
+		// 更新批號
+		newBatchNo = this.updBatchNo(batchNo, titaVo);
 		this.info("batchNo = " + batchNo);
 		this.info("titaVo = " + titaVo.toString());
 		MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
 
-		totaVo.put("OBatchNo", batchNo);
+		totaVo.put("OBatchNo", newBatchNo);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -212,17 +172,12 @@ public class L4101 extends TradeBuffer {
 		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
 		tAcCloseId.setSecNo("01"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
-		AcClose tAcClose = acCloseService.holdById(tAcCloseId, titaVo);
+		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0001", "無撥款帳務資料"); // 查詢資料不存在
 		}
 		batchNo = batchNo.trim() + parse.IntegerToString(tAcClose.getBatNo(), 2);
-		tAcClose.setBatNo(tAcClose.getBatNo() + 1);
-		try {
-			acCloseService.update(tAcClose, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-		}
+
 		return batchNo;
 	}
 

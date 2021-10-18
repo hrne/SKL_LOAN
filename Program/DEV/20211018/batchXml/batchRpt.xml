@@ -291,11 +291,11 @@
 			<tasklet ref="LM047" />
 		</step>
 	</job>
-	<job id="jLM048" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
+	<!-- <job id="jLM048" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM048" parent="parentStep">
 			<tasklet ref="LM048" />
 		</step>
-	</job>
+	</job> -->
 	<job id="jLM049" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLM049" parent="parentStep">
 			<tasklet ref="LM049" />
@@ -515,12 +515,12 @@
 		<step id="sLY002" parent="parentStep">
 			<tasklet ref="LY002" />
 		</step>
-	</job>	-->
+	</job>	
 	<job id="jLY003" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLY003" parent="parentStep">
 			<tasklet ref="LY003" />
 		</step>
-	</job>
+	</job>-->
 	<job id="jLY004" parent="parentJob" xmlns="http://www.springframework.org/schema/batch">
 		<step id="sLY004" parent="parentStep">
 			<tasklet ref="LY004" />

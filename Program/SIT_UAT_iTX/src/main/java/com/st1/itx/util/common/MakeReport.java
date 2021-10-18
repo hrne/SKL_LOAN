@@ -78,7 +78,7 @@ public class MakeReport extends CommBuffer {
 
 	@Autowired
 	CdReportService cdReportService;
-	
+
 	@Autowired
 	CdEmpService cdEmpService;
 
@@ -916,9 +916,11 @@ public class MakeReport extends CommBuffer {
 			this.rptCode = tTxFile.getFileCode();
 		}
 
-		rptTlrNo = tTxFile.getTlrNo();
+		rptTlrNo = tTxFile.getCreateEmpNo();
 
 		rptCreateDate = tTxFile.getCreateDate();
+
+		this.info("MakeRepor doToPdf rptTlrNo = " + rptTlrNo);
 
 		try {
 			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
@@ -1327,13 +1329,16 @@ public class MakeReport extends CommBuffer {
 
 		watermark += rptTlrNo;
 		watermark += " ";
-		
+
 		CdEmp tCdEmp = cdEmpService.findById(rptTlrNo);
-		
+
 		String empNm = "";
 		if (tCdEmp != null) {
 			empNm = tCdEmp.getFullname();
-		}		
+		}
+
+		this.info("MakeReport setWatermark empNm = " + empNm);
+
 		watermark += empNm;
 		watermark += " ";
 		String rptDate = new SimpleDateFormat("yyyyMMdd").format(rptCreateDate);

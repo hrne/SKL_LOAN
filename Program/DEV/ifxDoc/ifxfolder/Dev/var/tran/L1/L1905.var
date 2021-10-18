@@ -67,14 +67,14 @@ T(3,*)
 ENABLE(#BTN1)
 
 #BIND1=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-OOCustId:CustIdName<-OOCustName})
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-OOCustId:CustIdName<-OOCustName:CustNo<-:CustNoName<-})
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
 
 #BUF2=X,42,S
 ENABLE(#BTN2)
 
 #BIND2=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoName<-OOCustName})
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustNo<-OOCustNo:CustNoName<-OOCustName:CustId<-:CustIdName<-})
 
 
 #Submit=A,1,S

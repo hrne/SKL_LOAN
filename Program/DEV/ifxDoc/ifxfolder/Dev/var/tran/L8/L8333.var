@@ -42,7 +42,7 @@ E(0,0)
 [
 ["[L8333]                                 (571)更生款項統一收付回報債權資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdApplyDate+申請日期",#ApplyDate],["#FdBankId+受理款項統一收付之債權金融機構代號",#BankId,#BankIdX],
 ["#FdOwnerYn+是否為更生債權人",#OwnerYn],["#FdPayYn+債務人是否仍依更生方案正常還款予本金融機構",#PayYn],
@@ -202,6 +202,18 @@ HELP(#TranKeyHelp)
 ![債務人IDN]
 #CustId=X,10,L
 
+#RimCustId=X,10,S
+<include src="ROM.icf::L8R57.dec"/>
+T(2,@RimCustId,#CustId)
+! 檢核該統編是否存在於客戶檔
+#RimL8R57=X,1,S
+RESET_RIM(#RimL8R57,L8R57)
+S(L8R57,1,#RimCustId)
+R(1,L8R57)
+T(2,@CustIdX,#L8R57CustName)
+
+#CustIdX=X,2.50,L
+
 ![債權金融機構代號]
 #SubmitKey=X,3,L
 #SubmitKeyX=X,80,L
@@ -332,6 +344,7 @@ TXFORM=L8333^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R34.tom"/>
+<include src="ROM.icf::L8R57.tom"/>
 </sub>
 
 <sub type="PART" name="L8333" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">

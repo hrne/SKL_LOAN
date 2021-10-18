@@ -31,7 +31,9 @@ import com.st1.itx.db.service.FinReportRateService;
 import com.st1.itx.db.domain.FinReportQuality;
 import com.st1.itx.db.domain.FinReportQualityId;
 import com.st1.itx.db.service.FinReportQualityService;
-
+import com.st1.itx.db.domain.FinReportReview;
+import com.st1.itx.db.domain.FinReportReviewId;
+import com.st1.itx.db.service.FinReportReviewService;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.parse.Parse;
 
@@ -64,6 +66,9 @@ public class L1107 extends TradeBuffer {
 
 	@Autowired
 	public FinReportQualityService finReportQualityService;
+
+	@Autowired
+	public FinReportReviewService finReportReviewService;
 
 	/* 轉換工具 */
 	@Autowired
@@ -109,6 +114,7 @@ public class L1107 extends TradeBuffer {
 				throw new LogicException("E0005", "資產負債表(FinReportDebt)");
 			}
 
+			mntFinReportReview(titaVo, iCustUKey, iUKey);
 			mntFinReportProfit(titaVo, iCustUKey, iUKey);
 			mntFinReportCashFlow(titaVo, iCustUKey, iUKey);
 			mntFinReportRate(titaVo, iCustUKey, iUKey);
@@ -138,6 +144,7 @@ public class L1107 extends TradeBuffer {
 				throw new LogicException("E0007", "資產負債表(FinReportDebt)");
 			}
 
+			mntFinReportReview(titaVo, iCustUKey, iUKey);
 			mntFinReportProfit(titaVo, iCustUKey, iUKey);
 			mntFinReportCashFlow(titaVo, iCustUKey, iUKey);
 			mntFinReportRate(titaVo, iCustUKey, iUKey);
@@ -152,62 +159,142 @@ public class L1107 extends TradeBuffer {
 			if (finReportDebt == null) {
 				throw new LogicException("E0004", "資產負債表(FinReportDebt)");
 			}
-			
+
 			try {
 				finReportDebtService.delete(finReportDebt, titaVo);
 
 			} catch (DBException e) {
 				throw new LogicException("E0008", "資產負債表(FinReportDebt)");
 			}
-			
-			//現金流量表
-			
+
+			// 現金流量表
+
 			FinReportCashFlowId finReportCashFlowId = new FinReportCashFlowId();
 			finReportCashFlowId.setCustUKey(iCustUKey);
 			finReportCashFlowId.setUKey(iCustUKey);
 
 			FinReportCashFlow finReportCashFlow = finReportCashFlowService.holdById(finReportCashFlowId, titaVo);
-			
+
 			try {
 				finReportCashFlowService.delete(finReportCashFlow, titaVo);
 
 			} catch (DBException e) {
 				throw new LogicException("E0008", "現金流量表(FinReportCashFlow)");
 			}
-			
-			//財務比率表
-			
+
+			// 財務比率表
+
 			FinReportRateId finReportRateId = new FinReportRateId();
 			finReportRateId.setCustUKey(iCustUKey);
 			finReportRateId.setUKey(iCustUKey);
 
 			FinReportRate finReportRate = finReportRateService.holdById(finReportRateId, titaVo);
-			
+
 			try {
 				finReportRateService.delete(finReportRate, titaVo);
 
 			} catch (DBException e) {
 				throw new LogicException("E0008", "財報品質(FinReportQuality)");
 			}
-			
-			//財報品質
-			
+
+			// 財報品質
+
 			FinReportQualityId finReportQualityId = new FinReportQualityId();
 			finReportQualityId.setCustUKey(iCustUKey);
 			finReportQualityId.setUKey(iCustUKey);
 
 			FinReportQuality finReportQuality = finReportQualityService.holdById(finReportQualityId, titaVo);
-			
+
 			try {
 				finReportQualityService.delete(finReportQuality, titaVo);
 
 			} catch (DBException e) {
 				throw new LogicException("E0008", "財報品質(FinReportQuality)");
 			}
+
+            //覆審比率
+
+			FinReportReviewId finReportReviewId = new FinReportReviewId();
+			finReportReviewId.setCustUKey(iCustUKey);
+			finReportReviewId.setUKey(iCustUKey);
+
+			FinReportReview finReportReview = finReportReviewService.holdById(finReportReviewId, titaVo);
+
+			try {
+				finReportReviewService.delete(finReportReview, titaVo);
+
+			} catch (DBException e) {
+				throw new LogicException("E0008", "財報品質(FinReportReview)");
+			}
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private void mntFinReportReview(TitaVo titaVo, String custUKey, String uKey) throws LogicException {
+		boolean exist = false;
+
+		FinReportReview finReportReview2 = new FinReportReview();
+
+		FinReportReviewId finReportReviewId = new FinReportReviewId();
+		finReportReviewId.setCustUKey(custUKey);
+		finReportReviewId.setUKey(uKey);
+
+		FinReportReview finReportReview = finReportReviewService.holdById(finReportReviewId, titaVo);
+
+		if (finReportReview == null) {
+			finReportReview = new FinReportReview();
+			finReportReview.setFinReportReviewId(finReportReviewId);
+		} else {
+			exist = true;
+			finReportReview2 = (FinReportReview) dataLog.clone(finReportReview);
+		}
+
+		finReportReview.setCurrentAsset(parse.stringToBigDecimal(titaVo.getParam("ReviewCurrentAsset")));
+		finReportReview.setTotalAsset(parse.stringToBigDecimal(titaVo.getParam("ReviewTotalAsset")));
+		finReportReview.setPropertyAsset(parse.stringToBigDecimal(titaVo.getParam("ReviewPropertyAsset")));
+		finReportReview.setInvestment(parse.stringToBigDecimal(titaVo.getParam("ReviewInvestment")));
+		finReportReview.setInvestmentProperty(parse.stringToBigDecimal(titaVo.getParam("ReviewInvestmentProperty")));
+		finReportReview.setDepreciation(parse.stringToBigDecimal(titaVo.getParam("ReviewDepreciation")));
+		finReportReview.setCurrentDebt(parse.stringToBigDecimal(titaVo.getParam("ReviewCurrentDebt")));
+		finReportReview.setTotalDebt(parse.stringToBigDecimal(titaVo.getParam("ReviewTotalDebt")));
+		finReportReview.setTotalEquity(parse.stringToBigDecimal(titaVo.getParam("ReviewTotalEquity")));
+		finReportReview.setBondsPayable(parse.stringToBigDecimal(titaVo.getParam("ReviewBondsPayable")));
+		finReportReview.setLongTermBorrowings(parse.stringToBigDecimal(titaVo.getParam("ReviewLongTermBorrowings")));
+		finReportReview.setNonCurrentLease(parse.stringToBigDecimal(titaVo.getParam("ReviewNonCurrentLease")));
+		finReportReview.setLongTermPayable(parse.stringToBigDecimal(titaVo.getParam("ReviewLongTermPayable")));
+		finReportReview.setPreference(parse.stringToBigDecimal(titaVo.getParam("ReviewPreference")));
+		finReportReview.setOperatingRevenue(parse.stringToBigDecimal(titaVo.getParam("ReviewOperatingRevenue")));
+		finReportReview.setInterestExpense(parse.stringToBigDecimal(titaVo.getParam("ReviewInterestExpense")));
+		finReportReview.setProfitBeforeTax(parse.stringToBigDecimal(titaVo.getParam("ReviewProfitBeforeTax")));
+		finReportReview.setProfitAfterTax(parse.stringToBigDecimal(titaVo.getParam("ReviewProfitAfterTax")));
+		finReportReview.setWorkingCapitalRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewWorkingCapitalRatio")));
+		finReportReview.setInterestCoverageRatio1(parse.stringToBigDecimal(titaVo.getParam("ReviewInterestCoverageRatio1")));
+		finReportReview.setInterestCoverageRatio2(parse.stringToBigDecimal(titaVo.getParam("ReviewInterestCoverageRatio2")));
+		finReportReview.setLeverageRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewLeverageRatio")));
+		finReportReview.setEquityRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewEquityRatio")));
+		finReportReview.setLongFitRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewLongFitRatio")));
+		finReportReview.setLongFitRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewLongFitRatio")));
+		finReportReview.setNetProfitRatio(parse.stringToBigDecimal(titaVo.getParam("ReviewNetProfitRatio")));
+
+		if (exist) {
+			try {
+				finReportReview = finReportReviewService.update2(finReportReview, titaVo);
+
+				dataLog.setEnv(titaVo, finReportReview2, finReportReview);
+				dataLog.exec();
+
+			} catch (DBException e) {
+				throw new LogicException("E0007", "財報品質(FinReportReview)");
+			}
+		} else {
+			try {
+				finReportReviewService.insert(finReportReview, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "財報品質(FinReportReview)");
+			}
+		}
 	}
 
 	private void mntFinReportQuality(TitaVo titaVo, String custUKey, String uKey) throws LogicException {

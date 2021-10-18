@@ -62,7 +62,8 @@ E(0,0)
 ["#FdEmpnoBef+員工代號",#EmpnoBef,#EmpnameBef],[#EmpnoInd,#EmpnoAft,#BtnCdEmp,#EmpnameAft],
 ["#FdEntcodeBef+企金別",#EntcodeBef,#EntcodeBefX],[#EntcodeInd,#EntcodeAft,#EntcodeAftX],
 ["#FdIndustryBef+行業別",#IndustryBef,#IndustryBefX],[#IndustryInd,#IndustryAft,#IndustryAftX],
-["#FdCountryBef+國籍",#CountryBef,#CountryX],[#CountryInd,#CountryAft,#CountryXAft],
+["#FdCountryBef+出生地國籍",#CountryBef,#CountryX],[#CountryInd,#CountryAft,#CountryXAft],
+["#FdBussNationalityCode+居住地國籍",#BussNationalityCodeBef,#BussNationalityCodeBefX],[#BussNationalityCodeInd,#BussNationalityCodeAft,#BussNationalityCodeAftX],
 ["#FdSpouseIdBef+配偶身分證字號",#SpouseIdBef],[#SpouseIdInd,#SpouseIdAft],
 ["#FdSpouseNmBef1+配偶姓名",#SpouseNmBef],[#SpouseNmInd,#SpouseNmAft],
 ![#<->#,"#FdRegAdrBef+修改前戶籍-地址",#RegCityCodeBef,#RegCityItemBef,#RegAreaCodeBef,#RegAreaItemBef,"</br>",#RegRoadBef,"</br>",#RegSectionBef,"段",#RegAlleyBef,"巷",#RegLaneBef,"弄",#RegNumBef,"號","之",#RegNumDashBef,",",#RegFloorBef,"樓","之",#RegFloorDashBef],
@@ -263,6 +264,8 @@ T(2,@IndustryBef,#L1r01IndustryCode)
 T(2,@IndustryAft,#L1r01IndustryCode)
 T(2,@CountryBef,#L1r01NationalityCode)
 T(2,@CountryAft,#L1r01NationalityCode)
+T(2,@BussNationalityCodeBef,#L1r01BussNationalityCode)
+T(2,@BussNationalityCodeAft,#L1r01BussNationalityCode)
 T(2,@SpouseIdBef,#L1r01SpouseId)
 T(2,@SpouseIdAft,#L1r01SpouseId)
 T(2,@SpouseNmBef,#L1r01SpouseName)
@@ -439,10 +442,12 @@ T(H,@SexAftX,#GenderAft,#SexHelp)
 #CustTypeD=X,1,S
 T(H,@CustTypeCodeBefX,#CustTypeBef,#CustTypeCodeHelp)
 T(H,@CustTypeCodeAftX,#CustTypeAft,#CustTypeCodeHelp)
-!國籍
+!出生地國籍
 #CountryD=X,1,S
 T(H,@CountryX,#CountryBef,#NationalityCodeHelp)
 T(H,@CountryXAft,#CountryAft,#NationalityCodeHelp)
+T(H,@BussNationalityCodeBefX,#BussNationalityCodeBef,#NationalityCodeHelp)
+T(H,@BussNationalityCodeAftX,#BussNationalityCodeAft,#NationalityCodeHelp)
 !企金別
 #EntD=X,1,S
 T(H,@EntcodeBefX,#EntcodeBef,#EntCodeHelp)
@@ -513,6 +518,8 @@ T(3,*)
 #FdIndustryBef=X,2,L
 T(3,)
 #FdCountryBef=X,2,L
+T(3,*)
+#FdBussNationalityCode=X,2,L
 T(3,*)
 #FdSpouseIdBef=X,2,L
 #FdSpouseNmBef1=X,2,L
@@ -753,7 +760,7 @@ T(2,@IndustryBefX,#L6R06IndustryItem)
 IF(#IndustryAft==#IndustryBef || #IndustryAft == 0,T(3,),T(3,X))
 
 
-!國籍
+!出生地國籍
 #CountryBef=X,2,L
 
 #CountryX=X,50,L
@@ -773,6 +780,28 @@ T(H,#CountryAft,#NationalityCodeHelp)
 
 #CountryInd=_,_,L
 IF(#CountryAft==#CountryBef || #CountryAft == "",T(3,),T(3,X))
+
+
+!居住地國籍
+#BussNationalityCodeBef=X,2,L
+
+#BussNationalityCodeBefX=X,50,L
+!T(H,#BussNationalityCodeBef,#NationalityCodeHelp)
+
+#BussNationalityCodeInd=X,1,L
+
+#BussNationalityCodeAft=X,2,I
+HELP(#NationalityCodeHelp)
+@
+C(5,#TypeCodeInd,X,$,C(5,#BussNationalityCodeBef,#BussNationalityCodeAft,s,$))
+V(H,#NationalityCodeHelp)
+
+#BussNationalityCodeAftX=X,50,L
+T(H,#BussNationalityCodeAft,#NationalityCodeHelp)
+
+
+#BussNationalityCodeInd=_,_,L
+IF(#BussNationalityCodeBef==#BussNationalityCodeAft || #BussNationalityCodeAft == "",T(3,),T(3,X))
 
 !配偶身分證字號
 #SpouseIdBef=X,10,L
@@ -1574,6 +1603,9 @@ T(3,[L1103] 顧客基本資料變更-自然人)
 #CountryBef
 #CountryInd
 #CountryAft
+#BussNationalityCodeBef
+#BussNationalityCodeAft
+#BussNationalityCodeInd
 #SpouseIdBef
 #SpouseIdInd
 #SpouseIdAft

@@ -62,12 +62,12 @@ public class L5602 extends TradeBuffer {
 		int iClCustNo = iCollList.getClCustNo();
 		int iClFacmNo = iCollList.getClFacmNo();
 		// 用撈出的擔保品編號找全部相同擔保品的資料
-		Slice<CollList> AllCollList = iCollListService.findCl(iClCustNo, iClFacmNo, this.index, this.limit, titaVo);
-		if (AllCollList == null) {
+		Slice<CollList> allCollList = iCollListService.findCl(iClCustNo, iClFacmNo, 0,Integer.MAX_VALUE, titaVo);
+		if (allCollList == null) {
 			throw new LogicException(titaVo, "E0005", "");
 		}
 		// 處理找出的資料(包含面催檔登錄和主檔更新)
-		for (CollList CollListVo : AllCollList) {
+		for (CollList CollListVo : allCollList) {
 			CollMeetId iCollMeetId = new CollMeetId();
 			CollMeet iCollMeet = new CollMeet();
 			iCollMeetId.setCaseCode(titaVo.getParam("CaseCode"));
@@ -81,9 +81,6 @@ public class L5602 extends TradeBuffer {
 				iCollMeetId.setTitaTlrNo(titaVo.getParam("TitaTlrNo"));
 				iCollMeetId.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
 				iCollMeetId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));// 營業日 放acdate
-				this.info("updatetlrno" + titaVo.getParam("TitaTlrNo"));
-				this.info("updatetlrno" + titaVo.getParam("TitaTxtNo"));
-				this.info("updatetita=" + titaVo.getParam("TitaAcDate"));
 			}
 			iCollMeet.setCollMeetId(iCollMeetId);
 			iCollMeet.setMeetDate(Integer.valueOf(titaVo.getParam("MeetDate")));
@@ -99,28 +96,24 @@ public class L5602 extends TradeBuffer {
 			if (iFuntionCd.equals("1") || iFuntionCd.equals("3")) {
 				if (tCollMeet == null) {
 					try {
-						this.info("trytoinsert");
 						iCollMeetService.insert(iCollMeet, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 電催檔找不到資料錯誤
+						throw new LogicException(titaVo, "E0002", e.getErrorMsg());
 					}
 				}
 			}
 			if (iFuntionCd.equals("2")) {
-				this.info("update choose");
 				if (tCollMeet != null) {
 					try {
-						this.info("trytoupdate");
 						iCollMeetService.holdById(iCollMeetId);
-						iCollMeet.setCreateDate(tCollMeet.getCreateDate()); // 補上createdate
-						iCollMeet.setCreateEmpNo(tCollMeet.getCreateEmpNo()); // 補上createempno
+						iCollMeet.setCreateDate(tCollMeet.getCreateDate());
+						iCollMeet.setCreateEmpNo(tCollMeet.getCreateEmpNo());
 						iCollMeetService.update(iCollMeet, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 電催檔更新資料錯誤
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 				} else {
-					this.info("nottrytoupdate");
-					throw new LogicException(titaVo, "E0005", ""); // 電催檔找不到資料錯誤
+					throw new LogicException(titaVo, "E0003", "");
 				}
 			}
 			if (iFuntionCd.equals("4")) {
@@ -129,11 +122,10 @@ public class L5602 extends TradeBuffer {
 						iCollMeetService.holdById(iCollMeetId);
 						iCollMeetService.delete(iCollMeet, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 電催檔更新資料錯誤
+						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 					}
 				} else {
-					this.info("nottrytoupdate");
-					throw new LogicException(titaVo, "E0008", ""); // 電催檔找不到資料錯誤
+					throw new LogicException(titaVo, "E0004", "");
 				}
 			}
 			// 更新list的上次作業日期和項目
@@ -145,13 +137,13 @@ public class L5602 extends TradeBuffer {
 				try {
 					CollList upCollList = iCollListService.holdById(cCollListId, titaVo);
 					upCollList.setTxCode("4"); // 上次作業項目
-					upCollList.setTxDate(Integer.valueOf(titaVo.getEntDy())); // 上次作業日期
+					upCollList.setTxDate(Integer.valueOf(titaVo.getEntDy()));
 					iCollListService.update(upCollList, titaVo);
 				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 主檔更新錯誤訊息
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 				}
 			} else {
-				throw new LogicException(titaVo, "E0005", ""); // 主檔無資料錯誤訊息
+				throw new LogicException(titaVo, "E0002", "");
 			}
 		}
 		this.addList(this.totaVo);

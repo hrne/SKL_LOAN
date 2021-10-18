@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdAcCodeService")
 @Repository
-public class CdAcCodeServiceImpl implements CdAcCodeService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdAcCodeServiceImpl.class);
-
+public class CdAcCodeServiceImpl extends ASpringJpaParm implements CdAcCodeService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CdAcCodeServiceImpl implements CdAcCodeService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdAcCodeId);
+    this.info("findById " + dbName + " " + cdAcCodeId);
     Optional<CdAcCode> cdAcCode = null;
     if (dbName.equals(ContentName.onDay))
       cdAcCode = cdAcCodeReposDay.findById(cdAcCodeId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AcNoCode", "AcSubCode", "AcDtlCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AcNoCode", "AcSubCode", "AcDtlCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdAcCodeReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,6 +103,9 @@ em = null;
     else 
       slice = cdAcCodeRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -115,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("acCodeAcctFirst " + dbName + " : " + "acctCode_0 : " + acctCode_0);
+    this.info("acCodeAcctFirst " + dbName + " : " + "acctCode_0 : " + acctCode_0);
     Optional<CdAcCode> cdAcCodeT = null;
     if (dbName.equals(ContentName.onDay))
       cdAcCodeT = cdAcCodeReposDay.findTopByAcctCodeIs(acctCode_0);
@@ -125,6 +124,7 @@ em = null;
       cdAcCodeT = cdAcCodeReposHist.findTopByAcctCodeIs(acctCode_0);
     else 
       cdAcCodeT = cdAcCodeRepos.findTopByAcctCodeIs(acctCode_0);
+
     return cdAcCodeT.isPresent() ? cdAcCodeT.get() : null;
   }
 
@@ -140,7 +140,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findAcCode " + dbName + " : " + "acNoCode_0 : " + acNoCode_0 + " acNoCode_1 : " +  acNoCode_1 + " acSubCode_2 : " +  acSubCode_2 + " acSubCode_3 : " +  acSubCode_3 + " acDtlCode_4 : " +  acDtlCode_4 + " acDtlCode_5 : " +  acDtlCode_5);
+    this.info("findAcCode " + dbName + " : " + "acNoCode_0 : " + acNoCode_0 + " acNoCode_1 : " +  acNoCode_1 + " acSubCode_2 : " +  acSubCode_2 + " acSubCode_3 : " +  acSubCode_3 + " acDtlCode_4 : " +  acDtlCode_4 + " acDtlCode_5 : " +  acDtlCode_5);
     if (dbName.equals(ContentName.onDay))
       slice = cdAcCodeReposDay.findAllByAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoCode_0, acNoCode_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -150,6 +150,37 @@ em = null;
     else 
       slice = cdAcCodeRepos.findAllByAcNoCodeGreaterThanEqualAndAcNoCodeLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeAscAcSubCodeAscAcDtlCodeAsc(acNoCode_0, acNoCode_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<CdAcCode> findAcCodeOld(String acNoCodeOld_0, String acNoCodeOld_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdAcCode> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findAcCodeOld " + dbName + " : " + "acNoCodeOld_0 : " + acNoCodeOld_0 + " acNoCodeOld_1 : " +  acNoCodeOld_1 + " acSubCode_2 : " +  acSubCode_2 + " acSubCode_3 : " +  acSubCode_3 + " acDtlCode_4 : " +  acDtlCode_4 + " acDtlCode_5 : " +  acDtlCode_5);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdAcCodeReposDay.findAllByAcNoCodeOldGreaterThanEqualAndAcNoCodeOldLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeOldAscAcSubCodeAscAcDtlCodeAsc(acNoCodeOld_0, acNoCodeOld_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdAcCodeReposMon.findAllByAcNoCodeOldGreaterThanEqualAndAcNoCodeOldLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeOldAscAcSubCodeAscAcDtlCodeAsc(acNoCodeOld_0, acNoCodeOld_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdAcCodeReposHist.findAllByAcNoCodeOldGreaterThanEqualAndAcNoCodeOldLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeOldAscAcSubCodeAscAcDtlCodeAsc(acNoCodeOld_0, acNoCodeOld_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, pageable);
+    else 
+      slice = cdAcCodeRepos.findAllByAcNoCodeOldGreaterThanEqualAndAcNoCodeOldLessThanEqualAndAcSubCodeGreaterThanEqualAndAcSubCodeLessThanEqualAndAcDtlCodeGreaterThanEqualAndAcDtlCodeLessThanEqualOrderByAcNoCodeOldAscAcSubCodeAscAcDtlCodeAsc(acNoCodeOld_0, acNoCodeOld_1, acSubCode_2, acSubCode_3, acDtlCode_4, acDtlCode_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -158,7 +189,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdAcCodeId);
+    this.info("Hold " + dbName + " " + cdAcCodeId);
     Optional<CdAcCode> cdAcCode = null;
     if (dbName.equals(ContentName.onDay))
       cdAcCode = cdAcCodeReposDay.findByCdAcCodeId(cdAcCodeId);
@@ -176,7 +207,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdAcCode.getCdAcCodeId());
+    this.info("Hold " + dbName + " " + cdAcCode.getCdAcCodeId());
     Optional<CdAcCode> cdAcCodeT = null;
     if (dbName.equals(ContentName.onDay))
       cdAcCodeT = cdAcCodeReposDay.findByCdAcCodeId(cdAcCode.getCdAcCodeId());
@@ -198,7 +229,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdAcCode.getCdAcCodeId());
+    this.info("Insert..." + dbName + " " + cdAcCode.getCdAcCodeId());
     if (this.findById(cdAcCode.getCdAcCodeId()) != null)
       throw new DBException(2);
 
@@ -227,7 +258,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdAcCode.getCdAcCodeId());
+    this.info("Update..." + dbName + " " + cdAcCode.getCdAcCodeId());
     if (!empNot.isEmpty())
       cdAcCode.setLastUpdateEmpNo(empNot);
 
@@ -250,7 +281,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdAcCode.getCdAcCodeId());
+    this.info("Update..." + dbName + " " + cdAcCode.getCdAcCodeId());
     if (!empNot.isEmpty())
       cdAcCode.setLastUpdateEmpNo(empNot);
 
@@ -270,7 +301,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdAcCode.getCdAcCodeId());
+    this.info("Delete..." + dbName + " " + cdAcCode.getCdAcCodeId());
     if (dbName.equals(ContentName.onDay)) {
       cdAcCodeReposDay.delete(cdAcCode);	
       cdAcCodeReposDay.flush();
@@ -299,7 +330,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdAcCode t : cdAcCode){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -334,7 +365,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdAcCode == null || cdAcCode.size() == 0)
       throw new DBException(6);
 
@@ -363,7 +394,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdAcCode> cdAcCode, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

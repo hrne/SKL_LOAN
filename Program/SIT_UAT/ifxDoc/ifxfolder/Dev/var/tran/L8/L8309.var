@@ -38,16 +38,17 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[250,150,250,150];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[300,150,250,150];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8309]                                 (48)債務人基本資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
-[#<->#,"#FdCustId+債務人IDN",#CustId],
+[#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdRcDate+協商申請日",#RcDate],
 [#<->#,"#FdCustRegAddr+債務人戶籍之郵遞區號及地址",#CustRegAddr],
 [#<->#,"#FdCustComAddr+債務人通訊地之郵遞區號及地址",#CustComAddr],
-["#FdCustRegTelNo+債務人戶籍電話",#CustRegTelNo],["#FdCustComTelNo+債務人通訊電話",#CustComTelNo],
+[#<->#,"#FdCustRegTelNo+債務人戶籍電話<font color=red>例:02-28225252",#CustRegTelNo],
+[#<->#,"#FdCustComTelNo+債務人通訊電話",#CustComTelNo],
 [#<->#,"#FdCustMobilNo+債務人行動電話",#CustMobilNo],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
@@ -210,7 +211,17 @@ C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
 ![債務人IDN]
 #CustId=X,10,L
+#RimCustId=X,10,S
+<include src="ROM.icf::L8R57.dec"/>
+T(2,@RimCustId,#CustId)
+! 檢核該統編是否存在於客戶檔
+#RimL8R57=X,1,S
+RESET_RIM(#RimL8R57,L8R57)
+S(L8R57,1,#RimCustId)
+R(1,L8R57)
+T(2,@CustIdX,#L8R57CustName)
 
+#CustIdX=X,2.50,L
 
 ![報送單位代號]
 #SubmitKey=X,3,L
@@ -334,6 +345,7 @@ TXFORM=L8309^
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R20.tom"/>
 <include src="ROM.icf::L8R19.tom"/>
+<include src="ROM.icf::L8R57.tom"/>
 ! 調Rim相關 結束
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

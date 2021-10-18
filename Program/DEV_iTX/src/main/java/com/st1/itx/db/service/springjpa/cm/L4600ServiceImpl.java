@@ -43,9 +43,9 @@ public class L4600ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          , IR.\"InsuEndDate\"         AS \"InsuEndDate\"   "; // -- 保險迄日
 		sql += "          , IR.\"FireInsuCovrg\"       AS \"FireInsuCovrg\" "; // -- 火險保額
 		sql += "          , IR.\"EthqInsuCovrg\"       AS \"EthqInsuCovrg\" "; // -- 地震險保額
-		sql += "          , \"GetAdviseFireInsuCovrg\"(IR.\"ClCode1\",IR.\"ClCode2\",IR.\"ClNo\",1) ";
+		sql += "          , \"Fn_GetAdviseFireInsuCovrg\"(IR.\"ClCode1\",IR.\"ClCode2\",IR.\"ClNo\",1) ";
 		sql += "                                     AS \"TotalArea\" "; // -- 總坪數
-		sql += "          , \"GetAdviseFireInsuCovrg\"(IR.\"ClCode1\",IR.\"ClCode2\",IR.\"ClNo\",2)  ";
+		sql += "          , \"Fn_GetAdviseFireInsuCovrg\"(IR.\"ClCode1\",IR.\"ClCode2\",IR.\"ClNo\",2)  ";
 		sql += "                                     AS \"AdviseFireInsuCovrg\" "; // -- 建議火險保額
 		sql += "     FROM \"InsuRenew\" IR ";
 		sql += "     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = IR.\"CustNo\" ";

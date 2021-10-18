@@ -61,6 +61,22 @@ public interface CdAcCodeService {
   public Slice<CdAcCode> findAcCode(String acNoCode_0, String acNoCode_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, int index, int limit, TitaVo... titaVo);
 
   /**
+   * AcNoCodeOld &gt;= ,AND AcNoCodeOld &lt;= ,AND AcSubCode &gt;= ,AND AcSubCode &lt;= ,AND AcDtlCode &gt;= ,AND AcDtlCode &lt;= 
+   *
+   * @param acNoCodeOld_0 acNoCodeOld_0
+   * @param acNoCodeOld_1 acNoCodeOld_1
+   * @param acSubCode_2 acSubCode_2
+   * @param acSubCode_3 acSubCode_3
+   * @param acDtlCode_4 acDtlCode_4
+   * @param acDtlCode_5 acDtlCode_5
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdAcCode CdAcCode of List
+   */
+  public Slice<CdAcCode> findAcCodeOld(String acNoCodeOld_0, String acNoCodeOld_1, String acSubCode_2, String acSubCode_3, String acDtlCode_4, String acDtlCode_5, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CdAcCode
    * 
    * @param cdAcCodeId key

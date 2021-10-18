@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L1;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ import com.st1.itx.db.service.FinReportRateService;
 import com.st1.itx.db.domain.FinReportQuality;
 import com.st1.itx.db.domain.FinReportQualityId;
 import com.st1.itx.db.service.FinReportQualityService;
+import com.st1.itx.db.domain.FinReportReview;
+import com.st1.itx.db.domain.FinReportReviewId;
+import com.st1.itx.db.service.FinReportReviewService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -58,6 +62,9 @@ public class L1R03 extends TradeBuffer {
 
 	@Autowired
 	public FinReportQualityService finReportQualityService;
+	
+	@Autowired
+	public FinReportReviewService finReportReviewService;
 
 	/* 轉換工具 */
 	@Autowired
@@ -194,8 +201,36 @@ public class L1R03 extends TradeBuffer {
 			this.totaVo.putParam("ParentCompanyRight", 0);
 			this.totaVo.putParam("EPS", 0);
 		} else {
+			this.info("L1R03 finReportProfit found");
+			
 			this.totaVo.putParam("BusIncome", finReportProfit.getBusIncome());
-			this.totaVo.putParam("GrowRate", finReportProfit.getGrowRate());
+
+			//this.totaVo.putParam("GrowRate", finReportProfit.getGrowRate());
+			int lastYear = finReportDebt.getStartYY() - 1;
+			BigDecimal lastBusIncome = new BigDecimal("0");
+			FinReportDebt finReportDebt2 = finReportDebtService.findCustUKeyYearFirst(finReportDebt.getCustUKey(), lastYear,titaVo);
+			if (finReportDebt2 != null) {
+				FinReportProfitId finReportProfitId2 = new FinReportProfitId();
+				finReportProfitId2.setCustUKey(finReportDebt2.getCustUKey());
+				finReportProfitId2.setUKey(finReportDebt2.getUKey());
+
+				FinReportProfit finReportProfit2 = finReportProfitService.findById(finReportProfitId2, titaVo);
+				if (finReportProfit2 != null) {
+					lastBusIncome = finReportProfit2.getBusIncome();
+				}
+			}
+			this.info("L1R03 lastBusIncome = " + lastBusIncome);
+			this.info("L1R03 nowBusIncome  = " + finReportProfit.getBusIncome());
+			BigDecimal growRate = new BigDecimal("0");
+			if (lastBusIncome.compareTo(new BigDecimal("0")) != 0) {
+				// 成長率算法 (新-舊)/舊
+				BigDecimal iHundred = new BigDecimal("100");
+				BigDecimal iGap = finReportProfit.getBusIncome().subtract(lastBusIncome);
+				growRate = iGap.divide(lastBusIncome).setScale(4, BigDecimal.ROUND_HALF_UP).multiply(iHundred);
+			}
+			this.info("L1R03 GrowRate  = " + growRate);
+			this.totaVo.putParam("GrowRate", growRate);
+			
 			this.totaVo.putParam("BusCost", finReportProfit.getBusCost());
 			this.totaVo.putParam("BusGrossProfit", finReportProfit.getBusGrossProfit());
 			this.totaVo.putParam("ManageFee", finReportProfit.getManageFee());
@@ -328,6 +363,70 @@ public class L1R03 extends TradeBuffer {
 			this.totaVo.putParam("PunishRecord", finReportQuality.getPunishRecord());
 			this.totaVo.putParam("ChangeReason", finReportQuality.getChangeReason());
 
+		}
+
+		// 審比率
+
+		this.info("active L1R03 FinReportReview");
+		
+		FinReportReviewId finReportReviewId = new FinReportReviewId();
+		finReportReviewId.setCustUKey(iCustUKey);
+		finReportReviewId.setUKey(iUKey);
+
+		FinReportReview finReportReview = finReportReviewService.findById(finReportReviewId, titaVo);
+
+		if (finReportReview == null) {
+			this.totaVo.putParam("ReviewCurrentAsset", 0);
+			this.totaVo.putParam("ReviewTotalAsset", 0);
+			this.totaVo.putParam("ReviewPropertyAsset", 0);
+			this.totaVo.putParam("ReviewInvestment", 0);
+			this.totaVo.putParam("ReviewInvestmentProperty", 0);
+			this.totaVo.putParam("ReviewDepreciation", 0);
+			this.totaVo.putParam("ReviewCurrentDebt", 0);
+			this.totaVo.putParam("ReviewTotalDebt", 0);
+			this.totaVo.putParam("ReviewTotalEquity", 0);
+			this.totaVo.putParam("ReviewBondsPayable", 0);
+			this.totaVo.putParam("ReviewLongTermBorrowings", 0);
+			this.totaVo.putParam("ReviewNonCurrentLease", 0);
+			this.totaVo.putParam("ReviewLongTermPayable", 0);
+			this.totaVo.putParam("ReviewPreference", 0);
+			this.totaVo.putParam("ReviewOperatingRevenue", 0);
+			this.totaVo.putParam("ReviewInterestExpense", 0);
+			this.totaVo.putParam("ReviewProfitBeforeTax", 0);
+			this.totaVo.putParam("ReviewProfitAfterTax", 0);
+			this.totaVo.putParam("ReviewWorkingCapitalRatio", 0);
+			this.totaVo.putParam("ReviewInterestCoverageRatio1", 0);
+			this.totaVo.putParam("ReviewInterestCoverageRatio2", 0);
+			this.totaVo.putParam("ReviewLeverageRatio", 0);
+			this.totaVo.putParam("ReviewEquityRatio", 0);
+			this.totaVo.putParam("ReviewLongFitRatio", 0);
+			this.totaVo.putParam("ReviewNetProfitRatio", 0);
+		} else {
+			this.totaVo.putParam("ReviewCurrentAsset", finReportReview.getCurrentAsset());
+			this.totaVo.putParam("ReviewTotalAsset", finReportReview.getTotalAsset());
+			this.totaVo.putParam("ReviewPropertyAsset", finReportReview.getPropertyAsset());
+			this.totaVo.putParam("ReviewInvestment", finReportReview.getInvestment());
+			this.totaVo.putParam("ReviewInvestmentProperty", finReportReview.getInvestmentProperty());
+			this.totaVo.putParam("ReviewDepreciation", finReportReview.getDepreciation());
+			this.totaVo.putParam("ReviewCurrentDebt", finReportReview.getCurrentDebt());
+			this.totaVo.putParam("ReviewTotalDebt", finReportReview.getTotalDebt());
+			this.totaVo.putParam("ReviewTotalEquity", finReportReview.getTotalEquity());
+			this.totaVo.putParam("ReviewBondsPayable", finReportReview.getBondsPayable());
+			this.totaVo.putParam("ReviewLongTermBorrowings", finReportReview.getLongTermBorrowings());
+			this.totaVo.putParam("ReviewNonCurrentLease", finReportReview.getNonCurrentLease());
+			this.totaVo.putParam("ReviewLongTermPayable", finReportReview.getLongTermPayable());
+			this.totaVo.putParam("ReviewPreference", finReportReview.getPreference());
+			this.totaVo.putParam("ReviewOperatingRevenue", finReportReview.getOperatingRevenue());
+			this.totaVo.putParam("ReviewInterestExpense", finReportReview.getInterestExpense());
+			this.totaVo.putParam("ReviewProfitBeforeTax", finReportReview.getProfitBeforeTax());
+			this.totaVo.putParam("ReviewProfitAfterTax", finReportReview.getProfitAfterTax());
+			this.totaVo.putParam("ReviewWorkingCapitalRatio", finReportReview.getWorkingCapitalRatio());
+			this.totaVo.putParam("ReviewInterestCoverageRatio1", finReportReview.getInterestCoverageRatio1());
+			this.totaVo.putParam("ReviewInterestCoverageRatio2", finReportReview.getInterestCoverageRatio2());
+			this.totaVo.putParam("ReviewLeverageRatio", finReportReview.getLeverageRatio());
+			this.totaVo.putParam("ReviewEquityRatio", finReportReview.getEquityRatio());
+			this.totaVo.putParam("ReviewLongFitRatio", finReportReview.getLongFitRatio());
+			this.totaVo.putParam("ReviewNetProfitRatio", finReportReview.getNetProfitRatio());
 		}
 		
 		this.addList(this.totaVo);

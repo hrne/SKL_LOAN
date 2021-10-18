@@ -53,7 +53,8 @@ E(0,0)
 ["#FdEmpNo",#EmpNo,#BtnCdEmp,#EmployeeName],
 ["#FdEntCode+企金別",#EntCode,#EntCodeX],
 ["#FdIndustryCode+行業別",#IndustryCode,#IndustryCodeX],
-[#<->#,"#FdNationalityCode+國籍",#NationalityCode,#NationalityCodex],
+["#FdNationalityCode+出生地國籍",#NationalityCode,#NationalityCodex],
+["#FdBussNationalityCode+居住地國籍",#BussNationalityCode,#BussNationalityCodex],
 [#<->#,"#FdSpouseId+配偶身分證字號",#SpouseId],
 [#<->#,"#FdSpouseName+配偶姓名",#SpouseName],
 [#<->#,"#FdRegCityCode+戶籍-地址",#RegCityCode,#RegCityItem,#RegAreaCode,#RegAreaItem,"</br>",#RegRoad,"</br>",#RegSection,"段",#RegAlley,"巷",#RegLane,"弄",#RegNum,"號","之",#RegNumDash,",",#RegFloor,"樓","之",#RegFloorDash],
@@ -157,6 +158,7 @@ IF(#RegFg==0,$,s)
 #FdCustTypeCode=X,2,L
 #FdIndustryCode=X,2,L
 #FdNationalityCode=X,2,L
+#FdBussNationalityCode=X,2,L
 #FdSpouseId=X,2,L
 #FdSpouseName=X,2,L
 #FdRegZip3=X,2,L
@@ -438,6 +440,8 @@ C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
 T(2,@FdEntCode,#Fd)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
 T(2,@FdNationalityCode,#Fd)
+C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSTAR))
+T(2,@FdBussNationalityCode,#Fd)
 T(2,@FdSpouseId,#WKSPC)
 T(2,@FdSpouseName,#WKSPC)
 C(2,#TypeCode,T(2,#WKSTAR),T(2,#WKSTAR),T(2,#WKSPC),T(2,#WKSPC),T(2,#WKSPC))
@@ -664,7 +668,7 @@ T(3,060000)
 #IndustryCodeX=x,20,L
 T(3,個人)
 
-!國籍
+!出生地國籍
 #NationalityCode=X,2,I
 C(3,#FunCd,4,s,$)
 C(3,#FunCd,5,s,$)
@@ -676,6 +680,19 @@ C(4,#NationalityCode,$,V(H,#NationalityCodeHelp))
 
 #NationalityCodex=X,50,L
 T(H,#NationalityCode,#NationalityCodeHelp)
+
+!出生地國籍
+#BussNationalityCode=X,2,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+C(4,#BussNationalityCode,T(3,TW),$)
+HELP(#NationalityCodeHelp)
+@
+IF(#FdBussNationalityCode=="*",V(7),$)
+C(4,#BussNationalityCode,$,V(H,#NationalityCodeHelp))
+
+#BussNationalityCodex=X,50,L
+T(H,#BussNationalityCode,#NationalityCodeHelp)
 
 !配偶身分證字號
 #SpouseId=X,10,I
@@ -1391,10 +1408,14 @@ T(H,#OCustTypeCode,#CustTypeCodeHelp)
 !行業別
 #OIndustryCode=X,6,L
 #OIndustryCodeX=x,100,L
-!國籍
+!出生地國籍
 #ONationalityCode=X,2,L
 #ONationalityCodex=X,50,L
 T(H,#ONationalityCode,#NationalityCodeHelp)
+!居住地國籍
+#OBussNationalityCode=X,2,L
+#OBussNationalityCodex=X,50,L
+T(H,#OBussNationalityCode,#NationalityCodeHelp)
 !配偶身分證字號
 #OSpouseId=X,10,L
 !配偶姓名
@@ -1560,6 +1581,7 @@ T(H,#OOEnable,#EnableHelp)
 #CustTypeCode
 #IndustryCode
 #NationalityCode
+#BussNationalityCode
 #SpouseId
 #SpouseName
 #RegZip3
@@ -1626,6 +1648,7 @@ TXFORM=L1101
 #OIndustryCode
 #OIndustryCodeX
 #ONationalityCode
+#OBussNationalityCode
 #OSpouseId
 #OSpouseName
 #ORegZip3
@@ -1697,7 +1720,8 @@ TXFORM=L1101
 ["員工代號",#OEmpNo,#OEmpNoX],
 ["企金別",#OEntCodeX],
 ["行業別",#OIndustryCode,#OIndustryCodeX],
-[#<->#,"國籍",#ONationalityCodex],
+["出生地國籍",#ONationalityCodex],
+["居住地國籍",#OBussNationalityCodex],
 [#<->#,"配偶身分證字號",#OSpouseId],
 [#<->#,"配偶姓名",#OSpouseName],
 [#<->#,"戶籍-郵遞區號",#ORegZip3,#ORegZip2],

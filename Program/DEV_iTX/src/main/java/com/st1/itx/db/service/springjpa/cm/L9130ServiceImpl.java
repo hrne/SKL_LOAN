@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,7 +18,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9130ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -29,7 +26,6 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> doQuery(int acDate, int slipBatNo, TitaVo titaVo) throws Exception {
 
 		String sql = " ";
@@ -56,58 +52,70 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
 		sql += "              , NVL(TRIM(ACD.\"AcBookCode\"), '000') AS \"AcBookCode\" ";
-		sql += "              , ACD.\"AcNoCode\" ";
+		sql += "              , CDAC.\"AcNoCodeOld\" AS \"AcNoCode\" ";
 		sql += "              , ACD.\"AcSubCode\" ";
 		sql += "              , ACD.\"DbCr\" ";
 		sql += "              , ACD.\"TxAmt\" ";
 		sql += "              , N' '                                AS \"SlipNote\" ";
 		sql += "              , ' '                                 AS \"RvNo\" ";
 		sql += "         FROM \"AcDetail\" ACD ";
-		sql += "         WHERE \"AcDate\" = :acDate ";
-		sql += "               AND \"SlipBatNo\" = :slipBatNo ";
-		sql += "               AND \"ReceivableFlag\" <> '8' ";
+		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
+		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
+		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
+		sql += "           AND ACD.\"SlipBatNo\" = :slipBatNo ";
+		sql += "           AND ACD.\"ReceivableFlag\" <> '8' ";
 		sql += "         UNION ALL ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
 		sql += "              , '000'  AS \"AcBookCode\" ";
-		sql += "              , ACD.\"AcNoCode\" ";
+		sql += "              , CDAC.\"AcNoCodeOld\" AS \"AcNoCode\" ";
 		sql += "              , ACD.\"AcSubCode\" ";
 		sql += "              , ACD.\"DbCr\" ";
 		sql += "              , ACD.\"TxAmt\" ";
 		sql += "              , N' '   AS \"SlipNote\" ";
 		sql += "              , ' '    AS \"RvNo\" ";
 		sql += "         FROM \"AcDetail\" ACD ";
-		sql += "         WHERE \"AcDate\" = :acDate ";
-		sql += "               AND \"SlipBatNo\" = :slipBatNo ";
-		sql += "               AND \"ReceivableFlag\" <> '8' ";
-		sql += "               AND NVL(TRIM(ACD.\"AcBookCode\"), '000') <> '000' ";
-		sql += "               AND ACD.\"AcBookFlag\" <> '3' ";
+		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
+		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
+		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
+		sql += "           AND ACD.\"SlipBatNo\" = :slipBatNo ";
+		sql += "           AND ACD.\"ReceivableFlag\" <> '8' ";
+		sql += "           AND NVL(TRIM(ACD.\"AcBookCode\"), '000') <> '000' ";
+		sql += "           AND ACD.\"AcBookFlag\" <> '3' ";
 		sql += "         UNION ALL ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
 		sql += "              , NVL(TRIM(ACD.\"AcBookCode\"), '000') AS \"AcBookCode\" ";
-		sql += "              , ACD.\"AcNoCode\" ";
+		sql += "              , CDAC.\"AcNoCodeOld\" AS \"AcNoCode\" ";
 		sql += "              , ACD.\"AcSubCode\" ";
 		sql += "              , ACD.\"DbCr\" ";
 		sql += "              , ACD.\"TxAmt\" ";
 		sql += "              , ACD.\"SlipNote\" ";
 		sql += "              , ACD.\"RvNo\" ";
 		sql += "         FROM \"AcDetail\" ACD ";
-		sql += "         WHERE \"AcDate\" = :acDate ";
-		sql += "               AND \"SlipBatNo\"       = :slipBatNo ";
-		sql += "               AND \"ReceivableFlag\"  = '8' ";
+		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
+		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
+		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
+		sql += "           AND ACD.\"SlipBatNo\"       = :slipBatNo ";
+		sql += "           AND ACD.\"ReceivableFlag\"  = '8' ";
 		sql += "         UNION ALL ";
 		sql += "         SELECT ACD.\"AcDate\" ";
 		sql += "              , ACD.\"SlipBatNo\" ";
 		sql += "              , '000' AS \"AcBookCode\" ";
-		sql += "              , ACD.\"AcNoCode\" ";
+		sql += "              , CDAC.\"AcNoCodeOld\" AS \"AcNoCode\" ";
 		sql += "              , ACD.\"AcSubCode\" ";
 		sql += "              , ACD.\"DbCr\" ";
 		sql += "              , ACD.\"TxAmt\" ";
 		sql += "              , ACD.\"SlipNote\" ";
 		sql += "              , ACD.\"RvNo\" ";
 		sql += "         FROM \"AcDetail\" ACD ";
-		sql += "         WHERE \"AcDate\" = :acDate ";
+		sql += "         LEFT JOIN \"CdAcCode\" CDAC ON CDAC.\"AcNoCode\" = ACD.\"AcNoCode\" ";
+		sql += "                                    AND CDAC.\"AcSubCode\" = ACD.\"AcSubCode\" ";
+		sql += "                                    AND CDAC.\"AcDtlCode\" = ACD.\"AcDtlCode\" ";
+		sql += "         WHERE ACD.\"AcDate\" = :acDate ";
 		sql += "           AND ACD.\"SlipBatNo\"       = :slipBatNo ";
 		sql += "           AND ACD.\"ReceivableFlag\"  = '8' ";
 		sql += "           AND NVL(TRIM(ACD.\"AcBookCode\"), '000') <> '000' ";
@@ -128,7 +136,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , RESULT.\"AcSubCode\" ";
 		sql += "        , RESULT.\"DbCr\" DESC ";
 
-		logger.info("L9130ServiceImpl sql=" + sql);
+		this.info("L9130ServiceImpl sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -136,10 +144,9 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("acDate", acDate);
 		query.setParameter("slipBatNo", slipBatNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> doQuery2022(int acDate, int slipBatNo, TitaVo titaVo) throws Exception {
 
 		String sql = " ";
@@ -167,7 +174,7 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        , ACD.\"AcSubCode\"     "; // 子目代號
 		sql += "        , ACD.\"DbCr\" DESC     "; // 借貸別
 
-		logger.info("L9130ServiceImpl sql=" + sql);
+		this.info("L9130ServiceImpl sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -175,6 +182,6 @@ public class L9130ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("acDate", acDate);
 		query.setParameter("slipBatNo", slipBatNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

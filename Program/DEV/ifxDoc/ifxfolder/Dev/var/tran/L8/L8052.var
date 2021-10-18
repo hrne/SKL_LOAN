@@ -42,7 +42,7 @@ K(NOBUTTON,CLOSEY)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
 ["[L8052]                                 消債條列JCIC報送資料歷程查詢(440)"],
-["#FdCustId+身分證字號",#CustId],
+["#FdCustId+身分證字號",#CustId,#CustIdX],
 ["#FdRcDate+款項統一收付申請日",#RcDate],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
@@ -107,6 +107,8 @@ T(1,@ChainCd,#NTXBUF,1,5)
 T(1,@Ukey,#NTXBUF,6,32)
 
 #CustId=X,10,L
+#CustIdX=X,2.50,L
+
 #RcDate=D,7,L
 #SubmitKey=X,3,L
 #CourtCode=X,3,L
@@ -126,6 +128,15 @@ T(2,@SubmitKey,#L8r55SubmitKey)
 E(0,@RcDate,#L8r55ApplyDate)
 T(2,@CourtCode,#L8r55CourtCode)
 T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
+#RimCustId=X,10,S
+<include src="ROM.icf::L8R57.dec"/>
+T(2,@RimCustId,#CustId)
+! 檢核該統編是否存在於客戶檔
+#RimL8R57=X,1,S
+RESET_RIM(#RimL8R57,L8R57)
+S(L8R57,1,#RimCustId)
+R(1,L8R57)
+T(2,@CustIdX,#L8R57CustName)
 #ChainCd=X,5,S
 #Ukey=X,32,S
 #RPTFG=A,1,S
@@ -241,6 +252,7 @@ TXFORM=L8052
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L8R01.tom"/>
 <include src="ROM.icf::L8R55.tom"/>
+<include src="ROM.icf::L8R57.tom"/>
 </sub>
 !---------- 單據輸出組合 ----------
 <sub type="PART" name="L8052" layout="cols=3;screen.width=[250,250,100,250];printer.width=[20,20,20,20];order=1">

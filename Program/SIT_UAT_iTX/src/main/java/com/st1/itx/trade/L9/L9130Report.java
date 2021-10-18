@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -37,7 +35,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Component("L9130Report")
 @Scope("prototype")
 public class L9130Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9130Report.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -164,8 +161,7 @@ public class L9130Report extends MakeReport {
 
 		makeFile.open(titaVo, date, brno, no, desc, name, format);
 
-		Slice<SlipMedia> sSlipMedia = sSlipMediaService.findMediaSeq(iAcDate + 19110000, iBatchNo, iMediaSeq, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia> sSlipMedia = sSlipMediaService.findMediaSeq(iAcDate + 19110000, iBatchNo, iMediaSeq, 0, Integer.MAX_VALUE, titaVo);
 
 		if (sSlipMedia != null && !sSlipMedia.isEmpty()) {
 			// 若已存在,將該筆舊傳票刪除
@@ -223,8 +219,7 @@ public class L9130Report extends MakeReport {
 
 			acBookItem = tCdCode == null ? " " : tCdCode.getItem();
 
-			Slice<CdAcCode> slCdAcCode = sCdAcCodeService.findAcCode(acNoCode, acNoCode, acSubNoCode, acSubNoCode, "  ",
-					"  ", 0, Integer.MAX_VALUE, titaVo);
+			Slice<CdAcCode> slCdAcCode = sCdAcCodeService.findAcCodeOld(acNoCode, acNoCode, acSubNoCode, acSubNoCode, "  ", "  ", 0, Integer.MAX_VALUE, titaVo);
 
 			List<CdAcCode> lCdAcCode = slCdAcCode == null ? null : slCdAcCode.getContent();
 
@@ -237,9 +232,8 @@ public class L9130Report extends MakeReport {
 			}
 
 			// 寫入一筆到報表檔
-			makeFile.put(acBookCode + "," + slipNo + "," + i + "," + slipDate + "," + acNoCode + "," + acSubNoCode + ","
-					+ txBal + "," + slipRmk + "," + acReceivableCode + "," + costMonth + "," + insuNo + "," + empNo
-					+ "," + salaryCode + "," + currencyCode);
+			makeFile.put(acBookCode + "," + slipNo + "," + i + "," + slipDate + "," + acNoCode + "," + acSubNoCode + "," + txBal + "," + slipRmk + "," + acReceivableCode + "," + costMonth + ","
+					+ insuNo + "," + empNo + "," + salaryCode + "," + currencyCode);
 
 			// 寫入一筆到SlipMedia
 			SlipMedia tSlipMedia = new SlipMedia();
@@ -404,8 +398,7 @@ public class L9130Report extends MakeReport {
 			acNoItem = "應收調撥款";
 			if (crAmt.compareTo(BigDecimal.ZERO) != 0) {
 				// 寫入一筆
-				makeFile.put(lastAcBookCode + "," + slipNo + "," + i + "," + slipDate + "," + acNoCode + ","
-						+ acSubNoCode + "," + crAmt.toString() + "," + slipRmk + "," + " " + "," + costMonth + ","
+				makeFile.put(lastAcBookCode + "," + slipNo + "," + i + "," + slipDate + "," + acNoCode + "," + acSubNoCode + "," + crAmt.toString() + "," + slipRmk + "," + " " + "," + costMonth + ","
 						+ insuNo + "," + empNo + "," + salaryCode + "," + currencyCode);
 
 				SlipMedia tSlipMedia = new SlipMedia();
@@ -450,9 +443,8 @@ public class L9130Report extends MakeReport {
 			if (drAmt.compareTo(BigDecimal.ZERO) != 0) {
 
 				// 寫入一筆
-				makeFile.put(lastAcBookCode + "," + slipNo + "," + i + "," + slipDate + "," + acNoCode + ","
-						+ acSubNoCode + "," + drAmt.negate().toString() + "," + slipRmk + "," + " " + "," + costMonth
-						+ "," + insuNo + "," + empNo + "," + salaryCode + "," + currencyCode);
+				makeFile.put(lastAcBookCode + "," + slipNo + "," + i + "," + slipDate + "," + acNoCode + "," + acSubNoCode + "," + drAmt.negate().toString() + "," + slipRmk + "," + " " + ","
+						+ costMonth + "," + insuNo + "," + empNo + "," + salaryCode + "," + currencyCode);
 
 				SlipMedia tSlipMedia = new SlipMedia();
 

@@ -67,7 +67,7 @@ public class LY002Report extends MakeReport {
 		int rocYear = Integer.valueOf(titaVo.getParam("RocYear"));
 		int rocMonth = 12;
 
-		makeExcel.setValue(1, 2, "新光人壽保險股份有矽公司 " + rocYear + "年度(" + rocMonth + ")報表");
+		makeExcel.setValue(1, 2, "新光人壽保險股份有限公司 " + rocYear + "年度(" + rocMonth + ")報表");
 
 		if (lY002List.size() > 0) {
 

@@ -64,7 +64,7 @@ public class L5601 extends TradeBuffer {
 		iCollListId.setFacmNo(iFacmNo);
 		CollList aCollList = iCollListService.findById(iCollListId, titaVo);
 		// 以該戶號額度尋找同擔保品編號、額度
-		Slice<CollList> bCollList = iCollListService.findCl(aCollList.getClCustNo(), aCollList.getClFacmNo(), this.index, this.limit, titaVo);
+		Slice<CollList> bCollList = iCollListService.findCl(aCollList.getClCustNo(), aCollList.getClFacmNo(), 0,Integer.MAX_VALUE, titaVo);
 
 		// 其實不太必要的檢核，因為必定有一筆以上
 		if (bCollList == null) {
@@ -112,39 +112,36 @@ public class L5601 extends TradeBuffer {
 			if (iFunctioncd.equals("1") || iFunctioncd.equals("3")) {
 				if (bCollTel == null) {
 					try {
-						this.info("trytoinsert");
 						iCollTelService.insert(aCollTel, titaVo);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 新增資料時發生錯誤
+					} catch (DBException e) 	{
+						throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 					}
 				} else {
-					throw new LogicException(titaVo, "E0012", ""); // 該資料已存在
+					throw new LogicException(titaVo, "E0002", "");
 				}
 			} else if (iFunctioncd.equals("2")) {
 				if (bCollTel != null) {
 					try {
-						this.info("trytoupdate");
 						iCollTelService.holdById(aCollTelId);
 						aCollTel.setCreateEmpNo(bCollTel.getCreateEmpNo());
 						aCollTel.setCreateDate(bCollTel.getCreateDate());
 						iCollTelService.update(aCollTel, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時發生錯誤
+						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 				} else {
-					throw new LogicException(titaVo, "E0003", ""); // 修改資料不存在
+					throw new LogicException(titaVo, "E0003", "");
 				}
 			} else {
 				if (bCollTel != null) {
 					try {
-						this.info("trytodelete");
 						iCollTelService.holdById(aCollTelId);
 						iCollTelService.delete(aCollTel, titaVo);
 					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時發生錯誤
+						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 					}
 				} else {
-					throw new LogicException(titaVo, "E0008", ""); // 修改資料不存在
+					throw new LogicException(titaVo, "E0004", "");
 				}
 			}
 			// 更新催收主檔的上次作業項目和日期
@@ -155,15 +152,13 @@ public class L5601 extends TradeBuffer {
 			try {
 				CollList fCollList = iCollListService.holdById(dCollListId, titaVo);
 				fCollList.setTxCode("3"); // 上次作業項目
-				this.info("entdddy=" + Integer.valueOf(titaVo.getEntDy()));
 				fCollList.setTxDate(Integer.valueOf(titaVo.getEntDy()) + 19110000);
 				iCollListService.update(fCollList, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時發生錯誤
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 
 			// 若提醒日期有輸入，則把日期一併insert進提醒登錄表 不論更新或新增都是塞入操作人的員編和時間、交易序號
-			this.info("提醒日=" + titaVo.getParam("CallDate"));
 			if (!titaVo.getParam("CallDate").equals("0000000")) {
 				CollRemind iCollRemind = new CollRemind();
 				CollRemindId iCollRemindId = new CollRemindId();
@@ -178,11 +173,12 @@ public class L5601 extends TradeBuffer {
 				iCollRemind.setRemindDate(Integer.valueOf(titaVo.getParam("CallDate")));
 				iCollRemind.setRemark("登錄自電催會繳");
 				iCollRemind.setEditDate(Integer.valueOf(titaVo.getEntDy()));
+				iCollRemind.setEditTime(titaVo.getCalTm().substring(0,4));
 				iCollRemind.setRemindCode("01"); // 到時候看會繳的提醒項目編號是多少
 				try {
 					iCollRemindService.insert(iCollRemind, titaVo);
 				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 主檔更新錯誤訊息
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 				}
 			}
 		}

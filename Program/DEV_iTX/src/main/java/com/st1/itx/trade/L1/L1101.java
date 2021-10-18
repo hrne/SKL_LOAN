@@ -274,6 +274,7 @@ public class L1101 extends TradeBuffer {
 		this.totaVo.putParam("OIndustryCode", tCustMain.getIndustryCode());
 		this.totaVo.putParam("OIndustryCodeX", tCdIndustry.getIndustryItem());
 		this.totaVo.putParam("ONationalityCode", tCustMain.getNationalityCode());
+		this.totaVo.putParam("OBussNationalityCode", tCustMain.getBussNationalityCode());
 		this.totaVo.putParam("OSpouseId", tCustMain.getSpouseId());
 		this.totaVo.putParam("OSpouseName", tCustMain.getSpouseName().replace("$n", "\n"));
 		this.totaVo.putParam("ORegZip3", tCustMain.getRegZip3());
@@ -405,6 +406,7 @@ public class L1101 extends TradeBuffer {
 		tCustMain.setCustTypeCode(titaVo.getParam("CustTypeCode"));
 		tCustMain.setIndustryCode(titaVo.getParam("IndustryCode"));
 		tCustMain.setNationalityCode(titaVo.getParam("NationalityCode"));
+		tCustMain.setBussNationalityCode(titaVo.getParam("BussNationalityCode"));
 		tCustMain.setSpouseId(titaVo.getParam("SpouseId"));
 		tCustMain.setSpouseName(titaVo.getParam("SpouseName"));
 		tCustMain.setRegZip3(titaVo.getParam("RegZip3"));

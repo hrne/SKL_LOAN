@@ -1,4 +1,4 @@
-﻿----- BASIC LABEL Variables ----------
+﻿a----- BASIC LABEL Variables ----------
 <sub type="SYS">
 </sub>
 
@@ -24,10 +24,11 @@ E(0,0)
 ["#FdFunCdX+功能",#FunCdX],
 [#<->#,"#FdCustId+統一編號",#CustId,#BTN1,#CustName],
 [#<->#,"#FdStartYY+年度",#StartYY,"年",#StartMM,"月 ~",#EndYY,"年",#EndMM,"月"],
-[#<->#,"@",#FinBtn1,#FinBtn2,#FinBtn3,#FinBtn4,#FinBtn5,#FinBtn6],
+[#<->#,"@",#FinBtn7,#FinBtn1,#FinBtn2,#FinBtn3,#FinBtn4,#FinBtn5,#FinBtn6],
 ]
 !---------- AP Button AREA ----------
 #I0=X,1,S
+INVOKEJS(SHOW,p1,0)
 INVOKEJS(SHOW,p2,0)
 INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
@@ -36,6 +37,8 @@ INVOKEJS(SHOW,p6,0)
 
 ![Buttom資料查詢]
 #BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+
+#FinBtn7=X,15,I,ui:button;value:覆審比率;enable:1;tabbable:0
 
 #FinBtn1=X,15,I,ui:button;value:資產負債表;enable:1;tabbable:0
 
@@ -60,6 +63,7 @@ BIND(#FinBtn3,click, {cmd=CALLSEND;DOCODE=FinBtnProc3})
 BIND(#FinBtn4,click, {cmd=CALLSEND;DOCODE=FinBtnProc4})
 BIND(#FinBtn5,click, {cmd=CALLSEND;DOCODE=FinBtnProc5})
 BIND(#FinBtn6,click, {cmd=CALLSEND;DOCODE=FinBtnProc6})
+BIND(#FinBtn7,click, {cmd=CALLSEND;DOCODE=FinBtnProc7})
 
 #FinBtnProc1=@,1,S
 INVOKEJS(SHOW,p1,1)
@@ -68,6 +72,8 @@ INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
 INVOKEJS(SHOW,p5,0)
 INVOKEJS(SHOW,p6,0)
+INVOKEJS(SHOW,p7,0)
+INVOKEJS(SHOW,p8,0)
 
 #FinBtnProc2=@,1,S
 INVOKEJS(SHOW,p1,0)
@@ -76,6 +82,8 @@ INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
 INVOKEJS(SHOW,p5,0)
 INVOKEJS(SHOW,p6,0)
+INVOKEJS(SHOW,p7,0)
+INVOKEJS(SHOW,p8,0)
 
 #FinBtnProc3=@,1,S
 INVOKEJS(SHOW,p1,0)
@@ -84,6 +92,8 @@ INVOKEJS(SHOW,p3,1)
 INVOKEJS(SHOW,p4,0)
 INVOKEJS(SHOW,p5,0)
 INVOKEJS(SHOW,p6,0)
+INVOKEJS(SHOW,p7,0)
+INVOKEJS(SHOW,p8,0)
 
 #FinBtnProc4=@,1,S
 INVOKEJS(SHOW,p1,0)
@@ -92,6 +102,8 @@ INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,1)
 INVOKEJS(SHOW,p5,0)
 INVOKEJS(SHOW,p6,0)
+INVOKEJS(SHOW,p7,0)
+INVOKEJS(SHOW,p8,0)
 
 #FinBtnProc5=@,1,S
 INVOKEJS(SHOW,p1,0)
@@ -100,6 +112,8 @@ INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
 INVOKEJS(SHOW,p5,1)
 INVOKEJS(SHOW,p6,0)
+INVOKEJS(SHOW,p7,0)
+INVOKEJS(SHOW,p8,0)
 
 #FinBtnProc6=@,1,S
 INVOKEJS(SHOW,p1,0)
@@ -108,6 +122,18 @@ INVOKEJS(SHOW,p3,0)
 INVOKEJS(SHOW,p4,0)
 INVOKEJS(SHOW,p5,0)
 INVOKEJS(SHOW,p6,1)
+INVOKEJS(SHOW,p7,0)
+INVOKEJS(SHOW,p8,0)
+
+#FinBtnProc7=@,1,S
+INVOKEJS(SHOW,p1,0)
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+INVOKEJS(SHOW,p4,0)
+INVOKEJS(SHOW,p5,0)
+INVOKEJS(SHOW,p6,0)
+INVOKEJS(SHOW,p7,1)
+INVOKEJS(SHOW,p8,1)
 
 #FdFunCdX=X,1,L
 T(3, )
@@ -176,7 +202,52 @@ CALL(#ParentCompanyRightProc)
 
 !歸屬於母公司之權益計算
 #ParentCompanyRightProc=@,1,S
-E(0,@ParentCompanyRight,#HomeComLossProfit+#UncontrolRight)
+E(0,@ParentCompanyRight,#HomeComLossProfit-#UncontrolRight)
+
+#EPSProc=@,1,S
+IF(#Capital==0,E(0,@EPS,0),E(0,@EPS,#HomeLossProfit/#Capital*10))
+
+!覆審計算
+
+#C1=+m,14.2,S
+#C2=+m,14.2,S
+#C3=+m,14.2,S
+
+!流動比率
+#ReviewWorkingCapitalRatioProc=@,1,S
+IF(#ReviewCurrentDebt==0,E(0,@C1,0),E(3,@C1,#ReviewCurrentAsset/#ReviewCurrentDebt)*100)
+E(0,@ReviewWorkingCapitalRatio,#C1)
+
+!利息保障倍數1
+#ReviewInterestCoverageRatio1Proc=@,1,S
+IF(#ReviewInterestExpense==0,E(0,@C1,0),E(3,@C1,(#ReviewProfitBeforeTax+#ReviewInterestExpense)/#ReviewInterestExpense*100))
+E(0,@ReviewInterestCoverageRatio1,#C1)
+
+!利息保障倍數2
+#ReviewInterestCoverageRatio2Proc=@,1,S
+IF(#ReviewInterestExpense==0,E(0,@C1,0),E(3,@C1,(#ReviewProfitBeforeTax+#ReviewInterestExpense+#ReviewDepreciation)/#ReviewInterestExpense*100))
+E(0,@ReviewInterestCoverageRatio2,#C1)
+
+!槓桿比率
+#ReviewLeverageRatioProc=@,1,S
+IF(#ReviewTotalEquity==0,E(0,@C1,0),E(3,@C1,#ReviewTotalDebt/#ReviewTotalEquity*100))
+E(0,@ReviewLeverageRatio,#C1)
+
+!權益比率
+#ReviewEquityRatioProc=@,1,S
+IF(#ReviewTotalAsset==0,E(0,@C1,0),E(3,@C1,#ReviewTotalEquity/#ReviewTotalAsset*100))
+E(0,@ReviewEquityRatio,#C1)
+
+!固定長期適合率
+#ReviewLongFitRatioProc=@,1,S
+E(0,#C2,#ReviewTotalEquity+#ReviewBondsPayable+#ReviewLongTermBorrowings+#ReviewNonCurrentLease+#ReviewLongTermPayable+#ReviewPreference)
+IF(#C2==0,E(0,@C1,0),E(3,@C1,(#ReviewPropertyAsset+#ReviewInvestment+#ReviewInvestmentProperty)/#C2*100))
+E(0,@ReviewLongFitRatio,#C1)
+
+!純益率(稅後)=本期淨利(稅後)/營業收入
+#ReviewNetProfitRatioProc=@,1,S
+IF(#ReviewOperatingRevenue==0,E(0,@C1,0),E(3,@C1,#ReviewProfitAfterTax/#ReviewOperatingRevenue*100))
+E(0,@ReviewNetProfitRatio,#C1)
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=X,12,S
@@ -233,7 +304,7 @@ T(2,@ChangeReasonHelp,#HelpDesc6)
 
 !功能 下拉式選單 1: 新增 2:修改 4:刪除;5:查詢
 #FunCd=A,1,S
-
+C(3,#FunCd,1,$,HIDE(#BTN1))
 #FunCdX=X,4,L
 T(H,#FunCd,#FunCdHelp)
 C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
@@ -352,7 +423,24 @@ T(F,@BusRate,0)
 T(F,@PayFinLever,0)
 T(F,@ADE,0)
 T(F,@CashGuar,0)
-
+T(F,@ReviewCurrentAsset,0)
+T(F,@ReviewTotalAsset,0)
+T(F,@ReviewPropertyAsset,0)
+T(F,@ReviewInvestment,0)
+T(F,@ReviewInvestmentProperty,0)
+T(F,@ReviewDepreciation,0)
+T(F,@ReviewCurrentDebt,0)
+T(F,@ReviewTotalDebt,0)
+T(F,@ReviewTotalEquity,0)
+T(F,@ReviewBondsPayable,0)
+T(F,@ReviewLongTermBorrowings,0)
+T(F,@ReviewNonCurrentLease,0)
+T(F,@ReviewLongTermPayable,0)
+T(F,@ReviewPreference,0)
+T(F,@ReviewOperatingRevenue,0)
+T(F,@ReviewInterestExpense,0)
+T(F,@ReviewProfitBeforeTax,0)
+T(F,@ReviewProfitAfterTax,0)
 
 
 !刪除隱藏重新交易按鈕
@@ -370,6 +458,7 @@ RESET_RIM(#RimL1r03,L1R03)
 S(L1R03,1,#FunCd,#CustUKey,#UKey)
 R(1,L1R03)
 E(0,@FinYear,#StartYY)
+E(0,@StartYY2,#StartYY)
 
 !RIM參數使用
 #RimCustId=X,8,S
@@ -404,11 +493,21 @@ T(2,@CustName,#L1r01CustName)
 
 #UKey=x,32,S
 
+#StartYY2=A,3,S
+
 #StartYY=A,3,I
 C(2,#FunCd,$,$,$,$,s,s)
 @
 V(2,0)
 
+#CheckYY=A,1,S
+C(2,#FunCd,S,$,C(3,#StartYY,#StartYY2,S,$),S,S,S)
+RESET_RIM(#CheckYY,L1R19)
+E(0,@RimFunCd,2)
+T(2,@RimCustId,#CustId)
+E(0,@RimYear,#StartYY)
+S(L1R19,1,#RimFunCd,#RimCustId,#RimYear)
+R(1,L1R19)
 
 #StartMM=A,2,I
 C(2,#FunCd,$,$,$,$,s,s)
@@ -429,6 +528,180 @@ C(3,#EndMM,0,E(0,12),$)
 V(5,#StartMM,12)
 
 
+</sub>
+
+<sub type="DC" name="p7" layout="cols=1;screen.width=[300,750];printer.width=[20,20];order=1">
+[
+["覆審比率參數"],
+["<font color=red>資產類",""],
+["@@流動資產",#ReviewCurrentAsset],
+["@@資產總額",#ReviewTotalAsset],
+["@@不動產、廠房及設備淨額",#ReviewPropertyAsset],
+["@@權益法之投資",#ReviewInvestment],
+["@@投資性不動產",#ReviewInvestmentProperty],
+["@@折舊及攤銷",#ReviewDepreciation],
+["<font color=red>負債類",""],
+["@@流動負債",#ReviewCurrentDebt],
+["@@負債合計",#ReviewTotalDebt],
+["@@權益合計",#ReviewTotalEquity],
+["@@應付公司債",#ReviewBondsPayable],
+["@@長期借款",#ReviewLongTermBorrowings],
+["@@應付租賃款-非流動",#ReviewNonCurrentLease],
+["@@長期應付票據及款項-關係人",#ReviewLongTermPayable],
+["@@特別股負債",#ReviewPreference],
+["<font color=red>損益類",""],
+["@@營業收入",#ReviewOperatingRevenue],
+["@@利息支出",#ReviewInterestExpense],
+["@@稅前淨利",#ReviewProfitBeforeTax],
+["@@本期淨利(稅後)",#ReviewProfitAfterTax],
+]
+
+![資產類]
+!流動資產
+#ReviewCurrentAsset=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewWorkingCapitalRatioProc)
+
+!資產總額
+#ReviewTotalAsset=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewEquityRatioProc)
+
+!不動產、廠房及設備淨額
+#ReviewPropertyAsset=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLongFitRatioProc)
+
+!權益法之投資
+#ReviewInvestment=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLongFitRatioProc)
+
+!投資性不動產
+#ReviewInvestmentProperty=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLongFitRatioProc)
+
+!折舊及攤銷
+#ReviewDepreciation=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewInterestCoverageRatio2Proc)
+
+![負債類]
+!流動負債
+#ReviewCurrentDebt=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewWorkingCapitalRatioProc)
+
+!負債合計
+#ReviewTotalDebt=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLeverageRatioProc)
+
+!權益合計
+#ReviewTotalEquity=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLeverageRatioProc)
+CALL(#ReviewEquityRatioProc)
+CALL(#ReviewLongFitRatioProc)
+
+!應付公司債
+#ReviewBondsPayable=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLongFitRatioProc)
+
+!長期借款
+#ReviewLongTermBorrowings=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLongFitRatioProc)
+
+!應付租賃款-非流動
+#ReviewNonCurrentLease=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLongFitRatioProc)
+
+!長期應付票據及款項-關係人
+#ReviewLongTermPayable=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLongFitRatioProc)
+
+!特別股負債
+#ReviewPreference=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewLongFitRatioProc)
+
+![損益類]
+!營業收入
+#ReviewOperatingRevenue=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewNetProfitRatioProc)
+
+!利息支出
+#ReviewInterestExpense=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewInterestCoverageRatio1Proc)
+CALL(#ReviewInterestCoverageRatio2Proc)
+
+!稅前淨利
+#ReviewProfitBeforeTax=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewInterestCoverageRatio1Proc)
+CALL(#ReviewInterestCoverageRatio2Proc)
+
+!本期淨利(稅後)
+#ReviewProfitAfterTax=+m,14,I
+C(2,#FunCd,$,$,$,$,s,s)
+@
+CALL(#ReviewNetProfitRatioProc)
+
+</sub>
+
+<sub type="DC" name="p8" layout="cols=1;screen.width=[800,250];printer.width=[20,20];order=1">
+[
+["覆審比率計算"],
+["<font color=red>償債能力",""],
+["@@流動比率@@@@：流動資產/流動負債",#ReviewWorkingCapitalRatio,"@%"],
+["@@利息保障倍數：(一).（稅前淨利+利息支出）/利息支出",#ReviewInterestCoverageRatio1,"@%"],
+["@@@@@@@@@@@@@@@@(二).（稅前淨利+利息支出+折舊及攤銷）/利息支出",#ReviewInterestCoverageRatio2,"@%"],
+["<font color=red>財務結構",""],
+["@@槓桿比率：負債合計/權益合計",#ReviewLeverageRatio,"@%"],
+["@@權益比率：權益合計/資產總額",#ReviewEquityRatio,"@%"],
+["@@固定長期適合率：（不動產、廠房及設備淨額+權益法之投資+投資性不動產）/（權益合計+應付公司債+長期借款<br>@@@@@@@@@@@@@@@@@@@+應付租賃款-非流動+長期應付票據及款項-關係人+特別股負債）",#ReviewLongFitRatio,"@%"],
+["<font color=red>獲利能力",""],
+["@@純益率(稅後)：本期淨利(稅後)/營業收入",#ReviewNetProfitRatio,"@%"],
+]
+
+!流動比率
+#ReviewWorkingCapitalRatio=+m,14.2,L
+!利息保障倍數1
+#ReviewInterestCoverageRatio1=+m,14.2,L
+!利息保障倍數2
+#ReviewInterestCoverageRatio2=+m,14.2,L
+!槓桿比率
+#ReviewLeverageRatio=+m,14.2,L
+!權益比率
+#ReviewEquityRatio=+m,14.2,L
+!固定長期適合率
+#ReviewLongFitRatio=+m,14.2,L
+!純益率(稅後)
+#ReviewNetProfitRatio=+m,14.2,L
 </sub>
 
 <sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1">
@@ -767,6 +1040,7 @@ C(4,#AccountItem11,S,$)
 CALL(#NetValueProc)
 
 #x1=X,1,S
+C(2,#FunCd,$,$,$,$,s,s)
 CALL(#FinBtnProc2)
 </sub>
 
@@ -774,7 +1048,7 @@ CALL(#FinBtnProc2)
 [
 ["損益表"],
 ["@@@@@@@@@@@@@@@@營業收入",#BusIncome],
-["@@@@<font color=red>較去年同期營收成長率(%)",#GrowRate],
+["@@@@<font color=red>較去年同期營收成長率",#GrowRate,"@%"],
 ["@@@@@@@@@@@@@減:營業成本",#BusCost],
 ["@@@@@@@@@@@@@@@@營業毛利",#BusGrossProfit],
 ["@@@@@@@@@@@@@減:管銷費用",#ManageFee],
@@ -798,14 +1072,18 @@ C(2,#FunCd,$,$,$,$,s,s)
 @
 CALL(#BusGrossProfitProc)
 
-#RimL1R19=X,1,S
-#RimYear=9,3,S
+#RimYear=A,3,S
 E(0,@RimYear,#StartYY)
+
 #RimBusIncome=+m,18,S
 E(0,#BusIncome)
+E(0,@RimFunCd,1)
+
+#RimL1R19=X,1,S
+C(2,#FunCd,$,$,$,$,s,s)
 RESET_RIM(#RimL1r19,L1R19)
 T(2,@RimCustId,#CustId)
-S(L1R19,1,#RimCustId,#RimYear,#RimBusIncome)
+S(L1R19,1,#RimFunCd,#RimCustId,#RimYear,#RimBusIncome)
 R(1,L1R19)
 E(0,@GrowRate,#L1R19GrowRate)
 
@@ -879,7 +1157,7 @@ CALL(#ParentCompanyRightProc)
 #ParentCompanyRight=+m,18,L
 
 !每股盈餘EPS(元)
-#EPS=+m,14.4,I
+#EPS=+m,14.4,L
 C(2,#FunCd,$,$,$,$,s,s)
 @
 CALL(#FinBtnProc3)
@@ -1293,6 +1571,31 @@ T(3,1)ASGN(LOOP$)
 #OfficeType
 #PunishRecord
 #ChangeReason
+#ReviewCurrentAsset
+#ReviewTotalAsset
+#ReviewPropertyAsset
+#ReviewInvestment
+#ReviewInvestmentProperty
+#ReviewDepreciation
+#ReviewCurrentDebt
+#ReviewTotalDebt
+#ReviewTotalEquity
+#ReviewBondsPayable
+#ReviewLongTermBorrowings
+#ReviewNonCurrentLease
+#ReviewLongTermPayable
+#ReviewPreference
+#ReviewOperatingRevenue
+#ReviewInterestExpense
+#ReviewProfitBeforeTax
+#ReviewProfitAfterTax
+#ReviewWorkingCapitalRatio
+#ReviewInterestCoverageRatio1
+#ReviewInterestCoverageRatio2
+#ReviewLeverageRatio
+#ReviewEquityRatio
+#ReviewLongFitRatio
+#ReviewNetProfitRatio
 </sub>
 
 
@@ -1432,6 +1735,31 @@ TXFORM=L1R03
 #OfficeType
 #PunishRecord
 #ChangeReason
+#ReviewCurrentAsset
+#ReviewTotalAsset
+#ReviewPropertyAsset
+#ReviewInvestment
+#ReviewInvestmentProperty
+#ReviewDepreciation
+#ReviewCurrentDebt
+#ReviewTotalDebt
+#ReviewTotalEquity
+#ReviewBondsPayable
+#ReviewLongTermBorrowings
+#ReviewNonCurrentLease
+#ReviewLongTermPayable
+#ReviewPreference
+#ReviewOperatingRevenue
+#ReviewInterestExpense
+#ReviewProfitBeforeTax
+#ReviewProfitAfterTax
+#ReviewWorkingCapitalRatio
+#ReviewInterestCoverageRatio1
+#ReviewInterestCoverageRatio2
+#ReviewLeverageRatio
+#ReviewEquityRatio
+#ReviewLongFitRatio
+#ReviewNetProfitRatio
 ^
 </sub>
 

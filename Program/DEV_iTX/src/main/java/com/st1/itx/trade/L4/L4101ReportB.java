@@ -305,7 +305,7 @@ public class L4101ReportB extends MakeReport {
 			print(0, 69, FormatUtil.padX("" + wkCustName, 20));// 收款戶名
 			print(0, 91, wkAmlRspItem);// AML回應碼
 			print(0, 131, formatAmt(remitAmt, 0), "R");// 匯款金額
-			print(0, 154, FormatUtil.padX("" + tCdEmp.getFullname(), 20));// 專辦
+			print(0, 154, FormatUtil.padX("" + wkFullName, 20));// 專辦
 			print(0, 165, String.valueOf(wkCorFlag));// 沖轉
 
 			subTotal = subTotal.add(remitAmt);

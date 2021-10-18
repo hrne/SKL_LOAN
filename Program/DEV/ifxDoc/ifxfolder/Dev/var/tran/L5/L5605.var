@@ -31,7 +31,7 @@ E(0,0)
 [#<->#,"#FdRemindDate+提醒日期",#RemindDate],
 [#<->#,"#FdCondCode+狀態",#CondCode,#CondCodeX],
 ["#FdEditDate+維護日期",#EditDate],["#FdEditTime+維護時間",#EditTime],
-[#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo],
+[#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo,#EditEmpNoX],
 ]
 !---------- AP TEXT AREA Variables ----------
 #BTNA=X,1,I,ui:button;value:電催查詢;enable:1;tabbable:0
@@ -291,7 +291,17 @@ T(1,#EditTimeX,1,4)
 ! 維護人員
 #EditEmpNo=X,6,L
 T(4,TLRNO$)
-C(2,#FunctionCd,S,$,$,s,s,s,s)
+
+<include src="ROM.icf::L5R28.dec"/>
+#RimEmployeeNo=X,6,S
+#RimL5R28=X,1,S
+T(2,@RimEmployeeNo,#EditEmpNo)
+RESET_RIM(#RimL5R28,L5R28)
+S(L5R28,1,#RimEmployeeNo)
+R(1,L5R28)
+T(2,@EditEmpNoX,#L5r28FullName)
+
+#EditEmpNoX=X,50,L
 ! 經辦
 #TitaTlrNo=X,6,L
 ! 交易序號
@@ -336,6 +346,7 @@ C(2,#FunctionCd,S,$,$,s,s,s,s)
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L5R15.tom"/>
 <include src="ROM.icf::L5R22.tom"/>
+<include src="ROM.icf::L5R28.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5605
 

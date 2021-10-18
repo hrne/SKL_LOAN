@@ -97,6 +97,7 @@ public class L3005 extends TradeBuffer {
 		String AcFg;
 		String FeeFg;
 		String mrKey1;
+		String wkCurrencyCode = "";
 
 		Slice<CustRmk> slCustRmk;
 		Slice<LoanBorTx> slLoanBorTx;
@@ -150,6 +151,7 @@ public class L3005 extends TradeBuffer {
 		this.totaVo.putParam("OCustRmkFlag", oCustRmkFlag);
 		this.totaVo.putParam("OExcessive", baTxCom.getExcessive());
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
+		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -247,7 +249,10 @@ public class L3005 extends TradeBuffer {
 			} else {
 				loanIntDetailFg = "N";
 			}
-			this.totaVo.putParam("OCurrencyCode", ln.getTitaCurCd());
+			if (!"".equals(ln.getTitaCurCd())) {
+				wkCurrencyCode = ln.getTitaCurCd();
+			}
+			this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
 
 			wkShortfall = ln.getOverflow().subtract(ln.getShortfall());
 			// 暫收款金額為負時，為暫收抵繳
@@ -271,9 +276,7 @@ public class L3005 extends TradeBuffer {
 			if (ln.getTitaHCode().equals("1") || ln.getTitaHCode().equals("3")) {
 				occursList.putParam("OOTxAmt", BigDecimal.ZERO.subtract(ln.getTxAmt()));
 				occursList.putParam("OOTempAmt", BigDecimal.ZERO.subtract(wkTempAmt));
-				occursList.putParam("OOShortfall",
-						BigDecimal.ZERO.subtract(wkShortfall));
-
+				occursList.putParam("OOShortfall", BigDecimal.ZERO.subtract(wkShortfall));
 
 			} else {
 				occursList.putParam("OOTxAmt", ln.getTxAmt());

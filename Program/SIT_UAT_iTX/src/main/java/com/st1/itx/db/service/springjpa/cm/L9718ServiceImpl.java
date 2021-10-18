@@ -1,6 +1,7 @@
 package com.st1.itx.db.service.springjpa.cm;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case Acct990:
 			sql += " SELECT ";
 			sql += "   EMP.\"Fullname\" AS \"EmpName\" ";
-			sql += "  ,TO_NUMBER(SUBSTR(TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM'), 5, 2))+1 AS \"RocMonth\" ";
+			sql += "  ,TO_NUMBER(SUBSTR(:inputYearMonth, 5, 2))+1 AS \"RocMonth\" ";
 			sql += "  ,:inputEntryDateMin - 19110000 AS \"RocEntryDateMin\" ";
 			sql += "  ,:inputEntryDateMax - 19110000 AS \"RocEntryDateMax\" ";
 			sql += "  ,M.\"OvduTerm\" AS \"OvduTerm\" ";
@@ -139,7 +140,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                   ,\"CustNo\" ";
 			sql += "                   ,MIN(\"FacmNo\") \"FacmNo\" ";
 			sql += "             FROM \"MonthlyFacBal\" ";
-			sql += "             WHERE \"YearMonth\" = TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM') ";
+			sql += "             WHERE \"YearMonth\" = :inputYearMonth ";
 			sql += "             GROUP BY \"YearMonth\" ";
 			sql += "                     ,\"CustNo\" ) MGroup ON SUBSTR(lbtx.\"EntryDate\", 1, 6) - MGroup.\"YearMonth\" IN (1,89) "; // 入帳日期在YearMonth後一個月
 			sql += "                                       AND MGroup.\"CustNo\" = lbtx.\"CustNo\" ";
@@ -149,7 +150,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " GROUP BY lbtx.\"CustNo\", DECODE(lbtx.\"FacmNo\", 0, MGroup.\"FacmNo\", lbtx.\"FacmNo\") ";
 			sql += "      ) TX ON TX.\"CustNo\"  = M.\"CustNo\" ";
 			sql += "    AND (TX.\"FacmNo\" = 0 OR TX.\"FacmNo\" = M.\"FacmNo\") ";
-			sql += "  WHERE M.\"YearMonth\" = TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM') ";
+			sql += "  WHERE M.\"YearMonth\" = :inputYearMonth ";
 			sql += "    AND (NVL(:inputCollector, ' ') = ' ' OR NVL(M.\"AccCollPsn\",'X') = :inputCollector) ";
 			sql += "    AND FAC.\"FirstDrawdownDate\" >= :inputDrawdownDate ";
 			sql += "    AND :findOvdu = 'Y' ";
@@ -162,7 +163,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case AcctOthers:
 			sql += " SELECT ";
 			sql += "   EMP.\"Fullname\" AS \"EmpName\" ";
-			sql += "  ,TO_NUMBER(SUBSTR(TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM'), 5 ,2)) AS \"RocMonth\" ";
+			sql += "  ,TO_NUMBER(SUBSTR(:inputYearMonth, 5 ,2)) AS \"RocMonth\" ";
 			sql += "  ,:inputEntryDateMin - 19110000 AS \"RocEntryDateMin\" ";
 			sql += "  ,:inputEntryDateMax - 19110000 AS \"RocEntryDateMax\" ";
 			sql += "  ,M.\"OvduTerm\" AS \"OvduTerm\" ";
@@ -258,20 +259,20 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "                   ,\"CustNo\" ";
 			sql += "                   ,MIN(\"FacmNo\") \"FacmNo\" ";
 			sql += "             FROM \"MonthlyFacBal\" ";
-			sql += "             WHERE \"YearMonth\" = TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM') ";
+			sql += "             WHERE \"YearMonth\" = :inputYearMonth ";
 			sql += "               AND \"PrinBalance\" > 0 ";
 			sql += "               AND \"PrevIntDate\" > 0 ";
 			sql += "               AND \"NextIntDate\" > 0 "; // 額度月報轉換時, 如從未繳款, 這兩個日期會為0; 因為這裡是找出繳納暫收款可能歸屬的額度, 在這裡排除從未繳款的額度
 			sql += "             GROUP BY \"YearMonth\" ";
 			sql += "                     ,\"CustNo\" ) MGroup ON SUBSTR(lbtx.\"EntryDate\", 1, 6) - MGroup.\"YearMonth\" IN (1,89) "; // 入帳日期在YearMonth後一個月
-			sql += "                                       AND MGroup.\"CustNo\" = lbtx.\"CustNo\" ";
+			sql += "                                         AND MGroup.\"CustNo\" = lbtx.\"CustNo\" ";
 			sql += " WHERE lbtx.\"TitaHCode\" = '0' ";
 			sql += "   AND lbtx.\"EntryDate\" >= :inputEntryDateMin ";
 			sql += "   AND lbtx.\"EntryDate\" <= :inputEntryDateMax ";
 			sql += " GROUP BY lbtx.\"CustNo\", DECODE(lbtx.\"FacmNo\", 0, MGroup.\"FacmNo\", lbtx.\"FacmNo\") ";
 			sql += "      ) TX ON TX.\"CustNo\"  = M.\"CustNo\" ";
 			sql += "    AND (TX.\"FacmNo\" = 0 OR TX.\"FacmNo\" = M.\"FacmNo\") ";
-			sql += "  WHERE M.\"YearMonth\" = TO_CHAR(ADD_MONTHS(TO_DATE(:inputYearMonth, 'YYYYMM'), -1), 'YYYYMM') ";
+			sql += "  WHERE M.\"YearMonth\" = :inputYearMonth ";
 			sql += "    AND (NVL(:inputCollector, ' ') = ' ' OR NVL(M.\"AccCollPsn\",'X') = :inputCollector) ";
 			sql += "    AND FAC.\"FirstDrawdownDate\" >= :inputDrawdownDate ";
 			sql += "    AND :findOvdu = 'N' ";
@@ -298,7 +299,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 				+ Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
 		this.info("inputEntryDateMax="
 				+ Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
-		this.info("inputYearMonth=" + Integer.toString(Integer.parseInt(titaVo.getParam("inputYearMonth")) + 191100));
+		this.info("inputYearMonth=" + lastYearMonth.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
 		this.info("inputCollectorShow=" + titaVo.getParam("inputCollector"));
 		this.info("inputDrawdownDate="
 				+ Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));
@@ -309,8 +310,7 @@ public class L9718ServiceImpl extends ASpringJpaParm implements InitializingBean
 				Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMin")) + 19110000));
 		query.setParameter("inputEntryDateMax",
 				Integer.toString(Integer.parseInt(titaVo.getParam("inputEntryDateMax")) + 19110000));
-		query.setParameter("inputYearMonth",
-				Integer.toString(Integer.parseInt(titaVo.getParam("inputYearMonth")) + 191100)); // 實際出表資料應為前一個月 月份推移在Query中做
+		query.setParameter("inputYearMonth", lastYearMonth.format(DateTimeFormatter.ofPattern("yyyyMMdd")));
 		query.setParameter("inputCollector", titaVo.getParam("inputCollector"));
 		query.setParameter("inputDrawdownDate",
 				Integer.toString(Integer.parseInt(titaVo.getParam("inputDrawdownDate")) + 19110000));

@@ -74,7 +74,7 @@ public class L1103 extends TradeBuffer {
 		String custid = titaVo.get("CustId");
 
 		CustMain tCustMain = new CustMain();
-		
+
 		if (iCustUKey != null && !iCustUKey.isEmpty()) {
 			tCustMain = iCustMainService.findById(iCustUKey, titaVo);
 		} else {
@@ -85,7 +85,7 @@ public class L1103 extends TradeBuffer {
 		if (tCustMain == null) {
 			throw new LogicException("E1003", "客戶資料主檔");
 		}
-		
+
 		// 鎖定這筆
 		tCustMain = iCustMainService.holdById(tCustMain);
 
@@ -94,12 +94,11 @@ public class L1103 extends TradeBuffer {
 
 			// 若該欄位有被修改,更新該欄位資料
 
-			
-			//不可修正交易
-			
+			// 不可修正交易
+
 			// 正常交易或
 			if (titaVo.isHcodeNormal()) {
-				
+
 				// 如果要修改統編
 				if (titaVo.getParam("CustIdInd").trim().equals("X")) {
 					// 修改後的統編
@@ -157,7 +156,7 @@ public class L1103 extends TradeBuffer {
 			}
 
 		}
-		
+
 		// 放行一般
 		if (titaVo.isActfgSuprele() && titaVo.isHcodeNormal()) {
 			this.info("放行一般");
@@ -203,9 +202,14 @@ public class L1103 extends TradeBuffer {
 				tCustMain.setIndustryCode(titaVo.getParam("IndustryAft"));
 			}
 
-			// 國籍
+			// 出生地國籍
 			if (titaVo.getParam("CountryInd").equals("X")) {
 				tCustMain.setNationalityCode(titaVo.getParam("CountryAft"));
+			}
+
+			// 居住地國籍
+			if (titaVo.getParam("BussNationalityCodeInd").equals("X")) {
+				tCustMain.setBussNationalityCode(titaVo.getParam("BussNationalityCodeAft"));
 			}
 
 			// 配偶身分證字號

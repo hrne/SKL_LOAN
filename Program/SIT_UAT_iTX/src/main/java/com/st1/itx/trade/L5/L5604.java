@@ -82,7 +82,7 @@ public class L5604 extends TradeBuffer {
 			try {
 				iCollLawService.insert(iCollLaw, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 更新資料時發生錯誤
+				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}	
 			break;
 		case "2":
@@ -98,7 +98,7 @@ public class L5604 extends TradeBuffer {
 			CollLaw uCollLaw = new CollLaw();
 			uCollLaw = iCollLawService.holdById(iCollLawId, titaVo);
 			if (uCollLaw == null) {
-				throw new LogicException(titaVo, "E0006", "查無此資料"); // 更新資料時發生錯誤
+				throw new LogicException(titaVo, "E0003", "查無此資料");
 			}
 			CollLaw beforeCollLaw = (CollLaw) iDataLog.clone(uCollLaw);
 			uCollLaw.setRecordDate(iRecordDate);
@@ -109,7 +109,7 @@ public class L5604 extends TradeBuffer {
 			try {
 				iCollLawService.update(uCollLaw, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時發生錯誤
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}	
 			iDataLog.setEnv(titaVo, beforeCollLaw, uCollLaw);
 			iDataLog.exec();
@@ -136,7 +136,7 @@ public class L5604 extends TradeBuffer {
 			try {
 				iCollLawService.insert(iCollLaw, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", e.getErrorMsg()); // 更新資料時發生錯誤
+				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}	
 			break;
 		case "4":
@@ -151,12 +151,12 @@ public class L5604 extends TradeBuffer {
 			iCollLawId.setTitaTxtNo(dTitaTxtNo);
 			CollLaw dCollLaw = iCollLawService.findById(iCollLawId, titaVo);
 			if (dCollLaw == null) {
-				throw new LogicException(titaVo, "E0008", ""); // 更新資料時發生錯誤
+				throw new LogicException(titaVo, "E0004", "");
 			}
 			try {
 				iCollLawService.delete(dCollLaw, titaVo);
 			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 更新資料時發生錯誤
+				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}	
 			break;
 		}
@@ -171,7 +171,7 @@ public class L5604 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", "催收主檔"); // 更新資料時發生錯誤
 		}
 		iCollList.setTxCode("5");
-		iCollList.setTxDate(Integer.valueOf(titaVo.getCalDy()));
+		iCollList.setTxDate(Integer.valueOf(titaVo.getEntDy()));
 		try {
 			iCollListService.update(iCollList,titaVo);
 		}catch (DBException e) {

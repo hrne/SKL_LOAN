@@ -294,7 +294,7 @@ BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
 #ClCode2=9,2,S
 ! 發函種類
 #MailTypeCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MailTypeCodeHelp)
 @V(H,#MailTypeCodeHelp)
 #MailTypeCodeX=X,10,L
@@ -304,16 +304,15 @@ T(H,#MailTypeCode,#MailTypeCodeHelp)
 #MailDateX=X,8,S
 T(4,#SYSCDATE)
 #MailDate=D,7,I
-C(2,#FunctionCd,S,$,$,s,s,s)
-C(2,#FunctionCd,S,T(1,#MailDateX,2,7),$,T(1,#MailDateX,2,7),s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(2,#FunctionCd,S,T(1,#MailDateX,2,7),$,$,s,s)
 D(8)
-@V(7)
-@A(DATE,0,#MailDate)
+@V(7)A(DATE,0,#MailDate)
 
 
 ! 發函對象
 #MailObj=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MailObjHelp)
 @V(H,#MailObjHelp)
 #MailObjX=X,6,L
@@ -331,23 +330,23 @@ R(1,L5R25)
 C(3,#MailObj,1,T(2,@MailCustName,#L5R25CustName),E(0,@ApplNo,#L5R25ApplNo))
 
 ! 核准號碼
-#ApplNo=n,7,S
+#ApplNo=A,7,S
 
 ! 對象姓名 借:帶入；保:輸入
 #BTNF=X,1,I,ui:button;value:保證人查詢;enable:1;tabbable:0
-#BTNFBUF=X,50,S
-T(2,00000000000000          +#ApplNo)
+#BTNFBUF=X,40,S
+T(2,00000000000000+          +#ApplNo+000)
 #BTNFBIND=X,1,S
 BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L2020; ntxbuf=#BTNFBUF;ntxbuf5=type<-1:MailCustName<-OOGuarantor})
 
 #MailCustName=X,2.50,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#MailObj,1,s,$)
 @V(7)
 
 ! 是否送達
 #DelvrYet=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)    
+C(2,#FunctionCd,S,$,$,$,s,s)    
 HELP(#DelvrYetHelp)
 @V(H,#DelvrYetHelp)
 #DelvrYetX=X,6,L
@@ -355,7 +354,7 @@ T(H,#DelvrYet,#DelvrYetHelp)
 
 ! 送達方式
 #DelvrCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#DelvrCodeHelp)
 @V(H,#DelvrCodeHelp)
 #DelvrCodeX=X,14,L
@@ -363,7 +362,7 @@ T(H,#DelvrCode,#DelvrCodeHelp)
 
 ! 寄送地點選項
 #AddressCode=A,1,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#AddressCodeHelp)
 @V(H,#AddressCodeHelp)
 #AddressCodeX=X,10,L
@@ -380,7 +379,7 @@ T(2,@RimAddressCode,#AddressCode)
 T(2,@RimClNo,#ClNo)
 T(2,@RimClCode1,#ClCode1)
 T(2,@RimClCode2,#ClCode2)
-C(3,#FunctionCd,1,$,S)
+C(2,#FunctionCd,S,$,$,$,s,s)
 C(3,#AddressCode,4,S,$)
 RESET_RIM(#RimL5R24,L5R24)
 S(L5R24,1,#RimCustUKey,#RimAddressCode,#RimClNo,#RimClCode1,#RimClCode2)
@@ -389,12 +388,12 @@ T(2,@Address,#L5R24FullAddress)
 
 ! 寄送地點
 #Address=X,60,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 @V(7)
 
 ! 其他記錄
 #Remark=X,2.80,I
-C(2,#FunctionCd,S,$,$,s,s,s)
+C(2,#FunctionCd,S,$,$,$,s,s)
 ! 維護人員
 #EditEmpNo=X,6,L
 #EditEmpNoX=X,50,L
