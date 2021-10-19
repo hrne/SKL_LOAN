@@ -353,7 +353,7 @@ HELP(#AccCollPsnCodeHelp)
 #AccCollPsnCodeX=X,6,L
 T(H,#AccCollPsnCode,#AccCollPsnCodeHelp)
 @C(3,#AccCollPsnCode,1,HIDE(#BTNF)T(F,@AccCollPsnName,0),SHOW(#BTNF)T(F,@AccCollPsnName,1))
-IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF),$)
+IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(F,@AccCollPsnName,0),$)
 
 ! 催收人員姓名
 #BTNF=X,1,I,ui:button;value:聯徵地區別查詢;enable:1;tabbable:0

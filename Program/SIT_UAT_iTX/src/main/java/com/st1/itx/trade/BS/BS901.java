@@ -182,8 +182,8 @@ public class BS901 extends TradeBuffer {
 
 		int insuYearMonth = this.getTxBuffer().getMgBizDate().getTbsDyf() / 100;
 		// 計入已收，未收不計
-		// 本月到期已繳火險保費
-		Slice<InsuRenew> slInsuRenew = insuRenewService.findL4604A(insuYearMonth, 2, 1, 99999999, this.index,
+		// 本月到期未繳火險保費
+		Slice<InsuRenew> slInsuRenew = insuRenewService.findL4604A(insuYearMonth, 2, 0, 0, this.index,
 				Integer.MAX_VALUE);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {

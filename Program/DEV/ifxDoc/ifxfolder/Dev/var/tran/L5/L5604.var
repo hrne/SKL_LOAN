@@ -277,8 +277,7 @@ T(4,#SYSCDATE)
 C(2,#FunctionCd,S,$,$,$,s,s)
 C(2,#FunctionCd,S,T(1,#RecordDateX,2,7),$,T(1,#RecordDateX,2,7),s,s)
 D(8)
-@V(7)
-@A(DATE,0,#RecordDate)
+@V(7)A(DATE,0,#RecordDate)
 
 ! 法務進度
 #LegalProg=A,3,I

@@ -168,7 +168,7 @@ T(2,#OOEditEmpNo+#Space+#OOEditEmpNoX)
 ! 經辦
 #OOTitaTlrNo=X,6,L
 ! 系統日期
-#OOTitaAcDate=X,7,L
+#OOTitaAcDate=D,7,L
 
 ! 1+7+3+1 +1+7+7+5+2+160+6+20=220
 #OOBUF_MAINTAIN=X,241,S

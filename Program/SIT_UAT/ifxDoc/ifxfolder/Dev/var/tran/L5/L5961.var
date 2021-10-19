@@ -197,7 +197,7 @@ T(H,#OOResultCode,#ResultCodeHelp)
 ! 經辦
 #OOTitaTlrNo=X,6,L
 ! 系統日期
-#OOTitaAcDate=X,7,L
+#OOTitaAcDate=D,7,L
 
 #OOEditEmpNoX=X,40,S
 #EditEmpNoSpace=X,1,S

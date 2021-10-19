@@ -43,6 +43,7 @@ E(0,0)
 ["#FdBatchNo+整批批號",#BatchNo],
 ["#FdStatusCode+作業狀態",#StatusCode,#StatusCodeX],
 ["#FdRepayCode+還款來源",#RepayCode,#RepayCodeX],
+["#FdReconCode+對帳類別",#ReconCode,#ReconCodeX],
 ["#FdFileName+檔名",#FileName],
 ["#FdProcStsCode+處理狀態",#ProcStsCode,#ProcStsCodeX],
 ["#FdCustNo+戶號",#CustNo],
@@ -58,6 +59,7 @@ T(3,*)
 
 #FdRepayCode=X,2,L
 T(3,*)
+#FdReconCode=X,2,L
 
 #FdFileName=X,2,L
 
@@ -195,6 +197,19 @@ T(3,)T(H,#RepayCode,#RepayCodeHelp)
 !              09,T(3,其他),
 !              11,T(3,匯款轉帳預先作業),00,T(3,全部))
 
+#ReconCode=X,3,I
+C(3,#CHAIN,0,$,s)
+HELP(#ReconCodeHelp)
+
+#ReconCodeX=X,15,L
+T(3,)T(H,#ReconCode,#ReconCodeHelp)
+!SWITCH(#ReconCode,P01,T(3,銀行存款－郵局),
+!                  P02,T(3,銀行存款－新光),
+!                  P03,T(3,銀行存款－新光),
+!                  P04,T(3,銀行存款－台新),
+!                  TEM,T(3,員工扣薪),
+!                  TCK,T(3,支票),T(3, ))
+
 ! 檔名
 #FileName=x,30,I
 C(3,#CHAIN,0,$,s)
@@ -232,17 +247,6 @@ T(3,)T(H,#ProcStsCode,#ProcStsCodeHelp)
 !                 S,T(3,已處理),
 !                 R,T(3,待處理))
 
-#ReconCode=X,3,S
-C(3,#CHAIN,0,$,s)
-
-#ReconCodeX=X,15,L
-T(3,)T(H,#ReconCode,#ReconCodeHelp)
-!SWITCH(#ReconCode,P01,T(3,銀行存款－郵局),
-!                  P02,T(3,銀行存款－新光),
-!                  P03,T(3,銀行存款－新光),
-!                  P04,T(3,銀行存款－台新),
-!                  TEM,T(3,員工扣薪),
-!                  TCK,T(3,支票),T(3, ))
 ! 戶號
 #CustNo=A,7,I
 C(3,#CHAIN,0,$,s)

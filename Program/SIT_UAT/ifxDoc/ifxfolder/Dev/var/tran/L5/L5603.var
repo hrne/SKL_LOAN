@@ -180,7 +180,7 @@ T(2,@EditEmpNoX,#L5r28FullName)
 IF (#FunctionCd==1 || #FunctionCd==2|| #FunctionCd==3,T(F,@MailTypeCode,1)T(F,@MailDate,1)T(F,@MailObj,1)T(F,@CustName,1)T(F,@DelvrYet,1)T(F,@DelvrCode,1)T(F,@AddressCode,1)T(F,@Address,1)T(F,@Remark,1)T(F,@MailCustName,1),
                                                       T(F,@MailTypeCode,0)T(F,@MailDate,0)T(F,@MailObj,0)T(F,@CustName,0)T(F,@DelvrYet,0)T(F,@DelvrCode,0)T(F,@AddressCode,0)T(F,@Address,0)T(F,@Remark,0)T(F,@MailCustName,0))
 
-IF(#FunctionCd == 5,INVOKEJS(SHOW,L5603,8,8,0),INVOKEJS(SHOW,L5603,8,8,1))
+IF (#FunctionCd == 4|| #FunctionCd == 5,INVOKEJS(SHOW,L5603,8,8,0),INVOKEJS(SHOW,L5603,8,8,1))
 
 IF(#FunctionCd==5,K(NOBUTTON,CLOSEY),$)
 C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
@@ -318,7 +318,7 @@ HELP(#MailObjHelp)
 #MailObjX=X,6,L
 T(H,#MailObj,#MailObjHelp)
 C(3,#MailObj,1,HIDE(#BTNF)T(F,@MailCustName,0)T(2,@FdMailCustName, ),SHOW(#BTNF)T(F,@MailCustName,1)T(2,@FdMailCustName,*))
-IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(2,@FdMailCustName, ),$)
+IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(2,@FdMailCustName, )T(F,@MailCustName,0),$)
 
 <include src="ROM.icf::L5R25.dec"/>
 #RimCustUKey=X,32,S

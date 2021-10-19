@@ -153,7 +153,7 @@ T(H,#OOLegalProg,#LegalProgHelp)
 ! 金額
 #OOAmount=m,14,O
 ! 記錄
-#OORemark=A,1,O
+#OORemark=X,1,O
 #OORemarkX=X,20,O
 ! C(1,#OORemark,S,S,$)
 T(H,#OORemark,#LawRemarkHelp)

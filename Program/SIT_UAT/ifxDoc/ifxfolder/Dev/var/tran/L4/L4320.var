@@ -88,7 +88,7 @@ T(3,CdCode.TxKind)
 #TxKindHelp=x,1024,S 
 
 ![利率種類]
-#CDDEF03=x,26,S
+#CDDEF03=x,40,S
 T(3,CdCode.BaseRate0)
 
 #BaseRateHelp=x,1024,S 

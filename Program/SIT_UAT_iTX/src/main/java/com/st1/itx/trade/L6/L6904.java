@@ -205,7 +205,9 @@ public class L6904 extends TradeBuffer {
 				titaTlrNo = tAcDetail.getTitaTlrNo();
 				titaBatchNo = tAcDetail.getTitaBatchNo();
 				dscptCode = tAcDetail.getDscptCode();
-				slipNote = tAcDetail.getSlipNote();
+				if(tAcDetail.getSlipNote()!=null) {
+					slipNote = tAcDetail.getSlipNote().trim();
+				}
 				slipBatNo = tAcDetail.getSlipBatNo();
 				titaSecNo = tAcDetail.getTitaSecNo();
 				if (tAcDetail.getDbCr().equals("D")) {
@@ -242,7 +244,7 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OODbAmt", dbAmt);
 			occursList.putParam("OOCrCnt", crCnt);
 			occursList.putParam("OOCrAmt", crAmt);
-			occursList.putParam("OOslipNotet", slipNote.trim());
+			occursList.putParam("OOSlipNote", slipNote);
 			switch (iInqType) {
 			case 0: // 全部彙計方式
 				occursList.putParam("OOInqData", "");
@@ -286,7 +288,10 @@ public class L6904 extends TradeBuffer {
 			titaTlrNo = tAcDetail.getTitaTlrNo();
 			titaBatchNo = tAcDetail.getTitaBatchNo();
 			dscptCode = tAcDetail.getDscptCode();
-			slipNote = tAcDetail.getSlipNote();
+			if(tAcDetail.getSlipNote()!=null) {
+				slipNote = tAcDetail.getSlipNote().trim();
+			}
+			
 			slipBatNo = tAcDetail.getSlipBatNo();
 			titaSecNo = tAcDetail.getTitaSecNo();
 			dbCnt = 0;
@@ -315,7 +320,7 @@ public class L6904 extends TradeBuffer {
 			occursList.putParam("OODbAmt", dbAmt);
 			occursList.putParam("OOCrCnt", crCnt);
 			occursList.putParam("OOCrAmt", crAmt);
-			occursList.putParam("OOslipNotet", slipNote.trim());
+			occursList.putParam("OOSlipNote", slipNote);
 			switch (iInqType) {
 			case 0: // 全部彙計方式
 				occursList.putParam("OOInqData", "");

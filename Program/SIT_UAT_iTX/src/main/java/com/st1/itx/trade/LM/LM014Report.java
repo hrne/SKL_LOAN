@@ -2,6 +2,7 @@ package com.st1.itx.trade.LM;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -46,57 +47,12 @@ public class LM014Report extends MakeReport {
 		}
 	}
 	
-	
-	// 做產表Queue用的容器
-	
-	private class Queue
-	{
-		private QueueObject head = null;
-		
-		Queue(QueueObject newHead)
-		{
-			this.head = newHead;
-		}
-		
-		public QueueObject Pop()
-		{
-			QueueObject qo = this.head;
-			this.head = this.head.next;
-			
-			return qo;
-		}
-		
-		public Boolean IsEmpty()
-		{
-			return this.head == null ? true : false;
-		}
-		
-		public QueueObject GetTail()
-		{
-			QueueObject qo = this.head;
-			
-			while (qo.next != null)
-			{
-				qo = qo.next;
-			}
-			
-			return qo;
-		}
-		
-		public void Enqueue(QueueObject qo)
-		{
-			this.GetTail().next = qo;
-		}
-	}
-	
-	private class QueueObject
+	private class Query
 	{
 		public ReportType reportType = null;
 		public QueryType queryType = null;
 		
-		private QueueObject next = null;
-		
-		QueueObject(ReportType rptType, QueryType qType)
+		Query(ReportType rptType, QueryType qType)
 		{
 			this.reportType = rptType;
 			this.queryType = qType;
@@ -153,9 +109,9 @@ public class LM014Report extends MakeReport {
 		
 		int inputType = Integer.valueOf(titaVo.getParam("inputType"));
 		
-		// 依據輸入種類, 製作需要產的表的 Queue
+		// 依據輸入種類, 製作需要產的表的 List
 		
-		Queue queue = null;
+		ArrayList<Query> queryList = new ArrayList<Query>(inputType == 0 ? 20 : 5);
 		
 		this.info("inputType: " + inputType);
 		
@@ -169,13 +125,9 @@ public class LM014Report extends MakeReport {
 			//			 D <--> 4
 			//	    無對應      0
 			
-			// 先做總表 as head, 後面四張再透過for迴圈做
-			
-			queue = new Queue(new QueueObject(ReportType.All, QueryType.values()[inputType-1]));
-			
-			for (int i = 1; i < ReportType.values().length; i++)
+			for (int i = 0; i < ReportType.values().length; i++)
 			{
-				queue.Enqueue(new QueueObject(ReportType.values()[i], QueryType.values()[inputType-1]));
+				queryList.add(new Query(ReportType.values()[i], QueryType.values()[inputType-1]));
 			}		
 			
 		} else if (inputType == 0) {
@@ -186,14 +138,7 @@ public class LM014Report extends MakeReport {
 			{
 				for (int j = 0; j < QueryType.values().length; j++)
 				{			
-					if (queue == null)
-					{
-						queue = new Queue(new QueueObject(ReportType.values()[i], QueryType.values()[j]));
-					}
-					else
-					{
-						queue.Enqueue(new QueueObject(ReportType.values()[i], QueryType.values()[j]));
-					}
+					queryList.add(new Query(ReportType.values()[i], QueryType.values()[j]));
 				}
 			}
 		}
@@ -206,11 +151,9 @@ public class LM014Report extends MakeReport {
 		
 		Boolean isFirstOutput = true;
 		
-		while (!queue.IsEmpty())
+		for (Query qo : queryList)
 		{
-			// 取得此循環應做的報表，並且開pdf/開新頁
-			QueueObject qo = queue.Pop();
-			
+			// 取得此循環應做的報表，並且開pdf/開新頁			
 			currentReportType = qo.reportType;
 			
 			if (isFirstOutput)

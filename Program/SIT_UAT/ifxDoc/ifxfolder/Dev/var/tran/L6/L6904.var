@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,157)ASGN(INQLEN$) 
+E(0,163)ASGN(INQLEN$) 
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -247,13 +247,11 @@ T(2,#OOAcNoCode+-+#OOAcSubCode+-+#OOAcDtlCode)
 !彙計方式為6時,此欄位為"業務類別" (撥款匯款、支票繳款、債協、放款)
 #OOInqData=X,6,S
 
-#OOslipNotet=X,60,S
+#OOSlipNote=X,60,S
 
 #OOSumNoX=X,20,S
-C(2,#InqType,$,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData),T(2,#OOInqData),T(2,#OOslipNotet),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp))
-!C(3,#InqType,1,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData))
-!C(3,#InqType,6,T(H,#OOInqData,#SecNoTypeHelp),T(2,#OOInqData))
-!C(3,#InqType,4,T(2,#OOInqData+#OOslipNotet),T(2,#OOInqData))
+C(2,#InqType,S,T(H,#OOInqData,#SumNoTypeHelp),T(2,#OOInqData),T(2,#OOInqData),T(2,#OOSlipNote),T(2,#OOInqData),T(H,#OOInqData,#SecNoTypeHelp))
+
 !借方筆數
 #OODbCnt=n,3,L
 #OODbCntX=X,3,L
@@ -319,7 +317,7 @@ TXFORM=L6904
 #OOAcSubCode
 #OOAcDtlCode
 #OOAcNoItem
-#OOslipNotet
+#OOSlipNote
 #OOInqData
 #OODbCnt
 #OODbAmt
