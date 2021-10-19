@@ -75,7 +75,7 @@ public class L5965 extends TradeBuffer {
 				occursList.putParam("OOCondCode", reCollRemind.getCondCode());
 				occursList.putParam("OORemindDate", reCollRemind.getRemindDate());
 				occursList.putParam("OOEditDate", reCollRemind.getEditDate());
-				occursList.putParam("OOEditTime", reCollRemind.getEditTime());
+				occursList.putParam("OOEditTime", reCollRemind.getEditTime().trim());
 				occursList.putParam("OORemindCode", reCollRemind.getRemindCode());
 				occursList.putParam("OORemark", reCollRemind.getRemark());
 				occursList.putParam("OOEditEmpNo", reCollRemind.getLastUpdateEmpNo());

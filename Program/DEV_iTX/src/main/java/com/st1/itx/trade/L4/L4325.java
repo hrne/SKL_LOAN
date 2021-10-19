@@ -29,7 +29,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4325 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4325.class);
 
 	@Autowired
 	public Parse parse;

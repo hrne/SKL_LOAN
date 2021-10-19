@@ -42,7 +42,6 @@ K(MODIFYBUTTON,查詢)
 T(3,@FdApplNo, )
 T(3,@FdFacmNo,*)
 T(3,@FdBormNo,*)
-T(3,@FdRptFg,*)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
@@ -56,9 +55,6 @@ T(3,@FdRptFg,*)
 ["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN4,#ApplNoX],
 ["#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN5],
 ["#FdBormNo+撥款序號",#BormNo],
-["#FdRptFg+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -472,10 +468,10 @@ HIDE(#BTN2,#BTN3,#BTN4,#BTN5)
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
 C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 
-#FdRptFg=X,2,L
-T(3,*)
+#RPTFG=A,1,S
+E(0,0)
 
-<include src="COM.icf::RPTFG.dec"/>
+
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
 <include src="ROM.icf::L2R05.dec"/>
@@ -870,7 +866,7 @@ TXFORM=L3916
 [
 ["[L3916]                                 撥款內容查詢"],
 [#<->#,"#FdOCustNo+借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX],
-[#<->#,"#FdStatusX+戶況",#StatusX],
+! [#<->#,"#FdStatusX+戶況",#StatusX],
 [#<->#,"<font color=red>@金額資料區","@"],
 ["#FdOApplNo+核准號碼",#OApplNo],["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdAcctCodeX+業務科目",#AcctCodeX],["#FdDrawdownAmtX+撥款金額",#DrawdownAmtX],

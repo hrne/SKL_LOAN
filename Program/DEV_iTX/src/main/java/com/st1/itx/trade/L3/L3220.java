@@ -281,9 +281,9 @@ public class L3220 extends TradeBuffer {
 		if (!tLoanCheque.getStatusCode().equals("0")) {
 			throw new LogicException(titaVo, "E3058", "支票檔 支票帳號 = " + iChequeAcct + " 支票號碼 =  " + iChequeNo); // 該票據狀況碼非為未處理
 		}
-		// 存日期票當日不可抽、退票(請以訂正處理)
+		// 期票未托收不可抽票
 		if (tLoanCheque.getReceiveDate() == this.txBuffer.getTxCom().getTbsdy()) {
-			throw new LogicException(titaVo, "E0010", "存日期票當日不可抽、退票(請以訂正處理)"); // 功能選擇錯誤
+			throw new LogicException(titaVo, "E0010", "期票未托收不可抽票"); // 功能選擇錯誤
 		}
 
 		wkChequeAmt = tLoanCheque.getChequeAmt();

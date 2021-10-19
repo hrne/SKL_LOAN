@@ -38,7 +38,6 @@ K(MODIFYBUTTON,查詢)
 
 #InitValue=@,1,S
 T(3,@FdApplNo, )
-T(3,@FdRptFg,*)
 T(F,@BormNo,1)
 T(3,@FdTitaHCode,*)
 
@@ -57,9 +56,6 @@ T(3,@FdTitaHCode,*)
 ["#FdAcDate+會計日期",#AcDate],
 ["#FdEntryDate+入帳日期",#EntryDate],
 ["#FdTitaHCode+訂正別",#TitaHCode,#TitaHCodeX],
-["#FdRptFg+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -323,16 +319,17 @@ E(0,0)
 #TitaHCodeX=X,10,L
 T(3,)T(H,#TitaHCode,#inTitaHCodeHelp)
 
-#FdRptFg=X,2,L
-<include src="COM.icf::RPTFG.dec"/>
+#RPTFG=A,1,S
+E(0,0)
 
-#CHAINXMT=X,1,S
-C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 #MRKEY=_,_,S
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
 C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>

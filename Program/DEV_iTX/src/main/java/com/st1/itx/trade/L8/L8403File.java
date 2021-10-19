@@ -1513,7 +1513,7 @@ public class L8403File extends MakeFile {
 					String text = "44" + iTranKey + iSubmitKey + StringUtils.rightPad(iCustId, 10, "")
 							+ StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
 							+ StringUtils.rightPad(iDebtCode, 2, "") + StringUtils.leftPad(iNonGageAmt, 9, '0')
-							+ StringUtils.leftPad(iPeriod, 3, '0') + StringUtils.leftPad(iRate, 5, '0')
+							+ StringUtils.rightPad(iPeriod, 3, "") + StringUtils.leftPad(iRate, 5, '0')
 							+ StringUtils.leftPad(iMonthPayAmt, 9, '0') + StringUtils.rightPad("", 10)
 							+ StringUtils.leftPad(iReceYearIncome, 9, '0') + StringUtils.leftPad(iReceYear, 3, '0')
 							+ StringUtils.leftPad(iReceYear2Income, 9, '0') + StringUtils.leftPad(iReceYear2, 3, '0')
@@ -1522,11 +1522,11 @@ public class L8403File extends MakeFile {
 							+ StringUtils.rightPad(iCompId, 8, "") + StringUtils.rightPad("", 10)
 							+ StringUtils.leftPad(iCarCnt, 2, '0') + StringUtils.leftPad(iHouseCnt, 2, '0')
 							+ StringUtils.leftPad(iLandCnt, 2, '0') + StringUtils.leftPad(iChildCnt, 2, '0')
-							+ StringUtils.leftPad(iChildRate, 5, '0') + StringUtils.leftPad(iParentCnt, 2, '0')
-							+ StringUtils.leftPad(iParentRate, 5, '0') + StringUtils.leftPad(iMouthCnt, 2, '0')
-							+ StringUtils.leftPad(iMouthRate, 5, '0') + StringUtils.rightPad(iGradeType, 1, "")
+							+ StringUtils.rightPad(iChildRate, 5, "") + StringUtils.leftPad(iParentCnt, 2, '0')
+							+ StringUtils.rightPad(iParentRate, 5, "") + StringUtils.leftPad(iMouthCnt, 2, '0')
+							+ StringUtils.rightPad(iMouthRate, 5, "") + StringUtils.rightPad(iGradeType, 1, "")
 							+ StringUtils.leftPad(iPayLastAmt, 9, '0') + StringUtils.leftPad(iPeriod2, 3, '0')
-							+ StringUtils.leftPad(iRate2, 5, "") + StringUtils.leftPad(iMonthPayAmt2, 9, '0')
+							+ StringUtils.rightPad(iRate2, 5, "") + StringUtils.leftPad(iMonthPayAmt2, 9, '0')
 							+ StringUtils.leftPad(iPayLastAmt2, 9, '0') + StringUtils.rightPad("", 21);
 					this.put(text);
 
@@ -1602,7 +1602,8 @@ public class L8403File extends MakeFile {
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String text = "45" + iTranKey + iSubmitKey + StringUtils.rightPad(iCustId, 10, "")
 							+ StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
-							+ StringUtils.rightPad(iMaxMainCode, 3, "") + StringUtils.rightPad(iAgreeCode, 1, "");
+							+ StringUtils.rightPad(iMaxMainCode, 3, "") + StringUtils.rightPad(iAgreeCode, 1, "")
+							+ StringUtils.rightPad("", 48);
 					this.put(text);
 
 					// 檔案產生後，回填JcicDate
@@ -1654,7 +1655,7 @@ public class L8403File extends MakeFile {
 					String text = "46" + iTranKey + iSubmitKey + StringUtils.rightPad(iCustId, 10, "")
 							+ StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
 							+ StringUtils.rightPad(iBreakCode, 2, "") + StringUtils.rightPad("", 3)
-							+ StringUtils.leftPad(iCloseCode, 2, '0') + StringUtils.leftPad(iCloseDate, 7, '0')
+							+ StringUtils.rightPad(iCloseCode, 2, "") + StringUtils.leftPad(iCloseDate, 7, '0')
 							+ StringUtils.rightPad("", 43);
 					this.put(text);
 
@@ -1747,7 +1748,7 @@ public class L8403File extends MakeFile {
 					int iDate = Integer.valueOf(titaVo.getParam("ReportDate"));
 					String text = "47" + iTranKey + iSubmitKey + StringUtils.rightPad(iCustId, 10, "")
 							+ StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
-							+ StringUtils.leftPad(iPeriod, 3, '0') + StringUtils.leftPad(iRate, 5, '0')
+							+ StringUtils.leftPad(iPeriod, 3, '0') + StringUtils.rightPad(iRate, 5, "")
 							+ StringUtils.leftPad(iCivil323ExpAmt, 9, '0') + StringUtils.leftPad(iExpLoanAmt, 9, '0')
 							+ StringUtils.leftPad(iCivil323CashAmt, 9, '0') + StringUtils.leftPad(iCashCardAmt, 9, '0')
 							+ StringUtils.leftPad(iCivil323CreditAmt, 9, '0')
@@ -1757,8 +1758,8 @@ public class L8403File extends MakeFile {
 							+ StringUtils.leftPad(iLimitDate, 7, '0') + StringUtils.leftPad(iFirstPayDate, 7, '0')
 							+ StringUtils.leftPad(iMonthPayAmt, 9, '0') + StringUtils.rightPad(iPayAccount, 20, "")
 							+ StringUtils.rightPad(iPostAddr, 76, "") + StringUtils.rightPad(iGradeType, 1, "")
-							+ StringUtils.leftPad(iPayLastAmt, 9, '0') + StringUtils.rightPad(iPeriod2, 3, "")
-							+ StringUtils.leftPad(iRate2, 5, "") + StringUtils.leftPad(iMonthPayAmt2, 9, '0')
+							+ StringUtils.leftPad(iPayLastAmt, 9, '0') + StringUtils.leftPad(iPeriod2, 3, '0')
+							+ StringUtils.rightPad(iRate2, 5, "") + StringUtils.leftPad(iMonthPayAmt2, 9, '0')
 							+ StringUtils.leftPad(iPayLastAmt2, 9, '0') + StringUtils.rightPad("", 14);
 					this.put(text);
 
@@ -1898,7 +1899,7 @@ public class L8403File extends MakeFile {
 					String text = "49" + iTranKey + iSubmitKey + StringUtils.rightPad(iCustId, 10, "")
 							+ StringUtils.leftPad(iRcDate, 7, '0') + StringUtils.rightPad("", 5)
 							+ StringUtils.rightPad(iClaimStatus, 1, "") + StringUtils.leftPad(iApplyDate, 7, '0')
-							+ StringUtils.rightPad(iCourtCode, 3, "") + StringUtils.leftPad(iYear, 3, "")
+							+ StringUtils.rightPad(iCourtCode, 3, "") + StringUtils.leftPad(iYear, 3, '0')
 							+ StringUtils.rightPad(iCourtDiv, 4, "") + StringUtils.rightPad(iCourtCaseNo, 20, "")
 							+ StringUtils.rightPad(iApprove, 1, "") + StringUtils.leftPad(iClaimDate, 7, '0')
 							+ StringUtils.rightPad("", 46);

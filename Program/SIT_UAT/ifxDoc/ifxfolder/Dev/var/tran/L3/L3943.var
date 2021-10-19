@@ -37,7 +37,6 @@ E(0,0)
 K(MODIFYBUTTON,查詢)
 T(3,@FdChequeAcct,*)
 T(3,@FdChequeNo,*)
-T(3,@FdRptFg,*)
 
 </sub>
 
@@ -47,9 +46,6 @@ T(3,@FdRptFg,*)
 ["[L3943]                                 支票內容查詢"],
 ["#FdChequeAcct+支票帳號",#ChequeAcct],
 ["#FdChequeNo+支票號碼",#ChequeNo],
-["#FdRptFg+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -148,10 +144,8 @@ C(3,#CHAIN,1,T(1,#NTXBUF,10,7),$)
 C(3,#CHAIN,1,s,$)
 @V(2,0)
 
-#FdRptFg=X,2,L
-T(3,*)
-
-<include src="COM.icf::RPTFG.dec"/>
+#RPTFG=A,1,S
+E(0,0)
 
 #CHAINXMT=X,1,S
 C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)

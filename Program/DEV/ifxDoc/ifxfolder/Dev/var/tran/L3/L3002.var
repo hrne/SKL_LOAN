@@ -49,9 +49,6 @@ T(3,@FdRptFg,*)
 ["#FdCustNo+．借款人戶號",#CustNo,"@@@",#BTN2,#CustNoX],
 ["#FdCustId+．統一編號",#CustId,#BTN3,#CustIdX],
 ["#FdApplNo+．核准編號",#ApplNo,"@@@",#BTN4,#ApplNoX],
-["#FdRptFg+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -337,11 +334,16 @@ C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
 C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
 
-<include src="COM.icf::RPTFG.dec"/>
+#RPTFG=A,1,S
+
 
 #RPTFG2=A,1,S
 C(3,#RPTFG,0,$,S)
 C(4,#NTXBUF5,T(3,1),T(3,2))
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>

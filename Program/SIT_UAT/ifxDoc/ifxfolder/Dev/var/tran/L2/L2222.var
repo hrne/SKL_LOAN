@@ -6,6 +6,7 @@
 
 #TXCD
 T(3,L2222)
+K(MODIFYBUTTON,登錄)
 
 </sub>
 <sub type="PREDC" name="PreDC">
@@ -47,14 +48,16 @@ IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2022進入),$)
 C(2,#CHAIN,$,T(F,@FunCode,0))
 
 
-#NTXBUF=x,300,S
+#NTXBUF=x,350,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CreditSysNo,#NTXBUF,1,7)
 T(1,@CustNo,#NTXBUF,8,7)
-T(1,@CustName,#NTXBUF,15,100)
-T(1,@RelUKey,#NTXBUF,115,32)
-T(1,@RelId,#NTXBUF,147,10)
-T(1,@RelName,#NTXBUF,157,100)
+T(1,@FacmNo,#NTXBUF,15,3)
+T(1,@CustName,#NTXBUF,18,100)
+T(1,@RelUKey,#NTXBUF,118,32)
+T(1,@RelId,#NTXBUF,150,10)
+T(1,@RelName,#NTXBUF,160,100)
+T(1,@Type,#NTXBUF,260,50)
 
 !自動更新L2022機制
 #AutoReFresh=A,1,S
@@ -80,6 +83,8 @@ T(2,@RelCodeHelp,#HelpDesc1)
 
 #CustNo=X,7,L
 
+#FacmNo=X,3,L
+
 #CustName=x,2.50,L
 
 #RelUKey=x,32,L
@@ -87,6 +92,8 @@ T(2,@RelCodeHelp,#HelpDesc1)
 #RelId=x,10,L
 
 #RelName=x,2.50,L
+
+#Type=X,50,L
 
 #RelCode=X,2,I
 HELP(#RelCodeHelp)
@@ -125,8 +132,10 @@ T(3,[L2222] 與授信戶關係登錄)
 <sub type="TIM">
 #CreditSysNo
 #CustNo
+#FacmNo
 #RelUKey
 #RelCode
+#Type
 #END
 </sub>
 !------ 下行電文TOM ------

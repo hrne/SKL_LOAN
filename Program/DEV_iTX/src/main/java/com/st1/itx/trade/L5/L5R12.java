@@ -32,7 +32,8 @@ public class L5R12 extends TradeBuffer {
 		String strBankCode = titaVo.getParam("RimBankCode");// 銀行代碼
 		String iFunctionCode = titaVo.getParam("FunctionCode");
 		
-		
+		this.totaVo.putParam("L5r12BankItem", "");
+		this.totaVo.putParam("L5r12BranchItem", "");
 		
 		this.info("Run L5R12 strBankCode=[" + strBankCode + "]");
 		checkBankCode(strBankCode, titaVo);

@@ -70,9 +70,7 @@ public class L5R18 extends TradeBuffer {
 		iCollTel = iCollTelService.findById(iCollTelId, titaVo);
 		if (iCollTel != null) {
 			totaVo.putParam("L5R18TelDate", iCollTel.getTelDate());
-//			totaVo.putParam("L5R18TelTime", iCollTel.getTelTime());
-			String iTime = iCollTel.getTelTime().replaceAll(":", "");
-			totaVo.putParam("L5R18TelTime", iTime);
+			totaVo.putParam("L5R18TelTime", iCollTel.getTelTime().trim());
 			totaVo.putParam("L5R18ContactCode", iCollTel.getContactCode());
 			totaVo.putParam("L5R18RecvrCode", iCollTel.getRecvrCode());
 			totaVo.putParam("L5R18TelArea", iCollTel.getTelArea());

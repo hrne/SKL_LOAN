@@ -5,8 +5,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -37,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
 @Component("BS999")
 @Scope("prototype")
 public class BS999 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(BS999.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -60,18 +57,30 @@ public class BS999 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("BS999 ......");
 
-		// commitEnd
-		this.batchTransaction.commit();
-
 		/*---------- Step 2. 系統換日過帳(含年初損益類結轉) ----------*/
-
+		String iParm = titaVo.getParam("Parm");
+		if (iParm.length() != 7 || !parse.isNumeric(iParm))  {
+			throw new LogicException(titaVo, "E0000", "參數：EX.1090402( 會計起日)");
+		}
+		int iAcdate = this.parse.stringToInteger(iParm); // 會計起日
+        this.info("iAcdate =" + iAcdate );
 		acMainCom.setTxBuffer(this.txBuffer);
+		List<AcMain> lAcMain =   new ArrayList<AcMain>();
 		Slice<AcMain> slAcMain = acMainService.findAll(this.index, Integer.MAX_VALUE, titaVo);
-		List<AcMain> lAcMain = slAcMain == null ? null : new ArrayList<AcMain>(slAcMain.getContent());
-		;
+		if (slAcMain !=null) {
+			for (AcMain ac : slAcMain.getContent()) {
+				if ( ac.getAcDate() >= iAcdate)  {
+					lAcMain.add(ac);
+				}
+			}
+		}
+		if (lAcMain.size() == 0) {
+	        this.info(" cnt = 0 skip, iAcdate =" + iAcdate );
+			return null;			
+		}
+	
 		for (AcMain ac : lAcMain) {
-			CdAcCode tCdAcCode = cdAcCodeService
-					.findById(new CdAcCodeId(ac.getAcNoCode(), ac.getAcSubCode(), ac.getAcDtlCode()), titaVo);
+			CdAcCode tCdAcCode = cdAcCodeService.findById(new CdAcCodeId(ac.getAcNoCode(), ac.getAcSubCode(), ac.getAcDtlCode()), titaVo);
 			if (tCdAcCode != null) {
 				ac.setAcctCode(tCdAcCode.getAcctCode());
 			}
@@ -98,6 +107,7 @@ public class BS999 extends TradeBuffer {
 				acMainCom.changeDate(bhDate, ac.getAcDate(), lAc, titaVo);
 				bhDate = ac.getAcDate();
 				lAc = new ArrayList<AcMain>();
+				this.batchTransaction.commit();
 			}
 			lAc.add(ac);
 		}

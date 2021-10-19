@@ -73,7 +73,7 @@ public class L5R22 extends TradeBuffer {
 			totaVo.putParam("L5R22CondCode", iCollRemind.getCondCode());
 			totaVo.putParam("L5R22RemindDate", iCollRemind.getRemindDate());
 			totaVo.putParam("L5R22EditDate", iCollRemind.getEditDate());
-			totaVo.putParam("L5R22EditTime", iCollRemind.getEditTime());
+			totaVo.putParam("L5R22EditTime", iCollRemind.getEditTime().trim());
 			totaVo.putParam("L5R22RemindCode", iCollRemind.getRemindCode());
 			totaVo.putParam("L5R22ReMark", iCollRemind.getRemark());
 		} else {

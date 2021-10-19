@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,40)ASGN(INQLEN$)
+E(0,615)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -158,7 +158,7 @@ T(H,#OOLegalProg,#LegalProgHelp)
 ! C(1,#OORemark,S,S,$)
 T(H,#OORemark,#LawRemarkHelp)
 ! 其他記錄(160)
-#OOMemo=x,500,O
+#OOMemo=x,10.50,O
 ! 增修人員
 #OOEditEmpNo=X,6,O
 #OOEditEmpNoX=X,40,S
@@ -173,7 +173,7 @@ T(2,#OOEditEmpNo+#Space+#OOEditEmpNoX)
 ! 經辦
 #OOTitaTlrNo=X,6,L
 ! 系統日期
-#OOTitaAcDate=X,7,L
+#OOTitaAcDate=D,7,L
 
 ! 1+7+3+1 +7+3+16+1+160+6+20=225
 #OOBUF_EDIT=X,586,S

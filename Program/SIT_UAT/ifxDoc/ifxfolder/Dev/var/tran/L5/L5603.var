@@ -318,7 +318,7 @@ HELP(#MailObjHelp)
 #MailObjX=X,6,L
 T(H,#MailObj,#MailObjHelp)
 C(3,#MailObj,1,HIDE(#BTNF)T(F,@MailCustName,0)T(2,@FdMailCustName, ),SHOW(#BTNF)T(F,@MailCustName,1)T(2,@FdMailCustName,*))
-IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF),$)
+IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(2,@FdMailCustName, ),$)
 
 <include src="ROM.icf::L5R25.dec"/>
 #RimCustUKey=X,32,S

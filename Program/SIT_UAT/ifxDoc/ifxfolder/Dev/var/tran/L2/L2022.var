@@ -162,8 +162,8 @@ C(4,#oClCode1,S,T(2,#oClCode1+#Dash+#oClCode2+#Dash+#oClNo))
 #oModify=X,1,S
 
 !關聯戶
-#Buf1=x,300,S
-T(2,#oCreditSysNo+#oCustNo+#oCustName+#oUKey+#oId+#oName)
+#Buf1=x,350,S
+T(2,#oCreditSysNo+#oCustNo+#oFacmNo+#oCustName+#oUKey+#oId+#oName+#oType)
 
 #Btn1=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2222; ntxbuf=#Buf1})

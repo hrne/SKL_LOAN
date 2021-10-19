@@ -101,7 +101,7 @@ public class L5962 extends TradeBuffer {
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOFacmNo", returnVo.getFacmNo());
 				occursList.putParam("OOMeetDate", returnVo.getMeetDate());
-				occursList.putParam("OOMeetTime", returnVo.getMeetTime());
+				occursList.putParam("OOMeetTime", returnVo.getMeetTime().trim());
 				occursList.putParam("OOContactCode", returnVo.getContactCode());
 				occursList.putParam("OOMeetPsnCode", returnVo.getMeetPsnCode());
 				occursList.putParam("OOCollPsnCode", returnVo.getCollPsnCode());

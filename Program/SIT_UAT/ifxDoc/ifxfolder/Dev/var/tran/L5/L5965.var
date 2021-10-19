@@ -12,7 +12,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,40)ASGN(INQLEN$)
+E(0,271)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -151,7 +151,7 @@ T(H,#OOCondCode,#CondCodeHelp)
 C(1,#OORemindCode,S,S,$)
 T(H,#OORemindCode,#RemindCodeHelp)
 ! 其他記錄(160)
-#OORemark=X,160,O
+#OORemark=X,4.40,O
 ! 增修人員
 #OOEditEmpNo=X,6,O
 #Space=X,1,S

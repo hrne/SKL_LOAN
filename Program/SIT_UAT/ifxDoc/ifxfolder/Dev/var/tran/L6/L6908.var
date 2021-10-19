@@ -42,7 +42,7 @@ E(0,0)
 [
 ["[L6908]                                 銷帳歷史明細查詢"],
 ["#FdAcBookCode+帳冊別",#AcBookCode,#AcBookItem],
-["#FdAcSubBookCode+帳冊別",#AcSubBookCode,#AcSubBookItem,"(空白:查詢全部)"],
+["#FdAcSubBookCode+區隔帳冊",#AcSubBookCode,#AcSubBookItem,"(空白:查詢全部)"],
 ["#FdBranchNo+單位別",#BranchNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdAcNoCode+科子細目",#AcNoCode,"-",#AcSubCode,"-",#AcDtlCode,"@",#BTN1,#AcNoItem],

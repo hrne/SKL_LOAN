@@ -396,12 +396,12 @@ T(2,#OOTitaTlrNo+ +#OOTlrItem)
 #OORelSeqNo=X,8,S
 T(1,#OORelTxseq,11,8)
 
-!分錄
-#OOBUF5=X,25,S
-T(2,#OORelDy+#OORelTxseq)
+!分錄清單
+#OOBUF5=X,32,S
+T(2,#OORelDy+0000000+#OORelTxseq)
 
 #OOBTN5=X,4,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L6906;text=分錄;ntxbuf=#OOBUF5})
+BIND(grid,{ cmd=CHAIN; ntxcd=L6901;text=分錄清單;ntxbuf=#OOBUF5})
 
 </sub>
 
@@ -470,8 +470,8 @@ TXFORM=L6905
 #RPTFG=0,QUERY.GRID,L6905
 #any={detail:true, header:'L6905.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
-#OOBTN5=分錄
-{width:50,search:false,formatter:'cust:bind-button:分錄',align:'center',canExport:false}
+#OOBTN5=分錄清單
+{width:90,search:false,formatter:'cust:bind-button:分錄',align:'center',canExport:false}
 
 #OOAcNoCode=科目
 {width:80,align:'center'}

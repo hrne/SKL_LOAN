@@ -347,7 +347,7 @@ public class LY002Report extends MakeReport {
 					if (tempEva.compareTo(evaAmt) == 0) {
 						mergeEvaMap.put("eva", evaAmt);
 					}else {
-						mergeEvaMap.put("eva", tempLine.add(evaAmt));
+						mergeEvaMap.put("eva", tempEva.add(evaAmt));
 					}
 					mergeEva.set(l,mergeEvaMap);
 

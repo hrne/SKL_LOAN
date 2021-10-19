@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -207,7 +205,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L2101")
 @Scope("prototype")
 public class L2101 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2101.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -233,8 +230,8 @@ public class L2101 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L2101 ");
-		logger.info("   titaVo.getHsupCode() = " + titaVo.getHsupCode());
+		this.info("active L2101 ");
+		this.info("   titaVo.getHsupCode() = " + titaVo.getHsupCode());
 
 		this.totaVo.init(titaVo);
 
@@ -257,9 +254,9 @@ public class L2101 extends TradeBuffer {
 		FacProd tFacProd = new FacProd();
 		switch (iFuncCode) {
 		case 1: // 新增
-			logger.info("funcd =  1");
+			this.info("funcd =  1");
 		case 3: // 拷貝
-			logger.info("funcd =  3");
+			this.info("funcd =  3");
 			moveFacProd(iFuncCode, tFacProd, titaVo);
 			try {
 				facProdService.insert(tFacProd, titaVo);
@@ -275,12 +272,12 @@ public class L2101 extends TradeBuffer {
 			if (tFacProd == null) {
 				throw new LogicException(titaVo, "E0003", "商品代碼 = " + iProdNo); // 修改資料不存在
 			} else {
-				if (tFacProd.getStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
-					tFacProd.setEndDate(this.parse.stringToInteger(titaVo.getParam("EndDate")));
-					tFacProd.setStatusCode(titaVo.getParam("StatusCode"));
-				} else {
-					moveFacProd(iFuncCode, tFacProd, titaVo);
-				}
+//				if (tFacProd.getStartDate() <= this.txBuffer.getTxCom().getTbsdy()) {
+//					tFacProd.setEndDate(this.parse.stringToInteger(titaVo.getParam("EndDate")));
+//					tFacProd.setStatusCode(titaVo.getParam("StatusCode"));
+//				} else {
+//				}
+				moveFacProd(iFuncCode, tFacProd, titaVo);
 			}
 			try {
 				tFacProd = facProdService.update2(tFacProd, titaVo);
@@ -350,7 +347,7 @@ public class L2101 extends TradeBuffer {
 					tFacProdStepRate.setLastUpdate(
 							parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 					tFacProdStepRate.setLastUpdateEmpNo(titaVo.getTlrNo());
-					// logger.info("L2101 StepRate i=" + i + "key=" +
+					// this.info("L2101 StepRate i=" + i + "key=" +
 					// tFacProdStepRate.getFacProdStepRateId());
 					try {
 						facProdStepRateService.insert(tFacProdStepRate);
@@ -411,7 +408,6 @@ public class L2101 extends TradeBuffer {
 			}
 		}
 		// 更新帳管費
-		tFacProdAcctFee = new FacProdAcctFee();
 		slFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iProdNo, "1", new BigDecimal(0.00),
 				new BigDecimal(99999999999999.00), this.index, Integer.MAX_VALUE);
 		lFacProdAcctFee = slFacProdAcctFee == null ? null : slFacProdAcctFee.getContent();
@@ -424,6 +420,7 @@ public class L2101 extends TradeBuffer {
 		}
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 5; i++) {
+				tFacProdAcctFee = new FacProdAcctFee();
 				if (titaVo.get("TimLoanAmt" + i) != null
 						&& this.parse.stringToDouble(titaVo.get("TimLoanAmt" + i)) > 0) {
 					tFacProdAcctFee.setProdNo(iProdNo);
@@ -453,7 +450,6 @@ public class L2101 extends TradeBuffer {
 			}
 		}
 		// 更新手續費 handlingFee
-		tFacProdAcctFee = new FacProdAcctFee();
 		slFacProdAcctFee = facProdAcctFeeService.acctFeeProdNoEq(iProdNo, "2", new BigDecimal(0.00),
 				new BigDecimal(99999999999999.00), this.index, Integer.MAX_VALUE);
 		lFacProdAcctFee = slFacProdAcctFee == null ? null : slFacProdAcctFee.getContent();
@@ -466,6 +462,7 @@ public class L2101 extends TradeBuffer {
 		}
 		if (iFuncCode == 1 || iFuncCode == 2 || iFuncCode == 3) {
 			for (int i = 1; i <= 5; i++) {
+				tFacProdAcctFee = new FacProdAcctFee();
 				if (titaVo.get("TimHandlingFee" + i) != null
 						&& this.parse.stringToDouble(titaVo.get("TimHandlingFee" + i)) > 0) {
 					tFacProdAcctFee.setProdNo(iProdNo);
@@ -580,7 +577,6 @@ public class L2101 extends TradeBuffer {
 		} else {
 			mFacProd.setEndDate(this.parse.stringToInteger(titaVo.getParam("EndDate")));
 		}
-		logger.info("截止日期 = " + mFacProd.getEndDate());
 
 		mFacProd.setStatusCode(titaVo.getParam("StatusCode"));
 		mFacProd.setAgreementFg(titaVo.getParam("AgreementFg"));

@@ -73,9 +73,7 @@ public class L5R19 extends TradeBuffer {
 		iCollMeet = iCollMeetService.findById(iCollMeetId, titaVo);
 		if (iCollMeet != null) {
 			totaVo.putParam("L5R19MeetDate", iCollMeet.getMeetDate());
-			String iTime = iCollMeet.getMeetTime().replaceAll(":", "");
-			totaVo.putParam("L5R19MeetTime", iTime);
-//			totaVo.putParam("L5R19MeetTime", iCollMeet.getMeetTime());
+			totaVo.putParam("L5R19MeetTime", iCollMeet.getMeetTime().trim());
 			totaVo.putParam("L5R19ContactCode", iCollMeet.getContactCode());
 			totaVo.putParam("L5R19MeetPsnCode", iCollMeet.getMeetPsnCode());
 			totaVo.putParam("L5R19CollPsnCode", iCollMeet.getCollPsnCode());

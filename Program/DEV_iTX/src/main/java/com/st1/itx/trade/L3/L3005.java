@@ -113,6 +113,13 @@ public class L3005 extends TradeBuffer {
 		List<LoanBorMain> lLoanBorMain;
 //		LoanEachFeeVo loanEachFeeVo = new LoanEachFeeVo();
 
+		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		this.index = titaVo.getReturnIndex();
+
+		// 設定每筆分頁的資料筆數 預設50筆 總長不可超過六萬
+		this.limit = 100; // 100* 154 = 15400
+		
+		
 		if (iFacmNo != 0) {
 			wkFacmNoStart = iFacmNo;
 			wkFacmNoEnd = iFacmNo;
@@ -300,7 +307,7 @@ public class L3005 extends TradeBuffer {
 		// 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可
 		if (slLoanBorTx != null && slLoanBorTx.hasNext()) {
 			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToAuto(); // 自動折返
+			this.totaVo.setMsgEndToEnter(); // 自動折返
 		}
 
 		this.addList(this.totaVo);

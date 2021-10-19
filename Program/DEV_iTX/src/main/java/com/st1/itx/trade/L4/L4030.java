@@ -84,7 +84,7 @@ public class L4030 extends TradeBuffer {
 
 		this.index = titaVo.getReturnIndex();
 
-		this.limit = 500;
+		this.limit = 100;
 
 		selectCode = parse.stringToInteger(titaVo.getParam("SelectCode"));
 //		FunctionCode = 
