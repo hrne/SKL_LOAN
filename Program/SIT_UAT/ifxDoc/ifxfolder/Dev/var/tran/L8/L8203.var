@@ -1,0 +1,375 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L8203)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L8203]                                 疑似洗錢交易合理性維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdAcDate+入帳日期",#AcDate],
+["#FdCustNo+戶號",#CustNo,#CustName],
+["#FdFactor+交易樣態",#Factor,#FactorX],
+["#FdTotalAmt+累積金額",#TotalAmt],
+["#FdTotalCnt+累積筆數",#TotalCnt],
+["#FdRational+合理性",#Rational,#RationalX],
+["#FdEmpNoDesc+經辦合理性說明",#EmpNoDesc],
+["#FdManagerCheck+主管覆核",#ManagerCheck,#ManagerCheckX],
+["#FdManagerDate+主管同意日期",#ManagerDate],
+["#FdManagerDesc+主管覆核說明",#ManagerDesc],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN_SELECT_ALL=X,15,I,ui:button;value:查詢;enable:0;tabbable:0;title:LXXXX
+
+#FdFuncCode=X,2,L
+#FdAcDate=X,2,L
+#FdCustNo=X,2,L
+#FdFactor=X,2,L
+#FdTotalAmt=X,2,L
+#FdTotalCnt=X,2,L
+!#FdMemoSeq=X,2,L
+#FdRational=X,2,L
+#FdEmpNoDesc=X,2,L
+#FdManagerCheck=X,2,L
+#FdManagerDesc=X,2,L
+#FdManagerDate=X,2,L
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2(1:新增;2:修改;4:刪除)
+#CODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2) 
+!INVOKEJS(SHOW,p1,10,10,1)                 
+#TranKeyHelp=x,50,S
+
+!Factor(1:樣態1;2:樣態2;3:樣態3)
+#CODEFactor=x,20,S                  
+T(3,CdCode.Factor) 
+#FactorHelp=x,100,S
+
+!主管1 經辦3
+#Level=A,1,S
+T(4,LEVEL$)
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode2,#CODEFactor)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranKeyHelp,#HelpDesc1)
+T(2,@FactorHelp,#HelpDesc2)
+
+!YesNo
+#YesNoHelp=x,50,S
+T(3,Y:是;N:否)
+
+!同意不同意
+#AgreeHelp=x,50,S
+T(3,Y:同意;N:不同意)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L8922進入),$)
+
+#NTXBUF=X,23,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_AcDate=X,7,S
+T(1,#NTXBUF,2,7)
+
+#CHAIN_Factor=X,2,S
+T(1,#NTXBUF,9,2)
+
+#CHAIN_CustNo=X,7,S
+T(1,#NTXBUF,11,7)
+
+
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+C(3,#FuncCode,1,S,$)
+E(0,@AcDate,#CHAIN_AcDate)
+E(0,@Factor,#CHAIN_Factor)
+E(0,@CustNo,#CHAIN_CustNo)
+
+
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+T(F,@CustName,0)
+C(3,#CHAIN,1,s,$)
+HELP(#TranKeyHelp)
+@V(H,#TranKeyHelp)
+E(0,@FUNCIND,#FuncCode)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#TranKeyHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,@TotalAmt,1)T(F,@TotalCnt,1)T(F,@Rational,1)T(F,@EmpNoDesc,1)T(F,@ManagerDesc,1)T(F,@ManagerCheck,1)T(F,@ManagerDate,1),
+                                  T(F,@TotalAmt,0)T(F,@TotalCnt,0)T(F,@Rational,0)T(F,@EmpNoDesc,0)T(F,@ManagerDesc,0)T(F,@ManagerCheck,0)T(F,@ManagerDate,0))
+
+IF (#FuncCode==1 ,T(F,@AcDate,1)T(F,@CustNo,1)T(F,@Factor,1),
+                  T(F,@AcDate,0)T(F,@CustNo,0)T(F,@Factor,0))
+                  
+IF (#FuncCode==1 ,T(F,@TotalAmt,1)T(F,@TotalCnt,1),T(F,@TotalAmt,0)T(F,@TotalCnt,0))      
+
+IF(#Level==3 & #FuncCode!=4,T(F,@Rational,1)T(F,@EmpNoDesc,1),T(F,@Rational,0)T(F,@EmpNoDesc,0))     
+
+IF(#Level==1 & #FuncCode!=4,T(F,@ManagerCheck,1)T(F,@ManagerCheckDesc,1)T(F,@ManagerDate,1),T(F,@ManagerCheck,0)T(F,@ManagerCheckDesc,0)T(F,@ManagerDate,0))     
+
+#WKPSC=X,2,S
+
+#WKSTAR1=X,2,S
+C(2,#FuncCode,S,T(3,*),S,S,S,S)
+
+#WKSTAR2=X,2,S
+C(2,#FuncCode,S,$,$,S,S,S)
+C(3,#Level,3,T(3,*),T(3, ))
+
+#WKSTAR5=X,2,S
+C(2,#FuncCode,S,$,$,S,S,S)
+C(3,#Level,1,T(3,*),T(3, ))
+
+
+#WKNAME=X,1,S
+T(2,@FdAcDate,#WKSTAR1)
+T(2,@FdCustNo,#WKSTAR1)
+T(2,@FdFactor,#WKSTAR1)
+T(2,@FdTotalAmt,#WKSTAR1)
+T(2,@FdTotalCnt,#WKSTAR1)
+!T(2,@FdMemoSeq,#WKSTAR2)
+T(2,@FdRational,#WKSTAR2)
+T(2,@FdEmpNoDesc,#WKPSC)
+T(2,@FdManagerCheck,#WKSTAR5)
+T(2,@FdManagerDesc,#WKSTAR5)
+T(2,@FdManagerDate,#WKPSC)
+
+
+!本營業日
+#DATE=D,8,S
+T(4,DATE$)
+
+!入帳日期
+#AcDate=D,7,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+T(1,#DATE,2,7)
+D(8)
+@V(7)A(DATE,0,#AcDate)
+V(5,0000000,#DATE)
+
+!戶號
+#CustNo=A,7,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+@V(7)
+
+!額度號碼
+!#FacmNo=A,3,I
+!C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+!@V(7)
+
+!撥款序號
+!#BormNo=A,3,I
+!C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+!@V(7)
+
+!交易樣態
+#Factor=N,2,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+HELP(#FactorHelp)
+@V(H,#FactorHelp)
+
+#FactorX=X,6,L
+T(H,#Factor,#FactorHelp)
+
+#RimAcDate=9,7,S
+E(0,#AcDate)
+#RimFactor=9,2,S
+E(0,#Factor)
+#RimCustNo=9,7,S
+E(0,#CustNo)
+!#RimFacmNo=9,3,S
+!E(0,#FacmNo)
+!#RimBormNo=9,3,S
+!E(0,#BormNo)
+
+#SendL8R50=X,1,S
+C(3,#FuncCode,1,s,$)
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimTxCode,#TXCD)
+RESET_RIM(#SendL8R50,L8R50)
+S(L8R50,1,#RimFuncCode,#RimTxCode,#RimAcDate,#RimFactor,#RimCustNo)
+R(1,L8R50)
+E(0,@TotalCnt,#L8R50TotalCnt)
+E(0,@TotalAmt,#L8R50TotalAmt)
+T(2,@Rational,#L8R50Rational)
+T(2,@EmpNoDesc,#L8R50EmpNoDesc)
+T(2,@ManagerDesc,#L8R50ManagerDesc)
+T(2,@ManagerCheck,#L8R50ManagerCheck)
+E(0,@ManagerDate,#L8R50ManagerDate)
+T(2,@CustName,#L8R50CustName)
+T(H,#RationalX,#Rational,#YesNoHelp)
+T(H,#ManagerCheckX,#ManagerCheck,#AgreeHelp)
+!戶名
+#CustName=X,50,L
+
+!累積金額
+#TotalAmt=m,14,I
+IF(#FuncCode==2 || #FuncCode==4,s,$)
+@V(2,0)
+
+!累積筆數
+#TotalCnt=N,4,I
+IF(#FuncCode==2 || #FuncCode==4,s,$)
+@V(2,0)
+
+!備忘錄序號
+!#MemoSeq=N,2,I
+!C(3,#FuncCode,4,s)
+!@V(2,0)
+
+!合理性
+#Rational=X,1,I
+C(3,#FuncCode,4,s)
+C(3,#Level,3,$,s)
+HELP(#YesNoHelp)
+@V(H,#YesNoHelp)
+
+#RationalX=X,2,L
+T(H,#Rational,#YesNoHelp)
+
+!經辦合理性說明
+#EmpNoDesc=X,2.50,I
+C(3,#FuncCode,4,s)
+C(3,#Level,3,$,s)
+
+!主管覆核
+#ManagerCheck=X,1,I
+C(3,#FuncCode,4,s)
+C(3,#Level,1,$,s)
+T(2,Y)
+HELP(#AgreeHelp)
+@V(H,#AgreeHelp)
+!C(5,#ManagerCheck,Y,INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
+
+#WKSTAR3=X,2,S
+C(5,#ManagerCheck,N,T(3,*),S)
+
+#WKSTAR4=X,2,S
+C(3,#Level,1,$,s)
+C(5,#ManagerCheck,Y,T(3,*),S)
+
+#WKNAME1=X,1,S
+T(2,@FdManagerDesc,#WKSTAR3)
+
+
+#ManagerCheckX=X,6,L
+T(H,#ManagerCheck,#AgreeHelp)
+
+!日曆日
+#CDATE=D,8,S
+T(4,CDATE$)
+
+!主管同意日期
+#ManagerDate=D,7,L
+C(5,#ManagerCheck,N,S,$)
+C(3,#Level,1,$,s)
+E(0,#CDATE)
+C(3,#CHAIN,1,IF(#FuncCode==2 ||#FuncCode==4,s,$),$)
+D(8)
+@V(7)A(DATE,0,#AcDate)
+V(5,0000000,#CDATE)
+
+!主管覆核說明
+#ManagerDesc=X,2.50,I
+C(3,#FuncCode,4,s)
+C(3,#Level,1,$,s)
+@C(5,#ManagerCheck,N,C(4,#ManagerDesc,V(7),$),$)
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L8R50.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L8203 ----------
+<sub type="FORM" name="L8203">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L8203,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8203]  疑似洗錢交易合理性維護)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode
+#AcDate
+#CustNo
+#Factor
+#TotalAmt
+#TotalCnt
+#Rational
+#EmpNoDesc
+#ManagerDesc
+#ManagerCheck
+#ManagerDate
+#Level
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8203^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L8R50.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

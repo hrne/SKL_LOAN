@@ -1,1 +1,0 @@
-drop FUNCTION "GetAdviseFireInsuCovrg"; commit;

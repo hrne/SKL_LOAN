@@ -1,0 +1,14 @@
+L8R51RecordDate=9,7
+L8R51CustNo=9,7
+L8R51FacmNo=9,3
+L8R51BormNo=9,3
+L8R51RepayDate=9,7
+L8R51RepayAmt=9,14.2
+L8R51ActualRepayDate=9,7
+L8R51ActualRepayAmt=9,14.2
+L8R51Career=X,40
+L8R51Income=X,60
+L8R51RepaySource=9,2
+L8R51RepayBank=X,20
+L8R51Description=X,120
+L8R51CustName=X,200

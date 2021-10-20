@@ -1,0 +1,352 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L6932)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,793)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L6932]                                 資料變更交易查詢"],
+["#FdSearch+查詢條件","(交易序號、交易代號、戶號，需擇一輸入"],
+["#FD_ST_DT+會計日期",#ST_DT,"~",#ED_DT],
+["#FdTxtNo+．交易序號",#TxtNo],
+["#FD_TRN_CODE+．交易代號",#TRN_CODE],
+["#FD_CUST_NO+．戶號",#CUST_NO,"-",#FACM_NO,"-",#BORM_SEQ],
+
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BUF1=X,42,S
+!ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+
+! 必輸欄位
+#FdSearch=X,2,L
+T(3,*)
+#FD_TRN_CODE=X,2,L
+#FD_CUST_NO=X,2,L
+#FdTxtNo=X,2,L
+
+! 永遠為必輸欄位
+#FD_ST_DT=X,2,L
+T(3,*)
+
+
+#WKHIDE=X,1,S
+INVOKEJS(SHOW,p1,1)
+
+#Submit=A,1,S
+K(MODIFYBUTTON,查詢)
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#CHAINFlag=A,1,S
+C(3,#CHAIN,1,E(0,1),E(0,0))
+
+#NTXBUF=X,69,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+#CHAIN_ST_DT=X,7,S
+T(1,#NTXBUF,1,7)
+
+#CHAIN_ED_DT=X,7,S
+T(1,#NTXBUF,8,7)
+
+#CHAIN_TRN_CODE=X,5,S
+T(1,#NTXBUF,15,5)
+
+#CHAIN_TXSEQ=X,18,S
+T(1,#NTXBUF,20,18)
+
+#CHAIN_CUST_NO=X,7,S
+T(1,#NTXBUF,38,7)
+
+#CHAIN_FACM_NO=X,3,S
+T(1,#NTXBUF,45,3)
+
+#CHAIN_BORM_SEQ=X,3,S
+T(1,#NTXBUF,48,3)
+
+#CHAINSET=X,1,S
+E(0,@ST_DT,#CHAIN_ST_DT)
+E(0,@ED_DT,#CHAIN_ED_DT)
+T(2,@TxtNo,#CHAIN_TXSEQ)
+T(2,@TRN_CODE,#CHAIN_TRN_CODE)
+E(0,@CUST_NO,#CHAIN_CUST_NO)
+E(0,@FACM_NO,#CHAIN_FACM_NO)
+E(0,@BORM_SEQ,#CHAIN_BORM_SEQ)
+
+#RPTFG=A,1,S
+E(0,0)
+
+! 作業日期
+#DATE=D,8,S
+T(4,DATE$)
+
+#DT=D,7,S
+T(1,#DATE,2,7)
+
+#DT_MONTH=A,5,S
+T(1,#DATE,2,5)
+
+#DT_01=A,2,S
+E(0,1)
+
+#ST_DTS=D,7,S
+T(2,#DT_MONTH+#DT_01)
+#ED_DTS=D,7,S
+E(0,#DT)
+
+#ST_DT=D,7,I
+C(3,#CHAIN,1,s,$)
+T(2,#ST_DTS)
+@V(7)A(4,0,#ST_DT)
+
+#ED_DT=D,7,I
+C(3,#CHAIN,1,s,$)
+T(2,#ED_DTS)
+D(8)
+@V(7)V(5,#ST_DT,#ED_DTS)
+
+!交易序號
+#TxtNo=X,18,I
+C(3,#CHAIN,1,s,$)
+!INVOKEJS(SHOW,p1,2,4,1)
+
+#WKBTN1=X,1,S
+!C(4,#TxtNo,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,4,0))
+
+! 交易代號
+#TRN_CODE=X,5,I
+C(3,#CHAIN,1,s,$)
+C(4,#TxtNo,$,S)
+!INVOKEJS(SHOW,p1,3,4,1)
+
+#WKBTN=X,1,S
+!C(3,#TRN_CODE,0,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,4,4,0))
+
+! 戶號
+#CUST_NO=A,7,I
+C(3,#CHAIN,1,s,$)
+C(4,#TxtNo,$,S)
+C(3,#TRN_CODE,0,$,S)
+#FACM_NO=A,3,I
+C(3,#CHAIN,1,s,$)
+C(4,#TxtNo,$,S)
+C(3,#TRN_CODE,0,$,S)
+C(3,#CUST_NO,0,S,$)
+#BORM_SEQ=A,3,I
+C(3,#CHAIN,1,s,$)
+C(4,#TxtNo,$,S)
+C(3,#TRN_CODE,0,$,S)
+C(3,#FACM_NO,0,S,$)
+
+#MRKEY=_,_,S
+C(3,#CUST_NO,0,S,$)
+C(3,#FACM_NO,0,T(2,#CUST_NO),T(2,#CUST_NO+-+#FACM_NO))
+C(3,#BORM_SEQ,0,$,T(2,#CUST_NO+-+#FACM_NO+-+#BORM_SEQ))
+
+!檢核戶號是否為0
+#VCUSTNO=X,13,S
+C(3,#CHAIN,1,s,$)
+T(2,#CUST_NO+#FACM_NO+#BORM_SEQ)
+C(4,#TxtNo,$,S)
+C(3,#TRN_CODE,0,$,S)
+@C(3,#VCUSTNO,0,V(P,交易序號、交易代號、戶號，需擇一輸入),$)
+
+
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6932 ----------
+<sub type="FORM" name="L6932">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6932,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6932] 資料變更交易)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+#O_ST_DT=D,7,L
+T(2,#ST_DT)
+#O_ED_DT=D,7,L
+T(2,#ED_DT)
+#O_TRN_CODE=X,5,L
+T(2,#TRN_CODE)
+#O_CUST_NO=A,7,L
+T(2,#CUST_NO)
+#O_FACM_NO=A,3,L
+T(2,#FACM_NO)
+#O_BORM_SEQ=A,3,L
+T(2,#BORM_SEQ)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 作業日期
+!#OO_TRN_DT=D,7,S
+! 交易時間
+!#OO_TRN_TM=X,8,S
+! 作業日期時間
+#OO_TRN_DTTM=X,18,L
+!T(2,#OO_TRN_DT+ +#OO_TRN_TM)
+! 會計日期
+#OO_TxDate=D,7,S
+! 異動人員
+#OO_TlrItem=X,20,L
+! 交易代號
+#OO_TRN_CODE=X,5,S
+#OO_TranItem=X,80,S
+#OO_TranItemX=X,86,S
+T(2,#OO_TRN_CODE+ +#OO_TranItem)
+! 戶號
+#OO_CUST_NO=A,7,S
+#OO_FACM_NO=A,3,S
+#OO_BORM_SEQ=A,3,S
+#OO_CUST_NO_LB=X,17,L
+T(2,#OO_CUST_NO+－+#OO_FACM_NO+－+#OO_BORM_SEQ)
+! 欄位名稱
+#OO_COLUMN_NAME=X,50,L
+! 變更前
+#OO_DATA_BEFORE=X,300,L
+! 變更後
+#OO_DATA_AFTER=X,300,L
+
+! 修改的按鈕
+! #OO_FUNCD=A,1,S
+! E(0,2)
+
+! #OO_BUF=X,108,S
+! T(2,#OO_FUNCD+#OO_BANK_CODE+#OO_BANK_NM+#OO_BRANCH_NM)
+
+! #OO_BTN=X,4,S
+! BIND(grid,{cmd=CHAIN;ntxcd=L6701;text=修改;ntxbuf=#OO_BUF})
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#ST_DT
+#ED_DT
+#TRN_CODE
+#CUST_NO
+#FACM_NO
+#BORM_SEQ
+#TxtNo
+#CHAINFlag
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L6932
+#OO_TRN_DTTM
+#OO_TxDate
+#OO_TlrItem
+#OO_TRN_CODE
+#OO_TranItem
+#OO_CUST_NO
+#OO_FACM_NO
+#OO_BORM_SEQ
+#OO_COLUMN_NAME
+#OO_DATA_BEFORE
+#OO_DATA_AFTER
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+!---------- 單據輸出組合 ----------
+<sub type="PART" name="L6932" layout="cols=1;screen.width=[100,1000];printer.width=[20,20];">
+[
+["[L6932]                                 資料變更交易查詢"],
+[""],
+]
+</sub>
+
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L6932
+#any={detail:true, header:'L6932.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+! #OO_BTN=
+! {width:50,search:false,formatter:'cust:bind-button:#OO_BTN',align:'center',canExport:false}
+
+#OO_TRN_DTTM=作業日期時間
+{width:130,align:'center'}
+
+#OO_TxDate=會計日期
+{width:80,align:'center'}
+
+#OO_TlrItem=異動人員
+{width:90,align:'center'}
+
+#OO_TranItemX=交易代號
+{width:150,align:'center'}
+
+#OO_CUST_NO_LB=戶號
+{width:150,align:'center'}
+
+#OO_COLUMN_NAME=欄位名稱
+{width:300,align:'left'}
+
+#OO_DATA_BEFORE=變更前
+{width:300,align:'left'}
+
+#OO_DATA_AFTER=變更後
+{width:300,align:'left'}
+^
+<include src="PRT.icf::INQ01.sel" map="i=L6932;cpi=15"/>
+
+%
+
+@^
+</sub>
