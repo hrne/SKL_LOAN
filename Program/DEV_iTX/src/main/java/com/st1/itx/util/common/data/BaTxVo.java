@@ -34,62 +34,62 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	/**
 	 * 借款人戶號
 	 */
-	private int custNo = 0;  
+	private int custNo = 0;
 
 	/**
 	 * 額度編號
 	 */
-	private int facmNo = 0; 
+	private int facmNo = 0;
 
 	/**
 	 * 撥款序號
 	 */
-	private int bormNo = 0; 
+	private int bormNo = 0;
 
 	/**
 	 * 銷帳科目記號
 	 */
-	private int receivableFlag = 0;  
+	private int receivableFlag = 0;
 
 	/**
 	 * 銷帳編號
 	 */
-	private String rvNo = " "; 
+	private String rvNo = " ";
 
 	/**
 	 * 應繳息日、應繳日
 	 */
-	private int payIntDate = 0;  
+	private int payIntDate = 0;
 
 	/**
 	 * 繳息期數
 	 */
-	private int paidTerms = 0;  
+	private int paidTerms = 0;
 
 	/**
-	 * 未收金額 
+	 * 未收金額
 	 */
-	private BigDecimal unPaidAmt = BigDecimal.ZERO;  
+	private BigDecimal unPaidAmt = BigDecimal.ZERO;
 
 	/**
-	 * 還款順序 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 >  5:已到期應繳本息 > 6.另收欠款> 7.未到期應繳本息
+	 * 還款順序 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:已到期應繳本息 > 6.另收欠款> 7.未到期應繳本息
 	 */
-	private int repayPriority;  
+	private int repayPriority;
 
 	/**
 	 * 業務科目 (利息、費用)
 	 */
-	private String acctCode = " "; 
+	private String acctCode = " ";
 
 	/**
 	 * 借貸別
 	 */
-	private String dbCr = " "; 
+	private String dbCr = " ";
 
 	/**
 	 * 出帳金額
 	 */
-	private BigDecimal acctAmt = BigDecimal.ZERO;  
+	private BigDecimal acctAmt = BigDecimal.ZERO;
 
 	/**
 	 * 放款餘額(還款前、只放第一期)
@@ -99,69 +99,69 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	/**
 	 * 提前還款金額
 	 */
-	private BigDecimal extraAmt = BigDecimal.ZERO; 
+	private BigDecimal extraAmt = BigDecimal.ZERO;
 
 	/* ------------------- 計息明細 (按繳息期數) ---------------- */
 
 	/**
 	 * 計息起日
 	 */
-	private int intStartDate = 0;  
+	private int intStartDate = 0;
 
 	/**
 	 * 計息止日
 	 */
-	private int intEndDate = 0;   
+	private int intEndDate = 0;
 
 	/**
 	 * 計息本金
 	 */
-	private BigDecimal amount = BigDecimal.ZERO;  
+	private BigDecimal amount = BigDecimal.ZERO;
 
 	/**
 	 * 計息利率
 	 */
-	private BigDecimal intRate = BigDecimal.ZERO;  
+	private BigDecimal intRate = BigDecimal.ZERO;
 
 	/**
 	 * 本金、短繳本金
 	 */
-	private BigDecimal principal = BigDecimal.ZERO;   
+	private BigDecimal principal = BigDecimal.ZERO;
 
 	/**
 	 * 利息、短繳利息
 	 */
-	private BigDecimal interest = BigDecimal.ZERO;  
+	private BigDecimal interest = BigDecimal.ZERO;
 
 	/**
 	 * 延滯息
 	 */
-	private BigDecimal delayInt = BigDecimal.ZERO;   
+	private BigDecimal delayInt = BigDecimal.ZERO;
 
 	/**
 	 * 違約金
 	 */
-	private BigDecimal breachAmt = BigDecimal.ZERO;   
-	
+	private BigDecimal breachAmt = BigDecimal.ZERO;
+
 	/**
 	 * 短繳清償違約金
 	 */
-	private BigDecimal closeBreachAmt = BigDecimal.ZERO;   
+	private BigDecimal closeBreachAmt = BigDecimal.ZERO;
 
 	/**
 	 * 加碼利率
 	 */
-	private BigDecimal rateIncr = BigDecimal.ZERO;  
+	private BigDecimal rateIncr = BigDecimal.ZERO;
 
 	/**
 	 * 個別加碼利率
 	 */
-	private BigDecimal individualIncr = BigDecimal.ZERO;  
+	private BigDecimal individualIncr = BigDecimal.ZERO;
 
 	/**
 	 * 結案記號 1.正常結案 2.提前結案
 	 */
-	private int closeFg = 0; 
+	private int closeFg = 0;
 
 	@Override
 	public String toString() {
@@ -408,25 +408,16 @@ public class BaTxVo implements Comparable<BaTxVo> {
 		if (getClass() != o.getClass())
 			return 0;
 
-		int result = 0;
-
 		BaTxVo other = (BaTxVo) o;
 
 		/**
-		 * 排序優先度(由小到大) payIntDate 應繳息日、應繳日 custNo 借款人戶號 facmNo 額度編號 bormNo 撥款序號
+		 * 排序優先度(由小到大) payIntDate 應繳日
 		 */
 		if (this.payIntDate - other.payIntDate != 0) {
-			result = this.payIntDate - other.payIntDate;
-		} else if (this.custNo - other.custNo != 0) {
-			result = this.custNo - other.custNo;
-		} else if (this.facmNo - other.facmNo != 0) {
-			result = this.facmNo - other.facmNo;
-		} else if (this.bormNo - other.bormNo != 0) {
-			result = this.bormNo - other.bormNo;
+			return this.payIntDate - other.payIntDate;
 		} else {
-			result = 0;
+			return 0;
 		}
-		return result;
 	}
 
 }

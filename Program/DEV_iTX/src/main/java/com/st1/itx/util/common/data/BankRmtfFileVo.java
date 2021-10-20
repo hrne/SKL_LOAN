@@ -1,6 +1,7 @@
 package com.st1.itx.util.common.data;
 
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,8 @@ public class BankRmtfFileVo extends FileVo {
 	private final int headerCounts = 0;
 	// 設定尾筆筆數
 	private final int footerCounts = 0;
+
+	private BigDecimal bigDe100 = new BigDecimal("100");
 
 	// 明細資料容器
 	private ArrayList<OccursList> occursList = new ArrayList<>();
@@ -91,19 +94,32 @@ public class BankRmtfFileVo extends FileVo {
 				occursList.putParam("OccBankCode", split5(thisLine, 84, 91));
 				occursList.putParam("OccNoteCode", split5(thisLine, 91, 95));
 				occursList.putParam("OccTrader", split5(thisLine, 95, 115));
-
-				occursList.putParam("CheckFlag", "1");
-
-//				occursList.putParam("OccAcctNo", thisLine.substring(0, 13));
-//              occursList.putParam("OccEntryDate", thisLine.substring(13, 21));
-//				occursList.putParam("OccRemark", thisLine.substring(21, 27));
-//				occursList.putParam("OccVisAcctNo", thisLine.substring(27, 41));
-//				occursList.putParam("OccWithDrawAmt", thisLine.substring(41, 54));
-//				occursList.putParam("OccDepositAmt", thisLine.substring(54, 67));
-//				occursList.putParam("OccBalance", thisLine.substring(67, 80));
-//				occursList.putParam("OccBankCode", thisLine.substring(80, 87));
-//				occursList.putParam("OccNoteCode", thisLine.substring(87, 91));
-//				occursList.putParam("OccTrader", thisLine.substring(91));
+				BigDecimal repayAmt = BigDecimal.ZERO;
+				// 提款負數
+				if (occursList.get("OccWithDrawAmt").indexOf("p") >= 0) {
+					repayAmt = parse.stringToBigDecimal(occursList.get("OccWithDrawAmt").substring(0, 12) + "0")
+							.divide(bigDe100);
+				}
+				// 提款正數
+				if (parse.isNumeric(occursList.get("OccWithDrawAmt"))
+						&& parse.stringToBigDecimal(occursList.get("OccWithDrawAmt")).compareTo(BigDecimal.ZERO) > 0) {
+					repayAmt = BigDecimal.ZERO
+							.subtract(parse.stringToBigDecimal(occursList.get("OccWithDrawAmt")).divide(bigDe100));
+				}
+				// 存款正數
+				if (parse.isNumeric(occursList.get("OccDepositAmt"))
+						&& parse.stringToBigDecimal(occursList.get("OccDepositAmt")).divide(bigDe100)
+								.compareTo(BigDecimal.ZERO) > 0) {
+					repayAmt = parse.stringToBigDecimal(occursList.get("OccDepositAmt")).divide(bigDe100);
+				}
+				// 存款負數
+				if (occursList.get("OccDepositAmt").indexOf("p") >= 0) {
+					repayAmt = BigDecimal.ZERO
+							.subtract(parse.stringToBigDecimal(occursList.get("OccDepositAmt").substring(0, 12) + "0")
+									.divide(bigDe100));
+				}
+				occursList.putParam("OccRepayAmt", repayAmt);
+				occursList.putParam("OccEraseFlag", "0");
 
 				this.occursList.add(occursList);
 			}
@@ -116,6 +132,21 @@ public class BankRmtfFileVo extends FileVo {
 			}
 
 			i++;
+		}
+		// 處理正負對沖
+		for (OccursList oc1 : occursList) {
+			BigDecimal repayAmt = parse.stringToBigDecimal(oc1.get("OccRepayAmt"));
+			if (repayAmt.compareTo(BigDecimal.ZERO) < 0) {
+				for (OccursList oc2 : occursList) {
+					if (oc1.get("OccVirAcctNo").equals(oc2.get("OccVirAcctNo")) && "0".equals(oc2.get("OccEraseFlag"))
+							&& repayAmt.equals(
+									BigDecimal.ZERO.subtract(parse.stringToBigDecimal(oc2.get("OccRepayAmt"))))) {
+						oc1.putParam("OccEraseFlag", "1");
+						oc2.putParam("OccEraseFlag", "1");
+						continue;
+					}
+				}
+			}
 		}
 
 	}
@@ -148,6 +179,7 @@ public class BankRmtfFileVo extends FileVo {
 	}
 
 	public ArrayList<OccursList> getOccursList() {
+
 		return occursList;
 	}
 
@@ -171,7 +203,8 @@ public class BankRmtfFileVo extends FileVo {
 			result = new String(resultBytes);
 		} else {
 			if (endIndex > inputLength) {
-				throw new LogicException("XXXXX", "來源檔字元長度不足 inputLength : " + inputLength + ", endIndex : " + endIndex);
+				throw new LogicException("XXXXX",
+						"來源檔字元長度不足 inputLength : " + inputLength + ", endIndex : " + endIndex);
 			} else if (startIndex < 0 || resultLength == 0) {
 				throw new LogicException("XXXXX", "BankRmtfFileVo程式有誤");
 			}
@@ -210,7 +243,8 @@ public class BankRmtfFileVo extends FileVo {
 			}
 		} else {
 			if (endIndex > inputLength) {
-				throw new LogicException("E0014", "[BankRmtfFileVo]來源檔字元長度不足 inputLength : " + inputLength + ", endIndex : " + endIndex);
+				throw new LogicException("E0014",
+						"[BankRmtfFileVo]來源檔字元長度不足 inputLength : " + inputLength + ", endIndex : " + endIndex);
 			} else if (startIndex < 0 || resultLength == 0) {
 				throw new LogicException("E0014", "[BankRmtfFileVo]程式有誤");
 			}

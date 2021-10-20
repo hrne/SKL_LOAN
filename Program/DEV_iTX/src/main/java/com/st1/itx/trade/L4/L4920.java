@@ -135,7 +135,6 @@ public class L4920 extends TradeBuffer {
 				if (enterList.contains(result.get("F10"))) {
 					occursList.putParam("OODisacctAmt", parse.stringToBigDecimal(result.get("F8"))
 							.subtract(parse.stringToBigDecimal(result.get("F9"))));
-					occursList.putParam("OODisacctAmt", BigDecimal.ZERO);
 				} else {
 					occursList.putParam("OODisacctAmt", BigDecimal.ZERO);
 				}
@@ -147,17 +146,25 @@ public class L4920 extends TradeBuffer {
 
 					TempVo tempVo = new TempVo();
 					tempVo = tempVo.getVo(result.get("F12"));
+					
+					if (tempVo.get("ReturnMsg") != null && tempVo.get("ReturnMsg").length() > 0) {
+						procNote += "回應訊息:" + tempVo.get("ReturnMsg") + " ";
+					}
 
 					if (tempVo.get("CheckMsg") != null && tempVo.get("CheckMsg").length() > 0) {
-						procNote = "檢核訊息:" + tempVo.get("CheckMsg") + " ";
+						procNote += "檢核訊息:" + tempVo.get("CheckMsg") + " ";
 					}
 
 					if (tempVo.get("ErrorMsg") != null && tempVo.get("ErrorMsg").length() > 0) {
-						procNote = procNote + "錯誤訊息:" + tempVo.get("ErrorMsg") + " ";
+						procNote += "錯誤訊息:" + tempVo.get("ErrorMsg") + " ";
 					}
 
 					if (tempVo.get("Note") != null && tempVo.get("Note").length() > 0) {
-						procNote = procNote + "摘要:" + tempVo.get("Note");
+						procNote += "摘要:" + tempVo.get("Note");
+					}
+					
+					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
+						procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
 					}
 
 //					當吃檔進去時不會寫入還款類別，檢核後才會寫入。

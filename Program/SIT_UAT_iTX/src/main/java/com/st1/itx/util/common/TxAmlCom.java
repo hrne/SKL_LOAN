@@ -178,6 +178,11 @@ public class TxAmlCom extends TradeBuffer {
 	 * @param titaVo TitaVo
 	 * @throws LogicException
 	 */
+	/**
+	 * 
+	 * @param titaVo
+	 * @throws LogicException
+	 */
 	public void remitL3220(TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom.remit .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();

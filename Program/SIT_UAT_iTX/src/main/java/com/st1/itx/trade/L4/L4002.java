@@ -119,6 +119,8 @@ public class L4002 extends TradeBuffer {
 	}
 
 	private void setL4002Tota(int acDate, String batchNo, TitaVo titaVo) throws LogicException {
+
+		int labelRankFlag = 1;
 		Slice<BatxDetail> sBatxDetail = batxDetailService.findL4002AEq(acDate, batchNo, this.index, this.limit, titaVo);
 
 		List<BatxDetail> lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
@@ -133,6 +135,8 @@ public class L4002 extends TradeBuffer {
 			// (Group3 : 檔案合計 )
 			// 放入list
 
+			// 總筆數合計
+			HashMap<tmpBatx, Integer> totalCnt = new HashMap<>();
 			// 總金額合計
 			HashMap<tmpBatx, BigDecimal> totalAmtSum = new HashMap<>();
 			// 需處理金額合計
@@ -147,15 +151,16 @@ public class L4002 extends TradeBuffer {
 			HashMap<tmpBatx, Integer> alrCnt = new HashMap<>();
 			// 待處理筆數
 			HashMap<tmpBatx, Integer> watCnt = new HashMap<>();
-			// 虛擬轉暫收筆數
+			// 轉暫收筆數
 			HashMap<tmpBatx, Integer> virCnt = new HashMap<>();
-
-			// 狀態碼記號a
-//			HashMap<String, Integer> mapFlagA = new HashMap<>();
-			// 狀態碼記號b
-//			HashMap<String, Integer> mapFlagB = new HashMap<>();
-			// 狀態碼記號b
-			HashMap<String, Integer> checkFlagA = new HashMap<>();
+			// 需檢核筆數
+			HashMap<tmpBatx, Integer> chkCnt = new HashMap<>();
+			// 需入帳筆數
+			HashMap<tmpBatx, Integer> entCnt = new HashMap<>();
+			// 需轉暫收筆數
+			HashMap<tmpBatx, Integer> tmpCnt = new HashMap<>();
+			// 需訂正筆數
+			HashMap<tmpBatx, Integer> eraCnt = new HashMap<>();
 
 			for (BatxDetail tBatxDetail : lBatxDetail) {
 
@@ -165,8 +170,8 @@ public class L4002 extends TradeBuffer {
 
 				tmpBatx grp3 = new tmpBatx();
 
-//				其他類別僅需兩層
-				if (tBatxDetail.getRepayCode() >= 5) {
+				switch (tBatxDetail.getRepayCode()) {
+				case 1:
 					grp1.setAcDate(tBatxDetail.getAcDate());
 					grp1.setBatchNo(tBatxDetail.getBatchNo());
 					grp1.setRepayCode(0);
@@ -177,11 +182,21 @@ public class L4002 extends TradeBuffer {
 					grp2.setAcDate(tBatxDetail.getAcDate());
 					grp2.setBatchNo(tBatxDetail.getBatchNo());
 					grp2.setRepayCode(tBatxDetail.getRepayCode());
-					grp2.setReconCode(tBatxDetail.getReconCode());
-					grp2.setFileName(" ");
+					grp2.setReconCode(" ");
+					grp2.setFileName(tBatxDetail.getFileName());
 					grp2.setRankFlag(2);
 
-				} else {
+					grp3.setAcDate(tBatxDetail.getAcDate());
+					grp3.setBatchNo(tBatxDetail.getBatchNo());
+					grp3.setRepayCode(tBatxDetail.getRepayCode());
+					grp3.setReconCode(tBatxDetail.getReconCode());
+					grp3.setFileName(" ");
+					grp3.setRankFlag(3);
+					labelRankFlag = 3;
+					break;
+
+				case 2:
+				case 3:
 					grp1.setAcDate(tBatxDetail.getAcDate());
 					grp1.setBatchNo(tBatxDetail.getBatchNo());
 					grp1.setRepayCode(0);
@@ -202,8 +217,44 @@ public class L4002 extends TradeBuffer {
 					grp3.setReconCode(tBatxDetail.getReconCode());
 					grp3.setFileName(tBatxDetail.getFileName());
 					grp3.setRankFlag(3);
-				}
+					break;
 
+				case 4:
+					grp1.setAcDate(tBatxDetail.getAcDate());
+					grp1.setBatchNo(tBatxDetail.getBatchNo());
+					grp1.setRepayCode(0);
+					grp1.setReconCode(" ");
+					grp1.setFileName(" ");
+					grp1.setRankFlag(1);
+
+					grp2.setAcDate(tBatxDetail.getAcDate());
+					grp2.setBatchNo(tBatxDetail.getBatchNo());
+					grp2.setRepayCode(tBatxDetail.getRepayCode());
+					grp2.setReconCode(tBatxDetail.getReconCode());
+					grp2.setFileName(tBatxDetail.getFileName());
+					grp2.setRankFlag(2);
+					break;
+				default:
+					grp1.setAcDate(tBatxDetail.getAcDate());
+					grp1.setBatchNo(tBatxDetail.getBatchNo());
+					grp1.setRepayCode(0);
+					grp1.setReconCode(" ");
+					grp1.setFileName(" ");
+					grp1.setRankFlag(1);
+					grp1.setAcDate(tBatxDetail.getAcDate());
+					grp1.setBatchNo(tBatxDetail.getBatchNo());
+					grp1.setRepayCode(0);
+					grp1.setReconCode(" ");
+					grp1.setFileName(" ");
+					grp1.setRankFlag(1);
+					grp2.setAcDate(tBatxDetail.getAcDate());
+					grp2.setBatchNo(tBatxDetail.getBatchNo());
+					grp2.setRepayCode(tBatxDetail.getRepayCode());
+					grp2.setReconCode(tBatxDetail.getReconCode());
+					grp2.setFileName(" ");
+					grp2.setRankFlag(2);
+					break;
+				}
 				ooRpAmt = tBatxDetail.getRepayAmt();
 				this.info("L4002  - ooRpAmt : " + ooRpAmt);
 
@@ -212,65 +263,26 @@ public class L4002 extends TradeBuffer {
 				this.info("L4002  - grp3 : " + grp3.toString());
 
 // ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.虛擬轉暫收
-				// grp1 總筆數計算
-				if (fileCnt.containsKey(grp1)) {
-					fileCnt.put(grp1, fileCnt.get(grp1) + 1);
+				// grp1 總筆數合計
+				if (totalCnt.containsKey(grp1)) {
+					totalCnt.put(grp1, totalCnt.get(grp1) + 1);
 				} else {
-					fileCnt.put(grp1, 1);
+					totalCnt.put(grp1, 1);
 				}
-				// grp1不處理
-				if (tBatxDetail.getProcStsCode().equals("1")) {
-					if (dntCnt.containsKey(grp1)) {
-						dntCnt.put(grp1, dntCnt.get(grp1) + 1);
+				// grp2 總筆數合計
+				if (totalCnt.containsKey(grp2)) {
+					totalCnt.put(grp2, totalCnt.get(grp2) + 1);
+				} else {
+					totalCnt.put(grp2, 1);
+				}
+				// grp3總筆數合計
+				if (grp3.getBatchNo() != null && !grp3.getBatchNo().isEmpty()) {
+					if (totalCnt.containsKey(grp3)) {
+						totalCnt.put(grp3, totalCnt.get(grp3) + 1);
 					} else {
-						dntCnt.put(grp1, 1);
+						totalCnt.put(grp3, 1);
 					}
 				}
-				// grp1已處理
-				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-						|| tBatxDetail.getProcStsCode().equals("7")) {
-					if (alrCnt.containsKey(grp1)) {
-						alrCnt.put(grp1, alrCnt.get(grp1) + 1);
-					} else {
-						alrCnt.put(grp1, 1);
-					}
-				}
-				// grp1待處理
-				if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("2")
-						|| tBatxDetail.getProcStsCode().equals("3") || tBatxDetail.getProcStsCode().equals("4")) {
-					if (watCnt.containsKey(grp1)) {
-						watCnt.put(grp1, watCnt.get(grp1) + 1);
-					} else {
-						watCnt.put(grp1, 1);
-					}
-				}
-				// grp1虛擬轉暫收
-				if ("7".equals(tBatxDetail.getProcStsCode())) {
-					if (virCnt.containsKey(grp1)) {
-						virCnt.put(grp1, virCnt.get(grp1) + 1);
-					} else {
-						virCnt.put(grp1, 1);
-					}
-				}
-
-				// grp2虛擬轉暫收
-				if ("7".equals(tBatxDetail.getProcStsCode())) {
-					if (virCnt.containsKey(grp2)) {
-						virCnt.put(grp2, virCnt.get(grp2) + 1);
-					} else {
-						virCnt.put(grp2, 1);
-					}
-				}
-
-				// grp3虛擬轉暫收
-				if ("7".equals(tBatxDetail.getProcStsCode())) {
-					if (virCnt.containsKey(grp3)) {
-						virCnt.put(grp3, virCnt.get(grp3) + 1);
-					} else {
-						virCnt.put(grp3, 1);
-					}
-				}
-
 				// grp2 總筆數計算
 				if (fileCnt.containsKey(grp2)) {
 					fileCnt.put(grp2, fileCnt.get(grp2) + 1);
@@ -303,9 +315,17 @@ public class L4002 extends TradeBuffer {
 						watCnt.put(grp2, 1);
 					}
 				}
+				// grp2轉暫收
+				if (tBatxDetail.getProcStsCode().equals("7")) {
+					if (virCnt.containsKey(grp2)) {
+						virCnt.put(grp2, virCnt.get(grp2) + 1);
+					} else {
+						virCnt.put(grp2, 1);
+					}
+				}
 
+				// grp3 總筆數計算
 				if (grp3.getBatchNo() != null && !grp3.getBatchNo().isEmpty()) {
-					// grp3 總筆數計算
 					if (fileCnt.containsKey(grp3)) {
 						fileCnt.put(grp3, fileCnt.get(grp3) + 1);
 					} else {
@@ -337,15 +357,15 @@ public class L4002 extends TradeBuffer {
 							watCnt.put(grp3, 1);
 						}
 					}
+					// grp3轉暫收
+					if (tBatxDetail.getProcStsCode().equals("7")) {
+						if (virCnt.containsKey(grp3)) {
+							virCnt.put(grp3, virCnt.get(grp3) + 1);
+						} else {
+							virCnt.put(grp3, 1);
+						}
+					}
 				}
-
-				// grp1 總金額計算
-				if (totalAmtSum.containsKey(grp1)) {
-					totalAmtSum.put(grp1, ooRpAmt.add(totalAmtSum.get(grp1)));
-				} else {
-					totalAmtSum.put(grp1, ooRpAmt);
-				}
-
 				// grp2 總金額計算
 				if (totalAmtSum.containsKey(grp2)) {
 					totalAmtSum.put(grp2, ooRpAmt.add(totalAmtSum.get(grp2)));
@@ -353,23 +373,16 @@ public class L4002 extends TradeBuffer {
 					totalAmtSum.put(grp2, ooRpAmt);
 				}
 
+				// grp3 總金額計算
 				if (grp3.getBatchNo() != null && !grp3.getBatchNo().isEmpty()) {
-					// grp3 總金額計算
 					if (totalAmtSum.containsKey(grp3)) {
 						totalAmtSum.put(grp3, ooRpAmt.add(totalAmtSum.get(grp3)));
 					} else {
 						totalAmtSum.put(grp3, ooRpAmt);
 					}
 				}
-
-				// grp1 需處理金額計算
+				//  需處理金額計算
 				if (!"1".equals(tBatxDetail.getProcStsCode())) {
-					if (toDoAmtSum.containsKey(grp1)) {
-						toDoAmtSum.put(grp1, ooRpAmt.add(toDoAmtSum.get(grp1)));
-					} else {
-						toDoAmtSum.put(grp1, ooRpAmt);
-					}
-
 					// grp2 需處理金額計算
 					if (toDoAmtSum.containsKey(grp2)) {
 						toDoAmtSum.put(grp2, ooRpAmt.add(toDoAmtSum.get(grp2)));
@@ -377,8 +390,8 @@ public class L4002 extends TradeBuffer {
 						toDoAmtSum.put(grp2, ooRpAmt);
 					}
 
+					// grp3 需處理金額計算
 					if (grp3.getBatchNo() != null && !grp3.getBatchNo().isEmpty()) {
-						// grp3 需處理金額計算
 						if (toDoAmtSum.containsKey(grp3)) {
 							toDoAmtSum.put(grp3, ooRpAmt.add(toDoAmtSum.get(grp3)));
 						} else {
@@ -387,14 +400,8 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 
-				// grp1 不處理金額計算
+				//  不處理金額計算
 				if ("1".equals(tBatxDetail.getProcStsCode())) {
-					if (unDoAmtSum.containsKey(grp1)) {
-						unDoAmtSum.put(grp1, ooRpAmt.add(unDoAmtSum.get(grp1)));
-					} else {
-						unDoAmtSum.put(grp1, ooRpAmt);
-					}
-
 					// grp2 不處理金額計算
 					if (unDoAmtSum.containsKey(grp2)) {
 						unDoAmtSum.put(grp2, ooRpAmt.add(unDoAmtSum.get(grp2)));
@@ -402,8 +409,8 @@ public class L4002 extends TradeBuffer {
 						unDoAmtSum.put(grp2, ooRpAmt);
 					}
 
-					if (grp3.getBatchNo() != null && !grp3.getBatchNo().isEmpty()) {
 						// grp3 不處理金額計算
+					if (grp3.getBatchNo() != null && !grp3.getBatchNo().isEmpty()) {
 						if (unDoAmtSum.containsKey(grp3)) {
 							unDoAmtSum.put(grp3, ooRpAmt.add(unDoAmtSum.get(grp3)));
 						} else {
@@ -411,9 +418,83 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 				}
+
+				if (labelRankFlag == 1) {
+					// 需檢核筆數
+					if (tBatxDetail.getProcStsCode().equals("0")) {
+						if (chkCnt.containsKey(grp1)) {
+							chkCnt.put(grp1, chkCnt.get(grp1) + 1);
+						} else {
+							chkCnt.put(grp1, 1);
+						}
+					}
+					// 需入帳筆數
+					if ("4".equals(tBatxDetail.getProcStsCode())) {
+						if (entCnt.containsKey(grp1)) {
+							entCnt.put(grp1, entCnt.get(grp1) + 1);
+						} else {
+							entCnt.put(grp1, 1);
+						}
+					}
+					// 需轉暫收筆數
+					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
+							|| tBatxDetail.getProcStsCode().equals("4")) {
+						if (tmpCnt.containsKey(grp1)) {
+							tmpCnt.put(grp1, tmpCnt.get(grp1) + 1);
+						} else {
+							tmpCnt.put(grp1, 1);
+						}
+					}
+					// 需訂正筆數
+					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
+							|| tBatxDetail.getProcStsCode().equals("7")) {
+						if (eraCnt.containsKey(grp1)) {
+							eraCnt.put(grp1, eraCnt.get(grp1) + 1);
+						} else {
+							eraCnt.put(grp1, 1);
+						}
+					}
+				} else {
+					// 需檢核筆數
+					if (tBatxDetail.getProcStsCode().equals("0")) {
+						if (chkCnt.containsKey(grp3)) {
+							chkCnt.put(grp3, chkCnt.get(grp3) + 1);
+						} else {
+							chkCnt.put(grp3, 1);
+						}
+					}
+					// 需入帳筆數
+					if ("4".equals(tBatxDetail.getProcStsCode())) {
+						if (entCnt.containsKey(grp3)) {
+							entCnt.put(grp3, entCnt.get(grp3) + 1);
+						} else {
+							entCnt.put(grp3, 1);
+						}
+					}
+					// 需轉暫收筆數
+					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
+							|| tBatxDetail.getProcStsCode().equals("4")) {
+						if (tmpCnt.containsKey(grp3)) {
+							tmpCnt.put(grp3, tmpCnt.get(grp3) + 1);
+						} else {
+							tmpCnt.put(grp3, 1);
+						}
+					}
+					// 需訂正筆數
+					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
+							|| tBatxDetail.getProcStsCode().equals("7")) {
+						if (eraCnt.containsKey(grp3)) {
+							eraCnt.put(grp3, eraCnt.get(grp3) + 1);
+						} else {
+							eraCnt.put(grp3, 1);
+						}
+					}
+
+				}
+
 			}
 
-			Set<tmpBatx> tempSet = fileCnt.keySet();
+			Set<tmpBatx> tempSet = totalCnt.keySet();
 
 			List<tmpBatx> tempList = new ArrayList<>();
 
@@ -426,8 +507,6 @@ public class L4002 extends TradeBuffer {
 				return c1.compareTo(c2);
 			});
 			this.info("L4002 tempList size = " + tempList.size());
-
-			this.info("!!!! L4002 checkFlagA :" + checkFlagA);
 
 			for (tmpBatx tempL4002Vo : tempList) {
 
@@ -450,6 +529,42 @@ public class L4002 extends TradeBuffer {
 				occursList.putParam("OOTotalRepayAmt", totalAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOToDoRepayAmt", toDoAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOUnDoRepayAmt", unDoAmtSum.get(tempL4002Vo));
+// LabelFgA 整批刪除(D)、刪除回復(R)、整批入帳(E)、整批訂正(H)
+// LabelFgB             整批檢核(C)、整批入帳(E)、整批訂正(H)
+// LabelFgC 轉暫收(T) 待處理筆數 - 需檢核筆數 > 0
+
+				String labelFgA = "";
+				String labelFgB = "";
+				String labelFgC = "";
+				if (tempL4002Vo.getRankFlag() == 1) {
+					if ("8".equals(batxStatus)) {
+						labelFgA = "R";
+					} else {
+						if (eraCnt.get(tempL4002Vo) == null || eraCnt.get(tempL4002Vo) == 0) {
+							labelFgA = "D";
+						}
+					}
+				}
+				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+					if (eraCnt.get(tempL4002Vo) != null && eraCnt.get(tempL4002Vo) > 0) {
+						labelFgA = "H";
+					}
+					if (chkCnt.get(tempL4002Vo) != null && chkCnt.get(tempL4002Vo) > 0) {
+						labelFgB = "C";
+					} else {
+						if (entCnt.get(tempL4002Vo) != null && entCnt.get(tempL4002Vo) > 0) {
+							labelFgB = "E";
+						}
+					}
+				}
+				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+					if (tmpCnt.get(tempL4002Vo) != null && tmpCnt.get(tempL4002Vo) > 0) {
+						labelFgC = "T";
+					}
+				}
+				occursList.putParam("OOLabelFgA", labelFgA);
+				occursList.putParam("OOLabelFgB", labelFgB);
+				occursList.putParam("OOLabelFgC", labelFgC);
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

@@ -3,6 +3,7 @@ package com.st1.itx.trade.L9;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.text.NumberFormat;
@@ -61,6 +62,34 @@ public class L9717Report extends MakeReport {
 			+ " ";
 
 	private OutputSortBy currentSort;
+	
+	private class outputColumn {
+		private int pos = 0;
+		private String sort = "L";
+		private Boolean isAmount = false;
+		
+		public outputColumn(int _pos, String _sort, Boolean _isAmount)
+		{
+			this.pos = _pos;
+			this.sort = _sort;
+			this.isAmount = _isAmount;
+		}
+		
+		public int getPos()
+		{
+			return this.pos;
+		}
+		
+		public String getSort()
+		{
+			return this.sort;
+		}
+		
+		public Boolean getIsAmount()
+		{
+			return this.isAmount;
+		}
+	}
 
 	// 自訂表頭
 	@Override
@@ -203,21 +232,20 @@ public class L9717Report extends MakeReport {
 		}
 
 		if (lL9717 != null && lL9717.size() != 0) {
-
-			int[] outputPosArray = null;
-			String[] outputSortArray = null;
-			Boolean[] isAmountArray = null;
 			
 			BigDecimal totalCount = BigDecimal.ZERO;
 			BigDecimal totalAmt = BigDecimal.ZERO;
 
 			for (Map<String, String> tLDVo : lL9717) {
 				
+				ArrayList<outputColumn> columnList = new ArrayList<outputColumn>(18);
+				
 				this.print(1, 0, "");
 
 				switch (currentSort) {
 				
-				// this part can be written MUCH more efficient...
+				// tidy'd up this part from 3 arrays to 1 arraylist
+				// still feels like there's some better way to do this...
 				
 				case Year:
 					// F0 年度 14 R
@@ -239,13 +267,25 @@ public class L9717Report extends MakeReport {
 					// F16 合計金額 165 R
 					// 總計筆數 152 R
 					// 總計金額 165 R
-
-					outputPosArray = new int[] { 14, 26, 39, 44, 57, 62, 75, 80, 93, 98, 111, 116, 129, 134, 147, 152,
-							165 };
-					outputSortArray = new String[] { "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R",
-							"C", "R", "C", "R" };
-					isAmountArray = new Boolean[] { false, false, true, false, true, false, true, false, true, false,
-							true, false, true, false, true, false, true };
+					
+					columnList.add(new outputColumn(14, "R", false));
+					columnList.add(new outputColumn(26, "C", false));
+					columnList.add(new outputColumn(39, "R", true));
+					columnList.add(new outputColumn(44, "C", false));
+					columnList.add(new outputColumn(57, "R", true));
+					columnList.add(new outputColumn(62, "C", false));
+					columnList.add(new outputColumn(75, "R", true));
+					columnList.add(new outputColumn(80, "C", false));
+					columnList.add(new outputColumn(93, "R", true));
+					columnList.add(new outputColumn(98, "C", false));
+					columnList.add(new outputColumn(111, "R", true));
+					columnList.add(new outputColumn(116, "C", false));
+					columnList.add(new outputColumn(129, "R", true));
+					columnList.add(new outputColumn(134, "C", false));
+					columnList.add(new outputColumn(147, "R", true));
+					columnList.add(new outputColumn(152, "C", false));
+					columnList.add(new outputColumn(165, "R", true));
+					
 					
 					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F15")));
 					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F16")));
@@ -273,13 +313,25 @@ public class L9717Report extends MakeReport {
 					// F17 合計金額 165 R
 					// 總計筆數 152 R
 					// 總計金額 165 R
-
-					outputPosArray = new int[] { 2, 15, 26, 39, 44, 57, 62, 75, 80, 93, 98, 111, 116, 129, 134, 147,
-							152, 165 };
-					outputSortArray = new String[] { "L", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C",
-							"R", "C", "R", "C", "R" };
-					isAmountArray = new Boolean[] { false, false, false, true, false, true, false, true, false, true,
-							false, true, false, true, false, true, false, true };
+					
+					columnList.add(new outputColumn(2, "L", false));
+					columnList.add(new outputColumn(14, "R", false));
+					columnList.add(new outputColumn(26, "C", false));
+					columnList.add(new outputColumn(39, "R", true));
+					columnList.add(new outputColumn(44, "C", false));
+					columnList.add(new outputColumn(57, "R", true));
+					columnList.add(new outputColumn(62, "C", false));
+					columnList.add(new outputColumn(75, "R", true));
+					columnList.add(new outputColumn(80, "C", false));
+					columnList.add(new outputColumn(93, "R", true));
+					columnList.add(new outputColumn(98, "C", false));
+					columnList.add(new outputColumn(111, "R", true));
+					columnList.add(new outputColumn(116, "C", false));
+					columnList.add(new outputColumn(129, "R", true));
+					columnList.add(new outputColumn(134, "C", false));
+					columnList.add(new outputColumn(147, "R", true));
+					columnList.add(new outputColumn(152, "C", false));
+					columnList.add(new outputColumn(165, "R", true));
 					
 					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F16")));
 					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F17")));
@@ -292,11 +344,14 @@ public class L9717Report extends MakeReport {
 					// F2 戶號 27 C
 					// F3 戶名 42 R
 					// F4 期別 47 R
-					// F5 餘額 68 R
-
-					outputPosArray = new int[] { 2, 15, 27, 42, 47, 68 };
-					outputSortArray = new String[] { "L", "R", "C", "R", "R", "R" };
-					isAmountArray = new Boolean[] { false, false, false, false, false, true };
+					// F5 餘額 68 R;
+					
+					columnList.add(new outputColumn(2, "L", false));
+					columnList.add(new outputColumn(15, "R", false));
+					columnList.add(new outputColumn(27, "C", false));
+					columnList.add(new outputColumn(42, "R", false));
+					columnList.add(new outputColumn(47, "R", false));
+					columnList.add(new outputColumn(68, "R", true));
 					
 					totalCount = totalCount.add(new BigDecimal(1));
 					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F5")));
@@ -323,13 +378,25 @@ public class L9717Report extends MakeReport {
 					// F17 合計金額 165 R
 					// 總計筆數 152 R
 					// 總計金額 165 R
-
-					outputPosArray = new int[] { 2, 15, 26, 39, 44, 57, 62, 75, 80, 93, 98, 111, 116, 129, 134, 147,
-						152, 165 };
-					outputSortArray = new String[] { "L", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C", "R", "C",
-							"R", "C", "R", "C", "R" };
-					isAmountArray = new Boolean[] { false, false, false, true, false, true, false, true, false, true,
-							false, true, false, true, false, true, false, true };
+					
+					columnList.add(new outputColumn(2, "L", false));
+					columnList.add(new outputColumn(14, "R", false));
+					columnList.add(new outputColumn(26, "C", false));
+					columnList.add(new outputColumn(39, "R", true));
+					columnList.add(new outputColumn(44, "C", false));
+					columnList.add(new outputColumn(57, "R", true));
+					columnList.add(new outputColumn(62, "C", false));
+					columnList.add(new outputColumn(75, "R", true));
+					columnList.add(new outputColumn(80, "C", false));
+					columnList.add(new outputColumn(93, "R", true));
+					columnList.add(new outputColumn(98, "C", false));
+					columnList.add(new outputColumn(111, "R", true));
+					columnList.add(new outputColumn(116, "C", false));
+					columnList.add(new outputColumn(129, "R", true));
+					columnList.add(new outputColumn(134, "C", false));
+					columnList.add(new outputColumn(147, "R", true));
+					columnList.add(new outputColumn(152, "C", false));
+					columnList.add(new outputColumn(165, "R", true));
 					
 					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F16")));
 					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F17")));
@@ -341,11 +408,11 @@ public class L9717Report extends MakeReport {
 				
 				this.info("L9717Report: " + currentSort);
 
-				for (int i = 0; i < outputPosArray.length; i++) {
+				for (int i = 0; i < columnList.size(); i++) {
 					this.info(currentSort + " [" + i + "]: " + tLDVo.get("F" + i));
-					this.print(0, outputPosArray[i],
-							isAmountArray[i] == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i),
-							outputSortArray[i]);
+					this.print(0, columnList.get(i).getPos(),
+						 	columnList.get(i).getIsAmount() == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i),
+							columnList.get(i).getSort());
 				}
 				
 				// 根據樣張，大額客戶別不做每筆資料換行畫線

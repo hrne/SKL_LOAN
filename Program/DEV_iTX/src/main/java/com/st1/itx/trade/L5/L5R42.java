@@ -103,6 +103,7 @@ public class L5R42 extends TradeBuffer {
 			totaVo.putParam("L5R42ApprAmt"+i,0);
 			totaVo.putParam("L5R42AccuApprAmt"+i,0);
 		}
+			totaVo.putParam("L5R42TxAmt", "");
 		
 		 Slice<NegAppr01> slNegAppr01 = sNegAppr01Service.findByCustNoCaseSeq(iCustNo, iCaseSeq, 0, this.index, this.limit, titaVo);
 		List<NegAppr01> lNegAppr01 = slNegAppr01 == null ? null : slNegAppr01.getContent();

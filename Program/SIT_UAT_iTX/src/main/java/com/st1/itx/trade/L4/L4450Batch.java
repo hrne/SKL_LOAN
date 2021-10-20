@@ -581,9 +581,11 @@ public class L4450Batch extends TradeBuffer {
 
 		List<tmpBorm> tempList = new ArrayList<>();
 
+		
 		for (Iterator<tmpBorm> it = tempSet.iterator(); it.hasNext();) {
 			tmpBorm tmpFacmVo = it.next();
 			tempList.add(tmpFacmVo);
+			this.info("tmpFacmVo = " + tmpFacmVo);
 		}
 
 		this.info("tempList.size() = " + tempList.size());

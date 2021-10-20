@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4920ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -59,13 +56,14 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int flag, TitaVo titaVo) throws Exception {
 
-		logger.info("L4920.findAll");
+		this.info("L4920.findAll");
 
 //		會計日期    #AcDate
 //		整批批號    #BatchNo
 //		作業狀態    #StatusCode
 //		還款來源    #RepayCode
-//		檔名            #FileName
+//		檔名           #FileName
+//		對帳類別    # ReconCode			
 //		處理狀態    #ProcStsCode
 //		戶號           #CustNo
 
@@ -76,16 +74,16 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String iFileName = titaVo.get("FileName");
 		String iProcStsCode = titaVo.get("ProcStsCode");
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
-		String iReconCode = titaVo.get("ReconCode");
+		String iReconCode = titaVo.get("ReconCode").trim();
 
-		logger.info("acDate = " + iAcDate);
-		logger.info("iBatchNo = " + iBatchNo);
-		logger.info("iStatusCode = " + iStatusCode);
-		logger.info("iRepayCode = " + iRepayCode);
-		logger.info("iFileName = " + iFileName);
-		logger.info("iProcStsCode = " + iProcStsCode);
-		logger.info("iCustNo = " + iCustNo);
-		logger.info("iReconCode = " + iReconCode);
+		this.info("acDate = " + iAcDate);
+		this.info("iBatchNo = " + iBatchNo);
+		this.info("iStatusCode = " + iStatusCode);
+		this.info("iRepayCode = " + iRepayCode);
+		this.info("iFileName = " + iFileName);
+		this.info("iProcStsCode = " + iProcStsCode);
+		this.info("iCustNo = " + iCustNo);
+		this.info("iReconCode = " + iReconCode);
 
 		String sql = "";
 		if (flag == 0) {
@@ -97,7 +95,7 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,bd.\"RepayType\"    AS F4                  ";
 			sql += "  ,bd.\"RepayCode\"    AS F5                  ";
 			sql += "  ,bd.\"ReconCode\"    AS F6                  ";
-			sql += "  ,ca.\"AcctItem\"     AS F7                  ";
+			sql += "  ,nvl(ca.\"AcctItem\", bd.\"ReconCode\") AS F7 ";
 			sql += "  ,bd.\"RepayAmt\"     AS F8                  ";
 			sql += "  ,bd.\"AcctAmt\"      AS F9                  ";
 			sql += "  ,bd.\"ProcStsCode\"  AS F10                 ";
@@ -167,14 +165,14 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   GROUP BY bd.\"AcDate\" ";
 		}
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		if (flag == 0) {
 			// *** 折返控制相關 ***
@@ -189,7 +187,7 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

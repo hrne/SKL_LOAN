@@ -455,6 +455,8 @@ TXFORM=L4920
 
 #OOEntryDate=入帳日期
 {width:95,align:'center'}
+#OODetailSeq=檔名/序號
+{width:80}
 #OOCustNo=戶號
 {width:65}
 #OOFacmNo=額度
@@ -463,7 +465,7 @@ TXFORM=L4920
 {width:95}
 #OOReconCodeX=對帳類別
 {width:95}
-#OORepayAmt=還款金額
+#OORepayAmt=交易金額
 {width:95}
 #OOAcctAmt=已作帳金額
 {width:120}

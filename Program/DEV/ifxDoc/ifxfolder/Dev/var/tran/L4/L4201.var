@@ -31,9 +31,8 @@ E(0,0)
 ["@提款",#WithdrawAmt],["@存款",#DepositAmt],
 ["@結餘",#Balance],["@匯款銀行代碼",#RemintBankX],
 [#<->#,"@交易人資料",#TraderInfo],
-[#<->#,"@","------------------------------------------------"],
 [#<->#,"@還款類別",#RepayTypeA,#RepayTypeAX],
-[#<->#,"@虛擬帳號",#CustNoA],
+[#<->#,"@入帳戶號",#CustNoA],
 ]
 #BTN_L3921=X,94,I,ui:button;value:回收試算;enable:1;tabbable:0;
 #BTN_L3200=X,94,I,ui:button;value:回收登錄;enable:1;tabbable:0;
@@ -188,6 +187,8 @@ T(3,)T(H,#RepayType,#RepayTypeHelp)
 
 #ProcStsCode=X,1,I
 HELP(#ProcStsCodeHelp)
+IF(#RepayAmt < 0,T(F,@ProcStsCode,0),$)
+IF(#RepayAmt >= 0,$,s)
 IF(#ProcStsCode == 4 || #ProcStsCode == 3 || #ProcStsCode == 2 || #ProcStsCode == 1 || #ProcStsCode == 0,$,s)
 @
 C(3,#ProcStsCode,1,T(F,@CustNoA,0)T(F,@RepayTypeA,0),T(F,@CustNoA,1)T(F,@RepayTypeA,1))

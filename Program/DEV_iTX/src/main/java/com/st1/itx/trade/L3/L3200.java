@@ -23,7 +23,6 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.FacProd;
 import com.st1.itx.db.domain.LoanBook;
-import com.st1.itx.db.domain.LoanBookId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanBorTx;
@@ -977,6 +976,9 @@ public class L3200 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0021",
 					"額度檔 戶號 = " + tFacMain.getCustNo() + " 額度編號 =  " + tFacMain.getFacmNo()); // 該筆資料待放行中
 		}
+		if (titaVo.isHcodeNormal() && tFacMain.getUtilAmt().compareTo(wkPrincipal) <= 0) {
+			throw new LogicException(titaVo, "E010", "額度全部結案，請執行結案登錄， 額度編號 =  " + tFacMain.getFacmNo()); // 功能選擇錯誤
+		}
 		// 查詢商品參數檔
 		tFacProd = facProdService.findById(tFacMain.getProdNo(), titaVo);
 		if (tFacProd == null) {
@@ -1260,6 +1262,9 @@ public class L3200 extends TradeBuffer {
 
 		tLoanBorMain.setLastBorxNo(wkBorxNo);
 		tLoanBorMain.setLoanBal(tLoanBorMain.getLoanBal().subtract(wkPrincipal));
+		if (tLoanBorMain.getLoanBal().compareTo(BigDecimal.ZERO) == 0) {
+			tLoanBorMain.setStatus(3);
+		}
 		if (isCalcRepayInt) {
 			tLoanBorMain.setStoreRate(loanCalcRepayIntCom.getStoreRate());
 			if (tLoanBorMain.getAmortizedCode().equals("3")) {
@@ -1313,6 +1318,7 @@ public class L3200 extends TradeBuffer {
 		tLoanBorMain.setLastBorxNo(wkNewBorxNo);
 		tLoanBorMain.setStoreRate(this.parse.stringToBigDecimal(tTempVo.get("StoreRate")));
 		tLoanBorMain.setLoanBal(this.parse.stringToBigDecimal(tTempVo.get("LoanBal")));
+		tLoanBorMain.setStatus(0);
 		tLoanBorMain.setRepaidPeriod(this.parse.stringToInteger(tTempVo.get("RepaidPeriod")));
 		tLoanBorMain.setPaidTerms(this.parse.stringToInteger(tTempVo.get("PaidTerms")));
 		tLoanBorMain.setPrevPayIntDate(this.parse.stringToInteger(tTempVo.get("PrevPayIntDate")));
@@ -1841,26 +1847,33 @@ public class L3200 extends TradeBuffer {
 	// 約定還本檔處理
 	private void loanBookRoutine() throws LogicException {
 		this.info("loanBookRoutine ...");
-		LoanBook tLoanBook = loanBookService.holdById(new LoanBookId(iCustNo, iFacmNo, iBormNo, iEntryDate + 19110000),
+		Slice<LoanBook> slLoanBook = loanBookService.bookCustNoRange(iCustNo, iCustNo, iFacmNo,
+				iFacmNo == 0 ? 999 : iFacmNo, iBormNo, iBormNo == 0 ? 990 : iBormNo, this.index, Integer.MAX_VALUE,
 				titaVo);
-		if (tLoanBook != null) {
-			if (titaVo.isHcodeNormal()) {
-				tLoanBook.setRepayAmt(tLoanBook.getRepayAmt().add(iExtraRepay));// 實際還本金額
-			} else {
-				tLoanBook.setRepayAmt(tLoanBook.getRepayAmt().subtract(iExtraRepay));// 實際還本金額
-			}
-			if (tLoanBook.getRepayAmt().compareTo(BigDecimal.ZERO) > 0) {
-				tLoanBook.setStatus(1); // 1: 已回收
-			} else {
-				tLoanBook.setStatus(0); // 0: 未回收
-			}
+		if (slLoanBook == null) {
+			return;
+		}
+		for (LoanBook t : slLoanBook.getContent()) {
+			if (t.getBookDate() >= iEntryDate) {
+				LoanBook tLoanBook = loanBookService.holdById(t, titaVo);
+				if (titaVo.isHcodeNormal()) {
+					tLoanBook.setRepayAmt(tLoanBook.getRepayAmt().add(iExtraRepay));// 實際還本金額
+				} else {
+					tLoanBook.setRepayAmt(tLoanBook.getRepayAmt().subtract(iExtraRepay));// 實際還本金額
+				}
+				if (tLoanBook.getRepayAmt().compareTo(BigDecimal.ZERO) > 0) {
+					tLoanBook.setStatus(1); // 1: 已回收
+				} else {
+					tLoanBook.setStatus(0); // 0: 未回收
+				}
 
-			try {
-				loanBookService.update(tLoanBook, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "放款約定還本檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				try {
+					loanBookService.update(tLoanBook, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "放款約定還本檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
+				break;
 			}
-
 		}
 
 	}

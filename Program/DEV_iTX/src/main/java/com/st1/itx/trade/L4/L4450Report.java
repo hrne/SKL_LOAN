@@ -76,6 +76,27 @@ public class L4450Report extends MakeReport {
 
 	public void doReport(List<BankDeductDtl> lBankDeductDtl, TitaVo titaVo) throws LogicException {
 		this.info("doReport ");
+		
+		// RepayBank ,AcctCode ,CustNo ,FacmNo ,BormNo
+		lBankDeductDtl.sort((c1, c2) -> {
+			int result = 0;
+			if(c1.getRepayBank() != c2.getRepayBank()) {
+				result = Integer.valueOf(c1.getRepayBank().compareTo(c2.getRepayBank()));
+			} else if(c1.getAcctCode() !=  c2.getAcctCode()) {
+				result = Integer.valueOf(c1.getAcctCode().compareTo(c2.getAcctCode()));
+			} else if (c1.getCustNo() - c2.getCustNo() != 0) {
+				result = c1.getCustNo() - c2.getCustNo();
+			} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
+				result = c1.getFacmNo() - c2.getFacmNo();
+			} else if (c1.getBormNo() - c2.getBormNo() != 0) {
+				result = c1.getBormNo() - c2.getBormNo();
+			} else {
+				result = 0;
+			}
+			
+			return result;
+		});
+		
 		this.lBankDeductDtl = lBankDeductDtl;
 
 		this.exec(titaVo);

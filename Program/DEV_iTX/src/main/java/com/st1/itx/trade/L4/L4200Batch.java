@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -519,32 +520,8 @@ public class L4200Batch extends TradeBuffer {
 			// 使用資料容器內定義的方法切資料
 			bankRmtfFileVo.setValueFromFile(dataLineList1);
 
+			// 取得資料
 			ArrayList<OccursList> uploadFile = bankRmtfFileVo.getOccursList();
-			HashMap<String, BigDecimal> negaDraw = new HashMap<>();
-			HashMap<String, BigDecimal> negaDepo = new HashMap<>();
-			HashMap<String, BigDecimal> posiDepo = new HashMap<>();
-
-//			先抓出本日為負的帳號及金額
-			for (OccursList tempOccursList : uploadFile) {
-				String visAcctNo = tempOccursList.get("OccVirAcctNo");
-//				資料負數位放至小數點第二位，需自行補0
-				if (tempOccursList.get("OccDepositAmt").substring(12).equals("p")) {
-					BigDecimal nDepositAmt = parse
-							.stringToBigDecimal(tempOccursList.get("OccDepositAmt").substring(0, 12) + "0")
-							.divide(bigDe100);
-					negaDepo.put(visAcctNo, nDepositAmt);
-				} else {
-					BigDecimal pDepositAmt = parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt"))
-							.divide(bigDe100);
-					posiDepo.put(visAcctNo, pDepositAmt);
-				}
-				if (tempOccursList.get("OccWithDrawAmt").substring(12).equals("p")) {
-					BigDecimal nWithDrawAmt = parse
-							.stringToBigDecimal(tempOccursList.get("WithDrawAmt").substring(0, 12) + "0")
-							.divide(bigDe100);
-					negaDraw.put(visAcctNo, nWithDrawAmt);
-				}
-			}
 
 //			資料筆數:n 				uploadFile.size()
 //			資料庫,當天,同批號,未檢核筆數:m	lBatxDetail.size()
@@ -566,15 +543,13 @@ public class L4200Batch extends TradeBuffer {
 
 				OccursList tempOccursList = new OccursList();
 				tempOccursList = uploadFile.get(i - tableSize);
-
-				int intCustNo = 0;
-				int intRepayType = 0;
-				String procCodeX = "";
-
+				this.info("OccursList=" + tempOccursList.toString());
+				int custNo = 0;
+				int repayType = 0;
 				if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
-					intCustNo = parse.stringToInteger(tempOccursList.get("OccVirAcctNo").substring(7));
+					custNo = parse.stringToInteger(tempOccursList.get("OccVirAcctNo").substring(7));
 				} else {
-					intCustNo = 0;
+					custNo = 0;
 				}
 
 //				B.(first check)檢核資料與寫入檔是否相同  並回寫處理狀態(ProcStsCode)
@@ -584,77 +559,97 @@ public class L4200Batch extends TradeBuffer {
 //				3.摘要欄提示 :  104-ACH手續費 (前3碼為ACH) 120-法院 (有地院字眼)   106-特殊摘要 (不為數字else or 僅一筆存款負數 or 存款金額為0) 
 //				            110-更正轉帳 (OccRemark為更正轉帳)
 //				4.??? : 103-預先作業(上一營業日之ORTX 比照金額&戶號)  105-銀扣清算  (房貸 票交 字眼)
-				String errorCode = FormatUtil.pad9("".trim(), 5);
-				HashMap<String, Integer> err103map = new HashMap<>();
-				err103map.put(iBatchNo, 0);
-
-				if (negaDraw.containsKey(tempOccursList.get("OccVirAcctNo"))
-						|| negaDepo.containsKey(tempOccursList.get("OccVirAcctNo"))
-						|| posiDepo.containsKey(tempOccursList.get("OccVirAcctNo"))) {
-				} else {
-					BatxHead tBatxHead = new BatxHead();
-					tBatxHead = batxHeadService.titaTxCdFirst(this.txBuffer.getTxCom().getLbsdyf(), "L4210", "8",
-							titaVo);
-					String batchNo = "";
-					if (tBatxHead != null) {
-						batchNo = tBatxHead.getBatchNo();
-					}
-
-					List<String> err103List = new ArrayList<String>();
-					err103List.add("5");
-					err103List.add("6");
-					BatxDetail err103 = new BatxDetail();
-
-//					上營業日 戶號 金額 相同者
-					err103 = batxDetailService.findL4200BFirst(this.txBuffer.getTxCom().getLbsdyf(), batchNo, intCustNo,
-							parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt")), err103List, titaVo);
-					if (err103 != null) {
-						err103map.put(iBatchNo, 1);
-					}
-				}
-
+				String errorCode = "00000";
+				String procCodeX = "";
+				BigDecimal repayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt"));
+				String reconCode = "";
+				procStsCode = "0";
 				if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
-					if (negaDepo.containsKey(tempOccursList.get("OccVirAcctNo"))
-							&& posiDepo.containsKey(tempOccursList.get("OccVirAcctNo"))) {
-						if (negaDepo.get(tempOccursList.get("OccVirAcctNo")).compareTo(
-								parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt").substring(0, 12))
-										.divide(new BigDecimal("10"))) == 0) {
-							errorCode = FormatUtil.pad9("101".trim(), 5);
+					switch (tempOccursList.get("OccVirAcctNo").substring(0, 5)) {
+					case "95101":
+					case "95102":
+					case "95103":
+						reconCode = "A" + tempOccursList.get("OccVirAcctNo").substring(4, 5);
+						break;
+					case "95105":
+						if (custNo == this.txBuffer.getSystemParas().getNegDeptCustNo()) {
+							reconCode = "A7";
+						} else {
+							reconCode = "A6";
 						}
-					} else if (err103map.get(iBatchNo) == 1) {
-						errorCode = FormatUtil.pad9("103".trim(), 5);
-					} else if (tempOccursList.get("OccDepositAmt").indexOf("p") >= 0) {
-						errorCode = FormatUtil.pad9("106".trim(), 5);
-					} else if (negaDraw.containsKey(tempOccursList.get("OccVirAcctNo"))) {
-						errorCode = FormatUtil.pad9("102".trim(), 5);
-					} else if (tempOccursList.get("OccRemark").indexOf("更正轉帳") >= 0) {
-						errorCode = FormatUtil.pad9("110".trim(), 5);
-					} else if (parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt"))
-							.compareTo(BigDecimal.ZERO) == 0) {
-						errorCode = FormatUtil.pad9("106".trim(), 5);
-					} else {
-						errorCode = FormatUtil.pad9("".trim(), 5);
+						break;
+					default:
+						reconCode = "A3";
+						break;
 					}
-				} else if ("ACH".equals(tempOccursList.get("OccVirAcctNo").substring(0, 3))) {
-					errorCode = FormatUtil.pad9("104".trim(), 5);
-				} else if (tempOccursList.get("OccVirAcctNo").indexOf("地院") >= 0) {
-					errorCode = FormatUtil.pad9("120".trim(), 5);
-				} else if (tempOccursList.get("OccVirAcctNo").indexOf("房貸") >= 0) {
-					errorCode = FormatUtil.pad9("105".trim(), 5);
-				} else if (tempOccursList.get("OccVirAcctNo").indexOf("票交") >= 0) {
-					errorCode = FormatUtil.pad9("105".trim(), 5);
 				} else {
-					errorCode = FormatUtil.pad9("106".trim(), 5);
+					reconCode = "A3";
+					if (tempOccursList.get("OccVirAcctNo").indexOf("地院") >= 0) {
+						errorCode = "00120";
+						procStsCode = "2";
+						procCodeX = tempOccursList.get("OccVirAcctNo");
+					} else if ("ACH".equals(tempOccursList.get("OccVirAcctNo").substring(0, 3))) {
+						errorCode = "00104";
+						procStsCode = "1";
+						procCodeX = tempOccursList.get("OccVirAcctNo");
+					} else {
+						errorCode = "00105"; // 排除交易
+						procStsCode = "1";
+						procCodeX = tempOccursList.get("OccVirAcctNo");
+					}
 				}
-				this.info("title : " + tempOccursList.get("OccRemark") + ",,," + tempOccursList.get("OccVirAcctNo")
-						+ ",,," + tempOccursList.get("OccDepositAmt"));
-				this.info("CheckFlag : " + tempOccursList.get("CheckFlag"));
+
+				// 正負對沖
+				if ("00000".equals(errorCode)) {
+					if ("1".equals(tempOccursList.get("OccEraseFlag"))) {
+						errorCode = "00101";
+						procStsCode = "1";
+					}
+				}
+
+				// 提款(借方)
+				if ("00000".equals(errorCode) && isNumeric(tempOccursList.get("OccWithDrawAmt")) && parse
+						.stringToBigDecimal(tempOccursList.get("OccWithDrawAmt")).compareTo(BigDecimal.ZERO) > 0) {
+					errorCode = "00102";
+					procStsCode = "1";
+				}
+				// 提款(借方)
+				if ("00000".equals(errorCode) && tempOccursList.get("OccWithDrawAmt").indexOf("p") >= 0
+						&& parse.stringToBigDecimal(tempOccursList.get("OccWithDrawAmt").substring(0, 12) + "0")
+								.compareTo(BigDecimal.ZERO) > 0) {
+					errorCode = "00102";
+					procStsCode = "1";
+					procCodeX = "冲正";
+				}
+				// 更正轉帳
+				if ("00000".equals(errorCode) && tempOccursList.get("OccRemark").indexOf("更正轉帳") >= 0) {
+					errorCode = "00110";
+					procStsCode = "1";
+				}
+				// 冲正交易
+				if ("00000".equals(errorCode) && repayAmt.compareTo(BigDecimal.ZERO) < 0) {
+					errorCode = "00106";
+					procStsCode = "1";
+				}
+
+				// 預先作業 其他來源建檔 上營業日 戶號 金額 相同者
+				if ("00000".equals(errorCode)) {
+					List<String> procStsCodeList = Arrays.asList("5", "6");
+					BatxDetail err103 = batxDetailService.findL4200BFirst(this.txBuffer.getTxCom().getLbsdyf(), "L4210",
+							custNo, repayAmt, procStsCodeList, titaVo);
+					if (err103 != null) {
+						errorCode = "00103";
+						procCodeX = "" + this.txBuffer.getTxCom().getLbsdy() + " " + err103.getBatchNo();
+					}
+				}
+
+				this.info("OccEraseFlag : " + tempOccursList.get("OccEraseFlag"));
+				this.info("RepayAmt : " + repayAmt);
 				this.info("errorCode : " + errorCode);
 
 				if ("00000".equals(errorCode)) {
 					rmftSuccCnt = rmftSuccCnt + 1;
-					rmftSuccAmt = rmftSuccAmt
-							.add(parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt")).divide(bigDe100));
+					rmftSuccAmt = rmftSuccAmt.add(repayAmt);
 				} else {
 					rmftFailCnt = rmftFailCnt + 1;
 				}
@@ -669,59 +664,19 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setBatxDetailId(tBatxDetailId);
 				tBatxDetail.setRepayCode(1);
 				tBatxDetail.setFileName(filePath1.substring(filePath1.indexOf("rbalmall")));
+				tBatxDetail.setRecordSeq(i - tableSize + 1);
 				tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("OccEntryDate")));
-				tBatxDetail.setCustNo(intCustNo);
+				tBatxDetail.setCustNo(custNo);
 				tBatxDetail.setFacmNo(0);
 				tBatxDetail.setRvNo("");
-//				 --待確認
-				tBatxDetail.setRepayType(intRepayType);
-				tBatxDetail.setReconCode("P03");
-//				--待確認
+				tBatxDetail.setRepayType(repayType);
+				tBatxDetail.setReconCode(reconCode);
 				tBatxDetail.setRepayAcCode("");
-//				--待確認
+				tBatxDetail.setRepayAmt(repayAmt);
 				tBatxDetail.setAcquiredAmt(BigDecimal.ZERO);
-				if ("00000".equals(errorCode)) {
-					tBatxDetail.setRepayAmt(
-							parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt")).divide(bigDe100));
-				} else if ("00102".equals(errorCode)) {
-					tBatxDetail.setRepayAmt(
-							parse.stringToBigDecimal(tempOccursList.get("WithDrawAmt").substring(0, 12) + "0")
-									.divide(bigDe100));
-				} else if (isNumeric(tempOccursList.get("OccDepositAmt"))
-						&& parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt")).divide(bigDe100)
-								.compareTo(BigDecimal.ZERO) == 0) {
-					tBatxDetail
-							.setRepayAmt(parse.stringToBigDecimal(tempOccursList.get("WithDrawAmt")).divide(bigDe100));
-				} else {
-					tBatxDetail.setRepayAmt(BigDecimal.ZERO);
-				}
 				tBatxDetail.setAcctAmt(BigDecimal.ZERO);
 				tBatxDetail.setDisacctAmt(BigDecimal.ZERO);
-
-				if ("00000".equals(errorCode)) {
-					tBatxDetail.setProcStsCode("0");
-					procStsCode = "0";
-				} else if ("00110".equals(errorCode)) {
-					tBatxDetail.setProcStsCode("2");
-					procStsCode = "2";
-				} else if ("00101".equals(errorCode)) {
-					tBatxDetail.setProcStsCode("1");
-					procStsCode = "1";
-				} else if ("00102".equals(errorCode)) {
-					tBatxDetail.setProcStsCode("1");
-					procStsCode = "1";
-				} else if ("00103".equals(errorCode)) {
-					tBatxDetail.setProcStsCode("1");
-					procStsCode = "1";
-				} else if ("00104".equals(errorCode)) {
-					tBatxDetail.setProcStsCode("1");
-					procStsCode = "1";
-				} else {
-//				0622 由420A做檢核再決定檢核錯誤
-					tBatxDetail.setProcStsCode("2");
-					procStsCode = "2";
-				}
-
+				tBatxDetail.setProcStsCode(procStsCode);
 				tBatxDetail.setProcCode(errorCode);
 				tempVo = new TempVo();
 				tempVo.putParam("VirtualAcctNo", tempOccursList.get("OccVirAcctNo"));
@@ -729,38 +684,9 @@ public class L4200Batch extends TradeBuffer {
 				if ("00000".equals(errorCode)) {
 					tempVo.putParam("CheckMsg", "");
 					tempVo.putParam("Note", tempOccursList.get("OccRemark"));
-
-				} else if ("00110".equals(errorCode)) {
-					tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-					tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
 				} else {
-					if (isNumeric(tempOccursList.get("OccVirAcctNo"))) {
-						if (tempOccursList.get("OccDepositAmt").indexOf("p") >= 0) {
-							BigDecimal nDepositAmt = parse
-									.stringToBigDecimal(tempOccursList.get("OccDepositAmt").substring(0, 12) + "0")
-									.divide(bigDe100);
-
-							tempVo.putParam("CheckMsg", "-" + nDepositAmt);
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
-
-						} else if (parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt"))
-								.compareTo(BigDecimal.ZERO) == 0) {
-							tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
-						} else {
-							tempVo.putParam("CheckMsg",
-									parse.stringToBigDecimal("" + negaDepo.get(tempOccursList.get("OccVirAcctNo"))));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
-						}
-					} else {
-						if ("".equals(tempOccursList.get("OccVirAcctNo").trim())) {
-							tempVo.putParam("CheckMsg", tempOccursList.get("OccRemark"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
-						} else {
-							tempVo.putParam("CheckMsg", tempOccursList.get("OccVirAcctNo"));
-							tempVo.putParam("ReturnMsg", setProcCodeX(errorCode, procCodeX, titaVo));
-						}
-					}
+					tempVo.putParam("CheckMsg",
+							setProcCodeX(errorCode, procCodeX, titaVo) + ", " + tempOccursList.get("OccRemark"));
 				}
 
 				tBatxDetail.setTitaTlrNo("");
@@ -777,37 +703,25 @@ public class L4200Batch extends TradeBuffer {
 				tBankRmtf.setAcDate(iAcDate);
 				tBankRmtf.setBatchNo(iBatchNo);
 				tBankRmtf.setDetailSeq(i + 1);
-				tBankRmtf.setCustNo(intCustNo);
-				if (tempOccursList.get("OccDepositAmt").indexOf("p") >= 0) {
-					tBankRmtf.setRepayAmt(
-							parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt").substring(0, 12) + "0")
-									.divide(bigDe100));
-				} else {
-					tBankRmtf.setRepayAmt(
-							parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt")).divide(bigDe100));
-				}
-
+				tBankRmtf.setCustNo(custNo);
+				tBankRmtf.setRepayAmt(repayAmt);
 				tBankRmtf.setDepAcctNo(tempOccursList.get("OccAcctNo"));
-				;
 				tBankRmtf.setEntryDate(parse.stringToInteger(tempOccursList.get("OccEntryDate")));
-
 				tBankRmtf.setDscptCode(tempOccursList.get("OccNoteCode"));
-
 				tBankRmtf.setVirtualAcctNo(tempOccursList.get("OccVirAcctNo"));
-
 				if (tempOccursList.get("OccWithDrawAmt").indexOf("p") >= 0) {
-					tBankRmtf.setWithdrawAmt(
+					tBankRmtf.setWithdrawAmt(BigDecimal.ZERO.subtract(
 							parse.stringToBigDecimal(tempOccursList.get("OccWithDrawAmt").substring(0, 12) + "0")
-									.divide(bigDe100));
+									.divide(bigDe100)));
 				} else {
 					tBankRmtf.setWithdrawAmt(
 							parse.stringToBigDecimal(tempOccursList.get("OccWithDrawAmt")).divide(bigDe100));
 				}
 
 				if (tempOccursList.get("OccDepositAmt").indexOf("p") >= 0) {
-					tBankRmtf.setDepositAmt(
+					tBankRmtf.setDepositAmt(BigDecimal.ZERO.subtract(
 							parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt").substring(0, 12) + "0")
-									.divide(bigDe100));
+									.divide(bigDe100)));
 				} else {
 					tBankRmtf.setDepositAmt(
 							parse.stringToBigDecimal(tempOccursList.get("OccDepositAmt")).divide(bigDe100));
@@ -838,7 +752,9 @@ public class L4200Batch extends TradeBuffer {
 
 			}
 
-		} else {
+		} else
+
+		{
 //			throw new LogicException("E0014", "L4200Batch No Content " + filePath1);
 		}
 
@@ -952,6 +868,7 @@ public class L4200Batch extends TradeBuffer {
 //				02.銀行扣款
 				tBatxDetail.setRepayCode(2);
 				tBatxDetail.setFileName(filePath2A.substring(filePath2A.indexOf("AHR1")));
+				tBatxDetail.setRecordSeq(i - tableSize + 1);
 				tBatxDetail.setEntryDate(achEntryDate);
 				tBatxDetail.setCustNo(reCustNo);
 				tBatxDetail.setFacmNo(reFacmNo);
@@ -1122,6 +1039,7 @@ public class L4200Batch extends TradeBuffer {
 //				02.銀行扣款
 				tBatxDetail.setRepayCode(2);
 				tBatxDetail.setFileName(filePath2P.substring(filePath2P.indexOf("PRSBCP4")));
+				tBatxDetail.setRecordSeq(i - tableSize + 1);
 				tBatxDetail.setEntryDate(reEntryDate + 19110000);
 				tBatxDetail.setCustNo(parse.stringToInteger(tempOccursList.get("OccCustNo")));
 				tBatxDetail.setFacmNo(parse.stringToInteger(tempOccursList.get("OccFacmNo")));
@@ -1282,6 +1200,7 @@ public class L4200Batch extends TradeBuffer {
 				} else if ("5".equals(mediaType)) {
 					tBatxDetail.setFileName(filePath3.substring(filePath3.indexOf("LNM617P")));
 				}
+				tBatxDetail.setRecordSeq(i - tableSize + 1);
 				tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("OccEntryDate")));
 				tBatxDetail.setCustNo(parse.stringToInteger(tempOccursList.get("OccCustNo")));
 				tBatxDetail.setFacmNo(0);
@@ -1499,6 +1418,7 @@ public class L4200Batch extends TradeBuffer {
 //						04.支票兌現
 						tBatxDetail.setRepayCode(4);
 						tBatxDetail.setFileName(filePath4.substring(filePath4.indexOf("mortgage")));
+						tBatxDetail.setRecordSeq(i - tableSize + 1);
 						tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")) + 19110000);
 						tBatxDetail.setCustNo(tLoanCheque.getCustNo());
 						tBatxDetail.setFacmNo(tAcReceivable.getFacmNo());
@@ -1540,6 +1460,7 @@ public class L4200Batch extends TradeBuffer {
 //					04.支票兌現
 					tBatxDetail.setRepayCode(4);
 					tBatxDetail.setFileName(filePath4.substring(filePath4.indexOf("mortgage")));
+					tBatxDetail.setRecordSeq(i - tableSize + 1);
 					tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")) + 19110000);
 					if (tLoanCheque != null) {
 						tBatxDetail.setCustNo(tLoanCheque.getCustNo());
@@ -1802,6 +1723,7 @@ public class L4200Batch extends TradeBuffer {
 	}
 
 	private void checkBatxHead(BatxHeadId tBatxHeadId, BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
+
 		totSuccCnt = totSuccCnt + rmftSuccCnt + achSuccCnt + postSuccCnt + empASuccCnt + empBSuccCnt + chequeSuccCnt;
 		totFailCnt = totFailCnt + rmftFailCnt + achFailCnt + postFailCnt + empAFailCnt + empBFailCnt + chequeFailCnt;
 		totAmt = totAmt.add(rmftSuccAmt).add(achSuccAmt).add(postSuccAmt).add(empBSuccAmt).add(chequeSuccAmt);

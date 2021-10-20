@@ -48,10 +48,11 @@ public class L4930 extends TradeBuffer {
 		int iCustNo = 0;
 		int iAcDate = 0;
 		String iBatchNo = "";
-
+		String iReconCode = "";
 		iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		iReconCode = titaVo.getParam("ReconCode").trim();
 
 		iBatchNo = titaVo.getParam("BatchNo");
 
@@ -69,7 +70,6 @@ public class L4930 extends TradeBuffer {
 		func2.add("2");
 		func2.add("3");
 		func2.add("4");
-		func2.add("7");
 		// 整批訂正
 		List<String> func1 = new ArrayList<String>();
 		func1.add("5");
@@ -77,18 +77,24 @@ public class L4930 extends TradeBuffer {
 		func1.add("7");
 
 		if (iFunctionCode == 2) {
-			if (iCustNo == 0) {
-				sBatxDetail = batxDetailService.findL4930BAEq(iAcDate, iBatchNo, func2, this.index, this.limit, titaVo);
-			} else {
+			if (iCustNo > 0) {
 				sBatxDetail = batxDetailService.findL4930CAEq(iAcDate, iBatchNo, iCustNo, func2, this.index, this.limit,
 						titaVo);
+			} else if (!"".equals(iReconCode)) {
+				sBatxDetail = batxDetailService.findL4930RAEq(iAcDate, iBatchNo, iReconCode, func2, this.index,
+						this.limit, titaVo);
+			} else {
+				sBatxDetail = batxDetailService.findL4930BAEq(iAcDate, iBatchNo, func2, this.index, this.limit, titaVo);
 			}
 		} else if (iFunctionCode == 1) {
-			if (iCustNo == 0) {
-				sBatxDetail = batxDetailService.findL4930BHEq(iAcDate, iBatchNo, func1, this.index, this.limit, titaVo);
-			} else {
+			if (iCustNo > 0) {
 				sBatxDetail = batxDetailService.findL4930CHEq(iAcDate, iBatchNo, iCustNo, func1, this.index, this.limit,
 						titaVo);
+			} else if (!"".equals(iReconCode)) {
+				sBatxDetail = batxDetailService.findL4930RHEq(iAcDate, iBatchNo, iReconCode, func1, this.index,
+						this.limit, titaVo);
+			} else {
+				sBatxDetail = batxDetailService.findL4930BHEq(iAcDate, iBatchNo, func1, this.index, this.limit, titaVo);
 			}
 		}
 
@@ -136,6 +142,9 @@ public class L4930 extends TradeBuffer {
 					}
 					if (tempVo.get("Note") != null && tempVo.get("Note").length() > 0) {
 						procNote = procNote + "摘要:" + tempVo.get("Note");
+					}
+					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
+						procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
 					}
 //					當吃檔進去時不會寫入還款類別，檢核後才會寫入。
 //					若該筆無還款類別且為數字型態，顯示虛擬帳號

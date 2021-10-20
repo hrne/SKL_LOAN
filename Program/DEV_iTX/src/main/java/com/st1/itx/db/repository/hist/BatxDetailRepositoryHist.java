@@ -57,38 +57,44 @@ public interface BatxDetailRepositoryHist extends JpaRepository<BatxDetail, Batx
   // RepayType = 
   public Slice<BatxDetail> findAllByRepayTypeIsOrderByCustNoAscFacmNoAscRepayCodeAsc(int repayType_0, Pageable pageable);
 
-  // AcDate = , AND BatchNo = 
+  // AcDate = ,AND BatchNo = 
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIs(int acDate_0, String batchNo_1, Pageable pageable);
 
-  // AcDate = , AND BatchNo = , AND TitaTlrNo = 
+  // AcDate = ,AND BatchNo = ,AND TitaTlrNo = 
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsAndTitaTlrNoIs(int acDate_0, String batchNo_1, String titaTlrNo_2, Pageable pageable);
 
-  // AcDate >= , AND AcDate <= , AND CustNo >= , AND CustNo <= , AND RepayCode >= , AND RepayCode <= , AND ProcStsCode ^i 
+  // AcDate >= ,AND AcDate <= ,AND CustNo >= ,AND CustNo <= ,AND RepayCode >= ,AND RepayCode <= ,AND ProcStsCode ^i 
   public Slice<BatxDetail> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCustNoGreaterThanEqualAndCustNoLessThanEqualAndRepayCodeGreaterThanEqualAndRepayCodeLessThanEqualAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeAscDetailSeqAsc(int acDate_0, int acDate_1, int custNo_2, int custNo_3, int repayCode_4, int repayCode_5, List<String> procStsCode_6, Pageable pageable);
 
-  // AcDate = , AND BatchNo = 
+  // AcDate = ,AND BatchNo = 
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsOrderByMediaDateAscMediaKindAscMediaSeqAsc(int acDate_0, String batchNo_1, Pageable pageable);
 
-  // AcDate = , AND BatchNo = , AND CustNo = , AND RepayAmt = , AND ProcStsCode ^i
-  public Optional<BatxDetail> findTopByAcDateIsAndBatchNoIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByDetailSeqAsc(int acDate_0, String batchNo_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4);
+  // AcDate = ,AND FileName = ,AND CustNo = ,AND RepayAmt = ,AND ProcStsCode ^i
+  public Optional<BatxDetail> findTopByAcDateIsAndFileNameIsAndCustNoIsAndRepayAmtIsAndProcStsCodeInOrderByBatchNoDescDetailSeqDesc(int acDate_0, String fileName_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4);
 
-  // AcDate = , AND BatchNo = , AND CustNo = , AND ProcStsCode ^i
+  // AcDate = ,AND BatchNo = ,AND CustNo = ,AND ProcStsCode ^i
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, Pageable pageable);
 
-  // AcDate = , AND BatchNo = , AND CustNo = , AND ProcStsCode ^i
+  // AcDate = ,AND BatchNo = ,AND CustNo = ,AND ProcStsCode ^i
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsAndCustNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, Pageable pageable);
 
-  // AcDate = , AND BatchNo = , AND ProcStsCode ^i
+  // AcDate = ,AND BatchNo = ,AND ProcStsCode ^i
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(int acDate_0, String batchNo_1, List<String> procStsCode_2, Pageable pageable);
 
-  // AcDate = , AND BatchNo = , AND ProcStsCode ^i
+  // AcDate = ,AND BatchNo = ,AND ProcStsCode ^i
   public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(int acDate_0, String batchNo_1, List<String> procStsCode_2, Pageable pageable);
 
-  // AcDate >= , AND AcDate <= , AND RepayCode = 
+  // AcDate = ,AND BatchNo = ,AND ReconCode = ,AND ProcStsCode ^i
+  public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsAndReconCodeIsAndProcStsCodeInOrderByCustNoAscFacmNoAscRepayCodeDescDetailSeqAsc(int acDate_0, String batchNo_1, String reconCode_2, List<String> procStsCode_3, Pageable pageable);
+
+  // AcDate = ,AND BatchNo = ,AND ReconCode = ,AND ProcStsCode ^i
+  public Slice<BatxDetail> findAllByAcDateIsAndBatchNoIsAndReconCodeIsAndProcStsCodeInOrderByCustNoDescFacmNoDescRepayCodeAscDetailSeqDesc(int acDate_0, String batchNo_1, String reconCode_2, List<String> procStsCode_3, Pageable pageable);
+
+  // AcDate >= ,AND AcDate <= ,AND RepayCode = 
   public Slice<BatxDetail> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsOrderByBatchNoDescDetailSeqAsc(int acDate_0, int acDate_1, int repayCode_2, Pageable pageable);
 
-  // AcDate = , AND FileName = 
-  public Slice<BatxDetail> findAllByAcDateIsAndFileNameIsOrderByBatchNoDesc(int acDate_0, String fileName_1, Pageable pageable);
+  // AcDate = ,AND FileName = 
+  public Slice<BatxDetail> findAllByAcDateIsAndFileNameIsOrderByBatchNoDescRecordSeqAsc(int acDate_0, String fileName_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

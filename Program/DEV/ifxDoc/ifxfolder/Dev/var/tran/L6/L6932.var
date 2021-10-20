@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,393)ASGN(INQLEN$)
+E(0,793)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -255,9 +255,9 @@ T(2,#OO_CUST_NO+－+#OO_FACM_NO+－+#OO_BORM_SEQ)
 ! 欄位名稱
 #OO_COLUMN_NAME=X,50,L
 ! 變更前
-#OO_DATA_BEFORE=X,100,L
+#OO_DATA_BEFORE=X,300,L
 ! 變更後
-#OO_DATA_AFTER=X,100,L
+#OO_DATA_AFTER=X,300,L
 
 ! 修改的按鈕
 ! #OO_FUNCD=A,1,S

@@ -58,7 +58,7 @@ public class L6932 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 393 * 100 = 39,300
+		this.limit = 20; // 593 * 20 = 11,860
 
 		String iTlrItem = "";
 		String iTranItem = "";
@@ -97,7 +97,7 @@ public class L6932 extends TradeBuffer {
 		if (lTxDataLog == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
-
+		this.info("lTxDataLog=="+lTxDataLog.size());
 		for (TxDataLog txDataLog : lTxDataLog) {
 //			if (!iTxtNo.isEmpty() && iTxtNo.equals(txDataLog.getTxSeq())) {
 //				continue;

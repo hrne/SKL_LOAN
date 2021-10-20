@@ -56,6 +56,7 @@ public class L420ABatch extends TradeBuffer {
 	private int commitCnt = 20;
 	private int iAcDate;
 	private String iBatchNo;
+	private String iReconCode;
 	private List<BatxDetail> lBatxDetail;
 
 	@Override
@@ -68,7 +69,7 @@ public class L420ABatch extends TradeBuffer {
 		// 會計日期、批號
 		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		iBatchNo = titaVo.getParam("BatchNo");
-
+		iReconCode = titaVo.getParam("ReconCode").trim();
 		// hold 整批入帳總數檔
 		BatxHeadId tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(iAcDate);
@@ -86,7 +87,8 @@ public class L420ABatch extends TradeBuffer {
 		}
 
 		// findAll 整批入帳明細檔
-		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, Integer.MAX_VALUE);
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
+				Integer.MAX_VALUE);
 		lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 		this.batchTransaction.commit();
 		if (lBatxDetail != null) {
@@ -94,31 +96,34 @@ public class L420ABatch extends TradeBuffer {
 			this.info("lBatxDetail, size=" + lBatxDetail.size());
 			for (BatxDetail tDetail : lBatxDetail) {
 				// 0.未檢核 2.人工處理 3.檢核錯誤
-				if ("0".equals(tDetail.getProcStsCode()) || "2".equals(tDetail.getProcStsCode()) || "3".equals(tDetail.getProcStsCode())) {
-					// 逐筆 call BaTxCom 計算並寫入提息明細檔 //
-					if (cntTrans > this.commitCnt) {
-						cntTrans = 0;
-						this.batchTransaction.commit();
+				if ("0".equals(tDetail.getProcStsCode()) || "2".equals(tDetail.getProcStsCode())
+						|| "3".equals(tDetail.getProcStsCode())) {
+					if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
+						// 逐筆 call BaTxCom 計算並寫入提息明細檔 //
+						if (cntTrans > this.commitCnt) {
+							cntTrans = 0;
+							this.batchTransaction.commit();
+						}
+						cntTrans++;
+
+						// 更新整批入帳明細檔
+						batxDetailService.holdById(tDetail);
+
+						// 執行交易檢核 TxBatchCom.txCheck
+
+						// 02.銀行扣款 03.員工扣款 => 整批檢核時設定為 4.檢核正常，整批入帳時才進行檢核
+						if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
+							tDetail.setProcStsCode("4"); // 4.檢核正常
+						} else {
+							tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
+						}
+						try {
+							batxDetailService.update(tDetail);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007", "batxDetail " + tDetail + e.getErrorMsg());
+						}
+
 					}
-					cntTrans++;
-
-					// 更新整批入帳明細檔
-					batxDetailService.holdById(tDetail);
-
-					// 執行交易檢核 TxBatchCom.txCheck
-
-					// 02.銀行扣款 03.員工扣款 => 整批檢核時設定為 4.檢核正常，整批入帳時才進行檢核
-					if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
-						tDetail.setProcStsCode("4"); // 4.檢核正常
-					} else {
-						tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
-					}
-					try {
-						batxDetailService.update(tDetail);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007", "batxDetail " + tDetail + e.getErrorMsg());
-					}
-
 				}
 			}
 		}
@@ -128,7 +133,8 @@ public class L420ABatch extends TradeBuffer {
 
 		// end
 		this.batchTransaction.commit();
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4002", titaVo.getTlrNo(), iBatchNo + " 整批檢核, " + msg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4002", titaVo.getTlrNo(),
+				iBatchNo + " 整批檢核, " + msg, titaVo);
 
 		return null;
 
@@ -142,32 +148,44 @@ public class L420ABatch extends TradeBuffer {
 		int checkErrorCnt = 0; // 檢核錯誤 ,3.檢核錯誤
 		int checkOkCnt = 0; // 待檢核, 4.檢核正常
 		int doneCnt = 0; // 已入帳 5.人工入帳 6.批次入 7.虛擬轉暫收
-		int unfinishCnt = 0; // 未完 2.人工處理 3.檢核錯誤 4.檢核正常 7.虛擬轉暫收
+		//
+		int unfinishTotalCnt = 0; // 未完 2.人工處理 3.檢核錯誤 4.檢核正常 7.虛擬轉暫收
+		int checkErrorTotalCnt = 0; // 檢核錯誤 ,3.檢核錯誤
 
 //
-		for (BatxDetail tDetai : lBatxDetail) {
-			switch (tDetai.getProcStsCode()) {
+		for (BatxDetail tDetail : lBatxDetail) {
+			this.info("ReconCode = " + iReconCode + "," + tDetail.getReconCode());
+			switch (tDetail.getProcStsCode()) {
 			case "2":
-				manualCnt++;
-				unfinishCnt++;
+				if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
+					manualCnt++;
+				}
+				unfinishTotalCnt++;
 				break;
 			case "3":
-				checkErrorCnt++;
-				unfinishCnt++;
+				if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
+					checkErrorCnt++;
+				}
+				unfinishTotalCnt++;
+				checkErrorTotalCnt++;
 				break;
 			case "4":
-				checkOkCnt++;
-				unfinishCnt++;
+				if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
+					checkOkCnt++;
+				}
+				unfinishTotalCnt++;
 				break;
 			case "5":
-				doneCnt++;
-				break;
 			case "6":
-				doneCnt++;
+				if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
+					doneCnt++;
+				}
 				break;
 			case "7":
-				doneCnt++;
-				unfinishCnt++;
+				if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
+					doneCnt++;
+				}
+				unfinishTotalCnt++;
 				break;
 			default:
 				break;
@@ -183,15 +201,16 @@ public class L420ABatch extends TradeBuffer {
 			msg = msg + ", 需人工處理筆數 :" + manualCnt;
 
 		String batxExeCode = "2"; // 2.檢核正常
-		if (checkErrorCnt > 0)
+		if (checkErrorTotalCnt > 0) {
 			batxExeCode = "1"; // 1.檢核有誤
+		}
 
 		BatxHeadId tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(tHead.getAcDate());
 		tBatxHeadId.setBatchNo(tHead.getBatchNo());
 		BatxHead tBatxHead = batxHeadService.holdById(tBatxHeadId);
 		// BatxStsCode 整批作業狀態 0.正常 1.整批處理中
-		tBatxHead.setUnfinishCnt(unfinishCnt);
+		tBatxHead.setUnfinishCnt(unfinishTotalCnt);
 		tBatxHead.setBatxStsCode("0");
 		tBatxHead.setBatxExeCode(batxExeCode);
 		try {

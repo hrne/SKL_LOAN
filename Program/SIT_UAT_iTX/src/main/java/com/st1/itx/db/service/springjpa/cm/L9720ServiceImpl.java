@@ -1,14 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -17,11 +14,11 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.date.DateUtil;
 
 @Service
 @Repository
 public class L9720ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9720ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -33,10 +30,12 @@ public class L9720ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		return findAll(titaVo, 0);
 	}
+	
+	@Autowired
+	private DateUtil dUtil;
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo, int validTime) throws Exception {
-		logger.info("l9720.findAll ");
+		this.info("l9720.findAll ");
 
 		String sql = "SELECT M.\"CustNo\" AS \"戶號\"";
 		sql += "           ,M.\"FacmNo\" AS \"額度\"";
@@ -124,7 +123,7 @@ public class L9720ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                 AND PF.\"EmpNo\"  = M.\"BusinessOfficer\"";
 		sql += "     WHERE M.ROW_NUMBER = 1";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
@@ -132,21 +131,27 @@ public class L9720ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 
 		String EntDy = Integer.toString(titaVo.getEntDyI() + 19110000);
-		LocalDate validDatePivot = LocalDate.of(Integer.parseInt(EntDy.substring(0, 4)),
-				Integer.parseInt(EntDy.substring(4, 6)), Integer.parseInt(EntDy.substring(6)));
-		LocalDate validDateFirst = validDatePivot.minusMonths(10);
-		LocalDate validDateSecond = validDatePivot.minusMonths(22);
-		logger.info("validYearMonthFirst = " + Integer.toString(validDateFirst.getYear())
-				+ String.format("%02d", validDateFirst.getMonthValue()));
-		logger.info("validYearMonthSecond = " + Integer.toString(validDateSecond.getYear())
-				+ String.format("%02d", validDateSecond.getMonthValue()));
 		query.setParameter("makeDate", EntDy);
-		query.setParameter("validYearMonthFirst",
-				Integer.toString(validDateFirst.getYear()) + String.format("%02d", validDateFirst.getMonthValue()));
-		query.setParameter("validYearMonthSecond",
-				Integer.toString(validDateSecond.getYear()) + String.format("%02d", validDateSecond.getMonthValue()));
+		
+		// 10 個月前
+		
+		dUtil.init();
+		dUtil.setDate_1(EntDy);
+		dUtil.setMons(-10);
+		int minus10 = dUtil.getCalenderDay();
+		this.info("validYearMonthFirst = " + minus10);
+		query.setParameter("validYearMonthFirst", minus10);
+		
+		// 22 個月前
+		
+		dUtil.init();
+		dUtil.setDate_1(EntDy);
+		dUtil.setMons(-22);		
+		int minus22 = dUtil.getCalenderDay();
+		this.info("validYearMonthSecond = " + minus22);
+		query.setParameter("validYearMonthSecond", minus22);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

@@ -176,7 +176,12 @@ public class TxAmlCom extends TradeBuffer {
 	/**
 	 * 撥款匯款 Call By L3220 暫收款退還
 	 * @param titaVo TitaVo
-	 * @throws LogicException 
+	 * @throws LogicException
+	 */
+	/**
+	 * 
+	 * @param titaVo
+	 * @throws LogicException
 	 */
 	public void remitL3220(TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom.remit .....");
@@ -282,7 +287,7 @@ public class TxAmlCom extends TradeBuffer {
 	 * @param tAchAuthLog ACH授權記錄檔
 	 * @param titaVo      TitaVo
 	 * @return CheckAmlVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public CheckAmlVo authAch(AchAuthLog tAchAuthLog, TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom achAuth .....");
@@ -603,7 +608,7 @@ public class TxAmlCom extends TradeBuffer {
 	 * @param tBankRmtf 匯款轉帳檔
 	 * @param titaVo    TitaVo
 	 * @return TempVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public TempVo bankRmtf(TempVo tTempVo, BankRmtf tBankRmtf, TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom bankRmtf .....");

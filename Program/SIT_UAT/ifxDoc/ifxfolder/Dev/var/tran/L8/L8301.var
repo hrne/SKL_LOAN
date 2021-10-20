@@ -58,7 +58,6 @@ E(0,0)
 #FdTranKey=X,2,L
 #FdCustId=X,2,L
 #FdSubmitKey=X,2,L
-T(2,@FdSubmitKey,*)
 #FdRcDate=X,2,L
 #FdRbDate=X,2,L
 #FdApplyType=X,2,L
@@ -79,14 +78,6 @@ T(2,@FdSubmitKey,*)
 #VIEW_SYSDATE=X,8,S
 D(7,2,#SYSDATE,0,0)
 E(0,1)ASGN(AGAIN$)
-![預設值]
-![民國年]
-! #ChainRcDate8=D,8,S
-! T(2,@ChainRcDate,#VIEW_SYSDATE)
-
-! #ChainRcDate7=D,7,S
-! T(1,#ChainRcDate8,2,7)
-
 !---------- AP TEXT AREA Variables ----------
 
 #CDDEF0001=x,20,S
@@ -128,31 +119,27 @@ T(1,@TranKey,#NTXBUF,2,1)
 C(5,#TranKey_Tmp,1,$,S)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@RcDate,1)T(F,@ApplyType,1)T(F,@RefBankId,1)
+T(F,@RcDate,1)T(F,@ApplyType,1)T(F,@RefBankId,1)T(F,@SubmitKey,1)T(F,@TranKey,1)
 T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
 T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdApplyType,*)
 T(2,@FdRefBankId,*)
-
-
+T(2,@FdSubmitKey,*)
+T(2,@FdTranKey,*)
+T(3,@TranKeyHelp,A:新增;R:請求提供債權人清冊))
 ! 異動進入
 #Deal_Update=X,1,S
 C(5,#TranKey_Tmp,2,$,S)
 K(MODIFYBUTTON,異動)
 T(1,@Ukey,#NTXBUF,3,32)
-T(F,@TranKey,1)
 T(F,@ApplyType,1)T(F,@RefBankId,1)
 T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
 T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
-T(1,@Ukey,#NTXBUF,3,32)
 T(2,@FdApplyType,*)
 T(2,@FdRefBankId,*)
-T(2,@FdTranKey,*)
-T(3,@TranKeyHelp,C:異動;R:請求提供債權人清冊))
-
-
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ! 查詢進入
 #Deal_Search=X,1,S
 C(5,#TranKey_Tmp,5,$,S)
@@ -187,7 +174,6 @@ T(2,@RimUkey,#Ukey)
 RESET_RIM(#RimL8r11,L8R11)
 S(L8R11,1,#RimUkey)
 R(1,L8R11)
-T(2,@TranKey,#L8r11TranKey)
 T(2,@CustId,#L8r11CustId)
 T(2,@SubmitKey,#L8r11SubmitKey)
 E(0,@RcDate,#L8r11RcDate)
@@ -216,22 +202,26 @@ T(2,@RefBankIdX,#L8r01JcicBankName)
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
-C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,1,$,s)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
-C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@ApplyType,1)T(F,@RefBankId,1)
+C(5,#TranKey,A,K(MODIFYBUTTON,新增)T(F,@ApplyType,1)T(F,@RefBankId,1)T(F,@RcDate,1)
 T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)
 T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
-T(2,@FdApplyType,*)T(2,@FdRefBankId,*),
-C(5,#TranKey,R,K(MODIFYBUTTON,請求提供債權人清冊)T(F,@ApplyType,0)T(F,@RefBankId,0)
+T(2,@FdApplyType,*)T(2,@FdRefBankId,*)T(2,@FdRcDate,*)T(2,@FdRefBankId,*),
+C(5,#TranKey,R,K(MODIFYBUTTON,請求提供債權人清冊)T(F,@ApplyType,0)T(F,@RefBankId,0)T(F,@RcDate,0)
 T(F,@NotBankId1,0)T(F,@NotBankId2,0)T(F,@NotBankId3,0)
 T(F,@NotBankId4,0)T(F,@NotBankId5,0)T(F,@NotBankId6,0)
-T(2,@FdApplyType, )T(2,@FdRefBankId, ),$))
+T(2,@FdApplyType, )T(2,@FdRefBankId, )
+T(2,@FdRcDate, )T(2,@FdRefBankId, )
+,$))
 
 #TranKeyX=X,20,L
-C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,1,$,s)
+C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 T(H,#TranKey,#TranKeyHelp)
@@ -252,8 +242,17 @@ T(2,@CustIdX,#L8R57CustName)
 
 ![報送單位代號]
 #SubmitKey=X,3,I
-#SubmitKeyX=X,80,L
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@V(7)
 
+#SubmitKeyX=X,80,L
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 
 ![協商申請日]
@@ -261,14 +260,17 @@ T(2,@CustIdX,#L8R57CustName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
+C(5,#TranKey,R,S,$)
 D(8)
 @V(7)A(DATE,0,#RcDate)
 
 #RcDateA25=D,8,S
+C(5,#TranKey,R,S,$)
 D(7,2,#RcDate,0,25)
 
 ![止息基準日]
 #RbDate=D,7,L
+C(5,#TranKey,R,S,$)
 T(1,#RcDateA25,2,7)
 
 
@@ -276,17 +278,18 @@ T(1,#RcDateA25,2,7)
 #ApplyType=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey,R,T(2,@ApplyType,#L8r11ApplyType),$)
-C(5,#TranKey,R,s,$)
+C(5,#TranKey,R,S,$)
 HELP(#ApplyTypeDscp)
 @V(H,#ApplyTypeDscp)
 
 #ApplyTypeX=X,20,L
+C(5,#TranKey,R,S,$)
 T(H,#ApplyType,#ApplyTypeDscp)
 
 #DealRef=X,1,S
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,R,S,$)
 C(5,#ApplyType,A,T(2,@FdRefBankId, )T(F,@RefBankId,0),T(2,@FdRefBankId,*)T(F,@RefBankId,1))
 
 
@@ -294,12 +297,12 @@ C(5,#ApplyType,A,T(2,@FdRefBankId, )T(F,@RefBankId,0),T(2,@FdRefBankId,*)T(F,@Re
 #RefBankId=x,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey,R,T(2,@RefBankId,#L8r11RefBankId),$)
-C(5,#TranKey,R,s,$)
+C(5,#TranKey,R,S,$)
 IF(#ApplyType=="A",S,$)
 @V(7)V(NL)
 
 #RefBankIdRim=X,1,S
+C(5,#TranKey,R,S,$)
 C(5,#ApplyType,A,S,$)
 T(2,@RimJcicBankCode,#RefBankId)
 S(L8R01,1,#RimJcicBankCode)
@@ -307,6 +310,7 @@ R(1,L8R01)
 T(2,@RefBankIdX,#L8r01JcicBankName)
 
 #RefBankIdX=X,80,L
+C(5,#TranKey,R,S,$)
 IF(#ApplyType=="A",S,$)
 
 #NotBankId0=x,3,L
@@ -319,8 +323,7 @@ T(2,1)
 #NotBankId{i}=x,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-C(5,#TranKey,R,T(2,@RefBankId,#L8r11RefBankId),$)
-C(5,#TranKey,R,s,$)
+C(5,#TranKey,R,S,$)
 IF(#NotBankId{j}!="",$,s)
 @V(NL)
 

@@ -628,7 +628,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "ACCL01;Y;Y;-;-;-;L6985;L6985;L618D;Y;應收利息提存入帳";
 			break;
 		case "ACCL02":
-			settingValue = "ACCL02;Y;Y;-;-;-;L6985;L6985;L618D;Y;未付火險費提存入帳";
+			settingValue = "ACCL02;Y;Y;-;-;-;L4961;L6985;L618D;Y;未付火險費提存入帳";
 			break;
 		case "ACCL03":
 			settingValue = "ACCL03;Y;Y;-;-;-;L6985;L6985;L618D;Y;放款承諾提存入帳";
@@ -663,13 +663,13 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "L4604 ;Y;C;-;-;-;L698A;L4603;L4603;Y;火險保費未繳轉借支";
 			break;
 		case "L4702":
-			settingValue = "L4702 ;Y;C;-;-;-;L698A;L4702;L4702;-;繳息通知單產生作業";
+			settingValue = "L4702 ;Y;C;Y;-;-;L698A;L4702;L4702;-;繳息通知單產生作業";
 			break;
 		case "L4703":
-			settingValue = "L4703 ;Y;C;-;-;-;L698A;L4703;L4703;-;滯繳通知單產生作業";
+			settingValue = "L4703 ;Y;C;Y;-;-;L698A;L4703;L4703;-;滯繳通知單產生作業";
 			break;
 		case "L4454":
-			settingValue = "L4454 ;Y;C;-;-;-;L698A;L4454;L4454;-;銀扣失敗通知產生作業";
+			settingValue = "L4454 ;Y;C;Y;-;-;L698A;L4454;L4454;-;銀扣失敗通知產生作業";
 			break;
 		case "L9710":
 			settingValue = "L9710 ;-;C;-;-;-;L698A;L9710;L9710;-;產生寬限到期明細表";

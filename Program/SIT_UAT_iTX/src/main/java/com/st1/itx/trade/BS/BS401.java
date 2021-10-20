@@ -62,6 +62,10 @@ public class BS401 extends TradeBuffer {
 
 	private int commitCnt = 1;
 	private int ProcessCnt = 0;
+	private int iFunctionCode;
+	private int iAcDate;
+	private String iBatchNo;
+	private String iReconCode;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -71,11 +75,12 @@ public class BS401 extends TradeBuffer {
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
 		// 處理代碼 0:入帳 1:刪除 2:訂正
-		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
+		iFunctionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 
 		// 會計日期、批號
-		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
-		String iBatchNo = titaVo.getParam("BatchNo");
+		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		iBatchNo = titaVo.getParam("BatchNo");
+		iReconCode = titaVo.getParam("ReconCode").trim();
 
 		// hold 整批入帳總數檔
 		BatxHeadId tBatxHeadId = new BatxHeadId();
@@ -99,35 +104,48 @@ public class BS401 extends TradeBuffer {
 		List<BatxDetail> lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 
 		// 檢查明細狀態
-		checkDetail(functionCode, lBatxDetail, titaVo);
+		checkDetail(iFunctionCode, lBatxDetail, titaVo);
 		this.batchTransaction.commitEnd();
 		this.batchTransaction.init();
 		boolean isUpdate = false;
-		// functionCode 處理代碼 0:入帳 1:刪除 2:訂正 4.刪除回復
-		// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.虛擬轉暫收
+		// functionCode 處理代碼 0:入帳 1:刪除 4.刪除回復
+		// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.需轉暫收
 		// 訂正使用L420C
+		//
+		TempVo tTempVo = new TempVo();
 		for (BatxDetail tDetail : lBatxDetail) {
+			if (!"".equals(iReconCode) && !tDetail.getReconCode().equals(iReconCode)) {
+				continue;
+			}
 			if (isUpdate && ProcessCnt % commitCnt == 0) {
 				this.batchTransaction.commitEnd();
 				this.batchTransaction.init();
 				isUpdate = false;
 			}
-			// 0:入帳
-			if (functionCode == 0) {
+			switch (iFunctionCode) {
+
+			case 0: // 0:入帳
 				// 02.銀行扣款 03.員工扣款 => 1.整批檢核時設定檢核正常，整批入帳時才進行檢核 2.人工入帳則再檢核一次
+				boolean isCheck = false;
+				if ("3".equals(tDetail.getProcStsCode())) {
+					isCheck = true;
+				}
 				if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
 					if ("4".equals(tDetail.getProcStsCode()) || "2".equals(tDetail.getProcStsCode())) {
-						tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
-						if (!"4".equals(tDetail.getProcStsCode())) {
-							ProcessCnt++;
-							try {
-								batxDetailService.update(tDetail);
-							} catch (DBException e) {
-								throw new LogicException(titaVo, "E0007",
-										"BS401 update batxDetail " + tDetail + e.getErrorMsg());
-							}
-							isUpdate = true;
+						isCheck = true;
+					}
+				}
+				if (isCheck) {
+					tDetail = txBatchCom.txCheck(0, tDetail, titaVo);
+					if (!"4".equals(tDetail.getProcStsCode())) {
+						ProcessCnt++;
+						try {
+							batxDetailService.update(tDetail);
+						} catch (DBException e) {
+							throw new LogicException(titaVo, "E0007",
+									"BS401 update batxDetail " + tDetail + e.getErrorMsg());
 						}
+						isUpdate = true;
 					}
 				}
 				if ("4".equals(tDetail.getProcStsCode())) {
@@ -135,20 +153,33 @@ public class BS401 extends TradeBuffer {
 					excuteTx(0, tDetail, titaVo); // 正常交易
 					isUpdate = true;
 				}
-			}
-			// 4.刪除回復  3.檢核錯誤 4.檢核正常 ==> 0.未檢核
-			if (functionCode == 4) {
-				if ("3".equals(tDetail.getProcStsCode()) || "4".equals(tDetail.getProcStsCode())) {
-					ProcessCnt++;
-					tDetail.setProcStsCode("0");
-					try {
-						batxDetailService.update(tDetail);
-					} catch (DBException e) {
-						throw new LogicException(titaVo, "E0007",
-								"BS401 update batxDetail " + tDetail + e.getErrorMsg());
-					}
-					isUpdate = true;
+				break;
+
+			case 1: // 1:刪除
+				ProcessCnt++;
+				tTempVo = tTempVo.getVo(tDetail.getProcNote());
+				tTempVo.putParam("StsCode", tDetail.getProcStsCode());
+				tDetail.setProcNote(tTempVo.getJsonString());
+				tDetail.setProcStsCode("D");
+				try {
+					batxDetailService.update(tDetail);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "BS401 update batxDetail " + tDetail + e.getErrorMsg());
 				}
+				isUpdate = true;
+				break;
+
+			case 4: // 4.刪除回復
+				ProcessCnt++;
+				tTempVo = tTempVo.getVo(tDetail.getProcNote());
+				tDetail.setProcStsCode(tTempVo.getParam("StsCode"));
+				try {
+					batxDetailService.update(tDetail);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "BS401 update batxDetail " + tDetail + e.getErrorMsg());
+				}
+				isUpdate = true;
+				break;
 			}
 
 		}
@@ -157,11 +188,11 @@ public class BS401 extends TradeBuffer {
 		this.batchTransaction.commitEnd();
 		this.batchTransaction.init();
 
-		String msg = updateHead(functionCode, iAcDate, iBatchNo, titaVo);
+		String msg = updateHead(titaVo);
 		this.batchTransaction.commit();
 
 		// end
-		if (functionCode == 0) { // 0:入帳
+		if (iFunctionCode == 0) { // 0:入帳
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4002", titaVo.getTlrNo(),
 					iBatchNo + " 整批入帳, " + msg, titaVo);
 		}
@@ -169,25 +200,27 @@ public class BS401 extends TradeBuffer {
 	}
 
 	/* 更新作業狀態 */
-	private String updateHead(int functionCode, int acDate, String batchNo, TitaVo titaVo) throws LogicException {
+	private String updateHead(TitaVo titaVo) throws LogicException {
 
 		// findAll 整批入帳明細檔
-		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(acDate, batchNo, this.index, Integer.MAX_VALUE);
+		Slice<BatxDetail> slBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index,
+				Integer.MAX_VALUE);
 		List<BatxDetail> lBatxDetail = slBatxDetail == null ? null : slBatxDetail.getContent();
 // ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳  7.虛擬轉暫收
 
-		int toDoCnt = 0; // 未完需處理
 		int doneCnt = 0; // 已入帳
 		int manualCnt = 0; // 需人工處理
 		int unCheckCnt = 0; // 待檢核
 		int unDoCnt = 0; // 未處理
 		int checkErrorCnt = 0; // 檢核錯誤
-		int tempCnt = 0; // 虛擬轉暫收
-		int loantempCnt = 0; // 放款還款轉暫收
+		int toDoTotalCnt = 0; // 未完需處理
+		int doneTotalCnt = 0; // 已入帳
+		int unCheckTotalCnt = 0; // 待檢核
+		int checkErrorTotalCnt = 0; // 檢核錯誤
+		int tempCnt = 0; // 需轉暫收
 		boolean bankDeductFlag = false; // 銀扣交易失敗記號 0:成功 1:有一筆失敗以上
 		boolean bankRmtFlag = false; // 匯款轉帳
-		boolean loantempFlag = false; // 放款還款轉暫收
-		TempVo tTempVo = new TempVo();
+
 		for (BatxDetail t : lBatxDetail) {
 			if (t.getRepayCode() == 2) {
 				bankDeductFlag = true;
@@ -195,90 +228,98 @@ public class BS401 extends TradeBuffer {
 			if (t.getRepayCode() == 1) {
 				bankRmtFlag = true;
 			}
-
-			tTempVo = tTempVo.getVo(t.getProcNote());
-			//
-			if (t.getRepayType() >= 1 && t.getRepayType() <= 3 && "L3210".equals(tTempVo.get("Txcd"))) {
-				loantempFlag = true;
-			} else {
-				loantempFlag = false;
-			}
-
 			switch (t.getProcStsCode()) {
 			case "0": // 待檢核
-				toDoCnt++;
-				unCheckCnt++;
+				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
+					unCheckCnt++;
+				}
+				toDoTotalCnt++;
+				unCheckTotalCnt++;
 				break;
 			case "2":
-				toDoCnt++;
-				manualCnt++;
+				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
+					manualCnt++;
+				}
+				toDoTotalCnt++;
 				break;
 			case "3": // 錯誤
-				toDoCnt++;
-				checkErrorCnt++;
+				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
+					checkErrorCnt++;
+				}
+				toDoTotalCnt++;
+				checkErrorTotalCnt++;
 				break;
 			case "4": // 未處理
-				toDoCnt++;
-				unDoCnt++;
+				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
+					unDoCnt++;
+				}
+				toDoTotalCnt++;
 				break;
 			case "5":
-				doneCnt++;
-				if (loantempFlag)
-					loantempCnt++;
+				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
+					doneCnt++;
+				}
+				doneTotalCnt++;
 				break;
 			case "6":
-				doneCnt++;
-				if (loantempFlag)
-					loantempCnt++;
+				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
+					doneCnt++;
+				}
+				doneTotalCnt++;
 				break;
 			case "7":
-				doneCnt++;
-				toDoCnt++;
-				tempCnt++;
-				if (loantempFlag)
-					loantempCnt++;
+				if ("".equals(iReconCode) || t.getReconCode().equals(iReconCode)) {
+					doneCnt++;
+					tempCnt++;
+				}
+				doneTotalCnt++;
+				toDoTotalCnt++;
 				break;
 			}
 		}
 // BatxExeCode 作業狀態 0.待檢核 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除
 // 處理代碼 0:入帳 1:刪除 2:訂正 4.刪除回復
 		String batxExeCode = null;
-		switch (functionCode) {
+		String msg = "已入帳筆數 :" + doneCnt;
+		if (unCheckCnt > 0) {
+			msg += ", 待檢核筆數 :" + unCheckCnt;
+		}
+		if (checkErrorCnt > 0) {
+			msg += ", 錯誤筆數 :" + checkErrorCnt;
+		}
+		if (manualCnt > 0) {
+			msg += ", 需人工處理筆數 :" + manualCnt;
+		}
+		if (unDoCnt > 0) {
+			msg += ", 未處理筆數 :" + unDoCnt;
+		}
+		if (tempCnt > 0) {
+			msg += ", 待轉暫收筆數 :" + tempCnt;
+		}
+		//
+		switch (iFunctionCode) {
 		case 1:
-			if (doneCnt > 0)
+			if (doneTotalCnt > 0)
 				throw new LogicException("E0010", " 已入帳筆數：" + doneCnt++); // E0010 功能選擇錯誤
 			else
 				batxExeCode = "8";
 			break;
 		default:
-			if (checkErrorCnt > 0)
+			if (checkErrorTotalCnt > 0)
 				batxExeCode = "1";
-			else if (unCheckCnt > 0)
+			else if (unCheckTotalCnt > 0)
 				batxExeCode = "0";
-			else if (toDoCnt > 0)
+			else if (toDoTotalCnt > 0)
 				batxExeCode = "3";
 			else
 				batxExeCode = "4";
 		}
-		this.info("BS401 updateHead batxExeCode = " + batxExeCode + ", unCheckCnt=" + unCheckCnt + ", checkErrorCnt="
-				+ checkErrorCnt + ", toDoCnt=" + toDoCnt + ", doneCnt=" + doneCnt);
-		String msg = "已入帳筆數 :" + doneCnt;
-		if (unCheckCnt > 0)
-			msg = msg + ", 待檢核筆數 :" + unCheckCnt;
-		if (checkErrorCnt > 0)
-			msg = msg + ", 錯誤筆數 :" + checkErrorCnt;
-		if (manualCnt > 0)
-			msg = msg + ", 需人工處理筆數 :" + manualCnt;
-		if (unDoCnt > 0)
-			msg = msg + ", 未處理筆數 :" + unDoCnt;
-		if (tempCnt > 0)
-			msg = msg + ", 虛擬轉暫收筆數 :" + tempCnt;
-		if (loantempCnt > 0)
-			msg = msg + "; 放款還款轉暫收筆數 :" + loantempCnt;
-
+		this.info("BS401 updateHead batxExeCode = " + batxExeCode + ", unCheckTotalCnt=" + unCheckTotalCnt
+				+ ", checkErrorTotalCnt=" + checkErrorTotalCnt + ", toDoTotalCnt=" + toDoTotalCnt + ", doneTotalCnt="
+				+ doneTotalCnt);
 		BatxHeadId tBatxHeadId = new BatxHeadId();
-		tBatxHeadId.setAcDate(acDate);
-		tBatxHeadId.setBatchNo(batchNo);
+		tBatxHeadId.setAcDate(iAcDate);
+		tBatxHeadId.setBatchNo(iBatchNo);
 		BatxHead tBatxHead = batxHeadService.holdById(tBatxHeadId);
 		if (tBatxHead == null)
 			throw new LogicException("E0014", tBatxHeadId + " hold not exist"); // E0014 檔案錯誤

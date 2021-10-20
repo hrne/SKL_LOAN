@@ -29,7 +29,7 @@ public class BatxDetail implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1844054636253293318L;
+	private static final long serialVersionUID = -8150447601161120685L;
 
 @EmbeddedId
   private BatxDetailId batxDetailId;
@@ -56,6 +56,10 @@ public class BatxDetail implements Serializable {
   @Column(name = "`FileName`", length = 50)
   private String fileName;
 
+  // 檔案序號
+  @Column(name = "`RecordSeq`")
+  private int recordSeq = 0;
+
   // 入帳日期
   @Column(name = "`EntryDate`")
   private int entryDate = 0;
@@ -79,7 +83,7 @@ public class BatxDetail implements Serializable {
   private int repayType = 0;
 
   // 對帳類別
-  /* CdCode:ReconCodeP01銀行存款－郵局P02銀行存款－新光P03銀行存款－新光匯款轉帳P04銀行存款－台新TEM員工扣薪15/非15???TCK支票 */
+  /* CdCode:ReconCodeP01銀行存款－郵局P02銀行存款－新光A1~A7 (P03銀行存款－新光匯款轉帳)P04銀行存款－台新TEM員工扣薪15/非15???TCK支票 */
   @Column(name = "`ReconCode`", length = 3)
   private String reconCode;
 
@@ -106,7 +110,7 @@ public class BatxDetail implements Serializable {
   private BigDecimal disacctAmt = new BigDecimal("0");
 
   // 處理狀態
-  /* CdCode:ProcStsCode0.未檢核1.不處理2.人工處理3.檢核錯誤4.檢核正常5.人工入帳6.批次入帳7.虛擬轉暫收 */
+  /* CdCode:ProcStsCode0.未檢核1.不處理2.人工處理3.檢核錯誤4.檢核正常5.單筆入帳6.批次入帳7.待轉暫收 */
   @Column(name = "`ProcStsCode`", length = 1)
   private String procStsCode;
 
@@ -285,6 +289,25 @@ public class BatxDetail implements Serializable {
   }
 
 /**
+	* 檔案序號<br>
+	* 
+	* @return Integer
+	*/
+  public int getRecordSeq() {
+    return this.recordSeq;
+  }
+
+/**
+	* 檔案序號<br>
+	* 
+  *
+  * @param recordSeq 檔案序號
+	*/
+  public void setRecordSeq(int recordSeq) {
+    this.recordSeq = recordSeq;
+  }
+
+/**
 	* 入帳日期<br>
 	* 
 	* @return Integer
@@ -402,7 +425,7 @@ public class BatxDetail implements Serializable {
 	* CdCode:ReconCode
 P01銀行存款－郵局
 P02銀行存款－新光
-P03銀行存款－新光匯款轉帳
+A1~A7 (P03銀行存款－新光匯款轉帳)
 P04銀行存款－台新
 TEM員工扣薪15/非15???
 TCK支票
@@ -417,7 +440,7 @@ TCK支票
 	* CdCode:ReconCode
 P01銀行存款－郵局
 P02銀行存款－新光
-P03銀行存款－新光匯款轉帳
+A1~A7 (P03銀行存款－新光匯款轉帳)
 P04銀行存款－台新
 TEM員工扣薪15/非15???
 TCK支票
@@ -533,9 +556,9 @@ L4210 其他來源建檔
 2.人工處理
 3.檢核錯誤
 4.檢核正常
-5.人工入帳
+5.單筆入帳
 6.批次入帳
-7.虛擬轉暫收
+7.待轉暫收
 	* @return String
 	*/
   public String getProcStsCode() {
@@ -550,9 +573,9 @@ L4210 其他來源建檔
 2.人工處理
 3.檢核錯誤
 4.檢核正常
-5.人工入帳
+5.單筆入帳
 6.批次入帳
-7.虛擬轉暫收
+7.待轉暫收
   *
   * @param procStsCode 處理狀態
 	*/
@@ -782,10 +805,10 @@ L4210 其他來源建檔
 
   @Override
   public String toString() {
-    return "BatxDetail [batxDetailId=" + batxDetailId + ", repayCode=" + repayCode + ", fileName=" + fileName + ", entryDate=" + entryDate
-           + ", custNo=" + custNo + ", facmNo=" + facmNo + ", rvNo=" + rvNo + ", repayType=" + repayType + ", reconCode=" + reconCode + ", repayAcCode=" + repayAcCode
-           + ", acquiredAmt=" + acquiredAmt + ", repayAmt=" + repayAmt + ", acctAmt=" + acctAmt + ", disacctAmt=" + disacctAmt + ", procStsCode=" + procStsCode + ", procCode=" + procCode
-           + ", procNote=" + procNote + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", mediaDate=" + mediaDate + ", mediaKind=" + mediaKind + ", mediaSeq=" + mediaSeq
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "BatxDetail [batxDetailId=" + batxDetailId + ", repayCode=" + repayCode + ", fileName=" + fileName + ", recordSeq=" + recordSeq
+           + ", entryDate=" + entryDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", rvNo=" + rvNo + ", repayType=" + repayType + ", reconCode=" + reconCode
+           + ", repayAcCode=" + repayAcCode + ", acquiredAmt=" + acquiredAmt + ", repayAmt=" + repayAmt + ", acctAmt=" + acctAmt + ", disacctAmt=" + disacctAmt + ", procStsCode=" + procStsCode
+           + ", procCode=" + procCode + ", procNote=" + procNote + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", mediaDate=" + mediaDate + ", mediaKind=" + mediaKind
+           + ", mediaSeq=" + mediaSeq + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

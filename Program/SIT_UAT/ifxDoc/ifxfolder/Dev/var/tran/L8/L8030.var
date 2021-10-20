@@ -320,7 +320,8 @@ IF(#OOStatusFg==1,T(2,2+C+#OOUkey),$)
 IF(#OOStatusFg==0,BIND(grid,{ cmd=CHAIN; ntxcd=#OOChainTxCd; text=新增; ntxbuf=#OOBUF2}),$)
 IF(#OOStatusFg==1,BIND(grid,{ cmd=CHAIN; ntxcd=#OOChainTxCd; text=異動; ntxbuf=#OOBUF2}),$)
 IF(#OOStatusFg==2,BIND(grid,cancel),$)
-
+C(5,#OOTranKey,R,BIND(grid,cancel),$)
+C(5,#OOTranKey,X,BIND(grid,cancel),$)
 #OOBTNX=X,10,S
 IF(#OOStatusFg==0,T(2,新增),T(2,異動))
 

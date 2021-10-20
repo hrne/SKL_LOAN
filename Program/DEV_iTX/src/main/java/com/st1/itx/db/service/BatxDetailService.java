@@ -172,7 +172,7 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL492AKEq(int repayType_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = 
+   * AcDate = ,AND BatchNo = 
    *
    * @param acDate_0 acDate_0
    * @param batchNo_1 batchNo_1
@@ -184,7 +184,7 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4002AEq(int acDate_0, String batchNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = , AND TitaTlrNo = 
+   * AcDate = ,AND BatchNo = ,AND TitaTlrNo = 
    *
    * @param acDate_0 acDate_0
    * @param batchNo_1 batchNo_1
@@ -197,7 +197,7 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4002BEq(int acDate_0, String batchNo_1, String titaTlrNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate &gt;= , AND AcDate &lt;= , AND CustNo &gt;= , AND CustNo &lt;= , AND RepayCode &gt;= , AND RepayCode &lt;= , AND ProcStsCode ^i 
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND CustNo &gt;= ,AND CustNo &lt;= ,AND RepayCode &gt;= ,AND RepayCode &lt;= ,AND ProcStsCode ^i 
    *
    * @param acDate_0 acDate_0
    * @param acDate_1 acDate_1
@@ -214,7 +214,7 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4925AEq(int acDate_0, int acDate_1, int custNo_2, int custNo_3, int repayCode_4, int repayCode_5, List<String> procStsCode_6, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = 
+   * AcDate = ,AND BatchNo = 
    *
    * @param acDate_0 acDate_0
    * @param batchNo_1 batchNo_1
@@ -226,20 +226,20 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4200AEq(int acDate_0, String batchNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = , AND CustNo = , AND RepayAmt = , AND ProcStsCode ^i
+   * AcDate = ,AND FileName = ,AND CustNo = ,AND RepayAmt = ,AND ProcStsCode ^i
    *
    * @param acDate_0 acDate_0
-   * @param batchNo_1 batchNo_1
+   * @param fileName_1 fileName_1
    * @param custNo_2 custNo_2
    * @param repayAmt_3 repayAmt_3
    * @param procStsCode_4 procStsCode_4
    * @param titaVo Variable-Length Argument
    * @return Slice BatxDetail BatxDetail of List
    */
-  public BatxDetail findL4200BFirst(int acDate_0, String batchNo_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4, TitaVo... titaVo);
+  public BatxDetail findL4200BFirst(int acDate_0, String fileName_1, int custNo_2, BigDecimal repayAmt_3, List<String> procStsCode_4, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = , AND CustNo = , AND ProcStsCode ^i
+   * AcDate = ,AND BatchNo = ,AND CustNo = ,AND ProcStsCode ^i
    *
    * @param acDate_0 acDate_0
    * @param batchNo_1 batchNo_1
@@ -253,7 +253,7 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4930CAEq(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = , AND CustNo = , AND ProcStsCode ^i
+   * AcDate = ,AND BatchNo = ,AND CustNo = ,AND ProcStsCode ^i
    *
    * @param acDate_0 acDate_0
    * @param batchNo_1 batchNo_1
@@ -267,7 +267,7 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4930CHEq(int acDate_0, String batchNo_1, int custNo_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = , AND ProcStsCode ^i
+   * AcDate = ,AND BatchNo = ,AND ProcStsCode ^i
    *
    * @param acDate_0 acDate_0
    * @param batchNo_1 batchNo_1
@@ -280,7 +280,7 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4930BAEq(int acDate_0, String batchNo_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND BatchNo = , AND ProcStsCode ^i
+   * AcDate = ,AND BatchNo = ,AND ProcStsCode ^i
    *
    * @param acDate_0 acDate_0
    * @param batchNo_1 batchNo_1
@@ -293,7 +293,35 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4930BHEq(int acDate_0, String batchNo_1, List<String> procStsCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate &gt;= , AND AcDate &lt;= , AND RepayCode = 
+   * AcDate = ,AND BatchNo = ,AND ReconCode = ,AND ProcStsCode ^i
+   *
+   * @param acDate_0 acDate_0
+   * @param batchNo_1 batchNo_1
+   * @param reconCode_2 reconCode_2
+   * @param procStsCode_3 procStsCode_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxDetail BatxDetail of List
+   */
+  public Slice<BatxDetail> findL4930RAEq(int acDate_0, String batchNo_1, String reconCode_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate = ,AND BatchNo = ,AND ReconCode = ,AND ProcStsCode ^i
+   *
+   * @param acDate_0 acDate_0
+   * @param batchNo_1 batchNo_1
+   * @param reconCode_2 reconCode_2
+   * @param procStsCode_3 procStsCode_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxDetail BatxDetail of List
+   */
+  public Slice<BatxDetail> findL4930RHEq(int acDate_0, String batchNo_1, String reconCode_2, List<String> procStsCode_3, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * AcDate &gt;= ,AND AcDate &lt;= ,AND RepayCode = 
    *
    * @param acDate_0 acDate_0
    * @param acDate_1 acDate_1
@@ -306,7 +334,7 @@ public interface BatxDetailService {
   public Slice<BatxDetail> findL4454AEq(int acDate_0, int acDate_1, int repayCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate = , AND FileName = 
+   * AcDate = ,AND FileName = 
    *
    * @param acDate_0 acDate_0
    * @param fileName_1 fileName_1

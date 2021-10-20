@@ -172,7 +172,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTxAmt     入帳金額
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public ArrayList<BaTxVo> settingUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType,
 			BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
@@ -294,7 +294,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTxAmt      入帳金額
 	 * @param titaVo      TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public ArrayList<BaTxVo> settleUnPaid(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
 			int iRepayCode, int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
@@ -388,7 +388,7 @@ public class BaTxCom extends TradeBuffer {
 		// 放款回收時 5:已到期應繳本息
 		// 回收金額時排序,依應繳日由小到大、計息順序(利率由大到小)、額度由小到大
 		if (iRepayType == 1) {
-			Collections.sort(baTxList); // 排序優先度(由小到大) payIntDate 應繳日 custNo 借款人戶號 facmNo 額度編號 bormNo 撥款序號
+			Collections.sort(baTxList); // 排序優先度(由小到大) payIntDate 應繳日
 			settleByPayintDate();
 			// 無可回收計算全部欠繳
 			if (this.repayIntDate == 0) {
@@ -469,7 +469,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTerms     期數
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public ArrayList<BaTxVo> termsPay(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iTerms, TitaVo titaVo)
 			throws LogicException {
@@ -507,7 +507,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iBormNo    撥款
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public ArrayList<BaTxVo> cashFlow(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo)
 			throws LogicException {

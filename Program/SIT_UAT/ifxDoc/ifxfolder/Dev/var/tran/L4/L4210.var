@@ -70,8 +70,8 @@ CALL(#HelpProc)
 T(2,@RepayTypeHelp,#HelpDesc1)
 
 !來源,本交易限05,06,09,11
-#RepayCodeHelp=x,50,S
-T(3,05:法院扣薪;06:理賠金;09:其他;11:匯款轉帳預先作業)
+#RepayCodeHelp=x,60,S
+T(3,05:法院扣薪;06:理賠金;09:其他;11大額匯款手工增入入帳)
 
 !作業項目
 #FunctionHelp=x,40,S
