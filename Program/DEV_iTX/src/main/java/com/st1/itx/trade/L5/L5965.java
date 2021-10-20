@@ -63,7 +63,7 @@ public class L5965 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500;
+		this.limit = 40;
 
 		Slice<CollRemind> tCollRemind = iCollRemindService.findCl(iCaseCode, iCustNo, iFacmNo, iCondCodeFlag, this.index, this.limit, titaVo);
 		this.info("tcollremind=" + tCollRemind);

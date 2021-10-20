@@ -26,10 +26,10 @@ public interface MlaundryRecordRepositoryHist extends JpaRepository<MlaundryReco
   public Slice<MlaundryRecord> findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(int recordDate_0, int recordDate_1, int actualRepayDate_2, int actualRepayDate_3, Pageable pageable);
 
   // RecordDate >= ,AND RecordDate <= 
-  public Slice<MlaundryRecord> findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqual(int recordDate_0, int recordDate_1, Pageable pageable);
+  public Slice<MlaundryRecord> findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(int recordDate_0, int recordDate_1, Pageable pageable);
 
   // ActualRepayDate >= ,AND ActualRepayDate <=
-  public Slice<MlaundryRecord> findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqual(int actualRepayDate_0, int actualRepayDate_1, Pageable pageable);
+  public Slice<MlaundryRecord> findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(int actualRepayDate_0, int actualRepayDate_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

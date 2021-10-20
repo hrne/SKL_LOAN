@@ -29,7 +29,7 @@ public class MlaundryRecord implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 250198364989177373L;
+	private static final long serialVersionUID = 3081477238905709327L;
 
 @EmbeddedId
   private MlaundryRecordId mlaundryRecordId;
@@ -58,9 +58,14 @@ public class MlaundryRecord implements Serializable {
   @Column(name = "`ActualRepayDate`")
   private int actualRepayDate = 0;
 
-  // 還款金額
+  // 預定還款金額
   @Column(name = "`RepayAmt`")
   private BigDecimal repayAmt = new BigDecimal("0");
+
+  // 實際還款金額
+  /* 10/19 add by 智誠 */
+  @Column(name = "`ActualRepayAmt`")
+  private BigDecimal actualRepayAmt = new BigDecimal("0");
 
   // 職業別
   @Column(name = "`Career`", length = 20)
@@ -225,7 +230,7 @@ public class MlaundryRecord implements Serializable {
   }
 
 /**
-	* 還款金額<br>
+	* 預定還款金額<br>
 	* 
 	* @return BigDecimal
 	*/
@@ -234,13 +239,32 @@ public class MlaundryRecord implements Serializable {
   }
 
 /**
-	* 還款金額<br>
+	* 預定還款金額<br>
 	* 
   *
-  * @param repayAmt 還款金額
+  * @param repayAmt 預定還款金額
 	*/
   public void setRepayAmt(BigDecimal repayAmt) {
     this.repayAmt = repayAmt;
+  }
+
+/**
+	* 實際還款金額<br>
+	* 10/19 add by 智誠
+	* @return BigDecimal
+	*/
+  public BigDecimal getActualRepayAmt() {
+    return this.actualRepayAmt;
+  }
+
+/**
+	* 實際還款金額<br>
+	* 10/19 add by 智誠
+  *
+  * @param actualRepayAmt 實際還款金額
+	*/
+  public void setActualRepayAmt(BigDecimal actualRepayAmt) {
+    this.actualRepayAmt = actualRepayAmt;
   }
 
 /**
@@ -438,7 +462,7 @@ public class MlaundryRecord implements Serializable {
   @Override
   public String toString() {
     return "MlaundryRecord [mlaundryRecordId=" + mlaundryRecordId + ", repayDate=" + repayDate + ", actualRepayDate=" + actualRepayDate
-           + ", repayAmt=" + repayAmt + ", career=" + career + ", income=" + income + ", repaySource=" + repaySource + ", repayBank=" + repayBank + ", description=" + description
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", repayAmt=" + repayAmt + ", actualRepayAmt=" + actualRepayAmt + ", career=" + career + ", income=" + income + ", repaySource=" + repaySource + ", repayBank=" + repayBank
+           + ", description=" + description + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

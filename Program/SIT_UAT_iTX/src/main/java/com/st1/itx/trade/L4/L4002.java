@@ -76,9 +76,11 @@ public class L4002 extends TradeBuffer {
 
 		lBatxHead = sBatxHead == null ? null : sBatxHead.getContent();
 
+		// 未輸入經辦 or 經辦相同 or BS020
 		if (lBatxHead != null && lBatxHead.size() != 0) {
 			for (BatxHead tBatxHead : lBatxHead) {
-				if ("".equals(tlrNo) || tBatxHead.getTitaTlrNo().equals(tlrNo)) {
+				if ("".equals(tlrNo) || tBatxHead.getTitaTlrNo().equals(tlrNo)
+						|| "BS020".equals(tBatxHead.getTitaTxCd())) {
 				} else {
 					continue;
 				}
@@ -154,13 +156,11 @@ public class L4002 extends TradeBuffer {
 			// 轉暫收筆數
 			HashMap<tmpBatx, Integer> virCnt = new HashMap<>();
 			// 需檢核筆數
-			HashMap<tmpBatx, Integer> chkCnt = new HashMap<>();
+			HashMap<tmpBatx, Integer> canCheckCnt = new HashMap<>();
 			// 需入帳筆數
-			HashMap<tmpBatx, Integer> entCnt = new HashMap<>();
-			// 需轉暫收筆數
-			HashMap<tmpBatx, Integer> tmpCnt = new HashMap<>();
+			HashMap<tmpBatx, Integer> canEnterCnt = new HashMap<>();
 			// 需訂正筆數
-			HashMap<tmpBatx, Integer> eraCnt = new HashMap<>();
+			HashMap<tmpBatx, Integer> canEraseCnt = new HashMap<>();
 
 			for (BatxDetail tBatxDetail : lBatxDetail) {
 
@@ -381,7 +381,7 @@ public class L4002 extends TradeBuffer {
 						totalAmtSum.put(grp3, ooRpAmt);
 					}
 				}
-				//  需處理金額計算
+				// 需處理金額計算
 				if (!"1".equals(tBatxDetail.getProcStsCode())) {
 					// grp2 需處理金額計算
 					if (toDoAmtSum.containsKey(grp2)) {
@@ -400,7 +400,7 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 
-				//  不處理金額計算
+				// 不處理金額計算
 				if ("1".equals(tBatxDetail.getProcStsCode())) {
 					// grp2 不處理金額計算
 					if (unDoAmtSum.containsKey(grp2)) {
@@ -409,7 +409,7 @@ public class L4002 extends TradeBuffer {
 						unDoAmtSum.put(grp2, ooRpAmt);
 					}
 
-						// grp3 不處理金額計算
+					// grp3 不處理金額計算
 					if (grp3.getBatchNo() != null && !grp3.getBatchNo().isEmpty()) {
 						if (unDoAmtSum.containsKey(grp3)) {
 							unDoAmtSum.put(grp3, ooRpAmt.add(unDoAmtSum.get(grp3)));
@@ -419,77 +419,52 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 
+				// 可訂正筆數
+				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
+						|| tBatxDetail.getProcStsCode().equals("7")) {
+					if (canEraseCnt.containsKey(grp1)) {
+						canEraseCnt.put(grp1, canEraseCnt.get(grp1) + 1);
+					} else {
+						canEraseCnt.put(grp1, 1);
+					}
+				}
+				
 				if (labelRankFlag == 1) {
-					// 需檢核筆數
+					// 可檢核筆數
 					if (tBatxDetail.getProcStsCode().equals("0")) {
-						if (chkCnt.containsKey(grp1)) {
-							chkCnt.put(grp1, chkCnt.get(grp1) + 1);
+						if (canCheckCnt.containsKey(grp1)) {
+							canCheckCnt.put(grp1, canCheckCnt.get(grp1) + 1);
 						} else {
-							chkCnt.put(grp1, 1);
+							canCheckCnt.put(grp1, 1);
 						}
 					}
-					// 需入帳筆數
-					if ("4".equals(tBatxDetail.getProcStsCode())) {
-						if (entCnt.containsKey(grp1)) {
-							entCnt.put(grp1, entCnt.get(grp1) + 1);
-						} else {
-							entCnt.put(grp1, 1);
-						}
-					}
-					// 需轉暫收筆數
+					// 可入帳筆數
 					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
 							|| tBatxDetail.getProcStsCode().equals("4")) {
-						if (tmpCnt.containsKey(grp1)) {
-							tmpCnt.put(grp1, tmpCnt.get(grp1) + 1);
+						if (canEnterCnt.containsKey(grp1)) {
+							canEnterCnt.put(grp1, canEnterCnt.get(grp1) + 1);
 						} else {
-							tmpCnt.put(grp1, 1);
-						}
-					}
-					// 需訂正筆數
-					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-							|| tBatxDetail.getProcStsCode().equals("7")) {
-						if (eraCnt.containsKey(grp1)) {
-							eraCnt.put(grp1, eraCnt.get(grp1) + 1);
-						} else {
-							eraCnt.put(grp1, 1);
+							canEnterCnt.put(grp1, 1);
 						}
 					}
 				} else {
-					// 需檢核筆數
+					// 可檢核筆數
 					if (tBatxDetail.getProcStsCode().equals("0")) {
-						if (chkCnt.containsKey(grp3)) {
-							chkCnt.put(grp3, chkCnt.get(grp3) + 1);
+						if (canCheckCnt.containsKey(grp3)) {
+							canCheckCnt.put(grp3, canCheckCnt.get(grp3) + 1);
 						} else {
-							chkCnt.put(grp3, 1);
+							canCheckCnt.put(grp3, 1);
 						}
 					}
-					// 需入帳筆數
-					if ("4".equals(tBatxDetail.getProcStsCode())) {
-						if (entCnt.containsKey(grp3)) {
-							entCnt.put(grp3, entCnt.get(grp3) + 1);
-						} else {
-							entCnt.put(grp3, 1);
-						}
-					}
-					// 需轉暫收筆數
+					// 可入帳筆數
 					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
 							|| tBatxDetail.getProcStsCode().equals("4")) {
-						if (tmpCnt.containsKey(grp3)) {
-							tmpCnt.put(grp3, tmpCnt.get(grp3) + 1);
+						if (canEnterCnt.containsKey(grp3)) {
+							canEnterCnt.put(grp3, canEnterCnt.get(grp3) + 1);
 						} else {
-							tmpCnt.put(grp3, 1);
+							canEnterCnt.put(grp3, 1);
 						}
 					}
-					// 需訂正筆數
-					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-							|| tBatxDetail.getProcStsCode().equals("7")) {
-						if (eraCnt.containsKey(grp3)) {
-							eraCnt.put(grp3, eraCnt.get(grp3) + 1);
-						} else {
-							eraCnt.put(grp3, 1);
-						}
-					}
-
 				}
 
 			}
@@ -529,8 +504,8 @@ public class L4002 extends TradeBuffer {
 				occursList.putParam("OOTotalRepayAmt", totalAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOToDoRepayAmt", toDoAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOUnDoRepayAmt", unDoAmtSum.get(tempL4002Vo));
-// LabelFgA 整批刪除(D)、刪除回復(R)、整批入帳(E)、整批訂正(H)
-// LabelFgB             整批檢核(C)、整批入帳(E)、整批訂正(H)
+// LabelFgA 整批刪除(D)、刪除回復(R)、整批訂正(H)
+// LabelFgB             整批檢核(C)、整批入帳(E)
 // LabelFgC 轉暫收(T) 待處理筆數 - 需檢核筆數 > 0
 
 				String labelFgA = "";
@@ -540,25 +515,27 @@ public class L4002 extends TradeBuffer {
 					if ("8".equals(batxStatus)) {
 						labelFgA = "R";
 					} else {
-						if (eraCnt.get(tempL4002Vo) == null || eraCnt.get(tempL4002Vo) == 0) {
+						if (canEraseCnt.get(tempL4002Vo) == null || canEraseCnt.get(tempL4002Vo) == 0) {
 							labelFgA = "D";
 						}
 					}
 				}
 				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
-					if (eraCnt.get(tempL4002Vo) != null && eraCnt.get(tempL4002Vo) > 0) {
+					if (canEraseCnt.get(tempL4002Vo) != null && canEraseCnt.get(tempL4002Vo) > 0) {
 						labelFgA = "H";
 					}
-					if (chkCnt.get(tempL4002Vo) != null && chkCnt.get(tempL4002Vo) > 0) {
+				}
+				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
+					if (canCheckCnt.get(tempL4002Vo) != null && canCheckCnt.get(tempL4002Vo) > 0) {
 						labelFgB = "C";
 					} else {
-						if (entCnt.get(tempL4002Vo) != null && entCnt.get(tempL4002Vo) > 0) {
+						if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
 							labelFgB = "E";
 						}
 					}
 				}
 				if (!"8".equals(batxStatus) && labelRankFlag == tempL4002Vo.getRankFlag()) {
-					if (tmpCnt.get(tempL4002Vo) != null && tmpCnt.get(tempL4002Vo) > 0) {
+					if (canEnterCnt.get(tempL4002Vo) != null && canEnterCnt.get(tempL4002Vo) > 0) {
 						labelFgC = "T";
 					}
 				}

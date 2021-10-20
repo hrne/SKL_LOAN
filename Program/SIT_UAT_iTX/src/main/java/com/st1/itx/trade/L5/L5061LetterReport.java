@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -28,18 +26,17 @@ import com.st1.itx.util.parse.Parse;
 @Component("L5061LetterReport")
 @Scope("prototype")
 
-public class L5061LetterReport extends MakeReport{
-	private static final Logger logger = LoggerFactory.getLogger(L5061LetterReport.class);
+public class L5061LetterReport extends MakeReport {
 
 	@Autowired
 	public L5061ServiceImpl iL5061ServiceImpl;
-	
+
 	@Autowired
 	public CdEmpService iCdEmpService;
-	
+
 	@Autowired
 	public CdCodeService iCdCodeService;
-	
+
 	@Autowired
 	public MakeExcel makeExcel;
 
@@ -56,88 +53,94 @@ public class L5061LetterReport extends MakeReport{
 	public void printTitle() {
 
 	}
-	
-	public long exec(TitaVo titaVo) throws LogicException{
-		
-		
+
+	public long exec(TitaVo titaVo) throws LogicException {
+
 		this.info("L5061LetterReport start success");
-		
+
 		int chooseFlag = Integer.valueOf(titaVo.getParam("OptionCode"));
 		int dateS = Integer.valueOf(titaVo.getParam("DateS"));
 		int dateE = Integer.valueOf(titaVo.getParam("DateE"));
 		String sDateS = String.valueOf(dateS);
 		String sdateE = String.valueOf(dateE);
-		int sCustNoS = Integer.valueOf(titaVo.getParam("CustS"));
-		int sCustNoE = Integer.valueOf(titaVo.getParam("CustE"));
-		
+		int iCustNoS = Integer.valueOf(titaVo.getParam("CustS"));
+		int iCustNoE = Integer.valueOf(titaVo.getParam("CustE"));
+		String sCustNoS = String.valueOf(iCustNoS);
+		String sCustNoE = String.valueOf(iCustNoE);
+
 		List<String> header = new ArrayList<>();
-		header.addAll(Arrays.asList("戶號","額度","戶名","戶況","放款餘額","繳息迄日","逾期數","函催日期","發函種類","催收人員","法務人員"));
-		
+		header.addAll(Arrays.asList("戶號", "額度", "戶名", "戶況", "放款餘額", "繳息迄日", "逾期數", "函催日期", "發函種類", "催收人員", "法務人員"));
+
 		List<Map<String, String>> c5061SqlReturn = new ArrayList<Map<String, String>>();
-		
-		String fileName = "催收催繳明細表_"+sDateS+"_"+sdateE+"(逾期件函催查詢)";
-	
-		this.info("header ==== "+header);
-		
-		makeExcel.open(titaVo,titaVo.getEntDyI(), titaVo.getKinbr(),"L5061",fileName,fileName);
-		
+
+		String fileName = " ";
+		if (dateS > 0) {
+			fileName = "催收催繳明細表_" + sDateS + "_" + sdateE + "(逾期件函催查詢)";
+		} else {
+			fileName = "催收催繳明細表_" + sCustNoS + "_" + sCustNoE + "(逾期件函催查詢)";
+		}
+
+		this.info("header ==== " + header);
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5061", fileName, fileName);
+
 		try {
-			c5061SqlReturn = iL5061ServiceImpl.FindData(sDateS, sdateE, sCustNoS, sCustNoE, chooseFlag,titaVo);
-		}catch (Exception e) {
-			//E5004 讀取DB語法發生問題
-			this.info("L5908 ErrorForSql="+e);
-			throw new LogicException(titaVo, "E5004","");
+			c5061SqlReturn = iL5061ServiceImpl.FindData(sDateS, sdateE, iCustNoS, iCustNoE, chooseFlag, titaVo);
+		} catch (Exception e) {
+			// E5004 讀取DB語法發生問題
+			this.info("L5908 ErrorForSql=" + e);
+			throw new LogicException(titaVo, "E5004", "");
 		}
-		
-		if(c5061SqlReturn.isEmpty()) {
-			throw new LogicException(titaVo, "E0001","查無資料");
+
+		if (c5061SqlReturn.isEmpty()) {
+			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
-		
-		//列數
+
+		// 列數
 		int row = 1;
-		
-		//表頭列數
+
+		// 表頭列數
 		int hcol = 0;
-		
-		//表頭
-		for (String content:header) {
-			makeExcel.setValue(row,hcol+1,content);
-			hcol ++;
+
+		// 表頭
+		for (String content : header) {
+			makeExcel.setValue(row, hcol + 1, content);
+			hcol++;
 		}
-		
-		for (Map<String, String> i5061SqlReturn:c5061SqlReturn) {
-			row ++ ;
-			for (int col=0;col<i5061SqlReturn.size();col++) {		
-				String colName = "F"+String.valueOf(col);
-				switch(col) {
-				//處裡左右靠
+
+		for (Map<String, String> i5061SqlReturn : c5061SqlReturn) {
+			row++;
+			for (int col = 0; col < i5061SqlReturn.size(); col++) {
+				String colName = "F" + String.valueOf(col);
+				switch (col) {
+				// 處裡左右靠
 				case 0:
-					makeExcel.setValue(row,col+1,Integer.valueOf(i5061SqlReturn.get(colName)));
+					makeExcel.setValue(row, col + 1, Integer.valueOf(i5061SqlReturn.get(colName)));
 					break;
 				case 1:
-					makeExcel.setValue(row,col+1,Integer.valueOf(i5061SqlReturn.get(colName)));
+					makeExcel.setValue(row, col + 1, Integer.valueOf(i5061SqlReturn.get(colName)));
 					break;
 				case 3:
 					int status = Integer.valueOf(i5061SqlReturn.get(colName));
-					this.info("戶況===="+status);
+					this.info("戶況====" + status);
 					Slice<CdCode> iCdCode = null;
 					iCdCode = iCdCodeService.getCodeList(3, "Status", this.index, this.limit, titaVo);
 					for (CdCode xCdCode : iCdCode) {
-						this.info("戶況代碼===="+xCdCode.toString());
+						this.info("戶況代碼====" + xCdCode.toString());
 						if (Integer.valueOf(xCdCode.getCode()) == status) {
-							makeExcel.setValue(row,col+1,xCdCode.getItem());
+							makeExcel.setValue(row, col + 1, xCdCode.getItem());
 							break;
 						}
 					}
 					break;
 				case 4:
-					makeExcel.setValue(row,col+1,Integer.valueOf(i5061SqlReturn.get(colName)));
+					makeExcel.setValue(row, col + 1, Integer.valueOf(i5061SqlReturn.get(colName)));
 					break;
 				case 5:
-					makeExcel.setValue(row,col+1,Integer.valueOf(i5061SqlReturn.get(colName)));
+					makeExcel.setValue(row, col + 1, Integer.valueOf(i5061SqlReturn.get(colName)));
 					break;
 				case 6:
-					makeExcel.setValue(row,col+1,Integer.valueOf(i5061SqlReturn.get(colName)));
+					makeExcel.setValue(row, col + 1, Integer.valueOf(i5061SqlReturn.get(colName)));
 					break;
 				case 8:
 					int mailTypeCode = Integer.valueOf(i5061SqlReturn.get(colName));
@@ -145,7 +148,7 @@ public class L5061LetterReport extends MakeReport{
 					sCdCode = iCdCodeService.getCodeList(5, "MailTypeCode", this.index, this.limit, titaVo);
 					for (CdCode tCdCode : sCdCode) {
 						if (Integer.valueOf(tCdCode.getCode()) == mailTypeCode) {
-							makeExcel.setValue(row,col+1,tCdCode.getItem());
+							makeExcel.setValue(row, col + 1, tCdCode.getItem());
 							break;
 						}
 					}
@@ -154,42 +157,42 @@ public class L5061LetterReport extends MakeReport{
 					CdEmp iCdEmp = new CdEmp();
 					String employeeName = "";
 					employeeName = i5061SqlReturn.get(colName);
-					if(employeeName.equals("")) {
-						makeExcel.setValue(row,col+1,"");
+					if (employeeName.equals("")) {
+						makeExcel.setValue(row, col + 1, "");
 					}
 					iCdEmp = iCdEmpService.findById(employeeName, titaVo);
-					if(iCdEmp == null) {
-						makeExcel.setValue(row,col+1,"");
+					if (iCdEmp == null) {
+						makeExcel.setValue(row, col + 1, "");
 					} else {
-						makeExcel.setValue(row,col+1,iCdEmp.getFullname());
+						makeExcel.setValue(row, col + 1, iCdEmp.getFullname());
 					}
 					break;
 				case 10:
 					CdEmp pCdEmp = new CdEmp();
 					String iemployeeName = "";
 					iemployeeName = i5061SqlReturn.get(colName);
-					if(iemployeeName.equals("")) {
-						makeExcel.setValue(row,col+1,"");
+					if (iemployeeName.equals("")) {
+						makeExcel.setValue(row, col + 1, "");
 					}
 					pCdEmp = iCdEmpService.findById(iemployeeName, titaVo);
-					if(pCdEmp == null) {
-						makeExcel.setValue(row,col+1,"");
+					if (pCdEmp == null) {
+						makeExcel.setValue(row, col + 1, "");
 					} else {
-						makeExcel.setValue(row,col+1,pCdEmp.getFullname());
+						makeExcel.setValue(row, col + 1, pCdEmp.getFullname());
 					}
 					break;
 				default:
-					makeExcel.setValue(row,col+1,i5061SqlReturn.get(colName));
+					makeExcel.setValue(row, col + 1, i5061SqlReturn.get(colName));
 					break;
-						
-				}	
+
+				}
 			}
 		}
-		
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 
 		return sno;
 	}
-	
+
 }

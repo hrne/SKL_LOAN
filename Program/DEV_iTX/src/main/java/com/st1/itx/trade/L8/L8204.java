@@ -3,6 +3,8 @@ package com.st1.itx.trade.L8;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8204 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8204.class);
+	private static final Logger logger = LoggerFactory.getLogger(L8204.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -60,7 +62,7 @@ public class L8204 extends TradeBuffer {
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 		int iRecordDate = this.parse.stringToInteger(titaVo.getParam("RecordDate"));
 		int iFRecordDate = iRecordDate + 19110000;
-		this.info("L8204 iFRecordDate : " + iFRecordDate);
+		logger.info("L8204 iFRecordDate : " + iFRecordDate);
 
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 4)) {
@@ -74,9 +76,9 @@ public class L8204 extends TradeBuffer {
 		case 1: // 新增
 			moveMlaundryRecord(tMlaundryRecord, tMlaundryRecordId, iFuncCode, iFRecordDate, iCustNo, iFacmNo, iBormNo, titaVo);
 			try {
-				this.info("1");
+				logger.info("1");
 				sMlaundryRecordService.insert(tMlaundryRecord);
-				this.info("L8204 ins : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
+				logger.info("L8204 ins : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 			} catch (DBException e) {
 				if (e.getErrorId() == 2) {
 					throw new LogicException(titaVo, "E0002", titaVo.getParam("CustNo")); // 新增資料已存在
@@ -87,7 +89,7 @@ public class L8204 extends TradeBuffer {
 			break;
 		case 2: // 修改
 			tMlaundryRecord = sMlaundryRecordService.holdById(new MlaundryRecordId(iFRecordDate, iCustNo, iFacmNo, iBormNo));
-			this.info("L8204 upd : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
+			logger.info("L8204 upd : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 			if (tMlaundryRecord == null) {
 				throw new LogicException(titaVo, "E0003", titaVo.getParam("CustNo")); // 修改資料不存在
 			}
@@ -103,7 +105,7 @@ public class L8204 extends TradeBuffer {
 			break;
 		case 4: // 刪除
 			tMlaundryRecord = sMlaundryRecordService.holdById(new MlaundryRecordId(iFRecordDate, iCustNo, iFacmNo, iBormNo));
-			this.info("L8204 del : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
+			logger.info("L8204 del : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 			if (tMlaundryRecord != null) {
 				try {
 					sMlaundryRecordService.delete(tMlaundryRecord);
@@ -115,7 +117,7 @@ public class L8204 extends TradeBuffer {
 			}
 			break;
 		}
-		this.info("3");
+		logger.info("3");
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -130,8 +132,9 @@ public class L8204 extends TradeBuffer {
 		mMlaundryRecord.setMlaundryRecordId(mMlaundryRecordId);
 
 		mMlaundryRecord.setRepayDate(this.parse.stringToInteger(titaVo.getParam("RepayDate")));
-		mMlaundryRecord.setActualRepayDate(this.parse.stringToInteger(titaVo.getParam("ActualRepayDate")));
 		mMlaundryRecord.setRepayAmt(this.parse.stringToBigDecimal(titaVo.getParam("RepayAmt")));
+		mMlaundryRecord.setActualRepayDate(this.parse.stringToInteger(titaVo.getParam("ActualRepayDate")));
+		mMlaundryRecord.setActualRepayAmt(this.parse.stringToBigDecimal(titaVo.getParam("ActualRepayAmt")));
 		mMlaundryRecord.setCareer(titaVo.getParam("Career"));
 		mMlaundryRecord.setIncome(titaVo.getParam("Income"));
 		mMlaundryRecord.setRepaySource(this.parse.stringToInteger(titaVo.getParam("RepaySource")));

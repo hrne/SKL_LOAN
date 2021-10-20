@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("mlaundryRecordService")
 @Repository
-public class MlaundryRecordServiceImpl implements MlaundryRecordService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(MlaundryRecordServiceImpl.class);
-
+public class MlaundryRecordServiceImpl extends ASpringJpaParm implements MlaundryRecordService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class MlaundryRecordServiceImpl implements MlaundryRecordService, Initial
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + mlaundryRecordId);
+    this.info("findById " + dbName + " " + mlaundryRecordId);
     Optional<MlaundryRecord> mlaundryRecord = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryRecord = mlaundryRecordReposDay.findById(mlaundryRecordId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "RecordDate", "CustNo", "FacmNo", "BormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "RecordDate", "CustNo", "FacmNo", "BormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = mlaundryRecordReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = mlaundryRecordReposHist.findAll(pageable);
     else 
       slice = mlaundryRecordRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findRecordDate " + dbName + " : " + "recordDate_0 : " + recordDate_0 + " recordDate_1 : " +  recordDate_1 + " actualRepayDate_2 : " +  actualRepayDate_2 + " actualRepayDate_3 : " +  actualRepayDate_3);
+    this.info("findRecordDate " + dbName + " : " + "recordDate_0 : " + recordDate_0 + " recordDate_1 : " +  recordDate_1 + " actualRepayDate_2 : " +  actualRepayDate_2 + " actualRepayDate_3 : " +  actualRepayDate_3);
     if (dbName.equals(ContentName.onDay))
       slice = mlaundryRecordReposDay.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(recordDate_0, recordDate_1, actualRepayDate_2, actualRepayDate_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = mlaundryRecordReposHist.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(recordDate_0, recordDate_1, actualRepayDate_2, actualRepayDate_3, pageable);
     else 
       slice = mlaundryRecordRepos.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualAndActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(recordDate_0, recordDate_1, actualRepayDate_2, actualRepayDate_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,15 +149,18 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findRecordD " + dbName + " : " + "recordDate_0 : " + recordDate_0 + " recordDate_1 : " +  recordDate_1);
+    this.info("findRecordD " + dbName + " : " + "recordDate_0 : " + recordDate_0 + " recordDate_1 : " +  recordDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = mlaundryRecordReposDay.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqual(recordDate_0, recordDate_1, pageable);
+      slice = mlaundryRecordReposDay.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(recordDate_0, recordDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = mlaundryRecordReposMon.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqual(recordDate_0, recordDate_1, pageable);
+      slice = mlaundryRecordReposMon.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(recordDate_0, recordDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = mlaundryRecordReposHist.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqual(recordDate_0, recordDate_1, pageable);
+      slice = mlaundryRecordReposHist.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(recordDate_0, recordDate_1, pageable);
     else 
-      slice = mlaundryRecordRepos.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqual(recordDate_0, recordDate_1, pageable);
+      slice = mlaundryRecordRepos.findAllByRecordDateGreaterThanEqualAndRecordDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(recordDate_0, recordDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,15 +177,18 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findRepayD " + dbName + " : " + "actualRepayDate_0 : " + actualRepayDate_0 + " actualRepayDate_1 : " +  actualRepayDate_1);
+    this.info("findRepayD " + dbName + " : " + "actualRepayDate_0 : " + actualRepayDate_0 + " actualRepayDate_1 : " +  actualRepayDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = mlaundryRecordReposDay.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqual(actualRepayDate_0, actualRepayDate_1, pageable);
+      slice = mlaundryRecordReposDay.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(actualRepayDate_0, actualRepayDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = mlaundryRecordReposMon.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqual(actualRepayDate_0, actualRepayDate_1, pageable);
+      slice = mlaundryRecordReposMon.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(actualRepayDate_0, actualRepayDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = mlaundryRecordReposHist.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqual(actualRepayDate_0, actualRepayDate_1, pageable);
+      slice = mlaundryRecordReposHist.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(actualRepayDate_0, actualRepayDate_1, pageable);
     else 
-      slice = mlaundryRecordRepos.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqual(actualRepayDate_0, actualRepayDate_1, pageable);
+      slice = mlaundryRecordRepos.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(actualRepayDate_0, actualRepayDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -190,7 +198,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + mlaundryRecordId);
+    this.info("Hold " + dbName + " " + mlaundryRecordId);
     Optional<MlaundryRecord> mlaundryRecord = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryRecord = mlaundryRecordReposDay.findByMlaundryRecordId(mlaundryRecordId);
@@ -208,7 +216,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+    this.info("Hold " + dbName + " " + mlaundryRecord.getMlaundryRecordId());
     Optional<MlaundryRecord> mlaundryRecordT = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryRecordT = mlaundryRecordReposDay.findByMlaundryRecordId(mlaundryRecord.getMlaundryRecordId());
@@ -229,13 +237,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		}
+    this.info("Insert..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
     if (this.findById(mlaundryRecord.getMlaundryRecordId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       mlaundryRecord.setCreateEmpNo(empNot);
+
+    if(mlaundryRecord.getLastUpdateEmpNo() == null || mlaundryRecord.getLastUpdateEmpNo().isEmpty())
+      mlaundryRecord.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return mlaundryRecordReposDay.saveAndFlush(mlaundryRecord);	
@@ -256,7 +267,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+    this.info("Update..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
     if (!empNot.isEmpty())
       mlaundryRecord.setLastUpdateEmpNo(empNot);
 
@@ -279,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+    this.info("Update..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
     if (!empNot.isEmpty())
       mlaundryRecord.setLastUpdateEmpNo(empNot);
 
@@ -299,7 +310,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
+    this.info("Delete..." + dbName + " " + mlaundryRecord.getMlaundryRecordId());
     if (dbName.equals(ContentName.onDay)) {
       mlaundryRecordReposDay.delete(mlaundryRecord);	
       mlaundryRecordReposDay.flush();
@@ -328,11 +339,13 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (MlaundryRecord t : mlaundryRecord) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+    for (MlaundryRecord t : mlaundryRecord){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       mlaundryRecord = mlaundryRecordReposDay.saveAll(mlaundryRecord);	
@@ -361,7 +374,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (mlaundryRecord == null || mlaundryRecord.size() == 0)
       throw new DBException(6);
 
@@ -390,7 +403,7 @@ em = null;
 
   @Override
   public void deleteAll(List<MlaundryRecord> mlaundryRecord, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

@@ -50,6 +50,13 @@ public class L5961 extends TradeBuffer {
 		int iMonth1 = 0;
 		int iMonth3 = 0;
 		int iMonth6 = 0;
+		/*
+		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		 */
+		this.index = titaVo.getReturnIndex();
+
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = 40;
 
 		String exceptionError = "";
 

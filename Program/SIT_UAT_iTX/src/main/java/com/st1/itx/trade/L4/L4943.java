@@ -66,12 +66,12 @@ public class L4943 extends TradeBuffer {
 		BigDecimal totRepayAmt = BigDecimal.ZERO;
 
 		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode").trim());
-		
+
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100;
-		
+
 //		1.戶號 = 戶號+入帳日
 //		2.上限金額 = 入帳日+限額
 //		3.下限金額 = 入帳日+限額
@@ -94,12 +94,12 @@ public class L4943 extends TradeBuffer {
 			totRepayAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("F2"));
 		}
 
-		if(functionCode == 6) {
+		if (functionCode == 6) {
 			totaVo.putParam("OTotalUnpaidAmt", totUnpaidAmt);
 			totaVo.putParam("OTotalTempAmt", totTempAmt);
 			totaVo.putParam("OTotalRepayAmt", totRepayAmt);
 		} else {
-			
+
 			try {
 				// *** 折返控制相關 ***
 				resulParttList = l4943ServiceImpl.findAll(0, this.index, this.limit, titaVo);
@@ -107,15 +107,15 @@ public class L4943 extends TradeBuffer {
 				this.error("l4943ServiceImpl findByCondition " + e.getMessage());
 				throw new LogicException("E0013", e.getMessage());
 			}
-			
+
 			if (resulParttList != null && resulParttList.size() > 0) {
-				
+
 				for (Map<String, String> result : resulParttList) {
 					int entryDate = parse.stringToInteger(result.get("F0"));
 					int prevIntDate = parse.stringToInteger(result.get("F4"));
 					int payIntDate = parse.stringToInteger(result.get("F5"));
 					int acDate = parse.stringToInteger(result.get("F11"));
-					
+
 					if (entryDate > 19110000) {
 						entryDate = entryDate - 19110000;
 					}
@@ -128,9 +128,9 @@ public class L4943 extends TradeBuffer {
 					if (acDate > 19110000) {
 						acDate = acDate - 19110000;
 					}
-					
+
 					OccursList occursList = new OccursList();
-					
+
 					occursList.putParam("OOEntryDate", entryDate);
 					occursList.putParam("OOCustNo", result.get("F1"));
 					occursList.putParam("OOFacmNo", result.get("F2"));
@@ -143,21 +143,24 @@ public class L4943 extends TradeBuffer {
 					occursList.putParam("OORepayAmt", result.get("F9"));
 					occursList.putParam("OOMediaCode", result.get("F10"));
 					occursList.putParam("OOAcDate", acDate);
-					
 					String procNote = "";
+					TempVo tempVo = new TempVo();
+					tempVo = tempVo.getVo(result.get("F12"));
 					String returnCode = result.get("F13");
 					String mediaKind = result.get("F14");
-					if (returnCode == null || returnCode.trim().isEmpty()) {
-						TempVo tempVo = new TempVo();
-						tempVo = tempVo.getVo(result.get("F12"));
+					if (acDate > 0) {
+						if (tempVo.get("ProcStsCode") != null && tempVo.get("ProcStsCode").length() > 0) {
+							procNote = procStsCodeX(tempVo.get("ProcStsCode"), titaVo);
+						}
+					} else if (returnCode == null || returnCode.trim().isEmpty()) {
 						if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
 							procNote = "Aml檢核訊息：" + amlX(tempVo.get("Aml"), titaVo) + "。";
 						}
-						
+
 						if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
 							procNote = procNote + "帳號授權檢核：" + authX(tempVo.get("Auth"), titaVo) + "。";
 						}
-						
+
 						if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
 							procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
 						}
@@ -165,35 +168,47 @@ public class L4943 extends TradeBuffer {
 						if ("00".equals(returnCode)) {
 							procNote = "扣款成功";
 						} else {
-							procNote = "扣款失敗："
-									+ procCodeX("3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
+							procNote = "扣款失敗：" + procCodeX(
+									"3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
 						}
 					}
 					occursList.putParam("OOAmlRsp", " ");
-					
+
 					occursList.putParam("OOProcNote", procNote);
 //					 將每筆資料放入Tota的OcList 
 					this.totaVo.addOccursList(occursList);
 				}
-				
+
 				totaVo.putParam("OTotalUnpaidAmt", totUnpaidAmt);
 				totaVo.putParam("OTotalTempAmt", totTempAmt);
 				totaVo.putParam("OTotalRepayAmt", totRepayAmt);
-				
+
 				/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 				if (resulParttList.size() == this.limit && hasNext()) {
 					titaVo.setReturnIndex(this.setIndexNext());
 					/* 手動折返 */
-					this.totaVo.setMsgEndToEnter();		
+					this.totaVo.setMsgEndToEnter();
 				}
-				
+
 			} else {
 				throw new LogicException(titaVo, "E0001", "查無資料");
 			}
-		} // else 
+		} // else
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+
+	private String procStsCodeX(String procStsCode, TitaVo titaVo) {
+		String result = "";
+
+		CdCode cdCode = cdCodeService.getItemFirst(4, "ProcStsCode", procStsCode, titaVo);
+
+		if (cdCode != null) {
+			result = cdCode.getItem();
+		}
+
+		return result;
 	}
 
 	private String authX(String auth, TitaVo titaVo) {

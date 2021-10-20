@@ -424,7 +424,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iBormNo     撥款
 	 * @param titaVo      TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public ArrayList<BaTxVo> acLoanInt(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
 			TitaVo titaVo) throws LogicException {

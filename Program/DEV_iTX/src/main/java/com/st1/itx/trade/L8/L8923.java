@@ -3,6 +3,8 @@ package com.st1.itx.trade.L8;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -35,7 +37,7 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L8923 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8923.class);
+	private static final Logger logger = LoggerFactory.getLogger(L8923.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,7 +49,7 @@ public class L8923 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L8923 ");
+		logger.info("active L8923 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -58,13 +60,13 @@ public class L8923 extends TradeBuffer {
 		int iRecordDateEnd = this.parse.stringToInteger(titaVo.getParam("RecordDateEnd"));
 		int iFRecordDateStart = iRecordDateStart + 19110000;
 		int iFRecordDateEnd = iRecordDateEnd + 19110000;
-		this.info("L8923 iFRecordDate : " + iFRecordDateStart + "~" + iFRecordDateEnd);
+		logger.info("L8923 iFRecordDate : " + iFRecordDateStart + "~" + iFRecordDateEnd);
 
 		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
 		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
 		int iFActualRepayDateStart = iActualRepayDateStart + 19110000;
 		int iFActualRepayDateEnd = iActualRepayDateEnd + 19110000;
-		this.info("L8923 iFRepayDate : " + iFActualRepayDateStart + "~" + iFActualRepayDateEnd);
+		logger.info("L8923 iFRepayDate : " + iFActualRepayDateStart + "~" + iFActualRepayDateEnd);
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -110,11 +112,11 @@ public class L8923 extends TradeBuffer {
 			occursList.putParam("OOIncome", tMlaundryRecord.getIncome()); // 年收入(萬)
 			occursList.putParam("OORepaySource", tMlaundryRecord.getRepaySource()); // 還款來源
 			occursList.putParam("OORepayBank", tMlaundryRecord.getRepayBank()); // 代償銀行
-			occursList.putParam("OODescription", tMlaundryRecord.getDescription().replace("$n", "")); // 其他說明
+			occursList.putParam("OODescription", tMlaundryRecord.getDescription().replace("$n", "\n")); // 其他說明
 			occursList.putParam("OOEmpNo", tMlaundryRecord.getLastUpdateEmpNo()); // 經辦
 
 			DateTime = this.parse.timeStampToString(tMlaundryRecord.getLastUpdate()); // 異動日期
-			this.info("L8923 DateTime : " + DateTime);
+			logger.info("L8923 DateTime : " + DateTime);
 			Date = FormatUtil.left(DateTime, 9);
 			occursList.putParam("OOUpdate", Date);
 

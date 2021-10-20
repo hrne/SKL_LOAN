@@ -23,6 +23,7 @@ import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.AcroFields;
@@ -96,6 +97,10 @@ public class MakeReport extends CommBuffer {
 	// 字型放置路徑
 	@Value("${iTXFontFolder}")
 	private String fontFolder = "";
+
+	// 資源路徑
+	@Value("${iTXResourceFolder}")
+	private String ResourceFolde = "";
 
 	private int date = 0;
 
@@ -378,6 +383,42 @@ public class MakeReport extends CommBuffer {
 		map.put("font.size", this.fontSize);
 		map.put("p", this.rptPassword);
 		listMap.add(map);
+	}
+
+	/**
+	 * 指定位置列印 繪製圖檔
+	 * 
+	 * @param x        x軸cm
+	 * @param y        Y軸cm
+	 * @param percent  放大比例 %, 100 表原大小
+	 * @param filename 影像檔名
+	 */
+	public void printImageCm(double x, double y, float percent, String filename) {
+		int xx = (int) Math.ceil(x / 2.54 * 72);
+		int yy = (int) Math.ceil(y / 2.54 * 72);
+		printImage(xx,yy,percent,filename);
+	}
+	
+	/**
+	 *指定位置列印 繪製圖檔
+	 * 
+	 * @param x        x軸px
+	 * @param y        Y軸px
+	 * @param percent  放大比例 %, 100 表原大小
+	 * @param filename 影像檔名
+	 */
+	public void printImage(int x, int y, float percent, String filename) {
+
+		HashMap<String, Object> map = new HashMap<String, Object>();
+		map.put("type", "A");
+		map.put("x", x);
+		map.put("y", y);
+		map.put("p", percent);
+		map.put("f", filename);
+		listMap.add(map);
+
+		this.printCnt++;
+
 	}
 
 	/**
@@ -703,6 +744,37 @@ public class MakeReport extends CommBuffer {
 
 	}
 
+	public void printRectCm(double x, double y, int width, int height, String text) {
+		int xx = (int) Math.ceil(x / 2.54 * 72);
+		int yy = (int) Math.ceil(y / 2.54 * 72);
+		
+		printRect(xx,yy,width,height,text);
+	}
+	
+	/**
+	 * 矩形區間列印字串
+	 * 
+	 * @param x      x軸
+	 * @param y      y軸
+	 * @param width  每列列印半形字數
+	 * @param height 每列高度px
+	 * @param text   列印字串
+	 */
+	public void printRect(int x, int y, int width, int height, String text) {
+		if (!"".equals(text)) {
+			HashMap<String, Object> map = new HashMap<String, Object>();
+			map.put("type", "B");
+			map.put("x", x);
+			map.put("y", y);
+			map.put("w", width);
+			map.put("h", height);
+			map.put("s", text);
+			listMap.add(map);
+
+			this.printCnt++;
+		}
+	}
+
 	/**
 	 * 繪製線條(寬度1點)<br>
 	 * 
@@ -992,6 +1064,7 @@ public class MakeReport extends CommBuffer {
 			int lineSpaces = 0;
 			int fontwidth = fontsize / 2 + charSpaces;
 			int fonthigh = fontsize + lineSpaces + 2;
+			
 
 			for (HashMap<String, Object> map : this.listMap) {
 
@@ -1189,6 +1262,7 @@ public class MakeReport extends CommBuffer {
 					int x = (col - 1) * fontwidth;
 					int y = (int) page.getHeight() - (row * fonthigh);
 					cb.beginText();
+				
 					cb.setFontAndSize(baseFont, fontsize);
 					cb.setCharacterSpacing(charSpaces);
 					if ("L".equals(align)) {
@@ -1282,6 +1356,88 @@ public class MakeReport extends CommBuffer {
 						int y = Integer.parseInt(yy);
 						lineSpaces = y;
 						fonthigh = fontsize + lineSpaces + 2;
+					}
+				} else if ("A".equals(type)) {
+					// 列印圖片
+
+					String fna = map.get("f").toString();
+					int x = Integer.parseInt(map.get("x").toString());
+					int y = Integer.parseInt(map.get("y").toString());
+					int yy = (int) this.yPoints - y;
+					float percent = Float.parseFloat(map.get("p").toString());
+
+					String imagename = ResourceFolde + fna;
+
+					this.info("MakeReport imagename = " + imagename);
+
+					File tempFile = new File(imagename);
+					if (!tempFile.exists()) {
+						continue;
+					}
+
+					this.info("MakeReport percent = " + percent);
+
+					Image image = Image.getInstance(imagename);
+
+					this.info("MakeReport image b = " + image.getWidth() + "/" + image.getHeight());
+
+					double imageH = Math.ceil(image.getHeight());
+
+					if (percent != 0) {
+						image.scalePercent(percent);
+						imageH = Math.ceil(image.getHeight() * percent / 100);
+					}
+
+					this.info("MakeReport image a = " + image.getWidth() + "/" + image.getHeight());
+
+					yy -= imageH;
+
+					// 新增圖片
+					image.setAbsolutePosition(x, yy);
+					cb.addImage(image);
+
+				} else if ("B".equals(type)) {
+					// 指定區間列印字串
+					int x = Integer.parseInt(map.get("x").toString());
+					int y = Integer.parseInt(map.get("y").toString());
+					int w = Integer.parseInt(map.get("w").toString());
+					int h = Integer.parseInt(map.get("h").toString());
+					int yy = (int) this.yPoints - y;
+					String s = map.get("s").toString();
+
+					String ps = "";
+					int pw = 0;
+					for (int i = 0; i < s.length(); i++) {
+						String ss = s.substring(i, i + 1);
+						
+						ps += ss;
+						
+						int ww = 1;
+						if (haveChinese(ss)) {
+							ww = 2;
+						}
+						pw += ww;
+						if (pw >= w) {
+							cb.beginText();
+
+							cb.setFontAndSize(baseFont, fontsize);
+							cb.setCharacterSpacing(charSpaces);
+							cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
+							cb.endText();
+
+							ps = "";
+							pw = 0;
+							yy -= h;
+						}
+					}
+					if (pw > 0) {
+						cb.beginText();
+						this.info("MakeReport basefont = " + baseFont.TIMES_BOLD);
+						cb.setFontAndSize(baseFont, fontsize);
+						cb.setCharacterSpacing(charSpaces);
+						cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
+						
+						cb.endText();
 					}
 				}
 			}
