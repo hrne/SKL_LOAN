@@ -1,1 +1,0 @@
-alter table "NegFinShare" modify("AmtRatio" decimal(5, 2)); 
