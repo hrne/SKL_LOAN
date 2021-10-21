@@ -153,12 +153,15 @@ public class L4320Batch extends TradeBuffer {
 			setSendMsg(titaVo);
 
 			if (this.processCnt > 0) {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4031", titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4031",
+						titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
 			} else {
-				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
+				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320",
+						titaVo.getTlrNo(), sendMsg + "，筆數：" + this.processCnt, titaVo);
 			}
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4320", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		}
 		// end
 		this.addList(this.totaVo);
@@ -169,7 +172,7 @@ public class L4320Batch extends TradeBuffer {
 	private void setSendMsg(TitaVo titaVo) {
 		switch (iTxKind) {
 		case 1:
-			sendMsg = "定期機動非指數利率變動資料";
+			sendMsg = "定期機動指數利率變動資料";
 			break;
 		case 2:
 			sendMsg = "機動指數利率變動資料";
@@ -240,7 +243,7 @@ public class L4320Batch extends TradeBuffer {
 				bId.setCustNo(custNo);
 				bId.setFacmNo(facmNo);
 				bId.setBormNo(bormNo);
-				b = batxRateChangeService.holdById(bId);
+				b = batxRateChangeService.holdById(bId, titaVo);
 				// 已確認跳過，未確認Insert
 				boolean isInsert = false;
 				if (b == null) {
@@ -578,7 +581,8 @@ public class L4320Batch extends TradeBuffer {
 		}
 		this.info("processDelete...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(wkAdjDate + 19110000, wkAdjDate + 19110000, custType1, custType2, iTxKind, 0, this.index, this.limit, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(wkAdjDate + 19110000,
+				wkAdjDate + 19110000, custType1, custType2, iTxKind, 0, 0, Integer.MAX_VALUE, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
@@ -601,8 +605,8 @@ public class L4320Batch extends TradeBuffer {
 		}
 		this.info("deleteBatxRate...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, iTxKind, iTxKind, 0, 9, wkAdjDate + 19110000, wkAdjDate + 19110000, this.index, this.limit,
-				titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, iTxKind,
+				iTxKind, 0, 9, wkAdjDate + 19110000, wkAdjDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
@@ -702,7 +706,8 @@ public class L4320Batch extends TradeBuffer {
 				tmpBorm cust = new tmpBorm(custNo, 0, 0);
 
 				if (loanBalTot.containsKey(cust)) {
-					loanBalTot.put(cust, loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("F6"))));
+					loanBalTot.put(cust,
+							loanBalTot.get(cust).add(parse.stringToBigDecimal(fnAllList.get(i).get("F6"))));
 				} else {
 					loanBalTot.put(cust, parse.stringToBigDecimal(fnAllList.get(i).get("F6")));
 				}

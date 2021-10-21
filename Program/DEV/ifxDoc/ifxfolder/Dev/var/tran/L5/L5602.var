@@ -1,0 +1,484 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5602)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5602" layout="cols=3;screen.width=[150,400,150,400];printer.width=[20,80];order=1">
+[
+["[L5602]                                 面催登錄"],
+[#<->#,"#FdFunctionCd+功能",#FunctionCdX],
+[#<->#,"#FdCaseCode+案件種類",#CaseCode,#CaseCodeX],
+[#<->#,"#FdCustNo+戶號",#CustNo,"@",#CustName],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo],
+["#FdAccCollPsn+催收人員",#AccCollPsn,#AccCollPsnX],["#FdLegalPsn+法務人員",#LegalPsn,#LegalPsnX],
+["#FdPrevIntDate+繳息迄日",#PrevIntDate],["#FdLoanBal+放款餘額",#LoanBal],
+["#FdNextIntDate+下次應繳日",#NextIntDate],
+[#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
+["#FdMeetDate+面催日期",#MeetDate],["#FdMeetTime+面催時間",#MeetTime],
+["#FdContactCode+面催對象",#ContactCode,#ContactCodeX],["#FdMeetPsnCode+面晤人",#MeetPsnCode,#MeetPsnCodeX],
+[#<->#,"#FdAccCollPsnCode+催收人員",#AccCollPsnCode,#AccCollPsnCodeX,"@",#AccCollPsnName,#AccCollPsnNameX,#BTNF],
+[#<->#,"#FdMeetPlaceCode+面催地點類別",#MeetPlaceCode,#MeetPlaceCodeX],
+[#<->#,"#FdMeetPlace+面催地點",#MeetPlace],
+[#<->#,"#FdRemark+面催記錄",#Remark],
+[#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo,#EditEmpNoX],
+]
+!---------- AP TEXT AREA Variables ----------
+#BTNA=X,1,I,ui:button;value:電催查詢;enable:1;tabbable:0
+#BTNB=X,1,I,ui:button;value:面催查詢;enable:1;tabbable:0
+#BTNC=X,1,I,ui:button;value:函催查詢;enable:1;tabbable:0
+#BTND=X,1,I,ui:button;value:法務查詢;enable:1;tabbable:0
+#BTNE=X,1,I,ui:button;value:提醒查詢;enable:1;tabbable:0
+#BTNN=X,1,I,ui:button;value:提醒登錄;enable:1;tabbable:0
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從L5060進入),$)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 功能下拉選單1
+#FunctionCdRimName=x,20,S
+T(3,CdCode.FunctionCd)
+#FunctionCdHelp=x,1024,S
+
+! 案件種類下拉選單2
+#CaseCodeRimName=x,20,S
+T(3,CdCode.CaseCode)
+#CaseCodeHelp=x,1024,S
+
+! 面催對象下拉選單3
+#ContactCodeRimName=x,20,S
+T(3,CdCode.ContactCode)
+#ContactCodeHelp=x,1024,S
+
+! 面晤人下拉選單4
+#MeetPsnCodeRimName=x,20,S
+T(3,CdCode.MeetPsnCode)
+#MeetPsnCodeHelp=x,1024,S
+
+! 面催地址下拉選單5
+#MeetPlaceCodeRimName=x,20,S
+T(3,CdCode.MeetPlaceCode)
+#MeetPlaceCodeHelp=x,1024,S
+
+! 催收人員類別下拉選單6
+#AccCollPsnCodeRimName=x,25,S
+T(3,CdCode.AccCollPsnCode)
+#AccCollPsnCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#FunctionCdRimName,#CaseCodeRimName,#ContactCodeRimName,#MeetPsnCodeRimName,#MeetPlaceCodeRimName,#AccCollPsnCodeRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FunctionCdHelp,#HelpDesc1)
+T(2,@CaseCodeHelp,#HelpDesc2)
+T(2,@ContactCodeHelp,#HelpDesc3)
+T(2,@MeetPsnCodeHelp,#HelpDesc4)
+T(2,@MeetPlaceCodeHelp,#HelpDesc5)
+T(2,@AccCollPsnCodeHelp,#HelpDesc6)
+
+#NTXBUF=X,33,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunctionCd,#NTXBUF,1,1)
+T(1,@CaseCode,#NTXBUF,2,1)
+T(1,@CustNo,#NTXBUF,3,7)
+T(1,@FacmNo,#NTXBUF,10,3)
+T(1,@TitaTlrNo,#NTXBUF,13,6)
+T(1,@TitaTxtNo,#NTXBUF,19,8)
+T(1,@TitaAcDate,#NTXBUF,27,7)
+INVOKEJS(SHOW,p1,02,02,1)
+
+#PRE_EVELU=A,1,S
+
+<include src="ROM.icf::L5R15.dec"/>
+#RimCustNo=X,7,S
+#RimFacmNo=X,3,S
+#RimL5R15=X,1,S
+T(2,@RimCustNo,#CustNo)
+T(2,@RimFacmNo,#FacmNo)
+RESET_RIM(#RimL5R15,L5R15)
+S(L5R15,1,#RimCustNo,#RimFacmNo)
+R(1,L5R15)
+T(2,@CustName,#L5R15CustName)
+T(2,@AccCollPsn,#L5R15AccCollPsn)
+T(2,@LegalPsn,#L5R15LegalPsn)
+T(2,@AccCollPsnX,#L5R15AccCollPsnX)
+T(2,@LegalPsnX,#L5R15LegalPsnX)
+T(2,@PrevIntDate,#L5R15PrevIntDate)
+T(2,@LoanBal,#L5R15LoanBal)
+T(2,@NextIntDate,#L5R15NextIntDate)
+T(2,@CustUKey,#L5R15CustUKey)
+T(2,@ClNo,#L5R15ClNo)
+T(2,@ClCode1,#L5R15ClCode1)
+T(2,@ClCode2,#L5R15ClCode2)
+#Space1=X,1,S
+
+<include src="ROM.icf::L5R19.dec"/>
+#RimCaseCode=X,1,S
+! #RimCustNo=X,7,S
+! #RimFacmNo=X,3,S
+#RimAcDate=X,7,S
+#RimTitaTlrNo=X,6,S
+#RimTitaTxtNo=X,8,S
+#RimL5R19=X,1,S
+T(2,@RimCaseCode,#CaseCode)
+! T(2,@RimCustNo,#CustNo)
+! T(2,@RimFacmNo,#FacmNo)
+T(2,@RimAcDate,#TitaAcDate)
+T(2,@RimTitaTlrNo,#TitaTlrNo)
+T(2,@RimTitaTxtNo,#TitaTxtNo)
+C(3,#FunctionCd,1,S,$)
+RESET_RIM(#RimL5R19,L5R19)
+S(L5R19,1,#RimCaseCode,#RimCustNo,#RimFacmNo,#RimAcDate,#RimTitaTlrNo,#RimTitaTxtNo)
+R(1,L5R19)
+
+T(2,@MeetDate,#L5R19MeetDate)
+T(2,@MeetTime,#L5R19MeetTime)
+T(2,@ContactCode,#L5R19ContactCode)
+T(2,@MeetPsnCode,#L5R19MeetPsnCode)
+T(2,@AccCollPsnCode,#L5R19CollPsnCode)
+T(2,@AccCollPsnName,#L5R19CollPsnName)
+T(2,@MeetPlaceCode,#L5R19MeetPlaceCode)
+T(2,@MeetPlace,#L5R19MeetPlace)
+T(2,@AccCollPsnNameX,#L5R19CollPsnNameX)
+T(2,@Remark,#L5R19ReMark)
+T(2,@EditEmpNo,#L5R19EditEmpNo)
+
+! 調Rim完成預先帶入
+T(H,@ContactCodeX,#ContactCode,#ContactCodeHelp)
+T(H,@MeetPsnCodeX,#MeetPsnCode,#MeetPsnCodeHelp)
+T(H,@MeetPlaceCodeX,#MeetPlaceCode,#MeetPlaceCodeHelp)
+T(H,@AccCollPsnCodeX,#AccCollPsnCode,#AccCollPsnCodeHelp)
+#Space2=X,1,S
+C(2,#FunctionCd,s,$,$,$,s,s)
+T(4,@EditEmpNo,TLRNO$)
+<include src="ROM.icf::L5R28.dec"/>
+#RimEmployeeNo=X,6,S
+#RimL5R28=X,1,S
+T(2,@RimEmployeeNo,#EditEmpNo)
+RESET_RIM(#RimL5R28,L5R28)
+S(L5R28,1,#RimEmployeeNo)
+R(1,L5R28)
+T(2,@EditEmpNoX,#L5r28FullName)
+!必輸欄位
+#FdFunctionCd=X,1,L
+#FdCaseCode=X,1,L
+#FdCustNo=X,1,L
+#FdAccCollPsn=X,1,L
+#FdLegalPsn=X,1,L
+#FdPrevIntDate=X,1,L
+#FdLoanBal=X,1,L
+#FdNextIntDate=X,1,L
+#FdTelPhone=X,1,L
+#FdCallDate=X,1,L
+#FdRemark=X,1,L
+#FdEditEmpNo=X,1,L
+#FdFacmNo=X,1,L
+
+#FdMeetDate=X,1,L
+C(3,#FunctionCd,1,T(3,#FdMeetDate,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetDate,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetDate,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetDate, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetDate, ),$)
+#FdMeetTime=X,1,L
+C(3,#FunctionCd,1,T(3,#FdMeetTime,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetTime,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetTime,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetTime, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetTime, ),$)
+#FdContactCode=X,1,L
+C(3,#FunctionCd,1,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdContactCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdContactCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdContactCode, ),$)
+#FdMeetPsnCode=X,1,L
+C(3,#FunctionCd,1,T(3,#FdMeetPsnCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetPsnCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetPsnCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetPsnCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetPsnCode, ),$)
+#FdAccCollPsnCode=X,1,L
+C(3,#FunctionCd,1,T(3,#FdAccCollPsnCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdAccCollPsnCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdAccCollPsnCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdAccCollPsnCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdAccCollPsnCode, ),$)
+#FdMeetPlaceCode=X,1,L
+C(3,#FunctionCd,1,T(3,#FdMeetPlaceCode,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetPlaceCode,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetPlaceCode,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetPlaceCode, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetPlaceCode, ),$)
+#FdMeetPlace=X,1,L
+C(3,#FunctionCd,1,T(3,#FdMeetPlace,*),$)
+C(3,#FunctionCd,2,T(3,#FdMeetPlace,*),$)
+C(3,#FunctionCd,3,T(3,#FdMeetPlace,*),$)
+C(3,#FunctionCd,4,T(3,#FdMeetPlace, ),$)
+C(3,#FunctionCd,5,T(3,#FdMeetPlace, ),$)
+
+! 登放序號
+#ActSeq=X,20,S
+IF (#FunctionCd==1 || #FunctionCd==2|| #FunctionCd==3,T(F,@MeetDate,1)T(F,@MeetTime,1)T(F,@ContactCode,1)T(F,@MeetPsnCode,1)T(F,@AccCollPsnCode,1)T(F,@AccCollPsnName,1)T(F,@MeetPlaceCode,1)T(F,@MeetPlace,1)T(F,@Remark,1),
+                                                      T(F,@MeetDate,0)T(F,@MeetTime,0)T(F,@ContactCode,0)T(F,@MeetPsnCode,0)T(F,@AccCollPsnCode,0)T(F,@AccCollPsnName,0)T(F,@MeetPlaceCode,0)T(F,@MeetPlace,0)T(F,@Remark,0))
+
+IF(#FunctionCd == 4 || #FunctionCd == 5,INVOKEJS(SHOW,L5602,8,8,0),INVOKEJS(SHOW,L5602,8,8,1))
+
+IF(#FunctionCd==5,K(NOBUTTON,CLOSEY),$)
+C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
+
+! 功能
+#FunctionCd=A,1,S
+
+#FunctionCdX=X,4,L
+T(H,#FunctionCd,#FunctionCdHelp)
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(2,#FunctionCd,$,$,E(0,1),$,E(0,1))
+ASGN(AGAIN$)
+! 案件種類
+#CaseCode=A,1,L
+
+#CaseCodeX=X,4,L
+
+!<電催查詢>
+#BUFA=X,11,S
+T(2,#CaseCode+#CustNo+#FacmNo)
+#BINDA=X,1,S
+BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L5961; ntxbuf=#BUFA})
+!<面催查詢>
+#BUFB=X,11,S
+T(2,#CaseCode+#CustNo+#FacmNo)
+#BINDB=X,1,S
+BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L5962; ntxbuf=#BUFB})
+!<函催查詢>
+#BUFC=X,11,S
+T(2,#CaseCode+#CustNo+#FacmNo)
+#BINDC=X,1,S
+BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L5963; ntxbuf=#BUFC})
+!<法務查詢>
+#BUFD=X,11,S
+T(2,#CaseCode+#CustNo+#FacmNo)
+#BINDD=X,1,S
+BIND(#BTND,click, {cmd=CHAIN; ntxcd=L5964; ntxbuf=#BUFD})
+!<提醒查詢>
+#BUFE=X,12,S
+T(2,#CaseCode+#CustNo+#FacmNo+1)
+#BINDE=X,1,S
+BIND(#BTNE,click, {cmd=CHAIN; ntxcd=L5965; ntxbuf=#BUFE})
+! <提醒登錄>
+#BUFN=X,12,S
+T(2,1+#CaseCode+#CustNo+#FacmNo+1)
+#BINDN=X,1,S
+BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
+
+! 戶號
+#CustNo=A,7,L
+
+! 戶名----調RIM
+#CustName=X,20,L
+
+! 額度編號
+#FacmNo=A,3,L
+! 催收人員
+#AccCollPsn=X,8,L
+#AccCollPsnX=X,40,L
+! 法務人員
+#LegalPsn=X,8,L
+#LegalPsnX=X,40,L
+! 繳息迄日
+#PrevIntDate=D,7,L
+! 放款餘額
+#LoanBal=M,14,L
+! 下次繳息日
+#NextIntDate=D,7,L
+! 客戶識別碼
+#CustUKey=X,32,S
+! 擔保品號碼
+#ClNo=9,7,S
+! 擔保品代號1
+#ClCode1=9,1,S
+! 擔保品代號2
+#ClCode2=9,2,S
+! 面催日期
+#MeetDateX=X,8,S
+T(4,#SYSCDATE)
+
+#MeetDate=D,7,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(2,#FunctionCd,S,T(1,#MeetDateX,2,7),$,$,s,s)
+D(8)
+@V(7)
+@A(DATE,0,#MeetDate)
+
+! 面催時間
+#MeetTimeX=X,6,S
+T(4,TIME$)
+#MeetTime=X,4,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(3,#FunctionCd,1,T(1,#MeetTimeX,1,4),$)
+@V(7)A(TIME,HHmm,#MeetTime)
+
+
+! 面催對象
+#ContactCode=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+HELP(#ContactCodeHelp)
+@V(H,#ContactCodeHelp)
+#ContactCodeX=X,6,L
+T(H,#ContactCode,#ContactCodeHelp)
+
+! 面晤人
+#MeetPsnCode=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+HELP(#MeetPsnCodeHelp)
+@V(H,#MeetPsnCodeHelp)
+#MeetPsnCodeX=X,4,L
+T(H,#MeetPsnCode,#MeetPsnCodeHelp)
+
+! 催收人員
+#AccCollPsnCode=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+HELP(#AccCollPsnCodeHelp)
+@V(H,#AccCollPsnCodeHelp)
+#AccCollPsnCodeX=X,6,L
+T(H,#AccCollPsnCode,#AccCollPsnCodeHelp)
+@C(3,#AccCollPsnCode,1,HIDE(#BTNF)T(F,@AccCollPsnName,0),SHOW(#BTNF)T(F,@AccCollPsnName,1))
+IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(F,@AccCollPsnName,0),$)
+
+! 催收人員姓名
+#BTNF=X,1,I,ui:button;value:聯徵地區別查詢;enable:1;tabbable:0
+#AccCollPsnNameBUF=X,6,S
+#AccCollPsnNameBIND=X,1,S
+BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#AccCollPsnNameBUF;ntxbuf5=type<-1:AccCollPsnName<-OOAccCollPsn})
+
+#AccCollPsnName=X,6,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(3,#AccCollPsnCode,1,T(2,#TLRNO),$)
+C(3,#AccCollPsnCode,1,s,$)
+
+@V(7)
+
+#AccCollPsnNameX=X,6,L
+<include src="ROM.icf::L5R17.dec"/>
+#RimEmpNo=X,6,S
+#RimL5R17=X,1,S
+T(2,@RimEmpNo,#AccCollPsnName)
+RESET_RIM(#RimL5R17,L5R17)
+S(L5R17,1,#RimEmpNo)
+R(1,L5R17)
+T(2,@AccCollPsnNameX,#L5R17FullName)
+
+! 面催地點選項
+#MeetPlaceCode=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+HELP(#MeetPlaceCodeHelp)
+@V(H,#MeetPlaceCodeHelp)
+#MeetPlaceCodeX=X,10,L
+T(H,#MeetPlaceCode,#MeetPlaceCodeHelp)
+
+<include src="ROM.icf::L5R24.dec"/>
+#RimCustUKey=X,32,S
+#RimAddressCode=X,1,S
+#RimClNo=X,7,S
+#RimClCode1=X,1,S
+#RimClCode2=X,2,S
+#RimL5R24=X,1,S
+T(2,@RimCustUKey,#CustUKey)
+T(2,@RimAddressCode,#MeetPlaceCode)
+T(2,@RimClNo,#ClNo)
+T(2,@RimClCode1,#ClCode1)
+T(2,@RimClCode2,#ClCode2)
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(3,#MeetPlaceCode,4,S,$)
+RESET_RIM(#RimL5R24,L5R24)
+S(L5R24,1,#RimCustUKey,#RimAddressCode,#RimClNo,#RimClCode1,#RimClCode2)
+R(1,L5R24)
+T(2,@MeetPlace,#L5R24FullAddress)
+
+
+! 面催地點
+#MeetPlace=X,60,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(3,#MeetPlaceCode,4,T(2,#MeetPlace, ),$)
+@V(7)
+
+! 其他記錄
+#Remark=X,2.80,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+! T(2,#MemoA+#MemoB)
+! 維護人員
+#EditEmpNo=X,6,L
+#EditEmpNoX=X,50,L
+! 經辦
+#TitaTlrNo=X,6,L
+! 交易序號
+#TitaTxtNo=X,8,L
+! 系統日期
+#TitaAcDate=D,7,L
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5602 -----------
+<sub type="FORM" name="L5602">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCd
+#CaseCode
+#CustNo
+#FacmNo
+#AccCollPsn
+#LegalPsn
+#PrevIntDate
+#LoanBal
+#MeetDate
+#MeetTime
+#ContactCode
+#MeetPsnCode
+#AccCollPsnCode
+#AccCollPsnName
+#MeetPlaceCode
+#MeetPlace
+#Remark
+#TitaTlrNo
+#TitaTxtNo
+#TitaAcDate
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R15.tom"/>
+<include src="ROM.icf::L5R17.tom"/>
+<include src="ROM.icf::L5R19.tom"/>
+<include src="ROM.icf::L5R24.tom"/>
+<include src="ROM.icf::L5R28.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5602
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+</sub>

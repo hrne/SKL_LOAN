@@ -80,6 +80,7 @@ public class L5R19 extends TradeBuffer {
 			totaVo.putParam("L5R19CollPsnName", iCollMeet.getCollPsnName());
 			totaVo.putParam("L5R19MeetPlaceCode", iCollMeet.getMeetPlaceCode());
 			totaVo.putParam("L5R19MeetPlace", iCollMeet.getMeetPlace());
+			totaVo.putParam("L5R19EditEmpNo", iCollMeet.getLastUpdateEmpNo());
 			iCdEmp = sCdEmpService.findById(iCollMeet.getCollPsnName(), titaVo);
 			if (iCdEmp != null && !iCdEmp.getFullname().equals("")) {
 				totaVo.putParam("L5R19CollPsnNameX", iCdEmp.getFullname());
@@ -97,7 +98,7 @@ public class L5R19 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500;
+		this.limit = 300;
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -79,6 +79,7 @@ public class L5R18 extends TradeBuffer {
 			totaVo.putParam("L5R18ResultCode", iCollTel.getResultCode());
 			totaVo.putParam("L5R18CallDate", iCollTel.getCallDate());
 			totaVo.putParam("L5R18ReMark", iCollTel.getRemark());
+			totaVo.putParam("L5R18EditEmpNo", iCollTel.getLastUpdateEmpNo());
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}
@@ -89,7 +90,7 @@ public class L5R18 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500;
+		this.limit = 300;
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -337,11 +337,15 @@ T(3,)T(H,#OOProcCode,#ProcCodeHelp)
 ! Brno(4)+TitaTlrNo(6)+TitaTxtNo(8)
 #OOTxSn=X,18,S
 
+#OOTxtNo=X,8,S
+T(1,@OOTxtNo,#OOTxSn,11,8)
+
 #OOBTN_TXT=X,8,O
 SWITCH(#OOProcStsCode,5,T(2,分錄),
                    6,T(2,分錄),
                    7,T(2,分錄),C(3,#OORepayCode,1,T(2,維護),T(2,查詢))
                      )
+IF(#OOTxtNo == 0, T(2,查詢),$)
 
 ! KEY=會計日 批號 明細序號
 #OOBUF_L4201=X,416,S

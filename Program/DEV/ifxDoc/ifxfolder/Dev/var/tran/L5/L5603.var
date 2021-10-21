@@ -1,0 +1,460 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5603)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5603" layout="cols=3;screen.width=[150,400,150,400];printer.width=[20,80];order=1">
+[
+["[L5603]                                 函催登錄"],
+[#<->#,"#FdFunctionCd+功能",#FunctionCdX],
+[#<->#,"#FdCaseCode+案件種類",#CaseCode,#CaseCodeX],
+[#<->#,"#FdCustNo+戶號",#CustNo,"@",#CustNoX],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo],
+["#FdAccCollPsn+催收人員",#AccCollPsn,#AccCollPsnX],["#FdLegalPsn+法務人員",#LegalPsn,#LegalPsnX],
+["#FdPrevIntDate+繳息迄日",#PrevIntDate],["#FdLoanBal+放款餘額",#LoanBal],
+["#FdNextIntDate+下次應繳日",#NextIntDate],
+[#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
+["#FdMailTypeCode+發函種類",#MailTypeCode,#MailTypeCodeX],["#FdMailDate+發函日期",#MailDate],
+["#FdMailObj+發函對象",#MailObj,#MailObjX],["#FdMailCustName+對象姓名",#MailCustName,#BTNF],
+["#FdDelvrYet+是否送達",#DelvrYet,#DelvrYetX],["#FdDelvrCode+送達方式",#DelvrCode,#DelvrCodeX],
+[#<->#,"#FdAddressCode+寄送地點類別",#AddressCode,#AddressCodeX],
+[#<->#,"#FdAddress+寄送地點",#Address],
+[#<->#,"#FdRemark+其他記錄",#Remark],
+[#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo,#EditEmpNoX],
+]
+!---------- AP TEXT AREA Variables ----------
+#BTNA=X,1,I,ui:button;value:電催查詢;enable:1;tabbable:0
+#BTNB=X,1,I,ui:button;value:面催查詢;enable:1;tabbable:0
+#BTNC=X,1,I,ui:button;value:函催查詢;enable:1;tabbable:0
+#BTND=X,1,I,ui:button;value:法務查詢;enable:1;tabbable:0
+#BTNE=X,1,I,ui:button;value:提醒查詢;enable:1;tabbable:0
+#BTNN=X,1,I,ui:button;value:提醒登錄;enable:1;tabbable:0
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從L5060進入),$)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+! 功能下拉選單1
+#FunctionCdRimName=x,20,S
+T(3,CdCode.FunctionCd)
+#FunctionCdHelp=x,1024,S
+
+! 案件種類下拉選單2
+#CaseCodeRimName=x,20,S
+T(3,CdCode.CaseCode)
+#CaseCodeHelp=x,1024,S
+
+! 發函種類下拉選單3
+#MailTypeCodeRimName=x,20,S
+T(3,CdCode.MailTypeCode)
+#MailTypeCodeHelp=x,1024,S
+
+! 發函對象下拉選單4
+#MailObjRimName=x,20,S
+T(3,CdCode.MailObj)
+#MailObjHelp=x,1024,S
+
+! 送達否下拉選單5
+#DelvrYetRimName=x,20,S
+T(3,CdCode.DelvrYet)
+#DelvrYetHelp=x,1024,S
+
+! 送達方式下拉選單6
+#DelvrCodeRimName=x,20,S
+T(3,CdCode.DelvrCode)
+#DelvrCodeHelp=x,1024,S
+
+! 寄送地點類別下拉選單7
+#AddressCodeRimName=x,20,S
+T(3,CdCode.AddressCode)
+#AddressCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#FunctionCdRimName,#CaseCodeRimName,#MailTypeCodeRimName,#MailObjRimName,#DelvrYetRimName,#DelvrCodeRimName,#AddressCodeRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FunctionCdHelp,#HelpDesc1)
+T(2,@CaseCodeHelp,#HelpDesc2)
+T(2,@MailTypeCodeHelp,#HelpDesc3)
+T(2,@MailObjHelp,#HelpDesc4)
+T(2,@DelvrYetHelp,#HelpDesc5)
+T(2,@DelvrCodeHelp,#HelpDesc6)
+T(2,@AddressCodeHelp,#HelpDesc7)
+
+
+#NTXBUF=X,33,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunctionCd,#NTXBUF,1,1)
+T(1,@CaseCode,#NTXBUF,2,1)
+T(1,@CustNo,#NTXBUF,3,7)
+T(1,@FacmNo,#NTXBUF,10,3)
+T(1,@TitaTlrNo,#NTXBUF,13,6)
+T(1,@TitaTxtNo,#NTXBUF,19,8)
+T(1,@TitaAcDate,#NTXBUF,27,7)
+INVOKEJS(SHOW,p1,02,02,1)
+
+#PRE_EVELU=A,1,S
+
+<include src="ROM.icf::L5R15.dec"/>
+#RimCustNo=X,7,S
+#RimFacmNo=X,3,S
+#RimL5R15=X,1,S
+T(2,@RimCustNo,#CustNo)
+T(2,@RimFacmNo,#FacmNo)
+RESET_RIM(#RimL5R15,L5R15)
+S(L5R15,1,#RimCustNo,#RimFacmNo)
+R(1,L5R15)
+T(2,@CustNoX,#L5R15CustName)
+T(2,@AccCollPsn,#L5R15AccCollPsn)
+T(2,@LegalPsn,#L5R15LegalPsn)
+T(2,@AccCollPsnX,#L5R15AccCollPsnX)
+T(2,@LegalPsnX,#L5R15LegalPsnX)
+T(2,@PrevIntDate,#L5R15PrevIntDate)
+T(2,@LoanBal,#L5R15LoanBal)
+T(2,@NextIntDate,#L5R15NextIntDate)
+T(2,@CustUKey,#L5R15CustUKey)
+T(2,@ClNo,#L5R15ClNo)
+T(2,@ClCode1,#L5R15ClCode1)
+T(2,@ClCode2,#L5R15ClCode2)
+#Space=X,1,S
+
+<include src="ROM.icf::L5R20.dec"/>
+#RimCaseCode=X,1,S
+! #RimCustNo=X,7,S
+! #RimFacmNo=X,3,S
+#RimAcDate=X,7,S
+#RimTitaTlrNo=X,6,S
+#RimTitaTxtNo=X,8,S
+#RimL5R20=X,1,S
+T(2,@RimCaseCode,#CaseCode)
+! T(2,@RimCustNo,#CustNo)
+! T(2,@RimFacmNo,#FacmNo)
+T(2,@RimAcDate,#TitaAcDate)
+T(2,@RimTitaTlrNo,#TitaTlrNo)
+T(2,@RimTitaTxtNo,#TitaTxtNo)
+C(3,#FunctionCd,1,S,$)
+RESET_RIM(#RimL5R20,L5R20)
+S(L5R20,1,#RimCaseCode,#RimCustNo,#RimFacmNo,#RimAcDate,#RimTitaTlrNo,#RimTitaTxtNo)
+R(1,L5R20)
+T(2,@MailTypeCode,#L5R20MailTypeCode)
+T(2,@MailDate,#L5R20MailDate)
+T(2,@MailObj,#L5R20MailObj)
+T(2,@MailCustName,#L5R20CustName)
+T(2,@DelvrYet,#L5R20DelvrYet)
+T(2,@DelvrCode,#L5R20DelvrCode)
+T(2,@Address,#L5R20Address)
+T(2,@Remark,#L5R20ReMark)
+T(2,@AddressCode,#L5R20AddressCode)
+T(2,@EditEmpNo,#L5R20EditEmpNo)
+! 調Rim完成預先帶入
+T(H,@MailTypeCodeX,#MailTypeCode,#MailTypeCodeHelp)
+T(H,@MailObjX,#MailObj,#MailObjHelp)
+T(H,@DelvrYetX,#DelvrYet,#DelvrYetHelp)
+T(H,@DelvrCodeX,#DelvrCode,#DelvrCodeHelp)
+T(H,@AddressCodeX,#AddressCode,#AddressCodeHelp)
+#Space1=X,1,S
+C(2,#FunctionCd,s,$,$,$,s,s)
+T(4,@EditEmpNo,TLRNO$)
+<include src="ROM.icf::L5R28.dec"/>
+#RimEmployeeNo=X,6,S
+#RimL5R28=X,1,S
+T(2,@RimEmployeeNo,#EditEmpNo)
+RESET_RIM(#RimL5R28,L5R28)
+S(L5R28,1,#RimEmployeeNo)
+R(1,L5R28)
+T(2,@EditEmpNoX,#L5r28FullName)
+! 登放序號
+#ActSeq=X,20,S
+IF (#FunctionCd==1 || #FunctionCd==2|| #FunctionCd==3,T(F,@MailTypeCode,1)T(F,@MailDate,1)T(F,@MailObj,1)T(F,@CustName,1)T(F,@DelvrYet,1)T(F,@DelvrCode,1)T(F,@AddressCode,1)T(F,@Address,1)T(F,@Remark,1)T(F,@MailCustName,1),
+                                                      T(F,@MailTypeCode,0)T(F,@MailDate,0)T(F,@MailObj,0)T(F,@CustName,0)T(F,@DelvrYet,0)T(F,@DelvrCode,0)T(F,@AddressCode,0)T(F,@Address,0)T(F,@Remark,0)T(F,@MailCustName,0))
+
+IF (#FunctionCd == 4|| #FunctionCd == 5,INVOKEJS(SHOW,L5603,8,8,0),INVOKEJS(SHOW,L5603,8,8,1))
+
+IF(#FunctionCd==5,K(NOBUTTON,CLOSEY),$)
+C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
+!必輸欄位
+#FdFunctionCd=X,1,L
+#FdCaseCode=X,1,L
+#FdCustNo=X,1,L
+#FdAccCollPsn=X,1,L
+#FdLegalPsn=X,1,L
+#FdPrevIntDate=X,1,L
+#FdLoanBal=X,1,L
+#FdNextIntDate=X,1,L
+#FdTelPhone=X,1,L
+#FdCallDate=X,1,L
+#FdRemark=X,1,L
+#FdEditEmpNo=X,1,L
+#FdFacmNo=X,1,L
+#FdMailTypeCode=X,1,L
+C(3,#FunctionCd,5,T(3,#FdMailTypeCode, ),T(3,#FdMailTypeCode,*))
+#FdMailDate=X,1,L
+C(3,#FunctionCd,5,T(3,#FdMailDate, ),T(3,#FdMailDate,*))
+#FdMailObj=X,1,L
+C(3,#FunctionCd,5,T(3,#FdMailObj, ),T(3,#FdMailObj,*))
+#FdMailCustName=X,1,L
+C(3,#FunctionCd,5,T(3,#FdMailCustName, ),T(3,#FdMailCustName,*))
+#FdDelvrYet=X,1,L
+C(3,#FunctionCd,5,T(3,#FdDelvrYet, ),T(3,#FdDelvrYet,*))
+#FdDelvrCode=X,1,L
+C(3,#FunctionCd,5,T(3,#FdDelvrCode, ),T(3,#FdDelvrCode,*))
+#FdAddressCode=X,1,L
+C(3,#FunctionCd,5,T(3,#FdAddressCode, ),T(3,#FdAddressCode,*))
+#FdAddress=X,1,L
+C(3,#FunctionCd,5,T(3,#FdAddress, ),T(3,#FdAddress,*))
+
+
+! 功能
+#FunctionCd=A,1,S
+
+#FunctionCdX=X,4,L
+T(H,#FunctionCd,#FunctionCdHelp)
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(2,#FunctionCd,$,$,E(0,1),$,E(0,1))
+ASGN(AGAIN$)
+! 案件種類
+#CaseCode=A,1,L
+#CaseCodeX=X,4,L
+T(H,#CaseCode,#CaseCodeHelp)
+
+!<電催查詢>
+#BUFA=X,11,S
+T(2,#CaseCode+#CustNo+#FacmNo)
+#BINDA=X,1,S
+BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L5961; ntxbuf=#BUFA})
+!<面催查詢>
+#BUFB=X,11,S
+T(2,#CaseCode+#CustNo+#FacmNo)
+#BINDB=X,1,S
+BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L5962; ntxbuf=#BUFB})
+!<函催查詢>
+#BUFC=X,11,S
+T(2,#CaseCode+#CustNo+#FacmNo)
+#BINDC=X,1,S
+BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L5963; ntxbuf=#BUFC})
+!<法務查詢>
+#BUFD=X,11,S
+T(2,#CaseCode+#CustNo+#FacmNo)
+#BINDD=X,1,S
+BIND(#BTND,click, {cmd=CHAIN; ntxcd=L5964; ntxbuf=#BUFD})
+!<提醒查詢>
+#BUFE=X,12,S
+T(2,#CaseCode+#CustNo+#FacmNo+1)
+#BINDE=X,1,S
+BIND(#BTNE,click, {cmd=CHAIN; ntxcd=L5965; ntxbuf=#BUFE})
+! <提醒登錄>
+#BUFN=X,12,S
+T(2,1+#CaseCode+#CustNo+#FacmNo+1)
+#BINDN=X,1,S
+BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
+
+! 戶號
+#CustNo=A,7,L
+
+! 戶名----調RIM
+#CustNoX=X,20,L
+
+! 額度編號
+#FacmNo=A,3,L
+
+! ---------調RIM
+! 催收人員
+#AccCollPsn=X,8,L
+#AccCollPsnX=X,40,L
+! 法務人員
+#LegalPsn=X,8,L
+#LegalPsnX=X,40,L
+! 繳息迄日
+#PrevIntDate=D,7,L
+! 放款餘額
+#LoanBal=M,14,L
+! 下次繳息日
+#NextIntDate=D,7,L
+! ---------調RIM
+! 客戶識別碼
+#CustUKey=X,32,S
+! 擔保品號碼
+#ClNo=9,7,S
+! 擔保品代號1
+#ClCode1=9,1,S
+! 擔保品代號2
+#ClCode2=9,2,S
+! 發函種類
+#MailTypeCode=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+HELP(#MailTypeCodeHelp)
+@V(H,#MailTypeCodeHelp)
+#MailTypeCodeX=X,10,L
+T(H,#MailTypeCode,#MailTypeCodeHelp)
+
+! 發函日期
+#MailDateX=X,8,S
+T(4,#SYSCDATE)
+#MailDate=D,7,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(2,#FunctionCd,S,T(1,#MailDateX,2,7),$,$,s,s)
+D(8)
+@V(7)A(DATE,0,#MailDate)
+
+
+! 發函對象
+#MailObj=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+HELP(#MailObjHelp)
+@V(H,#MailObjHelp)
+#MailObjX=X,6,L
+T(H,#MailObj,#MailObjHelp)
+C(3,#MailObj,1,HIDE(#BTNF)T(F,@MailCustName,0)T(2,@FdMailCustName, ),SHOW(#BTNF)T(F,@MailCustName,1)T(2,@FdMailCustName,*))
+IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(2,@FdMailCustName, )T(F,@MailCustName,0),$)
+
+<include src="ROM.icf::L5R25.dec"/>
+#RimCustUKey=X,32,S
+#RimL5R25=X,1,S
+T(2,@RimCustUKey,#CustUKey)
+RESET_RIM(#RimL5R25,L5R25)
+S(L5R25,1,#RimCustNo,#RimFacmNo,#RimCustUKey)
+R(1,L5R25)
+C(3,#MailObj,1,T(2,@MailCustName,#L5R25CustName),E(0,@ApplNo,#L5R25ApplNo))
+
+! 核准號碼
+#ApplNo=A,7,S
+
+! 對象姓名 借:帶入；保:輸入
+#BTNF=X,1,I,ui:button;value:保證人查詢;enable:1;tabbable:0
+#BTNFBUF=X,40,S
+T(2,00000000000000+          +#ApplNo+000)
+#BTNFBIND=X,1,S
+BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L2020; ntxbuf=#BTNFBUF;ntxbuf5=type<-1:MailCustName<-OOGuarantor})
+
+#MailCustName=X,2.50,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(3,#MailObj,1,s,$)
+@V(7)
+
+! 是否送達
+#DelvrYet=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)    
+HELP(#DelvrYetHelp)
+@V(H,#DelvrYetHelp)
+#DelvrYetX=X,6,L
+T(H,#DelvrYet,#DelvrYetHelp)
+
+! 送達方式
+#DelvrCode=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+HELP(#DelvrCodeHelp)
+@V(H,#DelvrCodeHelp)
+#DelvrCodeX=X,14,L
+T(H,#DelvrCode,#DelvrCodeHelp)
+
+! 寄送地點選項
+#AddressCode=A,1,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+HELP(#AddressCodeHelp)
+@V(H,#AddressCodeHelp)
+#AddressCodeX=X,10,L
+T(H,#AddressCode,#AddressCodeHelp)
+
+<include src="ROM.icf::L5R24.dec"/>
+#RimAddressCode=X,1,S
+#RimClNo=X,7,S
+#RimClCode1=X,1,S
+#RimClCode2=X,2,S
+#RimL5R24=X,1,S
+
+T(2,@RimAddressCode,#AddressCode)
+T(2,@RimClNo,#ClNo)
+T(2,@RimClCode1,#ClCode1)
+T(2,@RimClCode2,#ClCode2)
+C(2,#FunctionCd,S,$,$,$,s,s)
+C(3,#AddressCode,4,S,$)
+RESET_RIM(#RimL5R24,L5R24)
+S(L5R24,1,#RimCustUKey,#RimAddressCode,#RimClNo,#RimClCode1,#RimClCode2)
+R(1,L5R24)
+T(2,@Address,#L5R24FullAddress)
+
+! 寄送地點
+#Address=X,60,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+@V(7)
+
+! 其他記錄
+#Remark=X,2.80,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+! 維護人員
+#EditEmpNo=X,6,L
+#EditEmpNoX=X,50,L
+! 經辦
+#TitaTlrNo=X,6,L
+! 交易序號
+#TitaTxtNo=X,8,L
+! 系統日期
+#TitaAcDate=D,7,L
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5603 -----------
+<sub type="FORM" name="L5603">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCd
+#CaseCode
+#CustNo
+#FacmNo
+#AccCollPsn
+#LegalPsn
+#PrevIntDate
+#LoanBal
+#MailTypeCode
+#MailDate
+#MailObj
+#MailCustName
+#DelvrYet
+#DelvrCode
+#AddressCode
+#Address
+#Remark
+#TitaTlrNo
+#TitaTxtNo
+#TitaAcDate
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R15.tom"/>
+<include src="ROM.icf::L5R20.tom"/>
+<include src="ROM.icf::L5R24.tom"/>
+<include src="ROM.icf::L5R25.tom"/>
+<include src="ROM.icf::L5R28.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5603
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+</sub>

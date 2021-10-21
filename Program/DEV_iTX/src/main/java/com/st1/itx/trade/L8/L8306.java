@@ -109,7 +109,11 @@ public class L8306 extends TradeBuffer {
 			// 2 start 完整key值未曾報送過'44':請求同意債務清償方案通知資料則予以剔退
 			iJcicZ044 = sJcicZ044Service.findById(iJcicZ044Id, titaVo);
 			if (iJcicZ044 == null) {
-				throw new LogicException("E0005", "未曾報送過(44)請求同意債務清償方案通知資料.");
+				if ("A".equals(iTranKey)) {
+					throw new LogicException("E0005", "未曾報送過(44)請求同意債務清償方案通知資料.");
+				} else {
+					throw new LogicException("E0007", "未曾報送過(44)請求同意債務清償方案通知資料.");
+				}
 			}
 			// 2 end
 

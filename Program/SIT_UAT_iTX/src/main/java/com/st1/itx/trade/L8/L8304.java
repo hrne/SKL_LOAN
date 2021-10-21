@@ -36,7 +36,6 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
-
 /**
  * Tita<br>
  * TranKey=X,1<br>
@@ -121,20 +120,32 @@ public class L8304 extends TradeBuffer {
 
 		// 檢核項目(D-9)
 		if (!"4".equals(iTranKey_Tmp)) {
-			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
-			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
-			if (iJcicZ040 == null) {
-				throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
-			} // 2 end
 
-			// 3 金融機構報送日大於協商申請日+25則予以剔退***J
+			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
+				// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
+				iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
+				if (iJcicZ040 == null) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+					} else {
+						throw new LogicException("E0007", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+					}
+				} // 2 end
 
-			// 4 start 第9欄「擔保品類別」代號不可為'00'~'09'.
-			if (Arrays.stream(irCollateralType).anyMatch(iCollateralType::equals)) {
-				throw new LogicException("E0005", "「擔保品類別」代號不可為'00'~'09'.");
-			} // 4 end
+				// 3 金融機構報送日大於協商申請日+25則予以剔退***J
 
-			// 檢核項目 end
+				// 4 start 第9欄「擔保品類別」代號不可為'00'~'09'.
+				if (Arrays.stream(irCollateralType).anyMatch(iCollateralType::equals)) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "「擔保品類別」代號不可為'00'~'09'.");
+					} else {
+						throw new LogicException("E0007", "「擔保品類別」代號不可為'00'~'09'.");
+					}
+				} // 4 end
+
+				// 檢核項目 end
+
+			}
 		}
 
 		switch (iTranKey_Tmp) {
@@ -238,6 +249,5 @@ public class L8304 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 
 }

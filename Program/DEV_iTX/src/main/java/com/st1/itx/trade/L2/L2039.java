@@ -69,7 +69,7 @@ public class L2039 extends TradeBuffer {
 		List<ClEva> lClEva = new ArrayList<ClEva>();
 		Slice<ClEva> slClEva = null;
 
-		slClEva = sClEvaService.findClNo(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
+		slClEva = sClEvaService.findClNo(iClCode1, iClCode2, iClNo, 0, this.index, this.limit, titaVo);
 		lClEva = slClEva == null ? null : slClEva.getContent();
 
 		if (slClEva != null && slClEva.hasNext()) {

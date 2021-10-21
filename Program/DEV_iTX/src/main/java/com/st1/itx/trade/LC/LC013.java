@@ -22,6 +22,9 @@ import com.st1.itx.db.domain.TxAuthGroup;
 import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.domain.TxAgent;
 import com.st1.itx.db.service.TxAgentService;
+import com.st1.itx.db.domain.TxTellerAuth;
+import com.st1.itx.db.service.TxTellerAuthService;
+
 import com.st1.itx.util.common.CheckAuth;
 
 import java.util.Date;
@@ -40,6 +43,9 @@ public class LC013 extends TradeBuffer {
 
 	@Autowired
 	public TxTellerService txTellerService;
+
+	@Autowired
+	public TxTellerAuthService txTellerAuthService;
 
 	@Autowired
 	public TxAuthGroupService txAuthGroupService;
@@ -73,7 +79,8 @@ public class LC013 extends TradeBuffer {
 
 		if (lTxAgent != null) {
 			for (TxAgent txAgent : lTxAgent) {
-				this.info("LC013 TxAgent = " + txAgent.getTlrNo() + '/' + txAgent.getBeginDate() + '/' + txAgent.getEndDate() + '/' + this.getTxBuffer().getTxCom().getTbsdy());
+				this.info("LC013 TxAgent = " + txAgent.getTlrNo() + '/' + txAgent.getBeginDate() + '/'
+						+ txAgent.getEndDate() + '/' + this.getTxBuffer().getTxCom().getTbsdy());
 
 				/*
 				 * // 未生效 if (txAgent.getStatus() != 1) { continue; } // 未在有效期間 if
@@ -132,16 +139,25 @@ public class LC013 extends TradeBuffer {
 		if ("".equals(agentNo)) {
 			this.totaVo.putParam("AdFg", txTeller.getAdFg());
 		}
-		addOccurs(txTeller.getAuthNo1(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo2(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo3(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo4(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo5(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo6(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo7(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo8(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo9(), agentNo, agentItem, titaVo);
-		addOccurs(txTeller.getAuthNo10(), agentNo, agentItem, titaVo);
+
+//		addOccurs(txTeller.getAuthNo1(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo2(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo3(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo4(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo5(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo6(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo7(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo8(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo9(), agentNo, agentItem, titaVo);
+//		addOccurs(txTeller.getAuthNo10(), agentNo, agentItem, titaVo);
+
+		Slice<TxTellerAuth> slTxTellerAuth = txTellerAuthService.findByTlrNo(tlrNo, 0, Integer.MAX_VALUE, titaVo);
+		List<TxTellerAuth> lTxTellerAuth = slTxTellerAuth == null ? null : slTxTellerAuth.getContent();
+		if (lTxTellerAuth != null && lTxTellerAuth.size() > 0) {
+			for (TxTellerAuth txTellerAuth : lTxTellerAuth) {
+				addOccurs(txTellerAuth.getAuthNo(), agentNo, agentItem, titaVo);
+			}
+		}
 	}
 
 	private void addOccurs(String authNo, String agentNo, String agentItem, TitaVo titaVo) throws LogicException {

@@ -113,11 +113,12 @@ public class L8301 extends TradeBuffer {
 		// 檢核項目(D-3)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.3 start若交易代碼報送C異動，於進檔時檢查並無此筆資料，視為新增A，不予剔退
-			JcicZ040 jJcicZ040 = sJcicZ040Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
-			if ("C".equals(iTranKey) && jJcicZ040 == null) {
-				iTranKey_Tmp = "1";
-				iTranKey = "A";
-
+			if ("C".equals(iTranKey)) {
+				JcicZ040 jJcicZ040 = sJcicZ040Service.ukeyFirst(titaVo.getParam("Ukey"), titaVo);
+				if (jJcicZ040 == null) {
+					iTranKey_Tmp = "1";
+					iTranKey = "A";
+				}
 			}
 			// 1.3 end
 
@@ -136,30 +137,39 @@ public class L8301 extends TradeBuffer {
 
 			// 1.10
 			// start檢核債權機構代號，是否屬於有效消債條例金融機構代號--不是則剔退(NegFinAcct「債務協商債權機構帳戶檔」FinCode)
-			try {
-				iL8301SqlReturn = sL8301ServiceImpl.findData(this.index, this.limit, titaVo);
-			} catch (Exception e) {
-				// E5004 讀取DB語法發生問題
-				this.info("NegFinAcct ErrorForSql=" + e);
-				throw new LogicException(titaVo, "E5004", "");
-			}
-			if (iL8301SqlReturn != null) {
-				int flagFind = 0;
-				for (String xNotBankId : sNotBankId) {
-					if (!xNotBankId.trim().isEmpty()) {
-						for (String xL8301SqlReturn : iL8301SqlReturn) {
-							if (xNotBankId.equals(xL8301SqlReturn)) {
-								flagFind = 1;
-								break;
+			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
+				try {
+					iL8301SqlReturn = sL8301ServiceImpl.findData(this.index, this.limit, titaVo);
+				} catch (Exception e) {
+					// E5004 讀取DB語法發生問題
+					this.info("NegFinAcct ErrorForSql=" + e);
+					throw new LogicException(titaVo, "E5004", "");
+				}
+				if (iL8301SqlReturn != null) {
+					int flagFind = 0;
+					for (String xNotBankId : sNotBankId) {
+						if (!xNotBankId.trim().isEmpty()) {
+							flagFind = 0;
+							for (String xL8301SqlReturn : iL8301SqlReturn) {
+								if (xNotBankId.equals(xL8301SqlReturn)) {
+									flagFind = 1;
+									break;
+								}
+							}
+							if (flagFind == 0) {
+								if ("A".equals(iTranKey)) {
+									throw new LogicException(titaVo, "E0005",
+											"債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+								} else {
+									throw new LogicException(titaVo, "E0007",
+											"債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+								}
 							}
 						}
-						if (flagFind == 0) {
-							throw new LogicException(titaVo, "E0005", "債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
-						}
-						flagFind = 0;
 					}
 				}
-			} // 1.10 end
+			}
+			// 1.10 end
 
 			// 2.本中心於債務人提出協商申請日後第22日截止時，若尚未接獲各債權金融機構回報債權金額資料，本中心即將此部分揭露於Z99前前置協商相關作業提醒資訊.***J
 

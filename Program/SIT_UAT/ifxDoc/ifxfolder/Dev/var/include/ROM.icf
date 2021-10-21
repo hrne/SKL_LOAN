@@ -5623,6 +5623,7 @@ TXFORM=L5R17
 #L5R18ResultCode=X,1,S
 #L5R18CallDate=D,7,S
 #L5R18ReMark=X,80,S
+#L5R18EditEmpNo=X,6,S
 </L5R18.dec>
 
 <L5R18.tom>
@@ -5637,6 +5638,7 @@ TXFORM=L5R18
 #L5R18ResultCode
 #L5R18CallDate
 #L5R18ReMark
+#L5R18EditEmpNo
 ^
 </L5R18.tom>
 
@@ -5651,6 +5653,7 @@ TXFORM=L5R18
 #L5R19ReMark=X,160,S
 #L5R19MeetPlaceCode=9,1,S
 #L5R19CollPsnNameX=X,6,S
+#L5R19EditEmpNo=X,6,S
 </L5R19.dec>
 
 <L5R19.tom>
@@ -5665,6 +5668,7 @@ TXFORM=L5R19
 #L5R19ReMark
 #L5R19MeetPlaceCode
 #L5R19CollPsnNameX
+#L5R19EditEmpNo
 ^
 </L5R19.tom>
 
@@ -5678,6 +5682,7 @@ TXFORM=L5R19
 #L5R20Address=X,60,S
 #L5R20ReMark=X,160,S
 #L5R20AddressCode=X,1,S
+#L5R20EditEmpNo=X,6,S
 </L5R20.dec>
 
 <L5R20.tom>
@@ -5691,6 +5696,7 @@ TXFORM=L5R20
 #L5R20Address
 #L5R20ReMark
 #L5R20AddressCode
+#L5R20EditEmpNo
 ^
 </L5R20.tom>
 
@@ -5703,6 +5709,7 @@ TXFORM=L5R20
 #L5R21ClCode1=9,1,S
 #L5R21ClCode2=9,2,S
 #L5R21ClNo=9,7,S
+#L5R21EditEmpNo=X,6,S
 </L5R21.dec>
 
 <L5R21.tom>
@@ -5715,6 +5722,7 @@ TXFORM=L5R21
 #L5R21ClCode1
 #L5R21ClCode2
 #L5R21ClNo
+#L5R21EditEmpNo
 ^
 </L5R21.tom>
 
@@ -5725,6 +5733,7 @@ TXFORM=L5R21
 #L5R22EditTime=X,4,S
 #L5R22RemindCode=X,2,S
 #L5R22ReMark=X,160,S
+#L5R22EditEmpNo=X,6,S
 </L5R22.dec>
 
 <L5R22.tom>
@@ -5735,6 +5744,7 @@ TXFORM=L5R22
 #L5R22EditTime
 #L5R22RemindCode
 #L5R22ReMark
+#L5R22EditEmpNo
 ^
 </L5R22.tom>
 

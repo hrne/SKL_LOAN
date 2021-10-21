@@ -36,17 +36,18 @@ public interface ClEvaService {
   public Slice<ClEva> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND  EvaNo &lt;&gt;
    *
    * @param clCode1_0 clCode1_0
    * @param clCode2_1 clCode2_1
    * @param clNo_2 clNo_2
+   * @param evaNo_3 evaNo_3
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice ClEva ClEva of List
    */
-  public Slice<ClEva> findClNo(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo);
+  public Slice<ClEva> findClNo(int clCode1_0, int clCode2_1, int clNo_2, int evaNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * ClCode1 = ,AND ClCode2 = ,AND ClNo = 

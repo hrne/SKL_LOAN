@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -14,12 +15,16 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcReceivable;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.FacCloseId;
+import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.service.CdGseqService;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
+import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.BaTxCom;
@@ -40,17 +45,19 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2631 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2631.class);
 
 	@Autowired
 	public CdGseqService cdGseqService;
 	/* DB服務注入 */
 	@Autowired
 	public FacCloseService sFacCloseService;
-
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService sCustMainService;
+	@Autowired
+	public ClFacService clFacService;
+	@Autowired
+	public LoanBorMainService loanBorMainService;
 
 	/* 日期工具 */
 	@Autowired
@@ -84,6 +91,7 @@ public class L2631 extends TradeBuffer {
 		FacClose tFacCloseMaxCloseNo = new FacClose();
 		FacClose tFacClose = new FacClose();
 		CustMain tCustMain = new CustMain();
+		List<ClFac> lClFac = new ArrayList<ClFac>();
 		// tita
 		// 登放記號
 		int iActFg = parse.stringToInteger(titaVo.getParam("ACTFG"));
@@ -186,6 +194,43 @@ public class L2631 extends TradeBuffer {
 		}
 
 		if ("7".equals(titaVo.getParam("RpFg"))) {
+
+			int wkFacmNoSt = 1;
+			int wkFacmNoEd = 999;
+			if (iFacmNo > 0) {
+				wkFacmNoSt = iFacmNo;
+				wkFacmNoEd = iFacmNo;
+			}
+			// 擔保品與額度關聯檔
+			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0,
+					Integer.MAX_VALUE, titaVo);
+			lClFac = slClFac == null ? null : slClFac.getContent();
+			// 全部結案
+			boolean isAllClose = true;
+			for (ClFac c : lClFac) {
+				if ((c.getCustNo() == iCustNo && iFacmNo == 0)
+						|| (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
+
+					// 撥款主檔
+					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
+							c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+					if (slLoanBorMain != null) {
+						for (LoanBorMain t : slLoanBorMain.getContent()) {
+							// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
+							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
+									|| t.getStatus() == 8) {
+								isAllClose = false;
+								break;
+							}
+						}
+
+					}
+				}
+			}
+			if (!isAllClose) {
+				throw new LogicException(titaVo, "E2074", "未全部結案不可列印清償證明 "); // 未全部結案，不可列印
+			}
+
 			FacClose BeforeFacClose = sFacCloseService.findById(new FacCloseId(iCustNo, iCloseNo), titaVo);
 			// 自動取公文編號
 			this.txBuffer.getTxCom();

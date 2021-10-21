@@ -20,11 +20,13 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
+import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.CdBankService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacProdService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.LoanOverdueService;
+import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.BaTxCom;
@@ -50,7 +52,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3916")
 @Scope("prototype")
 public class L3916 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3916.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -61,6 +62,8 @@ public class L3916 extends TradeBuffer {
 	public LoanBorMainService loanBorMainService;
 	@Autowired
 	public LoanOverdueService loanOverdueService;
+	@Autowired
+	public LoanRateChangeService loanRateChangeService;
 	@Autowired
 	public CdBankService cdBankService;
 	@Autowired
@@ -120,8 +123,12 @@ public class L3916 extends TradeBuffer {
 		// 查詢放款主檔
 		LoanBorMain tLoanBorMain = loanBorMainService.findById(new LoanBorMainId(wkCustNo, iFacmNo, iBormNo), titaVo);
 		if (tLoanBorMain == null) {
-			throw new LogicException(titaVo, "E0001",
-					"放款主檔  借款人戶號 = " + wkCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + iBormNo); // 查詢資料不存在
+			throw new LogicException(titaVo, "E0001", "放款主檔  借款人戶號 = " + wkCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + iBormNo); // 查詢資料不存在
+		}
+		LoanRateChange tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(wkCustNo, iFacmNo, iBormNo,
+				titaVo.getEntDyI() + 19110000, titaVo);
+		if (tLoanRateChange == null) {
+			throw new LogicException(titaVo, "E0001", "放款利率變動檔  借款人戶號 = " + wkCustNo + "-" + iFacmNo + "-" + iBormNo); // 查詢資料不存在
 		}
 
 		tempVo = authLogCom.exec(wkCustNo, iFacmNo, titaVo);
@@ -143,14 +150,11 @@ public class L3916 extends TradeBuffer {
 		// 查詢各項費用
 		baTxCom.settingUnPaid(this.txBuffer.getTxCom().getTbsdy(), iCustNo, iFacmNo, iBormNo, 99, BigDecimal.ZERO, titaVo); // 99-費用全部(含未到期)
 		// 2: 催收戶 5: 催收結案戶 6: 呆帳戶 7: 部分轉呆戶 9: 呆帳結案戶
-		if (tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 5 || tLoanBorMain.getStatus() == 6
-				|| tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 9) {
-			tLoanOverdue = loanOverdueService.findById(new LoanOverdueId(tLoanBorMain.getCustNo(),
-					tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(), tLoanBorMain.getLastOvduNo()), titaVo);
+		if (tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 5 || tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 9) {
+			tLoanOverdue = loanOverdueService.findById(new LoanOverdueId(tLoanBorMain.getCustNo(), tLoanBorMain.getFacmNo(), tLoanBorMain.getBormNo(), tLoanBorMain.getLastOvduNo()), titaVo);
 			if (tLoanOverdue == null) {
 				throw new LogicException(titaVo, "E0001",
-						"催收呆帳檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 = " + tLoanBorMain.getFacmNo() + " 撥款序號 = "
-								+ tLoanBorMain.getBormNo() + " 催收序號 = " + tLoanBorMain.getLastOvduNo()); // 查詢資料不存在
+						"催收呆帳檔 戶號 = " + tLoanBorMain.getCustNo() + " 額度編號 = " + tLoanBorMain.getFacmNo() + " 撥款序號 = " + tLoanBorMain.getBormNo() + " 催收序號 = " + tLoanBorMain.getLastOvduNo()); // 查詢資料不存在
 			}
 			wkOvduDate = tLoanOverdue.getOvduDate();
 			wkOvduAmt = tLoanOverdue.getOvduAmt();
@@ -207,7 +211,7 @@ public class L3916 extends TradeBuffer {
 		this.totaVo.putParam("RepayFreq", tLoanBorMain.getRepayFreq());
 		this.totaVo.putParam("PayIntFreq", tLoanBorMain.getPayIntFreq());
 		this.totaVo.putParam("GraceDate", tLoanBorMain.getGraceDate());
-		this.totaVo.putParam("StoreRate", tLoanBorMain.getStoreRate());
+		this.totaVo.putParam("StoreRate", tLoanRateChange.getFitRate());
 		this.totaVo.putParam("RateCode", tLoanBorMain.getRateCode());
 		this.totaVo.putParam("RateIncr", tLoanBorMain.getRateIncr());
 		this.totaVo.putParam("FirstAdjRateDate", tLoanBorMain.getFirstAdjRateDate());

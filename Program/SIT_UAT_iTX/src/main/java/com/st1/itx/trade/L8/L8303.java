@@ -153,7 +153,11 @@ public class L8303 extends TradeBuffer {
 			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
 			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
 			if (iJcicZ040 == null) {
-				throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+				if ("A".equals(iTranKey)) {
+					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+				} else {
+					throw new LogicException("E0007", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+				}
 			} // 2 end
 
 			// 3 start 金融機構報送日大於協商申請日+25則予以剔退
@@ -167,27 +171,35 @@ public class L8303 extends TradeBuffer {
 			if ("Y".equals(iIsClaims)) {
 				iJcicZ045 = sJcicZ045Service.findById(iJcicZ045Id, titaVo);
 				if (iJcicZ045 == null) {
-					throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
+					} else {
+						throw new LogicException("E0007", "本金融機構債務人必須先填報(45)回報是否同意債務清償方案資料.");
+					}
 				}
+				// 4 end
+
 				// 5 start 本金融機構債務人+有擔保債權筆數0，則信用貸款+現金卡放款+信用卡 本息餘額應大於0
 				if ((iGuarLoanCnt == 0) && (sTotalAmt <= 0)) {
-					throw new LogicException("E0005", "本金融機構債務人有擔保債權筆數為0，則[信用貸款本息餘額]+[現金卡放款本息餘額]+[信用卡本息餘額]合計應大於0.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "本金融機構債務人有擔保債權筆數為0，則[信用貸款本息餘額]+[現金卡放款本息餘額]+[信用卡本息餘額]合計應大於0.");
+					} else {
+						throw new LogicException("E0007", "本金融機構債務人有擔保債權筆數為0，則[信用貸款本息餘額]+[現金卡放款本息餘額]+[信用卡本息餘額]合計應大於0.");
+					}
 				}
-			} else {
-				// 7 start 非本金融機構債務人，有擔保債權筆數必須為0，信用貸款+現金卡放款+信用卡 本息餘額應等於0
-				if (iGuarLoanCnt != 0) {
-					throw new LogicException("E0005", "非本金融機構債務人，有擔保債權筆數應為0.");
-				} else if (sTotalAmt != 0) {
-					throw new LogicException("E0005", "非本金融機構債務人，[信用貸款本息餘額]+[現金卡放款本息餘額]+[信用卡本息餘額]合計應等於0.");
-				}
-			} // 4,5,7 end
+			}
+			// 5 end-->(前端已有檢核，但錯誤信息提示不明確)
 
 			// 6 start 有擔保債權筆數需等於報送'43':回報有擔保債權金額資料之筆數
-			Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.coutCollaterals(iCustId, iRcDate + 19110000, iSubmitKey, iMaxMainCode, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<JcicZ043> sJcicZ043 = sJcicZ043Service.coutCollaterals(iCustId, iRcDate + 19110000, iSubmitKey,
+					iMaxMainCode, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ043 == null) {
 				if (iGuarLoanCnt != 0) {
-					throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(43)回報有擔保債權金額資料之筆數.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(43)回報有擔保債權金額資料之筆數.");
+					} else {
+						throw new LogicException("E0007", "[有擔保債權筆數]需等於報送(43)回報有擔保債權金額資料之筆數.");
+					}
 				}
 			} else {
 				int sGuarLoanCnt = 0;
@@ -197,10 +209,17 @@ public class L8303 extends TradeBuffer {
 					}
 				}
 				if (iGuarLoanCnt != sGuarLoanCnt) {
-					throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(43)回報有擔保債權金額資料之筆數.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(43)回報有擔保債權金額資料之筆數.");
+					} else {
+						throw new LogicException("E0007", "[有擔保債權筆數]需等於報送(43)回報有擔保債權金額資料之筆數.");
+					}
 				}
 			}
 			// 6 end
+
+			// 7 非本金融機構債務人，有擔保債權筆數必須為0，信用貸款+現金卡放款+信用卡 本息餘額應等於0-->(前端檢核)
+			// 8,9,10合計值檢核，前端已改為合計值自動顯示
 
 			// 檢核項目 end
 		}

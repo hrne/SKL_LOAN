@@ -44,7 +44,7 @@ public class L5R21 extends TradeBuffer {
 	public CollLawService iCollLawService;
 
 	@Override
-	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException { 
 		// L5401交易內調RIM用,資料來源為CdBcm表
 		this.info("active L5R21 ");
 		this.info("L5R21 titaVo=[" + titaVo + "]");
@@ -75,9 +75,17 @@ public class L5R21 extends TradeBuffer {
 			totaVo.putParam("L5R21ClCode1", iCollLaw.getClCode1());
 			totaVo.putParam("L5R21ClCode2", iCollLaw.getClCode2());
 			totaVo.putParam("L5R21ClNo", iCollLaw.getClNo());
+			totaVo.putParam("L5R21EditEmpNo", iCollLaw.getLastUpdateEmpNo());
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}
+		/*
+		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		 */
+		this.index = titaVo.getReturnIndex();
+
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = 100;
 
 		this.addList(this.totaVo);
 		return this.sendList();

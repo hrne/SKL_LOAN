@@ -76,6 +76,7 @@ public class L5R22 extends TradeBuffer {
 			totaVo.putParam("L5R22EditTime", iCollRemind.getEditTime().trim());
 			totaVo.putParam("L5R22RemindCode", iCollRemind.getRemindCode());
 			totaVo.putParam("L5R22ReMark", iCollRemind.getRemark());
+			totaVo.putParam("L5R22EditEmpNo", iCollRemind.getLastUpdateEmpNo());
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}
@@ -86,7 +87,7 @@ public class L5R22 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 500;
+		this.limit = 300;
 
 		this.addList(this.totaVo);
 		return this.sendList();

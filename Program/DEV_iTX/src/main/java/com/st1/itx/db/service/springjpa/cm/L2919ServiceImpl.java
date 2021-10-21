@@ -61,17 +61,20 @@ public class L2919ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "SELECT  cm.\"ClCode1\"                    AS \"ClCode1\"";
 		sql += "       ,cm.\"ClCode2\"                    AS \"ClCode2\"";
 		sql += "       ,cm.\"ClNo\"                       AS \"ClNo\"";
-		sql += "       ,cm.\"ClTypeCode\")                AS \"ClTypeCode\"";
-		sql += "       ,cm.\"CityCode\"                   AS \"CityCode\"";
-		sql += "       ,cu.\"CustId\"                     AS \"CustId\"";
-		sql += "       ,cu.\"CustName\"                   AS \"CustName\"";
-		sql += "       ,cu.\"CustNo\"                     AS \"CustNo\"";
+		sql += "       ,min(cm.\"ClTypeCode\")                AS \"ClTypeCode\"";
+		sql += "       ,min(cm.\"CityCode\")                   AS \"CityCode\"";
+		sql += "       ,min(cu.\"CustId\")                     AS \"CustId\"";
+		sql += "       ,min(cu.\"CustName\")                   AS \"CustName\"";
+		sql += "       ,min(cu.\"CustNo\")                     AS \"CustNo\"";
 		sql += "       FROM \"ClMain\" cm";
 
-		sql += " LEFT JOIN \"ClFac\" clf on clf.\"ClCode1\"= cm.\"ClCode1\" " ; 
-		sql += "                        and clf.\"ClCode2\"= cm.\"ClCode2\" " ; 
-		sql += "                        and clf.\"ClNo\"= cm.\"ClNo\""        ;  
-		sql += " LEFT JOIN \"CustMain\" cu on cu.\"CustNo\"= clf.\"CustNo\" " ;
+//		sql += " LEFT JOIN \"ClFac\" clf on clf.\"ClCode1\"= cm.\"ClCode1\" " ; 
+//		sql += "                        and clf.\"ClCode2\"= cm.\"ClCode2\" " ; 
+//		sql += "                        and clf.\"ClNo\"= cm.\"ClNo\""        ;  
+//		sql += " LEFT JOIN \"CustMain\" cu on cu.\"CustNo\"= clf.\"CustNo\" " ;
+//		sql += "                               AND cu.\"CustId\"   = :custId";
+		
+		sql += " LEFT JOIN \"CustMain\" cu on cu.\"CustId\"   = :custId";
 		
 		sql += "       LEFT JOIN \"ClStock\" cs ON cs.\"ClCode1\" = cm.\"ClCode1\"";
 		sql += "                               AND cs.\"ClCode2\" = cm.\"ClCode2\"";
@@ -93,7 +96,7 @@ public class L2919ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                 AND cb.\"ClNo\"    = cm.\"ClNo\"";
 		sql += "                                 AND cb.\"OwnerCustUKey\"   = cu.\"CustUKey\"";
 
-		sql += "       LEFT JOIN \"ClLandOwner\" cmv ON cl.\"ClCode1\" = cm.\"ClCode1\"";
+		sql += "       LEFT JOIN \"ClLandOwner\" cl ON cl.\"ClCode1\" = cm.\"ClCode1\"";
 		sql += "                                    AND cl.\"ClCode2\" = cm.\"ClCode2\"";
 		sql += "                                    AND cl.\"ClNo\"    = cm.\"ClNo\"";
 		sql += "                                    AND cl.\"OwnerCustUKey\"   = cu.\"CustUKey\"";
@@ -113,7 +116,7 @@ public class L2919ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           or (cm.\"ClCode1\" =  cl.\"ClCode1\"" ; 
 		sql += "          and cm.\"ClCode2\" =  cl.\"ClCode2\"" ; 
 		sql += "          and cm.\"ClNo\" =  cl.\"ClNo\")" ;
-
+		sql += "       GROUP BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
 		sql += "       ORDER BY cm.\"ClCode1\",cm.\"ClCode2\",cm.\"ClNo\"";
 
 		this.info("sql = " + sql);

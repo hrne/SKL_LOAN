@@ -120,11 +120,10 @@ public class CheckAuth extends CommBuffer {
 		txTellerAuthId.setAuthNo(authNo);
 
 		TxTellerAuth txTellerAuth = txTellerAuthService.findById(txTellerAuthId, titaVo);
-
-//eric 2021.7.6待L6401 OK		
-//		if (txTellerAuth == null) {
-//			return checkAuthVo;
-//		}
+		
+		if (txTellerAuth == null) {
+			return checkAuthVo;
+		}
 
 		// 確認是否有交易權限
 
