@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R45 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R45.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -64,10 +61,8 @@ public class L2R45 extends TradeBuffer {
 		if ("1".equals(iFunCode) || "2".equals(iFunCode)) {
 			lfunCode.add("0");
 		} else {
-			if ("0".equals(iFunCode)) {
-				// 為清償 作業功能選擇錯誤
-			}
-			lfunCode.add("1");
+			lfunCode.add("2");
+			lfunCode.add("3");
 		}
 
 		tFacClose = sFacCloseService.findFacmNoFirst(iCustNo, iFacmNo, lfunCode, titaVo);
@@ -75,8 +70,10 @@ public class L2R45 extends TradeBuffer {
 		if (tFacClose == null) {
 			throw new LogicException(titaVo, "E2003", "查無清償作業檔資料"); // 查無資料
 		}
-		if (!(tFacClose.getCloseDate() > 0)) {
-			throw new LogicException(titaVo, "E0010", "(需做結案登錄)"); // 查無資料
+		if (!("3".equals(iFunCode))) {
+			if (!(tFacClose.getCloseDate() > 0)) {
+				throw new LogicException(titaVo, "E0010", "(需做結案登錄)"); // 查無資料
+			}
 		}
 
 		this.totaVo.putParam("L2r45CustNo", tFacClose.getCustNo());

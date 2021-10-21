@@ -40,7 +40,7 @@ public class CdBaseRate implements Serializable {
   private String currencyCode;
 
   // 利率代碼
-  /* 共用代碼檔從 L6301 維護代碼01:保單分紅利率02:郵政儲金利率 */
+  /* 共用代碼檔從 L6301 維護代碼01:保單分紅利率02:郵政儲金利率03:台北金融業拆款定盤利率 */
   @Column(name = "`BaseRateCode`", length = 2, insertable = false, updatable = false)
   private String baseRateCode;
 
@@ -57,7 +57,7 @@ public class CdBaseRate implements Serializable {
   private String remark;
 
   // 生效記號
-  /* 0:已放行 1:已生效不可刪除2:未放行 */
+  /* 0:已放行(生效日期&amp;gt;會計日:未生效 else 已生效)1:已使用(不可刪除)2:未放行 */
   @Column(name = "`EffectFlag`")
   private int effectFlag = 0;
 
@@ -114,6 +114,7 @@ TWD: 新台幣
 	* 共用代碼檔從 L6301 維護代碼
 01:保單分紅利率
 02:郵政儲金利率
+03:台北金融業拆款定盤利率
 	* @return String
 	*/
   public String getBaseRateCode() {
@@ -125,6 +126,7 @@ TWD: 新台幣
 	* 共用代碼檔從 L6301 維護代碼
 01:保單分紅利率
 02:郵政儲金利率
+03:台北金融業拆款定盤利率
   *
   * @param baseRateCode 利率代碼
 	*/
@@ -191,8 +193,8 @@ TWD: 新台幣
 
 /**
 	* 生效記號<br>
-	* 0:已放行 
-1:已生效不可刪除
+	* 0:已放行(生效日期&amp;gt;會計日:未生效 else 已生效)
+1:已使用(不可刪除)
 2:未放行
 	* @return Integer
 	*/
@@ -202,8 +204,8 @@ TWD: 新台幣
 
 /**
 	* 生效記號<br>
-	* 0:已放行 
-1:已生效不可刪除
+	* 0:已放行(生效日期&amp;gt;會計日:未生效 else 已生效)
+1:已使用(不可刪除)
 2:未放行
   *
   * @param effectFlag 生效記號

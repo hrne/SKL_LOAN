@@ -26,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R45 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R45.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -63,6 +62,7 @@ public class L2R45 extends TradeBuffer {
 			lfunCode.add("0");
 		} else {
 			lfunCode.add("2");
+			lfunCode.add("3");
 		}
 
 		tFacClose = sFacCloseService.findFacmNoFirst(iCustNo, iFacmNo, lfunCode, titaVo);

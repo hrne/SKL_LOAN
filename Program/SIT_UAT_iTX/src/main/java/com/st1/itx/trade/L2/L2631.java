@@ -92,6 +92,7 @@ public class L2631 extends TradeBuffer {
 		FacClose tFacClose = new FacClose();
 		CustMain tCustMain = new CustMain();
 		List<ClFac> lClFac = new ArrayList<ClFac>();
+		FacClose BeforeFacClose = new FacClose();
 		// tita
 		// 登放記號
 		int iActFg = parse.stringToInteger(titaVo.getParam("ACTFG"));
@@ -231,17 +232,14 @@ public class L2631 extends TradeBuffer {
 				throw new LogicException(titaVo, "E2074", "未全部結案不可列印清償證明 "); // 未全部結案，不可列印
 			}
 
-			FacClose BeforeFacClose = sFacCloseService.findById(new FacCloseId(iCustNo, iCloseNo), titaVo);
+			BeforeFacClose = sFacCloseService.holdById(new FacCloseId(iCustNo, iCloseNo), titaVo);
+			BeforeFacClose.setReceiveFg(1);
 			// 自動取公文編號
 			this.txBuffer.getTxCom();
 			wkDocNo = gGSeqCom.getSeqNo(110, 0, "L2", "2631", 9999, titaVo);
 			String finalDocNo = StringUtils.leftPad(String.valueOf(wkDocNo), 4, "0");
 
-			this.info("公文編號 wkDocNo = " + wkDocNo);
-			this.info("this.txBuffer.getTxCom() = " + this.txBuffer.getTxCom());
-			this.info("titaVo.getCalDy() 3 = " + titaVo.getCalDy().substring(0, 3));
-			this.info("test = " + titaVo.getCalDy().substring(0, 3) + finalDocNo);
-			this.info("FunCode = " + titaVo.getParam("FunCode"));
+			this.info("BeforeFacClose = " + BeforeFacClose);
 			String docNo = titaVo.getCalDy().substring(0, 3) + finalDocNo;
 			tFacClose.setFunCode(titaVo.getParam("FunCode"));
 			tFacClose.setActFlag(BeforeFacClose.getActFlag());
@@ -272,6 +270,12 @@ public class L2631 extends TradeBuffer {
 
 		}
 
+		// 更新領取記號
+		try {
+			sFacCloseService.update(BeforeFacClose, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0005", "清償作業檔");
+		}
 		this.totaVo.putParam("OCloseNo", wkcloseNo);
 
 		this.addList(this.totaVo);

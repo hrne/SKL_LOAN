@@ -174,6 +174,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		case 4: // 檢核不正常
 			sql += "   and BDD.\"JsonFields\" is not null                     ";
+			sql += "   and BDD.\"AcDate\" = 0                     ";
 			break;
 		case 5: // 扣款金額為0
 			sql += "   and BDD.\"RepayAmt\" = 0                     ";

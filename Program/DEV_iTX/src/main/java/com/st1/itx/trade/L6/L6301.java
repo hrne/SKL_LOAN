@@ -170,13 +170,14 @@ public class L6301 extends TradeBuffer {
 
 		mCdCode.setDefType(2);
 		mCdCode.setItem(titaVo.getParam("Item"));
-		mCdCode.setEnable("Y");
-		//0:已放行 2:未放行
+		mCdCode.setEnable("N");
+		//0:已放行 1:未放行
 		if(("BaseRate").equals(mCdCode.getCdCodeId().getDefCode())) {
 			if (titaVo.isActfgSuprele()) {
 				mCdCode.setEffectFlag(0);
+				mCdCode.setEnable("Y");
 			} else {
-				mCdCode.setEffectFlag(2);
+				mCdCode.setEffectFlag(1);
 			}
 			
 		}

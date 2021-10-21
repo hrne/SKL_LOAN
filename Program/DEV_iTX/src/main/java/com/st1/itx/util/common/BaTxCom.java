@@ -82,9 +82,6 @@ public class BaTxCom extends TradeBuffer {
 // isPaidAdvance 是否含提前繳期款
 	private boolean isTermAdvance = false;
 
-// isReverseMortgage 是否含逆向貸款
-	private boolean isReverseMortgage = true;
-
 // isAcLoanInt 是否利息提存
 	private boolean isAcLoanInt = false;
 
@@ -104,6 +101,7 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal lawFee = BigDecimal.ZERO; // 法務費用 F07
 	private BigDecimal collLawFee = BigDecimal.ZERO; // 催收法務費 F24
 	private BigDecimal openInterest = BigDecimal.ZERO; // 掛帳利息(逆向貸款) ICR
+	private BigDecimal totalFee = BigDecimal.ZERO; // 費用、短繳總額
 	private BigDecimal principal = BigDecimal.ZERO; // 本金
 	private BigDecimal interest = BigDecimal.ZERO; // 利息
 	private BigDecimal delayInt = BigDecimal.ZERO; // 延滯息
@@ -111,8 +109,10 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
 	private BigDecimal repayTotal = BigDecimal.ZERO; // 還款總金額
 	private int repayIntDate = 0; // repayIntDate 還款應繳日
+
 	private BigDecimal extraRepayAmt = BigDecimal.ZERO; // 部分還款金額
-	private int extraRepayFacmNo = 0; // 部分還款額度
+	private String includeIntFlag = "";// 是否內含利息
+	private String unpaidIntFlag = "";// 利息是否可欠繳
 
 //  initialize
 	private void init() {
@@ -141,6 +141,7 @@ public class BaTxCom extends TradeBuffer {
 		this.lawFee = BigDecimal.ZERO; // 法務費用 F07
 		this.collLawFee = BigDecimal.ZERO; // 催收法務費 F24
 		this.openInterest = BigDecimal.ZERO; // 掛帳利息(逆向貸款) ICR (未用)
+		this.totalFee = BigDecimal.ZERO; // 費用、短繳總額
 
 		// 本金、利息
 		this.principal = BigDecimal.ZERO; // 本金
@@ -152,8 +153,11 @@ public class BaTxCom extends TradeBuffer {
 		this.tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
 		this.repayTotal = BigDecimal.ZERO; // 總還款金額
 		this.repayIntDate = 0; // repayIntDate 還款應繳日
+
+		// 部分還款
 		this.extraRepayAmt = BigDecimal.ZERO; // 部分還款金額
-		this.extraRepayFacmNo = 0; // 部分還款額度
+		this.includeIntFlag = "Y";// 是否內含利息
+		this.unpaidIntFlag = "N";// 利息是否可欠繳
 	}
 
 	@Override
@@ -172,8 +176,9 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTxAmt     入帳金額
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
+
 	public ArrayList<BaTxVo> settingUnPaid(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iRepayType,
 			BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
 		this.info("BaTxCom settingUnPaid ...");
@@ -206,12 +211,9 @@ public class BaTxCom extends TradeBuffer {
 		// isPaidAdvance 是否含提前繳期款 ->不含
 		this.isTermAdvance = false;
 
-		// isReverseMortgage 是否含逆向貸款->含
-		this.isReverseMortgage = true;
-
-		// 還款類別:02 與約定還本金額相同
+		// 還款類別:02 與約定還本日期相同
 		if (iRepayType == 2) {
-			this.extraRepayAmt = iTxAmt;
+			this.extraRepayAmt = iTxAmt; // 部分還款金額
 			int wkFacmNoStart = iFacmNo == 0 ? 1 : iFacmNo;
 			int wkFacmNoEnd = iFacmNo == 0 ? 999 : iFacmNo;
 			int wkBormNoStart = iBormNo == 0 ? 1 : iBormNo;
@@ -224,24 +226,26 @@ public class BaTxCom extends TradeBuffer {
 						iFacmNo = tLoanBook.getFacmNo(); // 還款額度
 						iBormNo = tLoanBook.getBormNo(); // 撥款序號
 						this.extraRepayAmt = tLoanBook.getBookAmt(); // 部分還款金額
+						this.includeIntFlag = tLoanBook.getIncludeIntFlag(); // 是否內含利息
+						this.unpaidIntFlag = tLoanBook.getUnpaidIntFlag();// 利息是否可欠繳
 						break;
 					}
 				}
 			}
 		}
 
-		// STEP 2: 計算放款本息
+		// STEP 2: Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
+		loadUnPaid(iEntryDate, iCustNo, iFacmNo, 0, iRepayType, titaVo);
+
+		// STEP 3: 計算放款本息
 		if (iRepayType >= 1 && iRepayType <= 3) {
 			repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, 0, titaVo); // Terms = 0
 		}
-		// STEP 3: Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
-		loadUnPaid(iEntryDate, iCustNo, iRepayType == 2 ? extraRepayFacmNo : iFacmNo, 0, iRepayType, titaVo);
 
 		// STEP 4: 設定總金額
 		this.txBal = iTxAmt; // 回收金額
 		this.xxBal = this.txBal; // 可償還餘額
 		this.tmAmt = BigDecimal.ZERO; // this.tmAmt 暫收抵繳金額
-
 		// 加可抵繳至可償還餘額
 		this.xxBal = this.xxBal.add(this.tavAmt);
 
@@ -294,7 +298,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTxAmt      入帳金額
 	 * @param titaVo      TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public ArrayList<BaTxVo> settleUnPaid(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
 			int iRepayCode, int iRepayType, BigDecimal iTxAmt, TitaVo titaVo) throws LogicException {
@@ -325,13 +329,7 @@ public class BaTxCom extends TradeBuffer {
 		// isPaidAdvance 是否含提前繳期款 -> 不含
 		this.isTermAdvance = false;
 
-		// isReverseMortgage 是否含逆向貸款
-		if (iRepayType == 1) // 期款不含
-			this.isReverseMortgage = false;
-		else
-			this.isReverseMortgage = true;
-
-		// 還款類別:02 與約定還本金額相同
+		// 還款類別:02 大於等於約定還本金額
 		if (iRepayType == 2) {
 			this.extraRepayAmt = iTxAmt;
 			int wkFacmNoStart = iFacmNo == 0 ? 1 : iFacmNo;
@@ -342,26 +340,39 @@ public class BaTxCom extends TradeBuffer {
 					wkBormNoStart, wkBormNoEnd, this.index, Integer.MAX_VALUE, titaVo);
 			if (loanBookList != null) {
 				for (LoanBook tLoanBook : loanBookList.getContent()) {
-					if (tLoanBook.getBookDate() >= iEntryDate && tLoanBook.getStatus() == 0
-							&& tLoanBook.getBookAmt().compareTo(iTxAmt) == 0) {
-						iFacmNo = tLoanBook.getFacmNo(); // 還款額度
-						iBormNo = tLoanBook.getBormNo(); // 撥款序號
-						this.extraRepayAmt = tLoanBook.getBookAmt(); // 部分還款金額
-						break;
+					if (tLoanBook.getBookDate() >= iEntryDate && tLoanBook.getStatus() == 0) {
+						if (iTxAmt.compareTo(BigDecimal.ZERO) == 0 || iTxAmt.compareTo(tLoanBook.getBookAmt()) >= 0) {
+							iFacmNo = tLoanBook.getFacmNo(); // 還款額度
+							iBormNo = tLoanBook.getBormNo(); // 撥款序號
+							this.extraRepayAmt = tLoanBook.getBookAmt(); // 部分還款金額
+							this.includeIntFlag = tLoanBook.getIncludeIntFlag(); // 是否內含利息
+							this.unpaidIntFlag = tLoanBook.getUnpaidIntFlag();// 利息是否可欠繳
+							break;
+						}
 					}
 				}
 			}
 		}
-		// STEP 2: 計算放款本息
 
+		// STEP 2: Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
+		loadUnPaid(iEntryDate, iCustNo, iFacmNo, 0, iRepayType, titaVo);
+
+		// STEP 3: 計算放款本息
+
+		// 計算部分償還金額
+		// 未約定 => min(交易金額, 可部分償還金額)
+		// 有約定 => 約定還款金額
+		if (iRepayType == 2 && this.extraRepayAmt.compareTo(BigDecimal.ZERO) == 0) {
+			this.extraRepayAmt = iTxAmt.add(this.tavAmt).subtract(this.totalFee);
+			if (iTxAmt.compareTo(this.extraRepayAmt) < 0) {
+				this.extraRepayAmt = iTxAmt;
+			}
+		}
+
+		// 放款本息計算
 		if (iRepayType >= 1 && iRepayType <= 3) {
 			repayLoan(iEntryDate, iPayintDate, iCustNo, iFacmNo, iBormNo, iRepayType, iTxAmt, 0, titaVo); // Terms = 0
 		}
-		// STEP 3: Load UnPaid 1.應收費用+未收費用+短繳期金 3.暫收抵繳 6.另收欠款
-		loadUnPaid(iEntryDate, iCustNo, iRepayType == 2 ? extraRepayFacmNo : iFacmNo, 0, iRepayType, titaVo);
-
-		// TAV 暫收款－可抵繳
-		titaVo.putParam("TavAmt", tavAmt);
 
 		// STEP 4: 設定總金額
 		this.txBal = iTxAmt; // 回收金額
@@ -388,7 +399,13 @@ public class BaTxCom extends TradeBuffer {
 		// 放款回收時 5:已到期應繳本息
 		// 回收金額時排序,依應繳日由小到大、計息順序(利率由大到小)、額度由小到大
 		if (iRepayType == 1) {
+			for (BaTxVo ba : this.baTxList) {
+				this.info("sort B: " + ba.toString());
+			}
 			Collections.sort(baTxList); // 排序優先度(由小到大) payIntDate 應繳日
+			for (BaTxVo ba : this.baTxList) {
+				this.info("sort A: " + ba.toString());
+			}
 			settleByPayintDate();
 			// 無可回收計算全部欠繳
 			if (this.repayIntDate == 0) {
@@ -424,7 +441,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iBormNo     撥款
 	 * @param titaVo      TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public ArrayList<BaTxVo> acLoanInt(int iEntryDate, int iPayintDate, int iCustNo, int iFacmNo, int iBormNo,
 			TitaVo titaVo) throws LogicException {
@@ -441,9 +458,6 @@ public class BaTxCom extends TradeBuffer {
 
 		// 未到期火險費用條件 ==> 1.續約保單起日 > 入帳月
 		isUnOpenfireFee = 1;
-
-		// isReverseMortgage 是否含逆向貸款 -> 含
-		this.isReverseMortgage = true;
 
 		// isAcLoanInt 是否利息提存- > 是
 		this.isAcLoanInt = true;
@@ -469,7 +483,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iTerms     期數
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public ArrayList<BaTxVo> termsPay(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, int iTerms, TitaVo titaVo)
 			throws LogicException {
@@ -484,9 +498,6 @@ public class BaTxCom extends TradeBuffer {
 
 		// isPaidAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
-
-		// isReverseMortgage 是否含逆向貸款 -> 含
-		this.isReverseMortgage = true;
 
 		// 計算放款本息
 		repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, 01, BigDecimal.ZERO, iTerms, titaVo);
@@ -507,7 +518,7 @@ public class BaTxCom extends TradeBuffer {
 	 * @param iBormNo    撥款
 	 * @param titaVo     TitaVo
 	 * @return ArrayList of BaTxVo
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public ArrayList<BaTxVo> cashFlow(int iEntryDate, int iCustNo, int iFacmNo, int iBormNo, TitaVo titaVo)
 			throws LogicException {
@@ -516,9 +527,6 @@ public class BaTxCom extends TradeBuffer {
 
 		// isPaidAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
-
-		// isReverseMortgage 是否含逆向貸款 -> 含
-		this.isReverseMortgage = true;
 
 		//
 		repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, 01, BigDecimal.ZERO, 0, titaVo);
@@ -546,10 +554,8 @@ public class BaTxCom extends TradeBuffer {
 		int wkBormNoStart = 1;
 		int wkBormNoEnd = 900;
 		int wkTerms = 0;
-
+		BigDecimal wkExtraRepayAmtRemaind = BigDecimal.ZERO; // 部分還款剩餘金額
 		ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
-
-		this.baTxList = new ArrayList<BaTxVo>();
 
 		if (iRepayType <= 3 || iRepayType == 90) {
 			if (iFacmNo > 0) {
@@ -669,18 +675,29 @@ public class BaTxCom extends TradeBuffer {
 					}
 					break;
 				case 2: // 部分償還金額
+					wkExtraRepayAmtRemaind = this.extraRepayAmt.subtract(this.principal).subtract(this.interest)
+							.subtract(this.delayInt).subtract(this.breachAmt);
+					if (wkExtraRepayAmtRemaind.compareTo(BigDecimal.ZERO) <= 0) {
+						break;
+					}
 					if (ln.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
 						throw new LogicException(titaVo, "E3072",
 								parse.IntegerToString(ln.getFacmNo(), 3) + "-"
 										+ parse.IntegerToString(ln.getBormNo(), 3) + ", 部分償還前應先償還期款, 應繳息日 = "
 										+ ln.getNextPayIntDate()); // 該筆放款尚有未回收期款
 					}
-					this.extraRepayFacmNo = ln.getFacmNo();
-					loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
-					loancalcRepayIntCom.setExtraRepayFlag("Y"); // 是否內含利息 Y:是 N:否
-					loancalcRepayIntCom.setExtraRepay(this.extraRepayAmt);
+
+					// 部分償還金額超過放款餘額
+					if (wkExtraRepayAmtRemaind.compareTo(ln.getLoanBal()) >= 0) {
+						loancalcRepayIntCom.setCaseCloseFlag("Y"); // 結案記號 Y:是 N:否
+					} else {
+						loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
+						loancalcRepayIntCom.setExtraRepayFlag(this.includeIntFlag); // 是否內含利息 Y:是 N:否
+						loancalcRepayIntCom.setExtraRepay(this.extraRepayAmt);
+					}
 					lCalcRepayIntVo = loancalcRepayIntCom.getRepayInt(titaVo);
 					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo);
+
 					break;
 				case 3: // 結案
 					loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
@@ -732,10 +749,6 @@ public class BaTxCom extends TradeBuffer {
 							break;
 						}
 					}
-					break;
-				}
-				// 部分償還只還一筆
-				if (iRepayType == 2) {
 					break;
 				}
 			}
@@ -807,15 +820,21 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		// 是否含提前繳期款 yes -> 應繳日可大於入帳日
-		if (this.isTermAdvance || baTxVo.getPayIntDate() <= iEntryDate) {
-			if (iPayIntDate > 0 && baTxVo.getPayIntDate() > iPayIntDate)
-				this.info("repayLoan BaTxVo over payIntDate) : " + baTxVo);
-			else {
+		if (this.isTermAdvance) {
+			this.baTxList.add(baTxVo);
+		} else if (iPayIntDate > 0) {
+			if (baTxVo.getPayIntDate() > iPayIntDate) {
+				this.info("repayLoan BaTxVo over iPayIntDate) : " + baTxVo);
+			} else {
 				this.baTxList.add(baTxVo);
-				this.info("repayLoan BaTxVo add : " + baTxVo);
 			}
-		} else
-			this.info("repayLoan BaTxVo over EntryDate : " + baTxVo);
+		} else {
+			if (baTxVo.getPayIntDate() > iEntryDate) {
+				this.info("repayLoan BaTxVo over iEntryDate) : " + baTxVo);
+			} else {
+				this.baTxList.add(baTxVo);
+			}
+		}
 	}
 
 	private void emptyLoanBaTxVo(int iEntryDate, int iRepayType, int iCustNo, LoanBorMain ln) {
@@ -1099,7 +1118,7 @@ public class BaTxCom extends TradeBuffer {
 					if ("TAV".equals(rv.getAcctCode())) { // TAV 暫收款－可抵繳
 						if (iFacmNo == 0 || iFacmNo == rv.getFacmNo()) {
 							baTxVo.setDataKind(3); // 3.暫收抵繳
-							tavAmt = tavAmt.add(rv.getRvBal());
+							this.tavAmt = this.tavAmt.add(rv.getRvBal());
 							this.excessive = this.excessive.add(rv.getRvBal()); // 累溢收
 						} else
 							baTxVo.setDataKind(5); // 5.其他額度暫收可抵繳
@@ -1225,8 +1244,13 @@ public class BaTxCom extends TradeBuffer {
 						}
 					}
 				}
-				if (baTxVo.getDataKind() > 0)
+				this.info("baTxVo =" + baTxVo.toString());
+				if (baTxVo.getDataKind() > 0) {
 					this.baTxList.add(baTxVo);
+					if (baTxVo.getDataKind() == 1) {
+						this.totalFee = this.totalFee.add(baTxVo.getUnPaidAmt());
+					}
+				}
 			}
 		}
 	}
@@ -1436,6 +1460,24 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public BigDecimal getExtraRepay() {
 		return extraRepayAmt;
+	}
+
+	/**
+	 * 是否內含利息
+	 * 
+	 * @return ..
+	 */
+	public String getIncludeIntFlag() {
+		return includeIntFlag;
+	}
+
+	/**
+	 * 利息是否可欠繳
+	 * 
+	 * @return ..
+	 */
+	public String getUnpaidIntFlag() {
+		return unpaidIntFlag;
 	}
 
 }

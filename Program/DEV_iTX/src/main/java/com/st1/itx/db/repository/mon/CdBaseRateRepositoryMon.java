@@ -43,6 +43,9 @@ public interface CdBaseRateRepositoryMon extends JpaRepository<CdBaseRate, CdBas
   // CurrencyCode = ,AND BaseRateCode =
   public Slice<CdBaseRate> findAllByCurrencyCodeIsAndBaseRateCodeIsOrderByEffectDateAsc(String currencyCode_0, String baseRateCode_1, Pageable pageable);
 
+  // CurrencyCode = ,AND BaseRateCode =
+  public Slice<CdBaseRate> findAllByCurrencyCodeIsAndBaseRateCodeIsOrderByEffectDateDesc(String currencyCode_0, String baseRateCode_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

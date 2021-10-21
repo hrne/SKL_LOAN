@@ -1,0 +1,123 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L8701)
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,40];">
+[
+["[L8701]                                 產製公務人員報送資料 "],
+["#FdBUTTON_FLD+選擇檔案",#BUTTON_FLD],
+]
+!---------- AP Button AREA ----------
+
+#FdCustId=X,2,L
+T(3,*)
+#FdDataDate=X,2,L
+T(3,*)
+#FdBUTTON_FLD=X,2,L
+T(3,*)
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,4,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHK=X,1,S
+T(F,@CalDy,1)
+
+#BUTTON_FLD=X,1,O,ui:button;value:瀏覽;enable:1;tabbable:1;file:true;multiple:true;fieldName:#FILENA;width:600
+
+!本營業日
+#DATE=D,8,S
+T(4,DATE$)
+
+
+
+!#CustId=X,8,I
+!@V(7)A(ID_UNINO,0,#CustId)
+
+!#DataDate=D,7,I
+!E(0,#DATE)
+!D(8)
+!@V(7)A(DATE,0,#DataDate)
+
+! 宣告按鈕事件
+#BIND_ABA=X,1,S
+BIND(#BUTTON_FLD,click)
+
+
+! 上傳欄名返回傳接收變數
+#FILENA=x,1000,S
+
+
+#RPTFG=A,1,S
+E(0,0)
+
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L8701 ----------
+<sub type="FORM" name="L8701">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L8701,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8701 產製公務人員報送資料)
+
+!#TxtSnoF=X,8,S
+!E(2,@SnoF,#TxtSnoF)
+!#SnoF=A,8,S
+
+
+!#TxtPrtF=A,1,S
+!C(3,#SnoF,0,E(0,0),E(0,1))
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FILENA
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8701
+!#TxtSnoF
+^
+<include src="COM.icf::TRCTL.tom"/>
+
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+
+<sub type="SELECT">
+!#TxtPrtF=1,PDF,,,,,,,,,,,,,TxtSnoF;3,產製公務人員報送資料
+!^
+</sub>

@@ -428,10 +428,10 @@ public class L4002 extends TradeBuffer {
 						canEraseCnt.put(grp1, 1);
 					}
 				}
-				
+
 				if (labelRankFlag == 1) {
 					// 可檢核筆數
-					if (tBatxDetail.getProcStsCode().equals("0")) {
+					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("3")) {
 						if (canCheckCnt.containsKey(grp1)) {
 							canCheckCnt.put(grp1, canCheckCnt.get(grp1) + 1);
 						} else {
@@ -439,8 +439,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可入帳筆數
-					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
-							|| tBatxDetail.getProcStsCode().equals("4")) {
+					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("4")) {
 						if (canEnterCnt.containsKey(grp1)) {
 							canEnterCnt.put(grp1, canEnterCnt.get(grp1) + 1);
 						} else {
@@ -449,7 +448,7 @@ public class L4002 extends TradeBuffer {
 					}
 				} else {
 					// 可檢核筆數
-					if (tBatxDetail.getProcStsCode().equals("0")) {
+					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("3")) {
 						if (canCheckCnt.containsKey(grp3)) {
 							canCheckCnt.put(grp3, canCheckCnt.get(grp3) + 1);
 						} else {
@@ -457,8 +456,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// 可入帳筆數
-					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("3")
-							|| tBatxDetail.getProcStsCode().equals("4")) {
+					if (tBatxDetail.getProcStsCode().equals("2") || tBatxDetail.getProcStsCode().equals("4")) {
 						if (canEnterCnt.containsKey(grp3)) {
 							canEnterCnt.put(grp3, canEnterCnt.get(grp3) + 1);
 						} else {

@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L6;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -12,7 +14,10 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBaseRate;
 import com.st1.itx.db.domain.CdBaseRateId;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.service.CdBaseRateService;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -32,11 +37,12 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6302 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6302.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public CdBaseRateService sCdBaseRateService;
+	@Autowired
+	public CdCodeService sCdCodeService;
 	@Autowired
 	DateUtil dDateUtil;
 	@Autowired
@@ -58,6 +64,7 @@ public class L6302 extends TradeBuffer {
 		int iFEffectDate = iEffectDate + 19110000;
 		this.info("L6302 iFEffectDate : " + iFEffectDate);
 
+		int iTbsdy = titaVo.getEntDyI();
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 4)) {
 			throw new LogicException(titaVo, "E0010", "L6302"); // 功能選擇錯誤
@@ -77,7 +84,38 @@ public class L6302 extends TradeBuffer {
 		CdBaseRateId tCdBaseRateId = new CdBaseRateId();
 		switch (iFuncCode) {
 		case 1: // 新增
+			
+			CdBaseRate bCdBaseRate = sCdBaseRateService.effectFlagDescFirst("TWD", iBaseRateCode,0, titaVo);
+			if(bCdBaseRate!=null) {
+				
+				if(bCdBaseRate.getEffectDate()>iTbsdy) {
+					throw new LogicException(titaVo, "E0005", "未生效指標利率只能有一筆"); // 新增資料時，發生錯誤
+				}
+			}
+			
+			
+			Slice<CdBaseRate> cCdBaseRate1 = sCdBaseRateService.effectFlagDescFirst1("TWD", iBaseRateCode,1,1, titaVo);
+			List<CdBaseRate> cCdBaseRate2 = cCdBaseRate1 == null ? null :cCdBaseRate1.getContent();
+			if(cCdBaseRate2!=null) {
+				this.info("iEffectDate=="+iEffectDate);
+				this.info("iTbsdy=="+iTbsdy);
+				if(iEffectDate<cCdBaseRate2.get(0).getEffectDate()) {
+					throw new LogicException(titaVo, "E0005", "生效日期需大於"+cCdBaseRate2.get(0).getEffectDate()); // 新增資料時，發生錯誤
+				}
+				if(iEffectDate<iTbsdy) {
+					throw new LogicException(titaVo, "E0005", "生效日期需大於會計日"); // 新增資料時，發生錯誤
+				}
+			}
+			
+			CdCode tCdCode = sCdCodeService.findById(new CdCodeId("BaseRate",iBaseRateCode), titaVo);
+			if(tCdCode!=null) {
+				if(tCdCode.getEffectFlag()!=0) {
+					throw new LogicException(titaVo, "E0005", "該指標利率種類未放行"); // 新增資料時，發生錯誤
+				}
+			}
+			
 			moveCdBaseRate(tCdBaseRate, tCdBaseRateId, iFuncCode, iCurrencyCode, iBaseRateCode, iFEffectDate, titaVo);
+			
 			try {
 				this.info("1");
 				sCdBaseRateService.insert(tCdBaseRate, titaVo);
@@ -93,19 +131,18 @@ public class L6302 extends TradeBuffer {
 
 		case 2: // 修改
 			tCdBaseRate = sCdBaseRateService.holdById(new CdBaseRateId(iCurrencyCode, iBaseRateCode, iFEffectDate));
-			
+
 			if (tCdBaseRate == null) {
 				throw new LogicException(titaVo, "E0003", iBaseRateCode + "-" + iFEffectDate); // 修改資料不存在
 			}
-			
-			if(!titaVo.isActfgSuprele() && tCdBaseRate.getEffectFlag()==2) {
+
+			if (!titaVo.isActfgSuprele() && tCdBaseRate.getEffectFlag() == 2) {
 				throw new LogicException(titaVo, "", "未放行交易不可修改/刪除");
 			}
-			
+
 			CdBaseRate tCdBaseRate2 = (CdBaseRate) dataLog.clone(tCdBaseRate); ////
 			try {
-				moveCdBaseRate(tCdBaseRate, tCdBaseRateId, iFuncCode, iCurrencyCode, iBaseRateCode, iFEffectDate,
-						titaVo);
+				moveCdBaseRate(tCdBaseRate, tCdBaseRateId, iFuncCode, iCurrencyCode, iBaseRateCode, iFEffectDate, titaVo);
 				tCdBaseRate = sCdBaseRateService.update2(tCdBaseRate, titaVo); ////
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
@@ -133,8 +170,7 @@ public class L6302 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void moveCdBaseRate(CdBaseRate mCdBaseRate, CdBaseRateId mCdBaseRateId, int mFuncCode, String mCurrencyCode,
-			String mBaseRateCode, int mFEffectDate, TitaVo titaVo) throws LogicException {
+	private void moveCdBaseRate(CdBaseRate mCdBaseRate, CdBaseRateId mCdBaseRateId, int mFuncCode, String mCurrencyCode, String mBaseRateCode, int mFEffectDate, TitaVo titaVo) throws LogicException {
 
 		mCdBaseRateId.setCurrencyCode(mCurrencyCode);
 		mCdBaseRateId.setBaseRateCode(mBaseRateCode);
@@ -153,12 +189,10 @@ public class L6302 extends TradeBuffer {
 		}
 
 		if (mFuncCode != 2) {
-			mCdBaseRate.setCreateDate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			mCdBaseRate.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mCdBaseRate.setCreateEmpNo(titaVo.getTlrNo());
 		}
-		mCdBaseRate
-				.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+		mCdBaseRate.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mCdBaseRate.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
 }

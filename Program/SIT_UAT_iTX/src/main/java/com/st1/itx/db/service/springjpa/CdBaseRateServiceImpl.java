@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdBaseRateService")
 @Repository
-public class CdBaseRateServiceImpl implements CdBaseRateService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdBaseRateServiceImpl.class);
-
+public class CdBaseRateServiceImpl extends ASpringJpaParm implements CdBaseRateService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CdBaseRateServiceImpl implements CdBaseRateService, InitializingBea
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdBaseRateId);
+    this.info("findById " + dbName + " " + cdBaseRateId);
     Optional<CdBaseRate> cdBaseRate = null;
     if (dbName.equals(ContentName.onDay))
       cdBaseRate = cdBaseRateReposDay.findById(cdBaseRateId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CurrencyCode", "BaseRateCode", "EffectDate"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CurrencyCode", "BaseRateCode", "EffectDate"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdBaseRateReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = cdBaseRateReposHist.findAll(pageable);
     else 
       slice = cdBaseRateRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("baseRateCodeEq " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectDate_2 : " +  effectDate_2 + " effectDate_3 : " +  effectDate_3);
+    this.info("baseRateCodeEq " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectDate_2 : " +  effectDate_2 + " effectDate_3 : " +  effectDate_3);
     if (dbName.equals(ContentName.onDay))
       slice = cdBaseRateReposDay.findAllByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, effectDate_2, effectDate_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +131,9 @@ em = null;
     else 
       slice = cdBaseRateRepos.findAllByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, effectDate_2, effectDate_3, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +142,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("baseRateCodeDescFirst " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectDate_2 : " +  effectDate_2 + " effectDate_3 : " +  effectDate_3);
+    this.info("baseRateCodeDescFirst " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectDate_2 : " +  effectDate_2 + " effectDate_3 : " +  effectDate_3);
     Optional<CdBaseRate> cdBaseRateT = null;
     if (dbName.equals(ContentName.onDay))
       cdBaseRateT = cdBaseRateReposDay.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, effectDate_2, effectDate_3);
@@ -150,6 +152,7 @@ em = null;
       cdBaseRateT = cdBaseRateReposHist.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, effectDate_2, effectDate_3);
     else 
       cdBaseRateT = cdBaseRateRepos.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, effectDate_2, effectDate_3);
+
     return cdBaseRateT.isPresent() ? cdBaseRateT.get() : null;
   }
 
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("baseRateCodeAscFirst " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectDate_2 : " +  effectDate_2 + " effectDate_3 : " +  effectDate_3);
+    this.info("baseRateCodeAscFirst " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectDate_2 : " +  effectDate_2 + " effectDate_3 : " +  effectDate_3);
     Optional<CdBaseRate> cdBaseRateT = null;
     if (dbName.equals(ContentName.onDay))
       cdBaseRateT = cdBaseRateReposDay.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, effectDate_2, effectDate_3);
@@ -168,6 +171,7 @@ em = null;
       cdBaseRateT = cdBaseRateReposHist.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, effectDate_2, effectDate_3);
     else 
       cdBaseRateT = cdBaseRateRepos.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, effectDate_2, effectDate_3);
+
     return cdBaseRateT.isPresent() ? cdBaseRateT.get() : null;
   }
 
@@ -183,7 +187,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("baseRateCodeRange " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " baseRateCode_2 : " +  baseRateCode_2 + " effectDate_3 : " +  effectDate_3 + " effectDate_4 : " +  effectDate_4);
+    this.info("baseRateCodeRange " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " baseRateCode_2 : " +  baseRateCode_2 + " effectDate_3 : " +  effectDate_3 + " effectDate_4 : " +  effectDate_4);
     if (dbName.equals(ContentName.onDay))
       slice = cdBaseRateReposDay.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateDesc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -192,6 +196,9 @@ em = null;
       slice = cdBaseRateReposHist.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateDesc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
     else 
       slice = cdBaseRateRepos.findAllByCurrencyCodeIsAndBaseRateCodeGreaterThanEqualAndBaseRateCodeLessThanEqualAndEffectDateGreaterThanEqualAndEffectDateLessThanEqualOrderByBaseRateCodeAscEffectDateDesc(currencyCode_0, baseRateCode_1, baseRateCode_2, effectDate_3, effectDate_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -208,7 +215,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("effectFlagEq " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectFlag_2 : " +  effectFlag_2 + " effectDate_3 : " +  effectDate_3);
+    this.info("effectFlagEq " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectFlag_2 : " +  effectFlag_2 + " effectDate_3 : " +  effectDate_3);
     if (dbName.equals(ContentName.onDay))
       slice = cdBaseRateReposDay.findAllByCurrencyCodeIsAndBaseRateCodeIsAndEffectFlagIsAndEffectDateGreaterThanEqualOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, effectFlag_2, effectDate_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -218,6 +225,9 @@ em = null;
     else 
       slice = cdBaseRateRepos.findAllByCurrencyCodeIsAndBaseRateCodeIsAndEffectFlagIsAndEffectDateGreaterThanEqualOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, effectFlag_2, effectDate_3, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -226,7 +236,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("effectFlagDescFirst " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectFlag_2 : " +  effectFlag_2);
+    this.info("effectFlagDescFirst " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1 + " effectFlag_2 : " +  effectFlag_2);
     Optional<CdBaseRate> cdBaseRateT = null;
     if (dbName.equals(ContentName.onDay))
       cdBaseRateT = cdBaseRateReposDay.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectFlagIsOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, effectFlag_2);
@@ -236,6 +246,7 @@ em = null;
       cdBaseRateT = cdBaseRateReposHist.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectFlagIsOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, effectFlag_2);
     else 
       cdBaseRateT = cdBaseRateRepos.findTopByCurrencyCodeIsAndBaseRateCodeIsAndEffectFlagIsOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, effectFlag_2);
+
     return cdBaseRateT.isPresent() ? cdBaseRateT.get() : null;
   }
 
@@ -251,7 +262,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("baseRateCodeEq2 " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1);
+    this.info("baseRateCodeEq2 " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1);
     if (dbName.equals(ContentName.onDay))
       slice = cdBaseRateReposDay.findAllByCurrencyCodeIsAndBaseRateCodeIsOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -261,6 +272,37 @@ em = null;
     else 
       slice = cdBaseRateRepos.findAllByCurrencyCodeIsAndBaseRateCodeIsOrderByEffectDateAsc(currencyCode_0, baseRateCode_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<CdBaseRate> effectFlagDescFirst1(String currencyCode_0, String baseRateCode_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdBaseRate> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("effectFlagDescFirst1 " + dbName + " : " + "currencyCode_0 : " + currencyCode_0 + " baseRateCode_1 : " +  baseRateCode_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdBaseRateReposDay.findAllByCurrencyCodeIsAndBaseRateCodeIsOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdBaseRateReposMon.findAllByCurrencyCodeIsAndBaseRateCodeIsOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdBaseRateReposHist.findAllByCurrencyCodeIsAndBaseRateCodeIsOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, pageable);
+    else 
+      slice = cdBaseRateRepos.findAllByCurrencyCodeIsAndBaseRateCodeIsOrderByEffectDateDesc(currencyCode_0, baseRateCode_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -269,7 +311,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBaseRateId);
+    this.info("Hold " + dbName + " " + cdBaseRateId);
     Optional<CdBaseRate> cdBaseRate = null;
     if (dbName.equals(ContentName.onDay))
       cdBaseRate = cdBaseRateReposDay.findByCdBaseRateId(cdBaseRateId);
@@ -287,7 +329,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdBaseRate.getCdBaseRateId());
+    this.info("Hold " + dbName + " " + cdBaseRate.getCdBaseRateId());
     Optional<CdBaseRate> cdBaseRateT = null;
     if (dbName.equals(ContentName.onDay))
       cdBaseRateT = cdBaseRateReposDay.findByCdBaseRateId(cdBaseRate.getCdBaseRateId());
@@ -309,7 +351,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdBaseRate.getCdBaseRateId());
+    this.info("Insert..." + dbName + " " + cdBaseRate.getCdBaseRateId());
     if (this.findById(cdBaseRate.getCdBaseRateId()) != null)
       throw new DBException(2);
 
@@ -338,7 +380,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdBaseRate.getCdBaseRateId());
+    this.info("Update..." + dbName + " " + cdBaseRate.getCdBaseRateId());
     if (!empNot.isEmpty())
       cdBaseRate.setLastUpdateEmpNo(empNot);
 
@@ -361,7 +403,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + cdBaseRate.getCdBaseRateId());
+    this.info("Update..." + dbName + " " + cdBaseRate.getCdBaseRateId());
     if (!empNot.isEmpty())
       cdBaseRate.setLastUpdateEmpNo(empNot);
 
@@ -381,7 +423,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdBaseRate.getCdBaseRateId());
+    this.info("Delete..." + dbName + " " + cdBaseRate.getCdBaseRateId());
     if (dbName.equals(ContentName.onDay)) {
       cdBaseRateReposDay.delete(cdBaseRate);	
       cdBaseRateReposDay.flush();
@@ -410,7 +452,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CdBaseRate t : cdBaseRate){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -445,7 +487,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (cdBaseRate == null || cdBaseRate.size() == 0)
       throw new DBException(6);
 
@@ -474,7 +516,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdBaseRate> cdBaseRate, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

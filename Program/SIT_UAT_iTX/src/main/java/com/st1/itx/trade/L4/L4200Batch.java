@@ -31,6 +31,7 @@ import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.EmpDeductMedia;
 import com.st1.itx.db.domain.LoanCheque;
 import com.st1.itx.db.domain.LoanChequeId;
@@ -44,6 +45,7 @@ import com.st1.itx.db.service.BatxChequeService;
 import com.st1.itx.db.service.BatxDetailService;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.EmpDeductDtlService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.LoanBookService;
@@ -112,6 +114,9 @@ public class L4200Batch extends TradeBuffer {
 
 	@Autowired
 	public EmpDeductMediaService empDeductMediaService;
+
+	@Autowired
+	public EmpDeductDtlService empDeductDtlService;
 
 	@Autowired
 	public PostDeductFileVo postDeductFileVo;
@@ -820,11 +825,9 @@ public class L4200Batch extends TradeBuffer {
 				String returnCode = tempOccursList.get("OccReturnCode");
 				if (tAchDeductMedia == null) {
 					// 媒體檔無此資料
-					tBatxDetail.setProcCode("E0014");
 					procCode = "E0014"; // 檔案錯誤
 					procCodeX = "媒體檔無此資料";
 				} else {
-					tBatxDetail.setProcCode("002" + returnCode);
 					if ("00".equals(returnCode)) {
 						procCode = "00000";
 					} else {
@@ -839,15 +842,7 @@ public class L4200Batch extends TradeBuffer {
 							achEntryDateFlag = 1;
 						}
 					}
-
-//					結案
-//					if(tAchDeductMedia.getRepayType() == 3) {
-//						achRepayType = 1;
-//						tempVo.put("LastTermFg", "1");
-//					} else {
 					achRepayType = tAchDeductMedia.getRepayType();
-//					}
-
 //					回寫媒體檔
 					tAchDeductMedia = achDeductMediaService.holdById(tAchDeductMedia, titaVo);
 					tAchDeductMedia.setReturnCode(tempOccursList.get("OccReturnCode"));
@@ -898,6 +893,7 @@ public class L4200Batch extends TradeBuffer {
 
 				tBatxDetail.setProcCode(procCode);
 
+				// 更新銀扣檔
 				if ("00000".equals(procCode)) {
 //					tempVo.putParam("Note", tempOccursList.get("OccReturnCode"));
 					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
@@ -929,11 +925,7 @@ public class L4200Batch extends TradeBuffer {
 					e.printStackTrace();
 					throw new LogicException("E0005", "BatxDetail Insert Fail");
 				}
-
-//				D.寫VO入各個對應Table (Detail不為異常者)
 			}
-		} else {
-//			throw new LogicException("E0014", "L4200Batch No Content " + filePath2A);
 		}
 	}
 
@@ -1169,6 +1161,17 @@ public class L4200Batch extends TradeBuffer {
 					procCode = "E0014"; // 檔案錯誤
 					procCodeX = "媒體檔無此資料";
 				} else {
+					Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(
+							tEmpDeductMedia.getMediaDate() + 19110000, tEmpDeductMedia.getMediaKind(),
+							tEmpDeductMedia.getMediaSeq(), this.index, Integer.MAX_VALUE, titaVo);
+					if (slEmpDeductDtl == null) {
+						throw new LogicException("E0014", "無此員工扣款檔" + tEmpDeductMedia.getEmpDeductMediaId()); // 檔案錯誤
+					}
+					for (EmpDeductDtl tEmpDeductDtl : slEmpDeductDtl.getContent()) {
+						if (tEmpDeductDtl.getAcdate() > 0) {
+							throw new LogicException("E0014", "員工扣款檔已入帳" + tEmpDeductMedia.getEmpDeductMediaId()); // 檔案錯誤
+						}
+					}
 					if ("01".equals(tempOccursList.get("OccReturnCode"))) {
 						procCode = "00000";
 						tEmpDeductMedia.setTxAmt(reAcctAmt);
@@ -1553,6 +1556,9 @@ public class L4200Batch extends TradeBuffer {
 
 		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
 			for (BankDeductDtl tB : lBankDeductDtl) {
+				if (tB.getAcDate() > 0) {
+					throw new LogicException("E0014", "銀扣檔已入帳 " + tB.getBankDeductDtlId()); // // 檔案錯誤
+				}
 				BankDeductDtl tBankDeductDtl = bankDeductDtlService.holdById(tB, titaVo);
 				tBankDeductDtl.setReturnCode(returnCode);
 				try {

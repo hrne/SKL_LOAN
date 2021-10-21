@@ -522,15 +522,11 @@ public class L3200 extends TradeBuffer {
 	}
 
 	private void checkInputRoutine() throws LogicException {
-		// 還款類別 > 2 不可有短繳金額
-		if (iRepayType > 2 && iShortAmt.compareTo(BigDecimal.ZERO) > 0) {
+		// 還款類別 >= 3 不可有短繳金額
+		if (iRepayType >= 3 && iShortAmt.compareTo(BigDecimal.ZERO) > 0) {
 			throw new LogicException(titaVo, "E3094", "短繳金額 = " + iShortAmt); // 不可有短繳金額
 		}
 
-		// 短繳需輸入撥款序號
-		if (iShortAmt.compareTo(BigDecimal.ZERO) > 0 && iBormNo == 0) {
-			throw new LogicException(titaVo, "E3094", "短繳需輸入撥款序號，短繳金額 = " + iShortAmt); // 不可有短繳金額
-		}
 		if (titaVo.isHcodeNormal()) {
 			// 減免金額超過限額，需主管核可
 			if (iRqspFlag.equals("Y")) {
@@ -803,7 +799,7 @@ public class L3200 extends TradeBuffer {
 	}
 
 	private void calcRepayInt(LoanBorMain ln) throws LogicException {
-		this.info("calcRepayInt ...");
+		this.info("calcRepayInt ..." + "放款主檔 戶號 = " + ln.getCustNo() + " 額度編號 =  " + ln.getFacmNo() + " 撥款序號 = " + ln.getBormNo());
 		isCalcRepayInt = false;
 		wkIntStartDate = 9991231;
 		wkIntEndDate = 0;

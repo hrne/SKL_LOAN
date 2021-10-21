@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -44,7 +46,7 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2077 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2077.class);
+	private static final Logger logger = LoggerFactory.getLogger(L2077.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -88,7 +90,6 @@ public class L2077 extends TradeBuffer {
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 
 		int wkCloseDate = 0;
-		String wkRepayFg = "";
 		// new ArrayList
 		List<FacClose> lFacClose = new ArrayList<FacClose>();
 		Slice<FacClose> slFacClose = null;
@@ -122,9 +123,10 @@ public class L2077 extends TradeBuffer {
 			// 宣告
 			Timestamp ts = tmpFacClose.getCreateDate();
 			String createDate = "";
+			String wkRepayFg = "";
 			DateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 			createDate = sdf.format(ts);
-			this.info("createDate = " + createDate);
+			logger.info("createDate = " + createDate);
 			// new table
 			CustMain tCustMain = new CustMain();
 			int custno = tmpFacClose.getCustNo();
@@ -139,10 +141,11 @@ public class L2077 extends TradeBuffer {
 			baTxCom.setTxBuffer(txBuffer);
 			baTxCom.settingUnPaid(tmpFacClose.getEntryDate(), tmpFacClose.getCustNo(), tmpFacClose.getFacmNo(), 000, 0,
 					BigDecimal.ZERO, titaVo);
-			this.info("CloseBreach = "+ baTxCom.getShortCloseBreach());
-			this.info("FunCode = "+ tmpFacClose.getFunCode());
-			if ("2".equals(tmpFacClose.getFunCode()) && baTxCom.getShortCloseBreach().compareTo(BigDecimal.ZERO) == 0) {
-				this.info("wkRepayFg = \"Y\"");
+			logger.info("CloseBreach = " + baTxCom.getShortCloseBreach());
+			logger.info("FunCode = " + tmpFacClose.getFunCode());
+			if ("2".equals(tmpFacClose.getFunCode()) || "3".equals(tmpFacClose.getFunCode())
+					&& baTxCom.getShortCloseBreach().compareTo(BigDecimal.ZERO) == 0) {
+				logger.info("wkRepayFg = \"Y\"");
 				wkRepayFg = "Y";
 			}
 
@@ -211,8 +214,9 @@ public class L2077 extends TradeBuffer {
 				occursList.putParam("OOAllCloseFg", "N");
 			}
 			occursList.putParam("OORepayFg", wkRepayFg);
+			occursList.putParam("OOReceiveFg", tmpFacClose.getReceiveFg());
 
-			this.info("occursList L2077" + occursList);
+			logger.info("occursList L2077" + occursList);
 			this.totaVo.addOccursList(occursList);
 		}
 

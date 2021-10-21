@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("facCloseService")
 @Repository
-public class FacCloseServiceImpl implements FacCloseService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(FacCloseServiceImpl.class);
-
+public class FacCloseServiceImpl extends ASpringJpaParm implements FacCloseService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class FacCloseServiceImpl implements FacCloseService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + facCloseId);
+    this.info("findById " + dbName + " " + facCloseId);
     Optional<FacClose> facClose = null;
     if (dbName.equals(ContentName.onDay))
       facClose = facCloseReposDay.findById(facCloseId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "CloseNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "CloseNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = facCloseReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = facCloseReposHist.findAll(pageable);
     else 
       slice = facCloseRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
       slice = facCloseReposDay.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = facCloseReposHist.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, pageable);
     else 
       slice = facCloseRepos.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findFacmNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
+    this.info("findFacmNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = facCloseReposDay.findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, facmNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = facCloseReposHist.findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, facmNo_1, pageable);
     else 
       slice = facCloseRepos.findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, facmNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCloseDate " + dbName + " : " + "closeDate_0 : " + closeDate_0 + " closeDate_1 : " +  closeDate_1);
+    this.info("findCloseDate " + dbName + " : " + "closeDate_0 : " + closeDate_0 + " closeDate_1 : " +  closeDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = facCloseReposDay.findAllByCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(closeDate_0, closeDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -182,6 +187,9 @@ em = null;
     else 
       slice = facCloseRepos.findAllByCloseDateGreaterThanEqualAndCloseDateLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(closeDate_0, closeDate_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -190,7 +198,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findMaxCloseNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
+    this.info("findMaxCloseNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0);
     Optional<FacClose> facCloseT = null;
     if (dbName.equals(ContentName.onDay))
       facCloseT = facCloseReposDay.findTopByCustNoIsOrderByCloseNoDesc(custNo_0);
@@ -200,6 +208,7 @@ em = null;
       facCloseT = facCloseReposHist.findTopByCustNoIsOrderByCloseNoDesc(custNo_0);
     else 
       facCloseT = facCloseRepos.findTopByCustNoIsOrderByCloseNoDesc(custNo_0);
+
     return facCloseT.isPresent() ? facCloseT.get() : null;
   }
 
@@ -215,7 +224,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findEntryDate " + dbName + " : " + "entryDate_0 : " + entryDate_0);
+    this.info("findEntryDate " + dbName + " : " + "entryDate_0 : " + entryDate_0);
     if (dbName.equals(ContentName.onDay))
       slice = facCloseReposDay.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseDateAsc(entryDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -224,6 +233,9 @@ em = null;
       slice = facCloseReposHist.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseDateAsc(entryDate_0, pageable);
     else 
       slice = facCloseRepos.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseDateAsc(entryDate_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -240,7 +252,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCloseNo " + dbName + " : " + "closeDate_0 : " + closeDate_0 + " closeNo_1 : " +  closeNo_1 + " closeNo_2 : " +  closeNo_2 + " carLoan_3 : " +  carLoan_3 + " carLoan_4 : " +  carLoan_4);
+    this.info("findCloseNo " + dbName + " : " + "closeDate_0 : " + closeDate_0 + " closeNo_1 : " +  closeNo_1 + " closeNo_2 : " +  closeNo_2 + " carLoan_3 : " +  carLoan_3 + " carLoan_4 : " +  carLoan_4);
     if (dbName.equals(ContentName.onDay))
       slice = facCloseReposDay.findAllByCloseDateIsAndCloseNoGreaterThanEqualAndCloseNoLessThanEqualAndCarLoanGreaterThanEqualAndCarLoanLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(closeDate_0, closeNo_1, closeNo_2, carLoan_3, carLoan_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -250,6 +262,9 @@ em = null;
     else 
       slice = facCloseRepos.findAllByCloseDateIsAndCloseNoGreaterThanEqualAndCloseNoLessThanEqualAndCarLoanGreaterThanEqualAndCarLoanLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(closeDate_0, closeNo_1, closeNo_2, carLoan_3, carLoan_4, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -258,7 +273,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findFacmNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " funCode_2 : " +  funCode_2);
+    this.info("findFacmNoFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " funCode_2 : " +  funCode_2);
     Optional<FacClose> facCloseT = null;
     if (dbName.equals(ContentName.onDay))
       facCloseT = facCloseReposDay.findTopByCustNoIsAndFacmNoIsAndFunCodeInOrderByCloseNoDesc(custNo_0, facmNo_1, funCode_2);
@@ -268,6 +283,7 @@ em = null;
       facCloseT = facCloseReposHist.findTopByCustNoIsAndFacmNoIsAndFunCodeInOrderByCloseNoDesc(custNo_0, facmNo_1, funCode_2);
     else 
       facCloseT = facCloseRepos.findTopByCustNoIsAndFacmNoIsAndFunCodeInOrderByCloseNoDesc(custNo_0, facmNo_1, funCode_2);
+
     return facCloseT.isPresent() ? facCloseT.get() : null;
   }
 
@@ -283,7 +299,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findApplDateEq " + dbName + " : " + "applDate_0 : " + applDate_0 + " applDate_1 : " +  applDate_1);
+    this.info("findApplDateEq " + dbName + " : " + "applDate_0 : " + applDate_0 + " applDate_1 : " +  applDate_1);
     if (dbName.equals(ContentName.onDay))
       slice = facCloseReposDay.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAsc(applDate_0, applDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -293,6 +309,9 @@ em = null;
     else 
       slice = facCloseRepos.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAsc(applDate_0, applDate_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -301,7 +320,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + facCloseId);
+    this.info("Hold " + dbName + " " + facCloseId);
     Optional<FacClose> facClose = null;
     if (dbName.equals(ContentName.onDay))
       facClose = facCloseReposDay.findByFacCloseId(facCloseId);
@@ -319,7 +338,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + facClose.getFacCloseId());
+    this.info("Hold " + dbName + " " + facClose.getFacCloseId());
     Optional<FacClose> facCloseT = null;
     if (dbName.equals(ContentName.onDay))
       facCloseT = facCloseReposDay.findByFacCloseId(facClose.getFacCloseId());
@@ -341,7 +360,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + facClose.getFacCloseId());
+    this.info("Insert..." + dbName + " " + facClose.getFacCloseId());
     if (this.findById(facClose.getFacCloseId()) != null)
       throw new DBException(2);
 
@@ -370,7 +389,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + facClose.getFacCloseId());
+    this.info("Update..." + dbName + " " + facClose.getFacCloseId());
     if (!empNot.isEmpty())
       facClose.setLastUpdateEmpNo(empNot);
 
@@ -393,7 +412,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + facClose.getFacCloseId());
+    this.info("Update..." + dbName + " " + facClose.getFacCloseId());
     if (!empNot.isEmpty())
       facClose.setLastUpdateEmpNo(empNot);
 
@@ -413,7 +432,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + facClose.getFacCloseId());
+    this.info("Delete..." + dbName + " " + facClose.getFacCloseId());
     if (dbName.equals(ContentName.onDay)) {
       facCloseReposDay.delete(facClose);	
       facCloseReposDay.flush();
@@ -442,7 +461,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (FacClose t : facClose){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -477,7 +496,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (facClose == null || facClose.size() == 0)
       throw new DBException(6);
 
@@ -506,7 +525,7 @@ em = null;
 
   @Override
   public void deleteAll(List<FacClose> facClose, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

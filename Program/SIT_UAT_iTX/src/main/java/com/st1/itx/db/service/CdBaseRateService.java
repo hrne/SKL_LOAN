@@ -126,6 +126,18 @@ public interface CdBaseRateService {
   public Slice<CdBaseRate> baseRateCodeEq2(String currencyCode_0, String baseRateCode_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CurrencyCode = ,AND BaseRateCode =
+   *
+   * @param currencyCode_0 currencyCode_0
+   * @param baseRateCode_1 baseRateCode_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBaseRate CdBaseRate of List
+   */
+  public Slice<CdBaseRate> effectFlagDescFirst1(String currencyCode_0, String baseRateCode_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CdBaseRate
    * 
    * @param cdBaseRateId key

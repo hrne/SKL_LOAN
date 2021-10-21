@@ -3,7 +3,6 @@ package com.st1.itx.trade.LC;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -13,8 +12,10 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBranch;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.CdBranchService;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -35,6 +36,8 @@ public class LC100 extends TradeBuffer {
 	public TxTellerService txTellerService;
 
 	@Autowired
+	public CdEmpService tCdEmpService;
+	@Autowired
 	public CdBranchService sCdBranchService;
 
 	@Autowired
@@ -45,7 +48,17 @@ public class LC100 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC100 ");
 		this.totaVo.init(titaVo);
-
+		
+		CdEmp tCdEmp = tCdEmpService.findById(titaVo.getTlrNo(), titaVo);
+		
+		if(tCdEmp!=null) {
+			if(tCdEmp.getFullname().trim().isEmpty()) {
+				throw new LogicException("EC001", "員工資料檔員編姓名空白:" + titaVo.getTlrNo());	
+			}
+		} else {
+			throw new LogicException("EC001", "員工資料檔員編不存在:" + titaVo.getTlrNo());
+		}
+		
 		TxTeller tTxTeller = txTellerService.holdById(titaVo.getTlrNo());
 
 		if (tTxTeller != null) {

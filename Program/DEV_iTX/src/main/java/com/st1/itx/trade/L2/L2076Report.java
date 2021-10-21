@@ -2,7 +2,10 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,7 +26,7 @@ import com.st1.itx.util.parse.Parse;
 @Component("L2076Report")
 @Scope("prototype")
 public class L2076Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(L2076Report.class);
+	private static final Logger logger = LoggerFactory.getLogger(L2076Report.class);
 
 	@Autowired
 	public ClOtherRightsService sClOtherRightsService;
@@ -70,7 +73,7 @@ public class L2076Report extends MakeReport {
 	@Override
 	public void printHeader() {
 
-		this.info("L2076Report.printHeader");
+		logger.info("L2076Report.printHeader");
 
 //		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
 //		this.print(-3, 55, "抵押權塗銷同意書", "C");
@@ -93,7 +96,7 @@ public class L2076Report extends MakeReport {
 	}
 
 	public void exec(TitaVo titaVo, FacClose tFacClose) throws LogicException {
-		this.info("L2076Report exec ...");
+		logger.info("L2076Report exec ...");
 
 		// 設定字體1:標楷體 字體大小36
 		this.setFont(1, 36);
@@ -131,6 +134,8 @@ public class L2076Report extends MakeReport {
 		String DocNoyy = parse.IntegerToString(DocNo, 7).substring(0, 3);
 
 		String DocNoseQ = parse.IntegerToString(DocNo, 7).substring(3, 7);
+		// 功能
+		String funCdString = tFacClose.getFunCode();
 		// 縣市
 		String wkCity = "";
 		wkCity = tClOtherRights.getCity();
@@ -153,19 +158,19 @@ public class L2076Report extends MakeReport {
 		BigDecimal wkSecuredTotal = BigDecimal.ZERO;
 		wkSecuredTotal = tClOtherRights.getSecuredTotal();
 		// 金額轉中文大寫
-		String amtChinese = this.convertAmtToChinese(wkSecuredTotal)+"元整";
+		String amtChinese = this.convertAmtToChinese(wkSecuredTotal) + "元整";
 
-		this.info("Doc = " + DocNo);
-		this.info("DocNoyy = " + DocNoyy);
-		this.info("DocNoseQ = " + DocNoseQ);
-		this.info("wkCity = " + wkCity);
-		this.info("wkLandAdm = " + wkLandAdm);
-		this.info("RecYear = " + wkRecYear);
-		this.info("RecWord = " + wkRecWord);
-		this.info("RecNumber = " + wkRecNumber);
-		this.info("RightsNote = " + wkRightsNote);
-		this.info("SecuredTotal = " + wkSecuredTotal);
-		this.info("amtChinese = " + amtChinese);
+		logger.info("Doc = " + DocNo);
+		logger.info("DocNoyy = " + DocNoyy);
+		logger.info("DocNoseQ = " + DocNoseQ);
+		logger.info("wkCity = " + wkCity);
+		logger.info("wkLandAdm = " + wkLandAdm);
+		logger.info("RecYear = " + wkRecYear);
+		logger.info("RecWord = " + wkRecWord);
+		logger.info("RecNumber = " + wkRecNumber);
+		logger.info("RightsNote = " + wkRightsNote);
+		logger.info("SecuredTotal = " + wkSecuredTotal);
+		logger.info("amtChinese = " + amtChinese);
 //		ClCode1擔保品代號1
 //		ClCode2擔保品代號2
 //		ClNo擔保品編號
@@ -177,8 +182,31 @@ public class L2076Report extends MakeReport {
 //		RecNumber收件號
 //		RightsNote權利價值說明
 //		SecuredTotal擔保債權總金額
+		if ("3".equals(funCdString)) {
 
+			Point a = new Point(550, 7);
+			Point b = new Point(588, 7);
+			Point c = new Point(550, 25);
+			Point d = new Point(588, 25);
+
+			Line ab = new Line(a, b);
+			Line ac = new Line(a, c);
+			Line bd = new Line(b, d);
+			Line cd = new Line(c, d);
+
+			ArrayList<Line> lineList = new ArrayList<Line>();
+
+			lineList.add(ab);
+			lineList.add(ac);
+			lineList.add(bd);
+			lineList.add(cd);
+
+			this.drawLineList(lineList);
+			this.setFont(1, 12);
+			this.print(-1, 93, "補發", "L");
+		}
 		this.print(1, 1, "　　");
+
 		/**
 		 * -----------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 		 * --------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -250,4 +278,58 @@ public class L2076Report extends MakeReport {
 		this.print(0, 68, date.substring(5, 7));
 	}
 
+	private void drawLineList(ArrayList<Line> lineList) {
+		if (lineList != null && lineList.size() > 0) {
+			for (Line line : lineList) {
+				drawLine(line);
+			}
+		}
+	}
+
+	private void drawLine(Line line) {
+		this.drawLine(line.getA().getX(), line.getA().getY(), line.getB().getX(), line.getB().getY());
+	}
+
+	private class Point {
+		int x = 0;
+		int y = 0;
+
+		public Point(int x, int y) {
+			this.x = x;
+			this.y = y;
+		}
+
+		public int getX() {
+			return x;
+
+		}
+
+		public int getY() {
+			return y;
+		}
+	}
+
+	private class Line {
+		Point A;
+		Point B;
+
+		/**
+		 * Set a line from A to B
+		 * 
+		 * @param A starting point.
+		 * @param B end.
+		 */
+		public Line(Point A, Point B) {
+			this.A = A;
+			this.B = B;
+		}
+
+		public Point getA() {
+			return A;
+		}
+
+		public Point getB() {
+			return B;
+		}
+	}
 }

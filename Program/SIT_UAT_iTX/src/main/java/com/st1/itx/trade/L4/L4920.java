@@ -162,16 +162,12 @@ public class L4920 extends TradeBuffer {
 					if (tempVo.get("Note") != null && tempVo.get("Note").length() > 0) {
 						procNote += "摘要:" + tempVo.get("Note");
 					}
-					
-					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
-						procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
-					}
-
-//					當吃檔進去時不會寫入還款類別，檢核後才會寫入。
-//					若該筆無還款類別且為數字型態，顯示虛擬帳號
 					if (tempVo.get("VirtualAcctNo") != null && parse.stringToInteger(result.get("F4")) == 0
 							&& isNumeric(tempVo.get("VirtualAcctNo"))) {
 						procNote = procNote + "虛擬帳號:" + tempVo.get("VirtualAcctNo");
+					}
+					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
+						procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
 					}
 				}
 

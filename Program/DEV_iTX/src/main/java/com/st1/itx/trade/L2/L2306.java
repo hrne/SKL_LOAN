@@ -120,6 +120,7 @@ public class L2306 extends TradeBuffer {
 				tReltMain.setReltCode(titaVo.getParam("PosInd"));
 				tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
 				tReltMain.setReltmark(titaVo.getParam("Remark"));
+				tReltMain.setApplDate(parse.stringToInteger(titaVo.getEntDy()));
 				/* 存入DB */
 
 				try {
@@ -159,6 +160,7 @@ public class L2306 extends TradeBuffer {
 				tReltMain.setReltCode(titaVo.getParam("PosInd"));
 				tReltMain.setRemarkType(titaVo.getParam("RemarkType"));
 				tReltMain.setReltmark(titaVo.getParam("Remark"));
+				tReltMain.setApplDate(parse.stringToInteger(titaVo.getEntDy()));
 				/* 存入DB */
 
 				try {

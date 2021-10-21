@@ -1,0 +1,435 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2076)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,247)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];order=1;">
+[
+["[L2076]                                 領取清償證明作業"],
+["#FdFunCode+作業功能",#FunCode,#FunCodX],
+["#FdCustNo+戶號",#CustNo],
+["#FdFacmNo+額度編號",#FacmNo],
+["#FdTelNo1+連絡電話１",#TelNo1],
+["#FdTelNo2+連絡電話２",#TelNo2],
+["#FdFaxNum+傳真機號碼",#FaxNum],
+["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
+["#FdCollectWayCode+領取方式",#CollectWayCode,#CollectWayCodeX],
+["#FdReceiveDate+領取日期",#ReceiveDate],
+["#FdRmk1+備註欄",#Rmk1],
+]
+
+#FdFunCode=X,2,L
+#FdCustNo=X,2,L
+#FdFacmNo=X,2,L
+#FdTelNo1=X,2,L
+#FdTelNo2=X,2,L
+#FdFaxNum=X,2,L
+#FdCloseReasonCode=X,2,L
+T(3,*)
+#FdCollectWayCode=X,2,L
+T(3,*)
+#FdReceiveDate=X,2,L
+#FdRmk1=X,2,L
+
+
+!---------- AP Button AREA ----------   
+![Buttom資料查詢]
+! #BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#FunCodeHelp=X,100,S
+T(3,1:請領（已申請者為請領）;2:補領（已結案後來申請者）;3:補發（已領過者為補發）)
+
+!AdvanceCloseCode
+#CDDEF0001=x,25,S
+T(3,CdCode.AdvanceCloseCode)
+#CDDEF0002=x,30,S
+T(3,CdCode.CollectWayCode)
+#CDDEF0003=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AdvanceCloseCodeHelp,#HelpDesc1)
+T(2,@CollectWayCodeHelp,#HelpDesc2)
+T(2,@CurrPrecisionHelp,#HelpDesc3)
+
+#AdvanceCloseCodeHelp=x,1024,S
+
+#CollectWayCodeHelp=x,1024,S
+
+#CurrPrecisionHelp=x,1024,S
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,18,S
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2077進入),$)
+C(3,#CHAIN,1,$,S)
+T(4,NTXBUF$)
+T(1,@FunCode,#NTXBUF,1,1)
+T(1,@CustNo,#NTXBUF,2,7)
+T(1,@FacmNo,#NTXBUF,9,3)
+
+#initchain=X,1,S
+T(F,#FunCode,0)
+T(F,#CustNo,0)
+T(F,#FacmNo,0)
+
+!作業功能
+#FunCode=A,1,L
+C(3,#CHAIN,1,s,$)
+HELP(#FunCodeHelp)
+@V(H,#FunCodeHelp)
+
+#FunCodX=X,30,L
+T(H,#FunCode,#FunCodeHelp)
+
+
+!戶號
+#CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
+
+!額度編號
+#FacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
+
+!調RIM參數
+#RimFunCode=A,1,S
+#RimCustNo=A,7,S
+#RimFacmNo=A,3,S
+
+!取戶號額度清償作業檔
+#SendL2R45A=X,1,S
+E(0,@RimFunCode,#FunCode)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,#FacmNo)
+RESET_RIM(#SendL2R45A,L2R45)
+S(L2R45,1,#RimFunCode,#RimCustNo,#RimFacmNo)
+R(1,L2R45)
+
+#checkl2r45A=X,1,S
+T(2,@TelNo1,#L2r45TelNo1)
+T(2,@TelNo2,#L2r45TelNo2)
+T(2,@FaxNum,#L2r45FaxNum)
+E(0,@CloseReasonCode,#L2r45CloseReasonCode)
+T(2,@CollectWayCode,#L2r45CollectWayCode)
+! E(0,@ReceiveDate,#L2r45ReceiveDate)
+T(1,@Rmk1,#L2r45Rmk,1,100)
+E(0,@CloseNo,#L2r45CloseNo)
+
+!#L2r45CustNo=A,7,S
+!#L2r45CloseNo=A,3,S
+!#L2r45FacmNo=A,3,S
+!#L2r45ActFlag=A,1,S
+!#L2r45FunCode=X,1,S
+!#L2r45CarLoan=A,1,S
+!#L2r45ApplDate=D,7,S
+!#L2r45CloseDate=D,7,S
+!#L2r45CloseReasonCode=X,2,S
+!#L2r45TwCloseAmt=m,14.2,S
+!#L2r45UsCloseAmt=m,14.2,S
+!#L2r45CollectFlag=X,1,S
+!#L2r45CollectWayCode=X,2,S
+!#L2r45ReceiveDate=D,7,S
+!#L2r45TelNo1=X,15,S
+!#L2r45TelNo2=X,15,S
+!#L2r45FaxNum=X,15,S
+!#L2r45EntryDate=D,7,S
+!#L2r45AgreeNo=X,10,S
+!#L2r45DocNo=A,7,S
+!#L2r45ClsNo=X,18,S
+!#L2r45Rmk=x,100,S
+!#L2r45ClCode1=A,1,S
+!#L2r45ClCode2=A,2,S
+!#L2r45ClNo=A,7,S
+!連絡電話１
+#TelNo1=x,15,I
+!連絡電話２
+#TelNo2=x,15,I
+
+!傳真機號碼
+#FaxNum=x,15,I
+
+!清償原因
+#CloseReasonCode=A,2,I
+HELP(#AdvanceCloseCodeHelp)
+@V(H,#AdvanceCloseCodeHelp)
+
+#CloseReasonCodeX=X,20,L
+T(H,#CloseReasonCode,#AdvanceCloseCodeHelp)
+
+
+!領取地點
+#CollectWayCode=X,2,I
+HELP(#CollectWayCodeHelp,cols:5)
+@V(H,#CollectWayCodeHelp)
+
+
+
+#CollectWayCodeX=x,12,L
+C(4,#CollectWayCode,S,$)T(H,#CollectWayCode,#CollectWayCodeHelp)
+
+
+!領取日期
+#ReceiveDate=D,7,I
+C(3,#CollectWayCode,1,S,$)
+E(0,#SYSDATE)
+@A(DATE,0,#ReceiveDate)
+
+!備註欄
+#Rmk1=x,100,I
+
+#Rmk=x,100,L
+T(B,#Rmk1)
+
+#CloseNo=A,3,S
+
+#RPTFG=A,1,S
+E(0,0)
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
+
+<include src="ROM.icf::L2R45.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2076 ----------
+<sub type="FORM" name="L2076">
+#SCRTIL=_,_,S
+T(3,[L2076] 領取清償證明作業)
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2076,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2076] 清償作業)
+
+#OCurrencyCode=X,3,L
+T(3,TWD)
+
+#PRECISION=N,1,S
+T(H,#OCurrencyCode,#CurrPrecisionHelp)
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+! 匯款單FileNo
+#PdfSnoF=X,8,S
+E(2,@SnoF,#PdfSnoF)
+#SnoF=A,8,S
+
+! 匯款單FileNo
+#PdfPrtF=A,1,S
+C(3,#SnoF,0,E(0,0),E(0,1))
+
+
+#CustId=X,10,S
+
+#CloseNo=_,_,S
+E(0,#L2r45CloseNo)
+
+#ACTFG=_,_,S
+
+#CarLoan=A,1,S
+#CloseAmt=m,14.2,S
+#CollectFlag=X,1,S
+#TranDate=D,7,S
+#ApplDate=D,7,S
+#CloseInd=A,1,S
+#AgreeNo=X,10,S
+#DocNo=A,7,S
+#CloseDate=D,7,S
+#ClsNo=X,18,S
+
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOClCode1=A,1,S
+#OOClCode2=A,2,S
+#OOClNo=A,7,S
+#OOClCodeNo=X,12,S
+T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
+#OOSeq=X,8,S
+#OOCity=x,6,S
+#OOLandAdm=x,6,S
+#OORecYear=A,3,S
+#OORecWord=x,8,S
+#OORecNumber=X,6,S
+#OORightsNote=x,20,S
+#OOSecuredTotal=m,14,S
+#OOAllClose=X,1,S
+
+!列印用
+#RpFg=A,1,S
+E(0,7)
+T(2,@TXCD,L2631)
+T(2,@MRKEY,#CustNo+-+#FacmNo)
+
+#secret-no=x,1000,S
+T(6A,#CustId+#CustNo+#CloseNo+#FacmNo+#SECNO+#ACTFG+#FunCode+#CarLoan+#ApplDate+#CloseDate+#CloseReasonCode+#CloseAmt+#CloseInd
++#CollectFlag+#CollectWayCode+#ReceiveDate+#TelNo1+#TelNo2+#FaxNum+#TranDate+#AgreeNo+#DocNo+#ClsNo+#Rmk1+#OOClCode1
++#OOClCode2+#OOClNo+#OOSeq+#RpFg+#MRKEY)
+
+
+
+
+
+
+#batch-detail=x,100000,S
+#batch-print=A,1,S
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,50,S
+T(3,成功 請至LC009)
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCode
+#CustNo
+#FacmNo
+#TelNo1
+#TelNo2
+#FaxNum
+#CloseReasonCode
+#CollectWayCode
+#ReceiveDate
+#Rmk
+#CloseNo
+#RpFg
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2076
+#OOClCode1
+#OOClCode2
+#OOClNo
+#OOSeq
+#OOCity
+#OOLandAdm
+#OORecYear
+#OORecWord
+#OORecNumber
+#OORightsNote
+#OOSecuredTotal
+#OOAllClose
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R45.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L2076" layout="cols=3;screen.width=[1000];printer.width=[15,30,15,30];order=1">
+[
+["[L2076]                                 清償作業"],
+["@"],
+! ["@"],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#batch-print=1,L2076.PFNX,NA,,,,,,1169:827
+#PdfPrtF=1,PDF,,,,,,,,,,,,,PdfSnoF;1,清償作業
+^
+#RPTFG=0,QUERY.GRID,L2076
+#any={detail:true, header:'L2076.part', caption:'[L2076]清償作業', width:1000, rowNum:20, rowList:[20,40,60],
+ifxBatch:{
+	name:'列印清償證明',
+	type:'5',
+	rim:'L2631',
+	txtno:'#secret-no',
+	pfnx:"L2076.PFNX",
+	col_captions:["擔保品號碼","他項權利序號","報表代碼","戶號","額度編號","處理結果"],
+	col_names:["#OOClCodeNo","#OOSeq","#TXCD","#CustNo","#FacmNo","#batch-row-status"]
+	}
+}
+#TXCD
+#secret-no
+#CustNo
+#FacmNo
+#batch-row-status
+
+#OOClCodeNo=擔保品號碼
+{width:100,align:'center'}
+#OOSeq=他項權利序號
+{width:80,align:'center'}
+#OOCity=縣市
+{width:80,align:'center'}
+#OOLandAdm=地政
+{width:80,align:'center'}
+#OORecYear=收件年
+{width:80,align:'center'}
+#OORecWord=收件字
+{width:80,align:'center'}
+#OORecNumber=收件號
+{width:80,align:'center'}
+#OORightsNote=權利價值說明
+{width:200,align:'center'}
+#OOSecuredTotal=擔保債權總金額
+{width:170,align:'center'}
+#OOAllClose=全部結案
+{width:80,align:'center'}
+^
+</sub>

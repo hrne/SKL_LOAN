@@ -29,7 +29,7 @@ public class FacClose implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7679140372450194895L;
+	private static final long serialVersionUID = 3457872587356049124L;
 
 @EmbeddedId
   private FacCloseId facCloseId;
@@ -137,6 +137,11 @@ public class FacClose implements Serializable {
   // 擔保品編號
   @Column(name = "`ClNo`")
   private int clNo = 0;
+
+  // 領取記號
+  /* 0:未領取1:已領取 */
+  @Column(name = "`ReceiveFg`")
+  private int receiveFg = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -654,6 +659,27 @@ public class FacClose implements Serializable {
   }
 
 /**
+	* 領取記號<br>
+	* 0:未領取
+1:已領取
+	* @return Integer
+	*/
+  public int getReceiveFg() {
+    return this.receiveFg;
+  }
+
+/**
+	* 領取記號<br>
+	* 0:未領取
+1:已領取
+  *
+  * @param receiveFg 領取記號
+	*/
+  public void setReceiveFg(int receiveFg) {
+    this.receiveFg = receiveFg;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -736,6 +762,6 @@ public class FacClose implements Serializable {
            + ", applDate=" + applDate + ", closeDate=" + closeDate + ", closeReasonCode=" + closeReasonCode + ", closeAmt=" + closeAmt + ", collectFlag=" + collectFlag + ", collectWayCode=" + collectWayCode
            + ", receiveDate=" + receiveDate + ", telNo1=" + telNo1 + ", telNo2=" + telNo2 + ", faxNum=" + faxNum + ", entryDate=" + entryDate + ", agreeNo=" + agreeNo
            + ", docNo=" + docNo + ", clsNo=" + clsNo + ", rmk=" + rmk + ", clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", receiveFg=" + receiveFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

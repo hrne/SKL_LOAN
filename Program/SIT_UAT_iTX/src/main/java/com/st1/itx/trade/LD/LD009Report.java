@@ -195,8 +195,8 @@ public class LD009Report extends MakeReport {
 				print(0, 166, formatAmt(tLDVo.get("F16"), 0), "R");
 
 				for (int i = 0; i < 13; i++) {
-					totalArray[i] = totalArray[i].add(new BigDecimal(tLDVo.get("F" + (4 + i))));
-					totalPerItem[i] = totalPerItem[i].add(new BigDecimal(tLDVo.get("F" + (4 + i))));
+					totalArray[i] = totalArray[i].add(getBigDecimal(tLDVo.get("F" + (4 + i))));
+					totalPerItem[i] = totalPerItem[i].add(getBigDecimal(tLDVo.get("F" + (4 + i))));
 				}
 
 			}

@@ -29,7 +29,7 @@ public class CdBaseRateId implements Serializable {
   private String currencyCode = " ";
 
   // 利率代碼
-  /* 共用代碼檔從 L6301 維護代碼01:保單分紅利率02:郵政儲金利率 */
+  /* 共用代碼檔從 L6301 維護代碼01:保單分紅利率02:郵政儲金利率03:台北金融業拆款定盤利率 */
   @Column(name = "`BaseRateCode`", length = 2)
   private String baseRateCode = " ";
 
@@ -72,6 +72,7 @@ TWD: 新台幣
 	* 共用代碼檔從 L6301 維護代碼
 01:保單分紅利率
 02:郵政儲金利率
+03:台北金融業拆款定盤利率
 	* @return String
 	*/
   public String getBaseRateCode() {
@@ -83,6 +84,7 @@ TWD: 新台幣
 	* 共用代碼檔從 L6301 維護代碼
 01:保單分紅利率
 02:郵政儲金利率
+03:台北金融業拆款定盤利率
   *
   * @param baseRateCode 利率代碼
 	*/

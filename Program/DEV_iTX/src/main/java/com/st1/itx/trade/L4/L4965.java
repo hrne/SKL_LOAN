@@ -11,8 +11,12 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.InsuRenew;
+import com.st1.itx.db.domain.InsuRenewId;
+import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4965ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * Tita<br>
@@ -44,6 +48,12 @@ public class L4965 extends TradeBuffer {
 	@Autowired
 	public L4965ServiceImpl l4965ServiceImpl;
 
+	@Autowired
+	public Parse parse;
+	
+	@Autowired
+	public InsuRenewService insuRenewService;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4965 ");
@@ -85,7 +95,23 @@ public class L4965 extends TradeBuffer {
 			occursList.putParam("OOEthqInsuPrem", data[13]);
 			occursList.putParam("OOInsuStartDate", data[14]);
 			occursList.putParam("OOInsuEndDate", data[15]);
+			occursList.putParam("OOL4610Flag", 0);
+			occursList.putParam("OOL4611Flag", 0);
+			
+			InsuRenew tInsuRenew = new InsuRenew();
+			InsuRenewId tInsuRenewId = new InsuRenewId();
+			tInsuRenewId.setClCode1(parse.stringToInteger(data[4]));
+			tInsuRenewId.setClCode2(parse.stringToInteger(data[5]));
+			tInsuRenewId.setClNo(parse.stringToInteger(data[6]));
+			tInsuRenewId.setPrevInsuNo(data[7]);
+			tInsuRenewId.setEndoInsuNo(data[8]);
 
+			tInsuRenew = insuRenewService.findById(tInsuRenewId, titaVo);
+			
+			if(tInsuRenew != null) {
+				occursList.putParam("OOL4611Flag", 1);
+			}
+			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

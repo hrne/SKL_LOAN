@@ -50,6 +50,8 @@ public class L5601 extends TradeBuffer {
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
 		String iFunctioncd = titaVo.getParam("FunctionCd");
 		String iCaseCode = titaVo.getParam("CaseCode");
+		int iResultCode = Integer.valueOf(titaVo.getParam("ResultCode"));
+
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -159,7 +161,8 @@ public class L5601 extends TradeBuffer {
 			}
 
 			// 若提醒日期有輸入，則把日期一併insert進提醒登錄表 不論更新或新增都是塞入操作人的員編和時間、交易序號
-			if (!titaVo.getParam("CallDate").equals("0000000")) {
+			// 排除刪除時不新增提醒
+			if (!titaVo.getParam("CallDate").equals("0000000") && !iFunctioncd.equals("4")) {
 				CollRemind iCollRemind = new CollRemind();
 				CollRemindId iCollRemindId = new CollRemindId();
 				iCollRemindId.setTitaTlrNo(titaVo.getTlrNo());
@@ -171,7 +174,23 @@ public class L5601 extends TradeBuffer {
 				iCollRemind.setCollRemindId(iCollRemindId);
 				iCollRemind.setCondCode("1");
 				iCollRemind.setRemindDate(Integer.valueOf(titaVo.getParam("CallDate")));
-				iCollRemind.setRemark("登錄自電催會繳");
+				//iCollRemind.setRemark("登錄自電催會繳");
+				if (iResultCode == 1) {
+					iCollRemind.setRemark("登錄自電催－會繳");
+				} else if(iResultCode == 2) {
+					iCollRemind.setRemark("登錄自電催－繳款有困難");
+				} else if(iResultCode == 3) {
+					iCollRemind.setRemark("登錄自電催－無人接聽");
+				} else if(iResultCode == 4) {
+					iCollRemind.setRemark("登錄自電催－請接話人轉達");
+				} else if(iResultCode == 5) {
+					iCollRemind.setRemark("登錄自電催－保證人代繳");
+				} else if(iResultCode == 6) {
+					iCollRemind.setRemark("登錄自電催－電話留言");
+				} else {
+					iCollRemind.setRemark("登錄自電催－其他");
+				}
+				
 				iCollRemind.setEditDate(Integer.valueOf(titaVo.getEntDy()));
 				iCollRemind.setEditTime(titaVo.getCalTm().substring(0,4));
 				iCollRemind.setRemindCode("01"); // 到時候看會繳的提醒項目編號是多少
