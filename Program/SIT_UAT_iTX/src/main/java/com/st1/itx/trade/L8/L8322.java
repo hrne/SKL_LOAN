@@ -105,9 +105,9 @@ public class L8322 extends TradeBuffer {
 		
 		// 檢核項目(D-44)
 		if (!"4".equals(iTranKey_Tmp)) {
-		if ("1".equals(iTranKey_Tmp)) {
+			if ("A".equals(iTranKey)) {
 			// 2 IDN+調解申請日，不能重複，若有重複，剔退處理.
-			Slice<JcicZ440> sJcicZ440 = sJcicZ440Service.custRcEq(iCustId, iApplyDate, 0, Integer.MAX_VALUE, titaVo);
+			Slice<JcicZ440> sJcicZ440 = sJcicZ440Service.custRcEq(iCustId, iApplyDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
 			if(sJcicZ440 != null) {
 				throw new LogicException("E0005", "IDN+調解申請日，不能重複.");
 			}
@@ -125,11 +125,7 @@ public class L8322 extends TradeBuffer {
 			// 4 end
 		}
 		
-			// 5 start 第9欄「首次調解日」小於等於第8欄「同意書取得日期」時，第12欄「協辦行是否需自行回報債權」需填報為'N'，否則予以剔退.
-		if(iStartDate <= iAgreeDate && !"N".equals(iReportYn)) {
-			throw new LogicException("E0005", "「首次調解日」小於等於第「同意書取得日期」時，「協辦行是否需自行回報債權」需填報為'N'.");
-		}
-			// 5 end
+			// 5 第9欄「首次調解日」小於等於第8欄「同意書取得日期」時，第12欄「協辦行是否需自行回報債權」需填報為'N'，否則予以剔退.--->(前端檢核)
 		
 			// 6 start 檢核第13~18「未揭露債權機構代號」，若不屬於有效消債條例金融機構代號，則予剔退。
 		try {
@@ -150,7 +146,11 @@ public class L8322 extends TradeBuffer {
 						}
 					}
 					if (flagFind == 0) {
+						if ("A".equals(iTranKey)) {
 						throw new LogicException(titaVo, "E0005", "未揭露債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+						}else {
+							throw new LogicException(titaVo, "E0007", "未揭露債權機構代號" + xNotBankId + "不屬於有效消債條例金融機構代號");
+						}
 					}
 					flagFind = 0;
 				}
@@ -158,12 +158,15 @@ public class L8322 extends TradeBuffer {
 		} // 6 end
 		
 			// 7 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動本檔案資料.
-		if ("A".equals(iTranKey) ||  "C".equals(iTranKey)) {
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if(iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+				if ("A".equals(iTranKey)) {
 				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動本檔案資料.");
+				}else {
+					throw new LogicException(titaVo, "E0007", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動本檔案資料.");
+				}
 			}
-		}// 7 end
+		// 7 end
 		
 		// 檢核條件 end
 	}

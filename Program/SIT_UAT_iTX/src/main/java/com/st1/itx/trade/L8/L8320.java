@@ -111,15 +111,20 @@ public class L8320 extends TradeBuffer {
 		iJcicZ060Id.setRcDate(iRcDate);
 		iJcicZ060Id.setChangePayDate(iChangePayDate);
 		BigDecimal xMonthPayAmt = BigDecimal.ZERO;// 「月付金」
-		
+
 		// 檢核項目(D-34)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.2 start
 			// 檢核KEY值(IDN+報送單位代號+協商申請日+申請變更還款條件日)是否存在「'60':前置協商受理申請變更還款暨請求回報剩餘債權通知資料」.
 			iJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
 			if (iJcicZ060 == null) {
-				throw new LogicException("E0005",
-						"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
+				if ("A".equals(iTranKey)) {
+					throw new LogicException("E0005",
+							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
+				} else {
+					throw new LogicException("E0007",
+							"KEY值(IDN+報送單位代號+原前置協商申請日+申請變更還款條件日)未曾報送過(60)前置協商受理申請變更還款暨請求回報剩餘債權通知資料.");
+				}
 			}
 			// 1.2 end
 
@@ -131,26 +136,15 @@ public class L8320 extends TradeBuffer {
 
 			// 1.5 檢核第11-13欄若與所有協商剩餘金融機構回報'61'之回報協商剩餘債權金額不同時，則予剔退***J
 
-			// 1.6
+			// 1.6--->(前端檢核)
 			// 檢核第14欄「變更還款條件簽約總債務金額」需為第11-13欄信用貸款、現金卡、信用卡之「協商剩餘債務簽約餘額」合計，否則予以剔退.前端已設為自動填入數字。
 
-			// 1.7 start 變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日期
-			if (iChaRepayEndDate > 0 && iChaRepayEndDate < iChaRepayAgreeDate) {
-				throw new LogicException("E0005", "「變更還款條件簽約完成日期」需大於或等於「變更還款條件協議完成日期」.");
-			}
-			// 1.7 end
+			// 1.7 變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日期--->(前端檢核)
 
-			// 1.8 start 若第22欄「屬階梯式還款註記」填報'Y'者，第9欄第一階梯「期數」需填報固定值 '012'或'024'，否則予以剔退.
-			if ("Y".equals(iGradeType)) {
-				if (iPeriod != 12 && iPeriod != 24) {
-					throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第一階梯「期數」需填報固定值 '012'或'024'.");
-				} // 1.8 end
+			// 1.8 start 若第22欄「屬階梯式還款註記」填報'Y'者，第9欄第一階梯「期數」需填報固定值
+			// '012'或'024'，否則予以剔退.--->(前端檢核)
 
-				// 1.9 start 若第22欄「屬階梯式還款註記」填報'Y'者，第10欄第一階梯「利率」需填報固定值 '00.00'，否則予以剔退.
-				if (iRate.compareTo(BigDecimal.ZERO) != 0) {
-					throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第一階梯「利率」需填報固定值 '00.00'.");
-				}
-			} // 1.9 end
+			// 1.9 若第22欄「屬階梯式還款註記」填報'Y'者，第10欄第一階梯「利率」需填報固定值 '00.00'，否則予以剔退.--->(前端檢核)
 
 			// 1.10.一.(一) start 第22欄「屬階梯式還款註記」空白，第10欄「利率」不等於0：第21欄「月付金」>=
 			// 變更還款條件簽約總債務金額×{[(1+月利率)^第一階梯期數]×(月利率)}÷{[(1+月利率)^第一階梯期數]-1}
@@ -158,8 +152,13 @@ public class L8320 extends TradeBuffer {
 				if (iRate.compareTo(BigDecimal.ZERO) != 0) {
 					xMonthPayAmt = MonthPay1011(iChaRepayAmt, iRate, iPeriod);
 					if (new BigDecimal(iMonthPayAmt).compareTo(xMonthPayAmt) < 0) {
-						throw new LogicException("E0005",
-								"「屬階梯式還款註記」空白且第一階梯「利率」不等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額×{[(1+月利率)^第一階梯期數]×(月利率)}÷{[(1+月利率)^第一階梯期數]-1}.");
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005",
+									"「屬階梯式還款註記」空白且第一階梯「利率」不等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額×{[(1+月利率)^第一階梯期數]×(月利率)}÷{[(1+月利率)^第一階梯期數]-1}.");
+						} else {
+							throw new LogicException("E0007",
+									"「屬階梯式還款註記」空白且第一階梯「利率」不等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額×{[(1+月利率)^第一階梯期數]×(月利率)}÷{[(1+月利率)^第一階梯期數]-1}.");
+						}
 					} // 1.10.一.(一) end
 
 					// 1.10.一.(二) start 第22欄「屬階梯式還款註記」空白，第10欄「利率」等於0：第21欄「月付金」>=
@@ -171,23 +170,29 @@ public class L8320 extends TradeBuffer {
 						xMonthPayAmt = MonthPay1012(iChaRepayAmt, new BigDecimal(iPeriod));
 					}
 					if (new BigDecimal(iMonthPayAmt).compareTo(xMonthPayAmt) < 0) {
-						throw new LogicException("E0005", "「屬階梯式還款註記」空白且第一階梯「利率」等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額÷第一階梯期數.");
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005",
+									"「屬階梯式還款註記」空白且第一階梯「利率」等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額÷第一階梯期數.");
+						} else {
+							throw new LogicException("E0007",
+									"「屬階梯式還款註記」空白且第一階梯「利率」等於0時，「月付金」應大於等於：變更還款條件簽約總債務金額÷第一階梯期數.");
+						}
 					} // 1.10.一.(二) end
 				}
 			} else if ("Y".equals(iGradeType)) {
-				// 1.11 start 若第22欄「屬階梯式還款註記」填報'Y'者，第23-25欄二階梯期數、利率、月付金為必填，否則予以剔退。
-				if (iPeriod2 == 0 || iRate2 == null || iMonthPayAmt2 == 0) {
-					throw new LogicException("E0005", "「屬階梯式還款註記」填報'Y'，第二階梯期數、利率、月付金為必要填報欄位，不能為空.");
-				} // 1.11 end
-
 				// 1.10.二.(一)第22欄「屬階梯式還款註記」填報'Y'者，第21欄「月付金」不作檢核.
 				// 1.10.二.(二).1 start 第24欄「第二階梯利率」不等於0：第25欄「第二階梯月付金」>=
 				// [變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}
 				if (iRate2.compareTo(BigDecimal.ZERO) != 0) {
 					xMonthPayAmt = MonthPay10221(iChaRepayAmt, iRate2, iPeriod2, iMonthPayAmt, iPeriod);
 					if (new BigDecimal(iMonthPayAmt2).compareTo(xMonthPayAmt) < 0) {
-						throw new LogicException("E0005",
-								"「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005",
+									"「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
+						} else {
+							throw new LogicException("E0007",
+									"「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
+						}
 					} // 1.10.二.(二).1 end
 
 					// 1.10.二.(二).2 start 第24欄「第二階梯利率」等於0：第25欄「第二階梯月付金」>=
@@ -195,16 +200,26 @@ public class L8320 extends TradeBuffer {
 				} else {
 					xMonthPayAmt = MonthPay10222(iChaRepayAmt, new BigDecimal(iPeriod2), iMonthPayAmt, iPeriod);
 					if (new BigDecimal(iMonthPayAmt2).compareTo(xMonthPayAmt) < 0) {
-						throw new LogicException("E0005",
-								"「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005",
+									"「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
+						} else {
+							throw new LogicException("E0007",
+									"「屬階梯式還款註記」填報'Y'，第二階梯利率不等於0，則「第二階梯月付金」應大於等於：[變更還款條件簽約總債務金額-(月付金×第一階梯期數)]×{[(1+第二階梯月利率)^第二階梯期數]×(第二階梯月利率)}÷{[(1+第二階梯月利率)^第二階梯期數]-1}.");
+						}
 					} // 1.10.二.(二).2 end
-
 				}
 			}
 
+			// 1.11 start 若第22欄「屬階梯式還款註記」填報'Y'者，第23-25欄二階梯期數、利率、月付金為必填，否則予以剔退。--->(前端檢核)
+
 			// 1.12 start檢核第8欄「變更還款條件已履約期數」與第9欄「第一階梯期數」及第23欄「第二階梯期數」和不得大於180，否則予以剔退。
 			if ((iCompletePeriod + iPeriod + iPeriod2) > 180) {
-				throw new LogicException("E0005", "「變更還款條件已履約期數」與「第一階梯期數」及「第二階梯期數」和不得大於180.");
+				if ("A".equals(iTranKey)) {
+					throw new LogicException("E0005", "「變更還款條件已履約期數」與「第一階梯期數」及「第二階梯期數」和不得大於180.");
+				} else {
+					throw new LogicException("E0007", "「變更還款條件已履約期數」與「第一階梯期數」及「第二階梯期數」和不得大於180.");
+				}
 			}
 			// 1.12 end
 
@@ -214,11 +229,7 @@ public class L8320 extends TradeBuffer {
 			// 1.14
 			// 第17欄「變更還款條件簽約完成日」有值後，同一筆key值資料即不得報送'63'結案，否則予以剔退.***與1.17和「L8321(JcicZ063)檢核1.5是同一檢核，併同報送相關.***
 
-			// 1.15 start第18欄「變更還款條件首期應繳款日」需大於或等於第17欄「變更還款條件簽約完成日」，否則予以剔退.
-			if (iChaRepayEndDate > 0 && iChaRepayFirstDate < iChaRepayEndDate) {
-				throw new LogicException("E0005", "「變更還款條件首期應繳款日」需大於或等於「變更還款條件簽約完成日」.");
-			}
-			// 1.15 end
+			// 1.15 第18欄「變更還款條件首期應繳款日」需大於或等於第17欄「變更還款條件簽約完成日」，否則予以剔退.--->(前端檢核)
 
 			// 1.16 start第18欄「變更還款條件首期應繳款日」需為「'60':前置協商受理變更還款申請暨請求回報債權通知資料」報送日之次月10日，否則予以剔退.
 			jJcicZ060 = sJcicZ060Service.findById(iJcicZ060Id, titaVo);
@@ -226,7 +237,11 @@ public class L8320 extends TradeBuffer {
 				this.info("NextMonth10Date(TimestampToDate(iJcicZ060.getCreateDate()))++"
 						+ NextMonth10Date(TimestampToDate(iJcicZ060.getCreateDate())));
 				if (iChaRepayFirstDate != NextMonth10Date(TimestampToDate(iJcicZ060.getCreateDate()))) {
-					throw new LogicException("E0005", "「變更還款條件首期應繳款日」需為(60)前置協商受理變更還款申請暨請求回報債權通知資料報送日之次月10日.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "「變更還款條件首期應繳款日」需為(60)前置協商受理變更還款申請暨請求回報債權通知資料報送日之次月10日.");
+					} else {
+						throw new LogicException("E0007", "「變更還款條件首期應繳款日」需為(60)前置協商受理變更還款申請暨請求回報債權通知資料報送日之次月10日.");
+					}
 				}
 			} // 1.16 end
 
@@ -365,7 +380,6 @@ public class L8320 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-
 
 	// 轉換：Sql.Timestamp(創建日期)轉int(西元年YYYYMMDD)
 	private int TimestampToDate(Timestamp ts) throws LogicException {

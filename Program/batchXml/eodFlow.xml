@@ -22,7 +22,8 @@
 				</step>
 			</flow>
 		</split>
-		<split id="split2" task-executor="taskExecutor" next="split3">
+		<split id="split2" task-executor="taskExecutor"
+			next="startBS996">
 			<flow>
 				<!-- Usp_L8_JcicB204_Upd -->
 				<step id="l8JcicB204Upd" parent="parentStep">
@@ -36,22 +37,12 @@
 				</step>
 			</flow>
 		</split>
-		<split id="split3" task-executor="taskExecutor" next="split4">
-			<flow>
-				<!-- BS996 重新計算業績，更新業績明細檔 -->
-				<step id="startBS996" parent="parentStep">
-					<tasklet ref="StartBS996" />
-				</step>
-			</flow>
-			<flow>
-				<!-- 每日批次結束，判斷是否需要執行月批 -->
-				<step id="eodFinal" parent="parentStep">
-					<tasklet ref="EodFinal" />
-				</step>
-			</flow>
-		</split>
+		<!-- BS996 重新計算業績，更新業績明細檔 -->
+		<step id="startBS996" parent="parentStep" next="split4">
+			<tasklet ref="StartBS996" />
+		</step>
 		<!-- 日報批次 -->
-		<split id="split4" task-executor="taskExecutor">
+		<split id="split4" task-executor="taskExecutor" next="eodFinal">
 			<flow>
 				<step id="sLD003" parent="parentStep">
 					<tasklet ref="LD003" />
@@ -93,6 +84,10 @@
 				</step>
 			</flow>
 		</split>
+		<!-- 每日批次結束，判斷是否需要執行月批 -->
+		<step id="eodFinal" parent="parentStep">
+			<tasklet ref="EodFinal" />
+		</step>
 	</job>
 
 </beans>

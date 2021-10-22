@@ -133,25 +133,40 @@ public class L8311 extends TradeBuffer {
 				}
 			} // 2.2 end
 
-			// 5 start 同一協商案件首次報送本檔案時，若尚未報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期',則予以剔退
-			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-			if (iJcicZ047 == null) {
-				throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料.");
-			} else if ("D".equals(iJcicZ047.getTranKey()) || iJcicZ047.getSignDate() == 0) {
-				throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料，且「簽約完成日期」欄不能為空.");
-			} // 5 end
+			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
+				// 5 start 同一協商案件首次報送本檔案時，若尚未報送'47':金融機構無擔保債務協議資料第19欄'簽約完成日期',則予以剔退
+				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+				if (iJcicZ047 == null) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料.");
+					} else {
+						throw new LogicException("E0007", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料.");
+					}
+				} else if ("D".equals(iJcicZ047.getTranKey()) || iJcicZ047.getSignDate() == 0) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料，且「簽約完成日期」欄不能為空.");
+					} else {
+						throw new LogicException("E0007", "同一協商案件首次報送本檔案時，需先報送(47)金融機構無擔保債務協議資料，且「簽約完成日期」欄不能為空.");
+					}
+				} // 5 end
 
-			// 3 start 若第9欄累計實際還款金額不等於該IDN所有已報送本檔案資料之第8欄繳款金額之合計，則予以剔退
-			Slice<JcicZ050> sJcicZ050 = sJcicZ050Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-			if (sJcicZ050 != null) {
-				for (JcicZ050 xJcicZ050 : sJcicZ050) {
-					if (!"D".equals(xJcicZ050.getTranKey())) {
-						sPayAmt += xJcicZ050.getPayAmt();
+				// 3 start 若第9欄累計實際還款金額不等於該IDN所有已報送本檔案資料之第8欄繳款金額之合計，則予以剔退
+				Slice<JcicZ050> sJcicZ050 = sJcicZ050Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+				if (sJcicZ050 != null) {
+					for (JcicZ050 xJcicZ050 : sJcicZ050) {
+						if (!"D".equals(xJcicZ050.getTranKey())
+								&& !titaVo.getParam("Ukey").equals(xJcicZ050.getUkey())) {
+							sPayAmt += xJcicZ050.getPayAmt();
+						}
 					}
 				}
-			}
-			if (sPayAmt != iSumRepayActualAmt) {
-				throw new LogicException("E0005", "「累計實際還款金額」應等於該IDN所有已報送本檔案資料之「繳款金額」合計.");
+				if (sPayAmt != iSumRepayActualAmt) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "「累計實際還款金額」應等於該IDN所有已報送本檔案資料之「繳款金額」合計.");
+					} else {
+						throw new LogicException("E0007", "「累計實際還款金額」應等於該IDN所有已報送本檔案資料之「繳款金額」合計.");
+					}
+				}
 			}
 
 			// ***4

@@ -115,44 +115,64 @@ public class L8316 extends TradeBuffer {
 
 		// 檢核項目(D-65)
 		if (!"4".equals(iTranKey_Tmp)) {
+			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
 
-			// 1 start 案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」
-			if ("3".equals(iCaseStatus)) {
-				Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId, iClaimDate + 19110000,
-						iCourtCode, 0, Integer.MAX_VALUE, titaVo);
-				if (sJcicZ055 == null) {
-					throw new LogicException("E0005", "案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」 .");
-				} else {
-					int flagCaseStatus = 0;
-					for (JcicZ055 xJcicZ055 : sJcicZ055) {
-						if (!"D".equals(xJcicZ055.getTranKey()) && "1".equals(xJcicZ055.getCaseStatus())) {
-							flagCaseStatus = 1;
+				// 1 start 案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」
+				if ("3".equals(iCaseStatus)) {
+					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId,
+							iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					if (sJcicZ055 == null) {
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005", "案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」 .");
+						} else {
+							throw new LogicException("E0007", "案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」 .");
+						}
+					} else {
+						int flagCaseStatus = 0;
+						for (JcicZ055 xJcicZ055 : sJcicZ055) {
+							if (!"D".equals(xJcicZ055.getTranKey()) && "1".equals(xJcicZ055.getCaseStatus())) {
+								flagCaseStatus = 1;
+							}
+						}
+						if (flagCaseStatus == 0) {
+							if ("A".equals(iTranKey)) {
+								throw new LogicException("E0005", "案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」.");
+							} else {
+								throw new LogicException("E0007", "案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」.");
+							}
 						}
 					}
-					if (flagCaseStatus == 0) {
-						throw new LogicException("E0005", "案件狀態未曾報送過「1:更生程序開始」 前，不能報送「3:更生方案認可確定」.");
-					}
-				}
-			} // 1 end
+				} // 1 end
 
-			// 2 start 案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」
-			if ("4".equals(iCaseStatus) || "5".equals(iCaseStatus)) {
-				Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId, iClaimDate + 19110000,
-						iCourtCode, 0, Integer.MAX_VALUE, titaVo);
-				if (sJcicZ055 == null) {
-					throw new LogicException("E0005", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
-				} else {
-					int flagCaseStatus = 0;
-					for (JcicZ055 xJcicZ055 : sJcicZ055) {
-						if (!"D".equals(xJcicZ055.getTranKey()) && "3".equals(xJcicZ055.getCaseStatus())) {
-							flagCaseStatus = 1;
+				// 2 start 案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」
+				if ("4".equals(iCaseStatus) || "5".equals(iCaseStatus)) {
+					Slice<JcicZ055> sJcicZ055 = sJcicZ055Service.checkCaseStatus(iSubmitKey, iCustId,
+							iClaimDate + 19110000, iCourtCode, 0, Integer.MAX_VALUE, titaVo);
+					if (sJcicZ055 == null) {
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
+						} else {
+							throw new LogicException("E0007", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
+						}
+					} else {
+						int flagCaseStatus = 0;
+						for (JcicZ055 xJcicZ055 : sJcicZ055) {
+							if (!"D".equals(xJcicZ055.getTranKey()) && "3".equals(xJcicZ055.getCaseStatus())) {
+								flagCaseStatus = 1;
+							}
+						}
+						if (flagCaseStatus == 0) {
+							if ("A".equals(iTranKey)) {
+								throw new LogicException("E0005",
+										"案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
+							} else {
+								throw new LogicException("E0007",
+										"案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
+							}
 						}
 					}
-					if (flagCaseStatus == 0) {
-						throw new LogicException("E0005", "案件狀態未曾報送過「3:更生方案認可確定」 前，不能報送「4:更生方案履行完畢」或「5:更生裁定免責確定」.");
-					}
-				}
-			} // 2 end
+				} // 2 end
+			}
 
 			// 3.1 key值為「債務人IDN+報送單位代號+案件狀態+裁定日期+承審法院代碼」，不可重複，重複者予以剔退-case "1"檢核
 

@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.UUID;
 
 /* 套件 */
@@ -100,10 +99,7 @@ public class L8313 extends TradeBuffer {
 		String iDataCode5 = titaVo.getParam("DataCode5");
 		int iChangePayDate = Integer.valueOf(titaVo.getParam("ChangePayDate"));
 		String iKey = "";
-		String[] acceptDataCode = { "42", "43", "61" };// 同意報送檔案格式資料別
-		String[] sDataCode = { iDataCode1, iDataCode2, iDataCode3, iDataCode4, iDataCode5 };// 請求補報送資料檔案格式之資料別
-		int indexDataCode = 0;// 請求補報送資料檔案格式之資料別的索引值
-
+		
 		// JcicZ052, JcicZ040
 		JcicZ052 iJcicZ052 = new JcicZ052();
 		JcicZ052Id iJcicZ052Id = new JcicZ052Id();
@@ -122,30 +118,17 @@ public class L8313 extends TradeBuffer {
 			// 2 start 完整key值未曾報送過'40':前置協商受理申請暨請求回報債權通知則予以剔退
 			iJcicZ040 = sJcicZ040Service.findById(iJcicZ040Id, titaVo);
 			if (iJcicZ040 == null) {
-				throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
-			}
-
-			// extra項'消費者債務清理條例資料報送作業要點'(P167-12-D start
-			// 同一金融機構要求最大債權金融機構就同一債務人開啟'52'之次數，以一次為限
-			if ("A".equals(iTranKey)) {
-				Slice<JcicZ052> sJcicZ052 = sJcicZ052Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-				if (sJcicZ052 != null) {
-					throw new LogicException("E0005", "同一金融機構要求最大債權金融機構就同一債務人開啟(52) 前置協商相關資料報送例外處理之次數，以一次為限.");
+				if ("A".equals(iTranKey)) {
+					throw new LogicException("E0005", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
+				} else {
+					throw new LogicException("E0007", "未曾報送過(40)前置協商受理申請暨請求回報債權通知資料.");
 				}
+
 			} // 2 end
 
 			// 3 後續需檢核補報送金融機構需於最大債權金融機構報送本檔案格式後3個營業日內補送資料，予以剔退處理.***J
 
-			// 4 第8,10,12,14,16欄「請求補報送資料檔案格式之資料別」僅限於"42", "43", "61"，其餘予以剔退處理.
-			for (String xDataCode : sDataCode) {
-				indexDataCode++;
-				if (xDataCode != null && !xDataCode.trim().isEmpty()) {
-					if (!Arrays.stream(acceptDataCode).anyMatch(xDataCode::equals)) {
-						throw new LogicException("E0005", "「請求補報送資料檔案格式之資料別」" + indexDataCode + "僅限於'42','43','61'.");
-					}
-				}
-			}
-			// 4 end
+			// 4 第8,10,12,14,16欄「請求補報送資料檔案格式之資料別」僅限於"42", "43", "61"，其餘予以剔退處理.--->(前端檢核)
 
 			// 檢核項目end
 		}

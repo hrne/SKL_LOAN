@@ -36,10 +36,10 @@ public interface CollMeetService {
   public Slice<CollMeet> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate&gt;= , AND AcDate&lt;= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
+   * MeetDate&gt;= , AND MeetDate&lt;= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
    *
-   * @param acDate_0 acDate_0
-   * @param acDate_1 acDate_1
+   * @param meetDate_0 meetDate_0
+   * @param meetDate_1 meetDate_1
    * @param caseCode_2 caseCode_2
    * @param custNo_3 custNo_3
    * @param facmNo_4 facmNo_4
@@ -48,7 +48,7 @@ public interface CollMeetService {
    * @param titaVo Variable-Length Argument
    * @return Slice CollMeet CollMeet of List
    */
-  public Slice<CollMeet> telTimeBetween(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo);
+  public Slice<CollMeet> telTimeBetween(int meetDate_0, int meetDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseCode= ,AND CustNo= ,AND FacmNo= ,
@@ -64,10 +64,10 @@ public interface CollMeetService {
   public Slice<CollMeet> findSameCust(String caseCode_0, int custNo_1, int facmNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate&gt;= , AND AcDate&lt;= ,AND CaseCode= ,AND CustNo= 
+   * MeetDate&gt;= , AND MeetDate&lt;= ,AND CaseCode= ,AND CustNo= 
    *
-   * @param acDate_0 acDate_0
-   * @param acDate_1 acDate_1
+   * @param meetDate_0 meetDate_0
+   * @param meetDate_1 meetDate_1
    * @param caseCode_2 caseCode_2
    * @param custNo_3 custNo_3
    * @param index Page Index
@@ -75,7 +75,7 @@ public interface CollMeetService {
    * @param titaVo Variable-Length Argument
    * @return Slice CollMeet CollMeet of List
    */
-  public Slice<CollMeet> withoutFacmNo(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo);
+  public Slice<CollMeet> withoutFacmNo(int meetDate_0, int meetDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseCode= ,AND CustNo= 

@@ -30,7 +30,6 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(EodFinal.class);
 
 		// 第二個參數
 		// D=日批
@@ -46,6 +45,7 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 		// 月底日
 		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+//		int mfbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
 		// 此為日終維護,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);

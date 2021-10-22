@@ -68,7 +68,7 @@ public class L5963 extends TradeBuffer {
 				exceptionError = "1到3個月內";
 				iMonth1 = Dealdate(txDate, -1);
 				iMonth3 = Dealdate(txDate, -3);
-				iCollLetter = iCollLetterService.withoutFacmNo(iMonth1, iMonth3, iCaseCode, iCustNo, this.index, this.limit, titaVo);
+				iCollLetter = iCollLetterService.withoutFacmNo(iMonth3, iMonth1, iCaseCode, iCustNo, this.index, this.limit, titaVo);
 				break;
 			case 2:
 				exceptionError = "半年內";
@@ -85,7 +85,7 @@ public class L5963 extends TradeBuffer {
 				exceptionError = "1到3個月內";
 				iMonth1 = Dealdate(txDate, -1);
 				iMonth3 = Dealdate(txDate, -3);
-				iCollLetter = iCollLetterService.telTimeBetween(iMonth1, iMonth3, iCaseCode, iCustNo, iFacmNo, this.index, this.limit, titaVo);
+				iCollLetter = iCollLetterService.telTimeBetween(iMonth3, iMonth1, iCaseCode, iCustNo, iFacmNo, this.index, this.limit, titaVo);
 				break;
 			case 2:
 				exceptionError = "半年內";

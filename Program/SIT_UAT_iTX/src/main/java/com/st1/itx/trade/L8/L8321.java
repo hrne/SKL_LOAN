@@ -87,32 +87,48 @@ public class L8321 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.2 KEY值為IDN+報送單位wakg+dr前置協商申請日+申請變更還款條件日.***J
 
-			if ("1".equals(iTranKey_Tmp)) {
+			// 1.3.1 同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日--->(前端檢核)
+			if ("A".equals(iTranKey)) {
 				// 1.3.2 start 同一KEY值資料變更還款條件結案日期不可晚於本檔案資料報送日期
 				if (iClosedDate > txDate) {
 					throw new LogicException("E0005", "同一KEY值資料「變更還款條件結案日期」不可晚於本檔案資料報送日期.");
 				}
 				// 1.3.2 end
-
-				// 1.4 報送本結案檔案後，同一KEY值不可再報送相關檔案之異動.***J
-
-				// 1.5 第9欄「結案原因」為'C'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須有值.***
-				// ***與「L8320(JcicZ062)檢核1.14和1.17是同一檢核，併同報送相關，在'62'-1.17處理
 			}
-			
-			// 1.3.1 start 同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日
-			if(iClosedDate < iChangePayDate) {
-				throw new LogicException("E0005", "同一KEY值資料「變更還款條件結案日期」不可早於「申請變更還款條件日」.");
-			}//1.3.1 end
-			
-			// 1.6 start
-			// 第9欄「結案原因」為'A'及'B'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須空白.
-			if ("A".equals(iClosedResult) || "B".equals(iClosedResult)) {
-				iJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id, titaVo);
-				if (iJcicZ062 != null && (iJcicZ062.getChaRepayEndDate() != 0)) {
-					throw new LogicException("E0005", "「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
+
+			// 1.4 報送本結案檔案後，同一KEY值不可再報送相關檔案之異動.***J
+
+			// 1.5 start 第9欄「結案原因」為'C'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須有值.
+			iJcicZ062 = sJcicZ062Service.findById(iJcicZ062Id, titaVo);
+			if (iJcicZ062 == null) {
+				if ("C".equals(iClosedResult)) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "「結案原因」為'C'者，同一KEY值需先報送(62)金融機構無擔保債務變更還款條件協議資料.");
+					} else {
+						throw new LogicException("E0007", "「結案原因」為'C'者，同一KEY值需先報送(62)金融機構無擔保債務變更還款條件協議資料.");
+					}
 				}
-			} // 1.6 end
+			} else {
+				if ("C".equals(iClosedResult) && (iJcicZ062.getChaRepayEndDate() == 0)) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "「結案原因」為'C'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須有值.");
+					} else {
+						throw new LogicException("E0007", "「結案原因」為'C'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須有值.");
+					}
+				} // 1.5 end
+
+				// 1.6 start
+				// 第9欄「結案原因」為'A'及'B'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須空白.
+				if (("A".equals(iClosedResult) || "B".equals(iClosedResult)) && (iJcicZ062.getChaRepayEndDate() != 0)) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005",
+								"「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
+					} else {
+						throw new LogicException("E0007",
+								"「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
+					}
+				} // 1.6 end
+			}
 
 			// 2 各資料檔案格式(60-62)如有資料key值報送錯誤情形者，需以本檔案格式報送結案資料至本中心，並重新報送一筆原檔案資料.***J
 

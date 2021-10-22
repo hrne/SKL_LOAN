@@ -36,10 +36,10 @@ public interface CollLawService {
   public Slice<CollLaw> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate&gt;= , AND AcDate&lt;= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
+   * RecordDate&gt;= , AND RecordDate&lt;= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
    *
-   * @param acDate_0 acDate_0
-   * @param acDate_1 acDate_1
+   * @param recordDate_0 recordDate_0
+   * @param recordDate_1 recordDate_1
    * @param caseCode_2 caseCode_2
    * @param custNo_3 custNo_3
    * @param facmNo_4 facmNo_4
@@ -48,7 +48,7 @@ public interface CollLawService {
    * @param titaVo Variable-Length Argument
    * @return Slice CollLaw CollLaw of List
    */
-  public Slice<CollLaw> telTimeBetween(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo);
+  public Slice<CollLaw> telTimeBetween(int recordDate_0, int recordDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseCode= ,AND CustNo= ,AND FacmNo= ,
@@ -64,10 +64,10 @@ public interface CollLawService {
   public Slice<CollLaw> findSameCust(String caseCode_0, int custNo_1, int facmNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate&gt;= , AND AcDate&lt;= ,AND CaseCode= ,AND CustNo= 
+   * RecordDate&gt;= , AND RecordDate&lt;= ,AND CaseCode= ,AND CustNo= 
    *
-   * @param acDate_0 acDate_0
-   * @param acDate_1 acDate_1
+   * @param recordDate_0 recordDate_0
+   * @param recordDate_1 recordDate_1
    * @param caseCode_2 caseCode_2
    * @param custNo_3 custNo_3
    * @param index Page Index
@@ -75,7 +75,7 @@ public interface CollLawService {
    * @param titaVo Variable-Length Argument
    * @return Slice CollLaw CollLaw of List
    */
-  public Slice<CollLaw> withoutFacmNo(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo);
+  public Slice<CollLaw> withoutFacmNo(int recordDate_0, int recordDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseCode= ,AND CustNo= 

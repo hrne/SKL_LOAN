@@ -22,14 +22,14 @@ import com.st1.itx.db.domain.CollTelId;
  */
 public interface CollTelRepositoryDay extends JpaRepository<CollTel, CollTelId> {
 
-  // AcDate>= , AND AcDate<= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
-  public Slice<CollTel> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int facmNo_4, Pageable pageable);
+  // TelDate>= , AND TelDate<= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
+  public Slice<CollTel> findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(int telDate_0, int telDate_1, String caseCode_2, int custNo_3, int facmNo_4, Pageable pageable);
 
   // CaseCode= ,AND CustNo= ,AND FacmNo= ,
   public Slice<CollTel> findAllByCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(String caseCode_0, int custNo_1, int facmNo_2, Pageable pageable);
 
-  // AcDate>= , AND AcDate<= ,AND CaseCode= ,AND CustNo= 
-  public Slice<CollTel> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, Pageable pageable);
+  // TelDate>= , AND TelDate<= ,AND CaseCode= ,AND CustNo= 
+  public Slice<CollTel> findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(int telDate_0, int telDate_1, String caseCode_2, int custNo_3, Pageable pageable);
 
   // CaseCode= ,AND CustNo= 
   public Slice<CollTel> findAllByCaseCodeIsAndCustNoIsOrderByTelDateDesc(String caseCode_0, int custNo_1, Pageable pageable);

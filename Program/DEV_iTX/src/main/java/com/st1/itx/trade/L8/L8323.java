@@ -146,12 +146,22 @@ public class L8323 extends TradeBuffer {
 			if (iJcicZ440 != null) {
 				if ("Y".equals(iJcicZ440.getReportYn())) {
 					if (!"N".equals(iIsMaxMain)) {
-						throw new LogicException("E0005",
-								"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005",
+									"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+						} else {
+							throw new LogicException("E0007",
+									"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+						}
 					}
 				} else if (!"Y".equals(iIsMaxMain)) {
-					throw new LogicException("E0005",
-							"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005",
+								"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+					} else {
+						throw new LogicException("E0007",
+								"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+					}
 				}
 			}
 
@@ -161,8 +171,13 @@ public class L8323 extends TradeBuffer {
 			// 第10欄「是否為本金融機構債務人」填報'Y',且第11欄「有擔保債權筆數」填報'0'者，檢核本檔案格式[第12+13+14+15欄'依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息余額]之值需大於0，否則予以剔退.
 			if ("Y".equals(iIsClaims) && iGuarLoanCnt == 0) {
 				if ((iCivil323ExpAmt + iCivil323CashAmt + iCivil323CreditAmt + iCivil323GuarAmt) <= 0) {
-					throw new LogicException("E0005",
-							"「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息余額」之合計值需大於0.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005",
+								"「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息余額」之合計值需大於0.");
+					} else {
+						throw new LogicException("E0007",
+								"「是否為本金融機構債務人」填報'Y',且「有擔保債權筆數」填報'0'者，本檔案格式「依民法第323條計算之信用放款、現金卡放款、信用卡、保證債權本息余額」之合計值需大於0.");
+					}
 				}
 			} // 7 end
 
@@ -171,7 +186,11 @@ public class L8323 extends TradeBuffer {
 					iMaxMainCode, 0, Integer.MAX_VALUE, titaVo);
 			if (sJcicZ443 == null) {
 				if (iGuarLoanCnt != 0) {
-					throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(443)前置調解回報有擔保債權金額資料之筆數.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(443)前置調解回報有擔保債權金額資料之筆數.");
+					} else {
+						throw new LogicException("E0007", "[有擔保債權筆數]需等於報送(443)前置調解回報有擔保債權金額資料之筆數.");
+					}
 				}
 			} else {
 				int sGuarLoanCnt = 0;
@@ -181,43 +200,37 @@ public class L8323 extends TradeBuffer {
 					}
 				}
 				if (iGuarLoanCnt != sGuarLoanCnt) {
-					throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(443)前置調解回報有擔保債權金額資料之筆數.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "[有擔保債權筆數]需等於報送(443)前置調解回報有擔保債權金額資料之筆數.");
+					} else {
+						throw new LogicException("E0007", "[有擔保債權筆數]需等於報送(443)前置調解回報有擔保債權金額資料之筆數.");
+					}
 				}
 			}
 			// 8 end
 
-			// 9 start 檢核第17~20欄之金額合計需等於第12欄「依民法第323條計算之信用放款本息餘額」.
-			if ((iReceExpPrin + iReceExpInte + iReceExpPena + iReceExpOther) != iCivil323ExpAmt) {
-				throw new LogicException("E0005", "「信用放款」本金、利息、違約金、其他費用之金額合計需等於「依民法第323條計算之信用放款本息餘額」.");
-			} // 9 end
-
-			// 10 start檢核第21~24欄之金額合計需等於第13欄「依民法第323條計算之現金卡放款本息餘額」.
-			if ((iCashCardPrin + iCashCardInte + iCashCardPena + iCashCardOther) != iCivil323CashAmt) {
-				throw new LogicException("E0005", "「現金卡」本金、利息、違約金、其他費用之金額合計需等於「依民法第323條計算之現金卡放款本息餘額」.");
-			} // 10 end
-
-			// 11 start檢核第25~28欄之金額合計需等於第14欄「依民法第323條計算之信用卡本息餘額」.
-			if ((iCreditCardPrin + iCreditCardInte + iCreditCardPena + iCreditCardOther) != iCivil323CreditAmt) {
-				throw new LogicException("E0005", "「信用卡」本金、利息、違約金、其他費用之金額合計需等於「依民法第323條計算之信用卡本息餘額」.");
-			} // 11 end
-
-			// 12 start檢核第29~32欄之金額合計需等於第15欄「依民法第323條計算之保證債權本息餘額」.
-			if ((iGuarObliPrin + iGuarObliInte + iGuarObliPena + iGuarObliOther) != iCivil323GuarAmt) {
-				throw new LogicException("E0005", "「保證債權」本金、利息、違約金、其他費用之金額合計需等於「依民法第323條計算之保證債權本息餘額」.");
-			} // 12 end
+			// 9 檢核第17~20欄之金額合計需等於第12欄「依民法第323條計算之信用放款本息餘額」.--->(前端檢核)
+			// 10 檢核第21~24欄之金額合計需等於第13欄「依民法第323條計算之現金卡放款本息餘額」.--->(前端檢核)
+			// 11 檢核第25~28欄之金額合計需等於第14欄「依民法第323條計算之信用卡本息餘額」.--->(前端檢核)
+			// 12 檢核第29~32欄之金額合計需等於第15欄「依民法第323條計算之保證債權本息餘額」.--->(前端檢核)
 
 			// 13 start同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動本檔案資料.
-			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
-				iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
-				if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
+			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+				if ("A".equals(iTranKey)) {
 					throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動本檔案資料.");
+				} else {
+					throw new LogicException(titaVo, "E0007", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動本檔案資料.");
 				}
-			} // 13 end
+			}
+			// 13 end
 
 			// 檢核條件 end
 		}
 
-		switch (iTranKey_Tmp) {
+		switch (iTranKey_Tmp)
+
+		{
 		case "1":
 			// 檢核是否重複
 			chJcicZ442 = sJcicZ442Service.findById(iJcicZ442Id, titaVo);

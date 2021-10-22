@@ -90,7 +90,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CaseCode", "CustNo", "FacmNo", "AcDate", "TitaTlrNo", "TitaTxtNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CaseCode", "CustNo", "FacmNo", "AcDate", "TitaTlrNo", "TitaTxtNo"));
     this.info("findAll " + dbName);
@@ -110,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<CollMeet> telTimeBetween(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo) {
+  public Slice<CollMeet> telTimeBetween(int meetDate_0, int meetDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CollMeet> slice = null;
     if (titaVo.length != 0)
@@ -121,15 +121,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("telTimeBetween " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " caseCode_2 : " +  caseCode_2 + " custNo_3 : " +  custNo_3 + " facmNo_4 : " +  facmNo_4);
+    this.info("telTimeBetween " + dbName + " : " + "meetDate_0 : " + meetDate_0 + " meetDate_1 : " +  meetDate_1 + " caseCode_2 : " +  caseCode_2 + " custNo_3 : " +  custNo_3 + " facmNo_4 : " +  facmNo_4);
     if (dbName.equals(ContentName.onDay))
-      slice = collMeetReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
+      slice = collMeetReposDay.findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(meetDate_0, meetDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = collMeetReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
+      slice = collMeetReposMon.findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(meetDate_0, meetDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = collMeetReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
+      slice = collMeetReposHist.findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(meetDate_0, meetDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
     else 
-      slice = collMeetRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
+      slice = collMeetRepos.findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(meetDate_0, meetDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -166,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<CollMeet> withoutFacmNo(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<CollMeet> withoutFacmNo(int meetDate_0, int meetDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CollMeet> slice = null;
     if (titaVo.length != 0)
@@ -177,15 +177,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("withoutFacmNo " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " caseCode_2 : " +  caseCode_2 + " custNo_3 : " +  custNo_3);
+    this.info("withoutFacmNo " + dbName + " : " + "meetDate_0 : " + meetDate_0 + " meetDate_1 : " +  meetDate_1 + " caseCode_2 : " +  caseCode_2 + " custNo_3 : " +  custNo_3);
     if (dbName.equals(ContentName.onDay))
-      slice = collMeetReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, pageable);
+      slice = collMeetReposDay.findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(meetDate_0, meetDate_1, caseCode_2, custNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = collMeetReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, pageable);
+      slice = collMeetReposMon.findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(meetDate_0, meetDate_1, caseCode_2, custNo_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = collMeetReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, pageable);
+      slice = collMeetReposHist.findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(meetDate_0, meetDate_1, caseCode_2, custNo_3, pageable);
     else 
-      slice = collMeetRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, pageable);
+      slice = collMeetRepos.findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(meetDate_0, meetDate_1, caseCode_2, custNo_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

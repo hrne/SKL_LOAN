@@ -90,7 +90,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CaseCode", "CustNo", "FacmNo", "AcDate", "TitaTlrNo", "TitaTxtNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CaseCode", "CustNo", "FacmNo", "AcDate", "TitaTlrNo", "TitaTxtNo"));
     this.info("findAll " + dbName);
@@ -110,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<CollTel> telTimeBetween(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo) {
+  public Slice<CollTel> telTimeBetween(int telDate_0, int telDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CollTel> slice = null;
     if (titaVo.length != 0)
@@ -121,15 +121,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("telTimeBetween " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " caseCode_2 : " +  caseCode_2 + " custNo_3 : " +  custNo_3 + " facmNo_4 : " +  facmNo_4);
+    this.info("telTimeBetween " + dbName + " : " + "telDate_0 : " + telDate_0 + " telDate_1 : " +  telDate_1 + " caseCode_2 : " +  caseCode_2 + " custNo_3 : " +  custNo_3 + " facmNo_4 : " +  facmNo_4);
     if (dbName.equals(ContentName.onDay))
-      slice = collTelReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
+      slice = collTelReposDay.findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(telDate_0, telDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = collTelReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
+      slice = collTelReposMon.findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(telDate_0, telDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = collTelReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
+      slice = collTelReposHist.findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(telDate_0, telDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
     else 
-      slice = collTelRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
+      slice = collTelRepos.findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByTelDateDesc(telDate_0, telDate_1, caseCode_2, custNo_3, facmNo_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -166,7 +166,7 @@ em = null;
   }
 
   @Override
-  public Slice<CollTel> withoutFacmNo(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<CollTel> withoutFacmNo(int telDate_0, int telDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CollTel> slice = null;
     if (titaVo.length != 0)
@@ -177,15 +177,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("withoutFacmNo " + dbName + " : " + "acDate_0 : " + acDate_0 + " acDate_1 : " +  acDate_1 + " caseCode_2 : " +  caseCode_2 + " custNo_3 : " +  custNo_3);
+    this.info("withoutFacmNo " + dbName + " : " + "telDate_0 : " + telDate_0 + " telDate_1 : " +  telDate_1 + " caseCode_2 : " +  caseCode_2 + " custNo_3 : " +  custNo_3);
     if (dbName.equals(ContentName.onDay))
-      slice = collTelReposDay.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, pageable);
+      slice = collTelReposDay.findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(telDate_0, telDate_1, caseCode_2, custNo_3, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = collTelReposMon.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, pageable);
+      slice = collTelReposMon.findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(telDate_0, telDate_1, caseCode_2, custNo_3, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = collTelReposHist.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, pageable);
+      slice = collTelReposHist.findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(telDate_0, telDate_1, caseCode_2, custNo_3, pageable);
     else 
-      slice = collTelRepos.findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(acDate_0, acDate_1, caseCode_2, custNo_3, pageable);
+      slice = collTelRepos.findAllByTelDateGreaterThanEqualAndTelDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByTelDateDesc(telDate_0, telDate_1, caseCode_2, custNo_3, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

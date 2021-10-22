@@ -62,7 +62,8 @@ public class CollMeet implements Serializable {
   private int meetDate = 0;
 
   // 面催時間
-  @Column(name = "`MeetTime`", length = 6)
+  /* 2021/8/18 已與舜文確認只需填入時間此欄位由6碼改成4碼 */
+  @Column(name = "`MeetTime`", length = 4)
   private String meetTime;
 
   // 聯絡對象
@@ -255,7 +256,7 @@ public class CollMeet implements Serializable {
 
 /**
 	* 面催時間<br>
-	* 
+	* 2021/8/18 已與舜文確認只需填入時間此欄位由6碼改成4碼
 	* @return String
 	*/
   public String getMeetTime() {
@@ -264,7 +265,7 @@ public class CollMeet implements Serializable {
 
 /**
 	* 面催時間<br>
-	* 
+	* 2021/8/18 已與舜文確認只需填入時間此欄位由6碼改成4碼
   *
   * @param meetTime 面催時間
 	*/

@@ -56,7 +56,7 @@ public class L5961 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 40;
+		this.limit = 80;
 
 		String exceptionError = "";
 
@@ -67,7 +67,7 @@ public class L5961 extends TradeBuffer {
 				exceptionError = "1到3個月內";
 				iMonth1 = Dealdate(txDate, -1);
 				iMonth3 = Dealdate(txDate, -3);
-				iCollTel = iCollTelService.withoutFacmNo(iMonth1, iMonth3, iCaseCode, iCustNo, this.index, this.limit, titaVo);
+				iCollTel = iCollTelService.withoutFacmNo(iMonth3, iMonth1, iCaseCode, iCustNo, this.index, this.limit, titaVo);
 				break;
 			case 2:
 				exceptionError = "半年內";
@@ -84,7 +84,7 @@ public class L5961 extends TradeBuffer {
 				exceptionError = "1到3個月內";
 				iMonth1 = Dealdate(txDate, -1);
 				iMonth3 = Dealdate(txDate, -3);
-				iCollTel = iCollTelService.telTimeBetween(iMonth1, iMonth3, iCaseCode, iCustNo, iFacmNo, this.index, this.limit, titaVo);
+				iCollTel = iCollTelService.telTimeBetween(iMonth3, iMonth1, iCaseCode, iCustNo, iFacmNo, this.index, this.limit, titaVo);
 				break;
 			case 2:
 				exceptionError = "半年內";

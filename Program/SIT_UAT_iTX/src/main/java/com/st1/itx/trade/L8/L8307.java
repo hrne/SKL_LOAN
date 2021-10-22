@@ -26,12 +26,10 @@ import com.st1.itx.db.domain.JcicZ046Log;
 import com.st1.itx.db.domain.JcicZ047;
 import com.st1.itx.db.domain.JcicZ047Id;
 import com.st1.itx.db.domain.JcicZ051;
-import com.st1.itx.db.service.JcicZ044Service;
 import com.st1.itx.db.service.JcicZ046LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ046Service;
 import com.st1.itx.db.service.JcicZ047Service;
-import com.st1.itx.db.service.JcicZ048Service;
 import com.st1.itx.db.service.JcicZ051Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
@@ -72,15 +70,11 @@ import com.st1.itx.util.date.DateUtil;
 public class L8307 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
-	public JcicZ044Service sJcicZ044Service;
-	@Autowired
 	public JcicZ046Service sJcicZ046Service;
 	@Autowired
 	public JcicZ046LogService sJcicZ046LogService;
 	@Autowired
 	public JcicZ047Service sJcicZ047Service;
-	@Autowired
-	public JcicZ048Service sJcicZ048Service;
 	@Autowired
 	public JcicZ051Service sJcicZ051Service;
 	@Autowired
@@ -104,8 +98,6 @@ public class L8307 extends TradeBuffer {
 		String iCloseCode = titaVo.getParam("CloseCode");
 		String iBreakCode = titaVo.getParam("BreakCode");
 		String iKey = "";
-		String[] acceptCloseCode = { "00", "01", "99" }; // '47'無擔保債務協議資料簽約完成後，可報送的結案原因代號
-		String[] sBreakCode = { "01", "02", "03", "04", "05", "06", "07" };// 毀諾原因代號
 
 		// JcicZ046, JcicZ040
 		JcicZ046 iJcicZ046 = new JcicZ046();
@@ -127,33 +119,34 @@ public class L8307 extends TradeBuffer {
 		// 檢核項目(D-15)
 		if (!"4".equals(iTranKey_Tmp)) {
 			if ("A".equals(iTranKey)) {
+				// 1.3.1 結案日期不可早於協商申請日。--->(前端檢核)
 				// 1.3.2 結案日期不可晚於報送本檔案日期。
 				if (iCloseDate > txDate) {
 					throw new LogicException("E0005", "結案日期不可晚於報送本檔案日期.");
 				} // 1.3.2 end
 			}
 
-			// 1.4.1 結案原因代號為協商不成立或毀諾案件者，不能再度申請前置協商-->同L8301(檢核JcicZ040)-1.6.2
-			// 1.4.2 結案原因代號為視同未請求協商案件，且結案未滿180天，不能再度申請前置協商-->同L8301(檢核JcicZ040)-1.6.3
+			// 1.4.1 結案原因代號為協商不成立或毀諾案件者，不能再度申請前置協商---->1014會議通知不需檢核
+			// 1.4.2 結案原因代號為視同未請求協商案件，且結案未滿180天，不能再度申請前置協商--->1014會議通知不需檢核
 
-			// 1.5 start 報送'47':金融機構無擔保債務協議資料簽約完成後，本檔案結案原因代號僅能報送00，01，99
-			if (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals)) {
-				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-				if (iJcicZ047 != null && !"D".equals(iJcicZ047.getTranKey())) {
-					if (iJcicZ047.getSignDate() > 0 && iJcicZ047.getSignDate() <= txDate) {
-						throw new LogicException("E0005", "金融機構無擔保債務協議資料已經簽約完成，本檔案結案原因代號僅能報送00，01或99.");
+			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
+				// 1.5 start 報送'47':金融機構無擔保債務協議資料簽約完成後，本檔案結案原因代號僅能報送00，01，99
+				String[] acceptCloseCode = { "00", "01", "99" }; // '47'無擔保債務協議資料簽約完成後，可報送的結案原因代號
+				if (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals)) {
+					iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+					if (iJcicZ047 != null && !"D".equals(iJcicZ047.getTranKey())) {
+						if (iJcicZ047.getSignDate() > 0 && iJcicZ047.getSignDate() <= txDate) {
+							if ("A".equals(iTranKey)) {
+								throw new LogicException("E0005", "金融機構無擔保債務協議資料已經簽約完成，本檔案結案原因代號僅能報送00，01或99.");
+							} else {
+								throw new LogicException("E0007", "金融機構無擔保債務協議資料已經簽約完成，本檔案結案原因代號僅能報送00，01或99.");
+							}
+						}
 					}
-				}
-			} // 1.5 end
+				} // 1.5 end
 
-			// 1.3.1 結案日期不可早於協商申請日。
-			if (iCloseDate < iRcDate) {
-				throw new LogicException("E0005", "結案日期不可早於協商申請日.");
-			} // 1.3.1 end
-
-			// 1.6 start 同一key值於'51':延期繳款(喘息期)期間不可報送'00'毀諾
-			if ("00".equals(iCloseCode)) {
-				if ("A".equals(iTranKey)) {
+				// 1.6 start 同一key值於'51':延期繳款(喘息期)期間不可報送'00'毀諾
+				if ("00".equals(iCloseCode)) {
 					Slice<JcicZ051> sJcicZ051 = sJcicZ051Service.SubCustRcEq(iCustId, iRcDate + 19110000, iSubmitKey, 0,
 							Integer.MAX_VALUE, titaVo);
 					if (sJcicZ051 != null) {
@@ -166,27 +159,22 @@ public class L8307 extends TradeBuffer {
 						// 日期格式不一致， xJcicZ051.getDelayYM()是YYYMM，日期設31-->不合理，但不影響檢核
 						int formateDelayYM = Integer.parseInt(sDelayYM + "31");
 						if (txDate <= formateDelayYM) {
-							throw new LogicException("E0005", "於(51)延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
+							if ("A".equals(iTranKey)) {
+								throw new LogicException("E0005", "於(51)延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
+							} else {
+								throw new LogicException("E0007", "於(51)延期繳款(喘息期)期間(" + sDelayYM + "前)不可報送'00'毀諾.");
+							}
 						}
 					}
-				} // 1.6 end
-
-				// 5 start 「結案原因代號」為'00':毀諾，則第6欄則「毀諾原因代號」不能為空，且必須為01~07
-				if (iBreakCode.trim().isEmpty() || !Arrays.stream(sBreakCode).anyMatch(iBreakCode::equals)) {
-					throw new LogicException("E0005", "「結案原因代號」為'00':毀諾，則「毀諾原因代號」不能為空，且必須為01~07.");
-				} // 5 end
-
-				// 6 start 「結案原因代號」非'00':毀諾，則第6欄則「毀諾原因代號」必須為空白
-			} else if (!iBreakCode.trim().isEmpty()) {
-				throw new LogicException("E0005", "「結案原因代號」非'00':毀諾，「毀諾原因代號」必須為空.");
-			} // 6 end
+				}// 1.6 end
+			} 
 
 			// 1.7
 			// 報送本結案檔後，同一KEY值不可再報送相關檔案之異動。若前述相關檔案之交易代碼為'X'補件者，及報送'49':債務清償方案法院認可資料則不在此限.***J
 
 			// 2.若第2欄「交易代碼」無D刪除功能者，如有資料key值報送錯誤情形者，需以本檔案格式報送第8欄「結案原因代號」'97':資料key值報送錯誤.***J
 
-			// 3 start 第8欄「結案原因代號」為11~19，21、49時，必須同時填報'44'及'48',否則則予以剔退***
+			// 3 start 第8欄「結案原因代號」為11~19，21、49時，必須同時填報'44'及'48',否則則予以剔退***--->1014會議通知不需檢核
 
 			// 4 start 'D'刪除僅限毀諾資料，且刪除需為結案日當月
 			if ("D".equals(iTranKey)) {
@@ -198,6 +186,8 @@ public class L8307 extends TradeBuffer {
 				}
 			} // 4 end
 
+			// 5 「結案原因代號」為'00':毀諾，則第6欄則「毀諾原因代號」不能為空，且必須為01~07--->(前端檢核)
+			// 6 「結案原因代號」非'00':毀諾，則第6欄則「毀諾原因代號」必須為空白--->(前端檢核)
 			// 檢核項目end
 		}
 

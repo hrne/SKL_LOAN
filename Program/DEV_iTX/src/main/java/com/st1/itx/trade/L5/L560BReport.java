@@ -107,7 +107,7 @@ public class L560BReport extends MakeReport {
 			iNegMm = iNegDate.substring(3,5);
 			iNegDd = iNegDate.substring(5);
 			
-			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "前置協商毀諾通知函", "Normal","A4","P");
+			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "前置協商毀諾通知函"+iCustNo, "Normal","A4","P");
 			setFont(1, 20);
 			printCm(10,1,"前置協商毀諾(未依約履行)通知函","C");
 			setFont(1, 14);
@@ -177,7 +177,7 @@ public class L560BReport extends MakeReport {
 			}
 			iCount = bNegMain.getDueAmt().multiply(iMonthes);
 			String reCount = String.valueOf(iCount);
-			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "前置協商逾期繳款通知函", "Normal","A4","P");
+			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "前置協商逾期繳款通知函"+iCustNo, "Normal","A4","P");
 			setFont(1, 20);
 			printCm(10,1,"前置協商逾期繳款通知函","C");
 			setFont(1, 14);

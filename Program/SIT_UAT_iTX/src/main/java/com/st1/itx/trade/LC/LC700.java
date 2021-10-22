@@ -42,7 +42,7 @@ public class LC700 extends TradeBuffer {
 		// 每日夜間批次程式，參考文件.\itxConfig\spring\batch\eodFlow.xml
 		// EOD : End Of Day
 		titaVo.setBatchJobId("eodFlow");
-
+		
 		this.info("LC700 exit.");
 
 		this.addList(this.totaVo);

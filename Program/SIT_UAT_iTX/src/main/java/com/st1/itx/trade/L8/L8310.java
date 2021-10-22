@@ -110,35 +110,55 @@ public class L8310 extends TradeBuffer {
 
 		// 檢核項目(D-22)
 		if (!"4".equals(iTranKey_Tmp)) {
-
-			// 3.1 start 完整key值未曾報送過'47':金融機構無擔保債務協議資料檔案則予以剔退
-			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-			if (iJcicZ047 == null) {
-				throw new LogicException("E0005", "需先報送過(47)金融機構無擔保債務協議資料.");
-			} else { // 3.2 start '47':金融機構無擔保債務協議資料檔案第19欄「簽約完成日期」空白則予以剔退
-				if ("D".equals(iJcicZ047.getTranKey()) || iJcicZ047.getSignDate() == 0) {
-					throw new LogicException("E0005", "需先報送過(47)金融機構無擔保債務協議資料，且「簽約完成日期」不可空白.");
+			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
+				// 3.1 start 完整key值未曾報送過'47':金融機構無擔保債務協議資料檔案則予以剔退
+				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+				if (iJcicZ047 == null) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "需先報送過(47)金融機構無擔保債務協議資料.");
+					} else {
+						throw new LogicException("E0007", "需先報送過(47)金融機構無擔保債務協議資料.");
+					}
+				} else { // 3.2 start '47':金融機構無擔保債務協議資料檔案第19欄「簽約完成日期」空白則予以剔退
+					if ("D".equals(iJcicZ047.getTranKey()) || iJcicZ047.getSignDate() == 0) {
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005", "需先報送過(47)金融機構無擔保債務協議資料，且「簽約完成日期」不可空白.");
+						} else {
+							throw new LogicException("E0007", "需先報送過(47)金融機構無擔保債務協議資料，且「簽約完成日期」不可空白.");
+						}
+					}
 				}
+				// 3 end
+
+				// 4 start第7欄案件進度填報2:最大債權金融機構接獲法院裁定書，則第9-14欄承審法院相關內容必須有值，不能空白，否則則予以剔退
+				if (iClaimStatus == 2 && (iCourtCode.trim().isEmpty() || iYear == 0 || iCourtDiv.trim().isEmpty()
+						|| iCourtCaseNo.trim().isEmpty() || iApprove.trim().isEmpty() || iClaimDate == 0)) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "案件進度填報2:最大債權金融機構接獲法院裁定書，則承審法院相關內容必須有值，不能空白.");
+					} else {
+						throw new LogicException("E0007", "案件進度填報2:最大債權金融機構接獲法院裁定書，則承審法院相關內容必須有值，不能空白.");
+					}
+				} // 4 end
+
+				// 5.1 start法院裁定日期需大於遞狀日期
+				if (iClaimDate <= iApplyDate) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "法院裁定日期需大於遞狀日期.");
+					} else {
+						throw new LogicException("E0007", "法院裁定日期需大於遞狀日期.");
+					}
+				} // 5.1 end
+
+				// 5.2 start遞狀日期需大於或等於簽約日期
+				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
+				if (iJcicZ047 != null && iApplyDate < iJcicZ047.getSignDate()) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "遞狀日期需大於或等於(47)金融機構無擔保債務協議資料之「簽約完成日期」.");
+					} else {
+						throw new LogicException("E0007", "遞狀日期需大於或等於(47)金融機構無擔保債務協議資料之「簽約完成日期」.");
+					}
+				} // 5.2 end
 			}
-			// 3 end
-
-			// 4 start第7欄案件進度填報2:最大債權金融機構接獲法院裁定書，則第9-14欄承審法院相關內容必須有值，不能空白，否則則予以剔退
-			if (iClaimStatus == 2 && (iCourtCode.trim().isEmpty() || iYear == 0 || iCourtDiv.trim().isEmpty()
-					|| iCourtCaseNo.trim().isEmpty() || iApprove.trim().isEmpty() || iClaimDate == 0)) {
-				throw new LogicException("E0005", "案件進度填報2:最大債權金融機構接獲法院裁定書，則承審法院相關內容必須有值，不能空白.");
-			} // 4 end
-
-			// 5.1 start法院裁定日期需大於遞狀日期
-			if (iClaimDate <= iApplyDate) {
-				throw new LogicException("E0005", "法院裁定日期需大於遞狀日期.");
-			} // 5.1 end
-
-			// 5.2 start遞狀日期需大於或等於簽約日期
-			iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);
-			if (iJcicZ047 != null && iApplyDate < iJcicZ047.getSignDate()) {
-				throw new LogicException("E0005", "遞狀日期需大於或等於(47)金融機構無擔保債務協議資料之「簽約完成日期」.");
-			} // 5.2 end
-
 			// 檢核項目end
 		}
 

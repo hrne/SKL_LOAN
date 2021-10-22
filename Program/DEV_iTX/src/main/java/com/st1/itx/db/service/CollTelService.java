@@ -36,10 +36,10 @@ public interface CollTelService {
   public Slice<CollTel> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate&gt;= , AND AcDate&lt;= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
+   * TelDate&gt;= , AND TelDate&lt;= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
    *
-   * @param acDate_0 acDate_0
-   * @param acDate_1 acDate_1
+   * @param telDate_0 telDate_0
+   * @param telDate_1 telDate_1
    * @param caseCode_2 caseCode_2
    * @param custNo_3 custNo_3
    * @param facmNo_4 facmNo_4
@@ -48,7 +48,7 @@ public interface CollTelService {
    * @param titaVo Variable-Length Argument
    * @return Slice CollTel CollTel of List
    */
-  public Slice<CollTel> telTimeBetween(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo);
+  public Slice<CollTel> telTimeBetween(int telDate_0, int telDate_1, String caseCode_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseCode= ,AND CustNo= ,AND FacmNo= ,
@@ -64,10 +64,10 @@ public interface CollTelService {
   public Slice<CollTel> findSameCust(String caseCode_0, int custNo_1, int facmNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AcDate&gt;= , AND AcDate&lt;= ,AND CaseCode= ,AND CustNo= 
+   * TelDate&gt;= , AND TelDate&lt;= ,AND CaseCode= ,AND CustNo= 
    *
-   * @param acDate_0 acDate_0
-   * @param acDate_1 acDate_1
+   * @param telDate_0 telDate_0
+   * @param telDate_1 telDate_1
    * @param caseCode_2 caseCode_2
    * @param custNo_3 custNo_3
    * @param index Page Index
@@ -75,7 +75,7 @@ public interface CollTelService {
    * @param titaVo Variable-Length Argument
    * @return Slice CollTel CollTel of List
    */
-  public Slice<CollTel> withoutFacmNo(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo);
+  public Slice<CollTel> withoutFacmNo(int telDate_0, int telDate_1, String caseCode_2, int custNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
    * CaseCode= ,AND CustNo= 

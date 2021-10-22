@@ -22,14 +22,14 @@ import com.st1.itx.db.domain.CollMeetId;
  */
 public interface CollMeetRepositoryMon extends JpaRepository<CollMeet, CollMeetId> {
 
-  // AcDate>= , AND AcDate<= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
-  public Slice<CollMeet> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, int facmNo_4, Pageable pageable);
+  // MeetDate>= , AND MeetDate<= ,AND CaseCode= ,AND CustNo= ,AND FacmNo= ,
+  public Slice<CollMeet> findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(int meetDate_0, int meetDate_1, String caseCode_2, int custNo_3, int facmNo_4, Pageable pageable);
 
   // CaseCode= ,AND CustNo= ,AND FacmNo= ,
   public Slice<CollMeet> findAllByCaseCodeIsAndCustNoIsAndFacmNoIsOrderByMeetDateDesc(String caseCode_0, int custNo_1, int facmNo_2, Pageable pageable);
 
-  // AcDate>= , AND AcDate<= ,AND CaseCode= ,AND CustNo= 
-  public Slice<CollMeet> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(int acDate_0, int acDate_1, String caseCode_2, int custNo_3, Pageable pageable);
+  // MeetDate>= , AND MeetDate<= ,AND CaseCode= ,AND CustNo= 
+  public Slice<CollMeet> findAllByMeetDateGreaterThanEqualAndMeetDateLessThanEqualAndCaseCodeIsAndCustNoIsOrderByMeetDateDesc(int meetDate_0, int meetDate_1, String caseCode_2, int custNo_3, Pageable pageable);
 
   // CaseCode= ,AND CustNo= 
   public Slice<CollMeet> findAllByCaseCodeIsAndCustNoIsOrderByMeetDateDesc(String caseCode_0, int custNo_1, Pageable pageable);

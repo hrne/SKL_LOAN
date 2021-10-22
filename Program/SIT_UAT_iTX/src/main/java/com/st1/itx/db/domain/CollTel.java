@@ -62,7 +62,8 @@ public class CollTel implements Serializable {
   private int telDate = 0;
 
   // 電催時間
-  @Column(name = "`TelTime`", length = 6)
+  /* 2021/8/18 已與舜文確認只需填入時間此欄位由6碼改成4碼 */
+  @Column(name = "`TelTime`", length = 4)
   private String telTime;
 
   // 聯絡對象
@@ -259,7 +260,7 @@ public class CollTel implements Serializable {
 
 /**
 	* 電催時間<br>
-	* 
+	* 2021/8/18 已與舜文確認只需填入時間此欄位由6碼改成4碼
 	* @return String
 	*/
   public String getTelTime() {
@@ -268,7 +269,7 @@ public class CollTel implements Serializable {
 
 /**
 	* 電催時間<br>
-	* 
+	* 2021/8/18 已與舜文確認只需填入時間此欄位由6碼改成4碼
   *
   * @param telTime 電催時間
 	*/

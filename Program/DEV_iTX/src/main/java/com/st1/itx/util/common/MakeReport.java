@@ -995,7 +995,7 @@ public class MakeReport extends CommBuffer {
 
 		rptCreateDate = tTxFile.getCreateDate();
 
-		this.info("MakeRepor doToPdf rptTlrNo = " + rptTlrNo);
+//		this.info("MakeRepor doToPdf rptTlrNo = " + rptTlrNo);
 
 		try {
 			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
@@ -1012,7 +1012,7 @@ public class MakeReport extends CommBuffer {
 		this.info("MakeReport.toPdf.filename =" + outfile);
 
 		if (this.rptCode == null) {
-			this.info("makeReport rptCode is null");
+			this.error("makeReport rptCode is null");
 		}
 
 		// 檢查是否需浮水印
@@ -1030,7 +1030,7 @@ public class MakeReport extends CommBuffer {
 		try {
 			Files.delete(file.toPath());
 		} catch (IOException e) {
-			this.info("MakeReport Files.delete error =" + e.getMessage());
+			this.error("MakeReport Files.delete error =" + e.getMessage());
 		}
 
 		try {
@@ -1441,7 +1441,7 @@ public class MakeReport extends CommBuffer {
 					}
 					if (pw > 0) {
 						cb.beginText();
-						this.info("MakeReport basefont = " + baseFont.TIMES_BOLD);
+						this.info("MakeReport basefont = " + BaseFont.TIMES_BOLD);
 						cb.setFontAndSize(baseFont, fontsize);
 						cb.setCharacterSpacing(charSpaces);
 						cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
@@ -1502,7 +1502,7 @@ public class MakeReport extends CommBuffer {
 			empNm = tCdEmp.getFullname();
 		}
 
-		this.info("MakeReport setWatermark empNm = " + empNm);
+//		this.info("MakeReport setWatermark empNm = " + empNm);
 
 		watermark += empNm;
 		watermark += " ";
@@ -1520,13 +1520,13 @@ public class MakeReport extends CommBuffer {
 		float widthMax = document.getPageSize().getWidth();
 		float heightMax = document.getPageSize().getHeight();
 
-		this.info("widthMax = " + widthMax);
-		this.info("heightMax = " + heightMax);
+//		this.info("widthMax = " + widthMax);
+//		this.info("heightMax = " + heightMax);
 
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
-			this.info("w = " + w);
+//			this.info("w = " + w);
 			for (float h = 0; h < heightMax + 80f; h += 80f) {
-				this.info("h = " + h);
+//				this.info("h = " + h);
 				cb.showTextAligned(Element.ALIGN_CENTER, watermark, w, h, 15f);
 			}
 		}

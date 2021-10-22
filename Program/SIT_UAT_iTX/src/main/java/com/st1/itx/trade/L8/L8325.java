@@ -111,22 +111,38 @@ public class L8325 extends TradeBuffer {
 
 			// 2
 			// 「IDN+報送單位代號+調解申請日+受理調解機構代號」若未曾報送過「'440':前置調解受理申請暨請求回報債權通知資料」，予以剔退處理.(交易代碼為'X'者不檢核)
-			if (!"X".equals(iTranKey)) {
+			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
 				iJcicZ440 = sJcicZ440Service.findById(iJcicZ440Id, titaVo);
 				if (iJcicZ440 == null) {
-					throw new LogicException("E0005", "請先報送(440)前置調解受理申請暨請求回報債權通知資料.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "請先報送(440)前置調解受理申請暨請求回報債權通知資料.");
+					} else {
+						throw new LogicException("E0007", "請先報送(440)前置調解受理申請暨請求回報債權通知資料.");
+					}
 				}
 			} // 2 end
 
 			// 3 第10欄、第11欄及第12欄「債務人電話」之其中一欄，需為必要填報項目.
-			if (iCustRegTelNo.trim().isEmpty() && iCustComTelNo.trim().isEmpty() && iCustMobilNo.trim().isEmpty()) {
-				throw new LogicException("E0005", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
-			} // 3 end
+			if (!"D".equals(iTranKey)) {
+				if (iCustRegTelNo.trim().isEmpty() && iCustComTelNo.trim().isEmpty() && iCustMobilNo.trim().isEmpty()) {
+					if ("C".equals(iTranKey)) {
+						throw new LogicException("E0007", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
+					} else {
+						throw new LogicException("E0005", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
+					}
+				} // 3 end
+			}
 
 			// 4 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
-				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+				if ("A".equals(iTranKey) || "X".equals(iTranKey)) {
+					throw new LogicException(titaVo, "E0005",
+							"同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+				} else {
+					throw new LogicException(titaVo, "E0007",
+							"同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+				}
 			} // 4 end
 		}
 		// 檢核條件 end
