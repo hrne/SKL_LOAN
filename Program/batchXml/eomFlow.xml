@@ -69,6 +69,8 @@
 				<step id="sLM001" parent="parentStep">
 					<tasklet ref="LM001" />
 				</step>
+			</flow>
+			<flow>
 				<step id="sLM002" parent="parentStep">
 					<tasklet ref="LM002" />
 				</step>

@@ -143,7 +143,7 @@ public class L2077 extends TradeBuffer {
 					BigDecimal.ZERO, titaVo);
 			logger.info("CloseBreach = " + baTxCom.getShortCloseBreach());
 			logger.info("FunCode = " + tmpFacClose.getFunCode());
-			if ("2".equals(tmpFacClose.getFunCode()) || "3".equals(tmpFacClose.getFunCode())
+			if (("2".equals(tmpFacClose.getFunCode()) || "3".equals(tmpFacClose.getFunCode()))
 					&& baTxCom.getShortCloseBreach().compareTo(BigDecimal.ZERO) == 0) {
 				logger.info("wkRepayFg = \"Y\"");
 				wkRepayFg = "Y";

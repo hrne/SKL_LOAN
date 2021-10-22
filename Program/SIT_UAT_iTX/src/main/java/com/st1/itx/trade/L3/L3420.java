@@ -230,7 +230,6 @@ public class L3420 extends TradeBuffer {
 	private List<LoanOverdue> lLoanOverdue = new ArrayList<LoanOverdue>();
 	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private List<LoanBorTx> lLoanBorTx;
-	private List<PfDetailVo> pfList = new ArrayList<PfDetailVo>();
 	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo = new ArrayList<CalcRepayIntVo>();
 	private ArrayList<BaTxVo> baTxList;
 	private boolean isFirstBorm = true;
@@ -960,14 +959,17 @@ public class L3420 extends TradeBuffer {
 			if (tFacMain.getRecycleCode().equals("1")) {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().subtract(wkPrincipal));
 			}
+			if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) == 0) {
+				isAllClose = true;
+			}
 		} else {
+			if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) == 0) {
+				isAllClose = true;
+			}
 			tFacMain.setUtilAmt(tFacMain.getUtilAmt().add(wkPrincipal));
 			if (tFacMain.getRecycleCode().equals("1")) {
 				tFacMain.setUtilBal(tFacMain.getUtilBal().add(wkPrincipal));
 			}
-		}
-		if (tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) == 0) {
-			isAllClose = true;
 		}
 		try {
 			facMainService.update(tFacMain);
