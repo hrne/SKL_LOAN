@@ -559,4 +559,34 @@ public interface JobMainService {
    */
   public void Usp_L7_LoanIfrsJp_Upd(int tbsdyf,  String empNo, TitaVo... titaVo);
 
+  /**
+   * Stored Procedure<br>
+   * (月底日日終批次)維護 MonthlyLM052AssetClass
+   * @param  TYYMM int
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L9_MonthlyLM052AssetClass_Ins(int TYYMM, String EmpNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (月底日日終批次)維護 MonthlyLM052LoanAsset
+   * @param  TYYMM int
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L9_MonthlyLM052LoanAsset_Ins(int TYYMM, String EmpNo, TitaVo... titaVo);
+
+  /**
+   * Stored Procedure<br>
+   * (月底日日終批次)維護 MonthlyLM052Ovdu
+   * @param  TYYMM int
+   * @param  EmpNo String
+   * @param titaVo Variable-Length Argument
+   *
+   */
+  public void Usp_L9_MonthlyLM052Ovdu_Ins(int TYYMM, String EmpNo, TitaVo... titaVo);
+
 }

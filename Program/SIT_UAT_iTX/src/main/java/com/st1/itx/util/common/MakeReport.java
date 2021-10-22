@@ -117,42 +117,6 @@ public class MakeReport extends CommBuffer {
 	// 是否需要浮水印
 	private boolean watermarkFlag;
 
-	public String getRptItem() {
-		return rptItem;
-	}
-
-	public String getRptSecurity() {
-		return rptSecurity;
-	}
-
-	public String getNowDate() {
-		return nowDate;
-	}
-
-	public String getNowTime() {
-		return nowTime;
-	}
-
-	public void setRptItem(String rptItem) {
-		this.rptItem = rptItem;
-	}
-
-	public void setRptSecurity(String rptSecurity) {
-		this.rptSecurity = rptSecurity;
-	}
-
-	public void setNowDate(String nowDate) {
-		this.nowDate = nowDate;
-	}
-
-	public void setNowTime(String nowTime) {
-		this.nowTime = nowTime;
-	}
-
-	public void setNowPage(int nowPage) {
-		this.nowPage = nowPage;
-	}
-
 	// 報表機密等級(中文敍述)
 	private String rptSecurity;
 	// 紙張大小
@@ -396,11 +360,11 @@ public class MakeReport extends CommBuffer {
 	public void printImageCm(double x, double y, float percent, String filename) {
 		int xx = (int) Math.ceil(x / 2.54 * 72);
 		int yy = (int) Math.ceil(y / 2.54 * 72);
-		printImage(xx,yy,percent,filename);
+		printImage(xx, yy, percent, filename);
 	}
-	
+
 	/**
-	 *指定位置列印 繪製圖檔
+	 * 指定位置列印 繪製圖檔
 	 * 
 	 * @param x        x軸px
 	 * @param y        Y軸px
@@ -744,29 +708,68 @@ public class MakeReport extends CommBuffer {
 
 	}
 
-	public void printRectCm(double x, double y, int width, int height, String text) {
-		int xx = (int) Math.ceil(x / 2.54 * 72);
-		int yy = (int) Math.ceil(y / 2.54 * 72);
-		
-		printRect(xx,yy,width,height,text);
-	}
-	
 	/**
 	 * 矩形區間列印字串
 	 * 
-	 * @param x      x軸
-	 * @param y      y軸
+	 * @param x      x軸cm
+	 * @param y      y軸cm
+	 * @param width  每列列印半形字數
+	 * @param height 每列高度px
+	 * @param text   列印字串
+	 */
+	public void printRectCm(double x, double y, int width, int height, String text) {
+
+		printRectCm(x, y, width, 0, height, text);
+	}
+
+	/**
+	 * 矩形區間列印字串
+	 * 
+	 * @param x      x軸cm
+	 * @param y      y軸cm
+	 * @param width  每列列印半形字數
+	 * @param width2  第二行縮排半形字數
+	 * @param height 每列高度px
+	 * @param text   列印字串
+	 */
+	public void printRectCm(double x, double y, int width, int width2, int height, String text) {
+		int xx = (int) Math.ceil(x / 2.54 * 72);
+		int yy = (int) Math.ceil(y / 2.54 * 72);
+
+		printRect(xx, yy, width, width2, height, text);
+	}
+
+	/**
+	 * 矩形區間列印字串
+	 * 
+	 * @param x      x軸px
+	 * @param y      y軸px
 	 * @param width  每列列印半形字數
 	 * @param height 每列高度px
 	 * @param text   列印字串
 	 */
 	public void printRect(int x, int y, int width, int height, String text) {
+		printRect(x, y, width, 0, height, text);
+	}
+
+	/**
+	 * 矩形區間列印字串
+	 * 
+	 * @param x      x軸px
+	 * @param y      y軸px
+	 * @param width  每列列印半形字數
+	 * @param width2  第二行縮排半形字數
+	 * @param height 每列高度px
+	 * @param text   列印字串
+	 */
+	public void printRect(int x, int y, int width, int width2, int height, String text) {
 		if (!"".equals(text)) {
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			map.put("type", "B");
 			map.put("x", x);
 			map.put("y", y);
 			map.put("w", width);
+			map.put("w2", width2);
 			map.put("h", height);
 			map.put("s", text);
 			listMap.add(map);
@@ -1064,7 +1067,6 @@ public class MakeReport extends CommBuffer {
 			int lineSpaces = 0;
 			int fontwidth = fontsize / 2 + charSpaces;
 			int fonthigh = fontsize + lineSpaces + 2;
-			
 
 			for (HashMap<String, Object> map : this.listMap) {
 
@@ -1262,7 +1264,7 @@ public class MakeReport extends CommBuffer {
 					int x = (col - 1) * fontwidth;
 					int y = (int) page.getHeight() - (row * fonthigh);
 					cb.beginText();
-				
+
 					cb.setFontAndSize(baseFont, fontsize);
 					cb.setCharacterSpacing(charSpaces);
 					if ("L".equals(align)) {
@@ -1401,17 +1403,24 @@ public class MakeReport extends CommBuffer {
 					int x = Integer.parseInt(map.get("x").toString());
 					int y = Integer.parseInt(map.get("y").toString());
 					int w = Integer.parseInt(map.get("w").toString());
+					int w2 = Integer.parseInt(map.get("w2").toString());
 					int h = Integer.parseInt(map.get("h").toString());
 					int yy = (int) this.yPoints - y;
 					String s = map.get("s").toString();
-
+					
 					String ps = "";
 					int pw = 0;
+					
+					String prefix = "";
+					for (int i=0; i<w2; i++) {
+						prefix += " ";
+					}
+					
 					for (int i = 0; i < s.length(); i++) {
 						String ss = s.substring(i, i + 1);
-						
+
 						ps += ss;
-						
+
 						int ww = 1;
 						if (haveChinese(ss)) {
 							ww = 2;
@@ -1425,8 +1434,8 @@ public class MakeReport extends CommBuffer {
 							cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
 							cb.endText();
 
-							ps = "";
-							pw = 0;
+							ps = prefix;
+							pw = w2;
 							yy -= h;
 						}
 					}
@@ -1436,7 +1445,7 @@ public class MakeReport extends CommBuffer {
 						cb.setFontAndSize(baseFont, fontsize);
 						cb.setCharacterSpacing(charSpaces);
 						cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
-						
+
 						cb.endText();
 					}
 				}
@@ -2110,5 +2119,117 @@ public class MakeReport extends CommBuffer {
 
 	public void setRptCode(String rptCode) {
 		this.rptCode = rptCode;
+	}
+
+	public String getRptItem() {
+		return rptItem;
+	}
+
+	public String getRptSecurity() {
+		return rptSecurity;
+	}
+
+	public String getNowDate() {
+		return nowDate;
+	}
+
+	public String getNowTime() {
+		return nowTime;
+	}
+
+	public void setRptItem(String rptItem) {
+		this.rptItem = rptItem;
+	}
+
+	public void setRptSecurity(String rptSecurity) {
+		this.rptSecurity = rptSecurity;
+	}
+
+	public void setNowDate(String nowDate) {
+		this.nowDate = nowDate;
+	}
+
+	public void setNowTime(String nowTime) {
+		this.nowTime = nowTime;
+	}
+
+	public void setNowPage(int nowPage) {
+		this.nowPage = nowPage;
+	}
+
+	public HashMap<String, Object> toPrint(long pdfno, int pageno, String printer) throws LogicException {
+		this.info("MakeReport.toPrint = " + pdfno + "/" + pageno + "/" + printer);
+
+		TxFile tTxFile = txFileService.findById(pdfno);
+
+		if (tTxFile == null) {
+			throw new LogicException(titaVo, "EC001", "(MakeReport)輸出檔(TxFile)序號:" + pdfno);
+		}
+
+		if (pageno == 0) {
+			pageno = 1;
+		}
+
+		List<HashMap<String, Object>> pMap = new ArrayList<HashMap<String, Object>>();
+
+		this.info("MakeReport.toPrint.FileData = " + tTxFile.getFileData());
+
+		try {
+			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
+		} catch (IOException e) {
+			throw new LogicException("EC009", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",資料格式 " + e.getMessage());
+		}
+
+		int nowPage = 0;
+
+		for (HashMap<String, Object> map : this.listMap) {
+
+			String type = map.get("type").toString();
+
+			this.info("MakeReport.toPrint type = " + type);
+			
+			if ("0".equals(type)) {
+				HashMap<String, Object> map2 = new HashMap<String, Object>();
+				map2.put("Action", 2);
+				map2.put("Printer", printer);
+				map2.put("ReportNo", tTxFile.getFileItem());
+				listMap.add(map2);
+
+				nowPage = 1;
+
+				String papersize = map.get("paper").toString();
+				String paperorientaton = map.get("paper.orientation").toString();
+
+				String[] ss = papersize.split(",");
+
+				map2 = new HashMap<String, Object>();
+				if (ss.length == 2) {
+					map2.put("Action", 3);
+					map2.put("PageSize", "Custom");
+					map2.put("PageUnit", "Inch");
+					map2.put("PageWidth", ss[0]);
+					map2.put("PageHeight", ss[1]);
+					map2.put("Orientation", paperorientaton);
+				} else {
+					map2.put("Action", 3);
+					map2.put("PageSize", papersize);
+					map2.put("Orientation", paperorientaton);
+				}
+				listMap.add(map2);
+			} else if (nowPage == pageno) {
+
+			}
+		}
+
+		HashMap<String, Object> rmap = new HashMap<String, Object>();
+
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			rmap.put("printJson", mapper.writeValueAsString(pMap));
+		} catch (IOException e) {
+			throw new LogicException("EC009", "(MakeReport)資料格式 " + e.getMessage());
+		}
+
+		return rmap;
 	}
 }

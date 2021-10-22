@@ -1,0 +1,579 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5060)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,186)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5060" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5060]                                 案件處理清單"],
+[#<->#,"@案件種類",#CaseCode,#CaseCodeX],
+[#<->#,"@上次作業項目",#TxCode,#TxCodeX],
+[#<->#,"@查詢身分別",#Identity,#IdentityX],
+[#<->#,"@戶號",#CustNo,#BTN1],
+[#<->#,"@借款人姓名",#CustName,#BTN2],
+[#<->#,"@借款人身分證",#CustId,#BTN3],
+[#<->#,"@催收人員員工編號",#AccCollPsn,#BTN4,#AccCollPsnX],
+[#<->#,"@法務人員員工編號",#LegalPsn,#BTN5,#LegalPsnX],
+[#<->#,"@逾期金額",#CurrencyCode,#Ovdamtfm,"~",#Ovdamtto],
+[#<->#,"@逾期期數/天數",#OprionCd,#OprionCdX],
+[#<->#,"@逾期期數",#Ovdtrmfm,"~",#Ovdtrmto],
+[#<->#,"@逾期天數",#Ovddayfm,"~",#Ovddayto],
+[#<->#,"@戶況",#Status,#StatusX],
+]
+!---------- AP TEXT AREA Variables ----------
+#BTN1=X,45,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+#BTN2=X,45,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+#BTN3=X,45,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+#BTN4=X,45,I,ui:button;value:聯徵地區別查詢;enable:0;tabbable:0
+#BTN5=X,45,I,ui:button;value:聯徵地區別查詢;enable:0;tabbable:0
+#BUF1=X,42,S
+#BUF2=X,42,S
+#BUF3=X,42,S
+#BUF4=X,14,S
+#BUF5=X,14,S
+ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)ENABLE(#BTN4)ENABLE(#BTN5)
+
+#BIND1=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo})
+#BIND2=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustName<-OOCustName})
+#BIND3=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3;ntxbuf5=type<-1:CustId<-OOCustId})
+#BIND4=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#BUF4;ntxbuf5=type<-1:AccCollPsn<-OOAccCollPsn:AccCollPsnX<-OOAccCollPsnX})
+#BIND5=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#BUF5;ntxbuf5=type<-1:LegalPsn<-OOLegalPsn:LegalPsnX<-OOLegalPsnX})
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+INVOKEJS(SHOW,L5060_4,0)INVOKEJS(SHOW,L5060_5,0)INVOKEJS(SHOW,L5060_6,0)INVOKEJS(SHOW,L5060_7,0)INVOKEJS(SHOW,L5060_8,0)
+! INVOKEJS(SHOW,L5060_13,0)
+
+#NTXBUF=X,1,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CaseCode,#NTXBUF,1,1)
+INVOKEJS(SHOW,p1,02,02,1)
+
+! 案件種類下拉選單-1
+#CaseCodeRimName=x,20,S
+T(3,CdCode.CaseCode)
+#CaseCodeHelp=x,1024,S
+
+! 作業細項下拉選單-2
+#TxCodeRimName=x,20,S
+T(3,CdCode.TxCode)
+#TxCodeHelp=x,1024,S
+
+
+! 期數/天數下拉選單-3
+#OprionCdRimName=x,20,S
+T(3,CdCode.OprionCd)
+#OprionCdHelp=x,1024,S
+
+! 身分別下拉選單-4
+#IdentityRimName=x,20,S
+T(3,CdCode.Identity)
+#IdentityHelp=x,1024,S
+
+! 戶況下拉選單-5
+#StatusRimName=x,20,S
+T(3,CdCode.ColStatus)
+#StatusHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CaseCodeRimName,#TxCodeRimName,#OprionCdRimName,#IdentityRimName,#StatusRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CaseCodeHelp,#HelpDesc1)
+T(2,@TxCodeHelp,#HelpDesc2)
+T(2,@OprionCdHelp,#HelpDesc3)
+T(2,@IdentityHelp,#HelpDesc4)
+T(2,@StatusHelp,#HelpDesc5)
+T(2,@TxCodeHelp,0:全部;+#TxCodeHelp)
+T(2,@IdentityHelp,0:全部;+#IdentityHelp)
+#COL_DIS=A,1,S
+T(2,@CurrencyCode,TWD)
+E(0,@CaseCode,1)
+E(0,@TxCode,0)
+E(0,@Ovdtrmfm,1)
+E(0,@Ovdtrmto,99)
+E(0,@Ovddayfm,7)
+E(0,@Ovddayto,9999)
+E(0,@Ovdamtfm,0)
+E(0,@Ovdamtto,99999999999999)
+T(1,@TODAY,#SYSDATE,2,7)
+E(0,@Identity,0)
+
+#TODAY=D,7,O
+
+! 案件種類
+#CaseCode=A,1,I
+HELP(#CaseCodeHelp)
+@V(H,#CaseCodeHelp)
+
+#CaseCodeX=X,4,L
+T(H,#CaseCode,#CaseCodeHelp)
+
+! 作業細項
+#TxCode=A,1,I
+HELP(#TxCodeHelp)
+@V(H,#TxCodeHelp)
+#TxCodeX=X,12,L
+T(H,#TxCode,#TxCodeHelp)
+! 金額幣別
+#CurrencyCode=X,3,L
+
+! 查詢身分別
+#Space=X,1,S
+T(2, )
+#Identity=A,1,I
+HELP(#IdentityHelp)
+@V(H,#IdentityHelp)
+#IdentityX=X,16,L
+T(H,#Identity,#IdentityHelp)
+SWITCH(#Identity,
+		1,INVOKEJS(SHOW,L5060_4,1)INVOKEJS(SHOW,L5060_5,0)INVOKEJS(SHOW,L5060_6,0)INVOKEJS(SHOW,L5060_7,0)INVOKEJS(SHOW,L5060_8,0),
+		2,INVOKEJS(SHOW,L5060_4,0)INVOKEJS(SHOW,L5060_5,1)INVOKEJS(SHOW,L5060_6,0)INVOKEJS(SHOW,L5060_7,0)INVOKEJS(SHOW,L5060_8,0),
+		3,INVOKEJS(SHOW,L5060_4,0)INVOKEJS(SHOW,L5060_5,0)INVOKEJS(SHOW,L5060_6,1)INVOKEJS(SHOW,L5060_7,0)INVOKEJS(SHOW,L5060_8,0),
+		4,INVOKEJS(SHOW,L5060_4,0)INVOKEJS(SHOW,L5060_5,0)INVOKEJS(SHOW,L5060_6,0)INVOKEJS(SHOW,L5060_7,1)INVOKEJS(SHOW,L5060_8,0),
+		5,INVOKEJS(SHOW,L5060_4,0)INVOKEJS(SHOW,L5060_5,0)INVOKEJS(SHOW,L5060_6,0)INVOKEJS(SHOW,L5060_7,0)INVOKEJS(SHOW,L5060_8,1),
+		  INVOKEJS(SHOW,L5060_4,0)INVOKEJS(SHOW,L5060_5,0)INVOKEJS(SHOW,L5060_6,0)INVOKEJS(SHOW,L5060_7,0)INVOKEJS(SHOW,L5060_8,0))
+T(2,@AccCollPsnX,#Space)
+T(2,@LegalPsnX,#Space)
+
+! 戶號
+#CustNo=A,7,I
+C(3,#Identity,1,$,S)
+@V(2,0)
+
+#MRKEY=_,_,S
+T(2,#CustNo)
+
+! 借款人姓名
+#CustName=X,100,I
+C(3,#Identity,2,$,S)
+@V(7)
+! 借款人身分證
+#CustId=X,10,I
+C(3,#Identity,3,$,S)
+@V(7)A(ID_UNINO,0,#CustId)
+! 催收人員員編
+#AccCollPsn=X,6,I
+C(3,#Identity,4,$,S)
+@V(7)
+#AccCollPsnX=X,40,L
+! 法務人員員編
+#LegalPsn=X,6,I
+C(3,#Identity,5,$,S)
+@V(7)
+#LegalPsnX=X,40,L
+! 逾期金額
+#Ovdamtfm=M,14,I
+#Ovdamtto=M,14,I
+#OvdamCount=m,14,S
+! E(0,#Ovdamtto-#Ovdamtfm)
+! C(1,#OvdamCount,V(P,結束金額不可小於起始金額),$,$)
+IF(#Ovdamtto<#Ovdamtfm,V(P,結束金額不可小於起始金額),$)
+! 期數/天數
+#OprionCd=A,1,I
+HELP(#OprionCdHelp)
+@V(H,#OprionCdHelp)
+#OprionCdX=X,4,L
+T(H,#OprionCd,#OprionCdHelp)
+
+#COLDIS=A,1,S
+C(3,#OprionCd,1,INVOKEJS(SHOW,L5060_11,1)INVOKEJS(SHOW,L5060_12,0),
+                INVOKEJS(SHOW,L5060_11,0)INVOKEJS(SHOW,L5060_12,1))
+
+! 逾期期數
+#Ovdtrmfm=A,2,I
+C(3,#OprionCd,1,$,s)
+#TmpOvdtrmfm=n,2,S
+C(3,#OprionCd,1,$,s)
+E(0,#Ovdtrmfm)
+! @C(3,#Ovdtrmfm,0,INVOKEJS(SHOW,L5060_13,1),INVOKEJS(SHOW,L5060_13,0))
+#Ovdtrmto=A,2,I
+C(3,#OprionCd,1,$,s)
+#TmpOvdtrmto=n,2,S
+C(3,#OprionCd,1,$,s)
+E(0,#Ovdtrmto)
+IF(#TmpOvdtrmfm>#TmpOvdtrmto,V(P,結束期數不可小於起始期數),$)
+
+! 逾期天數
+#Ovddayfm=A,4,I
+C(3,#OprionCd,2,$,s)
+#TmpOvddayfm=n,2,S
+C(3,#OprionCd,2,$,s)
+E(0,#Ovddayfm)
+! @C(3,#Ovddayfm,0,INVOKEJS(SHOW,L5060_13,1),INVOKEJS(SHOW,L5060_13,0))
+#Ovddayto=A,4,I
+C(3,#OprionCd,2,$,s)
+#TmpOvddayto=n,2,S
+C(3,#OprionCd,2,$,s)
+E(0,#Ovddayto)
+IF(#TmpOvddayto<#TmpOvddayfm,V(P,結束天數不可小於起始天數),$)
+
+! 戶況 ---待確認
+#Status=A,2,I
+E(0,04)
+HELP(#StatusHelp,cols:2)
+C(3,#OprionCd,1,C(3,#Ovdtrmfm,0,$,s),C(3,#Ovddayfm,0,$,s))
+@V(H,#StatusHelp)
+#StatusX=X,22,L
+T(H,#Status,#StatusHelp)
+
+#RPTFG=A,1,S
+C(3,#CaseCode,1,E(0,0),E(0,1))
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5060 -----------
+<sub type="FORM" name="L5060">
+#SCRTIL=_,_,S
+T(3,[L5060] 案件處理清單)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 上次作業日期
+#OOTxDate=D,7,O
+! 上次作業項目
+#OOTxCode=X,1,O
+#OOTxCodeX=X,12,O
+C(1,#OOTxCode,S,S,$)
+T(H,#OOTxCode,#TxCodeHelp)
+
+! 戶號
+#OOCustNo=A,7,O
+! 額度
+#OOFacmNo=A,3,O
+! 姓名
+#OOCUSTNM=X,20,O
+! 繳息迄日
+#OOPrevIntDate=D,7,O
+! 逾期數
+#OOOverDueterm=m,3,O
+! 逾期天數
+#OOOvduDays=m,4,O
+! 幣別
+#OOCurrencyCode=X,3,O
+! 本金餘額
+#OOPrinBalance=M,14,O
+! 催收員
+#OOAccCollPsn=X,8,O
+! 法務人員
+#OOLegalPsn=X,8,O
+! 同擔保品額度
+#OOClFacmNo=A,10,O
+! 催收人員姓名
+#OOAccCollPsnX=X,49,O
+! 法務人員姓名
+#OOLegalPsnX=X,49,O
+! 提醒日------用戶號額度抓取
+#OOAlertDate=D,7,O
+! 是否為指定
+#OOIsSpecify=X,1,O
+! 戶況
+#OOStatus=A,2,O
+#OOStatusX=X,22,O
+T(H,#OOStatus,#StatusHelp)
+! 登錄人員編號+姓名
+#EmpNoSpace=X,1,S
+T(2, )
+
+#EditAccCollPsn=X,48,S
+T(2,#OOAccCollPsn+#EmpNoSpace+#OOAccCollPsnX)
+#EditLegalPsn=X,48,S
+T(2,#OOLegalPsn+#EmpNoSpace+#OOLegalPsnX)
+
+#AlertDateYYY=X,3,O
+T(1,#OOAlertDate,1,3)
+#AlertDateMM=X,2,O
+T(1,#OOAlertDate,4,2)
+#AlertDateDD=X,2,O
+T(1,#OOAlertDate,6,2)
+
+#XXAlertDate=X,9,O
+T(2,#AlertDateYYY+/+#AlertDateMM+/+#AlertDateDD)
+
+! 1+7+3+1 +1+7+7+5+2+160+6+20=220
+#OOBufEntry=X,12,S
+T(2,#OOCustNo+#OOFacmNo+#CaseCode)
+
+#OOBufAlert=X,13,S
+T(2,#CaseCode+#OOCustNo+#OOFacmNo+1)
+
+
+#XXCustNo=A,10,S
+T(2,#OOCustNo+#OOFacmNo)
+
+#OOClFlag=A,1,S
+#OOClFlagA=A,1,S
+#OOClFlagB=A,1,S
+! [案件] ---同擔保品的主額度(逾期天數最大)
+#OOBtnEntry=A,2,O
+C(3,#OOClFlag,1,BIND(grid,{ cmd=CHAIN; ntxcd=L5960; ntxbuf=#OOBufEntry}),
+                        BIND(grid,cancel))
+
+#OOBtnEntryB=A,2,O
+C(3,#OOClFlagA,0,BIND(grid,cancel),
+                        BIND(grid,{ cmd=CHAIN; ntxcd=L5960; ntxbuf=#OOBufEntry}))
+                        
+
+! [提醒]---若超過提醒日才顯示，否則不顯示按鈕
+#OOBtnAlert=A,2,O
+! C(3,#OOClFlag,#OOClFacmNo,
+!     IF(#TODAY>=#OOAlertDate,
+!         BIND(grid,{ cmd=CHAIN; ntxcd=L5965; text=#XXAlertDate; ntxbuf=#OOBufAlert}),
+!         BIND(grid,cancel)),
+!         BIND(grid,cancel))
+C(3,#OOClFlagB,0,BIND(grid,cancel),
+                        BIND(grid,{ cmd=CHAIN; ntxcd=L5965; text=#XXAlertDate; ntxbuf=#OOBufAlert}))
+
+#secret-no=x,99,S
+T(6A,#OOCustNo+#OOFacmNo+#OOPrinBalance+#OOOverDueterm)
+
+#batch-detail=x,100000,S
+
+#batch-print=A,1,S
+
+!#batch-rows 總筆數
+#batch-rows=X,2,S
+
+!#batch-rows-selected 勾選之筆數
+#batch-rows-selected=X,2,S
+
+!#batch-rows-ok  傳送成功筆數
+#batch-rows-ok=X,2,S
+
+!#batch-rows-error 傳送失敗筆數
+#batch-rows-error=X,2,S
+
+!#batch-row-status 該列傳送狀態
+#batch-row-status=X,100,S
+
+!#batch-row-txtno 該列傳送序號
+#batch-row-txtno=X,14,O
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CaseCode
+#TxCode
+#Ovdtrmfm
+#Ovdtrmto
+#Ovddayfm
+#Ovddayto
+#Ovdamtfm
+#Ovdamtto
+#Identity
+#Status
+#OprionCd
+#CustNo
+#CustName
+#CustId
+#AccCollPsn
+#LegalPsn
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5060
+#OOTxDate
+#OOTxCode
+#OOCustNo
+#OOFacmNo
+#OOPrevIntDate
+#OOOverDueterm
+#OOOvduDays
+#OOCurrencyCode
+#OOPrinBalance
+#OOAccCollPsn
+#OOLegalPsn
+#OOAlertDate
+#OOClFacmNo
+#OOClFlag
+#OOClFlagA
+#OOClFlagB
+#OOLegalPsnX
+#OOAccCollPsnX
+#OOIsSpecify
+#OOStatus
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L5060" layout="cols=1;screen.width=[100,900];order=1;">
+[
+["[L5060]                                 案件處理清單                                                                                                                "],
+]
+</sub>
+
+
+
+<sub type="SELECT">
+#batch-print=1,L5060.PFNX,NA,,,,,,1169:827
+^
+#RPTFG=0,QUERY.GRID,L5060
+#any={header:'L5060.part',caption:'[L5060]案件處理清單',width:1000,rowNum:40,ifxDisplay:1,
+ifxBatch:{
+	name:'存證信函;延遲繳款通知函;繳款通知函',
+	type:'5',
+	rim:'L560A',
+	txtno:'#secret-no',
+	pfnx:"L5060.PFNX",
+	col_captions:["執行狀態"],
+	col_names:["#batch-row-status"]
+	}
+}
+#secret-no
+#OOBtnEntry=
+{search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:35}
+#OOTxDate=上次作業日期
+{width:65}
+#OOTxCodeX=上次作業項目
+{width:95}
+#OOBtnAlert=提醒日
+{search:false,formatter:'cust:bind-button:#XXAlertDate',align:'center',canExport:false,width:80}
+#OOCustNo=戶號
+{width:65}
+#OOFacmNo=額度
+{width:40,align:'center'}
+#OOPrevIntDate=繳息迄日
+{width:65}
+#OOOverDueterm=逾期數
+{width:50}
+#OOOvduDays=逾期天數
+{width:50}
+#OOCurrencyCode=幣別
+{width:35}
+#OOPrinBalance=本金餘額
+{width:95}
+#EditAccCollPsn=催收人員
+{width:95}
+#EditLegalPsn=法務人員
+{width:95}
+#OOBtnEntryB=同擔保品
+{search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:95}
+#OOIsSpecify=是否指定
+{width:95,align:'center'}
+#OOStatusX=戶況
+{width:45}
+^
+#RPTFG=1,QUERY.GRID,L5060
+#any={caption:'[L5060]',width:1000,rowNum:40,ifxDisplay:1,
+ifxBatch:{
+	name:'前置協商毀諾通知函;前置協商逾期繳款通知函',
+	type:'5',
+	rim:'L560B',
+	txtno:'#secret-no',
+	pfnx:"L5060.PFNX",
+	col_captions:["執行狀態"],
+	col_names:["#batch-row-status"]
+	}
+}
+#secret-no
+#OOBtnEntry=
+{search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:35}
+#OOTxDate=上次作業日期
+{width:65}
+#OOTxCodeX=上次作業項目
+{width:95}
+#OOBtnAlert=提醒日
+{search:false,formatter:'cust:bind-button:#XXAlertDate',align:'center',canExport:false,width:80}
+#OOCustNo=戶號
+{width:65}
+#OOFacmNo=額度
+{width:40,align:'center'}
+#OOPrevIntDate=繳息迄日
+{width:65}
+#OOOverDueterm=逾期數
+{width:50}
+#OOOvduDays=逾期天數
+{width:50}
+#OOCurrencyCode=幣別
+{width:35}
+#OOPrinBalance=本金餘額
+{width:95}
+#EditAccCollPsn=催收人員
+{width:95}
+#EditLegalPsn=法務人員
+{width:95}
+#OOBtnEntryB=同擔保品
+{search:false,formatter:'cust:bind-button:案件',align:'center',canExport:false,width:95}
+#OOIsSpecify=是否指定
+{width:95,align:'center'}
+#OOStatusX=戶況
+{width:45}
+^
+
+<include src="PRT.icf::INQ04.sel" map="i=L5060;cpi=15"/>
+#CaseCode
+#TxCode
+#Ovdtrmfm
+#Ovdtrmto
+#Ovdamtfm
+#Ovdamtto
+#Identity
+#Status
+%
+#OOTxDate
+#OOTxCode
+#OOCustNo
+#OOFacmNo
+#OOPrevIntDate
+#OOOvduDays
+#OOCurrencyCode
+#OOPrinBalance
+#OOAccCollPsn
+#OOLegalPsn
+#OOAlertDate
+#OOClFacmNos
+@^
+</sub>

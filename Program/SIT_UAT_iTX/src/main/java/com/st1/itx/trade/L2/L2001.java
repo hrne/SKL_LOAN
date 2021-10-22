@@ -39,6 +39,9 @@ public class L2001 extends TradeBuffer {
 
 	private List<String> lStatusCode = new ArrayList<String>();
 	private List<String> lEnterpriseFg = new ArrayList<String>();
+	private List<String> lGovOfferFlag = new ArrayList<String>();
+	private List<String> lFinancialFlag = new ArrayList<String>();
+	private List<String> lEmpFlag = new ArrayList<String>();
 
 	private boolean inflag = false;
 
@@ -50,6 +53,10 @@ public class L2001 extends TradeBuffer {
 		String iProdNo = titaVo.getParam("ProdNo");
 		String iStatusCode = titaVo.getParam("ProdStatus");
 		String iEnterpriseFg = titaVo.getParam("EnterpriseFg");
+		String iGovOfferFlag = titaVo.getParam("GovOfferFlag"); // 政府優惠房貸
+		String iFinancialFlag = titaVo.getParam("FinancialFlag"); // 理財型房貸
+		String iEmpFlag = titaVo.getParam("EmpFlag"); // 員工專案
+
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -69,13 +76,45 @@ public class L2001 extends TradeBuffer {
 		} else {
 			lStatusCode.add("1");
 		}
+		// 政府優惠房貸處理邏輯
+		if ("Y".equals(iGovOfferFlag)) {
+			lGovOfferFlag.add("Y");
+		} else if ("N".equals(iGovOfferFlag)) {
+			lGovOfferFlag.add("N");
+		} else {
+			lGovOfferFlag.add("Y");
+			lGovOfferFlag.add("N");
+			lGovOfferFlag.add("");
+		}
+		// 理財型房貸處理邏輯
+		if ("Y".equals(iFinancialFlag)) {
+			lFinancialFlag.add("Y");
+		} else if ("N".equals(iGovOfferFlag)) {
+			lFinancialFlag.add("N");
+		} else {
+			lFinancialFlag.add("Y");
+			lFinancialFlag.add("N");
+			lFinancialFlag.add("");
+		}
+		// 員工專案處理邏輯
+		if ("Y".equals(iEmpFlag)) {
+			lEmpFlag.add("Y");
+		} else if ("N".equals(iGovOfferFlag)) {
+			lEmpFlag.add("N");
+		} else {
+			lEmpFlag.add("Y");
+			lEmpFlag.add("N");
+			lEmpFlag.add("");
+		}
+
 		// 空白為全部 Y企金可使用
 		if ("Y".equals(iEnterpriseFg)) {
 			lEnterpriseFg.add("Y");
-			slFacProd = facProdService.fildProdNo(iProdNo.trim() + "%", lStatusCode, lEnterpriseFg, this.index,
-					this.limit, titaVo);
+			slFacProd = facProdService.fildProdNo(iProdNo.trim() + "%", lStatusCode, lEnterpriseFg, lGovOfferFlag,
+					lFinancialFlag, lEmpFlag, this.index, this.limit, titaVo);
 		} else {
-			slFacProd = facProdService.fildStatus(iProdNo.trim() + "%", lStatusCode, this.index, this.limit, titaVo);
+			slFacProd = facProdService.fildStatus(iProdNo.trim() + "%", lStatusCode, lGovOfferFlag, lFinancialFlag,
+					lEmpFlag, this.index, this.limit, titaVo);
 		}
 
 		// 查詢商品參數檔

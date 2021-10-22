@@ -24,7 +24,6 @@
 // */
 //public class LD009 extends TradeBuffer {
 //	@SuppressWarnings("unused")
-//	// private static final Logger logger = LoggerFactory.getLogger(LD009.class);
 //
 //	@Autowired
 //	public LD009ServiceImpl LD009ServiceImpl;
@@ -59,14 +58,14 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
 
-@Service("LD009")
-@Scope("step")
 /**
- * 
+ * LD009
  * 
  * @author Eric Chang
  * @version 1.0.0
  */
+@Service("LD009")
+@Scope("step")
 public class LD009 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Autowired
@@ -79,9 +78,8 @@ public class LD009 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LD009.class);
 		ld009report.setParentTranCode(this.getParent());
-		return this.exec(contribution, "M");
+		return this.exec(contribution, "D");
 	}
 
 	@Override

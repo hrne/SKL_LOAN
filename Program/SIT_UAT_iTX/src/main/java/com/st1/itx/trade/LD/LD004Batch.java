@@ -97,11 +97,6 @@ public class LD004Batch extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LD004Batch ");
 
-		this.info(tranCode + " this.getParent()= " + this.getParent());
-		String parentTranCode = this.getParent();
-
-		lD004Report.setParentTranCode(parentTranCode);
-
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
 		titaVo.putParam("inputAcDate", tbsdyf);

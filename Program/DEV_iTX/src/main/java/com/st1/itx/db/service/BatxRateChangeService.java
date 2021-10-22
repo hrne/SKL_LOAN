@@ -113,6 +113,19 @@ public interface BatxRateChangeService {
   public Slice<BatxRateChange> findL4321Report(int adjDate_0, int adjDate_1, int custCode_2, int custCode_3, int txKind_4, int confirmFlag_5, int index, int limit, TitaVo... titaVo);
 
   /**
+   * AdjDate = ,AND TitaTlrNo = ,AND TitaTxtNo =
+   *
+   * @param adjDate_0 adjDate_0
+   * @param titaTlrNo_1 titaTlrNo_1
+   * @param titaTxtNo_2 titaTxtNo_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice BatxRateChange BatxRateChange of List
+   */
+  public Slice<BatxRateChange> findL4320Erase(int adjDate_0, String titaTlrNo_1, String titaTxtNo_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By BatxRateChange
    * 
    * @param batxRateChangeId key

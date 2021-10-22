@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("batxRateChangeService")
 @Repository
-public class BatxRateChangeServiceImpl implements BatxRateChangeService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(BatxRateChangeServiceImpl.class);
-
+public class BatxRateChangeServiceImpl extends ASpringJpaParm implements BatxRateChangeService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class BatxRateChangeServiceImpl implements BatxRateChangeService, Initial
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + batxRateChangeId);
+    this.info("findById " + dbName + " " + batxRateChangeId);
     Optional<BatxRateChange> batxRateChange = null;
     if (dbName.equals(ContentName.onDay))
       batxRateChange = batxRateChangeReposDay.findById(batxRateChangeId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "AdjDate", "CustNo", "FacmNo", "BormNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "AdjDate", "CustNo", "FacmNo", "BormNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = batxRateChangeReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = batxRateChangeReposHist.findAll(pageable);
     else 
       slice = batxRateChangeRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("baseRateCodeEq " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " baseRateCode_2 : " +  baseRateCode_2);
+    this.info("baseRateCodeEq " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " baseRateCode_2 : " +  baseRateCode_2);
     if (dbName.equals(ContentName.onDay))
       slice = batxRateChangeReposDay.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndBaseRateCodeIs(adjDate_0, adjDate_1, baseRateCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = batxRateChangeReposHist.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndBaseRateCodeIs(adjDate_0, adjDate_1, baseRateCode_2, pageable);
     else 
       slice = batxRateChangeRepos.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndBaseRateCodeIs(adjDate_0, adjDate_1, baseRateCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("custCodeEq " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " custCode_2 : " +  custCode_2 + " custCode_3 : " +  custCode_3);
+    this.info("custCodeEq " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " custCode_2 : " +  custCode_2 + " custCode_3 : " +  custCode_3);
     if (dbName.equals(ContentName.onDay))
       slice = batxRateChangeReposDay.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqual(adjDate_0, adjDate_1, custCode_2, custCode_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = batxRateChangeReposHist.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqual(adjDate_0, adjDate_1, custCode_2, custCode_3, pageable);
     else 
       slice = batxRateChangeRepos.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqual(adjDate_0, adjDate_1, custCode_2, custCode_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4931AEq " + dbName + " : " + "custCode_0 : " + custCode_0 + " custCode_1 : " +  custCode_1 + " txKind_2 : " +  txKind_2 + " txKind_3 : " +  txKind_3 + " adjCode_4 : " +  adjCode_4 + " adjCode_5 : " +  adjCode_5 + " adjDate_6 : " +  adjDate_6 + " adjDate_7 : " +  adjDate_7);
+    this.info("findL4931AEq " + dbName + " : " + "custCode_0 : " + custCode_0 + " custCode_1 : " +  custCode_1 + " txKind_2 : " +  txKind_2 + " txKind_3 : " +  txKind_3 + " adjCode_4 : " +  adjCode_4 + " adjCode_5 : " +  adjCode_5 + " adjDate_6 : " +  adjDate_6 + " adjDate_7 : " +  adjDate_7);
     if (dbName.equals(ContentName.onDay))
       slice = batxRateChangeReposDay.findAllByCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindGreaterThanEqualAndTxKindLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndAdjDateGreaterThanEqualAndAdjDateLessThanEqual(custCode_0, custCode_1, txKind_2, txKind_3, adjCode_4, adjCode_5, adjDate_6, adjDate_7, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = batxRateChangeReposHist.findAllByCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindGreaterThanEqualAndTxKindLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndAdjDateGreaterThanEqualAndAdjDateLessThanEqual(custCode_0, custCode_1, txKind_2, txKind_3, adjCode_4, adjCode_5, adjDate_6, adjDate_7, pageable);
     else 
       slice = batxRateChangeRepos.findAllByCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindGreaterThanEqualAndTxKindLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndAdjDateGreaterThanEqualAndAdjDateLessThanEqual(custCode_0, custCode_1, txKind_2, txKind_3, adjCode_4, adjCode_5, adjDate_6, adjDate_7, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("adjCodeEq " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " adjCode_2 : " +  adjCode_2 + " adjCode_3 : " +  adjCode_3 + " rateKeyInCode_4 : " +  rateKeyInCode_4 + " rateKeyInCode_5 : " +  rateKeyInCode_5);
+    this.info("adjCodeEq " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " adjCode_2 : " +  adjCode_2 + " adjCode_3 : " +  adjCode_3 + " rateKeyInCode_4 : " +  rateKeyInCode_4 + " rateKeyInCode_5 : " +  rateKeyInCode_5);
     if (dbName.equals(ContentName.onDay))
       slice = batxRateChangeReposDay.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndRateKeyInCodeGreaterThanEqualAndRateKeyInCodeLessThanEqual(adjDate_0, adjDate_1, adjCode_2, adjCode_3, rateKeyInCode_4, rateKeyInCode_5, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -206,6 +214,9 @@ em = null;
       slice = batxRateChangeReposHist.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndRateKeyInCodeGreaterThanEqualAndRateKeyInCodeLessThanEqual(adjDate_0, adjDate_1, adjCode_2, adjCode_3, rateKeyInCode_4, rateKeyInCode_5, pageable);
     else 
       slice = batxRateChangeRepos.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndRateKeyInCodeGreaterThanEqualAndRateKeyInCodeLessThanEqual(adjDate_0, adjDate_1, adjCode_2, adjCode_3, rateKeyInCode_4, rateKeyInCode_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -222,7 +233,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4321Report " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " custCode_2 : " +  custCode_2 + " custCode_3 : " +  custCode_3 + " txKind_4 : " +  txKind_4 + " confirmFlag_5 : " +  confirmFlag_5);
+    this.info("findL4321Report " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " custCode_2 : " +  custCode_2 + " custCode_3 : " +  custCode_3 + " txKind_4 : " +  txKind_4 + " confirmFlag_5 : " +  confirmFlag_5);
     if (dbName.equals(ContentName.onDay))
       slice = batxRateChangeReposDay.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIs(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -232,6 +243,37 @@ em = null;
     else 
       slice = batxRateChangeRepos.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIs(adjDate_0, adjDate_1, custCode_2, custCode_3, txKind_4, confirmFlag_5, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<BatxRateChange> findL4320Erase(int adjDate_0, String titaTlrNo_1, String titaTxtNo_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<BatxRateChange> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findL4320Erase " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " titaTlrNo_1 : " +  titaTlrNo_1 + " titaTxtNo_2 : " +  titaTxtNo_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = batxRateChangeReposDay.findAllByAdjDateIsAndTitaTlrNoIsAndTitaTxtNoIs(adjDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = batxRateChangeReposMon.findAllByAdjDateIsAndTitaTlrNoIsAndTitaTxtNoIs(adjDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = batxRateChangeReposHist.findAllByAdjDateIsAndTitaTlrNoIsAndTitaTxtNoIs(adjDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
+    else 
+      slice = batxRateChangeRepos.findAllByAdjDateIsAndTitaTlrNoIsAndTitaTxtNoIs(adjDate_0, titaTlrNo_1, titaTxtNo_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -240,7 +282,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + batxRateChangeId);
+    this.info("Hold " + dbName + " " + batxRateChangeId);
     Optional<BatxRateChange> batxRateChange = null;
     if (dbName.equals(ContentName.onDay))
       batxRateChange = batxRateChangeReposDay.findByBatxRateChangeId(batxRateChangeId);
@@ -258,7 +300,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + batxRateChange.getBatxRateChangeId());
+    this.info("Hold " + dbName + " " + batxRateChange.getBatxRateChangeId());
     Optional<BatxRateChange> batxRateChangeT = null;
     if (dbName.equals(ContentName.onDay))
       batxRateChangeT = batxRateChangeReposDay.findByBatxRateChangeId(batxRateChange.getBatxRateChangeId());
@@ -280,7 +322,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + batxRateChange.getBatxRateChangeId());
+    this.info("Insert..." + dbName + " " + batxRateChange.getBatxRateChangeId());
     if (this.findById(batxRateChange.getBatxRateChangeId()) != null)
       throw new DBException(2);
 
@@ -309,7 +351,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + batxRateChange.getBatxRateChangeId());
+    this.info("Update..." + dbName + " " + batxRateChange.getBatxRateChangeId());
     if (!empNot.isEmpty())
       batxRateChange.setLastUpdateEmpNo(empNot);
 
@@ -332,7 +374,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + batxRateChange.getBatxRateChangeId());
+    this.info("Update..." + dbName + " " + batxRateChange.getBatxRateChangeId());
     if (!empNot.isEmpty())
       batxRateChange.setLastUpdateEmpNo(empNot);
 
@@ -352,7 +394,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + batxRateChange.getBatxRateChangeId());
+    this.info("Delete..." + dbName + " " + batxRateChange.getBatxRateChangeId());
     if (dbName.equals(ContentName.onDay)) {
       batxRateChangeReposDay.delete(batxRateChange);	
       batxRateChangeReposDay.flush();
@@ -381,7 +423,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (BatxRateChange t : batxRateChange){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -416,7 +458,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (batxRateChange == null || batxRateChange.size() == 0)
       throw new DBException(6);
 
@@ -445,7 +487,7 @@ em = null;
 
   @Override
   public void deleteAll(List<BatxRateChange> batxRateChange, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

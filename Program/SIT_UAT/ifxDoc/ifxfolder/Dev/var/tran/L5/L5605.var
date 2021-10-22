@@ -277,8 +277,8 @@ C(2,#FunctionCd,S,T(1,#RemindDateX,2,7),$,T(1,#RemindDateX,2,7),s,s,s)
 ! D(8)
 ! 狀態
 #CondCode=A,1,I
-C(2,#FunctionCd,S,$,s,s,E(0,4),s,E(0,6))
-C(2,#FunctionCd,S,$,s,s,s,s,s)
+C(2,#FunctionCd,S,$,$,s,E(0,4),s,E(0,6))
+C(2,#FunctionCd,S,$,$,s,s,s,s)
 HELP(#CondCodeHelp)
 @V(H,#CondCodeHelp)
 #CondCodeX=X,6,L

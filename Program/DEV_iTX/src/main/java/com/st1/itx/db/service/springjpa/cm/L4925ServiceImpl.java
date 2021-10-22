@@ -126,9 +126,9 @@ public class L4925ServiceImpl extends ASpringJpaParm implements InitializingBean
 			
 			switch (iProcStsCode) {
 			case "A":
-				sql += "   and (bd.\"ProcStsCode\" in ('0','2','3','4') ";
+				sql += "   and ((bd.\"ProcStsCode\" in ('0','2','3','4') ";
 				sql += "   and bh.\"BatxExeCode\" <> 8 )";
-				sql += "   or  bd.\"ProcStsCode\" in ('5','6','7') ";
+				sql += "   or  bd.\"ProcStsCode\" in ('5','6','7')) ";
 				break;
 			case "R":
 				sql += "   and bd.\"ProcStsCode\" in ('0','2','3','4') ";

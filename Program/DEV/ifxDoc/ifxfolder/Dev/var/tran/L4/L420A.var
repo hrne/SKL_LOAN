@@ -1,0 +1,95 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L420A)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L420A" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L420A]                                 整批批次檢核作業"],
+[#<->#,"@會計日期",#AcDate],
+[#<->#,"@整批批號",#BatchNo],
+[#<->#,"@對帳類別",#ReconCode],
+]
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L4002進入),$)
+
+#NTXBUF=X,18,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunctionCode,#NTXBUF,1,1)
+T(1,@AcDate,#NTXBUF,2,7)
+T(1,@BatchNo,#NTXBUF,9,6)
+T(1,@ReconCode,#NTXBUF,15,3)
+INVOKEJS(SHOW,p1,02,02,1)
+
+! 處理印記 0:入帳 1:刪除 2:訂正
+#FunctionCode=A,1,O
+! C(3,#CHAIN,0,$,s)
+#FunctionCodeX=X,4,L
+! SWITCH(#FunctionCode,0,T(2,入帳),
+!                    1,T(2,刪除),
+!                    2,T(2,訂正))
+
+! 會計日期
+#AcDate=D,7,L
+C(3,#CHAIN,0,$,s)
+
+![整批批號]
+#BatchNo=X,6,L
+C(3,#CHAIN,0,$,s)
+
+
+![對帳類別]
+#ReconCode=X,3,L
+C(3,#CHAIN,0,$,s)
+
+
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L420A -----------
+<sub type="FORM" name="L420A">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCode
+#AcDate
+#BatchNo
+#ReconCode
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L420A
+
+^
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

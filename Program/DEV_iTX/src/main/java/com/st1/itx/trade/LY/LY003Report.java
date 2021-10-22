@@ -48,11 +48,13 @@ public class LY003Report extends MakeReport {
 
 		boolean isNotEmpty = true;
 
+		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
+		
 		for (int f = 1; f <= 6; f++) {
 
 			try {
 
-				lY003List = lY003ServiceImpl.findAll(titaVo, f,rocYear);
+				lY003List = lY003ServiceImpl.findAll(titaVo, f,endOfYearMonth);
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block

@@ -38,7 +38,7 @@ public class LY002Report extends MakeReport {
 	Map<String, Object> mergeEvaMap = null;
 	int countEva = 1;
 
-	List<Map<String, Object>> mergeLine =  new ArrayList<Map<String, Object>>();
+	List<Map<String, Object>> mergeLine = new ArrayList<Map<String, Object>>();
 	Map<String, Object> mergeLineMap = null;
 	int countLine = 1;
 
@@ -127,7 +127,6 @@ public class LY002Report extends MakeReport {
 				tempId = tLDVo.get("F1").toString();
 			}
 
-
 			// 列號
 			makeExcel.setValue(row, 2, count, "C");
 
@@ -178,18 +177,18 @@ public class LY002Report extends MakeReport {
 
 			// F16 核貸金額
 			tempLineAmt = tLDVo.get("F16").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F16"));
-			
+
 			// F0 戶號
 			custNo = tLDVo.get("F0");
 			// F21 額度
 			facmNo = tLDVo.get("F21");
 			// F22 擔保品號碼
 			clNo = tLDVo.get("F22");
-			
-			//合併另外做處理
+
+			// 合併另外做處理
 			checkMergeRegionValue(custNo, facmNo, clNo, tempEvaAmt, tempLineAmt);
 
-			//			對照用
+			// 對照用
 //			makeExcel.setValue(row, 25, custNo, "C");
 //			makeExcel.setValue(row, 26, facmNo, "C");
 //			makeExcel.setValue(row, 27, clNo, "C");
@@ -219,11 +218,11 @@ public class LY002Report extends MakeReport {
 
 		}
 
-		makeExcel.setValue(row+1, 2, count+1, "C");
-		makeExcel.setValue(row+2, 2, count+2, "C");
-		makeExcel.setValue(row+3, 2, count+3, "C");
-		makeExcel.setValue(row+4, 2, count+4, "C");
-		makeExcel.setValue(row+5, 2, count+5, "C");
+		makeExcel.setValue(row + 1, 2, count + 1, "C");
+		makeExcel.setValue(row + 2, 2, count + 2, "C");
+		makeExcel.setValue(row + 3, 2, count + 3, "C");
+		makeExcel.setValue(row + 4, 2, count + 4, "C");
+		makeExcel.setValue(row + 5, 2, count + 5, "C");
 
 		this.info("mergeEva=" + mergeEva.toString());
 
@@ -239,22 +238,23 @@ public class LY002Report extends MakeReport {
 			eRow = sRow + Integer.valueOf(eva.get("count").toString()) - 1;
 
 //			this.info("merge=" + sRow + "," + eRow);
-			
-			if(sRow==eRow) {
-				
+
+			if (sRow == eRow) {
+
 				makeExcel.setValue(sRow, 17, tempEvaAmt, "#,##0");
-				
-			}else {
-				
+
+			} else {
+
 				makeExcel.setMergedRegionValue(sRow, eRow, 17, 17, tempEvaAmt, "#,##0");
-				
+
 			}
-			
+
 			sRow = eRow + 1;
 		}
 
 		sRow = 7;
 		eRow = 0;
+
 		for (Map<String, Object> line : mergeLine) {
 
 			tempLineAmt = new BigDecimal(line.get("line").toString());
@@ -263,113 +263,73 @@ public class LY002Report extends MakeReport {
 
 //			this.info("merge=" + sRow + "," + eRow);
 
-			if(sRow==eRow) {
-				
+			if (sRow == eRow) {
+
 				makeExcel.setValue(sRow, 18, tempLineAmt, "#,##0");
-				
-			}else {
-				
-			makeExcel.setMergedRegionValue(sRow, eRow, 18, 18, tempLineAmt, "#,##0");
+
+			} else {
+
+				makeExcel.setMergedRegionValue(sRow, eRow, 18, 18, tempLineAmt, "#,##0");
 
 			}
-			
+
 			sRow = eRow + 1;
 
 		}
 
 	}
 
-	
-	
-	
 	/**
 	 * 估計總值和核貸金額 格式合併處理
+	 * 
 	 * @param custNo  戶號
 	 * @param facmNo  額度
 	 * @param clNo    擔保品號碼
 	 * @param evaAmt  估計總值
 	 * @param lineAmt 核貸金額
 	 * 
-	 * */
-	
+	 */
+
 	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt,
 			BigDecimal lineAmt) {
 
 		String tempClNo = "";
 		String tempCustNo = "";
 		String tempFacmNo = "";
-		
+
 		mergeEvaMap = new HashMap<String, Object>();
 		mergeLineMap = new HashMap<String, Object>();
-	
-		if (mergeEva.size() > 0 && mergeLine.size() > 0 ) {
+
 		
-			int e = mergeEva.size() - 1;
+		//核貸
+		if (mergeLine.size() > 0) {
+
 			int l = mergeLine.size() - 1;
-			
-//			this.info("e.size="+e);
-//			this.info("l.size="+l);
 
-	
 			BigDecimal tempLine = new BigDecimal(mergeLine.get(l).get("line").toString());
-
-		
+			
 			tempCustNo = mergeLine.get(l).get("cust").toString();
 			tempFacmNo = mergeLine.get(l).get("facm").toString();
 
-			// 與前一筆  戶號額度是否一樣
+			// 與前一筆 戶號額度是否一樣
 			if (tempCustNo.equals(custNo) && tempFacmNo.equals(facmNo)) {
-				
+
 				countLine++;
 				countEva++;
-							
+
 				mergeLineMap.put("count", countLine);
 				mergeLineMap.put("cust", custNo);
 				mergeLineMap.put("facm", facmNo);
 				// 核貸 與前一筆金額是否一樣
 				if (tempLine.compareTo(lineAmt) == 0) {
 					mergeLineMap.put("line", lineAmt);
-				}else {	
+				} else {
 					mergeLineMap.put("line", tempLine.add(lineAmt));
 				}
 				mergeLine.set(l, mergeLineMap);
 
-				
-				BigDecimal tempEva = new BigDecimal(mergeEva.get(e).get("eva").toString());
-				tempClNo = mergeEva.get(e).get("clno").toString();
-				
-				// 和前一筆 是否為同一擔保品號碼
-				if (tempClNo.equals(clNo)) {
-
-					mergeEvaMap.put("count", countEva);
-					mergeEvaMap.put("clno", clNo);
-					// 估計  與前一筆金額是否一樣(一樣為同一擔保品)
-					if (tempEva.compareTo(evaAmt) == 0) {
-						mergeEvaMap.put("eva", evaAmt);
-					}else {
-						mergeEvaMap.put("eva", tempEva.add(evaAmt));
-					}
-					mergeEva.set(l,mergeEvaMap);
-
-				} else {
-					countEva = 1;
-
-					mergeEvaMap.put("count", countEva);
-					mergeEvaMap.put("clno", clNo);
-					mergeEvaMap.put("eva", evaAmt);
-					mergeEva.add(mergeEvaMap);
-
-				}
-
 			} else {
 
-				countEva = 1;
-
-				mergeEvaMap.put("count", countEva);
-				mergeEvaMap.put("clno", clNo);
-				mergeEvaMap.put("eva", evaAmt);
-				mergeEva.add(mergeEvaMap);
-				
 				countLine = 1;
 
 				mergeLineMap.put("count", countLine);
@@ -382,13 +342,6 @@ public class LY002Report extends MakeReport {
 
 		} else {
 
-			countEva = 1;
-
-			mergeEvaMap.put("count", countEva);
-			mergeEvaMap.put("clno", clNo);
-			mergeEvaMap.put("eva", evaAmt);
-			mergeEva.add(mergeEvaMap);
-
 			countLine = 1;
 
 			mergeLineMap.put("count", countLine);
@@ -399,6 +352,45 @@ public class LY002Report extends MakeReport {
 
 		}
 
+		//估計總值
+		if (mergeEva.size() > 0) {
+
+			int e = mergeEva.size() - 1;
+			BigDecimal tempEva = new BigDecimal(mergeEva.get(e).get("eva").toString());
+			tempClNo = mergeEva.get(e).get("clno").toString();
+
+			// 和前一筆 是否為同一擔保品號碼
+			if (tempClNo.equals(clNo)) {
+
+				mergeEvaMap.put("count", countEva);
+				mergeEvaMap.put("clno", clNo);
+				// 估計 與前一筆金額是否一樣(一樣為同一擔保品)
+				if (tempEva.compareTo(evaAmt) == 0) {
+					mergeEvaMap.put("eva", evaAmt);
+				} else {
+					mergeEvaMap.put("eva", tempEva.add(evaAmt));
+				}
+				mergeEva.set(e, mergeEvaMap);
+
+			} else {
+				countEva = 1;
+
+				mergeEvaMap.put("count", countEva);
+				mergeEvaMap.put("clno", clNo);
+				mergeEvaMap.put("eva", evaAmt);
+				mergeEva.add(mergeEvaMap);
+
+			}
+
+		} else {
+
+			countEva = 1;
+
+			mergeEvaMap.put("count", countEva);
+			mergeEvaMap.put("clno", clNo);
+			mergeEvaMap.put("eva", evaAmt);
+			mergeEva.add(mergeEvaMap);
+		}
 	}
 
 }

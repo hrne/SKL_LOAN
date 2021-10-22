@@ -46,16 +46,19 @@ public interface FacProdService {
   public Slice<FacProd> prodNoLike(String prodNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * ProdNo % ,AND StatusCode ^i
+   * ProdNo % ,AND StatusCode ^i ,AND GovOfferFlag ^i ,AND FinancialFlag ^i ,AND EmpFlag ^i
    *
    * @param prodNo_0 prodNo_0
    * @param statusCode_1 statusCode_1
+   * @param govOfferFlag_2 govOfferFlag_2
+   * @param financialFlag_3 financialFlag_3
+   * @param empFlag_4 empFlag_4
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice FacProd FacProd of List
    */
-  public Slice<FacProd> fildStatus(String prodNo_0, List<String> statusCode_1, int index, int limit, TitaVo... titaVo);
+  public Slice<FacProd> fildStatus(String prodNo_0, List<String> statusCode_1, List<String> govOfferFlag_2, List<String> financialFlag_3, List<String> empFlag_4, int index, int limit, TitaVo... titaVo);
 
   /**
    * EnterpriseFg ^i
@@ -69,17 +72,20 @@ public interface FacProdService {
   public Slice<FacProd> fildentCode(List<String> enterpriseFg_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * ProdNo % ,AND StatusCode ^i ,AND EnterpriseFg ^i
+   * ProdNo % ,AND StatusCode ^i ,AND EnterpriseFg ^i ,AND GovOfferFlag ^i ,AND FinancialFlag ^i ,AND EmpFlag ^i
    *
    * @param prodNo_0 prodNo_0
    * @param statusCode_1 statusCode_1
    * @param enterpriseFg_2 enterpriseFg_2
+   * @param govOfferFlag_3 govOfferFlag_3
+   * @param financialFlag_4 financialFlag_4
+   * @param empFlag_5 empFlag_5
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice FacProd FacProd of List
    */
-  public Slice<FacProd> fildProdNo(String prodNo_0, List<String> statusCode_1, List<String> enterpriseFg_2, int index, int limit, TitaVo... titaVo);
+  public Slice<FacProd> fildProdNo(String prodNo_0, List<String> statusCode_1, List<String> enterpriseFg_2, List<String> govOfferFlag_3, List<String> financialFlag_4, List<String> empFlag_5, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By FacProd

@@ -137,7 +137,7 @@ em = null;
   }
 
   @Override
-  public Slice<FacProd> fildStatus(String prodNo_0, List<String> statusCode_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<FacProd> fildStatus(String prodNo_0, List<String> statusCode_1, List<String> govOfferFlag_2, List<String> financialFlag_3, List<String> empFlag_4, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<FacProd> slice = null;
     if (titaVo.length != 0)
@@ -148,15 +148,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("fildStatus " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " statusCode_1 : " +  statusCode_1);
+    this.info("fildStatus " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " statusCode_1 : " +  statusCode_1 + " govOfferFlag_2 : " +  govOfferFlag_2 + " financialFlag_3 : " +  financialFlag_3 + " empFlag_4 : " +  empFlag_4);
     if (dbName.equals(ContentName.onDay))
-      slice = facProdReposDay.findAllByProdNoLikeAndStatusCodeInOrderByProdNoAsc(prodNo_0, statusCode_1, pageable);
+      slice = facProdReposDay.findAllByProdNoLikeAndStatusCodeInAndGovOfferFlagInAndFinancialFlagInAndEmpFlagInOrderByProdNoAsc(prodNo_0, statusCode_1, govOfferFlag_2, financialFlag_3, empFlag_4, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = facProdReposMon.findAllByProdNoLikeAndStatusCodeInOrderByProdNoAsc(prodNo_0, statusCode_1, pageable);
+      slice = facProdReposMon.findAllByProdNoLikeAndStatusCodeInAndGovOfferFlagInAndFinancialFlagInAndEmpFlagInOrderByProdNoAsc(prodNo_0, statusCode_1, govOfferFlag_2, financialFlag_3, empFlag_4, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = facProdReposHist.findAllByProdNoLikeAndStatusCodeInOrderByProdNoAsc(prodNo_0, statusCode_1, pageable);
+      slice = facProdReposHist.findAllByProdNoLikeAndStatusCodeInAndGovOfferFlagInAndFinancialFlagInAndEmpFlagInOrderByProdNoAsc(prodNo_0, statusCode_1, govOfferFlag_2, financialFlag_3, empFlag_4, pageable);
     else 
-      slice = facProdRepos.findAllByProdNoLikeAndStatusCodeInOrderByProdNoAsc(prodNo_0, statusCode_1, pageable);
+      slice = facProdRepos.findAllByProdNoLikeAndStatusCodeInAndGovOfferFlagInAndFinancialFlagInAndEmpFlagInOrderByProdNoAsc(prodNo_0, statusCode_1, govOfferFlag_2, financialFlag_3, empFlag_4, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -193,7 +193,7 @@ em = null;
   }
 
   @Override
-  public Slice<FacProd> fildProdNo(String prodNo_0, List<String> statusCode_1, List<String> enterpriseFg_2, int index, int limit, TitaVo... titaVo) {
+  public Slice<FacProd> fildProdNo(String prodNo_0, List<String> statusCode_1, List<String> enterpriseFg_2, List<String> govOfferFlag_3, List<String> financialFlag_4, List<String> empFlag_5, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<FacProd> slice = null;
     if (titaVo.length != 0)
@@ -204,15 +204,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("fildProdNo " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " statusCode_1 : " +  statusCode_1 + " enterpriseFg_2 : " +  enterpriseFg_2);
+    this.info("fildProdNo " + dbName + " : " + "prodNo_0 : " + prodNo_0 + " statusCode_1 : " +  statusCode_1 + " enterpriseFg_2 : " +  enterpriseFg_2 + " govOfferFlag_3 : " +  govOfferFlag_3 + " financialFlag_4 : " +  financialFlag_4 + " empFlag_5 : " +  empFlag_5);
     if (dbName.equals(ContentName.onDay))
-      slice = facProdReposDay.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, pageable);
+      slice = facProdReposDay.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInAndGovOfferFlagInAndFinancialFlagInAndEmpFlagInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, govOfferFlag_3, financialFlag_4, empFlag_5, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = facProdReposMon.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, pageable);
+      slice = facProdReposMon.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInAndGovOfferFlagInAndFinancialFlagInAndEmpFlagInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, govOfferFlag_3, financialFlag_4, empFlag_5, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = facProdReposHist.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, pageable);
+      slice = facProdReposHist.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInAndGovOfferFlagInAndFinancialFlagInAndEmpFlagInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, govOfferFlag_3, financialFlag_4, empFlag_5, pageable);
     else 
-      slice = facProdRepos.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, pageable);
+      slice = facProdRepos.findAllByProdNoLikeAndStatusCodeInAndEnterpriseFgInAndGovOfferFlagInAndFinancialFlagInAndEmpFlagInOrderByProdNoAsc(prodNo_0, statusCode_1, enterpriseFg_2, govOfferFlag_3, financialFlag_4, empFlag_5, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

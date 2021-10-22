@@ -1,0 +1,1 @@
+drop FUNCTION "Fn_GetIsBankRelated"; commit;

@@ -109,11 +109,6 @@ public class LD005Batch extends BatchBase implements Tasklet, InitializingBean {
 	public void run() throws LogicException {
 		this.info("active LD005Batch ");
 
-		this.info(tranCode + " this.getParent()= " + this.getParent());
-		String parentTranCode = this.getParent();
-
-		lD005Report.setParentTranCode(parentTranCode);
-
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
 		List<String> statusCode = new ArrayList<>();

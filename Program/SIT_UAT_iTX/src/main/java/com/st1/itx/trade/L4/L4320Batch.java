@@ -124,8 +124,8 @@ public class L4320Batch extends TradeBuffer {
 		// 調整日期
 		wkAdjDate = this.getTxBuffer().getTxCom().getTbsdy();
 
-		// 上個月月初日
-		wkLastMonthDateS = this.getTxBuffer().getTxCom().getLmndy() / 100;
+		// 本月月初日
+		wkLastMonthDateS = this.getTxBuffer().getTxCom().getTmndy() / 100;
 		wkLastMonthDateS = wkLastMonthDateS * 100 + 01;
 		this.info("iEffectMonth = " + iEffectMonth + ", iBaseRateCode=" + iBaseRateCode);
 
@@ -206,8 +206,6 @@ public class L4320Batch extends TradeBuffer {
 	}
 
 	private void execute(TitaVo titaVo) throws LogicException {
-		// 刪除該作業項目未確認資料
-		processDelete(titaVo);
 
 //      抓取資料
 		List<Map<String, String>> fnAllList = new ArrayList<>();
@@ -244,14 +242,14 @@ public class L4320Batch extends TradeBuffer {
 				bId.setFacmNo(facmNo);
 				bId.setBormNo(bormNo);
 				b = batxRateChangeService.holdById(bId, titaVo);
-				// 已確認跳過，未確認Insert
+				// 已輸入利率跳過
 				boolean isInsert = false;
 				if (b == null) {
 					isInsert = true;
 					b = new BatxRateChange();
 					b.setBatxRateChangeId(bId);
 				} else {
-					if (b.getConfirmFlag() > 0) { // 確認記號 0.未確認 1.已確認 2.已確認放行
+					if (b.getRateKeyInCode() == 1) {
 						continue;
 					}
 				}
@@ -271,6 +269,8 @@ public class L4320Batch extends TradeBuffer {
 				/* 新增或更新整批利率調整檔 */
 				if (isInsert) {
 					try {
+						b.setTitaTlrNo(titaVo.getTlrNo());
+						b.setTitaTxtNo(titaVo.getTxtNo());
 						batxRateChangeService.insert(b, titaVo);
 					} catch (DBException e) {
 						throw new LogicException("E0005", ", BatxRateChange insert is error : " + e.getErrorMsg());
@@ -405,6 +405,16 @@ public class L4320Batch extends TradeBuffer {
 		// 本次利率
 		BigDecimal rateCurt = BigDecimal.ZERO;
 
+		// 逾期期數
+		b.setOvduTerm(0);
+		if (nextPayIntDate < wkLastMonthDateS) {
+			dateUtil.init();
+			dateUtil.setDate_1(nextPayIntDate);
+			dateUtil.setDate_2(wkLastMonthDateS);
+			dateUtil.dateDiff();
+			b.setOvduTerm(dateUtil.getMons());
+		}
+
 		/* 依作業項目設定 */
 //作業項目 
 		switch (iTxKind) {
@@ -443,10 +453,11 @@ public class L4320Batch extends TradeBuffer {
 					rateCurt = cityIntRateFloor;
 				}
 			}
+
 			// 逾一期 => 下次繳息日,下次應繳日 < 上次月初日
-			if (nextPayIntDate < wkLastMonthDateS) {
+			if (b.getOvduTerm() >= 1) {
 				adjCode = 3;
-				checkMsg = "逾一期以上";
+				checkMsg = "逾 " + dateUtil.getMons() + " 期";
 			}
 
 			break;
@@ -570,50 +581,17 @@ public class L4320Batch extends TradeBuffer {
 
 	}
 
-	// 刪除該作業項目未確認資料
-	private void processDelete(TitaVo titaVo) throws LogicException {
-		// 戶別 CustType 1:個金;2:企金（含企金自然人）=> 客戶檔 0:個金1:企金2:企金自然人
-		int custType1 = 0;
-		int custType2 = 0;
-		if (this.iCustType == 2) {
-			custType1 = 1;
-			custType2 = 2;
-		}
-		this.info("processDelete...");
-		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4321Report(wkAdjDate + 19110000,
-				wkAdjDate + 19110000, custType1, custType2, iTxKind, 0, 0, Integer.MAX_VALUE, titaVo);
-		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
-
-		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
-			try {
-				batxRateChangeService.deleteAll(lBatxRateChange, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0008", ", BatxRateChange deleteAll " + e.getErrorMsg());
-			}
-		}
-	}
-
 //	訂正(刪除)
 	private void deleteBatxRate(TitaVo titaVo) throws LogicException {
 		// 戶別 CustType 1:個金;2:企金（含企金自然人）=> 客戶檔 0:個金1:企金2:企金自然人
-		int custType1 = 0;
-		int custType2 = 0;
-		if (this.iCustType == 2) {
-			custType1 = 1;
-			custType2 = 2;
-		}
 		this.info("deleteBatxRate...");
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
-		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, iTxKind,
-				iTxKind, 0, 9, wkAdjDate + 19110000, wkAdjDate + 19110000, 0, Integer.MAX_VALUE, titaVo);
+		Slice<BatxRateChange> sBatxRateChange = batxRateChangeService.findL4320Erase(titaVo.getOrgEntdyI() + 19110000,
+				titaVo.getOrgTlr(), titaVo.getOrgTno(), 0, Integer.MAX_VALUE, titaVo);
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
-
 		if (lBatxRateChange != null && lBatxRateChange.size() != 0) {
 			for (BatxRateChange tBatxRateChange : lBatxRateChange) {
-
 				batxRateChangeService.holdById(tBatxRateChange, titaVo);
-
 				if (tBatxRateChange.getConfirmFlag() == 1) {
 					throw new LogicException("E0008", ", 該筆已確認，請先訂正L4321 ");
 				} else {

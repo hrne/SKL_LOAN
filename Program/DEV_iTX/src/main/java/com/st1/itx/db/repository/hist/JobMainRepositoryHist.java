@@ -198,5 +198,17 @@ public interface JobMainRepositoryHist extends JpaRepository<JobMain, JobMainId>
   @Procedure(value = "\"Usp_L7_LoanIfrsJp_Upd\"")
   public void uspL7LoanifrsjpUpd(int tbsdyf,  String empNo);
 
+  // (月底日日終批次)維護 MonthlyLM052AssetClass
+  @Procedure(value = "\"Usp_L9_MonthlyLM052AssetClass_Ins\"")
+  public void uspL9Monthlylm052assetclassIns(int TYYMM, String EmpNo);
+
+  // (月底日日終批次)維護 MonthlyLM052LoanAsset
+  @Procedure(value = "\"Usp_L9_MonthlyLM052LoanAsset_Ins\"")
+  public void uspL9Monthlylm052loanassetIns(int TYYMM, String EmpNo);
+
+  // (月底日日終批次)維護 MonthlyLM052Ovdu
+  @Procedure(value = "\"Usp_L9_MonthlyLM052Ovdu_Ins\"")
+  public void uspL9Monthlylm052ovduIns(int TYYMM, String EmpNo);
+
 }
 

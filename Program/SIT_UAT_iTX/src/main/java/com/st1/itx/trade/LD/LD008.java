@@ -2,8 +2,6 @@ package com.st1.itx.trade.LD;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -13,25 +11,24 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 
-@Service("LD008")
-@Scope("prototype")
 /**
- * 
+ * LD008
  * 
  * @author ChihWei
  * @version 1.0.0
  */
+@Service("LD008")
+@Scope("prototype")
 public class LD008 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LD008.class);
-	
-	String TXCD = "LD008";
-	
+
+	String tranCode = "LD008";
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active "+ TXCD);
+		this.info("active " + tranCode);
 		this.totaVo.init(titaVo);
 
-		MySpring.newTask(TXCD+"p", this.txBuffer, titaVo);
+		MySpring.newTask(tranCode + "p", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

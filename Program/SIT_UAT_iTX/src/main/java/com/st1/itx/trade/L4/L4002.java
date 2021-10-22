@@ -447,6 +447,15 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 				} else {
+					// 可訂正筆數
+					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
+							|| tBatxDetail.getProcStsCode().equals("7")) {
+						if (canEraseCnt.containsKey(grp3)) {
+							canEraseCnt.put(grp3, canEraseCnt.get(grp3) + 1);
+						} else {
+							canEraseCnt.put(grp3, 1);
+						}
+					}
 					// 可檢核筆數
 					if (tBatxDetail.getProcStsCode().equals("0") || tBatxDetail.getProcStsCode().equals("3")) {
 						if (canCheckCnt.containsKey(grp3)) {

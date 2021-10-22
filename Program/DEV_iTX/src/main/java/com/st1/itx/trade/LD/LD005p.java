@@ -13,16 +13,15 @@ import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
-@Service("LD005p")
-@Scope("prototype")
 /**
- * 
+ * LD005p
  * 
  * @author ChihWei
  * @version 1.0.0
  */
+@Service("LD005p")
+@Scope("prototype")
 public class LD005p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LD005p.class);
 
 	@Autowired
 	LD005Report lD005Report;
@@ -31,17 +30,17 @@ public class LD005p extends TradeBuffer {
 	DateUtil dDateUtil;
 
 	@Autowired
-	public WebClient webClient;
-	
-	String TXCD = "LD005";
-	String TXName = "暫收支票收據列印(個人戶)";
+	WebClient webClient;
+
+	String tranCode = "LD005";
+	String tranName = "暫收支票收據列印(個人戶)";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active " + TXCD + "p");
+		this.info("active " + tranCode + "p");
 		this.totaVo.init(titaVo);
 
-		this.info(TXCD + "p titaVo.getTxcd() = " + titaVo.getTxcd());
+		this.info(tranCode + "p titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 
 		lD005Report.setParentTranCode(parentTranCode);
@@ -50,10 +49,10 @@ public class LD005p extends TradeBuffer {
 
 		if (isFinish) {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "已完成", titaVo);
+					titaVo.getParam("TLRNO"), tranCode + tranName + "已完成", titaVo);
 		} else {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), TXCD + TXName + "查無資料", titaVo);
+					titaVo.getParam("TLRNO"), tranCode + tranName + "查無資料", titaVo);
 		}
 
 		this.addList(this.totaVo);

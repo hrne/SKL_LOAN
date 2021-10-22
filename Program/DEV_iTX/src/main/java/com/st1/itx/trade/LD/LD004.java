@@ -11,25 +11,24 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 
-@Service("LD004")
-@Scope("prototype")
 /**
- * 
+ * LD004
  * 
  * @author ChihWei
  * @version 1.0.0
  */
+@Service("LD004")
+@Scope("prototype")
 public class LD004 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(LD004.class);
-	
-	String TXCD = "LD004";
-	
+
+	String tranCode = "LD004";
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active "+ TXCD);
+		this.info("active " + tranCode);
 		this.totaVo.init(titaVo);
 
-		MySpring.newTask(TXCD+"p", this.txBuffer, titaVo);
+		MySpring.newTask(tranCode + "p", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

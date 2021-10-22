@@ -59,6 +59,9 @@ public interface NegMainRepositoryHist extends JpaRepository<NegMain, NegMainId>
   // CustNo= , AND ApplDate= , AND MainFinCode= 
   public Optional<NegMain> findTopByCustNoIsAndApplDateIsAndMainFinCodeIsOrderByCustNoDescCaseSeqDesc(int custNo_0, int applDate_1, String mainFinCode_2);
 
+  // CustNo= , AND CaseKindCode= 
+  public Slice<NegMain> findAllByCustNoIsAndCaseKindCodeIsOrderByCaseSeqDesc(int custNo_0, String caseKindCode_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

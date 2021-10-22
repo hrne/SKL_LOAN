@@ -29,7 +29,7 @@ public class BatxRateChange implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3525740809133420958L;
+	private static final long serialVersionUID = -1055386299672988675L;
 
 @EmbeddedId
   private BatxRateChangeId batxRateChangeId;
@@ -51,7 +51,7 @@ public class BatxRateChange implements Serializable {
   private int bormNo = 0;
 
   // 作業項目
-  /* 1.定期機動調整2.指數型利率調整3.機動利率調整4.員工利率調整5.按商品別調整 */
+  /* CdCode:TxKind1.定期機動調整2.指數型利率調整3.機動利率調整4.員工利率調整5.按商品別調整 */
   @Column(name = "`TxKind`")
   private int txKind = 0;
 
@@ -83,7 +83,7 @@ public class BatxRateChange implements Serializable {
   private int rateKeyInCode = 0;
 
   // 確認記號
-  /* 0.未確認1.已確認L4321維護，確認後Table欄位不可更改 */
+  /* 0.未確認1.確認未放行2.已確認放行L4321維護，確認後Table欄位不可更改 */
   @Column(name = "`ConfirmFlag`")
   private int confirmFlag = 0;
 
@@ -118,7 +118,7 @@ public class BatxRateChange implements Serializable {
   private int prevIntDate = 0;
 
   // 戶別
-  /* 共用代碼檔0:個金1:企金2:企金自然人 */
+  /* CdCode:EntCode0:個金1:企金2:企金自然人 */
   @Column(name = "`CustCode`")
   private int custCode = 0;
 
@@ -163,12 +163,12 @@ public class BatxRateChange implements Serializable {
   private BigDecimal individualIncr = new BigDecimal("0");
 
   // 指標利率代碼
-  /* 共用代碼檔CdDef.DefCd=ProdBaseRateCode01.保單分紅利率02.郵政儲金利率 99.自訂利率RateType */
+  /* CdCode:ProdBaseRateCode01.保單分紅利率02.郵政儲金利率 99.自訂利率RateType */
   @Column(name = "`BaseRateCode`", length = 2)
   private String baseRateCode;
 
   // 利率區分
-  /* 共用代碼檔CdDef.DefCd=FacmRateCode1:機動2:固定3:定期機動 */
+  /* CdCode:FacmRateCode1:機動2:固定3:定期機動 */
   @Column(name = "`RateCode`", length = 1)
   private String rateCode;
 
@@ -189,6 +189,18 @@ public class BatxRateChange implements Serializable {
   // jason格式紀錄欄
   @Column(name = "`JsonFields`", length = 300)
   private String jsonFields;
+
+  // 逾期期數
+  @Column(name = "`OvduTerm`")
+  private int ovduTerm = 0;
+
+  // 經辦
+  @Column(name = "`TitaTlrNo`", length = 6)
+  private String titaTlrNo;
+
+  // 交易序號
+  @Column(name = "`TitaTxtNo`", length = 8)
+  private String titaTxtNo;
 
   // 建檔日期時間
   @CreatedDate
@@ -295,7 +307,8 @@ public class BatxRateChange implements Serializable {
 
 /**
 	* 作業項目<br>
-	* 1.定期機動調整
+	* CdCode:TxKind
+1.定期機動調整
 2.指數型利率調整
 3.機動利率調整
 4.員工利率調整
@@ -308,7 +321,8 @@ public class BatxRateChange implements Serializable {
 
 /**
 	* 作業項目<br>
-	* 1.定期機動調整
+	* CdCode:TxKind
+1.定期機動調整
 2.指數型利率調整
 3.機動利率調整
 4.員工利率調整
@@ -449,7 +463,8 @@ public class BatxRateChange implements Serializable {
 /**
 	* 確認記號<br>
 	* 0.未確認
-1.已確認
+1.確認未放行
+2.已確認放行
 L4321維護，確認後Table欄位不可更改
 	* @return Integer
 	*/
@@ -460,7 +475,8 @@ L4321維護，確認後Table欄位不可更改
 /**
 	* 確認記號<br>
 	* 0.未確認
-1.已確認
+1.確認未放行
+2.已確認放行
 L4321維護，確認後Table欄位不可更改
   *
   * @param confirmFlag 確認記號
@@ -604,7 +620,7 @@ L4321維護，確認後Table欄位不可更改
 
 /**
 	* 戶別<br>
-	* 共用代碼檔
+	* CdCode:EntCode
 0:個金
 1:企金
 2:企金自然人
@@ -616,7 +632,7 @@ L4321維護，確認後Table欄位不可更改
 
 /**
 	* 戶別<br>
-	* 共用代碼檔
+	* CdCode:EntCode
 0:個金
 1:企金
 2:企金自然人
@@ -800,7 +816,7 @@ L4321維護，確認後Table欄位不可更改
 
 /**
 	* 指標利率代碼<br>
-	* 共用代碼檔CdDef.DefCd=ProdBaseRateCode
+	* CdCode:ProdBaseRateCode
 01.保單分紅利率
 02.郵政儲金利率 
 99.自訂利率
@@ -813,7 +829,7 @@ RateType
 
 /**
 	* 指標利率代碼<br>
-	* 共用代碼檔CdDef.DefCd=ProdBaseRateCode
+	* CdCode:ProdBaseRateCode
 01.保單分紅利率
 02.郵政儲金利率 
 99.自訂利率
@@ -827,7 +843,7 @@ RateType
 
 /**
 	* 利率區分<br>
-	* 共用代碼檔CdDef.DefCd=FacmRateCode
+	* CdCode:FacmRateCode
 1:機動
 2:固定
 3:定期機動
@@ -839,7 +855,7 @@ RateType
 
 /**
 	* 利率區分<br>
-	* 共用代碼檔CdDef.DefCd=FacmRateCode
+	* CdCode:FacmRateCode
 1:機動
 2:固定
 3:定期機動
@@ -927,6 +943,63 @@ RateType
   }
 
 /**
+	* 逾期期數<br>
+	* 
+	* @return Integer
+	*/
+  public int getOvduTerm() {
+    return this.ovduTerm;
+  }
+
+/**
+	* 逾期期數<br>
+	* 
+  *
+  * @param ovduTerm 逾期期數
+	*/
+  public void setOvduTerm(int ovduTerm) {
+    this.ovduTerm = ovduTerm;
+  }
+
+/**
+	* 經辦<br>
+	* 
+	* @return String
+	*/
+  public String getTitaTlrNo() {
+    return this.titaTlrNo == null ? "" : this.titaTlrNo;
+  }
+
+/**
+	* 經辦<br>
+	* 
+  *
+  * @param titaTlrNo 經辦
+	*/
+  public void setTitaTlrNo(String titaTlrNo) {
+    this.titaTlrNo = titaTlrNo;
+  }
+
+/**
+	* 交易序號<br>
+	* 
+	* @return String
+	*/
+  public String getTitaTxtNo() {
+    return this.titaTxtNo == null ? "" : this.titaTxtNo;
+  }
+
+/**
+	* 交易序號<br>
+	* 
+  *
+  * @param titaTxtNo 交易序號
+	*/
+  public void setTitaTxtNo(String titaTxtNo) {
+    this.titaTxtNo = titaTxtNo;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -1010,7 +1083,8 @@ RateType
            + ", totBalance=" + totBalance + ", loanBalance=" + loanBalance + ", presEffDate=" + presEffDate + ", curtEffDate=" + curtEffDate + ", preNextAdjDate=" + preNextAdjDate + ", preNextAdjFreq=" + preNextAdjFreq
            + ", prevIntDate=" + prevIntDate + ", custCode=" + custCode + ", prodNo=" + prodNo + ", rateIncr=" + rateIncr + ", contractRate=" + contractRate + ", presentRate=" + presentRate
            + ", proposalRate=" + proposalRate + ", adjustedRate=" + adjustedRate + ", contrBaseRate=" + contrBaseRate + ", contrRateIncr=" + contrRateIncr + ", individualIncr=" + individualIncr + ", baseRateCode=" + baseRateCode
-           + ", rateCode=" + rateCode + ", currBaseRate=" + currBaseRate + ", txEffectDate=" + txEffectDate + ", txRateAdjFreq=" + txRateAdjFreq + ", jsonFields=" + jsonFields + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", rateCode=" + rateCode + ", currBaseRate=" + currBaseRate + ", txEffectDate=" + txEffectDate + ", txRateAdjFreq=" + txRateAdjFreq + ", jsonFields=" + jsonFields + ", ovduTerm=" + ovduTerm
+           + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

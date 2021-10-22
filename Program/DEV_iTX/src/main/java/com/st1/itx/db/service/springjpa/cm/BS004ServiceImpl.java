@@ -41,10 +41,10 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<BS004Vo> compareProdNo(int quitDate, TitaVo titaVo) throws Exception {
 // 商品代碼 ProdNo  VARCHAR2(5) 
-//  if 產品為員工優惠貸款
+//  if 產品為員工優惠貸款 , <>  EO 員工利率-一般客戶 11-退休員工
 //     if    1.身份變更        任用狀況碼 <> 1,4
 //       ||  2. 退休屆滿5年    任用狀況碼 = 5 & QUIT_DATE 離職/停約日 <  本日減5年
-//                        
+//                           
 // 業務線別 CommLineType	VARCHAR2(1)	 			 
 //      0:單位報備
 //      1:在職
@@ -53,7 +53,6 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 //      4:留職停薪 
 //      5:退休離職
 //      9:未報聘/內勤 
-//  EO 員工利率-一般客戶 => 不寫入
 
 		String queryttext = "select NEW com.st1.itx.util.common.data.BS004Vo";
 		queryttext += "(a.custNo, a.facmNo, a.bormNo, ' ') ";
@@ -63,8 +62,8 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += "left join CdEmp e on e.employeeNo = c.empNo ";
 		queryttext += "left join FacProd p on p.prodNo = f.prodNo ";
 		queryttext += "where a.status in (0,4) "; // 戶況 0: 正常戶, 4: 逾期戶
-		queryttext += "  and f.prodNo not in ('EO') "; // EO 員工利率-一般客戶
-		queryttext += "  and p.empFlag = 'Y' "; // EmpFlag=Y 員工優惠貸款
+		queryttext += "  and f.prodNo not in ('EO','11') "; // EO 員工利率-一般客戶 11-退休員工 
+		queryttext += "  and p.empFlag = 'Y' "; // EmpFlag=Y 員工專案貸款
 		queryttext += "  and e.commLineType is not null ";
 		queryttext += "  and (   (e.commLineType not in ('1','4','5')) ";
 		queryttext += "       or (e.commLineType ='5' and e.quitDate < " + quitDate + " ))";
@@ -80,7 +79,7 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 	/* 客戶檔客戶別與員工檔比對不符清單 */
 	@SuppressWarnings("unchecked")
 	public List<BS004Vo> compareCustTyp() throws Exception {
-//　if 業務線別 <> 1,4 && 客戶別 = 01,09 ==> 比對不符清單
+//　if 業務線別 <> 1,4,5  && 客戶別 = 01,09 ==> 比對不符清單
 // 	CommLineType	VARCHAR2(1)	 		
 //  業務線別	 
 //      0:單位報備
@@ -109,7 +108,9 @@ public class BS004ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += "  and c.custNo > 0 ";
 		queryttext += "  and f.utilAmt > 0 ";
 		queryttext += "  and e.commLineType is not null";
-		queryttext += "  and not e.commLineType in ('1','4') ";
+		queryttext += "  and not e.commLineType in ('1','4','5') ";
+		queryttext += "group by c.custNo, c.custId ";
+		
 		this.info("queryttext=" + queryttext);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("jobMainService")
 @Repository
-public class JobMainServiceImpl implements JobMainService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(JobMainServiceImpl.class);
-
+public class JobMainServiceImpl extends ASpringJpaParm implements JobMainService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class JobMainServiceImpl implements JobMainService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + jobMainId);
+    this.info("findById " + dbName + " " + jobMainId);
     Optional<JobMain> jobMain = null;
     if (dbName.equals(ContentName.onDay))
       jobMain = jobMainReposDay.findById(jobMainId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ExecDate", "JobCode"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ExecDate", "JobCode"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = jobMainReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -118,7 +114,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jobMainId);
+    this.info("Hold " + dbName + " " + jobMainId);
     Optional<JobMain> jobMain = null;
     if (dbName.equals(ContentName.onDay))
       jobMain = jobMainReposDay.findByJobMainId(jobMainId);
@@ -136,7 +132,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + jobMain.getJobMainId());
+    this.info("Hold " + dbName + " " + jobMain.getJobMainId());
     Optional<JobMain> jobMainT = null;
     if (dbName.equals(ContentName.onDay))
       jobMainT = jobMainReposDay.findByJobMainId(jobMain.getJobMainId());
@@ -158,7 +154,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + jobMain.getJobMainId());
+    this.info("Insert..." + dbName + " " + jobMain.getJobMainId());
     if (this.findById(jobMain.getJobMainId()) != null)
       throw new DBException(2);
 
@@ -187,7 +183,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + jobMain.getJobMainId());
+    this.info("Update..." + dbName + " " + jobMain.getJobMainId());
     if (!empNot.isEmpty())
       jobMain.setLastUpdateEmpNo(empNot);
 
@@ -210,7 +206,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + jobMain.getJobMainId());
+    this.info("Update..." + dbName + " " + jobMain.getJobMainId());
     if (!empNot.isEmpty())
       jobMain.setLastUpdateEmpNo(empNot);
 
@@ -230,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + jobMain.getJobMainId());
+    this.info("Delete..." + dbName + " " + jobMain.getJobMainId());
     if (dbName.equals(ContentName.onDay)) {
       jobMainReposDay.delete(jobMain);	
       jobMainReposDay.flush();
@@ -259,7 +255,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (JobMain t : jobMain){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -294,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (jobMain == null || jobMain.size() == 0)
       throw new DBException(6);
 
@@ -323,7 +319,7 @@ em = null;
 
   @Override
   public void deleteAll(List<JobMain> jobMain, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)
@@ -1034,6 +1030,54 @@ em = null;
       jobMainReposHist.uspL7LoanifrsjpUpd(tbsdyf,  empNo);
    else
       jobMainRepos.uspL7LoanifrsjpUpd(tbsdyf,  empNo);
+  }
+
+  @Override
+  public void Usp_L9_MonthlyLM052AssetClass_Ins(int TYYMM, String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL9Monthlylm052assetclassIns(TYYMM, EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL9Monthlylm052assetclassIns(TYYMM, EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL9Monthlylm052assetclassIns(TYYMM, EmpNo);
+   else
+      jobMainRepos.uspL9Monthlylm052assetclassIns(TYYMM, EmpNo);
+  }
+
+  @Override
+  public void Usp_L9_MonthlyLM052LoanAsset_Ins(int TYYMM, String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL9Monthlylm052loanassetIns(TYYMM, EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL9Monthlylm052loanassetIns(TYYMM, EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL9Monthlylm052loanassetIns(TYYMM, EmpNo);
+   else
+      jobMainRepos.uspL9Monthlylm052loanassetIns(TYYMM, EmpNo);
+  }
+
+  @Override
+  public void Usp_L9_MonthlyLM052Ovdu_Ins(int TYYMM, String EmpNo, TitaVo... titaVo) {
+    String dbName = "";
+    
+    if (titaVo.length != 0)
+    dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    if (dbName.equals(ContentName.onDay))
+      jobMainReposDay.uspL9Monthlylm052ovduIns(TYYMM, EmpNo);
+    else if (dbName.equals(ContentName.onMon))
+      jobMainReposMon.uspL9Monthlylm052ovduIns(TYYMM, EmpNo);
+    else if (dbName.equals(ContentName.onHist))
+      jobMainReposHist.uspL9Monthlylm052ovduIns(TYYMM, EmpNo);
+   else
+      jobMainRepos.uspL9Monthlylm052ovduIns(TYYMM, EmpNo);
   }
 
 }

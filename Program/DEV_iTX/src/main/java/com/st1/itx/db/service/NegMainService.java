@@ -179,6 +179,18 @@ public interface NegMainService {
   public NegMain custNoAndApplDateFirst(int custNo_0, int applDate_1, String mainFinCode_2, TitaVo... titaVo);
 
   /**
+   * CustNo= , AND CaseKindCode= 
+   *
+   * @param custNo_0 custNo_0
+   * @param caseKindCode_1 caseKindCode_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice NegMain NegMain of List
+   */
+  public Slice<NegMain> forLetter(int custNo_0, String caseKindCode_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By NegMain
    * 
    * @param negMainId key

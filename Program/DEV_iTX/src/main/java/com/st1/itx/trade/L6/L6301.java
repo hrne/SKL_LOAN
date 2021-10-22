@@ -122,7 +122,7 @@ public class L6301 extends TradeBuffer {
 				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指指標利率種類");
 			}
 
-			if (!titaVo.isActfgSuprele() && tCdCode.getEffectFlag() == 2) {
+			if (!titaVo.isActfgSuprele() && tCdCode.getEffectFlag() == 1) {
 				throw new LogicException(titaVo, "", "未放行交易不可修改/刪除");
 			}
 			
@@ -147,7 +147,7 @@ public class L6301 extends TradeBuffer {
 				throw new LogicException(titaVo, "", "請先至L6302刪除指標利率，才可修改/刪除指標利率種類");
 			}
 			
-			if (!titaVo.isActfgSuprele() && tCdCode.getEffectFlag() == 2) {
+			if (!titaVo.isActfgSuprele() && tCdCode.getEffectFlag() == 1) {
 				throw new LogicException(titaVo, "", "未放行交易不可修改/刪除");
 			}
 

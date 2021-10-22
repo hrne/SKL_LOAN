@@ -2,8 +2,6 @@ package com.st1.itx.trade.LC;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -13,16 +11,15 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.tradeService.TradeBuffer;
 
-@Service("LC700")
-@Scope("prototype")
 /**
- * 批次換日,發動日終維護
+ * 發動每日夜間批次
  * 
  * @author ChihWei
  * @version 1.0.0
  */
+@Service("LC700")
+@Scope("prototype")
 public class LC700 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LC700.class);
 
 	@Autowired
 	LC800 sLC800;
@@ -37,11 +34,13 @@ public class LC700 extends TradeBuffer {
 
 		this.info("LC700 iEntday = " + iEntday);
 
-		// 更新日期檔
+		// 更新批次日期檔
 		sLC800.proc(titaVo, "BATCH", iEntday);
 
-		this.info("LC700 每日執行 endOfDayFlow");
+		this.info("LC700 每日夜間批次 eodFlow");
 
+		// 每日夜間批次程式，參考文件.\itxConfig\spring\batch\eodFlow.xml
+		// EOD : End Of Day
 		titaVo.setBatchJobId("eodFlow");
 
 		this.info("LC700 exit.");
