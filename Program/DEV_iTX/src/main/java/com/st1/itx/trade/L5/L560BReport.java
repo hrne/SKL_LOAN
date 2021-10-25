@@ -161,7 +161,7 @@ public class L560BReport extends MakeReport {
 			String iDateString = "";
 			BigDecimal iCount = new BigDecimal("0");
 			BigDecimal iMonthes = new BigDecimal(gapMonth);
-			for (int i= 1;i<=7;i++) {
+			for (int i= 1;i<=gapMonth;i++) {
 				iDateUtil.init();
 				iDateUtil.setDate_1(aPayIntDate);
 				iDateUtil.setMons(i);
@@ -169,7 +169,7 @@ public class L560BReport extends MakeReport {
 				String sYyy = sPayIntDate.substring(0,3);
 				String sMm = sPayIntDate.substring(3,5);
 				String sDd = sPayIntDate.substring(5);
-				if (i!=7) {
+				if (i!=gapMonth) {
 					iDateString = iDateString+sYyy+ "年"+sMm+"月"+sDd+"日、";
 				}else {
 					iDateString = iDateString+sYyy+ "年"+sMm+"月"+sDd+"日";

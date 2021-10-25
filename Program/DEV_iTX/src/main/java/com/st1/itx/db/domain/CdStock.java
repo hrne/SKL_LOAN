@@ -27,7 +27,7 @@ public class CdStock implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -8267851327394501651L;
+	private static final long serialVersionUID = -5332886958434659955L;
 
 // 股票代號
   @Id
@@ -58,6 +58,11 @@ public class CdStock implements Serializable {
   // 三個月平均價
   @Column(name = "`ThreeMonthAvg`")
   private BigDecimal threeMonthAvg = new BigDecimal("0");
+
+  // 上市上櫃記號
+  /* 1:上市2:上櫃 */
+  @Column(name = "`StockType`")
+  private int stockType = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -212,6 +217,27 @@ public class CdStock implements Serializable {
   }
 
 /**
+	* 上市上櫃記號<br>
+	* 1:上市
+2:上櫃
+	* @return Integer
+	*/
+  public int getStockType() {
+    return this.stockType;
+  }
+
+/**
+	* 上市上櫃記號<br>
+	* 1:上市
+2:上櫃
+  *
+  * @param stockType 上市上櫃記號
+	*/
+  public void setStockType(int stockType) {
+    this.stockType = stockType;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -291,6 +317,7 @@ public class CdStock implements Serializable {
   @Override
   public String toString() {
     return "CdStock [stockCode=" + stockCode + ", stockItem=" + stockItem + ", stockCompanyName=" + stockCompanyName + ", currency=" + currency + ", ydClosePrice=" + ydClosePrice + ", monthlyAvg=" + monthlyAvg
-           + ", threeMonthAvg=" + threeMonthAvg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", threeMonthAvg=" + threeMonthAvg + ", stockType=" + stockType + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

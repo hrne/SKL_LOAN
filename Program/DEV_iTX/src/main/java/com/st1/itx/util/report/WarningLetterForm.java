@@ -1,4 +1,4 @@
-package com.st1.itx.trade.report;
+package com.st1.itx.util.report;
 
 import java.util.HashMap;
 
@@ -9,10 +9,10 @@ import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 
-@Component("warningLetter")
+@Component("warningLetterForm")
 @Scope("prototype")
 
-public class WarningLetter extends MakeReport {
+public class WarningLetterForm extends MakeReport {
 	// 自訂表頭
 	@Override
 	public void printHeader() {
@@ -31,7 +31,7 @@ public class WarningLetter extends MakeReport {
 		String iCustNo = titaVo.getParam("OOCustNo");
 		
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "催收存證信函", "", "郵局存證信函2021格式.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "催收存證信函"+iCustNo, "", "郵局存證信函2021格式.pdf");
 
 		newP(titaVo, map);
 

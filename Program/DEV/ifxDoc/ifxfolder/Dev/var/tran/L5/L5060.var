@@ -468,8 +468,8 @@ ifxBatch:{
 	rim:'L560A',
 	txtno:'#secret-no',
 	pfnx:"L5060.PFNX",
-	col_captions:["執行狀態"],
-	col_names:["#batch-row-status"]
+	col_captions:["戶號","額度","執行狀態"],
+	col_names:["#OOCustNo","#OOFacmNo","#batch-row-status"]
 	}
 }
 #secret-no
@@ -514,8 +514,8 @@ ifxBatch:{
 	rim:'L560B',
 	txtno:'#secret-no',
 	pfnx:"L5060.PFNX",
-	col_captions:["執行狀態"],
-	col_names:["#batch-row-status"]
+	col_captions:["戶號","執行狀態"],
+	col_names:["#OOCustNo","#batch-row-status"]
 	}
 }
 #secret-no

@@ -44,19 +44,20 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT \"YearMonth\" ";
 		sql += "      , SUM(\"Counts\") AS \"Counts\" ";
 		sql += " FROM ( ";
-		sql += "     SELECT TRUNC(FCA.\"ApproveDate\" / 100 ) AS \"YearMonth\" "; // F0 資料年月
+		sql += "     SELECT TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) AS \"YearMonth\" "; // F0 資料年月
 		sql += "         , 1                                  AS \"Counts\" "; // F1 件數
 		sql += "     FROM \"FacCaseAppl\" FCA ";
 		sql += "     LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FCA.\"ApplNo\" ";
 		sql += "     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
 		sql += "     WHERE FCA.\"BranchNo\" = '0000' ";
 		sql += "       AND FCA.\"ApproveDate\" > 0 ";
+		sql += "       AND FAC.\"FirstDrawdownDate\" > 0 ";
 		sql += "       AND FCA.\"ProcessCode\" = '1' ";
 		sql += "       AND NVL(FAC.\"CustNo\",0) != 0 ";
 		sql += "       AND CM.\"EntCode\" = '0' ";
 		sql += "       AND NVL(FCA.\"PieceCode\",' ') NOT IN ('3','5','7','C','E') ";
-		sql += "       AND TRUNC(FCA.\"ApproveDate\" / 100 ) >= :startMonth ";
-		sql += "       AND TRUNC(FCA.\"ApproveDate\" / 100 ) <= :endMonth ";
+		sql += "       AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) >= :startMonth ";
+		sql += "       AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) <= :endMonth ";
 		sql += "     UNION ALL ";
 		sql += "     SELECT \"YearMonth\" ";
 		sql += "         , 0 AS \"Counts\" ";
@@ -93,24 +94,25 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("LM036ServiceImpl endMonth = " + endMonth);
 
 		String sql = "";
-		sql += " SELECT TRUNC(FCA.\"ApproveDate\" / 100 ) AS \"YearMonth\" "; // F0 資料年月
+		sql += " SELECT TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) AS \"YearMonth\" "; // F0 資料年月
 		sql += "      , SUM(NVL(LBM.\"DrawdownAmt\",0))   AS \"Counts\" "; // F1 件數
 		sql += " FROM \"FacCaseAppl\" FCA ";
 		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FCA.\"ApplNo\" ";
 		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = FAC.\"CustNo\" ";
 		sql += "                              AND LBM.\"FacmNo\" = FAC.\"FacmNo\" ";
-		sql += "                              AND TRUNC(LBM.\"DrawdownDate\" / 100 ) = TRUNC(FCA.\"ApproveDate\" / 100 )  ";
+		sql += "                              AND TRUNC(LBM.\"DrawdownDate\" / 100 ) = TRUNC(FAC.\"FirstDrawdownDate\" / 100 )  ";
 		sql += " WHERE FCA.\"BranchNo\" = '0000' ";
 		sql += "   AND FCA.\"ApproveDate\" > 0 ";
+		sql += "   AND FAC.\"FirstDrawdownDate\" > 0 ";
 		sql += "   AND FCA.\"ProcessCode\" = '1' ";
 		sql += "   AND NVL(FAC.\"CustNo\",0) != 0 ";
 		sql += "   AND CM.\"EntCode\" = '0' ";
 		sql += "   AND NVL(FCA.\"PieceCode\",' ') NOT IN ('3','5','7','C','E') ";
-		sql += "   AND TRUNC(FCA.\"ApproveDate\" / 100 ) >= :startMonth ";
-		sql += "   AND TRUNC(FCA.\"ApproveDate\" / 100 ) <= :endMonth ";
-		sql += " GROUP BY TRUNC(FCA.\"ApproveDate\" / 100 ) ";
-		sql += " ORDER BY TRUNC(FCA.\"ApproveDate\" / 100 )";
+		sql += "   AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) >= :startMonth ";
+		sql += "   AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) <= :endMonth ";
+		sql += " GROUP BY TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) ";
+		sql += " ORDER BY TRUNC(FAC.\"FirstDrawdownDate\" / 100 )";
 
 		this.info("sql=" + sql);
 

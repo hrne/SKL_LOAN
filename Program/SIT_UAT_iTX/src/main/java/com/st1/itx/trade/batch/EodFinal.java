@@ -5,13 +5,15 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.tradeService.BatchBase;
-import com.st1.itx.util.MySpring;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 
 @Service("EodFinal")
 @Scope("step")
@@ -22,6 +24,12 @@ import com.st1.itx.util.MySpring;
  * @version 1.0.0
  */
 public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
+
+	@Autowired
+	DateUtil dDateUtil;
+
+	@Autowired
+	WebClient webClient;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -44,8 +52,8 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 		// 帳務日
 		int tbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 		// 月底日
-		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
-//		int mfbsdyf = this.txBuffer.getTxCom().getTbsdyf();
+//		int mfbsdyf = this.txBuffer.getTxCom().getMfbsdyf();
+		int mfbsdyf = this.txBuffer.getTxCom().getTbsdyf();
 
 		// 此為日終維護,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
@@ -57,8 +65,11 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 		if (tbsdyf == mfbsdyf) {
 			this.info("EodFinal 本日為月底日,執行月底日日終維護.");
 
-			MySpring.newTask("LC701", this.txBuffer, titaVo);
+//			MySpring.newTask("LC701", this.txBuffer, titaVo);
 
+			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC701",
+					titaVo.getTlrNo(), "本日為月底日,執行LC701月底日日終維護", titaVo);
+			
 			String yearMonth = String.valueOf((tbsdyf / 100));
 
 			if (yearMonth.length() >= 2) {
@@ -66,9 +77,12 @@ public class EodFinal extends BatchBase implements Tasklet, InitializingBean {
 
 				// 每年年底日才執行
 				if (yearMonth.equals("12")) {
-					this.info("EodFinal 本日為年底日,執行月底日日終維護.");
+					this.info("EodFinal 本日為年底日,執行年底日日終維護.");
 
-					MySpring.newTask("LC702", this.txBuffer, titaVo);
+//					MySpring.newTask("LC702", this.txBuffer, titaVo);
+					
+					webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getTlrNo(), "Y", "LC702",
+							titaVo.getTlrNo(), "本日為年底日,執行LC702年底日日終維護", titaVo);
 				}
 			}
 		}
