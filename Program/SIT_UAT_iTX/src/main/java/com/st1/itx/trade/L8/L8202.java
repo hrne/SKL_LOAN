@@ -56,7 +56,7 @@ public class L8202 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		
 		//執行交易
-		MySpring.newTask("BS820",this.txBuffer,titaVo);
+		MySpring.newTask("L8202Batch",this.txBuffer,titaVo);
 		this.addList(this.totaVo);
 		return this.sendList(); 
 	}

@@ -400,9 +400,9 @@ T(H,#OOInsuCompany,#InsuCompanyHelp)
 
 #OOInsuEndDate=D,7,O
 
-#OOL4610Flag=A,1,O
+#OOPrevInsuNo=X,16,O
 
-#OOL4611Flag=A,1,O
+#OOBtnFlag=A,1,O
 
 
 !查詢
@@ -423,15 +423,14 @@ T(3,擔保品;L2038 擔保品明細資料查詢)
 BIND(grid,{ cmd=CHAIN; ntxcd=L2038;text=#BTN1_TXNM;ntxbuf=#BTN1_BUF})
 
 #BTN2_BUF=X,50,S
-T(2,5+#OOClCode1+#OOClCode2+#OOClNo+#OONowInsuNo+#OOEndoInsuNo+2)
+C(3,#OOBtnFlag,1,$,T(2,5+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+2))
 
 #BTN2_TXNM=X,50,S
-T(3,續保;L4611 保險單明細資料登錄)
+C(3,#OOBtnFlag,1,T(3,保單;L4610 保險單明細資料登錄),T(3,保單;L4611 續約保單資料維護))
 
 #OO_BTN2_COL=X,1,S
-BIND(grid,{ cmd=CHAIN; ntxcd=L4611;text=#BTN2_TXNM;ntxbuf=#BTN2_BUF})
-C(3,#OOL4611Flag,1,$,BIND(grid,cancel))
-
+C(3,#OOBtnFlag,1,BIND(grid,{ cmd=CHAIN; ntxcd=L4610;text=#BTN2_TXNM;ntxbuf=#BTN2_BUF}),$)
+C(3,#OOBtnFlag,2,BIND(grid,{ cmd=CHAIN; ntxcd=L4611;text=#BTN2_TXNM;ntxbuf=#BTN2_BUF}),$)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 
 </sub>
@@ -475,8 +474,8 @@ TXFORM=L4965
 #OOEthqInsuPrem
 #OOInsuStartDate
 #OOInsuEndDate
-#OOL4610Flag
-#OOL4611Flag
+#OOPrevInsuNo
+#OOBtnFlag
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L2R05.tom"/>
@@ -498,8 +497,8 @@ TXFORM=L4965
 
 #OO_BTN1_COL=擔保品
 {width:60,search:false,formatter:'cust:bind-button:擔保品',align:'center',canExport:false}
-#OO_BTN2_COL=新保
-{width:50,search:false,formatter:'cust:bind-button:新保',align:'center',canExport:false}
+#OO_BTN2_COL=保單
+{width:50,search:false,formatter:'cust:bind-button:保單',align:'center',canExport:false}
 
 #OOCustNo=戶號
 {width:50,align:'center'}

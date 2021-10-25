@@ -548,9 +548,9 @@ TXFORM=L3911
 ["@放款餘額",#OLoanBalX],
 ["@應繳日",#OSpecificDd],
 ["@入帳日期",#OIntStartDate,"@~",#OIntEndDate], 
-["@利率",#OStoreRate1X,#OEffectDate1X],
-["@",#OStoreRate2X,#OEffectDate2X],
-["@",#OStoreRate3X,#OEffectDate3X],
+["@利率",#OStoreRate1X,"生效日",#OEffectDate1X],
+["@",#OStoreRate2X,"@@@@@@",#OEffectDate2X],
+["@",#OStoreRate3X,"@@@@@@",#OEffectDate3X],
 ]
 </sub>
 

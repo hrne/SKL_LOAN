@@ -268,14 +268,15 @@ public class L2631 extends TradeBuffer {
 			pdfSnoF = doRpt(titaVo, tFacClose);
 			this.info("PdfSnoF 清償作業: " + pdfSnoF);
 
+			try {
+				sFacCloseService.update(BeforeFacClose, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "清償作業檔");
+			}
 		}
 
 		// 更新領取記號
-		try {
-			sFacCloseService.update(BeforeFacClose, titaVo);
-		} catch (DBException e) {
-			throw new LogicException("E0005", "清償作業檔");
-		}
+
 		this.totaVo.putParam("OCloseNo", wkcloseNo);
 
 		this.addList(this.totaVo);

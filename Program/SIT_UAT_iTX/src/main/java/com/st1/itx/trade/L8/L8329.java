@@ -90,7 +90,7 @@ public class L8329 extends TradeBuffer {
 		String iPayStatus = titaVo.getParam("PayStatus");
 		String iKey = "";
 		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD(檔案報送日)
-		// JcicZ450
+		// JcicZ450, JcicZ446, JcicZ447
 		JcicZ450 iJcicZ450 = new JcicZ450();
 		JcicZ450Id iJcicZ450Id = new JcicZ450Id();
 		iJcicZ450Id.setSubmitKey(iSubmitKey);
@@ -114,43 +114,65 @@ public class L8329 extends TradeBuffer {
 
 		// 檢核項目(D-58)
 		if (!"4".equals(iTranKey_Tmp)) {
-			// 2 start
-			// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否曾報送過「'447':金融機構無擔保債務協議資料」，若不存在或已報送結案，予以剔退處理。
-			iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
-			if (iJcicZ447 == null || "D".equals(iJcicZ447.getTranKey())) {
-				throw new LogicException(titaVo, "E0005",
-						"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
-			}
-			if ("A".equals(iTranKey)) {
-				iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
-				if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey()) ) {
-					throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」已報送(446)前置調解結案通知資料.");
-				} // 2 end
 
-				// 4 start「繳款日期」不得大於資料報送日期
+			if (!"D".equals(iTranKey)) {
+				// 2.1 start
+				// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否曾報送過「'447':金融機構無擔保債務協議資料」，若不存在予以剔退處理。
+				iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
+				if (iJcicZ447 == null || "D".equals(iJcicZ447.getTranKey())) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException(titaVo, "E0005",
+								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+					} else {
+						throw new LogicException(titaVo, "E0007",
+								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+					}
+				} // 2.1 end
+
+				// 3 start 累計實際還款金額不等於該IDN所有已報送本檔案資料繳款金額之合計(含本次繳款金額)
+				Slice<JcicZ450> sJcicZ450 = sJcicZ450Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+				int sPayAmt = 0;// IND所有已報送之繳款金額合計
+				if (sJcicZ450 == null) {
+					if (iPayAmt != iSumRepayActualAmt) {
+						if ("A".equals(iTranKey)) {
+							throw new LogicException(titaVo, "E0005", "[累計繳款金額]不等於該IND所有已報送之[本次繳款金額]合計(含今日).");
+						} else {
+							throw new LogicException(titaVo, "E0007", "[累計繳款金額]不等於該IND所有已報送之[本次繳款金額]合計(含今日).");
+						}
+					}
+				} else {
+					for (JcicZ450 xJcicZ450 : sJcicZ450) {
+						if (!"D".equals(xJcicZ450.getTranKey())
+								&& !titaVo.getParam("Ukey").equals(xJcicZ450.getUkey())) {
+							sPayAmt += xJcicZ450.getPayAmt();
+						}
+					}
+				}
+				if ((sPayAmt + iPayAmt) != iSumRepayActualAmt) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException(titaVo, "E0005", "[累計繳款金額]不等於該IND所有已報送之[本次繳款金額]合計(含今日).");
+					} else {
+						throw new LogicException(titaVo, "E0007", "[累計繳款金額]不等於該IND所有已報送之[本次繳款金額]合計(含今日).");
+					}
+				} // 3 end
+			}
+
+			// 4 start「繳款日期」不得大於資料報送日期
+			if ("A".equals(iTranKey)) {
 				if (iPayDate > txDate) {
 					throw new LogicException(titaVo, "E0005", "「繳款日期」不得大於資料報送日期");
 				}
+			} // 4 end
 
-			}
-
-			// 3 start 累計實際還款金額不等於該IDN所有已報送本檔案資料繳款金額之合計(含本次繳款金額)
-			Slice<JcicZ450> sJcicZ450 = sJcicZ450Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-			int sPayAmt = 0;//IND所有已報送之繳款金額合計
-			if (sJcicZ450 != null) {
-				for (JcicZ450 xJcicZ450 : sJcicZ450) {
-					sPayAmt += xJcicZ450.getPayAmt();
-				}
-			}
-			if ((sPayAmt + iPayAmt) != iSumRepayActualAmt) {
-				throw new LogicException(titaVo, "E0005", "[累計繳款金額]不等於該IND所有已報送之[本次繳款金額]合計(含今日).");
-			}
-			// 3 end
-			
+			// 2.2 start 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否已報送結案，已報送予以剔退處理。
 			// 5 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
-				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				if ("A".equals(iTranKey)) {
+					throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				} else {
+					throw new LogicException(titaVo, "E0007", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				}
 			} // 5 end
 		}
 

@@ -11,8 +11,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.InsuOrignal;
+import com.st1.itx.db.domain.InsuOrignalId;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.InsuRenewId;
+import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.springjpa.cm.L4965ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -54,6 +57,9 @@ public class L4965 extends TradeBuffer {
 	@Autowired
 	public InsuRenewService insuRenewService;
 	
+	@Autowired
+	public InsuOrignalService insuOrignalService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4965 ");
@@ -95,22 +101,56 @@ public class L4965 extends TradeBuffer {
 			occursList.putParam("OOEthqInsuPrem", data[13]);
 			occursList.putParam("OOInsuStartDate", data[14]);
 			occursList.putParam("OOInsuEndDate", data[15]);
-			occursList.putParam("OOL4610Flag", 0);
-			occursList.putParam("OOL4611Flag", 0);
 			
-			InsuRenew tInsuRenew = new InsuRenew();
-			InsuRenewId tInsuRenewId = new InsuRenewId();
-			tInsuRenewId.setClCode1(parse.stringToInteger(data[4]));
-			tInsuRenewId.setClCode2(parse.stringToInteger(data[5]));
-			tInsuRenewId.setClNo(parse.stringToInteger(data[6]));
-			tInsuRenewId.setPrevInsuNo(data[7]);
-			tInsuRenewId.setEndoInsuNo(data[8]);
-
-			tInsuRenew = insuRenewService.findById(tInsuRenewId, titaVo);
+			occursList.putParam("OOPrevInsuNo", "");
+			occursList.putParam("OOBtnFlag", 0);
 			
-			if(tInsuRenew != null) {
-				occursList.putParam("OOL4611Flag", 1);
+			int ClCode1 = parse.stringToInteger(data[4]);
+			int ClCode2 = parse.stringToInteger(data[5]);
+			int ClNo = parse.stringToInteger(data[6]);
+			String OrigInsuNo = data[7];
+			String EndoInsuNo = data[8];
+			String PrevInsuNo = "";
+			if(data[16] != null) {
+				PrevInsuNo = data[16];
+				occursList.putParam("OOPrevInsuNo", data[16]);
+			} 
+			
+			// 新保
+			InsuOrignal tInsuOrignal = new InsuOrignal();
+			InsuOrignalId tInsuOrignalId = new InsuOrignalId();
+			tInsuOrignalId.setClCode1(ClCode1);
+			tInsuOrignalId.setClCode2(ClCode2);
+			tInsuOrignalId.setClNo(ClNo);
+			tInsuOrignalId.setOrigInsuNo(OrigInsuNo);
+			tInsuOrignalId.setEndoInsuNo(EndoInsuNo);
+						
+			tInsuOrignal = insuOrignalService.findById(tInsuOrignalId, titaVo);
+						
+			if(tInsuOrignal != null) {
+				occursList.putParam("OOBtnFlag", 1);
 			}
+			
+			
+			// 續保
+			if(data[16] != null) {
+				PrevInsuNo = data[16];
+				
+				InsuRenew tInsuRenew = new InsuRenew();
+				InsuRenewId tInsuRenewId = new InsuRenewId();
+				tInsuRenewId.setClCode1(ClCode1);
+				tInsuRenewId.setClCode2(ClCode2);
+				tInsuRenewId.setClNo(ClNo);
+				tInsuRenewId.setPrevInsuNo(PrevInsuNo);
+				tInsuRenewId.setEndoInsuNo(EndoInsuNo);
+				
+				
+				tInsuRenew = insuRenewService.findById(tInsuRenewId, titaVo);
+				
+				if(tInsuRenew != null) {
+					occursList.putParam("OOBtnFlag", 2);
+				}
+			} 
 			
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);

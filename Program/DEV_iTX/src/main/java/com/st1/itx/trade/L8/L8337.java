@@ -89,20 +89,22 @@ public class L8337 extends TradeBuffer {
 		// 檢核項目(D-78)
 		if (!"4".equals(iTranKey_Tmp)) {
 
-			// 二  key值為「債務人IDN+報送單位代號+申請日期+異動債權金機構代號」，不可重複，重複者予以剔退--->檢核在case "1"
+			// 二 key值為「債務人IDN+報送單位代號+申請日期+異動債權金機構代號」，不可重複，重複者予以剔退--->檢核在case "1"
 
 			// 三 start 若異動債權金融機構代號不存在同一更生款項統一收付案件'570'檔案之債權金融機構代號者，予以剔退
-			try {
-				iL8337SqlReturn = sL8337ServiceImpl.findData(this.index, this.limit, iCustId, iBankId, titaVo);
-			} catch (Exception e) {
-				// E5004 讀取DB語法發生問題
-				this.info("L5024 ErrorForSql=" + e);
-				throw new LogicException(titaVo, "E5004", "");
+			if ("A".equals(iTranKey)) {
+				try {
+					iL8337SqlReturn = sL8337ServiceImpl.findData(this.index, this.limit, iCustId, iBankId, titaVo);
+				} catch (Exception e) {
+					// E5004 讀取DB語法發生問題
+					this.info("L5024 ErrorForSql=" + e);
+					throw new LogicException(titaVo, "E5004", "");
+				}
+				if (iL8337SqlReturn.size() == 0) {
+					throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
+				}
+				// 三end
 			}
-			if (iL8337SqlReturn.size() == 0) {
-				throw new LogicException(titaVo, "E0005", "異動債權金融機構代號不存在於同一更生款項統一收付案件'570'檔案之債權金融機構代號");
-			}
-			// 三end
 		}
 		// 檢核項目end
 

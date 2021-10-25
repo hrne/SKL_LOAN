@@ -87,7 +87,7 @@ public class L8331 extends TradeBuffer {
 		iJcicZ446Id.setCustId(iCustId);
 		iJcicZ446Id.setApplyDate(iApplyDate);
 		iJcicZ446Id.setCourtCode(iCourtCode);
-		
+
 		// 檢核項目(D-62)
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 2
@@ -103,7 +103,11 @@ public class L8331 extends TradeBuffer {
 			// 4 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
-				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				if ("A".equals(iTranKey)) {
+					throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				} else {
+					throw new LogicException(titaVo, "E0007", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				}
 			} // 4 end
 
 		}

@@ -14,20 +14,13 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.JcicZ572;
 /* DB容器 */
 import com.st1.itx.db.domain.JcicZ573;
 import com.st1.itx.db.domain.JcicZ573Id;
 import com.st1.itx.db.domain.JcicZ573Log;
-import com.st1.itx.db.domain.JcicZ574;
-import com.st1.itx.db.domain.JcicZ574Id;
-import com.st1.itx.db.service.JcicZ572LogService;
-import com.st1.itx.db.service.JcicZ572Service;
 import com.st1.itx.db.service.JcicZ573LogService;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ573Service;
-import com.st1.itx.db.service.JcicZ574LogService;
-import com.st1.itx.db.service.JcicZ574Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -55,16 +48,6 @@ import com.st1.itx.util.data.DataLog;
  */
 public class L8335 extends TradeBuffer {
 	/* DB服務注入 */
-	@Autowired
-	public JcicZ572LogService sJcicZ572LogService;
-	@Autowired
-	public JcicZ572Service sJcicZ572Service;
-	@Autowired
-	public JcicZ574Service sJcicZ574Service;
-	@Autowired
-	public JcicZ574LogService sJcicZ574LogService;
-	@Autowired
-	public JcicZ574Service iJcicZ574Service;
 	@Autowired
 	public JcicZ573Service sJcicZ573Service;
 	@Autowired
@@ -96,44 +79,43 @@ public class L8335 extends TradeBuffer {
 		iJcicZ573Id.setCustId(iCustId);
 		iJcicZ573Id.setSubmitKey(iSubmitKey);
 		JcicZ573 chJcicZ573 = new JcicZ573();
-		JcicZ574 iJcicZ574 = new JcicZ574();
-		JcicZ574Id iJcicZ574Id = new JcicZ574Id();
-		iJcicZ574Id.setApplyDate(iApplyDate);
-		iJcicZ574Id.setCustId(iCustId);
-		iJcicZ574Id.setSubmitKey(iSubmitKey);
 
 		// 檢核項目(D-76)
 		if (!"4".equals(iTranKey_Tmp)) {
 
 			// 二 start key值為「債務人IDN+報送單位代號+申請日期+繳款日期」，不可重複，重複者予以剔退--->檢核在case "1"
+			// 三 同一更生款項統一收付案件尚未報送572檔案資料且已報送574結案資料者，予以剔退處裡--->1014會議通知不需檢核
 
-			// 三start 同一更生款項統一收付案件尚未報送572檔案資料且已報送574結案資料者，予以剔退處裡
-			Slice<JcicZ572> ixJcicZ572 = sJcicZ572Service.custIdEq(iCustId, this.index, this.limit, titaVo);
-			if (ixJcicZ572 == null) {
-				throw new LogicException(titaVo, "E0005", "未報送(572)更生款項統一收款及撥付款項分配表資料");
-			}
-			if ("A".equals(iTranKey)) {
-				iJcicZ574 = sJcicZ574Service.findById(iJcicZ574Id, titaVo);
-				if (iJcicZ574 != null && !"D".equals(iJcicZ574.getTranKey())) {
-					throw new LogicException(titaVo, "E0005", "已報送(574)更生款項統一收付結案通知資料");
-				}
-				// 三end
-			}
-
-			// 四start 若累計繳款金額不等於該IND所有已報送之繳款金額(含今日)，予以剔退處裡
-			int sPayAmt = 0;// 累計繳款金額
-			Slice<JcicZ573> sJcicZ573 = sJcicZ573Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-			if (sJcicZ573 != null) {
-				for (JcicZ573 xJcicZ573 : sJcicZ573) {
-					if (!"D".equals(xJcicZ573.getTranKey())) {
-						sPayAmt += xJcicZ573.getPayAmt();
+			// 四start 若累計繳款金額不等於該IDN所有已報送之繳款金額(含今日)，予以剔退處裡
+			if (!"D".equals(iTranKey)) {
+				int sPayAmt = 0;// 累計繳款金額
+				Slice<JcicZ573> sJcicZ573 = sJcicZ573Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+				if (sJcicZ573 == null) {
+					if (iPayAmt != iTotalPayAmt) {
+						if ("A".equals(iTranKey)) {
+							throw new LogicException(titaVo, "E0005", "[累計繳款金額]不等於該IDN所有已報送之[本日繳款金額]合計(含今日)");
+						} else {
+							throw new LogicException(titaVo, "E0007", "[累計繳款金額]不等於該IDN所有已報送之[本日繳款金額]合計(含今日)");
+						}
+					}
+				} else {
+					for (JcicZ573 xJcicZ573 : sJcicZ573) {
+						if (!"D".equals(xJcicZ573.getTranKey())
+								&& !titaVo.getParam("Ukey").equals(xJcicZ573.getUkey())) {
+							sPayAmt += xJcicZ573.getPayAmt();
+						}
 					}
 				}
+				if ((sPayAmt + iPayAmt) != iTotalPayAmt) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException(titaVo, "E0005", "[累計繳款金額]不等於該IDN所有已報送之[本日繳款金額]合計(含今日)");
+					} else {
+						throw new LogicException(titaVo, "E0007", "[累計繳款金額]不等於該IDN所有已報送之[本日繳款金額]合計(含今日)");
+					}
+				} // 四end
 			}
-			if ((sPayAmt + iPayAmt) != iTotalPayAmt) {
-				throw new LogicException(titaVo, "E0005", "累計繳款金額不等於該IND所有已報送之繳款金額合計(含今日)");
-			} // 四end
 		}
+
 		// 檢核項目end
 
 		switch (iTranKey_Tmp) {

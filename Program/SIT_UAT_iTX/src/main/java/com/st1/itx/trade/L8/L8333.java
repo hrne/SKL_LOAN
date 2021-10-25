@@ -105,27 +105,20 @@ public class L8333 extends TradeBuffer {
 			// 三 start 同一更生款項統一收付案件若未曾報送'570'檔案資料，則予以剔退處理
 			iJcicZ570 = sJcicZ570Service.findById(iJcicZ570Id, titaVo);
 			if (iJcicZ570 == null || "D".equals(iJcicZ570.getTranKey())) {
+				if ("A".equals(iTranKey)) {
 				throw new LogicException(titaVo, "E0005", "同一更生款項統一收付案件未曾報送(570)受理更生款項統一收付通知資料");
+				}else {
+					throw new LogicException(titaVo, "E0007", "同一更生款項統一收付案件未曾報送(570)受理更生款項統一收付通知資料");
+				}
 			}
 			// 三end
 
 			// 四 檢核金融機構報送本檔案資料日期，若超逾同一更生款項統一收付案件'575'檔案資料建檔日+7個工作日，且最大債權金融機構未曾報送'575'***J
 			// 債務人通報債權金額異動檔者，予以剔退處理 處理***J
-
 			// 五 檢核金融機構報送本檔案資料日期，若超逾同一更生款項統一收付案件最大債權金融機構報送'575'資料建檔日+3個工作日者，予以剔退處理***J
 
-			// 六 start 第7欄「是否為更生債權人」填報為'Y'者，第8-11欄為必要填報欄位
-			if ("Y".equals(iOwnerYn)) {
-				if (iPayYn.trim().isEmpty() || iOwnerAmt == 0 || iAllotAmt == 0 || iUnallotAmt == 0) {
-					throw new LogicException(titaVo, "E0005", "「是否為更生債權人」填報為'Y'者,後續欄位為必要填報欄位，不能為空.");
-				}
-			} // 六 end
-
-			// 七start 檢核第10、11欄位金額加總為第9欄「更生債權總金額」
-			if (iAllotAmt + iUnallotAmt != iOwnerAmt) {
-				throw new LogicException(titaVo, "E0005", "第10、11欄位金額加總為第9欄「更生債權總金額」");
-			}
-			// 七end
+			// 六 第7欄「是否為更生債權人」填報為'Y'者，第8-11欄為必要填報欄位--->(前端檢核)
+			// 七 檢核第10、11欄位金額加總為第9欄「更生債權總金額」--->(前端檢核)
 
 			// 檢核項目 end
 		}

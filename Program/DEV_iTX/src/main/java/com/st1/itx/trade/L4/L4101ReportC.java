@@ -132,6 +132,7 @@ public class L4101ReportC extends MakeReport {
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
+		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-" + batchNo;
 		String wkName = "";
 		String wkBankCode = "";

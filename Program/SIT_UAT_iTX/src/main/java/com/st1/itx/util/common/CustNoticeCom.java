@@ -106,7 +106,7 @@ public class CustNoticeCom extends TradeBuffer {
 	 * @param formNo 程式ID or 報表ID
 	 * @param custNo 戶號
 	 * @param facmNo 額度
-	 * @param titaVo 
+	 * @param titaVo
 	 * @return NoticeFlag = 2:簡訊 ＞ 3:電郵 ＞ 1:書信 ＞ 4.不寄送 <br>
 	 *         isMessage Y.發送簡訊<br>
 	 *         isEmail Y.發送電郵<br>
@@ -114,9 +114,8 @@ public class CustNoticeCom extends TradeBuffer {
 	 *         MessagePhoneNo 簡訊號碼 <br>
 	 *         EmailAddress 電郵地址 <br>
 	 *         LetterAddress 書信地址 <br>
-	 * @throws LogicException 
 	 * 
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public TempVo getCustNotice(String formNo, int custNo, int facmNo, TitaVo titaVo) throws LogicException {
 		TempVo tempVo = new TempVo();
@@ -335,7 +334,7 @@ public class CustNoticeCom extends TradeBuffer {
 	/**
 	 * 
 	 * @param custMain 客戶主檔
-	 * @param titaVo 
+	 * @param titaVo   ..
 	 * @return currAddress = 通訊地址 <br>
 	 */
 	public String getCurrAddress(CustMain custMain, TitaVo titaVo) {
@@ -390,8 +389,8 @@ public class CustNoticeCom extends TradeBuffer {
 	/**
 	 * 
 	 * @param custMain 客戶主檔
-	 * @param titaVo 
-	 * @return regAddress = 戶籍地址 <br>
+	 * @param titaVo   ..
+	 * @return 戶籍地址
 	 */
 	public String getRegAddress(CustMain custMain, TitaVo titaVo) {
 		String regAddress = "";
@@ -446,17 +445,32 @@ public class CustNoticeCom extends TradeBuffer {
 		String messPhone = "";
 		String cellPhone = "";
 
-//					03:手機  05:簡訊(優先)			
+//	1.03:手機  05:簡訊(優先)
+//	2.本人優先
+
 		if (tCustMain != null) {
 			Slice<CustTelNo> slCustTelNo = custTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index,
 					Integer.MAX_VALUE, titaVo);
-
 			if (slCustTelNo != null) {
 				for (CustTelNo tCustTelNo : slCustTelNo.getContent()) {
-					if ("05".equals(tCustTelNo.getTelTypeCode()) && "Y".equals(tCustTelNo.getEnable())) {
+					if ("00".equals(tCustTelNo.getRelationCode())) {
+						if (messPhone.isEmpty() && "05".equals(tCustTelNo.getTelTypeCode())
+								&& "Y".equals(tCustTelNo.getEnable())) {
+							messPhone = tCustTelNo.getTelNo();
+						}
+						if (cellPhone.isEmpty() && "03".equals(tCustTelNo.getTelTypeCode())
+								&& "Y".equals(tCustTelNo.getEnable())) {
+							cellPhone = tCustTelNo.getTelNo();
+						}
+					}
+				}
+				for (CustTelNo tCustTelNo : slCustTelNo.getContent()) {
+					if (messPhone.isEmpty() && "05".equals(tCustTelNo.getTelTypeCode())
+							&& "Y".equals(tCustTelNo.getEnable())) {
 						messPhone = tCustTelNo.getTelNo();
 					}
-					if ("03".equals(tCustTelNo.getTelTypeCode()) && "Y".equals(tCustTelNo.getEnable())) {
+					if (cellPhone.isEmpty() && "03".equals(tCustTelNo.getTelTypeCode())
+							&& "Y".equals(tCustTelNo.getEnable())) {
 						cellPhone = tCustTelNo.getTelNo();
 					}
 				}

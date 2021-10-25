@@ -120,7 +120,7 @@ public class L4102Batch extends TradeBuffer {
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = this.getBatchNo(titaVo);
 		String wkbatchNo = titaVo.getBacthNo();
-		this.info("L4101 Batch batchNo = " + batchNo);
+		this.info("L4102 Batch batchNo = " + batchNo);
 
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();

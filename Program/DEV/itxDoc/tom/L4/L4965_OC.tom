@@ -14,5 +14,5 @@ OOEthqInsuCovrg=9,14.2
 OOEthqInsuPrem=9,14.2
 OOInsuStartDate=9,7
 OOInsuEndDate=9,7
-OOL4610Flag=9,1
-OOL4611Flag=9,1
+OOPrevInsuNo=X,16
+OOBtnFlag=9,1

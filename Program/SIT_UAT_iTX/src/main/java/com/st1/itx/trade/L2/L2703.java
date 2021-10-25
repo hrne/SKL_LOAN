@@ -6,8 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -46,7 +44,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2703 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2703.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -101,18 +98,15 @@ public class L2703 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0002", "L2703 該戶號" + custNo + "已存在於結清戶個資控管檔。");
 			}
 			// 檢查是否結清
-			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 999, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<LoanBorMain> slLoanBorMain = sLoanBorMainService.bormCustNoEq(custNo, 0, 999, 0, 999, 0, Integer.MAX_VALUE, titaVo);
 			List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 			if (lLoanBorMain != null) {
 				for (LoanBorMain tLoanBorMain : lLoanBorMain) {
-					if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4
-							|| tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 99) {
-						throw new LogicException(titaVo, "E0002", "該戶號非結清戶");
+					if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 7 || tLoanBorMain.getStatus() == 99) {
+						throw new LogicException(titaVo, "E2003", "該戶號非結清戶");
 					}
 				}
 			}
-			
 
 			tCustDataCtrl = new CustDataCtrl();
 			tCustDataCtrl.setCustNo(custNo);

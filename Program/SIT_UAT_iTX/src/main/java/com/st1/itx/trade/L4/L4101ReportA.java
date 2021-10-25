@@ -134,6 +134,7 @@ public class L4101ReportA extends MakeReport {
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		batchNo = titaVo.getBacthNo();
+		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-" + batchNo;
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();

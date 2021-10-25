@@ -118,52 +118,68 @@ public class L8326 extends TradeBuffer {
 
 			// 1.2
 			// 「IDN+報送單位代號+調解申請日+受理調解機構代號」若未曾報送過「'440':前置調解受理申請暨請求回報債權通知資料」，予以剔退處理.(交易代碼為'X'者不檢核)
-			if (!"X".equals(iTranKey)) {
+			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
 				iJcicZ440 = sJcicZ440Service.findById(iJcicZ440Id, titaVo);
 				if (iJcicZ440 == null) {
-					throw new LogicException("E0005", "請先報送(440)前置調解受理申請暨請求回報債權通知資料.");
+					if ("A".equals(iTranKey)) {
+						throw new LogicException("E0005", "請先報送(440)前置調解受理申請暨請求回報債權通知資料.");
+					} else {
+						throw new LogicException("E0007", "請先報送(440)前置調解受理申請暨請求回報債權通知資料.");
+					}
 				}
-			} // 1.2 end
+			}
+			// 1.2 end
 
+			// 1.3.1 結案日期不可早於調解申請日.--->(前端檢核)
 			// 1.3.2 結案日期不可晚於報送本檔案日期.
 			if ("A".equals(iTranKey)) {
 				if (iCloseDate > txDate) {
 					throw new LogicException("E0005", "[結案日期]不可晚於報送本檔案日期.");
 				}
 			} // 1.3.2 end
-			
-			// 1.3.1 結案日期不可早於調解申請日.
-			if(iCloseDate < iApplyDate) {
-				throw new LogicException("E0005", "[結案日期]不可早於[調解申請日].");
-			}// 1.3.1 end
 
-			// 1.4
-			// 同一KEY值報送「'447':金融機構無擔保債務協議資料」後，若再報送本檔案資料時，結案理由代碼僅能報送'00','01','90'及'99'，其餘結案理由皆以剔退處理.
-			iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
-			if (iJcicZ447 != null) {
-				if (!"D".equals(iJcicZ447.getTranKey()) && (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals))) { 
-				throw new LogicException("E0005", "已報送過(447)前置調解金融機構無擔保債務協議資料，本檔案[結案原因代號]僅能報送'00','01','90'及'99'.");
-				}
-			} // 1.4 end
-
-			// 1.5 檢核同一KEY值於'451':延期繳款期間不可報送「結案原因代號」 為'00'之本檔案資料
-			if ("00".equals(iCloseCode) && ("A".equals(iTranKey))) {
-				//@@@SQL-Function需改為custRcSubCourtEq
-				Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate, iCourtCode, txDate, 0, Integer.MAX_VALUE, titaVo);
-				if (sJcicZ451 != null) {
-					int sDelayYM = 0;
-					for(JcicZ451 xJcicZ451 : sJcicZ451) {
-						if(!"D".equals(xJcicZ451.getTranKey()) && xJcicZ451.getDelayYM() > sDelayYM) {
-							sDelayYM = xJcicZ451.getDelayYM();
+			if (!"D".equals(iTranKey)) {
+				// 1.4
+				// 同一KEY值報送「'447':金融機構無擔保債務協議資料」後，若再報送本檔案資料時，結案理由代碼僅能報送'00','01','90'及'99'，其餘結案理由皆以剔退處理.
+				iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
+				if (iJcicZ447 != null) {
+					if (!"D".equals(iJcicZ447.getTranKey())
+							&& (!Arrays.stream(acceptCloseCode).anyMatch(iCloseCode::equals))) {
+						if ("C".equals(iTranKey)) {
+							throw new LogicException("E0007",
+									"已報送過(447)前置調解金融機構無擔保債務協議資料，本檔案[結案原因代號]僅能報送'00','01','90'及'99'.");
+						} else {
+							throw new LogicException("E0005",
+									"已報送過(447)前置調解金融機構無擔保債務協議資料，本檔案[結案原因代號]僅能報送'00','01','90'及'99'.");
 						}
 					}
-					int formateDelayYM = Integer.parseInt(sDelayYM + "31");
-					if (txDate <= formateDelayYM) {
-						throw new LogicException("E0005",
-								"於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
+				} // 1.4 end
+
+				// 1.5 檢核同一KEY值於'451':延期繳款期間不可報送「結案原因代號」 為'00'之本檔案資料
+				if ("00".equals(iCloseCode)) {
+					// @@@SQL-Function需改為custRcSubCourtEq
+					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate + 19110000,
+							iCourtCode, txDate, 0, Integer.MAX_VALUE, titaVo);
+					if (sJcicZ451 != null) {
+						int sDelayYM = 0;
+						for (JcicZ451 xJcicZ451 : sJcicZ451) {
+							if (!"D".equals(xJcicZ451.getTranKey()) && xJcicZ451.getDelayYM() > sDelayYM) {
+								sDelayYM = xJcicZ451.getDelayYM();
+							}
+						}
+						int formateDelayYM = Integer.parseInt(sDelayYM + "31");
+						if (txDate <= formateDelayYM) {
+							if ("C".equals(iTranKey)) {
+								throw new LogicException("E0007",
+										"於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
+							} else {
+								throw new LogicException("E0005",
+										"於(451)前置調解延期繳款期間(" + iJcicZ451.getDelayYM() + "前)不可報送「結案原因代號」 為'00'之本檔案資料.");
+							}
+						}
 					}
-				}
-			} // 1.5 end
+				} // 1.5 end
+			}
 
 			// 2
 			// 各資料檔案格式若第2欄「交易代碼」無「'D'刪除」功能者，如有資料key值報送錯誤情形者，需以本檔案格式報送「結案原因代號'97':資料key值報送錯誤，本行結案」至本中心，並重新報送更正後資料.***J

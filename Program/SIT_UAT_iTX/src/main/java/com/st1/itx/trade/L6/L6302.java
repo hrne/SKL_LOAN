@@ -63,7 +63,7 @@ public class L6302 extends TradeBuffer {
 		this.info("L6302 iEffectDate : " + iEffectDate);
 		int iFEffectDate = iEffectDate + 19110000;
 		this.info("L6302 iFEffectDate : " + iFEffectDate);
-
+	
 		int iTbsdy = titaVo.getEntDyI();
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 4)) {
@@ -85,30 +85,30 @@ public class L6302 extends TradeBuffer {
 		switch (iFuncCode) {
 		case 1: // 新增
 			
-			CdBaseRate bCdBaseRate = sCdBaseRateService.effectFlagDescFirst("TWD", iBaseRateCode,0, titaVo);
-			if(bCdBaseRate!=null) {
-				
-				if(bCdBaseRate.getEffectDate()>iTbsdy) {
-					throw new LogicException(titaVo, "E0005", "未生效指標利率只能有一筆"); // 新增資料時，發生錯誤
-				}
+			if(iEffectDate<iTbsdy) {
+				throw new LogicException(titaVo, "E0005", "生效日期需大於會計日"); // 新增資料時，發生錯誤
 			}
 			
-			
-			Slice<CdBaseRate> cCdBaseRate1 = sCdBaseRateService.effectFlagDescFirst1("TWD", iBaseRateCode,1,1, titaVo);
+			//生效日期需為最大
+			Slice<CdBaseRate> cCdBaseRate1 = sCdBaseRateService.effectFlagDescFirst1("TWD", iBaseRateCode,0,Integer.MAX_VALUE, titaVo);
 			List<CdBaseRate> cCdBaseRate2 = cCdBaseRate1 == null ? null :cCdBaseRate1.getContent();
 			if(cCdBaseRate2!=null) {
 				this.info("iEffectDate=="+iEffectDate);
-				this.info("iTbsdy=="+iTbsdy);
+				this.info("cCdBaseRate2=="+cCdBaseRate2.get(0).getEffectDate());
 				if(iEffectDate<cCdBaseRate2.get(0).getEffectDate()) {
 					throw new LogicException(titaVo, "E0005", "生效日期需大於"+cCdBaseRate2.get(0).getEffectDate()); // 新增資料時，發生錯誤
 				}
 				
 			}
 			
-			if(iEffectDate<iTbsdy) {
-				throw new LogicException(titaVo, "E0005", "生效日期需大於會計日"); // 新增資料時，發生錯誤
+			CdBaseRate bCdBaseRate = sCdBaseRateService.effectFlagDescFirst("TWD", iBaseRateCode,0, titaVo);
+			if(bCdBaseRate!=null) {
+				this.info("bCdBaseRate=="+bCdBaseRate.getEffectDate());
+				if(bCdBaseRate.getEffectDate()>iTbsdy) {
+					throw new LogicException(titaVo, "E0005", "未生效指標利率只能有一筆"); // 新增資料時，發生錯誤
+				}
 			}
-			
+		
 			CdCode tCdCode = sCdCodeService.findById(new CdCodeId("BaseRate",iBaseRateCode), titaVo);
 			if(tCdCode!=null) {
 				if(tCdCode.getEffectFlag()!=0) {

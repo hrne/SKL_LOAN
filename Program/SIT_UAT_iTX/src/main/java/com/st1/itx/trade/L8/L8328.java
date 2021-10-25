@@ -101,7 +101,13 @@ public class L8328 extends TradeBuffer {
 			// 6 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
-				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+				if ("A".equals(iTranKey) || "X".equals(iTranKey)) {
+					throw new LogicException(titaVo, "E0005",
+							"同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+				} else {
+					throw new LogicException(titaVo, "E0007",
+							"同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.");
+				}
 			} // 6 end
 		}
 		// 檢核條件 end

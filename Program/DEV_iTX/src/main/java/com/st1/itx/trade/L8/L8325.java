@@ -123,15 +123,7 @@ public class L8325 extends TradeBuffer {
 			} // 2 end
 
 			// 3 第10欄、第11欄及第12欄「債務人電話」之其中一欄，需為必要填報項目.
-			if (!"D".equals(iTranKey)) {
-				if (iCustRegTelNo.trim().isEmpty() && iCustComTelNo.trim().isEmpty() && iCustMobilNo.trim().isEmpty()) {
-					if ("C".equals(iTranKey)) {
-						throw new LogicException("E0007", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
-					} else {
-						throw new LogicException("E0005", "債務人戶籍電話、通訊電話、行動電話，請至少填寫其中之一.");
-					}
-				} // 3 end
-			}
+			// removed by Fegie 2021/10/25
 
 			// 4 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);

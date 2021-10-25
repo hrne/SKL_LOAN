@@ -315,8 +315,7 @@ public class LY002Report extends MakeReport {
 			if (tempCustNo.equals(custNo) && tempFacmNo.equals(facmNo)) {
 
 				countLine++;
-				countEva++;
-
+			
 				mergeLineMap.put("count", countLine);
 				mergeLineMap.put("cust", custNo);
 				mergeLineMap.put("facm", facmNo);
@@ -362,6 +361,9 @@ public class LY002Report extends MakeReport {
 			// 和前一筆 是否為同一擔保品號碼
 			if (tempClNo.equals(clNo)) {
 
+				countEva++;
+
+				
 				mergeEvaMap.put("count", countEva);
 				mergeEvaMap.put("clno", clNo);
 				// 估計 與前一筆金額是否一樣(一樣為同一擔保品)

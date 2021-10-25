@@ -112,54 +112,68 @@ public class L8330 extends TradeBuffer {
 		// 檢核項目(D-60)
 		if (!"4".equals(iTranKey_Tmp)) {
 
-			// 2 start
-			// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否曾報送過「'447':金融機構無擔保債務協議資料」，若不存在予以剔退處理。
-			iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
-			if (iJcicZ447 == null || "D".equals(iJcicZ447.getTranKey())) {
-				throw new LogicException(titaVo, "E0005",
-						"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
-			} // 2 end
+			if (!"D".equals(iTranKey)) {
+				// 2 start
+				// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否曾報送過「'447':金融機構無擔保債務協議資料」，若不存在予以剔退處理。
+				iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
+				if (iJcicZ447 == null || "D".equals(iJcicZ447.getTranKey())) {
+					if ("A".equals(iTranKey)) {
+						throw new LogicException(titaVo, "E0005",
+								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+					} else {
+						throw new LogicException(titaVo, "E0007",
+								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+					}
+				} // 2 end
 
-			// 3 start「延期繳款年月」不得小於「調解申請日」
-			if (iDelayYM < (iApplyDate / 100)) {
-				throw new LogicException(titaVo, "E0005", "「延期繳款年月」不得小於「調解申請日」");
-			}
-			// 3 end
-
-			// 4 start 延期繳款累積期數(月份)不得超過6期
-			// 6.2 start 「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核4的限制.
-			if ("L".equals(iDelayCode)) {
-				sCovDelayYM = 1;
-			} else {
-				sDelayYM = 1;
-			}
-			// @@@SQL-Function需改為custRcSubCourtEq
-			Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
-			if (sJcicZ451 != null) {
-				for (JcicZ451 xJcicZ451 : sJcicZ451) {
-					if (!"D".equals(xJcicZ451.getTranKey())) {
-						if ("L".equals(xJcicZ451.getDelayCode())) {
-							sCovDelayYM++;
-						} else {
-							sDelayYM++;
+				// 4 start 延期繳款累積期數(月份)不得超過6期
+				// 6.2 start 「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】，則不受上述檢核4的限制.
+				if ("L".equals(iDelayCode)) {
+					sCovDelayYM = 1;
+				} else {
+					sDelayYM = 1;
+				}
+				// @@@SQL-Function需改為custRcSubCourtEq
+				Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
+				if (sJcicZ451 != null) {
+					for (JcicZ451 xJcicZ451 : sJcicZ451) {
+						if (!"D".equals(xJcicZ451.getTranKey())
+								&& !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
+							if ("L".equals(xJcicZ451.getDelayCode())) {
+								sCovDelayYM++;
+							} else {
+								sDelayYM++;
+							}
 						}
 					}
-				}
-				if (sDelayYM > 6) {
-					throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
-				} else if (sCovDelayYM > 6) {
-					throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
-				}
-			} // 4, 6.2 end
+					if (sDelayYM > 6) {
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005", "延期繳款累計期數(月份)不得超過6期.");
+						} else {
+							throw new LogicException("E0007", "延期繳款累計期數(月份)不得超過6期.");
+						}
+					} else if (sCovDelayYM > 6) {
+						if ("A".equals(iTranKey)) {
+							throw new LogicException("E0005", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+						} else {
+							throw new LogicException("E0007", "「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'【限累計申請最多6期】.");
+						}
+					}
+				} // 4, 6.2 end
+			}
+			// 3 「延期繳款年月」不得小於「調解申請日」--->(前端檢核)
 
 			// 5 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
+				if ("A".equals(iTranKey)) {
 				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				}else {
+					throw new LogicException(titaVo, "E0007", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				}
 			} // 5 end
 
 			// 6.1「延期繳款原因」為'L:受嚴重特殊傳染性肺炎疫情影響繳款'***J
-
 		}
 		// 檢核條件 end
 

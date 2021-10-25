@@ -57,7 +57,7 @@ public class L8201 extends TradeBuffer {
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		String iBusinessType = titaVo.getParam("BusinessType");
-		this.info("L8201 iBusinessType : " + iBusinessType);
+		logger.info("L8201 iBusinessType : " + iBusinessType);
 
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
@@ -100,10 +100,7 @@ public class L8201 extends TradeBuffer {
 				}
 				dataLog.setEnv(titaVo, tMlaundryParas2, tMlaundryParas); ////
 				dataLog.exec(); ////
-				//放行 1:登 2:放
-//				int ActFg=titaVo.getActFgI();
-//				if(ActFg==2){
-//			}
+
 			
 			break;
 		case 4: // 刪除
@@ -138,6 +135,10 @@ public class L8201 extends TradeBuffer {
 			mMlaundryParas.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mMlaundryParas.setCreateEmpNo(titaVo.getTlrNo());
 		}
+		if (mFuncCode == 1) {
+			mMlaundryParas.setBusinessType("LN");
+		}
+		
 		mMlaundryParas.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mMlaundryParas.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}
