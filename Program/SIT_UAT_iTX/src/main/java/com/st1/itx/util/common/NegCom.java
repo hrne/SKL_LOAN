@@ -354,7 +354,7 @@ public class NegCom extends CommBuffer {
 		mainAccuDueAmt = tNegMain.getAccuDueAmt();// 累應還金額
 		mainAccuSklShareAmt = tNegMain.getAccuSklShareAmt();// 累計新壽攤分
 		mainIntRate = tNegMain.getIntRate();// 利率\
-		remainPeriod = mainTotalPeriod - mainRepaidPeriod;// 剩餘期數
+		//remainPeriod = mainTotalPeriod - mainRepaidPeriod;// 剩餘期數
 
 		mainFirstDueDate = tNegMain.getFirstDueDate();// 首次應繳日
 		mainNextPayDate = tNegMain.getNextPayDate();// 下次應繳日
@@ -441,6 +441,7 @@ public class NegCom extends CommBuffer {
 			// E5009 資料檢核錯誤
 			throw new LogicException(titaVo, "E5009", "[下次應繳日]未填寫.請至L5071查詢後維護.");
 		}
+		
 		int lastpaydate = getRepayDate(mainNextPayDate, -1, titaVo);// 上個月應繳日
 		
 		if (transEntryDate > mainNextPayDate) { // 客戶逾期繳款應收2期利息(上期與本期)或以上
@@ -463,13 +464,20 @@ public class NegCom extends CommBuffer {
 			}
 		}		
 
+		//計算剩餘期數
+		remainPeriod = nper(mainPrincipalBal, mainDueAmt, mainIntRate);
+		if (transShouldPayPeriod > remainPeriod) {//應繳期數不可大於剩餘期數
+			transShouldPayPeriod = remainPeriod;
+		}
+		
 		// -----
 		if (transShouldPayPeriod != 0) {
 			newTransDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(transShouldPayPeriod));// Trans 本次應還金額
 		}
 
-		int DiffMonth = DiffMonth(1, mainFirstDueDate, Today) + 1;// 月份差異=首次應繳日 與 會計日的月份差+1
-		mainAccuDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(DiffMonth));// Main累應還金額=Main期金*累計應還期數
+		//int diffMonth1 = DiffMonth(1, mainFirstDueDate, Today) + 1;// 月份差異=首次應繳日 與 會計日的月份差+1
+		int diffMonth1 = mainRepaidPeriod + transShouldPayPeriod;//已繳期數+本次應繳期數
+		mainAccuDueAmt = mainDueAmt.multiply(BigDecimal.valueOf(diffMonth1));// Main累應還金額=Main期金*累計應還期數
 
 		//計算剩餘本利和(含利息倒扣)
 		int accuday = 0;//計息天數
@@ -532,6 +540,9 @@ public class NegCom extends CommBuffer {
 			// 3:提前還本-匯入款 >= 5期期款
 			if (transTxAmt.compareTo(mainDueAmt.multiply(new BigDecimal(5)).setScale(0, RoundingMode.UP)) >= 0) {
 				transTxKind = "3";
+				if (transShouldPayPeriod <= transRepayPeriod) {
+					transRepayPeriod = transShouldPayPeriod;// 計算幾期利息
+				}
 			}
 			// 1:溢繳(預收多期)-匯入款 > 期款
 			else if (transTxAmt.compareTo(mainDueAmt) > 0) {
@@ -575,7 +586,6 @@ public class NegCom extends CommBuffer {
 			break;
 		case "3": // 3:提前還本
 			rePayAmt = CanCountAmt;
-			transRepayPeriod = transShouldPayPeriod;//計算幾期利息
 			break;
 
 		case "4": // 4:結清-匯入款＋溢收款 >=最後一期期款
@@ -1881,6 +1891,12 @@ public class NegCom extends CommBuffer {
 		}
 
 		int diffPeriod = DiffMonth(1, nextPayDate, finallDate) + 1;
+		//剩餘期數
+		int diffPeriod2 = nper(tNegMain.getPrincipalBal(), tNegMain.getDueAmt(), tNegMain.getIntRate());
+		if (diffPeriod > diffPeriod2) {//應還期數不可大於剩餘期數
+			diffPeriod = diffPeriod2;
+		}
+		
 		OOPayTerm = String.valueOf(diffPeriod);
 		//OOPayAmt = String.valueOf(dueAmt.multiply(BigDecimal.valueOf(diffPeriod)));
 		// 計算應繳金額

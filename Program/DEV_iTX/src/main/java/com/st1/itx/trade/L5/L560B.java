@@ -28,7 +28,7 @@ public class L560B extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L560B ");
 		this.totaVo.init(titaVo);
-		String adjFlag = titaVo.getBtnIndex(); //0-存證信函;1-延遲繳款通知函;2-繳款通知函
+		String adjFlag = titaVo.getBtnIndex(); //0-前置協商毀諾通知函;1-前置協商逾期繳款通知函
 		this.info("按鈕編號==="+adjFlag);
 		txReport.run(titaVo);
 		this.addList(this.totaVo);

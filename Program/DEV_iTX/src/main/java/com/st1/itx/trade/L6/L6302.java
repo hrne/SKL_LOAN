@@ -102,9 +102,11 @@ public class L6302 extends TradeBuffer {
 				if(iEffectDate<cCdBaseRate2.get(0).getEffectDate()) {
 					throw new LogicException(titaVo, "E0005", "生效日期需大於"+cCdBaseRate2.get(0).getEffectDate()); // 新增資料時，發生錯誤
 				}
-				if(iEffectDate<iTbsdy) {
-					throw new LogicException(titaVo, "E0005", "生效日期需大於會計日"); // 新增資料時，發生錯誤
-				}
+				
+			}
+			
+			if(iEffectDate<iTbsdy) {
+				throw new LogicException(titaVo, "E0005", "生效日期需大於會計日"); // 新增資料時，發生錯誤
 			}
 			
 			CdCode tCdCode = sCdCodeService.findById(new CdCodeId("BaseRate",iBaseRateCode), titaVo);

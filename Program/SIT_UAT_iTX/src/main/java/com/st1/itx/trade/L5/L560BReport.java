@@ -17,6 +17,8 @@ import com.st1.itx.db.service.JcicZ046Service;
 import com.st1.itx.db.service.NegMainService;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.common.NegCom;
+
 
 @Service("L560BReport")
 @Scope("prototype")
@@ -36,6 +38,8 @@ public class L560BReport extends MakeReport {
 	public JcicZ046Service iJcicZ046Service;
 	@Autowired
 	public DateUtil iDateUtil;
+	@Autowired
+	public NegCom sNegCom;
 
 	@Override
 	public void printTitle() {
@@ -129,7 +133,8 @@ public class L560BReport extends MakeReport {
 		case "1": //前置協商逾期繳款通知函
 			Slice<NegMain> aNegMain = null;
 			NegMain bNegMain = new NegMain();
-			int aPayIntDate = 0;
+			int aPayIntDate = 0;//繳息迄日
+			int aNextPayDate =0;//下次應繳日
 			aNegMain = iNegMainService.forLetter(Integer.valueOf(iCustNo),"1", 0, Integer.MAX_VALUE, titaVo);
 			if (aNegMain == null) {
 				throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶號:"+titaVo.getParam("OOCustNo"));
@@ -141,11 +146,12 @@ public class L560BReport extends MakeReport {
 			if (!bNegMain.getIsMainFin().equals("Y")) {
 				throw new LogicException(titaVo, "E0001", "非最大債權:"+titaVo.getParam("OOCustNo"));
 			}
-			aPayIntDate = bNegMain.getPayIntDate()+19110000; //下次應繳日
-			int bPayIntDate = Integer.valueOf(iBusDate)+19110000; // 系統日
+			aPayIntDate = bNegMain.getPayIntDate()+19110000; //繳息迄日
+			aNextPayDate = bNegMain.getNextPayDate()+19110000;//下次應繳日
+			int bPayIntDate = Integer.valueOf(iBusDate)+19110000; // 會計日
 			
-			if (aPayIntDate>bPayIntDate) {
-				throw new LogicException(titaVo, "E0001", "下次應繳日大於系統日");
+			if (aNextPayDate > bPayIntDate) {//未逾期
+				throw new LogicException(titaVo, "E0001", "下次應繳日大於會計日");
 			}
 			iDateUtil.init();
 			iDateUtil.setDate_1(aPayIntDate);
@@ -155,12 +161,22 @@ public class L560BReport extends MakeReport {
 			if (gapMonth==0) {
 				throw new LogicException(titaVo, "E0001", "尚未有逾期資料:"+titaVo.getParam("OOCustNo"));
 			}
+
+			// 計算剩餘期數
+			int remainPeriod = sNegCom.nper(bNegMain.getPrincipalBal(), bNegMain.getDueAmt(), bNegMain.getIntRate());
+			// 計算應繳金額:最多扣到本金=0為止
+			BigDecimal iCount = sNegCom.calAccuDueAmt(bNegMain.getDueAmt(), bNegMain.getPrincipalBal(),
+					bNegMain.getIntRate(), gapMonth, 0);// 最後一位參數傳0代表計算本利和
+
+			if (gapMonth > remainPeriod) {// 應繳期數不可大於剩餘期數
+				gapMonth = remainPeriod;
+			}
+			
 			if (gapMonth > 7) {
 				throw new LogicException(titaVo, "E0001", "逾期資料過多:"+titaVo.getParam("OOCustNo"));
 			}
+
 			String iDateString = "";
-			BigDecimal iCount = new BigDecimal("0");
-			BigDecimal iMonthes = new BigDecimal(gapMonth);
 			for (int i= 1;i<=gapMonth;i++) {
 				iDateUtil.init();
 				iDateUtil.setDate_1(aPayIntDate);
@@ -175,7 +191,7 @@ public class L560BReport extends MakeReport {
 					iDateString = iDateString+sYyy+ "年"+sMm+"月"+sDd+"日";
 				}
 			}
-			iCount = bNegMain.getDueAmt().multiply(iMonthes);
+			
 			String reCount = String.valueOf(iCount);
 			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "前置協商逾期繳款通知函"+iCustNo, "Normal","A4","P");
 			setFont(1, 20);

@@ -195,6 +195,7 @@ public class L4606Batch extends TradeBuffer {
 					String empNo = "";
 					String empId = "";
 					String empName = "";
+					String agStatusCode = "";
 					int custNo = parse.stringToInteger(tempOccursList.get("CustNo").trim());
 					int facmNo = parse.stringToInteger(tempOccursList.get("FacmNo").trim());
 
@@ -225,8 +226,8 @@ public class L4606Batch extends TradeBuffer {
 					tInsuComm.setFacmNo(facmNo);
 
 //					By I.T. Mail 火險服務抓取 額度檔之火險服務，如果沒有則為戶號的介紹人，若兩者皆為空白者，則為空白(為未發放名單)
-//					** but User給的範例中，未發送名單的火險服務欄位卻有員工代號，且於CdEmp也存在???
-//					** user 給的媒體檔為10904，但報表為10902，無法驗證。
+//					業務人員任用狀況碼 AgStatusCode =   1:在職 ，才發放 	
+
 					tFacMainId.setCustNo(custNo);
 					tFacMainId.setFacmNo(facmNo);
 					tFacMain = facMainService.findById(tFacMainId, titaVo);
@@ -244,15 +245,15 @@ public class L4606Batch extends TradeBuffer {
 					if (tCdEmp != null) {
 						empId = tCdEmp.getAgentId();
 						empName = tCdEmp.getFullname();
+						agStatusCode = tCdEmp.getStatusCode();
 					}
 
 					tInsuComm.setFireOfficer(empNo);
 					tInsuComm.setEmpId(empId);
 					tInsuComm.setEmpName(empName);
-
 					InsuRenew tInsuRenew = insuRenewService.findNowInsuNoFirst(custNo, facmNo,
 							tempOccursList.get("InsuNo").trim(), titaVo);
-					if (tInsuRenew != null) {
+					if (tInsuRenew != null && "1".equals(agStatusCode)) {
 						tInsuComm.setDueAmt(parse.stringToBigDecimal(tempOccursList.get("TotalComm").trim()));
 					} else {
 						tInsuComm.setDueAmt(BigDecimal.ZERO);
