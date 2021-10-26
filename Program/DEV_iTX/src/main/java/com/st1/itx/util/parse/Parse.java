@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,8 @@ import com.st1.itx.Exception.LogicException;
 @Scope("singleton")
 public class Parse {
 	private static final Logger logger = LoggerFactory.getLogger(Parse.class);
+	
+	private  Pattern pattern = Pattern.compile("-?[0-9]+(\\.[0-9]+)?");
 
 	/**
 	 * Integer to String
@@ -184,8 +188,7 @@ public class Parse {
 			int year = dateI / 10000;
 			int mon = (dateI - (year * 10000)) / 100;
 			int day = dateI % 100;
-			return year + "/" + (mon < 10 ? "0" + mon : mon) + "/" + (day < 10 ? "0" + day : day) + " "
-					+ stf.format(value);
+			return year + "/" + (mon < 10 ? "0" + mon : mon) + "/" + (day < 10 ? "0" + day : day) + " " + stf.format(value);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -247,6 +250,7 @@ public class Parse {
 		if (str == null) {
 			return false;
 		}
+		/*
 		int sz = str.length();
 		for (int i = 0; i < sz; i++) {
 			if (Character.isDigit(str.charAt(i)) == false) {
@@ -254,5 +258,8 @@ public class Parse {
 			}
 		}
 		return true;
+		*/
+		Matcher m = pattern.matcher(str);
+        return m.matches();
 	}
 }

@@ -306,7 +306,7 @@ HELP(#LawRemarkHelp)
 ! C(3,#Remark,0,S,$)
 T(H,#Remark,#LawRemarkHelp)
 ! 其他記錄
-#Memo=x,5.100,I
+#Memo=x,10.50,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 ! 維護人員
 #EditEmpNo=X,6,L

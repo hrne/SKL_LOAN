@@ -32,7 +32,6 @@ public class L9725Report extends MakeReport {
 
 	// pivot position for data inputs
 	int pivotRow = 2; // 1-based
-	int pivotCol = 1; // 1-based
 
 	public boolean exec(TitaVo titaVo) throws LogicException {
 		this.info("L9725Report exec start ...");
@@ -57,7 +56,8 @@ public class L9725Report extends MakeReport {
 
 		this.info("L9725Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName,
+				TXCD + "_底稿_" + TXName + ".xlsx", 1, SheetName);
 
 		if (lList != null && lList.size() != 0) {
 
@@ -65,30 +65,14 @@ public class L9725Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : lList) {
 
-				int colShift = 0;
-
-				for (int i = 0; i < tLDVo.size(); i++) {
-
-					int col = i + pivotCol + colShift; // 1-based
-					int row = pivotRow + rowShift; // 1-based
-
-					// Query received will have column names in the format of F0, even if no alias
-					// is set in SQL
-					// notice it's 0-based for those names
-					String tmpValue = tLDVo.get("F" + i);
-
-					switch (i) {
-					// if specific column needs special treatment, insert case here.
-					case 1:
-						makeExcel.setValue(row, col, tmpValue, "L");
-						break;
-					default:
-						makeExcel.setValue(row, col, tmpValue, "C");
-						break;
-					}
-
-				} // for
-
+				int row = pivotRow + rowShift; // 1-base
+				makeExcel.setValue(row, 0, tLDVo.get("F0"), "C");
+				makeExcel.setValue(row, 1, tLDVo.get("F1"), "L");
+				makeExcel.setValue(row, 2, tLDVo.get("F2"), "C");
+				makeExcel.setValue(row, 3, tLDVo.get("F3"), "C");
+				makeExcel.setValue(row, 4, tLDVo.get("F4"), "C");
+				makeExcel.setValue(row, 5, tLDVo.get("F5"), "C");
+				
 				rowShift++;
 
 			} // for

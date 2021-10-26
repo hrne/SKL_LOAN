@@ -100,7 +100,6 @@ public class L5962 extends TradeBuffer {
 		if (iCollMeet != null) {
 			for (CollMeet returnVo : iCollMeet) {
 				OccursList occursList = new OccursList();
-				occursList.putParam("OOFacmNo", returnVo.getFacmNo());
 				occursList.putParam("OOMeetDate", returnVo.getMeetDate());
 				occursList.putParam("OOMeetTime", returnVo.getMeetTime().trim());
 				occursList.putParam("OOContactCode", returnVo.getContactCode());
@@ -122,7 +121,6 @@ public class L5962 extends TradeBuffer {
 				}else {
 					occursList.putParam("OOEditEmpNoX", iCdEmp.getFullname());
 				}
-				occursList.putParam("OOActSeq", returnVo.getTitaTxtNo());
 				occursList.putParam("OOTitaTxtNo", returnVo.getTitaTxtNo());
 				occursList.putParam("OOTitaTlrNo", returnVo.getTitaTlrNo());
 				occursList.putParam("OOTitaAcDate", returnVo.getAcDate());

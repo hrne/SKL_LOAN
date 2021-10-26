@@ -4143,7 +4143,7 @@ TXFORM=L3R14
 #L3r14SumLoanBal
 #L3r14Interest
 #L3r14OpenInterest
-#L3r14RealPayAmt
+#L3r14RealPayAmtL4R2
 #L3r14RemitBank
 #L3r14RemitBranch
 #L3r14RemitAcctNo
@@ -5059,6 +5059,30 @@ TXFORM=L4R24
 ^
 </L4R24.tom>
 
+<L4R25.dec>
+#L4r25InsuCompany=A,2,S
+#L4r25InsuTypeCode=A,2,S
+#L4r25FireInsuCovrg=m,14,S
+#L4r25EthqInsuCovrg=m,14,S
+#L4r25FireInsuPrem=m,14,S
+#L4r25EthqInsuPrem=m,14,S
+#L4r25InsuStartDate=D,7,S
+#L4r25InsuEndDate=D,7,S
+</L4R25.dec>
+
+<L4R25.tom>
+TXFORM=L4R25
+#L4r25InsuCompany
+#L4r25InsuTypeCode
+#L4r25FireInsuCovrg
+#L4r25EthqInsuCovrg
+#L4r25FireInsuPrem
+#L4r25EthqInsuPrem
+#L4r25InsuStartDate
+#L4r25InsuEndDate
+^
+</L4R25.tom>
+
 <L5R01.dec>
 #L5r01CustId=X,10,S
 #L5r01CustNo=9,7,S
@@ -5622,7 +5646,7 @@ TXFORM=L5R17
 #L5R18TelExt=X,5,S
 #L5R18ResultCode=X,1,S
 #L5R18CallDate=D,7,S
-#L5R18ReMark=X,80,S
+#L5R18ReMark=X,500,S
 #L5R18EditEmpNo=X,6,S
 </L5R18.dec>
 
@@ -5650,7 +5674,7 @@ TXFORM=L5R18
 #L5R19CollPsnCode=X,1,S
 #L5R19CollPsnName=X,6,S
 #L5R19MeetPlace=X,60,S
-#L5R19ReMark=X,160,S
+#L5R19ReMark=X,500,S
 #L5R19MeetPlaceCode=9,1,S
 #L5R19CollPsnNameX=X,6,S
 #L5R19EditEmpNo=X,6,S
@@ -5680,7 +5704,7 @@ TXFORM=L5R19
 #L5R20DelvrYet=X,1,S
 #L5R20DelvrCode=X,1,S
 #L5R20Address=X,60,S
-#L5R20ReMark=X,160,S
+#L5R20ReMark=X,500,S
 #L5R20AddressCode=X,1,S
 #L5R20EditEmpNo=X,6,S
 </L5R20.dec>

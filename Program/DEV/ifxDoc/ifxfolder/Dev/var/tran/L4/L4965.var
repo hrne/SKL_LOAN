@@ -423,7 +423,7 @@ T(3,擔保品;L2038 擔保品明細資料查詢)
 BIND(grid,{ cmd=CHAIN; ntxcd=L2038;text=#BTN1_TXNM;ntxbuf=#BTN1_BUF})
 
 #BTN2_BUF=X,50,S
-C(3,#OOBtnFlag,1,$,T(2,5+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+2))
+C(3,#OOBtnFlag,1,T(2,5+#OOClCode1+#OOClCode2+#OOClNo+#OONowInsuNo+#OOEndoInsuNo),T(2,5+#OOClCode1+#OOClCode2+#OOClNo+#OOPrevInsuNo+#OOEndoInsuNo+2))
 
 #BTN2_TXNM=X,50,S
 C(3,#OOBtnFlag,1,T(3,保單;L4610 保險單明細資料登錄),T(3,保單;L4611 續約保單資料維護))

@@ -35,7 +35,7 @@ public class LM013Report extends MakeReport {
 	private String reportKind = "";
 	
 	private enum DataType {
-		None(null),
+		Normal(null),
 		Below_Sum("Below_Sum"),
 		Above_Sum("Above_Sum"),
 		Total("Total");
@@ -45,11 +45,6 @@ public class LM013Report extends MakeReport {
 		DataType(String keyword)
 		{
 			this.keyword = keyword;
-		}
-		
-		public String getKeyword()
-		{
-			return this.keyword;
 		}
 		
 		public static DataType getType(String s)
@@ -62,7 +57,7 @@ public class LM013Report extends MakeReport {
 				}
 			}
 			
-			return DataType.None;
+			return DataType.Normal;
 		}
 	}
 	
@@ -184,8 +179,8 @@ public class LM013Report extends MakeReport {
 				
 				Map<String, String> lastTLDVo = null;
 				
-				DataType lastDataType = DataType.None;
-				DataType thisDataType = DataType.None;
+				DataType lastDataType = DataType.Normal;
+				DataType thisDataType = DataType.Normal;
 				
 				// 開始輸出資料
 				this.print(1, 0, " ");
@@ -255,7 +250,7 @@ public class LM013Report extends MakeReport {
 							// 情況1A  : 兩種資料類型不同，前一筆是正常資料        - 出上一戶最後的合計（顯示名字）, 然後畫線換行
 							// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum) - 換行
 							
-							if (lastDataType == DataType.None)
+							if (lastDataType == DataType.Normal)
 							{
 								// 情況1A Only
 								
@@ -290,7 +285,7 @@ public class LM013Report extends MakeReport {
 						
 						// 這裡開始都是兩筆DataType相同為前提
 						
-						else if (thisDataType == DataType.None && !tLDVo.get("F2").equals(lastTLDVo.get("F2"))) 
+						else if (thisDataType == DataType.Normal && !tLDVo.get("F2").equals(lastTLDVo.get("F2"))) 
 						{
 							// 情況2B  : 兩種資料類型一樣, 正常資料, 不同戶號 - 出上一戶/筆最後的合計（顯示名字）, 然後畫線換行
 	
@@ -311,7 +306,7 @@ public class LM013Report extends MakeReport {
 							this.print(1, 0, newBorder);
 							this.print(1, 0, " ");
 							
-						} else if (thisDataType == DataType.None) 
+						} else if (thisDataType == DataType.Normal) 
 						{
 							// 情況2A  : 兩種資料類型一樣, 正常資料, 同戶號   - 換行
 							this.print(1, 0, " ");
@@ -326,7 +321,7 @@ public class LM013Report extends MakeReport {
 					// 僅正常資料的時候出身分證,
 					// 其他情況出姓名(表示合計/總計)
 					
-					if (thisDataType == DataType.None)
+					if (thisDataType == DataType.Normal)
 					{
 						this.print(0, 15, tLDVo.get("F4"), "L"); // 身分證	
 					} else

@@ -22,8 +22,8 @@ import com.st1.itx.db.domain.ClEvaId;
  */
 public interface ClEvaRepository extends JpaRepository<ClEva, ClEvaId> {
 
-  // ClCode1 = ,AND ClCode2 = ,AND ClNo = ,AND  EvaNo <>
-  public Slice<ClEva> findAllByClCode1IsAndClCode2IsAndClNoIsAndEvaNoNotOrderByEvaNoAsc(int clCode1_0, int clCode2_1, int clNo_2, int evaNo_3, Pageable pageable);
+  // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
+  public Slice<ClEva> findAllByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoAsc(int clCode1_0, int clCode2_1, int clNo_2, Pageable pageable);
 
   // ClCode1 = ,AND ClCode2 = ,AND ClNo = 
   public Optional<ClEva> findTopByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoDesc(int clCode1_0, int clCode2_1, int clNo_2);

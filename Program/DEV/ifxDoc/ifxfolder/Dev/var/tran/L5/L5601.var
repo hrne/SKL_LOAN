@@ -390,7 +390,7 @@ D(8)
 ! #MemoB=X,40,I
 ! C(2,#FunctionCd,S,$,$,s,s,s)
 
-#Remark=X,2.40,I
+#Remark=X,10.50,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 
 @C(3,#ResultCode,9,V(7),$)

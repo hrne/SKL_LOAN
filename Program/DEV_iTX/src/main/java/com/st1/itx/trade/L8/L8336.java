@@ -62,7 +62,6 @@ public class L8336 extends TradeBuffer {
 		int iCloseDate = Integer.valueOf(titaVo.getParam("CloseDate"));
 		String iCloseMark = titaVo.getParam("CloseMark");
 		String iPhoneNo = titaVo.getParam("PhoneNo");
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 營業日 民國YYYMMDD(報送日期);
 		String iKey = "";
 		// JcicZ574
 		JcicZ574 iJcicZ574 = new JcicZ574();
@@ -76,13 +75,7 @@ public class L8336 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 二 key值為「債務人IDN+報送單位代號+申請日期」，不可重複，重複者予以剔退--->檢核在case "1"
 
-			// 三.1 結案日期不可早於申請日期-->(前端檢核)，亦不可晚於報送本檔案日期
-			// 三.2 start 結案日期不可晚於報送本檔案日期
-			if ("A".equals(iTranKey)) {
-				if (iCloseDate > txDate) {
-					throw new LogicException(titaVo, "E0005", "[結案日期]不可晚於本檔案報送日期");
-				}
-			} // 三 end
+			// 三 結案日期不可早於申請日期-->(前端檢核)，亦不可晚於報送本檔案日期--->前端檢核
 		}
 		// 檢核項目end
 

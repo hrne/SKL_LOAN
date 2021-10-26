@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("txAmlCreditService")
 @Repository
-public class TxAmlCreditServiceImpl implements TxAmlCreditService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(TxAmlCreditServiceImpl.class);
-
+public class TxAmlCreditServiceImpl extends ASpringJpaParm implements TxAmlCreditService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class TxAmlCreditServiceImpl implements TxAmlCreditService, InitializingB
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + txAmlCreditId);
+    this.info("findById " + dbName + " " + txAmlCreditId);
     Optional<TxAmlCredit> txAmlCredit = null;
     if (dbName.equals(ContentName.onDay))
       txAmlCredit = txAmlCreditReposDay.findById(txAmlCreditId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "DataDt", "CustKey"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "DataDt", "CustKey"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = txAmlCreditReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = txAmlCreditReposHist.findAll(pageable);
     else 
       slice = txAmlCreditRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("processAll " + dbName + " : " + "reviewType_0 : " + reviewType_0 + " dataDt_1 : " +  dataDt_1 + " dataDt_2 : " +  dataDt_2 + " processType_3 : " +  processType_3);
+    this.info("processAll " + dbName + " : " + "reviewType_0 : " + reviewType_0 + " dataDt_1 : " +  dataDt_1 + " dataDt_2 : " +  dataDt_2 + " processType_3 : " +  processType_3);
     if (dbName.equals(ContentName.onDay))
       slice = txAmlCreditReposDay.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = txAmlCreditReposHist.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, pageable);
     else 
       slice = txAmlCreditRepos.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("processNo " + dbName + " : " + "reviewType_0 : " + reviewType_0 + " dataDt_1 : " +  dataDt_1 + " dataDt_2 : " +  dataDt_2 + " processType_3 : " +  processType_3 + " processCount_4 : " +  processCount_4);
+    this.info("processNo " + dbName + " : " + "reviewType_0 : " + reviewType_0 + " dataDt_1 : " +  dataDt_1 + " dataDt_2 : " +  dataDt_2 + " processType_3 : " +  processType_3 + " processCount_4 : " +  processCount_4);
     if (dbName.equals(ContentName.onDay))
       slice = txAmlCreditReposDay.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeAndProcessCountIsOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, processCount_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = txAmlCreditReposHist.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeAndProcessCountIsOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, processCount_4, pageable);
     else 
       slice = txAmlCreditRepos.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeAndProcessCountIsOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, processCount_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("processYes " + dbName + " : " + "reviewType_0 : " + reviewType_0 + " dataDt_1 : " +  dataDt_1 + " dataDt_2 : " +  dataDt_2 + " processType_3 : " +  processType_3 + " processCount_4 : " +  processCount_4);
+    this.info("processYes " + dbName + " : " + "reviewType_0 : " + reviewType_0 + " dataDt_1 : " +  dataDt_1 + " dataDt_2 : " +  dataDt_2 + " processType_3 : " +  processType_3 + " processCount_4 : " +  processCount_4);
     if (dbName.equals(ContentName.onDay))
       slice = txAmlCreditReposDay.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeAndProcessCountGreaterThanOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, processCount_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -181,6 +186,9 @@ em = null;
       slice = txAmlCreditReposHist.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeAndProcessCountGreaterThanOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, processCount_4, pageable);
     else 
       slice = txAmlCreditRepos.findAllByReviewTypeIsAndDataDtGreaterThanEqualAndDataDtLessThanEqualAndProcessTypeLikeAndProcessCountGreaterThanOrderByDataDtAscCustKeyAsc(reviewType_0, dataDt_1, dataDt_2, processType_3, processCount_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -197,7 +205,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("dataDtAll " + dbName + " : " + "dataDt_0 : " + dataDt_0);
+    this.info("dataDtAll " + dbName + " : " + "dataDt_0 : " + dataDt_0);
     if (dbName.equals(ContentName.onDay))
       slice = txAmlCreditReposDay.findAllByDataDtIs(dataDt_0, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -207,6 +215,9 @@ em = null;
     else 
       slice = txAmlCreditRepos.findAllByDataDtIs(dataDt_0, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -215,7 +226,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + txAmlCreditId);
+    this.info("Hold " + dbName + " " + txAmlCreditId);
     Optional<TxAmlCredit> txAmlCredit = null;
     if (dbName.equals(ContentName.onDay))
       txAmlCredit = txAmlCreditReposDay.findByTxAmlCreditId(txAmlCreditId);
@@ -233,7 +244,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + txAmlCredit.getTxAmlCreditId());
+    this.info("Hold " + dbName + " " + txAmlCredit.getTxAmlCreditId());
     Optional<TxAmlCredit> txAmlCreditT = null;
     if (dbName.equals(ContentName.onDay))
       txAmlCreditT = txAmlCreditReposDay.findByTxAmlCreditId(txAmlCredit.getTxAmlCreditId());
@@ -254,13 +265,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + txAmlCredit.getTxAmlCreditId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		}
+    this.info("Insert..." + dbName + " " + txAmlCredit.getTxAmlCreditId());
     if (this.findById(txAmlCredit.getTxAmlCreditId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       txAmlCredit.setCreateEmpNo(empNot);
+
+    if(txAmlCredit.getLastUpdateEmpNo() == null || txAmlCredit.getLastUpdateEmpNo().isEmpty())
+      txAmlCredit.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return txAmlCreditReposDay.saveAndFlush(txAmlCredit);	
@@ -281,7 +295,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + txAmlCredit.getTxAmlCreditId());
+    this.info("Update..." + dbName + " " + txAmlCredit.getTxAmlCreditId());
     if (!empNot.isEmpty())
       txAmlCredit.setLastUpdateEmpNo(empNot);
 
@@ -304,7 +318,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + txAmlCredit.getTxAmlCreditId());
+    this.info("Update..." + dbName + " " + txAmlCredit.getTxAmlCreditId());
     if (!empNot.isEmpty())
       txAmlCredit.setLastUpdateEmpNo(empNot);
 
@@ -324,7 +338,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + txAmlCredit.getTxAmlCreditId());
+    this.info("Delete..." + dbName + " " + txAmlCredit.getTxAmlCreditId());
     if (dbName.equals(ContentName.onDay)) {
       txAmlCreditReposDay.delete(txAmlCredit);	
       txAmlCreditReposDay.flush();
@@ -353,11 +367,13 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (TxAmlCredit t : txAmlCredit) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+    for (TxAmlCredit t : txAmlCredit){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       txAmlCredit = txAmlCreditReposDay.saveAll(txAmlCredit);	
@@ -386,7 +402,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (txAmlCredit == null || txAmlCredit.size() == 0)
       throw new DBException(6);
 
@@ -415,7 +431,7 @@ em = null;
 
   @Override
   public void deleteAll(List<TxAmlCredit> txAmlCredit, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

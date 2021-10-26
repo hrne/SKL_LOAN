@@ -394,7 +394,7 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 @V(7)
 
 ! 其他記錄
-#Remark=X,2.80,I
+#Remark=X,10.50,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 ! 維護人員
 #EditEmpNo=X,6,L

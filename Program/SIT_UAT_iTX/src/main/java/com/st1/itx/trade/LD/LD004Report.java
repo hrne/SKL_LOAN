@@ -1,7 +1,9 @@
 package com.st1.itx.trade.LD;
 
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LD004ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.format.ConvertUpMoney;
+import com.st1.itx.util.format.StringCut;
 
 @Component
 @Scope("prototype")
@@ -127,26 +130,16 @@ public class LD004Report extends MakeReport {
 				DecimalFormat df1 = new DecimalFormat("#,##0");
 				this.print(0, 80, df1.format(f10), "R");
 				
-				// 戶名太長時做wrap
+				// 戶名固定做wrap
 				
-				String[] custNameWrap = new String[(int)Math.ceil((double)LD4Vo.get("F9").length() / 10)];
-				
-				for (int i = 0; i < custNameWrap.length; i++)
-				{
-					if (i < custNameWrap.length - 1)
-					{
-						custNameWrap[i] = LD4Vo.get("F9").substring(10*i, 10*i+10);
-					} else {
-						custNameWrap[i] = LD4Vo.get("F9").substring(10*i);
-					}
-				}
+				ArrayList<String> custNameWrap = longStringWrap(LD4Vo.get("F9"), 20);
 
 				this.print(1, 1, "│　　　　　　　　　　│　戶名：　　　　　　　　　　　　　　│　　　　　　　　　│");
-				this.print(0, 34, custNameWrap[0]);
+				if (custNameWrap.size() >= 1) { this.print(0, 34, custNameWrap.get(0)); }
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
-				if (custNameWrap.length >= 2) { this.print(0, 34, custNameWrap[1]); }
+				if (custNameWrap.size() >= 2) { this.print(0, 34, custNameWrap.get(1)); }
 				this.print(1, 1, "│　　　　　　　　　　│　　　　　　　　　　　　　　　　　　│　　　　　　　　　│");
-				if (custNameWrap.length >= 3) { this.print(0, 34, custNameWrap[2]); }
+				if (custNameWrap.size() >= 3) { this.print(0, 34, custNameWrap.get(2)); }
 				// 先輸出到最大三十字，如果將來有更長的戶名需要輸出，
 				// 這裡可以考慮改成for迴圈
 				
@@ -242,6 +235,80 @@ public class LD004Report extends MakeReport {
 			}
 		} else {
 			return rocdatex;
+		}
+	}
+	
+	private ArrayList<String> _longStringWrapRecursion(String s, int lpp, ArrayList<String> r)
+	{
+		try {
+			
+			// 打掉切割長度為0或負數的輸入
+			if (lpp <= 0)
+			{
+				this.warn("LD004 longStringWrap got " + lpp + " as lpp. Return.");
+				return r;
+			}
+			
+			int len = mixedLength(s);
+			BigDecimal length = BigDecimal.ZERO;
+			
+			if (s == null || s.isEmpty())
+			{
+				this.info("LD004 longStringWrap s is empty or null. Return.");
+				return r;
+			} else
+			{
+				length = new BigDecimal(len);
+			}
+			
+			this.info("LD004 longStringWrap cut: " + s + " into string with length as " + lpp);
+			
+			if (length.compareTo(new BigDecimal(lpp)) > 0)
+			{
+				// s依然>lpp, 切割, 加入名單, 進入下一輪遞迴
+				String cut = StringCut.stringCut(s, 0, lpp);
+				r.add(cut);
+				// log一下最後切了什麼東西
+				this.info("latest cut: '" + cut +"'");
+				
+				// 這裡如果s的長度大於int上限會壞掉
+				// 實際上cut不一定會=lpp
+				// 譬如終點在中文字的中間 最後一個中文字就不會吃進去
+				// 所以可能是lpp-1
+				return _longStringWrapRecursion(StringCut.stringCut(s, mixedLength(cut), length.intValue()), lpp, r);
+			} else
+			{
+				// s已經<=lpp, 直接加入名單回傳
+				r.add(s);
+				this.info("final cut: " + s);
+				return r;
+			}
+				
+		} catch (Exception e)
+		{
+			this.warn("LD004 Failed during string wrapping: " + s);
+			this.warn(e.toString());
+			return r;
+		}
+	}
+	
+	private ArrayList<String> longStringWrap(String s, int lengthPerPart)
+	{	
+		this.info("LD004 longStringWrap is called.");
+		this.info("string: " + s);
+		this.info("lengthPerPart: " + lengthPerPart);
+		return _longStringWrapRecursion(s, lengthPerPart, new ArrayList<String>());
+	}
+	
+	private int mixedLength(String s)
+	{
+		try {
+			return (s.getBytes("UTF-8").length - s.length()) / 2 + s.length();
+		} catch (UnsupportedEncodingException e)
+		{
+			this.error("LD004 MixedLength() failed to encode!");
+			this.error("Original string: " + s);
+			return 0;
 		}
 	}
 

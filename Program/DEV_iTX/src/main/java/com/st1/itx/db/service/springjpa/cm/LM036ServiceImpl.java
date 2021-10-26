@@ -43,9 +43,14 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sql = "";
 		sql += " SELECT \"YearMonth\" ";
 		sql += "      , SUM(\"Counts\") AS \"Counts\" ";
+		sql += "      , \"BadDebtMonth\" AS \"BadDebtMonth\" ";
+		sql += "      , SUM(\"BadDebtCount\") AS \"BadDebtCount\" ";
 		sql += " FROM ( ";
-		sql += "     SELECT TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) AS \"YearMonth\" "; // F0 資料年月
-		sql += "         , 1                                  AS \"Counts\" "; // F1 件數
+		sql += "     SELECT TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) ";
+		sql += "                                     AS \"YearMonth\" "; // F0 初貸年月
+		sql += "          , 1                        AS \"Counts\" "; // F1 初貸件數
+		sql += "          , 0                        AS \"BadDebtMonth\" "; // F2 逾90天時年月
+		sql += "          , 0                        AS \"BadDebtCount\" "; // F3 逾90天件數
 		sql += "     FROM \"FacCaseAppl\" FCA ";
 		sql += "     LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FCA.\"ApplNo\" ";
 		sql += "     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
@@ -59,14 +64,39 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) >= :startMonth ";
 		sql += "       AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) <= :endMonth ";
 		sql += "     UNION ALL ";
-		sql += "     SELECT \"YearMonth\" ";
-		sql += "         , 0 AS \"Counts\" ";
+		sql += "     SELECT \"YearMonth\" "; // F0 初貸年月
+		sql += "          , 0             AS \"Counts\" "; // F1 初貸件數
+		sql += "          , \"YearMonth\" AS \"BadDebtMonth\" "; // F2 逾90天時年月
+		sql += "          , 0             AS \"BadDebtCount\" "; // F3 逾90天件數
 		sql += "     FROM \"MonthlyFacBal\" ";
 		sql += "     WHERE \"YearMonth\" >= :startMonth  ";
-		sql += "     AND \"YearMonth\" <= :endMonth  ";
+		sql += "       AND \"YearMonth\" <= :endMonth  ";
+		sql += "     UNION ALL ";
+		sql += "     SELECT TRUNC(FAC.\"FirstDrawdownDate\" / 100) ";
+		sql += "                            AS \"YearMonth\" "; // F0 初貸年月
+		sql += "          , 0               AS \"Counts\" "; // F1 初貸件數
+		sql += "          , M.\"YearMonth\" AS \"BadDebtMonth\" "; // F2 逾90天時年月
+		sql += "          , 1               AS \"BadDebtCount\" "; // F3 逾90天件數
+		sql += "     FROM \"MonthlyFacBal\" M ";
+		sql += "     LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = M.\"CustNo\" ";
+		sql += "                              AND FAC.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += "     LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = FAC.\"ApplNo\" ";
+		sql += "     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "     WHERE FCA.\"BranchNo\" = '0000' ";
+		sql += "       AND FCA.\"ApproveDate\" > 0 ";
+		sql += "       AND FAC.\"FirstDrawdownDate\" > 0 ";
+		sql += "       AND FCA.\"ProcessCode\" = '1' ";
+		sql += "       AND NVL(FAC.\"CustNo\",0) != 0 ";
+		sql += "       AND CM.\"EntCode\" = '0' ";
+		sql += "       AND NVL(FCA.\"PieceCode\",' ') NOT IN ('3','5','7','C','E') ";
+		sql += "       AND M.\"YearMonth\" >= :startMonth  ";
+		sql += "       AND M.\"YearMonth\" <= :endMonth  ";
+		sql += "       AND M.\"OvduDays\" >= 90 ";
 		sql += " ) ";
 		sql += " GROUP BY \"YearMonth\" ";
+		sql += "        , \"BadDebtMonth\" ";
 		sql += " ORDER BY \"YearMonth\" ";
+		sql += "        , \"BadDebtMonth\" ";
 
 		this.info("sql=" + sql);
 
@@ -94,25 +124,65 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("LM036ServiceImpl endMonth = " + endMonth);
 
 		String sql = "";
-		sql += " SELECT TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) AS \"YearMonth\" "; // F0 資料年月
-		sql += "      , SUM(NVL(LBM.\"DrawdownAmt\",0))   AS \"Counts\" "; // F1 件數
-		sql += " FROM \"FacCaseAppl\" FCA ";
-		sql += " LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FCA.\"ApplNo\" ";
-		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
-		sql += " LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = FAC.\"CustNo\" ";
-		sql += "                              AND LBM.\"FacmNo\" = FAC.\"FacmNo\" ";
-		sql += "                              AND TRUNC(LBM.\"DrawdownDate\" / 100 ) = TRUNC(FAC.\"FirstDrawdownDate\" / 100 )  ";
-		sql += " WHERE FCA.\"BranchNo\" = '0000' ";
-		sql += "   AND FCA.\"ApproveDate\" > 0 ";
-		sql += "   AND FAC.\"FirstDrawdownDate\" > 0 ";
-		sql += "   AND FCA.\"ProcessCode\" = '1' ";
-		sql += "   AND NVL(FAC.\"CustNo\",0) != 0 ";
-		sql += "   AND CM.\"EntCode\" = '0' ";
-		sql += "   AND NVL(FCA.\"PieceCode\",' ') NOT IN ('3','5','7','C','E') ";
-		sql += "   AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) >= :startMonth ";
-		sql += "   AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) <= :endMonth ";
-		sql += " GROUP BY TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) ";
-		sql += " ORDER BY TRUNC(FAC.\"FirstDrawdownDate\" / 100 )";
+		sql += " SELECT \"YearMonth\" "; // -- F0 初貸年月 
+		sql += "      , SUM(\"DrawdownAmt\") AS \"DrawdownAmt\" "; // -- F1 初貸金額
+		sql += "      , \"BadDebtMonth\" "; // -- F2 逾90天時年月
+		sql += "      , SUM(\"BadDebtBal\") AS \"BadDebtBal\" "; // -- F3 逾90天時餘額
+		sql += " FROM ( ";
+		sql += "     SELECT TRUNC(FAC.\"FirstDrawdownDate\" / 100 )  ";
+		sql += "                                     AS \"YearMonth\" "; // -- F0 初貸年月
+		sql += "          , NVL(LBM.\"DrawdownAmt\",0) AS \"DrawdownAmt\" "; // -- F1 初貸金額
+		sql += "          , 0                        AS \"BadDebtMonth\" "; // -- F2 逾90天時年月
+		sql += "          , 0                        AS \"BadDebtBal\" "; // -- F3 逾90天時餘額
+		sql += "     FROM \"FacCaseAppl\" FCA ";
+		sql += "     LEFT JOIN \"FacMain\" FAC ON FAC.\"ApplNo\" = FCA.\"ApplNo\" ";
+		sql += "     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "     LEFT JOIN \"LoanBorMain\" LBM ON LBM.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "                                  AND LBM.\"FacmNo\" = FAC.\"FacmNo\" ";
+		sql += "                                  AND TRUNC(LBM.\"DrawdownDate\" / 100 ) = TRUNC(FAC.\"FirstDrawdownDate\" / 100 )  ";
+		sql += "     WHERE FCA.\"BranchNo\" = '0000' ";
+		sql += "       AND FCA.\"ApproveDate\" > 0 ";
+		sql += "       AND FAC.\"FirstDrawdownDate\" > 0 ";
+		sql += "       AND FCA.\"ProcessCode\" = '1' ";
+		sql += "       AND NVL(FAC.\"CustNo\",0) != 0 ";
+		sql += "       AND CM.\"EntCode\" = '0' ";
+		sql += "       AND NVL(FCA.\"PieceCode\",' ') NOT IN ('3','5','7','C','E') ";
+		sql += "       AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) >= :startMonth ";
+		sql += "       AND TRUNC(FAC.\"FirstDrawdownDate\" / 100 ) <= :endMonth ";
+		sql += "     UNION ALL ";
+		sql += "     SELECT \"YearMonth\" "; // -- F0 初貸年月
+		sql += "          , 0             AS \"Counts\" "; // -- F1 初貸件數
+		sql += "          , \"YearMonth\"   AS \"BadDebtMonth\" "; // -- F2 逾90天時年月
+		sql += "          , 0             AS \"BadDebtBal\" "; // -- F3 逾90天時餘額
+		sql += "     FROM \"MonthlyFacBal\" ";
+		sql += "     WHERE \"YearMonth\" >= :startMonth  ";
+		sql += "       AND \"YearMonth\" <= :endMonth  ";
+		sql += "     UNION ALL ";
+		sql += "     SELECT TRUNC(FAC.\"FirstDrawdownDate\" / 100) ";
+		sql += "                            AS \"YearMonth\" "; // -- F0 初貸年月
+		sql += "          , 0               AS \"Counts\" "; // -- F1 初貸件數
+		sql += "          , M.\"YearMonth\"   AS \"BadDebtMonth\" "; // -- F2 逾90天時年月
+		sql += "          , M.\"PrinBalance\" AS \"BadDebtBal\" "; // -- F3 逾90天時餘額
+		sql += "     FROM \"MonthlyFacBal\" M ";
+		sql += "     LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = M.\"CustNo\" ";
+		sql += "                              AND FAC.\"FacmNo\" = M.\"FacmNo\" ";
+		sql += "     LEFT JOIN \"FacCaseAppl\" FCA ON FCA.\"ApplNo\" = FAC.\"ApplNo\" ";
+		sql += "     LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = FAC.\"CustNo\" ";
+		sql += "     WHERE FCA.\"BranchNo\" = '0000' ";
+		sql += "       AND FCA.\"ApproveDate\" > 0 ";
+		sql += "       AND FAC.\"FirstDrawdownDate\" > 0 ";
+		sql += "       AND FCA.\"ProcessCode\" = '1' ";
+		sql += "       AND NVL(FAC.\"CustNo\",0) != 0 ";
+		sql += "       AND CM.\"EntCode\" = '0' ";
+		sql += "       AND NVL(FCA.\"PieceCode\",' ') NOT IN ('3','5','7','C','E') ";
+		sql += "       AND M.\"YearMonth\" >= :startMonth  ";
+		sql += "       AND M.\"YearMonth\" <= :endMonth  ";
+		sql += "       AND M.\"OvduDays\" >= 90 ";
+		sql += " ) ";
+		sql += " GROUP BY \"YearMonth\" ";
+		sql += "        , \"BadDebtMonth\" ";
+		sql += " ORDER BY \"YearMonth\" ";
+		sql += "        , \"BadDebtMonth\" ";
 
 		this.info("sql=" + sql);
 

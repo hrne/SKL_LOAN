@@ -130,13 +130,7 @@ public class L8326 extends TradeBuffer {
 			}
 			// 1.2 end
 
-			// 1.3.1 結案日期不可早於調解申請日.--->(前端檢核)
-			// 1.3.2 結案日期不可晚於報送本檔案日期.
-			if ("A".equals(iTranKey)) {
-				if (iCloseDate > txDate) {
-					throw new LogicException("E0005", "[結案日期]不可晚於報送本檔案日期.");
-				}
-			} // 1.3.2 end
+			// 1.3 結案日期不可早於調解申請日，亦不可晚於報送本檔案日期.--->(前端檢核)
 
 			if (!"D".equals(iTranKey)) {
 				// 1.4
@@ -159,7 +153,7 @@ public class L8326 extends TradeBuffer {
 				if ("00".equals(iCloseCode)) {
 					// @@@SQL-Function需改為custRcSubCourtEq
 					Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.otherEq(iSubmitKey, iCustId, iApplyDate + 19110000,
-							iCourtCode, txDate, 0, Integer.MAX_VALUE, titaVo);
+							iCourtCode, 0, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ451 != null) {
 						int sDelayYM = 0;
 						for (JcicZ451 xJcicZ451 : sJcicZ451) {

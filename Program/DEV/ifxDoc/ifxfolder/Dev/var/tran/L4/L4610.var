@@ -113,20 +113,8 @@ T(1,@FunctionCode,#NTXBUF,1,1)
 T(1,@ClCode1,#NTXBUF,2,1)
 T(1,@ClCode2,#NTXBUF,3,2)
 T(1,@ClNo,#NTXBUF,5,7)
-C(3,#FunctionCode,1,s,$)
-T(1,@InsuFlag,#NTXBUF,12,1)
-T(1,@PrevInsuNo,#NTXBUF,13,16)
-T(1,@NowInsuNo,#NTXBUF,29,16)
-T(1,@InsuCompany,#NTXBUF,45,2)
-T(1,@InsuTypeCode,#NTXBUF,47,2)
-T(1,@FireInsuCovrgX,#NTXBUF,49,18)
-T(1,@EthqInsuCovrgX,#NTXBUF,67,18)
-T(1,@FireInsuPremX,#NTXBUF,85,18)
-T(1,@EthqInsuPremX,#NTXBUF,103,18)
-T(1,@InsuStartDate,#NTXBUF,121,7)
-T(1,@InsuEndDate,#NTXBUF,128,7)
-T(1,@EndoInsuNo,#NTXBUF,135,16)
-T(1,@EndoInsuNoX,#NTXBUF,135,16)
+T(1,@PrevInsuNo,#NTXBUF,12,16)
+T(1,@EndoInsuNo,#NTXBUF,28,16)
 
 ! 按鈕傳值不會補零，需先轉型態
 #FireInsuCovrgX=X,18,S
@@ -183,6 +171,44 @@ C(3,#FunctionCode,5,K(NOBUTTON,CLOSEY),$)
 #AGAIN=X,1,S
 C(3,#FunctionCode,1,S,$)
 E(0,1)ASGN(AGAIN$)
+
+! 修改、刪除調Rim
+<include src="ROM.icf::L4R25.dec"/>
+
+! InsuOrignal續保檔Key
+#RimClCode1=A,1,S
+#RimClCode2=A,2,S
+#RimClNo=A,7,S
+#RimPrevInsuNo=x,16,S
+#RimEndoInsuNo=x,16,S
+
+! 塞值調rim，無值提error
+#RimL4R25=X,1,S
+C(3,#FunctionCode,1,s,$)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+T(2,@RimPrevInsuNo,#PrevInsuNo)
+T(2,@RimEndoInsuNo,#EndoInsuNo)
+RESET_RIM(#RimL4R25,L4R25)
+S(L4R25,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo)
+R(1,L4R25)
+
+#ReceiveL4r25=X,1,S
+C(3,#FunctionCode,1,s,$)
+E(0,@InsuCompany,#L4r25InsuCompany)
+E(0,@InsuTypeCode,#L4r25InsuTypeCode)
+E(0,@FireInsuCovrg,#L4r25FireInsuCovrg)
+E(0,@FireInsuCovrgL,#L4r25FireInsuCovrg)
+E(0,@EthqInsuCovrg,#L4r25EthqInsuCovrg)
+E(0,@EthqInsuCovrgL,#L4r25EthqInsuCovrg)
+E(0,@FireInsuPrem,#L4r25FireInsuPrem)
+E(0,@FireInsuPremL,#L4r25FireInsuPrem)
+E(0,@EthqInsuPrem,#L4r25EthqInsuPrem)
+E(0,@EthqInsuPremL,#L4r25EthqInsuPrem)
+E(0,@InsuStartDate,#L4r25InsuStartDate)
+E(0,@InsuEndDate,#L4r25InsuEndDate)
+
 
 ! 20210911 xiangwei
 ! 地震險/火險: 這裡改為預設將星號放在火險上
@@ -400,7 +426,6 @@ T(3,[L4610] 保險單明細資料登錄)
 #EthqInsuPrem
 #InsuStartDate
 #InsuEndDate
-
 </sub>
 
 
@@ -408,6 +433,7 @@ T(3,[L4610] 保險單明細資料登錄)
 <sub type="TOM">
 TXFORM=L4610^
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L4R25.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

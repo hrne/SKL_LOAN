@@ -114,7 +114,6 @@ public class L5964 extends TradeBuffer {
 				}else {
 					occursList.putParam("OOEditEmpNoX", iCdEmp.getFullname());
 				}
-				occursList.putParam("OOActSeq", returnVo.getTitaTxtNo());
 				occursList.putParam("OOTitaTxtNo", returnVo.getTitaTxtNo());
 				occursList.putParam("OOTitaTlrNo", returnVo.getTitaTlrNo());
 				occursList.putParam("OOTitaAcDate", returnVo.getAcDate());

@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,10 @@ public class LM061Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
+
+	List<Map<String, Object>> eAmtList = new ArrayList<Map<String, Object>>();
+	Map<String, Object> mergeAmtMap = null;
+	int countAmt = 1;
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
@@ -160,90 +165,92 @@ public class LM061Report extends MakeReport {
 				// 鑑價金額
 				F11 = tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11"));
 
-	
 				// 代號 56 拍定金額 58 分配金額
 				if (tLDVo.get("F12").equals("056")) {
 
-					// 和上一個戶號不一樣就歸零 並直接附值
-					// 和上一個戶號一樣就累加 並 合併儲存格 再賦值
+					// 20211025Test
 
-					if (tempCustNo.equals(tLDVo.get("F0"))) {
-				
-						// 紀錄同戶號多額度的筆數
-						tempCount++;
-						this.info("1.tempCount=" + tempCount);
-						// 累加轉催收金額
+					checkMergeRegionValue(tLDVo.get("F0").toString(), F11, ovduBal, row);
 
-						tempOvduBal = tempOvduBal.add(ovduBal);
-						this.info("1有相同戶號的累積金額" + tempOvduBal + ",單筆金額" + ovduBal);
-
-						// BigDecimal的比較大小：-1 小於 0 等於 1 大於
-						if (tempF11.compareTo(F11) == -1) {
-							tempF11 = F11;
-						}
-
-					} else {
-						// 上一同戶號多額度跟這筆比較，如果有1筆以上就使用合併
-						if (tempCount > 1) {
-
-							// 爛位的列數為多少筆額度減去當前列數
-							makeExcel.setValue(row - tempCount, 13, tempF11, "L");
-
-							// 同上方式，同戶號 累計轉催收金額 除以 鑑價金額 (LTV)
-							makeExcel.setValue(row - tempCount, 14, this.computeDivide(tempOvduBal, tempF11, 4),
-									"##0.0%");
-							this.info("2有相同戶號的累積金額" + tempOvduBal + ",單筆金額" + ovduBal);
-							this.info("戶號：" + tLDVo.get("F0") + ",需合併：從" + (row - tempCount) + "到" + (row - 1));
-
-							// 賦值完後 合併
-							makeExcel.setMergedRegion(row - tempCount, row - 1, 13, 13);
-							// 賦值完後 合併
-							makeExcel.setMergedRegion(row - tempCount, row - 1, 14, 14);
-
-
-						}
-						// 暫存鑑價金額 歸零
-						tempF11 = BigDecimal.ZERO;
-						// 賦值鑑價金額
-						tempF11 = F11;
-
-						// 暫存轉催收金額 歸零
-						tempOvduBal = BigDecimal.ZERO;
-						// 累加轉催收金額
-						tempOvduBal = tempOvduBal.add(ovduBal);
-
-						tempCount=0;
-						// 多筆額度計數
-						tempCount++;
-
-						// 單筆
-						makeExcel.setValue(row, 13,
-								tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")),
-								"$* #,##0", "R");
-
-						makeExcel.setValue(row, 14, this.computeDivide(ovduBal, new BigDecimal(tLDVo.get("F11")), 4),
-								"##0.0%");
-
-					}
-
-					// 暫存戶號
-					tempCustNo = tLDVo.get("F0");
-
-					// 最後一筆時如果是需要合併，且同戶號多額度有1筆以上就使用合併。
-					if (count == tLDVo.size() && tempCount > 1) {
-
-						// 欄位的列數為多少筆額度減去當前列數
-						makeExcel.setValue(row - tempCount, 13, tempF11, "L");
-
-						// 同上方式，同戶號 累計轉催收金額 除以 鑑價金額 (LTV)
-						makeExcel.setValue(row - tempCount, 14, this.computeDivide(tempOvduBal, tempF11, 4), "##0.0%");
-
-						// 賦值完後 合併
-						makeExcel.setMergedRegion(row - tempCount, row, 13, 13);
-						// 賦值完後 合併
-						makeExcel.setMergedRegion(row - tempCount, row, 14, 14);
-
-					}
+//					// 和上一個戶號不一樣就歸零 並直接附值
+//					// 和上一個戶號一樣就累加 並 合併儲存格 再賦值
+//
+//					if (tempCustNo.equals(tLDVo.get("F0"))) {
+//
+//						// 紀錄同戶號多額度的筆數
+//						tempCount++;
+//						this.info("1.tempCount=" + tempCount);
+//						// 累加轉催收金額
+//
+//						tempOvduBal = tempOvduBal.add(ovduBal);
+//						this.info("1有相同戶號的累積金額" + tempOvduBal + ",單筆金額" + ovduBal);
+//
+//						// BigDecimal的比較大小：-1 小於 0 等於 1 大於
+//						if (tempF11.compareTo(F11) == -1) {
+//							tempF11 = F11;
+//						}
+//
+//					} else {
+//						// 上一同戶號多額度跟這筆比較，如果有1筆以上就使用合併
+//						if (tempCount > 1) {
+//
+//							// 爛位的列數為多少筆額度減去當前列數
+//							makeExcel.setValue(row - tempCount, 13, tempF11, "L");
+//
+//							// 同上方式，同戶號 累計轉催收金額 除以 鑑價金額 (LTV)
+//							makeExcel.setValue(row - tempCount, 14, this.computeDivide(tempOvduBal, tempF11, 4),
+//									"##0.0%");
+//							this.info("2有相同戶號的累積金額" + tempOvduBal + ",單筆金額" + ovduBal);
+//							this.info("戶號：" + tLDVo.get("F0") + ",需合併：從" + (row - tempCount) + "到" + (row - 1));
+//
+//							// 賦值完後 合併
+//							makeExcel.setMergedRegion(row - tempCount, row - 1, 13, 13);
+//							// 賦值完後 合併
+//							makeExcel.setMergedRegion(row - tempCount, row - 1, 14, 14);
+//
+//						}
+//						// 暫存鑑價金額 歸零
+//						tempF11 = BigDecimal.ZERO;
+//						// 賦值鑑價金額
+//						tempF11 = F11;
+//
+//						// 暫存轉催收金額 歸零
+//						tempOvduBal = BigDecimal.ZERO;
+//						// 累加轉催收金額
+//						tempOvduBal = tempOvduBal.add(ovduBal);
+//
+//						tempCount = 0;
+//						// 多筆額度計數
+//						tempCount++;
+//
+//						// 單筆
+//						makeExcel.setValue(row, 13,
+//								tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")),
+//								"$* #,##0", "R");
+//
+//						makeExcel.setValue(row, 14, this.computeDivide(ovduBal, new BigDecimal(tLDVo.get("F11")), 4),
+//								"##0.0%");
+//
+//					}
+//
+//					// 暫存戶號
+//					tempCustNo = tLDVo.get("F0");
+//
+//					// 最後一筆時如果是需要合併，且同戶號多額度有1筆以上就使用合併。
+//					if (count == tLDVo.size() && tempCount > 1) {
+//
+//						// 欄位的列數為多少筆額度減去當前列數
+//						makeExcel.setValue(row - tempCount, 13, tempF11, "L");
+//
+//						// 同上方式，同戶號 累計轉催收金額 除以 鑑價金額 (LTV)
+//						makeExcel.setValue(row - tempCount, 14, this.computeDivide(tempOvduBal, tempF11, 4), "##0.0%");
+//
+//						// 賦值完後 合併
+//						makeExcel.setMergedRegion(row - tempCount, row, 13, 13);
+//						// 賦值完後 合併
+//						makeExcel.setMergedRegion(row - tempCount, row, 14, 14);
+//
+//					}
 
 				}
 
@@ -268,7 +275,109 @@ public class LM061Report extends MakeReport {
 			makeExcel.setValue(3, 3, "本日無資料");
 		}
 
+		BigDecimal tempAmt = null;
+		BigDecimal tempLTV = null;
+		int sRow = 0;
+		int eRow = 0;
+		
+		this.info("eAmtList=" + eAmtList.toString());
+		
+		for (Map<String, Object> eAmt : eAmtList) {
+
+			tempAmt = new BigDecimal(eAmt.get("amt").toString());
+			tempLTV = new BigDecimal(eAmt.get("ltv").toString());
+			eRow = Integer.valueOf(eAmt.get("eRow").toString());
+			sRow = eRow + Integer.valueOf(eAmt.get("count").toString()) - 1;
+
+			this.info("merge=" + sRow + "," + eRow);
+
+			if (Integer.valueOf(eAmt.get("count").toString()) > 1) {
+			
+				makeExcel.setMergedRegionValue(sRow, eRow, 13, 13, tempAmt, "#,##0");
+				makeExcel.setMergedRegionValue(sRow, eRow, 14, 14, tempLTV, "##0.00%");
+
+			} else {
+				
+				makeExcel.setValue(sRow, 13, tempAmt, "#,##0");
+				makeExcel.setValue(sRow, 14, tempLTV, "##0.00%");
+
+			}
+
+		}
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
+	}
+
+	private void checkMergeRegionValue(String custNo, BigDecimal eAmt, BigDecimal ovduAmt, int row) {
+
+		String tempCustNo = "";
+		BigDecimal ltvPercent = BigDecimal.ZERO;
+//		String tempFacmNo = "";
+
+		mergeAmtMap = new HashMap<String, Object>();
+
+		if (eAmtList.size() > 0) {
+
+			int as = eAmtList.size() - 1;
+
+			BigDecimal tempAmt = new BigDecimal(eAmtList.get(as).get("amt").toString()).add(eAmt);
+			BigDecimal tempOvduAmt = new BigDecimal(eAmtList.get(as).get("ovduamt").toString());
+
+			tempCustNo = eAmtList.get(as).get("cust").toString();
+
+			// 與前一筆 戶號額度是否一樣
+			if (tempCustNo.equals(custNo)) {
+
+				countAmt++;
+
+				ltvPercent = this.computeDivide(tempOvduAmt, tempAmt, 4);
+
+				mergeAmtMap.put("count", countAmt);
+				mergeAmtMap.put("cust", custNo);
+				mergeAmtMap.put("ovduamt", ovduAmt);
+				mergeAmtMap.put("ltv", ltvPercent);
+				mergeAmtMap.put("eRow", row);
+
+				if (tempAmt.compareTo(eAmt) == 0) {
+					mergeAmtMap.put("amt", eAmt);
+				} else if (tempAmt.compareTo(eAmt) == -1) {
+					mergeAmtMap.put("amt", eAmt);
+				} else {
+					mergeAmtMap.put("amt", tempAmt);
+				}
+
+				eAmtList.set(as, mergeAmtMap);
+
+			} else {
+
+				countAmt = 1;
+
+				mergeAmtMap.put("count", countAmt);
+				mergeAmtMap.put("cust", custNo);
+				mergeAmtMap.put("amt", eAmt);
+				mergeAmtMap.put("ovduamt", ovduAmt);
+				mergeAmtMap.put("ltv", ltvPercent);
+				mergeAmtMap.put("eRow", row);
+
+				eAmtList.add(mergeAmtMap);
+
+			}
+
+		} else {
+
+			countAmt = 1;
+
+			mergeAmtMap.put("count", countAmt);
+			mergeAmtMap.put("cust", custNo);
+			mergeAmtMap.put("amt", eAmt);
+			mergeAmtMap.put("ovduamt", ovduAmt);
+			mergeAmtMap.put("ltv", ltvPercent);
+			mergeAmtMap.put("eRow", row);
+
+			eAmtList.add(mergeAmtMap);
+
+		}
+
 	}
 }

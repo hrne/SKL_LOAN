@@ -6,8 +6,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -17,8 +15,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -41,7 +41,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2073 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2073.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -51,6 +50,9 @@ public class L2073 extends TradeBuffer {
 	@Autowired
 	public CustMainService sCustMainService;
 
+	@Autowired
+	public CdEmpService sCdEmpService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -144,10 +146,24 @@ public class L2073 extends TradeBuffer {
 				this.info("createTime = " + createTime);
 
 			}
+			String TlrNo = "";
+			String EmpName = "";
+			CdEmp tCdEmp = new CdEmp();
+			
+			if(tCustDateCtrl.getCreateEmpNo() != null) {
+		  	  TlrNo = tCustDateCtrl.getCreateEmpNo();
+		  	  tCdEmp = sCdEmpService.findById(TlrNo, titaVo);	
+		  	  if( tCdEmp != null) {
+		  		  EmpName =  tCdEmp.getFullname();
+		  	  }
+			}
+			
+			
 			occurslist.putParam("OOCustId", tCustMain.getCustId());
 			occurslist.putParam("OOCustNo", tCustDateCtrl.getCustNo());
 			occurslist.putParam("OOCustName", tCustMain.getCustName());
-			occurslist.putParam("OOTlrNo", tCustDateCtrl.getCreateEmpNo());
+			occurslist.putParam("OOTlrNo", TlrNo);
+			occurslist.putParam("OOEmpName", EmpName);
 			occurslist.putParam("OOCreateDate", createDate);
 			occurslist.putParam("OOCreateTime", createTime);
 

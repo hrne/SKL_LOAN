@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LD006Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LD006Report.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -85,24 +82,25 @@ public class LD006Report extends MakeReport {
 		}
 
 		exportExcel(titaVo, lD006List);
-		
+
 		return true;
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lD006List) throws LogicException {
 		this.info("exportExcel ... ");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD006", "三階放款明細統計", "LD006三階放款明細統計",
-				"LD006三階放款明細統計.xls", "三階放款明細統計");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD006", "三階放款明細統計", "LD006三階放款明細統計", "LD006三階放款明細統計.xls", "三階放款明細統計");
 
 		// 有標題列，從第二列開始塞值
 		int row = 2;
 		BigDecimal total = BigDecimal.ZERO;
-		if (lD006List != null && lD006List.size() != 0) {
+		if (lD006List != null && !lD006List.isEmpty()) {
 			for (Map<String, String> tLDVo : lD006List) {
-
-
-				for (int i = 0; i < tLDVo.size(); i++) {
+				
+				// 20211026 xiangwei
+				// 這裡先改成 hard-coded 數字
+				// 因為目前的 tLDVo map 結構, 用 size() iteration 會出問題
+				for (int i = 0; i < 24; i++) {
 
 					// 查詢結果第一個欄位為F0
 					String tmpValue = tLDVo.get("F" + i);
@@ -110,15 +108,12 @@ public class LD006Report extends MakeReport {
 					// 寫入Excel時，A欄為1
 					int col = i + 1;
 
-
-					switch (col) {
-					case 11: // K欄:撥款金額
-					case 22: // V欄:換算業績
-					case 23: // W欄:業務報酬
-					case 24: // X欄:業績金額
-						if(col == 11) {
-							total = total.add(new BigDecimal(tmpValue));
-						}
+					switch (i) {
+					case 10: // K欄:撥款金額
+						total = total.add(new BigDecimal(tmpValue));
+					case 21: // V欄:換算業績
+					case 22: // W欄:業務報酬
+					case 23: // X欄:業績金額
 						makeExcel.setValue(row, col, new BigDecimal(tmpValue), "#,##0");
 						break;
 					default:
@@ -131,7 +126,7 @@ public class LD006Report extends MakeReport {
 			} // for
 			makeExcel.setValue(row, 11, total);
 		} else {
-			this.info("exportExcel ... 本日無資料");
+			this.info("LD006Report exportExcel ... 本日無資料");
 			makeExcel.setValue(row, 1, "本日無資料");
 		}
 		long sno = makeExcel.close();

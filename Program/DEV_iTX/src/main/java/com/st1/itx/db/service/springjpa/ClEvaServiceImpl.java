@@ -110,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<ClEva> findClNo(int clCode1_0, int clCode2_1, int clNo_2, int evaNo_3, int index, int limit, TitaVo... titaVo) {
+  public Slice<ClEva> findClNo(int clCode1_0, int clCode2_1, int clNo_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<ClEva> slice = null;
     if (titaVo.length != 0)
@@ -121,15 +121,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findClNo " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " evaNo_3 : " +  evaNo_3);
+    this.info("findClNo " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2);
     if (dbName.equals(ContentName.onDay))
-      slice = clEvaReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndEvaNoNotOrderByEvaNoAsc(clCode1_0, clCode2_1, clNo_2, evaNo_3, pageable);
+      slice = clEvaReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = clEvaReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsAndEvaNoNotOrderByEvaNoAsc(clCode1_0, clCode2_1, clNo_2, evaNo_3, pageable);
+      slice = clEvaReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = clEvaReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsAndEvaNoNotOrderByEvaNoAsc(clCode1_0, clCode2_1, clNo_2, evaNo_3, pageable);
+      slice = clEvaReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
     else 
-      slice = clEvaRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndEvaNoNotOrderByEvaNoAsc(clCode1_0, clCode2_1, clNo_2, evaNo_3, pageable);
+      slice = clEvaRepos.findAllByClCode1IsAndClCode2IsAndClNoIsOrderByEvaNoAsc(clCode1_0, clCode2_1, clNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

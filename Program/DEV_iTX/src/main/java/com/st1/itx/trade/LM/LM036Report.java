@@ -4,6 +4,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -213,19 +214,72 @@ public class LM036Report extends MakeReport {
 		int rowCursor = 4;
 
 		BigDecimal total = BigDecimal.ZERO;
+		BigDecimal totalOfBadDebtAmt = BigDecimal.ZERO;
+
+		Map<Integer, BigDecimal> badDebtAmtTotal = new HashMap<>();
+
+		Map<Integer, Integer> rowCursorMap = new HashMap<>();
+		Map<Integer, Integer> columnCursorMap = new HashMap<>();
+
+		int columnCursor = 4;
+
+		// 列印逾90天時年月標題，並記錄欄位位置
+		for (Map<String, String> m : list) {
+			int yearMonth = Integer.parseInt(m.get("F0")) - 191100; // 初貸年月
+			int badDebtMonth = Integer.parseInt(m.get("F2")) == 0 ? 0 : Integer.parseInt(m.get("F1")) - 191100; // 逾90天時年月
+			if (badDebtMonth == 0) {
+				// 加三個月
+				// 先拆成年、月
+				int tmpYear = yearMonth / 100;
+				int tmpMonth = yearMonth % 100;
+				// 若跨年,年+1,月+3-12,否則用原年月+3
+				int tmpBadDebtMonth = (tmpMonth + 3) > 12 ? (((tmpYear + 1) * 100) + (tmpMonth + 3 - 12))
+						: (yearMonth + 3);
+				makeExcel.setValue(2, columnCursor, tmpBadDebtMonth); // 逾90天時年月
+				columnCursorMap.put(tmpBadDebtMonth, columnCursor);
+				columnCursor++;
+			}
+		}
 
 		for (Map<String, String> m : list) {
-			String yearMonth = "" + (Integer.parseInt(m.get("F0")) - 191100); // 資料年月
-			BigDecimal amt = getBigDecimal(m.get("F1")); // 件數
+			int yearMonth = Integer.parseInt(m.get("F0")) - 191100; // 初貸年月
+			BigDecimal counts = getBigDecimal(m.get("F1")); // 初貸件數
+			int badDebtMonth = Integer.parseInt(m.get("F2")) == 0 ? 0 : Integer.parseInt(m.get("F1")) - 191100; // 逾90天時年月
+			BigDecimal badDebtAmt = getBigDecimal(m.get("F3")); // 逾90天時餘額
 
-			makeExcel.setValue(rowCursor, 1, yearMonth);
-			makeExcel.setValue(rowCursor, 2, amt, "#,##0");
+			if (badDebtMonth == 0) {
+				makeExcel.setValue(rowCursor, 1, yearMonth); // 初貸年月
+				makeExcel.setValue(rowCursor, 2, counts, "#,##0"); // 初貸件數
+				total = total.add(counts);
+				rowCursorMap.put(yearMonth, rowCursor);
+				rowCursor++;
+			} else {
+				if (columnCursorMap != null && columnCursorMap.get(badDebtMonth) != null) {
+					columnCursor = columnCursorMap.get(badDebtMonth);
+					makeExcel.setValue(rowCursor, columnCursor, badDebtAmt, "#,##0"); // 逾90天件數
+				}
 
-			total = total.add(amt);
-
-			rowCursor++;
+				// 計算 每個初貸年月的 逾90天件數 加總
+				if (badDebtMonth > 0 && badDebtAmt.compareTo(BigDecimal.ZERO) > 0) {
+					if (badDebtAmtTotal.containsKey(yearMonth)) {
+						badDebtAmt = badDebtAmt.add(badDebtAmtTotal.get(yearMonth));
+					}
+					badDebtAmtTotal.put(yearMonth, badDebtAmt);
+				}
+			}
 		}
+
+		for (Map.Entry<Integer, BigDecimal> entrySet : badDebtAmtTotal.entrySet()) {
+			int yearMonth = entrySet.getKey();
+			BigDecimal badDebtAmt = entrySet.getValue();
+
+			rowCursor = rowCursorMap.get(yearMonth);
+			makeExcel.setValue(rowCursor, 3, badDebtAmt, "#,##0"); // 逾90天件數加總
+			totalOfBadDebtAmt = totalOfBadDebtAmt.add(badDebtAmt);
+		}
+
 		makeExcel.setValue(42, 2, total, "#,##0");
+		makeExcel.setValue(42, 3, totalOfBadDebtAmt, "#,##0");
 	}
 
 	private void setBadRateCount(List<Map<String, String>> list) throws LogicException {
@@ -242,19 +296,72 @@ public class LM036Report extends MakeReport {
 		int rowCursor = 4;
 
 		BigDecimal total = BigDecimal.ZERO;
+		BigDecimal totalOfBadDebtCounts = BigDecimal.ZERO;
+
+		Map<Integer, BigDecimal> badDebtCountsTotal = new HashMap<>();
+
+		Map<Integer, Integer> rowCursorMap = new HashMap<>();
+		Map<Integer, Integer> columnCursorMap = new HashMap<>();
+
+		int columnCursor = 4;
+
+		// 列印逾90天時年月標題，並記錄欄位位置
+		for (Map<String, String> m : list) {
+			int yearMonth = Integer.parseInt(m.get("F0")) - 191100; // 初貸年月
+			int badDebtMonth = Integer.parseInt(m.get("F2")) == 0 ? 0 : Integer.parseInt(m.get("F1")) - 191100; // 逾90天時年月
+			if (badDebtMonth == 0) {
+				// 加三個月
+				// 先拆成年、月
+				int tmpYear = yearMonth / 100;
+				int tmpMonth = yearMonth % 100;
+				// 若跨年,年+1,月+3-12,否則用原年月+3
+				int tmpBadDebtMonth = (tmpMonth + 3) > 12 ? (((tmpYear + 1) * 100) + (tmpMonth + 3 - 12))
+						: (yearMonth + 3);
+				makeExcel.setValue(2, columnCursor, tmpBadDebtMonth); // 逾90天時年月
+				columnCursorMap.put(tmpBadDebtMonth, columnCursor);
+				columnCursor++;
+			}
+		}
 
 		for (Map<String, String> m : list) {
-			String yearMonth = "" + (Integer.parseInt(m.get("F0")) - 191100); // 資料年月
-			BigDecimal counts = getBigDecimal(m.get("F1")); // 件數
+			int yearMonth = Integer.parseInt(m.get("F0")) - 191100; // 初貸年月
+			BigDecimal counts = getBigDecimal(m.get("F1")); // 初貸件數
+			int badDebtMonth = Integer.parseInt(m.get("F2")) == 0 ? 0 : Integer.parseInt(m.get("F1")) - 191100; // 逾90天時年月
+			BigDecimal badDebtCounts = getBigDecimal(m.get("F3")); // 逾90天件數
 
-			makeExcel.setValue(rowCursor, 1, yearMonth);
-			makeExcel.setValue(rowCursor, 2, counts, "#,##0");
+			if (badDebtMonth == 0) {
+				makeExcel.setValue(rowCursor, 1, yearMonth); // 初貸年月
+				makeExcel.setValue(rowCursor, 2, counts, "#,##0"); // 初貸件數
+				total = total.add(counts);
+				rowCursorMap.put(yearMonth, rowCursor);
+				rowCursor++;
+			} else {
+				if (columnCursorMap != null && columnCursorMap.get(badDebtMonth) != null) {
+					columnCursor = columnCursorMap.get(badDebtMonth);
+					makeExcel.setValue(rowCursor, columnCursor, badDebtCounts, "#,##0"); // 逾90天件數
+				}
 
-			total = total.add(counts);
-
-			rowCursor++;
+				// 計算 每個初貸年月的 逾90天件數 加總
+				if (badDebtMonth > 0 && badDebtCounts.compareTo(BigDecimal.ZERO) > 0) {
+					if (badDebtCountsTotal.containsKey(yearMonth)) {
+						badDebtCounts = badDebtCounts.add(badDebtCountsTotal.get(yearMonth));
+					}
+					badDebtCountsTotal.put(yearMonth, badDebtCounts);
+				}
+			}
 		}
+
+		for (Map.Entry<Integer, BigDecimal> entrySet : badDebtCountsTotal.entrySet()) {
+			int yearMonth = entrySet.getKey();
+			BigDecimal badDebtCounts = entrySet.getValue();
+
+			rowCursor = rowCursorMap.get(yearMonth);
+			makeExcel.setValue(rowCursor, 3, badDebtCounts, "#,##0"); // 逾90天件數加總
+			totalOfBadDebtCounts = totalOfBadDebtCounts.add(badDebtCounts);
+		}
+
 		makeExcel.setValue(42, 2, total, "#,##0");
+		makeExcel.setValue(42, 3, totalOfBadDebtCounts, "#,##0");
 	}
 
 	private void setCollection(List<Map<String, String>> list) throws LogicException {
@@ -276,8 +383,8 @@ public class LM036Report extends MakeReport {
 
 			int thisColumnMonth = Integer.parseInt(m.get("F0"));
 
-			this.info("thisColumnMonth = " + thisColumnMonth);
-			this.info("lastColumnMonth = " + lastColumnMonth);
+//			this.info("thisColumnMonth = " + thisColumnMonth);
+//			this.info("lastColumnMonth = " + lastColumnMonth);
 
 			if (lastColumnMonth == 0 || lastColumnMonth != thisColumnMonth) {
 				lastColumnMonth = thisColumnMonth;

@@ -120,6 +120,8 @@ public class L3912 extends TradeBuffer {
 			RPTFG = 15;
 		} else if (tLoanBorTx.getBorxNo() == 1 && tLoanBorTx.getTitaTxCd().equals("L3101")) {
 			RPTFG = 2;
+		} else if (tLoanBorTx.getTitaTxCd().equals("L3731")) {
+			RPTFG = 17;
 		} else {
 			RPTFG = 8;
 		}
@@ -217,7 +219,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OIncrFlag", tTempVo.getParam("IncrFlag"));
 		this.totaVo.putParam("ORateIncr", tTempVo.getParam("RateIncr"));
 		this.totaVo.putParam("OIndividualIncr", tTempVo.getParam("IndividualIncr"));
-		this.totaVo.putParam("ORemark", tTempVo.getParam("Remark"));
+		this.totaVo.putParam("ORemark", tTempVo.getParam("Remark").toString());
 		this.totaVo.putParam("OAcctFee", tTempVo.getParam("AcctFee"));
 		this.totaVo.putParam("OModifyFee", tTempVo.getParam("ModifyFee"));
 		this.totaVo.putParam("OFireFee", tTempVo.getParam("FireFee"));
@@ -256,19 +258,11 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OMasterCustId", tTempVo.getParam("MasterCustId"));
 		this.totaVo.putParam("OMasterCustIdX", loanCom.getCustNameById(tTempVo.getParam("MasterCustId")));
 		this.totaVo.putParam("ORvNo", tTempVo.getParam("RvNo"));
-		this.totaVo.putParam("OSubCustId1", tTempVo.getParam("SubCustId1"));
-		this.totaVo.putParam("OSubCustId1X", loanCom.getCustNameById(tTempVo.getParam("SubCustId1")));
-		this.totaVo.putParam("OSubCustId2", tTempVo.getParam("SubCustId2"));
-		this.totaVo.putParam("OSubCustId2X", loanCom.getCustNameById(tTempVo.getParam("SubCustId2")));
-		this.totaVo.putParam("OSubCustId3", tTempVo.getParam("SubCustId3"));
-		this.totaVo.putParam("OSubCustId3X", loanCom.getCustNameById(tTempVo.getParam("SubCustId3")));
-		this.totaVo.putParam("OSubCustId4", tTempVo.getParam("SubCustId4"));
-		this.totaVo.putParam("OSubCustId4X", loanCom.getCustNameById(tTempVo.getParam("SubCustId4")));
-		this.totaVo.putParam("OSubCustId5", tTempVo.getParam("SubCustId5"));
-		this.totaVo.putParam("OSubCustId5X", loanCom.getCustNameById(tTempVo.getParam("SubCustId5")));
-		this.totaVo.putParam("OSubCustId6", tTempVo.getParam("SubCustId6"));
-		this.totaVo.putParam("OSubCustId6X", loanCom.getCustNameById(tTempVo.getParam("SubCustId6")));
-
+		this.totaVo.putParam("OSupervisor", tTempVo.getParam("Supervisor"));
+		this.totaVo.putParam("OSupervisorX", loanCom.getEmpFullnameByEmpNo(tTempVo.getParam("Supervisor")));
+		this.totaVo.putParam("ORate", tLoanBorTx.getRate());
+		
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

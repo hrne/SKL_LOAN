@@ -9,8 +9,6 @@ import java.util.Map;
 import java.util.Date;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class L9707Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9707Report.class);
 
 	@Autowired
 	L9707ServiceImpl l9707ServiceImpl;
@@ -48,9 +45,9 @@ public class L9707Report extends MakeReport {
 		try {
 
 			List<Map<String, String>> L9707List = l9707ServiceImpl.findAll(titaVo, ACCTDATE_ST, ACCTDATE_ED);
-			
+
 			testExcel(titaVo, L9707List, txbuffer);
-			
+
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -60,8 +57,7 @@ public class L9707Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LDList, TxBuffer txbuffer) throws LogicException {
 		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9707", "新增逾放案件明細", "L9707-新增逾放案件明細",
-				"新增逾放案件明細.xlsx", "工作表1");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9707", "新增逾放案件明細", "L9707-新增逾放案件明細", "L9707_底稿_新增逾放案件明細.xlsx", "工作表1");
 		// F0 申請日期
 		// F1 准駁日期
 		// F2 借款人戶號
@@ -87,46 +83,62 @@ public class L9707Report extends MakeReport {
 		 * Principal // 本金 Interest // 利息 DelayInt // 延滯息 BreachAmt // 違約金
 		 */
 
-
 		if (LDList != null && LDList.size() != 0) {
 			int row = 3;
 			BigDecimal totalDataCount = BigDecimal.ZERO;
 			BigDecimal totalLoanAmt = BigDecimal.ZERO;
+			
 			for (Map<String, String> tLDVo : LDList) {
-				String ad = "";
+				for (String key : tLDVo.keySet())
+				{
+					this.info("L9707Report tLDVo " + key + "=" + tLDVo.get(key));
+				}
+				
 				int col = 0;
-				for (int i = 0; i < tLDVo.size(); i++) {
-					ad = "F" + String.valueOf(col);
+				
+				// 20211026 xiangwei
+				// 因為現在的 Map<String, String> 同欄位會存兩次 (一個key為Fn, 一個key為欄位alias)
+				// 所以不能用 size() 做 iteration
+				// 先改成這樣, 如果query有改動這裡也需要改
+				
+				// if (value == null) continue;
+				// 雖然也可以work, 但會多跑一倍的次數
+				
+				for (int i = 0; i < 14; i++) {
 					col++;
-					switch(i) {
+					String value = tLDVo.get("F"+i);
+					
+					switch (i) {
 					case 2:
-						//資料筆數
-						totalDataCount = totalDataCount.add(new BigDecimal(1));
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
+						// 資料筆數
+						totalDataCount = totalDataCount.add(BigDecimal.ONE);
+						makeExcel.setValue(row, col, value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value), "R");
 						break;
 					case 5:
-					        //貸出金額
-						totalLoanAmt = totalLoanAmt.add(new BigDecimal(tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad)));
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
+						// 貸出金額
+						BigDecimal F5Value = value == "" || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value);
+						totalLoanAmt = totalLoanAmt.add(F5Value);
+						makeExcel.setValue(row, col, F5Value, "R");
 						break;
 					case 11:
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "R");
+						makeExcel.setValue(row, col, value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value), "R");
 						break;
-					case 14:
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "L");
+					case 13:
+						// PieceCode有可能為英文字母
+						makeExcel.setValue(row, col, value == null || value.isEmpty() ? BigDecimal.ZERO : value, "L");
 						break;
 					default:
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? "0" : tLDVo.get(ad), "R");
+						makeExcel.setValue(row, col, value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value), "R");
 						break;
 					}
 				}
+
 				row++;
 			}
 
 			// output totals
 			makeExcel.setValue(1, 3, formatAmt(totalDataCount, 0), "R");
 			makeExcel.setValue(1, 6, formatAmt(totalLoanAmt, 1), "R");
-	
 
 		} else {
 			makeExcel.setValue(3, 1, "無資料");
@@ -141,11 +153,9 @@ public class L9707Report extends MakeReport {
 
 		/* 天數差 */
 
-		Date fromDate1 = simpleFormat
-				.parse(date1.substring(0, 4) + "-" + date1.substring(4, 6) + "-" + date1.substring(6, 8) + " 00:00");
+		Date fromDate1 = simpleFormat.parse(date1.substring(0, 4) + "-" + date1.substring(4, 6) + "-" + date1.substring(6, 8) + " 00:00");
 
-		Date toDate1 = simpleFormat
-				.parse(date2.substring(0, 4) + "-" + date2.substring(4, 6) + "-" + date2.substring(6, 8) + " 00:00");
+		Date toDate1 = simpleFormat.parse(date2.substring(0, 4) + "-" + date2.substring(4, 6) + "-" + date2.substring(6, 8) + " 00:00");
 
 		long from1 = fromDate1.getTime();
 

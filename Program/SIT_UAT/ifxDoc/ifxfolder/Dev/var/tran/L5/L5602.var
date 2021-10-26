@@ -417,7 +417,7 @@ C(3,#MeetPlaceCode,4,T(2,#MeetPlace, ),$)
 @V(7)
 
 ! 其他記錄
-#Remark=X,2.80,I
+#Remark=X,10.50,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 ! T(2,#MemoA+#MemoB)
 ! 維護人員

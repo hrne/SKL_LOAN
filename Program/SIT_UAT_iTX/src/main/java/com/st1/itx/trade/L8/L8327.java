@@ -215,6 +215,7 @@ public class L8327 extends TradeBuffer {
 				iJcicZ447.setRate(iJcicZ447Log.getRate());
 				iJcicZ447.setMonthPayAmt(iJcicZ447Log.getMonthPayAmt());
 				iJcicZ447.setPayAccount(iJcicZ447Log.getPayAccount());
+				iJcicZ447.setTranKey(iJcicZ447Log.getTranKey());
 				iJcicZ447.setOutJcicTxtDate(iJcicZ447Log.getOutJcicTxtDate());
 				try {
 					sJcicZ447Service.update(iJcicZ447, titaVo);

@@ -22,6 +22,7 @@ import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -54,7 +55,9 @@ public class L2703 extends TradeBuffer {
 	public CustMainService sCustMainService;
 	@Autowired
 	public LoanBorMainService sLoanBorMainService;
-
+	@Autowired
+	public SendRsp sendRsp;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -162,6 +165,11 @@ public class L2703 extends TradeBuffer {
 		this.totaVo.putParam("OCreateDate", parse.stringToInteger(createDate) - 19110000);
 		this.totaVo.putParam("OCreateTime", createTime);
 
+		// 刪除須刷主管卡
+		if (titaVo.getEmpNos().trim().isEmpty()) {
+			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+		}
+					
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
