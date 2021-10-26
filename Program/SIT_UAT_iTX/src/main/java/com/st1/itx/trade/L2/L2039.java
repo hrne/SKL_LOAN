@@ -12,7 +12,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClBuilding;
+import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.ClEva;
+import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.ClEvaService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -40,6 +43,9 @@ public class L2039 extends TradeBuffer {
 	@Autowired
 	public ClEvaService sClEvaService;
 
+	@Autowired
+	public ClBuildingService sClBuildingService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -103,6 +109,19 @@ public class L2039 extends TradeBuffer {
 			this.totaVo.addOccursList(occursList);
 		}
 
+		ClBuildingId clBuildingId = new ClBuildingId();
+		clBuildingId.setClCode1(iClCode1);
+		clBuildingId.setClCode2(iClCode2);
+		clBuildingId.setClNo(iClNo);
+		ClBuilding tClBuilding = new ClBuilding();
+		tClBuilding = sClBuildingService.findById(clBuildingId, titaVo);
+		
+		if(tClBuilding != null) {
+			this.totaVo.putParam("BdLocation", tClBuilding.getBdLocation() + "，建號" + tClBuilding.getBdNo1() + "-" + tClBuilding.getBdNo2());
+		} else {
+			this.totaVo.putParam("BdLocation", "");
+		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

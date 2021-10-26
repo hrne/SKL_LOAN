@@ -310,7 +310,7 @@ public class L2017 extends TradeBuffer {
 			occurslist.putParam("OFacmNo", thisFacmNo);
 
 			occurslist.putParam("OOCustName", tCustMain.getCustName());
-
+			occurslist.putParam("OOCreditSysNo", tFacCaseAppl.getCreditSysNo());
 			String clNo = String.valueOf(tmpClFac.getClCode1()) + "-"
 					+ FormatUtil.pad9(String.valueOf(tmpClFac.getClCode2()), 2) + "-"
 					+ FormatUtil.pad9(String.valueOf(tmpClFac.getClNo()), 7);

@@ -60,7 +60,7 @@ public class L560AReport extends MakeReport {
 	public long run(TitaVo titaVo) throws LogicException {
 		String adjFlag = titaVo.getBtnIndex(); //0-存證信函;1-延遲繳款通知函;2-繳款通知函
 		String iCustNo = titaVo.getParam("OOCustNo");
-		String iBusDate = titaVo.getEntDy(); //會計日
+		String iBusDate = StringUtils.leftPad(titaVo.getEntDy(), 7,"0"); //會計日
 		String iYyy = iBusDate.substring(1,4);
 		String iMm = iBusDate.substring(4,6);
 		String iDd = iBusDate.substring(6);
@@ -144,13 +144,13 @@ public class L560AReport extends MakeReport {
 			iCollListId.setFacmNo(Integer.valueOf(aFacmNo));
 			CollList iCollList = new CollList();
 			iCollList = iCollListService.findById(iCollListId, titaVo);
-			String iPrevIntDate = String.valueOf(iCollList.getPrevIntDate());
+			String iPrevIntDate = StringUtils.leftPad(String.valueOf(iCollList.getPrevIntDate()), 7,"0");
 			String iPrYyy = iPrevIntDate.substring(0,3);
 			String iPrMm = iPrevIntDate.substring(3,5);
 			String iPrDd = iPrevIntDate.substring(5);
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			
-			map.put("RcvName1",iCustName+"    戶號 :" + String.format("%07d", 123));
+			map.put("RcvName1",iCustName+"    戶號 :" + String.format("%07d", iCustNo));
 			map.put("RcvAddress1",iAddress);
 			map.put("p1", "一、台端前向本公司辦理房屋抵押貸款新台幣"+aLineAmt+"元整，約定於每月二十日繳交應攤還之本息；惟台端僅繳至"+iPrYyy+"年"+iPrMm+"月"+iPrDd+"日，共計積欠"+iOverDueterm+"期未繳付。");
 			map.put("p2", "二、依約定借款人如有一期未繳付應攤還本金或利息時，全部借款視為到期，借款人應即償還全部借款餘額，為此特通知台端三日內繳清所積欠之本金、利息、違約金，否則將聲請法院查封拍賣抵押物追償，事涉台端權益，請速處理，祈勿自誤為禱。");
@@ -204,7 +204,7 @@ public class L560AReport extends MakeReport {
 			if (iFacMain.getMaturityDate() == 0) {
 				throw new LogicException(titaVo, "E0001", "查無到期日，戶號:"+iCustNo+"額度:"+iFacmNo);
 			}
-			String iMaturityDate = String.valueOf(iFacMain.getMaturityDate());
+			String iMaturityDate = StringUtils.leftPad(String.valueOf(iFacMain.getMaturityDate()), 7,"0");
 			String iMatYyy = iMaturityDate.substring(0,3);
 			String iMatMm = iMaturityDate.substring(3, 5);
 			String iMatDd = iMaturityDate.substring(5);

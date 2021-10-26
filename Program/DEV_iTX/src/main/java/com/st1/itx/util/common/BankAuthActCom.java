@@ -170,7 +170,7 @@ public class BankAuthActCom extends TradeBuffer {
 	 * 
 	 * @param createFlag A.新增授權, D.取消授權
 	 * @param titaVo     ..
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public void add(String createFlag, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom add ...");
@@ -228,7 +228,7 @@ public class BankAuthActCom extends TradeBuffer {
 	 * 
 	 * @param createFlag A.新增授權, D.取消授權
 	 * @param titaVo     ..
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public void del(String createFlag, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom del Start...");
@@ -510,7 +510,7 @@ public class BankAuthActCom extends TradeBuffer {
 	 * 
 	 * @param iStatus 1:停止使用 0:授權成功(恢復授權)
 	 * @param titaVo  ..
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public void mntPostAuth(String iStatus, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom mntPostAuth ...");
@@ -580,7 +580,7 @@ public class BankAuthActCom extends TradeBuffer {
 	 * 
 	 * @param iStatus 1:停止使用 0:授權成功
 	 * @param titaVo  ..
-	 * @throws LogicException 
+	 * @throws LogicException ..
 	 */
 	public void mntAchAuth(String iStatus, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom mntAchAuth ...");

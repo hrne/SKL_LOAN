@@ -13,6 +13,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM003ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -20,6 +21,9 @@ public class LM003Report extends MakeReport {
 
 	@Autowired
 	LM003ServiceImpl lM003ServiceImpl;
+	
+	@Autowired
+	Parse parse;
 
 	// 四捨五入
 	RoundingMode roundingModeLM003 = RoundingMode.HALF_UP;
@@ -97,8 +101,9 @@ public class LM003Report extends MakeReport {
 			return this.sum;
 		}
 		
-		public void setSum(BigDecimal result) {
-			this.sum = result;
+		public void addToSum(BigDecimal apply)
+		{
+			this.sum = this.sum.add(apply);
 		}
 	}
 
@@ -107,10 +112,10 @@ public class LM003Report extends MakeReport {
 		public LM003Report lm003Report = null;
 
 		/**
-		 * 
 		 * @param tLDVo current tLDVo
+		 * @throws LogicException 
 		 */
-		public void dealSingleMonth(Map<String, String> tLDVo) {
+		public void dealSingleMonth(Map<String, String> tLDVo) throws LogicException {
 			// 單月輸出
 
 			for (int i = 0; i < Columns.values().length; i++) {
@@ -122,23 +127,23 @@ public class LM003Report extends MakeReport {
 					// 年月份輸出
 					if (v.length() >= 6) {
 						lm003Report.print(0, c.getOutputXPosR(),
-								(Integer.valueOf(v.substring(0, 4)) - 1911) + "年" + v.substring(4, 6) + "月", "R");
+								(parse.stringToInteger(v.substring(0, 4)) - 1911) + "年" + v.substring(4, 6) + "月", "R");
 					}
 					break;
 				default:
 					// 金額輸出與加總
 					lm003Report.print(0, c.getOutputXPosR(), formatAmt(getBillionAmt(v), 2), "R");
-					c.setSum(c.getSum().add(new BigDecimal(v)));
+					c.addToSum(parse.stringToBigDecimal(v));
 					break;
 				}
 			}
 		}
 
 		/**
-		 * 
-		 * @param lastF0 F0 lof lastTLDVo
+		 * @param lastF0 F0 of lastTLDVo
+		 * @throws LogicException 
 		 */
-		public void printYearlyTotal(String lastF0) {
+		public void printYearlyTotal(String lastF0) throws LogicException {
 			// 年合計輸出
 			for (int i = 0; i < Columns.values().length; i++) {
 				Columns c = Columns.values()[i];
@@ -148,7 +153,7 @@ public class LM003Report extends MakeReport {
 					// 年月份輸出
 					if (lastF0.length() >= 6) {
 						lm003Report.print(0, c.getOutputXPosL(),
-								(Integer.valueOf(lastF0.substring(0, 4)) - 1911) + "年合計", "L");
+								(parse.stringToInteger(lastF0.substring(0, 4)) - 1911) + "年合計", "L");
 					}
 					break;
 				default:
@@ -163,19 +168,19 @@ public class LM003Report extends MakeReport {
 		}
 
 		/**
-		 * 
 		 * @param lastF0 F0 of lastTLDVo
+		 * @throws LogicException 
 		 */
-		public void printYearlyAverage(String lastF0) {
+		public void printYearlyAverage(String lastF0) throws LogicException {
 			// 月平均輸出
 			for (int i = 0; i < Columns.values().length; i++) {
 				Columns c = Columns.values()[i];
 				BigDecimal monthCount = null;
 
 				if (lastF0.length() >= 6) {
-					monthCount = new BigDecimal(lastF0.substring(4, 6));
+					monthCount = parse.stringToBigDecimal(lastF0.substring(4, 6));
 				} else {
-					monthCount = new BigDecimal(1);
+					monthCount = BigDecimal.ONE;
 				}
 
 				switch (c) {
@@ -183,7 +188,7 @@ public class LM003Report extends MakeReport {
 					// 年月份輸出
 					if (lastF0.length() >= 6) {
 						lm003Report.print(0, c.getOutputXPosL(),
-								(Integer.valueOf(lastF0.substring(0, 4)) - 1911) + "年月平均", "L");
+								(parse.stringToInteger(lastF0.substring(0, 4)) - 1911) + "年月平均", "L");
 					}
 					break;
 				default:
@@ -204,7 +209,6 @@ public class LM003Report extends MakeReport {
 		}
 
 		/**
-		 * 
 		 * @param finalTLDVo the last tLDVo (latest month in this output)
 		 */
 		public void printRepayRatios(Map<String, String> finalTLDVo) {
@@ -231,7 +235,7 @@ public class LM003Report extends MakeReport {
 					// 取分子
 
 					try {
-						dividend = new BigDecimal(finalTLDVo.get(Columns.values()[i].getKeyword()));
+						dividend = parse.stringToBigDecimal(finalTLDVo.get(Columns.values()[i].getKeyword()));
 					} catch (Exception e) {
 						lm003Report.error("LM003Report.printRepayRatios() - dividend");
 						lm003Report.error("Received weird " + Columns.values()[i].getKeyword() + ": "
@@ -440,8 +444,8 @@ public class LM003Report extends MakeReport {
 		
 		if (lastTLDVo != null) {
 			
-			int year = Integer.valueOf(lastTLDVo.get("F0").substring(0,4)) - 1911;
-			int month = Integer.valueOf(lastTLDVo.get("F0").substring(4,6));
+			int year = parse.stringToInteger(lastTLDVo.get("F0").substring(0,4)) - 1911;
+			int month = parse.stringToInteger(lastTLDVo.get("F0").substring(4,6));
 			String EOMBalance = formatAmt(getBillionAmt(lastTLDVo.get("F11")), 2);
 			String EOMBalanceEnt = formatAmt(getBillionAmt(lastTLDVo.get("F12")), 2);
 			String EOMBalanceNat = formatAmt(getBillionAmt(lastTLDVo.get("F13")), 2);
@@ -453,9 +457,9 @@ public class LM003Report extends MakeReport {
 			String ActualRepay = formatAmt(
 					getBillionAmt(
 					Columns.repayTotal.getSum()
-					.subtract(new BigDecimal(lastTLDVo.get("F15")))
+					.subtract(parse.stringToBigDecimal(lastTLDVo.get("F15")))
 					.subtract(Columns.turnOvdu.getSum())
-					.subtract(new BigDecimal(lastTLDVo.get("F14")))
+					.subtract(parse.stringToBigDecimal(lastTLDVo.get("F14")))
 					)
 					, 2);
 			
@@ -494,17 +498,18 @@ public class LM003Report extends MakeReport {
 	 */
 	private BigDecimal getBillionAmt(String inputAmt) {
 		BigDecimal result = BigDecimal.ZERO;
-		BigDecimal billion = new BigDecimal("100000000");
+		final BigDecimal billion = new BigDecimal("100000000");
 
 		if (inputAmt == null || inputAmt.isEmpty()) {
 			return result;
 		}
 
 		try {
-			result = new BigDecimal(inputAmt).divide(billion, 2, roundingModeLM003);
+			result = parse.stringToBigDecimal(inputAmt).divide(billion, 2, roundingModeLM003);
 		} catch (Exception e)
 		{
 			this.error("LM003Report.getBillionAmt(): Tried to turn string " + inputAmt + " into BigDecimal and failed miserably.");
+			this.error(e.toString());
 			return result;
 		}
 

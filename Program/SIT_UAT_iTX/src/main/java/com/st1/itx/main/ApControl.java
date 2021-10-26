@@ -386,6 +386,26 @@ public class ApControl extends SysLogger {
 
 				return;
 			}
+
+			// 需輸入交易理由
+			this.info("Trade Reason Siz : [" + this.txBuffer.getReasonLi().size() + "]");
+			if (this.txBuffer.getReasonLi().size() > 0 && this.titaVo.getReason().isEmpty() && this.titaVo.isActfgEntry() && (this.titaVo.isHcodeNormal() || this.titaVo.isHcodeModify())) {
+				RspFlag = true;
+
+				this.totaVo.init(this.titaVo);
+				this.totaVo.setMsgId("EC998");
+				for (String s : this.txBuffer.getReasonLi()) {
+					OccursList occursList = new OccursList();
+					occursList.putParam("Reason", s);
+					this.totaVo.addOccursList(occursList);
+				}
+				this.totaVoList.clear();
+				this.totaVoList.add(this.totaVo);
+
+				baseTransaction.rollBack();
+
+				return;
+			}
 			this.Cs70UpDbs();
 		} else {
 			this.txAmlCom.setTxBuffer(this.txBuffer);

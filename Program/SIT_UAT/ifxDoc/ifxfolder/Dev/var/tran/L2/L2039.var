@@ -11,7 +11,7 @@ K(MODIFYBUTTON,查詢)
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,0)ASGN(INQHD$)
+E(0,100)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -83,13 +83,18 @@ T(3,1:房地;2:土地)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+#NTXBUF=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@ClCode1,#NTXBUF,1,1)
+T(1,@ClCode2,#NTXBUF,2,2)
+T(1,@ClNo,#NTXBUF,4,7)
+
 #Init=X,1,S
 INVOKEJS(SHOW,p1,10,16,0)
 
 !代號1
 #ClCode1=A,1,I
-C(3,#FirstIn,1,E(0,@CHAIN,1),$)
-C(3,#FirstIn,1,S,$)
+C(3,#CHAIN,1,s,$)
 HELP(#ClCode1Help) 
 @V(H,#ClCode1Help)
 
@@ -120,8 +125,7 @@ T(2,@CurrPrecisionHelp,#HelpDesc2)
 #ClCode2Help=x,300,S
 
 #ClCode2=A,2,I
-C(3,#FirstIn,1,E(0,@CHAIN,1),$)
-C(3,#FirstIn,1,S,$)
+C(3,#CHAIN,1,s,$)
 HELP(#ClCode2Help)
 @C(3,#ClCode1,0,s,$)
 V(H,#ClCode2Help)
@@ -134,8 +138,7 @@ T(H,#ClCode2,#ClCode2Help)
 
 !擔保品編號
 #ClNo=A,7,I
-C(3,#FirstIn,1,E(0,@CHAIN,1),$)
-C(3,#FirstIn,1,S,$)
+C(3,#CHAIN,1,s,$)
 @V(2,0)
 
 
@@ -144,18 +147,6 @@ E(0,0)
 
 ![折返KEY]
 #RTNTXT=X,9,S
-
-#FunCd=A,1,S
-E(0,2)
-E(0,@FirstIn,0)
-
-! #BUF1=X,11,S
-! C(3,#ClNo,0,HIDE(#BTN1),SHOW(#BTN1))
-! T(2,1+#ClCode1+#ClCode2+#ClNo)
-! E(0,@FirstIn,0)
-
-! #BIND1=X,1,S
-! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2480; ntxbuf=#BUF1})
 
 #RPTFG=A,1,S
 E(0,0)
@@ -180,6 +171,14 @@ C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 #SCRTIL=_,_,S
 T(3,[L2039] 擔保品重評明細資料)
 
+#BTNADDBUFB=X,21,S
+T(2,0000000000+#ClCode1+#ClCode2+#ClNo+Y)
+
+#BtnAddB=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2017; ntxbuf=#BTNADDBUFB; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,擔保品額度關聯)
+
 #OOCurrencyCode=X,3,O
 T(3,TWD)
 
@@ -188,6 +187,8 @@ E(0,0)
 T(H,#OOCurrencyCode,#CurrPrecisionHelp)
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+#BdLocation=X,100,L
 
 #LOOP=X,1,S
 T(3,1)ASGN(LOOP$)
@@ -199,8 +200,8 @@ T(3,1)ASGN(LOOP$)
 
 #OOClNo=A,7,S
 
-#OOClNoLabel=X,12,L
-T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
+#ClNoLabel=X,12,L
+T(2,#ClCode1+-+#ClCode2+-+#ClNo)
 
 !鑑估序號
 #OOEvaNo=A,2,L
@@ -287,6 +288,7 @@ C(3,#OOEvaNo,0,BIND(grid,cancel),$)
 !------ 下行電文TOM ------
 <sub type="TOM">
 TXFORM=L2039
+#BdLocation
 #OOClCode1
 #OOClCode2
 #OOClNo
@@ -308,7 +310,8 @@ TXFORM=L2039
 <sub type="PART" name="L2039" layout="cols=1;screen.width=[130,870];printer.width=[15,30]">
 [
 ["[L2039]                                 擔保品重評明細資料查詢"],
-[""],
+["擔保品號碼",#ClNoLabel],
+["建物門牌",#BdLocation]
 ]
 </sub>
 
@@ -329,8 +332,8 @@ TXFORM=L2039
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
 
-#OOClNoLabel=擔保品號碼
-{width:120,align:'center'}
+!#OOClNoLabel=擔保品號碼
+!{width:120,align:'center'}
 
 #OOEvaNo=鑑估</br>序號
 {width:50,align:'center'}

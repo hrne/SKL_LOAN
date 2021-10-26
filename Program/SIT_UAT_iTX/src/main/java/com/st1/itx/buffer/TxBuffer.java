@@ -51,6 +51,9 @@ public class TxBuffer {
 	// 主管授權明細
 	private List<HashMap<String, String>> rspList = new ArrayList<HashMap<String, String>>();
 
+	// 一般交易理由
+	private List<String> reasonLi = new ArrayList<String>();
+
 	private List<TxAmlLog> amlList = new ArrayList<TxAmlLog>();
 
 //	@PostConstruct
@@ -217,6 +220,18 @@ public class TxBuffer {
 	 */
 	public void setRspList(List<HashMap<String, String>> rspList) {
 		this.rspList = rspList;
+	}
+
+	public List<String> getReasonLi() {
+		return reasonLi;
+	}
+
+	public void setReasonLi(List<String> reasonLi) {
+		this.reasonLi = reasonLi;
+	}
+
+	public void addReasonLi(String reason) {
+		this.reasonLi.add(reason);
 	}
 
 	public List<TxAmlLog> getAmlList() {

@@ -14,6 +14,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9724ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -28,6 +29,9 @@ public class L9724Report extends MakeReport {
 
 	@Autowired
 	MakeExcel makeExcel;
+	
+	@Autowired
+	Parse parse;
 
 	String TXCD = "L9724";
 	String TXName = "應收利息之帳齡分析表";
@@ -114,7 +118,7 @@ public class L9724Report extends MakeReport {
 					case 4:
 						tmpValue = tLDVo.get("F" + col);
 						// format to YYYY/M/DD
-						makeExcel.setValue(row, col + pivotCol, tmpValue.substring(0, 4) + "/" + Integer.toString(Integer.parseInt(tmpValue.substring(4, 6))) + "/" + tmpValue.substring(6), "R");
+						makeExcel.setValue(row, col + pivotCol, String.format("%s/%s/%s", tmpValue.substring(0, 4), parse.stringToInteger(tmpValue.substring(4, 6)), tmpValue.substring(6)), "R");
 						break;
 					case 5:
 						// month diff
@@ -125,7 +129,7 @@ public class L9724Report extends MakeReport {
 					case 6:
 						// day diff (month excluded)
 						// daysDiffTotal: need to make sure endDate is after startDate.
-						// daysDiffSameMonth: 3/31 and 4/1 shoudn't have 30 days difference; that kinda
+						// daysDiffSameMonth: 3/31 and 4/1 shouldn't have 30 days difference; that kinda
 						// task goes to daysDiffTotal.
 						if (daysDiffTotal >= 0 && daysDiffSameMonth >= 0) {
 							makeExcel.setValue(row, col + pivotCol, daysDiffSameMonth, "R");

@@ -56,6 +56,9 @@ public class ContentName {
 	public static final String frommq = "FROMMQ";
 	public static final String funcind = "FUNCIND";
 
+	public static final String reasonFg = "ReasonFG";
+	public static final String reason = "Reason";
+
 	public static final String brno = "BRNO";
 	public static final String txrseq = "TXRSEQ";
 	public static final String msgEnd = "MSGEND";

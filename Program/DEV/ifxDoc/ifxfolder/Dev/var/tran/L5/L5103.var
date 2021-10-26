@@ -1,0 +1,902 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,4)
+
+#ACTFG=_,_,S
+C(2,#FKEY,$,s,s,s,$,$,s,s,$,$)
+E(0,1)
+
+
+#TXCD
+T(3,L5103)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!=====================================================================
+!#FKEY>0時，重新執行
+!=====================================================================
+<sub type="PREDC" name="PreDC">
+
+#ActFgHelp=x,20,S
+T(3,1:登錄;2:放行;3:審核)
+C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
+</sub> 
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5103" layout="cols=3;screen.width=[130,370,130,370];printer.width=[20,80];order=1">
+[
+["[L5103]                                 檔案借閱維護"],
+["#FdACTFGX+登放記號",#ACTFGX],["#FdApplCodeX+申請或歸還",#ApplCodeX],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,#BTND,#CustName],
+["#FdApplSeq+申請序號",#ApplSeq],["#FdApplEmpNo+借閱人",#ApplEmpNo,#BTNA,#ApplEmpNoX],
+["#FdUsageCode+用途",#UsageCode,#UsageCodeX],["#FdCopyCode+正本+/+影本",#CopyCode,#CopyCodeX],
+["#FdApplDate+借閱日期",#ApplDate],["#FdKeeperEmpNo+管理人",#KeeperEmpNo,#BTNB,#KeeperEmpNoX],
+["#FdReturnDate+歸還日期",#ReturnDate],["#FdReturnEmpNo+歸還人",#ReturnEmpNo,#BTNC,#ReturnEmpNoX],
+[#<->#,"#FdRemark+備註",#Remark],
+[#<->#,"#FdApplObj+借閱項目",#ApplObj,#ApplObjX],
+[#<->#,#LABLEA,#BTN_GRDA,#BTN_GRDB,#BTN_GRDC,#BTN_GRDD,#BTN_GRDE],
+["#grid#,{id:1,expand:true,loop:17,row_height:1,s_cols:[], p_cols:[]}","@申請資料","",
+[[#OPTA],"內容資料名稱","數量","備註"],
+[[#OPTA1],[#FILENMA1],[#AMTA1,"份"],[#RemarkA1]]],
+["#grid#,{id:2,expand:true,loop:11,row_height:1,s_cols:[], p_cols:[]}","@設定資料","",
+[[#OPTB],"內容資料名稱","數量","備註"],
+[[#OPTB1],[#FILENMB1],[#AMTB1,"份"],[#RemarkB1]]],
+["#grid#,{id:3,expand:true,loop:20,row_height:1,s_cols:[], p_cols:[]}","@對保資料","",
+[[#OPTC],"內容資料名稱","數量","備註"],
+[[#OPTC1],[#FILENMC1],[#AMTC1,"份"],[#RemarkC1]]],
+["#grid#,{id:4,expand:true,loop:2,row_height:1,s_cols:[], p_cols:[]}","@其他資料","",
+[[#OPTD],"內容資料名稱","數量","備註"],
+[[#OPTD1],[#FILENMD1],[#AMTD1,"份"],[#RemarkD1]]],
+
+]
+
+#FdACTFGX=X,2,L
+#FdCustNo=X,2,L
+T(3,*)
+#FdApplSeq=X,2,L
+#FdUsageCode=X,2,L
+T(3,*)
+#FdApplDate=X,2,L
+T(3,*)
+#FdReturnDate=X,2,L
+T(3,*)
+#FdRemark=X,2,L
+#FdApplObj=X,2,L
+T(3,*)
+#FdApplCodeX=X,2,L
+T(3,*)
+#FdApplEmpNo=X,2,L
+T(3,*)
+#FdCopyCode=X,2,L
+T(3,*)
+#FdKeeperEmpNo=X,2,L
+T(3,*)
+#FdReturnEmpNo=X,2,L
+T(3,*)
+
+!---------- AP TEXT AREA Variables ----------
+
+#BTNA=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
+#BTNB=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
+#BTNC=X,4,I,ui:button;value:使用者查詢;enable:1;tabbable:0
+#BTND=X,4,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+#BTN_GRDA=X,1,I,ui:button;value:申請資料;enable:1;tabbable:0
+#BTN_GRDB=X,1,I,ui:button;value:設定資料;enable:1;tabbable:0
+#BTN_GRDC=X,1,I,ui:button;value:對保資料;enable:1;tabbable:0
+#BTN_GRDD=X,1,I,ui:button;value:其他資料;enable:1;tabbable:0
+#BTN_GRDE=X,1,I,ui:button;value:已選預覽;enable:1;tabbable:0
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L2R08.dec"/>
+
+!1申請或歸還
+#ApplCodeRimName=x,20,S
+T(3,CdCode.ApplCode)
+#ApplCodeHelp=x,1024,S
+
+!3借閱項目
+#ApplObjRimName=x,20,S
+T(3,CdCode.ApplObj)
+#ApplObjHelp=x,1024,S
+
+!4用途
+#UsageCodeXRimName=x,20,S
+T(3,CdCode.UsageCodeX)
+#UsageCodeXHelp=x,1024,S
+
+!5正本/影本
+#CopyCodeRimName=x,20,S
+T(3,CdCode.CopyCode)
+#CopyCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#ApplCodeRimName,#ApplObjRimName,#UsageCodeXRimName,#CopyCodeRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ApplCodeHelp,#HelpDesc1) 
+T(2,@ApplObjHelp,#HelpDesc2)
+T(2,@UsageCodeXHelp,#HelpDesc3)
+T(2,@CopyCodeHelp,#HelpDesc4)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN==1,$,IF(#FKEY == 3,$,V(P,此為連動交易，請從交易:L5903進入)))
+
+#InitApplCode=A,1,S
+IF(#FKEY == 3,E(0,1),S)
+HIDE(#BTND,#BTNA,#BTNB)
+
+
+! 新增按鈕會帶入1 ??? 防呆
+#NTXBUF=X,200,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@ApplCode,#NTXBUF,128,1)
+
+C(3,#ApplCode,0,s,$)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@FacmNo,#NTXBUF,8,3)
+T(1,@ApplSeq,#NTXBUF,11,3)
+T(1,@CustName,#NTXBUF,14,20)
+T(1,@KeeperEmpNo,#NTXBUF,34,6)
+T(1,@ApplEmpNo,#NTXBUF,40,6)
+T(1,@ApplDate,#NTXBUF,46,7)
+T(1,@ReturnDate,#NTXBUF,53,7)
+T(1,@ReturnEmpNo,#NTXBUF,60,6)
+T(1,@UsageCode,#NTXBUF,66,2)
+T(1,@Remark,#NTXBUF,68,60)
+T(1,@CopyCode,#NTXBUF,129,1)
+T(1,@ApplObj,#NTXBUF,130,1)
+INVOKEJS(SHOW,p1,02,02,1)
+
+! 藏欄位
+! ApplCode 若=0預設1
+#PRE_GRDDIS=A,1,S
+INVOKEJS(SHOW,L5103,9,13,0)
+C(3,#ApplCode,0,E(0,@ApplCode,1),$)
+
+! 登放記號
+#ACTFGX=X,8,L
+T(H,#ACTFG,#ActFgHelp)
+C(2,#ACTFG,$,K(MODIFYBUTTON,登錄),K(MODIFYBUTTON,放行),K(MODIFYBUTTON,審核))
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#ACTFG,1,S,$)
+E(0,1)ASGN(AGAIN$)             
+
+#BUFD=A,7,S
+E(0,0)
+#BINDD=X,1,S
+BIND(#BTND,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFD;ntxbuf5=type<-1:
+CustNo<-OOCustNo:
+CustName<-OOCustName})
+
+! 申請或歸還
+#ApplCode=A,1,S
+C(3,#ApplCode,1,$,s)
+HELP(#ApplCodeHelp)
+@V(H,#ApplCodeHelp)
+T(2,@L5103ConfirmBrNo,)
+T(2,@L5103ConfirmGroupNo,)
+
+#ApplCodeX=X,4,L
+SWITCH(#ApplCode
+,1,
+INVOKEJS(SHOW,L5103_5,1)
+INVOKEJS(SHOW,L5103_6,0)
+T(F,@CustNo,1)
+T(F,@FacmNo,1)
+T(F,@ApplSeq,1)
+T(F,@ApplEmpNo,1)
+T(F,@UsageCode,1)
+T(F,@CopyCode,1)
+T(F,@Remark,1)
+T(F,@ApplObj,1)
+SHOW(#UsageCode,#CopyCode,#ApplObj)
+,2,
+INVOKEJS(SHOW,L5103_5,0)
+INVOKEJS(SHOW,L5103_6,1)
+T(F,@CustNo,0)
+T(F,@FacmNo,0)
+T(F,@ApplSeq,0)
+T(F,@ApplEmpNo,0)
+T(F,@UsageCode,0)
+T(F,@CopyCode,0)
+T(F,@Remark,0)
+T(F,@ApplObj,0)
+HIDE(#UsageCode,#CopyCode,#ApplObj)
+,$)
+T(H,#ApplCode,#ApplCodeHelp)
+IF(#InitApplCode == 1,
+T(F,@CustNo,0)
+T(F,@FacmNo,0)
+T(F,@ApplSeq,0)
+T(F,@ApplEmpNo,0)
+T(F,@UsageCode,0)
+T(F,@CopyCode,0)
+T(F,@Remark,0)
+T(F,@ApplObj,0)
+,$)
+
+! 借款人戶號
+#CustNo=A,7,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+@C(1,#CustNo,s,V(P,戶號不可為0),s)
+
+! 借款人戶名rim
+<include src="ROM.icf::L5R33.dec"/>     
+#RimL5R33=X,1,S
+#RimCustNo=A,7,S
+E(0,#CustNo)
+RESET_RIM(#RimL5R33,L5R33)
+S(L5R33,1,#RimCustNo)
+R(1,L5R33)
+
+! 歸還為帶入，不為調RIM
+#SetValue=A,1,S
+T(2,@CustName,#L5R33CustName)
+C(3,#ApplCode,2,S,$)
+E(0,@ApplSeq,#L5R33ApplSeq)
+
+! 額度編號
+#FacmNo=A,3,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+@C(1,#FacmNo,s,V(P,額度不可為0),s)
+
+! 借款人戶名---調RIM
+#CustName=X,20,L
+C(3,#ApplCode,0,$,s)
+
+! 申請序號
+#ApplSeq=A,3,L
+C(3,#ApplCode,1,$,s)
+
+
+#BINDA=X,1,S
+BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFA;ntxbuf5=type<-1:
+L5103ConfirmBrNo<-OBrNo:
+ApplEmpNo<-OTlrNo:
+ApplEmpNoX<-OTlrItem:
+L5103ConfirmGroupNo<-OGroupNo})
+IF(#InitApplCode == 1,BIND(grid,cancel),$)
+
+#BUFA=X,74,S
+T(2,#ApplEmpNo)
+
+#BUFB=X,74,S
+T(2,#KeeperEmpNo)
+!<瀏覽-員工號碼>
+#BINDB=X,1,S
+BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFB;ntxbuf5=type<-1:
+L5103ConfirmBrNo<-OBrNo:
+KeeperEmpNo<-OTlrNo:
+KeeperEmpNoX<-OTlrItem:
+L5103ConfirmGroupNo<-OGroupNo})
+IF(#InitApplCode == 1,BIND(grid,cancel),$)
+
+! 借閱人
+#ApplEmpNo=X,6,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+C(3,#ApplCode,2,s,$)
+T(4,TLRNO$)
+@V(7)
+
+#RimEmployeeNo=X,6,S
+#RimTxCode=X,6,S
+T(2,L5103)
+#RimErrorSkip=X,1,S
+T(2,Y)
+
+#SendL2r08A=X,1,S
+C(4,#ApplEmpNo,S,$)
+T(2,@RimEmployeeNo,#ApplEmpNo)
+RESET_RIM(#SendL2r08A,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@ApplEmpNoX,#L2r08FullName)
+
+
+! 員工姓名---調RIM
+#ApplEmpNoX=X,8,L
+C(3,#ApplCode,1,$,s)
+
+
+#CheckB=A,1,S
+C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
+T(F,@KeeperEmpNo,0)
+
+
+! 員工姓名---調RIM
+C(3,#ApplCode,1,$,s)
+#KeeperEmpNoX=X,8,L
+
+
+
+
+! 用途
+#UsageCode=A,2,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+HELP(#UsageCodeXHelp)
+@V(H,#UsageCodeXHelp)
+
+#UsageCodeX=X,4,L
+T(H,#UsageCode,#UsageCodeXHelp)
+
+
+! 正本/影本
+#CopyCode=A,1,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+HELP(#CopyCodeHelp)
+@V(H,#CopyCodeHelp)
+#CopyCodeX=X,6,L
+T(H,#CopyCode,#CopyCodeHelp)
+
+
+#PreApplObjX=X,16,L
+C(3,#ApplCode,2,$,s)
+T(H,#ApplObj,#ApplObjHelp)
+T(2,@ApplObjX,#PreApplObjX)
+
+
+#TmpApplDate=A,7,S
+E(0,0)
+
+#TmpReturnDate=A,7,S
+E(0,0)
+
+#TODAY=A,7,S
+E(0,#SYSDATE)
+C(3,#ApplCode,2,
+E(0,@ReturnDate,#TODAY),
+E(0,@ApplDate,#TODAY))
+
+! 借閱日期
+#ApplDate=D,7,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,2,s,$)
+@V(7)
+A(DATE,0,#ApplDate)
+
+#SetTmpApplDate=A,1,S
+E(0,@TmpApplDate,#ApplDate)
+
+! 管理人
+#KeeperEmpNo=X,6,L
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+C(3,#ApplCode,2,s,$)
+C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
+V(P,請點選[瀏覽]取得員工編號)
+@V(7)
+
+#AlertMsg1=x,32,S
+T(2,歸還日期不可小於借閱日期+#TmpApplDate)
+
+! 歸還日期
+#ReturnDate=D,7,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,2,$,s)
+@V(7)
+A(DATE,0,#ReturnDate)
+E(0,@TmpReturnDate,#ReturnDate)
+IF(#TmpReturnDate<#TmpApplDate,V(P,#AlertMsg1),$)
+
+#BINDC=X,1,S
+BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFC;ntxbuf5=type<-1:
+L5103ConfirmBrNo<-OBrNo:
+ReturnEmpNo<-OTlrNo:
+ReturnEmpNoX<-OTlrItem:
+L5103ConfirmGroupNo<-OGroupNo})
+#BUFC=X,74,S
+T(2,#KeeperEmpNo)
+
+
+! 歸還人
+#ReturnEmpNo=X,6,L
+C(3,#ApplCode,2,$,s)
+C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
+V(P,請點選[瀏覽]取得員工編號)
+@V(7)
+
+#CheckC=A,1,S
+C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
+T(F,@ReturnEmpNo,0)
+
+#ReturnEmpNoX=X,8,L
+
+! 備註
+#Remark=X,60,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+
+
+! 借閱項目
+#ApplObj=A,1,I
+IF(#InitApplCode == 1,s,$)
+C(3,#ApplCode,1,$,s)
+HELP(#ApplObjHelp)
+@V(H,#ApplObjHelp)
+
+#ApplObjX=X,16,L
+T(H,#ApplObj,#ApplObjHelp)
+
+#L5103ConfirmBrNo=x,5,S
+#L5103ConfirmGroupNo=x,5,S
+
+! 僅借時可輸入，DB未記錄，還時不顯示
+#GRD_COL=A,1,S
+IF(#ApplObj==4&&#ApplCode==1,
+INVOKEJS(SHOW,L5103_9,1),
+INVOKEJS(SHOW,L5103_9,0))
+
+#PAGE_FG=A,1,S
+E(0,0)
+
+! 內容明細
+#LABLEA=X,10,L
+C(3,#ApplObj,4,T(3,內容明細),S)
+
+! 全選記號(區分五個按鈕全選後跳頁籤後顯示用)
+##loop{times:5,i:1}
+#SELECT_ALL_FG{i}=A,1,S
+##end
+
+! PAGE_FG==按鈕頁籤 
+! 1.申請資料
+! 2.設定資料
+! 3.對保資料
+! 4.其他
+! 5.已選
+! OPTFG==每個欄位印記(無勾則零，否則規則同上)
+! SELECT_ALL_FG==全選按鈕印記(無勾則零，否則規則同上)
+! 01/20再按一次，縮回改為停留
+#GRDA=@,1,S
+IF(#PAGE_FG==1,$,E(0,@PAGE_FG,1))
+C(3,#SELECT_ALL_FG1,1,T(3,@OPTA,V),T(3,@OPTA, ))
+SHOW(#OPTA)
+CALL(#COL_CODE)
+
+#GRDB=@,1,S
+IF(#PAGE_FG==2,$,E(0,@PAGE_FG,2))
+C(3,#SELECT_ALL_FG2,2,T(3,@OPTB,V),T(3,@OPTB, ))
+SHOW(#OPTB)
+CALL(#COL_CODE)
+
+#GRDC=@,1,S
+IF(#PAGE_FG==3,$,E(0,@PAGE_FG,3))
+C(3,#SELECT_ALL_FG3,3,T(3,@OPTC,V),T(3,@OPTC, ))
+SHOW(#OPTC)
+CALL(#COL_CODE)
+
+#GRDD=@,1,S
+IF(#PAGE_FG==4,$,E(0,@PAGE_FG,4))
+C(3,#SELECT_ALL_FG4,4,T(3,@OPTD,V),T(3,@OPTD, ))
+SHOW(#OPTD)
+CALL(#COL_CODE)
+
+#GRDE=@,1,S
+IF(#PAGE_FG==5,$,E(0,@PAGE_FG,5))
+! C(3,#SELECT_ALL_FG5,5,T(3,@OPT,V),T(3,@OPT, ))
+HIDE(#OPTA,#OPTB,#OPTC,#OPTD)
+CALL(#COL_CODE)
+
+
+#BIND_GRDA=X,1,S
+C(3,#ApplObj,4,
+BIND(#BTN_GRDA,click, {cmd=CALLSEND;DOCODE=GRDA}),
+BIND(grid,cancel))
+
+#BIND_GRDB=X,1,S
+C(3,#ApplObj,4,
+BIND(#BTN_GRDB,click, {cmd=CALLSEND;DOCODE=GRDB}),
+BIND(grid,cancel))
+
+#BIND_GRDC=X,1,S
+C(3,#ApplObj,4,
+BIND(#BTN_GRDC,click, {cmd=CALLSEND;DOCODE=GRDC}),
+BIND(grid,cancel))
+
+#BIND_GRDD=X,1,S
+C(3,#ApplObj,4,
+BIND(#BTN_GRDD,click, {cmd=CALLSEND;DOCODE=GRDD}),
+BIND(grid,cancel))
+
+#BIND_GRDE=X,1,S
+C(3,#ApplObj,4,
+BIND(#BTN_GRDE,click, {cmd=CALLSEND;DOCODE=GRDE}),
+BIND(grid,cancel))
+
+
+! PAGE_FG=0 
+! PAGE_FG=1~4 (先將全部關閉，再展開選擇之欄位)
+! PAGE_FG=5   (顯示已勾選之欄位)
+#COL_CODE=@,1,S
+C(3,#ApplObj,4,$,S)
+C(2,#PAGE_FG,
+INVOKEJS(SHOW,L5103_10,0)INVOKEJS(SHOW,L5103_11,0)
+INVOKEJS(SHOW,L5103_12,0)INVOKEJS(SHOW,L5103_13,0)
+,
+INVOKEJS(SHOW,L5103_10,1)INVOKEJS(SHOW,L5103_11,0)
+INVOKEJS(SHOW,L5103_12,0)INVOKEJS(SHOW,L5103_13,0)
+INVOKEJS(SHOW,grd1,1,17,1)
+,
+INVOKEJS(SHOW,L5103_10,0)INVOKEJS(SHOW,L5103_11,1)
+INVOKEJS(SHOW,L5103_12,0)INVOKEJS(SHOW,L5103_13,0)
+INVOKEJS(SHOW,grd2,1,11,1)
+,
+INVOKEJS(SHOW,L5103_10,0)INVOKEJS(SHOW,L5103_11,0)
+INVOKEJS(SHOW,L5103_12,1)INVOKEJS(SHOW,L5103_13,0)
+INVOKEJS(SHOW,grd3,1,20,1)
+,
+INVOKEJS(SHOW,L5103_10,0)INVOKEJS(SHOW,L5103_11,0)
+INVOKEJS(SHOW,L5103_12,0)INVOKEJS(SHOW,L5103_13,1)
+INVOKEJS(SHOW,grd4,1,2,1)
+,
+CALL(#BRN_FIVE_CAL)
+,s)
+
+#BTN1TMP=m,3,S
+#BTN2TMP=m,3,S
+#BTN3TMP=m,3,S
+#BTN4TMP=m,3,S
+
+! 只要有一筆SHOW整欄，否則整欄隱藏
+#BRN_FIVE_CAL=@,1,S
+##loop{times:17,i:1,j:1}
+E(0,@BTN1TMP,#BTN1TMP+#OPTFGA{i})
+C(3,#OPTFGA{i},0,
+INVOKEJS(SHOW,grd1_{j},0),
+INVOKEJS(SHOW,grd1_{j},1))
+##end
+##loop{times:11,i:1,j:2}
+E(0,@BTN2TMP,#BTN2TMP+#OPTFGB{i})
+C(3,#OPTFGB{i},0,
+INVOKEJS(SHOW,grd2_{j},0),
+INVOKEJS(SHOW,grd2_{j},1))
+##end
+##loop{times:20,i:1,j:2}
+E(0,@BTN3TMP,#BTN3TMP+#OPTFGC{i})
+C(3,#OPTFGC{i},0,
+INVOKEJS(SHOW,grd3_{j},0),
+INVOKEJS(SHOW,grd3_{j},1))
+##end
+##loop{times:2,i:1,j:2}
+E(0,@BTN4TMP,#BTN4TMP+#OPTFGD{i})
+C(3,#OPTFGD{i},0,
+INVOKEJS(SHOW,grd4_{j},0),
+INVOKEJS(SHOW,grd4_{j},1))
+##end
+IF(#BTN1TMP>0,INVOKEJS(SHOW,L5103_10,1),
+              INVOKEJS(SHOW,L5103_10,0))
+IF(#BTN2TMP>0,INVOKEJS(SHOW,L5103_11,1),
+              INVOKEJS(SHOW,L5103_11,0))
+IF(#BTN3TMP>0,INVOKEJS(SHOW,L5103_12,1),
+              INVOKEJS(SHOW,L5103_12,0))
+IF(#BTN4TMP>0,INVOKEJS(SHOW,L5103_13,1),
+              INVOKEJS(SHOW,L5103_13,0))
+
+! *-*-*-*-*-*-*-*-*-*-*-*-Loop*Start-*-*-*-*-*-*-*-*-*-*-*-*-
+##loop{times:48,i:1}
+#DEFNO{i}=A,2,S
+C(3,#ApplObj,4,$,s)
+E(0,{i})
+##end
+! 塞中文
+! ---------申請資料01~17---------
+##loop{times:17,i:1}
+#FILENMA{i}=X,20,L
+C(3,#ApplObj,4,$,s)
+T(A,#DEFNO{i},L5DEF,BrFileNameDef,FileName,FileNameX)
+
+##end
+! ---------設定資料18~28---------
+##loop{times:11,i:1,j:18}
+#FILENMB{i}=X,20,L
+C(3,#ApplObj,4,$,s)
+T(A,#DEFNO{j},L5DEF,BrFileNameDef,FileName,FileNameX)
+##end
+! ---------對保資料29~48---------
+##loop{times:20,i:1,j:29}
+#FILENMC{i}=X,20,L
+C(3,#ApplObj,4,$,s)
+T(A,#DEFNO{j},L5DEF,BrFileNameDef,FileName,FileNameX)
+##end
+
+
+! 勾選記號分0無勾選&1~4(4種資料類別)
+##loop{times:17,i:1}
+#OPTFGA{i}=m,3,S
+##end
+##loop{times:11,i:1}
+#OPTFGB{i}=m,3,S
+##end
+##loop{times:20,i:1}
+#OPTFGC{i}=m,3,S
+##end
+##loop{times:2,i:1}
+#OPTFGD{i}=m,3,S
+##end
+
+
+
+
+! 全選記號給SELECT_ALL_FG，點擊不同按紐帶值用
+#SELECT_ALL_COL=A,1,S
+SWITCH(#PAGE_FG,1,C(4,#OPTA,$,E(0,@SELECT_ALL_FG1,1)),
+                2,C(4,#OPTB,$,E(0,@SELECT_ALL_FG2,2)),
+                3,C(4,#OPTC,$,E(0,@SELECT_ALL_FG3,3)),
+                4,C(4,#OPTD,$,E(0,@SELECT_ALL_FG4,4)))
+
+! 勾選記號回饋全選記號，只要一個不勾則全選欄位OFF
+#SELECT_ALL_COL1=@,1,S
+##loop{times:17,i:1}
+C(4,#OPTA{i},T(2,@OPTA, )E(0,@SELECT_ALL_FG1,0),$)
+C(4,#OPTA{i},s,T(2,@OPTA,V)E(0,@SELECT_ALL_FG1,1))
+##end
+
+#SELECT_ALL_COL2=@,1,S
+##loop{times:11,i:1}
+C(4,#OPTB{i},T(2,@OPTB, )E(0,@SELECT_ALL_FG2,0),$)
+C(4,#OPTB{i},s,T(2,@OPTB,V)E(0,@SELECT_ALL_FG2,2))
+##end
+
+#SELECT_ALL_COL3=@,1,S
+##loop{times:20,i:1}
+C(4,#OPTC{i},T(2,@OPTC, )E(0,@SELECT_ALL_FG3,0),$)
+C(4,#OPTC{i},s,T(2,@OPTC,V)E(0,@SELECT_ALL_FG3,3))
+##end
+
+#SELECT_ALL_COL4=@,1,S
+##loop{times:2,i:1}
+C(4,#OPTD{i},T(2,@OPTD, )E(0,@SELECT_ALL_FG4,0),$)
+C(4,#OPTD{i},s,T(2,@OPTD,V)E(0,@SELECT_ALL_FG4,4))
+##end
+
+! Button1 申請資料
+! 勾選欄位僅自身與已選頁籤能修改，其他欄位修改條件跟隨頁籤記號
+
+! 全選功能
+! 給予勾選欄位&勾選記號對應值(1~4)，已選無全選功能
+#OPTA=X,1,I,ui:checkbox;value:;
+C(3,#ApplObj,4,$,s)
+C(3,#PAGE_FG,1,$,s)
+@C(4,#OPTA,
+##loop{times:17,i:1}
+T(2,@OPTA{i}, )
+E(0,@OPTFGA{i},0)
+##end
+,
+##loop{times:17,i:1}
+T(2,@OPTA{i},V)
+E(0,@OPTFGA{i},1)
+##end
+)
+##loop{times:17,i:1}
+#OPTA{i}=X,1,I,ui:checkbox;value:;
+C(3,#ApplObj,4,$,s)
+C(3,#PAGE_FG,5,$,C(3,#PAGE_FG,1,$,s))
+@C(4,#OPTA{i},E(0,@OPTFGA{i},0),E(0,@OPTFGA{i},1))
+CALL(#SELECT_ALL_COL1)
+
+#AMTA{i}=m,3,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGA{i},0,E(0,0),$)
+C(3,#OPTFGA{i},0,s,$)
+C(3,#PAGE_FG,#OPTFGA{i},$,s)
+@V(2,0)
+
+#RemarkA{i}=X,60,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGA{i},0,T(2,),$)
+C(3,#OPTFGA{i},0,s,$)
+C(3,#PAGE_FG,#OPTFGA{i},$,s)
+@V(7)
+
+##end
+
+! Button2 設定資料
+#OPTB=X,1,I,ui:checkbox;value:;
+C(3,#ApplObj,4,$,s)
+C(3,#PAGE_FG,2,$,s)
+@C(4,#OPTB,
+##loop{times:11,i:1}
+T(2,@OPTB{i}, )
+E(0,@OPTFGB{i},0)
+##end
+,
+##loop{times:11,i:1}
+T(2,@OPTB{i},V)
+E(0,@OPTFGB{i},2)
+##end
+)
+##loop{times:11,i:1}
+#OPTB{i}=X,1,I,ui:checkbox;value:;
+C(3,#ApplObj,4,$,s)
+C(3,#PAGE_FG,5,$,C(3,#PAGE_FG,2,$,s))
+@C(4,#OPTB{i},E(0,@OPTFGB{i},0),E(0,@OPTFGB{i},2))
+CALL(#SELECT_ALL_COL2)
+
+#AMTB{i}=m,3,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGB{i},0,E(0,0),$)
+C(3,#OPTFGB{i},0,s,$)
+C(3,#PAGE_FG,#OPTFGB{i},$,s)
+@V(2,0)
+
+#RemarkB{i}=X,60,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGB{i},0,T(2,),$)
+C(3,#OPTFGB{i},0,s,$)
+C(3,#PAGE_FG,#OPTFGB{i},$,s)
+@V(7)
+
+##end
+
+! Button3 對保資料
+#OPTC=X,1,I,ui:checkbox;value:;
+C(3,#ApplObj,4,$,s)
+C(3,#PAGE_FG,3,$,s)
+@C(4,#OPTC,
+##loop{times:20,i:1}
+T(2,@OPTC{i}, )
+E(0,@OPTFGC{i},0)
+##end
+,
+##loop{times:20,i:1}
+T(2,@OPTC{i},V)
+E(0,@OPTFGC{i},3)
+##end
+)
+##loop{times:20,i:1}
+#OPTC{i}=X,1,I,ui:checkbox;value:;
+C(3,#ApplObj,4,$,s)
+C(3,#PAGE_FG,5,$,C(3,#PAGE_FG,3,$,s))
+@C(4,#OPTC{i},E(0,@OPTFGC{i},0),E(0,@OPTFGC{i},3))
+CALL(#SELECT_ALL_COL3)
+
+#AMTC{i}=m,3,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGC{i},0,E(0,0),$)
+C(3,#PAGE_FG,#OPTFGC{i},$,s)
+@V(2,0)
+
+#RemarkC{i}=X,60,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGC{i},0,T(2,),$)
+C(3,#OPTFGC{i},0,s,$)
+C(3,#PAGE_FG,#OPTFGC{i},$,s)
+@V(7)
+
+##end
+
+! Button4 其他----暫定??? 待確定
+#OPTD=X,1,I,ui:checkbox;value:;
+C(3,#ApplObj,4,$,s)
+C(3,#PAGE_FG,4,$,s)
+@C(4,#OPTD,
+##loop{times:2,i:1}
+T(2,@OPTD{i}, )
+E(0,@OPTFGD{i},0)
+##end
+,
+##loop{times:2,i:1}
+T(2,@OPTD{i},V)
+E(0,@OPTFGD{i},4)
+##end
+)
+##loop{times:2,i:1}
+#OPTD{i}=X,1,I,ui:checkbox;value:;
+C(3,#ApplObj,4,$,s)
+C(3,#PAGE_FG,5,$,C(3,#PAGE_FG,4,$,s))
+@C(4,#OPTD{i},E(0,@OPTFGD{i},0),E(0,@OPTFGD{i},4))
+CALL(#SELECT_ALL_COL4)
+
+#FILENMD{i}=X,20,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGD{i},0,T(2,),$)
+C(3,#OPTFGD{i},0,s,$)
+C(3,#PAGE_FG,#OPTFGD{i},$,s)
+@V(7)
+
+#AMTD{i}=m,3,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGD{i},0,E(0,0),$)
+C(3,#OPTFGD{i},0,s,$)
+C(3,#PAGE_FG,#OPTFGD{i},$,s)
+@V(2,0)
+
+#RemarkD{i}=X,60,I
+C(3,#ApplObj,4,$,s)
+C(3,#OPTFGD{i},0,T(2,),$)
+C(3,#OPTFGD{i},0,s,$)
+C(3,#PAGE_FG,#OPTFGD{i},$,s)
+@V(7)
+
+##end
+
+! -----tim-----
+! ##loop {times:5,i:1}
+! #OPTA{i}
+! #FILENMA{i}
+! #AMTA{i}
+! #RemarkA{i}
+! #OPTB{i}
+! #FILENMB{i}
+! #AMTB{i}
+! #RemarkB{i}
+! #OPTC{i}
+! #FILENMC{i}
+! #AMTC{i}
+! #RemarkC{i}
+! #OPTD{i}
+! #FILENMD{i}
+! #AMTD{i}
+! #RemarkD{i}
+! ##end
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5103 -----------
+<sub type="FORM" name="L5103">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CustNo
+#FacmNo
+#ApplCode
+#ApplSeq
+#ApplEmpNo
+#KeeperEmpNo
+#UsageCode
+#CopyCode
+#ApplDate
+#ReturnDate
+#ReturnEmpNo
+#Remark
+#ApplObj
+#L5103ConfirmBrNo
+#L5103ConfirmGroupNo
+
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R33.tom"/>
+<include src="ROM.icf::L2R08.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5103
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

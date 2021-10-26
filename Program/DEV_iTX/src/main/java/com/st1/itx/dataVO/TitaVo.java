@@ -582,9 +582,10 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getTlrNo() {
 		return this.get(ContentName.tlrno) == null ? "" : this.get(ContentName.tlrno);
 	}
-	
+
 	/**
 	 * 櫃員姓名
+	 * 
 	 * @return String
 	 */
 	public String getEmpNm() {
@@ -816,7 +817,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 		return this.get(ContentName.txamt) == null ? "" : this.get(ContentName.txamt);
 	}
 
-		/**
+	/**
 	 * 
 	 * @param txAmt TXAMT
 	 */
@@ -1267,6 +1268,14 @@ public class TitaVo extends LinkedHashMap<String, String> {
 //		if (this.isHcodeModify() && (this.isActfgRelease())) {
 //
 //		}
+	}
+
+	public boolean isReason() {
+		return this.isActfgEntry() && (this.isHcodeNormal() || this.isHcodeModify()) && this.getReason().isEmpty();
+	}
+
+	public String getReason() {
+		return this.get(ContentName.reason) == null ? "" : this.get(ContentName.reason).trim();
 	}
 
 }

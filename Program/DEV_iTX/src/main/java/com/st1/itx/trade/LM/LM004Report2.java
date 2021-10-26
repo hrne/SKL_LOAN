@@ -19,7 +19,6 @@ import com.st1.itx.util.common.MakeReport;
 // Making Excel
 
 public class LM004Report2 extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM004Report2.class);
 
 	@Autowired
 	public MakeExcel makeExcel;
@@ -34,28 +33,15 @@ public class LM004Report2 extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("===========in testExcel");
 		String entdy = titaVo.get("ENTDY").toString();
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表",
-				"LM004長中短期放款到期追蹤表.xls", "10806", showDate(entdy, 1));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM004", "長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表", "LM004長中短期放款到期追蹤表.xls", "10806", showDate(entdy, 1));
 
 		int row = 3;
-//		this.info("-----------------" + LDList);
 		int num = 1;
 		makeExcel.setValue(1, 1, showDate(entdy, 2) + "長中短期放款到期追蹤表");
 
 		for (Map<String, String> tLDVo : LDList) {
 
-//			String ad = "";
-			int col = 0;
-//			int rows = 2;
-
-			// this causes endRow<ShiftRowFrom problem and idk what they trying to do here
-//			if (row > 27) {
-//				makeExcel.setShiftRow(row, 1);
-//			}
-			
-			for (col = 0; col < tLDVo.size(); col++) {
-				// 欄位數
-//				col++;
+			for (int col = 0; col < 17; col++) {
 
 				switch (col) {
 				case 1:
