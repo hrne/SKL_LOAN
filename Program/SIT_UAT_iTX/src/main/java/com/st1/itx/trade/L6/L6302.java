@@ -106,7 +106,7 @@ public class L6302 extends TradeBuffer {
 			if(bCdBaseRate!=null) {
 				this.info("bCdBaseRate=="+bCdBaseRate.getEffectDate());
 				this.info("iCalDy=="+iCalDy);
-				if(bCdBaseRate.getEffectDate()>iCalDy && bCdBaseRate.getEffectDate()>iEffectDate) {
+				if(bCdBaseRate.getEffectDate()>iCalDy && iEffectDate>iCalDy) {
 					throw new LogicException(titaVo, "E0005", "未生效指標利率只能有一筆"); // 新增資料時，發生錯誤
 				}
 			}

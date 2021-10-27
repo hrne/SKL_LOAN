@@ -287,7 +287,7 @@ public class LM061Report extends MakeReport {
 			tempAmt = new BigDecimal(eAmt.get("amt").toString());
 			tempLTV = new BigDecimal(eAmt.get("ltv").toString());
 			eRow = Integer.valueOf(eAmt.get("eRow").toString());
-			sRow = eRow + Integer.valueOf(eAmt.get("count").toString()) - 1;
+			sRow = eRow - Integer.valueOf(eAmt.get("count").toString()) + 1;
 
 			this.info("merge=" + sRow + "," + eRow);
 

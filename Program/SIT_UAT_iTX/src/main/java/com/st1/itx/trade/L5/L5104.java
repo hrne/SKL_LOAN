@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5104 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5104.class);
 
 	@Autowired
 	public Parse parse;
@@ -138,7 +135,7 @@ public class L5104 extends TradeBuffer {
 
 		try {
 			// *** 折返控制相關 ***
-			resultList = l5904ServiceImpl.findAll(startDate, endDate, "00", this.index, this.limit, titaVo);
+			resultList = l5904ServiceImpl.findAll(startDate, endDate, "00", 1, this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("l5904ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -165,7 +162,7 @@ public class L5104 extends TradeBuffer {
 
 		try {
 			// *** 折返控制相關 ***
-			resultList = l5904ServiceImpl.findAll(startDate, endDate, "02", this.index, this.limit, titaVo);
+			resultList = l5904ServiceImpl.findAll(startDate, endDate, "02", 2, this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("l5904ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -190,10 +187,10 @@ public class L5104 extends TradeBuffer {
 //  3:件數統計表;
 	private void setReportC(TitaVo titaVo) throws LogicException {
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
-		
+
 		try {
 			// *** 折返控制相關 ***
-			resultList = l5904ServiceImpl.findAll(startDate, endDate, "00", this.index, this.limit, titaVo);
+			resultList = l5904ServiceImpl.findAll(startDate, endDate, "00", 3, this.index, this.limit, titaVo);
 		} catch (Exception e) {
 			this.error("l5904ServiceImpl findByCondition " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());

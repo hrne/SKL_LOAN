@@ -53,7 +53,7 @@ public class L5812 extends TradeBuffer {
 		int iYearMonth = this.parse.stringToInteger(titaVo.getParam("YearMonth"))+191100;
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
-		String iUsageCode = new Integer(titaVo.getParam("UsageCode")).toString();
+		String iUsageCode = titaVo.getParam("UsageCode").trim();
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E0010", "L5812"); // 功能選擇錯誤

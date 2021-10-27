@@ -81,7 +81,7 @@ public class L5982 extends TradeBuffer {
 			occursList.putParam("OOYearMonth", tYearlyHouseLoanInt.getYearMonth()-191100);
 			occursList.putParam("OOCustNo", tYearlyHouseLoanInt.getCustNo());
 			occursList.putParam("OOFacmNo", tYearlyHouseLoanInt.getFacmNo());
-			occursList.putParam("OOUsageCode", tYearlyHouseLoanInt.getUsageCode());
+			occursList.putParam("OOUsageCode", tYearlyHouseLoanInt.getUsageCode().trim());
 			occursList.putParam("OOAcctCode", tYearlyHouseLoanInt.getAcctCode());
 			occursList.putParam("OORepayCode", tYearlyHouseLoanInt.getRepayCode());
 			occursList.putParam("OOLoanAmt", tYearlyHouseLoanInt.getLoanAmt());

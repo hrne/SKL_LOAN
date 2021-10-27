@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,7 +18,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LD008ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -29,9 +26,8 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int rptType, String acSubBookCode, TitaVo titaVo) throws Exception {
-		logger.info("LD008 findAll rptType = " + rptType + " , acSubBookCode = " + acSubBookCode);
+		this.info("LD008 findAll rptType = " + rptType + " , acSubBookCode = " + acSubBookCode);
 
 		int entdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 
@@ -46,7 +42,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"IsRelated\" = 'Y'          THEN 4";
 		sql += "                  WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 5"; // EntCode = 2 為企金自然人,算在個人戶
 		sql += "                  WHEN D.\"AcctCode\" = '320'                                    THEN 6";
-		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"IsRelated\" = 'Y'          THEN 7"; 
+		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"IsRelated\" = 'Y'          THEN 7";
 		sql += "                  WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 8"; // EntCode = 2 為企金自然人,算在個人戶
 		sql += "                  WHEN D.\"AcctCode\" = '330'                                    THEN 9";
 		sql += "                  WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 10";
@@ -87,7 +83,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            LEFT JOIN \"BankRelationCompany\" BRC ON BRC.\"CompanyId\" = CM.\"CustId\"";
 		sql += "                            LEFT JOIN \"BankRelationFamily\" BRF ON BRF.\"RelationId\" = CM.\"CustId\"";
 		sql += "                            WHERE CM.\"CustNo\" > 0";
-		sql += "                            GROUP BY CM.\"CustNo\",NVL(CM.\"EntCode\",'0')"; 
+		sql += "                            GROUP BY CM.\"CustNo\",NVL(CM.\"EntCode\",'0')";
 		sql += "                          ) S0";
 		sql += "                   ) C ON C.\"CustNo\" = D.\"CustNo\"";
 		sql += "         LEFT JOIN ( SELECT A0.\"AcctCode\"";
@@ -129,7 +125,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " ORDER BY S.\"DetailSeq\"";
 		;
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -140,39 +136,33 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("acSubBookCode", acSubBookCode);
 		}
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
-	
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll_SubBookCodes(TitaVo titaVo) throws Exception
-	{
-		logger.info("LD008 findAll_SubBookCodes initiated");
-		
-		String sql = "";
-		sql += " SELECT ";
-		sql += " \"Code\" F0, ";
-		sql += " \"Item\" F1 ";
-		sql += " FROM ";
-		sql += " \"CdCode\" WHERE \"DefCode\" = 'AcSubBookCode' ";
-		sql += " UNION ALL ";
-                sql += " SELECT ";
-                sql += " '%' F0, ";
-                sql += " n'全部' F1 ";
-                sql += " FROM ";
-                sql += " DUAL ";
 
-		logger.info("sql=" + sql);
+	public List<Map<String, String>> findAll_SubBookCodes(TitaVo titaVo) throws Exception {
+		this.info("LD008 findAll_SubBookCodes initiated");
+
+		String sql = "";
+		sql += " SELECT \"Code\" F0 ";
+		sql += "       ,\"Item\" F1 ";
+		sql += " FROM \"CdCode\" ";
+		sql += " WHERE \"DefCode\" = 'AcSubBookCode' ";
+		sql += " UNION ALL ";
+		sql += " SELECT '%' F0 ";
+		sql += "       ,n'全部' F1 ";
+		sql += " FROM DUAL ";
+
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public List<Map<String, String>> findAll_related(int rptType, String acSubBookCode, TitaVo titaVo) throws Exception {
-		logger.info("LD008 findAll rptType = " + rptType + " , acSubBookCode = " + acSubBookCode);
+		this.info("LD008 findAll rptType = " + rptType + " , acSubBookCode = " + acSubBookCode);
 
 		int entdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 
@@ -180,20 +170,18 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " SELECT S.\"DetailSeq\" ";
 		sql += "       ,SUM(S.\"Counts\")      AS \"Counts\" ";
 		sql += "       ,SUM(S.\"LoanBalance\") AS \"Amt\" ";
-		sql += " FROM (  SELECT CASE ";
-		sql += " 				 WHEN C.\"IsRelated\" = 'Y' ";
-		sql += "                    THEN ";
-		sql += "                      CASE WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 1 ";
-		sql += "                           WHEN D.\"AcctCode\" = '310'                                    THEN 2 ";
-		sql += " 						  WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 3 ";
-		sql += "                           WHEN D.\"AcctCode\" = '320'                                    THEN 4 ";
-		sql += " 						  WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 5 ";
-		sql += "                           WHEN D.\"AcctCode\" = '330'                                    THEN 6 ";
-		sql += "                           WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 7 ";
-		sql += "                           WHEN D.\"AcctCode\" = '340'                                    THEN 8 ";
-		sql += "                           WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" = '340'      THEN 9 ";
-		sql += "                         ELSE 99 END  ";
-		sql += " 				 ELSE 99 END AS \"DetailSeq\" ";
+		sql += " FROM (  SELECT CASE WHEN C.\"IsRelated\" = 'Y' ";
+		sql += "                     THEN CASE WHEN D.\"AcctCode\" = '310' AND C.\"EntCode\" IN ('1')         THEN 1 ";
+		sql += "                               WHEN D.\"AcctCode\" = '310'                                    THEN 2 ";
+		sql += " 						       WHEN D.\"AcctCode\" = '320' AND C.\"EntCode\" IN ('1')         THEN 3 ";
+		sql += "                               WHEN D.\"AcctCode\" = '320'                                    THEN 4 ";
+		sql += " 						       WHEN D.\"AcctCode\" = '330' AND C.\"EntCode\" IN ('1')         THEN 5 ";
+		sql += "                               WHEN D.\"AcctCode\" = '330'                                    THEN 6 ";
+		sql += "                               WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" <> '340'     THEN 7 ";
+		sql += "                               WHEN D.\"AcctCode\" = '340'                                    THEN 8 ";
+		sql += "                               WHEN D.\"AcctCode\" = '990' AND D.\"FacAcctCode\" = '340'      THEN 9 ";
+		sql += "                          ELSE 990 END ";
+		sql += " 			   	     ELSE 99 END AS \"DetailSeq\" ";
 		sql += "               ,1 AS \"Counts\" ";
 		sql += "               ,D.\"LoanBalance\" ";
 		sql += "         FROM ( SELECT D.\"AcctCode\" ";
@@ -211,8 +199,8 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ) D ";
 		sql += "         LEFT JOIN ( SELECT S0.\"CustNo\" ";
 		sql += "                           ,S0.\"EntCode\" ";
-		sql += "                           ,CASE ";
-		sql += "                              WHEN S0.\"IsRelated\" > 0 THEN 'Y' ";
+		sql += "                           ,CASE WHEN S0.\"IsRelated\" > 0 ";
+	    sql += "                                 THEN 'Y' ";
 		sql += "                            ELSE 'N' END AS \"IsRelated\" ";
 		sql += "                     FROM ( SELECT CM.\"CustNo\" ";
 		sql += "                                  ,NVL(CM.\"EntCode\",'0') AS \"EntCode\" ";
@@ -254,8 +242,8 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "           AND NVL(A.\"AcctCode\",'   ') IN ('310','320','330','340','990') ";
 		sql += condition(rptType);
 		sql += "         UNION ALL SELECT 1,0,0 FROM DUAL ";
-		sql += "         UNION ALL SELECT 2,0,0 FROM DUAL         ";
-		sql += " 		UNION ALL SELECT 3,0,0 FROM DUAL ";
+		sql += "         UNION ALL SELECT 2,0,0 FROM DUAL ";
+		sql += "         UNION ALL SELECT 3,0,0 FROM DUAL ";
 		sql += "         UNION ALL SELECT 4,0,0 FROM DUAL ";
 		sql += "         UNION ALL SELECT 5,0,0 FROM DUAL ";
 		sql += "         UNION ALL SELECT 6,0,0 FROM DUAL ";
@@ -269,7 +257,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  ";
 		;
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -280,7 +268,7 @@ public class LD008ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("acSubBookCode", acSubBookCode);
 		}
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	private String condition(int rptType) {

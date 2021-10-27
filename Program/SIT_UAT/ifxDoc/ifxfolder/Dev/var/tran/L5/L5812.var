@@ -1,0 +1,310 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L5812)
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,370];printer.width=[20,50,20,50];order=1;">
+[
+["[L5812]                                 國稅局申報檔維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdYearMonth+年月",#YearMonth],
+["#FdCustNo+戶號",#CustNo,"-",#FacmNo],
+["#FdUsageCode+資金用途別",#UsageCode1,#UsageCodeX],
+["#FdAcctCode+業務科目代號",#AcctCode,#AcctCodX],
+["#FdRepayCode+繳款方式",#RepayCode,#RepayCodeX],
+["#FdLoanAmt+撥款金額",#LoanAmt],
+["#FdLoanBal+放款餘額",#LoanBal],
+["#FdFirstDrawdownDate+初貸日",#FirstDrawdownDate],
+["#FdMaturityDate+到期日",#MaturityDate],
+["#FdYearlyInt+年度繳息金額",#YearlyInt],
+["#FdHouseBuyDate+房屋取得日期",#HouseBuyDate],
+]
+!---------- AP Button AREA ----------
+#FdFuncCode=X,2,L
+T(3, )
+#FdYearMonth=X,2,L
+T(3, )
+#FdCustNo=X,2,L
+T(3, )
+#FdUsageCode=X,2,L
+T(3, )
+#FdAcctCode=X,2,L
+#FdRepayCode=X,2,L
+#FdLoanAmt=X,2,L
+#FdLoanBal=X,2,L
+#FdFirstDrawdownDate=X,2,L
+#FdMaturityDate=X,2,L
+#FdYearlyInt=X,2,L
+#FdHouseBuyDate=X,2,L
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2(1:新增;2:修改;4:刪除)
+#CODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)  
+                
+#FuncCode2Help=x,50,S     
+
+#CODEAcctCod=x,20,S                  
+T(3,CdCode.AcctCode)  
+                
+#AcctCodeHelp=x,1024,S   
+
+#CODERepayCode=x,20,S                  
+T(3,CdCode.RepayCode)  
+                
+#RepayCodeHelp=x,1024,S   
+
+#CODEUsageCode=x,20,S
+T(3,CdCode.UsageCode)
+
+#UsageCodeHelp=x,1024,S  
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode2,#CODEAcctCod,#CODERepayCode,#CODEUsageCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+T(2,@AcctCodeHelp,#HelpDesc2)
+T(2,@RepayCodeHelp,#HelpDesc3)
+T(2,@UsageCodeHelp,00:全部;+#HelpDesc4)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L5982進入),$)
+
+#NTXBUF=X,100,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+
+#CHAIN_YearMonth=A,5,S
+T(1,#NTXBUF,2,5)
+
+#CHAIN_CustNo=A,7,S
+T(1,#NTXBUF,7,7)
+
+#CHAIN_FacmNo=A,3,S
+T(1,#NTXBUF,14,3)
+
+#CHAIN_UsageCode=X,2,S
+T(1,#NTXBUF,17,2)
+
+#CHAINSET=X,1,S
+E(0,@FuncCode,#CHAIN_FuncCode)
+E(0,@YearMonth,#CHAIN_YearMonth)
+E(0,@CustNo,#CHAIN_CustNo)
+E(0,@FacmNo,#CHAIN_FacmNo)
+T(2,@UsageCode,#CHAIN_UsageCode)
+E(0,@UsageCode1,#CHAIN_UsageCode)
+
+#CHK=X,1,S
+T(F,@CalDy,1)
+
+!本營業日
+#DATE=D,8,S
+T(4,CDATE$)
+
+
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCode2Help)
+C(2,#FuncCode,$,$,K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+IF (#FuncCode==2 || #FuncCode==4 ,T(F,@YearMonth,0)T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@UsageCode,0),$)
+IF (#FuncCode==2 ,T(F,@AcctCode,1)T(F,@RepayCode,1)T(F,@LoanAmt,1)T(F,@LoanBal,1)T(F,@FirstDrawdownDate,1)T(F,@MaturityDate,1)T(F,@YearlyInt,1)T(F,@HouseBuyDate,1)
+                 ,T(F,@AcctCode,0)T(F,@RepayCode,0)T(F,@LoanAmt,0)T(F,@LoanBal,0)T(F,@FirstDrawdownDate,0)T(F,@MaturityDate,0)T(F,@YearlyInt,0)T(F,@HouseBuyDate,0))                                 
+
+#WKSTAR1=X,2,S
+C(2,#FuncCode,S,S,T(3,*),S,S,S)  
+                                
+#WKNAME=X,1,S                            
+C(3,#CHAIN,1,$,s)
+T(2,@FdAcctCode,#WKSTAR1)
+T(2,@FdRepayCode,#WKSTAR1)
+T(2,@FdLoanAmt,#WKSTAR1)
+T(2,@FdLoanBal,#WKSTAR1)
+T(2,@FdFirstDrawdownDate,#WKSTAR1)
+T(2,@FdMaturityDate,#WKSTAR1)
+T(2,@FdYearlyInt,#WKSTAR1)
+T(2,@FdHouseBuyDate,#WKSTAR1)   
+
+                               
+#YearMonth=A,5,L
+#CustNo=A,7,L
+#FacmNo=A,3,L
+
+#UsageCode=X,2,L
+#UsageCode1=A,2,L
+
+#UsageCodeX=X,20,L
+T(H,#UsageCode1,#UsageCodeHelp)
+
+#SendL5R41=X,1,S
+E(0,@RimFuncCode,5)
+E(0,@RimYearMonth,#CHAIN_YearMonth)
+E(0,@RimCustNo,#CHAIN_CustNo)
+E(0,@RimFacmNo,#CHAIN_FacmNo)
+T(2,@RimUsageCode,#CHAIN_UsageCode)
+RESET_RIM(#SendL5R41,L5R41)
+S(L5R41,1,#RimFuncCode,#RimYearMonth,#RimCustNo,#RimFacmNo,#RimUsageCode)
+R(1,L5R41)
+
+#RIMSET=X,1,S
+E(0,@AcctCode,#L5R41AcctCode)
+E(0,@RepayCode,#L5R41RepayCode)
+E(0,@LoanAmt,#L5R41LoanAmt)
+E(0,@LoanBal,#L5R41LoanBal)
+E(0,@FirstDrawdownDate,#L5R41FirstDrawdownDate)
+E(0,@MaturityDate,#L5R41MaturityDate)
+E(0,@YearlyInt,#L5R41YearlyInt)
+E(0,@HouseBuyDate,#L5R41HouseBuyDate)
+T(H,@RepayCodeX,#RepayCode,#RepayCodeHelp)
+!業務科目
+#AcctCode=A,3,I
+C(2,#FuncCode,s,s,$,s,s,s)
+HELP(#AcctCodeHelp)
+@C(3,#FuncCode,2,V(H,#AcctCodeHelp),$)
+
+#AcctCodX=X,20,L
+T(H,#AcctCode,#AcctCodeHelp)
+
+!繳款方式
+#RepayCode=A,2,I
+C(2,#FuncCode,s,s,$,s,s,s)
+HELP(#RepayCodeHelp)
+@C(3,#FuncCode,2,V(H,#RepayCodeHelp),$)
+
+#RepayCodeX=X,20,L
+T(H,#RepayCode,#RepayCodeHelp)
+
+!撥款金額
+#LoanAmt=m,14,I
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(2,0)
+
+!放款餘額
+#LoanBal=m,14,I                       
+C(2,#FuncCode,s,s,$,s,s,s)   
+@V(2,0)
+
+!初貸日
+#FirstDrawdownDate=D,7,I
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(7)A(DATE,0,#FirstDrawdownDate) 
+
+!到期日
+#MaturityDate=D,7,I                        
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(7)A(DATE,0,#MaturityDate) 
+
+!年度繳息金額
+#YearlyInt=m,14,I
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(2,0)
+
+!房屋取得日期
+#HouseBuyDate=D,7,I                      
+C(2,#FuncCode,s,s,$,s,s,s)
+@V(7)A(DATE,0,#HouseBuyDate)                                 
+                                  
+                                  
+#AGAIN=X,1,S
+IF(#FuncCode==4||#FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)     
+                                  
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="ROM.icf::L5R41.dec"/>
+<include src="ROM.icf::L5R41Rim.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+</sub>
+
+!---------- TXFORM = L5812 ----------
+<sub type="FORM" name="L5812">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L5812,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L5812] 國稅局申報檔維護)
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode
+#YearMonth
+#CustNo
+#FacmNo
+#UsageCode
+#AcctCode
+#RepayCode
+#LoanAmt
+#LoanBal
+#FirstDrawdownDate
+#MaturityDate
+#YearlyInt
+#HouseBuyDate
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L5812
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L5R41.tom"/>
+
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

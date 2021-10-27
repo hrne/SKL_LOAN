@@ -423,14 +423,15 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
 		tLoanBorTx.setDesc("暫收款登錄");
+		if (titaVo.get("RpCode1") != null) {
+			tLoanBorTx.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RpCode1"))); // 還款來源
+		}
+
 		tLoanBorTx.setEntryDate(iEntryDate);
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTxAmt(iTempAmt);
 		tLoanBorTx.setTempAmt(wkTempAmt);
-		if (titaVo.get("OverRpFg") != null && "2".equals(titaVo.getParam("OverRpFg"))) { // 1->短收 2->溢收
-			tLoanBorTx.setOverflow(parse.stringToBigDecimal(titaVo.getParam("OverRpAmt")));
-		}
 
 		// 其他欄位
 		tTempVo.clear();
@@ -438,9 +439,6 @@ public class L3210 extends TradeBuffer {
 		tTempVo.putParam("TempSourceCode", iTempSourceCode);
 		tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 
-		if (titaVo.get("RpCode1") != null) {
-			tTempVo.putParam("RepayCode", titaVo.getParam("RpCode1")); // 還款來源
-		}
 		if (titaVo.get("RpDscpt1") != null) {
 			tTempVo.putParam("DscptCode", titaVo.getParam("RpDscpt1")); // 摘要代碼
 		}

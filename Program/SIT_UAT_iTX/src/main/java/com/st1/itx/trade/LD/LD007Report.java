@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,7 +18,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LD007Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LD007Report.class);
 
 	@Autowired
 	LD007ServiceImpl lD007ServiceImpl;
@@ -49,48 +46,59 @@ public class LD007Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LD007List) throws LogicException {
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD007", "房貸專員明細統計", "LD007房貸專員明細統計",
-				"LD007房貸專員明細統計.xls", "房貸專員明細統計");
+		makeExcel.open(titaVo
+				, titaVo.getEntDyI()
+				, titaVo.getKinbr()
+				, "LD007"
+				, "房貸專員明細統計"
+				, "LD007房貸專員明細統計"
+				, "LD007房貸專員明細統計.xls"
+				, "房貸專員明細統計");
+		
 		int row = 2;
 		BigDecimal total = BigDecimal.ZERO;
 		if (LD007List != null && LD007List.size() != 0) {
 			for (Map<String, String> tLDVo : LD007List) {
 
-				String ad = "";
+				String value = "";
 				int col = 0;
-				for (int i = 0; i < tLDVo.size(); i++) {
+				for (int i = 0; i <= 15; i++) {
 
-					ad = "F" + String.valueOf(col);
+					value = tLDVo.get("F" + i);
+					
+					if (value == null)
+					{
+						value = "";
+					}
+					
 					col++;
-					switch (col) {
-					case 1:
-						if(tLDVo.get(ad).equals("業務推展部")) {
+					switch (i) {
+					case 0:
+						if (value.equals("業務推展部")) {
 							makeExcel.setValue(row, col, "業　推　部");
-						}
-						else if(tLDVo.get(ad).equals("營業推展部")) {
+						} else if (value.equals("營業推展部")) {
 							makeExcel.setValue(row, col, "營　推　部");
-						}
-						else if(tLDVo.get(ad).equals("營業管理部")) {
+						} else if (value.equals("營業管理部")) {
 							makeExcel.setValue(row, col, "營　管　部");
-						}
-						else if(tLDVo.get(ad).equals("業務開發部")) {
+						} else if (value.equals("業務開發部")) {
 							makeExcel.setValue(row, col, "業　開　部");
 						} else {
-							makeExcel.setValue(row, col, tLDVo.get(ad));
+							makeExcel.setValue(row, col, value);
 						}
 						break;
-					case 10:
-						makeExcel.setValue(row, col, new BigDecimal(tLDVo.get(ad).toString()), "#,##0");
-						total = total.add(new BigDecimal(tLDVo.get(ad)));
+					case 9:
+						BigDecimal bd = getBigDecimal(value);
+						makeExcel.setValue(row, col, bd, "#,##0");
+						total = total.add(bd);
 						break;
 					default:
-						makeExcel.setValue(row, col, tLDVo.get(ad));
+						makeExcel.setValue(row, col, value);
 						break;
 					}
 				} // for
 				row++;
 			} // for
-			makeExcel.setValue(row, 10, total, "#,##0"); 
+			makeExcel.setValue(row, 10, total, "#,##0");
 		} else {
 			makeExcel.setValue(2, 1, "本日無資料");
 		}

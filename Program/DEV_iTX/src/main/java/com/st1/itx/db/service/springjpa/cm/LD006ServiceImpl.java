@@ -14,20 +14,23 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
+
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int entDy, String workSeason, TitaVo titaVo) throws Exception {
 		this.info("lD006.findAll entDy = " + entDy + " , workSeason = " + workSeason);
 
@@ -95,12 +98,12 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("inputYearStart", Integer.toString(Integer.valueOf(titaVo.getParam("inputYearStart")) + 1911));
-		query.setParameter("inputYearEnd", Integer.toString(Integer.valueOf(titaVo.getParam("inputYearEnd")) + 1911));
+		query.setParameter("inputYearStart", parse.stringToInteger(titaVo.getParam("inputYearStart")) + 1911);
+		query.setParameter("inputYearEnd", parse.stringToInteger(titaVo.getParam("inputYearEnd")) + 1911);
 		query.setParameter("inputMonthStart", titaVo.getParam("inputMonthStart"));
 		query.setParameter("inputMonthEnd", titaVo.getParam("inputMonthEnd"));
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

@@ -201,7 +201,6 @@ public class L3120 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, iBormNo, wkBorxNo, titaVo);
-		tLoanBorTx.setTxTypeCode(0); // 0: 臨櫃交易 1: 批次交易
 		tLoanBorTx.setDesc("預約撥款刪除");
 		tLoanBorTx.setAcDate(wkTbsDy);
 		tLoanBorTx.setDisplayflag("Y");

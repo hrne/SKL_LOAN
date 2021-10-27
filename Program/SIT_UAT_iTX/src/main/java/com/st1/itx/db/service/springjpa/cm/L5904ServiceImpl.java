@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5904ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -44,7 +41,7 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 	private int applStartDate = 0;
 	private int applEndDate = 0;
 	private String usageCode = "";
-
+	private int type = 0;
 	// *** 折返控制相關 ***
 	private int index;
 
@@ -69,10 +66,10 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //		L5104 預設出報表皆為未歸還
 
-		logger.info("L5904.findAll applStartDate=" + applStartDate);
-		logger.info("L5904.findAll applEndDate=" + applEndDate);
+		this.info("L5904.findAll applStartDate=" + applStartDate);
+		this.info("L5904.findAll applEndDate=" + applEndDate);
 
-		sql = " select  i.\"CustNo\"                                      "; // F0
+		sql = " select   i.\"CustNo\"                                     "; // F0
 		sql += "        ,i.\"FacmNo\"                                     "; // F1
 		sql += "        ,i.\"ApplSeq\"                                    "; // F2
 		sql += "        ,c.\"CustName\"                                   "; // F3
@@ -93,11 +90,12 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      \"CustNo\"                                          ";
 		sql += "     ,\"FacmNo\"                                          ";
 		sql += "     ,\"ApplDate\"                                        ";
+		sql += "     ,\"ApplSeq\"                                        ";
 		sql += "     from \"InnDocRecord\"                                ";
 		sql += "     where \"ApplCode\" = 2                               ";
 		sql += " ) i2  on i2.\"CustNo\"  = i.\"CustNo\"                   ";
 		sql += "      and i2.\"FacmNo\"  = i.\"FacmNo\"                   ";
-		sql += "      and i2.\"ApplDate\" = i.\"ApplDate\"                ";
+		sql += "      and i2.\"ApplSeq\" = i.\"ApplSeq\"                ";
 
 		sql += " where i.\"ApplDate\" >= " + applStartDate;
 		sql += "   and i.\"ApplDate\" <= " + applEndDate;
@@ -105,17 +103,19 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!"00".equals(usageCode)) {
 			sql += "   and \"UsageCode\" = " + usageCode;
 		}
+		if(type == 1) {
+		  sql += "   and i.\"ApplCode\" = 01  " ;
+		  sql += "   and NVL(i2.\"CustNo\",0) = 0                             ";
+		}
 
-		sql += " and NVL(i2.\"CustNo\",0) = 0                             ";
-
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -128,19 +128,18 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> findAll(int applStartDate, int applEndDate, String usageCode, int index, int limit,
-			TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(int applStartDate, int applEndDate, String usageCode, int type, int index, int limit, TitaVo titaVo) throws Exception {
 		this.applStartDate = applStartDate;
 		this.applEndDate = applEndDate;
 		this.usageCode = usageCode;
+		this.type = type;
 		this.index = index;
 		this.limit = limit;
-
 		return findAll(titaVo);
 	}
 

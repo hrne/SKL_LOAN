@@ -2014,7 +2014,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 	private void logInputRoutine() {
 		this.info("logInputRoutine ... ");
-		this.info("   CustNo-FacmNo-BormNo  戶號           = " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
+		this.info("   CustNo-FacmNo-BormNo Input = " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		this.info("   CaseCloseFlag     結案記號   = " + iCaseCloseFlag); // 結案記號 Y:是 N:否
 		this.info("   ExtraRepay        部分償還本金   = " + iExtraRepay); // 部分償還本金
 		this.info("   ExtraRepayFlag 部分償還本金是否內含利息   = " + iExtraRepayFlag); // 部分償還本金是否內含利息 Y:是 N:否
@@ -2075,6 +2075,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 	private void logOutputRoutine() {
 		this.info("logOutputRoutine ... ");
+		this.info("   CustNo-FacmNo-BormNo Output = " + iCustNo + "-" + iFacmNo + "-" + iBormNo);
 		this.info("   StoreRate       適用利率       = " + oStoreRate);
 		this.info("   RateIncr        加碼利率       = " + oRateIncr);
 		this.info("   IndividualIncr  個別加碼利率   = " + oIndividualIncr);
@@ -2095,9 +2096,6 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 
 		for (int i = 0; i <= wkCalcVoCount; i++) {
 			this.info("   i=" + i);
-			this.info("   custNo          戶號               = " + lCalcRepayIntVo.get(i).getCustNo()); // 戶號
-			this.info("   facmNo          額度編號           = " + lCalcRepayIntVo.get(i).getFacmNo()); // 額度編號
-			this.info("   bormNo          撥款序號           = " + lCalcRepayIntVo.get(i).getBormNo()); // 撥款序號
 			this.info("   termNo          期數編號           = " + lCalcRepayIntVo.get(i).getTermNo()); // 期數編號
 			this.info("   type            種類               = " + lCalcRepayIntVo.get(i).getType()); // 種類
 			this.info("   amount          計算金額           = " + lCalcRepayIntVo.get(i).getAmount()); // 計算金額

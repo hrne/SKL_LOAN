@@ -125,14 +125,23 @@ public class L3912 extends TradeBuffer {
 		} else {
 			RPTFG = 8;
 		}
-		if (tLoanBorTx.getDisplayflag().equals("I"))
-			RPTFG = 10;
+
 
 		this.info("BorxNo     =" + tLoanBorTx.getBorxNo());
 		this.info("TitaTxCd   =" + tLoanBorTx.getTitaTxCd());
 		this.info("RPTFG      =" + RPTFG);
 		// Put Tota
 		wkReduceAmt = this.parse.stringToBigDecimal(tTempVo.getParam("ReduceAmt"));
+
+		BigDecimal wkAcctFee = parse.stringToBigDecimal(tTempVo.getParam("AcctFee"));
+		BigDecimal wkModifyFee = parse.stringToBigDecimal(tTempVo.getParam("ModifyFee"));
+		BigDecimal wkFireFee = parse.stringToBigDecimal(tTempVo.getParam("FireFee"));
+		BigDecimal wkLawFee = parse.stringToBigDecimal(tTempVo.getParam("LawFee"));
+
+		BigDecimal wkRepayAmt = tLoanBorTx.getPrincipal().add(tLoanBorTx.getInterest()).add(tLoanBorTx.getDelayInt())
+				.add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()).add(wkAcctFee).add(wkModifyFee)
+				.add(wkFireFee).add(wkLawFee);
+
 		this.totaVo.putParam("ORPTFG", RPTFG); // rptfg
 		this.totaVo.putParam("OCustNo", tLoanBorTx.getCustNo());
 		this.totaVo.putParam("OFacmNo", tLoanBorTx.getFacmNo());
@@ -147,7 +156,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OHCode", tLoanBorTx.getTitaHCode());
 		this.totaVo.putParam("OEntryDate", tLoanBorTx.getEntryDate());
 		this.totaVo.putParam("OCurrencyCode", tLoanBorTx.getTitaCurCd());
-		this.totaVo.putParam("OTxAmt", tLoanBorTx.getTxAmt());
+		this.totaVo.putParam("OTxAmt", wkRepayAmt.add(tLoanBorTx.getTempAmt()));
 		this.totaVo.putParam("OLoanBal", tLoanBorTx.getLoanBal());
 		this.totaVo.putParam("ORemitAmt", tTempVo.getParam("RemitAmt"));
 		this.totaVo.putParam("OPrinciPal", tLoanBorTx.getPrincipal());
@@ -181,7 +190,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OTxTime", tLoanBorTx.getTitaCalTm());
 		this.totaVo.putParam("OStampFreeAmt", tTempVo.getParam("StampFreeAmt"));
 		this.totaVo.putParam("OBatchNo", tTempVo.getParam("BatchNo"));
-		this.totaVo.putParam("OTxTypeCode", tLoanBorTx.getTxTypeCode());
+		this.totaVo.putParam("ORepayCode", tLoanBorTx.getRepayCode());
 		this.totaVo.putParam("ORemitSeq", tTempVo.getParam("RemitSeq"));
 		this.totaVo.putParam("OTempReasonCode", tTempVo.getParam("TempReasonCode"));
 		this.totaVo.putParam("ORepayBank", tTempVo.getParam("RepayBank"));
@@ -193,8 +202,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("ONewDueAmt", tTempVo.getParam("NewDueAmt"));
 		this.totaVo.putParam("ONewTotalPeriod", tTempVo.getParam("NewTotalPeriod"));
 		this.totaVo.putParam("ORepayTerms", tLoanBorTx.getRepaidPeriod());
-		this.totaVo.putParam("ORepayAmt", tLoanBorTx.getPrincipal().add(tLoanBorTx.getInterest())
-				.add(tLoanBorTx.getDelayInt()).add(tLoanBorTx.getBreachAmt()).add(tLoanBorTx.getCloseBreachAmt()));
+		this.totaVo.putParam("ORepayAmt", wkRepayAmt);
 		this.totaVo.putParam("OCloseBreachAmt", tLoanBorTx.getCloseBreachAmt());
 		this.totaVo.putParam("OCloseBreachAmtUnpaid", tTempVo.getParam("CloseBreachAmtUnpaid"));
 		this.totaVo.putParam("OExtraRepay", tLoanBorTx.getExtraRepay());
@@ -261,8 +269,7 @@ public class L3912 extends TradeBuffer {
 		this.totaVo.putParam("OSupervisor", tTempVo.getParam("Supervisor"));
 		this.totaVo.putParam("OSupervisorX", loanCom.getEmpFullnameByEmpNo(tTempVo.getParam("Supervisor")));
 		this.totaVo.putParam("ORate", tLoanBorTx.getRate());
-		
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

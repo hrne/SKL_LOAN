@@ -14,27 +14,29 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> doQuery(TitaVo titaVo) throws Exception {
 		this.info("lM002.doQuery");
 
 		// 資料前兩年一月起至當月
-		String startYM = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19090000).substring(0, 4) + "01";
-		String endYM = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000).substring(0, 6);
+		String startYM = (parse.stringToInteger(titaVo.get("ENTDY").substring(0, 4)) + 1909) + "01";
+		String endYM = parse.IntegerToString(parse.stringToInteger(titaVo.get("ENTDY").substring(0, 6)) + 191100, 1);
 
 		String sql = "";
 		// 為了排除掉不是出表範圍的資料，實際Query包進subquery，以便篩選掉DataType=0者
@@ -67,14 +69,9 @@ public class LM002ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "          AND NVL(FP.\"ProdNo\", 'XXX') != 'XXX' ";
 		sql += " ) ";
 		sql += " WHERE \"DataType\" != 0 ";
-		sql += " GROUP BY \"Year\" "; // 為了DRY，把GROUP BY拉出來外層做，否則DataType條件會需要寫兩次
+		sql += " GROUP BY \"Year\" ";     // 為了DRY，把GROUP BY拉出來外層做，否則DataType條件會需要寫兩次
 		sql += "         ,\"DataType\" "; // 對於效能並無顯著影響
 		sql += "         ,\"Month\" ";
-		// 方便debug時確認view用
-		// ORDER BY "Year" DESC
-		//         ,"Month" DESC
-		//         ,"DataType" ASC
- 
 
 		this.info("sql=" + sql);
 

@@ -17,17 +17,20 @@ import com.st1.itx.db.domain.InnFundApl;
 import com.st1.itx.db.service.InnFundAplService;
 import com.st1.itx.db.service.springjpa.cm.LD008ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
 public class LD008Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LD008Report.class);
-	
+
 	@Autowired
 	LD008ServiceImpl lD008ServiceImpl;
 
 	@Autowired
 	InnFundAplService innFundAplService;
+	
+	@Autowired
+	Parse parse;
 
 	String exportDate;
 
@@ -46,6 +49,9 @@ public class LD008Report extends MakeReport {
 	BigDecimal fundsLimitAmt;
 	String fundsMonth;
 	String fundsDay;
+	
+	// percent函數計算用
+	private static final BigDecimal hundred = new BigDecimal("100");
 
 	// 自訂表頭
 	@Override
@@ -74,8 +80,8 @@ public class LD008Report extends MakeReport {
 	public Boolean exec(TitaVo titaVo) throws LogicException {
 
 		this.titaVo = titaVo;
-		
-		Boolean findRelatedOnly = titaVo.getParam("inputShowType").equals("1") ? true : false;
+
+		Boolean findRelatedOnly = "1".equals(titaVo.getParam("inputShowType"));
 
 		// 設定製表日期
 		setExportDate(dDateUtil.getNowStringBc());
@@ -96,7 +102,14 @@ public class LD008Report extends MakeReport {
 			this.error("lD008ServiceImpl.findAll error = " + e.getMessage());
 		}
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD008", (findRelatedOnly ? "關係人" : "") + "放款餘額總表", "機密", "A4", "L");
+		this.open(titaVo
+				, titaVo.getEntDyI()
+				, titaVo.getKinbr()
+				, "LD008"
+				, (findRelatedOnly ? "關係人放款餘額總表" : "放款餘額總表")
+				, "機密"
+				, "A4"
+				, "L");
 
 		List<Map<String, String>> listLD008 = null;
 		List<Map<String, String>> listLD008r = null;
@@ -107,7 +120,7 @@ public class LD008Report extends MakeReport {
 		for (Map<String, String> SubBookCodesVo : listSubBookCodes) {
 
 			String AcSubBookCode = SubBookCodesVo.get("F0");
-			
+
 			rptTypeItem = SubBookCodesVo.get("F1");
 
 			if (!isFirstPage) {
@@ -118,27 +131,21 @@ public class LD008Report extends MakeReport {
 			}
 
 			try {
-				if (findRelatedOnly)
-				{
-				listLD008r = lD008ServiceImpl.findAll_related(rptType, AcSubBookCode, titaVo);
-				}
-				else
-				{
-				listLD008 = lD008ServiceImpl.findAll(rptType, AcSubBookCode, titaVo);
+				if (findRelatedOnly) {
+					listLD008r = lD008ServiceImpl.findAll_related(rptType, AcSubBookCode, titaVo);
+				} else {
+					listLD008 = lD008ServiceImpl.findAll(rptType, AcSubBookCode, titaVo);
 				}
 			} catch (Exception e) {
 				StringWriter errors = new StringWriter();
 				e.printStackTrace(new PrintWriter(errors));
 				this.error("lD008ServiceImpl.findAll error = " + e.getMessage());
 			}
-			
-			if (findRelatedOnly)
-			{
-			exportPdf_Related(listLD008r);
-			}
-			else
-			{
-			exportPdf(listLD008);
+
+			if (findRelatedOnly) {
+				exportPdf_Related(listLD008r);
+			} else {
+				exportPdf(listLD008);
 			}
 		}
 
@@ -306,7 +313,7 @@ public class LD008Report extends MakeReport {
 		print(0, 114, formatAmt(fundsLimitAmt, 0), "R"); // 上限金額
 
 	}
-	
+
 	private void exportPdf_Related(List<Map<String, String>> listLD008r) {
 
 		// 測試使用-印表前先把list資料列印到LOG
@@ -398,28 +405,24 @@ public class LD008Report extends MakeReport {
 
 	private BigDecimal percentOfTotal(String input) {
 
-		BigDecimal amt = new BigDecimal(input);
+		BigDecimal amt = getBigDecimal(input);
 
 		return percentOfTotal(amt);
 	}
 
 	private BigDecimal percentOfTotal(BigDecimal amt) {
 
-		BigDecimal hundred = new BigDecimal("100");
-
 		return computeDivide(amt, total, 4).multiply(hundred);
 	}
 
 	private BigDecimal percentOfFunds(String input) {
 
-		BigDecimal amt = new BigDecimal(input);
+		BigDecimal amt = getBigDecimal(input);
 
 		return percentOfFunds(amt);
 	}
 
 	private BigDecimal percentOfFunds(BigDecimal amt) {
-
-		BigDecimal hundred = new BigDecimal("100");
 
 		return computeDivide(amt, availableFunds, 4).multiply(hundred);
 	}
@@ -441,9 +444,18 @@ public class LD008Report extends MakeReport {
 
 		// 計算
 		for (Map<String, String> tLD008 : listLD008) {
-			int detailSeq = Integer.parseInt(tLD008.get("F0"));
-			BigDecimal counts = new BigDecimal(tLD008.get("F1"));
-			BigDecimal amt = new BigDecimal(tLD008.get("F2"));
+			int detailSeq = 0;
+			
+			try {
+				detailSeq = parse.stringToInteger(tLD008.get("F0"));
+			} catch (LogicException e) {
+				this.error("LD008 computeTotal: failed to transform detailSeq from string to integer");
+				this.error("tLD008 detailSeq: " + tLD008.get("F0"));
+				this.error(e.toString());
+			}
+			
+			BigDecimal counts = getBigDecimal(tLD008.get("F1"));
+			BigDecimal amt = getBigDecimal(tLD008.get("F2"));
 
 			switch (detailSeq) {
 			case 1:
@@ -489,8 +501,7 @@ public class LD008Report extends MakeReport {
 	}
 
 	private void setExportDate(String nowStringBc) {
-		exportDate = nowStringBc.substring(4, 6) + "/" + nowStringBc.substring(6, 8) + "/"
-				+ nowStringBc.substring(2, 4);
+		exportDate = this.showBcDate(nowStringBc, 1);
 	}
 
 	private void getFundData() {
@@ -507,7 +518,7 @@ public class LD008Report extends MakeReport {
 			availableFunds = tInnFundApl.getResrvStndrd();
 			fundsLimit = tInnFundApl.getPosbleBorPsn();
 			fundsLimitAmt = tInnFundApl.getPosbleBorAmt();
-			String acDate = String.valueOf(tInnFundApl.getAcDate());
+			String acDate = parse.IntegerToString(tInnFundApl.getAcDate(), 1);
 			fundsMonth = acDate.substring(4, 6);
 			fundsDay = acDate.substring(6, 8);
 		}

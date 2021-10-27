@@ -59,40 +59,40 @@ public class L5R24 extends TradeBuffer {
 			case "1":
 				for (Map<String, String> r5R24SqlReturn : i5R24SqlReturn) {
 					String reAddress = "";
-					String iCityItem = r5R24SqlReturn.get("CityItem");
-					String iAreaItem = r5R24SqlReturn.get("AreaItem");
-					String iRoad = r5R24SqlReturn.get("RegRoad");
-					String iRegSection = r5R24SqlReturn.get("RegSection");
-					String iRegAlley = r5R24SqlReturn.get("RegAlley");
-					String iRegLane = r5R24SqlReturn.get("RegLane");
-					String iRegNum = r5R24SqlReturn.get("RegNum");
-					String iRegNumDash = r5R24SqlReturn.get("RegNumDash");
-					String iRegFloor = r5R24SqlReturn.get("RegFloor");
-					String iRegFloorDash = r5R24SqlReturn.get("RegFloorDash");
+					String iCityItem = r5R24SqlReturn.get("F2");
+					String iAreaItem = r5R24SqlReturn.get("F3");
+					String iRoad = r5R24SqlReturn.get("F4");
+					String iRegSection = r5R24SqlReturn.get("F5");
+					String iRegAlley = r5R24SqlReturn.get("F6");
+					String iRegLane = r5R24SqlReturn.get("F7");
+					String iRegNum = r5R24SqlReturn.get("F8");
+					String iRegNumDash = r5R24SqlReturn.get("F9");
+					String iRegFloor = r5R24SqlReturn.get("F10");
+					String iRegFloorDash = r5R24SqlReturn.get("F11");
 					
 					reAddress = iCityItem+iAreaItem;
-					if (!iRoad.equals("")) {
+					if (!"".equals(iRoad)) {
 						reAddress = reAddress+iRoad;
 					}
-					if (!iRegSection.equals("")) {
+					if (!"".equals(iRegSection)) {
 						reAddress = reAddress+iRegSection+"段";
 					}
-					if (!iRegAlley.equals("")) {
+					if (!"".equals(iRegAlley)) {
 						reAddress = reAddress+iRegAlley+"弄";
 					}
-					if (!iRegLane.equals("")) {
+					if (!"".equals(iRegLane)) {
 						reAddress = reAddress+iRegLane+"巷";
 					}
-					if (!iRegNum.equals("")) {
+					if (!"".equals(iRegNum)) {
 						reAddress = reAddress+iRegNum+"號";
 					}
-					if (!iRegNumDash.equals("")) {
+					if (!"".equals(iRegNumDash)) {
 						reAddress = reAddress+"之"+iRegNumDash;
 					}
-					if (!iRegFloor.equals("")) {
+					if (!"".equals(iRegFloor)) {
 						reAddress = reAddress+iRegFloor+"樓";
 					}
-					if (!iRegFloorDash.equals("")) {
+					if (!"".equals(iRegFloorDash)) {
 						reAddress = reAddress+"之"+iRegFloorDash;
 					}
 					totaVo.putParam("L5R24FullAddress", reAddress);
@@ -101,40 +101,40 @@ public class L5R24 extends TradeBuffer {
 			case "2":
 				for (Map<String, String> r5R24SqlReturn : i5R24SqlReturn) {
 					String reAddress = "";
-					String iCityItem = r5R24SqlReturn.get("CityItem");
-					String iAreaItem = r5R24SqlReturn.get("AreaItem");
-					String iCurrRoad = r5R24SqlReturn.get("CurrRoad");
-					String iCurrSection = r5R24SqlReturn.get("CurrSection");
-					String iCurrAlley = r5R24SqlReturn.get("CurrAlley");
-					String iCurrLane = r5R24SqlReturn.get("CurrLane");
-					String iCurrNum = r5R24SqlReturn.get("CurrNum");
-					String iCurrNumDash = r5R24SqlReturn.get("CurrNumDash");
-					String iCurrFloor = r5R24SqlReturn.get("CurrFloor");
-					String iCurrFloorDash = r5R24SqlReturn.get("CurrFloorDash");
+					String iCityItem = r5R24SqlReturn.get("F2");
+					String iAreaItem = r5R24SqlReturn.get("F3");
+					String iCurrRoad = r5R24SqlReturn.get("F4");
+					String iCurrSection = r5R24SqlReturn.get("F5");
+					String iCurrAlley = r5R24SqlReturn.get("F6");
+					String iCurrLane = r5R24SqlReturn.get("F7");
+					String iCurrNum = r5R24SqlReturn.get("F8");
+					String iCurrNumDash = r5R24SqlReturn.get("F9");
+					String iCurrFloor = r5R24SqlReturn.get("F10");
+					String iCurrFloorDash = r5R24SqlReturn.get("F11");
 					
 					reAddress = iCityItem+iAreaItem;
-					if (!iCurrRoad.equals("")) {
+					if (!"".equals(iCurrRoad)) {
 						reAddress = reAddress+iCurrRoad;
 					}
-					if (!iCurrSection.equals("")) {
+					if (!"".equals(iCurrSection)) {
 						reAddress = reAddress+iCurrSection+"段";
 					}
-					if (!iCurrAlley.equals("")) {
+					if (!"".equals(iCurrAlley)) {
 						reAddress = reAddress+iCurrAlley+"弄";
 					}
-					if (!iCurrLane.equals("")) {
+					if (!"".equals(iCurrLane)) {
 						reAddress = reAddress+iCurrLane+"巷";
 					}
-					if (!iCurrNum.equals("")) {
+					if (!"".equals(iCurrNum)) {
 						reAddress = reAddress+iCurrNum+"號";
 					}
-					if (!iCurrNumDash.equals("")) {
+					if (!"".equals(iCurrNumDash)) {
 						reAddress = reAddress+"之"+iCurrNumDash;
 					}
-					if (!iCurrFloor.equals("")) {
+					if (!"".equals(iCurrFloor)) {
 						reAddress = reAddress+iCurrFloor+"樓";
 					}
-					if (!iCurrFloorDash.equals("")) {
+					if (!"".equals(iCurrFloorDash)) {
 						reAddress = reAddress+"之"+iCurrFloorDash;
 					}
 					totaVo.putParam("L5R24FullAddress", reAddress);
@@ -143,44 +143,44 @@ public class L5R24 extends TradeBuffer {
 			case "3":
 				for (Map<String, String> r5R24SqlReturn : i5R24SqlReturn) {
 					String reAddress = "";
-					String iCityItem = r5R24SqlReturn.get("CityItem");
-					String iAreaItem = r5R24SqlReturn.get("AreaItem");
-					String iIrtem = r5R24SqlReturn.get("IrItem");
-					String iRoad = r5R24SqlReturn.get("Road");
-					String iSection = r5R24SqlReturn.get("Section");
-					String iAlley = r5R24SqlReturn.get("Alley");
-					String iLane = r5R24SqlReturn.get("Lane");
-					String iNum = r5R24SqlReturn.get("Num");
-					String iNumDash = r5R24SqlReturn.get("NumDash");
-					String iFloor = r5R24SqlReturn.get("Floor");
-					String iFloorDash = r5R24SqlReturn.get("FloorDash");
+					String iCityItem = r5R24SqlReturn.get("F2");
+					String iAreaItem = r5R24SqlReturn.get("F3");
+					String iIrtem = r5R24SqlReturn.get("F4");
+					String iRoad = r5R24SqlReturn.get("F5");
+					String iSection = r5R24SqlReturn.get("F6");
+					String iAlley = r5R24SqlReturn.get("F7");
+					String iLane = r5R24SqlReturn.get("F8");
+					String iNum = r5R24SqlReturn.get("F9");
+					String iNumDash = r5R24SqlReturn.get("F10");
+					String iFloor = r5R24SqlReturn.get("F11");
+					String iFloorDash = r5R24SqlReturn.get("F12");
 					
 					reAddress = iCityItem+iAreaItem;
-					if (!iIrtem.equals("")) {
+					if (!"".equals(iIrtem)) {
 						reAddress = reAddress+iIrtem;
 					}
-					if (!iRoad.equals("")) {
+					if (!"".equals(iRoad)) {
 						reAddress = reAddress+iRoad;
 					}
-					if (!iSection.equals("")) {
+					if (!"".equals(iSection)) {
 						reAddress = reAddress+iSection+"段";
 					}
-					if (!iAlley.equals("")) {
+					if (!"".equals(iAlley)) {
 						reAddress = reAddress+iAlley+"弄";
 					}
-					if (!iLane.equals("")) {
+					if (!"".equals(iLane)) {
 						reAddress = reAddress+iLane+"巷";
 					}
-					if (!iNum.equals("")) {
+					if (!"".equals(iNum)) {
 						reAddress = reAddress+iNum+"號";
 					}
-					if (!iNumDash.equals("")) {
+					if (!"".equals(iNumDash)) {
 						reAddress = reAddress+"之"+iNumDash;
 					}
-					if (!iFloor.equals("")) {
+					if (!"".equals(iFloor)) {
 						reAddress = reAddress+iFloor+"樓";
 					}
-					if (!iFloorDash.equals("")) {
+					if (!"".equals(iFloorDash)) {
 						reAddress = reAddress+"之"+iFloorDash;
 					}
 					totaVo.putParam("L5R24FullAddress", reAddress);

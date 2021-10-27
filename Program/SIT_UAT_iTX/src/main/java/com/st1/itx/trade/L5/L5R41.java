@@ -42,7 +42,7 @@ public class L5R41 extends TradeBuffer {
 		int iYearMonth = this.parse.stringToInteger(titaVo.getParam("RimYearMonth"))+191100;
 		int iRimCustNo = this.parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		int iRimFacmNo = this.parse.stringToInteger(titaVo.getParam("RimFacmNo"));
-		String iRimUsageCode = new Integer(titaVo.getParam("RimUsageCode")).toString();
+		String iRimUsageCode = titaVo.getParam("RimUsageCode").trim();
 
 		// 檢查輸入資料
 		if (!(iRimFuncCode >= 1 && iRimFuncCode <= 5)) {

@@ -29,7 +29,7 @@ public class LoanBorTx implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 2780438203383898591L;
+	private static final long serialVersionUID = 7305112262892063162L;
 
 @EmbeddedId
   private LoanBorTxId loanBorTxId;
@@ -93,10 +93,10 @@ public class LoanBorTx implements Serializable {
   @Column(name = "`TitaEmpNoS`", length = 6)
   private String titaEmpNoS;
 
-  // 交易別
-  /* 0: 臨櫃交易  1: 批次交易 */
-  @Column(name = "`TxTypeCode`")
-  private int txTypeCode = 0;
+  // 還款來源
+  /* CdCode.RepayCode01 匯款轉帳02 銀行扣款03 員工扣薪04 支票05 特約金06 人事特約金07 定存特約08 劃撥存款09 其他 */
+  @Column(name = "`RepayCode`")
+  private int repayCode = 0;
 
   // 摘要
   @Column(name = "`Desc`", length = 15)
@@ -175,7 +175,7 @@ public class LoanBorTx implements Serializable {
   private BigDecimal closeBreachAmt = new BigDecimal("0");
 
   // 暫收款金額
-  /* 首筆，存入暫收為正、暫收抵繳為負 */
+  /* 存入暫收為正、暫收抵繳為負 */
   @Column(name = "`TempAmt`")
   private BigDecimal tempAmt = new BigDecimal("0");
 
@@ -518,22 +518,40 @@ public class LoanBorTx implements Serializable {
   }
 
 /**
-	* 交易別<br>
-	* 0: 臨櫃交易  1: 批次交易
+	* 還款來源<br>
+	* CdCode.RepayCode
+01 匯款轉帳
+02 銀行扣款
+03 員工扣薪
+04 支票
+05 特約金
+06 人事特約金
+07 定存特約
+08 劃撥存款
+09 其他
 	* @return Integer
 	*/
-  public int getTxTypeCode() {
-    return this.txTypeCode;
+  public int getRepayCode() {
+    return this.repayCode;
   }
 
 /**
-	* 交易別<br>
-	* 0: 臨櫃交易  1: 批次交易
+	* 還款來源<br>
+	* CdCode.RepayCode
+01 匯款轉帳
+02 銀行扣款
+03 員工扣薪
+04 支票
+05 特約金
+06 人事特約金
+07 定存特約
+08 劃撥存款
+09 其他
   *
-  * @param txTypeCode 交易別
+  * @param repayCode 還款來源
 	*/
-  public void setTxTypeCode(int txTypeCode) {
-    this.txTypeCode = txTypeCode;
+  public void setRepayCode(int repayCode) {
+    this.repayCode = repayCode;
   }
 
 /**
@@ -869,7 +887,7 @@ N:否
 
 /**
 	* 暫收款金額<br>
-	* 首筆，存入暫收為正、暫收抵繳為負
+	* 存入暫收為正、暫收抵繳為負
 	* @return BigDecimal
 	*/
   public BigDecimal getTempAmt() {
@@ -878,7 +896,7 @@ N:否
 
 /**
 	* 暫收款金額<br>
-	* 首筆，存入暫收為正、暫收抵繳為負
+	* 存入暫收為正、暫收抵繳為負
   *
   * @param tempAmt 暫收款金額
 	*/
@@ -1104,7 +1122,7 @@ N:否
   public String toString() {
     return "LoanBorTx [loanBorTxId=" + loanBorTxId + ", titaCalDy=" + titaCalDy + ", titaCalTm=" + titaCalTm
            + ", titaKinBr=" + titaKinBr + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", titaTxCd=" + titaTxCd + ", titaCrDb=" + titaCrDb + ", titaHCode=" + titaHCode
-           + ", titaCurCd=" + titaCurCd + ", titaEmpNoS=" + titaEmpNoS + ", txTypeCode=" + txTypeCode + ", desc=" + desc + ", acDate=" + acDate + ", correctSeq=" + correctSeq
+           + ", titaCurCd=" + titaCurCd + ", titaEmpNoS=" + titaEmpNoS + ", repayCode=" + repayCode + ", desc=" + desc + ", acDate=" + acDate + ", correctSeq=" + correctSeq
            + ", displayflag=" + displayflag + ", entryDate=" + entryDate + ", dueDate=" + dueDate + ", txAmt=" + txAmt + ", loanBal=" + loanBal + ", intStartDate=" + intStartDate
            + ", intEndDate=" + intEndDate + ", repaidPeriod=" + repaidPeriod + ", rate=" + rate + ", principal=" + principal + ", interest=" + interest + ", delayInt=" + delayInt
            + ", breachAmt=" + breachAmt + ", closeBreachAmt=" + closeBreachAmt + ", tempAmt=" + tempAmt + ", extraRepay=" + extraRepay + ", unpaidInterest=" + unpaidInterest + ", unpaidPrincipal=" + unpaidPrincipal

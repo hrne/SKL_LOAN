@@ -2,8 +2,6 @@ package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -49,7 +47,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5103 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5103.class);
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
@@ -66,6 +63,7 @@ public class L5103 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+
 		this.info("active L5103 ");
 		this.totaVo.init(titaVo);
 
@@ -108,9 +106,28 @@ public class L5103 extends TradeBuffer {
 			InnDocRecord nInnDocRecord = innDocRecordService.findById(tInnDocRecordId, titaVo);
 
 			if (nInnDocRecord != null) {
-				if ("1".equals(tInnDocRecord.getTitaActFg())) {
+				if ("1".equals(nInnDocRecord.getTitaActFg())) {
 					throw new LogicException(titaVo, "E0005", "待放行");
 				}
+				
+				nInnDocRecord.setTitaActFg(titaVo.getActFgI() + "");
+				nInnDocRecord.setApplCode(titaVo.getParam("ApplCode"));
+				nInnDocRecord.setApplEmpNo(titaVo.getParam("ApplEmpNo"));
+				nInnDocRecord.setKeeperEmpNo(titaVo.getParam("KeeperEmpNo"));
+				nInnDocRecord.setUsageCode(titaVo.getParam("UsageCode"));
+				nInnDocRecord.setCopyCode(titaVo.getParam("CopyCode"));
+				nInnDocRecord.setApplDate(parse.stringToInteger(titaVo.getParam("ApplDate")));
+				nInnDocRecord.setReturnDate(parse.stringToInteger(titaVo.getParam("ReturnDate")));
+				nInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
+				nInnDocRecord.setRemark(titaVo.getParam("Remark"));
+				nInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
+
+				try {
+					innDocRecordService.update(nInnDocRecord);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", "L5103 InnDocRecord insert " + e.getErrorMsg());
+				}
+				
 			} else {
 				tInnDocRecord.setInnDocRecordId(tInnDocRecordId);
 

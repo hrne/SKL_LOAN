@@ -984,9 +984,7 @@ public class L3100 extends TradeBuffer {
 	private void moveLoanBorTx() throws LogicException {
 		this.info("   moveLoanBorTx ...");
 
-		if (wkReserve) {
-			tLoanBorTx.setTxTypeCode(1); // 0: 臨櫃交易 1: 批次交易
-		}
+
 		if ("1".equals(titaVo.getParam("RenewFlag"))) {
 			tLoanBorTx.setDesc("展期");
 		} else if ("2".equals(titaVo.getParam("RenewFlag"))) {

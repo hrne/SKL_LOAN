@@ -670,7 +670,7 @@ BIND(#ApeBtn0,click, {cmd=CALLSEND;DOCODE=ApeBtnProc0})
 #ApeBtnProc0=@,1,S
 C(3,#FunCode,4,s,$)
 C(5,#ApeBtn0,V,T(3,@ApeBtn0, ),T(3,@ApeBtn0,V))
-##loop {times:100,i:1}
+##loop {times:120,i:1}
 T(2,@ApeBtn{i},#ApeBtn0)
 C(5,#ApeBtn{i},V,C(3,#ApeType{i},1,T(3,@OieBtn{i},V),$),T(3,@OieBtn{i}, ))
 ##end
@@ -683,7 +683,7 @@ BIND(#OieBtn0,click, {cmd=CALLSEND;DOCODE=OieBtnProc0})
 #OieBtnProc0=@,1,S
 C(3,#FunCode,4,s,$)
 C(5,#OieBtn0,V,T(3,@OieBtn0, ),T(3,@OieBtn0,V))
-##loop {times:100,i:1}
+##loop {times:120,i:1}
 C(2,#ApeType{i},T(2,@OieBtn{i},#OieBtn0),$,C(5,#ApeBtn{i},V,T(2,@OieBtn{i},#OieBtn0),$)) 
 ##end
 

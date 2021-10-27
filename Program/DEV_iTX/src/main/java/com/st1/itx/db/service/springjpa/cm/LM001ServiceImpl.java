@@ -7,8 +7,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,9 +18,7 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM001ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -31,7 +27,6 @@ public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	/**
 	 * 查詢本月及上月的戶數及金額
 	 * 
@@ -42,8 +37,8 @@ public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean
 	 */
 	public List<Map<String, String>> doQuery(int thisMonth, int lastMonth, TitaVo titaVo) {
 
-		logger.info("doQuery");
-		
+		this.info("doQuery");
+
 		String sql = "SELECT \"ThisMonthCnt\" ";
 		sql += "            ,NVL(\"ThisMonthLoanBalTotal\",0) AS \"ThisMonthLoanBalTotal\" ";
 		sql += "            ,\"LastMonthCnt\" ";
@@ -103,7 +98,7 @@ public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                  ) \"ThisMonthAddDetail\""; // 以戶號&額度加總放款餘額
 		sql += "           ) \"ThisMonthAdd\"";
 
-		logger.info("sql = " + sql);
+		this.info("sql = " + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -112,14 +107,13 @@ public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("lastMonth", lastMonth);
 		query.setParameter("thisMonth", thisMonth);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> doQueryRate(int thisMonth, TitaVo titaVo) {
 
-		logger.info("doQueryRate");
-		
+		this.info("doQueryRate");
+
 		String sql = "SELECT NVL(\"FirstRateMin\",0)    AS \"FirstRateMin\"";
 		sql += "            ,NVL(\"FirstRateMax\",0)    AS \"FirstRateMax\"";
 		sql += "            ,NVL(\"ContinueRateMin\",0) AS \"ContinueRateMin\"";
@@ -170,19 +164,19 @@ public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             WHERE \"Seq\" = 1";
 		sql += "           ) \"ContinueRate\"";
 
-		logger.info("sql = " + sql);
-		
+		this.info("sql = " + sql);
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> findNewCase(int thisMonth, TitaVo titaVo) {
 
-		logger.info("dofindNewCase");
-		
+		this.info("dofindNewCase");
+
 		String sql = "SELECT M.\"CustNo\"";
 		sql += "            ,M.\"FacmNo\"";
 		sql += "            ,M.\"BormNo\"";
@@ -197,19 +191,19 @@ public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        AND L.\"RenewFlag\" <> 'Y'";
 		sql += "        AND M.\"LoanBalance\" > 0";
 
-		logger.info("sql = " + sql);
-		
+		this.info("sql = " + sql);
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> findMinMaxRate(int thisMonth, TitaVo titaVo) {
 
-		logger.info("dofindMinMaxRate");
-		
+		this.info("LM001ServiceImpl dofindMinMaxRate");
+
 		String sql = "SELECT MIN(M.\"StoreRate\")    AS \"MIN\"";
 		sql += "            ,MAX(M.\"StoreRate\")    AS \"MAX\"";
 		sql += "      FROM \"MonthlyLoanBal\" M";
@@ -221,19 +215,19 @@ public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        AND L.\"Status\" IN ('0', '2')";
 		sql += "        AND M.\"LoanBalance\" > 0";
 
-		logger.info("sql = " + sql);
-		
+		this.info("sql = " + sql);
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
-	
+
 	public List<Map<String, String>> findHigherRate(int thisMonth, BigDecimal maxRate, TitaVo titaVo) {
 
-		logger.info("dofindMinMaxRate");
-		
+		this.info("LM001ServiceImpl dofindMinMaxRate");
+
 		String sql = "SELECT M.\"CustNo\"";
 		sql += "            ,M.\"FacmNo\"";
 		sql += "            ,M.\"BormNo\"";
@@ -251,13 +245,13 @@ public class LM001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        AND L.\"Status\" IN ('0', '2')";
 		sql += "        AND M.\"LoanBalance\" > 0";
 
-		logger.info("sql = " + sql);
-		
+		this.info("sql = " + sql);
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
 		query.setParameter("maxRate", maxRate);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

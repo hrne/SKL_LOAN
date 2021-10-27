@@ -32,32 +32,11 @@ public class LM002Report extends MakeReport {
 
 	@Override
 	public void printHeader() {
-
-//		this.info("MakeReport.printHeader");
-//		printHeaderP();
-//		if (page == 0) {
-//			printHeaderP();
-//		} else {
-//			printHeaderP1();
-//		}
-//		this.setBeginRow(2);
-//
-//		this.setMaxRows(maxRowsLM002);
 	}
 
 	@Override
 	public void printTitle() {
 	}
-
-//	public void printHeaderP() {
-//		this.print(-1, 147, "機密等級:密");
-//		this.print(-1, 67, "房 貸 專 案 貸 款");
-//		this.print(-1, 2, "預警系統申請作業");
-//	}
-
-//	public void printHeaderP1() {
-//		this.print(-3, 60, "PAGE  " + this.getNowPage());
-//	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
@@ -71,8 +50,7 @@ public class LM002Report extends MakeReport {
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		// 民國年
-		int rocYY = Integer.parseInt(titaVo.get("ENTDY").substring(0, 4));
-
+		int rocYY = parse.stringToInteger(titaVo.get("ENTDY").substring(0, 4));
 		int currentYear = rocYY + 1911;
 
 		// 打開excel
@@ -86,7 +64,6 @@ public class LM002Report extends MakeReport {
 
 		try {
 			fnAllList = lM002ServiceImpl.doQuery(titaVo);
-
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -108,11 +85,13 @@ public class LM002Report extends MakeReport {
 				}
 
 				try {
-					// say currentYear is 2020
-					// 2018 - 2020 + 2 = 0
-					// 2019 - 2020 + 2 = 1
-					// 2020 - 2020 + 2 = 2
-					makeExcel.setValue(20 - (currentYear - parse.stringToInteger(F[0])) * 8 + parse.stringToInteger(F[1]) - 1, (parse.stringToInteger(F[2])) + 1, parse.stringToBigDecimal(F[3]), "R");
+					// 第三排為當年分　為20
+					// 第二排 12
+					// 第一排 4
+					makeExcel.setValue(20 - (currentYear - parse.stringToInteger(F[0])) * 8 + parse.stringToInteger(F[1]) - 1
+				         			 , parse.stringToInteger(F[2]) + 1
+				         			 , getBigDecimal(F[3])
+				         			 , "R");
 				} catch (Exception e) {
 					this.warn("LM002 trying to parse data failed: ");
 					this.info("F0: " + F[0]);
@@ -120,7 +99,8 @@ public class LM002Report extends MakeReport {
 					this.info("F2: " + F[2]);
 					this.info("F3: " + F[3]);
 				}
-
+				
+				// 從上到下每排啟動 excel formulas
 				for (int y = 0; y < 3; y++) {
 					for (int x = 0; x < 12; x++) {
 						makeExcel.formulaCaculate(8 + y * 8, 2 + x);

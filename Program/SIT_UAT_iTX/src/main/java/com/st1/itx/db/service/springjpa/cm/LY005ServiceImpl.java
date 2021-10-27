@@ -11,9 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
+import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.eum.ContentName;
 
 @Service("LY005ServiceImpl")
 @Repository
@@ -26,17 +26,17 @@ public class LY005ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	public List<Map<String, String>> queryDetail(int inputYearMonth) throws Exception {
+	public List<Map<String, String>> queryDetail(int inputYearMonth, TitaVo titaVo) throws Exception {
 		this.info("LY005ServiceImpl queryDetail ");
 		String sql = "";
-		sql += " WITH \"LoanData\" AS ( ";
+		sql += " WITH \"LoanData\" AS ( "; // 計算每個戶號的放款餘額加總
 		sql += "     SELECT \"CustNo\" ";
 		sql += "          , SUM(\"LoanBalance\") AS \"LoanTotal\" ";
 		sql += "     FROM \"MonthlyLoanBal\" ";
 		sql += "     WHERE \"YearMonth\" = :inputYearMonth ";
 		sql += "     GROUP BY \"CustNo\" ";
 		sql += " ) ";
-		sql += " , \"FacData\" AS ( ";
+		sql += " , \"FacData\" AS ( "; // 取各戶號的最新一筆額度的撥貸日期及核決主管
 		sql += "     SELECT FAC.\"CustNo\" ";
 		sql += "          , FAC.\"FirstDrawdownDate\" ";
 		sql += "          , CASE ";
@@ -48,6 +48,8 @@ public class LY005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                               ORDER BY FAC.\"FirstDrawdownDate\" DESC ";
 		sql += "                              ) AS \"Seq\"  ";
 		sql += "     FROM \"FacMain\" FAC ";
+		sql += "     WHERE FAC.\"UtilAmt\" > 0 ";
+		sql += "       AND FAC.\"FirstDrawdownDate\" > 0 ";
 		sql += " ) ";
 		sql += " , \"ClData\" AS ( ";
 		sql += "     SELECT CF.\"CustNo\" ";
@@ -85,7 +87,11 @@ public class LY005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                   ORDER BY CF.\"FacmNo\" DESC ";
 		sql += "                                  ) AS \"Seq\"  ";
 		sql += "         FROM \"ClFac\" CF ";
+		sql += "         LEFT JOIN \"FacMain\" FAC ON FAC.\"CustNo\" = CF.\"CustNo\" ";
+		sql += "                                  AND FAC.\"FacmNo\" = CF.\"FacmNo\" ";
 		sql += "         WHERE CF.\"MainFlag\" = 'Y' ";
+		sql += "           AND FAC.\"UtilAmt\" > 0 "; // 已動用
+		sql += "           AND FAC.\"FirstDrawdownDate\" > 0 "; // 已有初貸日
 		sql += "     ) CF ";
 		sql += "     LEFT JOIN ( ";
 		sql += "         SELECT CF.\"CustNo\" ";
@@ -96,9 +102,11 @@ public class LY005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "     LEFT JOIN \"ClBuilding\" CB ON CB.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                              AND CB.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                              AND CB.\"ClNo\" = CF.\"ClNo\" ";
+		sql += "                              AND CF.\"ClCode1\" = 1 "; // 房地擔保品串建物檔取建物門牌
 		sql += "     LEFT JOIN \"ClLand\" CL ON CL.\"ClCode1\" = CF.\"ClCode1\" ";
 		sql += "                          AND CL.\"ClCode2\" = CF.\"ClCode2\" ";
 		sql += "                          AND CL.\"ClNo\" = CF.\"ClNo\" ";
+		sql += "                          AND CF.\"ClCode1\" = 2 "; // 土地擔保品串土地檔取土地座落
 		sql += "     WHERE CF.\"Seq\" = 1 ";
 		sql += " ) ";
 		sql += " , R AS ( ";
@@ -191,14 +199,14 @@ public class LY005ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"ClData\" CD ON CD.\"CustNo\" = S.\"CustNo\" ";
 		sql += " LEFT JOIN \"LoanData\" LD ON LD.\"CustNo\" = S.\"CustNo\" ";
 		sql += " LEFT JOIN \"FacData\" FD ON FD.\"CustNo\" = S.\"CustNo\" ";
-		sql += "                       AND FD.\"Seq\" = 1 ";
+		sql += "                         AND FD.\"Seq\" = 1 ";
 		sql += " LEFT JOIN CDV ON CDV.\"Seq\" = 1 ";
 		sql += " ORDER BY LD.\"LoanTotal\" DESC ";
 
 		this.info("sql=" + sql);
 
 		Query query;
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
 		query.setParameter("inputYearMonth", inputYearMonth);

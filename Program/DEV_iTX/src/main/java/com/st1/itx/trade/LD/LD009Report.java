@@ -40,10 +40,8 @@ public class LD009Report extends MakeReport {
 	private String pageOrientation = "L";
 
 	// 製表日期
-	@SuppressWarnings("unused")
 	private String nowDate;
 	// 製表時間
-	@SuppressWarnings("unused")
 	private String nowTime;
 
 	// length: 167
@@ -133,9 +131,12 @@ public class LD009Report extends MakeReport {
 //		this.print(-9, 1, "業務科目                　前日　　加　　減　展入　展出　淨值　　本日　　　　前　　日　　　　　　　加　　　　　　　減　　　　淨增減　　　　本　　日　　　　　　展　期");
 
 		if (lLD009 != null && lLD009.size() != 0) {
-			BigDecimal[] totalArray = new BigDecimal[13];
-			Arrays.fill(totalArray, BigDecimal.ZERO);
-
+			
+			// 全表總計
+			BigDecimal[] totalAll = new BigDecimal[13];
+			Arrays.fill(totalAll, BigDecimal.ZERO);
+			
+			// 小計
 			BigDecimal[] totalPerItem = new BigDecimal[13];
 			Arrays.fill(totalPerItem, BigDecimal.ZERO);
 
@@ -193,9 +194,11 @@ public class LD009Report extends MakeReport {
 				print(0, 132, formatAmt(tLDVo.get("F14"), 0), "R");
 				print(0, 148, formatAmt(tLDVo.get("F15"), 0), "R");
 				print(0, 166, formatAmt(tLDVo.get("F16"), 0), "R");
+				
+				// 計算小計與總計
 
 				for (int i = 0; i < 13; i++) {
-					totalArray[i] = totalArray[i].add(getBigDecimal(tLDVo.get("F" + (4 + i))));
+					totalAll[i] = totalAll[i].add(getBigDecimal(tLDVo.get("F" + (4 + i))));
 					totalPerItem[i] = totalPerItem[i].add(getBigDecimal(tLDVo.get("F" + (4 + i))));
 				}
 
@@ -222,19 +225,19 @@ public class LD009Report extends MakeReport {
 			MakeSpace(3);
 			this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 			this.print(1, 1, " 合　　計");
-			print(0, 32, totalArray[0].toString(), "R");
-			print(0, 38, totalArray[1].toString(), "R");
-			print(0, 44, totalArray[2].toString(), "R");
-			print(0, 50, totalArray[3].toString(), "R");
-			print(0, 56, totalArray[4].toString(), "R");
-			print(0, 62, totalArray[5].toString(), "R");
-			print(0, 70, totalArray[6].toString(), "R");
-			print(0, 86, formatAmt(totalArray[7], 0), "R");
-			print(0, 102, formatAmt(totalArray[8], 0), "R");
-			print(0, 118, formatAmt(totalArray[9], 0), "R");
-			print(0, 132, formatAmt(totalArray[10], 0), "R");
-			print(0, 148, formatAmt(totalArray[11], 0), "R");
-			print(0, 166, formatAmt(totalArray[12], 0), "R");
+			print(0, 32, totalAll[0].toString(), "R");
+			print(0, 38, totalAll[1].toString(), "R");
+			print(0, 44, totalAll[2].toString(), "R");
+			print(0, 50, totalAll[3].toString(), "R");
+			print(0, 56, totalAll[4].toString(), "R");
+			print(0, 62, totalAll[5].toString(), "R");
+			print(0, 70, totalAll[6].toString(), "R");
+			print(0, 86, formatAmt(totalAll[7], 0), "R");
+			print(0, 102, formatAmt(totalAll[8], 0), "R");
+			print(0, 118, formatAmt(totalAll[9], 0), "R");
+			print(0, 132, formatAmt(totalAll[10], 0), "R");
+			print(0, 148, formatAmt(totalAll[11], 0), "R");
+			print(0, 166, formatAmt(totalAll[12], 0), "R");
 			this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 		} else {

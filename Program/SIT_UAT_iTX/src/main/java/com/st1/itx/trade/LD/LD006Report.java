@@ -52,6 +52,8 @@ public class LD006Report extends MakeReport {
 		int workMonth = tCdWorkMonth.getMonth();
 
 		String workSeason = "" + workYear;
+		
+		// 工作月是13個月
 
 		switch (workMonth) {
 		case 1:
@@ -89,7 +91,14 @@ public class LD006Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lD006List) throws LogicException {
 		this.info("exportExcel ... ");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LD006", "三階放款明細統計", "LD006三階放款明細統計", "LD006三階放款明細統計.xls", "三階放款明細統計");
+		makeExcel.open(titaVo
+				, titaVo.getEntDyI()
+				, titaVo.getKinbr()
+				, "LD006"
+				, "三階放款明細統計"
+				, "LD006三階放款明細統計"
+				, "LD006三階放款明細統計.xls"
+				, "三階放款明細統計");
 
 		// 有標題列，從第二列開始塞值
 		int row = 2;
@@ -97,9 +106,7 @@ public class LD006Report extends MakeReport {
 		if (lD006List != null && !lD006List.isEmpty()) {
 			for (Map<String, String> tLDVo : lD006List) {
 				
-				// 20211026 xiangwei
-				// 這裡先改成 hard-coded 數字
-				// 因為目前的 tLDVo map 結構, 用 size() iteration 會出問題
+				// query欄位數有變時, 這裡也須修改
 				for (int i = 0; i < 24; i++) {
 
 					// 查詢結果第一個欄位為F0
@@ -110,11 +117,11 @@ public class LD006Report extends MakeReport {
 
 					switch (i) {
 					case 10: // K欄:撥款金額
-						total = total.add(new BigDecimal(tmpValue));
+						total = total.add(getBigDecimal(tmpValue));
 					case 21: // V欄:換算業績
 					case 22: // W欄:業務報酬
 					case 23: // X欄:業績金額
-						makeExcel.setValue(row, col, new BigDecimal(tmpValue), "#,##0");
+						makeExcel.setValue(row, col, getBigDecimal(tmpValue), "#,##0");
 						break;
 					default:
 						makeExcel.setValue(row, col, tmpValue);

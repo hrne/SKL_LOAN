@@ -19,6 +19,7 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 //*  ----------------------- AcEnterCom 會計入帳處理 ------------------ 
@@ -215,7 +216,8 @@ public class AcEnterCom extends TradeBuffer {
 //          3.正常交易，from txBuffer
 
 		if (AcHCode > 0 || titaVo.isActfgSuprele()) { // 訂正或主管放行
-			Slice<AcDetail> sacList = acDetailService.acdtlRelTxseqEq(RelDy, RelTxseq, RelDy, this.index, Integer.MAX_VALUE, titaVo); // findByTxseq
+			Slice<AcDetail> sacList = acDetailService.acdtlRelTxseqEq(RelDy, RelTxseq, RelDy, this.index,
+					Integer.MAX_VALUE, titaVo); // findByTxseq
 			acList = sacList == null ? null : sacList.getContent();
 			if (acList == null) {
 				throw new LogicException(titaVo, "E6003", "訂正或主管放行時AcDetail NotFound " + RelDy + RelTxseq);
@@ -410,7 +412,8 @@ public class AcEnterCom extends TradeBuffer {
 			}
 			// 當日訂正傳票批號需相同
 			if (AcHCode == 1 && SlipBatNo != acList.get(0).getSlipBatNo()) {
-				throw new LogicException(titaVo, "E6003", "再開帳後，不可訂正前批關帳之帳務, " + SlipBatNo + "<>" + acList.get(0).getSlipBatNo());
+				throw new LogicException(titaVo, "E6003",
+						"再開帳後，不可訂正前批關帳之帳務, " + SlipBatNo + "<>" + acList.get(0).getSlipBatNo());
 			}
 		}
 
@@ -459,13 +462,16 @@ public class AcEnterCom extends TradeBuffer {
 			else
 				CrAmt = CrAmt.add(ac.getTxAmt());
 		}
-
 		if (DbAmt.compareTo(CrAmt) != 0) {
 			for (AcDetail ac : acList) {
-				this.info("unequal !! " + ac.getDbCr() + " " + ac.getAcctCode() + " " + ac.getTxAmt() + " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-" + ac.getBormNo() + " " + ac.getRvNo());
+				this.info("unequal !! " + ac.getDbCr() + " " + ac.getAcctCode() + " "
+						+ FormatUtil.padLeft(""+ac.getTxAmt(), 11) + " " + ac.getCustNo() + "-" + ac.getFacmNo() + "-"
+						+ ac.getBormNo() + " " + ac.getRvNo());
 			}
-			this.info("借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方=" + CrAmt + ", 差額=" + DbAmt.subtract(CrAmt));
-			throw new LogicException(titaVo, "E6003", "借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方=" + CrAmt + ", 差額=" + DbAmt.subtract(CrAmt));
+			this.info("借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方=" + CrAmt + ", 差額="
+					+ DbAmt.subtract(CrAmt));
+			throw new LogicException(titaVo, "E6003", "借貸不平，借方=" + DbAmt.setScale(0, BigDecimal.ROUND_HALF_UP) + ", 貸方="
+					+ CrAmt + ", 差額=" + DbAmt.subtract(CrAmt));
 		}
 	}
 
@@ -580,7 +586,8 @@ public class AcEnterCom extends TradeBuffer {
 			if (ac.getDbCr().equals("D")) {
 				acDetail.setDbCr("C");
 				// 整批入帳的隔日訂正，還款來源(1xx-應收)回沖至暫收可抵繳
-				if (acDetail.getSumNo() != null && acDetail.getSumNo().length() == 3 && "1".equals(ac.getSumNo().substring(0, 1)) && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
+				if (acDetail.getSumNo() != null && acDetail.getSumNo().length() == 3
+						&& "1".equals(ac.getSumNo().substring(0, 1)) && titaVo.getEntDyI() != titaVo.getOrgEntdyI()) {
 					acDetail.setAcctCode("TAV");
 					if (acDetail.getFacmNo() == 0) {
 						acDetail.setFacmNo(rpFacmno);

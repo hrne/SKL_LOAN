@@ -10,10 +10,8 @@ import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -510,6 +508,17 @@ public class MakeReport extends CommBuffer {
 	/**
 	 * 換新頁<br>
 	 * 
+	 * @param changeDefault 套印用強迫換頁
+	 */
+
+	public void newPage(boolean changeDefault) {
+		useDefault = changeDefault;
+		newPage();
+	}
+
+	/**
+	 * 換新頁<br>
+	 * 
 	 */
 	public void newPage() {
 
@@ -730,7 +739,7 @@ public class MakeReport extends CommBuffer {
 	 * @param x      x軸cm
 	 * @param y      y軸cm
 	 * @param width  每列列印半形字數
-	 * @param width2  第二行縮排半形字數
+	 * @param width2 第二行縮排半形字數
 	 * @param height 每列高度px
 	 * @param text   列印字串
 	 */
@@ -760,7 +769,7 @@ public class MakeReport extends CommBuffer {
 	 * @param x      x軸px
 	 * @param y      y軸px
 	 * @param width  每列列印半形字數
-	 * @param width2  第二行縮排半形字數
+	 * @param width2 第二行縮排半形字數
 	 * @param height 每列高度px
 	 * @param text   列印字串
 	 */
@@ -997,7 +1006,7 @@ public class MakeReport extends CommBuffer {
 
 		rptCreateDate = tTxFile.getCreateDate();
 
-//		this.info("MakeRepor doToPdf rptTlrNo = " + rptTlrNo);
+		this.info("MakeRepor doToPdf rptTlrNo = " + rptTlrNo);
 
 		try {
 			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
@@ -1014,7 +1023,7 @@ public class MakeReport extends CommBuffer {
 		this.info("MakeReport.toPdf.filename =" + outfile);
 
 		if (this.rptCode == null) {
-			this.error("makeReport rptCode is null");
+			this.info("makeReport rptCode is null");
 		}
 
 		// 檢查是否需浮水印
@@ -1032,7 +1041,7 @@ public class MakeReport extends CommBuffer {
 		try {
 			Files.delete(file.toPath());
 		} catch (IOException e) {
-			this.error("MakeReport Files.delete error =" + e.getMessage());
+			this.info("MakeReport Files.delete error =" + e.getMessage());
 		}
 
 		try {
@@ -1409,15 +1418,15 @@ public class MakeReport extends CommBuffer {
 					int h = Integer.parseInt(map.get("h").toString());
 					int yy = (int) this.yPoints - y;
 					String s = map.get("s").toString();
-					
+
 					String ps = "";
 					int pw = 0;
-					
+
 					String prefix = "";
-					for (int i=0; i<w2; i++) {
+					for (int i = 0; i < w2; i++) {
 						prefix += " ";
 					}
-					
+
 					for (int i = 0; i < s.length(); i++) {
 						String ss = s.substring(i, i + 1);
 
@@ -1443,7 +1452,7 @@ public class MakeReport extends CommBuffer {
 					}
 					if (pw > 0) {
 						cb.beginText();
-						this.info("MakeReport basefont = " + BaseFont.TIMES_BOLD);
+						this.info("MakeReport basefont = " + baseFont.TIMES_BOLD);
 						cb.setFontAndSize(baseFont, fontsize);
 						cb.setCharacterSpacing(charSpaces);
 						cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
@@ -1504,7 +1513,7 @@ public class MakeReport extends CommBuffer {
 			empNm = tCdEmp.getFullname();
 		}
 
-//		this.info("MakeReport setWatermark empNm = " + empNm);
+		this.info("MakeReport setWatermark empNm = " + empNm);
 
 		watermark += empNm;
 		watermark += " ";
@@ -1522,13 +1531,13 @@ public class MakeReport extends CommBuffer {
 		float widthMax = document.getPageSize().getWidth();
 		float heightMax = document.getPageSize().getHeight();
 
-//		this.info("widthMax = " + widthMax);
-//		this.info("heightMax = " + heightMax);
+		this.info("widthMax = " + widthMax);
+		this.info("heightMax = " + heightMax);
 
 		for (float w = 0; w < widthMax + 150f; w += 150f) {
-//			this.info("w = " + w);
+			this.info("w = " + w);
 			for (float h = 0; h < heightMax + 80f; h += 80f) {
-//				this.info("h = " + h);
+				this.info("h = " + h);
 				cb.showTextAligned(Element.ALIGN_CENTER, watermark, w, h, 15f);
 			}
 		}
@@ -1862,52 +1871,6 @@ public class MakeReport extends CommBuffer {
 		// override this
 
 	}
-	
-	// 為了 formatAmt() 預先建好的單位 prefabs
-	// 利用 static block 做初始化, 確保 formatAmtTemplates 只會創建一次
-	// unmodifiableMap 讓此 map 變成唯讀狀態
-	
-	// key 是次方數
-	// value 是 prefab
-	
-	private static final Map<Integer, BigDecimal> formatAmtTemplates;
-	static {
-		HashMap<Integer, BigDecimal> m = new HashMap<Integer, BigDecimal>();
-		m.put(1, BigDecimal.TEN); // 十
-		m.put(2, new BigDecimal(100)); // 百
-		m.put(3, new BigDecimal(1000)); // 千
-		m.put(4, new BigDecimal(10000)); // 萬
-		m.put(5, new BigDecimal(100000)); // 十萬
-		m.put(6, new BigDecimal(1000000)); // 百萬
-		m.put(7, new BigDecimal(10000000)); // 千萬
-		m.put(8, new BigDecimal(100000000)); // 億
-		formatAmtTemplates = Collections.unmodifiableMap(m);
-	};
-	
-	/**
-	 * @param amt 金額
-	 * @param n 四捨五入至第n位
-	 * @param unitPow 每多少元為單位之次方數（如單位為千元，輸入3）
-	 * @return String 具撇節並已除好的金額格式
-	 */
-	public String formatAmt(String amt, int n, int unitPow)
-	{
-		BigDecimal bd = getBigDecimal(amt);
-		
-		if (unitPow <= 1)
-		{
-			// do nothing
-		} else if (formatAmtTemplates.containsKey(n))
-		{
-			bd = computeDivide(bd, formatAmtTemplates.get(n), 0);
-		} else
-		{
-			// Math.Pow(a,b) -> a 的 b 次方
-			bd = computeDivide(bd, new BigDecimal(Math.pow(10, unitPow)), 0);
-		}
-		
-		return formatAmt(bd, n);
-	}
 
 	/**
 	 * @param amt 金額
@@ -2220,7 +2183,7 @@ public class MakeReport extends CommBuffer {
 
 		List<HashMap<String, Object>> pMap = new ArrayList<HashMap<String, Object>>();
 
-		this.info("MakeReport.toPrint.FileData = " + tTxFile.getFileData());
+//		this.info("MakeReport.toPrint.FileData = " + tTxFile.getFileData());
 
 		try {
 			this.listMap = new ObjectMapper().readValue(tTxFile.getFileData(), ArrayList.class);
@@ -2230,18 +2193,23 @@ public class MakeReport extends CommBuffer {
 
 		int nowPage = 0;
 
+		int morePage = 0;
+
+//		this.info("MakeReport.toPrint listMap.size = " + listMap.size());
+
 		for (HashMap<String, Object> map : this.listMap) {
 
 			String type = map.get("type").toString();
 
-			this.info("MakeReport.toPrint type = " + type);
-			
+//			this.info("MakeReport.toPrint type = " + type);
+
 			if ("0".equals(type)) {
+				// mew report
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
 				map2.put("Action", 2);
 				map2.put("Printer", printer);
 				map2.put("ReportNo", tTxFile.getFileItem());
-				listMap.add(map2);
+				pMap.add(map2);
 
 				nowPage = 1;
 
@@ -2263,14 +2231,65 @@ public class MakeReport extends CommBuffer {
 					map2.put("PageSize", papersize);
 					map2.put("Orientation", paperorientaton);
 				}
-				listMap.add(map2);
-			} else if (nowPage == pageno) {
+				pMap.add(map2);
+			} else if ("9".equals(type)) {
+				// 套pdf form
+				throw new LogicException("E0014", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",資料格式錯誤(type=9)");
+			} else if ("1".equals(type)) {
+				nowPage++;
 
+				if (nowPage > pageno) {
+					morePage = 1;
+					break;
+				}
+
+				// new page
+//				HashMap<String, Object> map2 = new HashMap<String, Object>();
+//				map2.put("Action", 5);
+//				pMap.add(map2);
+
+			} else if ("2".equals(type) && nowPage == pageno) {
+				// set font
+				String font = map.get("font").toString();
+				int fontsize = Integer.parseInt(map.get("size").toString());
+
+				HashMap<String, Object> map2 = new HashMap<String, Object>();
+				map2.put("Action", 4);
+				map2.put("Font", font);
+				map2.put("FontSize", fontsize);
+				map2.put("FontWeight", "normal");
+				map2.put("FontStyle", "normal");
+				pMap.add(map2);
+			} else if ("3".equals(type)) {
+				// 指定行列,列印字串
+				throw new LogicException("E0014", "(MakeReport)輸出檔(TxFile)序號:" + pdfno + ",資料格式錯誤(type=3)");
+
+			} else if ("4".equals(type) && nowPage == pageno) {
+				// 指定XY軸列印字串
+
+				int x = Integer.parseInt(map.get("x").toString());
+				int y = Integer.parseInt(map.get("y").toString());
+
+				double xx = x * 2.54 / 720;
+				double yy = y * 2.54 / 720;
+
+				String text = map.get("txt").toString();
+				String align = map.get("align").toString();
+
+				HashMap<String, Object> map2 = new HashMap<String, Object>();
+				map2.put("Action", 4);
+				map2.put("Unit", "mm");
+				map2.put("X", xx);
+				map2.put("Y", yy);
+				map2.put("Align", align);
+				map2.put("Text", text);
+				pMap.add(map2);
 			}
 		}
 
 		HashMap<String, Object> rmap = new HashMap<String, Object>();
 
+		rmap.put("morePage", morePage);
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			rmap.put("printJson", mapper.writeValueAsString(pMap));

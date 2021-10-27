@@ -1,5 +1,7 @@
 package com.st1.itx.util.format;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -17,7 +19,7 @@ import com.st1.itx.util.filter.FilterUtils;
  *
  */
 public class FormatUtil {
-	static final Logger logger = LoggerFactory.getLogger(FormatUtil.class);
+	private static final Logger logger = LoggerFactory.getLogger(FormatUtil.class);
 
 	public static String padX(String s, int n) {
 		// 將tab取代
@@ -95,9 +97,13 @@ public class FormatUtil {
 
 	public static boolean isChinese(char c) {
 		Character.UnicodeBlock ub = Character.UnicodeBlock.of(c);
-		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS || ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
-				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B || ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
-				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS || ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
+		if (ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS
+				|| ub == Character.UnicodeBlock.CJK_COMPATIBILITY_IDEOGRAPHS
+				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_A
+				|| ub == Character.UnicodeBlock.CJK_UNIFIED_IDEOGRAPHS_EXTENSION_B
+				|| ub == Character.UnicodeBlock.CJK_SYMBOLS_AND_PUNCTUATION
+				|| ub == Character.UnicodeBlock.HALFWIDTH_AND_FULLWIDTH_FORMS
+				|| ub == Character.UnicodeBlock.GENERAL_PUNCTUATION) {
 			return true;
 		}
 		return false;
@@ -107,5 +113,62 @@ public class FormatUtil {
 		if (32 <= ch && ch <= 126)
 			return true;
 		return false;
+	}
+
+	/**
+	 * 金額加撇節
+	 *
+	 * @param amt 金額
+	 * @param n   四捨五入至第n位
+	 * @return String 具撇節的金額格式
+	 */
+	public static String formatAmt(BigDecimal amt, int n) {
+
+		amt = amt == null ? BigDecimal.ZERO : amt;
+
+		String result = "";
+
+		String sAmt = amt.setScale(n, RoundingMode.HALF_UP).toString();
+
+		String dec = "";
+
+		// 若有保留小數位數 先擷取小數點及小數點後數字
+		// 拆成兩段,僅有小數點前的數值需要加撇節
+		if (n > 0) {
+			int point = sAmt.indexOf(".");
+
+			dec = sAmt.substring(point);
+
+			sAmt = sAmt.substring(0, point);
+		}
+
+		String sign = "";
+
+		// 負數時先把負號拔掉
+		if (amt.compareTo(BigDecimal.ZERO) < 0) {
+			sign = "-";
+			sAmt = sAmt.substring(1);
+		}
+
+		// 取得整數總長
+		int amtLength = sAmt.length();
+
+		int remainder = amtLength % 3;
+
+		for (int i = 1; i <= amtLength; i++) {
+			result += sAmt.substring(i - 1, i);
+			if ((i == remainder || (i - remainder) % 3 == 0) && i != amtLength) {
+				result += ",";
+			}
+		}
+
+		result += dec;
+
+		// 負數時把負號組回
+		if (amt.compareTo(BigDecimal.ZERO) < 0) {
+			result = sign + result;
+		}
+
+		return result;
 	}
 }

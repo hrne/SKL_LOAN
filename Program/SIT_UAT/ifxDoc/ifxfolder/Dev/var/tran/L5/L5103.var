@@ -274,10 +274,10 @@ C(3,#ApplCode,1,$,s)
 
 #BINDA=X,1,S
 BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFA;ntxbuf5=type<-1:
-L5103ConfirmBrNo<-OBrNo:
+!L5103ConfirmBrNo<-OBrNo:
 ApplEmpNo<-OTlrNo:
-ApplEmpNoX<-OTlrItem:
-L5103ConfirmGroupNo<-OGroupNo})
+ApplEmpNoX<-OTlrItem})
+!L5103ConfirmGroupNo<-OGroupNo})
 IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
 #BUFA=X,74,S
@@ -288,10 +288,10 @@ T(2,#KeeperEmpNo)
 !<瀏覽-員工號碼>
 #BINDB=X,1,S
 BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFB;ntxbuf5=type<-1:
-L5103ConfirmBrNo<-OBrNo:
+!L5103ConfirmBrNo<-OBrNo:
 KeeperEmpNo<-OTlrNo:
-KeeperEmpNoX<-OTlrItem:
-L5103ConfirmGroupNo<-OGroupNo})
+KeeperEmpNoX<-OTlrItem})
+!L5103ConfirmGroupNo<-OGroupNo})
 IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
 ! 借閱人
@@ -393,8 +393,8 @@ R(1,L2R08)
 T(2,@KeeperEmpNoX,#L2r08FullName)
 
 ! 員工姓名---調RIM
-C(3,#ApplCode,1,$,s)
 #KeeperEmpNoX=X,8,L
+C(3,#ApplCode,1,$,s)
 
 #AlertMsg1=x,32,S
 T(2,歸還日期不可小於借閱日期+#TmpApplDate)
@@ -410,10 +410,10 @@ IF(#TmpReturnDate<#TmpApplDate,V(P,#AlertMsg1),$)
 
 #BINDC=X,1,S
 BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFC;ntxbuf5=type<-1:
-L5103ConfirmBrNo<-OBrNo:
+!L5103ConfirmBrNo<-OBrNo:
 ReturnEmpNo<-OTlrNo:
-ReturnEmpNoX<-OTlrItem:
-L5103ConfirmGroupNo<-OGroupNo})
+ReturnEmpNoX<-OTlrItem})
+!L5103ConfirmGroupNo<-OGroupNo})
 #BUFC=X,74,S
 T(2,#KeeperEmpNo)
 

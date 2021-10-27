@@ -203,10 +203,6 @@ public class LoanCom extends TradeBuffer {
 		tLoanBorTx.setTitaHCode(titaVo.getHCode());
 		tLoanBorTx.setTitaCurCd(titaVo.getCurName());
 		tLoanBorTx.setTitaEmpNoS(titaVo.getEmpNos());
-		if (titaVo.isTrmtypBatch())
-			tLoanBorTx.setTxTypeCode(1); // 1: 批次交易
-		else
-			tLoanBorTx.setTxTypeCode(0); // 0: 臨櫃交易
 		tLoanBorTx.setAcDate(titaVo.getEntDyI());
 		tLoanBorTx.setDisplayflag("Y");
 		this.info("   TitaCurCd = " + tLoanBorTx.getTitaCurCd());

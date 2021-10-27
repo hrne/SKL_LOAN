@@ -90,11 +90,11 @@ T(3,CdCode.TitaHCode)
 
 #TitaHCodeHelp=x,1024,S
 
-!TxTypeCode 交易別
+!RepayCode 還款來源
 #CDDEF02=x,20,S
-T(3,CdCode.TxTypeCode)
+T(3,CdCode.RepayCode)
 
-#TxTypeCodeHelp=x,1024,S
+#RepayCodeHelp=x,1024,S
 
 !CurrPrecision 幣別小位數
 #CDDEF03=x,20,S
@@ -150,7 +150,7 @@ S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04,#CDDEF05,#CDDEF06,#CDDEF07,#CDDEF
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TitaHCodeHelp,#HelpDesc1)
-T(2,@TxTypeCodeHelp,#HelpDesc2)
+T(2,@RepayCodeHelp,#HelpDesc2)
 T(2,@CurrPrecisionHelp,#HelpDesc3)
 T(2,@CaseCloseCodeHelp,#HelpDesc4)
 T(2,@TempReasonCodeHelp,#HelpDesc5)
@@ -345,19 +345,19 @@ E(0,@L3610TxtNo,#OTxtNo)
 E(0,@L3712TxtNo,#OTxtNo)
 E(0,@L3721TxtNo,#OTxtNo)
 
-![交易別]
-#OTxTypeCode=A,1,L
+![還款來源]
+#ORepayCode=A,2,L
 
-#OTxTypeCodeX=X,10,L
-T(3,)T(H,#OTxTypeCode,#TxTypeCodeHelp)
-T(2,@L3100TxTypeCodeX,#OTxTypeCodeX)
-T(2,@L3200TxTypeCodeX,#OTxTypeCodeX)
-T(2,@L3410TxTypeCodeX,#OTxTypeCodeX)
-T(2,@L3440TxTypeCodeX,#OTxTypeCodeX)
-T(2,@L3600TxTypeCodeX,#OTxTypeCodeX)
-T(2,@L3610TxTypeCodeX,#OTxTypeCodeX)
-T(2,@L3712TxTypeCodeX,#OTxTypeCodeX)
-T(2,@L3721TxTypeCodeX,#OTxTypeCodeX)
+#ORepayCodeX=X,10,L
+T(3,)T(H,#ORepayCode,#RepayCodeHelp)
+T(2,@L3100RepayCodeX,#ORepayCodeX)
+T(2,@L3200RepayCodeX,#ORepayCodeX)
+T(2,@L3410RepayCodeX,#ORepayCodeX)
+T(2,@L3440RepayCodeX,#ORepayCodeX)
+T(2,@L3600RepayCodeX,#ORepayCodeX)
+T(2,@L3610RepayCodeX,#ORepayCodeX)
+T(2,@L3712RepayCodeX,#ORepayCodeX)
+T(2,@L3721RepayCodeX,#ORepayCodeX)
 
 ![訂正別]
 #OHCode=A,1,L
@@ -1211,10 +1211,10 @@ T(3,[L3912] 交易內容查詢)
 ![交易序號]
 #L3100TxtNo=A,8,L
 
-![交易別]
-#L3100TxTypeCode=A,1,S
+![還款來源]
+#L3100RepayCode=A,2,S
 
-#L3100TxTypeCodeX=X,10,L
+#L3100RepayCodeX=X,10,L
 
 ![訂正別]
 #L3100HCode=A,1,S
@@ -1305,10 +1305,10 @@ T(3,[L3912] 交易內容查詢)
 ![交易序號]
 #L3200TxtNo=A,8,L
 
-![交易別]
-#L3200TxTypeCode=A,1,S
+![還款來源]
+#L3200RepayCode=A,1,S
 
-#L3200TxTypeCodeX=X,10,L
+#L3200RepayCodeX=X,10,L
 
 ![訂正別]
 #L3200HCode=A,1,S
@@ -1437,10 +1437,10 @@ T(3,[L3912] 交易內容查詢)
 ![交易序號]
 #L3410TxtNo=A,8,L
 
-![交易別]
-#L3410TxTypeCode=A,1,S
+![還款來源]
+#L3410RepayCode=A,2,S
 
-#L3410TxTypeCodeX=X,10,L
+#L3410RepayCodeX=X,10,L
 
 ![訂正別]
 #L3410HCode=A,1,S
@@ -1547,10 +1547,10 @@ T(3,[L3912] 交易內容查詢)
 ![交易序號]
 #L3440TxtNo=A,8,L
 
-![交易別]
-#L3440TxTypeCode=A,1,S
+![還款來源]
+#L3440RepayCode=A,2,S
 
-#L3440TxTypeCodeX=X,10,L
+#L3440RepayCodeX=X,10,L
 
 ![訂正別]
 #L3440HCode=A,1,S
@@ -1662,10 +1662,10 @@ T(3,[L3912] 交易內容查詢)
 ![交易序號]
 #L3712TxtNo=A,8,L
 
-![交易別]
-#L3712TxTypeCode=A,1,S
+![還款來源]
+#L3712RepayCode=A,2,S
 
-#L3712TxTypeCodeX=X,10,L
+#L3712RepayCodeX=X,10,L
 
 ![訂正別]
 #L3712HCode=A,1,S
@@ -1771,8 +1771,8 @@ T(3,[L3912] 交易內容查詢)
 ![交易序號]
 #L3721TxtNo=A,8,L
 
-![交易別]
-#L3721TxTypeCodeX=X,10,L
+![還款來源]
+#L3721RepayCodeX=X,10,L
 
 ![訂正別]
 #L3721HCodeX=X,10,L
@@ -1845,10 +1845,10 @@ T(3,[L3912] 交易內容查詢)
 ![交易序號]
 #L3600TxtNo=A,8,L
 
-![交易別]
-#L3600TxTypeCode=A,1,S
+![還款來源]
+#L3600RepayCode=A,2,S
 
-#L3600TxTypeCodeX=X,10,L
+#L3600RepayCodeX=X,10,L
 
 ![幣別]
 #L3600CurrencyCode=X,3,L
@@ -1931,10 +1931,10 @@ T(3,[L3912] 交易內容查詢)
 ![交易序號]
 #L3610TxtNo=A,8,L
 
-![交易別]
-#L3610TxTypeCode=A,1,S
+![還款來源]
+#L3610RepayCode=A,2,S
 
-#L3610TxTypeCodeX=X,10,L
+#L3610RepayCodeX=X,10,L
 
 ![訂正別]
 #L3610HCode=A,1,S
@@ -2034,7 +2034,7 @@ TXFORM=L3912
 #OBreachAmt#OTempTax#OTempAmt#OIntStartDate#OIntEndDate#OUnpaidInterest
 #OCaseCloseCode#OUnpaidPrinciPal#ORemitBank#ORemitBankX#OUnpaidBreach#ORemitAcctNo#OShortFall#ORemitCustName#ORemitRemark
 #OOverflow#OSupperNo#OSupperNoX#OReduceAmt#OTxDate#OTxTime
-#OStampFreeAmt#OBatchNo#OTxTypeCode#ORemitSeq#OTempReasonCode#ORepayBank#ORepayBankX
+#OStampFreeAmt#OBatchNo#ORepayCode#ORemitSeq#OTempReasonCode#ORepayBank#ORepayBankX
 #OChequeAcctNo#ORepayPeriod#OChequeNo#ONewDueAmt#ONewTotalPeriod
 #ORepayTerms#ORepayAmt#OCloseBreachAmt#OCloseBreachAmtUnpaid#OExtraRepay#OIncludeIntFlag
 #OUnpaidIntFlag#OExtraUnpaidInt#OPayMethod#OOldSpecificDd#ONewSpecificDd
@@ -2064,7 +2064,7 @@ TXFORM=L3912
 [#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
 ["@會計日期",#OAcctDate],["@櫃員編號",#OTellerNo,#OTellerNoX],
-["@交易序號",#OTxtNo],["@交易別",#OTxTypeCode,#OTxTypeCodeX],
+["@交易序號",#OTxtNo],["@還款來源",#ORepayCode,#ORepayCodeX],
 ["@訂正別",#OHCode,#OHCodeX],["@入帳日期",#OEntryDate],
 ["@幣別",#OCurrencyCode],["@交易金額",#OTxAmtX],
 ["@放款餘額",#OLoanBalX],["@電匯金額",#ORemitAmtX],
@@ -2096,7 +2096,7 @@ TXFORM=L3912
 ["@會計日期",#L3100AcctDate],
 ["@櫃員編號",#L3100TellerNo,#L3100TellerNoX],
 ["@交易序號",#L3100TxtNo],
-["@交易別",#L3100TxTypeCodeX],
+["@還款來源",#L3100RepayCodeX],
 ["@訂正別",#L3100HCodeX],
 ["@幣別",#L3100CurrencyCode],
 ["@撥款金額",#L3100DrawdowmAmtX],
@@ -2118,7 +2118,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#L3200TxCode,#L3200TxCodeX],
 ["@會計日期",#L3200AcctDate],["@入帳日期",#L3200EntryDateX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#L3200TxtNo],
-["@交易別",#L3200TxTypeCodeX],["@訂正別",#L3200HCodeX],
+["@還款來源",#L3200RepayCodeX],["@訂正別",#L3200HCodeX],
 ["@幣別",#L3200CurrencyCode],["@交易金額",#L3200TxAmtX],
 ["@回收金額",#L3200RepayAmtX],["@暫收抵繳",#L3200TempRepayX],
 ["@回收期數",#L3200RepayTerms],["@部分償還繳納方式",#L3200PayMethodX], 
@@ -2143,7 +2143,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#L3712TxCode,#L3712TxCodeX],
 ["@會計日期",#L3712AcctDate],["@入帳日期",#L3712EntryDateX],
 ["@櫃員編號",#L3712TellerNo,#L3712TellerNoX],["@交易序號",#L3712TxtNo],
-["@交易別",#L3712TxTypeCodeX],["@訂正別",#L3712HCodeX],
+["@還款來源",#L3712RepayCodeX],["@訂正別",#L3712HCodeX],
 ["@幣別",#L3712CurrencyCode],["@交易金額",#L3712TxAmtX],
 ["@回收金額",#L3712RepayAmtX],["@暫收款",#L3712TempAmtX],
 ["@計息起日",#L3712IntStartDateX],["@暫收抵繳",#L3712TempRepayX],
@@ -2164,7 +2164,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#L3721TxCode,#L3721TxCodeX],
 ["@會計日期",#L3721AcctDate],["@入帳日期",#L3721EntryDateX],
 ["@櫃員編號",#L3721TellerNo,#L3721TellerNoX],["@交易序號",#L3721TxtNo],
-["@交易別",#L3721TxTypeCodeX],["@訂正別",#L3721HCodeX],
+["@還款來源",#L3721RepayCodeX],["@訂正別",#L3721HCodeX],
 ["@利率區分",#L3721RateCodeX],["@生效日",#L3721EffectDate],
 ["@商品名稱",#L3721ProdName],["@指標利率代碼",#L3721BaseRateCodeX],
 ["@商品利率",#L3721ProdRateX],["@指標利率",#L3721BaseRateX],
@@ -2181,7 +2181,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#L3600TxCode,#L3600TxCodeX],
 [#<->#,"@會計日期",#L3600AcctDate],
 ["@櫃員編號",#L3600TellerNo,#L3600TellerNoX],["@交易序號",#L3600TxtNo],
-[#<->#,"@交易別",#L3600TxTypeCodeX],
+[#<->#,"@還款來源",#L3600RepayCodeX],
 [#<->#,"@幣別",#L3600CurrencyCode],
 ["@主辦行",#L3600LeadingBank],["@母公司統編",#L3600MasterCustId,#L3600MasterCustIdX],
 ["@簽約日",#L3600SigningDate],
@@ -2202,7 +2202,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#L3610TxCode,#L3610TxCodeX],
 [#<->#,"@會計日期",#L3610AcctDate],
 ["@櫃員編號",#L3610TellerNo,#L3610TellerNoX],["@交易序號",#L3610TxtNo],
-["@交易別",#L3610TxTypeCodeX],["@訂正別",#L3610HCodeX],
+["@還款來源",#L3610RepayCodeX],["@訂正別",#L3610HCodeX],
 ["@幣別",#L3610CurrencyCode],["@交易金額",#L3610TxAmtX],
 ["@主辦費",#L3610LeadingFeeX],["@帳務科目-手續費收入",#L3610IncomeFeeX],
 ["@管理費",#L3610ManageFeeX],["@帳務科目-其他預收款",#L3610PrepaidFeeX],
@@ -2222,7 +2222,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
 ["@會計日期",#OAcctDate],["@入帳日期",#OEntryDateX],
 ["@櫃員編號",#OTellerNo,#OTellerNoX],["@交易序號",#OTxtNo],
-["@交易別",#OTxTypeCodeX],["@訂正別",#OHCodeX],
+["@還款來源",#ORepayCodeX],["@訂正別",#OHCodeX],
 [#<->#,"@幣別",#OCurrencyCode],
 [#<->#,"@回收金額",#ORepayAmtX],
 [#<->#,"@回收期數",#ORepayTerms],
@@ -2244,7 +2244,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#L3410TxCode,#L3410TxCodeX],
 ["@會計日期",#L3410AcctDate],["@入帳日期",#L3410EntryDateX],
 ["@櫃員編號",#L3410TellerNo,#L3410TellerNoX],["@交易序號",#L3410TxtNo],
-["@交易別",#L3410TxTypeCodeX],["@訂正別",#L3410HCodeX],
+["@還款來源",#L3410RepayCodeX],["@訂正別",#L3410HCodeX],
 ["@幣別",#L3410CurrencyCode],["@交易金額",#L3410TxAmtX],
 ["@回收金額",#L3410RepayAmtX],["@暫收抵繳",#L3410TempRepayX],
 ["@回收期數",#L3410RepayTerms],["@結案區分",#L3410CaseCloseCodeX],
@@ -2267,7 +2267,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#L3410TxCode,#L3410TxCodeX],
 ["@會計日期",#L3410AcctDate],["@入帳日期",#L3410EntryDateX],
 ["@櫃員編號",#L3410TellerNo,#L3410TellerNoX],["@交易序號",#L3410TxtNo],
-["@交易別",#L3410TxTypeCodeX],["@訂正別",#L3410HCodeX],
+["@還款來源",#L3410RepayCodeX],["@訂正別",#L3410HCodeX],
 [#<->#,"幣別",#L3410CurrencyCode],
 [#<->#,"火險費用轉銷呆帳",#L3420FireFeeX],
 [#<->#,"法務費用轉銷呆帳",#L3420LawFeeX],
@@ -2284,7 +2284,7 @@ TXFORM=L3912
 [#<->#,"@交易代號",#L3440TxCode,#L3440TxCodeX],
 ["@會計日期",#L3440AcctDate],["@入帳日期",#L3440EntryDateX],
 ["@櫃員編號",#L3440TellerNo,#L3440TellerNoX],["@交易序號",#L3440TxtNo],
-["@交易別",#L3440TxTypeCodeX],["@訂正別",#L3440HCodeX],
+["@還款來源",#L3440RepayCodeX],["@訂正別",#L3440HCodeX],
 ["@幣別",#L3440CurrencyCode],["@交易金額",#L3440TxAmtX],
 ["@回收金額",#L3440RepayAmtX],["@暫收款",#L3440TempAmtX],
 ["@回收期數",#L3440RepayTerms],["@暫收抵繳",#L3440TempRepayX],
@@ -2349,7 +2349,7 @@ TXFORM=L3912
 ["@交易代號",#OTxCode,#OTxCodeX],["@交易序號",#L3440TxtNo],
 ["@會計日期",#OAcctDate],["@轉催收金額",#OTxAmtX],
 ["@交易序號",#OTxtNo],["@銷帳編號",#ORvNo],
-["@訂正別",#OHCode,#OHCodeX],["@交易別",#OTxTypeCode,#OTxTypeCodeX],
+["@訂正別",#OHCode,#OHCodeX],["@還款來源",#ORepayCode,#ORepayCodeX],
 ]
 </sub>
 
@@ -2359,7 +2359,7 @@ TXFORM=L3912
 [#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
 ["@會計日期",#OAcctDate],["@櫃員編號",#OTellerNo,#OTellerNoX],
-["@交易序號",#OTxtNo],["@交易別",#OTxTypeCode,#OTxTypeCodeX],
+["@交易序號",#OTxtNo],["@還款來源",#ORepayCode,#ORepayCodeX],
 [#<->#,"@訂正別",#OHCode,#OHCodeX],
 [#<->#,"@放款餘額",#L3731DrawdowmAmtX],
 [#<->#,"@利率",#L3731RateX],
@@ -2430,7 +2430,7 @@ TXFORM=L3912
 #OIntStartDate#OExtraRepay#OIntEndDate#OUnpaidInterest#OCaseCloseCode#OCaseCloseCodeX
 #OUnpaidPrinciPal#ORemitBank#ORemitBankX#OUnpaidBreach#ORemitAcctNo#OShortFall
 #OSupperNo#OSupperNoX#OOverflow#OTxDate#OTxTimeX#OReduceAmt#OBatchNo#OStampFreeAmt
-#ORemitSeq#OTxTypeCode#OTxTypeCodeX#ORepayBank#ORepayBankX#OTempReasonCode#OTempReasonCodeX#OChequeAcctNo
+#ORemitSeq#ORepayCode#ORepayCodeX#ORepayBank#ORepayBankX#OTempReasonCode#OTempReasonCodeX#OChequeAcctNo
 #OChequeNo#ORepayPeriod#ONewDueAmt#ONewTotalPeriod
 ^
 </sub>

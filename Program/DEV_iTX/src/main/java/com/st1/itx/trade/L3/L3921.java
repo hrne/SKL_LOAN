@@ -146,7 +146,8 @@ public class L3921 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 300; // 295 + 122 * 300 = 41695
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
+				wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
@@ -183,26 +184,21 @@ public class L3921 extends TradeBuffer {
 		// 償還期款
 		for (LoanBorMain ln : lLoanBorMain) {
 			if (ln.getStatus() == 0 || ln.getStatus() == 4) {
-				if ("5".equals(ln.getAmortizedCode())) { // 攤還方式 = 5.按月撥款收息(逆向貸款)
-					continue;
-				}
+				wkPreRepayTermNo = 0;
 				if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-					wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
+					wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+							ln.getSpecificDd(), ln.getPrevPayIntDate());
 				}
 				if (iRepayTerms > 0) { // 回收期數 > 0
-					wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), ln.getMaturityDate()) + 1 - wkPreRepayTermNo;
-					if (wkTerms > iRepayTerms) {
-						wkTerms = iRepayTerms;
-					}
+					wkTerms = iRepayTerms;
 				} else {
 					if (ln.getPrevPayIntDate() >= iEntryDate || ln.getDrawdownDate() == iEntryDate) {
 						continue;
 					}
 					// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
-					wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
-					if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-						wkTerms = wkTerms - wkPreRepayTermNo;
-					}
+					wkTerms = loanCom.getTermNo(iEntryDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
+							ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
+					wkTerms = wkTerms - wkPreRepayTermNo;
 				}
 
 				if (wkTerms <= 0) {
@@ -219,7 +215,8 @@ public class L3921 extends TradeBuffer {
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-				wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt).subtract(oBreachAmt);
+				wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
+						.subtract(oBreachAmt);
 				addOccurs(ln, titaVo);
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
 					ln.setStoreRate(loanCalcRepayIntCom.getStoreRate());
@@ -259,7 +256,8 @@ public class L3921 extends TradeBuffer {
 						oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 						oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 						oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-						wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt).subtract(oBreachAmt);
+						wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
+								.subtract(oBreachAmt);
 						addOccurs(ln, titaVo);
 						LoanCloseBreachVo v = new LoanCloseBreachVo();
 						// 放入清償違約金計算List
@@ -281,7 +279,8 @@ public class L3921 extends TradeBuffer {
 
 		// 計算清償違約金，收取方式 "1":即時收取
 		if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
-			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, iBormNo, iListCloseBreach, titaVo);
+			oListCloseBreach = loanCloseBreachCom.getCloseBreachAmtPaid(iCustNo, iFacmNo, iBormNo, iListCloseBreach,
+					titaVo);
 			// 輸出清償違約金
 			if (oListCloseBreach != null && oListCloseBreach.size() > 0) {
 				for (LoanCloseBreachVo v : oListCloseBreach) {

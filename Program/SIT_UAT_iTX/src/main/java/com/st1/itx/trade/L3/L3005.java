@@ -118,8 +118,7 @@ public class L3005 extends TradeBuffer {
 
 		// 設定每筆分頁的資料筆數 預設50筆 總長不可超過六萬
 		this.limit = 100; // 100* 154 = 15400
-		
-		
+
 		if (iFacmNo != 0) {
 			wkFacmNoStart = iFacmNo;
 			wkFacmNoEnd = iFacmNo;
@@ -232,12 +231,6 @@ public class L3005 extends TradeBuffer {
 				AcFg = "N";
 			// 費用
 			tTempVo = tTempVo.getVo(ln.getOtherFields());
-			this.info("test20210310  relNo  = " + newRelNo);
-			this.info("test20210310  BorxNo  = " + ln.getBorxNo());
-			this.info("test20210310  AcctFee  = " + tTempVo.getParam("AcctFee"));
-			this.info("test20210310  ModifyFee  = " + tTempVo.getParam("ModifyFee"));
-			this.info("test20210310  FireFee  = " + tTempVo.getParam("FireFee"));
-			this.info("test20210310  LawFee  = " + tTempVo.getParam("LawFee"));
 			if ((!"".equals(tTempVo.getParam("AcctFee"))
 					&& (parse.stringToBigDecimal(tTempVo.getParam("AcctFee")).compareTo(BigDecimal.ZERO) != 0)
 					|| (!"".equals(tTempVo.getParam("ModifyFee"))
@@ -263,13 +256,11 @@ public class L3005 extends TradeBuffer {
 
 			wkShortfall = ln.getOverflow().subtract(ln.getShortfall());
 			// 暫收款金額為負時，為暫收抵繳
-			// 暫收款金額為正時，為溢短繳
 			if (ln.getTempAmt().compareTo(BigDecimal.ZERO) < 0) {
 				wkTempAmt = BigDecimal.ZERO.subtract(ln.getTempAmt());
 			} else {
-				wkShortfall = wkShortfall.add(ln.getTempAmt());
+				wkTempAmt = BigDecimal.ZERO;
 			}
-
 			relNo = titaVo.getKinbr() + ln.getTitaTlrNo() + ln.getTitaTxtNo();
 			occursList.putParam("OOEntryDate", ln.getEntryDate());
 			occursList.putParam("OOAcDate", ln.getAcDate());

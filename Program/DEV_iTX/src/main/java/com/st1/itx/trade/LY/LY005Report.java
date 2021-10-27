@@ -19,6 +19,7 @@ import com.st1.itx.db.service.CdVarValueService;
 import com.st1.itx.db.service.springjpa.cm.LY005ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -29,6 +30,9 @@ public class LY005Report extends MakeReport {
 
 	@Autowired
 	CdVarValueService sCdVarValueService;
+
+	@Autowired
+	Parse parse;
 
 	@Autowired
 	MakeExcel makeExcel;
@@ -54,7 +58,7 @@ public class LY005Report extends MakeReport {
 		List<Map<String, String>> lY005List = null;
 
 		try {
-			lY005List = lY005ServiceImpl.queryDetail(inputYearMonth);
+			lY005List = lY005ServiceImpl.queryDetail(inputYearMonth, titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -100,8 +104,8 @@ public class LY005Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : lY005List) {
 
-				BigDecimal valueNum = null;
-				String valueStr = null;
+				String valueStr = "";
+				BigDecimal valueNum = BigDecimal.ZERO;
 
 				makeExcel.setValue(rowCursor, 2, seq, "C"); // 列號
 
@@ -112,6 +116,12 @@ public class LY005Report extends MakeReport {
 						continue;
 					}
 
+					if (parse.isNumeric(valueStr)) {
+						valueNum = getBigDecimal(valueStr);
+					} else {
+						valueNum = BigDecimal.ZERO;
+					}
+
 					int columnCursor = 3 + i; // 欄指標
 
 					switch (i) {
@@ -120,20 +130,18 @@ public class LY005Report extends MakeReport {
 						makeExcel.setValue(rowCursor, columnCursor, this.showBcDate(valueStr, 0));
 						break;
 					case 7:
-						valueNum = getBigDecimal(valueStr);
 						txAmtTotal = txAmtTotal.add(valueNum); // 交易金額加總
 					case 8:
 					case 9:
 					case 10:
 						// 金額欄位
-						valueNum = getBigDecimal(valueStr);
 						if (valueNum.compareTo(BigDecimal.ZERO) != 0) {
 							makeExcel.setValue(rowCursor, columnCursor, valueNum, "#,##0");
 						}
 						break;
 					case 11:
 						// 交易金額占業主權益比率%
-						valueNum = getBigDecimal(valueStr).multiply(getBigDecimal(100));
+						valueNum = valueNum.multiply(getBigDecimal(100));
 						makeExcel.setValue(rowCursor, columnCursor, valueNum, "#,##0.00");
 						break;
 					default:

@@ -481,6 +481,20 @@ public class L3110 extends TradeBuffer {
 		this.info("LoanBorMainRoutine ...");
 
 		if (titaVo.isActfgSuprele()) {
+			// TODO:放行時更新主管編號
+
+			tLoanBorTx = new LoanBorTx();
+			tLoanBorTx = loanBorTxService.holdById(new LoanBorTxId(iCustNo, iFacmNo, wkBormNo, wkBorxNo), titaVo);
+			if (tLoanBorTx == null) {
+				throw new LogicException(titaVo, "E0006", "放款交易內容檔"); // 鎖定資料時，發生錯誤
+			}
+			tLoanBorTx.setTitaEmpNoS(titaVo.getTlrNo());
+			try {
+				loanBorTxService.update(tLoanBorTx, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", "放款交易內容檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
+
 			return;
 		}
 		// 刪除放款交易內容檔
@@ -608,7 +622,6 @@ public class L3110 extends TradeBuffer {
 	private void SetLoanBorTx() throws LogicException {
 		this.info("SetLoanBorTx ...");
 
-		tLoanBorTx.setTxTypeCode(0); // 0: 臨櫃交易 1: 批次交易
 		tLoanBorTx.setDesc("預約撥款");
 		tLoanBorTx.setAcDate(wkTbsDy);
 		tLoanBorTx.setDisplayflag("Y");

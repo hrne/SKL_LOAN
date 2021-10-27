@@ -79,8 +79,11 @@ public class BaTxCom extends TradeBuffer {
 	// 未到期火險費用條件 0.全列已到期、1.續約保單起日 > 入帳月、2.續約保單起日 >=入帳日,
 	private int isUnOpenfireFee = 0;
 
-// isPaidAdvance 是否含提前繳期款
+// isTermAdvance 是否含未到期期款
 	private boolean isTermAdvance = false;
+
+// 預收期數
+	private int preRepayTerms = 0;
 
 // isAcLoanInt 是否利息提存
 	private boolean isAcLoanInt = false;
@@ -208,8 +211,8 @@ public class BaTxCom extends TradeBuffer {
 			isUnOpenfireFee = 2;
 		}
 
-		// isPaidAdvance 是否含提前繳期款 ->不含
-		this.isTermAdvance = false;
+		// isTermAdvance 是否為含未到期期款 ->含
+		this.isTermAdvance = true;
 
 		// 還款類別:02 與約定還本日期相同
 		if (iRepayType == 2) {
@@ -250,7 +253,7 @@ public class BaTxCom extends TradeBuffer {
 		this.xxBal = this.xxBal.add(this.tavAmt);
 
 		// STEP 5: 設定還款順序
-		// 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:已到期應繳本息 > 6:另收欠款 > 7.未到期應繳本息
+		// 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:應繳本利 > 6:另收欠款
 		settlePriority(iEntryDate, iRepayType); // 還款順序
 
 		// STEP 6 : 計算作帳金額
@@ -265,7 +268,7 @@ public class BaTxCom extends TradeBuffer {
 			settleAcctAmt(4);
 		}
 
-		// 還放款時收回 5:已到期應繳本息
+		// 還放款時收回 5:應繳本利
 		if (iRepayType >= 1 && iRepayType <= 3) {
 			settleAcctAmt(5);
 		}
@@ -326,7 +329,7 @@ public class BaTxCom extends TradeBuffer {
 			isUnOpenfireFee = 2;
 		}
 
-		// isPaidAdvance 是否含提前繳期款 -> 不含
+		// isTermAdvance 是否含提前繳期款 ->不含(依會計日及批次預收期數計算)
 		this.isTermAdvance = false;
 
 		// 還款類別:02 大於等於約定還本金額
@@ -383,7 +386,7 @@ public class BaTxCom extends TradeBuffer {
 		this.xxBal = this.xxBal.add(this.tavAmt);
 
 		// STEP 5: 設定還款順序
-		// 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:已到期應繳本息 > 6:另收欠款 > 7.未到期應繳本息
+		// 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:已到期應繳本利 > 6:另收欠款
 		settlePriority(iEntryDate, iRepayType); //
 
 		// STEP 6 : 計算作帳金額
@@ -396,7 +399,7 @@ public class BaTxCom extends TradeBuffer {
 			settleAcctAmt(4);
 		}
 
-		// 放款回收時 5:已到期應繳本息
+		// 放款回收時 5:應繳本利
 		// 回收金額時排序,依應繳日由小到大、計息順序(利率由大到小)、額度由小到大
 		if (iRepayType == 1) {
 			for (BaTxVo ba : this.baTxList) {
@@ -453,7 +456,7 @@ public class BaTxCom extends TradeBuffer {
 
 		this.baTxList = new ArrayList<BaTxVo>();
 
-		// isPaidAdvance 是否含提前繳期款
+		// isTermAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
 
 		// 未到期火險費用條件 ==> 1.續約保單起日 > 入帳月
@@ -496,7 +499,7 @@ public class BaTxCom extends TradeBuffer {
 		// 未到期火險費用條件 1：fireFee(續約保單起日 <= 入帳月)、 unOpenfireFee(續約保單起日 > 入帳月)
 		isUnOpenfireFee = 1;
 
-		// isPaidAdvance 是否含提前繳期款
+		// isTermAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
 
 		// 計算放款本息
@@ -525,7 +528,7 @@ public class BaTxCom extends TradeBuffer {
 		this.info("BaTxCom cashFlow ...");
 		init();
 
-		// isPaidAdvance 是否含提前繳期款
+		// isTermAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
 
 		//
@@ -613,38 +616,51 @@ public class BaTxCom extends TradeBuffer {
 				switch (iRepayType) {
 				case 1: // 01-期款
 					if (iTerms == 0) {
-						if (ln.getPrevPayIntDate() >= iEntryDate || ln.getDrawdownDate() == iEntryDate) {
+						// 應繳日
+						int wkPayIntDate = iPayIntDate > 0 ? iPayIntDate : iEntryDate;
+						if (wkPayIntDate <= ln.getPrevPayIntDate() || wkPayIntDate <= ln.getDrawdownDate()) {
 							continue;
 						}
 						if (ln.getPayIntFreq() == 0 || ln.getPayIntFreq() == 99) {
 							wkTerms = 1;
 						} else {
-							// 計算至入帳日/應繳日的應繳期數
-							wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-									ln.getSpecificDd(), iPayIntDate > 0 ? iPayIntDate : iEntryDate);
+							int wkPrevTermNo = 0;
+							int wkRepayTermNo = 0;
+							// 計算至上次繳息日之期數
 							if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-								wkTerms = wkTerms - loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
+								wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
 										ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 							}
+							// 是否含提前繳期款
+							if (this.isTermAdvance) {
+								// 可回收期數 = 計算至入帳日/應繳日的應繳期數
+								wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
+										ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+										wkPayIntDate);
+
+							} else {
+								// 可回收期數 = 可回收期數 + 批次預收期數
+								wkRepayTermNo = loanCom.getTermNo(
+										this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2,
+										ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+										this.txBuffer.getTxCom().getTbsdy())
+										+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
+							}
+							wkTerms = wkRepayTermNo - wkPrevTermNo;
 						}
 					} else {
 						wkTerms = iTerms;
 					}
-					// 期款最後一期
-					if (iEntryDate >= ln.getMaturityDate() || iPayIntDate >= ln.getMaturityDate()) {
-						if (wkTerms == 0) {
-							wkTerms = 1;
-						}
-						if (this.isTermAdvance) {
-							loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, ln.getMaturityDate(), 0,
-									iEntryDate, titaVo);
-						} else {
-							loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 0, iEntryDate,
-									titaVo);
-						}
-					} else {
-						loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
+
+					// 無可計息
+					if (wkTerms == 0) {
+						emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
+						break;
 					}
+
+					// 計息參數
+					loancalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
+
 					// 輸出每期
 					for (int i = 1; i <= wkTerms; i++) {
 						lCalcRepayIntVo = loancalcRepayIntCom.getRepayInt(titaVo);
@@ -663,21 +679,13 @@ public class BaTxCom extends TradeBuffer {
 						if (loancalcRepayIntCom.getLoanBal().equals(BigDecimal.ZERO)) {
 							break;
 						}
-						// 期款最後一期
-						if (loancalcRepayIntCom.getNextPayIntDate() >= ln.getMaturityDate()) {
-							loancalcRepayIntCom.setCaseCloseFlag("Y"); // 結案記號 Y:是 N:否
-							if (this.isTermAdvance) {
-								loancalcRepayIntCom.setIntEndDate(ln.getMaturityDate());
-							} else {
-								loancalcRepayIntCom.setIntEndDate(iEntryDate);
-							}
-						}
 					}
 					break;
 				case 2: // 部分償還金額
 					wkExtraRepayAmtRemaind = this.extraRepayAmt.subtract(this.principal).subtract(this.interest)
 							.subtract(this.delayInt).subtract(this.breachAmt);
 					if (wkExtraRepayAmtRemaind.compareTo(BigDecimal.ZERO) <= 0) {
+						emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
 						break;
 					}
 					if (ln.getNextPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
@@ -819,22 +827,8 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
-		// 是否含提前繳期款 yes -> 應繳日可大於入帳日
-		if (this.isTermAdvance) {
-			this.baTxList.add(baTxVo);
-		} else if (iPayIntDate > 0) {
-			if (baTxVo.getPayIntDate() > iPayIntDate) {
-				this.info("repayLoan BaTxVo over iPayIntDate) : " + baTxVo);
-			} else {
-				this.baTxList.add(baTxVo);
-			}
-		} else {
-			if (baTxVo.getPayIntDate() > iEntryDate) {
-				this.info("repayLoan BaTxVo over iEntryDate) : " + baTxVo);
-			} else {
-				this.baTxList.add(baTxVo);
-			}
-		}
+		
+		this.baTxList.add(baTxVo);
 	}
 
 	private void emptyLoanBaTxVo(int iEntryDate, int iRepayType, int iCustNo, LoanBorMain ln) {
@@ -853,15 +847,12 @@ public class BaTxCom extends TradeBuffer {
 
 	/* 設定費用還款順序 */
 	private void settlePriority(int EntryDate, int RepayType) {
-		// 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:已到期應繳本息 > 6:另收欠款 > 7.未到期應繳本息
+		// 1.還款類別(費用)相同 > 2.應收費用 > 3:未收費用 > 4:短繳期金 > 5:應繳本利 > 6:另收欠款
 		for (BaTxVo ba : this.baTxList) {
 			if (ba.getDataKind() == 6) {
 				ba.setRepayPriority(6);
 			} else if (ba.getDataKind() == 2) {
-				if (RepayType == 1 && ba.getPayIntDate() > EntryDate) // 期款 應繳日 > 入帳日
-					ba.setRepayPriority(7);
-				else
-					ba.setRepayPriority(5);
+				ba.setRepayPriority(5);
 			} else {
 				if (ba.getDataKind() == 1) {
 					if (ba.getRepayType() == RepayType && this.txBal.compareTo(ba.getUnPaidAmt()) == 0)
@@ -916,12 +907,14 @@ public class BaTxCom extends TradeBuffer {
 						payIntDate = ba.getPayIntDate();
 						facmNo = ba.getFacmNo();
 						payintDateAmt = getPayintDateAmt(payIntDate, facmNo);
-						this.info("settleByTerm xxBal=" + this.xxBal + " , payintDateAmt=" + payintDateAmt);
+						this.info("settleByTerm xxBal=" + this.xxBal + ", payintDat=" + payIntDate + ", payintDateAmt="
+								+ payintDateAmt);
 						if (this.xxBal.compareTo(payintDateAmt) < 0) {
 							break;
 						} else {
 							this.info("settlePayintDateAmt payintDateAmt=" + payintDateAmt);
 							settlePayintDateAmt(payIntDate, facmNo);
+							this.repayIntDate = payIntDate;
 						}
 					}
 				}
@@ -955,7 +948,6 @@ public class BaTxCom extends TradeBuffer {
 			}
 		}
 		this.info("settlePayintDateAmt PayIntDate=" + payIntDate + ", FacmNo=" + facmNo);
-		this.repayIntDate = payIntDate;
 	}
 
 	/* 計算暫收抵繳作帳金額 */

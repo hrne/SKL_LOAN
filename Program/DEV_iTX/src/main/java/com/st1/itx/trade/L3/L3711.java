@@ -70,7 +70,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3711")
 @Scope("prototype")
 public class L3711 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3712.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -115,9 +114,8 @@ public class L3711 extends TradeBuffer {
 	private int iNewSpecificDd;
 	private int iNewPayIntDate;
 	private BigDecimal iReduceAmt;
-	private BigDecimal iTotalRepayAmt;
-	private BigDecimal iRealRepayAmt;
 	private String iRqspFlag;
+	private BigDecimal iTmpAmt =  BigDecimal.ZERO; // 暫收抵繳金額
 
 	// work area
 	private int wkTbsDy;
@@ -140,6 +138,8 @@ public class L3711 extends TradeBuffer {
 	private BigDecimal wkTempAmt = BigDecimal.ZERO;
 	private BigDecimal wkReduceAmt = BigDecimal.ZERO;
 	private BigDecimal wkTotalInterest = BigDecimal.ZERO;
+	private BigDecimal wkTxAmtRemaind = BigDecimal.ZERO; // 交易還款餘額
+	private BigDecimal wkTotalRepay = BigDecimal.ZERO; // 總還款金額
 	private FacMain tFacMain;
 	private LoanBorMain tLoanBorMain;
 	private LoanBorTx tLoanBorTx;
@@ -172,17 +172,18 @@ public class L3711 extends TradeBuffer {
 		iNewSpecificDd = this.parse.stringToInteger(titaVo.getParam("NewSpecificDd"));
 		iNewPayIntDate = this.parse.stringToInteger(titaVo.getParam("NewPayIntDate"));
 		iReduceAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimReduceAmt"));
-		iTotalRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("TotalRepayAmt"));
-		iRealRepayAmt = this.parse.stringToBigDecimal(titaVo.getParam("RealRepayAmt"));
 		iRqspFlag = titaVo.getParam("RqspFlag");
 		wkReduceAmt = iReduceAmt;
 
-		// 暫收款金額 存入暫收為正、暫收抵繳為負
+		// 收付欄金額
 		for (int i = 1; i <= 50; i++) {
 			if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
 				break;
+			if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) != 90) {
+				wkTxAmtRemaind = wkTxAmtRemaind.add(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 交易還款餘額
+			}
 			if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 90) {
-				wkTempAmt = wkTempAmt.subtract(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i)));
+				iTmpAmt = iTmpAmt.subtract(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 暫收抵繳金額
 			}
 		}
 
@@ -299,10 +300,10 @@ public class L3711 extends TradeBuffer {
 			if (wkLoanPrevIntDate != ln.getDrawdownDate()) {
 				AddLoanIntDetailRoutine();
 			}
-			// 新增放款交易內容檔
-			AddLoanBorTxRoutine();
 			// 利息貸方帳務處理
 			AcDetailCrRoutine();
+			// 新增放款交易內容檔
+			AddLoanBorTxRoutine();
 			// FirstBorm
 			isFirstBorm = false;
 		}
@@ -401,7 +402,8 @@ public class L3711 extends TradeBuffer {
 				iNewPayIntDate, iNewSpecificDd, 1, tLoanBorMain.getMaturityDate());
 
 		// 重算新指定基準日期
-		wkNewSpecificDate = loanCom.getSpecificDate(iNewSpecificDd, tLoanBorMain.getFirstDueDate(), tLoanBorMain.getPayIntFreq());
+		wkNewSpecificDate = loanCom.getSpecificDate(iNewSpecificDd, tLoanBorMain.getFirstDueDate(),
+				tLoanBorMain.getPayIntFreq());
 		this.info("wkNewSpecificDate = " + tLoanBorMain.getBormNo() + " " + wkNewSpecificDate);
 
 		// 新上次還本日
@@ -515,6 +517,7 @@ public class L3711 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, wkFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setDesc("應繳日變更-不可欠繳");
+		tLoanBorTx.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RpCode1"))); // 還款來源
 		tLoanBorTx.setEntryDate(wkTbsDy);
 		tLoanBorTx.setTxAmt(this.parse.stringToBigDecimal(titaVo.getTxAmt()));
 		tLoanBorTx.setLoanBal(tLoanBorMain.getLoanBal());
@@ -522,8 +525,7 @@ public class L3711 extends TradeBuffer {
 		tLoanBorTx.setIntStartDate(wkIntStartDate);
 		tLoanBorTx.setIntEndDate(wkIntEndDate);
 		tLoanBorTx.setInterest(wkInterest);
-		tLoanBorTx.setTempAmt(wkTempAmt);
-		wkTempAmt = BigDecimal.ZERO;
+		tLoanBorTx.setTempAmt(this.compTempAmt());	// 暫收款金額	
 		tLoanBorTx.setUnpaidInterest(BigDecimal.ZERO);
 		tLoanBorTx.setShortfall(BigDecimal.ZERO);
 		// 繳息首筆、繳息次筆
@@ -611,6 +613,38 @@ public class L3711 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007",
 					"撥款主檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo); // 更新資料時，發生錯誤
 		}
+	}
+	// 計算暫收款金額
+	private BigDecimal compTempAmt() throws LogicException {
+		// 還款總金額
+		BigDecimal wkAcTotal = BigDecimal.ZERO;		
+		for (AcDetail ac : lAcDetail) {
+			if ("C".equals(ac.getDbCr())) {
+				wkAcTotal = wkAcTotal.add(ac.getTxAmt());
+			} else {
+				wkAcTotal = wkAcTotal.subtract((ac.getTxAmt()));
+			}
+		}
+		// 本筆還款金額 、累計還款總金額
+		BigDecimal wkRepayAmt = wkAcTotal.subtract(this.wkTotalRepay);
+		this.wkTotalRepay = wkAcTotal;
+
+		// 本筆暫收款金額
+		this.wkTempAmt = BigDecimal.ZERO;
+
+		if (iTmpAmt.compareTo(BigDecimal.ZERO) == 0) {
+			return wkTempAmt;
+		}
+
+		// 暫收抵繳金額(暫收款金額為負值) = 交易還款餘額 - 本筆還款金額
+		if (wkRepayAmt.compareTo(this.wkTxAmtRemaind) < 0) {
+			wkTempAmt = BigDecimal.ZERO;
+			this.wkTxAmtRemaind = this.wkTxAmtRemaind.subtract(wkRepayAmt);
+		} else {
+			wkTempAmt = this.wkTxAmtRemaind.subtract(wkRepayAmt);
+			this.wkTxAmtRemaind = BigDecimal.ZERO;
+		}
+		return wkTempAmt;
 	}
 
 }

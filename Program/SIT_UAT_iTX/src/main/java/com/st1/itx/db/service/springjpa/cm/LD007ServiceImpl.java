@@ -14,42 +14,44 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		this.info("lD007.findAll ");
 
 		String sql = "";
 		sql += "               SELECT DISTINCT ";
-		sql += "                      E0.\"DepItem\" ";
-		sql += "                     ,E0.\"Fullname\" ";
-		sql += "                     ,C.\"CustName\" ";
-		sql += "                     ,B.\"CustNo\" ";
-		sql += "                     ,B.\"FacmNo\" ";
-		sql += "                     ,B.\"BormNo\" ";
-		sql += "                     ,B.\"DrawdownDate\" ";
-		sql += "                     ,F.\"ProdNo\" ";
-		sql += "                     ,B.\"PieceCode\" ";
-		sql += "                     ,B.\"DrawdownAmt\" ";
-		sql += "                     ,B.\"WorkMonth\" ";
-		sql += "                     ,NVL(NVL(B1.\"DeptItem\", B1.\"UnitItem\"), ' ') AS F1 ";
-		sql += "                     ,NVL(NVL(B2.\"DistItem\", B2.\"UnitItem\"), ' ') AS F2 ";
-		sql += "                     ,NVL(B3.\"UnitItem\", ' ') AS F3 ";
-		sql += "                     ,NVL(E1.\"Fullname\", ' ') AS F4 ";
-		sql += "                     ,NVL(I.\"Introducer\", ' ') AS F5 ";
+		sql += "                      E0.\"DepItem\" F0 ";
+		sql += "                     ,E0.\"Fullname\" F1 ";
+		sql += "                     ,C.\"CustName\" F2 ";
+		sql += "                     ,B.\"CustNo\" F3 ";
+		sql += "                     ,B.\"FacmNo\" F4 ";
+		sql += "                     ,B.\"BormNo\" F5 ";
+		sql += "                     ,B.\"DrawdownDate\" F6 ";
+		sql += "                     ,F.\"ProdNo\" F7 ";
+		sql += "                     ,B.\"PieceCode\" F8 ";
+		sql += "                     ,B.\"DrawdownAmt\" F9 ";
+		sql += "                     ,B.\"WorkMonth\" F10 ";
+		sql += "                     ,NVL(NVL(B1.\"DeptItem\", B1.\"UnitItem\"), ' ') AS F11 ";
+		sql += "                     ,NVL(NVL(B2.\"DistItem\", B2.\"UnitItem\"), ' ') AS F12 ";
+		sql += "                     ,NVL(B3.\"UnitItem\", ' ') AS F13 ";
+		sql += "                     ,NVL(E1.\"Fullname\", ' ') AS F14 ";
+		sql += "                     ,NVL(I.\"Introducer\", ' ') AS F15 ";
 		sql += "               FROM \"PfBsDetail\" B  ";
 		sql += "               LEFT JOIN \"PfItDetail\" I ";
 		sql += "                     ON I.\"PerfDate\" = B.\"PerfDate\" ";
@@ -76,12 +78,12 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("inputYearStart", Integer.toString(Integer.valueOf(titaVo.getParam("inputYearStart")) + 1911));
-		query.setParameter("inputYearEnd", Integer.toString(Integer.valueOf(titaVo.getParam("inputYearEnd")) + 1911));
+		query.setParameter("inputYearStart", parse.stringToInteger(titaVo.getParam("inputYearStart")) + 1911);
+		query.setParameter("inputYearEnd", parse.stringToInteger(titaVo.getParam("inputYearEnd")) + 1911);
 		query.setParameter("inputMonthStart", titaVo.getParam("inputMonthStart"));
 		query.setParameter("inputMonthEnd", titaVo.getParam("inputMonthEnd"));
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

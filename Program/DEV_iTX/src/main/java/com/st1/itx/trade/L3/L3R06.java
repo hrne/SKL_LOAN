@@ -267,8 +267,9 @@ public class L3R06 extends TradeBuffer {
 					}
 
 					// 可回收期數
-					wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-							ln.getSpecificDd(), this.txBuffer.getTxCom().getTbsdy());
+					wkPreRepayTermNo = loanCom.getTermNo(iEntryDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
+							ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+							this.txBuffer.getTxCom().getTbsdy());
 
 					// 可回收期數；可回收期數 = 已到期期數 + 預收期數
 					wkPreRepayTermNo = wkPreRepayTermNo + this.txBuffer.getSystemParas().getPreRepayTerms();
@@ -285,8 +286,8 @@ public class L3R06 extends TradeBuffer {
 							continue;
 						}
 						// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
-						wkTerms = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-								ln.getSpecificDd(), iEntryDate);
+						wkTerms = loanCom.getTermNo(iEntryDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
+								ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
 						if (ln.getPrevPayIntDate() > 0) {
 							wkTerms = wkTerms - loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
 									ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());

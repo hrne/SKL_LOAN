@@ -220,7 +220,7 @@ T(H,#RepaySourceX,#RepaySource,#ApHelp)
 !預定還款日期
 #RepayDate=D,7,I
 C(3,#FuncCode,4,s)
-T(1,#DATE,2,7)
+C(3,#CHAIN,1,$,T(1,#DATE,2,7))
 D(8)
 @A(DATE,0,#RepayDate)
 

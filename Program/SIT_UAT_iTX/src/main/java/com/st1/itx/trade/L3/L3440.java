@@ -131,7 +131,8 @@ public class L3440 extends TradeBuffer {
 	private BigDecimal iLawFee;
 	private BigDecimal iShortfall;
 	private int iOverRpFg; // 1.短收 2.溢收
-	private BigDecimal iOverRpAmt; // 短溢收金額
+	private BigDecimal iOverAmt; // 短溢收金額
+	private BigDecimal iTmpAmt =  BigDecimal.ZERO; // 暫收抵繳金額
 
 	// work area
 	private int wkCustNo;
@@ -169,7 +170,8 @@ public class L3440 extends TradeBuffer {
 	private BigDecimal wkShortfallPrincipal = BigDecimal.ZERO; // 累短收 - 本金
 	private BigDecimal wkShortfallInterest = BigDecimal.ZERO; // 累短收-利息
 	private BigDecimal wkShortCloseBreach = BigDecimal.ZERO; // 累短收 - 清償違約金
-	// private BigDecimal wkTotalCloseBreachAmt = BigDecimal.ZERO;
+	private BigDecimal wkTxAmtRemaind = BigDecimal.ZERO; // 交易還款餘額
+	private BigDecimal wkTotalRepay = BigDecimal.ZERO; // 總還款金額
 	private TxTemp tTxTemp;
 	private TxTempId tTxTempId;
 	private TempVo tTempVo = new TempVo();
@@ -236,11 +238,11 @@ public class L3440 extends TradeBuffer {
 		this.info("iShortfall=" + iShortfall);
 		iRqspFlag = titaVo.getParam("RqspFlag");
 		iOverRpFg = this.parse.stringToInteger(titaVo.getParam("OverRpFg")); // 1->短收 2->溢收
-		iOverRpAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
+		iOverAmt = this.parse.stringToBigDecimal(titaVo.getParam("OverRpAmt"));
 		iTxAmt = this.parse.stringToBigDecimal(titaVo.getTxAmt());
 		// 不可有短繳金額
-		if (iOverRpFg == 1 && iOverRpAmt.compareTo(BigDecimal.ZERO) > 0) {
-			throw new LogicException(titaVo, "E3094", "短繳金額 = " + iOverRpAmt); // 不可有短繳金額
+		if (iOverRpFg == 1 && iOverAmt.compareTo(BigDecimal.ZERO) > 0) {
+			throw new LogicException(titaVo, "E3094", "短繳金額 = " + iOverAmt); // 不可有短繳金額
 		}
 		// 按違約金、 延滯息、利息順序減免
 		if (iReduceAmt.compareTo(BigDecimal.ZERO) > 0) {
@@ -277,8 +279,11 @@ public class L3440 extends TradeBuffer {
 		for (int i = 1; i <= 50; i++) {
 			if (titaVo.get("RpCode" + i) == null || parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 0)
 				break;
+			if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) != 90) {
+				wkTxAmtRemaind = wkTxAmtRemaind.add(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 交易還款餘額
+			}
 			if (parse.stringToInteger(titaVo.getParam("RpCode" + i)) == 90) {
-				wkTempAmt = wkTempAmt.add(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i)));
+				iTmpAmt = iTmpAmt.subtract(parse.stringToBigDecimal(titaVo.getParam("RpAmt" + i))); // 暫收抵繳金額
 			}
 		}
 		// 暫收抵繳為負數
@@ -693,6 +698,7 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTxId = new LoanBorTxId();
 		loanCom.setLoanBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, wkBormNo, wkBorxNo, titaVo);
 		tLoanBorTx.setDesc("催收回復登錄");
+		tLoanBorTx.setRepayCode(this.parse.stringToInteger(titaVo.getParam("RpCode1"))); // 還款來源
 		tLoanBorTx.setEntryDate(iEntryDate);
 		tLoanBorTx.setDueDate(wkDueDate);
 		tLoanBorTx.setTxAmt(this.parse.stringToBigDecimal(titaVo.getTxAmt()));
@@ -706,11 +712,11 @@ public class L3440 extends TradeBuffer {
 		tLoanBorTx.setDelayInt(wkDelayInt);
 		tLoanBorTx.setBreachAmt(wkBreachAmt);
 		tLoanBorTx.setCloseBreachAmt(wkCloseBreachAmt);
+		tLoanBorTx.setTempAmt(this.compTempAmt());	// 暫收款金額	
 		// 繳息首筆、繳息次筆
 		if (isFirstOvdu) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
 			tLoanBorTx.setTxAmt(iTxAmt);
-			tLoanBorTx.setTempAmt(wkTempAmt); // 暫收抵繳為負
 		} else {
 			tLoanBorTx.setDisplayflag("I"); // 繳息次筆
 		}
@@ -950,5 +956,37 @@ public class L3440 extends TradeBuffer {
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "催收呆帳檔 戶號 = " + wkCustNo + " 額度編號 = " + wkFacmNo + " 撥款序號 = " + wkBormNo + " 催收序號 = " + wkOvduNo); // 更新資料時，發生錯誤
 		}
+	}
+	// 計算暫收款金額
+	private BigDecimal compTempAmt() throws LogicException {
+		// 還款總金額
+		BigDecimal wkAcTotal = BigDecimal.ZERO;		
+		for (AcDetail ac : lAcDetail) {
+			if ("C".equals(ac.getDbCr())) {
+				wkAcTotal = wkAcTotal.add(ac.getTxAmt());
+			} else {
+				wkAcTotal = wkAcTotal.subtract((ac.getTxAmt()));
+			}
+		}
+		// 本筆還款金額 、累計還款總金額
+		BigDecimal wkRepayAmt = wkAcTotal.subtract(this.wkTotalRepay);
+		this.wkTotalRepay = wkAcTotal;
+
+		// 本筆暫收款金額
+		this.wkTempAmt = BigDecimal.ZERO;
+
+		if (iTmpAmt.compareTo(BigDecimal.ZERO) == 0) {
+			return wkTempAmt;
+		}
+
+		// 暫收抵繳金額(暫收款金額為負值) = 交易還款餘額 - 本筆還款金額
+		if (wkRepayAmt.compareTo(this.wkTxAmtRemaind) < 0) {
+			wkTempAmt = BigDecimal.ZERO;
+			this.wkTxAmtRemaind = this.wkTxAmtRemaind.subtract(wkRepayAmt);
+		} else {
+			wkTempAmt = this.wkTxAmtRemaind.subtract(wkRepayAmt);
+			this.wkTxAmtRemaind = BigDecimal.ZERO;
+		}
+		return wkTempAmt;
 	}
 }
