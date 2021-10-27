@@ -65,6 +65,7 @@ public class L6302 extends TradeBuffer {
 		this.info("L6302 iFEffectDate : " + iFEffectDate);
 	
 		int iTbsdy = titaVo.getEntDyI();
+		int iCalDy = parse.stringToInteger(titaVo.getCalDy());
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 4)) {
 			throw new LogicException(titaVo, "E0010", "L6302"); // 功能選擇錯誤
@@ -104,7 +105,8 @@ public class L6302 extends TradeBuffer {
 			CdBaseRate bCdBaseRate = sCdBaseRateService.effectFlagDescFirst("TWD", iBaseRateCode,0, titaVo);
 			if(bCdBaseRate!=null) {
 				this.info("bCdBaseRate=="+bCdBaseRate.getEffectDate());
-				if(bCdBaseRate.getEffectDate()>iTbsdy) {
+				this.info("iCalDy=="+iCalDy);
+				if(bCdBaseRate.getEffectDate()>iCalDy && bCdBaseRate.getEffectDate()>iEffectDate) {
 					throw new LogicException(titaVo, "E0005", "未生效指標利率只能有一筆"); // 新增資料時，發生錯誤
 				}
 			}

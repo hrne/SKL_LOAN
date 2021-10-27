@@ -346,22 +346,23 @@ public class LY002Report extends MakeReport {
 	private void checkMergeRegionValue(String custNo, String facmNo, String clNo, BigDecimal evaAmt,
 			BigDecimal lineAmt) {
 
-		String tempClNo = "";
 		String tempCustNo = "";
 		String tempFacmNo = "";
-
-
+		String tempClNo = "";
+		
+		mergeEvaMap = new HashMap<String, Object>();
+		mergeLineMap = new HashMap<String, Object>();
+		
+		int l = mergeLine.size() - 1;
+		int e = mergeEva.size() - 1;
+		
 		// 核貸
 		if (mergeLine.size() > 0) {
 
-			mergeEvaMap = new HashMap<String, Object>();
-			mergeLineMap = new HashMap<String, Object>();
-			int l = mergeLine.size() - 1;
-
 			BigDecimal tempLine = new BigDecimal(mergeLine.get(l).get("line").toString());
-
 			tempCustNo = mergeLine.get(l).get("cust").toString();
 			tempFacmNo = mergeLine.get(l).get("facm").toString();
+
 
 			// 與前一筆 戶號額度是否一樣
 			if (tempCustNo.equals(custNo) && tempFacmNo.equals(facmNo)) {
@@ -406,7 +407,6 @@ public class LY002Report extends MakeReport {
 		// 估計總值
 		if (mergeEva.size() > 0) {
 
-			int e = mergeEva.size() - 1;
 			BigDecimal tempEva = new BigDecimal(mergeEva.get(e).get("eva").toString());
 			tempClNo = mergeEva.get(e).get("clno").toString();
 

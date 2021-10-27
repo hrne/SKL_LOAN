@@ -36,7 +36,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5903 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5903.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -54,12 +53,11 @@ public class L5903 extends TradeBuffer {
 		this.info("active L5903 ");
 		this.totaVo.init(titaVo);
 
-
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100;
-		
+
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		try {
@@ -77,17 +75,17 @@ public class L5903 extends TradeBuffer {
 				/* 手動折返 */
 				this.totaVo.setMsgEndToEnter();
 			}
-			
+
 			for (Map<String, String> result : resultList) {
-				
+
 				int applDate = parse.stringToInteger(result.get("F6"));
 				int returnDate = parse.stringToInteger(result.get("F7"));
-				
-				if(applDate > 19110000) {
+
+				if (applDate > 19110000) {
 					applDate = applDate - 19110000;
 				}
-				
-				if(returnDate > 19110000) {
+
+				if (returnDate > 19110000) {
 					returnDate = returnDate - 19110000;
 				}
 
@@ -96,16 +94,18 @@ public class L5903 extends TradeBuffer {
 				occursList.putParam("OOFacmNo", result.get("F1"));
 				occursList.putParam("OOApplSeq", result.get("F2"));
 				occursList.putParam("OOCustName", result.get("F3"));
-				occursList.putParam("OOKeeperEmpNo", result.get("F4"));
-				occursList.putParam("OOApplEmpNo", result.get("F5"));
+				occursList.putParam("OOKeeperEmpName", result.get("F4"));
+				occursList.putParam("OOApplEmpName", result.get("F5"));
 				occursList.putParam("OOApplDate", applDate);
 				occursList.putParam("OOReturnDate", returnDate);
-				occursList.putParam("OOReturnEmpNo", result.get("F8"));
+				occursList.putParam("OOReturnEmpName", result.get("F8"));
 				occursList.putParam("OOUsageCode", result.get("F9"));
 				occursList.putParam("OOCopyCode", result.get("F10"));
 				occursList.putParam("OORemark", result.get("F11"));
 				occursList.putParam("OOApplObj", result.get("F12"));
-
+				occursList.putParam("OOKeeperEmpNo", result.get("F13"));
+				occursList.putParam("OOApplEmpNo", result.get("F14"));
+				occursList.putParam("OOReturnEmpNo", result.get("F15"));
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}
@@ -116,7 +116,7 @@ public class L5903 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private Boolean hasNext() {
 		Boolean result = true;
 

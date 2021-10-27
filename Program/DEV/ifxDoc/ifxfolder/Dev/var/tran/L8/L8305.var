@@ -134,7 +134,7 @@ T(2,@DebtCodeHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic044連動進入),$)
-T(F,@TranKey,0)T(F,@RcDate,0)T(F,@DebtCode,0)T(F,@NonGageAmt,0)T(F,@Period,0)
+T(F,@TranKey,0)T(F,@SubmitKey,0)T(F,@RcDate,0)T(F,@DebtCode,0)T(F,@NonGageAmt,0)T(F,@Period,0)
 T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@ReceYearIncome,0)T(F,@ReceYear,0)T(F,@ReceYear2Income,0)
 T(F,@ReceYear2,0)T(F,@CurrentMonthIncome,0)T(F,@LivingCost,0)T(F,@CompName,0)T(F,@CompId,0)
 T(F,@CarCnt,0)T(F,@HouseCnt,0)T(F,@LandCnt,0)T(F,@ChildCnt,0)T(F,@ChildRate,0)
@@ -157,7 +157,7 @@ T(1,@TranKey,#NTXBUF,2,1)
 C(5,#TranKey_Tmp,1,$,S)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@TranKey,1)T(F,@RcDate,1)T(F,@DebtCode,1)T(F,@NonGageAmt,1)T(F,@Period,1)
+T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@RcDate,1)T(F,@DebtCode,1)T(F,@NonGageAmt,1)T(F,@Period,1)
 T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@ReceYearIncome,1)T(F,@ReceYear,1)T(F,@ReceYear2Income,1)
 T(F,@ReceYear2,1)T(F,@CurrentMonthIncome,1)T(F,@LivingCost,1)T(F,@CompName,1)T(F,@CompId,1)
 T(F,@CarCnt,1)T(F,@HouseCnt,1)T(F,@LandCnt,1)T(F,@ChildCnt,1)T(F,@ChildRate,1)
@@ -165,6 +165,7 @@ T(F,@ParentCnt,1)T(F,@ParentRate,1)T(F,@MouthCnt,1)T(F,@MouthRate,1)T(F,@GradeTy
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdTranKey,*)
+T(2,@FdSubmitKey,*)
 T(2,@FdRcDate,*)
 T(2,@FdDebtCode,*)
 T(2,@FdReceYear,*)
@@ -303,9 +304,17 @@ T(2,@CustIdX,#L8R57CustName)
 #CustIdX=X,2.50,L
 
 ![報送單位代號]
-#SubmitKey=X,3,L
-
+#SubmitKey=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@V(7)
 #SubmitKeyX=X,80,L
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 
 ![協商申請日]

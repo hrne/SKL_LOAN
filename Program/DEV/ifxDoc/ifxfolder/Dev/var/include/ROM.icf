@@ -3758,12 +3758,16 @@ TXFORM=L3R02
 
 !尋找放款約定還本檔
 <L3R03.dec>
+#L3r03IncludeIntFlag=X,1,S
+#L3r03UnpaidIntFlag=X,1,S
 #L3r03BookAmt=m,14.2,S
 #L3r03BookStatus=A,1,S
 </L3R03.dec>
 
 <L3R03.tom>
 TXFORM=L3R03
+#L3r03IncludeIntFlag
+#L3r03UnpaidIntFlag
 #L3r03BookAmt
 #L3r03BookStatus
 ^
@@ -4143,7 +4147,7 @@ TXFORM=L3R14
 #L3r14SumLoanBal
 #L3r14Interest
 #L3r14OpenInterest
-#L3r14RealPayAmtL4R2
+#L3r14RealPayAmt
 #L3r14RemitBank
 #L3r14RemitBranch
 #L3r14RemitAcctNo
@@ -6278,12 +6282,19 @@ TXFORM=L8R10
 #L8r11RbDate=D,7,S
 #L8r11ApplyType=X,1,S
 #L8r11RefBankId=X,3,S
+#L8r11RefBankIdX=X,100,S
 #L8r11NotBankId1=X,3,S
+#L8r11NotBankId1X=X,100,S
 #L8r11NotBankId2=X,3,S
+#L8r11NotBankId2X=X,100,S
 #L8r11NotBankId3=X,3,S
+#L8r11NotBankId3X=X,100,S
 #L8r11NotBankId4=X,3,S
+#L8r11NotBankId4X=X,100,S
 #L8r11NotBankId5=X,3,S
+#L8r11NotBankId5X=X,100,S
 #L8r11NotBankId6=X,3,S
+#L8r11NotBankId6X=X,100,S
 #L8r11OutJcicTxtDate=D,7,S
 </L8R11.dec>
 
@@ -6296,12 +6307,19 @@ TXFORM=L8R11
 #L8r11RbDate
 #L8r11ApplyType
 #L8r11RefBankId
+#L8r11RefBankIdX
 #L8r11NotBankId1
+#L8r11NotBankId1X
 #L8r11NotBankId2
+#L8r11NotBankId2X
 #L8r11NotBankId3
+#L8r11NotBankId3X
 #L8r11NotBankId4
+#L8r11NotBankId4X
 #L8r11NotBankId5
+#L8r11NotBankId5X
 #L8r11NotBankId6
+#L8r11NotBankId6X
 #L8r11OutJcicTxtDate
 ^
 </L8R11.tom>

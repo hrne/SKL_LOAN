@@ -773,7 +773,7 @@ public class L2154 extends TradeBuffer {
 		}
 
 		try {
-			facMainService.update2(tFacMain, titaVo);
+			tFacMain = facMainService.update2(tFacMain, titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E2010", "額度主檔"); // 更新資料時，發生錯誤
 		}
@@ -1018,10 +1018,21 @@ public class L2154 extends TradeBuffer {
 			txtitaVo.putParam("RelationId", titaVo.getParam("OldRelationId"));
 			txtitaVo.putParam("RepayBank", titaVo.getParam("OldRepayBank"));
 			bankAuthActCom.del("A", txtitaVo);
+		} else {
+			txtitaVo = new TitaVo();
+			txtitaVo = (TitaVo) titaVo.clone();
+			txtitaVo.putParam("RepayCode", titaVo.getParam("OldRepayCode"));
+			bankAuthActCom.addRepayActChangeLog(txtitaVo);
+
 		}
 		// 新還款帳號(含還款方式)刪除
 		if ("02".equals(titaVo.getParam("RepayCode"))) {
 			bankAuthActCom.add("A", titaVo);
+		}else {
+			txtitaVo = new TitaVo();
+			txtitaVo = (TitaVo) titaVo.clone();
+			txtitaVo.putParam("RepayCode", titaVo.getParam("OldRepayCode"));
+			bankAuthActCom.addRepayActChangeLog(txtitaVo);
 		}
 	}
 

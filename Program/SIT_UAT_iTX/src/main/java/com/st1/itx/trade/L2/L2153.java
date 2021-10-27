@@ -246,6 +246,7 @@ public class L2153 extends TradeBuffer {
 	private List<TxTemp> lTxTemp;
 	private boolean isElaonUpdate = false;
 	private boolean isEloan = false;
+	private TitaVo txtitaVo;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -326,13 +327,21 @@ public class L2153 extends TradeBuffer {
 		}
 		// 銀扣授權帳號檔
 		if (titaVo.isActfgRelease()) {
-			bankAuthActCom.add("A",titaVo);
+//			bankAuthActCom.add("A",titaVo);
+			// 新還款帳號(含還款方式)刪除
+			if ("02".equals(titaVo.getParam("RepayCode"))) {
+				bankAuthActCom.add("A", titaVo);
+			} else {
+				txtitaVo = new TitaVo();
+				txtitaVo = (TitaVo) titaVo.clone();
+				txtitaVo.putParam("RepayCode", titaVo.getParam("RepayCode"));
+				bankAuthActCom.addRepayActChangeLog(txtitaVo);
+			}
 		}
 
 		// 額度與擔保品關聯檔變動處理
 		clFacCom.changeClFac(iApplNo, titaVo);
-		
-		
+
 		this.info("relcd" + titaVo.toString());
 		this.totaVo.putParam("OCustNo", wkCustNo);
 		this.totaVo.putParam("OFacmNo", wkFacmNo);
@@ -613,7 +622,7 @@ public class L2153 extends TradeBuffer {
 		tFacMain.setCreditOfficer(titaVo.getParam("CreditOfficer"));
 		tFacMain.setLoanOfficer(titaVo.getParam("BusinessOfficer"));
 		tFacMain.setBusinessOfficer(titaVo.getParam("BusinessOfficer"));
-		tFacMain.setApprovedLevel(titaVo.getParam("ApprovedLevel")); //TODO:9/27新增 
+		tFacMain.setApprovedLevel(titaVo.getParam("ApprovedLevel")); // TODO:9/27新增
 		tFacMain.setSupervisor(titaVo.getParam("Supervisor"));
 		tFacMain.setInvestigateOfficer("");
 		tFacMain.setEstimateReview("");

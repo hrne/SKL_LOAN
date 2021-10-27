@@ -38,6 +38,14 @@ public class ASpringJpaParm extends SysLogger {
 		this.info("result:" + result.size());
 		return result;
 	}
+	
+	public List<Map<String, String>> convertToMap(Query query, boolean isUpdate) {
+		if (isUpdate) {
+			query.executeUpdate();
+			return new ArrayList<Map<String, String>>();
+		} else
+			return this.convertToMap(query);
+	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public List<Map<String, String>> convertToMap(Query query) {

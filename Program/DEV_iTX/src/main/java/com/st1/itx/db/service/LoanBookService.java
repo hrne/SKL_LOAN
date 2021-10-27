@@ -90,6 +90,19 @@ public interface LoanBookService {
   public Slice<LoanBook> bookCustNoRange(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3, int bormNo_4, int bormNo_5, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo &gt;= ,AND FacmNo &lt;= ,AND BormNo &gt;= ,AND BormNo &lt;=
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param facmNo_2 facmNo_2
+   * @param bormNo_3 bormNo_3
+   * @param bormNo_4 bormNo_4
+   * @param titaVo Variable-Length Argument
+   * @return Slice LoanBook LoanBook of List
+   */
+  public LoanBook facmNoLastBookDateFirst(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, TitaVo... titaVo);
+
+  /**
    * hold By LoanBook
    * 
    * @param loanBookId key

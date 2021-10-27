@@ -8,8 +8,6 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -20,11 +18,11 @@ import com.st1.itx.db.service.springjpa.cm.LM012ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
 public class LM012Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM012Report.class);
 
 	@Autowired
 	LM012ServiceImpl lM012ServiceImpl;
@@ -32,18 +30,24 @@ public class LM012Report extends MakeReport {
 	@Autowired
 	DateUtil dateUtil;
 	
+	@Autowired
+	Parse parse;
+
 	String dataDate = "";
+	
+	private static final BigDecimal million = new BigDecimal("1000000");
+	private static final BigDecimal hundred = new BigDecimal("100");
+
 	@Override
 	public void printHeader() {
-		
+
 		this.print(-1, 123, "機密等級：密");
 		this.print(-2, 1, "　 程式ID：" + this.getParentTranCode());
 		this.print(-2, 68, "新光人壽保險股份有限公司", "C");
 		this.print(-2, 123, "日　期：" + this.showBcDate(dateUtil.getNowStringBc(), 1));
 		this.print(-3, 1, "　 報  表：" + this.getRptCode());
 		this.print(-3, 68, "放款餘額利率分佈表", "C");
-		this.print(-3, 123, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, 123, "時　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, 123, "頁　數：" + this.getNowPage());
 		this.print(-5, 68, getshowRocDate(Integer.parseInt(dataDate)), "C");
 		this.print(-5, 123, "單　位：百萬元");
@@ -77,6 +81,7 @@ public class LM012Report extends MakeReport {
 
 		this.setMaxRows(30);
 	}
+
 	public void printFooter() {
 		this.print(0, 1, "└─────────┴──────┴─────┴──────┴─────┴──────┴─────┴──────┴─────┴──────┴─────┘");
 	}
@@ -93,23 +98,23 @@ public class LM012Report extends MakeReport {
 		 * 利率下限
 		 */
 		String sRateMinimum = titaVo.getParam("RateMinimum");
-		
+
 		/**
 		 * 利率上限
 		 */
 		String sRateMaximum = titaVo.getParam("RateMaximum");
-		
+
 		/**
 		 * 利率區間
 		 */
 		String sRateRange = titaVo.getParam("RateRange");
 		String sDataYear = titaVo.getParam("DataYear");
 		String sDataMonth = titaVo.getParam("DataMonth");
-		dataDate = String.valueOf(Integer.parseInt(sDataYear) + 1911) + sDataMonth + getLastDayOfMonth(sDataYear, sDataMonth);
-		BigDecimal bRateMinimum = sRateMinimum == null ? BigDecimal.ZERO : new BigDecimal(sRateMinimum);
-		BigDecimal bRateMaximum = sRateMaximum == null ? BigDecimal.ZERO : new BigDecimal(sRateMaximum);
-		BigDecimal bRateRange = sRateRange == null ? BigDecimal.ZERO : new BigDecimal(sRateRange);
-		
+		dataDate = (parse.stringToInteger(sDataYear) + 1911) + sDataMonth + getLastDayOfMonth(sDataYear, sDataMonth);
+		BigDecimal bRateMinimum = getBigDecimal(sRateMinimum);
+		BigDecimal bRateMaximum = getBigDecimal(sRateMaximum);
+		BigDecimal bRateRange = getBigDecimal(sRateRange);
+
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM012", "放款利率分佈表", "", "A4", "L");
 
 		List<Map<String, String>> listLM012 = null;
@@ -122,14 +127,14 @@ public class LM012Report extends MakeReport {
 			this.error("lM012ServiceImpl.findAll error = " + errors.toString());
 		}
 		int size = 2;
-		if(bRateRange.compareTo(BigDecimal.ZERO) == 1) {
+		if (bRateRange.compareTo(BigDecimal.ZERO) == 1) {
 			size = bRateMaximum.subtract(bRateMinimum).divide(bRateRange, 0, 4).intValue() + 2;
 			this.info("size = " + size);
 		}
 		BigDecimal rate[] = new BigDecimal[size - 1];
 		for (int i = 0; i < size - 1; i++) {
 			BigDecimal j = bRateMinimum;
-			rate[i] = j.add(new BigDecimal(String.valueOf(i)).multiply(bRateRange));
+			rate[i] = j.add(getBigDecimal(parse.IntegerToString(i, 1)).multiply(bRateRange));
 		}
 		BigDecimal value[][] = new BigDecimal[size][5];
 		BigDecimal total[] = new BigDecimal[5];
@@ -142,24 +147,22 @@ public class LM012Report extends MakeReport {
 			total[i] = BigDecimal.ZERO;
 		}
 		for (Map<String, String> LM12Vo : listLM012) {
-			int i = 0;// 先算總金額
-			if (Float.parseFloat(LM12Vo.get("F0")) == -1) {
+			int i = 0; // 先算總金額
+			if (parse.stringToFloat(LM12Vo.get("F0")) == -1) {
 				i = 0;
-			} else if (Float.parseFloat(LM12Vo.get("F0")) == 999) {
+			} else if (parse.stringToFloat(LM12Vo.get("F0")) == 999) {
 				i = size - 1;
 			} else {
-				i = (int) ((Double.parseDouble(LM12Vo.get("F0")) - 1) / bRateRange.floatValue() + 1);
+				i = (int) ((parse.stringToDouble(LM12Vo.get("F0")) - 1) / bRateRange.floatValue() + 1);
 				this.info("i = " + i);
 			}
 			BigDecimal totalLoanBalance = BigDecimal.ZERO;
 			for (int k = 1; k < 5; k++) {
 				String ad = "F" + String.valueOf(k);
-//				value[i][k-1] = value[i][k-1].add(new BigDecimal(LM12Vo.get(ad)));
-				value[i][k - 1] = value[i][k - 1]
-						.add(new BigDecimal(LM12Vo.get(ad)).divide(new BigDecimal("1000000"), 0, 4));// Last Version
-//				total[k-1] = total[k-1].add(new BigDecimal(LM12Vo.get(ad)));
-				total[k - 1] = total[k - 1].add(new BigDecimal(LM12Vo.get(ad)).divide(new BigDecimal("1000000"), 0, 4));// Last
-																														// Version
+				
+				value[i][k - 1] = value[i][k - 1].add(getBigDecimal(LM12Vo.get(ad)).divide(million, 0, 4));
+				total[k - 1] = total[k - 1].add(getBigDecimal(LM12Vo.get(ad)).divide(million, 0, 4));
+				
 				totalLoanBalance = totalLoanBalance.add(value[i][k - 1]);
 			}
 
@@ -174,8 +177,6 @@ public class LM012Report extends MakeReport {
 		}
 		if (listLM012 != null && listLM012.size() != 0) {
 
-//			setFontSize(8);
-			
 			int temp = 22;
 			for (int i = 0; i < size; i++) {
 				this.print(1, 1, "│　　　　　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│");
@@ -191,12 +192,10 @@ public class LM012Report extends MakeReport {
 				}
 				temp = 0;
 				for (int j = 0; j < 5; j++) {
-//					BigDecimal result = this.computeDivide(value[i][j], new BigDecimal("1000000"), 0);
 					BigDecimal result = value[i][j];// Last Version
 					this.print(0, 31 + temp, this.formatAmt(result, 0), "R");
 					if (!value[i][j].equals(BigDecimal.ZERO)) {
-						BigDecimal percent = this.computeDivide(value[i][j], total[j], 4)
-								.multiply(new BigDecimal("100"));
+						BigDecimal percent = this.computeDivide(value[i][j], total[j], 4).multiply(hundred);
 						this.print(0, 42 + temp, this.formatAmt(percent, 2), "R");
 					} else {
 						this.print(0, 42 + temp, "0.00", "R");
@@ -208,20 +207,15 @@ public class LM012Report extends MakeReport {
 			this.print(1, 1, "│　　　　　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│");
 			this.print(0, 7, "總　　　計");
 			this.info("Print total!!!");
-//			BigDecimal result = this.computeDivide(total[0], new BigDecimal("1000000"), 0);
-			BigDecimal result = total[0];// Last Version
+			BigDecimal result = total[0];
 			this.print(0, 31, this.formatAmt(result, 0), "R");
-//			result = this.computeDivide(total[1], new BigDecimal("1000000"), 0);
-			result = total[1];// Last Version
+			result = total[1];
 			this.print(0, 55, this.formatAmt(result, 0), "R");
-//			result = this.computeDivide(total[2], new BigDecimal("1000000"), 0);
-			result = total[2];// Last Version
+			result = total[2];
 			this.print(0, 79, this.formatAmt(result, 0), "R");
-//			result = this.computeDivide(total[3], new BigDecimal("1000000"), 0);
-			result = total[3];// Last Version
+			result = total[3];
 			this.print(0, 103, this.formatAmt(result, 0), "R");
-//			result = this.computeDivide(total[4], new BigDecimal("1000000"), 0);
-			result = total[4];// Last Version
+			result = total[4];
 			this.print(0, 127, this.formatAmt(result, 0), "R");
 
 			this.print(0, 42, "100.00", "R");
@@ -264,8 +258,6 @@ public class LM012Report extends MakeReport {
 				}
 			}
 			for (int i = 0; i < size; i++) {
-//				String temp1 = String.valueOf(Double.parseDouble(te) + 0.25);
-//				BigDecimal[] sum = new BigDecimal[5];
 				this.print(1, 1, "│　　　　　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│　　　　　　│　　　　　│");
 				if (i == 0) {
 					this.print(0, 11, FormatUtil.padLeft(df3.format(rate[0]), 7), "R");
@@ -290,13 +282,14 @@ public class LM012Report extends MakeReport {
 
 		return true;
 	}
+
 	public static String getLastDayOfMonth(String year, String month) {
 		Calendar cal = Calendar.getInstance();
-	    cal.set(Calendar.YEAR, Integer.parseInt(year));
-	    cal.set(Calendar.MONTH, Integer.parseInt(month) - 1);
-	    cal.set(Calendar.DATE, 1);
-	    cal.add(Calendar.MONTH,1);
-	    cal.add(Calendar.DATE, -1);
-	    return String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
+		cal.set(Calendar.YEAR, Integer.parseInt(year));
+		cal.set(Calendar.MONTH, Integer.parseInt(month) - 1);
+		cal.set(Calendar.DATE, 1);
+		cal.add(Calendar.MONTH, 1);
+		cal.add(Calendar.DATE, -1);
+		return String.valueOf(cal.get(Calendar.DAY_OF_MONTH));
 	}
 }

@@ -213,6 +213,25 @@ em = null;
   }
 
   @Override
+  public LoanBook facmNoLastBookDateFirst(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("facmNoLastBookDateFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2 + " bormNo_3 : " +  bormNo_3 + " bormNo_4 : " +  bormNo_4);
+    Optional<LoanBook> loanBookT = null;
+    if (dbName.equals(ContentName.onDay))
+      loanBookT = loanBookReposDay.findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByBookDateDesc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4);
+    else if (dbName.equals(ContentName.onMon))
+      loanBookT = loanBookReposMon.findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByBookDateDesc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4);
+    else if (dbName.equals(ContentName.onHist))
+      loanBookT = loanBookReposHist.findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByBookDateDesc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4);
+    else 
+      loanBookT = loanBookRepos.findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByBookDateDesc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4);
+
+    return loanBookT.isPresent() ? loanBookT.get() : null;
+  }
+
+  @Override
   public LoanBook holdById(LoanBookId loanBookId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

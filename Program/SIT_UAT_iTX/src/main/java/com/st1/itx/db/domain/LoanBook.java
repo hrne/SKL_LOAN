@@ -51,6 +51,7 @@ public class LoanBook implements Serializable {
   private int bookDate = 0;
 
   // 實際還本日期
+  /* 入帳日期 */
   @Column(name = "`ActualDate`")
   private int actualDate = 0;
 
@@ -185,7 +186,7 @@ public class LoanBook implements Serializable {
 
 /**
 	* 實際還本日期<br>
-	* 
+	* 入帳日期
 	* @return Integer
 	*/
   public int getActualDate() {
@@ -194,7 +195,7 @@ public class LoanBook implements Serializable {
 
 /**
 	* 實際還本日期<br>
-	* 
+	* 入帳日期
   *
   * @param actualDate 實際還本日期
   * @throws LogicException when Date Is Warn	*/

@@ -106,7 +106,7 @@ public class L560BReport extends MakeReport {
 			String iCloseMm = iCloseDate.substring(3,5);
 			String iCloseDd = iCloseDate.substring(5);
 
-			iNegDate = String.valueOf(rNegMain.getApplDate());
+			iNegDate = StringUtils.leftPad(String.valueOf(rNegMain.getApplDate()), 7,"0");
 			iNegYyy = iNegDate.substring(0,3);
 			iNegMm = iNegDate.substring(3,5);
 			iNegDd = iNegDate.substring(5);
@@ -182,9 +182,10 @@ public class L560BReport extends MakeReport {
 				iDateUtil.setDate_1(aPayIntDate);
 				iDateUtil.setMons(i);
 				String sPayIntDate = String.valueOf(iDateUtil.getCalenderDay()-19110000);
-				String sYyy = sPayIntDate.substring(0,3);
-				String sMm = sPayIntDate.substring(3,5);
-				String sDd = sPayIntDate.substring(5);
+				String rPayIntDate = StringUtils.leftPad(sPayIntDate,7,"0");
+				String sYyy = rPayIntDate.substring(0,3);
+				String sMm = rPayIntDate.substring(3,5);
+				String sDd = rPayIntDate.substring(5);
 				if (i!=gapMonth) {
 					iDateString = iDateString+sYyy+ "年"+sMm+"月"+sDd+"日、";
 				}else {

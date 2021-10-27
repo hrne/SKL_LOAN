@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -25,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L5903ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -69,11 +66,11 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //		T(3,01:未還;02:已還;09:全部)
 
-		logger.info("L5903.findAll iCustNo=" + iCustNo);
-		logger.info("L5903.findAll iApplDateFrom=" + iApplDateFrom);
-		logger.info("L5903.findAll iApplDateTo=" + iApplDateTo);
-		logger.info("L5903.findAll iUsageCode=" + iUsageCode);
-		logger.info("L5903.findAll iApplCode=" + iApplCode);
+		this.info("L5903.findAll iCustNo=" + iCustNo);
+		this.info("L5903.findAll iApplDateFrom=" + iApplDateFrom);
+		this.info("L5903.findAll iApplDateTo=" + iApplDateTo);
+		this.info("L5903.findAll iUsageCode=" + iUsageCode);
+		this.info("L5903.findAll iApplCode=" + iApplCode);
 
 		sql = " select  i.\"CustNo\"                                      ";
 		sql += "        ,i.\"FacmNo\"                                     ";
@@ -88,6 +85,9 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "        ,i.\"CopyCode\"                                   ";
 		sql += "        ,i.\"Remark\"                                     ";
 		sql += "        ,i.\"ApplObj\"                                    ";
+		sql += "        ,i.\"KeeperEmpNo\"                                ";
+		sql += "        ,i.\"ApplEmpNo\"                                ";
+		sql += "        ,i.\"ReturnEmpNo\"                                ";
 		sql += " from \"InnDocRecord\" i                                  ";
 		sql += " left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"  ";
 		sql += " left join \"CdEmp\" e1 on e1.\"EmployeeNo\" = i.\"KeeperEmpNo\"  ";
@@ -126,14 +126,14 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 		}
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -146,9 +146,9 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findAll(int index, int limit, TitaVo titaVo) throws Exception {

@@ -1,0 +1,322 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5903)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,127)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L5103; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增資料)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5903" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5903]                                 檔案借閱明細資料查詢"],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,#BTNA],
+[#<->#,"#FdApplDateFrom+借閱日期",#ApplDateFrom,"~",#ApplDateTo],
+[#<->#,"#FdUsageCode+用途",#UsageCode,#UsageCodeX],
+[#<->#,"#FdApplCode+狀態",#ApplCode,#ApplCodeX],
+]
+!---------- AP TEXT AREA Variables ----------
+#BTNA=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#FdCustNo=X,2,L
+#FdApplDateFrom=X,2,L
+#FdUsageCode=X,2,L
+T(3,*)
+#FdApplCode=X,2,L
+T(3,*)
+
+! 用途
+#UsageCodeXRimName=x,20,S
+T(3,CdCode.UsageCodeX)
+#UsageCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#UsageCodeXRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@UsageCodeHelp,00:全部;+#HelpDesc1)
+
+!狀態
+#ApplHelp=X,50,S
+T(3,01:未還;02:已還;09:全部)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,26,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@ApplDateFrom,#NTXBUF,8,7)
+T(1,@ApplDateTo,#NTXBUF,15,7)
+T(1,@UsageCode,#NTXBUF,22,2)
+T(1,@ApplCode,#NTXBUF,24,2)
+INVOKEJS(SHOW,p1,02,02,1)
+!<瀏覽>
+#BUFA=X,74,S
+T(2,#CustNo)
+#BINDA=X,1,S
+BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFA;ntxbuf5=type<-1:
+CustNo<-OOCustNo})
+
+#TODAY=A,7,S
+T(1,#SYSDATE,2,7)
+
+#PREVALUE=A,1,S
+E(0,@ApplDateFrom,#TODAY)
+E(0,@ApplDateTo,#TODAY)
+E(0,@UsageCode,0)
+E(0,@ApplCode,1)
+
+! 借款人戶號
+#CustNo=A,7,I
+C(3,#CHAIN,0,$,s)
+
+#MRKEY=_,_,S
+C(3,#CustNo,0,S,T(2,#CustNo))
+
+! 借閱日期
+#ApplDateFrom=D,7,I
+C(3,#CHAIN,0,$,s)
+#ApplDateTo=D,7,I
+C(3,#CHAIN,0,$,s)
+
+! 用途
+#UsageCode=A,2,I
+C(3,#CHAIN,0,$,s)
+HELP(#UsageCodeHelp)
+@V(H,#UsageCodeHelp)
+
+#UsageCodeX=X,4,L
+T(H,#UsageCode,#UsageCodeHelp)
+
+! 狀態
+#ApplCode=A,2,I
+C(3,#CHAIN,0,$,s)
+HELP(#ApplHelp)
+@V(H,#ApplHelp)
+
+#ApplCodeX=X,4,L
+T(H,#ApplCode,#ApplHelp)
+                   
+#RPTFG=A,1,S
+E(0,0)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5903 -----------
+<sub type="FORM" name="L5903">
+
+#SCRTIL=_,_,S
+T(3,[L5903] 檔案借閱明細資料)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 戶號
+#OOCustNo=A,7,O
+! 額度
+#OOFacmNo=A,3,O
+! 申請序號
+#OOApplSeq=A,3,O
+! 戶名
+#OOCustName=X,20,O
+! 管理人
+#OOKeeperEmpName=x,20,O
+! 借閱人
+#OOApplEmpName=x,20,O
+! 借閱日期
+#OOApplDate=D,7,O
+! 歸還日期
+#OOReturnDate=D,7,O
+! 歸還人
+#OOReturnEmpName=x,20,O
+! 用途
+#OOUsageCode=A,2,O
+#OOUsageCodeX=X,4,O
+T(H,#OOUsageCode,#UsageCodeHelp)
+
+! 正本/影本
+#OOCopyCode=A,1,O
+
+! 備註
+#OORemark=X,60,O
+! 備註
+#OOApplObj=A,1,O
+
+! 管理人
+#OOKeeperEmpNo=x,6,O
+! 借閱人
+#OOApplEmpNo=x,6,O
+! 歸還人
+#OOReturnEmpNo=x,6,O
+! 
+
+! 管理人
+#OKeeperEmpNoX=x,27,O
+T(2,#OOKeeperEmpNo+ +#OOKeeperEmpName)
+! 借閱人
+#OApplEmpNoX=x,27,O
+T(2,#OOApplEmpNo+ +#OOApplEmpName)
+! 歸還人
+#OReturnEmpNoX=x,27,O
+ T(2,#OOReturnEmpNo+ +#OOReturnEmpName)
+
+#OOBUF_RETURN=X,200,S
+T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
+   +#OOApplEmpNo+#OOApplDate+#OOReturnDate+#OOReturnEmpNo
+   +#OOUsageCode+#OORemark+2+#OOCopyCode+#OOApplObj)
+
+#OOBTN_RETURN=A,2,O
+IF(#OOReturnDate>0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5103; ntxbuf=#OOBUF_RETURN}))
+
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CustNo
+#ApplDateFrom
+#ApplDateTo
+#UsageCode
+#ApplCode
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5903
+#OOCustNo
+#OOFacmNo
+#OOApplSeq
+#OOCustName
+#OOKeeperEmpName
+#OOApplEmpName
+#OOApplDate
+#OOReturnDate
+#OOReturnEmpName
+#OOUsageCode
+#OORemark
+#OOCopyCode
+#OOApplObj
+#OOKeeperEmpNo
+#OOApplEmpNo
+#OOReturnEmpNo
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+<sub type="PART" name="L5903" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L5903]                                 檔案借閱明細資料查詢"],
+[""],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L5903
+#any={detail:true, header:'L5903.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_RETURN=
+{search:false,formatter:'cust:bind-button:歸還',align:'center',canExport:false,width:35}
+
+! 戶號
+#OOCustNo=戶號
+{width:65,align:'center'}
+! 額度
+#OOFacmNo=額度
+{width:65,align:'center'}
+! 申請序號
+#OOApplSeq=申請序號
+{width:85,align:'center'}
+! 戶名
+#OOCustName=戶名
+{width:95,align:'center'}
+! 管理人
+#OKeeperEmpNoX=管理人
+{width:100,align:'center'}
+! 借閱人
+#OApplEmpNoX=借閱人
+{width:100,align:'center'}
+! 借閱日期
+#OOApplDate=借閱日期
+{width:85,align:'center'}
+! 歸還日期
+#OOReturnDate=歸還日期
+{width:85,align:'center'}
+! 歸還人
+#OReturnEmpNoX=歸還人
+{width:100,align:'center'}
+! 用途
+#OOUsageCodeX=用途
+{width:65,align:'center'}
+! 備註
+#OORemark=備註
+{width:95,align:'center'}
+
+^
+<include src="PRT.icf::INQ04.sel" map="i=L5903;cpi=15"/>
+#CustNo
+#ApplDateFrom
+#ApplDateTo
+#UsageCode
+#ApplCode
+%
+#OOCustNo
+#OOFacmNo
+#OOApplSeq
+#OOCustName
+#OOKeeperEmpNo
+#OOApplEmpNo
+#OOApplDate
+#OOReturnDate
+#OOReturnEmpNo
+#OOUsageCode
+#OORemark
+@^
+</sub>

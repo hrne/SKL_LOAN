@@ -6,8 +6,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -23,7 +21,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Component("L9704Report")
 @Scope("prototype")
 public class L9704Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9704Report.class);
 
 	@Autowired
 	L9704ServiceImpl l9704ServiceImpl;
@@ -65,8 +62,7 @@ public class L9704Report extends MakeReport {
 	private void exportExcel(int thisMonth, List<Map<String, String>> listL9704, TitaVo titaVo) throws LogicException {
 		this.info("L9704 exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9704", "催收款明細表", "L9704催收款明細表",
-				"L9704_底稿_催收款明細表.xlsx", "工作表1", this.showRocDate(thisMonth * 100 + 1, 5));
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9704", "催收款明細表", "L9704催收款明細表", "L9704_底稿_催收款明細表.xlsx", "工作表1", this.showRocDate(thisMonth * 100 + 1, 5));
 
 		fontStyleVo = new ExcelFontStyleVo();
 
@@ -128,50 +124,38 @@ public class L9704Report extends MakeReport {
 				makeExcel.setValue(printRow, 6, this.showRocDate(ovduDate, 1), fontStyleVo);
 
 				// F7 上月催收本金餘額
-				BigDecimal lastMonthOvduPrinBal = mapL9704.get("F7") == null ? BigDecimal.ZERO
-						: new BigDecimal(mapL9704.get("F7"));
+				BigDecimal lastMonthOvduPrinBal = getBigDecimal(mapL9704.get("F7"));
 
 				makeExcel.setValue(printRow, 7, lastMonthOvduPrinBal, "#,##0", "R", fontStyleVo);
 
 				// F8 上月催收利息餘額 + 上月催收違約金餘額
-				BigDecimal lastMonthOvduIntBal = mapL9704.get("F8") == null ? BigDecimal.ZERO
-						: mapL9704.get("F8").equals("1") ? BigDecimal.ZERO
-                                                : new BigDecimal(mapL9704.get("F8"));
+				BigDecimal lastMonthOvduIntBal = mapL9704.get("F8").equals("1") ? BigDecimal.ZERO : getBigDecimal(mapL9704.get("F8"));
 
 				makeExcel.setValue(printRow, 8, lastMonthOvduIntBal, "#,##0", "R", fontStyleVo);
 
 				// 上月催收餘額 = F7 + F8
-				makeExcel.setValue(printRow, 9, lastMonthOvduPrinBal.add(lastMonthOvduIntBal), "#,##0", "R",
-						fontStyleVo);
+				makeExcel.setValue(printRow, 9, lastMonthOvduPrinBal.add(lastMonthOvduIntBal), "#,##0", "R", fontStyleVo);
 
 				// F9 本月催收本金餘額
-				BigDecimal thisMonthOvduPrinBal = mapL9704.get("F9") == null ? BigDecimal.ZERO
-                                                : mapL9704.get("F8").equals("1") ? new BigDecimal("1")
-						: new BigDecimal(mapL9704.get("F9"));
+				BigDecimal thisMonthOvduPrinBal = mapL9704.get("F8").equals("1") ? BigDecimal.ONE : getBigDecimal(mapL9704.get("F9"));
 
 				makeExcel.setValue(printRow, 12, thisMonthOvduPrinBal, "#,##0", "R", fontStyleVo);
 
 				// F10 本月催收利息餘額 + 本月催收違約金餘額
-				BigDecimal thisMonthOvduIntBal = mapL9704.get("F10") == null ? BigDecimal.ZERO
-                                                : mapL9704.get("F8").equals("1") ? BigDecimal.ZERO
-						: new BigDecimal(mapL9704.get("F10"));
+				BigDecimal thisMonthOvduIntBal =  mapL9704.get("F8").equals("1") ? BigDecimal.ZERO : getBigDecimal(mapL9704.get("F10"));
 
 				makeExcel.setValue(printRow, 13, thisMonthOvduIntBal, "#,##0", "R", fontStyleVo);
 
 				// 本月催收餘額 = F9 + F10
-				makeExcel.setValue(printRow, 14, thisMonthOvduPrinBal.add(thisMonthOvduIntBal), "#,##0", "R",
-						fontStyleVo);
+				makeExcel.setValue(printRow, 14, thisMonthOvduPrinBal.add(thisMonthOvduIntBal), "#,##0", "R", fontStyleVo);
 
 				// 本月增減-本金 = F9 - F7
-				makeExcel.setValue(printRow, 10, thisMonthOvduPrinBal.subtract(lastMonthOvduPrinBal), "#,##0", "R",
-						fontStyleVo);
+				makeExcel.setValue(printRow, 10, thisMonthOvduPrinBal.subtract(lastMonthOvduPrinBal), "#,##0", "R", fontStyleVo);
 
-                                if (!mapL9704.get("F8").equals("1"))
-                                {
-			 		// 本月增減-利息 = F10 - F8
-					makeExcel.setValue(printRow, 11, thisMonthOvduIntBal.subtract(lastMonthOvduIntBal), "#,##0", "R",
-							fontStyleVo);
-                                }
+				if (!mapL9704.get("F8").equals("1")) {
+					// 本月增減-利息 = F10 - F8
+					makeExcel.setValue(printRow, 11, thisMonthOvduIntBal.subtract(lastMonthOvduIntBal), "#,##0", "R", fontStyleVo);
+				}
 
 				// F11 催收人員姓名
 				String fullname = mapL9704.get("F11");
@@ -233,16 +217,13 @@ public class L9704Report extends MakeReport {
 		makeExcel.setValue(printRow, 13, sumThisMonthOvduIntBal, "#,##0", "R", fontStyleVo);
 
 		// 本月催收餘額 = F9 + F10
-		makeExcel.setValue(printRow, 14, sumThisMonthOvduPrinBal.add(sumThisMonthOvduIntBal), "#,##0", "R",
-				fontStyleVo);
+		makeExcel.setValue(printRow, 14, sumThisMonthOvduPrinBal.add(sumThisMonthOvduIntBal), "#,##0", "R", fontStyleVo);
 
 		// 本月增減-本金 = F9 - F7
-		makeExcel.setValue(printRow, 10, sumThisMonthOvduPrinBal.subtract(sumLastMonthOvduPrinBal), "#,##0", "R",
-				fontStyleVo);
+		makeExcel.setValue(printRow, 10, sumThisMonthOvduPrinBal.subtract(sumLastMonthOvduPrinBal), "#,##0", "R", fontStyleVo);
 
 		// 本月增減-利息 = F10 - F8
-		makeExcel.setValue(printRow, 11, sumThisMonthOvduIntBal.subtract(sumLastMonthOvduIntBal), "#,##0", "R",
-				fontStyleVo);
+		makeExcel.setValue(printRow, 11, sumThisMonthOvduIntBal.subtract(sumLastMonthOvduIntBal), "#,##0", "R", fontStyleVo);
 
 		// 將小計歸零
 		sumLastMonthOvduPrinBal = BigDecimal.ZERO;
@@ -265,24 +246,20 @@ public class L9704Report extends MakeReport {
 		makeExcel.setValue(printRow, 8, totalLastMonthOvduIntBal, "#,##0", "R", fontStyleVo);
 
 		// 上月催收餘額 = F7 + F8
-		makeExcel.setValue(printRow, 9, totalLastMonthOvduPrinBal.add(totalLastMonthOvduIntBal), "#,##0", "R",
-				fontStyleVo);
+		makeExcel.setValue(printRow, 9, totalLastMonthOvduPrinBal.add(totalLastMonthOvduIntBal), "#,##0", "R", fontStyleVo);
 
 		makeExcel.setValue(printRow, 12, totalThisMonthOvduPrinBal, "#,##0", "R", fontStyleVo);
 
 		makeExcel.setValue(printRow, 13, totalThisMonthOvduIntBal, "#,##0", "R", fontStyleVo);
 
 		// 本月催收餘額 = F9 + F10
-		makeExcel.setValue(printRow, 14, totalThisMonthOvduPrinBal.add(totalThisMonthOvduIntBal), "#,##0", "R",
-				fontStyleVo);
+		makeExcel.setValue(printRow, 14, totalThisMonthOvduPrinBal.add(totalThisMonthOvduIntBal), "#,##0", "R", fontStyleVo);
 
 		// 本月增減-本金 = F9 - F7
-		makeExcel.setValue(printRow, 10, totalThisMonthOvduPrinBal.subtract(totalLastMonthOvduPrinBal), "#,##0", "R",
-				fontStyleVo);
+		makeExcel.setValue(printRow, 10, totalThisMonthOvduPrinBal.subtract(totalLastMonthOvduPrinBal), "#,##0", "R", fontStyleVo);
 
 		// 本月增減-利息 = F10 - F8
-		makeExcel.setValue(printRow, 11, totalThisMonthOvduIntBal.subtract(totalLastMonthOvduIntBal), "#,##0", "R",
-				fontStyleVo);
+		makeExcel.setValue(printRow, 11, totalThisMonthOvduIntBal.subtract(totalLastMonthOvduIntBal), "#,##0", "R", fontStyleVo);
 	}
 
 }

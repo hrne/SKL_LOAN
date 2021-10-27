@@ -1,0 +1,757 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L8308)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,350,150];printer.width=[20,20,20,20];order=1;">
+[
+["[L8308]                                 (47)金融機構無擔保債務協議資料檔案"],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdRcDate+協商申請日",#RcDate],
+["#FdPeriod+期數",#Period],["#FdRate+利率",#Rate,"%"],
+["#FdExpLoanAmt+信用貸款債務簽約總金額",#ExpLoanAmt],["#FdCivil323ExpAmt+依民法第323條計算之信用貸款債務總金額",#Civil323ExpAmt],
+["#FdCashCardAmt+現金卡債務簽約總金額",#CashCardAmt],["#FdCivil323CashAmt+依民法第323條計算之現金卡債務總金額",#Civil323CashAmt],
+["#FdCreditCardAmt+信用卡債務簽約總金額",#CreditCardAmt],["#FdCivil323CreditAmt+依民法第323條計算之信用卡債務總金額",#Civil323CreditAmt],
+["#FdTotalAmt+簽約總債務金額",#TotalAmt],["#FdCivil323Amt+依民法第323條計算之債務總金額",#Civil323Amt],
+["#FdInterviewDate+面談日期",#InterviewDate],["#FdPassDate+協議完成日",#PassDate],
+["#FdLimitDate+前置協商註記訊息揭露期限",#LimitDate],["#FdSignDate+簽約完成日期",#SignDate],
+["#FdMonthPayAmt+月付金",#MonthPayAmt],["#FdFirstPayDate+首期應繳日",#FirstPayDate],
+["#FdGradeType+屬二階段還款方案之階段註記",#GradeType,#GradeTypeX],["#FdPayLastAmt+第一階段最後一期應繳金額",#PayLastAmt],
+["#FdPeriod2+第二階段期數",#Period2],["#FdRate2+第二階段利率",#Rate2,"%"],
+["#FdMonthPayAmt2+第二階段協商方案估計月付金",#MonthPayAmt2],["#FdPayLastAmt2+第二階段最後一期應繳金額",#PayLastAmt2],
+[#<->#,"#FdPayAccount+繳款帳號",#PayAccount],
+[#<->#,"#FdPostAddr+最大債權金融機構聲請狀送達地址",#PostAddr],
+[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+]
+
+#FdTranKey=X,2,L
+#FdCustId=X,2,L
+#FdSubmitKey=X,2,L
+#FdRcDate=X,2,L
+#FdPeriod=X,2,L
+#FdRate=X,2,L
+#FdExpLoanAmt=X,2,L
+#FdCivil323ExpAmt=X,2,L
+#FdCashCardAmt=X,2,L
+#FdCivil323CashAmt=X,2,L
+#FdCreditCardAmt=X,2,L
+#FdCivil323CreditAmt=X,2,L
+#FdTotalAmt=X,2,L
+#FdCivil323Amt=X,2,L
+#FdInterviewDate=X,2,L
+#FdPassDate=X,2,L
+#FdLimitDate=X,2,L
+#FdSignDate=X,2,L
+#FdMonthPayAmt=X,2,L
+#FdFirstPayDate=X,2,L
+#FdGradeType=X,2,L
+#FdPayLastAmt=X,2,L
+#FdPeriod2=X,2,L
+#FdRate2=X,2,L
+#FdMonthPayAmt2=X,2,L
+#FdPayLastAmt2=X,2,L
+#FdPayAccount=X,2,L
+#FdPostAddr=X,2,L
+#FdOutJcicTxtDate=X,2,L
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!---------- 日期處理 ----------
+#VIEW_SYSDATE=X,8,S
+D(7,2,#SYSDATE,0,0)
+T(1,#VIEW_SYSDATE,2,7)
+E(0,1)ASGN(AGAIN$)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L8R01.dec"/>
+
+! TranKey
+#CDDEF0001=x,20,S
+T(3,CdCode.TranKey)
+#TranKeyHelp=x,1024,S
+
+!#CDDEF0002=x,20,S
+!T(3,CdCode.GradeType)
+!#GradeTypeDscp=X,50,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranKeyHelp,#HelpDesc1)
+
+
+#ErroMsg=X,100,S
+T(3,日期順序應為：首期應繳日期＞＝簽約完成日期＞＝協議完成日期)
+
+#GradeTypeDscp=X,50,S
+T(3, :非屬二階段還款;1:第一階段;2:第二階段)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic047連動進入),$)
+T(F,@TranKey,0)T(F,@SubmitKey,0)T(F,@RcDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@ExpLoanAmt,0)
+T(F,@Civil323ExpAmt,0)T(F,@CashCardAmt,0)T(F,@Civil323CashAmt,0)T(F,@CreditCardAmt,0)T(F,@Civil323CreditAmt,0)
+T(F,@TotalAmt,0)T(F,@Civil323Amt,0)T(F,@InterviewDate,0)T(F,@PassDate,0)T(F,@LimitDate,0)
+T(F,@SignDate,0)T(F,@MonthPayAmt,0)T(F,@FirstPayDate,0)T(F,@GradeType,0)T(F,@PayLastAmt,0)
+T(F,@Period2,0)T(F,@Rate2,0)T(F,@MonthPayAmt2,0)T(F,@PayLastAmt2,0)T(F,@PayAccount,0)T(F,@PostAddr,0)
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+![連動交易]
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@TranKey_Tmp,#NTXBUF,1,1)
+T(1,@TranKey,#NTXBUF,2,1)
+! 連動傳值處理
+
+! 新增進入
+#Deal_New=X,1,S
+C(5,#TranKey_Tmp,1,$,S)
+! T(2,@TranKey,A)
+T(1,@CustId,#NTXBUF,3,10)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@RcDate,1)T(F,@SubmitKey,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
+T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
+T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
+T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
+K(MODIFYBUTTON,新增)
+T(2,@FdRcDate,*)
+T(2,@FdPeriod,*)
+T(2,@FdRate,*)
+T(2,@FdExpLoanAmt,*)
+T(2,@FdCivil323ExpAmt,*)
+T(2,@FdCashCardAmt,*)
+T(2,@FdCivil323CashAmt,*)
+T(2,@FdCreditCardAmt,*)
+T(2,@FdCivil323CreditAmt,*)
+T(2,@FdTotalAmt,*)
+T(2,@FdCivil323Amt,*)
+T(2,@FdInterviewDate,*)
+T(2,@FdPassDate,*)
+T(2,@FdLimitDate,*)
+T(2,@FdSignDate,*)
+T(2,@FdMonthPayAmt,*)
+T(2,@FdFirstPayDate,*)
+T(2,@FdGradeType,*)
+T(2,@FdPayLastAmt,*)
+T(2,@FdPeriod2,*)
+T(2,@FdRate2,*)
+T(2,@FdMonthPayAmt2,*)
+T(2,@FdPayLastAmt2,*)
+T(2,@FdPayAccount,*)
+T(2,@FdPostAddr,*)
+T(2,@FdSubmitKey,*)
+! 異動進入
+#Deal_Update=X,1,S
+C(5,#TranKey_Tmp,2,$,S)
+! T(2,@TranKey,C)
+T(F,@TranKey,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
+T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
+T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
+T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
+T(2,@FdPeriod,*)
+T(2,@FdRate,*)
+T(2,@FdExpLoanAmt,*)
+T(2,@FdCivil323ExpAmt,*)
+T(2,@FdCashCardAmt,*)
+T(2,@FdCivil323CashAmt,*)
+T(2,@FdCreditCardAmt,*)
+T(2,@FdCivil323CreditAmt,*)
+T(2,@FdTotalAmt,*)
+T(2,@FdCivil323Amt,*)
+T(2,@FdInterviewDate,*)
+T(2,@FdPassDate,*)
+T(2,@FdLimitDate,*)
+T(2,@FdSignDate,*)
+T(2,@FdMonthPayAmt,*)
+T(2,@FdFirstPayDate,*)
+T(2,@FdGradeType,*)
+T(2,@FdPayLastAmt,*)
+T(2,@FdPeriod2,*)
+T(2,@FdRate2,*)
+T(2,@FdMonthPayAmt2,*)
+T(2,@FdPayLastAmt2,*)
+T(2,@FdPayAccount,*)
+T(2,@FdPostAddr,*)
+T(3,@TranKeyHelp,C:異動;D:刪除))
+
+! 查詢進入
+#Deal_Search=X,1,S
+C(5,#TranKey_Tmp,5,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(NOBUTTON,CLOSEY)
+
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,刪除)
+
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L8R18.dec"/>
+#RimUkey=X,32,S
+#RimL8r18=X,1,S
+C(5,#TranKey,A,S,$)
+T(2,@RimUkey,#Ukey)
+RESET_RIM(#RimL8r18,L8R18)
+S(L8R18,1,#RimUkey)
+R(1,L8R18)
+T(2,@TranKey,#L8r18TranKey)
+T(2,@CustId,#L8r18CustId)
+T(2,@SubmitKey,#L8r18SubmitKey)
+E(0,@RcDate,#L8r18RcDate)
+E(0,@Period,#L8r18Period)
+E(0,@Rate,#L8r18Rate)
+E(0,@ExpLoanAmt,#L8r18ExpLoanAmt)
+E(0,@Civil323ExpAmt,#L8r18Civil323ExpAmt)
+E(0,@CashCardAmt,#L8r18CashCardAmt)
+E(0,@Civil323CashAmt,#L8r18Civil323CashAmt)
+E(0,@CreditCardAmt,#L8r18CreditCardAmt)
+E(0,@Civil323CreditAmt,#L8r18Civil323CreditAmt)
+E(0,@TotalAmt,#L8r18TotalAmt)
+E(0,@Civil323Amt,#L8r18Civil323Amt)
+E(0,@InterviewDate,#L8r18InterviewDate)
+E(0,@PassDate,#L8r18PassDate)
+E(0,@LimitDate,#L8r18LimitDate)
+E(0,@SignDate,#L8r18SignDate)
+E(0,@MonthPayAmt,#L8r18MonthPayAmt)
+E(0,@FirstPayDate,#L8r18FirstPayDate)
+T(2,@GradeType,#L8r18GradeType)
+E(0,@PayLastAmt,#L8r18PayLastAmt)
+E(0,@Period2,#L8r18Period2)
+E(0,@Rate2,#L8r18Rate2)
+E(0,@MonthPayAmt2,#L8r18MonthPayAmt2)
+E(0,@PayLastAmt2,#L8r18PayLastAmt2)
+T(2,@PayAccount,#L8r18PayAccount)
+T(2,@PostAddr,#L8r18PostAddr)
+E(0,@OutJcicTxtDate,#L8r18OutJcicTxtDate)
+![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(H,@GradeTypeX,#GradeType,#GradeTypeDscp)
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r18TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+! 調Rim相關 結束
+
+
+! ! 類似的有L8308,L8320
+! #PreValuePostAddr=U,38,S
+! T(2,台北市中正區忠孝西路一段66號18樓)
+! IF(#L8r18PostAddr!="",s,T(2,@PostAddr,#PreValuePostAddr))
+
+![交易代碼]
+#TranKey_Tmp=X,1,S
+#TranKey=X,1,I
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#TranKeyHelp)
+@V(H,#TranKeyHelp)
+C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1)
+T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
+T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
+T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
+T(2,@FdPeriod,*)T(2,@FdRate,*)T(2,@FdExpLoanAmt,*)T(2,@FdCivil323ExpAmt,*)T(2,@FdCashCardAmt,*)
+T(2,@FdCivil323CashAmt,*)T(2,@FdCreditCardAmt,*)T(2,@FdCivil323CreditAmt,*)T(2,@FdTotalAmt,*)
+T(2,@FdCivil323Amt,*)T(2,@FdInterviewDate,*)T(2,@FdPassDate,*)T(2,@FdLimitDate,*)T(2,@FdSignDate,*)
+T(2,@FdMonthPayAmt,*)T(2,@FdFirstPayDate,*)T(2,@FdGradeType,*)T(2,@FdPayLastAmt,*)T(2,@FdPeriod2,*)
+T(2,@FdRate2,*)T(2,@FdMonthPayAmt2,*)T(2,@FdPayLastAmt2,*)T(2,@FdPayAccount,*)T(2,@FdPostAddr,*),
+C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Period,0)T(F,@Rate,0)T(F,@ExpLoanAmt,0)
+T(F,@Civil323ExpAmt,0)T(F,@CashCardAmt,0)T(F,@Civil323CashAmt,0)T(F,@CreditCardAmt,0)T(F,@Civil323CreditAmt,0)
+T(F,@TotalAmt,0)T(F,@Civil323Amt,0)T(F,@InterviewDate,0)T(F,@PassDate,0)T(F,@LimitDate,0)
+T(F,@SignDate,0)T(F,@MonthPayAmt,0)T(F,@FirstPayDate,0)T(F,@GradeType,0)T(F,@PayLastAmt,0)
+T(F,@Period2,0)T(F,@Rate2,0)T(F,@MonthPayAmt2,0)T(F,@PayLastAmt2,0)T(F,@PayAccount,0)T(F,@PostAddr,0)
+T(2,@FdPeriod, )T(2,@FdRate, )T(2,@FdExpLoanAmt, )T(2,@FdCivil323ExpAmt, )T(2,@FdCashCardAmt, )
+T(2,@FdCivil323CashAmt, )T(2,@FdCreditCardAmt, )T(2,@FdCivil323CreditAmt, )T(2,@FdTotalAmt, )
+T(2,@FdCivil323Amt, )T(2,@FdInterviewDate, )T(2,@FdPassDate, )T(2,@FdLimitDate, )T(2,@FdSignDate, )
+T(2,@FdMonthPayAmt, )T(2,@FdFirstPayDate, )T(2,@FdGradeType, )T(2,@FdPayLastAmt, )T(2,@FdPeriod2, )
+T(2,@FdRate2, )T(2,@FdMonthPayAmt2, )T(2,@FdPayLastAmt2, )T(2,@FdPayAccount, )T(2,@FdPostAddr, ),$))
+
+#TranKeyX=X,4,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+T(H,#TranKey,#TranKeyHelp)
+
+![債務人IDN]
+#CustId=X,10,L
+#RimCustId=X,10,S
+<include src="ROM.icf::L8R57.dec"/>
+T(2,@RimCustId,#CustId)
+! 檢核該統編是否存在於客戶檔
+#RimL8R57=X,1,S
+RESET_RIM(#RimL8R57,L8R57)
+S(L8R57,1,#RimCustId)
+R(1,L8R57)
+T(2,@CustIdX,#L8R57CustName)
+
+#CustIdX=X,2.50,L
+
+![報送單位代號]
+#SubmitKey=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@V(7)
+#SubmitKeyX=X,80,L
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+
+![協商申請日]
+#RcDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+D(8)
+@V(7)
+@A(DATE,0,#RcDate)
+
+
+![期數]
+#Period=A,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Period,#L8r18Period),$)
+C(5,#TranKey,D,s,$)
+
+![利率]
+#Rate=m,2.2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Rate,#L8r18Rate),$)
+C(5,#TranKey,D,s,$)
+
+![信用貸款債務簽約總金額]
+#ExpLoanAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@ExpLoanAmt,#L8r18ExpLoanAmt),$)
+C(5,#TranKey,D,s,$)
+
+![現金卡債務簽約總金額]
+#CashCardAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CashCardAmt,#L8r18CashCardAmt),$)
+C(5,#TranKey,D,s,$)
+
+![信用卡債務簽約總金額]
+#CreditCardAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@CreditCardAmt,#L8r18CreditCardAmt),$)
+C(5,#TranKey,D,s,$)
+
+![簽約總債務金額]
+#TotalAmt=M,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@TotalAmt,#L8r18TotalAmt),$)
+C(5,#TranKey,D,s,$)
+
+#CheckTotalAmt=M,15,S
+E(0,#TotalAmt-#ExpLoanAmt-#CashCardAmt-#CreditCardAmt)
+IF(#CheckTotalAmt!=0,$,s)
+V(P,簽約總債務金額需等於 信用貸款債務簽約總金額+現金卡債務簽約總金額+信用卡債務簽約總金額)
+
+![依民法第323條計算之信用貸款債務總金額]
+#Civil323ExpAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Civil323ExpAmt,#L8r18Civil323ExpAmt),$)
+C(5,#TranKey,D,s,$)
+
+![依民法第323條計算之現金卡債務總金額]
+#Civil323CashAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Civil323CashAmt,#L8r18Civil323CashAmt),$)
+C(5,#TranKey,D,s,$)
+
+![依民法第323條計算之信用卡債務總金額]
+#Civil323CreditAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Civil323CreditAmt,#L8r18Civil323CreditAmt),$)
+C(5,#TranKey,D,s,$)
+
+![依民法第323條計算之債務總金額]
+#Civil323Amt=M,10,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Civil323Amt,#L8r18Civil323Amt),$)
+C(5,#TranKey,D,s,$)
+
+#CheckCivil323Amt=M,15,S
+E(0,#Civil323Amt-#Civil323ExpAmt-#Civil323CashAmt-#Civil323CreditAmt)
+IF(#CheckCivil323Amt!=0,$,s)
+V(P,依民法第323條計算之債務總金額需等於 依民法第323條計算之信用貸款債務總金額+依民法第323條計算之現金卡債務總金額+依民法第323條計算之信用卡債務總金額)
+
+
+![面談日期]
+#InterviewDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@InterviewDate,#L8r18InterviewDate),$)
+C(5,#TranKey,D,s,$)
+D(8)
+@A(DATE,0,#InterviewDate)
+
+![協議完成日]
+#PassDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PassDate,#L8r18PassDate),$)
+C(5,#TranKey,D,s,$)
+D(8)
+@A(DATE,0,#PassDate)
+
+![前置協商註記訊息揭露期限]
+#LimitDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@LimitDate,#L8r18LimitDate),$)
+C(5,#TranKey,D,s,$)
+D(8)
+@A(DATE,0,#LimitDate)
+
+![簽約完成日期]
+#SignDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@SignDate,#L8r18SignDate),$)
+C(5,#TranKey,D,s,$)
+D(8)
+@A(DATE,0,#SignDate)
+
+#CheckSignDate=X,1,S
+IF(#SignDate<#PassDate,$,S)
+V(P,#ErroMsg)
+
+![月付金]
+#MonthPayAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@MonthPayAmt,#L8r18MonthPayAmt),$)
+C(5,#TranKey,D,s,$)
+
+![首期應繳日]
+#FirstPayDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@FirstPayDate,#L8r18FirstPayDate),$)
+C(5,#TranKey,D,s,$)
+D(8)
+@A(DATE,0,#FirstPayDate)
+
+#CheckFirstPayDate=X,1,S
+IF(#FirstPayDate<#SignDate,$,S)
+V(P,#ErroMsg)
+
+! #CheckDate=X,1,S
+! !#FirstPayDate[首期應繳日期]3
+! !#SignDate[簽約完成日期]2
+! !#PassDate[協議完成日期]1
+! V(P,#ErroMsg=[日期順序應為：首期應繳日期＞＝簽約完成日期＞＝協議完成日期])
+
+! #FirstPayDate>=#SignDate>=#PassDate
+
+![屬二階段還款方案之階段註記]
+#GradeType=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@GradeType,#L8r18GradeType),$)
+C(5,#TranKey,D,s,$)
+HELP(#GradeTypeDscp)
+@C(4,#GradeType,$,V(H,#GradeTypeDscp))
+T(2,#GradeTypeX,)
+
+#GradeTypeX=X,20,L
+T(H,#GradeType,#GradeTypeDscp)
+
+#CheckPeriod=X,1,S
+IF(#GradeType=="1" && #TranKey!="X",$,s)
+IF(#Period!=72,$,s)
+@V(P,期數只可填072！)
+
+#CheckRate=X,1,S
+IF(#GradeType=="1" || #GradeType=="2",$,s)
+IF(#Rate!=0,$,s)
+@V(P,利率只可填0！)
+
+![防呆應該和L8305相同]
+
+![第一階段最後一期應繳金額]
+#PayLastAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayLastAmt,#L8r18PayLastAmt),$)
+C(5,#TranKey,D,s,$)
+
+#CheckPayLastAmt=X,1,S
+IF(#GradeType=="1" && #PayLastAmt<=0,$,s)
+@V(P,第一階段最後一期應繳金額不可為空且不可小於零！)
+
+#CheckPayLastAmt1=X,1,S
+IF(#GradeType!="1" && #PayLastAmt!=0,$,s)
+@V(P,第一階段最後一期應繳金額須為空白！)
+
+!第一階段最後一期應繳金額[#PayLastAmt]=無擔保金融債務協商總金額[#TotalAmt]-(協商方案估計月付金[#MonthPayAmt]*71期)
+#CheckValue=M,15,S
+E(0,#TotalAmt-#MonthPayAmt*71-#PayLastAmt)
+IF(#TranKey!="X" && #GradeType=="1" && #CheckValue!=0,$,s)
+V(P,第一階段最後一期應繳金額應等於（簽約總債務金額）減（月付金＊71期），請重新輸入)
+
+![第二階段期數]
+#Period2=A,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Period2,#L8r18Period2),$)
+C(5,#TranKey,D,s,$)
+@IF(#GradeType!="2" && #Period2>0,$,s)
+V(P,第二階段期數須為空白！)
+
+#CheckPeriod21=X,1,S
+IF(#GradeType=="2",$,s)
+IF(#Period2==0,$,s)
+V(P,第二階段期數不可為空！)
+
+!#CheckPeriod22=X,1,S
+!IF(#GradeType=="2",$,s)
+!IF(#Period2!=0,$,s)
+!V(P,第二階段期數須為空白！)
+
+
+![第二階段利率]
+#Rate2=m,2.2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@Rate2,#L8r18Rate2),$)
+C(5,#TranKey,D,s,$)
+
+#CheckRate21=X,1,S
+IF(#GradeType=="2",$,s)
+IF(#Rate2==0,$,s)
+V(P,第二階段利率不可為空！)
+
+#CheckRate22=X,1,S
+IF(#GradeType!="2",$,s)
+IF(#Rate2!=0,$,s)
+V(P,第二階段利率須為空白！)
+
+![第二階段協商方案估計月付金]
+#MonthPayAmt2=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@MonthPayAmt2,#L8r18MonthPayAmt2),$)
+C(5,#TranKey,D,s,$)
+
+#CheckMonthPayAmt21=X,1,S
+IF(#GradeType=="2",$,s)
+IF(#MonthPayAmt2==0,$,s)
+V(P,第二階段協商方案估計月付金不可為空！)
+
+#CheckMonthPayAmt22=X,1,S
+IF(#GradeType!="2",$,s)
+IF(#MonthPayAmt2!=0,$,s)
+V(P,第二階段協商方案估計月付金須為空白！)
+
+![第二階段最後一期應繳金額]
+#PayLastAmt2=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayLastAmt2,#L8r18PayLastAmt2),$)
+C(5,#TranKey,D,s,$)
+
+#CheckPayLastAmt21=X,1,S
+IF(#GradeType=="2",$,s)
+IF(#PayLastAmt2==0,$,s)
+V(P,第二階段最後一期應繳金額不可為空！)
+
+#CheckPayLastAmt22=X,1,S
+IF(#GradeType!="2",$,s)
+IF(#PayLastAmt2!=0,$,s)
+V(P,第二階段最後一期應繳金額須為空白！)
+
+
+![繳款帳號]
+#PayAccount=X,40,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PayAccount,#L8r18PayAccount),$)
+C(5,#TranKey,D,s,$)
+@V(8,0,20)
+
+![最大債權金融機構聲請狀送達地址]-可存入38個全形中文字
+#PostAddr=X,76,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey,D,T(2,@PostAddr,#L8r18PostAddr),$)
+C(5,#TranKey,D,s,$)
+@V(8,0,38)
+
+![轉JCIC文字檔日期]
+#OutJcicTxtDate=D,7,L
+
+! 流水號
+#Ukey=X,32,S
+
+! !<儲存>
+! #BUF1=X,10,S
+! T(2,#CUSTID)
+! #BIND1=X,1,S
+! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=#CHAINCD; ntxbuf=#BUF1})
+![列印用系統變數]
+#RPTFG=X,1,S
+E(0,0)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L8308 ----------
+<sub type="FORM" name="L8308">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L8308,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8308] 金融機構無擔保債務協議資料檔案)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranKey_Tmp
+#TranKey
+#CustId
+#SubmitKey
+#RcDate
+#Period
+#Rate
+#ExpLoanAmt
+#Civil323ExpAmt
+#CashCardAmt
+#Civil323CashAmt
+#CreditCardAmt
+#Civil323CreditAmt
+#TotalAmt
+#Civil323Amt
+#InterviewDate
+#PassDate
+#LimitDate
+#SignDate
+#MonthPayAmt
+#FirstPayDate
+#GradeType
+#PayLastAmt
+#Period2
+#Rate2
+#MonthPayAmt2
+#PayLastAmt2
+#PayAccount
+#PostAddr
+#OutJcicTxtDate
+#Ukey
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8308^
+! 調Rim相關 開始
+<include src="ROM.icf::L8R01.tom"/>
+<include src="ROM.icf::L8R18.tom"/>
+<include src="ROM.icf::L8R57.tom"/>
+! 調Rim相關 結束
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L8308" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L8308]                                 金融機構無擔保債務協議資料檔案"],
+[#<->#,"案件編號"],
+[#<->#,"統一編號"],
+["借款人戶號"],
+["核准編號"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

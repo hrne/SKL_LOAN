@@ -24,7 +24,7 @@ E(0,0)
 ["#FdRecordDate+訪談日期  ",#RecordDate],
 ["#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo,"-",#BormNo,#CustName],
 ["#FdRepayDate+預定還款日期",#RepayDate],
-["#FdRepayAmt+預定還款金額",#RepayAmt],
+["#FdRepayAmt+約定還款金額",#RepayAmt],
 ["#FdCareer+職業別",#Career],
 ["#FdIncome+年收入（萬）",#Income],  
 ["#FdRepaySource+還款來源",#RepaySource,#RepaySourceX],
@@ -148,8 +148,8 @@ C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
 #WKNAME=X,1,S
 T(2,@FdRecordDate,#WKSTAR1)
 T(2,@FdCustNo,#WKSTAR1)
-T(2,@FdRepayDate,#WKSTAR2)
-T(2,@FdRepayAmt,#WKSTAR2)
+T(2,@FdRepayDate,#WKPSC)
+T(2,@FdRepayAmt,#WKPSC)
 T(2,@FdCareer,#WKPSC)
 T(2,@FdIncome,#WKPSC)
 T(2,@FdRepaySource,#WKSTAR2)
@@ -222,11 +222,12 @@ T(H,#RepaySourceX,#RepaySource,#ApHelp)
 C(3,#FuncCode,4,s)
 T(1,#DATE,2,7)
 D(8)
-@V(7)A(DATE,0,#RepayDate)
+@A(DATE,0,#RepayDate)
 
-!還款金額
+!約定還款金額
 #RepayAmt=m,14,I
 C(3,#FuncCode,4,s)
+C(3,#RepayDate,0,S,$)
 @V(2,0)
 
 !職業別

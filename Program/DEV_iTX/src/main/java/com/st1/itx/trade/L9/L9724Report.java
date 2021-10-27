@@ -14,10 +14,8 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L9724ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 
 @Component
 @Scope("prototype")
@@ -32,6 +30,9 @@ public class L9724Report extends MakeReport {
 	
 	@Autowired
 	Parse parse;
+	
+	@Autowired
+	DateUtil dUtil;
 
 	String TXCD = "L9724";
 	String TXName = "應收利息之帳齡分析表";
@@ -71,17 +72,30 @@ public class L9724Report extends MakeReport {
 		this.info("L9724Report exportExcel");
 
 		if (newExcel == true) {
-			makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + TXName, TXCD + "_底稿_" + TXName + ".xlsx", SheetName, SheetName);
+			makeExcel.open(titaVo
+					, titaVo.getEntDyI()
+					, titaVo.getKinbr()
+					, TXCD
+					, TXName
+					, TXCD + "_" + TXName
+					, TXCD + "_底稿_" + TXName + ".xlsx"
+					, SheetName
+					, SheetName);
 		} else {
 			makeExcel.setSheet(SheetName);
 		}
 
 		// fill in inputDate with proper format
-		String targetDate = Integer.toString(Integer.parseInt(titaVo.getParam("inputEndOfMonthDate")) + 19110000); // YYYYMMDD
+		String targetDate = parse.IntegerToString(parse.stringToInteger(titaVo.getParam("inputEndOfMonthDate")) + 19110000, 1); // YYYYMMDD
+		
 		// at F1
-		makeExcel.setValue(1, 6, "月差 " + targetDate.substring(0, 4) + "/" + targetDate.substring(4, 6) + "/" + targetDate.substring(6));
+		makeExcel.setValue(1, 6, String.format("月差 %s/%s/%s"
+				                               , targetDate.substring(0, 4)
+				                               , targetDate.substring(4, 6)
+				                               , targetDate.substring(6)
+				                               ));
 
-		if (lList != null && lList.size() != 0) {
+		if (lList != null && !lList.isEmpty()) {
 
 			int rowShift = 0;
 			int totalInterest = 0;
@@ -92,15 +106,17 @@ public class L9724Report extends MakeReport {
 
 				// for later date difference calculation uses.
 				// make LocalDates
-				LocalDate endDate = LocalDate.of(Integer.parseInt(targetDate.substring(0, 4)), Integer.parseInt(targetDate.substring(4, 6)), Integer.parseInt(targetDate.substring(6)));
-				LocalDate startDate = LocalDate.of(Integer.parseInt(tLDVo.get("F4").substring(0, 4)), Integer.parseInt(tLDVo.get("F4").substring(4, 6)),
-						Integer.parseInt(tLDVo.get("F4").substring(6)));
+				
+				dUtil.init();
+				dUtil.setDate_1(tLDVo.get("F4"));
+				dUtil.setDate_2(targetDate);
+				dUtil.dateDiff();
 
 				// withDayOfMonth(1) since for cases like 3/31 and 4/1, it should show as 1
 				// month too.
-				long monthsBetween = ChronoUnit.MONTHS.between(startDate.withDayOfMonth(1), endDate.withDayOfMonth(1));
-				long daysDiffTotal = ChronoUnit.DAYS.between(startDate, endDate);
-				int daysDiffSameMonth = endDate.getDayOfMonth() - startDate.getDayOfMonth();
+				long monthsBetween = dUtil.getMons();
+				long daysDiffTotal = dUtil.getDays();
+				int daysDiffSameMonth = ( dUtil.getDate_2Integer() % 100 ) - (dUtil.getDate_1Integer() % 100);
 
 				// switch by Column: there're more Column than actual query result.
 				for (int col = 0; col < 8; col++) {
@@ -113,7 +129,7 @@ public class L9724Report extends MakeReport {
 					case 3:
 						tmpValue = tLDVo.get("F" + col);
 						totalInterest += Integer.parseInt(tmpValue);
-						makeExcel.setValue(row, col + pivotCol, Integer.parseInt(tmpValue), "R");
+						makeExcel.setValue(row, col + pivotCol, parse.stringToBigDecimal(tmpValue), "R");
 						break;
 					case 4:
 						tmpValue = tLDVo.get("F" + col);
@@ -143,7 +159,7 @@ public class L9724Report extends MakeReport {
 						break;
 					default:
 						tmpValue = tLDVo.get("F" + col);
-						makeExcel.setValue(row, col + pivotCol, Integer.parseInt(tmpValue), "R");
+						makeExcel.setValue(row, col + pivotCol, parse.stringToBigDecimal(tmpValue), "R");
 						break;
 
 					}

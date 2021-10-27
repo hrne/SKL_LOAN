@@ -150,7 +150,7 @@ public class L560AReport extends MakeReport {
 			String iPrDd = iPrevIntDate.substring(5);
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			
-			map.put("RcvName1",iCustName+"    戶號 :" + String.format("%07d", iCustNo));
+			map.put("RcvName1",iCustName+"    戶號 :" + StringUtils.leftPad(iCustNo, 7,"0"));
 			map.put("RcvAddress1",iAddress);
 			map.put("p1", "一、台端前向本公司辦理房屋抵押貸款新台幣"+aLineAmt+"元整，約定於每月二十日繳交應攤還之本息；惟台端僅繳至"+iPrYyy+"年"+iPrMm+"月"+iPrDd+"日，共計積欠"+iOverDueterm+"期未繳付。");
 			map.put("p2", "二、依約定借款人如有一期未繳付應攤還本金或利息時，全部借款視為到期，借款人應即償還全部借款餘額，為此特通知台端三日內繳清所積欠之本金、利息、違約金，否則將聲請法院查封拍賣抵押物追償，事涉台端權益，請速處理，祈勿自誤為禱。");

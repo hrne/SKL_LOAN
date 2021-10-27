@@ -10,8 +10,10 @@ import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -1859,6 +1861,52 @@ public class MakeReport extends CommBuffer {
 	public void exec() throws LogicException {
 		// override this
 
+	}
+	
+	// 為了 formatAmt() 預先建好的單位 prefabs
+	// 利用 static block 做初始化, 確保 formatAmtTemplates 只會創建一次
+	// unmodifiableMap 讓此 map 變成唯讀狀態
+	
+	// key 是次方數
+	// value 是 prefab
+	
+	private static final Map<Integer, BigDecimal> formatAmtTemplates;
+	static {
+		HashMap<Integer, BigDecimal> m = new HashMap<Integer, BigDecimal>();
+		m.put(1, BigDecimal.TEN); // 十
+		m.put(2, new BigDecimal(100)); // 百
+		m.put(3, new BigDecimal(1000)); // 千
+		m.put(4, new BigDecimal(10000)); // 萬
+		m.put(5, new BigDecimal(100000)); // 十萬
+		m.put(6, new BigDecimal(1000000)); // 百萬
+		m.put(7, new BigDecimal(10000000)); // 千萬
+		m.put(8, new BigDecimal(100000000)); // 億
+		formatAmtTemplates = Collections.unmodifiableMap(m);
+	};
+	
+	/**
+	 * @param amt 金額
+	 * @param n 四捨五入至第n位
+	 * @param unitPow 每多少元為單位之次方數（如單位為千元，輸入3）
+	 * @return String 具撇節並已除好的金額格式
+	 */
+	public String formatAmt(String amt, int n, int unitPow)
+	{
+		BigDecimal bd = getBigDecimal(amt);
+		
+		if (unitPow <= 1)
+		{
+			// do nothing
+		} else if (formatAmtTemplates.containsKey(n))
+		{
+			bd = computeDivide(bd, formatAmtTemplates.get(n), 0);
+		} else
+		{
+			// Math.Pow(a,b) -> a 的 b 次方
+			bd = computeDivide(bd, new BigDecimal(Math.pow(10, unitPow)), 0);
+		}
+		
+		return formatAmt(bd, n);
 	}
 
 	/**

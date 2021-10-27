@@ -273,32 +273,33 @@ public class L2480 extends TradeBuffer {
 
 			// FunCd = 2 修改
 		} else if (iFunCd == 2) {
-
-			tClEva = sClEvaService.holdById(tClEvaId, titaVo);
-			if (tClEva == null) {
+			
+			ClEva tClEva1 = new ClEva();
+			tClEva1 = sClEvaService.holdById(tClEvaId, titaVo);
+			if (tClEva1 == null) {
 				throw new LogicException("E0003", "L2480該擔保品編號不存在擔保品重評資料檔(ClEva)");
 			}
 
 			// 變更前
-			ClEva beforeClEva = (ClEva) dataLog.clone(tClEva);
+			ClEva beforeClEva = (ClEva) dataLog.clone(tClEva1);
 
-			tClEva.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
-			tClEva.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
-			tClEva.setEvaNetWorth(parse.stringToBigDecimal(titaVo.getParam("EvaNetWorth")));
-			tClEva.setRentEvaValue(parse.stringToBigDecimal(titaVo.getParam("RentEvaValue")));
-			tClEva.setEvaCompanyId(titaVo.getParam("EvaCompanyId"));
-			tClEva.setEvaCompanyName(titaVo.getParam("EvaCompanyName"));
-			tClEva.setEvaEmpno(titaVo.getParam("EvaEmpno"));
-			tClEva.setEvaReason(parse.stringToInteger(titaVo.getParam("EvaReason")));
-			tClEva.setOtherReason(titaVo.getParam("EvaReasonX").trim());
+			tClEva1.setEvaDate(parse.stringToInteger(titaVo.getParam("EvaDate")));
+			tClEva1.setEvaAmt(parse.stringToBigDecimal(titaVo.getParam("EvaAmt")));
+			tClEva1.setEvaNetWorth(parse.stringToBigDecimal(titaVo.getParam("EvaNetWorth")));
+			tClEva1.setRentEvaValue(parse.stringToBigDecimal(titaVo.getParam("RentEvaValue")));
+			tClEva1.setEvaCompanyId(titaVo.getParam("EvaCompanyId"));
+			tClEva1.setEvaCompanyName(titaVo.getParam("EvaCompanyName"));
+			tClEva1.setEvaEmpno(titaVo.getParam("EvaEmpno"));
+			tClEva1.setEvaReason(parse.stringToInteger(titaVo.getParam("EvaReason")));
+			tClEva1.setOtherReason(titaVo.getParam("EvaReasonX").trim());
 
 			try {
-				tClEva = sClEvaService.update2(tClEva);
+				tClEva1 = sClEvaService.update2(tClEva1);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "擔保品重評資料檔");
 			}
 			// 紀錄變更前變更後
-			dataLog.setEnv(titaVo, beforeClEva, tClEva);
+			dataLog.setEnv(titaVo, beforeClEva, tClEva1);
 			dataLog.exec();
 
 			// 如果為最後一筆序號才更新擔保品主檔與擔保品不動產檔

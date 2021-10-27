@@ -145,7 +145,6 @@ HIDE(#BTND,#BTNA,#BTNB)
 #NTXBUF=X,200,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@ApplCode,#NTXBUF,128,1)
-
 C(3,#ApplCode,0,s,$)
 T(1,@CustNo,#NTXBUF,1,7)
 T(1,@FacmNo,#NTXBUF,8,3)
@@ -204,6 +203,7 @@ T(F,@ApplSeq,1)
 T(F,@ApplEmpNo,1)
 T(F,@UsageCode,1)
 T(F,@CopyCode,1)
+T(F,@KeeperEmpNo,1)
 T(F,@Remark,1)
 T(F,@ApplObj,1)
 SHOW(#UsageCode,#CopyCode,#ApplObj)
@@ -216,9 +216,11 @@ T(F,@ApplSeq,0)
 T(F,@ApplEmpNo,0)
 T(F,@UsageCode,0)
 T(F,@CopyCode,0)
+T(F,@KeeperEmpNo,0)
 T(F,@Remark,0)
 T(F,@ApplObj,0)
 HIDE(#UsageCode,#CopyCode,#ApplObj)
+HIDE(#BTNA)
 ,$)
 T(H,#ApplCode,#ApplCodeHelp)
 IF(#InitApplCode == 1,
@@ -228,6 +230,7 @@ T(F,@ApplSeq,0)
 T(F,@ApplEmpNo,0)
 T(F,@UsageCode,0)
 T(F,@CopyCode,0)
+T(F,@KeeperEmpNo,0)
 T(F,@Remark,0)
 T(F,@ApplObj,0)
 ,$)
@@ -251,6 +254,7 @@ R(1,L5R33)
 #SetValue=A,1,S
 T(2,@CustName,#L5R33CustName)
 C(3,#ApplCode,2,S,$)
+IF(#InitApplCode == 1,s,$)
 E(0,@ApplSeq,#L5R33ApplSeq)
 
 ! 額度編號
@@ -322,14 +326,6 @@ C(3,#ApplCode,1,$,s)
 C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 T(F,@KeeperEmpNo,0)
 
-
-! 員工姓名---調RIM
-C(3,#ApplCode,1,$,s)
-#KeeperEmpNoX=X,8,L
-
-
-
-
 ! 用途
 #UsageCode=A,2,I
 IF(#InitApplCode == 1,s,$)
@@ -380,13 +376,25 @@ A(DATE,0,#ApplDate)
 E(0,@TmpApplDate,#ApplDate)
 
 ! 管理人
-#KeeperEmpNo=X,6,L
+#KeeperEmpNo=X,6,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 C(3,#ApplCode,2,s,$)
 C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
-V(P,請點選[瀏覽]取得員工編號)
+!V(P,請點選[瀏覽]取得員工編號)
 @V(7)
+
+#SendL2r08C=X,1,S
+C(4,#KeeperEmpNo,S,$)
+T(2,@RimEmployeeNo,#KeeperEmpNo)
+RESET_RIM(#SendL2r08C,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@KeeperEmpNoX,#L2r08FullName)
+
+! 員工姓名---調RIM
+C(3,#ApplCode,1,$,s)
+#KeeperEmpNoX=X,8,L
 
 #AlertMsg1=x,32,S
 T(2,歸還日期不可小於借閱日期+#TmpApplDate)
@@ -411,15 +419,24 @@ T(2,#KeeperEmpNo)
 
 
 ! 歸還人
-#ReturnEmpNo=X,6,L
+#ReturnEmpNo=X,6,I
 C(3,#ApplCode,2,$,s)
 C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
-V(P,請點選[瀏覽]取得員工編號)
+!V(P,請點選[瀏覽]取得員工編號)
 @V(7)
 
 #CheckC=A,1,S
 C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
 T(F,@ReturnEmpNo,0)
+
+
+#SendL2r08B=X,1,S
+C(4,#ReturnEmpNo,S,$)
+T(2,@RimEmployeeNo,#ReturnEmpNo)
+RESET_RIM(#SendL2r08B,L2R08)
+S(L2R08,1,#RimTxCode,#RimEmployeeNo,#RimErrorSkip)
+R(1,L2R08)
+T(2,@ReturnEmpNoX,#L2r08FullName)
 
 #ReturnEmpNoX=X,8,L
 

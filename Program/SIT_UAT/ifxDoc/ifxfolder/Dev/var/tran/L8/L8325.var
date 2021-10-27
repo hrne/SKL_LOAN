@@ -98,7 +98,7 @@ T(2,@CourtCodeHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic444連動進入),$)
-T(F,@TranKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0) 
+T(F,@TranKey,0)T(F,@SubmitKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@CustRegAddr,0)T(F,@CustComAddr,0)T(F,@CustRegTelNo,0)T(F,@CustComTelNo,0)T(F,@CustMobilNo,0) 
 #AutoReFresh=A,1,S
 C(3,#CHAIN,1,$,S)
 E(0,1)
@@ -115,7 +115,7 @@ T(1,@TranKey,#NTXBUF,2,1)
 C(5,#TranKey_Tmp,1,$,S)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@TranKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1) 
+T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@CustComTelNo,1)T(F,@CustMobilNo,1) 
 K(MODIFYBUTTON,新增)
 T(2,@FdTranKey,*)
 T(2,@FdApplyDate,*)
@@ -123,6 +123,7 @@ T(2,@FdCourtCode,*)
 T(2,@FdCustRegAddr,*)
 T(2,@FdCustComAddr,*)
 T(2,@FdMain,*)
+T(2,@FdSubmitKey,*)
 T(3,@TranKeyHelp,A:新增;X:補件))
 
 ! 異動進入
@@ -132,7 +133,6 @@ T(F,@TranKey,1)T(F,@CustRegAddr,1)T(F,@CustComAddr,1)T(F,@CustRegTelNo,1)T(F,@Cu
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
 T(2,@FdTranKey,*)
-T(2,@FdApplyDate,*)
 T(2,@FdCustRegAddr,*)
 T(2,@FdCustComAddr,*)
 T(2,@FdMain,*)
@@ -225,9 +225,18 @@ T(2,@CustIdX,#L8R57CustName)
 #CustIdX=X,2.50,L
 
 ![債權金融機構代號]
-#SubmitKey=X,3,L
-#SubmitKeyX=X,80,L
+#SubmitKey=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@V(7)
 
+#SubmitKeyX=X,80,L
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 !款項統一收付申請日
 #ApplyDate=D,7,I

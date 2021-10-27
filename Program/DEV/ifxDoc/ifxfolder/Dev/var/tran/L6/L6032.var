@@ -116,11 +116,11 @@ IF(#CHAIN==1,T(1,#NTXBUF,1,1),s)
 T(3,TWD)
 
 ![會計日期]
-#DATE=D,8,S
-T(4,DATE$)
+#CDATE=D,8,S
+T(4,CDATE$)
 
-#DT=D,7,S
-T(1,#DATE,2,7)
+#CDT=D,7,S
+T(1,#CDATE,2,7)
 
 ![指標利率種類]
 #BaseRateCode=A,2,I
@@ -203,7 +203,7 @@ C(2,#OOEffectFlag,T(3,),
                   T(3,已使用),
                   T(3,未放行))
 C(3,#OOEffectFlag,0,$,s)
-IF(#OOEffectDate>#DT,T(3,#OOEffectFlagX,未生效),T(3,#OOEffectFlagX,已生效))
+IF(#OOEffectDate>#CDT,T(3,#OOEffectFlagX,未生效),T(3,#OOEffectFlagX,已生效))
 
 
 ! 備註

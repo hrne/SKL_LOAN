@@ -34,6 +34,9 @@ public interface LoanBookRepositoryMon extends JpaRepository<LoanBook, LoanBookI
   // CustNo >= ,AND CustNo <= ,AND FacmNo >= ,AND FacmNo <= ,AND BormNo >= ,AND BormNo <=
   public Slice<LoanBook> findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscBookDateAsc(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3, int bormNo_4, int bormNo_5, Pageable pageable);
 
+  // CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND BormNo >= ,AND BormNo <=
+  public Optional<LoanBook> findTopByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByBookDateDesc(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

@@ -49,7 +49,7 @@ public class L3R03 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L3R03 ");
+		logger.info("active L3R03 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -68,9 +68,12 @@ public class L3R03 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "功能 = " + iFuncCode); // 功能選擇錯誤
 		}
 		// 查詢放款約定還本檔
-		LoanBook tLoanBook = loanBookService.findById(new LoanBookId(iCustNo, iFacmNo, iBormNo, iBookDate + 19110000), titaVo);
+		LoanBook tLoanBook = loanBookService.findById(new LoanBookId(iCustNo, iFacmNo, iBormNo, iBookDate + 19110000),
+				titaVo);
 		if (tLoanBook == null) {
 			if (iTxCode.equals("L3130") && (iFuncCode == 1)) {
+				this.totaVo.putParam("OIncludeIntFlag", "");
+				this.totaVo.putParam("OUnpaidIntFlag", "");
 				this.totaVo.putParam("OBookAmt", 0);
 				this.totaVo.putParam("OBookStatus", 0);
 				this.addList(this.totaVo);
@@ -88,6 +91,8 @@ public class L3R03 extends TradeBuffer {
 			}
 		}
 
+		this.totaVo.putParam("OIncludeIntFlag", tLoanBook.getIncludeIntFlag());
+		this.totaVo.putParam("OUnpaidIntFlag", tLoanBook.getUnpaidIntFlag());
 		this.totaVo.putParam("OBookAmt", tLoanBook.getBookAmt());
 		this.totaVo.putParam("OBookStatus", tLoanBook.getStatus());
 

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
@@ -21,12 +22,14 @@ public class L9724ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo, int aging) throws Exception {
 		this.info("l9724.findAll ");
 
@@ -41,33 +44,26 @@ public class L9724ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                   AND lbm.\"BormNo\" = ali.\"BormNo\" ";
 		sql += "      WHERE ali.\"YearMonth\" = :inputYearMonth ";
 		sql += "        AND ali.\"IntStartDate\" > 0 ";
-		if (aging != 9)
-		{
-			sql += "        AND ali.\"Aging\" = :aging ";
-		}
+		sql += "        AND ( ali.\"Aging\" = :aging OR :aging = 9 ) ";
 		sql += "      GROUP BY ali.\"YearMonth\" ";
-        sql += "              ,ali.\"CustNo\" ";
-        sql += "              ,ali.\"IntStartDate\" ";
+		sql += "              ,ali.\"CustNo\" ";
+		sql += "              ,ali.\"IntStartDate\" ";
 		this.info("sql=" + sql);
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 
 		Query query;
 		query = em.createNativeQuery(sql);
-		String inputYearMonth = Integer.toString(Integer.parseInt(titaVo.getParam("inputYear")) + 1911) + titaVo.getParam("inputMonth");
+		int inputYearMonth = parse.stringToInteger(titaVo.getParam("inputYear") + titaVo.getParam("inputMonth")) + 191100;
+		
 		this.info("l9724 input");
 		this.info("inputYearMonth: " + inputYearMonth);
-		this.info("aging: " + Integer.toString(aging));
+		this.info("aging: " + aging);
+		
 		query.setParameter("inputYearMonth", inputYearMonth);
+		query.setParameter("aging", parse.IntegerToString(aging, 1)); // 9 代表出全部資料
 
-		// 9 means All
-		// sorry for magic number
-		if (aging != 9)
-		{
-			query.setParameter("aging", Integer.toString(aging));
-		}
-
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

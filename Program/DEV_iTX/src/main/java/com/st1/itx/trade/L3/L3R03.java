@@ -2,6 +2,8 @@ package com.st1.itx.trade.L3;
 
 import java.util.ArrayList;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,7 +36,7 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R03")
 @Scope("prototype")
 public class L3R03 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3R03.class);
+	private static final Logger logger = LoggerFactory.getLogger(L3R03.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,7 +49,7 @@ public class L3R03 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L3R03 ");
+		logger.info("active L3R03 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -66,9 +68,12 @@ public class L3R03 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "功能 = " + iFuncCode); // 功能選擇錯誤
 		}
 		// 查詢放款約定還本檔
-		LoanBook tLoanBook = loanBookService.findById(new LoanBookId(iCustNo, iFacmNo, iBormNo, iBookDate + 19110000), titaVo);
+		LoanBook tLoanBook = loanBookService.findById(new LoanBookId(iCustNo, iFacmNo, iBormNo, iBookDate + 19110000),
+				titaVo);
 		if (tLoanBook == null) {
 			if (iTxCode.equals("L3130") && (iFuncCode == 1)) {
+				this.totaVo.putParam("OIncludeIntFlag", "");
+				this.totaVo.putParam("OUnpaidIntFlag", "");
 				this.totaVo.putParam("OBookAmt", 0);
 				this.totaVo.putParam("OBookStatus", 0);
 				this.addList(this.totaVo);
@@ -86,6 +91,8 @@ public class L3R03 extends TradeBuffer {
 			}
 		}
 
+		this.totaVo.putParam("OIncludeIntFlag", tLoanBook.getIncludeIntFlag());
+		this.totaVo.putParam("OUnpaidIntFlag", tLoanBook.getUnpaidIntFlag());
 		this.totaVo.putParam("OBookAmt", tLoanBook.getBookAmt());
 		this.totaVo.putParam("OBookStatus", tLoanBook.getStatus());
 

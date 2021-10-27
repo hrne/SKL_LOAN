@@ -170,23 +170,12 @@ public class BankAuthActCom extends TradeBuffer {
 	 * 
 	 * @param createFlag A.新增授權, D.取消授權
 	 * @param titaVo     ..
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public void add(String createFlag, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom add ...");
 		setVarValue(titaVo);
 		showLog();
-
-		// 還款方式為非銀扣時新增還款帳號變更(含還款方式)紀錄檔
-		if (iRepayCode != 2) {
-			if (titaVo.isHcodeNormal()) {
-				addRepayActChangeLog("", titaVo);
-			}
-			if (titaVo.isHcodeErase()) {
-				addRepayActChangeLogDelete(titaVo);
-			}
-			return;
-		}
 
 		if ("A".equals(createFlag)) {
 			if (titaVo.isHcodeNormal()) {
@@ -223,28 +212,32 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 	}
 
+	public void addRepayActChangeLog(TitaVo titaVo) throws LogicException {
+		this.info("bankAuthActCom add ...");
+		setVarValue(titaVo);
+		showLog();
+
+		// 還款方式為非銀扣時新增還款帳號變更(含還款方式)紀錄檔
+		if (titaVo.isHcodeNormal()) {
+			addRepayActChangeLog("", titaVo);
+		}
+		if (titaVo.isHcodeErase()) {
+			addRepayActChangeLogDelete(titaVo);
+		}
+
+	}
+
 	/**
 	 * 刪除授權資料
 	 * 
 	 * @param createFlag A.新增授權, D.取消授權
 	 * @param titaVo     ..
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public void del(String createFlag, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom del Start...");
 		setVarValue(titaVo);
 		showLog();
-
-		// 還款方式為非銀扣時刪除還款帳號變更(含還款方式)紀錄檔
-		if (iRepayCode != 2) {
-			if (titaVo.isHcodeNormal()) {
-				addRepayActChangeLogDelete(titaVo);
-			}
-			if (titaVo.isHcodeErase()) {
-				addRepayActChangeLog("", titaVo);
-			}
-			return;
-		}
 
 		if ("A".equals(createFlag)) {
 			if (titaVo.isHcodeNormal()) {
@@ -510,7 +503,7 @@ public class BankAuthActCom extends TradeBuffer {
 	 * 
 	 * @param iStatus 1:停止使用 0:授權成功(恢復授權)
 	 * @param titaVo  ..
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public void mntPostAuth(String iStatus, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom mntPostAuth ...");
@@ -580,7 +573,7 @@ public class BankAuthActCom extends TradeBuffer {
 	 * 
 	 * @param iStatus 1:停止使用 0:授權成功
 	 * @param titaVo  ..
-	 * @throws LogicException ..
+	 * @throws LogicException
 	 */
 	public void mntAchAuth(String iStatus, TitaVo titaVo) throws LogicException {
 		this.info("bankAuthActCom mntAchAuth ...");
@@ -660,7 +653,6 @@ public class BankAuthActCom extends TradeBuffer {
 			if ("".equals(tBankAuthAct.getStatus().trim())) {
 				throw new LogicException("E0015", "該額度扣款帳號尚未提出授權 " + tBankAuthAct.getRepayAcct());
 			}
-			status = tBankAuthAct.getStatus();
 		}
 		// 同戶扣款帳號
 		tBankAuthAct = getRepayAcct(titaVo);
@@ -715,7 +707,6 @@ public class BankAuthActCom extends TradeBuffer {
 		}
 
 		addRepayActChangeLog(status, titaVo);// 新增還款帳號變更(含還款方式)紀錄檔
-
 		if ("700".equals(iRepayBank)) {
 			if (this.isNewAct) {
 				tBankAuthAct = inserBankAuthAct("01", acctSeq, status, titaVo);
@@ -1132,6 +1123,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 	// 新增還款帳號變更(含還款方式)紀錄檔
 	private void addRepayActChangeLog(String status, TitaVo titaVo) throws LogicException {
+		this.info("addRepayActChangeLog ...");
 		RepayActChangeLog tRepayActChangeLog = new RepayActChangeLog();
 		tRepayActChangeLog.setCustNo(iCustNo);
 		tRepayActChangeLog.setFacmNo(iFacmNo);
@@ -1257,6 +1249,7 @@ public class BankAuthActCom extends TradeBuffer {
 		this.info("iLimitAmt : " + iLimitAmt);
 		this.info("iTitaTxCd : " + iTitaTxCd);
 		this.info("txType : " + txType);
+		this.info("RepayCode : " + iRepayCode);
 	}
 
 }

@@ -2,12 +2,9 @@ package com.st1.itx.trade.LM;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -17,28 +14,32 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM011ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
 
 public class LM011Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM011Report.class);
 
 	@Autowired
 	LM011ServiceImpl lM011ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
+
+	private int dateYear = 0;
+	private int dateMonth = 0;
 	
-	private String dateYear = "";
-	private String dateMonth = "";
+	@Autowired
+	Parse parse;
 
 	public void exec(TitaVo titaVo) throws LogicException {
 		this.info("LM011Report exec start ...");
+
+		dateYear = parse.stringToInteger(titaVo.getParam("Year"));
+		dateMonth = parse.stringToInteger(titaVo.getParam("Month"));
 		
-		dateYear = titaVo.getParam("Year");
-	    dateMonth = titaVo.getParam("Month");
-		int dateSent = Integer.parseInt(dateYear + dateMonth + "00")  + 19110000;	
+		int dateSent = (dateYear + dateMonth) * 100 + 19110000;
 
 		this.info("LM011Report exec dateSent = " + dateSent);
 
@@ -67,12 +68,17 @@ public class LM011Report extends MakeReport {
 
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lLM011, List<Map<String, String>> lLM011Drawdown, int date)
-			throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lLM011, List<Map<String, String>> lLM011Drawdown, int date) throws LogicException {
 		this.info("LM011Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM011", "表外明細",
-				"LM011表外明細" + dateYear + "年" + dateMonth + "月", "LM011表外明細.xlsx", "LNWLCTP");
+		makeExcel.open(titaVo
+				, titaVo.getEntDyI()
+				, titaVo.getKinbr()
+				, "LM011"
+				, "表外明細"
+				, "LM011表外明細" + dateYear + "年" + dateMonth + "月"
+				, "LM011表外明細.xlsx"
+				, "LNWLCTP");
 
 		int row = 2;
 
@@ -80,27 +86,23 @@ public class LM011Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : lLM011) {
 
-				for (int i = 0; i < tLDVo.size(); i++) {
+				for (int i = 0; i <= 21; i++) {
 
 					int col = i + 1;
 
 					String tmpValue = tLDVo.get("F" + i);
 
-//					this.info("exportExcel lLM011 i = " + i);
-//					this.info("exportExcel lLM011 col = " + col);
-//					this.info("exportExcel lLM011 tmpValue = " + tmpValue);
-
-					switch (col) {
-					case 12: // L欄:核准額度
-					case 13: // M欄:放款餘額
-					case 14: // N欄:可動用餘額
+					switch (i) {
+					case 11: // L欄:核准額度
+					case 12: // M欄:放款餘額
+					case 13: // N欄:可動用餘額
 						// 金額
-						makeExcel.setValue(row, col, new BigDecimal(tmpValue), "###0", "R");
+						makeExcel.setValue(row, col, getBigDecimal(tmpValue), "###0", "R");
 						break;
-					case 18: // R欄:信用風險轉換係數
-					case 19: // S欄:表外曝險金額
+					case 17: // R欄:信用風險轉換係數
+					case 18: // S欄:表外曝險金額
 						// 金額
-						makeExcel.setValue(row, col, new BigDecimal(tmpValue), "###0.00", "R");
+						makeExcel.setValue(row, col, getBigDecimal(tmpValue), "###0.00", "R");
 						break;
 					default:
 						makeExcel.setValue(row, col, tmpValue, "R");
@@ -122,7 +124,7 @@ public class LM011Report extends MakeReport {
 
 			for (Map<String, String> tLDVo : lLM011Drawdown) {
 
-				for (int i = 0; i < tLDVo.size(); i++) {
+				for (int i = 0; i <= 21; i++) {
 
 					int col = i + 1;
 
@@ -132,22 +134,22 @@ public class LM011Report extends MakeReport {
 //					this.info("exportExcel lLM011Drawdown col = " + col);
 //					this.info("exportExcel lLM011Drawdown tmpValue = " + tmpValue);
 
-					switch (col) {
-					case 12: // L欄:核准額度
-					case 13: // M欄:放款餘額
-					case 14: // N欄:可動用餘額
+					switch (i) {
+					case 11: // L欄:核准額度
+					case 12: // M欄:放款餘額
+					case 13: // N欄:可動用餘額
 						// 金額
-						makeExcel.setValue(row, col, new BigDecimal(tmpValue), "###0", "R");
+						makeExcel.setValue(row, col, getBigDecimal(tmpValue), "###0", "R");
 						break;
-					case 18: // R欄:信用風險轉換係數
-					case 19: // S欄:表外曝險金額
+					case 17: // R欄:信用風險轉換係數
+					case 18: // S欄:表外曝險金額
 						// 金額
-						makeExcel.setValue(row, col, new BigDecimal(tmpValue), "###0.00", "R");
+						makeExcel.setValue(row, col, getBigDecimal(tmpValue), "###0.00", "R");
 						break;
-					case 20: // 第二個Sheet不顯示借方：備忘分錄會計科目
-					case 21: // 第二個Sheet不顯示貸方：備忘分錄會計科目
+					case 19: // 第二個Sheet不顯示借方：備忘分錄會計科目
+					case 20: // 第二個Sheet不顯示貸方：備忘分錄會計科目
 						break;
-					case 22: // 第二個Sheet此欄位實際印在第20欄
+					case 21: // 第二個Sheet此欄位實際印在第20欄
 						makeExcel.setValue(row, 20, tmpValue, "R");
 						break;
 					default:

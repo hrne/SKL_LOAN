@@ -1,0 +1,548 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L8320)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[300,200,250,250];printer.width=[20,20,20,20];order=1;">
+[
+["[L8320]                                 (62)金融機構無擔保債務變更還款條件協議資料"],
+[#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
+[#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
+[#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+["#FdRcDate+原前置協商申請日",#RcDate],["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
+["#FdCompletePeriod+變更還款條件已履約期數",#CompletePeriod],["#FdPeriod+（第一階梯）期數",#Period],
+["#FdRate+（第一階梯）利率",#Rate,"%"],["#FdExpBalanceAmt+信用貸款協商剩餘債務簽約餘額",#ExpBalanceAmt],
+["#FdCashBalanceAmt+現金卡協商剩餘債務簽約餘額",#CashBalanceAmt],["#FdCreditBalanceAmt+信用卡協商剩餘債務簽約餘額",#CreditBalanceAmt],
+["#FdChaRepayAmt+變更還款條件簽約總債務金額",#ChaRepayAmt],["#FdChaRepayAgreeDate+變更還款條件協議完成日",#ChaRepayAgreeDate],
+["#FdChaRepayViewDate+變更還款條件面談日期",#ChaRepayViewDate],["#FdChaRepayEndDate+變更還款條件簽約完成日期",#ChaRepayEndDate],
+["#FdChaRepayFirstDate+變更還款條件首期應繳款日",#ChaRepayFirstDate],["#FdPayAccount+繳款帳號",#PayAccount],
+[#<->#,"#FdPostAddr+最大債權金融機構聲請狀送達地址",#PostAddr],
+["#FdMonthPayAmt+月付金",#MonthPayAmt],["#FdGradeType+屬階梯式還款註記",#GradeType],
+["#FdPeriod2+第二階梯期數",#Period2],["#FdRate2+第二階梯利率",#Rate2,"%"],
+["#FdMonthPayAmt2+第二階梯月付金",#MonthPayAmt2],["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+]
+
+#FdTranKey=X,2,L
+#FdCustId=X,2,L
+#FdSubmitKey=X,2,L
+#FdRcDate=X,2,L
+#FdChangePayDate=X,2,L
+#FdCompletePeriod=X,2,L
+#FdPeriod=X,2,L
+#FdRate=X,2,L
+#FdExpBalanceAmt=X,2,L
+#FdCashBalanceAmt=X,2,L
+#FdCreditBalanceAmt=X,2,L
+#FdChaRepayAmt=X,2,L
+#FdChaRepayAgreeDate=X,2,L
+#FdChaRepayViewDate=X,2,L
+#FdChaRepayEndDate=X,2,L
+#FdChaRepayFirstDate=X,2,L
+#FdPayAccount=X,2,L
+#FdPostAddr=X,2,L
+#FdMonthPayAmt=X,2,L
+#FdGradeType=X,2,L
+#FdPeriod2=X,2,L
+#FdRate2=X,2,L
+#FdMonthPayAmt2=X,2,L
+#FdOutJcicTxtDate=X,2,L
+
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!---------- 日期處理 ----------
+#VIEW_SYSDATE=X,8,S
+D(7,2,#SYSDATE,0,0)
+T(1,#VIEW_SYSDATE,2,7)
+E(0,1)ASGN(AGAIN$)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L8R01.dec"/>
+#CDDEF0001=x,20,S
+T(3,CdCode.TranKey)
+#TranKeyHelp=x,1024,S
+
+#CDDEF0002=x,20,S
+T(3,CdCode.YesNo)
+#YesNoHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@TranKeyHelp,#HelpDesc1)
+T(2,@YesNoHelp,#HelpDesc2)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic062連動進入),$)
+T(F,@TranKey,0)T(F,@RcDate,0)T(F,@ChangePayDate,0)T(F,@CompletePeriod,0)T(F,@Period,0)T(F,@Rate,0)T(F,@ExpBalanceAmt,0)
+T(F,@CashBalanceAmt,0)T(F,@CreditBalanceAmt,0)T(F,@ChaRepayAmt,0)T(F,@ChaRepayAgreeDate,0)T(F,@ChaRepayViewDate,0)
+T(F,@ChaRepayEndDate,0)T(F,@ChaRepayFirstDate,0)T(F,@PayAccount,0)T(F,@PostAddr,0)T(F,@MonthPayAmt,0)T(F,@GradeType,0)
+T(F,@Period2,0)T(F,@Rate2,0)T(F,@MonthPayAmt2,0)T(F,@SubmitKey,0)
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+![連動交易]
+#NTXBUF=X,138,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@TranKey_Tmp,#NTXBUF,1,1)
+T(1,@TranKey,#NTXBUF,2,1)
+
+! 新增進入
+#Deal_New=X,1,S
+C(5,#TranKey_Tmp,1,$,S)
+T(1,@CustId,#NTXBUF,3,10)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@RcDate,1)T(F,@ChangePayDate,1)T(F,@CompletePeriod,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpBalanceAmt,1)
+T(F,@CashBalanceAmt,1)T(F,@CreditBalanceAmt,1)T(F,@ChaRepayAmt,1)T(F,@ChaRepayAgreeDate,1)T(F,@ChaRepayViewDate,1)
+T(F,@ChaRepayEndDate,1)T(F,@ChaRepayFirstDate,1)T(F,@PayAccount,1)T(F,@PostAddr,1)T(F,@MonthPayAmt,1)T(F,@GradeType,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@SubmitKey,1)
+K(MODIFYBUTTON,新增)
+T(2,@FdRcDate,*)
+T(2,@FdChangePayDate,*)
+T(2,@FdCompletePeriod,*)
+T(2,@FdPeriod,*)
+T(2,@FdRate,*)
+T(2,@FdExpBalanceAmt,*)
+T(2,@FdCashBalanceAmt,*)
+T(2,@FdCreditBalanceAmt,*)
+! T(2,@FdChaRepayAmt,*)
+T(2,@FdChaRepayAgreeDate,*)
+T(2,@FdChaRepayViewDate,*)
+T(2,@FdChaRepayEndDate,*)
+T(2,@FdChaRepayFirstDate,*)
+T(2,@FdPayAccount,*)
+T(2,@FdPostAddr,*)
+T(2,@FdMonthPayAmt,*)
+! T(2,@FdGradeType,*)
+T(2,@FdPeriod2,*)
+T(2,@FdRate2,*)
+T(2,@FdMonthPayAmt2,*)
+T(2,@FdSubmitKey,*)
+! 異動進入
+#Deal_Update=X,1,S
+C(5,#TranKey_Tmp,2,$,S)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(F,@CompletePeriod,1)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpBalanceAmt,1)
+T(F,@CashBalanceAmt,1)T(F,@CreditBalanceAmt,1)T(F,@ChaRepayAmt,1)T(F,@ChaRepayAgreeDate,1)T(F,@ChaRepayViewDate,1)
+T(F,@ChaRepayEndDate,1)T(F,@ChaRepayFirstDate,1)T(F,@PayAccount,1)T(F,@PostAddr,1)T(F,@MonthPayAmt,1)T(F,@GradeType,1)
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,異動)
+T(2,@FdTranKey,*)
+T(2,@FdCompletePeriod,*)
+T(2,@FdPeriod,*)
+T(2,@FdRate,*)
+T(2,@FdExpBalanceAmt,*)
+T(2,@FdCashBalanceAmt,*)
+T(2,@FdCreditBalanceAmt,*)
+! T(2,@FdChaRepayAmt,*)
+T(2,@FdChaRepayAgreeDate,*)
+T(2,@FdChaRepayViewDate,*)
+T(2,@FdChaRepayEndDate,*)
+T(2,@FdChaRepayFirstDate,*)
+T(2,@FdPayAccount,*)
+T(2,@FdPostAddr,*)
+T(2,@FdMonthPayAmt,*)
+! T(2,@FdGradeType,*)
+T(2,@FdPeriod2,*)
+T(2,@FdRate2,*)
+T(2,@FdMonthPayAmt2,*)
+
+! 查詢進入
+#Deal_Search=X,1,S
+C(5,#TranKey_Tmp,5,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(NOBUTTON,CLOSEY)
+
+! 刪除進入
+#Deal_Delete=X,1,S
+C(5,#TranKey_Tmp,4,$,S)
+T(1,@Ukey,#NTXBUF,3,32)
+K(MODIFYBUTTON,刪除)
+
+
+! 預設值
+#Default=X,1,S
+T(2,@SubmitKey,458)
+#RimJcicBankCode=X,3,S
+#RimL8r01=X,1,S
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L8R31.dec"/>
+#RimUkey=X,32,S
+! Rim L8R31.java
+#RimL8r31=X,1,S
+C(5,#TranKey,A,S,$)
+T(2,@RimUkey,#Ukey)
+RESET_RIM(#RimL8r31,L8R31)
+S(L8R31,1,#RimUkey)
+R(1,L8R31)
+T(2,@CustId,#L8r31CustId)
+T(2,@SubmitKey,#L8r31SubmitKey)
+E(0,@RcDate,#L8r31RcDate)
+E(0,@ChangePayDate,#L8r31ChangePayDate)
+E(0,@CompletePeriod,#L8r31CompletePeriod)
+E(0,@Period,#L8r31Period)
+E(0,@Rate,#L8r31Rate)
+E(0,@ExpBalanceAmt,#L8r31ExpBalanceAmt)
+E(0,@CashBalanceAmt,#L8r31CashBalanceAmt)
+E(0,@CreditBalanceAmt,#L8r31CreditBalanceAmt)
+E(0,@ChaRepayAmt,#L8r31ChaRepayAmt)
+E(0,@ChaRepayAgreeDate,#L8r31ChaRepayAgreeDate)
+E(0,@ChaRepayViewDate,#L8r31ChaRepayViewDate)
+E(0,@ChaRepayEndDate,#L8r31ChaRepayEndDate)
+E(0,@ChaRepayFirstDate,#L8r31ChaRepayFirstDate)
+T(2,@PayAccount,#L8r31PayAccount)
+T(2,@PostAddr,#L8r31PostAddr)
+E(0,@MonthPayAmt,#L8r31MonthPayAmt)
+T(2,@GradeType,#L8r31GradeType)
+E(0,@Period2,#L8r31Period2)
+E(0,@Rate2,#L8r31Rate2)
+E(0,@MonthPayAmt2,#L8r31MonthPayAmt2)
+E(0,@OutJcicTxtDate,#L8r31OutJcicTxtDate)
+![下拉選單的值]
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+#Space=X,1,S
+IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
+T(2,@TranKey,#L8r31TranKey)
+T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+! 調Rim相關 結束
+
+! 類似的有L8308,L8320
+#PreValuePostAddr=X,76,S
+! T(2,台北市中正區忠孝西路一段66號18樓)
+IF(#L8r31PostAddr!="",s,T(2,@PostAddr,#PreValuePostAddr))
+
+!---------- AP TEXT AREA Variables ----------
+![交易代碼]
+#TranKey_Tmp=X,1,S
+#TranKey=X,1,L
+C(5,#TranKey_Tmp,1,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+HELP(#TranKeyHelp)
+@V(H,#TranKeyHelp)
+
+#TranKeyX=X,4,L
+
+![債務人IDN]
+#CustId=X,10,L
+#RimCustId=X,10,S
+<include src="ROM.icf::L8R57.dec"/>
+T(2,@RimCustId,#CustId)
+! 檢核該統編是否存在於客戶檔
+#RimL8R57=X,1,S
+RESET_RIM(#RimL8R57,L8R57)
+S(L8R57,1,#RimCustId)
+R(1,L8R57)
+T(2,@CustIdX,#L8R57CustName)
+
+#CustIdX=X,2.50,L
+
+![報送單位代號]
+#SubmitKey=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@V(7)
+
+#SubmitKeyX=X,80,L
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
+
+
+!原前置協商申請日
+#RcDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+D(8)
+@V(7)
+@A(DATE,0,#RcDate)
+
+!申請變更還款條件日
+#ChangePayDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+D(8)
+@V(7)
+@A(DATE,0,#ChangePayDate)
+
+!變更還款條件已履約期數
+#CompletePeriod=A,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+
+!（第一階梯）期數
+#Period=A,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+
+!（第一階梯）利率
+#Rate=m,2.2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+
+!信用貸款協商剩餘債務簽約餘額
+#ExpBalanceAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@E(0,@ChaRepayAmt,#ExpBalanceAmt)
+
+!現金卡協商剩餘債務簽約餘額
+#CashBalanceAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@E(0,@ChaRepayAmt,#ExpBalanceAmt+#CashBalanceAmt)
+!信用卡協商剩餘債務簽約餘額
+#CreditBalanceAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@E(0,@ChaRepayAmt,#ExpBalanceAmt+#CashBalanceAmt+#CreditBalanceAmt)
+!變更還款條件簽約總債務金額
+#ChaRepayAmt=M,10,L
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+
+
+!變更還款條件協議完成日
+#ChaRepayAgreeDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+D(8)
+@A(DATE,0,#ChaRepayAgreeDate)
+
+!變更還款條件面談日期
+#ChaRepayViewDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+D(8)
+@A(DATE,0,#ChaRepayViewDate)
+
+!變更還款條件簽約完成日期
+#ChaRepayEndDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+D(8)
+@A(DATE,0,#ChaRepayEndDate)
+@IF(#ChaRepayEndDate!="",IF(#ChaRepayEndDate>=#ChaRepayAgreeDate,$,V(P,變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日，請重新選擇)),s)
+
+!變更還款條件首期應繳款日
+#ChaRepayFirstDate=D,7,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+D(8)
+@A(DATE,0,#ChaRepayFirstDate)
+@IF(#ChaRepayFirstDate!="",IF(#ChaRepayFirstDate>=#ChaRepayEndDate,$,V(P,變更還款條件首期應繳款日需大於或等於變更還款條件簽約完成日期，請重新選擇)),s)
+
+!繳款帳號-20字元
+#PayAccount=X,40,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@V(8,0,20)
+
+!最大債權金融機構聲請狀送達地址
+#PostAddr=X,76,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@V(8,0,38)
+
+!月付金
+#MonthPayAmt=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+
+!屬階梯式還款註記
+#GradeType=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@C(4,#GradeType,$,C(5,#GradeType,Y,$,V(P,限輸入Y或空白)))
+
+#CheckPeriod=X,1,S
+IF(#GradeType=="Y",$,s)
+IF(#Period=="012" || #Period=="024",s,$)
+V(P,當屬階梯式還款註記選擇「Y」時，第一階梯期數需為「012」或「024」，請重新輸入)
+
+#CheckRate=X,1,S
+IF(#CheckRate==0,s,$)
+V(P,當屬階梯式還款註記選擇「Y」時，第一階梯利率需為「00.00」，請重新輸入)
+
+!第二階梯期數
+#Period2=A,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#GradeType=="N",S,$)
+@IF(#GradeType=="Y" && #Period2==0,V(P,不可為0),s)
+
+#SumPeriod=M,4,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+E(0,#CompletePeriod+#Period+#Period2)
+
+#SumPeriod1=M,4,S
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+E(0,#CompletePeriod+#Period)
+
+#CheckPeriod2=X,1,S
+IF(#Period2!=0 && #SumPeriod>180,V(P,「變更還款條件已履約期數」+「第一階梯期數」+「第二階梯期數」不得超過180，請重新輸入),$)
+IF(#Period2==0 && #SumPeriod1>180,V(P,「變更還款條件已履約期數」+「第一階梯期數」不得超過180，請重新輸入),$)
+
+!第二階梯利率
+#Rate2=m,2.2,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#GradeType=="N",S,$)
+! @IF(#GradeType=="Y" && #Rate2==0,V(P,不可為0),s)
+
+!第二階梯月付金
+#MonthPayAmt2=M,9,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+IF(#GradeType=="N",S,$)
+@IF(#GradeType=="Y" && #MonthPayAmt2==0,V(P,不可為0),s)
+
+![轉JCIC文字檔日期]
+#OutJcicTxtDate=D,7,L
+
+
+! 流水號
+#Ukey=X,32,S
+
+! !<儲存>
+! #BUF1=X,10,S
+! T(2,#CUSTID)
+! #BIND1=X,1,S
+! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=#CHAINCD; ntxbuf=#BUF1})
+#RPTFG=X,1,S
+E(0,0)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L8320 ----------
+<sub type="FORM" name="L8320">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L8320,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L8320] 金融機構無擔保債務變更還款條件協議資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#TranKey_Tmp
+#TranKey
+#CustId
+#SubmitKey
+#RcDate
+#ChangePayDate
+#CompletePeriod
+#Period
+#Rate
+#ExpBalanceAmt
+#CashBalanceAmt
+#CreditBalanceAmt
+#ChaRepayAmt
+#ChaRepayAgreeDate
+#ChaRepayViewDate
+#ChaRepayEndDate
+#ChaRepayFirstDate
+#PayAccount
+#PostAddr
+#MonthPayAmt
+#GradeType
+#Period2
+#Rate2
+#MonthPayAmt2
+#OutJcicTxtDate
+#Ukey
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L8320^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L8R01.tom"/>
+<include src="ROM.icf::L8R31.tom"/>
+<include src="ROM.icf::L8R57.tom"/>
+</sub>
+
+<sub type="PART" name="L8320" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L8320]                                 債務人繳款資料檔案"],
+[#<->#,"案件編號"],
+[#<->#,"統一編號"],
+["借款人戶號"],
+["核准編號"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

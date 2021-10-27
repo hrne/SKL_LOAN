@@ -57,7 +57,15 @@ public class L9707Report extends MakeReport {
 
 	private void testExcel(TitaVo titaVo, List<Map<String, String>> LDList, TxBuffer txbuffer) throws LogicException {
 		this.info("===========in testExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9707", "新增逾放案件明細", "L9707-新增逾放案件明細", "L9707_底稿_新增逾放案件明細.xlsx", "工作表1");
+		makeExcel.open(titaVo
+				, titaVo.getEntDyI()
+				, titaVo.getKinbr()
+				, "L9707"
+				, "新增逾放案件明細"
+				, "L9707-新增逾放案件明細"
+				, "L9707_底稿_新增逾放案件明細.xlsx"
+				, "工作表1");
+		
 		// F0 申請日期
 		// F1 准駁日期
 		// F2 借款人戶號
@@ -96,15 +104,8 @@ public class L9707Report extends MakeReport {
 				
 				int col = 0;
 				
-				// 20211026 xiangwei
-				// 因為現在的 Map<String, String> 同欄位會存兩次 (一個key為Fn, 一個key為欄位alias)
-				// 所以不能用 size() 做 iteration
-				// 先改成這樣, 如果query有改動這裡也需要改
-				
-				// if (value == null) continue;
-				// 雖然也可以work, 但會多跑一倍的次數
-				
-				for (int i = 0; i < 14; i++) {
+				// 如果欄位數量有改變, 這裡也要改
+				for (int i = 0; i <= 13; i++) {
 					col++;
 					String value = tLDVo.get("F"+i);
 					
@@ -112,23 +113,23 @@ public class L9707Report extends MakeReport {
 					case 2:
 						// 資料筆數
 						totalDataCount = totalDataCount.add(BigDecimal.ONE);
-						makeExcel.setValue(row, col, value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value), "R");
+						makeExcel.setValue(row, col, getBigDecimal(value), "R");
 						break;
 					case 5:
 						// 貸出金額
-						BigDecimal F5Value = value == "" || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value);
+						BigDecimal F5Value = getBigDecimal(value);
 						totalLoanAmt = totalLoanAmt.add(F5Value);
 						makeExcel.setValue(row, col, F5Value, "R");
 						break;
 					case 11:
-						makeExcel.setValue(row, col, value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value), "R");
+						makeExcel.setValue(row, col, getBigDecimal(value), "R");
 						break;
 					case 13:
 						// PieceCode有可能為英文字母
-						makeExcel.setValue(row, col, value == null || value.isEmpty() ? BigDecimal.ZERO : value, "L");
+						makeExcel.setValue(row, col, getBigDecimal(value), "L");
 						break;
 					default:
-						makeExcel.setValue(row, col, value == null || value.isEmpty() ? BigDecimal.ZERO : new BigDecimal(value), "R");
+						makeExcel.setValue(row, col, getBigDecimal(value), "R");
 						break;
 					}
 				}

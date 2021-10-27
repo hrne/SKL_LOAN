@@ -66,11 +66,27 @@ public class L3130 extends TradeBuffer {
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 		String iCurrencyCode = titaVo.getParam("CurrencyCode");
 		int iBookDate = this.parse.stringToInteger(titaVo.getParam("BookDate"));
+		int iOldBookDate = this.parse.stringToInteger(titaVo.getParam("OldBookDate"));
 		BigDecimal iBookAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimBookAmt"));
+		String iIncludeIntFlag = titaVo.getParam("IncludeIntFlag");
+		String iUnpaidIntFlag = titaVo.getParam("UnpaidIntFlag");
 
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E0010", "功能 = " + iFuncCode); // 功能選擇錯誤
+		}
+		boolean existence = false;
+		int wkBormNoS = 0;
+		int wkBormNoE = 900;
+		if (iBormNo > 0) {
+			wkBormNoS = iBormNo;
+			wkBormNoE = iBormNo;
+		}
+		// 入帳日或會計日小於等於約定部分償還日期，未過期者僅能一筆
+		LoanBook lastLoanBook = loanBookService.facmNoLastBookDateFirst(iCustNo, iFacmNo, iFacmNo, wkBormNoS, wkBormNoE,
+				titaVo);
+		if (lastLoanBook != null && lastLoanBook.getBookDate() >= this.txBuffer.getTxCom().getTbsdy()) {
+			existence = true;
 		}
 
 		// 更新放款約定還本檔
@@ -82,6 +98,9 @@ public class L3130 extends TradeBuffer {
 		tLoanBookId.setBookDate(iBookDate);
 		switch (iFuncCode) {
 		case 1: // 新增
+			if(existence) {
+				throw new LogicException(titaVo, "E2067", "約定部分償還，未過期者僅能一筆"); // 約定部分償還，未過期者僅能一筆
+			}
 			tLoanBook.setCustNo(iCustNo);
 			tLoanBook.setFacmNo(iFacmNo);
 			tLoanBook.setBormNo(iBormNo);
@@ -89,6 +108,8 @@ public class L3130 extends TradeBuffer {
 			tLoanBook.setLoanBookId(tLoanBookId);
 			tLoanBook.setStatus(0); // 0: 未回收 1: 已回收
 			tLoanBook.setCurrencyCode(iCurrencyCode);
+			tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
+			tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
 			tLoanBook.setBookAmt(iBookAmt);
 			tLoanBook.setRepayAmt(new BigDecimal(0));
 			try {
@@ -100,23 +121,66 @@ public class L3130 extends TradeBuffer {
 			}
 			break;
 		case 2: // 修改
-			tLoanBook = loanBookService.holdById(tLoanBookId);
-			beforeLoanBook = (LoanBook) datalog.clone(tLoanBook);
-			if (tLoanBook == null) {
-				throw new LogicException(titaVo, "E0006", "放款約定還本檔"); // 鎖定資料時，發生錯誤
-			}
-			if (tLoanBook.getStatus() == 1) {
-				throw new LogicException(titaVo, "E3056", "放款約定還本檔"); // 該筆資料已回收
-			}
-			tLoanBook.setBookAmt(iBookAmt);
-			try {
-				tLoanBook = loanBookService.update2(tLoanBook, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", "放款約定還本檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
-			}
 
-			datalog.setEnv(titaVo, beforeLoanBook, tLoanBook);
-			datalog.exec();
+			if (iOldBookDate == iBookDate) {
+
+				tLoanBook = loanBookService.holdById(tLoanBookId);
+				beforeLoanBook = (LoanBook) datalog.clone(tLoanBook);
+				if (tLoanBook == null) {
+					throw new LogicException(titaVo, "E0006", "放款約定還本檔"); // 鎖定資料時，發生錯誤
+				}
+				if (tLoanBook.getStatus() == 1) {
+					throw new LogicException(titaVo, "E3056", "放款約定還本檔"); // 該筆資料已回收
+				}
+				tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
+				tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
+				tLoanBook.setBookAmt(iBookAmt);
+				try {
+					tLoanBook = loanBookService.update2(tLoanBook, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", "放款約定還本檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+				}
+
+				datalog.setEnv(titaVo, beforeLoanBook, tLoanBook);
+				datalog.exec();
+
+				// 修改日期時先刪除後新增
+			} else {
+
+				LoanBookId tOldLoanBookId = new LoanBookId();
+				LoanBook tOldLoanBook = new LoanBook();
+				tOldLoanBookId.setCustNo(iCustNo);
+				tOldLoanBookId.setFacmNo(iFacmNo);
+				tOldLoanBookId.setBormNo(iBormNo);
+				tOldLoanBookId.setBookDate(iOldBookDate);
+
+				tOldLoanBook = loanBookService.holdById(tOldLoanBookId);
+
+				try {
+					loanBookService.delete(tOldLoanBook, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", "放款約定還本檔 " + e.getErrorMsg()); // 刪除資料時，發生錯誤
+				}
+
+				tLoanBook.setCustNo(iCustNo);
+				tLoanBook.setFacmNo(iFacmNo);
+				tLoanBook.setBormNo(iBormNo);
+				tLoanBook.setBookDate(iBookDate);
+				tLoanBook.setLoanBookId(tLoanBookId);
+				tLoanBook.setStatus(0); // 0: 未回收 1: 已回收
+				tLoanBook.setCurrencyCode(iCurrencyCode);
+				tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
+				tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
+				tLoanBook.setBookAmt(iBookAmt);
+				tLoanBook.setRepayAmt(new BigDecimal(0));
+				try {
+					loanBookService.insert(tLoanBook, titaVo);
+				} catch (DBException e) {
+					if (e.getErrorId() == 2) {
+						throw new LogicException(titaVo, "E0005", "放款約定還本檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
+					}
+				}
+			}
 
 			break;
 		case 4: // 刪除

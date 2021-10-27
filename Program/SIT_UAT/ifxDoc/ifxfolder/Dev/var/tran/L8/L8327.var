@@ -97,7 +97,7 @@ T(2,@CourtCodeHelp,#HelpDesc2)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030-Jcic447連動進入),$)
-T(F,@TranKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)   
+T(F,@TranKey,0)T(F,@SubmitKey,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@Civil323Amt,0)T(F,@TotalAmt,0)T(F,@FirstPayDate,0)T(F,@Period,0)T(F,@Rate,0)T(F,@MonthPayAmt,0)T(F,@PayAccount,0)   
 #AutoReFresh=A,1,S
 C(3,#CHAIN,1,$,S)
 E(0,1)
@@ -114,7 +114,7 @@ T(1,@TranKey,#NTXBUF,2,1)
 C(5,#TranKey_Tmp,1,$,S)
 T(1,@CustId,#NTXBUF,3,10)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@TranKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)   
+T(F,@TranKey,1)T(F,@SubmitKey,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@Civil323Amt,1)T(F,@TotalAmt,1)T(F,@FirstPayDate,1)T(F,@Period,1)T(F,@Rate,1)T(F,@MonthPayAmt,1)T(F,@PayAccount,1)   
 K(MODIFYBUTTON,新增)
 T(2,@FdTranKey,*)
 T(2,@FdApplyDate,*)
@@ -122,6 +122,7 @@ T(2,@FdCourtCode,*)
 T(2,@FdFirstPayDate,*)
 T(2,@FdSignDate,*)
 T(2,@FdPayAccount,*)
+T(2,@FdSubmitKey,*)
 T(3,@TranKeyHelp,A:新增;X:補件))
 ! 異動進入
 #Deal_Update=X,1,S
@@ -220,8 +221,18 @@ T(2,@CustIdX,#L8R57CustName)
 #CustIdX=X,2.50,L
 
 ![債權金融機構代號]
-#SubmitKey=X,3,L
+#SubmitKey=X,3,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
+@V(7)
+
 #SubmitKeyX=X,80,L
+T(2,@RimJcicBankCode,#SubmitKey)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@SubmitKeyX,#L8r01JcicBankName)
 
 !調解申請日
 #ApplyDate=D,7,I
