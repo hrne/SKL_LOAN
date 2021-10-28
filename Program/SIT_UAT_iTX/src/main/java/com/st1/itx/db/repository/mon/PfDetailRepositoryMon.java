@@ -33,6 +33,9 @@ public interface PfDetailRepositoryMon extends JpaRepository<PfDetail, Long> {
   // CustNo = ,AND FacmNo = ,AND BormNo = ,AND BorxNo = 
   public Slice<PfDetail> findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByPerfDateAsc(int custNo_0, int facmNo_1, int bormNo_2, int borxNo_3, Pageable pageable);
 
+  // CustNo = ,AND FacmNo = ,AND BormNo =
+  public Slice<PfDetail> findAllByCustNoIsAndFacmNoIsAndBormNoIs(int custNo_0, int facmNo_1, int bormNo_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

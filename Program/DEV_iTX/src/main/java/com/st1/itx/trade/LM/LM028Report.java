@@ -20,7 +20,6 @@ import com.st1.itx.util.common.MakeReport;
 @Component
 @Scope("prototype")
 public class LM028Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM028Report.class);
 
 	@Autowired
 	MonthlyLM028Service sMonthlyLM028Service;
@@ -38,7 +37,7 @@ public class LM028Report extends MakeReport {
 
 		this.info("LM028Report exec Usp begin.");
 		try {
-		sMonthlyLM028Service.Usp_L9_MonthlyLM028_Upd(iTbsdyf, titaVo.getEmpNos(), titaVo);
+			sMonthlyLM028Service.Usp_L9_MonthlyLM028_Upd(iTbsdyf, titaVo.getEmpNos(), titaVo);
 		} catch (Exception e) {
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
@@ -64,51 +63,49 @@ public class LM028Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<MonthlyLM028> lMonthlyLM028) throws LogicException {
 		this.info("LM028Report exportExcel start ...");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM028", "預估現金流量", "LM028預估現金流量", "預估現金流量.xlsx",
-				"DEL5");
-		if (lMonthlyLM028 == null || lMonthlyLM028.size() == 0) {
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM028", "預估現金流量", "LM028預估現金流量", "預估現金流量.xlsx", "DEL5");
+		if (lMonthlyLM028 == null || lMonthlyLM028.isEmpty()) {
 			makeExcel.setValue(2, 1, "本日無資料");
-		}
-		else {
-		// 有標題列,從第2列開始塞值
-		int row = 2;
+		} else {
+			// 有標題列,從第2列開始塞值
+			int row = 2;
 
-		for (MonthlyLM028 tMonthlyLM028 : lMonthlyLM028) {
+			for (MonthlyLM028 tMonthlyLM028 : lMonthlyLM028) {
 
-			makeExcel.setValue(row, 1, tMonthlyLM028.getLMSSTS());
-			makeExcel.setValue(row, 2, tMonthlyLM028.getCUSENT());
-			makeExcel.setValue(row, 3, tMonthlyLM028.getCUSBRH());
-			makeExcel.setValue(row, 4, tMonthlyLM028.getLMSACN());
-			makeExcel.setValue(row, 5, tMonthlyLM028.getLMSAPN());
-			makeExcel.setValue(row, 6, tMonthlyLM028.getLMSASQ());
-			makeExcel.setValue(row, 7, tMonthlyLM028.getIRTRAT(), "###0.0000");
-			makeExcel.setValue(row, 8, tMonthlyLM028.getLMSISC());
-			makeExcel.setValue(row, 9, tMonthlyLM028.getLMSPBK());
-			makeExcel.setValue(row, 10, tMonthlyLM028.getAPLMON());
-			makeExcel.setValue(row, 11, tMonthlyLM028.getAPLDAY());
-			makeExcel.setValue(row, 12, tMonthlyLM028.getLMSLBL(), "###0");
-			makeExcel.setValue(row, 13, tMonthlyLM028.getAILIRT());
-			makeExcel.setValue(row, 14, tMonthlyLM028.getPOSCDE());
-			makeExcel.setValue(row, 15, tMonthlyLM028.getLMSPDY());
-			makeExcel.setValue(row, 16, tMonthlyLM028.getIRTFSC());
-			makeExcel.setValue(row, 17, tMonthlyLM028.getIRTBCD());
-			makeExcel.setValue(row, 18, tMonthlyLM028.getIRTRATYR1(), "###0.0000");
-			makeExcel.setValue(row, 19, tMonthlyLM028.getIRTRATYR2(), "###0.0000");
-			makeExcel.setValue(row, 20, tMonthlyLM028.getIRTRATYR3(), "###0.0000");
-			makeExcel.setValue(row, 21, tMonthlyLM028.getIRTRATYR4(), "###0.0000");
-			makeExcel.setValue(row, 22, tMonthlyLM028.getIRTRATYR5(), "###0.0000");
-			makeExcel.setValue(row, 23, tMonthlyLM028.getGDRID1());
-			makeExcel.setValue(row, 24, tMonthlyLM028.getGDRID2());
-			makeExcel.setValue(row, 25, tMonthlyLM028.getYYYY());
-			makeExcel.setValue(row, 26, tMonthlyLM028.getMONTH());
-			makeExcel.setValue(row, 27, tMonthlyLM028.getDAY());
-			makeExcel.setValue(row, 28, tMonthlyLM028.getW08CDE());
-			makeExcel.setValue(row, 29, tMonthlyLM028.getRELATION());
-			makeExcel.setValue(row, 30, tMonthlyLM028.getDPTLVL());
-			makeExcel.setValue(row, 31, tMonthlyLM028.getACTFSC());
+				makeExcel.setValue(row, 1, tMonthlyLM028.getLMSSTS());
+				makeExcel.setValue(row, 2, tMonthlyLM028.getCUSENT());
+				makeExcel.setValue(row, 3, tMonthlyLM028.getCUSBRH());
+				makeExcel.setValue(row, 4, tMonthlyLM028.getLMSACN());
+				makeExcel.setValue(row, 5, tMonthlyLM028.getLMSAPN());
+				makeExcel.setValue(row, 6, tMonthlyLM028.getLMSASQ());
+				makeExcel.setValue(row, 7, tMonthlyLM028.getIRTRAT(), "###0.0000");
+				makeExcel.setValue(row, 8, tMonthlyLM028.getLMSISC());
+				makeExcel.setValue(row, 9, tMonthlyLM028.getLMSPBK());
+				makeExcel.setValue(row, 10, tMonthlyLM028.getAPLMON());
+				makeExcel.setValue(row, 11, tMonthlyLM028.getAPLDAY());
+				makeExcel.setValue(row, 12, tMonthlyLM028.getLMSLBL(), "###0");
+				makeExcel.setValue(row, 13, tMonthlyLM028.getAILIRT());
+				makeExcel.setValue(row, 14, tMonthlyLM028.getPOSCDE());
+				makeExcel.setValue(row, 15, tMonthlyLM028.getLMSPDY());
+				makeExcel.setValue(row, 16, tMonthlyLM028.getIRTFSC());
+				makeExcel.setValue(row, 17, tMonthlyLM028.getIRTBCD());
+				makeExcel.setValue(row, 18, tMonthlyLM028.getIRTRATYR1(), "###0.0000");
+				makeExcel.setValue(row, 19, tMonthlyLM028.getIRTRATYR2(), "###0.0000");
+				makeExcel.setValue(row, 20, tMonthlyLM028.getIRTRATYR3(), "###0.0000");
+				makeExcel.setValue(row, 21, tMonthlyLM028.getIRTRATYR4(), "###0.0000");
+				makeExcel.setValue(row, 22, tMonthlyLM028.getIRTRATYR5(), "###0.0000");
+				makeExcel.setValue(row, 23, tMonthlyLM028.getGDRID1());
+				makeExcel.setValue(row, 24, tMonthlyLM028.getGDRID2());
+				makeExcel.setValue(row, 25, tMonthlyLM028.getYYYY());
+				makeExcel.setValue(row, 26, tMonthlyLM028.getMONTH());
+				makeExcel.setValue(row, 27, tMonthlyLM028.getDAY());
+				makeExcel.setValue(row, 28, tMonthlyLM028.getW08CDE());
+				makeExcel.setValue(row, 29, tMonthlyLM028.getRELATION());
+				makeExcel.setValue(row, 30, tMonthlyLM028.getDPTLVL());
+				makeExcel.setValue(row, 31, tMonthlyLM028.getACTFSC());
 
-			row++;
-		}
+				row++;
+			}
 		}
 		for (int i = 1; i <= 31; i++) {
 			makeExcel.setWidth(i, 15);

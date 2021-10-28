@@ -118,11 +118,9 @@ public class L8330 extends TradeBuffer {
 				iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
 				if (iJcicZ447 == null || "D".equals(iJcicZ447.getTranKey())) {
 					if ("A".equals(iTranKey)) {
-						throw new LogicException(titaVo, "E0005",
-								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+						throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
 					} else {
-						throw new LogicException(titaVo, "E0007",
-								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+						throw new LogicException(titaVo, "E0007", "「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
 					}
 				} // 2 end
 
@@ -133,12 +131,11 @@ public class L8330 extends TradeBuffer {
 				} else {
 					sDelayYM = 1;
 				}
-				// @@@SQL-Function需改為custRcSubCourtEq
+				// @@@SQL-Function要改为：custRcSubCourtEq
 				Slice<JcicZ451> sJcicZ451 = sJcicZ451Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 				if (sJcicZ451 != null) {
 					for (JcicZ451 xJcicZ451 : sJcicZ451) {
-						if (!"D".equals(xJcicZ451.getTranKey())
-								&& !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
+						if (!"D".equals(xJcicZ451.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ451.getUkey())) {
 							if ("L".equals(xJcicZ451.getDelayCode())) {
 								sCovDelayYM++;
 							} else {
@@ -167,8 +164,8 @@ public class L8330 extends TradeBuffer {
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {
 				if ("A".equals(iTranKey)) {
-				throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
-				}else {
+					throw new LogicException(titaVo, "E0005", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
+				} else {
 					throw new LogicException(titaVo, "E0007", "同一key值報送(446)前置調解結案通知資料後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.");
 				}
 			} // 5 end

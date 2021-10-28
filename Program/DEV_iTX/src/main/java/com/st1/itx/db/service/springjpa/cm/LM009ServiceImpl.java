@@ -23,10 +23,10 @@ public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
@@ -35,7 +35,7 @@ public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("lM009.findAll ");
 
-		String iYRMO = String.valueOf((parse.stringToInteger(titaVo.getParam("ENTDY")) + 19110000) / 100);
+		int iYRMO = (parse.stringToInteger(titaVo.getParam("ENTDY")) + 19110000) / 100;
 
 		String sql = "";
 		sql += "      SELECT C.\"AcctItem\" ";
@@ -67,7 +67,9 @@ public class LM009ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+
 		query.setParameter("iyemo", iYRMO);
+
 		return this.convertToMap(query);
 	}
 

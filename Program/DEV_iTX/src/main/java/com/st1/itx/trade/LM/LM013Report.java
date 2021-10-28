@@ -31,64 +31,58 @@ public class LM013Report extends MakeReport {
 	private String validDate;
 
 	private String newBorder = "-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------";
-	
+
 	private String reportKind = "";
-	
+
 	private enum DataType {
-		Normal(null),
-		Below_Sum("Below_Sum"),
-		Above_Sum("Above_Sum"),
-		Total("Total");
-		
+		Normal(null), Below_Sum("Below_Sum"), Above_Sum("Above_Sum"), Total("Total");
+
+		// keyword對應query中的CustId欄
+		// 合計, 總計資料會在該欄位有特別的字串
+		// 這些是用來分類特別字串的關鍵字
 		private String keyword;
-		
-		DataType(String keyword)
-		{
+
+		DataType(String keyword) {
 			this.keyword = keyword;
 		}
-		
-		public static DataType getType(String s)
-		{
-			for (int i = 1; i < DataType.values().length; i++)
-			{
-				if (s.contains(DataType.values()[i].keyword))
-				{
+
+		// 找到第一個擁有對應keyword的資料種類並回傳
+		// 因為這裡的設計, 關鍵字不能有重複的情況, 否則會出現意外結果
+		public static DataType getType(String s) {
+			for (int i = 1; i < DataType.values().length; i++) {
+				if (s.contains(DataType.values()[i].keyword)) {
 					return DataType.values()[i];
 				}
 			}
-			
+
 			return DataType.Normal;
 		}
 	}
-	
+
 	private class DataList {
 		private List<Map<String, String>> listBody = null;
 		private String reportKind = "";
 		private Boolean isFirst = false;
-		
-		DataList(List<Map<String, String>> list, String reportKind, Boolean isFirst)
-		{
+
+		DataList(List<Map<String, String>> list, String reportKind, Boolean isFirst) {
 			this.listBody = list;
 			this.reportKind = reportKind;
 			this.isFirst = isFirst;
 		}
-		
-		public List<Map<String, String>> getListBody()
-		{
+
+		public List<Map<String, String>> getListBody() {
 			return this.listBody;
 		}
-		
-		public String getReportKind()
-		{
+
+		public String getReportKind() {
 			return this.reportKind;
 		}
-		
-		public Boolean getIsFirst()
-		{
+
+		public Boolean getIsFirst() {
 			return this.isFirst;
 		}
 	}
-	
+
 	@Override
 	public void printHeader() {
 
@@ -103,8 +97,7 @@ public class LM013Report extends MakeReport {
 
 		print(-1, 192, "機密等級：密");
 		print(-2, 192, "日  期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
-		print(-3, 192, "時  間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		print(-3, 192, "時  間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		print(-4, 192, "頁  數：" + this.getNowPage());
 
 		print(-3, newBorder.length() / 2, "新光人壽保險股份有限公司", "C");
@@ -117,13 +110,10 @@ public class LM013Report extends MakeReport {
 		 * -------------------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6---------7---------8---------9---------0
 		 * ----------------123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 		 */
-		print(-9, 0,
-				          "          放款對象                                                核貸總值                                                                                  帳面總值");
+		print(-9, 0, "          放款對象                                                核貸總值                                                                                  帳面總值");
 		print(-10, 0, "");
-		print(-11, 0,
-   				          "戶號 額度/名稱 統編　　     不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計      不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計");
+		print(-11, 0, "戶號 額度/名稱 統編　　     不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計      不動產抵押       動產抵押       有價證券       銀行保證       專案放款           合計");
 		print(-12, 0, newBorder);
-		
 
 		// 明細起始列(自訂亦必須)
 		this.setBeginRow(13);
@@ -134,15 +124,15 @@ public class LM013Report extends MakeReport {
 	}
 
 	public Boolean exec(TitaVo titaVo) throws LogicException {
-	
+
 		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM013", "金檢報表(放款種類表)", "密", "A4", "L");
 
 		this.setFont(1, 8);
-		
+
 		this.setCharSpaces(0);
-		
-		marginAmount = new BigDecimal(titaVo.getParam("inputAmount"));
-		validDate = showRocDate(Integer.valueOf(titaVo.getParam("inputDate")) + 19110000, 1);
+
+		marginAmount = getBigDecimal(titaVo.getParam("inputAmount"));
+		validDate = showRocDate(titaVo.getParam("inputDate"), 1);
 
 		DataList[] listsArray = new DataList[5];
 
@@ -155,33 +145,31 @@ public class LM013Report extends MakeReport {
 		} catch (Exception e) {
 			this.info("lM013ServiceImpl.findAll error = " + e.toString());
 		}
-		
+
 		for (DataList list : listsArray) {
-			
+
 			List<Map<String, String>> thisList = list.getListBody();
-			
+
 			// 除第一頁以外，換頁
-			
+
 			reportKind = list.getReportKind();
-			
-			if (list.getIsFirst() == false)
-			{
+
+			if (list.getIsFirst() == false) {
 				this.newPage();
 			}
-			
-			if (thisList != null && !thisList.isEmpty()) 
-			{
-				
+
+			if (thisList != null && !thisList.isEmpty()) {
+
 				// 每張表初始化處理
 
 				BigDecimal lineAmtTotal = BigDecimal.ZERO;
 				BigDecimal bookValueTotal = BigDecimal.ZERO;
-				
+
 				Map<String, String> lastTLDVo = null;
-				
+
 				DataType lastDataType = DataType.Normal;
 				DataType thisDataType = DataType.Normal;
-				
+
 				// 開始輸出資料
 				this.print(1, 0, " ");
 
@@ -227,121 +215,112 @@ public class LM013Report extends MakeReport {
 					// 總計 19, L
 
 					//
-					
+
 					// 處理: 判斷是否換了一類, 需要畫線? 需要換行?
-					
+
 					thisDataType = DataType.getType(tLDVo.get("F4"));
-					
-					if (lastTLDVo != null)
-					{
+
+					if (lastTLDVo != null) {
 						lastDataType = DataType.getType(lastTLDVo.get("F4"));
-												
-						// 情況1A  : 兩種資料類型不同，前一筆是正常資料        - 出上一戶最後的合計（顯示名字）, 然後畫線換行
-						// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum)  - 換行
-						// 情況1C  : 兩種資料類型不同，這一筆是總計資料 (Total) - 畫線換行
-						
-						// 情況2A  : 兩種資料類型一樣, 正常資料, 同戶號   - 換行
-						// 情況2B  : 兩種資料類型一樣, 正常資料, 不同戶號 - 出上一戶/筆最後的合計（顯示名字）, 然後畫線換行
-						// 情況2C  : 兩種資料類型一樣，合計資料 (Sum)    - 無處理
-						// 情況2D  : 兩種資料類型一樣，合計資料 (Total)  - 無處理
-						
-						if ( lastDataType != thisDataType )
-						{
-							// 情況1A  : 兩種資料類型不同，前一筆是正常資料        - 出上一戶最後的合計（顯示名字）, 然後畫線換行
-							// 情況1B  : 兩種資料類型不同，前一筆是合計資料 (Sum) - 換行
-							
-							if (lastDataType == DataType.Normal)
-							{
+
+						// 情況1A : 兩種資料類型不同，前一筆是正常資料 - 出上一戶最後的合計（顯示名字）, 然後畫線換行
+						// 情況1B : 兩種資料類型不同，前一筆是合計資料 (Sum) - 換行
+						// 情況1C : 兩種資料類型不同，這一筆是總計資料 (Total) - 畫線換行
+
+						// 情況2A : 兩種資料類型一樣, 正常資料, 同戶號 - 換行
+						// 情況2B : 兩種資料類型一樣, 正常資料, 不同戶號 - 出上一戶/筆最後的合計（顯示名字）, 然後畫線換行
+						// 情況2C : 兩種資料類型一樣，合計資料 (Sum) - 無處理
+						// 情況2D : 兩種資料類型一樣，合計資料 (Total) - 無處理
+
+						if (lastDataType != thisDataType) {
+							// 情況1A : 兩種資料類型不同，前一筆是正常資料 - 出上一戶最後的合計（顯示名字）, 然後畫線換行
+							// 情況1B : 兩種資料類型不同，前一筆是合計資料 (Sum) - 換行
+
+							if (lastDataType == DataType.Normal) {
 								// 情況1A Only
-								
+
 								this.print(1, 0, " ");
-								
+
 								this.print(0, 0, lastTLDVo.get("F2"), "L"); // 戶號
 								this.print(0, 8, StringCut.stringCut(lastTLDVo.get("F5"), 0, 10) + " " + lastTLDVo.get("F4"), "L");
 							}
-							
+
 							// 出上一筆資料最後的合計
 							this.print(0, 113, formatAmt(lineAmtTotal, 0), "R"); // 核貸總值合計
 							this.print(0, 204, formatAmt(bookValueTotal, 0), "R"); // 帳面價值合計
-							
+
 							// 重置
-							
+
 							lineAmtTotal = BigDecimal.ZERO;
 							bookValueTotal = BigDecimal.ZERO;
-							
+
 							if (lastDataType != DataType.Above_Sum) // 偷吃步，如果因為Above_Sum一定在Below_Sum之前，這裡這樣讓合計區不多畫線
 							{
 								this.print(1, 0, newBorder);
-							} else if (thisDataType == DataType.Total)
-							{
-								// 情況1C  : 兩種資料類型不同，這一筆是總計資料 (Total) - 畫線換行
+							} else if (thisDataType == DataType.Total) {
+								// 情況1C : 兩種資料類型不同，這一筆是總計資料 (Total) - 畫線換行
 								// 合計區畫線
 								this.print(1, 0, newBorder);
 							}
 
 							this.print(1, 0, " ");
-	
-						} 
-						
+
+						}
+
 						// 這裡開始都是兩筆DataType相同為前提
-						
-						else if (thisDataType == DataType.Normal && !tLDVo.get("F2").equals(lastTLDVo.get("F2"))) 
-						{
-							// 情況2B  : 兩種資料類型一樣, 正常資料, 不同戶號 - 出上一戶/筆最後的合計（顯示名字）, 然後畫線換行
-	
+
+						else if (thisDataType == DataType.Normal && !tLDVo.get("F2").equals(lastTLDVo.get("F2"))) {
+							// 情況2B : 兩種資料類型一樣, 正常資料, 不同戶號 - 出上一戶/筆最後的合計（顯示名字）, 然後畫線換行
+
 							this.print(1, 0, " ");
-								
+
 							this.print(0, 0, lastTLDVo.get("F2"), "L"); // 戶號
 							this.print(0, 8, StringCut.stringCut(lastTLDVo.get("F5"), 0, 10) + " " + lastTLDVo.get("F4"), "L");
-							
+
 							// 出上一筆資料最後的合計
 							this.print(0, 113, formatAmt(lineAmtTotal, 0), "R"); // 核貸總值合計
 							this.print(0, 204, formatAmt(bookValueTotal, 0), "R"); // 帳面價值合計
-							
+
 							// 重置
-							
+
 							lineAmtTotal = BigDecimal.ZERO;
 							bookValueTotal = BigDecimal.ZERO;
-							
+
 							this.print(1, 0, newBorder);
 							this.print(1, 0, " ");
-							
-						} else if (thisDataType == DataType.Normal) 
-						{
-							// 情況2A  : 兩種資料類型一樣, 正常資料, 同戶號   - 換行
+
+						} else if (thisDataType == DataType.Normal) {
+							// 情況2A : 兩種資料類型一樣, 正常資料, 同戶號 - 換行
 							this.print(1, 0, " ");
 						}
 					}
-					
+
 					// 本行開頭
-					
+
 					this.print(0, 0, tLDVo.get("F2"), "L"); // 戶號
 					this.print(0, 8, tLDVo.get("F3"), "L"); // 額度
-					
+
 					// 僅正常資料的時候出身分證,
 					// 其他情況出姓名(表示合計/總計)
-					
-					if (thisDataType == DataType.Normal)
-					{
-						this.print(0, 15, tLDVo.get("F4"), "L"); // 身分證	
-					} else
-					{
+
+					if (thisDataType == DataType.Normal) {
+						this.print(0, 15, tLDVo.get("F4"), "L"); // 身分證
+					} else {
 						// 姓名 - Sum與Total類資料的此欄為"以上合計/以下合計/總計"
 						// 只有在前一筆資料與這一筆資料種類不同時, 才出字樣
 						// 避免多次重覆輸出疊字
 
-						if (lastTLDVo != null && lastDataType != thisDataType)
-						{
+						if (lastTLDVo != null && lastDataType != thisDataType) {
 							this.print(0, 15, tLDVo.get("F5"), "L");
 						}
 					}
-					
+
 					// 計算合計用
-					lineAmtTotal = lineAmtTotal.add(new BigDecimal(tLDVo.get("F7")));
-					bookValueTotal = bookValueTotal.add(new BigDecimal(tLDVo.get("F8")));
-					
+					lineAmtTotal = lineAmtTotal.add(getBigDecimal(tLDVo.get("F7")));
+					bookValueTotal = bookValueTotal.add(getBigDecimal(tLDVo.get("F8")));
+
 					// 處理: 輸出款項數目
-					
+
 					// 依據款項項目指定X座標
 					switch (tLDVo.get("F6")) {
 					case "0":
@@ -379,21 +358,20 @@ public class LM013Report extends MakeReport {
 					lastTLDVo = tLDVo;
 
 				}
-				
+
 				// 出最後總計的子項合計, 並畫最後的線
-				
+
 				this.print(0, 113, formatAmt(lineAmtTotal, 0), "R"); // 核貸總值合計
 				this.print(0, 204, formatAmt(bookValueTotal, 0), "R"); // 帳面價值合計
-				
+
 				this.print(1, 0, newBorder);
-				
-			} else
-			{
+
+			} else {
 				// 處理: 無資料時
-				
+
 				this.print(1, 0, "本月無資料!");
 			}
-			
+
 		}
 
 		long sno = this.close();

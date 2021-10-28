@@ -41,8 +41,7 @@ public class LM009Report extends MakeReport {
 		this.print(-2, 1, "報  表：" + this.getRptCode());
 		this.print(-2, 50, "應 收 利 息 總 表", "C");
 		this.print(-2, 80, "日　　期：" + this.showBcDate(dDateUtil.getNowStringBc(), 1));
-		this.print(-3, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
+		this.print(-3, 80, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6));
 		this.print(-4, 80, "頁　　次：" + this.getNowPage());
 		this.print(-6, 50, getshowRocDate(this.getReportDate()), "C");
 	}
@@ -62,7 +61,7 @@ public class LM009Report extends MakeReport {
 			this.info("lM009ServiceImpl.findAll error = " + e.toString());
 		}
 
-		if (LM009List != null && LM009List.size() != 0) {
+		if (LM009List != null && !LM009List.isEmpty()) {
 			int i = 0;
 			BigDecimal cnt = BigDecimal.ZERO;
 			BigDecimal amt = BigDecimal.ZERO;
@@ -90,7 +89,7 @@ public class LM009Report extends MakeReport {
 					}
 					this.print(1, 10, "├────────────────────┼───────┼──────────┤");
 					this.print(1, 10, "│　　　　　　　　　　　　　　　　　　　　│　　　　　　　│　　　　　　　　　　│");
-					
+
 					lastAcctItem = tLM009Vo.get("F0");
 					this.print(0, 15, tLM009Vo.get("F0"));
 					this.print(0, 33, tLM009Vo.get("F1"));
@@ -139,9 +138,6 @@ public class LM009Report extends MakeReport {
 			this.print(0, 61, formatAmt(totcnt, 0), "R");
 			this.print(0, 80, formatAmt(totamt, 0), "R");
 			this.print(1, 10, "└────────────────────┴───────┴──────────┘");
-//			this.print(2, 10, "協　　　　　　　經　　　　　　　副　　　　　　　襄　　　　　　　覆　　　　　　　製");
-//			this.print(2, 10, "理　　　　　　　理　　　　　　　理　　　　　　　理　　　　　　　核　　　　　　　製");
-//			this.print(2, 10, "　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　人");
 		} else {
 			this.print(1, 80, "單位：元");
 			this.print(0, 15, "本日無資料");

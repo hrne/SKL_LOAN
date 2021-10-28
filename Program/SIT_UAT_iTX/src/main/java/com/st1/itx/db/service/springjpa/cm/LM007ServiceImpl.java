@@ -17,7 +17,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -27,7 +26,6 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int iTbsdyf, String acSubBookCode, TitaVo titaVo) throws Exception {
 		this.info("lM007.findAll ");
 		this.info("lM007 findAll acSubBookCode = " + acSubBookCode);
@@ -58,7 +56,8 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                  AND F.\"CustNo\" <> 0";
 		sql += "           LEFT JOIN \"LoanBorMain\" L ON L.\"CustNo\" = A.\"CustNo\"";
 		sql += "                                      AND L.\"FacmNo\" = A.\"FacmNo\"";
-		sql += "                                      AND L.\"BormNo\" = A.\"BormNo\"";;
+		sql += "                                      AND L.\"BormNo\" = A.\"BormNo\"";
+		;
 		sql += "           WHERE TRUNC(A.\"AcDate\" / 10000) = :entdy";
 		sql += "             AND A.\"AcctCode\" IN ('IC1', 'IC2', 'IC3', 'IC4', 'IOV', 'IOP')";
 		sql += "      ) S1";
@@ -77,7 +76,6 @@ public class LM007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll_SubBookCodes(TitaVo titaVo) throws Exception {
 		this.info("LM007 findAll_SubBookCodes initiated");
 

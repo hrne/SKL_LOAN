@@ -234,7 +234,7 @@ public class LY002Report extends MakeReport {
 		int eRow = 0;
 		this.info("eva-----");
 		//Test2
-		for (int i = 0, length = mergeEva.size(); i < length; i++) {
+//		for (int i = 0, length = mergeEva.size(); i < length; i++) {
 
 			Iterator<Map<String, Object>> iter = mergeEva.iterator();
 
@@ -242,7 +242,7 @@ public class LY002Report extends MakeReport {
 				
 				tempEvaAmt = new BigDecimal(iter.next().get("eva").toString());
 
-				eRow = sRow + Integer.valueOf(iter.next().get("count").toString()) - 1;
+				eRow = sRow + Integer.valueOf(iter.next().get("count").toString()) -1;
 
 				if (sRow == eRow) {
 
@@ -258,7 +258,7 @@ public class LY002Report extends MakeReport {
 				
 			}
 
-		}
+//		}
 //Test1
 //		for (Map<String, Object> eva : mergeEva) {
 //
@@ -283,9 +283,9 @@ public class LY002Report extends MakeReport {
 		sRow = 7;
 		eRow = 0;
 		//TEST2
-		for (int i = 0, length = mergeLine.size(); i < length; i++) {
+//		for (int i = 0, length = mergeLine.size(); i < length; i++) {
 
-			Iterator<Map<String, Object>> iter = mergeLine.iterator();
+			iter = mergeLine.iterator();
 
 			while (iter.hasNext()) {
 				
@@ -307,7 +307,7 @@ public class LY002Report extends MakeReport {
 				
 			}
 
-		}
+//		}
 //TEST1
 //		for (Map<String, Object> line : mergeLine) {
 //

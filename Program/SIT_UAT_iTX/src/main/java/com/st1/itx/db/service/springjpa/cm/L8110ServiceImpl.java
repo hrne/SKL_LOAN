@@ -5,9 +5,6 @@ import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* AML每日有效客戶名單 */
 public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L8110ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -35,21 +31,19 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> deleteAll(TitaVo titaVo) throws Exception {
 
 		String sql = "　";
 		sql += "	DELETE                                                    \r\n";
 		sql += "	FROM \"AmlCustList\"                                      \r\n";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	public List<Map<String, String>> insertAll(int iDate, int iDate3Y, int iDate5Y, int iAmt, TitaVo titaVo)
-			throws Exception {
+	public List<Map<String, String>> insertAll(int iDate, int iDate3Y, int iDate5Y, int iAmt, TitaVo titaVo) throws Exception {
 
 		String sql = "　";
 		sql += "INSERT INTO \"AmlCustList\"                               \r\n";
@@ -67,10 +61,10 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	          THEN 'Y'                                       \r\n";
 		sql += "	     ELSE 'N'                                            \r\n";
 		sql += "	END                                                      \r\n"; // 註記3
-		sql += ",TIMESTAMP                                                \r\n"; // 建檔日期時間
-		sql += "," + titaVo.getTlrNo() + "                                \r\n"; // 建檔人員
-		sql += ",TIMESTAMP                                                \r\n"; // 最後更新日期時間
-		sql += "," + titaVo.getTlrNo() + "                                \r\n"; // 最後更新人員
+		sql += ",SYSTIMESTAMP                                                \r\n"; // 建檔日期時間
+		sql += ",:TlrNo                                \r\n"; // 建檔人員
+		sql += ",SYSTIMESTAMP                                               \r\n"; // 最後更新日期時間
+		sql += ",:TlrNo                                \r\n"; // 最後更新人員
 		sql += "	FROM                                                     \r\n";
 		sql += "	 (SELECT                                                  \r\n";
 		sql += "		 L.\"CustNo\"         AS  \"CustNo\"                  \r\n"; // 戶號
@@ -110,10 +104,11 @@ public class L8110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       GROUP BY L.\"CustNo\"                                  \r\n";
 		sql += "   )                                                          \r\n";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		return this.convertToMap(query.getResultList());
+		query.setParameter("TlrNo", titaVo.getTlrNo());
+		return this.convertToMap(query, true);
 	}
 }

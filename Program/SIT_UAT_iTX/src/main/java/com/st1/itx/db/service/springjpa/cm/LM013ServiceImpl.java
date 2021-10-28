@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
@@ -22,44 +23,38 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
+	@Autowired
+	Parse parse;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 
 	}
-	
-	public enum EntCodeCondition
-	{
-		Natural("0"),
-		Enterprise("1"),
-		All("%");
-		
+
+	public enum EntCodeCondition {
+		Natural("0"), Enterprise("1"), All("%");
+
 		private String value;
-		
-		EntCodeCondition(String value)
-		{
+
+		EntCodeCondition(String value) {
 			this.value = value;
 		}
 	}
-	
-	public enum IsRelsCondition
-	{
-		Yes("Y"),
-		No("N"),
-		All("%");
-		
+
+	public enum IsRelsCondition {
+		Yes("Y"), No("N"), All("%");
+
 		private String value;
-		
-		IsRelsCondition(String value)
-		{
+
+		IsRelsCondition(String value) {
 			this.value = value;
 		}
 	}
-	
-	@SuppressWarnings("unchecked")
+
 	public List<Map<String, String>> findAll(TitaVo titaVo, EntCodeCondition entCodeCondition, IsRelsCondition isRelsCondition) throws Exception {
 		this.info("lM009.findAll ");
 
-		String entdy = String.valueOf((Integer.valueOf(titaVo.getParam("inputDate")) + 19110000));
+		int entdy = (parse.stringToInteger(titaVo.getParam("inputDate")) + 19110000);
 
 		String sql = " ";
 		sql += "  WITH TotalData AS (  ";
@@ -214,26 +209,26 @@ public class LM013ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  WHERE \"EntCode\" LIKE :EntCodeCondition  ";
 		sql += "    AND \"IsRels\" LIKE :IsRelsCondition  ";
 		sql += "  GROUP BY \"ClCode1\"  ";
-		
+
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		// EntCodeCondition		企金別			0/1
-		// entdy				製表日期		YYYYMMDD
-		// IsRelsCondition      關係人別		Y/N
-		// LineAmtThreshold		核貸總值分界
-		// YearMonth			製表年月		YYYYMM
+		// EntCodeCondition 企金別 0/1
+		// entdy 製表日期 YYYYMMDD
+		// IsRelsCondition 關係人別 Y/N
+		// LineAmtThreshold 核貸總值分界
+		// YearMonth 製表年月 YYYYMM
 
 		query.setParameter("EntCodeCondition", entCodeCondition.value);
 		query.setParameter("entdy", entdy);
 		query.setParameter("IsRelsCondition", isRelsCondition.value);
 		query.setParameter("LineAmtThreshold", titaVo.getParam("inputAmount"));
-		query.setParameter("YearMonth", entdy.substring(0,6));
+		query.setParameter("YearMonth", entdy / 100);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

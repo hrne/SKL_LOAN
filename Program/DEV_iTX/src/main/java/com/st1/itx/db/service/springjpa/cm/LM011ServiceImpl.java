@@ -18,7 +18,6 @@ import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM011ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
@@ -27,7 +26,7 @@ public class LM011ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
-	
+
 	@Autowired
 	Parse parse;
 

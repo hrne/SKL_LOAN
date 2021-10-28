@@ -260,10 +260,10 @@ TXFORM=L5982
 #RPTFG2=0,QUERY.GRID,L5982
 #any={detail:true, header:'L5982.part', caption:'', rowNum:20, rowList:[20,40,60]}
 
-#OOBTN2=
+#OOBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 
-#OOBTN4=
+#OOBTN4=刪除
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN4',align:'center',canExport:false}
 
 #OOYearMonth=資料年月

@@ -28,8 +28,8 @@ public class LM061Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
-	List<Map<String, Object>> eAmtList = new ArrayList<Map<String, Object>>();
-	Map<String, Object> mergeAmtMap = null;
+	List<Map<String, Object>> mergeList = new ArrayList<Map<String, Object>>();
+	Map<String, Object> mergeMap = null;
 	int countAmt = 1;
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -61,17 +61,17 @@ public class LM061Report extends MakeReport {
 			String tempCustNo = "";
 
 			// 暫存 轉催收金額
-			BigDecimal tempOvduBal = BigDecimal.ZERO;
+//			BigDecimal tempOvduBal = BigDecimal.ZERO;
 
 			// 鑑價金額
 			BigDecimal F11 = BigDecimal.ZERO;
 
 			// 暫存 鑑價金額
-			BigDecimal tempF11 = BigDecimal.ZERO;
+//			BigDecimal tempF11 = BigDecimal.ZERO;
 
 			// 同戶號多額度 筆數
-			int tempCount = 0;
-			int tempCount2 = 0;
+//			int tempCount = 0;
+//			int tempCount2 = 0;
 
 			// 從第三列開始塞值
 			int row = 3;
@@ -107,15 +107,15 @@ public class LM061Report extends MakeReport {
 				this.info("tLDVo:" + tLDVo);
 
 				// 戶號
-				makeExcel.setValue(row, 3,
-						tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0")), "R");
+//				makeExcel.setValue(row, 3,
+//						tLDVo.get("F0").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F0")), "R");
 
 				// 額度
 				makeExcel.setValue(row, 4,
 						tLDVo.get("F1").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F1")), "R");
 
 				// 戶名
-				makeExcel.setValue(row, 5, tLDVo.get("F2"), "R");
+//				makeExcel.setValue(row, 5, tLDVo.get("F2"), "R");
 
 				// 核貸金額
 				makeExcel.setValue(row, 6,
@@ -170,7 +170,7 @@ public class LM061Report extends MakeReport {
 
 					// 20211025Test
 
-					checkMergeRegionValue(tLDVo.get("F0").toString(), F11, ovduBal, row);
+					checkMergeRegionValue(tLDVo.get("F0").toString(), tLDVo.get("F2").toString(), F11, ovduBal, row);
 
 //					// 和上一個戶號不一樣就歸零 並直接附值
 //					// 和上一個戶號一樣就累加 並 合併儲存格 再賦值
@@ -279,25 +279,33 @@ public class LM061Report extends MakeReport {
 		BigDecimal tempLTV = null;
 		int sRow = 0;
 		int eRow = 0;
-		
-		this.info("eAmtList=" + eAmtList.toString());
-		
-		for (Map<String, Object> eAmt : eAmtList) {
 
-			tempAmt = new BigDecimal(eAmt.get("amt").toString());
-			tempLTV = new BigDecimal(eAmt.get("ltv").toString());
-			eRow = Integer.valueOf(eAmt.get("eRow").toString());
-			sRow = eRow - Integer.valueOf(eAmt.get("count").toString()) + 1;
+		this.info("mergeList=" + mergeList.toString());
+
+		for (Map<String, Object> mergeData : mergeList) {
+
+			tempAmt = new BigDecimal(mergeData.get("amt").toString());
+			tempLTV = new BigDecimal(mergeData.get("ltv").toString());
+			eRow = Integer.valueOf(mergeData.get("eRow").toString());
+			sRow = eRow - Integer.valueOf(mergeData.get("count").toString()) + 1;
 
 			this.info("merge=" + sRow + "," + eRow);
 
-			if (Integer.valueOf(eAmt.get("count").toString()) > 1) {
-			
+			if (Integer.valueOf(mergeData.get("count").toString()) > 1) {
+
+				//戶號
+				makeExcel.setMergedRegionValue(sRow, eRow, 3, 3, Integer.valueOf(mergeData.get("cust").toString()));
+				//戶名
+				makeExcel.setMergedRegionValue(sRow, eRow, 5, 5, mergeData.get("name").toString());
 				makeExcel.setMergedRegionValue(sRow, eRow, 13, 13, tempAmt, "#,##0");
 				makeExcel.setMergedRegionValue(sRow, eRow, 14, 14, tempLTV, "##0.00%");
 
 			} else {
-				
+
+				//戶號
+				makeExcel.setValue(sRow, 3, Integer.valueOf(mergeData.get("cust").toString()));
+				//戶名
+				makeExcel.setValue(sRow, 5, mergeData.get("name").toString());
 				makeExcel.setValue(sRow, 13, tempAmt, "#,##0");
 				makeExcel.setValue(sRow, 14, tempLTV, "##0.00%");
 
@@ -309,22 +317,22 @@ public class LM061Report extends MakeReport {
 		makeExcel.toExcel(sno);
 	}
 
-	private void checkMergeRegionValue(String custNo, BigDecimal eAmt, BigDecimal ovduAmt, int row) {
+	private void checkMergeRegionValue(String custNo, String custName, BigDecimal eAmt, BigDecimal ovduAmt, int row) {
 
 		String tempCustNo = "";
 		BigDecimal ltvPercent = BigDecimal.ZERO;
 //		String tempFacmNo = "";
 
-		mergeAmtMap = new HashMap<String, Object>();
+		mergeMap = new HashMap<String, Object>();
 
-		if (eAmtList.size() > 0) {
+		if (mergeList.size() > 0) {
 
-			int as = eAmtList.size() - 1;
+			int as = mergeList.size() - 1;
 
-			BigDecimal tempAmt = new BigDecimal(eAmtList.get(as).get("amt").toString()).add(eAmt);
-			BigDecimal tempOvduAmt = new BigDecimal(eAmtList.get(as).get("ovduamt").toString());
+			BigDecimal tempAmt = new BigDecimal(mergeList.get(as).get("amt").toString());
+			BigDecimal tempOvduAmt = new BigDecimal(mergeList.get(as).get("ovduamt").toString());
 
-			tempCustNo = eAmtList.get(as).get("cust").toString();
+			tempCustNo = mergeList.get(as).get("cust").toString();
 
 			// 與前一筆 戶號額度是否一樣
 			if (tempCustNo.equals(custNo)) {
@@ -333,34 +341,38 @@ public class LM061Report extends MakeReport {
 
 				ltvPercent = this.computeDivide(tempOvduAmt, tempAmt, 4);
 
-				mergeAmtMap.put("count", countAmt);
-				mergeAmtMap.put("cust", custNo);
-				mergeAmtMap.put("ovduamt", ovduAmt);
-				mergeAmtMap.put("ltv", ltvPercent);
-				mergeAmtMap.put("eRow", row);
+				mergeMap.put("count", countAmt);
+				mergeMap.put("cust", custNo);
+				mergeMap.put("ovduamt", ovduAmt);
+				mergeMap.put("ltv", ltvPercent);
+				mergeMap.put("eRow", row);
+				mergeMap.put("name", custName);
 
 				if (tempAmt.compareTo(eAmt) == 0) {
-					mergeAmtMap.put("amt", eAmt);
+
+					mergeMap.put("amt", eAmt);
 				} else if (tempAmt.compareTo(eAmt) == -1) {
-					mergeAmtMap.put("amt", eAmt);
+					mergeMap.put("amt", eAmt);
 				} else {
-					mergeAmtMap.put("amt", tempAmt);
+
+					mergeMap.put("amt", tempAmt);
 				}
 
-				eAmtList.set(as, mergeAmtMap);
+				mergeList.set(as, mergeMap);
 
 			} else {
 
 				countAmt = 1;
 
-				mergeAmtMap.put("count", countAmt);
-				mergeAmtMap.put("cust", custNo);
-				mergeAmtMap.put("amt", eAmt);
-				mergeAmtMap.put("ovduamt", ovduAmt);
-				mergeAmtMap.put("ltv", ltvPercent);
-				mergeAmtMap.put("eRow", row);
+				mergeMap.put("count", countAmt);
+				mergeMap.put("cust", custNo);
+				mergeMap.put("amt", eAmt);
+				mergeMap.put("ovduamt", ovduAmt);
+				mergeMap.put("ltv", ltvPercent);
+				mergeMap.put("eRow", row);
+				mergeMap.put("name", custName);
 
-				eAmtList.add(mergeAmtMap);
+				mergeList.add(mergeMap);
 
 			}
 
@@ -368,14 +380,15 @@ public class LM061Report extends MakeReport {
 
 			countAmt = 1;
 
-			mergeAmtMap.put("count", countAmt);
-			mergeAmtMap.put("cust", custNo);
-			mergeAmtMap.put("amt", eAmt);
-			mergeAmtMap.put("ovduamt", ovduAmt);
-			mergeAmtMap.put("ltv", ltvPercent);
-			mergeAmtMap.put("eRow", row);
+			mergeMap.put("count", countAmt);
+			mergeMap.put("cust", custNo);
+			mergeMap.put("amt", eAmt);
+			mergeMap.put("ovduamt", ovduAmt);
+			mergeMap.put("ltv", ltvPercent);
+			mergeMap.put("eRow", row);
+			mergeMap.put("name", custName);
 
-			eAmtList.add(mergeAmtMap);
+			mergeList.add(mergeMap);
 
 		}
 

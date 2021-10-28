@@ -119,7 +119,9 @@ public class L5407 extends TradeBuffer {
 			PfCoOfficer cPfCoOfficer = (PfCoOfficer) iDataLog.clone(oPfCoOfficer);
 
 			oPfCoOfficer.setClassPass(iClassPass);
-			oPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
+			if (iIneffectiveDate != 19110000) {
+				oPfCoOfficer.setIneffectiveDate(iIneffectiveDate);
+			}
 			oPfCoOfficer.setEmpClass(iEmpClass);
 			try {
 				oPfCoOfficer = iPfCoOfficerService.update2(oPfCoOfficer, titaVo);
@@ -184,7 +186,7 @@ public class L5407 extends TradeBuffer {
 				throw new LogicException("E0005", "刪除時發生錯誤");
 			}
 			UpdateLog(titaVo);
-			
+
 			break;
 		default:
 			break;
@@ -192,7 +194,7 @@ public class L5407 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private void UpdateLog(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 		String iFunctionCd = titaVo.getParam("FunctionCd");
@@ -210,24 +212,24 @@ public class L5407 extends TradeBuffer {
 		int iSerialNo = 0;
 		PfCoOfficerLog iPfCoOfficerLog = new PfCoOfficerLog();
 		PfCoOfficerLogId iPfCoOfficerLogId = new PfCoOfficerLogId();
-		if (iFunctionCd.equals("4")){ //刪除
+		if (iFunctionCd.equals("4")) { // 刪除
 			Slice<PfCoOfficerLog> dPfCoOfficerLog = null;
 			dPfCoOfficerLog = iPfCoOfficerLogService.otherEq(iEmpNo, iEffectiveDate, 0, Integer.MAX_VALUE, titaVo);
-			for (PfCoOfficerLog ddPfCoOfficerLog :dPfCoOfficerLog) {
+			for (PfCoOfficerLog ddPfCoOfficerLog : dPfCoOfficerLog) {
 				try {
 					iPfCoOfficerLogService.delete(ddPfCoOfficerLog, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "刪除歷程資料時發生錯誤");
 				}
 			}
-			
-		}else {
+
+		} else {
 			Slice<PfCoOfficerLog> rPfCoOfficerLog = null;
 			rPfCoOfficerLog = iPfCoOfficerLogService.otherEq(iEmpNo, iEffectiveDate, this.index, this.limit, titaVo);
 			if (rPfCoOfficerLog == null) {
 				iSerialNo = 0;
-			}else {
-				iSerialNo = rPfCoOfficerLog.getContent().size()+1;
+			} else {
+				iSerialNo = rPfCoOfficerLog.getContent().size() + 1;
 			}
 			if (iIneffectiveDate != 19110000) {
 				iPfCoOfficerLog.setIneffectiveDate(iIneffectiveDate);
@@ -244,12 +246,12 @@ public class L5407 extends TradeBuffer {
 			iPfCoOfficerLogId.setEmpNo(iEmpNo);
 			iPfCoOfficerLogId.setSerialNo(iSerialNo);
 			iPfCoOfficerLog.setPfCoOfficerLogId(iPfCoOfficerLogId);
-			
+
 			try {
 				iPfCoOfficerLogService.insert(iPfCoOfficerLog, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0005", "新增歷程資料時發生錯誤");
-			}	
+			}
 		}
 	}
 }

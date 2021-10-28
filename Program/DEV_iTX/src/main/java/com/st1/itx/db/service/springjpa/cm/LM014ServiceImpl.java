@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
@@ -21,6 +22,9 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -67,7 +71,6 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo, EntCodeCondition entCodeCondition, DepartmentCodeCondition departmentCodeCondition, QueryType queryType) throws Exception {
 
 		this.info("lM014.findAll ");
@@ -92,8 +95,8 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 			query.setParameter("DepartmentCodeCondition", departmentCodeCondition.value);
 			query.setParameter("EntCodeCondition", entCodeCondition.value);
-			query.setParameter("inputYear", Integer.toString(Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000).substring(0, 4));
-			query.setParameter("inputYearMonth", Integer.toString(Integer.valueOf(titaVo.getParam("ENTDY")) + 19110000).substring(0, 6));
+			query.setParameter("inputYear", (parse.stringToInteger(titaVo.getParam("ENTDY")) + 19110000) / 10000);
+			query.setParameter("inputYearMonth", (parse.stringToInteger(titaVo.getParam("ENTDY")) + 19110000) / 100);
 
 			return this.convertToMap(query);
 		} else {
@@ -405,7 +408,8 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append("                           THEN ROUND(yearGroup.\"IntRcvSumYearly\" / yearWhole.\"IntRcvTotalYearly\" * 100, 1) ");
 			result.append("                      ELSE 0 END, 'FM990.0') \"YearlyIntRcvRatio\" ");
 			result.append("             ,ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) \"YearlyAvgLoanBal\" ");
-			result.append("             ,TO_CHAR(ROUND(ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) / ROUND(yearWhole.\"LoanBalTotalYearly\" / MOD(:inputYearMonth, 100)) * 100, 1), 'FM999.0') \"YearlyAvgLoanBalRatio\" ");
+			result.append(
+					"             ,TO_CHAR(ROUND(ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) / ROUND(yearWhole.\"LoanBalTotalYearly\" / MOD(:inputYearMonth, 100)) * 100, 1), 'FM999.0') \"YearlyAvgLoanBalRatio\" ");
 			result.append("             ,TO_CHAR(CASE WHEN yearGroup.\"LoanBalSumYearly\" > 0 ");
 			result.append("                           THEN ROUND(yearGroup.\"LoanBalWeightedSumYearly\" / yearGroup.\"LoanBalSumYearly\", 3) ");
 			result.append("                      ELSE 0 END, 'FM990.000') \"YearlyAvgStoreRate\" ");
@@ -467,7 +471,8 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append("                               THEN ROUND(yearGroup.\"IntRcvSumYearly\" / yearWhole.\"IntRcvTotalYearly\" * 100, 1) ");
 			result.append("                          ELSE 0 END), 'FM990.0') ");
 			result.append("             ,ROUND(SUM(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100))) \"YearlyAvgLoanBal\" ");
-			result.append("             ,TO_CHAR(SUM(ROUND(ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) / ROUND(yearWhole.\"LoanBalTotalYearly\" / MOD(:inputYearMonth, 100)) * 100, 1)), 'FM999.0') \"YearlyAvgLoanBalRatio\" ");
+			result.append(
+					"             ,TO_CHAR(SUM(ROUND(ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) / ROUND(yearWhole.\"LoanBalTotalYearly\" / MOD(:inputYearMonth, 100)) * 100, 1)), 'FM999.0') \"YearlyAvgLoanBalRatio\" ");
 			result.append("             ,TO_CHAR(CASE WHEN SUM(yearGroup.\"LoanBalSumYearly\") > 0 ");
 			result.append("                           THEN ROUND(SUM(yearGroup.\"LoanBalWeightedSumYearly\") / SUM(yearGroup.\"LoanBalSumYearly\"), 3) ");
 			result.append("                      ELSE 0 END, 'FM990.000') ");
@@ -726,7 +731,8 @@ public class LM014ServiceImpl extends ASpringJpaParm implements InitializingBean
 			result.append("                           THEN ROUND(yearGroup.\"IntRcvSumYearly\" / yearWhole.\"IntRcvTotalYearly\" * 100, 1) ");
 			result.append("                      ELSE 0 END, 'FM990.0') \"YearlyIntRcvRatio\" ");
 			result.append("             ,ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) \"YearlyAvgLoanBal\" ");
-			result.append("             ,TO_CHAR(ROUND(ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) / ROUND(yearWhole.\"LoanBalTotalYearly\" / MOD(:inputYearMonth, 100)) * 100, 1), 'FM999.0') \"YearlyAvgLoanBalRatio\" ");
+			result.append(
+					"             ,TO_CHAR(ROUND(ROUND(yearGroup.\"LoanBalSumYearly\" / MOD(:inputYearMonth, 100)) / ROUND(yearWhole.\"LoanBalTotalYearly\" / MOD(:inputYearMonth, 100)) * 100, 1), 'FM999.0') \"YearlyAvgLoanBalRatio\" ");
 			result.append("             ,TO_CHAR(CASE WHEN yearGroup.\"LoanBalSumYearly\" > 0 ");
 			result.append("                           THEN ROUND(yearGroup.\"LoanBalWeightedSumYearly\" / yearGroup.\"LoanBalSumYearly\", 3) ");
 			result.append("                      ELSE 0 END, 'FM990.000') \"YearlyAvgStoreRate\" ");

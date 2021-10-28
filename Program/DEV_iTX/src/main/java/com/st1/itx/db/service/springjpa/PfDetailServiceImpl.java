@@ -89,7 +89,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "LogNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "LogNo"));
     this.info("findAll " + dbName);
@@ -213,6 +213,34 @@ em = null;
       slice = pfDetailReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByPerfDateAsc(custNo_0, facmNo_1, bormNo_2, borxNo_3, pageable);
     else 
       slice = pfDetailRepos.findAllByCustNoIsAndFacmNoIsAndBormNoIsAndBorxNoIsOrderByPerfDateAsc(custNo_0, facmNo_1, bormNo_2, borxNo_3, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<PfDetail> FindByBormNo(int custNo_0, int facmNo_1, int bormNo_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<PfDetail> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("FindByBormNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " bormNo_2 : " +  bormNo_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = pfDetailReposDay.findAllByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = pfDetailReposMon.findAllByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = pfDetailReposHist.findAllByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2, pageable);
+    else 
+      slice = pfDetailRepos.findAllByCustNoIsAndFacmNoIsAndBormNoIs(custNo_0, facmNo_1, bormNo_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

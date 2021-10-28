@@ -46,12 +46,10 @@ public class L8922 extends TradeBuffer {
 	public CustMainService sCustMainService;
 	@Autowired
 	Parse parse;
-	
+
 	@Autowired
 	public DateUtil dateUtil;
-	
-	
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		logger.info("active L8922 ");
@@ -69,9 +67,9 @@ public class L8922 extends TradeBuffer {
 		int iLevel = this.txBuffer.getTxCom().getTlrLevel();
 		logger.info("L8922 iFAcDate : " + iFAcDateStart + "~" + iFAcDateEnd);
 		logger.info("L8922 iLevel : " + iLevel);
-		
+
 		int retxdate = 0;
-		
+
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -89,53 +87,50 @@ public class L8922 extends TradeBuffer {
 		// 如有找到資料
 		for (MlaundryDetail tMlaundryDetail : lMlaundryDetail) {
 			OccursList occursList = new OccursList();
-			
+
 			// 0:全部;1:樣態1;2:樣態2;3:樣態3 -> 不等時找下一筆
-			if (!(iFactor == 0 ) && !(iFactor == tMlaundryDetail.getFactor())) {
+			if (!(iFactor == 0) && !(iFactor == tMlaundryDetail.getFactor())) {
 				continue;
-				}
-			
-			
-			switch(iType) {
-			
+			}
+
+			switch (iType) {
+
 			case 1:
 				// 查詢種類 1:合理性;
 				break;
-				
+
 			case 2:
-				//2:延遲交易確認
-				
+				// 2:延遲交易確認
+
 				dateUtil.init();
-				
-				if(tMlaundryDetail.getManagerDate()!=0) {
+
+				if (tMlaundryDetail.getManagerDate() != 0) {
 					retxdate = dateUtil.getbussDate(tMlaundryDetail.getManagerDate(), -4);
-					logger.info("延期交易日="+retxdate);
-					//延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
-					if(!(retxdate>= tMlaundryDetail.getEntryDate())) {
-						continue;
-					}	
-				}
-				break; 
-			}		
-			
-			
-			switch(iLevel) {
-			
-				case 1:
-					//主管
-					//經辦未輸入合理性,主管查不出來
-					logger.info("L8922 Rational"+tMlaundryDetail.getRational());
-					if((" ").equals(tMlaundryDetail.getRational())) {
-						logger.info("Rational 空白");
+					logger.info("延期交易日=" + retxdate);
+					// 延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
+					if (!(retxdate >= tMlaundryDetail.getEntryDate())) {
 						continue;
 					}
-					break;
-				
-				case 3:
-					//經辦
-					break; 
+				}
+				break;
 			}
 
+			switch (iLevel) {
+
+			case 1:
+				// 主管
+				// 經辦未輸入合理性,主管查不出來
+				logger.info("L8922 Rational" + tMlaundryDetail.getRational());
+				if (("").equals(tMlaundryDetail.getRational().trim())) {
+					logger.info("Rational 空白");
+					continue;
+				}
+				break;
+
+			case 3:
+				// 經辦
+				break;
+			}
 
 			// 查詢客戶資料主檔
 			CustMain tCustMain = new CustMain();
@@ -143,7 +138,6 @@ public class L8922 extends TradeBuffer {
 			if (tCustMain == null) {
 				throw new LogicException(titaVo, "E0001", "客戶資料主檔"); // 查無資料
 			}
-			
 
 			occursList.putParam("OOAcDate", tMlaundryDetail.getEntryDate()); // 入帳日期
 			occursList.putParam("OOFactor", tMlaundryDetail.getFactor()); // 交易樣態
@@ -159,12 +153,12 @@ public class L8922 extends TradeBuffer {
 			occursList.putParam("OOManagerDesc", tMlaundryDetail.getManagerDesc().replace("$n", "\n")); // 主管覆核說明
 			occursList.putParam("OOEmpNo", tMlaundryDetail.getLastUpdateEmpNo()); // 經辦
 			occursList.putParam("OOManagerCheck", tMlaundryDetail.getManagerCheck()); // 主管覆核
-			if(tMlaundryDetail.getManagerDate()==0) {
+			if (tMlaundryDetail.getManagerDate() == 0) {
 				occursList.putParam("OOManagerDate", ""); // 主管同意日期
 			} else {
 				occursList.putParam("OOManagerDate", tMlaundryDetail.getManagerDate()); // 主管同意日期
 			}
-			
+
 			DateTime = this.parse.timeStampToString(tMlaundryDetail.getLastUpdate()); // 異動日期
 			logger.info("L8922 DateTime : " + DateTime);
 			Date = FormatUtil.left(DateTime, 9);

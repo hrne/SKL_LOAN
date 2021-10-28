@@ -10,8 +10,10 @@ import java.nio.file.Files;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -177,8 +179,7 @@ public class MakeReport extends CommBuffer {
 	 * @param pageOrientation 報表方向,P:直印/L:橫印
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String PageSize, String pageOrientation) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String PageSize, String pageOrientation) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -216,8 +217,7 @@ public class MakeReport extends CommBuffer {
 	 * @throws LogicException LogicException
 	 */
 
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security)
-			throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -249,8 +249,7 @@ public class MakeReport extends CommBuffer {
 	 * @param defaultPdf 預設PDF底稿
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security,
-			String defaultPdf) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String rptCode, String rptItem, String Security, String defaultPdf) throws LogicException {
 
 		this.checkParm(date, brno, rptCode, rptItem);
 
@@ -1452,7 +1451,7 @@ public class MakeReport extends CommBuffer {
 					}
 					if (pw > 0) {
 						cb.beginText();
-						this.info("MakeReport basefont = " + baseFont.TIMES_BOLD);
+						this.info("MakeReport basefont = " + BaseFont.TIMES_BOLD);
 						cb.setFontAndSize(baseFont, fontsize);
 						cb.setCharacterSpacing(charSpaces);
 						cb.showTextAligned(PdfContentByte.ALIGN_LEFT, ps, frameX + x, frameY + yy, 0);
@@ -1872,6 +1871,56 @@ public class MakeReport extends CommBuffer {
 
 	}
 
+	// 為了 formatAmt() 預先建好的單位 prefabs
+	// 利用 static block 做初始化, 確保 formatAmtTemplates 只會創建一次
+	// unmodifiableMap 讓此 map 變成唯讀狀態
+
+	// key 是次方數
+	// value 是 prefab
+
+	private static final Map<Integer, BigDecimal> formatAmtTemplates;
+	static {
+		HashMap<Integer, BigDecimal> m = new HashMap<Integer, BigDecimal>();
+		m.put(1, BigDecimal.TEN); // 十
+		m.put(2, new BigDecimal(100)); // 百
+		m.put(3, new BigDecimal(1000)); // 千
+		m.put(4, new BigDecimal(10000)); // 萬
+		m.put(5, new BigDecimal(100000)); // 十萬
+		m.put(6, new BigDecimal(1000000)); // 百萬
+		m.put(7, new BigDecimal(10000000)); // 千萬
+		m.put(8, new BigDecimal(100000000)); // 億
+		formatAmtTemplates = Collections.unmodifiableMap(m);
+	};
+
+	/**
+	 * @param amt     金額
+	 * @param n       四捨五入至第n位
+	 * @param unitPow 每多少元為單位之次方數（如單位為千元，輸入3）
+	 * @return String 具撇節並已除好的金額格式
+	 */
+	public String formatAmt(BigDecimal amt, int n, int unitPow) {
+		if (unitPow <= 1) {
+			// do nothing
+		} else if (formatAmtTemplates.containsKey(n)) {
+			amt = computeDivide(amt, formatAmtTemplates.get(n), 0);
+		} else {
+			// Math.Pow(a,b) -> a 的 b 次方
+			amt = computeDivide(amt, new BigDecimal(Math.pow(10, unitPow)), 0);
+		}
+
+		return formatAmt(amt, n);
+	}
+
+	/**
+	 * @param amt     金額
+	 * @param n       四捨五入至第n位
+	 * @param unitPow 每多少元為單位之次方數（如單位為千元，輸入3）
+	 * @return String 具撇節並已除好的金額格式
+	 */
+	public String formatAmt(String amt, int n, int unitPow) {
+		return formatAmt(getBigDecimal(amt), n, unitPow);
+	}
+
 	/**
 	 * @param amt 金額
 	 * @param n   四捨五入至第n位
@@ -1965,8 +2014,7 @@ public class MakeReport extends CommBuffer {
 			try {
 				result = new BigDecimal(inputString);
 			} catch (NumberFormatException e) {
-				this.error("getBigDecimal inputString : \"" + inputString
-						+ "\" parse to BigDecimal has NumberFormatException.");
+				this.error("getBigDecimal inputString : \"" + inputString + "\" parse to BigDecimal has NumberFormatException.");
 				result = BigDecimal.ZERO;
 			}
 		}
@@ -1985,8 +2033,7 @@ public class MakeReport extends CommBuffer {
 		try {
 			result = BigDecimal.valueOf(inputdouble);
 		} catch (NumberFormatException e) {
-			this.error("getBigDecimal inputdouble : \"" + inputdouble
-					+ "\" parse to BigDecimal has NumberFormatException.");
+			this.error("getBigDecimal inputdouble : \"" + inputdouble + "\" parse to BigDecimal has NumberFormatException.");
 			result = BigDecimal.ZERO;
 		}
 		return result;
@@ -2168,6 +2215,7 @@ public class MakeReport extends CommBuffer {
 		this.nowPage = nowPage;
 	}
 
+	@SuppressWarnings("unchecked")
 	public HashMap<String, Object> toPrint(long pdfno, int pageno, String printer) throws LogicException {
 		this.info("MakeReport.toPrint = " + pdfno + "/" + pageno + "/" + printer);
 

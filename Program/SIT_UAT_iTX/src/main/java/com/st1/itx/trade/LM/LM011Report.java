@@ -29,7 +29,7 @@ public class LM011Report extends MakeReport {
 
 	private int dateYear = 0;
 	private int dateMonth = 0;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -38,7 +38,7 @@ public class LM011Report extends MakeReport {
 
 		dateYear = parse.stringToInteger(titaVo.getParam("Year"));
 		dateMonth = parse.stringToInteger(titaVo.getParam("Month"));
-		
+
 		int dateSent = (dateYear + dateMonth) * 100 + 19110000;
 
 		this.info("LM011Report exec dateSent = " + dateSent);
@@ -71,14 +71,7 @@ public class LM011Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lLM011, List<Map<String, String>> lLM011Drawdown, int date) throws LogicException {
 		this.info("LM011Report exportExcel");
 
-		makeExcel.open(titaVo
-				, titaVo.getEntDyI()
-				, titaVo.getKinbr()
-				, "LM011"
-				, "表外明細"
-				, "LM011表外明細" + dateYear + "年" + dateMonth + "月"
-				, "LM011表外明細.xlsx"
-				, "LNWLCTP");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM011", "表外明細", "LM011表外明細" + dateYear + "年" + dateMonth + "月", "LM011表外明細.xlsx", "LNWLCTP");
 
 		int row = 2;
 
@@ -129,10 +122,6 @@ public class LM011Report extends MakeReport {
 					int col = i + 1;
 
 					String tmpValue = tLDVo.get("F" + i);
-
-//					this.info("exportExcel lLM011Drawdown i = " + i);
-//					this.info("exportExcel lLM011Drawdown col = " + col);
-//					this.info("exportExcel lLM011Drawdown tmpValue = " + tmpValue);
 
 					switch (i) {
 					case 11: // L欄:核准額度
