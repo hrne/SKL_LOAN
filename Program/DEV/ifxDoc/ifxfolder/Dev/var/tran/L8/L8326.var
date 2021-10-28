@@ -279,6 +279,9 @@ HELP(#CloseCodeHelp,cols:3)
 C(5,#TranKey,X,S,$)
 T(H,#CloseCode,#CloseCodeHelp)
 
+#CDate=D,7,S
+T(1,#SYSCDATE,2,7)
+
 !結案日期
 #CloseDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -287,6 +290,8 @@ C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,S,$)
 D(8)
 @V(7)A(DATE,0,#CloseDate)
+IF(#CloseDate > #ApplyDate ,$, V(P,結案日期須大於調解申請日))
+IF(#CloseDate <= #CDate,$,V(P,結案日期不可晚於報送日))
 
 
 !轉JCIC文字檔日期

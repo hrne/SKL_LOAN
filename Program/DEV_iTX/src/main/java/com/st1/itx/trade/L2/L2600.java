@@ -11,12 +11,9 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
-import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.FacCaseAppl;
-import com.st1.itx.db.domain.LoanBorTx;
-import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanSynd;
 import com.st1.itx.db.domain.LoanSyndId;
 import com.st1.itx.db.domain.LoanSyndItem;
@@ -99,10 +96,8 @@ public class L2600 extends TradeBuffer {
 
 	// work area
 	private int wkSyndNo = 0;
-	private int wkTbsDy;
-	private TempVo tTempVo = new TempVo();
-	private LoanBorTx tLoanBorTx;
-	private LoanBorTxId tLoanBorTxId;
+//	private int wkTbsDy;
+//	private TempVo tTempVo = new TempVo();
 	private LoanSynd tLoanSynd = new LoanSynd();
 	private LoanSyndId tLoanSyndId = new LoanSyndId();
 
@@ -114,7 +109,7 @@ public class L2600 extends TradeBuffer {
 		this.titaVo = titaVo;
 		loanCom.setTxBuffer(this.txBuffer);
 
-		wkTbsDy = this.txBuffer.getTxCom().getTbsdy();
+//		wkTbsDy = this.txBuffer.getTxCom().getTbsdy();
 
 		// 取得輸入資料
 		iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode")); // 功能

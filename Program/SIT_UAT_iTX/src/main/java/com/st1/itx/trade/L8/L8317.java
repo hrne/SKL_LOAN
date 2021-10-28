@@ -81,7 +81,12 @@ public class L8317 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");// 債務人IDN
 		String iSubmitKey = titaVo.getParam("SubmitKey");// 報送單位代號
 		String iCaseStatus = titaVo.getParam("CaseStatus");// 案件狀態
-		int iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate"));// 裁定日期
+		int iClaimDate = 0;
+		if ("E".equals(iCaseStatus)) {
+			iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate1"));//發文日期
+		} else {
+			iClaimDate = Integer.valueOf(titaVo.getParam("ClaimDate"));// 裁定日期
+		} 
 		String iCourtCode = titaVo.getParam("CourtCode");// 承審法院代碼
 		int iYear = Integer.valueOf(titaVo.getParam("Year"));
 		String iCourtDiv = titaVo.getParam("CourtDiv");
@@ -95,7 +100,6 @@ public class L8317 extends TradeBuffer {
 		int iSaveEndDate = Integer.valueOf(titaVo.getParam("SaveEndDate"));
 		String iAdminName = titaVo.getParam("AdminName");
 		String iKey = "";
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 營業日 民國YYYMMDD
 
 		// JcicZ056
 		JcicZ056 iJcicZ056 = new JcicZ056();
@@ -175,7 +179,8 @@ public class L8317 extends TradeBuffer {
 
 				// 3.2 若非key值欄位資料需要更新，請以交易代碼'C'異動處理***
 
-				// 8 start 報送案件狀態「H:清算復權」 前，需曾報送「A:清算程序開始」 或「C:清算程序開始同時終止」.--->1014會議清和通知此檢核只查詢custId
+				// 8 start 報送案件狀態「H:清算復權」 前，需曾報送「A:清算程序開始」
+				// 或「C:清算程序開始同時終止」.--->1014會議清和通知此檢核只查詢custId
 				if ("H".equals(iCaseStatus)) {
 					Slice<JcicZ056> sJcicZ056 = sJcicZ056Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 					if (sJcicZ056 == null) {
@@ -217,12 +222,7 @@ public class L8317 extends TradeBuffer {
 				} // 4 end
 			}
 
-			// 5 start 裁定日期須小於等於報送日期
-			if ("A".equals(iTranKey)) {
-				if (iClaimDate > txDate) {
-					throw new LogicException("E0005", "「裁定日期/發文日期」 須小於等於報送日期.");
-				}
-			}
+			// 5 裁定日期須小於等於報送日期--->(前端檢核)
 
 			// 6 各金融機構清算資料報送不一致時，中心檢核事項***J
 

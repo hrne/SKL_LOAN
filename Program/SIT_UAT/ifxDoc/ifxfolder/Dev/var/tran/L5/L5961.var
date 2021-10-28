@@ -40,10 +40,10 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="L5961" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L5961]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@電催明細資料查詢"],
-[#<->#,"@案件種類",#CaseCode,#CaseCodeX],
-[#<->#,"@借款人戶號",#CustNo,#CustNoX],
-[#<->#,"@額度編號",#FacmNo],
-[#<->#,"@項目",#DateFlag,#DateFlagX],
+[#<->#,#FdCaseCode+案件種類",#CaseCode,#CaseCodeX],
+[#<->#,#FdCustNo+借款人戶號",#CustNo,#CustNoX],
+[#<->#,#FdFacmNo+額度編號",#FacmNo],
+[#<->#,#FdDateFlag+項目",#DateFlag,#DateFlagX],
 ]
 !---------- AP TEXT AREA Variables ----------
 
@@ -57,6 +57,15 @@ T(1,@CaseCode,#NTXBUF,1,1)
 T(1,@CustNo,#NTXBUF,2,7)
 T(1,@FacmNo,#NTXBUF,9,3)
 INVOKEJS(SHOW,p1,02,02,1)
+
+#FdCaseCode=X,1,L
+T(3,*)
+#FdCustNo=X,1,L
+T(3,*)
+#FdFacmNo=X,1,L
+T(3, )
+#FdDateFlag=X,1,L
+T(3,*)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 ! 案件種類下拉選單1
@@ -111,6 +120,26 @@ T(H,#CaseCode,#CaseCodeHelp)
 ! 借款人戶名----調RIM
 #CustNoX=X,20,L
 
+!抓戶名
+#oCustNo=A,7,L
+E(0,#CustNo)
+#CustNo2=A,7,S
+#RimFunCd=A,1,S
+#RimCustId=X,10,S
+#RimCustNo=A,7,S
+
+#RimL1r09=X,1,S
+C(3,#CustNo,#CustNo2,s,$)
+E(0,@RimFunCd,1)
+T(2,@RimCustId,)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+T(2,@CustName,#L1r09CustName)
+#CustName=x,2.50,L
+
+
 ! 額度編號
 #FacmNo=A,3,I
 ! C(3,#CHAIN,0,$,s)
@@ -130,6 +159,7 @@ T(H,#DateFlag,#DateFlagHelp)
 
 
 #RPTFG=A,1,S
+<include src="ROM.icf::L1R09.dec"/>
 
 </sub>
 
@@ -188,7 +218,7 @@ T(H,#OOResultCode,#ResultCodeHelp)
 
 ! 其他記錄(500)
 #OORemark=X,10.50,O
-! 增修人員
+! 修改人員
 #OOEditEmpNo=X,6,O
 ! 交易序號
 #OOTitaTxtNo=X,8,L
@@ -253,6 +283,7 @@ TXFORM=L5961
 #OOTitaTlrNo
 #OOTitaAcDate
 ^
+<include src="ROM.icf::L1R09.tom"/>
 </sub>
 
 
@@ -260,10 +291,8 @@ TXFORM=L5961
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L5961" layout="cols=1;screen.width=[130,870];order=1;">
 [
 ["[L5961]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@電催明細資料查詢                                                                                   "],
-! [#<->#,"@借款人戶號",#CustNo,#CustNoX],
-! [#<->#,"@額度編號",#FacmNo],
-! [#<->#,"@項目",#DateFlag,#DateFlagX],
-! [#<->#,"@案件種類",#CaseCode,#CaseCodeX],
+["戶號",#oCustNo],
+["戶名",#CustName],
 ]
 </sub>
 
@@ -297,7 +326,7 @@ TXFORM=L5961
 {width:80}
 #OORemark=其他記錄
 {width:80}
-#EditEmp=增修人員
+#EditEmp=修改人員
 {width:80,align:'center'}
 #OOTitaTxtNo=登放序號
 {width:80,align:'center'}

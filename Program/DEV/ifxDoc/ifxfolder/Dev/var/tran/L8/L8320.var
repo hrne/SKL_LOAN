@@ -433,8 +433,7 @@ E(0,#CompletePeriod+#Period+#Period2)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 E(0,#CompletePeriod+#Period)
-
-#CheckPeriod2=X,1,S
+@
 IF(#Period2!=0 && #SumPeriod>180,V(P,「變更還款條件已履約期數」+「第一階梯期數」+「第二階梯期數」不得超過180，請重新輸入),$)
 IF(#Period2==0 && #SumPeriod1>180,V(P,「變更還款條件已履約期數」+「第一階梯期數」不得超過180，請重新輸入),$)
 

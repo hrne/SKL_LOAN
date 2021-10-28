@@ -66,7 +66,7 @@ public class L8321 extends TradeBuffer {
 		int iClosedDate = Integer.valueOf(titaVo.getParam("ClosedDate"));
 		String iClosedResult = titaVo.getParam("ClosedResult");
 		String iKey = "";
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD
+
 
 		// JcicZ063, JcicZ062
 		JcicZ063 iJcicZ063 = new JcicZ063();
@@ -87,15 +87,8 @@ public class L8321 extends TradeBuffer {
 		if (!"4".equals(iTranKey_Tmp)) {
 			// 1.2 KEY值為IDN+報送單位wakg+dr前置協商申請日+申請變更還款條件日.***J
 
-			// 1.3.1 同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日--->(前端檢核)
-			if ("A".equals(iTranKey)) {
-				// 1.3.2 start 同一KEY值資料變更還款條件結案日期不可晚於本檔案資料報送日期
-				if (iClosedDate > txDate) {
-					throw new LogicException("E0005", "同一KEY值資料「變更還款條件結案日期」不可晚於本檔案資料報送日期.");
-				}
-				// 1.3.2 end
-			}
-
+			// 1.3  同一KEY值資料變更還款條件結案日期不可早於申請變更還款條件日，也不可晚於本檔案資料報送日期--->(前端檢核)
+			
 			// 1.4 報送本結案檔案後，同一KEY值不可再報送相關檔案之異動.***J
 
 			// 1.5 start 第9欄「結案原因」為'C'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須有值.
@@ -121,11 +114,9 @@ public class L8321 extends TradeBuffer {
 				// 第9欄「結案原因」為'A'及'B'者，同一KEY值之「'62':金融機構無擔保債務變更還款條件協議資料」第17欄「簽約完成日」必須空白.
 				if (("A".equals(iClosedResult) || "B".equals(iClosedResult)) && (iJcicZ062.getChaRepayEndDate() != 0)) {
 					if ("A".equals(iTranKey)) {
-						throw new LogicException("E0005",
-								"「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
+						throw new LogicException("E0005", "「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
 					} else {
-						throw new LogicException("E0007",
-								"「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
+						throw new LogicException("E0007", "「結案原因」為'A'及'B'者，同一KEY值之(62)金融機構無擔保債務變更還款條件協議資料之「簽約完成日」必須空白.");
 					}
 				} // 1.6 end
 			}

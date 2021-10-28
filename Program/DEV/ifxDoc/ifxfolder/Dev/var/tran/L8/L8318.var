@@ -222,8 +222,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#ChangePayDate)
+@V(7)A(DATE,0,#ChangePayDate)
 
 
 #CutChangePayDate=X,1,S

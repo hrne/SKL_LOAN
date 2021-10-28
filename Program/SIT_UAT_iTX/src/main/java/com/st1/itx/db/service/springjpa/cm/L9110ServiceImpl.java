@@ -26,7 +26,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryBuilding(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110ServiceImpl.queryBuilding");
@@ -122,10 +121,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryCl(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110ServiceImpl.queryCl ");
@@ -210,7 +208,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> queryCrossUse(TitaVo titaVo, String applNo) {
@@ -234,10 +232,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryCustTelNo(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110.findAll queryCustTelNo");
@@ -270,10 +267,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryGua(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110.findAll queryGua");
@@ -308,10 +304,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryInsu(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110ServiceImpl.queryInsu");
@@ -359,10 +354,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryLand(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110ServiceImpl.queryLand");
@@ -420,10 +414,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryPerson(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110.findAll Person");
@@ -515,7 +508,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                       AS F46放款專員 ";
 		sql += "      , CASE ";
 		sql += "          WHEN FAC.\"ApprovedLevel\" = '9' ";
-		sql += "          THEN '董事會' "; // 核准層級9:董事會，不需填寫核決主管
+		sql += "          THEN n'董事會' "; // 核准層級9:董事會，不需填寫核決主管
 		sql += "        ELSE \"Fn_GetEmpName\"(FAC.\"Supervisor\",1) ";
 		sql += "        END                            AS F47核決主管 ";
 		sql += "      , PROD.\"ProhibitMonth\"         AS F48限制清償期限 ";
@@ -554,10 +547,9 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> queryStock(TitaVo titaVo, String applNo) throws Exception {
 
 		this.info("L9110ServiceImpl.queryStock");
@@ -583,7 +575,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> queryCoborrower(TitaVo titaVo, String applNo) {
@@ -630,7 +622,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> queryShareQuota(TitaVo titaVo, String applNo) {
@@ -696,6 +688,6 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("applNo", applNo);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 }

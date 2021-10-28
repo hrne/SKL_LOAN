@@ -1,7 +1,6 @@
 package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
@@ -35,10 +34,7 @@ public class L2076Report extends MakeReport {
 	@Autowired
 	public FacCloseService sFacCloseService;
 
-	private static String[] CH = { "", "", "拾", "佰", "仟" };
-	private static String[] CHS_NUMBER = { "零", "壹", "貳", "叄", "肆", "伍", "陸", "柒", "捌", "玖" };
-	private static String[] CHS = { "萬", "億", "兆" };
-	private static DecimalFormat df = new DecimalFormat("#########################0.0#");
+//	private static DecimalFormat df = new DecimalFormat("#########################0.0#");
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -64,10 +60,10 @@ public class L2076Report extends MakeReport {
 	private int iCustNo = 0;
 	private int iCloseNo = 0;
 
-	// 製表日期
-	private String NowDate;
-	// 製表時間
-	private String NowTime;
+//	// 製表日期
+//	private String NowDate;
+//	// 製表時間
+//	private String NowTime;
 
 	// 自訂表頭
 	@Override
@@ -102,9 +98,9 @@ public class L2076Report extends MakeReport {
 		this.setFont(1, 36);
 		this.reportDate = Integer.valueOf(titaVo.getEntDy());
 		this.brno = titaVo.getBrno();
-		this.NowDate = dDateUtil.getNowStringRoc();
+//		this.NowDate = dDateUtil.getNowStringRoc();
 //		this.pageSize = "A5";
-		this.NowTime = dDateUtil.getNowStringTime();
+//		this.NowTime = dDateUtil.getNowStringTime();
 		iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		iCloseNo = parse.stringToInteger(titaVo.getParam("CloseNo"));
 		reportItem = "抵押權塗銷同意書,戶號 :" + titaVo.getParam("CustNo");
@@ -127,8 +123,7 @@ public class L2076Report extends MakeReport {
 		FacCloseId FacCloseId = new FacCloseId();
 		FacCloseId.setCustNo(iCustNo);
 		FacCloseId.setCloseNo(iCloseNo);
-		ClOtherRights tClOtherRights = sClOtherRightsService
-				.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
+		ClOtherRights tClOtherRights = sClOtherRightsService.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
 //		FacClose tFacClose = sFacCloseService.findById(FacCloseId, titaVo);
 		int DocNo = tFacClose.getDocNo();
 		String DocNoyy = parse.IntegerToString(DocNo, 7).substring(0, 3);

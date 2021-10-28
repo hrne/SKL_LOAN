@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
@@ -22,18 +23,19 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("lM030.findAll ");
 
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 100);
-
-		this.info("entdy = " + entdy);
+		this.info("inputted AcDate = " + titaVo.getParam("AcDate"));
+		
 		String sql = "";
 		sql += " SELECT CITY.\"CityItem\" ";
 		sql += "             ,F.\"AccCollPsn\" ";
@@ -96,8 +98,8 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		// query.setParameter("entdy", entdy);
-		query.setParameter("AcDate", Integer.toString(Integer.valueOf(titaVo.getParam("AcDate"))+19110000));
+
+		query.setParameter("AcDate", parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000);
 		query.setParameter("CustNo", titaVo.getParam("CustNo"));
 		query.setParameter("FacmNo", titaVo.getParam("FacmNo"));
 		query.setParameter("DelayCondition", titaVo.getParam("DelayCondition"));
@@ -108,7 +110,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("PayMethod", titaVo.getParam("PayMethod"));
 		query.setParameter("EntCode", titaVo.getParam("EntCode"));
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

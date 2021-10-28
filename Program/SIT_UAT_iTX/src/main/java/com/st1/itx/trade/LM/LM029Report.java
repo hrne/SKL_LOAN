@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -21,7 +19,6 @@ import com.st1.itx.util.common.MakeReport;
 @Component
 @Scope("prototype")
 public class LM029Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(LM029Report.class);
 
 	@Autowired
 	LM029ServiceImpl lM029ServiceImpl;
@@ -47,10 +44,9 @@ public class LM029Report extends MakeReport {
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> listLM029) throws LogicException {
 		this.info("LM029Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表",
-				"LM029-放款餘額明細表.xlsx", "la$w30p");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM029", "放款餘額明細表", "LM029-放款餘額明細表", "LM029-放款餘額明細表.xlsx", "la$w30p");
 
-		if (listLM029.size() == 0) {
+		if (listLM029 == null || listLM029.isEmpty()) {
 
 			makeExcel.setValue(2, 1, "本日無資料", "L");
 
@@ -58,48 +54,39 @@ public class LM029Report extends MakeReport {
 
 			int row = 2;
 
-			BigDecimal loanBalTotal = BigDecimal.ZERO;
-
 			for (Map<String, String> tLDVo : listLM029) {
 
-				for (int i = 0; i < tLDVo.size(); i++) {
+				for (int i = 0; i <= 25; i++) {
 
 					String fieldValue = tLDVo.get("F" + i);
 
 					int col = i + 1;
 
-					switch (col) {
+					switch (i) {
+					case 0:
 					case 1:
 					case 2:
-					case 3:
-						makeExcel.setValue(row, col, fieldValue,"#0");
+						makeExcel.setValue(row, col, fieldValue, "#0");
 						break;
+					case 6:
 					case 7:
-					case 8:
+					case 10:
 					case 11:
-					case 12:
 						if (fieldValue != null && !fieldValue.isEmpty() && !fieldValue.equals("0")) {
 							makeExcel.setValue(row, col + 1, showBcDate(fieldValue, 0), "C");
 						}
 						break;
-					case 9:
-						BigDecimal rate = new BigDecimal(fieldValue);
-
+					case 8:
+						BigDecimal rate = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col + 1, rate, "0.0000", "R");
 						break;
+					case 19:
 					case 20:
 					case 21:
-					case 22:
-
-						BigDecimal amt = new BigDecimal(fieldValue);
-
+						BigDecimal amt = getBigDecimal(fieldValue);
 						makeExcel.setValue(row, col + 1, amt, "#,##0", "R");
-
-						if (col == 22) {
-							loanBalTotal = loanBalTotal.add(amt);
-						}
 						break;
-					case 26:
+					case 25:
 						makeExcel.setValue(row, 4, fieldValue, "L"); // 帳冊別
 						break;
 					default:
@@ -110,10 +97,8 @@ public class LM029Report extends MakeReport {
 
 				row++;
 			} // for
-
-			// 印放款餘額總計
-			// makeExcel.setValue(1, 23, loanBalTotal, "#,##0", "R");
-
+			
+			// 放款餘額總計的 excel formula
 			makeExcel.formulaCaculate(1, 23);
 		}
 

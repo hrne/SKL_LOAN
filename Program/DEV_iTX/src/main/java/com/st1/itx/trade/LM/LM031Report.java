@@ -15,18 +15,21 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM031ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
 
 public class LM031Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM031Report.class);
 
 	@Autowired
 	LM031ServiceImpl lM031ServiceImpl;
 
 	@Autowired
 	MakeExcel makeExcel;
+
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void printTitle() {
@@ -39,88 +42,94 @@ public class LM031Report extends MakeReport {
 		try {
 			LM031List = lM031ServiceImpl.findAll(titaVo);
 			exportExcel(titaVo, LM031List);
-			
+
 			return true;
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM031ServiceImpl.testExcel error = " + errors.toString());
-			
+
 			return false;
 		}
 	}
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
-		this.info("===========in testExcel");
-		String entdy = String.valueOf(Integer.valueOf(titaVo.get("ENTDY").toString()));
-
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM031", "企業動用率", "LM031企業動用率", "LM031企業動用率.xlsx", "10810", showDate(entdy));
-		if (LDList.size() == 0) {
-			makeExcel.setValue(3, 1, "本日無資料");
-		}
-		int row = 3;
-		BigDecimal totalLineAmt = BigDecimal.ZERO;
-		BigDecimal totalUtilBal = BigDecimal.ZERO;
-		String lastCustNo = "";
-		String lastFacmNo = "";
-		int set1 = 0;//判斷戶號是否與上一筆相同
-		int set2 = 0;//判斷額度是否與上一筆相同
-		for (Map<String, String> tLDVo : LDList) {
-
-			String ad = "";
-			int col = 0;
-			for (int i = 0; i < tLDVo.size(); i++) {
-
-				ad = "F" + String.valueOf(col);
-				col++;
-
-				switch (col) {
-				case 1:
-					makeExcel.setValue(row, col, tLDVo.get(ad), "R");
-					if(lastCustNo.equals(tLDVo.get(ad))) {
-						set1 = 1;
-					} else {
-						set1 = 0;
-					}
-					lastCustNo = tLDVo.get(ad);
-					break;
-				case 2:
-					makeExcel.setValue(row, col, tLDVo.get(ad), "R");
-					if(lastFacmNo.equals(tLDVo.get(ad))) {
-						set2 = 1;
-					} else {
-						set2 = 0;
-					}
-					lastFacmNo = tLDVo.get(ad);
-					break;
-				case 5:
-					if(set1 == 0 || set2 == 0) {
-						makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "#,##0", "R");
-						totalLineAmt = totalLineAmt.add(tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)));
-					}
-					break;
-				case 6:
-					// 金額
-					makeExcel.setValue(row, col, tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "#,##0", "R");
-					totalUtilBal = totalUtilBal.add(tLDVo.get(ad) == null || tLDVo.get(ad) == "" ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)));
-					break;
-				case 7:
-					makeExcel.setValue(row, col, tLDVo.get(ad), "L");
-					break;
-				case 9:
-					makeExcel.setValue(row, col, tLDVo.get(ad), "C");
-					break;
-				default:
-					makeExcel.setValue(row, col, tLDVo.get(ad), "R");
-					break;
-				}
-			} // for
-			makeExcel.setValue(1, 5, totalLineAmt, "#,##0");
-			makeExcel.setValue(1, 6, totalUtilBal, "#,##0");
-			row++;
-		} // for
 		
+		this.info("LM031Report exportExcel()");
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM031", "企業動用率", "LM031企業動用率", "LM031企業動用率.xlsx",
+				"10810", showDate(titaVo.get("ENTDY")));
+		if (LDList == null || LDList.isEmpty()) {
+			makeExcel.setValue(3, 1, "本日無資料");
+		} else {
+			
+			int row = 3;
+			
+			BigDecimal totalLineAmt = BigDecimal.ZERO;
+			BigDecimal totalUtilBal = BigDecimal.ZERO;
+			String lastCustNo = "";
+			String lastFacmNo = "";
+			int set1 = 0;// 判斷戶號是否與上一筆相同
+			int set2 = 0;// 判斷額度是否與上一筆相同
+			
+			for (Map<String, String> tLDVo : LDList) {
+
+				for (int i = 0; i <= 9; i++) {
+
+					String value = tLDVo.get("F" + i);
+					int col = i + 1;
+
+					switch (col) {
+					case 1:
+						makeExcel.setValue(row, col, value, "R");
+						if (lastCustNo.equals(value)) {
+							set1 = 1;
+						} else {
+							set1 = 0;
+						}
+						lastCustNo = value;
+						break;
+					case 2:
+						makeExcel.setValue(row, col, value, "R");
+						if (lastFacmNo.equals(value)) {
+							set2 = 1;
+						} else {
+							set2 = 0;
+						}
+						lastFacmNo = value;
+						break;
+					case 5:
+						if (set1 == 0 || set2 == 0) {
+							BigDecimal bd = getBigDecimal(value);
+							makeExcel.setValue(row, col, bd, "#,##0", "R");
+							totalLineAmt = totalLineAmt.add(bd);
+						}
+						break;
+					case 6:
+						// 金額
+						BigDecimal bd = getBigDecimal(value);
+						makeExcel.setValue(row, col, bd, "#,##0", "R");
+						totalUtilBal = totalUtilBal.add(bd);
+						break;
+					case 7:
+						makeExcel.setValue(row, col, value, "L");
+						break;
+					case 9:
+						makeExcel.setValue(row, col, value, "C");
+						break;
+					default:
+						makeExcel.setValue(row, col, value, "R");
+						break;
+					}
+				} // for
+				makeExcel.setValue(1, 5, totalLineAmt, "#,##0");
+				makeExcel.setValue(1, 6, totalUtilBal, "#,##0");
+				row++;
+			} // for
+
+		}
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}

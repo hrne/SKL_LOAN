@@ -2,8 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -25,7 +23,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R44 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2R44.class);
 
 	@Autowired
 	public AuthLogCom authLogCom;
@@ -37,7 +34,7 @@ public class L2R44 extends TradeBuffer {
 	// work area
 	private int wkCustNo = 0;
 	private int wkFacmNo = 0;
-	private int wkFunCd = 0;
+//	private int wkFunCd = 0;
 
 	private String wkRepayBank = "";
 	private String wkRepayAcctNo = "";
@@ -48,9 +45,8 @@ public class L2R44 extends TradeBuffer {
 	private String wkRelationId = "";
 	private int wkRelationBirthday = 0;
 	private String wkRelationGender = "";
-	private String wkAuthStatus ="";
-	private String wkMainStatus ="";
-	
+	private String wkAuthStatus = "";
+	private String wkMainStatus = "";
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -59,7 +55,7 @@ public class L2R44 extends TradeBuffer {
 
 		wkCustNo = this.parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		wkFacmNo = this.parse.stringToInteger(titaVo.getParam("RimFacmNo"));
-		wkFunCd = this.parse.stringToInteger(titaVo.getParam("RimFunCode"));
+//		wkFunCd = this.parse.stringToInteger(titaVo.getParam("RimFunCode"));
 
 		tempVo = authLogCom.exec(wkCustNo, wkFacmNo, titaVo);
 
@@ -78,8 +74,8 @@ public class L2R44 extends TradeBuffer {
 			wkRelationId = tempVo.getParam("RelationId");
 			wkRelationBirthday = parse.stringToInteger(tempVo.getParam("RelationBirthday"));
 			wkRelationGender = tempVo.getParam("RelationGender");
-			wkAuthStatus =  tempVo.getParam("AuthStatus");
-			wkMainStatus =  tempVo.getParam("MainStatus");
+			wkAuthStatus = tempVo.getParam("AuthStatus");
+			wkMainStatus = tempVo.getParam("MainStatus");
 		}
 		this.totaVo.putParam("ORepayBank", wkRepayBank);
 		this.totaVo.putParam("ORepayAcctNo", wkRepayAcctNo);

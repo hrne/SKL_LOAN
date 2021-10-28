@@ -2306,8 +2306,13 @@ TXFORM=L3912
 ["@交易代號",#OTxCode,#OTxCodeX],["@交易序號",#L3440TxtNo],
 [#<->#,"@暫收原因",#OTempReasonCode,#OTempReasonCodeX],
 [#<->#,"@入帳日期",#OEntryDateX],
-[#<->#,"@額度編號",#OFacmNo],
-["@幣別",#OCurrencyCode],["@轉暫收金額",#OTxAmtX],
+["@額度編號",#OFacmNo],["@交易金額",#L3440TxAmtX],
+["@幣別",#OCurrencyCode],["@轉暫收金額",#L3440TempAmtX],
+[#<->#,"@帳管費",#L3420AcctFeeX],
+[#<->#,"@契變手續費",#L3420ModifyFeeX],
+[#<->#,"@火險費",#L3420FireFeeX],
+[#<->#,"@法務費",#L3420LawFeeX],
+[#<->#,"@清償違約金",#L3200CloseBreachAmtX],
 [#<->#,"@暫收來源",#OTempSourceCodeX],
 ]
 </sub>

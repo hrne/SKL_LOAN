@@ -284,6 +284,7 @@ C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,S,$)
 D(8)
 @V(7)A(DATE,0,#FirstPayDate)
+IF(#FirstPayDate > #SignDate ,$,V(P,首期應繳日需大於簽約完成日))
 
 !期數
 #Period=A,3,I
@@ -291,10 +292,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,S,$)
-#CheckPeriod=X,1,S
-C(5,#TranKey,X,S,$)
-IF(#Period>=0 && #Period<=180,S,$)
-V(P,期數需小於或等於180)
+@
+IF(#Period>=0 && #Period<=180,$,V(P,期數需小於或等於180))
+
 
 !利率
 #Rate=m,2.2,I

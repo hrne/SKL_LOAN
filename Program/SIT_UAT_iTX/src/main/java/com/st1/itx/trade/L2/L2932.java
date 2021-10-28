@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -58,7 +56,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2932 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2932.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -98,7 +95,7 @@ public class L2932 extends TradeBuffer {
 	public TotaVo totaC; // 抵押權塗銷同意書
 
 	private List<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
-	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+//	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
 	private List<LoanBorMain> lLoanBorMain2 = new ArrayList<LoanBorMain>();
 	private List<FacMain> lFacMain = new ArrayList<FacMain>();
 	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
@@ -131,8 +128,7 @@ public class L2932 extends TradeBuffer {
 			wkFacmNoEnd = 999;
 		}
 		// 額度主檔
-		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<FacMain> slFacMain = facMainService.facmCustNoRange(iCustNo, iCustNo, wkFacmNoStart, wkFacmNoEnd, 0, Integer.MAX_VALUE, titaVo);
 		lFacMain = slFacMain == null ? null : slFacMain.getContent();
 		if (lFacMain == null || lFacMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "額度主檔"); // 查詢資料不存在
@@ -145,18 +141,15 @@ public class L2932 extends TradeBuffer {
 		}
 
 		// 撥款主檔
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, 1, 900,
-				0, Integer.MAX_VALUE, titaVo);
-		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+//		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, 1, 900, 0, Integer.MAX_VALUE, titaVo);
+//		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 
 		// 暫收支票
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acctCodeEq(0, "TCK", iCustNo, iCustNo, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acctCodeEq(0, "TCK", iCustNo, iCustNo, 0, Integer.MAX_VALUE, titaVo);
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 
 		// 保證人檔
-		Slice<Guarantor> slGuarantor = guarantorService.guaUKeyEq(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<Guarantor> slGuarantor = guarantorService.guaUKeyEq(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
 		lGuarantor = slGuarantor == null ? null : slGuarantor.getContent();
 
 		// totaA 額度資料、totaB 清償金類型
@@ -165,8 +158,7 @@ public class L2932 extends TradeBuffer {
 			setTotaB(tFacMain, titaVo);
 		}
 		// 擔保品與額度關聯檔
-		Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoStart, wkFacmNoEnd, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoStart, wkFacmNoEnd, 0, Integer.MAX_VALUE, titaVo);
 		lClFac = slClFac == null ? null : slClFac.getContent();
 		if (lClFac != null) {
 			// 擔保品編號重複的不要
@@ -176,8 +168,7 @@ public class L2932 extends TradeBuffer {
 				isNew = true;
 				if (l1ClFac.size() > 0) {
 					for (ClFac t2 : l1ClFac) {
-						if (t.getClCode1() == t2.getClCode1() && t.getClCode2() == t2.getClCode2()
-								&& t.getClNo() == t2.getClNo()) {
+						if (t.getClCode1() == t2.getClCode1() && t.getClCode2() == t2.getClCode2() && t.getClNo() == t2.getClNo()) {
 							isNew = false;
 						}
 					}
@@ -217,8 +208,7 @@ public class L2932 extends TradeBuffer {
 		occursList.putParam("OOAProdNo", tFacMain.getProdNo()); // 商品代碼
 		occursList.putParam("OOALineAmt", tFacMain.getLineAmt()); // 核准額度
 
-		Slice<LoanBorMain> slLoanBorMain2 = loanBorMainService.bormCustNoEq(iCustNo, tFacMain.getFacmNo(),
-				tFacMain.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+		Slice<LoanBorMain> slLoanBorMain2 = loanBorMainService.bormCustNoEq(iCustNo, tFacMain.getFacmNo(), tFacMain.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 
 		lLoanBorMain2 = slLoanBorMain2 == null ? null : slLoanBorMain2.getContent();
 		// 放款餘額
@@ -264,15 +254,13 @@ public class L2932 extends TradeBuffer {
 			// 房地
 			if (tClFac.getClCode1() == 1) {
 				// ClBuilding 擔保品建物檔
-				ClBuilding tClBuilding = clBuildingService
-						.findById(new ClBuildingId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
+				ClBuilding tClBuilding = clBuildingService.findById(new ClBuildingId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
 				if (tClBuilding != null) {
 					occursList.putParam("OOABdLocation", tClBuilding.getBdLocation());
 				}
 			}
 			// ClImm擔保品不動產檔
-			ClImm tClImm = clImmService
-					.findById(new ClImmId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
+			ClImm tClImm = clImmService.findById(new ClImmId(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo()), titaVo);
 			if (tClImm != null) {
 				occursList.putParam("OOABdRmk", tClImm.getBdRmk()); // 建物標示備註
 			}
@@ -344,8 +332,7 @@ public class L2932 extends TradeBuffer {
 		occursList.putParam("OOCSecuredTotal", "0");
 		// 全部結案
 		List<ClFac> l2ClFac = new ArrayList<ClFac>(); // 擔保品與額度關聯檔
-		Slice<ClFac> slClFac = clFacService.clNoEq(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<ClFac> slClFac = clFacService.clNoEq(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 		l2ClFac = slClFac == null ? null : slClFac.getContent();
 		boolean isAllClose = true;
 		for (ClFac c : l2ClFac) {
@@ -353,13 +340,11 @@ public class L2932 extends TradeBuffer {
 			if ((c.getCustNo() == iCustNo && iFacmNo == 0) || (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
 
 				// 撥款主檔
-				Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
-						c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+				Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 				if (slLoanBorMain != null) {
 					for (LoanBorMain t : slLoanBorMain.getContent()) {
 						// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-						if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
-								|| t.getStatus() == 8) {
+						if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6 || t.getStatus() == 8) {
 							isAllClose = false;
 							break;
 						}
@@ -367,8 +352,7 @@ public class L2932 extends TradeBuffer {
 				}
 			}
 		}
-		Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(tClFac.getClCode1(), tClFac.getClCode2(),
-				tClFac.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<ClOtherRights> slClOtherRights = ClOtherRightsService.findClNo(tClFac.getClCode1(), tClFac.getClCode2(), tClFac.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 
 		lClOtherRights = slClOtherRights == null ? null : slClOtherRights.getContent();
 

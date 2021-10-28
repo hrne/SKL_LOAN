@@ -33,7 +33,7 @@ public class L2670Report extends MakeReport {
 
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	@Autowired
 	DateUtil dDateUtil;
 
@@ -58,10 +58,11 @@ public class L2670Report extends MakeReport {
 //	private String reprint = "✽✽✽重印✽✽✽";
 	private String reprint = "******重印******";
 	// 製表日期
-	private String NowDate;
+//	private String NowDate;
 	// 製表時間
-	private String NowTime;
+//	private String NowTime;
 	private int sPrintCode = 0;
+
 	// 自訂表頭
 	@Override
 	public void printHeader() {
@@ -69,8 +70,8 @@ public class L2670Report extends MakeReport {
 		this.info("L2670Report.printHeader");
 
 		this.print(-2, 55, "新光人壽保險股份有限公司", "C");
-		if(sPrintCode != 0) {
-		  this.print(-2, 110, reprint, "R");
+		if (sPrintCode != 0) {
+			this.print(-2, 110, reprint, "R");
 		}
 		this.print(-3, 55, this.reportItem, "C");
 		this.print(-4, 6, "茲收到", "L");
@@ -86,14 +87,14 @@ public class L2670Report extends MakeReport {
 	// 自訂表尾
 	@Override
 	public void printFooter() {
-		
-		CdEmp tCdEmp = new CdEmp();	
+
+		CdEmp tCdEmp = new CdEmp();
 		String EmpName = "";
-		tCdEmp = sCdEmpService.findById(this.titaVo.getTlrNo(), titaVo);	
-		if( tCdEmp != null) {
+		tCdEmp = sCdEmpService.findById(this.titaVo.getTlrNo(), titaVo);
+		if (tCdEmp != null) {
 			EmpName = tCdEmp.getFullname(); // 建檔人員姓名
 		}
-		
+
 		this.print(-15, 25, "放款部部章：　　　　　　　　　　　　　　　　　　　經辦：" + this.titaVo.getTlrNo() + "  " + EmpName);
 	}
 
@@ -105,8 +106,8 @@ public class L2670Report extends MakeReport {
 
 		this.reportDate = Integer.valueOf(titaVo.getEntDy());
 		this.brno = titaVo.getBrno();
-		this.NowDate = dDateUtil.getNowStringRoc();
-		this.NowTime = dDateUtil.getNowStringTime();
+//		this.NowDate = dDateUtil.getNowStringRoc();
+//		this.NowTime = dDateUtil.getNowStringTime();
 
 		this.open(titaVo, reportDate, brno, reportCode, reportItem, security, pageSize, pageOrientation);
 
@@ -118,8 +119,7 @@ public class L2670Report extends MakeReport {
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
 		// 契變日期
 		int iContractChgDate = Integer.valueOf(titaVo.getParam("ContractChgDate")) + 19110000;
-		// 序號
-		int iContractChgNo = Integer.valueOf(titaVo.getParam("ContractChgNo"));
+		Integer.valueOf(titaVo.getParam("ContractChgNo"));
 
 		String iRvNo = parse.IntegerToString(iContractChgDate, 8) + titaVo.getParam("ContractChgNo");
 

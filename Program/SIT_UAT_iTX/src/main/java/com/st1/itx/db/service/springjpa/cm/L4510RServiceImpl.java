@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -18,26 +16,17 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("l4510RServiceImpl")
 @Repository
 /* 逾期放款明細 */
 public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4510RServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
 
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
-
-	@Autowired
-	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	private int entryDate = 0;
 	private String procCode = "";
@@ -47,54 +36,75 @@ public class L4510RServiceImpl extends ASpringJpaParm implements InitializingBea
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4510R.findAll");
+		this.info("L4510R.findAll");
 
-		String sql = " select                                                           ";
-		sql += "  d.\"PerfMonth\"            AS F0                                      ";
-		sql += " ,d.\"ProcCode\"             AS F1                                      ";
-		sql += " ,d.\"EntryDate\"            AS F2                                      ";
-		sql += " ,d.\"EmpNo\"                AS F3                                      ";
-		sql += " ,d.\"CustId\"               AS F4                                      ";
-		sql += " ,d.\"CustNo\"               AS F5                                      ";
-		sql += " ,c.\"CustName\"             AS F6                                      ";
-		sql += " ,d.\"FacmNo\"               AS F7                                      ";
-		sql += " ,r.\"ClNo\"                 AS F8                                      ";
-		sql += " ,r.\"FireInsuPrem\"         AS F9                                      ";
-		sql += " ,r.\"EthqInsuPrem\"         AS F10                                     ";
-		sql += " ,r.\"TotInsuPrem\"          AS F11                                     ";
-		sql += " from \"EmpDeductDtl\" d                                                ";
-		sql += " left join \"CustMain\" c on c.\"CustNo\" = d.\"CustNo\"                ";
-		sql += " left join (                                                            ";
-		sql += "     select                                                             ";
-		sql += "      \"CustNo\"                                                        ";
-		sql += "     ,\"FacmNo\"                                                        ";
-		sql += "     ,\"ClCode1\" || ' ' || LPAD(\"ClCode2\", 2, '0') || ' ' ||  LPAD(\"ClNo\", 7, '0') as \"ClNo\" ";
-		sql += "     ,\"FireInsuPrem\"                                                  ";
-		sql += "     ,\"EthqInsuPrem\"                                                  ";
-		sql += "     ,\"TotInsuPrem\"                                                   ";
-		sql += "     ,row_number() over (partition by \"CustNo\", \"FacmNo\" order by \"InsuYearMonth\" Desc) as seq ";
-		sql += "     from \"InsuRenew\"                                                 ";
-		sql += " ) r on r.\"CustNo\" = d.\"CustNo\"                                     ";
-		sql += "    and r.\"FacmNo\" = d.\"FacmNo\"                                     ";
-		sql += "    and r.seq = 1                                                       ";
-		sql += " where d.\"ErrMsg\" is null                                             ";
-		sql += "   and d.\"EntryDate\" = " + entryDate;
-		sql += "   and d.\"ProcCode\" in ( " + procCode + " ) ";
-		sql += "   and d.\"AchRepayCode\" = 5                                           ";
-		sql += " order by d.\"CustNo\",d.\"FacmNo\"                                     ";
+		String sql = " ";
+		sql += " WITH EDD AS ( ";
+		sql += "     SELECT EDD.\"EntryDate\" ";
+		sql += "          , EDD.\"CustNo\" ";
+		sql += "          , EDD.\"AchRepayCode\" ";
+		sql += "          , EDD.\"PerfMonth\" ";
+		sql += "          , EDD.\"ProcCode\" ";
+		sql += "          , EDD.\"RepayCode\" ";
+		sql += "          , EDD.\"AcctCode\" ";
+		sql += "          , EDD.\"FacmNo\" ";
+		sql += "          , EDD.\"CustId\" ";
+		sql += "          , JSON_VALUE(EDD.\"JsonFields\", '$.InsuNo') AS JSON_DATA "; // -- 先取得JSON_VALUE
+		sql += "     FROM \"EmpDeductDtl\" EDD ";
+		sql += "     WHERE JSON_VALUE(EDD.\"JsonFields\", '$.InsuNo') IS NOT NULL "; // -- 判斷NOT NULL 避免後面資料重複
+		sql += "       AND EDD.\"ErrMsg\" IS NULL ";
+		sql += "       AND EDD.\"EntryDate\" = :entryDate ";
+		sql += "       AND EDD.\"ProcCode\" IN ( :procCode ) ";
+		sql += "       AND EDD.\"AchRepayCode\" = 5 ";
+		sql += " ) ";
+		sql += " ,EDD2 AS ( ";
+		sql += "     SELECT EDD.\"EntryDate\" ";
+		sql += "          , EDD.\"CustNo\" ";
+		sql += "          , EDD.\"AchRepayCode\" ";
+		sql += "          , EDD.\"PerfMonth\" ";
+		sql += "          , EDD.\"ProcCode\" ";
+		sql += "          , EDD.\"RepayCode\" ";
+		sql += "          , EDD.\"AcctCode\" ";
+		sql += "          , EDD.\"FacmNo\" ";
+		sql += "          , EDD.\"CustId\" ";
+		sql += "          , REGEXP_SUBSTR(JSON_DATA,'[^,]+',1,LEVEL,'i') AS \"Splited_JSON_DATA\" ";
+		// -- 用正規表達式+LEVEL 做到類似JAVA SPLIT的功能
+		sql += "     FROM EDD ";
+		sql += "     CONNECT BY LEVEL <= REGEXP_COUNT(JSON_DATA,',') + 1 ";
+		sql += " ) ";
+		sql += " SELECT EDD.\"PerfMonth\" ";
+		sql += "      , EDD.\"ProcCode\" ";
+		sql += "      , EDD.\"EntryDate\" ";
+		sql += "      , EDD.\"EmpNo\" ";
+		sql += "      , EDD.\"CustId\" ";
+		sql += "      , EDD.\"CustNo\" ";
+		sql += "      , CM.\"CustNam\" ";
+		sql += "      , EDD.\"FacmNo\" ";
+		sql += "      , EDD.\"FacmNo\" ";
+		sql += "      , IR.\"ClNo\" ";
+		sql += "      , IR.\"FireInsuPrem\" ";
+		sql += "      , IR.\"EthqInsuPrem\" ";
+		sql += "      , IR.\"TotInsuPrem\" ";
+		sql += " FROM EDD2 ";
+		sql += " LEFT JOIN \"CustMain\" CM ON CM.\"CustNo\" = EDD2.\"CustNo\" ";
+		sql += " LEFT JOIN \"InsuRenew\" IR ON IR.\"CustNo\" = EDD2.\"CustNo\" ";
+		sql += "                         AND IR.\"FacmNo\" = EDD2.\"FacmNo\" ";
+		sql += "                         AND IR.\"PrevInsuNo\" = EDD2.\"Splited_JSON_DATA\" "; // -- 拿來串檔
+		sql += " ORDER BY EDD2.\"CustNo\" ";
+		sql += "        , EDD2.\"FacmNo\" ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
-		List<Object> result = query.getResultList();
+		query.setParameter("entryDate", entryDate);
+		query.setParameter("procCode", procCode);
 
-		return this.convertToMap(result);
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findAll(int iEntryDate, String iProcCode, TitaVo titaVo) throws Exception {

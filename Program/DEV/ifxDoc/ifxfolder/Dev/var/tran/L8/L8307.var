@@ -260,6 +260,9 @@ C(5,#CloseCode,00,T(2,@FdBreakCode,*)T(F,@BreakCode,1),T(2,@FdBreakCode, )T(F,@B
 #CloseCodeX=X,50,L
 T(H,#CloseCode,#CloseCodeHelp)
 
+! 會計日(民國年)
+#SDate=D,7,S
+T(1,#SYSDATE,2,8)
 
 !結案日期
 #CloseDate=D,7,I
@@ -268,11 +271,8 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)A(DATE,0,#CloseDate)
-
-
-#CheckCloseDate=X,1,S
-IF(#CloseDate<#RcDate,$,S)
-V(P,結案日早於協商申請日)
+IF(#CloseDate<#RcDate,V(P,結案日不可早於協商申請日),$)
+IF(#CloseDate>#SDate,V(P,結案日不可晚於報送日),$)
 
 !毀諾原因代號
 #BreakCode=X,2,I

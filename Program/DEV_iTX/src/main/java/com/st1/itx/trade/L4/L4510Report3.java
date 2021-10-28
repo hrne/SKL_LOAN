@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.springjpa.cm.L4510R3ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
@@ -35,9 +34,6 @@ public class L4510Report3 extends MakeReport {
 
 	@Autowired
 	private DateUtil dateUtil;
-
-	@Autowired
-	private CdCodeService cdCodeService;
 
 	private int perfMonth = 0;
 	private String procCode = "";
@@ -119,9 +115,9 @@ public class L4510Report3 extends MakeReport {
 				this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4510Report3", "非15日薪-扣薪媒體明細表", "", "A4", "L");
 			}
 
-			BigDecimal leglFee = BigDecimal.ZERO; // 違約金
-			BigDecimal ovduAmt = BigDecimal.ZERO; // 滯繳本金
-			BigDecimal ovduBal = BigDecimal.ZERO; // 滯繳利息
+			BigDecimal breach = BigDecimal.ZERO; // 違約金
+			BigDecimal shortPri = BigDecimal.ZERO; // 滯繳本金
+			BigDecimal shortInt = BigDecimal.ZERO; // 滯繳利息
 			BigDecimal tempAmt = BigDecimal.ZERO; // 暫收抵繳
 
 //			by 流程別合計
@@ -148,22 +144,22 @@ public class L4510Report3 extends MakeReport {
 
 				this.info("fnAllList.get(i)-------->" + fnAllList.get(i).toString());
 
-				leglFee = BigDecimal.ZERO;
-				ovduAmt = BigDecimal.ZERO;
-				ovduBal = BigDecimal.ZERO;
+				breach = BigDecimal.ZERO;
+				shortPri = BigDecimal.ZERO;
+				shortInt = BigDecimal.ZERO;
 				tempAmt = BigDecimal.ZERO;
 
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(fnAllList.get(i).get("F16"));
 
-				if (tempVo.get("LeglFee") != null && tempVo.get("LeglFee").length() > 0) {
-					leglFee = parse.stringToBigDecimal(tempVo.get("LeglFee"));
+				if (tempVo.get("Breach") != null && tempVo.get("Breach").length() > 0) {
+					breach = parse.stringToBigDecimal(tempVo.get("Breach"));
 				}
-				if (tempVo.get("OvduAmt") != null && tempVo.get("OvduAmt").length() > 0) {
-					ovduAmt = parse.stringToBigDecimal(tempVo.get("OvduAmt"));
+				if (tempVo.get("ShortPri") != null && tempVo.get("ShortPri").length() > 0) {
+					shortPri = parse.stringToBigDecimal(tempVo.get("ShortPri"));
 				}
-				if (tempVo.get("OvduBal") != null && tempVo.get("OvduBal").length() > 0) {
-					ovduBal = parse.stringToBigDecimal(tempVo.get("OvduBal"));
+				if (tempVo.get("ShortInt") != null && tempVo.get("ShortInt").length() > 0) {
+					shortInt = parse.stringToBigDecimal(tempVo.get("ShortInt"));
 				}
 				if (tempVo.get("TempAmt") != null && tempVo.get("TempAmt").length() > 0) {
 					tempAmt = parse.stringToBigDecimal(tempVo.get("TempAmt"));
@@ -191,9 +187,9 @@ public class L4510Report3 extends MakeReport {
 				this.print(0, 82, format4Amt(parse.stringToBigDecimal(fnAllList.get(i).get("F14"))), "R");// 本金
 				this.print(0, 92, format4Amt(parse.stringToBigDecimal(fnAllList.get(i).get("F15"))), "R");// 利息
 //				僅期款需顯示
-				this.print(0, 102, format4Amt(leglFee), "R");// 違約金
-				this.print(0, 112, format4Amt(ovduAmt), "R");// 欠繳本金
-				this.print(0, 122, format4Amt(ovduBal), "R");// 欠繳利息
+				this.print(0, 102, format4Amt(breach), "R");// 違約金
+				this.print(0, 112, format4Amt(shortPri), "R");// 欠繳本金
+				this.print(0, 122, format4Amt(shortInt), "R");// 欠繳利息
 				this.print(0, 132, format4Amt(tempAmt), "R");// 暫收抵繳
 
 				timeBs++;
@@ -201,9 +197,9 @@ public class L4510Report3 extends MakeReport {
 				sumB1 = sumB1.add(parse.stringToBigDecimal(fnAllList.get(i).get("F13")));
 				sumB2 = sumB2.add(parse.stringToBigDecimal(fnAllList.get(i).get("F14")));
 				sumB3 = sumB3.add(parse.stringToBigDecimal(fnAllList.get(i).get("F15")));
-				sumB4 = sumB4.add(leglFee);
-				sumB5 = sumB5.add(ovduAmt);
-				sumB6 = sumB6.add(ovduBal);
+				sumB4 = sumB4.add(breach);
+				sumB5 = sumB5.add(shortPri);
+				sumB6 = sumB6.add(shortInt);
 				sumB7 = sumB7.add(tempAmt);
 
 //				流程別筆數統計
@@ -212,9 +208,9 @@ public class L4510Report3 extends MakeReport {
 				sumA1 = sumA1.add(parse.stringToBigDecimal(fnAllList.get(i).get("F13")));
 				sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("F14")));
 				sumA3 = sumA3.add(parse.stringToBigDecimal(fnAllList.get(i).get("F15")));
-				sumA4 = sumA4.add(leglFee);
-				sumA5 = sumA5.add(ovduAmt);
-				sumA6 = sumA6.add(ovduBal);
+				sumA4 = sumA4.add(breach);
+				sumA5 = sumA5.add(shortPri);
+				sumA6 = sumA6.add(shortInt);
 				sumA7 = sumA7.add(tempAmt);
 
 //				全部筆數統計
@@ -241,11 +237,8 @@ public class L4510Report3 extends MakeReport {
 //						this.print(0, 112, format4Amt(sumA5), "R");// 欠繳本金
 //						this.print(0, 122, format4Amt(sumA6), "R");// 欠繳利息
 //						this.print(0, 132, format4Amt(sumA7), "R");// 暫收抵繳
-						
-						
-						
-						this.print(1, 1,
-								"--------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 
 						this.print(1, 44, "總　計：");
 						this.print(0, 15, "" + perfMonth);
@@ -258,7 +251,7 @@ public class L4510Report3 extends MakeReport {
 						this.print(0, 112, format4Amt(sumB5), "R");// 欠繳本金
 						this.print(0, 122, format4Amt(sumB6), "R");// 欠繳利息
 						this.print(0, 132, format4Amt(sumB7), "R");// 暫收抵繳 this.print(1, 1,
-						
+
 //						扣除合計的行數
 						this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
 
@@ -271,8 +264,6 @@ public class L4510Report3 extends MakeReport {
 						sumA6 = BigDecimal.ZERO;
 						sumA7 = BigDecimal.ZERO;
 
-						
-						
 //						若流程別相同則需出總計
 //						if (!fnAllList.get(i).get("F1").equals(fnAllList.get(j).get("F1"))) {
 //							this.print(1, 1,
@@ -432,31 +423,6 @@ public class L4510Report3 extends MakeReport {
 		case "5":
 			result = "房貸扣薪件";
 			break;
-		}
-
-		return result;
-	}
-
-	private String limitLength(String str, int pos) {
-		byte[] input = str.getBytes();
-
-		int inputLength = input.length;
-
-		this.info("str ..." + str);
-		this.info("inputLength ..." + inputLength);
-
-		int resultLength = inputLength;
-
-		if (inputLength > pos) {
-			resultLength = pos;
-		}
-
-		String result = "";
-
-		if (resultLength > 0) {
-			byte[] resultBytes = new byte[resultLength];
-			System.arraycopy(input, 0, resultBytes, 0, resultLength);
-			result = new String(resultBytes);
 		}
 
 		return result;

@@ -1,16 +1,11 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -19,41 +14,32 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM032ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM032ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+
+	@Autowired
+	DateUtil dUtil;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String lastdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY")) + 19110000));
-
-		// 設定日期格式
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		// 進行轉換
-		Date date = sdf.parse(lastdy);
-
-		Calendar cal = Calendar.getInstance();
-
-		cal.setTime(date);
-
-		cal.add(Calendar.MONTH, -1);
-
-		lastdy = sdf.format(cal.getTime());
-
-		lastdy = String.valueOf((Integer.valueOf(lastdy) / 100));
-
-		logger.info("lM032.findAll ");
+		int thisYearMonth = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
+		
+		this.info("LM032ServiceImpl thisYearMonth: " + thisYearMonth);
+		this.info("lM032.findAll ");
 		String sql = " ";
 		sql += " SELECT \"ADTYMT\"  "; // F0 前期資料年月
 		sql += "       ,\"GDRID1\"  "; // F1 前期擔保品代號1
@@ -80,14 +66,16 @@ public class LM032ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,CASE WHEN \"W08DLY01\" = 0 AND \"STATUS\" <> '轉催' THEN '0'";
 		sql += "        ELSE \"ACTACT\" END \"ACTACT\""; // F15 當期業務科目
 		sql += " FROM \"MonthlyLM032\" L";
-		sql += " WHERE L.\"ADTYMT\" = :lastdy ";
-		logger.info("sql=" + sql);
+		sql += " WHERE L.\"ADTYMT\" = \"Fn_GetLastMonth\"(:thisYearMonth) ";
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("lastdy", lastdy);
-		return this.convertToMap(query.getResultList());
+		
+		query.setParameter("thisYearMonth", thisYearMonth);
+		
+		return this.convertToMap(query);
 	}
 
 }

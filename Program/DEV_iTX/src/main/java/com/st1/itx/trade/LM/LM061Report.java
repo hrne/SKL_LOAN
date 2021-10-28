@@ -166,93 +166,14 @@ public class LM061Report extends MakeReport {
 				F11 = tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11"));
 
 				// 代號 56 拍定金額 58 分配金額
-				if (tLDVo.get("F12").equals("056")) {
+//				if (tLDVo.get("F12").equals("056")) {
 
-					// 20211025Test
+				// 20211025Test
 
-					checkMergeRegionValue(tLDVo.get("F0").toString(), tLDVo.get("F2").toString(), F11, ovduBal, row);
+				// 代號 56 拍定金額 58 分配金額 (含戶號 戶名)
+				checkMergeRegionValue(tLDVo.get("F0").toString(), tLDVo.get("F2").toString(), F11, ovduBal, row);
 
-//					// 和上一個戶號不一樣就歸零 並直接附值
-//					// 和上一個戶號一樣就累加 並 合併儲存格 再賦值
-//
-//					if (tempCustNo.equals(tLDVo.get("F0"))) {
-//
-//						// 紀錄同戶號多額度的筆數
-//						tempCount++;
-//						this.info("1.tempCount=" + tempCount);
-//						// 累加轉催收金額
-//
-//						tempOvduBal = tempOvduBal.add(ovduBal);
-//						this.info("1有相同戶號的累積金額" + tempOvduBal + ",單筆金額" + ovduBal);
-//
-//						// BigDecimal的比較大小：-1 小於 0 等於 1 大於
-//						if (tempF11.compareTo(F11) == -1) {
-//							tempF11 = F11;
-//						}
-//
-//					} else {
-//						// 上一同戶號多額度跟這筆比較，如果有1筆以上就使用合併
-//						if (tempCount > 1) {
-//
-//							// 爛位的列數為多少筆額度減去當前列數
-//							makeExcel.setValue(row - tempCount, 13, tempF11, "L");
-//
-//							// 同上方式，同戶號 累計轉催收金額 除以 鑑價金額 (LTV)
-//							makeExcel.setValue(row - tempCount, 14, this.computeDivide(tempOvduBal, tempF11, 4),
-//									"##0.0%");
-//							this.info("2有相同戶號的累積金額" + tempOvduBal + ",單筆金額" + ovduBal);
-//							this.info("戶號：" + tLDVo.get("F0") + ",需合併：從" + (row - tempCount) + "到" + (row - 1));
-//
-//							// 賦值完後 合併
-//							makeExcel.setMergedRegion(row - tempCount, row - 1, 13, 13);
-//							// 賦值完後 合併
-//							makeExcel.setMergedRegion(row - tempCount, row - 1, 14, 14);
-//
-//						}
-//						// 暫存鑑價金額 歸零
-//						tempF11 = BigDecimal.ZERO;
-//						// 賦值鑑價金額
-//						tempF11 = F11;
-//
-//						// 暫存轉催收金額 歸零
-//						tempOvduBal = BigDecimal.ZERO;
-//						// 累加轉催收金額
-//						tempOvduBal = tempOvduBal.add(ovduBal);
-//
-//						tempCount = 0;
-//						// 多筆額度計數
-//						tempCount++;
-//
-//						// 單筆
-//						makeExcel.setValue(row, 13,
-//								tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11")),
-//								"$* #,##0", "R");
-//
-//						makeExcel.setValue(row, 14, this.computeDivide(ovduBal, new BigDecimal(tLDVo.get("F11")), 4),
-//								"##0.0%");
-//
-//					}
-//
-//					// 暫存戶號
-//					tempCustNo = tLDVo.get("F0");
-//
-//					// 最後一筆時如果是需要合併，且同戶號多額度有1筆以上就使用合併。
-//					if (count == tLDVo.size() && tempCount > 1) {
-//
-//						// 欄位的列數為多少筆額度減去當前列數
-//						makeExcel.setValue(row - tempCount, 13, tempF11, "L");
-//
-//						// 同上方式，同戶號 累計轉催收金額 除以 鑑價金額 (LTV)
-//						makeExcel.setValue(row - tempCount, 14, this.computeDivide(tempOvduBal, tempF11, 4), "##0.0%");
-//
-//						// 賦值完後 合併
-//						makeExcel.setMergedRegion(row - tempCount, row, 13, 13);
-//						// 賦值完後 合併
-//						makeExcel.setMergedRegion(row - tempCount, row, 14, 14);
-//
-//					}
-
-				}
+//				}
 
 				// 代號 77 協議達成
 				if (tLDVo.get("F12").equals("077")) {
@@ -293,18 +214,18 @@ public class LM061Report extends MakeReport {
 
 			if (Integer.valueOf(mergeData.get("count").toString()) > 1) {
 
-				//戶號
+				// 戶號
 				makeExcel.setMergedRegionValue(sRow, eRow, 3, 3, Integer.valueOf(mergeData.get("cust").toString()));
-				//戶名
+				// 戶名
 				makeExcel.setMergedRegionValue(sRow, eRow, 5, 5, mergeData.get("name").toString());
 				makeExcel.setMergedRegionValue(sRow, eRow, 13, 13, tempAmt, "#,##0");
 				makeExcel.setMergedRegionValue(sRow, eRow, 14, 14, tempLTV, "##0.00%");
 
 			} else {
 
-				//戶號
+				// 戶號
 				makeExcel.setValue(sRow, 3, Integer.valueOf(mergeData.get("cust").toString()));
-				//戶名
+				// 戶名
 				makeExcel.setValue(sRow, 5, mergeData.get("name").toString());
 				makeExcel.setValue(sRow, 13, tempAmt, "#,##0");
 				makeExcel.setValue(sRow, 14, tempLTV, "##0.00%");
@@ -321,7 +242,6 @@ public class LM061Report extends MakeReport {
 
 		String tempCustNo = "";
 		BigDecimal ltvPercent = BigDecimal.ZERO;
-//		String tempFacmNo = "";
 
 		mergeMap = new HashMap<String, Object>();
 
@@ -351,8 +271,11 @@ public class LM061Report extends MakeReport {
 				if (tempAmt.compareTo(eAmt) == 0) {
 
 					mergeMap.put("amt", eAmt);
+
 				} else if (tempAmt.compareTo(eAmt) == -1) {
+
 					mergeMap.put("amt", eAmt);
+
 				} else {
 
 					mergeMap.put("amt", tempAmt);

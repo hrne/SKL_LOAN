@@ -356,11 +356,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#GradeType,1,E(0,72),$)
 C(5,#GradeType,1,s,$)
-
-
-#CheckPeriodMore180=X,1,S
-IF(#Period>180,$,s)
+@IF(#Period>180,$,s)
 V(P,期數不得大於180)
+
 
 !利率
 #Rate=m,2.2,I

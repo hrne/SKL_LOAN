@@ -288,8 +288,6 @@ HELP(#ClaimStatusHelp)
 
 #ClaimStatusX=X,20,L
 T(H,#ClaimStatus,#ClaimStatusHelp)
-IF(#ClaimStatus==0,$,s)
-V(P,請選擇1或2)
 
 ![遞狀日期]
 #ApplyDate=D,7,I
@@ -299,8 +297,6 @@ C(5,#TranKey,D,T(2,@ApplyDate,#L8r21ApplyDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
 @A(DATE,0,#ApplyDate)
-
-#CheckApplyDate=X,1,S
 IF(#ClaimStatus==2,$,s)
 IF(#ApplyDate=="" || #ApplyDate==0,$,s)
 V(P,案件進度為法院裁定時，遞狀日期不可空白)
@@ -313,14 +309,13 @@ C(5,#TranKey,D,T(2,@CourtCode,#L8r21CourtCode),$)
 C(5,#TranKey,D,s,$)
 HELP(#CourtCodeHelp)
 @V(H,#CourtCodeHelp)
+IF(#ClaimStatus==2,$,s)
+IF(#CourtCode=="" || #CourtCode==0,$,s)
+V(P,案件進度為法院裁定時，承審法院代碼不可空白)
 
 #CourtCodeX=X,20,L
 T(H,#CourtCode,#CourtCodeHelp)
 
-#CheckCourtCode=X,1,S
-IF(#ClaimStatus==2,$,s)
-IF(#CourtCode=="" || #CourtCode==0,$,s)
-V(P,案件進度為法院裁定時，承審法院代碼不可空白)
 
 !年度別[民國年]
 #Year=A,3,I

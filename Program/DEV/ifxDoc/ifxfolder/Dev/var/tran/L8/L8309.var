@@ -279,7 +279,6 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,X,S,$)
 @A(PH,0,#CustRegTelNo)
-#CheckConnectTel=X,1,S
 C(5,#TranKey,X,S,$)
 IF(#CustRegTelNo=="" && #CustComTelNo=="" && #CustMobilNo=="",$,s)
 V(P,債務人戶籍電話，通訊電話，行動電話必須至少填寫一項)

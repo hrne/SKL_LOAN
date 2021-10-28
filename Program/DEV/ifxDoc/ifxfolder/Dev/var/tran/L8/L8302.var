@@ -211,11 +211,18 @@ C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)A(DATE,0,#RcDate)
 
+![協商申請日]+25
+#RcDateA25=D,8,S
+D(7,2,#RcDate,0,25)
+
+#RcDateA25X=D,7,S
+T(1,#RcDateA25,2,7)
+
 ![協商開始日]
 #NegoStartDate=D,7,L
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-T(2,1090126)
+T(2,#NegoStartDate,#RcDateA25X)
 
 
 ![非金融機構債權金額]

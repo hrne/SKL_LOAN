@@ -384,8 +384,7 @@ C(3,#Precision,0,SHOW(#TwBookAmt)
 
 ![約定部分償還日期]
 #FdBookDate=X,2,L
-C(3,#CHAIN,1,C(3,#FuncCode,1,$,S),$)
-!C(3,#UpdateCode,1,$,S)
+C(3,#UpdateCode,1,$,S)
 T(3,*)
 
 #OldBookDate=D,7,S

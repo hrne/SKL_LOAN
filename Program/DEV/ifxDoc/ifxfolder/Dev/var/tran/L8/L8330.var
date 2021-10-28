@@ -260,20 +260,19 @@ HELP(#DelayCodeHelp)
 #DelayCodeX=X,40,L
 T(H,#DelayCode,#DelayCodeHelp)
 
+#tDelayYM=X,6,S
+T(1,#tDelayYM,#ApplyDate,1,5)
+
 !延期繳款年月
 #DelayYM=A,5,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey,D,s,$)
-@V(7)
-A(YM,1,#DelayYM)
+@V(7)A(YM,1,#DelayYM)
 IF(#DelayYM>0,$,V(P,延期繳款年月不可小於零))
+IF(#tDelayYM<=#DelayYM,$,V(P,延期繳款年月不得小於調解申請日))
 
-#tDelayYM=X,6,S
-T(1,#tDelayYM,#ApplyDate,1,5)
-IF(#tDelayYM<=#DelayYM,s,$)
-V(P,延期繳款年月不得小於調解申請日)
 
 
 !轉JCIC文字檔日期

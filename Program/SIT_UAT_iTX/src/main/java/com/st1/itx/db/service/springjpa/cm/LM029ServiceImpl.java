@@ -14,24 +14,26 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("LM029ServiceImpl findAll ");
 
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 100);
+		int entdy = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
 
 		String sql = "";
 		sql += " SELECT M.\"CustNo\"                              AS F0 ";
@@ -81,7 +83,7 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                   ,LPAD(NVL(CL.\"LandNo1\",'0'),4,'0') ";
 		sql += "                         || LPAD(NVL(CL.\"LandNo2\",'0'),4,'0')    AS \"LandNo\"  "; // 地號格式為 4-4
 		sql += "                   ,LPAD(NVL(CB.\"BdNo1\",'0'),5,'0') ";
-		sql += "                         || LPAD(NVL(CB.\"BdNo2\",'0'),3,'0')      AS \"BdNo\"  ";   // 建號格式為 5-3
+		sql += "                         || LPAD(NVL(CB.\"BdNo2\",'0'),3,'0')      AS \"BdNo\"  "; // 建號格式為 5-3
 		sql += "                   ,ROW_NUMBER() OVER (PARTITION BY M.\"ClCode1\" ";
 		sql += "                                                   ,M.\"ClCode2\" ";
 		sql += "                                                   ,M.\"ClNo\" ";
@@ -109,13 +111,16 @@ public class LM029ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " WHERE M.\"YearMonth\" = :entdy ";
 		sql += "   AND M.\"LoanBalance\" > 0 ";
 		sql += " ORDER BY F0,F1,F2 ";
+		
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		
 		query.setParameter("entdy", entdy);
-		return this.convertToMap((List<Object>) query.getResultList());
+		
+		return this.convertToMap(query);
 	}
 
 }
