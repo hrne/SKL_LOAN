@@ -45,7 +45,7 @@ public class L5963 extends TradeBuffer {
 		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
 		int iDateFlag = Integer.valueOf(titaVo.getParam("DateFlag"));
-		int txDate = Integer.valueOf(titaVo.getEntDy()) + 19110000;// 營業日 放acdate
+		int txDate = Integer.valueOf(titaVo.getCalDy()) + 19110000;// 日曆日 放acdate
 
 		int iMonth1 = 0;
 		int iMonth3 = 0;
@@ -111,10 +111,10 @@ public class L5963 extends TradeBuffer {
 				occursList.putParam("OOAddress", returnVo.getAddress());
 				occursList.putParam("OORemark", returnVo.getRemark());
 				occursList.putParam("OOEditEmpNo", returnVo.getLastUpdateEmpNo());
-				CdEmp iCdEmp = iCdEmpService.findById(returnVo.getLastUpdateEmpNo(),titaVo);
+				CdEmp iCdEmp = iCdEmpService.findById(returnVo.getLastUpdateEmpNo(), titaVo);
 				if (iCdEmp == null) {
 					occursList.putParam("OOEditEmpNoX", "");
-				}else {
+				} else {
 					occursList.putParam("OOEditEmpNoX", iCdEmp.getFullname());
 				}
 				occursList.putParam("OOTitaTxtNo", returnVo.getTitaTxtNo());

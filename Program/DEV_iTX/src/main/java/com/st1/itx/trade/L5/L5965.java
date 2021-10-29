@@ -63,7 +63,7 @@ public class L5965 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 200;
+		this.limit = 80;
 
 		Slice<CollRemind> tCollRemind = iCollRemindService.findCl(iCaseCode, iCustNo, iFacmNo, iCondCodeFlag, this.index, this.limit, titaVo);
 		this.info("tcollremind=" + tCollRemind);
@@ -79,10 +79,10 @@ public class L5965 extends TradeBuffer {
 				occursList.putParam("OORemindCode", reCollRemind.getRemindCode());
 				occursList.putParam("OORemark", reCollRemind.getRemark());
 				occursList.putParam("OOEditEmpNo", reCollRemind.getLastUpdateEmpNo());
-				CdEmp iCdEmp = iCdEmpService.findById(reCollRemind.getLastUpdateEmpNo(),titaVo);
+				CdEmp iCdEmp = iCdEmpService.findById(reCollRemind.getLastUpdateEmpNo(), titaVo);
 				if (iCdEmp == null) {
 					occursList.putParam("OOEditEmpNoX", "");
-				}else {
+				} else {
 					occursList.putParam("OOEditEmpNoX", iCdEmp.getFullname());
 				}
 				occursList.putParam("OOTitaTxtNo", reCollRemind.getTitaTxtNo());

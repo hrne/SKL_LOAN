@@ -2,6 +2,7 @@ package com.st1.itx.trade.L4;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,6 +105,8 @@ public class L4520Report3 extends MakeReport {
 			DecimalFormat df1 = new DecimalFormat("#,##0");
 			int total = 0, i = 0, pageCnt = 0;
 			
+			BigDecimal sumA1 = BigDecimal.ZERO;
+			BigDecimal sumA2 = BigDecimal.ZERO;
 			
 			for(int j = 1; j <= fnAllList.size(); j++) {
 //			1.每筆先印出明細
@@ -118,11 +121,15 @@ public class L4520Report3 extends MakeReport {
 	  		  this.print(0, 50, fnAllList.get(i).get("F5")); // 員工代號
 	  		  this.print(0, 60, fnAllList.get(i).get("F6")); // 身份證字號
 	  		  this.print(0, 73, fnAllList.get(i).get("F7")); // 交易序號
-	  		  if(!"0".equals(fnAllList.get(i).get("F9"))) {
+	  		  if(parse.stringToInteger(fnAllList.get(i).get("F9")) > 0) {
 	  			  this.print(0, 98, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))), "R");// 沖火險費
 	  			  this.print(0, 116, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))), "R");// 沖火險費
+	  			  sumA1 = sumA1.add(parse.stringToBigDecimal(fnAllList.get(i).get("F8")));
+	  			  sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("F8")));
 	  		  } else {
+	  			  this.print(0, 116, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))), "R");// 沖火險費
 	  			  this.print(0, 135, df1.format(parse.stringToBigDecimal(fnAllList.get(i).get("F8"))), "R");// 沖火險費
+	  			  sumA2 = sumA2.add(parse.stringToBigDecimal(fnAllList.get(i).get("F8")));
 	  		  }
 	  		                    
 	  		  this.print(1, 0, "-------------------------------------------------------------------------------------------------------------------------------------------------");
@@ -139,6 +146,7 @@ public class L4520Report3 extends MakeReport {
 //					扣除合計的行數
 					this.print(pageIndex - pageCnt - 2, 70, "=====續下頁=====", "C");
 	  				pageCnt = 0;
+	  				BatchNo = fnAllList.get(j).get("F0");
 					this.newPage();
 					continue;
 	  			}
@@ -156,6 +164,8 @@ public class L4520Report3 extends MakeReport {
 			  } else {
 				  if (total == fnAllList.size()) {
 						this.print(1, 1, "   總　計：                                                                                                             ");
+						this.print(0, 98, df1.format(sumA1), "R");// 沖火險費
+						this.print(0, 116, df1.format(sumA2), "R");// 沖火險費
 //						扣除總計合計的行數 +1 
 						this.print(pageIndex - pageCnt - 2, 70, "=====報表結束=====", "C");
 				  } 

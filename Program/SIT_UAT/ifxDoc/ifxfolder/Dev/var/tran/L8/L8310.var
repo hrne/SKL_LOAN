@@ -137,12 +137,6 @@ K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdClaimStatus,*)
 T(2,@FdApplyDate,*)
-T(2,@FdCourtCode,*)
-T(2,@FdYear,*)
-T(2,@FdCourtDiv,*)
-T(2,@FdCourtCaseNo,*)
-T(2,@FdApprove,*)
-T(2,@FdClaimDate,*)
 T(2,@FdSubmitKey,*)
 ! 異動進入
 #Deal_Update=X,1,S
@@ -155,12 +149,6 @@ K(MODIFYBUTTON,異動)
 T(2,@FdTranKey,*)
 T(2,@FdClaimStatus,*)
 T(2,@FdApplyDate,*)
-T(2,@FdCourtCode,*)
-T(2,@FdYear,*)
-T(2,@FdCourtDiv,*)
-T(2,@FdCourtCaseNo,*)
-T(2,@FdApprove,*)
-T(2,@FdClaimDate,*)
 T(3,@TranKeyHelp,C:異動;D:刪除))
 
 !! 查詢進入
@@ -229,9 +217,9 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@ClaimStatus,1)T(F,@ApplyDate,1)T(F,@CourtCode,1)T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@Approve,1)T(F,@ClaimDate,1)
-T(2,@FdClaimStatus,*)T(2,@FdApplyDate,*)T(2,@FdCourtCode,*)T(2,@FdYear,*)T(2,@FdCourtDiv,*)T(2,@FdCourtCaseNo,*)T(2,@FdApprove,*)T(2,@FdClaimDate,*),
+T(2,@FdClaimStatus,*)T(2,@FdApplyDate,*),
 C(5,#TranKey,D,T(F,@ClaimStatus,0)T(F,@ApplyDate,0)T(F,@CourtCode,0)T(F,@Year,0)T(F,@CourtDiv,0)T(F,@CourtCaseNo,0)T(F,@Approve,0)T(F,@ClaimDate,0)K(MODIFYBUTTON,刪除)
-T(2,@FdClaimStatus, )T(2,@FdApplyDate, )T(2,@FdCourtCode, )T(2,@FdYear, )T(2,@FdCourtDiv, )T(2,@FdCourtCaseNo, )T(2,@FdApprove, )T(2,@FdClaimDate, ),$))
+T(2,@FdClaimStatus, )T(2,@FdApplyDate, ),$))
 
 
 #TranKeyX=X,4,L
@@ -274,10 +262,9 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#RcDate)
+@V(7)A(DATE,0,#RcDate)
 
-!案件進度
+!案件進度 7
 #ClaimStatus=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -285,6 +272,8 @@ C(5,#TranKey,D,T(2,@ClaimStatus,#L8r21ClaimStatus),$)
 C(5,#TranKey,D,s,$)
 HELP(#ClaimStatusHelp)
 @V(H,#ClaimStatusHelp)
+C(5,#ClaimStatus,2,T(2,@FdCourtCode,*)T(2,@FdYear,*)T(2,@FdCourtDiv,*)T(2,@FdCourtCaseNo,*)T(2,@FdApprove,*)T(2,@FdClaimDate,*),
+T(2,@FdCourtCode, )T(2,@FdYear, )T(2,@FdCourtDiv, )T(2,@FdCourtCaseNo, )T(2,@FdApprove, )T(2,@FdClaimDate, ))
 
 #ClaimStatusX=X,20,L
 T(H,#ClaimStatus,#ClaimStatusHelp)
@@ -296,97 +285,67 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@ApplyDate,#L8r21ApplyDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
-@A(DATE,0,#ApplyDate)
-IF(#ClaimStatus==2,$,s)
-IF(#ApplyDate=="" || #ApplyDate==0,$,s)
-V(P,案件進度為法院裁定時，遞狀日期不可空白)
+@V(7)A(DATE,0,#ApplyDate)
 
-!承審法院代碼
+!承審法院代碼 9
 #CourtCode=X,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtCode,#L8r21CourtCode),$)
 C(5,#TranKey,D,s,$)
 HELP(#CourtCodeHelp)
-@V(H,#CourtCodeHelp)
-IF(#ClaimStatus==2,$,s)
-IF(#CourtCode=="" || #CourtCode==0,$,s)
-V(P,案件進度為法院裁定時，承審法院代碼不可空白)
+@C(5,#ClaimStatus,1,$,V(H,#CourtCodeHelp))
+C(4,#CourtCode,$,V(H,#CourtCodeHelp))
+
 
 #CourtCodeX=X,20,L
-T(H,#CourtCode,#CourtCodeHelp)
+C(4,#CourtCode,S,T(H,#CourtCode,#CourtCodeHelp))
 
 
-!年度別[民國年]
+!年度別[民國年] 10
 #Year=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@Year,#L8r21Year),$)
 C(5,#TranKey,D,s,$)
-IF(#ClaimStatus==2,$,s)
-
-#CheckYear1=X,1,S
-IF(#ClaimStatus==2,$,s)
-IF(#Year=="" || #Year==0,$,s)
-V(P,案件進度為法院裁定時，年度別不可空白)
-
-!法院承審股別(兩個中文字)
-#CourtDiv=C,9,I
+@C(5,#ClaimStatus,1,$,V(2,0))
+!法院承審股別(兩個中文字) 11
+#CourtDiv=C,4,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtDiv,#L8r21CourtDiv),$)
 C(5,#TranKey,D,s,$)
-IF(#ClaimStatus==2,$,s)
-@V(8,0,2)
+@C(5,#ClaimStatus,1,$,V(7))
+V(8,0,2)
 
-#CheckCourtDiv=X,1,S
-IF(#ClaimStatus==2,$,s)
-IF(#CourtDiv=="" || #CourtDiv==0,$,s)
-V(P,案件進度為法院裁定時，法院承審股別不可空白)
-
-!法院案號(只可寫入10個中文字)
+!法院案號(只可寫入10個中文字) 12
 #CourtCaseNo=C,25,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@CourtCaseNo,#L8r21CourtCaseNo),$)
 C(5,#TranKey,D,s,$)
-IF(#ClaimStatus==2,$,s)
-@V(8,0,10)
+@C(5,#ClaimStatus,1,$,V(7))
+V(8,0,10)
 
-#CheckCourtCaseNo=X,1,S
-IF(#ClaimStatus==2,$,s)
-IF(#CourtCaseNo=="" || #CourtCaseNo==0,$,s)
-V(P,案件進度為法院裁定時，法院案號不可空白)
-
-!法院認可與否
+!法院認可與否 13
 #Approve=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@Approve,#L8r21Approve),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
-@C(2,#ClaimStatus,$,$,C(4,#Approve,V(P,案件進度為法院裁定時，法院認可與否不可空白),$))  
-C(4,#ClaimStatus,s,V(H,#YesNoHelp))
-
-!法院裁定日期
+@C(5,#ClaimStatus,1,$,V(H,#YesNoHelp))
+C(4,#Approve,$,V(H,#YesNoHelp))
+!法院裁定日期 14
 #ClaimDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@ClaimDate,#L8r21ClaimDate),$)
 C(5,#TranKey,D,s,$)
-IF(#ClaimStatus==2,$,s)
 D(8)
-@A(DATE,0,#ClaimDate)
-
-#CheckClaimDate1=X,1,S
-IF(#ClaimStatus==2,$,s)
-IF(#ClaimDate=="" || #ClaimDate==0,$,s)
-V(P,案件進度為法院裁定時，法院裁定日期不可空白)
-
-#CheckClaimDate2=X,1,S
-IF(#ClaimStatus==2,$,s)
-IF(#ClaimDate>=#ApplyDate,s,$)
-V(P,法院裁定日期需大於遞狀日期，請重新選擇)
+@C(5,#ClaimStatus,1,$,V(7))
+A(DATE,0,#ClaimDate)
+IF(#ClaimDate <= #ApplyDate,V(P,法院裁定日期須大於遞狀日期),$)
 
 
 ![轉JCIC文字檔日期]

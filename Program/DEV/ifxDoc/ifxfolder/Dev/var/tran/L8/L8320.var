@@ -44,6 +44,7 @@ E(0,0)
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
+[#<->#,"#FdGradeType+屬階梯式還款註記",#GradeType],
 ["#FdRcDate+原前置協商申請日",#RcDate],["#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
 ["#FdCompletePeriod+變更還款條件已履約期數",#CompletePeriod],["#FdPeriod+（第一階梯）期數",#Period],
 ["#FdRate+（第一階梯）利率",#Rate,"%"],["#FdExpBalanceAmt+信用貸款協商剩餘債務簽約餘額",#ExpBalanceAmt],
@@ -52,7 +53,7 @@ E(0,0)
 ["#FdChaRepayViewDate+變更還款條件面談日期",#ChaRepayViewDate],["#FdChaRepayEndDate+變更還款條件簽約完成日期",#ChaRepayEndDate],
 ["#FdChaRepayFirstDate+變更還款條件首期應繳款日",#ChaRepayFirstDate],["#FdPayAccount+繳款帳號",#PayAccount],
 [#<->#,"#FdPostAddr+最大債權金融機構聲請狀送達地址",#PostAddr],
-["#FdMonthPayAmt+月付金",#MonthPayAmt],["#FdGradeType+屬階梯式還款註記",#GradeType],
+["#FdMonthPayAmt+月付金",#MonthPayAmt],
 ["#FdPeriod2+第二階梯期數",#Period2],["#FdRate2+第二階梯利率",#Rate2,"%"],
 ["#FdMonthPayAmt2+第二階梯月付金",#MonthPayAmt2],["#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
@@ -139,21 +140,13 @@ T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@SubmitKey,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
 T(2,@FdChangePayDate,*)
-T(2,@FdCompletePeriod,*)
 T(2,@FdPeriod,*)
 T(2,@FdRate,*)
-T(2,@FdExpBalanceAmt,*)
-T(2,@FdCashBalanceAmt,*)
-T(2,@FdCreditBalanceAmt,*)
-! T(2,@FdChaRepayAmt,*)
 T(2,@FdChaRepayAgreeDate,*)
-T(2,@FdChaRepayViewDate,*)
 T(2,@FdChaRepayEndDate,*)
 T(2,@FdChaRepayFirstDate,*)
 T(2,@FdPayAccount,*)
-T(2,@FdPostAddr,*)
 T(2,@FdMonthPayAmt,*)
-! T(2,@FdGradeType,*)
 T(2,@FdPeriod2,*)
 T(2,@FdRate2,*)
 T(2,@FdMonthPayAmt2,*)
@@ -169,21 +162,13 @@ T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
 T(2,@FdTranKey,*)
-T(2,@FdCompletePeriod,*)
 T(2,@FdPeriod,*)
 T(2,@FdRate,*)
-T(2,@FdExpBalanceAmt,*)
-T(2,@FdCashBalanceAmt,*)
-T(2,@FdCreditBalanceAmt,*)
-! T(2,@FdChaRepayAmt,*)
 T(2,@FdChaRepayAgreeDate,*)
-T(2,@FdChaRepayViewDate,*)
 T(2,@FdChaRepayEndDate,*)
 T(2,@FdChaRepayFirstDate,*)
 T(2,@FdPayAccount,*)
-T(2,@FdPostAddr,*)
 T(2,@FdMonthPayAmt,*)
-! T(2,@FdGradeType,*)
 T(2,@FdPeriod2,*)
 T(2,@FdRate2,*)
 T(2,@FdMonthPayAmt2,*)
@@ -254,11 +239,6 @@ T(2,@TranKey,#L8r31TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ! 調Rim相關 結束
 
-! 類似的有L8308,L8320
-#PreValuePostAddr=X,76,S
-! T(2,台北市中正區忠孝西路一段66號18樓)
-IF(#L8r31PostAddr!="",s,T(2,@PostAddr,#PreValuePostAddr))
-
 !---------- AP TEXT AREA Variables ----------
 ![交易代碼]
 #TranKey_Tmp=X,1,S
@@ -299,6 +279,12 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@SubmitKeyX,#L8r01JcicBankName)
 
+!屬階梯式還款註記
+#GradeType=X,1,I
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+@C(4,#GradeType,$,C(5,#GradeType,Y,$,V(P,限輸入Y或空白)))
+C(5,#GradeType,Y,E(0,#Rate,0)T(F,@Rate,0)T(2,#FdRate, )T(F,@Period2,1)T(2,@FdPeriod2,*)T(2,@FdMonthPayAmt2,*)T(F,@MonthPayAmt2,1)T(2,@FdRate2,*)T(F,@Rate2,1),T(F,@Rate,1)T(2,@FdRate,*)E(0,@Period2,0)T(F,@Period2,0)T(2,@FdPeriod2, )T(2,@FdMonthPayAmt2, )T(F,@MonthPayAmt2,0)T(2,@FdRate2, )T(F,@Rate2,0)E(0,@Rate2,0))
 
 !原前置協商申請日
 #RcDate=D,7,I
@@ -306,8 +292,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#RcDate)
+@V(7)A(DATE,0,#RcDate)
 
 !申請變更還款條件日
 #ChangePayDate=D,7,I
@@ -315,8 +300,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
-@V(7)
-@A(DATE,0,#ChangePayDate)
+@V(7)A(DATE,0,#ChangePayDate)
 
 !變更還款條件已履約期數
 #CompletePeriod=A,3,I
@@ -327,30 +311,34 @@ C(5,#TranKey_Tmp,4,s,$)
 #Period=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+@V(2,0)
+C(5,#GradeType,Y,V(1,12,24),$)
 
 !（第一階梯）利率
 #Rate=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#GradeType,Y,s,$)
+@V(2,0)
 
-!信用貸款協商剩餘債務簽約餘額
+!信用貸款協商剩餘債務簽約餘額 11
 #ExpBalanceAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 @E(0,@ChaRepayAmt,#ExpBalanceAmt)
 
-!現金卡協商剩餘債務簽約餘額
+!現金卡協商剩餘債務簽約餘額 12
 #CashBalanceAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 @E(0,@ChaRepayAmt,#ExpBalanceAmt+#CashBalanceAmt)
-!信用卡協商剩餘債務簽約餘額
+!信用卡協商剩餘債務簽約餘額 13
 #CreditBalanceAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 @E(0,@ChaRepayAmt,#ExpBalanceAmt+#CashBalanceAmt+#CreditBalanceAmt)
-!變更還款條件簽約總債務金額
-#ChaRepayAmt=M,10,L
+!變更還款條件簽約總債務金額 14 = 11+12+13
+#ChaRepayAmt=M,10,L 
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 
@@ -360,7 +348,7 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)
-@A(DATE,0,#ChaRepayAgreeDate)
+@V(7)A(DATE,0,#ChaRepayAgreeDate)
 
 !變更還款條件面談日期
 #ChaRepayViewDate=D,7,I
@@ -374,22 +362,22 @@ D(8)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)
-@A(DATE,0,#ChaRepayEndDate)
-@IF(#ChaRepayEndDate!="",IF(#ChaRepayEndDate>=#ChaRepayAgreeDate,$,V(P,變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日，請重新選擇)),s)
+@V(7)A(DATE,0,#ChaRepayEndDate)
+IF(#ChaRepayEndDate>=#ChaRepayAgreeDate,$,V(P,變更還款條件簽約完成日期需大於或等於變更還款條件協議完成日))
 
 !變更還款條件首期應繳款日
 #ChaRepayFirstDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)
-@A(DATE,0,#ChaRepayFirstDate)
-@IF(#ChaRepayFirstDate!="",IF(#ChaRepayFirstDate>=#ChaRepayEndDate,$,V(P,變更還款條件首期應繳款日需大於或等於變更還款條件簽約完成日期，請重新選擇)),s)
+@V(7)A(DATE,0,#ChaRepayFirstDate)
+IF(#ChaRepayFirstDate>=#ChaRepayEndDate,$,V(P,變更還款條件首期應繳款日需大於或等於變更還款條件簽約完成日期))
 
 !繳款帳號-20字元
 #PayAccount=X,40,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(8,0,20)
+@V(7)V(8,0,20)
 
 !最大債權金融機構聲請狀送達地址
 #PostAddr=X,76,I
@@ -401,29 +389,13 @@ C(5,#TranKey_Tmp,4,s,$)
 #MonthPayAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-
-!屬階梯式還款註記
-#GradeType=X,1,I
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-@C(4,#GradeType,$,C(5,#GradeType,Y,$,V(P,限輸入Y或空白)))
-
-#CheckPeriod=X,1,S
-IF(#GradeType=="Y",$,s)
-IF(#Period=="012" || #Period=="024",s,$)
-V(P,當屬階梯式還款註記選擇「Y」時，第一階梯期數需為「012」或「024」，請重新輸入)
-
-#CheckRate=X,1,S
-IF(#CheckRate==0,s,$)
-V(P,當屬階梯式還款註記選擇「Y」時，第一階梯利率需為「00.00」，請重新輸入)
-
+@V(2,0)
 !第二階梯期數
 #Period2=A,3,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-IF(#GradeType=="N",S,$)
-@IF(#GradeType=="Y" && #Period2==0,V(P,不可為0),s)
-
+C(4,#GradeType,S,$)
+@V(2,0)
 #SumPeriod=M,4,S
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -441,15 +413,15 @@ IF(#Period2==0 && #SumPeriod1>180,V(P,「變更還款條件已履約期數」+�
 #Rate2=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-IF(#GradeType=="N",S,$)
-! @IF(#GradeType=="Y" && #Rate2==0,V(P,不可為0),s)
+C(4,#GradeType,S,$)
+@V(2,0)
 
 !第二階梯月付金
 #MonthPayAmt2=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-IF(#GradeType=="N",S,$)
-@IF(#GradeType=="Y" && #MonthPayAmt2==0,V(P,不可為0),s)
+C(4,#GradeType,S,$)
+@V(2,0)
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

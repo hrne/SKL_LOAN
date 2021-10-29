@@ -40,10 +40,10 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="L5965" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L5965]                                 提醒事項查詢"],
-[#<->#,"@案件種類",#CaseCode,#CaseCodeX],
-[#<->#,"@借款人戶號",#CustNo,#CUSTNM],
-[#<->#,"@額度編號",#FacmNo],
-[#<->#,"@項目",#CondCodeFlag,#CondCodeFlagX],
+[#<->#,"#FdCaseCode+案件種類",#CaseCode,#CaseCodeX],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,#CUSTNM],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo],
+[#<->#,"#FdCondCodeFlag+項目",#CondCodeFlag,#CondCodeFlagX],
 ]
 !---------- AP TEXT AREA Variables ----------
 
@@ -58,6 +58,15 @@ T(1,@CustNo,#NTXBUF,2,7)
 T(1,@FacmNo,#NTXBUF,9,3)
 T(1,@CondCodeFlag,#NTXBUF,12,1)
 INVOKEJS(SHOW,p1,02,02,1)
+
+#FdCaseCode=X,1,L
+T(3,*)
+#FdCustNo=X,1,L
+T(3,*)
+#FdFacmNo=X,1,L
+T(3, )
+#FdCondCodeFlag=X,1,L
+T(3,*)
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 ! 案件種類下拉選單1
@@ -100,6 +109,25 @@ T(H,#CaseCode,#CaseCodeHelp)
 ! 借款人戶名----調RIM
 #CUSTNM=X,20,L
 
+!抓戶名
+#oCustNo=A,7,L
+E(0,#CustNo)
+#CustNo2=A,7,S
+#RimFunCd=A,1,S
+#RimCustId=X,10,S
+#RimCustNo=A,7,S
+
+#RimL1r09=X,1,S
+C(3,#CustNo,#CustNo2,s,$)
+E(0,@RimFunCd,1)
+T(2,@RimCustId,)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimFunCd,#RimCustId,#RimCustNo)
+R(1,L1R09)
+T(2,@CustName,#L1r09CustName)
+#CustName=x,2.50,L
+
 ! 額度編號
 #FacmNo=A,3,I
 ! C(3,#CHAIN,0,$,s)
@@ -118,6 +146,8 @@ HELP(#CondCodeHelp)
 T(H,#CondCodeFlag,#CondCodeHelp)
 
 #RPTFG=A,1,S
+<include src="ROM.icf::L1R09.dec"/>
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -151,8 +181,8 @@ T(H,#OOCondCode,#CondCodeHelp)
 C(1,#OORemindCode,S,S,$)
 T(H,#OORemindCode,#RemindCodeHelp)
 ! 其他記錄(160)
-#OORemark=X,4.40,O
-! 增修人員
+#OORemark=x,10.50,O
+! 修改人員
 #OOEditEmpNo=X,6,O
 #Space=X,1,S
 T(2, )
@@ -171,15 +201,15 @@ T(2,#OOEditEmpNo+#Space+#OOEditEmpNoX)
 ! 1+7+3+1 +1+7+7+5+2+160+6+20=220
 #OOBUF_MAINTAIN=X,241,S
 T(2,2+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
-#OOBUF_DELETE=X,241,S
-T(2,4+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
+!#OOBUF_DELETE=X,241,S
+!T(2,4+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
 #OOBUF_LIFT=X,241,S
 T(2,6+#CaseCode+#CustNo+#FacmNo+#OOTitaTlrNo+#OOTitaTxtNo+#OOTitaAcDate)
 
 #OOBTN_MAINTAIN=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5605; ntxbuf=#OOBUF_MAINTAIN})
-#OOBTN_DELETE=A,2,O
-BIND(grid,{ cmd=CHAIN; ntxcd=L5605; ntxbuf=#OOBUF_DELETE})
+!#OOBTN_DELETE=A,2,O
+!BIND(grid,{ cmd=CHAIN; ntxcd=L5605; ntxbuf=#OOBUF_DELETE})
 #OOBTN_LIFT=A,2,O
 BIND(grid,{ cmd=CHAIN; ntxcd=L5605; ntxbuf=#OOBUF_LIFT})
 
@@ -209,6 +239,7 @@ TXFORM=L5965
 #OOTitaAcDate
 #OOEditEmpNoX
 ^
+<include src="ROM.icf::L1R09.tom"/>
 </sub>
 
 
@@ -216,10 +247,8 @@ TXFORM=L5965
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L5965" layout="cols=1;screen.width=[130,870];order=1;">
 [
 ["[L5965]                                 提醒事項查詢                                                                           "],
-! [#<->#,"@案件種類",#CaseCode,#CaseCodeX],
-! [#<->#,"@借款人戶號",#CustNo,#CUSTNM],
-! [#<->#,"@額度編號",#FacmNo],
-! [#<->#,"@項目",#CondCodeFlag,#CondCodeFlagX],
+["戶號",#oCustNo],
+["戶名",#CustName],
 ]
 </sub>
 
@@ -230,8 +259,8 @@ TXFORM=L5965
 
 #OOBTN_MAINTAIN=修改
 {search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
-#OOBTN_DELETE=刪除
-{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+!#OOBTN_DELETE=刪除
+!{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
 #OOBTN_LIFT=解除
 {search:false,formatter:'cust:bind-button:解除',align:'center',canExport:false,width:40}
 
@@ -249,9 +278,9 @@ TXFORM=L5965
 {width:135}
 #OORemark=其他記錄
 {width:120}
-#EditEmpCombine=增修人員
+#EditEmpCombine=修改人員
 {width:80,align:'center'}
-#OOTitaTxtNo=登放序號
+#OOTitaTxtNo=交易序號
 {width:85,align:'center'}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5965;cpi=15"/>

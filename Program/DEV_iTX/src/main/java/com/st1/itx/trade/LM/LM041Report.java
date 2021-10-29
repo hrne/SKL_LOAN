@@ -15,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.LM041ServiceImpl;
 import com.st1.itx.util.common.MakeExcel;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.parse.Parse;
 
 @Component
 @Scope("prototype")
@@ -27,6 +28,9 @@ public class LM041Report extends MakeReport {
 	@Autowired
 	MakeExcel makeExcel;
 
+	@Autowired
+	Parse parse;
+	
 	@Override
 	public void printTitle() {
 
@@ -48,42 +52,47 @@ public class LM041Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LMList) throws LogicException {
 		this.info("LM041Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM041", "催收及呆帳戶暫收款明細表", "LM041催收及呆帳戶暫收款明細表", "LM041催收及呆帳戶暫收款明細表.xlsx", "D961211M");
-		if (LMList.size() == 0) {
+	    makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM041", "催收及呆帳戶暫收款明細表", "LM041催收及呆帳戶暫收款明細表", "LM041催收及呆帳戶暫收款明細表.xlsx", "D961211M");
+
+	    if (LMList == null || LMList.isEmpty()) {
+			
 			makeExcel.setValue(3, 1, "本日無資料");
-		}
+			
+		} else {
 		int row = 3;
 		BigDecimal total = BigDecimal.ZERO;
 		for (Map<String, String> tLDVo : LMList) {
 
-			String ad = "";
-			int col = 0;
-			for (int i = 0; i < tLDVo.size(); i++) {
+			for (int i = 0; i <= 6; i++) {
+				
+				String value = tLDVo.get("F" + i);
+				int col = i + 1;
 
-				ad = "F" + String.valueOf(col);
-				col++;
-				switch (col) {
+				switch (i) {
 				case 7:
-					total = total.add(tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)));
-					makeExcel.setValue(row, col, tLDVo.get(ad) == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(ad)), "#,##0", "R");
+					BigDecimal bd = getBigDecimal(value);
+					total = total.add(bd);
+					makeExcel.setValue(row, col, bd, "#,##0", "R");
 					break;
 				default:
-					makeExcel.setValue(row, col, tLDVo.get(ad));
+					makeExcel.setValue(row, col, value);
 					break;
 				}
 			} // for
 
 			row++;
 		} // for
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) / 100));
-		String year = entdy.substring(0, 3);
-		int month = Integer.parseInt(entdy.substring(3, 5));
-		
+		int entdy = parse.stringToInteger(titaVo.get("ENTDY"));
+		int year = entdy / 10000;
+		int month = entdy / 100 % 100;
+
 		makeExcel.setMergedRegion(row + 3, row + 3, 1, 7);
-		makeExcel.setValue(row + 3, 1, "一、擬 " + year + "年" + String.valueOf(month) + "月份呆帳戶之暫收款項金額共計 $" + total + "元入呆帳回收。", "#,##0");
+		makeExcel.setValue(row + 3, 1, "一、擬 " + year + "年" + month + "月份呆帳戶之暫收款項金額共計 $" + formatAmt(total, 0) + "元入呆帳回收。");
 		makeExcel.setMergedRegion(row + 4, row + 4, 1, 7);
 		makeExcel.setValue(row + 4, 1, "二、陳核。");
 		
+		}
+
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 	}

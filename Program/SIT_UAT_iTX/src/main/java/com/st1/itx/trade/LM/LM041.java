@@ -12,32 +12,6 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.tradeService.BatchBase;
 
-//@Service("LM041")
-//@Scope("prototype")
-///**
-// * 
-// * 
-// * @author Eric Chang
-// * @version 1.0.0
-// */
-//public class LM041 extends TradeBuffer {
-//	@SuppressWarnings("unused")
-//	private static final Logger logger = LoggerFactory.getLogger(LM041.class);
-//
-//	@Autowired
-//	public LM041Report lm041report;
-//
-//	@Override
-//	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-//		this.info("active LM041 ");
-//		this.totaVo.init(titaVo);
-//
-//		lm041report.exec(titaVo);
-//		this.addList(this.totaVo);
-//		return this.sendList();
-//	}
-//}
-
 @Service("LM041")
 @Scope("step")
 /**
@@ -58,7 +32,6 @@ public class LM041 extends BatchBase implements Tasklet, InitializingBean {
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(LM041.class);
 		return this.exec(contribution, "M");
 	}
 

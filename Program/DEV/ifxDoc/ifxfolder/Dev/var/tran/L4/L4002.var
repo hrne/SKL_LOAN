@@ -267,9 +267,9 @@ T,T(2,轉暫收),)
 T(2,A+#AcDate+#OOBatchNo+#OOStatusCode+00
      +   +0000000+ )
 ! 筆數按鈕_RANK=2
-#OOBUF_L4920C2=X,100,S
+#OOBUF_L4920C2=x,100,S
 T(2,A+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
-     +#OOReconCode+0000000+ )
+     +#OOReconCode+0000000+#OOFileName)
 ! 筆數按鈕_RANK=3
 #OOBUF_L4920C3=x,100,S
 T(2,A+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
@@ -280,9 +280,9 @@ T(2,A+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
 T(2,S+#AcDate+#OOBatchNo+#OOStatusCode+00
      +   +0000000+ )
 ! 已處理按鈕_RANK=2
-#OOBUF_L4920D2=X,100,S
+#OOBUF_L4920D2=x,100,S
 T(2,S+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
-     +#OOReconCode+0000000+ )
+     +#OOReconCode+0000000+#OOFileName)
 ! 已處理按鈕_RANK=3
 #OOBUF_L4920D3=x,100,S
 T(2,S+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
@@ -293,9 +293,9 @@ T(2,S+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
 T(2,R+#AcDate+#OOBatchNo+#OOStatusCode+00
      +   +0000000+ )
 ! 待處理按鈕_RANK=2 
-#OOBUF_L4920E2=X,100,S
+#OOBUF_L4920E2=x,100,S
 T(2,R+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
-     +#OOReconCode+0000000+ )
+     +#OOReconCode+0000000+#OOFileName)
 ! 待處理按鈕_RANK=3 
 #OOBUF_L4920E3=x,100,S
 T(2,R+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
@@ -306,9 +306,9 @@ T(2,R+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
 T(2,1+#AcDate+#OOBatchNo+#OOStatusCode+00
      +   +0000000+ )
 ! 不處理按鈕_RANK=2 
-#OOBUF_L4920F2=X,100,S
+#OOBUF_L4920F2=x,100,S
 T(2,1+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
-     +#OOReconCode+0000000+ )
+     +#OOReconCode+0000000+#OOFileName)
 ! 不處理按鈕_RANK=3 
 #OOBUF_L4920F3=x,100,S
 T(2,1+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
@@ -316,9 +316,9 @@ T(2,1+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
 
 ! 20210113 新增
 ! 虛擬轉暫收按鈕_RANK=2
-#OOBUF_L4920H2=X,100,S
+#OOBUF_L4920H2=x,100,S
 T(2,7+#AcDate+#OOBatchNo+#OOStatusCode+#OORepayCode
-     +#OOReconCode+0000000+ )
+     +#OOReconCode+0000000+#OOFileName)
 
 
 ! 處理印記 0:入帳 1:刪除 2:訂正 3: 檢核

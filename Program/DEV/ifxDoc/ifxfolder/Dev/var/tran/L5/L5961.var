@@ -40,10 +40,10 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="L5961" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L5961]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@電催明細資料查詢"],
-[#<->#,#FdCaseCode+案件種類",#CaseCode,#CaseCodeX],
-[#<->#,#FdCustNo+借款人戶號",#CustNo,#CustNoX],
-[#<->#,#FdFacmNo+額度編號",#FacmNo],
-[#<->#,#FdDateFlag+項目",#DateFlag,#DateFlagX],
+[#<->#,"#FdCaseCode+案件種類",#CaseCode,#CaseCodeX],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,#CustNoX],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo],
+[#<->#,"#FdDateFlag+項目",#DateFlag,#DateFlagX],
 ]
 !---------- AP TEXT AREA Variables ----------
 
@@ -217,7 +217,7 @@ C(1,#OOResultCode,S,S,$)
 T(H,#OOResultCode,#ResultCodeHelp)
 
 ! 其他記錄(500)
-#OORemark=X,10.50,O
+#OORemark=x,10.50,O
 ! 修改人員
 #OOEditEmpNo=X,6,O
 ! 交易序號
@@ -328,7 +328,7 @@ TXFORM=L5961
 {width:80}
 #EditEmp=修改人員
 {width:80,align:'center'}
-#OOTitaTxtNo=登放序號
+#OOTitaTxtNo=交易序號
 {width:80,align:'center'}
 #OOTitaTlrNo=
 {width:1,hidden:true}

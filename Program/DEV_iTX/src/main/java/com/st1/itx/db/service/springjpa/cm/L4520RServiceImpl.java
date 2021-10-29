@@ -64,6 +64,7 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql +=       "    WHERE                   "; 
 		sql +=		 "    ed.\"PerfMonth\" = :PerfMonth "; 
 		sql +=		 "    AND ed.\"AchRepayCode\" = 5   ";
+		sql +=		 "     ORDER BY \"BatchNo\",\"CustNo\"   ";
 		this.info("sql=" + sql);
 		Query query;
 

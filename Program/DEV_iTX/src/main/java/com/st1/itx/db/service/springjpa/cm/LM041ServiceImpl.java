@@ -14,25 +14,26 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("lM041.findAll ");
 
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000));
-		String yearMonth = entdy.substring(0, 6);
+		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
 		String sql = "";
 		sql += " SELECT CT.\"CityItem\" ";
@@ -65,7 +66,7 @@ public class LM041ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yearMonth", yearMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

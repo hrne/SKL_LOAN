@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,35 +14,34 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
 /* 逾期放款明細 */
 public class LM040ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM040ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("LM040ServiceImpl findAll ");
+		this.info("LM040ServiceImpl findAll ");
 		int entryMonth = (titaVo.getEntDyI() + 19110000) / 100;
-		int inputDate = Integer.parseInt(titaVo.getParam("InputDate")) + 19110000;
-		logger.info("LM040ServiceImpl entryMonth = " + entryMonth);
-		logger.info("LM040ServiceImpl inputDate =  " + inputDate);
+		int inputDate = parse.stringToInteger(titaVo.getParam("InputDate")) + 19110000;
+		
+		this.info("LM040ServiceImpl entryMonth = " + entryMonth);
+		this.info("LM040ServiceImpl inputDate =  " + inputDate);
 
 		String sql = " ";
-		sql += " SELECT CASE";
-		sql += "          WHEN M.\"EntCode\" IN ('0', '2') THEN '0'";
-		sql += "        ELSE '1' END            AS F0";
-		sql += "       ,CASE";
-		sql += "          WHEN NVL(M.\"CityCode\",' ') = ' ' THEN '0'";
-		sql += "        ELSE M.\"CityCode\" END AS F1";
+		sql += " SELECT DECODE(M.\"EntCode\", 1, 1, 0) AS F0";
+		sql += "       ,NVL(M.\"CityCode\", '0') AS F1";
 		sql += "       ,SUM(M.\"PrinBalance\")  AS F2";
 		sql += " FROM \"MonthlyFacBal\" M";
 		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
@@ -53,23 +50,20 @@ public class LM040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND M.\"Status\" = 0";
 		sql += "   AND M.\"PrinBalance\" > 0";
 		sql += "   AND F.\"FirstDrawdownDate\" <= :inputDate";
-		sql += " GROUP BY CASE";
-		sql += "            WHEN M.\"EntCode\" IN ('0', '2') THEN '0'";
-		sql += "          ELSE '1' END";
-		sql += "         ,CASE";
-		sql += "            WHEN NVL(M.\"CityCode\",' ') = ' ' THEN '0'";
-		sql += "          ELSE M.\"CityCode\" END";
+		sql += " GROUP BY DECODE(M.\"EntCode\", 1, 1, 0)";
+		sql += "         ,NVL(M.\"CityCode\", '0') ";
 		sql += " ORDER BY F0";
 		sql += "         ,F1";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		
 		query.setParameter("entryMonth", entryMonth);
 		query.setParameter("inputDate", inputDate);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

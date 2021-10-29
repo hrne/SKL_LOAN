@@ -47,7 +47,7 @@ E(0,0)
 [#<->#,"#FdRcDate+協商申請日",#RcDate],
 [#<->#,"#FdDebtCode+負債主因",#DebtCode,#DebtCodeX],
 [#<->#,"#FdNonGageAmt+無擔保金融債務協商總金額",#NonGageAmt],
-[#<->#,"#FdGradeType+屬二階段還款方案之階段註記",#GradeType],
+[#<->#,"#FdGradeType+屬二階段還款方案之階段註記",#GradeType,#GradeTypeX],
 ["#FdPeriod+期數",#Period],["#FdRate+利率",#Rate,"%"],
 ["#FdMonthPayAmt+協商方案估計月付金",#MonthPayAmt],
 ["#FdReceYearIncome+最近年度綜合所得總額",#ReceYearIncome],["#FdReceYear+最近年度別",#ReceYear],
@@ -129,6 +129,9 @@ R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
 T(2,@DebtCodeHelp,#HelpDesc2)
+
+#GradeTypeDscp=X,50,S
+T(3, :非屬二階段還款;1:第一階段;2:第二階段)
 
 
 #CHAIN=A,1,S
@@ -257,6 +260,7 @@ E(0,@OutJcicTxtDate,#L8r15OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(H,@DebtCodeX,#DebtCode,#DebtCodeHelp)
+T(H,@GradeTypeX,#GradeType,#GradeTypeDscp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r15TranKey)
@@ -345,10 +349,15 @@ C(5,#TranKey_Tmp,4,s,$)
 #GradeType=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@C(4,#GradeType,$,V(NL))
+HELP(#GradeTypeDscp)
+@C(4,#GradeType,$,V(H,#GradeTypeDscp))
+T(2,#GradeTypeX,)
 C(5,#GradeType,1,T(F,@PayLastAmt,0)T(F,@Period,0)T(F,@Rate,0),T(F,@PayLastAmt,0)T(F,@Period,1)T(F,@Rate,1))
 C(5,#GradeType,2,T(2,@FdPeriod2,*)T(2,@FdRate2,*)T(2,@FdMonthPayAmt2,*)T(2,@FdPayLastAmt2,*)T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1),
                  T(2,@FdPeriod2, )T(2,@FdRate2, )T(2,@FdMonthPayAmt2, )T(2,@FdPayLastAmt2, )T(F,@Period2,0)T(F,@Rate2,0)T(F,@MonthPayAmt2,0)T(F,@PayLastAmt2,0))
+
+#GradeTypeX=X,20,L
+T(H,#GradeType,#GradeTypeDscp)
 
 !期數
 #Period=A,3,I

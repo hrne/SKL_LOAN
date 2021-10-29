@@ -70,36 +70,32 @@ public class L5977 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");
 		int iCaseSeq = parse.stringToInteger(titaVo.getParam("CaseSeq"));
 		int iCustNo = 0;
-		String iCustName="";
 		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = 40;// 查全部
 
 		CustMain tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
-		if(tCustMain!=null) {
+		if (tCustMain != null) {
 			iCustNo = tCustMain.getCustNo();
-			iCustName = tCustMain.getCustName();
 		} else {
 			throw new LogicException(titaVo, "E0001", "客戶資料主檔");
 		}
-		
-		List<Map<String, String>> listL5977 = null;
-		
-			try {
-				if(iCaseSeq==0) {
-					listL5977 = l5975ServiceImpl.findbyCustNo(iCustNo, titaVo, this.index, this.limit);
-				} else {
-					listL5977 = l5975ServiceImpl.findbyCustNoCaseSeq(iCustNo, iCaseSeq, titaVo, this.index, this.limit);
-				}
-				
 
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.info("L5975ServiceImpl.findAll error = " + errors.toString());
+		List<Map<String, String>> listL5977 = null;
+
+		try {
+			if (iCaseSeq == 0) {
+				listL5977 = l5975ServiceImpl.findbyCustNo(iCustNo, titaVo, this.index, this.limit);
+			} else {
+				listL5977 = l5975ServiceImpl.findbyCustNoCaseSeq(iCustNo, iCaseSeq, titaVo, this.index, this.limit);
 			}
-	
+
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("L5975ServiceImpl.findAll error = " + errors.toString());
+		}
 
 		if (listL5977 != null && listL5977.size() >= this.limit) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
@@ -112,7 +108,7 @@ public class L5977 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "最大債權撥付統計查詢");
 
 		} else {
-			
+
 			for (Map<String, String> t5977 : listL5977) {
 
 				OccursList occursList = new OccursList();
@@ -121,7 +117,6 @@ public class L5977 extends TradeBuffer {
 				occursList.putParam("OOFinCodeName", MainFinCodeName);
 				occursList.putParam("OOAmt", t5977.get("F1"));
 				occursList.putParam("OOCnt", t5977.get("F2"));
-				occursList.putParam("OOCustName", iCustName);
 				this.totaVo.addOccursList(occursList);
 
 			} // for

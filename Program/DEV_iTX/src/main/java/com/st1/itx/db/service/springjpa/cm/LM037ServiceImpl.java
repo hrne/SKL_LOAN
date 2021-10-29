@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,26 +14,27 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM037ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM037ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 100);
+		int entdy = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
 
-		logger.info("lM037.findAll ");
+		this.info("lM037.findAll ");
 		String sql = "SELECT DECODE(M.\"EntCode\", '1', '1', '0')          F1";
 		sql += "			,NVL (M.\"CityCode\", '0') F2";
 		sql += "			,SUM(M.\"LoanBalance\") F3";
@@ -48,13 +47,15 @@ public class LM037ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			  ,M.\"CityCode\"";
 		sql += "	  ORDER BY F1";
 		sql += "			  ,M.\"CityCode\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		
 		query.setParameter("entdy", entdy);
-		return this.convertToMap(query.getResultList());
+		
+		return this.convertToMap(query);
 	}
 
 }

@@ -49,76 +49,78 @@ public class LM038Report extends MakeReport {
 
 	private void exportExcel(TitaVo titaVo, List<Map<String, String>> LDList) throws LogicException {
 		this.info("LM038Report exportExcel");
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM038", "逾期案件明細", "LM038-逾期案件明細", "LM038逾期案件明細.xls", "D9210081");
-		if (LDList.size() == 0) {
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM038", "逾期案件明細", "LM038-逾期案件明細",
+				"LM038逾期案件明細.xls", "D9210081");
+		if (LDList == null || LDList.isEmpty()) {
 			makeExcel.setValue(4, 1, "本日無資料");
-		}
-		int row = 2;
+		} else {
+			int row = 2;
 
-		BigDecimal total_DataCount = BigDecimal.ZERO;
-		BigDecimal total_LoanBal = BigDecimal.ZERO;
-		BigDecimal total_Principal = BigDecimal.ZERO;
-		BigDecimal total_Interest = BigDecimal.ZERO;
+			BigDecimal total_DataCount = BigDecimal.ZERO;
+			BigDecimal total_LoanBal = BigDecimal.ZERO;
+			BigDecimal total_Principal = BigDecimal.ZERO;
+			BigDecimal total_Interest = BigDecimal.ZERO;
 
-		for (Map<String, String> tLDVo : LDList) {
+			for (Map<String, String> tLDVo : LDList) {
 
-			String ad = "";
-			int col = 0;
-			for (int i = 0; i < tLDVo.size(); i++) {
+				int col = 0;
+				for (int i = 0; i <= 28; i++) {
 
-				ad = "F" + String.valueOf(col);
-				String tmpValue = tLDVo.get(ad);
-				col++;
-				switch (col) {
-				case 6:
-					total_DataCount = total_DataCount.add(new BigDecimal(1));
-					makeExcel.setValue(row, col, tmpValue);
-					break;
+					String value = tLDVo.get("F" + i);
+					BigDecimal bd = null;
+					
+					col++;
+					switch (i) {
+					case 5:
+						total_DataCount = total_DataCount.add(BigDecimal.ONE);
+						makeExcel.setValue(row, col, value);
+						break;
 
-				case 8:
-					BigDecimal tmpLoanBal = tmpValue == null || tmpValue.isEmpty() ? BigDecimal.ZERO : new BigDecimal(tmpValue);
-					total_LoanBal = total_LoanBal.add(tmpLoanBal);
-					makeExcel.setValue(row, col, tmpLoanBal, "#,##0");
-					break;
+					case 7:
+						bd = getBigDecimal(value);
+						total_LoanBal = total_LoanBal.add(bd);
+						makeExcel.setValue(row, col, bd, "#,##0");
+						break;
 
-				case 12:
-					BigDecimal tmpPrincipal = tmpValue == null || tmpValue.isEmpty() ? BigDecimal.ZERO : new BigDecimal(tmpValue);
-					total_Principal = total_Principal.add(tmpPrincipal);
-					makeExcel.setValue(row, col, tmpPrincipal, "#,##0");
-					break;
+					case 11:
+						 bd = getBigDecimal(value);
+						total_Principal = total_Principal.add(bd);
+						makeExcel.setValue(row, col, bd, "#,##0");
+						break;
 
-				case 13:
-					BigDecimal tmpInterest = tmpValue == null || tmpValue.isEmpty() ? BigDecimal.ZERO : new BigDecimal(tmpValue);
-					total_Interest = total_Interest.add(tmpInterest);
-					makeExcel.setValue(row, col, tmpInterest, "#,##0");
-					break;
+					case 12:
+						bd = getBigDecimal(value);
+						total_Interest = total_Interest.add(bd);
+						makeExcel.setValue(row, col, bd, "#,##0");
+						break;
 
-				case 26:
-					makeExcel.setValue(row, col, tmpValue, "R");
-					break;
-				case 21:
-					makeExcel.setValue(row, col, tmpValue, "L");
-					break;
-				case 15:
-					BigDecimal tmpAmt = tmpValue == null || tmpValue.isEmpty() ? BigDecimal.ZERO : new BigDecimal(tmpValue);
-					// 金額
-					makeExcel.setValue(row, col, tmpAmt, "#,##0");
-					break;
-				default:
-					makeExcel.setValue(row, col, tmpValue);
-					break;
-				}
+					case 25:
+						makeExcel.setValue(row, col, value, "R");
+						break;
+					case 20:
+						makeExcel.setValue(row, col, value, "L");
+						break;
+					case 14:
+						// 金額
+						makeExcel.setValue(row, col, getBigDecimal(value), "#,##0");
+						break;
+					default:
+						makeExcel.setValue(row, col, value);
+						break;
+					}
+				} // for
+
+				row++;
 			} // for
 
-			row++;
-		} // for
+			// total output
 
-		// total output
+			makeExcel.setValue(1, 6, total_DataCount, "#,##0");
+			makeExcel.setValue(1, 8, total_LoanBal, "#,##0");
+			makeExcel.setValue(1, 12, total_Principal, "#,##0");
+			makeExcel.setValue(1, 13, total_Interest, "#,##0");
 
-		makeExcel.setValue(1, 6, total_DataCount, "#,##0");
-		makeExcel.setValue(1, 8, total_LoanBal, "#,##0");
-		makeExcel.setValue(1, 12, total_Principal, "#,##0");
-		makeExcel.setValue(1, 13, total_Interest, "#,##0");
+		}
 
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);

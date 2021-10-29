@@ -1,8 +1,5 @@
 package com.st1.itx.db.service.springjpa.cm;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -17,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
@@ -25,35 +23,19 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String lastdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000));
-
-		lastdy = String.format("%s-%s-%s", lastdy.substring(0, 4), lastdy.substring(4, 6), lastdy.substring(6, 8));
-
-		// 設定日期格式
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-		// 進行轉換
-		Date date = sdf.parse(lastdy);
-
-		Calendar cal = Calendar.getInstance();
-
-		cal.setTime(date);
-
-		cal.add(Calendar.MONTH, -1);
-
-		lastdy = sdf.format(cal.getTime());
-		// xxxx-xx-xx
-		lastdy = lastdy.substring(0, 4) + lastdy.substring(5, 7);
-
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 100);
-		this.info("entdy = " + entdy + "    lastdy = " + lastdy);
+		int yearMonth = (parse.stringToInteger(titaVo.get("ENTDY")) + 19110000) / 100;
+		
+		this.info("yearMonth = " + yearMonth);
 		this.info("lM038.findAll ");
 		String sql = "";
 		sql += " SELECT M.\"OvduTerm\"                               F0 ";
@@ -105,7 +87,7 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,M.\"EntCode\"                                F27 ";
 		sql += "       ,E.\"Fullname\"                               F28 ";
 		sql += " FROM \"MonthlyFacBal\" M ";
-		sql += " LEFT JOIN \"MonthlyFacBal\" L ON L.\"YearMonth\" = :lastdy ";
+		sql += " LEFT JOIN \"MonthlyFacBal\" L ON L.\"YearMonth\" = \"Fn_GetLastMonth\"(:entdy) ";
 		sql += "                              AND L.\"CustNo\"    = M.\"CustNo\" ";
 		sql += "                              AND L.\"FacmNo\"    = M.\"FacmNo\" ";
 		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\" ";
@@ -127,9 +109,10 @@ public class LM038ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entdy", entdy);
-		query.setParameter("lastdy", lastdy);
-		return this.convertToMap(query.getResultList());
+		
+		query.setParameter("entdy", yearMonth);
+
+		return this.convertToMap(query);
 	}
 
 }
