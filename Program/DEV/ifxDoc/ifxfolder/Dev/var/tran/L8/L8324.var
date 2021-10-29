@@ -38,16 +38,19 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[200,50,700,50];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,50,250,50];printer.width=[20,20,20,20];order=1;">
 [
 ["[L8324]                                 (443)前置調解回報有擔保債權金額資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdSubmitKey+債權金融機構代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
-["#FdApplyDate+調解申請日",#ApplyDate],["#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
-["#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],["#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain],
-["#FdAccount+帳號",#Account],["#FdGuarantyType+擔保品類別",#GuarantyType,#GuarantyTypeX],
-["#FdLoanAmt+原借款金額",#LoanAmt],
+[#<->#,"#FdApplyDate+調解申請日",#ApplyDate],
+[#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
+[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
+[#<->#,"#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain,#IsMaxMainX],
+[#<->#,"#FdAccount+帳號",#Account],
+[#<->#,"#FdGuarantyType+擔保品類別",#GuarantyType,#GuarantyTypeX],
+[#<->#,"#FdLoanAmt+原借款金額",#LoanAmt],
 [#<->#,"#FdCreditAmt+授信餘額",#CreditAmt],
 ["#FdPrincipal+本金",#Principal],["#FdInterest+利息",#Interest],
 ["#FdPenalty+違約金",#Penalty],["#FdOther+其他費用",#Other],
@@ -237,6 +240,7 @@ E(0,@OutJcicTxtDate,#L8r41OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(H,@GuarantyTypeX,#GuarantyType,#CollateralTypeHelp)
+T(H,@IsMaxMainX,#IsMaxMain,#YesNoHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r41TranKey)
@@ -329,6 +333,9 @@ C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
+
+#IsMaxMainX=X,2,L
+T(H,@IsMaxMainX,#IsMaxMain,#YesNoHelp)
 
 !帳號
 #Account=X,60,I

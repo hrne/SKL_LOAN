@@ -14,37 +14,40 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM044ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-		String iYEAR = iENTDY.substring(0, 4);
-		String iMM = iENTDY.substring(4, 6);
-		String iEYYMM = iENTDY.substring(0, 6);
-		String iLYYMM = "";
-		String iSYYMM = "";
-		if (iMM.equals("1")) {
-			iLYYMM = String.valueOf(Integer.valueOf(iYEAR) - 1) + "12";
-			iSYYMM = String.valueOf(Integer.valueOf(iYEAR) - 1) + "11";
-		} else if (iMM.equals("2")) {
-			iLYYMM = iYEAR + "01";
-			iSYYMM = String.valueOf(Integer.valueOf(iYEAR) - 1) + "12";
+		int iENTDY = parse.stringToInteger(titaVo.get("ENTDY")) + 19110000;
+		int iYEAR = iENTDY / 100000;
+		int iEYYMM = iENTDY / 100; // n月
+		int iMM = iEYYMM % 100;
+		
+		int iLYYMM = 0; // n-1月
+		int iSYYMM = 0; // n-2月
+		if (iMM == 1) {
+			iLYYMM = (iYEAR - 1) * 100 + 12;
+			iSYYMM = (iYEAR - 1) * 100 + 11;
+		} else if (iMM == 2) {
+			iLYYMM = iYEAR * 100 + 1;
+			iSYYMM = (iYEAR - 1) * 100 + 12;
 		} else {
-			iLYYMM = iYEAR + String.format("%02d", Integer.valueOf(iMM) - 1);
-			iSYYMM = iYEAR + String.format("%02d", Integer.valueOf(iMM) - 2);
+			iLYYMM = iEYYMM - 1;
+			iSYYMM = iEYYMM - 2;
 		}
 
 		this.info("lM044.findAll SYYMM=" + iSYYMM + ",EYYMM=" + iEYYMM + ",LYYMM=" + iLYYMM);
@@ -54,14 +57,14 @@ public class LM044ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,SUM(M.\"LoanBal\") + SUM(M.\"ColBal\") \"LoanBal\"";
 		sql += "            ,SUM(M.\"OvduBal\") \"OvduBal\"";
 		sql += "            ,SUM(M.\"ColBal\") \"ColBal\"";
-		sql += "            ,CASE WHEN (SUM(M.\"sLoanBal\") + SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")) > 0 THEN";
-		sql += "             ROUND((SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")) / (SUM(M.\"sLoanBal\") + SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")), 4)";
+		sql += "            ,CASE WHEN (SUM(M.\"sLoanBal\") + SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")) > 0 "; 
+		sql += "                  THEN ROUND((SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")) / (SUM(M.\"sLoanBal\") + SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\")), 4) ";
 		sql += "             ELSE 0 END \"sRatio\"";
-		sql += "            ,CASE WHEN (SUM(M.\"lLoanBal\") + SUM(M.\"lColBal\") + SUM(M.\"lOvduBal\")) > 0 THEN";
-		sql += "             ROUND((SUM(M.\"lColBal\") + SUM(M.\"lOvduBal\")) / (SUM(M.\"lLoanBal\") + SUM(M.\"lColBal\") + SUM(M.\"lOvduBal\")), 4)";
+		sql += "            ,CASE WHEN (SUM(M.\"lLoanBal\") + SUM(M.\"lColBal\") + SUM(M.\"lOvduBal\")) > 0";
+		sql += "                  THEN ROUND((SUM(M.\"lColBal\") + SUM(M.\"lOvduBal\")) / (SUM(M.\"lLoanBal\") + SUM(M.\"lColBal\") + SUM(M.\"lOvduBal\")), 4) ";
 		sql += "             ELSE 0 END \"lRatio\"";
-		sql += "            ,CASE WHEN (SUM(M.\"LoanBal\") + SUM(M.\"ColBal\") + SUM(M.\"OvduBal\")) > 0 THEN";
-		sql += "             ROUND((SUM(M.\"ColBal\") + SUM(M.\"OvduBal\")) / (SUM(M.\"LoanBal\") + SUM(M.\"ColBal\") + SUM(M.\"OvduBal\")), 4)";
+		sql += "            ,CASE WHEN (SUM(M.\"LoanBal\") + SUM(M.\"ColBal\") + SUM(M.\"OvduBal\")) > 0";
+		sql += "                  THEN ROUND((SUM(M.\"ColBal\") + SUM(M.\"OvduBal\")) / (SUM(M.\"LoanBal\") + SUM(M.\"ColBal\") + SUM(M.\"OvduBal\")), 4) ";
 		sql += "             ELSE 0 END \"Ratio\"";
 		sql += "            ,SUM(M.\"sLoanBal\") + SUM(M.\"sColBal\") + SUM(M.\"sOvduBal\") \"sLoanBal\"";
 		sql += "            ,SUM(M.\"lLoanBal\") + SUM(M.\"lColBal\") + SUM(M.\"lOvduBal\") \"lLoanBal\"";
@@ -331,10 +334,12 @@ public class LM044ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		
 		query.setParameter("syymm", iSYYMM);
 		query.setParameter("lyymm", iLYYMM);
 		query.setParameter("eyymm", iEYYMM);
-		return this.convertToMap(query.getResultList());
+		
+		return this.convertToMap(query);
 	}
 
 }

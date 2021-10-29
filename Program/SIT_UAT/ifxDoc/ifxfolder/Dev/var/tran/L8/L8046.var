@@ -67,10 +67,6 @@ C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
-#CDDEF0002=x,20,S
-T(3,CdCode.YesNo)
-#YesNoHelp=x,1024,S
-
 ! CourtCode
 #CDDEF0003=x,20,S                  
 T(3,CdCode.CourtCode) 
@@ -86,13 +82,12 @@ T(3,1:裁定日期;2:發文日期;3:裁定日期;4:更生方案履行完畢日�
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDCODECaseStatus55)
+S(XXR99,01,#CDDEF0001,#CDDEF0003,#CDCODECaseStatus55)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
-T(2,@YesNoHelp,#HelpDesc2)
-T(2,@CourtCodeHelp,#HelpDesc3)
-T(2,@CaseStatus55Help,#HelpDesc4)
+T(2,@CourtCodeHelp,#HelpDesc2)
+T(2,@CaseStatus55Help,#HelpDesc3)
 
 ! 預設值
 #Default=X,1,S

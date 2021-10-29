@@ -153,8 +153,6 @@ T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@Pay
 T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
 K(MODIFYBUTTON,新增)
 T(2,@FdRcDate,*)
-T(2,@FdPeriod,*)
-T(2,@FdRate,*)
 T(2,@FdPassDate,*)
 T(2,@FdLimitDate,*)
 T(2,@FdSignDate,*)
@@ -162,10 +160,6 @@ T(2,@FdMonthPayAmt,*)
 T(2,@FdFirstPayDate,*)
 T(2,@FdGradeType,*)
 T(2,@FdPayLastAmt,*)
-T(2,@FdPeriod2,*)
-T(2,@FdRate2,*)
-T(2,@FdMonthPayAmt2,*)
-T(2,@FdPayLastAmt2,*)
 T(2,@FdPayAccount,*)
 T(2,@FdPostAddr,*)
 T(2,@FdSubmitKey,*)
@@ -181,8 +175,6 @@ T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccou
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
 T(2,@FdTranKey,*)
-T(2,@FdPeriod,*)
-T(2,@FdRate,*)
 T(2,@FdPassDate,*)
 T(2,@FdLimitDate,*)
 T(2,@FdSignDate,*)
@@ -190,10 +182,6 @@ T(2,@FdMonthPayAmt,*)
 T(2,@FdFirstPayDate,*)
 T(2,@FdGradeType,*)
 T(2,@FdPayLastAmt,*)
-T(2,@FdPeriod2,*)
-T(2,@FdRate2,*)
-T(2,@FdMonthPayAmt2,*)
-T(2,@FdPayLastAmt2,*)
 T(2,@FdPayAccount,*)
 T(2,@FdPostAddr,*)
 T(3,@TranKeyHelp,C:異動;D:刪除))
@@ -281,19 +269,15 @@ C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Period,1)T(F,@Rate,1)T(F,@ExpLoanAmt,1
 T(F,@Civil323ExpAmt,1)T(F,@CashCardAmt,1)T(F,@Civil323CashAmt,1)T(F,@CreditCardAmt,1)T(F,@Civil323CreditAmt,1)
 T(F,@TotalAmt,1)T(F,@Civil323Amt,1)T(F,@InterviewDate,1)T(F,@PassDate,1)T(F,@LimitDate,1)
 T(F,@SignDate,1)T(F,@MonthPayAmt,1)T(F,@FirstPayDate,1)T(F,@GradeType,1)T(F,@PayLastAmt,1)
-T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)
-T(2,@FdPeriod,*)T(2,@FdRate,*)T(2,@FdPassDate,*)T(2,@FdLimitDate,*)T(2,@FdSignDate,*)
-T(2,@FdMonthPayAmt,*)T(2,@FdFirstPayDate,*)T(2,@FdGradeType,*)T(2,@FdPayLastAmt,*)T(2,@FdPeriod2,*)
-T(2,@FdRate2,*)T(2,@FdMonthPayAmt2,*)T(2,@FdPayLastAmt2,*)T(2,@FdPayAccount,*)T(2,@FdPostAddr,*),
+T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(F,@PayAccount,1)T(F,@PostAddr,1)T(2,@FdPassDate,*)T(2,@FdLimitDate,*)T(2,@FdSignDate,*)
+T(2,@FdMonthPayAmt,*)T(2,@FdFirstPayDate,*)T(2,@FdGradeType,*)T(2,@FdPayLastAmt,*)T(2,@FdPayAccount,*)T(2,@FdPostAddr,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Period,0)T(F,@Rate,0)T(F,@ExpLoanAmt,0)
 T(F,@Civil323ExpAmt,0)T(F,@CashCardAmt,0)T(F,@Civil323CashAmt,0)T(F,@CreditCardAmt,0)T(F,@Civil323CreditAmt,0)
 T(F,@TotalAmt,0)T(F,@Civil323Amt,0)T(F,@InterviewDate,0)T(F,@PassDate,0)T(F,@LimitDate,0)
 T(F,@SignDate,0)T(F,@MonthPayAmt,0)T(F,@FirstPayDate,0)T(F,@GradeType,0)T(F,@PayLastAmt,0)
 T(F,@Period2,0)T(F,@Rate2,0)T(F,@MonthPayAmt2,0)T(F,@PayLastAmt2,0)T(F,@PayAccount,0)T(F,@PostAddr,0)
-T(2,@FdPeriod, )T(2,@FdRate, )
 T(2,@FdPassDate, )T(2,@FdLimitDate, )T(2,@FdSignDate, )
-T(2,@FdMonthPayAmt, )T(2,@FdFirstPayDate, )T(2,@FdGradeType, )T(2,@FdPayLastAmt, )T(2,@FdPeriod2, )
-T(2,@FdRate2, )T(2,@FdMonthPayAmt2, )T(2,@FdPayLastAmt2, )T(2,@FdPayAccount, )T(2,@FdPostAddr, ),$))
+T(2,@FdMonthPayAmt, )T(2,@FdFirstPayDate, )T(2,@FdGradeType, )T(2,@FdPayLastAmt, )T(2,@FdPayAccount, )T(2,@FdPostAddr, ),$))
 
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
@@ -352,9 +336,9 @@ C(5,#TranKey,D,S,$)
 C(5,#TranKey_Tmp,5,S,$)
 C(5,#TranKey_Tmp,4,S,$)
 SWITCH(#GradeType,
-      1,E(0,@Period,72)E(0,@Rate,0)T(F,@Period,0)T(F,@Rate,0)T(2,@FdPeriod, )T(2,@FdRate, )E(0,@Period2,0)T(F,@Period2,0)T(2,@FdPeriod2, )E(0,@Rate2,0)T(F,@Rate2,0)T(2,@FdRate2, )E(0,@MonthPayAmt2,0)T(F,@MonthPayAmt2,0)T(2,@FdMonthPayAmt2, )E(0,@PayLastAmt2,0)T(F,@PayLastAmt2,0)T(2,@FdPayLastAmt2, )T(F,@PayLastAmt,0)T(2,@FdPayLastAmt, ),
-      2,E(0,@Rate,0)T(F,@Period,1)T(F,@Rate,0)T(2,@FdRate, )T(2,@FdPeriod,*)T(F,@Period2,1)T(2,@FdPeriod2,*)T(F,@Rate2,1)T(2,@FdRate2,*)T(F,@MonthPayAmt2,1)T(2,@FdMonthPayAmt2,*)T(F,@PayLastAmt2,1)T(2,@FdPayLastAmt2,*)T(2,@FdPayLastAmt,*)T(F,@PayLastAmt,1),
-      T(F,@Period,1)T(F,@Rate,1)T(2,@FdPeriod,*)T(2,@FdRate,*)E(0,@PayLastAmt,0)T(F,@PayLastAmt,0)T(2,@FdPayLastAmt, )E(0,@Period2,0)T(F,@Period2,0)T(2,@FdPeriod2, )E(0,@Rate2,0)T(F,@Rate2,0)T(2,@FdRate2, )E(0,@MonthPayAmt2,0)T(F,@MonthPayAmt2,0)T(2,@FdMonthPayAmt2, )E(0,@PayLastAmt2,0)T(F,@PayLastAmt2,0)T(2,@FdPayLastAmt2, )T(2,@FdPayLastAmt, )T(F,@PayLastAmt,0))
+      1,E(0,@Period,72)E(0,@Rate,0)T(F,@Period,0)T(F,@Rate,0)E(0,@Period2,0)T(F,@Period2,0)E(0,@Rate2,0)T(F,@Rate2,0)E(0,@MonthPayAmt2,0)T(F,@MonthPayAmt2,0)E(0,@PayLastAmt2,0)T(F,@PayLastAmt2,0)T(F,@PayLastAmt,0)T(2,@FdPayLastAmt, ),
+      2,E(0,@Rate,0)T(F,@Period,1)T(F,@Rate,0)T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1)T(2,@FdPayLastAmt,*)T(F,@PayLastAmt,1),
+      T(F,@Period,1)T(F,@Rate,1)E(0,@PayLastAmt,0)T(F,@PayLastAmt,0)T(2,@FdPayLastAmt,)E(0,@Period2,0)T(F,@Period2,0)E(0,@Rate2,0)T(F,@Rate2,0)E(0,@MonthPayAmt2,0)T(F,@MonthPayAmt2,0)E(0,@PayLastAmt2,0)T(F,@PayLastAmt2,0)T(2,@FdPayLastAmt, )T(F,@PayLastAmt,0))
 
 #GradeTypeX=X,20,L
 T(H,#GradeType,#GradeTypeDscp)
@@ -366,7 +350,7 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@Period,#L8r18Period),$)
 C(5,#TranKey,D,s,$)
 C(5,#GradeType,1,s,$)
-@V(2,0)
+
 ![利率]
 #Rate=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -375,7 +359,7 @@ C(5,#TranKey,D,T(2,@Rate,#L8r18Rate),$)
 C(5,#TranKey,D,s,$)
 C(5,#GradeType,1,s,$)   
 C(5,#GradeType,2,s,$)  
-@V(2,0)
+
 ![信用貸款債務簽約總金額] 10
 #ExpLoanAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -499,8 +483,6 @@ C(5,#TranKey,D,T(2,@Period2,#L8r18Period2),$)
 C(5,#TranKey,D,s,$)
 C(4,#GradeType,S,$)
 C(5,#GradeType,1,S,$)
-@V(2,0)
-
 
 ![第二階段利率]
 #Rate2=m,2.2,I
@@ -510,7 +492,6 @@ C(5,#TranKey,D,T(2,@Rate2,#L8r18Rate2),$)
 C(5,#TranKey,D,s,$)
 C(4,#GradeType,S,$)
 C(5,#GradeType,1,S,$)
-@V(2,0)
 
 ![第二階段協商方案估計月付金]
 #MonthPayAmt2=M,9,I
@@ -520,7 +501,6 @@ C(5,#TranKey,D,T(2,@MonthPayAmt2,#L8r18MonthPayAmt2),$)
 C(5,#TranKey,D,s,$)
 C(4,#GradeType,S,$)
 C(5,#GradeType,1,S,$)
-@V(2,0)
 
 ![第二階段最後一期應繳金額]
 #PayLastAmt2=M,9,I
@@ -530,7 +510,6 @@ C(5,#TranKey,D,T(2,@PayLastAmt2,#L8r18PayLastAmt2),$)
 C(5,#TranKey,D,s,$)
 C(4,#GradeType,S,$)
 C(5,#GradeType,1,S,$)
-@V(2,0)
 
 
 ![繳款帳號]

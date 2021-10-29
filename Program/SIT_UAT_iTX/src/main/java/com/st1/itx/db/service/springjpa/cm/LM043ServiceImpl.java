@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -16,25 +14,26 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM043ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM043ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(int type, TitaVo titaVo) throws Exception {
-		logger.info("lM043.findAll ");
+		this.info("lM043.findAll ");
 
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("ENTDY").toString()) + 19110000) / 100);
+		int yearMonth = parse.stringToInteger(titaVo.get("ENTDY")) / 100 + 191100;
 
 		String sql = "SELECT M.\"EntCode\"";
 		sql += "            ,M.\"CityCode\"";
@@ -76,18 +75,20 @@ public class LM043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "              ,M.\"CityCode\"";
 		sql += "      ORDER BY M.\"EntCode\"";
 		sql += "              ,M.\"CityCode\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entdy", entdy);
-		return this.convertToMap(query.getResultList());
+		
+		query.setParameter("entdy", yearMonth);
+		
+		return this.convertToMap(query);
 	}
-	
-	private String condition(int type) {
+
+	private static final String condition(int type) {
 		String sql = "";
-		switch(type) {
+		switch (type) {
 		case 0:
 			sql += " AND M.\"AcctCode\" <> '990'";
 			break;
@@ -99,8 +100,8 @@ public class LM043ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " AND M.\"OvduTerm\" >= 3";
 			break;
 		default:
-			sql +="";
+			sql += "";
 		}
-		return sql;	
+		return sql;
 	}
 }

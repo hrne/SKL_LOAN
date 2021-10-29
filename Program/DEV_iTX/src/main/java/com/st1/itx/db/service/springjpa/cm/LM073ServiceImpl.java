@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,7 +18,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class LM073ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM073ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -29,10 +26,9 @@ public class LM073ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo, String RptMonth) throws Exception {
-		logger.info("LM073.findAll ");
-		logger.info("LM073ServiceImpl RptMonth: " + RptMonth);
+	public List<Map<String, String>> findAll(TitaVo titaVo, int RptMonth) throws Exception {
+		this.info("LM073.findAll ");
+		this.info("LM073ServiceImpl RptMonth: " + RptMonth);
 
 		String sql = "SELECT CM.\"CityCode\"";
 		sql += "	        ,FAC.\"RuleCode\"";
@@ -46,8 +42,8 @@ public class LM073ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	  FROM \"FacMain\" FAC";
 		sql += "	  LEFT JOIN (SELECT CF.\"CustNo\"";
 		sql += "	                   ,CF.\"FacmNo\"";
-		sql += "	                   ,MAX(CASE";
-		sql += "	                        WHEN CF.\"MainFlag\" = 'Y' THEN CM.\"CityCode\"";
+		sql += "	                   ,MAX(CASE WHEN CF.\"MainFlag\" = 'Y' ";
+		sql += "                                 THEN CM.\"CityCode\" ";
 		sql += "	                        ELSE ' ' END) AS \"CityCode\"";
 		sql += "	                   ,SUM(CM.\"EvaAmt\") AS \"EvaAmt\"";
 		sql += "	             FROM \"ClFac\" CF";
@@ -65,15 +61,15 @@ public class LM073ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	                          AND CD.\"Code\" = FAC.\"RuleCode\"";
 		sql += "	  WHERE TRUNC(FAC.\"FirstDrawdownDate\" / 100) = :RptMonth";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("RptMonth", RptMonth);
-		
-		return this.convertToMap(query.getResultList());
+
+		return this.convertToMap(query);
 	}
 
 }

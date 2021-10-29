@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -20,7 +18,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class LM078ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM078ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -29,14 +26,13 @@ public class LM078ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo, String RptMonth) throws Exception {
-		logger.info("LM078.findAll ");
-		logger.info("LM078ServiceImpl RptMonth: " + RptMonth);
-		
+	public List<Map<String, String>> findAll(TitaVo titaVo, int RptMonth) throws Exception {
+		this.info("LM078.findAll ");
+		this.info("LM078ServiceImpl RptMonth: " + RptMonth);
+
 		String sql = "";
 		sql += " WITH tmp AS ( SELECT fac.\"RuleCode\" as erule ";
-		sql += "                    ,COUNT(*) e0 ";
+		sql += "                     ,COUNT(*) e0 ";
 		sql += "                     ,SUM(fac.\"LineAmt\") e1 ";
 		sql += "               FROM \"FacMain\" fac ";
 		sql += "               LEFT JOIN ( SELECT cf.\"CustNo\" ";
@@ -71,15 +67,15 @@ public class LM078ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,s.e1 f2 ";
 		sql += " FROM tmp s ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("RptMonth", RptMonth);
-		
-		return this.convertToMap(query.getResultList());
+
+		return this.convertToMap(query);
 	}
 
 }

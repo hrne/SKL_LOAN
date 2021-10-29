@@ -47,7 +47,7 @@ E(0,0)
 ["#FdRcDate+協商申請日",#RcDate],["#FdClaimStatus+案件進度",#ClaimStatus,#ClaimStatusX],
 ["#FdApplyDate+遞狀日",#ApplyDate],["#FdCourtCode+承審法院代碼",#CourtCode,#CourtCodeX],
 ["#FdYear+年度別",#Year],["#FdCourtDiv+法院承審股別",#CourtDiv,"股"],
-["#FdCourtCaseNo+法院案號",#CourtCaseNo],["#FdApprove+法院認可與否",#Approve],
+["#FdCourtCaseNo+法院案號",#CourtCaseNo],["#FdApprove+法院認可與否",#Approve,#ApproveX],
 ["#FdClaimDate+法院裁定日期",#ClaimDate],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
@@ -202,12 +202,15 @@ E(0,@OutJcicTxtDate,#L8r21OutJcicTxtDate)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(H,@ClaimStatusX,#ClaimStatus,#ClaimStatusHelp)
 T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
+
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r21TranKey)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 ! 調Rim相關 結束
 
+#Space1=X,1,S
+C(4,#Approve,$,T(H,@ApproveX,#Approve,#YesNoHelp))
 ![交易代碼]
 #TranKey_Tmp=X,1,S
 #TranKey=X,1,I
@@ -336,6 +339,9 @@ C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @C(5,#ClaimStatus,1,$,V(H,#YesNoHelp))
 C(4,#Approve,$,V(H,#YesNoHelp))
+
+#ApproveX=X,2,L
+C(4,#Approve,S,T(H,@ApproveX,#Approve,#YesNoHelp))
 !法院裁定日期 14
 #ClaimDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)

@@ -46,7 +46,7 @@ E(0,0)
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdRcDate+協商申請日",#RcDate],
 [#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
-[#<->#,"#FdIsClaims+是否為本金融機構債務人",#IsClaims],
+[#<->#,"#FdIsClaims+是否為本金融機構債務人",#IsClaims,#IsClaimsX],
 [#<->#,"#FdGuarLoanCnt+本金融機構有擔保債權筆數",#GuarLoanCnt],
 ["#FdExpLoanAmt+信用貸款對內本息餘額",#ExpLoanAmt],["#FdCivil323ExpAmt+依民法第323條計算之信用貸款本息餘額",#Civil323ExpAmt],
 [#<->#,"#FdReceExpAmt+信用貸款最近一期繳款金額",#ReceExpAmt],
@@ -236,6 +236,7 @@ E(0,@CreditCardOther,#L8r13CreditCardOther)
 T(2,@OutJcicTxtDate,#L8r13OutJcicTxtDate)
 ![下拉選單的值]
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
+T(H,@IsClaimsX,#IsClaims,#YesNoHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r13TranKey)
@@ -303,6 +304,9 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
+#IsClaimsX=X,2,L
+T(H,@IsClaimsX,#IsClaims,#YesNoHelp)
+
 ![本金融機構有擔保債權筆數]
 #GuarLoanCnt=M,2,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -356,20 +360,6 @@ C(5,#IsClaims,N,S,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#IsClaims,N,S,$)
-
-
-![本金融機構有擔保債權筆數==0 #GuarLoanCnt==0]
-! (10)信用貸款對內本息餘額 #ExpLoanAmt
-! (11)依民法第323條計算之信用貸款本息餘額 #Civil323ExpAmt
-! (13)現金卡放款對內本息餘額 #CashCardAmt
-! (14)依民法第323條計算之現金卡放款本息餘額 #Civil323CashAmt
-! (16)信用卡對內本息餘額 #CreditCardAmt
-! (17)依民法第323條計算之信用卡本息餘額 #Civil323CreditAmt
-#SumAmt=M,22,S
-C(5,#IsClaims,Y,$,S)
-C(3,#GuarLoanCnt,0,$,S)
-E(3,#ExpLoanAmt+#Civil323ExpAmt+#CashCardAmt+#Civil323CashAmt+#CreditCardAmt+#Civil323CreditAmt)
-@V(2,0)
 
 !信用卡最近一期繳款金額
 #ReceCreditAmt=M,9,I

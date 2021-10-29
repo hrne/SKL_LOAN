@@ -98,17 +98,12 @@ E(0,1)ASGN(AGAIN$)
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
-#CDDEF0002=x,20,S
-T(3,CdCode.YesNo)
-#YesNoHelp=x,1024,S
-
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002)
+S(XXR99,01,#CDDEF0001)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
-T(2,@YesNoHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -147,9 +142,6 @@ T(2,@FdChaRepayEndDate,*)
 T(2,@FdChaRepayFirstDate,*)
 T(2,@FdPayAccount,*)
 T(2,@FdMonthPayAmt,*)
-T(2,@FdPeriod2,*)
-T(2,@FdRate2,*)
-T(2,@FdMonthPayAmt2,*)
 T(2,@FdSubmitKey,*)
 ! 異動進入
 #Deal_Update=X,1,S
@@ -169,9 +161,6 @@ T(2,@FdChaRepayEndDate,*)
 T(2,@FdChaRepayFirstDate,*)
 T(2,@FdPayAccount,*)
 T(2,@FdMonthPayAmt,*)
-T(2,@FdPeriod2,*)
-T(2,@FdRate2,*)
-T(2,@FdMonthPayAmt2,*)
 
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -284,7 +273,7 @@ T(2,@SubmitKeyX,#L8r01JcicBankName)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 @C(4,#GradeType,$,C(5,#GradeType,Y,$,V(P,限輸入Y或空白)))
-C(5,#GradeType,Y,E(0,#Rate,0)T(F,@Rate,0)T(2,#FdRate, )T(F,@Period2,1)T(2,@FdPeriod2,*)T(2,@FdMonthPayAmt2,*)T(F,@MonthPayAmt2,1)T(2,@FdRate2,*)T(F,@Rate2,1),T(F,@Rate,1)T(2,@FdRate,*)E(0,@Period2,0)T(F,@Period2,0)T(2,@FdPeriod2, )T(2,@FdMonthPayAmt2, )T(F,@MonthPayAmt2,0)T(2,@FdRate2, )T(F,@Rate2,0)E(0,@Rate2,0))
+C(5,#GradeType,Y,E(0,#Rate,0)T(F,@Rate,0)T(2,#FdRate, )T(F,@Period2,1)T(F,@MonthPayAmt2,1)T(F,@Rate2,1),T(F,@Rate,1)T(2,@FdRate,*)E(0,@Period2,0)T(F,@Period2,0)T(F,@MonthPayAmt2,0)T(F,@Rate2,0)E(0,@Rate2,0))
 
 !原前置協商申請日
 #RcDate=D,7,I
@@ -395,7 +384,7 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(4,#GradeType,S,$)
-@V(2,0)
+
 #SumPeriod=M,4,S
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
@@ -414,14 +403,13 @@ IF(#Period2==0 && #SumPeriod1>180,V(P,「變更還款條件已履約期數」+�
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(4,#GradeType,S,$)
-@V(2,0)
 
 !第二階梯月付金
 #MonthPayAmt2=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(4,#GradeType,S,$)
-@V(2,0)
+
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

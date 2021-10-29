@@ -14,28 +14,30 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM045ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
+	
+	@Autowired
+	Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-		String iYEAR = iENTDY.substring(0, 4);
-		String iLYEAR = String.valueOf(Integer.valueOf(iYEAR) - 1);
-		String iSYYMM = iLYEAR + "12";
-		
-		String entYearMonth = iENTDY.substring(0, 6);
+		int iENTDY = parse.stringToInteger(titaVo.get("ENTDY")) + 19110000;
+		int iYEAR = iENTDY / 10000;
+		int iLYEAR = iYEAR - 1;
+		int iSYYMM = iLYEAR * 100 + 12;
+
+		int entYearMonth = iENTDY / 100;
 
 		this.info("lM045.findAll SYYMM=" + iSYYMM + ",LYEAR=" + iLYEAR);
 
@@ -95,7 +97,7 @@ public class LM045ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("yyyy", iYEAR);
 		query.setParameter("syymm", iSYYMM);
 		query.setParameter("entYearMonth", entYearMonth);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

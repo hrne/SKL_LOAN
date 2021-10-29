@@ -231,6 +231,8 @@ C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)A(DATE,0,#ChangePayDate)
 
+#CDate=D,7,S
+T(1,#SYSCDATE,2,7)
 
 !變更還款條件結案日期
 #ClosedDate=D,7,I
@@ -238,7 +240,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)
 @V(7)A(DATE,0,#ClosedDate)
-
+IF(#ClosedDate >= #ChangePayDate,$,V(P,變更還款條件結案日期不可早於申請變更還款條件日))
+IF(#ClosedDate > #CDate,V(P,變更還款條件結案日期不可晚於報送日期),$)
 
 !結案原因
 #ClosedResult=X,1,I

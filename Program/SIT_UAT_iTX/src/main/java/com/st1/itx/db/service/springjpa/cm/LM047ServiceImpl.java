@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -19,9 +17,7 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 
 @Service
 @Repository
-/* 逾期放款明細 */
 public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM047ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -30,9 +26,8 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
-		logger.info("lM047.findAll ");
+		this.info("lM047.findAll ");
 		String sql = "SELECT R.\"CustNo\"                                                           F0";
 		sql += "            ,R.\"OldFacmNo\"                                                        F1";
 		sql += "            ,C.\"CustName\"                                                         F2";
@@ -45,12 +40,9 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,L.\"Amount2\"                                                          F9";
 		sql += "            ,L.\"Amount3\"                                                          F10";
 		sql += "            ,NVL(L.\"Memo1\", '')                                                   F11";
-		sql += "            ,DECODE(NVL(L.\"Amount2\", 0)";
-		sql += "                   ,0";
-		sql += "                  ,'有'";
-		sql += "                   ,NULL";
-		sql += "                  ,'有'";
-		sql += "                  ,'無')                                                            F12";
+		sql += "            ,CASE WHEN NVL(L.\"Amount2\", 0) = 0                                    ";
+		sql += "                  THEN '有'                                                         ";
+		sql += "             ELSE '無' END                                                          F12";
 		sql += "            ,M.\"LoanTermYy\" || ';' || M.\"LoanTermMm\" || ';' || M.\"LoanTermDd\" F13";
 		sql += "            ,M.\"DrawdownDate\"                                                     F14";
 		sql += "            ,M.\"MaturityDate\"                                                     F15";
@@ -120,13 +112,13 @@ public class LM047ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      LEFT JOIN \"CollList\" CL ON CL.\"CustNo\" = R.\"CustNo\"";
 		sql += "                               AND CL.\"FacmNo\" = R.\"NewFacmNo\"";
 		sql += "      LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\" = CL.\"LegalPsn\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

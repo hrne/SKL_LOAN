@@ -306,11 +306,10 @@ C(5,#TranKey,D,s,$)
 ! 流水號
 #Ukey=X,32,S
 
-! !<儲存>
-! #BUF1=X,10,S
-! T(2,#CUSTID)
-! #BIND1=X,1,S
-! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=#CHAINCD; ntxbuf=#BUF1})
+#Alter=X,1,S
+IF(#TranKey_Tmp == 1,$,S)
+ALERT(此交易需隨同填報046)
+
 #RPTFG=X,1,S
 E(0,0)
 </sub>

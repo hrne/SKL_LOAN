@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.text.NumberFormat;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -41,14 +40,9 @@ public class L9717Report extends MakeReport {
 	private String pageOrientation = "L";
 
 	// 製表日期
-	@SuppressWarnings("unused")
 	private String nowDate;
 	// 製表時間
-	@SuppressWarnings("unused")
 	private String nowTime;
-
-	// number with commas
-	NumberFormat nfNum = NumberFormat.getNumberInstance();
 
 	String rocYear;
 	String rocMonth;
@@ -62,31 +56,27 @@ public class L9717Report extends MakeReport {
 			+ " ";
 
 	private OutputSortBy currentSort;
-	
+
 	private class outputColumn {
 		private int pos = 0;
 		private String sort = "L";
 		private Boolean isAmount = false;
-		
-		public outputColumn(int _pos, String _sort, Boolean _isAmount)
-		{
+
+		public outputColumn(int _pos, String _sort, Boolean _isAmount) {
 			this.pos = _pos;
 			this.sort = _sort;
 			this.isAmount = _isAmount;
 		}
-		
-		public int getPos()
-		{
+
+		public int getPos() {
 			return this.pos;
 		}
-		
-		public String getSort()
-		{
+
+		public String getSort() {
 			return this.sort;
 		}
-		
-		public Boolean getIsAmount()
-		{
+
+		public Boolean getIsAmount() {
 			return this.isAmount;
 		}
 	}
@@ -134,10 +124,8 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1,
-					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
-			this.print(-7, 1,
-					" 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
+			this.print(-6, 1, " 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
+			this.print(-7, 1, " 員工編號　經辦　　     件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
 			this.print(-8, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -154,10 +142,8 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1,
-					" 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
-			this.print(-7, 1,
-					" 　　　　　　　　     　件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
+			this.print(-6, 1, " 　　　　　 　 　     　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
+			this.print(-7, 1, " 　　　　　　　　     　件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
 			this.print(-8, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -174,10 +160,8 @@ public class L9717Report extends MakeReport {
 			 * ---------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * ------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1,
-					" 　　　　　 　      　　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
-			this.print(-7, 1,
-					" 　　　　　經辦     　　件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
+			this.print(-6, 1, " 　　　　　 　      　　　逾　一　期      　逾　二　期     　 逾　三　期　　　　逾　四　期　　　　逾　五　期　　　　逾　六　期　　　　轉　催　收　　　　合　　　計");
+			this.print(-7, 1, " 　　　　　經辦     　　件數    　金額 　 件數　  　金額 　 件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額　　件數　　　金額");
 			this.print(-8, 1, newBorder);
 			this.print(-8, 1, newBorder);
 
@@ -195,8 +179,7 @@ public class L9717Report extends MakeReport {
 			 * ----------------1---------2---------3---------4---------5---------6---------7---------8---------9---------0---------1---------2---------3---------4---------5---------6
 			 * -------1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890
 			 */
-			this.print(-6, 1, 
-                          "          經辦　　　 　　戶號　　  　戶名　期別　　　　　　　　金額");
+			this.print(-6, 1, "          經辦　　　 　　戶號　　  　戶名　期別　　　　　　　　金額");
 			this.print(-7, 1, newBorder);
 
 			// 明細起始列(自訂亦必須)
@@ -231,22 +214,22 @@ public class L9717Report extends MakeReport {
 			this.error("L9717ServiceImpl.findAll error = " + errors.toString());
 		}
 
-		if (lL9717 != null && lL9717.size() != 0) {
-			
+		if (lL9717 != null && !lL9717.isEmpty()) {
+
 			BigDecimal totalCount = BigDecimal.ZERO;
 			BigDecimal totalAmt = BigDecimal.ZERO;
 
 			for (Map<String, String> tLDVo : lL9717) {
-				
+
 				ArrayList<outputColumn> columnList = new ArrayList<outputColumn>(18);
-				
+
 				this.print(1, 0, "");
 
 				switch (currentSort) {
-				
+
 				// tidy'd up this part from 3 arrays to 1 arraylist
 				// still feels like there's some better way to do this...
-				
+
 				case Year:
 					// F0 年度 14 R
 					// F1 一期件數 26 C
@@ -267,7 +250,7 @@ public class L9717Report extends MakeReport {
 					// F16 合計金額 165 R
 					// 總計筆數 152 R
 					// 總計金額 165 R
-					
+
 					columnList.add(new outputColumn(14, "R", false));
 					columnList.add(new outputColumn(26, "C", false));
 					columnList.add(new outputColumn(39, "R", true));
@@ -285,11 +268,10 @@ public class L9717Report extends MakeReport {
 					columnList.add(new outputColumn(147, "R", true));
 					columnList.add(new outputColumn(152, "C", false));
 					columnList.add(new outputColumn(165, "R", true));
-					
-					
-					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F15")));
-					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F16")));
-					
+
+					totalCount = totalCount.add(getBigDecimal(tLDVo.get("F15")));
+					totalAmt = totalAmt.add(getBigDecimal(tLDVo.get("F16")));
+
 					break;
 
 				case Agent:
@@ -313,7 +295,7 @@ public class L9717Report extends MakeReport {
 					// F17 合計金額 165 R
 					// 總計筆數 152 R
 					// 總計金額 165 R
-					
+
 					columnList.add(new outputColumn(2, "L", false));
 					columnList.add(new outputColumn(14, "R", false));
 					columnList.add(new outputColumn(26, "C", false));
@@ -332,12 +314,12 @@ public class L9717Report extends MakeReport {
 					columnList.add(new outputColumn(147, "R", true));
 					columnList.add(new outputColumn(152, "C", false));
 					columnList.add(new outputColumn(165, "R", true));
-					
-					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F16")));
-					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F17")));
+
+					totalCount = totalCount.add(getBigDecimal(tLDVo.get("F16")));
+					totalAmt = totalAmt.add(getBigDecimal(tLDVo.get("F17")));
 
 					break;
-					
+
 				case LargeAmt_Customer:
 					// F0 員編 2 L
 					// F1 員工姓名 15 R
@@ -345,17 +327,17 @@ public class L9717Report extends MakeReport {
 					// F3 戶名 42 R
 					// F4 期別 47 R
 					// F5 餘額 68 R;
-					
+
 					columnList.add(new outputColumn(2, "L", false));
 					columnList.add(new outputColumn(15, "R", false));
 					columnList.add(new outputColumn(27, "C", false));
 					columnList.add(new outputColumn(42, "R", false));
 					columnList.add(new outputColumn(47, "R", false));
 					columnList.add(new outputColumn(68, "R", true));
-					
-					totalCount = totalCount.add(new BigDecimal(1));
-					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F5")));
-					
+
+					totalCount = totalCount.add(getBigDecimal(1));
+					totalAmt = totalAmt.add(getBigDecimal(tLDVo.get("F5")));
+
 					break;
 				case LargeAmt_Agent:
 					// F0 員編 2 L
@@ -378,7 +360,7 @@ public class L9717Report extends MakeReport {
 					// F17 合計金額 165 R
 					// 總計筆數 152 R
 					// 總計金額 165 R
-					
+
 					columnList.add(new outputColumn(2, "L", false));
 					columnList.add(new outputColumn(14, "R", false));
 					columnList.add(new outputColumn(26, "C", false));
@@ -397,68 +379,63 @@ public class L9717Report extends MakeReport {
 					columnList.add(new outputColumn(147, "R", true));
 					columnList.add(new outputColumn(152, "C", false));
 					columnList.add(new outputColumn(165, "R", true));
-					
-					totalCount = totalCount.add(new BigDecimal(tLDVo.get("F16")));
-					totalAmt = totalAmt.add(new BigDecimal(tLDVo.get("F17")));
-					
+
+					totalCount = totalCount.add(getBigDecimal(tLDVo.get("F16")));
+					totalAmt = totalAmt.add(getBigDecimal(tLDVo.get("F17")));
+
 					break;
 				default:
 					break;
 				}
-				
+
 				this.info("L9717Report: " + currentSort);
 
 				for (int i = 0; i < columnList.size(); i++) {
 					this.info(currentSort + " [" + i + "]: " + tLDVo.get("F" + i));
-					this.print(0, columnList.get(i).getPos(),
-						 	columnList.get(i).getIsAmount() == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i),
-							columnList.get(i).getSort());
+					this.print(0, columnList.get(i).getPos(), columnList.get(i).getIsAmount() == true ? formatAmt(tLDVo.get("F" + i), 0) : tLDVo.get("F" + i), columnList.get(i).getSort());
 				}
-				
+
 				// 根據樣張，大額客戶別不做每筆資料換行畫線
-				if (currentSort != OutputSortBy.LargeAmt_Customer)
-				{
+				if (currentSort != OutputSortBy.LargeAmt_Customer) {
 					this.print(1, 1, newBorder);
 				}
 
 			}
-			
+
 			// 總計
-			
+
 			this.print(1, 0, "");
-			
+
 			int countX = 0;
 			int amtX = 0;
-			
-			switch(currentSort)
-			{
-				case Agent:
-					countX = 152;
-					amtX = 165;
-					break;
-				case Year:
-					countX = 152;
-					amtX = 165;
-					break;
-				case LargeAmt_Agent:
-					countX = 152;
-					amtX = 165;
-					break;
-				case LargeAmt_Customer:
-					countX = 47;
-					amtX = 68;
-					break;
-				default:
-					break;
+
+			switch (currentSort) {
+			case Agent:
+				countX = 152;
+				amtX = 165;
+				break;
+			case Year:
+				countX = 152;
+				amtX = 165;
+				break;
+			case LargeAmt_Agent:
+				countX = 152;
+				amtX = 165;
+				break;
+			case LargeAmt_Customer:
+				countX = 47;
+				amtX = 68;
+				break;
+			default:
+				break;
 			}
-			
+
 			this.print(0, countX, "總計：　　" + formatAmt(totalCount, 0) + " 筆", "R");
 			this.print(0, amtX, formatAmt(totalAmt, 0), "R");
 			this.print(1, 1, newBorder);
-			
+
 			// 經辦別最後加這個
-			if (currentSort == OutputSortBy.Agent)
-			{
+			if (currentSort == OutputSortBy.Agent) {
 				this.print(1, 1, "『因組織變動因素，經辦人員餘期案件統計基準：94年元月前以授信人員為統計對象，94年元月起則更改為放款專員。』");
 			}
 
@@ -484,20 +461,18 @@ public class L9717Report extends MakeReport {
 
 		this.currentSort = sort;
 
-		this.reportItem = "逾期及轉催收件統計表";
-
 		switch (currentSort) {
 		case Agent:
-			this.reportItem += "_經辦別";
+			this.reportItem = "逾期及轉催收件統計表_經辦別";
 			break;
 		case Year:
-			this.reportItem += "_年度別";
+			this.reportItem = "逾期及轉催收件統計表_年度別";
 			break;
 		case LargeAmt_Agent:
-			this.reportItem += "_大額件經辦別";
+			this.reportItem = "逾期及轉催收件統計表_大額件經辦別";
 			break;
 		case LargeAmt_Customer:
-			this.reportItem += "_大額件客戶別";
+			this.reportItem = "逾期及轉催收件統計表_大額件客戶別";
 			break;
 		default:
 			break;

@@ -49,9 +49,9 @@ E(0,0)
 [#<->#,"#FdClaimDate1+發文日期",#ClaimDate1],
 ["#FdCourtCode+承審法院代碼",#CourtCode,#CourtCodeX],["#FdYear+年度別",#Year,"</br>","以＂YYY表示＂。 年度別是以法院發文時之案號前段為主,例如105年度消債更字第221號,發文日期106/01/20,年度別應報送105。"],
 ["#FdCourtDiv+法院承審股別",#CourtDiv,"股"],["#FdCourtCaseNo+法院案號",#CourtCaseNo],
-["#FdApprove+法院裁定免責確定",#Approve],["#FdOutstandAmt+原始債權金額",#OutstandAmt],
-["#FdClaimStatus1+法院裁定保全處分",#ClaimStatus1],["#FdSaveDate+保全處分起始日",#SaveDate],
-["#FdClaimStatus2+法院裁定撤銷保全處分",#ClaimStatus2],["#FdSaveEndDate+保全處分撤銷日",#SaveEndDate],
+["#FdApprove+法院裁定免責確定",#Approve,#ApproveX],["#FdOutstandAmt+原始債權金額",#OutstandAmt],
+["#FdClaimStatus1+法院裁定保全處分",#ClaimStatus1,#ClaimStatus1X],["#FdSaveDate+保全處分起始日",#SaveDate],
+["#FdClaimStatus2+法院裁定撤銷保全處分",#ClaimStatus2,#ClaimStatus2X],["#FdSaveEndDate+保全處分撤銷日",#SaveEndDate],
 ["#FdSubAmt+清算損失金額",#SubAmt],["#FdAdminName+管理人姓名",#AdminName],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
@@ -140,13 +140,11 @@ T(2,@FdYear,*)
 T(2,@FdCourtDiv,*)
 T(2,@FdCourtCaseNo,*)
 T(2,@FdApprove,*)
-T(2,@FdOutstandAmt,*)
 T(2,@FdClaimStatus1,*)
 T(2,@FdSaveDate,*)
 T(2,@FdClaimStatus2,*)
 T(2,@FdSaveEndDate,*)
 T(2,@FdSubAmt,*)
-T(2,@FdAdminName,*)
 T(2,@FdClaimDate,*)
 T(2,@FdClaimDate1,*)
 ! 異動進入
@@ -161,13 +159,11 @@ T(2,@FdYear,*)
 T(2,@FdCourtDiv,*)
 T(2,@FdCourtCaseNo,*)
 T(2,@FdApprove,*)
-T(2,@FdOutstandAmt,*)
 T(2,@FdClaimStatus1,*)
 T(2,@FdSaveDate,*)
 T(2,@FdClaimStatus2,*)
 T(2,@FdSaveEndDate,*)
 T(2,@FdSubAmt,*)
-T(2,@FdAdminName,*)
 T(3,@TranKeyHelp,C:異動;D:刪除)
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -224,6 +220,9 @@ E(0,@OutJcicTxtDate,#L8r28OutJcicTxtDate)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(H,@CaseStatusX,#CaseStatus,#CaseStatus56Help)
 T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
+T(H,@ApproveX,#Approve,#YesNoHelp)
+T(H,@ClaimStatus1X,#ClaimStatus1,#YesNoHelp)
+T(H,@ClaimStatus2X,#ClaimStatus2,#YesNoHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r28TranKey)
@@ -242,9 +241,9 @@ C(5,#TranKey_Tmp,4,s,$)
 HELP(#TranKeyHelp)
 @V(H,#TranKeyHelp)
 C(5,#TranKey,C,K(MODIFYBUTTON,異動)T(F,@Year,1)T(F,@CourtDiv,1)T(F,@CourtCaseNo,1)T(F,@OutstandAmt,1)T(F,@ClaimStatus1,1)T(F,@SaveDate,1)T(F,@ClaimStatus2,1)T(F,@SaveEndDate,1)T(F,@SubAmt,1)T(F,@AdminName,1)T(2,@FdYear,*)
-T(2,@FdCourtDiv,*)T(2,@FdCourtCaseNo,*)T(2,@FdOutstandAmt,*)T(2,@FdClaimStatus1,*)T(2,@FdSaveDate,*)T(2,@FdClaimStatus2,*)T(2,@FdSaveEndDate,*)T(2,@FdSubAmt,*)T(2,@FdAdminName,*),
+T(2,@FdCourtDiv,*)T(2,@FdCourtCaseNo,*)T(2,@FdClaimStatus1,*)T(2,@FdSaveDate,*)T(2,@FdClaimStatus2,*)T(2,@FdSaveEndDate,*)T(2,@FdSubAmt,*),
 C(5,#TranKey,D,K(MODIFYBUTTON,刪除)T(F,@Year,0)T(F,@CourtDiv,0)T(F,@CourtCaseNo,0)T(F,@Approve,0)T(2,@FdApprove, )T(F,@OutstandAmt,0)T(F,@ClaimStatus1,0)T(F,@SaveDate,0)T(F,@ClaimStatus2,0)T(F,@SaveEndDate,0)T(F,@SubAmt,0)T(F,@AdminName,0)T(2,@FdYear, )
-T(2,@FdCourtDiv, )T(2,@FdCourtCaseNo, )T(2,@FdOutstandAmt, )T(2,@FdClaimStatus1, )T(2,@FdSaveDate, )T(2,@FdClaimStatus2, )T(2,@FdSaveEndDate, )T(2,@FdSubAmt, )T(2,@FdAdminName, ),$))
+T(2,@FdCourtDiv, )T(2,@FdCourtCaseNo, )T(2,@FdClaimStatus1, )T(2,@FdSaveDate, )T(2,@FdClaimStatus2, )T(2,@FdSaveEndDate, )T(2,@FdSubAmt, ),$))
 
 #TranKeyX=X,4,L
 C(5,#TranKey_Tmp,1,s,$)
@@ -360,6 +359,9 @@ C(5,#CaseStatus,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
+#ApproveX=X,2,L
+T(H,@ApproveX,#Approve,#YesNoHelp)
+
 !原始債權金額
 #OutstandAmt=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -375,7 +377,8 @@ C(5,#TranKey,D,T(2,@ClaimStatus1,#L8r28ClaimStatus1),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
-
+#ClaimStatus1X=X,2,L
+T(H,@ClaimStatus1X,#ClaimStatus1,#YesNoHelp)
 
 !保全處分起始日
 #SaveDate=D,7,I
@@ -395,6 +398,9 @@ C(5,#TranKey,D,T(2,@ClaimStatus2,#L8r28ClaimStatus2),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
+
+#ClaimStatus2X=X,2,L
+T(H,@ClaimStatus2X,#ClaimStatus2,#YesNoHelp)
 
 !保全處分撤銷日
 #SaveEndDate=D,7,I

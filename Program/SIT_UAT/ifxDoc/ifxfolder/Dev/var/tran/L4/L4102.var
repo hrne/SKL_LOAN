@@ -15,7 +15,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L4102" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
-["[L4102]                                 匯款傳票明細表"],
+["[L4102]                                 撥款退款明細表"],
 [#<->#,"#FdAcDate+會計日期",#AcDate],
 [#<->#,"#FdBatchNo+整批批號",#BatchNo],
 ]

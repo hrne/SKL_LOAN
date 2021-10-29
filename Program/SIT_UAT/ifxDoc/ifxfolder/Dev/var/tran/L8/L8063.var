@@ -64,17 +64,12 @@ C(3,#CHAIN,0,V(P,本交易為連動交易，請由L8030連動進入),$)
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
-#CDDEF0002=x,20,S
-T(3,CdCode.YesNo)
-#YesNoHelp=x,1024,S
-
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002)
+S(XXR99,01,#CDDEF0001)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
-T(2,@YesNoHelp,#HelpDesc2)
 
 ! 預設值
 #Default=X,1,S

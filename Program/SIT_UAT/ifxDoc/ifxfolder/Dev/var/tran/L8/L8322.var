@@ -49,7 +49,7 @@ E(0,0)
 [#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
 ["#FdAgreeDate+同意書取得日期",#AgreeDate],["#FdStartDate+首次調解日",#StartDate],
 ["#FdRemindDate+債權計算基準日",#RemindDate],
-[#<->#,"#FdReportYn+協辦行是否需自行回報債權",#ReportYn],
+[#<->#,"#FdReportYn+協辦行是否需自行回報債權",#ReportYn,#ReportYnX],
 [#<->#,"#FdNotBankId1+未揭露債權機構代號1",#NotBankId1,#NotBankIdX1],
 [#<->#,"#FdNotBankId2+未揭露債權機構代號2",#NotBankId2,#NotBankIdX2],
 [#<->#,"#FdNotBankId3+未揭露債權機構代號3",#NotBankId3,#NotBankIdX3],
@@ -150,12 +150,6 @@ T(2,@FdAgreeDate,*)
 T(2,@FdStartDate,*)
 T(2,@FdRemindDate,*)
 T(2,@FdReportYn,*)
-T(2,@FdNotBankId1,*)
-T(2,@FdNotBankId2,*)
-T(2,@FdNotBankId3,*)
-T(2,@FdNotBankId4,*)
-T(2,@FdNotBankId5,*)
-T(2,@FdNotBankId6,*)
 T(2,@FdSubmitKey,*)
 ! 異動進入
 #Deal_Update=X,1,S
@@ -170,12 +164,6 @@ T(2,@FdStartDate,*)
 T(2,@FdRemindDate,*)
 T(2,@FdApplyType,*)
 T(2,@FdReportYn,*)
-T(2,@FdNotBankId1,*)
-T(2,@FdNotBankId2,*)
-T(2,@FdNotBankId3,*)
-T(2,@FdNotBankId4,*)
-T(2,@FdNotBankId5,*)
-T(2,@FdNotBankId6,*)
 
 ! 查詢進入
 #Deal_Search=X,1,S
@@ -233,6 +221,7 @@ T(2,@NotBankId4,#L8r39NotBankId4)
 T(2,@NotBankId5,#L8r39NotBankId5)
 T(2,@NotBankId6,#L8r39NotBankId6)
 E(0,@OutJcicTxtDate,#L8r39OutJcicTxtDate)
+T(H,@ReportYnX,#ReportYn,#YesNoHelp)
 ![下拉選單的值]
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
@@ -283,6 +272,9 @@ S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@SubmitKeyX,#L8r01JcicBankName)
 
+#CDate=D,7,S
+T(1,#SYSCDATE,2,7)
+
 
 !款項統一收付申請日
 #ApplyDate=D,7,I
@@ -291,7 +283,7 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 D(8)
 @V(7)A(DATE,0,#ApplyDate)
-
+IF(#CDate >= #ApplyDate ,$, V(P,調解申請日不得大於資料報送日))
 !受理方式
 #ApplyType=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -319,6 +311,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)
 @V(7)A(DATE,0,#AgreeDate)
+IF(#CDate >= #AgreeDate ,$, V(P,同意書取得日期不得大於資料報送日))
 
 !首次調解日
 #StartDate=D,7,I
@@ -326,7 +319,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 D(8)
 @V(7)A(DATE,0,#StartDate)
-
+IF(#StartDate <= #AgreeDate,T(2,@ReportYn,N)T(2,@FdReportYn, )T(F,@ReportYn,0),T(2,@FdReportYn,*)T(F,@ReportYn,1))
 !債權計算基準日
 #RemindDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -339,8 +332,12 @@ D(8)
 #ReportYn=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+IF(#StartDate <= #AgreeDate,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
+
+#ReportYnX=X,2,L
+T(H,@ReportYnX,#ReportYn,#YesNoHelp)
 
 #NotBankId0=x,3,L
 T(2,1)

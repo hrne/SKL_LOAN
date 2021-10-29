@@ -52,9 +52,9 @@ E(0,0)
 ["#FdPayDate+更生方案首期應繳款日",#PayDate],["#FdPayEndDate+更生方案末期應繳款日",#PayEndDate],
 ["#FdPeriod+更生條件（期數）",#Period],["#FdRate+更生條件（利率）",#Rate,"%"],
 ["#FdOutstandAmt+原始債權金額",#OutstandAmt],["#FdSubAmt+更生損失金額",#SubAmt],
-["#FdClaimStatus1+法院裁定保全處分",#ClaimStatus1],["#FdSaveDate+保全處分起始日",#SaveDate],
-["#FdClaimStatus2+法院裁定撤銷保全處分",#ClaimStatus2],["#FdSaveEndDate+保全處分撤銷日",#SaveEndDate],
-["#FdIsImplement+是否依更生條件履行",#IsImplement],["#FdInspectName+監督人姓名",#InspectName],
+["#FdClaimStatus1+法院裁定保全處分",#ClaimStatus1,#ClaimStatus1X],["#FdSaveDate+保全處分起始日",#SaveDate],
+["#FdClaimStatus2+法院裁定撤銷保全處分",#ClaimStatus2,#ClaimStatus2X],["#FdSaveEndDate+保全處分撤銷日",#SaveEndDate],
+["#FdIsImplement+是否依更生條件履行",#IsImplement,#IsImplementX],["#FdInspectName+監督人姓名",#InspectName],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 !---------- AP Button AREA ----------
@@ -235,6 +235,9 @@ T(H,@TranKeyX,#TranKey,#TranKeyHelp)
 T(H,@CaseStatusX,#CaseStatus,#CaseStatus55Help)
 T(H,@ClaimDateName,#CaseStatus,#ClaimDateNameHelp)
 T(H,@CourtCodeX,#CourtCode,#CourtCodeHelp)
+T(H,@IsImplementX,#IsImplement,#YesNoHelp)
+T(H,@ClaimStatus2X,#ClaimStatus2,#YesNoHelp)
+T(H,@ClaimStatus1X,#ClaimStatus1,#YesNoHelp)
 #Space=X,1,S
 IF(#TranKey_Tmp == "5" || #TranKey_Tmp=="4",$,S)
 T(2,@TranKey,#L8r27TranKey)
@@ -415,6 +418,9 @@ C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
 
+#ClaimStatus1X=X,2,L
+T(H,@ClaimStatus1X,#ClaimStatus1,#YesNoHelp)
+
 !保全處分起始日
 #SaveDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -431,6 +437,9 @@ C(5,#TranKey,D,T(2,@ClaimStatus2,#L8r27ClaimStatus2),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
+
+#ClaimStatus2X=X,2,L
+T(H,@ClaimStatus2X,#ClaimStatus2,#YesNoHelp)
 
 !保全處分撤銷日
 #SaveEndDate=D,7,I
@@ -449,6 +458,9 @@ C(5,#TranKey,D,T(2,@IsImplement,#L8r27IsImplement),$)
 C(5,#TranKey,D,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
+
+#IsImplementX=X,2,L
+T(H,@IsImplementX,#IsImplement,#YesNoHelp)
 
 !監督人姓名 5全形
 #InspectName=C,10,I

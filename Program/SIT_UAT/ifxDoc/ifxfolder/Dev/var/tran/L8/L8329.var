@@ -78,10 +78,6 @@ E(0,1)ASGN(AGAIN$)
 T(3,CdCode.TranKey)
 #TranKeyHelp=x,1024,S
 
-#CDDEF0002=x,20,S
-T(3,CdCode.YesNo)
-#YesNoHelp=x,1024,S
-
 #CDDEF0003=x,20,S
 T(3,CdCode.Status50)
 #Status50Help=x,1024,S
@@ -93,13 +89,12 @@ T(3,CdCode.CourtCode)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004)
+S(XXR99,01,#CDDEF0001,#CDDEF0003,#CDDEF0004)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@TranKeyHelp,#HelpDesc1)
-T(2,@YesNoHelp,#HelpDesc2)
-T(2,@Status50Help,#HelpDesc3)
-T(2,@CourtCodeHelp,#HelpDesc4)
+T(2,@Status50Help,#HelpDesc2)
+T(2,@CourtCodeHelp,#HelpDesc3)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)

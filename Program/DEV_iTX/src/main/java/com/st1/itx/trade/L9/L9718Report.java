@@ -61,7 +61,6 @@ public class L9718Report extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			logger.error(TXCD + "ServiceImpl.findAll error = " + errors.toString());
 		}
-		
 
 		exportExcel(titaVo, lL9718Ovdu, ReportType.Acct990);
 		exportExcel(titaVo, lL9718Others, ReportType.AcctOthers);
@@ -70,17 +69,14 @@ public class L9718Report extends MakeReport {
 
 	}
 
-	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lList, ReportType reportType)
-			throws LogicException {
+	private void exportExcel(TitaVo titaVo, List<Map<String, String>> lList, ReportType reportType) throws LogicException {
 
 		logger.info(TXCD + "Report exportExcel");
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName,
-				TXCD + "_" + reportType.getDesc() + TXName, TXCD + "_底稿_" + reportType.getDesc() + "成果統計表" + ".xlsx", 1,
-				titaVo.getParam("inputYearMonth").substring(0, 3) + "年" + titaVo.getParam("inputYearMonth").substring(3)
-						+ "月" + reportType.getDesc());
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), TXCD, TXName, TXCD + "_" + reportType.getDesc() + TXName, TXCD + "_底稿_" + reportType.getDesc() + "成果統計表" + ".xlsx", 1,
+				titaVo.getParam("inputYearMonth").substring(0, 3) + "年" + titaVo.getParam("inputYearMonth").substring(3) + "月" + reportType.getDesc());
 
-		if (lList != null && lList.size() != 0) {
+		if (lList != null && !lList.isEmpty()) {
 
 			int rowShift = 0;
 
@@ -98,104 +94,82 @@ public class L9718Report extends MakeReport {
 					// notice it's 0-based for those names
 					String tmpValue = tLDVo.get("F" + i);
 					if (tmpValue == null) {
+						// 因為reportType分別對應不同的query, 這邊先用null判定Fi到底存不存在...
 						tmpValue = "";
 					}
 
 					BigDecimal output = BigDecimal.ZERO;
 
 					switch (reportType) {
-						case Acct990:
-							// F9,F10,F11,F12
-							// ,F14
-							// formatAmt
+					case Acct990:
+						// F9,F10,F11,F12
+						// ,F14
+						// formatAmt
 
-							// F16是百分比	
-							// 用F14 / F12 * 100 可算出來
+						// F16是百分比
+						// 用F14 / F12 * 100 可算出來
 
-							switch (i) {
-								case 9:
-								case 10:
-								case 11:
-								case 12:
-								case 14:
-									output = BigDecimal.ZERO;
+						switch (i) {
+						case 9:
+						case 10:
+						case 11:
+						case 12:
+						case 14:
+							output = BigDecimal.ZERO;
 
-									try {
-										output = new BigDecimal(tmpValue);
-									} catch (Exception e) {
-										this.info("L9718Report-990, F" + i + ": " + tmpValue);
-									}
-
-									makeExcel.setValue(row, col, formatAmt(output, 0));
-									break;
-								case 16:
-									output = BigDecimal.ZERO;
-									try {
-										output = new BigDecimal(tLDVo.get("F14"))
-												.divide(new BigDecimal(tLDVo.get("F12")), 2, RoundingMode.HALF_UP)
-												.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-									} catch (Exception e) {
-										this.info("L9718Report-990, F14: " + tLDVo.get("F14") + "; F12: "
-												+ tLDVo.get("F12"));
-									}
-
-									makeExcel.setValue(row, col, output + "%");
-									break;
-								default:
-									makeExcel.setValue(row, col, tmpValue);
+							try {
+								output = new BigDecimal(tmpValue);
+							} catch (Exception e) {
+								this.info("L9718Report-990, F" + i + ": " + tmpValue);
 							}
+
+							makeExcel.setValue(row, col, formatAmt(output, 0));
+							break;
+						case 16:
+							output = computeDivide(getBigDecimal(tLDVo.get("F14")), getBigDecimal(tLDVo.get("F12")), 3).multiply(getBigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
+
+							makeExcel.setValue(row, col, output + "%");
+							break;
+						default:
+							makeExcel.setValue(row, col, tmpValue);
+						}
+
+						break;
+					case AcctOthers:
+						// F9, F11
+						// formatAmt
+
+						// F14是百分比
+
+						// 用F11 / F9求出
+
+						switch (i) {
+
+						case 9:
+						case 11:
+
+							output = getBigDecimal(tmpValue);
+
+							makeExcel.setValue(row, col, formatAmt(output, 0));
 
 							break;
-						case AcctOthers:
-							// F9, F11
-							// formatAmt
 
-							// F14是百分比
+						case 14:
 
-							// 用F11 / F9求出
-
-							switch (i) {
-
-								case 9:
-								case 11:
-
-									output = BigDecimal.ZERO;
-
-									try {
-										output = new BigDecimal(tmpValue);
-									} catch (Exception e) {
-										this.info("L9718Report-990, F" + i + ": " + tmpValue);
-									}
-
-									makeExcel.setValue(row, col, formatAmt(output, 0));
-
-									break;
-
-								case 14:
-
-									output = BigDecimal.ZERO;
-									try {
-										output = new BigDecimal(tLDVo.get("F11"))
-												.divide(new BigDecimal(tLDVo.get("F9")), 2, RoundingMode.HALF_UP)
-												.multiply(new BigDecimal(100)).setScale(0, RoundingMode.HALF_UP);
-									} catch (Exception e) {
-										this.info("L9718Report-non990, F11: " + tLDVo.get("F11") + "; F8: "
-												+ tLDVo.get("F9"));
-									}
-
-									makeExcel.setValue(row, col, output + "%");
-									break;
-
-								default:
-									makeExcel.setValue(row, col, tmpValue);
-									break;
-							}
-
+							output = computeDivide(getBigDecimal(tLDVo.get("F11")), getBigDecimal(tLDVo.get("F9")), 2).multiply(getBigDecimal("100")).setScale(0, RoundingMode.HALF_UP);
+							makeExcel.setValue(row, col, output + "%");
 							break;
 
 						default:
-							this.warn("L9718Report weird ReportType");
+							makeExcel.setValue(row, col, tmpValue);
 							break;
+						}
+
+						break;
+
+					default:
+						this.warn("L9718Report weird ReportType");
+						break;
 					}
 
 				}

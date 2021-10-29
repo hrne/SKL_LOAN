@@ -353,8 +353,6 @@ HELP(#GradeTypeDscp)
 @C(4,#GradeType,$,V(H,#GradeTypeDscp))
 T(2,#GradeTypeX,)
 C(5,#GradeType,1,T(F,@PayLastAmt,0)T(F,@Period,0)T(F,@Rate,0),T(F,@PayLastAmt,0)T(F,@Period,1)T(F,@Rate,1))
-C(5,#GradeType,2,T(2,@FdPeriod2,*)T(2,@FdRate2,*)T(2,@FdMonthPayAmt2,*)T(2,@FdPayLastAmt2,*)T(F,@Period2,1)T(F,@Rate2,1)T(F,@MonthPayAmt2,1)T(F,@PayLastAmt2,1),
-                 T(2,@FdPeriod2, )T(2,@FdRate2, )T(2,@FdMonthPayAmt2, )T(2,@FdPayLastAmt2, )T(F,@Period2,0)T(F,@Rate2,0)T(F,@MonthPayAmt2,0)T(F,@PayLastAmt2,0))
 
 #GradeTypeX=X,20,L
 T(H,#GradeType,#GradeTypeDscp)
@@ -486,34 +484,45 @@ C(5,#GradeType,1,s,S)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#GradeType,2,$,S)
-@V(2,0)
+
 
 !第二階段利率
 #Rate2=m,2.2,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#GradeType,2,$,S)
-@V(2,0)
+
 
 !第二階段協商方案估計月付金
 #MonthPayAmt2=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#GradeType,2,$,S)
-@V(2,0)
+
 
 !第二階段最後一期應繳金額
 #PayLastAmt2=M,9,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#GradeType,2,$,S)
-@V(2,0)
+
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L
 
 ! 流水號
 #Ukey=X,32,S
+
+#NTXBUF1=X,18,S
+IF(#TranKey_Tmp == 1,$,S) 
+T(2,1+A+#CustId)ASGN(NTXBUF$)
+
+! 新增時開啟48
+#TmpNTXCD=X,5,S
+IF(#TranKey_Tmp == 1,$,S) 
+T(3,L8309)
+ASGN(NTXCD$)
+K(NEXTNOCLOSE,true)
 
 ![列印用系統變數]
 #RPTFG=X,1,S
