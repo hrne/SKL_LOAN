@@ -35,26 +35,6 @@ public interface CustomerAmlRatingService {
   public Slice<CustomerAmlRating> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * CompanyId =
-   *
-   * @param companyId_0 companyId_0
-   * @param index Page Index
-   * @param limit Page Data Limit
-   * @param titaVo Variable-Length Argument
-   * @return Slice CustomerAmlRating CustomerAmlRating of List
-   */
-  public Slice<CustomerAmlRating> findCompanyIdEq(String companyId_0, int index, int limit, TitaVo... titaVo);
-
-  /**
-   * CustId = 
-   *
-   * @param custId_0 custId_0
-   * @param titaVo Variable-Length Argument
-   * @return Slice CustomerAmlRating CustomerAmlRating of List
-   */
-  public CustomerAmlRating custIdFirst(String custId_0, TitaVo... titaVo);
-
-  /**
    * hold By CustomerAmlRating
    * 
    * @param custId key

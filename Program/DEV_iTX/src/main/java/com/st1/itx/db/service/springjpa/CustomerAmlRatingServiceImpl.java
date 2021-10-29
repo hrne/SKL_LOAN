@@ -109,53 +109,6 @@ em = null;
   }
 
   @Override
-  public Slice<CustomerAmlRating> findCompanyIdEq(String companyId_0, int index, int limit, TitaVo... titaVo) {
-    String dbName = "";
-    Slice<CustomerAmlRating> slice = null;
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-     Pageable pageable = null;
-
-    if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
-    else
-         pageable = PageRequest.of(index, limit);
-    this.info("findCompanyIdEq " + dbName + " : " + "companyId_0 : " + companyId_0);
-    if (dbName.equals(ContentName.onDay))
-      slice = customerAmlRatingReposDay.findAllByCompanyIdIs(companyId_0, pageable);
-    else if (dbName.equals(ContentName.onMon))
-      slice = customerAmlRatingReposMon.findAllByCompanyIdIs(companyId_0, pageable);
-    else if (dbName.equals(ContentName.onHist))
-      slice = customerAmlRatingReposHist.findAllByCompanyIdIs(companyId_0, pageable);
-    else 
-      slice = customerAmlRatingRepos.findAllByCompanyIdIs(companyId_0, pageable);
-
-		if (slice != null) 
-			this.baseEntityManager.clearEntityManager(dbName);
-
-    return slice != null && !slice.isEmpty() ? slice : null;
-  }
-
-  @Override
-  public CustomerAmlRating custIdFirst(String custId_0, TitaVo... titaVo) {
-    String dbName = "";
-    if (titaVo.length != 0)
-      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    this.info("custIdFirst " + dbName + " : " + "custId_0 : " + custId_0);
-    Optional<CustomerAmlRating> customerAmlRatingT = null;
-    if (dbName.equals(ContentName.onDay))
-      customerAmlRatingT = customerAmlRatingReposDay.findTopByCustIdIs(custId_0);
-    else if (dbName.equals(ContentName.onMon))
-      customerAmlRatingT = customerAmlRatingReposMon.findTopByCustIdIs(custId_0);
-    else if (dbName.equals(ContentName.onHist))
-      customerAmlRatingT = customerAmlRatingReposHist.findTopByCustIdIs(custId_0);
-    else 
-      customerAmlRatingT = customerAmlRatingRepos.findTopByCustIdIs(custId_0);
-
-    return customerAmlRatingT.isPresent() ? customerAmlRatingT.get() : null;
-  }
-
-  @Override
   public CustomerAmlRating holdById(String custId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

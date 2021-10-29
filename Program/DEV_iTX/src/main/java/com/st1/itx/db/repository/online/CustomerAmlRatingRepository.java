@@ -5,8 +5,6 @@ import java.util.Optional;
 
 import javax.persistence.LockModeType;
 
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,12 +18,6 @@ import com.st1.itx.db.domain.CustomerAmlRating;
  * @version 1.0.0
  */
 public interface CustomerAmlRatingRepository extends JpaRepository<CustomerAmlRating, String> {
-
-  // CompanyId =
-  public Slice<CustomerAmlRating> findAllByCompanyIdIs(String companyId_0, Pageable pageable);
-
-  // CustId = 
-  public Optional<CustomerAmlRating> findTopByCustIdIs(String custId_0);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

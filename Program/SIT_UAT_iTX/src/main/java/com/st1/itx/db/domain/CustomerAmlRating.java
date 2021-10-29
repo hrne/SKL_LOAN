@@ -11,7 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.Column;
 
 /**
- * CustomerAmlRating 客戶AML評級資料檔(eLoan)<br>
+ * CustomerAmlRating 客戶AML評級資料檔<br>
  * Gen By Tool
  * 
  * @author AdamPan
