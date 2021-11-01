@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.LoanBook;
@@ -74,7 +76,7 @@ public interface LoanBookService {
   public Slice<LoanBook> bookBormNoRange(int custNo_0, int facmNo_1, int bormNo_2, int bookDate_3, int bookDate_4, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo &gt;= ,AND CustNo &lt;= ,AND FacmNo &gt;= ,AND FacmNo &lt;= ,AND BormNo &gt;= ,AND BormNo &lt;=
+   * CustNo &gt;= ,AND CustNo &lt;= ,AND FacmNo &gt;= ,AND FacmNo &lt;= ,AND BormNo &gt;= ,AND BormNo &lt;= ,AND BookDate &gt;=
    *
    * @param custNo_0 custNo_0
    * @param custNo_1 custNo_1
@@ -82,12 +84,13 @@ public interface LoanBookService {
    * @param facmNo_3 facmNo_3
    * @param bormNo_4 bormNo_4
    * @param bormNo_5 bormNo_5
+   * @param bookDate_6 bookDate_6
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice LoanBook LoanBook of List
    */
-  public Slice<LoanBook> bookCustNoRange(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3, int bormNo_4, int bormNo_5, int index, int limit, TitaVo... titaVo);
+  public Slice<LoanBook> bookCustNoRange(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3, int bormNo_4, int bormNo_5, int bookDate_6, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustNo = ,AND FacmNo &gt;= ,AND FacmNo &lt;= ,AND BormNo &gt;= ,AND BormNo &lt;=

@@ -46,6 +46,8 @@ BEGIN
         EXECUTE IMMEDIATE "vSql";
 
         -- 賦予權限 (暫時不用)
+        "vSql" := 'GRANT CREATE SYNONYM TO ' || "vUserName";
+        EXECUTE IMMEDIATE "vSql";
         "vSql" := 'GRANT CREATE ANY TABLE TO ' || "vUserName";
         EXECUTE IMMEDIATE "vSql";
 
@@ -75,6 +77,40 @@ BEGIN
                       || x."TABLE_NAME" 
                       || '"';
             EXECUTE IMMEDIATE "vSql";
+        END LOOP;
+
+        -- 複製Index
+        FOR x
+        IN (
+            SELECT DBMS_METADATA.GET_DDL('INDEX',OBJECT_NAME,"UserName") AS "DESC"
+            FROM ALL_OBJECTS
+            WHERE OWNER = "UserName"
+            AND OBJECT_TYPE = 'INDEX'
+            AND STATUS = 'VALID'
+        )
+        LOOP
+            -- DBMS_OUTPUT.PUT_LINE(x."DESC");
+            "cSql" := SUBSTR(x."DESC",4);
+            -- "cSql" := SUBSTR("cSql",0,INSTR("cSql",';',-1));
+            -- DBMS_OUTPUT.PUT_LINE("cSql");
+            EXECUTE IMMEDIATE REPLACE("cSql","UserName","vUserName");
+        END LOOP;
+
+        -- 複製SEQUENCE
+        FOR x
+        IN (
+            SELECT DBMS_METADATA.GET_DDL('SEQUENCE',OBJECT_NAME,"UserName") AS "DESC"
+            FROM ALL_OBJECTS
+            WHERE OWNER = "UserName"
+            AND OBJECT_TYPE = 'SEQUENCE'
+            AND STATUS = 'VALID'
+        )
+        LOOP
+            -- DBMS_OUTPUT.PUT_LINE(x."DESC");
+            "cSql" := SUBSTR(x."DESC",4);
+            -- "cSql" := SUBSTR("cSql",0,INSTR("cSql",';',-1));
+            -- DBMS_OUTPUT.PUT_LINE("cSql");
+            EXECUTE IMMEDIATE REPLACE("cSql","UserName","vUserName");
         END LOOP;
 
         -- 複製Function

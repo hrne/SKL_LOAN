@@ -166,14 +166,14 @@ public class LM061Report extends MakeReport {
 				F11 = tLDVo.get("F11").isEmpty() ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F11"));
 
 				// 代號 56 拍定金額 58 分配金額
-//				if (tLDVo.get("F12").equals("056")) {
+				if (!tLDVo.get("F12").equals("056")) {
+					F11 = BigDecimal.ZERO;
+				}
 
 				// 20211025Test
 
 				// 代號 56 拍定金額 58 分配金額 (含戶號 戶名)
 				checkMergeRegionValue(tLDVo.get("F0").toString(), tLDVo.get("F2").toString(), F11, ovduBal, row);
-
-//				}
 
 				// 代號 77 協議達成
 				if (tLDVo.get("F12").equals("077")) {

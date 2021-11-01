@@ -5760,7 +5760,7 @@ TXFORM=L5R21
 #L5R22EditDate=D,7,S
 #L5R22EditTime=X,4,S
 #L5R22RemindCode=X,2,S
-#L5R22ReMark=X,160,S
+#L5R22ReMark=X,500,S
 #L5R22EditEmpNo=X,6,S
 </L5R22.dec>
 
@@ -5833,6 +5833,7 @@ TXFORM=L5R26
 #L5r27CustNm=X,200,S
 #L5r27BsOfficer=X,6,S
 #L5r27BsOfficerName=X,50,S
+#L5r27UtilBal=+m,15,S
 #L5r27PerfDate=D,7,S
 #L5r27Introducer=X,6,S
 #L5r27IntroducerName=X,50,S
@@ -5851,9 +5852,10 @@ TXFORM=L5R27
 #L5r27CustNm
 #L5r27BsOfficer
 #L5r27BsOfficerName
-#L5r27PerfDate
 #L5r27Introducer
 #L5r27IntroducerName
+#L5r27UtilBal
+#L5r27PerfDate
 #L5r27PerfCnt
 #L5r27PerfEqAmt
 #L5r27PerfReward
@@ -5878,6 +5880,7 @@ TXFORM=L5R28
 #L5r29FacmNo=A,3,S
 #L5r29BormNo=A,3,S
 #L5r29CustNm=X,200,S
+#L5r29WorkMonth=A,6,S
 #L5r29Introducer=X,6,S
 #L5r29IntroducerName=X,50,S
 #L5r29BsOfficer=X,6,S
@@ -5893,6 +5896,7 @@ TXFORM=L5R29
 #L5r29FacmNo
 #L5r29BormNo
 #L5r29CustNm
+#L5r29WorkMonth
 #L5r29Introducer
 #L5r29IntroducerName
 #L5r29BsOfficer

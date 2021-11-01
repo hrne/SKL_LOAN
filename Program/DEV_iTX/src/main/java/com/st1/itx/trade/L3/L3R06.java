@@ -232,7 +232,7 @@ public class L3R06 extends TradeBuffer {
 			wkBormNoStart = iBormNo;
 			wkBormNoEnd = iBormNo;
 		}
-
+		BigDecimal wkExtraRepay = iExtraRepay;
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
 				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
 		lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
@@ -255,8 +255,12 @@ public class L3R06 extends TradeBuffer {
 					}
 					wkTerms = 0;
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
-					loanCalcRepayIntCom.setExtraRepayFlag(iExtraRepayFlag);
-					loanCalcRepayIntCom.setExtraRepay(iExtraRepay);
+					if (wkExtraRepay.compareTo(ln.getLoanBal()) >= 0 || iEntryDate >= ln.getMaturityDate()) {
+						loanCalcRepayIntCom.setCaseCloseFlag("Y");
+					} else {
+						loanCalcRepayIntCom.setExtraRepayFlag(iExtraRepayFlag);
+						loanCalcRepayIntCom.setExtraRepay(wkExtraRepay);
+					}
 				} else {
 					wkPrevTermNo = 0;
 					wkPrevTermNo = 0;
@@ -308,6 +312,10 @@ public class L3R06 extends TradeBuffer {
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
+				if (oRpFacmNo == 0) {
+					oRpFacmNo = ln.getFacmNo();
+				}
+				wkTotaCount++;
 				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) { // 部分償還本金 > 0
 					LoanCloseBreachVo v = new LoanCloseBreachVo();
 					v.setCustNo(ln.getCustNo());
@@ -316,12 +324,12 @@ public class L3R06 extends TradeBuffer {
 					v.setExtraRepay(loanCalcRepayIntCom.getExtraAmt());
 					v.setEndDate(iEntryDate);
 					iListCloseBreach.add(v);
+					wkExtraRepay = iExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
+							.subtract(oBreachAmt);
+					if (wkExtraRepay.compareTo(BigDecimal.ZERO) <= 0) {
+						break;
+					}
 				}
-
-				if (oRpFacmNo == 0) {
-					oRpFacmNo = ln.getFacmNo();
-				}
-				wkTotaCount++;
 			}
 		}
 		if (wkTotaCount == 0 && iExtraRepay.compareTo(BigDecimal.ZERO) == 0 && !iTxCode.equals("L3440")) {

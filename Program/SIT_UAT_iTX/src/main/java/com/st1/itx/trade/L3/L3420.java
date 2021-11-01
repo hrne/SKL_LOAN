@@ -28,6 +28,7 @@ import com.st1.itx.db.domain.LoanIntDetail;
 import com.st1.itx.db.domain.LoanIntDetailId;
 import com.st1.itx.db.domain.LoanOverdue;
 import com.st1.itx.db.domain.LoanOverdueId;
+import com.st1.itx.db.domain.MlaundryRecord;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -35,6 +36,7 @@ import com.st1.itx.db.service.LoanBorTxService;
 import com.st1.itx.db.service.LoanChequeService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.db.service.LoanOverdueService;
+import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcPaymentCom;
@@ -104,6 +106,8 @@ public class L3420 extends TradeBuffer {
 	public LoanChequeService loanChequeService;
 	@Autowired
 	public FacCloseService facCloseService;
+	@Autowired
+	public MlaundryRecordService mlaundryRecordService;
 
 	@Autowired
 	Parse parse;
@@ -164,7 +168,7 @@ public class L3420 extends TradeBuffer {
 	private BigDecimal iCloseBreachAmt;
 	private int iOverRpFg; // 1.短收 2.溢收
 	private BigDecimal iOverAmt; // 溢收金額
-	private BigDecimal iTmpAmt =  BigDecimal.ZERO; // 暫收抵繳金額
+	private BigDecimal iTmpAmt = BigDecimal.ZERO; // 暫收抵繳金額
 	// work area
 	private int wkTbsDy;
 	private int wkCustNo = 0;
@@ -452,6 +456,9 @@ public class L3420 extends TradeBuffer {
 
 		// 清償作業檔處理
 		FacCloseRoutine();
+
+		// 疑似洗錢交易訪談記錄檔處理
+		mlaundryRecordRoutine();
 
 		// 帳務處理
 		if (this.txBuffer.getTxCom().isBookAcYes()) {
@@ -1364,7 +1371,7 @@ public class L3420 extends TradeBuffer {
 		tLoanBorTx.setUnpaidPrincipal(BigDecimal.ZERO);
 		tLoanBorTx.setUnpaidInterest(BigDecimal.ZERO);
 		tLoanBorTx.setShortfall(BigDecimal.ZERO);
-		tLoanBorTx.setTempAmt(this.compTempAmt());	// 暫收款金額	
+		tLoanBorTx.setTempAmt(this.compTempAmt()); // 暫收款金額
 		// 繳息首筆、繳息次筆
 		if (isFirstBorm) {
 			tLoanBorTx.setDisplayflag("F"); // 繳息首筆
@@ -1997,6 +2004,47 @@ public class L3420 extends TradeBuffer {
 		}
 	}
 
+	// 疑似洗錢交易訪談記錄檔處理
+	private void mlaundryRecordRoutine() throws LogicException {
+		this.info("mlaundryRecordRoutine ...");
+		Slice<MlaundryRecord> slMlaundryRecord = mlaundryRecordService.findCustNoEq(iCustNo, iFacmNo,
+				iFacmNo > 0 ? iFacmNo : 999, iBormNo, iBormNo > 0 ? iBormNo : 900, iEntryDate, this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slMlaundryRecord == null) {
+			return;
+		}
+		for (MlaundryRecord t : slMlaundryRecord.getContent()) {
+			if (titaVo.isHcodeNormal()) {
+				if (t.getActualRepayDate() == 0) {
+					updateMlaundryRecord(t);
+					break;
+				}
+			} else {
+				if (t.getActualRepayDate() == wkTbsDy) {
+					updateMlaundryRecord(t);
+					break;
+				}
+			}
+		}
+	}
+
+	// 疑似洗錢交易訪談記錄檔更新
+	private void updateMlaundryRecord(MlaundryRecord t) throws LogicException {
+		MlaundryRecord tMlaundryRecord = mlaundryRecordService.holdById(t, titaVo);
+		if (titaVo.isHcodeNormal()) {
+			tMlaundryRecord.setActualRepayDate(iEntryDate);
+			tMlaundryRecord.setActualRepayAmt(iRealRepayAmt);// 實際還本金額
+		} else {
+			tMlaundryRecord.setActualRepayDate(0);
+			tMlaundryRecord.setActualRepayAmt(BigDecimal.ZERO);// 實際還本金額
+		}
+		try {
+			mlaundryRecordService.update(tMlaundryRecord, titaVo);
+		} catch (DBException e) {
+			throw new LogicException(titaVo, "E0007", "疑似洗錢交易訪談記錄檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
+		}
+	}
+
 	// 兌現票入帳處理
 	private void LoanChequeRoutine() throws LogicException {
 		this.info("LoanCheckRoutine ...");
@@ -2007,10 +2055,11 @@ public class L3420 extends TradeBuffer {
 			acPaymentCom.loanCheque(titaVo);
 		}
 	}
+
 	// 計算暫收款金額
 	private BigDecimal compTempAmt() throws LogicException {
 		// 還款總金額
-		BigDecimal wkAcTotal = BigDecimal.ZERO;		
+		BigDecimal wkAcTotal = BigDecimal.ZERO;
 		for (AcDetail ac : lAcDetail) {
 			if ("C".equals(ac.getDbCr())) {
 				wkAcTotal = wkAcTotal.add(ac.getTxAmt());

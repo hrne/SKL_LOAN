@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.MlaundryRecord;
@@ -72,6 +74,22 @@ public interface MlaundryRecordService {
    * @return Slice MlaundryRecord MlaundryRecord of List
    */
   public Slice<MlaundryRecord> findRepayD(int actualRepayDate_0, int actualRepayDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * CustNo = ,AND FacmNo &gt;= ,AND FacmNo &lt;= ,AND BormNo &gt;= ,AND BormNo &lt;= ,AND RepayDate &gt;=
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param facmNo_2 facmNo_2
+   * @param bormNo_3 bormNo_3
+   * @param bormNo_4 bormNo_4
+   * @param repayDate_5 repayDate_5
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice MlaundryRecord MlaundryRecord of List
+   */
+  public Slice<MlaundryRecord> findCustNoEq(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int repayDate_5, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By MlaundryRecord

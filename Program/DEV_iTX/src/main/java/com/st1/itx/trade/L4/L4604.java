@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.service.InsuRenewService;
@@ -59,21 +61,56 @@ public class L4604 extends TradeBuffer {
 
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
 
-		// 未繳
-		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 0, 0, this.index, this.limit);
+		String slipNote = titaVo.getParam("InsuEndMonth").substring(0, 3) + "年"
+				+ titaVo.getParam("InsuEndMonth").substring(3, 5) + "月已繳火險保費轉應付費用";
+// 與新光產險對帳後，列應付費用
+// 一、正常繳款(放款系統出帳)
+//  　　借:20232010 暫收及待結轉帳項-火險保費
+//　　 貸:20210391 應付費用-待匯
+// 二、墊付火險費(核心系統出帳)
+// 　 　借:10522106 暫付及待結轉帳項-火險保費
+//  　　貸:20210391 應付費用-待匯
 
+		// 已繳
+		Slice<InsuRenew> sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index,
+				this.limit);
 		List<InsuRenew> lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
+		if (lInsuRenew != null) {
+			BigDecimal txAmt = BigDecimal.ZERO;
+			for (InsuRenew tInsuRenew : lInsuRenew) {
+				txAmt = txAmt.add(tInsuRenew.getTotInsuPrem());
+			}
+			// 帳務處理
+			if (this.txBuffer.getTxCom().isBookAcYes()) {
+				List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+				AcDetail acDetail = new AcDetail();
+				acDetail.setDbCr("D");
+				acDetail.setAcctCode("TMI"); // 暫付及待結轉帳項-火險保費
+				acDetail.setTxAmt(txAmt);
+				acDetail.setSlipNote(slipNote);
+				lAcDetail.add(acDetail);
+				acDetail = new AcDetail();
+				acDetail.setDbCr("C");
+				acDetail.setAcctCode("ERT"); // 應付費用-待匯
+				acDetail.setTxAmt(txAmt);
+				acDetail.setSlipNote(slipNote);
+				lAcDetail.add(acDetail);
+			}
+		}
+
+		// 未繳
+		sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 0, 0, this.index, this.limit);
+
+		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
 
 		if (lInsuRenew != null) {
 //			一般
 			if (titaVo.isHcodeNormal()) {
-//				Update StatusCode = 1.借支
-				updateInsuRenew(lInsuRenew, 1);
+				updateInsuRenew(lInsuRenew, 1); // StatusCode = 1.借支
 			}
 //			訂正
 			if (titaVo.isHcodeErase()) {
-//				Update StatusCode = 0.正常
-				updateInsuRenew(lInsuRenew, 0);
+				updateInsuRenew(lInsuRenew, 0); // StatusCode = 0.正常
 			}
 //			1.銷帳 -> 未收
 			closeAcReceivable(lInsuRenew, titaVo);
@@ -85,37 +122,8 @@ public class L4604 extends TradeBuffer {
 			throw new LogicException(titaVo, "E2003", "查無資料"); // 檢查錯誤
 		}
 
-		// 已繳
-		sInsuRenew = insuRenewService.findL4604A(iInsuEndMonth, 2, 1, 99999999, this.index, this.limit);
-
-		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
-
-		if (lInsuRenew != null) {
-//		      已銷科目核心出帳
-			coreAcReceivable(lInsuRenew, titaVo);
-		}
-
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	//
-	private void coreAcReceivable(List<InsuRenew> lInsuRenew, TitaVo titaVo) throws LogicException {
-		this.info("CloseAcReceivable Start...");
-		List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
-		for (InsuRenew tInsuRenew : lInsuRenew) {
-			// 正常、未收
-			AcReceivable acReceivable = new AcReceivable();
-			acReceivable.setReceivableFlag(2); // 火險保費 -> 2-核心出帳
-			acReceivable.setAcctCode("TMI"); // 火險保費
-			acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
-			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
-			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
-			acReceivableList.add(acReceivable);
-		}
-		acReceivableCom.mnt(4, acReceivableList, titaVo); // 4.已銷科目核心出帳
 	}
 
 	private void closeAcReceivable(List<InsuRenew> lInsuRenew, TitaVo titaVo) throws LogicException {
@@ -157,7 +165,6 @@ public class L4604 extends TradeBuffer {
 	private void updateInsuRenew(List<InsuRenew> lInsuRenew, int flag) throws LogicException {
 		this.info("openAcReceivable Start Flag = " + flag);
 		for (InsuRenew tInsuRenew : lInsuRenew) {
-
 			if (tInsuRenew.getStatusCode() == flag) {
 				if (flag == 0) {
 					throw new LogicException("E0005", "該筆狀態為正常");

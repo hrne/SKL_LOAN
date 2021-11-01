@@ -183,30 +183,73 @@ public class L3921 extends TradeBuffer {
 		wkExtraRepay = iExtraRepay;
 		// 償還期款
 		for (LoanBorMain ln : lLoanBorMain) {
-			if (ln.getStatus() == 0 || ln.getStatus() == 4) {
-				wkPreRepayTermNo = 0;
-				if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-					wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
-							ln.getSpecificDd(), ln.getPrevPayIntDate());
-				}
-				if (iRepayTerms > 0) { // 回收期數 > 0
-					wkTerms = iRepayTerms;
-				} else {
-					if (ln.getPrevPayIntDate() >= iEntryDate || ln.getDrawdownDate() == iEntryDate) {
-						continue;
-					}
-					// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
-					wkTerms = loanCom.getTermNo(iEntryDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
-							ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
-					wkTerms = wkTerms - wkPreRepayTermNo;
-				}
-
-				if (wkTerms <= 0) {
+			if (!(ln.getStatus() == 0 || ln.getStatus() == 4)) {
+				continue;
+			}
+			wkPreRepayTermNo = 0;
+			if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+				wkPreRepayTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+						ln.getSpecificDd(), ln.getPrevPayIntDate());
+			}
+			if (iRepayTerms > 0) { // 回收期數 > 0
+				wkTerms = iRepayTerms;
+			} else {
+				if (ln.getPrevPayIntDate() >= iEntryDate || ln.getDrawdownDate() == iEntryDate) {
 					continue;
 				}
+				// 計算至入帳日期應繳之期數 - 計算至上次繳息日之期數
+				wkTerms = loanCom.getTermNo(iEntryDate >= ln.getMaturityDate() ? 1 : 2, ln.getFreqBase(),
+						ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(), iEntryDate);
+				wkTerms = wkTerms - wkPreRepayTermNo;
+			}
 
+			if (wkTerms <= 0) {
+				continue;
+			}
+
+			// 計算
+			loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
+			lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+			oLoanBal = oLoanBal.add(ln.getLoanBal());
+			oRate = ln.getStoreRate();
+			oCurrencyCode = ln.getCurrencyCode();
+			oPrincipal = oPrincipal.add(loanCalcRepayIntCom.getPrincipal());
+			oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
+			oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
+			oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
+			wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
+					.subtract(oBreachAmt);
+			addOccurs(ln, titaVo);
+			if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
+				ln.setStoreRate(loanCalcRepayIntCom.getStoreRate());
+				ln.setLoanBal(ln.getLoanBal().subtract(loanCalcRepayIntCom.getPrincipal()));
+				ln.setRepaidPeriod(ln.getRepaidPeriod() + loanCalcRepayIntCom.getRepaidPeriod());
+				ln.setPaidTerms(loanCalcRepayIntCom.getPaidTerms());
+				ln.setPrevPayIntDate(loanCalcRepayIntCom.getPrevPaidIntDate());
+				ln.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate());
+				ln.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
+				ln.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());
+			}
+		}
+
+		// 部分償還本金
+		BigDecimal wkExtraRepayRmd = wkExtraRepay;
+		if (wkExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
+			for (LoanBorMain ln : lLoanBorMain) {
+				if (!(ln.getStatus() == 0 || ln.getStatus() == 4)) {
+					continue;
+				}
+				if (ln.getLoanBal().compareTo(BigDecimal.ZERO) == 0) {
+					continue;
+				}
+				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
+				if (wkExtraRepay.compareTo(ln.getLoanBal()) >= 0 || iEntryDate >= ln.getMaturityDate()) {
+					loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案試算
+				} else {
+					loanCalcRepayIntCom.setExtraRepayFlag(iExtraRepayFlag);
+					loanCalcRepayIntCom.setExtraRepay(wkExtraRepay); // 部分償還本金試算
+				}
 				// 計算
-				loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
 				lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 				oLoanBal = oLoanBal.add(ln.getLoanBal());
 				oRate = ln.getStoreRate();
@@ -215,59 +258,19 @@ public class L3921 extends TradeBuffer {
 				oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
 				oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
 				oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-				wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
-						.subtract(oBreachAmt);
 				addOccurs(ln, titaVo);
-				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
-					ln.setStoreRate(loanCalcRepayIntCom.getStoreRate());
-					ln.setLoanBal(ln.getLoanBal().subtract(loanCalcRepayIntCom.getPrincipal()));
-					ln.setRepaidPeriod(ln.getRepaidPeriod() + loanCalcRepayIntCom.getRepaidPeriod());
-					ln.setPaidTerms(loanCalcRepayIntCom.getPaidTerms());
-					ln.setPrevPayIntDate(loanCalcRepayIntCom.getPrevPaidIntDate());
-					ln.setPrevRepaidDate(loanCalcRepayIntCom.getPrevRepaidDate());
-					ln.setNextPayIntDate(loanCalcRepayIntCom.getNextPayIntDate());
-					ln.setNextRepayDate(loanCalcRepayIntCom.getNextRepayDate());
-				}
-			}
-		}
-
-		// 部分償還本金
-		BigDecimal wkExtraRepayRmd = wkExtraRepay;
-		if (wkExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
-			for (LoanBorMain ln : lLoanBorMain) {
-				if (ln.getStatus() == 0 || ln.getStatus() == 4) {
-					if (wkExtraRepay.compareTo(BigDecimal.ZERO) <= 0) {
-						break;
-					} else {
-						loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
-						this.info("wkExtraRepay= " + wkExtraRepay + ", LoanBal=" + ln.getLoanBal());
-						if (wkExtraRepay.compareTo(ln.getLoanBal()) >= 0) {
-							loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案試算
-						} else {
-							loanCalcRepayIntCom.setExtraRepayFlag(iExtraRepayFlag);
-							loanCalcRepayIntCom.setExtraRepay(wkExtraRepay); // 部分償還本金試算
-						}
-						// 計算
-						lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
-						oLoanBal = oLoanBal.add(ln.getLoanBal());
-						oRate = ln.getStoreRate();
-						oCurrencyCode = ln.getCurrencyCode();
-						oPrincipal = oPrincipal.add(loanCalcRepayIntCom.getPrincipal());
-						oInterest = oInterest.add(loanCalcRepayIntCom.getInterest());
-						oDelayInt = oDelayInt.add(loanCalcRepayIntCom.getDelayInt());
-						oBreachAmt = oBreachAmt.add(loanCalcRepayIntCom.getBreachAmt());
-						wkExtraRepay = wkExtraRepay.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
-								.subtract(oBreachAmt);
-						addOccurs(ln, titaVo);
-						LoanCloseBreachVo v = new LoanCloseBreachVo();
-						// 放入清償違約金計算List
-						v.setCustNo(ln.getCustNo());
-						v.setFacmNo(ln.getFacmNo());
-						v.setBormNo(ln.getBormNo());
-						v.setExtraRepay(loanCalcRepayIntCom.getExtraAmt());
-						v.setEndDate(iEntryDate);
-						iListCloseBreach.add(v);
-					}
+				LoanCloseBreachVo v = new LoanCloseBreachVo();
+				// 放入清償違約金計算List
+				v.setCustNo(ln.getCustNo());
+				v.setFacmNo(ln.getFacmNo());
+				v.setBormNo(ln.getBormNo());
+				v.setExtraRepay(loanCalcRepayIntCom.getExtraAmt());
+				v.setEndDate(iEntryDate);
+				iListCloseBreach.add(v);
+				wkExtraRepay = wkExtraRepayRmd.subtract(oPrincipal).subtract(oInterest).subtract(oDelayInt)
+						.subtract(oBreachAmt);
+				if (wkExtraRepay.compareTo(BigDecimal.ZERO) <= 0) {
+					break;
 				}
 			}
 		}

@@ -15,6 +15,7 @@ import com.st1.itx.db.service.CollLawService;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.common.SendRsp;
 /* DB容器 */
 import com.st1.itx.db.domain.CollLaw;
 import com.st1.itx.db.domain.CollLawId;
@@ -38,12 +39,14 @@ public class L5604 extends TradeBuffer {
 	public CollListService iCollListService;
 	@Autowired
 	public DataLog iDataLog;
+	@Autowired
+	SendRsp iSendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.totaVo.init(titaVo);
 		this.info("L5604 start");
-		
+
 		String iFunctionCd = titaVo.getParam("FunctionCd");
 		String iCaseCode = titaVo.getParam("CaseCode");
 		int iClCode1 = Integer.valueOf(titaVo.getParam("ClCode1"));
@@ -56,12 +59,12 @@ public class L5604 extends TradeBuffer {
 		BigDecimal iAmount = new BigDecimal(titaVo.getParam("Amount"));
 		String iRemark = titaVo.getParam("Remark");
 		String iMemo = titaVo.getParam("Memo");
-		
+
 		CollLaw iCollLaw = new CollLaw();
 		CollLawId iCollLawId = new CollLawId();
-		switch(iFunctionCd) {
+		switch (iFunctionCd) {
 		case "1":
-			int  iAcDate = Integer.valueOf(titaVo.getCalDy());
+			int iAcDate = Integer.valueOf(titaVo.getCalDy());
 			String iTitaTlrNo = titaVo.getTlrNo();
 			String iTitaTxtNo = titaVo.getTxtNo();
 			iCollLawId.setAcDate(iAcDate);
@@ -83,10 +86,10 @@ public class L5604 extends TradeBuffer {
 				iCollLawService.insert(iCollLaw, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
-			}	
+			}
 			break;
 		case "2":
-			int  uAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
+			int uAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
 			String uTitaTlrNo = titaVo.getParam("TitaTlrNo");
 			String uTitaTxtNo = titaVo.getParam("TitaTxtNo");
 			iCollLawId.setAcDate(uAcDate);
@@ -110,12 +113,12 @@ public class L5604 extends TradeBuffer {
 				iCollLawService.update(uCollLaw, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}	
+			}
 			iDataLog.setEnv(titaVo, beforeCollLaw, uCollLaw);
 			iDataLog.exec();
 			break;
 		case "3":
-			int  cAcDate = Integer.valueOf(titaVo.getCalDy());
+			int cAcDate = Integer.valueOf(titaVo.getCalDy());
 			String cTitaTlrNo = titaVo.getTlrNo();
 			String cTitaTxtNo = titaVo.getTxtNo();
 			iCollLawId.setAcDate(cAcDate);
@@ -137,10 +140,10 @@ public class L5604 extends TradeBuffer {
 				iCollLawService.insert(iCollLaw, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
-			}	
+			}
 			break;
 		case "4":
-			int  dAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
+			int dAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
 			String dTitaTlrNo = titaVo.getParam("TitaTlrNo");
 			String dTitaTxtNo = titaVo.getParam("TitaTxtNo");
 			iCollLawId.setAcDate(dAcDate);
@@ -149,19 +152,23 @@ public class L5604 extends TradeBuffer {
 			iCollLawId.setFacmNo(iFacmNo);
 			iCollLawId.setTitaTlrNo(dTitaTlrNo);
 			iCollLawId.setTitaTxtNo(dTitaTxtNo);
-			CollLaw dCollLaw = iCollLawService.findById(iCollLawId, titaVo);
+			CollLaw dCollLaw = iCollLawService.holdById(iCollLawId, titaVo);
 			if (dCollLaw == null) {
 				throw new LogicException(titaVo, "E0004", "");
+			}
+			// 刪除需刷主管卡
+			if (!titaVo.getHsupCode().equals("1")) {
+				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
 			try {
 				iCollLawService.delete(dCollLaw, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
-			}	
+			}
 			break;
 		}
-		
-		//更新催收主檔
+
+		// 更新催收主檔
 		CollListId iCollListId = new CollListId();
 		CollList iCollList = new CollList();
 		iCollListId.setCustNo(iCustNo);
@@ -171,12 +178,12 @@ public class L5604 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0007", "催收主檔"); // 更新資料時發生錯誤
 		}
 		iCollList.setTxCode("5");
-		iCollList.setTxDate(Integer.valueOf(titaVo.getEntDy()));
+		iCollList.setTxDate(Integer.valueOf(titaVo.getCalDy()));
 		try {
-			iCollListService.update(iCollList,titaVo);
-		}catch (DBException e) {
+			iCollListService.update(iCollList, titaVo);
+		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時發生錯誤
-		}	
+		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

@@ -51,9 +51,6 @@ public class L2060 extends TradeBuffer {
 	@Autowired
 	LoanCom loanCom;
 
-	private int wkTotalCount = 0;
-	private int wkSyndNo = 0;
-
 	private OccursList occursList;
 	private Slice<LoanSynd> slLoanSynd;
 	private List<LoanSynd> lLoanSynd;
@@ -77,21 +74,7 @@ public class L2060 extends TradeBuffer {
 //		int iDrawdownEndDateEnd = this.parse.stringToInteger(titaVo.getParam("DrawdownEndDateEnd"));
 //		String iCommitFeeFlag = titaVo.getParam("CommitFeeFlag");
 
-		// work area
-		int wkCustNoStart = 1;
-		int wkCustNoEnd = 9999999;
-		List<String> lCommitFeeFlag = new ArrayList<String>();
-//
-//		if (iCustNo > 0) {
-//			wkCustNoStart = iCustNo;
-//			wkCustNoEnd = iCustNo;
-//		}
-//		if (iCommitFeeFlag.trim().equals("")) {
-//			lCommitFeeFlag.add("Y");
-//			lCommitFeeFlag.add("N");
-//		} else {
-//			lCommitFeeFlag.add(iCommitFeeFlag);
-//		}
+		new ArrayList<String>();
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -99,10 +82,15 @@ public class L2060 extends TradeBuffer {
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100; // 183 * 250 = 45750
 
+		
+		if(iSigningDateEnd == 0) {
+			iSigningDateEnd = 99999999;
+		} else {
+			iSigningDateEnd = iSigningDateEnd + 19110000;
+		}
 		// 查詢聯貸案主檔 聯貸案編號區間
 		if (iSyndNoStart > 0) {
-			slLoanSynd = loanSyndService.syndNoRange(iSyndNoStart, iSyndNoEnd, iLeadingBank,
-					iSigningDateStart + 19110000, iSigningDateEnd + 19110000, this.index, this.limit, titaVo);
+			slLoanSynd = loanSyndService.syndNoRange(iSyndNoStart, iSyndNoEnd, iLeadingBank, iSigningDateStart + 19110000, iSigningDateEnd, this.index, this.limit, titaVo);
 		} else {
 
 		}

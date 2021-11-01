@@ -12,8 +12,6 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.AcClose;
-import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
@@ -89,6 +87,10 @@ public class L4101ReportC extends MakeReport {
 		this.print(-1, 85, "新光人壽保險股份有限公司", "C");
 		this.print(-1, 145, "機密等級：" + this.security);
 		this.print(-2, 2, "報　表：" + this.reportCode);
+		// 退款名稱
+		if ("BCK".equals(batchNo)) {
+			reportItem = "抽退票傳票明細表";
+		}
 		this.print(-2, 85, this.reportItem, "C");
 		this.print(-2, 145, "日　　期：" + showBcDate(this.nowDate, 1));
 		this.print(-3, 2, "來源別：放款服務課");
@@ -134,6 +136,10 @@ public class L4101ReportC extends MakeReport {
 		batchNo = titaVo.getBacthNo();
 		reportCode = titaVo.getTxcd();
 		reportCode = reportCode + "-" + batchNo;
+		// 退款名稱
+		if ("BCK".equals(batchNo)) {
+			reportItem = "抽退票傳票明細表";
+		}
 		String wkName = "";
 		String wkBankCode = "";
 		String wkBranchCode = "";
@@ -143,8 +149,7 @@ public class L4101ReportC extends MakeReport {
 		// 分錄
 		List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
 
-		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate,
-				batchNo, 0, Integer.MAX_VALUE, titaVo);
+		Slice<AcDetail> slAcDetail = acDetailService.acdtlTitaBatchNo(titaVo.getAcbrNo(), titaVo.getCurName(), acDate, batchNo, 0, Integer.MAX_VALUE, titaVo);
 		lAcDetail = slAcDetail == null ? null : new ArrayList<AcDetail>(slAcDetail.getContent());
 
 		if (lAcDetail == null || lAcDetail.isEmpty()) {
@@ -240,20 +245,6 @@ public class L4101ReportC extends MakeReport {
 		print(0, 103, formatAmt(sumDbAmt, 0), "R");
 		print(0, 119, formatAmt(sumCrAmt, 0), "R");
 
-	}
-
-	private String getBatchNo(TitaVo titaVo) throws LogicException {
-		String batchNo = "";
-		AcCloseId tAcCloseId = new AcCloseId();
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
-		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
-		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
-		}
-		batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
-		return batchNo;
 	}
 
 }

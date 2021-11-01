@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class MlaundryRecord implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3081477238905709327L;
-
-@EmbeddedId
+  @EmbeddedId
   private MlaundryRecordId mlaundryRecordId;
 
   // 訪談日期
@@ -55,6 +51,7 @@ public class MlaundryRecord implements Serializable {
   private int repayDate = 0;
 
   // 實際還款日期
+  /* 入帳日期 */
   @Column(name = "`ActualRepayDate`")
   private int actualRepayDate = 0;
 
@@ -212,7 +209,7 @@ public class MlaundryRecord implements Serializable {
 
 /**
 	* 實際還款日期<br>
-	* 
+	* 入帳日期
 	* @return Integer
 	*/
   public int getActualRepayDate() {
@@ -221,7 +218,7 @@ public class MlaundryRecord implements Serializable {
 
 /**
 	* 實際還款日期<br>
-	* 
+	* 入帳日期
   *
   * @param actualRepayDate 實際還款日期
   * @throws LogicException when Date Is Warn	*/

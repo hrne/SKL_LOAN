@@ -490,7 +490,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				} else {
 					wkTerms = 1;
 					wkProcessCode = 2;
-					this.info("specifyPayTermsRoutine-1 ");
+					this.info("specifyPayTermsRoutine-2 ");
 					specifyTermsRoutine();
 					// 計算到新起日的相對日
 					dDateUtil.init();
@@ -500,6 +500,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 					this.info("specifyPayTermsRoutine first term dateDiffSp " + wkSpecificDate + "~" + wkIntStartDate
 							+ " =" + dDateUtil.getMons() + "/" + dDateUtil.getDays());
 					wkMons = dDateUtil.getYears() * 12 + dDateUtil.getMons();
+					this.info("specifyPayTermsRoutine-3 ");
 					// 有零星日，計算滿一期的止日
 					if (dDateUtil.getDays() > 0) {
 						dDateUtil.init();
@@ -508,7 +509,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 						wkIntEndDate = dDateUtil.getCalenderDay();
 						wkTerms = 1;
 						wkProcessCode = 1;
-						this.info("specifyPayTermsRoutine-2");
+						this.info("specifyPayTermsRoutine-4");
 						specifyTermsRoutine();
 					}
 				}
@@ -807,11 +808,18 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 			break;
 		case 2: // 2:週期為月
 			wkIntEndDate = freqMonthRoutine();
-			dDateUtil.init();
-			dDateUtil.setDate_1(wkIntStartDate);
-			dDateUtil.setDate_2(wkIntEndDate);
-			dDateUtil.dateDiff();
-			wkMonthLimit = dDateUtil.getDays();
+			if (wkIntEndDate > iMaturityDate) {
+				wkProcessCode = 1;
+				dDateUtil.init();
+				dDateUtil.setDate_1(wkIntStartDate);
+				wkMonthLimit = dDateUtil.getMonLimit();
+			} else {
+				dDateUtil.init();
+				dDateUtil.setDate_1(wkIntStartDate);
+				dDateUtil.setDate_2(wkIntEndDate);
+				dDateUtil.dateDiff();
+				wkMonthLimit = dDateUtil.getDays();
+			}
 			break;
 		case 3: // 3:週期為週
 			wkMonthLimit = iPayIntFreq * 7;
@@ -1020,14 +1028,14 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 				vCalcRepayIntVo = lCalcRepayIntVo.get(wkCalcVoIndex);
 				vCalcRepayIntVo.setDuraFlag(1);
 				lCalcRepayIntVo.set(wkCalcVoIndex, vCalcRepayIntVo);
-				this.info("   wkFlag == 1 " + wkIntStartDate + "~" + wkIntEndDate );
+				this.info("   wkFlag == 1 " + wkIntStartDate + "~" + wkIntEndDate);
 			}
 			dDateUtil.init();
 			dDateUtil.setDate_1(wkIntStartDate);
 			dDateUtil.setDate_2(wkIntEndDate);
 			dDateUtil.dateDiff();
 			wkDays = dDateUtil.getDays();
-			this.info("   wkFlag == 0 " + wkIntStartDate + "~" + wkIntEndDate );
+			this.info("   wkFlag == 0 " + wkIntStartDate + "~" + wkIntEndDate);
 			wkType = 2;
 			moveCalcDataRoutine();
 			wkIntStartDate = iMaturityDate;
@@ -2027,7 +2035,7 @@ public class LoanCalcRepayIntCom extends CommBuffer {
 		this.info("   RateCode          利率區分           = " + iRateCode); // 利率區分 1:機動 2:固動 3:定期機動
 		this.info("   RateAdjFreq       利率調整週期       = " + iRateAdjFreq); // 利率調整週期
 		this.info("   NextAdjRateDate   下次利率調整日     = " + iNextAdjRateDate); // 下次利率調整日
-		this.info("   Principal         計息本金           = " + iPrincipal); // 計息本金
+		this.info("   Principal         計息本金(放款餘額) = " + iPrincipal); // 計息本金
 		this.info("   IncrFlag          加減碼是否依合約   = " + iIncrFlag); // 加減碼是否依合約 Y:是 N:否
 		this.info("   StoreRate         上次收息利率       = " + iStoreRate); // 上次收息利率
 		this.info("   RateIncr          加碼利率           = " + iRateIncr); // 加碼利率

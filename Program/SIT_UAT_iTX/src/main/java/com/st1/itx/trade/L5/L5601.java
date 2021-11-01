@@ -14,10 +14,12 @@ import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.CollRemindService;
 import com.st1.itx.db.service.CollTelService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.common.SendRsp;
+
 /* DB容器 */
 import com.st1.itx.db.domain.CollTel;
 import com.st1.itx.db.domain.CollTelId;
-
 import com.st1.itx.db.domain.CollList;
 import com.st1.itx.db.domain.CollListId;
 import com.st1.itx.db.domain.CollRemind;
@@ -41,6 +43,10 @@ public class L5601 extends TradeBuffer {
 	public CollListService iCollListService;
 	@Autowired
 	public CollRemindService iCollRemindService;
+	@Autowired
+	public DataLog iDataLog;
+	@Autowired
+	SendRsp iSendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -66,7 +72,7 @@ public class L5601 extends TradeBuffer {
 		iCollListId.setFacmNo(iFacmNo);
 		CollList aCollList = iCollListService.findById(iCollListId, titaVo);
 		// 以該戶號額度尋找同擔保品編號、額度
-		Slice<CollList> bCollList = iCollListService.findCl(aCollList.getClCustNo(), aCollList.getClFacmNo(), 0,Integer.MAX_VALUE, titaVo);
+		Slice<CollList> bCollList = iCollListService.findCl(aCollList.getClCustNo(), aCollList.getClFacmNo(), 0, Integer.MAX_VALUE, titaVo);
 
 		// 其實不太必要的檢核，因為必定有一筆以上
 		if (bCollList == null) {
@@ -83,12 +89,12 @@ public class L5601 extends TradeBuffer {
 			if (iFunctioncd.equals("1") || iFunctioncd.equals("3")) {
 				aCollTelId.setTitaTlrNo(titaVo.getTlrNo());
 				aCollTelId.setTitaTxtNo(titaVo.getTxtNo());
-				aCollTelId.setAcDate(Integer.valueOf(titaVo.getEntDy())); // 西元
+				aCollTelId.setAcDate(Integer.valueOf(titaVo.getCalDy())); // 日曆日 放acdate
 				aCollTel.setCreateEmpNo(titaVo.getTlrNo());
 			} else {
 				aCollTelId.setTitaTlrNo(titaVo.getParam("TitaTlrNo"));
 				aCollTelId.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
-				aCollTelId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")) + 19110000); // 西元
+				aCollTelId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));
 				aCollTel.setLastUpdateEmpNo(titaVo.getTlrNo());
 			}
 			aCollTel.setCollTelId(aCollTelId);
@@ -101,11 +107,7 @@ public class L5601 extends TradeBuffer {
 			aCollTel.setTelExt(titaVo.getParam("TelExt"));
 			aCollTel.setResultCode(titaVo.getParam("ResultCode"));
 			aCollTel.setRemark(titaVo.getParam("Remark"));
-//			if(titaVo.getParam("CallDate").equals("0")) {
 			aCollTel.setCallDate(Integer.valueOf(titaVo.getParam("CallDate")));
-//			}else {
-//				aCollTel.setCallDate(Integer.valueOf(Integer.valueOf(titaVo.getParam("CallDate"))+19110000));
-//			}
 
 			// 查找同pk以做後續判斷
 			CollTel bCollTel = iCollTelService.findById(aCollTelId, titaVo);
@@ -115,7 +117,7 @@ public class L5601 extends TradeBuffer {
 				if (bCollTel == null) {
 					try {
 						iCollTelService.insert(aCollTel, titaVo);
-					} catch (DBException e) 	{
+					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 					}
 				} else {
@@ -123,21 +125,36 @@ public class L5601 extends TradeBuffer {
 				}
 			} else if (iFunctioncd.equals("2")) {
 				if (bCollTel != null) {
+					CollTel uCollTel = new CollTel();
+					uCollTel = iCollTelService.holdById(aCollTelId);
+					CollTel beforeCollTel = (CollTel) iDataLog.clone(uCollTel);
+					uCollTel.setTelDate(Integer.valueOf(titaVo.getParam("TelDate")));
+					uCollTel.setTelTime(titaVo.getParam("TelTime"));
+					uCollTel.setContactCode(titaVo.getParam("ContactCode"));
+					uCollTel.setRecvrCode(titaVo.getParam("RecvrCode"));
+					uCollTel.setTelArea(titaVo.getParam("TelArea"));
+					uCollTel.setTelNo(titaVo.getParam("TelNo"));
+					uCollTel.setTelExt(titaVo.getParam("TelExt"));
+					uCollTel.setResultCode(titaVo.getParam("ResultCode"));
+					uCollTel.setRemark(titaVo.getParam("Remark"));
+					uCollTel.setCallDate(Integer.valueOf(titaVo.getParam("CallDate")));
 					try {
-						iCollTelService.holdById(aCollTelId);
-						aCollTel.setCreateEmpNo(bCollTel.getCreateEmpNo());
-						aCollTel.setCreateDate(bCollTel.getCreateDate());
-						iCollTelService.update(aCollTel, titaVo);
+						iCollTelService.update(uCollTel, titaVo);
+						iDataLog.setEnv(titaVo, beforeCollTel, uCollTel);
+						iDataLog.exec();
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 				} else {
 					throw new LogicException(titaVo, "E0003", "");
 				}
-			} else {
+			} else {// 刪除需刷主管卡
 				if (bCollTel != null) {
+					if (!titaVo.getHsupCode().equals("1")) {
+						iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+					}
+					iCollTelService.holdById(aCollTelId);
 					try {
-						iCollTelService.holdById(aCollTelId);
 						iCollTelService.delete(aCollTel, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
@@ -154,7 +171,7 @@ public class L5601 extends TradeBuffer {
 			try {
 				CollList fCollList = iCollListService.holdById(dCollListId, titaVo);
 				fCollList.setTxCode("3"); // 上次作業項目
-				fCollList.setTxDate(Integer.valueOf(titaVo.getEntDy()) + 19110000);
+				fCollList.setTxDate(Integer.valueOf(titaVo.getCalDy()));
 				iCollListService.update(fCollList, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
@@ -167,32 +184,32 @@ public class L5601 extends TradeBuffer {
 				CollRemindId iCollRemindId = new CollRemindId();
 				iCollRemindId.setTitaTlrNo(titaVo.getTlrNo());
 				iCollRemindId.setTitaTxtNo(titaVo.getTxtNo());
-				iCollRemindId.setAcDate(Integer.valueOf(titaVo.getEntDy()));// 營業日 放acdate
+				iCollRemindId.setAcDate(Integer.valueOf(titaVo.getCalDy()));// 日曆日 放acdate
 				iCollRemindId.setCaseCode(titaVo.getParam("CaseCode"));
 				iCollRemindId.setFacmNo(Integer.valueOf(cCollList.getFacmNo()));
 				iCollRemindId.setCustNo(Integer.valueOf(cCollList.getCustNo()));
 				iCollRemind.setCollRemindId(iCollRemindId);
 				iCollRemind.setCondCode("1");
 				iCollRemind.setRemindDate(Integer.valueOf(titaVo.getParam("CallDate")));
-				//iCollRemind.setRemark("登錄自電催會繳");
+				// iCollRemind.setRemark("登錄自電催會繳");
 				if (iResultCode == 1) {
 					iCollRemind.setRemark("登錄自電催－會繳");
-				} else if(iResultCode == 2) {
+				} else if (iResultCode == 2) {
 					iCollRemind.setRemark("登錄自電催－繳款有困難");
-				} else if(iResultCode == 3) {
+				} else if (iResultCode == 3) {
 					iCollRemind.setRemark("登錄自電催－無人接聽");
-				} else if(iResultCode == 4) {
+				} else if (iResultCode == 4) {
 					iCollRemind.setRemark("登錄自電催－請接話人轉達");
-				} else if(iResultCode == 5) {
+				} else if (iResultCode == 5) {
 					iCollRemind.setRemark("登錄自電催－保證人代繳");
-				} else if(iResultCode == 6) {
+				} else if (iResultCode == 6) {
 					iCollRemind.setRemark("登錄自電催－電話留言");
 				} else {
 					iCollRemind.setRemark("登錄自電催－其他");
 				}
-				
-				iCollRemind.setEditDate(Integer.valueOf(titaVo.getEntDy()));
-				iCollRemind.setEditTime(titaVo.getCalTm().substring(0,4));
+
+				iCollRemind.setEditDate(Integer.valueOf(titaVo.getCalDy()));
+				iCollRemind.setEditTime(titaVo.getCalTm().substring(0, 4));
 				iCollRemind.setRemindCode("01"); // 到時候看會繳的提醒項目編號是多少
 				try {
 					iCollRemindService.insert(iCollRemind, titaVo);

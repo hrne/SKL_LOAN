@@ -952,16 +952,16 @@ public class TxBatchCom extends TradeBuffer {
 			if (titaVo.isHcodeNormal()) {
 				tDetail.setProcStsCode("3"); // 正常交易失敗，設定為檢核錯誤
 				// 失敗交易自動轉暫收(銀行扣款、 員工扣款)
-				if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
-					// 組入帳交易電文
-					TitaVo txTitaVo = new TitaVo();
-					txTitaVo = txTita(2, tDetail, titaVo); // 1:訂正 2:轉暫收
-					// 執行入帳交易
-					this.info("轉暫收 excuteTx " + txTitaVo);
-					ApControl apControl = (ApControl) MySpring.getBean("apControl");
-					apControl.callTrade(txTitaVo);
-					apControl = null;
-				}
+//				if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
+//					// 組入帳交易電文
+//					TitaVo txTitaVo = new TitaVo();
+//					txTitaVo = txTita(2, tDetail, titaVo); // 1:訂正 2:轉暫收
+//					// 執行入帳交易
+//					this.info("轉暫收 excuteTx " + txTitaVo);
+//					ApControl apControl = (ApControl) MySpring.getBean("apControl");
+//					apControl.callTrade(txTitaVo);
+//					apControl = null;
+//				}
 			} else { // 訂正交易失敗，狀態不變
 			}
 		}
@@ -1386,12 +1386,12 @@ public class TxBatchCom extends TradeBuffer {
 	/* 1.大於約定還本金額 ==> 還款類別:02-部分償還 */
 	private void loanBookRepayType(BatxDetail tDetail, TitaVo titaVo) throws LogicException {
 		this.info("CASE 3-1!!!!");
-		Slice<LoanBook> loanBookList = loanBookService.bookCustNoRange(tDetail.getCustNo(), tDetail.getCustNo(), 0, 999,
-				0, 990, this.index, Integer.MAX_VALUE, titaVo);
-		if (loanBookList != null) {
-			for (LoanBook tLoanBook : loanBookList.getContent()) {
-				if (tLoanBook.getBookDate() >= tDetail.getEntryDate() && tLoanBook.getStatus() == 0
-						&& tDetail.getRepayAmt().compareTo(tLoanBook.getBookAmt()) >= 0) {
+		Slice<LoanBook> slLoanBook = loanBookService.bookCustNoRange(tDetail.getCustNo(), tDetail.getCustNo(),
+				tDetail.getFacmNo(), tDetail.getFacmNo() > 0 ? tDetail.getFacmNo() : 999, 0, 990,
+				tDetail.getEntryDate(), this.index, Integer.MAX_VALUE, titaVo);
+		if (slLoanBook != null) {
+			for (LoanBook tLoanBook : slLoanBook.getContent()) {
+				if (tLoanBook.getStatus() == 0 && tDetail.getRepayAmt().compareTo(tLoanBook.getBookAmt()) >= 0) {
 					this.repayType = 02; // 02-部分償還
 					this.repayFacmNo = tLoanBook.getFacmNo(); // 還款額度
 					this.repayBormNo = tLoanBook.getBormNo(); // 撥款序號
@@ -1546,9 +1546,8 @@ public class TxBatchCom extends TradeBuffer {
 		baTxList = new ArrayList<BaTxVo>();
 		// call 應繳試算，試算至會計日
 		try {
-			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), this.txBuffer.getTxBizDate().getTbsDy(),
-					tDetail.getCustNo(), this.repayFacmNo, this.repayBormNo, tDetail.getRepayCode(), this.repayType,
-					tDetail.getRepayAmt(), titaVo);
+			baTxList = baTxCom.settleUnPaid(tDetail.getEntryDate(), 0, tDetail.getCustNo(), this.repayFacmNo,
+					this.repayBormNo, tDetail.getRepayCode(), this.repayType, tDetail.getRepayAmt(), titaVo);
 		} catch (LogicException e) {
 			this.errorMsg = e.getMessage();
 			if (this.errorMsg.length() >= 5) {
@@ -1622,7 +1621,7 @@ public class TxBatchCom extends TradeBuffer {
 				}
 				if (baTxVo.getDataKind() == 2) {
 					// 全部應繳
-					if (baTxVo.getPayIntDate() > this.txBuffer.getTxCom().getTbsdy()) {
+					if (baTxVo.getPayIntDate() <= this.txBuffer.getTxCom().getTbsdy()) {
 						this.unPayTotal = this.unPayTotal.add(baTxVo.getUnPaidAmt());
 						this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
 					}

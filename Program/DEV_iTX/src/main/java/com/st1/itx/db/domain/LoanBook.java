@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -26,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class LoanBook implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3991493654242324571L;
-
-@EmbeddedId
+  @EmbeddedId
   private LoanBookId loanBookId;
 
   // 借款人戶號
@@ -80,6 +76,11 @@ public class LoanBook implements Serializable {
   // 實際還本金額
   @Column(name = "`RepayAmt`")
   private BigDecimal repayAmt = new BigDecimal("0");
+
+  // 繳納方式
+  /* 共用代碼檔PayMethod1:減少每期攤還金額2:縮短應繳期數 */
+  @Column(name = "`PayMethod`", length = 1)
+  private String payMethod;
 
   // 建檔日期時間
   @CreatedDate
@@ -322,6 +323,31 @@ TWD: 新台幣
   }
 
 /**
+	* 繳納方式<br>
+	* 共用代碼檔
+PayMethod
+1:減少每期攤還金額
+2:縮短應繳期數
+	* @return String
+	*/
+  public String getPayMethod() {
+    return this.payMethod == null ? "" : this.payMethod;
+  }
+
+/**
+	* 繳納方式<br>
+	* 共用代碼檔
+PayMethod
+1:減少每期攤還金額
+2:縮短應繳期數
+  *
+  * @param payMethod 繳納方式
+	*/
+  public void setPayMethod(String payMethod) {
+    this.payMethod = payMethod;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -401,7 +427,7 @@ TWD: 新台幣
   @Override
   public String toString() {
     return "LoanBook [loanBookId=" + loanBookId + ", actualDate=" + actualDate + ", status=" + status
-           + ", currencyCode=" + currencyCode + ", includeIntFlag=" + includeIntFlag + ", unpaidIntFlag=" + unpaidIntFlag + ", bookAmt=" + bookAmt + ", repayAmt=" + repayAmt + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", currencyCode=" + currencyCode + ", includeIntFlag=" + includeIntFlag + ", unpaidIntFlag=" + unpaidIntFlag + ", bookAmt=" + bookAmt + ", repayAmt=" + repayAmt + ", payMethod=" + payMethod
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -101,7 +101,6 @@ public class L8316 extends TradeBuffer {
 		String iClaimStatus2 = titaVo.getParam("ClaimStatus2");
 		int iSaveEndDate = Integer.valueOf(titaVo.getParam("SaveEndDate"));
 		String iKey = "";
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 營業日 民國YYYMMDD
 
 		// JcicZ055
 		JcicZ055 iJcicZ055 = new JcicZ055();
@@ -173,21 +172,12 @@ public class L8316 extends TradeBuffer {
 					}
 				} // 2 end
 			}
-
-			// 3.1 key值為「債務人IDN+報送單位代號+案件狀態+裁定日期+承審法院代碼」，不可重複，重複者予以剔退-case "1"檢核
-
-			// 3.2 若非key值欄位資料需要更新，請以交易代碼'C'異動處理***
-
-			// 4 start 裁定日/撤回通知日/履行完畢日/發文日須小於等於報送日期
-			if ("A".equals(iTranKey)) {
-				if (iClaimDate > txDate) {
-					throw new LogicException("E0005", "「裁定日期/更生履行完畢日期/發文日期」 須小於等於報送日期.");
-				}
-			} // 4 end
 		}
 
+		// 3.1 key值為「債務人IDN+報送單位代號+案件狀態+裁定日期+承審法院代碼」，不可重複，重複者予以剔退-case "1"檢核
+		// 3.2 若非key值欄位資料需要更新，請以交易代碼'C'異動處理***
+		// 4 裁定日/撤回通知日/履行完畢日/發文日須小於等於報送日期--->前端檢核
 		// 5 各金融機構更生資料報送不一致時，中心檢核事項***J
-
 		// 6 各金融機構更生資料報送不一致時，中心檢核事項的比對邏輯***J
 
 		// 檢核條件 end

@@ -73,16 +73,16 @@ public class L5061ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else {
 			sql += " where l.\"OvduTerm\" > 0";
 		}
-		//排序
+		// 排序
 		switch (OptionCode) {
 		case 1:
-			sql += " ORDER BY c.\"TelDate\" , c.\"TelTime\" , c.\"CustNo\" ";
+			sql += " ORDER BY c.\"TelDate\" DESC, c.\"TelTime\" DESC, c.\"CustNo\" ";
 			break;
 		case 2:
-			sql += " ORDER BY c.\"MeetDate\" , c.\"MeetTime\" , c.\"CustNo\" ";
+			sql += " ORDER BY c.\"MeetDate\" DESC, c.\"MeetTime\" DESC, c.\"CustNo\" ";
 			break;
 		case 3:
-			sql += " ORDER BY c.\"MailDate\" , c.\"CustNo\" ";
+			sql += " ORDER BY c.\"MailDate\" DESC, c.\"CustNo\" ";
 			break;
 		case 5:
 			break;

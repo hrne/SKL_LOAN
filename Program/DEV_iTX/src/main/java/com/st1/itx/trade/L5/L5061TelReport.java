@@ -82,7 +82,7 @@ public class L5061TelReport extends MakeReport {
 		this.info("header ==== " + header);
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5061", fileName, fileName);
-
+		makeExcel.setSheet("L5061", "電催資料");
 		try {
 			c5061SqlReturn = iL5061ServiceImpl.FindData(sDateS, sdateE, iCustNoS, iCustNoE, chooseFlag, titaVo);
 		} catch (Exception e) {

@@ -69,7 +69,7 @@ public class L5061MeetReport extends MakeReport {
 		String sCustNoE = String.valueOf(iCustNoE);
 
 		List<String> header = new ArrayList<>();
-		header.addAll(Arrays.asList("戶號", "額度", "戶名", "戶況", "放款餘額", "繳息迄日", "逾期數", "面催日期", "面催時間", "面催紀錄", "催收人員", "法務人員"));
+		header.addAll(Arrays.asList("戶號", "額度", "戶名", "戶況", "放款餘額", "繳息迄日", "逾期數", "面催日期", "面催時間", "面催記錄", "催收人員", "法務人員"));
 
 		List<Map<String, String>> c5061SqlReturn = new ArrayList<Map<String, String>>();
 
@@ -82,7 +82,7 @@ public class L5061MeetReport extends MakeReport {
 		this.info("header ==== " + header);
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5061", fileName, fileName);
-
+		makeExcel.setSheet("L5061", "面催資料");
 		try {
 			c5061SqlReturn = iL5061ServiceImpl.FindData(sDateS, sdateE, iCustNoS, iCustNoE, chooseFlag, titaVo);
 		} catch (Exception e) {

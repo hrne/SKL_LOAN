@@ -3,11 +3,14 @@ package com.st1.itx.db.repository.day;
 
 import java.util.Optional;
 
+import java.math.BigDecimal;
+import java.util.List;
 import javax.persistence.LockModeType;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.query.Procedure;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +33,9 @@ public interface MlaundryRecordRepositoryDay extends JpaRepository<MlaundryRecor
 
   // ActualRepayDate >= ,AND ActualRepayDate <=
   public Slice<MlaundryRecord> findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(int actualRepayDate_0, int actualRepayDate_1, Pageable pageable);
+
+  // CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND BormNo >= ,AND BormNo <= ,AND RepayDate >=
+  public Slice<MlaundryRecord> findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualOrderByRepayDateAsc(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int repayDate_5, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

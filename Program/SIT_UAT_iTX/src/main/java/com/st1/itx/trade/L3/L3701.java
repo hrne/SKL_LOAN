@@ -326,7 +326,8 @@ public class L3701 extends TradeBuffer {
 			wkBormNoEnd = iBormNo;
 		}
 
-		if (iPieceCodeY.equals("X")||iPieceCodeSecondY.equals("X")||(iPieceCodeSecondAmtY.equals("X")) && iBormNo == 0) {
+		if (iPieceCodeY.equals("X") || iPieceCodeSecondY.equals("X")
+				|| (iPieceCodeSecondAmtY.equals("X")) && iBormNo == 0) {
 			throw new LogicException(titaVo, "E0019", "變更計件代碼相關欄位需輸入撥款序號"); // E0019 輸入資料錯誤
 		}
 
@@ -1343,7 +1344,8 @@ public class L3701 extends TradeBuffer {
 
 			// 帳管費處理
 			if (tLoanBorMain.getAcctFee().compareTo(BigDecimal.ZERO) > 0) {
-				int mntFlag = wkAcctFee.compareTo(tLoanBorMain.getAcctFee()) >= 0 ? 0 : 1;
+				if (wkAcctFee.compareTo(tLoanBorMain.getAcctFee()) >= 0) {
+				}
 				BigDecimal rvAmt = wkAcctFee.compareTo(tLoanBorMain.getAcctFee()) >= 0
 						? wkAcctFee.subtract(tLoanBorMain.getAcctFee())
 						: tLoanBorMain.getAcctFee().subtract(wkAcctFee);
@@ -1508,12 +1510,15 @@ public class L3701 extends TradeBuffer {
 		// 到期日、 攤還方式、 繳息週期、 寬限到期日變更，須重算期金
 		if (iMaturityDateY.equals("X") || iAmortizedCodeY.equals("X") || iPayIntFreqY.equals("X")
 				|| iGraceDateY.equals("X")) {
+			wkGracePeriod = loanCom.getGracePeriod(tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
+					tLoanBorMain.getPayIntFreq(), tLoanBorMain.getSpecificDate(), tLoanBorMain.getSpecificDd(),
+					tLoanBorMain.getGraceDate());
 			wkDueAmt = loanDueAmtCom.getDueAmt(tLoanBorMain.getDrawdownAmt(), tLoanBorMain.getStoreRate(),
 					tLoanBorMain.getAmortizedCode(), tLoanBorMain.getFreqBase(),
-					(tLoanBorMain.getPaidTerms() > tLoanBorMain.getGracePeriod()
+					tLoanBorMain.getPaidTerms() > wkGracePeriod
 							? tLoanBorMain.getTotalPeriod() - tLoanBorMain.getPaidTerms()
-							: tLoanBorMain.getTotalPeriod() - tLoanBorMain.getGracePeriod()),
-					tLoanBorMain.getGracePeriod(), tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
+							: tLoanBorMain.getTotalPeriod() - wkGracePeriod,
+					0, tLoanBorMain.getPayIntFreq(), tLoanBorMain.getFinalBal(), titaVo);
 			tTemp2Vo.putParam("DueAmtY", "X");
 			tLoanBorMain.setDueAmt(wkDueAmt);
 		}

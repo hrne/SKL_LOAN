@@ -37,7 +37,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3004")
 @Scope("prototype")
 public class L3004 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3004.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -87,7 +86,7 @@ public class L3004 extends TradeBuffer {
 		}
 
 		slLoanBook = loanBookService.bookCustNoRange(wkCustNoStart, wkCustNoEnd, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, this.index, this.limit, titaVo);
+				wkBormNoStart, wkBormNoEnd, 0, this.index, this.limit, titaVo);
 		lLoanBook = slLoanBook == null ? null : slLoanBook.getContent();
 		if (lLoanBook == null || lLoanBook.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款約定還本檔"); // 查詢資料不存在

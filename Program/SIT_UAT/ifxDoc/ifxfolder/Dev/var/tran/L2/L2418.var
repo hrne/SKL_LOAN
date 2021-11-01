@@ -1,0 +1,392 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2418)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,900];printer.width=[15,30]">
+[
+["[L2418]                                 他項權利資料登錄"],
+["#FdFunCd+功能",#FunCdX],
+["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
+["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],
+["#FdClNo+擔保品編號",#ClNo,#BTN1],
+["#FdSeq+他項權利序號",#SeqS,"-",#SeqE],
+["#FdCity+縣市",#City],
+["#FdLandAdm+地政",#LandAdm],
+["#FdRecYear+收件年",#RecYear],
+["#FdRecWord+收件字",#RecWord],
+["#FdRecNumber+收件號",#RecNumber],
+["#FdRightsNote+權利價值說明",#RightsNote],
+["#FdSecuredTotal+擔保債權總金額",#TwSecuredTotal,#UsSecuredTotal],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:瀏覽;enable:1;tabbable:0;title:L2038 擔保品明細資料查詢;
+!---------- AP TEXT AREA Variables ----------
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+
+!#CDDEF01=x,20,S
+!T(3,CdCode.ClCode1)
+
+#ClCode1Help=X,1024,S
+T(3,1:房地;2:土地)
+
+!#HelpRim=X,1,S
+!RESET_RIM(#HelpRim,XXR99)
+!R(1,XXR99)
+!CALL(#HelpProc)
+!T(2,@ClCode1Help,#HelpDesc1)
+
+!FuncCode
+#FuncCodeHelp=x,30,S
+T(3,1:新增;2:修改;4:刪除;5:查詢)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2918進入),$)
+
+
+#NTXBUF=X,200,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCd,#NTXBUF,1,1)
+T(1,@ClCode1,#NTXBUF,2,1)
+T(1,@ClCode2,#NTXBUF,3,2)
+T(1,@ClNo,#NTXBUF,5,7)
+T(1,@SeqS,#NTXBUF,12,4)
+T(1,@SeqE,#NTXBUF,17,3)
+
+
+#Precision=N,1,S
+
+
+#Init=X,1,S
+HIDE(#UsSecuredTotal)
+HIDE(#BTN1)
+T(2,@FdClCode1,*)
+T(2,@FdClCode2,*)
+T(2,@FdClNo,*)
+T(2,@FdSeq,*)
+T(2,@FdCity,*)
+T(2,@FdLandAdm,*)
+T(2,@FdRecYear,*)
+T(2,@FdRecWord,*)
+T(2,@FdRecNumber,*)
+T(2,@FdRightsNote,*)
+T(2,@FdSecuredTotal,*)
+
+#FdFunCd=X,2,L
+#FdClCode1=X,2,L
+#FdClCode2=X,2,L
+#FdClNo=X,2,L
+#FdSeq=X,2,L
+#FdCity=X,2,L
+#FdLandAdm=X,2,L
+#FdRecYear=X,2,L
+#FdRecWord=X,2,L
+#FdRecNumber=X,2,L
+#FdRightsNote=X,2,L
+#FdSecuredTotal=X,2,L
+
+#FunCd=A,1,S
+
+#FunCdX=X,10,L
+E(0,@FUNCIND,#FunCd)
+T(H,#FunCd,#FuncCodeHelp)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+#checkFunCd=X,1,S
+C(3,#CHAIN,1,C(3,#FunCd,1,S,$),S)
+T(F,@ClCode1,0)
+T(F,@ClCode2,0)
+T(F,@ClNo,0)
+T(F,@SeqS,0)
+T(F,@SeqE,0)
+T(2,@FdClCode1,)
+T(2,@FdClCode2,)
+T(2,@FdClNo,)
+T(2,@FdSeq,)
+IF(#FunCd>=4,$,S)
+T(F,@City,0)
+T(F,@LandAdm,0)
+T(F,@RecYear,0)
+T(F,@RecWord,0)
+T(F,@RecNumber,0)
+T(F,@RightsNote,0)
+T(F,@TwSecuredTotal,0)
+T(F,@UsSecuredTotal,0)
+T(2,@FdClCode1,)
+T(2,@FdClCode2,)
+T(2,@FdClNo,)
+T(2,@FdSeq,)
+T(2,@FdCity,)
+T(2,@FdLandAdm,)
+T(2,@FdRecYear,)
+T(2,@FdRecWord,)
+T(2,@FdRecNumber,)
+T(2,@FdRightsNote,)
+T(2,@FdSecuredTotal,)
+
+
+!除功能為1新增時,其他隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunCd,1,$,S)
+E(0,0)ASGN(AGAIN$)
+
+
+! [擔保品代號1]
+#ClCode1=A,1,I
+C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
+HELP(#ClCode1Help)
+@V(H,#ClCode1Help)
+
+
+#ClCode1X=X,20,L
+T(H,#ClCode1,#ClCode1Help)
+
+!調RIM參數
+!L2r46 取他項權利資料
+!L2r48 取擔保品代號2Help
+#RimClCode1=A,1,S
+#RimClCode2=A,2,S
+#RimClNo=A,7,S
+#RimFunCd=A,1,S
+
+!取擔保品代號2Help
+#RimL2R48=X,1,S
+E(0,@RimClCode1,#ClCode1)
+RESET_RIM(#RimL2R48,L2R48)
+S(L2R48,1,#RimClCode1)
+R(1,L2R48)
+
+! [擔保品代號2]
+#ClCode2=A,2,I
+HIDE(#BTN1)
+C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
+HELP(#L2r48Help1)
+@V(H,#L2r48Help1)
+
+#ClCode2X=X,30,L
+T(H,#ClCode2,#L2r48Help1)
+
+! [擔保品編號]
+
+#BUF1A=X,18,S
+T(2, +#ClCode1+#ClCode2+       +   +       +)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUF1A;ntxbuf5=type<-1:ClNo<-OOClNo:ClCode2<-OOClCode2:ClCode1<-OOClCode1})
+
+#ClNo=A,7,I
+C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
+SHOW(#BTN1)
+@V(2,0)
+HIDE(#BTN1)
+
+! 修改、刪除時，調RIM查擔保品主檔(ClMain)資料
+#RimL2r22=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+E(0,@RimFunCd,5)
+RESET_RIM(#RimL2r22,L2R22)
+S(L2R22,1,#RimClCode1,#RimClCode2,#RimClNo,#RimFunCd)
+R(1,L2R22)
+
+!登記次序0000-000
+#SeqS=A,4,I
+C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
+@V(2,0)
+
+#SeqE=A,3,I
+C(3,#CHAIN,1,C(3,#FunCd,1,$,s),$)
+
+#ClSeq=X,8,S
+T(2,#SeqS+-+#SeqE)
+
+#RimClSeq=X,8,S
+!    L2R46 : 依擔保品編號取他項權利資料
+#RimL2r46=X,1,S
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+T(2,@RimClSeq,#ClSeq)
+RESET_RIM(#RimL2r46,L2R46)
+S(L2R46,1,#RimClCode1,#RimClCode2,#RimClNo,#RimClSeq)
+R(1,L2R46)
+
+#checkL2r46=X,1,S=
+T(2,@City,#L2r46City)
+T(2,@LandAdm,#L2r46LandAdm)
+E(0,@RecYear,#L2r46RecYear)
+T(2,@RecWord,#L2r46RecWord)
+T(2,@RecNumber,#L2r46RecNumber)
+T(2,@RightsNote,#L2r46RightsNote)
+E(0,@TwSecuredTotal,#L2r46SecuredTotal)
+E(0,@UsSecuredTotal,#L2r46SecuredTotal)
+
+!縣市
+#City=x,6,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(7)
+
+!地政
+#LandAdm=x,6,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(7)
+
+!收件年
+#RecYear=A,3,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(2,0)
+
+!收件字
+#RecWord=x,8,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(7)
+
+!收件號
+#RecNumber=X,6,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(9)V(7)
+
+
+!權利價值說明
+#RightsNote=x,20,I
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+HELP(本金最高限額新臺幣:;最高限額新臺幣:)
+@V(7)
+
+!擔保債權總金額
+#TwSecuredTotal=m,14,I
+C(3,#Precision,0,$,s)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(2,0)
+
+#UsSecuredTotal=m,14.2,I
+C(3,#Precision,0,s,$)
+C(3,#FunCd,4,s,$)
+C(3,#FunCd,5,s,$)
+@V(2,0)
+
+
+#TimSecuredTotal=m,14.2,S
+C(3,#Precision,0,E(0,#TwSecuredTotal),E(0,#UsSecuredTotal))
+
+
+
+
+
+#RPTFG=A,1,S
+
+<include src="ROM.icf::L2R22.dec"/>
+<include src="ROM.icf::L2R46.dec"/>
+<include src="ROM.icf::L2R48.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+#PRTSCRFG=_,_,S
+E(0,2)
+
+</sub>
+
+
+!---------- TXFORM = L2418 ----------
+<sub type="FORM" name="L2418">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2418,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2418] 他項權利資料登錄)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#ClCode1
+#ClCode2
+#ClNo
+#ClSeq
+#City
+#LandAdm
+#RecYear
+#RecWord
+#RecNumber
+#RightsNote
+#TimSecuredTotal
+#END
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2418
+
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L2R22.tom"/>
+<include src="ROM.icf::L2R46.tom"/>
+<include src="ROM.icf::L2R48.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+</sub>

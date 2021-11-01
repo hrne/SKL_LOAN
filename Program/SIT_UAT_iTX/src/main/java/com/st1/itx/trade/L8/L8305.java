@@ -24,13 +24,10 @@ import com.st1.itx.db.domain.JcicZ040Id;
 import com.st1.itx.db.domain.JcicZ044;
 import com.st1.itx.db.domain.JcicZ044Id;
 import com.st1.itx.db.domain.JcicZ044Log;
-import com.st1.itx.db.domain.JcicZ046;
 /*DB服務*/
 import com.st1.itx.db.service.JcicZ040Service;
 import com.st1.itx.db.service.JcicZ044Service;
-import com.st1.itx.db.service.JcicZ046Service;
 import com.st1.itx.db.service.JcicZ044LogService;
-import com.st1.itx.db.service.JcicZ048Service;
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.SendRsp;
@@ -72,10 +69,6 @@ public class L8305 extends TradeBuffer {
 	public JcicZ040Service sJcicZ040Service;
 	@Autowired
 	public JcicZ044Service sJcicZ044Service;
-	@Autowired
-	public JcicZ046Service sJcicZ046Service;
-	@Autowired
-	public JcicZ048Service sJcicZ048Service;
 	@Autowired
 	public JcicZ044LogService sJcicZ044LogService;
 	@Autowired
@@ -163,26 +156,8 @@ public class L8305 extends TradeBuffer {
 			// 3.因協商不成立致須回報本資料檔案格式時，則須以交易代碼「'X'補件」報送之，本中心即可接受金融機構報送之前已因協商不成立而結案之案件資料.***J
 			// 4.當本資料檔案格式交易代碼為「'X'補件」時，則第11欄「協商方案估計月付金」、第25~30欄「扶養人」相關，為非必要填報欄位.***J
 
-			// extra項'消費者債務清理條例資料報送作業要點'(P169-(三)-(3) start
-			// 當本資料檔案格式交易代碼為「'X'補件」時,第9欄「期數」和第10欄
-			// 「利率」為必要欄位(「'46':結案通知資料」之「結案原因」為「'21':資產大於負債者除外」)
-			if ("X".equals(iTranKey) && (iPeriod == 0 || iRate == null)) {
-				Slice<JcicZ046> sJcicZ046 = sJcicZ046Service.hadZ046(iCustId, iRcDate + 19110000, iSubmitKey, 0,
-						Integer.MAX_VALUE, titaVo);
-				if (sJcicZ046 == null) {
-					throw new LogicException("E0005", "交易代碼為「'X'補件」時，「期數」和「利率」為必要欄位，不可空白.");
-				} else {
-					String iCloseCode = null;
-					for (JcicZ046 xJcicZ046 : sJcicZ046) {
-						if ("21".equals(xJcicZ046.getCloseCode())) {
-							iCloseCode = "21";
-						}
-					}
-					if (!"21".equals(iCloseCode)) {
-						throw new LogicException("E0005", "交易代碼為「'X'補件」時，「期數」和「利率」為必要欄位，不可空白.");
-					}
-				}
-			}
+			// extra項'消費者債務清理條例資料報送作業要點'(P169-(三)-(3)  --->相關欄位均為數字，1029謙和通知不必檢核
+			// 當本資料檔案格式交易代碼為「'X'補件」時,第9欄「期數」和第10欄「利率」為必要欄位(「'46':結案通知資料」之「結案原因」為「'21':資產大於負債者除外」)
 			// 檢核項目 end
 		}
 

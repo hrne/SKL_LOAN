@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -186,6 +189,34 @@ em = null;
       slice = mlaundryRecordReposHist.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(actualRepayDate_0, actualRepayDate_1, pageable);
     else 
       slice = mlaundryRecordRepos.findAllByActualRepayDateGreaterThanEqualAndActualRepayDateLessThanEqualOrderByRecordDateAscActualRepayDateAsc(actualRepayDate_0, actualRepayDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<MlaundryRecord> findCustNoEq(int custNo_0, int facmNo_1, int facmNo_2, int bormNo_3, int bormNo_4, int repayDate_5, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<MlaundryRecord> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findCustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " facmNo_2 : " +  facmNo_2 + " bormNo_3 : " +  bormNo_3 + " bormNo_4 : " +  bormNo_4 + " repayDate_5 : " +  repayDate_5);
+    if (dbName.equals(ContentName.onDay))
+      slice = mlaundryRecordReposDay.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualOrderByRepayDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, repayDate_5, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = mlaundryRecordReposMon.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualOrderByRepayDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, repayDate_5, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = mlaundryRecordReposHist.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualOrderByRepayDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, repayDate_5, pageable);
+    else 
+      slice = mlaundryRecordRepos.findAllByCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndRepayDateGreaterThanEqualOrderByRepayDateAsc(custNo_0, facmNo_1, facmNo_2, bormNo_3, bormNo_4, repayDate_5, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

@@ -14,6 +14,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.CollLetterService;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.data.DataLog;
+import com.st1.itx.util.common.SendRsp;
 /* DB容器 */
 import com.st1.itx.db.domain.CollLetter;
 import com.st1.itx.db.domain.CollLetterId;
@@ -36,6 +38,10 @@ public class L5603 extends TradeBuffer {
 	public CollLetterService iCollLetterService;
 	@Autowired
 	public CollListService iCollListService;
+	@Autowired
+	public DataLog iDataLog;
+	@Autowired
+	SendRsp iSendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -64,7 +70,7 @@ public class L5603 extends TradeBuffer {
 		int iClCustNo = iCollList.getClCustNo();
 		int iClFacmNo = iCollList.getClFacmNo();
 		// 用撈出的擔保品編號找全部相同擔保品的資料
-		Slice<CollList> allCollList = iCollListService.findCl(iClCustNo, iClFacmNo, 0,Integer.MAX_VALUE, titaVo);
+		Slice<CollList> allCollList = iCollListService.findCl(iClCustNo, iClFacmNo, 0, Integer.MAX_VALUE, titaVo);
 		if (allCollList == null) {
 			throw new LogicException(titaVo, "E0002", "");
 		}
@@ -78,11 +84,11 @@ public class L5603 extends TradeBuffer {
 			if (iFunctionCd.equals("1") || iFunctionCd.equals("3")) {
 				iCollLetterId.setTitaTlrNo(titaVo.getTlrNo());
 				iCollLetterId.setTitaTxtNo(titaVo.getTxtNo());
-				iCollLetterId.setAcDate(Integer.valueOf(titaVo.getEntDy()));// 營業日 放acdate
+				iCollLetterId.setAcDate(Integer.valueOf(titaVo.getCalDy()));// 日曆日 放acdate
 			} else {
 				iCollLetterId.setTitaTlrNo(titaVo.getParam("TitaTlrNo"));
 				iCollLetterId.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
-				iCollLetterId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));// 營業日 放acdate
+				iCollLetterId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));
 			}
 			iCollLetter.setCollLetterId(iCollLetterId);
 			iCollLetter.setMailTypeCode(titaVo.getParam("MailTypeCode"));
@@ -102,24 +108,40 @@ public class L5603 extends TradeBuffer {
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 					}
-				}else {
+				} else {
 					throw new LogicException(titaVo, "E0002", "");
 				}
-			}else if (iFunctionCd.equals("2")) {
+			} else if (iFunctionCd.equals("2")) {
 				if (tCollLetter != null) {
+					CollLetter uCollLetter = new CollLetter();
+					uCollLetter = iCollLetterService.holdById(iCollLetterId);
+					CollLetter beforeCollLetter = (CollLetter) iDataLog.clone(uCollLetter);
+					uCollLetter.setMailTypeCode(titaVo.getParam("MailTypeCode"));
+					uCollLetter.setMailDate(Integer.valueOf(titaVo.getParam("MailDate")));
+					uCollLetter.setMailObj(titaVo.getParam("MailObj"));
+					uCollLetter.setCustName(titaVo.getParam("MailCustName"));
+					uCollLetter.setDelvrYet(titaVo.getParam("DelvrYet"));
+					uCollLetter.setDelvrCode(titaVo.getParam("DelvrCode"));
+					uCollLetter.setAddressCode(Integer.valueOf(titaVo.getParam("AddressCode")));
+					uCollLetter.setAddress(titaVo.getParam("Address"));
+					uCollLetter.setRemark(titaVo.getParam("Remark"));
 					try {
-						iCollLetterService.holdById(iCollLetterId);
-						iCollLetterService.update(iCollLetter, titaVo);
+						iCollLetterService.update(uCollLetter, titaVo);
+						iDataLog.setEnv(titaVo, beforeCollLetter, uCollLetter);
+						iDataLog.exec();
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
 				} else {
 					throw new LogicException(titaVo, "E0003", "");
 				}
-			}else {
+			} else {// 刪除需刷主管卡
 				if (tCollLetter != null) {
+					if (!titaVo.getHsupCode().equals("1")) {
+						iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+					}
+					iCollLetterService.holdById(iCollLetterId);
 					try {
-						iCollLetterService.holdById(iCollLetterId);
 						iCollLetterService.delete(iCollLetter, titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
@@ -137,7 +159,7 @@ public class L5603 extends TradeBuffer {
 				try {
 					CollList upCollList = iCollListService.holdById(cCollListId, titaVo);
 					upCollList.setTxCode("2"); // 上次作業項目
-					upCollList.setTxDate(Integer.valueOf(titaVo.getEntDy()));
+					upCollList.setTxDate(Integer.valueOf(titaVo.getCalDy()));
 					iCollListService.update(upCollList, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg());

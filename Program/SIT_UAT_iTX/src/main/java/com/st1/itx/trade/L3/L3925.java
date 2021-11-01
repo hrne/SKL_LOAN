@@ -241,8 +241,10 @@ public class L3925 extends TradeBuffer {
 			oExtraRepay = oExtraRepay.add(loanCalcRepayIntCom.getExtraAmt());
 			wkTotalAmt = oPrincipal.add(oInterest).add(oDelayInt).add(oBreachAmt).add(oCloseBreachAmt);
 			oLeftTerms = oLeftTerms + ln.getTotalPeriod() - loanCalcRepayIntCom.getPaidTerms();
+			int wkGracePeriod = loanCom.getGracePeriod(ln.getAmortizedCode(), ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(),
+					ln.getSpecificDd(), ln.getGraceDate());
 			oNewDueAmt = loanDueAmtCom.getDueAmt(ln.getLoanBal().subtract(oPrincipal), loanCalcRepayIntCom.getStoreRate(), ln.getAmortizedCode(), ln.getFreqBase(),
-					(loanCalcRepayIntCom.getPaidTerms() > ln.getGracePeriod() ? ln.getTotalPeriod() - loanCalcRepayIntCom.getPaidTerms() : ln.getTotalPeriod() - ln.getGracePeriod()),
+					(loanCalcRepayIntCom.getPaidTerms() > wkGracePeriod ? ln.getTotalPeriod() - loanCalcRepayIntCom.getPaidTerms() : ln.getTotalPeriod() - wkGracePeriod),
 					ln.getGracePeriod(), ln.getPayIntFreq(), ln.getFinalBal(), titaVo);
 			wkLoanBal = ln.getLoanBal();
 			this.info(" xx BormNo = " + ln.getBormNo());

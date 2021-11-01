@@ -334,7 +334,7 @@ public class L4450Batch extends TradeBuffer {
 		} else {
 			flagMap.put(tmp2, 1);
 		}
-		
+
 		List<BaTxVo> listBaTxVo = new ArrayList<BaTxVo>();
 
 		try {
@@ -342,7 +342,6 @@ public class L4450Batch extends TradeBuffer {
 		} catch (Exception e) {
 			this.info("Error : " + e.getMessage());
 		}
-
 
 //		預設暫收款=0
 		tmpAmtMap.put(tmp2, BigDecimal.ZERO);
@@ -581,7 +580,6 @@ public class L4450Batch extends TradeBuffer {
 
 		List<tmpBorm> tempList = new ArrayList<>();
 
-		
 		for (Iterator<tmpBorm> it = tempSet.iterator(); it.hasNext();) {
 			tmpBorm tmpFacmVo = it.next();
 			tempList.add(tmpFacmVo);
@@ -589,7 +587,6 @@ public class L4450Batch extends TradeBuffer {
 		}
 
 		this.info("tempList.size() = " + tempList.size());
-
 
 		for (tmpBorm tmp : tempList) {
 			cnt++;
@@ -621,7 +618,6 @@ public class L4450Batch extends TradeBuffer {
 				sAcctCode = rpAcCodeMap.get(tmp);
 			}
 
-			
 			tBankDeductDtl.setAcctCode(sAcctCode);
 			tBankDeductDtl.setPrevIntDate(minIntStartDate.get(tmp));
 
@@ -829,7 +825,7 @@ public class L4450Batch extends TradeBuffer {
 		// 未到期約定還本金額
 		BigDecimal bookAmt = BigDecimal.ZERO;
 		Slice<LoanBook> loanBookList = loanBookService.bookCustNoRange(tmp.getCustNo(), tmp.getCustNo(),
-				tmp.getFacmNo(), tmp.getFacmNo(), 0, 990, this.index, Integer.MAX_VALUE, titaVo);
+				tmp.getFacmNo(), tmp.getFacmNo(), 0, 0, 990, this.index, Integer.MAX_VALUE, titaVo);
 		if (loanBookList != null) {
 			for (LoanBook tLoanBook : loanBookList.getContent()) {
 				if (tLoanBook.getStatus() == 0 && tLoanBook.getBookDate() >= titaVo.getEntDyI()) {
@@ -873,7 +869,6 @@ public class L4450Batch extends TradeBuffer {
 		private int bormNo = 0;
 		private int payIntDate = 0;
 		private int repayType = 0;
-		private String rvNo = "";
 
 		public tmpBorm(int custNo, int facmNo, int bormNo, int repayType, int payIntDate) {
 			this.setCustNo(custNo);
@@ -964,14 +959,6 @@ public class L4450Batch extends TradeBuffer {
 
 		private void setRepayType(int repayType) {
 			this.repayType = repayType;
-		}
-
-		private String getRvNo() {
-			return rvNo;
-		}
-
-		private void setRvNo(String rvNo) {
-			this.rvNo = rvNo;
 		}
 
 		private L4450Batch getEnclosingInstance() {

@@ -58,7 +58,7 @@ public class L5061AllReport extends MakeReport {
 
 		this.info("L5061Report start success");
 
-		int chooseFlag = Integer.valueOf(titaVo.getParam("OptionCode"));
+		Integer.valueOf(titaVo.getParam("OptionCode"));
 		int dateS = Integer.valueOf(titaVo.getParam("DateS"));
 		int dateE = Integer.valueOf(titaVo.getParam("DateE"));
 		String sDateS = String.valueOf(dateS);
@@ -71,7 +71,7 @@ public class L5061AllReport extends MakeReport {
 		List<String> telHeader = new ArrayList<>();
 		telHeader.addAll(Arrays.asList("戶號", "額度", "戶名", "戶況", "放款餘額", "繳息迄日", "逾期數", "電催日期", "電催時間", "通話結果", "催收人員", "法務人員"));
 		List<String> meetHeader = new ArrayList<>();
-		meetHeader.addAll(Arrays.asList("戶號", "額度", "戶名", "戶況", "放款餘額", "繳息迄日", "逾期數", "面催日期", "面催時間", "面催紀錄", "催收人員", "法務人員"));
+		meetHeader.addAll(Arrays.asList("戶號", "額度", "戶名", "戶況", "放款餘額", "繳息迄日", "逾期數", "面催日期", "面催時間", "面催記錄", "催收人員", "法務人員"));
 		List<String> letterHeader = new ArrayList<>();
 		letterHeader.addAll(Arrays.asList("戶號", "額度", "戶名", "戶況", "放款餘額", "繳息迄日", "逾期數", "函催日期", "發函種類", "催收人員", "法務人員"));
 
@@ -84,7 +84,7 @@ public class L5061AllReport extends MakeReport {
 		} else {
 			fileName = "催收催繳明細表_" + sCustNoS + "_" + sCustNoE + "(逾期件全部查詢)";
 		}
-		
+
 		int iFlag = 0;
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5061", fileName, fileName);
@@ -107,6 +107,7 @@ public class L5061AllReport extends MakeReport {
 		if (t5061SqlReturn.isEmpty()) {
 //			throw new LogicException(titaVo, "E0001","查無資料");
 		} else {
+			makeExcel.setSheet("L5061", "電催資料");
 			// 表頭
 			for (String content : telHeader) {
 				makeExcel.setValue(row, hcol + 1, content);
@@ -201,10 +202,11 @@ public class L5061AllReport extends MakeReport {
 			this.info("L5908 ErrorForSql=" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
-
+		row = 0;
 		if (m5061SqlReturn.isEmpty()) {
 //			throw new LogicException(titaVo, "E0001","查無資料");
 		} else {
+			makeExcel.newSheet("面催資料");
 			hcol = 0;
 			row++;
 			for (String content : meetHeader) {
@@ -298,10 +300,11 @@ public class L5061AllReport extends MakeReport {
 			this.info("L5908 ErrorForSql=" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
-
+		row = 0;
 		if (l5061SqlReturn.isEmpty()) {
 //			throw new LogicException(titaVo, "E0001","查無資料");
 		} else {
+			makeExcel.newSheet("函催資料");
 			hcol = 0;
 			row++;
 			for (String content : letterHeader) {

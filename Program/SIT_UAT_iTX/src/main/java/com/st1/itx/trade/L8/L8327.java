@@ -85,7 +85,6 @@ public class L8327 extends TradeBuffer {
 		int iMonthPayAmt = Integer.valueOf(titaVo.getParam("MonthPayAmt"));
 		String iPayAccount = titaVo.getParam("PayAccount");
 		String iKey = "";
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD
 
 		// JcicZ447, JcicZ446
 		JcicZ447 iJcicZ447 = new JcicZ447();
@@ -107,16 +106,8 @@ public class L8327 extends TradeBuffer {
 
 			// 2
 			// 檢核第8欄「依民法第323條計算之債務總金額」需等於各金融機構回報之「'442':回報無擔保債權金融資料」檔案第[12+13+14+15]欄金額總和。(交易代碼X者不檢核).***J
-
 			// 3 檢核第9欄「簽約總債權金額」需等於「'448':前置調解無擔保債務還款分配資料」檔案各金融機構第9+10欄金額總和.***J
-
-			// 4 第10欄「簽約完成日期」不得大於「資料報送日」，否則予以剔退.
-			if ("A".equals(iTranKey)) {
-				if (iSignDate > txDate) {
-					throw new LogicException("E0005", "「簽約完成日期」不得大於資料報送日.");
-				}
-			} // 4 end
-
+			// 4 第10欄「簽約完成日期」不得大於「資料報送日」，否則予以剔退.--->(前端檢核)
 			// 5 第11欄「首期應繳款日」不得小於第10欄「簽約完成日」，否則予以剔退.--->(前端檢核)
 
 			// 6 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除、補件本檔案資料.

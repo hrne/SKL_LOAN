@@ -1,0 +1,71 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4103" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4103]                                 抽退票傳票明細表"],
+[#<->#,"#FdAcDate+會計日期",#AcDate],
+]
+
+#FdFunCode=X,2,L
+#FdAcDate=X,2,L
+#FdBatchNo=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,17,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@BatchNo,#NTXBUF,1,6)
+
+
+! 會計日期
+#AcDate=D,7,I
+E(0,#SYSDATE)
+
+![整批批號]
+#BatchNo=X,6,S
+T(3,BCK)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#AcDate
+#BatchNo
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L4103^
+<include src="COM.icf::TRCTL.tom"/>
+
+</sub>
+
+! pdf:1, excel:2, txt:3(分號區隔)
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+</sub>

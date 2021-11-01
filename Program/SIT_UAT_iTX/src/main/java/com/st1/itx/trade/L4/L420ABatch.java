@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BatxDetail;
@@ -113,6 +114,11 @@ public class L420ABatch extends TradeBuffer {
 
 						// 02.銀行扣款 03.員工扣款 => 整批檢核時設定為 4.檢核正常，整批入帳時才進行檢核
 						if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
+							TempVo tTempVo = new TempVo();
+							tTempVo =tTempVo.getVo(tDetail.getProcNote());
+							tTempVo.putParam("CheckMsg", "");
+							tTempVo.putParam("ErrorMsg", "");
+							tDetail.setProcNote(tTempVo.getJsonString());
 							tDetail.setProcStsCode("4"); // 4.檢核正常
 						} else {
 							tDetail = txBatchCom.txCheck(0, tDetail, titaVo);

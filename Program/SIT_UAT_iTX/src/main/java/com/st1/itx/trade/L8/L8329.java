@@ -89,7 +89,7 @@ public class L8329 extends TradeBuffer {
 		int iSumRepayShouldAmt = Integer.valueOf(titaVo.getParam("SumRepayShouldAmt"));
 		String iPayStatus = titaVo.getParam("PayStatus");
 		String iKey = "";
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD(檔案報送日)
+
 		// JcicZ450, JcicZ446, JcicZ447
 		JcicZ450 iJcicZ450 = new JcicZ450();
 		JcicZ450Id iJcicZ450Id = new JcicZ450Id();
@@ -117,15 +117,13 @@ public class L8329 extends TradeBuffer {
 
 			if (!"D".equals(iTranKey)) {
 				// 2.1 start
-				// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否曾報送過「'447':金融機構無擔保債務協議資料」，若不存在予以剔退處理。
+				// 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號」是否曾報送過「'447':金融機構無擔保債務協議資料」，若不存在予以剔退處理。
 				iJcicZ447 = sJcicZ447Service.findById(iJcicZ447Id, titaVo);
 				if (iJcicZ447 == null || "D".equals(iJcicZ447.getTranKey())) {
 					if ("A".equals(iTranKey)) {
-						throw new LogicException(titaVo, "E0005",
-								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+						throw new LogicException(titaVo, "E0005", "「IDN+報送單位代號+調解申請日+受理調解機構代號」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
 					} else {
-						throw new LogicException(titaVo, "E0007",
-								"「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
+						throw new LogicException(titaVo, "E0007", "「IDN+報送單位代號+調解申請日+受理調解機構代號」未曾報送(447)前置調解金融機構無擔保債務協議資料.");
 					}
 				} // 2.1 end
 
@@ -142,8 +140,7 @@ public class L8329 extends TradeBuffer {
 					}
 				} else {
 					for (JcicZ450 xJcicZ450 : sJcicZ450) {
-						if (!"D".equals(xJcicZ450.getTranKey())
-								&& !titaVo.getParam("Ukey").equals(xJcicZ450.getUkey())) {
+						if (!"D".equals(xJcicZ450.getTranKey()) && !titaVo.getParam("Ukey").equals(xJcicZ450.getUkey())) {
 							sPayAmt += xJcicZ450.getPayAmt();
 						}
 					}
@@ -157,14 +154,9 @@ public class L8329 extends TradeBuffer {
 				} // 3 end
 			}
 
-			// 4 start「繳款日期」不得大於資料報送日期
-			if ("A".equals(iTranKey)) {
-				if (iPayDate > txDate) {
-					throw new LogicException(titaVo, "E0005", "「繳款日期」不得大於資料報送日期");
-				}
-			} // 4 end
-
-			// 2.2 start 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號+最大債權金融機構」是否已報送結案，已報送予以剔退處理。
+			// 4 「繳款日期」不得大於資料報送日期--->前端檢核
+			
+			// 2.2 start 需檢核「IDN+報送單位代號+調解申請日+受理調解機構代號」是否已報送結案，已報送予以剔退處理。
 			// 5 start 同一key值報送446檔案結案後，且該結案資料未刪除前，不得新增、異動、刪除本檔案資料.
 			iJcicZ446 = sJcicZ446Service.findById(iJcicZ446Id, titaVo);
 			if (iJcicZ446 != null && !"D".equals(iJcicZ446.getTranKey())) {

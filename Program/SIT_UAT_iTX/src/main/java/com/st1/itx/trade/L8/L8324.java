@@ -98,7 +98,6 @@ public class L8324 extends TradeBuffer {
 		int iBeginDate = Integer.valueOf(titaVo.getParam("BeginDate"));
 		int iEndDate = Integer.valueOf(titaVo.getParam("EndDate"));
 		String iKey = "";
-		int txDate = Integer.valueOf(titaVo.getEntDy());// 會計日 民國年YYYMMDD
 
 		// JcicZ443, JcicZ440, JcicZ446
 		JcicZ443 iJcicZ443 = new JcicZ443();
@@ -129,14 +128,7 @@ public class L8324 extends TradeBuffer {
 			// 2 「IDN+最大債權金融機構+調解申請日+受理調解機構代號」若未曾報送過「'440':前置調解受理申請暨請求回報債權通知資料」，予以剔退處理.***
 			// 3 第3欄「債權金融機構代號」若非屬Z41「受理申請暨請求回報債權」之應回報金融機構代號，予以剔退處理.***J
 			// 4 檢核第14~17欄「本金、利息、違約金、其他費用」之金額合計需等於第13欄「授信餘額」.--->(前端檢核)
-
-			// 5 start 第20欄「最後繳息日」不可大於資料報送日.
-			if ("A".equals(iTranKey)) {
-				if (iFinalPayDay > txDate) {
-					throw new LogicException("E0005", "「最後繳息日」不可大於資料報送日.");
-				}
-			} // 5 end
-
+			// 5 第20欄「最後繳息日」不可大於資料報送日.--->(前端檢核)
 			// 6 第23欄「契約起始年月」不可大於第24欄「契約截止年月」.--->(前端檢核)
 
 			if ("A".equals(iTranKey) || "C".equals(iTranKey)) {
@@ -147,20 +139,16 @@ public class L8324 extends TradeBuffer {
 					if ("Y".equals(iJcicZ440.getReportYn())) {
 						if (!"N".equals(iIsMaxMain)) {
 							if ("A".equals(iTranKey)) {
-								throw new LogicException("E0005",
-										"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+								throw new LogicException("E0005", "(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
 							} else {
-								throw new LogicException("E0007",
-										"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
+								throw new LogicException("E0007", "(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為Y時，本檔案「是否為最大債權金融機構報送」需填報為N.");
 							}
 						}
 					} else if (!"Y".equals(iIsMaxMain)) {
 						if ("A".equals(iTranKey)) {
-							throw new LogicException("E0005",
-									"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+							throw new LogicException("E0005", "(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
 						} else {
-							throw new LogicException("E0007",
-									"(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
+							throw new LogicException("E0007", "(440)前置調解愛理申請暨請求回報債權通知資料之「協辦行是否需自行回報債權」填報為N時，本檔案「是否為最大債權金融機構報送」需填報為Y");
 						}
 					}
 				}

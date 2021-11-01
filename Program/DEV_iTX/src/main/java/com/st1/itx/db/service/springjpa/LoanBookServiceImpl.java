@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -185,7 +188,7 @@ em = null;
   }
 
   @Override
-  public Slice<LoanBook> bookCustNoRange(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3, int bormNo_4, int bormNo_5, int index, int limit, TitaVo... titaVo) {
+  public Slice<LoanBook> bookCustNoRange(int custNo_0, int custNo_1, int facmNo_2, int facmNo_3, int bormNo_4, int bormNo_5, int bookDate_6, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<LoanBook> slice = null;
     if (titaVo.length != 0)
@@ -196,15 +199,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("bookCustNoRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " facmNo_3 : " +  facmNo_3 + " bormNo_4 : " +  bormNo_4 + " bormNo_5 : " +  bormNo_5);
+    this.info("bookCustNoRange " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " facmNo_3 : " +  facmNo_3 + " bormNo_4 : " +  bormNo_4 + " bormNo_5 : " +  bormNo_5 + " bookDate_6 : " +  bookDate_6);
     if (dbName.equals(ContentName.onDay))
-      slice = loanBookReposDay.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscBookDateAsc(custNo_0, custNo_1, facmNo_2, facmNo_3, bormNo_4, bormNo_5, pageable);
+      slice = loanBookReposDay.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndBookDateGreaterThanEqualOrderByBookDateAsc(custNo_0, custNo_1, facmNo_2, facmNo_3, bormNo_4, bormNo_5, bookDate_6, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = loanBookReposMon.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscBookDateAsc(custNo_0, custNo_1, facmNo_2, facmNo_3, bormNo_4, bormNo_5, pageable);
+      slice = loanBookReposMon.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndBookDateGreaterThanEqualOrderByBookDateAsc(custNo_0, custNo_1, facmNo_2, facmNo_3, bormNo_4, bormNo_5, bookDate_6, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = loanBookReposHist.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscBookDateAsc(custNo_0, custNo_1, facmNo_2, facmNo_3, bormNo_4, bormNo_5, pageable);
+      slice = loanBookReposHist.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndBookDateGreaterThanEqualOrderByBookDateAsc(custNo_0, custNo_1, facmNo_2, facmNo_3, bormNo_4, bormNo_5, bookDate_6, pageable);
     else 
-      slice = loanBookRepos.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualOrderByCustNoAscFacmNoAscBormNoAscBookDateAsc(custNo_0, custNo_1, facmNo_2, facmNo_3, bormNo_4, bormNo_5, pageable);
+      slice = loanBookRepos.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndBormNoGreaterThanEqualAndBormNoLessThanEqualAndBookDateGreaterThanEqualOrderByBookDateAsc(custNo_0, custNo_1, facmNo_2, facmNo_3, bormNo_4, bormNo_5, bookDate_6, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

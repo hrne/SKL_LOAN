@@ -15,6 +15,7 @@ import com.st1.itx.db.service.CollRemindService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.db.domain.CollList;
 import com.st1.itx.db.domain.CollListId;
+import com.st1.itx.util.data.DataLog;
 /* DB容器 */
 import com.st1.itx.db.domain.CollRemind;
 import com.st1.itx.db.domain.CollRemindId;
@@ -35,6 +36,8 @@ public class L5605 extends TradeBuffer {
 	public CollRemindService iCollRemindService;
 	@Autowired
 	public CollListService iCollListService;
+	@Autowired
+	public DataLog iDataLog;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -63,7 +66,7 @@ public class L5605 extends TradeBuffer {
 		int iClCustNo = iCollList.getClCustNo();
 		int iClFacmNo = iCollList.getClFacmNo();
 		// 用撈出的擔保品編號找全部相同擔保品的資料
-		Slice<CollList> allCollList = iCollListService.findCl(iClCustNo, iClFacmNo, 0,Integer.MAX_VALUE, titaVo);
+		Slice<CollList> allCollList = iCollListService.findCl(iClCustNo, iClFacmNo, 0, Integer.MAX_VALUE, titaVo);
 		if (allCollList == null) {
 			throw new LogicException(titaVo, "E0005", "");
 		}
@@ -77,11 +80,11 @@ public class L5605 extends TradeBuffer {
 			if (iFunctionCd.equals("1")) {
 				iCollRemindId.setTitaTlrNo(titaVo.getTlrNo());
 				iCollRemindId.setTitaTxtNo(titaVo.getTxtNo());
-				iCollRemindId.setAcDate(Integer.valueOf(titaVo.getEntDy()));// 營業日 放acdate
+				iCollRemindId.setAcDate(Integer.valueOf(titaVo.getCalDy()));// 日曆日 放acdate
 			} else {
 				iCollRemindId.setTitaTlrNo(titaVo.getParam("TitaTlrNo"));
 				iCollRemindId.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
-				iCollRemindId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));// 營業日 放acdate
+				iCollRemindId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));
 			}
 			iCollRemind.setCollRemindId(iCollRemindId);
 			iCollRemind.setCondCode(titaVo.getParam("CondCode"));
@@ -101,14 +104,21 @@ public class L5605 extends TradeBuffer {
 				} else {
 					throw new LogicException(titaVo, "E0002", "");
 				}
-			}
-			else {
+			} else {
 				if (tCollRemind != null) {
+					CollRemind uCollRemind = new CollRemind();
+					uCollRemind = iCollRemindService.holdById(iCollRemindId);
+					CollRemind beforeCollRemind = (CollRemind) iDataLog.clone(uCollRemind);
+					uCollRemind.setCondCode(titaVo.getParam("CondCode"));
+					uCollRemind.setRemindDate(Integer.valueOf(titaVo.getParam("RemindDate")));
+					uCollRemind.setEditDate(Integer.valueOf(titaVo.getParam("EditDate")));
+					uCollRemind.setEditTime(titaVo.getParam("EditTime"));
+					uCollRemind.setRemindCode(titaVo.getParam("RemindCode"));
+					uCollRemind.setRemark(titaVo.getParam("Remark"));
 					try {
-						iCollRemindService.holdById(iCollRemindId);
-						iCollRemind.setCreateDate(tCollRemind.getCreateDate()); 
-						iCollRemind.setCreateEmpNo(tCollRemind.getCreateEmpNo());
-						iCollRemindService.update(iCollRemind, titaVo);
+						iCollRemindService.update(uCollRemind, titaVo);
+						iDataLog.setEnv(titaVo, beforeCollRemind, uCollRemind);
+						iDataLog.exec();		
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 					}
@@ -126,7 +136,7 @@ public class L5605 extends TradeBuffer {
 				try {
 					CollList upCollList = iCollListService.holdById(neCollList);
 					upCollList.setTxCode("6"); // 上次作業項目
-					upCollList.setTxDate(Integer.valueOf(titaVo.getEntDy())); // 上次作業日期
+					upCollList.setTxDate(Integer.valueOf(titaVo.getCalDy())); // 上次作業日期
 					iCollListService.update(upCollList, titaVo);
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 主檔更新錯誤訊息
