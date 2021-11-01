@@ -3761,6 +3761,7 @@ TXFORM=L3R02
 #L3r03IncludeIntFlag=X,1,S
 #L3r03UnpaidIntFlag=X,1,S
 #L3r03BookAmt=m,14.2,S
+#L3r03PayMethod=X,1,S
 #L3r03BookStatus=A,1,S
 </L3R03.dec>
 
@@ -3769,6 +3770,7 @@ TXFORM=L3R03
 #L3r03IncludeIntFlag
 #L3r03UnpaidIntFlag
 #L3r03BookAmt
+#L3r03PayMethod
 #L3r03BookStatus
 ^
 </L3R03.tom>
@@ -5650,7 +5652,7 @@ TXFORM=L5R17
 #L5R18TelExt=X,5,S
 #L5R18ResultCode=X,1,S
 #L5R18CallDate=D,7,S
-#L5R18ReMark=X,500,S
+#L5R18ReMark=x,500,S
 #L5R18EditEmpNo=X,6,S
 </L5R18.dec>
 
@@ -5678,7 +5680,7 @@ TXFORM=L5R18
 #L5R19CollPsnCode=X,1,S
 #L5R19CollPsnName=X,6,S
 #L5R19MeetPlace=X,60,S
-#L5R19ReMark=X,500,S
+#L5R19ReMark=x,500,S
 #L5R19MeetPlaceCode=9,1,S
 #L5R19CollPsnNameX=X,6,S
 #L5R19EditEmpNo=X,6,S
@@ -5708,7 +5710,7 @@ TXFORM=L5R19
 #L5R20DelvrYet=X,1,S
 #L5R20DelvrCode=X,1,S
 #L5R20Address=X,60,S
-#L5R20ReMark=X,500,S
+#L5R20ReMark=x,500,S
 #L5R20AddressCode=X,1,S
 #L5R20EditEmpNo=X,6,S
 </L5R20.dec>
@@ -5732,7 +5734,7 @@ TXFORM=L5R20
 #L5R21RecordDate=D,7,S
 #L5R21LegalProg=X,3,S
 #L5R21Amount=M,14,S
-#L5R21Memo=X,500,S
+#L5R21Memo=x,500,S
 #L5R21ReMark=X,1,S
 #L5R21ClCode1=9,1,S
 #L5R21ClCode2=9,2,S
@@ -5760,7 +5762,7 @@ TXFORM=L5R21
 #L5R22EditDate=D,7,S
 #L5R22EditTime=X,4,S
 #L5R22RemindCode=X,2,S
-#L5R22ReMark=X,500,S
+#L5R22ReMark=x,500,S
 #L5R22EditEmpNo=X,6,S
 </L5R22.dec>
 
@@ -8153,8 +8155,6 @@ TXFORM=L6R11
 #L6R12CityCode=X,2,S
 #L6R12CityItem=X,20,S
 #L6R12UnitCode=X,6,S
-#L6R12AccCollPsn=X,6,S
-#L6R12LegalPsn=X,6,S
 </L6R12.dec>
 
 <L6R12.tom>
@@ -8162,8 +8162,6 @@ TXFORM=L6R12
 #L6R12CityCode
 #L6R12CityItem
 #L6R12UnitCode
-#L6R12AccCollPsn
-#L6R12LegalPsn
 ^
 </L6R12.tom>
 

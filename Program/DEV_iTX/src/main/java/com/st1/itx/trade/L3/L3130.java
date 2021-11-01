@@ -68,6 +68,7 @@ public class L3130 extends TradeBuffer {
 		int iBookDate = this.parse.stringToInteger(titaVo.getParam("BookDate"));
 		int iOldBookDate = this.parse.stringToInteger(titaVo.getParam("OldBookDate"));
 		BigDecimal iBookAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimBookAmt"));
+		String iPayMethod = titaVo.getParam("PayMethod");
 		String iIncludeIntFlag = titaVo.getParam("IncludeIntFlag");
 		String iUnpaidIntFlag = titaVo.getParam("UnpaidIntFlag");
 
@@ -85,9 +86,11 @@ public class L3130 extends TradeBuffer {
 		// 入帳日或會計日小於等於約定部分償還日期，未過期者僅能一筆
 		LoanBook lastLoanBook = loanBookService.facmNoLastBookDateFirst(iCustNo, iFacmNo, iFacmNo, wkBormNoS, wkBormNoE,
 				titaVo);
+
 		if (lastLoanBook != null && lastLoanBook.getBookDate() >= this.txBuffer.getTxCom().getTbsdy()) {
 			existence = true;
 		}
+
 
 		// 更新放款約定還本檔
 		LoanBookId tLoanBookId = new LoanBookId();
@@ -98,7 +101,7 @@ public class L3130 extends TradeBuffer {
 		tLoanBookId.setBookDate(iBookDate);
 		switch (iFuncCode) {
 		case 1: // 新增
-			if(existence) {
+			if (existence) {
 				throw new LogicException(titaVo, "E2067", "約定部分償還，未過期者僅能一筆"); // 約定部分償還，未過期者僅能一筆
 			}
 			tLoanBook.setCustNo(iCustNo);
@@ -111,6 +114,7 @@ public class L3130 extends TradeBuffer {
 			tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
 			tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
 			tLoanBook.setBookAmt(iBookAmt);
+			tLoanBook.setPayMethod(iPayMethod);
 			tLoanBook.setRepayAmt(new BigDecimal(0));
 			try {
 				loanBookService.insert(tLoanBook, titaVo);
@@ -135,6 +139,7 @@ public class L3130 extends TradeBuffer {
 				tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
 				tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
 				tLoanBook.setBookAmt(iBookAmt);
+				tLoanBook.setPayMethod(iPayMethod);
 				try {
 					tLoanBook = loanBookService.update2(tLoanBook, titaVo);
 				} catch (DBException e) {
@@ -172,6 +177,7 @@ public class L3130 extends TradeBuffer {
 				tLoanBook.setIncludeIntFlag(iIncludeIntFlag);
 				tLoanBook.setUnpaidIntFlag(iUnpaidIntFlag);
 				tLoanBook.setBookAmt(iBookAmt);
+				tLoanBook.setPayMethod(iPayMethod);
 				tLoanBook.setRepayAmt(new BigDecimal(0));
 				try {
 					loanBookService.insert(tLoanBook, titaVo);

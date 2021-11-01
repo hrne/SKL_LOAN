@@ -23,7 +23,6 @@ import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
-import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;

@@ -70,6 +70,18 @@ public interface YearlyHouseLoanIntService {
   public Slice<YearlyHouseLoanInt> findYearCustNo(int yearMonth_0, int custNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * YearMonth&gt;= , AND YearMonth&lt;=
+   *
+   * @param yearMonth_0 yearMonth_0
+   * @param yearMonth_1 yearMonth_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice YearlyHouseLoanInt YearlyHouseLoanInt of List
+   */
+  public Slice<YearlyHouseLoanInt> findbyYear(int yearMonth_0, int yearMonth_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By YearlyHouseLoanInt
    * 
    * @param yearlyHouseLoanIntId key

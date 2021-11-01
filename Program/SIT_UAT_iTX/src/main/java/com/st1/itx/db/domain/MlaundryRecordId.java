@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class MlaundryRecordId implements Serializable {
 
 
-  // 訪談日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 2605318021689044682L;
+
+// 訪談日期
   @Column(name = "`RecordDate`")
   private int recordDate = 0;
 

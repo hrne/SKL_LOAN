@@ -55,6 +55,9 @@ public interface ClFacRepositoryHist extends JpaRepository<ClFac, ClFacId> {
   // CustNo = ,AND FacmNo =  ,AND MainFlag = 
   public Optional<ClFac> findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(int custNo_0, int facmNo_1, String mainFlag_2);
 
+  // ClCode1 = ,AND ClCode2 = ,AND ClNo =,AND CustNo = ,AND FacmNo = 
+  public Slice<ClFac> findAllByClCode1IsAndClCode2IsAndClNoIsAndCustNoIsAndFacmNoIs(int clCode1_0, int clCode2_1, int clNo_2, int custNo_3, int facmNo_4, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

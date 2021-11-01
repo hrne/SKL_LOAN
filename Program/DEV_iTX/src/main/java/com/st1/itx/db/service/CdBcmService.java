@@ -89,7 +89,7 @@ public interface CdBcmService {
   public CdBcm distCodeFirst(String distCode_0, TitaVo... titaVo);
 
   /**
-   * UnitManager =
+   * UnitManager %
    *
    * @param unitManager_0 unitManager_0
    * @param index Page Index
@@ -100,7 +100,7 @@ public interface CdBcmService {
   public Slice<CdBcm> findUnitManager(String unitManager_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * DeptManager =
+   * DeptManager %
    *
    * @param deptManager_0 deptManager_0
    * @param index Page Index
@@ -111,7 +111,7 @@ public interface CdBcmService {
   public Slice<CdBcm> findDeptManager(String deptManager_0, int index, int limit, TitaVo... titaVo);
 
   /**
-   * DistManager =
+   * DistManager %
    *
    * @param distManager_0 distManager_0
    * @param index Page Index
@@ -120,6 +120,39 @@ public interface CdBcmService {
    * @return Slice CdBcm CdBcm of List
    */
   public Slice<CdBcm> findDistManager(String distManager_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * DeptCode %
+   *
+   * @param deptCode_0 deptCode_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBcm CdBcm of List
+   */
+  public Slice<CdBcm> findDeptCode1(String deptCode_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * DistCode %
+   *
+   * @param distCode_0 distCode_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBcm CdBcm of List
+   */
+  public Slice<CdBcm> findDistCode1(String distCode_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * UnitCode %
+   *
+   * @param unitCode_0 unitCode_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBcm CdBcm of List
+   */
+  public Slice<CdBcm> findUnitCode1(String unitCode_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By CdBcm

@@ -45,7 +45,7 @@ ASGN(CAUTO$)
 [
 ["[L5960]                                 案件資料查詢"],
 [#<->#,"@案件種類",#CaseCode,#CaseCodeX],
-[#<->#,"@借款人戶號",#CustNo,#CustName],
+[#<->#,"@借戶戶號",#CustNo,#CustName],
 [#<->#,"@額度編號",#FacmNo],
 ["@催收人員",#AccCollPsn,#AccCollPsnX],["@法務人員",#LegalPsn,#LegalPsnX],
 ["@繳息迄日",#PrevIntDate],["@放款餘額",#LoanBal],
@@ -138,7 +138,7 @@ HELP(#CaseCodeHelp)
 
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)
-! 借款人戶號
+! 借戶戶號
 #CustNo=A,7,L
 C(3,#CHAIN,0,$,s)
 
@@ -405,7 +405,7 @@ TXFORM=L5960
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L5960" layout="cols=1;screen.width=[130,870];order=1;">
 [
 ["[L5960]                                 案件資料查詢"],
-! [#<->#,"@借款人戶號",#CustNo,#CustName],
+! [#<->#,"@借戶戶號",#CustNo,#CustName],
 ! [#<->#,"@額度編號",#FacmNo],
 ! [#<->#,"@案件種類",#CaseCode,#CaseCodeX],
 ]

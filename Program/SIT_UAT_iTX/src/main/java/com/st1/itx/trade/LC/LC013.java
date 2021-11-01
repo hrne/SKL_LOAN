@@ -63,6 +63,10 @@ public class LC013 extends TradeBuffer {
 		this.info("active LC013 ");
 		this.totaVo.init(titaVo);
 
+		// 保留原本DBFG Adam
+		titaVo.keepOrgDataBase();
+		titaVo.setDataBaseOnLine();
+
 		// 經辦權限
 		TlrAuth(titaVo.getTlrNo(), "", "", titaVo);
 
@@ -79,8 +83,7 @@ public class LC013 extends TradeBuffer {
 
 		if (lTxAgent != null) {
 			for (TxAgent txAgent : lTxAgent) {
-				this.info("LC013 TxAgent = " + txAgent.getTlrNo() + '/' + txAgent.getBeginDate() + '/'
-						+ txAgent.getEndDate() + '/' + this.getTxBuffer().getTxCom().getTbsdy());
+				this.info("LC013 TxAgent = " + txAgent.getTlrNo() + '/' + txAgent.getBeginDate() + '/' + txAgent.getEndDate() + '/' + this.getTxBuffer().getTxCom().getTbsdy());
 
 				/*
 				 * // 未生效 if (txAgent.getStatus() != 1) { continue; } // 未在有效期間 if
@@ -120,6 +123,9 @@ public class LC013 extends TradeBuffer {
 
 			}
 		}
+
+		// 恢復原本DBFG Adam
+		titaVo.setDataBaseOnOrg();
 
 		this.addList(this.totaVo);
 		return this.sendList();

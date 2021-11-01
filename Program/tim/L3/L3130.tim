@@ -51,6 +51,7 @@ BormNo=9,3
 CurrencyCode=X,3
 BookDate=9,7
 TimBookAmt=9,14.2
+PayMethod=X,1
 IncludeIntFlag=X,1
 UnpaidIntFlag=X,1
 OldBookDate=9,7

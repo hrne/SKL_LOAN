@@ -1,0 +1,415 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2632)
+
+![借貸別 (1:借 2:貸)]
+#CRDB=_,_,S
+E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];order=1;">
+[
+["[L2632]                                 清償作業維護"],
+["#FdFunCode+功能",#FunCodeX],
+["#FdCustNo+借戶戶號",#CustNo,#CustName],
+["#FdCloseNo+清償序號",#CloseNo],
+["#FdFacmNo+額度編號",#FacmNo],
+["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
+["#FdCloseAmt+還清金額",#TwCloseAmt,#UsCloseAmt,#PAYOFF_AMTX],
+["#FdCollectWayCode+領取方式",#CollectWayCode,#CollectWayCodeX],
+["#FdReceiveDate+領取日期",#ReceiveDate],
+["#FdAgreeNo+塗銷同意書編號",#AgreeNo],
+["#FdDocNo+公文編號",#DocNo],
+["#FdClsNo+銷號欄",#ClsNo],
+["#FdCloseDate+清償日期",#CloseDate],
+["#FdTelNo1+連絡電話１",#TelNo1],
+["#FdTelNo2+連絡電話２",#TelNo2],
+["#FdCreateDate+建檔日期",#CreateDate],
+]
+!---------- AP Button AREA ----------   
+
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+![Buttom資料查詢]
+#FdFunCode=X,2,L
+T(3,*)
+#FdCustNo=X,2,L
+T(3,*)
+#FdCloseNo=X,2,L
+#FdFacmNo=X,2,L
+#FdCloseReasonCode=X,2,L
+#FdCloseAmt=X,2,L
+#FdCollectWayCode=X,2,L
+#FdReceiveDate=X,2,L
+#FdAgreeNo=X,2,L
+#FdDocNo=X,2,L
+#FdClsNo=X,2,L
+#FdCloseDate=X,2,L
+#FdTelNo1=X,2,L
+#FdTelNo2=X,2,L
+#FdCreateDate=X,2,L
+!---------- AP TEXT AREA Variables ----------
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!CloseReasonCode
+#CDDEF0001=x,30,S
+T(3,CdCode.CloseReasonCode)
+
+#CloseReasonCodeHelp=x,1024,S
+
+!CollectWayCode
+#CDDEF0002=x,25,S
+T(3,CdCode.CollectWayCode)
+
+#CollectWayCodeHelp=x,1024,S
+
+!登放記號
+!ActFgX
+#CDDEF0003=x,20,S
+T(3,CdCode.ActFgX)
+
+#ActFgHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@CloseReasonCodeHelp,#HelpDesc1)
+T(2,@CollectWayCodeHelp,#HelpDesc2)
+T(2,@ActFgHelp,#HelpDesc3)
+
+#FunCodHelp=x,30,S
+T(3,2:修改;4:刪除;5:查詢)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2077進入),$)
+#NTXBUF=X,60,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCode,#NTXBUF,1,1)
+! T(1,@CloseDate,#NTXBUF,2,7)
+T(1,@CloseNo,#NTXBUF,9,3)
+T(1,@RimCloseNo,#NTXBUF,9,3)
+T(1,@CustNo,#NTXBUF,12,7)
+! T(1,@FacmNo,#NTXBUF,19,3)
+! T(1,@CloseReasonCode,#NTXBUF,22,2)
+! T(1,@TwCloseAmt,#NTXBUF,24,15)
+! T(1,@CollectWayCode,#NTXBUF,39,2)
+! T(1,@ReceiveDate,#NTXBUF,41,7)
+! T(1,@CreateDate,#NTXBUF,48,7),$)
+
+
+!    L2R36B : 尋找清償作業檔資料
+#RimL2r36B=X,1,S
+C(3,#CHAIN,1,$,S)
+E(0,@RimCustNo,#CustNo)
+T(2,@RimCloseNo,#CloseNo)
+RESET_RIM(#RimL2r36B,L2R36)
+S(L2R36,1,#RimCustNo,#RimCloseNo)
+R(1,L2R36)
+
+#CheckL2r36B=X,1,S
+C(3,#CHAIN,1,$,S)
+E(0,@FacmNo,#L2r36FacmNo)
+T(2,@CloseReasonCode,#L2r36CloseReasonCode)
+E(0,@TwCloseAmt,#L2r36CloseAmt)
+E(0,@UsCloseAmt,#L2r36CloseAmt)
+E(0,@CollectWayCode,#L2r36CollectWayCode)
+E(0,@ReceiveDate,#L2r36ReceiveDate)
+T(2,@AgreeNo,#L2r36AgreeNo)
+E(0,@DocNo,#L2r36DocNo)
+T(2,@ClsNo,#L2r36ClsNo)
+E(0,@CloseDate,#L2r36CloseDate)
+T(2,@TelNo1,#L2r36TelNo1)
+T(2,@TelNo2,#L2r36TelNo2)
+E(0,@CreateDate,#L2r36CreateDate)
+E(0,@ItemCode,#L2r36FunCd)
+T(H,@CloseReasonCodeX,#CloseReasonCode,#CloseReasonCodeHelp)
+T(H,@CollectWayCodeX,#CollectWayCode,#CollectWayCodeHelp)
+
+#checkCloseDate=X,1,S
+C(3,#L2r36CloseDate,0,S,$)
+T(F,@TwCloseAmt,0)
+T(F,@UsCloseAmt,0)
+T(F,@AgreeNo,0)
+T(F,@DocNo,0)
+T(F,@ClsNo,0)
+
+!作業項目
+#ItemCode=A,1,S
+
+
+!功能 必須輸入 下拉式選單 2.修改 4.刪除 5.查詢
+#FunCode=A,1,S
+C(3,#CHAIN,1,s,$)
+HIDE(#UsCloseAmt)
+HELP(#FunCodHelp)
+@V(H,#FunCodHelp)
+E(0,@FUNCIND,#FunCode)
+
+#FunCodeX=X,4,L
+C(4,#FunCode,S,$)
+T(H,#FunCode,#FunCodHelp)
+C(2,#FunCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+#ShowFd=X,1,S
+C(2,#FunCode,T(3, ),T(3,*),T(3,*),T(3, ),T(3, ),T(3, ))
+T(2,@FdFunCode,#ShowFd)     
+T(2,@FdCustNo,#ShowFd)
+T(2,@FdCloseReasonCode,#ShowFd)
+T(2,@FdCollectWayCode,#ShowFd)
+T(2,@FdReceiveDate,#ShowFd)
+
+
+#AGAIN=X,1,S
+C(3,#FunCode,4,$,S)
+E(0,1)ASGN(AGAIN$)
+
+#CurrencyCode=X,3,S
+T(3,TWD)
+
+#PRECISION=N,1,S
+T(A,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
+
+#WKHIDE=X,1,S
+C(3,#FunCode,2,$,S)
+C(3,#PRECISION,0,SHOW(#TwCloseAmt)HIDE(#UsCloseAmt)
+                ,HIDE(#TwCloseAmt)SHOW(#UsCloseAmt))
+
+#WKTEXTON=X,1,S
+C(3,#FunCode,2,$,S)
+SHOW(#CloseReasonCode,#CollectWayCode,#TwCloseAmt)
+HIDE(#PAYOFF_AMTX)
+T(F,@CustNo,0)
+T(F,@FacmNo,0)
+T(F,@CloseNo,0)
+T(F,@CloseReasonCode,1)
+! T(F,@TwCloseAmt,1)
+! T(F,@UsCloseAmt,1)
+T(F,@CollectWayCode,1)
+T(F,@ReceiveDate,1)
+! T(F,@AgreeNo,1)
+! T(F,@DocNo,1)
+! T(F,@ClsNo,1)
+T(F,@CreateDate,1)
+
+#WKTEXTOFF=X,1,S
+C(3,#FunCode,2,S,$)
+SHOW(#PAYOFF_AMTX)
+HIDE(#CloseReasonCode,#CollectWayCode,#UsCloseAmt,#TwCloseAmt)
+T(F,@CustNo,0)
+T(F,@FacmNo,0)
+T(F,@CloseReasonCode,0)
+T(F,@TwCloseAmt,0)
+T(F,@UsCloseAmt,0)
+T(F,@CollectWayCode,0)
+T(F,@ReceiveDate,0)
+T(F,@AgreeNo,0)
+T(F,@DocNo,0)
+T(F,@ClsNo,0)
+T(F,@NTXBUF,0)
+T(F,@TelNo1,0)
+T(F,@TelNo2,0)
+T(F,@CloseNo,0)
+T(F,@CloseDate,0)
+T(F,@CreateDate,0)
+
+
+
+!借戶戶號 修改時自動顯示可修改,其他自動顯示不需輸入
+#CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
+C(2,#FunCode,$,$,T(F,1),$,T(F,0),T(F,0),$)
+C(2,#FunCode,S,S,$,S,s,s,S)
+
+
+#CustName=X,100,L
+!清償序號 必須輸入
+#CloseNo=A,3,I
+C(3,#CHAIN,1,s,$)
+
+!調rim參數
+#RimCustNo=A,7,S
+#RimCloseNo=A,3,S
+
+<include src="ROM.icf::L2R36.dec"/>
+
+
+
+!額度編號 自動顯示不需輸入
+#FacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
+
+!清償原因 修改時自動顯示可修改,其他自動顯示不需輸入
+#CloseReasonCode=X,2,I
+C(2,#FunCode,S,S,$,S,s,s,S)
+! HELP(1: 買賣;2: 自行還清;3: 軍功教勞工貸款轉貸;4: 利率過高轉貸;5: 增貸不准轉貸;6: 額度內動支不准轉貸;7: 內部代償;8: 借新還舊;9: 其他;10: 買回;11: 綁約期還款)
+HELP(#CloseReasonCodeHelp,cols:5)
+@IF(#CloseReasonCode==#L2r36CloseReasonCode,$,V(H,#CloseReasonCodeHelp))
+
+#CloseReasonCodeX=X,20,L
+T(H,#CloseReasonCode,#CloseReasonCodeHelp)
+
+
+!還清金額 修改時自動顯示可修改,其他自動顯示不需輸入
+#TwCloseAmt=+m,14,L
+C(3,#PRECISION,0,$,S)
+C(3,#L2r36CloseDate,0,$,s)
+C(2,#FunCode,S,S,$,S,s,s,S)
+
+#UsCloseAmt=+m,14.2,L
+C(3,#PRECISION,0,S,$)
+C(3,#L2r36CloseDate,0,$,s)
+C(2,#FunCode,S,S,$,S,s,s,S)
+
+#TIM_PAYOFF_AMT=+m,14.2,S
+C(3,#PRECISION,0,E(0,#TwCloseAmt),E(0,#UsCloseAmt))
+
+#PAYOFF_AMTX=X,22,L
+C(3,#FunCode,2,S,$)
+CALL2(#ADJUSTDOT,#PRECISION,#TIM_PAYOFF_AMT,#PAYOFF_AMTX)
+
+!領取方式 修改時自動顯示可修改,其他自動顯示不需輸入
+#CollectWayCode=A,2,I
+C(2,#FunCode,S,S,$,S,s,s,S)
+HELP(#CollectWayCodeHelp,cols:5)
+@V(H,#CollectWayCodeHelp)
+
+#CollectWayCodeX=X,50,L
+T(H,#CollectWayCode,#CollectWayCodeHelp)
+
+![領取日期]
+!修改時自動顯示可修改,其他自動顯示不需輸入
+#ReceiveDate=D,7,I
+C(2,#FunCode,S,S,$,S,s,s,S)
+C(3,#CollectWayCode,01,S,$)
+C(3,#CollectWayCode,20,S,$)
+@V(7)A(DATE,0,#ReceiveDate)
+
+![塗銷同意書編號]
+#AgreeNo=X,10,I
+C(2,#FunCode,S,S,$,S,s,s,S)
+C(3,#L2r36CloseDate,0,$,s)
+
+![公文編號]
+#DocNo=A,7,I
+C(2,#FunCode,S,S,$,S,s,s,S)
+C(3,#L2r36CloseDate,0,$,s)
+
+![銷號欄]
+#ClsNo=c,18,I
+C(2,#FunCode,S,S,$,S,s,s,S)
+C(3,#L2r36CloseDate,0,$,s)
+
+![清償日期] 
+!系統帳務日期 必須輸入
+#CloseDate=D,7,L
+
+!連絡電話１ 自動顯示不需輸入
+#TelNo1=X,15,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+
+
+!連絡電話２ 自動顯示不需輸入
+#TelNo2=X,15,I
+C(3,#FunCode,4,s,$)
+C(3,#FunCode,5,s,$)
+
+
+!建檔日期 修改時自動顯示可修改,其他自動顯示不需輸入
+#CreateDate=D,7,I
+C(2,#FunCode,S,S,$,S,s,s,S)
+@
+A(DATE,0,#CreateDate)
+
+#RPTFG=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2632 ----------
+<sub type="FORM" name="L2632">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2632,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2632] 清償作業維護)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCode
+#CloseDate
+#CustNo
+#CloseNo
+#FacmNo
+#CloseReasonCode
+#TIM_PAYOFF_AMT
+#CollectWayCode
+#ReceiveDate
+#AgreeNo
+#DocNo
+#ClsNo
+#TelNo1
+#TelNo2
+#CreateDate
+#ItemCode
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2632^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R36.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+! <sub type="PART" name="L2632" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+! [
+! ["[L2632]                                 清償作業維護"],
+! [#<->#,"@案件編號"],
+! [#<->#,"@統一編號"],
+! ["@借戶戶號"],
+! ["@核准編號"],
+! ]
+! </sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+</sub>

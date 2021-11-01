@@ -284,6 +284,23 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	}
 
 	/**
+	 * getOrgDataBaseFg
+	 * 
+	 * @return String DBName
+	 */
+	public String getOrgDataBase() {
+		return this.get(ContentName.orgDataBase) == null ? "onLine" : this.get(ContentName.orgDataBase);
+	}
+
+	/**
+	 * keepOrgDataBaseFg
+	 * 
+	 */
+	public void keepOrgDataBase() {
+		this.putParam(ContentName.orgDataBase, this.getDataBase());
+	}
+
+	/**
 	 * set DB Flag to OnLine
 	 */
 	public void setDataBaseOnLine() {
@@ -309,6 +326,13 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	 */
 	public void setDataBaseOnHist() {
 		this.putParam(ContentName.dataBase, ContentName.onHist);
+	}
+
+	/**
+	 * set DB Flag to Org
+	 */
+	public void setDataBaseOnOrg() {
+		this.putParam(ContentName.dataBase, this.getOrgDataBase());
 	}
 
 	/**

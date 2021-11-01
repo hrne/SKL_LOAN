@@ -1,0 +1,579 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+#Submit=A,1,S
+K(MODIFYBUTTON,查詢)
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2921)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,103)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#BTNADDBUF=X,35,S
+T(2,1+0000000+0000000+          +0000000+000)
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2801; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,1100];printer.width=[20,20];">
+[
+["[L2921]                                 未齊件資料查詢"],
+["#FdMain+查詢條件","@(案件編號、借戶戶號、統一編號、核准編號、房貸專員，需擇一輸入)"],
+["#FdCaseNo+案件編號",#CaseNo],
+["#FdCustNo+借戶戶號",#CustNo,#BTN2],
+["#FdCustId+統一編號",#CustId,#BTN3],
+["#FdApplNo+核准編號",#ApplNo,#BTN4],
+["#FdTeller+房貸專員",#Teller,#BTN5],
+["#FdFacmNo+額度編號",#FacmNo,"@(000表示查詢全部額度)"],
+["#FdCloseCode+銷號狀態",#CloseCode,#CloseCodeX],
+["#FdYetDate+齊件迄日",#YetDate1,"-",#YetDate2],
+["#FdCloseDate+銷號日期",#CloseDate1,"-",#CloseDate2],
+]
+
+#FdMain=X,2,L
+T(3,*)
+#FdCaseNo=X,2,L
+#FdCustNo=X,2,L
+#FdCustId=X,2,L
+#FdApplNo=X,2,L
+#FdTeller=X,2,L
+#FdFacmNo=X,2,L
+#FdYetDate=X,2,L
+#FdCloseDate=X,2,L
+#FdCloseCode=X,2,L
+T(3,*)
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN1=X,15,I,ui:button;value:申請案件明細資料;enable:1;tabbable:0
+#BTN2=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0
+#BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+#BTN4=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0
+#BTN5=X,15,I,ui:button;value:使用者查詢;enable:1;tabbable:0
+
+
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,142,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CaseNo,#NTXBUF,1,7)
+T(1,@CustNo,#NTXBUF,8,7)
+T(1,@CustId,#NTXBUF,15,10)
+T(1,@ApplNo,#NTXBUF,25,7)
+T(1,@Teller,#NTXBUF,32,6)
+T(1,@FacmNo,#NTXBUF,38,3)
+T(1,@CloseCode,#NTXBUF,41,1)
+T(1,@YetDate1,#NTXBUF,43,7)
+T(1,@YetDate2,#NTXBUF,51,7)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+!申請案件
+! #BUF1=X,18,S
+! T(2,0900001+          +9)
+
+
+! #BIND1=X,1,S
+! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2010; ntxbuf=#BUF1;ntxbuf5=type<-1:CaseNo<-OOApplNo})
+
+![案件編號]
+#CaseNo=A,7,I
+C(3,#CHAIN,1,s,$)
+!INVOKEJS(SHOW,p1,1,5,1)
+! SHOW(#BTN1)
+
+#BUF2A=X,18,S
+T(3,00000019999999000)
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo:FacmNo<-OOFacmNo})
+
+![借戶戶號]
+#CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+!INVOKEJS(SHOW,p1,2,5,1)
+!SHOW(#BTN2)
+
+<include src="ROM.icf::L1R01.dec"/>
+!調RIML1R01取CustName
+#RimL1r01=X,1,S
+C(3,#CustNo,0,S,$)
+E(0,@RimFunCd,5)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1r01,L1R01)
+S(L1R01,1,#RimCustId,#RimFunCd,#RimCustNo)
+R(1,L1R01)
+
+#BUF3=X,18,S
+
+
+#BIND3=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3;ntxbuf5=type<-1:CustId<-OOCustId})
+
+![統一編號]
+#CustId=X,10,I
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+C(3,#CustNo,0,$,S)
+!INVOKEJS(SHOW,p1,3,5,1)
+!SHOW(#BTN3)
+@C(4,#CustId,S,$)A(ID_UNINO,0,#CustId)
+
+!戶號有輸入，塞戶號
+
+#BUF4=X,15,S
+T(2,0000001+9999999+0)
+
+#BIND4=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+![核准編號]
+#ApplNo=A,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05A=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05A,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+E(0,@FacmNo,#L2r05FacmNo)
+
+#SendL2r07B=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+
+#TimCustNo=A,7,S
+E(0,0)
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+
+#BUF5=X,18,S
+
+
+#BIND5=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUF5;ntxbuf5=type<-1:Teller<-OTlrNo})
+
+
+![經辦]
+#Teller=X,6,I
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+C(3,#ApplNo,0,$,S)
+
+@V(7)
+!@IF(#CaseNo == 0 && #CustNo == 0 &&#CustId == 0 &&#ApplNo == 0 &&#Teller == 0 ,V(P,案件編號、借戶戶號、統一編號、核准編號、房貸專員擇一輸入),$)
+
+
+![額度編號]
+#FacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
+
+![銷號狀態]
+#CloseCodeHelp=x,20,S
+T(3,0:全部;1:已銷;2:未銷)
+
+#CloseCode=A,1,I
+C(3,#CHAIN,1,s,$)
+HELP(#CloseCodeHelp)
+@V(H,#CloseCodeHelp)
+#CloseCodeX=X,20,L
+T(3,)T(H,#CloseCode,#CloseCodeHelp)
+
+![齊件迄日1]
+#YetDate1=D,7,I
+C(3,#CHAIN,1,s,$)
+@A(DATE,0,#YetDate1)
+
+
+![齊件迄日2]
+#YetDate2=D,7,I
+C(3,#CHAIN,1,s,$)
+C(4,#YetDate1,S,E(0,#YetDate1))
+@A(DATE,0,#YetDate2)
+V(5,#YetDate1,9991231)
+
+
+![銷號日期1]
+#CloseDate1=D,7,I
+C(3,#CHAIN,1,s,$)
+IF(#CloseCode == 0 || #CloseCode == 1,$,S)
+@A(DATE,0,#CloseDate1)
+
+![銷號日期2]
+#CloseDate2=D,7,I
+C(3,#CHAIN,1,s,$)
+C(4,#CloseDate1,S,E(0,#CloseDate1))
+@A(DATE,0,#CloseDate2)
+V(5,#CloseDate1,9991231)
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+#RPTFG=A,1,S
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
+
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L3Rim.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2921 ----------
+<sub type="FORM" name="L2921">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2921,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2921] 未齊件資料)
+
+!新增
+#FUNC1=A,1,S
+E(0,1)
+
+!修改
+#FUNC2=A,1,S
+E(0,2)
+
+!刪除
+#FUNC4=A,1,S
+E(0,4)
+
+!查詢
+#FUNC5=A,1,S
+E(0,5)
+
+#OCASENO=A,7,L
+T(2,#CaseNo)
+
+#OCUSTNO=A,7,L
+T(2,#CustNo)
+
+#OCustId=X,10,L
+T(2,#CustId)
+
+#OApplNo=A,7,L
+T(2,#ApplNo)
+
+#OTELLER=X,6,L
+
+T(2,#Teller)
+
+![額度編號]
+#OFACMNO=A,3,L
+
+![銷號狀態]
+#OPAYMENT_DATE=A,1,L 
+
+#OPAYMENT_DATEX=X,20,L
+T(3,)T(H,#OPAYMENT_DATE,#CloseCodeHelp)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOCaseNo=A,7,L
+
+#OOCustNo=A,7,L  
+
+#OOCustId=X,10,L
+
+#OOCustName=X,100,L
+
+#OOApplNo=A,7,L     
+
+#OOFacmNo=A,3,L     
+
+#OOFirstDrawdownDate=D,7,L
+!轉換西元後續使用funtion取天數
+#FirstDateF=F,8,S
+E(0,#OOFirstDrawdownDate+19110000)
+#OOEmpNo=X,6,L
+
+#OOEmpName=X,10,L
+
+#OOEmp=X,16,L
+T(2,#OOEmpNo+ +#OOEmpName)
+!系統日期
+#date1=D,8,S
+T(4,DATE$)
+#date=D,7,S
+T(1,#date1,2,7)
+!轉換西元後續使用funtion取天數
+#DATEf=F,8,S
+E(0,#date+19110000)
+!撥款日期到今天天數
+#OOTODATEDAY=A,6,L
+IF(#OOFirstDrawdownDate==0,E(0,0),D(6,1,#FirstDateF,#DATEf))
+
+
+#OONotYetCode=A,2,L
+
+#OONotYetItemX=X,40,L
+
+#OONotYet=X,43,L
+T(2,#OONotYetCode+-+#OONotYetItemX)
+
+#OOYetDate=D,7,L
+
+#OOCloseDate=D,7,L
+
+#OOReMark=x,80,L
+
+!新增
+#OOBUF1=X,37,S
+T(2,#FUNC1+#OOCaseNo+#OOCustNo+#OOCustId+#OOApplNo+#OOFacmNo+#OONotYetCode)
+
+#OOBTN1=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2801; ntxbuf=#OOBUF1})
+
+!修改
+#OOBUF2=X,37,S
+T(2,#FUNC2+#OOCaseNo+#OOCustNo+#OOCustId+#OOApplNo+#OOFacmNo+#OONotYetCode)
+
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2801; ntxbuf=#OOBUF2})
+
+!刪除
+#OOBUF4=X,37,S
+T(2,#FUNC4+#OOCaseNo+#OOCustNo+#OOCustId+#OOApplNo+#OOFacmNo+#OONotYetCode)
+
+#OOBTN4=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2801; ntxbuf=#OOBUF4})
+
+!查詢
+#OOBUF5=X,37,S
+T(2,#FUNC5+#OOCaseNo+#OOCustNo+#OOCustId+#OOApplNo+#OOFacmNo+#OONotYetCode)
+
+#OOBTN5=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2801; ntxbuf=#OOBUF5})
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CaseNo
+#CustNo
+#CustId
+#ApplNo
+#Teller
+#FacmNo
+#YetDate1
+#YetDate2
+#CloseDate1
+#CloseDate2
+#CloseCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2921
+#OOCaseNo       
+#OOCustNo       
+#OOCustId
+#OOCustName         
+#OOApplNo       
+#OOFacmNo       
+#OOFirstDrawdownDate    
+#OOEmpNo  
+#OOEmpName      
+#OONotYetCode
+#OONotYetItemX    
+#OOYetDate       
+#OOCloseDate
+#OOReMark     
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L1R01.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+</sub>
+
+<sub type="PART" name="L2921" layout="cols=1;screen.width=[100,1000];printer.width=[15,30]">
+[
+["[L2921]                                 未齊件資料查詢"],
+[""],
+! ["@案件編號",#OCASENO],
+! ["@借戶戶號",#OCUSTNO],
+! ["@統一編號",#OCustId],
+! ["@核准編號",#OApplNo],
+! ["@經辦",#OTELLER],
+! ["@額度編號",#OFACMNO],
+! ["@銷號狀態",#OPAYMENT_DATE,#OPAYMENT_DATEX],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L2921
+#any={detail:true, header:'L2921.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
+
+#OOBTN5=查詢
+{width:50,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+
+#OOCaseNo=案件編號
+{width:90,align:'center'}
+
+#OOApplNo=核准編號
+{width:90,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'center'}
+
+#OOCustNo=借戶戶號
+{width:90,align:'center'}
+
+#OOFacmNo=額度</br>編號
+{width:60,align:'center'}
+
+#OONotYet=未齊件說明
+{width:300,align:'center'}
+
+#OOFirstDrawdownDate=首撥日期
+{width:85,align:'center'}
+
+#OOTODATEDAY=迄今日數
+{width:85,align:'center'}
+
+#OOYetDate=齊件訖日    
+{width:85,align:'center'}
+
+#OOCloseDate=銷號日期  
+{width:85,align:'center'}
+
+#OOEmp=房貸專員
+{width:150,align:'center'}
+
+#OOReMark=備註
+{width:150,align:'left'}
+^
+#RPTFG2=2,QUERY.GRID,L2921
+#any={detail:true, header:'L2921.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOCaseNo=案件編號
+{width:90,align:'center'}
+
+#OOApplNo=核准編號
+{width:90,align:'center'}
+
+#OOCustName=戶名
+{width:100,align:'center'}
+
+#OOCustNo=借戶戶號
+{width:90,align:'center'}
+
+#OOFacmNo=額度</br>編號
+{width:60,align:'center'}
+
+#OONotYet=未齊件說明
+{width:300,align:'center'}
+
+#OOFirstDrawdownDate=首撥日期
+{width:85,align:'center'}
+
+#OOTODATEDAY=迄今日數
+{width:85,align:'center'}
+
+#OOYetDate=齊件訖日    
+{width:85,align:'center'}
+
+#OOCloseDate=銷號日期  
+{width:85,align:'center'}
+
+#OOEmp=房貸專員
+{width:150,align:'center'}
+
+#OOReMark=備註
+{width:150,align:'left'}
+
+^
+<include src="PRT.icf::INQ01.sel" map="i=L2921;cpi=15"/>
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

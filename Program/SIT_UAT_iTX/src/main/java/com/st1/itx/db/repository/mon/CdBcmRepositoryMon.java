@@ -36,14 +36,23 @@ public interface CdBcmRepositoryMon extends JpaRepository<CdBcm, String> {
   // DistCode =
   public Optional<CdBcm> findTopByDistCodeIsOrderByUnitCodeAsc(String distCode_0);
 
-  // UnitManager =
-  public Slice<CdBcm> findAllByUnitManagerIs(String unitManager_0, Pageable pageable);
+  // UnitManager %
+  public Slice<CdBcm> findAllByUnitManagerLikeOrderByUnitManagerAsc(String unitManager_0, Pageable pageable);
 
-  // DeptManager =
-  public Slice<CdBcm> findAllByDeptManagerIs(String deptManager_0, Pageable pageable);
+  // DeptManager %
+  public Slice<CdBcm> findAllByDeptManagerLikeOrderByDeptManagerAsc(String deptManager_0, Pageable pageable);
 
-  // DistManager =
-  public Slice<CdBcm> findAllByDistManagerIs(String distManager_0, Pageable pageable);
+  // DistManager %
+  public Slice<CdBcm> findAllByDistManagerLikeOrderByDistManagerAsc(String distManager_0, Pageable pageable);
+
+  // DeptCode %
+  public Slice<CdBcm> findAllByDeptCodeLikeOrderByDeptCodeAsc(String deptCode_0, Pageable pageable);
+
+  // DistCode %
+  public Slice<CdBcm> findAllByDistCodeLikeOrderByDistCodeAsc(String distCode_0, Pageable pageable);
+
+  // UnitCode %
+  public Slice<CdBcm> findAllByUnitCodeLikeOrderByUnitCodeAsc(String unitCode_0, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

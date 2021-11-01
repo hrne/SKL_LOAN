@@ -41,7 +41,7 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L5963]                                 函催明細資料查詢"],
 [#<->#,"#FdCaseCode+案件種類",#CaseCode,#CaseCodeX],
-[#<->#,"#FdCustNo+借款人戶號",#CustNo,#CustNoX],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,#CustNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdDateFlag+項目",#DateFlag,#DateFlagX],
 ]
@@ -119,7 +119,7 @@ HELP(#CaseCodeHelp)
 #CaseCodeX=X,4,L
 T(H,#CaseCode,#CaseCodeHelp)
 
-! 借款人戶號
+! 借戶戶號
 #CustNo=A,7,I
 ! C(3,#CHAIN,0,$,s)
 @V(2,0)

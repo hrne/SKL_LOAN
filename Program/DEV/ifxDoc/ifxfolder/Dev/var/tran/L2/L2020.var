@@ -1,0 +1,486 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+#KeyInq=X,1,S
+K(MODIFYBUTTON,查詢)
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2020)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,221)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+! #FirstIn=A,1,S
+! E(0,1)
+
+#BTNADDBUF=X,58,S
+T(2,1+0000000+          )
+
+
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2250; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
+!#FKEY
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,1000];printer.width=[20,20];">
+[
+["[L2020]                                 保證人明細資料查詢"],
+["#FdMain+查詢條件","@(案件編號、借戶戶號、統一編號、核准編號，需擇一輸入)"],
+["#FdCaseNo+案件編號",#CaseNo,"@",#CustName0],
+["#FdCustNo+借戶戶號",#CustNo,#BTN2,"@",#CustName],
+["#FdCustId+統一編號",#CustId,#BTN3,"@",#CustName1],
+["#FdApplNo+核准號碼",#ApplNo,#BTN4,"@",#CustName2],
+["#FdFacmNo+額度編號",#FacmNo,"@(000表示查詢全部額度)"],
+]
+
+#FdMain=X,2,L
+T(3,*)
+#FdCaseNo=X,2,L
+#FdCustNo=X,2,L
+#FdCustId=X,2,L
+#FdApplNo=X,2,L
+#FdFacmNo=X,2,L
+#FdRPTFG=X,2,L
+T(3,*)
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+#BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+#BTN4=X,15,I,ui:button;value:核准號碼查詢;enable:0;tabbable:0
+#BUF1=X,42,S
+#BUF2=X,42,S
+#BUF3=X,42,S
+#BUF4=X,14,S
+T(2,00000019999999)
+!ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)ENABLE(#BTN4)
+ENABLE(#BTN2)ENABLE(#BTN3)ENABLE(#BTN4)
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,40,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CaseNo,#NTXBUF,1,7)
+T(1,@CustNo,#NTXBUF,8,7)
+T(1,@CustId,#NTXBUF,15,10)
+T(1,@ApplNo,#NTXBUF,25,7)
+T(1,@FacmNo,#NTXBUF,32,3)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+
+#BIND1=X,1,S
+!BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUF1;ntxbuf5=type<-1:CaseNo<-OOApplNo})
+#BIND2=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustNo<-OOCustNo})
+#BIND3=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3;ntxbuf5=type<-1:CustId<-OOCustId})
+#BIND4=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF4;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+!案件編號,借戶戶號, 統一編號或核准編號擇一輸入
+!案件編號
+#CaseNo=A,7,I
+C(3,#CHAIN,1,s,$)
+@C(3,#CaseNo,0,,$)
+
+#SendL2r10=X,1,S
+C(3,#CaseNo,0,S,$)
+E(0,@RimCaseNo,#CaseNo)
+RESET_RIM(#SendL2r10,L2R10)
+S(L2R10,1,#RimCaseNo)
+R(1,L2R10)
+
+#SendL2r07=X,1,S
+C(3,#CaseNo,0,S,$)
+T(2,@RimCustId, )
+E(0,@RimCustNo,#L2r10CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#CustName0=X,100,L
+C(3,#CaseNo,0,S,T(2,#L2r07CustName))
+
+
+!借戶戶號
+#CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+
+
+#SendL2r07A=X,1,S
+C(3,#CustNo,0,S,$)
+T(2,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#CustName=X,100,L
+C(3,#CustNo,0,S,T(2,#L2r07CustName))
+
+!統一編號
+#CustId=X,10,I
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+C(3,#CustNo,0,$,S)
+@C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+#SendL2r07B=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustName1=X,100,L
+C(4,#CustId,S,T(2,#L2r07CustName))
+
+!核准號碼
+#ApplNo=A,7,I
+! C(3,#FirstIn,1,E(0,@CHAIN,1),$)
+C(3,#CHAIN,1,s,$)
+C(3,#CaseNo,0,$,S)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+!@IF(#CaseNo == 0 && #CustNo == 0 &&#CustId == 0 &&#ApplNo == 0 ,V(P,案件編號、借戶戶號、統一編號或核准編號擇一輸入),$)
+@V(2,0)
+!F(#ApplNo>0,INVOKEJS(SHOW,p1,1,3,0),$)
+! V(2,0)
+
+
+!用核准號碼(ApplNo)調L2R21
+#SendL2r21A=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFunCd,5)
+E(0,@RimApplNo,#ApplNo)
+RESET_RIM(#SendL2r21A,L2R21)
+S(L2R21,1,#RimFunCd,#RimTxCode,#RimFKey,#RimApplNo)
+R(1,L2R21)
+
+#CustName2=X,100,L
+C(3,#ApplNo,0,S,T(2,#L2r21CustName))
+
+#TimCustNo=A,7,S
+E(0,0)
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+!C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+C(3,#ApplNo,0,$,E(0,#L2r21CustNo))
+
+#CustName3=X,100,L
+C(4,#CustName0,$,T(2,#CustName0))
+C(4,#CustName,$,T(2,#CustName))
+C(4,#CustName1,$,T(2,#CustName1))
+C(4,#CustName2,$,T(2,#CustName2))
+
+![額度編號]
+#FacmNo=A,3,I
+C(3,#CHAIN,1,s,$)
+
+
+![折返KEY]
+#RTNTXT=X,9,S
+
+#FunCd2=A,1,S
+T(3,2)
+
+#FunCd1=A,1,S
+T(3,1)
+
+#FunCd4=A,1,S
+T(3,4)
+
+#FunCd5=A,1,S
+T(3,5)
+
+#FunCd=A,1,S
+E(0,2)
+
+#MRKEY=_,_,S
+T(2,#TimCustNo)
+
+<include src="ROM.icf::L2R42.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L3Rim.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R10.dec"/>
+<include src="ROM.icf::L2R21.dec"/>
+
+#RPTFG=A,1,S
+E(0,0)
+
+#RPTFG2=A,1,S
+C(3,#RPTFG,0,$,S)
+C(4,#NTXBUF5,T(3,1),T(3,2))
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L2020 ----------
+<sub type="FORM" name="L2020">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2020,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2020] 保證人明細資料)
+
+!修改
+#FUNC2=A,1,S
+E(0,2)
+
+!複製
+#FUNC3=A,1,S
+E(0,3)
+
+!刪除
+#FUNC4=A,1,S
+E(0,4)
+
+!查詢
+#FUNC5=A,1,S
+E(0,5)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#OOCustNo=A,7,L
+
+#OOFacmNo=A,3,L
+
+#OOCustNoX=X,11,L
+T(2,#OOCustNo+-+#OOFacmNo)
+
+#OOCustId=X,10,L
+
+#OOGuarantor=x,100,L
+
+#OOGuaRel=X,2,S
+! T(H,#OOGuaRel,#L2r42GuaRelDef)
+
+#OOGuaAmt=m,14,L
+
+#AMT=X,21,S
+X(#OOGuaAmt)
+
+#OOGuaDt=D,7,L
+!核准號碼
+#OOApplNo=A,7,S
+!保證類別
+#OOGuaType=A,2,S
+!保證狀況碼
+#OOStatCd=A,1,S
+!解除日期
+#OOCancelDate=D,7,S
+
+#OOGuaRelX=X,60,L
+!借戶否
+#OOBorrower=X,1,L
+
+!修改
+#OOBUF2=X,58,S
+T(2,#FUNC2+#OOApplNo+#OOCustId+#OOGuaRel)
+
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2250; ntxbuf=#OOBUF2})
+
+!複製
+#OOBUF3=X,58,S
+T(2,#FUNC3+#OOApplNo+#OOCustId+#OOGuaRel)
+
+#OOBTN3=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2250; ntxbuf=#OOBUF3})
+
+!刪除
+#OOBUF4=X,58,S
+T(2,#FUNC4+#OOApplNo+#OOCustId+#OOGuaRel)
+
+#OOBTN4=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2250; ntxbuf=#OOBUF4})
+
+!查詢
+#OOBUF5=X,58,S
+T(2,#FUNC5+#OOApplNo+#OOCustId+#OOGuaRel)
+
+#OOBTN5=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2250; ntxbuf=#OOBUF5})
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+#CaseNo
+#CustNo
+#CustId
+#ApplNo
+#FacmNo
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2020
+#OOCustNo
+#OOFacmNo
+#OOCustId
+#OOGuarantor
+#OOGuaRel
+#OOGuaAmt
+#OOGuaDt
+#OOApplNo
+#OOGuaType
+#OOStatCd
+#OOCancelDate
+#OOGuaRelX
+#OOBorrower
+^
+<include src="ROM.icf::L2R42.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R10.tom"/>
+<include src="ROM.icf::L2R21.tom"/>
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L2020" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];order=1">
+[
+["[L2020]                                 保證人明細資料查詢"],
+["戶號",#OOCustNo],
+["戶名",#CustName3],
+]
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+
+#RPTFG2=1,QUERY.GRID,L2020
+#any={detail:true, header:'L2020.part', caption:'', width:1010, rowNum:20, rowList:[20,40,60]}
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:修改;L2250 保證人資料登錄',align:'center',canExport:false}
+
+#OOBTN3=複製
+{width:50,search:false,formatter:'cust:bind-button:複製',align:'center',canExport:false}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}
+
+#OOBTN5=查詢
+{width:40,search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false}
+
+#OOApplNo=核准號碼
+{width:80,align:'center'}
+
+#OOFacmNo=額度
+{width:60,align:'center'}
+
+#OOCustId=保證人統編
+{width:150,align:'left'}
+
+#OOGuarantor=保證人姓名
+{width:150,align:'left'}
+
+#OOGuaRelX=保證人關係
+{width:150,align:'left'}
+
+#AMT=保證金額
+{width:120,align:'right'}
+
+#OOBorrower=借戶否
+{width:60,align:'center'}
+
+#OOGuaDt=對保日期
+{width:100,align:'center'}
+
+^
+#RPTFG2=2,QUERY.GRID,L2020
+#any={detail:true, header:'L2020.part', caption:'', width:1010, rowNum:20, rowList:[20,40,60]}
+
+#OOApplNo=核准號碼
+{width:80,align:'center'}
+
+#OOFacmNo=額度
+{width:60,align:'center'}
+
+#OOCustId=保證人統編
+{width:150,align:'left'}
+
+#OOGuarantor=保證人姓名
+{width:150,align:'left'}
+
+#OOGuaRelX=保證人關係
+{width:150,align:'left'}
+
+#AMT=保證金額
+{width:120,align:'right'}
+
+#OOBorrower=借戶否
+{width:60,align:'center'}
+
+#OOGuaDt=對保日期
+{width:100,align:'center'}
+
+^
+<include src="PRT.icf::INQ01.sel" map="i=L2020;cpi=15"/>
+#CaseNo#CustNo#CustId#ApplNo
+%#OOApplNo#OOCustNoX#OOCustId#OOGuaRelX#OOGuarantor#AMT#OOBorrower#OOGuaDt@^
+</sub>

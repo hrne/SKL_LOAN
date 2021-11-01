@@ -90,6 +90,7 @@ public class ContentName {
 	public static final String onDay = "onDay";
 	public static final String onMon = "onMon";
 	public static final String onHist = "onHist";
+	public static final String orgDataBase = "orgDataBase";
 
 	/* brno Area */
 	public static final String fxBrno = "1058";

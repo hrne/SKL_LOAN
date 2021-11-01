@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -33,7 +31,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L6086 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6086.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -60,17 +57,17 @@ public class L6086 extends TradeBuffer {
 		// 查詢分公司資料檔
 		Slice<CdBcm> slCdBcm;
 		if (!(iDistCode.isEmpty() || iDistCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findDistCode(iDistCode, iDistCode, this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDistCode1(iDistCode+"%", this.index, this.limit, titaVo);
 		} else if (!(iDeptCode.isEmpty() || iDeptCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findDeptCode(iDeptCode, iDeptCode, this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findDeptCode1(iDeptCode+"%", this.index, this.limit, titaVo);
 		} else if (!(iUnitCode.isEmpty() || iUnitCode.equals("000000"))) {
-			slCdBcm = sCdBcmService.findUnitCode(iUnitCode, iUnitCode, this.index, this.limit, titaVo);
+			slCdBcm = sCdBcmService.findUnitCode1(iUnitCode+"%", this.index, this.limit, titaVo);
 		} else {
 			slCdBcm = sCdBcmService.findAll(this.index, this.limit, titaVo);
 		}
 		List<CdBcm> lCdBcm = slCdBcm == null ? null : slCdBcm.getContent();
 
-		if (lCdBcm == null || lCdBcm.size() == 0) {
+		if (lCdBcm == null || lCdBcm.size() == 0 ||lCdBcm.isEmpty()) {
 			throw new LogicException(titaVo, "E0001", "分公司資料檔"); // 查無資料
 		}
 		// 如有找到資料

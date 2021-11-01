@@ -376,7 +376,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 [#<->#,"#FdActFg+登放記號",#ACTFGX],
 [#<->#,"#FdCustId+統一編號",#CustId,"@",#BTN1,#CustIdX],
 [#<->#,"#FdApplNo+申請號碼",#ApplNo,"@@@",#BTN2],
-[#<->#,"#FdCustNo+借款人戶號",#CustNo],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo],
 [#<->#,"@@@@@@額度編號",#FacmNo],
 [#<->#,"#FdCreditSysNo+案件編號",#CreditSysNo],
 [#<->#,"@@@",#BTNHIDEP2,"@",#BTNHIDEP3,"@",#BTNHIDEP9,"@",#BTNHIDEP4,"@",#BTNHIDEP5,"@",#BTNHIDEP6,"@",#BTNHIDEP7,"@",#BTNHIDEP8,"@",#BTNExpand],
@@ -827,7 +827,7 @@ S(L2R13,1,#RimFunCd,#RimEmployeeNo)
 R(1,L2R13)
 T(2,@CoorgnizerX,#L2r13FullName)
 
-![借款人戶號]
+![借戶戶號]
 !自動顯示不必輸入
 #FdCustNo=X,2,L
 

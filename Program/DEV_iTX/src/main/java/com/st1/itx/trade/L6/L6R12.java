@@ -28,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R12 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R12.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -89,8 +88,6 @@ public class L6R12 extends TradeBuffer {
 		this.totaVo.putParam("L6R12CityItem", mCdCity.getCityItem());
 //		this.totaVo.putParam("L6R12AS400CityCode", mCdCity.getAS400CityCode());
 		this.totaVo.putParam("L6R12UnitCode", mCdCity.getUnitCode());
-		this.totaVo.putParam("L6R12AccCollPsn", mCdCity.getAccCollPsn());
-		this.totaVo.putParam("L6R12LegalPsn", mCdCity.getLegalPsn());
 //		this.totaVo.putParam("L6R12IntRateCeiling", mCdCity.getIntRateCeiling());
 //		this.totaVo.putParam("L6R12IntRateFloor", mCdCity.getIntRateFloor());
 

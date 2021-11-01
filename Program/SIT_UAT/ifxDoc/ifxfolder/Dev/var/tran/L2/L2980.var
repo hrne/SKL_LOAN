@@ -43,8 +43,8 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[150,300,150,300];printer.width=[15,35,15,35];order=1">
 [
 ["[L2980]                                 個人房貸調整作業"],
-[#<->#,"#FdMain+查詢條件","@(借款人戶號、統一編號，需擇一輸入)"],
-[#<->#,"#FdCustNo+借款人戶號",#CustNo,#BTN1],
+[#<->#,"#FdMain+查詢條件","@(借戶戶號、統一編號，需擇一輸入)"],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,#BTN1],
 [#<->#,"#FdCustId+統一編號",#CustId,#BTN2],
 ["#FdFacmNo+額度編號",#FacmNo],
 ["#FdCustTypeCode+客戶別",#CustTypeCode,#CustTypeCodeX],
@@ -72,7 +72,6 @@ E(0,0)
 ["#FdRepayBank+扣款銀行",#RepayBank,#RepayBankX],
 [#<->#,"#FdEmail+電子信箱",#Email],
 [#<->#,"#FdStatus+繳息狀況",#Status,#StatusX],
-[#<->#,"#FdReMark+備註",#ReMark],
 [#<->#,"#FdReason+調整原因",#Reason],
 [#<->#,"#FdReason+1.調降利率"],
 [#<->#,"#FdCustomerRate+客戶要求利率",#CustomerRate],
@@ -81,6 +80,7 @@ E(0,0)
 [#<->#,"#FdGracePeriod+3.延長寬限期",#GracePeriod],
 [#<->#,"#FdShortenYear+4.縮短年期",#ShortenYear],
 [#<->#,"#FdExtendYear+5.延長年期",#ExtendYear],
+[#<->#,"#FdReMark+備註",#ReMark],
 ]
 
 #FdMain=X,2,L
@@ -163,9 +163,9 @@ C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
 #BIND1=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo})
 
-!借款人戶號, 統一編號擇一輸入
+!借戶戶號, 統一編號擇一輸入
 
-![借款人戶號]
+![借戶戶號]
 #FdCustNo=X,2,L
 
 #CustNo=A,7,I
@@ -547,11 +547,6 @@ HELP(#StatusHelp)
 #StatusX=X,8,L
 T(H,#Status,#StatusHelp)
 
-![備註]
-#FdReMark=X,2,L
-
-#ReMark=X,100,I
-
 ![調整原因]
 
 #Reason=A,1,I
@@ -561,33 +556,37 @@ T(H,#Status,#StatusHelp)
 #FdCustomerRate=X,2,L
 
 #CustomerRate=n,2.4,I
-C(3,#Reason,1,$,s)
+C(3,#Reason,1,$,S)
 
 ![擬調利率]
 #FdExpectedRate=X,2,L
 
 #ExpectedRate=n,2.4,I
-C(3,#Reason,1,$,s)
+C(3,#Reason,1,$,S)
 
 ![3.延長寬限期]
 #FdGracePeriod=X,2,L
 
 #GracePeriod=A,3,I
-C(3,#Reason,3,$,s)
+C(3,#Reason,3,$,S)
 
 
 ![4.縮短年期]
 #FdShortenYear=X,2,L
 
 #ShortenYear=A,2,I
-C(3,#Reason,4,$,s)
+C(3,#Reason,4,$,S)
 
 ![5.延長年期]
 #FdExtendYear=X,2,L
 
 #ExtendYear=A,2,I
-C(3,#Reason,5,$,s)
+C(3,#Reason,5,$,S)
 
+![備註]
+#FdReMark=X,2,L
+
+#ReMark=X,100,I
 
 #RPTFG=A,1,S
 #CHAINXMT=X,1,S
@@ -676,6 +675,13 @@ T(3,1)ASGN(LOOP$)
 #FloorArea
 #Area
 #ParkingArea
+#Reason
+#CustomerRate
+#ExpectedRate
+#GracePeriod
+#ShortenYear
+#ExtendYear
+#ReMark
 </sub>
 
 

@@ -1,0 +1,220 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2470)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,27)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,75)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[130,300,130,300];printer.width=[20,20,20,20];order=1;">
+[
+["[L2470]                                 火險保費資料查詢修改-依戶號"],
+[#<->#,"@功能",#FUNCD,#FUNCDX],
+[#<->#,"@借戶戶號",#CUSTNO,#BTN1,#CUSTNAMEX],
+[#<->#,"@年月份",#FIRE_INS_YYMM],
+[#<->#,"@擔保品編號",#COL_NO],
+["@原保單號碼",#ORG_ISUNO],["@新保單號碼",#NEW_ISUNO],
+["@火險保額",#ORG_FIRE_AMT],["@火險保額",#NEW_FIRE_AMT],
+["@火險保費",#ORG_FIRE_EXP],["@火險保費",#NEW_FIRE_EXP],
+["@地震險保額",#ORG_EQ_AMT],["@地震險保額",#NEW_EQ_AMT],
+["@地震險保費",#ORG_EQ_EXP],["@地震險保費",#NEW_EQ_EXP],
+["@保險起日",#ORG_ISU_ST],["@保險起日",#NEW_ISU_ST],
+["@保險迄日",#ORG_ISU_ED],["@保險迄日",#NEW_ISU_ED],
+[""],["@總保費",#TOTAL_EXP],
+["@會計日期",#ACCOUNTING_DATE],["@入媒體檔",#MEDIA_IND,#MEDIA_INDX],
+["@交易序號",#TXN_NO],["@處理代碼",#OPROCESSIND,#OPROCESSINDX],
+["@轉催收日",#OVERDUE_DT],["@轉催編號",#OVERDUE_NO],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BUF1=X,42,S
+
+#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+!功能 下拉式選單 2.修改 5.查詢
+#FUNCD=A,1,I
+HELP(2: 修改;5: 查詢)
+@V(1,2,5)
+E(0,@FUNCIND,#FUNCD)
+
+#FUNCDX=X,4,L
+C(4,#FUNCD,S,$)
+C(2,#FUNCD,T(3,),
+           T(3,),
+           T(3,修改),
+           T(3,),
+           T(3,),
+           T(3,查詢),
+           )
+
+!借戶戶號 
+#CUSTNO=A,7,I
+
+#CUSTNAMEX=X,10,L
+
+!年月份
+#FIRE_INS_YYMM=A,5,I
+
+!擔保品編號 待確認是否只要一個變數名稱or四個
+#COL_NO=A,12,I
+
+!原保單號碼
+#ORG_ISUNO=X,16,I
+
+!新保單號碼
+#NEW_ISUNO=X,16,I
+
+!火險保額
+#ORG_FIRE_AMT=m,14.2,I
+
+!火險保額
+#NEW_FIRE_AMT=m,14.2,I
+
+!火險保費
+#ORG_FIRE_EXP=m,14.2,I
+
+!火險保費
+#NEW_FIRE_EXP=m,14.2,I
+
+!地震險保額
+#ORG_EQ_AMT=m,14.2,I
+
+!地震險保額
+#NEW_EQ_AMT=m,14.2,I
+
+!地震險保費
+#ORG_EQ_EXP=m,14.2,I
+
+!地震險保費
+#NEW_EQ_EXP=m,14.2,I
+
+!保險起日
+#ORG_ISU_ST=D,7,I
+@A(DATE,0,#ORG_ISU_ST)
+
+!保險起日
+#NEW_ISU_ST=D,7,I
+@A(DATE,0,#NEW_ISU_ST)
+
+!保險迄日
+#ORG_ISU_ED=D,7,I
+@A(DATE,0,#ORG_ISU_ED)
+
+!保險迄日
+#NEW_ISU_ED=D,7,I
+@A(DATE,0,#NEW_ISU_ED)
+
+!總保費
+#TOTAL_EXP=m,14.2,I
+
+!會計日期
+#ACCOUNTING_DATE=D,7,I
+@A(DATE,0,#ACCOUNTING_DATE)
+
+!入媒體檔
+#MEDIA_IND=X,1,I
+
+#MEDIA_INDX=X,100,L
+
+!交易序號
+#TXN_NO=A,7,I
+
+!處理代碼
+#OPROCESSIND=A,1,I
+
+#OPROCESSINDX=X,100,L
+
+!轉催收日
+#OVERDUE_DT=D,7,I
+@A(DATE,0,#OVERDUE_DT)
+
+!轉催編號
+#OVERDUE_NO=A,10,I
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2470 ----------
+<sub type="FORM" name="L2470">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2470,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2470] 火險保費資料查詢修改-依戶號)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2470^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L2470" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L2470]                                 火險保費資料查詢修改-依戶號"],
+[#<->#,"@案件編號"],
+[#<->#,"@統一編號"],
+["@借戶戶號"],
+["@核准編號"],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

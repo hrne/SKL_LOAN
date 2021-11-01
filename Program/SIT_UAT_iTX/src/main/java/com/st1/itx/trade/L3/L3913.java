@@ -3,8 +3,6 @@ package com.st1.itx.trade.L3;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -14,7 +12,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.LoanIntDetail;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.LoanIntDetailService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -28,10 +28,11 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L3913 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3913.class);
 
 	@Autowired
 	public LoanIntDetailService sLoanIntDetailService;
+	@Autowired
+	public CustMainService custMainService;
 
 	@Autowired
 	Parse parse;
@@ -58,11 +59,23 @@ public class L3913 extends TradeBuffer {
 		Slice<LoanIntDetail> slLoanIntDetail;
 		List<LoanIntDetail> lLoanIntDetail;
 
-		slLoanIntDetail = sLoanIntDetailService.fildFacmNoEq(iCustNo, iFacmNo, iBormNo, iAcDate, iTellerNo, iTxtNo, this.index, this.limit, titaVo);
+		slLoanIntDetail = sLoanIntDetailService.fildFacmNoEq(iCustNo, iFacmNo, iBormNo, iAcDate, iTellerNo, iTxtNo,
+				this.index, this.limit, titaVo);
 		if (slLoanIntDetail == null) {
 			throw new LogicException(titaVo, "E0001", "計息明細檔"); // 查詢資料不存在
 		}
 		lLoanIntDetail = slLoanIntDetail == null ? null : new ArrayList<LoanIntDetail>(slLoanIntDetail.getContent());
+
+		CustMain tCustMain = custMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+
+		this.totaVo.putParam("OCustNo", iCustNo);
+		if (tCustMain != null) {
+
+			this.totaVo.putParam("OCustName", tCustMain.getCustName());
+		} else {
+			this.totaVo.putParam("OCustName", "");
+
+		}
 
 		for (LoanIntDetail tLoanIntDetail : lLoanIntDetail) {
 

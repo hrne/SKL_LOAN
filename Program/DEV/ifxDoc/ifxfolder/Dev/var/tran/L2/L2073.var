@@ -54,7 +54,7 @@ E(0,0)
 ["[L2073]                                 結清客戶申請個人資料控管查詢"],
 ["#FdIdNo+依統編或戶號",#IdNo,#IdNoX],
 ["#FdCustId+客戶統一編號",#CustId],
-["#FdCustNo+借款人戶號",#CustNo],
+["#FdCustNo+借戶戶號",#CustNo],
 ]
 
 #FdIdNo=X,2,L
@@ -253,7 +253,7 @@ TXFORM=L2073
 #OOCustId=客戶統一編號
 {width:120,align:'center'}
 
-#OOCustNo=借款人戶號
+#OOCustNo=借戶戶號
 {width:100,align:'center'}
 
 #OOCustName=戶名

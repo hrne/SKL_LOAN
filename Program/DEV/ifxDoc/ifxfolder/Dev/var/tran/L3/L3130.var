@@ -33,6 +33,7 @@ T(3,@FdFacmNo,*)
 T(3,@FdBookDate,*)
 T(3,@FdIncludeIntFlag,*)
 T(3,@FdUnpaidIntFlag,*)
+T(3,@FdPayMethod,*)
 T(3,@FdBookAmt,*)
 
 </sub>
@@ -66,6 +67,7 @@ T(3,@FdBookAmt,*)
 ["#FdIncludeIntFlag+是否內含利息",#IncludeIntFlag,#IncludeIntFlagX],
 ["#FdUnpaidIntFlag+利息是否可欠繳",#UnpaidIntFlag,#UnpaidIntFlagX],
 ["#FdBookAmt+約定部分償還金額",#TwBookAmt,#UsBookAmt,#BookAmtX,#BTN5],
+["#FdPayMethod+繳納方式",#PayMethod,#PayMethodX],
 ["#FdBookStatus+狀態",#BookStatusX],
 ]
 !---------- AP Button AREA ----------
@@ -101,14 +103,22 @@ T(3,CdCode.BookStatus)
 
 #BookStatusHelp=x,1024,S 
 
+#CDDEF0004=x,26,S
+T(3,CdCode.PayMethod)
+
+#PayMethodHelp=x,1024,S 
+
+
+
 #CurrencyCodeHelpRim=X,1,S
 RESET_RIM(#CurrencyCodeHelpRim,XXR99)
-S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@CurrencyCodeHelp,#HelpDesc1)
 T(2,@CurrPrecisionHelp,#HelpDesc2) 
 T(2,@BookStatusHelp,#HelpDesc3) 
+T(2,@PayMethodHelp,#HelpDesc4)
 
 
 #FuncCodeHelp=x,40,S
@@ -149,9 +159,11 @@ T(2,@IncludeIntFlag,#L3r03IncludeIntFlag)
 T(2,@UnpaidIntFlag,#L3r03UnpaidIntFlag)
 E(0,@TwBookAmt,#L3r03BookAmt)
 E(0,@UsBookAmt,#L3r03BookAmt)
+T(2,@PayMethod,#L3r03PayMethod)
 E(0,@BookStatus,#L3r03BookStatus)
 T(H,@IncludeIntFlagX,#IncludeIntFlag,#YNHelp)
 T(H,@UnpaidIntFlagX,#UnpaidIntFlag,#YNHelp)
+T(H,@PayMethodX,#PayMethod,#PayMethodHelp)
 T(H,@BookStatusX,#BookStatus,#BookStatusHelp)
 
 ![功能]
@@ -422,6 +434,9 @@ HELP(#YNHelp)
 @V(H,#YNHelp)
 #IncludeIntFlagX=X,2,L
 T(3,)T(H,#IncludeIntFlag,#YNHelp)
+
+
+
 !利息是否可欠繳
 #FdUnpaidIntFlag=X,2,L
 C(3,#UpdateCode,1,$,S)
@@ -475,6 +490,24 @@ T(2,#TXCD+#CustNo+#FacmNo+#BormNo+#CurrencyCode+#TimBookAmt+#BookDate)
 
 #BIND3=X,1,S
 BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3921; ntxbuf=#BUF5})
+
+![繳納方式]
+!依額度[攤還額異動碼]為1時預設1.減少每期攤還金額
+!依額度[攤還額異動碼]為0時預設2.縮短應繳期數
+#FdPayMethod=X,2,L
+C(4,#PayMethod,$,s)
+C(3,#L2r05ExtraRepayCode,1,T(3,@PayMethod,1),$)
+C(3,#L2r05ExtraRepayCode,0,T(3,@PayMethod,2),$)
+
+
+#PayMethod=X,1,I
+HELP(#PayMethodHelp)
+@V(H,#PayMethodHelp)
+
+
+#PayMethodX=X,20,L
+T(3,)T(H,#PayMethod,#PayMethodHelp)
+
 
 ![狀態]
 #FdBookStatus=X,2,L
@@ -530,7 +563,7 @@ T(3,[L3130] 約定部分償還登錄)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 
-#FuncCode#CustNo#FacmNo#BormNo#CurrencyCode#BookDate#TimBookAmt
+#FuncCode#CustNo#FacmNo#BormNo#CurrencyCode#BookDate#TimBookAmt#PayMethod
 #IncludeIntFlag
 #UnpaidIntFlag
 #OldBookDate

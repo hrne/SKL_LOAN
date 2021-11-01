@@ -1,0 +1,319 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L3913)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,107)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,138)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,20)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L3913]                                 計息明細查詢"],
+["戶號",#CustNo,"-",#FacmNo,"-",#BormNo],
+["會計日期",#AcDate],
+["經辦",#TellerNo],
+["交易序號",#TxtNo],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN1=X,15,I,ui:button;value:額度明細查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
+! #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
+! #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
+! #BTN4=X,15,I,ui:button;value:額度明細查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
+
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!BreachGetCode 清償違約金收取方式
+#CDDEF01=x,20,S
+T(3,CdCode.BreachGetCode)
+
+#BreachGetCodeHelp=x,1024,S
+
+!BaseRate0 清償違約金收取方式
+#CDDEF02=x,20,S
+T(3,CdCode.BaseRate0)
+
+#BaseRate0Help=x,1024,S
+
+!YesNo YesNo
+#CDDEF03=x,20,S
+T(3,CdCode.YesNo)
+
+#YesNoHelp=x,1024,S
+
+!幣別小數位
+#CDDEF04=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S
+
+#BreachGetCodeHelpRim=X,1,S
+RESET_RIM(#BreachGetCodeHelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03,#CDDEF04)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@BreachGetCodeHelp,#HelpDesc1)
+T(2,@BaseRate0Help,#HelpDesc2)
+T(2,@YesNoHelp,#HelpDesc3)
+T(2,@CurrPrecisionHelp,#HelpDesc4) 
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,100,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,1,7)
+T(1,@FacmNo,#NTXBUF,8,3)
+T(1,@BormNo,#NTXBUF,11,3)
+T(1,@AcDate,#NTXBUF,14,7)
+T(1,@TellerNo,#NTXBUF,21,6)
+T(1,@TxtNo,#NTXBUF,27,8)
+
+![借款人戶號]
+!借款人戶號, 統一編號或核准編號擇一輸入
+#FdCustNo=X,2,L
+
+#CustNo=A,7,S
+C(3,#CHAIN,1,s,$)
+
+![額度編號]
+!可不輸入
+#FdFacmNo=X,2,L
+C(3,#CHAIN,1,s,$)
+
+#FacmNo=A,3,S
+C(3,#CHAIN,1,s,$)
+
+![撥款序號]
+!可不輸入
+#FdBormNo=X,2,L
+
+#BormNo=A,3,S
+C(3,#CHAIN,1,s,$)
+
+#AcDate=D,7,S
+C(3,#CHAIN,1,s,$)
+
+#TellerNo=X,6,S
+C(3,#CHAIN,1,s,$)
+
+#TxtNo=X,8,S
+C(3,#CHAIN,1,s,$)
+
+#RPTFG=A,1,S
+C(3,#CHAIN,1,s,$)
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L3913 ----------
+<sub type="FORM" name="L3913">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L3913,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L3913] 繳息情形)
+
+#CurrencyCode=X,3,S
+T(3,TWD)
+
+#Precision=N,1,S
+E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+#OCustNo=A,7,L
+
+#OCustName=x,100,L
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+
+!額度
+#OOFacmNo=A,3,L
+!撥款
+#OOBormNo=A,3,L
+!計息起日
+#OOIntStartDate=D,7,L
+!計息止日
+#OOIntEndDate=D,7,L
+!計息本金
+#OOAmount=m,14.2,L
+
+#OOAmountX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOAmount,#OOAmountX)
+P(R,#OOAmountX)
+
+
+!計息利率
+#OORate=+n,2.4,L
+!回收本金
+#OOPrincipal=m,14.2,L
+#OOPrincipalX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOPrincipal,#OOPrincipalX)
+P(R,#OOPrincipalX)
+!利息
+#OOInterest=m,14.2,L
+#OOInterestX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOInterest,#OOInterestX)
+P(R,#OOInterestX)
+!延滯息
+#OODelayInt=m,14.2,L
+#OODelayIntX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OODelayInt,#OODelayIntX)
+P(R,#OODelayIntX)
+!違約金
+#OOBreachAmt=m,14.2,L
+#OOBreachAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOBreachAmt,#OOBreachAmtX)
+P(R,#OOBreachAmtX)
+!清償違約金
+#OOCloseBreachAmt=m,14.2,L
+#OOCloseBreachAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOCloseBreachAmt,#OOCloseBreachAmtX)
+P(R,#OOCloseBreachAmtX)
+!放款餘額
+#OOLoanBal=m,14.2,L
+#OOLoanBalX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOLoanBal,#OOLoanBalX)
+P(R,#OOLoanBalX)
+
+! !查詢
+! #OOBUF1=X,22,S
+! T(2,#OAcDate+#OOTellerNo+#OTxtNo)
+
+! #OOBTN1=X,1,S
+! BIND(grid,{ cmd=CHAIN; ntxcd=L3912; ntxbuf=#OOBUF1})
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustNo
+#FacmNo
+#BormNo
+#AcDate
+#TellerNo
+#TxtNo
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L3913
+#OCustNo
+#OCustName
+#OOFacmNo
+#OOBormNo 
+#OOIntStartDate
+#OOIntEndDate 
+#OOAmount
+#OORate 
+#OOPrincipal 
+#OOInterest 
+#OODelayInt 
+#OOBreachAmt 
+#OOCloseBreachAmt 
+#OOLoanBal
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+</sub>
+
+<sub type="PART" name="L3913" layout="cols=1;screen.width=[100,900];printer.width=[15,30,15,30];">
+[
+["[L3913]                                 計息明細查詢"],
+["戶號",#OCustNo],
+["戶名",#OCustName],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L3913
+#any={detail:true, header:'L3913.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOFacmNo=額度
+{width:40,align:'center'}
+#OOBormNo=撥款
+{width:40,align:'center'}
+#OOIntStartDate=計息起日
+{width:80,align:'center'}
+#OOIntEndDate=計息止日
+{width:80,align:'center'}
+#OOAmountX=計息本金
+{width:160,align:'right'}
+#OORate=計息利率
+{width:70,align:'right'}
+#OOPrincipalX=回收本金
+{width:160,align:'right'}
+#OOInterestX=利息
+{width:160,align:'right'}
+#OODelayIntX=延滯息
+{width:160,align:'right'}
+#OOBreachAmtX=違約金
+{width:160,align:'right'}
+#OOLoanBalX=放款餘額
+{width:160,align:'right'}
+
+
+^
+<include src="PRT.icf::INQ01.sel"/>
+
+</sub>

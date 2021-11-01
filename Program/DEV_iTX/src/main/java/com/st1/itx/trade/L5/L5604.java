@@ -4,18 +4,20 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CollLawService;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.common.SendRsp;
+import com.st1.itx.db.domain.ClFac;
 /* DB容器 */
 import com.st1.itx.db.domain.CollLaw;
 import com.st1.itx.db.domain.CollLawId;
@@ -37,6 +39,8 @@ public class L5604 extends TradeBuffer {
 	public CollLawService iCollLawService;
 	@Autowired
 	public CollListService iCollListService;
+	@Autowired
+	public ClFacService iClFacService;
 	@Autowired
 	public DataLog iDataLog;
 	@Autowired
@@ -62,128 +66,122 @@ public class L5604 extends TradeBuffer {
 
 		CollLaw iCollLaw = new CollLaw();
 		CollLawId iCollLawId = new CollLawId();
-		switch (iFunctionCd) {
-		case "1":
-			int iAcDate = Integer.valueOf(titaVo.getCalDy());
-			String iTitaTlrNo = titaVo.getTlrNo();
-			String iTitaTxtNo = titaVo.getTxtNo();
-			iCollLawId.setAcDate(iAcDate);
-			iCollLawId.setCaseCode(iCaseCode);
-			iCollLawId.setCustNo(iCustNo);
-			iCollLawId.setFacmNo(iFacmNo);
-			iCollLawId.setTitaTlrNo(iTitaTlrNo);
-			iCollLawId.setTitaTxtNo(iTitaTxtNo);
-			iCollLaw.setCollLawId(iCollLawId);
-			iCollLaw.setClCode1(iClCode1);
-			iCollLaw.setClCode2(iClCode2);
-			iCollLaw.setClNo(iClNo);
-			iCollLaw.setRecordDate(iRecordDate);
-			iCollLaw.setLegalProg(iLegalProg);
-			iCollLaw.setAmount(iAmount);
-			iCollLaw.setRemark(iRemark);
-			iCollLaw.setMemo(iMemo);
-			try {
-				iCollLawService.insert(iCollLaw, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
-			}
-			break;
-		case "2":
-			int uAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
-			String uTitaTlrNo = titaVo.getParam("TitaTlrNo");
-			String uTitaTxtNo = titaVo.getParam("TitaTxtNo");
-			iCollLawId.setAcDate(uAcDate);
-			iCollLawId.setCaseCode(iCaseCode);
-			iCollLawId.setCustNo(iCustNo);
-			iCollLawId.setFacmNo(iFacmNo);
-			iCollLawId.setTitaTlrNo(uTitaTlrNo);
-			iCollLawId.setTitaTxtNo(uTitaTxtNo);
-			CollLaw uCollLaw = new CollLaw();
-			uCollLaw = iCollLawService.holdById(iCollLawId, titaVo);
-			if (uCollLaw == null) {
-				throw new LogicException(titaVo, "E0003", "查無此資料");
-			}
-			CollLaw beforeCollLaw = (CollLaw) iDataLog.clone(uCollLaw);
-			uCollLaw.setRecordDate(iRecordDate);
-			uCollLaw.setLegalProg(iLegalProg);
-			uCollLaw.setAmount(iAmount);
-			uCollLaw.setRemark(iRemark);
-			uCollLaw.setMemo(iMemo);
-			try {
-				iCollLawService.update(uCollLaw, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}
-			iDataLog.setEnv(titaVo, beforeCollLaw, uCollLaw);
-			iDataLog.exec();
-			break;
-		case "3":
-			int cAcDate = Integer.valueOf(titaVo.getCalDy());
-			String cTitaTlrNo = titaVo.getTlrNo();
-			String cTitaTxtNo = titaVo.getTxtNo();
-			iCollLawId.setAcDate(cAcDate);
-			iCollLawId.setCaseCode(iCaseCode);
-			iCollLawId.setCustNo(iCustNo);
-			iCollLawId.setFacmNo(iFacmNo);
-			iCollLawId.setTitaTlrNo(cTitaTlrNo);
-			iCollLawId.setTitaTxtNo(cTitaTxtNo);
-			iCollLaw.setCollLawId(iCollLawId);
-			iCollLaw.setClCode1(iClCode1);
-			iCollLaw.setClCode2(iClCode2);
-			iCollLaw.setClNo(iClNo);
-			iCollLaw.setRecordDate(iRecordDate);
-			iCollLaw.setLegalProg(iLegalProg);
-			iCollLaw.setAmount(iAmount);
-			iCollLaw.setRemark(iRemark);
-			iCollLaw.setMemo(iMemo);
-			try {
-				iCollLawService.insert(iCollLaw, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
-			}
-			break;
-		case "4":
-			int dAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
-			String dTitaTlrNo = titaVo.getParam("TitaTlrNo");
-			String dTitaTxtNo = titaVo.getParam("TitaTxtNo");
-			iCollLawId.setAcDate(dAcDate);
-			iCollLawId.setCaseCode(iCaseCode);
-			iCollLawId.setCustNo(iCustNo);
-			iCollLawId.setFacmNo(iFacmNo);
-			iCollLawId.setTitaTlrNo(dTitaTlrNo);
-			iCollLawId.setTitaTxtNo(dTitaTxtNo);
-			CollLaw dCollLaw = iCollLawService.holdById(iCollLawId, titaVo);
-			if (dCollLaw == null) {
-				throw new LogicException(titaVo, "E0004", "");
-			}
-			// 刪除需刷主管卡
-			if (!titaVo.getHsupCode().equals("1")) {
-				iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-			}
-			try {
-				iCollLawService.delete(dCollLaw, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
-			}
-			break;
-		}
-
-		// 更新催收主檔
 		CollListId iCollListId = new CollListId();
 		CollList iCollList = new CollList();
-		iCollListId.setCustNo(iCustNo);
-		iCollListId.setFacmNo(iFacmNo);
-		iCollList = iCollListService.holdById(iCollListId, titaVo);
-		if (iCollList == null) {
-			throw new LogicException(titaVo, "E0007", "催收主檔"); // 更新資料時發生錯誤
+		
+		Slice<ClFac> cClFac = null;
+		cClFac = iClFacService.selectForL5064(iClCode1, iClCode2, iClNo, iCustNo, iFacmNo, 0, Integer.MAX_VALUE, titaVo);
+		if (cClFac == null) {
+			throw new LogicException(titaVo, "E0005", "擔保品與額度關聯檔查無資料"); // 更新資料時發生錯誤
 		}
-		iCollList.setTxCode("5");
-		iCollList.setTxDate(Integer.valueOf(titaVo.getCalDy()));
-		try {
-			iCollListService.update(iCollList, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時發生錯誤
+		
+		Slice<ClFac> iClFac = null;
+		iClFac = iClFacService.clNoEq(iClCode1, iClCode2, iClNo, 0, Integer.MAX_VALUE, titaVo);
+		if (iClFac == null) {
+			throw new LogicException(titaVo, "E0005", "擔保品與額度關聯檔查無資料"); // 更新資料時發生錯誤
 		}
+		for (ClFac rClFac :iClFac) {
+			iCollListId.setCustNo(rClFac.getCustNo());
+			iCollListId.setFacmNo(rClFac.getFacmNo());
+			iCollList = iCollListService.findById(iCollListId, titaVo);
+			if (iCollList == null) {
+				continue; //催收主檔若無資料則跳過
+			}
+			if (iFunctionCd.equals("1") || iFunctionCd.equals("3")) { //新增
+				iCollLawId.setCustNo(rClFac.getCustNo());
+				iCollLawId.setFacmNo(rClFac.getFacmNo());
+				iCollLawId.setAcDate(Integer.valueOf(titaVo.getCalDy()));
+				iCollLawId.setCaseCode(iCaseCode);
+				iCollLawId.setTitaTlrNo(titaVo.getTlrNo());
+				iCollLawId.setTitaTxtNo(titaVo.getTxtNo());
+				iCollLaw.setCollLawId(iCollLawId);
+				iCollLaw.setClCode1(iClCode1);
+				iCollLaw.setClCode2(iClCode2);
+				iCollLaw.setClNo(iClNo);
+				iCollLaw.setRecordDate(iRecordDate);
+				iCollLaw.setLegalProg(iLegalProg);
+				iCollLaw.setAmount(iAmount);
+				iCollLaw.setRemark(iRemark);
+				iCollLaw.setMemo(iMemo);
+				try {
+					iCollLawService.insert(iCollLaw, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
+				}
+			}else if (iFunctionCd.equals("2")) { //修改
+				int uAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
+				String uTitaTlrNo = titaVo.getParam("TitaTlrNo");
+				String uTitaTxtNo = titaVo.getParam("TitaTxtNo");
+				iCollLawId.setAcDate(uAcDate);
+				iCollLawId.setCaseCode(iCaseCode);
+				iCollLawId.setCustNo(rClFac.getCustNo());
+				iCollLawId.setFacmNo(rClFac.getFacmNo());
+				iCollLawId.setTitaTlrNo(uTitaTlrNo);
+				iCollLawId.setTitaTxtNo(uTitaTxtNo);
+				CollLaw uCollLaw = new CollLaw();
+				uCollLaw = iCollLawService.holdById(iCollLawId, titaVo);
+				if (uCollLaw == null) {
+//					throw new LogicException(titaVo, "E0003", "查無此資料"); 為避免資料不同步問題，只使用continue跳過
+					continue;
+				}
+				CollLaw beforeCollLaw = (CollLaw) iDataLog.clone(uCollLaw);
+				CollLaw uuCollLaw = new CollLaw();
+				uCollLaw.setRecordDate(iRecordDate);
+				uCollLaw.setLegalProg(iLegalProg);
+				uCollLaw.setAmount(iAmount);
+				uCollLaw.setRemark(iRemark);
+				uCollLaw.setMemo(iMemo);
+				try {
+					uuCollLaw = iCollLawService.update(uCollLaw, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+				}
+				iDataLog.setEnv(titaVo, beforeCollLaw, uuCollLaw);
+				iDataLog.exec();
+				
+			}else { //刪除
+				int dAcDate = Integer.valueOf(titaVo.getParam("TitaAcDate"));
+				String dTitaTlrNo = titaVo.getParam("TitaTlrNo");
+				String dTitaTxtNo = titaVo.getParam("TitaTxtNo");
+				iCollLawId.setAcDate(dAcDate);
+				iCollLawId.setCaseCode(iCaseCode);
+				iCollLawId.setCustNo(rClFac.getCustNo());
+				iCollLawId.setFacmNo(rClFac.getFacmNo());
+				iCollLawId.setTitaTlrNo(dTitaTlrNo);
+				iCollLawId.setTitaTxtNo(dTitaTxtNo);
+				CollLaw dCollLaw = iCollLawService.holdById(iCollLawId, titaVo);
+				if (dCollLaw == null) {
+//					throw new LogicException(titaVo, "E0004", ""); 為避免資料不同步問題，只使用continue跳過
+					continue;
+				}
+				// 刪除需刷主管卡
+				if (!titaVo.getHsupCode().equals("1")) {
+					iSendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+				}
+				try {
+					iCollLawService.delete(dCollLaw, titaVo);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+				}
+			}
+			CollListId rCollListId = new CollListId();
+			CollList rCollList = new CollList();
+			rCollListId.setCustNo(rClFac.getCustNo());
+			rCollListId.setFacmNo(rClFac.getFacmNo());
+			rCollList = iCollListService.holdById(iCollListId, titaVo);
+			if (rCollList == null) {
+				throw new LogicException(titaVo, "E0007", "催收主檔"); // 更新資料時發生錯誤
+			}
+			rCollList.setTxCode("5");
+			rCollList.setTxDate(Integer.valueOf(titaVo.getCalDy()));
+			try {
+				iCollListService.update(rCollList, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時發生錯誤
+			}
+		}
+
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

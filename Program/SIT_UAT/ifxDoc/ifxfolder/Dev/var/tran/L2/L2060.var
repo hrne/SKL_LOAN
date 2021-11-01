@@ -1,0 +1,568 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2060)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,184)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,20)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+
+#FirstIn=A,1,S
+!HIDE(#BTN1)
+E(0,0)
+
+#BtnAddBuf=X,8,S
+T(2,1)
+
+#BtnAdd=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2600; ntxbuf=1; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+[
+["[L2060]                                 聯貸案訂約明細資料查詢"],
+! ["#FdMain+查詢條件","(借戶戶號、統一編號、核准編號，需擇一輸入)"],
+! ["#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+! ["#FdCustId+統一編號",#CustId,#BTN2],
+! ["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3],
+["#FdSyndNo+聯貸案編號",#SyndNoSt,"@至",#SyndNoEnd],
+["#FdLeadingBank+主辦行",#LeadingBank],
+["#FdSigningDateStart+簽約日",#SigningDateStart,"@至",#SigningDateEnd],
+! ["#FdDrawdownStartDateStart+動撥起日",#DrawdownStartDateStart,"@至",#DrawdownStartDateEnd],
+! ["#FdDrawdownEndDateStart+動撥迄日",#DrawdownEndDateStart,"@至",#DrawdownEndDateEnd],
+! ["#FdCommitFeeFlag+有收承諾費",#CommitFeeFlag,#CommitFeeFlagX],
+]
+! #FdMain=X,2,L
+! T(3,*)
+! #FdCustNo=X,2,L
+! #FdCustId=X,2,L
+! #FdApplNo=X,2,L
+#FdSyndNo=X,2,L
+T(3,*)
+#FdLeadingBank=X,2,L
+#FdSigningDateStart=X,2,L
+#FdDrawdownStartDateStart=X,2,L
+#FdDrawdownEndDateStart=X,2,L
+! #FdCommitFeeFlag=X,2,L
+! T(3,*)
+#FdRPTFG=X,2,L
+T(3,*)
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+! #BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
+! #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
+! #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
+#BUF1=X,42,S
+! ENABLE(#BTN1)ENABLE(#BTN2)ENABLE(#BTN3)
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF01=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S 
+
+
+!國內或國際聯貸
+#CDDEF02=x,26,S
+T(3,CdCode.SyndTypeCode)
+
+#SyndTypeCodeHelp=x,1024,S
+
+
+#StatusHelpRim=X,1,S
+RESET_RIM(#StatusHelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@CurrPrecisionHelp,#HelpDesc1) 
+T(2,@SyndTypeCodeHelp,#HelpDesc2) 
+
+
+#CommitFeeFlagHelp=x,50,S
+T(3, :Space 全部;Y:有收承諾費;N:沒收承諾費)
+
+#CommitFeeFlagHelp1=x,50,S
+T(3, :全部;Y:有收承諾費;N:沒收承諾費)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,100,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,1),E(0,@RPTFG2,2))
+
+#CHAINTXCD=_,_,S
+C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
+
+! #BUF1A=X,18,S
+! T(3,00000019999999000)
+
+! #BIND1A=X,1,S
+! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:CustNo<-OOCustNo})
+
+! ![借戶戶號]
+! !借戶戶號, 統一編號或核准編號擇一輸入
+! #CustNo=A,7,I
+! C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
+! C(3,#CHAIN,1,s,$)
+! ! INVOKEJS(SHOW,p1,1,3,1)
+! SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+! C(3,#FirstIn,1,S,$)
+
+! #WKBTN1=X,1,S
+! C(3,#FirstIn,1,S,$)
+! ! C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
+
+! #BUF1B=X,18,S
+! C(3,#CustNo,0,T(3,00000019999999000),T(2,#CustNo+#CustNo+000))
+! ! T(2,#CustNo+9999999000)
+
+! #BIND1B=X,1,S
+! BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:CustNo<-OOCustNo})
+
+! #SendL2r07A=X,1,S
+! C(3,#CustNo,0,S,$)
+! T(3,@RimCustId, )
+! E(0,@RimCustNo,#CustNo)
+! RESET_RIM(#SendL2r07A,L2R07)
+! S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+! R(1,L2R07)
+
+
+! #BUF2A=X,100,S
+
+! #BIND2A=X,1,S
+! BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+
+
+! #CustNoX=X,100,L
+! C(3,#CustNo,0,S,T(2,#L2r07CustName))
+
+! ![統一編號]
+! #CustId=X,10,I
+! C(3,#FirstIn,1,S,$)
+! C(3,#CustNo,0,$,s)
+! ! INVOKEJS(SHOW,p1,2,3,1)
+! SHOW(#BTN2)HIDE(#BTN1,#BTN3)
+! @C(4,#CustId,S,$)V(7)A(ID_UNINO,0,#CustId)
+
+
+! #BUF2B=X,100,S
+! T(2,0000000+#CustId)
+
+! #BIND2B=X,1,S
+! BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+
+
+! #WKBTN2=X,1,S
+! C(3,#FirstIn,1,S,$)
+! C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
+! ! C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,3,0))
+
+! #SendL2r07B=X,1,S
+! C(4,#CustId,S,$)
+! T(2,@RimCustId,#CustId)
+! E(0,@RimCustNo,0)
+! RESET_RIM(#SendL2r07B,L2R07)
+! S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+! R(1,L2R07)
+
+! #CustIdX=X,100,L
+! C(4,#CustId,S,T(2,#L2r07CustName))
+
+! #BUF3A=X,18,S
+! T(3,000000199999990)
+
+! #BIND3A=X,1,S
+! BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+
+! ![核准編號]
+! #ApplNo=A,7,I
+! C(3,#FirstIn,1,S,$)
+! C(3,#CustNo,0,$,S)
+! C(4,#CustId,$,S)
+! ! INVOKEJS(SHOW,p1,3,3,1)
+! SHOW(#BTN3)
+! ! @C(3,#ApplNo,0,V(P,需擇一輸入),$)
+
+
+! #WKBTN3=X,1,S
+! C(3,#FirstIn,1,S,$)
+! C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
+
+! #BUF3B=X,18,S
+! C(3,#ApplNo,0,T(3,000000199999990),T(2,#ApplNo+99999990))
+! ! T(2,#ApplNo+99999990)
+
+! #BIND3B=X,1,S
+! BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo})
+
+! #HIDEALLBTN=X,1,S
+! C(3,#CHAIN,1,$,S)
+! HIDE(#BTN1,#BTN2,#BTN3)
+
+! !用核准號碼(ApplNo)調L2R05
+! #SendL2r05A=X,1,S
+! C(3,#ApplNo,0,S,$)
+! E(0,@RimFuncCode,5)
+! E(0,@RimCustNo,#CustNo)
+! E(0,@RimFacmNo,0)
+! E(0,@RimApplNo,#ApplNo)
+! E(0,@RimCaseNo,0)
+! RESET_RIM(#SendL2r05A,L2R05)
+! S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+! R(1,L2R05)
+! ! E(0,@FacmNo,#L2r05FacmNo)
+
+! #SendL2r07C=X,1,S
+! C(3,#ApplNo,0,S,$)
+! T(2,@RimCustId,#L2r05CustId)
+! E(0,@RimCustNo,#CustNo)
+! RESET_RIM(#SendL2r07C,L2R07)
+! S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+! R(1,L2R07)
+
+! #ApplNoX=X,100,L
+! C(3,#ApplNo,0,S,T(2,#L2r07CustName))
+
+! #TimCustNo=A,7,S
+! E(0,0)
+! C(3,#CustNo,0,$,E(0,#CustNo))
+! C(4,#CustId,$,E(0,#L2r07CustNo))
+! C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+
+!聯貸案編號區間(起)
+
+#SyndNoSt=A,6,I
+@V(2,0)
+
+! #WkSyndNoX=A,6,S
+! E(0,#SyndNoSt-1)
+!聯貸案編號區間(迄)
+!不可輸入小於等於[聯貸案編號區間(起)]
+#SyndNoEnd=A,6,I
+E(0,#SyndNoSt)
+@IF(#SyndNoEnd<#SyndNoSt,V(P,不可小於聯貸案編號起號),$)
+! V(6,0,#WkSyndNoX)
+
+
+
+![主辦行]
+!可不輸入
+#LeadingBank=X,7,I
+
+![簽約日]
+!可不輸入
+#SigningDateStart=D,7,I
+E(0,0)
+@
+A(DATE,0,#SigningDateStart)
+
+#SigningDateEnd=D,7,I
+E(0,#SYSDATE)
+@A(DATE,0,#SigningDateEnd)
+V(5,#SigningDateStart,9991231)
+
+! ![動撥起日]
+! !可不輸入
+! #DrawdownStartDateStart=D,7,I
+! C(3,#FirstIn,1,S,$)
+! E(0,0)
+! @A(DATE,0,#DrawdownStartDateStart)
+
+! #DrawdownStartDateEnd=D,7,I
+! C(3,#FirstIn,1,S,$)
+! @A(DATE,0,#DrawdownStartDateEnd)
+! V(5,#DrawdownStartDateStart,9991231)
+
+! ![動撥迄日]
+! !可不輸入
+! #DrawdownEndDateStart=D,7,I
+! C(3,#FirstIn,1,S,$)
+! E(0,#DrawdownStartDateStart)
+! @A(DATE,0,#DrawdownEndDateStart)
+
+! #DrawdownEndDateEnd=D,7,I
+! C(3,#FirstIn,1,S,$)
+! @A(DATE,0,#DrawdownEndDateEnd)
+! V(5,#DrawdownEndDateStart,9991231)
+
+![有收承諾費]
+
+! !可不輸入
+! #CommitFeeFlag=X,1,I
+! C(3,#FirstIn,1,S,$)
+! HELP(#CommitFeeFlagHelp) 
+! @V(H,#CommitFeeFlagHelp1)
+
+! #CommitFeeFlagX=X,10,L
+! T(3,)T(H,#CommitFeeFlag,#CommitFeeFlagHelp1)
+! C(3,#FirstIn,1,E(0,@CHAIN,1),$)
+! E(0,@FirstIn,0)
+
+
+#RPTFG=A,0,S
+#RPTFG2=A,1,S
+! C(3,#RPTFG2,0,$,S)
+C(4,#NTXBUF5,E(0,1),E(0,2))
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2060 ----------
+<sub type="FORM" name="L2060">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2060,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2060] 聯貸案訂約明細資料)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#SPC10=X,10,S
+
+#ZRO07=A,7,S
+
+#DASH=X,1,S
+T(3,-)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+
+#OOSyndNo=A,6,S
+
+
+
+#OOLeadingBank=A,7,O
+
+#OOSigningDate=D,7,O
+
+
+#OOCurrencyCode=X,3,O
+
+#Precision=N,1,S
+E(0,0)T(H,#OOCurrencyCode,#CurrPrecisionHelp)
+ 
+#OOSyndAmt=m,14.2,S
+
+#OOSyndAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOSyndAmt,#OOSyndAmtX)
+P(R,#OOSyndAmtX)
+
+#OOPartAmt=m,14.2,S
+
+#OOPartAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OOPartAmt,#OOPartAmtX)
+P(R,#OOPartAmtX)
+
+#OOSyndTypeCode=X,1,L
+#OOSyndTypeCodeX=X,10,L
+T(3,)
+T(H,#OOSyndTypeCode,#SyndTypeCodeHelp)
+
+
+
+!修改
+#OOBUF1=X,100,S
+T(2,2+#OOSyndNo)
+
+#OOBTN1=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2600; ntxbuf=#OOBUF1})
+
+!複製
+#OOBUF2=X,100,S
+T(2,3+#OOSyndNo)
+
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2600; ntxbuf=#OOBUF2})
+
+!刪除
+#OOBUF3=X,100,S
+T(2,4+#OOSyndNo)
+
+#OOBTN3=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2600; ntxbuf=#OOBUF3})
+
+!查詢
+#OOBUF4=X,100,S
+T(2,5+#OOSyndNo)
+
+#OOBTN4=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2600; ntxbuf=#OOBUF4})
+
+!補收費用
+#OOBUF5=X,100,S
+! T(2,#OOCustNo+#OOSyndNo)
+
+#OOBTN5=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L3230; ntxbuf=#OOBUF5})
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+
+#SyndNoSt#SyndNoEnd
+#LeadingBank
+#SigningDateStart#SigningDateEnd
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L2060
+#OOSyndNo#OOLeadingBank#OOSigningDate#OOCurrencyCode#OOSyndAmt#OOPartAmt#OOSyndTypeCode
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+<sub type="PART" name="L2060" layout="cols=1;screen.width=[130,880];printer.width=[15,30,15,30];">
+[
+["[L2060]                                 聯貸案訂約明細資料查詢"],
+[""],
+!["@借戶戶號",#OCustNo,#OCustNoX],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG2=1,QUERY.GRID,L2060
+#any={detail:true, header:'L2060.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN1=修改
+{width:50,search:false,formatter:'cust:bind-button:修改;L2600 聯貸案訂約登錄',align:'center',canExport:false}
+
+#OOBTN2=複製
+{width:50,search:false,formatter:'cust:bind-button:複製;L2600 聯貸案訂約登錄',align:'center',canExport:false}
+
+#OOBTN3=刪除
+{width:50,search:false,formatter:'cust:bind-button:刪除;L2600 聯貸案訂約登錄',align:'center',canExport:false}
+
+#OOBTN4=查詢
+{width:50,search:false,formatter:'cust:bind-button:查詢;L2600 聯貸案訂約登錄',align:'center',canExport:false}
+
+
+#OOSyndNo=聯貸編號 
+{width:85,align:'center'}
+
+#OOLeadingBank=主辦行 
+{width:85,align:'center'}
+
+#OOSigningDate=簽約日
+{width:85,align:'center'}
+
+#OOCurrencyCode=幣別 
+{width:50,align:'center'}
+ 
+#OOSyndAmtX=聯貸總金額
+{width:170}
+
+#OOPartAmtX=參貸金額
+{width:170}
+
+#OOSyndTypeCodeX=國內或國際聯貸
+{width:170}
+
+#OOSyndNo=
+{width:1,hidden:true}
+
+^
+
+#RPTFG2=2,QUERY.GRID,L2060
+#any={detail:true, header:'L2060.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOSyndNo=聯貸編號 
+{width:85,align:'center'}
+
+#OOLeadingBank=主辦行 
+{width:85,align:'center'}
+
+#OOSigningDate=簽約日
+{width:85,align:'center'}
+
+#OOCurrencyCode=幣別 
+{width:50,align:'center'}
+ 
+#OOSyndAmtX=聯貸總金額
+{width:150}
+
+#OOPartAmtX=參貸金額
+{width:150}
+
+#OOSyndTypeCodeX=國內或國際聯貸
+{width:170}
+
+
+#OOSyndNo=
+{width:1,hidden:true}
+
+^
+<include src="PRT.icf::INQ01.sel" map="i=L2060;cpi=15"/>
+%
+#OOSyndNo#OOLeadingBank#OOSigningDate#OOCurrencyCode
+#OOSyndAmtX#OOPartAmtX
+@^
+</sub>

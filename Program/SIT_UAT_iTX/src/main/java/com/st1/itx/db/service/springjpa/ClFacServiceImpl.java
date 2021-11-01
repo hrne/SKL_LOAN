@@ -90,7 +90,7 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "ApproveNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "ClCode1", "ClCode2", "ClNo", "ApproveNo"));
     this.info("findAll " + dbName);
@@ -406,6 +406,34 @@ em = null;
       clFacT = clFacRepos.findTopByCustNoIsAndFacmNoIsAndMainFlagIsOrderByClCode1AscClCode2AscClNoAscApproveNoAsc(custNo_0, facmNo_1, mainFlag_2);
 
     return clFacT.isPresent() ? clFacT.get() : null;
+  }
+
+  @Override
+  public Slice<ClFac> selectForL5064(int clCode1_0, int clCode2_1, int clNo_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<ClFac> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("selectForL5064 " + dbName + " : " + "clCode1_0 : " + clCode1_0 + " clCode2_1 : " +  clCode2_1 + " clNo_2 : " +  clNo_2 + " custNo_3 : " +  custNo_3 + " facmNo_4 : " +  facmNo_4);
+    if (dbName.equals(ContentName.onDay))
+      slice = clFacReposDay.findAllByClCode1IsAndClCode2IsAndClNoIsAndCustNoIsAndFacmNoIs(clCode1_0, clCode2_1, clNo_2, custNo_3, facmNo_4, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = clFacReposMon.findAllByClCode1IsAndClCode2IsAndClNoIsAndCustNoIsAndFacmNoIs(clCode1_0, clCode2_1, clNo_2, custNo_3, facmNo_4, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = clFacReposHist.findAllByClCode1IsAndClCode2IsAndClNoIsAndCustNoIsAndFacmNoIs(clCode1_0, clCode2_1, clNo_2, custNo_3, facmNo_4, pageable);
+    else 
+      slice = clFacRepos.findAllByClCode1IsAndClCode2IsAndClNoIsAndCustNoIsAndFacmNoIs(clCode1_0, clCode2_1, clNo_2, custNo_3, facmNo_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override

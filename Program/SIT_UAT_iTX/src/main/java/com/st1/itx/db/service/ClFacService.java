@@ -185,6 +185,21 @@ public interface ClFacService {
   public ClFac mainClNoFirst(int custNo_0, int facmNo_1, String mainFlag_2, TitaVo... titaVo);
 
   /**
+   * ClCode1 = ,AND ClCode2 = ,AND ClNo =,AND CustNo = ,AND FacmNo = 
+   *
+   * @param clCode1_0 clCode1_0
+   * @param clCode2_1 clCode2_1
+   * @param clNo_2 clNo_2
+   * @param custNo_3 custNo_3
+   * @param facmNo_4 facmNo_4
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice ClFac ClFac of List
+   */
+  public Slice<ClFac> selectForL5064(int clCode1_0, int clCode2_1, int clNo_2, int custNo_3, int facmNo_4, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By ClFac
    * 
    * @param clFacId key

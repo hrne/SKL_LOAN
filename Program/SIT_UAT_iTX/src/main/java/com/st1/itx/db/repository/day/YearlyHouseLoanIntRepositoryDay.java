@@ -31,6 +31,9 @@ public interface YearlyHouseLoanIntRepositoryDay extends JpaRepository<YearlyHou
   // YearMonth= ,AND CustNo=
   public Slice<YearlyHouseLoanInt> findAllByYearMonthIsAndCustNoIsOrderByYearMonthAscCustNoAscFacmNoAsc(int yearMonth_0, int custNo_1, Pageable pageable);
 
+  // YearMonth>= , AND YearMonth<=
+  public Slice<YearlyHouseLoanInt> findAllByYearMonthGreaterThanEqualAndYearMonthLessThanEqualOrderByYearMonthAsc(int yearMonth_0, int yearMonth_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

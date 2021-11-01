@@ -1,4 +1,5 @@
 OIncludeIntFlag=X,1
 OUnpaidIntFlag=X,1
 OBookAmt=9,14.2
+OPayMethod=X,1
 OBookStatus=9,1

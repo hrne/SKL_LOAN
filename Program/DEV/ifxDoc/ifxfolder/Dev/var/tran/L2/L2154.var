@@ -425,7 +425,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 ["[L2154]                                 額度資料維護"],
 [#<->#,"#FdACTFG+登放記號",#ACTFGX],
 [#<->#,"#FdFuncCode+功能",#FuncCode,#FuncCodeX],
-[#<->#,"#FdCustNo+借款人戶號",#CustNo,#BTN1],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,#BTN1],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdApplNo+核准號碼",#ApplNo],
 [#<->#,"#FdCustId+統一編號",#CustId,#CustIdX],
@@ -878,7 +878,7 @@ K(LIGHT,#FdPayIntFreq,TXTRED,0)
 K(LIGHT,#FdCustTypeCode,TXTRED,0)
 K(LIGHT,#FdApplAmt,TXTRED,0)
 
-![借款人戶號]
+![借戶戶號]
 !必須輸入
 #FdCustNo=X,2,L
 IF(#FKEY==0 || #FKEY==7,$,s)

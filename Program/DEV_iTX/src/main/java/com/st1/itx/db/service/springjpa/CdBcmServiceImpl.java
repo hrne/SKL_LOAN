@@ -244,13 +244,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findUnitManager " + dbName + " : " + "unitManager_0 : " + unitManager_0);
     if (dbName.equals(ContentName.onDay))
-      slice = cdBcmReposDay.findAllByUnitManagerIs(unitManager_0, pageable);
+      slice = cdBcmReposDay.findAllByUnitManagerLikeOrderByUnitManagerAsc(unitManager_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdBcmReposMon.findAllByUnitManagerIs(unitManager_0, pageable);
+      slice = cdBcmReposMon.findAllByUnitManagerLikeOrderByUnitManagerAsc(unitManager_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdBcmReposHist.findAllByUnitManagerIs(unitManager_0, pageable);
+      slice = cdBcmReposHist.findAllByUnitManagerLikeOrderByUnitManagerAsc(unitManager_0, pageable);
     else 
-      slice = cdBcmRepos.findAllByUnitManagerIs(unitManager_0, pageable);
+      slice = cdBcmRepos.findAllByUnitManagerLikeOrderByUnitManagerAsc(unitManager_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -272,13 +272,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findDeptManager " + dbName + " : " + "deptManager_0 : " + deptManager_0);
     if (dbName.equals(ContentName.onDay))
-      slice = cdBcmReposDay.findAllByDeptManagerIs(deptManager_0, pageable);
+      slice = cdBcmReposDay.findAllByDeptManagerLikeOrderByDeptManagerAsc(deptManager_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdBcmReposMon.findAllByDeptManagerIs(deptManager_0, pageable);
+      slice = cdBcmReposMon.findAllByDeptManagerLikeOrderByDeptManagerAsc(deptManager_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdBcmReposHist.findAllByDeptManagerIs(deptManager_0, pageable);
+      slice = cdBcmReposHist.findAllByDeptManagerLikeOrderByDeptManagerAsc(deptManager_0, pageable);
     else 
-      slice = cdBcmRepos.findAllByDeptManagerIs(deptManager_0, pageable);
+      slice = cdBcmRepos.findAllByDeptManagerLikeOrderByDeptManagerAsc(deptManager_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -300,13 +300,97 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findDistManager " + dbName + " : " + "distManager_0 : " + distManager_0);
     if (dbName.equals(ContentName.onDay))
-      slice = cdBcmReposDay.findAllByDistManagerIs(distManager_0, pageable);
+      slice = cdBcmReposDay.findAllByDistManagerLikeOrderByDistManagerAsc(distManager_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdBcmReposMon.findAllByDistManagerIs(distManager_0, pageable);
+      slice = cdBcmReposMon.findAllByDistManagerLikeOrderByDistManagerAsc(distManager_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdBcmReposHist.findAllByDistManagerIs(distManager_0, pageable);
+      slice = cdBcmReposHist.findAllByDistManagerLikeOrderByDistManagerAsc(distManager_0, pageable);
     else 
-      slice = cdBcmRepos.findAllByDistManagerIs(distManager_0, pageable);
+      slice = cdBcmRepos.findAllByDistManagerLikeOrderByDistManagerAsc(distManager_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<CdBcm> findDeptCode1(String deptCode_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdBcm> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findDeptCode1 " + dbName + " : " + "deptCode_0 : " + deptCode_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdBcmReposDay.findAllByDeptCodeLikeOrderByDeptCodeAsc(deptCode_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdBcmReposMon.findAllByDeptCodeLikeOrderByDeptCodeAsc(deptCode_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdBcmReposHist.findAllByDeptCodeLikeOrderByDeptCodeAsc(deptCode_0, pageable);
+    else 
+      slice = cdBcmRepos.findAllByDeptCodeLikeOrderByDeptCodeAsc(deptCode_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<CdBcm> findDistCode1(String distCode_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdBcm> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findDistCode1 " + dbName + " : " + "distCode_0 : " + distCode_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdBcmReposDay.findAllByDistCodeLikeOrderByDistCodeAsc(distCode_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdBcmReposMon.findAllByDistCodeLikeOrderByDistCodeAsc(distCode_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdBcmReposHist.findAllByDistCodeLikeOrderByDistCodeAsc(distCode_0, pageable);
+    else 
+      slice = cdBcmRepos.findAllByDistCodeLikeOrderByDistCodeAsc(distCode_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<CdBcm> findUnitCode1(String unitCode_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<CdBcm> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findUnitCode1 " + dbName + " : " + "unitCode_0 : " + unitCode_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = cdBcmReposDay.findAllByUnitCodeLikeOrderByUnitCodeAsc(unitCode_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = cdBcmReposMon.findAllByUnitCodeLikeOrderByUnitCodeAsc(unitCode_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = cdBcmReposHist.findAllByUnitCodeLikeOrderByUnitCodeAsc(unitCode_0, pageable);
+    else 
+      slice = cdBcmRepos.findAllByUnitCodeLikeOrderByUnitCodeAsc(unitCode_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

@@ -45,7 +45,7 @@ E(0,0)
 ["[L2703]                                 結清客戶申請個人資料控管維護"],
 ["#FdFunCdX+功能",#FunCdX],
 ["#FdCustId+客戶統一編號",#CustId,#BTN1],
-["#FdCustNo+借款人戶號",#CustNo],
+["#FdCustNo+借戶戶號",#CustNo],
 ["#FdCustName+戶名",#CustName],
 ["#FdCreateEmpNo+建立者",#CreateEmpNo,#CreateEmpName],
 ["#FdCreateDate+建立時間",#CreateDate,#CreateTime],
@@ -161,7 +161,7 @@ T(2,@CreateTime,#L2r31CreateTime)
 
 
 
-!借款人戶號
+!借戶戶號
 #CustNo=A,7,L
 
 !戶名
@@ -277,7 +277,7 @@ TXFORM=L2703
 ["[L2703]                                 結清客戶申請個人資料控管維護"],
 [#<->#,"@案件編號"],
 [#<->#,"@統一編號"],
-["@借款人戶號"],
+["@借戶戶號"],
 ["@核准編號"],
 ]
 </sub>

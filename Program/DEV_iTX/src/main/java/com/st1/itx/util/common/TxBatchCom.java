@@ -42,7 +42,6 @@ import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.TxErrCodeService;
 import com.st1.itx.db.service.TxRecordService;
-import com.st1.itx.main.ApControl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.common.data.BaTxVo;
