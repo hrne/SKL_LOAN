@@ -67,6 +67,9 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		this.info("   IntEndDate = " + iIntEndDate);
 		this.info("   IntEndCode = " + iIntEndCode);
 		this.info("   EntryDate  = " + iEntryDate);
+		this.info("   PrevPayIntDate  = " + t.getPrevPayIntDate());
+		int prevPayIntDate = t.getPrevPayIntDate() == 0 ? t.getDrawdownDate() : t.getPrevPayIntDate();
+		this.info("   prevPayIntDate = " + prevPayIntDate);
 
 		// 查詢額度檔
 		FacMain tFacMain = new FacMain();
@@ -106,18 +109,18 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setRepayFreq(t.getRepayFreq() == 0 ? 99 : t.getRepayFreq()); // 還本週期
 		loanCalcRepayIntCom.setTerms(iRepayTerms); // 本次繳息期數
 		loanCalcRepayIntCom.setPaidTerms(t.getPaidTerms()); // 已繳息期數
-		loanCalcRepayIntCom.setIntStartDate(t.getPrevPayIntDate() == 0 ? t.getDrawdownDate() : t.getPrevPayIntDate()); // 計算起日
+		loanCalcRepayIntCom.setIntStartDate(prevPayIntDate); // 計算起日
 		loanCalcRepayIntCom.setIntEndCode(iIntEndCode); // 計算止日代碼 0.無計算止日 1.至計算止日
 		// 計算止日小於上次繳息日，則以上次繳息日為計算止日
-		loanCalcRepayIntCom.setIntEndDate(
-				(iIntEndCode == 1 && iIntEndDate < t.getPrevRepaidDate()) ? t.getPrevRepaidDate() : iIntEndDate); // 計算止日
+		loanCalcRepayIntCom
+				.setIntEndDate((iIntEndCode == 1 && iIntEndDate < prevPayIntDate) ? prevPayIntDate : iIntEndDate); // 計算止日
+
 		loanCalcRepayIntCom.setFirstDrawdownDate(tFacMain.getFirstDrawdownDate()); // 初貸日
 		loanCalcRepayIntCom.setDrawdownDate(t.getDrawdownDate()); // 貸放起日
 		loanCalcRepayIntCom.setMaturityDate(t.getMaturityDate()); // 貸放止日
 		loanCalcRepayIntCom.setBreachValidDate(iEntryDate); // 違約金生效日
 		loanCalcRepayIntCom.setPrevRepaidDate(t.getPrevRepaidDate() == 0 ? t.getDrawdownDate() : t.getPrevRepaidDate()); // 上次還本日
-		loanCalcRepayIntCom
-				.setPrevPaidIntDate(t.getPrevPayIntDate() == 0 ? t.getDrawdownDate() : t.getPrevPayIntDate()); // 上次繳息日
+		loanCalcRepayIntCom.setPrevPaidIntDate(prevPayIntDate); // 上次繳息日
 		// 下次繳息日,應繳息日,預定收息日； 最後一期依應繳日計算的下次繳息日重新設定為到期日
 		loanCalcRepayIntCom.setNextPayIntDate(
 				t.getNextPayIntDate() > t.getMaturityDate() ? t.getMaturityDate() : t.getNextPayIntDate());

@@ -1,0 +1,15 @@
+OOCustRelMainUKey=X,32
+OOUkey=X,32
+OOCustRelId=X,11
+OOCustRelName=X,35
+OORelTypeCode=X,1
+OORelId=X,11
+OORelName=X,35
+OORelationCode=9,2
+OORemark=X,50
+OOStatus=9,1
+OONote=X,500
+OOCreateDate=X,30
+OOLastUpdate=X,30
+OOLastUpdateEmpNo=X,6
+OOLastUpdateEmpNoX=X,50

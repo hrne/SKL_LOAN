@@ -26,7 +26,7 @@ public class CustDataCtrl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7646536861646528397L;
+	private static final long serialVersionUID = 1L;
 
 // 借款人戶號
   @Id
@@ -41,6 +41,15 @@ public class CustDataCtrl implements Serializable {
   /* Y:是N:否 */
   @Column(name = "`Enable`", length = 1)
   private String enable;
+
+  // 申請記號
+  /* 0:客戶申請1:滿五年自動寫入2:解除 */
+  @Column(name = "`ApplMark`")
+  private int applMark = 0;
+
+  // 解除原因
+  @Column(name = "`Reason`", length = 50)
+  private String reason;
 
   // 建檔日期時間
   @CreatedDate
@@ -118,6 +127,48 @@ N:否
 	*/
   public void setEnable(String enable) {
     this.enable = enable;
+  }
+
+/**
+	* 申請記號<br>
+	* 0:客戶申請
+1:滿五年自動寫入
+2:解除
+	* @return Integer
+	*/
+  public int getApplMark() {
+    return this.applMark;
+  }
+
+/**
+	* 申請記號<br>
+	* 0:客戶申請
+1:滿五年自動寫入
+2:解除
+  *
+  * @param applMark 申請記號
+	*/
+  public void setApplMark(int applMark) {
+    this.applMark = applMark;
+  }
+
+/**
+	* 解除原因<br>
+	* 
+	* @return String
+	*/
+  public String getReason() {
+    return this.reason == null ? "" : this.reason;
+  }
+
+/**
+	* 解除原因<br>
+	* 
+  *
+  * @param reason 解除原因
+	*/
+  public void setReason(String reason) {
+    this.reason = reason;
   }
 
 /**
@@ -199,7 +250,7 @@ N:否
 
   @Override
   public String toString() {
-    return "CustDataCtrl [custNo=" + custNo + ", custUKey=" + custUKey + ", enable=" + enable + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "CustDataCtrl [custNo=" + custNo + ", custUKey=" + custUKey + ", enable=" + enable + ", applMark=" + applMark + ", reason=" + reason + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

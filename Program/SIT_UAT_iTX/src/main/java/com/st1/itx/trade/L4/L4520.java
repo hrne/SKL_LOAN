@@ -61,6 +61,9 @@ public class L4520 extends TradeBuffer {
 	public L4520Report l4520Report;
 
 	@Autowired
+	public L4520Report2 l4520Report2;
+	
+	@Autowired
 	public L4520Report3 l4520Report3;
 	
 	int succCnt = 0;
@@ -85,7 +88,7 @@ public class L4520 extends TradeBuffer {
 		l4520Report.exec(titaVo);
 		
 		//產生員工扣薪總傳票明細表
-		
+		l4520Report2.exec(titaVo);
 		
 		//產生火險費沖銷明細表(員工扣薪)
 		long sno = l4520Report3.exec(titaVo);

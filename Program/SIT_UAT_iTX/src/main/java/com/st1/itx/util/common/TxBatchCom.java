@@ -27,8 +27,6 @@ import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.domain.EmpDeductDtl;
 import com.st1.itx.db.domain.FacClose;
-import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.domain.TxErrCode;
 import com.st1.itx.db.domain.TxRecord;
@@ -422,6 +420,10 @@ public class TxBatchCom extends TradeBuffer {
 		if ("0".equals(this.procStsCode) && tDetail.getRepayType() == 3) {
 			facCloseRepayType(tDetail, titaVo);
 		}
+		// --------------- 部分償還作業設定 ------------------
+		if ("0".equals(this.procStsCode) && tDetail.getRepayType() == 2) {
+			loanBookRepayType(tDetail, titaVo);
+		}
 
 		// ------------- 執行應繳試算，依結果重設還款類別，再依還款類別進行檢核 ----------------------
 		if ("0".equals(this.procStsCode)) {
@@ -799,9 +801,7 @@ public class TxBatchCom extends TradeBuffer {
 			l3200TitaVo.putParam("UsExtraRepay", tBatxDetail.getRepayAmt());
 			l3200TitaVo.putParam("IncludeIntFlag", this.tTempVo.getParam("IncludeIntFlag")); // 是否內含利息
 			l3200TitaVo.putParam("UnpaidIntFlag", this.tTempVo.getParam("UnpaidIntFlag")); // 利息是否可欠繳
-			// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
-			// FacMain ExtraRepayCode 攤還額異動碼 0:不變 1:變
-			l3200TitaVo.putParam("PayMethod", this.tTempVo.getParam("PayMethod"));
+			l3200TitaVo.putParam("PayMethod", this.tTempVo.getParam("PayMethod"));// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
 			if ("".equals(this.tTempVo.getParam("CloseBreachAmt"))) {
 				l3200TitaVo.putParam("TimExtraCloseBreachAmt", "0");
 			} else {
@@ -878,7 +878,6 @@ public class TxBatchCom extends TradeBuffer {
 		BatxHeadId tBatxHeadId = new BatxHeadId();
 		tBatxHeadId.setAcDate(this.txBuffer.getTxCom().getTbsdyf());
 		tBatxHeadId.setBatchNo(batchNo);
-
 		int acDate = 0;
 		// 存入暫收可抵繳金額
 		BigDecimal disacctAmt = BigDecimal.ZERO;
@@ -893,8 +892,9 @@ public class TxBatchCom extends TradeBuffer {
 		this.tTempVo = this.tTempVo.getVo(tDetail.getProcNote());
 		this.tTempVo.putParam("Txcd", titaVo.getTxcd());
 		this.tTempVo.putParam("ErrorMsg", "");
-		int unfinishCnt = 0;
-
+		int unfinishCnt = 0; 
+		// 是否執行BS401，非整批入帳且全部入帳完畢執行BS401
+        boolean isBS401 = false;
 		if (this.txBuffer.getTxCom().getTxRsut() == 0) { // 交易成功
 			if (titaVo.isHcodeNormal()) { // 正常交易
 				if (this.txBuffer.getAcDetailList() != null && this.txBuffer.getAcDetailList().size() > 0) {
@@ -987,11 +987,11 @@ public class TxBatchCom extends TradeBuffer {
 				throw new LogicException(titaVo, "E0007", "update BatxHead " + tBatxHead + e.getErrorMsg());
 			}
 
-			// 啟動背景作業－整批入帳完成
-			if (tBatxHead.getUnfinishCnt() == 0) {
+			// 啟動背景作業－整批入帳完成(非整批入帳)
+			if (tBatxHead.getUnfinishCnt() == 0 && ! "6".equals(tDetail.getProcStsCode())) {
 				TitaVo bs401TitaVo = new TitaVo();
 				bs401TitaVo = (TitaVo) titaVo.clone();
-				bs401TitaVo.putParam("FunctionCode", "0");// 處理代碼 0:入帳
+				bs401TitaVo.putParam("FunctionCode", "3");// 處理代碼 3.檢核
 				bs401TitaVo.putParam("AcDate", tBatxHead.getAcDate() - 19110000); // 會計日期
 				bs401TitaVo.putParam("BatchNo", tBatxHead.getBatchNo());// 批號
 				MySpring.newTask("BS401", this.txBuffer, bs401TitaVo);
@@ -1150,18 +1150,10 @@ public class TxBatchCom extends TradeBuffer {
 			}
 
 			// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
-			// FacMain ExtraRepayCode 攤還額異動碼 0:不變 1:變
-			this.payMethod = "2";
-			FacMainId tFacmainId = new FacMainId();
-			tFacmainId.setCustNo(tBatxDetail.getCustNo());
-			tFacmainId.setFacmNo(this.repayFacmNo);
-			FacMain tFacMain = facMainService.findById(tFacmainId, titaVo);
-			if ("1".equals(tFacMain.getExtraRepayCode())) {
-				this.payMethod = "1";
-			}
 			if ("1".equals(this.payMethod)) {
 				this.checkMsg = "減少每期攤還金額 ";
-			} else {
+			}
+			if ("2".equals(this.payMethod)) {
 				this.checkMsg = "縮短應繳期數";
 			}
 			// 檢核正常
@@ -1305,15 +1297,17 @@ public class TxBatchCom extends TradeBuffer {
 		if (this.unOpenfireFee.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 未到期火險費用:" + this.unOpenfireFee;
 
-		// 短繳、暫收抵繳
+		// 暫收抵繳
+		if (this.tmpAmt.compareTo(BigDecimal.ZERO) > 0) {
+			this.checkMsg = this.checkMsg + ", 暫收抵繳:" + this.tmpAmt;
+		}
+
+		// 暫收可抵繳
 		if (this.shortAmt.compareTo(BigDecimal.ZERO) > 0) {
 			if (this.tavAmt.compareTo(BigDecimal.ZERO) > 0)
 				this.checkMsg = this.checkMsg + ", 暫收可抵繳:" + this.tavAmt;
 			if (this.otrTavAmt.compareTo(BigDecimal.ZERO) > 0)
 				this.checkMsg = this.checkMsg + ", 其他額度暫收可抵繳:" + this.otrTavAmt;
-		} else {
-			if (this.tmpAmt.compareTo(BigDecimal.ZERO) > 0)
-				this.checkMsg = this.checkMsg + ", 暫收抵繳:" + this.tmpAmt;
 		}
 	}
 
@@ -1568,6 +1562,7 @@ public class TxBatchCom extends TradeBuffer {
 		if (this.repayType == 2) {
 			this.includeIntFlag = baTxCom.getIncludeIntFlag();// 是否內含利息
 			this.unpaidIntFlag = baTxCom.getUnpaidIntFlag();// 利息是否可欠繳
+			this.payMethod = baTxCom.getPayMethod();// 繳納方式 1.減少每期攤還金額 2.縮短應繳期數
 		}
 
 		// 結案記號判斷

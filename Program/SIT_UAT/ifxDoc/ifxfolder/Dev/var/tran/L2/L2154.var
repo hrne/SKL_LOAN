@@ -954,7 +954,8 @@ S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#Rim
 R(1,L2R05)
 
 #SendL2r02=X,1,S
-IF(#FKEY==0 || #FKEY==7,$,s)
+! C(3,#FKEY,7,S,$)
+IF(#FKEY==0,$,s)
 E(0,@RimFuncCode,5)
 T(2,@RimCustId,#L2r05CustId)
 E(0,@RimApplNo,#L2r05ApplNo)
@@ -1003,7 +1004,6 @@ T(2,@PieceCode,#L2r05PieceCode)
 E(0,@RateAdjNoticeCode,#L2r05RateAdjNoticeCode)
 E(0,@RepayCode,#L2r05RepayCode)
 E(0,@OldRepayCode,#L2r05RepayCode)
-E(0,@beforeRepaycode,#L2r05RepayCode)
 T(2,@RepayBank,#L2r05RepayBank)
 E(0,@OldRepayBank,#L2r05RepayBank)
 E(0,@RepayAcctNo,#L2r05RepayAcctNo)
@@ -2537,14 +2537,12 @@ T(H,@RelationGenderX,#RelationGender,#SexHelp)
 ![繳款方式]
 !修改時自動顯示可修改,其他自動顯示不必須輸入
 #FdRepayCode=X,2,L
-#beforeRepaycode=A,2,S
 #RepayCode=A,2,I
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
-E(0,#beforeRepaycode)
-E(0,@beforeRepaycode,#RepayCode)
 HELP(#RepayCodeHelp)
-@V(H,#RepayCodeHelp)
+@
+V(H,#RepayCodeHelp)
 !@V(2,0)V(E,0,L3DEF,RepayCodeDef)
 
 #RepayCodeX=X,16,L
@@ -2574,8 +2572,7 @@ S(L2R44,1,#RimCustNo,#RimFacmNo,#RimFunCode)
 R(1,L2R44)
 
 #CHECKL2R44=X,1,S
-IF(#FKEY==0 || #FKEY==7,$,s)
-E(0,@beforeRepaycode,#RepayCode)
+IF(#FKEY==0,$,s)
 C(3,#RepayCode,2,$,S)
 T(2,@RepayBank,#L2r44RepayBank)
 E(0,@OldRepayBank,#L2r44RepayBank)
@@ -2768,7 +2765,6 @@ E(0,1)
 C(3,#RepayCode,02,$,S)
 C(3,#UpdateCode,0,S,$)
 C(3,#CheckFlag,1,S,$)
-C(3,#BeforeAcctCheckFlag,8,S,$)
 C(3,#AcctCheckFlag,1,$,V(P,此帳號未授權，請至L4042／L4043新增授權資料))
 
 

@@ -49,16 +49,16 @@ E(0,0)
 ["#FdCustName+戶名",#CustName],
 ["#FdCreateEmpNo+建立者",#CreateEmpNo,#CreateEmpName],
 ["#FdCreateDate+建立時間",#CreateDate,#CreateTime],
+["#FdReason+解除原因",#Reason],
 ]
 
 #FdFunCdX=X,2,L
 #FdCustId=X,2,L
-T(3,*)
 #FdCustNo=X,2,L
 #FdCustName=X,2,L
 #FdCreateEmpNo=X,2,L
 #FdCreateDate=X,2,L
-
+#FdReason=X,2,L
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -96,30 +96,31 @@ T(1,@CustId,#NTXBUF,2,10),$)
 #FunCd=A,1,S
 C(3,#CHAIN,1,s,$)
 CALL(#HideAll)
-HELP(1: 新增;4: 刪除;5: 查詢)
-@V(1,1,4,5)
+HELP(1: 新增;2: 解除;4: 刪除;5: 查詢)
+@V(1,1,2,4,5)
 E(0,@FUNCIND,#FunCd)
 
 #FunCdX=X,4,L
 C(4,#FunCd,S,$)
 C(2,#FunCd,T(3,),
            T(3,新增),
-           T(3,),
+           T(3,解除),
            T(3,),
            T(3,刪除),
            T(3,查詢),
            )
-C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,解除),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
 
 
 #ShowFd=X,1,S
-C(2,#FunCd,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
+C(2,#FunCd,T(3, ),T(3,*),T(3,　),T(3,*),T(3, ),T(3, ))
 T(2,@FdCustId,#ShowFd)
 
-!刪除、查詢關闢框線
+!解除、刪除、查詢關闢框線
 #WKTF=X,1,S
-IF(#FunCd==4 || #FunCd==5,HIDE(#BTN1)T(F,@CustNo,0)T(F,@CustId,0),$)
-
+IF(#FunCd==4 || #FunCd==5,HIDE(#BTN1)T(F,@CustId,0)T(F,@Reason,0),$)
+IF(#FunCd==2,HIDE(#BTN1)T(2,@FdReason,*)T(F,@CustId,0),$)
+IF(#FunCd==1,T(F,@Reason,0),$)
 
 #BUF1=X,31,S
 
@@ -131,7 +132,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustId<-
 
 !統一編號 (可以不存在於顧客檔)
 #CustId=X,10,I
-IF(#FunCd==4 || #FunCd==5,s,$)
+IF(#FunCd==2 ||#FunCd==4 || #FunCd==5,s,$)
 @V(7)A(ID_UNINO,0,#CustId)
 
 !RIM查顧客檔(取得戶號,戶名,建立者,建立時間)
@@ -154,6 +155,7 @@ R(1,L2R31)
 E(0,@CustNo,#L2r31CustNo)
 T(2,@CustName,#L2r31CustName)
 T(2,@CreateEmpNo,#L2r31CreateEmpNo)
+T(2,@Reason,#L2r31Reason)
 C(3,#FunCd,1,S,$)
 T(2,@CreateDate,#L2r31CreateDate)
 T(2,@CreateTime,#L2r31CreateTime)
@@ -200,6 +202,9 @@ T(2,@CreateEmpName,#L2r13FullName)
 
 #CreateTime=X,8,L
 
+#Reason=X,50,I
+IF(#FunCd==2,$,s)
+@V(7)
 
 #RPTFG=A,1,S
 
@@ -257,6 +262,7 @@ T(2,@CreateTime,#OCreateTime)
 #CustName
 #CreateEmpNo
 #CreateDate
+#Reason
 </sub>
 
 

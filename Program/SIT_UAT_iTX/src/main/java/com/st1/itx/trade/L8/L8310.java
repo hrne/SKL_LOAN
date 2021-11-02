@@ -130,24 +130,8 @@ public class L8310 extends TradeBuffer {
 				}
 				// 3 end
 
-				// 4 start第7欄案件進度填報2:最大債權金融機構接獲法院裁定書，則第9-14欄承審法院相關內容必須有值，不能空白，否則則予以剔退
-				if (iClaimStatus == 2 && (iCourtCode.trim().isEmpty() || iYear == 0 || iCourtDiv.trim().isEmpty()
-						|| iCourtCaseNo.trim().isEmpty() || iApprove.trim().isEmpty() || iClaimDate == 0)) {
-					if ("A".equals(iTranKey)) {
-						throw new LogicException("E0005", "案件進度填報2:最大債權金融機構接獲法院裁定書，則承審法院相關內容必須有值，不能空白.");
-					} else {
-						throw new LogicException("E0007", "案件進度填報2:最大債權金融機構接獲法院裁定書，則承審法院相關內容必須有值，不能空白.");
-					}
-				} // 4 end
-
-				// 5.1 start法院裁定日期需大於遞狀日期
-				if (iClaimDate <= iApplyDate) {
-					if ("A".equals(iTranKey)) {
-						throw new LogicException("E0005", "法院裁定日期需大於遞狀日期.");
-					} else {
-						throw new LogicException("E0007", "法院裁定日期需大於遞狀日期.");
-					}
-				} // 5.1 end
+				// 4 第7欄案件進度填報2:最大債權金融機構接獲法院裁定書，則第9-14欄承審法院相關內容必須有值，不能空白，否則則予以剔退--->前端檢核
+				// 5.1 法院裁定日期需大於遞狀日期--->前端檢核
 
 				// 5.2 start遞狀日期需大於或等於簽約日期
 				iJcicZ047 = sJcicZ047Service.findById(iJcicZ047Id, titaVo);

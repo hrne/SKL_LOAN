@@ -51,7 +51,7 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[130,370,150,350];printer.width=[15,35,15,35];order=1">
 [
 ["[L3731]                                    呆帳戶改呆帳結案戶"],
-[#<->#,"#FdCustNo+借款人戶號",#CustNo,"@@",#CustNoX],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@",#CustNoX],
 [#<->#,"#FdFacmNo+額度編號",#FacmNo],
 [#<->#,"#FdBormNo+撥款序號",#BormNo],
 [#<->#,"#FdSupervisor+核決主管",#Supervisor,#SupervisorX],
@@ -94,7 +94,7 @@ T(F,@FacmNo,0)
 T(F,@BormNo,0)
 T(3,@FdCustNo, )
 
-!借款人戶號
+!借戶戶號
 
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)

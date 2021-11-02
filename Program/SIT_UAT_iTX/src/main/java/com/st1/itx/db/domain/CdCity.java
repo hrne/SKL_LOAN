@@ -27,10 +27,10 @@ public class CdCity implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8929313936006139450L;
+	private static final long serialVersionUID = -3793268157174323481L;
 
 // 縣市代碼(地區別)
-  /* 3:基隆市5:台北市10:新北市15:桃園市17:新竹市20:新竹縣25:苗栗縣35:台中市40:彰化縣45:南投縣50:雲林縣54:嘉義市55:嘉義縣65:台南市70:高雄市80:屏東縣95:宜蘭縣90:花蓮縣85:台東縣97:澎湖縣 */
+  /* 03:基隆市05:台北市10:新北市15:桃園市17:新竹市20:新竹縣25:苗栗縣35:台中市40:彰化縣45:南投縣50:雲林縣54:嘉義市55:嘉義縣65:台南市70:高雄市80:屏東縣95:宜蘭縣90:花蓮縣85:台東縣97:澎湖縣 */
   @Id
   @Column(name = "`CityCode`", length = 2)
   private String cityCode = " ";
@@ -47,24 +47,51 @@ public class CdCity implements Serializable {
   @Column(name = "`AccCollPsn`", length = 6)
   private String accCollPsn;
 
+  // 催收人員電話-區碼
+  @Column(name = "`AccTelArea`", length = 5)
+  private String accTelArea;
+
+  // 催收人員電話
+  @Column(name = "`AccTelNo`", length = 10)
+  private String accTelNo;
+
+  // 催收人員電話-分機
+  @Column(name = "`AccTelExt`", length = 5)
+  private String accTelExt;
+
   // 法務人員
   @Column(name = "`LegalPsn`", length = 6)
   private String legalPsn;
 
+  // 法務人員電話-區碼
+  @Column(name = "`LegalArea`", length = 5)
+  private String legalArea;
+
+  // 法務人員電話
+  @Column(name = "`LegalNo`", length = 10)
+  private String legalNo;
+
+  // 法務人員電話-分機
+  @Column(name = "`LegalExt`", length = 5)
+  private String legalExt;
+
   // 利率加減碼
+  /* 刪除 */
   @Column(name = "`IntRateIncr`")
   private BigDecimal intRateIncr = new BigDecimal("0");
 
   // 利率上限
+  /* 刪除 */
   @Column(name = "`IntRateCeiling`")
   private BigDecimal intRateCeiling = new BigDecimal("0");
 
   // 利率下限
+  /* 刪除 */
   @Column(name = "`IntRateFloor`")
   private BigDecimal intRateFloor = new BigDecimal("0");
 
   // 聯徵用縣市代碼
-  /* C:基隆市A:台北市F:新北市H:桃園市O:新竹市J:新竹縣K:苗栗縣B:台中市N:彰化縣M:南投縣P:雲林縣I:嘉義市Q:嘉義縣D:台南市E:高雄市T:屏東縣V:台東縣U:花蓮縣G:宜蘭縣W:金門縣X:澎湖縣Z:連江縣 */
+  /* 刪除 */
   @Column(name = "`JcicCityCode`", length = 0)
   private String jcicCityCode;
 
@@ -89,8 +116,8 @@ public class CdCity implements Serializable {
 
 /**
 	* 縣市代碼(地區別)<br>
-	* 3:基隆市
-5:台北市
+	* 03:基隆市
+05:台北市
 10:新北市
 15:桃園市
 17:新竹市
@@ -117,8 +144,8 @@ public class CdCity implements Serializable {
 
 /**
 	* 縣市代碼(地區別)<br>
-	* 3:基隆市
-5:台北市
+	* 03:基隆市
+05:台北市
 10:新北市
 15:桃園市
 17:新竹市
@@ -202,6 +229,63 @@ public class CdCity implements Serializable {
   }
 
 /**
+	* 催收人員電話-區碼<br>
+	* 
+	* @return String
+	*/
+  public String getAccTelArea() {
+    return this.accTelArea == null ? "" : this.accTelArea;
+  }
+
+/**
+	* 催收人員電話-區碼<br>
+	* 
+  *
+  * @param accTelArea 催收人員電話-區碼
+	*/
+  public void setAccTelArea(String accTelArea) {
+    this.accTelArea = accTelArea;
+  }
+
+/**
+	* 催收人員電話<br>
+	* 
+	* @return String
+	*/
+  public String getAccTelNo() {
+    return this.accTelNo == null ? "" : this.accTelNo;
+  }
+
+/**
+	* 催收人員電話<br>
+	* 
+  *
+  * @param accTelNo 催收人員電話
+	*/
+  public void setAccTelNo(String accTelNo) {
+    this.accTelNo = accTelNo;
+  }
+
+/**
+	* 催收人員電話-分機<br>
+	* 
+	* @return String
+	*/
+  public String getAccTelExt() {
+    return this.accTelExt == null ? "" : this.accTelExt;
+  }
+
+/**
+	* 催收人員電話-分機<br>
+	* 
+  *
+  * @param accTelExt 催收人員電話-分機
+	*/
+  public void setAccTelExt(String accTelExt) {
+    this.accTelExt = accTelExt;
+  }
+
+/**
 	* 法務人員<br>
 	* 
 	* @return String
@@ -221,8 +305,65 @@ public class CdCity implements Serializable {
   }
 
 /**
-	* 利率加減碼<br>
+	* 法務人員電話-區碼<br>
 	* 
+	* @return String
+	*/
+  public String getLegalArea() {
+    return this.legalArea == null ? "" : this.legalArea;
+  }
+
+/**
+	* 法務人員電話-區碼<br>
+	* 
+  *
+  * @param legalArea 法務人員電話-區碼
+	*/
+  public void setLegalArea(String legalArea) {
+    this.legalArea = legalArea;
+  }
+
+/**
+	* 法務人員電話<br>
+	* 
+	* @return String
+	*/
+  public String getLegalNo() {
+    return this.legalNo == null ? "" : this.legalNo;
+  }
+
+/**
+	* 法務人員電話<br>
+	* 
+  *
+  * @param legalNo 法務人員電話
+	*/
+  public void setLegalNo(String legalNo) {
+    this.legalNo = legalNo;
+  }
+
+/**
+	* 法務人員電話-分機<br>
+	* 
+	* @return String
+	*/
+  public String getLegalExt() {
+    return this.legalExt == null ? "" : this.legalExt;
+  }
+
+/**
+	* 法務人員電話-分機<br>
+	* 
+  *
+  * @param legalExt 法務人員電話-分機
+	*/
+  public void setLegalExt(String legalExt) {
+    this.legalExt = legalExt;
+  }
+
+/**
+	* 利率加減碼<br>
+	* 刪除
 	* @return BigDecimal
 	*/
   public BigDecimal getIntRateIncr() {
@@ -231,7 +372,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率加減碼<br>
-	* 
+	* 刪除
   *
   * @param intRateIncr 利率加減碼
 	*/
@@ -241,7 +382,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率上限<br>
-	* 
+	* 刪除
 	* @return BigDecimal
 	*/
   public BigDecimal getIntRateCeiling() {
@@ -250,7 +391,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率上限<br>
-	* 
+	* 刪除
   *
   * @param intRateCeiling 利率上限
 	*/
@@ -260,7 +401,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率下限<br>
-	* 
+	* 刪除
 	* @return BigDecimal
 	*/
   public BigDecimal getIntRateFloor() {
@@ -269,7 +410,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 利率下限<br>
-	* 
+	* 刪除
   *
   * @param intRateFloor 利率下限
 	*/
@@ -279,28 +420,7 @@ public class CdCity implements Serializable {
 
 /**
 	* 聯徵用縣市代碼<br>
-	* C:基隆市
-A:台北市
-F:新北市
-H:桃園市
-O:新竹市
-J:新竹縣
-K:苗栗縣
-B:台中市
-N:彰化縣
-M:南投縣
-P:雲林縣
-I:嘉義市
-Q:嘉義縣
-D:台南市
-E:高雄市
-T:屏東縣
-V:台東縣
-U:花蓮縣
-G:宜蘭縣
-W:金門縣
-X:澎湖縣
-Z:連江縣
+	* 刪除
 	* @return String
 	*/
   public String getJcicCityCode() {
@@ -309,28 +429,7 @@ Z:連江縣
 
 /**
 	* 聯徵用縣市代碼<br>
-	* C:基隆市
-A:台北市
-F:新北市
-H:桃園市
-O:新竹市
-J:新竹縣
-K:苗栗縣
-B:台中市
-N:彰化縣
-M:南投縣
-P:雲林縣
-I:嘉義市
-Q:嘉義縣
-D:台南市
-E:高雄市
-T:屏東縣
-V:台東縣
-U:花蓮縣
-G:宜蘭縣
-W:金門縣
-X:澎湖縣
-Z:連江縣
+	* 刪除
   *
   * @param jcicCityCode 聯徵用縣市代碼
 	*/
@@ -417,7 +516,8 @@ Z:連江縣
 
   @Override
   public String toString() {
-    return "CdCity [cityCode=" + cityCode + ", cityItem=" + cityItem + ", unitCode=" + unitCode + ", accCollPsn=" + accCollPsn + ", legalPsn=" + legalPsn + ", intRateIncr=" + intRateIncr
+    return "CdCity [cityCode=" + cityCode + ", cityItem=" + cityItem + ", unitCode=" + unitCode + ", accCollPsn=" + accCollPsn + ", accTelArea=" + accTelArea + ", accTelNo=" + accTelNo
+           + ", accTelExt=" + accTelExt + ", legalPsn=" + legalPsn + ", legalArea=" + legalArea + ", legalNo=" + legalNo + ", legalExt=" + legalExt + ", intRateIncr=" + intRateIncr
            + ", intRateCeiling=" + intRateCeiling + ", intRateFloor=" + intRateFloor + ", jcicCityCode=" + jcicCityCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
            + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }

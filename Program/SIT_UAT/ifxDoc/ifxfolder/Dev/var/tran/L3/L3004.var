@@ -56,10 +56,10 @@ T(F,@BormNo,1)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,970];printer.width=[20,20];">
 [
 ["[L3004]                                 約定部分償還明細資料查詢"],
-["#FdMain+查詢條件","@(借款人戶號、統一編號、核准編號，擇一輸入)"],
-["#FdCustNo+借款人戶號",#CustNo,"@@@",#BTN1,#CustNoX],
-["#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
-["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
+["#FdMain+查詢條件","@(借戶戶號、統一編號、核准編號，擇一輸入)"],
+["#FdCustNo+．借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+["#FdCustId+．統一編號",#CustId,#BTN2,#CustIdX],
+["#FdApplNo+．核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 ["#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN4],
 ["#FdBormNo+撥款序號",#BormNo],
 ]
@@ -115,8 +115,8 @@ T(3,00000019999999000)
 #BIND1A=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
-![借款人戶號]
-!借款人戶號, 統一編號或核准編號擇一輸入
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
 #CustNo=A,7,I
@@ -470,8 +470,7 @@ TXFORM=L3004
 <sub type="PART" name="L3004" layout="cols=1;screen.width=[130,920];printer.width=[15,30,15,30];">
 [
 ["[L3004]                                 約定部分償還明細資料查詢"],
-[""],
-! ["@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX],
+["@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX],
 ]
 </sub>
 

@@ -113,8 +113,8 @@ public class L6704 extends TradeBuffer {
 		mCdCity.setCityCode(titaVo.getParam("CityCode"));
 		mCdCity.setCityItem(titaVo.getParam("CityItem"));
 		mCdCity.setUnitCode(titaVo.getParam("UnitCode"));
-		mCdCity.setAccCollPsn(titaVo.getParam("AccCollPsn"));
-		mCdCity.setLegalPsn(titaVo.getParam("LegalPsn"));
+//		mCdCity.setAccCollPsn(titaVo.getParam("AccCollPsn"));
+//		mCdCity.setLegalPsn(titaVo.getParam("LegalPsn"));
 //		mCdCity.setIntRateCeiling(this.parse.stringToBigDecimal(titaVo.getParam("IntRateCeiling")));
 //		mCdCity.setIntRateFloor(this.parse.stringToBigDecimal(titaVo.getParam("IntRateFloor")));
 

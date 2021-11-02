@@ -1,0 +1,215 @@
+----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L5062)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,280)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+!HIDE(#BTN1)
+
+#FirstIn=A,1,S
+E(0,1)
+
+#button=x,100,S
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[L5062]                                 法務催收人員查詢"],
+["#FdCityCode+地區別",#CityCode],
+]
+!---------- AP Button AREA ----------
+
+!---------- AP TEXT AREA Variables ----------
+
+#FdCityCode=X,2,L
+#FdRPTFG=X,2,L
+T(3,*)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#RPTFG=A,1,S
+E(0,0)
+
+
+!地區別
+#CityCode=A,2,I
+C(3,#CHAIN,1,T(1,#NTXBUF,1,2),$)
+C(3,#CHAIN,1,s,$)
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L5062 ----------
+<sub type="FORM" name="L5062">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L5062,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L5062] 地區別資料查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+! 地區別(TOTA)
+#OOCityCode=X,2,L
+
+! 地區別名稱(TOTA)
+#OOCityItem=X,20,L
+
+! 單位代號(TOTA)
+#OOUnitCode=X,6,L
+
+
+#OOAccCollPsn=X,6,L
+#OOAccTelArea=X,5,L
+#OOAccTelNo=X,10,L
+#OOAccTelExt=X,5,L
+#OOAccCollPsnX=X,100,L
+#OOLegalPsn=X,6,L
+#OOLegalArea=X,5,L
+#OOLegalNo=X,10,L
+#OOLegalExt=X,5,L
+#OOLegalPsnX=X,100,L
+
+#OOAccCollPsnCombine=X,150,L
+T(2,#OOAccCollPsn+ +#OOAccCollPsnX)
+
+#OOAccTelCombine=X,22,L
+T(2,#OOAccTelArea+ +#OOAccTelNo+ +#OOAccTelExt)
+
+#OOLegalPsnCombine=X,150,L
+T(2,#OOLegalPsn+ +#OOLegalPsnX)
+
+#OOLegalCombine=X,22,L
+T(2,#OOLegalArea+ +#OOLegalNo+ +#OOLegalExt)
+
+! 修改的按鈕
+#OOFunc2=A,1,S
+E(0,2)
+
+! 1+2+20+6+6+6
+! T(2,#OOFunc2+#OOCityCode+#OOCityItem+#OOUnitCode+#OOIntRateCeiling+#OOIntRateFloor)
+#OOBUF2=X,41,S
+T(2,#OOFunc2+#OOCityCode+#OOCityItem+#OOUnitCode)
+
+#OOBTN2=X,4,S
+C(3,#CHAIN,1,HIDE(#OOBTN2),SHOW(#OOBTN2))
+BIND(grid,{cmd=CHAIN;ntxcd=L6704;text=修改;ntxbuf=#OOBUF2})
+
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CityCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+! #OOIntRateCeiling
+! #OOIntRateFloor
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5062
+#OOCityCode
+#OOCityItem
+#OOUnitCode
+#OOAccCollPsn
+#OOAccTelArea
+#OOAccTelNo
+#OOAccTelExt
+#OOAccCollPsnX
+#OOLegalPsn
+#OOLegalArea
+#OOLegalNo
+#OOLegalExt
+#OOLegalPsnX
+^
+</sub>
+
+!--------- OUTPUT畫面 --------
+<sub type="PART" name="L5062" layout="cols=1;screen.width=[100,900];printer.width=[20,20];">
+[
+["[L5062]                                 法務催收人員查詢                                             "],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,L5062
+#any={detail:true, header:'L5062.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=修改
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
+
+#OOCityCode=地區別
+{width:60,align:'center'}
+
+#OOCityItem=地區別</br>名稱
+{width:80,align:'center'}
+
+#OOUnitCode=單位代號
+{width:70,align:'center'}
+
+#OOAccCollPsnCombine=催收人員
+{width:100,align:'center'}
+
+#OOAccTelCombine=催收人員電話
+{width:200,align:'center'}
+
+#OOLegalPsnCombine=法務人員
+{width:100,align:'center'}
+
+#OOLegalCombine=法務人員電話
+{width:200,align:'center'}
+^
+
+</sub>

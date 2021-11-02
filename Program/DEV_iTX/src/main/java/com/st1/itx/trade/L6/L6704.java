@@ -31,7 +31,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L6704 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6704.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -114,8 +113,8 @@ public class L6704 extends TradeBuffer {
 		mCdCity.setCityCode(titaVo.getParam("CityCode"));
 		mCdCity.setCityItem(titaVo.getParam("CityItem"));
 		mCdCity.setUnitCode(titaVo.getParam("UnitCode"));
-		mCdCity.setAccCollPsn(titaVo.getParam("AccCollPsn"));
-		mCdCity.setLegalPsn(titaVo.getParam("LegalPsn"));
+//		mCdCity.setAccCollPsn(titaVo.getParam("AccCollPsn"));
+//		mCdCity.setLegalPsn(titaVo.getParam("LegalPsn"));
 //		mCdCity.setIntRateCeiling(this.parse.stringToBigDecimal(titaVo.getParam("IntRateCeiling")));
 //		mCdCity.setIntRateFloor(this.parse.stringToBigDecimal(titaVo.getParam("IntRateFloor")));
 

@@ -143,6 +143,10 @@ C(2,#IdNo,S,T(2,#L2R47CustNo),T(2,#CustNo))
 #SCRTIL=_,_,S
 T(3,[L2073] 結清客戶申請個人資料控管查詢)
 
+!解除
+#FUNC2=A,1,S
+E(0,2)
+
 !刪除
 #FUNC4=A,1,S
 E(0,4)
@@ -186,6 +190,13 @@ T(1,#OOCreateTime,5,2)
 
 #OOFormatCreateTime=X,8,S
 T(2,#OOFormatHH+:+#OOFormatMM+:+#OOFormatSS)
+
+!解除
+#OOBUF2=X,142,S
+T(2,#FUNC2+#OOCustId)
+
+#OOBTN2=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2703; ntxbuf=#OOBUF2})
 
 !刪除
 #OOBUF4=X,142,S
@@ -243,6 +254,9 @@ TXFORM=L2073
 
 #RPTFG=0,QUERY.GRID,L2073
 #any={detail:true, header:'L2073.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN2=解除
+{width:50,search:false,formatter:'cust:bind-button:解除',align:'center',canExport:false}
 
 #OOBTN4=刪除
 {width:50,search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false}

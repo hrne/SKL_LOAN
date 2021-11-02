@@ -2936,6 +2936,7 @@ TXFORM=L2R30
 #L2r31CreateEmpNo=X,6,S
 #L2r31CreateDate=D,7,S
 #L2r31CreateTime=X,8,S
+#L2r31Reason=X,50,S
 </L2R31.dec>
 
 <L2R31.tom>
@@ -2945,6 +2946,7 @@ TXFORM=L2R31
 #L2r31CreateEmpNo
 #L2r31CreateDate
 #L2r31CreateTime
+#L2r31Reason
 ^
 </L2R31.tom>
 
@@ -6165,6 +6167,36 @@ TXFORM=L5R43
 #L5R43CourtItem
 ^
 </L5R43.tom>
+
+<L5R44.dec>
+#L5R44CityCodeX=X,50,S
+#L5R44AccCollPsn=X,6,S
+#L5R44AccCollPsnX=X,40,S
+#L5R44LegalPsn=X,6,S
+#L5R44LegalPsnX=X,40,S
+#L5R44AccTelArea=X,5,S
+#L5R44AccTelNo=X,10,S
+#L5R44AccTelExt=X,5,S
+#L5R44LegalArea=X,5,S
+#L5R44LegalNo=X,10,S
+#L5R44LegalExt=X,5,S
+</L5R44.dec>
+
+<L5R44.tom>
+TXFORM=L5R44
+#L5R44CityCodeX
+#L5R44AccCollPsn
+#L5R44AccCollPsnX
+#L5R44LegalPsn
+#L5R44LegalPsnX
+#L5R44AccTelArea
+#L5R44AccTelNo
+#L5R44AccTelExt
+#L5R44LegalArea
+#L5R44LegalNo
+#L5R44LegalExt
+^
+</L5R44.tom>
 
 <L6R03.dec>
 #L6r03Result=x,50000,S

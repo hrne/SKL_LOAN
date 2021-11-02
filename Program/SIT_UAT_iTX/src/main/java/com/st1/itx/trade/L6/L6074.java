@@ -78,8 +78,8 @@ public class L6074 extends TradeBuffer {
 			occursList.putParam("OOCityCode", tCdCity.getCityCode());
 			occursList.putParam("OOCityItem", tCdCity.getCityItem());
 			occursList.putParam("OOUnitCode", tCdCity.getUnitCode());
-			occursList.putParam("OOAccCollPsn", tCdCity.getAccCollPsn());
-			occursList.putParam("OOLegalPsn", tCdCity.getLegalPsn());
+//			occursList.putParam("OOAccCollPsn", tCdCity.getAccCollPsn());
+//			occursList.putParam("OOLegalPsn", tCdCity.getLegalPsn());
 //			occursList.putParam("OOIntRateCeiling", tCdCity.getIntRateCeiling());
 //			occursList.putParam("OOIntRateFloor", tCdCity.getIntRateFloor());
 			sCdEmp = sCdEmpService.findById(tCdCity.getAccCollPsn(), titaVo);

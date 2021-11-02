@@ -57,7 +57,7 @@ public class L2703 extends TradeBuffer {
 	public LoanBorMainService sLoanBorMainService;
 	@Autowired
 	public SendRsp sendRsp;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -76,6 +76,10 @@ public class L2703 extends TradeBuffer {
 		int iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		// 客戶統編
 		String iCustId = titaVo.getParam("CustId");
+		
+		
+		String iReason = titaVo.getParam("Reason");
+		
 		// new table
 		CustMain tCustMain = new CustMain();
 		CustDataCtrl tCustDataCtrl = new CustDataCtrl();
@@ -115,6 +119,7 @@ public class L2703 extends TradeBuffer {
 			tCustDataCtrl.setCustNo(custNo);
 			tCustDataCtrl.setCustUKey(custUKet);
 			tCustDataCtrl.setEnable("Y");
+			tCustDataCtrl.setApplMark(0);
 			tCustDataCtrl.setCreateEmpNo(titaVo.getParam("CreateEmpNo"));
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
 
@@ -125,6 +130,25 @@ public class L2703 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 			}
+			// 解除
+		} else if (iFunCd == 2) {
+			tCustDataCtrl = sCustDataCtrlService.holdById(custNo);
+			if (tCustDataCtrl == null) {
+				throw new LogicException(titaVo, "E0004", "L2703 該戶號" + custNo + "不存在於結清戶個資控管檔。");
+			}
+			
+			tCustDataCtrl.setApplMark(2);
+			tCustDataCtrl.setReason(iReason);
+			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
+			
+			/* UpdateDB */
+			try {
+				this.info("update");
+				tCustDataCtrl = sCustDataCtrlService.update(tCustDataCtrl);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+			
 			// 刪除
 		} else if (iFunCd == 4) {
 
@@ -169,7 +193,7 @@ public class L2703 extends TradeBuffer {
 		if (titaVo.getEmpNos().trim().isEmpty()) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 		}
-					
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

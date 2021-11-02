@@ -37,7 +37,6 @@ K(MODIFYBUTTON,查詢)
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
-T(3,@FdRptFg,*)
 
 </sub>
 
@@ -45,16 +44,13 @@ T(3,@FdRptFg,*)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L3911]                                 繳息情形查詢"],
-["#FdMain+查詢條件","@(借款人戶號、統一編號、核准編號，需擇一輸入)"],
-["#FdCustNo+借款人戶號",#CustNo,"@@@",#BTN1,#CustNoX],
-["#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
-["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
+["#FdMain+查詢條件","@(借戶戶號、統一編號、核准編號，需擇一輸入)"],
+["#FdCustNo+．借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+["#FdCustId+．統一編號",#CustId,#BTN2,#CustIdX],
+["#FdApplNo+．核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 ["#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN4],
 ["#FdBormNo+撥款序號",#BormNo],
 ["#FdEntryDate+入帳日期",#EntryStartDate,"@~",#EntryEndDate],
-["#FdRptFg+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
 ]
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -115,8 +111,8 @@ T(3,00000009999999000)
 #BIND1A=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
-![借款人戶號]
-!借款人戶號, 統一編號或核准編號擇一輸入
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
 #CustNo=X,7,I
@@ -204,9 +200,6 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<
 
 ![核准編號]
 #FdApplNo=X,2,L
-C(4,#CustNo,$,S)
-C(4,#CustId,$,S)
-T(3,*)
 
 #ApplNo=X,7,I
 C(4,#CustNo,$,S)
@@ -341,11 +334,7 @@ C(3,#CHAIN,1,s,$)
 @A(DATE,0,#EntryEndDate)
 ! V(5,#EntryStartDate,#SYSDATE)
 
-#FdRptFg=X,2,L
-T(3,*)
-
-<include src="COM.icf::RPTFG.dec"/>
-
+#RPTFG=A,1,S
 
 #RPTFG2=A,1,S
 C(3,#RPTFG,0,$,S)
@@ -355,6 +344,9 @@ C(4,#NTXBUF5,T(3,1),T(3,2))
 C(3,#RPTFG2,1,T(3,@RPTFG2,3),$)
 C(3,#RPTFG2,2,T(3,@RPTFG2,4),$)
 
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
 
 <include src="ROM.icf::L0Rim.dec"/>
 <include src="ROM.icf::L2Rim.dec"/>
@@ -544,7 +536,7 @@ TXFORM=L3911
 <sub type="PART" name="L3911" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];">
 [
 ["[L3911]                                 繳息情形查詢"],
-["@借款人戶號",#OCustNo,#OCustNoX],
+["@借戶戶號",#OCustNo,#OCustNoX],
 ["@放款餘額",#OLoanBalX],
 ["@應繳日",#OSpecificDd],
 ["@入帳日期",#OIntStartDate,"@~",#OIntEndDate], 

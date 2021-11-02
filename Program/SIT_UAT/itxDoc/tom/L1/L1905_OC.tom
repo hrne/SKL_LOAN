@@ -1,0 +1,14 @@
+OOTelTypeCode=9,2
+OOTelArea=X,5
+OOTelNo=X,10
+OOTelExt=X,5
+OORelationCode=X,2
+OOLiaisonName=X,100
+OOLastUpdate=X,30
+OOLastUpdateEmpNo=X,6
+OOLastUpdateEmpNoName=X,40
+OOEnable=X,1
+OOTelChgRsnCode=X,2
+OORmk=X,40
+OOStopReason=X,40
+OOTelNoUKey=X,32

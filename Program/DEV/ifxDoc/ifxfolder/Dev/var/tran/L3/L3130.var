@@ -59,7 +59,7 @@ T(3,@FdBookAmt,*)
 [
 ["[L3130]                                 約定部分償還登錄"],
 ["#FdFuncCode+功能",#FuncCodeX],
-["#FdCustNo+借款人戶號",#CustNo,#BTN1,#BTN2,#CustNoX],
+["#FdCustNo+借戶戶號",#CustNo,#BTN1,#BTN2,#CustNoX],
 ["#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN4],
 ["#FdBormNo+撥款序號",#BormNo],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
@@ -255,8 +255,8 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L3004; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<
 ! #BIND3A=X,1,S
 ! BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L8923; ntxbuf=#BUF3A})
 
-![借款人戶號]
-!借款人戶號, 統一編號或核准編號擇一輸入
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 C(3,#CHAIN,1,C(3,#FuncCode,1,$,S),$)
 T(3,*)

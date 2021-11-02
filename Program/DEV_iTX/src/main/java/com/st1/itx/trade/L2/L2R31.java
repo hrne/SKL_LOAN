@@ -1,6 +1,5 @@
 package com.st1.itx.trade.L2;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R31 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R31.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -65,10 +63,9 @@ public class L2R31 extends TradeBuffer {
 			throw new LogicException(titaVo, "E2003", "該統編不存在客戶主檔");
 		}
 		int custNo = tCustMain.getCustNo();
-		String custUKet = tCustMain.getCustUKey();
+		tCustMain.getCustUKey();
 
-		/* 取得日曆日日期及現在時間 */
-		Timestamp date = parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime());
+		parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime());
 
 		if (iFunCd == 1) {
 
@@ -77,6 +74,7 @@ public class L2R31 extends TradeBuffer {
 			this.totaVo.putParam("L2r31CreateEmpNo", titaVo.getTlrNo());
 			this.totaVo.putParam("L2r31CreateDate", dateUtil.getNowIntegerForBC() - 19110000);
 			this.totaVo.putParam("L2r31CreateTime", dateUtil.getNowIntegerTime());
+			this.totaVo.putParam("L2r31Reason", "");
 			this.info("tlrno = " + titaVo.getTlrNo());
 
 		} else {
@@ -101,6 +99,7 @@ public class L2R31 extends TradeBuffer {
 			this.totaVo.putParam("L2r31CreateEmpNo", tCustDataCtrl.getLastUpdateEmpNo());
 			this.totaVo.putParam("L2r31CreateDate", txDate4);
 			this.totaVo.putParam("L2r31CreateTime", txTime2);
+			this.totaVo.putParam("L2r31Reason", tCustDataCtrl.getReason());
 		}
 
 		this.addList(this.totaVo);

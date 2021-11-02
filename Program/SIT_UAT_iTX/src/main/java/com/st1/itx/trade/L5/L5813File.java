@@ -60,7 +60,7 @@ public class L5813File extends MakeFile {
 
 	private CustMain tCustMain = new CustMain();
 	private CdCode tCdCode = new CdCode();
-	private Slice<ClFac> tClFac = null;
+	private ClFac tClFac = new ClFac();
 	private ClBuilding tClBuilding = null;
 	private Slice<ClBuildingOwner> tClBuildingOwner = null;
 	
@@ -138,26 +138,37 @@ public class L5813File extends MakeFile {
 				}
 				
 				//戶號找擔保品
-				tClFac = clFacService.facmNoEq(iCustNo, iFacmNo, this.index, this.limit, titaVo);
-				List<ClFac> sClFac = tClFac == null ? null:tClFac.getContent();
+				tClFac = clFacService.mainClNoFirst(iCustNo, iFacmNo, "Y", titaVo);
 				
-				if(sClFac != null) {
-					int oClCode1 = sClFac.get(0).getClCode1();
-					int oClCode2 = sClFac.get(0).getClCode2();
-					int oClNo = sClFac.get(0).getClNo();
+				if(tClFac != null) {
+					int oClCode1 = tClFac.getClCode1();
+					int oClCode2 = tClFac.getClCode2();
+					int oClNo = tClFac.getClNo();
 					tClBuilding = sClBuildingService.findById(new ClBuildingId(oClCode1, oClCode2, oClNo), titaVo);
+					if(tClBuilding!=null) {
+						bdLocation = tClBuilding.getBdLocation();
+						bdContractDate = tClBuilding.getContractDate();
+					}
 					
-					bdLocation = tClBuilding.getBdLocation();
-					bdContractDate = tClBuilding.getContractDate();
+					//所有權人戶名、統編
 					tClBuildingOwner = sClBuildingOwnerService.clNoEq(oClCode1, oClCode2, oClNo, this.index, this.limit, titaVo);
 					List<ClBuildingOwner> sClBuildingOwner = tClBuildingOwner == null ? null:tClBuildingOwner.getContent();
-					
 					if(sClBuildingOwner != null) {
 						tCustMain = sCustMainService.findById(sClBuildingOwner.get(0).getOwnerCustUKey(), titaVo);
 						bdOwner = tCustMain.getCustName();
 						bdCustId = tCustMain.getCustId();
 					}
 				}
+				
+				
+				
+				int iYYYMM = iYearlyHouseLoanInt.getYearMonth()-191100; 
+				if(iYearlyHouseLoanInt.getFirstDrawdownDate() < iYYYMM * 100) {// 繳息年月起
+					iYearMonthSt = String.valueOf(iYYYMM).substring(0, 3)+"01";
+				} else {
+					iYearMonthSt = String.valueOf(iYearlyHouseLoanInt.getFirstDrawdownDate()/100);
+				}
+				
 				
 				String cUsageCode = iYearlyHouseLoanInt.getUsageCode();
 				if(!cUsageCode.isEmpty() && cUsageCode.length()<2) {
@@ -166,13 +177,6 @@ public class L5813File extends MakeFile {
 				tCdCode = sCdCodeService.findById(new CdCodeId("UsageCode",cUsageCode),titaVo);
 				if(tCdCode!=null) {
 					iUsageCode = tCdCode.getItem();// 用途別
-				}
-				
-				int iYYYMM = iYearlyHouseLoanInt.getYearMonth()-191100; 
-				if(iYearlyHouseLoanInt.getFirstDrawdownDate() < iYYYMM * 100) {// 繳息年月起
-					iYearMonthSt = String.valueOf(iYYYMM).substring(0, 3)+"01";
-				} else {
-					iYearMonthSt = String.valueOf(iYearlyHouseLoanInt.getFirstDrawdownDate()/100);
 				}
 				
 				
