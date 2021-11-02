@@ -263,7 +263,7 @@ T(3,[L3912] 交易內容)
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
 #ORPTFG=A,2,S
 
-![借款人戶號]
+![借戶戶號]
 #OCustNo=A,7,L
 E(0,@L3100CustNo,#OCustNo)
 E(0,@L3100CustNo,#OCustNo)
@@ -1191,7 +1191,7 @@ T(3,[L3912] 交易內容查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-![借款人戶號]
+![借戶戶號]
 #L3100CustNo=A,7,L
 
 #L3100FacmNo=A,3,L
@@ -1282,7 +1282,7 @@ T(3,[L3912] 交易內容查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-![借款人戶號]
+![借戶戶號]
 
 
 #L3200FacmNo=A,3,L
@@ -1416,7 +1416,7 @@ T(3,[L3912] 交易內容查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-![借款人戶號]
+![借戶戶號]
 #L3410CustNo=A,7,L
 
 #L3410FacmNo=A,3,L
@@ -1524,7 +1524,7 @@ T(3,[L3912] 交易內容查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-![借款人戶號]
+![借戶戶號]
 #L3440CustNo=A,7,L
 
 #L3440FacmNo=A,3,L
@@ -1639,7 +1639,7 @@ T(3,[L3912] 交易內容查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-![借款人戶號]
+![借戶戶號]
 #L3712CustNo=A,7,L
 
 #L3712FacmNo=A,3,L
@@ -1744,7 +1744,7 @@ T(3,[L3912] 交易內容查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-![借款人戶號]
+![借戶戶號]
 #L3721CustNo=A,7,L
 
 #L3721FacmNo=A,3,L
@@ -1827,7 +1827,7 @@ T(3,[L3912] 交易內容查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-![借款人戶號]
+![借戶戶號]
 #L3600CustNo=A,7,L
 
 #L3600SyndNo=A,3,L
@@ -1910,7 +1910,7 @@ T(3,[L3912] 交易內容查詢)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 !------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
-![借款人戶號]
+![借戶戶號]
 #L3610CustNo=A,7,L
 
 #L3610SyndNo=A,3,L
@@ -2061,7 +2061,7 @@ TXFORM=L3912
 <sub type="PART" name="L3912" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
 ["@會計日期",#OAcctDate],["@櫃員編號",#OTellerNo,#OTellerNoX],
 ["@交易序號",#OTxtNo],["@還款來源",#ORepayCode,#ORepayCodeX],
@@ -2091,7 +2091,7 @@ TXFORM=L3912
 <sub type="PART" name="L3100" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#L3100CustNo,"@-",#L3100FacmNo,"@-",#L3100BormNo,"@",#L3100CustNoX],
+[#<->#,"@借戶戶號",#L3100CustNo,"@-",#L3100FacmNo,"@-",#L3100BormNo,"@",#L3100CustNoX],
 [#<->#,"@交易代號",#L3100TxCode,#L3100TxCodeX],
 ["@會計日期",#L3100AcctDate],
 ["@櫃員編號",#L3100TellerNo,#L3100TellerNoX],
@@ -2114,7 +2114,7 @@ TXFORM=L3912
 <sub type="PART" name="L3200" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#L3100CustNo,"@-",#L3200FacmNo,"@-",#L3200BormNo,"@",#L3100CustNoX],
+[#<->#,"@借戶戶號",#L3100CustNo,"@-",#L3200FacmNo,"@-",#L3200BormNo,"@",#L3100CustNoX],
 [#<->#,"@交易代號",#L3200TxCode,#L3200TxCodeX],
 ["@會計日期",#L3200AcctDate],["@入帳日期",#L3200EntryDateX],
 ["@櫃員編號",#L3200TellerNo,#L3200TellerNoX],["@交易序號",#L3200TxtNo],
@@ -2139,7 +2139,7 @@ TXFORM=L3912
 <sub type="PART" name="L3712" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#L3712CustNo,"@-",#L3712FacmNo,"@-",#L3712BormNo,"@",#L3712CustNoX],
+[#<->#,"@借戶戶號",#L3712CustNo,"@-",#L3712FacmNo,"@-",#L3712BormNo,"@",#L3712CustNoX],
 [#<->#,"@交易代號",#L3712TxCode,#L3712TxCodeX],
 ["@會計日期",#L3712AcctDate],["@入帳日期",#L3712EntryDateX],
 ["@櫃員編號",#L3712TellerNo,#L3712TellerNoX],["@交易序號",#L3712TxtNo],
@@ -2160,7 +2160,7 @@ TXFORM=L3912
 <sub type="PART" name="L3721" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#L3721CustNo,"@-",#L3721FacmNo,"@-",#L3721BormNo,"@",#L3721CustNoX],
+[#<->#,"@借戶戶號",#L3721CustNo,"@-",#L3721FacmNo,"@-",#L3721BormNo,"@",#L3721CustNoX],
 [#<->#,"@交易代號",#L3721TxCode,#L3721TxCodeX],
 ["@會計日期",#L3721AcctDate],["@入帳日期",#L3721EntryDateX],
 ["@櫃員編號",#L3721TellerNo,#L3721TellerNoX],["@交易序號",#L3721TxtNo],
@@ -2218,7 +2218,7 @@ TXFORM=L3912
 <sub type="PART" name="PFN10" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
 ["@會計日期",#OAcctDate],["@入帳日期",#OEntryDateX],
 ["@櫃員編號",#OTellerNo,#OTellerNoX],["@交易序號",#OTxtNo],
@@ -2240,7 +2240,7 @@ TXFORM=L3912
 <sub type="PART" name="L3410" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#L3410CustNo,"@-",#L3410FacmNo,"@-",#OBormNo,"@",#L3410CustNoX],
+[#<->#,"@借戶戶號",#L3410CustNo,"@-",#L3410FacmNo,"@-",#OBormNo,"@",#L3410CustNoX],
 [#<->#,"@交易代號",#L3410TxCode,#L3410TxCodeX],
 ["@會計日期",#L3410AcctDate],["@入帳日期",#L3410EntryDateX],
 ["@櫃員編號",#L3410TellerNo,#L3410TellerNoX],["@交易序號",#L3410TxtNo],
@@ -2263,7 +2263,7 @@ TXFORM=L3912
 <sub type="PART" name="L3420" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#L3410CustNo,"@-",#L3410FacmNo,"@-",#OBormNo,"@",#L3410CustNoX],
+[#<->#,"@借戶戶號",#L3410CustNo,"@-",#L3410FacmNo,"@-",#OBormNo,"@",#L3410CustNoX],
 [#<->#,"@交易代號",#L3410TxCode,#L3410TxCodeX],
 ["@會計日期",#L3410AcctDate],["@入帳日期",#L3410EntryDateX],
 ["@櫃員編號",#L3410TellerNo,#L3410TellerNoX],["@交易序號",#L3410TxtNo],
@@ -2280,7 +2280,7 @@ TXFORM=L3912
 <sub type="PART" name="L3440" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#L3440CustNo,"@-",#L3440FacmNo,"@-",#L3440BormNo,"@",#L3440CustNoX],
+[#<->#,"@借戶戶號",#L3440CustNo,"@-",#L3440FacmNo,"@-",#L3440BormNo,"@",#L3440CustNoX],
 [#<->#,"@交易代號",#L3440TxCode,#L3440TxCodeX],
 ["@會計日期",#L3440AcctDate],["@入帳日期",#L3440EntryDateX],
 ["@櫃員編號",#L3440TellerNo,#L3440TellerNoX],["@交易序號",#L3440TxtNo],
@@ -2302,7 +2302,7 @@ TXFORM=L3912
 <sub type="PART" name="L3210" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#OCustNo,"@",#OCustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@",#OCustNoX],
 ["@交易代號",#OTxCode,#OTxCodeX],["@交易序號",#L3440TxtNo],
 [#<->#,"@暫收原因",#OTempReasonCode,#OTempReasonCodeX],
 [#<->#,"@入帳日期",#OEntryDateX],
@@ -2320,7 +2320,7 @@ TXFORM=L3912
 <sub type="PART" name="L3220" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#OCustNo,"@",#OCustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@",#OCustNoX],
 ["@交易代號",#OTxCode,#OTxCodeX],["@交易序號",#L3440TxtNo],
 [#<->#,"@幣別",#OCurrencyCode],
 [#<->#,"@暫收款金額",#L3220OTempAmtX],
@@ -2337,7 +2337,7 @@ TXFORM=L3912
 <sub type="PART" name="L3230" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#OCustNo,"@",#OCustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@",#OCustNoX],
 ["@交易代號",#OTxCode,#OTxCodeX],["@交易序號",#L3440TxtNo],
 [#<->#,"@作業項目",#OTempItemCode,#L3230TempItemCodeX],
 [#<->#,"@額度編號",#OFacmNo],
@@ -2350,7 +2350,7 @@ TXFORM=L3912
 <sub type="PART" name="L618X" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,"@",#OCustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@",#OCustNoX],
 ["@交易代號",#OTxCode,#OTxCodeX],["@交易序號",#L3440TxtNo],
 ["@會計日期",#OAcctDate],["@轉催收金額",#OTxAmtX],
 ["@交易序號",#OTxtNo],["@銷帳編號",#ORvNo],
@@ -2361,7 +2361,7 @@ TXFORM=L3912
 <sub type="PART" name="L3731" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3912]                                 交易內容查詢"],
-[#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,"@",#OCustNoX],
 [#<->#,"@交易代號",#OTxCode,#OTxCodeX],
 ["@會計日期",#OAcctDate],["@櫃員編號",#OTellerNo,#OTellerNoX],
 ["@交易序號",#OTxtNo],["@還款來源",#ORepayCode,#ORepayCodeX],

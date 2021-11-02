@@ -77,7 +77,7 @@ public class L5062 extends TradeBuffer {
 					
 					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
 					if (iCdEmp == null) {
-						throw new LogicException(titaVo, "E0001", "員工資料檔"); // 查無資料
+						occursList.putParam("OOAccCollPsnX", "");
 					}else {
 						occursList.putParam("OOAccCollPsnX", iCdEmp.getFullname());
 					}
@@ -90,7 +90,7 @@ public class L5062 extends TradeBuffer {
 					occursList.putParam("OOLegalExt", rCdCity.getLegalExt());
 					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
 					if (iCdEmp == null) {
-						throw new LogicException(titaVo, "E0001", "員工資料檔"); // 查無資料
+						occursList.putParam("OOLegalPsnX", "");
 					}else {
 						occursList.putParam("OOLegalPsnX", iCdEmp.getFullname());
 					}

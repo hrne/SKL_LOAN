@@ -14,6 +14,7 @@ import com.st1.itx.db.domain.BatxHeadId;
 import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L420A")
@@ -31,6 +32,9 @@ public class L420A extends TradeBuffer {
 
 	@Autowired
 	public BatxHeadService batxHeadService;
+
+	@Autowired
+	SendRsp sendRsp;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -64,9 +68,11 @@ public class L420A extends TradeBuffer {
 	private void checkHead(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
 
 // BatxStsCode 整批作業狀態 0.正常 1.整批處理中
-
-		if ("1".equals(tBatxHead.getBatxStsCode()))
-			throw new LogicException("E0010", "整批處理中，請稍後"); // E0010 功能選擇錯誤
+		if ("1".equals(tBatxHead.getBatxStsCode())) {
+			if (!titaVo.getHsupCode().equals("1")) {
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "整批處理中");
+			}
+		}
 
 // 處理代碼 0:入帳 1:刪除 2:訂正
 // BatxExeCode 作業狀態 1.檢核有誤 2.檢核正常 3.入帳未完 4.入帳完成 8.已刪除		

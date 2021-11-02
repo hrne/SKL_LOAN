@@ -48,7 +48,7 @@ T(F,@FacmNo,1)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L3921]                                 回 收 試 算"],
-["#FdCustNo+借款人戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+["#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
 ["#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
 ["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 ["#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN4,#BTN6],
@@ -69,7 +69,7 @@ T(F,@FacmNo,1)
 #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
 #BTN4=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
 #BTN5=X,15,I,ui:button;value:回收登錄;enable:1;tabbable:0;title: L3200 回收登錄;
-#BTN6=X,15,I,ui:button;value:疑似洗錢合理性維護;enable:1;tabbable:0;title:L8203 疑似洗錢交易訪談維護
+#BTN6=X,15,I,ui:button;value:疑似洗錢交易訪談維護;enable:1;tabbable:0;title:L8204 疑似洗錢交易訪談維護
 
 #BUF1=X,42,S
 HIDE(#UsExtraRepay)
@@ -125,8 +125,8 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 
 
 
-![借款人戶號]
-!借款人戶號, 統一編號或核准編號擇一輸入
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
 #CustNo=A,7,I
@@ -165,7 +165,7 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<
 T(2,10000000+#CustNo)
 
 #BIND6A=X,1,S
-BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L8203; ntxbuf=#BUF6A})
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF6A})
 
 ![統一編號]
 #FdCustId=X,2,L
@@ -270,7 +270,7 @@ C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 T(2,10000000+#TimCustNo)
 
 #BIND6B=X,1,S
-BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L8203; ntxbuf=#BUF6B})
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L8204; ntxbuf=#BUF6B})
 
 #WkCaseNo=A,7,S
 #WkCustId=X,10,S
@@ -788,7 +788,7 @@ TXFORM=L3921
 <sub type="PART" name="L3921" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1;">
 [
 ["[L3921]                                 回 收 試 算"],
-[#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#OCustNoX],
 ["@入帳日期",#OEntryDate],
 ["@放款餘額",#OLoanBalX],
 ["@計息期間",#OIntStartDate,"@-",#OIntEndDate],

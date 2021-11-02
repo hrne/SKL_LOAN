@@ -80,13 +80,11 @@ public class L2018 extends TradeBuffer {
 		List<FacShareAppl> lFacShareAppl = new ArrayList<FacShareAppl>();
 		FacShareAppl tFacShareAppl = new FacShareAppl();
 		Slice<FacShareAppl> slFacShareAppl = null;
-		int lastCreditSysNo = 0;
-		int lastMainCustNo = 0;
 		// 處理邏輯
 		if (iApplNo > 0) {
 			tFacShareAppl = facShareApplService.findById(iApplNo, titaVo);
 			if (tFacShareAppl == null) {
-				throw new LogicException("E0001","");// E0001 查無資料
+				throw new LogicException("E0001", "");// E0001 查無資料
 			}
 			lFacShareAppl.add(tFacShareAppl);
 		} else if (iCustNo > 0) {

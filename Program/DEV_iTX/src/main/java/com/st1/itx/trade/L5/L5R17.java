@@ -48,7 +48,7 @@ public class L5R17 extends TradeBuffer {
 		if (iCdEmp != null) {
 			totaVo.putParam("L5R17FullName", iCdEmp.getFullname());
 		} else {
-			totaVo.putParam("L5R17FullName", "");
+			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}
 
 		this.addList(this.totaVo);

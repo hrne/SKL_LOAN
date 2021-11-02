@@ -26,7 +26,7 @@ public class CustDataCtrl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 3093429932534726152L;
 
 // 借款人戶號
   @Id

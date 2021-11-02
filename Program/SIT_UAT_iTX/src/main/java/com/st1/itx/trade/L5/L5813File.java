@@ -86,7 +86,7 @@ public class L5813File extends MakeFile {
 
 		doFile(titaVo);
 		
-		
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L5813國稅局申報媒體檔已完成", titaVo);
 	}
 
 

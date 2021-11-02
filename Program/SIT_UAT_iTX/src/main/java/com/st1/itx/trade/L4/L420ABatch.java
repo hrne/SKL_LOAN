@@ -115,7 +115,7 @@ public class L420ABatch extends TradeBuffer {
 						// 02.銀行扣款 03.員工扣款 => 整批檢核時設定為 4.檢核正常，整批入帳時才進行檢核
 						if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
 							TempVo tTempVo = new TempVo();
-							tTempVo =tTempVo.getVo(tDetail.getProcNote());
+							tTempVo = tTempVo.getVo(tDetail.getProcNote());
 							tTempVo.putParam("CheckMsg", "");
 							tTempVo.putParam("ErrorMsg", "");
 							tDetail.setProcNote(tTempVo.getJsonString());
@@ -139,8 +139,9 @@ public class L420ABatch extends TradeBuffer {
 
 		// end
 		this.batchTransaction.commit();
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4002", titaVo.getTlrNo(),
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
 				iBatchNo + " 整批檢核, " + msg, titaVo);
+
 
 		return null;
 
@@ -183,15 +184,10 @@ public class L420ABatch extends TradeBuffer {
 				break;
 			case "5":
 			case "6":
-				if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
-					doneCnt++;
-				}
-				break;
 			case "7":
 				if ("".equals(iReconCode) || tDetail.getReconCode().equals(iReconCode)) {
 					doneCnt++;
 				}
-				unfinishTotalCnt++;
 				break;
 			default:
 				break;

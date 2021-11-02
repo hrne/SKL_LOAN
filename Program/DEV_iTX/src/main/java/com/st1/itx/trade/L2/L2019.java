@@ -88,7 +88,7 @@ public class L2019 extends TradeBuffer {
 			lFacShareLimit.add(tFacShareLimit);
 		} else if (iCustNo > 0) {
 			slFacShareLimit = sFacShareLimitService.findCustNoEq(iCustNo, this.index, this.limit, titaVo);
-			if (slFacShareLimit== null) {
+			if (slFacShareLimit == null) {
 				throw new LogicException("E0001", "合併額度");// E0001 查無資料
 			}
 			lFacShareLimit = slFacShareLimit == null ? null : slFacShareLimit.getContent();

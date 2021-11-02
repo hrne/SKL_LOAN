@@ -67,7 +67,7 @@ public class L5905 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 200; // 349 * 100 = 34,900
+		this.limit = 100; // 361 * 100 = 34,900
 
 		// 查詢覆審案件明細檔
 		Slice<InnReCheck> slInnReCheck;
@@ -85,7 +85,6 @@ public class L5905 extends TradeBuffer {
 			}
 		}
 //		List<InnReCheck> lInnReCheck = slInnReCheck == null ? null : slInnReCheck.getContent();
-		
 
 //		if (lInnReCheck == null || lInnReCheck.size() == 0) {
 //			throw new LogicException(titaVo, "E0001", "覆審案件明細檔"); // 查無資料

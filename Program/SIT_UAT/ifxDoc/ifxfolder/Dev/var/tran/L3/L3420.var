@@ -51,7 +51,7 @@ K(MODIFYBUTTON,登錄)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[200,400,200,400];printer.width=[20,80];order=1">
 [
 ["[L3420]                                 結案登錄-不可欠繳"],
-[#<->#,"#FdCustNo+借款人戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
 [#<->#,"#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 [#<->#,"#FdCaseCloseCode+結案區分",#CaseCloseCode,#CaseCloseCodeX],
@@ -181,8 +181,8 @@ T(3,00000009999999000)
 #BIND1A=X,1,S
 BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
-![借款人戶號]
-!借款人戶號, 統一編號或核准編號擇一輸入
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
 #CustNo=A,7,I
@@ -349,8 +349,7 @@ C(2,#CaseCloseCode,SHOW(#BTN7),HIDE(#BTN7),HIDE(#BTN7),HIDE(#BTN7),SHOW(#BTN7),S
 #WKHIDE1=X,1,S
 E(0,@EntryDate,0)
 HIDE(#EntryDate)
-IF(#CaseCloseCode>=7,INVOKEJS(SHOW,p1,5,5,0)
-                     INVOKEJS(SHOW,p1,8,17,0)
+IF(#CaseCloseCode>=7,INVOKEJS(SHOW,p1,8,17,0)
                      INVOKEJS(SHOW,p1,18,24,1)
                     ,$)
 IF(#CaseCloseCode>=7,S,$)                      
@@ -943,14 +942,14 @@ IF(#LawFg=="Y",E(0,@checkamt,#checkamt+#LawFee2),$)
 IF(#CollLawFg=="Y",E(0,@checkamt,#checkamt+#CollLawFee),$)
 E(0,@checkamt,#checkamt+#TimTrfOvDuAmt)
 
-#FireFg=X,1,L
+#FireFg=X,1,I
 C(2,#CaseCloseCode,S,S,S,S,S,S,S,$,$)
 HELP(#YesNoHelp)
 C(3,#FireFee2,0,S,$)
-T(3,N)
-! 10/15改為固定N
-! @V(H,#YesNoHelp)
-! CALL(#checkFg)
+! T(3,N)
+! 10/15改為固定N(已改開放輸入)
+@V(H,#YesNoHelp)
+CALL(#checkFg)
 
 #FireFeeFgX=X,2,L
 C(2,#CaseCloseCode,S,S,S,S,S,S,S,$,$)
@@ -969,14 +968,14 @@ C(2,#CaseCloseCode,S,S,S,S,S,S,S,$,$)
 C(4,#CollFireFg,S,$)
 T(H,#FireFg,#YesNoHelp)
 
-#LawFg=X,1,L
+#LawFg=X,1,I
 C(2,#CaseCloseCode,S,S,S,S,S,S,S,$,$)
 HELP(#YesNoHelp)
 C(3,#LawFee2,0,S,$)
-T(3,N)
-! 10/15改為固定N
-! @V(H,#YesNoHelp)
-! CALL(#checkFg)
+! T(3,N)
+! 10/15改為固定N(已改開放)
+@V(H,#YesNoHelp)
+CALL(#checkFg)
 
 #LawFeeFgX=X,2,L
 C(2,#CaseCloseCode,S,S,S,S,S,S,S,$,$)

@@ -1,0 +1,159 @@
+!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5606)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5606" layout="cols=3;screen.width=[150,350,150,350];printer.width=[20,80];order=1">
+[
+["[L5606]                                 法務催收人員變動"],
+[#<->#,"#FdCityCode+地區別",#CityCode,#CityCodeX],
+["#FdAccCollPsn+催收人員",#AccCollPsn,#AccCollPsnX],["#FdLegalPsn+法務人員",#LegalPsn,#LegalPsnX],
+["#FdAccTelArea+催收人員電話",#AccTelArea,#AccTelNo,#AccTelExt],["#FdLegalArea+法務人員電話",#LegalArea,#LegalNo,#LegalExt],
+]
+
+#FdCityCode=X,2,L
+#FdAccCollPsn=X,2,L
+#FdLegalPsn=X,2,L
+#FdAccTelArea=X,2,L
+#FdLegalArea=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+K(MODIFYBUTTON,修改)
+
+#NTXBUF=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CityCode,#NTXBUF,1,2)
+
+#CityCode=X,2,L
+
+#CityCodeX=X,50,L
+
+! 調rim CdCity
+<include src="ROM.icf::L5R44.dec"/>
+#RimL5R44=X,1,S
+#RimCityCode=X,2,S
+T(2,@RimCityCode,#CityCode)
+RESET_RIM(#RimL5R44,L5R44)
+S(L5R44,1,#RimCityCode)
+R(1,L5R44)
+T(2,@CityCodeX,#L5R44CityCodeX)
+T(2,@AccCollPsn,#L5R44AccCollPsn)
+T(2,@AccCollPsnX,#L5R44AccCollPsnX)
+T(2,@LegalPsn,#L5R44LegalPsn)
+T(2,@LegalPsnX,#L5R44LegalPsnX)
+T(2,@AccTelArea,#L5R44AccTelArea)
+T(2,@AccTelNo,#L5R44AccTelNo)
+T(2,@AccTelExt,#L5R44AccTelExt)
+T(2,@LegalArea,#L5R44LegalArea)
+T(2,@LegalNo,#L5R44LegalNo)
+T(2,@LegalExt,#L5R44LegalExt)
+
+! 催收人員
+#AccCollPsn=X,6,I
+@V(7)
+#AccCollPsnX=X,40,L
+C(4,#AccCollPsn,S,$)
+
+<include src="ROM.icf::L5R17.dec"/>
+#RimEmpNo=X,6,S
+#RimL5R17=X,1,S
+T(2,@RimEmpNo,#AccCollPsn)
+RESET_RIM(#RimL5R17,L5R17)
+S(L5R17,1,#RimEmpNo)
+R(1,L5R17)
+T(2,@AccCollPsnX,#L5R17FullName)
+
+! 催收人員電話
+#AccTelArea=X,5,I
+C(4,#AccCollPsn,S,$)
+@
+C(4,#AccTelArea,S,$)
+V(9)
+#AccTelNo=X,10,I
+C(4,#AccCollPsn,S,$)
+@V(9)
+#AccTelExt=X,5,I
+C(4,#AccCollPsn,S,$)
+@C(4,#AccTelExt,S,$)
+V(9)
+
+
+! 法務人員
+#LegalPsn=X,6,I
+@V(7)
+#LegalPsnX=X,40,L
+C(4,#LegalPsn,S,$)
+
+T(2,@RimEmpNo,#LegalPsn)
+RESET_RIM(#RimL5R17,L5R17)
+S(L5R17,1,#RimEmpNo)
+R(1,L5R17)
+T(2,@LegalPsnX,#L5R17FullName)
+
+#LegalArea=X,5,I
+C(4,#LegalPsn,S,$)
+@C(4,#LegalArea,S,$)
+V(9)
+#LegalNo=X,10,I
+C(4,#LegalPsn,S,$)
+@V(9)
+#LegalExt=X,5,I
+C(4,#LegalPsn,S,$)
+@C(4,#LegalExt,S,$)
+V(9)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5606 -----------
+<sub type="FORM" name="L5606">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CityCode
+#AccCollPsn
+#AccTelArea
+#AccTelNo
+#AccTelExt
+#LegalPsn
+#LegalArea
+#LegalNo
+#LegalExt
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R17.tom"/>
+<include src="ROM.icf::L5R44.tom"/>
+TXFORM=L5606
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+</sub>

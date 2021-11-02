@@ -298,8 +298,7 @@ public class L4002 extends TradeBuffer {
 					}
 				}
 				// grp2已處理
-				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-						|| tBatxDetail.getProcStsCode().equals("7")) {
+				if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")) {
 					if (alrCnt.containsKey(grp2)) {
 						alrCnt.put(grp2, alrCnt.get(grp2) + 1);
 					} else {
@@ -340,8 +339,7 @@ public class L4002 extends TradeBuffer {
 						}
 					}
 					// grp3已處理
-					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")
-							|| tBatxDetail.getProcStsCode().equals("7")) {
+					if (tBatxDetail.getProcStsCode().equals("5") || tBatxDetail.getProcStsCode().equals("6")) {
 						if (alrCnt.containsKey(grp3)) {
 							alrCnt.put(grp3, alrCnt.get(grp3) + 1);
 						} else {

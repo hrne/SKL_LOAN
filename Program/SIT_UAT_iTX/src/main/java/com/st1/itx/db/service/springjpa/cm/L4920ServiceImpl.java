@@ -143,13 +143,12 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		switch (iProcStsCode) {
 		case "A":
-			sql += "   and bd.\"ProcStsCode\" in ('0','1','2','3','4','5','6','7') ";
 			break;
 		case "R":
 			sql += "   and bd.\"ProcStsCode\" in ('0','2','3','4') ";
 			break;
 		case "S":
-			sql += "   and bd.\"ProcStsCode\" in ('5','6','7') ";
+			sql += "   and bd.\"ProcStsCode\" in ('5','6') ";
 			break;
 		default:
 			sql += "   and bd.\"ProcStsCode\" = '" + iProcStsCode + "'";
@@ -161,7 +160,7 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		if (flag == 1) {
-			sql += "   and bd.\"ProcStsCode\" != 1 ";
+			sql += "   and bd.\"ProcStsCode\" != '1' ";
 			sql += "   GROUP BY bd.\"AcDate\" ";
 		}
 

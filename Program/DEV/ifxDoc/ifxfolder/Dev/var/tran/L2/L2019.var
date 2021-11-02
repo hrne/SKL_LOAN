@@ -1,0 +1,295 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L2019)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,175)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,查詢)
+
+#BTNADDBUF=X,18,S
+T(2,1)
+
+!L2119 合併額度控管登錄
+#BtnAddA=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L2119; ntxbuf=#BTNADDBUF; ntxbuf5=type})
+ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,1000];printer.width=[20,20];">
+[
+["[L2019]                                 合併額度控管資料查詢"],
+["#FdCustNo+戶號",#CustNo],
+["#FdApplNo+核准號碼",#ApplNo],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+
+
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF0001=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S 
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@CurrPrecisionHelp,#HelpDesc1) 
+
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,18,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#NTXBUF5=X,10,S
+C(3,#CHAIN,1,T(4,NTXBUF5$),S)
+C(4,#NTXBUF5,E(0,@RPTFG2,0),E(0,@RPTFG2,2))
+
+
+!戶號
+#FdCustNo=X,2,L
+#CustNo=A,7,I
+
+!核准號碼
+#FdApplNo=X,2,L
+#ApplNo=A,7,I
+
+
+#RPTFG=A,1,S
+#RPTFG2=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2019 ----------
+<sub type="FORM" name="L2019">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2019,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2019] 合併額度控管資料查詢)
+
+!修改
+#Func2=A,1,S
+E(0,2)
+
+!刪除
+#Func4=A,1,S
+E(0,4)
+
+!查1
+#Func5=A,1,S
+E(0,5)
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+!核准號碼
+#OOApplNo=A,7,O
+!戶號
+#OOCustNo=A,7,O
+!戶名
+#OOCustName=X,100,O
+!幣別
+#OOCurrencyCode=X,3,O
+!幣別小數點
+#OOPrecision=N,1,S
+E(0,0)T(H,#OOCurrencyCode,#CurrPrecisionHelp)
+!總額度
+#OOLineAmt=m,14.2,O
+#OOLineAmtX=X,22,L
+CALL2(#ADJUSTDOT,#OOPrecision,#OOLineAmt,#OOLineAmtX)
+P(R,#OOLineAmtX)
+
+#OOCreateDate=D,7,O
+
+#OOCreateEmpNo=X,6,O
+
+#OOCreateEmpName=X,10,O
+
+#OOCreateName=X,18,O
+T(2,#OOCreateEmpNo+  +#OOCreateEmpName)
+
+#OOLastUpdate=D,7,O
+
+#OOLastUpdateEmpNo=X,6,O
+
+#OOLastUpdateEmpName=X,10,O
+
+#OOLastUpdateName=X,18,O
+T(2,#OOLastUpdate+  +#OOLastUpdateEmpName)
+
+!主要核准號碼
+#OOMainApplNo=A,7,O
+
+!刪除
+#OOBUF4=X,18,S
+T(2,#Func4+#OOMainApplNo)
+
+#OOBTN4=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L2119; ntxbuf=#OOBUF4})
+
+!查詢
+#OOBUF5=X,18,S
+T(2,#OOMainApplNo)
+
+#OOBTN5=X,1,S
+BIND(grid,{ cmd=CHAIN; ntxcd=L291B; ntxbuf=#OOBUF5})
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#CustNo#ApplNo
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L2019
+#OOApplNo#OOCustNo#OOCustName#OOCurrencyCode#OOLineAmt
+#OOCreateDate#OOCreateEmpNo#OOCreateEmpName#OOLastUpdate#OOLastUpdateEmpNo#OOLastUpdateEmpName#OOMainApplNo
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L2019" layout="cols=1;screen.width=[150,850];printer.width=[15,30,15,30];order=1">
+[
+["[L2019]                                 合併額度控管資料查詢"],
+[""],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG2=0,QUERY.GRID,L2019
+#any={detail:true, header:'L2019.part', caption:'', width:1100, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN4=刪除
+{width:50,search:false,formatter:'cust:bind-button:刪除;L2119 合併額度控管登錄',align:'center',canExport:false}
+
+#OOBTN5=額度
+{width:50,search:false,formatter:'cust:bind-button:額度;L291B 合併額度控管額度查詢',align:'center',canExport:false}
+
+#OOApplNo=核准號碼
+{width:80,align:'center'}
+
+#OOCustNo=戶號
+{width:80,align:'center'}
+
+#OOCustName=戶名
+{width:80,align:'center'}
+
+#OOCurrencyCode=幣別
+{width:80,align:'center'}
+
+#OOLineAmtX=總額度(元)
+{width:170,align:'center'}
+
+#OOCreateDate=建檔日期
+{width:80,align:'center'}
+
+#OOCreateName=建檔人員
+{width:130,align:'center'}
+
+#OOLastUpdate=最後更新日期
+{width:130,align:'center'}
+
+#OOLastUpdateName=最後更新人員
+{width:130,align:'center'}
+
+^
+#RPTFG2=2,QUERY.GRID,L2019
+#any={detail:true, header:'L2019.part', caption:'', width:1100, rowNum:20, rowList:[20,40,60]}
+
+#OOApplNo=核准號碼
+{width:80,align:'center'}
+
+#OOCustNo=戶號
+{width:80,align:'center'}
+
+#OOCustName=戶名
+{width:80,align:'center'}
+
+#OOCurrencyCode=幣別
+{width:80,align:'center'}
+
+#OOLineAmtX=總額度(元)
+{width:50,align:'center'}
+
+#OOCreateDate=建檔日期
+{width:80,align:'center'}
+
+#OOCreateName=建檔人員
+{width:130,align:'center'}
+
+#OOLastUpdate=最後更新日期
+{width:130,align:'center'}
+
+#OOLastUpdateName=最後更新人員
+{width:130,align:'center'}
+
+
+
+^
+
+<include src="PRT.icf::INQ01.sel" map="i=L2019;cpi=15"/>
+
+%
+#OOApplNo#OOCustNo#OOCustName#OOCurrencyCode#OOLineAmtX
+#OOCreateDate#OOCreateEmpNo#OOLastUpdate#OOLastUpdateEmpNo
+@^
+</sub>

@@ -1,0 +1,1260 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,XW111)
+
+![業務別] 01:撥款匯款(含暫收退還且非退票) 02:支票繳款 03:債協 09:放款
+#SECNO=_,_,S
+T(3,09)
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+![借貸別 (1:借 2:貸)]
+#CRDB=_,_,S
+E(0,2)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,登錄)
+</sub>
+<sub type="DC" name="BFRP">
+<include src="RPDTL.icf::BFRP.dec"/>
+</sub>
+!=====================================================================
+!#FKEY>0時，重新執行
+!=====================================================================
+<sub type="PREDC" name="PreDC">
+!#PDC=X,1,S
+!C(3,#FKEY,0,NOP,T(R,#MRKEY,#REFNO))
+!C(3,#FKEY,3,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),$)
+!C(3,#FKEY,7,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),s)
+
+!<include src="COM.icf::ACTFGX-RUN.pre"/>
+!<include src="COM.icf::TITLE-RUN.pre"/>
+!<include src="TITF.icf::RPRUN.dec"/>
+
+#HIDEUS=X,1,S
+HIDE(#UsPrincipal,#UsAcctFee,#UsInterest,#UsModifyFee,#UsAcctFee,#UsDelayInt,#UsFireFee,#UsBreachAmt,#UsLawFee,#UsExtraCloseBreachAmt)
+
+#InitValue=@,1,S
+T(3,@FdRepayType,*)
+E(0,@RepayType,0)
+T(3,@RepayTypeX, )
+T(3,@DetailNote, )
+E(0,@DetailSeq,0)
+!E(0,@FacmNo,0)
+E(0,@BormNo,0)
+E(0,@TwRepayAmt,0)
+E(0,@UsRepayAmt,0)
+E(0,@TwExtraRepay,0)
+E(0,@UsExtraRepay,0)
+E(0,@TwCloseBreachAmt,0)
+E(0,@UsCloseBreachAmt,0)
+E(0,@L3r06CloseBreachAmt,0)
+E(0,@L3r06RepayAmt,0)
+E(0,@L3r06TotalFee,0)
+E(0,@L3r06CloseBreachAmtUnpaid,0)
+E(0,@L492aRepayType,0)
+E(0,@L492aRepayAmt,0)
+T(F,@FacmNo,1)
+T(F,@TwCloseBreachAmt,1)
+T(F,@UsCloseBreachAmt,1)
+T(F,@TwRepayAmt,1)
+T(F,@UsRepayAmt,1)
+T(F,@TwExtraRepay,1)
+T(F,@UsExtraRepay,1)
+! HIDE(#EntryDate,#CloseBreachAmtX)
+SHOW(#RepayType,#TwCloseBreachAmt)
+INVOKEJS(SHOW,p1,9,19,1)
+INVOKEJS(SHOW,p1,13,18,0)
+
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[150,350,150,450];printer.width=[20,80];order=1">
+[
+["[L3200]                                 回收登錄"],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+[#<->#,"#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
+[#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
+[#<->#,"#FdEntryDate+入帳日期",#EntryDate,"@",#BTN4],
+[#<->#,"#FdRepayType+還款類別",#RepayType,#RepayTypeX], 
+[#<->#,"#FdFacmNo+額度編號",#FacmNo],
+[#<->#,"#FdBormNo+撥款序號",#BormNo],
+[#<->#,"#FdCurrencyCode+幣別",#CurrencyCode], 
+[#<->#,"#FdRepayTerms+回收期數",#RepayTerms,"@@",#BTN5],
+[#<->#,"#FdRepayAmt+回收金額",#TwRepayAmt,#UsRepayAmt],
+[#<->#,"#FdOvduRepay+催收收回金額",#TwOvduRepay,#UsOvduRepay],
+[#<->#,"#FdCloseBreachAmt+清償違約金",#TwCloseBreachAmt,#UsCloseBreachAmt,#CloseBreachAmtX],                  
+[#<->#,"#FdExtraRepay+部分償還金額",#TwExtraRepay,#UsExtraRepay,"@@是否內含利息",#IncludeIntFlag,#IncludeIntFlagX,"@@利息是否可欠繳",#UnpaidIntFlag,#UnpaidIntFlagX],
+["#FdPrincipal+本金",#TwPrincipal,#UsPrincipal],["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee],
+["#FdInterest+利息",#TwInterest,#UsInterest],["#FdModifyFee+契變手續費",#TwModifyFee,#UsModifyFee],
+["#FdDelayInt+延遲息",#TwDelayInt,#UsDelayInt],["#FdFireFee+火險費",#TwFireFee,#UsFireFee],
+["#FdBreachAmt+違約金",#TwBreachAmt,#UsBreachAmt],["#FdLawFee+法務費",#TwLawFee,#UsLawFee],
+[#<->#,"#FdShortfall+累短收",#ShortfallX,#ShortfallXX],
+[#<->#,"#FdPayMethod+繳納方式",#PayMethod,#PayMethodX],
+[#<->#,"#FdExtraCloseBreachAmt+清償違約金",#TwExtraCloseBreachAmt,#UsExtraCloseBreachAmt,#BreachCodeX],
+["#FdReduceAmt+減免金額",#TwReduceAmt,#UsReduceAmt],
+["@","@",], 
+["@","@",], 
+["@","@",],       
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN1=X,15,I,ui:button;value:額度資料查詢;enable:1;tabbable:0;title: L2015 額度明細資料查詢;
+#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
+#BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
+#BTN5=X,15,I,ui:button;value:回收試算;enable:1;tabbable:0;title: L3921 回收試算;
+
+#BUF1=X,42,S
+HIDE(#UsRepayAmt,#UsOvduRepay,#UsCloseBreachAmt,#CloseBreachAmtX,#UsExtraRepay,#UsReduceAmt)
+HIDE(#BTN1,#BTN2,#BTN3)SHOW(#BTN4)
+!---------- AP TEXT AREA Variables ----------
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!RepayType
+!#CDDEF01=x,20,S
+!T(3,CdCode.RepayType)
+
+!CurrencyCode
+#CDDEF01=x,30,S
+T(3,CdCode.Currency)
+
+#CDDEF02=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CDDEF03=x,26,S
+T(3,CdCode.PayMethod)
+
+#RepayTypeHelpRim=X,1,S
+RESET_RIM(#RepayTypeHelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#CDDEF03)
+R(1,XXR99)
+CALL(#HelpProc)
+!T(2,@RepayTypeHelp,#HelpDesc1)
+T(2,@CurrencyCodeHelp,#HelpDesc1)
+T(2,@CurrPrecisionHelp,#HelpDesc2) 
+T(2,@PayMethodHelp,#HelpDesc3) 
+
+#RepayTypeHelp=x,1024,S
+T(3,01:期款;02:部分償還;09:清償違約金;12:催收收回)
+
+#CurrencyCodeHelp=x,1024,S
+
+#CurrPrecisionHelp=x,1024,S 
+
+#PayMethodHelp=x,1024,S 
+
+#YNHelp=x,20,S
+T(3,Y:是;N:否)
+
+#InitA=X,1,S
+T(3,@FdEntryDate,*)
+T(3,@FdPayMethod,)
+T(3,@FdRepayType,*)
+! HIDE(#EntryDate)
+!HIDE(#RepayType)
+!改
+INVOKEJS(SHOW,p1,13,18,0)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+#NTXBUF=X,50,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustNo,#NTXBUF,6,7)
+T(1,@FacmNo,#NTXBUF,13,3)
+T(1,@BormNo,#NTXBUF,16,3)
+T(1,@EntryDate,#NTXBUF,19,7)
+T(1,@TwExtraRepay,#NTXBUF,26,16)
+T(1,@UsExtraRepay,#NTXBUF,26,16)
+T(1,@IncludeIntFlag,#NTXBUF,42,1)
+T(1,@RepayTerms,#NTXBUF,43,3),$)
+
+#CHAINTXCD=_,_,S
+C(3,#CHAIN,1,T(1,#NTXBUF,1,5),S)
+
+#txcdtype=X,2,S
+C(3,#CHAIN,1,T(1,#NTXBUF,1,2),S)
+
+
+#WKFUNC=X,1,S
+T(3,1)
+
+#BUF1A=X,18,S
+T(2,00000009999999000)
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
+
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
+#FdCustNo=X,2,L
+#TempCustNo=A,7,S
+#CustNo=A,7,I
+C(3,#CHAIN,1,s,$)
+INVOKEJS(SHOW,p1,1,3,1)
+SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+@
+C(3,#CustNo,#TempCustNo,$,CALL(#InitValue))
+E(0,@TempCustNo,#CustNo)
+
+#WKBTN1=X,1,S
+C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
+
+#BUF1B=X,18,S
+C(3,#CustNo,0,T(2,00000009999999000),T(2,#CustNo+#CustNo+000))
+
+
+#BIND1B=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
+
+#SendL2r07A=X,1,S
+C(3,#CustNo,0,S,$)
+T(3,@RimCustId, )
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07A,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#CustNoX=X,100,L
+C(3,#CustNo,0,S,T(2,#L2r07CustName))
+
+#BUF2A=X,100,S
+
+#BIND2A=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+
+![統一編號]
+#FdCustId=X,2,L
+
+#CustId=X,10,I
+T(3,@FdApplNo, )
+C(3,#CHAIN,1,S,$)
+C(3,#CustNo,0,$,S)
+INVOKEJS(SHOW,p1,2,3,1)
+SHOW(#BTN2)HIDE(#BTN3)
+CALL(#InitValue)
+@C(4,#CustId,S,$)
+V(7)
+
+#BUF2B=X,100,S
+T(2,0000000+#CustId)
+
+#BIND2B=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2B;ntxbuf5=type<-1:CustId<-OOCustId})
+
+#CheckCustId=X,1,S
+C(4,#CustId,S,$)
+A(ID_UNINO,0,#CustId)
+
+#WKBTN2=X,1,S
+C(4,#CustId,HIDE(#BTN2),SHOW(#BTN2))
+C(4,#CustId,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,3,3,0))
+
+#SendL2r07B=X,1,S
+C(4,#CustId,S,$)
+T(2,@RimCustId,#CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#SendL2r07B,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#CustIdX=X,100,L
+C(4,#CustId,S,T(2,#L2r07CustName))
+
+#BUF3A=X,18,S
+T(3,000000099999990)
+
+#BIND3A=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+
+![核准編號]
+#FdApplNo=X,2,L
+C(3,#CHAIN,1,S,$)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+T(3,*)
+
+#ApplNo=A,7,I
+C(3,#CHAIN,1,S,$)
+C(3,#CustNo,0,$,S)
+C(4,#CustId,$,S)
+INVOKEJS(SHOW,p1,3,3,1)
+SHOW(#BTN3)
+CALL(#InitValue)
+@V(2,0)
+
+#WKBTN3=X,1,S
+C(3,#ApplNo,0,HIDE(#BTN3),SHOW(#BTN3))
+
+#BUF3B=X,18,S
+T(2,#ApplNo+99999990)
+
+#BIND3B=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3B;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+
+#HIDEALLBTN=X,1,S
+C(3,#CHAIN,1,$,S)
+HIDE(#BTN1,#BTN2,#BTN3)
+
+!用核准號碼(ApplNo)調L2R05
+#SendL2r05A=X,1,S
+C(3,#ApplNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#CustNo)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05A,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+E(0,@FacmNo,#L2r05FacmNo)
+
+#SendL2r07C=X,1,S
+C(3,#ApplNo,0,S,$)
+T(2,@RimCustId,#L2r05CustId)
+E(0,@RimCustNo,#CustNo)
+RESET_RIM(#SendL2r07C,L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo,#END)
+R(1,L2R07)
+
+#ApplNoX=X,100,L
+C(3,#ApplNo,0,S,T(2,#L2r07CustName))
+
+#TimCustNo=A,7,S
+E(0,0)
+C(3,#CustNo,0,$,E(0,#CustNo))
+C(4,#CustId,$,E(0,#L2r07CustNo))
+C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
+T(2,@LockCustNo,#CustNo)
+! <include src="COM.icf::LockControl.rtn"/>
+
+!尋找系統參數設定檔資料
+#SendL6r28=X,1,S
+E(0,@RimFuncCode,5)
+T(2,@RimBusinessType,LN)
+RESET_RIM(#SendL6r28,L6R28)
+S(L6R28,1,#RimFuncCode,#RimTxCode,#RimBusinessType)
+R(1,L6R28)
+
+#ShortPrinPercent=A,3,S
+E(0,#L6R28ShortPrinPercent)
+
+#ShortIntPercent=A,3,S
+E(0,#L6R28ShortIntPercent)
+
+! 還款來源 00:全部;
+#RepayCode=A,2,S
+E(0,0)
+
+#BUF5A=X,12,S
+T(2,#TimCustNo+000+#RepayCode)
+
+#BIND5A=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L492A; ntxbuf=#BUF5A;ntxbuf5=type<-1
+:EntryDate<-OOEntryDate
+:FacmNo<-OOFacmNo
+:DetailSeq<-OODetailSeq
+:DetailNote<-OOProcNote
+:L492aRepayAmt<-OORepayAmt
+:L492aRepayCode<-OORepayCode
+:L492aRepayType<-OORepayType
+:RP_ACCTCODE<-OOAcctCode
+:RP_BatchNo<-OOBatchNo
+:RP_AcDate<-OOAcDate
+:RP_CHQUENO<-OOChequeNo
+:RP_CHQACT<-OOChequeAcct
+:RP_CHQUEAMT<-OOChequeAmt
+:RpDscpt1<-OODscpt
+:RpNote1<-OONote
+:RpRvno1<-OORvNo
+:RP_ACNO<-OOAcNo})
+
+#BTN4=X,20,I,ui:button;value:已入帳未還款查詢;enable:1;tabbable:0;title:L492A 已入帳未還款查詢
+
+#L492aRepayCode=A,2,S
+
+#L492aRepayType=A,2,S
+
+#L492aRepayAmt=m,14.2,S        
+
+![入帳日期]
+#FdEntryDate=X,2,L
+SHOW(#EntryDate)
+T(3,*)
+
+#EntryDate=D,7,I
+C(3,#CHAIN,1,s,$)
+C(3,#L492aRepayType,0,$,s)
+E(0,#SYSDATE)
+@V(7)A(DATE,0,#EntryDate)
+
+
+![已入帳未還款-明細序號]
+#DetailSeq=A,6,S
+!E(0,6)
+
+![已入帳未還款-摘要]
+#DetailNote=X,60,S
+
+!還款類別 1:期款 2:部分償還 3:結案 4:帳管費 5:火險費 6:契變手續費 7:法務費 9:其他
+#FdRepayType=X,2,L
+! IF(#L492aRepayType==01||#L492aRepayType==02,HIDE(#RepayType),SHOW(#RepayType))
+! C(3,#L492aRepayType,0,T(3,*)SHOW(#RepayType),T(3, )HIDE(#RepayType))
+
+#RepayType=A,2,I
+!改
+INVOKEJS(SHOW,p1,9,19,1)
+! INVOKEJS(SHOW,p1,13,18,0)
+C(3,#L492aRepayType,0,$,E(0,#L492aRepayType))
+IF(#L492aRepayType==01||#L492aRepayType==02,$,E(0,00))
+! C(3,#L492aRepayType,0,$,s)
+HELP(#RepayTypeHelp)
+C(5,#CHAINTXCD,L2631,E(0,9),$)
+C(5,#CHAINTXCD,L2631,s,$)
+@
+V(H,#RepayTypeHelp)
+C(3,#RepayType,2,$,E(0,@TimExtraRepay,0))
+! V(2,3,4,5,6,7,11) 
+! V(2,01,02,09,12) 
+
+
+#RepayTypeX=X,10,L
+T(H,#RepayType,#RepayTypeHelp)
+!SWITCH(#RepayType,01,T(3,期款),
+!                  02,T(3,部分償還),
+!                  09,T(3,清償違約金),
+!                  12,T(3,催收收回))
+
+#RepayTypeMsgErr=X,1,S
+C(3,#L492aRepayType,3,V(P,[已入帳未還款查詢]，還款類別請勿選擇[結案]),$)
+IF(#L492aRepayType >= 0 &&#L492aRepayType <= 2 ,$,V(P,還款類別選擇錯誤))
+
+!V(P,請按[已入帳未還款查詢]，選擇回收資料)
+
+#WkHideAmt=X,1,S
+!改
+! INVOKEJS(SHOW,p1,9,17,0)
+INVOKEJS(SHOW,p1,9,13,0)
+C(3,#RepayType,2,INVOKEJS(SHOW,p1,13,13,1),$)
+C(3,#RepayType,2,s,$)
+! C(3,#RepayType,1,INVOKEJS(SHOW,p1,9,10,1),INVOKEJS(SHOW,p1,13,13,1)INVOKEJS(SHOW,p1,19,19,0))
+C(3,#RepayType,1,INVOKEJS(SHOW,p1,9,10,1),$)
+C(3,#RepayType,9,INVOKEJS(SHOW,p1,12,12,1),$)
+C(3,#RepayType,9,INVOKEJS(SHOW,p1,14,20,0),$)
+C(3,#RepayType,12,INVOKEJS(SHOW,p1,11,11,1),$)
+
+![額度編號]
+!可不輸入
+#FdFacmNo=X,2,L
+T(F,@FacmNo,0)
+C(3,#CHAIN,1,s,$)
+C(3,#ApplNo,0,$,s)
+C(3,#L492aRepayType,0,$,s)
+! T(F,@FacmNo,1)
+
+#FacmNo=A,3,I
+C(3,#CHAIN,1,C(5,#txcdtype,L4,$,s),$)
+C(3,#ApplNo,0,$,s)
+C(3,#L492aRepayType,0,$,$)
+
+!用CustNo,FacmNo調L2R05
+#SendL2r05B=X,1,S
+C(3,#FacmNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimApplNo,0)
+E(0,@RimCaseNo,0)
+RESET_RIM(#SendL2r05B,L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+
+#SendL2r01=X,1,S
+C(3,#FacmNo,0,S,$)
+E(0,@RimFuncCode,5)
+T(2,@RimProdNo,#L2r05ProdNo)
+RESET_RIM(#SendL2r01,L2R01)
+S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
+R(1,L2R01)
+
+![撥款序號]
+!可不輸入
+#FdBormNo=X,2,L
+
+#BormNo=A,3,I
+E(0,0)
+C(3,#CHAIN,1,s,$)
+C(3,#FacmNo,0,T(F,#BormNo,0),T(F,#BormNo,1))
+C(3,#FacmNo,0,S,$)
+C(3,#RepayType,9,S,$)
+! @C(3,#RepayType,2,V(2,0),$)
+
+#SendL3r02=X,1,S
+C(3,#BormNo,0,S,$)
+E(0,@RimFuncCode,5)
+E(0,#RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#BormNo)
+RESET_RIM(#SendL3r02,L3R02)
+S(L3R02,1,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo)
+R(1,L3R02)
+
+![幣別]
+#FdCurrencyCode=X,2,L
+
+#CurrencyCode=X,3,L
+T(3,TWD)
+C(3,#FacmNo,0,s,T(2,#L2r05CurrencyCode))
+C(3,#BormNo,0,s,T(2,#L3r02CurrencyCode))
+
+#CurrencyCodeX=X,10,S
+T(3,)T(H,#CurrencyCode,#CurrencyCodeHelp)
+
+#Precision=N,1,S
+E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
+C(3,#Precision,0,SHOW(#TwRepayAmt,#TwOvduRepay,#TwCloseBreachAmt,#TwExtraRepay,#TwReduceAmt,
+                      #TwPrincipal,#TwInterest,#TwDelayInt,#TwBreachAmt,
+                      #TwAcctFee,#TwModifyFee,#TwFireFee,#TwLawFee,
+                      #TwExtraCloseBreachAmt)
+                 HIDE(#UsRepayAmt,#UsOvduRepay,#UsCloseBreachAmt,#UsExtraRepay,#UsReduceAmt,
+                      #UsPrincipal,#UsInterest,#UsDelayInt,#UsBreachAmt,
+                      #UsAcctFee,#UsModifyFee,#UsFireFee,#UsLawFee,
+                      #UsExtraCloseBreachAmt)
+                ,SHOW(#UsRepayAmt,#UsOvduRepay,#UsCloseBreachAmt,#UsExtraRepay,#UsReduceAmt,
+                      #UsPrincipal,#UsInterest,#UsDelayInt,#UsBreachAmt,
+                      #UsAcctFee,#UsModifyFee,#UsFireFee,#UsLawFee,
+                      #UsExtraCloseBreachAmt)
+                 HIDE(#TwRepayAmt,#TwOvduRepay,#TwCloseBreachAmt,#TwExtraRepay,#TwReduceAmt,
+                      #TwPrincipal,#TwInterest,#TwDelayInt,#TwBreachAmt,
+                      #TwAcctFee,#TwModifyFee,#TwFireFee,#TwLawFee,
+                      #TwExtraCloseBreachAmt))
+
+#PreRepayTerms=A,3,S
+E(0,#L6R28PreRepayTerms)
+
+![回收期數]
+!部份償還本金時，回收期數不可輸入
+!回收期數不可大於未還款期數
+!清償違約金時，回收期數．部份償還本金，減免金額不可輸入
+#FdRepayTerms=X,2,L
+C(5,#L2r01CharCode,2,T(F,@RepayTerms,0),T(F,@RepayTerms,1))
+
+#RepayTerms=A,3,I
+C(3,#CHAIN,1,s,$)
+C(3,#RepayType,12,S,$)
+C(5,#L2r01CharCode,2,E(0,1),$)
+C(5,#L2r01CharCode,2,s,$)
+C(3,#RepayType,1,$,S)
+
+#BUF5=X,50,S
+T(2,#TXCD+#TimCustNo+#FacmNo+#BormNo+#CurrencyCode+#TimExtraRepay+#EntryDate+#IncludeIntFlag+#RepayTerms)
+
+#BIND5=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3921; ntxbuf=#BUF5})
+
+#SendL3r06A=X,1,S
+C(3,#RepayType,12,S,$)
+C(3,#RepayType,2,S,$)
+E(0,@RimFuncCode,3)
+C(3,#RepayType,9,E(0,@RimFuncCode,1),$)
+C(3,#RepayType,1,E(0,@RimFuncCode,2),$)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#BormNo)
+T(2,@RimCurrencyCode,#CurrencyCode)
+E(0,@RimExtraRepay,#TimExtraRepay)
+T(2,@RimIncludeIntFlag,#IncludeIntFlag)
+E(0,@RimRepayTerms,#RepayTerms)
+E(0,@RimRepayType,#RepayType)
+E(0,@RimEntryDate,#EntryDate)
+E(0,@RimCloseBreachAmt,#TimCloseBreachAmt)
+RESET_RIM(#SendL3r06A,L3R06)
+S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
+R(1,L3R06)
+
+#ShowPrincipal=X,1,S
+!改
+! INVOKEJS(SHOW,p1,13,17,0)
+C(3,#RepayType,12,S,$)
+C(3,#RepayType,1,$,S)
+! INVOKEJS(SHOW,p1,13,16,1)
+E(0,@TwPrincipal,#L3r06Principal)
+E(0,@UsPrincipal,#L3r06Principal)
+E(0,@TwInterest,#L3r06Interest)
+E(0,@UsInterest,#L3r06Interest)
+E(0,@TwDelayInt,#L3r06DelayInt)
+E(0,@UsDelayInt,#L3r06DelayInt)
+! C(3,#L3r06CloseBreachAmtUnpaid,0,E(0,@TwBreachAmt,#L3r06BreachAmt),E(0,@TwBreachAmt,#L3r06CloseBreachAmtUnpaid))
+! C(3,#L3r06CloseBreachAmtUnpaid,0,E(0,@UsBreachAmt,#L3r06BreachAmt),E(0,@UsBreachAmt,#L3r06CloseBreachAmtUnpaid))
+E(0,@TwBreachAmt,#L3r06BreachAmt)
+E(0,@UsBreachAmt,#L3r06BreachAmt)
+E(0,@TwAcctFee,#L3r06AcctFee)
+E(0,@UsAcctFee,#L3r06AcctFee)
+E(0,@TwModifyFee,#L3r06ModifyFee)
+E(0,@UsModifyFee,#L3r06ModifyFee)
+E(0,@TwFireFee,#L3r06FireFee+#L3r06CollFireFee)
+E(0,@UsFireFee,#L3r06FireFee+#L3r06CollFireFee)
+E(0,@TwLawFee,#L3r06LawFee+#L3r06CollLawFee)
+E(0,@UsLawFee,#L3r06LawFee+#L3r06CollLawFee)
+C(3,#L3r06CloseBreachAmtUnpaid,0,T(3,@BreachCodeX,),T(3,@BreachCodeX,領清償證明時收取))
+![回收金額]
+!回收金額,清償違約金,部分償還金額擇一輸入
+#FdRepayAmt=X,2,L
+C(3,#L492aRepayType,0,T(F,@TwRepayAmt,1),T(F,@TwRepayAmt,0))
+C(3,#L492aRepayType,0,T(F,@UsRepayAmt,1),T(F,@UsRepayAmt,0))
+
+
+![清償違約金]
+#FdCloseBreachAmt=X,2,L
+!T(F,@TwCloseBreachAmt,0)
+!T(F,@UsCloseBreachAmt,0)
+!HIDE(#TwCloseBreachAmt,#UsCloseBreachAmt)SHOW(#CloseBreachAmtX)
+
+#TwCloseBreachAmt=m,14,I
+C(3,#Precision,0,$,S)
+C(3,#RepayType,12,S,$)
+C(3,#RepayType,1,S,$)
+C(3,#RepayType,2,S,$)
+C(3,#RepayType,4,E(0,#L3r06AcctFee),$)
+C(3,#RepayType,5,E(0,#L3r06FireFee),$)
+C(3,#RepayType,6,E(0,#L3r06ModifyFee),$)
+C(3,#RepayType,7,E(0,#L3r06LawFee),$)
+C(3,#RepayType,9,E(0,#L3r06CloseBreachAmt),$)
+C(3,#RepayType,9,C(3,#L3r06CloseBreachAmt,0,V(P,無清償違約金),$),$)
+C(3,#RepayType,9,s,$)
+C(3,#CHAIN,1,s,$)
+@
+V(2,0)
+C(3,#RepayType,4,V(5,1,#L3r06AcctFee),$)
+C(3,#RepayType,5,V(5,1,#L3r06FireFee),$)
+C(3,#RepayType,6,V(5,1,#L3r06ModifyFee),$)
+C(3,#RepayType,7,V(5,1,#L3r06LawFee),$)
+C(3,#RepayType,9,V(5,0,#L3r06CloseBreachAmt),$)
+
+#UsCloseBreachAmt=m,14.2,I
+C(3,#Precision,0,S,$)
+C(3,#RepayType,12,S,$)
+C(3,#RepayType,1,S,$)
+C(3,#RepayType,4,E(0,#L3r06AcctFee),$)
+C(3,#RepayType,5,E(0,#L3r06FireFee),$)
+C(3,#RepayType,6,E(0,#L3r06ModifyFee),$)
+C(3,#RepayType,7,E(0,#L3r06LawFee),$)
+C(3,#RepayType,9,E(0,#L3r06CloseBreachAmt),$)
+C(3,#RepayType,9,s,$)
+C(3,#CHAIN,1,s,$)
+@
+C(3,#RepayType,9,C(3,#L3r06CloseBreachAmt,0,V(P,無清償違約金),$),$)
+V(2,0)
+C(3,#RepayType,4,V(5,0.01,#L3r06AcctFee),$)
+C(3,#RepayType,5,V(5,0.01,#L3r06FireFee),$)
+C(3,#RepayType,6,V(5,0.01,#L3r06ModifyFee),$)
+C(3,#RepayType,7,V(5,0.01,#L3r06LawFee),$)
+C(3,#RepayType,9,V(5,0.00,#L3r06CloseBreachAmt),$)
+
+#TimCloseBreachAmt=m,14.2,S
+C(3,#Precision,0,E(0,#TwCloseBreachAmt),E(0,#UsCloseBreachAmt))
+
+#CloseBreachAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#TimCloseBreachAmt,#CloseBreachAmtX)
+
+![部分償還金額]
+!集體回收，不可輸入部份償還本金
+!催收戶回收時，部份償還本金不可輸入
+!清償違約金時，回收期數．部份償還本金，減免金額不可輸入
+#FdExtraRepay=X,2,L
+C(3,#L492aRepayType,2,T(F,@TwExtraRepay,0),T(F,@TwExtraRepay,1))
+C(3,#L492aRepayType,2,T(F,@UsExtraRepay,0),T(F,@UsExtraRepay,1))
+
+#TwExtraRepay=m,14,I
+C(3,#Precision,0,$,S)
+C(3,#CHAIN,1,s,$)
+C(3,#RepayType,12,S,$)
+C(3,#L492aRepayType,2,E(0,#L492aRepayAmt),$)
+C(3,#L492aRepayType,2,s,$)
+C(3,#RepayType,2,$,S)
+@V(2,0)
+
+#UsExtraRepay=m,14.2,I
+C(3,#Precision,0,S,$)
+C(3,#CHAIN,1,s,$)
+C(3,#RepayType,12,S,$)
+C(3,#L492aRepayType,2,E(0,#L492aRepayAmt),$)
+C(3,#L492aRepayType,2,s,$)
+C(3,#RepayType,2,$,S)
+@V(2,0)
+
+#TimExtraRepay=m,14.2,S
+C(3,#Precision,0,E(0,#TwExtraRepay),E(0,#UsExtraRepay))
+
+#ShowPayMethod=X,1,S
+C(3,#TimExtraRepay,0,INVOKEJS(SHOW,p1,19,19,0),INVOKEJS(SHOW,p1,19,19,1))
+
+![是否內含利息]
+#IncludeIntFlag=X,1,I
+C(3,#CHAIN,1,s,$)
+C(3,#RepayType,12,S,$)
+T(3,Y)
+C(3,#TimExtraRepay,0,s,$)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+
+#IncludeIntFlagX=X,2,L
+T(3,)T(H,#IncludeIntFlag,#YNHelp)
+
+![利息是否可欠繳]
+#UnpaidIntFlag=X,1,I
+T(3,N)
+C(3,#RepayType,12,s,$)
+C(3,#TimExtraRepay,0,s,$)
+C(5,#IncludeIntFlag,Y,s,$)
+HELP(#YNHelp)
+@V(H,#YNHelp)
+
+#UnpaidIntFlagX=X,2,L
+T(3,)T(H,#UnpaidIntFlag,#YNHelp)
+
+#SendL3r06B=X,1,S
+C(3,#RepayType,2,$,S)
+C(3,#RepayType,12,S,$)
+E(0,@RimFuncCode,2)
+E(0,@RimCustNo,#TimCustNo)
+E(0,@RimFacmNo,#FacmNo)
+E(0,@RimBormNo,#BormNo)
+T(2,@RimCurrencyCode,#CurrencyCode)
+E(0,@RimExtraRepay,#TimExtraRepay)
+T(2,@RimIncludeIntFlag,#IncludeIntFlag)
+E(0,@RimRepayTerms,#RepayTerms)
+E(0,@RimEntryDate,#EntryDate)
+E(0,@RimCloseBreachAmt,#TimCloseBreachAmt)
+RESET_RIM(#SendL3r06B,L3R06)
+S(L3R06,01,#RimTxCode,#RimFKey,#RimFuncCode,#RimCustNo,#RimFacmNo,#RimBormNo,#RimCurrencyCode,#RimExtraRepay,#RimIncludeIntFlag,#RimRepayTerms,#RimRepayType,#RimEntryDate,#RimCloseBreachAmt)
+R(1,L3R06)
+C(3,#L3r06CloseBreachAmtUnpaid,0,T(3,@BreachCodeX,),T(3,@BreachCodeX,領清償證明時收取))
+
+
+#SumRepayAmt=m,14.2,S
+E(0,#L3r06RepayAmt+#L3r06TotalFee+#L3r06Shortfall)
+
+!回收金額
+#TwRepayAmt=m,14,I
+C(3,#Precision,0,$,S)
+C(3,#RepayType,12,S,$)
+! IF(#RepayType==1,$,S)
+! IF(#RepayType==1 || #RepayType==2,$,S)
+! C(3,#RepayType,1,$,S)
+IF(#L492aRepayType==0 || #L492aRepayType==1|| #L492aRepayType==2,$,S)
+E(0,#SumRepayAmt)
+C(3,#L492aRepayType,0,$,s)
+C(3,#RepayType,9,s,$)
+@V(2,0)
+V(5,1,#SumRepayAmt)
+
+#UsRepayAmt=m,14.2,I
+C(3,#Precision,0,S,$)
+C(3,#RepayType,12,S,$)
+! IF(#RepayType==1,$,S)
+! IF(#RepayType==1 || #RepayType==2,$,S)
+! C(3,#RepayType,1,$,S)
+IF(#L492aRepayType==0 || #L492aRepayType==1|| #L492aRepayType==2,$,S)
+E(0,#SumRepayAmt)
+C(3,#L492aRepayType,0,$,s)
+C(3,#RepayType,9,s,$)
+@V(2,0)
+V(5,1,#SumRepayAmt)
+
+#TimRepayAmt=m,14.2,S
+C(3,#Precision,0,E(0,#TwRepayAmt),E(0,#UsRepayAmt))
+
+!催收收回金額
+#FdOvduRepay=X,2,L
+
+#TwOvduRepay=m,14,I
+C(3,#RepayType,12,$,S)
+C(3,#Precision,0,$,S)
+@C(3,#RepayType,12,V(2,0),S)
+
+#UsOvduRepay=m,14.2,I
+C(3,#RepayType,12,$,S)
+C(3,#Precision,0,S,$)
+@C(3,#RepayType,12,V(2,0),S)
+
+#TimOvduRepay=m,14.2,S
+C(3,#RepayType,12,$,S)
+C(3,#Precision,0,E(0,#TwOvduRepay),E(0,#UsOvduRepay))
+
+
+![本金]
+#FdPrincipal=X,2,L
+
+#TwPrincipal=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06Principal)
+
+#UsPrincipal=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06Principal)
+
+#TimPrincipal=m,14.2,L
+C(3,#Precision,0,E(0,#TwPrincipal),E(0,#UsPrincipal))
+
+![利息]
+#FdInterest=X,2,L
+C(3,#TimCloseBreachAmt,0,$,S)
+C(3,#RepayType,09,$,INVOKEJS(SHOW,p1,14,14,1))
+
+#TwInterest=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06Interest)
+
+#UsInterest=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06Interest)
+
+#TimInterest=m,14.2,L
+C(3,#Precision,0,E(0,#TwInterest),E(0,#UsInterest))
+
+![延遲息]
+#FdDelayInt=X,2,L
+
+#TwDelayInt=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06DelayInt)
+
+#UsDelayInt=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06DelayInt)
+
+#TimDelayInt=m,14.2,L
+C(3,#Precision,0,E(0,#TwDelayInt),E(0,#UsDelayInt))
+
+![違約金]
+#FdBreachAmt=X,2,L
+
+#TwBreachAmt=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06BreachAmt)
+
+#UsBreachAmt=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06BreachAmt)
+
+#TimBreachAmt=m,14.2,L
+C(3,#Precision,0,E(0,#TwBreachAmt),E(0,#UsBreachAmt))
+
+#BreachCodeX=x,20,L
+
+![帳管費]
+#FdAcctFee=X,2,L
+
+#TwAcctFee=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06AcctFee)
+
+#UsAcctFee=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06AcctFee)
+
+#TimAcctFee=m,14.2,L
+C(3,#Precision,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
+
+![契變手續費]
+#FdModifyFee=X,2,L
+
+#TwModifyFee=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06ModifyFee)
+
+#UsModifyFee=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06ModifyFee)
+
+#TimModifyFee=m,14.2,L
+C(3,#Precision,0,E(0,#TwModifyFee),E(0,#UsModifyFee))
+
+![火險費]
+#FdFireFee=X,2,L
+
+#TwFireFee=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06FireFee+#L3r06CollFireFee)
+
+#UsFireFee=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06FireFee+#L3r06CollFireFee)
+
+#TimFireFee=m,14.2,L
+C(3,#Precision,0,E(0,#TwFireFee),E(0,#UsFireFee))
+
+![法務費]
+#FdLawFee=X,2,L
+
+#TwLawFee=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06LawFee+#L3r06CollLawFee)
+
+#UsLawFee=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06LawFee+#L3r06CollLawFee)
+
+#TimLawFee=m,14.2,L
+C(3,#Precision,0,E(0,#TwLawFee),E(0,#UsLawFee))
+
+
+![累短收]
+#FdShortfall=X,2,L
+
+#Shortfall=m,14.2,S
+E(0,#L3r06Shortfall)
+
+#ShortfallX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#Shortfall,#ShortfallX)
+
+#ShortfallInt=m,14.2,S
+E(0,#L3r06ShortfallInt)
+
+#TimShortfallInt=m,14.2,S
+E(0,#ShortfallInt)
+
+#WKINTX=X,6,S
+T(3,[利息 )
+
+#WKPRIX=X,5,S
+T(3,本金 )
+
+#WKCBX=X,10,S
+T(3,清償違約金)
+
+#WKBRAX=X,1,S
+T(3,])
+
+#ShortfallIntX=X,22,S
+CALL2(#ADJUSTDOT,#Precision,#ShortfallInt,#ShortfallIntX)
+
+#ShortfallIntXX=X,27,S
+T(2,#WKINTX+#ShortfallIntX)
+P(R,#ShortfallIntXX)
+
+#ShortfallPrin=m,14.2,S
+E(0,#L3r06ShortfallPrin)
+
+#TimShortfallPrin=m,14.2,S
+E(0,#ShortfallPrin)
+
+#ShortfallPrinX=X,22,S
+CALL2(#ADJUSTDOT,#Precision,#ShortfallPrin,#ShortfallPrinX)
+P(R,#ShortfallPrinX)
+
+#ShortfallPrinXX=X,27,S
+T(2,#ShortfallPrinX)
+P(L,#ShortfallPrinXX)
+T(2,#WKPRIX+#ShortfallPrinXX)
+
+#ShortCloseBreach=m,14.2,S
+E(0,#L3r06ShortCloseBreach)
+
+#TimShortCloseBreach=m,14.2,S
+E(0,#ShortCloseBreach)
+
+#ShortCloseBreachX=X,22,S
+CALL2(#ADJUSTDOT,#Precision,#ShortCloseBreach,#ShortCloseBreachX)
+P(R,#ShortCloseBreachX)
+
+#ShortCloseBreachXX=X,33,S
+T(2,#ShortCloseBreachX+#WKBRAX)
+P(L,#ShortCloseBreachXX)
+T(2,#WKCBX+#ShortCloseBreachXX)
+
+
+#WKSPC2=X,2,S
+T(3,，)
+
+#ShortfallXX=X,80,L
+T(B,#ShortfallIntXX+#WKSPC2+#ShortfallPrinXX+#WKSPC2+#ShortCloseBreachXX)
+P(L,#ShortfallXX)
+
+
+![繳納方式]
+#FdPayMethod=X,2,L
+T(3,*)
+
+#PayMethod=A,1,I
+C(3,#TimExtraRepay,0,S,$)
+C(3,#RepayType,12,S,$)
+HELP(#PayMethodHelp)
+@V(H,#PayMethodHelp)
+
+#PayMethodX=X,16,L
+T(3,)T(H,#PayMethod,#PayMethodHelp)  
+
+
+![部分償還金額的清償違約金]
+#FdExtraCloseBreachAmt=X,2,L
+C(3,#TimExtraRepay,0,S,$)
+INVOKEJS(SHOW,p1,17,17,1)
+
+#TwExtraCloseBreachAmt=m,14,L
+C(3,#Precision,0,$,S)
+C(3,#TimExtraRepay,0,S,$)
+C(3,#L3r06CloseBreachAmtUnpaid,0,E(0,#L3r06CloseBreachAmt),E(0,#L3r06CloseBreachAmtUnpaid))
+! E(0,#L3r06CloseBreachAmt)
+
+#UsExtraCloseBreachAmt=m,14.2,L
+C(3,#Precision,0,S,$)
+C(3,#TimExtraRepay,0,S,$)
+C(3,#L3r06CloseBreachAmtUnpaid,0,E(0,#L3r06CloseBreachAmt),E(0,#L3r06CloseBreachAmtUnpaid))
+! E(0,#L3r06CloseBreachAmt)
+
+#TimExtraCloseBreachAmt=m,14.2,L
+C(3,#Precision,0,E(0,#TwExtraCloseBreachAmt),E(0,#UsExtraCloseBreachAmt))
+
+
+#TotalReduceAmt=m,14.2,S
+! C(3,#TimCloseBreachAmt,0,$,S)
+E(0,#L3r06Interest+#L3r06DelayInt+#L3r06BreachAmt+#L3r06CloseBreachAmt)
+C(3,#TimExtraRepay,0,s,$)
+C(5,#IncludeIntFlag,Y,E(0,#L3r06CloseBreachAmt),$)
+
+
+![減免金額]
+#FdReduceAmt=X,2,L
+C(5,#L2r01CharCode,2,T(F,@TwReduceAmt,0)T(F,@UsReduceAmt,0)
+                    ,T(F,@TwReduceAmt,1)T(F,@UsReduceAmt,1))
+
+#TwReduceAmt=m,14,I
+C(3,#Precision,0,$,S)
+C(5,#L2r01CharCode,2,S,$)
+C(3,#RepayType,12,S,$)
+! C(3,#TimCloseBreachAmt,0,$,S)
+E(0,0)
+@V(5,0,#TotalReduceAmt)
+
+#UsReduceAmt=m,14.2,I
+C(3,#Precision,0,S,$)
+C(5,#L2r01CharCode,2,S,$)
+C(3,#RepayType,12,S,$)
+! C(3,#TimCloseBreachAmt,0,$,S)
+E(0,0)
+@V(5,0,#TotalReduceAmt)
+
+#TimReduceAmt=m,14.2,S
+C(3,#Precision,0,E(0,#TwReduceAmt),E(0,#UsReduceAmt))
+
+#ReduceLimit=N,3,S
+E(0,#L6R28ReduceAmtLimit)
+
+#WKMAMT=m,14.2,S
+E(0,#TimReduceAmt-#ReduceLimit)
+
+!0007 減免金額超過限額，需主管核可
+#RqspFlag=X,1,S
+C(1,#WKMAMT,T(3,N),T(3,N),T(3,Y))
+
+! #ReduceInt=m,14.2,S
+! IF(#TimReduceAmt > #TimExtraCloseBreachAmt,E(0,#TimReduceAmt-#TimExtraCloseBreachAmt),E(0,0))
+
+#RealTxAmt=m,14.2,S
+E(0,#TimRepayAmt)
+! C(3,#RepayCode,9,)
+! C(3,#TimCloseBreachAmt,0,$,E(0,#TimCloseBreachAmt))
+! C(3,#TimExtraRepay,0,$,E(0,#TimRepayAmt+#TimExtraRepay))
+! E(0,#RealTxAmt-#ReduceInt)
+C(3,#RepayType,2,$,E(0,#RealTxAmt-#TimReduceAmt))
+C(5,#IncludeIntFlag,Y,s,$)
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#TimCustNo),T(2,#TimCustNo+-+#FacmNo))
+C(3,#BormNo,0,$,T(2,#TimCustNo+-+#FacmNo+-+#BormNo))
+
+![SWIFT幣別三碼]
+#CURNM=_,_,S
+T(2,#CurrencyCode)
+
+!應收付類別,1:回收
+#TMPRPFG=X,1,S
+E(0,@RPFG,1)
+
+!還款來源
+#TMPRPTYP=X,1,S
+C(3,#L492aRepayCode,0,E(0,@RPTYPZ,90),E(0,@RPTYPZ,#L492aRepayCode))
+
+#WkRepayAmt=m,14.2,S
+E(0,#TimRepayAmt-#TimReduceAmt)
+
+!應收付總金額
+#TotalRepayAmt=m,14.2,S
+E(0,#RealTxAmt)
+C(3,#TimRepayAmt,0,$,E(0,#WkRepayAmt))
+! C(3,#TimCloseBreachAmt,0,$,E(0,#TimCloseBreachAmt))
+C(3,#TimExtraRepay,0,$,E(0,#RealTxAmt))
+C(5,#L2r01CharCode,2,E(0,0),$)
+E(3,@RPTOT,#TotalRepayAmt)
+C(3,#RepayType,12,E(3,@RPTOT,#TimOvduRepay),$)
+
+!實際收付金額
+#RealRepayAmt=m,14.2,L
+C(3,#L492aRepayType,0,E(0,0),E(0,#L492aRepayAmt))
+E(3,@RPAMTZ,#RealRepayAmt)
+
+![交易金額]
+#TXAMT=_,_,S
+E(0,#RealRepayAmt)
+
+! ----------1:還款、2:結案，需輸入----------
+! 明細序號
+#TmpSEQ=X,1,S
+E(0,@RPSEQ,#DetailSeq)
+
+! 入帳日期
+#TmpEntryDate=X,1,S
+E(0,@RP_ENTRYDATE,#EntryDate)
+
+! 還款類別  1:期款 2:部分償還 3:結案 4:帳管費 5:火險費 6:契變手續費 7:法務費 9:其他
+#TmpRepCat=X,1,S
+E(0,@RP_REPCAT,1)
+C(1,#TimExtraRepay,$,$,E(0,@RP_REPCAT,2))
+
+! 戶號
+#TmpCustNo=X,1,S
+E(0,@RP_CUSTNO,#TimCustNo)
+
+! 額度
+#TmpFacmNo=X,1,S
+E(0,@RP_FACMNO,#L3r06RpFacmNo)
+
+!類別   摘要
+#TmpNote=X,1,S
+T(2,@RP_NOTE,#DetailNote)
+
+<include src="RPDTL.icf::RPCOL.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L2R01.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L3Rim.dec"/>
+<include src="ROM.icf::L3R02.dec"/>
+<include src="ROM.icf::L3R06.dec"/>
+<include src="ROM.icf::L6R28.dec"/>
+
+</sub>
+!--------- 收付欄 -----------------------
+<sub type="DC" name="RPDTL" layout="cols=1;screen.width=[1000];printer.width=[20,80];">
+[
+<include src="RPDTL.icf::RPDTL.scr"/>
+]
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+<include src="PRT.icf::FM101.rtn"/>
+</sub>
+
+!---------- TXFORM = L3200 ----------
+<sub type="FORM" name="L3200">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L3200,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L3200] 回收登錄)
+
+</sub>
+!---------- TXFORM = FM101 交易分錄----------
+<sub type="FORM" name="FM101">
+<include src="PRT.icf::FM101.form"/>
+</sub>
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+
+#TimCustNo#CustId#ApplNo#FacmNo#BormNo
+#RepayType#TimRepayAmt#TimOvduRepay#TimCloseBreachAmt
+#TimExtraRepay#IncludeIntFlag#UnpaidIntFlag
+#RepayTerms#EntryDate
+#TimAcctFee#TimModifyFee#TimFireFee#TimLawFee
+#PayMethod#TimReduceAmt
+#TotalRepayAmt#RealRepayAmt
+#RqspFlag#ShortPrinPercent#ShortIntPercent
+#TimShortfallInt#TimShortfallPrin#TimShortCloseBreach
+#TimInterest#TimDelayInt#TimBreachAmt#TimPrincipal
+#TimExtraCloseBreachAmt
+<include src="RPDTL.icf::RPDTL.tim"/>
+#CustNo#TwRepayAmt#UsRepayAmt
+#TwCloseBreachAmt#UsCloseBreachAmt
+#TwExtraRepay#UsExtraRepay
+#TwPrincipal#UsPrincipal
+#TwInterest#UsInterest
+#TwDelayInt#UsDelayInt
+#TwBreachAmt#UsBreachAmt
+#TwAcctFee#UsAcctFee
+#TwModifyFee#UsModifyFee
+#TwFireFee#UsFireFee
+#TwLawFee#UsLawFee
+#TwExtraCloseBreachAmt#UsExtraCloseBreachAmt
+#TwReduceAmt#UsReduceAmt
+#TwExtraCloseBreachAmt#UsExtraCloseBreachAmt
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L3200^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="COM.icf::LockControl.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="PRT.icf::FM101.tom"/>
+<include src="ROM.icf::L2R01.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L3R02.tom"/>
+<include src="ROM.icf::L3R06.tom"/>
+<include src="ROM.icf::L6R28.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+<include src="PRT.icf::FM01.sel"/>
+<include src="PRT.icf::FMR01.sel"/>
+<include src="PRT.icf::FMH01.sel"/>
+<include src="PRT.icf::FMHR01.sel"/>
+<include src="PRT.icf::FM101.sel" map="landscape=1;size=830:1170" />
+</sub>

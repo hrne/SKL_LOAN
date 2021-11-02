@@ -46,6 +46,13 @@ E(0,0)
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從L5060進入),$)
 
+!做完交易自動更新原畫面
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 ! 功能下拉選單1
 #FunctionCdRimName=x,20,S
@@ -360,7 +367,7 @@ T(H,#AccCollPsnCode,#AccCollPsnCodeHelp)
 IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(F,@AccCollPsnName,0),$)
 
 ! 催收人員姓名
-#BTNF=X,1,I,ui:button;value:聯徵地區別查詢;enable:1;tabbable:0
+#BTNF=X,1,I,ui:button;value:法催地區別查詢;enable:1;tabbable:0
 #AccCollPsnNameBUF=X,6,S
 #AccCollPsnNameBIND=X,1,S
 BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#AccCollPsnNameBUF;ntxbuf5=type<-1:AccCollPsnName<-OOAccCollPsn})
@@ -417,7 +424,7 @@ C(3,#MeetPlaceCode,4,T(2,#MeetPlace, ),$)
 @V(7)
 
 ! 其他記錄
-#Remark=X,10.50,I
+#Remark=x,10.50,I
 C(2,#FunctionCd,S,$,$,$,s,s)
 ! T(2,#MemoA+#MemoB)
 ! 維護人員

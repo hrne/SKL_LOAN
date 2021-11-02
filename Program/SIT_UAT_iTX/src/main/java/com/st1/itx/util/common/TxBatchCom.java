@@ -567,18 +567,11 @@ public class TxBatchCom extends TradeBuffer {
 			this.repayFacmNo = tDetail.getFacmNo();
 
 		// 組L3200、L3210、L3420 交易電文
-		// 虛擬轉暫收，以還款類別 9, 再執行一次檢核
-		// 02.銀行扣款、 03.員工扣款，進行檢核
 		if (this.tTempVo.get("RepayType") != null)
 			this.repayType = parse.stringToInteger(this.tTempVo.get("RepayType"));
 		else
 			this.repayType = tDetail.getRepayType();
 
-		// 虛擬轉暫收時以09-其他，進行檢核
-		// 02.銀行扣款 03.員工扣款 => 整批檢核時設定為 4.檢核正常，整批入帳時才進行檢核
-		if (functionCode == 2) {
-			txCheck(9, tDetail, txTitaVo); // 09-其他
-		}
 		if (functionCode == 2) {
 			txTitaVo = setL3210Tita(txTitaVo, tDetail);
 		} else if (this.repayType == 1 || this.repayType == 2 || this.repayType == 12)
@@ -892,9 +885,7 @@ public class TxBatchCom extends TradeBuffer {
 		this.tTempVo = this.tTempVo.getVo(tDetail.getProcNote());
 		this.tTempVo.putParam("Txcd", titaVo.getTxcd());
 		this.tTempVo.putParam("ErrorMsg", "");
-		int unfinishCnt = 0; 
-		// 是否執行BS401，非整批入帳且全部入帳完畢執行BS401
-        boolean isBS401 = false;
+		int unfinishCnt = 0;
 		if (this.txBuffer.getTxCom().getTxRsut() == 0) { // 交易成功
 			if (titaVo.isHcodeNormal()) { // 正常交易
 				if (this.txBuffer.getAcDetailList() != null && this.txBuffer.getAcDetailList().size() > 0) {
@@ -914,7 +905,11 @@ public class TxBatchCom extends TradeBuffer {
 						tDetail.setProcStsCode("6"); // 6.批次入帳
 					}
 				} else {
-					tDetail.setProcStsCode("5");
+					if ("L3210".equals(titaVo.getTxcd())) {
+						tDetail.setProcStsCode("7"); // 7.轉暫收
+					} else {
+						tDetail.setProcStsCode("5");
+					}
 				}
 				acDate = this.txBuffer.getTxCom().getTbsdy();
 				tDetail.setTitaTlrNo(titaVo.getTlrNo());
@@ -950,17 +945,6 @@ public class TxBatchCom extends TradeBuffer {
 					this.txBuffer.getTxCom().getMsgId() + this.txBuffer.getTxCom().getErrorMsg()); // 錯誤訊息
 			if (titaVo.isHcodeNormal()) {
 				tDetail.setProcStsCode("3"); // 正常交易失敗，設定為檢核錯誤
-				// 失敗交易自動轉暫收(銀行扣款、 員工扣款)
-//				if (tDetail.getRepayCode() == 2 || tDetail.getRepayCode() == 3) {
-//					// 組入帳交易電文
-//					TitaVo txTitaVo = new TitaVo();
-//					txTitaVo = txTita(2, tDetail, titaVo); // 1:訂正 2:轉暫收
-//					// 執行入帳交易
-//					this.info("轉暫收 excuteTx " + txTitaVo);
-//					ApControl apControl = (ApControl) MySpring.getBean("apControl");
-//					apControl.callTrade(txTitaVo);
-//					apControl = null;
-//				}
 			} else { // 訂正交易失敗，狀態不變
 			}
 		}
@@ -988,7 +972,7 @@ public class TxBatchCom extends TradeBuffer {
 			}
 
 			// 啟動背景作業－整批入帳完成(非整批入帳)
-			if (tBatxHead.getUnfinishCnt() == 0 && ! "6".equals(tDetail.getProcStsCode())) {
+			if (tBatxHead.getUnfinishCnt() == 0 && !"6".equals(tDetail.getProcStsCode())) {
 				TitaVo bs401TitaVo = new TitaVo();
 				bs401TitaVo = (TitaVo) titaVo.clone();
 				bs401TitaVo.putParam("FunctionCode", "3");// 處理代碼 3.檢核
