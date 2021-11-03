@@ -1,5 +1,7 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -32,13 +34,24 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		// 2021XX
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		int iMonth = Integer.valueOf(String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000).substring(4, 6));
-		if (iMonth == 1) {
-			iYear = iYear - 1;
-			iMonth = 12;
-		} else {
-			iMonth = iMonth - 1;
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		// 當日(int)
+		int nowDate = Integer.valueOf(iEntdy);
+		Calendar calMonthLastDate = Calendar.getInstance();
+		// 設當年月底日
+		calMonthLastDate.set(iYear, iMonth, 0);
+
+		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
+
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		if (nowDate < monthLastDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
 		this.info("lM062.findAll iYear=" + iYear + ",iMonth=" + iMonth);
@@ -80,7 +93,7 @@ public class LM062ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yyyymm", iYear + String.format("%02d", iMonth));
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

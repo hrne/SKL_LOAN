@@ -237,11 +237,15 @@ public class LY002Report extends MakeReport {
 
 		Iterator<Map<String, Object>> iter = mergeEva.iterator();
 
+		Map<String, Object> itData = null;
+		
 		while (iter.hasNext()) {
 
-			tempEvaAmt = new BigDecimal(iter.next().get("eva").toString());
+			itData = iter.next();
 
-			eRow = sRow + Integer.valueOf(iter.next().get("count").toString()) - 1;
+			tempEvaAmt = new BigDecimal(itData.get("eva").toString());
+
+			eRow = sRow + Integer.valueOf(itData.get("count").toString()) - 1;
 
 			if (sRow == eRow) {
 
@@ -288,9 +292,11 @@ public class LY002Report extends MakeReport {
 
 		while (iter.hasNext()) {
 
-			tempLineAmt = new BigDecimal(iter.next().get("line").toString());
+			itData = iter.next();
 
-			eRow = sRow + Integer.valueOf(iter.next().get("count").toString()) - 1;
+			tempLineAmt = new BigDecimal(itData.get("line").toString());
+
+			eRow = sRow + Integer.valueOf(itData.get("count").toString()) - 1;
 
 			if (sRow == eRow) {
 

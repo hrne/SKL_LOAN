@@ -56,12 +56,12 @@ import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.CheckClEva;
 import com.st1.itx.util.common.ClFacCom;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-
 
 @Service("L2411")
 @Scope("prototype")
@@ -105,11 +105,14 @@ public class L2411 extends TradeBuffer {
 	public FacMainService sFacMainService;
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
-
+	
+	@Autowired
+	public CheckClEva sCheckClEva ;
+	
 	/* DB服務注入 */
 	@Autowired
 	public ClParkingTypeService sClParkingTypeService;
-	
+
 	@Autowired
 	public ClOwnerRelationService sClOwnerRelationService;
 
@@ -209,7 +212,7 @@ public class L2411 extends TradeBuffer {
 //		         建物門牌+建物所有權人(多)
 //		  2. 土地擔保品：
 //			  土地座落+土地所有權人(多)
-		
+
 		if (iFunCd == 1 && iClNo == 0) {
 			// 擔保品編號唯一性規則
 			if (iClCode1 == 1) {
@@ -223,6 +226,8 @@ public class L2411 extends TradeBuffer {
 				// from ELOAN 主檔變更
 				if (this.isEloan) {
 					iFunCd = 2;
+					// 新增擔保品重評資料
+					sCheckClEva.setClEva(titaVo,iClNo);
 				} else {
 					iFunCd = 2;
 					if (iClCode1 == 1) {
@@ -255,7 +260,7 @@ public class L2411 extends TradeBuffer {
 		ClImmId.setClCode1(iClCode1);
 		ClImmId.setClCode2(iClCode2);
 		ClImmId.setClNo(iClNo);
-		
+
 		clBuildingId.setClCode1(iClCode1);
 		clBuildingId.setClCode2(iClCode2);
 		clBuildingId.setClNo(iClNo);
@@ -271,7 +276,7 @@ public class L2411 extends TradeBuffer {
 				throw new LogicException("E2019", "核准號碼 = " + iApplNo);
 			}
 		}
-		
+
 		// 查擔保品主檔
 		tClMain = sClMainService.findById(ClMainId, titaVo);
 
@@ -295,11 +300,10 @@ public class L2411 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0005", "擔保品不動產檔" + e.getErrorMsg());
 				}
-				
+
 				// 擔保品不動產檔設定順位明細
 				setClImmRankDetail(titaVo);
-				
-				
+
 				// 房地擔保品
 				if (iClCode1 == 1) {
 					// 擔保品不動產建物檔主檔
@@ -325,32 +329,31 @@ public class L2411 extends TradeBuffer {
 					// insert 土地所有權人檔
 					InsertClLandOwner(titaVo);
 				}
-				
-				if( iApplNo > 0 ) {
-				  List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
-				  for (int i = 1; i <= 20; i++) {
-					// 若該筆無資料就離開迴圈
-					if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
-						break;
-					}
-					
-					String iOwnerId = titaVo.getParam("OwnerId" + i);
-					
-					CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
-					
-					if( custMain != null) {						
-						String custUKey = custMain.getCustUKey().trim();
-						String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
-						HashMap<String, String> map = new HashMap<String, String>();
-						map.put("OwnerCustUKey", custUKey);
-						map.put("OwnerRelCode", relCode);
-						ownerMap.add(map);
-					}
-				  }			
-				  clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
-				
-				} // if
 
+				if (iApplNo > 0) {
+					List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
+					for (int i = 1; i <= 20; i++) {
+						// 若該筆無資料就離開迴圈
+						if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
+							break;
+						}
+
+						String iOwnerId = titaVo.getParam("OwnerId" + i);
+
+						CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
+
+						if (custMain != null) {
+							String custUKey = custMain.getCustUKey().trim();
+							String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
+							HashMap<String, String> map = new HashMap<String, String>();
+							map.put("OwnerCustUKey", custUKey);
+							map.put("OwnerRelCode", relCode);
+							ownerMap.add(map);
+						}
+					}
+					clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
+
+				} // if
 
 			} else if (iFunCd == 2) {
 				throw new LogicException("E0003", "擔保品主檔"); // 修改資料不存在
@@ -389,18 +392,16 @@ public class L2411 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0007", "擔保品不動產檔" + e.getErrorMsg());
 				}
-				
-				
+
 				// 紀錄變更前變更後 不動產檔
 				dataLog.setEnv(titaVo, beforeClImm, tClImm);
 				dataLog.exec();
 
-				
 				// 擔保品不動產檔設定順位明細
 				deleteClImmRankDetail(titaVo);
-				
+
 				setClImmRankDetail(titaVo);
-				
+
 				// 房地擔保品
 				if (iClCode1 == 1) {
 					// 擔保品不動產建物檔主檔
@@ -472,56 +473,56 @@ public class L2411 extends TradeBuffer {
 					// insert 土地所有權人檔
 					InsertClLandOwner(titaVo);
 				}
-				
-				if( iApplNo > 0 ) {
-					
+
+				if (iApplNo > 0) {
+
 					for (int i = 1; i <= 20; i++) {
 						// 若該筆無資料就離開迴圈
 						if (titaVo.getParam("OwnerId" + i) == null || titaVo.getParam("OwnerId" + i).trim().isEmpty()) {
 							break;
 						}
-						
-					  String iOwnerId = titaVo.getParam("OwnerId" + i);
-							
-					  CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);						
-					  if( custMain != null) {						
-						String custUKey = custMain.getCustUKey().trim();
-						String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
 
-						FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
-						if (facMain == null) {
-							throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
-						}
-						
-						ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
-						clOwnerRelationId.setCreditSysNo(facMain.getCreditSysNo());
-						clOwnerRelationId.setCustNo(facMain.getCustNo());
-						clOwnerRelationId.setOwnerCustUKey(custUKey);
+						String iOwnerId = titaVo.getParam("OwnerId" + i);
 
-						ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId, titaVo);
-						
-						if (clOwnerRelation == null) {
-							clOwnerRelation = new ClOwnerRelation();
-							clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
-							clOwnerRelation.setOwnerRelCode(relCode);
-							try {
-								sClOwnerRelationService.insert(clOwnerRelation, titaVo);
-							} catch (DBException e) {
-								throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+						CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
+						if (custMain != null) {
+							String custUKey = custMain.getCustUKey().trim();
+							String relCode = titaVo.getParam("OwnerRelCode" + i).trim();
+
+							FacMain facMain = sFacMainService.facmApplNoFirst(iApplNo, titaVo);
+							if (facMain == null) {
+								throw new LogicException(titaVo, "E0001", "核准號碼:" + iApplNo);
 							}
-						} else {
-							clOwnerRelation.setOwnerRelCode(relCode);
-							try {
-								sClOwnerRelationService.update(clOwnerRelation, titaVo);
-							} catch (DBException e) {
-								throw new LogicException("E0007", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
-							}
-						} // else 
-						
-					  } // if
+
+							ClOwnerRelationId clOwnerRelationId = new ClOwnerRelationId();
+							clOwnerRelationId.setCreditSysNo(facMain.getCreditSysNo());
+							clOwnerRelationId.setCustNo(facMain.getCustNo());
+							clOwnerRelationId.setOwnerCustUKey(custUKey);
+
+							ClOwnerRelation clOwnerRelation = sClOwnerRelationService.holdById(clOwnerRelationId, titaVo);
+
+							if (clOwnerRelation == null) {
+								clOwnerRelation = new ClOwnerRelation();
+								clOwnerRelation.setClOwnerRelationId(clOwnerRelationId);
+								clOwnerRelation.setOwnerRelCode(relCode);
+								try {
+									sClOwnerRelationService.insert(clOwnerRelation, titaVo);
+								} catch (DBException e) {
+									throw new LogicException("E0005", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+								}
+							} else {
+								clOwnerRelation.setOwnerRelCode(relCode);
+								try {
+									sClOwnerRelationService.update(clOwnerRelation, titaVo);
+								} catch (DBException e) {
+									throw new LogicException("E0007", "擔保品所有權人與授信戶關係檔" + e.getErrorMsg());
+								}
+							} // else
+
+						} // if
 					} // for
 				} // if
-				
+
 			} else
 			/* 刪除 */
 			if (iFunCd == 4) {
@@ -542,10 +543,10 @@ public class L2411 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0008", "擔保品不動產檔" + e.getErrorMsg());
 				}
-				
+
 				// 擔保品不動產檔設定順位明細
 				deleteClImmRankDetail(titaVo);
-				
+
 				// 房地擔保品
 				if (iClCode1 == 1) {
 					// 擔保品不動產建物檔主檔
@@ -577,7 +578,7 @@ public class L2411 extends TradeBuffer {
 				}
 
 				deleteClParkingType(titaVo);
-				
+
 				// 擔保品主檔
 				tClMain = sClMainService.holdById(ClMainId, titaVo);
 				if (tClMain == null) {
@@ -606,8 +607,8 @@ public class L2411 extends TradeBuffer {
 //		  土地座落+土地所有權人(多)
 		int clNo = 0;
 //		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(bdLocation, this.index, Integer.MAX_VALUE, titaVo);
-		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(), titaVo.getParam("AreaCode").trim()
-				,titaVo.getParam("IrCode").trim(),titaVo.getParam("BdNo1").trim(), titaVo.getParam("BdNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
+		Slice<ClBuilding> slClBuilding = sClBuildingService.findBdLocationEq(titaVo.getParam("CityCode").trim(), titaVo.getParam("AreaCode").trim(), titaVo.getParam("IrCode").trim(),
+				titaVo.getParam("BdNo1").trim(), titaVo.getParam("BdNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
 		List<ClBuilding> lClBuilding = slClBuilding == null ? null : slClBuilding.getContent();
 		if (lClBuilding != null) {
 			for (ClBuilding cl : lClBuilding) {
@@ -652,8 +653,8 @@ public class L2411 extends TradeBuffer {
 	// 土地擔保品編號
 	private int getLandClNo(TitaVo titaVo) throws LogicException {
 		int clNo = 0;
-		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(), titaVo.getParam("AreaCodeB").trim()
-				,titaVo.getParam("IrCodeB").trim(),titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
+		Slice<ClLand> slClLand = sClLandService.findLandLocationEq(titaVo.getParam("CityCodeB").trim(), titaVo.getParam("AreaCodeB").trim(), titaVo.getParam("IrCodeB").trim(),
+				titaVo.getParam("LandNo1").trim(), titaVo.getParam("LandNo2").trim(), this.index, Integer.MAX_VALUE, titaVo);
 		List<ClLand> lClLand = slClLand == null ? null : slClLand.getContent();
 		if (lClLand != null) {
 			for (ClLand cl : lClLand) {
@@ -786,43 +787,42 @@ public class L2411 extends TradeBuffer {
 		tClImm.setClaimDate(parse.stringToInteger(titaVo.getParam("ClaimDate")));
 		tClImm.setSettingSeq(titaVo.getParam("SettingSeq"));
 	}
-	
-	private void setClImmRankDetail(TitaVo titaVo) throws LogicException {		
-	  
-	  int times = parse.stringToInteger(iSettingSeq) ; 
-	  
-	  for(int i = 1; i <= times;i++) {
-		
-		ClImmRankDetailId.setClCode1(iClCode1);
-		ClImmRankDetailId.setClCode2(iClCode2);
-		ClImmRankDetailId.setClNo(iClNo);
-		ClImmRankDetailId.setSettingSeq(""+i);
-		
-		
-		tClImmRankDetail = new ClImmRankDetail();
 
-		tClImmRankDetail.setClImmRankDetailId(ClImmRankDetailId);
-		
-		tClImmRankDetail.setClCode1(iClCode1);
-		tClImmRankDetail.setClCode2(iClCode2);
-		tClImmRankDetail.setClNo(iClNo);
-		tClImmRankDetail.setSettingSeq(""+i);
-		
-		if( i > 1 ) { // 第一順位之外
-		  tClImmRankDetail.setFirstCreditor(titaVo.getParam("FirstCreditor" + (i-1)));
-		  tClImmRankDetail.setFirstAmt(parse.stringToBigDecimal(titaVo.getParam("FirstAmt" + (i-1))));
+	private void setClImmRankDetail(TitaVo titaVo) throws LogicException {
+
+		int times = parse.stringToInteger(iSettingSeq);
+
+		for (int i = 1; i <= times; i++) {
+
+			ClImmRankDetailId.setClCode1(iClCode1);
+			ClImmRankDetailId.setClCode2(iClCode2);
+			ClImmRankDetailId.setClNo(iClNo);
+			ClImmRankDetailId.setSettingSeq("" + i);
+
+			tClImmRankDetail = new ClImmRankDetail();
+
+			tClImmRankDetail.setClImmRankDetailId(ClImmRankDetailId);
+
+			tClImmRankDetail.setClCode1(iClCode1);
+			tClImmRankDetail.setClCode2(iClCode2);
+			tClImmRankDetail.setClNo(iClNo);
+			tClImmRankDetail.setSettingSeq("" + i);
+
+			if (i > 1) { // 第一順位之外
+				tClImmRankDetail.setFirstCreditor(titaVo.getParam("FirstCreditor" + (i - 1)));
+				tClImmRankDetail.setFirstAmt(parse.stringToBigDecimal(titaVo.getParam("FirstAmt" + (i - 1))));
+			}
+
+			try {
+				sClImmRankDetailService.insert(tClImmRankDetail, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0005", "擔保品不動產檔設定順位明細檔" + e.getErrorMsg());
+			}
 		}
-		
-		try {
-			sClImmRankDetailService.insert(tClImmRankDetail, titaVo);
-		} catch (DBException e) {
-			throw new LogicException("E0005", "擔保品不動產檔設定順位明細檔" + e.getErrorMsg());
-		}
-	  }
 	}
 
-	private void deleteClImmRankDetail(TitaVo titaVo) throws LogicException {		
-		  
+	private void deleteClImmRankDetail(TitaVo titaVo) throws LogicException {
+
 		Slice<ClImmRankDetail> slClImmRankDetail = sClImmRankDetailService.clNoEq(iClCode1, iClCode2, iClNo, this.index, this.limit, titaVo);
 		lClImmRankDetail = slClImmRankDetail == null ? null : slClImmRankDetail.getContent();
 		if (lClImmRankDetail != null && lClImmRankDetail.size() > 0) {
@@ -833,7 +833,7 @@ public class L2411 extends TradeBuffer {
 			}
 		}
 	}
-	
+
 	private void setClBuilding(TitaVo titaVo) throws LogicException {
 
 		tClBuilding.setClBuildingId(clBuildingId);
@@ -884,7 +884,7 @@ public class L2411 extends TradeBuffer {
 			clBuildingOwnerId.setClCode2(iClCode2);
 			clBuildingOwnerId.setClNo(iClNo);
 			String iRelCode = (titaVo.getParam("OwnerRelCode" + i));
-			
+
 			CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
 			// ID不存在時,新增一筆資料在CustMain
 			if (custMain == null) {
@@ -1032,7 +1032,7 @@ public class L2411 extends TradeBuffer {
 			}
 		}
 	}
-			
+
 	private String getBdLocation(TitaVo titaVo) throws LogicException {
 
 		String result = "";
@@ -1100,5 +1100,5 @@ public class L2411 extends TradeBuffer {
 		this.info("L2415 getBdLocation result = " + result);
 		return result;
 	}
-
+	
 }

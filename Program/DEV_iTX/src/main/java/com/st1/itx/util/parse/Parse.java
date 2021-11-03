@@ -239,6 +239,21 @@ public class Parse {
 			return "";
 		}
 	}
+	
+	public String stringToStringDate(String value) {
+		if (value == null || value.trim().isEmpty())
+			return "";
+
+		String p[] = value.split(" ");
+		Timestamp t = null;
+		if (p.length > 1)
+			t = this.StringToSqlDateO(p[0], p[1]);
+		else
+			t = this.StringToSqlDateO(value, "");
+
+		return this.timeStampToStringDate(t);
+
+	}
 
 	/**
 	 * is numeric

@@ -49,33 +49,32 @@ public class LY003Report extends MakeReport {
 		boolean isNotEmpty = true;
 
 		int endOfYearMonth = (Integer.valueOf(titaVo.getParam("RocYear")) + 1911) * 100 + 12;
-		
-		for (int f = 1; f <= 6; f++) {
 
-			try {
+		try {
+			//暫時先產前3
+			for (int f = 1; f <= 3; f++) {
 
-				lY003List = lY003ServiceImpl.findAll(titaVo, f,endOfYearMonth);
+				lY003List = lY003ServiceImpl.findAll(titaVo, f, endOfYearMonth);
 
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.info("LY003ServiceImpl.findAll error = " + errors.toString());
+				if (lY003List.size() > 0) {
+
+					exportExcel(lY003List, f);
+
+					isNotEmpty = true;
+
+				} else {
+
+					makeExcel.setValue(6, 3, "本日無資料");
+
+					isNotEmpty = false;
+				}
+
 			}
-
-			if (lY003List.size() > 0) {
-
-				exportExcel(lY003List, f);
-				
-				isNotEmpty = true;
-
-			} else {
-
-				makeExcel.setValue(6, 3, "本日無資料");
-
-				isNotEmpty = false;
-			}
-
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.info("LY003ServiceImpl.findAll error = " + errors.toString());
 		}
 
 		long sno = makeExcel.close();
@@ -91,7 +90,7 @@ public class LY003Report extends MakeReport {
 		BigDecimal evaAmt = BigDecimal.ZERO;
 		BigDecimal lineAmt = BigDecimal.ZERO;
 		BigDecimal loanAmt = BigDecimal.ZERO;
-		
+
 		for (Map<String, String> tLDVo : LDList) {
 
 			switch (formNum) {
@@ -127,10 +126,6 @@ public class LY003Report extends MakeReport {
 			makeExcel.setValue(row, 5, lineAmt, "#,##0");
 			makeExcel.setValue(row, 8, loanAmt, "#,##0");
 		}
-		
-		
-		
-		
 
 	}
 
