@@ -36,7 +36,7 @@ E(0,40)ASGN(INQPRT$)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,900];printer.width=[15,30]">
 [
-["[L2418]                                 他項權利資料登錄"],
+["[L2418]                                 擔保品他項權利登錄"],
 ["#FdFunCd+功能",#FunCdX],
 ["#FdClCode1+擔保品代號1",#ClCode1,#ClCode1X],
 ["#FdClCode2+擔保品代號2",#ClCode2,#ClCode2X],

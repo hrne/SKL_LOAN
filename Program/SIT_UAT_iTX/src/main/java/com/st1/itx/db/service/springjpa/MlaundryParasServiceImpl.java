@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -34,9 +32,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("mlaundryParasService")
 @Repository
-public class MlaundryParasServiceImpl implements MlaundryParasService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(MlaundryParasServiceImpl.class);
-
+public class MlaundryParasServiceImpl extends ASpringJpaParm implements MlaundryParasService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -66,7 +62,7 @@ public class MlaundryParasServiceImpl implements MlaundryParasService, Initializ
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + businessType);
+    this.info("findById " + dbName + " " + businessType);
     Optional<MlaundryParas> mlaundryParas = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryParas = mlaundryParasReposDay.findById(businessType);
@@ -93,10 +89,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "BusinessType"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "BusinessType"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = mlaundryParasReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
     else 
       slice = mlaundryParasRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -114,7 +113,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + businessType);
+    this.info("Hold " + dbName + " " + businessType);
     Optional<MlaundryParas> mlaundryParas = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryParas = mlaundryParasReposDay.findByBusinessType(businessType);
@@ -132,7 +131,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + mlaundryParas.getBusinessType());
+    this.info("Hold " + dbName + " " + mlaundryParas.getBusinessType());
     Optional<MlaundryParas> mlaundryParasT = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryParasT = mlaundryParasReposDay.findByBusinessType(mlaundryParas.getBusinessType());
@@ -153,13 +152,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + mlaundryParas.getBusinessType());
+         empNot = empNot.isEmpty() ? "System" : empNot;		}
+    this.info("Insert..." + dbName + " " + mlaundryParas.getBusinessType());
     if (this.findById(mlaundryParas.getBusinessType()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       mlaundryParas.setCreateEmpNo(empNot);
+
+    if(mlaundryParas.getLastUpdateEmpNo() == null || mlaundryParas.getLastUpdateEmpNo().isEmpty())
+      mlaundryParas.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return mlaundryParasReposDay.saveAndFlush(mlaundryParas);	
@@ -180,7 +182,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + mlaundryParas.getBusinessType());
+    this.info("Update..." + dbName + " " + mlaundryParas.getBusinessType());
     if (!empNot.isEmpty())
       mlaundryParas.setLastUpdateEmpNo(empNot);
 
@@ -203,7 +205,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + mlaundryParas.getBusinessType());
+    this.info("Update..." + dbName + " " + mlaundryParas.getBusinessType());
     if (!empNot.isEmpty())
       mlaundryParas.setLastUpdateEmpNo(empNot);
 
@@ -223,7 +225,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + mlaundryParas.getBusinessType());
+    this.info("Delete..." + dbName + " " + mlaundryParas.getBusinessType());
     if (dbName.equals(ContentName.onDay)) {
       mlaundryParasReposDay.delete(mlaundryParas);	
       mlaundryParasReposDay.flush();
@@ -252,11 +254,13 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (MlaundryParas t : mlaundryParas) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+    for (MlaundryParas t : mlaundryParas){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       mlaundryParas = mlaundryParasReposDay.saveAll(mlaundryParas);	
@@ -285,7 +289,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (mlaundryParas == null || mlaundryParas.size() == 0)
       throw new DBException(6);
 
@@ -314,7 +318,7 @@ em = null;
 
   @Override
   public void deleteAll(List<MlaundryParas> mlaundryParas, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

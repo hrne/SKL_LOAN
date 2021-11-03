@@ -48,7 +48,7 @@ public class L8201 extends TradeBuffer {
 
 	@Autowired
 	SendRsp sendRsp;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8201 ");
@@ -84,24 +84,23 @@ public class L8201 extends TradeBuffer {
 			if (tMlaundryParas == null) {
 				throw new LogicException(titaVo, "E0003", iBusinessType); // 修改資料不存在
 			}
-			//刷主管卡後始可刪除
+			// 刷主管卡後始可刪除
 			// 交易需主管核可
 			if (!titaVo.getHsupCode().equals("1")) {
-				//titaVo.getSupCode();
-				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+				// titaVo.getSupCode();
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "疑似洗錢樣態條件設定");
 			}
-			
-				MlaundryParas tMlaundryParas2 = (MlaundryParas) dataLog.clone(tMlaundryParas); ////
-				try {
-					moveMlaundryParas(tMlaundryParas, iFuncCode, titaVo);
-					tMlaundryParas = sMlaundryParasService.update2(tMlaundryParas);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
-				}
-				dataLog.setEnv(titaVo, tMlaundryParas2, tMlaundryParas); ////
-				dataLog.exec(); ////
 
-			
+			MlaundryParas tMlaundryParas2 = (MlaundryParas) dataLog.clone(tMlaundryParas); ////
+			try {
+				moveMlaundryParas(tMlaundryParas, iFuncCode, titaVo);
+				tMlaundryParas = sMlaundryParasService.update2(tMlaundryParas);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg()); // 更新資料時，發生錯誤
+			}
+			dataLog.setEnv(titaVo, tMlaundryParas2, tMlaundryParas); ////
+			dataLog.exec(); ////
+
 			break;
 		case 4: // 刪除
 			tMlaundryParas = sMlaundryParasService.holdById(iBusinessType);
@@ -131,6 +130,7 @@ public class L8201 extends TradeBuffer {
 		mMlaundryParas.setFactor2AmtEnd(this.parse.stringToBigDecimal(titaVo.getParam("Factor2AmtEnd")));
 		mMlaundryParas.setFactor3TotLimit(this.parse.stringToBigDecimal(titaVo.getParam("Factor3TotLimit")));
 		mMlaundryParas.setFactorDays(this.parse.stringToInteger(titaVo.getParam("FactorDays")));
+		mMlaundryParas.setFactorDays3(this.parse.stringToInteger(titaVo.getParam("FactorDays3")));
 		if (mFuncCode != 2) {
 			mMlaundryParas.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 			mMlaundryParas.setCreateEmpNo(titaVo.getTlrNo());
@@ -138,7 +138,7 @@ public class L8201 extends TradeBuffer {
 		if (mFuncCode == 1) {
 			mMlaundryParas.setBusinessType("LN");
 		}
-		
+
 		mMlaundryParas.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
 		mMlaundryParas.setLastUpdateEmpNo(titaVo.getTlrNo());
 	}

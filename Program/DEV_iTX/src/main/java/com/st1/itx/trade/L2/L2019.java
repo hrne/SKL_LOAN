@@ -14,8 +14,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacShareLimit;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacShareLimitService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -50,6 +52,9 @@ public class L2019 extends TradeBuffer {
 	@Autowired
 	public CustMainService sCustMainService;
 
+	@Autowired
+	public CdEmpService sCdEmpService;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -115,7 +120,7 @@ public class L2019 extends TradeBuffer {
 		for (FacShareLimit t : lFacShareLimit) {
 
 			/* 將每筆資料放入Tota的OcList */
-// 核准號碼 戶號 戶名 額度  幣別  總額度 建檔日期 建檔人員 最後更新日期 最後更新人員 主核准號碼
+
 			OccursList occurslist = new OccursList();
 			occurslist.putParam("OOApplNo", t.getApplNo());
 			occurslist.putParam("OOCustNo", t.getCustNo());
@@ -135,6 +140,21 @@ public class L2019 extends TradeBuffer {
 				occurslist.putParam("OOCreateDate", "");
 			}
 			occurslist.putParam("OOCreateEmpNo", t.getCreateEmpNo());
+			
+			String TlrNo = "";
+			String EmpName = "";
+			CdEmp tCdEmp = new CdEmp();
+
+			if (t.getCreateEmpNo() != null) {
+				TlrNo = t.getCreateEmpNo() ;
+				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
+				if (tCdEmp != null) {
+					EmpName = tCdEmp.getFullname();
+				}
+			}
+			occurslist.putParam("OOCreateEmpName", EmpName);
+			
+			
 			if (t.getLastUpdate() != null) {
 				lastUpdate = parse.stringToInteger(df.format(t.getLastUpdate())) - 19110000;
 				occurslist.putParam("OOLastUpdate", lastUpdate);
@@ -142,6 +162,16 @@ public class L2019 extends TradeBuffer {
 				occurslist.putParam("OOLastUpdate", "");
 			}
 			occurslist.putParam("OOLastUpdateEmpNo", t.getLastUpdateEmpNo());
+			
+			if (t.getLastUpdateEmpNo() != null) {
+				TlrNo = t.getLastUpdateEmpNo() ;
+				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
+				if (tCdEmp != null) {
+					EmpName = tCdEmp.getFullname();
+				}
+			}
+			occurslist.putParam("OOLastUpdateEmpName", EmpName);
+			
 			occurslist.putParam("OOMainApplNo", t.getMainApplNo());
 
 			this.totaVo.addOccursList(occurslist);

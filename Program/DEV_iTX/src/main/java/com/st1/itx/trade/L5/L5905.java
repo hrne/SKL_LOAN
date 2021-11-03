@@ -58,6 +58,7 @@ public class L5905 extends TradeBuffer {
 		int iYearMonthE = this.parse.stringToInteger(titaVo.getParam("YearMonthE"));
 		int iFYearMonthE = iYearMonthE + 191100;
 		this.info("L5905 iFYearMonth : " + iFYearMonth + "-" + iFYearMonthS + "-" + iFYearMonthE);
+		String iReChkMonth = titaVo.getParam("ReChkMonth");
 		int wkFYearMonth = 0;
 		int wkFReChkYearMonth = 0;
 		String wkYearMonth;
@@ -99,8 +100,8 @@ public class L5905 extends TradeBuffer {
 			wkReChkMonth = FormatUtil.right(wkYearMonth, 2);
 			this.info("L5905 wkReChkMonth : " + wkReChkMonth);
 
-//			if (iInqFg == 2 && !(iReChkMonth.equals(wkReChkMonth))) {
-			if (iInqFg == 2) {
+			if (iInqFg == 2 && !(iReChkMonth.equals(wkReChkMonth))) {
+//			if (iInqFg == 2) {
 				continue;
 			}
 

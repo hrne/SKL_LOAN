@@ -27,7 +27,7 @@ public class MlaundryParas implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 8247455879394853617L;
+	private static final long serialVersionUID = 8889661918021663285L;
 
 // 業務類型
   /* LN */
@@ -64,6 +64,11 @@ public class MlaundryParas implements Serializable {
   /* L8201維護 : 統計期間天數 */
   @Column(name = "`FactorDays`")
   private int factorDays = 0;
+
+  // 統計期間天數
+  /* L8201維護 : 統計期間天數 */
+  @Column(name = "`FactorDays3`")
+  private int factorDays3 = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -218,6 +223,25 @@ public class MlaundryParas implements Serializable {
   }
 
 /**
+	* 統計期間天數<br>
+	* L8201維護 : 統計期間天數
+	* @return Integer
+	*/
+  public int getFactorDays3() {
+    return this.factorDays3;
+  }
+
+/**
+	* 統計期間天數<br>
+	* L8201維護 : 統計期間天數
+  *
+  * @param factorDays3 統計期間天數
+	*/
+  public void setFactorDays3(int factorDays3) {
+    this.factorDays3 = factorDays3;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -297,6 +321,7 @@ public class MlaundryParas implements Serializable {
   @Override
   public String toString() {
     return "MlaundryParas [businessType=" + businessType + ", factor1TotLimit=" + factor1TotLimit + ", factor2Count=" + factor2Count + ", factor2AmtStart=" + factor2AmtStart + ", factor2AmtEnd=" + factor2AmtEnd + ", factor3TotLimit=" + factor3TotLimit
-           + ", factorDays=" + factorDays + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", factorDays=" + factorDays + ", factorDays3=" + factorDays3 + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

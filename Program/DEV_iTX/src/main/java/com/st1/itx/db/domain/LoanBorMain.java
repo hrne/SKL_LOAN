@@ -29,7 +29,7 @@ public class LoanBorMain implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3224672124138822106L;
+	private static final long serialVersionUID = -6345010354335006752L;
 
 @EmbeddedId
   private LoanBorMainId loanBorMainId;
@@ -55,7 +55,7 @@ public class LoanBorMain implements Serializable {
   private int lastOvduNo = 0;
 
   // 戶況
-  /* 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶97:預約撥款已刪除98:預約已撥款99:預約撥款 */
+  /* 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶(顯示用)5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶97:預約撥款已刪除98:預約已撥款99:預約撥款 */
   @Column(name = "`Status`")
   private int status = 0;
 
@@ -210,6 +210,10 @@ public class LoanBorMain implements Serializable {
   @Column(name = "`AcctFee`")
   private BigDecimal acctFee = new BigDecimal("0");
 
+  // 手續費
+  @Column(name = "`HandlingFee`")
+  private BigDecimal handlingFee = new BigDecimal("0");
+
   // 最後一期本金餘額
   @Column(name = "`FinalBal`")
   private BigDecimal finalBal = new BigDecimal("0");
@@ -219,8 +223,8 @@ public class LoanBorMain implements Serializable {
   @Column(name = "`NotYetFlag`", length = 1)
   private String notYetFlag;
 
-  // 借新還舊
-  /* Y:是 N:否 */
+  // 展期/借新還舊
+  /* 0:正常 1.展期 2.借新還舊 */
   @Column(name = "`RenewFlag`", length = 1)
   private String renewFlag;
 
@@ -270,7 +274,7 @@ public class LoanBorMain implements Serializable {
   private String relationGender;
 
   // 交易進行記號
-  /* 1STEP TX -&amp;gt; 0   2STEP TX -&amp;gt; 5 63STEP TX -&amp;gt; 1 2 3 4 */
+  /* 1STEP TX -&amp;gt; 0   2STEP TX -&amp;gt; 1 23STEP TX -&amp;gt; 1 2 3 4 */
   @Column(name = "`ActFg`")
   private int actFg = 0;
 
@@ -456,7 +460,7 @@ public class LoanBorMain implements Serializable {
 1:展期
 2: 催收戶
 3: 結案戶
-4: 逾期戶
+4: 逾期戶(顯示用)
 5: 催收結案戶
 6: 呆帳戶
 7: 部分轉呆戶
@@ -477,7 +481,7 @@ public class LoanBorMain implements Serializable {
 1:展期
 2: 催收戶
 3: 結案戶
-4: 逾期戶
+4: 逾期戶(顯示用)
 5: 催收結案戶
 6: 呆帳戶
 7: 部分轉呆戶
@@ -1202,6 +1206,25 @@ public class LoanBorMain implements Serializable {
   }
 
 /**
+	* 手續費<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getHandlingFee() {
+    return this.handlingFee;
+  }
+
+/**
+	* 手續費<br>
+	* 
+  *
+  * @param handlingFee 手續費
+	*/
+  public void setHandlingFee(BigDecimal handlingFee) {
+    this.handlingFee = handlingFee;
+  }
+
+/**
 	* 最後一期本金餘額<br>
 	* 
 	* @return BigDecimal
@@ -1240,8 +1263,8 @@ public class LoanBorMain implements Serializable {
   }
 
 /**
-	* 借新還舊<br>
-	* Y:是 N:否
+	* 展期/借新還舊<br>
+	* 0:正常 1.展期 2.借新還舊
 	* @return String
 	*/
   public String getRenewFlag() {
@@ -1249,10 +1272,10 @@ public class LoanBorMain implements Serializable {
   }
 
 /**
-	* 借新還舊<br>
-	* Y:是 N:否
+	* 展期/借新還舊<br>
+	* 0:正常 1.展期 2.借新還舊
   *
-  * @param renewFlag 借新還舊
+  * @param renewFlag 展期/借新還舊
 	*/
   public void setRenewFlag(String renewFlag) {
     this.renewFlag = renewFlag;
@@ -1519,7 +1542,7 @@ E: 展期
 /**
 	* 交易進行記號<br>
 	* 1STEP TX -&amp;gt; 0   
-2STEP TX -&amp;gt; 5 6
+2STEP TX -&amp;gt; 1 2
 3STEP TX -&amp;gt; 1 2 3 4
 	* @return Integer
 	*/
@@ -1530,7 +1553,7 @@ E: 展期
 /**
 	* 交易進行記號<br>
 	* 1STEP TX -&amp;gt; 0   
-2STEP TX -&amp;gt; 5 6
+2STEP TX -&amp;gt; 1 2
 3STEP TX -&amp;gt; 1 2 3 4
   *
   * @param actFg 交易進行記號
@@ -1872,11 +1895,11 @@ E: 展期
            + ", payIntFreq=" + payIntFreq + ", repayFreq=" + repayFreq + ", totalPeriod=" + totalPeriod + ", repaidPeriod=" + repaidPeriod + ", paidTerms=" + paidTerms + ", prevPayIntDate=" + prevPayIntDate
            + ", prevRepaidDate=" + prevRepaidDate + ", nextPayIntDate=" + nextPayIntDate + ", nextRepayDate=" + nextRepayDate + ", dueAmt=" + dueAmt + ", gracePeriod=" + gracePeriod + ", graceDate=" + graceDate
            + ", specificDd=" + specificDd + ", specificDate=" + specificDate + ", firstDueDate=" + firstDueDate + ", firstAdjRateDate=" + firstAdjRateDate + ", nextAdjRateDate=" + nextAdjRateDate + ", acctFee=" + acctFee
-           + ", finalBal=" + finalBal + ", notYetFlag=" + notYetFlag + ", renewFlag=" + renewFlag + ", pieceCode=" + pieceCode + ", pieceCodeSecond=" + pieceCodeSecond + ", pieceCodeSecondAmt=" + pieceCodeSecondAmt
-           + ", usageCode=" + usageCode + ", syndNo=" + syndNo + ", relationCode=" + relationCode + ", relationName=" + relationName + ", relationId=" + relationId + ", relationBirthday=" + relationBirthday
-           + ", relationGender=" + relationGender + ", actFg=" + actFg + ", lastEntDy=" + lastEntDy + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo + ", lastTxtNo=" + lastTxtNo
-           + ", remitBank=" + remitBank + ", remitBranch=" + remitBranch + ", remitAcctNo=" + remitAcctNo + ", compensateAcct=" + compensateAcct + ", paymentBank=" + paymentBank + ", remark=" + remark
-           + ", acDate=" + acDate + ", nextAcDate=" + nextAcDate + ", branchNo=" + branchNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", handlingFee=" + handlingFee + ", finalBal=" + finalBal + ", notYetFlag=" + notYetFlag + ", renewFlag=" + renewFlag + ", pieceCode=" + pieceCode + ", pieceCodeSecond=" + pieceCodeSecond
+           + ", pieceCodeSecondAmt=" + pieceCodeSecondAmt + ", usageCode=" + usageCode + ", syndNo=" + syndNo + ", relationCode=" + relationCode + ", relationName=" + relationName + ", relationId=" + relationId
+           + ", relationBirthday=" + relationBirthday + ", relationGender=" + relationGender + ", actFg=" + actFg + ", lastEntDy=" + lastEntDy + ", lastKinbr=" + lastKinbr + ", lastTlrNo=" + lastTlrNo
+           + ", lastTxtNo=" + lastTxtNo + ", remitBank=" + remitBank + ", remitBranch=" + remitBranch + ", remitAcctNo=" + remitAcctNo + ", compensateAcct=" + compensateAcct + ", paymentBank=" + paymentBank
+           + ", remark=" + remark + ", acDate=" + acDate + ", nextAcDate=" + nextAcDate + ", branchNo=" + branchNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

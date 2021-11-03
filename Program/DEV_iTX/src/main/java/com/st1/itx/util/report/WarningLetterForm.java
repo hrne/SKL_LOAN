@@ -31,7 +31,7 @@ public class WarningLetterForm extends MakeReport {
 		String iCustNo = titaVo.getParam("OOCustNo");
 		
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "催收存證信函"+iCustNo, "", "郵局存證信函2021格式.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "催收存證信函"+iCustNo, "", "郵局存證信函2021格式.pdf");
 
 		newP(titaVo, map);
 

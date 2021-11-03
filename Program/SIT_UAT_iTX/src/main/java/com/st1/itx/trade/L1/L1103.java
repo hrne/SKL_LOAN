@@ -97,7 +97,7 @@ public class L1103 extends TradeBuffer {
 			// 不可修正交易
 
 			// 正常交易或
-			if (titaVo.isHcodeNormal()) {
+			if (titaVo.isHcodeNormal() || titaVo.isHcodeModify()) {
 
 				// 如果要修改統編
 				if (titaVo.getParam("CustIdInd").trim().equals("X")) {

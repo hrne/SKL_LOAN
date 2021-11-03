@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +17,7 @@ import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
+import com.st1.itx.util.common.SendRsp;
 import com.st1.itx.util.data.DataLog;
 
 /**
@@ -47,8 +46,10 @@ public class L8204 extends TradeBuffer {
 	Parse parse;
 	@Autowired
 	public DataLog dataLog;
-	
-	private List<String> lStatusCode = new ArrayList<String>();
+	@Autowired
+	SendRsp sendRsp;
+
+//	private List<String> lStatusCode = new ArrayList<String>();
 	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -106,6 +107,14 @@ public class L8204 extends TradeBuffer {
 		case 4: // 刪除
 			tMlaundryRecord = sMlaundryRecordService.holdById(new MlaundryRecordId(iFRecordDate, iCustNo, iFacmNo, iBormNo));
 			logger.info("L8204 del : " + iFuncCode + "-" + iFRecordDate + "-" + iCustNo + "-" + iFacmNo + "-" + iBormNo);
+			
+				// 刷主管卡後始可刪除
+				// 交易需主管核可
+				if (!titaVo.getHsupCode().equals("1")) {
+					// titaVo.getSupCode();
+					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+				}
+						
 			if (tMlaundryRecord != null) {
 				try {
 					sMlaundryRecordService.delete(tMlaundryRecord);

@@ -749,6 +749,7 @@ T(H,@AcctCodeX,#AcctCode,#FacmAcctCodeHelp)
 T(2,@CurrencyCode,#L2r02CurrencyCode)
 T(H,@Precision,#CurrencyCode,#CurrPrecisionHelp)
 E(0,@DepartmentCode,#L2r02DepartmentCode)
+T(H,@DepartmentCodeX,#DepartmentCode,#DepartmentCodeHelp)
 E(0,@TwApplAmt,#L2r02ApplAmt)
 E(0,@UsApplAmt,#L2r02ApplAmt)
 T(2,@Estimate,#L2r02Estimate)
@@ -1221,6 +1222,7 @@ R(1,L2R04)
 #TMP3=X,1,S
 E(0,@TwAcctFee,#L2r04AcctFee)
 E(0,@UsAcctFee,#L2r04AcctFee)
+C(3,#DepartmentCode,1,$,s)
 E(0,@TwHandlingFee,#L2r04HandlingFee)
 E(0,@UsHandlingFee,#L2r04HandlingFee)
 
@@ -1454,20 +1456,23 @@ C(3,#Precision,0,S,$)
 #TimAcctFee=m,14.2,S
 C(3,#Precision,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
 
-!手續費
+!手續費 企金才可輸入
 #FdHandlingFee=X,2,L
 
 #TwHandlingFee=m,14,I
+C(3,#DepartmentCode,1,$,S)
 C(3,#Hide3Flag,0,CALL(#HideP3),$)
 C(3,#Precision,0,$,S)
 @I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #UsHandlingFee=m,14.2,I
+C(3,#DepartmentCode,1,$,S)
 C(3,#Hide3Flag,0,CALL(#HideP3),$)
 C(3,#Precision,0,S,$)
 @I(0,#CurrencyCode,CURR,CURDEF,ENAME,PRECISION)
 
 #TimHandlingFee=m,14.2,S
+C(3,#DepartmentCode,1,$,S)
 C(3,#Precision,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 !---- P9 階梯式利率
 
@@ -1615,7 +1620,7 @@ T(2,@FdRuleCode,#WkStar)
 T(2,@FdRecycleCode,#WkStar)
 T(2,@FdRecycleDeadline,#WkStar)
 T(2,@FdUsageCode,#WkStar)
-T(2,@FdDepartmentCode,#WkStar)
+T(2,@FdDepartmentCode, )
 T(3,@FdIncomeTaxFlag, )
 T(2,@FdCompensateFlag,#WkStar)
 T(2,@FdIrrevocableFlag,#WkStar)
@@ -1724,9 +1729,9 @@ T(H,#UsageCode,#UsageCodeHelp)
 !可不輸入
 #FdDepartmentCode=X,2,L
 
-#DepartmentCode=A,1,I
-HELP(#DepartmentCodeHelp)
-@V(H,#DepartmentCodeHelp)
+#DepartmentCode=A,1,L
+! HELP(#DepartmentCodeHelp)
+! @V(H,#DepartmentCodeHelp)
 
 #DepartmentCodeX=X,10,L
 T(H,#DepartmentCode,#DepartmentCodeHelp)

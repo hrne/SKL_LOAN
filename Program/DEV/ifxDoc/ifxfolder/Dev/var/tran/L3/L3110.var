@@ -787,6 +787,8 @@ E(0,@TwAcctFee,#L2r05AcctFee)
 E(0,@UsAcctFee,#L2r05AcctFee)
 E(0,@LbTwAcctFee,#L2r05AcctFee)
 E(0,@LbUsAcctFee,#L2r05AcctFee)
+E(0,@TwHandlingFee,#L2r05HandlingFee)
+E(0,@UsHandlingFee,#L2r05HandlingFee)
 E(0,@UsageCode,#L2r05UsageCode)
 T(2,@PieceCode,#L2r05PieceCode)
 ! E(0,@TwDrawdownAmt,#L2r05DuePayAmt)
@@ -882,10 +884,11 @@ SHOW(#DrawdownAmtX,#GraceDateX,#LbAcctFee)
 
 #WKHIDEAMT=X,1,S
 C(5,#L2r01CharCode,2,S,$)
-C(3,#PRECISION,0,SHOW(#TwDrawdownAmt,#TwAcctFee,#TwFinalBal,#TwPieceCodeSecondAmt)
-                 HIDE(#UsDrawdownAmt,#UsAcctFee,#UsFinalBal,#UsPieceCodeSecondAmt,#LbAcctFee)
-                ,HIDE(#TwDrawdownAmt,#TwAcctFee,#TwFinalBal,#TwPieceCodeSecondAmt,#LbAcctFee)
-                 SHOW(#UsDrawdownAmt,#UsAcctFee,#UsFinalBal,#UsPieceCodeSecondAmt))
+C(3,#PRECISION,0,SHOW(#TwDrawdownAmt,#TwAcctFee,#TwHandlingFee,#TwFinalBal,#TwPieceCodeSecondAmt)
+                 HIDE(#UsDrawdownAmt,#UsAcctFee,#UsHandlingFee,#UsFinalBal,#UsPieceCodeSecondAmt,#LbAcctFee)
+                ,HIDE(#TwDrawdownAmt,#TwAcctFee,#TwHandlingFee,#TwFinalBal,#TwPieceCodeSecondAmt,#LbAcctFee)
+                 SHOW(#UsDrawdownAmt,#UsAcctFee,#UsHandlingFee,#UsFinalBal,#UsPieceCodeSecondAmt))
+C(3,#L2r05DepartmentCode,1,T(F,@TwHandlingFee,1)T(F,@UsHandlingFee,1),T(F,@TwHandlingFee,0)T(F,@UsHandlingFee,0))
 
 
 !個金                 
@@ -1446,6 +1449,24 @@ E(0,#UsAcctFee)
 
 #TimAcctFee=m,14.2,S
 C(3,#PRECISION,0,E(0,#TwAcctFee),E(0,#UsAcctFee))
+
+!手續費 企金才可輸入
+#FdHandlingFee=X,2,L
+
+#TwHandlingFee=m,14,I
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#L2r05DepartmentCode,1,$,S)
+C(3,#PRECISION,0,$,s)
+
+#UsHandlingFee=m,14.2,I
+C(3,#HIDE4FG,0,CALL(#HIDEP4),$)
+C(3,#L2r05DepartmentCode,1,$,S)
+C(3,#PRECISION,0,s,$)
+
+#TimHandlingFee=m,14.2,S
+C(3,#L2r05DepartmentCode,1,$,S)
+C(3,#PRECISION,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
+
 
 ![最後一期餘額]上線版鎖住預設0
 #FdFinalBal=X,2,L
@@ -2071,6 +2092,7 @@ C(3,#EXPANDFG,0,CALL(#EXPAND),$)
 ["#FdSpecificDd+指定應繳日",#SpecificDd],                  
 ["#FdFirstDueDate+首次應繳日",#FirstDueDate],
 ["#FdAcctFee+帳管費",#TwAcctFee,#UsAcctFee,#LbAcctFee],
+["#FdHandlingFee+手續費",#TwHandlingFee,#UsHandlingFee],
 ["#FdFinalBal+最後一期餘額",#TwFinalBal,#UsFinalBal],
 ]
 </sub>
@@ -2203,7 +2225,7 @@ K(MODIFYBUTTON,1,提交)
 #CurrencyCode#TimDrawdownAmt#DrawdownDate#LoanTermYy#LoanTermMm#LoanTermDd
 #MaturityDate#IntCalcCode#AmortizedCode#FreqBase#PayIntFreq#RepayFreq
 #GracePeriod#GraceDate#SpecificDd#SpecificDate#FirstDueDate#FirstAdjRateDate
-#NextIntDate#NextRepayDate#TotalPeriod#TimAcctFee#TimFinalBal
+#NextIntDate#NextRepayDate#TotalPeriod#TimAcctFee#TimHandlingFee#TimFinalBal
 #NotYetFlag#PieceCode#PieceCodeSecond
 #TimPieceCodeSecondAmt#UsageCode#SyndNo#RenewFlag
 #RelationCode#RelationName#RelationId#RelationBirthday#RelationGender
@@ -2214,6 +2236,7 @@ K(MODIFYBUTTON,1,提交)
 #RemitIdKind#RemitId#RemitGender#RemitBirthday
 #END
 #TwAcctFee#UsAcctFee
+#TwHandlingFee#UsHandlingFee
 #TwFinalBal#UsFinalBal
 #TwPieceCodeSecondAmt#UsPieceCodeSecondAmt
 #RPTITLEtt

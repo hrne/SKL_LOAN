@@ -1,21 +1,17 @@
 package com.st1.itx.trade.L3;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.LoanSynd;
-import com.st1.itx.db.domain.LoanSyndItem;
-import com.st1.itx.db.service.LoanSyndItemService;
 import com.st1.itx.db.service.LoanSyndService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.LoanCom;
@@ -42,8 +38,6 @@ public class L3R10 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public LoanSyndService loanSyndService;
-	@Autowired
-	public LoanSyndItemService loanSyndItemService;
 
 	@Autowired
 	Parse parse;
@@ -110,15 +104,6 @@ public class L3R10 extends TradeBuffer {
 		this.totaVo.putParam("OSyndAmt", 0);
 		this.totaVo.putParam("OPartAmt", 0);
 
-		for (int i = 1; i <= 5; i++) {
-
-			this.totaVo.putParam("OItem" + i, "");
-			this.totaVo.putParam("OSyndAmt" + i, BigDecimal.ZERO);
-			this.totaVo.putParam("OSyndMark" + i, "");
-			this.totaVo.putParam("OSyndBal" + i, BigDecimal.ZERO);
-
-		}
-
 	}
 
 	private void moveTotaLoanSynd() throws LogicException {
@@ -131,24 +116,6 @@ public class L3R10 extends TradeBuffer {
 		this.totaVo.putParam("OCurrencyCode", tLoanSynd.getCurrencyCode());
 		this.totaVo.putParam("OSyndAmt", tLoanSynd.getSyndAmt());
 		this.totaVo.putParam("OPartAmt", tLoanSynd.getPartAmt());
-		// 查詢
-		Slice<LoanSyndItem> slLoanSyndItem = loanSyndItemService.findSyndNoEq(tLoanSynd.getSyndNo(), 0,
-				Integer.MAX_VALUE, titaVo);
-		if (slLoanSyndItem != null) {
-			int i = 1;
-			for (LoanSyndItem tLoanSyndItem : slLoanSyndItem.getContent()) {
-				this.info("tLoanSyndItem =" + tLoanSyndItem);
-				if (tLoanSyndItem.getItem().equals("")) {
-					break;
-				}
-				this.totaVo.putParam("OItem" + i, tLoanSyndItem.getItem());
-				this.totaVo.putParam("OSyndAmt" + i, tLoanSyndItem.getSyndAmt());
-				this.totaVo.putParam("OSyndMark" + i, tLoanSyndItem.getSyndMark());
-				this.totaVo.putParam("OSyndBal" + i, tLoanSyndItem.getSyndBal());
-				i++;
-			}
-		} else {
-			this.info("loanSyndItem null ... ");
-		}
+
 	}
 }

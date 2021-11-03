@@ -205,6 +205,7 @@ public class L3R02 extends TradeBuffer {
 		this.totaVo.putParam("OAcDate", tLoanBorMain.getAcDate());
 		this.totaVo.putParam("ONextAcDate", tLoanBorMain.getNextAcDate());
 		this.totaVo.putParam("OIntCalcCode", tLoanBorMain.getIntCalcCode());
+		this.totaVo.putParam("OHandlingFee", tLoanBorMain.getHandlingFee());
 
 		this.addList(this.totaVo);
 		return this.sendList();

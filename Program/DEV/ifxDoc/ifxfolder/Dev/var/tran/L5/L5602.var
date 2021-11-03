@@ -28,7 +28,7 @@ E(0,0)
 [#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
 ["#FdMeetDate+面催日期",#MeetDate],["#FdMeetTime+面催時間",#MeetTime],
 ["#FdContactCode+面催對象",#ContactCode,#ContactCodeX],["#FdMeetPsnCode+面晤人",#MeetPsnCode,#MeetPsnCodeX],
-[#<->#,"#FdAccCollPsnCode+催收人員",#AccCollPsnCode,#AccCollPsnCodeX,"@",#AccCollPsnName,#AccCollPsnNameX,#BTNF],
+[#<->#,"#FdAccCollPsnCode+催收人員",#AccCollPsnCode,#AccCollPsnCodeX,"@",#AccCollPsnName,#AccCollPsnNameX,#BTNF,#BTNR],
 [#<->#,"#FdMeetPlaceCode+面催地點類別",#MeetPlaceCode,#MeetPlaceCodeX],
 [#<->#,"#FdMeetPlace+面催地點",#MeetPlace],
 [#<->#,"#FdRemark+面催記錄",#Remark],
@@ -363,14 +363,20 @@ HELP(#AccCollPsnCodeHelp)
 @V(H,#AccCollPsnCodeHelp)
 #AccCollPsnCodeX=X,6,L
 T(H,#AccCollPsnCode,#AccCollPsnCodeHelp)
-@C(3,#AccCollPsnCode,1,HIDE(#BTNF)T(F,@AccCollPsnName,0),SHOW(#BTNF)T(F,@AccCollPsnName,1))
-IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(F,@AccCollPsnName,0),$)
+@C(3,#AccCollPsnCode,1,HIDE(#BTNF)HIDE(#BTNR)T(F,@AccCollPsnName,0),SHOW(#BTNF)SHOW(#BTNR)T(F,@AccCollPsnName,1))
+IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)HIDE(#BTNR)T(F,@AccCollPsnName,0),$)
 
 ! 催收人員姓名
 #BTNF=X,1,I,ui:button;value:法催地區別查詢;enable:1;tabbable:0
 #AccCollPsnNameBUF=X,6,S
 #AccCollPsnNameBIND=X,1,S
 BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#AccCollPsnNameBUF;ntxbuf5=type<-1:AccCollPsnName<-OOAccCollPsn})
+
+! 員工檔查詢
+#BTNR=X,1,I,ui:button;value:員工檔查詢;enable:1;tabbable:0
+#BTNBBUR=X,7,S
+T(3,      Y)
+BIND(#BTNR,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BTNBBUR;ntxbuf5=type<-1:AccCollPsnName<-OOEmployeeNo})
 
 #AccCollPsnName=X,6,I
 C(2,#FunctionCd,S,$,$,$,s,s)

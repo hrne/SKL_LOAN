@@ -201,6 +201,7 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("NextRepayDate", tLoanBorMain.getNextRepayDate());
 				occursList.putParam("TotalPeriod", tLoanBorMain.getTotalPeriod());
 				occursList.putParam("TimAcctFee", tLoanBorMain.getAcctFee());
+				occursList.putParam("TimHandlingFee", tLoanBorMain.getHandlingFee());
 				occursList.putParam("TimFinalBal", tLoanBorMain.getFinalBal());
 				occursList.putParam("NotYetFlag", tLoanBorMain.getNotYetFlag());
 				occursList.putParam("PieceCode", tLoanBorMain.getPieceCode());

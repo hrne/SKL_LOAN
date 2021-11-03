@@ -1,10 +1,13 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -12,18 +15,22 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdArea;
 import com.st1.itx.db.domain.CdAreaId;
 import com.st1.itx.db.domain.CdCity;
-import com.st1.itx.db.domain.CollList;
-import com.st1.itx.db.domain.CollListId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
+import com.st1.itx.db.domain.LoanBorMain;
+
 import com.st1.itx.db.service.CdAreaService;
 import com.st1.itx.db.service.CdCityService;
-import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
+import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.util.common.MakeReport;
+import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.report.WarningLetterForm;
+import com.st1.itx.buffer.TxBuffer;
+import com.st1.itx.util.common.BaTxCom;
+
 
 @Service("L560AReport")
 @Scope("prototype")
@@ -44,9 +51,13 @@ public class L560AReport extends MakeReport {
 	@Autowired
 	public CdCityService iCdCityService;
 	@Autowired
-	public CollListService iCollListService;
+	public LoanBorMainService loanBorMainService;
+
 	@Autowired
 	WarningLetterForm iWarningLetterForm;
+	@Autowired
+	BaTxCom baTxCom;
+
 	@Override
 	public void printTitle() {
 //		this.print(-8, 1, "┌────────────────────┬──────┬─────────┐");
@@ -57,16 +68,15 @@ public class L560AReport extends MakeReport {
 	public void printHeader() {
 	}
 	
-	public long run(TitaVo titaVo) throws LogicException {
+	public long exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		String adjFlag = titaVo.getBtnIndex(); //0-存證信函;1-延遲繳款通知函;2-繳款通知函
 		String iCustNo = titaVo.getParam("OOCustNo");
-		String iBusDate = StringUtils.leftPad(titaVo.getEntDy(), 7,"0"); //會計日
-		String iYyy = iBusDate.substring(1,4);
-		String iMm = iBusDate.substring(4,6);
-		String iDd = iBusDate.substring(6);
-		String iPrinBalance = titaVo.getParam("OOPrinBalance");
-		String iOverDueterm = titaVo.getParam("OOOverDueterm");
-		CustMain iCustMain = iCustMainService.custNoFirst(Integer.valueOf(iCustNo), Integer.valueOf(iCustNo), titaVo);
+		int rCustNo = Integer.valueOf(iCustNo);
+		String iCalDy = titaVo.getCalDy(); // 日曆日
+		String iCalyy = iCalDy.substring(0, 3);
+		String iCalMm = iCalDy.substring(3, 5);
+		String iCalDd = iCalDy.substring(5, 7);
+		CustMain iCustMain = iCustMainService.custNoFirst(rCustNo, rCustNo, titaVo);
 		String iCustName = "";
 		long sno = 0;
 		if (iCustMain != null) {
@@ -75,18 +85,89 @@ public class L560AReport extends MakeReport {
 			throw new LogicException(titaVo, "E0001", "客戶主檔無此戶號:"+titaVo.getParam("OOCustNo"));
 		}
 		
-		
-		String aFacmNo = titaVo.getParam("OOFacmNo");
+		String iFacmNo = titaVo.getParam("OOFacmNo");
+		int rFacmNo = Integer.valueOf(iFacmNo);
 		FacMain aFacMain = new FacMain();
 		FacMainId aFacMainId = new FacMainId();
-		aFacMainId.setCustNo(Integer.valueOf(iCustNo));
-		aFacMainId.setFacmNo(Integer.valueOf(aFacmNo));
+		aFacMainId.setCustNo(rCustNo);
+		aFacMainId.setFacmNo(rFacmNo);
 		aFacMain = iFacMainService.findById(aFacMainId, titaVo);
 		if (aFacMain == null) {
-			throw new LogicException(titaVo, "E0001", "查無額度，戶號:"+iCustNo+"額度:"+aFacmNo);
+			throw new LogicException(titaVo, "E0001", "查無額度，戶號:"+iCustNo+"額度:"+iFacmNo);
 		}
 
-		String aLineAmt = String.valueOf(aFacMain.getLineAmt());	
+		String aLineAmt = String.valueOf(aFacMain.getLineAmt());// 核准額度
+
+		//
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(rCustNo, rFacmNo, rFacmNo, 0, 990, 0,
+				Integer.MAX_VALUE, titaVo);
+		int closeday = 0;
+		BigDecimal loanBalance = BigDecimal.ZERO; // 總餘額
+		BigDecimal closeBalance = BigDecimal.ZERO; //到期餘額
+		for (LoanBorMain ln : slLoanBorMain.getContent()) {
+			if (ln.getStatus() == 0) {
+				loanBalance = loanBalance.add(ln.getLoanBal());
+				if (ln.getMaturityDate() <= txbuffer.getTxBizDate().getLbsDy()) {
+					if (ln.getMaturityDate() > closeday) {
+						closeday = ln.getMaturityDate();
+					}
+					closeBalance = closeBalance.add(ln.getLoanBal());
+				}
+			}
+		}
+		
+		int iPayIntDate = 0;
+		int iIntStartDate = 0;
+		int terms = 0;
+		BigDecimal unpaidAmt = BigDecimal.ZERO; // 未收本息
+		if (closeday == 0) {// 未到期
+			if (adjFlag.equals("2")) {
+				throw new LogicException(titaVo, "E0001", "查無到期資料");
+			}
+			ArrayList<BaTxVo> listBaTxVo = new ArrayList<BaTxVo>();
+			baTxCom.setTxBuffer(txbuffer);
+			try {
+				listBaTxVo = baTxCom.settingUnPaid(txbuffer.getTxBizDate().getLbsDy(), rCustNo, rFacmNo, 0, 1,
+						BigDecimal.ZERO, titaVo);// 日期為上營業日
+			} catch (LogicException e) {
+				this.error("baTxCom settingUnPaid ErrorMsg :" + e.getMessage());
+			}
+			for (BaTxVo baTxVo : listBaTxVo) {
+				if (baTxVo.getDataKind() == 2) {
+					if (baTxVo.getPayIntDate() > iPayIntDate) {// 取日期最大的for通知函
+						iPayIntDate = baTxVo.getPayIntDate();
+					}
+					if (baTxVo.getPaidTerms() > terms) {// 期數最大
+						terms = baTxVo.getPaidTerms();
+					}
+					if (iIntStartDate == 0) {
+						iIntStartDate = baTxVo.getIntStartDate();
+					} else if (baTxVo.getIntStartDate() < iIntStartDate && baTxVo.getIntStartDate() > 0) {// 取日期最小的for存證信函
+						iIntStartDate = baTxVo.getIntStartDate();
+					}
+					unpaidAmt = unpaidAmt.add(baTxVo.getPrincipal()); // 未收本
+					unpaidAmt = unpaidAmt.add(baTxVo.getInterest()); // 未收息
+					unpaidAmt = unpaidAmt.add(baTxVo.getBreachAmt()); // 違約金
+					unpaidAmt = unpaidAmt.add(baTxVo.getDelayInt()); // 延遲息
+				}
+			}
+		}
+		if (closeday == 0 && terms ==0) {
+			throw new LogicException(titaVo, "E0001", "查無符合資料");
+		}
+		
+		String iPrevIntDate = StringUtils.leftPad(String.valueOf(iPayIntDate), 7, "0");
+		if (adjFlag.equals("0")) {
+			iPrevIntDate = StringUtils.leftPad(String.valueOf(iIntStartDate), 7, "0");// 存證信函使用
+		}
+		
+		String iPrYyy = iPrevIntDate.substring(0,3);
+		String iPrMm = iPrevIntDate.substring(3,5);
+		String iPrDd = iPrevIntDate.substring(5);
+		String sterms = String.valueOf(terms);
+		String iPrinBalance = String.valueOf(unpaidAmt);
+
+		
 		switch(adjFlag) {
 		case "0": //列印存證信函
 			String iCityCode = iCustMain.getCurrCityCode();
@@ -139,25 +220,16 @@ public class L560AReport extends MakeReport {
 			}
 			iAddress = iCity+iArea+iRoad+iSection+iAlley+iLane+iCurrNum+iCurrNumDash+iCurrFloor+iCurrFloorDash;
 			
-			CollListId iCollListId = new CollListId();
-			iCollListId.setCustNo(Integer.valueOf(iCustNo));
-			iCollListId.setFacmNo(Integer.valueOf(aFacmNo));
-			CollList iCollList = new CollList();
-			iCollList = iCollListService.findById(iCollListId, titaVo);
-			String iPrevIntDate = StringUtils.leftPad(String.valueOf(iCollList.getPrevIntDate()), 7,"0");
-			String iPrYyy = iPrevIntDate.substring(0,3);
-			String iPrMm = iPrevIntDate.substring(3,5);
-			String iPrDd = iPrevIntDate.substring(5);
 			HashMap<String, Object> map = new HashMap<String, Object>();
 			
 			map.put("RcvName1",iCustName+"    戶號 :" + StringUtils.leftPad(iCustNo, 7,"0"));
 			map.put("RcvAddress1",iAddress);
-			map.put("p1", "一、台端前向本公司辦理房屋抵押貸款新台幣"+aLineAmt+"元整，約定於每月二十日繳交應攤還之本息；惟台端僅繳至"+iPrYyy+"年"+iPrMm+"月"+iPrDd+"日，共計積欠"+iOverDueterm+"期未繳付。");
+			map.put("p1", "一、台端前向本公司辦理房屋抵押貸款新台幣"+aLineAmt+"元整，約定於每月"+iPrDd+"日繳交應攤還之本息；惟台端僅繳至"+iPrYyy+"年"+iPrMm+"月"+iPrDd+"日，共計積欠"+sterms+"期未繳付。");
 			map.put("p2", "二、依約定借款人如有一期未繳付應攤還本金或利息時，全部借款視為到期，借款人應即償還全部借款餘額，為此特通知台端三日內繳清所積欠之本金、利息、違約金，否則將聲請法院查封拍賣抵押物追償，事涉台端權益，請速處理，祈勿自誤為禱。");
 			iWarningLetterForm.run(titaVo,map);
 			break;
 		case "1": //列印延遲繳款通知函
-			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "延遲繳款通知函"+iCustNo, "Normal","A4","P");
+			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "延遲繳款通知函" + iCustNo, "Normal", "A4", "P");
 			printImageCm(1, 1, 35, "SklLogo.jpg");
 			
 			setFont(1, 14);
@@ -170,7 +242,7 @@ public class L560AReport extends MakeReport {
 			setFont(1, 18);
 			printCm(1, 5, iCustName+"　 生生/小姐　台照：");
 			setFont(1, 14);
-			printRectCm(1, 6, 70, 20 , "　　台端前向本公司辦理房屋抵押貸款，至民國"+iYyy+"年"+iMm+"月"+iDd+"日止，尚積欠"+iOverDueterm+"期期款未繳納，應納金額共"+iPrinBalance+"元，特函提醒台端儘速處理，如您仍未按時依約繳款，將會使您與保證人的信用出現不良紀錄，亦可能影響您們未來與各銀行間之往來甚鉅（諸如持用支票、信用卡、信用貸款等）。");
+			printRectCm(1, 6, 70, 20 , "　　台端前向本公司辦理房屋抵押貸款，至民國"+iPrYyy+"年"+iPrMm+"月"+iPrDd+"日止，尚積欠"+sterms+"期期款未繳納，應納金額共"+iPrinBalance+"元，特函提醒台端儘速處理，如您仍未按時依約繳款，將會使您與保證人的信用出現不良紀錄，亦可能影響您們未來與各銀行間之往來甚鉅（諸如持用支票、信用卡、信用貸款等）。");
 			printRectCm(1, 9, 70, 20, "　　為維護您的個人信用，請儘速繳清所應支付之本金、利息及違約金，或電洽本公司承辦人員洽商還款事宜。");
 			printRectCm(1, 11,70,20, "【繳期款專戶】");
 			printRectCm(1, 12,70,20, "解款銀行：新光銀行　城內分行（ATM銀行代號  103）");
@@ -186,30 +258,31 @@ public class L560AReport extends MakeReport {
 			printCm(7, 21, "承辦人員：邱怡婷");
 			printCm(7, 22, "電　　話：(02) 2389-5858 分機 7076");
 			setFont(1, 15);
-			printCm(10,27,"中　　華　　民　　國　"+iYyy+"　年　"+iMm+"　月　"+iDd+"　日","C");
+			printCm(10,27,"中　　華　　民　　國　"+iCalyy+"　年　"+iCalMm+"　月　"+iCalDd+"　日","C");
 			sno = close();
 			//test only
 			toPdf(sno);
 			break;
 		case "2": //列印繳款通知函
-			String iFacmNo = titaVo.getParam("OOFacmNo");
-			FacMain iFacMain = new FacMain();
-			FacMainId iFacMainId = new FacMainId();
-			iFacMainId.setCustNo(Integer.valueOf(iCustNo));
-			iFacMainId.setFacmNo(Integer.valueOf(iFacmNo));
-			iFacMain = iFacMainService.findById(iFacMainId, titaVo);
-			if (iFacMain == null) {
-				throw new LogicException(titaVo, "E0001", "查無額度，戶號:"+iCustNo+"額度:"+iFacmNo);
-			}
-			if (iFacMain.getMaturityDate() == 0) {
-				throw new LogicException(titaVo, "E0001", "查無到期日，戶號:"+iCustNo+"額度:"+iFacmNo);
-			}
-			String iMaturityDate = StringUtils.leftPad(String.valueOf(iFacMain.getMaturityDate()), 7,"0");
+			//FacMain iFacMain = new FacMain();
+			//FacMainId iFacMainId = new FacMainId();
+			//iFacMainId.setCustNo(rCustNo);
+			//iFacMainId.setFacmNo(rFacmNo);
+			//iFacMain = iFacMainService.findById(iFacMainId, titaVo);
+			//if (iFacMain == null) {
+			//	throw new LogicException(titaVo, "E0001", "查無額度，戶號:"+iCustNo+"額度:"+iFacmNo);
+			//}
+			//if (iFacMain.getMaturityDate() == 0) {
+			//	throw new LogicException(titaVo, "E0001", "查無到期日，戶號:"+iCustNo+"額度:"+iFacmNo);
+			//}
+			//String iMaturityDate = StringUtils.leftPad(String.valueOf(iFacMain.getMaturityDate()), 7,"0");
+			String iMaturityDate = StringUtils.leftPad(String.valueOf(closeday), 7,"0");
 			String iMatYyy = iMaturityDate.substring(0,3);
 			String iMatMm = iMaturityDate.substring(3, 5);
 			String iMatDd = iMaturityDate.substring(5);
-			String iLineAmt = String.valueOf(iFacMain.getLineAmt());			
-			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060"+iCustNo, "繳款通知函"+iCustNo, "Normal","A4","P");
+			String sloanBalance = String.valueOf(loanBalance);
+			String scloseBalance = String.valueOf(closeBalance);
+			open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "繳款通知函" + iCustNo, "Normal", "A4", "P");
 			printImageCm(1, 1, 35, "SklLogo.jpg");
 			
 			setFont(1, 14);
@@ -221,7 +294,7 @@ public class L560AReport extends MakeReport {
 			setFont(1, 18);
 			printCm(1, 5, iCustName+"　 生生/小姐　台照：");
 			setFont(1, 14);
-			printRectCm(1, 6, 70, 20 , "　　台端前向本公司辦理房屋抵押貸款共新台幣（以下同）"+iLineAmt+"元整，其中500元之借款至民國"+iMatYyy+"年"+iMatMm+"月"+iMatDd+"日已到期，尚有應納本金金額50元及計至清償日止之利息，特函提醒台端來電處理結清事宜。");
+			printRectCm(1, 6, 70, 20 , "　　台端前向本公司辦理房屋抵押貸款共新台幣（以下同）"+aLineAmt+"元整，其中"+scloseBalance+"元之借款至民國"+iMatYyy+"年"+iMatMm+"月"+iMatDd+"日已到期，尚有應納本金金額"+sloanBalance+"元及計至清償日止之利息，特函提醒台端來電處理結清事宜。");
 			printRectCm(1, 9, 70, 20, "　　為維護您的個人信用，請儘速繳清所應支付之本額，或電洽本公司承辦人員洽商相關事宜。");
 			printRectCm(1, 11,70,20, "【繳期款專戶】");
 			printRectCm(1, 12,70,20, "解款銀行：新光銀行　城內分行（ATM銀行代號  103）");
@@ -237,9 +310,9 @@ public class L560AReport extends MakeReport {
 			printCm(7, 21, "承辦人員：邱怡婷");
 			printCm(7, 22, "電　　話：(02) 2389-5858 分機 7076");
 			setFont(1, 15);
-			printCm(10,27,"中　　華　　民　　國　"+iYyy+"　年　"+iMm+"　月　"+iDd+"　日","C");
+			printCm(10,27,"中　　華　　民　　國　"+iCalyy+"　年　"+iCalMm+"　月　"+iCalDd+"　日","C");
 			sno = close();
-			//test only
+
 			toPdf(sno);
 			break;
 		}

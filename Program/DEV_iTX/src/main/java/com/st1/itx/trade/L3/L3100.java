@@ -154,9 +154,8 @@ public class L3100 extends TradeBuffer {
 	private int iTxBormNo;
 	private BigDecimal iDrawdownAmt;
 	private BigDecimal iAcctFee;
+	private BigDecimal iHandlingFee;
 	private String iCompensateFlag;
-	private String wkCompensateFlag;
-
 	// work area
 	private long sno = 0;
 	private int wkBormNo = 0;
@@ -213,6 +212,7 @@ public class L3100 extends TradeBuffer {
 		iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 		iDrawdownAmt = this.parse.stringToBigDecimal(titaVo.getParam("TimDrawdownAmt"));
 		iAcctFee = this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee"));
+		iHandlingFee = this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee"));
 		iDrawdownDate = this.parse.stringToInteger(titaVo.getParam("DrawdownDate"));
 		iMaturityDate = this.parse.stringToInteger(titaVo.getParam("MaturityDate"));
 		iCompensateFlag = titaVo.getParam("CompensateFlag");
@@ -248,6 +248,9 @@ public class L3100 extends TradeBuffer {
 
 		// 帳管費
 		AcctFeeRoutine();
+
+		// 手續費
+		HandlingFeeRoutine();
 
 		// 維護撥款匯款檔
 		AcPaymentRoutine();
@@ -817,8 +820,28 @@ public class L3100 extends TradeBuffer {
 			tAcReceivable.setAcctCode("F10"); // F10 帳管費
 			tAcReceivable.setCustNo(iCustNo);
 			tAcReceivable.setFacmNo(iFacmNo);
-			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3));
+			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "-1");
 			tAcReceivable.setRvAmt(iAcctFee);
+			lAcReceivable.add(tAcReceivable);
+			acReceivableCom.setTxBuffer(this.getTxBuffer());
+			acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳
+		}
+	}
+
+//	TODO:手續費
+	private void HandlingFeeRoutine() throws LogicException {
+		this.info("   HandlingFeeRoutine ...");
+
+		// 手續費
+		if (this.titaVo.isActfgRelease() && iHandlingFee.compareTo(BigDecimal.ZERO) > 0) {
+			tAcReceivable = new AcReceivable();
+			lAcReceivable = new ArrayList<AcReceivable>();
+			tAcReceivable.setReceivableFlag(3); // 3-未收費用
+			tAcReceivable.setAcctCode("F10"); // F10 帳管費
+			tAcReceivable.setCustNo(iCustNo);
+			tAcReceivable.setFacmNo(iFacmNo);
+			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "-2");
+			tAcReceivable.setRvAmt(iHandlingFee);
 			lAcReceivable.add(tAcReceivable);
 			acReceivableCom.setTxBuffer(this.getTxBuffer());
 			acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳
@@ -910,6 +933,7 @@ public class L3100 extends TradeBuffer {
 		tLoanBorMain.setFirstAdjRateDate(this.parse.stringToInteger(titaVo.getParam("FirstAdjRateDate")));
 		tLoanBorMain.setNextAdjRateDate(this.parse.stringToInteger(titaVo.getParam("FirstAdjRateDate")));
 		tLoanBorMain.setAcctFee(this.parse.stringToBigDecimal(titaVo.getParam("TimAcctFee")));
+		tLoanBorMain.setHandlingFee(this.parse.stringToBigDecimal(titaVo.getParam("TimHandlingFee")));
 		tLoanBorMain.setFinalBal(this.parse.stringToBigDecimal(titaVo.getParam("TimFinalBal")));
 		tLoanBorMain.setNotYetFlag(titaVo.getParam("NotYetFlag"));
 		tLoanBorMain.setRenewFlag(titaVo.getParam("RenewFlag"));
@@ -983,7 +1007,6 @@ public class L3100 extends TradeBuffer {
 
 	private void moveLoanBorTx() throws LogicException {
 		this.info("   moveLoanBorTx ...");
-
 
 		if ("1".equals(titaVo.getParam("RenewFlag"))) {
 			tLoanBorTx.setDesc("展期");

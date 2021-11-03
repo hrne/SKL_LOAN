@@ -14,9 +14,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacShareAppl;
+import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacShareApplService;
@@ -51,7 +53,8 @@ public class L2018 extends TradeBuffer {
 	public FacMainService facMainService;
 	@Autowired
 	public CustMainService sCustMainService;
-
+	@Autowired
+	public CdEmpService sCdEmpService;
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -121,9 +124,8 @@ public class L2018 extends TradeBuffer {
 			}
 
 			/* 將每筆資料放入Tota的OcList */
-// 主要案件編號 主要戶號 總額度(元) 循環動用限額(元) 建檔日期 建檔人員 最後更新日期 最後更新人員
+
 			OccursList occurslist = new OccursList();
-			occurslist.putParam("OOApplNo", t.getApplNo());
 			occurslist.putParam("OOCustNo", t.getCustNo());
 			occurslist.putParam("OOFacmNo", t.getFacmNo());
 			CustMain tCustMain = sCustMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
@@ -132,14 +134,7 @@ public class L2018 extends TradeBuffer {
 			} else {
 				occurslist.putParam("OOCustName", "");
 			}
-			occurslist.putParam("OOCaseNo", tFacMain.getCreditSysNo());
-			if (tFacMain.getRecycleCode().equals("1")) {
-				this.totaVo.putParam("OOMDeadline", tFacMain.getRecycleDeadline());
-				this.totaVo.putParam("OOMRecycleCode", "Y");// 循環動用 1-循環動用
-			} else {
-				this.totaVo.putParam("OOMDeadline", tFacMain.getUtilDeadline());
-				this.totaVo.putParam("OOMRecycleCode", "");// 循環動用 0-非循環動用
-			}
+			occurslist.putParam("OOApplNo", t.getApplNo());
 			occurslist.putParam("OOCurrencyCode", tFacMain.getCurrencyCode());
 			occurslist.putParam("OOLineAmt", tFacMain.getLineAmt());
 
@@ -150,6 +145,20 @@ public class L2018 extends TradeBuffer {
 				occurslist.putParam("OOCreateDate", "");
 			}
 			occurslist.putParam("OOCreateEmpNo", t.getCreateEmpNo());
+			
+			String TlrNo = "";
+			String EmpName = "";
+			CdEmp tCdEmp = new CdEmp();
+
+			if (t.getCreateEmpNo() != null) {
+				TlrNo = t.getCreateEmpNo() ;
+				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
+				if (tCdEmp != null) {
+					EmpName = tCdEmp.getFullname();
+				}
+			}
+			occurslist.putParam("OOCreateEmpName", EmpName);
+			
 			if (t.getLastUpdate() != null) {
 				lastUpdate = parse.stringToInteger(df.format(t.getLastUpdate())) - 19110000;
 				occurslist.putParam("OOLastUpdate", lastUpdate);
@@ -157,6 +166,15 @@ public class L2018 extends TradeBuffer {
 				occurslist.putParam("OOLastUpdate", "");
 			}
 			occurslist.putParam("OOLastUpdateEmpNo", t.getLastUpdateEmpNo());
+			
+			if (t.getLastUpdateEmpNo() != null) {
+				TlrNo = t.getLastUpdateEmpNo() ;
+				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
+				if (tCdEmp != null) {
+					EmpName = tCdEmp.getFullname();
+				}
+			}
+			occurslist.putParam("OOLastUpdateEmpName", EmpName);
 			occurslist.putParam("OOMApplNo", t.getMainApplNo());
 
 			this.totaVo.addOccursList(occurslist);

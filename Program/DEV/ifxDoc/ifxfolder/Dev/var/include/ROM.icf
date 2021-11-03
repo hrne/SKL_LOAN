@@ -2652,7 +2652,7 @@ TXFORM=L2R26
 #L2r27CityCode=X,2,S
 #L2r27AreaCode=X,3,S
 #L2r27IrCode=X,5,S
-#L2r27Road=x,20,S
+#L2r27Road=x,40,S
 #L2r27Section=X,4,S
 #L2r27Alley=X,4,S
 #L2r27Lane=X,4,S
@@ -3685,6 +3685,7 @@ TXFORM=L3R01
 #L3r02AcDate=D,7,S
 #L3r02NextAcDate=D,7,S
 #L3r02IntCalcCode=X,1,S
+#L3r02HandlingFee=m,14.2,S
 </L3R02.dec>
 
 <L3R02.tom>
@@ -3755,6 +3756,7 @@ TXFORM=L3R02
 #L3r02AcDate
 #L3r02NextAcDate
 #L3r02IntCalcCode
+#L3r02HandlingFee
 ^
 </L3R02.tom>
 
@@ -3990,12 +3992,7 @@ TXFORM=L3R09
 #L3r10CurrencyCode=X,3,S
 #L3r10SyndAmt=m,14.2,S
 #L3r10PartAmt=m,14.2,S
-##loop{times:5,n:1}
-#L3r10Item{n}=x,10,S
-#L3r10SyndAmt{n}=m,14.2,S
-#L3r10SyndMark{n}=x,20,S
-#L3r10SyndBal{n}=m,14.2,S
-##end
+
 </L3R10.dec>
 
 
@@ -4010,12 +4007,6 @@ TXFORM=L3R10
 #L3r10CurrencyCode
 #L3r10SyndAmt
 #L3r10PartAmt
-##loop{times:5,n:1}
-#L3r10Item{n}
-#L3r10SyndAmt{n}
-#L3r10SyndMark{n}
-#L3r10SyndBal{n}
-##end
 ^
 </L3R10.tom>
 
@@ -5656,6 +5647,8 @@ TXFORM=L5R17
 #L5R18CallDate=D,7,S
 #L5R18ReMark=x,500,S
 #L5R18EditEmpNo=X,6,S
+#L5R18EditDate=X,7,S
+#L5R18EditTime=X,4,S
 </L5R18.dec>
 
 <L5R18.tom>
@@ -7663,6 +7656,7 @@ TXFORM=L8R48
 #L8R49Factor2AmtEnd=m,14,S
 #L8R49Factor3TotLimit=m,14,S
 #L8R49FactorDays=N,3,S
+#L8R49FactorDays3=N,3,S
 </L8R49.dec>
 
 <L8R49.tom>
@@ -7673,6 +7667,7 @@ TXFORM=L8R49
 #L8R49Factor2AmtEnd
 #L8R49Factor3TotLimit
 #L8R49FactorDays
+#L8R49FactorDays3
 ^
 </L8R49.tom>
 

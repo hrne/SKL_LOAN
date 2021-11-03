@@ -1,0 +1,586 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,XW111)
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+K(MODIFYBUTTON,登錄)
+</sub>
+
+!=====================================================================
+!#FKEY>0時，重新執行
+!=====================================================================
+<sub type="PREDC" name="PreDC">
+!#PDC=X,1,S
+!C(3,#FKEY,0,NOP,T(R,#MRKEY,#REFNO))
+!C(3,#FKEY,3,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),$)
+!C(3,#FKEY,7,NO_RUN(#CIFKEY,#PREFG,#KINDCD,#REFNO),s)
+
+!<include src="COM.icf::ACTFGX-RUN.pre"/>
+!<include src="COM.icf::TITLE-RUN.pre"/>
+!<include src="TITF.icf::RPRUN.dec"/>
+
+#INVKALL=@,1,S
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+
+
+#InitValue=@,1,S
+E(0,#SyndNo,0)
+T(2,@FdFuncCode,)
+T(2,@FdSyndTypeCode,#Star)
+T(2,@FdLeadingBank,#Star)
+T(2,@FdSigningDate,#Star)
+T(3,@FdCurrencyCode, )
+T(2,@FdSyndAmt,#Star)
+T(2,@FdPartAmt,#Star)
+T(2,@FdAgentBank,#Star)
+T(F,@LeadingBank,1)
+T(F,@SigningDate,1)
+T(F,@CurrencyCode,1)
+T(F,@TwSyndAmt,1)
+T(F,@USSyndAmt,1)
+T(F,@TwPartAmt,1)
+T(F,@UsPartAmt,1)
+T(F,@AgentBank,1)
+T(F,@CentralBankPercent,1)
+SHOW(#LeadingBank,#AgentBank,#TwSyndAmt,#TwPartAmt)
+HIDE(#UsSyndAmt,#UsPartAmt,#TimSyndAmtX,#TimPartAmtX)
+C(3,#FuncCode,3,INVOKEJS(SHOW,p1,3,3,1),INVOKEJS(SHOW,p1,3,3,0))
+
+
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[160,340,160,370];printer.width=[20,80];order=1">
+[
+["[L2600]                                 聯貸案訂約登錄"],
+[#<->#,"#FdFuncCode+功能",#FuncCodeX],
+["#FdSyndNo+聯貸編號",#SyndNo], 
+[#<->#,"#FdCopy+複製來源",#CopySyndNo],
+[#<->#,"#FdSyndTypeCode+國內或國際聯貸",#SyndTypeCode,#SyndTypeCodeX], 
+[#<->#,"#FdLeadingBank+主辦行",#LeadingBank,#Btn2,#LeadingBankX],
+["#FdAgentBank+擔保品管理行",#AgentBank,#Btn3,#AgentBankX],
+["#FdSigningDate+簽約日",#SigningDate],
+["#FdPartRate+參貸費率",#PartRate," %"],
+["#FdCurrencyCode+幣別",#CurrencyCode],
+["#FdSyndAmt+聯貸總金額",#TwSyndAmt,#UsSyndAmt,#TimSyndAmtX],
+["#FdPartAmt+參貸金額",#TwPartAmt,#UsPartAmt,#TimPartAmtX],
+["@"],
+["#FdPartRateB+參貸比例",#PartRateB," %"],
+]
+
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+##loop{times:50,n:1}
+#BtnA{n}=X,15,I,ui:button;value:保證人明細資料;enable:1;tabbable:0;title: L2020 保證人明細資料查詢;
+##end
+#Btn2=X,15,I,ui:button;value:行庫資料查詢;enable:1;tabbable:0;title: L6071 行庫資料查詢;
+#Btn3=X,15,I,ui:button;value:行庫資料查詢;enable:1;tabbable:0;title: L6071 行庫資料查詢;
+
+#BUF1=X,42,S
+!---------- AP TEXT AREA Variables ----------
+#SetSysPar=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!幣別小數位
+#CDDEF01=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CurrPrecisionHelp=x,1024,S
+
+!國內或國際聯貸
+#CDDEF02=x,26,S
+T(3,CdCode.SyndTypeCode)
+
+#SyndTypeCodeHelp=x,1024,S
+
+!FuncCode1功能
+#FuncCode1Help=x,1024,S
+T(3,1:新增;2:修改;3:複製;4:刪除;5:查詢)
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@CurrPrecisionHelp,#HelpDesc1)
+T(2,@SyndTypeCodeHelp,#HelpDesc2)
+
+#YNHelp=x,20,S
+T(3,Y:是;N:否)
+
+#ItemHelp=X,1024,S
+T(3,01:參貸費;02:管理費;99:其他)
+
+#Percent=X,1,S
+T(3,%)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2060進入),$)
+T(2,@RimTxCode,#TXCD)
+C(3,#CHAIN,1,$,s)
+!HIDE(#FuncCode,#Btn1,#UsSyndAmt,#UsPartAmt)
+HIDE(#FuncCode,#UsSyndAmt,#UsPartAmt)
+T(F,@SyndNo,0)
+T(3,@FdFuncCode, )
+T(3,@FdSyndNo, )
+
+#NTXBUF=X,100,S
+T(4,NTXBUF$)
+
+#FdFuncCode=X,2,L
+#FdSyndNo=X,2,L
+#FdSyndTypeCode=X,2,L
+#FdCopy=X,2,L
+#FdLeadingBank=X,2,L
+#FdAgentBank=X,2,L
+#FdSigningDate=X,2,L
+#FdPartRate=X,2,L
+#FdCurrencyCode=X,2,L
+#FdSyndAmt=X,2,L
+#FdPartAmt=X,2,L
+#FdPartRateB=X,2,L
+
+![功能]
+!1.新增  2.修改  3.複製  4.刪除  5.查詢
+
+#FuncCode=X,1,S
+C(3,#CHAIN,1,T(1,#NTXBUF,1,1),$)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode1Help) 
+@V(H,#FuncCode1Help) 
+E(0,@FUNCIND,#FuncCode)
+
+
+
+#UpdateCode=N,1,S
+IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
+
+#Spc=X,2,S
+
+#Star=X,2,S
+C(3,#UpdateCode,1,T(3,*),T(3, ))
+
+#Star2=X,2,S
+C(3,#FuncCode,2,T(3,*),T(3, ))
+
+#Star3=X,2,S
+IF(#FuncCode==1 || #FuncCode==3,T(3,*),T(3, ))
+
+#FuncCodeX=X,4,L
+T(3,)T(H,#FuncCode,#FuncCode1Help)  
+C(3,#FuncCode,3,INVOKEJS(SHOW,p1,3,3,1),INVOKEJS(SHOW,p1,3,3,0))
+CALL(#InitValue)
+CALL(#INVKALL)
+
+#InitA=X,1,S
+C(3,#CHAIN,1,$,C(3,#FuncCode,1,T(F,@SyndNo,0),T(F,@SyndNo,1)))
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+#SetSysPar1=X,1,S
+IF(#FuncCode ==1 ,E(0,0)ASGN(AGAIN$),$)
+
+![拷貝來源]
+
+#CopySyndNo=A,6,L
+C(3,#CHAIN,1,T(1,#NTXBUF,2,6),$)
+E(0,@SyndNo,0)
+C(3,#CHAIN,1,s,$)
+
+!查詢聯貸訂約檔
+#SendL3r10A=X,1,S
+C(3,#FuncCode,3,$,S)
+E(0,@RimFuncCode,5)
+E(0,@RimSyndNo,#CopySyndNo)
+! RESET_RIM(#SendL3r10A,L3R10)
+S(L3R10,1,#RimFuncCode,#RimTxCode,#RimSyndNo)
+R(1,L3R10)
+
+#RcvL3r10A=X,1,S
+C(3,#FuncCode,3,$,S)
+E(0,@SyndNo,#L3r10SyndNo)
+T(2,@LeadingBank,#L3r10LeadingBank)
+T(2,@AgentBank,#L3r10AgentBank)
+E(0,@SigningDate,#L3r10SigningDate)
+T(2,@SyndTypeCode,#L3r10SyndTypeCodeFlag)
+E(0,@PartRate,#L3r10PartRate)
+T(2,@CurrencyCode,#L3r10CurrencyCode)
+E(0,@TwSyndAmt,#L3r10SyndAmt)
+E(0,@UsSyndAmt,#L3r10SyndAmt)
+E(0,@TwPartAmt,#L3r10PartAmt)
+E(0,@UsPartAmt,#L3r10PartAmt)
+CALL(#INVKALL)
+
+
+![聯貸編號]
+!新增時由系統自動編號,其他必須輸入
+
+#SyndNo=A,6,I
+IF(#FuncCode==1 || #FuncCode==3,S,$)
+C(3,#CHAIN,1,T(1,#NTXBUF,2,6),$)
+C(3,#CHAIN,1,s,$)
+@V(2,0)
+
+
+
+#BUF2A=X,7,S
+
+#BIND2A=X,1,S
+BIND(#Btn2,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF2A;ntxbuf5=type<-1:LeadingBank<-OOTBank Code})
+
+!查詢聯貸訂約檔
+#SendL3r10B=X,1,S
+C(3,#FuncCode,3,S,$)
+E(0,@RimFuncCode,#FuncCode)
+E(0,@RimSyndNo,#SyndNo)
+! RESET_RIM(#SendL3r10B,L3R10)
+S(L3R10,1,#RimFuncCode,#RimTxCode,#RimSyndNo)
+R(1,L3R10)
+#RcvL3r10B=X,1,S
+C(3,#FuncCode,3,S,$)
+E(0,@SyndNo,#L3r10SyndNo)
+T(2,@LeadingBank,#L3r10LeadingBank)
+T(2,@AgentBank,#L3r10AgentBank)
+E(0,@SigningDate,#L3r10SigningDate)
+T(2,@SyndTypeCode,#L3r10SyndTypeCodeFlag)
+E(0,@PartRate,#L3r10PartRate)
+T(2,@CurrencyCode,#L3r10CurrencyCode)
+E(0,@TwSyndAmt,#L3r10SyndAmt)
+E(0,@UsSyndAmt,#L3r10SyndAmt)
+E(0,@TwPartAmt,#L3r10PartAmt)
+E(0,@UsPartAmt,#L3r10PartAmt)
+CALL(#INVKALL)
+
+
+
+#InitB=X,1,S
+IF(#FuncCode==4 || #FuncCode==5,$,S)
+HIDE(#LeadingBank,#AgentBank,#Btn2,#Btn3)
+T(F,@SyndTypeCode,0)
+T(F,@LeadingBank,0)
+T(F,@SigningDate,0)
+T(F,@PartRate,0)
+T(F,@TwSyndAmt,0)
+T(F,@USSyndAmt,0)
+T(F,@TwPartAmt,0)
+T(F,@UsPartAmt,0)
+T(F,@AgentBank,0)
+T(F,@CentralBankPercent,0)
+T(3,@FdLeadingBank,)
+T(3,@FdSyndAmt,)
+T(3,@FdPartAmt,)
+
+
+
+#SyndTypeCode=X,1,I
+C(3,#UpdateCode,1,$,s)
+C(4,#SyndTypeCode,T(3,A),$)
+HELP(#SyndTypeCodeHelp)
+@V(H,#SyndTypeCodeHelp)
+
+#SyndTypeCodeX=X,10,L
+T(H,#SyndTypeCode,#SyndTypeCodeHelp)
+
+
+![主辦行]
+!新增、修改時必須輸入,其他自動顯示不必輸入
+! T(3,)
+
+#LeadingBank=X,7,I
+C(3,#UpdateCode,1,$,s)
+@V(7)
+
+!尋找行庫資料檔
+#SendL2r09A=X,1,S
+T(2,@RimBankCode,#LeadingBank)
+! RESET_RIM(#SendL2r09A,L2R09)
+S(L2R09,1,#RimTxCode,#RimBankCode)
+R(1,L2R09)
+
+#LeadingBankX=x,50,L
+T(B,#L2r09BankItem+#L2r09BranchItem)
+
+!擔保品管理行(代理行)
+#BUF3A=X,7,S
+
+#BIND3A=X,1,S
+BIND(#Btn3,click, {cmd=CHAIN; ntxcd=L6071; ntxbuf=#BUF3A;ntxbuf5=type<-1:AgentBank<-OOBankCode})
+
+
+#AgentBank=X,7,I
+C(3,#UpdateCode,1,$,s)
+T(2,#LeadingBank)
+@V(7)
+
+!尋找行庫資料檔
+#SendL2r09B=X,1,S
+T(2,@RimBankCode,#AgentBank)
+! RESET_RIM(#SendL2r09B,L2R09)
+S(L2R09,1,#RimTxCode,#RimBankCode)
+R(1,L2R09)
+
+#AgentBankX=X,50,L
+T(B,#L2r09BankItem+#L2r09BranchItem)
+
+![簽約日]
+!新增、修改時必須輸入,其他自動顯示不必輸入
+
+#SigningDate=D,7,I
+C(3,#UpdateCode,1,$,s)
+C(3,#FuncCode,1,E(0,#SYSDATE),$)
+D(8)
+@V(7)A(DATE,0,#SigningDate)
+
+
+
+!參貸費率
+
+#PartRate=n,2.4,I
+C(3,#UpdateCode,1,$,s)
+
+![幣別]
+
+#CurrencyCode=X,3,L
+T(3,TWD)
+
+!#CurrencyCodeX=X,10,L
+!T(A,#CurrencyCode,CURR,CURDEF,ENAME,CNAME)
+
+#Precision=N,1,S
+E(0,0)T(H,#CurrencyCode,#CurrPrecisionHelp)
+
+#WKHIDEAMTA=X,1,S
+C(3,#UpdateCode,1,$,S)
+C(3,#Precision,0,SHOW(#TwSyndAmt,#TwPartAmt)
+                 HIDE(#UsSyndAmt,#UsPartAmt,#TimSyndAmtX,#TimPartAmtX)
+                ,HIDE(#TwSyndAmt,#TwPartAmt)
+                 SHOW(#UsSyndAmt,#UsPartAmt,#TimSyndAmtX,#TimPartAmtX))
+
+#WKHIDEAMTB=X,1,S
+C(3,#UpdateCode,1,S,$)
+SHOW(#TimSyndAmtX,#TimPartAmtX)
+HIDE(#TwSyndAmt,#TwPartAmt,#UsSyndAmt,#UsPartAmt)
+
+![聯貸總金額]
+!新增、修改時必須輸入,其他自動顯示不必輸入
+!聯貸總金額 > 0
+! T(3,*)
+ 
+#TwSyndAmt=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Precision,0,$,S)
+@V(2,0)
+
+#UsSyndAmt=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Precision,0,S,$)
+@V(2,0)
+
+#TimSyndAmt=m,14.2,S
+C(3,#Precision,0,E(0,#TwSyndAmt),E(0,#UsSyndAmt))
+
+#TimSyndAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#TimSyndAmt,#TimSyndAmtX)
+
+#WKAMT1=m,14.2,S
+E(0,#TimSyndAmt-1)
+
+![參貸金額]
+!新增、修改時必須輸入,其他自動顯示不必輸入
+!聯貸總金額 > 參貸金額 > 0
+! T(3,*)
+
+#TwPartAmt=m,14,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Precision,0,$,S)
+@V(2,0)
+IF(#TwPartAmt>=#TimSyndAmt,V(P,不可高於聯貸總金額),$)
+
+#UsPartAmt=m,14.2,I
+C(3,#UpdateCode,1,$,s)
+C(3,#Precision,0,S,$)
+@V(2,0)
+IF(#UsPartAmt>=#TimSyndAmt,V(P,不可高於聯貸總金額),$)
+
+#TimPartAmt=m,14.2,S
+C(3,#Precision,0,E(0,#TwPartAmt),E(0,#UsPartAmt))
+
+#TimPartAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#TimPartAmt,#TimPartAmtX)
+
+!參貸比例
+#PartRateB=n,2.2,L
+E(0,#TimPartAmt/#TimSyndAmt*100)
+
+
+#ShowFac=X,1,S
+C(3,#UpdateCode,1,S,$)
+INVOKEJS(SHOW,p2,1)
+INVOKEJS(SHOW,p3,1)
+
+
+#SendL2r54=X,1,S
+C(3,#UpdateCode,1,S,$)
+E(0,@RimSyndNo,#CopySyndNo)
+S(L2R54,1,#RimSyndNo)
+R(1,L2R54)
+
+#SendL2r55=X,1,S
+C(3,#UpdateCode,1,S,$)
+E(0,@RimSyndNo,#CopySyndNo)
+S(L2R55,1,#RimSyndNo)
+R(1,L2R55)
+
+
+##loop{times:50,n:1}
+
+#ApplNo{n}=A,7,L
+E(0,#L2r54ApplNo{n})
+#CreditSysNo{n}=A,7,L
+E(0,#L2r54CreditSysNo{n})
+#CustId{n}=X,10,L
+T(2,#L2r54CustId{n})
+#CustNo{n}=A,7,L
+E(0,#L2r54CustNo{n})
+#CustNameX{n}=x,200,L
+T(2,#L2r54CustName{n})
+#CustName{n}=x,50,L
+T(2,#CustNameX{n})
+
+#FacCustNo{n}=A,7,S
+E(0,#L2r55CustNo{n})
+#FacmNo{n}=A,3,S
+E(0,#L2r55FacmNo{n})
+
+#BUF1A{n}=X,100,S
+T(2,0000000+#FacCustNo{n}+          +0000000+#FacmNo{n})
+
+#GuaId{n}=X,1,S
+BIND(#BtnA{n},click, {cmd=CHAIN; ntxcd=L2020; ntxbuf=#BUF1A{n}})
+C(4,#L2r55GuaFg{n},HIDE(#BtnA{n}),SHOW(#BtnA{n}))
+
+#CustFacX{n}=X,12,L
+T(2,#FacCustNo{n}+-+#FacmNo{n})
+#Rate{n}=n,2.4,L
+E(0,#L2r55BaseRate{n})
+#Incr{n}=n,2.4,L
+E(0,#L2r55RateIncr{n})
+#RecycleDeadline{n}=D,7,L
+E(0,#L2r55Deadline{n})
+#MaturityDate{n}=D,7,L
+E(0,#L2r55MaturityDate{n})
+
+
+#FacEnd{n}=X,1,S
+C(3,#UpdateCode,1,S,$)
+C(3,#ApplNo{n},0,INVOKEJS(SHOW,grd2_{n},0),INVOKEJS(SHOW,grd2_{n},1))
+C(3,#FacmNo{n},0,INVOKEJS(SHOW,grd3_{n},0),INVOKEJS(SHOW,grd3_{n},1))
+
+
+##end
+
+
+
+<include src="ROM.icf::L2Rim.dec"/>
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R09.dec"/>
+<include src="ROM.icf::L2R54.dec"/>
+<include src="ROM.icf::L2R55.dec"/>
+<include src="ROM.icf::L3Rim.dec"/>
+<include src="ROM.icf::L3R10.dec"/>
+</sub>
+
+<sub type="DC" name="p2" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
+[
+[""],
+["#grid#,{id:2,expand:true,loop:50,row_height:1,s_cols:[100,100,100,100,200], p_cols:[20,20,20,20,20]}","","<font color=red>@@@@@@@相關案件明細　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 　　  　　 　 　　  　　　 　 　　  　",
+["核准號碼","案件編號","借款人統編","戶號","戶名"],
+[[#ApplNo1],[#CreditSysNo1],[#CustId1],[#CustNo1],[#CustName1]],
+],
+]
+</sub>
+<sub type="DC" name="p3" layout="cols=3;screen.width=[200,350,200,350];printer.width=[30,30,30,30];order=1">
+[
+[""],
+["#grid#,{id:3,expand:true,loop:50,row_height:1,s_cols:[100,100,100,100,100,50], p_cols:[20,20,20,20,20]}","","<font color=red>@@@@@@@額度資料　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 　　  　　 　 　　  　　　 　 　　  　",
+["戶號","利率基準","加碼","動用日期","到期日","保證人"],
+[[#CustFacX1],[#Rate1,"<font color=Black>%"],[#Incr1,"<font color=Black>%"],[#RecycleDeadline1],[#MaturityDate1],[#BtnA1]],
+],
+]
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2600 ----------
+<sub type="FORM" name="L2600">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L2600,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2600] 聯貸案訂約登錄)
+C(3,#FuncCode,1,K(LIGHT,#SyndNo,TXTRED,0),$)
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FuncCode
+#SyndNo
+#SyndTypeCode
+#LeadingBank
+#AgentBank
+#SigningDate
+#PartRate
+#CurrencyCode
+#TimSyndAmt#TimPartAmt
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2600
+#SyndNo
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="COM.icf::LockControl.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R09.tom"/>
+<include src="ROM.icf::L2R54.tom"/>
+<include src="ROM.icf::L2R55.tom"/>
+<include src="ROM.icf::L3R10.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+</sub>

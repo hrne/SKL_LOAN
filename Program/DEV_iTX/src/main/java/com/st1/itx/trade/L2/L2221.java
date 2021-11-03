@@ -21,7 +21,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2221")
 @Scope("prototype")
 /**
@@ -38,7 +37,7 @@ public class L2221 extends TradeBuffer {
 
 	@Autowired
 	public FacRelationService sFacRelationService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	DateUtil dDateUtil;
@@ -49,7 +48,7 @@ public class L2221 extends TradeBuffer {
 
 	@Autowired
 	public DataLog dataLog;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2221 ");
@@ -60,179 +59,176 @@ public class L2221 extends TradeBuffer {
 		String iCustId = titaVo.getParam("CustId");
 		String Ukey = "";
 		CustMain lCustMain = new CustMain();
-		
+
 		// new table PK
 		FacRelationId tfacRelationId = new FacRelationId();
-		
-		if(iFunCd == 1) {
-		
-			
-			lCustMain  = sCustMainService.custIdFirst(iCustId, titaVo);
-			
-	    	if( lCustMain == null ) {  // 沒在客戶檔 同步新增資料到客戶檔
-	    		Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-	    		// PK
-	    		tfacRelationId.setCreditSysNo(iCaseNo);		
-	    		tfacRelationId.setCustUKey(Ukey);
-	    		
-	    		// new table 
-	    		FacRelation tFacRelation = new FacRelation();
-	    		
-	    		tFacRelation.setFacRelationId(tfacRelationId);
-	    		tFacRelation.setCreditSysNo(iCaseNo);
-	    		tFacRelation.setCustUKey(Ukey);
-	    		tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
-	    		tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-	    		tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
-	    		tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-	    		tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
-	    		
-	    		try {
-	    			sFacRelationService.insert(tFacRelation, titaVo);
+
+		if (iFunCd == 1) {
+
+			lCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+
+			if (lCustMain == null) { // 沒在客戶檔 同步新增資料到客戶檔
+				Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+				// PK
+				tfacRelationId.setCreditSysNo(iCaseNo);
+				tfacRelationId.setCustUKey(Ukey);
+
+				// new table
+				FacRelation tFacRelation = new FacRelation();
+
+				tFacRelation.setFacRelationId(tfacRelationId);
+				tFacRelation.setCreditSysNo(iCaseNo);
+				tFacRelation.setCustUKey(Ukey);
+				tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
+				tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
+				tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
+
+				try {
+					sFacRelationService.insert(tFacRelation, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "交易關係人檔");
 				}
-	    		
-	    		
-	    		// new table 
-	    		CustMain tCustMain = new CustMain();
-	    		tCustMain.setCustUKey(Ukey);
-	    		tCustMain.setCustId(iCustId);
-	    		tCustMain.setCustName(titaVo.getParam("CustName"));
-	    		tCustMain.setDataStatus(1);
-	    		tCustMain.setTypeCode(3);
-	    		try {
-	    			sCustMainService.insert(tCustMain, titaVo);
+
+				// new table
+				CustMain tCustMain = new CustMain();
+				tCustMain.setCustUKey(Ukey);
+				tCustMain.setCustId(iCustId);
+				tCustMain.setCustName(titaVo.getParam("CustName"));
+				tCustMain.setDataStatus(1);
+				tCustMain.setTypeCode(3);
+				try {
+					sCustMainService.insert(tCustMain, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "客戶資料主檔");
 				}
-	    		
-	    		/*需加丟訊息  要至客戶資料主檔補件資料*/
-	    		this.totaVo.putParam("OWarningMsg", "需至顧客明細資料補件資料");
-	    		
-	    	} else { // 有在客戶檔 
-	    		Ukey = lCustMain.getCustUKey();
-	    		
-	    		tfacRelationId.setCreditSysNo(iCaseNo);		
-	    		tfacRelationId.setCustUKey(Ukey);
-	    		
-	    		FacRelation FacRelation = sFacRelationService.findById(tfacRelationId, titaVo);
-	    		
-	    		if(FacRelation != null) {
-	    			throw new LogicException(titaVo, "E0002", "交易關係人主檔"); 
-	    		}
-	    		
-	    		// new table 
-	    		FacRelation tFacRelation = new FacRelation();
-	    		
-	    		tFacRelation.setFacRelationId(tfacRelationId);
-	    		tFacRelation.setCreditSysNo(parse.stringToInteger(titaVo.getParam("CaseNo")));
-	    		tFacRelation.setCustUKey(Ukey);
-	    		tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
-	    		tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-	    		tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
-	    		tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-	    		tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
-	    		
-	    		try {
-	    			sFacRelationService.insert(tFacRelation, titaVo);
+
+				/* 需加丟訊息 要至客戶資料主檔補件資料 */
+				this.totaVo.putParam("OWarningMsg", "需至顧客明細資料補件資料");
+
+			} else { // 有在客戶檔
+				Ukey = lCustMain.getCustUKey();
+
+				tfacRelationId.setCreditSysNo(iCaseNo);
+				tfacRelationId.setCustUKey(Ukey);
+
+				FacRelation FacRelation = sFacRelationService.findById(tfacRelationId, titaVo);
+
+				if (FacRelation != null) {
+					throw new LogicException(titaVo, "E0002", "交易關係人主檔");
+				}
+
+				// new table
+				FacRelation tFacRelation = new FacRelation();
+
+				tFacRelation.setFacRelationId(tfacRelationId);
+				tFacRelation.setCreditSysNo(parse.stringToInteger(titaVo.getParam("CaseNo")));
+				tFacRelation.setCustUKey(Ukey);
+				tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
+				tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
+				tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+				tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
+
+				try {
+					sFacRelationService.insert(tFacRelation, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "交易關係人檔");
 				}
-	    		
-	    		this.totaVo.putParam("OWarningMsg", "");
-	    	} // else
+
+				this.totaVo.putParam("OWarningMsg", "");
+			} // else
 		} else if (iFunCd == 2) {
-			
-			lCustMain  = sCustMainService.custIdFirst(iCustId, titaVo);
-			
-			if( lCustMain == null ) {
+
+			lCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+
+			if (lCustMain == null) {
 				throw new LogicException("E0001", "客戶資料主檔");
-			} 
-			
+			}
+
 			Ukey = lCustMain.getCustUKey();
-			
-			
-			tfacRelationId.setCreditSysNo(iCaseNo);		
-    		tfacRelationId.setCustUKey(Ukey);
-    		
-    		FacRelation FacRelation = sFacRelationService.findById(tfacRelationId, titaVo);
-    		
-    		if(FacRelation == null) {
-    			throw new LogicException(titaVo, "E0003", "交易關係人主檔"); 
-    		}
-    		
-    		// 變更前
-    		FacRelation beforeFacRelation = (FacRelation) dataLog.clone(FacRelation);
-    					
-    		// new table 
-    		FacRelation tFacRelation = new FacRelation();
-    		
-    		tFacRelation = sFacRelationService.holdById(tfacRelationId);
-    		tFacRelation.setFacRelationId(tfacRelationId);
-    		tFacRelation.setCreditSysNo(parse.stringToInteger(titaVo.getParam("CaseNo")));
-    		tFacRelation.setCustUKey(Ukey);
-    		tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
-    		tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-    		tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
-    		tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-    		tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
-    		
-    		try {
-    			sFacRelationService.update(tFacRelation, titaVo);
+
+			tfacRelationId.setCreditSysNo(iCaseNo);
+			tfacRelationId.setCustUKey(Ukey);
+
+			FacRelation FacRelation = sFacRelationService.findById(tfacRelationId, titaVo);
+
+			if (FacRelation == null) {
+				throw new LogicException(titaVo, "E0003", "交易關係人主檔");
+			}
+
+			// 變更前
+			FacRelation beforeFacRelation = (FacRelation) dataLog.clone(FacRelation);
+
+			// new table
+			FacRelation tFacRelation = new FacRelation();
+
+			tFacRelation = sFacRelationService.holdById(tfacRelationId);
+			tFacRelation.setFacRelationId(tfacRelationId);
+			tFacRelation.setCreditSysNo(parse.stringToInteger(titaVo.getParam("CaseNo")));
+			tFacRelation.setCustUKey(Ukey);
+			tFacRelation.setFacRelationCode(titaVo.getParam("FacRelationCode"));
+			tFacRelation.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tFacRelation.setCreateEmpNo(titaVo.getTlrNo());
+			tFacRelation.setLastUpdate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
+			tFacRelation.setLastUpdateEmpNo(titaVo.getTlrNo());
+
+			try {
+				sFacRelationService.update(tFacRelation, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0007", "交易關係人檔");
 			}
-			
-    		if(!lCustMain.getCustName().equals(titaVo.getParam("CustName"))) { // 姓名不同 更新客戶主檔戶名
-    			lCustMain.setCustName(titaVo.getParam("CustName"));
-    			
-    			try {
-        			sCustMainService.update(lCustMain, titaVo);
-    			} catch (DBException e) {
-    				throw new LogicException("E0007", "客戶資料主檔");
-    			}
-    		}
-    		
-    		// 紀錄變更前變更後
-    		dataLog.setEnv(titaVo, beforeFacRelation, tFacRelation);
-    		dataLog.exec();
-    		
-    		this.totaVo.putParam("OWarningMsg", "");
-	   } else if(iFunCd == 4) {
-			
-			lCustMain  = sCustMainService.custIdFirst(iCustId, titaVo);
-			
-			if( lCustMain == null ) {
+
+			if (!lCustMain.getCustName().equals(titaVo.getParam("CustName"))) { // 姓名不同 更新客戶主檔戶名
+				lCustMain.setCustName(titaVo.getParam("CustName"));
+
+				try {
+					sCustMainService.update(lCustMain, titaVo);
+				} catch (DBException e) {
+					throw new LogicException("E0007", "客戶資料主檔");
+				}
+			}
+
+			// 紀錄變更前變更後
+			dataLog.setEnv(titaVo, beforeFacRelation, tFacRelation);
+			dataLog.exec();
+
+			this.totaVo.putParam("OWarningMsg", "");
+		} else if (iFunCd == 4) {
+
+			lCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
+
+			if (lCustMain == null) {
 				throw new LogicException("E0001", "客戶資料主檔");
 			}
-			
+
 			Ukey = lCustMain.getCustUKey();
-			
-			tfacRelationId.setCreditSysNo(iCaseNo);		
-    		tfacRelationId.setCustUKey(Ukey);
-    		
-    		FacRelation dFacRelation = sFacRelationService.findById(tfacRelationId, titaVo);
-    		
-    		if(dFacRelation != null) {
-    			throw new LogicException(titaVo, "E0004", "交易關係人主檔"); 
-    		}
-    		
-    		// new table 
-    		FacRelation tFacRelation = new FacRelation();
-    		
-    		tFacRelation = sFacRelationService.holdById(tfacRelationId);
-    		
-    		try {
-    			sFacRelationService.delete(tFacRelation, titaVo);
+
+			tfacRelationId.setCreditSysNo(iCaseNo);
+			tfacRelationId.setCustUKey(Ukey);
+
+			FacRelation dFacRelation = sFacRelationService.findById(tfacRelationId, titaVo);
+
+			if (dFacRelation != null) {
+				throw new LogicException(titaVo, "E0004", "交易關係人主檔");
+			}
+
+			// new table
+			FacRelation tFacRelation = new FacRelation();
+
+			tFacRelation = sFacRelationService.holdById(tfacRelationId);
+
+			try {
+				sFacRelationService.delete(tFacRelation, titaVo);
 			} catch (DBException e) {
 				throw new LogicException("E0008", "交易關係人檔");
 			}
-    		this.totaVo.putParam("OWarningMsg", "");
-	    } // else  
+			this.totaVo.putParam("OWarningMsg", "");
+		} // else
 
 		this.addList(this.totaVo);
 		return this.sendList();
-		
+
 	}
 }

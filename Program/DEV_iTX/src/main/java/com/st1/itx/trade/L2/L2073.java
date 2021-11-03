@@ -52,7 +52,7 @@ public class L2073 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService sCdEmpService;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -128,9 +128,6 @@ public class L2073 extends TradeBuffer {
 				continue;
 			}
 
-			// 建立日期 時間
-			String txDate4 = "";
-			String txTime2 = "";
 			if (tCustDateCtrl.getCreateDate() != null) {
 
 				// 宣告
@@ -149,16 +146,15 @@ public class L2073 extends TradeBuffer {
 			String TlrNo = "";
 			String EmpName = "";
 			CdEmp tCdEmp = new CdEmp();
-			
-			if(tCustDateCtrl.getCreateEmpNo() != null) {
-		  	  TlrNo = tCustDateCtrl.getCreateEmpNo();
-		  	  tCdEmp = sCdEmpService.findById(TlrNo, titaVo);	
-		  	  if( tCdEmp != null) {
-		  		  EmpName =  tCdEmp.getFullname();
-		  	  }
+
+			if (tCustDateCtrl.getCreateEmpNo() != null) {
+				TlrNo = tCustDateCtrl.getCreateEmpNo();
+				tCdEmp = sCdEmpService.findById(TlrNo, titaVo);
+				if (tCdEmp != null) {
+					EmpName = tCdEmp.getFullname();
+				}
 			}
-			
-			
+
 			occurslist.putParam("OOCustId", tCustMain.getCustId());
 			occurslist.putParam("OOCustNo", tCustDateCtrl.getCustNo());
 			occurslist.putParam("OOCustName", tCustMain.getCustName());
@@ -166,7 +162,7 @@ public class L2073 extends TradeBuffer {
 			occurslist.putParam("OOEmpName", EmpName);
 			occurslist.putParam("OOCreateDate", createDate);
 			occurslist.putParam("OOCreateTime", createTime);
-
+			occurslist.putParam("OOReason", tCustDateCtrl.getReason());
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);
 		}

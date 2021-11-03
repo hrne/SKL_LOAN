@@ -988,8 +988,6 @@ E(0,@UtilDeadline,#L2r05UtilDeadline)
 E(0,@GracePeriod,#L2r05GracePeriod)
 E(0,@TwAcctFee,#L2r05AcctFee)
 E(0,@UsAcctFee,#L2r05AcctFee)
-E(0,@TwHandlingFee,#L2r05HandlingFee)
-E(0,@UsHandlingFee,#L2r05HandlingFee)
 E(0,@ExtraRepayCode,#L2r05ExtraRepayCode)
 E(0,@IntCalcCode,#L2r05IntCalcCode)
 T(2,@CustTypeCode,#L2r05CustTypeCode)
@@ -1036,6 +1034,7 @@ T(2,@EstimateReviewLb,#L2r05EstimateReview)
 T(2,@Coorgnizer,#L2r05Coorgnizer)
 T(2,@CoorgnizerLb,#L2r05Coorgnizer)
 T(2,@DepartmentCode,#L2r05DepartmentCode)
+T(H,@DepartmentCodeX,#DepartmentCode,#DepartmentCodeHelp)
 ! E(0,@BreachCode,#L2r05BreachCode)
 C(4,#L2r05ProdBreachFlag,T(3,@ProdBreachFlag,Y),T(2,@ProdBreachFlag,#L2r05ProdBreachFlag))
 C(5,#L2r05ProdBreachFlag,N,T(2,@Breach,#L2r05Breach),$)
@@ -1069,6 +1068,9 @@ E(0,@StepMonthELb{n},#L2r05StepRateMonthE{n})
 E(0,@StepRateIncrLb{n},#L2r05StepRateIncr{n})
 T(3,@StepRatePer{n},%)
 ##end
+C(3,#DepartmentCode,1,E(0,@TwHandlingFee,#L2r05HandlingFee),$)
+C(3,#DepartmentCode,1,E(0,@UsHandlingFee,#L2r05HandlingFee),$)
+
 
 
 ! 檢查該帳號是否授權 郵局檢查
@@ -2050,20 +2052,24 @@ C(3,#Precision,0,SHOW(#TwHandlingFee)HIDE(#UsHandlingFee)
                 ,HIDE(#TwHandlingFee)SHOW(#UsHandlingFee))
 
 #TwHandlingFee=m,14,I
+C(3,#DepartmentCode,1,$,S)
 C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,$,s)
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
 
 #UsHandlingFee=m,14.2,I
+C(3,#DepartmentCode,1,$,S)
 C(3,#UpdateCode,1,$,s)
 C(3,#Precision,0,s,$)
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
 
 #LbHandlingFee=X,21,L
+C(3,#DepartmentCode,1,$,S)
 C(3,#Precision,0,X(#TwHandlingFee),X(#UsHandlingFee))
 P(L,#LbHandlingFee)
 
 #TimHandlingFee=m,14.2,S
+C(3,#DepartmentCode,1,$,S)
 C(3,#Precision,0,E(0,#TwHandlingFee),E(0,#UsHandlingFee))
 
 #LbGuaranteeDate=D,7,L
@@ -2253,7 +2259,7 @@ T(2,@FdCustTypeCode,#WkStar)
 T(2,@FdRecycleCode,#WkStar)
 T(2,@FdRecycleDeadline,#WkStar)
 T(2,@FdUsageCode,#WkStar)
-T(2,@FdDepartmentCode,#WkStar)
+T(2,@FdDepartmentCode, )
 T(3,@FdIncomeTaxFlag, )
 T(2,@FdCompensateFlag,#WkStar)
 T(2,@FdIrrevocableFlag,#WkStar)
@@ -2412,11 +2418,11 @@ T(H,#UsageCode,#UsageCodeHelp)
 !修改時自動顯示可修改,其他自動顯示不必須輸入
 #FdDepartmentCode=X,2,L
 
-#DepartmentCode=A,1,I
+#DepartmentCode=A,1,L
 C(3,#UpdateCode,1,$,s)
 C(3,#Hide4Fg,0,CALL(#HideP4),$)
-HELP(#DepartmentCodeHelp)
-@V(H,#DepartmentCodeHelp)
+! HELP(#DepartmentCodeHelp)
+! @V(H,#DepartmentCodeHelp)
 
 #DepartmentCodeX=X,10,L
 T(H,#DepartmentCode,#DepartmentCodeHelp)

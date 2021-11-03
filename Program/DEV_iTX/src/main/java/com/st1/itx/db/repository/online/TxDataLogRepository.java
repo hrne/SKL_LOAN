@@ -39,16 +39,16 @@ public interface TxDataLogRepository extends JpaRepository<TxDataLog, TxDataLogI
   public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTxSeqLikeOrderByCustNoAsc(int txDate_0, int txDate_1, String txSeq_2, Pageable pageable);
 
   // TxDate >= ,AND TxDate <= ,AND TranNo ^i
-  public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInOrderByCreateDateAsc(int txDate_0, int txDate_1, List<String> tranNo_2, Pageable pageable);
+  public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInOrderByCreateDateDesc(int txDate_0, int txDate_1, List<String> tranNo_2, Pageable pageable);
 
   // TxDate >= ,AND TxDate <= ,AND TranNo ^i ,AND CustNo =
-  public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInAndCustNoIsOrderByCreateDateAsc(int txDate_0, int txDate_1, List<String> tranNo_2, int custNo_3, Pageable pageable);
+  public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInAndCustNoIsOrderByCreateDateDesc(int txDate_0, int txDate_1, List<String> tranNo_2, int custNo_3, Pageable pageable);
 
   // TxDate >= ,AND TxDate <= ,AND TranNo ^i ,AND CustNo = ,AND FacmNo =
-  public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInAndCustNoIsAndFacmNoIsOrderByCreateDateAsc(int txDate_0, int txDate_1, List<String> tranNo_2, int custNo_3, int facmNo_4, Pageable pageable);
+  public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInAndCustNoIsAndFacmNoIsOrderByCreateDateDesc(int txDate_0, int txDate_1, List<String> tranNo_2, int custNo_3, int facmNo_4, Pageable pageable);
 
   // TxDate >= ,AND TxDate <= ,AND TranNo ^i ,AND CustNo = ,AND FacmNo = ,AND BormNo =
-  public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInAndCustNoIsAndFacmNoIsAndBormNoIsOrderByCreateDateAsc(int txDate_0, int txDate_1, List<String> tranNo_2, int custNo_3, int facmNo_4, int bormNo_5, Pageable pageable);
+  public Slice<TxDataLog> findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInAndCustNoIsAndFacmNoIsAndBormNoIsOrderByCreateDateDesc(int txDate_0, int txDate_1, List<String> tranNo_2, int custNo_3, int facmNo_4, int bormNo_5, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

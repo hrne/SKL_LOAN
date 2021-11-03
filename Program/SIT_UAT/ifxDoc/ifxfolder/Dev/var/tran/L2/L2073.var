@@ -191,12 +191,15 @@ T(1,#OOCreateTime,5,2)
 #OOFormatCreateTime=X,8,S
 T(2,#OOFormatHH+:+#OOFormatMM+:+#OOFormatSS)
 
+#OOReason=X,50,S
+
 !解除
 #OOBUF2=X,142,S
 T(2,#FUNC2+#OOCustId)
 
 #OOBTN2=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=L2703; ntxbuf=#OOBUF2})
+C(4,#OOReason,$,BIND(grid,cancel))
 
 !刪除
 #OOBUF4=X,142,S
@@ -238,6 +241,7 @@ TXFORM=L2073
 #OOEmpName
 #OOCreateDate
 #OOCreateTime
+#OOReason
 ^
 <include src="ROM.icf::L1R09.tom"/>
 <include src="ROM.icf::L2R47.tom"/>
@@ -282,7 +286,8 @@ TXFORM=L2073
 #OOFormatCreateTime=建立時間
 {width:100,align:'center'}
 
-
+#OOReason=解除原因
+{width:75,align:'left'}
 ^
 
 <include src="PRT.icf::INQ01.sel" map="i=L2049;cpi=15"/>

@@ -28,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L8R49 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8R49.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -73,7 +72,7 @@ public class L8R49 extends TradeBuffer {
 				this.addList(this.totaVo);
 				return this.sendList();
 			} else {
-				if(!("L8201").equals(iRimTxCode)) {
+				if (!("L8201").equals(iRimTxCode)) {
 					throw new LogicException(titaVo, "E0001", "疑似洗錢樣態條件設定檔"); // 查無資料
 				}
 			}
@@ -93,6 +92,7 @@ public class L8R49 extends TradeBuffer {
 		this.totaVo.putParam("L8R49Factor2AmtEnd", mMlaundryParas.getFactor2AmtEnd());
 		this.totaVo.putParam("L8R49Factor3TotLimit", mMlaundryParas.getFactor3TotLimit());
 		this.totaVo.putParam("L8R49FactorDays", mMlaundryParas.getFactorDays());
+		this.totaVo.putParam("L8R49FactorDays3", mMlaundryParas.getFactorDays3());
 	}
 
 }

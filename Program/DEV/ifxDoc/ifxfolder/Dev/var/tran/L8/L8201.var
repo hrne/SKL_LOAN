@@ -27,12 +27,13 @@ E(0,0)
 [
 ["[L8201]                                 疑似洗錢樣態條件設定"],
 ["#FdFactorDays+統計期間天數",#FactorDays],
-["@洗錢樣態一"],
+["@洗錢樣態一","銀扣/匯款轉帳/支票兌現(不含專戶)"],
 ["#FdFactor1TotLimit+金額合計超過",#Factor1TotLimit],
-["@洗錢樣態二"],
+["@洗錢樣態二","銀扣/匯款轉帳/支票兌現(不含專戶)"],
 ["#FdFactor2Count+次數",#Factor2Count],
 ["#FdFactor2AmtStart+單筆金額起迄",#Factor2AmtStart,"~",#Factor2AmtEnd],
-["@洗錢樣態三"],
+["@洗錢樣態三","匯款摘要0087ＡＴ存入&0001現金存入"],
+["#FdFactorDays3+統計期間天數",#FactorDays3],
 ["#FdFactor3TotLimit+金額合計超過",#Factor3TotLimit],
 
 ]
@@ -49,6 +50,8 @@ T(3,*)
 #FdFactor3TotLimit=X,2,L
 T(3,*)
 #FdFactorDays=X,2,L
+T(3,*)
+#FdFactorDays3=X,2,L
 T(3,*)
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -84,7 +87,7 @@ E(0,@Factor2AmtStart,#L8R49Factor2AmtStart)
 E(0,@Factor2AmtEnd,#L8R49Factor2AmtEnd)
 E(0,@Factor3TotLimit,#L8R49Factor3TotLimit)
 E(0,@FactorDays,#L8R49FactorDays)
-
+E(0,@FactorDays3,#L8R49FactorDays3)
 
 #FuncCode1=A,1,S
 C(3,#L8R49FactorDays,0,E(0,#FuncCode,1),E(0,#FuncCode,2))
@@ -108,6 +111,8 @@ C(3,#L8R49FactorDays,0,E(0,#FuncCode,1),E(0,#FuncCode,2))
 #Factor2AmtEnd=m,14,I
 @V(2,0)
 
+!統計期間天數
+#FactorDays3=N,3,I
 ! 樣態三-金額合計超過
 #Factor3TotLimit=m,14,I
 @V(2,0)
@@ -148,6 +153,7 @@ T(3,[L8201] 疑似洗錢樣態條件設定)
 #Factor2AmtEnd
 #Factor3TotLimit
 #FactorDays
+#FactorDays3
 #END
 </sub>
 

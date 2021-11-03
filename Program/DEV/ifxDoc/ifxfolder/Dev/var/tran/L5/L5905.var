@@ -53,9 +53,6 @@ K(MODIFYBUTTON,查詢)
 ["#FdYearS+資料年份",#YearS,"~",#YearE],
 ["#FdReChkMonth+覆審月份",#ReChkMonth],
 ["#FdCustNo+借款人戶號",#CustNo],
-["#FdRPTFG+顯示方式",
-<include src="COM.icf::RPTFG.scr"/>
-],
 ]
 
 #FdInqFg=X,2,L
@@ -200,8 +197,7 @@ C(3,#CustNo,0,S,T(2,#CustNo))
 C(3,#InqFg,1,$,S)
 C(3,#ConditionCode,06,E(0,1),E(0,0)) 
 
-
-<include src="COM.icf::RPTFG.dec"/>
+#RPTFG=A,1,S
 
 </sub>
 

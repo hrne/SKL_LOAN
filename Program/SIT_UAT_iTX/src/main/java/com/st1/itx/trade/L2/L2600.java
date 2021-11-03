@@ -2,7 +2,6 @@ package com.st1.itx.trade.L2;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -11,20 +10,21 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.FacCaseAppl;
+import com.st1.itx.db.domain.LoanBorTx;
+import com.st1.itx.db.domain.LoanBorTxId;
 import com.st1.itx.db.domain.LoanSynd;
 import com.st1.itx.db.domain.LoanSyndId;
-import com.st1.itx.db.domain.LoanSyndItem;
-import com.st1.itx.db.domain.LoanSyndItemId;
 import com.st1.itx.db.service.CdGseqService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.LoanSyndItemService;
 import com.st1.itx.db.service.LoanSyndService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.GSeqCom;
-import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.parse.Parse;
 /*
  * L2600 聯貸案訂約登錄
@@ -74,11 +74,12 @@ public class L2600 extends TradeBuffer {
 	public LoanSyndItemService loanSyndItemService;
 	@Autowired
 	public FacCaseApplService facCaseApplService;
+	// 銷帳處理
+	@Autowired
+	public AcReceivableCom acReceivableCom;
 
 	@Autowired
 	Parse parse;
-	@Autowired
-	LoanCom loanCom;
 	@Autowired
 	GSeqCom gGSeqCom;
 
@@ -96,8 +97,10 @@ public class L2600 extends TradeBuffer {
 
 	// work area
 	private int wkSyndNo = 0;
-//	private int wkTbsDy;
-//	private TempVo tTempVo = new TempVo();
+	private int wkTbsDy;
+	private TempVo tTempVo = new TempVo();
+	private LoanBorTx tLoanBorTx;
+	private LoanBorTxId tLoanBorTxId;
 	private LoanSynd tLoanSynd = new LoanSynd();
 	private LoanSyndId tLoanSyndId = new LoanSyndId();
 
@@ -107,9 +110,8 @@ public class L2600 extends TradeBuffer {
 
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
-		loanCom.setTxBuffer(this.txBuffer);
 
-//		wkTbsDy = this.txBuffer.getTxCom().getTbsdy();
+		wkTbsDy = this.txBuffer.getTxCom().getTbsdy();
 
 		// 取得輸入資料
 		iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode")); // 功能
@@ -167,9 +169,8 @@ public class L2600 extends TradeBuffer {
 			// 刪除時 有案件申請使用時error
 			Slice<FacCaseAppl> slFacCaseAppl = facCaseApplService.syndNoEq(iSyndNo, 0, 1, titaVo);
 			if (slFacCaseAppl != null) {
-				throw new LogicException(titaVo, "E0008", "案件申請檔有使用此聯貸案編號 = " + iSyndNo); // 刪除資料時，發生錯誤
+				throw new LogicException(titaVo, "E0008", "案件申請檔有使用此聯貸案編號  聯貸案編號 =  " + iSyndNo); // 刪除資料時，發生錯誤
 			}
-			DeleteLoanSyndItemRoutine();
 			try {
 				loanSyndService.delete(tLoanSynd);
 			} catch (DBException e) {
@@ -209,53 +210,6 @@ public class L2600 extends TradeBuffer {
 		tLoanSynd.setSyndAmt(iSyndAmt);
 		tLoanSynd.setPartAmt(iPartAmt);
 		tLoanSynd.setAgentBank(iAgentBank);
-
-		// 刪除聯貸案動撥條件檔
-		DeleteLoanSyndItemRoutine();
-		// 更新動撥條件檔
-		LoanSyndItem tLoanSyndItem = new LoanSyndItem();
-		int j = 0;
-		for (int i = 1; i <= 5; i++) {
-			this.info(("Item=" + titaVo.get("Item" + i)));
-
-			if (!"".equals(titaVo.getParam("Item" + i))) {
-				j++;
-				String Item = titaVo.get("Item" + i);
-				tLoanSyndItem = new LoanSyndItem();
-				LoanSyndItemId LoanSyndItemId = new LoanSyndItemId();
-				LoanSyndItemId.setSyndNo(wkSyndNo);
-				LoanSyndItemId.setSyndSeq(j);
-				tLoanSyndItem.setLoanSyndItemId(LoanSyndItemId);
-				tLoanSyndItem.setItem(Item);
-				tLoanSyndItem.setSyndAmt(parse.stringToBigDecimal(titaVo.get("Amt" + i)));
-				tLoanSyndItem.setSyndMark(titaVo.get("Mark" + i));
-				tLoanSyndItem.setSyndBal(parse.stringToBigDecimal(titaVo.get("Bal" + i)));
-
-				try {
-					loanSyndItemService.insert(tLoanSyndItem, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E2009", "聯貸案動撥條件檔"); // 新增資料時，發生錯誤
-				}
-			} else {
-				break;
-			}
-		}
-
 	}
 
-	// 刪除聯貸案動撥條件檔
-	private void DeleteLoanSyndItemRoutine() throws LogicException {
-		this.info("DeleteLoanSyndItemRoutine ...");
-
-		Slice<LoanSyndItem> slLoanSyndItem = loanSyndItemService.findSyndNoEq(wkSyndNo, 0, Integer.MAX_VALUE, titaVo);
-		List<LoanSyndItem> lLoanSyndItem = slLoanSyndItem == null ? null : slLoanSyndItem.getContent();
-		if (lLoanSyndItem != null && lLoanSyndItem.size() > 0) {
-			try {
-				loanSyndItemService.deleteAll(lLoanSyndItem, titaVo);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E2008", "聯貸案動撥條件檔"); // 刪除資料時，發生錯誤
-			}
-		}
-
-	}
 }

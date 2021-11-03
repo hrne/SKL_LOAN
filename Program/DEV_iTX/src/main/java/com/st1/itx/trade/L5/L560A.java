@@ -30,7 +30,7 @@ public class L560A extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		String adjFlag = titaVo.getBtnIndex(); //0-存證信函;1-延遲繳款通知函;2-繳款通知函
 		this.info("按鈕編號==="+adjFlag);
-		txReport.run(titaVo);
+		txReport.exec(titaVo,this.txBuffer);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

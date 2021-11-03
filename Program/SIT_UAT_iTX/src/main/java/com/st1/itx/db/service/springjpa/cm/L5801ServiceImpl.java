@@ -28,7 +28,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// 補貼息申貸名冊工作檔
-	@SuppressWarnings("unchecked")
+
 	public List<Map<String, String>> findAll(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl.findAll ");
 
@@ -50,8 +50,8 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , N.\"ProjectKind\"                                                "; // -- F3 專案融資種類
 		sql += "      , CU.\"CustName\"                                                  "; // -- F4 借款人戶名
 		sql += "      , CU.\"CustId\"                                                    "; // -- F5 借款人身份證字號
-		sql += "      , RM.\"ReltName\"                                                  "; // -- F6 配偶人戶名
-		sql += "      , RM.\"ReltId\"                                                    "; // -- F7 配偶身份證字號
+		sql += "      , CU2.\"CustName\"  AS \"CustName1\"                               "; // -- F6 配偶人戶名
+		sql += "      , CU2.\"CustId\"    AS \"CustId1\"                                 "; // -- F7 配偶身份證字號
 		sql += "      , N.\"LoanTermYy\"                                                 "; // -- F8 貸款期限
 		sql += "      , N.\"ApproveRate\"                                                "; // -- F9 貸放利率
 		sql += "      , N.\"DrawdownAmt\"                                                "; // -- F10 優惠貸款金額
@@ -110,6 +110,8 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   LEFT JOIN \"ReltMain\" RM";
 		sql += "          ON RM.\"ReltUKey\" = CU.\"CustUKey\"";
 		sql += "          AND RM.\"ReltCode\" = '2'";
+		sql += "   LEFT JOIN \"CustMain\" CU2";
+		sql += "          ON CU2.\"CustNo\" = RM.\"CustNo\"";
 		sql += "   LEFT JOIN \"CdCity\" CI";
 		sql += "          ON CI.\"CityCode\" =  N.\"CityCode\"";
 		sql += "   ORDER BY  N.\"ProjectKind\", N.\"ProdNo\", N.\"CustNo\", N.\"FacmNo\"";
@@ -126,7 +128,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// 補貼息結清名冊/終止名冊工作檔
-	@SuppressWarnings("unchecked")
+
 	public List<Map<String, String>> findAll2(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl.findAll ");
 
@@ -230,7 +232,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// 補貼息核撥清單工作檔
-	@SuppressWarnings("unchecked")
+
 	public List<Map<String, String>> findAll3(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl.findAll ");
 
@@ -361,7 +363,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// 補貼息核撥清單明細檔
-	@SuppressWarnings("unchecked")
+
 	public List<Map<String, String>> findAll4(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl.findAll ");
 

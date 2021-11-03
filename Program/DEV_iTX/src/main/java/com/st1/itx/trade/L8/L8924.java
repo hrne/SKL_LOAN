@@ -35,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L8924 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8924.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -51,7 +50,8 @@ public class L8924 extends TradeBuffer {
 	Parse parse;
 
 	private List<String> iTranNo = new ArrayList<String>();
-	
+
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L8924 ");
@@ -67,51 +67,45 @@ public class L8924 extends TradeBuffer {
 		String iTranItem = "";
 
 		String TranNo = titaVo.getParam("TRN_CODE");
-		
-		if(("1").equals(TranNo)) {
+
+		if (("1").equals(TranNo)) {
 			iTranNo.add("L8203");
-		} else if(("2").equals(TranNo)) {
+		} else if (("2").equals(TranNo)) {
 			iTranNo.add("L8204");
 		} else {
 			iTranNo.add("L8203");
 			iTranNo.add("L8204");
 		}
-		
-		this.info("L8924 iDateStart="+titaVo.getParam("CDATESTART")+"L8924 iDateEND=" +titaVo.getParam("CDATEEND"));
+
+		this.info("L8924 iDateStart=" + titaVo.getParam("CDATESTART") + "L8924 iDateEND=" + titaVo.getParam("CDATEEND"));
 //		int Code = Integer.parseInt(titaVo.getParam("TRN_CODE").toString());
 		int CustNo = Integer.parseInt(titaVo.getParam("CUST_NO").toString());
-		int FacmNo = Integer.parseInt(titaVo.getParam("FACM_NO").toString());
-		int BormNo = Integer.parseInt(titaVo.getParam("BORM_SEQ").toString());
 		int iDateStart = Integer.parseInt(titaVo.getParam("CDATESTART").toString());
 		int iDateEnd = Integer.parseInt(titaVo.getParam("CDATEEND").toString());
 		iDateStart = iDateStart + 19110000;
 		iDateEnd = iDateEnd + 19110000;
-		this.info("L8924 iDateStart="+iDateStart+"L8924 iDateEND=" +iDateEnd);
-		
+		this.info("L8924 iDateStart=" + iDateStart + "L8924 iDateEND=" + iDateEnd);
+
 		List<TxDataLog> lTxDataLog = null;
 		Slice<TxDataLog> slTxDataLog = null;
-		if (CustNo > 0 && FacmNo > 0 && BormNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo7(iDateStart, iDateEnd, iTranNo , CustNo, FacmNo, BormNo, this.index,
-					this.limit, titaVo); 
-		} else if (CustNo > 0 && FacmNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo6(iDateStart, iDateEnd, iTranNo , CustNo, FacmNo, this.index, this.limit,
-					titaVo);
-		} else if (CustNo > 0) {
-			slTxDataLog = txDataLogService.findByCustNo5(iDateStart, iDateEnd, iTranNo , CustNo, this.index, this.limit,
-					titaVo);
-		} else  {
-			slTxDataLog = txDataLogService.findByCustNo4(iDateStart, iDateEnd, iTranNo , this.index, this.limit, titaVo);
-		}
+//		if (CustNo > 0 && FacmNo > 0 && BormNo > 0) {
+//			slTxDataLog = txDataLogService.findByCustNo7(iDateStart, iDateEnd, iTranNo, CustNo, FacmNo, BormNo, this.index, this.limit, titaVo);
+//		} else if (CustNo > 0 && FacmNo > 0) {
+//			slTxDataLog = txDataLogService.findByCustNo6(iDateStart, iDateEnd, iTranNo, CustNo, FacmNo, this.index, this.limit, titaVo);
+//		} 
+//		if (CustNo > 0) {
+			slTxDataLog = txDataLogService.findByCustNo5(iDateStart, iDateEnd, iTranNo, CustNo, this.index, this.limit, titaVo);
+//		} else {
+//			slTxDataLog = txDataLogService.findByCustNo4(iDateStart, iDateEnd, iTranNo, this.index, this.limit, titaVo);
+//		}
 		lTxDataLog = slTxDataLog == null ? null : slTxDataLog.getContent();
-		
+
 		if (lTxDataLog == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
 
 		for (TxDataLog txDataLog : lTxDataLog) {
-			
-			
-			
+
 			List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
 			try {
 				this.info("txDataLog.getContent()=" + txDataLog.getContent());
@@ -119,13 +113,12 @@ public class L8924 extends TradeBuffer {
 			} catch (IOException e) {
 				throw new LogicException("EC009", "資料格式");
 			}
-			this.info("listMap="+listMap);
+			this.info("listMap=" + listMap);
 			for (HashMap<String, Object> map : listMap) {
 				String fld = map.get("f").toString();
 				String oval = map.get("o").toString();
 				String nval = map.get("n").toString();
-				if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld)
-						|| "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld)) {
+				if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld) || "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld)) {
 					continue;
 				}
 				OccursList occursList = new OccursList();
@@ -135,14 +128,7 @@ public class L8924 extends TradeBuffer {
 				iTlrItem = "";
 				iTlrItem = inqTxTeller(txDataLog.getTlrNo(), iTlrItem, titaVo);
 				occursList.putParam("OO_TlrItem", iTlrItem);
-				iTranItem = "";
-				iTranItem = inqTxTranCode(txDataLog.getTranNo(), iTranItem, titaVo);
-				occursList.putParam("OO_TranItem", iTranItem);
-				occursList.putParam("OO_TRN_CODE", txDataLog.getTranNo());
-
 				occursList.putParam("OO_CUST_NO", txDataLog.getCustNo());
-				occursList.putParam("OO_FACM_NO", txDataLog.getFacmNo());
-				occursList.putParam("OO_BORM_SEQ", txDataLog.getBormNo());
 
 				occursList.putParam("OO_COLUMN_NAME", fld);
 				occursList.putParam("OO_DATA_BEFORE", oval.replace("$n", ""));

@@ -241,7 +241,7 @@ T(2,@RelationCodeHelp,#HelpDesc2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
-
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L2038進入),$)
 
 #NTXBUF=X,57,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -290,8 +290,9 @@ C(2,#ClCode1,T(3,),T(H,#ClCode2,#ClCode21Help),
 #ClNo=A,7,I
 C(3,#CHAIN,1,s,$)
 @V(2,0)
-SHOW(#BTN1)
 
+#OpenBtn=X,1,S
+SHOW(#BTN1)
 
 #RimClCode1=A,1,S
 #RimClCode2=A,2,S
@@ -395,7 +396,7 @@ E(0,@OwnerTotal{i},#L2r28OwnerTotal{i})
 #CityCode=X,2,L
 #AreaCode=X,3,L
 #IrCode=X,5,L
-#Road=x,20,L
+#Road=x,40,L
 #Section=X,5,L
 #Alley=X,5,L
 #Lane=X,5,L
