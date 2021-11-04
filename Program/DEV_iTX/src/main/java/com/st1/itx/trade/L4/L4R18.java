@@ -24,7 +24,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R18 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R18.class);
 
 	@Autowired
 	public InsuRenewService insuRenewService;
@@ -91,9 +90,11 @@ public class L4R18 extends TradeBuffer {
 			this.totaVo.putParam("L4r18StatusCode", tInsuRenew.getStatusCode());
 			this.totaVo.putParam("L4r18OvduDate", tInsuRenew.getOvduDate());
 			this.totaVo.putParam("L4r18OvduNo", tInsuRenew.getOvduNo());
+			this.totaVo.putParam("L4r18RenewCode", tInsuRenew.getRenewCode());
 			this.totaVo.putParam("L4r18RenewCodeX", renewCodeX);
 			this.totaVo.putParam("L4r18InsuCompany", tInsuRenew.getInsuCompany());
 			this.totaVo.putParam("L4r18InsuTypeCode", tInsuRenew.getInsuTypeCode());
+			this.totaVo.putParam("L4r18CommericalFlag", tInsuRenew.getCommericalFlag());
 		} else {
 //			傳回前端，由前端判斷
 			this.totaVo.putParam("L4r18CustNo", 0);
@@ -113,9 +114,11 @@ public class L4R18 extends TradeBuffer {
 			this.totaVo.putParam("L4r18StatusCode", 0);
 			this.totaVo.putParam("L4r18OvduDate", 0);
 			this.totaVo.putParam("L4r18OvduNo", 0);
+			this.totaVo.putParam("L4r18RenewCode", 0);
 			this.totaVo.putParam("L4r18RenewCodeX", 0);
 			this.totaVo.putParam("L4r18InsuCompany", 0);
 			this.totaVo.putParam("L4r18InsuTypeCode", 0);
+			this.totaVo.putParam("L4r18CommericalFlag", "");
 		}
 
 		this.addList(this.totaVo);

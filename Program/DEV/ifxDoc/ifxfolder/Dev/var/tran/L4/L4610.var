@@ -18,7 +18,7 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[150,320,150,320];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[200,320,150,320];printer.width=[20,20,20,20];order=1;">
 [
 ["[L4610]                                 保險單明細資料登錄"],
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
@@ -29,7 +29,8 @@ E(0,0)
 ["#FdInsuCompany+保險公司",#InsuCompany,#InsuCompanyX],["#FdInsuTypeCode+保險類別",#InsuTypeCode,#InsuTypeCodeX],
 ["#FdFireInsuCovrg+火災險保險金額",#FireInsuCovrg,#FireInsuCovrgL],["#FdFireInsuPrem+火災險保費",#FireInsuPrem,#FireInsuPremL],
 ["#FdEthqInsuCovrg+地震險保險金額",#EthqInsuCovrg,#EthqInsuCovrgL],["#FdEthqInsuPrem+地震險保費",#EthqInsuPrem,#EthqInsuPremL],
-["#FdInsuStartDate+保險起日",#InsuStartDate],["#FdInsuEndDate+保險迄日",#InsuEndDate]
+["#FdInsuStartDate+保險起日",#InsuStartDate],["#FdInsuEndDate+保險迄日",#InsuEndDate],
+["#FdCommericalFlag+住宅險改商業險註記",#CommericalFlag]
 ]
 
 #FdFunctionCodeX=X,2,L
@@ -51,6 +52,8 @@ T(3,*)
 #FdEndoInsuNo=X,2,L
 #FdInsuTypeCode=X,2,L
 T(3,*)
+
+#FdCommericalFlag=X,2,L
 
 ! 20210911 xiangwei
 ! 這裡的星號顯示判定改在下方做
@@ -208,6 +211,7 @@ E(0,@EthqInsuPrem,#L4r25EthqInsuPrem)
 E(0,@EthqInsuPremL,#L4r25EthqInsuPrem)
 E(0,@InsuStartDate,#L4r25InsuStartDate)
 E(0,@InsuEndDate,#L4r25InsuEndDate)
+T(2,@CommericalFlag,#L4r25CommericalFlag)
 
 
 ! 20210911 xiangwei
@@ -235,6 +239,7 @@ T(F,#InsuCompany,0)
 T(F,#InsuTypeCode,0)
 T(F,#InsuStartDate,0)
 T(F,#InsuEndDate,0)
+T(F,#CommericalFlag,0)
 ,
 HIDE(#EndoInsuNoX))
 
@@ -381,6 +386,11 @@ A(4,0,#InsuEndDate)
 
 #InsuEndDateL=D,7,L
 
+
+#CommericalFlag=X,1,I
+C(2,#FunctionCode,s,$,$,s,s,s)
+@V(3, ,Y)
+
 #RPTFG=A,1,S
 
 </sub>
@@ -426,6 +436,7 @@ T(3,[L4610] 保險單明細資料登錄)
 #EthqInsuPrem
 #InsuStartDate
 #InsuEndDate
+#CommericalFlag
 </sub>
 
 

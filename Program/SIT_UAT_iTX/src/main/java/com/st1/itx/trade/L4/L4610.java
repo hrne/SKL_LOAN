@@ -59,7 +59,7 @@ public class L4610 extends TradeBuffer {
 
 	@Autowired
 	public SendRsp sendRsp;
-	
+
 	@Autowired
 	public InsuOrignalService insuOrignalService;
 
@@ -145,7 +145,8 @@ public class L4610 extends TradeBuffer {
 					tNewInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
 					tNewInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate")));
 					tNewInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate")));
-
+					tNewInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+					
 					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuRenew.getInsuEndDate()) {
 						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
 					}
@@ -158,8 +159,7 @@ public class L4610 extends TradeBuffer {
 					tNewInsuRenew.setOvduDate(0);
 					tNewInsuRenew.setOvduNo(BigDecimal.ZERO);
 
-					totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem"))
-							.add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
+					totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
 
 					tNewInsuRenew.setTotInsuPrem(totPrem);
 
@@ -195,7 +195,8 @@ public class L4610 extends TradeBuffer {
 					tNewInsuOrignal.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem").trim()));
 					tNewInsuOrignal.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate").trim()));
 					tNewInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
-
+					tNewInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+					
 					if (parse.stringToInteger(titaVo.getParam("InsuEndDate")) != tOldInsuOrignal.getInsuEndDate()) {
 						throw new LogicException(titaVo, "E0007", "L4610 登打批單號碼時，保險迄日需相同");
 					}
@@ -218,7 +219,7 @@ public class L4610 extends TradeBuffer {
 				tInsuOrignal.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem").trim()));
 				tInsuOrignal.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate").trim()));
 				tInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
-
+				tInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 				try {
 					insuOrignalService.insert(tInsuOrignal);
 				} catch (DBException e) {
@@ -239,6 +240,7 @@ public class L4610 extends TradeBuffer {
 			editInsuOrignal.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem").trim()));
 			editInsuOrignal.setInsuStartDate(parse.stringToInteger(titaVo.getParam("InsuStartDate").trim()));
 			editInsuOrignal.setInsuEndDate(parse.stringToInteger(titaVo.getParam("InsuEndDate").trim()));
+			editInsuOrignal.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
 			try {
 				// 送出到DB
 				insuOrignalService.update(editInsuOrignal);
@@ -249,12 +251,12 @@ public class L4610 extends TradeBuffer {
 
 		} else if (iFunctionCode.equals("4")) {
 			// 抓出要刪除的資料
-			
+
 			// 刪除須刷主管卡
 			if (titaVo.getEmpNos().trim().isEmpty()) {
 				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 			}
-			
+
 			InsuOrignal deleInsuOrignal = insuOrignalService.holdById(tInsuOrignalId);
 			if (deleInsuOrignal == null) {
 				throw new LogicException(titaVo, "E0004", "火險初保檔 ");

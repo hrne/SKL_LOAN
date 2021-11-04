@@ -108,7 +108,7 @@ public class L4611 extends TradeBuffer {
 		clNo = parse.stringToInteger(titaVo.getParam("ClNo"));
 		custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
-		
+
 		insuYearMonth = parse.stringToInteger(titaVo.getParam("InsuYearMonth")) + 191100;
 		prevInsuNo = titaVo.getParam("PrevInsuNo");
 		endoInsuNo = titaVo.getParam("EndoInsuNo");
@@ -175,6 +175,9 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setEthqInsuPrem(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setInsuStartDate(parse.stringToInteger(titaVo.getParam("NewInsuStartDate")));
 			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
+			
+			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+			
 			tInsuRenew.setAcDate(0);
 			tInsuRenew.setTitaTlrNo(this.getTxBuffer().getTxCom().getRelTlr());
 			tInsuRenew.setTitaTxtNo("" + this.getTxBuffer().getTxCom().getRelTno());
@@ -188,8 +191,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setStatusCode(0);
 			tInsuRenew.setOvduDate(0);
 			tInsuRenew.setOvduNo(BigDecimal.ZERO);
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem"))
-					.add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			tInsuRenew.setRepayCode(tFacMain.getRepayCode());
 			try {
@@ -233,11 +235,10 @@ public class L4611 extends TradeBuffer {
 			}
 
 			resetAcReceivable(2, tInsuRenew, titaVo); // 2-起帳刪除
-			
-			
+
 			custNo = parse.stringToInteger(titaVo.getParam("NewCustNo"));
 			facmNo = parse.stringToInteger(titaVo.getParam("NewFacmNo"));
-			
+
 			tInsuRenew.setClCode1(clCode1);
 			tInsuRenew.setClCode2(clCode2);
 			tInsuRenew.setClNo(clNo);
@@ -258,8 +259,9 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setStatusCode(parse.stringToInteger(titaVo.getParam("StatusCode")));
 			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
-					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+			
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 
 			try {
@@ -335,8 +337,9 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setInsuEndDate(parse.stringToInteger(titaVo.getParam("NewInsuEndDate")));
 			tInsuRenew.setInsuCompany(titaVo.getParam("InsuCompany"));
 			tInsuRenew.setInsuTypeCode(titaVo.getParam("InsuTypeCode"));
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem"))
-					.add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
+			tInsuRenew.setCommericalFlag(titaVo.getParam("CommericalFlag").trim());
+			
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			try {
 				insuRenewService.update(tInsuRenew, titaVo);
@@ -366,7 +369,7 @@ public class L4611 extends TradeBuffer {
 			return;
 		}
 		// 尚未通知
-		if (insuYearMonth < noticeYearMonth) {
+		if (insuYearMonth > noticeYearMonth) {
 			this.info("resetAcReceivable insuYearMonth");
 			return;
 		}
@@ -386,8 +389,7 @@ public class L4611 extends TradeBuffer {
 
 	private String getOrigInsuNo(TitaVo titaVo) throws LogicException {
 		String result = "";
-		InsuOrignal tInsuOrignal = insuOrignalService
-				.findById(new InsuOrignalId(clCode1, clCode2, clNo, prevInsuNo, " "), titaVo);
+		InsuOrignal tInsuOrignal = insuOrignalService.findById(new InsuOrignalId(clCode1, clCode2, clNo, prevInsuNo, " "), titaVo);
 		if (tInsuOrignal == null) {
 			InsuRenew t2InsuRenew = insuRenewService.findL4600AFirst(clCode1, clCode2, clNo, prevInsuNo, titaVo);
 			if (t2InsuRenew == null) {

@@ -520,8 +520,7 @@ public class TxToDoCom extends TradeBuffer {
 
 	/* 累加應處理清單筆數 */
 	private void addMainCntValue(TxToDoMain tMain, TxToDoDetail tdetail, TitaVo titaVo) throws LogicException {
-		this.info("TxToDoCom ... addMainCntValue " + tdetail.getDataDate() + ", tx="
-				+ this.txBuffer.getTxBizDate().getTbsDy());
+		this.info("TxToDoCom ... addMainCntValue " + tMain.getItemCode() + "/" + tdetail.getItemCode());
 		if (tdetail.getDataDate() < this.txBuffer.getTxBizDate().getTbsDy())
 			tMain.setYdReserveCnt(tMain.getYdReserveCnt() + 1); // 昨日留存筆數
 		else
@@ -649,9 +648,10 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "MAIL00;Y;Y;Y;Y;-;L698A;     ;L4711;-;電子郵件";
 			break;
 		case "L45101":
-			settingValue = "L45101;-;C;-;-;Y;L698A;L4510;L4510;-;產出15日薪員工扣薪檔";
+			settingValue = "L45101;-;Y;-;-;Y;L698A;L4510;L4511;-;產出15日薪員工扣薪檔";
+			break;
 		case "L45102":
-			settingValue = "L45102;-;C;-;-;Y;L698A;L4510;L4510;-;產出非15日薪員工扣薪檔";
+			settingValue = "L45102;-;Y;-;-;Y;L698A;L4510;L4511;-;產出非15日薪員工扣薪檔";
 			break;
 		case "EMEP00":
 			settingValue = "EMEP00;-;C;-;-;-;L698A;L4200;L4200;-;員工扣薪入帳作業";
@@ -695,5 +695,6 @@ public class TxToDoCom extends TradeBuffer {
 		tMain.setExcuteTxcd(strAr[8].trim());
 		tMain.setEraseFg(strAr[9]);
 		tMain.setItemDesc(strAr[10]);
+		this.info("mntMainFixValue =" + itemCode + tMain.toString());
 	}
 }

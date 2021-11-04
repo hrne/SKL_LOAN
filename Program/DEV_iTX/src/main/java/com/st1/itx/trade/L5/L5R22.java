@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -72,11 +74,14 @@ public class L5R22 extends TradeBuffer {
 		if (iCollRemind != null) {
 			totaVo.putParam("L5R22CondCode", iCollRemind.getCondCode());
 			totaVo.putParam("L5R22RemindDate", iCollRemind.getRemindDate());
-			totaVo.putParam("L5R22EditDate", iCollRemind.getEditDate());
-			totaVo.putParam("L5R22EditTime", iCollRemind.getEditTime().trim());
 			totaVo.putParam("L5R22RemindCode", iCollRemind.getRemindCode());
 			totaVo.putParam("L5R22ReMark", iCollRemind.getRemark());
 			totaVo.putParam("L5R22EditEmpNo", iCollRemind.getLastUpdateEmpNo());
+			String tU = iCollRemind.getLastUpdate().toString();
+			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uTime = tU.substring(11,13) + tU.substring(14,16);
+			totaVo.putParam("L5R22EditDate", uDate);
+			totaVo.putParam("L5R22EditTime", uTime);
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}

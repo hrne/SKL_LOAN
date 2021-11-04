@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -74,8 +76,11 @@ public class L5965 extends TradeBuffer {
 				occursList.putParam("OOFacmNo", reCollRemind.getFacmNo());
 				occursList.putParam("OOCondCode", reCollRemind.getCondCode());
 				occursList.putParam("OORemindDate", reCollRemind.getRemindDate());
-				occursList.putParam("OOEditDate", reCollRemind.getEditDate());
-				occursList.putParam("OOEditTime", reCollRemind.getEditTime().trim());
+				String tU = reCollRemind.getLastUpdate().toString();
+				String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+				String uTime = tU.substring(11,13) + tU.substring(14,16);
+				occursList.putParam("OOEditDate", uDate);
+				occursList.putParam("OOEditTime", uTime);
 				occursList.putParam("OORemindCode", reCollRemind.getRemindCode());
 				occursList.putParam("OORemark", reCollRemind.getRemark());
 				occursList.putParam("OOEditEmpNo", reCollRemind.getLastUpdateEmpNo());

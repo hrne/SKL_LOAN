@@ -39,6 +39,7 @@ E(0,0)
 ["#FdStatusCode+處理代碼",#StatusCode,#StatusCodeX],["#FdNotiTempFg+入通知檔",#NotiTempFg],
 ["#FdAcDate+會計日期",#AcDate],["#FdTitaTxtNo+交易序號",#TitaTxtNo],
 ["#FdOvduDate+轉催收日",#OvduDate],["#FdOvduNo+轉催編號",#OvduNo],
+["#FdCommericalFlag+住宅險改商業險註記",#CommericalFlag]
 ]
 
 
@@ -71,7 +72,7 @@ E(0,0)
 #FdNotiTempFg=X,2,L
 #FdStatusCode=X,2,L
 #FdOvduNo=X,2,L
-
+#FdCommericalFlag=X,2,L
 
 !---------- AP Button AREA ----------
 ![Buttom資料查詢]
@@ -115,8 +116,6 @@ T(1,@ClCode2,#NTXBUF,3,2)
 T(1,@ClNo,#NTXBUF,5,7)
 T(1,@PrevInsuNo,#NTXBUF,12,16)
 T(1,@EndoInsuNo,#NTXBUF,28,16)
-T(1,@RenewCode,#NTXBUF,44,1)
-
 
 
 #INIT=X,1,S
@@ -184,6 +183,7 @@ T(F,@RenewCode,0)
 T(F,@InsuCompany,0)
 T(F,@InsuTypeCode,0)
 T(F,@StatusCode,0)
+T(F,@CommericalFlag,0)
 HIDE(#NewCustNo)
 HIDE(#NewFacmNo)
 
@@ -232,9 +232,10 @@ C(3,#AcDate,0000000,$,T(2,@TitaTxtNo,#L4r18TitaTxtNo))
 E(0,@StatusCode,#L4r18StatusCode)
 E(0,@OvduDate,#L4r18OvduDate)
 T(2,@OvduNo,#L4r18OvduNo)
+E(0,@RenewCode,#L4r18RenewCode)
 T(2,@InsuCompany,#L4r18InsuCompany)
 T(2,@InsuTypeCode,#L4r18InsuTypeCode)
-
+T(2,@CommericalFlag,#L4r18CommericalFlag)
 
 #SelfInsuCodeHelp2=x,30,S
 T(3,1:自保;2:續保)
@@ -397,6 +398,28 @@ C(3,#L4r18CustNo,0,$,s)
 IF(#FunctionCode==2 || #FunctionCode==6,$,s)
 @IF(#FunctionCode==6,V(7),$)
 
+
+
+<include src="ROM.icf::L4R26.dec"/>
+! 塞值調rim，無值提error
+#RimL4r26=X,1,S
+C(3,#FunctionCode,1,$,s)
+E(0,@RimClCode1,#ClCode1)
+E(0,@RimClCode2,#ClCode2)
+E(0,@RimClNo,#ClNo)
+T(2,@RimPrevInsuNo,#PrevInsuNo)
+T(2,@RimEndoInsuNo,#EndoInsuNo)
+RESET_RIM(#RimL4r26,L4R26)
+S(L4R26,1,#RimClCode1,#RimClCode2,#RimClNo,#RimPrevInsuNo,#RimEndoInsuNo)
+R(1,L4R26)
+
+#RimL4R26SetValue=X,1,S
+C(3,#FunctionCode,1,$,s)
+E(0,@FireInsuCovrg,#L4r26FireInsuCovrg)
+E(0,@FireInsuPrem,#L4r26FireInsuPrem)
+E(0,@EthqInsuCovrg,#L4r26EthqInsuCovrg)
+E(0,@EthqInsuPrem,#L4r26EthqInsuPrem)
+
 !火險保額
 #FireInsuCovrg=m,14,L
 
@@ -531,7 +554,9 @@ T(3,@StatusCodeX, ))
 !轉催編號
 #OvduNo=A,10,L
 
-
+#CommericalFlag=X,1,I
+C(2,#FunctionCode,s,$,$,s,s,s)
+@V(3, ,Y)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -593,6 +618,7 @@ T(3,[L4611] 火險保費資料查詢修改-依戶號)
 #OvduDate
 #OvduNo
 #RenewCode
+#CommericalFlag
 </sub>
 
 
@@ -601,6 +627,7 @@ T(3,[L4611] 火險保費資料查詢修改-依戶號)
 TXFORM=L4611^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="ROM.icf::L4R18.tom"/>
+<include src="ROM.icf::L4R26.tom"/>
 <include src="ROM.icf::L2R14.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

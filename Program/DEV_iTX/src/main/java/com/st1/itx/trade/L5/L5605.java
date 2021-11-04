@@ -81,16 +81,16 @@ public class L5605 extends TradeBuffer {
 				iCollRemindId.setTitaTlrNo(titaVo.getTlrNo());
 				iCollRemindId.setTitaTxtNo(titaVo.getTxtNo());
 				iCollRemindId.setAcDate(Integer.valueOf(titaVo.getCalDy()));// 日曆日 放acdate
+				iCollRemind.setCreateEmpNo(titaVo.getTlrNo());
 			} else {
 				iCollRemindId.setTitaTlrNo(titaVo.getParam("TitaTlrNo"));
 				iCollRemindId.setTitaTxtNo(titaVo.getParam("TitaTxtNo"));
 				iCollRemindId.setAcDate(Integer.valueOf(titaVo.getParam("TitaAcDate")));
+				iCollRemind.setLastUpdateEmpNo(titaVo.getTlrNo());
 			}
 			iCollRemind.setCollRemindId(iCollRemindId);
 			iCollRemind.setCondCode(titaVo.getParam("CondCode"));
 			iCollRemind.setRemindDate(Integer.valueOf(titaVo.getParam("RemindDate")));
-			iCollRemind.setEditDate(Integer.valueOf(titaVo.getParam("EditDate")));
-			iCollRemind.setEditTime(titaVo.getParam("EditTime"));
 			iCollRemind.setRemindCode(titaVo.getParam("RemindCode"));
 			iCollRemind.setRemark(titaVo.getParam("Remark"));
 			CollRemind tCollRemind = iCollRemindService.findById(iCollRemindId, titaVo);
@@ -111,8 +111,6 @@ public class L5605 extends TradeBuffer {
 					CollRemind beforeCollRemind = (CollRemind) iDataLog.clone(uCollRemind);
 					uCollRemind.setCondCode(titaVo.getParam("CondCode"));
 					uCollRemind.setRemindDate(Integer.valueOf(titaVo.getParam("RemindDate")));
-					uCollRemind.setEditDate(Integer.valueOf(titaVo.getParam("EditDate")));
-					uCollRemind.setEditTime(titaVo.getParam("EditTime"));
 					uCollRemind.setRemindCode(titaVo.getParam("RemindCode"));
 					uCollRemind.setRemark(titaVo.getParam("Remark"));
 					try {

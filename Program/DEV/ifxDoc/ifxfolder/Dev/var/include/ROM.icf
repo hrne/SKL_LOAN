@@ -66,6 +66,7 @@
 !    L2R55 : 依聯貸案編號尋找額度主檔
 !    L2R56 : 商品建檔時組出清償說明
 !    L2R57 : 依企金使用記號組出商品下拉式選單
+!    L2R58 : 依鍵值查詢銷帳檔資料
 !    L1R01 : 尋找客戶檔資料
 !    L1R02 : 尋找客戶關聯戶資料
 !    L1R03 : 尋找客戶額度檔資料
@@ -4941,9 +4942,11 @@ TXFORM=L4R17
 #L4r18StatusCode=A,1,S
 #L4r18OvduDate=D,7,S
 #L4r18OvduNo=A,10,S
+#L4r18RenewCode=A,1,S
 #L4r18RenewCodeX=x,4,S
 #L4r18InsuCompany=A,2,S
 #L4r18InsuTypeCode=A,2,S
+#L4r18CommericalFlag=X,2,S
 </L4R18.dec>
 
 <L4R18.tom>
@@ -4965,9 +4968,11 @@ TXFORM=L4R18
 #L4r18StatusCode
 #L4r18OvduDate
 #L4r18OvduNo
+#L4r18RenewCode
 #L4r18RenewCodeX
 #L4r18InsuCompany
 #L4r18InsuTypeCode
+#L4r18CommericalFlag
 ^
 </L4R18.tom>
 
@@ -5066,6 +5071,7 @@ TXFORM=L4R24
 #L4r25EthqInsuPrem=m,14,S
 #L4r25InsuStartDate=D,7,S
 #L4r25InsuEndDate=D,7,S
+#L4r25CommericalFlag=X,1,S
 </L4R25.dec>
 
 <L4R25.tom>
@@ -5078,6 +5084,7 @@ TXFORM=L4R25
 #L4r25EthqInsuPrem
 #L4r25InsuStartDate
 #L4r25InsuEndDate
+#L4r25CommericalFlag
 ^
 </L4R25.tom>
 
@@ -5663,6 +5670,8 @@ TXFORM=L5R17
 #L5R18CallDate=D,7,S
 #L5R18ReMark=x,500,S
 #L5R18EditEmpNo=X,6,S
+#L5R18EditDate=D,7,S
+#L5R18EditTime=X,4,S
 </L5R18.dec>
 
 <L5R18.tom>
@@ -5678,6 +5687,8 @@ TXFORM=L5R18
 #L5R18CallDate
 #L5R18ReMark
 #L5R18EditEmpNo
+#L5R18EditDate
+#L5R18EditTime
 ^
 </L5R18.tom>
 
@@ -5693,6 +5704,8 @@ TXFORM=L5R18
 #L5R19MeetPlaceCode=9,1,S
 #L5R19CollPsnNameX=X,6,S
 #L5R19EditEmpNo=X,6,S
+#L5R19EditDate=D,7,S
+#L5R19EditTime=X,4,S
 </L5R19.dec>
 
 <L5R19.tom>
@@ -5708,6 +5721,8 @@ TXFORM=L5R19
 #L5R19MeetPlaceCode
 #L5R19CollPsnNameX
 #L5R19EditEmpNo
+#L5R19EditDate
+#L5R19EditTime
 ^
 </L5R19.tom>
 
@@ -5722,6 +5737,8 @@ TXFORM=L5R19
 #L5R20ReMark=x,500,S
 #L5R20AddressCode=X,1,S
 #L5R20EditEmpNo=X,6,S
+#L5R20EditDate=D,7,S
+#L5R20EditTime=X,4,S
 </L5R20.dec>
 
 <L5R20.tom>
@@ -5736,6 +5753,8 @@ TXFORM=L5R20
 #L5R20ReMark
 #L5R20AddressCode
 #L5R20EditEmpNo
+#L5R20EditDate
+#L5R20EditTime
 ^
 </L5R20.tom>
 
@@ -5749,6 +5768,8 @@ TXFORM=L5R20
 #L5R21ClCode2=9,2,S
 #L5R21ClNo=9,7,S
 #L5R21EditEmpNo=X,6,S
+#L5R21EditDate=D,7,S
+#L5R21EditTime=X,4,S
 </L5R21.dec>
 
 <L5R21.tom>
@@ -5762,6 +5783,8 @@ TXFORM=L5R21
 #L5R21ClCode2
 #L5R21ClNo
 #L5R21EditEmpNo
+#L5R21EditDate
+#L5R21EditTime
 ^
 </L5R21.tom>
 

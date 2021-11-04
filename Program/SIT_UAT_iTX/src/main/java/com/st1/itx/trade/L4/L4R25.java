@@ -43,9 +43,9 @@ public class L4R25 extends TradeBuffer {
 		int iClNo = parse.stringToInteger(titaVo.getParam("RimClNo"));
 		String iPrevInsuNo = titaVo.getParam("RimPrevInsuNo");
 		String iRimEndoInsuNo = titaVo.getParam("RimEndoInsuNo");
-        
-		if("".equals(iRimEndoInsuNo)) {
-			iRimEndoInsuNo = " " ;
+
+		if ("".equals(iRimEndoInsuNo)) {
+			iRimEndoInsuNo = " ";
 		}
 		InsuOrignal tInsuOrignal = new InsuOrignal();
 		InsuOrignalId tInsuOrignalId = new InsuOrignalId();
@@ -55,8 +55,7 @@ public class L4R25 extends TradeBuffer {
 		tInsuOrignalId.setClNo(iClNo);
 		tInsuOrignalId.setEndoInsuNo(iRimEndoInsuNo);
 		tInsuOrignalId.setOrigInsuNo(iPrevInsuNo);
-		
-		
+
 		tInsuOrignal = insuOrignalService.findById(tInsuOrignalId, titaVo);
 
 		if (tInsuOrignal != null) {
@@ -69,6 +68,7 @@ public class L4R25 extends TradeBuffer {
 			this.totaVo.putParam("L4r25EthqInsuPrem", tInsuOrignal.getEthqInsuPrem());
 			this.totaVo.putParam("L4r25InsuStartDate", tInsuOrignal.getInsuStartDate());
 			this.totaVo.putParam("L4r25InsuEndDate", tInsuOrignal.getInsuEndDate());
+			this.totaVo.putParam("L4r25CommericalFlag", tInsuOrignal.getCommericalFlag());
 		} else {
 			throw new LogicException(titaVo, "E0001", " 查無資料");
 		}

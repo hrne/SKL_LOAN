@@ -39,7 +39,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class BS010 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS010.class);
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -122,8 +121,7 @@ public class BS010 extends TradeBuffer {
 		baTxCom.setTxBuffer(this.getTxBuffer());
 
 		// find data
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate, 0, this.index,
-				Integer.MAX_VALUE);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate, 0, this.index, Integer.MAX_VALUE);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		// size > 0 -> 新增應處理明細
 		TxToDoDetail tTxToDoDetail;
@@ -195,8 +193,7 @@ public class BS010 extends TradeBuffer {
 		this.info("火險費轉列催收日期 < " + payDate);
 		// find data
 		// F09 暫付火險保費
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, payDate, this.index,
-				Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, payDate, this.index, Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 //test	lAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, 99999999); // acctCode=, clsFlag=, openAcDate <
 		// data size > 0 -> 新增應處理明細
@@ -225,12 +222,9 @@ public class BS010 extends TradeBuffer {
 		this.info("法務費轉列催收日期 < " + payDate);
 		// find data
 		// F07 暫付法務費
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, payDate, this.index,
-				Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, payDate, this.index, Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
-//test	lAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, 99999999); //
 		// acctCode=, clsFlag=, openAcDate <
-		this.info("lAcReceivable" + lAcReceivable.toString());
 		// data size > 0 -> 新增應處理明細
 		TxToDoDetail tTxToDoDetail;
 		if (lAcReceivable != null) {

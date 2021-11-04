@@ -41,7 +41,7 @@ public class L8950 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		String iEmpId = titaVo.getParam("EmpId");
-		int iDataDate = Integer.valueOf(titaVo.getParam("DataDate"));
+		int iDataDate = Integer.valueOf(titaVo.getParam("DataDate"))+19110000;
 		/*
 		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		 */
@@ -51,11 +51,11 @@ public class L8950 extends TradeBuffer {
 		this.limit = 500;
 
 		Slice<TbJcicMu01> iTbJcicMu01 = null;
-		if (iEmpId.equals("") && iDataDate == 0) {
+		if (iEmpId.equals("") && iDataDate == 19110000) {
 			iTbJcicMu01 = sTbJcicMu01Service.findAll(this.index, this.limit, titaVo);
-		} else if (!iEmpId.equals("") && iDataDate == 0) {
+		} else if (!iEmpId.equals("") && iDataDate == 19110000) {
 			iTbJcicMu01 = sTbJcicMu01Service.empIdEq(iEmpId, this.index, this.limit, titaVo);
-		} else if (iEmpId.equals("") && iDataDate != 0) {
+		} else if (iEmpId.equals("") && iDataDate != 19110000) {
 			iTbJcicMu01 = sTbJcicMu01Service.dataDateEq(iDataDate, this.index, this.limit, titaVo);
 		} else {
 			iTbJcicMu01 = sTbJcicMu01Service.empIdRcEq(iEmpId, iDataDate, this.index, this.limit, titaVo);
@@ -69,14 +69,14 @@ public class L8950 extends TradeBuffer {
 				occursList.putParam("OOBranchCode", aTbJcicMu01.getBranchCode());
 				occursList.putParam("OODataDate", Integer.valueOf(aTbJcicMu01.getDataDate()));
 				occursList.putParam("OOEmpId", aTbJcicMu01.getEmpId());
-				CdEmp iCdEmp = new CdEmp ();
+				CdEmp iCdEmp = new CdEmp();
 				iCdEmp = iCdEmpService.findById(aTbJcicMu01.getEmpId(), titaVo);
 				if (iCdEmp == null) {
 					occursList.putParam("OOEmpName", "");
-				}else {
+				} else {
 					occursList.putParam("OOEmpName", iCdEmp.getFullname());
 				}
-				
+
 				this.totaVo.addOccursList(occursList);
 			}
 		}

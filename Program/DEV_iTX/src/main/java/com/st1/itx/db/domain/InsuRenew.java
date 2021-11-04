@@ -29,7 +29,7 @@ public class InsuRenew implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3654277774403173324L;
+	private static final long serialVersionUID = -6111065926486952470L;
 
 @EmbeddedId
   private InsuRenewId insuRenewId;
@@ -153,6 +153,10 @@ public class InsuRenew implements Serializable {
   // 轉催編號
   @Column(name = "`OvduNo`")
   private BigDecimal ovduNo = new BigDecimal("0");
+
+  // 住宅險改商業險註記
+  @Column(name = "`CommericalFlag`", length = 1)
+  private String commericalFlag;
 
   // 建檔日期時間
   @CreatedDate
@@ -758,6 +762,25 @@ null:待通知
   }
 
 /**
+	* 住宅險改商業險註記<br>
+	* 
+	* @return String
+	*/
+  public String getCommericalFlag() {
+    return this.commericalFlag == null ? "" : this.commericalFlag;
+  }
+
+/**
+	* 住宅險改商業險註記<br>
+	* 
+  *
+  * @param commericalFlag 住宅險改商業險註記
+	*/
+  public void setCommericalFlag(String commericalFlag) {
+    this.commericalFlag = commericalFlag;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -840,7 +863,7 @@ null:待通知
            + ", custNo=" + custNo + ", facmNo=" + facmNo + ", nowInsuNo=" + nowInsuNo + ", origInsuNo=" + origInsuNo + ", renewCode=" + renewCode + ", insuCompany=" + insuCompany
            + ", insuTypeCode=" + insuTypeCode + ", repayCode=" + repayCode + ", fireInsuCovrg=" + fireInsuCovrg + ", ethqInsuCovrg=" + ethqInsuCovrg + ", fireInsuPrem=" + fireInsuPrem + ", ethqInsuPrem=" + ethqInsuPrem
            + ", insuStartDate=" + insuStartDate + ", insuEndDate=" + insuEndDate + ", totInsuPrem=" + totInsuPrem + ", acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo
-           + ", notiTempFg=" + notiTempFg + ", statusCode=" + statusCode + ", ovduDate=" + ovduDate + ", ovduNo=" + ovduNo + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", notiTempFg=" + notiTempFg + ", statusCode=" + statusCode + ", ovduDate=" + ovduDate + ", ovduNo=" + ovduNo + ", commericalFlag=" + commericalFlag + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

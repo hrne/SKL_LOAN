@@ -43,7 +43,7 @@ public class L8351File extends MakeFile {
 		// 檔名
 		String filename = iSubmitKey + iTxtDate.substring(3) + ".MU1";
 
-		this.open(titaVo, date, brno, filecode, fileitem, filename);
+		this.open(titaVo, date, brno, filecode, fileitem, filename,2);
 		// 用String.format()
 		Slice<TbJcicMu01> iTbJcicMu01 = iTbJcicMu01Service.findAll(this.index, this.limit, titaVo);
 
@@ -59,12 +59,11 @@ public class L8351File extends MakeFile {
 				if (aTbJcicMu01.getOutJcictxtDate() == 0) {
 					String iEmpNo = aTbJcicMu01.getEmpId();
 					CdEmp iCdEmp = new CdEmp();
-					iCdEmp = sCdEmpService.findById(iEmpNo,titaVo);
+					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
 					String iEmpName = "";
 					if (iCdEmp != null) {
 						iEmpName = iCdEmp.getFullname();
 					}
-
 
 					// 產檔內容
 					int iDataDate = Integer.valueOf(aTbJcicMu01.getDataDate()) - 19110000;

@@ -44,6 +44,12 @@ E(0,0)
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從L5060進入),$)
 
+!做完交易自動更新原畫面
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 ! 功能下拉選單1
 #FunctionCdRimName=x,30,S
@@ -137,8 +143,8 @@ T(2,@EditEmpNo,#L5R22EditEmpNo)
 T(H,@CondCodeX,#CondCode,#CondCodeHelp)
 T(H,@RemindCodeX,#RemindCode,#RemindCodeHelp)
 #Space2=X,1,S
-C(2,#FunctionCd,s,$,$,$,s,s,s)
-T(4,@EditEmpNo,TLRNO$)
+!C(2,#FunctionCd,s,$,$,s,s,s,$)
+!T(4,@EditEmpNo,TLRNO$)
 <include src="ROM.icf::L5R28.dec"/>
 #RimEmployeeNo=X,6,S
 #RimL5R28=X,1,S
@@ -265,14 +271,13 @@ HELP(#RemindCodeHelp)
 #RemindCodeX=X,30,L
 T(H,#RemindCode,#RemindCodeHelp)
 ! 其他記錄
-#Remark=X,2.80,I
+#Remark=x,10.50,I
 C(2,#FunctionCd,S,$,$,s,s,s,s)
 ! 提醒日期
-#RemindDateX=X,8,S
-T(4,#SYSCDATE)
+#CDate=D,7,S
+T(1,#SYSCDATE,2,7)
 #RemindDate=D,7,I
-C(2,#FunctionCd,S,$,$,s,s,s,s)
-C(2,#FunctionCd,S,T(1,#RemindDateX,2,7),$,T(1,#RemindDateX,2,7),s,s,s)
+C(2,#FunctionCd,S,T(2,#CDate),$,T(2,#CDate),s,s,s)
 @A(DATE,0,#RemindDate)
 ! D(8)
 ! 狀態
@@ -284,24 +289,27 @@ HELP(#CondCodeHelp)
 #CondCodeX=X,6,L
 T(H,#CondCode,#CondCodeHelp)
 ! 維護日期
-#EditDateX=X,8,S
-T(4,DATE$)
-
 #EditDate=D,7,L
-T(1,#EditDateX,2,7)
-D(8)
-C(2,#FunctionCd,S,$,$,s,s,s,s)
+C(2,#FunctionCd,S,T(2,#CDate),T(2,#CDate),s,s,s,T(2,#CDate))
+
 ! 維護時間
 #EditTimeX=X,6,S
 T(4,TIME$)
 #EditTime=X,4,L
-C(2,#FunctionCd,S,$,$,s,s,s,s)
+C(2,#FunctionCd,S,$,$,s,s,s,$)
 T(1,#EditTimeX,1,4)
 @V(7)
 
 
 ! 維護人員
 #EditEmpNo=X,6,L
+C(2,#FunctionCd,S,$,$,s,s,s,$)
+T(4,@EditEmpNo,TLRNO$)
+T(2,@RimEmployeeNo,#EditEmpNo)
+RESET_RIM(#RimL5R28,L5R28)
+S(L5R28,1,#RimEmployeeNo)
+R(1,L5R28)
+T(2,@EditEmpNoX,#L5r28FullName)
 
 
 #EditEmpNoX=X,50,L
@@ -336,8 +344,6 @@ T(1,#EditTimeX,1,4)
 #Remark
 #RemindDate
 #CondCode
-#EditDate
-#EditTime
 #TitaTlrNo
 #TitaTxtNo
 #TitaAcDate
