@@ -3,8 +3,6 @@ package com.st1.itx.trade.XX;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -25,7 +23,9 @@ import com.st1.itx.db.service.TxAuthGroupService;
 import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxTellerService;
 import com.st1.itx.db.domain.CdLoanNotYet;
+import com.st1.itx.db.domain.CdSyndFee;
 import com.st1.itx.db.service.CdLoanNotYetService;
+import com.st1.itx.db.service.CdSyndFeeService;
 import com.st1.itx.db.domain.CdGuarantor;
 import com.st1.itx.db.service.CdGuarantorService;
 
@@ -38,7 +38,6 @@ import com.st1.itx.db.service.CdGuarantorService;
  * @version 1.0.0
  */
 public class XXR99 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(XXR99.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -61,6 +60,9 @@ public class XXR99 extends TradeBuffer {
 
 	@Autowired
 	public CdGuarantorService sCdGuarantorService;
+
+	@Autowired
+	public CdSyndFeeService sCdSyndFeeService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -117,6 +119,8 @@ public class XXR99 extends TradeBuffer {
 				s = getCdLoanNotYetYetDays();
 			} else if ("CdGuarantor".equals(k)) {
 				s = getCdGuarantor();
+			} else if ("CdSyndFee".equals(k)) {
+				s = getSyndFeeCode();
 			} else {
 				throw new LogicException(titaVo, "E0010", "HELP類別:" + k);
 			}
@@ -492,7 +496,8 @@ public class XXR99 extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;
 
-		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index, this.limit);
+		Slice<TxAuthGroup> slTxAuthGroup = sTxAuthGroupService.BranchAll(branchNo, Integer.valueOf(levelFg), this.index,
+				this.limit);
 		List<TxAuthGroup> lTxAuthGroup = slTxAuthGroup == null ? null : slTxAuthGroup.getContent();
 
 		if (lTxAuthGroup != null) {
@@ -530,6 +535,34 @@ public class XXR99 extends TradeBuffer {
 					s += ";";
 				}
 				s += txTeller.getTlrNo().trim() + ":" + txTeller.getTlrItem().trim();
+			}
+		}
+
+		return s;
+	}
+
+//聯貸案費用help
+	private String getSyndFeeCode() {
+		this.info("XXR99 getSyndFeeCode");
+		String s = "";
+
+		/*
+		 * 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
+		 */
+		this.index = 0;
+
+		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
+		this.limit = Integer.MAX_VALUE;
+
+		Slice<CdSyndFee> slCdSyndFee = sCdSyndFeeService.findAll(this.index, this.limit);
+		List<CdSyndFee> lCdSyndFee = slCdSyndFee == null ? null : slCdSyndFee.getContent();
+
+		if (lCdSyndFee != null) {
+			for (CdSyndFee cdSyndFee : lCdSyndFee) {
+				if (!"".equals(s)) {
+					s += ";";
+				}
+				s += cdSyndFee.getSyndFeeCode().trim() + ":" + cdSyndFee.getSyndFeeItem().trim();
 			}
 		}
 

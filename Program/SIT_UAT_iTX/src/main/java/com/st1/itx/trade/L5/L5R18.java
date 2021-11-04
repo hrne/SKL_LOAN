@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+import org.apache.commons.lang3.StringUtils;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
@@ -42,6 +43,7 @@ public class L5R18 extends TradeBuffer {
 
 	@Autowired
 	public CollTelService iCollTelService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		// L5401交易內調RIM用,資料來源為CdBcm表
@@ -80,6 +82,11 @@ public class L5R18 extends TradeBuffer {
 			totaVo.putParam("L5R18CallDate", iCollTel.getCallDate());
 			totaVo.putParam("L5R18ReMark", iCollTel.getRemark());
 			totaVo.putParam("L5R18EditEmpNo", iCollTel.getLastUpdateEmpNo());
+			String tU = iCollTel.getLastUpdate().toString();
+			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uTime = tU.substring(11,13) + tU.substring(14,16);
+			totaVo.putParam("L5R18EditDate", uDate);
+			totaVo.putParam("L5R18EditTime", uTime);
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}

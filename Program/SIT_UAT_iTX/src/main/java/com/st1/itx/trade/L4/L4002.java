@@ -51,6 +51,7 @@ public class L4002 extends TradeBuffer {
 	private BigDecimal ooRpAmt = new BigDecimal("0");
 	private int totalCnt = 0;
 	private String batxStatus = "";
+	int acDate;
 
 //	private BigDecimal bgZero = new BigDecimal("0");
 
@@ -63,7 +64,7 @@ public class L4002 extends TradeBuffer {
 
 		this.limit = Integer.MAX_VALUE;
 
-		int acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
+		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		String procExeCode = titaVo.getParam("ProcExeCode");
 //		計算總筆數，若0最後提示ERROR
 
@@ -97,14 +98,14 @@ public class L4002 extends TradeBuffer {
 					if ("0".equals(tBatxHead.getBatxExeCode()) || "1".equals(tBatxHead.getBatxExeCode())
 							|| "2".equals(tBatxHead.getBatxExeCode()) || "3".equals(tBatxHead.getBatxExeCode())) {
 
-						setL4002Tota(tBatxHead.getAcDate(), tBatxHead.getBatchNo(), titaVo);
+						setL4002Tota(tBatxHead, titaVo);
 					} else {
 						this.info("continue... ，procExeCode = " + procExeCode + "， BatxHead狀態 != 0~3 ，狀態 = "
 								+ tBatxHead.getBatxExeCode());
 						continue;
 					}
 				} else {
-					setL4002Tota(tBatxHead.getAcDate(), tBatxHead.getBatchNo(), titaVo);
+					setL4002Tota(tBatxHead, titaVo);
 				}
 			}
 			if (totalCnt == 0) {
@@ -120,14 +121,35 @@ public class L4002 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private void setL4002Tota(int acDate, String batchNo, TitaVo titaVo) throws LogicException {
-
+	private void setL4002Tota(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
+				String batchNo =  tBatxHead.getBatchNo();
 		int labelRankFlag = 1;
 		Slice<BatxDetail> sBatxDetail = batxDetailService.findL4002AEq(acDate, batchNo, this.index, this.limit, titaVo);
 
 		List<BatxDetail> lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
+		if (lBatxDetail == null) {
+		OccursList occursList = new OccursList();
+		occursList.putParam("OOBatchNo", batchNo);
+		occursList.putParam("OORankFlag", 1);
+		occursList.putParam("OOStatusCode", batxStatus);
+		occursList.putParam("OORepayCode", 90);
+		occursList.putParam("OOReconCode", "   ");
+		occursList.putParam("OOFileName", tBatxHead.getTitaTxCd());
+		occursList.putParam("OOFileCnt", 0);
+		occursList.putParam("OODntCnt", 0);
+		occursList.putParam("OOAlrCnt", 0);
+		occursList.putParam("OOWatCnt", 0);
+		occursList.putParam("OOVirCnt", 0);
+		occursList.putParam("OOTotalRepayAmt", 0);
+		occursList.putParam("OOToDoRepayAmt", 0);
+		occursList.putParam("OOUnDoRepayAmt", 0);
+		occursList.putParam("OOLabelFgA", "");
+		occursList.putParam("OOLabelFgB", "");
+		occursList.putParam("OOLabelFgC", "");
 
-		if (lBatxDetail != null && lBatxDetail.size() != 0) {
+		/* 將每筆資料放入Tota的OcList */
+		this.totaVo.addOccursList(occursList);
+		} else {
 			totalCnt++;
 			// 會計日期 整批批號 還款來源 對帳類別 檔名
 			// AcDate BatchNo RepayCode ReconCode fileName
@@ -240,18 +262,12 @@ public class L4002 extends TradeBuffer {
 					grp1.setRepayCode(0);
 					grp1.setReconCode(" ");
 					grp1.setFileName(" ");
-					grp1.setRankFlag(1);
-					grp1.setAcDate(tBatxDetail.getAcDate());
-					grp1.setBatchNo(tBatxDetail.getBatchNo());
-					grp1.setRepayCode(0);
-					grp1.setReconCode(" ");
-					grp1.setFileName(" ");
-					grp1.setRankFlag(1);
+					grp1.setRankFlag(1);	
 					grp2.setAcDate(tBatxDetail.getAcDate());
 					grp2.setBatchNo(tBatxDetail.getBatchNo());
 					grp2.setRepayCode(tBatxDetail.getRepayCode());
 					grp2.setReconCode(tBatxDetail.getReconCode());
-					grp2.setFileName(" ");
+					grp2.setFileName(tBatxDetail.getFileName());
 					grp2.setRankFlag(2);
 					break;
 				}

@@ -11,6 +11,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
@@ -31,7 +32,7 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 /**
  * 新增整批入帳明細－暫收抵繳<br>
- * 執行時機：日始作業，系統換日後(BS001執行後)自動執行<br>
+ * 執行時機：日始作業，系統換日後(BS001執行後)自動執行，L4450-產出銀行扣帳檔<br>
  * 1.保留成功的整批入帳明細，其餘刪除(程式可重複執行)<br>
  * 2.找正常戶、應繳日<=本日，且額度下有暫收可抵繳之戶號、額度<br>
  * 3.進行還款試算(戶號、額度)，若暫收可抵繳>= 期金 或 費用，則寫入整批入帳檔<br>
@@ -61,6 +62,7 @@ public class BS020 extends TradeBuffer {
 	private int tbsdy;
 	private String batchNo;
 	private int detailSeq;
+	private String txCode;
 	private BatxHead tBatxHead;
 	private BatxHeadId tBatxHeadId;
 	private BatxDetail tBatxDetail;
@@ -71,10 +73,20 @@ public class BS020 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active BS020 ");
 
-		baTxCom.setTxBuffer(this.getTxBuffer());
+		exec(titaVo, this.txBuffer);
 
-		this.tbsdyf = this.getTxBuffer().getMgBizDate().getTbsDyf();
-		tbsdy = this.getTxBuffer().getMgBizDate().getTbsDy();
+		this.batchTransaction.commit();
+
+		return null;
+	}
+
+	/* 設定暫收抵繳款批號 */
+	public BatxHead exec(TitaVo titaVo, TxBuffer txBuffer) throws LogicException {
+		txCode = "L4450".equals(titaVo.getTxcd()) ? "L4450" : "BS020";
+		baTxCom.setTxBuffer(txBuffer);
+
+		this.tbsdyf = txBuffer.getMgBizDate().getTbsDyf();
+		tbsdy = txBuffer.getMgBizDate().getTbsDy();
 
 		// step 1. get BatchNo
 		this.batchNo = null;
@@ -86,7 +98,7 @@ public class BS020 extends TradeBuffer {
 		findList(titaVo);
 
 		// step 3.insert BatxDetail
-		if (this.lBatxDetail != null && this.lBatxDetail.size() > 0) {
+		if (this.lBatxDetail.size() > 0) {
 			try {
 				batxDetailService.insertAll(lBatxDetail);
 			} catch (DBException e) {
@@ -95,22 +107,17 @@ public class BS020 extends TradeBuffer {
 		}
 
 		// step 4.insert/update BatxHead
+		updateBatxHead(titaVo);
+		return tBatxHead;
 
-		if (this.lBatxDetail != null && this.lBatxDetail.size() > 0)
-			updateBatxHead(titaVo);
-
-		// end
-		this.batchTransaction.commit();
-		return null;
 	}
 
 	/* 設定暫收抵繳款批號 */
 	private void settingBatchNo(TitaVo titaVo) throws LogicException {
-
-		tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, "BS020", "8"); // <> 8-已刪除
-
+		// call by BS020-日始作業, or L4450-產出銀行扣帳檔
+		tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, txCode, "8"); // <> 8-已刪除
 		// 保留成功的整批入帳明細，其餘刪除(程式可重複執行)
-		// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.虛擬轉暫收
+		// ProcStsCode 處理狀態 0.未檢核 1.不處理 2.人工處理 3.檢核錯誤 4.檢核正常 5.人工入帳 6.批次入帳 7.轉暫收
 		if (tBatxHead != null) {
 			this.batchNo = tBatxHead.getBatchNo();
 			List<String> dStatusCode = new ArrayList<String>();
@@ -150,7 +157,7 @@ public class BS020 extends TradeBuffer {
 
 		try {
 			// *** 折返控制相關 ***
-			resultList = bS020ServiceImpl.findAll(titaVo);
+			resultList = bS020ServiceImpl.findAll(titaVo, tbsdy + 19110000);
 		} catch (Exception e) {
 			this.error("bS020ServiceImpl " + e.getMessage());
 			throw new LogicException("E0013", e.getMessage());
@@ -158,16 +165,25 @@ public class BS020 extends TradeBuffer {
 		if (resultList == null || resultList.size() == 0) {
 			return;
 		}
+//		 F0   戶號
+//		 F1   暫收可抵繳金額
+//		 F2   還款類別 1.期款 2.費用
+//		 F3   還款來源 02.銀行扣款 00.其他
 
 		// 進行還款試算(戶號、額度)，若暫收可抵繳>= 期金(含費用)，則寫入整批入帳檔
 		for (Map<String, String> result : resultList) {
 			// 期款款試算
 			ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 			int custNo = parse.stringToInteger(result.get("F0"));
-			int facmNo = parse.stringToInteger(result.get("F1"));
-			BigDecimal tempAmt = parse.stringToBigDecimal(result.get("F2"));
+			int repayType = parse.stringToInteger(result.get("F2"));  
+			int repayCode = parse.stringToInteger(result.get("F3"));
+			// 銀扣檔產生只處理還款來源 02.銀行扣款
+			if ("L4450".equals(txCode) && repayCode == 0 ) {
+				continue;
+			}
 			try {
-				listBaTxVo = baTxCom.settingUnPaid(tbsdy, custNo, facmNo, 0, 1, BigDecimal.ZERO, titaVo);
+				listBaTxVo = baTxCom.settleUnPaid(tbsdy, 0, custNo, 0, 0, repayCode, repayType, BigDecimal.ZERO,
+						titaVo);
 			} catch (LogicException e) {
 				this.info("baTxCom.settingUnPaid" + e.getMessage());
 				continue;
@@ -185,7 +201,7 @@ public class BS020 extends TradeBuffer {
 			if (listBaTxVo != null && listBaTxVo.size() != 0) {
 				for (BaTxVo ba : listBaTxVo) {
 					// 費用
-					if (ba.getRepayType() >= 4 && tempAmt.compareTo(ba.getUnPaidAmt()) >= 0) {
+					if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) >= 0) {
 						isRecvPay = true;
 					}
 					// 期款
@@ -200,10 +216,10 @@ public class BS020 extends TradeBuffer {
 				}
 			}
 			if (isTermPay && !isShortAmt) {
-				addDetail(custNo, facmNo, 1, titaVo);
+				addDetail(custNo, 1, titaVo);
 			} else {
 				if (isRecvPay) {
-					addDetail(custNo, facmNo, 9, titaVo); // 其他
+					addDetail(custNo, 9, titaVo); // 其他
 				}
 			}
 		}
@@ -222,10 +238,10 @@ public class BS020 extends TradeBuffer {
 		}
 		tBatxHead.setBatxTotAmt(BigDecimal.ZERO);
 		tBatxHead.setBatxTotCnt(this.lBatxDetail.size());
-		tBatxHead.setBatxExeCode("0");
+		tBatxHead.setBatxExeCode(this.lBatxDetail.size() > 0 ? "0" : "4");
 		tBatxHead.setBatxStsCode("0");
 		tBatxHead.setTitaTlrNo(titaVo.getTlrNo());
-		tBatxHead.setTitaTxCd("BS020");
+		tBatxHead.setTitaTxCd(txCode);
 		if (insertfg)
 			try {
 				batxHeadService.insert(tBatxHead);
@@ -242,7 +258,7 @@ public class BS020 extends TradeBuffer {
 
 	}
 
-	private void addDetail(int custNo, int facmNo, int repayType, TitaVo titaVo) throws LogicException {
+	private void addDetail(int custNo, int repayType, TitaVo titaVo) throws LogicException {
 		tBatxDetail = new BatxDetail();
 		tBatxDetailId = new BatxDetailId();
 		tBatxDetailId.setAcDate(this.tbsdy);
@@ -254,9 +270,9 @@ public class BS020 extends TradeBuffer {
 		tBatxDetail.setBatxDetailId(tBatxDetailId);
 		tBatxDetail.setRepayCode(90); // 暫收抵繳
 		tBatxDetail.setCustNo(custNo);
-		tBatxDetail.setFacmNo(facmNo);
+		tBatxDetail.setFacmNo(0);
 		tBatxDetail.setEntryDate(this.tbsdy);
-		tBatxDetail.setFileName("BS020");
+		tBatxDetail.setFileName(txCode);
 		tBatxDetail.setReconCode("   ");
 		tBatxDetail.setRepayType(repayType);
 		tBatxDetail.setRepayAmt(BigDecimal.ZERO);

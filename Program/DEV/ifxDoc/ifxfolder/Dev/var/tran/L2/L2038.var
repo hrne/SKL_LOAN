@@ -727,14 +727,14 @@ T(2,#OOClCode1+#Dash+#OOClCode2+#Dash+#OOClNo)
 
 #OOClTypeCode=X,20,L
 
-#OOOwnerId=X,10,L
+!#OOOwnerId=X,10,L
 
-#OOOwnerIdLB=X,11,L
+!#OOOwnerIdLB=X,11,L
 
-#OOOwnerFlag=X,1,S
-T(2,@OOOwnerIdLB,#OOOwnerId)
+!#OOOwnerFlag=X,1,S
+!T(2,@OOOwnerIdLB,#OOOwnerId)
 
-#OOOwnerName=X,20,L
+!#OOOwnerName=X,20,L
 
 #OOSettingAmt=m,14,L
 
@@ -931,9 +931,6 @@ TXFORM=L2038
 #OOClNo
 #OONewNote
 #OOClTypeCode
-#OOOwnerId
-#OOOwnerFlag
-#OOOwnerName
 #OOSettingAmt
 #OOSettingStat
 #OOClStat

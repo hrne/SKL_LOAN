@@ -19,6 +19,7 @@ import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdIndustry;
 import com.st1.itx.db.domain.CustCross;
 import com.st1.itx.db.domain.CustCrossId;
+import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.CustTelNo;
 import com.st1.itx.db.domain.LoanBorMain;
@@ -28,6 +29,7 @@ import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdIndustryService;
 import com.st1.itx.db.service.CustCrossService;
+import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -88,7 +90,8 @@ public class L1101 extends TradeBuffer {
 	public CustCrossService iCustCrossService;
 	@Autowired
 	public CdCodeService iCdCodeService;
-
+	@Autowired
+	public CustDataCtrlService sCustDataCtrlService;
 	@Autowired
 	public Parse iParse;
 
@@ -106,7 +109,7 @@ public class L1101 extends TradeBuffer {
 	private String wkIsSuspected = "N";
 	private String wkIsDataDate = "";
 	CustMain beforeCustMain = new CustMain();
-
+	private int iCustNo;
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1101 ");
@@ -157,7 +160,7 @@ public class L1101 extends TradeBuffer {
 		}
 
 		this.info("L1101 funcd = " + funcd);
-		
+
 		switch (funcd) {
 		case "1": // 新增
 			tCustMain = new CustMain();
@@ -176,6 +179,36 @@ public class L1101 extends TradeBuffer {
 			setCustCross(titaVo, tCustMain);
 			break;
 		case "2": // 修改
+			
+			if(this.isEloan) {
+			  // 申請記號 ApplMark
+			  // 0:客戶申請(案件申請時丟錯誤訊息)
+			  // 1:滿五年自動寫入(案件申請自動刪除)
+			  iCustNo = tCustMain.getCustNo();
+						
+			  CustDataCtrl tCustDataCtrl = new CustDataCtrl();
+						
+			 tCustDataCtrl = sCustDataCtrlService.findById(iCustNo);
+			  int iApplMark = 0;
+			  if(tCustDataCtrl != null) {
+				iApplMark = tCustDataCtrl.getApplMark();
+				if(iApplMark == 0) {
+					throw new LogicException(titaVo, "E2004", "結清客戶個人資料控管狀態"); // 功能選擇錯誤
+				} else if(iApplMark == 1){
+					try {
+
+						this.info(" L2703 deletetCustDataCtrlLog : " + tCustDataCtrl);
+
+						if (tCustDataCtrl != null) {
+							sCustDataCtrlService.delete(tCustDataCtrl);
+						}
+					} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+					}
+				}
+			  }
+			}
+						
 			// 變更前
 			beforeCustMain = (CustMain) iDataLog.clone(tCustMain);
 			// 搬值
@@ -189,10 +222,11 @@ public class L1101 extends TradeBuffer {
 			// 紀錄變更前變更後
 			iDataLog.setEnv(titaVo, beforeCustMain, tCustMain);
 			iDataLog.exec();
-			
+
 			// by eric 2021.7.31
 			setCustCross(titaVo, tCustMain);
 
+			
 			break;
 		case "4": // 刪除
 //		刪除功能暫時先拔掉 資料刪除影響很多db
@@ -246,8 +280,7 @@ public class L1101 extends TradeBuffer {
 	private void setTota(TitaVo titaVo) throws LogicException {
 		this.info("tCustMain = " + tCustMain);
 		// 用客戶識別碼取電話資料
-		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index, this.limit,
-				titaVo);
+		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index, this.limit, titaVo);
 		List<CustTelNo> lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 		// 查詢行業別代號資料檔
@@ -256,17 +289,17 @@ public class L1101 extends TradeBuffer {
 			tCdIndustry = new CdIndustry();
 		}
 		// 通訊地址
-		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain,titaVo);
+		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
 		this.info("CurrAddres" + WkCurrAddres);
 		// 戶籍地址
-		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain,titaVo);
+		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain, titaVo);
 		this.info("CurrAddres" + WkRegAddres);
 
 		this.totaVo.putParam("OCustId", tCustMain.getCustId());
 		this.totaVo.putParam("OCustNo", tCustMain.getCustNo());
 
 		this.totaVo.putParam("OTypeCode", tCustMain.getTypeCode());
-		
+
 		this.totaVo.putParam("OCustName", tCustMain.getCustName().replace("$n", "\n"));
 		this.totaVo.putParam("OBirthday", tCustMain.getBirthday());
 		this.totaVo.putParam("OSex", tCustMain.getSex());
@@ -289,11 +322,10 @@ public class L1101 extends TradeBuffer {
 		this.totaVo.putParam("OIsLnrelNear", wkIsLnrelNear);
 		this.totaVo.putParam("OIsSuspected", wkIsSuspected);
 		this.totaVo.putParam("OIsDataDate", wkIsDataDate);
-		
-		
+
 		this.totaVo.putParam("OEntCode", tCustMain.getEntCode());
 		this.totaVo.putParam("OEmpNo", tCustMain.getEmpNo());
-		//2021.10.15 by eric
+		// 2021.10.15 by eric
 		String OEmpNoX = "";
 		if (!"".equals(tCustMain.getEmpNo())) {
 			CdEmp tCdEmp = cdEmpService.findById(tCustMain.getEmpNo(), titaVo);
@@ -457,8 +489,7 @@ public class L1101 extends TradeBuffer {
 		tCustMain.setAMLJobCode(titaVo.getParam("AMLJobCode"));
 		tCustMain.setAMLGroup(titaVo.getParam("AMLGroup"));
 		tCustMain.setIndigenousName(titaVo.getParam("IndigenousName"));
-		if (beforeCustMain == null
-				& (beforeCustMain.getIntroducer() == null || "".equals(beforeCustMain.getIntroducer()))) {
+		if (beforeCustMain == null & (beforeCustMain.getIntroducer() == null || "".equals(beforeCustMain.getIntroducer()))) {
 			tCustMain.setIntroducer("");
 		} else {
 			tCustMain.setIntroducer(beforeCustMain.getIntroducer());
@@ -466,11 +497,11 @@ public class L1101 extends TradeBuffer {
 //		Introducer
 		// 分行別預設0000 --2021.8.6 Fegie
 		tCustMain.setBranchNo("0000");
-		
+
 		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
 		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
-		
+
 		tCustMain.setDataStatus(0);
 
 	}
@@ -538,8 +569,7 @@ public class L1101 extends TradeBuffer {
 		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
 
 			// 0:正常戶 2:催收戶 4:逾期戶 6:呆帳戶 7:部分轉呆戶 => 不需授權
-			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4
-					|| tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
+			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
 				cChkFg = 0;
 				return cChkFg;
 			}

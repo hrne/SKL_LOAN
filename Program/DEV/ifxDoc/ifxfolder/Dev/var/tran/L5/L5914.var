@@ -30,17 +30,18 @@ E(0,40)ASGN(INQPRT$)
 !起始交易記號  0:起始交易,1:非起始交易
 #ORGFG=_,_,S
 E(0,0)
-K(MODIFYBUTTON,查詢)
+K(NOBUTTON,CLOSEY)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L5914" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L5914]                                 協辦人員等級歷程查詢"],
-[#<->#,"#FdEmpNo+員工代號",#EmpNo],
+[#<->#,"#FdEmpNo+員工代號",#EmpNo,#EmpNoX],
 [#<->#,"#FdEffectiveDate+生效日期",#EffectiveDate],
 ]
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
+<include src="ROM.icf::L5R28.dec"/>
 #CDCODEClassType=x,20,S
 T(3,CdCode.ClassType)
 #ClassTypeHelp=x,100,S
@@ -63,8 +64,17 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@EmpNo,#NTXBUF,1,6)
 T(1,@EffectiveDate,#NTXBUF,7,7)
 
+#RimEmployeeNo=X,6,S
+#RimL5R28=X,1,S
+T(2,@RimEmployeeNo,#EmpNo)
+RESET_RIM(#RimL5R28,L5R28)
+S(L5R28,1,#RimEmployeeNo)
+R(1,L5R28)
+T(2,@EmpNoX,#L5r28FullName)
+
 ! 員工代號
 #EmpNo=X,6,L
+#EmpNoX=X,50,L
 ! 生效日期
 #EffectiveDate=D,7,L
 
@@ -113,6 +123,7 @@ T(H,#OOEmpClass,#ClassTypeHelp)
 !------ 下行電文TOM ------
 <sub type="TOM">
 <include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R28.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 TXFORM=L5914
 #OOIneffectiveDate#OOEmpClass#OOClassPass#OOLastUpdate#OOLastUpdateEmpNo
@@ -122,7 +133,7 @@ TXFORM=L5914
 !---------- 單據輸出組合 ----------
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L5914" layout="cols=1;screen.width=[130,870];order=1;">
 [
-["[L5914]                                 協辦人員等級歷程查詢"],
+["[L5914]                                 協辦人員等級歷程查詢                            "],
 ! [#<->#,"@年月分",#YyyMm],
 ]
 </sub>

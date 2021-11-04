@@ -61,6 +61,10 @@ T(3,*)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
+
+#NTXBUF=X,4,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
 #RPTFG=A,1,S
 E(0,0)
 
@@ -135,11 +139,11 @@ E(0,2)
 ! 1+2+20+6+6+6
 ! T(2,#OOFunc2+#OOCityCode+#OOCityItem+#OOUnitCode+#OOIntRateCeiling+#OOIntRateFloor)
 #OOBUF2=X,41,S
-T(2,#OOFunc2+#OOCityCode+#OOCityItem+#OOUnitCode)
+T(2,#OOCityCode)
 
 #OOBTN2=X,4,S
 C(3,#CHAIN,1,HIDE(#OOBTN2),SHOW(#OOBTN2))
-BIND(grid,{cmd=CHAIN;ntxcd=L6704;text=修改;ntxbuf=#OOBUF2})
+BIND(grid,{cmd=CHAIN;ntxcd=L5606;text=修改;ntxbuf=#OOBUF2})
 
 
 </sub>
@@ -186,6 +190,8 @@ TXFORM=L5062
 
 #RPTFG=0,QUERY.GRID,L5062
 #any={detail:true, header:'L5062.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#OOAccCollPsn
 
 #OOBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}

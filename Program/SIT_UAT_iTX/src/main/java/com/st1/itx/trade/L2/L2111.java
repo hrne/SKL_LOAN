@@ -15,15 +15,16 @@ import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacShareAppl;
 import com.st1.itx.db.service.CdGseqService;
+import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCaseApplService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.GSeqCom;
+import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
-import com.st1.itx.util.data.DataLog;
 
 /*
  * L2111 案件申請登錄
@@ -71,7 +72,8 @@ public class L2111 extends TradeBuffer {
 	public FacShareApplService facShareApplService;
 	@Autowired
 	public FacMainService facMainService;
-
+	@Autowired
+	public CustDataCtrlService sCustDataCtrlService;
 	@Autowired
 	public DataLog iDataLog;
 
@@ -107,18 +109,13 @@ public class L2111 extends TradeBuffer {
 
 		// isEloan
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
-			this.isEloan = true;
+			this.isEloan = true;	
 		}
-		// 取得輸入資料
-		if (this.isEloan) {
-			iFuncCode = 1;
-		} else {
-			iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
-		}
+		
 		iApplNo = this.parse.stringToInteger(titaVo.getParam("ApplNo"));
 		iCustId = titaVo.getParam("CustId").trim();
 		iGroupId = titaVo.getParam("GroupId").trim();
-
+		
 		CustMain tCustMain = custMainService.custIdFirst(iCustId);
 		if (tCustMain == null) {
 			throw new LogicException(titaVo, "E2003", "客戶資料主檔" + iCustId); // 查無資料
@@ -131,15 +128,24 @@ public class L2111 extends TradeBuffer {
 			}
 			wkGroupUkey = tCustMain.getCustUKey();
 		}
-
+		
+		
+		// 取得輸入資料
+		if (this.isEloan) {
+			iFuncCode = 1;
+		} else {
+			iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
+		}
+		
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {
 			throw new LogicException(titaVo, "E2004", "L2R01"); // 功能選擇錯誤
 		}
-
+				
 		// 更新案件申請檔
 		int WkTbsYy = this.txBuffer.getTxCom().getTbsdy() / 10000;
 		int wkApplNo = iApplNo;
+				
 		switch (iFuncCode) {
 		case 1: // 新增
 

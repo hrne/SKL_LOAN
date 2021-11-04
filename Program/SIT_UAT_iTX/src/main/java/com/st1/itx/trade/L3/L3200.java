@@ -587,7 +587,7 @@ public class L3200 extends TradeBuffer {
 					return c1.getStatus() - c2.getStatus();
 				}
 				// 回收金額 > 0時排序,依應繳日順序由小到大、利率順序由大到小、額度由小到大
-				if (iRepayAmt.compareTo(BigDecimal.ZERO) > 0) {
+				if (iRepayType == 1) {
 					if (c1.getNextPayIntDate() != c2.getNextPayIntDate()) {
 						return c1.getNextPayIntDate() - c2.getNextPayIntDate();
 					}
@@ -596,7 +596,7 @@ public class L3200 extends TradeBuffer {
 					}
 				}
 				// 部分償還金額 > 0時排序,依利率順序由大到小
-				if (iExtraRepay.compareTo(BigDecimal.ZERO) > 0) {
+				if (iRepayType ==2) {
 					if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
 						return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 					}
@@ -615,6 +615,10 @@ public class L3200 extends TradeBuffer {
 		for (
 
 		LoanBorMain ln : lLoanBorMain) {
+			if (!(ln.getStatus() == 0)) {
+				continue;
+			}
+			this.info("order1 = " + ln.getLoanBorMainId());
 			wkCustNo = ln.getCustNo();
 			wkFacmNo = ln.getFacmNo();
 			wkBormNo = ln.getBormNo();
@@ -824,11 +828,11 @@ public class L3200 extends TradeBuffer {
 
 	private void calcRepayInt(LoanBorMain ln) throws LogicException {
 		checkMsg = " 戶號:" + iCustNo + "-" + ln.getFacmNo() + "-" + ln.getBormNo();
-		this.info("calcRepayInt ..." + checkMsg);
 		isCalcRepayInt = false;
 		isLoanClose = false; // 最後一期期款
 		BigDecimal wkRepayLoan = wkTotalPrincipal.add(wkTotalInterest).add(wkTotalDelayInt).add(wkTotalDelayInt)
 				.add(wkTotalBreachAmt);
+		this.info("calcRepayInt ..." + checkMsg + " 累計償還本利:" + wkRepayLoan + ", 試算償還本利:" + iRepayLoan);
 
 		// 整批入帳電文有償還本利償則只計至還至應繳日時本利 > 0 (未全部償還時)>= 已償還本利
 		if (iRepayLoan.compareTo(BigDecimal.ZERO) > 0) {
@@ -860,9 +864,6 @@ public class L3200 extends TradeBuffer {
 		wkExtraRepay = BigDecimal.ZERO;
 		wkRepaidPeriod = 0;
 
-		if (!(ln.getStatus() == 0 || ln.getStatus() == 4)) {
-			return;
-		}
 		if (ln.getActFg() == 1) {
 			throw new LogicException(titaVo, "E0021", checkMsg); // 該筆資料待放行中
 		}

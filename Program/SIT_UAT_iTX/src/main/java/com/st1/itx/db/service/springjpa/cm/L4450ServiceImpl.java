@@ -133,7 +133,9 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            and  a.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
 		sql += "                            and  a.seq = 1                 ";
 		sql += "  where b.\"Status\"= 0                                    ";
-		sql += "    and b.\"NextPayIntDate\" <= " + nextPayIntDate;
+// 未到期按應繳日，已到期按到期日
+		sql += "    and (   (b.\"MaturityDate\" >  " + nextPayIntDate + " and  b.\"NextPayIntDate\" <= "  + nextPayIntDate + ")" ;
+		sql += "         or (b.\"MaturityDate\" <= " + nextPayIntDate + " and  b.\"MaturityDate\"   <= "  + nextPayIntDate + ") )" ;
 //		追加逾期
 		sql += "    and b.\"NextPayIntDate\" >= " + iDeductDate;
 		sql += "    and f.\"RepayCode\" = 2                                ";
@@ -157,17 +159,14 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    and case                                               ";
 		sql += "         when ba.\"RepayBank\" = 700                      ";
 		sql += "           then case                                        ";
-		sql += "                 when substr(b.\"NextPayIntDate\",-2,2) IN ( '" + iPostSpecificDd + "' , '"
-				+ iPostSecondSpecificDd + "') ";
+		sql += "                 when substr(b.\"NextPayIntDate\",-2,2) IN ( '" + iPostSpecificDd + "' , '" + iPostSecondSpecificDd + "') ";
 		sql += "                 then 1                                    ";
 		sql += "                    else 0                                 ";
 		sql += "               end                                         ";
 		sql += "         else case                                          ";
-		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSpecificDdFrom + " and "
-				+ iAchSpecificDdTo;
+		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSpecificDdFrom + " and " + iAchSpecificDdTo;
 		sql += "               then 1                                      ";
-		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSecondSpecificDdFrom + " and "
-				+ iAchSecondSpecificDdTo;
+		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSecondSpecificDdFrom + " and " + iAchSecondSpecificDdTo;
 		sql += "               then 1                                      ";
 		sql += "                  else 0                                   ";
 		sql += "             end                                           ";
@@ -269,13 +268,13 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		sql += "   order by \"F4\",\"F3\",\"F0\",\"F1\",\"F2\"                              ";
-		
+
 		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

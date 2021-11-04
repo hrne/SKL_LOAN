@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -80,6 +82,11 @@ public class L5R20 extends TradeBuffer {
 			totaVo.putParam("L5R20ReMark", iCollLetter.getRemark());
 			totaVo.putParam("L5R20AddressCode", iCollLetter.getAddressCode());
 			totaVo.putParam("L5R20EditEmpNo", iCollLetter.getLastUpdateEmpNo());
+			String tU = iCollLetter.getLastUpdate().toString();
+			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uTime = tU.substring(11,13) + tU.substring(14,16);
+			totaVo.putParam("L5R20EditDate", uDate);
+			totaVo.putParam("L5R20EditTime", uTime);
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}

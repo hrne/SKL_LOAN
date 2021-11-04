@@ -1,6 +1,8 @@
 package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -44,7 +46,7 @@ public class L5R21 extends TradeBuffer {
 	public CollLawService iCollLawService;
 
 	@Override
-	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException { 
+	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		// L5401交易內調RIM用,資料來源為CdBcm表
 		this.info("active L5R21 ");
 		this.info("L5R21 titaVo=[" + titaVo + "]");
@@ -76,6 +78,11 @@ public class L5R21 extends TradeBuffer {
 			totaVo.putParam("L5R21ClCode2", iCollLaw.getClCode2());
 			totaVo.putParam("L5R21ClNo", iCollLaw.getClNo());
 			totaVo.putParam("L5R21EditEmpNo", iCollLaw.getLastUpdateEmpNo());
+			String tU = iCollLaw.getLastUpdate().toString();
+			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uTime = tU.substring(11,13) + tU.substring(14,16);
+			totaVo.putParam("L5R21EditDate", uDate);
+			totaVo.putParam("L5R21EditTime", uTime);
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}

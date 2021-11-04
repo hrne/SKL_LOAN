@@ -57,7 +57,9 @@ public class L2703 extends TradeBuffer {
 	public LoanBorMainService sLoanBorMainService;
 	@Autowired
 	public SendRsp sendRsp;
-
+	
+	private boolean isEloan = false;
+	
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -79,6 +81,7 @@ public class L2703 extends TradeBuffer {
 		
 		
 		String iReason = titaVo.getParam("Reason");
+		
 		
 		// new table
 		CustMain tCustMain = new CustMain();
@@ -134,7 +137,7 @@ public class L2703 extends TradeBuffer {
 		} else if (iFunCd == 2) {
 			tCustDataCtrl = sCustDataCtrlService.holdById(custNo);
 			if (tCustDataCtrl == null) {
-				throw new LogicException(titaVo, "E0004", "L2703 該戶號" + custNo + "不存在於結清戶個資控管檔。");
+				throw new LogicException(titaVo, "E0003", "L2703 該戶號" + custNo + "不存在於結清戶個資控管檔。");
 			}
 			
 			tCustDataCtrl.setApplMark(2);
@@ -189,7 +192,7 @@ public class L2703 extends TradeBuffer {
 		this.totaVo.putParam("OCreateDate", parse.stringToInteger(createDate) - 19110000);
 		this.totaVo.putParam("OCreateTime", createTime);
 
-		// 刪除須刷主管卡
+		// 刷主管卡
 		if (titaVo.getEmpNos().trim().isEmpty()) {
 			sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
 		}

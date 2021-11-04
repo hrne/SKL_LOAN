@@ -22,16 +22,19 @@ import com.st1.itx.db.domain.BankAuthAct;
 import com.st1.itx.db.domain.BankAuthActId;
 import com.st1.itx.db.domain.BankDeductDtl;
 import com.st1.itx.db.domain.BankDeductDtlId;
+import com.st1.itx.db.domain.BatxHead;
 import com.st1.itx.db.domain.LoanBook;
 import com.st1.itx.db.service.AchDeductMediaService;
 import com.st1.itx.db.service.BankAuthActService;
 import com.st1.itx.db.service.BankDeductDtlService;
+import com.st1.itx.db.service.BatxHeadService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBookService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4450ServiceImpl;
+import com.st1.itx.trade.BS.BS020;
 import com.st1.itx.trade.L4.L4450Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AuthLogCom;
@@ -79,6 +82,8 @@ public class L4450Batch extends TradeBuffer {
 	@Autowired
 	public LoanBookService loanBookService;
 	@Autowired
+	public BatxHeadService batxHeadService;
+	@Autowired
 	public L4450Report l4450Report;
 	@Autowired
 	public WebClient webClient;
@@ -86,6 +91,8 @@ public class L4450Batch extends TradeBuffer {
 	public AuthLogCom authLogCom;
 	@Autowired
 	public L4450ServiceImpl l4450ServiceImpl;
+	@Autowired
+	public BS020 bs020;
 
 //	寄送筆數
 	private int commitCnt = 200;
@@ -148,6 +155,21 @@ public class L4450Batch extends TradeBuffer {
 //	二扣應繳日：會計日前五個營業日（含本日），為基準計算上述之該日應繳日
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
+		int tbsdyf = txBuffer.getMgBizDate().getTbsDyf();
+		// 暫收抵繳整批入帳完畢，再產檔
+		BatxHead tBatxHead = batxHeadService.titaTxCdFirst(tbsdyf, "L4450", "8"); // <> 8-已刪除
+		if (tBatxHead == null || !"4".equals(tBatxHead.getBatxExeCode())) {
+			tBatxHead = bs020.exec(titaVo, this.txBuffer);
+			this.info("BatchNo = " + tBatxHead.getBatchNo());
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "F", "L4002", titaVo.getTlrNo(),
+					"請先完成暫收抵繳整批入帳(批號=" + tBatxHead.getBatchNo() + ")，再重新執行(產出銀行扣帳檔)", titaVo);
+		} else {
+			exec(titaVo);
+		}
+		return this.sendList();
+	}
+
+	private void exec(TitaVo titaVo) throws LogicException {
 		this.info("active L4450Batch  Call by " + titaVo.getTxcd());
 		baTxCom.setTxBuffer(this.getTxBuffer());
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -317,8 +339,6 @@ public class L4450Batch extends TradeBuffer {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", checkMsg, titaVo);
 			}
 		}
-
-		return null;
 
 	}
 

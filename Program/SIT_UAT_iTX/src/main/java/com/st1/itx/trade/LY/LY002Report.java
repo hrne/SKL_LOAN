@@ -300,11 +300,11 @@ public class LY002Report extends MakeReport {
 
 			if (sRow == eRow) {
 
-				makeExcel.setValue(sRow, 17, tempLineAmt, "#,##0");
+				makeExcel.setValue(sRow, 18, tempLineAmt, "#,##0");
 
 			} else {
 
-				makeExcel.setMergedRegionValue(sRow, eRow, 17, 17, tempLineAmt, "#,##0");
+				makeExcel.setMergedRegionValue(sRow, eRow, 18, 18, tempLineAmt, "#,##0");
 
 			}
 

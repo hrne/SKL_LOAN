@@ -32,6 +32,7 @@ E(0,0)
 [#<->#,"#FdMeetPlaceCode+面催地點類別",#MeetPlaceCode,#MeetPlaceCodeX],
 [#<->#,"#FdMeetPlace+面催地點",#MeetPlace],
 [#<->#,"#FdRemark+面催記錄",#Remark],
+["#FdEditDate+維護日期",#EditDate],["#FdEditTime+維護時間",#EditTime],
 [#<->#,"#FdEditEmpNo+維護人員",#EditEmpNo,#EditEmpNoX],
 ]
 !---------- AP TEXT AREA Variables ----------
@@ -162,6 +163,8 @@ T(2,@MeetPlace,#L5R19MeetPlace)
 T(2,@AccCollPsnNameX,#L5R19CollPsnNameX)
 T(2,@Remark,#L5R19ReMark)
 T(2,@EditEmpNo,#L5R19EditEmpNo)
+T(2,@EditDate,#L5R19EditDate)
+T(2,@EditTime,#L5R19EditTime)
 
 ! 調Rim完成預先帶入
 T(H,@ContactCodeX,#ContactCode,#ContactCodeHelp)
@@ -169,8 +172,8 @@ T(H,@MeetPsnCodeX,#MeetPsnCode,#MeetPsnCodeHelp)
 T(H,@MeetPlaceCodeX,#MeetPlaceCode,#MeetPlaceCodeHelp)
 T(H,@AccCollPsnCodeX,#AccCollPsnCode,#AccCollPsnCodeHelp)
 #Space2=X,1,S
-C(2,#FunctionCd,s,$,$,$,s,s)
-T(4,@EditEmpNo,TLRNO$)
+!C(2,#FunctionCd,s,$,$,$,s,s)
+!T(4,@EditEmpNo,TLRNO$)
 <include src="ROM.icf::L5R28.dec"/>
 #RimEmployeeNo=X,6,S
 #RimL5R28=X,1,S
@@ -193,6 +196,9 @@ T(2,@EditEmpNoX,#L5r28FullName)
 #FdRemark=X,1,L
 #FdEditEmpNo=X,1,L
 #FdFacmNo=X,1,L
+#FdEditDate=X,1,L
+#FdEditTime=X,1,L
+
 
 #FdMeetDate=X,1,L
 C(3,#FunctionCd,1,T(3,#FdMeetDate,*),$)
@@ -370,7 +376,7 @@ IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)HIDE(#BTNR)T(F,@AccCollPsnName,0)
 #BTNF=X,1,I,ui:button;value:法催地區別查詢;enable:1;tabbable:0
 #AccCollPsnNameBUF=X,6,S
 #AccCollPsnNameBIND=X,1,S
-BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#AccCollPsnNameBUF;ntxbuf5=type<-1:AccCollPsnName<-OOAccCollPsn})
+BIND(#BTNF,click, {cmd=CHAIN; ntxcd=L5062; ntxbuf=#AccCollPsnNameBUF;ntxbuf5=type<-1:AccCollPsnName<-OOAccCollPsn})
 
 ! 員工檔查詢
 #BTNR=X,1,I,ui:button;value:員工檔查詢;enable:1;tabbable:0
@@ -426,7 +432,7 @@ T(2,@MeetPlace,#L5R24FullAddress)
 ! 面催地點
 #MeetPlace=X,60,I
 C(2,#FunctionCd,S,$,$,$,s,s)
-C(3,#MeetPlaceCode,4,T(2,#MeetPlace, ),$)
+!C(3,#MeetPlaceCode,4,T(2,#MeetPlace, ),$)
 @V(7)
 
 ! 其他記錄
@@ -435,6 +441,14 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 ! T(2,#MemoA+#MemoB)
 ! 維護人員
 #EditEmpNo=X,6,L
+C(2,#FunctionCd,S,$,$,$,s,s)
+T(4,@EditEmpNo,TLRNO$)
+T(2,@RimEmployeeNo,#EditEmpNo)
+RESET_RIM(#RimL5R28,L5R28)
+S(L5R28,1,#RimEmployeeNo)
+R(1,L5R28)
+T(2,@EditEmpNoX,#L5r28FullName)
+
 #EditEmpNoX=X,50,L
 ! 經辦
 #TitaTlrNo=X,6,L
@@ -442,6 +456,21 @@ C(2,#FunctionCd,S,$,$,$,s,s)
 #TitaTxtNo=X,8,L
 ! 系統日期
 #TitaAcDate=D,7,L
+
+#CDate=D,7,S
+T(1,#SYSCDATE,2,7)
+! 維護日期
+#EditDate=D,7,L
+C(2,#FunctionCd,S,T(2,#CDate),T(2,#CDate),T(2,#CDate),s,s)
+
+! 維護時間
+#EditTimeX=X,6,S
+T(4,TIME$)
+#EditTime=X,4,L
+C(2,#FunctionCd,S,$,$,$,s,s)
+T(1,#EditTimeX,1,4)
+@V(7)
+
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------

@@ -3992,7 +3992,6 @@ TXFORM=L3R09
 #L3r10CurrencyCode=X,3,S
 #L3r10SyndAmt=m,14.2,S
 #L3r10PartAmt=m,14.2,S
-
 </L3R10.dec>
 
 
@@ -5082,6 +5081,23 @@ TXFORM=L4R25
 ^
 </L4R25.tom>
 
+
+<L4R26.dec>
+#L4r26FireInsuCovrg=m,14,S
+#L4r26EthqInsuCovrg=m,14,S
+#L4r26FireInsuPrem=m,14,S
+#L4r26EthqInsuPrem=m,14,S
+</L4R26.dec>
+
+<L4R26.tom>
+TXFORM=L4R26
+#L4r26FireInsuCovrg
+#L4r26EthqInsuCovrg
+#L4r26FireInsuPrem
+#L4r26EthqInsuPrem
+^
+</L4R26.tom>
+
 <L5R01.dec>
 #L5r01CustId=X,10,S
 #L5r01CustNo=9,7,S
@@ -5647,8 +5663,6 @@ TXFORM=L5R17
 #L5R18CallDate=D,7,S
 #L5R18ReMark=x,500,S
 #L5R18EditEmpNo=X,6,S
-#L5R18EditDate=X,7,S
-#L5R18EditTime=X,4,S
 </L5R18.dec>
 
 <L5R18.tom>
@@ -9014,3 +9028,19 @@ TXFORM=L6R44
 #L6r44GroupHelpList
 ^
 </L6R44.tom>
+
+
+! 聯貸費用代碼檔 
+<L6R45.dec>
+#L6R45SyndFeeCode=X,2,S
+#L6R45SyndFeeItem=x,60,S
+#L6R45AcctCode=X,3,S
+</L6R45.dec>
+
+<L6R45.tom>
+TXFORM=L6R45
+#L6R45SyndFeeCode
+#L6R45SyndFeeItem
+#L6R45AcctCode
+^
+</L6R45.tom>

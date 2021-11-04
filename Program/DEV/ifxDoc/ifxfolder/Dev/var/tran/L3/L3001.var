@@ -491,7 +491,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L3932; ntxbuf=#OOBUF9})
 T(2,#OOApplNo)
 
 #OOBTN10=X,1,S
-C(5,#OOShareFacFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L291B; ntxbuf=#OOBUF10}),$)
+C(5,#OOShareFacFg,Y,BIND(grid,{ cmd=CHAIN; ntxcd=L291B; ntxbuf=#OOBUF10}),BIND(grid,cancel))
 
 
 !連結 L2017額度與擔保品關聯查詢

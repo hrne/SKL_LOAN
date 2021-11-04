@@ -38,20 +38,38 @@ public class BS020ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int nextPayIntDate) throws Exception {
 		String sql = "SELECT ";
-		sql += "a.\"CustNo\"             as F0 ";
-		sql += ",a.\"FacmNo\"            as F1 ";
-		sql += ",a.\"RvBal\"             as F2 ";
-		sql += ",f.\"RepayCode\"         as F3 ";
-		sql += "FROM   \"AcReceivable\" a ";
-		sql += "LEFT JOIN \"FacMain\"  f ON f.\"CustNo\" = a.\"CustNo\" ";
-		sql += "                        AND f.\"FacmNo\" = a.\"FacmNo\" ";
-		sql += "WHERE a.\"AcctCode\" = 'TAV' ";
-		sql += "  and a.\"ClsFlag\" = 0 ";
-		sql += "  and nvl(f.\"RepayCode\",0) > 0 ";
-		sql += "order BY a.\"CustNo\" ";
-		sql += "        ,a.\"FacmNo\" ";
+		sql += " t.\"CustNo\"             as F0 "; // 戶號
+		sql += ",t.TAV                    as F1 "; // 暫收可抵繳金額
+		sql += ",NVL(b.\"RepayType\",9)   as F2 "; // 還款類別 1.期款 2.費用
+		sql += ",t.\"RepayCode\"          as F3 "; // 還款來源 02.銀行扣款 00.其他
+		sql += "FROM ";
+		sql += "( SELECT";
+		sql += "   a.\"CustNo\"             as \"CustNo\" ";
+		sql += "  ,max (case when NVL(f.\"RepayCode\",0) = 2 then 2  else 0 end)";  
+		sql += "                            as \"RepayCode\"  "; 
+		sql += "  ,sum (case when a.\"AcctCode\" = 'TAV' then a.\"RvBal\" else 0 end)  as TAV ";
+		sql += "  ,sum (case when a.\"AcctCode\" <> 'TAV' then a.\"RvBal\" else 0 end) as FEE ";
+		sql += "  FROM \"AcReceivable\" a ";
+		sql += "  LEFT JOIN \"FacMain\"  f ON f.\"CustNo\" = a.\"CustNo\" ";
+		sql += "                          AND f.\"FacmNo\" = a.\"FacmNo\" ";
+		sql += "  WHERE a.\"AcctFlag\" = 0 ";
+		sql += "    and a.\"ClsFlag\" = 0 ";
+	    sql += "  GROUP BY a.\"CustNo\"     ";
+		sql += ") t ";
+		sql += "Left join";
+		sql += "( SELECT";
+		sql += "   l.\"CustNo\"               as \"CustNo\" ";
+		sql += "  ,1                          as \"RepayType\" ";
+		sql += "  FROM \"LoanBorMain\" l ";
+		sql += "  WHERE l.\"Status\" = 0 ";
+		sql += "    and ( l.\"NextPayIntDate\" <= " + nextPayIntDate + " or l.\"MaturityDate\" <= "  + nextPayIntDate + ")";
+		sql += "  GROUP BY l.\"CustNo\"     ";
+		sql += " ) b  on b.\"CustNo\"    = t.\"CustNo\" ";
+		sql += "WHERE t.TAV > 0 ";
+		sql += " and (t.FEE > 0 or NVL(b.\"RepayType\",0) > 0)";
+		sql += "ORDER BY t.\"CustNo\" ";
 
 		this.info("sql=" + sql);
 		Query query;
