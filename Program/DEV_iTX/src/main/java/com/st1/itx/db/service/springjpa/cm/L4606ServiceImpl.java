@@ -33,7 +33,6 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("l4606.findAll ");
 		String entdy = String.valueOf((Integer.valueOf(titaVo.get("InsuEndMonth").toString()) + 191100));
@@ -47,11 +46,12 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   , I.\"CustNo\"                                                  ";
 		sql += "   , I.\"FacmNo\"                                                  ";
 		sql += "   , I.\"FireOfficer\"                                             ";
-		sql += "   , I.\"EmpId\"                                                   ";
+		sql += "   , C.\"CustName\"                                                ";
 		sql += "   , I.\"EmpName\"                                                 ";
 		sql += "   , I.\"Commision\"                                               ";
 		sql += "  FROM \"InsuComm\" I                                              ";
 		sql += "  LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\"  = I.\"FireOfficer\"   ";
+		sql += "  LEFT JOIN \"CustMain\" C ON c.\"CustNo\"  = I.\"CustNo\"         ";
 		sql += "  WHERE I.\"InsuYearMonth\" = " + entdy;
 		sql += "    and E.\"EmployeeNo\" is not null                               ";
 		sql += "  ORDER BY I.\"BatchNo\", I.\"InsuCate\"                           ";
@@ -64,7 +64,6 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(query);
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> find(TitaVo titaVo) throws Exception {
 		this.info("l4606.findAll ");
 		String entdy = String.valueOf((Integer.valueOf(titaVo.get("InsuEndMonth").toString()) + 191100));
@@ -78,10 +77,11 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   , I.\"CustNo\"                                                  ";
 		sql += "   , I.\"FacmNo\"                                                  ";
 		sql += "   , I.\"FireOfficer\"                                             ";
-		sql += "   , I.\"EmpId\"                                                   ";
+		sql += "   , C.\"CustName\"                                                ";
 		sql += "   , I.\"EmpName\"                                                 ";
 		sql += "   , I.\"Commision\"                                               ";
 		sql += "  FROM \"InsuComm\" I                                              ";
+		sql += "  LEFT JOIN \"CustMain\" C ON c.\"CustNo\"  = I.\"CustNo\"         ";
 		sql += "  WHERE I.\"InsuYearMonth\" = " + entdy;
 		sql += "    and I.\"FireOfficer\" is null        ";
 		sql += "  ORDER BY I.\"BatchNo\", I.\"InsuCate\"                           ";

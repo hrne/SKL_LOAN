@@ -23,6 +23,7 @@ import com.st1.itx.util.common.LoanCalcRepayIntCom;
 import com.st1.itx.util.common.LoanCloseBreachCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanSetRepayIntCom;
+import com.st1.itx.util.common.data.CalcRepayIntVo;
 import com.st1.itx.util.common.data.LoanCloseBreachVo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -76,8 +77,9 @@ public class L2931 extends TradeBuffer {
 	private BigDecimal iExtraRepay;
 	private String iExtraRepayFlag;
 	private List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+	private ArrayList<CalcRepayIntVo> lCalcRepayIntVo = new ArrayList<CalcRepayIntVo>();
 	private ArrayList<LoanCloseBreachVo> iListCloseBreach = new ArrayList<LoanCloseBreachVo>();
-//	private ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
+	private ArrayList<LoanCloseBreachVo> oListCloseBreach = new ArrayList<LoanCloseBreachVo>();
 
 	private int wkFacmNoStart = 1;
 	private int wkFacmNoEnd = 999;
@@ -212,7 +214,7 @@ public class L2931 extends TradeBuffer {
 
 					// 計算
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, wkTerms, 0, 0, iEntryDate, titaVo);
-					loanCalcRepayIntCom.getRepayInt(titaVo);
+					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 					ln.setStoreRate(loanCalcRepayIntCom.getStoreRate());
 					ln.setLoanBal(ln.getLoanBal().subtract(loanCalcRepayIntCom.getPrincipal()));
 					ln.setRepaidPeriod(ln.getRepaidPeriod() + loanCalcRepayIntCom.getRepaidPeriod());
@@ -235,15 +237,14 @@ public class L2931 extends TradeBuffer {
 			if (ln.getStatus() == 0 || ln.getStatus() == 4) {
 				if (iInqKind == 2 || wkExtraRepay.compareTo(BigDecimal.ZERO) >= 0) {
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
-					if (iInqKind == 2 || wkExtraRepay.compareTo(ln.getLoanBal()) >= 0
-							|| iEntryDate >= ln.getMaturityDate()) {
+					if (iInqKind == 2 || wkExtraRepay.compareTo(ln.getLoanBal()) >= 0) {
 						loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案試算
 					} else {
 						loanCalcRepayIntCom.setExtraRepayFlag(iExtraRepayFlag);
 						loanCalcRepayIntCom.setExtraRepay(wkExtraRepay); // 部分償還本金試算
 					}
 					// 計算
-//					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
+					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
 					wkTotaCount++;
 					LoanCloseBreachVo v = new LoanCloseBreachVo();
 					// 放入清償違約金計算List

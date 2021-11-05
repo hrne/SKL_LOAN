@@ -34,7 +34,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2414")
 @Scope("prototype")
 /**
@@ -63,14 +62,14 @@ public class L2414 extends TradeBuffer {
 	public FacMainService sFacMainService;
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
-	
+
 	/* 自動取號 */
 	@Autowired
 	GSeqCom gGSeqCom;
 
 	@Autowired
 	public ClFacCom clFacCom;
-	
+
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -85,7 +84,7 @@ public class L2414 extends TradeBuffer {
 	private boolean isEloan = false;
 	// 核准號碼
 	private int iApplNo;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2414 ");
@@ -251,23 +250,23 @@ public class L2414 extends TradeBuffer {
 				throw new LogicException("E2009", "擔保品其他檔");
 			}
 
-			if( iApplNo > 0 ) {
-			  List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();	
-			  String iOwnerId = titaVo.getParam("OwnerId");
-						
-			  CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);						
-			  if( custMain != null) {						
-			    String custUKey = custMain.getCustUKey().trim();
-				String relCode = titaVo.getParam("OwnerRelCode").trim();
-				HashMap<String, String> map = new HashMap<String, String>();
-				map.put("OwnerCustUKey", custUKey);
-				map.put("OwnerRelCode", relCode);
-				ownerMap.add(map);
-			  }		
-			  clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
-					
+			if (iApplNo > 0) {
+				List<HashMap<String, String>> ownerMap = new ArrayList<HashMap<String, String>>();
+				String iOwnerId = titaVo.getParam("OwnerId");
+
+				CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
+				if (custMain != null) {
+					String custUKey = custMain.getCustUKey().trim();
+					String relCode = titaVo.getParam("OwnerRelCode").trim();
+					HashMap<String, String> map = new HashMap<String, String>();
+					map.put("OwnerCustUKey", custUKey);
+					map.put("OwnerRelCode", relCode);
+					ownerMap.add(map);
+				}
+				clFacCom.insertClFac(titaVo, iClCode1, iClCode2, iClNo, iApplNo, ownerMap);
+
 			} // if
-			
+
 //			// 依核准號碼建立一筆額度與擔保品關聯檔
 //			if( iApplNo > 0 ) { // 核准編號大於0才去做
 //				ClFacId clFacId = new ClFacId();
@@ -477,6 +476,11 @@ public class L2414 extends TradeBuffer {
 			custMain.setCustName(titaVo.getParam("OwnerName"));
 			custMain.setDataStatus(1);
 			custMain.setTypeCode(2);
+			if (titaVo.getParam("OwnerId").length() == 8) {
+				custMain.setCuscCd("2");
+			} else {
+				custMain.setCuscCd("1");
+			}
 			try {
 				sCustMainService.insert(custMain, titaVo);
 			} catch (DBException e) {

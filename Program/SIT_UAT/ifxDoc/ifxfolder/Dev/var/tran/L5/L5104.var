@@ -1,0 +1,250 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5104)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#button=x,1,S
+K(MODIFYBUTTON,製表)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5104" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5104]                                 檔案借閱報表作業(列印)"],
+[#<->#,"#FdStartDate+借閱日期",#StartDate,"~",#EndDate],
+[#<->#,"#FdReportFlag+報表種類",#ReportFlag,#ReportFlagX],
+]
+!---------- AP TEXT AREA Variables ----------
+
+
+#FdStartDate=X,2,L
+#FdReportFlag=X,2,L
+
+!報表種類
+#ReportHelp=X,100,S
+T(3,1:未歸還月報表;2:法拍件月報表;3:件數統計表;4:全部)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,13,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@StartDate,#NTXBUF,1,7)
+INVOKEJS(SHOW,p1,02,02,1)
+
+#TODAY=A,7,S
+T(1,#SYSDATE,2,7)
+
+#PREVALUE=A,1,S
+E(0,@StartDate,#TODAY)
+E(0,@EndDate,#TODAY)
+
+! 開始日期
+#StartDate=D,7,I
+C(3,#CHAIN,0,$,s)
+
+! 終止日期
+#EndDate=D,7,I
+
+! 報表種類
+#ReportFlag=A,1,I
+E(0,4)
+HELP(#ReportHelp)
+@V(H,#ReportHelp)
+     
+#ReportFlagX=X,12,L
+T(3, )
+T(H,#ReportFlag,#ReportHelp)
+
+#Report=X,1,S
+SWITCH(#ReportFlag,
+1,T(2,@ReportA,Y)T(2,@ReportB,)T(2,@ReportC,),
+2,T(2,@ReportA,)T(2,@ReportB,Y)T(2,@ReportC,),
+3,T(2,@ReportA,)T(2,@ReportB,)T(2,@ReportC,Y),
+4,T(2,@ReportA,Y)T(2,@ReportB,Y)T(2,@ReportC,Y))
+#ReportA=X,1,S
+#ReportB=X,1,S
+#ReportC=X,1,S
+
+
+
+!  4.印表機代號: XXXXXXXXXX
+!  5.報表分數  : 1~255
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+![顯示註記]
+#L514APRT=A,1,S
+C(4,#ReportA,E(0,0),E(0,1))
+C(5,#TXFORM,L514A,E(0,1),E(0,0))
+![資料表頭(HEADER)長度]
+#L514AHD=n,3,S
+C(3,#L514APRT,0,S,$)E(0,6)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L514ALN=n,3,S
+C(3,#L514APRT,0,S,$)E(0,24)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L514AQPRT=n,2,S
+C(3,#L514APRT,0,S,$)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L514ALOOP=n,3,S
+C(3,#L514APRT,0,S,$)E(0,1)ASGN(LOOPHEIGHT$)
+
+![顯示註記]
+#L514BPRT=A,1,S
+C(4,#ReportB,E(0,0),E(0,1))
+![資料表頭(HEADER)長度]
+#L514BHD=n,3,S
+C(4,#ReportB,S,$)E(0,6)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L514BLN=n,3,S
+C(4,#ReportB,S,$)E(0,22)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L514BQPRT=n,2,S
+C(4,#ReportB,S,$)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L514BLOOP=n,3,S
+C(4,#ReportB,S,$)E(0,1)ASGN(LOOPHEIGHT$)
+
+#L514CPRT=A,1,S
+C(4,#ReportC,E(0,0),E(0,1))
+![資料表頭(HEADER)長度]
+#L514CHD=n,3,S
+C(4,#ReportC,S,$)E(0,6)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L514CLN=n,3,S
+C(4,#ReportC,S,$)E(0,8)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L514CQPRT=n,2,S
+C(4,#ReportC,S,$)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L514CLOOP=n,3,S
+C(4,#ReportC,S,$)E(0,1)ASGN(LOOPHEIGHT$)
+
+</sub>
+
+!------------ TXFORM = L5104 -----------
+<sub type="FORM" name="L514A" tota-mode="1">
+#BackACnt=m,6,O
+C(3,#BackACnt,0,E(0,@L514APRT,0),E(0,@L514APRT,1))
+
+#L514A_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+#ReportACustNo=A,7,O
+#ReportAFacmNo=A,3,O
+#ReportAUsageCode=A,2,O
+#ReportAUsageCodeX=x,4,O
+T(A,#ReportAUsageCode,L5DEF,UsageCodeDef,UsageCode,UsageCodeX)
+#ReportAApplEmpNo=X,6,O
+#ReportAKeeperEmpNo=X,6,O
+![防止二次單據]
+E(0,@L514BPRT,0)
+E(0,@L514CPRT,0)
+</sub>
+
+<sub type="FORM" name="L514B" tota-mode="1">
+#BackBCnt=m,6,O
+C(3,#BackBCnt,0,E(0,@L514BPRT,0),E(0,@L514BPRT,1))
+
+#L514B_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+#ReportBCustNo=A,7,O
+#ReportBFacmNo=A,3,O
+#ReportBApplEmpNo=X,6,O
+#ReportBKeeperEmpNo=X,6,O
+![防止二次單據]
+E(0,@L514APRT,0)
+E(0,@L514CPRT,0)
+</sub>
+
+<sub type="FORM" name="L514C" tota-mode="1">
+#BackCCnt=m,6,O
+C(3,#BackCCnt,0,E(0,@L514CPRT,0),E(0,@L514CPRT,1))
+
+#L514C_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+#ReportCUsageCode=A,2,O
+#ReportCUsageCodeX=x,4,O
+T(A,#ReportCUsageCode,L5DEF,UsageCodeDef,UsageCode,UsageCodeX)
+
+#ReportCUsageCnt=m,6,O
+![防止二次單據]
+E(0,@L514APRT,0)
+E(0,@L514BPRT,0)
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#StartDate#EndDate#ReportFlag
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L514A
+#BackACnt
+#ReportACustNo
+#ReportAFacmNo
+#ReportAUsageCode
+#ReportAApplEmpNo
+#ReportAKeeperEmpNo
+^
+TXFORM=L514B
+#BackBCnt
+#ReportBCustNo
+#ReportBFacmNo
+#ReportBApplEmpNo
+#ReportBKeeperEmpNo
+^
+TXFORM=L514C
+#BackCCnt
+#ReportCUsageCode
+#ReportCUsageCnt
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#L514APRT=1,L514A,NA,,D,15
+%
+#ReportACustNo
+#ReportAFacmNo
+#ReportAUsageCodeX
+#ReportAApplEmpNo
+#ReportAKeeperEmpNo
+@
+#BackACnt
+^
+
+#L514BPRT=1,L514B,NA,,D,15
+%
+#ReportBCustNo
+#ReportBFacmNo
+#ReportBApplEmpNo
+#ReportBKeeperEmpNo
+@
+#BackBCnt
+^
+
+#L514CPRT=1,L514C,NA,,D,15
+%
+#ReportCUsageCodeX
+#ReportCUsageCnt
+@
+#BackCCnt
+^
+</sub>

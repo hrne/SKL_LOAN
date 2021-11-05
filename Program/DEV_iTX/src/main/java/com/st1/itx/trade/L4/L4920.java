@@ -131,13 +131,7 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOReconCodeX", result.get("F7"));
 				occursList.putParam("OORepayAmt", result.get("F8"));
 				occursList.putParam("OOAcctAmt", result.get("F9"));
-
-				if (enterList.contains(result.get("F10"))) {
-					occursList.putParam("OODisacctAmt", parse.stringToBigDecimal(result.get("F8"))
-							.subtract(parse.stringToBigDecimal(result.get("F9"))));
-				} else {
-					occursList.putParam("OODisacctAmt", BigDecimal.ZERO);
-				}
+				occursList.putParam("OODisacctAmt", result.get("F15"));
 				occursList.putParam("OOProcStsCode", result.get("F10"));
 				occursList.putParam("OOProcCode", result.get("F11"));
 
@@ -146,7 +140,7 @@ public class L4920 extends TradeBuffer {
 
 					TempVo tempVo = new TempVo();
 					tempVo = tempVo.getVo(result.get("F12"));
-					
+
 					if (tempVo.get("ReturnMsg") != null && tempVo.get("ReturnMsg").length() > 0) {
 						procNote += "回應訊息:" + tempVo.get("ReturnMsg") + " ";
 					}
@@ -174,7 +168,8 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOProcNote", procNote);
 
 				occursList.putParam("OOTxSn", titaVo.getKinbr() + result.get("F13") + result.get("F14"));
-
+				occursList.putParam("OOFileName", result.get("F16"));
+				occursList.putParam("OOFileSeq", result.get("F17"));
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

@@ -19,6 +19,7 @@ import com.st1.itx.db.domain.AcReceivable;
 import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.util.common.AcDetailCom;
 import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
@@ -51,7 +52,11 @@ public class L4604 extends TradeBuffer {
 	@Autowired
 	public AcReceivableCom acReceivableCom;
 
+	@Autowired
+	AcDetailCom acDetailCom;
+
 	private int iInsuEndMonth = 0;
+	private int cnt = 0;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -95,6 +100,10 @@ public class L4604 extends TradeBuffer {
 				acDetail.setTxAmt(txAmt);
 				acDetail.setSlipNote(slipNote);
 				lAcDetail.add(acDetail);
+				// 產生會計分錄
+				this.txBuffer.addAllAcDetailList(lAcDetail);
+				acDetailCom.setTxBuffer(this.txBuffer);
+				acDetailCom.run(titaVo);
 			}
 		}
 
@@ -118,10 +127,8 @@ public class L4604 extends TradeBuffer {
 			openAcReceivable(lInsuRenew, titaVo);
 //			產出交易後報表
 			prodOutPut(lInsuRenew, titaVo);
-		} else {
-			throw new LogicException(titaVo, "E2003", "查無資料"); // 檢查錯誤
 		}
-
+		totaVo.putParam("OCnt", cnt);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -184,7 +191,6 @@ public class L4604 extends TradeBuffer {
 	}
 
 	private void prodOutPut(List<InsuRenew> lInsuRenew, TitaVo titaVo) {
-		int cnt = 0;
 		for (InsuRenew tInsuRenew : lInsuRenew) {
 			cnt = cnt + 1;
 
@@ -226,6 +232,5 @@ public class L4604 extends TradeBuffer {
 			this.totaVo.addOccursList(occursList);
 
 		}
-		totaVo.putParam("OCnt", cnt);
 	}
 }

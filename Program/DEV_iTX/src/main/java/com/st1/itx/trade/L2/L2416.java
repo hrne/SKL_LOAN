@@ -33,7 +33,6 @@ import com.st1.itx.util.data.DataLog;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service("L2416")
 @Scope("prototype")
 /**
@@ -59,7 +58,7 @@ public class L2416 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public ClLandReasonService sClLandReasonService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
 
@@ -101,7 +100,6 @@ public class L2416 extends TradeBuffer {
 			this.isEloan = true;
 		}
 
-		
 		iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
 		iClCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		iClCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
@@ -270,7 +268,6 @@ public class L2416 extends TradeBuffer {
 			}
 		}
 
-
 		this.totaVo.putParam("LandSeq", tClLand.getLandSeq());
 
 		this.addList(this.totaVo);
@@ -309,7 +306,7 @@ public class L2416 extends TradeBuffer {
 			tClLand.setLandNo1(titaVo.getParam("LandNo1"));
 			tClLand.setLandNo2(titaVo.getParam("LandNo2"));
 			tClLand.setLandLocation(titaVo.getParam("LandLocation"));
-			
+
 			tClLand.setLandCode("");
 			tClLand.setArea(BigDecimal.ZERO);
 			tClLand.setLandZoningCode("");
@@ -330,7 +327,7 @@ public class L2416 extends TradeBuffer {
 			tClLand.setLandNo1(titaVo.getParam("LandNo1"));
 			tClLand.setLandNo2(titaVo.getParam("LandNo2"));
 			tClLand.setLandLocation(titaVo.getParam("LandLocation"));
-			
+
 			tClLand.setLandCode(titaVo.getParam("LandCode"));
 			tClLand.setArea(parse.stringToBigDecimal(titaVo.getParam("Area")));
 			tClLand.setLandZoningCode(titaVo.getParam("LandZoningCode"));
@@ -362,24 +359,29 @@ public class L2416 extends TradeBuffer {
 			clLandOwnerId.setClCode2(iClCode2);
 			clLandOwnerId.setClNo(iClNo);
 			clLandOwnerId.setLandSeq(iLandSeq);
-			
+
 			CustMain custMain = sCustMainService.custIdFirst(iOwnerId, titaVo);
-			//ID不存在時,新增一筆資料在CustMain
+			// ID不存在時,新增一筆資料在CustMain
 			if (custMain == null) {
 				String Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-	    		custMain = new CustMain();
-	    		custMain.setCustUKey(Ukey);
-	    		custMain.setCustId(iOwnerId);
-	    		custMain.setCustName(titaVo.getParam("OwnerName" + i));
-	    		custMain.setDataStatus(1);
-	    		custMain.setTypeCode(2);
-	    		try {
-	    			sCustMainService.insert(custMain, titaVo);
+				custMain = new CustMain();
+				custMain.setCustUKey(Ukey);
+				custMain.setCustId(iOwnerId);
+				custMain.setCustName(titaVo.getParam("OwnerName" + i));
+				custMain.setDataStatus(1);
+				custMain.setTypeCode(2);
+				if (iOwnerId.length() == 8) {
+					custMain.setCuscCd("2");
+				} else {
+					custMain.setCuscCd("1");
+				}
+				try {
+					sCustMainService.insert(custMain, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "客戶資料主檔");
 				}
 			}
-			
+
 			clLandOwnerId.setOwnerCustUKey(custMain.getCustUKey());
 
 			tClLandOwner.setClLandOwnerId(clLandOwnerId);

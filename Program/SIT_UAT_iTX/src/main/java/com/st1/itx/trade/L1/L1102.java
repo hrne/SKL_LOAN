@@ -150,6 +150,7 @@ public class L1102 extends TradeBuffer {
 			// 產生一組新的識別碼
 			tCustMain.setCustUKey(UUID.randomUUID().toString().toUpperCase().replaceAll("-", ""));
 			tCustMain.setCustId(CustId);
+			tCustMain.setCuscCd("2");
 
 			setCstMain(titaVo);
 
@@ -218,8 +219,7 @@ public class L1102 extends TradeBuffer {
 
 		this.info("tCustMain = " + tCustMain);
 		// 用客戶識別碼取電話資料
-		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE,
-				titaVo);
+		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
 		List<CustTelNo> lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 		// 查詢行業別代號資料檔
@@ -229,10 +229,10 @@ public class L1102 extends TradeBuffer {
 		}
 
 		// 通訊地址
-		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain,titaVo);
+		String WkCurrAddres = custNoticeCom.getCurrAddress(tCustMain, titaVo);
 		this.info("CurrAddres" + WkCurrAddres);
 		// 戶籍地址
-		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain,titaVo);
+		String WkRegAddres = custNoticeCom.getRegAddress(tCustMain, titaVo);
 		this.info("CurrAddres" + WkRegAddres);
 
 		this.totaVo.putParam("OCustId", tCustMain.getCustId());
@@ -381,7 +381,7 @@ public class L1102 extends TradeBuffer {
 		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
 		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
-		
+
 		tCustMain.setDataStatus(0);
 	}
 
@@ -400,8 +400,7 @@ public class L1102 extends TradeBuffer {
 		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
 
 			// 0:正常戶 2:催收戶 4:逾期戶 6:呆帳戶 7:部分轉呆戶 => 不需授權
-			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4
-					|| tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
+			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
 				cChkFg = 0;
 				return cChkFg;
 			}

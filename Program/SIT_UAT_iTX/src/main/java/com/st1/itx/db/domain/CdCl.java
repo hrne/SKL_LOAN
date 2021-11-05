@@ -26,7 +26,7 @@ public class CdCl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -371567064943060932L;
+	private static final long serialVersionUID = -8232497504262132206L;
 
 @EmbeddedId
   private CdClId cdClId;
@@ -44,18 +44,9 @@ public class CdCl implements Serializable {
   @Column(name = "`ClItem`", length = 20)
   private String clItem;
 
-  // 最後使用碼
-  @Column(name = "`LastUsedNo`")
-  private int lastUsedNo = 0;
-
   // JCIC類別
   @Column(name = "`ClTypeJCIC`", length = 2)
   private String clTypeJCIC;
-
-  // 啟用記號
-  /* Y:啟用 , N:未啟用 */
-  @Column(name = "`Enable`", length = 1)
-  private String enable;
 
   // 建檔日期時間
   @CreatedDate
@@ -182,25 +173,6 @@ public class CdCl implements Serializable {
   }
 
 /**
-	* 最後使用碼<br>
-	* 
-	* @return Integer
-	*/
-  public int getLastUsedNo() {
-    return this.lastUsedNo;
-  }
-
-/**
-	* 最後使用碼<br>
-	* 
-  *
-  * @param lastUsedNo 最後使用碼
-	*/
-  public void setLastUsedNo(int lastUsedNo) {
-    this.lastUsedNo = lastUsedNo;
-  }
-
-/**
 	* JCIC類別<br>
 	* 
 	* @return String
@@ -217,25 +189,6 @@ public class CdCl implements Serializable {
 	*/
   public void setClTypeJCIC(String clTypeJCIC) {
     this.clTypeJCIC = clTypeJCIC;
-  }
-
-/**
-	* 啟用記號<br>
-	* Y:啟用 , N:未啟用
-	* @return String
-	*/
-  public String getEnable() {
-    return this.enable == null ? "" : this.enable;
-  }
-
-/**
-	* 啟用記號<br>
-	* Y:啟用 , N:未啟用
-  *
-  * @param enable 啟用記號
-	*/
-  public void setEnable(String enable) {
-    this.enable = enable;
   }
 
 /**
@@ -317,7 +270,7 @@ public class CdCl implements Serializable {
 
   @Override
   public String toString() {
-    return "CdCl [cdClId=" + cdClId + ", clItem=" + clItem + ", lastUsedNo=" + lastUsedNo + ", clTypeJCIC=" + clTypeJCIC + ", enable=" + enable
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "CdCl [cdClId=" + cdClId + ", clItem=" + clItem + ", clTypeJCIC=" + clTypeJCIC + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

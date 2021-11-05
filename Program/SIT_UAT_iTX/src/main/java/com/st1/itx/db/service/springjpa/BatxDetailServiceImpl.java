@@ -760,13 +760,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("fileCheck " + dbName + " : " + "acDate_0 : " + acDate_0 + " fileName_1 : " +  fileName_1);
     if (dbName.equals(ContentName.onDay))
-      slice = batxDetailReposDay.findAllByAcDateIsAndFileNameIsOrderByBatchNoDescRecordSeqAsc(acDate_0, fileName_1, pageable);
+      slice = batxDetailReposDay.findAllByAcDateIsAndFileNameIsOrderByBatchNoDesc(acDate_0, fileName_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = batxDetailReposMon.findAllByAcDateIsAndFileNameIsOrderByBatchNoDescRecordSeqAsc(acDate_0, fileName_1, pageable);
+      slice = batxDetailReposMon.findAllByAcDateIsAndFileNameIsOrderByBatchNoDesc(acDate_0, fileName_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = batxDetailReposHist.findAllByAcDateIsAndFileNameIsOrderByBatchNoDescRecordSeqAsc(acDate_0, fileName_1, pageable);
+      slice = batxDetailReposHist.findAllByAcDateIsAndFileNameIsOrderByBatchNoDesc(acDate_0, fileName_1, pageable);
     else 
-      slice = batxDetailRepos.findAllByAcDateIsAndFileNameIsOrderByBatchNoDescRecordSeqAsc(acDate_0, fileName_1, pageable);
+      slice = batxDetailRepos.findAllByAcDateIsAndFileNameIsOrderByBatchNoDesc(acDate_0, fileName_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

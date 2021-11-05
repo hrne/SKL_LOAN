@@ -34,6 +34,11 @@ E(0,0)
 #ActFgHelp=x,20,S
 T(3,1:登錄;2:放行;3:審核)
 C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
+
+#Hiddent=X,1,S
+C(3,#ACTFG,2,$,s)
+HIDE(#BTNA,#BTNB,#BTNC,#BTND)
+
 </sub> 
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L5103" layout="cols=3;screen.width=[130,370,130,370];printer.width=[20,80];order=1">
@@ -44,7 +49,7 @@ C(3,#FKEY,2,T(H,@ACTFGX,#ACTFG,#ActFgHelp),$)
 ["#FdApplSeq+申請序號",#ApplSeq],["#FdApplEmpNo+借閱人",#ApplEmpNo,#BTNA,#ApplEmpNoX],
 ["#FdUsageCode+用途",#UsageCode,#UsageCodeX],["#FdCopyCode+正本+/+影本",#CopyCode,#CopyCodeX],
 ["#FdApplDate+借閱日期",#ApplDate],["#FdKeeperEmpNo+管理人",#KeeperEmpNo,#BTNB,#KeeperEmpNoX],
-["#FdReturnDate+歸還日期",#ReturnDate],["#FdReturnEmpNo+歸還人",#ReturnEmpNo,#BTNC,#ReturnEmpNoX],
+["#FdReturnDate+歸還日期",#ReturnDate],["#FdReturnEmpNo+歸檔人",#ReturnEmpNo,#BTNC,#ReturnEmpNoX],
 [#<->#,"#FdRemark+備註",#Remark],
 [#<->#,"#FdApplObj+借閱項目",#ApplObj,#ApplObjX],
 [#<->#,#LABLEA,#BTN_GRDA,#BTN_GRDB,#BTN_GRDC,#BTN_GRDD,#BTN_GRDE],
@@ -134,31 +139,31 @@ T(2,@CopyCodeHelp,#HelpDesc4)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
-IF(#CHAIN==1,$,IF(#FKEY == 3,$,V(P,此為連動交易，請從交易:L5903進入)))
+IF(#CHAIN==1,$,IF(#FKEY == 3 || #FKEY == 7,$,V(P,此為連動交易，請從交易:L5903進入)))
 
 #InitApplCode=A,1,S
-IF(#FKEY == 3,E(0,1),S)
+IF(#FKEY == 3 ,E(0,1),S)
 HIDE(#BTND,#BTNA,#BTNB)
 
 
 ! 新增按鈕會帶入1 ??? 防呆
-#NTXBUF=X,200,S
+#NTXBUF=X,280,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@ApplCode,#NTXBUF,128,1)
+T(1,@ApplCode,#NTXBUF,208,1)
 C(3,#ApplCode,0,s,$)
 T(1,@CustNo,#NTXBUF,1,7)
 T(1,@FacmNo,#NTXBUF,8,3)
 T(1,@ApplSeq,#NTXBUF,11,3)
-T(1,@CustName,#NTXBUF,14,20)
-T(1,@KeeperEmpNo,#NTXBUF,34,6)
-T(1,@ApplEmpNo,#NTXBUF,40,6)
-T(1,@ApplDate,#NTXBUF,46,7)
-T(1,@ReturnDate,#NTXBUF,53,7)
-T(1,@ReturnEmpNo,#NTXBUF,60,6)
-T(1,@UsageCode,#NTXBUF,66,2)
-T(1,@Remark,#NTXBUF,68,60)
-T(1,@CopyCode,#NTXBUF,129,1)
-T(1,@ApplObj,#NTXBUF,130,1)
+T(1,@CustName,#NTXBUF,14,100)
+T(1,@KeeperEmpNo,#NTXBUF,114,6)
+T(1,@ApplEmpNo,#NTXBUF,120,6)
+T(1,@ApplDate,#NTXBUF,126,7)
+T(1,@ReturnDate,#NTXBUF,133,7)
+T(1,@ReturnEmpNo,#NTXBUF,140,6)
+T(1,@UsageCode,#NTXBUF,146,2)
+T(1,@Remark,#NTXBUF,148,60)
+T(1,@CopyCode,#NTXBUF,209,1)
+T(1,@ApplObj,#NTXBUF,210,1)
 INVOKEJS(SHOW,p1,02,02,1)
 
 ! 藏欄位
@@ -166,7 +171,6 @@ INVOKEJS(SHOW,p1,02,02,1)
 #PRE_GRDDIS=A,1,S
 INVOKEJS(SHOW,L5103,9,13,0)
 C(3,#ApplCode,0,E(0,@ApplCode,1),$)
-
 ! 登放記號
 #ACTFGX=X,8,L
 T(H,#ACTFG,#ActFgHelp)
@@ -183,6 +187,8 @@ E(0,0)
 BIND(#BTND,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFD;ntxbuf5=type<-1:
 CustNo<-OOCustNo:
 CustName<-OOCustName})
+
+
 
 ! 申請或歸還
 #ApplCode=A,1,S
@@ -220,7 +226,7 @@ T(F,@KeeperEmpNo,0)
 T(F,@Remark,0)
 T(F,@ApplObj,0)
 HIDE(#UsageCode,#CopyCode,#ApplObj)
-HIDE(#BTNA)
+HIDE(#BTNA,#BTND)
 ,$)
 T(H,#ApplCode,#ApplCodeHelp)
 IF(#InitApplCode == 1,
@@ -233,7 +239,9 @@ T(F,@CopyCode,0)
 T(F,@KeeperEmpNo,0)
 T(F,@Remark,0)
 T(F,@ApplObj,0)
+T(F,@ApplDate,0)
 ,$)
+
 
 ! 借款人戶號
 #CustNo=A,7,I
@@ -252,10 +260,10 @@ R(1,L5R33)
 
 ! 歸還為帶入，不為調RIM
 #SetValue=A,1,S
-T(2,@CustName,#L5R33CustName)
+IF(#FKEY == 7,$,T(2,@CustName,#L5R33CustName))
 C(3,#ApplCode,2,S,$)
 IF(#InitApplCode == 1,s,$)
-E(0,@ApplSeq,#L5R33ApplSeq)
+IF(#FKEY == 7,$,E(0,@ApplSeq,#L5R33ApplSeq))
 
 ! 額度編號
 #FacmNo=A,3,I
@@ -264,35 +272,25 @@ C(3,#ApplCode,1,$,s)
 @C(1,#FacmNo,s,V(P,額度不可為0),s)
 
 ! 借款人戶名---調RIM
-#CustName=X,20,L
+#CustName=X,100,L
 C(3,#ApplCode,0,$,s)
 
 ! 申請序號
 #ApplSeq=A,3,L
 C(3,#ApplCode,1,$,s)
 
+#BUFA=X,74,S
+!T(2,#ApplEmpNo)
 
 #BINDA=X,1,S
 BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFA;ntxbuf5=type<-1:
-!L5103ConfirmBrNo<-OBrNo:
+L5103ConfirmBrNo<-OBrNo:
 ApplEmpNo<-OTlrNo:
-ApplEmpNoX<-OTlrItem})
-!L5103ConfirmGroupNo<-OGroupNo})
+ApplEmpNoX<-OTlrItem:
+L5103ConfirmGroupNo<-OGroupNo})
 IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
-#BUFA=X,74,S
-T(2,#ApplEmpNo)
 
-#BUFB=X,74,S
-T(2,#KeeperEmpNo)
-!<瀏覽-員工號碼>
-#BINDB=X,1,S
-BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFB;ntxbuf5=type<-1:
-!L5103ConfirmBrNo<-OBrNo:
-KeeperEmpNo<-OTlrNo:
-KeeperEmpNoX<-OTlrItem})
-!L5103ConfirmGroupNo<-OGroupNo})
-IF(#InitApplCode == 1,BIND(grid,cancel),$)
 
 ! 借閱人
 #ApplEmpNo=X,6,I
@@ -324,7 +322,7 @@ C(3,#ApplCode,1,$,s)
 
 #CheckB=A,1,S
 C(4,#L5103ConfirmBrNo,s,C(4,#L5103ConfirmGroupNo,s,$))
-T(F,@KeeperEmpNo,0)
+!T(F,@KeeperEmpNo,0)
 
 ! 用途
 #UsageCode=A,2,I
@@ -361,9 +359,7 @@ E(0,0)
 
 #TODAY=A,7,S
 E(0,#SYSDATE)
-C(3,#ApplCode,2,
-E(0,@ReturnDate,#TODAY),
-E(0,@ApplDate,#TODAY))
+C(3,#ApplCode,2,E(0,@ReturnDate,#TODAY),E(0,@ApplDate,#TODAY))
 
 ! 借閱日期
 #ApplDate=D,7,I
@@ -375,12 +371,23 @@ A(DATE,0,#ApplDate)
 #SetTmpApplDate=A,1,S
 E(0,@TmpApplDate,#ApplDate)
 
+#BUFB=X,74,S
+!T(2,#KeeperEmpNo)
+!<瀏覽-員工號碼>
+#BINDB=X,1,S
+BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFB;ntxbuf5=type<-1:
+L5103ConfirmBrNo<-OBrNo:
+KeeperEmpNo<-OTlrNo:
+KeeperEmpNoX<-OTlrItem:
+L5103ConfirmGroupNo<-OGroupNo})
+IF(#InitApplCode == 1,BIND(grid,cancel),$)
+
 ! 管理人
 #KeeperEmpNo=X,6,I
 IF(#InitApplCode == 1,s,$)
 C(3,#ApplCode,1,$,s)
 C(3,#ApplCode,2,s,$)
-C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
+!C(4,#L5103ConfirmBrNo,$,C(4,#L5103ConfirmGroupNo,$,s))
 !V(P,請點選[瀏覽]取得員工編號)
 @V(7)
 
@@ -408,14 +415,17 @@ A(DATE,0,#ReturnDate)
 E(0,@TmpReturnDate,#ReturnDate)
 IF(#TmpReturnDate<#TmpApplDate,V(P,#AlertMsg1),$)
 
+
+#BUFC=X,74,S
+!T(2,#KeeperEmpNo)
+
 #BINDC=X,1,S
 BIND(#BTNC,click, {cmd=CHAIN; ntxcd=L6041; ntxbuf=#BUFC;ntxbuf5=type<-1:
-!L5103ConfirmBrNo<-OBrNo:
+L5103ConfirmBrNo<-OBrNo:
 ReturnEmpNo<-OTlrNo:
-ReturnEmpNoX<-OTlrItem})
-!L5103ConfirmGroupNo<-OGroupNo})
-#BUFC=X,74,S
-T(2,#KeeperEmpNo)
+ReturnEmpNoX<-OTlrItem:
+L5103ConfirmGroupNo<-OGroupNo})
+
 
 
 ! 歸還人

@@ -12,7 +12,7 @@ E(0,42)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,496)ASGN(INQLEN$)
+E(0,542)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -337,6 +337,10 @@ T(3,)T(H,#OOProcCode,#ProcCodeHelp)
 ! Brno(4)+TitaTlrNo(6)+TitaTxtNo(8)
 #OOTxSn=X,18,S
 
+#OOFileSeq=A,6,O
+
+#OOFileName=x,40,O
+
 #OOTxtNo=X,8,S
 T(1,@OOTxtNo,#OOTxSn,11,8)
 
@@ -437,6 +441,8 @@ TXFORM=L4920
 #OOProcCode
 #OOProcNote
 #OOTxSn
+#OOFileSeq
+#OOFileName
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
@@ -459,8 +465,6 @@ TXFORM=L4920
 
 #OOEntryDate=入帳日期
 {width:95,align:'center'}
-#OODetailSeq=檔名/序號
-{width:80}
 #OOCustNo=戶號
 {width:65}
 #OOFacmNo=額度
@@ -481,6 +485,13 @@ TXFORM=L4920
 {width:600}
 #OOBTN_A=
 {search:false,formatter:'cust:bind-button:#OOBTN_TXT',align:'center',canExport:false,width:35}
+
+#OOFileSeq=明細序號
+{width:80}
+#OOFileName=檔名
+{width:95}
+#OODetailSeq=檔名/序號
+{width:80}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4920;cpi=15"/>
 #BatchNo#OOStatusCode#OORepayType#FileName#ProcStsCode#CustNo

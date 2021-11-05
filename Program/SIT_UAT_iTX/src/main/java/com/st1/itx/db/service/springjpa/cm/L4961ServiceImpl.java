@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -18,14 +16,12 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4961ServiceImpl")
 @Repository
 /* 逾期放款明細 */
 public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4961ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -35,9 +31,6 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	// *** 折返控制相關 ***
 	private int index;
@@ -59,17 +52,17 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4961.findAll");
+		this.info("L4961.findAll");
 
 		int intSearchFlag = parse.stringToInteger(titaVo.getParam("SearchFlag"));
 		int intInsuYearMonth = parse.stringToInteger(titaVo.getParam("InsuYearMonth")) + 191100;
 		int intSearchOption = parse.stringToInteger(titaVo.getParam("SearchOption"));
 		int intRepayCode = parse.stringToInteger(titaVo.getParam("RepayCode"));
 
-		logger.info("intSearchFlag = " + intSearchFlag);
-		logger.info("intInsuYearMonth = " + intInsuYearMonth);
-		logger.info("intSearchOption = " + intSearchOption);
-		logger.info("intRepayCode = " + intRepayCode);
+		this.info("intSearchFlag = " + intSearchFlag);
+		this.info("intInsuYearMonth = " + intInsuYearMonth);
+		this.info("intSearchOption = " + intSearchOption);
+		this.info("intRepayCode = " + intRepayCode);
 
 		String sql = " ";
 		sql += " select                                                    ";
@@ -103,6 +96,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// T(3,0:正常未繳;1:正常已繳;2:借支;3:轉催;4:結案;7:續保;8:自保;9:全部)
 		switch (intSearchOption) {
 		case 0:
+			sql += "   and i.\"RenewCode\" = 2                             ";
 			sql += "   and i.\"StatusCode\" = 0                            ";
 			sql += "   and i.\"AcDate\" = 0                                ";
 			break;
@@ -127,14 +121,14 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		}
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -147,7 +141,7 @@ public class L4961ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

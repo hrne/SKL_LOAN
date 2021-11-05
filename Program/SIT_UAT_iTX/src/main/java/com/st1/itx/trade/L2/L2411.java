@@ -895,6 +895,11 @@ public class L2411 extends TradeBuffer {
 				custMain.setCustName(titaVo.getParam("OwnerName" + i));
 				custMain.setDataStatus(1);
 				custMain.setTypeCode(2);
+				if (iOwnerId.length() == 8) {
+					custMain.setCuscCd("2");
+				} else {
+					custMain.setCuscCd("1");
+				}
 				try {
 					sCustMainService.insert(custMain, titaVo);
 				} catch (DBException e) {

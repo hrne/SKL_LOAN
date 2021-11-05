@@ -56,7 +56,7 @@ import com.st1.itx.util.parse.Parse;
 //    支票兌現： 1.借款人 2.發票人
 //  3.預設匯款轉帳還款類別 
 //    帳還款類別 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他 11.債協匯入款 
-//    企金戶:95101 ==> 還款類別: 00 處理狀態 : 3.檢核錯誤 處理說明: 企金戶請變更<還款類別>後，重新檢核
+//    企金戶:95101 ==> 還款類別: 00 處理狀態 : 2.人工處理 處理說明: 企金戶請變更<還款類別>後，重新檢核
 //    個人戶期款:95102 ==> 最後一期(還款後本金餘額 =0 )=> 還款類別: 03-結案 ---->
 //    個人戶還本:95103 ==>
 //      1.與約定還本金額相同 ==> 還款類別:02-部分償還
@@ -1317,7 +1317,7 @@ public class TxBatchCom extends TradeBuffer {
 	/* 匯款轉帳依虛擬帳號設定還款類別 */
 	private void bankRmtRepayType(BatxDetail tDetail, TitaVo titaVo) throws LogicException {
 //		 1.期款 2.部分償還 3.結案 4.帳管費 5.火險費 6.契變手續費 7.法務費 9.其他 11.債協匯入款 
-// 企金戶:95101 ==> 還款類別: 00 處理狀態 : 3.檢核錯誤 處理說明: 企金戶請變更<還款類別>後，重新檢核
+// 企金戶:95101 ==> 還款類別: 00 處理狀態 : 2.人工處理 處理說明: 企金戶請變更<還款類別>後，重新檢核
 // 個人戶期款:95102 ==> 最後一期(還款後本金餘額 =0 )=> 還款類別: 03-結案 ---->
 // 個人戶還本:95103 ==>
 //          1.與大於等於約定還本金額 ==> 還款類別:02-部分償還
@@ -1327,22 +1327,13 @@ public class TxBatchCom extends TradeBuffer {
 		String VirtualAcctNo = this.tTempVo.getParam("VirtualAcctNo"); // 虛擬帳號
 		if (VirtualAcctNo != null && VirtualAcctNo.length() >= 5)
 			switch (VirtualAcctNo.substring(0, 5)) {
+			case "95101":
+				this.checkMsg = "企金戶請變更<還款類別>後，重新檢核";
+				this.procStsCode = "2"; // 2.人工處理
+				break;
 			case "95102":
 				this.repayType = 1;
 				break;
-			case "95101":
-				// 1.大於等於約定還本金額 ==> 還款類別:02-部分償還
-				if (this.repayType == 0) {
-					loanBookRepayType(tDetail, titaVo);
-				}
-				// 2.執行過清償作業 ==> 還款類別:03-結案 (check FacClose exist)
-				if (this.repayType == 0) {
-					facCloseRepayType(tDetail, titaVo);
-				}
-				// 3.預設為期款試算
-				if (this.repayType == 0) {
-					this.repayType = 1;
-				}
 			case "95103":
 				// 1.大於等於約定還本金額 ==> 還款類別:02-部分償還
 				if (this.repayType == 0) {

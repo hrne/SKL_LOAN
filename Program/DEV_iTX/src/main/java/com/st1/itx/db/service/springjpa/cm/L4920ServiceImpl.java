@@ -68,10 +68,10 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		戶號           #CustNo
 
 		int iAcDate = parse.stringToInteger(titaVo.get("AcDate")) + 19110000;
-		String iBatchNo = titaVo.get("BatchNo");
+		String iBatchNo = titaVo.get("BatchNo").trim();
 		String iStatusCode = titaVo.get("StatusCode");
 		int iRepayCode = parse.stringToInteger(titaVo.get("RepayCode"));
-		String iFileName = titaVo.get("FileName");
+		String iFileName = titaVo.get("FileName").trim();
 		String iProcStsCode = titaVo.get("ProcStsCode");
 		int iCustNo = parse.stringToInteger(titaVo.get("CustNo"));
 		String iReconCode = titaVo.get("ReconCode").trim();
@@ -104,41 +104,49 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,bd.\"TitaTlrNo\"    AS F13                 ";
 			sql += "  ,bd.\"TitaTxtNo\"    AS F14                 ";
 			sql += "  ,bd.\"DisacctAmt\"   AS F15                 ";
+			sql += "  ,bd.\"FileName\"     AS F16                 ";
+			sql += "  ,row_number() over (partition by bd.\"AcDate\", bd.\"BatchNo\", bd.\"FileName\" ";
+			sql += "                      order by \"DetailSeq\" Asc) as F17  ";
+			sql += " from \"BatxDetail\" bd                       ";
+			sql += " left join (                                  ";
+			sql += "     select                                   ";
+			sql += "      \"AcctCode\"                            ";
+			sql += "     ,\"AcctItem\"                            ";
+			sql += "     ,row_number() over (partition by \"AcctCode\" order by \"AcctCode\" Desc) as seq  ";
+			sql += "     from \"CdAcCode\"                        ";
+			sql += " )  ca on ca.\"AcctCode\" = bd.\"ReconCode\"  ";
+			sql += "      and ca.seq = 1                          ";
 		} else {
 			sql += " select                                       ";
 			sql += "   SUM(bd.\"RepayAmt\")     AS F0             ";
 			sql += "  ,SUM(bd.\"AcctAmt\")      AS F1             ";
 			sql += "  ,SUM(bd.\"RepayAmt\") - SUM(bd.\"AcctAmt\")   AS F2 ";
+			sql += " from \"BatxDetail\" bd                       ";
 		}
-		sql += " from \"BatxDetail\" bd                       ";
-		sql += " left join (                                  ";
-		sql += "     select                                   ";
-		sql += "      \"AcctCode\"                            ";
-		sql += "     ,\"AcctItem\"                            ";
-		sql += "     ,row_number() over (partition by \"AcctCode\" order by \"AcctCode\" Desc) as seq  ";
-		sql += "     from \"CdAcCode\"                        ";
-		sql += " )  ca on ca.\"AcctCode\" = bd.\"ReconCode\"  ";
-		sql += "      and ca.seq = 1                          ";
-		sql += " left join \"BatxHead\" bh on bh.\"AcDate\"  = bd.\"AcDate\"   ";
-		sql += "                          and bh.\"BatchNo\" = bd.\"BatchNo\"  ";
+
 		sql += " where bd.\"AcDate\" =       " + iAcDate;
 
-		if (!"".equals(iBatchNo)) {
+		if (!iBatchNo.isEmpty()) {
 			sql += "   and bd.\"BatchNo\" = '" + iBatchNo + "'";
 		}
 
-//		sql += "   and bh.\"BatxExeCode\" = '" + iStatusCode + "'";
+		// 刪除
+		if ("8".equals(iStatusCode)) {
+			sql += "   and bd.\"ProcStsCode\" in ('D') ";
+		} else {
+			sql += "   and bd.\"ProcStsCode\" not in ('D') ";
+		}
 
 		if (iRepayCode != 0) {
 			sql += "   and bd.\"RepayCode\" = " + iRepayCode;
 		}
 
-		if (!"".equals(iReconCode.trim())) {
+		if (!iReconCode.isEmpty()) {
 			sql += "   and bd.\"ReconCode\" = '" + iReconCode + "'";
 		}
 
-		if (!"".equals(iFileName.trim())) {
-			sql += "   and bd.\"FileName\" = '" + iFileName.trim() + "'";
+		if (!iFileName.isEmpty()) {
+			sql += "   and bd.\"FileName\" = '" + iFileName + "'";
 		}
 
 		switch (iProcStsCode) {

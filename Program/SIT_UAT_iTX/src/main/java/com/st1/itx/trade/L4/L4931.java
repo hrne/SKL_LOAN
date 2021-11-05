@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -40,7 +38,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4931 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4931.class);
 
 	@Autowired
 	public Parse parse;
@@ -60,7 +57,7 @@ public class L4931 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = 100;
- 
+
 		List<Map<String, String>> resultList = new ArrayList<Map<String, String>>();
 
 		try {
@@ -86,7 +83,7 @@ public class L4931 extends TradeBuffer {
 				dateUtil.setDate_1(parse.stringToInteger(result.get("F15")));
 				dateUtil.setMons(parse.stringToInteger(result.get("F17"))); // 調整周期(單位固定為月)
 				int nextAdjDate = dateUtil.getCalenderDay();
-				
+
 				int presEffDate = parse.stringToInteger(result.get("F14"));
 				int curtEffDate = parse.stringToInteger(result.get("F15"));
 				int prevIntDate = parse.stringToInteger(result.get("F18"));
@@ -100,8 +97,8 @@ public class L4931 extends TradeBuffer {
 				if (prevIntDate > 19110000) {
 					prevIntDate = prevIntDate - 19110000;
 				}
-				
-				if (nextAdjDate >19110000) {
+
+				if (nextAdjDate > 19110000) {
 					nextAdjDate = nextAdjDate - 19110000;
 				}
 				occursList.putParam("OOCityItem", result.get("F37"));
@@ -134,7 +131,8 @@ public class L4931 extends TradeBuffer {
 				occursList.putParam("OONextAdjDate", nextAdjDate);
 //				擬調利率
 				occursList.putParam("OONextAdjRate", result.get("F25"));
-				
+//              逾期期數
+				occursList.putParam("OOOvduTerm", result.get("F41"));
 				
 				TempVo tempVo = new TempVo();
 				tempVo = tempVo.getVo(result.get("F34"));

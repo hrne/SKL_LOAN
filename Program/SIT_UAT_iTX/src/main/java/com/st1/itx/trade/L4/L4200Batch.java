@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -165,7 +164,6 @@ public class L4200Batch extends TradeBuffer {
 
 	private int iAcDate = 0;
 	private String iBatchNo = "";
-	private String iTlrNo = "";
 
 	private int tableSize = 0;
 	private BigDecimal bigDe100 = new BigDecimal("100");
@@ -218,8 +216,15 @@ public class L4200Batch extends TradeBuffer {
 	private int totSuccCnt = 0;
 //	檢核失敗筆數
 	private int totFailCnt = 0;
-//	檢核成功金額
+//	總筆數
+	private int totCnt = 0;
+//	總金額	
 	private BigDecimal totAmt = BigDecimal.ZERO;
+//	
+	private int meadiaDatePost; // 郵局扣帳檔
+	private int meadiaDateAch1; // ACH 新光扣帳檔
+	private int meadiaDateAch2; // ACH他行扣帳檔
+
 	private String procStsCode = "";
 
 	private List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
@@ -234,10 +239,8 @@ public class L4200Batch extends TradeBuffer {
 //	寄送筆數
 	private int commitCnt = 500;
 
-//	郵局入帳日檢核記號
-	private int postEntryDateFlag = 0;
-//	ACH入帳日檢核記號
-	private int achEntryDateFlag = 0;
+//	入帳日
+	private int entryDate = 0;
 
 	private String sendMsg = "";
 	private Boolean checkFlag = true;
@@ -261,16 +264,6 @@ public class L4200Batch extends TradeBuffer {
 
 		iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		iBatchNo = titaVo.getParam("BatchNo");
-
-		iTlrNo = titaVo.getTlrNo();
-
-//		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		this.index = titaVo.getReturnIndex();
-//		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = Integer.MAX_VALUE;
-
-//		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", titaVo.getTlrNo(),
-//				"L4200" + " - " + iBatchNo + " 整批處理中，請稍候", titaVo);
 
 //		暫定路徑 待討論過後決定抓取路徑方法
 
@@ -531,7 +524,7 @@ public class L4200Batch extends TradeBuffer {
 //			資料筆數:n 				uploadFile.size()
 //			資料庫,當天,同批號,未檢核筆數:m	lBatxDetail.size()
 //			loop : m+1~m+n 
-			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, this.limit, titaVo);
+			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
 
 			lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 
@@ -669,7 +662,6 @@ public class L4200Batch extends TradeBuffer {
 				tBatxDetail.setBatxDetailId(tBatxDetailId);
 				tBatxDetail.setRepayCode(1);
 				tBatxDetail.setFileName(filePath1.substring(filePath1.indexOf("rbalmall")));
-				tBatxDetail.setRecordSeq(i - tableSize + 1);
 				tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("OccEntryDate")));
 				tBatxDetail.setCustNo(custNo);
 				tBatxDetail.setFacmNo(0);
@@ -747,7 +739,8 @@ public class L4200Batch extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException("E0005", "tBankRmtf Insert Fail : " + e.getErrorMsg());
 				}
-
+				totAmt = totAmt.add(tBatxDetail.getRepayAmt());
+				entryDate = tBatxDetail.getEntryDate();
 				try {
 					batxDetailService.insert(tBatxDetail, titaVo);
 				} catch (DBException e) {
@@ -780,7 +773,7 @@ public class L4200Batch extends TradeBuffer {
 			String procCode = "00000";
 			String procCodeX = "";
 
-			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, this.limit, titaVo);
+			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
 
 			lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 
@@ -835,13 +828,6 @@ public class L4200Batch extends TradeBuffer {
 					}
 
 					achEntryDate = tAchDeductMedia.getEntryDate();
-
-//					僅檢查第一筆
-					if (i == tableSize) {
-						if (iAcDate < (achEntryDate + 19110000)) {
-							achEntryDateFlag = 1;
-						}
-					}
 					achRepayType = tAchDeductMedia.getRepayType();
 //					回寫媒體檔
 					tAchDeductMedia = achDeductMediaService.holdById(tAchDeductMedia, titaVo);
@@ -849,6 +835,11 @@ public class L4200Batch extends TradeBuffer {
 					tAchDeductMedia.setAcDate(iAcDate);
 					tAchDeductMedia.setBatchNo(iBatchNo);
 					tAchDeductMedia.setDetailSeq(i + 1);
+					if ("1".equals(tAchDeductMedia.getMediaKind())) {
+						meadiaDateAch1 = tAchDeductMedia.getMediaDate();
+					} else {
+						meadiaDateAch2 = tAchDeductMedia.getMediaDate();
+					}
 					try {
 						achDeductMediaService.update(tAchDeductMedia, titaVo);
 					} catch (DBException e) {
@@ -863,7 +854,6 @@ public class L4200Batch extends TradeBuffer {
 //				02.銀行扣款
 				tBatxDetail.setRepayCode(2);
 				tBatxDetail.setFileName(filePath2A.substring(filePath2A.indexOf("AHR1")));
-				tBatxDetail.setRecordSeq(i - tableSize + 1);
 				tBatxDetail.setEntryDate(achEntryDate);
 				tBatxDetail.setCustNo(reCustNo);
 				tBatxDetail.setFacmNo(reFacmNo);
@@ -919,6 +909,8 @@ public class L4200Batch extends TradeBuffer {
 					tBatxDetail.setMediaKind(tAchDeductMedia.getMediaKind());
 					tBatxDetail.setMediaSeq(tAchDeductMedia.getMediaSeq());
 				}
+				totAmt = totAmt.add(tBatxDetail.getRepayAmt());
+				entryDate = tBatxDetail.getEntryDate();
 				try {
 					batxDetailService.insert(tBatxDetail, titaVo);
 				} catch (DBException e) {
@@ -946,7 +938,7 @@ public class L4200Batch extends TradeBuffer {
 			ArrayList<OccursList> uploadFile = postDeductFileVo.getOccursList();
 			String procCode = "00000";
 
-			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, this.limit, titaVo);
+			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
 
 			lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 
@@ -966,13 +958,6 @@ public class L4200Batch extends TradeBuffer {
 
 				PostDeductMedia tPostDeductMedia = new PostDeductMedia();
 
-//				僅檢查第一筆
-				if (i == tableSize) {
-					if (iAcDate < parse.stringToInteger(tempOccursList.get("OccTxDate")) + 19110000) {
-						postEntryDateFlag = 1;
-					}
-				}
-
 //			B.(first check)檢核資料與寫入檔是否相同  並回寫處理狀態(ProcStsCode)
 				BigDecimal reRepayAmt = parse.stringToBigDecimal(tempOccursList.get("OccRepayAmt")).divide(bigDe100);
 				int reEntryDate = parse.stringToInteger(tempOccursList.get("OccTxDate"));
@@ -990,11 +975,7 @@ public class L4200Batch extends TradeBuffer {
 				tempVo = new TempVo();
 
 				if (tPostDeductMedia != null) {
-//					結案
-//					if (tPostDeductMedia.getRepayType() == 3) {
-//						postRepayType = 1;
-//						tempVo.put("LastTermFg", "1");
-//					} else {
+					// mediaDate = tPostDeductMedia.getMediaDate();
 					postRepayType = tPostDeductMedia.getRepayType();
 //					}
 					if ("00".equals(returnCode)) {
@@ -1010,6 +991,7 @@ public class L4200Batch extends TradeBuffer {
 					tPostDeductMedia.setAcDate(iAcDate);
 					tPostDeductMedia.setBatchNo(iBatchNo);
 					tPostDeductMedia.setDetailSeq(i + 1);
+					meadiaDatePost = tPostDeductMedia.getMediaDate();
 					try {
 						postDeductMediaService.update(tPostDeductMedia, titaVo);
 					} catch (DBException e) {
@@ -1031,7 +1013,6 @@ public class L4200Batch extends TradeBuffer {
 //				02.銀行扣款
 				tBatxDetail.setRepayCode(2);
 				tBatxDetail.setFileName(filePath2P.substring(filePath2P.indexOf("PRSBCP4")));
-				tBatxDetail.setRecordSeq(i - tableSize + 1);
 				tBatxDetail.setEntryDate(reEntryDate + 19110000);
 				tBatxDetail.setCustNo(parse.stringToInteger(tempOccursList.get("OccCustNo")));
 				tBatxDetail.setFacmNo(parse.stringToInteger(tempOccursList.get("OccFacmNo")));
@@ -1086,6 +1067,8 @@ public class L4200Batch extends TradeBuffer {
 					tBatxDetail.setMediaSeq(tPostDeductMedia.getMediaSeq());
 				}
 
+				totAmt = totAmt.add(tBatxDetail.getRepayAmt());
+				entryDate = tBatxDetail.getEntryDate();
 				try {
 					batxDetailService.insert(tBatxDetail, titaVo);
 				} catch (DBException e) {
@@ -1117,7 +1100,7 @@ public class L4200Batch extends TradeBuffer {
 
 			String procCode = "00000";
 			String procCodeX = "";
-			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, this.limit, titaVo);
+			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
 
 			lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 
@@ -1163,7 +1146,7 @@ public class L4200Batch extends TradeBuffer {
 				} else {
 					Slice<EmpDeductDtl> slEmpDeductDtl = empDeductDtlService.mediaSeqEq(
 							tEmpDeductMedia.getMediaDate() + 19110000, tEmpDeductMedia.getMediaKind(),
-							tEmpDeductMedia.getMediaSeq(), this.index, Integer.MAX_VALUE, titaVo);
+							tEmpDeductMedia.getMediaSeq(), 0, Integer.MAX_VALUE, titaVo);
 					if (slEmpDeductDtl == null) {
 						throw new LogicException("E0014", "無此員工扣款檔" + tEmpDeductMedia.getEmpDeductMediaId()); // 檔案錯誤
 					}
@@ -1203,7 +1186,6 @@ public class L4200Batch extends TradeBuffer {
 				} else if ("5".equals(mediaType)) {
 					tBatxDetail.setFileName(filePath3.substring(filePath3.indexOf("LNM617P")));
 				}
-				tBatxDetail.setRecordSeq(i - tableSize + 1);
 				tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("OccEntryDate")));
 				tBatxDetail.setCustNo(parse.stringToInteger(tempOccursList.get("OccCustNo")));
 				tBatxDetail.setFacmNo(0);
@@ -1260,6 +1242,9 @@ public class L4200Batch extends TradeBuffer {
 					tBatxDetail.setMediaSeq(tEmpDeductMedia.getMediaSeq());
 				}
 
+				totAmt = totAmt.add(tBatxDetail.getRepayAmt());
+				entryDate = tBatxDetail.getEntryDate();
+
 				try {
 					batxDetailService.insert(tBatxDetail, titaVo);
 				} catch (DBException e) {
@@ -1280,7 +1265,7 @@ public class L4200Batch extends TradeBuffer {
 			batxChequeFileVo.setValueFromFile(dataLineList4);
 			ArrayList<OccursList> uploadFile = batxChequeFileVo.getOccursList();
 
-			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, this.index, this.limit, titaVo);
+			sBatxDetail = batxDetailService.findL4200AEq(iAcDate, iBatchNo, 0, Integer.MAX_VALUE, titaVo);
 
 			lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
 
@@ -1354,8 +1339,8 @@ public class L4200Batch extends TradeBuffer {
 //					於AcRecivible.RvNo(需拆字串 : 9票據帳號+1空白+7票號  ), 找到相同者(可能兩筆), 比對加總金額 若不相等則error
 //					若相等則利用銷帳檔之戶號額度找尋相關欄位
 
-					sAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), rvno, this.index,
-							this.limit, titaVo);
+					sAcReceivable = acReceivableService.acrvRvNoEq("TCK", tLoanCheque.getCustNo(), rvno, 0,
+							Integer.MAX_VALUE, titaVo);
 					lAcReceivable = sAcReceivable == null ? null : sAcReceivable.getContent();
 
 					BigDecimal acrvCheqAmt = BigDecimal.ZERO;
@@ -1421,7 +1406,6 @@ public class L4200Batch extends TradeBuffer {
 //						04.支票兌現
 						tBatxDetail.setRepayCode(4);
 						tBatxDetail.setFileName(filePath4.substring(filePath4.indexOf("mortgage")));
-						tBatxDetail.setRecordSeq(i - tableSize + 1);
 						tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")) + 19110000);
 						tBatxDetail.setCustNo(tLoanCheque.getCustNo());
 						tBatxDetail.setFacmNo(tAcReceivable.getFacmNo());
@@ -1447,6 +1431,8 @@ public class L4200Batch extends TradeBuffer {
 						txAmlCom.setTxBuffer(this.getTxBuffer());
 						tempVo = txAmlCom.batxCheque(tempVo, tLoanCheque, iBatchNo, titaVo);
 						tBatxDetail.setProcNote(tempVo.getJsonString());
+						totAmt = totAmt.add(tBatxDetail.getRepayAmt());
+						entryDate = tBatxDetail.getEntryDate();
 
 						try {
 							batxDetailService.insert(tBatxDetail, titaVo);
@@ -1463,7 +1449,6 @@ public class L4200Batch extends TradeBuffer {
 //					04.支票兌現
 					tBatxDetail.setRepayCode(4);
 					tBatxDetail.setFileName(filePath4.substring(filePath4.indexOf("mortgage")));
-					tBatxDetail.setRecordSeq(i - tableSize + 1);
 					tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")) + 19110000);
 					if (tLoanCheque != null) {
 						tBatxDetail.setCustNo(tLoanCheque.getCustNo());
@@ -1489,6 +1474,8 @@ public class L4200Batch extends TradeBuffer {
 					tBatxDetail.setMediaDate(0);
 					tBatxDetail.setMediaKind("");
 					tBatxDetail.setMediaSeq(0);
+					totAmt = totAmt.add(tBatxDetail.getRepayAmt());
+					entryDate = tBatxDetail.getEntryDate();
 
 					try {
 						batxDetailService.insert(tBatxDetail, titaVo);
@@ -1550,8 +1537,8 @@ public class L4200Batch extends TradeBuffer {
 
 	private void updateBankDeductDtl(int mediaDate, String mediaKind, int mediaSeq, String returnCode, TitaVo titaVo)
 			throws LogicException {
-		sBankDeductDtl = bankDeductDtlService.mediaSeqRng(mediaDate + 19110000, mediaKind, mediaSeq, this.index,
-				this.limit, titaVo);
+		sBankDeductDtl = bankDeductDtlService.mediaSeqRng(mediaDate + 19110000, mediaKind, mediaSeq, 0,
+				Integer.MAX_VALUE, titaVo);
 		lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
 
 		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
@@ -1589,9 +1576,15 @@ public class L4200Batch extends TradeBuffer {
 
 	private void checkFile(String fileName, TitaVo titaVo) throws LogicException {
 		this.info("checkFile Start...");
-//		1.檢核檔名，不為下列區間者為False
-//		2.檢核檔案內容，若格式不合，此階段先提出錯誤
-//		3.檢核該檔名是否已上傳過，若上傳過，該批只能是已刪除，否則為False
+// --- 錯誤訊息 ---
+//		1.檔名不符處理範圍 ： 檢核檔名
+//        1).匯款轉帳： rbalmall
+//        2).ACH扣款： AHR11P, AHR12P
+//        3).郵局扣款：PRSBCP4_53N, PRSBCP4_8460001, PRSBCP4_8460002
+//        4).員工扣薪：10H00, LNM617P
+//		2.檔案錯誤  ...： 檢核檔案內容，若格式不合，此階段先提出錯誤
+//		3.相同檔名已存在，需先刪除此批號     
+//      4.需按來源(匯款轉帳，銀行扣款、員工扣薪、支票兌現)，分開上傳;
 
 		this.info("fileName ..." + fileName);
 
@@ -1602,6 +1595,10 @@ public class L4200Batch extends TradeBuffer {
 			checkFlag = false;
 		}
 
+		int Rmtfkind = 0;
+		int bankDeductKind = 0;
+		int empDeductKind = 0;
+		int mortgageKind = 0;
 		for (String filename : filelist) {
 //			每次執行setValue後，需初始化occursList
 			initialFileVoOccursList();
@@ -1619,6 +1616,7 @@ public class L4200Batch extends TradeBuffer {
 			}
 
 			if (filename.indexOf("rbalmall") >= 0) {
+				Rmtfkind = 1;
 				try {
 					bankRmtfFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1627,6 +1625,7 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else if (filename.indexOf("AHR11P") >= 0) {
+				bankDeductKind = 1;
 				try {
 					achDeductFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1635,6 +1634,7 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else if (filename.indexOf("AHR12P") >= 0) {
+				bankDeductKind = 1;
 				try {
 					achDeductFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1643,6 +1643,7 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else if (filename.indexOf("PRSBCP4_53N") >= 0) {
+				bankDeductKind = 1;
 				try {
 					postDeductFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1651,6 +1652,7 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else if (filename.indexOf("PRSBCP4_8460001") >= 0) {
+				bankDeductKind = 1;
 				try {
 					postDeductFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1659,6 +1661,7 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else if (filename.indexOf("PRSBCP4_8460002") >= 0) {
+				bankDeductKind = 1;
 				try {
 					postDeductFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1667,6 +1670,7 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else if (filename.indexOf("10H00") >= 0) {
+				empDeductKind = 1;
 				try {
 					empDeductFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1675,6 +1679,7 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else if (filename.indexOf("LNM617P") >= 0) {
+				empDeductKind = 1;
 				try {
 					empDeductFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1683,6 +1688,7 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else if (filename.indexOf("mortgage") >= 0) {
+				mortgageKind++;
 				try {
 					batxChequeFileVo.setValueFromFile(dataLineList1);
 				} catch (LogicException e) {
@@ -1691,24 +1697,23 @@ public class L4200Batch extends TradeBuffer {
 					break;
 				}
 			} else {
-				sendMsg = sendMsg + removeDot(filename) + "，檔名不符本交易處理範圍。";
+				sendMsg = sendMsg + removeDot(filename) + "，檔名不符處理範圍。";
 				checkFlag = false;
 				break;
 			}
-
+			if ((Rmtfkind +bankDeductKind + empDeductKind + mortgageKind) > 1) {
+				sendMsg = sendMsg + "，匯款轉帳，銀行扣款、員工扣薪、支票兌現。";
+				checkFlag = false;
+			}
 			if (checkFlag) {
-				sBatxDetail = batxDetailService.fileCheck(iAcDate, filename, this.index, this.limit, titaVo);
-
+				sBatxDetail = batxDetailService.fileCheck(iAcDate, filename, 0, Integer.MAX_VALUE, titaVo);
 				lBatxDetail = sBatxDetail == null ? null : sBatxDetail.getContent();
-
 				if (lBatxDetail != null && lBatxDetail.size() != 0) {
 					BatxHead tBatxHead = new BatxHead();
 					BatxHeadId tBatxHeadId = new BatxHeadId();
-
 					tBatxHeadId.setAcDate(lBatxDetail.get(0).getAcDate() + 19110000);
 					tBatxHeadId.setBatchNo(lBatxDetail.get(0).getBatchNo());
 					tBatxHead = batxHeadService.findById(tBatxHeadId, titaVo);
-
 					if (tBatxHead == null) {
 						sendMsg = sendMsg + removeDot(filename) + "，明細檔存在，總數檔不存在";
 						checkFlag = false;
@@ -1717,7 +1722,7 @@ public class L4200Batch extends TradeBuffer {
 					if ("8".equals(tBatxHead.getBatxExeCode())) {
 						checkFlag = true;
 					} else {
-						sendMsg = sendMsg + removeDot(filename) + "，已存在，需先刪除此批號 : " + lBatxDetail.get(0).getBatchNo();
+						sendMsg = sendMsg + removeDot(filename) + "，相同檔名已存在，需先刪除此批號 : " + lBatxDetail.get(0).getBatchNo();
 						checkFlag = false;
 						break;
 					}
@@ -1729,174 +1734,102 @@ public class L4200Batch extends TradeBuffer {
 	}
 
 	private void checkBatxHead(BatxHeadId tBatxHeadId, BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
-
+// --- 提示訊息 ---
+//  1.與提出媒體檔不符， 筆數= xxx , 金額 = xxxx
+//  2.入帳日期 xxxxxxx 大於會計日期  xxxxxxx
+//  3.與日期 : xxxxxxx  "，批號 : xxxxxxx 筆數、金額相同
+//    檢查本日、上營業日、上上營業日
 		totSuccCnt = totSuccCnt + rmftSuccCnt + achSuccCnt + postSuccCnt + empASuccCnt + empBSuccCnt + chequeSuccCnt;
 		totFailCnt = totFailCnt + rmftFailCnt + achFailCnt + postFailCnt + empAFailCnt + empBFailCnt + chequeFailCnt;
-		totAmt = totAmt.add(rmftSuccAmt).add(achSuccAmt).add(postSuccAmt).add(empBSuccAmt).add(chequeSuccAmt);
+//		總筆數
+		totCnt = totSuccCnt + totFailCnt;
 
-		String batxNoFin = tBatxHeadId.getBatchNo();
+		tBatxHead = batxHeadService.holdById(tBatxHeadId, titaVo);
+		tBatxHead.setAcDate(tBatxHeadId.getAcDate());
+		tBatxHead.setBatchNo(tBatxHeadId.getBatchNo());
+		tBatxHead.setBatxTotAmt(totAmt);
+		tBatxHead.setBatxTotCnt(totCnt);
+		tBatxHead.setBatxExeCode("0");
+		tBatxHead.setBatxStsCode("0");
+		tBatxHead.setTitaTlrNo(titaVo.getTlrNo());
+		tBatxHead.setTitaTxCd(titaVo.getTxcd());
 
-		if (totSuccCnt + totFailCnt > 0) {
-			tBatxHead = batxHeadService.holdById(tBatxHeadId, titaVo);
-			tBatxHead.setBatxTotAmt(totAmt);
-			tBatxHead.setBatxTotCnt(totSuccCnt + totFailCnt);
-//  		status 皆為0.未檢核 放入放0.未處理 其他則放入1.檢核有誤
-			if ("0".equals(procStsCode)) {
-				tBatxHead.setBatxExeCode("0");
-			} else {
-				tBatxHead.setBatxExeCode("1");
-			}
-			tBatxHead.setBatxStsCode("0");
-			tBatxHead.setTitaTlrNo(titaVo.getTlrNo());
-			tBatxHead.setTitaTxCd(titaVo.getTxcd());
-
-			try {
-				this.info("Insert BatxHead !!!");
-				batxHeadService.update(tBatxHead, titaVo);
-			} catch (DBException e) {
-				throw new LogicException("E0007", "L4200Batch BatxHead update " + e.getErrorMsg());
-			}
+		try {
+			this.info("Insert BatxHead !!!");
+			batxHeadService.update(tBatxHead, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0007", "L4200Batch BatxHead update " + e.getErrorMsg());
 		}
+		sendMsg = "批號: " + iBatchNo + "上傳處理完成，總筆數=" + totCnt + ", 總金額 =" + totAmt + "。";
 
-//		E.回寫Head檔 總金額與總筆數(if與前兩天相同，則丟Warning)
-//		本營業日
-		int tbsdyf = this.getTxBuffer().getTxCom().getTbsdyf();
-//		上營業日
-		int lbsdyf = 0;
-//		上上營業日
-		int lLbsdyf = 0;
+		// 檢核今日、前兩日，筆數、金額
+		checkBatx(tBatxHead, titaVo);
 
-//		檢核今日批次若相同於檢核訊息提示警告
-		List<BatxHead> toBatxHeadList = new ArrayList<BatxHead>();
-		Slice<BatxHead> stodayBatxHeadList = null;
+		// 檢核提出媒體筆數、金額不同則提示警告
+		checkMedia(tBatxHead, titaVo);
 
-		BatxHead todayBatxHead = new BatxHead();
-		BatxHeadId todayBatxHeadId = new BatxHeadId();
-		stodayBatxHeadList = batxHeadService.acDateRange(tbsdyf, tbsdyf, this.index, this.limit, titaVo);
-
-		toBatxHeadList = stodayBatxHeadList == null ? null : stodayBatxHeadList.getContent();
-
-		HashMap<Integer, Integer> toBatxNo = new HashMap<>();
-		int batxtno = 1;
-		toBatxNo.put(tbsdyf, 0);
-
-		if (toBatxHeadList != null && toBatxHeadList.size() != 0) {
-			int batchCnt = 0;
-			for (int i = 0; i < toBatxHeadList.size(); i++) {
-				if ("L4200".equals(toBatxHeadList.get(i).getTitaTxCd())
-						&& toBatxHeadList.get(i).getBatxTotCnt() == totSuccCnt
-						&& toBatxHeadList.get(i).getBatxTotAmt().compareTo(totAmt) == 0
-						&& !batxNoFin.equals(toBatxHeadList.get(i).getBatchNo())
-						&& !"8".equals(toBatxHeadList.get(i).getBatxExeCode())) {
-//				第一筆自己
-					this.info("toBatxHeadList.get(i).getBatchNo() ..." + toBatxHeadList.get(i).getBatchNo());
-					this.info("toBatxHeadList.get(i).ID.getBatchNo() ..."
-							+ toBatxHeadList.get(i).getBatxHeadId().getBatchNo());
-					batchCnt = batchCnt + 1;
-					batxtno = parse.stringToInteger(toBatxHeadList.get(i).getBatxHeadId().getBatchNo().substring(4));
-//				排除自己
-					if (batxtno > toBatxNo.get(tbsdyf) && batchCnt > 0) {
-						toBatxNo.put(tbsdyf, batxtno);
-					}
-				}
-			}
-		}
-		String sBatchNo = "BATX" + FormatUtil.pad9("" + toBatxNo.get(tbsdyf), 2);
-		todayBatxHeadId.setAcDate(tbsdyf);
-		todayBatxHeadId.setBatchNo(sBatchNo);
-		todayBatxHead = batxHeadService.findById(todayBatxHeadId, titaVo);
-
-		lbsdyf = this.getTxBuffer().getTxCom().getLbsdyf();
-		this.info("Lbsdyf : " + lbsdyf);
-
-		lLbsdyf = dateUtil.getbussDate(lbsdyf, -1);
-
-		this.info("lLbsdyf : " + lLbsdyf);
-
-//	上營業日之最後一批
-		List<BatxHead> yesterdayBatxHeadList = new ArrayList<BatxHead>();
-		Slice<BatxHead> syesterdayBatxHeadList = null;
-
-		BatxHead yesterdayBatxHead = new BatxHead();
-		BatxHeadId yesterdayBatxHeadId = new BatxHeadId();
-		syesterdayBatxHeadList = batxHeadService.acDateRange(lbsdyf, lbsdyf, this.index, this.limit, titaVo);
-
-		yesterdayBatxHeadList = syesterdayBatxHeadList == null ? null : syesterdayBatxHeadList.getContent();
-
-		HashMap<Integer, Integer> yesBatxNo = new HashMap<>();
-		yesBatxNo.put(lbsdyf, 0);
-		int batxyno = 1;
-
-		if (yesterdayBatxHeadList != null && yesterdayBatxHeadList.size() != 0) {
-			for (int i = 0; i < yesterdayBatxHeadList.size(); i++) {
-				if ("L4200".equals(yesterdayBatxHeadList.get(i).getTitaTxCd())
-						&& yesterdayBatxHeadList.get(i).getBatxTotCnt() == totSuccCnt
-						&& yesterdayBatxHeadList.get(i).getBatxTotAmt().compareTo(totAmt) == 0
-						&& !"8".equals(yesterdayBatxHeadList.get(i).getBatxExeCode())) {
-					batxyno = parse
-							.stringToInteger(yesterdayBatxHeadList.get(i).getBatxHeadId().getBatchNo().substring(4));
-					if (batxyno > yesBatxNo.get(lbsdyf)) {
-						yesBatxNo.put(lbsdyf, batxyno);
-					}
-				}
-			}
-		}
-		sBatchNo = "BATX" + FormatUtil.pad9("" + yesBatxNo.get(lbsdyf), 2);
-		yesterdayBatxHeadId.setAcDate(lbsdyf);
-		yesterdayBatxHeadId.setBatchNo(sBatchNo);
-		yesterdayBatxHead = batxHeadService.findById(yesterdayBatxHeadId, titaVo);
-
-//	上上營業日之最後一批
-		List<BatxHead> dayB4BatxHeadList = new ArrayList<BatxHead>();
-		Slice<BatxHead> sdayB4BatxHeadList = null;
-
-		BatxHead dayB4BatxHead = new BatxHead();
-		BatxHeadId dayB4BatxHeadId = new BatxHeadId();
-		sdayB4BatxHeadList = batxHeadService.acDateRange(lLbsdyf, lLbsdyf, this.index, this.limit, titaVo);
-
-		dayB4BatxHeadList = sdayB4BatxHeadList == null ? null : sdayB4BatxHeadList.getContent();
-
-		HashMap<Integer, Integer> dayB4BatxNo = new HashMap<>();
-		dayB4BatxNo.put(lLbsdyf, 0);
-		int dayB4Batxno = 1;
-
-		if (dayB4BatxHeadList != null && dayB4BatxHeadList.size() != 0) {
-			for (int i = 0; i < dayB4BatxHeadList.size(); i++) {
-				if ("BATX".equals(dayB4BatxHeadList.get(i).getBatxHeadId().getBatchNo().substring(0, 4))
-						&& dayB4BatxHeadList.get(i).getBatxTotCnt() == totSuccCnt
-						&& dayB4BatxHeadList.get(i).getBatxTotAmt().compareTo(totAmt) == 0
-						&& !"8".equals(dayB4BatxHeadList.get(i).getBatxExeCode())) {
-					dayB4Batxno = parse
-							.stringToInteger(dayB4BatxHeadList.get(i).getBatxHeadId().getBatchNo().substring(4));
-					if (dayB4Batxno > dayB4BatxNo.get(lLbsdyf)) {
-						dayB4BatxNo.put(lLbsdyf, dayB4Batxno);
-					}
-				}
-			}
-		}
-		String sdayB4BatchNo = "BATX" + FormatUtil.pad9("" + dayB4BatxNo.get(lLbsdyf), 2);
-		dayB4BatxHeadId.setAcDate(lLbsdyf);
-		dayB4BatxHeadId.setBatchNo(sdayB4BatchNo);
-		dayB4BatxHead = batxHeadService.findById(dayB4BatxHeadId, titaVo);
-
-		if (yesterdayBatxHead != null) {
-			sendMsg = sendMsg + "L4200" + " - " + iBatchNo + "整批處理完成。與批號 : " + yesterdayBatxHead.getAcDate() + "，"
-					+ yesterdayBatxHead.getBatchNo() + " 筆數、金額相同";
-		} else if (dayB4BatxHead != null) {
-			sendMsg = sendMsg + "L4200" + " - " + iBatchNo + "整批處理完成。與日期 : " + dayB4BatxHead.getAcDate() + "，批號 : "
-					+ dayB4BatxHead.getBatchNo() + " 筆數、金額相同";
-		} else if (todayBatxHead != null) {
-			sendMsg = sendMsg + "L4200" + " - " + iBatchNo + "整批處理完成。與日期 : " + todayBatxHead.getAcDate() + "，批號 : "
-					+ todayBatxHead.getBatchNo() + " 筆數、金額相同";
-		} else {
-			sendMsg = sendMsg + "L4200" + " - " + iBatchNo + "，整批處理完成";
-		}
-
-		if (postEntryDateFlag == 1) {
-			sendMsg = sendMsg + "，郵局扣款檔入帳日期大於會計日期";
-		}
-		if (achEntryDateFlag == 1) {
-			sendMsg = sendMsg + "，銀行扣款檔入帳日期大於會計日期";
+		// 檢核入帳日期 > 會計日期
+		if (entryDate > this.getTxBuffer().getTxCom().getTbsdy()) {
+			sendMsg += "，入帳日期 " + entryDate + " 大於會計日期 " + this.getTxBuffer().getTxCom().getTbsdy();
 		}
 	}
+
+//	檢核今日、前兩日批次，若筆數、金額相同則提示警告
+	private void checkBatx(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
+		int lbsdyf = this.getTxBuffer().getTxCom().getLbsdyf();
+		int tbsdyf = this.getTxBuffer().getTxCom().getTbsdyf();
+		int llbsdyf = dateUtil.getbussDate(lbsdyf, -1);
+		Slice<BatxHead> slBatxHead = batxHeadService.acDateRange(llbsdyf, tbsdyf, 0, Integer.MAX_VALUE, titaVo);
+
+		if (slBatxHead != null) {
+			for (BatxHead ba : slBatxHead.getContent()) {
+				if ("L4200".equals(ba.getTitaTxCd()) && ba.getBatxTotCnt() == totCnt
+						&& ba.getBatxTotAmt().compareTo(totAmt) == 0 && !tBatxHead.getBatchNo().equals(ba.getBatchNo())
+						&& !"8".equals(ba.getBatxExeCode())) {
+					sendMsg += " 與日期 : " + ba.getAcDate() + "，批號 : " + ba.getBatchNo() + " 筆數、金額相同";
+				}
+			}
+		}
+	}
+
+//	檢核提出媒體筆數、金額不同則提示警告
+	private void checkMedia(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
+		int deductMediaCnt = 0;
+		BigDecimal deductMediaAmt = BigDecimal.ZERO;
+		if (meadiaDateAch1 > 0) {
+			Slice<AchDeductMedia> slAchDeductMedia = achDeductMediaService.mediaDateEq(meadiaDateAch1 + 19110000, "1",
+					0, Integer.MAX_VALUE, titaVo);
+			if (slAchDeductMedia != null) {
+				for (AchDeductMedia ach : slAchDeductMedia.getContent()) {
+					deductMediaCnt++;
+					deductMediaAmt = deductMediaAmt.add(ach.getRepayAmt());
+				}
+			}
+		}
+		if (meadiaDateAch2 > 0) {
+			Slice<AchDeductMedia> slAchDeductMedia = achDeductMediaService.mediaDateEq(meadiaDateAch2 + 19110000, "2",
+					0, Integer.MAX_VALUE, titaVo);
+			if (slAchDeductMedia != null) {
+				for (AchDeductMedia ach : slAchDeductMedia.getContent()) {
+					deductMediaCnt++;
+					deductMediaAmt = deductMediaAmt.add(ach.getRepayAmt());
+				}
+			}
+		}
+
+		if (meadiaDatePost > 0) {
+			Slice<AchDeductMedia> slAchDeductMedia = achDeductMediaService.mediaDateEq(meadiaDatePost + 19110000, "2",
+					0, Integer.MAX_VALUE, titaVo);
+			if (slAchDeductMedia != null) {
+				for (AchDeductMedia ach : slAchDeductMedia.getContent()) {
+					deductMediaCnt++;
+					deductMediaAmt = deductMediaAmt.add(ach.getRepayAmt());
+				}
+			}
+		}
+		if (deductMediaCnt != totCnt || !deductMediaAmt.equals(totAmt)) {
+			sendMsg += " 與提出媒體檔不符， 筆數=" + deductMediaCnt + ", 金額 =" + deductMediaAmt;
+		}
+	}
+
 }

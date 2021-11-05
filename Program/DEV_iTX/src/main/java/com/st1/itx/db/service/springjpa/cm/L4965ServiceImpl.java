@@ -65,11 +65,11 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 			} else {
 				searchStr += "  where c.\"CustNo\" = " + iCustNo + " and c.\"FacmNo\" = " + iFacmNo + "  ";
 			}
-			sqlL4965 = makeSql2(searchStr);
+			sqlL4965 = makeSql2(searchStr,titaVo);
 			break;
 		case 3:
 			searchStr += "  where c.\"ApproveNo\" = " + iApplNo + "  ";
-			sqlL4965 = makeSql2(searchStr);
+			sqlL4965 = makeSql2(searchStr,titaVo);
 			break;
 		case 4:
 			searchInsuNo1 += "  where o.\"OrigInsuNo\" = '" + iNowInsuNo + "'   ";
@@ -185,7 +185,11 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return sqlL4965;
 	}
 
-	private String makeSql2(String searchStr) throws LogicException {
+	private String makeSql2(String searchStr,TitaVo titaVo) throws LogicException {
+		
+		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
+		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		
 		String sqlL4965 = "";
 		sqlL4965 += "select i.\"CustNo\"            as  F0";
 		sqlL4965 += "      ,c.\"CustName\"          as  F1";
@@ -250,6 +254,13 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "                    on o.\"ClCode1\" = c.\"ClCode1\"";
 		sqlL4965 += "                   and o.\"ClCode2\" = c.\"ClCode2\"";
 		sqlL4965 += "                   and o.\"ClNo\" = c.\"ClNo\"";
+		
+		if (iFacmNo == 0) {
+			sqlL4965 += "                   and o.\"CustNo\" = " + iCustNo + "  ";
+		} else {
+			sqlL4965 += "  and o.\"CustNo\" = " + iCustNo + " and o.\"FacmNo\" = " + iFacmNo + "  ";
+		}
+		
 		sqlL4965 += searchStr;
 		sqlL4965 += "     ) i";
 		sqlL4965 += "  left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"";

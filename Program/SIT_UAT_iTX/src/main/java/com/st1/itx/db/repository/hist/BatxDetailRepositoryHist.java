@@ -94,7 +94,7 @@ public interface BatxDetailRepositoryHist extends JpaRepository<BatxDetail, Batx
   public Slice<BatxDetail> findAllByAcDateGreaterThanEqualAndAcDateLessThanEqualAndRepayCodeIsOrderByBatchNoDescDetailSeqAsc(int acDate_0, int acDate_1, int repayCode_2, Pageable pageable);
 
   // AcDate = ,AND FileName = 
-  public Slice<BatxDetail> findAllByAcDateIsAndFileNameIsOrderByBatchNoDescRecordSeqAsc(int acDate_0, String fileName_1, Pageable pageable);
+  public Slice<BatxDetail> findAllByAcDateIsAndFileNameIsOrderByBatchNoDesc(int acDate_0, String fileName_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

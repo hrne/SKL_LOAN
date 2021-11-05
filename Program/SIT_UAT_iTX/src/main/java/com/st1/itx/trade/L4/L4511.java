@@ -13,6 +13,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.EmpDeductMedia;
+import com.st1.itx.db.domain.TxToDoDetailId;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.EmpDeductMediaService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -78,59 +79,59 @@ public class L4511 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
+		int iOpItem = parse.stringToInteger(titaVo.getParam("OpItem")); // 作業項目 1.15日薪 2.非15日薪
 
 		cntY = 0;
 		cntN = 0;
-		sendMsg = "L4511，";
-
-//		1.產出媒體
-//		------------is15------------
+		sendMsg = "";
 		int mediaDate = parse.stringToInteger(titaVo.getParam("MediaDate")) + 19110000;
+//		------------is15------------
+		if (iOpItem == 1) {
 
-//		String pathis15 = outFolder + "10H00015日薪.TXT";
+			ArrayList<EmpDeductMedia> lis15EmpDeductMedia = new ArrayList<EmpDeductMedia>();
 
-		ArrayList<EmpDeductMedia> lis15EmpDeductMedia = new ArrayList<EmpDeductMedia>();
+			Slice<EmpDeductMedia> slis15EmpDeductMedia = null;
 
-		Slice<EmpDeductMedia> slis15EmpDeductMedia = null;
+			slis15EmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "4", this.index,
+					this.limit);
 
-		slis15EmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "4", this.index, this.limit);
+			lis15EmpDeductMedia = slis15EmpDeductMedia == null ? null
+					: new ArrayList<EmpDeductMedia>(slis15EmpDeductMedia.getContent());
 
-		lis15EmpDeductMedia = slis15EmpDeductMedia == null ? null : new ArrayList<EmpDeductMedia>(slis15EmpDeductMedia.getContent());
-
-		if (lis15EmpDeductMedia != null && lis15EmpDeductMedia.size() != 0) {
+//		String pathis15 = outFolder + "10H00015日薪.TXT";			
 			setFile(lis15EmpDeductMedia, titaVo, 1);
+			sendMsg += "15日薪媒體檔已完成，筆數：" + cntY + "。";
+
+			// 應處理清單(已處理)產出15日薪員工扣薪檔
+			TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
+			tTxToDoDetailId.setItemCode("L45101"); // 應處理清單(已處理)產出15日薪員工扣薪檔
+			txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 		}
-//		------------un15------------
 
-		ArrayList<EmpDeductMedia> lun15EmpDeductMedia = new ArrayList<EmpDeductMedia>();
+		// ------------un15------------
+		if (iOpItem == 2) {
 
-		Slice<EmpDeductMedia> sun15EmpDeductMedia = null;
+			ArrayList<EmpDeductMedia> lun15EmpDeductMedia = new ArrayList<EmpDeductMedia>();
 
-		sun15EmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "5", this.index, this.limit);
+			Slice<EmpDeductMedia> sun15EmpDeductMedia = null;
 
-		lun15EmpDeductMedia = sun15EmpDeductMedia == null ? null : new ArrayList<EmpDeductMedia>(sun15EmpDeductMedia.getContent());
+			sun15EmpDeductMedia = empDeductMediaService.mediaDateRng(mediaDate, mediaDate, "5", this.index, this.limit);
+
+			lun15EmpDeductMedia = sun15EmpDeductMedia == null ? null
+					: new ArrayList<EmpDeductMedia>(sun15EmpDeductMedia.getContent());
 
 //		String pathun15 = outFolder + "LNM617P非15日.txt";
-
-		if (lun15EmpDeductMedia != null && lun15EmpDeductMedia.size() != 0) {
 			setFile(lun15EmpDeductMedia, titaVo, 2);
-		}
 
-		if (cntY == 0 && cntN == 0) {
-			throw new LogicException("E0001 ", "查無資料");
-		}
-		if (cntY > 0) {
-			sendMsg += "15日薪媒體檔已完成，筆數：" + cntY + "。";
-		}
-		if (cntN > 0) {
+			// 應處理清單(已處理)產出非15日薪員工扣薪檔
+			TxToDoDetailId tTxToDoDetailId = new TxToDoDetailId();
+			tTxToDoDetailId.setItemCode("L45102"); // 產出非15日薪員工扣薪檔
+			txToDoCom.updDetailStatus(2, tTxToDoDetailId, titaVo);
 			sendMsg += "非15日薪媒體檔已完成，筆數：" + cntN + "。";
 		}
 
-//		刪除應處理事項清單
-//		0.新增 1.刪除
-//		txToDo(titaVo, 1);
-
-		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), sendMsg, titaVo);
+		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+				sendMsg, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -155,9 +156,11 @@ public class L4511 extends TradeBuffer {
 
 			fileName = centerCodeAcc + "_" + empNo + "_" + empName + "_" + entryDate + ".txt";
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-產出員工扣薪媒體檔-15日薪", fileName, 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-產出員工扣薪媒體檔-15日薪", fileName, 2);
 		} else if (flag == 2) {
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-產出員工扣薪媒體檔-非15日", "LNM617P.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-產出員工扣薪媒體檔-非15日", "LNM617P.txt", 2);
 		}
 
 		if (lEmpDeductMedia != null && lEmpDeductMedia.size() != 0) {
@@ -210,7 +213,8 @@ public class L4511 extends TradeBuffer {
 				}
 
 				occursList.putParam("OccUnknowC", FormatUtil.padX("", 11));
-				occursList.putParam("OccRepayAmt", FormatUtil.padX("-" + FormatUtil.pad9("" + tEmpDeductMedia.getRepayAmt(), 9), 10));
+				occursList.putParam("OccRepayAmt",
+						FormatUtil.padX("-" + FormatUtil.pad9("" + tEmpDeductMedia.getRepayAmt(), 9), 10));
 				occursList.putParam("OccUnknowD", FormatUtil.padX("", 40));
 				occursList.putParam("OccUnknowE", "Y");
 				occursList.putParam("OccEntryDate", tEmpDeductMedia.getEntryDate() + 19110000);
@@ -233,13 +237,11 @@ public class L4511 extends TradeBuffer {
 				makeFile.put(line);
 			}
 
-			long sno = makeFile.close();
-
-			this.info("sno : " + sno);
-			makeFile.toFile(sno);
-		} else {
-			throw new LogicException("E0001 ", "查無資料");
 		}
+		
+		long sno = makeFile.close();
+		this.info("sno : " + sno);
+		makeFile.toFile(sno);
 	}
 
 	private String setFormatMonth(int month) {

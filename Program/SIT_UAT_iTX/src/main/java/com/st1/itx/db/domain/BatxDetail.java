@@ -29,7 +29,7 @@ public class BatxDetail implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -8150447601161120685L;
+	private static final long serialVersionUID = 1844054636253293318L;
 
 @EmbeddedId
   private BatxDetailId batxDetailId;
@@ -55,10 +55,6 @@ public class BatxDetail implements Serializable {
   // 檔名
   @Column(name = "`FileName`", length = 50)
   private String fileName;
-
-  // 檔案序號
-  @Column(name = "`RecordSeq`")
-  private int recordSeq = 0;
 
   // 入帳日期
   @Column(name = "`EntryDate`")
@@ -110,7 +106,7 @@ public class BatxDetail implements Serializable {
   private BigDecimal disacctAmt = new BigDecimal("0");
 
   // 處理狀態
-  /* CdCode:ProcStsCode0.未檢核1.不處理2.人工處理3.檢核錯誤4.檢核正常5.單筆入帳6.批次入帳7.待轉暫收 */
+  /* CdCode:ProcStsCode0.未檢核1.失敗2.人工處理3.檢核錯誤4.檢核正常5.單筆入帳6.批次入帳7.轉暫收D.刪除 */
   @Column(name = "`ProcStsCode`", length = 1)
   private String procStsCode;
 
@@ -286,25 +282,6 @@ public class BatxDetail implements Serializable {
 	*/
   public void setFileName(String fileName) {
     this.fileName = fileName;
-  }
-
-/**
-	* 檔案序號<br>
-	* 
-	* @return Integer
-	*/
-  public int getRecordSeq() {
-    return this.recordSeq;
-  }
-
-/**
-	* 檔案序號<br>
-	* 
-  *
-  * @param recordSeq 檔案序號
-	*/
-  public void setRecordSeq(int recordSeq) {
-    this.recordSeq = recordSeq;
   }
 
 /**
@@ -552,13 +529,14 @@ L4210 其他來源建檔
 	* 處理狀態<br>
 	* CdCode:ProcStsCode
 0.未檢核
-1.不處理
+1.失敗
 2.人工處理
 3.檢核錯誤
 4.檢核正常
 5.單筆入帳
 6.批次入帳
-7.待轉暫收
+7.轉暫收
+D.刪除
 	* @return String
 	*/
   public String getProcStsCode() {
@@ -569,13 +547,14 @@ L4210 其他來源建檔
 	* 處理狀態<br>
 	* CdCode:ProcStsCode
 0.未檢核
-1.不處理
+1.失敗
 2.人工處理
 3.檢核錯誤
 4.檢核正常
 5.單筆入帳
 6.批次入帳
-7.待轉暫收
+7.轉暫收
+D.刪除
   *
   * @param procStsCode 處理狀態
 	*/
@@ -805,10 +784,10 @@ L4210 其他來源建檔
 
   @Override
   public String toString() {
-    return "BatxDetail [batxDetailId=" + batxDetailId + ", repayCode=" + repayCode + ", fileName=" + fileName + ", recordSeq=" + recordSeq
-           + ", entryDate=" + entryDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", rvNo=" + rvNo + ", repayType=" + repayType + ", reconCode=" + reconCode
-           + ", repayAcCode=" + repayAcCode + ", acquiredAmt=" + acquiredAmt + ", repayAmt=" + repayAmt + ", acctAmt=" + acctAmt + ", disacctAmt=" + disacctAmt + ", procStsCode=" + procStsCode
-           + ", procCode=" + procCode + ", procNote=" + procNote + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", mediaDate=" + mediaDate + ", mediaKind=" + mediaKind
-           + ", mediaSeq=" + mediaSeq + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "BatxDetail [batxDetailId=" + batxDetailId + ", repayCode=" + repayCode + ", fileName=" + fileName + ", entryDate=" + entryDate
+           + ", custNo=" + custNo + ", facmNo=" + facmNo + ", rvNo=" + rvNo + ", repayType=" + repayType + ", reconCode=" + reconCode + ", repayAcCode=" + repayAcCode
+           + ", acquiredAmt=" + acquiredAmt + ", repayAmt=" + repayAmt + ", acctAmt=" + acctAmt + ", disacctAmt=" + disacctAmt + ", procStsCode=" + procStsCode + ", procCode=" + procCode
+           + ", procNote=" + procNote + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", mediaDate=" + mediaDate + ", mediaKind=" + mediaKind + ", mediaSeq=" + mediaSeq
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

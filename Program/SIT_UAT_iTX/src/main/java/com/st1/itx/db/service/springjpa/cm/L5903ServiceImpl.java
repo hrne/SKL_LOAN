@@ -16,7 +16,6 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L5903ServiceImpl")
@@ -32,9 +31,6 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	String sql = "";
 
@@ -55,7 +51,7 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
@@ -126,6 +122,7 @@ public class L5903ServiceImpl extends ASpringJpaParm implements InitializingBean
 			}
 		}
 
+		sql += "order by i.\"CustNo\",i.\"FacmNo\" ,i.\"ApplSeq\"";
 		this.info("sql=" + sql);
 		Query query;
 

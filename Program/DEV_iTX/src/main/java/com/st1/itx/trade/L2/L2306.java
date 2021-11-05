@@ -45,7 +45,7 @@ public class L2306 extends TradeBuffer {
 
 	@Autowired
 	public FacCaseApplService sFacCaseApplService;
-	
+
 	@Autowired
 	public CustMainService sCustMainService;
 
@@ -60,8 +60,6 @@ public class L2306 extends TradeBuffer {
 	@Autowired
 	public DataLog dataLog;
 
-	private boolean isEloan = false;
-
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L2306 ");
@@ -69,7 +67,6 @@ public class L2306 extends TradeBuffer {
 
 		// isEloan
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
-			this.isEloan = true;
 		}
 
 		int iFunCd = parse.stringToInteger(titaVo.getParam("FunCd"));
@@ -81,9 +78,7 @@ public class L2306 extends TradeBuffer {
 		String iRelId = titaVo.getParam("RelId");
 		String Ukey = "";
 		CustMain lCustMain = new CustMain();
-		
-		
-		
+
 		ReltMain tReltMain = new ReltMain();
 		List<ReltMain> tmplReltMain = new ArrayList<ReltMain>();
 
@@ -103,13 +98,13 @@ public class L2306 extends TradeBuffer {
 		// 新增
 		if (iFunCd == 1) {
 
-			lCustMain  = sCustMainService.custIdFirst(iRelId, titaVo);
-			
-			if( lCustMain == null ) {  // 沒在客戶檔 同步新增資料到客戶檔
-	    		Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
-	    		// PK
-	    		
-	    		tReltMain = new ReltMain();
+			lCustMain = sCustMainService.custIdFirst(iRelId, titaVo);
+
+			if (lCustMain == null) { // 沒在客戶檔 同步新增資料到客戶檔
+				Ukey = UUID.randomUUID().toString().toUpperCase().replaceAll("-", "");
+				// PK
+
+				tReltMain = new ReltMain();
 
 				ReltMainId ReltMainIdVo = new ReltMainId();
 				ReltMainIdVo.setCaseNo(iCaseNo);
@@ -128,26 +123,31 @@ public class L2306 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 				}
-	    		
-	    		// new table 
-	    		CustMain tCustMain = new CustMain();
-	    		tCustMain.setCustUKey(Ukey);
-	    		tCustMain.setCustId(iRelId);
-	    		tCustMain.setCustName(titaVo.getParam("RelName"));
-	    		tCustMain.setDataStatus(1);
-	    		tCustMain.setTypeCode(4);
-	    		try {
-	    			sCustMainService.insert(tCustMain, titaVo);
+
+				// new table
+				CustMain tCustMain = new CustMain();
+				tCustMain.setCustUKey(Ukey);
+				tCustMain.setCustId(iRelId);
+				tCustMain.setCustName(titaVo.getParam("RelName"));
+				tCustMain.setDataStatus(1);
+				tCustMain.setTypeCode(4);
+				if (iRelId.length() == 8) {
+					tCustMain.setCuscCd("2");
+				} else {
+					tCustMain.setCuscCd("1");
+				}
+				try {
+					sCustMainService.insert(tCustMain, titaVo);
 				} catch (DBException e) {
 					throw new LogicException("E0005", "客戶資料主檔");
 				}
-	    		
+
 //	    		/*需加丟訊息  要至客戶資料主檔補件資料*/
 //	    		this.totaVo.putParam("OWarningMsg", "需至顧客明細資料補件資料");
-	    		
-	    	} else { // 有在客戶檔 
-	    		Ukey = lCustMain.getCustUKey();
-	    		tReltMain = new ReltMain();
+
+			} else { // 有在客戶檔
+				Ukey = lCustMain.getCustUKey();
+				tReltMain = new ReltMain();
 
 				ReltMainId ReltMainIdVo = new ReltMainId();
 				ReltMainIdVo.setCaseNo(iCaseNo);
@@ -168,20 +168,20 @@ public class L2306 extends TradeBuffer {
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0005", e.getErrorMsg());
 				}
-	    		
-	    	} // else
-			
+
+			} // else
+
 			// 修改
 		} else if (iFunCd == 2) {
 
-			lCustMain  = sCustMainService.custIdFirst(iRelId, titaVo);
-			
-			if( lCustMain == null ) {
+			lCustMain = sCustMainService.custIdFirst(iRelId, titaVo);
+
+			if (lCustMain == null) {
 				throw new LogicException("E0001", "客戶資料主檔");
-			} 
-			
+			}
+
 			Ukey = lCustMain.getCustUKey();
-			
+
 			ReltMainId ReltMainIdVo = new ReltMainId();
 			ReltMainIdVo.setCaseNo(iCaseNo);
 			ReltMainIdVo.setCustNo(iCustNo);
@@ -216,14 +216,14 @@ public class L2306 extends TradeBuffer {
 			// 刪除
 		} else if (iFunCd == 4) {
 
-			lCustMain  = sCustMainService.custIdFirst(iRelId, titaVo);
-			
-			if( lCustMain == null ) {
+			lCustMain = sCustMainService.custIdFirst(iRelId, titaVo);
+
+			if (lCustMain == null) {
 				throw new LogicException("E0001", "客戶資料主檔");
 			}
-			
+
 			Ukey = lCustMain.getCustUKey();
-			
+
 			ReltMainId ReltMainIdVo = new ReltMainId();
 			ReltMainIdVo.setCaseNo(iCaseNo);
 			ReltMainIdVo.setCustNo(iCustNo);
@@ -240,53 +240,52 @@ public class L2306 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
-			
-		} 
+
+		}
 		// 抓該戶號所有資料更新Finalfg
-		
+
 		int CreatDate = 0;
 		int tempcase = 0;
 		FacCaseAppl tFacCaseAppl = new FacCaseAppl();
 		Slice<ReltMain> slReltMain = sReltMainService.custNoEq(iCustNo, index, limit, titaVo);
-		tmplReltMain = slReltMain == null ? null : slReltMain.getContent();		
-		if(tmplReltMain != null) {
-		  for(ReltMain ttReltMain:tmplReltMain) {
-		    tFacCaseAppl = sFacCaseApplService.CreditSysNoFirst(ttReltMain.getCaseNo(), titaVo);
-		    if(tFacCaseAppl != null) {
-		      if(CreatDate < tFacCaseAppl.getApplDate()) {
-		        CreatDate = tFacCaseAppl.getApplDate();
-		        tempcase = ttReltMain.getCaseNo();
-		      }
-		    }
-		    tFacCaseAppl = new FacCaseAppl();
-		  }
-		  // 先全部清空再把最新的案件編號上"Y"
-		  for(ReltMain ttReltMain:tmplReltMain) {
-			
-			ReltMainId ReltMainIdVo = new ReltMainId();
-			ReltMainIdVo = ttReltMain.getReltMainId();
-			tReltMain = sReltMainService.holdById(ReltMainIdVo);
-
-			if (tReltMain == null) {
-				throw new LogicException(titaVo, "E0003", "關係人主檔案件記號錯誤");
+		tmplReltMain = slReltMain == null ? null : slReltMain.getContent();
+		if (tmplReltMain != null) {
+			for (ReltMain ttReltMain : tmplReltMain) {
+				tFacCaseAppl = sFacCaseApplService.CreditSysNoFirst(ttReltMain.getCaseNo(), titaVo);
+				if (tFacCaseAppl != null) {
+					if (CreatDate < tFacCaseAppl.getApplDate()) {
+						CreatDate = tFacCaseAppl.getApplDate();
+						tempcase = ttReltMain.getCaseNo();
+					}
+				}
+				tFacCaseAppl = new FacCaseAppl();
 			}
+			// 先全部清空再把最新的案件編號上"Y"
+			for (ReltMain ttReltMain : tmplReltMain) {
 
-			tReltMain.setFinalFg("");
-			if(tempcase == tReltMain.getCaseNo()) {
-				tReltMain.setFinalFg("Y");
-			}
+				ReltMainId ReltMainIdVo = new ReltMainId();
+				ReltMainIdVo = ttReltMain.getReltMainId();
+				tReltMain = sReltMainService.holdById(ReltMainIdVo);
 
-			try {
-				// 修改
-				sReltMainService.update(tReltMain);
-			} catch (DBException e) {
-				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
-			}
-			
-			
-		  } // for
+				if (tReltMain == null) {
+					throw new LogicException(titaVo, "E0003", "關係人主檔案件記號錯誤");
+				}
+
+				tReltMain.setFinalFg("");
+				if (tempcase == tReltMain.getCaseNo()) {
+					tReltMain.setFinalFg("Y");
+				}
+
+				try {
+					// 修改
+					sReltMainService.update(tReltMain);
+				} catch (DBException e) {
+					throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+				}
+
+			} // for
 		} // if
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

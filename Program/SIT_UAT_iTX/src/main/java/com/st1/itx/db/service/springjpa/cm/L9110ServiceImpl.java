@@ -147,7 +147,7 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            , CLM.\"EvaDate\"          AS EvaDate "; // -- F3 鑑價日期
 		sql += "            , CLI.\"ClaimDate\"        AS OtherDate "; // -- F4 他項存續期限 ???
 		sql += "            , CLI.\"SettingSeq\"       AS SettingSeq "; // -- F5 順位 只有不動產會有此欄位
-		sql += "            , CLI.\"FirstAmt\"         AS FirstAmt "; // -- F6 前順位金額 只有不動產會有此欄位
+		sql += "            , CLIRD.\"FirstAmt\"       AS FirstAmt "; // -- F6 前順位金額 只有不動產會有此欄位
 		sql += "            , CITY.\"CityItem\"        AS CityItem "; // -- F7 地區別
 		sql += "            , CDC2.\"Item\"            AS EvaCompany "; // -- F8 鑑定公司 只有不動產會有此欄位
 		sql += "            , CLI.\"BdRmk\"            AS BdRmk "; // -- F9 建物標示備註 只有不動產會有此欄位
@@ -185,6 +185,10 @@ public class L9110ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       LEFT JOIN \"ClImm\" CLI ON CLI.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                              AND CLI.\"ClCode2\" = CF.\"ClCode2\"";
 		sql += "                              AND CLI.\"ClNo\"    = CF.\"ClNo\"";
+		sql += "       LEFT JOIN \"ClImmRankDetail\" CLIRD ON CLIRD.\"ClCode1\"    = CLI.\"ClCode1\" " ;
+		sql += "                                          AND CLIRD.\"ClCode2\"    = CLI.\"ClCode2\" ";
+		sql += "                                          AND CLIRD.\"ClNo\"       = CLI.\"ClNo\" ";
+		sql += "                                          AND CLIRD.\"SettingSeq\" = CLI.\"SettingSeq\"";
 		sql += "       LEFT JOIN \"CdCity\" CITY ON CITY.\"CityCode\" = CLM.\"CityCode\"";
 		sql += "       LEFT JOIN \"ClStock\" CLS ON CLS.\"ClCode1\" = CF.\"ClCode1\"";
 		sql += "                                AND CLS.\"ClCode2\" = CF.\"ClCode2\"";

@@ -42,6 +42,10 @@ import com.st1.itx.db.service.FacShareApplService;
 import com.st1.itx.db.service.GuarantorService;
 import com.st1.itx.db.service.LoanNotYetService;
 import com.st1.itx.db.service.ReltMainService;
+
+import com.st1.itx.db.domain.CustDataCtrl;
+import com.st1.itx.db.service.CustDataCtrlService;
+
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
@@ -102,6 +106,9 @@ public class L1001 extends TradeBuffer {
 	@Autowired
 	public ClFacService sClFacService;
 
+	@Autowired
+	public CustDataCtrlService custDataCtrlService;
+
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse iParse;
@@ -156,14 +163,17 @@ public class L1001 extends TradeBuffer {
 			}
 
 			for (CustMain aCustMain : iCustMain1) {
-				if (iCustType == 1) {
-					if (aCustMain.getCustId().length() != 10) {
-						continue;
-					}
-				} else if (iCustType == 2) {
-					if (aCustMain.getCustId().length() != 8) {
-						continue;
-					}
+//				if (iCustType == 1) {
+//					if (aCustMain.getCustId().length() != 10) {
+//						continue;
+//					}
+//				} else if (iCustType == 2) {
+//					if (aCustMain.getCustId().length() != 8) {
+//						continue;
+//					}
+//				}
+				if (iCustType > 0 && Integer.valueOf(aCustMain.getCuscCd()) != iCustType) {
+					continue;
 				}
 
 				totaList(titaVo, aCustMain);
@@ -179,14 +189,17 @@ public class L1001 extends TradeBuffer {
 			if (iCustMain2 == null) {
 				throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
 			}
-			if (iCustType == 1) {
-				if (iCustMain2.getCustId().length() != 10) {
-					throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
-				}
-			} else if (iCustType == 2) {
-				if (iCustMain2.getCustId().length() != 8) {
-					throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
-				}
+//			if (iCustType == 1) {
+//				if (iCustMain2.getCustId().length() != 10) {
+//					throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
+//				}
+//			} else if (iCustType == 2) {
+//				if (iCustMain2.getCustId().length() != 8) {
+//					throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
+//				}
+//			}
+			if (iCustType > 0 && Integer.valueOf(iCustMain2.getCuscCd()) != iCustType) {
+				throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
 			}
 
 			totaList(titaVo, iCustMain2);
@@ -200,15 +213,20 @@ public class L1001 extends TradeBuffer {
 			}
 
 			for (CustMain bCustMain : iCustMain3) {
-				if (iCustType == 1) {
-					if (bCustMain.getCustId().length() != 10) {
-						continue;
-					}
-				} else if (iCustType == 2) {
-					if (bCustMain.getCustId().length() != 8) {
-						continue;
-					}
+//				if (iCustType == 1) {
+//					if (bCustMain.getCustId().length() != 10) {
+//						continue;
+//					}
+//				} else if (iCustType == 2) {
+//					if (bCustMain.getCustId().length() != 8) {
+//						continue;
+//					}
+//				}
+				
+				if (iCustType > 0 && Integer.valueOf(bCustMain.getCuscCd()) != iCustType) {
+					continue;
 				}
+				
 				totaList(titaVo, bCustMain);
 
 			}
@@ -230,14 +248,17 @@ public class L1001 extends TradeBuffer {
 				if (dCustMain == null) {
 					throw new LogicException("E0001", "客戶檔查無資料"); // 查無資料
 				}
-				if (iCustType == 1) {
-					if (dCustMain.getCustId().length() != 10) {
-						continue;
-					}
-				} else if (iCustType == 2) {
-					if (dCustMain.getCustId().length() != 8) {
-						continue;
-					}
+//				if (iCustType == 1) {
+//					if (dCustMain.getCustId().length() != 10) {
+//						continue;
+//					}
+//				} else if (iCustType == 2) {
+//					if (dCustMain.getCustId().length() != 8) {
+//						continue;
+//					}
+//				}
+				if (iCustType > 0 && Integer.valueOf(dCustMain.getCuscCd()) != iCustType) {
+					continue;
 				}
 
 				totaList(titaVo, dCustMain);
@@ -255,14 +276,18 @@ public class L1001 extends TradeBuffer {
 			}
 
 			for (CustMain eCustMain : iCustMain5) {
-				if (iCustType == 1) {
-					if (eCustMain.getCustId().length() != 10) {
-						continue;
-					}
-				} else if (iCustType == 2) {
-					if (eCustMain.getCustId().length() != 8) {
-						continue;
-					}
+//				if (iCustType == 1) {
+//					if (eCustMain.getCustId().length() != 10) {
+//						continue;
+//					}
+//				} else if (iCustType == 2) {
+//					if (eCustMain.getCustId().length() != 8) {
+//						continue;
+//					}
+//				}
+				
+				if (iCustType > 0 && Integer.valueOf(eCustMain.getCuscCd()) != iCustType) {
+					continue;
 				}
 
 				totaList(titaVo, eCustMain);
@@ -280,7 +305,6 @@ public class L1001 extends TradeBuffer {
 		}
 		/* 將其中一個tota放入待發送List */
 		this.addList(this.totaVo);
-		
 
 		/* 執行結束並返回totaList */
 		return this.sendList();
@@ -310,6 +334,14 @@ public class L1001 extends TradeBuffer {
 		int CustCrossBTNFg = 0;
 		// 客戶電話
 		int CustTleNoBTNFg = 0;
+
+		boolean custDataControl = false;
+
+		CustDataCtrl custDataCtrl = custDataCtrlService.findById(aCustMain.getCustNo(), titaVo);
+		if (custDataCtrl != null && custDataCtrl.getApplMark() == 1) {
+			custDataControl = true;
+		}
+
 		new CustMain();
 //		List<CustFin> tmpCustFin = new ArrayList<CustFin>();
 		List<FacMain> tmpFacMain = new ArrayList<FacMain>();
@@ -324,93 +356,133 @@ public class L1001 extends TradeBuffer {
 //		tmpCustMain = iCustMainService.custIdFirst(aCustMain.getCustId(), titaVo);
 //		this.info("顧客" + tmpCustMain);
 //		if (tmpCustMain != null) {
-		CustMainBTNFg = 1;
+		if (!custDataControl) {
+			CustMainBTNFg = 1;
+		}
 //		}
 		// 財報按鈕fg
 //		Slice<CustFin> stmpCustFin = sCustFinService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
 //		tmpCustFin = stmpCustFin == null ? null : stmpCustFin.getContent();
-		Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(aCustMain.getCustUKey(), this.index, this.limit, titaVo);
-		List<FinReportDebt> lFinReportDebt = slFinReportDebt == null ? null : slFinReportDebt.getContent();
+		if (!custDataControl) {
+			Slice<FinReportDebt> slFinReportDebt = finReportDebtService.findCustUKey(aCustMain.getCustUKey(),
+					this.index, this.limit, titaVo);
+			List<FinReportDebt> lFinReportDebt = slFinReportDebt == null ? null : slFinReportDebt.getContent();
 
-//		this.info("財報" + lFinReportDebt);
-		if (lFinReportDebt != null) {
-			CustFinBTNFg = 1;
+			if (lFinReportDebt != null) {
+				CustFinBTNFg = 1;
+			}
 		}
 		// 放款按鈕fg
 		if (aCustMain.getCustNo() != 0) {
-			Slice<FacMain> stmpFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
+			Slice<FacMain> stmpFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(),
+					0, 999, 0, Integer.MAX_VALUE, titaVo);
 			tmpFacMain = stmpFacMain == null ? null : stmpFacMain.getContent();
 //			this.info("放款按鈕" + tmpFacMain);
 			if (tmpFacMain != null) {
 				FacMainBTNFg = 1;
 			}
 		}
-		Slice<FacCaseAppl> stmplFacCaseAppl = sFacCaseApplService.caseApplCustUKeyEq(aCustMain.getCustUKey(), "0", "2", 0, Integer.MAX_VALUE, titaVo);
-		tmplFacCaseAppl = stmplFacCaseAppl == null ? null : stmplFacCaseAppl.getContent();
+
+		if (!custDataControl) {
+			Slice<FacCaseAppl> stmplFacCaseAppl = sFacCaseApplService.caseApplCustUKeyEq(aCustMain.getCustUKey(), "0",
+					"2", 0, Integer.MAX_VALUE, titaVo);
+			tmplFacCaseAppl = stmplFacCaseAppl == null ? null : stmplFacCaseAppl.getContent();
 //		this.info("案件=" + tmpLoanNotYet);
-		// 案件按鈕
-		if (tmplFacCaseAppl != null) {
-			FacCaseApplBTNFg = 1;
-		}
-		// 未齊件按鈕fg
-		Slice<LoanNotYet> stmpLoanNotYet = sLoanNotYetService.findCustNoEq(aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
-		tmpLoanNotYet = stmpLoanNotYet == null ? null : stmpLoanNotYet.getContent();
-//		this.info("未齊件=" + tmpLoanNotYet);
-		if (tmpLoanNotYet != null) {
-			LoanNotYetBTNFg = 1;
-		}
-		// 保證人按鈕fg
-		Slice<FacMain> slFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(), 0, 999, 0, Integer.MAX_VALUE, titaVo);
-		List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
-		if (lFacMain != null) {
-			for (FacMain tFacMain : lFacMain) {
-				listApproveNo.add(tFacMain.getApplNo());
+			// 案件按鈕
+			if (tmplFacCaseAppl != null) {
+				FacCaseApplBTNFg = 1;
 			}
-			for (int approveNo : listApproveNo) {
-				Slice<Guarantor> stmpListGuarantor = sGuarantorService.approveNoEq(approveNo, 0, Integer.MAX_VALUE, titaVo);
-				List<Guarantor> tmpListGuarantor = stmpListGuarantor == null ? null : stmpListGuarantor.getContent();
-				if (tmpListGuarantor != null) {
+		}
+
+		// 未齊件按鈕fg
+		if (!custDataControl) {
+			Slice<LoanNotYet> stmpLoanNotYet = sLoanNotYetService.findCustNoEq(aCustMain.getCustNo(), 0,
+					Integer.MAX_VALUE, titaVo);
+			tmpLoanNotYet = stmpLoanNotYet == null ? null : stmpLoanNotYet.getContent();
+//		this.info("未齊件=" + tmpLoanNotYet);
+			if (tmpLoanNotYet != null) {
+				LoanNotYetBTNFg = 1;
+			}
+		}
+
+		// 保證人按鈕fg
+		if (!custDataControl) {
+			Slice<FacMain> slFacMain = sFacMainService.facmCustNoRange(aCustMain.getCustNo(), aCustMain.getCustNo(), 0,
+					999, 0, Integer.MAX_VALUE, titaVo);
+			List<FacMain> lFacMain = slFacMain == null ? null : slFacMain.getContent();
+			if (lFacMain != null) {
+				for (FacMain tFacMain : lFacMain) {
+					listApproveNo.add(tFacMain.getApplNo());
+				}
+				for (int approveNo : listApproveNo) {
+					Slice<Guarantor> stmpListGuarantor = sGuarantorService.approveNoEq(approveNo, 0, Integer.MAX_VALUE,
+							titaVo);
+					List<Guarantor> tmpListGuarantor = stmpListGuarantor == null ? null
+							: stmpListGuarantor.getContent();
+					if (tmpListGuarantor != null) {
 //					this.info("保證人=" + tmpListGuarantor);
-					GuarantorBTNFg = 1;
+						GuarantorBTNFg = 1;
+					}
 				}
 			}
 		}
+
 		// 擔保品按鈕fg
-		Slice<ClFac> stmpClFac1 = sClFacService.custNoEq(aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
-		tmpClFac1 = stmpClFac1 == null ? null : stmpClFac1.getContent();
+		if (!custDataControl) {
+			Slice<ClFac> stmpClFac1 = sClFacService.custNoEq(aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+			tmpClFac1 = stmpClFac1 == null ? null : stmpClFac1.getContent();
 //		this.info("擔保品=" + tmpClFac1);
-		if (tmpClFac1 != null) {
-			ClMainBTNFg1 = 1;
+			if (tmpClFac1 != null) {
+				ClMainBTNFg1 = 1;
+			}
 		}
+
 		// 共同借款人
-		Slice<FacShareAppl> stmpFacShareAppl = sFacShareApplService.findCustNoEq(aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
-		if (stmpFacShareAppl != null) {
-			FacShareApplBTNFg = 1;
+		if (!custDataControl) {
+			Slice<FacShareAppl> stmpFacShareAppl = sFacShareApplService.findCustNoEq(aCustMain.getCustNo(), 0,
+					Integer.MAX_VALUE, titaVo);
+			if (stmpFacShareAppl != null) {
+				FacShareApplBTNFg = 1;
+			}
 		}
+
 		// 關聯戶按鈕fg
-		ReltMain stmpReltMain = iReltMainService.ReltUKeyFirst(aCustMain.getCustUKey(), titaVo);
+		if (!custDataControl) {
+			ReltMain stmpReltMain = iReltMainService.ReltUKeyFirst(aCustMain.getCustUKey(), titaVo);
 //		this.info("關聯戶 =" + stmpReltMain);
-		if (stmpReltMain != null) {
-			CustRelBTNFg = 1;
-		} else {
-			ReltMain stmpReltMain1 = iReltMainService.custNoFirst(aCustMain.getCustNo(), titaVo);
-			if (stmpReltMain1 != null) {
+			if (stmpReltMain != null && !custDataControl) {
 				CustRelBTNFg = 1;
+			} else {
+				ReltMain stmpReltMain1 = iReltMainService.custNoFirst(aCustMain.getCustNo(), titaVo);
+				if (stmpReltMain1 != null) {
+					CustRelBTNFg = 1;
+				}
 			}
 		}
 		// 交互運用按鈕fg
-		Slice<CustCross> stmpCustCross = sCustCrossService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
-		tmpCustCross = stmpCustCross == null ? null : stmpCustCross.getContent();
-		if (tmpCustCross != null) {
-			CustCrossBTNFg = 1;
+		if (!custDataControl) {
+			Slice<CustCross> stmpCustCross = sCustCrossService.custUKeyEq(aCustMain.getCustUKey(), 0, Integer.MAX_VALUE,
+					titaVo);
+			tmpCustCross = stmpCustCross == null ? null : stmpCustCross.getContent();
+			if (tmpCustCross != null) {
+				CustCrossBTNFg = 1;
+			}
+		} else {
+			CustCrossBTNFg = 2;
 		}
 
 		// 客戶電話按鈕fg
-		Slice<CustTelNo> stmpCustTelNo = iCustTelNoService.findCustUKey(aCustMain.getCustUKey(), this.index, this.limit, titaVo);
-		tmpCustTelNo = stmpCustTelNo == null ? null : stmpCustTelNo.getContent();
-		if (tmpCustTelNo != null) {
-			CustTleNoBTNFg = 1;
+		if (!custDataControl) {
+			Slice<CustTelNo> stmpCustTelNo = iCustTelNoService.findCustUKey(aCustMain.getCustUKey(), this.index,
+					this.limit, titaVo);
+			tmpCustTelNo = stmpCustTelNo == null ? null : stmpCustTelNo.getContent();
+			if (tmpCustTelNo != null) {
+				CustTleNoBTNFg = 1;
+			}
+		} else {
+			CustTleNoBTNFg = 2;
 		}
+
 		// 顧客
 		occursList.putParam("OOCustMainBTNFg", CustMainBTNFg);
 		// 財報
@@ -437,7 +509,11 @@ public class L1001 extends TradeBuffer {
 		occursList.putParam("OOCustNo", aCustMain.getCustNo());
 		occursList.putParam("OOCustTypeCode", aCustMain.getCustTypeCode());
 		occursList.putParam("OOCustName", aCustMain.getCustName().replace("$n", "\n"));
-		occursList.putParam("OODataStatus", aCustMain.getDataStatus());
+		if (custDataControl) {
+			occursList.putParam("OODataStatus", "X");
+		} else {
+			occursList.putParam("OODataStatus", aCustMain.getDataStatus());
+		}
 		this.totaVo.addOccursList(occursList);
 
 	}

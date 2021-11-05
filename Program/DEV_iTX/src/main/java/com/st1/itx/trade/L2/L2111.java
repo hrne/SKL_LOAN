@@ -10,6 +10,7 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CustDataCtrl;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacCaseAppl;
 import com.st1.itx.db.domain.FacMain;
@@ -97,7 +98,7 @@ public class L2111 extends TradeBuffer {
 	FacMain tFacMain = new FacMain();
 	private String wkCustUkey = "";
 	private String wkGroupUkey = "";
-
+	private int iCustNo;
 	private boolean isEloan = false;
 
 	@Override
@@ -133,6 +134,31 @@ public class L2111 extends TradeBuffer {
 		// 取得輸入資料
 		if (this.isEloan) {
 			iFuncCode = 1;
+			
+			// 申請記號 ApplMark
+			// 1:滿五年自動寫入(案件申請自動刪除)
+			iCustNo = tCustMain.getCustNo();
+						
+			CustDataCtrl tCustDataCtrl = new CustDataCtrl();
+						
+			tCustDataCtrl = sCustDataCtrlService.findById(iCustNo);
+			int iApplMark = 0;
+			if(tCustDataCtrl != null) {
+			  iApplMark = tCustDataCtrl.getApplMark();
+			  if(iApplMark == 1){
+				try {
+
+				  this.info(" L2703 deletetCustDataCtrlLog : " + tCustDataCtrl);
+
+				  if (tCustDataCtrl != null) {
+					sCustDataCtrlService.delete(tCustDataCtrl);
+				  }
+				} catch (DBException e) {
+						throw new LogicException(titaVo, "E0008", e.getErrorMsg());
+			    }
+			  } //  if
+			} // if
+			  
 		} else {
 			iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		}

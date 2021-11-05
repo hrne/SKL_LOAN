@@ -44,6 +44,7 @@ E(0,0)
 [#<->#,"@@@@@@@@@註記",#AdjCode,#AdjCodeX],
 [#<->#,"@@@@@@@@@狀態",#InqCode,#InqCodeX],
 [#<->#,"@@@@@調整日期",#AdjDate],
+[#<->#,"@@@@@逾期期數",#OvduTerm],
 ]
 
 ! Help
@@ -185,6 +186,11 @@ E(0,#SYSDATE)
 ! 4:人工調整(已調整)         RPTFG = 4(全部欄位，可取消調整)
 ! 9:上次繳息日大於利率生效日  RPTFG = 2(全部欄位，無取消調整)
 ! A:全部                    RPTFG = 4(全部欄位，可取消調整)
+
+#OvduTerm=A,2,I
+C(3,#CHAIN,0,$,s)
+
+
 #RPTFG=A,1,S
 C(3,#InqCode,2,E(0,2),$)
 C(3,#InqCode,2,s,$)
@@ -319,6 +325,7 @@ C(3,#OOContrRateIncr,#OOIndividualIncr,T(2,#XXRateIncr),T(2,#XXRateIncr+#STARSYM
 ! 擬調利率
 #OONextAdjRate=m,2.4,O
 
+#OOOvduTerm=A,2,O
 
 ! 查詢利率歷程
 #OOBUF_L3932=X,20,S
@@ -366,6 +373,7 @@ T(6A,#AdjDate+#TxKind+#OOAdjCode+#OOCustNo+#OOFacmNo+#OOBormNo+#OOCurtEffDate)
 #AdjCode
 #InqCode
 #AdjDate
+#OvduTerm
 #END
 
 
@@ -404,7 +412,7 @@ TXFORM=L4931
 #OOProcNote
 #OONextAdjDate
 #OONextAdjRate
-
+#OOOvduTerm
 ^
 <include src="ROM.icf::L4R12.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>

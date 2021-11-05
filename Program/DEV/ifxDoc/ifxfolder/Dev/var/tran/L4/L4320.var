@@ -43,7 +43,7 @@ E(0,0)
 [#<->#,"#FdBaseRateCode+利率種類",#BaseRateCode,#BaseRateCodeX],
 [#<->#,"#FdLableA+生效日期",#EffectDate,"@@@@@@",#LableB,#BaseRate,#LableC],
 [#<->#,"#FdRateIncr+批次加減碼",#RateIncr],
-[#<->#,"#FdEntCode+戶別種類",#EntCode,#EntCodeX],
+[#<->#,"#FdEntCode+個金/企金",#EntCode,#EntCodeX],
 [#<->#,"#FdNextAdjPeriod+預調週期",#NextAdjPeriod," 個月"],
 [#<->#,"#FdProdNo1+商品",#ProdNo1,#ProdNo1X],
 [#<->#,"@",#ProdNo2,#ProdNo2X],

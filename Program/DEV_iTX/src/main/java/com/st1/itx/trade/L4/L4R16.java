@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.EmpDeductSchedule;
 import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.EmpDeductScheduleService;
@@ -27,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4R16 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4R16.class);
 
 	@Autowired
 	public Parse parse;
@@ -56,23 +56,26 @@ public class L4R16 extends TradeBuffer {
 		this.limit = 200;
 
 		int rimToday = parse.stringToInteger(titaVo.getParam("RimToday")) + 19110000;
-
-		Slice<EmpDeductSchedule> sEmpDeductSchedule = null;
+		int iOpItem = parse.stringToInteger(titaVo.getParam("OpItem")); // 作業項目 1.15日薪 2.非15日薪
+//		抓取媒體日為今日者
 		List<EmpDeductSchedule> lEmpDeductSchedule = new ArrayList<EmpDeductSchedule>();
-
-		sEmpDeductSchedule = empDeductScheduleService.mediaDateRange(rimToday, rimToday, this.index, this.limit, titaVo);
-
-		lEmpDeductSchedule = sEmpDeductSchedule == null ? null : sEmpDeductSchedule.getContent();
-
-//		Slice<CdCode> sCdCode = null;
-//		List<CdCode> lCdCode = new ArrayList<CdCode>();
-//		sCdCode = cdCodeService.getCodeList(4, "EmpDeductType", this.index, this.limit, titaVo);
-//		lCdCode = sCdCode == null ? null : sCdCode.getContent();
-
-		if (lEmpDeductSchedule != null && lEmpDeductSchedule.size() != 0) {
+		Slice<EmpDeductSchedule> slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(rimToday, rimToday,
+				this.index, this.limit, titaVo);
+		if (slEmpDeductSchedule != null) {
+			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
+				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
+						titaVo);
+				if (iOpItem == 1 && "1".equals(tCdCode.getItem().substring(0, 1))) {
+					lEmpDeductSchedule.add(tEmpDeductSchedule);
+				}
+				if (iOpItem == 2 && "2".equals(tCdCode.getItem().substring(0, 1))) {
+					lEmpDeductSchedule.add(tEmpDeductSchedule);
+				}
+			}
+		}
+		if (lEmpDeductSchedule.size() > 0) {
 			for (int j = 1; j <= 9; j++) {
 				boolean flag = false;
-
 				for (EmpDeductSchedule tEmpDeductSchedule : lEmpDeductSchedule) {
 					this.info("tEmpDeductSchedule.getAgType1() : " + tEmpDeductSchedule.getAgType1());
 					int i = parse.stringToInteger(tEmpDeductSchedule.getAgType1());

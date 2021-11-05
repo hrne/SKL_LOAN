@@ -160,7 +160,7 @@ E(0,1)ASGN(LOOP$)
 ! 申請序號
 #OOApplSeq=A,3,O
 ! 戶名
-#OOCustName=X,20,O
+#OOCustName=X,100,O
 ! 管理人
 #OOKeeperEmpName=x,20,O
 ! 借閱人
@@ -202,7 +202,7 @@ T(2,#OOApplEmpNo+ +#OOApplEmpName)
 #OReturnEmpNoX=x,27,O
  T(2,#OOReturnEmpNo+ +#OOReturnEmpName)
 
-#OOBUF_RETURN=X,200,S
+#OOBUF_RETURN=X,280,S
 T(2,#OOCustNo+#OOFacmNo+#OOApplSeq+#OOCustName+#OOKeeperEmpNo
    +#OOApplEmpNo+#OOApplDate+#OOReturnDate+#OOReturnEmpNo
    +#OOUsageCode+#OORemark+2+#OOCopyCode+#OOApplObj)
@@ -297,7 +297,7 @@ TXFORM=L5903
 {width:65,align:'center'}
 ! 備註
 #OORemark=備註
-{width:95,align:'center'}
+{width:200,align:'left'}
 
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L5903;cpi=15"/>

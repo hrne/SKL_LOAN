@@ -58,7 +58,6 @@ public class L2703 extends TradeBuffer {
 	@Autowired
 	public SendRsp sendRsp;
 	
-	private boolean isEloan = false;
 	
 	/* 日期工具 */
 	@Autowired
@@ -122,7 +121,7 @@ public class L2703 extends TradeBuffer {
 			tCustDataCtrl.setCustNo(custNo);
 			tCustDataCtrl.setCustUKey(custUKet);
 			tCustDataCtrl.setEnable("Y");
-			tCustDataCtrl.setApplMark(0);
+			tCustDataCtrl.setApplMark(1);
 			tCustDataCtrl.setCreateEmpNo(titaVo.getParam("CreateEmpNo"));
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
 
@@ -140,7 +139,7 @@ public class L2703 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0003", "L2703 該戶號" + custNo + "不存在於結清戶個資控管檔。");
 			}
 			
-			tCustDataCtrl.setApplMark(2);
+			tCustDataCtrl.setApplMark(3);
 			tCustDataCtrl.setReason(iReason);
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
 			

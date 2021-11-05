@@ -1,0 +1,17 @@
+OODetailSeq=9,6
+OOEntryDate=9,7
+OOCustNo=9,7
+OOFacmNo=9,3
+OORepayType=9,2
+OORepayCode=9,2
+OOReconCode=X,3
+OOReconCodeX=X,100
+OORepayAmt=+9,14
+OOAcctAmt=+9,14
+OODisacctAmt=+9,14
+OOProcStsCode=X,1
+OOProcCode=X,5
+OOProcNote=X,300
+OOTxSn=X,18
+OOFileSeq=9,6
+OOFileName=X,40

@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -18,14 +16,12 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4931ServiceImpl")
 @Repository
 /* 逾期放款明細 */
 public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4931ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -35,9 +31,6 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	// *** 折返控制相關 ***
 	private int index;
@@ -59,7 +52,7 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4931.findAll");
+		this.info("L4931.findAll");
 
 		int today = parse.stringToInteger(titaVo.getCalDy()) + 19110000;
 		int iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
@@ -67,7 +60,8 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		int iAdjDate = parse.stringToInteger(titaVo.getParam("AdjDate")) + 19110000;
 		String iInqCode = titaVo.getParam("InqCode");
-
+		int iOvduTerm = parse.stringToInteger(titaVo.getParam("OvduTerm"));
+		
 		int custCode1 = 0;
 		int custCode2 = 0;
 		String adjCode1 = iAdjCode;
@@ -82,7 +76,7 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 			adjCode2 = "8";
 		}
 
-		logger.info("today = " + today);
+		this.info("today = " + today);
 
 		String sql = " ";
 		sql += " select                                                         ";
@@ -127,6 +121,7 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " , cc.\"IntRateCeiling\"  as F38                                ";
 		sql += " , cc.\"IntRateFloor\"    as F39                                ";
 		sql += " , ca.\"AreaItem\"        as F40                                ";
+		sql += " , b.\"OvduTerm\"         as F41                                ";
 		sql += " from \"BatxRateChange\" b                                      ";
 		sql += " left join \"CustMain\" cm on cm.\"CustNo\" = b.\"CustNo\"      ";
 		sql += " left join (                                                    ";
@@ -148,21 +143,25 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   and b.\"AdjCode\" >= " + adjCode1;
 		sql += "   and b.\"AdjCode\" <= " + adjCode2;
 		sql += "   and b.\"AdjDate\"  = " + iAdjDate;
-
+		
+		if(iOvduTerm != 0) {
+			sql += "   and b.\"OvduTerm\"  = " + iOvduTerm;
+		}
+		
 		if ("2".equals(iInqCode)) {
 			sql += "   and b.\"RateKeyInCode\"  = 2                                 ";
 		} else {
 			sql += "   and b.\"RateKeyInCode\" != 2                                 ";
 		}
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 
 		cnt = query.getResultList().size();
-		logger.info("Total cnt ..." + cnt);
+		this.info("Total cnt ..." + cnt);
 
 		// *** 折返控制相關 ***
 		// 設定從第幾筆開始抓,需在createNativeQuery後設定
@@ -175,7 +174,7 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		List<Object> result = query.getResultList();
 
 		size = result.size();
-		logger.info("Total size ..." + size);
+		this.info("Total size ..." + size);
 
 		return this.convertToMap(result);
 	}

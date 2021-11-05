@@ -172,6 +172,7 @@ public class L1101 extends TradeBuffer {
 			// 產生一組新的識別碼
 			tCustMain.setCustUKey(UUID.randomUUID().toString().toUpperCase().replaceAll("-", ""));
 			tCustMain.setCustId(iCustId);
+			tCustMain.setCuscCd("1");
 			/* 存入DB */
 			try {
 				custMainService.insert(tCustMain, titaVo);
@@ -185,8 +186,8 @@ public class L1101 extends TradeBuffer {
 			
 			if(this.isEloan) {
 			  // 申請記號 ApplMark
-			  // 0:客戶申請(案件申請時丟錯誤訊息)
-			  // 1:滿五年自動寫入(案件申請自動刪除)
+			  // 1:客戶申請(案件申請時丟錯誤訊息)
+			  // 2:滿五年自動寫入(案件申請自動刪除)
 			  iCustNo = tCustMain.getCustNo();
 						
 			  CustDataCtrl tCustDataCtrl = new CustDataCtrl();
@@ -195,9 +196,9 @@ public class L1101 extends TradeBuffer {
 			  int iApplMark = 0;
 			  if(tCustDataCtrl != null) {
 				iApplMark = tCustDataCtrl.getApplMark();
-				if(iApplMark == 0) {
+				if(iApplMark == 1) {
 					throw new LogicException(titaVo, "E2004", "結清客戶個人資料控管狀態"); // 功能選擇錯誤
-				} else if(iApplMark == 1){
+				} else if(iApplMark == 2){
 					try {
 
 						this.info(" L2703 deletetCustDataCtrlLog : " + tCustDataCtrl);
