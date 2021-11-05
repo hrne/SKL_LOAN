@@ -10,9 +10,12 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClBuilding;
+import com.st1.itx.db.domain.ClBuildingId;
 import com.st1.itx.db.domain.CollLaw;
 import com.st1.itx.db.domain.CollLawId;
 import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.CollLawService;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.CustMainService;
@@ -44,6 +47,9 @@ public class L5R21 extends TradeBuffer {
 
 	@Autowired
 	public CollLawService iCollLawService;
+	
+	@Autowired
+	public ClBuildingService iClBuildingService;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -83,6 +89,17 @@ public class L5R21 extends TradeBuffer {
 			String uTime = tU.substring(11,13) + tU.substring(14,16);
 			totaVo.putParam("L5R21EditDate", uDate);
 			totaVo.putParam("L5R21EditTime", uTime);
+			ClBuildingId iClBuildingId = new ClBuildingId();
+			ClBuilding iClBuilding = new ClBuilding();
+			iClBuildingId.setClCode1(iCollLaw.getClCode1());
+			iClBuildingId.setClCode2(iCollLaw.getClCode2());
+			iClBuildingId.setClNo(iCollLaw.getClNo());
+			iClBuilding = iClBuildingService.findById(iClBuildingId, titaVo);
+			if (iClBuilding == null) {
+				totaVo.putParam("L5R21Other", "");
+			}else {
+				totaVo.putParam("L5R21Other", iClBuilding.getBdLocation() + "，建號" + iClBuilding.getBdNo1() + "-" + iClBuilding.getBdNo2());
+			}
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}

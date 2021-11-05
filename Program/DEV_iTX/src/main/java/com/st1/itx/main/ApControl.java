@@ -5,6 +5,8 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+
 import javax.annotation.PostConstruct;
 
 import org.springframework.batch.core.JobParameters;
@@ -332,7 +334,7 @@ public class ApControl extends SysLogger {
 		}
 
 		watch.stop();
-		this.info("Total execution time " + watch.getTotalTimeMillis() + " Millisecond");
+		this.mustInfo("Total execution time " + watch.getTotalTimeMillis() + " Millisecond");
 	}
 
 	private void callAp() throws LogicException, BeansException {
@@ -361,6 +363,7 @@ public class ApControl extends SysLogger {
 				}
 
 			// Eric
+			// 需主管授權
 			this.info("ApControl.callAp rspList.size = " + this.txBuffer.getRspList().size());
 			if (this.txBuffer.getRspList().size() > 0 && (this.titaVo.getSupCode() == null || "".equals(this.titaVo.getSupCode()))) {
 
@@ -379,6 +382,10 @@ public class ApControl extends SysLogger {
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occursList);
 				}
+
+				//去除重複
+				this.totaVo.getOccursList().stream().distinct().collect(Collectors.toList());
+				
 				this.totaVoList.clear();
 				this.totaVoList.add(totaVo);
 
@@ -406,6 +413,7 @@ public class ApControl extends SysLogger {
 
 				return;
 			}
+
 			this.Cs70UpDbs();
 		} else {
 			this.txAmlCom.setTxBuffer(this.txBuffer);

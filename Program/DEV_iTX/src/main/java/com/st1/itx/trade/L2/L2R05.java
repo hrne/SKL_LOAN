@@ -134,7 +134,8 @@ public class L2R05 extends TradeBuffer {
 
 		this.totaVo.init(titaVo);
 		this.titaVo = titaVo;
-
+		initset();
+		
 		// 取得輸入資料
 		iFuncCode = this.parse.stringToInteger(titaVo.getParam("RimFuncCode"));
 		iTxCode = titaVo.getParam("RimTxCode");
@@ -161,6 +162,11 @@ public class L2R05 extends TradeBuffer {
 		if (iApplNo > 0) {
 			tFacMain = facMainService.facmApplNoFirst(iApplNo, titaVo);
 			if (tFacMain == null) {
+				if (iTxCode.equals("L2118") & iFuncCode == 5) {
+
+					this.addList(this.totaVo);
+					return this.sendList();
+				}
 				throw new LogicException(titaVo, "E0001", "L2R05 額度主檔 核准編號 = " + iApplNo); // 查詢資料不存在
 			}
 			if ((iTxCode.equals("L3410") || iTxCode.equals("L3420")) && iCustNo > 0) {
@@ -345,7 +351,7 @@ public class L2R05 extends TradeBuffer {
 	private void MoveTotaFacMain() throws LogicException {
 		wkAcctFee = tFacMain.getAcctFee();
 		if ((iTxCode.equals("L3100") || iTxCode.equals("L3110"))
-				&& tFacMain.getUtilAmt().compareTo(BigDecimal.ZERO) > 0) {
+				&& (tFacMain.getLastBormNo() > 0 || tFacMain.getLastBormRvNo() > 900)) {
 			wkAcctFee = BigDecimal.ZERO;
 		}
 		this.info("tempVo =   " + tempVo);
@@ -373,7 +379,7 @@ public class L2R05 extends TradeBuffer {
 		this.totaVo.putParam("OLoanTermDd", tFacMain.getLoanTermDd());
 		this.totaVo.putParam("OFirstDrawdownDate", tFacMain.getFirstDrawdownDate());
 		this.totaVo.putParam("OMaturityDate", tFacMain.getMaturityDate());
-		this.totaVo.putParam("OIntCalcCode", tFacMain.getIntCalcCode()); 
+		this.totaVo.putParam("OIntCalcCode", tFacMain.getIntCalcCode());
 		this.totaVo.putParam("OAmortizedCode", tFacMain.getAmortizedCode());
 		this.totaVo.putParam("OFreqBase", tFacMain.getFreqBase());
 		this.totaVo.putParam("OPayIntFreq", tFacMain.getPayIntFreq());
@@ -549,6 +555,121 @@ public class L2R05 extends TradeBuffer {
 			this.totaVo.putParam("StepRateType" + i, tFacProdStepRate.getRateType());
 			this.totaVo.putParam("StepRateIncr" + i, tFacProdStepRate.getRateIncr());
 			i++;
+		}
+	}
+
+	private void initset() throws LogicException {
+
+		this.totaVo.putParam("OCustId", "");
+		this.totaVo.putParam("OCustNo", 0);
+		this.totaVo.putParam("OFacmNo", 0);
+		this.totaVo.putParam("OApplNo", 0);
+		this.totaVo.putParam("OProdNo", "");
+		this.totaVo.putParam("OBaseRateCode", "");
+		this.totaVo.putParam("ORateIncr", 0);
+		this.totaVo.putParam("OIndividualIncr", 0);
+		this.totaVo.putParam("OApproveRate", 0);
+		this.totaVo.putParam("ORateCode", "");
+		this.totaVo.putParam("OFirstRateAdjFreq", 0);
+		this.totaVo.putParam("OFirstAdjRateDate", 0);
+		this.totaVo.putParam("ORateAdjFreq", 0);
+		this.totaVo.putParam("OCurrencyCode", "");
+		this.totaVo.putParam("OLineAmt", 0);
+		this.totaVo.putParam("OUtilAmt", 0);
+		this.totaVo.putParam("OUtilBal", 0);
+		this.totaVo.putParam("OAcctCode", "");
+		this.totaVo.putParam("OLoanTermYy", 0);
+		this.totaVo.putParam("OLoanTermMm", 0);
+		this.totaVo.putParam("OLoanTermDd", 0);
+		this.totaVo.putParam("OFirstDrawdownDate",0);
+		this.totaVo.putParam("OMaturityDate", 0);
+		this.totaVo.putParam("OIntCalcCode", "");
+		this.totaVo.putParam("OAmortizedCode", "");
+		this.totaVo.putParam("OFreqBase", "");
+		this.totaVo.putParam("OPayIntFreq", "");
+		this.totaVo.putParam("ORepayFreq", "");
+		this.totaVo.putParam("OUtilDeadline", "");
+		this.totaVo.putParam("OGracePeriod", 0);
+		this.totaVo.putParam("OAcctFee", 0);
+		this.totaVo.putParam("OHandlingFee", 0);
+		this.totaVo.putParam("OExtraRepayCode", "");
+		this.totaVo.putParam("OCustomerCode", "");
+		this.totaVo.putParam("ORuleCode", "");
+		this.totaVo.putParam("ORecycleCode", "");
+		this.totaVo.putParam("ORecycleDeadline", "");
+		this.totaVo.putParam("OUsageCode", "");
+		this.totaVo.putParam("ODepartmentCode", "");
+		this.totaVo.putParam("OIncomeTaxFlag", "");
+		this.totaVo.putParam("OCompensateFlag", "");
+		this.totaVo.putParam("OIrrevocableFlag", "");
+		this.totaVo.putParam("OPieceCode", "");
+		this.totaVo.putParam("ORateAdjNoticeCode", "");
+		this.totaVo.putParam("ORepayCode", "");
+		this.totaVo.putParam("ORepayBank", "");
+		this.totaVo.putParam("ORepayAcctNo", "");
+		this.totaVo.putParam("OPostCode", "");
+		this.totaVo.putParam("OIntroducer", "");
+		this.totaVo.putParam("ODistrict", "");
+		this.totaVo.putParam("OFireOfficer", "");
+		this.totaVo.putParam("OEstimate", "");
+		this.totaVo.putParam("OCreditOfficer", "");
+		this.totaVo.putParam("OLoanOfficer", "");
+		this.totaVo.putParam("OBusinessOfficer", "");
+		this.totaVo.putParam("OApprovedLevel", "");
+		this.totaVo.putParam("OSupervisor", "");
+		this.totaVo.putParam("OInvestigateOfficer", "");
+		this.totaVo.putParam("OEstimateReview", "");
+		this.totaVo.putParam("OCoorgnizer", "");
+		this.totaVo.putParam("OGroupId", "");
+		this.totaVo.putParam("OAdvanceCloseCode", "");
+		this.totaVo.putParam("OBreachCode", "");
+		this.totaVo.putParam("OBreachGetCode", "");
+		this.totaVo.putParam("OProdBreachFlag", "");
+		this.totaVo.putParam("OBreach", "");
+		this.totaVo.putParam("OCreditScore", "");
+		this.totaVo.putParam("OGuaranteeDate", "");
+		this.totaVo.putParam("OContractNo", "");
+		this.totaVo.putParam("OAchAuthCode", "");
+		this.totaVo.putParam("OCreditSysNo", "");
+		this.totaVo.putParam("ORelationCode", "");
+		this.totaVo.putParam("ORelationName", "");
+		this.totaVo.putParam("ORelationId", "");
+		this.totaVo.putParam("ORelationBirthday", "");
+		this.totaVo.putParam("ORelationGender", "");
+		this.totaVo.putParam("OPrevPayIntDate", 0);
+		this.totaVo.putParam("ONextPayIntDate", 0);
+		this.totaVo.putParam("OSpecificDd", 0);
+		this.totaVo.putParam("OSpecificDate", 0);
+		this.totaVo.putParam("OBormCurrencyCode", wkCurrencyCode);
+		this.totaVo.putParam("OLoanBal", 0);
+		this.totaVo.putParam("OBormCount", 0);
+		this.totaVo.putParam("OBormNo", "");
+		this.totaVo.putParam("ODueAmt", 0);
+		this.totaVo.putParam("OAvailableAmt", "");
+		this.totaVo.putParam("OLimitFlag", "");
+		this.totaVo.putParam("OPrevPayIntDate", "");
+		this.totaVo.putParam("ONextPayIntDate", "");
+		this.totaVo.putParam("OSpecificDd", "");
+		this.totaVo.putParam("OSpecificDate", "");
+		this.totaVo.putParam("OBormCurrencyCode", "");
+		this.totaVo.putParam("OLoanBal", "");
+		this.totaVo.putParam("OBormCount", "");
+		this.totaVo.putParam("ODueAmt", "");
+		this.totaVo.putParam("OBaseRate", 0); 
+		this.totaVo.putParam("OCloseFg", ""); 
+		this.totaVo.putParam("ORvBormNo", 0); 
+		this.totaVo.putParam("ORvDrawdownAmt", 0); 
+		for (int i = 1; i <= 10; i++) {
+			this.totaVo.putParam("BreachbMmA" + i, 0);
+			this.totaVo.putParam("BreachbMmB" + i, 0);
+			this.totaVo.putParam("BreachbPercent" + i, 0);
+			this.totaVo.putParam("BreachaYyA" + i, 0);
+			this.totaVo.putParam("BreachaYyB" + i, 0);
+			this.totaVo.putParam("BreachaPercent" + i, 0);
+			this.totaVo.putParam("StepMonths" + i, 0);
+			this.totaVo.putParam("StepMonthE" + i, 0);
+			this.totaVo.putParam("StepRateType" + i, "");
+			this.totaVo.putParam("StepRateIncr" + i, 0);
 		}
 	}
 }

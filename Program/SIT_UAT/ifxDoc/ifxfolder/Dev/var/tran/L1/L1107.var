@@ -808,7 +808,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 #AccountValue01=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem01,S,$)
-@
+
+#AccountValue01t=X,1,S
 CALL(#FlowAssetProc)
 
 #AccountItem02=x,20,I
@@ -817,7 +818,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 #AccountValue02=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem02,S,$)
-@
+
+#AccountValue02t=X,1,S
 CALL(#FlowAssetProc)
 
 #AccountItem03=x,20,I
@@ -826,7 +828,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 #AccountValue03=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem03,S,$)
-@
+
+#AccountValue03t=X,1,S
 CALL(#FlowAssetProc)
 
 #LongInvest=+m,18,I
@@ -884,7 +887,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 #AccountValue04=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem04,S,$)
-@
+
+#AccountValue04t=x,1,S
 CALL(#OtherAssetProc)
 
 #AccountItem05=x,20,I
@@ -893,7 +897,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 #AccountValue05=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem05,S,$)
-@
+
+#AccountValue05t=x,1,S
 CALL(#OtherAssetProc)
 
 #AccountItem06=x,20,I
@@ -902,7 +907,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 #AccountValue06=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem06,S,$)
-@
+
+#AccountValue06t=x,1,S
 CALL(#OtherAssetProc)
 !-----------
 !負債及淨值總額
@@ -968,8 +974,9 @@ C(2,#FunCd,$,$,$,$,s,s)
 
 #AccountValue07=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
-C(4,#AccountItem06,S,$)
-@
+C(4,#AccountItem07,S,$)
+
+#AccountValue07t=x,1,S
 CALL(#FlowDebtProc)
 
 #AccountItem08=x,20,I
@@ -978,7 +985,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 #AccountValue08=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem08,S,$)
-@
+
+#AccountValue08t=x,1,S
 CALL(#FlowDebtProc)
 
 #AccountItem09=x,20,S
@@ -1035,7 +1043,8 @@ C(2,#FunCd,$,$,$,$,s,s)
 #AccountValue10=+m,18,I
 C(2,#FunCd,$,$,$,$,s,s)
 C(4,#AccountItem10,S,$)
-@
+
+#AccountValue10t=X,1,S
 CALL(#NetValueProc)
 
 #AccountItem11=x,20,I
@@ -1178,7 +1187,7 @@ CALL(#FinBtnProc3)
 ["現金流量表"],
 ["@營業活動淨現金流入(出)",#BusCash],
 ["@投資活動淨現金流入(出)",#InvestCash],
-["@現財活動淨現金流入(出)",#FinCash],
+["@理財活動淨現金流入(出)",#FinCash],
 [#CashAccountItem01,#CashAccountValue01],
 [#CashAccountItem02,#CashAccountValue02],
 ["@@@@@@@@@@@期末現金餘額",#EndCash],

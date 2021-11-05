@@ -49,7 +49,7 @@ public class AcReceivable implements Serializable {
   private int facmNo = 0;
 
   // 銷帳編號
-  /* 1.暫收款－可抵繳 : ''primary key 不可有null, 放一個空白2.擔保放款、催收款項 : 撥款序號(3)3.會計銷帳科目：系統自編(AC+西元年後兩碼+流水號六碼)4.暫收款－支票：支票帳號(9)-支票號碼(7) 5.未收帳管費：第一筆撥款序號(3) 6.未收契變手續費：契變日期(8,西元)+契變序號(02)7.未收、暫收、暫付、催收火險保費：原保險單號碼8.暫付、催收法務費：記錄號碼(8)9.短繳期金：撥款序號(3)10.'FacmNo'+額度編號(暫收款－借新還舊) */
+  /* 1.暫收款－可抵繳 : ''primary key 不可有null, 放一個空白2.擔保放款、催收款項 : 撥款序號(3)3.會計銷帳科目：系統自編(AC+西元年後兩碼+流水號六碼)4.暫收款－支票：支票帳號(9)-支票號碼(7) 5.未收帳管費：第一筆撥款序號(3) 6.未收契變手續費：契變日期(8,西元)+契變序號(02)7.未收、暫收、暫付、催收火險保費：原保險單號碼8.暫付、催收法務費：記錄號碼(8)9.短繳期金：撥款序號(3)10.'FacmNo'+額度編號(暫收款－借新還舊)11.聯貸手續費:SL+費用代號(2)+流水號(3) */
   @Column(name = "`RvNo`", length = 30, insertable = false, updatable = false)
   private String rvNo;
 
@@ -120,7 +120,7 @@ public class AcReceivable implements Serializable {
   private String acSubBookCode;
 
   // 起帳日期
-  /* 火險：保險起日、暫付法務費：法務費單據日期 */
+  /* 火險：原保險單保險迄日、暫付法務費：法務費單據日期 */
   @Column(name = "`OpenAcDate`")
   private int openAcDate = 0;
 
@@ -256,6 +256,7 @@ public class AcReceivable implements Serializable {
 8.暫付、催收法務費：記錄號碼(8)
 9.短繳期金：撥款序號(3)
 10.'FacmNo'+額度編號(暫收款－借新還舊)
+11.聯貸手續費:SL+費用代號(2)+流水號(3)
 	* @return String
 	*/
   public String getRvNo() {
@@ -274,6 +275,7 @@ public class AcReceivable implements Serializable {
 8.暫付、催收法務費：記錄號碼(8)
 9.短繳期金：撥款序號(3)
 10.'FacmNo'+額度編號(暫收款－借新還舊)
+11.聯貸手續費:SL+費用代號(2)+流水號(3)
   *
   * @param rvNo 銷帳編號
 	*/
@@ -561,7 +563,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 起帳日期<br>
-	* 火險：保險起日、暫付法務費：法務費單據日期
+	* 火險：原保險單保險迄日、暫付法務費：法務費單據日期
 	* @return Integer
 	*/
   public int getOpenAcDate() {
@@ -570,7 +572,7 @@ public class AcReceivable implements Serializable {
 
 /**
 	* 起帳日期<br>
-	* 火險：保險起日、暫付法務費：法務費單據日期
+	* 火險：原保險單保險迄日、暫付法務費：法務費單據日期
   *
   * @param openAcDate 起帳日期
   * @throws LogicException when Date Is Warn	*/

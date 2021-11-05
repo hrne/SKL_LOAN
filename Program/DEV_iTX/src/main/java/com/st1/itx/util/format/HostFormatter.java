@@ -64,7 +64,7 @@ public class HostFormatter extends SysLogger {
 				if (isEc)
 					value = "";
 				else
-					throw new LogicException("CE000", "Tota Field Not Found : " + fld.name);
+					throw new LogicException("CE000", "電文定義檔有誤,請洽資訊人員 Tota Field [" + fld.name + "] Not Found");
 
 			String hostText = fld.toHost(value);
 			this.info("value    : " + hostText);

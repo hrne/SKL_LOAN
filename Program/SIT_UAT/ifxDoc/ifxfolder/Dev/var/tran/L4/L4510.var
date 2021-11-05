@@ -20,7 +20,7 @@ E(0,0)
 [
 ["[L4510]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@產出員工扣薪明細檔"],
 [#<->#,"#FdMediaDate+媒體日期",#MediaDate],
-[#<->#,"#FdFunctionCode+查詢選項",#FunctionCode,#FunctionCodeX],
+[#<->#,"#FdOpItem+作業項目",#OpItem,#OpItemX],
 [#<->#,"@@@@@@產出報表","火險費扣薪明細表"],
 [#<->#,"@@@@@@@@@","帳管費扣薪明細表"],
 [#<->#,"@@@@@@@@@","扣薪媒體明細表"],
@@ -32,7 +32,7 @@ E(0,0)
 
 #FdMediaDate=X,2,L
 T(3,*)
-#FdFunctionCode=X,2,L
+#FdOpItem=X,2,L
 T(3,*)
 
 #CHAIN=A,1,S
@@ -49,7 +49,7 @@ C(3,#BATNO,0,T(2,@FlagA,Y)T(2,@FlagB,Y),T(2,@FlagA, )T(2,@FlagB, ))
 
 #NTXBUF=X,8,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@FunctionCode,#NTXBUF,7,1)
+T(1,@OpItem,#NTXBUF,7,1)
 
 #MediaDate=D,7,I
 INVOKEJS(SHOW,L4510_5,0)
@@ -57,15 +57,15 @@ INVOKEJS(SHOW,L4510_5,0)
 A(DATE,0,#MediaDate)
 INVOKEJS(SHOW,L4510_5,1)
 
-! 查詢選項
-#FunctionHelp=x,20,S
+! 作業項目
+#OpItemHelp=x,20,S
 T(3,1:15日薪;2:非15日薪)
 
-#FunctionCode=A,1,I
-HELP(#FunctionHelp)
-@V(H,#FunctionHelp)
-#FunctionCodeX=X,10,L
-T(3,)T(H,#FunctionCode,#FunctionHelp)
+#OpItem=A,1,I
+HELP(#OpItemHelp)
+@V(H,#OpItemHelp)
+#OpItemX=X,10,L
+T(3,)T(H,#OpItem,#OpItemHelp)
 
 #RimToday=D,7,S
 E(0,#MediaDate)
@@ -74,7 +74,7 @@ E(0,#MediaDate)
 
 #RimL4r16=X,1,S
 RESET_RIM(#RimL4r16,L4R16)
-S(L4R16,1,#RimToday)
+S(L4R16,1,#RimToday,#OpItem)
 R(1,L4R16)
 ##loop {times:9,i:1}
 E(0,@EntryDate{i},#L4r16EntryDate{i})
@@ -102,11 +102,11 @@ C(3,#WorkMonth{i},0,INVOKEJS(SHOW,grd1_{j},0),INVOKEJS(SHOW,grd1_{j},1))
 
 #FlagA=X,1,S
 ! HELP(Y: ;N: )
-! 查詢選項
+! 作業項目
 
 #FlagB=X,1,S
 ! HELP(Y: ;N: )
-! 查詢選項
+! 作業項目
 
 ! 每天RESET
 #BATNO=A,3,S
@@ -174,7 +174,7 @@ C(3,#SnoF,0,E(0,0),E(0,1))
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 #MediaDate
-#FunctionCode
+#OpItem
 #FlagA
 #FlagB
 #BATNO

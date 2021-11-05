@@ -3582,6 +3582,27 @@ TXFORM=L2R57
 #L2r57Help1
 ^
 </L2R57.tom>
+
+
+<L2R58.dec>
+#L2r58CustNo=A,7,S
+#L2r58FacmNo=A,3,S
+#L2r58SyndFeeCode=X,2,S
+#L2r58SyndFee=m,14.2,S
+#L2r58Rmk=x,40,S
+#L2r58AcctCode=X,3,S
+</L2R58.dec>
+
+<L2R58.tom>
+TXFORM=L2R58
+#L2r58CustNo
+#L2r58FacmNo
+#L2r58SyndFeeCode
+#L2r58SyndFee
+#L2r58Rmk
+#L2r58AcctCode
+^
+</L2R58.tom>
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -5770,6 +5791,7 @@ TXFORM=L5R20
 #L5R21EditEmpNo=X,6,S
 #L5R21EditDate=D,7,S
 #L5R21EditTime=X,4,S
+#L5R21Other=X,100,S
 </L5R21.dec>
 
 <L5R21.tom>
@@ -5785,6 +5807,7 @@ TXFORM=L5R21
 #L5R21EditEmpNo
 #L5R21EditDate
 #L5R21EditTime
+#L5R21Other
 ^
 </L5R21.tom>
 

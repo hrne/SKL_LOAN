@@ -19,13 +19,16 @@ E(0,0)
 [
 ["[L4511]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@產出員工扣薪媒體檔"],
 [#<->#,"#FdMediaDate+媒體檔日期",#MediaDate],
-[#<->#,"#FdFunctionCode+查詢選項",#FunctionCode,#FunctionCodeX],
+[#<->#,"#FdOpItem+作業項目",#OpItem,#OpItemX],
 ]
+! 作業項目
+#OpItemHelp=x,20,S
+T(3,1:15日薪;2:非15日薪)
 
 #FdMediaDate=X,2,L
 T(3,*)
 
-#FdFunctionCode=X,2,L
+#FdOpItem=X,2,L
 T(3,*)
 
 #CHAIN=A,1,S
@@ -33,11 +36,13 @@ T(4,CHAIN$)
 
 #NTXBUF=X,8,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
-T(1,@FunctionCode,#NTXBUF,7,1)
+T(1,@OpItem,#NTXBUF,7,1)
+T(H,@OpItemX,#OpItem,#OpItemHelp)
+#Space=X,1,S
+C(3,#CHAIN,1,$,S)
 
 #NEXT_DATE=D,8,S
 T(4,NBSDY$)
-
 
 ! 會計日期
 #MediaDate=D,7,I
@@ -45,15 +50,13 @@ E(0,#SYSDATE)
 @
 V(7)A(DATE,0,#MediaDate)
 
-! 查詢選項
-#FunctionHelp=x,20,S
-T(3,1:15日薪;2:非15日薪)
 
-#FunctionCode=A,1,I
-HELP(#FunctionHelp)
-@V(H,#FunctionHelp)
-#FunctionCodeX=X,10,L
-T(3,)T(H,#FunctionCode,#FunctionHelp)
+
+#OpItem=A,1,I
+HELP(#OpItemHelp)
+@V(H,#OpItemHelp)
+#OpItemX=X,10,L
+T(3,)T(H,#OpItem,#OpItemHelp)
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -68,7 +71,7 @@ T(3,)T(H,#FunctionCode,#FunctionHelp)
 !------ 上行電文 TEXT ------
 <sub type="TIM">
 #MediaDate
-#FunctionCode
+#OpItem
 </sub>
 
 !------ 下行電文TOM ------

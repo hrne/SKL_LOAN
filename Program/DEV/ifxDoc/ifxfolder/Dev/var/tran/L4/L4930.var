@@ -331,8 +331,6 @@ ifxBatch:{
 {width:95}
 #OODisAcctAmt=入暫收金額
 {width:95}
-#OOProcCodeX=處理代碼
-{width:150}
 #OOProcNote=處理說明
 {width:450}
 #OOTxSn=交易序號
@@ -374,8 +372,6 @@ ifxBatch:{
 {width:95}
 #OODisAcctAmt=入暫收金額
 {width:95}
-#OOProcCodeX=處理代碼
-{width:150}
 #OOProcNote=處理說明
 {width:450}
 #OOTxSn=交易序號

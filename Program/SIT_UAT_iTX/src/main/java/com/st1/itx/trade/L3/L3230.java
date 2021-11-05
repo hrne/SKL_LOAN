@@ -101,8 +101,6 @@ public class L3230 extends TradeBuffer {
 	TxToDoCom txToDoCom;
 	@Autowired
 	BaTxCom baTxCom;
-	@Autowired
-	L3731 l3731;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
@@ -153,7 +151,6 @@ public class L3230 extends TradeBuffer {
 		this.info("active L3230 ");
 		baTxCom.setTxBuffer(this.txBuffer);
 		acNegCom.setTxBuffer(this.txBuffer);
-		l3731.setTxBuffer(txBuffer);
 
 		this.totaVo.init(titaVo);
 
@@ -185,7 +182,6 @@ public class L3230 extends TradeBuffer {
 			if (titaVo.isHcodeErase()) {
 				UpdLoanOverDueEraseRoutine();
 			}
-
 		}
 // 作業項目              業務科目
 // 06.轉帳               收付欄
@@ -227,6 +223,8 @@ public class L3230 extends TradeBuffer {
 			case "10": // 10.沖帳管費/手續費
 			case "24": // 24.沖催收法務費
 			case "25": // 25.沖催收火險費
+			case "12": // 12.聯貸件
+			case "27": // 27.聯貸管理費
 			case "29": // 29.貸後契變手續費
 				settingUnPaid("F" + iTempItemCode);
 				this.txBuffer.addAllAcDetailList(lAcDetail);
@@ -244,10 +242,6 @@ public class L3230 extends TradeBuffer {
 			case "23": // 23.3200億傳統A
 				throw new LogicException(titaVo, "E0010", "請使用 L6201 其他傳票輸入"); // E0010 功能選擇錯誤
 
-			case "12": // 12.聯貸件
-				wkAcctCode = "F10";
-				ItemAcDetailRoutine();
-				this.txBuffer.addAllAcDetailList(lAcDetail);
 
 			case "22": // 22.88風災-保費 ???
 				throw new LogicException(titaVo, "E0010", "無對應之會計科目"); // E0010 功能選擇錯誤
@@ -268,19 +262,7 @@ public class L3230 extends TradeBuffer {
 		if (iTempAmt.compareTo(new BigDecimal(0)) > 0) {
 			setLoanBorTxRoutine();
 		}
-		if (iTempItemCode.equals("08")) { // 08: 收回呆帳
-			// 呆帳結案處理
-			if (titaVo.get("BDCLFg") != null && "Y".equals(titaVo.get("BDCLFg"))) {
 
-				if (titaVo.isHcodeNormal()) {
-					l3731.CaseCloseNormalRoutine(iCustNo, iFacmNo, 0, titaVo);
-				}
-
-				if (titaVo.isHcodeErase()) {
-					l3731.CaseCloseEraseRoutine(iCustNo, titaVo);
-				}
-			}
-		}
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -506,9 +488,7 @@ public class L3230 extends TradeBuffer {
 			this.info("   wkFacmNo = " + wkFacmNo);
 			this.info("   wkBormNo = " + wkBormNo);
 			this.info("   wkOvduNo = " + wkOvduNo);
-			if (wkBormNo > 0) {
-				continue;
-			}
+
 			// 還原催收檔
 			tLoanOverdue = loanOverdueService.holdById(new LoanOverdueId(wkCustNo, wkFacmNo, wkBormNo, wkOvduNo));
 			if (tLoanOverdue == null) {

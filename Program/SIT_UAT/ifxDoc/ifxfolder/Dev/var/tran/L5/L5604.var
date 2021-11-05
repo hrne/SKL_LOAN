@@ -141,6 +141,7 @@ E(0,@ClNo,#L5R21ClNo)
 T(2,@EditEmpNo,#L5R21EditEmpNo)
 T(2,@EditDate,#L5R21EditDate)
 T(2,@EditTime,#L5R21EditTime)
+T(2,@ClX,#L5R21Other)
 
 ! 調Rim完成預先帶入
 T(H,@LegalProgX,#LegalProg,#LegalProgHelp)

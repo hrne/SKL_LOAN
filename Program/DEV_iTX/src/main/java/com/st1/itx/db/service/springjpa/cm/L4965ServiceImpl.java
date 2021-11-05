@@ -50,7 +50,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		int iInsuEndDateTo = parse.stringToInteger(titaVo.getParam("InsuEndDateTo")) + 19110000;
 		//
 		String sqlL4965 = "";
-		
+
 		String searchStr = "";
 		String searchInsuNo1 = "";
 		String searchInsuNo2 = "";
@@ -63,7 +63,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 			if (iFacmNo == 0) {
 				searchStr += "  where c.\"CustNo\" = " + iCustNo + "  ";
 			} else {
-				searchStr += "  and c.\"CustNo\" = " + iCustNo + " and c.\"FacmNo\" = " + iFacmNo + "  ";
+				searchStr += "  where c.\"CustNo\" = " + iCustNo + " and c.\"FacmNo\" = " + iFacmNo + "  ";
 			}
 			sqlL4965 = makeSql2(searchStr);
 			break;
@@ -86,11 +86,11 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 			break;
 		}
 
-		if(iEffectiveCode == 0) {
-			 searchStr += "  and o.\"InsuEndDate\" >= " + iInsuEndDateFrom + " and o.\"InsuEndDate\" <= " + iInsuEndDateTo + "  ";
-			 sqlL4965 = makeSql1(searchStr, "", "");
-		} 
-		
+		if (iEffectiveCode == 0) {
+			searchStr += "  and o.\"InsuEndDate\" >= " + iInsuEndDateFrom + " and o.\"InsuEndDate\" <= " + iInsuEndDateTo + "  ";
+			sqlL4965 = makeSql1(searchStr, "", "");
+		}
+
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sqlL4965);
@@ -163,7 +163,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "        ,o.\"EthqInsuPrem\"       as \"EthqInsuPrem\" ";
 		sqlL4965 += "        ,o.\"InsuStartDate\"      as \"InsuStartDate\"";
 		sqlL4965 += "        ,o.\"InsuEndDate\"        as \"InsuEndDate\"  ";
-		sqlL4965 += "        ,o.\"PrevInsuNo\"        as \"PrevInsuNo\"  ";		
+		sqlL4965 += "        ,o.\"PrevInsuNo\"        as \"PrevInsuNo\"  ";
 		sqlL4965 += "        ,ROW_NUMBER() Over (Partition By o.\"ClCode1\", o.\"ClCode2\", o.\"ClNo\", o.\"PrevInsuNo\", o.\"EndoInsuNo\"";
 		sqlL4965 += "                             order By c.\"ApproveNo\" ASC)";
 		sqlL4965 += "                             as   \"RowNo\"";
@@ -203,7 +203,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "      ,i.\"EthqInsuPrem\"      as  F13";
 		sqlL4965 += "      ,i.\"InsuStartDate\" - 19110000     as  F14";
 		sqlL4965 += "      ,i.\"InsuEndDate\"   - 19110000     as  F15";
-		sqlL4965 += "      ,i.\"PrevInsuNo\"       as  F16";		
+		sqlL4965 += "      ,i.\"PrevInsuNo\"       as  F16";
 		sqlL4965 += "  from ( select ";
 		sqlL4965 += "         c.\"CustNo\"          as  \"CustNo\" ";
 		sqlL4965 += "        ,c.\"FacmNo\"          as  \"FacmNo\" ";
@@ -220,7 +220,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "        ,o.\"EthqInsuPrem\"    as  \"EthqInsuPrem\"  ";
 		sqlL4965 += "        ,o.\"InsuStartDate\"   as  \"InsuStartDate\" ";
 		sqlL4965 += "        ,o.\"InsuEndDate\"     as  \"InsuEndDate\" ";
-		sqlL4965 += "        ,null                  as \"PrevInsuNo\"  ";		
+		sqlL4965 += "        ,null                  as \"PrevInsuNo\"  ";
 		sqlL4965 += "        from   \"ClFac\" c     ";
 		sqlL4965 += "        left join \"InsuOrignal\" o";
 		sqlL4965 += "                    on o.\"ClCode1\" = c.\"ClCode1\"";
@@ -244,7 +244,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "        ,o.\"EthqInsuPrem\"       as \"EthqInsuPrem\" ";
 		sqlL4965 += "        ,o.\"InsuStartDate\"      as \"InsuStartDate\"";
 		sqlL4965 += "        ,o.\"InsuEndDate\"        as \"InsuEndDate\"  ";
-		sqlL4965 += "        ,o.\"PrevInsuNo\"         as \"PrevInsuNo\"  ";		
+		sqlL4965 += "        ,o.\"PrevInsuNo\"         as \"PrevInsuNo\"  ";
 		sqlL4965 += "        from   \"ClFac\" c  ";
 		sqlL4965 += "        left join \"InsuRenew\" o";
 		sqlL4965 += "                    on o.\"ClCode1\" = c.\"ClCode1\"";
@@ -260,21 +260,19 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return sqlL4965;
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<String[]> findItem(List<Map<String, String>> lObject) throws LogicException {
 		List<String[]> data = new ArrayList<String[]>();
 		if (lObject != null && lObject.size() != 0) {
-			int col = ((Map<String, String>) lObject.get(0)).keySet().size();
-			for (Object obj : lObject) {
-				Map<String, String> MapObj = (Map<String, String>) obj;
+			int col = lObject.get(0).keySet().size();
+			for (Map<String, String> MapObj : lObject) {
 				String row[] = new String[col];
 				for (int i = 0; i < col; i++) {
 					row[i] = MapObj.get("F" + String.valueOf(i));
-					if (row[i] != null && row[i].length() != 0) {
-
-					} else {
+					if (row[i] != null && row[i].length() != 0)
+						;
+					else
 						row[i] = "";
-					}
+
 				}
 				data.add(row);
 			}

@@ -29,7 +29,7 @@ public class ClImm implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 5747952369297098092L;
+	private static final long serialVersionUID = 7997369176754068602L;
 
 @EmbeddedId
   private ClImmId clImmId;
@@ -167,33 +167,9 @@ public class ClImm implements Serializable {
   @Column(name = "`ClaimDate`")
   private int claimDate = 0;
 
-  // 設定順位(1~4)
+  // 設定順位(1~9)
   @Column(name = "`SettingSeq`", length = 1)
   private String settingSeq;
-
-  // 前一順位債權人
-  @Column(name = "`FirstCreditor`", length = 10)
-  private String firstCreditor;
-
-  // 前一順位金額
-  @Column(name = "`FirstAmt`")
-  private BigDecimal firstAmt = new BigDecimal("0");
-
-  // 前二順位債權人
-  @Column(name = "`SecondCreditor`", length = 10)
-  private String secondCreditor;
-
-  // 前二順位金額
-  @Column(name = "`SecondAmt`")
-  private BigDecimal secondAmt = new BigDecimal("0");
-
-  // 前三順位債權人
-  @Column(name = "`ThirdCreditor`", length = 10)
-  private String thirdCreditor;
-
-  // 前三順位金額
-  @Column(name = "`ThirdAmt`")
-  private BigDecimal thirdAmt = new BigDecimal("0");
 
   // 建檔日期時間
   @CreatedDate
@@ -837,7 +813,7 @@ N:否
   }
 
 /**
-	* 設定順位(1~4)<br>
+	* 設定順位(1~9)<br>
 	* 
 	* @return String
 	*/
@@ -846,127 +822,13 @@ N:否
   }
 
 /**
-	* 設定順位(1~4)<br>
+	* 設定順位(1~9)<br>
 	* 
   *
-  * @param settingSeq 設定順位(1~4)
+  * @param settingSeq 設定順位(1~9)
 	*/
   public void setSettingSeq(String settingSeq) {
     this.settingSeq = settingSeq;
-  }
-
-/**
-	* 前一順位債權人<br>
-	* 
-	* @return String
-	*/
-  public String getFirstCreditor() {
-    return this.firstCreditor == null ? "" : this.firstCreditor;
-  }
-
-/**
-	* 前一順位債權人<br>
-	* 
-  *
-  * @param firstCreditor 前一順位債權人
-	*/
-  public void setFirstCreditor(String firstCreditor) {
-    this.firstCreditor = firstCreditor;
-  }
-
-/**
-	* 前一順位金額<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getFirstAmt() {
-    return this.firstAmt;
-  }
-
-/**
-	* 前一順位金額<br>
-	* 
-  *
-  * @param firstAmt 前一順位金額
-	*/
-  public void setFirstAmt(BigDecimal firstAmt) {
-    this.firstAmt = firstAmt;
-  }
-
-/**
-	* 前二順位債權人<br>
-	* 
-	* @return String
-	*/
-  public String getSecondCreditor() {
-    return this.secondCreditor == null ? "" : this.secondCreditor;
-  }
-
-/**
-	* 前二順位債權人<br>
-	* 
-  *
-  * @param secondCreditor 前二順位債權人
-	*/
-  public void setSecondCreditor(String secondCreditor) {
-    this.secondCreditor = secondCreditor;
-  }
-
-/**
-	* 前二順位金額<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getSecondAmt() {
-    return this.secondAmt;
-  }
-
-/**
-	* 前二順位金額<br>
-	* 
-  *
-  * @param secondAmt 前二順位金額
-	*/
-  public void setSecondAmt(BigDecimal secondAmt) {
-    this.secondAmt = secondAmt;
-  }
-
-/**
-	* 前三順位債權人<br>
-	* 
-	* @return String
-	*/
-  public String getThirdCreditor() {
-    return this.thirdCreditor == null ? "" : this.thirdCreditor;
-  }
-
-/**
-	* 前三順位債權人<br>
-	* 
-  *
-  * @param thirdCreditor 前三順位債權人
-	*/
-  public void setThirdCreditor(String thirdCreditor) {
-    this.thirdCreditor = thirdCreditor;
-  }
-
-/**
-	* 前三順位金額<br>
-	* 
-	* @return BigDecimal
-	*/
-  public BigDecimal getThirdAmt() {
-    return this.thirdAmt;
-  }
-
-/**
-	* 前三順位金額<br>
-	* 
-  *
-  * @param thirdAmt 前三順位金額
-	*/
-  public void setThirdAmt(BigDecimal thirdAmt) {
-    this.thirdAmt = thirdAmt;
   }
 
 /**
@@ -1053,7 +915,6 @@ N:否
            + ", agreement=" + agreement + ", evaCompanyCode=" + evaCompanyCode + ", limitCancelDate=" + limitCancelDate + ", clCode=" + clCode + ", loanToValue=" + loanToValue + ", otherOwnerTotal=" + otherOwnerTotal
            + ", compensationCopy=" + compensationCopy + ", bdRmk=" + bdRmk + ", mtgReasonCode=" + mtgReasonCode + ", receivedDate=" + receivedDate + ", receivedNo=" + receivedNo + ", cancelDate=" + cancelDate
            + ", cancelNo=" + cancelNo + ", settingStat=" + settingStat + ", clStat=" + clStat + ", settingDate=" + settingDate + ", settingAmt=" + settingAmt + ", claimDate=" + claimDate
-           + ", settingSeq=" + settingSeq + ", firstCreditor=" + firstCreditor + ", firstAmt=" + firstAmt + ", secondCreditor=" + secondCreditor + ", secondAmt=" + secondAmt + ", thirdCreditor=" + thirdCreditor
-           + ", thirdAmt=" + thirdAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", settingSeq=" + settingSeq + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

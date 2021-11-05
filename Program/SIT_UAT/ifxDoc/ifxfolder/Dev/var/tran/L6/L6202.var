@@ -51,6 +51,9 @@ T(3,CdCode.FuncCode2)
 T(3,CdCode.AcctCode)
 #AcctCodeHelp=x,1024,S
 
+#AcctCodeHelp2=x,1024,S
+T(3,F12:聯貸件;F27:聯貸管理費)
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CODE0001,#CODE0002)
@@ -147,19 +150,18 @@ T(2,@AcctCode,#L6R45AcctCode)
 
 !聯貸費用說明
 #SyndFeeItem=x,60,I
-
 C(3,#FunCd,4,s,$)
 @V(7)
 
 !業務科目代號
+! T(HELP,@AcctCodeHelp,#AcctCodeHelp,-,310;320;330;340;990;IC1;IC2;IC3;IC4;T10;TAV;TCK;TLD;TMI;YOP;Z10;Z20;Z30;Z40)
 #AcctCode=X,3,I
 C(3,#FunCd,4,s,$)
-T(HELP,@AcctCodeHelp,#AcctCodeHelp,-,310;320;330;340;990;IC1;IC2;IC3;IC4;T10;TAV;TCK;TLD;TMI;YOP;Z10;Z20;Z30;Z40)
-HELP(#AcctCodeHelp)
-@V(H,#AcctCodeHelp)
+HELP(#AcctCodeHelp2)
+@V(H,#AcctCodeHelp2)
 
 #AcctCodeX=X,20,L
-T(3,)T(H,#AcctCode,#AcctCodeHelp)
+T(3,)T(H,#AcctCode,#AcctCodeHelp2)
 
 
 

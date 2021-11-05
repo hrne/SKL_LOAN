@@ -1,0 +1,493 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,XW111)
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+T(2,@RimTxCode,#TXCD)
+E(0,@RimFKey,#FKEY)
+
+</sub>
+
+<sub type="PREDC" name="PreDC">
+
+!先隱藏欄位 FLAG 0=隱藏 1=顯示
+#HIDE1FG=A,1,S
+IF(#FKEY==0,E(0,0),$)
+
+
+
+!--- P1 主要戶號額度
+#HIDEP1=@,1,S
+C(3,#HIDE1FG,1,E(0,@HIDE1FG,0),E(0,@HIDE1FG,1))
+INVOKEJS(SHOW,p2,#HIDE1FG)
+C(3,#HIDE1FG,1,$,s)
+CALL(#CALLGRID)
+
+
+
+!--- 控制grd顯示欄位
+#CALLGRID=@,1,S
+##loop{times:10,n:1}
+IF(#ApplNo{n}==0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
+##end
+C(3,#UpdateCode,1,$,s)
+INVOKEJS(SHOW,grd1_1,1)
+
+
+</sub>
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[240,120,120,150];printer.width=[15,35,15,35];order=1">
+[
+["[L2118]                                 共同借款人資料登錄                                                   "],
+[#<->#,"功能",#FuncCode,#FuncCodeX],
+[#<->#,"是否合併申報",#JcicMergeFlag,#JcicMergeFlagX,"@@@",#TXT],
+]
+
+! 進交易先隱藏主要戶號額度與共用戶號額度欄
+#init=X,1,S
+INVOKEJS(SHOW,p2,0)
+INVOKEJS(SHOW,p3,0)
+
+!---------- AP Button AREA ----------   
+![Buttom資料查詢]
+
+!---------- AP TEXT AREA Variables ----------
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+#CDDEF0001=x,26,S
+T(3,CdCode.CurrPrecision)
+
+#CDDEF0002=x,11,S
+T(3,CdGuarantor)
+
+#CurrPrecisionHelp=x,1024,S 
+#RelCodeHelp=x,3000,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@CurrPrecisionHelp,#HelpDesc1) 
+T(2,@RelCodeHelp,#HelpDesc2) 
+
+
+!FuncCode
+#FuncCodeHelp=x,30,S
+T(3,1:新增;2:修改;4:刪除;5:查詢)
+
+
+!YN
+#YNHelp=X,30,S
+T(3,Y:是;N:否)
+!Y
+#YHelp=X,30,S
+T(3,Y:是)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,18,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FuncCode,#NTXBUF,1,1)
+C(3,#FuncCode,1,s,$)
+T(1,@ApplNo1,#NTXBUF,2,7)
+
+!功能
+#FuncCode=A,1,L
+C(3,#FuncCode,0,E(0,1),$)
+C(3,#CHAIN,1,s,E(0,1))
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+IF(#FuncCode==4 || #FuncCode==2,$,S)
+E(0,1)ASGN(AGAIN$)
+
+!依功能選項顯示submit按鈕名稱
+#FuncCodeX=X,4,L
+E(0,@FUNCIND,#FuncCode)
+T(H,#FuncCode,#FuncCodeHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+
+
+!維護記號 1-可維護 0-純顯示
+#UpdateCode=A,1,S
+!IF(#FuncCode==1 || #FuncCode==2 || #FuncCode==3,E(0,1),E(0,0))
+IF(#FuncCode==1,E(0,1),E(0,0))
+! C(3,#FuncCode,1,T(F,#CustNo,1),T(F,#CustNo,0))
+
+
+
+#CtrlBTN=X,1,S
+##loop{times:10,n:1}
+C(3,#UpdateCode,1,SHOW(#BTNA{n}),HIDE(#BTNA{n}))
+##end
+
+
+#ctrltf=X,1,S
+C(3,#UpdateCode,1,S,$)
+##loop{times:10,n:1}
+T(F,#ApplNo{n},0)
+##end
+
+#L2r49=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#FuncCode,1,S,$)
+E(0,@RimFuncCode,#FuncCode)
+E(0,@RimApplNo,#ApplNo1)
+S(L2R49,1,#RimFuncCode,#RimApplNo)
+R(1,L2R49)
+
+#RcvL2r49=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#FuncCode,1,S,$)
+T(2,@JcicMergeFlag,#L2r49JcicMergeFlag)
+##loop{times:10,n:1}
+E(0,@ApplNo{n},#L2r49ApplNo{n})
+E(0,@MCustNo{n},#L2r49CustNo{n})
+E(0,@MFacmNo{n},#L2r49FacmNo{n})
+C(3,#L2r49CustNo{n},0,$,T(2,@MCustFacmNo{n},#L2r49CustNo{n}+-+#L2r49FacmNo{n}))
+T(2,@MCustName{n},#L2r49CustName{n})
+E(0,@MCaseNo{n},#L2r49CaseNo{n})
+E(0,@MUtilDeadline{n},#L2r49Deadline{n})
+T(2,@MCurrencyCode{n},#L2r49CurrencyCode{n})
+E(0,@MLineAmt{n},#L2r49LineAmt{n})
+T(2,@MRecycleCode{n},#L2r49RecycleCode{n})
+##end
+##loop{times:10,n:1}
+T(2,@RelCode{n},#L2r49RelCode{n})
+T(H,@RelCodeX{n},#RelCode{n},#RelCodeHelp)
+##end
+
+
+!以主要戶號申報聯徵
+#JcicMergeFlag=X,1,L
+T(2,Y)
+HELP(#YNHelp)
+! @V(H,#YNHelp)
+
+#JcicMergeFlagX=X,5,L
+T(H,#JcicMergeFlag,#YNHelp)
+
+#TXT=x,50,L
+
+
+!--- P1 主要戶號額度
+#MMainCustNo0=A,7,S
+#ApplNo0=A,7,S
+
+#Cnt=A,2,S
+E(0,0)
+
+!主要戶號額度GRD1
+##loop{times:10,l:0,n:1,m:2}
+!核准號碼
+
+#BTNA{n}=X,15,I,ui:button;value:核准號碼;enable:1;tabbable:0;title:L2016 核准號碼明細資料查詢;
+
+#BUFa{n}=X,18,S
+T(3,000000000000000)
+IF(#FuncCode == 1 || #FuncCode == 2,$,HIDE(#BTNA{n}))
+
+#BINDa{n}=X,1,S
+BIND(#BTNA{n},click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUFa{n};ntxbuf5=type<-1:ApplNo{n}<-OOApplNo})
+
+#ApplNo{n}=A,7,I
+C(3,#HIDE1FG,0,CALL(#HIDEP1),$)
+IF({n}==1,$,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1)))
+IF({n}==1,$,C(3,#ApplNo{l},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1)))
+IF({n}==1,$,C(3,#ApplNo{l},0,S,$))
+C(3,#UpdateCode,1,$,s)
+@
+IF({n}==1 || {n}==2,V(2,0),$)
+C(3,#ApplNo{n},0,$,E(0,@Cnt,#Cnt+1))
+
+#CustId{n}=X,10,L
+
+! L2118新增時(L2R05)檢查 撥款後不可再建檔 TODO:測試期間暫不控管
+#L2r05A{n}=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#ApplNo{n},0,S,$)
+C(3,#FuncCode,1,E(0,@RimFuncCode,#FuncCode),E(0,@RimFuncCode,5))
+E(0,@RimCustNo,0)
+E(0,@RimFacmNo,0)
+E(0,@RimApplNo,#ApplNo{n})
+E(0,@RimCaseNo,0)
+RESET_RIM(#L2r05A{n},L2R05)
+S(L2R05,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimCustNo,#RimFacmNo,#RimApplNo,#RimCaseNo)
+R(1,L2R05)
+
+#SendL2r02A{n}=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#ApplNo{n},0,S,$)
+E(0,@RimApplNo,#ApplNo{n})
+C(3,#FuncCode,1,E(0,@RimFuncCode,#FuncCode),E(0,@RimFuncCode,5))
+T(2,@RimCustId,)
+RESET_RIM(#SendL2r02A,{n}L2R02)
+S(L2R02,1,#RimFuncCode,#RimTxCode,#RimFKey,#RimApplNo,#RimCustId)
+R(1,L2R02)
+
+#L2r07A{n}=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#ApplNo{n},0,S,$)
+T(2,@RimCustId,#L2r02CustId)
+E(0,@RimCustNo,0)
+RESET_RIM(#L2r07A{n},L2R07)
+S(L2R07,1,#RimTxCode,#RimCustId,#RimCustNo)
+R(1,L2R07)
+
+#RcvL2r05A{n}=X,1,S
+IF(#FKEY==0 || #FKEY==7,$,s)
+C(3,#ApplNo{n},0,S,$)
+E(0,@MCustNo{n},#L2r05CustNo)
+E(0,@MFacmNo{n},#L2r05FacmNo)
+T(2,@CustId{n},#L2r07CustId)
+T(2,@MCustName{n},#L2r07CustName)
+C(3,#L2r05CustNo,0,$,T(2,@MCustFacmNo{n},#L2r05CustNo+-+#L2r05FacmNo))
+E(0,@MCaseNo{n},#L2r05CreditSysNo)
+E(0,@MUtilDeadline{n},#L2r05UtilDeadline)
+T(2,@MCurrencyCode{n},#L2r05CurrencyCode)
+E(0,@MLineAmt{n},#L2r05LineAmt)
+C(3,#L2r05RecycleCode,1,T(3,@MRecycleCode{n},Y),T(3,@MRecycleCode{n},))
+
+!戶號-額度
+#MCustNo{n}=A,7,L
+C(3,#ApplNo{n},0,S,$)
+
+#MFacmNo{n}=A,3,L
+C(3,#ApplNo{n},0,S,$)
+
+#MCustFacmNo{n}=X,12,L
+C(3,#ApplNo{n},0,S,$)
+
+#MCustName{n}=x,100,L
+C(3,#ApplNo{n},0,S,$)
+#MCustNameS{n}=x,30,L
+C(3,#ApplNo{n},0,S,$)
+T(B,#MCustName{n})
+
+#showtxt{n}=X,1,S
+IF({n}==1,$,S)
+C(3,#ApplNo{n},0,T(3,@TXT,),T(B,@TXT,合併至+#MCustName{n}))
+K(LIGHT,#TXT,TXTRED,0,1)
+
+!案件編號
+#MCaseNo{n}=A,7,L
+C(3,#ApplNo{n},0,S,$)
+
+!動支期限
+#MUtilDeadline{n}=D,7,L
+C(3,#ApplNo{n},0,S,$)
+
+!幣別
+#MCurrencyCode{n}=X,3,L
+C(3,#ApplNo{n},0,S,$)
+
+
+!幣別小數位-預設為新台幣
+#Precision{n}=N,1,S
+E(0,0)
+T(H,#MCurrencyCode{n},#CurrPrecisionHelp)
+
+
+!核准額度
+#MLineAmt{n}=m,14.2,S
+C(3,#ApplNo{n},0,S,$)
+#MLineAmtX{n}=X,22,L
+CALL2(#ADJUSTDOT,#Precision{n},#MLineAmt{n},#MLineAmtX{n})
+P(R,#MLineAmtX{n})
+
+!循環動用 0-非循環動用 1-循環動用
+#MRecycleCode{n}=X,1,L
+
+##end
+
+
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L2R02.dec"/>
+<include src="ROM.icf::L2R05.dec"/>
+<include src="ROM.icf::L2R07.dec"/>
+<include src="ROM.icf::L2R49.dec"/>
+<include src="ROM.icf::L2Rim.dec"/>
+
+</sub>
+
+
+<sub type="DC" name="p2" layout="cols=2;screen.width=[10,1200];printer.width=[15,30];order=1;">
+[
+["<font color=red>@共同借款人"],
+["#grid#,{id:1,expand:true,loop:10,row_height:1,s_cols:[,70,120,250,70,120,70,70,], p_cols:[5,15,15,15,15,20,15,15,15]}","","",
+["","核准號碼","戶號","戶名","案件編號","循環動用</br>動支期限",
+"幣別","核准額度","循環動用"],
+[[#BTNA1],[#ApplNo1],[#MCustFacmNo1],[#CustId1,#MCustNameS1],[#MCaseNo1],[#MUtilDeadline1],
+[#MCurrencyCode1],[#MLineAmtX1],[#MRecycleCode1],],
+],
+]
+
+#T2=X,1,S
+INVOKEJS(SHOW,p3,1)
+
+</sub>
+
+<sub type="DC" name="p3" layout="cols=2;screen.width=[10,1200];printer.width=[15,30];order=1;">
+[
+["<font color=red>@共同借款人關係登錄"],
+["#grid#,{id:2,expand:true,loop:100,row_height:1,s_cols:[200,200,200], p_cols:[20,20,20]}","","",
+["共同借款人","與共同借款人","關係"],
+[[#IdA1,#NameA1],[#IdB1,#NameB1],[#RelCode1,#RelCodeX1]],
+],
+]
+#Cnt2=A,3,S
+E(0,0)
+
+#NowApplNo=A,7,S
+#NowCustId=X,10,S
+#NowCustName=X,30,S
+
+#NowApplNo2=A,7,S
+#NowCustId2=X,10,S
+#NowCustName2=X,30,S
+
+#CallRel=@,1,S
+##loop{times:10,i:1}
+C(4,#CustId{i},s,$)
+E(0,@NowApplNo2,#ApplNo{i})
+T(2,@NowCustId2,#CustId{i})
+T(2,@NowCustName2,#MCustNameS{i})
+IF(#NowCustId == #NowCustId2,$,CALL(#CallRel2))
+##end
+
+#CallRel2=@,1,S
+E(0,@Cnt2,#Cnt2+1)
+##loop{times:100,i:1}
+IF(#Cnt2 == {i},E(0,@ApplNoA{i},#NowApplNo)T(2,@IdA{i},#NowCustId)T(2,@NameA{i},#NowCustName)E(0,@ApplNoB{i},#NowApplNo2)T(2,@IdB{i},#NowCustId2)T(2,@NameB{i},#NowCustName2),$)
+##end
+
+#InitGrid2=X,1,S
+##loop{times:10,i:1}
+#Set{i}=X,1,S
+C(4,#CustId{i},s,$)
+E(0,@NowApplNo,#ApplNo{i})
+T(2,@NowCustId,#CustId{i})
+T(2,@NowCustName,#MCustNameS{i})
+CALL(#CallRel)
+##end
+
+#T3=X,1,S
+!E(0,@Cnt2,#Cnt2+1)
+INVOKEJS(SHOW,grd2,1,101,0)
+INVOKEJS(SHOW,grd2,1,#Cnt2,1)
+
+##loop{times:100,i:1}
+#ApplNoA{i}=A,7,S
+
+#IdA{i}=X,10,L
+
+#NameA{i}=X,2.50,L
+
+#ApplNoB{i}=A,7,S
+
+#IdB{i}=X,10,L
+
+#NameB{i}=X,2.50,L
+
+#RelCode{i}=X,2,I
+IF(#FuncCode==1 || #FuncCode==2,$,T(F,#RelCode{i},0))
+IF(#FuncCode==1 || #FuncCode==2,$,s)
+C(4,#IdA{i},S,$)
+HELP(#RelCodeHelp)
+@V(H,#RelCodeHelp)
+
+#RelCodeX{i}=x,30,L
+C(4,#IdA{i},S,$)
+T(H,#RelCode{i},#RelCodeHelp)
+
+##end
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L2118 ----------
+<sub type="FORM" name="L2118">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L2118,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L2118] 共同借款人資料登錄)
+
+
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode
+#JcicMergeFlag
+##loop{times:10,n:1}
+#ApplNo{n}
+##end
+##loop{times:100,i:1}
+#ApplNoA{i}
+#ApplNoB{i}
+#RelCode{i}
+##end
+
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L2118
+
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="COM.icf::LockControl.tom"/>
+<include src="ROM.icf::L2R05.tom"/>
+<include src="ROM.icf::L2R02.tom"/>
+<include src="ROM.icf::L2R07.tom"/>
+<include src="ROM.icf::L2R49.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+<sub type="PART" name="L2118" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
+[
+["[L2118]                                 共同借款人資料登錄"],
+! [""],
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+<include src="PRT.icf::UPDH01.sel"/>
+</sub>

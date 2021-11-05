@@ -191,7 +191,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setStatusCode(0);
 			tInsuRenew.setOvduDate(0);
 			tInsuRenew.setOvduNo(BigDecimal.ZERO);
-			totPrem = parse.stringToBigDecimal(titaVo.getParam("FireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("EthqInsuPrem")));
+			totPrem = parse.stringToBigDecimal(titaVo.getParam("NewFireInsuPrem")).add(parse.stringToBigDecimal(titaVo.getParam("NewEthqInsuPrem")));
 			tInsuRenew.setTotInsuPrem(totPrem);
 			tInsuRenew.setRepayCode(tFacMain.getRepayCode());
 			try {

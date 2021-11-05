@@ -230,6 +230,20 @@ public interface AcReceivableService {
   public Slice<AcReceivable> acctCodeSubBook(int clsFlag_0, String acBookCode_1, String acSubBookCode_2, String acctCode_3, int custNo_4, int custNo_5, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND AcctFlag &gt;= ,AND AcctFlag &lt;= ,AND RvNo %
+   *
+   * @param custNo_0 custNo_0
+   * @param acctFlag_1 acctFlag_1
+   * @param acctFlag_2 acctFlag_2
+   * @param rvNo_3 rvNo_3
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice AcReceivable AcReceivable of List
+   */
+  public Slice<AcReceivable> useL2064Eq(int custNo_0, int acctFlag_1, int acctFlag_2, String rvNo_3, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By AcReceivable
    * 
    * @param acReceivableId key

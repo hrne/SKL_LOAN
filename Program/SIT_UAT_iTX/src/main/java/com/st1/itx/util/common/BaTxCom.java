@@ -94,7 +94,7 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal excessiveOther = BigDecimal.ZERO; // 其他額度累溢收
 	private BigDecimal tempTax = BigDecimal.ZERO; // 暫付所得稅
 	private BigDecimal modifyFee = BigDecimal.ZERO; // 契變手續費 F29
-	private BigDecimal acctFee = BigDecimal.ZERO; // 帳管費用 F10
+	private BigDecimal acctFee = BigDecimal.ZERO; // 帳管費/手續費 F10 F12 F27
 	private BigDecimal fireFee = BigDecimal.ZERO; // 火險費用 TMI F09
 	private BigDecimal unOpenfireFee = BigDecimal.ZERO; // 未到期火險費用
 	private BigDecimal collFireFee = BigDecimal.ZERO; // 催收火險費 F25
@@ -136,7 +136,7 @@ public class BaTxCom extends TradeBuffer {
 
 		this.tempTax = BigDecimal.ZERO; // 暫付所得稅
 		this.modifyFee = BigDecimal.ZERO; // 契變手續費 F29
-		this.acctFee = BigDecimal.ZERO; // 帳管費用 F10
+		this.acctFee = BigDecimal.ZERO; // 帳管費/手續費 F10 F12 F27
 		this.fireFee = BigDecimal.ZERO; // 火險費用 TMI F09
 		this.unOpenfireFee = BigDecimal.ZERO; // 未到期火險費用
 		this.collFireFee = BigDecimal.ZERO; // 催收火險費 F25
@@ -612,6 +612,7 @@ public class BaTxCom extends TradeBuffer {
 				if (ln.getStatus() != 0) {
 					continue;
 				}
+				this.info("order2 = " + ln.getLoanBorMainId());
 				this.loanBal = ln.getLoanBal(); // 還款前本金餘額
 				switch (iRepayType) {
 				case 1: // 01-期款
@@ -663,7 +664,7 @@ public class BaTxCom extends TradeBuffer {
 					// 輸出每期
 					for (int i = 1; i <= wkTerms; i++) {
 						lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
-						repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo);
+						repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo,i);
 						loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
 						loanCalcRepayIntCom.setStoreRate(loanCalcRepayIntCom.getStoreRate()); // 上次收息利率
 						loanCalcRepayIntCom.setTerms(1); // 本次計息期數
@@ -701,14 +702,14 @@ public class BaTxCom extends TradeBuffer {
 					this.extraRepayAmt = this.extraRepayAmt.subtract(loanCalcRepayIntCom.getPrincipal())
 							.subtract(loanCalcRepayIntCom.getInterest()).subtract(loanCalcRepayIntCom.getDelayInt())
 							.subtract(loanCalcRepayIntCom.getBreachAmt());
-					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo);
+					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo,0);
 
 					break;
 				case 3: // 結案
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iEntryDate, 1, iEntryDate, titaVo);
 					loanCalcRepayIntCom.setCaseCloseFlag("Y"); // 結案記號 Y:是 N:否
 					lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
-					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo);
+					repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo,0);
 					break;
 				case 90: // 提存
 					// iEntryDate 入帳日 ==> 月底日曆日
@@ -740,7 +741,7 @@ public class BaTxCom extends TradeBuffer {
 							loanCalcRepayIntCom.setIntEndDate(iPayIntDate); // 計息止日
 						}
 						lCalcRepayIntVo = loanCalcRepayIntCom.getRepayInt(titaVo);
-						repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo);
+						repayLoanBaTxVo(iEntryDate, iPayIntDate, iRepayType, iCustNo, ln, lCalcRepayIntVo,i);
 						loanCalcRepayIntCom.setPrincipal(loanCalcRepayIntCom.getLoanBal()); // 計息本金
 						loanCalcRepayIntCom.setStoreRate(loanCalcRepayIntCom.getStoreRate()); // 上次收息利率
 						loanCalcRepayIntCom.setIntStartDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 計算起日
@@ -768,7 +769,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	private void repayLoanBaTxVo(int iEntryDate, int iPayIntDate, int iRepayType, int iCustNo, LoanBorMain ln,
-			ArrayList<CalcRepayIntVo> lCalcRepayIntVo) {
+			ArrayList<CalcRepayIntVo> lCalcRepayIntVo, int terms) {
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(2); // 2.本金利息
 		// 還款類別
@@ -778,7 +779,7 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setFacmNo(ln.getFacmNo()); // 額度編號
 		baTxVo.setBormNo(ln.getBormNo()); // 撥款序號
 		baTxVo.setRvNo(" "); // 銷帳編號
-		baTxVo.setPaidTerms(loanCalcRepayIntCom.getPaidTerms()); // 繳息期數
+		baTxVo.setPaidTerms(terms); // 繳息期數
 		baTxVo.setPayIntDate(loanCalcRepayIntCom.getPrevPaidIntDate()); // 應繳息日
 		baTxVo.setAcctCode(loanCalcRepayIntCom.getAcctCode()); // 業務科目
 		// 結案時還款本金已含短繳本金，回收金額須扣除
@@ -899,7 +900,7 @@ public class BaTxCom extends TradeBuffer {
 
 	/* 按額度應繳日回收，應繳日由小到大、計息順序(利率由大到小)、額度由小到大 */
 	private void settleByPayintDate() {
-		this.info("settleByTerm ...xxBal=" + this.xxBal);
+		this.info("settleByPayintDate ...xxBal=" + this.xxBal);
 		int facmNo = 0;
 		int payIntDate = 0;
 		BigDecimal payintDateAmt = BigDecimal.ZERO;
@@ -911,12 +912,12 @@ public class BaTxCom extends TradeBuffer {
 						payIntDate = ba.getPayIntDate();
 						facmNo = ba.getFacmNo();
 						payintDateAmt = getPayintDateAmt(payIntDate, facmNo);
-						this.info("settleByTerm xxBal=" + this.xxBal + ", payintDat=" + payIntDate + ", payintDateAmt="
+						this.info("settleByPayintDate xxBal=" + this.xxBal + ", payintDat=" + payIntDate + ", payintDateAmt="
 								+ payintDateAmt);
 						if (this.xxBal.compareTo(payintDateAmt) < 0) {
 							break;
 						} else {
-							this.info("settlePayintDateAmt payintDateAmt=" + payintDateAmt);
+							this.info("settleByPayintDate payintDateAmt=" + payintDateAmt);
 							settlePayintDateAmt(payIntDate, facmNo);
 							this.repayIntDate = payIntDate;
 						}
@@ -1169,8 +1170,10 @@ public class BaTxCom extends TradeBuffer {
 								}
 							} else {
 								switch (rv.getAcctCode()) {
-								case "F10": // F10 帳管費
-									baTxVo.setRepayType(4); // 04-帳管費
+								case "F10": // 帳管費/手續費 
+								case "F12": // 帳管費/手續費 F10 F12 F27
+								case "F27": // 帳管費/手續費 F10 F12 F27
+									baTxVo.setRepayType(4); // 04-帳管費/手續費 
 									baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 									this.acctFee = this.acctFee.add(rv.getRvBal());
 									break;

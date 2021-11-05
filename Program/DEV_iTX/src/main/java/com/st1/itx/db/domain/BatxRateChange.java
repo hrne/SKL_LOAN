@@ -126,7 +126,7 @@ public class BatxRateChange implements Serializable {
   @Column(name = "`ProdNo`", length = 5)
   private String prodNo;
 
-  // 利率加減碼
+  // 加碼利率
   /* 調整前借戶利率檔加碼利率 */
   @Column(name = "`RateIncr`")
   private BigDecimal rateIncr = new BigDecimal("0");
@@ -152,13 +152,13 @@ public class BatxRateChange implements Serializable {
   @Column(name = "`ContrBaseRate`")
   private BigDecimal contrBaseRate = new BigDecimal("0");
 
-  // 合約加減碼
+  // 合約加碼利率
   /* 調整前借戶利率檔加碼利率 */
   @Column(name = "`ContrRateIncr`")
   private BigDecimal contrRateIncr = new BigDecimal("0");
 
-  // 個別加減碼
-  /* 調整前借戶利率檔個別加減碼 */
+  // 個別加碼利率
+  /* 調整前借戶利率檔個別加碼利率 */
   @Column(name = "`IndividualIncr`")
   private BigDecimal individualIncr = new BigDecimal("0");
 
@@ -663,7 +663,7 @@ L4321維護，確認後Table欄位不可更改
   }
 
 /**
-	* 利率加減碼<br>
+	* 加碼利率<br>
 	* 調整前借戶利率檔加碼利率
 	* @return BigDecimal
 	*/
@@ -672,10 +672,10 @@ L4321維護，確認後Table欄位不可更改
   }
 
 /**
-	* 利率加減碼<br>
+	* 加碼利率<br>
 	* 調整前借戶利率檔加碼利率
   *
-  * @param rateIncr 利率加減碼
+  * @param rateIncr 加碼利率
 	*/
   public void setRateIncr(BigDecimal rateIncr) {
     this.rateIncr = rateIncr;
@@ -777,7 +777,7 @@ L4321維護，確認後Table欄位不可更改
   }
 
 /**
-	* 合約加減碼<br>
+	* 合約加碼利率<br>
 	* 調整前借戶利率檔加碼利率
 	* @return BigDecimal
 	*/
@@ -786,18 +786,18 @@ L4321維護，確認後Table欄位不可更改
   }
 
 /**
-	* 合約加減碼<br>
+	* 合約加碼利率<br>
 	* 調整前借戶利率檔加碼利率
   *
-  * @param contrRateIncr 合約加減碼
+  * @param contrRateIncr 合約加碼利率
 	*/
   public void setContrRateIncr(BigDecimal contrRateIncr) {
     this.contrRateIncr = contrRateIncr;
   }
 
 /**
-	* 個別加減碼<br>
-	* 調整前借戶利率檔個別加減碼
+	* 個別加碼利率<br>
+	* 調整前借戶利率檔個別加碼利率
 	* @return BigDecimal
 	*/
   public BigDecimal getIndividualIncr() {
@@ -805,10 +805,10 @@ L4321維護，確認後Table欄位不可更改
   }
 
 /**
-	* 個別加減碼<br>
-	* 調整前借戶利率檔個別加減碼
+	* 個別加碼利率<br>
+	* 調整前借戶利率檔個別加碼利率
   *
-  * @param individualIncr 個別加減碼
+  * @param individualIncr 個別加碼利率
 	*/
   public void setIndividualIncr(BigDecimal individualIncr) {
     this.individualIncr = individualIncr;

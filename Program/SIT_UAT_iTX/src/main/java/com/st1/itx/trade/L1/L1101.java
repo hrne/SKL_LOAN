@@ -129,7 +129,10 @@ public class L1101 extends TradeBuffer {
 		String funcd = titaVo.getParam("FunCd");
 
 		// 統編
-		String iCustId = titaVo.get("CustId");
+		// 2021-11-05 智偉修改 
+		// titaVo.get("CustId") -> titaVo.getParam("CustId")
+		// getParam會trim
+		String iCustId = titaVo.getParam("CustId");
 
 		// isEloan
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
