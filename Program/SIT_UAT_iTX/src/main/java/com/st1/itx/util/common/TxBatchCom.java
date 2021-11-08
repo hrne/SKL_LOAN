@@ -1268,6 +1268,8 @@ public class TxBatchCom extends TradeBuffer {
 			this.checkMsg = this.checkMsg + ", 短繳利息:" + this.shortfallInt;
 		if (this.shortfallPrin.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 短繳本金:" + this.shortfallPrin;
+		if (this.shortCloseBreach.compareTo(BigDecimal.ZERO) > 0)
+			this.checkMsg = this.checkMsg + ", 短繳清償違約金:" + this.shortCloseBreach;
 		if (this.acctFee.compareTo(BigDecimal.ZERO) > 0)
 			this.checkMsg = this.checkMsg + ", 帳管費:" + this.acctFee;
 		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0)
@@ -1553,12 +1555,9 @@ public class TxBatchCom extends TradeBuffer {
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						switch (baTxVo.getRepayType()) {
 						case 1: // 01-期款
-								// 短繳利息
-							this.shortfallInt = this.shortfallInt.add(baTxVo.getInterest());
-							// 短繳本金
-							this.shortfallPrin = this.shortfallPrin.add(baTxVo.getPrincipal());
-							// 短繳清償違約金
-							this.shortCloseBreach = this.shortfallPrin.add(baTxVo.getCloseBreachAmt());
+							this.shortfallInt = this.shortfallInt.add(baTxVo.getInterest()); // 短繳利息
+							this.shortfallPrin = this.shortfallPrin.add(baTxVo.getPrincipal()); // 短繳本金
+							this.shortCloseBreach = this.shortfallPrin.add(baTxVo.getCloseBreachAmt());// 短繳清償違約金
 							break;
 						case 4: // 04-帳管費
 							this.acctFee = this.acctFee.add(baTxVo.getAcctAmt());
@@ -1571,6 +1570,9 @@ public class TxBatchCom extends TradeBuffer {
 							break;
 						case 7: // 07-法務費
 							this.lawFee = this.lawFee.add(baTxVo.getAcctAmt());
+							break;
+						case 9: // 09-其他(清償違約金)
+							this.closeBreachAmt = this.closeBreachAmt.add(baTxVo.getCloseBreachAmt());// 未收清償違約金
 							break;
 						default:
 							break;

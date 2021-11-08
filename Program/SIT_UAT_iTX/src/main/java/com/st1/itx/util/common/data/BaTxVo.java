@@ -14,7 +14,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 3.暫收抵繳 <BR>
 	 * 4.溢(C)短(D)繳 <BR>
 	 * 5.其他額度暫收可抵繳 <BR>
-	 * 6.另收欠款(未到期火險費用、費用收取之短繳期金、清償違約金) <BR>
+	 * 6.另收欠款(未到期火險費用、費用收取之短繳期金) <BR>
 	 */
 	private int dataKind = 0;
 
@@ -27,7 +27,7 @@ public class BaTxVo implements Comparable<BaTxVo> {
 	 * 05-火險費 <BR>
 	 * 06-契變手續費 <BR>
 	 * 07-法務費 <BR>
-	 * 09-其他 <BR>
+	 * 09-其他(清償違約金) <BR>
 	 */
 	private int repayType = 0;
 

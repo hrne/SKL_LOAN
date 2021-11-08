@@ -66,8 +66,7 @@ public class L4602Report extends MakeReport {
 
 	private void getCdCodeMaps(TitaVo titaVo) {
 
-		Slice<CdCode> sliceCdCodeRepayCode = sCdCodeService.getCodeListWithFlag("RepayCode", "Y", 0, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<CdCode> sliceCdCodeRepayCode = sCdCodeService.getCodeListWithFlag("RepayCode", "Y", 0, 0, Integer.MAX_VALUE, titaVo);
 
 		if (sliceCdCodeRepayCode != null) {
 
@@ -100,8 +99,7 @@ public class L4602Report extends MakeReport {
 		for (Map<String, Object> m : listL4602) {
 
 			// 擔保品代號
-			String clNo = "" + m.get("OOClCode1") + "-" + FormatUtil.pad9("" + m.get("OOClCode2"), 2) + "-"
-					+ FormatUtil.pad9("" + m.get("OOClNo"), 7);
+			String clNo = "" + m.get("OOClCode1") + "-" + FormatUtil.pad9("" + m.get("OOClCode2"), 2) + "-" + FormatUtil.pad9("" + m.get("OOClNo"), 7);
 			makeExcel.setValue(rowCursor, 1, clNo);
 
 			// 原保險單號碼
@@ -109,14 +107,13 @@ public class L4602Report extends MakeReport {
 			makeExcel.setValue(rowCursor, 2, prevInsuNo);
 
 			// 戶號
-			String custNo = "" + FormatUtil.pad9("" + m.get("OOCustNo"), 7) + "-"
-					+ FormatUtil.pad9("" + m.get("OOFacmNo"), 3);
+			String custNo = "" + FormatUtil.pad9("" + m.get("OOCustNo"), 7) + "-" + FormatUtil.pad9("" + m.get("OOFacmNo"), 3);
 			makeExcel.setValue(rowCursor, 3, custNo);
 
 			// 繳款方式
 			String repayCode = "" + m.get("OORepayCodeX");
 
-			String repayCodeItem = repayCodeMap.get(FormatUtil.pad9(repayCode, 0));
+			String repayCodeItem = repayCodeMap.get(FormatUtil.pad9(repayCode, 2));
 
 			if (repayCodeItem != null && !repayCodeItem.isEmpty()) {
 				repayCode += repayCodeItem;

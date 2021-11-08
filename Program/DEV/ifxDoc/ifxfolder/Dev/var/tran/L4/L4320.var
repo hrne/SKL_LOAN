@@ -42,6 +42,7 @@ E(0,0)
 [#<->#,"#FdEffectMonth+生效月份",#EffectMonth],
 [#<->#,"#FdBaseRateCode+利率種類",#BaseRateCode,#BaseRateCodeX],
 [#<->#,"#FdLableA+生效日期",#EffectDate,"@@@@@@",#LableB,#BaseRate,#LableC],
+[#<->#,"#FdRate+批次利率",#Rate],
 [#<->#,"#FdRateIncr+批次加減碼",#RateIncr],
 [#<->#,"#FdEntCode+個金/企金",#EntCode,#EntCodeX],
 [#<->#,"#FdNextAdjPeriod+預調週期",#NextAdjPeriod," 個月"],
@@ -64,6 +65,7 @@ T(3,*)
 #FdEffectMonth=X,2,L
 #FdBaseRateCode=X,2,L
 #FdEffectDate=X,2,L
+#FdRate=X,2,L
 #FdRateIncr=X,2,L
 #FdEntCode=X,2,L
 T(3,*)
@@ -120,7 +122,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 ! T(1,@BaseRateCode,#NTXBUF,1,1)
 
 #PreCol=A,1,S
-INVOKEJS(SHOW,L4320,2,17,0)
+INVOKEJS(SHOW,L4320,2,18,0)
 
 #SystemDate=D,7,S
 E(0,#SYSDATE)
@@ -137,29 +139,29 @@ HELP(#TxKindHelp)
 @V(H,#TxKindHelp)
 SWITCH(#TxKind,
 1,
-INVOKEJS(SHOW,L4320,2,17,0)
+INVOKEJS(SHOW,L4320,2,18,0)
 INVOKEJS(SHOW,L4320,2,4,1)
-INVOKEJS(SHOW,L4320_6,1)
+INVOKEJS(SHOW,L4320_7,1)
 SHOW(#LableB,#BaseRate,#LableC),
 2,
-INVOKEJS(SHOW,L4320,2,17,0)
+INVOKEJS(SHOW,L4320,2,18,0)
 INVOKEJS(SHOW,L4320,3,4,1)
-INVOKEJS(SHOW,L4320_6,1)
+INVOKEJS(SHOW,L4320_7,1)
 SHOW(#LableB,#BaseRate,#LableC),
 3,
-INVOKEJS(SHOW,L4320,2,17,0)
+INVOKEJS(SHOW,L4320,2,18,0)
 INVOKEJS(SHOW,L4320_2,1)
-INVOKEJS(SHOW,L4320,6,7,1)
+INVOKEJS(SHOW,L4320,7,8,1)
 SHOW(#LableB,#BaseRate,#LableC),
 4,
-INVOKEJS(SHOW,L4320,2,17,0)
-INVOKEJS(SHOW,L4320,4,5,1)
-INVOKEJS(SHOW,L4320_8,1)
+INVOKEJS(SHOW,L4320,2,18,0)
+INVOKEJS(SHOW,L4320,4,6,1)
+INVOKEJS(SHOW,L4320_9,1)
 HIDE(#LableB,#BaseRate,#LableC),
 5,
-INVOKEJS(SHOW,L4320,2,17,0)
-INVOKEJS(SHOW,L4320,4,5,1)
-INVOKEJS(SHOW,L4320_8,1)
+INVOKEJS(SHOW,L4320,2,18,0)
+INVOKEJS(SHOW,L4320,4,6,1)
+INVOKEJS(SHOW,L4320_9,1)
 HIDE(#LableB,#BaseRate,#LableC)
 )
 
@@ -237,9 +239,15 @@ E(0,#SYSDATE)
 ! 指標利率
 #BaseRate=m,2.4,L
 
+! 批次利率
+#Rate=+m,2.4,I
+IF(#TxKind==4||#TxKind==5,$,s)
+
 ! 批次加減碼
 #RateIncr=+m,2.4,I
 IF(#TxKind==4||#TxKind==5,$,s)
+C(3,#Rate,0,$,S)
+@V(2,0)
 
 ! 戶別
 #EntCode=A,1,I
@@ -261,11 +269,12 @@ E(0,6)
 #ProdNo1=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-INVOKEJS(SHOW,L4320_8,1)
+INVOKEJS(SHOW,L4320_9,1)
 @
+IF(#Rate > 0,V(7),$)
 C(4,#ProdNo1,
 IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),
-INVOKEJS(SHOW,L4320,8,17,0)
+INVOKEJS(SHOW,L4320,9,18,0)
 T(2,@ProdNo1,)T(2,@ProdNo1X,)
 T(2,@ProdNo2,)T(2,@ProdNo2X,)
 T(2,@ProdNo3,)T(2,@ProdNo3X,)
@@ -276,7 +285,7 @@ T(2,@ProdNo7,)T(2,@ProdNo7X,)
 T(2,@ProdNo8,)T(2,@ProdNo8X,)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,)),
-INVOKEJS(SHOW,L4320_9,1))
+INVOKEJS(SHOW,L4320_10,1))
 C(4,#ProdNo2,$,V(4,#ProdNo2))
 C(4,#ProdNo3,$,V(4,#ProdNo3))
 C(4,#ProdNo4,$,V(4,#ProdNo4))
@@ -318,7 +327,7 @@ C(5,#IncrFlag1,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo2=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo1,s,INVOKEJS(SHOW,L4320_9,1))
+C(4,#ProdNo1,s,INVOKEJS(SHOW,L4320_10,1))
 @
 C(4,#ProdNo2,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -331,7 +340,7 @@ C(4,#ProdNo8,$,V(4,#ProdNo8))
 C(4,#ProdNo9,$,V(4,#ProdNo9))
 C(4,#ProdNo10,$,V(4,#ProdNo10))
 C(4,#ProdNo2,
-INVOKEJS(SHOW,L4320,9,17,0)
+INVOKEJS(SHOW,L4320,10,18,0)
 T(2,@ProdNo2,)T(2,@ProdNo2X,)
 T(2,@ProdNo3,)T(2,@ProdNo3X,)
 T(2,@ProdNo4,)T(2,@ProdNo4X,)
@@ -341,7 +350,7 @@ T(2,@ProdNo7,)T(2,@ProdNo7X,)
 T(2,@ProdNo8,)T(2,@ProdNo8X,)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_10,1)
+INVOKEJS(SHOW,L4320_11,1)
 )
 
 #SendL2r01B=X,1,S
@@ -370,7 +379,7 @@ C(5,#IncrFlag2,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo3=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo2,s,INVOKEJS(SHOW,L4320_10,1))
+C(4,#ProdNo2,s,INVOKEJS(SHOW,L4320_11,1))
 @
 C(4,#ProdNo3,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -383,7 +392,7 @@ C(4,#ProdNo8,$,V(4,#ProdNo8))
 C(4,#ProdNo9,$,V(4,#ProdNo9))
 C(4,#ProdNo10,$,V(4,#ProdNo10))
 C(4,#ProdNo3,
-INVOKEJS(SHOW,L4320,10,17,0)
+INVOKEJS(SHOW,L4320,11,18,0)
 T(2,@ProdNo3,)T(2,@ProdNo3X,)
 T(2,@ProdNo4,)T(2,@ProdNo4X,)
 T(2,@ProdNo5,)T(2,@ProdNo5X,)
@@ -392,7 +401,7 @@ T(2,@ProdNo7,)T(2,@ProdNo7X,)
 T(2,@ProdNo8,)T(2,@ProdNo8X,)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_11,1)
+INVOKEJS(SHOW,L4320_12,1)
 )
 
 #SendL2r01C=X,1,S
@@ -420,7 +429,7 @@ C(5,#IncrFlag3,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo4=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo3,s,INVOKEJS(SHOW,L4320_11,1))
+C(4,#ProdNo3,s,INVOKEJS(SHOW,L4320_12,1))
 @
 C(4,#ProdNo4,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -433,7 +442,7 @@ C(4,#ProdNo8,$,V(4,#ProdNo8))
 C(4,#ProdNo9,$,V(4,#ProdNo9))
 C(4,#ProdNo10,$,V(4,#ProdNo10))
 C(4,#ProdNo4,
-INVOKEJS(SHOW,L4320,11,17,0)
+INVOKEJS(SHOW,L4320,12,18,0)
 T(2,@ProdNo4,)T(2,@ProdNo4X,)
 T(2,@ProdNo5,)T(2,@ProdNo5X,)
 T(2,@ProdNo6,)T(2,@ProdNo6X,)
@@ -441,7 +450,7 @@ T(2,@ProdNo7,)T(2,@ProdNo7X,)
 T(2,@ProdNo8,)T(2,@ProdNo8X,)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_12,1)
+INVOKEJS(SHOW,L4320_13,1)
 )
 
 #SendL2r01D=X,1,S
@@ -469,7 +478,7 @@ C(5,#IncrFlag4,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo5=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo4,s,INVOKEJS(SHOW,L4320_12,1))
+C(4,#ProdNo4,s,INVOKEJS(SHOW,L4320_13,1))
 @
 C(4,#ProdNo5,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -482,14 +491,14 @@ C(4,#ProdNo8,$,V(4,#ProdNo8))
 C(4,#ProdNo9,$,V(4,#ProdNo9))
 C(4,#ProdNo10,$,V(4,#ProdNo10))
 C(4,#ProdNo5,
-INVOKEJS(SHOW,L4320,12,17,0)
+INVOKEJS(SHOW,L4320,13,18,0)
 T(2,@ProdNo5,)T(2,@ProdNo5X,)
 T(2,@ProdNo6,)T(2,@ProdNo6X,)
 T(2,@ProdNo7,)T(2,@ProdNo7X,)
 T(2,@ProdNo8,)T(2,@ProdNo8X,)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_13,1)
+INVOKEJS(SHOW,L4320_14,1)
 )
 
 #SendL2r01E=X,1,S
@@ -517,7 +526,7 @@ C(5,#IncrFlag5,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo6=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo5,s,INVOKEJS(SHOW,L4320_13,1))
+C(4,#ProdNo5,s,INVOKEJS(SHOW,L4320_14,1))
 @
 C(4,#ProdNo6,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -530,13 +539,13 @@ C(4,#ProdNo8,$,V(4,#ProdNo8))
 C(4,#ProdNo9,$,V(4,#ProdNo9))
 C(4,#ProdNo10,$,V(4,#ProdNo10))
 C(4,#ProdNo6,
-INVOKEJS(SHOW,L4320,13,17,0)
+INVOKEJS(SHOW,L4320,14,18,0)
 T(2,@ProdNo6,)T(2,@ProdNo6X,)
 T(2,@ProdNo7,)T(2,@ProdNo7X,)
 T(2,@ProdNo8,)T(2,@ProdNo8X,)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_14,1)
+INVOKEJS(SHOW,L4320_15,1)
 )
 
 #SendL2r01F=X,1,S
@@ -564,7 +573,7 @@ C(5,#IncrFlag6,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo7=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo6,s,INVOKEJS(SHOW,L4320_14,1))
+C(4,#ProdNo6,s,INVOKEJS(SHOW,L4320_15,1))
 @
 C(4,#ProdNo7,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -577,12 +586,12 @@ C(4,#ProdNo8,$,V(4,#ProdNo8))
 C(4,#ProdNo9,$,V(4,#ProdNo9))
 C(4,#ProdNo10,$,V(4,#ProdNo10))
 C(4,#ProdNo7,
-INVOKEJS(SHOW,L4320,14,17,0)
+INVOKEJS(SHOW,L4320,15,18,0)
 T(2,@ProdNo7,)T(2,@ProdNo7X,)
 T(2,@ProdNo8,)T(2,@ProdNo8X,)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_15,1)
+INVOKEJS(SHOW,L4320_16,1)
 )
 
 #SendL2r01G=X,1,S
@@ -610,7 +619,7 @@ C(5,#IncrFlag7,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo8=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo7,s,INVOKEJS(SHOW,L4320_15,1))
+C(4,#ProdNo7,s,INVOKEJS(SHOW,L4320_16,1))
 @
 C(4,#ProdNo8,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -623,11 +632,11 @@ C(4,#ProdNo7,$,V(4,#ProdNo7))
 C(4,#ProdNo9,$,V(4,#ProdNo9))
 C(4,#ProdNo10,$,V(4,#ProdNo10))
 C(4,#ProdNo8,
-INVOKEJS(SHOW,L4320,15,17,0)
+INVOKEJS(SHOW,L4320,16,18,0)
 T(2,@ProdNo8,)T(2,@ProdNo8X,)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_16,1)
+INVOKEJS(SHOW,L4320_17,1)
 )
 
 #SendL2r01H=X,1,S
@@ -655,7 +664,7 @@ C(5,#IncrFlag8,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo9=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo8,s,INVOKEJS(SHOW,L4320_16,1))
+C(4,#ProdNo8,s,INVOKEJS(SHOW,L4320_17,1))
 @
 C(4,#ProdNo9,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -668,10 +677,10 @@ C(4,#ProdNo7,$,V(4,#ProdNo7))
 C(4,#ProdNo8,$,V(4,#ProdNo8))
 C(4,#ProdNo10,$,V(4,#ProdNo10))
 C(4,#ProdNo9,
-INVOKEJS(SHOW,L4320,16,17,0)
+INVOKEJS(SHOW,L4320,17,18,0)
 T(2,@ProdNo9,)T(2,@ProdNo9X,)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_17,1)
+INVOKEJS(SHOW,L4320_18,1)
 )
 
 #SendL2r01I=X,1,S
@@ -699,7 +708,7 @@ C(5,#IncrFlag9,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo10=X,5,I
 IF(#TxKind==5||#TxKind==4,$,s)
 IF(#TxKind==5,HELP(#BatchProdRateChangeHelp),$)
-C(4,#ProdNo9,s,INVOKEJS(SHOW,L4320_17,1))
+C(4,#ProdNo9,s,INVOKEJS(SHOW,L4320_18,1))
 @
 C(4,#ProdNo10,$,IF(#TxKind==5,V(H,#BatchProdRateChangeHelp),$))
 C(4,#ProdNo1,$,V(4,#ProdNo1))
@@ -712,9 +721,9 @@ C(4,#ProdNo7,$,V(4,#ProdNo7))
 C(4,#ProdNo8,$,V(4,#ProdNo8))
 C(4,#ProdNo9,$,V(4,#ProdNo9))
 C(4,#ProdNo10,
-INVOKEJS(SHOW,L4320_17,0)
+INVOKEJS(SHOW,L4320_18,0)
 T(2,@ProdNo10,)T(2,@ProdNo10X,),
-INVOKEJS(SHOW,L4320_17,1)
+INVOKEJS(SHOW,L4320_18,1)
 )
 
 #SendL2r01J=X,1,S
@@ -759,6 +768,7 @@ C(5,#IncrFlag10,Y,V(P,此商品不適用按商品別調整),$)
 #BaseRateCode
 #EffectDate
 #BaseRate
+#Rate
 #RateIncr
 #EntCode
 #NextAdjPeriod

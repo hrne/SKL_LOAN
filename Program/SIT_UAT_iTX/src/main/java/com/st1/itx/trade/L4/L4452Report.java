@@ -3,8 +3,6 @@ package com.st1.itx.trade.L4;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -12,8 +10,6 @@ import org.springframework.stereotype.Component;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.CdCode;
-import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.format.FormatUtil;
@@ -23,20 +19,19 @@ import com.st1.itx.util.parse.Parse;
 @Scope("prototype")
 
 public class L4452Report extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L4452Report.class);
 	@Autowired
 	private Parse parse;
 
 	@Autowired
 	private DateUtil dateUtil;
 
-	@Autowired
-	private CdCodeService cdCodeService;
-
-	private String repayBank = "";
 	// 明細資料容器
 	private ArrayList<OccursList> occursList = new ArrayList<>();
 
+	private String repayBank = "";
+    // 每頁筆數
+	private int pageIndex = 38;
+	
 	@Override
 	public void printHeader() {
 		this.info("MakeReport.printHeader");
@@ -55,19 +50,16 @@ public class L4452Report extends MakeReport {
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
 		String tim = String.valueOf(Integer.parseInt(dateUtil.getNowStringBc().substring(2, 4)));
 //		月/日/年(西元後兩碼)
-		this.print(-1, 130, "日　　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/"
-				+ dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
+		this.print(-1, 130, "日　　期：" + dateUtil.getNowStringBc().substring(4, 6) + "/" + dateUtil.getNowStringBc().substring(6, 8) + "/" + tim, "R");
 		this.print(-2, 1, "報　表：" + "L4452");
 		this.print(-2, 70, "銀扣媒體檔未產出清單", "C");
-		this.print(-2, 130, "時　　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":"
-				+ dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
-//		this.print(-3, 1, "扣款銀行：" + repayBank);
+		this.print(-2, 130, "時　　間：" + dateUtil.getNowStringTime().substring(0, 2) + ":" + dateUtil.getNowStringTime().substring(2, 4) + ":" + dateUtil.getNowStringTime().substring(4, 6), "R");
+		this.print(-3, 1, "扣款銀行：" + repayBank);
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
 //		this.print(-4, 1,
 //				"入帳日期   戶號   額度 撥款    繳息迄日   應繳日   還款類別           應扣金額        暫收抵繳金額           扣款金額 媒體   會計日期");
-		this.print(-4, 1, "戶號   額度 撥款    還款類別                扣款金額    摘要");
-		this.print(-5, 1,
-				"--------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-4, 1, "戶號   額度 撥款    戶名                還款類別                扣款金額    摘要");
+		this.print(-5, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -80,8 +72,12 @@ public class L4452Report extends MakeReport {
 
 		this.info("occursList.size = " + occursList.size());
 
+		// 排序資料 銀行別 戶號 額度 序號
+		sort(occursList);
+		
 		if (occursList.size() > 0) {
 
+			repayBank = occursList.get(0).get("RepayBank");
 			this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L4452", "銀扣媒體檔未產出清單", "", "A4", "L");
 
 			int i = 0, pageCnt = 0;
@@ -103,18 +99,36 @@ public class L4452Report extends MakeReport {
 				this.print(0, 9, FormatUtil.pad9(occursList.get(i).get("OOFacmNo"), 3));// 額度
 				this.print(0, 12, "-");
 				this.print(0, 13, FormatUtil.pad9(occursList.get(i).get("OOBormNo"), 3));// 撥款
-				this.print(0, 20, occursList.get(i).get("OORepayType"));// 還款類別
-				this.print(0, 50, df1.format(parse.stringToBigDecimal(occursList.get(i).get("OORepayAmt"))), "R");// 還款金額
-				this.print(0, 55, occursList.get(i).get("OONote"));// 摘要
+				this.print(0, 20, occursList.get(i).get("OOCustName"));// 戶名
+				this.print(0, 40, occursList.get(i).get("OORepayType"));// 還款類別
+				this.print(0, 70, df1.format(parse.stringToBigDecimal(occursList.get(i).get("OORepayAmt"))), "R");// 還款金額
+				this.print(0, 75, occursList.get(i).get("OONote"));// 摘要
 
-//				每頁第42筆 跳頁 
-				if (j != occursList.size() && pageCnt == 42) {
-					this.print(1, 70, "=====續下頁=====", "C");
+				
+				if (j != occursList.size()) {
+//					年月不同則跳頁，並且累計歸零
+					if (!occursList.get(i).get("RepayBank").equals(occursList.get(j).get("RepayBank"))) {
+						this.info("RepayBank Not Match...");
 
-					pageCnt = 0;
-					this.newPage();
-					continue;
+						pageCnt = 0;
+						this.newPage();
+						continue;
+					}
+//					每頁第42筆 跳頁 
+					if (pageCnt == 42) {
+						this.print(1, 70, "=====續下頁=====", "C");
+
+						pageCnt = 0;
+						this.newPage();
+						continue;
+					}
+				} else {
+//				3.若為最後一筆，則固定產出小計、總計、報表合計
+//					扣除總計合計的行數 +1 
+					this.print(pageIndex - pageCnt - 2, 70, "=====報表結束=====", "C");
 				}
+				
+			
 			}
 			long sno = this.close();
 			this.toPdf(sno);
@@ -127,18 +141,28 @@ public class L4452Report extends MakeReport {
 
 		this.exec(titaVo);
 	}
+	
+	public void sort(ArrayList<OccursList> doReportOccurs) throws LogicException {
+		
+		// RepayBank ,CustNo ,FacmNo ,BormNo
+		doReportOccurs.sort((c1, c2) -> {
+					int result = 0;
+					if (c1.get("RepayBank") != c2.get("RepayBank")) {
+						result = Integer.valueOf(c1.get("RepayBank").compareTo(c2.get("RepayBank")));
+					} else if (c1.get("CustNo") != c2.get("CustNo") ) {
+						result = Integer.valueOf(c1.get("CustNo").compareTo(c2.get("CustNo")));
+					} else if (c1.get("FacmNo") != c2.get("FacmNo")) {
+						result = Integer.valueOf(c1.get("FacmNo").compareTo(c2.get("FacmNo")));
+					} else if (c1.get("BormNo") != c2.get("BormNo")) {
+						result = Integer.valueOf(c1.get("BormNo").compareTo(c2.get("BormNo")));
+					} else {
+						result = 0;
+					}
 
-	private String repayTypeX(String repayType) {
-		String result = "";
-
-		String srt = FormatUtil.pad9(repayType.trim(), 2);
-
-		CdCode cdCode = cdCodeService.getItemFirst(4, "RepayType", srt, titaVo);
-
-		if (cdCode != null) {
-			result = cdCode.getItem();
-		}
-
-		return result;
+					return result;
+		});
+				
+		this.occursList = doReportOccurs;
 	}
+	
 }

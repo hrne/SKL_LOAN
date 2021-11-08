@@ -632,7 +632,7 @@ public class L4200Batch extends TradeBuffer {
 
 				// 預先作業 其他來源建檔 上營業日 戶號 金額 相同者
 				if ("00000".equals(errorCode)) {
-					List<String> procStsCodeList = Arrays.asList("5", "6");
+					List<String> procStsCodeList = Arrays.asList("5", "6", "7");
 					BatxDetail err103 = batxDetailService.findL4200BFirst(this.txBuffer.getTxCom().getLbsdyf(), "L4210",
 							custNo, repayAmt, procStsCodeList, titaVo);
 					if (err103 != null) {

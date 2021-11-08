@@ -65,41 +65,41 @@ public class L560BReport extends MakeReport {
 		String iCalyy = iCalDy.substring(0, 3);
 		String iCalMm = iCalDy.substring(3, 5);
 		String iCalDd = iCalDy.substring(5, 7);
-
+		// 檢查客戶檔戶號
+		String iCustId = "";
+		String iCustName = "";
+		CustMain iCustMain = iCustMainService.custNoFirst(Integer.valueOf(iCustNo), Integer.valueOf(iCustNo), titaVo);
+		if (iCustMain != null) {
+			iCustName = iCustMain.getCustName();
+			iCustId = iCustMain.getCustId();
+		} else {
+			throw new LogicException(titaVo, "E0001", "客戶主檔無此戶號:" + iCustNo);
+		}
+		// 檢查債協主檔
+		Slice<NegMain> iNegMain = null;
+		NegMain rNegMain = new NegMain();
+		iNegMain = iNegMainService.forLetter(Integer.valueOf(iCustNo), "1", 0, Integer.MAX_VALUE, titaVo);
+		if (iNegMain == null) {
+			throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶號:" + titaVo.getParam("OOCustNo"));
+		}
+		rNegMain = iNegMain.getContent().get(0);
 		
 		switch (adjFlag) {
 		case "0": // 前置協商毀諾通知函
+			if (!rNegMain.getStatus().equals("0") && !rNegMain.getStatus().equals("2")) {// 債協戶況需為正常或毀諾
+				throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶況:" + iCustNo);
+			}
+
 			String iNegDate = "";
 			String iNegYyy = "";
 			String iNegMm = "";
 			String iNegDd = "";
-			String iCustId = "";
-			CustMain iCustMain = iCustMainService.custNoFirst(Integer.valueOf(iCustNo), Integer.valueOf(iCustNo),
-					titaVo);
-			String iCustName = "";
-			if (iCustMain != null) {
-				iCustName = iCustMain.getCustName();
-				iCustId = iCustMain.getCustId();
-			} else {
-				throw new LogicException(titaVo, "E0001", "客戶主檔無此戶號:" + titaVo.getParam("OOCustNo"));
-			}
-			Slice<NegMain> iNegMain = null;
-			NegMain rNegMain = new NegMain();
-			iNegMain = iNegMainService.forLetter(Integer.valueOf(titaVo.getParam("OOCustNo")), "1", 0,
-					Integer.MAX_VALUE, titaVo);
-			if (iNegMain == null) {
-				throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶號:" + titaVo.getParam("OOCustNo"));
-			}
-			rNegMain = iNegMain.getContent().get(0);
-			if (!rNegMain.getStatus().equals("0") && !rNegMain.getStatus().equals("2")) {
-				throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶況:" + titaVo.getParam("OOCustNo"));
-			}
 			Slice<JcicZ046> iJcicZ046 = null;
 			JcicZ046 rJcicZ046 = new JcicZ046();
 			String iCloseDate = ""; // JcicZ046--結案日期
 			iJcicZ046 = iJcicZ046Service.custIdEq(iCustId, 0, Integer.MAX_VALUE, titaVo);
 			if (iJcicZ046 == null) {
-				throw new LogicException(titaVo, "E0001", "結案通知檔案無此戶號資料:" + titaVo.getParam("OOCustNo"));
+				throw new LogicException(titaVo, "E0001", "結案通知檔案無此戶號資料:" + iCustNo);
 			}
 			rJcicZ046 = iJcicZ046.getContent().get(0);
 			if (rJcicZ046.getTranKey().equals("D")) {
@@ -123,7 +123,7 @@ public class L560BReport extends MakeReport {
 			iJcicZ047Id.setSubmitKey("458");
 			iJcicZ047 = iJcicZ047Service.findById(iJcicZ047Id, titaVo);
 			if (iJcicZ047 == null) {
-				throw new LogicException(titaVo, "E0001", "金融機構無擔保債務協議資料檔案無此戶號資料:" + titaVo.getParam("OOCustNo"));
+				throw new LogicException(titaVo, "E0001", "金融機構無擔保債務協議資料檔案無此戶號資料:" + iCustNo);
 			}
 			iNegDate = StringUtils.leftPad(String.valueOf(iJcicZ047.getSignDate()), 7, "0");// 簽約完成日
 			iNegYyy = iNegDate.substring(0, 3);
@@ -154,46 +154,38 @@ public class L560BReport extends MakeReport {
 			printCm(10, 27, "中　　華　　民　　國　" + iCalyy + "　年　" + iCalMm + "　月　" + iCalDd + "　日", "C");
 			break;
 		case "1": // 前置協商逾期繳款通知函
-			Slice<NegMain> aNegMain = null;
-			NegMain bNegMain = new NegMain();
-			int aNextPayDate = 0;// 下次應繳日
-			aNegMain = iNegMainService.forLetter(Integer.valueOf(iCustNo), "1", 0, Integer.MAX_VALUE, titaVo);
-			if (aNegMain == null) {
-				throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶號:" + titaVo.getParam("OOCustNo"));
+			if (!rNegMain.getStatus().equals("0")) {// 債協戶況須為正常
+				throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶況:" + iCustNo);
 			}
-			bNegMain = aNegMain.getContent().get(0);
-			if (!bNegMain.getStatus().equals("0")) {
-				throw new LogicException(titaVo, "E0001", "債協案件主檔無相符戶況:" + titaVo.getParam("OOCustNo"));
+			if (!rNegMain.getIsMainFin().equals("Y")) {
+				throw new LogicException(titaVo, "E0001", "非最大債權:" + iCustNo);
 			}
-			if (!bNegMain.getIsMainFin().equals("Y")) {
-				throw new LogicException(titaVo, "E0001", "非最大債權:" + titaVo.getParam("OOCustNo"));
-			}
-			aNextPayDate = bNegMain.getNextPayDate() + 19110000;// 下次應繳日
+			int aNextPayDate = rNegMain.getNextPayDate() + 19110000;// 下次應繳日
 			int rBusDate = Integer.valueOf(iBusDate) + 19110000; // 會計日
 			String rBusDatedd = String.valueOf(rBusDate).substring(6, 8);// 會計日是否為10號
 
 			if (aNextPayDate >= rBusDate) {// 未逾期
-				throw new LogicException(titaVo, "E0001", "下次應繳日大於會計日");
+				throw new LogicException(titaVo, "E0001", "下次應繳日未大於會計日");
 			}
 
 			// 用下次繳款日~會計日計算期數(債協有喘息期)
 			int gapMonth = sNegCom.DiffMonth(1, aNextPayDate, rBusDate);
-			if (!rBusDatedd.equals("10")) {// 計算月份非10號需加1
+			if (!rBusDatedd.equals("10")) {// 計算月份非10號需加1,10號算未到期
 				gapMonth = gapMonth + 1;
 			}
 
 			// 計算剩餘期數
-			int remainPeriod = sNegCom.nper(bNegMain.getPrincipalBal(), bNegMain.getDueAmt(), bNegMain.getIntRate());
+			int remainPeriod = sNegCom.nper(rNegMain.getPrincipalBal(), rNegMain.getDueAmt(), rNegMain.getIntRate());
 			// 計算應繳金額:最多扣到本金=0為止
-			BigDecimal iCount = sNegCom.calAccuDueAmt(bNegMain.getDueAmt(), bNegMain.getPrincipalBal(),
-					bNegMain.getIntRate(), gapMonth, 0);// 最後一位參數傳0代表計算本利和
+			BigDecimal iCount = sNegCom.calAccuDueAmt(rNegMain.getDueAmt(), rNegMain.getPrincipalBal(),
+					rNegMain.getIntRate(), gapMonth, 0);// 最後一位參數傳0代表計算本利和
 
-			if (gapMonth > remainPeriod) {// 應繳期數不可大於剩餘期數
+			if (gapMonth > remainPeriod) {// 應繳期數不可大於剩餘期數(不超過到期日)
 				gapMonth = remainPeriod;
 			}
 
 			if (gapMonth > 7) {
-				throw new LogicException(titaVo, "E0001", "逾期資料過多:" + titaVo.getParam("OOCustNo"));
+				throw new LogicException(titaVo, "E0001", "逾期資料過多:" + iCustNo);
 			}
 
 			int lastPayIntDate = sNegCom.getRepayDate(aNextPayDate, -1, titaVo);// 上次繳息迄日為下次繳款日往前推一個月

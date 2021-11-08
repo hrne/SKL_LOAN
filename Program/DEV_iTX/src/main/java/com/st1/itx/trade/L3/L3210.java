@@ -116,6 +116,7 @@ public class L3210 extends TradeBuffer {
 	private LoanCheque tLoanCheque;
 	private LoanChequeId tLoanChequeId;
 	private BigDecimal wkTempAmt;
+	private BigDecimal wkCloseBreachAmt;
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
 	private TempVo tTempVo;
@@ -135,6 +136,7 @@ public class L3210 extends TradeBuffer {
 		this.iTempReasonCode = 0;
 		this.iTempAmt = BigDecimal.ZERO;
 		this.wkTempAmt = BigDecimal.ZERO;
+		this.wkCloseBreachAmt = BigDecimal.ZERO;
 		this.tTempVo = new TempVo();
 		this.lAcDetail = new ArrayList<AcDetail>();
 	}
@@ -408,6 +410,7 @@ public class L3210 extends TradeBuffer {
 					acDetail.setRvNo(ba.getRvNo());
 					acDetail.setReceivableFlag(ba.getReceivableFlag());
 					lAcDetail.add(acDetail);
+					wkCloseBreachAmt = wkCloseBreachAmt.add(ba.getCloseBreachAmt());
 				}
 			}
 		}
@@ -432,6 +435,7 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTxAmt(iTempAmt);
 		tLoanBorTx.setTempAmt(wkTempAmt);
+		tLoanBorTx.setCloseBreachAmt(wkCloseBreachAmt);
 
 		// 其他欄位
 		tTempVo.clear();
@@ -458,11 +462,8 @@ public class L3210 extends TradeBuffer {
 		if (titaVo.get("LawFee") != null && titaVo.get("LawFee") != "0") {
 			tTempVo.putParam("LawFee", titaVo.getParam("LawFee"));
 		}
-		if (titaVo.get("ShortfallPrin") != null && titaVo.get("ShortfallPrin") != "0") {
-			tTempVo.putParam("ShortfallPrin", titaVo.getParam("ShortfallPrin"));
-		}
-		if (titaVo.get("ShortfallInt") != null && titaVo.get("ShortfallInt") != "0") {
-			tTempVo.putParam("ShortfallInt", titaVo.getParam("ShortfallInt"));
+		if (titaVo.get("LawFee") != null && titaVo.get("LawFee") != "0") {
+			tTempVo.putParam("LawFee", titaVo.getParam("LawFee"));
 		}
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {

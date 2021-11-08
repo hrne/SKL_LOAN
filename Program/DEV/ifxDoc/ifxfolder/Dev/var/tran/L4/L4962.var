@@ -122,6 +122,21 @@ C(5,#TXFORM,L462B,$,S)E(0,30)ASGN(INQPRT$)
 #L462BLOOP=n,3,S
 C(5,#TXFORM,L462B,$,S)E(0,1)ASGN(LOOPHEIGHT$)
 
+#L462CPRT=A,1,S
+C(5,#TXFORM,L462C,E(0,1),E(0,0))
+![資料表頭(HEADER)長度]
+#L462CHD=n,3,S
+C(5,#TXFORM,L462C,$,S)E(0,6)ASGN(INQHD$)
+![每筆明細(OCCURS)長度]
+#L462CLN=n,3,S
+C(5,#TXFORM,L462C,$,S)E(0,126)ASGN(INQLEN$)
+![每張印錄單列印的筆數]
+#L462CQPRT=n,2,S
+C(5,#TXFORM,L462C,$,S)E(0,30)ASGN(INQPRT$)
+![畫面顯示的明細間的高度]
+#L462CLOOP=n,3,S
+C(5,#TXFORM,L462C,$,S)E(0,1)ASGN(LOOPHEIGHT$)
+
 </sub>
 
 !------------ TXFORM = L4962 -----------
@@ -144,7 +159,7 @@ E(0,1)ASGN(LOOP$)
 #ReportAErrMsg=x,20,O
 ![防止二次單據]
 E(0,@L462BPRT,0)
-
+E(0,@L462CPRT,0)
 </sub>
 
 <sub type="FORM" name="L462B" tota-mode="1">
@@ -166,7 +181,29 @@ E(0,1)ASGN(LOOP$)
 #ReportBErrMsg=x,20,O
 ![防止二次單據]
 E(0,@L462APRT,0)
+E(0,@L462CPRT,0)
+</sub>
 
+<sub type="FORM" name="L462C" tota-mode="1">
+
+#OCntC=m,6,O
+C(3,#OCntC,0,E(0,@L462CPRT,0),E(0,@L462CPRT,1))
+
+#L462C_LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+#ReportCInsuEndMonth=A,6,O
+#ReportCPrevInsuNo=X,20,O
+#ReportCCustNo=A,7,O
+#ReportCFacmNo=A,3,O
+#ReportCCustName=x,40,O
+#ReportCClCode1=A,1,O
+#ReportCClCode2=A,2,O
+#ReportCClNo=A,7,O
+#ReportCNowInsuNo=X,20,O
+#ReportCErrMsg=x,20,O
+![防止二次單據]
+E(0,@L462APRT,0)
+E(0,@L462BPRT,0)
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -212,7 +249,19 @@ TXFORM=L462B
 #ReportBInsuEndDAte
 #ReportBErrMsg
 ^
-
+TXFORM=L462C
+#OCntC
+#ReportCInsuEndMonth
+#ReportCPrevInsuNo
+#ReportCCustNo
+#ReportCFacmNo
+#ReportCCustName
+#ReportCClCode1
+#ReportCClCode2
+#ReportCClNo
+#ReportCNowInsuNo
+#ReportCErrMsg
+^
 </sub>
 ------- 單據輸出組合 ----------
 <sub type="SELECT">
@@ -248,5 +297,18 @@ TXFORM=L462B
 @
 ^
 
-
+#L462CPRT=1,L462C,NA,,D,15
+%
+#ReportCInsuEndMonth
+#ReportCPrevInsuNo
+#ReportCCustNo
+#ReportCFacmNo
+#ReportCCustName
+#ReportCClCode1
+#ReportCClCode2
+#ReportCClNo
+#ReportCNowInsuNo
+#ReportCErrMsg
+@
+^
 </sub>

@@ -75,7 +75,6 @@ public class L3001 extends TradeBuffer {
 		int iCaseNo = this.parse.stringToInteger(titaVo.getParam("CaseNo"));
 		int iCustNo = this.parse.stringToInteger(titaVo.getParam("TimCustNo"));
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
-		int wkCustNo = iCustNo;
 		BigDecimal wkAvailable = BigDecimal.ZERO;
 		// work area
 		int wkFacmNoStart = 0;
@@ -84,9 +83,8 @@ public class L3001 extends TradeBuffer {
 		String wkClShareFg = "";
 		Slice<FacMain> slFacMain;
 		List<FacMain> lFacMain;
-		Slice<ClFac> slClFac = null;
-		List<ClFac> lClFac = new ArrayList<ClFac>();
-
+		new ArrayList<ClFac>();
+		this.info("L3001 getReturnIndex = " + titaVo.getReturnIndex());
 		// 首次進入, 計算有效額度筆數
 		if (titaVo.getReturnIndex() == 0) {
 			this.index = titaVo.getReturnIndex();
@@ -96,7 +94,7 @@ public class L3001 extends TradeBuffer {
 				if (tFacMain == null) {
 					throw new LogicException(titaVo, "E0001", "額度主檔 案件編號 = " + iCaseNo); // 查詢資料不存在
 				}
-				wkCustNo = tFacMain.getCustNo();
+				tFacMain.getCustNo();
 				slFacMain = facMainService.facmCreditSysNoRange(iCaseNo, iCaseNo, 1, 999, this.index, this.limit, titaVo);
 				lFacMain = slFacMain == null ? null : slFacMain.getContent();
 			} else {
@@ -131,7 +129,7 @@ public class L3001 extends TradeBuffer {
 			}
 			titaVo.putParam("ValidFacm", wkValidFacm);
 			this.totaVo.putParam("OValidFacm", wkValidFacm);
-
+			this.info("L3001 OValidFacm = " + wkValidFacm);
 		}
 
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
@@ -198,9 +196,12 @@ public class L3001 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();
 		}
 		// 顧客控管警訊通知訊息
+
 		if (titaVo.getReturnIndex() == 0) {
-			custRmkCom.getCustRmk(titaVo, wkCustNo);
+//			custRmkCom.getCustRmk(wkCustNo, titaVo);
+//			this.addAllList(custRmkCom.getCustRmk(titaVo, wkCustNo));
 		}
+
 		// end
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -70,8 +70,9 @@ public class AjaxController extends SysLogger {
 
 			inputStream = new FileInputStream(file);
 			response.addHeader("Access-Control-Allow-Origin", "*");
+
 			if (!"1".equals(fileType)) {
-				response.setHeader("Content-Disposition", "attachment;filename*=UTF-8''" + saveName);
+				response.setHeader("Content-Disposition", "attachment;filename*=UTF-8'zh_TW'" + URLEncoder.encode(saveName, "UTF-8"));
 				response.setContentType("application/force-download");
 				// "attachment;filename*=UTF-8''"+URLEncoder.encode("时间都去哪儿了.mp3", "UTF-8");
 //				response.setHeader("Content-Disposition", "attachment; filename=" + saveName);
