@@ -162,7 +162,7 @@ C(3,#OOStatus,0,S,$)
 #OODtlValue=x,30,S
 
 
-
+#OOCustId=X,10,S
 
 
 #ColA=A,1,S
@@ -221,8 +221,12 @@ T(6A,#TxItemCode+#TxCustNo+#TxFacmNo+#TxBormNo
 #OOBUF5=X,58,S
 T(2,#TxCustNo+#TxFacmNo+#TxBormNo)
 
+#OOBUFL1=X,20,S
+T(2,2+#OOCustId)
+
 #OOBTN5=X,1,S
 BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=#OOExcuteTxcd;ntxbuf=#OOBUF5})
+C(5,#OOExcuteTxcd,L1103,BIND(grid,{ cmd=CHAIN; ntxcd=#OOExcuteTxcd;text=修改;ntxbuf=#OOBUFL1}),$)
 
 
 
@@ -252,6 +256,7 @@ TXFORM=L698A
 #OOExcuteTxcd
 #OOItemCode
 #OODtlValue
+#OOCustId
 
 ^
 </sub>

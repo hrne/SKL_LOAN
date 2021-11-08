@@ -1,0 +1,15 @@
+ReportCClCode1=X,1
+ReportCClCode2=X,2
+ReportCClNo=X,7
+ReportCPrevInsuNo=X,16
+ReportCCustNo=X,7
+ReportCFacmNo=X,3
+ReportCCustName=X,20
+ReportCNewInsuStartDate=9,8
+ReportCNewInsuEndDate=9,8
+ReportCFireAmt=9,18
+ReportCFireFee=9,18
+ReportCEthqAmt=9,18
+ReportCEthqFee=9,18
+ReportCTotlFee=9,18
+ReportCErrMsg=X,40

@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("insuCommService")
 @Repository
-public class InsuCommServiceImpl implements InsuCommService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(InsuCommServiceImpl.class);
-
+public class InsuCommServiceImpl extends ASpringJpaParm implements InsuCommService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class InsuCommServiceImpl implements InsuCommService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + insuCommId);
+    this.info("findById " + dbName + " " + insuCommId);
     Optional<InsuComm> insuComm = null;
     if (dbName.equals(ContentName.onDay))
       insuComm = insuCommReposDay.findById(insuCommId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "InsuYearMonth", "InsuCommSeq"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "InsuYearMonth", "InsuCommSeq"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = insuCommReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = insuCommReposHist.findAll(pageable);
     else 
       slice = insuCommRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("insuYearMonthRng " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " insuYearMonth_1 : " +  insuYearMonth_1);
+    this.info("insuYearMonthRng " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " insuYearMonth_1 : " +  insuYearMonth_1);
     if (dbName.equals(ContentName.onDay))
       slice = insuCommReposDay.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByNowInsuNoAscInsuCateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = insuCommReposHist.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByNowInsuNoAscInsuCateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
     else 
       slice = insuCommRepos.findAllByInsuYearMonthGreaterThanEqualAndInsuYearMonthLessThanEqualOrderByNowInsuNoAscInsuCateAsc(insuYearMonth_0, insuYearMonth_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findL4606A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " commDate_1 : " +  commDate_1 + " commDate_2 : " +  commDate_2);
+    this.info("findL4606A " + dbName + " : " + "insuYearMonth_0 : " + insuYearMonth_0 + " commDate_1 : " +  commDate_1 + " commDate_2 : " +  commDate_2);
     if (dbName.equals(ContentName.onDay))
       slice = insuCommReposDay.findAllByInsuYearMonthIsAndCommDateGreaterThanEqualAndCommDateLessThanEqualOrderByNowInsuNoAscInsuCateAsc(insuYearMonth_0, commDate_1, commDate_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -157,6 +159,9 @@ em = null;
     else 
       slice = insuCommRepos.findAllByInsuYearMonthIsAndCommDateGreaterThanEqualAndCommDateLessThanEqualOrderByNowInsuNoAscInsuCateAsc(insuYearMonth_0, commDate_1, commDate_2, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -165,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + insuCommId);
+    this.info("Hold " + dbName + " " + insuCommId);
     Optional<InsuComm> insuComm = null;
     if (dbName.equals(ContentName.onDay))
       insuComm = insuCommReposDay.findByInsuCommId(insuCommId);
@@ -183,7 +188,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + insuComm.getInsuCommId());
+    this.info("Hold " + dbName + " " + insuComm.getInsuCommId());
     Optional<InsuComm> insuCommT = null;
     if (dbName.equals(ContentName.onDay))
       insuCommT = insuCommReposDay.findByInsuCommId(insuComm.getInsuCommId());
@@ -205,7 +210,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + insuComm.getInsuCommId());
+    this.info("Insert..." + dbName + " " + insuComm.getInsuCommId());
     if (this.findById(insuComm.getInsuCommId()) != null)
       throw new DBException(2);
 
@@ -234,7 +239,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + insuComm.getInsuCommId());
+    this.info("Update..." + dbName + " " + insuComm.getInsuCommId());
     if (!empNot.isEmpty())
       insuComm.setLastUpdateEmpNo(empNot);
 
@@ -257,7 +262,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + insuComm.getInsuCommId());
+    this.info("Update..." + dbName + " " + insuComm.getInsuCommId());
     if (!empNot.isEmpty())
       insuComm.setLastUpdateEmpNo(empNot);
 
@@ -277,7 +282,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + insuComm.getInsuCommId());
+    this.info("Delete..." + dbName + " " + insuComm.getInsuCommId());
     if (dbName.equals(ContentName.onDay)) {
       insuCommReposDay.delete(insuComm);	
       insuCommReposDay.flush();
@@ -306,7 +311,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (InsuComm t : insuComm){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -341,7 +346,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (insuComm == null || insuComm.size() == 0)
       throw new DBException(6);
 
@@ -370,7 +375,7 @@ em = null;
 
   @Override
   public void deleteAll(List<InsuComm> insuComm, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

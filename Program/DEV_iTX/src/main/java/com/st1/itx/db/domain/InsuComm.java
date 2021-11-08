@@ -29,7 +29,7 @@ public class InsuComm implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -4185761180956896665L;
+	private static final long serialVersionUID = 7821497442070044431L;
 
 @EmbeddedId
   private InsuCommId insuCommId;
@@ -142,6 +142,11 @@ public class InsuComm implements Serializable {
   // 應領金額
   @Column(name = "`DueAmt`")
   private BigDecimal dueAmt = new BigDecimal("0");
+
+  // 媒體碼
+  /* Y:已產生 */
+  @Column(name = "`MediaCode`", length = 1)
+  private String mediaCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -684,6 +689,25 @@ public class InsuComm implements Serializable {
   }
 
 /**
+	* 媒體碼<br>
+	* Y:已產生
+	* @return String
+	*/
+  public String getMediaCode() {
+    return this.mediaCode == null ? "" : this.mediaCode;
+  }
+
+/**
+	* 媒體碼<br>
+	* Y:已產生
+  *
+  * @param mediaCode 媒體碼
+	*/
+  public void setMediaCode(String mediaCode) {
+    this.mediaCode = mediaCode;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -766,7 +790,7 @@ public class InsuComm implements Serializable {
            + ", insuSignDate=" + insuSignDate + ", insuredName=" + insuredName + ", insuredAddr=" + insuredAddr + ", insuredTeleph=" + insuredTeleph + ", insuStartDate=" + insuStartDate + ", insuEndDate=" + insuEndDate
            + ", insuCate=" + insuCate + ", insuPrem=" + insuPrem + ", commRate=" + commRate + ", commision=" + commision + ", totInsuPrem=" + totInsuPrem + ", totComm=" + totComm
            + ", recvSeq=" + recvSeq + ", chargeDate=" + chargeDate + ", commDate=" + commDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", fireOfficer=" + fireOfficer
-           + ", empId=" + empId + ", empName=" + empName + ", dueAmt=" + dueAmt + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", empId=" + empId + ", empName=" + empName + ", dueAmt=" + dueAmt + ", mediaCode=" + mediaCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

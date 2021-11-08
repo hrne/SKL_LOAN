@@ -143,12 +143,14 @@ public class L698A extends TradeBuffer {
 //				}
 
 				int custno = tTxToDoDetail.getCustNo();
-				String csutNm = "";
+				String custName = "";
+				String custId = "";
 
 				if (custno != 0) {
 					CustMain tCustMain = custMainService.custNoFirst(custno, custno);
 					if (tCustMain != null) {
-						csutNm = tCustMain.getCustName();
+						custName = tCustMain.getCustName();
+						custId = tCustMain.getCustId();
 					}
 				}
 
@@ -166,13 +168,14 @@ public class L698A extends TradeBuffer {
 				occursList.putParam("OOCustNo", custno);
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo());
 				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo());
-				occursList.putParam("OOCustName", csutNm);
+				occursList.putParam("OOCustName", custName);
 				occursList.putParam("OOProcessNote", tTxToDoDetail.getProcessNote());
 				occursList.putParam("OOTxSn", tTxToDoDetail.getTitaEntdy() + titaVo.getKinbr()
 						+ tTxToDoDetail.getTitaTlrNo() + tTxToDoDetail.getTitaTxtNo()); // 登放序號
 				occursList.putParam("OOExcuteTxcd", tTxToDoDetail.getExcuteTxcd());
 				occursList.putParam("OOItemCode", tTxToDoDetail.getItemCode());
 				occursList.putParam("OODtlValue", tTxToDoDetail.getDtlValue());
+				occursList.putParam("OOCustId", custId);
 
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
@@ -183,34 +186,5 @@ public class L698A extends TradeBuffer {
 
 		this.addList(this.totaVo);
 		return this.sendList();
-	}
-
-	private Boolean selectCodeIsNotQualify(TxToDoDetail tTxToDoDetail) throws LogicException {
-		Boolean result = false;
-		int today = this.getTxBuffer().getTxCom().getTbsdy();
-//		! 1:昨日留存 
-//		! 2:本日新增 
-//		! 3:全部     
-//		! 4:本日處理 
-//		! 5:本日刪除 
-//		! 6:保留    
-//		! 7:未處理
-//		! 9:未處理 (按鈕處理)
-
-		switch (selectCode) {
-		case 1:
-			if (tTxToDoDetail.getDataDate() >= today) {
-				result = true;
-			}
-			break;
-		case 2:
-			if (tTxToDoDetail.getDataDate() != today) {
-				result = true;
-			}
-			break;
-		default:
-			break;
-		}
-		return result;
 	}
 }

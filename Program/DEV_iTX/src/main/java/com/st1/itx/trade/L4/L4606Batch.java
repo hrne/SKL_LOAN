@@ -3,6 +3,7 @@ package com.st1.itx.trade.L4;
 import java.io.IOException;
 import java.io.File;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,7 +45,11 @@ import com.st1.itx.util.parse.Parse;
 @Service("L4606Batch")
 @Scope("prototype")
 /**
- * 
+ * 火險佣金作業<BR>
+ * 1. 佣金為負不寫入、僅顯示筆數<BR>
+ * 2. 應領金額為零，不出表<BR>
+ * 3. 業務人員任用狀況碼 AgStatusCode = 1:在職 ，才發放<BR>
+ * 4. 要發放的，應領金額為零，仍寫入佣金媒體檔
  * 
  * @author Zi-Jun,Huang
  * @version 1.0.0
@@ -148,7 +153,11 @@ public class L4606Batch extends TradeBuffer {
 		String flagB = titaVo.getParam("FlagB");
 		String flagC = titaVo.getParam("FlagC");
 		long sno = 0;
-
+		int totCnt = 0;
+		int minusCnt = 0;
+		int zeroDueAmtCnt = 0;
+		int paidCnt = 0;
+		int unPaidCnt = 0;
 		deleinsuComm();
 
 //		PC上傳媒體檔轉入佣金媒體檔
@@ -158,7 +167,7 @@ public class L4606Batch extends TradeBuffer {
 
 //			String fileName = "874-B1.txt";
 			String filePath1 = inFolder + dateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo()
-					+ File.separatorChar + titaVo.getParam("FILENA").trim();
+					+ File.separatorChar + titaVo.getParam("FILENA");
 
 			ArrayList<String> dataLineList = new ArrayList<>();
 
@@ -184,7 +193,12 @@ public class L4606Batch extends TradeBuffer {
 						this.info("Seq : " + seq);
 						this.batchTransaction.commit();
 					}
-
+					totCnt++;
+					// 佣金為負不寫入、僅顯示筆數
+					if (parse.stringToBigDecimal(tempOccursList.get("InsuComm")).compareTo(BigDecimal.ZERO) < 0) {
+						minusCnt++;
+						continue;
+					}
 					InsuComm tInsuComm = new InsuComm();
 					InsuCommId tInsuCommId = new InsuCommId();
 					FacMain tFacMain = new FacMain();
@@ -196,34 +210,39 @@ public class L4606Batch extends TradeBuffer {
 					String empId = "";
 					String empName = "";
 					String agStatusCode = "";
-					int custNo = parse.stringToInteger(tempOccursList.get("CustNo").trim());
-					int facmNo = parse.stringToInteger(tempOccursList.get("FacmNo").trim());
+					String mediaCode = "";
+					int custNo = parse.stringToInteger(tempOccursList.get("CustNo"));
+					int facmNo = parse.stringToInteger(tempOccursList.get("FacmNo"));
 
 					tInsuCommId.setInsuYearMonth(iInsuEndMonth);
 					tInsuCommId.setInsuCommSeq(seq);
 
 					tInsuComm.setInsuCommId(tInsuCommId);
-					tInsuComm.setNowInsuNo(tempOccursList.get("InsuNo").trim());
-					tInsuComm.setInsuCate(parse.stringToInteger(tempOccursList.get("InsuType").trim()));
-					tInsuComm.setManagerCode(tempOccursList.get("IndexCode").trim());
-					tInsuComm.setBatchNo(tempOccursList.get("BatxNo").trim());
-					tInsuComm.setInsuType(parse.stringToInteger(tempOccursList.get("InsuKind").trim()));
-					tInsuComm.setInsuSignDate(parse.stringToInteger(tempOccursList.get("SignDate").trim()));
-					tInsuComm.setInsuredName(tempOccursList.get("InsuredName").trim());
-					tInsuComm.setInsuredAddr(tempOccursList.get("InsuredAddress").trim());
-					tInsuComm.setInsuredTeleph(tempOccursList.get("InsuredTeleNo").trim());
-					tInsuComm.setInsuStartDate(parse.stringToInteger(tempOccursList.get("InsuStartDate").trim()));
-					tInsuComm.setInsuEndDate(parse.stringToInteger(tempOccursList.get("InsuEndDate").trim()));
-					tInsuComm.setInsuPrem(parse.stringToBigDecimal(tempOccursList.get("InsuFee").trim()).abs());
-					tInsuComm.setCommRate(parse.stringToBigDecimal(tempOccursList.get("InsuCommRate").trim()));
-					tInsuComm.setCommision(parse.stringToBigDecimal(tempOccursList.get("InsuComm").trim()).abs());
-					tInsuComm.setTotInsuPrem(parse.stringToBigDecimal(tempOccursList.get("TotalFee").trim()).abs());
-					tInsuComm.setTotComm(parse.stringToBigDecimal(tempOccursList.get("TotalComm").trim()).abs());
-					tInsuComm.setRecvSeq(tempOccursList.get("CaseNo").trim());
-					tInsuComm.setChargeDate(parse.stringToInteger(tempOccursList.get("AcDate").trim()));
-					tInsuComm.setCommDate(parse.stringToInteger(tempOccursList.get("CommDate").trim()));
+					tInsuComm.setNowInsuNo(tempOccursList.get("InsuNo"));
+					tInsuComm.setInsuCate(parse.stringToInteger(tempOccursList.get("InsuType")));
+					tInsuComm.setManagerCode(tempOccursList.get("IndexCode"));
+					tInsuComm.setBatchNo(tempOccursList.get("BatxNo"));
+					tInsuComm.setInsuType(parse.stringToInteger(tempOccursList.get("InsuKind")));
+					tInsuComm.setInsuSignDate(parse.stringToInteger(tempOccursList.get("SignDate")));
+					tInsuComm.setInsuredName(tempOccursList.get("InsuredName"));
+					tInsuComm.setInsuredAddr(tempOccursList.get("InsuredAddress"));
+					tInsuComm.setInsuredTeleph(tempOccursList.get("InsuredTeleNo"));
+					tInsuComm.setInsuStartDate(parse.stringToInteger(tempOccursList.get("InsuStartDate")));
+					tInsuComm.setInsuEndDate(parse.stringToInteger(tempOccursList.get("InsuEndDate")));
+					tInsuComm.setInsuPrem(parse.stringToBigDecimal(tempOccursList.get("InsuFee")));
+					tInsuComm.setCommRate(parse.stringToBigDecimal(tempOccursList.get("InsuCommRate")));
+					tInsuComm.setCommision(parse.stringToBigDecimal(tempOccursList.get("InsuComm")));
+					tInsuComm.setTotInsuPrem(parse.stringToBigDecimal(tempOccursList.get("TotalFee")));
+					tInsuComm.setTotComm(parse.stringToBigDecimal(tempOccursList.get("TotalComm")));
+					tInsuComm.setRecvSeq(tempOccursList.get("CaseNo"));
+					tInsuComm.setChargeDate(parse.stringToInteger(tempOccursList.get("AcDate")));
+					tInsuComm.setCommDate(parse.stringToInteger(tempOccursList.get("CommDate")));
 					tInsuComm.setCustNo(custNo);
 					tInsuComm.setFacmNo(facmNo);
+					BigDecimal commBase = parse.stringToBigDecimal(tempOccursList.get("CommBase"));
+					BigDecimal commRate = parse.stringToBigDecimal(tempOccursList.get("CommRate"));
+					BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
+					tInsuComm.setDueAmt(dueAmt);
 
 //					By I.T. Mail 火險服務抓取 額度檔之火險服務，如果沒有則為戶號的介紹人，若兩者皆為空白者，則為空白(為未發放名單)
 //					業務人員任用狀況碼 AgStatusCode =   1:在職 ，才發放 	
@@ -252,11 +271,18 @@ public class L4606Batch extends TradeBuffer {
 					tInsuComm.setEmpId(empId);
 					tInsuComm.setEmpName(empName);
 					InsuRenew tInsuRenew = insuRenewService.findNowInsuNoFirst(custNo, facmNo,
-							tempOccursList.get("InsuNo").trim(), titaVo);
+							tempOccursList.get("InsuNo"), titaVo);
+
 					if (tInsuRenew != null && "1".equals(agStatusCode)) {
-						tInsuComm.setDueAmt(parse.stringToBigDecimal(tempOccursList.get("TotalComm").trim()));
+						mediaCode = "Y";
+					}
+					tInsuComm.setMediaCode(mediaCode);
+					if (dueAmt.compareTo(BigDecimal.ZERO) == 0) {
+						zeroDueAmtCnt++;
+					} else if ("Y".equals(mediaCode)) {
+						paidCnt++;
 					} else {
-						tInsuComm.setDueAmt(BigDecimal.ZERO);
+						unPaidCnt++;
 					}
 
 					try {
@@ -280,8 +306,13 @@ public class L4606Batch extends TradeBuffer {
 			l4606Report1.exec(titaVo);
 
 			l4606Report2.exec(titaVo);
+			// int minusCnt = 0;
+			// int zeroDueAmtCnt = 0;
+			// int paidCnt = 0;
+			// int unPaidCnt = 0;
 
-			sendMsg = "火險佣金發放報表已完成";
+			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
+					+ ", 佣金為負剃除筆數：" + minusCnt;
 		}
 
 //		產生下傳媒體
@@ -309,7 +340,7 @@ public class L4606Batch extends TradeBuffer {
 				HashMap<String, Integer> cntComm = new HashMap<>();
 
 				for (InsuComm tInsuComm : lInsuComm) {
-					if (!"".equals(tInsuComm.getFireOfficer().trim())) {
+					if ("Y".equals(tInsuComm.getMediaCode())) {
 						String empId = tInsuComm.getEmpId();
 
 						if (sumComm.containsKey(empId)) {
@@ -338,10 +369,10 @@ public class L4606Batch extends TradeBuffer {
 				int seq = 0;
 
 				for (InsuComm tInsuComm : lInsuComm) {
-					if (!"".equals(tInsuComm.getFireOfficer().trim())) {
+					if (!"".equals(tInsuComm.getFireOfficer())) {
 						OccursList occursList = new OccursList();
 
-						this.info("FireOfficer ... '" + tInsuComm.getFireOfficer().trim() + "'");
+						this.info("FireOfficer ... '" + tInsuComm.getFireOfficer() + "'");
 
 						String empId = tInsuComm.getEmpId();
 
@@ -432,234 +463,5 @@ public class L4606Batch extends TradeBuffer {
 				}
 			}
 		}
-	}
-
-	private void setReportA() {
-		this.info("ReportA Start...");
-
-		HashMap<tmpComm, Integer> commCnt = new HashMap<>();
-		HashMap<tmpComm, BigDecimal> commSum = new HashMap<>();
-
-		List<InsuComm> lInsuComm = new ArrayList<InsuComm>();
-
-		Slice<InsuComm> sInsuComm = null;
-
-		sInsuComm = insuCommService.findL4606A(iInsuEndMonth, insuStartDate, insuEndDate, this.index, this.limit);
-
-		lInsuComm = sInsuComm == null ? null : sInsuComm.getContent();
-
-//		第一筆        :筆數、金額初始
-//		第二筆~
-//		倒數第一筆:判斷是否有這個ID
-//				若有:筆數、金額+1，寫一筆明細
-//				若無:產生小計欄位、小計結尾"-----"，並寫入下一組Id
-//		最後一筆之小計與結尾: 判斷補上
-//		總計筆數、服務人筆數、金額
-		int cnt = 0;
-		int cntEmp = 0;
-		BigDecimal sum = BigDecimal.ZERO;
-
-		if (lInsuComm != null && lInsuComm.size() != 0) {
-			int rounds = 1;
-			for (InsuComm tInsuComm : lInsuComm) {
-				this.info("rounds = " + rounds);
-
-				if (rounds % commitCnt == 0) {
-					this.batchTransaction.commit();
-				}
-
-				tmpComm comm1 = new tmpComm(tInsuComm.getEmpId(), tInsuComm.getFireOfficer(), tInsuComm.getEmpName());
-				OccursList occursList = new OccursList();
-
-				if (rounds == 1) {
-					cntEmp = cntEmp + 1;
-					commCnt.put(comm1, 1);
-					commSum.put(comm1, tInsuComm.getCommision());
-				} else {
-					if (commCnt.containsKey(comm1)) {
-						commCnt.put(comm1, commCnt.get(comm1) + 1);
-						commSum.put(comm1, commSum.get(comm1).add(tInsuComm.getCommision()));
-					} else {
-						occursList.putParam("ReportALine",
-								FormatUtil.padLeft("小計:", 89) + FormatUtil.padLeft("" + commCnt.get(comm1), 8) + "筆"
-										+ FormatUtil.padLeft("" + commSum.get(comm1), 79));
-						totaA.addOccursList(occursList);
-
-						occursList = new OccursList();
-						occursList.putParam("ReportALine", addMark("-", 200));
-						totaA.addOccursList(occursList);
-
-						commCnt.put(comm1, 1);
-						commSum.put(comm1, tInsuComm.getCommision());
-
-						cntEmp = cntEmp + 1;
-					}
-				}
-
-				occursList = new OccursList();
-				occursList.putParam("ReportALine",
-						FormatUtil.padX(tInsuComm.getNowInsuNo(), 20) + " "
-								+ FormatUtil.pad9("" + tInsuComm.getInsuCate(), 2) + "  "
-								+ FormatUtil.padLeft("" + tInsuComm.getInsuPrem(), 21) + FormatUtil.padX("", 4)
-								+ FormatUtil.padX("" + tInsuComm.getInsuStartDate(), 8) + " "
-								+ FormatUtil.padX("" + tInsuComm.getInsuEndDate(), 8) + " "
-								+ FormatUtil.padX("" + tInsuComm.getInsuredAddr(), 40) + " "
-								+ FormatUtil.pad9("" + tInsuComm.getCustNo(), 7) + " "
-								+ FormatUtil.pad9("" + tInsuComm.getFacmNo(), 3) + " "
-								+ FormatUtil.padX("" + tInsuComm.getEmpId(), 10) + " "
-								+ FormatUtil.padX("" + tInsuComm.getFireOfficer(), 6) + " "
-								+ FormatUtil.padX("" + tInsuComm.getEmpName(), 20) + " "
-								+ FormatUtil.padLeft("" + tInsuComm.getCommision(), 21) + FormatUtil.padX("", 18));
-				totaA.addOccursList(occursList);
-
-				if (rounds == lInsuComm.size()) {
-					occursList = new OccursList();
-					occursList.putParam("ReportALine",
-							FormatUtil.padLeft("小計:", 89) + FormatUtil.padLeft("" + commCnt.get(comm1), 8) + " 筆"
-									+ FormatUtil.padLeft("" + commSum.get(comm1), 79));
-					totaA.addOccursList(occursList);
-
-					occursList = new OccursList();
-					occursList.putParam("ReportALine", addMark("-", 200));
-					totaA.addOccursList(occursList);
-				}
-				rounds++;
-				cnt = cnt + 1;
-				sum = sum.add(tInsuComm.getCommision());
-			}
-		}
-		totaA.putParam("MSGID", "L466A");
-		totaA.putParam("ReportACnt", cnt);
-		totaA.putParam("ReportACntEmp", cntEmp);
-		totaA.putParam("ReportASum", sum);
-
-		this.info("tota A : " + totaA.toString());
-		this.addList(totaA);
-	}
-
-	private void setReportB() {
-		this.info("ReportB Start...");
-
-		List<InsuComm> lInsuComm = new ArrayList<InsuComm>();
-
-		Slice<InsuComm> sInsuComm = null;
-
-		sInsuComm = insuCommService.findL4606A(iInsuEndMonth, 0, 0, this.index, this.limit);
-
-		lInsuComm = sInsuComm == null ? null : sInsuComm.getContent();
-
-		int seq = 0;
-
-		if (lInsuComm != null && lInsuComm.size() != 0) {
-			for (InsuComm tInsuComm : lInsuComm) {
-				seq = seq + 1;
-
-				if (seq % commitCnt == 0) {
-					this.batchTransaction.commit();
-				}
-
-				OccursList occursList = new OccursList();
-
-				occursList.putParam("ReportBInsuNo", tInsuComm.getNowInsuNo());
-				occursList.putParam("ReportBInsuType", tInsuComm.getInsuCate());
-				occursList.putParam("ReportBInsuFee", tInsuComm.getInsuPrem());
-				occursList.putParam("ReportBInsuStartDate", tInsuComm.getInsuStartDate());
-				occursList.putParam("ReportBInsuEndDate", tInsuComm.getInsuEndDate());
-				occursList.putParam("ReportBInsuredAddress", tInsuComm.getInsuredAddr());
-				occursList.putParam("ReportBCustNo", tInsuComm.getCustNo());
-				occursList.putParam("ReportBFacmNo", tInsuComm.getFacmNo());
-				occursList.putParam("ReportBTelCode", tInsuComm.getEmpId());
-				occursList.putParam("ReportBTelId", tInsuComm.getFireOfficer());
-				occursList.putParam("ReportBTelName", tInsuComm.getEmpName());
-				occursList.putParam("ReportBCommAmt", tInsuComm.getCommision());
-
-				totaB.addOccursList(occursList);
-				totaB.putParam("MSGID", "L466B");
-			}
-			this.addList(totaB);
-		}
-	}
-
-//	暫時紀錄戶號額度
-	private class tmpComm implements Comparable<tmpComm> {
-		private String empId = "";
-		private String empNo = "";
-		private String empName = "";
-
-		public tmpComm(String empId, String empNo, String empName) {
-			this.setEmpId(empId);
-			this.setEmpNo(empNo);
-			this.setEmpName(empName);
-		}
-
-		public void setEmpId(String empId) {
-			this.empId = empId;
-		}
-
-		public void setEmpName(String empName) {
-			this.empName = empName;
-		}
-
-		public void setEmpNo(String empNo) {
-			this.empNo = empNo;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpComm other = (tmpComm) obj;
-			if (empId == null) {
-				if (other.empId != null)
-					return false;
-			} else if (!empId.equals(other.empId))
-				return false;
-			if (empName == null) {
-				if (other.empName != null)
-					return false;
-			} else if (!empName.equals(other.empName))
-				return false;
-			if (empNo == null) {
-				if (other.empNo != null)
-					return false;
-			} else if (!empNo.equals(other.empNo))
-				return false;
-			return true;
-		}
-
-		@Override
-		public int compareTo(tmpComm other) {
-			if (this.empId.compareTo(other.empId) != 0) {
-				return this.empId.compareTo(other.empId);
-			} else if (this.empName.compareTo(other.empName) != 0) {
-				return this.empName.compareTo(other.empName);
-			} else if (this.empNo.compareTo(other.empNo) != 0) {
-				return this.empNo.compareTo(other.empNo);
-			} else {
-				return 0;
-			}
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + ((empId == null) ? 0 : empId.hashCode());
-			result = prime * result + ((empName == null) ? 0 : empName.hashCode());
-			result = prime * result + ((empNo == null) ? 0 : empNo.hashCode());
-			return result;
-		}
-	}
-
-	private String addMark(String mark, int number) {
-		String result = mark;
-		for (int i = 1; i < number; i++) {
-			result = result + mark;
-		}
-		return result;
 	}
 }

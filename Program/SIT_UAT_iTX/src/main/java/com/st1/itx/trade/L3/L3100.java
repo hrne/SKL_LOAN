@@ -50,6 +50,7 @@ import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.LoanCom;
 import com.st1.itx.util.common.LoanDueAmtCom;
 import com.st1.itx.util.common.PfDetailCom;
+import com.st1.itx.util.common.TxAmlCom;
 import com.st1.itx.util.common.data.PfDetailVo;
 
 /*
@@ -144,6 +145,8 @@ public class L3100 extends TradeBuffer {
 	public PfDetailCom pfDetailCom;
 	@Autowired
 	public AuthLogCom authLogCom;
+	@Autowired
+	TxAmlCom txAmlCom;
 
 	private TitaVo titaVo = new TitaVo();
 	private int iCustNo;
@@ -251,6 +254,12 @@ public class L3100 extends TradeBuffer {
 
 		// 手續費
 		HandlingFeeRoutine();
+
+		// 預約撥款到期； 撥款於經辦提交時檢核(Call by ApControl)
+		if (wkReserve && titaVo.isHcodeNormal()) {
+			txAmlCom.setTxBuffer(this.txBuffer);
+			txAmlCom.remitOut(titaVo);
+		}
 
 		// 維護撥款匯款檔
 		AcPaymentRoutine();

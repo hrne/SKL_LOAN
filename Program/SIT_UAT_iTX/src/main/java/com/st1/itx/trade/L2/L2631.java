@@ -116,8 +116,7 @@ public class L2631 extends TradeBuffer {
 		int iTranDate = parse.stringToInteger(titaVo.getParam("TranDate"));
 		// 申請日期
 		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"));
-		// 結案區分
-		int iCloseInd = parse.stringToInteger(titaVo.getParam("CloseInd"));
+		parse.stringToInteger(titaVo.getParam("CloseInd"));
 		// 額度編號
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 
@@ -128,7 +127,6 @@ public class L2631 extends TradeBuffer {
 		int wkcloseNo = 1;
 		// wk
 		int wkDocNo = 0;
-		int wkCloseDate = 0;
 		// 測試是否存在清償作業檔 如不存在清償序號為01,如存在取該戶號額度清償序號最大筆+1
 		tFacCloseMaxCloseNo = sFacCloseService.findMaxCloseNoFirst(iCustNo);
 		if (tFacCloseMaxCloseNo != null) {
@@ -203,23 +201,19 @@ public class L2631 extends TradeBuffer {
 				wkFacmNoEd = iFacmNo;
 			}
 			// 擔保品與額度關聯檔
-			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0,
-					Integer.MAX_VALUE, titaVo);
+			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0, Integer.MAX_VALUE, titaVo);
 			lClFac = slClFac == null ? null : slClFac.getContent();
 			// 全部結案
 			boolean isAllClose = true;
 			for (ClFac c : lClFac) {
-				if ((c.getCustNo() == iCustNo && iFacmNo == 0)
-						|| (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
+				if ((c.getCustNo() == iCustNo && iFacmNo == 0) || (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
 
 					// 撥款主檔
-					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
-							c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 					if (slLoanBorMain != null) {
 						for (LoanBorMain t : slLoanBorMain.getContent()) {
 							// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
-									|| t.getStatus() == 8) {
+							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6 || t.getStatus() == 8) {
 								isAllClose = false;
 								break;
 							}

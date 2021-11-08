@@ -35,25 +35,24 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("l4606.findAll ");
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("InsuEndMonth").toString()) + 191100));
+		String insuYearMonth = String.valueOf((Integer.valueOf(titaVo.get("InsuEndMonth").toString()) + 191100));
 		String sql = "   SELECT                                                    ";
-		sql += "     I.\"BatchNo\"                                                 ";
-		sql += "   , I.\"InsuCate\"                                                ";
-		sql += "   , I.\"InsuPrem\"                                                ";
-		sql += "   , I.\"InsuStartDate\"                                           ";
-		sql += "   , I.\"InsuEndDate\"                                             ";
-		sql += "   , I.\"InsuredAddr\"                                             ";
-		sql += "   , I.\"CustNo\"                                                  ";
-		sql += "   , I.\"FacmNo\"                                                  ";
-		sql += "   , I.\"FireOfficer\"                                             ";
-		sql += "   , C.\"CustName\"                                                ";
-		sql += "   , I.\"EmpName\"                                                 ";
-		sql += "   , I.\"Commision\"                                               ";
+		sql += "     I.\"BatchNo\"                                           AS F0  ";
+		sql += "   , I.\"InsuCate\"                                          AS F1  ";
+		sql += "   , I.\"InsuPrem\"                                          AS F2  ";
+		sql += "   , I.\"InsuStartDate\"                                     AS F3  ";
+		sql += "   , I.\"InsuEndDate\"                                       AS F4  ";
+		sql += "   , I.\"InsuredAddr\"                                       AS F5  ";
+		sql += "   , I.\"CustNo\"                                            AS F6  ";
+		sql += "   , I.\"FacmNo\"                                            AS F7  ";
+		sql += "   , I.\"FireOfficer\"                                       AS F8  ";
+		sql += "   , I.\"EmpId\"                                             AS F9  ";
+		sql += "   , I.\"EmpName\"                                           AS F10 ";
+		sql += "   , I.\"DueAmt\"                                            AS F11 ";
 		sql += "  FROM \"InsuComm\" I                                              ";
-		sql += "  LEFT JOIN \"CdEmp\" E ON E.\"EmployeeNo\"  = I.\"FireOfficer\"   ";
-		sql += "  LEFT JOIN \"CustMain\" C ON c.\"CustNo\"  = I.\"CustNo\"         ";
-		sql += "  WHERE I.\"InsuYearMonth\" = " + entdy;
-		sql += "    and E.\"EmployeeNo\" is not null                               ";
+		sql += "  WHERE I.\"InsuYearMonth\" = " + insuYearMonth;
+		sql += "    and I.\"DueAmt\"  > 0                                         ";
+		sql += "    and NVL(I.\"MediaCode\",'N') = 'Y'                             ";
 		sql += "  ORDER BY I.\"BatchNo\", I.\"InsuCate\"                           ";
 
 		this.info("sql=" + sql);
@@ -66,24 +65,24 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	public List<Map<String, String>> find(TitaVo titaVo) throws Exception {
 		this.info("l4606.findAll ");
-		String entdy = String.valueOf((Integer.valueOf(titaVo.get("InsuEndMonth").toString()) + 191100));
+		String insuYearMonth = String.valueOf((Integer.valueOf(titaVo.get("InsuEndMonth").toString()) + 191100));
 		String sql = "   SELECT                                                    ";
-		sql += "     I.\"BatchNo\"                                                 ";
-		sql += "   , I.\"InsuCate\"                                                ";
-		sql += "   , I.\"InsuPrem\"                                                ";
-		sql += "   , I.\"InsuStartDate\"                                           ";
-		sql += "   , I.\"InsuEndDate\"                                             ";
-		sql += "   , I.\"InsuredAddr\"                                             ";
-		sql += "   , I.\"CustNo\"                                                  ";
-		sql += "   , I.\"FacmNo\"                                                  ";
-		sql += "   , I.\"FireOfficer\"                                             ";
-		sql += "   , C.\"CustName\"                                                ";
-		sql += "   , I.\"EmpName\"                                                 ";
-		sql += "   , I.\"Commision\"                                               ";
+		sql += "     I.\"BatchNo\"                                           AS F0  ";
+		sql += "   , I.\"InsuCate\"                                          AS F1  ";
+		sql += "   , I.\"InsuPrem\"                                          AS F2  ";
+		sql += "   , I.\"InsuStartDate\"                                     AS F3  ";
+		sql += "   , I.\"InsuEndDate\"                                       AS F4  ";
+		sql += "   , I.\"InsuredAddr\"                                       AS F5  ";
+		sql += "   , I.\"CustNo\"                                            AS F6  ";
+		sql += "   , I.\"FacmNo\"                                            AS F7  ";
+		sql += "   , I.\"FireOfficer\"                                       AS F8  ";
+		sql += "   , I.\"EmpId\"                                             AS F9  ";
+		sql += "   , I.\"EmpName\"                                           AS F10 ";
+		sql += "   , I.\"DueAmt\"                                            AS F11 ";
 		sql += "  FROM \"InsuComm\" I                                              ";
-		sql += "  LEFT JOIN \"CustMain\" C ON c.\"CustNo\"  = I.\"CustNo\"         ";
-		sql += "  WHERE I.\"InsuYearMonth\" = " + entdy;
-		sql += "    and I.\"FireOfficer\" is null        ";
+		sql += "  WHERE I.\"InsuYearMonth\" = " + insuYearMonth;
+		sql += "    and I.\"DueAmt\"  > 0                                         ";
+		sql += "    and NVL(I.\"MediaCode\",'N') = 'N'                             ";
 		sql += "  ORDER BY I.\"BatchNo\", I.\"InsuCate\"                           ";
 
 		this.info("sql=" + sql);

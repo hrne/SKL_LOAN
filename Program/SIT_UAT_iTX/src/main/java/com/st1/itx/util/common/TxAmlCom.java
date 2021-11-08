@@ -36,7 +36,7 @@ import com.st1.itx.util.parse.Parse;
 //        2.檢核或確認通過，主管才能放行或駁回
 //        3.確認未過，需訂正
 //        4.檢核或確認通過但主管駁回，可修正後，重跑流程
-//      B.remitL3220 撥款匯款 (暫收款退還 ) Call by  Call by L3220 暫收款退還 
+//      B.remitOut 撥款匯款 (暫收款退還、預約撥款到期 ) Call by 1.L3220 暫收款退還 2.L3100 預約撥款到期
 //        1.經辦交易送AML檢核
 //        2.檢核或確認通過，交易成功
 // 
@@ -183,7 +183,7 @@ public class TxAmlCom extends TradeBuffer {
 	 * @param titaVo
 	 * @throws LogicException
 	 */
-	public void remitL3220(TitaVo titaVo) throws LogicException {
+	public void remitOut(TitaVo titaVo) throws LogicException {
 		this.info("TxAmlCom.remit .....");
 		CheckAmlVo checkAmlVo = new CheckAmlVo();
 		// AML@交易序號：前兩碼03+會計日期+交易序號

@@ -1,11 +1,14 @@
 package com.st1.itx.util.common.data;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.util.parse.Parse;
 
 /**
  * 
@@ -24,6 +27,27 @@ public class InsuCommFileVo extends FileVo {
 	private final int headerCounts = 0;
 	// 設定尾筆筆數
 	private final int footerCounts = 0;
+
+	private BigDecimal commRate11 = new BigDecimal("0.11");
+	private BigDecimal commRate12 = new BigDecimal("0.65");
+	private BigDecimal commRate13 = new BigDecimal("0.65");
+	private BigDecimal commRate15 = new BigDecimal("0.04");
+//	【CMT04險別】=1
+//			Case1 【險種CMT11】=11→【應領金額CMT20】=【保費CMT12】*【佣金率(0.11)】
+//			Case2 【險種CMT11】=12、13→【應領金額CMT20】=【佣金CMT13】*【佣金率(0.65)】
+//			Case3【險種CMT11】=15→【應領金額CMT20】=【保費CMT12】*【佣金率(0.04)】
+//			不符合Case1、Case2、Case3的則為0
+//   
+//	 佣金率
+//			險種     新佣金率
+//			11	   	0.11   
+//			15 	   	0.04   
+//			12	   	0.65   
+//			13      0.65  
+//
+	
+	@Autowired
+	public Parse parse;
 
 	// 明細資料容器
 	private ArrayList<OccursList> occursList = new ArrayList<>();
@@ -51,54 +75,94 @@ public class InsuCommFileVo extends FileVo {
 			// 明細
 			if (i >= headerCounts && i <= (LastIndex - footerCounts)) {
 				OccursList occursList = new OccursList();
-//				經紀人代號  
-//				保單號碼    
-//				批號        
-//				險別        
-//				簽單日期    
-//				被保險人    
-//				被保險人地址
-//				被保險人電話
-//				起保日期    
-//				到期日期    
-//				險種        
-//				保費        
-//				佣金率      
-//				佣金    
-//				合計保費
-//				合計佣金
-//				收件號碼
-//				收費日期
-//				佣金日期
-//				借款人戶號
-//				額度編號  
+
+//  0.經紀人代號  
+//  1.保單號碼    
+//  2.批號        
+//  3.險別                  【CMT04險別】
+//  4.簽單日期    
+//  5.被保險人    
+//  6.被保險人地址
+//  7.被保險人電話
+//  8.起保日期    
+//  9.到期日期    
+// 10.險種                  【險種CMT11】
+// 11.保費                  【保費CMT12】
+// 12.佣金率      
+// 13.佣金                  【佣金CMT13】
+// 14.合計保費
+// 15.合計佣金
+// 16.收件號碼
+// 17.收費日期
+// 18.佣金日期
+// 19.借款人戶號
+// 20.額度編號 
+// ---------------------------------------------------------
+// 應領金額 DueAmt  【應領金額CMT20】
+//
 
 				// 設定明細欄位的擷取位置
 
 				String[] thisColumn = thisLine.split("[|]");
+//				【CMT04險別】=1
+//				Case1 【險種CMT11】=11→【應領金額CMT20】=【保費CMT12】*【佣金率(0.11)】
+//				Case2 【險種CMT11】=12、13→【應領金額CMT20】=【佣金CMT13】*【佣金率(0.65)】
+//				Case3【險種CMT11】=15→【應領金額CMT20】=【保費CMT12】*【佣金率(0.04)】
+//				不符合Case1、Case2、Case3的則為0
 
 				if (thisColumn.length >= 1 && thisColumn != null) {
-					occursList.putParam("IndexCode", thisColumn[0]);
-					occursList.putParam("InsuNo", thisColumn[1]);
-					occursList.putParam("BatxNo", thisColumn[2]);
-					occursList.putParam("InsuKind", thisColumn[3]);
-					occursList.putParam("SignDate", thisColumn[4]);
-					occursList.putParam("InsuredName", thisColumn[5]);
-					occursList.putParam("InsuredAddress", thisColumn[6]);
-					occursList.putParam("InsuredTeleNo", thisColumn[7]);
-					occursList.putParam("InsuStartDate", thisColumn[8]);
-					occursList.putParam("InsuEndDate", thisColumn[9]);
-					occursList.putParam("InsuType", thisColumn[10]);
-					occursList.putParam("InsuFee", thisColumn[11]);
-					occursList.putParam("InsuCommRate", thisColumn[12]);
-					occursList.putParam("InsuComm", thisColumn[13]);
-					occursList.putParam("TotalFee", thisColumn[14]);
-					occursList.putParam("TotalComm", thisColumn[15]);
-					occursList.putParam("CaseNo", thisColumn[16]);
-					occursList.putParam("AcDate", thisColumn[17]);
-					occursList.putParam("CommDate", thisColumn[18]);
-					occursList.putParam("CustNo", thisColumn[19]);
-					occursList.putParam("FacmNo", thisColumn[20]);
+					occursList.putParam("IndexCode", thisColumn[0].trim()); 
+					occursList.putParam("InsuNo", thisColumn[1].trim());
+					occursList.putParam("BatxNo", thisColumn[2].trim());
+					occursList.putParam("InsuKind", thisColumn[3].trim()); // 【CMT04險別】
+					occursList.putParam("SignDate", thisColumn[4].trim());  
+					occursList.putParam("InsuredName", thisColumn[5].trim());
+					occursList.putParam("InsuredAddress", thisColumn[6].trim());
+					occursList.putParam("InsuredTeleNo", thisColumn[7].trim());
+					occursList.putParam("InsuStartDate", thisColumn[8].trim());
+					occursList.putParam("InsuEndDate", thisColumn[9].trim());
+					occursList.putParam("InsuType", thisColumn[10].trim()); // 【險種CMT11】
+					occursList.putParam("InsuFee", thisColumn[11].trim());  // 【保費CMT12】
+					occursList.putParam("InsuCommRate", thisColumn[12].trim()); 
+					occursList.putParam("InsuComm", thisColumn[13].trim()); //【佣金CMT13】
+					occursList.putParam("TotalFee", thisColumn[14].trim());
+					occursList.putParam("TotalComm", thisColumn[15].trim());
+					occursList.putParam("CaseNo", thisColumn[16].trim());
+					occursList.putParam("AcDate", thisColumn[17].trim());
+					occursList.putParam("CommDate", thisColumn[18].trim());
+					occursList.putParam("CustNo", thisColumn[19].trim());
+					occursList.putParam("FacmNo", thisColumn[20].trim());
+//					【CMT04險別】=1
+//					Case1 【險種CMT11】=11→【應領金額CMT20】=【保費CMT12】*【佣金率(0.11)】
+//					Case2 【險種CMT11】=12、13→【應領金額CMT20】=【佣金CMT13】*【佣金率(0.65)】
+//					Case3【險種CMT11】=15→【應領金額CMT20】=【保費CMT12】*【佣金率(0.04)】
+//					不符合Case1、Case2、Case3的則為0
+					String commBase = "0";
+					BigDecimal commRate = BigDecimal.ZERO;
+					if ("1".equals(thisColumn[3].trim()) ) {
+						switch (thisColumn[10])	{
+						case "11" : 
+							commBase = thisColumn[11].trim();
+							commRate = commRate11;
+							break;
+						case "12" : 
+							commBase = thisColumn[13].trim();
+							commRate = commRate12;
+							break;
+						case "13" : 
+							commBase = thisColumn[13].trim();
+							commRate = commRate13;
+							break;
+						case "15" : 
+							commBase = thisColumn[11].trim();
+							commRate = commRate15;
+						break;
+							
+						}
+					}
+					occursList.putParam("CommBase", commBase);
+					occursList.putParam("CommRate", commRate);
+
 				}
 
 				this.occursList.add(occursList);
@@ -149,9 +213,12 @@ public class InsuCommFileVo extends FileVo {
 //			ColumnG			G		X	1	0
 //			ColumnH			H		X	1	0
 
-			String thisLine = occursList.get("SalesId") + "," + occursList.get("FireInsuMonth") + "," + occursList.get("ColumnA") + "," + occursList.get("TotCommA") + "," + occursList.get("TotCommB")
-					+ "," + occursList.get("ColumnB") + "," + occursList.get("ColumnC") + "," + occursList.get("ColumnD") + "," + occursList.get("ColumnE") + "," + occursList.get("Count") + ","
-					+ occursList.get("TotFee") + "," + occursList.get("TotCommC") + "," + occursList.get("ColumnF") + "," + occursList.get("ColumnG") + "," + occursList.get("ColumnH");
+			String thisLine = occursList.get("SalesId") + "," + occursList.get("FireInsuMonth") + ","
+					+ occursList.get("ColumnA") + "," + occursList.get("TotCommA") + "," + occursList.get("TotCommB")
+					+ "," + occursList.get("ColumnB") + "," + occursList.get("ColumnC") + ","
+					+ occursList.get("ColumnD") + "," + occursList.get("ColumnE") + "," + occursList.get("Count") + ","
+					+ occursList.get("TotFee") + "," + occursList.get("TotCommC") + "," + occursList.get("ColumnF")
+					+ "," + occursList.get("ColumnG") + "," + occursList.get("ColumnH");
 			result.add(thisLine);
 		}
 
