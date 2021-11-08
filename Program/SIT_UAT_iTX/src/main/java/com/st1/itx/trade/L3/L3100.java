@@ -370,7 +370,7 @@ public class L3100 extends TradeBuffer {
 				this.info("RenewFlag" + titaVo.getParam("RenewFlag") + "," + titaVo.getParam("RpFacmNo1") + "="
 						+ titaVo.getParam("FacmNo"));
 			} else {
-				if (tFacMain.getUtilDeadline() < wkTbsDy) {
+				if (tFacMain.getRecycleCode().equals("0") && tFacMain.getUtilDeadline() < wkTbsDy) {
 					throw new LogicException(titaVo, "E3052", "動支期限=" + tFacMain.getUtilDeadline()); // 已超過動支期限
 				}
 				if (tFacMain.getRecycleCode().equals("1") && tFacMain.getRecycleDeadline() < wkTbsDy) {
