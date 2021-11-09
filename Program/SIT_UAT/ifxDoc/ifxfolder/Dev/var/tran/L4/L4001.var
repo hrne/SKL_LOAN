@@ -43,9 +43,12 @@ E(0,0)
 [
 ["[L4001]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@撥款退款彙總查詢"],
 [#<->#,"#FdAcDateFrom+會計日期",#AcDateFrom,"-",#AcDateTo],
+[#<->#,"#FdItemCode+作業項目",#ItemCode,#ItemCodeX],
 ]
 
 #FdAcDateFrom=X,2,L
+T(3,*)
+#FdItemCode=X,2,L
 T(3,*)
 
 ! Help
@@ -62,6 +65,9 @@ T(3,CdCode.DrawdownCode2)
 T(3,CdCode.DrawdownStatus)
 
 #StatusCodeHelp=x,1024,S
+
+#ItemCodeHelp=x,1024,S
+T(3,1:撥款;2:退款)
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -106,6 +112,19 @@ IF(#TmpDateTo<#TmpDateFrom,V(P,迄日不可小於起日),$)
 
 #AcDateTo2=D,7,L
 E(0,#AcDateTo)
+
+
+
+!作業項目
+
+#ItemCode=X,1,I
+HELP(#ItemCodeHelp)
+@V(H,#ItemCodeHelp)
+
+#ItemCodeX=X,10,L
+T(3,)
+T(H,#ItemCode,#ItemCodeHelp)
+
 
 #RPTFG=A,1,S
 </sub>
@@ -162,7 +181,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4901; ntxbuf=#OOBUFA})
 
 !------ 上行電文 TEXT ------
 <sub type="TIM">
-#AcDateFrom#AcDateTo#END
+#AcDateFrom#AcDateTo#ItemCode#END
 </sub>
 
 !------ 下行電文TOM ------

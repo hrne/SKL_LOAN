@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -17,7 +15,6 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
-import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -25,7 +22,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L4510ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -51,7 +47,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		logger.info("L4510.findAll");
+		this.info("L4510.findAll");
 
 		String sql = " select                                                   ";
 		sql += "  l.\"CustNo\"            as F0                                 ";
@@ -66,12 +62,13 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " left join \"CdEmp\"    e on e.\"EmployeeNo\" = c.\"EmpNo\"     ";
 		sql += " left join \"CdCode\"   d on d.\"DefType\"    = 4               ";
 		sql += "                         and d.\"DefCode\"    = 'EmpDeductType' ";
-		sql += "                         and d.\"Code\"       = e.\"AgType1\"   ";
+		sql += "                         and substr(d.\"Item\",0,1) = e.\"AgType1\"   ";
 		sql += " where l.\"NextPayIntDate\" >= " + intStartDate;
 		sql += "   and l.\"NextPayIntDate\" <= " + intEndDate;
 		sql += "   and l.\"Status\" = 0                                         ";
 		sql += "   and l.\"AmortizedCode\" != 5 "; // --逆向房貸跳過
 		sql += "   and substr(d.\"Item\",0,1) = " + flag; // c."EmpNo" is not null && d.Item = flag
+		sql += "   and d.\"Code\"       = e.\"AgType1\"   ";
 //		15日薪-員工扣薪
 		if (flag == 1) {
 			sql += "   and f.\"RepayCode\" = 3                                  ";
@@ -82,10 +79,10 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		}
 		// sql += " and e.\"AgType1\" in(0,2,3,5) ";
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
 		List<Object> result = query.getResultList();
@@ -93,8 +90,7 @@ public class L4510ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return this.convertToMap(result);
 	}
 
-	public List<Map<String, String>> findAll(int iIntStartDate, int iIntEndDate, int iFlag, TitaVo titaVo)
-			throws Exception {
+	public List<Map<String, String>> findAll(int iIntStartDate, int iIntEndDate, int iFlag, TitaVo titaVo) throws Exception {
 		intStartDate = iIntStartDate;
 		intEndDate = iIntEndDate;
 		flag = iFlag;

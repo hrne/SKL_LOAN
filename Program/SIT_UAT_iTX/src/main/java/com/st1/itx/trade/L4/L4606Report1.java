@@ -2,7 +2,9 @@ package com.st1.itx.trade.L4;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.math.BigDecimal;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.cm.L4606ServiceImpl;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.parse.Parse;
 
 @Component("L4606Report1")
 @Scope("prototype")
@@ -22,6 +25,10 @@ public class L4606Report1 extends MakeReport {
 
 	@Autowired
 	public L4606ServiceImpl L4606ServiceImpl;
+
+	/* 轉換工具 */
+	@Autowired
+	public Parse parse;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -58,7 +65,7 @@ public class L4606Report1 extends MakeReport {
 		this.print(-2, 130, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-3, 70, titaVo.get("InsuEndMonth").toString().substring(0, 3) + "/" + titaVo.get("InsuEndMonth").toString().substring(3, 5), "C");
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
-		this.print(-4, 1, "保單號碼       險種   保費 起保日期  到期日期 被保險人地址                          戶號額度    火險服務ＩＤ  戶名          火險服務人  應領金額"); // fix
+		this.print(-4, 1, "保單號碼       險種   保費 起保日期  到期日期 被保險人地址                          戶號額度    戶名          火險服務ＩＤ  火險服務人  應領金額"); // fix
 		this.print(-5, 1, "-------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
@@ -77,16 +84,23 @@ public class L4606Report1 extends MakeReport {
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("L4606ServiceImpl.findAll error = " + errors.toString());
 		}
-
+		
+		ArrayList<String> tfire = new ArrayList<String>();
+		
 		String officer = "";
-		String id = "";
 		int i = 0;
-		int times = 0, total = 0, people = 0;
+		int times = 0, total = 0;
+		BigDecimal amt = new BigDecimal("0");
+		BigDecimal totamt = new BigDecimal("0");
 		for (Map<String, String> tL4606Vo : L4606List) {
 
 			if (i == 0) {
 				officer = tL4606Vo.get("F8").toString();
-				id = tL4606Vo.get("F9").toString();
+				
+				if(officer != "") {
+				  tfire.add(officer);
+				}
+				
 				this.print(1, 1,
 						"                                                                                                                                                                               ");
 				this.print(0, 1, tL4606Vo.get("F0"));
@@ -98,26 +112,31 @@ public class L4606Report1 extends MakeReport {
 				this.print(0, 81, PadStart(7, tL4606Vo.get("F6").toString()));
 				this.print(0, 88, "-");
 				this.print(0, 92, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-				this.print(0, 93, tL4606Vo.get("F8"));
-				this.print(0, 105, limitLength(tL4606Vo.get("F9"),16));
+				this.print(0, 93, limitLength(tL4606Vo.get("F9"),16));
+				this.print(0, 105, tL4606Vo.get("F8"));
 				this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
 				this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
+				
+				amt = amt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
+				totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
+				
 				times++;
-				people++;
 			} else {
-				if (officer.equals(tL4606Vo.get("F8").toString()) && id.equals(tL4606Vo.get("F9").toString())) {
+				if(tfire.contains(tL4606Vo.get("F8").toString()) || "".equals(tL4606Vo.get("F8").toString())) {
 					times++;
 				} else {
 //					reset比較值
 					officer = tL4606Vo.get("F8").toString();
-					id = tL4606Vo.get("F9").toString();
-
-					this.print(1, 1, "                                                                          小　計：           筆");
-					this.print(0, 91, String.format("%,d", times), "R");
+					if(officer != "") {
+						  tfire.add(officer);
+					}
+					this.print(1, 1, "                                                                小　計：           筆");
+					this.print(0, 81, String.format("%,d", times), "R");
+					this.print(0, 138, String.format("%,d", amt.intValue()), "R");
 					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
+					amt = new BigDecimal("0");
 					total = total + times;
 					times = 1;
-					people++;
 				}
 
 				this.print(1, 1,
@@ -131,25 +150,30 @@ public class L4606Report1 extends MakeReport {
 				this.print(0, 81, PadStart(7, tL4606Vo.get("F6").toString()));
 				this.print(0, 88, "-");
 				this.print(0, 92, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-				this.print(0, 93, tL4606Vo.get("F8"));
-				this.print(0, 105, limitLength(tL4606Vo.get("F9"),16));
+				this.print(0, 93, limitLength(tL4606Vo.get("F9"),16));
+				this.print(0, 105, tL4606Vo.get("F8"));
 				this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
 				this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
+				
+				amt = amt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
+				totamt = totamt.add(parse.stringToBigDecimal(tL4606Vo.get("F11")));
 			} // else
 
 			i++;
 			if (i == L4606List.size()) {
-				this.print(1, 1, "                                                                          小　計：           筆");
-				this.print(0, 91, String.format("%,d", times), "R");
+				this.print(1, 1, "                                                                小　計：           筆");
+				this.print(0, 81, String.format("%,d", times), "R");
+				this.print(0, 138, String.format("%,d", amt.intValue()), "R");
 				this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 				total = total + times;
 				times = 0;
 			}
 		}
 
-		this.print(1, 1, "                                                                          總　計：           筆              火險服務人：           人 ");
-		this.print(0, 91, String.format("%,d", total), "R");
-		this.print(0, 129, String.format("%,d", people), "R");
+		this.print(1, 1, "                                                                總　計：           筆              火險服務人：           人 ");
+		this.print(0, 81, String.format("%,d", total), "R");
+		this.print(0, 119, String.format("%,d", tfire.size()), "R");
+		this.print(0, 138, String.format("%,d", totamt.intValue()), "R");
 		long sno = this.close();
 		this.toPdf(sno);
 	}

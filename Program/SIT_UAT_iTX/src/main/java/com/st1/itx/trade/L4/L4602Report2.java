@@ -18,14 +18,18 @@ import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.http.WebClient;
 
 /**
- * L4600Report <BR>
+ * L4602Report2 <BR>
+ * [L4600火險到期檔產生作業]產生LN5811P.CSV <BR>
+ * 2021-11-09 智偉修改 <BR>
+ * 原本在L4600產生 <BR>
+ * 改為在L4602產生,並將報表程式改名
  * 
  * @author Chih Wei
  *
  */
 @Component
 @Scope("prototype")
-public class L4600Report extends MakeReport {
+public class L4602Report2 extends MakeReport {
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
@@ -42,14 +46,13 @@ public class L4600Report extends MakeReport {
 	@Autowired
 	L4600ServiceImpl l4600ServiceImpl;
 
-	// [L4600火險到期檔產生作業]產生LN5811P.CSV
 	String fileName = "LN5811P.csv";
 
-	final String fileHeader = "到期年月,戶號,額度,姓名,保單號碼,保險起日,保險迄日,火險保額,地震險保額,坪數(含建築物、公設等),建議火險保額 (e-loan),備註";
+	private static final String fileHeader = "到期年月,戶號,額度,姓名,保單號碼,保險起日,保險迄日,火險保額,地震險保額,坪數(含建築物、公設等),建議火險保額 (e-loan),備註";
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
-		this.info("L4600Report exec start");
+		this.info("L4602Report2 exec start");
 
 		List<String> file = getData(titaVo);
 
@@ -67,12 +70,12 @@ public class L4600Report extends MakeReport {
 		makeFile.toFile(sno);
 
 		webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"L4600 已產生LN5811P.CSV", titaVo);
+				titaVo.getTxCode() + " 已產生LN5811P.CSV", titaVo);
 	}
 
 	private List<String> getData(TitaVo titaVo) {
 
-		this.info("L4600Report getData start");
+		this.info("L4602Report2 getData start");
 
 		List<String> result = new ArrayList<>();
 

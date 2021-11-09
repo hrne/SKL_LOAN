@@ -69,6 +69,7 @@ public class L4001 extends TradeBuffer {
 
 		int acDateFrom = parse.stringToInteger(titaVo.getParam("AcDateFrom")) + 19110000;
 		int acDateTo = parse.stringToInteger(titaVo.getParam("AcDateTo")) + 19110000;
+		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
 
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4001A(acDateFrom, acDateTo, this.index, this.limit);
 
@@ -78,6 +79,21 @@ public class L4001 extends TradeBuffer {
 
 		// put
 		for (BankRemit tBankRemit : slBankRemit.getContent()) {
+			//作業項目為1.撥款時把退款篩選掉
+			if (iItemCode == 1) {
+				if (tBankRemit.getDrawdownCode() == 4 || tBankRemit.getDrawdownCode() == 5
+						|| tBankRemit.getDrawdownCode() == 11) {
+					continue;
+				}
+			}
+
+			//作業項目為2.退款時把撥款篩選掉
+			if (iItemCode == 2) {
+				if (tBankRemit.getDrawdownCode() == 1 || tBankRemit.getDrawdownCode() == 2) {
+					continue;
+				}
+			}
+
 			if (tBankRemit.getActFg() == 1) {
 				add(3, tBankRemit, titaVo);
 			} else {

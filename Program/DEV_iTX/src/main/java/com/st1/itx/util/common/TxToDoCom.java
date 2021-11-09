@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxToDoMain;
@@ -93,6 +94,7 @@ public class TxToDoCom extends TradeBuffer {
 	private TxToDoDetail tDetail = new TxToDoDetail();
 	private TxToDoDetailId tDetailId = new TxToDoDetailId();
 	private TxToDoMain tMain = new TxToDoMain();
+	private TempVo tTempVo = new TempVo();
 
 	/* maintain by Tx */
 	/**
@@ -117,19 +119,26 @@ public class TxToDoCom extends TradeBuffer {
 		this.info("txUpdStatus MRKEY=" + titaVo.getMrKey() + ", TxBormNo=" + titaVo.get("TxBormNo"));
 
 		int custNo = 0;
-		if (parse.isNumeric(titaVo.getMrKey().substring(0, 7)))
+		if (parse.isNumeric(titaVo.getMrKey().substring(0, 7))) {
 			custNo = parse.stringToInteger(titaVo.getMrKey().substring(0, 7));
+		}
 
 		int facmNo = 0;
-		if ("-".equals(titaVo.getMrKey().substring(7, 8)) && parse.isNumeric(titaVo.getMrKey().substring(8, 11)))
+		if ("-".equals(titaVo.getMrKey().substring(7, 8)) && parse.isNumeric(titaVo.getMrKey().substring(8, 11))) {
 			facmNo = parse.stringToInteger(titaVo.getMrKey().substring(8, 11));
+		}
 
 		int bormNo = 0;
-		if (titaVo.get("TxBormNo") != null)
-			bormNo = this.parse.stringToInteger(titaVo.getParam("TxBormNo"));
-		else if ("-".equals(titaVo.getMrKey().substring(11, 12))
-				&& parse.isNumeric(titaVo.getMrKey().substring(12, 15)))
+		if ("-".equals(titaVo.getMrKey().substring(11, 12)) && parse.isNumeric(titaVo.getMrKey().substring(12, 15))) {
 			bormNo = parse.stringToInteger(titaVo.getMrKey().substring(12, 15));
+		}
+
+		if (titaVo.get("TxBormNo") != null) {
+			TempVo tTempVo = new TempVo();
+			tTempVo.clear();
+			tTempVo.putParam("BormNo", bormNo);
+			bormNo = this.parse.stringToInteger(titaVo.getParam("TxBormNo"));
+		}
 
 		String iDtlValue = titaVo.get("TxDtlValue");
 		if (iDtlValue == null || iDtlValue.trim().length() == 0)
@@ -143,12 +152,13 @@ public class TxToDoCom extends TradeBuffer {
 		tDetail = txToDoDetailService.findById(tDetailId, titaVo);
 //		this.info("upd "+tDetail.toString());
 		// 新增與處理交易序號需不相同
-		if (tDetail != null && tDetail.getStatus() <= 2)
+		if (tDetail != null && tDetail.getStatus() <= 2) {
 			if (tDetail.getTitaTlrNo() == null || titaVo.getTlrNo() == null
 					|| !tDetail.getTitaTlrNo().equals(titaVo.getTlrNo())
-					|| parse.stringToInteger(titaVo.getTxtNo()) != tDetail.getTitaTxtNo())
+					|| parse.stringToInteger(titaVo.getTxtNo()) != tDetail.getTitaTxtNo()) {
 				updDetailStatus(2, tDetailId, titaVo); // 2.已處理
-
+			}
+		}
 	}
 
 	/**
@@ -327,6 +337,11 @@ public class TxToDoCom extends TradeBuffer {
 					subMainCntValue(tMain, tDetail, titaVo);
 					// 訂正交易 2.已處理 --> 0.未處理
 					tDetail.setStatus(status);
+					// 合併銷帳檔及會計分錄的jsonFields
+					TempVo rTempVo = new TempVo();
+					rTempVo = rTempVo.getVo(tDetail.getProcessNote());
+					rTempVo.putAll(tTempVo);
+					tDetail.setProcessNote(tTempVo.getJsonString());
 
 					// 加新資料狀態筆數，正常交易執行
 					addMainCntValue(tMain, tDetail, titaVo);

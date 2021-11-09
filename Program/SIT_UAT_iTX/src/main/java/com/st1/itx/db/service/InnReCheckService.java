@@ -64,6 +64,18 @@ public interface InnReCheckService {
   public Slice<InnReCheck> findYearMonth(int yearMonth_0, int yearMonth_1, int custNo_2, int custNo_3, int index, int limit, TitaVo... titaVo);
 
   /**
+   * TraceMonth &gt;= ,AND TraceMonth &lt;=
+   *
+   * @param traceMonth_0 traceMonth_0
+   * @param traceMonth_1 traceMonth_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice InnReCheck InnReCheck of List
+   */
+  public Slice<InnReCheck> findTraceMonth(int traceMonth_0, int traceMonth_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By InnReCheck
    * 
    * @param innReCheckId key

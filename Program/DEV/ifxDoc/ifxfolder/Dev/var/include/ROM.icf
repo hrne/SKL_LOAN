@@ -3583,7 +3583,6 @@ TXFORM=L2R57
 ^
 </L2R57.tom>
 
-
 <L2R58.dec>
 #L2r58CustNo=A,7,S
 #L2r58FacmNo=A,3,S
@@ -3603,6 +3602,17 @@ TXFORM=L2R58
 #L2r58AcctCode
 ^
 </L2R58.tom>
+
+<L2R59.dec>
+#L2r59Help1=X,2000,S
+</L2R59.dec>
+
+<L2R59.tom>
+TXFORM=L2R59
+#L2r59Help1
+^
+</L2R59.tom>
+
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -5498,8 +5508,7 @@ TXFORM=L5R07
 <L5R08.dec>
 #L5R08CustName=X,100,S
 #L5R08ReCheckCode=X,1,S
-#L5R08ReChkYear=N,3,S
-#L5R08ReChkMonth=N,2,S
+#L5R08ReChkYearMonth=N,5,S
 #L5R08ReChkUnit=X,20,S
 #L5R08FollowMark=X,1,S
 #L5R08Remark=X,120,S
@@ -5509,8 +5518,7 @@ TXFORM=L5R07
 TXFORM=L5R08
 #L5R08CustName
 #L5R08ReCheckCode
-#L5R08ReChkYear
-#L5R08ReChkMonth
+#L5R08ReChkYearMonth
 #L5R08ReChkUnit
 #L5R08FollowMark
 #L5R08Remark
@@ -7743,6 +7751,7 @@ TXFORM=L8R49
 #L8R50ManagerDesc=x,100,S
 #L8R50ManagerCheck=x,1,S
 #L8R50ManagerDate=D,7,S
+#L8R50ManagerCheckDate=D,7,S
 #L8R50CustName=x,50,S
 </L8R50.dec>
 
@@ -7758,6 +7767,7 @@ TXFORM=L8R50
 #L8R50ManagerDesc
 #L8R50ManagerCheck
 #L8R50ManagerDate
+#L8R50ManagerCheckDate
 #L8R50CustName
 
 ^

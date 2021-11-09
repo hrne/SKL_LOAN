@@ -134,9 +134,6 @@ public class L4600Batch extends TradeBuffer {
 	@Autowired
 	public WebClient webClient;
 
-	@Autowired
-	L4600Report l4600Report;
-
 	private int iInsuEndMonth = 0;
 	private int insuEndDateFrom = 0;
 	private int insuEndDateTo = 0;
@@ -162,15 +159,10 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-					"L4600 已產生火險到期檔", titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L4600 已產生火險到期檔", titaVo);
 		} else {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(),
-					sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "L4600", titaVo.getTlrNo(), sendMsg, titaVo);
 		}
-
-		// 2021-10-15 智偉新增
-		l4600Report.exec(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();
@@ -213,8 +205,7 @@ public class L4600Batch extends TradeBuffer {
 		// 轉換資料格式
 		ArrayList<String> file = insuRenewFileVo.toFile();
 
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔",
-				"LNM01P.txt", 2);
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-火險到期檔", "LNM01P.txt", 2);
 
 		for (String line : file) {
 			makeFile.put(line);
@@ -235,8 +226,7 @@ public class L4600Batch extends TradeBuffer {
 	}
 
 	private void orignalToList(TitaVo titaVo) throws LogicException {
-		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0,
-				Integer.MAX_VALUE, titaVo);
+		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuOrignal != null) {
 			for (InsuOrignal tInsuOrignal : slInsuOrignal.getContent()) {
 				InsuRenew tempInsuRenew = new InsuRenew();
@@ -266,10 +256,8 @@ public class L4600Batch extends TradeBuffer {
 
 	private void endoInsuNoToList(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
 		for (InsuRenew t : lInsuRenewTemp) {
-			if (tInsuRenew.getClCode1() == t.getClCode1() && tInsuRenew.getClCode2() == t.getClCode2()
-					&& tInsuRenew.getClNo() == t.getClNo() && tInsuRenew.getClCode2() == t.getClCode2()
-					&& tInsuRenew.getPrevInsuNo().equals(t.getPrevInsuNo())
-					&& tInsuRenew.getInsuEndDate() == t.getInsuEndDate()) {
+			if (tInsuRenew.getClCode1() == t.getClCode1() && tInsuRenew.getClCode2() == t.getClCode2() && tInsuRenew.getClNo() == t.getClNo() && tInsuRenew.getClCode2() == t.getClCode2()
+					&& tInsuRenew.getPrevInsuNo().equals(t.getPrevInsuNo()) && tInsuRenew.getInsuEndDate() == t.getInsuEndDate()) {
 				t.setFireInsuCovrg(t.getFireInsuCovrg().add(tInsuRenew.getFireInsuCovrg()));
 				t.setFireInsuPrem(t.getFireInsuPrem().add(tInsuRenew.getFireInsuPrem()));
 				t.setEthqInsuCovrg(t.getEthqInsuCovrg().add(tInsuRenew.getEthqInsuCovrg()));
@@ -280,8 +268,7 @@ public class L4600Batch extends TradeBuffer {
 	}
 
 	private void renewToList(TitaVo titaVo) throws LogicException {
-		Slice<InsuRenew> slInsuRenew = insuRenewService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0,
-				Integer.MAX_VALUE);
+		Slice<InsuRenew> slInsuRenew = insuRenewService.insuEndDateRange(insuEndDateFrom, insuEndDateTo, 0, Integer.MAX_VALUE);
 		if (slInsuRenew != null) {
 			for (InsuRenew tInsuRenew : slInsuRenew.getContent()) {
 				if ("".equals(tInsuRenew.getEndoInsuNo().trim())) {
@@ -304,8 +291,7 @@ public class L4600Batch extends TradeBuffer {
 			}
 
 //				排除自保件
-			InsuRenew nInsuRenew = insuRenewService.findById(
-					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "), titaVo);
+			InsuRenew nInsuRenew = insuRenewService.findById(new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "), titaVo);
 
 			if (nInsuRenew != null) {
 				this.info("排除自保件 ... " + t.getNowInsuNo());
@@ -325,8 +311,7 @@ public class L4600Batch extends TradeBuffer {
 			tInsuRenew.setClNo(t.getClNo());
 			tInsuRenew.setPrevInsuNo(t.getNowInsuNo());
 			tInsuRenew.setEndoInsuNo(" ");
-			tInsuRenew.setInsuRenewId(
-					new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "));
+			tInsuRenew.setInsuRenewId(new InsuRenewId(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getNowInsuNo(), " "));
 			tInsuRenew.setNowInsuNo("");
 			tInsuRenew.setOrigInsuNo(t.getOrigInsuNo());
 			tInsuRenew.setInsuYearMonth(iInsuEndMonth);
@@ -373,8 +358,7 @@ public class L4600Batch extends TradeBuffer {
 		// 原額度為正常戶優先
 		Slice<LoanBorMain> slLoanBorMain;
 		if (tInsuRenew.getFacmNo() > 0) {
-			slLoanBorMain = loanBorMainService.bormCustNoEq(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(),
-					tInsuRenew.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
+			slLoanBorMain = loanBorMainService.bormCustNoEq(tInsuRenew.getCustNo(), tInsuRenew.getFacmNo(), tInsuRenew.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
 			if (slLoanBorMain != null) {
 				int status = facStatusCom.settingStatus(slLoanBorMain.getContent(), tInsuRenew.getInsuEndDate());
 				if (status == 0 || status == 4) {
@@ -386,16 +370,13 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 		if (priorty > 0) {
-			Slice<ClFac> slClFac = clFacService.clNoEq(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(),
-					tInsuRenew.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClFac> slClFac = clFacService.clNoEq(tInsuRenew.getClCode1(), tInsuRenew.getClCode2(), tInsuRenew.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 			if (slClFac != null) {
 				for (ClFac tClFac : slClFac.getContent()) {
-					slLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(),
-							tClFac.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
+					slLoanBorMain = loanBorMainService.bormCustNoEq(tClFac.getCustNo(), tClFac.getFacmNo(), tClFac.getFacmNo(), 0, 900, 0, Integer.MAX_VALUE);
 					int priortyNow = 99;
 					if (slLoanBorMain != null) {
-						int status = facStatusCom.settingStatus(slLoanBorMain.getContent(),
-								tInsuRenew.getInsuEndDate());
+						int status = facStatusCom.settingStatus(slLoanBorMain.getContent(), tInsuRenew.getInsuEndDate());
 						if (status == 0 || status == 4) {
 							priortyNow = 1;
 						} else if (status == 2) {
@@ -420,8 +401,7 @@ public class L4600Batch extends TradeBuffer {
 			}
 		}
 
-		this.info("findFacmNo CustNo=" + this.custNo + ", FacmNo=" + this.facmNo + ", priorty=" + priorty
-				+ ", approveNo=" + approveNo);
+		this.info("findFacmNo CustNo=" + this.custNo + ", FacmNo=" + this.facmNo + ", priorty=" + priorty + ", approveNo=" + approveNo);
 
 	}
 
@@ -509,8 +489,7 @@ public class L4600Batch extends TradeBuffer {
 		return result;
 	}
 
-	public OccursList getOccurs(String iTxCode, OccursList occursList, InsuRenew t, TitaVo titaVo)
-			throws LogicException {
+	public OccursList getOccurs(String iTxCode, OccursList occursList, InsuRenew t, TitaVo titaVo) throws LogicException {
 		occursList.putParam("FireInsuMonth", FormatUtil.padX("" + (t.getInsuYearMonth()), 6));
 		occursList.putParam("ReturnCode", FormatUtil.pad9("99", 2));
 		occursList.putParam("InsuCampCode", FormatUtil.pad9("01", 2));
@@ -519,8 +498,7 @@ public class L4600Batch extends TradeBuffer {
 		ClBuilding tClBuilding = null;
 		ClBuildingOwner tClBuildingOwner = null;
 		if (t.getClCode1() == 1) {
-			tClBuilding = clBuildingService.findById(new ClBuildingId(t.getClCode1(), t.getClCode2(), t.getClNo()),
-					titaVo);
+			tClBuilding = clBuildingService.findById(new ClBuildingId(t.getClCode1(), t.getClCode2(), t.getClNo()), titaVo);
 			tClBuildingOwner = clBuildingOwnerService.clNoFirst(t.getClCode1(), t.getClCode2(), t.getClNo(), titaVo);
 		}
 		if (tClBuildingOwner != null) {
@@ -550,10 +528,8 @@ public class L4600Batch extends TradeBuffer {
 		BigDecimal publicArea = BigDecimal.ZERO;
 
 		if (tClBuilding != null) {
-			Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(tClBuilding.getClCode1(),
-					tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
-			Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(),
-					tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClBuildingParking> sClBuildingParking = clBuildingParkingService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClBuildingPublic> sClBuildingPublic = clBuildingPublicService.clNoEq(tClBuilding.getClCode1(), tClBuilding.getClCode2(), tClBuilding.getClNo(), 0, Integer.MAX_VALUE, titaVo);
 			if (sClBuildingParking != null) {
 				for (ClBuildingParking tClBuildingParking : sClBuildingParking.getContent()) {
 					parkArea = parkArea.add(tClBuildingParking.getArea());
@@ -569,8 +545,7 @@ public class L4600Batch extends TradeBuffer {
 			subArea = tClBuilding.getBdSubArea();
 			occursList.putParam("PostalCode", FormatUtil.padX("" + findZipCode(tCustMain, titaVo), 5));
 			occursList.putParam("Address", FormatUtil.padX(replaceComma(tClBuilding.getBdLocation()), 58));
-			occursList.putParam("BuildingSquare",
-					FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
+			occursList.putParam("BuildingSquare", FormatUtil.pad9(chgDot(mainArea.add(subArea).add(parkArea).add(publicArea)), 9));
 			occursList.putParam("BuildingCode", FormatUtil.pad9("" + tClBuilding.getBdMtrlCode(), 2));
 			occursList.putParam("BuildingYears", FormatUtil.pad9(("" + tClBuilding.getBdDate()), 7).substring(0, 3));
 			occursList.putParam("BuildingFloors", FormatUtil.pad9("" + tClBuilding.getFloor(), 2));
@@ -603,8 +578,7 @@ public class L4600Batch extends TradeBuffer {
 
 //		原保單之年月
 //		1.初保檔 = 原保險單號碼=原始保險單號碼
-		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoEq(t.getClCode1(), t.getClCode2(),
-				t.getClNo(), t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuOrignal> slInsuOrignal = insuOrignalService.findOrigInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuOrignal != null) {
 			for (InsuOrignal t2 : slInsuOrignal.getContent()) {
 				if ("".equals(t2.getEndoInsuNo().trim())) {
@@ -619,8 +593,7 @@ public class L4600Batch extends TradeBuffer {
 		}
 
 //		2.續保檔 = 原保險單號碼(t)=目前保險單號碼(t2)
-		Slice<InsuRenew> slInsuRenew = insuRenewService.findNowInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(),
-				t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenew> slInsuRenew = insuRenewService.findNowInsuNoEq(t.getClCode1(), t.getClCode2(), t.getClNo(), t.getPrevInsuNo(), 0, Integer.MAX_VALUE, titaVo);
 		if (slInsuRenew != null) {
 			for (InsuRenew t2 : slInsuRenew.getContent()) {
 				if ("".equals(t2.getEndoInsuNo().trim())) {
@@ -666,8 +639,7 @@ public class L4600Batch extends TradeBuffer {
 		occursList.putParam("CustNo", FormatUtil.pad9("" + t.getCustNo(), 7));
 		occursList.putParam("FacmNo", FormatUtil.pad9("" + t.getFacmNo(), 3));
 		occursList.putParam("Space", FormatUtil.padX("", 4));
-		occursList.putParam("SendDate",
-				FormatUtil.padLeft("" + (parse.stringToInteger(titaVo.getCalDy()) + 19110000), 14));
+		occursList.putParam("SendDate", FormatUtil.padLeft("" + (parse.stringToInteger(titaVo.getCalDy()) + 19110000), 14));
 //				SklSalesName 2.CdEmp.FullName
 //				SklUnitCode  2.CdEmp.CenterCodeAcc
 //				SklUnitName  2.CdEmp.CenterShortName
@@ -703,8 +675,7 @@ public class L4600Batch extends TradeBuffer {
 		if (tCustMain == null) {
 			occursList.putParam("MailingAddress", FormatUtil.padX("", 60));
 		} else {
-			occursList.putParam("MailingAddress",
-					FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain, titaVo), 60));
+			occursList.putParam("MailingAddress", FormatUtil.padX("" + custNoticeCom.getCurrAddress(tCustMain, titaVo), 60));
 		}
 		occursList.putParam("Remark2", FormatUtil.padX("", 39));
 		occursList.putParam("Space46", FormatUtil.padX("", 46));
@@ -714,8 +685,7 @@ public class L4600Batch extends TradeBuffer {
 	private void check(TitaVo titaVo) throws LogicException {
 		String sInsuEndMonth = iInsuEndMonth + "";
 
-		Slice<InsuRenewMediaTemp> sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(sInsuEndMonth,
-				sInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
+		Slice<InsuRenewMediaTemp> sInsuRenewMediaTemp = insuRenewMediaTempService.fireInsuMonthRg(sInsuEndMonth, sInsuEndMonth, 0, Integer.MAX_VALUE, titaVo);
 		// 已執行L4602
 		if (sInsuRenewMediaTemp != null) {
 			throw new LogicException("E0015", "該批已送回詢價，不可再產檔 ");

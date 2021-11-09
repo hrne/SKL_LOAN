@@ -17,20 +17,28 @@ E(0,0)
 [
 ["[L4101]                                 撥款退款作業"],
 [#<->#,"#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdItemCode+作業項目",#ItemCode,#ItemCodeX],
 [#<->#,"#FdReleaseCheck+是否檢核未放行",#ReleaseCheck,#ReleaseCheckX],
 [#<->#,"#FdBatchNo+整批批號",#BatchNo],
 ]
 
 #FdAcDate=X,2,L
+#FdItemCode=X,2,L
+T(3,*)
 #FdReleaseCheck=X,2,L
 #FdBatchNo=X,2,L
 
 #ReleaseCheckHELP=X,1024,S
 T(3,Y:是;N:否)
 
+#ItemCodeHelp=x,1024,S
+T(3,1:撥款;2:退款)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
+
+#Init=X,1,S
+INVOKEJS(SHOW,L4101,3,3,0)
 
 #NTXBUF=X,17,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
@@ -41,8 +49,22 @@ T(1,@BatchNo,#NTXBUF,1,6)
 #AcDate=D,7,L
 E(0,#SYSDATE)
 
+!作業項目
+
+#ItemCode=X,1,I
+HELP(#ItemCodeHelp)
+@V(H,#ItemCodeHelp)
+
+#ItemCodeX=X,10,L
+T(3,)
+T(H,#ItemCode,#ItemCodeHelp)
+IF(#ItemCode=="1",INVOKEJS(SHOW,L4101,3,3,1),INVOKEJS(SHOW,L4101,3,3,0))
+
+
+
 !是否檢核未放行
 #ReleaseCheck=X,1,I
+IF(#ItemCode=="1",$,S)
 C(4,#ReleaseCheck,T(3,Y),$)
 HELP(#ReleaseCheckHELP)
 @V(H,#ReleaseCheckHELP)
@@ -181,6 +203,7 @@ E(0,@L411APRT,0)
 #AcDate
 #ReleaseCheck
 #BatchNo
+#ItemCode
 #END
 </sub>
 

@@ -275,6 +275,9 @@ TXFORM=L461C
 ^
 
 
+#PdfPrtM=1,PDF,,,,,,,,,,,,,PdfSnoM;3,火險通知作業_LNM52P.txt
+^
+
 #L461CPRT=1,L461C,NA,,D,15
 %
 #ReportCClCode1

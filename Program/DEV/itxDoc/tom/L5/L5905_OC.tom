@@ -1,0 +1,17 @@
+OOYearMonth=9,5
+OOConditionCode=9,2
+OOCustNo=9,7
+OOFacmNo=9,3
+OOCustName=X,100
+OOReCheckCode=X,1
+OOFollowMark=X,1
+OOReChkYearMonth=9,5
+OODrawdownDate=9,7
+OOLoanBal=9,14.2
+OOEvaluation=9,2
+OOCustTypeItem=X,20
+OOUsageItem=X,20
+OOCityItem=X,20
+OOReChkUnit=X,20
+OORemark=X,120
+OOTraceYearMonth=9,5

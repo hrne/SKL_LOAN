@@ -14,8 +14,6 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
-import com.st1.itx.db.domain.AcClose;
-import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
@@ -59,11 +57,6 @@ public class L4101ReportA extends MakeReport {
 	private String security = "機密";
 	private String pageSize = "A4";
 	private String pageOrientation = "L";
-
-	// 帳冊別 TODO:待修改
-	private String nowAcBookCode = "000";
-	private String nowAcBookItem = "全帳冊";
-//	private String slipNo = "";
 
 	// 製表日期
 	private String nowDate;
@@ -186,20 +179,6 @@ public class L4101ReportA extends MakeReport {
 		print(0, 105, formatAmt(sumDbAmt, 0), "R");// 借方金額加總
 		print(0, 125, formatAmt(sumCrAmt, 0), "R");// 貸方金額加總
 
-	}
-
-	private String getBatchNo(TitaVo titaVo) throws LogicException {
-		String batchNo = "";
-		AcCloseId tAcCloseId = new AcCloseId();
-		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
-		tAcCloseId.setBranchNo(titaVo.getAcbrNo());
-		tAcCloseId.setSecNo("09"); // 業務類別: 01-撥款匯款 02-支票繳款 09-放款
-		AcClose tAcClose = acCloseService.findById(tAcCloseId, titaVo);
-		if (tAcClose == null) {
-			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
-		}
-		batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
-		return batchNo;
 	}
 
 	private List<String> procReportA(List<AcDetail> lAcDetail, TitaVo titaVo) {

@@ -115,7 +115,9 @@ public class L4101 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
-		batchNo = FormatUtil.padX(this.getBatchNo(titaVo), 6);
+		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
+		batchNo = FormatUtil.padX(this.getBatchNo(iItemCode, titaVo), 6);
+
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
 				titaVo);
@@ -125,6 +127,20 @@ public class L4101 extends TradeBuffer {
 
 		int unReleaseCnt = 0;
 		for (BankRemit t : slBankRemit.getContent()) {
+			// 作業項目為1.撥款時把退款篩選掉
+			if (iItemCode == 1) {
+				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
+					continue;
+				}
+			}
+
+			// 作業項目為2.退款時把撥款篩選掉
+			if (iItemCode == 2) {
+				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2) {
+					continue;
+				}
+			}
+
 			if (t.getActFg() == 1) {
 				unReleaseCnt++;
 			} else {
@@ -152,7 +168,7 @@ public class L4101 extends TradeBuffer {
 		return this.sendList();
 	}
 
-	private String getBatchNo(TitaVo titaVo) throws LogicException {
+	private String getBatchNo(int iItemCode, TitaVo titaVo) throws LogicException {
 		String batchNo = "";
 		AcCloseId tAcCloseId = new AcCloseId();
 		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
@@ -162,7 +178,13 @@ public class L4101 extends TradeBuffer {
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
 		}
-		batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
+		if (iItemCode == 1) {
+
+			batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
+		} else {
+
+			batchNo = "RT" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
+		}
 		return batchNo;
 	}
 

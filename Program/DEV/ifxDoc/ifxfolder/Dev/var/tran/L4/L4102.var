@@ -17,11 +17,18 @@ E(0,0)
 [
 ["[L4102]                                 撥款退款明細表"],
 [#<->#,"#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdItemCode+作業項目",#ItemCode,#ItemCodeX],
 [#<->#,"#FdBatchNo+整批批號",#BatchNo],
 ]
 
 #FdAcDate=X,2,L
 #FdBatchNo=X,2,L
+#FdItemCode=X,2,L
+T(3,*)
+
+#ItemCodeHelp=x,1024,S
+T(3,1:撥款;2:退款)
+
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -35,9 +42,20 @@ T(1,@BatchNo,#NTXBUF,1,6)
 #AcDate=D,7,L
 E(0,#SYSDATE)
 
+!作業項目
+
+#ItemCode=X,1,I
+HELP(#ItemCodeHelp)
+@V(H,#ItemCodeHelp)
+
+#ItemCodeX=X,10,L
+T(3,)
+T(H,#ItemCode,#ItemCodeHelp)
+
 ![整批批號]
 #BatchNo=X,6,I
-C(4,#BatchNo,T(3,LN0100),$)
+C(3,#ItemCode,1,T(3,LN0100),$)
+C(3,#ItemCode,2,T(3,RT0100),$)
 @V(7)
 
 
@@ -56,6 +74,7 @@ T(2,Y)
 <sub type="TIM">
 #AcDate
 #BatchNo
+#ItemCode
 #END
 </sub>
 !------ 下行電文TOM ------

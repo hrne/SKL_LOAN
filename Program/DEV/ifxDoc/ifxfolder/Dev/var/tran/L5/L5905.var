@@ -36,9 +36,9 @@ E(0,40)ASGN(INQPRT$)
 E(0,0)
 !HIDE(#BTN1)
 
-! #button=x,100,S
-! T(2,{cmd=CHAIN; ntxcd=L5105; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
-! K(MODIFYBUTTON,1,新增)
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L5105; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
 K(MODIFYBUTTON,查詢)
 
 </sub>
@@ -48,11 +48,12 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L5905]                                 覆審案件明細檔查詢"],
 ["#FdInqFg+查詢條件",#InqFg,#InqFgX],
-["#FdYear+資料年月",#Year,"/",#Month],
+["#FdYear+資料年月",#YearMonth],
 ["#FdConditionCode+條件代碼",#ConditionCode,#ConditionCodeX],
 ["#FdYearS+資料年份",#YearS,"~",#YearE],
 ["#FdReChkMonth+覆審月份",#ReChkMonth],
 ["#FdCustNo+借款人戶號",#CustNo],
+["#FdTraceYearMonth+追蹤月份",#TraceYearMonthS,#TraceYearMonthE]
 ]
 
 #FdInqFg=X,2,L
@@ -65,7 +66,7 @@ T(3,*)
 T(3,*)
 #FdReChkMonth=X,2,L
 #FdCustNo=X,2,L
-#FdRPTFG=X,2,L
+#FdTraceYearMonth=X,2,L
 T(3,*)
 
 !---------- AP Button AREA ----------
@@ -82,26 +83,28 @@ K(MODIFYBUTTON,查詢)
 #CDCODECondition=x,30,S
 T(3,CdCode.ConditionCode)
 #ConditionHelp=x,500,S
+!覆審記號
+#CDCODEReCheckHelp=x,25,S
+T(3,CdCode.ReCheck)
+#ReCheckHelp=x,1024,S
+!追蹤記號
+#CDCODEFollowMark=x,25,S
+T(3,CdCode.FollowMark)
+#FollowMarkHelp=x,1024,S
+! 查詢條件
+#CDCODEInqFg=x,25,S
+T(3,CdCode.InqFg)
+#InqFgHelp=x,1024,S
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDCODECondition)
+S(XXR99,01,#CDCODECondition,#CDCODEReCheckHelp,#CDCODEFollowMark,#CDCODEInqFg)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ConditionHelp,#HelpDesc1)
-
-!查詢條件
-#InqFgHelp=X,100,S
-T(3,1:依年月份;2:依年份區間)
-
-!覆審記號(TOTA)
-#CheckHelp=X,100,S
-T(3,1:免覆審;2:要覆審;3:不覆審)
-
-!追蹤記號(TOTA)
-#FollowHelp=X,100,S
-T(3,1:免追蹤;2:要追蹤;3:不追蹤)
-
+T(2,@ReCheckHelp,#HelpDesc2)
+T(2,@FollowMarkHelp,#HelpDesc3)
+T(2,@InqFgHelp,#HelpDesc4)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -110,23 +113,21 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #WK=X,1,S
-INVOKEJS(SHOW,p1,2,2,0)
+INVOKEJS(SHOW,p1,2,5,0)
 INVOKEJS(SHOW,p1,3,3,0)
 INVOKEJS(SHOW,p1,4,4,0)
-INVOKEJS(SHOW,p1,5,5,0)
+INVOKEJS(SHOW,p1,7,7,0)
 
 #DATE=D,8,S
 T(4,DATE$)
 
 #YYY=A,3,S
 T(1,#DATE,2,3)
-E(0,@Year,#YYY)
 E(0,@YearS,#YYY)
 E(0,@YearE,#YYY)
 
 #MM=A,2,S
 T(1,#DATE,5,2)
-E(0,@Month,#MM)
 E(0,@ReChkMonth,#MM)
 
 !查詢條件
@@ -138,26 +139,20 @@ HELP(#InqFgHelp)
 T(H,#InqFg,#InqFgHelp)
 
 #WKBTN=X,1,S
-C(3,#InqFg,1,INVOKEJS(SHOW,p1,4,4,0),INVOKEJS(SHOW,p1,4,4,1))
-C(3,#InqFg,1,INVOKEJS(SHOW,p1,5,5,0),INVOKEJS(SHOW,p1,5,5,1))
-C(3,#InqFg,2,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,2,2,1))
-C(3,#InqFg,2,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,3,3,1))
+SWITCH(#InqFg,1,INVOKEJS(SHOW,p1,2,3,1)INVOKEJS(SHOW,p1,4,5,0)INVOKEJS(SHOW,p1,7,7,0)INVOKEJS(SHOW,p1,6,6,1),
+              2,INVOKEJS(SHOW,p1,2,3,0)INVOKEJS(SHOW,p1,4,5,1)INVOKEJS(SHOW,p1,7,7,0)INVOKEJS(SHOW,p1,6,6,1),
+              3,INVOKEJS(SHOW,p1,2,6,0)INVOKEJS(SHOW,p1,7,7,1),
+              4,INVOKEJS(SHOW,p1,2,7,0),)
 
 !資料年月
-#Year=A,3,I
-C(3,#InqFg,1,$,s)
-@V(2,0)
-
-#Month=A,2,I
-C(3,#InqFg,1,$,s)
-@V(5,01,12)
-
-#YearMonth=A,5,S
-T(2,#Year+#Month)
+#YearMonth=A,5,I
+C(3,#InqFg,1,$,S)
+T(1,#DATE,2,5)
+@V(2,0)A(YM,0,#YearMonth)
 
 !條件代碼
 #ConditionCode=A,2,I
-C(3,#InqFg,1,$,s)
+C(3,#InqFg,1,$,S)
 HELP(#ConditionHelp)
 @V(H,#ConditionHelp)
 
@@ -167,7 +162,7 @@ T(H,#ConditionCode,#ConditionHelp)
 
 !資料年份-S
 #YearS=A,3,I
-C(3,#InqFg,2,$,s)
+C(3,#InqFg,2,$,S)
 @V(2,0)
 
 #YearMonthS=A,5,S
@@ -175,7 +170,7 @@ T(2,#YearS+01)
 
 !資料年份-E
 #YearE=A,3,I
-C(3,#InqFg,2,$,s)
+C(3,#InqFg,2,$,S)
 @V(2,0)V(5,#YearS,999)
 
 #YearMonthE=A,5,S
@@ -183,12 +178,21 @@ T(2,#YearE+12)
 
 !覆審月份
 #ReChkMonth=A,2,I
-C(3,#InqFg,2,$,s)
+C(3,#InqFg,2,$,S)
 @V(5,00,12)
 
 !借款人戶號
 #CustNo=A,7,I
-
+C(5,#InqFg,3,S,$)
+C(5,#InqFg,4,S,$)
+!追蹤年月
+#TraceYearMonthS=A,5,I
+C(5,#InqFg,3,$,S)
+@V(2,0)A(YM,0,#TraceYearMonthS)
+#TraceYearMonthE=A,5,I
+C(5,#InqFg,3,$,S)
+@V(2,0)A(YM,0,#TraceYearMonthE)
+IF(#TraceYearMonthE>#TraceYearMonthS,$,V(P,起月不可大於迄月))
 #MRKEY=_,_,S
 C(3,#CustNo,0,S,T(2,#CustNo))
 
@@ -224,15 +228,6 @@ T(3,1)ASGN(LOOP$)
 ! 資料年月(TOTA)
 #OOYearMonth=A,5,S
 
-#OOYearX=A,3,S
-T(1,#OOYearMonth,1,3)
-
-#OOMonthX=A,2,S
-T(1,#OOYearMonth,4,2)
-
-#OOYearMonthX=X,6,L
-T(2,#OOYearX+/+#OOMonthX)
-
 !條件代碼(TOTA)
 #OOConditionCode=A,2,S
 #OOConditionCodeX=X,40,L
@@ -253,26 +248,17 @@ T(2,#OOCustNo+-+#OOFacmNo)
 !覆審記號(TOTA)  
 #OOReCheckCode=X,1,S
 #OOReCheckCodeX=X,6,L
-T(3, )
-T(H,#OOReCheckCode,#CheckHelp)
+C(4,#OOReCheckCode,S,T(H,#OOReCheckCode,#ReCheckHelp))
+
 
 !追蹤記號(TOTA) 
 #OOFollowMark=X,1,S
 #OOFollowMarkX=X,6,L
-T(3, )
-T(H,#OOFollowMark,#FollowHelp)
+C(4,#OOFollowMark,S,T(H,#OOFollowMark,#FollowMarkHelp))
+
 
 ! 覆審年月(TOTA)
 #OOReChkYearMonth=A,5,S
-
-#OOReChkYearX=A,3,S
-T(1,#OOReChkYearMonth,1,3)
-
-#OOReChkMonthX=A,2,S
-T(1,#OOReChkYearMonth,4,2)
-
-#OOReChkYearMonthX=X,6,L
-T(2,#OOReChkYearX+/+#OOReChkMonthX)
 
 !撥款日期(TOTA)
 #OODrawdownDate=D,7,L
@@ -303,6 +289,8 @@ X(#OOLoanBal1)
 !備註(TOTA)
 #OORemark=X,120,S
 
+#OOTraceYearMonth=A,5,S
+C(4,#OOTraceYearMonth,S,$)
 ! 登錄的按鈕
 #OOBUF2=X,17,S
 T(2,#OOYearMonth+#OOConditionCode+#OOCustNo+#OOFacmNo)
@@ -321,7 +309,9 @@ BIND(grid,{cmd=CHAIN;ntxcd=L5105;text=維護;ntxbuf=#OOBUF2})
 #YearMonthS
 #YearMonthE         
 #ReChkMonth
-#CustNo                
+#CustNo    
+#TraceYearMonthS    
+#TraceYearMonthE        
 #END
 </sub>
 
@@ -344,7 +334,8 @@ TXFORM=L5905
 #OOUsageItem             
 #OOCityItem              
 #OOReChkUnit             
-#OORemark         
+#OORemark       
+#OOTraceYearMonth  
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -366,7 +357,7 @@ TXFORM=L5905
 #OOBTN2=
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 
-#OOYearMonthX=資料年月
+#OOYearMonth=資料年月
 {width:80,align:'center'}
 
 #OOConditionCodeX=條件代碼
@@ -396,7 +387,7 @@ TXFORM=L5905
 #OOCityItem=地區別
 {width:80,align:'left'}
 
-#OOReChkYearMonthX=覆審年月
+#OOReChkYearMonth=覆審年月
 {width:80,align:'center'}
 
 #OODrawdownDate=最小值-撥款日
@@ -405,8 +396,6 @@ TXFORM=L5905
 #OOLoanBalX=加總-貸放餘額
 {width:140,align:'right'}
 
-!#OOEvaluation=評等
-!{width:50,align:'center'}
 
 #OORemark=備註
 {width:150,align:'left'}
@@ -419,7 +408,7 @@ TXFORM=L5905
 #OOBTN2=
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
 
-#OOYearMonthX=資料年月
+#OOYearMonth=資料年月
 {width:80,align:'center'}
 
 #OOConditionCodeX=條件代碼
@@ -437,10 +426,13 @@ TXFORM=L5905
 #OOReCheckCodeX=覆審記號
 {width:80,align:'center'}
 
+#OOReChkYearMonth=覆審年月
+{width:80,align:'center'}
+
 #OOFollowMarkX=追蹤記號
 {width:80,align:'center'}
 
-#OOReChkYearMonthX=覆審年月
+#OOTraceYearMonth=追蹤年月
 {width:80,align:'center'}
 
 #OODrawdownDate=最小值-撥款日

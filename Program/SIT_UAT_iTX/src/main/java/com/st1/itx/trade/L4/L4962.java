@@ -114,7 +114,7 @@ public class L4962 extends TradeBuffer {
 //			戶號 額度 借款人 首撥日 押品號碼 保單號碼(最末) 保險起日 保險迄日 說明
 //				1.保單資料已到期 : 該月月底日前之所有保單(續保&正常)
 //				2.無保單資料 : 無目前保單號碼者
-		if (!"".equals(flagB)) {
+		if ("Y".equals(flagB)) {
 			totaB.init(titaVo);
 //				1.CollList額度之戶況為0246者
 //				2.clfac 1(房地)打頭者

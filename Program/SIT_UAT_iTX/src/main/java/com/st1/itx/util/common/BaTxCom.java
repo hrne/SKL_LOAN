@@ -652,14 +652,14 @@ public class BaTxCom extends TradeBuffer {
 						wkTerms = iTerms;
 					}
 
+					// 計息參數
+					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
+
 					// 無可計息
 					if (wkTerms == 0) {
 						emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
 						break;
 					}
-
-					// 計息參數
-					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
 
 					// 輸出每期
 					for (int i = 1; i <= wkTerms; i++) {
@@ -716,6 +716,7 @@ public class BaTxCom extends TradeBuffer {
 					// iPayIntDate 利息計算止日 ==> 次月月初日
 					// 上次繳息日超過
 					if (ln.getPrevPayIntDate() >= iPayIntDate || ln.getDrawdownDate() >= iPayIntDate) {
+						loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 0, iPayIntDate, 0, iEntryDate, titaVo);
 						emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
 						continue;
 					}

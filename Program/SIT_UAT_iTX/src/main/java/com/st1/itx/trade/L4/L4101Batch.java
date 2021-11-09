@@ -1,8 +1,6 @@
 package com.st1.itx.trade.L4;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +20,7 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.BankRemit;
 import com.st1.itx.db.domain.CdBank;
 import com.st1.itx.db.domain.CdBankId;
-import com.st1.itx.db.domain.CdBcm;
 import com.st1.itx.db.domain.CdEmp;
-import com.st1.itx.db.domain.CustMain;
-import com.st1.itx.db.domain.FacMain;
-import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
@@ -120,15 +114,33 @@ public class L4101Batch extends TradeBuffer {
 		this.info("active L4101Batch ");
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
-		batchNo = this.getBatchNo(titaVo);
+		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
+		batchNo = this.getBatchNo(iItemCode, titaVo);
+
 		String wkbatchNo = titaVo.getBacthNo();
 		this.info("L4101 Batch batchNo = " + batchNo);
 
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
+		List<BankRemit> lBankRemit2 = new ArrayList<BankRemit>();
+
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
 				titaVo);
 
 		for (BankRemit t : slBankRemit.getContent()) {
+			// 作業項目為1.撥款時把退款篩選掉
+			if (iItemCode == 1) {
+				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
+					continue;
+				}
+			}
+
+			// 作業項目為2.退款時把撥款篩選掉
+			if (iItemCode == 2) {
+				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2) {
+					continue;
+				}
+			}
+
 			if (t.getActFg() != 1) {
 				lBankRemit.add(t);
 			}
@@ -178,18 +190,34 @@ public class L4101Batch extends TradeBuffer {
 
 		// 批號查全部
 		lBankRemit = new ArrayList<BankRemit>();
+		lBankRemit2 = new ArrayList<BankRemit>();
 		slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
 		if (slBankRemit == null) {
 			throw new LogicException(titaVo, "E0001", "查無資料");
 		}
 		lBankRemit = slBankRemit == null ? null : new ArrayList<BankRemit>(slBankRemit.getContent());
+		for (BankRemit t : lBankRemit) {
+			// 作業項目為1.撥款時把退款篩選掉
+			if (iItemCode == 1) {
+				if (t.getDrawdownCode() == 4 || t.getDrawdownCode() == 5 || t.getDrawdownCode() == 11) {
+					continue;
+				}
+			}
 
+			// 作業項目為2.退款時把撥款篩選掉
+			if (iItemCode == 2) {
+				if (t.getDrawdownCode() == 1 || t.getDrawdownCode() == 2) {
+					continue;
+				}
+			}
+			lBankRemit2.add(t);
+		}
 
 		totaVo.put("PdfSnoM", "");
 		totaVo.put("PdfSnoF", "");
 
 //			step1.產出媒體檔
-		procBankRemitMedia(lBankRemit, titaVo);
+		procBankRemitMedia(lBankRemit2, titaVo);
 
 //			step2產出撥款傳票
 //		totaA.init(titaVo);
@@ -198,7 +226,7 @@ public class L4101Batch extends TradeBuffer {
 //			step3產出整批匯款單
 		totaB.init(titaVo);
 //			1.匯款申請書
-		long snoF = printRemitForm(lBankRemit, titaVo);
+		long snoF = printRemitForm(lBankRemit2, titaVo);
 
 		this.info("snoF : " + snoF);
 
@@ -282,7 +310,7 @@ public class L4101Batch extends TradeBuffer {
 
 	}
 
-	private String getBatchNo(TitaVo titaVo) throws LogicException {
+	private String getBatchNo(int iItemCode, TitaVo titaVo) throws LogicException {
 		String batchNo = "";
 		AcCloseId tAcCloseId = new AcCloseId();
 		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
@@ -292,7 +320,13 @@ public class L4101Batch extends TradeBuffer {
 		if (tAcClose == null) {
 			throw new LogicException(titaVo, "E0001", "無帳務資料"); // 查詢資料不存在
 		}
-		batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
+		if (iItemCode == 1) {
+			batchNo = "LN" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
+
+		} else {
+			batchNo = "RT" + parse.IntegerToString(tAcClose.getClsNo() + 1, 2) + "  ";
+
+		}
 		return batchNo;
 	}
 
@@ -434,231 +468,9 @@ public class L4101Batch extends TradeBuffer {
 		return sno;
 	}
 
-//	整批匯款單明細報表
-	private void procReportB(List<BankRemit> lBankRemit, TitaVo titaVo) {
-		this.info("setReportB .... ");
 
-		HashMap<tmpFacm, BigDecimal> remitAmt = new HashMap<>();
-		BigDecimal sum = BigDecimal.ZERO;
-//		沖轉總計
-		int corCnt = 0;
-//		客戶總計
-		int custCnt = 0;
-//		行數
-		int rounds = 1;
 
-//		第一筆 與第二筆比較用
-		tmpFacm oldTmp = new tmpFacm(0, 0);
 
-		for (BankRemit tBankRemit : lBankRemit) {
-			tmpFacm tmp = new tmpFacm(tBankRemit.getCustNo(), tBankRemit.getFacmNo());
-
-			OccursList occursList = new OccursList();
-
-			CustMain tCustMain = new CustMain();
-			tCustMain = custMainService.custNoFirst(tBankRemit.getCustNo(), tBankRemit.getCustNo(), titaVo);
-
-			FacMain tFacMain = facMainService.findById(new FacMainId(tBankRemit.getCustNo(), tBankRemit.getFacmNo()),
-					titaVo);
-			CdBcm tCdBcm = new CdBcm();
-			if (tFacMain != null) {
-				tCdBcm = cdBcmService.distCodeFirst(tFacMain.getDistrict(), titaVo);
-			}
-
-			if (rounds == 1) {
-				oldTmp = new tmpFacm(tBankRemit.getCustNo(), tBankRemit.getFacmNo());
-				remitAmt.put(tmp, tBankRemit.getRemitAmt());
-				custCnt = custCnt + 1;
-			} else {
-				if (remitAmt.containsKey(tmp)) {
-					remitAmt.put(tmp, remitAmt.get(tmp).add(tBankRemit.getRemitAmt()));
-				} else {
-
-					this.info(" tmp : " + tmp);
-					occursList = new OccursList();
-					occursList.putParam("ReportBLine", FormatUtil.padLeft("小計", 91)
-							+ FormatUtil.padLeft("" + amtFormat(remitAmt.get(oldTmp)), 18) + FormatUtil.padX("", 22));
-					totaB.addOccursList(occursList);
-
-					occursList = new OccursList();
-					occursList.putParam("ReportBLine", addMark("-", 200));
-					totaB.addOccursList(occursList);
-
-					remitAmt.put(tmp, tBankRemit.getRemitAmt());
-
-					oldTmp = new tmpFacm(tBankRemit.getCustNo(), tBankRemit.getFacmNo());
-					custCnt = custCnt + 1;
-				}
-			}
-
-			Slice<AcDetail> slAcDetail = acDetailService.acdtlRelTxseqEq(acDate,
-					titaVo.getKinbr() + tBankRemit.getTitaTlrNo() + tBankRemit.getTitaTxtNo(), acDate, 0,
-					Integer.MAX_VALUE, titaVo);
-
-//			沖轉 1.是 0.否
-			int corFlag = 1;
-
-			if (slAcDetail != null) {
-				corFlag = 0;
-			} else {
-				corCnt = corCnt + 1;
-			}
-
-			String distItem = "";
-			BigDecimal lineAmt = BigDecimal.ZERO;
-			String businessOfficer = "";
-			if (tFacMain != null) {
-				lineAmt = tFacMain.getLineAmt();
-				if (tCdBcm != null)
-					distItem = tCdBcm.getDistItem();
-				businessOfficer = tFacMain.getBusinessOfficer();
-			}
-
-			occursList = new OccursList();
-			occursList.putParam("ReportBLine",
-					" " + FormatUtil.pad9("" + rounds, 3) + " " + FormatUtil.pad9("" + tBankRemit.getCustNo(), 7) + "-"
-							+ FormatUtil.pad9("" + tBankRemit.getFacmNo(), 3) + "-"
-							+ FormatUtil.pad9("" + tBankRemit.getBormNo(), 3) + "  "
-							+ FormatUtil.padX("" + tCustMain.getCustName(), 20) + "  "
-							+ FormatUtil.padX("" + tBankRemit.getRemitBank(), 3) + "  "
-							+ FormatUtil.padX("" + tBankRemit.getRemitBranch(), 4) + "  "
-							+ FormatUtil.padX("" + tBankRemit.getRemitAcctNo(), 14) + "  "
-							+ FormatUtil.padX("" + tBankRemit.getCustName(), 20) + "  "
-							+ FormatUtil.padLeft(amtFormat(tBankRemit.getRemitAmt()), 18) + "  "
-							+ FormatUtil.padLeft(amtFormat(lineAmt), 18) + "  " + FormatUtil.padX("" + distItem, 10)
-							+ "  " + FormatUtil.padX("" + businessOfficer, 10) + "  "
-							+ FormatUtil.pad9("" + corFlag, 1));
-
-			totaB.addOccursList(occursList);
-
-			if (rounds == lBankRemit.size()) {
-				occursList = new OccursList();
-				occursList.putParam("ReportBLine",
-						FormatUtil.padLeft("小計", 91) + FormatUtil.padLeft("" + amtFormat(remitAmt.get(oldTmp)), 18));
-				totaB.addOccursList(occursList);
-
-				occursList = new OccursList();
-				occursList.putParam("ReportBLine", addMark("-", 200));
-				totaB.addOccursList(occursList);
-			}
-			rounds++;
-			sum = sum.add(tBankRemit.getRemitAmt());
-		}
-
-//		總計
-		totaB.putParam("MSGID", "L411B");
-		totaB.putParam("ReportBCnt", custCnt);
-		totaB.putParam("ReportBTotalSum", sum);
-		totaB.putParam("ReportBCorCnt", corCnt);
-
-		this.addList(totaB);
-	}
-
-//	暫時紀錄戶號額度
-	private class tmpFacm {
-
-		private int custNo = 0;
-		private int facmNo = 0;
-
-		public tmpFacm(int custNo, int facmNo) {
-			this.setCustNo(custNo);
-			this.setFacmNo(facmNo);
-		}
-
-		public int getCustNo() {
-			return custNo;
-		}
-
-		public void setCustNo(int custNo) {
-			this.custNo = custNo;
-		}
-
-		public int getFacmNo() {
-			return facmNo;
-		}
-
-		public void setFacmNo(int facmNo) {
-			this.facmNo = facmNo;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + custNo;
-			result = prime * result + facmNo;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpFacm other = (tmpFacm) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (custNo != other.custNo)
-				return false;
-			if (facmNo != other.facmNo)
-				return false;
-			return true;
-		}
-
-		private L4101Batch getEnclosingInstance() {
-			return L4101Batch.this;
-		}
-	}
-
-	private String addMark(String mark, int number) {
-		String result = mark;
-		for (int i = 1; i < number; i++) {
-			result = result + mark;
-		}
-		return result;
-	}
-
-	private String amtFormat(BigDecimal amt) {
-		String result = "";
-		this.info("amt : " + amt);
-		this.info("amt.length : " + (amt + "").length());
-		int length = 0;
-		int quotient = 0;
-		int remainder = 0;
-		int divisor = 3;
-		int q = 1;
-
-		length = (amt + "").length();
-		quotient = length / divisor;
-		remainder = length % divisor;
-
-		if (amt != null) {
-			if (remainder == 0) {
-				q = 0;
-			}
-			for (int i = 0; i < quotient + q; i++) {
-				if (remainder == 0) {
-					if (i == 0) {
-						result = (amt + "").substring(remainder + divisor * i, divisor * (i + 1));
-					} else {
-						result = result + "," + (amt + "").substring(divisor * i, divisor * (i + 1));
-					}
-				} else {
-					if (i == 0) {
-						result = (amt + "").substring(divisor * i, remainder + divisor * i);
-					} else {
-						result = result + ","
-								+ (amt + "").substring(remainder + divisor * (i - 1), remainder + divisor * (i));
-					}
-				}
-			}
-		}
-		return result;
-	}
 
 	public void doRptA(TitaVo titaVo) throws LogicException {
 		this.info("L411A doRpt started.");

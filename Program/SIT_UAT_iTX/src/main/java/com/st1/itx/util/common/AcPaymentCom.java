@@ -82,7 +82,6 @@ public class AcPaymentCom extends TradeBuffer {
 
 	private List<AcDetail> acDetailList;
 	private AcDetail acDetail;
-	private AcClose tAcClose = new AcClose();
 	private int acDate;
 	private String titaTlrNo;
 	private String titaTxtNo;
@@ -98,7 +97,7 @@ public class AcPaymentCom extends TradeBuffer {
 		this.RpFlag = "";
 		this.acDetailList = new ArrayList<AcDetail>();
 		this.acDetail = new AcDetail();
-		this.tAcClose = new AcClose();
+		new AcClose();
 		this.tTempVo = new TempVo();
 	}
 
@@ -240,7 +239,7 @@ public class AcPaymentCom extends TradeBuffer {
 			acDetail.setAcctCode(acNegCom.getReturnAcctCode(acDetail.getCustNo(), titaVo));
 			break;
 		case "101": // 101.匯款轉帳
-			acDetail.setAcctCode("P03");			
+			acDetail.setAcctCode("P03");
 			break;
 		case "102": // 102.銀行扣款 C01 暫收款－非核心資金運用 核心銷帳碼 0010060yyymmdd (銀扣 ACH)
 			if ("C01".equals(acDetail.getAcctCode())) {
@@ -554,7 +553,14 @@ public class AcPaymentCom extends TradeBuffer {
 	// 取得批號
 	private String getBatchNo(int drawdownCode, TitaVo titaVo) throws LogicException {
 		// LN+ 傳票批號 + 撥款批號 (整批匯款:' '、單筆匯款:'00')
-		String batchNo = "LN";
+		// LN為撥款
+		// RT為退款
+		String batchNo = "";
+		if (drawdownCode == 1 || drawdownCode == 2) {
+			batchNo = "LN";
+		} else {
+			batchNo = "RT";
+		}
 		AcCloseId tAcCloseId = new AcCloseId();
 		tAcCloseId.setAcDate(this.txBuffer.getTxCom().getTbsdy());
 		tAcCloseId.setBranchNo(titaVo.getAcbrNo());

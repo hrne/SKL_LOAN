@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CustMain;
@@ -62,6 +63,7 @@ public class L6984 extends TradeBuffer {
 	private int selectCode = 0;
 	private int custNo = 0;
 	private int trasCollDate = 0;
+	private TempVo tTempVo = new TempVo();
 	private int cnt = 0;
 
 	@Override
@@ -112,7 +114,7 @@ public class L6984 extends TradeBuffer {
 		case 4:
 			slTxToDoDetail = txToDoDetailService.detailStatusRange("RVTX00", 2, 2, this.index, this.limit, titaVo);
 			break;
-			//不可整批訂正 訂正需主管放行
+		// 不可整批訂正 訂正需主管放行
 		case 5:
 			slTxToDoDetail = txToDoDetailService.detailStatusRange("RVTX00", 3, 3, this.index, this.limit, titaVo);
 			break;
@@ -156,11 +158,14 @@ public class L6984 extends TradeBuffer {
 				tFacMain = sFacMainService.findById(new FacMainId(tTxToDoDetail.getCustNo(), tTxToDoDetail.getFacmNo()),
 						titaVo);
 
+				tTempVo = tTempVo.getVo(tTxToDoDetail.getProcessNote());
+
 				occursList.putParam("OODrawdownDate", tLoanBorMain.getDrawdownDate()); // 預約日期
 				occursList.putParam("OOCaseNo", tFacMain.getCreditSysNo()); // 案件編號
 				occursList.putParam("OOApplNo", tFacMain.getApplNo()); // 核准號碼
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo()); // 額度號碼
-				occursList.putParam("OOBormNo", tLoanBorMain.getBormNo()); // 預約序號
+				occursList.putParam("OOBormNo",
+						tTempVo.get("BormNo") == null ? tTxToDoDetail.getBormNo() : tTempVo.get("BormNo")); // 預約序號
 				occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額
 				occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()

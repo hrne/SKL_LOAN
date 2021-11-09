@@ -2,8 +2,6 @@ package com.st1.itx.trade.L5;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5R08 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5R08.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -87,15 +84,10 @@ public class L5R08 extends TradeBuffer {
 		this.totaVo.putParam("L5R08CustName", mCustName);
 		this.totaVo.putParam("L5R08ReCheckCode", mInnReCheck.getReCheckCode());
 		if (iReChkYearMonth == 0) {
-			this.totaVo.putParam("L5R08ReChkYear", 0);
-			this.totaVo.putParam("L5R08ReChkMonth", 0);
-		}else {
-			iReChkYearMonth = iReChkYearMonth-191100;
-			String sReChkYearMonth = String.valueOf(iReChkYearMonth);
-			int sReChkYear = Integer.valueOf(sReChkYearMonth.substring(0,3));
-			int sReChkMonth = Integer.valueOf(sReChkYearMonth.substring(3,5));
-			this.totaVo.putParam("L5R08ReChkYear", sReChkYear);
-			this.totaVo.putParam("L5R08ReChkMonth", sReChkMonth);
+			this.totaVo.putParam("L5R08ReChkYearMonth", 0);
+		} else {
+			iReChkYearMonth = iReChkYearMonth - 191100;
+			this.totaVo.putParam("L5R08ReChkYearMonth", iReChkYearMonth);
 		}
 		this.totaVo.putParam("L5R08ReChkUnit", mInnReCheck.getReChkUnit());
 		this.totaVo.putParam("L5R08FollowMark", mInnReCheck.getFollowMark());

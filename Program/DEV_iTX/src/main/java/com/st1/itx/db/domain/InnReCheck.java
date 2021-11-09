@@ -29,17 +29,18 @@ public class InnReCheck implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -7254578420467145174L;
+	private static final long serialVersionUID = 1486808680449938496L;
 
 @EmbeddedId
   private InnReCheckId innReCheckId;
 
   // 資料年月
+  /* 指定複審名單時為 0 紅字部分2021/11/5審查會議修改 */
   @Column(name = "`YearMonth`", insertable = false, updatable = false)
   private int yearMonth = 0;
 
   // 條件代碼
-  /* 01-個金3000萬以上02-企金3000萬以上03-個金2000萬以上小於3000萬04-個金100萬以上小於2000萬05-企金未達3000萬06-土地追蹤 */
+  /* 01-個金3000萬以上02-企金3000萬以上03-個金2000萬以上小於3000萬04-個金100萬以上小於2000萬05-企金未達3000萬06-土地追蹤99-指定複審名單 */
   @Column(name = "`ConditionCode`", insertable = false, updatable = false)
   private int conditionCode = 0;
 
@@ -62,6 +63,7 @@ public class InnReCheck implements Serializable {
   private String followMark;
 
   // 覆審年月
+  /* 指定覆審名單為第一次覆審年月 */
   @Column(name = "`ReChkYearMonth`")
   private int reChkYearMonth = 0;
 
@@ -97,9 +99,24 @@ public class InnReCheck implements Serializable {
   @Column(name = "`ReChkUnit`", length = 10)
   private String reChkUnit;
 
+  // 指定複審記號
+  /* Y-指定覆審 null-非指定 */
+  @Column(name = "`SpecifyFg`", length = 2)
+  private String specifyFg;
+
   // 備註
-  @Column(name = "`Remark`", length = 60)
+  @Column(name = "`Remark`", length = 300)
   private String remark;
+
+  // 追蹤年月
+  /* FollowMark=2時輸入 */
+  @Column(name = "`TraceMonth`")
+  private int traceMonth = 0;
+
+  // 指定覆審週期
+  /* 00'~'12'-複審名單的複審週期 */
+  @Column(name = "`Cycle`")
+  private int cycle = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -130,7 +147,7 @@ public class InnReCheck implements Serializable {
 
 /**
 	* 資料年月<br>
-	* 
+	* 指定複審名單時為 0 紅字部分2021/11/5審查會議修改
 	* @return Integer
 	*/
   public int getYearMonth() {
@@ -139,7 +156,7 @@ public class InnReCheck implements Serializable {
 
 /**
 	* 資料年月<br>
-	* 
+	* 指定複審名單時為 0 紅字部分2021/11/5審查會議修改
   *
   * @param yearMonth 資料年月
 	*/
@@ -155,6 +172,7 @@ public class InnReCheck implements Serializable {
 04-個金100萬以上小於2000萬
 05-企金未達3000萬
 06-土地追蹤
+99-指定複審名單
 	* @return Integer
 	*/
   public int getConditionCode() {
@@ -169,6 +187,7 @@ public class InnReCheck implements Serializable {
 04-個金100萬以上小於2000萬
 05-企金未達3000萬
 06-土地追蹤
+99-指定複審名單
   *
   * @param conditionCode 條件代碼
 	*/
@@ -254,7 +273,7 @@ public class InnReCheck implements Serializable {
 
 /**
 	* 覆審年月<br>
-	* 
+	* 指定覆審名單為第一次覆審年月
 	* @return Integer
 	*/
   public int getReChkYearMonth() {
@@ -263,7 +282,7 @@ public class InnReCheck implements Serializable {
 
 /**
 	* 覆審年月<br>
-	* 
+	* 指定覆審名單為第一次覆審年月
   *
   * @param reChkYearMonth 覆審年月
 	*/
@@ -405,6 +424,25 @@ public class InnReCheck implements Serializable {
   }
 
 /**
+	* 指定複審記號<br>
+	* Y-指定覆審 null-非指定
+	* @return String
+	*/
+  public String getSpecifyFg() {
+    return this.specifyFg == null ? "" : this.specifyFg;
+  }
+
+/**
+	* 指定複審記號<br>
+	* Y-指定覆審 null-非指定
+  *
+  * @param specifyFg 指定複審記號
+	*/
+  public void setSpecifyFg(String specifyFg) {
+    this.specifyFg = specifyFg;
+  }
+
+/**
 	* 備註<br>
 	* 
 	* @return String
@@ -421,6 +459,44 @@ public class InnReCheck implements Serializable {
 	*/
   public void setRemark(String remark) {
     this.remark = remark;
+  }
+
+/**
+	* 追蹤年月<br>
+	* FollowMark=2時輸入
+	* @return Integer
+	*/
+  public int getTraceMonth() {
+    return this.traceMonth;
+  }
+
+/**
+	* 追蹤年月<br>
+	* FollowMark=2時輸入
+  *
+  * @param traceMonth 追蹤年月
+	*/
+  public void setTraceMonth(int traceMonth) {
+    this.traceMonth = traceMonth;
+  }
+
+/**
+	* 指定覆審週期<br>
+	* 00'~'12'-複審名單的複審週期
+	* @return Integer
+	*/
+  public int getCycle() {
+    return this.cycle;
+  }
+
+/**
+	* 指定覆審週期<br>
+	* 00'~'12'-複審名單的複審週期
+  *
+  * @param cycle 指定覆審週期
+	*/
+  public void setCycle(int cycle) {
+    this.cycle = cycle;
   }
 
 /**
@@ -504,7 +580,7 @@ public class InnReCheck implements Serializable {
   public String toString() {
     return "InnReCheck [innReCheckId=" + innReCheckId + ", reCheckCode=" + reCheckCode + ", followMark=" + followMark
            + ", reChkYearMonth=" + reChkYearMonth + ", drawdownDate=" + drawdownDate + ", loanBal=" + loanBal + ", evaluation=" + evaluation + ", custTypeItem=" + custTypeItem + ", usageItem=" + usageItem
-           + ", cityItem=" + cityItem + ", reChkUnit=" + reChkUnit + ", remark=" + remark + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", cityItem=" + cityItem + ", reChkUnit=" + reChkUnit + ", specifyFg=" + specifyFg + ", remark=" + remark + ", traceMonth=" + traceMonth + ", cycle=" + cycle
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

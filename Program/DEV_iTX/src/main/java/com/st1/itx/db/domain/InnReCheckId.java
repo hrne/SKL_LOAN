@@ -22,11 +22,12 @@ public class InnReCheckId implements Serializable {
 	private static final long serialVersionUID = -8252281610986094654L;
 
 // 資料年月
+  /* 指定複審名單時為 0 紅字部分2021/11/5審查會議修改 */
   @Column(name = "`YearMonth`")
   private int yearMonth = 0;
 
   // 條件代碼
-  /* 01-個金3000萬以上02-企金3000萬以上03-個金2000萬以上小於3000萬04-個金100萬以上小於2000萬05-企金未達3000萬06-土地追蹤 */
+  /* 01-個金3000萬以上02-企金3000萬以上03-個金2000萬以上小於3000萬04-個金100萬以上小於2000萬05-企金未達3000萬06-土地追蹤99-指定複審名單 */
   @Column(name = "`ConditionCode`")
   private int conditionCode = 0;
 
@@ -50,7 +51,7 @@ public class InnReCheckId implements Serializable {
 
 /**
 	* 資料年月<br>
-	* 
+	* 指定複審名單時為 0 紅字部分2021/11/5審查會議修改
 	* @return Integer
 	*/
   public int getYearMonth() {
@@ -59,7 +60,7 @@ public class InnReCheckId implements Serializable {
 
 /**
 	* 資料年月<br>
-	* 
+	* 指定複審名單時為 0 紅字部分2021/11/5審查會議修改
   *
   * @param yearMonth 資料年月
 	*/
@@ -75,6 +76,7 @@ public class InnReCheckId implements Serializable {
 04-個金100萬以上小於2000萬
 05-企金未達3000萬
 06-土地追蹤
+99-指定複審名單
 	* @return Integer
 	*/
   public int getConditionCode() {
@@ -89,6 +91,7 @@ public class InnReCheckId implements Serializable {
 04-個金100萬以上小於2000萬
 05-企金未達3000萬
 06-土地追蹤
+99-指定複審名單
   *
   * @param conditionCode 條件代碼
 	*/
