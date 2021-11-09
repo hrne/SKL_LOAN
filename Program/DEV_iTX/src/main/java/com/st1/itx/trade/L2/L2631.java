@@ -171,7 +171,7 @@ public class L2631 extends TradeBuffer {
 				// 短繳清償違約金處理, 新增銷帳檔
 				List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 				AcReceivable tAcReceivable = new AcReceivable();
-				tAcReceivable.setReceivableFlag(4); // 短繳期金
+				tAcReceivable.setReceivableFlag(3); // 短繳期金
 				tAcReceivable.setAcctCode("YOP");
 				tAcReceivable.setCustNo(iCustNo);
 				tAcReceivable.setFacmNo(iFacmNo);

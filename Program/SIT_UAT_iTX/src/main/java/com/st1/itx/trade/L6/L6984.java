@@ -112,6 +112,7 @@ public class L6984 extends TradeBuffer {
 		case 4:
 			slTxToDoDetail = txToDoDetailService.detailStatusRange("RVTX00", 2, 2, this.index, this.limit, titaVo);
 			break;
+			//不可整批訂正 訂正需主管放行
 		case 5:
 			slTxToDoDetail = txToDoDetailService.detailStatusRange("RVTX00", 3, 3, this.index, this.limit, titaVo);
 			break;
@@ -159,7 +160,7 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("OOCaseNo", tFacMain.getCreditSysNo()); // 案件編號
 				occursList.putParam("OOApplNo", tFacMain.getApplNo()); // 核准號碼
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo()); // 額度號碼
-				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo()); // 預約序號
+				occursList.putParam("OOBormNo", tLoanBorMain.getBormNo()); // 預約序號
 				occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額
 				occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()

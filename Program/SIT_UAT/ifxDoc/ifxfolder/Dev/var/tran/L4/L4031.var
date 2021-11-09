@@ -145,8 +145,8 @@ T(3,)T(H,#OOLableA,#LableAHelp)
 ! 註記
 #OOLableB=X,1,O
 #OOLableBX=X,30,O
-C(3,#OORank,2,$,S)  
-T(3,)T(H,#OOLableB,#LableBHelp)        
+!C(3,#OORank,2,$,S)  
+!T(3,)T(H,#OOLableB,#LableBHelp)        
 !SWITCH(#OOLableB,1,T(2,1.批次自動調整),
 !                 2,T(2,2.按地區別調整),
 !                 3,T(2,3.人工調整（未調整）),
@@ -166,7 +166,9 @@ T(3,)T(H,#OOLableB,#LableBHelp)
 #OOSumCntX=X,5,O
 C(3,#OOSumCnt,0,T(2, ),X(#OOSumCnt))
 
-! 不處理
+#OOTotCnt=m,4,O
+
+! 待處理
 #OOIgnCnt=m,4,O
 #OOIgnCntX=X,5,O
 C(3,#OOIgnCnt,0,T(2, ),X(#OOIgnCnt))
@@ -186,7 +188,7 @@ SWITCH(#OORank,
 1,T(2,#CustType+#OOLableA+A+0+#RateChangeDate),
 2,T(2,#CustType+#OOLableA+#OOLableB+2+#RateChangeDate))
 
-! 總數
+! 總筆數
 #OOBTN_TOTAL1=A,1,O
 IF(#OOSumCnt>=1&&#OORank==1,
   BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOSumCntX; ntxbuf=#OOBUF_TOTAL}),
@@ -203,7 +205,7 @@ IF(#OOIgnCnt>=1&&#OORank==2,
   BIND(grid,cancel))
 
 #OOText_Exec=X,10,O
-IF(#OOCheckFlag==1,T(2,已確認報表),IF(#OOCheckFlag==0,T(2,確認),IF(#OOLableB==4,T(2,輸入利率),T(2,))))
+IF(#OOCheckFlag==1,T(2,已確認報表),IF(#OOCheckFlag==0,T(2,確認),IF(#OOCheckFlag==2,T(2,輸入利率),T(2,)))))
   
 #OOBuff_L4321=X,10,O
 T(2,#RateChangeDate+#OOLableA+#CustType)
@@ -216,8 +218,8 @@ T(2,#RateChangeDate+#OOLableA+#CustType)
 #OOBTN_Exec=A,1,O
 IF(#OOSumCnt>=1&&#OORank==1,
 SWITCH(#OOCheckFlag,1,BIND(grid,{ cmd=CHAIN;ntxcd=LC009; text=#OOText_Exec; ntxbuf=#OOBuff_LC009}),
-                    0,BIND(grid,{ cmd=CHAIN;ntxcd=L4321; text=#OOText_Exec; ntxbuf=#OOBuff_L4321}),BIND(grid,cancel)
-      ),IF(#OOLableB==4,BIND(grid,{ cmd=CHAIN;ntxcd=L4325; text=#OOText_Exec; ntxbuf=#OOBuff_L4325}),BIND(grid,cancel)))
+					0,BIND(grid,{ cmd=CHAIN;ntxcd=L4321; text=#OOText_Exec; ntxbuf=#OOBuff_L4321}),BIND(grid,cancel)
+      ),IF(#OOCheckFlag==2,BIND(grid,{ cmd=CHAIN;ntxcd=L4325; text=#OOText_Exec; ntxbuf=#OOBuff_L4325}),BIND(grid,cancel)))
 
 #OOStatus=A,1,O
 
@@ -242,6 +244,8 @@ TXFORM=L4031
 #OORank
 #OOLableA
 #OOLableB
+#OOLableBX
+#OOTotCnt
 #OOSumCnt
 #OOIgnCnt
 #OOCheckFlag
@@ -253,6 +257,7 @@ TXFORM=L4031
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L4031" layout="cols=1;screen.width=[130,870];order=1;">
 [
 ["[L4031]                                 利率調整清單"],
+[""],
 ]
 </sub>
 <sub type="SELECT">
@@ -264,17 +269,16 @@ TXFORM=L4031
 {width:200,align:'center'}
 #OOLableBX=註記
 {width:320,align:'center'}
-#OOBTN_TOTAL2=筆數
-{search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:90}
-#OOBTN_TOTAL1=要處理
+#OOBTN_TOTAL2=要處理
 {search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:90}
 #OOBTN_Exec=
 {search:false,formatter:'cust:bind-button:#OOText_Exec',align:'center',canExport:false,width:90}
-#OOBTN_TOTAL3=不處理
+#OOBTN_TOTAL3=待處理
+{search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:90}
+#OOBTN_TOTAL1=總筆數
 {search:false,formatter:'cust:bind-button:#OOSumCntX',align:'right',canExport:false,width:90}
 #OOStatusX=作業狀態
 {width:200,align:'center'}
-
 ^
 
 <include src="PRT.icf::INQ04.sel" map="i=L4031;cpi=15"/>

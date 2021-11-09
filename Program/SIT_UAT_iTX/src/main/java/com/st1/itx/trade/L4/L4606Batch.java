@@ -187,6 +187,8 @@ public class L4606Batch extends TradeBuffer {
 			if (uploadFile != null && uploadFile.size() != 0) {
 				this.info("tInsuCommId Start");
 				for (OccursList tempOccursList : uploadFile) {
+					this.info(tempOccursList.toString());
+
 					seq = seq + 1;
 
 					if (seq % commitCnt == 0) {
@@ -219,16 +221,16 @@ public class L4606Batch extends TradeBuffer {
 
 					tInsuComm.setInsuCommId(tInsuCommId);
 					tInsuComm.setNowInsuNo(tempOccursList.get("InsuNo"));
-					tInsuComm.setInsuCate(parse.stringToInteger(tempOccursList.get("InsuType")));
+					tInsuComm.setInsuType(parse.stringToInteger(tempOccursList.get("InsuKind")));
 					tInsuComm.setManagerCode(tempOccursList.get("IndexCode"));
 					tInsuComm.setBatchNo(tempOccursList.get("BatxNo"));
-					tInsuComm.setInsuType(parse.stringToInteger(tempOccursList.get("InsuKind")));
 					tInsuComm.setInsuSignDate(parse.stringToInteger(tempOccursList.get("SignDate")));
 					tInsuComm.setInsuredName(tempOccursList.get("InsuredName"));
 					tInsuComm.setInsuredAddr(tempOccursList.get("InsuredAddress"));
 					tInsuComm.setInsuredTeleph(tempOccursList.get("InsuredTeleNo"));
 					tInsuComm.setInsuStartDate(parse.stringToInteger(tempOccursList.get("InsuStartDate")));
 					tInsuComm.setInsuEndDate(parse.stringToInteger(tempOccursList.get("InsuEndDate")));
+					tInsuComm.setInsuCate(parse.stringToInteger(tempOccursList.get("InsuType")));
 					tInsuComm.setInsuPrem(parse.stringToBigDecimal(tempOccursList.get("InsuFee")));
 					tInsuComm.setCommRate(parse.stringToBigDecimal(tempOccursList.get("InsuCommRate")));
 					tInsuComm.setCommision(parse.stringToBigDecimal(tempOccursList.get("InsuComm")));
@@ -240,7 +242,8 @@ public class L4606Batch extends TradeBuffer {
 					tInsuComm.setCustNo(custNo);
 					tInsuComm.setFacmNo(facmNo);
 					BigDecimal commBase = parse.stringToBigDecimal(tempOccursList.get("CommBase"));
-					BigDecimal commRate = parse.stringToBigDecimal(tempOccursList.get("CommRate"));
+					BigDecimal commRate =  parse.stringToBigDecimal(tempOccursList.get("CommRate"));;
+				    this.info("commBase=" + commBase + ", commRate = " + commRate);
 					BigDecimal dueAmt = commBase.multiply(commRate).setScale(0, RoundingMode.HALF_UP);
 					tInsuComm.setDueAmt(dueAmt);
 
@@ -312,7 +315,7 @@ public class L4606Batch extends TradeBuffer {
 			// int unPaidCnt = 0;
 
 			sendMsg = "上傳筆數：" + totCnt + ", 發放筆數：" + paidCnt + ", 未發放筆數：" + unPaidCnt + ", 應領金額為零筆數：" + zeroDueAmtCnt
-					+ ", 佣金為負剃除筆數：" + minusCnt;
+					+ ", 剔除佣金為負筆數：" + minusCnt;
 		}
 
 //		產生下傳媒體

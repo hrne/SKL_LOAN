@@ -77,8 +77,8 @@ public class AjaxController extends SysLogger {
 				// "attachment;filename*=UTF-8''"+URLEncoder.encode("时间都去哪儿了.mp3", "UTF-8");
 //				response.setHeader("Content-Disposition", "attachment; filename=" + saveName);
 			} else {
-				response.setHeader("Content-Disposition",
-						"inline; name=\"" + URLEncoder.encode(titleName, "UTF-8") + "\"; filename*=UTF-8''" + saveName.replaceAll(".pdf", "") + "_" + titleName + ".pdf");
+				response.setHeader("Content-Disposition", "inline; name=\"" + URLEncoder.encode(titleName, "UTF-8") + "\"; filename*=UTF-8''"
+						+ URLEncoder.encode(saveName.replaceAll(".pdf", ""), "UTF-8") + "_" + URLEncoder.encode(titleName + ".pdf", "UTF-8"));
 				response.setContentType("application/pdf;");
 			}
 			IOUtils.copy(inputStream, response.getOutputStream());

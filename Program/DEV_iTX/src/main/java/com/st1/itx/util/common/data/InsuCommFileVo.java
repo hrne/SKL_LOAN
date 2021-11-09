@@ -45,7 +45,7 @@ public class InsuCommFileVo extends FileVo {
 //			12	   	0.65   
 //			13      0.65  
 //
-	
+
 	@Autowired
 	public Parse parse;
 
@@ -111,20 +111,20 @@ public class InsuCommFileVo extends FileVo {
 //				不符合Case1、Case2、Case3的則為0
 
 				if (thisColumn.length >= 1 && thisColumn != null) {
-					occursList.putParam("IndexCode", thisColumn[0].trim()); 
+					occursList.putParam("IndexCode", thisColumn[0].trim());
 					occursList.putParam("InsuNo", thisColumn[1].trim());
 					occursList.putParam("BatxNo", thisColumn[2].trim());
 					occursList.putParam("InsuKind", thisColumn[3].trim()); // 【CMT04險別】
-					occursList.putParam("SignDate", thisColumn[4].trim());  
+					occursList.putParam("SignDate", thisColumn[4].trim());
 					occursList.putParam("InsuredName", thisColumn[5].trim());
 					occursList.putParam("InsuredAddress", thisColumn[6].trim());
 					occursList.putParam("InsuredTeleNo", thisColumn[7].trim());
 					occursList.putParam("InsuStartDate", thisColumn[8].trim());
 					occursList.putParam("InsuEndDate", thisColumn[9].trim());
 					occursList.putParam("InsuType", thisColumn[10].trim()); // 【險種CMT11】
-					occursList.putParam("InsuFee", thisColumn[11].trim());  // 【保費CMT12】
-					occursList.putParam("InsuCommRate", thisColumn[12].trim()); 
-					occursList.putParam("InsuComm", thisColumn[13].trim()); //【佣金CMT13】
+					occursList.putParam("InsuFee", thisColumn[11].trim()); // 【保費CMT12】
+					occursList.putParam("InsuCommRate", thisColumn[12].trim());
+					occursList.putParam("InsuComm", thisColumn[13].trim()); // 【佣金CMT13】
 					occursList.putParam("TotalFee", thisColumn[14].trim());
 					occursList.putParam("TotalComm", thisColumn[15].trim());
 					occursList.putParam("CaseNo", thisColumn[16].trim());
@@ -139,30 +139,30 @@ public class InsuCommFileVo extends FileVo {
 //					不符合Case1、Case2、Case3的則為0
 					String commBase = "0";
 					BigDecimal commRate = BigDecimal.ZERO;
-					if ("1".equals(thisColumn[3].trim()) ) {
-						switch (thisColumn[10])	{
-						case "11" : 
+					if ("1".equals(thisColumn[3].trim())) {
+						switch (thisColumn[10].trim()) {
+						case "11":
 							commBase = thisColumn[11].trim();
 							commRate = commRate11;
 							break;
-						case "12" : 
+						case "12":
 							commBase = thisColumn[13].trim();
 							commRate = commRate12;
 							break;
-						case "13" : 
+						case "13":
 							commBase = thisColumn[13].trim();
 							commRate = commRate13;
 							break;
-						case "15" : 
+						case "15":
 							commBase = thisColumn[11].trim();
 							commRate = commRate15;
-						break;
-							
+							break;
+
 						}
 					}
 					occursList.putParam("CommBase", commBase);
 					occursList.putParam("CommRate", commRate);
-
+					this.info("commBase) = " + commBase + ",commRate=" +commRate);
 				}
 
 				this.occursList.add(occursList);

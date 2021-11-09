@@ -48,7 +48,7 @@ public class L6R06 extends TradeBuffer {
 		int sErrCode = 0;
 		if (iErrCode == null) {
 			sErrCode = 0;
-		}else {
+		} else {
 			sErrCode = 1;
 		}
 
@@ -60,21 +60,26 @@ public class L6R06 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0010", "L6R06"); // 功能選擇錯誤
 		}
 
-
-
 		// 查詢行業別代號資料檔
 		CdIndustry tCdIndustry = sCdIndustryService.findById(iRimIndustryCode, titaVo);
 
 		/* 如有找到資料 */
 		if (tCdIndustry == null) {
-			if(sErrCode == 1) {
+			if (sErrCode == 1) {
 				totaVo.putParam("L6R06IndustryCode", "");
 				totaVo.putParam("L6R06IndustryItem", "");
 				totaVo.putParam("L6R06MainType", "");
-			}else {
-				throw new LogicException(titaVo, "E0001", "行業別代號資料檔"); // 查無資料
+			} else {
+				if(iRimTxCode.equals("L6602") && iRimFuncCode == 1) {
+					totaVo.putParam("L6R06IndustryCode", "");
+					totaVo.putParam("L6R06IndustryItem", "");
+					totaVo.putParam("L6R06MainType", "");
+				} else {
+					throw new LogicException(titaVo, "E0001", "行業別代號資料檔"); // 查無資料
+				}
+				
 			}
-		}else {
+		} else {
 			if (iRimTxCode.equals("L6602") && iRimFuncCode == 1) {
 				throw new LogicException(titaVo, "E0002", titaVo.getParam("RimIndustryCode")); // 新增資料已存在
 			} else {

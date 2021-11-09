@@ -185,6 +185,7 @@ public class L3001 extends TradeBuffer {
 			occursList.putParam("OOAvailable", wkAvailable); // 可用額度
 			occursList.putParam("OOShareFacFg", wkFacShareFg); // 合併額度控管記號
 			occursList.putParam("OOClShareFg", wkClShareFg); // 擔保品配額記號
+			occursList.putParam("OOLastBormNo", tFacMain.getLastBormNo()); // 已撥款序號
 
 			this.totaVo.addOccursList(occursList);
 		}

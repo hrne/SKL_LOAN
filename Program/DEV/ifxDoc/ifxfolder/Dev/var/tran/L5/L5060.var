@@ -463,7 +463,7 @@ TXFORM=L5060
 #RPTFG=0,QUERY.GRID,L5060
 #any={header:'L5060.part',caption:'[L5060]案件處理清單',width:1000,rowNum:40,ifxDisplay:1,
 ifxBatch:{
-	name:'存證信函;延遲繳款通知函;繳款通知函',
+	name:'存證信函;延遲繳款通知函',
 	type:'5',
 	rim:'L560A',
 	txtno:'#secret-no',

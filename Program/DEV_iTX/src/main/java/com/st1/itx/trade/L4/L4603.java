@@ -1,5 +1,6 @@
 package com.st1.itx.trade.L4;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,12 +26,8 @@ import com.st1.itx.db.domain.InsuRenew;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.service.AcReceivableService;
-import com.st1.itx.db.service.CdAreaService;
-import com.st1.itx.db.service.CdCityService;
 import com.st1.itx.db.service.ClBuildingService;
 import com.st1.itx.db.service.CustMainService;
-import com.st1.itx.db.service.CustNoticeService;
-import com.st1.itx.db.service.CustTelNoService;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.InsuRenewService;
 import com.st1.itx.db.service.LoanBorMainService;
@@ -65,19 +62,7 @@ public class L4603 extends TradeBuffer {
 	public Parse parse;
 
 	@Autowired
-	public CustNoticeService custNoticeService;
-
-	@Autowired
 	public CustMainService custMainService;
-
-	@Autowired
-	public CdAreaService cdAreaService;
-
-	@Autowired
-	public CdCityService cdCityService;
-
-	@Autowired
-	public CustTelNoService custTelNoService;
 
 	@Autowired
 	public FileCom fileCom;
@@ -110,6 +95,9 @@ public class L4603 extends TradeBuffer {
 	public MakeFile makeFile;
 
 	private int iInsuEndMonth = 0;
+	private int errorCCnt = 0;
+	private String checkResultC = "";
+	private int specificDd = 0;
 
 	private int noticeFlag = 0;
 	private String noticePhoneNo = "";
@@ -118,9 +106,13 @@ public class L4603 extends TradeBuffer {
 	private int iEntryDate = 0;
 	private String sEntryDate = "";
 	private ArrayList<String> dataListLatter = new ArrayList<String>();
+	private List<AcReceivable> lAcReceivable = new ArrayList<AcReceivable>();
 
 	@Value("${iTXOutFolder}")
 	private String outFolder = "";
+
+	@Autowired
+	public TotaVo totaC;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -128,6 +120,7 @@ public class L4603 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		totaVo.put("PdfSnoM", "");
+		totaC.putParam("MSGID", "L461C");
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 //		書信
@@ -160,64 +153,103 @@ public class L4603 extends TradeBuffer {
 
 		// 正常交易
 		if (titaVo.isHcodeNormal()) {
-			updateNormal(lInsuRenew, titaVo);
 			for (InsuRenew t : slInsuRenew.getContent()) {
+				if ("Y".equals(t.getNotiTempFg())) {
+					throw new LogicException("E0005", "已入通知，請先訂正此交易。");
+				}
 
 //		1.找出客戶通知方式
-				int Dd = findNextPayDate(t.getCustNo(), t.getFacmNo(), titaVo);
-				iEntryDate = parse.stringToInteger("" + iInsuEndMonth + Dd);
+				CustMain t2CustMain = new CustMain();
+				String custName = "";
+				t2CustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
+				if (t2CustMain != null) {
+					custName = t2CustMain.getCustName();
+				}
+				checkC(t.getCustNo(), t.getFacmNo(), titaVo);
+				updateNormal(t, titaVo);
+				if (!"".equals(checkResultC)) {
+					// 押品號碼 原保單號碼 戶號 額度 戶名 新保險起日 新保險迄日 火險保額 火線保費 地震險保額 地震險保費 總保費 錯誤說明
+					OccursList occursListReport = new OccursList();
+					occursListReport.putParam("ReportCClCode1", t.getClCode1());
+					occursListReport.putParam("ReportCClCode2", t.getClCode2());
+					occursListReport.putParam("ReportCClNo", t.getClNo());
+					occursListReport.putParam("ReportCPrevInsuNo", t.getPrevInsuNo());
+					occursListReport.putParam("ReportCCustNo", t.getCustNo());
+					occursListReport.putParam("ReportCFacmNo", t.getFacmNo());
+					occursListReport.putParam("ReportCCustName", custName);
+					occursListReport.putParam("ReportCNewInsuStartDate", t.getInsuStartDate());
+					occursListReport.putParam("ReportCNewInsuEndDate", t.getInsuEndDate());
+					occursListReport.putParam("ReportCFireAmt", t.getFireInsuCovrg());
+					occursListReport.putParam("ReportCFireFee", t.getFireInsuPrem());
+					occursListReport.putParam("ReportCEthqAmt", t.getEthqInsuCovrg());
+					occursListReport.putParam("ReportCEthqFee", t.getEthqInsuPrem());
+					occursListReport.putParam("ReportCTotlFee", t.getTotInsuPrem());
+					if ("31".equals(checkResultC)) {
+						occursListReport.putParam("ReportCErrMsg", "此額度已結案");
+					}
+					if ("32".equals(checkResultC)) {
+						occursListReport.putParam("ReportCErrMsg", "此額度未撥款");
+					}
+					totaC.addOccursList(occursListReport);
+				} else {
+					dateUtil.init();
+					dateUtil.setDate_1(iInsuEndMonth * 100 + 01);
+					dateUtil.setMons(0);
+					dateUtil.getCalenderDay();
+					if (specificDd > dateUtil.getDays()) {
+						specificDd = dateUtil.getDays();
+					}
+					iEntryDate = parse.stringToInteger("" + iInsuEndMonth + specificDd);
 
-				sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
-						+ ("" + iEntryDate).substring(6);
+					sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/"
+							+ ("" + iEntryDate).substring(6);
 
-				this.info("iEntryDate : " + iEntryDate);
-				TempVo tempVo = new TempVo();
-				tempVo = custNoticeCom.getCustNotice("L4603", t.getCustNo(), t.getFacmNo(), titaVo);
-				noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
-				noticePhoneNo = tempVo.getParam("MessagePhoneNo");
-				noticeEmail = tempVo.getParam("EmailAddress");
-				noticeAddress = tempVo.getParam("LetterAddress");
+					this.info("iEntryDate : " + iEntryDate);
+					TempVo tempVo = new TempVo();
+					tempVo = custNoticeCom.getCustNotice("L4603", t.getCustNo(), t.getFacmNo(), titaVo);
+					noticeFlag = parse.stringToInteger(tempVo.getParam("NoticeFlag"));
+					noticePhoneNo = tempVo.getParam("MessagePhoneNo");
+					noticeEmail = tempVo.getParam("EmailAddress");
+					noticeAddress = tempVo.getParam("LetterAddress");
 
-				this.info("noticeFlag : " + noticeFlag);
-				this.info("noticePhoneNo : " + noticePhoneNo);
-				this.info("noticeEmail : " + noticeEmail);
-				this.info("noticeAddress : " + noticeAddress);
+					this.info("noticeFlag : " + noticeFlag);
+					this.info("noticePhoneNo : " + noticePhoneNo);
+					this.info("noticeEmail : " + noticeEmail);
+					this.info("noticeAddress : " + noticeAddress);
 
 //		2.依通知方式寫入L6001處理事項清單，之後在由批次程式去執行BatxNoticeCom寫File
 //			通知方式為書信者直接寫File
 //		           預設書信
-				if ("Y".equals(tempVo.getParam("isLetter"))) {
-					setLetterFileVO(t, titaVo);
-				}
-				if ("Y".equals(tempVo.getParam("isMessage"))) {
-					setTextFileVO(t, 0, titaVo);
-				}
-				if ("Y".equals(tempVo.getParam("isEmail"))) {
-					setEMailFileVO(t, 0, titaVo);
-				}
+					if ("Y".equals(tempVo.getParam("isLetter"))) {
+						setLetterFileVO(t, titaVo);
+					}
+					if ("Y".equals(tempVo.getParam("isMessage"))) {
+						setTextFileVO(t, 0, titaVo);
+					}
+					if ("Y".equals(tempVo.getParam("isEmail"))) {
+						setEMailFileVO(t, 0, titaVo);
+					}
 
-//		3.L4603之output & 更新table ->NotiTempFg 入通知檔	Y:已入 N:未入		
-				CustMain t2CustMain = new CustMain();
-				t2CustMain = custMainService.custNoFirst(t.getCustNo(), t.getCustNo(), titaVo);
-
-				OccursList occursList = new OccursList();
-				occursList.putParam("OOCustNo", t.getCustNo());
-				occursList.putParam("OOFacmNo", t.getFacmNo());
-				occursList.putParam("OOClCode1", t.getClCode1());
-				occursList.putParam("OOClCode2", t.getClCode2());
-				occursList.putParam("OOClNo", t.getClNo());
-				if (t2CustMain != null) {
-					occursList.putParam("OOCustName", t2CustMain.getCustName());
-				} else {
-					occursList.putParam("OOCustName", "");
+					OccursList occursList = new OccursList();
+					occursList.putParam("OOCustNo", t.getCustNo());
+					occursList.putParam("OOFacmNo", t.getFacmNo());
+					occursList.putParam("OOClCode1", t.getClCode1());
+					occursList.putParam("OOClCode2", t.getClCode2());
+					occursList.putParam("OOClNo", t.getClNo());
+					occursList.putParam("OOCustName", custName);
+					occursList.putParam("OOInsuNo", t.getPrevInsuNo());
+					occursList.putParam("OOLableA", noticeFlag);
+					this.totaVo.addOccursList(occursList);
 				}
-				occursList.putParam("OOInsuNo", t.getNowInsuNo());
-				occursList.putParam("OOLableA", noticeFlag);
-
-				this.totaVo.addOccursList(occursList);
+				if (lAcReceivable.size() > 0) {
+					acReceivableCom.setTxBuffer(this.getTxBuffer());
+					acReceivableCom.mnt(0, lAcReceivable, titaVo); // 0-起帳 1-銷帳-刪除
+				}
 			}
 
-			if (dataListLatter.size() > 0) {
+			if (dataListLatter.size() > 0)
+
+			{
 				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
 						titaVo.getTxCode() + "-火險通知作業", "LNM52P.txt", 2);
 
@@ -236,6 +268,11 @@ public class L4603 extends TradeBuffer {
 		}
 
 		this.addList(this.totaVo);
+
+		this.info("errorCCnt  = ");
+		totaC.putParam("ErrorCCnt", errorCCnt);
+		this.addList(totaC);
+
 		return this.sendList();
 	}
 
@@ -353,19 +390,42 @@ public class L4603 extends TradeBuffer {
 	}
 
 //	火險應繳日跟著期款->額度內>0、最小之應繳日
-	private int findNextPayDate(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
-		int specificDd = 0;
+	private void checkC(int custNo, int facmNo, TitaVo titaVo) throws LogicException {
+		// 未撥款或已結案
+		boolean isClose = true;
+		boolean isUnLoan = true;
+		specificDd = 01;
 		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(custNo, facmNo, facmNo, 0, 900, this.index,
 				this.limit, titaVo);
 		if (slLoanBorMain != null) {
+			isUnLoan = false;
 			for (LoanBorMain tLoanBorMain : slLoanBorMain.getContent()) {
-				if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 7) {
+				if (tLoanBorMain.getLoanBal().compareTo(BigDecimal.ZERO) > 0) {
+					isClose = false;
 					specificDd = tLoanBorMain.getSpecificDd();
-
 				}
 			}
 		}
-		return specificDd;
+		// 已結案
+		if (isClose) {
+			if ("".equals(checkResultC)) {
+				checkResultC += "31";
+			} else {
+				checkResultC += ",31";
+			}
+		}
+		// 未撥款
+		if (isUnLoan) {
+			if ("".equals(checkResultC)) {
+				checkResultC += "32";
+			} else {
+				checkResultC += ",32";
+			}
+		}
+
+		if (!"".equals(checkResultC)) {
+			errorCCnt = errorCCnt + 1;
+		}
 	}
 
 	private String toFullWidth(String Pwd) {
@@ -380,26 +440,6 @@ public class L4603 extends TradeBuffer {
 			outStr += (char) tranTemp;
 		}
 		return outStr;
-	}
-
-//	暫時紀錄戶號額度
-	private class tmpFacm {
-
-		private int custNo = 0;
-		private int facmNo = 0;
-
-		public tmpFacm(int custNo, int facmNo) {
-			this.setCustNo(custNo);
-			this.setFacmNo(facmNo);
-		}
-
-		public void setCustNo(int custNo) {
-			this.custNo = custNo;
-		}
-
-		public void setFacmNo(int facmNo) {
-			this.facmNo = facmNo;
-		}
 	}
 
 	private String getZipCode(CustMain tCustMain) {
@@ -489,64 +529,58 @@ public class L4603 extends TradeBuffer {
 	}
 
 	// 入銷帳檔
-	private void updateNormal(List<InsuRenew> lInsuRenew, TitaVo titaVo) throws LogicException {
-		List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
-
-		for (InsuRenew tInsuRenew : lInsuRenew) {
-			if ("Y".equals(tInsuRenew.getNotiTempFg())) {
-				throw new LogicException("E0005", "已入通知，請先訂正此交易。");
-			}
-			AcReceivable acReceivable = new AcReceivable();
-			acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
-			if (tInsuRenew.getStatusCode() == 0) {
-				acReceivable.setAcctCode("TMI"); // 業務科目
-				acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
-				acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
-				acReceivable.setFacmNo(tInsuRenew.getFacmNo());
-				acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
-				acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
-				acReceivableList.add(acReceivable);
-				tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
-				tInsuRenew.setNotiTempFg("Y");
-				try {
-					insuRenewService.update(tInsuRenew, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0007", "InsuRenew update error");
-				}
-			}
+	private void updateNormal(InsuRenew tInsuRenew, TitaVo titaVo) throws LogicException {
+		tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
+		if ("".equals(checkResultC)) {
+			tInsuRenew.setNotiTempFg("Y");
+		} else {
+			tInsuRenew.setNotiTempFg("N");
+		}
+		try {
+			insuRenewService.update(tInsuRenew, titaVo);
+		} catch (DBException e) {
+			throw new LogicException("E0007", "InsuRenew update error");
 		}
 
-		acReceivableCom.setTxBuffer(this.getTxBuffer());
-		acReceivableCom.mnt(0, acReceivableList, titaVo); // 0-起帳 1-銷帳-刪除
+		AcReceivable acReceivable = new AcReceivable();
+		acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
+		if (tInsuRenew.getStatusCode() == 0) {
+			acReceivable.setAcctCode("TMI"); // 業務科目
+			acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
+			acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
+			acReceivable.setFacmNo(tInsuRenew.getFacmNo());
+			acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
+			acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
+			lAcReceivable.add(acReceivable);
+		}
 	}
 
 //	將以入通知檔者將其銷帳，並改為未入
 	private void updateErase(List<InsuRenew> lInsuRenew, TitaVo titaVo) throws LogicException {
-		List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
 		for (InsuRenew tInsuRenew : lInsuRenew) {
 			if ("Y".equals(tInsuRenew.getNotiTempFg())) {
 				AcReceivable acReceivable = new AcReceivable();
-				if (tInsuRenew.getStatusCode() == 0) {
-					acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
-				}
+				acReceivable.setReceivableFlag(3); // 銷帳科目記號 -> 2-核心出帳 3-未收費用 4-短繳期金 5-另收欠款
 				acReceivable.setAcctCode("TMI"); // 業務科目
 				acReceivable.setRvAmt(tInsuRenew.getTotInsuPrem()); // 記帳金額
 				acReceivable.setCustNo(tInsuRenew.getCustNo());// 戶號+額度
 				acReceivable.setFacmNo(tInsuRenew.getFacmNo());
 				acReceivable.setRvNo(tInsuRenew.getPrevInsuNo()); // 銷帳編號
 				acReceivable.setOpenAcDate(tInsuRenew.getInsuStartDate());
-				acReceivableList.add(acReceivable);
-				tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
-				tInsuRenew.setNotiTempFg(""); // 待通知
-				try {
-					insuRenewService.update(tInsuRenew, titaVo);
-				} catch (DBException e) {
-					throw new LogicException("E0007", "InsuRenew update error");
-				}
+				lAcReceivable.add(acReceivable);
+			}
+			tInsuRenew = insuRenewService.holdById(tInsuRenew, titaVo);
+			tInsuRenew.setNotiTempFg(""); // 待通知
+			try {
+				insuRenewService.update(tInsuRenew, titaVo);
+			} catch (DBException e) {
+				throw new LogicException("E0007", "InsuRenew update error");
 			}
 		}
-		acReceivableCom.setTxBuffer(this.getTxBuffer());
-		acReceivableCom.mnt(2, acReceivableList, titaVo); // 0-起帳 1-銷帳2-刪除
+		if (lAcReceivable.size() > 0) {
+			acReceivableCom.setTxBuffer(this.getTxBuffer());
+			acReceivableCom.mnt(2, lAcReceivable, titaVo); // 0-起帳 1-銷帳2-刪除
+		}
 
 	}
 }
