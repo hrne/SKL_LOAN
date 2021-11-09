@@ -1,0 +1,1 @@
+node --stack-size=65500 gen/make.js $1
