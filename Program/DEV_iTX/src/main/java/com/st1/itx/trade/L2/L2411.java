@@ -1079,7 +1079,7 @@ public class L2411 extends TradeBuffer {
 			result += AreaItem;
 		}
 		if (!Road.isEmpty()) {
-			result += Road;
+			result += Road + "路";
 		}
 		if (!Section.isEmpty()) {
 			result += Section + "段";

@@ -358,7 +358,7 @@ E(0,0)
 E(0,0)
 
 #TODAY=A,7,S
-E(0,#SYSDATE)
+E(0,#SYSCDATE)
 C(3,#ApplCode,2,E(0,@ReturnDate,#TODAY),E(0,@ApplDate,#TODAY))
 
 ! 借閱日期

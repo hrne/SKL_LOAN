@@ -1,0 +1,212 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,LC003)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,99)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+#button=x,1,S
+K(MODIFYBUTTON,查詢)
+
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[LC003]                                 放行資料查詢"],
+["@會計日期",#iEntdy],
+["@使用單位",#iBrNo],
+!["@部@@@@門",#iGroupNo],
+["@交易代碼",#iTranNo],
+]
+!---------- AP Button AREA ----------
+
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,3,S
+
+#iEntdy=D,7,L
+E(0,#SYSDATE)
+D(8)
+@V(7)A(DATE,0,#iEntdy)
+V(5,0010101,#SYSDATE)
+
+#iBrNo=X,4,L
+T(2,#KINBR) 
+
+#iGroupNo=X,1,S
+
+!交易代碼
+#iTranNo=X,5,I
+
+#RPTFG=A,1,S
+E(0,0)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = LC003 ----------
+<sub type="FORM" name="LC003">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,LC003,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LC003] 放行資料查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#CalDate=D,7,S
+
+#CalTime=A,6,S
+#CalHH=X,2,S
+T(1,#CalTime,1,2)
+#CalMM=X,2,S
+T(1,#CalTime,3,2)
+#CalSS=X,2,S
+T(1,#CalTime,5,2)
+#CalTimeX=X,8,S
+T(2,#CalHH+:+#CalMM+:+#CalSS)
+
+#Entdy=D,7,S
+#TxNo=X,18,S
+#TranNo=X,5,S
+#MrKey=X,20,S
+#CurName=X,3,S
+
+#TxAmt=m,14.2,S
+#TxAmt1=m,14,S
+E(0,#TxAmt)
+#TxAmtX=X,17,S
+X(#TxAmt1)
+
+#BrNo=X,4,S
+#TlrNo=X,30,S
+#FlowType=X,1,S
+#FlowStep=A,1,S
+#TypeX=X,4,S
+C(3,#FlowStep,3,T(3,審核放行),T(3,放行))
+
+#Actfg=X,1,S
+T(3,1)
+
+#RimData=x,100,S
+T(6A,#Entdy+#TxNo+#Actfg)
+
+#BTN=X,1,S
+BIND(grid,{ cmd=APPROVAL;once=1; ntxcd=#TranNo; txno=#RimData;rim=LCR03})
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#iEntdy#iBrNo#iGroupNo#iTranNo
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=LC003
+#CalDate
+#CalTime
+#Entdy
+#TxNo
+#TranNo
+#MrKey
+#CurName
+#TxAmt
+#BrNo
+#TlrNo
+#FlowType
+#FlowStep
+^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,LC003
+#any={detail:true, header:'LC003.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#BTN=
+{width:40,search:false,formatter:'cust:bind-button:放行',canExport:false,align:'center'}
+
+#CalDate=交易日期
+{width:100,align:'center'}
+
+#CalTimeX=交易時間
+{width:100,align:'center'}
+
+#Entdy=會計日期
+{width:100,align:'center'}
+
+#TxNo=交易序號
+{width:140,align:'center'}
+
+#TranNo=交易代號
+{width:80,align:'center'}
+
+#MrKey=參考編號
+{width:140,align:'left'}
+
+#CurName=幣別
+{width:40,align:'center'}
+
+#TxAmtX=金額
+{width:120,align:'right'}
+
+#BrNo=使用單位
+{width:80,align:'center'}
+
+#TlrNo=經辦
+{width:150,align:'center'}
+
+#TypeX=類別
+{width:80,align:'center'}
+
+
+^
+
+</sub>

@@ -81,6 +81,7 @@ public class L4320Batch extends TradeBuffer {
 	private int iNextAdjPeriod = 0;
 	private String iBaseRateCode;
 	private BigDecimal iRateIncr = BigDecimal.ZERO;
+	private BigDecimal iRate = BigDecimal.ZERO;
 	private BigDecimal iBaseRate = BigDecimal.ZERO;
 	private int iCustType = 0;
 
@@ -116,6 +117,9 @@ public class L4320Batch extends TradeBuffer {
 
 		// 批次加減碼
 		iRateIncr = parse.stringToBigDecimal(titaVo.getParam("RateIncr"));
+
+		// 批次利率
+		iRate = parse.stringToBigDecimal(titaVo.getParam("Rate"));
 
 		// 預調週期
 		iNextAdjPeriod = parse.stringToInteger(titaVo.getParam("NextAdjPeriod"));
@@ -509,7 +513,11 @@ public class L4320Batch extends TradeBuffer {
 			// 本次生效日 =生效日期
 			effDateCurt = iEffectDate;
 			// 本次利率 = 原利率 + 批次加減碼
-			rateCurt = fitRate.add(iRateIncr);
+			if (iRate.compareTo(BigDecimal.ZERO) > 0) {
+				rateCurt = iRate;
+			} else {
+				rateCurt = fitRate.add(iRateIncr);
+			}
 			// 1.自動調整
 			adjCode = 1;
 			break;
@@ -523,7 +531,11 @@ public class L4320Batch extends TradeBuffer {
 			// 本次生效日 =生效日期
 			effDateCurt = iEffectDate;
 			// 本次利率 = 目前利率 + 批次加減碼
-			rateCurt = fitRate.add(iRateIncr);
+			if (iRate.compareTo(BigDecimal.ZERO) > 0) {
+				rateCurt = iRate;
+			} else {
+				rateCurt = fitRate.add(iRateIncr);
+			}
 			// 3.人工調整
 			adjCode = 3;
 			break;
@@ -566,16 +578,17 @@ public class L4320Batch extends TradeBuffer {
 		b.setJsonFields(tTempVo.getJsonString());
 
 		/* 設定調整後利率 */
-		if ((adjCode == 1 || adjCode == 2) && errorFlag == 0) {
+		// 利率輸入記號 0.未調整 1.已調整 9.待處理(檢核有誤)
+		if ((adjCode == 1) && errorFlag == 0) {
 			b.setAdjustedRate(rateCurt); // 調整後利率
-			b.setRateKeyInCode(1); // 是否輸入利率 0.未輸入 1.已輸入 2.不處理(檢核有誤)
+			b.setRateKeyInCode(1); // 利率輸入記號 0.未調整 1.已調整 9.待處理(檢核有誤)
 		} else {
 			if (errorFlag == 0) {
 				b.setAdjustedRate(BigDecimal.ZERO);
 				b.setRateKeyInCode(0);
 			} else {
 				b.setAdjustedRate(BigDecimal.ZERO);
-				b.setRateKeyInCode(2);
+				b.setRateKeyInCode(9);
 			}
 		}
 

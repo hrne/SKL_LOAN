@@ -56,24 +56,27 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int today = parse.stringToInteger(titaVo.getCalDy()) + 19110000;
 		int iCustType = parse.stringToInteger(titaVo.getParam("CustType"));
-		String iAdjCode = titaVo.getParam("AdjCode");
+		String iAdjCode = titaVo.getParam("AdjCode").substring(0, 1);
+		String iRateKeyInCode = "";
+		if (titaVo.getParam("AdjCode").length() == 2) {
+			iRateKeyInCode = titaVo.getParam("AdjCode").substring(1, 2);
+		}
 		int iTxKind = parse.stringToInteger(titaVo.getParam("TxKind"));
 		int iAdjDate = parse.stringToInteger(titaVo.getParam("AdjDate")) + 19110000;
-		String iInqCode = titaVo.getParam("InqCode");
+		//
+		String iInqCode = titaVo.getParam("InqCode"); // 0-要處理 9-待處理 A-全部
 		int iOvduTerm = parse.stringToInteger(titaVo.getParam("OvduTerm"));
-		
+
 		int custCode1 = 0;
 		int custCode2 = 0;
-		String adjCode1 = iAdjCode;
-		String adjCode2 = iAdjCode;
+		String adjCode = iAdjCode;
 //		1:個金;2:企金（含企金自然人）
 		if (iCustType == 2) {
 			custCode1 = 1;
 			custCode2 = 2;
 		}
 		if ("9".equals(iAdjCode) || "A".equals(iAdjCode)) {
-			adjCode1 = "0";
-			adjCode2 = "8";
+			adjCode = "";
 		}
 
 		this.info("today = " + today);
@@ -140,18 +143,22 @@ public class L4931ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " where b.\"CustCode\" >= " + custCode1;
 		sql += "   and b.\"CustCode\" <= " + custCode2;
 		sql += "   and b.\"TxKind\" = " + iTxKind;
-		sql += "   and b.\"AdjCode\" >= " + adjCode1;
-		sql += "   and b.\"AdjCode\" <= " + adjCode2;
 		sql += "   and b.\"AdjDate\"  = " + iAdjDate;
-		
-		if(iOvduTerm != 0) {
+		if (!"".equals(adjCode)) {
+			sql += "   and b.\"AdjCode\" = " + adjCode;
+		}
+		if (!"".equals(iRateKeyInCode)) {
+			sql += "   and b.\"RateKeyInCode\" = " + iRateKeyInCode;
+		}
+		if (iOvduTerm != 0) {
 			sql += "   and b.\"OvduTerm\"  = " + iOvduTerm;
 		}
-		
-		if ("2".equals(iInqCode)) {
-			sql += "   and b.\"RateKeyInCode\"  = 2                                 ";
-		} else {
-			sql += "   and b.\"RateKeyInCode\" != 2                                 ";
+		if (!"A".equals(iInqCode)) {
+			if ("9".equals(iInqCode)) {
+				sql += "   and b.\"RateKeyInCode\"  = 9                                 ";
+			} else {
+				sql += "   and b.\"RateKeyInCode\" != 9                                 ";
+			}
 		}
 
 		this.info("sql=" + sql);

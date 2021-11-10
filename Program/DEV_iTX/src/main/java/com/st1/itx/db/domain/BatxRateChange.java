@@ -29,7 +29,7 @@ public class BatxRateChange implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -1055386299672988675L;
+	private static final long serialVersionUID = 1L;
 
 @EmbeddedId
   private BatxRateChangeId batxRateChangeId;

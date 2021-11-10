@@ -118,17 +118,7 @@ T(3,)T(H,#CustType,#EntCodeHelp)
 T(3,[L4031] 利率調整清單)
 
 #LOOP=X,1,S
-E(0,1)ASGN(LOOP$)
-
-! 指標利率       ! 註記               ! 是否輸入利率  ! 利率區分
-! 1-保單分紅利率 A:未註記;                            1:定期機動;     
-! 2-郵政儲金利率 1:批次自動調整;                      2:機動-指數;    
-! 3-員工一般利率 2:按合約加碼利率調整;                3:機動-非指數;  
-! 4-自訂利率     3:按目前利率調整;                    9:全部      
-!                4:按個別加碼利率調整;                           
-!                5:按輸入利率調整;    1:已輸入;2:未輸入;9:全部
-!                6:按擬調利率調整;                           
-!                9:全部)    
+E(0,1)ASGN(LOOP$) 
 
 #OORank=m,1,S
 
@@ -137,29 +127,14 @@ E(0,1)ASGN(LOOP$)
 #OOLableAX=X,20,O
 C(3,#OORank,1,$,S)
 T(3,)T(H,#OOLableA,#LableAHelp)
-!SWITCH(#OOLableA,1,T(2,定期機動調整),
-!                 2,T(2,指數型利率調整),
-!                 3,T(2,機動利率調整),
-!                 4,T(2,員工利率調整),
-!                 5,T(2,按商品別調整),T(3,))
+
 ! 註記
 #OOLableB=X,2,O
 #OOLableBX=X,30,O
-!C(3,#OORank,2,$,S)  
-!T(3,)T(H,#OOLableB,#LableBHelp)        
-!SWITCH(#OOLableB,1,T(2,1.批次自動調整),
-!                 2,T(2,2.按地區別調整),
-!                 3,T(2,3.人工調整（未調整）),
-!                 4,T(2,4.人工調整（待輸入）),
-!                 5,T(2,5.人工調整（已調整）),
-!                 9,T(2,9.檢核有誤),
-!                   T(3,))
 
 ! 方式細項 0:未輸入 1:已輸入 2:有誤
 #OOLableC=X,1,O
-! #OOLableCX=X,6,O
-! C(3,#OORank,3,$,S)
-! SWITCH(#OOLableC,1,T(2,已輸入),0,T(2,未輸入),T(3,))
+
 
 ! 總數   
 #OOSumCnt=m,4,O
@@ -179,23 +154,29 @@ C(3,#OOIgnCnt,0,T(2, ),X(#OOIgnCnt))
 #OOCheckFlag=A,1,O
 
 ! 總數 
-#OOBUF_TOTAL=X,20,S
+#OOBUF_TOTAL=X,50,S
 SWITCH(#OORank,
-1,T(2,#CustType+#OOLableA+A +0+#RateChangeDate+#OORptFg),
-2,T(2,#CustType+#OOLableA+#OOLableB+0+#RateChangeDate+#OORptFg))
+1,T(2,#CustType+#OOLableA+A +#OOLableBX+A+#RateChangeDate+#OORptFg),
+2,T(2,#CustType+#OOLableA+#OOLableB+#OOLableBX+A+#RateChangeDate+#OORptFg))
 
-! 總數 
-#OOBUF_ERROR=X,20,S
+! 有處理 
+#OOBUF_SUM=X,50,S
 SWITCH(#OORank,
-1,T(2,#CustType+#OOLableA+A +0+#RateChangeDate+#OORptFg),
-2,T(2,#CustType+#OOLableA+#OOLableB+2+#RateChangeDate+#OORptFg))
+1,T(2,#CustType+#OOLableA+A +#OOLableBX+0+#RateChangeDate+#OORptFg),
+2,T(2,#CustType+#OOLableA+#OOLableB+#OOLableBX+0+#RateChangeDate+#OORptFg))
+
+! 待處理 
+#OOBUF_ERROR=X,50,S
+SWITCH(#OORank,
+1,T(2,#CustType+#OOLableA+A +#OOLableBX+9+#RateChangeDate+#OORptFg),
+2,T(2,#CustType+#OOLableA+#OOLableB+#OOLableBX+9+#RateChangeDate+#OORptFg))
 
 ! 總筆數
 #OOBTN_TOTAL1=A,1,O
 IF(#OOTotCnt>0,BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOTotCntX; ntxbuf=#OOBUF_TOTAL}),BIND(grid,cancel))
 ! 需處理
 #OOBTN_TOTAL2=A,1,O
-IF(#OOSumCnt>0,BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOSumCntX; ntxbuf=#OOBUF_TOTAL}),BIND(grid,cancel))
+IF(#OOSumCnt>0,BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOSumCntX; ntxbuf=#OOBUF_SUM}),BIND(grid,cancel))
 ! 不處理
 #OOBTN_TOTAL3=A,1,O
 IF(#OOIgnCnt>0,BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOIgnCntX; ntxbuf=#OOBUF_ERROR}),BIND(grid,cancel))

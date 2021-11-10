@@ -1263,6 +1263,11 @@ public class BaTxCom extends TradeBuffer {
 									baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 									this.collLawFee = this.collLawFee.add(rv.getRvBal());
 									break;
+								case "F30": // F30 呆帳戶法務費墊付
+									baTxVo.setRepayType(7); // 07-法務費
+									baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
+									this.lawFee = this.lawFee.add(rv.getRvBal());
+									break;
 								case "YOP": // YOP 清償違約金(未收費用，清償時寫入)
 									if ("YOP".equals(rv.getAcctCode())) {
 										baTxVo.setRepayType(9); // 09-其他(清償違約金)

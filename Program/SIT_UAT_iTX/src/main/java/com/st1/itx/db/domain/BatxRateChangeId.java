@@ -21,7 +21,7 @@ public class BatxRateChangeId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 4999011852780236817L;
+	private static final long serialVersionUID = 1L;
 
 // 調整日期
   @Column(name = "`AdjDate`")

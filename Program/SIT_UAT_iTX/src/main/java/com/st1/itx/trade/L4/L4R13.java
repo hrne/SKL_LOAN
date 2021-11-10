@@ -70,7 +70,7 @@ public class L4R13 extends TradeBuffer {
 
 		List<BatxRateChange> lBatxRateChange = new ArrayList<BatxRateChange>();
 //		調出AdjCode = 5 者 上限100筆
-		sBatxRateChange = batxRateChangeService.findL4931AEq(custType1, custType2, txKind, txKind, 4, 4, adjDate, adjDate, this.index, this.limit, titaVo);
+		sBatxRateChange = batxRateChangeService.adjCodeEq(adjDate, txKind, 2, this.index, this.limit, titaVo);
 
 		lBatxRateChange = sBatxRateChange == null ? null : sBatxRateChange.getContent();
 
@@ -97,7 +97,11 @@ public class L4R13 extends TradeBuffer {
 				this.totaVo.putParam("L4r13CustNo" + j, tBatxRateChange.getBatxRateChangeId().getCustNo());
 				this.totaVo.putParam("L4r13FacmNo" + j, tBatxRateChange.getBatxRateChangeId().getFacmNo());
 				this.totaVo.putParam("L4r13BormNo" + j, tBatxRateChange.getBatxRateChangeId().getBormNo());
-				this.totaVo.putParam("L4r13CustName" + j, tCustMain.getCustName());
+				String custName = tCustMain.getCustName();
+				if (custName.length() > 10)  {
+					 custName =  tCustMain.getCustName().substring(0, 10);
+				}
+				this.totaVo.putParam("L4r13CustName" + j, custName);
 				this.totaVo.putParam("L4r13ProdNo" + j, tBatxRateChange.getProdNo());
 				this.totaVo.putParam("L4r13AdjFreq" + j, tBatxRateChange.getTxRateAdjFreq());
 				this.totaVo.putParam("L4r13PresEffDate" + j, tBatxRateChange.getPresEffDate());

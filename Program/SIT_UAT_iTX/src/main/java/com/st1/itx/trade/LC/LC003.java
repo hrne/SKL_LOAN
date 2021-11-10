@@ -3,8 +3,6 @@ package com.st1.itx.trade.LC;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -20,7 +18,9 @@ import com.st1.itx.db.domain.TxFlow;
 import com.st1.itx.db.service.TxFlowService;
 import com.st1.itx.db.domain.TxRecord;
 import com.st1.itx.db.domain.TxRecordId;
+import com.st1.itx.db.domain.TxTeller;
 import com.st1.itx.db.service.TxRecordService;
+import com.st1.itx.db.service.TxTellerService;
 
 @Service("LC003")
 @Scope("prototype")
@@ -31,7 +31,6 @@ import com.st1.itx.db.service.TxRecordService;
  * @version 1.0.0
  */
 public class LC003 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(LC003.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -40,6 +39,9 @@ public class LC003 extends TradeBuffer {
 	@Autowired
 	public TxRecordService txRecordService;
 
+	@Autowired
+	public TxTellerService txTellerService;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC003 ");
@@ -63,12 +65,12 @@ public class LC003 extends TradeBuffer {
 		this.limit = 500;
 
 		List<String> groupNoList = new ArrayList<String>();
-		
+
 		groupNoList.add(this.txBuffer.getTxCom().getTlrDept());
-		
+
 		Slice<TxFlow> slTxFlow = txFlowService.findByLC003(iEntday, iBrNo, 1, iTranNo + "%", groupNoList, this.index, this.limit);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
-
+		TxTeller tTxTeller = null;
 		if (lTxFlow == null) {
 			throw new LogicException(titaVo, "E0001", "放行資料");
 		} else {
@@ -105,7 +107,13 @@ public class LC003 extends TradeBuffer {
 				occursList.putParam("CurName", tTxRecord.getCurName());
 				occursList.putParam("TxAmt", tTxRecord.getTxAmt());
 				occursList.putParam("BrNo", tTxRecord.getBrNo());
-				occursList.putParam("TlrNo", tTxRecord.getTlrNo());
+				
+				tTxTeller = txTellerService.findById(tTxRecord.getTlrNo(), titaVo);
+				String tTlrItem = "";
+				if(tTxTeller!=null) {
+					tTlrItem = tTxTeller.getTlrItem();
+				}
+				occursList.putParam("TlrNo", tTxRecord.getTlrNo()+" "+tTlrItem);
 
 				occursList.putParam("FlowType", tTxFlow.getFlowType());
 				occursList.putParam("FlowStep", tTxFlow.getFlowStep());

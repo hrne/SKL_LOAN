@@ -75,8 +75,8 @@ public class L4450Report extends MakeReport {
 			int result = 0;
 			if (c1.getRepayBank() != c2.getRepayBank()) {
 				result = Integer.valueOf(c1.getRepayBank().compareTo(c2.getRepayBank()));
-			} else if (c1.getAcctCode() != c2.getAcctCode()) {
-				result = Integer.valueOf(c1.getAcctCode().compareTo(c2.getAcctCode()));
+			} else if (c1.getRepayType() - c2.getRepayType() != 0) {
+				result = c1.getRepayType() - c2.getRepayType();
 			} else if (c1.getCustNo() - c2.getCustNo() != 0) {
 				result = c1.getCustNo() - c2.getCustNo();
 			} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {

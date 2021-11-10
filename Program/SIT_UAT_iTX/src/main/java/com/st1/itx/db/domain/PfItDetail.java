@@ -32,7 +32,7 @@ public class PfItDetail implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2798283326840412989L;
+	private static final long serialVersionUID = 1L;
 
 // 序號
   @Id

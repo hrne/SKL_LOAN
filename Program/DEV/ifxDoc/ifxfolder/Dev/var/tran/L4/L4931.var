@@ -81,19 +81,21 @@ T(2,@EntCodeHelp,#HelpDesc3)
 !T(3,1:按合約自動調整;2:按地區別自動調整;3:人工調整-未調整;4:人工調整-待輸入;5:人工調整-已調整;9:檢核有誤;A:全部)
 
 #InqCodeHelp=x,120,S
-T(3,0:正常;9:檢核有誤)
+T(3,0:要處理;9:待處理;A:全部)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 
-#NTXBUF=X,20,S
+#NTXBUF=X,50,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustType,#NTXBUF,1,1)
 T(1,@TxKind,#NTXBUF,2,1)
 T(1,@AdjCode,#NTXBUF,3,2)
-T(1,@InqCode,#NTXBUF,5,1)
-T(1,@AdjDate,#NTXBUF,6,7)
-T(1,@RPTFG,#NTXBUF,13,1)
+T(1,@AdjCodeX,#NTXBUF,5,30)
+T(1,@InqCode,#NTXBUF,35,1)
+T(1,@AdjDate,#NTXBUF,36,7)
+T(1,@RPTFG,#NTXBUF,43,1)
+
 
 #ColDispaly=A,1,S
 C(3,#CHAIN,1,$,S)
@@ -123,70 +125,34 @@ T(3,)T(H,#TxKind,#TxKindHelp)
 
 #AdjCode=X,2,I
 C(3,#CHAIN,0,$,s) 
-HELP(#AdjCodeHelp)
-@V(H,#AdjCodeHelp)
-!HELP(1:按合約自動調整;
-!     2:按地區別自動調整;
-!     3:人工調整-未調整;
-!     4:人工調整-待輸入;
-!     5:人工調整-已調整;
-!     9:檢核有誤;
-!     A:全部)
-!@V(3,1,2,3,4,5,9,A)
+!HELP(#AdjCodeHelp)
+!@V(H,#AdjCodeHelp)
+
 
 #AdjCodeX=X,30,L
-T(3,)T(H,#AdjCode,#AdjCodeHelp)
-!SWITCH(#AdjCode,1,T(3,按合約自動調整),
-!                2,T(3,按地區別自動調整),
-!                3,T(3,人工調整-未調整),
-!                4,T(3,人工調整-待輸入),
-!                5,T(3,人工調整-已調整),
-!                9,T(3,檢核有誤),
-!                A,T(3,全部),
-!                    T(3,))
+
 
 ! [#<->#,"@是否輸入利率",#InqCode,#InqCodeX],
 ! 查詢區分
-#InqCode=A,1,I
+#InqCode=X,1,I
 C(3,#CHAIN,0,$,s)
 HELP(#InqCodeHelp)
 @V(H,#InqCodeHelp)
 
-! C(3,#CHAIN,0,$,s)
-! C(3,#AdjCode,5,$,S)
-! HELP(1:已輸入;
-!      2:未輸入;
-!      0:全部)
-! @V(1,1,2,0)
 #InqCodeX=X,14,L
 T(3,)T(H,#InqCode,#InqCodeHelp)
-! SWITCH(#InqCode,1,T(3,已輸入),
-!               2,T(3,未輸入),
-!               0,T(3,全部))
+
 
 ! 利率區分
 #RateCode=A,1,S
-! C(3,#CHAIN,0,$,s)
-! HELP(1:機動-指數;2:機動-非指數;3:定期機動;9:全部)
-! @V(1,1,2,3,9)
+
 
 #RateCodeX=X,11,L
-! SWITCH(#RateCode,1,T(3,機動-指數),
-!                 2,T(3,機動-非指數),
-!                 3,T(3,定期機動),
-!                 9,T(3,全部))
 
 ! 年月
 #AdjDate=D,7,I
 C(3,#CHAIN,0,$,s)
 E(0,#SYSDATE)
-
-! 1:按合約自動調整           RPTFG = 5(只有目前&調後，無取消調整)
-! 2:按地區別自動調整         RPTFG = 6(只有目前&調後&上下限，無取消調整)
-! 3:人工調整(未調整)         RPTFG = 3(全部欄位，可選擇4種調整方式) 若為機動利率調整則為7
-! 4:人工調整(已調整)         RPTFG = 4(全部欄位，可取消調整)
-! 9:上次繳息日大於利率生效日  RPTFG = 2(全部欄位，無取消調整)
-! A:全部                    RPTFG = 4(全部欄位，可取消調整)
 
 #OvduTerm=A,2,I
 C(3,#CHAIN,0,$,s)
@@ -420,10 +386,10 @@ TXFORM=L4931
 
 </sub>
 
-<sub type="PART" prompt='{{#SCRTIL}} world' name="L4931" layout="cols=1;screen.width=[];order=1;">
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4931" layout="cols=1;screen.width=[870];order=1;">
 [
 ["[L4931]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@個別利率調整作業"],
-["調整記號:  1.按合約自動調整@@@@@2.按地區別自動調整@@@@@3.人工調整-未調整@@@@@4.人工調整-待輸入@@@@@5.人工調整-已調整@@@@@9.檢核有誤"],
+["調整記號:  1.批次自動調整@@@@@2.按地區別調整@@@@@3.人工調整@@@@@"],
 ]
 </sub>
 
@@ -449,7 +415,7 @@ TXFORM=L4931
 #RPTFG=7,QUERY.GRID,L4931
 #any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
 ifxBatch:{
-     	name:'按目前利率調整;按擬調利率調整;按輸入利率調整',
+     	name:'按擬調利率調整;按目前利率調整;按輸入利率調整',
 	     type:'5',
 	     rim:'L431A',
 	     txtno:'#secret-no',
@@ -656,7 +622,7 @@ ifxBatch:{
 #RPTFG=3,QUERY.GRID,L4931
 #any={caption:'[L4931]',width:1000,rowNum:40,ifxDisplay:1,
 ifxBatch:{
-     	name:'按合約加碼利率調整;按目前利率調整;按擬調利率調整;按輸入利率調整',
+     	name:'按擬調利率調整;按目前利率調整;按輸入利率調整',
 	     type:'5',
 	     rim:'L431A',
 	     txtno:'#secret-no',

@@ -73,49 +73,13 @@ public class L4325 extends TradeBuffer {
 					tBatxRateChange = batxRateChangeService.holdById(tBatxRateChangeId);
 
 					tBatxRateChange.setAdjustedRate(iAdjustedRate);
-					tBatxRateChange.setRateKeyInCode(1);
-//					5.人工調整(已調整) 
-					tBatxRateChange.setAdjCode(5);
+					tBatxRateChange.setRateKeyInCode(1); // 已調整
 
 					try {
 						batxRateChangeService.update(tBatxRateChange);
 					} catch (DBException e) {
 						throw new LogicException("E0007", "BatxRateChange update is error : " + e.getErrorMsg());
 					}
-
-//					CdBaseRate tCdBaseRate = new CdBaseRate();
-//					tCdBaseRate = cdBaseRateService.baseRateCodeDescFirst("TWD", tBatxRateChange.getRateType(), 0,
-//							this.getTxBuffer().getTxCom().getTbsdyf());
-//
-//					LoanRateChange tLoanRateChange = new LoanRateChange();
-//					LoanRateChangeId tLoanRateChangeId = new LoanRateChangeId();
-//
-//					tLoanRateChangeId.setCustNo(tBatxRateChange.getCustNo());
-//					tLoanRateChangeId.setFacmNo(tBatxRateChange.getFacmNo());
-//					tLoanRateChangeId.setBormNo(tBatxRateChange.getBormNo());
-//					tLoanRateChangeId.setEffectDate(tBatxRateChange.getCurtEffDate());
-//
-//					tLoanRateChange.setLoanRateChangeId(tLoanRateChangeId);
-//					
-//					tLoanRateChange.setFitRate(iAdjustedRate);
-//					tLoanRateChange.setIndividualIncr(iAdjustedRate.subtract(tCdBaseRate.getBaseRate()));
-//
-//					tLoanRateChange.setStatus(0);
-//					tLoanRateChange.setRateCode(tBatxRateChange.getRateCode());
-//					tLoanRateChange.setProdNo(tBatxRateChange.getProdNo());
-//					tLoanRateChange.setBaseRateCode(tBatxRateChange.getRateType());
-//					tLoanRateChange.setIncrFlag(tBatxRateChange.getIncrFlag());
-//					tLoanRateChange.setRateIncr(tBatxRateChange.getRateIncr());
-//					tLoanRateChange.setRemark("");
-//					tLoanRateChange.setAcDate(this.getTxBuffer().getTxCom().getTbsdy());
-//					tLoanRateChange.setTellerNo(this.getTxBuffer().getTxCom().getRelTlr());
-//					tLoanRateChange.setTxtNo(parse.IntegerToString(this.getTxBuffer().getTxCom().getRelTno(), 8));
-//
-//					try {
-//						loanRateChangeService.insert(tLoanRateChange);
-//					} catch (DBException e) {
-//						throw new LogicException("E0005", "LoanRateChange update is error : " + e.getErrorMsg());
-//					}
 				}
 			} else {
 				break;

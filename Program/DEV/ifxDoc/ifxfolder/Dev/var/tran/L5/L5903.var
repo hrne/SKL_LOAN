@@ -96,7 +96,7 @@ BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUFA;ntxbuf5=type<-1:
 CustNo<-OOCustNo})
 
 #TODAY=A,7,S
-T(1,#SYSDATE,2,7)
+T(1,#SYSCDATE,2,7)
 
 #PREVALUE=A,1,S
 E(0,@ApplDateFrom,#TODAY)
