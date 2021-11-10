@@ -139,6 +139,8 @@ V(5,#CDATESTART,#DATE)
 C(3,#CHAIN,0,$,s)
 @V(2,0)
 #CustNo=A,7,L
+E(0,#CUST_NO)
+
 #RimL1r09=X,1,S
 C(3,#CUST_NO,0,s,$)
 E(0,@RimFunCd,1)

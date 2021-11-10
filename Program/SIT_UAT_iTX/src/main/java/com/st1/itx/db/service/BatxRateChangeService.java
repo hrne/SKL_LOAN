@@ -81,20 +81,17 @@ public interface BatxRateChangeService {
   public Slice<BatxRateChange> findL4931AEq(int custCode_0, int custCode_1, int txKind_2, int txKind_3, int adjCode_4, int adjCode_5, int adjDate_6, int adjDate_7, int index, int limit, TitaVo... titaVo);
 
   /**
-   * AdjDate &gt;= ,AND AdjDate &lt;= ,AND AdjCode &gt;= ,AND  AdjCode &lt;= ,AND RateKeyInCode &gt;= ,AND RateKeyInCode &lt;= 
+   * AdjDate = ,AND TxKind = ,AND RateKeyInCode = 
    *
    * @param adjDate_0 adjDate_0
-   * @param adjDate_1 adjDate_1
-   * @param adjCode_2 adjCode_2
-   * @param adjCode_3 adjCode_3
-   * @param rateKeyInCode_4 rateKeyInCode_4
-   * @param rateKeyInCode_5 rateKeyInCode_5
+   * @param txKind_1 txKind_1
+   * @param rateKeyInCode_2 rateKeyInCode_2
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice BatxRateChange BatxRateChange of List
    */
-  public Slice<BatxRateChange> adjCodeEq(int adjDate_0, int adjDate_1, int adjCode_2, int adjCode_3, int rateKeyInCode_4, int rateKeyInCode_5, int index, int limit, TitaVo... titaVo);
+  public Slice<BatxRateChange> adjCodeEq(int adjDate_0, int txKind_1, int rateKeyInCode_2, int index, int limit, TitaVo... titaVo);
 
   /**
    * AdjDate &gt;= ,AND AdjDate &lt;= ,AND CustCode &gt;= ,AND CustCode &lt;= ,AND TxKind = ,AND ConfirmFlag = 

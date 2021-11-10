@@ -194,7 +194,7 @@ em = null;
   }
 
   @Override
-  public Slice<BatxRateChange> adjCodeEq(int adjDate_0, int adjDate_1, int adjCode_2, int adjCode_3, int rateKeyInCode_4, int rateKeyInCode_5, int index, int limit, TitaVo... titaVo) {
+  public Slice<BatxRateChange> adjCodeEq(int adjDate_0, int txKind_1, int rateKeyInCode_2, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<BatxRateChange> slice = null;
     if (titaVo.length != 0)
@@ -205,15 +205,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("adjCodeEq " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " adjDate_1 : " +  adjDate_1 + " adjCode_2 : " +  adjCode_2 + " adjCode_3 : " +  adjCode_3 + " rateKeyInCode_4 : " +  rateKeyInCode_4 + " rateKeyInCode_5 : " +  rateKeyInCode_5);
+    this.info("adjCodeEq " + dbName + " : " + "adjDate_0 : " + adjDate_0 + " txKind_1 : " +  txKind_1 + " rateKeyInCode_2 : " +  rateKeyInCode_2);
     if (dbName.equals(ContentName.onDay))
-      slice = batxRateChangeReposDay.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndRateKeyInCodeGreaterThanEqualAndRateKeyInCodeLessThanEqual(adjDate_0, adjDate_1, adjCode_2, adjCode_3, rateKeyInCode_4, rateKeyInCode_5, pageable);
+      slice = batxRateChangeReposDay.findAllByAdjDateIsAndTxKindIsAndRateKeyInCodeIsOrderByCustNoAscFacmNoAscBormNoAsc(adjDate_0, txKind_1, rateKeyInCode_2, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = batxRateChangeReposMon.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndRateKeyInCodeGreaterThanEqualAndRateKeyInCodeLessThanEqual(adjDate_0, adjDate_1, adjCode_2, adjCode_3, rateKeyInCode_4, rateKeyInCode_5, pageable);
+      slice = batxRateChangeReposMon.findAllByAdjDateIsAndTxKindIsAndRateKeyInCodeIsOrderByCustNoAscFacmNoAscBormNoAsc(adjDate_0, txKind_1, rateKeyInCode_2, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = batxRateChangeReposHist.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndRateKeyInCodeGreaterThanEqualAndRateKeyInCodeLessThanEqual(adjDate_0, adjDate_1, adjCode_2, adjCode_3, rateKeyInCode_4, rateKeyInCode_5, pageable);
+      slice = batxRateChangeReposHist.findAllByAdjDateIsAndTxKindIsAndRateKeyInCodeIsOrderByCustNoAscFacmNoAscBormNoAsc(adjDate_0, txKind_1, rateKeyInCode_2, pageable);
     else 
-      slice = batxRateChangeRepos.findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndRateKeyInCodeGreaterThanEqualAndRateKeyInCodeLessThanEqual(adjDate_0, adjDate_1, adjCode_2, adjCode_3, rateKeyInCode_4, rateKeyInCode_5, pageable);
+      slice = batxRateChangeRepos.findAllByAdjDateIsAndTxKindIsAndRateKeyInCodeIsOrderByCustNoAscFacmNoAscBormNoAsc(adjDate_0, txKind_1, rateKeyInCode_2, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

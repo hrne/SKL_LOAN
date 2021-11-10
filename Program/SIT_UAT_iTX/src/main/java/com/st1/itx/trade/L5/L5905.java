@@ -157,6 +157,7 @@ public class L5905 extends TradeBuffer {
 			}else {
 				occursList.putParam("OOTraceYearMonth", tInnReCheck.getTraceMonth()-191100);
 			}
+			occursList.putParam("OOSpecifyFg", tInnReCheck.getSpecifyFg());
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

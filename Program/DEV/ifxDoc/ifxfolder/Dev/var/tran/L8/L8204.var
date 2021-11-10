@@ -267,6 +267,7 @@ D(8)
 !實際還款金額
 #ActualRepayAmt=m,14,I
 C(3,#FuncCode,4,s)
+C(3,#ActualRepayDate,0,T(3,@FdActualRepayAmt,),T(3,@FdActualRepayAmt,*))
 C(3,#ActualRepayDate,0,S,$)
 @V(2,0)
 

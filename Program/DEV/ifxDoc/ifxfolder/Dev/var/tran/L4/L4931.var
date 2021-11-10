@@ -78,10 +78,10 @@ T(2,@TxKindHelp,#HelpDesc2)
 T(2,@EntCodeHelp,#HelpDesc3) 
 
 #AdjCodeHelp=x,120,S
-T(3,1:按合約自動調整;2:按地區別自動調整;3:人工調整-未調整;4:人工調整-待輸入;5:人工調整-已調整;9:檢核有誤;A:全部)
+!T(3,1:按合約自動調整;2:按地區別自動調整;3:人工調整-未調整;4:人工調整-待輸入;5:人工調整-已調整;9:檢核有誤;A:全部)
 
 #InqCodeHelp=x,120,S
-T(3,0:正常;2:檢核有誤)
+T(3,0:正常;9:檢核有誤)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
@@ -90,9 +90,10 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 T(1,@CustType,#NTXBUF,1,1)
 T(1,@TxKind,#NTXBUF,2,1)
-T(1,@AdjCode,#NTXBUF,3,1)
-T(1,@InqCode,#NTXBUF,4,1)
-T(1,@AdjDate,#NTXBUF,5,7)
+T(1,@AdjCode,#NTXBUF,3,2)
+T(1,@InqCode,#NTXBUF,5,1)
+T(1,@AdjDate,#NTXBUF,6,7)
+T(1,@RPTFG,#NTXBUF,13,1)
 
 #ColDispaly=A,1,S
 C(3,#CHAIN,1,$,S)
@@ -120,7 +121,7 @@ T(3,)T(H,#TxKind,#TxKindHelp)
 !                 4,T(2,員工利率調整),
 !                 5,T(2,按商品別調整),T(3,))
 
-#AdjCode=X,1,I
+#AdjCode=X,2,I
 C(3,#CHAIN,0,$,s) 
 HELP(#AdjCodeHelp)
 @V(H,#AdjCodeHelp)
@@ -192,13 +193,13 @@ C(3,#CHAIN,0,$,s)
 
 
 #RPTFG=A,1,S
-C(3,#InqCode,2,E(0,2),$)
-C(3,#InqCode,2,s,$)
-SWITCH(#AdjCode,1,E(0,5),
-                2,E(0,6),
-                3,C(3,#TxKind,3,E(0,7),E(0,3)),
-                9,E(0,2),
-                  E(0,4))
+!C(3,#InqCode,2,E(0,2),$)
+!C(3,#InqCode,2,s,$)
+!SWITCH(#AdjCode,1,E(0,5),
+!                2,E(0,6),
+!                3,C(3,#TxKind,3,E(0,7),E(0,3)),
+!                9,E(0,2),
+!                  E(0,4))
 
 
 

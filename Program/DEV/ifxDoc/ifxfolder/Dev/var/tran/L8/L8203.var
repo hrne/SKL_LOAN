@@ -7,6 +7,16 @@
 #TXCD
 T(3,L8203)
 
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+C(2,#FKEY,$,s,s,s,s,s,s,$,s,s)
+E(0,2)
+
+#ACTFG=_,_,S
+C(2,#FKEY,$,s,s,s,s,s,s,$,s,s)
+E(0,1)
+
 </sub>
 
 <sub type="DC" name="BFHEAD">
@@ -15,7 +25,9 @@ T(3,L8203)
 #ORGFG=_,_,S
 E(0,0)
 </sub>
-
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
@@ -30,6 +42,7 @@ E(0,0)
 ["#FdEmpNoDesc+經辦合理性說明",#EmpNoDesc],
 ["#FdManagerCheck+主管覆核",#ManagerCheck,#ManagerCheckX],
 ["#FdManagerDate+主管同意日期",#ManagerDate],
+["#FdManagerDate+主管覆核日期",#ManagerCheckDate],
 ["#FdManagerDesc+主管覆核說明",#ManagerDesc],
 ]
 !---------- AP Button AREA ----------
@@ -67,6 +80,9 @@ T(3,CdCode.Factor)
 #Level=A,1,S
 T(4,LEVEL$)
 
+#mkg=X,1,S
+INVOKEJS(SHOW,p1,11,11,0)
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
 S(XXR99,01,#CODEFuncCode2,#CODEFactor)
@@ -80,7 +96,7 @@ T(2,@FactorHelp,#HelpDesc2)
 T(3,Y:是;N:否)
 
 !同意不同意
-#AgreeHelp=x,50,S
+#AgreeHelp=x,50,L
 T(3,Y:同意;N:不同意)
 
 #CHAIN=A,1,S
@@ -137,8 +153,8 @@ E(0,#FuncCode)
 
 !FuncCode=1,2 顯示框線
 #WKTF=X,1,S
-IF (#FuncCode==1 || #FuncCode==2 ,T(F,@TotalAmt,1)T(F,@TotalCnt,1)T(F,@Rational,1)T(F,@EmpNoDesc,1)T(F,@ManagerDesc,1)T(F,@ManagerCheck,1)T(F,@ManagerDate,1),
-                                  T(F,@TotalAmt,0)T(F,@TotalCnt,0)T(F,@Rational,0)T(F,@EmpNoDesc,0)T(F,@ManagerDesc,0)T(F,@ManagerCheck,0)T(F,@ManagerDate,0))
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,@TotalAmt,1)T(F,@TotalCnt,1)T(F,@Rational,1)T(F,@EmpNoDesc,1)T(F,@ManagerDesc,1)T(F,@ManagerCheck,1)T(F,@ManagerDate,1)T(F,@ManagerCheckDate,1),
+                                  T(F,@TotalAmt,0)T(F,@TotalCnt,0)T(F,@Rational,0)T(F,@EmpNoDesc,0)T(F,@ManagerDesc,0)T(F,@ManagerCheck,0)T(F,@ManagerDate,0)T(F,@ManagerCheckDate,0))
 
 IF (#FuncCode==1 ,T(F,@AcDate,1)T(F,@CustNo,1)T(F,@Factor,1),
                   T(F,@AcDate,0)T(F,@CustNo,0)T(F,@Factor,0))
@@ -147,7 +163,7 @@ IF (#FuncCode==1 ,T(F,@TotalAmt,1)T(F,@TotalCnt,1),T(F,@TotalAmt,0)T(F,@TotalCnt
 
 IF(#Level==3 & #FuncCode!=4,T(F,@Rational,1)T(F,@EmpNoDesc,1),T(F,@Rational,0)T(F,@EmpNoDesc,0))     
 
-IF(#Level==1 & #FuncCode!=4,T(F,@ManagerCheck,1)T(F,@ManagerCheckDesc,1)T(F,@ManagerDate,1),T(F,@ManagerCheck,0)T(F,@ManagerCheckDesc,0)T(F,@ManagerDate,0))     
+IF(#Level==1 & #FuncCode!=4,T(F,@ManagerCheck,1)T(F,@ManagerCheckDesc,1)T(F,@ManagerDate,1),T(F,@ManagerCheck,0)T(F,@ManagerCheckDesc,0)T(F,@ManagerDate,0)T(F,@ManagerCheckDate,0))     
 
 #WKPSC=X,2,S
 
@@ -238,9 +254,14 @@ T(2,@EmpNoDesc,#L8R50EmpNoDesc)
 T(2,@ManagerDesc,#L8R50ManagerDesc)
 T(2,@ManagerCheck,#L8R50ManagerCheck)
 E(0,@ManagerDate,#L8R50ManagerDate)
+E(0,@ManagerCheckDate,#L8R50ManagerCheckDate)
 T(2,@CustName,#L8R50CustName)
 T(H,#RationalX,#Rational,#YesNoHelp)
 T(H,#ManagerCheckX,#ManagerCheck,#AgreeHelp)
+
+#mkg2=X,1,S
+!IF(#L8R50ManagerDate>0,INVOKEJS(SHOW,p1,11,11,0),$)
+IF(#L8R50ManagerDate!=0 && #L8R50ManagerCheckDate!=0,INVOKEJS(SHOW,p1,11,11,1),$)
 !戶名
 #CustName=X,50,L
 
@@ -275,13 +296,21 @@ C(3,#FuncCode,4,s)
 C(3,#Level,3,$,s)
 
 !主管覆核
-#ManagerCheck=X,1,I
-C(3,#FuncCode,4,s)
+#ManagerCheck=X,1,H
+T(4,@Level,LEVEL$)
+T(4,@CDATE,CDATE$)
+C(3,#FuncCode,4,s,$)
 C(3,#Level,1,$,s)
+IF(#CDATE!=#ManagerDate && #ManagerDate!=0,E(0,@ManagerDateCopy,#ManagerDate),$)
+IF(#ManagerDateCopy>0,INVOKEJS(SHOW,p1,11,11,1),INVOKEJS(SHOW,p1,11,11,0))
+C(3,#ManagerDateCopy,0,E(0,@CheckDate,1),$)
 T(2,Y)
 HELP(#AgreeHelp)
 @V(H,#AgreeHelp)
-!C(5,#ManagerCheck,Y,INVOKEJS(SHOW,p1,10,10,1),INVOKEJS(SHOW,p1,10,10,0))
+
+#ManagerDateCopy=D,7,S
+!第一次放行=1,第二次=0
+#CheckDate=A,1,S
 
 #WKSTAR3=X,2,S
 C(5,#ManagerCheck,N,T(3,*),S)
@@ -302,18 +331,31 @@ T(H,#ManagerCheck,#AgreeHelp)
 T(4,CDATE$)
 
 !主管同意日期
-#ManagerDate=D,7,L
-C(5,#ManagerCheck,N,S,$)
+#ManagerDate=D,7,H
 C(3,#Level,1,$,s)
-E(0,#CDATE)
-C(3,#CHAIN,1,IF(#FuncCode==2 ||#FuncCode==4,s,$),$)
+C(5,#ManagerCheck,N,S,$)
+C(3,#ManagerDate,0,$,s)
+IF(#ManagerDate==0 && #ManagerDateCopy==0,E(0,#CDATE),E(0,#ManagerDateCopy))
+C(3,#ManagerDate,0,$,s)
 D(8)
-@V(7)A(DATE,0,#AcDate)
-V(5,0000000,#CDATE)
+
+
+
+
+!主管覆核日期(主管第二次覆核 才會顯示)
+#ManagerCheckDate=D,7,H
+C(5,#ManagerCheck,N,S,$)
+C(3,#ManagerDate,0,S,$)
+C(3,#Level,1,$,s)
+C(3,#CheckDate,1,$,E(0,#CDATE))
+C(3,#CheckDate,1,s,$)
+C(3,#ManagerCheckDate,0,$,s)
+D(8)
+
 
 !主管覆核說明
-#ManagerDesc=X,2.50,I
-C(3,#FuncCode,4,s)
+#ManagerDesc=X,2.50,H
+C(3,#FuncCode,4,s,$)
 C(3,#Level,1,$,s)
 @C(5,#ManagerCheck,N,C(4,#ManagerDesc,V(7),$),$)
 
@@ -339,6 +381,22 @@ C(5,#TXFORM,L8203,$,S)
 #SCRTIL=_,_,S
 T(3,[L8203]  疑似洗錢交易合理性維護)
 
+#Entdy=X,8,S
+T(2,#ENTDY)
+
+#TxNo=X,18,S
+T(2,#KINBR+#TLRNO+#TXTNO)
+
+#RimData=x,100,S
+T(6A,#Entdy+#TxNo)
+
+!#FKEY 0:登錄,1:更正,2:放行,3:審核/在途登錄,5:更正重登,6:在途設定,7修改,9檢視journal
+#button=x,100,S
+T(2,{ cmd=SendOut;once=1; ntxcd=L8203; txno=#RimData;rim=LCR05;auto=true})ASGN(BTN_NEW1$)
+C(2,#FKEY,$,S,S,S,S,S,S,S,S,S,S)
+K(MODIFYBUTTON,1,提交)
+
+
 </sub>
 
 
@@ -355,6 +413,7 @@ T(3,[L8203]  疑似洗錢交易合理性維護)
 #ManagerDesc
 #ManagerCheck
 #ManagerDate
+#ManagerCheckDate
 #Level
 #END
 </sub>

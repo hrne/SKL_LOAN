@@ -57,15 +57,14 @@ public class L4606Report1 extends MakeReport {
 	public void printHeaderL() {
 		this.print(-1, 1, "程式ID：" + "L4606");
 		this.print(-1, 70, "新光人壽保險股份有限公司", "C");
-		String tim = String.valueOf(Integer.parseInt(dDateUtil.getNowStringBc().substring(4, 6)));
 
-		this.print(-1, 130, "日　　期： " + tim + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(2, 4), "R");
+		this.print(-1, 130, "日　　期：" + dDateUtil.getNowStringBc().substring(6, 8) + "/" + dDateUtil.getNowStringBc().substring(4, 6) + "/" + dDateUtil.getNowStringBc().substring(2, 4), "R");
 		this.print(-2, 1, "報　表：" + "L4606");
 		this.print(-2, 70, "火險佣金發放明細表", "C");
 		this.print(-2, 130, "時　　間：" + dDateUtil.getNowStringTime().substring(0, 2) + ":" + dDateUtil.getNowStringTime().substring(2, 4) + ":" + dDateUtil.getNowStringTime().substring(4, 6), "R");
 		this.print(-3, 70, titaVo.get("InsuEndMonth").toString().substring(0, 3) + "/" + titaVo.get("InsuEndMonth").toString().substring(3, 5), "C");
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
-		this.print(-4, 1, "保單號碼       險種   保費 起保日期  到期日期 被保險人地址                          戶號額度    戶名          火險服務ＩＤ  火險服務人  應領金額"); // fix
+		this.print(-4, 1, "保單號碼         險種   保費 起保日期  到期日期 被保險人地址                          戶號額度    戶名          火險服務ＩＤ 火險服務人 應領金額"); // fix
 		this.print(-5, 1, "-------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 
@@ -104,16 +103,16 @@ public class L4606Report1 extends MakeReport {
 				this.print(1, 1,
 						"                                                                                                                                                                               ");
 				this.print(0, 1, tL4606Vo.get("F0"));
-				this.print(0, 16, tL4606Vo.get("F1"));
-				this.print(0, 25, String.format("%,d", Integer.parseInt(tL4606Vo.get("F2").toString())), "R");
-				this.print(0, 34, tL4606Vo.get("F3"), "R");
-				this.print(0, 43, tL4606Vo.get("F4"), "R");
-				this.print(0, 44, limitLength(tL4606Vo.get("F5"), 40));
-				this.print(0, 81, PadStart(7, tL4606Vo.get("F6").toString()));
-				this.print(0, 88, "-");
-				this.print(0, 92, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-				this.print(0, 93, limitLength(tL4606Vo.get("F9"),16));
-				this.print(0, 105, tL4606Vo.get("F8"));
+				this.print(0, 18, tL4606Vo.get("F1"));
+				this.print(0, 27, String.format("%,d", Integer.parseInt(tL4606Vo.get("F2").toString())), "R");
+				this.print(0, 36, tL4606Vo.get("F3"), "R");
+				this.print(0, 45, tL4606Vo.get("F4"), "R");
+				this.print(0, 46, limitLength(tL4606Vo.get("F5"), 40));
+				this.print(0, 83, PadStart(7, tL4606Vo.get("F6").toString()));
+				this.print(0, 90, "-");
+				this.print(0, 94, PadStart(3, tL4606Vo.get("F7").toString()), "R");
+				this.print(0, 95, limitLength(tL4606Vo.get("F8"),14));
+				this.print(0, 109, tL4606Vo.get("F9"));
 				this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
 				this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
 				
@@ -142,16 +141,16 @@ public class L4606Report1 extends MakeReport {
 				this.print(1, 1,
 						"                                                                                                                                                                               ");
 				this.print(0, 1, tL4606Vo.get("F0"));
-				this.print(0, 16, tL4606Vo.get("F1"));
-				this.print(0, 25, tL4606Vo.get("F2"), "R");
-				this.print(0, 34, tL4606Vo.get("F3"), "R");
-				this.print(0, 43, tL4606Vo.get("F4"), "R");
-				this.print(0, 44, limitLength(tL4606Vo.get("F5"), 40));
-				this.print(0, 81, PadStart(7, tL4606Vo.get("F6").toString()));
-				this.print(0, 88, "-");
-				this.print(0, 92, PadStart(3, tL4606Vo.get("F7").toString()), "R");
-				this.print(0, 93, limitLength(tL4606Vo.get("F9"),16));
-				this.print(0, 105, tL4606Vo.get("F8"));
+				this.print(0, 18, tL4606Vo.get("F1"));
+				this.print(0, 27, tL4606Vo.get("F2"), "R");
+				this.print(0, 36, tL4606Vo.get("F3"), "R");
+				this.print(0, 45, tL4606Vo.get("F4"), "R");
+				this.print(0, 46, limitLength(tL4606Vo.get("F5"), 40));
+				this.print(0, 83, PadStart(7, tL4606Vo.get("F6").toString()));
+				this.print(0, 90, "-");
+				this.print(0, 94, PadStart(3, tL4606Vo.get("F7").toString()), "R");
+				this.print(0, 95, limitLength(tL4606Vo.get("F8"),14));
+				this.print(0, 109, tL4606Vo.get("F9"));
 				this.print(0, 120, limitLength(tL4606Vo.get("F10"),12));
 				this.print(0, 138, String.format("%,d", Integer.parseInt(tL4606Vo.get("F11").toString())), "R");
 				

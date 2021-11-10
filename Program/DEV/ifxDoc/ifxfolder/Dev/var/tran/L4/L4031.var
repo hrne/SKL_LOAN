@@ -143,7 +143,7 @@ T(3,)T(H,#OOLableA,#LableAHelp)
 !                 4,T(2,員工利率調整),
 !                 5,T(2,按商品別調整),T(3,))
 ! 註記
-#OOLableB=X,1,O
+#OOLableB=X,2,O
 #OOLableBX=X,30,O
 !C(3,#OORank,2,$,S)  
 !T(3,)T(H,#OOLableB,#LableBHelp)        
@@ -167,6 +167,8 @@ T(3,)T(H,#OOLableA,#LableAHelp)
 C(3,#OOSumCnt,0,T(2, ),X(#OOSumCnt))
 
 #OOTotCnt=m,4,O
+#OOTotCntX=X,5,O
+C(3,#OOTotCnt,0,T(2, ),X(#OOTotCnt))
 
 ! 待處理
 #OOIgnCnt=m,4,O
@@ -179,30 +181,24 @@ C(3,#OOIgnCnt,0,T(2, ),X(#OOIgnCnt))
 ! 總數 
 #OOBUF_TOTAL=X,20,S
 SWITCH(#OORank,
-1,T(2,#CustType+#OOLableA+A+0+#RateChangeDate),
-2,T(2,#CustType+#OOLableA+#OOLableB+0+#RateChangeDate))
+1,T(2,#CustType+#OOLableA+A +0+#RateChangeDate+#OORptFg),
+2,T(2,#CustType+#OOLableA+#OOLableB+0+#RateChangeDate+#OORptFg))
 
 ! 總數 
 #OOBUF_ERROR=X,20,S
 SWITCH(#OORank,
-1,T(2,#CustType+#OOLableA+A+0+#RateChangeDate),
-2,T(2,#CustType+#OOLableA+#OOLableB+2+#RateChangeDate))
+1,T(2,#CustType+#OOLableA+A +0+#RateChangeDate+#OORptFg),
+2,T(2,#CustType+#OOLableA+#OOLableB+2+#RateChangeDate+#OORptFg))
 
 ! 總筆數
 #OOBTN_TOTAL1=A,1,O
-IF(#OOSumCnt>=1&&#OORank==1,
-  BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOSumCntX; ntxbuf=#OOBUF_TOTAL}),
-  BIND(grid,cancel))
+IF(#OOTotCnt>0,BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOTotCntX; ntxbuf=#OOBUF_TOTAL}),BIND(grid,cancel))
 ! 需處理
 #OOBTN_TOTAL2=A,1,O
-IF(#OOSumCnt>=1&&#OORank==2,
-  BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOSumCntX; ntxbuf=#OOBUF_TOTAL}),
-  BIND(grid,cancel))
+IF(#OOSumCnt>0,BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOSumCntX; ntxbuf=#OOBUF_TOTAL}),BIND(grid,cancel))
 ! 不處理
 #OOBTN_TOTAL3=A,1,O
-IF(#OOIgnCnt>=1&&#OORank==2,
-  BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOIgnCntX; ntxbuf=#OOBUF_ERROR}),
-  BIND(grid,cancel))
+IF(#OOIgnCnt>0,BIND(grid,{ cmd=CHAIN;ntxcd=L4931; text=#OOIgnCntX; ntxbuf=#OOBUF_ERROR}),BIND(grid,cancel))
 
 #OOText_Exec=X,10,O
 IF(#OOCheckFlag==1,T(2,已確認報表),IF(#OOCheckFlag==0,T(2,確認),IF(#OOCheckFlag==2,T(2,輸入利率),T(2,)))))
@@ -228,6 +224,7 @@ T(2,)
 C(3,#OORank,1,$,s)
 C(2,#OOStatus,T(2,未確認),T(2,確認未放行),T(2,已確認放行))
 
+#OORptFg=X,1,O
 </sub>
 
 !------ 上行電文 TEXT ------
@@ -250,6 +247,7 @@ TXFORM=L4031
 #OOIgnCnt
 #OOCheckFlag
 #OOStatus
+#OORptFg
 ^
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>

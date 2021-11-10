@@ -83,7 +83,7 @@ public class L8R50 extends TradeBuffer {
 		// 查詢疑似洗錢交易合理性明細檔
 		MlaundryDetail tMlaundryDetail = sMlaundryDetailService.findById(new MlaundryDetailId(iFAcDate, iRimFactor, iRimCustNo), titaVo);
 
-		logger.info("tMlaundryDetail="+tMlaundryDetail);
+		logger.info("tMlaundryDetail=" + tMlaundryDetail);
 		/* 如有找到資料 */
 		if (tMlaundryDetail != null) {
 			if (iRimFuncCode == 1) {
@@ -109,24 +109,21 @@ public class L8R50 extends TradeBuffer {
 	// 疑似洗錢交易合理性明細檔
 	private void moveTotaMlaundryDetail(MlaundryDetail mMlaundryDetail, String mCustName) throws LogicException {
 
-		
 		this.totaVo.putParam("L8R50AcDate", mMlaundryDetail.getEntryDate()); // 入帳日期
-		logger.info("L8r50 AcDate="+mMlaundryDetail.getEntryDate());
+		logger.info("L8r50 AcDate=" + mMlaundryDetail.getEntryDate());
 		this.totaVo.putParam("L8R50Factor", mMlaundryDetail.getFactor()); // 交易樣態
 		this.totaVo.putParam("L8R50CustNo", mMlaundryDetail.getCustNo()); // 戶號
-//		this.totaVo.putParam("L8R50FacmNo", mMlaundryDetail.getFacmNo()); // 額度編號
-//		this.totaVo.putParam("L8R50BormNo", mMlaundryDetail.getBormNo()); // 撥款序號
 		this.totaVo.putParam("L8R50TotalCnt", mMlaundryDetail.getTotalCnt()); // 累積筆數
 		this.totaVo.putParam("L8R50TotalAmt", mMlaundryDetail.getTotalAmt()); // 累積金額
-//		this.totaVo.putParam("L8R50MemoSeq", mMlaundryDetail.getMemoSeq()); // 備忘錄序號
 		this.totaVo.putParam("L8R50Rational", mMlaundryDetail.getRational()); // 合理性記號
-		this.totaVo.putParam("L8R50EmpNoDesc", mMlaundryDetail.getEmpNoDesc().replace("$n","\n")); // 經辦合理性說明
-		this.totaVo.putParam("L8R50ManagerDesc", mMlaundryDetail.getManagerDesc().replace("$n","\n")); // 主管覆核說明
+		this.totaVo.putParam("L8R50EmpNoDesc", mMlaundryDetail.getEmpNoDesc().replace("$n", "\n")); // 經辦合理性說明
+		this.totaVo.putParam("L8R50ManagerDesc", mMlaundryDetail.getManagerDesc().replace("$n", "\n")); // 主管覆核說明
 		this.totaVo.putParam("L8R50ManagerCheck", mMlaundryDetail.getManagerCheck()); // 主管覆核
 		this.totaVo.putParam("L8R50ManagerDate", mMlaundryDetail.getManagerDate()); // 主管同意日期
-		logger.info("L8r50 ManagerDate="+mMlaundryDetail.getManagerDate());
+		this.totaVo.putParam("L8R50ManagerCheckDate", mMlaundryDetail.getManagerCheckDate()); // 主管覆核日期
+		logger.info("L8r50 ManagerDate=" + mMlaundryDetail.getManagerDate());
 		this.totaVo.putParam("L8R50CustName", mCustName); // 戶名
-		logger.info("L8r50 mCustName="+mCustName);
+		logger.info("L8r50 mCustName=" + mCustName);
 	}
 
 }

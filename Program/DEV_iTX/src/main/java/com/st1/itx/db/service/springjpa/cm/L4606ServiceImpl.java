@@ -37,7 +37,7 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("l4606.findAll ");
 		String insuYearMonth = String.valueOf((Integer.valueOf(titaVo.get("InsuEndMonth").toString()) + 191100));
 		String sql = "   SELECT                                                    ";
-		sql += "     I.\"BatchNo\"                                           AS F0  ";
+		sql += "     I.\"NowInsuNo\"                                         AS F0  ";
 		sql += "   , I.\"InsuCate\"                                          AS F1  ";
 		sql += "   , I.\"InsuPrem\"                                          AS F2  ";
 		sql += "   , I.\"InsuStartDate\"                                     AS F3  ";
@@ -45,15 +45,17 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   , I.\"InsuredAddr\"                                       AS F5  ";
 		sql += "   , I.\"CustNo\"                                            AS F6  ";
 		sql += "   , I.\"FacmNo\"                                            AS F7  ";
-		sql += "   , I.\"FireOfficer\"                                       AS F8  ";
+		sql += "   , C.\"CustName\"                                          AS F8  ";
 		sql += "   , I.\"EmpId\"                                             AS F9  ";
 		sql += "   , I.\"EmpName\"                                           AS F10 ";
 		sql += "   , I.\"DueAmt\"                                            AS F11 ";
 		sql += "  FROM \"InsuComm\" I                                              ";
+		sql += "  LEFT JOIN \"CustMain\" C ON c.\"CustNo\"  = I.\"CustNo\"          ";
 		sql += "  WHERE I.\"InsuYearMonth\" = " + insuYearMonth;
 		sql += "    and I.\"DueAmt\"  > 0                                         ";
 		sql += "    and NVL(I.\"MediaCode\",'N') = 'Y'                             ";
-		sql += "  ORDER BY I.\"BatchNo\", I.\"InsuCate\"                           ";
+		sql += "  ORDER BY I.\"EmpId\",I.\"NowInsuNo\", I.\"InsuCate\"                ";
+
 
 		this.info("sql=" + sql);
 		Query query;
@@ -67,7 +69,7 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("l4606.findAll ");
 		String insuYearMonth = String.valueOf((Integer.valueOf(titaVo.get("InsuEndMonth").toString()) + 191100));
 		String sql = "   SELECT                                                    ";
-		sql += "     I.\"BatchNo\"                                           AS F0  ";
+		sql += "     I.\"NowInsuNo\"                                           AS F0  ";
 		sql += "   , I.\"InsuCate\"                                          AS F1  ";
 		sql += "   , I.\"InsuPrem\"                                          AS F2  ";
 		sql += "   , I.\"InsuStartDate\"                                     AS F3  ";
@@ -75,15 +77,16 @@ public class L4606ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   , I.\"InsuredAddr\"                                       AS F5  ";
 		sql += "   , I.\"CustNo\"                                            AS F6  ";
 		sql += "   , I.\"FacmNo\"                                            AS F7  ";
-		sql += "   , I.\"FireOfficer\"                                       AS F8  ";
+		sql += "   , C.\"CustName\"                                          AS F8  ";
 		sql += "   , I.\"EmpId\"                                             AS F9  ";
 		sql += "   , I.\"EmpName\"                                           AS F10 ";
 		sql += "   , I.\"DueAmt\"                                            AS F11 ";
-		sql += "  FROM \"InsuComm\" I                                              ";
+		sql += "  FROM \"InsuComm\" I                                               ";
+		sql += "  LEFT JOIN \"CustMain\" C ON c.\"CustNo\"  = I.\"CustNo\"          ";
 		sql += "  WHERE I.\"InsuYearMonth\" = " + insuYearMonth;
-		sql += "    and I.\"DueAmt\"  > 0                                         ";
-		sql += "    and NVL(I.\"MediaCode\",'N') = 'N'                             ";
-		sql += "  ORDER BY I.\"BatchNo\", I.\"InsuCate\"                           ";
+		sql += "    and I.\"DueAmt\"  > 0                                           ";
+		sql += "    and NVL(I.\"MediaCode\",'N') = 'N'                              ";
+		sql += "  ORDER BY I.\"EmpId\",I.\"NowInsuNo\", I.\"InsuCate\"                ";
 
 		this.info("sql=" + sql);
 		Query query;

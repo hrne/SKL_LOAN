@@ -108,7 +108,9 @@ public class BaTxCom extends TradeBuffer {
 	private BigDecimal breachAmt = BigDecimal.ZERO; // 違約金
 	private BigDecimal tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
 	private BigDecimal repayTotal = BigDecimal.ZERO; // 還款總金額
-	private int repayIntDate = 0; // repayIntDate 還款應繳日
+	private int repayIntDate = 0; // 還款應繳日
+	private int ovduTerms = 0; // 逾期數
+	private int ovduDays = 0; // 逾期天數
 
 	private BigDecimal extraRepayAmt = BigDecimal.ZERO; // 部分還款金額
 	private String includeIntFlag = "";// 是否內含利息
@@ -151,11 +153,12 @@ public class BaTxCom extends TradeBuffer {
 		this.delayInt = BigDecimal.ZERO; // 延滯息
 		this.breachAmt = BigDecimal.ZERO; // 違約金
 
-		// 還款金額
+		// 還款金額、日期
 		this.tempAmt = BigDecimal.ZERO; // 暫收款金額(存入暫收為正、暫收抵繳為負)
 		this.repayTotal = BigDecimal.ZERO; // 總還款金額
 		this.repayIntDate = 0; // repayIntDate 還款應繳日
-
+		this.ovduTerms = 0; // 逾期數
+		this.ovduDays = 0; // 逾期天數
 		// 部分還款
 		this.extraRepayAmt = BigDecimal.ZERO; // 部分還款金額
 		this.includeIntFlag = "Y";// 是否內含利息
@@ -557,7 +560,7 @@ public class BaTxCom extends TradeBuffer {
 		int wkBormNoStart = 1;
 		int wkBormNoEnd = 900;
 		int wkTerms = 0;
-
+		int nextIntDate = 0;
 		int wkPayIntDate = iPayIntDate > 0 ? iPayIntDate : iEntryDate; // 試算應繳日
 		ArrayList<CalcRepayIntVo> lCalcRepayIntVo;
 
@@ -594,16 +597,42 @@ public class BaTxCom extends TradeBuffer {
 						}
 					}
 					// 部分償還時排序,依利率順序由大到小
+//					利率高至低>用途別>由額度編號大至小
+//					用途別為9->1->3->4->5->6->2
+//					欄位代碼       欄位說明     
+//					1            週轉金    
+//					2            購置不動產
+//					3            營業用資產
+//					4            固定資產  
+//					5            企業投資  
+//					6            購置動產
+//					9            其他					
 					if (iRepayType == 2) {
 						if (c1.getStoreRate().compareTo(c2.getStoreRate()) != 0) {
 							return (c1.getStoreRate().compareTo(c2.getStoreRate()) > 0 ? -1 : 1);
 						}
+						// 若用途別不同
+						if (!c1.getUsageCode().equals(c2.getUsageCode())) {
+							int c1UsageCode = Integer.parseInt(c1.getUsageCode());
+							int c2UsageCode = Integer.parseInt(c2.getUsageCode());
+
+							// C1優先的特殊情況
+							if (c1UsageCode == 9 || c2UsageCode == 2) {
+								return -1;
+							}
+							// C2優先的特殊情況
+							if (c1UsageCode == 2 || c2UsageCode == 9) {
+								return 1;
+							}
+							// 一般情況
+							return c1UsageCode - c2UsageCode;
+						}
 					}
 					if (c1.getFacmNo() != c2.getFacmNo()) {
-						return c1.getFacmNo() - c2.getFacmNo();
+						return c2.getFacmNo() - c1.getFacmNo();
 					}
 					if (c1.getBormNo() != c2.getBormNo()) {
-						return c1.getBormNo() - c2.getBormNo();
+						return c2.getBormNo() - c1.getBormNo();
 					}
 					return 0;
 				}
@@ -614,6 +643,9 @@ public class BaTxCom extends TradeBuffer {
 				}
 				this.info("order2 = " + ln.getLoanBorMainId());
 				this.loanBal = ln.getLoanBal(); // 還款前本金餘額
+				if (ln.getNextPayIntDate() < nextIntDate || nextIntDate == 0) {
+					nextIntDate = ln.getNextPayIntDate();
+				}
 				switch (iRepayType) {
 				case 1: // 01-期款
 					if (iTerms == 0) {
@@ -621,33 +653,29 @@ public class BaTxCom extends TradeBuffer {
 						if (wkPayIntDate <= ln.getPrevPayIntDate() || wkPayIntDate <= ln.getDrawdownDate()) {
 							continue;
 						}
-						if (ln.getPayIntFreq() == 0 || ln.getPayIntFreq() == 99) {
-							wkTerms = 1;
-						} else {
-							int wkPrevTermNo = 0;
-							int wkRepayTermNo = 0;
-							// 計算至上次繳息日之期數
-							if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-								wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
-										ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
-							}
-							// 是否含提前繳期款
-							if (this.isTermAdvance) {
-								// 可回收期數 = 計算至入帳日/應繳日的應繳期數
-								wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
-										ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-										wkPayIntDate);
-
-							} else {
-								// 可回收期數 = 可回收期數 + 批次預收期數
-								wkRepayTermNo = loanCom.getTermNo(
-										this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2,
-										ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-										this.txBuffer.getTxCom().getTbsdy())
-										+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
-							}
-							wkTerms = wkRepayTermNo - wkPrevTermNo;
+						int wkPrevTermNo = 0;
+						int wkRepayTermNo = 0;
+						// 計算至上次繳息日之期數
+						if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+							wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
+									ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
 						}
+						// 是否含提前繳期款
+						if (this.isTermAdvance) {
+							// 可回收期數 = 計算至入帳日/應繳日的應繳期數
+							wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
+									ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+									wkPayIntDate);
+
+						} else {
+							// 可回收期數 = 可回收期數 + 批次預收期數
+							wkRepayTermNo = loanCom.getTermNo(
+									this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2,
+									ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+									this.txBuffer.getTxCom().getTbsdy())
+									+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
+						}
+						wkTerms = wkRepayTermNo - wkPrevTermNo;
 					} else {
 						wkTerms = iTerms;
 					}
@@ -760,6 +788,18 @@ public class BaTxCom extends TradeBuffer {
 				}
 			}
 		}
+		// 逾期期數、逾期天數
+		if (nextIntDate > 0 && nextIntDate < iEntryDate)
+
+		{
+			dDateUtil.init();
+			dDateUtil.setDate_1(nextIntDate);
+			dDateUtil.setDate_2(iEntryDate);
+			dDateUtil.dateDiff();
+			this.ovduTerms = dDateUtil.getMons();
+			this.ovduDays = dDateUtil.getDays();
+		}
+
 		if (this.baTxList != null && this.baTxList.size() > 0)
 
 		{
@@ -1480,6 +1520,24 @@ public class BaTxCom extends TradeBuffer {
 	 */
 	public String getPayMethod() {
 		return payMethod;
+	}
+
+	/**
+	 * 逾期數
+	 * 
+	 * @return 逾期數
+	 */
+	public int getOverTerms() {
+		return ovduTerms;
+	}
+
+	/**
+	 * 逾期天數
+	 * 
+	 * @return 逾期天數
+	 */
+	public int getOvduDays() {
+		return ovduDays;
 	}
 
 }

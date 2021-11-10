@@ -29,7 +29,7 @@ public class MlaundryDetail implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -3988936525894426151L;
+	private static final long serialVersionUID = -619580125979051449L;
 
 @EmbeddedId
   private MlaundryDetailId mlaundryDetailId;
@@ -66,6 +66,11 @@ public class MlaundryDetail implements Serializable {
   // 主管同意日期
   @Column(name = "`ManagerDate`")
   private int managerDate = 0;
+
+  // 主管覆核日期
+  /* 主管第二次覆核時顯示欄位 */
+  @Column(name = "`ManagerCheckDate`")
+  private int managerCheckDate = 0;
 
   // 主管覆核
   /* Y:同意;N不同意 */
@@ -256,6 +261,25 @@ public class MlaundryDetail implements Serializable {
   }
 
 /**
+	* 主管覆核日期<br>
+	* 主管第二次覆核時顯示欄位
+	* @return Integer
+	*/
+  public int getManagerCheckDate() {
+    return StaticTool.bcToRoc(this.managerCheckDate);
+  }
+
+/**
+	* 主管覆核日期<br>
+	* 主管第二次覆核時顯示欄位
+  *
+  * @param managerCheckDate 主管覆核日期
+  * @throws LogicException when Date Is Warn	*/
+  public void setManagerCheckDate(int managerCheckDate) throws LogicException {
+    this.managerCheckDate = StaticTool.rocToBc(managerCheckDate);
+  }
+
+/**
 	* 主管覆核<br>
 	* Y:同意;N不同意
 	* @return String
@@ -373,7 +397,7 @@ public class MlaundryDetail implements Serializable {
   @Override
   public String toString() {
     return "MlaundryDetail [mlaundryDetailId=" + mlaundryDetailId + ", totalCnt=" + totalCnt + ", totalAmt=" + totalAmt + ", rational=" + rational
-           + ", empNoDesc=" + empNoDesc + ", managerDate=" + managerDate + ", managerCheck=" + managerCheck + ", managerDesc=" + managerDesc + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", empNoDesc=" + empNoDesc + ", managerDate=" + managerDate + ", managerCheckDate=" + managerCheckDate + ", managerCheck=" + managerCheck + ", managerDesc=" + managerDesc + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

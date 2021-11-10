@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("mlaundryDetailService")
 @Repository
-public class MlaundryDetailServiceImpl implements MlaundryDetailService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(MlaundryDetailServiceImpl.class);
-
+public class MlaundryDetailServiceImpl extends ASpringJpaParm implements MlaundryDetailService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class MlaundryDetailServiceImpl implements MlaundryDetailService, Initial
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + mlaundryDetailId);
+    this.info("findById " + dbName + " " + mlaundryDetailId);
     Optional<MlaundryDetail> mlaundryDetail = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryDetail = mlaundryDetailReposDay.findById(mlaundryDetailId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "EntryDate", "Factor", "CustNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "EntryDate", "Factor", "CustNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = mlaundryDetailReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = mlaundryDetailReposHist.findAll(pageable);
     else 
       slice = mlaundryDetailRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findEntryDateRange " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " rational_2 : " +  rational_2);
+    this.info("findEntryDateRange " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1 + " rational_2 : " +  rational_2);
     if (dbName.equals(ContentName.onDay))
       slice = mlaundryDetailReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRationalInOrderByEntryDateAscCustNoAsc(entryDate_0, entryDate_1, rational_2, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = mlaundryDetailReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRationalInOrderByEntryDateAscCustNoAsc(entryDate_0, entryDate_1, rational_2, pageable);
     else 
       slice = mlaundryDetailRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRationalInOrderByEntryDateAscCustNoAsc(entryDate_0, entryDate_1, rational_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,15 +149,18 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findbyDate " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1);
+    this.info("findbyDate " + dbName + " : " + "entryDate_0 : " + entryDate_0 + " entryDate_1 : " +  entryDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = mlaundryDetailReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqual(entryDate_0, entryDate_1, pageable);
+      slice = mlaundryDetailReposDay.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(entryDate_0, entryDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = mlaundryDetailReposMon.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqual(entryDate_0, entryDate_1, pageable);
+      slice = mlaundryDetailReposMon.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(entryDate_0, entryDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = mlaundryDetailReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqual(entryDate_0, entryDate_1, pageable);
+      slice = mlaundryDetailReposHist.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(entryDate_0, entryDate_1, pageable);
     else 
-      slice = mlaundryDetailRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqual(entryDate_0, entryDate_1, pageable);
+      slice = mlaundryDetailRepos.findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(entryDate_0, entryDate_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -165,7 +170,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + mlaundryDetailId);
+    this.info("Hold " + dbName + " " + mlaundryDetailId);
     Optional<MlaundryDetail> mlaundryDetail = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryDetail = mlaundryDetailReposDay.findByMlaundryDetailId(mlaundryDetailId);
@@ -183,7 +188,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + mlaundryDetail.getMlaundryDetailId());
+    this.info("Hold " + dbName + " " + mlaundryDetail.getMlaundryDetailId());
     Optional<MlaundryDetail> mlaundryDetailT = null;
     if (dbName.equals(ContentName.onDay))
       mlaundryDetailT = mlaundryDetailReposDay.findByMlaundryDetailId(mlaundryDetail.getMlaundryDetailId());
@@ -204,13 +209,16 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Insert..." + dbName + " " + mlaundryDetail.getMlaundryDetailId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		}
+    this.info("Insert..." + dbName + " " + mlaundryDetail.getMlaundryDetailId());
     if (this.findById(mlaundryDetail.getMlaundryDetailId()) != null)
       throw new DBException(2);
 
     if (!empNot.isEmpty())
       mlaundryDetail.setCreateEmpNo(empNot);
+
+    if(mlaundryDetail.getLastUpdateEmpNo() == null || mlaundryDetail.getLastUpdateEmpNo().isEmpty())
+      mlaundryDetail.setLastUpdateEmpNo(empNot);
 
     if (dbName.equals(ContentName.onDay))
       return mlaundryDetailReposDay.saveAndFlush(mlaundryDetail);	
@@ -231,7 +239,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + mlaundryDetail.getMlaundryDetailId());
+    this.info("Update..." + dbName + " " + mlaundryDetail.getMlaundryDetailId());
     if (!empNot.isEmpty())
       mlaundryDetail.setLastUpdateEmpNo(empNot);
 
@@ -254,7 +262,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + mlaundryDetail.getMlaundryDetailId());
+    this.info("Update..." + dbName + " " + mlaundryDetail.getMlaundryDetailId());
     if (!empNot.isEmpty())
       mlaundryDetail.setLastUpdateEmpNo(empNot);
 
@@ -274,7 +282,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + mlaundryDetail.getMlaundryDetailId());
+    this.info("Delete..." + dbName + " " + mlaundryDetail.getMlaundryDetailId());
     if (dbName.equals(ContentName.onDay)) {
       mlaundryDetailReposDay.delete(mlaundryDetail);	
       mlaundryDetailReposDay.flush();
@@ -303,11 +311,13 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}    logger.info("InsertAll...");
-    for (MlaundryDetail t : mlaundryDetail) 
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+    for (MlaundryDetail t : mlaundryDetail){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
-		
+      if(t.getLastUpdateEmpNo() == null || t.getLastUpdateEmpNo().isEmpty())
+        t.setLastUpdateEmpNo(empNot);
+}		
 
     if (dbName.equals(ContentName.onDay)) {
       mlaundryDetail = mlaundryDetailReposDay.saveAll(mlaundryDetail);	
@@ -336,7 +346,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (mlaundryDetail == null || mlaundryDetail.size() == 0)
       throw new DBException(6);
 
@@ -365,7 +375,7 @@ em = null;
 
   @Override
   public void deleteAll(List<MlaundryDetail> mlaundryDetail, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

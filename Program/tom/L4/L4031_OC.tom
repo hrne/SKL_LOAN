@@ -1,9 +1,10 @@
 OORank=9,1
 OOLableA=9,1
-OOLableB=X,1
+OOLableB=X,2
 OOLableBX=X,30
 OOTotCnt=9,4
 OOSumCnt=9,4
 OOIgnCnt=9,4
 OOCheckFlag=9,1
 OOStatus=9,1
+OORptFg=X,1

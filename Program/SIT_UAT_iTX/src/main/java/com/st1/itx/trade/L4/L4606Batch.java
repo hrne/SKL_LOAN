@@ -109,8 +109,6 @@ public class L4606Batch extends TradeBuffer {
 	private String inFolder = "";
 
 	private int iInsuEndMonth = 0;
-	private int insuStartDate = 0;
-	private int insuEndDate = 0;
 //	寄送筆數
 	private int commitCnt = 500;
 	private String sendMsg = "";
@@ -121,8 +119,6 @@ public class L4606Batch extends TradeBuffer {
 		this.info("active L4606Batch ");
 		this.totaVo.init(titaVo);
 		iInsuEndMonth = parse.stringToInteger(titaVo.getParam("InsuEndMonth")) + 191100;
-		insuStartDate = parse.stringToInteger(iInsuEndMonth + "01");
-		insuEndDate = parse.stringToInteger(iInsuEndMonth + "31");
 
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
@@ -253,7 +249,7 @@ public class L4606Batch extends TradeBuffer {
 					tFacMainId.setCustNo(custNo);
 					tFacMainId.setFacmNo(facmNo);
 					tFacMain = facMainService.findById(tFacMainId, titaVo);
-
+					
 					if (tFacMain != null && tFacMain.getFireOfficer() != null) {
 						empNo = tFacMain.getFireOfficer();
 					} else {
@@ -262,12 +258,12 @@ public class L4606Batch extends TradeBuffer {
 							empNo = tCustMain.getIntroducer();
 						}
 					}
-
+					
 					tCdEmp = cdEmpService.findById(empNo);
 					if (tCdEmp != null) {
 						empId = tCdEmp.getAgentId();
 						empName = tCdEmp.getFullname();
-						agStatusCode = tCdEmp.getStatusCode();
+						agStatusCode = tCdEmp.getAgStatusCode();   
 					}
 
 					tInsuComm.setFireOfficer(empNo);
@@ -275,7 +271,10 @@ public class L4606Batch extends TradeBuffer {
 					tInsuComm.setEmpName(empName);
 					InsuRenew tInsuRenew = insuRenewService.findNowInsuNoFirst(custNo, facmNo,
 							tempOccursList.get("InsuNo"), titaVo);
-
+					
+					this.info("tInsuRenew =" + tInsuRenew);
+					this.info("agStatusCode2 =" + agStatusCode );
+					
 					if (tInsuRenew != null && "1".equals(agStatusCode)) {
 						mediaCode = "Y";
 					}

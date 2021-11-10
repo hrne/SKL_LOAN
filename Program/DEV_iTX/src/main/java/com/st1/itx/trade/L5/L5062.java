@@ -81,6 +81,11 @@ public class L5062 extends TradeBuffer {
 					}else {
 						occursList.putParam("OOAccCollPsnX", iCdEmp.getFullname());
 					}
+				}else{
+					occursList.putParam("OOAccCollPsn", "");
+					occursList.putParam("OOAccTelArea", "");
+					occursList.putParam("OOAccTelNo", "");
+					occursList.putParam("OOAccTelExt", "");
 				}
 				iEmpNo = rCdCity.getLegalPsn();
 				if (!iEmpNo.trim().isEmpty() || !iEmpNo.equals("")) {
@@ -94,6 +99,11 @@ public class L5062 extends TradeBuffer {
 					}else {
 						occursList.putParam("OOLegalPsnX", iCdEmp.getFullname());
 					}
+				}else{
+					occursList.putParam("OOLegalPsn", "");
+					occursList.putParam("OOLegalArea", "");
+					occursList.putParam("OOLegalNo", "");
+					occursList.putParam("OOLegalExt", "");
 				}
 				this.totaVo.addOccursList(occursList);
 			}

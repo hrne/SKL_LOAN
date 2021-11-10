@@ -96,16 +96,20 @@ T(3,CdCode.FollowMark)
 T(3,CdCode.InqFg)
 #InqFgHelp=x,1024,S
 
+#CDCODEYesNo=x,25,S
+T(3,CdCode.YesNo)
+#YesNoHelp=x,1024,S
+
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
-S(XXR99,01,#CDCODECondition,#CDCODEReCheckHelp,#CDCODEFollowMark,#CDCODEInqFg)
+S(XXR99,01,#CDCODECondition,#CDCODEReCheckHelp,#CDCODEFollowMark,#CDCODEInqFg,#CDCODEYesNo)
 R(1,XXR99)
 CALL(#HelpProc)
 T(2,@ConditionHelp,#HelpDesc1)
 T(2,@ReCheckHelp,#HelpDesc2)
 T(2,@FollowMarkHelp,#HelpDesc3)
 T(2,@InqFgHelp,#HelpDesc4)
-
+T(2,@YesNoHelp,#HelpDesc5)
 #CHAIN=A,1,S
 T(4,CHAIN$)
 
@@ -291,6 +295,11 @@ X(#OOLoanBal1)
 
 #OOTraceYearMonth=A,5,S
 C(4,#OOTraceYearMonth,S,$)
+
+!指定覆審(TOTA)
+#OOSpecifyFg=X,1,S
+#OOSpecifyFgX=X,2,S
+C(4,#OOSpecifyFg,S,T(H,#OOSpecifyFg,#YesNoHelp))
 ! 登錄的按鈕
 #OOBUF2=X,17,S
 T(2,#OOYearMonth+#OOConditionCode+#OOCustNo+#OOFacmNo)
@@ -336,6 +345,7 @@ TXFORM=L5905
 #OOReChkUnit             
 #OORemark       
 #OOTraceYearMonth  
+#OOSpecifyFg
 ^
 <include src="COM.icf::TRCTL.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -396,9 +406,11 @@ TXFORM=L5905
 #OOLoanBalX=加總-貸放餘額
 {width:140,align:'right'}
 
-
 #OORemark=備註
 {width:150,align:'left'}
+
+#OOSpecifyFgX=指定覆審
+{width:130,align:'center'}
 
 ^
 
@@ -440,6 +452,9 @@ TXFORM=L5905
 
 #OOLoanBalX=加總-貸放餘額
 {width:130,align:'right'}
+
+#OOSpecifyFgX=指定覆審
+{width:80,align:'center'}
 
 ^
 </sub>

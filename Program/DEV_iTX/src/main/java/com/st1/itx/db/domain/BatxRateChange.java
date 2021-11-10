@@ -73,12 +73,12 @@ public class BatxRateChange implements Serializable {
   private String incrFlag;
 
   // 調整記號
-  /* 1.批次自動調整2.按地區別自動調整3.人工調整(未調整)4.人工調整(待輸入)5.人工調整(已調整) */
+  /* 1.批次自動調整2.按地區別調整3.人工調整 */
   @Column(name = "`AdjCode`")
   private int adjCode = 0;
 
   // 是否輸入利率
-  /* 0.未輸入1.已輸入2.不處理(檢核有誤) */
+  /* 0.未調整1.已調整2.待輸入3.已輸入9.待處理(檢核有誤) */
   @Column(name = "`RateKeyInCode`")
   private int rateKeyInCode = 0;
 
@@ -413,10 +413,8 @@ public class BatxRateChange implements Serializable {
 /**
 	* 調整記號<br>
 	* 1.批次自動調整
-2.按地區別自動調整
-3.人工調整(未調整)
-4.人工調整(待輸入)
-5.人工調整(已調整)
+2.按地區別調整
+3.人工調整
 	* @return Integer
 	*/
   public int getAdjCode() {
@@ -426,10 +424,8 @@ public class BatxRateChange implements Serializable {
 /**
 	* 調整記號<br>
 	* 1.批次自動調整
-2.按地區別自動調整
-3.人工調整(未調整)
-4.人工調整(待輸入)
-5.人工調整(已調整)
+2.按地區別調整
+3.人工調整
   *
   * @param adjCode 調整記號
 	*/
@@ -439,9 +435,11 @@ public class BatxRateChange implements Serializable {
 
 /**
 	* 是否輸入利率<br>
-	* 0.未輸入
-1.已輸入
-2.不處理(檢核有誤)
+	* 0.未調整
+1.已調整
+2.待輸入
+3.已輸入
+9.待處理(檢核有誤)
 	* @return Integer
 	*/
   public int getRateKeyInCode() {
@@ -450,9 +448,11 @@ public class BatxRateChange implements Serializable {
 
 /**
 	* 是否輸入利率<br>
-	* 0.未輸入
-1.已輸入
-2.不處理(檢核有誤)
+	* 0.未調整
+1.已調整
+2.待輸入
+3.已輸入
+9.待處理(檢核有誤)
   *
   * @param rateKeyInCode 是否輸入利率
 	*/

@@ -32,7 +32,7 @@ public class PfBsDetail implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 437220263775811807L;
+	private static final long serialVersionUID = -7564591729739276483L;
 
 // 序號
   @Id
@@ -59,7 +59,7 @@ public class PfBsDetail implements Serializable {
   private int bormNo = 0;
 
   // 還款類別
-  /* 0.撥款 1.計件代碼變更 2.部分償還 3.提前結案 4.人工增減業績 */
+  /* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案4.人工增減業績 */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
@@ -92,12 +92,23 @@ public class PfBsDetail implements Serializable {
   private BigDecimal drawdownAmt = new BigDecimal("0");
 
   // 件數
+  /* 追回時為扣除金額後重算之件數 */
   @Column(name = "`PerfCnt`")
   private BigDecimal perfCnt = new BigDecimal("0");
 
   // 業績金額
   @Column(name = "`PerfAmt`")
   private BigDecimal perfAmt = new BigDecimal("0");
+
+  // 週整加減件數
+  /* by eric 2021.11.4 */
+  @Column(name = "`AdjPerfCnt`")
+  private BigDecimal adjPerfCnt = new BigDecimal("0");
+
+  // 週整加減業績金額
+  /* by eric 2021.11.4 */
+  @Column(name = "`AdjPerfAmt`")
+  private BigDecimal adjPerfAmt = new BigDecimal("0");
 
   // 工作月
   @Column(name = "`WorkMonth`")
@@ -228,7 +239,7 @@ public class PfBsDetail implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.撥款 1.計件代碼變更 2.部分償還 3.提前結案 4.人工增減業績
+	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案4.人工增減業績
 	* @return Integer
 	*/
   public int getRepayType() {
@@ -237,7 +248,7 @@ public class PfBsDetail implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.撥款 1.計件代碼變更 2.部分償還 3.提前結案 4.人工增減業績
+	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案4.人工增減業績
   *
   * @param repayType 還款類別
 	*/
@@ -361,7 +372,7 @@ public class PfBsDetail implements Serializable {
 
 /**
 	* 件數<br>
-	* 
+	* 追回時為扣除金額後重算之件數
 	* @return BigDecimal
 	*/
   public BigDecimal getPerfCnt() {
@@ -370,7 +381,7 @@ public class PfBsDetail implements Serializable {
 
 /**
 	* 件數<br>
-	* 
+	* 追回時為扣除金額後重算之件數
   *
   * @param perfCnt 件數
 	*/
@@ -395,6 +406,44 @@ public class PfBsDetail implements Serializable {
 	*/
   public void setPerfAmt(BigDecimal perfAmt) {
     this.perfAmt = perfAmt;
+  }
+
+/**
+	* 週整加減件數<br>
+	* by eric 2021.11.4
+	* @return BigDecimal
+	*/
+  public BigDecimal getAdjPerfCnt() {
+    return this.adjPerfCnt;
+  }
+
+/**
+	* 週整加減件數<br>
+	* by eric 2021.11.4
+  *
+  * @param adjPerfCnt 週整加減件數
+	*/
+  public void setAdjPerfCnt(BigDecimal adjPerfCnt) {
+    this.adjPerfCnt = adjPerfCnt;
+  }
+
+/**
+	* 週整加減業績金額<br>
+	* by eric 2021.11.4
+	* @return BigDecimal
+	*/
+  public BigDecimal getAdjPerfAmt() {
+    return this.adjPerfAmt;
+  }
+
+/**
+	* 週整加減業績金額<br>
+	* by eric 2021.11.4
+  *
+  * @param adjPerfAmt 週整加減業績金額
+	*/
+  public void setAdjPerfAmt(BigDecimal adjPerfAmt) {
+    this.adjPerfAmt = adjPerfAmt;
   }
 
 /**
@@ -516,7 +565,7 @@ public class PfBsDetail implements Serializable {
   public String toString() {
     return "PfBsDetail [logNo=" + logNo + ", perfDate=" + perfDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", repayType=" + repayType
            + ", bsOfficer=" + bsOfficer + ", deptCode=" + deptCode + ", drawdownDate=" + drawdownDate + ", prodCode=" + prodCode + ", pieceCode=" + pieceCode + ", drawdownAmt=" + drawdownAmt
-           + ", perfCnt=" + perfCnt + ", perfAmt=" + perfAmt + ", workMonth=" + workMonth + ", workSeason=" + workSeason + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", perfCnt=" + perfCnt + ", perfAmt=" + perfAmt + ", adjPerfCnt=" + adjPerfCnt + ", adjPerfAmt=" + adjPerfAmt + ", workMonth=" + workMonth + ", workSeason=" + workSeason
+           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

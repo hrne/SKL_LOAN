@@ -2,12 +2,12 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -15,10 +15,12 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.MlaundryRecord;
+import com.st1.itx.db.domain.MlaundryRecordId;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.service.MlaundryRecordService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.tradeService.TradeBuffer;
+import com.st1.itx.db.service.springjpa.cm.L8923ServiceImpl;
 import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
@@ -46,7 +48,13 @@ public class L8923 extends TradeBuffer {
 	public CustMainService sCustMainService;
 	@Autowired
 	Parse parse;
-
+	
+	@Autowired 
+	L8923ServiceImpl l8923Servicelmpl;
+	private int recorddate = 0;
+	private int repaydate = 0;
+	private int actualrepaydate = 0;
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		logger.info("active L8923 ");
@@ -55,82 +63,120 @@ public class L8923 extends TradeBuffer {
 		// 取得輸入資料
 		String DateTime; // YYY/MM/DD hh:mm:ss
 		String Date = "";
-
-		int iRecordDateStart = this.parse.stringToInteger(titaVo.getParam("RecordDateStart"));
-		int iRecordDateEnd = this.parse.stringToInteger(titaVo.getParam("RecordDateEnd"));
-		int iFRecordDateStart = iRecordDateStart + 19110000;
-		int iFRecordDateEnd = iRecordDateEnd + 19110000;
-		logger.info("L8923 iFRecordDate : " + iFRecordDateStart + "~" + iFRecordDateEnd);
-
-		int iActualRepayDateStart = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateStart"));
-		int iActualRepayDateEnd = this.parse.stringToInteger(titaVo.getParam("ActualRepayDateEnd"));
-		int iFActualRepayDateStart = iActualRepayDateStart + 19110000;
-		int iFActualRepayDateEnd = iActualRepayDateEnd + 19110000;
-		logger.info("L8923 iFRepayDate : " + iFActualRepayDateStart + "~" + iFActualRepayDateEnd);
-
-		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
-		this.index = titaVo.getReturnIndex();
-
-		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 100; // 292 * 100 = 29,200
-
-		// 查詢疑似洗錢交易訪談記錄檔檔
-		Slice<MlaundryRecord> slMlaundryRecord;
-		if(iRecordDateStart==0 && iRecordDateEnd==0) {
-			slMlaundryRecord = sMlaundryRecordService.findRepayD(iFActualRepayDateStart, iFActualRepayDateEnd, this.index, this.limit, titaVo);
-		} else {
-			slMlaundryRecord = sMlaundryRecordService.findRecordD(iFRecordDateStart, iFRecordDateEnd, this.index, this.limit, titaVo);
+		int sCustNo = Integer.parseInt(titaVo.getParam("CustNo"));
+		
+		
+		List<Map<String, String>> resultList = null;
+		try {
+			resultList = l8923Servicelmpl.queryresult(this.index,this.limit,titaVo);
+	
+		} catch (Exception e) {
+			this.error("l8923Servicelmpl findByCondition " + e.getMessage());
+			throw new LogicException("E0013", e.getMessage());
 		}
 		
+		int iFacmNo = 0;
+		int iBormNo = 0;
+		MlaundryRecord iMlaundryRecord = null;
 		
-		
-		List<MlaundryRecord> lMlaundryRecord = slMlaundryRecord == null ? null : slMlaundryRecord.getContent();
-
-		if (lMlaundryRecord == null || lMlaundryRecord.size() == 0) {
-			throw new LogicException(titaVo, "E0001", "疑似洗錢交易訪談記錄檔"); // 查無資料
-		}
 		// 如有找到資料
-		for (MlaundryRecord tMlaundryRecord : lMlaundryRecord) {
-			OccursList occursList = new OccursList();
+		if (resultList != null && resultList.size() > 0) {
+			for (Map<String, String> result : resultList) {
+				OccursList occursList = new OccursList();
+				setData(result);
+				// 查詢客戶資料主檔
+				CustMain tCustMain = new CustMain();
+				int iCustNo = Integer.parseInt(result.get("F2"));
+				tCustMain = sCustMainService.custNoFirst(iCustNo, iCustNo, titaVo);
+				if (tCustMain != null) {
+					occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+				} else {
+					occursList.putParam("OOCustName", ""); // 戶名
+				}
+			
+			
+				occursList.putParam("OORecordDate", recorddate); // 訪談日期
+				occursList.putParam("OOCustNo", result.get("F2")); // 戶號
+				occursList.putParam("OOFacmNo", result.get("F3")); // 額度編號
+				occursList.putParam("OOBormNo", result.get("F4")); // 撥款序號
+				occursList.putParam("OORepayDate", repaydate); // 預定還款日期
+				occursList.putParam("OOActualRepayDate", actualrepaydate); // 實際還款日期
+				occursList.putParam("OORepayAmt", result.get("F5")); // 還款金額
+				occursList.putParam("OOCareer", result.get("F6")); // 職業別
+				occursList.putParam("OOIncome", result.get("F7")); // 年收入(萬)
+				occursList.putParam("OORepaySource", result.get("F8")); // 還款來源
+				occursList.putParam("OORepayBank", result.get("F9")); // 代償銀行
+				occursList.putParam("OODescription", result.get("F13").replace("$n", "\n")); // 其他說明
+				occursList.putParam("OOEmpNo", result.get("F10")); // 經辦
+			
+				iFacmNo = parse.stringToInteger(result.get("F3"));
+				iBormNo = parse.stringToInteger(result.get("F4"));
+			
+				iMlaundryRecord = sMlaundryRecordService.findById(new MlaundryRecordId(recorddate+19110000,iCustNo,iFacmNo,iBormNo), titaVo);
+				if(iMlaundryRecord!=null) {
+					DateTime = this.parse.timeStampToString(iMlaundryRecord.getLastUpdate()); // 異動日期
+					this.info("DateTime="+DateTime);
+					Date = FormatUtil.left(DateTime, 9);
+					this.info("Date="+Date);
+				} else {
+					Date = "";
+				}
+			
+				occursList.putParam("OOUpdate", Date);// 異動日期
 
-			// 查詢客戶資料主檔
-			CustMain tCustMain = new CustMain();
-			tCustMain = sCustMainService.custNoFirst(tMlaundryRecord.getCustNo(), tMlaundryRecord.getCustNo(), titaVo);
-			if (tCustMain == null) {
-				throw new LogicException(titaVo, "E0001", "客戶資料主檔"); // 查無資料
-			}
-			occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
+				/* 將每筆資料放入Tota的OcList */
+				this.totaVo.addOccursList(occursList);
+		 }
 
-			occursList.putParam("OORecordDate", tMlaundryRecord.getRecordDate()); // 訪談日期
-			occursList.putParam("OOCustNo", tMlaundryRecord.getCustNo()); // 戶號
-			occursList.putParam("OOFacmNo", tMlaundryRecord.getFacmNo()); // 額度編號
-			occursList.putParam("OOBormNo", tMlaundryRecord.getBormNo()); // 撥款序號
-			occursList.putParam("OORepayDate", tMlaundryRecord.getRepayDate()); // 預定還款日期
-			occursList.putParam("OOActualRepayDate", tMlaundryRecord.getActualRepayDate()); // 實際還款日期
-			occursList.putParam("OORepayAmt", tMlaundryRecord.getRepayAmt()); // 還款金額
-			occursList.putParam("OOCareer", tMlaundryRecord.getCareer()); // 職業別
-			occursList.putParam("OOIncome", tMlaundryRecord.getIncome()); // 年收入(萬)
-			occursList.putParam("OORepaySource", tMlaundryRecord.getRepaySource()); // 還款來源
-			occursList.putParam("OORepayBank", tMlaundryRecord.getRepayBank()); // 代償銀行
-			occursList.putParam("OODescription", tMlaundryRecord.getDescription().replace("$n", "\n")); // 其他說明
-			occursList.putParam("OOEmpNo", tMlaundryRecord.getLastUpdateEmpNo()); // 經辦
+		 /* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 
-			DateTime = this.parse.timeStampToString(tMlaundryRecord.getLastUpdate()); // 異動日期
-			logger.info("L8923 DateTime : " + DateTime);
-			Date = FormatUtil.left(DateTime, 9);
-			occursList.putParam("OOUpdate", Date);
-
-			/* 將每筆資料放入Tota的OcList */
-			this.totaVo.addOccursList(occursList);
-		}
-
-		/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
-		if (slMlaundryRecord != null && slMlaundryRecord.hasNext()) {
-			titaVo.setReturnIndex(this.setIndexNext());
-			this.totaVo.setMsgEndToEnter();// 手動折返
+		 if (resultList.size() == this.limit && hasNext()) {
+	 		 titaVo.setReturnIndex(this.setIndexNext());
+		 	 /* 手動折返 */
+		 	 this.totaVo.setMsgEndToEnter();
+		 }
+		} else {
+			throw new LogicException(titaVo, "E0001", "");
 		}
 
 		this.addList(this.totaVo);
 		return this.sendList();
+	}
+	
+	private Boolean hasNext() {
+		Boolean result = true;
+
+		int times = this.index + 1;
+		int cnt = l8923Servicelmpl.getSize();
+		int size = times * this.limit;
+
+		this.info("index ..." + this.index);
+		this.info("times ..." + times);
+		this.info("cnt ..." + cnt);
+		this.info("size ..." + size);
+
+		if (size == cnt) {
+			result = false;
+		}
+		this.info("result ..." + result);
+
+		return result;
+	}
+	private void setData(Map<String, String> result) throws LogicException {
+		
+		recorddate = parse.stringToInteger(result.get("F0"));
+		repaydate = parse.stringToInteger(result.get("F12"));
+		actualrepaydate = parse.stringToInteger(result.get("F1"));
+		this.info("recorddate="+recorddate+",repaydate="+repaydate+",actualrepaydate="+actualrepaydate);
+		
+		if(recorddate>19110000) {
+			recorddate = recorddate-19110000;
+		}
+		if(repaydate>19110000) {
+			repaydate = repaydate-19110000;
+		}
+		if(actualrepaydate>19110000) {
+			actualrepaydate = actualrepaydate-19110000;
+		}
 	}
 }

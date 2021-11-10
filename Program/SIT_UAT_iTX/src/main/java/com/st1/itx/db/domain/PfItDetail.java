@@ -32,7 +32,7 @@ public class PfItDetail implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -2360029745173404776L;
+	private static final long serialVersionUID = -2798283326840412989L;
 
 // 序號
   @Id
@@ -59,7 +59,7 @@ public class PfItDetail implements Serializable {
   private int bormNo = 0;
 
   // 還款類別
-  /* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案 4.人工增減業績 5.保費檢核追回 */
+  /* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案 4.人工維護 5.保費檢核追回 */
   @Column(name = "`RepayType`")
   private int repayType = 0;
 
@@ -77,7 +77,7 @@ public class PfItDetail implements Serializable {
   private String pieceCode;
 
   // 是否計件
-  /* Y/N */
+  /* Y/N，追回時為扣除追回後重算後之是否計件 */
   @Column(name = "`CntingCode`", length = 1)
   private String cntingCode;
 
@@ -122,7 +122,7 @@ public class PfItDetail implements Serializable {
   private String deptManager;
 
   // 件數
-  /* 介紹人-件數不會有小數點[是否計件]為Y,件數為1;若為N,件數為0 */
+  /* 介紹人-件數不會有小數點，追回時為扣除追回後重算後之筆數[是否計件]為Y,件數為1;若為N,件數為0 */
   @Column(name = "`PerfCnt`")
   private BigDecimal perfCnt = new BigDecimal("0");
 
@@ -158,9 +158,31 @@ public class PfItDetail implements Serializable {
   private int mediaDate = 0;
 
   // 產出媒體檔記號
-  /* 0:尚未產生媒體檔1:已產生發放媒體-(不可刪除與異動) */
+  /* 0:尚未產生媒體檔1:已產生發放媒體-(不可刪除與異動)2:人工維護後之原資料(不出媒體)3.保費檢核結果為Y時已追回撥款，還款不用追回 */
   @Column(name = "`MediaFg`")
   private int mediaFg = 0;
+
+  // 調整記號
+  /* 0:無調整1:調整本月   2:調整本月及季累計 */
+  @Column(name = "`AdjRange`")
+  private int adjRange = 0;
+
+  // 調整後換算業績
+  @Column(name = "`AdjPerfEqAmt`")
+  private BigDecimal adjPerfEqAmt = new BigDecimal("0");
+
+  // 業調整後務報酬
+  @Column(name = "`AdjPerfReward`")
+  private BigDecimal adjPerfReward = new BigDecimal("0");
+
+  // 調整後業績金額
+  @Column(name = "`AdjPerfAmt`")
+  private BigDecimal adjPerfAmt = new BigDecimal("0");
+
+  // 調整後是否計件
+  /* Y/N */
+  @Column(name = "`AdjCntingCode`", length = 1)
+  private String adjCntingCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -285,7 +307,7 @@ public class PfItDetail implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案 4.人工增減業績 5.保費檢核追回
+	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案 4.人工維護 5.保費檢核追回
 	* @return Integer
 	*/
   public int getRepayType() {
@@ -294,7 +316,7 @@ public class PfItDetail implements Serializable {
 
 /**
 	* 還款類別<br>
-	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案 4.人工增減業績 5.保費檢核追回
+	* 0.撥款(計件代碼變更) 2.部分償還 3.提前結案 4.人工維護 5.保費檢核追回
   *
   * @param repayType 還款類別
 	*/
@@ -361,7 +383,7 @@ public class PfItDetail implements Serializable {
 
 /**
 	* 是否計件<br>
-	* Y/N
+	* Y/N，追回時為扣除追回後重算後之是否計件
 	* @return String
 	*/
   public String getCntingCode() {
@@ -370,7 +392,7 @@ public class PfItDetail implements Serializable {
 
 /**
 	* 是否計件<br>
-	* Y/N
+	* Y/N，追回時為扣除追回後重算後之是否計件
   *
   * @param cntingCode 是否計件
 	*/
@@ -532,7 +554,7 @@ public class PfItDetail implements Serializable {
 
 /**
 	* 件數<br>
-	* 介紹人-件數不會有小數點
+	* 介紹人-件數不會有小數點，追回時為扣除追回後重算後之筆數
 [是否計件]為Y,件數為1;若為N,件數為0
 	* @return BigDecimal
 	*/
@@ -542,7 +564,7 @@ public class PfItDetail implements Serializable {
 
 /**
 	* 件數<br>
-	* 介紹人-件數不會有小數點
+	* 介紹人-件數不會有小數點，追回時為扣除追回後重算後之筆數
 [是否計件]為Y,件數為1;若為N,件數為0
   *
   * @param perfCnt 件數
@@ -688,6 +710,8 @@ public class PfItDetail implements Serializable {
 	* 產出媒體檔記號<br>
 	* 0:尚未產生媒體檔
 1:已產生發放媒體-(不可刪除與異動)
+2:人工維護後之原資料(不出媒體)
+3.保費檢核結果為Y時已追回撥款，還款不用追回
 	* @return Integer
 	*/
   public int getMediaFg() {
@@ -698,11 +722,112 @@ public class PfItDetail implements Serializable {
 	* 產出媒體檔記號<br>
 	* 0:尚未產生媒體檔
 1:已產生發放媒體-(不可刪除與異動)
+2:人工維護後之原資料(不出媒體)
+3.保費檢核結果為Y時已追回撥款，還款不用追回
   *
   * @param mediaFg 產出媒體檔記號
 	*/
   public void setMediaFg(int mediaFg) {
     this.mediaFg = mediaFg;
+  }
+
+/**
+	* 調整記號<br>
+	* 0:無調整
+1:調整本月   
+2:調整本月及季累計
+	* @return Integer
+	*/
+  public int getAdjRange() {
+    return this.adjRange;
+  }
+
+/**
+	* 調整記號<br>
+	* 0:無調整
+1:調整本月   
+2:調整本月及季累計
+  *
+  * @param adjRange 調整記號
+	*/
+  public void setAdjRange(int adjRange) {
+    this.adjRange = adjRange;
+  }
+
+/**
+	* 調整後換算業績<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getAdjPerfEqAmt() {
+    return this.adjPerfEqAmt;
+  }
+
+/**
+	* 調整後換算業績<br>
+	* 
+  *
+  * @param adjPerfEqAmt 調整後換算業績
+	*/
+  public void setAdjPerfEqAmt(BigDecimal adjPerfEqAmt) {
+    this.adjPerfEqAmt = adjPerfEqAmt;
+  }
+
+/**
+	* 業調整後務報酬<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getAdjPerfReward() {
+    return this.adjPerfReward;
+  }
+
+/**
+	* 業調整後務報酬<br>
+	* 
+  *
+  * @param adjPerfReward 業調整後務報酬
+	*/
+  public void setAdjPerfReward(BigDecimal adjPerfReward) {
+    this.adjPerfReward = adjPerfReward;
+  }
+
+/**
+	* 調整後業績金額<br>
+	* 
+	* @return BigDecimal
+	*/
+  public BigDecimal getAdjPerfAmt() {
+    return this.adjPerfAmt;
+  }
+
+/**
+	* 調整後業績金額<br>
+	* 
+  *
+  * @param adjPerfAmt 調整後業績金額
+	*/
+  public void setAdjPerfAmt(BigDecimal adjPerfAmt) {
+    this.adjPerfAmt = adjPerfAmt;
+  }
+
+/**
+	* 調整後是否計件<br>
+	* Y/N
+	* @return String
+	*/
+  public String getAdjCntingCode() {
+    return this.adjCntingCode == null ? "" : this.adjCntingCode;
+  }
+
+/**
+	* 調整後是否計件<br>
+	* Y/N
+  *
+  * @param adjCntingCode 調整後是否計件
+	*/
+  public void setAdjCntingCode(String adjCntingCode) {
+    this.adjCntingCode = adjCntingCode;
   }
 
 /**
@@ -788,7 +913,8 @@ public class PfItDetail implements Serializable {
            + ", drawdownDate=" + drawdownDate + ", prodCode=" + prodCode + ", pieceCode=" + pieceCode + ", cntingCode=" + cntingCode + ", drawdownAmt=" + drawdownAmt + ", unitCode=" + unitCode
            + ", distCode=" + distCode + ", deptCode=" + deptCode + ", introducer=" + introducer + ", unitManager=" + unitManager + ", distManager=" + distManager + ", deptManager=" + deptManager
            + ", perfCnt=" + perfCnt + ", perfEqAmt=" + perfEqAmt + ", perfReward=" + perfReward + ", perfAmt=" + perfAmt + ", workMonth=" + workMonth + ", workSeason=" + workSeason
-           + ", rewardDate=" + rewardDate + ", mediaDate=" + mediaDate + ", mediaFg=" + mediaFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", rewardDate=" + rewardDate + ", mediaDate=" + mediaDate + ", mediaFg=" + mediaFg + ", adjRange=" + adjRange + ", adjPerfEqAmt=" + adjPerfEqAmt + ", adjPerfReward=" + adjPerfReward
+           + ", adjPerfAmt=" + adjPerfAmt + ", adjCntingCode=" + adjCntingCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

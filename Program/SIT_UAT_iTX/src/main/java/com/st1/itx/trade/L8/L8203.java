@@ -2,8 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -36,7 +34,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8203 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8203.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -47,10 +44,9 @@ public class L8203 extends TradeBuffer {
 	Parse parse;
 	@Autowired
 	public DataLog dataLog;
-	
+
 	@Autowired
 	SendRsp sendRsp;
-	
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -66,12 +62,12 @@ public class L8203 extends TradeBuffer {
 		int iEntryDate = this.parse.stringToInteger(titaVo.getParam("AcDate"));
 		int iFEntryDate = iEntryDate + 19110000;
 		this.info("L8203 iFAcDate : " + iFEntryDate);
-		
+
 		String iManagerCheck = titaVo.getParam("ManagerCheck");
 		int iManagerDate = this.parse.stringToInteger(titaVo.getParam("ManagerDate"));
-		
-		int iFManagerDate =0;
-		if(iManagerDate!=0) {
+
+		int iFManagerDate = 0;
+		if (iManagerDate != 0) {
 			iFManagerDate = iManagerDate + 19110000;
 		}
 		this.info("L8203 iFManagerDate : " + iFManagerDate);
@@ -106,17 +102,7 @@ public class L8203 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0003", titaVo.getParam("CustNo")); // 修改資料不存在
 			}
 			MlaundryDetail tMlaundryDetail2 = (MlaundryDetail) dataLog.clone(tMlaundryDetail); ////
-			
-			//刷主管卡後始可刪除
-			// 交易需主管核可
-			if(("3").equals(titaVo.getParam("Level"))){
-				if (!titaVo.getHsupCode().equals("1")) {
-					//titaVo.getSupCode();
-					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-				}
-			}
-			
-			
+
 			try {
 				moveMlaundryDetail(tMlaundryDetail, tMlaundryDetailId, iFuncCode, iFEntryDate, iFactor, iCustNo, iManagerCheck, iFManagerDate, titaVo);
 				tMlaundryDetail = sMlaundryDetailService.update2(tMlaundryDetail); ////
@@ -129,18 +115,20 @@ public class L8203 extends TradeBuffer {
 		case 4: // 刪除
 			tMlaundryDetail = sMlaundryDetailService.holdById(new MlaundryDetailId(iFEntryDate, iFactor, iCustNo));
 			this.info("L8203 del : " + iFuncCode + "-" + iFEntryDate + "-" + iFactor + "-" + iCustNo);
+			
+			// 刷主管卡後始可刪除
+			// 交易需主管核可
+			if (!titaVo.getHsupCode().equals("1")) {
+				// titaVo.getSupCode();
+				sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
+			}
+			
 			if (tMlaundryDetail != null) {
-				
-				//刷主管卡後始可刪除
-				// 交易需主管核可
-				if (!titaVo.getHsupCode().equals("1")) {
-					//titaVo.getSupCode();
-					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "");
-				}
-				
+
+
 				try {
 					sMlaundryDetailService.delete(tMlaundryDetail);
-					
+
 				} catch (DBException e) {
 					throw new LogicException(titaVo, "E0008", e.getErrorMsg()); // 刪除資料時，發生錯誤
 				}
@@ -151,30 +139,32 @@ public class L8203 extends TradeBuffer {
 		}
 		this.info("3");
 		this.addList(this.totaVo);
-		return this.sendList(); 
+		return this.sendList();
 	}
 
-	private void moveMlaundryDetail(MlaundryDetail mMlaundryDetail, MlaundryDetailId mMlaundryDetailId, int mFuncCode, int mFEntryDate, int mFactor, int mCustNo, String iManagerCheck, int iFManagerDate, TitaVo titaVo)
-			throws LogicException {
+	private void moveMlaundryDetail(MlaundryDetail mMlaundryDetail, MlaundryDetailId mMlaundryDetailId, int mFuncCode, int mFEntryDate, int mFactor, int mCustNo, String iManagerCheck,
+			int iFManagerDate, TitaVo titaVo) throws LogicException {
 
 		mMlaundryDetailId.setEntryDate(mFEntryDate);
 		mMlaundryDetailId.setFactor(mFactor);
 		mMlaundryDetailId.setCustNo(mCustNo);
-//		mMlaundryDetailId.setFacmNo(mFacmNo);
-//		mMlaundryDetailId.setBormNo(mBormNo);
 		mMlaundryDetail.setMlaundryDetailId(mMlaundryDetailId);
-
-		mMlaundryDetail.setManagerCheck(iManagerCheck);
-		mMlaundryDetail.setManagerDate(iFManagerDate);
 		
-//		mMlaundryDetail.setType(1);
+		mMlaundryDetail.setManagerDate(iFManagerDate);//主管同意日期
+		
+		int iManagerCheckDate = 0;
+		if(Integer.valueOf(titaVo.getParam("ManagerCheckDate"))!=0) {
+			iManagerCheckDate = Integer.valueOf(titaVo.getParam("ManagerCheckDate"))+19110000;
+		}
+		this.info("ManagerCheckDate="+iManagerCheckDate);
+		mMlaundryDetail.setManagerCheckDate(iManagerCheckDate);//主管覆核日期
+		mMlaundryDetail.setManagerCheck(iManagerCheck);
+
 		mMlaundryDetail.setTotalAmt(this.parse.stringToBigDecimal(titaVo.getParam("TotalAmt")));
 		mMlaundryDetail.setTotalCnt(this.parse.stringToInteger(titaVo.getParam("TotalCnt")));
-		//mMlaundryDetail.setMemoSeq(this.parse.stringToInteger(titaVo.getParam("MemoSeq")));
 		mMlaundryDetail.setRational(titaVo.getParam("Rational"));
 		mMlaundryDetail.setEmpNoDesc(titaVo.getParam("EmpNoDesc"));
 		mMlaundryDetail.setManagerDesc(titaVo.getParam("ManagerDesc"));
-		this.info("Manager Desc="+titaVo.getParam("ManagerDesc"));
 
 		if (mFuncCode != 2) {
 			mMlaundryDetail.setCreateDate(parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));

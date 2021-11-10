@@ -99,6 +99,9 @@ K(MODIFYBUTTON,查詢)
 #DATE=D,8,S
 T(4,DATE$)
 
+#CDATE=D,8,S
+T(4,CDATE$)
+
 !上營業日
 #LDATE=D,8,S
 T(4,LBSDY$)
@@ -108,13 +111,13 @@ T(4,LBSDY$)
 E(0,#LDATE)
 D(8)
 @V(7)A(DATE,0,#AcDateStart)
-V(5,0010101,#DATE)
+V(5,0010101,#CDATE)
 
 #AcDateEnd=D,7,I
 E(0,#LDATE)
 D(8)	
 @V(7)A(DATE,0,#AcDateEnd)
-V(5,#AcDateStart,#DATE)
+V(5,#AcDateStart,#CDATE)
 
 !交易樣態
 #Factor=N,2,I
@@ -227,7 +230,7 @@ T(2,2+#OOAcDate+#OOFactor+#OOCustNo)
 #OOBTN2=X,4,S
 BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=修改;ntxbuf=#OOBUF2})
 C(3,#Level,3,IF(#OORational=="",BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=登錄;ntxbuf=#OOBUF2}),$),$)
-C(3,#Level,1,IF(#OOManagerCheck=="",BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=覆核;ntxbuf=#OOBUF2}),$),$)
+C(3,#Level,1,BIND(grid,cancel),$)
 
 
 
@@ -236,7 +239,9 @@ C(3,#Level,1,IF(#OOManagerCheck=="",BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=覆核
 T(2,4+#OOAcDate+#OOFactor+#OOCustNo)
 
 #OOBTN4=X,4,S
-BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=刪除;ntxbuf=#OOBUF4})
+C(3,#Level,1,BIND(grid,cancel),BIND(grid,{cmd=CHAIN;ntxcd=L8203;text=刪除;ntxbuf=#OOBUF4}))
+
+
 
 ! 歷程的按鈕
 #OOBUF5=X,32,S

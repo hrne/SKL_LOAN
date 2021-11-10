@@ -41,7 +41,7 @@ public class L6041 extends TradeBuffer {
 
 	@Autowired
 	CdBranchGroupService cdBranchGroupService;
-	
+
 	boolean first = true;
 
 	@Override
@@ -73,23 +73,23 @@ public class L6041 extends TradeBuffer {
 					cdBranch = cdBranchService.findById(iBrNo, titaVo);
 					first = false;
 				}
-				
-				
-				
+
 				OccursList occursList = new OccursList();
 				occursList.putParam("OTlrNo", tTxTeller.getTlrNo());
 				occursList.putParam("OTlrItem", tTxTeller.getTlrItem());
 				occursList.putParam("OBrNo", tTxTeller.getBrNo());
 				occursList.putParam("OBrItem", cdBranch.getBranchItem());
 				occursList.putParam("OGroupNo", tTxTeller.getGroupNo());
-				
-				cdBranchGroup = cdBranchGroupService.findById(new CdBranchGroupId(iBrNo, tTxTeller.getGroupNo()),titaVo);
-				
-				if(cdBranchGroup!=null) {
-				occursList.putParam("OGroupItem", cdBranchGroup.getGroupItem());
-					
+
+				cdBranchGroup = cdBranchGroupService.findById(new CdBranchGroupId(iBrNo, tTxTeller.getGroupNo()), titaVo);
+
+				if (cdBranchGroup != null) {
+					occursList.putParam("OGroupItem", cdBranchGroup.getGroupItem());
+
+				} else {
+					occursList.putParam("OGroupItem", "");
 				}
-				
+
 //				occursList.putParam("OAuthNo", tTxTeller.getAuthNo());
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);

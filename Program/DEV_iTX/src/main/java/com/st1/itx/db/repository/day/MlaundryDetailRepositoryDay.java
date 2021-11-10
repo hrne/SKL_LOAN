@@ -27,7 +27,7 @@ public interface MlaundryDetailRepositoryDay extends JpaRepository<MlaundryDetai
   public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndRationalInOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, List<String> rational_2, Pageable pageable);
 
   // EntryDate >= ,AND EntryDate <= ,
-  public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqual(int entryDate_0, int entryDate_1, Pageable pageable);
+  public Slice<MlaundryDetail> findAllByEntryDateGreaterThanEqualAndEntryDateLessThanEqualOrderByEntryDateAscCustNoAsc(int entryDate_0, int entryDate_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

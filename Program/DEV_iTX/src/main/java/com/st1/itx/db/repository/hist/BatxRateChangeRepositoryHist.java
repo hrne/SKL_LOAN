@@ -31,8 +31,8 @@ public interface BatxRateChangeRepositoryHist extends JpaRepository<BatxRateChan
   // CustCode >= ,AND CustCode <= ,AND TxKind >= ,AND TxKind <= ,AND AdjCode >= ,AND AdjCode <=   ,AND AdjDate >= ,AND AdjDate <=
   public Slice<BatxRateChange> findAllByCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindGreaterThanEqualAndTxKindLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndAdjDateGreaterThanEqualAndAdjDateLessThanEqual(int custCode_0, int custCode_1, int txKind_2, int txKind_3, int adjCode_4, int adjCode_5, int adjDate_6, int adjDate_7, Pageable pageable);
 
-  // AdjDate >= ,AND AdjDate <= ,AND AdjCode >= ,AND  AdjCode <= ,AND RateKeyInCode >= ,AND RateKeyInCode <= 
-  public Slice<BatxRateChange> findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndAdjCodeGreaterThanEqualAndAdjCodeLessThanEqualAndRateKeyInCodeGreaterThanEqualAndRateKeyInCodeLessThanEqual(int adjDate_0, int adjDate_1, int adjCode_2, int adjCode_3, int rateKeyInCode_4, int rateKeyInCode_5, Pageable pageable);
+  // AdjDate = ,AND TxKind = ,AND RateKeyInCode = 
+  public Slice<BatxRateChange> findAllByAdjDateIsAndTxKindIsAndRateKeyInCodeIsOrderByCustNoAscFacmNoAscBormNoAsc(int adjDate_0, int txKind_1, int rateKeyInCode_2, Pageable pageable);
 
   // AdjDate >= ,AND AdjDate <= ,AND CustCode >= ,AND CustCode <= ,AND TxKind = ,AND ConfirmFlag = 
   public Slice<BatxRateChange> findAllByAdjDateGreaterThanEqualAndAdjDateLessThanEqualAndCustCodeGreaterThanEqualAndCustCodeLessThanEqualAndTxKindIsAndConfirmFlagIs(int adjDate_0, int adjDate_1, int custCode_2, int custCode_3, int txKind_4, int confirmFlag_5, Pageable pageable);

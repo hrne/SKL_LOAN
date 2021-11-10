@@ -29,9 +29,9 @@ public class WarningLetterForm extends MakeReport {
 
 		this.info("WarningLetter beginning");
 		String iCustNo = titaVo.getParam("OOCustNo");
-		
+		String iFacmNo = titaVo.getParam("OOFacmNo");
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "催收存證信函"+iCustNo, "", "郵局存證信函2021格式.pdf");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5060", "催收存證信函"+iCustNo+"-"+iFacmNo, "", "郵局存證信函2021格式.pdf");
 
 		newP(titaVo, map);
 
@@ -73,7 +73,7 @@ public class WarningLetterForm extends MakeReport {
 
 		long sno = this.close();
 
-		// test only
+		
 		toPdf(sno);
 	}
 
@@ -81,16 +81,16 @@ public class WarningLetterForm extends MakeReport {
 		this.newPage();
 
 		// 寄件人
-		this.setField("SenderName", "新光人壽保險股份有限公司");
+		this.setField("SenderName", map.get("SenderName").toString());
 		// 寄件人
-		this.setField("AgentName", "邱怡婷");
+		this.setField("AgentName", map.get("AgentName").toString());
 		// 寄件人地址
-		this.setField("SenderAddress", "台北市忠孝西路一段66號39樓");
+		this.setField("SenderAddress", map.get("SenderAddress").toString());
+
 		// 收件人1
 		if (map.get("RcvName1") != null) {
 			this.setField("RcvName1", map.get("RcvName1").toString());
 		}
-
 		// 收件人地1
 		if (map.get("RcvAddress1") != null) {
 			this.setField("RcvAddress1", map.get("RcvAddress1").toString());
@@ -100,10 +100,18 @@ public class WarningLetterForm extends MakeReport {
 		if (map.get("RcvName2") != null) {
 			this.setField("RcvName2", map.get("RcvName2").toString());
 		}
-
 		// 收件人地2
 		if (map.get("RcvAddress2") != null) {
 			this.setField("RcvAddress2", map.get("RcvAddress2").toString());
+		}
+
+		// 收件人3
+		if (map.get("RcvName3") != null) {
+			this.setField("RcvName3", map.get("RcvName3").toString());
+		}
+		// 收件人地3
+		if (map.get("RcvAddress3") != null) {
+			this.setField("RcvAddress3", map.get("RcvAddress3").toString());
 		}
 
 	}

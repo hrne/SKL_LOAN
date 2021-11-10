@@ -13,8 +13,11 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.domain.InsuOrignal;
 import com.st1.itx.db.domain.InsuRenew;
+import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.InsuOrignalService;
 import com.st1.itx.db.service.InsuRenewService;
@@ -49,6 +52,9 @@ public class L4962 extends TradeBuffer {
 	@Autowired
 	public InsuOrignalService insuOrignalService;
 
+	@Autowired
+	public ClFacService sClFacService;
+	
 	@Autowired
 	public L4962ServiceImpl l4962ServiceImpl;
 
@@ -87,8 +93,12 @@ public class L4962 extends TradeBuffer {
 		this.limit = 200;
 
 		Slice<InsuRenew> sInsuRenew = null;
-
+		Slice<InsuOrignal> sInsuOrignal = null;
+		
 		List<InsuRenew> lInsuRenew = new ArrayList<InsuRenew>();
+		
+		List<InsuOrignal> lInsuOrignal = new ArrayList<InsuOrignal>(); 
+		
 		sInsuRenew = insuRenewService.findL4962A(iInsuEndMonthFrom, iInsuEndMonthTo, this.index, this.limit, titaVo);
 
 		lInsuRenew = sInsuRenew == null ? null : sInsuRenew.getContent();
@@ -205,6 +215,35 @@ public class L4962 extends TradeBuffer {
 					
 				}
 			}
+			
+			iInsuEndMonthFrom1 = iInsuEndMonthFrom1 * 100 + 1;
+			iInsuEndMonthTo1 = iInsuEndMonthTo1 *100 + 31;
+			sInsuOrignal = insuOrignalService.insuEndDateRange(iInsuEndMonthFrom1, iInsuEndMonthTo1, this.index, this.limit, titaVo);
+			
+			lInsuOrignal = sInsuOrignal == null ? null : sInsuOrignal.getContent();
+			
+			if (lInsuOrignal != null && lInsuOrignal.size() != 0) {
+				for (InsuOrignal tInsuOrignal : lInsuOrignal) {
+					if("Y".equals(tInsuOrignal.getCommericalFlag())) {						
+						totaC.init(titaVo);						
+						errorReportC2(tInsuOrignal, titaVo);						
+					}
+					
+				}
+			}
+			
+			TotaVo t = totaC;
+			t.getOccursList().sort((c1,c2) -> {
+				int result = 0;
+				if (c1.get("ReportCInsuEndMonth") != c2.get("ReportCInsuEndMonth")) {
+					result = Integer.valueOf(c1.get("ReportCInsuEndMonth").compareTo(c2.get("ReportCInsuEndMonth")));
+				}  else {
+					result = 0;
+				}
+
+				return result;
+			});
+			totaC = t;
 		}
 		
 		
@@ -284,6 +323,56 @@ public class L4962 extends TradeBuffer {
 			occursListReport.putParam("ReportCErrMsg", "");
 			break;
 		}
+
+		totaC.addOccursList(occursListReport);
+	}
+	
+	private void errorReportC2(InsuOrignal tInsuOrignal, TitaVo titaVo) {
+		cntC = cntC + 1;
+
+
+		Slice<ClFac> sClFac = sClFacService.clNoEq(tInsuOrignal.getClCode1(), tInsuOrignal.getClCode2(), 
+				tInsuOrignal.getClNo(), this.index, this.limit, titaVo);
+		
+		int custno = 0;
+		int facmno = 0;
+		String custname = "";
+		List<ClFac>  lClFac = null;
+		if(sClFac != null) {
+			lClFac = sClFac.getContent();
+		}
+		
+		if(lClFac != null) {
+			custno = lClFac.get(0).getCustNo();
+			facmno = lClFac.get(0).getFacmNo();
+			CustMain tCustMain = custMainService.custNoFirst(custno, custno, titaVo);
+			if(tCustMain != null) {
+				custname = 	tCustMain.getCustName();
+			}
+		}
+		
+		OccursList occursListReport = new OccursList();
+		occursListReport.putParam("ReportCInsuEndMonth", (tInsuOrignal.getInsuEndDate() / 100) + 191100);
+		occursListReport.putParam("ReportCPrevInsuNo", tInsuOrignal.getOrigInsuNo());
+		occursListReport.putParam("ReportCCustNo", custno);
+		occursListReport.putParam("ReportCFacmNo", facmno);
+		occursListReport.putParam("ReportCCustName", custname);
+		occursListReport.putParam("ReportCClCode1", tInsuOrignal.getClCode1());
+		occursListReport.putParam("ReportCClCode2", tInsuOrignal.getClCode2());
+		occursListReport.putParam("ReportCClNo", tInsuOrignal.getClNo());
+		occursListReport.putParam("ReportCNowInsuNo", "");
+		
+//		switch (errorFlag) {
+//		case 1:
+//			occursListReport.putParam("ReportCErrMsg", "無新保單號碼");
+//			break;
+//		case 2:
+//			occursListReport.putParam("ReportCErrMsg", "保費未入帳");
+//			break;
+//		default:
+			occursListReport.putParam("ReportCErrMsg", "");
+//			break;
+//		}
 
 		totaC.addOccursList(occursListReport);
 	}
