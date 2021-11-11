@@ -371,7 +371,7 @@ TXFORM=L5905
 {width:80,align:'center'}
 
 #OOConditionCodeX=條件代碼
-{width:300,align:'left'}
+{width:250,align:'left'}
 
 #OOCustNoX=借款人戶號
 {width:100,align:'center'}
@@ -424,7 +424,7 @@ TXFORM=L5905
 {width:80,align:'center'}
 
 #OOConditionCodeX=條件代碼
-{width:300,align:'left'}
+{width:250,align:'left'}
 
 #OOCustNoX=借款人戶號
 {width:100,align:'center'}

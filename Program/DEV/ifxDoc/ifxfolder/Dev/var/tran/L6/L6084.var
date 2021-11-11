@@ -50,7 +50,7 @@ K(MODIFYBUTTON,查詢)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6084]                                 業績件數及金額核算標準查詢"],
-["#FdWorkMonth+工作月",#WorkMonth,"@(輸入0查全部)"],
+["#FdWorkMonth+工作年月",#WorkMonth,"@(輸入0查全部)"],
 ]
 
 #FdWorkMonth=X,2,L
@@ -148,8 +148,8 @@ TXFORM=L6084
 #OOBTN5=查詢
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN5',align:'center',canExport:false}
 
-#OOWorkMonth=工作月
-{width:60,align:'center'}
+#OOWorkMonth=工作年月
+{width:70,align:'center'}
 
 ^
 

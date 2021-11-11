@@ -1,0 +1,407 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+<sub type="PREDC" name="PreDC">
+
+! 介紹單位區塊的開關
+#HIDEUNITFG=A,1,S
+E(0,0)
+
+#HIDEUNIT=@,1,S
+C(3,#HIDEUNITFG,1,E(0,@HIDEUNITFG,0),E(0,@HIDEUNITFG,1))
+INVOKEJS(SHOW,p1,5,7,#HIDEUNITFG)
+
+! 介紹人區塊的開關
+#HIDEINTRODUCERFG=A,1,S
+E(0,0)
+
+#HIDEINTRODUCER=@,1,S
+C(3,#HIDEINTRODUCERFG,1,E(0,@HIDEINTRODUCERFG,0),E(0,@HIDEINTRODUCERFG,1))
+INVOKEJS(SHOW,p1,9,14,#HIDEINTRODUCERFG)
+
+! 房貸專員區塊的開關
+#HIDEAOFG=A,1,S
+E(0,0)
+
+#HIDEAO=@,1,S
+C(3,#HIDEAOFG,1,E(0,@HIDEAOFG,0),E(0,@HIDEAOFG,1))
+INVOKEJS(SHOW,p1,16,20,#HIDEAOFG)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[300,700];printer.width=[35,25,60];">
+[
+["[L6754]                                 業績件數及金額核算標準設定"],
+["#R1+@功能",#FuncCodeX],
+["#R2+@工作年月",#WorkMonth],
+["#R3+@計件代碼",#PieceCode,#PieceCodeX],
+[#BTN_UNIT],
+["#R4+@件數",#UnitCnt,#UnitCntX],
+["#R5+@計件金額門檻",#UnitAmtCond,#UnitAmtCondX,"元"],
+["#R6+@撥款業績比例",#UnitPercent,#UnitPercentX,"%"],
+[#BTN_INTRODUCER],
+["#R7+@介紹獎金比例",#IntrodPerccent,#IntrodPerccentX],
+["#R8+@介紹獎金門檻（新增額度）",#IntrodAmtCond,#IntrodAmtCondX,"元"],
+["#R9+@換算業績率（分母）",#IntrodPfEqBase,#IntrodPfEqBaseX],
+["#R10+@換算業績率（分子）",#IntrodPfEqAmt,#IntrodPfEqAmtX],
+["#R11+@業務報酬率（分母）",#IntrodRewardBase,#IntrodRewardBaseX],
+["#R12+@業務報酬率（分子）",#IntrodReward,#IntrodRewardX],
+[#BTN_AO],
+["#R13+@件數",#BsOffrCnt,#BsOffrCntX],
+["#R14+@件數上限",#BsOffrCntLimit,#BsOffrCntLimitX],
+["#R15+@計件金額門檻",#BsOffrAmtCond,#BsOffrAmtCondX,"元"],
+["#R17+@撥款業績比例",#BsOffrPerccent,#BsOffrPerccentX,"%"],
+]
+!["#R16+@計件金額門檻（動支、增貸）",#BsOffrCntAmt,#BsOffrCntAmtX,"元"],
+
+!隱藏INPUT,LABEL
+#WKHIDE=X,1,S
+HIDE(#UnitCnt,#UnitAmtCond,#UnitPercent,#IntrodPerccent,#IntrodAmtCond,#IntrodPfEqBase,#IntrodPfEqAmt,#IntrodRewardBase,#IntrodReward
+    ,#BsOffrCnt,#BsOffrCntLimit,#BsOffrAmtCond,#BsOffrPerccent,#UnitCntX,#UnitAmtCondX,#UnitPercentX,#IntrodPerccentX
+    ,#IntrodAmtCondX,#IntrodPfEqBaseX,#IntrodPfEqAmtX,#IntrodRewardBaseX,#IntrodRewardX
+    ,#BsOffrCntX,#BsOffrCntLimitX,#BsOffrAmtCondX,#BsOffrPerccentX)
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+#BTN_UNIT=X,15,I,ui:button;value:介紹單位;enable:0;tabbable:0
+#BTN_INTRODUCER=X,15,I,ui:button;value:介紹人;enable:0;tabbable:0
+#BTN_AO=X,15,I,ui:button;value:房貸專員;enable:0;tabbable:0
+#BUF1=X,42,S
+
+! 必輸欄位
+##loop{times:18,i:1}
+#R{i}=X,1,L
+INVOKEJS(SHOW,#R{i},0)
+!K(LIGHT,#R{i},TXTRED,0)
+##end
+
+! 永遠為必輸欄位
+#ALWAYS_HIGHLIGHT=@,1,S
+!T(3,@R1,*)
+!T(3,@R2,*)
+! C(3,#FuncCode,1,T(3,@R1,*),T(3,@R1, ))
+C(3,#FuncCode,1,T(3,@R2,*),T(3,@R2, ))
+C(3,#FuncCode,1,T(3,@R3,*),T(3,@R3, ))
+
+! FuncCode=1 新增時為必輸欄位
+#HIGHLIGHT_AFTER_FUNCD=@,1,S
+##loop{times:16,i:3}
+IF(#FuncCode==1 || #FuncCode==2,T(3,@R{i},*),T(3,@R{i}, ))
+IF(#FuncCode==1 || #FuncCode==2,INVOKEJS(SHOW,#R{i},1),INVOKEJS(SHOW,#R{i},0))
+##end
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode1 (1:新增;2:修改;4:刪除;5:查詢)
+#CDCODEFuncCode1=x,20,S                  
+T(3,CdCode.FuncCode1)                  
+#FuncCodeHelp=x,100,S
+
+!計件代碼
+#CDCODEPieceCode=x,20,S
+T(3,CdCode.PieceCode)
+#ApHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode1,#CDCODEPieceCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCodeHelp,#HelpDesc1)
+T(2,@ApHelp,#HelpDesc2)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+T(2,@RimTxCode,#TXCD)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L6084進入),$)
+
+#NTXBUF=X,7,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_WorkMonth=A,5,S
+T(1,#NTXBUF,2,5)
+
+#CHAIN_PieceCode=X,1,S
+T(1,#NTXBUF,7,1)
+
+C(3,#CHAIN,1,T(2,@FuncCode,#CHAIN_FuncCode),)
+C(3,#CHAIN,1,T(2,@WorkMonth,#CHAIN_WorkMonth),)
+C(3,#CHAIN,1,T(2,@PieceCode,#CHAIN_PieceCode),)
+
+#INIT=X,1,S
+CALL(#ALWAYS_HIGHLIGHT)
+
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCodeHelp)
+@V(H,#FuncCodeHelp)
+CALL(#HIGHLIGHT_AFTER_FUNCD)
+#FuncCodeX=X,4,L
+C(4,#FuncCode,S,$)
+T(3, )
+T(H,#FuncCode,#FuncCodeHelp)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢))
+C(3,#FuncCode,5,K(NOBUTTON,CLOSEY),$)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FuncCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+          
+!顯示INPUT,LABEL
+#WKSHOW=X,1,S
+IF (#FuncCode==1 || #FuncCode==2,SHOW(#UnitCnt,#UnitAmtCond,#UnitPercent,#IntrodPerccent,#IntrodAmtCond
+                               ,#IntrodPfEqBase,#IntrodPfEqAmt,#IntrodRewardBase,#IntrodReward
+                               ,#BsOffrCnt,#BsOffrCntLimit,#BsOffrAmtCond,#BsOffrPerccent)
+                           HIDE(#UnitCntX,#UnitAmtCondX,#UnitPercentX,#IntrodPerccentX,#IntrodAmtCondX
+                               ,#IntrodPfEqBaseX,#IntrodPfEqAmtX,#IntrodRewardBaseX,#IntrodRewardX
+                               ,#BsOffrCntX,#BsOffrCntLimitX,#BsOffrAmtCondX,#BsOffrPerccentX),
+                           SHOW(#UnitCntX,#UnitAmtCondX,#UnitPercentX,#IntrodPerccentX,#IntrodAmtCondX
+                               ,#IntrodPfEqBaseX,#IntrodPfEqAmtX,#IntrodRewardBaseX,#IntrodRewardX
+                               ,#BsOffrCntX,#BsOffrCntLimitX,#BsOffrAmtCondX,#BsOffrPerccentX)
+                           HIDE(#UnitCnt,#UnitAmtCond,#UnitPercent,#IntrodPerccent,#IntrodAmtCond
+                               ,#IntrodPfEqBase,#IntrodPfEqAmt,#IntrodRewardBase,#IntrodReward
+                               ,#BsOffrCnt,#BsOffrCntLimit,#BsOffrAmtCond,#BsOffrPerccent))
+
+! 工作月
+#WorkMonth=A,5,I
+C(3,#FuncCode,1,$,T(F,@WorkMonth,0))
+C(2,#FuncCode,S,$,s,$,s,s)
+@A(YM13,1,#WorkMonth)
+
+! 計件代碼 必須輸入
+! ~~~(綁約2年以下或未綁約)~~~
+! A: 新貸件
+! B: 新貸件(同押品,數額度之額度一以外)
+! C: 原額度內—動支件
+! D: 新增額度—增貸件(指有增加設定抵押權者)
+! E: 展期件
+! ~~~(有綁約2年(含)以上)~~~
+! 1: 新貸件
+! 2: 新貸件(同押品,數額度之額度一以外)
+! 3: 原額度內—動支件
+! 4: 新增額度—增貸件(指有增加設定抵押權者)
+! 5: 展期件
+! ~~~(無關綁約)~~~
+! 6: 原額度內—6個月內動支件(還款後6個月內再動支者)
+! 7: 服務件
+! 8: 特殊件
+! 9: 固特利契轉
+#PieceCode=X,1,I
+C(3,#FuncCode,1,$,T(F,@PieceCode,0))
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+HELP(#ApHelp,cols:2)
+@V(H,#ApHelp)
+
+#PieceCodeX=X,50,L
+@C(4,#PieceCode,S,T(H,#PieceCode,#ApHelp))
+
+#SendL6R21=X,1,S
+E(0,@RimFuncCode,#FuncCode)
+T(2,@RimWorkMonth,#WorkMonth)
+T(2,@RimPieceCode,#PieceCode)
+RESET_RIM(#SendL6R21,L6R21)
+S(L6R21,1,#RimFuncCode,#RimTxCode,#RimWorkMonth,#RimPieceCode)
+R(1,L6R21)
+
+E(0,@UnitCnt,#L6R21UnitCnt)
+E(0,@UnitAmtCond,#L6R21UnitAmtCond)
+E(0,@UnitPercent,#L6R21UnitPercent)
+E(0,@IntrodPerccent,#L6R21IntrodPerccent)
+E(0,@IntrodAmtCond,#L6R21IntrodAmtCond)
+E(0,@IntrodPfEqBase,#L6R21IntrodPfEqBase)
+E(0,@IntrodPfEqAmt,#L6R21IntrodPfEqAmt)
+E(0,@IntrodRewardBase,#L6R21IntrodRewardBase)
+E(0,@IntrodReward,#L6R21IntrodReward)
+E(0,@BsOffrCnt,#L6R21BsOffrCnt)
+E(0,@BsOffrCntLimit,#L6R21BsOffrCntLimit)
+E(0,@BsOffrAmtCond,#L6R21BsOffrAmtCond)
+E(0,@BsOffrPerccent,#L6R21BsOffrPerccent)
+
+
+! 介紹單位
+#INVK_UNIT=X,1,S
+ENABLE(#BTN_UNIT)
+C(3,#HIDEUNITFG,0,CALL(#HIDEUNIT),$)
+
+#BIND_UNIT=X,1,S
+BIND(#BTN_UNIT,click, {cmd=CALLSEND;DOCODE=HIDEUNIT})
+
+! 件數
+#UnitCnt=n,2.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#UnitCntX=n,2.2,L
+E(0,#UnitCnt)
+
+! 計件金額門檻
+#UnitAmtCond=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+C(1,#UnitCnt,S,S,$)
+#UnitAmtCondX=m,14,L
+E(0,#UnitAmtCond)
+
+! 撥款業績比例
+#UnitPercent=n,3.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#UnitPercentX=n,3.2,L
+E(0,#UnitPercent)
+
+! 介紹人
+#INVK_INTRODUCER=X,1,S
+ENABLE(#BTN_INTRODUCER)
+C(3,#HIDEINTRODUCERFG,0,CALL(#HIDEINTRODUCER),$)
+
+#BIND_INTRODUCER=X,1,S
+BIND(#BTN_INTRODUCER,click, {cmd=CALLSEND;DOCODE=HIDEINTRODUCER})
+
+! 介紹獎金比例
+#IntrodPerccent=n,3.6,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#IntrodPerccentX=n,3.6,L
+E(0,#IntrodPerccent)
+
+! 介紹獎金門檻（新增額度）
+#IntrodAmtCond=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#IntrodAmtCondX=m,14,L
+E(0,#IntrodAmtCond)
+
+! 換算業績率（分母）
+#IntrodPfEqBase=m,14.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#IntrodPfEqBaseX=m,14.2,L
+E(0,#IntrodPfEqBase)
+
+! [換算業績率（分子）
+#IntrodPfEqAmt=m,14.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+C(1,#IntrodPfEqBase,S,S,$)
+#IntrodPfEqAmtX=m,14.2,L
+E(0,#IntrodPfEqAmt)
+
+! 業務報酬率（分母）
+#IntrodRewardBase=m,14.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#IntrodRewardBaseX=m,14.2,L
+E(0,#IntrodRewardBase)
+
+! 業務報酬率（分子）
+#IntrodReward=m,14.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+C(1,#IntrodRewardBase,S,S,$)
+#IntrodRewardX=m,14.2,L
+E(0,#IntrodReward)
+
+
+! 房貸專員
+#INVK_AO=X,1,S
+ENABLE(#BTN_AO)
+C(3,#HIDEAOFG,0,CALL(#HIDEAO),$)
+
+#BIND_AO=X,1,S
+BIND(#BTN_AO,click, {cmd=CALLSEND;DOCODE=HIDEAO})
+
+! 件數
+#BsOffrCnt=n,2.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#BsOffrCntX=n,2.2,L
+E(0,#BsOffrCnt)
+
+! 件數上限
+#BsOffrCntLimit=n,2.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#BsOffrCntLimitX=n,2.2,L
+E(0,#BsOffrCntLimit)
+
+! 計件金額門檻
+#BsOffrAmtCond=m,14,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#BsOffrAmtCondX=m,14,L
+E(0,#BsOffrAmtCond)
+
+! 撥款業績比例
+#BsOffrPerccent=n,3.2,I
+C(2,#FuncCode,$,$,$,$,s,s)
+#BsOffrPerccentX=n,3.2,L
+E(0,#BsOffrPerccent)
+
+#RPTFG=A,1,S
+E(0,0)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R21Rim.dec"/>
+<include src="ROM.icf::L6R21.dec"/>
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L6754 ----------
+<sub type="FORM" name="L6754">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L6754,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L6754] 業績件數及金額核算標準設定)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode#WorkMonth#PieceCode#UnitCnt#UnitAmtCond#UnitPercent
+#IntrodPerccent#IntrodAmtCond#IntrodPfEqBase#IntrodPfEqAmt#IntrodRewardBase#IntrodReward
+#BsOffrCnt#BsOffrCntLimit#BsOffrAmtCond#BsOffrPerccent
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L6754
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L6R21.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

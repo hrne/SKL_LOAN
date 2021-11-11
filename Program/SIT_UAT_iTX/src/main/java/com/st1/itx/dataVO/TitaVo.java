@@ -139,7 +139,7 @@ public class TitaVo extends LinkedHashMap<String, String> {
 	public String getParam(String key) throws LogicException {
 		String value = this.get(key);
 		if (value == null)
-			throw new LogicException("CE000", "電文有誤,無此Tita欄位 [ " + key + "]");
+			throw new LogicException("CE000", "電文有誤,無此Tita欄位 [" + key + "]");
 
 		return value.trim();
 	}

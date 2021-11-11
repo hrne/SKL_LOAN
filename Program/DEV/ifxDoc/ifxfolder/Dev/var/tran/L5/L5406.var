@@ -1,0 +1,236 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5406)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5406" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5406]                                 晤談人員資料維護"],
+[#<->#,"#FdFunctionCdX+功能",#FunctionCdX],
+[#<->#,"#FdCustNo+借款人戶號",#CustNo,#CustName],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo],
+[#<->#,"#FdInterviewerA+晤談人員一",#InterviewerA,#BTNA,#InterviewerAX],
+[#<->#,"#FdInterviewerB+晤談人員二",#InterviewerB,#BTNB,#InterviewerBX],
+[#<->#,"#FdChgRsn+變更理由",#ChgRsn],
+[#<->#,"#FdCoorgnizer+協辦人員",#Coorgnizer,#CoorgnizerX],
+[#<->#,"#FdKeyiner+建檔人員",#Keyiner,#KeyinerX],
+]
+!---------- AP TEXT AREA Variables ----------
+#BTNA=X,1,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
+#BTNB=X,1,I,ui:button;value:員工資料查詢;enable:1;tabbable:0
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+!1功能
+#CDCODEFuncCode=x,20,S
+T(3,CdCode.FunctionCd)
+#FuncCodeHelp=x,100,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCodeHelp,#HelpDesc1)
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L5023進入),$)
+
+#NTXBUF=X,44,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunctionCd,#NTXBUF,1,1)
+T(1,@CustNo,#NTXBUF,2,7)
+T(1,@FacmNo,#NTXBUF,9,3)
+T(1,@InterviewerA,#NTXBUF,12,6)
+T(1,@InterviewerB,#NTXBUF,18,6)
+T(1,@Keyiner,#NTXBUF,24,6)
+T(1,@Coorgnizer,#NTXBUF,30,6)
+
+#PRE_EVELU=A,1,S
+
+IF(#FunctionCd == 1,T(F,@CustNo,1)T(F,@FacmNo,1),T(F,@CustNo,0)T(F,@FacmNo,0))
+IF(#FunctionCd == 4 || #FunctionCd == 5,T(F,@InterviewerA,0)T(F,@InterviewerB,0)T(F,@Coorgnizer,0)T(F,@Keyiner,0),
+                                        T(F,@InterviewerA,1)T(F,@InterviewerB,1)T(F,@Coorgnizer,1)T(F,@Keyiner,1))
+IF(#FunctionCd == 2 ,INVOKEJS(SHOW,L5406,6,6,1),INVOKEJS(SHOW,L5406,6,6,0))                                      
+IF(#FunctionCd==5,K(NOBUTTON,CLOSEY),$)    
+IF(#FunctionCd == 2 ,SHOW(#BTNA)SHOW(#BTNB),HIDE(#BTNA)HIDE(#BTNB))     
+
+C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除))
+
+#FdFunctionCdX=X,1,L
+T(2, )
+#FdCustNo=X,1,L
+T(2, )
+#FdFacmNo=X,1,L
+T(2, )
+#FdInterviewerA=X,1,L
+
+#FdInterviewerB=X,1,L
+
+#FdChgRsn=X,1,L
+T(2,*)
+#FdCoorgnizer=X,1,L
+T(2, )
+#FdKeyiner=X,1,L
+T(2, )
+
+IF(#FunctionCd==2,$,T(2,@FdInterviewerA, )T(2,@FdInterviewerB, )T(2,@FdChgRsn, ))  
+
+! 功能
+#FunctionCd=A,1,S
+HELP(#FuncCodeHelp)
+@V(H,#FuncCodeHelp)
+
+#FunctionCdX=X,4,L
+T(H,#FunctionCd,#FuncCodeHelp)
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FunctionCd,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+! 借款人戶號
+#CustNo=A,7,I
+C(3,#FunctionCd,1,$,s)
+@C(3,#CustNo,0,V(P,必須輸入),$)
+
+#Blank=X,1,S
+<include src="ROM.icf::L5R36.dec"/>     
+#RimL5R36=X,1,S
+#RimCustNo=A,7,S
+E(0,#CustNo)
+RESET_RIM(#RimL5R36,L5R36)
+S(L5R36,1,#RimCustNo)
+R(1,L5R36)
+T(2,@CustName,#L5R36CustName)
+
+#CustName=X,50,L
+! 額度編號
+#FacmNo=A,3,I
+C(3,#FunctionCd,1,$,s)
+@C(3,#FacmNo,0,V(P,必須輸入),$)
+! 晤談人員一
+#BUFA=X,7,S
+T(3,      Y)
+#BINDA=X,1,S
+BIND(#BTNA,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUFA;ntxbuf5=type<-1:InterviewerA<-OOEmployeeNo:InterviewerAX<-OOFullname})
+
+
+#InterviewerA=X,6,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+
+<include src="ROM.icf::L5R06.dec"/>     
+#RimL5R06=X,1,S
+#CdEmpRimEmpNo=X,6,S
+T(2,#InterviewerA)
+C(4,#InterviewerA,S,$)
+RESET_RIM(#RimL5R06,L5R06)
+S(L5R06,1,#CdEmpRimEmpNo)
+R(1,L5R06)
+T(2,@InterviewerAX,#L5R06FullName)
+
+! 晤談人員一姓名
+#InterviewerAX=X,40,L
+C(4,#InterviewerA,S,$)
+! 晤談人員二
+#BUFB=X,7,S
+T(3,      Y)
+#BINDB=X,1,S
+BIND(#BTNB,click, {cmd=CHAIN; ntxcd=L190A; ntxbuf=#BUFB;ntxbuf5=type<-1:InterviewerB<-OOEmployeeNo:InterviewerBX<-OOFullname})
+
+C(4,#InterviewerB,$,C(2,#FunctionCd,S,$,$,$,s,s))
+#InterviewerB=X,6,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+
+#Space=X,1,S
+T(2,@CdEmpRimEmpNo,#InterviewerB)
+C(4,#InterviewerB,S,$)
+RESET_RIM(#RimL5R06,L5R06)
+S(L5R06,1,#CdEmpRimEmpNo)
+R(1,L5R06)
+T(2,@InterviewerBX,#L5R06FullName)
+
+! 晤談人員二姓名
+#InterviewerBX=X,40,L
+C(4,#InterviewerB,S,$)
+! 變更理由
+#ChgRsn=X,120,I
+C(2,#FunctionCd,S,$,$,$,s,s)
+@V(7)
+
+! 協辦人員
+#Coorgnizer=X,6,L
+
+
+! 協辦人員姓名
+#CoorgnizerX=X,40,L
+C(4,#Coorgnizer,S,$)
+T(2,@CdEmpRimEmpNo,#Coorgnizer)
+RESET_RIM(#RimL5R06,L5R06)
+S(L5R06,1,#CdEmpRimEmpNo)
+R(1,L5R06)
+T(2,@CoorgnizerX,#L5R06FullName)
+
+! 建檔人員
+#Keyiner=X,6,L
+C(3,#FunctionCd,1,T(4,TLRNO$),$)
+T(2,@CdEmpRimEmpNo,#Keyiner)
+RESET_RIM(#RimL5R06,L5R06)
+S(L5R06,1,#CdEmpRimEmpNo)
+R(1,L5R06)
+T(2,@KeyinerX,#L5R06FullName)
+
+! 建檔人員姓名
+#KeyinerX=X,40,L
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5406 -----------
+<sub type="FORM" name="L5406">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCd
+#CustNo
+#FacmNo
+#InterviewerA
+#InterviewerB
+#Keyiner
+#Coorgnizer
+#ChgRsn
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R06.tom"/>
+<include src="ROM.icf::L5R36.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L5406
+
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

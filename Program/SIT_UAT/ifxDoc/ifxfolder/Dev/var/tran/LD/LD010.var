@@ -53,11 +53,11 @@ T(3,LD010)
 #inputMonth=A,2,I
 @V(5,1,13)
 
-#inputYearMonth=A,5,S
+#inputWorkMonth=A,5,S
 T(2,#inputYear+#inputMonth)
 
 #RimWorkMonth=A,5,S
-T(2,#inputYearMonth)
+T(2,#inputWorkMonth)
 E(0,#RimWorkMonth-1)
 ! -1: 條件是小於等於會計日之工作月;
 !     但L6R34僅分 小於 : 大於等於 兩種結果
@@ -122,7 +122,7 @@ IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
 
 !------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
 <sub type="TIM">
-#inputYearMonth
+#inputWorkMonth
 #END
 </sub>
 !------ 下行電文TOM ------

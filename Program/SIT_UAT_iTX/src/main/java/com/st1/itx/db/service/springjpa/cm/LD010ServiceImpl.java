@@ -33,7 +33,9 @@ public class LD010ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 		this.info("LD010ServiceImpl findAll");
 
-		int inputWorkMonth = Integer.parseInt(titaVo.getParam("inputWorkMonth")) + 19110000;
+		int inputWorkMonth = Integer.parseInt(titaVo.getParam("inputWorkMonth")) + 191100;
+
+		this.info("inputWorkMonth = " + inputWorkMonth);
 
 		String sql = "";
 		sql += " WITH S0 AS ( ";
@@ -100,7 +102,7 @@ public class LD010ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " FROM S0 ";
 		sql += " GROUP BY S0.CustNo ";
 		sql += "        , S0.FacmNo ";
-		
+
 		this.info("sql=" + sql);
 		Query query;
 

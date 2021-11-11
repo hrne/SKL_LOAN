@@ -60,55 +60,59 @@ public class L5062 extends TradeBuffer {
 		
 		if (iCdCity == null) {
 			throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
-		}else {
-			for (CdCity rCdCity :iCdCity) {
+		} else {
+			for (CdCity rCdCity : iCdCity) {
 				OccursList occursList = new OccursList();
 				CdEmp iCdEmp = new CdEmp();
 				String iEmpNo = "";
+				String iAccTelArea = "";
+				String iAccTelNo = "";
+				String iAccTelExt = "";
+				String iAccCollPsnX = "";
+
 				occursList.putParam("OOCityCode", rCdCity.getCityCode());
 				occursList.putParam("OOCityItem", rCdCity.getCityItem());
 				occursList.putParam("OOUnitCode", rCdCity.getUnitCode());
-				iEmpNo = rCdCity.getAccCollPsn();
+
+				iEmpNo = rCdCity.getAccCollPsn();// 催收人員
 				if (!iEmpNo.trim().isEmpty() || !iEmpNo.equals("")) {
-					occursList.putParam("OOAccCollPsn", iEmpNo);
-					occursList.putParam("OOAccTelArea", rCdCity.getAccTelArea());
-					occursList.putParam("OOAccTelNo", rCdCity.getAccTelNo());
-					occursList.putParam("OOAccTelExt", rCdCity.getAccTelExt());
-					
+					iAccTelArea = rCdCity.getAccTelArea();
+					iAccTelNo = rCdCity.getAccTelNo();
+					iAccTelExt = rCdCity.getAccTelExt();
 					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
-					if (iCdEmp == null) {
-						occursList.putParam("OOAccCollPsnX", "");
-					}else {
-						occursList.putParam("OOAccCollPsnX", iCdEmp.getFullname());
+					if (iCdEmp != null) {
+						iAccCollPsnX = iCdEmp.getFullname();
 					}
-				}else{
-					occursList.putParam("OOAccCollPsn", "");
-					occursList.putParam("OOAccTelArea", "");
-					occursList.putParam("OOAccTelNo", "");
-					occursList.putParam("OOAccTelExt", "");
 				}
-				iEmpNo = rCdCity.getLegalPsn();
+				occursList.putParam("OOAccCollPsn", iEmpNo);
+				occursList.putParam("OOAccTelArea", iAccTelArea);
+				occursList.putParam("OOAccTelNo", iAccTelNo);
+				occursList.putParam("OOAccTelExt", iAccTelExt);
+				occursList.putParam("OOAccCollPsnX", iAccCollPsnX);
+
+				iEmpNo = rCdCity.getLegalPsn();// 法務人員
+				String iLegalArea = "";
+				String iLegalNo = "";
+				String iLegalExt = "";
+				String iLegalPsnX = "";
 				if (!iEmpNo.trim().isEmpty() || !iEmpNo.equals("")) {
-					occursList.putParam("OOLegalPsn", iEmpNo);
-					occursList.putParam("OOLegalArea", rCdCity.getLegalArea());
-					occursList.putParam("OOLegalNo", rCdCity.getLegalNo());
-					occursList.putParam("OOLegalExt", rCdCity.getLegalExt());
+					iLegalArea = rCdCity.getLegalArea();
+					iLegalNo = rCdCity.getLegalNo();
+					iLegalExt = rCdCity.getLegalExt();
 					iCdEmp = sCdEmpService.findById(iEmpNo, titaVo);
-					if (iCdEmp == null) {
-						occursList.putParam("OOLegalPsnX", "");
-					}else {
-						occursList.putParam("OOLegalPsnX", iCdEmp.getFullname());
+					if (iCdEmp != null) {
+						iLegalPsnX = iCdEmp.getFullname();
 					}
-				}else{
-					occursList.putParam("OOLegalPsn", "");
-					occursList.putParam("OOLegalArea", "");
-					occursList.putParam("OOLegalNo", "");
-					occursList.putParam("OOLegalExt", "");
 				}
+				occursList.putParam("OOLegalPsn", iEmpNo);
+				occursList.putParam("OOLegalArea", iLegalArea);
+				occursList.putParam("OOLegalNo", iLegalNo);
+				occursList.putParam("OOLegalExt", iLegalExt);
+				occursList.putParam("OOLegalPsnX", iLegalPsnX);
+
 				this.totaVo.addOccursList(occursList);
 			}
-		}
-		
+		}		
 
 		this.addList(this.totaVo);
 		return this.sendList();

@@ -48,17 +48,17 @@ public class LC100 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active LC100 ");
 		this.totaVo.init(titaVo);
-		
+
 		CdEmp tCdEmp = tCdEmpService.findById(titaVo.getTlrNo(), titaVo);
-		
-		if(tCdEmp!=null) {
-			if(tCdEmp.getFullname().trim().isEmpty()) {
-				throw new LogicException("EC001", "員工資料檔員編姓名空白:" + titaVo.getTlrNo());	
+
+		if (tCdEmp != null) {
+			if (tCdEmp.getFullname().trim().isEmpty()) {
+				throw new LogicException("EC001", "員工資料檔員編姓名空白:" + titaVo.getTlrNo());
 			}
 		} else {
 			throw new LogicException("EC001", "員工資料檔員編不存在:" + titaVo.getTlrNo());
 		}
-		
+
 		TxTeller tTxTeller = txTellerService.holdById(titaVo.getTlrNo());
 
 		if (tTxTeller != null) {
@@ -104,11 +104,8 @@ public class LC100 extends TradeBuffer {
 				default:
 					s = "";
 				}
-				String ss = "";
-				if (!"".equals(s)) {
-					ss = "(" + s + ")";
-				}
-				this.totaVo.putParam("BRNAME", tCdBranch.getBranchItem() + ss);
+				s = s.trim();
+				this.totaVo.putParam("BRNAME", tCdBranch.getBranchItem());
 				this.totaVo.putParam("BANKNO", "");
 				this.totaVo.putParam("FXLVL", "0");
 				this.totaVo.putParam("BCURCD", "00");
