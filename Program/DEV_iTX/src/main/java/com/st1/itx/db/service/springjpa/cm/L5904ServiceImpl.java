@@ -16,8 +16,6 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L5904ServiceImpl")
 @Repository
@@ -29,12 +27,6 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
-
-	@Autowired
-	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	private String sql = "";
 
@@ -59,7 +51,7 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 //		T(3,01:未還;02:已還;09:全部)
@@ -103,11 +95,12 @@ public class L5904ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!"00".equals(usageCode)) {
 			sql += "   and \"UsageCode\" = " + usageCode;
 		}
-		if(type == 1) {
-		  sql += "   and i.\"ApplCode\" = 01  " ;
-		  sql += "   and NVL(i2.\"CustNo\",0) = 0                             ";
+		if (type == 1 || type == 2) {
+			sql += "   and i.\"ApplCode\" = 01  ";
+			sql += "   and NVL(i2.\"CustNo\",0) = 0                             ";
 		}
-
+		sql += " order by  i.\"UsageCode\",i.\"ApplDate\",i.\"CustNo\"                          ";
+		
 		this.info("sql=" + sql);
 		Query query;
 

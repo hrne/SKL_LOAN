@@ -88,13 +88,13 @@ INVOKEJS(SHOW,p1,13,18,0)
 <sub type="DC" name="p1" layout="cols=3;screen.width=[150,350,150,450];printer.width=[20,80];order=1">
 [
 ["[L3200]                                 回收登錄"],
-[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN1,#CustNoX],
+[#<->#,"#FdCustNo+借戶戶號",#CustNo,"@@@",#BTN6,#CustNoX],
 [#<->#,"#FdCustId+統一編號",#CustId,#BTN2,#CustIdX],
 [#<->#,"#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate,"@",#BTN4],
 [#<->#,"#FdRepayType+還款類別",#RepayType,#RepayTypeX], 
-[#<->#,"#FdFacmNo+額度編號",#FacmNo],
-[#<->#,"#FdBormNo+撥款序號",#BormNo],
+[#<->#,"#FdFacmNo+額度編號",#FacmNo,"@",#BTN1],
+[#<->#,"#FdBormNo+撥款序號",#BormNo,"@",#BTN7],
 [#<->#,"#FdCurrencyCode+幣別",#CurrencyCode], 
 [#<->#,"#FdRepayTerms+回收期數",#RepayTerms,"@@",#BTN5],
 [#<->#,"#FdRepayAmt+回收金額",#TwRepayAmt,#UsRepayAmt],
@@ -119,10 +119,24 @@ INVOKEJS(SHOW,p1,13,18,0)
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
 #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
 #BTN5=X,15,I,ui:button;value:回收試算;enable:1;tabbable:0;title: L3921 回收試算;
+#BTN6=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
+#BTN7=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢;
+
+#BIND1AS=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
+#BIND2AS=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+#BIND3AS=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+#BIND6AS=X,1,S
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF6A;ntxbuf5=type<-1:CustNo<-OOCustNo})
+#BIND7AS=X,1,S
+BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF7A;ntxbuf5=type<-1:BormNo<-OOBormNo:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
 #BUF1=X,42,S
 HIDE(#UsRepayAmt,#UsOvduRepay,#UsCloseBreachAmt,#CloseBreachAmtX,#UsExtraRepay,#UsReduceAmt)
-HIDE(#BTN1,#BTN2,#BTN3)SHOW(#BTN4)
+HIDE(#BTN1,#BTN2,#BTN3,#BTN5,#BTN6,#BTN7)SHOW(#BTN4)
+
 !---------- AP TEXT AREA Variables ----------
 
 ! Help
@@ -198,11 +212,9 @@ C(3,#CHAIN,1,T(1,#NTXBUF,1,2),S)
 #WKFUNC=X,1,S
 T(3,1)
 
-#BUF1A=X,18,S
+#BUF6A=X,18,S
 T(2,00000009999999000)
 
-#BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
 
 ![借戶戶號]
 !借戶戶號, 統一編號或核准編號擇一輸入
@@ -211,7 +223,7 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<
 #CustNo=A,7,I
 C(3,#CHAIN,1,s,$)
 INVOKEJS(SHOW,p1,1,3,1)
-SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+SHOW(#BTN6)HIDE(#BTN1,#BTN2,#BTN3,#BTN7)
 @
 C(3,#CustNo,#TempCustNo,$,CALL(#InitValue))
 E(0,@TempCustNo,#CustNo)
@@ -219,12 +231,12 @@ E(0,@TempCustNo,#CustNo)
 #WKBTN1=X,1,S
 C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
 
-#BUF1B=X,18,S
+#BUF6B=X,18,S
 C(3,#CustNo,0,T(2,00000009999999000),T(2,#CustNo+#CustNo+000))
 
 
-#BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo:TimCustNo<-OOCustNo})
+#BIND6B=X,1,S
+BIND(#BTN6,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF6B;ntxbuf5=type<-1:CustNo<-OOCustNo})
 
 #SendL2r07A=X,1,S
 C(3,#CustNo,0,S,$)
@@ -239,8 +251,6 @@ C(3,#CustNo,0,S,T(2,#L2r07CustName))
 
 #BUF2A=X,100,S
 
-#BIND2A=X,1,S
-BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
 
 ![統一編號]
 #FdCustId=X,2,L
@@ -250,7 +260,7 @@ T(3,@FdApplNo, )
 C(3,#CHAIN,1,S,$)
 C(3,#CustNo,0,$,S)
 INVOKEJS(SHOW,p1,2,3,1)
-SHOW(#BTN2)HIDE(#BTN3)
+SHOW(#BTN2)HIDE(#BTN1,#BTN6,#BTN3,#BTN7)
 CALL(#InitValue)
 @C(4,#CustId,S,$)
 V(7)
@@ -283,8 +293,6 @@ C(4,#CustId,S,T(2,#L2r07CustName))
 #BUF3A=X,18,S
 T(3,000000099999990)
 
-#BIND3A=X,1,S
-BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
 
 ![核准編號]
 #FdApplNo=X,2,L
@@ -298,7 +306,7 @@ C(3,#CHAIN,1,S,$)
 C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
 INVOKEJS(SHOW,p1,3,3,1)
-SHOW(#BTN3)
+SHOW(#BTN3)HIDE(#BTN1,#BTN6,#BTN2,#BTN7)
 CALL(#InitValue)
 @V(2,0)
 
@@ -462,19 +470,32 @@ C(3,#RepayType,9,INVOKEJS(SHOW,p1,12,12,1),$)
 C(3,#RepayType,9,INVOKEJS(SHOW,p1,14,20,0),$)
 C(3,#RepayType,12,INVOKEJS(SHOW,p1,11,11,1),$)
 
+#BUF1A=X,18,S
+T(2,00000009999999000)
+
+#BUF1B=X,18,S
+T(2,#TimCustNo+#TimCustNo+000)
+
+
+#BIND1B=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+
 ![額度編號]
 !可不輸入
 #FdFacmNo=X,2,L
-T(F,@FacmNo,0)
 C(3,#CHAIN,1,s,$)
 C(3,#ApplNo,0,$,s)
 C(3,#L492aRepayType,0,$,s)
-! T(F,@FacmNo,1)
 
 #FacmNo=A,3,I
 C(3,#CHAIN,1,C(5,#txcdtype,L4,$,s),$)
+C(3,#ApplNo,0,T(F,@FacmNo,1),T(F,@FacmNo,0))
 C(3,#ApplNo,0,$,s)
 C(3,#L492aRepayType,0,$,$)
+SHOW(#BTN1)HIDE(#BTN3,#BTN6,#BTN2,#BTN7)
+
+
+
 
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
@@ -496,8 +517,11 @@ RESET_RIM(#SendL2r01,L2R01)
 S(L2R01,1,#RimFuncCode,#RimTxCode,#RimProdNo)
 R(1,L2R01)
 
-![撥款序號]
-!可不輸入
+#BUF7A=X,18,S
+T(2,0000000+#CustNo+#CustId+#ApplNo+000)
+
+! [撥款序號]
+! 可不輸入
 #FdBormNo=X,2,L
 
 #BormNo=A,3,I
@@ -506,7 +530,16 @@ C(3,#CHAIN,1,s,$)
 C(3,#FacmNo,0,T(F,#BormNo,0),T(F,#BormNo,1))
 C(3,#FacmNo,0,S,$)
 C(3,#RepayType,9,S,$)
+SHOW(#BTN7)HIDE(#BTN3,#BTN6,#BTN2,#BTN1)
 ! @C(3,#RepayType,2,V(2,0),$)
+
+
+#BUF7B=X,18,S
+T(2,0000000+#CustNo+#CustId+#ApplNo+000)
+
+
+#BIND7B=X,1,S
+BIND(#BTN7,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF7B;ntxbuf5=type<-1:BormNo<-OOBormNo:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
 #SendL3r02=X,1,S
 C(3,#BormNo,0,S,$)
@@ -564,6 +597,7 @@ C(3,#RepayType,12,S,$)
 C(5,#L2r01CharCode,2,E(0,1),$)
 C(5,#L2r01CharCode,2,s,$)
 C(3,#RepayType,1,$,S)
+@SHOW(#BTN5)
 
 #BUF5=X,50,S
 T(2,#TXCD+#TimCustNo+#FacmNo+#BormNo+#CurrencyCode+#TimExtraRepay+#EntryDate+#IncludeIntFlag+#RepayTerms)

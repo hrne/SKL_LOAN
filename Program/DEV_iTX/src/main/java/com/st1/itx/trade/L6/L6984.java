@@ -138,6 +138,7 @@ public class L6984 extends TradeBuffer {
 		if (lTxToDoDetail != null && lTxToDoDetail.size() != 0) {
 			for (TxToDoDetail tTxToDoDetail : lTxToDoDetail) {
 				OccursList occursList = new OccursList();
+				tTempVo = new TempVo();
 				this.info("custno = " + tTxToDoDetail.getCustNo());
 				this.info("facmno = " + tTxToDoDetail.getFacmNo());
 				this.info("bormno = " + tTxToDoDetail.getBormNo());

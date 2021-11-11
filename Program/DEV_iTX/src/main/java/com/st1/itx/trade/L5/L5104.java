@@ -12,6 +12,10 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdEmp;
+import com.st1.itx.db.domain.CustMain;
+import com.st1.itx.db.service.CdEmpService;
+import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.springjpa.cm.L5904ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -53,6 +57,12 @@ public class L5104 extends TradeBuffer {
 
 	@Autowired
 	public L5904ServiceImpl l5904ServiceImpl;
+	
+	@Autowired
+	public CustMainService sCustMainService;
+	
+	@Autowired
+	public CdEmpService sCdEmpService;
 
 	private int reportFlag = 0;
 	private int startDate = 0;
@@ -61,7 +71,11 @@ public class L5104 extends TradeBuffer {
 	private int reportACnt = 0;
 	private int reportBCnt = 0;
 	private int reportCCnt = 0;
+	private String custName = "";
+	private String empnoName = "";
+	private int custno = 0;
 
+	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5104 ");
@@ -145,11 +159,27 @@ public class L5104 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 				OccursList occursListReport = new OccursList();
 				occursListReport.putParam("ReportACustNo", result.get("F0"));
+				custName = getName(result.get("F0"),1,titaVo);
+				occursListReport.putParam("ReportACustName", custName);
+				
 				occursListReport.putParam("ReportAFacmNo", result.get("F1"));
 				occursListReport.putParam("ReportAUsageCode", result.get("F9"));
+				
 				occursListReport.putParam("ReportAApplEmpNo", result.get("F5"));
+				empnoName = getName(result.get("F5"),2,titaVo);
+				occursListReport.putParam("ReportAApplName", empnoName);
+				
 				occursListReport.putParam("ReportAKeeperEmpNo", result.get("F4"));
-
+				empnoName = getName(result.get("F4"),2,titaVo);
+				occursListReport.putParam("ReportAKeeperName", empnoName);
+				if(Integer.parseInt(result.get("F6"))!=0){
+					occursListReport.putParam("ReportAApplDate", Integer.parseInt(result.get("F6"))-19110000);
+				} else {
+					occursListReport.putParam("ReportAApplDate", 0);
+				}
+					
+				
+				
 				totaVoA.addOccursList(occursListReport);
 			}
 			reportACnt = resultList.size();
@@ -172,9 +202,33 @@ public class L5104 extends TradeBuffer {
 			for (Map<String, String> result : resultList) {
 				OccursList occursListReport = new OccursList();
 				occursListReport.putParam("ReportBCustNo", result.get("F0"));
-				occursListReport.putParam("ReportBFacmNo", result.get("F1"));
+				custName = getName(result.get("F0"),1,titaVo);
+				occursListReport.putParam("ReportBCustName", custName);
+				
+				occursListReport.putParam("ReportBFacmNo", result.get("F1")); //借閱人
 				occursListReport.putParam("ReportBApplEmpNo", result.get("F5"));
-				occursListReport.putParam("ReportBKeeperEmpNo", result.get("F4"));
+				empnoName = getName(result.get("F5"),2,titaVo);
+				occursListReport.putParam("ReportBApplName", empnoName);
+				
+				occursListReport.putParam("ReportBKeeperEmpNo", result.get("F4"));//管理人
+				empnoName = getName(result.get("F4"),2,titaVo);
+				occursListReport.putParam("ReportBKeeperName", empnoName);
+				
+				
+				occursListReport.putParam("ReportBReturnEmpNo", result.get("F8"));//歸還人
+				empnoName = getName(result.get("F8"),2,titaVo);
+				occursListReport.putParam("ReportBReturnName", empnoName);
+				if(Integer.parseInt(result.get("F6"))!=0){
+					occursListReport.putParam("ReportBApplDate", Integer.parseInt(result.get("F6"))-19110000);
+				} else {
+					occursListReport.putParam("ReportBApplDate", 0);
+				}
+				if(Integer.parseInt(result.get("F7"))!=0) {
+					occursListReport.putParam("ReportBReturnDate", Integer.parseInt(result.get("F7"))-19110000);
+				} else {
+					occursListReport.putParam("ReportBReturnDate", 0);
+				}
+				
 
 				totaVoB.addOccursList(occursListReport);
 			}
@@ -261,4 +315,48 @@ public class L5104 extends TradeBuffer {
 			totaVoC.addOccursList(occursListReport);
 		}
 	}
+	
+	public  String getName(String number,int Type,TitaVo titaVo) {
+		//Type = 1 客戶檔 Type = 2 員工檔
+		this.info("getName = "+number+","+ Type);
+		String name = "";
+		
+		switch(Type) {
+		case 1:
+			custno = Integer.parseInt(number);
+			
+			CustMain tCustMain = new CustMain();
+			tCustMain = sCustMainService.custNoFirst(custno, custno, titaVo);
+			
+			if(tCustMain!=null) {
+				name = tCustMain.getCustName();
+				
+				if(name.length()>10) {
+					name = name.substring(0, 10);
+				}
+			} 
+			
+			
+			break;
+		
+		case 2 :
+			
+			CdEmp tCdEmp = new CdEmp();
+			tCdEmp = sCdEmpService.findById(number, titaVo);
+			
+			if(tCdEmp!=null) {
+				name = tCdEmp.getFullname();
+				
+				if(name.length()>5) {
+					name = name.substring(0, 5);
+				}
+			} 
+			
+			
+			break;
+		
+		}
+		return name;
+	}
+	
 }

@@ -1052,7 +1052,7 @@ T(H,#IntCalcCode,#ProdIntCalcCodeHelp)
 !2021/8/30 額度資料改為不可修改純顯示
 #AmortizedCode=A,1,L
 C(5,#L2r01CharCode,2,s,$)
-HELP(#FacmAmortizedCodeHelp)
+! HELP(#FacmAmortizedCodeHelp)
 ! @V(H,#FacmAmortizedCodeHelp)
 ! C(3,#AcctCode,330,V(2,1),$)
 ! C(3,#AcctCode,340,V(2,1),$)
@@ -1071,7 +1071,7 @@ T(H,#AmortizedCode,#FacmAmortizedCodeHelp)
 
 !2021/8/30 額度資料改為不可修改純顯示
 #FreqBase=A,1,L
-HELP(#FreqBaseHelp)
+! HELP(#FreqBaseHelp)
 !到期取息者,週期基準固定為月不必輸入
 C(3,#AmortizedCode,2,E(0,2),$)
 C(3,#AmortizedCode,2,s,$)  

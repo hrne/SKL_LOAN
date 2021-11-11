@@ -1,0 +1,11 @@
+ReportBCustNo=9,7
+ReportBFacmNo=9,3
+ReportBCustName=X,20
+ReportBApplEmpNo=X,6
+ReportBApplName=X,10
+ReportBKeeperEmpNo=X,6
+ReportBKeeperName=X,10
+ReportBReturnEmpNo=X,6
+ReportBReturnName=X,10
+ReportBApplDate=9,7
+ReportBReturnDate=9,7

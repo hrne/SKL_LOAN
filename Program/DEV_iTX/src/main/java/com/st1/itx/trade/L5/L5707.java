@@ -21,7 +21,6 @@ import com.st1.itx.db.service.NegTransService;
 
 /*DB服務*/
 
-
 /* 交易共用組件 */
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.NegReportCom;
@@ -33,7 +32,6 @@ import com.st1.itx.util.parse.Parse;
 
 /*DB服務*/
 
-
 @Service("L5707")
 @Scope("prototype")
 /**
@@ -44,7 +42,6 @@ import com.st1.itx.util.parse.Parse;
  */
 //最大債權撥付產檔
 public class L5707 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5707.class);
 	/* DB服務注入 */
 	@Autowired
 	public NegReportCom NegReportCom;
@@ -58,7 +55,7 @@ public class L5707 extends TradeBuffer {
 	public NegFinShareService sNegFinShareService;
 	@Autowired
 	public NegFinAcctService sNegFinAcctService;
-	
+
 	@Autowired
 	public NegCom NegCom;
 
@@ -75,23 +72,23 @@ public class L5707 extends TradeBuffer {
 		this.info("active L5707 ");
 		this.info("L5707 Run");
 		this.totaVo.init(titaVo);
-		String BringUpDate = titaVo.getParam("BringUpDate").trim();//提兌日
-		
-		if(BringUpDate!=null && BringUpDate.length()!=0) {
-			long sno=0L;
-			if(titaVo.isHcodeNormal()) {
-				//正向
+		String BringUpDate = titaVo.getParam("BringUpDate").trim();// 提兌日
+
+		if (BringUpDate != null && BringUpDate.length() != 0) {
+			long sno = 0L;
+			if (titaVo.isHcodeNormal()) {
+				// 正向
 				StringBuffer sbData = NegReportCom.BatchTx01(BringUpDate, titaVo);
-				sno=NegReportCom.CreateTxt(titaVo,sbData, "BACHTX01");
-				this.info("L5707 sno=["+sno+"]");
-			}else {
-				//訂正
+				sno = NegReportCom.CreateTxt(titaVo, sbData, "BATCHTX01");
+				this.info("L5707 sno=[" + sno + "]");
+			} else {
+				// 訂正
 				NegReportCom.BatchTx01(BringUpDate, titaVo);
-				//InsUpdNegApprO1<-在這裡面處理
+				// InsUpdNegApprO1<-在這裡面處理
 			}
 			totaVo.put("TxtSnoF", "" + sno);
-		}else {
-			//E5009 資料檢核錯誤
+		} else {
+			// E5009 資料檢核錯誤
 			throw new LogicException(titaVo, "E5009", "[提兌日]為空值");
 		}
 

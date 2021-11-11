@@ -37,7 +37,7 @@ E(0,0)
 !HIDE(#BTN1)
 
 #button=x,100,S
-T(2,{cmd=CHAIN; ntxcd=L5105; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+T(2,{cmd=CHAIN; ntxcd=L5107; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
 K(MODIFYBUTTON,1,新增)
 K(MODIFYBUTTON,查詢)
 
@@ -48,8 +48,8 @@ K(MODIFYBUTTON,查詢)
 [
 ["[L5905]                                 覆審案件明細檔查詢"],
 ["#FdInqFg+查詢條件",#InqFg,#InqFgX],
-["#FdYear+資料年月",#YearMonth],
 ["#FdConditionCode+條件代碼",#ConditionCode,#ConditionCodeX],
+["#FdYear+資料年月",#YearMonth],
 ["#FdYearS+資料年份",#YearS,"~",#YearE],
 ["#FdReChkMonth+覆審月份",#ReChkMonth],
 ["#FdCustNo+借款人戶號",#CustNo],
@@ -148,11 +148,7 @@ SWITCH(#InqFg,1,INVOKEJS(SHOW,p1,2,3,1)INVOKEJS(SHOW,p1,4,5,0)INVOKEJS(SHOW,p1,7
               3,INVOKEJS(SHOW,p1,2,6,0)INVOKEJS(SHOW,p1,7,7,1),
               4,INVOKEJS(SHOW,p1,2,7,0),)
 
-!資料年月
-#YearMonth=A,5,I
-C(3,#InqFg,1,$,S)
-T(1,#DATE,2,5)
-@V(2,0)A(YM,0,#YearMonth)
+
 
 !條件代碼
 #ConditionCode=A,2,I
@@ -163,6 +159,13 @@ HELP(#ConditionHelp)
 #ConditionCodeX=X,40,L
 C(3,#InqFg,1,$,S)
 T(H,#ConditionCode,#ConditionHelp)
+
+!資料年月
+#YearMonth=A,5,I
+C(3,#InqFg,1,$,S)
+C(3,#ConditionCode,99,S,$)
+T(1,#DATE,2,5)
+@V(2,0)A(YM,0,#YearMonth)
 
 !資料年份-S
 #YearS=A,3,I

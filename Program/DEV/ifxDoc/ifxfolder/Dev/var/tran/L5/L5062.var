@@ -129,8 +129,8 @@ T(2,-)
 #OOAccTelCombine=X,24,L
 IF(#OOAccTelNo=="",S,$)
 IF(#OOAccTelArea=="",
-   IF(#OOAccTelExt=="",T(2,#OOAccTelNo),T(2,#OOAccTelNo+ +#DASH1+#OOAccTelExt)),
-   IF(#OOAccTelExt=="",T(2,#OOAccTelArea+#DASH1+ +#OOAccTelNo),T(2,#OOAccTelArea+#DASH1+ +#OOAccTelNo+ +#DASH1+#OOAccTelExt)))
+   IF(#OOAccTelExt=="",T(2,#OOAccTelNo),T(2,#OOAccTelNo+#DASH1+ +#OOAccTelExt)),
+   IF(#OOAccTelExt=="",T(2,#OOAccTelArea+#DASH1+ +#OOAccTelNo),T(2,#OOAccTelArea+#DASH1+ +#OOAccTelNo+#DASH1+ +#OOAccTelExt)))
 
 
 #OOLegalPsnCombine=X,150,L
@@ -139,8 +139,8 @@ T(2,#OOLegalPsn+ +#OOLegalPsnX)
 #OOLegalCombine=X,24,L
 IF(#OOLegalNo=="",S,$)
 IF(#OOLegalArea=="",
-   IF(#OOLegalExt=="",T(2,#OOLegalNo),T(2,#OOLegalNo+ +#DASH1+#OOLegalExt)),
-   IF(#OOLegalExt=="",T(2,#OOLegalArea+#DASH1+ +#OOLegalNo),T(2,#OOLegalArea+#DASH1+ +#OOLegalNo+ +#DASH1+#OOLegalExt)))
+   IF(#OOLegalExt=="",T(2,#OOLegalNo),T(2,#OOLegalNo+#DASH1+ +#OOLegalExt)),
+   IF(#OOLegalExt=="",T(2,#OOLegalArea+#DASH1+ +#OOLegalNo),T(2,#OOLegalArea+#DASH1+ +#OOLegalNo+#DASH1+ +#OOLegalExt)))
 
 ! 修改的按鈕
 #OOFunc2=A,1,S

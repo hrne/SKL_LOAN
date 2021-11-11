@@ -205,10 +205,15 @@ T(2, )
 #OOTelExt=X,5,O
 @C(4,#OOTelExt,S,V(9))
 
+#DASH1=X,1,S
+T(2,-)
 
 ! 聯絡電話
-#OOTelPhone=X,22,O
-T(2,#OOTelArea+#SPACE+#OOTelNo+#SPACE+#OOTelExt)
+#OOTelPhone=X,24,O
+IF(#OOTelNo=="",S,$)
+IF(#OOTelArea=="",
+   IF(#OOTelExt=="",T(2,#OOTelNo),T(2,#OOTelNo+#DASH1+ +#OOTelExt)),
+   IF(#OOTelExt=="",T(2,#OOTelArea+#DASH1+ +#OOTelNo),T(2,#OOTelArea+#DASH1+ +#OOTelNo+#DASH1+ +#OOTelExt)))
 
 ! 通話結果
 #OOResultCode=A,1,O
@@ -327,7 +332,7 @@ TXFORM=L5961
 #OORemark=其他記錄
 {width:80}
 #EditEmp=修改人員
-{width:80,align:'center'}
+{width:100,align:'center'}
 #OOTitaTxtNo=交易序號
 {width:80,align:'center'}
 #OOTitaTlrNo=

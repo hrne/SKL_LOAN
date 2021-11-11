@@ -116,7 +116,6 @@ public class L3210 extends TradeBuffer {
 	private LoanCheque tLoanCheque;
 	private LoanChequeId tLoanChequeId;
 	private BigDecimal wkTempAmt;
-	private BigDecimal wkCloseBreachAmt;
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
 	private TempVo tTempVo;
@@ -124,6 +123,11 @@ public class L3210 extends TradeBuffer {
 	private ArrayList<BaTxVo> baTxList;
 	AcDetail acDetail;
 	List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
+	private BigDecimal acctFee ;
+	private BigDecimal modifyFee;
+	private BigDecimal fireFee;
+	private BigDecimal lawFee;
+	private BigDecimal closeBreachAmt;
 
 	// initialize variable
 	@PostConstruct
@@ -136,9 +140,13 @@ public class L3210 extends TradeBuffer {
 		this.iTempReasonCode = 0;
 		this.iTempAmt = BigDecimal.ZERO;
 		this.wkTempAmt = BigDecimal.ZERO;
-		this.wkCloseBreachAmt = BigDecimal.ZERO;
 		this.tTempVo = new TempVo();
 		this.lAcDetail = new ArrayList<AcDetail>();
+		this.acctFee = BigDecimal.ZERO;
+		this.modifyFee = BigDecimal.ZERO;
+		this.fireFee = BigDecimal.ZERO;
+		this.lawFee = BigDecimal.ZERO;
+		this.closeBreachAmt = BigDecimal.ZERO;
 	}
 
 	@Override
@@ -410,7 +418,22 @@ public class L3210 extends TradeBuffer {
 					acDetail.setRvNo(ba.getRvNo());
 					acDetail.setReceivableFlag(ba.getReceivableFlag());
 					lAcDetail.add(acDetail);
-					wkCloseBreachAmt = wkCloseBreachAmt.add(ba.getCloseBreachAmt());
+					switch (ba.getRepayType()) {
+					case 4: // 04-帳管費
+						this.acctFee = this.acctFee.add(ba.getAcctAmt());
+						break;
+					case 5: // 05-火險費
+						this.fireFee = this.fireFee.add(ba.getAcctAmt());
+						break;
+					case 6: // 06-契變手續費
+						this.modifyFee = this.modifyFee.add(ba.getAcctAmt());
+						break;
+					case 7: // 07-法務費
+						this.lawFee = this.lawFee.add(ba.getAcctAmt());
+						break;
+					case 9: // 09-其他(清償違約金)
+						this.closeBreachAmt = this.closeBreachAmt.add(ba.getCloseBreachAmt());// 未收清償違約金
+					}
 				}
 			}
 		}
@@ -435,7 +458,7 @@ public class L3210 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTxAmt(iTempAmt);
 		tLoanBorTx.setTempAmt(wkTempAmt);
-		tLoanBorTx.setCloseBreachAmt(wkCloseBreachAmt);
+		tLoanBorTx.setCloseBreachAmt(this.closeBreachAmt);
 
 		// 其他欄位
 		tTempVo.clear();
@@ -450,19 +473,16 @@ public class L3210 extends TradeBuffer {
 			tTempVo.putParam("BatchNo", titaVo.getBacthNo()); // 整批批號
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
 		}
-		if (titaVo.get("AcctFee") != null && titaVo.get("AcctFee") != "0") {
+		if (this.acctFee.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("AcctFee", titaVo.getParam("AcctFee"));
 		}
-		if (titaVo.get("ModifyFee") != null && titaVo.get("ModifyFee") != "0") {
+		if (this.modifyFee.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("ModifyFee", titaVo.getParam("ModifyFee"));
 		}
-		if (titaVo.get("FireFee") != null && titaVo.get("FireFee") != "0") {
+		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("FireFee", titaVo.getParam("FireFee"));
 		}
-		if (titaVo.get("LawFee") != null && titaVo.get("LawFee") != "0") {
-			tTempVo.putParam("LawFee", titaVo.getParam("LawFee"));
-		}
-		if (titaVo.get("LawFee") != null && titaVo.get("LawFee") != "0") {
+		if (this.lawFee.compareTo(BigDecimal.ZERO) > 0) {
 			tTempVo.putParam("LawFee", titaVo.getParam("LawFee"));
 		}
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());

@@ -89,9 +89,6 @@ public class L4451 extends TradeBuffer {
 	private BigDecimal unpaidAmt = BigDecimal.ZERO;
 	private BigDecimal tempAmt = BigDecimal.ZERO;
 	private BigDecimal repayAmt = BigDecimal.ZERO;
-	private int postMediaSeq = 0;
-	private int achMediaSeq1 = 0;
-	private int achMediaSeq2 = 0;
 	private BigDecimal limitAmt = BigDecimal.ZERO;
 
 	@Override
@@ -107,7 +104,7 @@ public class L4451 extends TradeBuffer {
 		this.info("tempAmt = " + tempAmt);
 		this.info("repayAmt = " + repayAmt);
 
-		BankDeductDtl tBankDeductDtl = new BankDeductDtl();
+		new BankDeductDtl();
 
 		String iFunctionCode = titaVo.getParam("FunctionCode").trim();
 		int rocAcDate = parse.stringToInteger(titaVo.getParam("AcDate"));
@@ -162,7 +159,7 @@ public class L4451 extends TradeBuffer {
 			totaVo.putParam("OWarningMsg", "處理中...");
 
 			break;
-			
+
 		case "2":
 			tBankDeductDtlId.setEntryDate(entryDate);
 			tBankDeductDtlId.setCustNo(custNo);
@@ -238,7 +235,7 @@ public class L4451 extends TradeBuffer {
 				}
 			}
 			break;
-			
+
 		case "4":
 			tBankDeductDtlId.setEntryDate(entryDate);
 			tBankDeductDtlId.setCustNo(custNo);
@@ -278,87 +275,6 @@ public class L4451 extends TradeBuffer {
 		}
 
 		return result;
-	}
-
-//	暫時紀錄戶號額度
-	private class tmpFacm {
-
-		private int custNo = 0;
-		private int facmNo = 0;
-
-		public tmpFacm(int custNo, int facmNo) {
-			this.setCustNo(custNo);
-			this.setFacmNo(facmNo);
-		}
-
-		public int getCustNo() {
-			return custNo;
-		}
-
-		public void setCustNo(int custNo) {
-			this.custNo = custNo;
-		}
-
-		public int getFacmNo() {
-			return facmNo;
-		}
-
-		public void setFacmNo(int facmNo) {
-			this.facmNo = facmNo;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + custNo;
-			result = prime * result + facmNo;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			tmpFacm other = (tmpFacm) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (custNo != other.custNo)
-				return false;
-			if (facmNo != other.facmNo)
-				return false;
-			return true;
-		}
-
-		private L4451 getEnclosingInstance() {
-			return L4451.this;
-		}
-	}
-
-	private void setMediaSeq(String mediaKind, TitaVo titaVo) {
-		BankDeductDtl tBankDeductDtl = new BankDeductDtl();
-
-		tBankDeductDtl = bankDeductDtlService.findL4451First(this.getTxBuffer().getTxCom().getTbsdyf(),
-				this.getTxBuffer().getTxCom().getTbsdyf(), mediaKind, titaVo);
-
-		if (tBankDeductDtl != null) {
-			switch (mediaKind) {
-			case "1":
-				achMediaSeq1 = tBankDeductDtl.getMediaSeq() + 1;
-				break;
-			case "2":
-				achMediaSeq2 = tBankDeductDtl.getMediaSeq() + 1;
-				break;
-			case "3":
-				postMediaSeq = tBankDeductDtl.getMediaSeq() + 1;
-				break;
-			}
-		}
 	}
 
 	private String checkAcctAuth(TitaVo titaVo) throws LogicException {

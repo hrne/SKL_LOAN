@@ -335,18 +335,18 @@ IF(#OOAcDate=="0000000",T(2,),T(2,#OOAcDateA+/+#OOAcDateB+/+#OOAcDateC))
 
 ! 整批入帳後回寫會計日，已入帳者不可修改、刪除
 ! <修改> 6+7+7+3+7+1+16+7=54
-#OOBUF_A=X,90,S
-T(2,2+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX)
+#OOBUF_A=X,390,S
+T(2,2+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
 #OOBTN_A=A,2,O
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_A}),BIND(grid,cancel))
 
 ! <刪除> 6+7+7+3+7+1+16+7=54
-#OOBUF_B=X,90,S
-T(2,4+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX)
+#OOBUF_B=X,390,S
+T(2,4+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
 
 ! <查詢> 6+7+7+3+7+1+16+7=54
-#OOBUF_C=X,90,S
-T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX)
+#OOBUF_C=X,390,S
+T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
 #OOBTN_B=A,2,O
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_B}),BIND(grid,cancel))
 

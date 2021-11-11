@@ -204,6 +204,7 @@ T(F,@IncludeIntFlag,1)
 T(F,@UnpaidIntFlag,1)
 T(F,@TwBookAmt,1)
 T(F,@UsBookAmt,1)
+T(F,@PayMethod,1)
 SHOW(#TwBookAmt)
 HIDE(#BookAmtX)
 C(3,#FuncCode,1,SHOW(#BTN1,#BTN4)HIDE(#BTN2),SHOW(#BTN2)HIDE(#BTN1,#BTN4))
@@ -219,6 +220,7 @@ T(F,@IncludeIntFlag,0)
 T(F,@UnpaidIntFlag,0)
 T(F,@TwBookAmt,0)
 T(F,@UsBookAmt,0)
+T(F,@PayMethod,0)
 HIDE(#TwBookAmt)
 SHOW(#BookAmtX)
 
@@ -495,12 +497,15 @@ BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L3921; ntxbuf=#BUF5})
 !依額度[攤還額異動碼]為1時預設1.減少每期攤還金額
 !依額度[攤還額異動碼]為0時預設2.縮短應繳期數
 #FdPayMethod=X,2,L
+C(3,#UpdateCode,1,$,S)
+T(3,*)
 C(4,#PayMethod,$,s)
 C(3,#L2r05ExtraRepayCode,1,T(3,@PayMethod,1),$)
 C(3,#L2r05ExtraRepayCode,0,T(3,@PayMethod,2),$)
 
 
 #PayMethod=X,1,I
+C(3,#UpdateCode,1,$,s)
 HELP(#PayMethodHelp)
 @V(H,#PayMethodHelp)
 
@@ -531,6 +536,10 @@ C(3,#UpdateCode,1,$,S)
 T(3,L8204)
 IF(#UpdateCode == 1,ASGN(NTXCD$),$)
 
+
+#MRKEY=_,_,S
+C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo))
+C(3,#BormNo,0,$,T(2,#CustNo+-+#FacmNo+-+#BormNo)))
 
 
 <include src="ROM.icf::L0Rim.dec"/>

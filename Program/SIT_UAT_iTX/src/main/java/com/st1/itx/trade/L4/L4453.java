@@ -2,8 +2,6 @@ package com.st1.itx.trade.L4;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
@@ -22,7 +20,6 @@ import com.st1.itx.util.MySpring;
  * @version 1.0.0
  */
 public class L4453 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4453.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {

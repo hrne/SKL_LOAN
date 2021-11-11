@@ -9,7 +9,7 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,199)ASGN(INQHD$)
+E(0,215)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
@@ -35,7 +35,7 @@ E(0,40)ASGN(INQPRT$)
 #ORGFG=_,_,S
 E(0,0)
 K(MODIFYBUTTON,查詢)
-T(3,@FdNewDueAmt,*)
+T(3,@FdNewDueAmt,)
 T(3,@FdEntryDate,*)
 T(3,@FdFacmNo, )
 T(3,@FdBormNo, )
@@ -47,15 +47,16 @@ T(F,@BormNo,1)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L3926]                                 變更期款試算"],
-["#FdMain+查詢條件","@(借款人戶號、統一編號、核准編號，需擇一輸入)"],
-["#FdCustNo+借款人戶號",#CustNo,"@@@",#BTN1,#CustNoX],
-["#FdCustId+統一編號",#CustId,"@",#BTN2,#CustIdX],
-["#FdApplNo+核准編號",#ApplNo,"@@@",#BTN3,#ApplNoX],
-["#FdFacmNo+額度編號",#FacmNo,"@@@@@@",#BTN4],
-["#FdBormNo+撥款序號",#BormNo],
+["@","@(借戶戶號、統一編號、核准編號，需擇一輸入)"],
+["#FdCustNo+．借戶戶號",#CustNo,"@",#BTN5,#CustNoX],
+["#FdCustId+．統一編號",#CustId,"@",#BTN2,#CustIdX],
+["#FdApplNo+．核准編號",#ApplNo,"@",#BTN3,#ApplNoX],
+["#FdFacmNo+額度編號",#FacmNo,"@",#BTN1],
+["#FdBormNo+撥款序號",#BormNo,"@",#BTN4],
 ["#FdCurrencyCode+幣別",#CurrencyCode],
 ["#FdOldDueAmt+原攤還金額",#OldDueAmtX],
 ["#FdNewDueAmt+新攤還金額",#TwNewDueAmt,#UsNewDueAmt],
+["#FdExtraRepay+部分償還金額",#TwExtraRepay,#UsExtraRepay],
 ["#FdEntryDate+入帳日期",#EntryDate],
 ]
 !---------- AP Button AREA ----------
@@ -64,10 +65,23 @@ T(F,@BormNo,1)
 #BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
 #BTN3=X,15,I,ui:button;value:核准號碼查詢;enable:1;tabbable:0;title: L2016 核准號碼明細資料查詢;
 #BTN4=X,15,I,ui:button;value:撥款資料查詢;enable:1;tabbable:0;title: L3002 撥款明細資料查詢
+#BTN5=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0;title: L1001 顧客明細資料查詢;
+
+
+#BIND1AS=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+#BIND2AS=X,1,S
+BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<-OOCustId})
+#BIND3AS=X,1,S
+BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<-OOApplNo:FacmNo<-OOFacmNo})
+#BIND4AS=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF4A;ntxbuf5=type<-1:BormNo<-OOBormNo:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+#BIND5AS=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustNo<-OOCustNo})
 
 #BUF1=X,42,S
-HIDE(#UsNewDueAmt)
-HIDE(#BTN1,#BTN2,#BTN3,#BTN4)
+HIDE(#UsNewDueAmt,#UsExtraRepay)
+HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5)
 !---------- AP TEXT AREA Variables ----------
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
@@ -92,42 +106,38 @@ CALL(#HelpProc)
 T(2,@CurrPrecisionHelp,#HelpDesc1)
 T(2,@CurrencyCodeHelp,#HelpDesc2)
 
-#FdMain=X,2,L
-T(3,*)
 
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 T(2,@RimTxCode,#TXCD)
 E(0,@RimFKey,#FKEY)
 
-#BUF1A=X,18,S
-T(3,00000009999999000)
+#BUF5A=X,18,S
+T(3,0000000)
 
-#BIND1A=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+#BIND5A=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF5A;ntxbuf5=type<-1:CustNo<-OOCustNo})
 
-![借款人戶號]
-!借款人戶號, 統一編號或核准編號擇一輸入
+![借戶戶號]
+!借戶戶號, 統一編號或核准編號擇一輸入
 #FdCustNo=X,2,L
 
 #CustNo=A,7,I
 C(3,#CHAIN,1,T(1,#NTXBUF,6,7),$)
 C(3,#CHAIN,1,s,$)
 ! INVOKEJS(SHOW,p1,1,3,1)
-SHOW(#BTN1)HIDE(#BTN2,#BTN3)
+SHOW(#BTN5)HIDE(#BTN1,#BTN2,#BTN3,#BTN4)
 
 #WkInit=X,1,S
 E(0,@FacmNo,0)
 E(0,@BormNo,0)
 
-#WKBTN1=X,1,S
-! C(3,#CustNo,0,INVOKEJS(SHOW,p1,1,1,0),INVOKEJS(SHOW,p1,2,3,0))
 
-#BUF1B=X,18,S
-T(2,#CustNo+9999999000)
+#BUF5B=X,18,S
+T(2,#CustNo)
 
-#BIND1B=X,1,S
-BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+#BIND5B=X,1,S
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF5B;ntxbuf5=type<-1:CustNo<-OOCustNo})
 
 #SendL2r07A=X,1,S
 C(3,#CustNo,0,S,$)
@@ -149,9 +159,9 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2A;ntxbuf5=type<-1:CustId<
 #FdCustId=X,2,L
 
 #CustId=X,10,I
-C(3,#CustNo,0,$,s)
+C(3,#CustNo,0,$,S)
 ! INVOKEJS(SHOW,p1,2,3,1)
-SHOW(#BTN2)HIDE(#BTN3)
+SHOW(#BTN2)HIDE(#BTN1,#BTN3,#BTN4,#BTN5)
 @C(4,#CustId,S,$)
 V(7)
 
@@ -189,15 +199,12 @@ BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L2016; ntxbuf=#BUF3A;ntxbuf5=type<-1:ApplNo<
 
 ![核准編號]
 #FdApplNo=X,2,L
-C(3,#CustNo,0,$,S)
-C(4,#CustId,$,S)
-T(3,*)
 
 #ApplNo=A,7,I
 C(3,#CustNo,0,$,S)
 C(4,#CustId,$,S)
 ! INVOKEJS(SHOW,p1,3,3,1)
-SHOW(#BTN3)
+SHOW(#BTN3)HIDE(#BTN1,#BTN2,#BTN4,#BTN5)
 ! @V(2,0)
 @C(3,#ApplNo,0,V(P,需擇一輸入),$)
 
@@ -246,21 +253,23 @@ C(3,#ApplNo,0,$,E(0,#L2r05CustNo))
 
 #WkA=X,1,S
 IF(#L2r07FacmCount==1 && #L2r07BormCount==1,
-   T(F,@FacmNo,0)T(F,@BormNo,0)HIDE(#BTN4)
-  ,T(F,@FacmNo,1)T(F,@BormNo,1)SHOW(#BTN4))
+   T(F,@FacmNo,0)T(F,@BormNo,0)
+  ,T(F,@FacmNo,1)T(F,@BormNo,1))
 
-#BUF4A=X,50,S
-T(2,0000000+#CustNo+#CustId+#ApplNo+000)
+#BUF1A=X,100,S
+T(2,#TimCustNo+#TimCustNo+#FacmNo)
 
-#BIND4A=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF4A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:BormNo<-OOBormNo})
+
+#BIND1A=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1A;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
 ![額度編號]
 !可不輸入
 #FdFacmNo=X,2,L
 T(3, )
 T(F,@FacmNo,0)
-IF(#L2r07FacmCount==1 && #L2r07BormCount==1,$,T(3,@FdBormNo,*)T(F,@BormNo,1))
+IF(#L2r07FacmCount==1 && #L2r07BormCount==1,$,T(F,@BormNo,1))
+! IF(#L2r07FacmCount==1 && #L2r07BormCount==1,$,T(3,@FdBormNo,*)T(F,@BormNo,1))
 C(3,#ApplNo,0,$,S)
 IF(#L2r07FacmCount==1 && #L2r07BormCount==1,S,$)
 T(3,*)
@@ -270,7 +279,16 @@ T(F,@FacmNo,1)
 C(3,#ApplNo,0,$,s)
 IF(#L2r07FacmCount==1 && #L2r07BormCount==1,E(0,#L2r07FacmNo),$)
 IF(#L2r07FacmCount==1 && #L2r07BormCount==1,s,$)
+SHOW(#BTN1)HIDE(#BTN2,#BTN3,#BTN4,#BTN5)
 @V(2,0)
+
+
+#BUF1B=X,100,S
+T(2,#TimCustNo+#TimCustNo+#FacmNo)
+
+
+#BIND1B=X,1,S
+BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L2015; ntxbuf=#BUF1B;ntxbuf5=type<-1:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
 
 !用CustNo,FacmNo調L2R05
 #SendL2r05B=X,1,S
@@ -290,13 +308,25 @@ R(1,L2R05)
 T(3, )
 T(F,@BormNo,0)
 IF(#L2r07FacmCount==1 && #L2r07BormCount==1,S,$)
-T(3,*)
+! T(3,*)
 T(F,@BormNo,1)
+
+#BUF4A=X,50,S
+T(2,0000000+#CustNo+#CustId+#ApplNo+000)
+
+#BIND4A=X,1,S
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L3002; ntxbuf=#BUF4A;ntxbuf5=type<-1:BormNo<-OOBormNo:FacmNo<-OOFacmNo:CustNo<-OOCustNo})
+
+
 
 #BormNo=A,3,I
 IF(#L2r07FacmCount==1 && #L2r07BormCount==1,E(0,#L2r07BormNo),$)
 IF(#L2r07FacmCount==1 && #L2r07BormCount==1,s,$)
-@V(2,0)
+SHOW(#BTN4)HIDE(#BTN1,#BTN2,#BTN3,#BTN5)
+
+#HIDEBTN=X,1,S
+HIDE(#BTN1,#BTN2,#BTN3,#BTN4,#BTN5)
+
 
 #SendL3r02=X,1,S
 C(3,#BormNo,0,S,$)
@@ -325,13 +355,14 @@ T(3,)T(H,#CurrencyCode,#CurrencyCodeHelp)
 
 #Precision=N,1,S
 E(0,0)T(H,#OCurrencyCode,#CurrPrecisionHelp)
-C(3,#Precision,0,SHOW(#TwNewDueAmt)HIDE(#UsNewDueAmt)
-                ,SHOW(#UsNewDueAmt)HIDE(#TwNewDueAmt))
+C(3,#Precision,0,SHOW(#TwNewDueAmt,#TwExtraRepay)HIDE(#UsNewDueAmt,#UsExtraRepay)
+                ,SHOW(#UsNewDueAmt,#UsExtraRepay)HIDE(#TwNewDueAmt,#TwExtraRepay))
 
 ![原攤還金額]
 #FdOldDueAmt=X,2,L
 
 #OldDueAmt=m,14.2,S
+C(3,#BormNo,0,S,$)
 E(0,#L3r02DueAmt)
 
 #OldDueAmtX=X,22,L
@@ -344,18 +375,41 @@ E(0,#OldDueAmt-1)
 !必須輸入
 !原攤還金額 > 新攤還金額 > 0
 #FdNewDueAmt=X,2,L
-T(3,*)
+T(3,)
 
 #TwNewDueAmt=m,14,I
 C(3,#Precision,0,$,S)
-@V(2,0)V(5,1,#WkOldDueAmt)
+C(3,#BormNo,0,S,$)
+@
+C(3,#TwNewDueAmt,0,$,V(5,1,#WkOldDueAmt))
 
 #UsNewDueAmt=m,14.2,I
 C(3,#Precision,0,S,$)
-@V(2,0)V(5,1,#WkOldDueAmt)
+C(3,#BormNo,0,S,$)
+@
+C(3,#UsNewDueAmt,0,$,V(5,1,#WkOldDueAmt))
 
 #NewDueAmt=m,14.2,S
 C(3,#Precision,0,E(0,#TwNewDueAmt),E(0,#UsNewDueAmt))
+!部分償還金額
+#FdExtraRepay=X,2,L
+C(3,#NewDueAmt,0,T(3,*),T(3,))
+
+
+#TwExtraRepay=m,14,I
+C(3,#Precision,0,$,S)
+C(3,#NewDueAmt,0,$,S)
+@
+C(3,#TwExtraRepay,0,V(P,新攤還金額、部分償還金額需擇一輸入),$)
+
+#UsExtraRepay=m,14.2,I
+C(3,#Precision,0,S,$)
+C(3,#NewDueAmt,0,$,S)
+@
+C(3,#TwExtraRepay,0,V(P,新攤還金額、部分償還金額需擇一輸入),$)
+
+#TimExtraRepay=m,14.2,S
+C(3,#Precision,0,E(0,#TwExtraRepay),E(0,#UsExtraRepay))
 
 ![入帳日期]
 !必須輸入, >=系統帳務日期
@@ -367,6 +421,8 @@ C(4,#EntryDate,E(0,#SYSDATE),$)
 @V(7)V(5,#SYSDATE,9991231)
 A(DATE,0,#EntryDate)
 
+#RPTFG=A,1,S
+C(3,#TimExtraRepay,0,E(0,0),E(0,2))
 
 
 <include src="ROM.icf::L0Rim.dec"/>
@@ -411,6 +467,13 @@ E(0,#NewDueAmt)
 
 #ONewDueAmtX=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#ONewDueAmt,#ONewDueAmtX)
+
+
+#OExtraRepayAmt=m,14.2,S
+E(0,#TimExtraRepay)
+
+#OExtraRepayAmtX=X,22,L
+CALL2(#ADJUSTDOT,#Precision,#OExtraRepayAmt,#OExtraRepayAmtX)
 
 #OEntryDate=D,7,L
 E(0,#EntryDate)
@@ -601,7 +664,15 @@ P(R,#OOLoanBalX)
 !------ 上行電文 ------
 <sub type="TIM">
 
-#TimCustNo#CustId#ApplNo#FacmNo#BormNo#CurrencyCode#NewDueAmt#EntryDate
+#TimCustNo
+#CustId
+#ApplNo
+#FacmNo
+#BormNo
+#CurrencyCode
+#NewDueAmt
+#TimExtraRepay
+#EntryDate
 
 </sub>
 
@@ -629,11 +700,29 @@ TXFORM=L3926
 <sub type="PART" name="L3926" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1">
 [
 ["[L3926]                                 變更期款試算"],
-[#<->#,"@借款人戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#CustNoX],
+[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#CustNoX],
 [#<->#,"@新攤還金額",#ONewDueAmtX],
 [#<->#,"@入帳日期",#OEntryDate],
 [#<->#,"@幣別",#CurrencyCode],
 ["@本金",#OPrincipalX],["@部分償還本金",#OExtraRepayX],
+["@計息期間",#OIntStartDate,"@-",#OIntEndDate],["@放款餘額",#OLoanBalX],
+["@利率",#ORateX],["@剩餘期數",#OLeftTermsX],
+[#<->#,"@利息",#OInterestX],
+[#<->#,"@延遲息",#ODelayIntX],
+[#<->#,"@違約金",#OBreachAmtX],
+[#<->#,"@累溢收",#OExcessiveX],
+[#<->#,"@累短收",#OShortfallX,#OShortfallXX],
+[#<->#,"<font color=red>@小計",#OSumX],
+]
+</sub>
+<sub type="PART" name="L3926B" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1">
+[
+["[L3926]                                 變更期款試算"],
+[#<->#,"@借戶戶號",#OCustNo,"@-",#OFacmNo,"@-",#OBormNo,#CustNoX],
+[#<->#,"@部分償還金額",#OExtraRepayAmtX],
+[#<->#,"@入帳日期",#OEntryDate],
+[#<->#,"@幣別",#CurrencyCode],
+["@本金",#OPrincipalX],["@"],
 ["@計息期間",#OIntStartDate,"@-",#OIntEndDate],["@放款餘額",#OLoanBalX],
 ["@利率",#ORateX],["@剩餘期數",#OLeftTermsX],
 [#<->#,"@利息",#OInterestX],
@@ -663,26 +752,64 @@ TXFORM=L3926
 #OOIntEndDate=計息迄日 
 {width:80,align:'center'}
 
-#OOAmountX=計息金額
-{width:180}
+#OOAmount=計息金額
+{width:100}
 
 #OORateX=利率
 {width:80,align:'right'}
 
-#OOPrincipalX=本金
-{width:180}
+#OOPrincipal=本金
+{width:100}
 
-#OOInterestX=利息
-{width:180}
+#OOInterest=利息
+{width:100}
 
-#OODelayIntX=延遲息
-{width:180}
+#OODelayInt=延遲息
+{width:100}
 
-#OOBreachAmtX=違約金
-{width:180}
+#OOBreachAmt=違約金
+{width:100}
 
-#OOLoanBalX=放款餘額
-{width:180}
+#OOLoanBal=放款餘額
+{width:100}
+
+^
+
+#RPTFG=2,QUERY.GRID,L3926
+#any={detail:true, header:'L3926B.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+
+#OOFacmNo=額度 
+{width:50,align:'center'}
+
+#OOBormNo=撥款 
+{width:50,align:'center'}
+
+#OOIntStartDate=計息起日 
+{width:80,align:'center'}
+
+#OOIntEndDate=計息迄日 
+{width:80,align:'center'}
+
+#OOAmount=計息金額
+{width:100}
+
+#OORateX=利率
+{width:80,align:'right'}
+
+#OOPrincipal=本金
+{width:100}
+
+#OOInterest=利息
+{width:100}
+
+#OODelayInt=延遲息
+{width:100}
+
+#OOBreachAmt=違約金
+{width:100}
+
+#OOLoanBal=放款餘額
+{width:100}
 
 ^
 

@@ -26,7 +26,7 @@ E(0,0)
 ["#FdPrevIntDate+繳息迄日",#PrevIntDate],["#FdLoanBal+放款餘額",#LoanBal],
 ["#FdNextIntDate+下次應繳日",#NextIntDate],
 [#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
-[#<->#,"@",#BTNX],
+[#<->#,"@",#BTNX,#BTNG],
 [#<->#,"#FdClCode+擔保品編號",#ClCode1,"-",#ClCode2,"-",#ClNo,#ClX],
 [#<->#,"#FdRecordDate+記錄日期",#RecordDate],
 [#<->#,"#FdLegalProg+法務進度",#LegalProg,#LegalProgX],
@@ -43,7 +43,8 @@ E(0,0)
 #BTND=X,1,I,ui:button;value:法務查詢;enable:1;tabbable:0
 #BTNE=X,1,I,ui:button;value:提醒查詢;enable:1;tabbable:0
 #BTNN=X,1,I,ui:button;value:提醒登錄;enable:1;tabbable:0
-#BTNX=X,1,I,ui:button;value:擔保品明細資料查詢;enable:1;tabbable:0
+#BTNX=X,1,I,ui:button;value:擔保品不動產資料查詢;enable:1;tabbable:0
+#BTNG=X,1,I,ui:button;value:擔保品全部資料查詢;enable:1;tabbable:0
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從L5060進入),$)
@@ -187,7 +188,7 @@ T(2,@EditEmpNoX,#L5r28FullName)
 #Default=X,1,S
 SWITCH(#FunctionCd,
     1,K(MODIFYBUTTON,新增)T(2,@FdClCode,*)T(2,@FdRecordDate,*)T(2,@FdLegalProg,*)T(2,@FdRemark,*),
-    2,K(MODIFYBUTTON,修改)T(2,@FdRecordDate,*)T(2,@FdLegalProg,*)T(2,@FdRemark,*)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0),
+    2,K(MODIFYBUTTON,修改)INVOKEJS(SHOW,L5604,9,9,0)T(2,@FdRecordDate,*)T(2,@FdLegalProg,*)T(2,@FdRemark,*)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0),
     3,K(MODIFYBUTTON,新增)T(2,@FdClCode,*)T(2,@FdRecordDate,*)T(2,@FdLegalProg,*)T(2,@FdRemark,*),
     4,K(MODIFYBUTTON,刪除)INVOKEJS(SHOW,L5604,8,9,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@RecordDate,0)T(F,@LegalProg,0)T(F,@Amount,0)T(F,@Remark,0)T(F,@Memo,0),
     5,K(NOBUTTON,CLOSEY)INVOKEJS(SHOW,L5604,8,9,0)T(F,@ClCode1,0)T(F,@ClCode2,0)T(F,@ClNo,0)T(F,@RecordDate,0)T(F,@LegalProg,0)T(F,@Amount,0)T(F,@Remark,0)T(F,@Memo,0)
@@ -251,6 +252,8 @@ BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
 ! <擔保品明細資料查詢>
 #BUFX=X,38,S
 T(2,1 000000000+#FacmNo+0000000+          +#CustNo)
+#BUFG=X,38,S
+T(2,  000000000+#FacmNo+0000000+          +#CustNo)
 ! 戶號
 #CustNo=A,7,L
 C(3,#CHAIN,0,$,s)
@@ -279,6 +282,8 @@ C(2,#FunctionCd,S,$,$,s,s,s)
 #NextIntDate=D,7,L
 ! ---------調RIM
 ! 擔保品編號1
+#BINDG=X,1,S
+BIND(#BTNG,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUFG;ntxbuf5=type<-1:ClCode1<-OOClCode1:ClCode2<-OOClCode2:ClNo<-OOClNo:ClX<-})
 #BINDX=X,1,S
 BIND(#BTNX,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUFX;ntxbuf5=type<-1:ClCode1<-OOClCode1:ClCode2<-OOClCode2:ClNo<-OOClNo:ClX<-OOOther})
 #ClCode1=A,1,I

@@ -85,7 +85,10 @@ public class MailService extends CommBuffer {
 	@PostConstruct
 	public void init() {
 		this.properties = System.getProperties();
-
+		
+		//設定寄件人
+		this.from = "SKL<" + from + ">";
+		
 		// 設定傳輸協定為smtp
 		this.properties.setProperty("mail.transport.protocol", "smtp");
 		// 設定mail Server
@@ -98,7 +101,8 @@ public class MailService extends CommBuffer {
 		this.properties.put("mail.smtp.starttls.enable", "true");
 
 		properties.setProperty(mailServer, mailHost);
-		this.session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
+		this.session = Session.getInstance(properties, new javax.mail.Authenticator() {
+//		this.session = Session.getDefaultInstance(properties, new javax.mail.Authenticator() {
 			protected PasswordAuthentication getPasswordAuthentication() {
 				return new PasswordAuthentication(username, password);
 			}
@@ -119,7 +123,6 @@ public class MailService extends CommBuffer {
 		if (from == null || to == null || subject == null || bodyText == null)
 			throw new LogicException("CE000", "Send Mail Missing parameters..Main");
 
-		this.from = "SKL<" + from + ">";
 		this.to = to;
 		this.subject = subject;
 		this.bodyText = bodyText;

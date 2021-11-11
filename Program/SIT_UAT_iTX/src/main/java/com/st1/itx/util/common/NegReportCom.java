@@ -141,15 +141,15 @@ public class NegReportCom extends CommBuffer {
 			String fileitem = "";
 			String filename = "";
 			switch (FileName) {
-			case "BACHTX01":
+			case "BATCHTX01":
 				// For L5707 BatchTx01
 				fileitem = "最大債權撥付產檔";
-				filename = "BACHTX01.txt";
+				filename = "BATCHTX01.txt";
 				break;
-			case "BACHTX03":
+			case "BATCHTX03":
 				// For L5710 BACHTX03
 				fileitem = "一般債權撥付資料檢核";
-				filename = "BACHTX03.txt";
+				filename = "BATCHTX03.txt";
 				break;
 			}
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), fileitem, filename, 2);
@@ -205,6 +205,10 @@ public class NegReportCom extends CommBuffer {
 				String Identifier = ThisLine.substring(0, 1);
 				// 發件單位
 				String FromFinCode = ThisLine.substring(1, 9);
+				if (!FromFinCode.equals("03458902")) {
+					// E0015 檢查錯誤
+					throw new LogicException(titaVo, "E0015", "發件單位不符，請檢查檔案是否正確");
+				}
 				// 收件單位
 				String ToFinCode = ThisLine.substring(9, 17);
 				// 入/扣帳日-民國年
@@ -231,6 +235,10 @@ public class NegReportCom extends CommBuffer {
 					Header[4] = TransAccCode;
 					// 性質別
 					Header[5] = ThisLine.substring(29, 30);
+					if (!Header[5].equals("1")) {
+						// E0015 檢查錯誤
+						throw new LogicException(titaVo, "E0015", "性質別不為結果，請檢查檔案是否正確");
+					}
 					// 批號
 					Header[6] = ThisLine.substring(30, 32);
 					// 保留欄
@@ -363,6 +371,10 @@ public class NegReportCom extends CommBuffer {
 				String FromFinCode = ThisLine.substring(1, 9);
 				// 收件單位
 				String ToFinCode = ThisLine.substring(9, 17);
+				if (!ToFinCode.equals("03458902")) {
+					// E0015 檢查錯誤
+					throw new LogicException(titaVo, "E0015", "收件單位不符，請檢查檔案是否正確");
+				}
 				// 入/扣帳日-民國年
 				String AssigeDate = ThisLine.substring(17, 24);
 				// 轉帳類別
@@ -383,6 +395,10 @@ public class NegReportCom extends CommBuffer {
 					Header[4] = TransAccCode;
 					// 性質別
 					Header[5] = ThisLine.substring(29, 30);
+					if (!Header[5].equals("1")) {
+						// E0015 檢查錯誤
+						throw new LogicException(titaVo, "E0015", "性質別不為通知，請檢查檔案是否正確");
+					}
 					// 批號
 					Header[6] = ThisLine.substring(30, 32);
 					// 保留欄
@@ -798,8 +814,10 @@ public class NegReportCom extends CommBuffer {
 
 				tNegApprOrg = tNegAppr;
 				if (tNegAppr != null) {
-					//this.info("tNegAppr.getExportDate()=[" + tNegAppr.getExportDate() + "] , String.valueOf(tNegAppr.getExportDate()).length()=[" + String.valueOf(tNegAppr.getExportDate()).length()
-					//		+ "]");
+					// this.info("tNegAppr.getExportDate()=[" + tNegAppr.getExportDate() + "] ,
+					// String.valueOf(tNegAppr.getExportDate()).length()=[" +
+					// String.valueOf(tNegAppr.getExportDate()).length()
+					// + "]");
 					this.info("CheckNegArrp IntDate=[" + IntDateRoc + "]" + ",[製檔 " + tNegAppr.getExportMark() + "," + tNegAppr.getExportDate() + "]" + ",[傳票 " + tNegAppr.getApprAcMark() + ","
 							+ tNegAppr.getApprAcDate() + "]" + ",[提兌 " + tNegAppr.getBringUpMark() + "," + tNegAppr.getBringUpDate() + "]");
 					if (Status == 1) {
@@ -823,7 +841,7 @@ public class NegReportCom extends CommBuffer {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "L5707[製檔日期]不等於 [會計日]");
 							}
-							if (tNegAppr.getBringUpMark() == 1 ) {
+							if (tNegAppr.getBringUpMark() == 1) {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "已執行過[L5709最大債權撥付回覆檔檢核]");
 							}
@@ -837,7 +855,7 @@ public class NegReportCom extends CommBuffer {
 							}
 
 							tNegAppr.setExportMark(0);
-							
+
 						}
 					} else if (Status == 2) {
 						// 撥付傳票
@@ -863,7 +881,7 @@ public class NegReportCom extends CommBuffer {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "L5704[傳票日期] 不等於 [會計日]");
 							}
-							if (tNegAppr.getBringUpMark() == 1 ) {
+							if (tNegAppr.getBringUpMark() == 1) {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "已執行過[L5709最大債權撥付回覆檔檢核]");
 							}
@@ -871,7 +889,7 @@ public class NegReportCom extends CommBuffer {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "未執行[L5708最大債權撥付出帳]");
 							}
-							
+
 							tNegAppr.setApprAcMark(0);
 						}
 					} else if (Status == 3) {
@@ -904,7 +922,7 @@ public class NegReportCom extends CommBuffer {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "L5704[傳票日期] 不等於 [會計日]");
 							}
-							if (tNegAppr.getBringUpMark() == 0 ) {
+							if (tNegAppr.getBringUpMark() == 0) {
 								// E5009 資料檢核錯誤
 								throw new LogicException(titaVo, "E5009", "未執行[L5709最大債權撥付回覆檔檢核]");
 							}
@@ -1277,7 +1295,7 @@ public class NegReportCom extends CommBuffer {
 							case "02960":
 								// 還款狀況-0:正常,1:溢繳,2:短繳,3:大額還本,4:結清
 								Detail16 = tNegTrans.getTxKind();// tNegTrans-交易別
-								if (("5").equals(Detail16)) {//tNegTrans-交易別=5:提前清償
+								if (("5").equals(Detail16)) {// tNegTrans-交易別=5:提前清償
 									Detail16 = "4";
 								}
 								break;
@@ -1387,7 +1405,8 @@ public class NegReportCom extends CommBuffer {
 					String Head5 = TransAccCode;
 					Head5 = LRFormat(Head5, 5, "R", "0");
 
-					//this.info("BatchTx01 Head1=[" + Head1 + "],Head2=[" + Head2 + "],Head3=[" + Head3 + "],Head4=[" + Head4 + "],Head5=[" + Head5 + "]");
+					// this.info("BatchTx01 Head1=[" + Head1 + "],Head2=[" + Head2 + "],Head3=[" +
+					// Head3 + "],Head4=[" + Head4 + "],Head5=[" + Head5 + "]");
 
 					// 性質別
 					String Head6 = "1";
@@ -1398,7 +1417,7 @@ public class NegReportCom extends CommBuffer {
 					// 保留欄
 					String Head8 = LRFormat("", 168, "R", " ");
 					Same2To5 = Head2 + Head3 + Head4 + Head5;
-					//this.info("BatchTx01 Same2To5=[" + Same2To5 + "]");
+					// this.info("BatchTx01 Same2To5=[" + Same2To5 + "]");
 
 					sbHead.append(Head1);
 					sbHead.append(Same2To5);

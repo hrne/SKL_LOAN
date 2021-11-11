@@ -168,8 +168,7 @@ public class L4943 extends TradeBuffer {
 						if ("00".equals(returnCode)) {
 							procNote = "扣款成功";
 						} else {
-							procNote = "扣款失敗：" + procCodeX(
-									"3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
+							procNote = "扣款失敗：" + procCodeX("3".equals(mediaKind) ? "003" + returnCode : "002" + returnCode, titaVo);
 						}
 					}
 					occursList.putParam("OOAmlRsp", " ");

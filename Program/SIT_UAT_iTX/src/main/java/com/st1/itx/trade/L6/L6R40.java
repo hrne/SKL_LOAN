@@ -21,12 +21,12 @@ import com.st1.itx.tradeService.TradeBuffer;
 @Service("L6R40")
 @Scope("prototype")
 /**
- * 特殊參數設定(L650A)-調rim
+ * 特殊參數設定(L650B)-調rim
  * 
  * @author Fegie
  * @version 1.0.0
  */
-public class L6R40 extends TradeBuffer {	
+public class L6R40 extends TradeBuffer {
 	@Autowired
 	public CdPfParmsService iCdPfParmsService;
 	@Autowired
@@ -49,120 +49,118 @@ public class L6R40 extends TradeBuffer {
 		cCdPfParms = iCdPfParmsService.findCode1AndCode2Eq("2", "3", 0, Integer.MAX_VALUE, titaVo);
 		dCdPfParms = iCdPfParmsService.findCode1AndCode2Eq("2", "4", 0, Integer.MAX_VALUE, titaVo);
 		eCdPfParms = iCdPfParmsService.findCode1AndCode2Eq("2", "5", 0, Integer.MAX_VALUE, titaVo);
-		FacProd iFacProd = new FacProd();
+		new FacProd();
 		CdBcm iCdBcm = new CdBcm();
 		int r = 1;
 		if (aCdPfParms != null) {
-			for (CdPfParms aaCdPfParms:aCdPfParms) {
-				totaVo.putParam("L6R40DeptCodeA"+r, aaCdPfParms.getCondition());
+			for (CdPfParms aaCdPfParms : aCdPfParms) {
+				totaVo.putParam("L6R40DeptCodeA" + r, aaCdPfParms.getCondition());
 				iCdBcm = iCdBcmService.deptCodeFirst(aaCdPfParms.getCondition(), titaVo);
 				if (iCdBcm == null) {
-					totaVo.putParam("L6R40DeptCodeXA"+r, "");
+					totaVo.putParam("L6R40DeptCodeXA" + r, "");
 				} else {
-					totaVo.putParam("L6R40DeptCodeXA"+r, iCdBcm.getDeptItem());
+					totaVo.putParam("L6R40DeptCodeXA" + r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSA"+r, Integer.valueOf(aaCdPfParms.getWorkMonthStart())-191100);
-				totaVo.putParam("L6R40WorkMonthEA"+r, Integer.valueOf(aaCdPfParms.getWorkMonthEnd())-191100);
+				totaVo.putParam("L6R40WorkMonthSA" + r, Integer.valueOf(aaCdPfParms.getWorkMonthStart()) - 191100);
+				totaVo.putParam("L6R40WorkMonthEA" + r, Integer.valueOf(aaCdPfParms.getWorkMonthEnd()) - 191100);
 				r++;
 			}
 		}
-		while(r<=30) {
-			totaVo.putParam("L6R40DeptCodeA"+r, "");
-			totaVo.putParam("L6R40DeptCodeXA"+r, "");
-			totaVo.putParam("L6R40WorkMonthSA"+r, "");
-			totaVo.putParam("L6R40WorkMonthEA"+r, "");
+		while (r <= 30) {
+			totaVo.putParam("L6R40DeptCodeA" + r, "");
+			totaVo.putParam("L6R40DeptCodeXA" + r, "");
+			totaVo.putParam("L6R40WorkMonthSA" + r, "");
+			totaVo.putParam("L6R40WorkMonthEA" + r, "");
 			r++;
 		}
 		r = 1;
 		if (bCdPfParms != null) {
-			for (CdPfParms bbCdPfParms:bCdPfParms) {
-				totaVo.putParam("L6R40DeptCodeB"+r, bbCdPfParms.getCondition());
+			for (CdPfParms bbCdPfParms : bCdPfParms) {
+				totaVo.putParam("L6R40DeptCodeB" + r, bbCdPfParms.getCondition());
 				iCdBcm = iCdBcmService.deptCodeFirst(bbCdPfParms.getCondition(), titaVo);
 				if (iCdBcm == null) {
-					totaVo.putParam("L6R40DeptCodeXB"+r, "");
+					totaVo.putParam("L6R40DeptCodeXB" + r, "");
 				} else {
-					totaVo.putParam("L6R40DeptCodeXB"+r, iCdBcm.getDeptItem());
+					totaVo.putParam("L6R40DeptCodeXB" + r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSB"+r, Integer.valueOf(bbCdPfParms.getWorkMonthStart())-191100);
-				totaVo.putParam("L6R40WorkMonthEB"+r, Integer.valueOf(bbCdPfParms.getWorkMonthEnd())-191100);
+				totaVo.putParam("L6R40WorkMonthSB" + r, Integer.valueOf(bbCdPfParms.getWorkMonthStart()) - 191100);
+				totaVo.putParam("L6R40WorkMonthEB" + r, Integer.valueOf(bbCdPfParms.getWorkMonthEnd()) - 191100);
 				r++;
 			}
 		}
-		while(r<=30) {
-			totaVo.putParam("L6R40DeptCodeB"+r, "");
-			totaVo.putParam("L6R40DeptCodeXB"+r, "");
-			totaVo.putParam("L6R40WorkMonthSB"+r, "");
-			totaVo.putParam("L6R40WorkMonthEB"+r, "");
+		while (r <= 30) {
+			totaVo.putParam("L6R40DeptCodeB" + r, "");
+			totaVo.putParam("L6R40DeptCodeXB" + r, "");
+			totaVo.putParam("L6R40WorkMonthSB" + r, "");
+			totaVo.putParam("L6R40WorkMonthEB" + r, "");
 			r++;
 		}
 		r = 1;
 		if (cCdPfParms != null) {
-			for (CdPfParms ccCdPfParms:cCdPfParms) {
-				totaVo.putParam("L6R40DeptCodeC"+r, ccCdPfParms.getCondition());
+			for (CdPfParms ccCdPfParms : cCdPfParms) {
+				totaVo.putParam("L6R40DeptCodeC" + r, ccCdPfParms.getCondition());
 				iCdBcm = iCdBcmService.deptCodeFirst(ccCdPfParms.getCondition(), titaVo);
 				if (iCdBcm == null) {
-					totaVo.putParam("L6R40DeptCodeXC"+r, "");
+					totaVo.putParam("L6R40DeptCodeXC" + r, "");
 				} else {
-					totaVo.putParam("L6R40DeptCodeXC"+r, iCdBcm.getDeptItem());
+					totaVo.putParam("L6R40DeptCodeXC" + r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSC"+r, Integer.valueOf(ccCdPfParms.getWorkMonthStart())-191100);
-				totaVo.putParam("L6R40WorkMonthEC"+r, Integer.valueOf(ccCdPfParms.getWorkMonthEnd())-191100);
+				totaVo.putParam("L6R40WorkMonthSC" + r, Integer.valueOf(ccCdPfParms.getWorkMonthStart()) - 191100);
+				totaVo.putParam("L6R40WorkMonthEC" + r, Integer.valueOf(ccCdPfParms.getWorkMonthEnd()) - 191100);
 				r++;
 			}
 		}
-		while(r<=30) {
-			totaVo.putParam("L6R40DeptCodeC"+r, "");
-			totaVo.putParam("L6R40DeptCodeXC"+r, "");
-			totaVo.putParam("L6R40WorkMonthSC"+r, "");
-			totaVo.putParam("L6R40WorkMonthEC"+r, "");
+		while (r <= 30) {
+			totaVo.putParam("L6R40DeptCodeC" + r, "");
+			totaVo.putParam("L6R40DeptCodeXC" + r, "");
+			totaVo.putParam("L6R40WorkMonthSC" + r, "");
+			totaVo.putParam("L6R40WorkMonthEC" + r, "");
 			r++;
 		}
 		r = 1;
 		if (dCdPfParms != null) {
-			for (CdPfParms ddCdPfParms:dCdPfParms) {
-				totaVo.putParam("L6R40DeptCodeD"+r, ddCdPfParms.getCondition());
+			for (CdPfParms ddCdPfParms : dCdPfParms) {
+				totaVo.putParam("L6R40DeptCodeD" + r, ddCdPfParms.getCondition());
 				iCdBcm = iCdBcmService.deptCodeFirst(ddCdPfParms.getCondition(), titaVo);
 				if (iCdBcm == null) {
-					totaVo.putParam("L6R40DeptCodeXD"+r, "");
+					totaVo.putParam("L6R40DeptCodeXD" + r, "");
 				} else {
-					totaVo.putParam("L6R40DeptCodeXD"+r, iCdBcm.getDeptItem());
+					totaVo.putParam("L6R40DeptCodeXD" + r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSD"+r, Integer.valueOf(ddCdPfParms.getWorkMonthStart())-191100);
-				totaVo.putParam("L6R40WorkMonthED"+r, Integer.valueOf(ddCdPfParms.getWorkMonthEnd())-191100);
+				totaVo.putParam("L6R40WorkMonthSD" + r, Integer.valueOf(ddCdPfParms.getWorkMonthStart()) - 191100);
+				totaVo.putParam("L6R40WorkMonthED" + r, Integer.valueOf(ddCdPfParms.getWorkMonthEnd()) - 191100);
 				r++;
 			}
 		}
-		while(r<=30) {
-			totaVo.putParam("L6R40DeptCodeD"+r, "");
-			totaVo.putParam("L6R40DeptCodeXD"+r, "");
-			totaVo.putParam("L6R40WorkMonthSD"+r, "");
-			totaVo.putParam("L6R40WorkMonthED"+r, "");
+		while (r <= 30) {
+			totaVo.putParam("L6R40DeptCodeD" + r, "");
+			totaVo.putParam("L6R40DeptCodeXD" + r, "");
+			totaVo.putParam("L6R40WorkMonthSD" + r, "");
+			totaVo.putParam("L6R40WorkMonthED" + r, "");
 			r++;
 		}
 		r = 1;
 		if (eCdPfParms != null) {
-			for (CdPfParms eeCdPfParms:eCdPfParms) {
-				totaVo.putParam("L6R40DeptCodeE"+r, eeCdPfParms.getCondition());
+			for (CdPfParms eeCdPfParms : eCdPfParms) {
+				totaVo.putParam("L6R40DeptCodeE" + r, eeCdPfParms.getCondition());
 				iCdBcm = iCdBcmService.deptCodeFirst(eeCdPfParms.getCondition(), titaVo);
 				if (iCdBcm == null) {
-					totaVo.putParam("L6R40DeptCodeXE"+r, "");
+					totaVo.putParam("L6R40DeptCodeXE" + r, "");
 				} else {
-					totaVo.putParam("L6R40DeptCodeXE"+r, iCdBcm.getDeptItem());
+					totaVo.putParam("L6R40DeptCodeXE" + r, iCdBcm.getDeptItem());
 				}
-				totaVo.putParam("L6R40WorkMonthSE"+r, Integer.valueOf(eeCdPfParms.getWorkMonthStart())-191100);
-				totaVo.putParam("L6R40WorkMonthEE"+r, Integer.valueOf(eeCdPfParms.getWorkMonthEnd())-191100);
+				totaVo.putParam("L6R40WorkMonthSE" + r, Integer.valueOf(eeCdPfParms.getWorkMonthStart()) - 191100);
+				totaVo.putParam("L6R40WorkMonthEE" + r, Integer.valueOf(eeCdPfParms.getWorkMonthEnd()) - 191100);
 				r++;
 			}
 		}
-		while(r<=30) {
-			totaVo.putParam("L6R40DeptCodeE"+r, "");
-			totaVo.putParam("L6R40DeptCodeXE"+r, "");
-			totaVo.putParam("L6R40WorkMonthSE"+r, "");
-			totaVo.putParam("L6R40WorkMonthEE"+r, "");
+		while (r <= 30) {
+			totaVo.putParam("L6R40DeptCodeE" + r, "");
+			totaVo.putParam("L6R40DeptCodeXE" + r, "");
+			totaVo.putParam("L6R40WorkMonthSE" + r, "");
+			totaVo.putParam("L6R40WorkMonthEE" + r, "");
 			r++;
 		}
-		
-
 
 		this.addList(this.totaVo);
 		return this.sendList();

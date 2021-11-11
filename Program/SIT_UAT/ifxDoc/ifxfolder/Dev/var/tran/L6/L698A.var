@@ -309,7 +309,7 @@ ifxBatch:{
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}
 
-#OOAcDate=日曆日
+#OOAcDate=資料日期
 {width:80,align:'center'}
 
 #OOTxSn=登放序號
@@ -353,7 +353,7 @@ ifxBatch:{
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}
 
-#OOAcDate=日曆日
+#OOAcDate=資料日期
 {width:80,align:'center'}
 
 #OOTxSn=登放序號
@@ -380,7 +380,7 @@ ifxBatch:{
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}
 
-#OOAcDate=日曆日
+#OOAcDate=資料日期
 {width:80,align:'center'}
 
 #OOTxSn=登放序號
@@ -423,7 +423,7 @@ ifxBatch:{
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}
 
-#OOAcDate=日曆日
+#OOAcDate=資料日期
 {width:80,align:'center'}
 
 #OOTxSn=登放序號
@@ -467,7 +467,7 @@ ifxBatch:{
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}
 
-#OOAcDate=日曆日
+#OOAcDate=資料日期
 {width:80,align:'center'}
 
 #OOTxSn=登放序號
@@ -511,7 +511,7 @@ ifxBatch:{
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}
 
-#OOAcDate=日曆日
+#OOAcDate=資料日期
 {width:80,align:'center'}
 
 #OOTxSn=登放序號
@@ -539,7 +539,7 @@ ifxBatch:{
 #OOProcessNote=處理事項說明
 {width:300,align:'left'}
 
-#OOAcDate=日曆日
+#OOAcDate=資料日期
 {width:80,align:'center'}
 
 #OOBTN5=

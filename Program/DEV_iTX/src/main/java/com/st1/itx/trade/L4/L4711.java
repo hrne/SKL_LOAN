@@ -29,7 +29,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4711 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L4711.class);
 
 	/* 轉型共用工具 */
 	@Autowired
