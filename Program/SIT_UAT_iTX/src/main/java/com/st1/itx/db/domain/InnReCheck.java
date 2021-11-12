@@ -29,7 +29,7 @@ public class InnReCheck implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1486808680449938496L;
+	private static final long serialVersionUID = 531753406149815268L;
 
 @EmbeddedId
   private InnReCheckId innReCheckId;
@@ -40,7 +40,7 @@ public class InnReCheck implements Serializable {
   private int yearMonth = 0;
 
   // 條件代碼
-  /* 01-個金3000萬以上02-企金3000萬以上03-個金2000萬以上小於3000萬04-個金100萬以上小於2000萬05-企金未達3000萬06-土地追蹤99-指定複審名單 */
+  /* 01-個金3000萬以上02-企金3000萬以上03-個金2000萬以上小於3000萬、指定複審&amp;lt;&amp;gt;01,02,05,0604-個金100萬以上小於2000萬(新件)05-企金未達3000萬06-土地追蹤99-指定複審名單 */
   @Column(name = "`ConditionCode`", insertable = false, updatable = false)
   private int conditionCode = 0;
 
@@ -113,11 +113,6 @@ public class InnReCheck implements Serializable {
   @Column(name = "`TraceMonth`")
   private int traceMonth = 0;
 
-  // 指定覆審週期
-  /* 00'~'12'-複審名單的複審週期 */
-  @Column(name = "`Cycle`")
-  private int cycle = 0;
-
   // 建檔日期時間
   @CreatedDate
   @Column(name = "`CreateDate`")
@@ -168,8 +163,8 @@ public class InnReCheck implements Serializable {
 	* 條件代碼<br>
 	* 01-個金3000萬以上
 02-企金3000萬以上
-03-個金2000萬以上小於3000萬
-04-個金100萬以上小於2000萬
+03-個金2000萬以上小於3000萬、指定複審&amp;lt;&amp;gt;01,02,05,06
+04-個金100萬以上小於2000萬(新件)
 05-企金未達3000萬
 06-土地追蹤
 99-指定複審名單
@@ -183,8 +178,8 @@ public class InnReCheck implements Serializable {
 	* 條件代碼<br>
 	* 01-個金3000萬以上
 02-企金3000萬以上
-03-個金2000萬以上小於3000萬
-04-個金100萬以上小於2000萬
+03-個金2000萬以上小於3000萬、指定複審&amp;lt;&amp;gt;01,02,05,06
+04-個金100萬以上小於2000萬(新件)
 05-企金未達3000萬
 06-土地追蹤
 99-指定複審名單
@@ -481,25 +476,6 @@ public class InnReCheck implements Serializable {
   }
 
 /**
-	* 指定覆審週期<br>
-	* 00'~'12'-複審名單的複審週期
-	* @return Integer
-	*/
-  public int getCycle() {
-    return this.cycle;
-  }
-
-/**
-	* 指定覆審週期<br>
-	* 00'~'12'-複審名單的複審週期
-  *
-  * @param cycle 指定覆審週期
-	*/
-  public void setCycle(int cycle) {
-    this.cycle = cycle;
-  }
-
-/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -580,7 +556,7 @@ public class InnReCheck implements Serializable {
   public String toString() {
     return "InnReCheck [innReCheckId=" + innReCheckId + ", reCheckCode=" + reCheckCode + ", followMark=" + followMark
            + ", reChkYearMonth=" + reChkYearMonth + ", drawdownDate=" + drawdownDate + ", loanBal=" + loanBal + ", evaluation=" + evaluation + ", custTypeItem=" + custTypeItem + ", usageItem=" + usageItem
-           + ", cityItem=" + cityItem + ", reChkUnit=" + reChkUnit + ", specifyFg=" + specifyFg + ", remark=" + remark + ", traceMonth=" + traceMonth + ", cycle=" + cycle
-           + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", cityItem=" + cityItem + ", reChkUnit=" + reChkUnit + ", specifyFg=" + specifyFg + ", remark=" + remark + ", traceMonth=" + traceMonth + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

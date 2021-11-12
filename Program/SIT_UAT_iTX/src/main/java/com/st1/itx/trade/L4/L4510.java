@@ -141,7 +141,7 @@ public class L4510 extends TradeBuffer {
 
 	private HashMap<tmpFacm, Integer> mapFlag = new HashMap<>();
 	private HashMap<tmpFacm, Integer> mapFlag2 = new HashMap<>();
-
+// 火險單
 	private HashMap<tmpFacm, String> insuNoMap = new HashMap<>();
 	private HashMap<tmpFacm, Integer> bormMap = new HashMap<>();
 

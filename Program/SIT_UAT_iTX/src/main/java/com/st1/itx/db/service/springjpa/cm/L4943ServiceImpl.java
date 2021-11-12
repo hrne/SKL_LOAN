@@ -102,6 +102,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += " ,BDD.\"JsonFields\"  AS F12                              ";
 			sql += " ,BDD.\"ReturnCode\"  AS F13                              ";
 			sql += " ,BDD.\"MediaKind\"   AS F14                              ";
+			sql += " ,BDD.\"AmlRsp\"      AS F15                              ";
 			sql += " from \"BankDeductDtl\" BDD                               ";
 		} else {
 			sql += " select                                                   ";
@@ -169,7 +170,10 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and BDD.\"RepayAmt\" <= " + lowLimitAmt;
 			break;
 		case 4: // 檢核不正常
-			sql += "   and BDD.\"JsonFields\" is not null                     ";
+			sql += "   and case when BDD.\"AmlRsp\" in ('1','2') then 1 ";
+			sql += "            when NVL(JSON_VALUE(BDD.\"JsonFields\", '$.Auth'),' ') <> ' ' then 1 ";
+			sql += "            when NVL(JSON_VALUE(BDD.\"JsonFields\", '$.Deduct'),' ') <> ' ' then 1 ";
+			sql += "            else 0 end = 1 ";
 			sql += "   and BDD.\"AcDate\" = 0                     ";
 			break;
 		case 5: // 扣款金額為0

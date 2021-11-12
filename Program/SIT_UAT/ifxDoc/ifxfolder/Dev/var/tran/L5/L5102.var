@@ -21,7 +21,7 @@ E(0,0)
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
 [#<->#,"#FdMeetingDate+日期",#MeetingDate],
 [#<->#,"#FdIssue+議題",#Issue],
-[#<->#,"#FdCustCode+戶別",#CustCode,#CustCodeX],
+[#<->#,"#FdCustCode+事項",#CustCode,#CustCodeX],
 [#<->#,"#FdAmount+金額+(+千元+)",#Amount],
 [#<->#,"#FdRemark+備註",#Remark],
 ]
@@ -165,7 +165,7 @@ C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
 C(3,#FunctionCode,2,$,C(3,#FunctionCode,1,$,s))
 HELP(#InnEntCodeHelp)
 @V(H,#InnEntCodeHelp)
-#CustCodeX=X,10,L
+#CustCodeX=X,30,L
 T(H,#CustCode,#InnEntCodeHelp)
 
 ! 金額

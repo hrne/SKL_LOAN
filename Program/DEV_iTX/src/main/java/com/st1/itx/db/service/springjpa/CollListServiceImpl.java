@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,9 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("collListService")
 @Repository
-public class CollListServiceImpl implements CollListService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CollListServiceImpl.class);
-
+public class CollListServiceImpl extends ASpringJpaParm implements CollListService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +63,7 @@ public class CollListServiceImpl implements CollListService, InitializingBean {
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + collListId);
+    this.info("findById " + dbName + " " + collListId);
     Optional<CollList> collList = null;
     if (dbName.equals(ContentName.onDay))
       collList = collListReposDay.findById(collListId);
@@ -94,10 +90,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = collListReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +102,9 @@ em = null;
       slice = collListReposHist.findAll(pageable);
     else 
       slice = collListRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +121,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findCl " + dbName + " : " + "clCustNo_0 : " + clCustNo_0 + " clFacmNo_1 : " +  clFacmNo_1);
+    this.info("findCl " + dbName + " : " + "clCustNo_0 : " + clCustNo_0 + " clFacmNo_1 : " +  clFacmNo_1);
     if (dbName.equals(ContentName.onDay))
       slice = collListReposDay.findAllByClCustNoIsAndClFacmNoIs(clCustNo_0, clFacmNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -131,6 +130,9 @@ em = null;
       slice = collListReposHist.findAllByClCustNoIsAndClFacmNoIs(clCustNo_0, clFacmNo_1, pageable);
     else 
       slice = collListRepos.findAllByClCustNoIsAndClFacmNoIs(clCustNo_0, clFacmNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -147,7 +149,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("statusRng " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " facmNo_3 : " +  facmNo_3 + " status_4 : " +  status_4);
+    this.info("statusRng " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " facmNo_3 : " +  facmNo_3 + " status_4 : " +  status_4);
     if (dbName.equals(ContentName.onDay))
       slice = collListReposDay.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndStatusIn(custNo_0, custNo_1, facmNo_2, facmNo_3, status_4, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -156,6 +158,9 @@ em = null;
       slice = collListReposHist.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndStatusIn(custNo_0, custNo_1, facmNo_2, facmNo_3, status_4, pageable);
     else 
       slice = collListRepos.findAllByCustNoGreaterThanEqualAndCustNoLessThanEqualAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndStatusIn(custNo_0, custNo_1, facmNo_2, facmNo_3, status_4, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -172,7 +177,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("ovduDaysRange " + dbName + " : " + "ovduDays_0 : " + ovduDays_0 + " ovduDays_1 : " +  ovduDays_1);
+    this.info("ovduDaysRange " + dbName + " : " + "ovduDays_0 : " + ovduDays_0 + " ovduDays_1 : " +  ovduDays_1);
     if (dbName.equals(ContentName.onDay))
       slice = collListReposDay.findAllByOvduDaysGreaterThanEqualAndOvduDaysLessThanEqual(ovduDays_0, ovduDays_1, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -182,6 +187,9 @@ em = null;
     else 
       slice = collListRepos.findAllByOvduDaysGreaterThanEqualAndOvduDaysLessThanEqual(ovduDays_0, ovduDays_1, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -190,7 +198,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + collListId);
+    this.info("Hold " + dbName + " " + collListId);
     Optional<CollList> collList = null;
     if (dbName.equals(ContentName.onDay))
       collList = collListReposDay.findByCollListId(collListId);
@@ -208,7 +216,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + collList.getCollListId());
+    this.info("Hold " + dbName + " " + collList.getCollListId());
     Optional<CollList> collListT = null;
     if (dbName.equals(ContentName.onDay))
       collListT = collListReposDay.findByCollListId(collList.getCollListId());
@@ -230,7 +238,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
          empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + collList.getCollListId());
+    this.info("Insert..." + dbName + " " + collList.getCollListId());
     if (this.findById(collList.getCollListId()) != null)
       throw new DBException(2);
 
@@ -259,7 +267,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + collList.getCollListId());
+    this.info("Update..." + dbName + " " + collList.getCollListId());
     if (!empNot.isEmpty())
       collList.setLastUpdateEmpNo(empNot);
 
@@ -282,7 +290,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("Update..." + dbName + " " + collList.getCollListId());
+    this.info("Update..." + dbName + " " + collList.getCollListId());
     if (!empNot.isEmpty())
       collList.setLastUpdateEmpNo(empNot);
 
@@ -302,7 +310,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + collList.getCollListId());
+    this.info("Delete..." + dbName + " " + collList.getCollListId());
     if (dbName.equals(ContentName.onDay)) {
       collListReposDay.delete(collList);	
       collListReposDay.flush();
@@ -331,7 +339,7 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
     for (CollList t : collList){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -366,7 +374,7 @@ em = null;
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-    logger.info("UpdateAll...");
+    this.info("UpdateAll...");
     if (collList == null || collList.size() == 0)
       throw new DBException(6);
 
@@ -395,7 +403,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CollList> collList, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

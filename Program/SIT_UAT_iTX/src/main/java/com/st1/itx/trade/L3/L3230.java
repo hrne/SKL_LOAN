@@ -131,6 +131,10 @@ public class L3230 extends TradeBuffer {
 	private List<LoanOverdue> lLoanOverdue = new ArrayList<LoanOverdue>();
 	private LoanBorTx tLoanBorTx;
 	private LoanBorTxId tLoanBorTxId;
+	private BigDecimal acctFee;
+	private BigDecimal modifyFee;
+	private BigDecimal fireFee;
+	private BigDecimal lawFee;
 
 	// initialize variable
 	@PostConstruct
@@ -144,6 +148,10 @@ public class L3230 extends TradeBuffer {
 		this.iTempAmt = new BigDecimal(0);
 		this.iRemoveNo = "";
 		this.lAcDetail = new ArrayList<AcDetail>();
+		this.acctFee = BigDecimal.ZERO;
+		this.modifyFee = BigDecimal.ZERO;
+		this.fireFee = BigDecimal.ZERO;
+		this.lawFee = BigDecimal.ZERO;
 	}
 
 	@Override
@@ -189,7 +197,7 @@ public class L3230 extends TradeBuffer {
 // 08.收回呆帳                     F08	收回呆帳及過期帳                                   
 // 09.沖火險費                     F09	暫付款－火險保費、TMI	暫收款－火險保費
 // 10.沖帳管費/手續費          F10	帳管費 
-// 12.聯貸件             F10帳管費 
+// 12.聯貸件             F12聯貸件 
 // 13.沖什項收入                  F13	什項收入
 // 14.NPL-銷項稅額             F14  暫付及待結轉帳項－預所稅－放款部
 // 15.921貸款戶                  F15	利息收入－九二一貸款戶
@@ -226,6 +234,7 @@ public class L3230 extends TradeBuffer {
 			case "12": // 12.聯貸件
 			case "27": // 27.聯貸管理費
 			case "29": // 29.貸後契變手續費
+			case "30": // 30.沖呆帳戶法務費墊付
 				settingUnPaid("F" + iTempItemCode);
 				this.txBuffer.addAllAcDetailList(lAcDetail);
 				break;
@@ -241,7 +250,6 @@ public class L3230 extends TradeBuffer {
 			case "17": // 17.3200億-利變
 			case "23": // 23.3200億傳統A
 				throw new LogicException(titaVo, "E0010", "請使用 L6201 其他傳票輸入"); // E0010 功能選擇錯誤
-
 
 			case "22": // 22.88風災-保費 ???
 				throw new LogicException(titaVo, "E0010", "無對應之會計科目"); // E0010 功能選擇錯誤
@@ -347,6 +355,7 @@ public class L3230 extends TradeBuffer {
 					acDetail.setReceivableFlag(ba.getReceivableFlag());
 					acDetail.setRvNo(ba.getRvNo());
 					lAcDetail.add(acDetail);
+					addFeeRoutine(ba);
 					isFind = true;
 					break;
 				}
@@ -364,12 +373,30 @@ public class L3230 extends TradeBuffer {
 					acDetail.setReceivableFlag(ba.getReceivableFlag());
 					acDetail.setRvNo(ba.getRvNo());
 					lAcDetail.add(acDetail);
+					addFeeRoutine(ba);
 					isFind = true;
 				}
 			}
 		}
 		if (!isFind) {
 			throw new LogicException(titaVo, "E0019", "無金額相同之未銷費用，請使用 L6907 未銷帳餘額明細查詢 "); // 查詢資料不存在
+		}
+	}
+
+	private void addFeeRoutine(BaTxVo ba) throws LogicException {
+		switch (ba.getRepayType()) {
+		case 4: // 04-帳管費
+			this.acctFee = this.acctFee.add(ba.getAcctAmt());
+			break;
+		case 5: // 05-火險費
+			this.fireFee = this.fireFee.add(ba.getAcctAmt());
+			break;
+		case 6: // 06-契變手續費
+			this.modifyFee = this.modifyFee.add(ba.getAcctAmt());
+			break;
+		case 7: // 07-法務費
+			this.lawFee = this.lawFee.add(ba.getAcctAmt());
+			break;
 		}
 	}
 
@@ -554,31 +581,21 @@ public class L3230 extends TradeBuffer {
 		tLoanBorTx.setDisplayflag("A"); // A:帳務
 		tLoanBorTx.setTempAmt(BigDecimal.ZERO.subtract(iTempAmt));
 		tTempVo.clear();
-		switch (iTempItemCode) {
-		case "07": // 07.沖執行費
-			tTempVo.putParam("LawFee", iTempAmt);
-			break;
-		case "09": // 09.沖火險費
-			tTempVo.putParam("FireFee", iTempAmt);
-			break;
-		case "10": // 10.沖帳管費/手續費
-			tTempVo.putParam("AcctFee", iTempAmt);
-			break;
-		case "24": // 24.沖催收法務費
-			tTempVo.putParam("CollLawFee", iTempAmt);
-			break;
-		case "25": // 25.沖催收火險費
-			tTempVo.putParam("CollFireFee", iTempAmt);
-			break;
-		case "29": // 29.貸後契變手續費
-			tTempVo.putParam("ModifyFee", iTempAmt);
-			break;
-		default:
-			break;
-		}
 
 		tTempVo.putParam("TempItemCode", iTempItemCode);
 		tTempVo.putParam("Description", titaVo.getParam("Description"));
+		if (this.acctFee.compareTo(BigDecimal.ZERO) > 0) {
+			tTempVo.putParam("AcctFee", titaVo.getParam("AcctFee"));
+		}
+		if (this.modifyFee.compareTo(BigDecimal.ZERO) > 0) {
+			tTempVo.putParam("ModifyFee", titaVo.getParam("ModifyFee"));
+		}
+		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0) {
+			tTempVo.putParam("FireFee", titaVo.getParam("FireFee"));
+		}
+		if (this.lawFee.compareTo(BigDecimal.ZERO) > 0) {
+			tTempVo.putParam("LawFee", titaVo.getParam("LawFee"));
+		}
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {
 			loanBorTxService.insert(tLoanBorTx);

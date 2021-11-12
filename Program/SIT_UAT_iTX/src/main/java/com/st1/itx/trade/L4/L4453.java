@@ -27,7 +27,7 @@ public class L4453 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 
 		// 執行交易
-		MySpring.newTask("BS442", this.txBuffer, titaVo);
+		MySpring.newTask("L4453Batch", this.txBuffer, titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

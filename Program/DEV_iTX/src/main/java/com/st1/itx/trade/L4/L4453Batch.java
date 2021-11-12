@@ -81,36 +81,32 @@ public class L4453Batch extends TradeBuffer {
 	public WebClient webClient;
 
 	private int iEntryDate = 0;
-	private String iRepayBank = "";
+	private int iRepayBank = 0;
 	private String sEntryDate = "";
 	private HashMap<tmpFacm, String> custPhone = new HashMap<>();
 	private HashMap<tmpFacm, String> custId = new HashMap<>();
-	private HashMap<tmpFacm, String> repayBank = new HashMap<>();
 	private HashMap<tmpFacm, Integer> insuMonth = new HashMap<>();
 	private HashMap<tmpFacm, BigDecimal> insuFee = new HashMap<>();
 	private HashMap<Integer, Integer> custLoanFlag = new HashMap<>();
 	private HashMap<Integer, Integer> custFireFlag = new HashMap<>();
+	private HashMap<tmpFacm, Integer> sendFlag = new HashMap<>();
 
 	private Boolean checkFlag = true;
 	private String sendMsg = "";
-	private String noticePhoneNo = "";
-	private String noticeEmail = "";
-	private String itemCodeText = "";
-	private String itemCodeMail = "";
+	String noticePhoneNo = "";
+	String noticeEmail = "";
 
 //	寄送筆數
 	private int commitCnt = 200;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		this.info("active L4453Batch ");
+		this.info("active BS442 ");
 		this.totaVo.init(titaVo);
 //		設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
 		this.limit = Integer.MAX_VALUE;
-		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
-		iRepayBank = titaVo.getParam("RepayBank");
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 
@@ -133,30 +129,33 @@ public class L4453Batch extends TradeBuffer {
 
 	private void execute(TitaVo titaVo) throws LogicException {
 //		刪除TxToDoDetail
-		deleteTxtoDo("TEXT00", titaVo);
-		deleteTxtoDo("MAIL00", titaVo);
+		dele("TEXT00", "<期款扣款通知>", titaVo);
+		dele("TEXT00", "<火險扣款通知>", titaVo);
+		dele("MAIL00", "<期款扣款通知>", titaVo);
+		dele("MAIL00", "<火險扣款通知>", titaVo);
+
+		Slice<BankDeductDtl> sBankDeductDtl = null;
+
+		iEntryDate = parse.stringToInteger(titaVo.getParam("EntryDate")) + 19110000;
+		iRepayBank = parse.stringToInteger(titaVo.getParam("RepayBank"));
 
 		sEntryDate = ("" + iEntryDate).substring(0, 4) + "/" + ("" + iEntryDate).substring(4, 6) + "/" + ("" + iEntryDate).substring(6);
 
 //		條件 : 入帳日 or 銀行代號
-		Slice<BankDeductDtl> slBankDeductDtl = null;
-		switch (iRepayBank) {
-		case "999":
-			slBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate, iEntryDate, this.index, this.limit, titaVo);
-			break;
-		case "998":
-			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
-			break;
-		default:
-			slBankDeductDtl = bankDeductDtlService.repayBankEq(iRepayBank, iEntryDate, iEntryDate, this.index, this.limit, titaVo);
-			break;
+		List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
+		if (iRepayBank == 999) {
+			sBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate, iEntryDate, this.index, this.limit);
+		} else {
+			sBankDeductDtl = bankDeductDtlService.repayBankEq(FormatUtil.pad9("" + iRepayBank, 3), iEntryDate, iEntryDate, this.index, this.limit);
 		}
 
+		lBankDeductDtl = sBankDeductDtl == null ? null : sBankDeductDtl.getContent();
+
 //		Step1. find Cust Phone Num. & CustId
-		if (slBankDeductDtl != null) {
+		if (lBankDeductDtl != null && lBankDeductDtl.size() != 0) {
 			int n = 0;
 
-			for (BankDeductDtl tBankDeductDtl : slBankDeductDtl.getContent()) {
+			for (BankDeductDtl tBankDeductDtl : lBankDeductDtl) {
 
 				if (n % commitCnt == 0) {
 					this.batchTransaction.commit();
@@ -198,7 +197,6 @@ public class L4453Batch extends TradeBuffer {
 				}
 				custId.put(tmp, tCustMain.getCustId());
 				custPhone.put(tmp, noticePhoneNo);
-				repayBank.put(tmp, tBankDeductDtl.getRepayBank());
 				if ("Y".equals(tempVo.getParam("isMessage"))) {
 					setText(tmp, titaVo);
 				}
@@ -224,8 +222,8 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<期款扣款通知>" + repayBank.get(tmp));
-				tTxToDoDetail.setItemCode(itemCodeText);
+				tTxToDoDetail.setDtlValue("<期款扣款通知>");
+				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
 
@@ -251,8 +249,8 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<火險扣款通知>" + repayBank.get(tmp));
-				tTxToDoDetail.setItemCode(itemCodeText);
+				tTxToDoDetail.setDtlValue("<火險扣款通知>");
+				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
 
@@ -282,8 +280,8 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<期款扣款通知>" + repayBank.get(tmp));
-				tTxToDoDetail.setItemCode(itemCodeMail);
+				tTxToDoDetail.setDtlValue("<期款扣款通知>");
+				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
 
@@ -307,8 +305,8 @@ public class L4453Batch extends TradeBuffer {
 				tTxToDoDetail.setCustNo(tmp.getCustNo());
 				tTxToDoDetail.setFacmNo(tmp.getFacmNo());
 				tTxToDoDetail.setBormNo(0);
-				tTxToDoDetail.setDtlValue("<火險扣款通知>" + repayBank.get(tmp));
-				tTxToDoDetail.setItemCode("itemCodeMail");
+				tTxToDoDetail.setDtlValue("<火險扣款通知>");
+				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
 
@@ -427,39 +425,15 @@ public class L4453Batch extends TradeBuffer {
 		}
 	}
 
-//	刪除TxToDoDetail
-	private void deleteTxtoDo(String itemCode, TitaVo titaVo) {
+//	刪除TxToDoDetail 同L4454 須同步更改
+	private void dele(String itemCode, String dtlValue, TitaVo titaVo) {
 //		刪除未處理且為今天的
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.DataDateRange(itemCode, 0, 0, this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(), this.index,
-				this.limit, titaVo);
-		List<TxToDoDetail> lTxToDoDetail = new ArrayList<TxToDoDetail>();
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.itemCodeRange(itemCode, dtlValue, 0, 0, this.getTxBuffer().getTxCom().getTbsdyf(), this.getTxBuffer().getTxCom().getTbsdyf(),
+				this.index, this.limit, titaVo);
 		if (slTxToDoDetail != null) {
-			for (TxToDoDetail tTxToDoDetail : slTxToDoDetail.getContent()) {
-				if (tTxToDoDetail.getDtlValue().length() >= 9) {
-					if (tTxToDoDetail.getDtlValue().substring(0, 8).equals("<期款扣款通知>") || tTxToDoDetail.getDtlValue().substring(0, 8).equals("<火險扣款通知>")) {
-						switch (iRepayBank) {
-						case "999": // ALL
-							lTxToDoDetail.add(tTxToDoDetail);
-							break;
-						case "998": // ACH
-							if (!tTxToDoDetail.getDtlValue().substring(8, 3).equals("700")) {
-								lTxToDoDetail.add(tTxToDoDetail);
-							}
-							break;
-						default: // Bank
-							if (!tTxToDoDetail.getDtlValue().substring(8, 3).equals(iRepayBank)) {
-								lTxToDoDetail.add(tTxToDoDetail);
-							}
-							break;
-						}
-					}
-				}
-			}
-		}
-		if (lTxToDoDetail.size() > 0) {
 			try {
 				this.info("DeleteAll...");
-				txToDoCom.addByDetailList(false, 1, lTxToDoDetail, titaVo);
+				txToDoCom.addByDetailList(false, 1, slTxToDoDetail.getContent(), titaVo);
 			} catch (LogicException e) {
 				this.info("DeleteAll Error : " + e.getErrorMsg());
 			}

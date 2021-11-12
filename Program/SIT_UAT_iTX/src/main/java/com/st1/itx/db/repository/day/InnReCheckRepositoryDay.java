@@ -32,6 +32,12 @@ public interface InnReCheckRepositoryDay extends JpaRepository<InnReCheck, InnRe
   // TraceMonth >= ,AND TraceMonth <=
   public Slice<InnReCheck> findAllByTraceMonthGreaterThanEqualAndTraceMonthLessThanEqualOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(int traceMonth_0, int traceMonth_1, Pageable pageable);
 
+  // ConditionCode =
+  public Slice<InnReCheck> findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(int conditionCode_0, Pageable pageable);
+
+  // ConditionCode = ,AND CustNo=
+  public Slice<InnReCheck> findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(int conditionCode_0, int custNo_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

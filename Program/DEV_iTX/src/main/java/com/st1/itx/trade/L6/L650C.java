@@ -57,90 +57,100 @@ public class L650C extends TradeBuffer {
 
 		CdPfParms iCdPfParams = new CdPfParms();
 		CdPfParmsId iCdPfParamsId = new CdPfParmsId();
-		//Input
+		// Input
 		String iYesNoA = titaVo.getParam("YesNoA");
 		String iYesNoB = titaVo.getParam("YesNoB");
 		String iYesNoC = titaVo.getParam("YesNoC");
 		String iYesNoD = titaVo.getParam("YesNoD");
 		String iYesNoE = titaVo.getParam("YesNoE");
-		int iWorkMonthSA = Integer.valueOf(titaVo.getParam("WorkMonthSA"))+191100;
-		int iWorkMonthEA = Integer.valueOf(titaVo.getParam("WorkMonthEA"))+191100;
-		int iWorkMonthSB = Integer.valueOf(titaVo.getParam("WorkMonthSB"))+191100;
-		int iWorkMonthEB = Integer.valueOf(titaVo.getParam("WorkMonthEB"))+191100;
-		int iWorkMonthSC = Integer.valueOf(titaVo.getParam("WorkMonthSC"))+191100;
-		int iWorkMonthEC = Integer.valueOf(titaVo.getParam("WorkMonthEC"))+191100;
-		int iWorkMonthSD = Integer.valueOf(titaVo.getParam("WorkMonthSD"))+191100;
-		int iWorkMonthED = Integer.valueOf(titaVo.getParam("WorkMonthED"))+191100;
-		int iWorkMonthSE = Integer.valueOf(titaVo.getParam("WorkMonthSE"))+191100;
-		int iWorkMonthEE = Integer.valueOf(titaVo.getParam("WorkMonthEE"))+191100;
-		
-		//業績全部
-		iCdPfParamsId.setConditionCode1("3");
-		iCdPfParamsId.setConditionCode2("1");
-		iCdPfParamsId.setCondition(iYesNoA);
-		iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-		iCdPfParams.setWorkMonthStart(iWorkMonthSA);
-		iCdPfParams.setWorkMonthEnd(iWorkMonthEA);
-		try {
-			iCdPfParmsService.insert(iCdPfParams, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008", "業績全部");
+		int iWorkMonthSA = Integer.valueOf(titaVo.getParam("WorkMonthSA")) + 191100;
+		int iWorkMonthEA = Integer.valueOf(titaVo.getParam("WorkMonthEA")) + 191100;
+		int iWorkMonthSB = Integer.valueOf(titaVo.getParam("WorkMonthSB")) + 191100;
+		int iWorkMonthEB = Integer.valueOf(titaVo.getParam("WorkMonthEB")) + 191100;
+		int iWorkMonthSC = Integer.valueOf(titaVo.getParam("WorkMonthSC")) + 191100;
+		int iWorkMonthEC = Integer.valueOf(titaVo.getParam("WorkMonthEC")) + 191100;
+		int iWorkMonthSD = Integer.valueOf(titaVo.getParam("WorkMonthSD")) + 191100;
+		int iWorkMonthED = Integer.valueOf(titaVo.getParam("WorkMonthED")) + 191100;
+		int iWorkMonthSE = Integer.valueOf(titaVo.getParam("WorkMonthSE")) + 191100;
+		int iWorkMonthEE = Integer.valueOf(titaVo.getParam("WorkMonthEE")) + 191100;
+
+		// 業績全部
+		if (!iYesNoA.trim().isEmpty()) {
+			iCdPfParamsId.setConditionCode1("3");
+			iCdPfParamsId.setConditionCode2("1");
+			iCdPfParamsId.setCondition(iYesNoA);
+			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
+			iCdPfParams.setWorkMonthStart(iWorkMonthSA);
+			iCdPfParams.setWorkMonthEnd(iWorkMonthEA);
+			try {
+				iCdPfParmsService.insert(iCdPfParams, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "業績全部");
+			}
 		}
-		//換算業績、業務報酬
-		iCdPfParams = new CdPfParms();
-		iCdPfParamsId = new CdPfParmsId();
-		iCdPfParamsId.setConditionCode1("3");
-		iCdPfParamsId.setConditionCode2("2");
-		iCdPfParamsId.setCondition(iYesNoB);
-		iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-		iCdPfParams.setWorkMonthStart(iWorkMonthSB);
-		iCdPfParams.setWorkMonthEnd(iWorkMonthEB);
-		try {
-			iCdPfParmsService.insert(iCdPfParams, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008", "換算業績、業務報酬");
+		// 換算業績、業務報酬
+		if (!iYesNoB.trim().isEmpty()) {
+			iCdPfParams = new CdPfParms();
+			iCdPfParamsId = new CdPfParmsId();
+			iCdPfParamsId.setConditionCode1("3");
+			iCdPfParamsId.setConditionCode2("2");
+			iCdPfParamsId.setCondition(iYesNoB);
+			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
+			iCdPfParams.setWorkMonthStart(iWorkMonthSB);
+			iCdPfParams.setWorkMonthEnd(iWorkMonthEB);
+			try {
+				iCdPfParmsService.insert(iCdPfParams, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "換算業績、業務報酬");
+			}
 		}
-		//介紹獎金
-		iCdPfParams = new CdPfParms();
-		iCdPfParamsId = new CdPfParmsId();
-		iCdPfParamsId.setConditionCode1("3");
-		iCdPfParamsId.setConditionCode2("3");
-		iCdPfParamsId.setCondition(iYesNoC);
-		iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-		iCdPfParams.setWorkMonthStart(iWorkMonthSC);
-		iCdPfParams.setWorkMonthEnd(iWorkMonthEC);
-		try {
-			iCdPfParmsService.insert(iCdPfParams, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008", "介紹獎金");
+		// 介紹獎金
+		if (!iYesNoC.trim().isEmpty()) {
+			iCdPfParams = new CdPfParms();
+			iCdPfParamsId = new CdPfParmsId();
+			iCdPfParamsId.setConditionCode1("3");
+			iCdPfParamsId.setConditionCode2("3");
+			iCdPfParamsId.setCondition(iYesNoC);
+			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
+			iCdPfParams.setWorkMonthStart(iWorkMonthSC);
+			iCdPfParams.setWorkMonthEnd(iWorkMonthEC);
+			try {
+				iCdPfParmsService.insert(iCdPfParams, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "介紹獎金");
+			}
 		}
-		//加碼獎勵津貼
-		iCdPfParams = new CdPfParms();
-		iCdPfParamsId = new CdPfParmsId();
-		iCdPfParamsId.setConditionCode1("3");
-		iCdPfParamsId.setConditionCode2("4");
-		iCdPfParamsId.setCondition(iYesNoD);
-		iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-		iCdPfParams.setWorkMonthStart(iWorkMonthSD);
-		iCdPfParams.setWorkMonthEnd(iWorkMonthED);
-		try {
-			iCdPfParmsService.insert(iCdPfParams, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008", "加碼獎勵津貼");
+		// 加碼獎勵津貼
+		if (!iYesNoD.trim().isEmpty()) {
+			iCdPfParams = new CdPfParms();
+			iCdPfParamsId = new CdPfParmsId();
+			iCdPfParamsId.setConditionCode1("3");
+			iCdPfParamsId.setConditionCode2("4");
+			iCdPfParamsId.setCondition(iYesNoD);
+			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
+			iCdPfParams.setWorkMonthStart(iWorkMonthSD);
+			iCdPfParams.setWorkMonthEnd(iWorkMonthED);
+			try {
+				iCdPfParmsService.insert(iCdPfParams, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "加碼獎勵津貼");
+			}
 		}
-		//協辦獎金
-		iCdPfParams = new CdPfParms();
-		iCdPfParamsId = new CdPfParmsId();
-		iCdPfParamsId.setConditionCode1("3");
-		iCdPfParamsId.setConditionCode2("5");
-		iCdPfParamsId.setCondition(iYesNoE);
-		iCdPfParams.setCdPfParmsId(iCdPfParamsId);
-		iCdPfParams.setWorkMonthStart(iWorkMonthSE);
-		iCdPfParams.setWorkMonthEnd(iWorkMonthEE);
-		try {
-			iCdPfParmsService.insert(iCdPfParams, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0008", "協辦獎金");
+		// 協辦獎金
+		if (!iYesNoE.trim().isEmpty()) {
+			iCdPfParams = new CdPfParms();
+			iCdPfParamsId = new CdPfParmsId();
+			iCdPfParamsId.setConditionCode1("3");
+			iCdPfParamsId.setConditionCode2("5");
+			iCdPfParamsId.setCondition(iYesNoE);
+			iCdPfParams.setCdPfParmsId(iCdPfParamsId);
+			iCdPfParams.setWorkMonthStart(iWorkMonthSE);
+			iCdPfParams.setWorkMonthEnd(iWorkMonthEE);
+			try {
+				iCdPfParmsService.insert(iCdPfParams, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0008", "協辦獎金");
+			}
 		}
 
 		this.addList(this.totaVo);

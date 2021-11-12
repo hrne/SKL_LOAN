@@ -20,7 +20,7 @@ E(0,0)
 ["[L4451]                                 銀行扣款檔資料維護                                 "],
 [#<->#,"#FdFunctionCodeX+功能",#FunctionCodeX],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate,#EntryDateL],
-[#<->#,"#FdCustNo+戶號",#CustNo,#CustNoL,"-",#FacmNo,#FacmNoL,"-",#BormNo,#BormNoL],
+[#<->#,"#FdCustNo+戶號",#CustNo,#CustNoL,"-",#FacmNo,#FacmNoL],
 [#<->#,"#FdCustName+戶名",#CustName],
 [#<->#,"#FdRepayType+還款類別",#RepayType,#RepayTypeX],
 ["#FdRepayBank+扣款銀行",#RepayBank],["#FdRepayAcctNo+扣款帳號",#RepayAcctNo],
@@ -142,7 +142,7 @@ T(2,@AcctCode,#L4r27AcctCode)
 E(0,@TitaTxtNo,#L4r27TitaTxtNo)
 E(0,@IntStartDate,#L4r27IntStartDate)
 E(0,@IntEndDate,#L4r27IntEndDate)
-E(0,@BatchNo,#L4r27BatchNo)
+T(2,@BatchNo,#L4r27BatchNo)
 
 ! 新增為輸入欄位
 #PreCol_Chain_0=A,1,S
@@ -258,7 +258,7 @@ C(3,#FunctionCode,1,$,s)
 
 ! 撥款
 #BormNoL=A,3,L
-#BormNo=A,3,I
+#BormNo=A,3,L
 C(3,#FunctionCode,1,$,s)
 
 <include src="ROM.icf::L1R09.dec"/>

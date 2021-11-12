@@ -70,9 +70,9 @@ public class L4450Report extends MakeReport {
 		this.print(-3, 1, "扣款銀行：" + repayBank + " " + bankCodeX(repayBank));
 		this.print(-3, 130, "頁　　次：" + this.getNowPage(), "R");
 		if(RepayType == 5) {
-		  this.print(-4, 1, "入帳日期   戶號   額度 撥款    到期年月   保險迄日 還款類別           應扣金額        暫收抵繳金額           扣款金額   檢核結果");	
+		  this.print(-4, 1, "入帳日期   戶號   額度         到期年月   保險迄日 還款類別           應扣金額        暫收抵繳金額           扣款金額   檢核結果");	
 		} else {
-		  this.print(-4, 1, "入帳日期   戶號   額度 撥款    繳息迄日   應繳日   還款類別           應扣金額        暫收抵繳金額           扣款金額   檢核結果");
+		  this.print(-4, 1, "入帳日期   戶號   額度         繳息迄日   應繳日   還款類別           應扣金額        暫收抵繳金額           扣款金額   檢核結果");
 		}
 		this.print(-5, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
@@ -156,8 +156,6 @@ public class L4450Report extends MakeReport {
 
 				i = j - 1;
 
-				this.info("lBankDeductDtl.get(i)-------->" + lBankDeductDtl.get(i).toString());
-
 				String repayTypei = "";
 				String repayTypej = "";
 				repayTypei = "" + lBankDeductDtl.get(i).getRepayType();
@@ -169,26 +167,50 @@ public class L4450Report extends MakeReport {
 				this.print(0, 10, FormatUtil.pad9("" + lBankDeductDtl.get(i).getCustNo(), 7));// 戶號
 				this.print(0, 17, "-");
 				this.print(0, 18, FormatUtil.pad9("" + lBankDeductDtl.get(i).getFacmNo(), 3));// 額度
-				this.print(0, 21, "-");
-				this.print(0, 22, FormatUtil.pad9("" + lBankDeductDtl.get(i).getBormNo(), 3));// 撥款
+//				this.print(0, 21, "-");
+//				this.print(0, 22, FormatUtil.pad9("" + lBankDeductDtl.get(i).getBormNo(), 3));// 撥款
 				
 				if(RepayType == 5 ) {
 				  
 				  TempVo tTempVo = new TempVo();
 				  tTempVo = tTempVo.getVo(lBankDeductDtl.get(i).getJsonFields());
 				
-				  if(tTempVo.getJsonString().contains("InsuNo")) {					
-					String InsuNo = tTempVo.getParam("InsuNo");
+				  String InsuNo = tTempVo.getParam("InsuNo");
+				  this.info("tTempVo---->" + tTempVo);
+				  if(!"".equals(InsuNo)) {	
+					int InsuYearMonth = 0,InsuEndDate = 0;
 					
-					InsuRenew tInsuRenew = new InsuRenew();
-					tInsuRenew = insuRenewService.prevInsuNoFirst(lBankDeductDtl.get(i).getCustNo(), lBankDeductDtl.get(i).getFacmNo(), InsuNo, titaVo);
-					if(tInsuRenew != null) {
-						this.print(0, 30, "" + (tInsuRenew.getInsuYearMonth()-191100) );// 到期年月
-						this.print(0, 40, "" + tInsuRenew.getInsuEndDate() );// 保險迄日
+					String tInsuNo[] = InsuNo.split(",");
+					Boolean firstflg = false;
+					for(int k = 0 ; k < tInsuNo.length; k++) {
+						InsuRenew tInsuRenew = new InsuRenew();
+						tInsuRenew = insuRenewService.prevInsuNoFirst(lBankDeductDtl.get(i).getCustNo(), lBankDeductDtl.get(i).getFacmNo(), tInsuNo[k], titaVo);
+					    
+						if(tInsuRenew != null) {
+							
+							if(InsuYearMonth == 0 && !firstflg) { // 第一次
+								InsuYearMonth = tInsuRenew.getInsuYearMonth()-191100;
+								InsuEndDate = tInsuRenew.getInsuEndDate();
+								firstflg = true;
+							} // if
+							
+							if( InsuYearMonth > tInsuRenew.getInsuYearMonth()) {
+								InsuYearMonth = tInsuRenew.getInsuYearMonth()-191100;
+								InsuEndDate = tInsuRenew.getInsuEndDate();
+							} 
+							
+						}
+					}
+					
+			
+					if(InsuYearMonth == 0) {
+						this.print(0, 30, "0");// 到期年月
+						this.print(0, 40, "0");// 保險迄日
 					} else {
-					    this.print(0, 30, "0" );// 到期年月
-					    this.print(0, 40, "0" );// 保險迄日
+					    this.print(0, 30, "" + InsuYearMonth );// 到期年月
+					    this.print(0, 40, "" + InsuEndDate );// 保險迄日
 					} // else 
+					
 				  } else {
 				    this.print(0, 30, "0" );// 到期年月
 				    this.print(0, 40, "0" );// 保險迄日

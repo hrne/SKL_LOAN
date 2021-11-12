@@ -47,6 +47,8 @@ E(0,0)
 ["#FdSearch+查詢條件","(訪談日期、還款日期，擇一輸入)"],
 ["#FdRecordDate+訪談日期  ",#RecordDateStart,"~",#RecordDateEnd],
 ["#FdActualRepayDate+還款日期",#ActualRepayDateStart,"~",#ActualRepayDateEnd],
+["#FdCustNo+戶號","#CustNo],
+["#FdCustName+戶名","#CustName],
 !["#FdRPTFG+顯示方式",
 !<include src="COM.icf::RPTFG.scr"/>
 !],
@@ -61,6 +63,10 @@ T(3,*)
 #FdRecordDate=X,2,L
 T(3, )
 #FdActualRepayDate=X,2,L
+T(3, )
+#FdCustNo=X,2,L
+T(3, )
+#FdCustName=X,2,L
 T(3, )
 #FdRPTFG=X,2,L
 T(3,*)
@@ -141,6 +147,9 @@ V(5,#ActualRepayDateStart,#CDATEX)
 
 #WKBTN2=X,2,S
 !IF(#ActualRepayDateStart==0 & #ActualRepayDateEnd==0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,2,2,1))
+
+#CustNo=A,7,I
+#CustName=X,50,I
 
 #RPTFG=A,1,S
 E(0,0)
@@ -260,6 +269,8 @@ BIND(grid,{cmd=CHAIN;ntxcd=L8924;text=歷程;ntxbuf=#OOBUF5})
 #RecordDateEnd
 #ActualRepayDateStart
 #ActualRepayDateEnd
+#CustNo
+#CustName
 #END
 </sub>
 

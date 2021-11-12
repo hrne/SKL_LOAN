@@ -46,10 +46,12 @@ public class L5107 extends TradeBuffer {
 		iInnReCheckId.setCustNo(iCustNo);
 		iInnReCheckId.setFacmNo(iFacmNo);
 		iInnReCheck.setInnReCheckId(iInnReCheckId);
-		iInnReCheck.setReChkYearMonth(iReChkYearMonth);
-		iInnReCheck.setCycle(iCycle);
+		iInnReCheck.setReChkYearMonth(iReChkYearMonth+191100);
+		// iInnReCheck.setCycle(iCycle);
+		// 20211112 morning, 根據Fegie指示先註解掉這行以解決error
+		// - xiangwei
 		iInnReCheck.setRemark(iRemark);
-		
+		iInnReCheck.setSpecifyFg("Y");
 		try {
 			iInnReCheckService.insert(iInnReCheck, titaVo);
 		}catch (DBException e) {

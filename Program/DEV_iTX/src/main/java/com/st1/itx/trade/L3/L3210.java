@@ -123,7 +123,7 @@ public class L3210 extends TradeBuffer {
 	private ArrayList<BaTxVo> baTxList;
 	AcDetail acDetail;
 	List<AcDetail> lAcDetail = new ArrayList<AcDetail>();
-	private BigDecimal acctFee ;
+	private BigDecimal acctFee;
 	private BigDecimal modifyFee;
 	private BigDecimal fireFee;
 	private BigDecimal lawFee;

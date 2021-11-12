@@ -144,6 +144,9 @@ public class BS001 extends TradeBuffer {
 
 		// 啟動背景作業－ BS020 新增整批入帳明細－暫收抵繳期款
 		MySpring.newTask("BS020", this.txBuffer, titaVo);
+		
+		// 啟動背景作業－ BS050 未齊件到期寄發Email通知
+		MySpring.newTask("BS050", this.txBuffer, titaVo);
 
 		// 啟動背景作業－ BS060 現金流量預估資料檔維護
 		// bizDate 月底前五個營業日

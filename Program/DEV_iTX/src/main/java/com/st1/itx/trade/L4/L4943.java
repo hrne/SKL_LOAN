@@ -148,21 +148,19 @@ public class L4943 extends TradeBuffer {
 					tempVo = tempVo.getVo(result.get("F12"));
 					String returnCode = result.get("F13");
 					String mediaKind = result.get("F14");
+					String amlRsp  = result.get("F15");
 					if (acDate > 0) {
 						if (tempVo.get("ProcStsCode") != null && tempVo.get("ProcStsCode").length() > 0) {
 							procNote = procStsCodeX(tempVo.get("ProcStsCode"), titaVo);
 						}
 					} else if (returnCode == null || returnCode.trim().isEmpty()) {
-						if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
-							procNote = "Aml檢核訊息：" + amlX(tempVo.get("Aml"), titaVo) + "。";
-						}
-
+//						欄位不夠長，順序為帳號、AML、扣帳金額為零
 						if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
-							procNote = procNote + "帳號授權檢核：" + authX(tempVo.get("Auth"), titaVo) + "。";
-						}
-
-						if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
-							procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
+							procNote = "帳號授權檢核:" + authX(tempVo.get("Auth"), titaVo) + "。";
+						} else if ("1".equals(amlRsp) || "2".equals(amlRsp)) {
+							procNote = "Aml檢核:" + amlX(amlRsp, titaVo) + "。";
+						} else if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
+							procNote = "扣款檢核：" + tempVo.get("Deduct") + "。";
 						}
 					} else {
 						if ("00".equals(returnCode)) {

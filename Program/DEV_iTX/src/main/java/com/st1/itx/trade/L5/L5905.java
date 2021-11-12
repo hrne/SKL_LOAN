@@ -81,9 +81,17 @@ public class L5905 extends TradeBuffer {
 		switch(iInqFg) {
 		case 1:
 			if (iCustNo == 0) {
-				slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, 0000000, 9999999, this.index, this.limit, titaVo);
+				if (iConditionCode == 99){
+					slInnReCheck = sInnReCheckService.findSpecify(99, this.index, this.limit, titaVo);
+				}else {
+					slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, 0000000, 9999999, this.index, this.limit, titaVo);
+				}
 			} else {
-				slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, iCustNo, iCustNo, this.index, this.limit, titaVo);
+				if (iConditionCode == 99){
+					slInnReCheck = sInnReCheckService.findSpecifyNo(99, iCustNo,this.index, this.limit, titaVo);
+				}else {
+					slInnReCheck = sInnReCheckService.findCustNo(iFYearMonth, iConditionCode, iCustNo, iCustNo, this.index, this.limit, titaVo);
+				}
 			}
 			break;
 		case 2:
@@ -110,7 +118,7 @@ public class L5905 extends TradeBuffer {
 			wkYearMonth = this.parse.IntegerToString(tInnReCheck.getReChkYearMonth(), 6);
 			wkReChkMonth = FormatUtil.right(wkYearMonth, 2);
 			this.info("L5905 wkReChkMonth : " + wkReChkMonth);
-
+			
 			if (iInqFg == 2 && !(iReChkMonth.equals(wkReChkMonth))) {
 //			if (iInqFg == 2) {
 				continue;
@@ -130,9 +138,12 @@ public class L5905 extends TradeBuffer {
 			occursList.putParam("OOCustName", tCustMain.getCustName());
 
 			wkFYearMonth = tInnReCheck.getYearMonth();
-			wkFYearMonth = wkFYearMonth - 191100;
-			occursList.putParam("OOYearMonth", wkFYearMonth);
-
+			if (wkFYearMonth==0){
+				occursList.putParam("OOYearMonth", 0);
+			}else {
+				wkFYearMonth = wkFYearMonth - 191100;
+				occursList.putParam("OOYearMonth", wkFYearMonth);
+			}
 			wkFReChkYearMonth = tInnReCheck.getReChkYearMonth();
 			if (!(wkFReChkYearMonth == 0)) {
 				wkFReChkYearMonth = wkFReChkYearMonth - 191100;

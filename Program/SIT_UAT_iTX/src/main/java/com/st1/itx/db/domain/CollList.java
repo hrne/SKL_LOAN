@@ -29,7 +29,7 @@ public class CollList implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7857009143873099007L;
+	private static final long serialVersionUID = 688892043961502566L;
 
 @EmbeddedId
   private CollListId collListId;
@@ -146,6 +146,11 @@ public class CollList implements Serializable {
   /* 空白 Y:是,N:否若催收或法務人員非CdCity裡設定的人，則此欄位為Y，否則預設N */
   @Column(name = "`IsSpecify`", length = 1)
   private String isSpecify;
+
+  // 擔保品地區別
+  /* 地區別與鄉鎮區對照檔CdArea */
+  @Column(name = "`CityCode`", length = 2)
+  private String cityCode;
 
   // 建檔日期時間
   @CreatedDate
@@ -707,6 +712,25 @@ public class CollList implements Serializable {
   }
 
 /**
+	* 擔保品地區別<br>
+	* 地區別與鄉鎮區對照檔CdArea
+	* @return String
+	*/
+  public String getCityCode() {
+    return this.cityCode == null ? "" : this.cityCode;
+  }
+
+/**
+	* 擔保品地區別<br>
+	* 地區別與鄉鎮區對照檔CdArea
+  *
+  * @param cityCode 擔保品地區別
+	*/
+  public void setCityCode(String cityCode) {
+    this.cityCode = cityCode;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -789,7 +813,7 @@ public class CollList implements Serializable {
            + ", nextIntDate=" + nextIntDate + ", ovduTerm=" + ovduTerm + ", ovduDays=" + ovduDays + ", currencyCode=" + currencyCode + ", prinBalance=" + prinBalance + ", badDebtBal=" + badDebtBal
            + ", accCollPsn=" + accCollPsn + ", legalPsn=" + legalPsn + ", status=" + status + ", acctCode=" + acctCode + ", facAcctCode=" + facAcctCode + ", clCustNo=" + clCustNo
            + ", clFacmNo=" + clFacmNo + ", clRowNo=" + clRowNo + ", clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo + ", renewCode=" + renewCode
-           + ", acDate=" + acDate + ", isSpecify=" + isSpecify + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+           + ", acDate=" + acDate + ", isSpecify=" + isSpecify + ", cityCode=" + cityCode + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

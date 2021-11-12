@@ -194,6 +194,62 @@ em = null;
   }
 
   @Override
+  public Slice<InnReCheck> findSpecify(int conditionCode_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<InnReCheck> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findSpecify " + dbName + " : " + "conditionCode_0 : " + conditionCode_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = innReCheckReposDay.findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = innReCheckReposMon.findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = innReCheckReposHist.findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, pageable);
+    else 
+      slice = innReCheckRepos.findAllByConditionCodeIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<InnReCheck> findSpecifyNo(int conditionCode_0, int custNo_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<InnReCheck> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findSpecifyNo " + dbName + " : " + "conditionCode_0 : " + conditionCode_0 + " custNo_1 : " +  custNo_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = innReCheckReposDay.findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, custNo_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = innReCheckReposMon.findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, custNo_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = innReCheckReposHist.findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, custNo_1, pageable);
+    else 
+      slice = innReCheckRepos.findAllByConditionCodeIsAndCustNoIsOrderByYearMonthAscConditionCodeAscCustNoAscFacmNoAsc(conditionCode_0, custNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public InnReCheck holdById(InnReCheckId innReCheckId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

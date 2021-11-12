@@ -151,7 +151,8 @@ public class L4452Batch extends TradeBuffer {
 		}
 
 		if (checkFlag) {
-			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), sendMsg, titaVo);
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+					sendMsg, titaVo);
 		} else {
 			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", sendMsg, titaVo);
 		}
@@ -174,10 +175,12 @@ public class L4452Batch extends TradeBuffer {
 		Slice<BankDeductDtl> slBankDeductDtl = null;
 		switch (iOpItem) {
 		case 1: // ach
-			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit,
+					titaVo);
 			break;
 		case 2: // post
-			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit,
+					titaVo);
 			break;
 		default: // all
 			slBankDeductDtl = bankDeductDtlService.entryDateRng(iEntryDate, iEntryDate, this.index, this.limit, titaVo);
@@ -229,11 +232,13 @@ public class L4452Batch extends TradeBuffer {
 		case 1:
 			deleteOldAchMedia(mediaDate, "1", titaVo);
 			deleteOldAchMedia(mediaDate, "2", titaVo);
-			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankNotEq("700", iEntryDate, iEntryDate, this.index, this.limit,
+					titaVo);
 			break;
 		case 2:
 			deleteOldPostMedia(mediaDate, titaVo);
-			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit, titaVo);
+			slBankDeductDtl = bankDeductDtlService.repayBankEq("700", iEntryDate, iEntryDate, this.index, this.limit,
+					titaVo);
 			break;
 		default:
 			deleteOldAchMedia(mediaDate, "1", titaVo);
@@ -306,38 +311,28 @@ public class L4452Batch extends TradeBuffer {
 				tmp.setFacmNo(tBankDeductDtl.getFacmNo());
 				tmp.setRepayType(tBankDeductDtl.getRepayType());
 				tmp.setPayIntDate(tBankDeductDtl.getPayIntDate());
-
-				String mediaCode = "";
-
-				if (tBankDeductDtl.getJsonFields() != null && !"".equals(tBankDeductDtl.getJsonFields())) {
-					TempVo tempVo = new TempVo();
-					tempVo = tempVo.getVo(tBankDeductDtl.getJsonFields());
-					this.info("JsonFields : " + tBankDeductDtl.getJsonFields());
-					String procNote = "";
+				String mediaCode = "Y";
+				String procNote = "";
+				TempVo tempVo = new TempVo();
+				tempVo = tempVo.getVo(tBankDeductDtl.getJsonFields());
+				this.info("JsonFields : " + tBankDeductDtl.getJsonFields());
 //					欄位不夠長，順序為帳號、AML、扣帳金額為零
-					if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
-						procNote = procNote + "帳號授權檢核:" + authX(tempVo.get("Auth"), titaVo) + "。";
-
-					} else if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
-						procNote = "Aml檢核:" + amlRspX(tempVo.get("Aml"), titaVo) + "。";
-
-					} else if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
-						procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
-					}
-					doReport(procNote, "", tBankDeductDtl, titaVo);
-					this.info("JsonFields != null ... '" + tBankDeductDtl.getJsonFields() + "'");
-
+				if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
+					procNote = "帳號授權檢核:" + authX(tempVo.get("Auth"), titaVo) + "。";
 					mediaCode = "N";
-
-					updateBankDeductDtl(tBankDeductDtl, 0, "3", 0, mediaCode, titaVo);
-					this.info("檢核未過跳過...");
-					continue;
-				} else {
-					mediaCode = "Y";
+				} else if ("1".equals(tBankDeductDtl.getAmlRsp()) || "2".equals(tBankDeductDtl.getAmlRsp())) {
+					procNote = "Aml檢核:" + amlRspX(tBankDeductDtl.getAmlRsp(), titaVo) + "。";
+					mediaCode = "N";
+				} else if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
+					procNote = "扣款檢核：" + tempVo.get("Deduct") + "。";
+					mediaCode = "N";
 				}
 
-				if (!"0".equals(tBankDeductDtl.getAmlRsp())) {
-					this.info("AmlRsp != 0 ..." + tBankDeductDtl.getAmlRsp());
+				updateBankDeductDtl(tBankDeductDtl, 0, "3", 0, mediaCode, titaVo);
+
+				if ("N".equals(mediaCode)) {
+					doReport(procNote, "", tBankDeductDtl, titaVo);
+					this.info("不產出，僅寫入報表...");
 					continue;
 				}
 
@@ -398,10 +393,12 @@ public class L4452Batch extends TradeBuffer {
 				// 右靠左補空白
 
 				if (tBankDeductDtl.getRepayAcctSeq().trim().isEmpty()) {
-					tPostDeductMedia.setPostUserNo("  " + FormatUtil.padX(tCustMain.getCustId(), 10) + tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7));
+					tPostDeductMedia.setPostUserNo("  " + FormatUtil.padX(tCustMain.getCustId(), 10)
+							+ tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7));
 				} else {
-					tPostDeductMedia.setPostUserNo(
-							FormatUtil.padX(tCustMain.getCustId(), 10) + tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7) + tBankDeductDtl.getRepayAcctSeq());
+					tPostDeductMedia.setPostUserNo(FormatUtil.padX(tCustMain.getCustId(), 10)
+							+ tBankDeductDtl.getPostCode() + FormatUtil.pad9("" + tBankDeductDtl.getCustNo(), 7)
+							+ tBankDeductDtl.getRepayAcctSeq());
 				}
 
 // 				計息迄日+額度編號+入帳扣款別
@@ -409,7 +406,8 @@ public class L4452Batch extends TradeBuffer {
 				if (tBankDeductDtl.getIntEndDate() != 0) {
 					entryDate = tBankDeductDtl.getIntEndDate() + 19110000;
 				}
-				tPostDeductMedia.setOutsrcRemark(FormatUtil.padX(FormatUtil.pad9("" + entryDate, 8) + FormatUtil.pad9("" + tBankDeductDtl.getFacmNo(), 3) + OccRepayType, 20));
+				tPostDeductMedia.setOutsrcRemark(FormatUtil.padX(FormatUtil.pad9("" + entryDate, 8)
+						+ FormatUtil.pad9("" + tBankDeductDtl.getFacmNo(), 3) + OccRepayType, 20));
 
 				lPostDeductMedia.add(tPostDeductMedia);
 			}
@@ -451,43 +449,31 @@ public class L4452Batch extends TradeBuffer {
 				tmp.setRepayType(tBankDeductDtl.getRepayType());
 				tmp.setPayIntDate(tBankDeductDtl.getPayIntDate());
 
-				String mediaCode = "";
-
-				if (tBankDeductDtl.getJsonFields() != null && !"".equals(tBankDeductDtl.getJsonFields())) {
-					TempVo tempVo = new TempVo();
-					tempVo = tempVo.getVo(tBankDeductDtl.getJsonFields());
-					this.info("JsonFields : " + tBankDeductDtl.getJsonFields());
-					String procNote = "";
+				String mediaCode = "Y";
+				String procNote = "";
+				TempVo tempVo = new TempVo();
+				tempVo = tempVo.getVo(tBankDeductDtl.getJsonFields());
+				this.info("JsonFields : " + tBankDeductDtl.getJsonFields());
 //					欄位不夠長，順序為帳號、AML、扣帳金額為零
-					if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
-						procNote = procNote + "帳號授權檢核:" + authX(tempVo.get("Auth"), titaVo) + "。";
-
-					} else if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
-						procNote = "Aml檢核:" + amlRspX(tempVo.get("Aml"), titaVo) + "。";
-
-					} else if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
-						procNote = procNote + "扣款檢核：" + tempVo.get("Deduct") + "。";
-					}
-					doReport(procNote, "", tBankDeductDtl, titaVo);
-					this.info("JsonFields != null ..." + tBankDeductDtl.getJsonFields());
-
+				if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
+					procNote = "帳號授權檢核:" + authX(tempVo.get("Auth"), titaVo) + "。";
 					mediaCode = "N";
-
-					if ("103".equals(tBankDeductDtl.getRepayBank())) {
-						updateBankDeductDtl(tBankDeductDtl, 0, "1", 0, mediaCode, titaVo);
-					} else {
-						updateBankDeductDtl(tBankDeductDtl, 0, "2", 0, mediaCode, titaVo);
-					}
-					this.info("不產出，僅寫入報表...");
-					continue;
-				} else {
-					mediaCode = "Y";
-					this.info("tBankDeductDtl ..." + tBankDeductDtl);
+				} else if ("1".equals(tBankDeductDtl.getAmlRsp()) || "2".equals(tBankDeductDtl.getAmlRsp())) {
+					procNote = "Aml檢核:" + amlRspX(tBankDeductDtl.getAmlRsp(), titaVo) + "。";
+					mediaCode = "N";
+				} else if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
+					procNote = "扣款檢核：" + tempVo.get("Deduct") + "。";
+					mediaCode = "N";
 				}
 
-				if (!"0".equals(tBankDeductDtl.getAmlRsp())) {
-					this.info("AmlRsp != 0 ..." + tBankDeductDtl.getAmlRsp());
-					rpAmtMap.put(tmp, BigDecimal.ZERO);
+				if ("103".equals(tBankDeductDtl.getRepayBank())) {
+					updateBankDeductDtl(tBankDeductDtl, 0, "1", 0, mediaCode, titaVo);
+				} else {
+					updateBankDeductDtl(tBankDeductDtl, 0, "2", 0, mediaCode, titaVo);
+				}
+				if ("N".equals(mediaCode)) {
+					doReport(procNote, "", tBankDeductDtl, titaVo);
+					this.info("不產出，僅寫入報表...");
 					continue;
 				}
 
@@ -575,7 +561,9 @@ public class L4452Batch extends TradeBuffer {
 				lAchDeductMedia.add(tAchDeductMedia);
 			}
 		}
-		if (mediaSeq1 >= 1 || mediaSeq2 >= 1) {
+		if (mediaSeq1 >= 1 || mediaSeq2 >= 1)
+
+		{
 			try {
 				achDeductMediaService.insertAll(lAchDeductMedia, titaVo);
 			} catch (DBException e) {
@@ -609,7 +597,8 @@ public class L4452Batch extends TradeBuffer {
 
 		sPostDeductMedia = postDeductMediaService.mediaDateEq(mediaDate, this.index, this.limit, titaVo);
 
-		lPostDeductMedia = sPostDeductMedia == null ? null : new ArrayList<PostDeductMedia>(sPostDeductMedia.getContent());
+		lPostDeductMedia = sPostDeductMedia == null ? null
+				: new ArrayList<PostDeductMedia>(sPostDeductMedia.getContent());
 
 //		postMediaSorting()
 
@@ -730,7 +719,8 @@ public class L4452Batch extends TradeBuffer {
 
 //			String outputFilePath53N = outFolder + "PWBCP4CS_53N扣出.txt";
 
-			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局扣款提出媒體檔_53N", "PWBCP4CS_53N扣出.txt", 2);
+			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+					titaVo.getTxCode() + "-郵局扣款提出媒體檔_53N", "PWBCP4CS_53N扣出.txt", 2);
 
 			for (String line : file53N) {
 				makeFile.put(line);
@@ -773,7 +763,8 @@ public class L4452Batch extends TradeBuffer {
 
 //				String outputFilePath846 = outFolder + "PWBCP4CS_846扣出.txt";
 
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局扣款提出媒體檔_846", "PWBCP4CS_846扣出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+						titaVo.getTxCode() + "-郵局扣款提出媒體檔_846", "PWBCP4CS_846扣出.txt", 2);
 
 				for (String line : file8460001) {
 					makeFile.put(line);
@@ -806,7 +797,8 @@ public class L4452Batch extends TradeBuffer {
 				ArrayList<String> file8460002 = tmp8460002PostDeductFileVo.toFile();
 
 				if (cnt8460001 == 0) {
-					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-郵局扣款提出媒體檔_846", "PWBCP4CS_846扣出.txt", 2);
+					makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+							titaVo.getTxCode() + "-郵局扣款提出媒體檔_846", "PWBCP4CS_846扣出.txt", 2);
 				}
 
 				for (String line : file8460002) {
@@ -880,7 +872,8 @@ public class L4452Batch extends TradeBuffer {
 //			String outputFilePath11 = outFolder + "AHP11P_扣出.txt";
 
 			if (cnt11 >= 1) {
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-銀行扣款提出媒體檔_新光", "AHP11P_扣出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+						titaVo.getTxCode() + "-銀行扣款提出媒體檔_新光", "AHP11P_扣出.txt", 2);
 				this.batchTransaction.commit();
 
 				for (String line : file11) {
@@ -941,7 +934,8 @@ public class L4452Batch extends TradeBuffer {
 //			String outputFilePath12 = outFolder + "AHP12P_扣出.txt";
 
 			if (cnt12 >= 1) {
-				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), titaVo.getTxCode() + "-銀行扣款提出媒體檔_他行", "AHP12P_扣出.txt", 2);
+				makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(),
+						titaVo.getTxCode() + "-銀行扣款提出媒體檔_他行", "AHP12P_扣出.txt", 2);
 				this.batchTransaction.commit();
 
 				for (String line : file12) {
@@ -964,7 +958,8 @@ public class L4452Batch extends TradeBuffer {
 	}
 
 //	table資料寫入File明細
-	private ArrayList<OccursList> setAchOccurs(List<AchDeductMedia> lAchDeductMedia, TitaVo titaVo) throws LogicException {
+	private ArrayList<OccursList> setAchOccurs(List<AchDeductMedia> lAchDeductMedia, TitaVo titaVo)
+			throws LogicException {
 		this.info("setAchOccurs ...");
 		ArrayList<OccursList> tmp = new ArrayList<>();
 		if (lAchDeductMedia != null && lAchDeductMedia.size() != 0) {
@@ -992,14 +987,16 @@ public class L4452Batch extends TradeBuffer {
 				}
 
 				CustMain tCustMain = new CustMain();
-				tCustMain = custMainService.custNoFirst(tAchDeductMedia.getCustNo(), tAchDeductMedia.getCustNo(), titaVo);
+				tCustMain = custMainService.custNoFirst(tAchDeductMedia.getCustNo(), tAchDeductMedia.getCustNo(),
+						titaVo);
 
 				OccursList occursList = new OccursList();
 
 				occursList.putParam("OccTransType", "N");
 				occursList.putParam("OccTransCate", "SD");
 				occursList.putParam("OccTransCode", "801");
-				occursList.putParam("OccTransSeq", FormatUtil.pad9("" + tAchDeductMedia.getAchDeductMediaId().getMediaSeq(), 6));
+				occursList.putParam("OccTransSeq",
+						FormatUtil.pad9("" + tAchDeductMedia.getAchDeductMediaId().getMediaSeq(), 6));
 				occursList.putParam("OccSenderNo", "1030116");
 				occursList.putParam("OccSenderAcct", "00116101001006");
 				if ("812".equals(tAchDeductMedia.getRepayBank())) {
@@ -1021,7 +1018,8 @@ public class L4452Batch extends TradeBuffer {
 				occursList.putParam("OccOTransDate", FormatUtil.pad9("", 8));
 				occursList.putParam("OccOTransSeq", FormatUtil.pad9("", 6));
 				occursList.putParam("OccOTransOrder", FormatUtil.padX("", 1));
-				occursList.putParam("OccCustSeq", FormatUtil.padX("" + FormatUtil.pad9("" + tAchDeductMedia.getCustNo(), 7), 20));
+				occursList.putParam("OccCustSeq",
+						FormatUtil.padX("" + FormatUtil.pad9("" + tAchDeductMedia.getCustNo(), 7), 20));
 
 				int prevIntDate = 0;
 
@@ -1030,8 +1028,12 @@ public class L4452Batch extends TradeBuffer {
 				}
 
 //				戶號7+額度3+入帳扣款別1+繳息迄日8 左靠右補空白
-				occursList.putParam("OccSenderRemarker", FormatUtil.padX(FormatUtil.pad9("" + tAchDeductMedia.getCustNo(), 7) + FormatUtil.pad9("" + tAchDeductMedia.getFacmNo(), 3)
-						+ tAchDeductMedia.getAchRepayCode() + FormatUtil.pad9("" + prevIntDate, 8), 20));
+				occursList.putParam("OccSenderRemarker",
+						FormatUtil.padX(
+								FormatUtil.pad9("" + tAchDeductMedia.getCustNo(), 7)
+										+ FormatUtil.pad9("" + tAchDeductMedia.getFacmNo(), 3)
+										+ tAchDeductMedia.getAchRepayCode() + FormatUtil.pad9("" + prevIntDate, 8),
+								20));
 				occursList.putParam("OccAbstract", FormatUtil.padX("801", 10));
 				occursList.putParam("OccNote", FormatUtil.padX("", 2));
 
@@ -1102,7 +1104,8 @@ public class L4452Batch extends TradeBuffer {
 		}
 	}
 
-	private void updateBankDeductDtl(BankDeductDtl t2BankDeductDtl, int mediaDate, String mediaKind, int mediaSeq, String mediaCode, TitaVo titaVo) throws LogicException {
+	private void updateBankDeductDtl(BankDeductDtl t2BankDeductDtl, int mediaDate, String mediaKind, int mediaSeq,
+			String mediaCode, TitaVo titaVo) throws LogicException {
 		this.info("updateBankDeductDtl Start...");
 
 		BankDeductDtl tBankDeductDtl = new BankDeductDtl();
@@ -1135,7 +1138,6 @@ public class L4452Batch extends TradeBuffer {
 		int n = 0;
 		for (BankDeductDtl tBankDeductDtl : lBankDeductDtl) {
 			if (!"0".equals(tBankDeductDtl.getAmlRsp())) {
-//				Aml
 				n++;
 				if (n % commitCnt == 0) {
 					this.batchTransaction.commit();
@@ -1144,31 +1146,6 @@ public class L4452Batch extends TradeBuffer {
 				CheckAmlVo tCheckAmlVo = txAmlCom.deduct(tBankDeductDtl, titaVo);
 				String amlRsp = tCheckAmlVo.getConfirmStatus();
 				tBankDeductDtl.setAmlRsp(amlRsp);
-
-				if (tBankDeductDtl.getJsonFields() != null && !"".equals(tBankDeductDtl.getJsonFields())) {
-					TempVo tempVo = new TempVo();
-					tempVo = tempVo.getVo(tBankDeductDtl.getJsonFields());
-					this.info("JsonFields : " + tBankDeductDtl.getJsonFields());
-					this.info("Aml : " + tempVo.get("Aml"));
-//						欄位不夠長，順序為帳號、AML、扣帳金額為零
-					if (tempVo.get("Aml") != null && tempVo.get("Aml").length() > 0) {
-						if ("0".equals(amlRsp)) {
-							TempVo temp2Vo = new TempVo();
-							if (tempVo.get("Auth") != null) {
-								temp2Vo.put("Auth", tempVo.get("Auth"));
-							}
-							if (tempVo.get("Deduct") != null) {
-								temp2Vo.put("Deduct", tempVo.get("Deduct"));
-							}
-							this.info("temp2Vo ..." + temp2Vo);
-							tBankDeductDtl.setJsonFields(temp2Vo.getJsonString());
-						} else {
-							tempVo.put("Aml", amlRsp);
-							tBankDeductDtl.setJsonFields(tempVo.getJsonString());
-						}
-					}
-				}
-
 				try {
 					bankDeductDtlService.update(tBankDeductDtl, titaVo);
 				} catch (DBException e) {
@@ -1221,7 +1198,7 @@ public class L4452Batch extends TradeBuffer {
 		occursList.putParam("OONote", note);
 		unDoList.add(occursList);
 	}
-
+	
 	private ArrayList<BankDeductDtl> postMediaSorting(ArrayList<BankDeductDtl> lBankDeductDtl) {
 		this.info("setPostDeductMedia Start...");
 //		依儲金帳號排序後，先依區處代號排序(0001.0002)，再依計息迄日由小到大，最後才依扣款金額由大到小排序
@@ -1314,7 +1291,8 @@ public class L4452Batch extends TradeBuffer {
 
 		@Override
 		public String toString() {
-			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", repayType=" + repayType + ", payIntDate=" + payIntDate + "]";
+			return "tmpFacm [custNo=" + custNo + ", facmNo=" + facmNo + ", repayType=" + repayType + ", payIntDate="
+					+ payIntDate + "]";
 		}
 
 		@Override

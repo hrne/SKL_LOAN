@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -35,8 +33,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("collListTmpService")
 @Repository
-public class CollListTmpServiceImpl implements CollListTmpService, InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(CollListTmpServiceImpl.class);
+public class CollListTmpServiceImpl extends ASpringJpaParm implements CollListTmpService, InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -67,7 +64,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("findById " + dbName + " " + collListTmpId);
+		this.info("findById " + dbName + " " + collListTmpId);
 		Optional<CollListTmp> collListTmp = null;
 		if (dbName.equals(ContentName.onDay))
 			collListTmp = collListTmpReposDay.findById(collListTmpId);
@@ -95,7 +92,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 		Pageable pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo", "ClCode1", "ClCode2", "ClNo"));
 		if (limit == Integer.MAX_VALUE)
 			pageable = Pageable.unpaged();
-		logger.info("findAll " + dbName);
+		this.info("findAll " + dbName);
 		if (dbName.equals(ContentName.onDay))
 			slice = collListTmpReposDay.findAll(pageable);
 		else if (dbName.equals(ContentName.onMon))
@@ -113,7 +110,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + collListTmpId);
+		this.info("Hold " + dbName + " " + collListTmpId);
 		Optional<CollListTmp> collListTmp = null;
 		if (dbName.equals(ContentName.onDay))
 			collListTmp = collListTmpReposDay.findByCollListTmpId(collListTmpId);
@@ -131,7 +128,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Hold " + dbName + " " + collListTmp.getCollListTmpId());
+		this.info("Hold " + dbName + " " + collListTmp.getCollListTmpId());
 		Optional<CollListTmp> collListTmpT = null;
 		if (dbName.equals(ContentName.onDay))
 			collListTmpT = collListTmpReposDay.findByCollListTmpId(collListTmp.getCollListTmpId());
@@ -153,7 +150,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Insert..." + dbName + " " + collListTmp.getCollListTmpId());
+		this.info("Insert..." + dbName + " " + collListTmp.getCollListTmpId());
 		if (this.findById(collListTmp.getCollListTmpId()) != null)
 			throw new DBException(2);
 
@@ -179,7 +176,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + collListTmp.getCollListTmpId());
+		this.info("Update..." + dbName + " " + collListTmp.getCollListTmpId());
 		if (!empNot.isEmpty())
 			collListTmp.setLastUpdateEmpNo(empNot);
 
@@ -202,7 +199,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("Update..." + dbName + " " + collListTmp.getCollListTmpId());
+		this.info("Update..." + dbName + " " + collListTmp.getCollListTmpId());
 		if (!empNot.isEmpty())
 			collListTmp.setLastUpdateEmpNo(empNot);
 
@@ -222,7 +219,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 		String dbName = "";
 		if (titaVo.length != 0)
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-		logger.info("Delete..." + dbName + " " + collListTmp.getCollListTmpId());
+		this.info("Delete..." + dbName + " " + collListTmp.getCollListTmpId());
 		if (dbName.equals(ContentName.onDay)) {
 			collListTmpReposDay.delete(collListTmp);
 			collListTmpReposDay.flush();
@@ -249,7 +246,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("InsertAll...");
+		this.info("InsertAll...");
 		for (CollListTmp t : collListTmp)
 			if (!empNot.isEmpty())
 				t.setCreateEmpNo(empNot);
@@ -278,7 +275,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
 		}
-		logger.info("UpdateAll...");
+		this.info("UpdateAll...");
 		if (collListTmp == null || collListTmp.size() == 0)
 			throw new DBException(6);
 
@@ -303,7 +300,7 @@ public class CollListTmpServiceImpl implements CollListTmpService, InitializingB
 
 	@Override
 	public void deleteAll(List<CollListTmp> collListTmp, TitaVo... titaVo) throws DBException {
-		logger.info("DeleteAll...");
+		this.info("DeleteAll...");
 		String dbName = "";
 
 		if (titaVo.length != 0)

@@ -156,7 +156,7 @@ public class L4451 extends TradeBuffer {
 		case "1":
 			// 執行產檔
 			MySpring.newTask("L4450Batch", this.txBuffer, titaVo);
-			totaVo.putParam("OWarningMsg", "處理中...");
+			totaVo.putParam("OWarningMsg", "請查詢產檔資料(L4943銀行扣款檔資料查詢)");
 
 			break;
 
@@ -196,7 +196,6 @@ public class L4451 extends TradeBuffer {
 //				Aml檢核未過
 				if (!"0".equals(amlRsp)) {
 					warningMsg += "Aml檢核：" + amlMSg(amlRsp, titaVo) + "。";
-					tTempVo.putParam("Aml", amlRsp);
 				}
 //				帳號授權檢核未過
 				if (!"0".equals(failFlag)) {

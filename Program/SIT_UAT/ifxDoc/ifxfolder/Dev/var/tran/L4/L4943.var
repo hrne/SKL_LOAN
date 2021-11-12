@@ -438,8 +438,8 @@ TXFORM=L4943
 {width:95}
 #OOFacmNo=額度
 {width:95}
-#OOBormNo=撥款
-{width:95}
+! #OOBormNo=撥款
+! {width:95}
 #OOPrevIntDate=繳息迄日
 {width:95}
 #OOPayIntDate=應繳日
