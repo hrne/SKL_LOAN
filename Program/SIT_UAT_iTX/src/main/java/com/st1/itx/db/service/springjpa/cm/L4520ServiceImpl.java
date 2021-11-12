@@ -47,7 +47,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("L4520.findAll");
 
 		int PerfMonth = parse.stringToInteger(titaVo.getParam("PerfMonth")) + 191100;
-		
+		String BatchNo= titaVo.getParam("BatchNo");
 		String sql = "SELECT";
 		sql +=  "substr(ed.\"TitaTxtNo\", 0, 2) as f0,";
 		sql +=  "ed.\"CustNo\" as f1,   ";
@@ -74,6 +74,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql +=  " AND lb.\"IntStartDate\" <> 0 ";
 		sql +=  "  AND lb.\"IntEndDate\"   <> 0 ";
 		sql +=  "AND \"PerfMonth\" = :PerfMonth";
+		sql += 	"    AND ed.\"BatchNo\" = :BatchNo";
 		sql +=  "GROUP BY ed.\"TitaTxtNo\", substr(ed.\"TitaTxtNo\", 0, 2), ed.\"CustNo\", lb.\"IntStartDate\", lb.\"IntEndDate\", ";
 		sql +=  "ce.\"Fullname\", ed.\"JsonFields\", ce.\"CenterCode\", ce.\"EmployeeNo\", cm.\"CustId\"";
 		sql +=  "ORDER BY ed.\"TitaTxtNo\",ed.\"CustNo\",lb.\"IntStartDate\",lb.\"IntEndDate\"";
@@ -83,7 +84,7 @@ public class L4520ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-
+		query.setParameter("BatchNo", BatchNo);
 		query.setParameter("PerfMonth", PerfMonth);
 		return this.convertToMap(query);
 	}

@@ -180,6 +180,7 @@ public class L3220 extends TradeBuffer {
 
 		// 帳務處理
 		if (iTempAmt.compareTo(new BigDecimal(0)) > 0) { // 暫收款
+			titaVo.setBatchNo("RT");  // 整批批號 for 退款
 			TempAcDetailRoutine();
 		} else {
 			titaVo.setBatchNo("BCK"); // 整批批號 for L4103 列印傳票明細表

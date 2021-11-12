@@ -202,6 +202,9 @@ TXFORM=L5062
 #any={detail:true, header:'L5062.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
 
 #OOAccCollPsn
+#OOAccCollPsnX
+#OOLegalPsn
+#OOLegalPsnX
 
 #OOBTN2=修改
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN2',align:'center',canExport:false}
@@ -226,6 +229,8 @@ TXFORM=L5062
 
 #OOLegalCombine=法務人員電話
 {width:200,align:'center'}
+
+
 ^
 
 </sub>

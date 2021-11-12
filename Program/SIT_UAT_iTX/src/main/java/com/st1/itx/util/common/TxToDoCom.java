@@ -134,7 +134,7 @@ public class TxToDoCom extends TradeBuffer {
 		}
 
 		if (titaVo.get("TxBormNo") != null) {
-			TempVo tTempVo = new TempVo();
+			tTempVo = new TempVo();
 			tTempVo.clear();
 			tTempVo.putParam("BormNo", bormNo);
 			bormNo = this.parse.stringToInteger(titaVo.getParam("TxBormNo"));
@@ -341,7 +341,7 @@ public class TxToDoCom extends TradeBuffer {
 					TempVo rTempVo = new TempVo();
 					rTempVo = rTempVo.getVo(tDetail.getProcessNote());
 					rTempVo.putAll(tTempVo);
-					tDetail.setProcessNote(tTempVo.getJsonString());
+					tDetail.setProcessNote(rTempVo.getJsonString());
 
 					// 加新資料狀態筆數，正常交易執行
 					addMainCntValue(tMain, tDetail, titaVo);
@@ -600,9 +600,14 @@ public class TxToDoCom extends TradeBuffer {
 
 //		項目  昨日留存  處理功能  刪除功能  保留功能  關帳檢核  連結查詢交易  連結處理交易  執行交易  訂正功能  項目中文
 //      1    2        3       4        5        6       7            8           9        A       B
-// 處理功能 Y-有自動處理功能，由該交易程式將明細檔狀態更改為已處理
-//   		C-連結處理交易，交易處理後由TxToDoCom共用程式將明細檔狀態更改為已處理
-//   		M-人工自行處理，明細檔狀態不會變動
+// 2.昨日留存
+//   Y-留存未處理資料
+//
+//		
+// 3.處理功能 
+//   Y-有自動處理功能，由該交易程式將明細檔狀態更改為已處理
+//   C-連結處理交易，交易處理後由TxToDoCom共用程式將明細檔狀態更改為已處理
+//   M-人工自行處理，明細檔狀態不會變動
 		switch (itemCode) {
 //                            1    2 3 4 5 6 7     8     9     A B
 		case "TRLN00":
@@ -613,6 +618,9 @@ public class TxToDoCom extends TradeBuffer {
 			break;
 		case "TRLW00":
 			settingValue = "TRLW00;Y;Y;-;Y;Y;L6983;L6983;L618C;Y;法務費轉列催收";
+			break;
+		case "BDLW00":
+			settingValue = "BDLW00;Y;Y;-;Y;Y;L6987;L6987;L618E;Y;呆帳戶法務費墊付";
 			break;
 		case "BDCL00":
 			settingValue = "BDCL00;Y;C;-;-;-;L698A;L698A;L3731;-;呆帳還清待結案";

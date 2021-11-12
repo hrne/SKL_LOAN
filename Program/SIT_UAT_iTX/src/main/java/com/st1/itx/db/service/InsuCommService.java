@@ -61,6 +61,39 @@ public interface InsuCommService {
   public Slice<InsuComm> findL4606A(int insuYearMonth_0, int commDate_1, int commDate_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo =
+   *
+   * @param custNo_0 custNo_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuComm InsuComm of List
+   */
+  public Slice<InsuComm> findCustNo(int custNo_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * FireOfficer = 
+   *
+   * @param fireOfficer_0 fireOfficer_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuComm InsuComm of List
+   */
+  public Slice<InsuComm> findFireOfficer(String fireOfficer_0, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * EmpId = 
+   *
+   * @param empId_0 empId_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice InsuComm InsuComm of List
+   */
+  public Slice<InsuComm> findEmpId(String empId_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By InsuComm
    * 
    * @param insuCommId key

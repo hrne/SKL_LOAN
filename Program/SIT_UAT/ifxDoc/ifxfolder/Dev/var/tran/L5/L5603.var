@@ -27,7 +27,7 @@ E(0,0)
 ["#FdNextIntDate+下次應繳日",#NextIntDate],
 [#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
 ["#FdMailTypeCode+發函種類",#MailTypeCode,#MailTypeCodeX],["#FdMailDate+發函日期",#MailDate],
-["#FdMailObj+發函對象",#MailObj,#MailObjX],["#FdMailCustName+對象姓名",#MailCustName,#BTNF],
+["#FdMailObj+發函對象",#MailObj,#MailObjX],["#FdMailCustName+#FieldName",#MailCustName,#BTNF],
 ["#FdDelvrYet+是否送達",#DelvrYet,#DelvrYetX],["#FdDelvrCode+送達方式",#DelvrCode,#DelvrCodeX],
 [#<->#,"#FdAddressCode+寄送地點類別",#AddressCode,#AddressCodeX],
 [#<->#,"#FdAddress+寄送地點",#Address],
@@ -169,6 +169,8 @@ T(2,@AddressCode,#L5R20AddressCode)
 T(2,@EditEmpNo,#L5R20EditEmpNo)
 T(2,@EditDate,#L5R20EditDate)
 T(2,@EditTime,#L5R20EditTime)
+C(5,#MailObj,1,T(2,@FieldName,借款人姓名),T(2,@FieldName,保證人姓名))
+
 
 ! 調Rim完成預先帶入
 T(H,@MailTypeCodeX,#MailTypeCode,#MailTypeCodeHelp)
@@ -201,9 +203,9 @@ C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,�
 #FdCaseCode=X,1,L
 #FdCustNo=X,1,L
 #FdAccCollPsn=X,1,L
-#FdLegalPsn=X,1,L
+#FdLegalPsn=X,2,L
 #FdPrevIntDate=X,1,L
-#FdLoanBal=X,1,L
+#FdLoanBal=X,2,L
 #FdNextIntDate=X,1,L
 #FdTelPhone=X,1,L
 #FdCallDate=X,1,L
@@ -212,7 +214,7 @@ C(2,#FunctionCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,�
 #FdFacmNo=X,1,L
 #FdMailTypeCode=X,1,L
 C(3,#FunctionCd,5,T(3,#FdMailTypeCode, ),T(3,#FdMailTypeCode,*))
-#FdMailDate=X,1,L
+#FdMailDate=X,2,L
 C(3,#FunctionCd,5,T(3,#FdMailDate, ),T(3,#FdMailDate,*))
 #FdMailObj=X,1,L
 C(3,#FunctionCd,5,T(3,#FdMailObj, ),T(3,#FdMailObj,*))
@@ -220,14 +222,14 @@ C(3,#FunctionCd,5,T(3,#FdMailObj, ),T(3,#FdMailObj,*))
 C(3,#FunctionCd,5,T(3,#FdMailCustName, ),T(3,#FdMailCustName,*))
 #FdDelvrYet=X,1,L
 C(3,#FunctionCd,5,T(3,#FdDelvrYet, ),T(3,#FdDelvrYet,*))
-#FdDelvrCode=X,1,L
+#FdDelvrCode=X,2,L
 C(3,#FunctionCd,5,T(3,#FdDelvrCode, ),T(3,#FdDelvrCode,*))
 #FdAddressCode=X,1,L
 C(3,#FunctionCd,5,T(3,#FdAddressCode, ),T(3,#FdAddressCode,*))
 #FdAddress=X,1,L
 C(3,#FunctionCd,5,T(3,#FdAddress, ),T(3,#FdAddress,*))
 #FdEditDate=X,1,L
-#FdEditTime=X,1,L
+#FdEditTime=X,2,L
 
 
 ! 功能
@@ -329,7 +331,9 @@ D(8)
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#MailObjHelp)
 @V(H,#MailObjHelp)
-#MailObjX=X,6,L
+C(5,#MailObj,1,T(2,@FieldName,借款人姓名),T(2,@FieldName,保證人姓名))
+
+#MailObjX=X,14,L
 T(H,#MailObj,#MailObjHelp)
 C(3,#MailObj,1,HIDE(#BTNF)T(F,@MailCustName,0)T(2,@FdMailCustName, ),SHOW(#BTNF)T(F,@MailCustName,1)T(2,@FdMailCustName,*))
 IF(#FunctionCd==4 || #FunctionCd==5,HIDE(#BTNF)T(2,@FdMailCustName, )T(F,@MailCustName,0),$)
@@ -345,6 +349,9 @@ C(3,#MailObj,1,T(2,@MailCustName,#L5R25CustName),E(0,@ApplNo,#L5R25ApplNo))
 
 ! 核准號碼
 #ApplNo=A,7,S
+
+! 文字欄位
+#FieldName=X,10,L
 
 ! 對象姓名 借:帶入；保:輸入
 #BTNF=X,1,I,ui:button;value:保證人查詢;enable:1;tabbable:0

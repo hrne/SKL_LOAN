@@ -337,6 +337,11 @@ public class L1001 extends TradeBuffer {
 
 		boolean custDataControl = false;
 
+		boolean allowInquiry = true;
+		if ("1".equals(aCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(aCustMain.getBranchNo())) {
+			allowInquiry = false;
+		}
+		
 		CustDataCtrl custDataCtrl = custDataCtrlService.findById(aCustMain.getCustNo(), titaVo);
 		if (custDataCtrl != null && custDataCtrl.getApplMark() == 1) {
 			custDataControl = true;
@@ -356,7 +361,7 @@ public class L1001 extends TradeBuffer {
 //		tmpCustMain = iCustMainService.custIdFirst(aCustMain.getCustId(), titaVo);
 //		this.info("顧客" + tmpCustMain);
 //		if (tmpCustMain != null) {
-		if (!custDataControl) {
+		if (!custDataControl && allowInquiry) {
 			CustMainBTNFg = 1;
 		}
 //		}
@@ -472,7 +477,7 @@ public class L1001 extends TradeBuffer {
 		}
 
 		// 客戶電話按鈕fg
-		if (!custDataControl) {
+		if (!custDataControl && allowInquiry) {
 			Slice<CustTelNo> stmpCustTelNo = iCustTelNoService.findCustUKey(aCustMain.getCustUKey(), this.index,
 					this.limit, titaVo);
 			tmpCustTelNo = stmpCustTelNo == null ? null : stmpCustTelNo.getContent();
@@ -509,7 +514,7 @@ public class L1001 extends TradeBuffer {
 		occursList.putParam("OOCustNo", aCustMain.getCustNo());
 		occursList.putParam("OOCustTypeCode", aCustMain.getCustTypeCode());
 		occursList.putParam("OOCustName", aCustMain.getCustName().replace("$n", "\n"));
-		if (custDataControl) {
+		if (custDataControl || !allowInquiry) {
 			occursList.putParam("OODataStatus", "X");
 		} else {
 			occursList.putParam("OODataStatus", aCustMain.getDataStatus());

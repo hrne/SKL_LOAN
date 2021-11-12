@@ -17,6 +17,7 @@ create table "InnReCheck" (
   "ReChkUnit" nvarchar2(10),
   "SpecifyFg" varchar2(2),
   "Remark" nvarchar2(300),
+  "TraceMonth" decimal(6, 0) default 0 not null,
   "CreateDate" timestamp,
   "CreateEmpNo" varchar2(6),
   "LastUpdate" timestamp,
@@ -42,6 +43,7 @@ comment on column "InnReCheck"."CityItem" is '地區別';
 comment on column "InnReCheck"."ReChkUnit" is '應覆審單位';
 comment on column "InnReCheck"."SpecifyFg" is '指定複審記號';
 comment on column "InnReCheck"."Remark" is '備註';
+comment on column "InnReCheck"."TraceMonth" is '追蹤年月';
 comment on column "InnReCheck"."CreateDate" is '建檔日期時間';
 comment on column "InnReCheck"."CreateEmpNo" is '建檔人員';
 comment on column "InnReCheck"."LastUpdate" is '最後更新日期時間';

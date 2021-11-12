@@ -244,7 +244,11 @@ public class L1101 extends TradeBuffer {
 //		}
 			break;
 		case "5": // 查詢
-			this.info("L1101 inquiry ");
+					
+			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
+				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
+			}
+			
 			// 主管刷卡
 			if (titaVo.getEmpNos().trim().isEmpty()) {
 				this.info("主管 = " + titaVo.getEmpNos().trim());
@@ -499,14 +503,15 @@ public class L1101 extends TradeBuffer {
 			tCustMain.setIntroducer(beforeCustMain.getIntroducer());
 		}
 //		Introducer
-		// 分行別預設0000 --2021.8.6 Fegie
-		tCustMain.setBranchNo("0000");
+
+		tCustMain.setBranchNo(titaVo.getParam("KINBR"));
 
 		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
 		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
 
 		tCustMain.setDataStatus(0);
+		tCustMain.setAllowInquire("2");
 
 	}
 

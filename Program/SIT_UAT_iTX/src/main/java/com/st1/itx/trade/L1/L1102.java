@@ -184,6 +184,12 @@ public class L1102 extends TradeBuffer {
 			setCustCross(titaVo, tCustMain);
 
 		} else if ("5".equals(funcd)) {
+
+			if (funcd.equals("5") && "1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000")
+					&& !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
+				throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
+			}
+
 			if (titaVo.getEmpNos().trim().isEmpty()) {
 				this.info("主管 = " + titaVo.getEmpNos().trim());
 
@@ -219,7 +225,8 @@ public class L1102 extends TradeBuffer {
 
 		this.info("tCustMain = " + tCustMain);
 		// 用客戶識別碼取電話資料
-		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE, titaVo);
+		Slice<CustTelNo> slCustTelNo = sCustTelNoService.findCustUKey(tCustMain.getCustUKey(), 0, Integer.MAX_VALUE,
+				titaVo);
 		List<CustTelNo> lCustTelNo = slCustTelNo == null ? null : slCustTelNo.getContent();
 
 		// 查詢行業別代號資料檔
@@ -375,14 +382,14 @@ public class L1102 extends TradeBuffer {
 			tCustMain.setIncomeDataDate("" + (iParse.stringToInteger(titaVo.getParam("IncomeDataDate")) + 191100));
 		}
 
-		// 分行別預設0000 --2021.8.6 Fegie
-		tCustMain.setBranchNo("0000");
+		tCustMain.setBranchNo(titaVo.getParam("KINBR"));
 
 		tCustMain.setIsSuspected(titaVo.getParam("IsSuspected"));
 		tCustMain.setIsSuspectedCheck(titaVo.getParam("IsSuspectedCheck"));
 		tCustMain.setIsSuspectedCheckType(titaVo.getParam("IsSuspectedCheckType"));
 
 		tCustMain.setDataStatus(0);
+		tCustMain.setAllowInquire("2");
 	}
 
 	// 查詢放款主檔
@@ -400,7 +407,8 @@ public class L1102 extends TradeBuffer {
 		for (LoanBorMain tLoanBorMain : lLoanBorMain) {
 
 			// 0:正常戶 2:催收戶 4:逾期戶 6:呆帳戶 7:部分轉呆戶 => 不需授權
-			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4 || tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
+			if (tLoanBorMain.getStatus() == 0 || tLoanBorMain.getStatus() == 2 || tLoanBorMain.getStatus() == 4
+					|| tLoanBorMain.getStatus() == 6 || tLoanBorMain.getStatus() == 7) {
 				cChkFg = 0;
 				return cChkFg;
 			}

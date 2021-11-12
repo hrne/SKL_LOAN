@@ -209,6 +209,7 @@ public class L560AReport extends MakeReport {
 		String iAccTel = "";// 通知函需用到-未定版
 		String iAccCollPsn = "";
 		String iAccCollPsnX = "";// 通知函需用到-未定版
+		String iCityCode = "";
 		if (adjFlag.equals("1")) {// 通知函-法催人員與電話
 			iCollListId.setCustNo(rCustNo);
 			iCollListId.setFacmNo(rFacmNo);
@@ -216,27 +217,24 @@ public class L560AReport extends MakeReport {
 			if (iCollList == null) {
 				throw new LogicException(titaVo, "E0001", "法催紀錄清單檔無資料，戶號:\" + iCustNo + \"額度:\" + iFacmNo");
 			}
+			iCityCode = iCollList.getCityCode();// 法催地區
 			iAccCollPsn = iCollList.getAccCollPsn();// 催收人員
-			if (!iAccCollPsn.trim().isEmpty() || !iAccCollPsn.equals("")) {
-				Slice<CdCity> iCdCity = null;
-				iCdCity = iCdCityService.findAll(0, Integer.MAX_VALUE, titaVo);
+			if (!iCityCode.trim().isEmpty() || !iCityCode.equals("")) {
+				CdCity iCdCity = null;
+				iCdCity = iCdCityService.findById(iCityCode, titaVo);
 				if (iCdCity == null) {
 					throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
 				}
-				for (CdCity rCdCity : iCdCity) {
-					if (rCdCity.getAccCollPsn().equals(iCollList.getAccCollPsn())) {
-						if (!rCdCity.getAccTelArea().trim().isEmpty() || !rCdCity.getAccTelArea().equals("")) {
-							iAccTel = rCdCity.getAccTelArea().trim() + "-";
-						}
-						if (!rCdCity.getAccTelNo().trim().isEmpty() || !rCdCity.getAccTelNo().equals("")) {
-							iAccTel = iAccTel + rCdCity.getAccTelNo().trim();
-						}
-						if (!rCdCity.getAccTelExt().trim().isEmpty() || !rCdCity.getAccTelExt().equals("")) {
-							iAccTel = iAccTel + "-" + rCdCity.getAccTelExt().trim();
-						}
-						break;
-					}
+				if (!iCdCity.getAccTelArea().trim().isEmpty() || !iCdCity.getAccTelArea().equals("")) {
+					iAccTel = iCdCity.getAccTelArea().trim() + "-";
 				}
+				if (!iCdCity.getAccTelNo().trim().isEmpty() || !iCdCity.getAccTelNo().equals("")) {
+					iAccTel = iAccTel + iCdCity.getAccTelNo().trim();
+				}
+				if (!iCdCity.getAccTelExt().trim().isEmpty() || !iCdCity.getAccTelExt().equals("")) {
+					iAccTel = iAccTel + "-" + iCdCity.getAccTelExt().trim();
+				}
+
 				iCdEmp = iCdEmpService.findById(iAccCollPsn, titaVo);
 				if (iCdEmp != null) {
 					iAccCollPsnX = iCdEmp.getFullname();

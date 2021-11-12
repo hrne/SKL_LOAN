@@ -54,6 +54,7 @@ L1r01AMLGroup=X,3
 L1r01IndigenousName=X,100
 L1r01Introducer=X,6
 L1r01TypeCode=9,1
+L1r01AllowInquire=X,1
 L1r01RegAddress=X,115
 L1r01CurrAddress=X,115
 

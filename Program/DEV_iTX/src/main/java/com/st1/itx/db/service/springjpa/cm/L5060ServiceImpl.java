@@ -38,20 +38,17 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 	}
 
 	// *** 折返控制相關 ***
-	private int index;
-
-	// *** 折返控制相關 ***
 	private int limit;
 
 	private String sqlRow = "OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
 
 	/* load 法催紀錄清單檔 */
-	public List<Map<String, String>> load(int index, int limit, String iCaseCode, int sOvduTerm, int eOvduTerm, String iOvdamtfm, String iOvdamtto, int iStatus, int iBizDateF, int iIdentity,
-			int iCustNo, String iCustName, String iCustId, String iAccCollPsn, String iLegalPsn, String iTxCode, TitaVo titaVo) throws Exception {
+	public List<Map<String, String>> load(int index, int limit, String iCaseCode, int sOvduTerm, int eOvduTerm,
+			String iOvdamtfm, String iOvdamtto, int iStatus, int iBizDateF, int iIdentity, int iCustNo,
+			String iCustName, String iCustId, String iAccCollPsn, String iLegalPsn, String iTxCode, String iCityCode,
+			TitaVo titaVo) throws Exception {
 
 		Query query;
-		// *** 折返控制相關 ***
-		this.index = index;
 		// *** 折返控制相關 ***
 		this.limit = limit;
 
@@ -78,6 +75,7 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		queryttext += ",s.\"ClFacmNo\""; // 同擔保品額度
 		queryttext += ",s.\"ClRowNo\""; // 同擔保品序列號
 		queryttext += ",s.\"IsSpecify\"";// 是否為指定
+		queryttext += ",s.\"CityCode\"";// 擔保品地區別
 //		queryttext += ") ";
 		queryttext += " from \"CollList\" s "; // 法催紀錄清單檔
 //		queryttext += "left join \"CollList\" c on s.\"ClCustNo\" = s.\"ClCustNo\" and s.\"ClFacmNo\" = s.\"ClFacmNo\" "; // 法催紀錄清單檔
@@ -135,6 +133,11 @@ public class L5060ServiceImpl extends ASpringJpaParm implements InitializingBean
 			queryttext += " and s.\"LegalPsn\" = '" + iLegalPsn + "' ";
 			break;
 		}
+		if (!iCityCode.equals("")) {
+			queryttext += " and s.\"CityCode\" =  '" + iCityCode + "'"; // 擔保品地區別
+		}
+
+		
 		queryttext += "order by s.\"ClCustNo\", s.\"ClFacmNo\", s.\"ClRowNo\", s.\"CustNo\", s.\"FacmNo\" "; // 01: 逾期/催收戶
 
 		queryttext += sqlRow;

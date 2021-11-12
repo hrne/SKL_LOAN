@@ -26,7 +26,7 @@ public class SpecInnReCheck implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 7001271411468861966L;
+	private static final long serialVersionUID = -1108011086733211921L;
 
 @EmbeddedId
   private SpecInnReCheckId specInnReCheckId;
@@ -47,6 +47,10 @@ public class SpecInnReCheck implements Serializable {
   /* 00'~'12'-複審名單的複審週期 */
   @Column(name = "`Cycle`")
   private int cycle = 0;
+
+  // 覆審年月
+  @Column(name = "`ReChkYearMonth`")
+  private int reChkYearMonth = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -152,6 +156,25 @@ public class SpecInnReCheck implements Serializable {
   }
 
 /**
+	* 覆審年月<br>
+	* 
+	* @return Integer
+	*/
+  public int getReChkYearMonth() {
+    return this.reChkYearMonth;
+  }
+
+/**
+	* 覆審年月<br>
+	* 
+  *
+  * @param reChkYearMonth 覆審年月
+	*/
+  public void setReChkYearMonth(int reChkYearMonth) {
+    this.reChkYearMonth = reChkYearMonth;
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -230,7 +253,7 @@ public class SpecInnReCheck implements Serializable {
 
   @Override
   public String toString() {
-    return "SpecInnReCheck [specInnReCheckId=" + specInnReCheckId + ", remark=" + remark + ", cycle=" + cycle + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "SpecInnReCheck [specInnReCheckId=" + specInnReCheckId + ", remark=" + remark + ", cycle=" + cycle + ", reChkYearMonth=" + reChkYearMonth + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

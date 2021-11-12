@@ -53,13 +53,14 @@ K(MODIFYBUTTON,查詢)
 [#<->#,"@逾期期數",#Ovdtrmfm,"~",#Ovdtrmto],
 [#<->#,"@逾期天數",#Ovddayfm,"~",#Ovddayto],
 [#<->#,"@戶況",#Status,#StatusX],
+[#<->#,"@擔保品地區別",#CityCode,#CityCodeX],
 ]
 !---------- AP TEXT AREA Variables ----------
 #BTN1=X,45,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
 #BTN2=X,45,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
 #BTN3=X,45,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
-#BTN4=X,45,I,ui:button;value:聯徵地區別查詢;enable:0;tabbable:0
-#BTN5=X,45,I,ui:button;value:聯徵地區別查詢;enable:0;tabbable:0
+#BTN4=X,45,I,ui:button;value:法催地區別查詢;enable:0;tabbable:0
+#BTN5=X,45,I,ui:button;value:法催地區別查詢;enable:0;tabbable:0
 #BUF1=X,42,S
 #BUF2=X,42,S
 #BUF3=X,42,S
@@ -74,9 +75,9 @@ BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustName
 #BIND3=X,1,S
 BIND(#BTN3,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF3;ntxbuf5=type<-1:CustId<-OOCustId})
 #BIND4=X,1,S
-BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#BUF4;ntxbuf5=type<-1:AccCollPsn<-OOAccCollPsn:AccCollPsnX<-OOAccCollPsnX})
+BIND(#BTN4,click, {cmd=CHAIN; ntxcd=L5062; ntxbuf=#BUF4;ntxbuf5=type<-1:AccCollPsn<-OOAccCollPsn:AccCollPsnX<-OOAccCollPsnX})
 #BIND5=X,1,S
-BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L6074; ntxbuf=#BUF5;ntxbuf5=type<-1:LegalPsn<-OOLegalPsn:LegalPsnX<-OOLegalPsnX})
+BIND(#BTN5,click, {cmd=CHAIN; ntxcd=L5062; ntxbuf=#BUF5;ntxbuf5=type<-1:LegalPsn<-OOLegalPsn:LegalPsnX<-OOLegalPsnX})
 
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -259,6 +260,36 @@ C(3,#OprionCd,1,C(3,#Ovdtrmfm,0,$,s),C(3,#Ovddayfm,0,$,s))
 #StatusX=X,22,L
 T(H,#Status,#StatusHelp)
 
+<include src="ROM.icf::L6R03.dec"/>
+!調RIM參數
+
+#RimFunCd=A,1,S
+#RimCityCode=X,1,S
+#RimAreaCode=X,1,S
+
+! 調RIM取縣市代碼
+#RimL6r03City=X,1,S
+E(0,@RimFunCd,1)
+T(3,@RimCityCode,)
+T(3,@RimAreaCode,)
+S(L6R03,1,#RimFunCd,#RimCityCode,#RimAreaCode)
+R(1,L6R03)
+
+! 縣市代碼的下拉選單
+#L6r03ResultCity=X,10000,S
+T(2,#L6r03Result)
+
+!擔保品地區別-縣市代碼
+#CityCode=X,2,I
+HELP(#L6r03ResultCity,cols:5)
+@
+C(4,#CityCode,$,V(H,#L6r03ResultCity))
+
+! 縣市代碼對應名稱
+#CityCodeX=X,8,L
+C(4,#CityCode,S,T(H,#CityCode,#L6r03ResultCity))
+
+
 #RPTFG=A,1,S
 C(3,#CaseCode,1,E(0,0),E(0,1))
 
@@ -290,6 +321,9 @@ T(H,#OOTxCode,#TxCodeHelp)
 #OOFacmNo=A,3,O
 ! 姓名
 #OOCUSTNM=X,20,O
+!戶名
+#OOCustName=X,2.50,O
+
 ! 繳息迄日
 #OOPrevIntDate=D,7,O
 ! 逾期數
@@ -321,6 +355,10 @@ T(H,#OOStatus,#StatusHelp)
 ! 登錄人員編號+姓名
 #EmpNoSpace=X,1,S
 T(2, )
+!擔保品地區別
+#OOCityCode=X,2,S
+#OOCityCodeX=X,8,O
+C(4,#OOCityCode,S,T(H,#OOCityCode,#L6r03ResultCity))
 
 #EditAccCollPsn=X,48,S
 T(2,#OOAccCollPsn+#EmpNoSpace+#OOAccCollPsnX)
@@ -416,6 +454,7 @@ T(6A,#OOCustNo+#OOFacmNo+#OOPrinBalance+#OOOverDueterm)
 #CustId
 #AccCollPsn
 #LegalPsn
+#CityCode
 #END
 </sub>
 
@@ -444,7 +483,10 @@ TXFORM=L5060
 #OOAccCollPsnX
 #OOIsSpecify
 #OOStatus
+#OOCustName
+#OOCityCode
 ^
+<include src="ROM.icf::L6R03.tom"/>
 </sub>
 
 
@@ -481,18 +523,20 @@ ifxBatch:{
 {width:95}
 #OOBtnAlert=提醒日
 {search:false,formatter:'cust:bind-button:#XXAlertDate',align:'center',canExport:false,width:80}
+#OOCustName=戶名
+{width:100}
 #OOCustNo=戶號
 {width:65}
 #OOFacmNo=額度
 {width:40,align:'center'}
 #OOPrevIntDate=繳息迄日
-{width:65}
+{width:70}
 #OOOverDueterm=逾期數
-{width:50}
+{width:55}
 #OOOvduDays=逾期天數
-{width:50}
+{width:70}
 #OOCurrencyCode=幣別
-{width:35}
+{width:40}
 #OOPrinBalance=本金餘額
 {width:95}
 #EditAccCollPsn=催收人員
@@ -505,6 +549,8 @@ ifxBatch:{
 {width:95,align:'center'}
 #OOStatusX=戶況
 {width:45}
+#OOCityCodeX=擔保品地區別
+{width:100}
 ^
 #RPTFG=1,QUERY.GRID,L5060
 #any={caption:'[L5060]',width:1000,rowNum:40,ifxDisplay:1,
@@ -527,18 +573,20 @@ ifxBatch:{
 {width:95}
 #OOBtnAlert=提醒日
 {search:false,formatter:'cust:bind-button:#XXAlertDate',align:'center',canExport:false,width:80}
+#OOCustName=戶名
+{width:100}
 #OOCustNo=戶號
 {width:65}
 #OOFacmNo=額度
 {width:40,align:'center'}
 #OOPrevIntDate=繳息迄日
-{width:65}
+{width:70}
 #OOOverDueterm=逾期數
-{width:50}
+{width:55}
 #OOOvduDays=逾期天數
-{width:50}
+{width:70}
 #OOCurrencyCode=幣別
-{width:35}
+{width:40}
 #OOPrinBalance=本金餘額
 {width:95}
 #EditAccCollPsn=催收人員
@@ -551,6 +599,8 @@ ifxBatch:{
 {width:95,align:'center'}
 #OOStatusX=戶況
 {width:45}
+#OOCityCodeX=擔保品地區別
+{width:100}
 ^
 
 <include src="PRT.icf::INQ04.sel" map="i=L5060;cpi=15"/>

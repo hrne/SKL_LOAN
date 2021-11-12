@@ -22,7 +22,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L6R17") // 尋找員工檔資料
 @Scope("prototype")
 public class L6R17 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6R17.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -59,11 +58,11 @@ public class L6R17 extends TradeBuffer {
 
 		/* 如有找到資料 */
 		if (tCdEmp != null) {
-			if (!(tCdEmp.getAgCurInd().equals("Y") || tCdEmp.getAgCurInd().equals("y"))) {
-				throw new LogicException(titaVo, "E6012", "員工編號 = " + iRimEmployeeNo); // 該員工非現職人員
-			} else {
+//			if (!(tCdEmp.getAgCurInd().equals("Y") || tCdEmp.getAgCurInd().equals("y"))) {
+//				throw new LogicException(titaVo, "E6012", "員工編號 = " + iRimEmployeeNo); // 該員工非現職人員
+//			} else {
 				moveTotaCdEmp(tCdEmp);
-			}
+//			}
 		} else {
 			if (iRimFuncCode == 5) {
 				this.info("L6R17 iRimFuncCode : " + iRimFuncCode);

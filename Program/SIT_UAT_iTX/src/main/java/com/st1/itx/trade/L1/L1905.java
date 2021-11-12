@@ -81,6 +81,10 @@ public class L1905 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "客戶資料主檔");
 		}
 
+		if ("1".equals(tCustMain.getAllowInquire()) && !titaVo.getKinbr().equals("0000") && !titaVo.getKinbr().equals(tCustMain.getBranchNo())) {
+			throw new LogicException("E0015", "已設定不開放查詢,限總公司及原建檔單位查詢");
+		}
+
 		String custUKey = tCustMain.getCustUKey().trim();
 
 		List<CustTelNo> lCustTelNo = new ArrayList<CustTelNo>();

@@ -273,9 +273,21 @@ public class L4452Batch extends TradeBuffer {
 			tmp.setFacmNo(tBankDeductDtl.getFacmNo());
 			tmp.setRepayType(tBankDeductDtl.getRepayType());
 			tmp.setPayIntDate(tBankDeductDtl.getPayIntDate());
+			TempVo tempVo = new TempVo();
+			tempVo = tempVo.getVo(tBankDeductDtl.getJsonFields());
 
-			if (!"".equals(tBankDeductDtl.getJsonFields())) {
-				this.info("有問題不計算...");
+			this.info("JsonFields : " + tBankDeductDtl.getJsonFields());
+//				欄位不夠長，順序為帳號、AML、扣帳金額為零
+			if (tempVo.get("Auth") != null && tempVo.get("Auth").length() > 0) {
+				this.info("帳號授權檢核");
+				continue;
+			}
+			if ("1".equals(tBankDeductDtl.getAmlRsp()) || "2".equals(tBankDeductDtl.getAmlRsp())) {
+				this.info("Aml檢核");
+				continue;
+			}
+			if (tempVo.get("Deduct") != null && tempVo.get("Deduct").length() > 0) {
+				this.info("扣款檢核");
 				continue;
 			}
 
@@ -443,12 +455,6 @@ public class L4452Batch extends TradeBuffer {
 			}
 
 			if (!"700".equals(tBankDeductDtl.getRepayBank())) {
-				tmpFacm tmp = new tmpFacm();
-				tmp.setCustNo(tBankDeductDtl.getCustNo());
-				tmp.setFacmNo(tBankDeductDtl.getFacmNo());
-				tmp.setRepayType(tBankDeductDtl.getRepayType());
-				tmp.setPayIntDate(tBankDeductDtl.getPayIntDate());
-
 				String mediaCode = "Y";
 				String procNote = "";
 				TempVo tempVo = new TempVo();
@@ -476,6 +482,11 @@ public class L4452Batch extends TradeBuffer {
 					this.info("不產出，僅寫入報表...");
 					continue;
 				}
+				tmpFacm tmp = new tmpFacm();
+				tmp.setCustNo(tBankDeductDtl.getCustNo());
+				tmp.setFacmNo(tBankDeductDtl.getFacmNo());
+				tmp.setRepayType(tBankDeductDtl.getRepayType());
+				tmp.setPayIntDate(tBankDeductDtl.getPayIntDate());
 
 //					重複的撥款seq不+1
 				if (!flagMap.containsKey(tmp)) {
@@ -559,11 +570,11 @@ public class L4452Batch extends TradeBuffer {
 				tAchDeductMedia.setRelCustId(tBankDeductDtl.getRelCustId());
 
 				lAchDeductMedia.add(tAchDeductMedia);
+				this.info("lAchDeductMedia" + tAchDeductMedia.toString());
+
 			}
 		}
-		if (mediaSeq1 >= 1 || mediaSeq2 >= 1)
-
-		{
+		if (mediaSeq1 >= 1 || mediaSeq2 >= 1) {
 			try {
 				achDeductMediaService.insertAll(lAchDeductMedia, titaVo);
 			} catch (DBException e) {
@@ -1166,22 +1177,23 @@ public class L4452Batch extends TradeBuffer {
 		String repayType = "";
 		String note = "";
 		int repayTypeInt = 0;
-		
+
 		int custno = tBankDeductDtl.getCustNo();
 		String custname = "";
 		CustMain tCustMain = custMainService.custNoFirst(custno, custno, titaVo);
-		
-		if(tCustMain != null) {
+
+		if (tCustMain != null) {
 			custname = tCustMain.getCustName();
 		}
-		
+
 		if (tBankDeductDtl.getRepayType() == 3) {
 			repayTypeInt = 1;
 		} else {
 			repayTypeInt = tBankDeductDtl.getRepayType();
 		}
 
-		CdCode t2CdCode = cdCodeService.getItemFirst(4, "RepayTypeSearch", FormatUtil.pad9("" + repayTypeInt, 2), titaVo);
+		CdCode t2CdCode = cdCodeService.getItemFirst(4, "RepayTypeSearch", FormatUtil.pad9("" + repayTypeInt, 2),
+				titaVo);
 
 		if (t2CdCode != null) {
 			repayType = t2CdCode.getItem();
@@ -1198,7 +1210,7 @@ public class L4452Batch extends TradeBuffer {
 		occursList.putParam("OONote", note);
 		unDoList.add(occursList);
 	}
-	
+
 	private ArrayList<BankDeductDtl> postMediaSorting(ArrayList<BankDeductDtl> lBankDeductDtl) {
 		this.info("setPostDeductMedia Start...");
 //		依儲金帳號排序後，先依區處代號排序(0001.0002)，再依計息迄日由小到大，最後才依扣款金額由大到小排序

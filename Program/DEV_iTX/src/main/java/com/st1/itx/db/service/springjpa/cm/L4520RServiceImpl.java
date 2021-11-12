@@ -42,7 +42,8 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		int PerfMonth = parse.stringToInteger(titaVo.getParam("PerfMonth")) + 191100;
-		
+//		String BatchNo = parse.stringToStringDate(titaVo.getParam("BatchNo"));
+		String BatchNo= titaVo.getParam("BatchNo");
 		this.info("L4520.Fire");
 
 		String sql = "    SELECT                      ";
@@ -64,14 +65,14 @@ public class L4520RServiceImpl extends ASpringJpaParm implements InitializingBea
 		sql +=       "    WHERE                   "; 
 		sql +=		 "    ed.\"PerfMonth\" = :PerfMonth "; 
 		sql +=		 "    AND ed.\"AchRepayCode\" = 5   ";
+		sql += 	     "    AND ed.\"BatchNo\" = :BatchNo";
 		sql +=		 "     ORDER BY \"BatchNo\",\"CustNo\"   ";
 		this.info("sql=" + sql);
 		Query query;
-
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-
 		query.setParameter("PerfMonth", PerfMonth);
+		query.setParameter("BatchNo", BatchNo);
 		return this.convertToMap(query);
 	}
 

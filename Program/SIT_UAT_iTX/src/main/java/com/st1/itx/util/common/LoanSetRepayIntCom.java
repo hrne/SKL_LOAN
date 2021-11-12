@@ -122,8 +122,9 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setPrevRepaidDate(t.getPrevRepaidDate() == 0 ? t.getDrawdownDate() : t.getPrevRepaidDate()); // 上次還本日
 		loanCalcRepayIntCom.setPrevPaidIntDate(prevPayIntDate); // 上次繳息日
 		// 下次繳息日,應繳息日,預定收息日； 最後一期依應繳日計算的下次繳息日重新設定為到期日
-		loanCalcRepayIntCom.setNextPayIntDate(
-				t.getNextPayIntDate() > t.getMaturityDate() ? t.getMaturityDate() : t.getNextPayIntDate());
+//		loanCalcRepayIntCom.setNextPayIntDate(
+//				t.getNextPayIntDate() > t.getMaturityDate() ? t.getMaturityDate() : t.getNextPayIntDate());
+		loanCalcRepayIntCom.setNextPayIntDate(t.getNextPayIntDate());
 		loanCalcRepayIntCom.setNextRepayDate(t.getNextRepayDate()); // 下次還本日,應還本日,預定還本日
 		loanCalcRepayIntCom.setSpecificDate(t.getSpecificDate()); // 指定基準日期, 利息基準日
 		loanCalcRepayIntCom.setSpecificDd(t.getSpecificDd()); // 指定應繳日
@@ -148,7 +149,7 @@ public class LoanSetRepayIntCom extends TradeBuffer {
 		loanCalcRepayIntCom.setEntryDate(iEntryDate); // 入帳日期
 		loanCalcRepayIntCom.setUsageCode(t.getUsageCode()); // 資金用途別 1: 週轉金2: 購置不動產3: 營業用資產4: 固定資產5: 企業投資6: 購置動產9: 其他
 		loanCalcRepayIntCom.setCaseCloseFlag("N"); // 結案記號 Y:是 N:否
-		loanCalcRepayIntCom.setBreachReliefFlag("N"); // 減免違約金 Y:是 N:否
+		loanCalcRepayIntCom.setBreachReliefFlag(t.getNextPayIntDate() > t.getMaturityDate() ? "Y" :"N"); // 減免違約金 Y:是 N:否
 		// 聯貸案件 Y:是 N:否
 		if (t.getSyndNo() > 0) { // 聯貸案序號
 			loanCalcRepayIntCom.setSyndFlag("Y");

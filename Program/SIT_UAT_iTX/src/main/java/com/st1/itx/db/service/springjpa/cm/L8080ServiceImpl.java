@@ -16,7 +16,6 @@ import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
-import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L8080ServiceImpl")
@@ -32,9 +31,6 @@ public class L8080ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private Parse parse;
-
-	@Autowired
-	private DateUtil dateUtil;
 
 	// *** 折返控制相關 ***
 	private int index;
@@ -82,7 +78,7 @@ public class L8080ServiceImpl extends ASpringJpaParm implements InitializingBean
 			switch (iTypeCode) {
 			case 0:
 				sql += " case                                                         ";
-				sql += " when SUBSTR(\"CaseNo\",0,2) = 'LN'                           ";
+				sql += " when SUBSTR(\"CaseNo\",0,2) in ('LN','RT')                   ";
 				sql += " THEN 1                                  				      ";
 				sql += " when (\"CaseNo\") = 'L3110'                                  ";
 				sql += " THEN 1                                  					  ";
@@ -130,7 +126,6 @@ public class L8080ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		sql += " order by t.\"CreateDate\" Desc ";
 		sql += " )  ";
-
 
 		this.info("sql=" + sql);
 		Query query;

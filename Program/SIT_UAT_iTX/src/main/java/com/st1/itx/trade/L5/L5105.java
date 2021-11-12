@@ -49,7 +49,6 @@ public class L5105 extends TradeBuffer {
 		int iConditionCode = Integer.valueOf(titaVo.getParam("ConditionCode"));
 		int iCustNo = Integer.valueOf(titaVo.getParam("CustNo"));
 		int iFacmNo = Integer.valueOf(titaVo.getParam("FacmNo"));
-		this.info("月份="+iCustNo);
 		String iReCheckCode = titaVo.getParam("ReCheckCode");
 		int iReChkYearMonth = Integer.valueOf(titaVo.getParam("ReChkYearMonth"))+191100;
 		String iReChkUnit = titaVo.getParam("ReChkUnit");	
@@ -87,7 +86,7 @@ public class L5105 extends TradeBuffer {
 			idataLog.exec();
 
 		} catch (DBException e) {
-			throw new LogicException("E0007", "資產負債表(FinReportDebt)");
+			throw new LogicException("E0007", "");
 		}
 
 		this.addList(this.totaVo);

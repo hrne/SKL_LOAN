@@ -166,6 +166,90 @@ em = null;
   }
 
   @Override
+  public Slice<InsuComm> findCustNo(int custNo_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<InsuComm> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = insuCommReposDay.findAllByCustNoIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(custNo_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = insuCommReposMon.findAllByCustNoIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(custNo_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = insuCommReposHist.findAllByCustNoIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(custNo_0, pageable);
+    else 
+      slice = insuCommRepos.findAllByCustNoIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(custNo_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<InsuComm> findFireOfficer(String fireOfficer_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<InsuComm> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findFireOfficer " + dbName + " : " + "fireOfficer_0 : " + fireOfficer_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = insuCommReposDay.findAllByFireOfficerIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(fireOfficer_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = insuCommReposMon.findAllByFireOfficerIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(fireOfficer_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = insuCommReposHist.findAllByFireOfficerIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(fireOfficer_0, pageable);
+    else 
+      slice = insuCommRepos.findAllByFireOfficerIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(fireOfficer_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<InsuComm> findEmpId(String empId_0, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<InsuComm> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findEmpId " + dbName + " : " + "empId_0 : " + empId_0);
+    if (dbName.equals(ContentName.onDay))
+      slice = insuCommReposDay.findAllByEmpIdIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(empId_0, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = insuCommReposMon.findAllByEmpIdIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(empId_0, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = insuCommReposHist.findAllByEmpIdIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(empId_0, pageable);
+    else 
+      slice = insuCommRepos.findAllByEmpIdIsOrderByInsuYearMonthAscNowInsuNoAscInsuCateAsc(empId_0, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public InsuComm holdById(InsuCommId insuCommId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

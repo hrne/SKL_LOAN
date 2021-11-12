@@ -31,7 +31,7 @@ public class L1R01 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustTelNoService sCustTelNoService;
-	
+
 	@Autowired
 	public CustNoticeCom custNoticeCom;
 
@@ -42,7 +42,7 @@ public class L1R01 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L1R01 ");
 		this.totaVo.init(titaVo);
-		
+
 		// RimCustId=X,10
 		String iCustId = titaVo.get("RimCustId").trim();
 
@@ -64,7 +64,7 @@ public class L1R01 extends TradeBuffer {
 			// 統編、戶號需擇一輸入
 			throw new LogicException("E0010", "客戶主檔");
 		}
-		
+
 		// 邏輯錯誤處理
 		if (funcd.equals("1") && tCustMain != null) {
 			// 2021.8.29 by eric
@@ -103,11 +103,11 @@ public class L1R01 extends TradeBuffer {
 			if (tCustMain.getActFg() == 1) {
 				throw new LogicException("E0021", "");
 			}
-			
+
 			if (tCustMain.getDataStatus() == 1 && "L1103".equals(txcd)) {
 				throw new LogicException("E0003", "請先至L1103補建基本資料");
 			}
-			
+
 			if (tCustMain.getDataStatus() == 1 && "L1104".equals(txcd)) {
 				throw new LogicException("E0003", "請先至L1104補建基本資料");
 			}
@@ -168,12 +168,10 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01JobTenure", tCustMain.getJobTenure());
 		this.totaVo.putParam("L1r01IncomeOfYearly", tCustMain.getIncomeOfYearly());
 
-		if (tCustMain.getIncomeDataDate() == null || "".equals(tCustMain.getIncomeDataDate())
-				|| "0".equals(tCustMain.getIncomeDataDate())) {
+		if (tCustMain.getIncomeDataDate() == null || "".equals(tCustMain.getIncomeDataDate()) || "0".equals(tCustMain.getIncomeDataDate())) {
 			this.totaVo.putParam("L1r01IncomeDataDate", "");
 		} else {
-			this.totaVo.putParam("L1r01IncomeDataDate",
-					(iParse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100));
+			this.totaVo.putParam("L1r01IncomeDataDate", (iParse.stringToInteger(tCustMain.getIncomeDataDate()) - 191100));
 		}
 		this.totaVo.putParam("L1r01PassportNo", tCustMain.getPassportNo());
 		this.totaVo.putParam("L1r01AMLJobCode", tCustMain.getAMLJobCode());
@@ -181,8 +179,9 @@ public class L1R01 extends TradeBuffer {
 		this.totaVo.putParam("L1r01IndigenousName", tCustMain.getIndigenousName());
 		this.totaVo.putParam("L1r01Introducer", tCustMain.getIntroducer());
 		this.totaVo.putParam("L1r01TypeCode", tCustMain.getTypeCode());
-		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain,titaVo));
-		this.totaVo.putParam("L1r01CurrAddress", custNoticeCom.getCurrAddress(tCustMain,titaVo));
+		this.totaVo.putParam("L1r01AllowInquire", tCustMain.getAllowInquire());
+		this.totaVo.putParam("L1r01RegAddress", custNoticeCom.getRegAddress(tCustMain, titaVo));
+		this.totaVo.putParam("L1r01CurrAddress", custNoticeCom.getCurrAddress(tCustMain, titaVo));
 
 		this.addList(this.totaVo);
 		return this.sendList();

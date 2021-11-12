@@ -111,7 +111,6 @@ C(3,#FunctionCode,1,$,S)
 
 #FacmNo=A,3,I
 C(3,#FunctionCode,1,$,S)
-@V(2,0)
 
 #EntryDate=D,7,I
 IF(#FunctionCode == 1 || #FunctionCode == 2 ,$,S)
