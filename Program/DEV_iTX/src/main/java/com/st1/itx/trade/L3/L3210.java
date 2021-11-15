@@ -474,16 +474,16 @@ public class L3210 extends TradeBuffer {
 			tTempVo.putParam("DetailSeq", titaVo.get("RpDetailSeq1")); // 明細序號
 		}
 		if (this.acctFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("AcctFee", titaVo.getParam("AcctFee"));
+			tTempVo.putParam("AcctFee", this.acctFee);
 		}
 		if (this.modifyFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("ModifyFee", titaVo.getParam("ModifyFee"));
+			tTempVo.putParam("ModifyFee", this.modifyFee);
 		}
 		if (this.fireFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("FireFee", titaVo.getParam("FireFee"));
+			tTempVo.putParam("FireFee", this.fireFee);
 		}
 		if (this.lawFee.compareTo(BigDecimal.ZERO) > 0) {
-			tTempVo.putParam("LawFee", titaVo.getParam("LawFee"));
+			tTempVo.putParam("LawFee", this.lawFee);
 		}
 		tLoanBorTx.setOtherFields(tTempVo.getJsonString());
 		try {

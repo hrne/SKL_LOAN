@@ -17,7 +17,7 @@ E(0,0)
 <sub type="DC" name="L4211" layout="cols=3;screen.width=[150,400,150,300];printer.width=[20,80];order=1">
 [
 ["[L4211]                                 匯款轉帳報表                                 "],
-[#<->#,"#FdFunctionCodeX+報表種類",#FunctionCode,"( 1: 成功  2: 失敗 )"], 
+[#<->#,"#FdFunctionCodeX+報表種類",#FunctionCode,#FunctionCodeX], 
 [#<->#,"#FdAcDate+會計日期",#AcDate],
 [#<->#,"#FdEntryDate+入帳日期",#EntryDate],
 [#<->#,"#FdReconCode+存摺代號",#ReconCode,"(A1～A7，空白:全部)"],
@@ -39,11 +39,16 @@ T(4,CHAIN$)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 !T(1,@FunctionCode,#NTXBUF,1,1)
 
+#FunctionCodeHelp=X,20,S
+T(3,1:成功;2:失敗)
 
 ! 作業項目
 #FunctionCode=A,1,I
-@V(5,1,2)
+HELP(#FunctionCodeHelp)
+@V(H,#FunctionCodeHelp)
 
+#FunctionCodeX=X,10,L
+T(H,#FunctionCode,#FunctionCodeHelp)
 
 #CheckHide=X,1,S
 IF(#FunctionCode == 1,INVOKEJS(SHOW,L4211,3,3,0),INVOKEJS(SHOW,L4211,3,3,1))

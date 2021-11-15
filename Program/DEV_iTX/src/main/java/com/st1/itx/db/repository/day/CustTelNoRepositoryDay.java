@@ -22,7 +22,7 @@ import com.st1.itx.db.domain.CustTelNo;
 public interface CustTelNoRepositoryDay extends JpaRepository<CustTelNo, String> {
 
   // CustUKey = 
-  public Slice<CustTelNo> findAllByCustUKeyIsOrderByCreateDateAsc(String custUKey_0, Pageable pageable);
+  public Slice<CustTelNo> findAllByCustUKeyIsOrderByLastUpdateAsc(String custUKey_0, Pageable pageable);
 
   // CustUKey = ,AND TelTypeCode = 
   public Optional<CustTelNo> findTopByCustUKeyIsAndTelTypeCodeIsOrderByCreateDateAsc(String custUKey_0, String telTypeCode_1);

@@ -166,7 +166,7 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("OOApplNo", tFacMain.getApplNo()); // 核准號碼
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo()); // 額度號碼
 				occursList.putParam("OOBormNo",
-						tTempVo.get("BormNo") == null ? tTxToDoDetail.getBormNo() : tTempVo.get("BormNo")); // 預約序號
+						tTxToDoDetail.getStatus() == 2 ? tTempVo.get("BormNo") : tTxToDoDetail.getBormNo()); // 預約序號
 				occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額
 				occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()

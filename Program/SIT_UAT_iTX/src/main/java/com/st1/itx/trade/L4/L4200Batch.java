@@ -221,9 +221,10 @@ public class L4200Batch extends TradeBuffer {
 //	總金額	
 	private BigDecimal totAmt = BigDecimal.ZERO;
 //	
-	private int meadiaDatePost; // 郵局扣帳檔
-	private int meadiaDateAch1; // ACH 新光扣帳檔
-	private int meadiaDateAch2; // ACH他行扣帳檔
+	private int meadiaDatePost = 0; // 郵局扣帳檔
+	private int meadiaDateAch1 = 0; // ACH 新光扣帳檔
+	private int meadiaDateAch2 = 0; // ACH他行扣帳檔
+	private int fileSeq = 0; // 檔案序號
 
 	private String procStsCode = "";
 
@@ -788,6 +789,7 @@ public class L4200Batch extends TradeBuffer {
 					this.batchTransaction.commit();
 				}
 
+				fileSeq = i - tableSize + 1;
 				OccursList tempOccursList = new OccursList();
 				tempOccursList = uploadFile.get(i - tableSize);
 
@@ -812,6 +814,7 @@ public class L4200Batch extends TradeBuffer {
 				BatxDetailId tBatxDetailId = new BatxDetailId();
 
 				tempVo = new TempVo();
+				tempVo.putParam("FileSeq", fileSeq);
 
 				int achEntryDate = 0;
 				int achRepayType = 0;
@@ -897,7 +900,6 @@ public class L4200Batch extends TradeBuffer {
 					updateBankDeductDtl(tAchDeductMedia.getMediaDate(), tAchDeductMedia.getMediaKind(),
 							tAchDeductMedia.getMediaSeq(), returnCode, titaVo);
 				}
-
 				this.info("1132...");
 
 				tBatxDetail.setProcNote(tempVo.getJsonString());
@@ -953,6 +955,7 @@ public class L4200Batch extends TradeBuffer {
 					this.batchTransaction.commit();
 				}
 
+				fileSeq = i - tableSize + 1;
 				OccursList tempOccursList = new OccursList();
 				tempOccursList = uploadFile.get(i - tableSize);
 
@@ -973,6 +976,7 @@ public class L4200Batch extends TradeBuffer {
 				BatxDetail tBatxDetail = new BatxDetail();
 				BatxDetailId tBatxDetailId = new BatxDetailId();
 				tempVo = new TempVo();
+				tempVo.putParam("FileSeq", fileSeq);
 
 				if (tPostDeductMedia != null) {
 					// mediaDate = tPostDeductMedia.getMediaDate();
@@ -1115,9 +1119,11 @@ public class L4200Batch extends TradeBuffer {
 				if (i % commitCnt == 0) {
 					this.batchTransaction.commit();
 				}
-
 				OccursList tempOccursList = new OccursList();
 				tempOccursList = uploadFile.get(i - tableSize);
+				fileSeq = i - tableSize + 1;
+				tempVo = new TempVo();
+				tempVo.putParam("FileSeq", fileSeq);
 
 //			B.(first check)檢核資料與寫入檔是否相同  並回寫處理狀態(ProcStsCode)
 				EmpDeductMedia tEmpDeductMedia = new EmpDeductMedia();
@@ -1227,7 +1233,6 @@ public class L4200Batch extends TradeBuffer {
 				}
 
 				// Error Message
-				tempVo = new TempVo();
 				if (!"00000".equals(procCode)) {
 					tempVo.putParam("CheckMsg", setProcCodeX(procCode, procCodeX, titaVo));
 				}
@@ -1288,6 +1293,9 @@ public class L4200Batch extends TradeBuffer {
 				procStsCode = "0";
 				OccursList tempOccursList = new OccursList();
 				tempOccursList = uploadFile.get(i - tableSize);
+				fileSeq = i - tableSize + 1;
+				tempVo = new TempVo();
+				tempVo.putParam("FileSeq", fileSeq);
 
 				this.info("chequeAcct : " + tempOccursList.get("ChequeAcct"));
 				this.info("chequeNo : " + tempOccursList.get("ChequeNo"));
@@ -1380,7 +1388,6 @@ public class L4200Batch extends TradeBuffer {
 				}
 
 //				 正常、且有銷帳檔
-				tempVo = new TempVo();
 				tempVo.putParam("Note", "支票帳號 : " + parse.IntegerToString(chequeAcct, 9) + " 支票號碼 : "
 						+ parse.IntegerToString(chequeNo, 7) + " 支票金額 : " + chequeAmt);
 
@@ -1702,7 +1709,7 @@ public class L4200Batch extends TradeBuffer {
 				break;
 			}
 			if ((Rmtfkind +bankDeductKind + empDeductKind + mortgageKind) > 1) {
-				sendMsg = sendMsg + "，匯款轉帳，銀行扣款、員工扣薪、支票兌現。";
+				sendMsg = sendMsg + "，需按來源(匯款轉帳，銀行扣款、員工扣薪、支票兌現)，分開上傳。";
 				checkFlag = false;
 			}
 			if (checkFlag) {
@@ -1796,6 +1803,10 @@ public class L4200Batch extends TradeBuffer {
 	private void checkMedia(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
 		int deductMediaCnt = 0;
 		BigDecimal deductMediaAmt = BigDecimal.ZERO;
+		this.info("meadiaDateAch1="+ meadiaDateAch1 + ", meadiaDateAch2=" + meadiaDateAch2 + ", meadiaDatePost=" +meadiaDatePost);
+		if (meadiaDateAch1 + meadiaDateAch2 + meadiaDatePost == 0) {
+			return;
+		}
 		if (meadiaDateAch1 > 0) {
 			Slice<AchDeductMedia> slAchDeductMedia = achDeductMediaService.mediaDateEq(meadiaDateAch1 + 19110000, "1",
 					0, Integer.MAX_VALUE, titaVo);
@@ -1818,12 +1829,12 @@ public class L4200Batch extends TradeBuffer {
 		}
 
 		if (meadiaDatePost > 0) {
-			Slice<AchDeductMedia> slAchDeductMedia = achDeductMediaService.mediaDateEq(meadiaDatePost + 19110000, "2",
+			Slice<PostDeductMedia> slPostDeductMedia = postDeductMediaService.mediaDateEq(meadiaDatePost + 19110000, 
 					0, Integer.MAX_VALUE, titaVo);
-			if (slAchDeductMedia != null) {
-				for (AchDeductMedia ach : slAchDeductMedia.getContent()) {
+			if (slPostDeductMedia != null) {
+				for (PostDeductMedia post : slPostDeductMedia.getContent()) {
 					deductMediaCnt++;
-					deductMediaAmt = deductMediaAmt.add(ach.getRepayAmt());
+					deductMediaAmt = deductMediaAmt.add(post.getRepayAmt());
 				}
 			}
 		}

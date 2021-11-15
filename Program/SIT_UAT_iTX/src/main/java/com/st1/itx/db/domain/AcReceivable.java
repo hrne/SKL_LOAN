@@ -87,7 +87,7 @@ public class AcReceivable implements Serializable {
   private int acctFlag = 0;
 
   // 銷帳科目記號
-  /* 1:會計銷帳科目2:業務銷帳科目3:未收費用4:短繳期金5.另收欠款 */
+  /* 1:會計銷帳科目2:業務銷帳科目3:未收費用4:短繳期金5.另收欠款(未用) */
   @Column(name = "`ReceivableFlag`")
   private int receivableFlag = 0;
 
@@ -424,7 +424,7 @@ public class AcReceivable implements Serializable {
 2:業務銷帳科目
 3:未收費用
 4:短繳期金
-5.另收欠款
+5.另收欠款(未用)
 	* @return Integer
 	*/
   public int getReceivableFlag() {
@@ -437,7 +437,7 @@ public class AcReceivable implements Serializable {
 2:業務銷帳科目
 3:未收費用
 4:短繳期金
-5.另收欠款
+5.另收欠款(未用)
   *
   * @param receivableFlag 銷帳科目記號
 	*/

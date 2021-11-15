@@ -136,6 +136,8 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOProcCode", result.get("F11"));
 
 				String procNote = "";
+				String fileSeq = "";
+
 				if (result.get("F12") != null) {
 
 					TempVo tempVo = new TempVo();
@@ -163,13 +165,16 @@ public class L4920 extends TradeBuffer {
 					if (tempVo.get("PayIntDate") != null && tempVo.get("PayIntDate").length() > 0) {
 						procNote = procNote + "應繳日:" + tempVo.get("PayIntDate");
 					}
+					if (tempVo.get("FileSeq") != null && tempVo.get("FileSeq").length() > 0) {
+						fileSeq = tempVo.get("FileSeq");
+					}
 				}
 
 				occursList.putParam("OOProcNote", procNote);
 
 				occursList.putParam("OOTxSn", titaVo.getKinbr() + result.get("F13") + result.get("F14"));
 				occursList.putParam("OOFileName", result.get("F16"));
-				occursList.putParam("OOFileSeq", result.get("F17"));
+				occursList.putParam("OOFileSeq", fileSeq);
 				/* 將每筆資料放入Tota的OcList */
 				this.totaVo.addOccursList(occursList);
 			}

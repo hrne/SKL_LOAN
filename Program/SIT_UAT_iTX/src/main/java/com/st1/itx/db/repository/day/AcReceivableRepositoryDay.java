@@ -39,7 +39,7 @@ public interface AcReceivableRepositoryDay extends JpaRepository<AcReceivable, A
   public Slice<AcReceivable> findAllByAcctCodeIsAndClsFlagIsAndOpenAcDateLessThanOrderByCustNoAscFacmNoAscRvNoAsc(String acctCode_0, int clsFlag_1, int openAcDate_2, Pageable pageable);
 
   // ClsFlag = , AND AcctCode ^i
-  public Slice<AcReceivable> findAllByClsFlagIsAndAcctCodeIn(int clsFlag_0, List<String> acctCode_1, Pageable pageable);
+  public Slice<AcReceivable> findAllByClsFlagIsAndAcctCodeInOrderByCustNoAsc(int clsFlag_0, List<String> acctCode_1, Pageable pageable);
 
   // ClsFlag = ,AND AcctCode = ,AND CustNo >= ,AND CustNo <=
   public Slice<AcReceivable> findAllByClsFlagIsAndAcctCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscFacmNoAsc(int clsFlag_0, String acctCode_1, int custNo_2, int custNo_3, Pageable pageable);

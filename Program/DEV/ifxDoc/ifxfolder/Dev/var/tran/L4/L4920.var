@@ -486,11 +486,11 @@ TXFORM=L4920
 #OOBTN_A=
 {search:false,formatter:'cust:bind-button:#OOBTN_TXT',align:'center',canExport:false,width:35}
 
-#OOFileSeq=明細序號
+#OODetailSeq=明細序號
 {width:80}
 #OOFileName=檔案名稱
 {width:95}
-#OODetailSeq=檔案序號
+#OOFileSeq=檔案序號
 {width:80}
 ^
 <include src="PRT.icf::INQ04.sel" map="i=L4920;cpi=15"/>

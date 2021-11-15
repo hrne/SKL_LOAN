@@ -45,7 +45,7 @@ public class L1111 extends TradeBuffer {
 		this.totaVo.init(titaVo);
 		
 		if (!titaVo.getHsupCode().equals("1")) {
-			sendRsp.addvReason(this.txBuffer, titaVo, "0101", "");
+			sendRsp.addvReason(this.txBuffer, titaVo, "0101", "身份證號／統一編號變更");
 		}
 		
 		String iCustIdBefore = titaVo.getParam("CustIdBefore");

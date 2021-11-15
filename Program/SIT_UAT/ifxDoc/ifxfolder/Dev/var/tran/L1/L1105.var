@@ -1,0 +1,423 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L1105)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,1)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,0)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[200,1500];printer.width=[20,20];">
+[
+["[L1105]                                 顧客聯絡電話維護"],
+["#FdFuncd+功能",#FuncdX],
+["#FdCustNo+戶號",#CustNo,#CustNameA],
+["#FdCustId+統一編號",#CustId,#CustNameB],
+["#FdTelTypeCode+電話種類",#TelTypeCode,#TelTypeCodeItem],
+["#FdTelArea+電話號碼",#TelArea,#TelNo,#TelExt],
+["#FdTelOther+電話號碼",#TelOther],
+["#FdTelChgRsnCode+異動原因",#TelChgRsnCode,#TelChgRsnItem],
+["#FdRelationCode+與借款人關係",#RelationCode,#RelationItem],
+["#FdLiaisonNam+聯絡人姓名",#LiaisonName],
+["#FdRmk+備註",#Rmk],
+["#FdEnable+啟用記號",#Enable,#EnableX],
+["#FdStopReason+停用原因",#StopReason],
+]
+! ["@每頁十筆",#LastPage,#NextPage],
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+!#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:1;tabbable:0
+! #BUTTON_FLD=X,15,I,ui:button;value:找檔案;enable:1;tabbable:0;file:true;encode:big5
+! #LastPage=X,15,I,ui:button;value:上一頁;enable:0;tabbable:0
+! #NextPage=X,15,I,ui:button;value:下一頁;enable:0;tabbable:0
+!#BTN2=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+!#BTN3=X,15,I,ui:button;value:顧客資料查詢;enable:0;tabbable:0
+#BUF1=X,42,S
+!#BIND1=X,1,S
+!BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF1;ntxbuf5=type<-1:CustNo<-OOCustNo})
+#BUF2=X,42,S
+!#BIND2=X,1,S
+!BIND(#BTN2,click, {cmd=CHAIN; ntxcd=L1001; ntxbuf=#BUF2;ntxbuf5=type<-1:CustId<-OOCustId})
+
+! #BIND_FLD=X,1,S
+! BIND(#BUTTON_FLD,click)
+
+!ENABLE(#BTN2)ENABLE(#BTN3)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L1905進入),$)
+
+#NTXBUF=X,50,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,#FunCd,#NTXBUF,1,1)
+T(1,#CustId,#NTXBUF,2,10)
+T(1,#CustNo,#NTXBUF,12,7)
+C(3,#FunCd,2,$,S)
+T(1,#TelNoUKey,#NTXBUF,19,32)
+
+#Chk=X,1,S
+C(4,#CustId,C(3,#CustNo,0,V(P,請先指定統一編號或戶號),$),$)
+C(4,#CustId,INVOKEJS(SHOW,p1,3,3,0),$)
+C(3,#CustNo,0,INVOKEJS(SHOW,p1,2,2,0),$)
+!EnableFg
+#CDDEF0001=x,20,S
+T(3,CdCode.EnableFg)
+
+#EnableFgHelp=x,1024,S
+
+!TelTypeCode
+#CDDEF0002=x,20,S
+T(3,CdCode.TelTypeCode)
+
+#TelTypeCodeHelp=x,1024,S
+
+!RelationCode
+#CDDEF0003=x,20,S
+T(3,CdCode.RelationCode)
+
+#RelationCodeHelp=x,1024,S
+
+#CDDEF0004=x,20,S
+T(3,CdCode.FuncCode)
+
+#FuncCodeHelp=x,1024,S 
+
+#CODEF0005=x,20,S
+T(3,CdCode.TelChgRsnCode)
+
+#TelChgRsnCodeHelp=x,1024,S
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF0001,#CDDEF0002,#CDDEF0003,#CDDEF0004,#CODEF0005)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@EnableFgHelp,#HelpDesc1)
+T(2,@TelTypeCodeHelp,#HelpDesc2)
+T(2,@RelationCodeHelp,#HelpDesc3)
+T(2,@FuncCodeHelp,#HelpDesc4)
+T(2,@TelChgRsnCodeHelp,#HelpDesc5)
+
+! 必輸欄位
+#FdFuncd=X,1,L
+T(3, )
+#FdCustNo=X,1,L
+C(3,#CHAIN,1,T(3, ),T(3,*))
+#FdCustId=X,1,L
+C(3,#CHAIN,1,T(3, ),T(3,*))
+#FdTelTypeCode=X,1,L
+T(3,*)
+#FdTelArea=X,1,L
+T(3,*)
+#FdTelOther=X,1,L
+T(3,*)
+INVOKEJS(SHOW,p1,6,6,0)
+#FdTelChgRsnCode=X,1,L
+T(3,*)
+#FdRelationCode=X,1,L
+T(3, )
+#FdLiaisonNam=X,1,L
+T(3, )
+#FdRmk=X,1,L
+T(3, )
+#FdEnable=X,1,L
+C(3,#FunCd,1,$,T(3,*))
+C(3,#FunCd,1,T(F,#Enable,0),$)
+C(3,#FunCd,1,T(3,@Enable,Y),$)
+T(H,@EnableX,#Enable,#EnableFgHelp)
+
+#FdStopReason=X,1,L
+T(3, )
+INVOKEJS(SHOW,p1,12,12,0)
+
+
+
+!自動更新L1905機制
+!#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+#Blank=X,1,S
+<include src="ROM.icf::L1R05.dec"/>
+!RIM取客戶電話檔資料
+#RimL1r05=X,1,S
+RESET_RIM(#RimL1r05,L1R05)
+C(3,#FunCd,2,$,S)
+S(L1R05,1,#TelNoUKey)
+R(1,L1R05)
+E(0,@TelTypeCode,#L1r05TelTypeCode)
+T(H,@TelTypeCodeItem,#TelTypeCode,#TelTypeCodeHelp)
+
+#Other=X,1,S
+C(3,#FunCd,2,$,S)
+C(3,#TelTypeCode,9,S,$)
+T(2,@TelArea,#L1r05TelArea)
+T(2,@TelNo,#L1r05TelNo)
+T(2,@TelExt,#L1r05TelExt)
+IF(#TelTypeCode==3||#TelTypeCode==5,HIDE(#TelArea,#TelExt),SHOW(#TelArea,#TelExt))
+
+#Other1=X,2,S
+C(3,#FunCd,2,$,S)
+C(3,#TelTypeCode,9,$,S)
+T(2,@TelOther,#L1r05TelOther)
+
+#Other3=X,2,S
+C(3,#FunCd,2,$,S)
+E(0,@TelChgRsnCode,#L1r05TelChgRsnCode)
+T(H,@TelChgRsnItem,#TelChgRsnCode,#TelChgRsnCodeHelp)
+T(2,@RelationCode,#L1r05RelationCode)
+T(H,@RelationItem,#RelationCode,#RelationCodeHelp)
+T(2,@LiaisonName,#L1r05LiaisonName)
+T(2,@Rmk,#L1r05Rmk)
+T(2,@Enable,#L1r05Enable)
+T(H,@EnableX,#Enable,#EnableFgHelp)
+T(2,@StopReason,#L1r05StopReason)
+T(3,@FdStopReason,*)
+C(5,#Enable,Y,INVOKEJS(SHOW,p1,12,12,0),INVOKEJS(SHOW,p1,12,12,1))
+
+!功能 下拉式選單 1: 新增 2:修改
+#FunCd=A,1,S
+
+#FuncdX=X,4,L
+T(H,#FunCd,#FuncCodeHelp)
+C(2,#FunCd,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),K(MODIFYBUTTON,新增),K(MODIFYBUTTON,刪除),K(MODIFYBUTTON,查詢)K(NOBUTTON,CLOSEY))
+C(3,#FunCd,1,T(F,#CustNo,1)T(F,#CustId,1),T(F,#CustNo,0)T(F,#CustId,0))
+C(3,#FunCd,1,$,C(4,#CustId,INVOKEJS(SHOW,p1,3,3,0),INVOKEJS(SHOW,p1,2,2,0)))
+!C(3,#FunCd,1,SHOW(#BTN1)SHOW(#BTN2),HIDE(#BTN1)HIDE(#BTN2))
+!C(3,#FunCd,1,T(2,@FdCustId,*)T(2,@FdCustNo,*),T(2,@FdCustId, )T(2,@FdCustNo, ))
+
+#AGAIN=X,1,S
+C(2,#FunCd,$,$,E(0,1),$,E(0,1),E(0,1))
+ASGN(AGAIN$)
+
+#Space=X,1,L
+T(2, )
+
+!戶號
+#CustNo=A,7,L
+C(3,#CHAIN,1,s,$)
+C(3,#FunCd,1,$,s)
+INVOKEJS(SHOW,p1,2,2,1)
+@C(3,#CustNo,0,INVOKEJS(SHOW,p1,2,2,0)INVOKEJS(SHOW,p1,3,3,1),INVOKEJS(SHOW,p1,2,2,1)INVOKEJS(SHOW,p1,3,3,0))
+
+#CustNameA=X,100,L
+C(3,#CustNo,0,S,s)
+
+!統一編號
+#CustId=X,10,L
+C(3,#CHAIN,1,s,$)
+C(3,#CustNo,0,$,S)
+C(3,#FunCd,1,$,s)
+@V(7)
+A(ID_UNINO,0,#CustId)
+
+#CustNameB=X,100,L
+C(4,#CustId,S,s)
+
+<include src="ROM.icf::L1R09.dec"/>
+#RimFunCd=A,1,S
+#RimCustId=X,10,S
+#RimCustNo=A,7,S
+#RimL1r09=X,1,S
+T(2,@RimFunCd,1)
+T(2,@RimCustId,#CustId)
+T(2,@RimCustNo,#CustNo)
+RESET_RIM(#RimL1r09,L1R09)
+S(L1R09,1,#RimCustId,#RimCustNo,#RimFunCd)
+R(1,L1R09)
+
+#checkL1r09=X,1,S
+C(3,#CustNo,0,$,T(2,@CustNameA,#L1r09CustName))
+C(4,#CustId,$,T(2,@CustNameB,#L1r09CustName))
+
+! 電話種類
+#TelTypeCode=A,2,I
+HELP(#TelTypeCodeHelp)
+C(3,#L1r05TelTypeCode,9,INVOKEJS(SHOW,p1,6,6,1)INVOKEJS(SHOW,p1,5,5,0),INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1))
+@V(H,#TelTypeCodeHelp)
+IF(#TelTypeCode == 6 || #TelTypeCode == 9,T(3,@FdRelationCode,*)T(3,@FdLiaisonNam,*),T(3,@FdRelationCode, )T(3,@FdLiaisonNam, ))
+C(3,#TelTypeCode,9,INVOKEJS(SHOW,p1,6,6,1)INVOKEJS(SHOW,p1,5,5,0),INVOKEJS(SHOW,p1,6,6,0)INVOKEJS(SHOW,p1,5,5,1))
+IF(#TelTypeCode==3||#TelTypeCode==5,HIDE(#TelArea,#TelExt),SHOW(#TelArea,#TelExt))
+
+! 電話種類中文
+#TelTypeCodeItem=X,10,L
+T(H,#TelTypeCode,#TelTypeCodeHelp)
+! 電話號碼區碼
+#TelArea=X,5,I
+IF(#TelTypeCode == 3 || #TelTypeCode == 5 || #TelTypeCode == 9,S,$)
+@C(4,#TelArea,$,V(9))
+! 電話號碼
+#TelNo=X,10,I
+C(3,#TelTypeCode,9,S,$)
+@V(9)
+! 電話號碼分機
+#TelExt=X,5,I
+IF(#TelTypeCode == 3 || #TelTypeCode == 5 || #TelTypeCode == 9,S,$)
+@C(4,#TelExt,$,V(9))
+! 其他種類電話
+#TelOther=X,20,I
+IF(#TelTypeCode == 9,$,S)
+@IF(#TelTypeCode == 9,V(9),S)
+! 異動原因
+#TelChgRsnCode=A,2,I
+C(3,#TelChgRsnCode,0,E(0,1),$)
+HELP(#TelChgRsnCodeHelp)
+@V(H,#TelChgRsnCodeHelp)
+! 異動原因中文
+#TelChgRsnItem=X,40,L
+T(H,#TelChgRsnCode,#TelChgRsnCodeHelp)
+
+! 與借款人關係
+#RelationCode=X,2,I
+HELP(#RelationCodeHelp)
+@
+IF(#RelationCode == "00" || #RelationCode == "",INVOKEJS(SHOW,p1,9,9,0)T(2,@FdLiaisonNam, ),INVOKEJS(SHOW,p1,9,9,1)T(2,@FdLiaisonNam,*))
+IF(#TelTypeCode == "06" || #TelTypeCode == "09",V(H,#RelationCodeHelp),C(4,#RelationCode,$,V(H,#RelationCodeHelp)))
+
+! 與借款人關係中文
+#RelationItem=X,10,L
+C(4,#RelationCode,S,T(H,#RelationCode,#RelationCodeHelp))
+
+! 聯絡人姓名
+#LiaisonName=x,100,I
+C(4,#RelationCode,S,$)
+IF(#RelationCode == "00",S,$)
+@IF(#TelTypeCode == "06" || #TelTypeCode == "09",V(7),$)
+IF(#RelationCode == "00" ,$,V(7))
+
+! 備註
+#Rmk=x,40,I
+
+! 啟用記號
+#Enable=X,1,I
+C(4,#Enable,T(3,Y),$)
+C(3,#FunCd,1,s,$)
+HELP(#EnableFgHelp)
+@V(H,#EnableFgHelp)
+
+! 啟用記號中文
+#EnableX=X,10,L
+T(H,#Enable,#EnableFgHelp)
+
+#S1=X,1,S
+C(5,#Enable,Y,INVOKEJS(SHOW,p1,12,12,0),INVOKEJS(SHOW,p1,12,12,1))
+
+! 停用原因
+#StopReason=x,40,I
+C(5,#Enable,N,$,S)
+!C(5,#Enable,N,T(3,@FdStopReason,*),S)
+@
+V(7)
+
+! 電話識別碼
+#TelNoUKey=x,32,S
+
+#RPTFG=A,1,S
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L1105 ----------
+<sub type="FORM" name="L1105">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,L1105,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L1105] 顧客聯絡電話維護)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+
+#OResult=X,1,S
+
+#OResultX=X,10,L
+IF(#OResult == "Y",T(3,交易成功),T(3,交易失敗))
+ALERT(#OResultX);
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FunCd
+#CustNo
+#CustId
+#TelTypeCode
+#TelArea
+#TelNo
+#TelExt
+#TelOther
+#TelChgRsnCode
+#RelationCode
+#LiaisonName
+#Rmk
+#Enable
+#StopReason
+#TelNoUKey
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L1105
+#OResult
+^
+
+<include src="ROM.icf::L1R09.tom"/>
+
+<include src="ROM.icf::L1R05.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::INQ01.sel"/>
+</sub>

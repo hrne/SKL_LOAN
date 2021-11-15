@@ -40,7 +40,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[130,1100];printer.width=[20,120];">
 [
-["[L2604]                                 聯貸費用新增"],
+["[L2604]                                 聯貸費用維護"],
 ["#FdFunCd+功能",#FunCdX],
 ["#FdCustNo+借戶戶號",#CustNo,#CustNoX],
 ["#FdFacmNo+額度編號",#FacmNo],
@@ -290,7 +290,7 @@ T(2,#CustNo+-+#FacmNo)
 !C(5,#TXFORM,L2604,$,S)
 
 #SCRTIL=_,_,S
-T(3,[L2604] 聯貸費用新增)
+T(3,[L2604] 聯貸費用維護)
 
 !------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
 
@@ -334,7 +334,7 @@ TXFORM=L2604
 
 <sub type="PART" name="L2604" layout="cols=3;screen.width=[130,370,130,370];printer.width=[15,30,15,30];order=1">
 [
-["[L2604]                                 聯貸費用新增"],
+["[L2604]                                 聯貸費用維護"],
 [""],
 ]
 </sub>

@@ -105,8 +105,6 @@ public class L4920ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  ,bd.\"TitaTxtNo\"    AS F14                 ";
 			sql += "  ,bd.\"DisacctAmt\"   AS F15                 ";
 			sql += "  ,bd.\"FileName\"     AS F16                 ";
-			sql += "  ,row_number() over (partition by bd.\"AcDate\", bd.\"BatchNo\", bd.\"FileName\" ";
-			sql += "                      order by \"DetailSeq\" Asc) as F17  ";
 			sql += " from \"BatxDetail\" bd                       ";
 			sql += " left join (                                  ";
 			sql += "     select                                   ";

@@ -1415,6 +1415,8 @@ public class TxBatchCom extends TradeBuffer {
 			this.tTempVo.putParam("AmlRsp2", t.get("AmlRsp2")); // AML檢核狀態
 		if (t.get("EraseCnt") != null)
 			this.tTempVo.putParam("EraseCnt", t.get("EraseCnt")); // 訂正次數
+		if (t.get("FileSeq") != null)
+			this.tTempVo.putParam("FileSeq", t.get("FileSeq")); // 檔案序號
 
 	}
 

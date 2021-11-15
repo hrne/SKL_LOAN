@@ -79,20 +79,30 @@ public class BS010 extends TradeBuffer {
 		// 本營業日(西元)
 		this.tbsDyf = this.getTxBuffer().getMgBizDate().getTbsDyf();
 
+		// 取本月份
+		String entryDateMm = parse.IntegerToString(this.txBuffer.getMgBizDate().getTbsDy() / 100, 5).substring(3, 5);
+		this.info("取本月份 = " + parse.stringToInteger(entryDateMm));
+
 		// 月底營業日(西元)
 		this.mfbsDyf = this.getTxBuffer().getMgBizDate().getMfbsDyf();
 
-		// step 1. 逾期放款應於清償期屆滿六個月內轉入「催收款項」
+		// step 1. 年底呆帳產生法務費墊付
+		if (parse.stringToInteger(entryDateMm) == 12) {
+			procBdLawFee(titaVo);
+			this.batchTransaction.commit();
+		}
+
+		// step 2. 逾期放款應於清償期屆滿六個月內轉入「催收款項」
 		procLoanOverdue(titaVo);
 		this.batchTransaction.commit();
 
-		// step 2. 月底日將逾三個月之火險費轉列催收
+		// step 3. 月底日將逾三個月之火險費轉列催收
 		if (this.tbsDyf == this.mfbsDyf) {
 			procInsuFeeOverdue(titaVo);
 			this.batchTransaction.commit();
 		}
 
-		// step 3. 月底日將逾三個月之法務費轉列催收
+		// step 4. 月底日將逾三個月之法務費轉列催收
 		if (this.tbsDyf == this.mfbsDyf) {
 			procLawFeeOverdue(titaVo);
 			this.batchTransaction.commit();
@@ -121,7 +131,8 @@ public class BS010 extends TradeBuffer {
 		baTxCom.setTxBuffer(this.getTxBuffer());
 
 		// find data
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate, 0, this.index, Integer.MAX_VALUE);
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.nextPayIntDateRange(0, iPayDate, 0, this.index,
+				Integer.MAX_VALUE);
 		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
 		// size > 0 -> 新增應處理明細
 		TxToDoDetail tTxToDoDetail;
@@ -193,7 +204,8 @@ public class BS010 extends TradeBuffer {
 		this.info("火險費轉列催收日期 < " + payDate);
 		// find data
 		// F09 暫付火險保費
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, payDate, this.index, Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, payDate, this.index,
+				Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 //test	lAcReceivable = acReceivableService.acrvOpenAcDateLq("F09", 0, 99999999); // acctCode=, clsFlag=, openAcDate <
 		// data size > 0 -> 新增應處理明細
@@ -222,7 +234,8 @@ public class BS010 extends TradeBuffer {
 		this.info("法務費轉列催收日期 < " + payDate);
 		// find data
 		// F07 暫付法務費
-		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, payDate, this.index, Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
+		Slice<AcReceivable> slAcReceivable = acReceivableService.acrvOpenAcDateLq("F07", 0, payDate, this.index,
+				Integer.MAX_VALUE); // acctCode=, clsFlag=, openAcDate <
 		lAcReceivable = slAcReceivable == null ? null : slAcReceivable.getContent();
 		// acctCode=, clsFlag=, openAcDate <
 		// data size > 0 -> 新增應處理明細
@@ -235,6 +248,69 @@ public class BS010 extends TradeBuffer {
 					tTxToDoDetail.setCustNo(rv.getCustNo());
 					tTxToDoDetail.setFacmNo(rv.getFacmNo());
 					tTxToDoDetail.setDtlValue(rv.getRvNo());
+					txToDoCom.addDetail(true, titaVo.getHCodeI(), tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
+				}
+			}
+		}
+	}
+
+	/* 年底呆帳產生法務費墊付 */
+	private void procBdLawFee(TitaVo titaVo) throws LogicException {
+		Slice<AcReceivable> slAcReceivable = null;
+		List<AcReceivable> lAcReceivableAll = new ArrayList<AcReceivable>();
+		List<String> lAcctCode = new ArrayList<String>();
+		int wkCustNo = 0;
+		Boolean wkDBFg = true;
+
+		lAcctCode.add("F07"); // 法務費
+		lAcctCode.add("F24"); // 催收法務費
+		// find data
+		slAcReceivable = acReceivableService.UseL5074(0, lAcctCode, 0, Integer.MAX_VALUE, titaVo);
+		lAcReceivableAll = slAcReceivable == null ? null : slAcReceivable.getContent();
+
+		for (AcReceivable rv : lAcReceivableAll) {
+			// 同一戶號非呆帳戶或呆帳結案戶直接刪除
+			if (wkCustNo != rv.getCustNo()) {
+				wkDBFg = true;
+				wkCustNo = rv.getCustNo();
+			} else {
+				if (!wkDBFg) {
+					lAcReceivableAll.remove(rv);
+				}
+				continue;
+			}
+			Slice<LoanBorMain> slLoanBorMain = null;
+			List<LoanBorMain> lLoanBorMain = new ArrayList<LoanBorMain>();
+			slLoanBorMain = loanBorMainService.bormCustNoEq(rv.getCustNo(), 0, 999, 0, 900, 0, Integer.MAX_VALUE,
+					titaVo);
+			lLoanBorMain = slLoanBorMain == null ? null : slLoanBorMain.getContent();
+			// 檢查戶號下全額度撥款 只要有一筆非呆帳戶或呆帳結案戶 即跳開並刪除
+			for (LoanBorMain t : lLoanBorMain) {
+				if (!(t.getStatus() == 6 || t.getStatus() == 8 || t.getStatus() == 9)) {
+					wkDBFg = false;
+					break;
+				}
+			}
+			if (!wkDBFg) {
+				lAcReceivableAll.remove(rv);
+				continue;
+			}
+		}
+
+		TxToDoDetail tTxToDoDetail;
+		if (lAcReceivableAll != null) {
+			for (AcReceivable rv : lAcReceivableAll) {
+
+				if (rv.getRvNo().length() == 7) {
+					tTxToDoDetail = new TxToDoDetail();
+					TempVo tTempVo = new TempVo();
+					tTempVo.clear();
+					tTempVo.putParam("AcctCode", rv.getAcctCode());
+					tTxToDoDetail.setItemCode("BDLW00"); // 呆帳產生法務費墊付
+					tTxToDoDetail.setCustNo(rv.getCustNo());
+					tTxToDoDetail.setFacmNo(rv.getFacmNo());
+					tTxToDoDetail.setDtlValue(rv.getRvNo());
+					tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 					txToDoCom.addDetail(true, titaVo.getHCodeI(), tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 				}
 			}

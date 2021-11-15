@@ -254,13 +254,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("UseL5074 " + dbName + " : " + "clsFlag_0 : " + clsFlag_0 + " acctCode_1 : " +  acctCode_1);
     if (dbName.equals(ContentName.onDay))
-      slice = acReceivableReposDay.findAllByClsFlagIsAndAcctCodeIn(clsFlag_0, acctCode_1, pageable);
+      slice = acReceivableReposDay.findAllByClsFlagIsAndAcctCodeInOrderByCustNoAsc(clsFlag_0, acctCode_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = acReceivableReposMon.findAllByClsFlagIsAndAcctCodeIn(clsFlag_0, acctCode_1, pageable);
+      slice = acReceivableReposMon.findAllByClsFlagIsAndAcctCodeInOrderByCustNoAsc(clsFlag_0, acctCode_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = acReceivableReposHist.findAllByClsFlagIsAndAcctCodeIn(clsFlag_0, acctCode_1, pageable);
+      slice = acReceivableReposHist.findAllByClsFlagIsAndAcctCodeInOrderByCustNoAsc(clsFlag_0, acctCode_1, pageable);
     else 
-      slice = acReceivableRepos.findAllByClsFlagIsAndAcctCodeIn(clsFlag_0, acctCode_1, pageable);
+      slice = acReceivableRepos.findAllByClsFlagIsAndAcctCodeInOrderByCustNoAsc(clsFlag_0, acctCode_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
