@@ -195,7 +195,7 @@ IF(#BeginDate<#CDATEX,V(P,開始日期不可小於日曆日),$)
 T(1,#BeginTime,1,2)
 C(3,#FunCode,1,$,s)
 @
-C(3,#BeginTimeh,0,$,V(5,1,23))
+C(3,#BeginTimeh,0,$,V(5,0,23))
 
 
 #BeginTimem=A,2,I

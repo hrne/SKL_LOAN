@@ -1104,7 +1104,7 @@ IF(#CurrZip3Aft==#CurrZip3Bef,T(3,),T(3,X))
 
 #CurrZip2Aft=X,3,I
 C(4,#CurrCityCodeAft,S,$)
-C(5,#SameReg,Y,S,$)
+C(5,#SameReg,Y,s,$)
 @
 C(4,#CurrZip2Aft,$,V(9))
 
