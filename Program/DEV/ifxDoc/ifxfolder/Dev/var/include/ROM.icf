@@ -3614,6 +3614,16 @@ TXFORM=L2R59
 ^
 </L2R59.tom>
 
+<L2R60.dec>
+#L2r60Help1=X,2000,S
+</L2R60.dec>
+
+<L2R60.tom>
+TXFORM=L2R60
+#L2r60Help1
+^
+</L2R60.tom>
+
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -6546,7 +6556,7 @@ TXFORM=L8R13
 #L8r14SubmitKey=X,3,S
 #L8r14RcDate=D,7,S
 #L8r14MaxMainCode=X,10,S
-#L8r14Account=X,50,S
+#L8r14Account=x,50,S
 #L8r14CollateralType=X,2,S
 #L8r14OriginLoanAmt=M,12,S
 #L8r14CreditBalance=M,12,S

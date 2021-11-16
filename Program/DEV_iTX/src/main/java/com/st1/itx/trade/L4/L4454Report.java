@@ -34,16 +34,17 @@ public class L4454Report extends MakeReport {
 	public L4454ServiceImpl L4454ServiceImpl;
 
 	@Autowired
+	public CustMainService custMainService;
+
+	@Autowired
+	public CustNoticeCom custNoticeCom;
+
+	@Autowired
 	DateUtil dateUtil;
 
 	@Autowired
 	BaTxCom baTxCom;
 
-	@Autowired
-	CustNoticeCom custNoticeCom;
-	
-	@Autowired
-	public CustMainService custMainService;
 	@Autowired
 	public Parse parse;
 
@@ -108,47 +109,17 @@ public class L4454Report extends MakeReport {
 		reportCnt++;
 
 //		F1 戶號 F2 戶名
-		String custNo = FormatUtil.pad9(tL4454Vo.get("F1"), 7);
-		String custName = tL4454Vo.get("F2");
-		String zipCode1 = tL4454Vo.get("F3");
-		String zipCode2 = tL4454Vo.get("F4");
+		String custNo = FormatUtil.pad9(tL4454Vo.get("CustNo"), 7);
+		int intCustNo = parse.stringToInteger(tL4454Vo.get("CustNo"));
+		CustMain tCustMain = custMainService.custNoFirst(intCustNo, intCustNo, titaVo);
+		if ( tCustMain == null) {
+			throw new LogicException("E0014", "CustMain"); // 檔案錯誤
+		}
+		String address =  custNoticeCom.getCurrAddress(tCustMain, titaVo);
+		String custName = tCustMain.getCustName();
+		String zipCode1 = tCustMain.getCurrZip3();
+		String zipCode2 = tCustMain.getCurrZip2();
 		String virtAcct = "9510200" + custNo;
-		int no = Integer.parseInt(tL4454Vo.get("F1"));
-		
-		CustMain tCustMain = custMainService.custNoFirst(no, no, titaVo);
-				
-		String address = custNoticeCom.getCurrAddress(tCustMain,titaVo);
-		
-//		if (tL4454Vo.get("F5") != null) {
-//			address = address + tL4454Vo.get("F5");
-//		}
-//		if (tL4454Vo.get("F6") != null) {
-//			address = address + tL4454Vo.get("F6");
-//		}
-//		if (tL4454Vo.get("F7") != null) {
-//			address = address + tL4454Vo.get("F7") + "路";
-//		}
-//		if (tL4454Vo.get("F8") != null) {
-//			address = address + tL4454Vo.get("F8") + "段";
-//		}
-//		if (tL4454Vo.get("F9") != null) {
-//			address = address + tL4454Vo.get("F9") + "巷";
-//		}
-//		if (tL4454Vo.get("F10") != null) {
-//			address = address + tL4454Vo.get("F10") + "弄";
-//		}
-//		if (tL4454Vo.get("F11") != null) {
-//			address = address + tL4454Vo.get("F11") + "號";
-//		}
-//		if (tL4454Vo.get("F12") != null) {
-//			address = address + "之" + tL4454Vo.get("F12") + "，";
-//		}
-//		if (tL4454Vo.get("F13") != null) {
-//			address = address + tL4454Vo.get("F13") + "樓";
-//		}
-//		if (tL4454Vo.get("F14") != null) {
-//			address = address + "之" + tL4454Vo.get("F14");
-//		}
 
 		this.print(1, 1, "");
 		this.print(1, 1, "");

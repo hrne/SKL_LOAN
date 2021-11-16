@@ -1,0 +1,227 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4940)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,100)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,156)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#button=x,100,S
+K(MODIFYBUTTON,查詢)
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4940" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4940]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@帳號授權檔查詢"],
+[#<->#,"#FdCustNo+戶號",#CustNo],
+[#<->#,"#FdRepayAcct+帳號",#RepayAcct],
+]
+
+#FdCustNo=X,2,L
+#FdRepayAcct=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L4042進入),$)
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+! 授權狀態下拉選單
+#CDDEF01=x,50,S
+T(3,CdCode.AuthStatusCode)
+#AuthStatusCodeHelp=x,1024,S
+
+#AuthTypeHelp=x,1024,S
+T(3,00:ACH期款;01:郵局期款;02:郵局火險)
+
+#CDDEF02=x,50,S
+T(3,CdCode.BankDeductCd)
+
+#BankCdHelp=x,1024,S
+
+! 郵局存款別選單
+#PostDepCodeRimName=x,20,S
+T(3,CdCode.PostDepCode)
+#PostDepCodeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02,#PostDepCodeRimName)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@AuthStatusCodeHelp,#HelpDesc1)
+T(2,@BankCdHelp,#HelpDesc2)
+T(2,@PostDepCodeHelp,#HelpDesc3)
+
+#NTXBUF=X,500,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@ChainTxCd,#NTXBUF,1,5)
+T(1,@CustNo,#NTXBUF,6,7)
+T(1,@RepayAcct,#NTXBUF,13,14)
+
+#ChainTxCd=X,5,S
+
+! 會計日期
+#CustNo=A,7,L
+#RepayAcct=X,14,L
+
+#RPTFG=A,1,S
+E(0,0)
+C(5,#ChainTxCd,L4042,E(0,0),$)
+C(5,#ChainTxCd,L4043,E(0,2),$)
+
+#CHAINXMT=X,1,S
+C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4940 -----------
+<sub type="FORM" name="L4940">
+#SCRTIL=_,_,S
+T(3,[L4940] 帳號授權檔查詢)
+
+#OCustNo=A,7,L
+E(0,#CustNo)
+
+#OCustName=x,100,L
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+#OOCustNo=A,7,O
+#OOFacmNo=A,3,O
+#OOAuthType=A,2,O
+#OOAuthTypeX=X,10,O
+T(H,@OOAuthTypeX,#OOAuthType,#AuthTypeHelp)
+#OORepayAcct=A,14,O
+
+#OORepayAcctName=x,100,O
+
+#OORepayBank=A,3,O
+#OORepayBankX=x,20,O
+T(H,@OORepayBankX,#OORepayBank,#BankCdHelp)
+#OOStatus=X,1,O
+#OOStatusX=X,50,O
+T(H,@OOStatusX,#OOStatus,#AuthStatusCodeHelp)
+
+#OODepCode=X,1,O
+#OODepCodeX=x,10,O
+T(3,)
+T(H,@OODepCodeX,#OODepCode,#PostDepCodeHelp)
+#OOAcctNoSeq=X,25,O
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#CustNo
+#RepayAcct
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+TXFORM=L4940
+#OCustName
+#OOCustNo
+#OOFacmNo
+#OOAuthType
+#OORepayAcct
+#OORepayBank
+#OOStatus
+#OODepCode
+#OOAcctNoSeq
+#OORepayAcctName
+^
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4940" layout="cols=1;screen.width=[100,900];order=1;">
+[
+["[L4940]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@帳號授權檔查詢"],
+["借戶戶號",#OCustNo],
+["借戶戶名",#OCustName],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#RPTFG=0,QUERY.GRID,L4940
+#any={detail:true, header:'L4940.part', caption:'', rowNum:20, rowList:[20,40,60]}
+
+#OOFacmNo=額度
+{width:50}
+#OORepayBankX=扣款銀行
+{width:105}
+#OORepayAcct=扣款帳號
+{width:105}
+#OORepayAcctName=扣款人姓名
+{width:105}
+#OOAuthTypeX=授權類別
+{width:105}
+#OOStatusX=帳號狀態
+{width:105}
+#OODepCodeX=帳戶別
+{width:60}
+
+^
+
+#RPTFG=2,QUERY.GRID,L4940
+#any={detail:true, header:'L4940.part', caption:'', rowNum:20, rowList:[20,40,60]}
+
+#OOFacmNo=額度
+{width:50}
+#OORepayBankX=扣款銀行
+{width:105}
+#OORepayAcct=扣款帳號
+{width:105}
+#OORepayAcctName=扣款人姓名
+{width:105}
+#OOAuthTypeX=授權類別
+{width:105}
+#OOStatusX=帳號狀態
+{width:105}
+#OODepCodeX=帳戶別
+{width:60}
+#OOAcctNoSeq=用戶編號
+{width:250}
+
+
+</sub>

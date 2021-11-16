@@ -606,6 +606,25 @@ em = null;
   }
 
   @Override
+  public AchAuthLog facmNoRepayAcctFirst(int custNo_0, int facmNo_1, String repayBank_2, String repayAcct_3, TitaVo... titaVo) {
+    String dbName = "";
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+    this.info("facmNoRepayAcctFirst " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " repayBank_2 : " +  repayBank_2 + " repayAcct_3 : " +  repayAcct_3);
+    Optional<AchAuthLog> achAuthLogT = null;
+    if (dbName.equals(ContentName.onDay))
+      achAuthLogT = achAuthLogReposDay.findTopByCustNoIsAndFacmNoIsAndRepayBankIsAndRepayAcctIs(custNo_0, facmNo_1, repayBank_2, repayAcct_3);
+    else if (dbName.equals(ContentName.onMon))
+      achAuthLogT = achAuthLogReposMon.findTopByCustNoIsAndFacmNoIsAndRepayBankIsAndRepayAcctIs(custNo_0, facmNo_1, repayBank_2, repayAcct_3);
+    else if (dbName.equals(ContentName.onHist))
+      achAuthLogT = achAuthLogReposHist.findTopByCustNoIsAndFacmNoIsAndRepayBankIsAndRepayAcctIs(custNo_0, facmNo_1, repayBank_2, repayAcct_3);
+    else 
+      achAuthLogT = achAuthLogRepos.findTopByCustNoIsAndFacmNoIsAndRepayBankIsAndRepayAcctIs(custNo_0, facmNo_1, repayBank_2, repayAcct_3);
+
+    return achAuthLogT.isPresent() ? achAuthLogT.get() : null;
+  }
+
+  @Override
   public AchAuthLog holdById(AchAuthLogId achAuthLogId, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)

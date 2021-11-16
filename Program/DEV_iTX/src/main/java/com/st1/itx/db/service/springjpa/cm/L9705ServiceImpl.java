@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +19,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Service
 @Repository
 public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(L9705ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -30,10 +27,9 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws LogicException {
 
-		logger.info("l9705.findAll");
+		this.info("l9705.findAll");
 
 		String acctDateStart = titaVo.getParam("ACCTDATE_ST");
 		String acctDateEnd = titaVo.getParam("ACCTDATE_ED");
@@ -46,16 +42,16 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String apNo = titaVo.getParam("APNO");
 		String dayFg = "";
 
-		logger.info("custno1 ..." + custNoStart);
-		logger.info("custno2 ..." + custNoEnd);
-		logger.info("corpInd ..." + corpInd);
-		logger.info("acctDateStart ..." + acctDateStart);
-		logger.info("acctDateEnd ..." + acctDateEnd);
+		this.info("custno1 ..." + custNoStart);
+		this.info("custno2 ..." + custNoEnd);
+		this.info("corpInd ..." + corpInd);
+		this.info("acctDateStart ..." + acctDateStart);
+		this.info("acctDateEnd ..." + acctDateEnd);
 
-		String sql = "SELECT DISTINCT M.\"CustNo\" ";
-		sql += "            ,M.\"FacmNo\"";
-		sql += "            ,C.\"CustName\"";
-		sql += "            ,F.\"RepayCode\"";
+		String sql = "SELECT DISTINCT M.\"CustNo\"    AS \"CustNo\"    ";
+		sql += "            ,M.\"FacmNo\"             AS \"FacmNo\"    ";
+		sql += "            ,C.\"CustName\"           AS \"CustName\"  ";
+		sql += "            ,F.\"RepayCode\"          AS \"RepayCode\" ";
 		sql += "      FROM \"LoanBorMain\" M";
 		sql += "      LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
 		sql += "                             AND F.\"FacmNo\" = M.\"FacmNo\"";
@@ -203,7 +199,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 		 * 
 		 */
 
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
@@ -221,7 +217,7 @@ public class L9705ServiceImpl extends ASpringJpaParm implements InitializingBean
 			query.setParameter("eday", acctDateEnd);
 		}
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

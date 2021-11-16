@@ -1,0 +1,305 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5055)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,329)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+! #button=x,100,S
+! T(2,{cmd=CHAIN; ntxcd=L5503; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+! K(MODIFYBUTTON,1,新增)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5055" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5055]                                 協辦獎金處理清單"],
+["#FdPerfDateFm+撥款日期",#PerfDateFm,"~",#PerfDateTo],
+["#FdCustNo+戶號-額度",#CustNo,"-",#FacmNo],
+]
+!---------- AP TEXT AREA Variables ----------
+
+#FdPerfDateFm=X,2,L
+#FdCustNo=X,2,L
+
+#NewCoBonus=X,11,S
+T(2,1+#CustNo+#FacmNo)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L5503; ntxbuf=#NewCoBonus})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增)
+
+!查詢方式
+#FunctionCdH=X,100,S
+T(3,1:業績日期;2:戶號)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#Value=A,1,S
+T(1,@PerfDateFm,#SYSDATE,2,7)
+T(1,@PerfDateTo,#SYSDATE,2,7)
+
+! 查詢方式
+#FunctionCd=A,1,L
+E(0,1)
+HELP(#FunctionCdH)
+@V(H,#FunctionCdH)
+C(3,#FunctionCd,1,INVOKEJS(SHOW,L5055_2,1)INVOKEJS(SHOW,L5055_3,0),
+                  INVOKEJS(SHOW,L5055_2,0)INVOKEJS(SHOW,L5055_3,1))
+#FunctionCdX=X,8,L
+T(3, )
+T(H,#FunctionCd,#FunctionCdH)
+
+! 業績日期
+#PerfDateFm=D,7,I
+C(3,#FunctionCd,1,$,s)
+D(8)
+@A(DATE,0,#PerfDateFm)
+V(7)
+IF(#PerfDateFm==0,V(P,業績日期不可空白),$)
+
+#PerfDateTo=D,7,I
+C(3,#FunctionCd,1,$,s)
+@A(DATE,0,#PerfDateTo)
+D(8)
+V(7)
+IF(#PerfDateTo==0,V(P,業績日期不可空白),$)
+
+#CheckPerfDate=X,1,S
+C(3,#FunctionCd,1,$,s)
+@IF(#PerfDateTo>=#PerfDateFm,$,V(P,業績日期起日不得大於訖日))
+
+#CustNo=A,7,I
+C(3,#FunctionCd,2,$,s)
+@IF(#CustNo>0,s,$)
+V(P,請填寫戶號)
+
+#FacmNo=A,3,I
+C(3,#FunctionCd,2,$,s)
+
+#MRKEY=_,_,S
+C(3,#CustNo,0,S,$)
+C(3,#FacmNo,0,T(2,#CustNo),T(2,#CustNo+-+#FacmNo)) 
+
+![顯示方式]
+#RPTFG=A,1,S
+E(0,1)
+! SWITCH(#FunctionCd,1,E(0,1),
+!                    2,E(0,2),E(0,0))
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5055 -----------
+!PfReward
+<sub type="FORM" name="L5055">
+
+#SCRTIL=_,_,S
+T(3,[L5055] 協辦獎金處理清單)
+
+! 獎金類別
+#OOBonusType=X,1,S
+E(0,1)
+
+! 小計
+#OOSummation=+m,14,S
+E(0,#OOIntroducerBonus)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 業績日期 
+#OOPerfDate=D,7,O
+! 戶號
+#OOCustNo=A,7,O
+! 額度
+#OOFacmNo=A,3,O
+! 撥款
+#OOBormNo=A,3,O
+
+! 借戶戶號
+#OOCustNum=X,15,O
+T(2,#OOCustNo+-+#OOFacmNo+-+#OOBormNo)
+! 戶名
+#OOCustNm=X,100,O
+! 房貸專員
+#OOBsOfficer=X,6,O
+! 房貸專員名稱
+#OOBsOfficerName=x,50,O
+! 介紹人
+#OOIntroducer=X,6,O
+! 介紹人
+#OOIntroducerName=x,50,O
+! 介紹獎金
+#OOIntroducerBonus=+m,14,O
+! 撥款日-PfBsDetail
+#OODrawdownDate=D,7,O
+! 商品代碼
+#OOProdCode=X,5,O
+! 計件代碼
+#OOPieceCode=X,1,O
+! 撥款金額 
+#OODrawdownAmt=+m,14,O
+! 員工代號
+#OOLastUpdateEmpNo=X,6,O
+! 經辦
+#OOLastUpdateEmpNoName=x,50,O
+
+#OOL5504=X,20,S
+T(2,#OOCustNo+#OOFacmNo+#OOBormNo+#OOPerfDate)
+
+! FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
+#OOBufA=X,21,S
+T(2,5+#OOL5504)
+
+#OOBtnA=A,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBufA})
+
+#OOBufB=X,21,S
+T(2,2+#OOL5504)
+
+#OOBtnB=A,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBufB})
+
+#OOBufC=X,21,S
+T(2,4+#OOL5504)
+
+#OOBtnC=A,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBufC})
+
+#OOBufD=X,21,S
+T(2,4+#OOL5504)
+
+#OOBtnD=A,1,O
+BIND(grid,{ cmd=CHAIN; ntxcd=L5959; ntxbuf=#OOBtnD})
+! <追回> 0106 +撥款金額
+! #OOBUF_B=X,214,S
+! T(2,#OOCustNo+#OOFacmNo+#OOBormNo+#OOCustNm+#OOIntroducer+#OOBsOfficer+#OOPieceCode+#OOCASECNT+#OOTRNSPERF+#OOPERFRWD+#OOPERFAMT+#OOIntroducerBonus+#OODrawdownAmt)
+! #OOBTN_B=A,2,O
+! BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBUF_B})
+! C(3,#OOSUMMARYWORKAMT,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L5503; ntxbuf=#OOBUF_B}))
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#FunctionCd
+#PerfDateFm
+#PerfDateTo
+#CustNo
+#FacmNo
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5055
+#OOPerfDate
+#OOCustNo
+#OOFacmNo
+#OOBormNo
+#OOCustNm
+#OOBsOfficer
+#OOBsOfficerName
+#OOIntroducer
+#OOIntroducerName
+#OOIntroducerBonus
+#OODrawdownDate
+#OOProdCode
+#OOPieceCode
+#OODrawdownAmt
+#OOLastUpdateEmpNo
+#OOLastUpdateEmpNoName
+^
+</sub>
+
+<sub type="PART" name="L5055A" layout="cols=1;screen.width=[130,870];printer.width=[15,30,15,30];order=1">
+[
+["[L5055]                                  協辦獎金處理清單                                                                          "],
+]
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+#RPTFG=1,QUERY.GRID,L5055A
+#any={detail:true, header:'L5055A.part', caption:'', width:1020, rowNum:20, rowList:[20,40,60]}
+#OOBtnA=
+{search:false,formatter:'cust:bind-button:查詢',align:'center',canExport:false,width:40}
+#OOBtnB=
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:40}
+#OOBtnC=
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:40}
+#OOBtnD=
+{search:false,formatter:'cust:bind-button:保費檢核',align:'center',canExport:false,width:80}
+#OOPieceCode=計件代碼
+#OOProdCode=利率代碼
+#OOIntroducer=協辦人員工代號
+#OOIntroducerName=協辦人
+#OOCustNum=借戶戶號
+#OOBonusType=獎金類別
+#OOCustNm=戶名
+#OODrawdownDate=撥款日期
+#OODrawdownAmt=撥款金額 
+#OOIntroducerBonus=車馬費
+#OOSummation=小計
+^
+</sub>
+! <include src="PRT.icf::INQ04.sel" map="i=L5055;cpi=15"/>
+! #FunctionCd
+! #PerfDateFm
+! #PerfDateTo
+! #CustNo
+! #FacmNo
+! %
+! #OOPerfDate
+! #OOCustNo
+! #OOFacmNo
+! #OOBormNo
+! #OOCustNm
+! #OOBsOfficer
+! #OOBsOfficerName
+! #OOIntroducer
+! #OOIntroducerName
+! #OOIntroducerBonus
+! #OODrawdownDate
+! #OOProdCode
+! #OOPieceCode
+! #OODrawdownAmt
+! #OOLastUpdateEmpNo
+! #OOLastUpdateEmpNoName
+! @^
+! </sub>

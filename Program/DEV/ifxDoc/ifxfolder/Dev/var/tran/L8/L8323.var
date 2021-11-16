@@ -78,7 +78,6 @@ E(0,0)
 #FdCivil323GuarAmt=X,2,L
 #FdReceExpPrin=X,2,L
 #FdReceExpInte=X,2,L
-
 #FdReceExpPena=X,2,L
 #FdReceExpOther=X,2,L
 #FdCashCardPrin=X,2,L
@@ -163,23 +162,7 @@ T(2,@FdCourtCode,*)
 T(2,@FdMaxMainCode,*)
 T(2,@FdIsMaxMain,*)
 T(2,@FdIsClaims,*)
-T(2,@FdGuarLoanCnt,*)
-T(2,@FdReceExpPrin,*)
-T(2,@FdReceExpInte,*)
-T(2,@FdReceExpPena,*)
-T(2,@FdReceExpOther,*)
-T(2,@FdCashCardPrin,*)
-T(2,@FdCashCardInte,*)
-T(2,@FdCashCardPena,*)
-T(2,@FdCashCardOther,*)
-T(2,@FdCreditCardPrin,*)
-T(2,@FdCreditCardInte,*)
-T(2,@FdCreditCardPena,*)
-T(2,@FdCreditCardOther,*)
-T(2,@FdGuarObliPrin,*)
-T(2,@FdGuarObliInte,*)
-T(2,@FdGuarObliPena,*)
-T(2,@FdGuarObliOther,*)
+
 
 ! 異動進入
 #Deal_Update=X,1,S
@@ -193,23 +176,7 @@ T(F,@CreditCardPrin,1)T(F,@CreditCardInte,1)T(F,@CreditCardPena,1)T(F,@CreditCar
 T(F,@GuarObliPrin,1)T(F,@GuarObliInte,1)T(F,@GuarObliPena,1)T(F,@GuarObliOther,1)
 T(2,@FdTranKey,*)
 T(2,@FdIsClaims,*)
-T(2,@FdGuarLoanCnt,*)
-T(2,@FdReceExpPrin,*)
-T(2,@FdReceExpInte,*)
-T(2,@FdReceExpPena,*)
-T(2,@FdReceExpOther,*)
-T(2,@FdCashCardPrin,*)
-T(2,@FdCashCardInte,*)
-T(2,@FdCashCardPena,*)
-T(2,@FdCashCardOther,*)
-T(2,@FdCreditCardPrin,*)
-T(2,@FdCreditCardInte,*)
-T(2,@FdCreditCardPena,*)
-T(2,@FdCreditCardOther,*)
-T(2,@FdGuarObliPrin,*)
-T(2,@FdGuarObliInte,*)
-T(2,@FdGuarObliPena,*)
-T(2,@FdGuarObliOther,*)
+
 
 ! 查詢進入
 #Deal_Search=X,1,S

@@ -85,7 +85,7 @@ public class L5511Report extends MakeReport {
 		this.setFont(1, 10);
 		this.setCharSpaces(0);
 
-	//	this.setLineSpaces(2);
+		this.setLineSpaces(2);
 		
 		this.setBeginRow(12);
 		this.setMaxRows(50);

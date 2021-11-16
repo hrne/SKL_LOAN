@@ -3,8 +3,9 @@ package com.st1.itx.trade.L5;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -15,15 +16,18 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.CdWorkMonth;
 import com.st1.itx.db.domain.CdWorkMonthId;
 import com.st1.itx.db.domain.PfInsCheck;
 import com.st1.itx.db.domain.PfItDetail;
-
+import com.st1.itx.db.domain.TxControl;
+import com.st1.itx.db.service.TxControlService;
 import com.st1.itx.db.service.PfItDetailService;
+import com.st1.itx.db.service.PfItDetailAdjustService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.CdWorkMonthService;
+import com.st1.itx.db.service.springjpa.cm.L5510ServiceImpl;
+
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.PfCheckInsuranceCom;
 import com.st1.itx.util.common.MakeFile;
@@ -45,7 +49,11 @@ import com.st1.itx.util.common.MakeExcel;
 public class L5510Batch extends TradeBuffer {
 
 	@Autowired
+	public TxControlService txControlService;
+	@Autowired
 	public PfItDetailService pfItDetailService;
+	@Autowired
+	public PfItDetailAdjustService pfItDetailAdjustService;
 	@Autowired
 	CdWorkMonthService cdWorkMonthService;
 	@Autowired
@@ -64,6 +72,9 @@ public class L5510Batch extends TradeBuffer {
 	public MakeExcel makeExcel;
 	@Autowired
 	public CdEmpService cdEmpService;
+
+	@Autowired
+	private L5510ServiceImpl l5510ServiceImpl;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -127,17 +138,23 @@ public class L5510Batch extends TradeBuffer {
 		}
 
 		slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonthS, iWorkMonth, 0, Integer.MAX_VALUE);
-		if (slPfItDetail != null) {
-			ArrayList<PfItDetail> lPfFac = new ArrayList<PfItDetail>(); // 額度業績
-			custNo = slPfItDetail.getContent().get(0).getCustNo();
-			facmNo = slPfItDetail.getContent().get(0).getFacmNo();
-			for (PfItDetail pfIt : slPfItDetail.getContent()) {
-				// 刪除本月保費檢核追回資料(重新執行用)
-				if (pfIt.getWorkMonth() == iWorkMonth && pfIt.getRepayType() == 1) {
-					deletePfItDetail(pfIt, titaVo);
-					continue;
-				}
 
+		ArrayList<PfItDetail> lPfItDetail = new ArrayList<PfItDetail>(); // 額度業績
+
+		for (PfItDetail pfIt : slPfItDetail.getContent()) {
+			// 排除業績金額為零
+			if (pfIt.getPerfEqAmt().compareTo(BigDecimal.ZERO) == 0
+					&& pfIt.getPerfReward().compareTo(BigDecimal.ZERO) == 0) {
+				continue;
+			}
+			lPfItDetail.add(pfIt);
+		}
+
+		if (lPfItDetail.size() > 0) {
+			ArrayList<PfItDetail> lPfFac = new ArrayList<PfItDetail>(); // 額度業績
+			for (PfItDetail pfIt : lPfFac) {
+				custNo = slPfItDetail.getContent().get(0).getCustNo();
+				facmNo = slPfItDetail.getContent().get(0).getFacmNo();
 				// 額度不同則執行房貸獎勵保費檢核、產生發放媒體
 				if (pfIt.getCustNo() != custNo || pfIt.getFacmNo() != facmNo) {
 					calculate(custNo, facmNo, lPfFac, titaVo);
@@ -183,6 +200,12 @@ public class L5510Batch extends TradeBuffer {
 			}
 			makeExcel.close();
 		}
+
+		// 寫入交易控制檔
+
+		String controlCode = "L5510." + iWorkMonth + ".1";
+		logTxControl(titaVo, controlCode);
+
 		this.batchTransaction.commit();
 
 		String msg = "換算業績、業務報酬發放檔已產生，業績筆數=" + +plusCnt + ", 追回業績筆數=" + minusCnt;
@@ -397,7 +420,7 @@ public class L5510Batch extends TradeBuffer {
 		this.info(" updatePfItDetail .....");
 		PfItDetail tPfItDetail = pfItDetailService.holdById(pf, titaVo);
 		if (tPfItDetail == null) {
-			throw new LogicException(titaVo, "E0006", "PfItDetail" ); // 鎖定資料時，發生錯誤
+			throw new LogicException(titaVo, "E0006", "PfItDetail"); // 鎖定資料時，發生錯誤
 		}
 		tPfItDetail.setRewardDate(this.txBuffer.getTxCom().getTbsdy()); // 保費檢核日
 		try {
@@ -414,7 +437,7 @@ public class L5510Batch extends TradeBuffer {
 		this.info(" deletePfItDetail .....");
 		PfItDetail tPfItDetail = pfItDetailService.holdById(pf, titaVo);
 		if (tPfItDetail == null) {
-			throw new LogicException(titaVo, "E0006", "PfItDetail" ); // 鎖定資料時，發生錯誤
+			throw new LogicException(titaVo, "E0006", "PfItDetail"); // 鎖定資料時，發生錯誤
 		}
 		try {
 			pfItDetailService.delete(tPfItDetail, titaVo); // update
@@ -441,113 +464,174 @@ public class L5510Batch extends TradeBuffer {
 
 //		int iBonusDate = Integer.valueOf(titaVo.getParam("BonusDate").trim()) + 19110000;// 獎金發放日
 
-		Slice<PfItDetail> slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonth, iWorkMonth, this.index,
-				this.limit, titaVo);
-		List<PfItDetail> lPfItDetail = slPfItDetail == null ? null : slPfItDetail.getContent();
+//		Slice<PfItDetail> slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonth, iWorkMonth, this.index,
+//				this.limit, titaVo);
+//		List<PfItDetail> lPfItDetail = slPfItDetail == null ? null : slPfItDetail.getContent();
+
+		List<Map<String, String>> L5510List = null;
+
+		try {
+			L5510List = l5510ServiceImpl.FindData(titaVo, iWorkMonth, this.index, this.limit);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			this.info("L5051 ErrorForDB=" + e);
+			throw new LogicException(titaVo, "E5004", "");
+		}
 
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5510.2", "業績報酬媒體檔(LNQQQP2NEW)", "LNQQQP2NEW.txt",
 				2);
 		int cnt = 0;
-		if (lPfItDetail != null) {
-			for (PfItDetail pfItDetail : lPfItDetail) {
 
-				BigDecimal perfReward = pfItDetail.getPerfReward();
+		Map<String, String> dd = new HashMap<String, String>();
 
-				this.info("L5510Batch.makeMedia data = " + pfItDetail.getMediaFg() + "/" + perfReward + '/'
-						+ pfItDetail.getIntroducer().trim());
+		String introducer = "";
+		int custNo = 0;
+		int facmNo = 0;
+		BigDecimal drawdownAmt = BigDecimal.ZERO;
+		BigDecimal perfReward = BigDecimal.ZERO;
+		BigDecimal perfEqAmt = BigDecimal.ZERO;
 
-				if (pfItDetail.getMediaFg() > 0) {
-					continue;
+		boolean first = true;
+		if (L5510List != null && L5510List.size() > 0) {
+			for (Map<String, String> d : L5510List) {
+				int custNo2 = Integer.valueOf(d.get("CustNo").trim());
+				int facmNo2 = Integer.valueOf(d.get("FacmNo").trim());
+				BigDecimal drawdownAmt2 = new BigDecimal(d.get("DrawdownAmt").trim());
+				BigDecimal perfReward2 = new BigDecimal(d.get("PerfReward").trim());
+				BigDecimal perfEqAmt2 = new BigDecimal(d.get("PerfEqAmt").trim());
+				if (first || !introducer.equals(d.get("Introducer").toString().trim()) || custNo != custNo2
+						|| facmNo != facmNo2 || drawdownAmt2.compareTo(BigDecimal.ZERO) < 0) {
+					if (!first) {
+						writeMedia(titaVo, dd, drawdownAmt, perfReward, perfEqAmt);
+						drawdownAmt = BigDecimal.ZERO;
+						perfReward = BigDecimal.ZERO;
+						perfEqAmt = BigDecimal.ZERO;
+						cnt++;
+					}
+					first = false;
 				}
+				drawdownAmt = drawdownAmt.add(drawdownAmt2);
+				perfReward = perfReward.add(perfReward2);
+				perfEqAmt = perfEqAmt.add(perfEqAmt2);
 
-				if (perfReward.compareTo(BigDecimal.ZERO) == 0) {
-					continue;
-				}
-
-				if ("".equals(pfItDetail.getIntroducer().trim())) {
-					continue;
-				}
-
-				PfItDetail pfItDetail2 = pfItDetailService.holdById(pfItDetail, titaVo);
-				if (pfItDetail2 == null) {
-					throw new LogicException(titaVo, "E0001", "介紹人業績明細檔");
-				}
-
-//				pfItDetail2.setRewardDate(this.txBuffer.getTxCom().getTbsdy());//暫不使用
-				pfItDetail2.setMediaFg(1);
-				pfItDetail2.setMediaDate(this.txBuffer.getTxCom().getTbsdy());
-				try {
-					pfItDetailService.update(pfItDetail2, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "獎金媒體發放檔");
-				}
-				//
-				String s = "";
-
-				String workMonth = String.valueOf(pfItDetail.getWorkMonth());
-				s += workMonth.substring(0, 4) + "/" + workMonth.substring(4, 6); // 業績年月(7)
-				s += "10H000"; // 申請單位代號(6)
-				s += "0000" + workMonth; // 申請批號(10)
-
-				String employeeId = "";
-				CdEmp cdEmp = cdEmpService.findById(pfItDetail.getIntroducer(), titaVo);
-				if (cdEmp == null) {
-					throw new LogicException(titaVo, "E0001", "員工編號=" + pfItDetail.getIntroducer());
-				} else {
-					employeeId = String.format("%-10s", cdEmp.getAgentId());
-				}
-
-				s += employeeId; // 身份證字號(10)
-				s += "QQ"; // 薪碼(2)
-				s += "                    "; // 薪碼說明
-
-				String ss = "";
-				if (perfReward.compareTo(BigDecimal.ZERO) < 0) {
-					DecimalFormat df = new DecimalFormat("000000000");
-					ss = df.format(perfReward);
-				} else {
-					DecimalFormat df = new DecimalFormat("0000000000");
-					ss = df.format(perfReward);
-				}
-				s += ss;// 金額(10)
-
-				s += ss;// 業績(FYC)(10)
-
-				BigDecimal perfEqAmt = pfItDetail.getPerfEqAmt();
-				if (perfEqAmt.compareTo(BigDecimal.ZERO) < 0) {
-					DecimalFormat df = new DecimalFormat("000000000");
-					ss = df.format(perfEqAmt);
-				} else {
-					DecimalFormat df = new DecimalFormat("0000000000");
-					ss = df.format(perfEqAmt);
-				}
-
-				s += ss;// 業績(FYP)(10)
-
-				//
-
-				s += String.format("%07d%03d", pfItDetail.getCustNo(), pfItDetail.getFacmNo())
-						+ "000                           ";// 轉發明細(40)
-
-				// 撥款金額/追回金額
-				BigDecimal drawdownAmt = pfItDetail.getDrawdownAmt();
-				if (drawdownAmt.compareTo(BigDecimal.ZERO) < 0) {
-					DecimalFormat df = new DecimalFormat("000000000");
-					ss = df.format(drawdownAmt);// 業績(FYP)(10)
-				} else {
-					DecimalFormat df = new DecimalFormat("0000000000");
-					ss = df.format(drawdownAmt);// 業績(FYP)(10)
-				}
-
-				s += ss;// 計算基礎(10)
-
-				s += "00035.00";// FP跨售換算率(8)
-				s += "00012.50";// FC跨售換算率(8)
-				s += "6";// 跨售類別(1)
-				makeFile.put(s);
-				cnt++;
+				dd.clear();
+				dd.putAll(d);
 			}
+			writeMedia(titaVo, dd, drawdownAmt, perfReward, perfEqAmt);
+			cnt++;
 		}
+
+//		if (lPfItDetail != null) {
+//			for (PfItDetail pfItDetail : lPfItDetail) {
+//
+//				BigDecimal perfReward = pfItDetail.getPerfReward();
+//
+//				this.info("L5510Batch.makeMedia data = " + pfItDetail.getMediaFg() + "/" + perfReward + '/'
+//						+ pfItDetail.getIntroducer().trim());
+//
+//				if (pfItDetail.getMediaFg() > 0) {
+//					continue;
+//				}
+//
+//				if (perfReward.compareTo(BigDecimal.ZERO) == 0) {
+//					continue;
+//				}
+//
+//				if ("".equals(pfItDetail.getIntroducer().trim())) {
+//					continue;
+//				}
+//
+//				if (pfItDetail.getDrawdownAmt().compareTo(BigDecimal.ZERO) == 0) {
+//					continue;
+//				}
+//
+//				this.info("L5510Batch.makeMedia DrawdownAmt = " + pfItDetail.getDrawdownAmt());
+//
+//				PfItDetail pfItDetail2 = pfItDetailService.holdById(pfItDetail, titaVo);
+//				if (pfItDetail2 == null) {
+//					throw new LogicException(titaVo, "E0001", "介紹人業績明細檔");
+//				}
+//
+////				pfItDetail2.setRewardDate(this.txBuffer.getTxCom().getTbsdy());//暫不使用
+//				pfItDetail2.setMediaFg(1);
+//				pfItDetail2.setMediaDate(this.txBuffer.getTxCom().getTbsdy());
+//				try {
+//					pfItDetailService.update(pfItDetail2, titaVo);
+//				} catch (DBException e) {
+//					throw new LogicException(titaVo, "E0007", "獎金媒體發放檔");
+//				}
+//				//
+//				String s = "";
+//
+//				String workMonth = String.valueOf(pfItDetail.getWorkMonth());
+//				s += workMonth.substring(0, 4) + "/" + workMonth.substring(4, 6); // 業績年月(7)
+//				s += "10H000"; // 申請單位代號(6)
+//				s += "0000" + workMonth; // 申請批號(10)
+//
+//				String employeeId = "";
+//				CdEmp cdEmp = cdEmpService.findById(pfItDetail.getIntroducer(), titaVo);
+//				if (cdEmp == null) {
+//					throw new LogicException(titaVo, "E0001", "員工編號=" + pfItDetail.getIntroducer());
+//				} else {
+//					employeeId = String.format("%-10s", cdEmp.getAgentId());
+//				}
+//
+//				s += employeeId; // 身份證字號(10)
+//				s += "QQ"; // 薪碼(2)
+//				s += "                    "; // 薪碼說明
+//
+//				String ss = "";
+//				if (perfReward.compareTo(BigDecimal.ZERO) < 0) {
+//					DecimalFormat df = new DecimalFormat("000000000");
+//					ss = df.format(perfReward);
+//				} else {
+//					DecimalFormat df = new DecimalFormat("0000000000");
+//					ss = df.format(perfReward);
+//				}
+//				s += ss;// 金額(10)
+//
+//				s += ss;// 業績(FYC)(10)
+//
+//				BigDecimal perfEqAmt = pfItDetail.getPerfEqAmt();
+//				if (perfEqAmt.compareTo(BigDecimal.ZERO) < 0) {
+//					DecimalFormat df = new DecimalFormat("000000000");
+//					ss = df.format(perfEqAmt);
+//				} else {
+//					DecimalFormat df = new DecimalFormat("0000000000");
+//					ss = df.format(perfEqAmt);
+//				}
+//
+//				s += ss;// 業績(FYP)(10)
+//
+//				//
+//
+//				s += String.format("%07d%03d", pfItDetail.getCustNo(), pfItDetail.getFacmNo())
+//						+ "000                           ";// 轉發明細(40)
+//
+//				// 撥款金額/追回金額
+//				BigDecimal drawdownAmt = pfItDetail.getDrawdownAmt();
+//				if (drawdownAmt.compareTo(BigDecimal.ZERO) < 0) {
+//					DecimalFormat df = new DecimalFormat("000000000");
+//					ss = df.format(drawdownAmt);// 業績(FYP)(10)
+//				} else {
+//					DecimalFormat df = new DecimalFormat("0000000000");
+//					ss = df.format(drawdownAmt);// 業績(FYP)(10)
+//				}
+//
+//				s += ss;// 計算基礎(10)
+//
+//				s += "00035.00";// FP跨售換算率(8)
+//				s += "00012.50";// FC跨售換算率(8)
+//				s += "6";// 跨售類別(1)
+//				makeFile.put(s);
+//				cnt++;
+//			}
+//		}
+
+		// 寫入交易控制檔
+
+		String controlCode = "L5510." + iWorkMonth + ".2";
+		logTxControl(titaVo, controlCode);
 
 		if (cnt > 0) {
 			makeFile.close();
@@ -559,6 +643,74 @@ public class L5510Batch extends TradeBuffer {
 			webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", msg, titaVo);
 		}
 
+	}
+
+	private void writeMedia(TitaVo titaVo, Map<String, String> d, BigDecimal drawdownAmt, BigDecimal perfReward,
+			BigDecimal perfEqAmt) throws LogicException {
+		this.info("L5510Batch writeMedia=" + d.get("CustNo" + "/" + d.get("FacmNo") + "/" + d.get("WorkMonth")));
+
+		String s = "";
+
+		String workMonth = d.get("WorkMonth");
+		s += workMonth.substring(0, 4) + "/" + workMonth.substring(4, 6); // 業績年月(7)
+		s += "10H000"; // 申請單位代號(6)
+		s += "0000" + workMonth; // 申請批號(10)
+
+		String employeeId = String.format("%-10s", d.get("AgentId").trim());
+
+		s += employeeId; // 身份證字號(10)
+		s += "QQ"; // 薪碼(2)
+		s += "                    "; // 薪碼說明
+
+		String ss = "";
+
+		// BigDecimal perfReward = new BigDecimal(d.get("PerfReward").trim());
+
+		if (perfReward.compareTo(BigDecimal.ZERO) < 0) {
+			DecimalFormat df = new DecimalFormat("000000000");
+			ss = df.format(perfReward);
+		} else {
+			DecimalFormat df = new DecimalFormat("0000000000");
+			ss = df.format(perfReward);
+		}
+		s += ss;// 金額(10)
+
+		s += ss;// 業績(FYC)(10)
+
+		// BigDecimal perfEqAmt = new BigDecimal(d.get("PerfEqAmt").trim());
+
+		if (perfEqAmt.compareTo(BigDecimal.ZERO) < 0) {
+			DecimalFormat df = new DecimalFormat("000000000");
+			ss = df.format(perfEqAmt);
+		} else {
+			DecimalFormat df = new DecimalFormat("0000000000");
+			ss = df.format(perfEqAmt);
+		}
+
+		s += ss;// 業績(FYP)(10)
+
+		//
+
+		s += String.format("%07d%03d", Integer.valueOf(d.get("CustNo").trim()),
+				Integer.valueOf(d.get("FacmNo").trim()));
+		s += "000                           ";// 轉發明細(40)
+
+		// 撥款金額/追回金額
+		// BigDecimal drawdownAmt = new BigDecimal(d.get("DrawdownAmt").trim());
+		if (drawdownAmt.compareTo(BigDecimal.ZERO) < 0) {
+			DecimalFormat df = new DecimalFormat("000000000");
+			ss = df.format(drawdownAmt);// 業績(FYP)(10)
+		} else {
+			DecimalFormat df = new DecimalFormat("0000000000");
+			ss = df.format(drawdownAmt);// 業績(FYP)(10)
+		}
+
+		s += ss;// 計算基礎(10)
+
+		s += "00035.00";// FP跨售換算率(8)
+		s += "00012.50";// FC跨售換算率(8)
+		s += "6";// 跨售類別(1)
+		makeFile.put(s);
 	}
 
 	/**
@@ -575,38 +727,72 @@ public class L5510Batch extends TradeBuffer {
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
 		this.limit = Integer.MAX_VALUE;// 查全部
 
-		Slice<PfItDetail> slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonth, iWorkMonth, this.index,
-				this.limit, titaVo);
-		List<PfItDetail> lPfItDetail = slPfItDetail == null ? null : slPfItDetail.getContent();
+//		Slice<PfItDetail> slPfItDetail = pfItDetailService.findByWorkMonth(iWorkMonth, iWorkMonth, this.index,
+//				this.limit, titaVo);
+//		List<PfItDetail> lPfItDetail = slPfItDetail == null ? null : slPfItDetail.getContent();
+//
+//		int cnt = 0;
+//		if (lPfItDetail != null) {
+//			for (PfItDetail pfItDetail : lPfItDetail) {
+//
+//				if (pfItDetail.getMediaFg() == 0) {
+//					continue;
+//				}
+//
+//				PfItDetail pfItDetail2 = pfItDetailService.holdById(pfItDetail, titaVo);
+//				if (pfItDetail2 == null) {
+//					throw new LogicException(titaVo, "E0001", "介紹人業績明細檔");
+//				}
+//
+////				pfItDetail2.setRewardDate(0);
+//				pfItDetail2.setMediaFg(0);
+//				pfItDetail2.setMediaDate(0);
+//				try {
+//					pfItDetailService.update(pfItDetail2, titaVo);
+//				} catch (DBException e) {
+//					throw new LogicException(titaVo, "E0007", "獎金媒體發放檔");
+//				}
+//
+//				cnt++;
+//			}
+//		}
 
-		int cnt = 0;
-		if (lPfItDetail != null) {
-			for (PfItDetail pfItDetail : lPfItDetail) {
+		// 刪除交易控制檔
 
-				if (pfItDetail.getMediaFg() == 0) {
-					continue;
-				}
-
-				PfItDetail pfItDetail2 = pfItDetailService.holdById(pfItDetail, titaVo);
-				if (pfItDetail2 == null) {
-					throw new LogicException(titaVo, "E0001", "介紹人業績明細檔");
-				}
-
-//				pfItDetail2.setRewardDate(0);
-				pfItDetail2.setMediaFg(0);
-				pfItDetail2.setMediaDate(0);
-				try {
-					pfItDetailService.update(pfItDetail2, titaVo);
-				} catch (DBException e) {
-					throw new LogicException(titaVo, "E0007", "獎金媒體發放檔");
-				}
-
-				cnt++;
+		String controlCode = "L5510." + iWorkMonth + ".2";
+		TxControl txControl = txControlService.holdById(controlCode, titaVo);
+		if (txControl != null) {
+			try {
+				txControlService.delete(txControl, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
 		}
 
-		String msg = "共取消" + cnt + "筆資料";
+
+		String msg = "已取消";//"取消" + cnt + "筆資料";
 		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "N", "", "", msg, titaVo);
+
+	}
+
+	private void logTxControl(TitaVo titaVo, String controlCode) throws LogicException {
+		TxControl txControl = txControlService.holdById(controlCode, titaVo);
+		if (txControl == null) {
+			txControl = new TxControl();
+			txControl.setCode(controlCode);
+			txControl.setDesc("");
+			try {
+				txControlService.insert(txControl, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+		} else {
+			try {
+				txControlService.update(txControl, titaVo);
+			} catch (DBException e) {
+				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
+			}
+		}
 
 	}
 }

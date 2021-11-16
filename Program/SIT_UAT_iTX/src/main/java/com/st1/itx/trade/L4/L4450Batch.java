@@ -134,8 +134,10 @@ public class L4450Batch extends TradeBuffer {
 	private HashMap<tmpBorm, BigDecimal> shortAmtMap = new HashMap<>();
 //	暫收款占用金額 = 未到期約定還本金額 + 法務費金額 
 	private HashMap<tmpBorm, BigDecimal> bookAmtMap = new HashMap<>();
-//  火險單
+//  火險單號碼
 	private HashMap<tmpBorm, String> insuNoMap = new HashMap<>();
+//  火險單日期
+	private HashMap<tmpBorm, Integer> insuDateMap = new HashMap<>();
 
 	private HashMap<tmpBorm, String> rpAcCodeMap = new HashMap<>();
 //	預設true 若有錯誤改為 False 
@@ -482,13 +484,17 @@ public class L4450Batch extends TradeBuffer {
 
 				// 火險單
 				if (tBaTxVo.getRepayType() == 5) {
+					// 火險單號碼
 					if (!insuNoMap.containsKey(tmp2)) {
 						insuNoMap.put(tmp2, tBaTxVo.getRvNo());
 					} else {
 						insuNoMap.put(tmp2, insuNoMap.get(tmp2) + "," + tBaTxVo.getRvNo());
 					}
+					// 火險單日期(最小)
+					if (!insuDateMap.containsKey(tmp2)) {
+						insuDateMap.put(tmp2, tBaTxVo.getPayIntDate());
+					}
 				}
-
 				// 暫收款
 				if (tBaTxVo.getDataKind() == 3) {
 					this.info("bookAmAmtMap : " + bookAmtMap.get(tmp2));
@@ -519,9 +525,9 @@ public class L4450Batch extends TradeBuffer {
 					minIntStartDate.put(tmp, tBaTxVo.getIntStartDate());
 				}
 
-//				 已送出媒體未回或未製成媒體 1.與輸入還款來源相同 2.與輸入還款來源不相同
+//				 // 1.已送出媒體未回或未製成媒體 2.期款二扣
 				int sendCode = isMediaSent(tmp, iRepayType, minIntStartDate.get(tmp), titaVo);
-				if (sendCode > 0) {
+				if (sendCode == 1) {
 					if (sendCode == 1 && "L4451".equals(titaVo.getTxcd())) {
 						checkMsg = "已送出媒體未回或未製成媒體";
 						checkFlag = false;
@@ -530,7 +536,8 @@ public class L4450Batch extends TradeBuffer {
 						continue;
 					}
 				}
-
+				if (sendCode == 2) {
+				}
 //				應扣金額 shPayAmtMap - 暫收抵繳金額  tmpAmtMap = 扣款金額 repAmtMap 
 
 				if (shPayAmtMap.containsKey(tmp)) {
@@ -717,6 +724,9 @@ public class L4450Batch extends TradeBuffer {
 				if (insuNoMap.get(tmp2) != null) {
 					tTempVo.putParam("InsuNo", insuNoMap.get(tmp2));
 				}
+				if (insuDateMap.get(tmp2) != null) {
+					tTempVo.putParam("InsuDate", insuDateMap.get(tmp2));
+				}
 			}
 			tBankDeductDtl.setJsonFields(tTempVo.getJsonString());
 
@@ -787,29 +797,24 @@ public class L4450Batch extends TradeBuffer {
 		}
 	}
 
-	// 已送出媒體未回或未製成媒體 1.與輸入還款來源相同 2.與輸入還款來源不相同
+	// 1.已送出媒體未回或未製成媒體
 	private int isMediaSent(tmpBorm tmp, int iRepayType, int prevIntDate, TitaVo titaVo) {
 		int result = 0;
-
-		Slice<BankDeductDtl> slBankDeductDtl = null;
+		BankDeductDtl tBankDeductDtl = null;
 		if (tmp.getRepayType() <= 3) {
-			slBankDeductDtl = bankDeductDtlService.findL4450PrevIntDate(tmp.getCustNo(), tmp.getFacmNo(),
-					tmp.getBormNo(), prevIntDate + 19110000, this.index, this.limit, titaVo);
-
+			tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(tmp.getCustNo(), tmp.getFacmNo(),
+					tmp.getBormNo(), prevIntDate + 19110000, titaVo);
 		} else {
-			slBankDeductDtl = bankDeductDtlService.findL4450Rng(tmp.getCustNo(), tmp.getFacmNo(), tmp.getBormNo(),
-					tmp.getRepayType(), tmp.getPayIntDate() + 19110000, this.index, this.limit, titaVo);
+			tBankDeductDtl = bankDeductDtlService.findL4450EntryDateFirst(tmp.getCustNo(), tmp.getFacmNo(),
+					tmp.getBormNo(), tmp.getRepayType(), titaVo);
 		}
-		if (slBankDeductDtl != null) {
-			for (BankDeductDtl tBankDeductDtl : slBankDeductDtl.getContent()) {
+
+		if (tBankDeductDtl != null) {
+			if ((iRepayType <= 3 && tBankDeductDtl.getRepayType() <= 3)
+					|| iRepayType == tBankDeductDtl.getRepayType()) {
 				if ("".equals(tBankDeductDtl.getMediaCode().trim())
 						|| "".equals(tBankDeductDtl.getReturnCode().trim())) {
-					if ((iRepayType <= 3 && tBankDeductDtl.getRepayType() <= 3)
-							|| iRepayType == tBankDeductDtl.getRepayType()) {
-						result = 1;
-					} else if (tmp.getRepayType() == tBankDeductDtl.getRepayType()) {
-						result = 2;
-					}
+					result = 1;
 				}
 			}
 		}

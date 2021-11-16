@@ -18,7 +18,6 @@ import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.parse.Parse;
 
 @Service("L4454R3ServiceImpl")
 @Repository
@@ -32,9 +31,6 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 	private LoanBorMainRepository loanBorMainRepos;
 
 	@Autowired
-	private Parse parse;
-
-	@Autowired
 	private DateUtil dateUtil;
 
 	@Override
@@ -42,42 +38,40 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	private int entdy = 0;
-	private int lastYearEntdy = 0;
+	private int entryDate = 0;
+	private int lastYearEntryDate = 0;
 
-	@SuppressWarnings("unchecked")
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 //		4-8-62_一年內新貸件扣款失敗表
 		this.info("一年內新貸件扣款失敗表 findAll...");
 
-		
-		entdy = Integer.parseInt(titaVo.getParam("AcDate")) + 19110000;
-		lastYearEntdy = calDate(entdy, -1, 0, 0);
+		entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
 
-		this.info("entdy = " + entdy);
-		this.info("lastYearEntdy = " + lastYearEntdy);
+		this.info("entryDate= " + entryDate);
+
+		this.info("entryDate= " + entryDate);
+		lastYearEntryDate = calDate(entryDate, -1, 0, 0);
+
+		this.info("lastYearEntryDate = " + lastYearEntryDate);
 
 		String sql = " select                                                                ";
-		sql += "     MIN(bdd.\"RepayAcctNo\")                       AS F0                         ";
+		sql += "     MIN(bd.\"RepayAcctNo\")                        AS F0                         ";
 		sql += "   , MIN(LPAD(bd.\"CustNo\", 7 , '0'))              AS F1                         ";
 		sql += "   , MIN(LPAD(bd.\"FacmNo\", 3 , '0'))              AS F2                         ";
 		sql += "   , MIN(cm.\"CustName\")                           AS F3                         ";
 		sql += "   , MIN(bd.\"RepayAmt\")                           AS F4                         ";
 		sql += "   , MIN(NVL(ctl.\"PhoneNo\", ''))                  AS F5                         ";
-		sql += "   , MIN(NVL(bdd.\"RelCustName\", cm.\"CustName\")) AS F6                         ";
+		sql += "   , MIN(NVL(bd.\"RelCustName\", cm.\"CustName\"))  AS F6                         ";
 		sql += "   , case when lbm.\"PrevPayIntDate\" < 19110000 then lbm.\"PrevPayIntDate\" ";
 		sql += "          else lbm.\"PrevPayIntDate\" - 19110000 end     AS F7               ";
 		sql += "   , case when fm.\"FirstDrawdownDate\" < 19110000 then fm.\"FirstDrawdownDate\" ";
 		sql += "          else fm.\"FirstDrawdownDate\" - 19110000 end  AS F8               ";
 		sql += "   , ce.\"Fullname\"                           AS F9                         ";
-		sql += "   from \"BatxDetail\" bd                                                    ";
-		sql += "   left join \"BankDeductDtl\" bdd on bdd.\"MediaDate\" = bd.\"MediaDate\"   ";
-		sql += "                                and bdd.\"MediaKind\" = bd.\"MediaKind\"     ";
-		sql += "                                and bdd.\"MediaSeq\"  = bd.\"MediaSeq\"      ";
-		sql += "   left join \"LoanBorMain\" lbm   on lbm.\"CustNo\"    = bdd.\"CustNo\"     ";
-		sql += "                                and lbm.\"FacmNo\"    = bdd.\"FacmNo\"       ";
-		sql += "                                and lbm.\"BormNo\"    = bdd.\"BormNo\"       ";
+		sql += "   from \"BankDeductDtl\" bd                                                    ";
+		sql += "   left join \"LoanBorMain\" lbm   on lbm.\"CustNo\"    = bd.\"CustNo\"     ";
+		sql += "                                and lbm.\"FacmNo\"    = bd.\"FacmNo\"       ";
+		sql += "                                and lbm.\"BormNo\"    = bd.\"BormNo\"       ";
 		sql += "   left join \"FacMain\" fm        on fm.\"CustNo\"     = bd.\"CustNo\"      ";
 		sql += "                                and fm.\"FacmNo\"     = bd.\"FacmNo\"        ";
 		sql += "   left join \"CustMain\" cm       on cm.\"CustNo\"     = bd.\"CustNo\"      ";
@@ -95,13 +89,11 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "      )    ctl ON ctl.\"CustUKey\" = cm.\"CustUKey\"                         ";
 		sql += "              AND ctl.SEQ = 1                                                ";
 		sql += "   left join \"CdEmp\" ce          on ce.\"EmployeeNo\" = fm.\"FireOfficer\" ";
-		sql += "   left join \"BatxHead\" bh       on bh.\"AcDate\"     = bd.\"AcDate\"      ";
-		sql += "                                and bh.\"BatchNo\"    = bd.\"BatchNo\"       ";
-		sql += "   where bd.\"AcDate\" = :entdy                                              ";
-		sql += "     and bd.\"RepayCode\"    = 2                                             ";
-		sql += "     and bh.\"BatxExeCode\" <> 8                                             ";
-		sql += "     and (bd.\"ProcCode\" <> '00000' and substr(bd.\"ProcCode\",1,1) <> 'E')  ";
-		sql += "     and (fm.\"FirstDrawdownDate\" >= :lastYearEntdy";
+		sql += "   where bd.\"EntryDate\" = :entryDate                                       ";
+		sql += "     and bd.\"MediaCode\" = 'Y'                                              ";
+		sql += "     and bd.\"RepayType\" = 1                                                ";
+		sql += "     and NVL(bd.\"ReturnCode\",'  ') not in ('  ','00')                      ";
+		sql += "     and (fm.\"FirstDrawdownDate\" >= :lastYearEntryDate";
 		sql += "           and  fm.\"FirstDrawdownDate\" <= :entdy ";
 		sql += "           )                                                                 ";
 		sql += "   group by CASE WHEN                                                        ";
@@ -114,14 +106,14 @@ public class L4454R3ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "                 ELSE fm.\"FirstDrawdownDate\" - 19110000 ";
 		sql += "            END, ";
 		sql += "ce.\"Fullname\"";
-		sql += "   order by \"F0\",\"F1\", \"F2\"                                           "; 
+		sql += "   order by \"F0\",\"F1\", \"F2\"                                           ";
 		this.info("sql=" + sql);
 		Query query;
 //
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-		query.setParameter("entdy", entdy);
-		query.setParameter("lastYearEntdy", lastYearEntdy);
+		query.setParameter("entryDate",entryDate);
+		query.setParameter("lastYearEntryDate", lastYearEntryDate);
 		return this.convertToMap(query);
 	}
 

@@ -49,11 +49,11 @@ public interface BankDeductDtlRepositoryMon extends JpaRepository<BankDeductDtl,
   // MediaDate >= , AND MediaDate <= 
   public Slice<BankDeductDtl> findAllByMediaDateGreaterThanEqualAndMediaDateLessThanEqual(int mediaDate_0, int mediaDate_1, Pageable pageable);
 
-  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND RepayType = ,AND PayIntDate = 
-  public Slice<BankDeductDtl> findAllByCustNoIsAndFacmNoIsAndBormNoIsAndRepayTypeIsAndPayIntDateIsOrderByEntryDateDesc(int custNo_0, int facmNo_1, int bormNo_2, int repayType_3, int payIntDate_4, Pageable pageable);
+  // CustNo = ,AND FacmNo = ,AND BormNo = ,AND RepayType = 
+  public Optional<BankDeductDtl> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndRepayTypeIsOrderByEntryDateDesc(int custNo_0, int facmNo_1, int bormNo_2, int repayType_3);
 
   // CustNo = ,AND FacmNo = ,AND BormNo = ,AND PrevIntDate =
-  public Slice<BankDeductDtl> findAllByCustNoIsAndFacmNoIsAndBormNoIsAndPrevIntDateIsOrderByEntryDateDesc(int custNo_0, int facmNo_1, int bormNo_2, int prevIntDate_3, Pageable pageable);
+  public Optional<BankDeductDtl> findTopByCustNoIsAndFacmNoIsAndBormNoIsAndPrevIntDateIsOrderByEntryDateDesc(int custNo_0, int facmNo_1, int bormNo_2, int prevIntDate_3);
 
   // EntryDate >= ,AND EntryDate <= , AND MediaKind = 
   public Optional<BankDeductDtl> findTopByEntryDateGreaterThanEqualAndEntryDateLessThanEqualAndMediaKindIsOrderByMediaSeqDesc(int entryDate_0, int entryDate_1, String mediaKind_2);

@@ -1,9 +1,11 @@
 package com.st1.itx.trade.L4;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -13,6 +15,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.service.springjpa.cm.L4702ServiceImpl;
 import com.st1.itx.trade.L4.L4702Report;
+import com.st1.itx.trade.L9.L9705Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.MySpring;
 import com.st1.itx.util.parse.Parse;
@@ -36,10 +39,12 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L4702 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L4702.class);
 
 	@Autowired
 	public L4702ServiceImpl l4702ServiceImpl;
+	
+	@Autowired
+	L9705Report l9705Report;
 
 	@Autowired
 	public L4702Report txReport;
@@ -79,7 +84,7 @@ public class L4702 extends TradeBuffer {
 //		繳息通知單
 
 		switch (funcCode) {
-		case 1:
+		case 1: // 個別
 //			List<Map<String, String>> L4702List = txReport.exec(titaVo);
 
 //			今日已還款者 BatxDetail 
@@ -95,38 +100,26 @@ public class L4702 extends TradeBuffer {
 			iID_TYPE = parse.stringToInteger(titaVo.getParam("ID_TYPE"));
 			iCORP_IND = parse.stringToInteger(titaVo.getParam("CORP_IND"));
 			iAPNO = parse.stringToInteger(titaVo.getParam("APNO"));
+			execL9705(titaVo);
 
 //			存入憑條
 
 			break;
 		case 2:
-//			List<Map<String, String>> L4702List = txReport.exec(titaVo);
-
-//			今日已還款者 BatxDetail 
-//			1.acDate = today 
-//			2.procCode = 6
-			this.info("L4702 Start ...");
-
-			iACCTDATE_ST = this.getTxBuffer().getTxCom().getTbsdyf();
-			iACCTDATE_ED = this.getTxBuffer().getTxCom().getTbsdyf();
-			iCUSTNO = 0;
-
-//			A.匯款轉帳，已入金，有欠繳-------入帳完成後，於應處理事項清單執行L4702。
-//			B.銀扣火險成功，期款失敗----------L4454.銀扣失敗通知(一扣)
-			iCONDITION1 = "A";
-			iCONDITION2 = 0; // 全部
-			iID_TYPE = 0; // 全部
-			iCORP_IND = 0; // 全部
-			iAPNO = 0; // 全部
-
-//			存入憑條
+			List<Map<String, String>> l9705List = null;
+			try {
+				l9705List = l4702ServiceImpl.findAll(titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.error("l4702ServiceImpl.findAll error = " + errors.toString());
+			}
+			l9705Report.exec(l9705List, titaVo, this.txBuffer);
 
 			break;
 		default:
 			break;
 		}
-
-		execL9705(titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

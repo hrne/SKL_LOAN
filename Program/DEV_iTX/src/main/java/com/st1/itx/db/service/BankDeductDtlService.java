@@ -152,19 +152,16 @@ public interface BankDeductDtlService {
   public Slice<BankDeductDtl> findL4452Rng(int mediaDate_0, int mediaDate_1, int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND FacmNo = ,AND BormNo = ,AND RepayType = ,AND PayIntDate = 
+   * CustNo = ,AND FacmNo = ,AND BormNo = ,AND RepayType = 
    *
    * @param custNo_0 custNo_0
    * @param facmNo_1 facmNo_1
    * @param bormNo_2 bormNo_2
    * @param repayType_3 repayType_3
-   * @param payIntDate_4 payIntDate_4
-   * @param index Page Index
-   * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice BankDeductDtl BankDeductDtl of List
    */
-  public Slice<BankDeductDtl> findL4450Rng(int custNo_0, int facmNo_1, int bormNo_2, int repayType_3, int payIntDate_4, int index, int limit, TitaVo... titaVo);
+  public BankDeductDtl findL4450EntryDateFirst(int custNo_0, int facmNo_1, int bormNo_2, int repayType_3, TitaVo... titaVo);
 
   /**
    * CustNo = ,AND FacmNo = ,AND BormNo = ,AND PrevIntDate =
@@ -173,12 +170,10 @@ public interface BankDeductDtlService {
    * @param facmNo_1 facmNo_1
    * @param bormNo_2 bormNo_2
    * @param prevIntDate_3 prevIntDate_3
-   * @param index Page Index
-   * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice BankDeductDtl BankDeductDtl of List
    */
-  public Slice<BankDeductDtl> findL4450PrevIntDate(int custNo_0, int facmNo_1, int bormNo_2, int prevIntDate_3, int index, int limit, TitaVo... titaVo);
+  public BankDeductDtl findL4450PrevIntDateFirst(int custNo_0, int facmNo_1, int bormNo_2, int prevIntDate_3, TitaVo... titaVo);
 
   /**
    * EntryDate &gt;= ,AND EntryDate &lt;= , AND MediaKind = 

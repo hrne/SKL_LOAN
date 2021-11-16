@@ -298,7 +298,7 @@ R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
 
 ![帳號]
-#Account=X,50,I
+#Account=x,50,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
@@ -398,8 +398,8 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@ContractEndYM,#L8r14ContractEndYM),$)
 C(5,#TranKey,D,s,$)
 @A(YM,1,#ContractEndYM)
-IF(#ContractEndYM>=#ContractStartYM,S,$)
-V(P,契約起始年月不得大於截止年月)
+IF(#ContractEndYM>=#ContractStartYM,$,V(P,契約起始年月不得大於截止年月))
+
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

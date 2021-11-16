@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -28,7 +26,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5054 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5054.class);
 
 	/* 日期工具 */
 	@Autowired
@@ -40,12 +37,11 @@ public class L5054 extends TradeBuffer {
 
 	@Autowired
 	public L5054ServiceImpl l5054ServiceImpl;
-	
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5054 ");
 		this.totaVo.init(titaVo);
-
 
 		List<Map<String, String>> L5054VoList = null;
 
@@ -75,9 +71,9 @@ public class L5054 extends TradeBuffer {
 				// L5053Vo L5053VO = (L5053Vo) l5053ServiceImpl.MapToVO(MapL5054, "L5053",
 				// titaVo);
 				OccursList occursList = new OccursList();
-				
+
 				int oBonusDate = Integer.valueOf(MapL5054.get("F0"));
-				
+
 				if (oBonusDate > 0) {
 					oBonusDate -= 19110000;
 				}
@@ -130,7 +126,7 @@ public class L5054 extends TradeBuffer {
 			// this.totaVo.setMsgEndToAuto();// 自動折返
 			this.totaVo.setMsgEndToEnter();// 手動折返
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

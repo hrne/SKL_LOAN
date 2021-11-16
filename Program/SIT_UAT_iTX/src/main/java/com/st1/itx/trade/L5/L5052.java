@@ -1,11 +1,11 @@
 package com.st1.itx.trade.L5;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -15,20 +15,19 @@ import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 
-import com.st1.itx.db.service.springjpa.cm.L5051ServiceImpl;
+import com.st1.itx.db.service.springjpa.cm.L5052ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
-import com.st1.itx.util.common.data.L5052Vo;
 import com.st1.itx.util.date.DateUtil;
 import com.st1.itx.util.parse.Parse;
 
 /**
  * Tita<br>
-* FunctionCd=9,1<br>
-* PerfDateFm=9,7<br>
-* PerfDateTo=9,7<br>
-* CustNo=9,7<br>
-* FacmNo=9,3<br>
-*/
+ * FunctionCd=9,1<br>
+ * PerfDateFm=9,7<br>
+ * PerfDateTo=9,7<br>
+ * CustNo=9,7<br>
+ * FacmNo=9,3<br>
+ */
 
 @Service("L5052")
 @Scope("prototype")
@@ -39,7 +38,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5052 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L5052.class);
 	/* 日期工具 */
 	@Autowired
 	public DateUtil dateUtil;
@@ -47,98 +45,174 @@ public class L5052 extends TradeBuffer {
 	/* 轉型共用工具 */
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
-	public L5051ServiceImpl l5051ServiceImpl;
-	
+	public L5052ServiceImpl l5052ServiceImpl;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L5052 ");
 		this.totaVo.init(titaVo);
-		String FunctionCd=titaVo.getParam("FunctionCd").trim(); //查詢方式 1:業績日期;2:戶號
-		String PerfDateFm=titaVo.getParam("PerfDateFm").trim(); //業績日期From
-		String PerfDateTo=titaVo.getParam("PerfDateTo").trim(); //業績日期To
-		String CustNo=titaVo.getParam("CustNo").trim(); //戶號
-		String FacmNo=titaVo.getParam("FacmNo").trim(); //額度編號
-		if(("1").equals(FunctionCd)) {
-			if(PerfDateFm!=null && PerfDateTo!=null) {
-				if(Integer.parseInt(PerfDateFm)>Integer.parseInt(PerfDateTo)) {
-					//E5009	資料檢核錯誤
-					throw new LogicException(titaVo, "E5009","業績日期起訖有誤");
-				}
-			}
-		}
-		
-		String L5052Sql="";
-		List<Object> L5052VoList = null;
-		try {
-			L5052Sql=l5051ServiceImpl.FindL5052(FunctionCd,PerfDateFm,PerfDateTo,CustNo,FacmNo);
-		} catch (Exception e) {
-			//E5003 組建SQL語法發生問題
-			this.info("L5051 ErrorForSql="+e);
-			throw new LogicException(titaVo, "E5003","");
-		}
-		/*設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值*/
+
+		String SumByFacm = titaVo.getParam("SumByFacm").trim();
+
+//		String L5052Sql = "";
+//		List<Map<String,String>> L5052VoList = null;
+//		try {
+//			L5052Sql = l5052ServiceImpl.FindL5052(FunctionCd, PerfDateFm, PerfDateTo, CustNo, FacmNo);
+//		} catch (Exception e) {
+//			// E5003 組建SQL語法發生問題
+//			this.info("L5051 ErrorForSql=" + e);
+//			throw new LogicException(titaVo, "E5003", "");
+//		}
+		/* 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值 */
 		this.index = titaVo.getReturnIndex();
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		//this.limit=Integer.MAX_VALUE;//查全部
-		this.limit=40;//查全部
-		try {
-			L5052VoList=l5051ServiceImpl.FindData(this.index,this.limit,L5052Sql,titaVo,FunctionCd,PerfDateFm,PerfDateTo,CustNo,FacmNo);
-		} catch (Exception e) {
-			//E5004 讀取DB時發生問題
-			this.info("L5051 ErrorForDB="+e);
-			throw new LogicException(titaVo, "E5004","");
+		// this.limit=Integer.MAX_VALUE;//查全部
+		if ("Y".equals(SumByFacm)) {
+			this.limit = Integer.MAX_VALUE;// 查全部
+		} else {
+			this.limit = 40;// 每次40筆
 		}
-		
-		if(L5052VoList!=null && L5052VoList.size()>=this.limit) {
+		List<Map<String, String>> L5052List = null;
+
+		try {
+			L5052List = l5052ServiceImpl.FindData(titaVo, this.index, this.limit);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			this.info("L5051 ErrorForDB=" + e);
+			throw new LogicException(titaVo, "E5004", "");
+		}
+
+		if (L5052List == null || L5052List.size() == 0) {
+			throw new LogicException(titaVo, "E0001", "");
+		}
+
+		this.info("L5052List.size() =" + L5052List.size());
+
+		String BsOfficer = "";
+		String CustNo = "";
+		String FacmNo = "";
+		String WorkMonth = "";
+		BigDecimal PerfCnt = new BigDecimal("0");
+		BigDecimal PerfAmt = new BigDecimal("0");
+		BigDecimal DrawdownAmt = new BigDecimal("0");
+		int cnt = 0;
+		Boolean first = true;
+
+		Map<String, String> dd = new HashMap<String, String>();
+
+		for (Map<String, String> d : L5052List) {
+			if ("Y".equals(SumByFacm)) {
+				if (first || !BsOfficer.equals(d.get("BsOfficer").trim()) || !CustNo.equals(d.get("CustNo").trim())
+						|| !FacmNo.equals(d.get("FacmNo").trim())) {
+					if (!first) {
+						putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm);
+					}
+
+					WorkMonth = d.get("WorkMonth").trim();
+					PerfCnt = new BigDecimal("0");
+					PerfAmt = new BigDecimal("0");
+					DrawdownAmt = new BigDecimal("0");
+					cnt = 0;
+					first = false;
+				}
+
+				PerfCnt = PerfCnt.add(new BigDecimal(d.get("PerfCnt")));
+				PerfAmt = PerfAmt.add(new BigDecimal(d.get("PerfAmt")));
+				DrawdownAmt = DrawdownAmt.add(new BigDecimal(d.get("DrawdownAmt")));
+
+				cnt++;
+
+				BsOfficer = d.get("BsOfficer").trim();
+				CustNo = d.get("CustNo").trim();
+				FacmNo = d.get("FacmNo").trim();
+				if (!WorkMonth.equals(d.get("WorkMonth").trim())) {
+					WorkMonth = "";
+				}
+			} else {
+				putTota(d, d.get("WorkMonth"), new BigDecimal(d.get("PerfCnt")), new BigDecimal(d.get("PerfAmt")),
+						new BigDecimal(d.get("DrawdownAmt")), 0, SumByFacm);
+			}
+
+			dd.clear();
+			dd.putAll(d);
+
+		}
+
+		if ("Y".equals(SumByFacm)) {
+			putTota(dd, WorkMonth, PerfCnt, PerfAmt, DrawdownAmt, 1, SumByFacm);
+		}
+
+		if (L5052List != null && L5052List.size() >= this.limit) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */
 			titaVo.setReturnIndex(this.setIndexNext());
-			//this.totaVo.setMsgEndToAuto();// 自動折返
-			this.totaVo.setMsgEndToEnter();// 手動折返
-		}
-		
-		if(L5052VoList!=null && L5052VoList.size()!=0) {
-			for(Object ThisObject:L5052VoList) {
-				@SuppressWarnings("unchecked")
-				Map<String,String> MapL5052=(Map<String, String>) ThisObject;
-				L5052Vo L5052VO=(L5052Vo) l5051ServiceImpl.MapToVO(MapL5052,"L5052",titaVo);
-				OccursList occursList = new OccursList();
-				occursList.putParam("OOPerfDate",L5052VO.getPerfDate());//業績日期
-				occursList.putParam("OOAreaCenter",L5052VO.getAreaCenter());//區域中心
-				occursList.putParam("OOAreaCenterX",L5052VO.getAreaCenterX());//區域中心名稱
-				occursList.putParam("OODeptCode",L5052VO.getDeptCode());//部室別
-				occursList.putParam("OODeptCodeX",L5052VO.getDeptCodeX());//部室別名稱
-				occursList.putParam("OOBsOfficer",L5052VO.getBsOfficer());//房貸專員
-				occursList.putParam("OOBsOfficerName",L5052VO.getBsOfficerName());//房貸專員名稱
-				occursList.putParam("OOCustNm",L5052VO.getCustNm());//戶名
-				occursList.putParam("OOCustNo",L5052VO.getCustNo());//戶號
-				occursList.putParam("OOFacmNo",L5052VO.getFacmNo());//額度編號
-				occursList.putParam("OOBormNo",L5052VO.getBormNo());//撥款編號
-				occursList.putParam("OODrawdownDate",L5052VO.getDrawdownDate());//撥款日
-				occursList.putParam("OOProdCode",L5052VO.getProdCode());//商品代碼
-				occursList.putParam("OOPieceCode",L5052VO.getPieceCode());//計件代碼
-				occursList.putParam("OODrawdownAmt",L5052VO.getDrawdownAmt());//撥款金額 
-				occursList.putParam("OOWorkMonth",L5052VO.getWorkMonth());//工作月-民國
-				occursList.putParam("OOPerfCnt",L5052VO.getPerfCnt());//件數
-				occursList.putParam("OOPerfAmt",L5052VO.getPerfAmt());//業績金額
-				occursList.putParam("OOIntroduceDeptCode",L5052VO.getIntroduceDeptCode());//介紹人部室代號
-				occursList.putParam("OOIntroduceDistCode",L5052VO.getIntroduceDistCode());//介紹人區部代號
-				occursList.putParam("OOIntroduceUnitCode",L5052VO.getIntroduceUnitCode());//介紹人單位代號
-				occursList.putParam("OOIntroducer",L5052VO.getIntroducer());//介紹人員編
-				occursList.putParam("OOIntroducerName",L5052VO.getIntroducerName());//介紹人姓名
-				this.totaVo.addOccursList(occursList);
-			}
-		}else {
-			if(this.index!=0) {
-				//代表有多筆查詢,然後筆數剛好可以被整除
-				
-			}else {
-				// E2003 查無資料
-				throw new LogicException(titaVo, "E2003", "");
+			if ("Y".equals(SumByFacm)) {
+				this.totaVo.setMsgEndToAuto();// 自動折返
+			} else {
+				this.totaVo.setMsgEndToEnter();// 手動折返
 			}
 		}
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
+
+	private void putTota(Map<String, String> d, String WorkMonth, BigDecimal PerfCnt, BigDecimal PerfAmt,
+			BigDecimal DrawdownAmt, int canModify, String SumByFacm) {
+		OccursList occursList = new OccursList();
+
+		occursList.putParam("OOLogNo", d.get("LogNo"));
+		occursList.putParam("OOBsDeptName", d.get("BsDeptName"));// 部室中文(部室中文(房貸專員))
+		occursList.putParam("OOOfficerName", d.get("OfficerName"));// 員工姓名(房貸專員)
+		occursList.putParam("OOBsOfficer", d.get("BsOfficer"));// 員工代號(房貸專員)
+
+		int AdjFg = 0; 
+		if ("Y".equals(SumByFacm)) {
+			String AdjLogNo = d.get("AdjLogNo").toString().trim();
+
+			if (!"0".equals(AdjLogNo)) {
+				occursList.putParam("OOPerfCnt", PerfCnt);// 計件件數
+				occursList.putParam("OOPerfAmt", PerfAmt);// 業績金額
+				BigDecimal AdjPerfCnt = new BigDecimal(d.get("AdjPerfCnt").toString().trim());
+				BigDecimal AdjPerfAmt = new BigDecimal(d.get("AdjPerfAmt").toString().trim());
+				PerfCnt = PerfCnt.add(AdjPerfCnt);
+				PerfAmt = PerfAmt.add(AdjPerfAmt);
+				AdjFg = 1;
+			}
+
+		}
+		occursList.putParam("OOAdjFg", AdjFg);
+		
+		occursList.putParam("OOPerfCnt", PerfCnt);// 計件件數
+		occursList.putParam("OOPerfAmt", PerfAmt);// 業績金額
+
+		occursList.putParam("OOCustName", d.get("CustName"));// 戶名
+		occursList.putParam("OOCustNo", d.get("CustNo"));// 戶號
+		occursList.putParam("OOFacmNo", d.get("FacmNo"));// 額度編號
+		occursList.putParam("OOBormNo", d.get("BormNo"));// 撥款序號
+
+		occursList.putParam("OOPerfDate", d.get("PerfDate"));// 撥款日期
+
+		occursList.putParam("OOProdCode", d.get("ProdCode"));// 商品代碼
+		occursList.putParam("OOPieceCode", d.get("PieceCode"));// 計件代碼
+		occursList.putParam("OODrawdownAmt", DrawdownAmt);// 撥款金額
+		occursList.putParam("OOWorkMonth", WorkMonth);// 工作月
+
+//			occursList.putParam("OODeptCode", d.get("DeptCode"));// 部室代號
+//			occursList.putParam("OODistCode", d.get("DistCode"));// 區部代號
+//			occursList.putParam("OOUnitCode", d.get("UnitCode"));// 單位代號
+		occursList.putParam("OOItDeptName", d.get("ItDeptName"));// 部室中文
+		occursList.putParam("OOItDistName", d.get("ItDistName"));// 區部中文
+		occursList.putParam("OOItUnitName", d.get("ItUnitName"));// 單位中文
+		occursList.putParam("OOIntroducer", d.get("Introducer"));// 員工代號(介紹人)
+		occursList.putParam("OOIntroducerName", d.get("IntroducerName"));// 員工姓名(介紹人)
+
+		occursList.putParam("OOCanModify", 1);
+		occursList.putParam("OORepayType", d.get("RepayType"));
+
+		this.totaVo.addOccursList(occursList);
+
+	}
+
 }

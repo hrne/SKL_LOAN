@@ -1,7 +1,5 @@
 package com.st1.itx.trade.L9;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -18,13 +16,13 @@ import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.service.CdEmpService;
-import com.st1.itx.db.service.springjpa.cm.L4454BServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L4702ServiceImpl;
 import com.st1.itx.db.service.springjpa.cm.L9705ServiceImpl;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.common.data.BaTxVo;
 import com.st1.itx.util.format.FormatUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -42,10 +40,7 @@ public class L9705Report extends MakeReport {
 
 	@Autowired
 	private L4702ServiceImpl l4702ServiceImpl;
-
-	@Autowired
-	private L4454BServiceImpl l4454BServiceImpl;
-
+	
 	@Autowired
 	private BaTxCom dBaTxCom;
 
@@ -54,6 +49,9 @@ public class L9705Report extends MakeReport {
 
 	@Autowired
 	private Parse parse;
+
+	@Autowired
+	WebClient webClient;
 
 	@Override
 	public void printHeader() {
@@ -68,7 +66,7 @@ public class L9705Report extends MakeReport {
 
 	}
 
-	public void exec(TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
+	public void exec(List<Map<String, String>> l9705List, TitaVo titaVo, TxBuffer txbuffer) throws LogicException {
 		/*
 		 * ["#R1+@會計日期",#ACCTDATE_ST,"～",#ACCTDATE_ED,"止有變動者"], ["#R2+@戶號",#CUSTNO],
 		 * ["#R3+@選擇條件一",#CONDITION1,#CONDITION1X],
@@ -80,8 +78,6 @@ public class L9705Report extends MakeReport {
 
 		String entdy = titaVo.getEntDy();
 
-		List<Map<String, String>> l9705List = null;
-
 		String conditionCode = "";
 
 		if (titaVo.get("CONDITION1") != null) {
@@ -90,32 +86,6 @@ public class L9705Report extends MakeReport {
 
 //		A.匯款轉帳，已入金，有欠繳-------入帳完成後，於應處理事項清單執行L4702。
 //		B.銀扣火險成功，期款失敗----------L4454.銀扣失敗通知(一扣)
-
-		if ("A".equals(conditionCode)) {
-			try {
-				l9705List = l4702ServiceImpl.findAll(titaVo);
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.error("l4702ServiceImpl.findAll error = " + errors.toString());
-			}
-		} else if ("B".equals(conditionCode)) {
-			try {
-				l9705List = l4454BServiceImpl.findAll(titaVo);
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.error("l4454BServiceImpl.findAll error = " + errors.toString());
-			}
-		} else {
-			try {
-				l9705List = l9705ServiceImpl.findAll(titaVo);
-			} catch (Exception e) {
-				StringWriter errors = new StringWriter();
-				e.printStackTrace(new PrintWriter(errors));
-				this.error("l9705ServiceImpl.findAll error = " + errors.toString());
-			}
-		}
 
 		if (l9705List.size() == 0) {
 
@@ -136,38 +106,30 @@ public class L9705Report extends MakeReport {
 
 				dBaTxCom.setTxBuffer(txbuffer);
 
-				String custNo = "";
-				String facmNo = "";
+				int custNo = 0;
+				int facmNo = 0;
+				int entryDate =  parse.stringToInteger(titaVo.getParam("ENTDY"));
+				String repayCode = "";
 				String custName = "";
-				String repayType = "";
 
-				if (tL9Vo.get("F0") != null) {
-					custNo = FormatUtil.pad9(tL9Vo.get("F0"), 7);
+				if (tL9Vo.get("CustNo") != null) {
+					custNo = parse.stringToInteger(tL9Vo.get("CustNo"));
 				}
-				if (tL9Vo.get("F1") != null) {
-					facmNo = FormatUtil.pad9(tL9Vo.get("F1"), 3);
+				if (tL9Vo.get("FacmNo") != null) {
+					facmNo = parse.stringToInteger(tL9Vo.get("FacmNo"));
 				}
-				if (tL9Vo.get("F2") != null) {
-					custName = tL9Vo.get("F2");
-				}
-				if (tL9Vo.get("F3") != null) {
-					repayType = tL9Vo.get("F3");
+				if (tL9Vo.get("RepayCode") != null) {
+					repayCode = tL9Vo.get("RepayCode");
 				}
 
-				if ("B".equals(conditionCode)) {
-					try {
-						listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("EntryDate")),
-								parse.stringToInteger(custNo), parse.stringToInteger(facmNo), 0, 6, titaVo);
-					} catch (LogicException e) {
-						this.info("listBaTxVo ErrorMsg :" + e.getMessage());
-					}
-				} else {
-					try {
-						listBaTxVo = dBaTxCom.termsPay(parse.stringToInteger(titaVo.getParam("ENTDY")),
-								parse.stringToInteger(custNo), parse.stringToInteger(facmNo), 0, 6, titaVo);
-					} catch (LogicException e) {
-						this.info("listBaTxVo ErrorMsg :" + e.getMessage());
-					}
+				if (tL9Vo.get("CustName") != null) {
+					custName = tL9Vo.get("CustName");
+				}
+				
+				try {
+					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, 6, titaVo);
+				} catch (LogicException e) {
+					this.info("listBaTxVo ErrorMsg :" + e.getMessage());
 				}
 
 				if (listBaTxVo.size() > 0) {
@@ -192,41 +154,41 @@ public class L9705Report extends MakeReport {
 					// 合計 = 未收本息 + 違約金 - 溢短繳
 					// 未還本金餘額
 //				金額欄位 同下繳日的加總
-					for (int i = 0; i < listBaTxVo.size(); i++) {
-						if (listBaTxVo.get(i).getDataKind() == 2) {
-							payIntDate = listBaTxVo.get(i).getPayIntDate();
+					for (BaTxVo ba :listBaTxVo ) {
+						if (ba.getDataKind() == 2) {
+							payIntDate = ba.getPayIntDate();
 							if (principal.containsKey(payIntDate)) {
 								principal.put(payIntDate,
-										principal.get(payIntDate).add(listBaTxVo.get(i).getPrincipal()));
+										principal.get(payIntDate).add(ba.getPrincipal()));
 							} else {
-								principal.put(payIntDate, listBaTxVo.get(i).getPrincipal());
+								principal.put(payIntDate, ba.getPrincipal());
 							}
 
 							if (interest.containsKey(payIntDate)) {
-								interest.put(payIntDate, interest.get(payIntDate).add(listBaTxVo.get(i).getInterest()));
+								interest.put(payIntDate, interest.get(payIntDate).add(ba.getInterest()));
 							} else {
-								interest.put(payIntDate, listBaTxVo.get(i).getInterest());
+								interest.put(payIntDate, ba.getInterest());
 							}
 
 							if (breachAmt.containsKey(payIntDate)) {
 								breachAmt.put(payIntDate,
-										breachAmt.get(payIntDate).add(listBaTxVo.get(i).getBreachAmt()));
+										breachAmt.get(payIntDate).add(ba.getBreachAmt()));
 							} else {
-								breachAmt.put(payIntDate, listBaTxVo.get(i).getBreachAmt());
+								breachAmt.put(payIntDate, ba.getBreachAmt());
 							}
 //					本金為總和
-							loanBal = loanBal.add(listBaTxVo.get(i).getLoanBal());
+							loanBal = loanBal.add(ba.getLoanBal());
 						}
 //					溢短繳 = 暫收款 - 短繳期金
-						if (listBaTxVo.get(i).getDataKind() == 3) {
-							unPaidAmt = unPaidAmt.add(listBaTxVo.get(i).getUnPaidAmt());
+						if (ba.getDataKind() == 3) {
+							unPaidAmt = unPaidAmt.add(ba.getUnPaidAmt());
 						}
-						if (listBaTxVo.get(i).getDataKind() == 1 && listBaTxVo.get(i).getRepayType() == 2) {
-							unPaidAmt = unPaidAmt.subtract(listBaTxVo.get(i).getUnPaidAmt());
+						if (ba.getDataKind() == 1 && ba.getRepayType() == 1) {
+							unPaidAmt = unPaidAmt.subtract(ba.getUnPaidAmt());
 						}
 //					04.帳管費(總和)，含06.契變手續費
-						if (listBaTxVo.get(i).getRepayType() == 4 || listBaTxVo.get(i).getRepayType() == 6) {
-							acctFee = acctFee.add(listBaTxVo.get(i).getUnPaidAmt());
+						if (ba.getRepayType() == 4 || ba.getRepayType() == 6) {
+							acctFee = acctFee.add(ba.getUnPaidAmt());
 						}
 					}
 					// 無計息資料
@@ -260,7 +222,7 @@ public class L9705Report extends MakeReport {
 					this.print(1, 10, "製發日期：　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　");
 					this.print(0, 20,
 							entdy.substring(1, 4) + "/" + entdy.substring(4, 6) + "/" + entdy.substring(6, 8));
-					this.print(0, 78, repayTypeX(repayType));
+					this.print(0, 78, repayCodeX(repayCode));
 					this.print(1, 10, "戶號：　　　　　　　目前利率：　　　　%");
 					this.print(0, 16, custNo + "-" + facmNo);
 					this.print(0, 47, padStart(6, "" + intRate), "R");
@@ -273,12 +235,12 @@ public class L9705Report extends MakeReport {
 					this.print(1, 10, "應繳日　　違約金　　　　　本金　　　　　　利息　　　應繳合計　　　本金餘額　　所得稅　　　應繳淨額");
 					this.print(1, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
-					for (int i = 0; i < listBaTxVo.size(); i++) {
+					for (BaTxVo ba :listBaTxVo) {
 						// 本金、利息
-						if (listBaTxVo.get(i).getDataKind() != 2) {
+						if (ba.getDataKind() != 2) {
 							continue;
 						}
-						payIntDate = listBaTxVo.get(i).getPayIntDate();
+						payIntDate = ba.getPayIntDate();
 
 //					同一日期者金額加總只顯示一筆
 						if (!flag.containsKey(payIntDate)) {
@@ -354,6 +316,8 @@ public class L9705Report extends MakeReport {
 		}
 		long sno = this.close();
 		this.toPdf(sno);
+		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
+				titaVo.getParam("TLRNO"), "L9705放款本息攤還表暨繳息通知單已完成", titaVo);
 	}
 
 	private String transRocChinese(String date) {
@@ -374,9 +338,9 @@ public class L9705Report extends MakeReport {
 		return input;
 	}
 
-	private String repayTypeX(String repaytype) {
+	private String repayCodeX(String repayCode) {
 		String result = "";
-		switch (repaytype) {
+		switch (repayCode) {
 		case "1":
 			result = "匯款轉帳";
 			break;

@@ -422,7 +422,7 @@ public class LM036Report extends MakeReport {
 				rowCursor = 14;
 				break;
 			case "8": // type 8 = 轉催收 to Loss
-				rowCursor = 6;
+				rowCursor = 16;
 				break;
 			default:
 				continue;

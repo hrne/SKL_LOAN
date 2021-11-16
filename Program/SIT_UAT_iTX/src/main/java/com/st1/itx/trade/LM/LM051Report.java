@@ -34,34 +34,58 @@ public class LM051Report extends MakeReport {
 
 	public void exec(TitaVo titaVo) throws LogicException {
 
+		// 取得會計日(同頁面上會計日)
+		// 年月日
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		// 月
 		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
+		Calendar calendar = Calendar.getInstance();
+
+		// 設當年月底日
+		// calendar.set(iYear, iMonth, 0);
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth - 1);
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+
+		// 星期 X (排除六日用) 代號 0~6對應 日到六
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		// 月底日有卡在六日，需往前推日期
+		int diff = -(day == 1 ? 2 : (day == 6 ? 1 : 0));
+		calendar.add(Calendar.DATE, diff);
+
+		// 格式
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		// 當日
+
+		// 當前日期
 		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthDate = Calendar.getInstance();
-		// 設當年月底日 0是月底
-		calMonthDate.set(iYear, iMonth, 0);
+		// 以當前月份取得月底日期 並格式化處理
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
-
+		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
 
+		// 當前日期 比 當月底日期 前面 就取上個月底日
 		if (nowDate < thisMonthEndDate) {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
+		
 
-		// 這個月底
-		calMonthDate.set(iYear, iMonth, 0);
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+		// 設正確月底日
+		// calMonthDate.set(iYear, iMonth, 0);
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth - 1);
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
 		// 上個月初
-		calMonthDate.set(iYear, iMonth - 2, 1);
-
-		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth - 1);
+		calendar.set(Calendar.DATE, calendar.getActualMinimum(Calendar.DATE));
+		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM051", "放款資產分類案件明細表_內部控管",
 				"LM051_放款資產分類案件明細表_內部控管", "LM051_底稿_放款資產分類案件明細表_內部控管.xlsx", "10804工作表");
@@ -244,7 +268,7 @@ public class LM051Report extends MakeReport {
 			// 4 = 股票質押
 			// 5 = 無意義
 			// TOTAL = 放款餘額
-			
+
 			case 1:
 				if (!tLDVo.get("F0").equals("99") && !tLDVo.get("F0").equals("5")) {
 
@@ -272,7 +296,7 @@ public class LM051Report extends MakeReport {
 				}
 				break;
 			case 2:
-				if ( !tLDVo.get("F1").equals("99")) {
+				if (!tLDVo.get("F1").equals("99")) {
 
 					if (tLDVo.get("F0").equals("1")) {
 						row = 18;
@@ -289,7 +313,7 @@ public class LM051Report extends MakeReport {
 					tempAmt = tLDVo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 
 					this.info("row=" + row + ",col=" + col + ",tempAmt=" + tempAmt);
-					
+
 					makeExcel.setValue(row, col, tempAmt, "#,##0");
 
 				}
@@ -315,7 +339,7 @@ public class LM051Report extends MakeReport {
 					tempAmt = tLDVo.get("F2") == null ? BigDecimal.ZERO : new BigDecimal(tLDVo.get("F2"));
 
 					this.info("row=" + row + ",col=" + col + ",tempAmt=" + tempAmt);
-					
+
 					makeExcel.setValue(row, col, tempAmt, "#,##0");
 				}
 				break;
@@ -394,6 +418,5 @@ public class LM051Report extends MakeReport {
 			makeExcel.setValue(row, col, Float.valueOf(prinBalance), "#,##0");
 		}
 	}
-
 
 }

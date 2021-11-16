@@ -39,7 +39,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L5053 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L5053.class);
 
 //	@Autowired
 //	public PfRewardMediaService pfRewardMediaService;
@@ -88,9 +87,9 @@ public class L5053 extends TradeBuffer {
 				// L5053Vo L5053VO = (L5053Vo) l5053ServiceImpl.MapToVO(MapL5053, "L5053",
 				// titaVo);
 				OccursList occursList = new OccursList();
-				
+
 				int oBonusDate = Integer.valueOf(MapL5053.get("F0"));
-				
+
 				if (oBonusDate > 0) {
 					oBonusDate -= 19110000;
 				}

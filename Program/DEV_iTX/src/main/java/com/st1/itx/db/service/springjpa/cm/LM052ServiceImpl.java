@@ -32,21 +32,40 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo, int formNum) throws Exception {
 
+		// 取得會計日(同頁面上會計日)
+		// 年月日
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		// 月
 		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
+		Calendar calendar = Calendar.getInstance();
+
+		// 設當年月底日
+		// calendar.set(iYear, iMonth, 0);
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth - 1);
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+
+		// 星期 X (排除六日用) 代號 0~6對應 日到六
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		// 月底日有卡在六日，需往前推日期
+		int diff = -(day == 1 ? 2 : (day == 6 ? 1 : 0));
+		calendar.add(Calendar.DATE, diff);
+
+		// 格式
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		// 當日
+
+		// 當前日期
 		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthDate = Calendar.getInstance();
-		// 設當年月底日 0是月底
-		calMonthDate.set(iYear, iMonth, 0);
+		// 以當前月份取得月底日期 並格式化處理
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
-
+		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
 
+		// 當前日期 比 當月底日期 前面 就取上個月底日
 		if (nowDate < thisMonthEndDate) {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
@@ -54,11 +73,11 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int yymm = (iYear * 100) + iMonth;
 
-		calMonthDate.set(iYear, iMonth - 1, 0);
+		calendar.set(iYear, iMonth - 1, 0);
 
-		int lyymm = Integer.valueOf(dateFormat.format(calMonthDate.getTime())) / 100;
+		int lyymm = Integer.valueOf(dateFormat.format(calendar.getTime())) / 100;
 
-		this.info("lM052.findAll yymm=" + yymm + ",lyymm="+lyymm);
+		this.info("lM052.findAll yymm=" + yymm + ",lyymm=" + lyymm);
 
 		String sql = " ";
 		if (formNum == 1) {
@@ -72,9 +91,9 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   			,\"AcSubBookCode\"";
 		} else if (formNum == 2) {
 
-			//此年月為上個月
+			// 此年月為上個月
 			yymm = lyymm;
-			
+
 			sql += "	SELECT DECODE(\"AssetClassNo\",'11','1','12','1',\"AssetClassNo\") AS \"AssetClassNo\"";
 			sql += "          ,SUM(\"LoanBal\") AS \"LoanBal\"";
 			sql += "    FROM \"MonthlyLM052AssetClass\"";
@@ -101,14 +120,13 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    WHERE \"YearMonth\" = :yymm ";
 			sql += "    ORDER BY \"LoanAssetCode\"";
 
-		}else if (formNum == 5) {
-			//目前無科目，等確認有科目再寫
+		} else if (formNum == 5) {
+			// 目前無科目，等確認有科目再寫
 			sql += "	SELECT SUM(\"DbAmt\" - \"CrAmt\" ) AS \"LoanBal\"";
 			sql += "    FROM \"AcMain\"";
 			sql += "    WHERE \"MonthEndYm\" = :yymm ";
 			sql += "      AND \"AcNoCode\" IN ('10621301000','10621302000')";
-			
-			
+
 		}
 
 		this.info("sql" + formNum + "=" + sql);

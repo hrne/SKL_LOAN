@@ -80,6 +80,9 @@ public interface AchAuthLogRepository extends JpaRepository<AchAuthLog, AchAuthL
   // CustNo = ,AND RepayBank = ,AND AuthStatus ^i ,AND CreateFlag ^i
   public Slice<AchAuthLog> findAllByCustNoIsAndRepayBankIsAndAuthStatusInAndCreateFlagInOrderByRepayAcctDescAuthCreateDateDesc(int custNo_0, String repayBank_1, List<String> authStatus_2, List<String> createFlag_3, Pageable pageable);
 
+  // CustNo = ,AND FacmNo = ,AND RepayBank = ,AND RepayAcct = 
+  public Optional<AchAuthLog> findTopByCustNoIsAndFacmNoIsAndRepayBankIsAndRepayAcctIs(int custNo_0, int facmNo_1, String repayBank_2, String repayAcct_3);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

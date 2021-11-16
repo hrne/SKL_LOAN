@@ -1,0 +1,144 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5511)
+
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5511" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5511]                           產生介紹、協辦、專業獎勵獎金發放媒體"],
+[#<->#,"#FdFunCode+功能",#FunCode,#FunCodeX],
+[#<->#,"#FdDateFm+工作年月",#WorkMonth],
+[#<->#,"#FdDateFm+撥款起訖日",#DateFm,"~",#DateTo],
+[#<->#,"#FdBonusDate+獎金發放日",#BonusDate],
+]
+
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+#FdFunCode=X,2,L
+#FdDateFm=X,2,L
+#FdBonusDate=X,2,L
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+! 37*2+3*2+2=74+6
+#FunCodeHelp=X,200,S
+T(3,1:匯入介紹、協辦獎金發放資料;2:產生介紹、協辦、專業獎勵獎金媒體檔;3:取消介紹、協辦、專業獎勵獎金媒體檔)
+
+
+<include src="ROM.icf::L5R38.rtn"/>
+
+#RimL5R38=X,1,S
+RESET_RIM(#RimL5R38,L5R38)
+E(0,@L5R38iCode,1)
+E(0,@L5R38iDate,#SYSDATE)
+S(L5R38,01,#L5R38iCode,#L5R38iDate)
+R(1,L5R38)
+E(0,@WorkMonth,#L5R38oWorkYM)
+E(0,@WorkMonth2,#L5R38oWorkYM)
+E(0,@DateFm,#L5R38oStartDate)
+E(0,@DateTo,#L5R38oEndDate)
+
+#FunCode=X,1,I
+HELP(#FunCodeHelp)
+@V(H,#FunCodeHelp)
+
+#FunCodeX=X,40,L
+T(H,#FunCode,#FunCodeHelp)
+C(2,#FunCode,$,K(MODIFYBUTTON,匯入資料),K(MODIFYBUTTON,產生媒體),K(MODIFYBUTTON,取消媒體))
+C(3,#FunCode,2,INVOKEJS(SHOW,L5511_4,1),INVOKEJS(SHOW,L5511_4,0))
+
+#WorkMonth2=A,5,S
+
+#WorkMonth=A,5,I
+@
+A(YM13,1,#WorkMonth)
+
+#RimL5R38B=X,1,S
+C(5,#WorkMonth,#WorkMonth2,S,$)
+RESET_RIM(#RimL5R38B,L5R38)
+E(0,@L5R38iCode,2)
+E(0,@L5R38iWorkYM,#WorkMonth)
+S(L5R38,01,#L5R38iCode,#L5R38iWorkYM)
+R(1,L5R38)
+E(0,@DateFm,#L5R38oStartDate)
+E(0,@DateTo,#L5R38oEndDate)
+
+! 撥款起始日
+#DateFm=D,7,L
+
+! 撥款結束日
+#DateTo=D,7,L
+
+! 獎金發放日
+#BonusDate=D,7,I
+C(3,#FunCode,2,$,s)
+D(8)
+@
+V(7)
+A(DATE,0,#BonusDate)
+IF(#BonusDate<=#DateTo,V(P,獎金發放日必須大於撥款起訖日),$)
+
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5511 -----------
+<sub type="FORM" name="L5511" tota-mode="1">
+
+
+#SCRTIL=_,_,S
+T(3,[L5511] 產生介紹、協辦、專業獎勵獎金發放媒體)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+#fileSno=A,8,S
+
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+
+</sub>
+
+!------ 上行電文 TEXT ------
+
+! #FunCode
+<sub type="TIM">
+#FunCode
+#WorkMonth
+#DateFm
+#DateTo
+#BonusDate
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="ROM.icf::L5R38.tom"/>
+TXFORM=L5511
+^
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel" map="printNo=PRINTRIM"/>
+</sub>
+

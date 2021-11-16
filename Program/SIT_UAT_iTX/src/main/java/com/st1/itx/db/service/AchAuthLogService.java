@@ -259,6 +259,18 @@ public interface AchAuthLogService {
   public Slice<AchAuthLog> custNoRepayBankEq(int custNo_0, String repayBank_1, List<String> authStatus_2, List<String> createFlag_3, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = ,AND RepayBank = ,AND RepayAcct = 
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param repayBank_2 repayBank_2
+   * @param repayAcct_3 repayAcct_3
+   * @param titaVo Variable-Length Argument
+   * @return Slice AchAuthLog AchAuthLog of List
+   */
+  public AchAuthLog facmNoRepayAcctFirst(int custNo_0, int facmNo_1, String repayBank_2, String repayAcct_3, TitaVo... titaVo);
+
+  /**
    * hold By AchAuthLog
    * 
    * @param achAuthLogId key

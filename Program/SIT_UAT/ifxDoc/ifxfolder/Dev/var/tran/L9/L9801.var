@@ -1,4 +1,4 @@
-﻿----- BASIC LABEL Variables ----------
+----- BASIC LABEL Variables ----------
 <sub type="SYS">
 </sub>
 
@@ -9,11 +9,11 @@
 
 ![資料表頭(HEADER)長度]
 #INQHD=n,3,S
-E(0,27)ASGN(INQHD$)
+E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,75)ASGN(INQLEN$)
+E(0,0)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -117,28 +117,28 @@ V(5,0,#DT2)
 
 !---------- TRADE DICTIONARY -----------
 ! TradeDic: The trade that button points to. Notice it's raw data for input only.
-! format is [tradeCat]/[tradeNTX]/[tradeCode]/[tradeName] without brackets.
+! format is [tradeCat]/[tradeCode]/[tradeName] without brackets.
 
 ! 這裡的編號順序要跟畫面輸出一樣
 ! 並且每種種類依序放在一起
 ! 也不可以跳號
 
-#TradeDic1=X,32,S
-T(3,1/N/LD003/放款明細餘額總表（日）) 
-#TradeDic2=X,34,S
-T(3,1/Y/LD004/企金戶還本收據及繳息收據) 
-#TradeDic3=X,36,S
-T(3,1/Y/LD005/暫收支票收據列印（個人戶）) 
-#TradeDic4=X,38,S
-T(3,1/Y/LD006/三階放款明細統計（T9410051）) 
-#TradeDic5=X,38,S
-T(3,1/Y/LD007/放款專員明細統計（T9410052）) 
-#TradeDic6=X,22,S
-T(3,1/Y/LD008/放款餘額總表) 
-#TradeDic7=X,24,S
-T(3,1/N/LD009/放款授信日報表) 
-#TradeDic8=X,34,S
-T(3,1/Y/LD010/介紹人換算業績報酬檢核表) 
+#TradeDic1=X,30,S
+T(3,1/LD003/放款明細餘額總表（日）)
+#TradeDic2=X,32,S
+T(3,1/LD004/企金戶還本收據及繳息收據)
+#TradeDic3=X,34,S
+T(3,1/LD005/暫收支票收據列印（個人戶）)
+#TradeDic4=X,36,S
+T(3,1/LD006/三階放款明細統計（T9410051）)
+#TradeDic5=X,36,S
+T(3,1/LD007/放款專員明細統計（T9410052）)
+#TradeDic6=X,20,S
+T(3,1/LD008/放款餘額總表)
+#TradeDic7=X,22,S
+T(3,1/LD009/放款授信日報表)
+#TradeDic8=X,32,S
+T(3,1/LD010/介紹人換算業績報酬檢核表)
 
 
 
@@ -151,18 +151,13 @@ T(3,1/Y/LD010/介紹人換算業績報酬檢核表)
 #TradeCat{i}=X,1,S
 T(1,#TradeDic{i},1,1)
 
-! TradeNTX: 3rd byte of TradeDic. When the trade's selected, Y: chain; N: run() in java.
-! Check if it uses run(titaVo) or run() in java before you fill Y/N.
-#TradeNTX{i}=X,1,S
-T(1,#TradeDic{i},3,1)
-
-! TradeCode: 5-9th bytes of TradeDic. The TXCD of a trade.
+! TradeCode: 3-7 th bytes of TradeDic. The TXCD of a trade.
 #TradeCode{i}=X,5,L
-T(1,#TradeDic{i},5,5)
+T(1,#TradeDic{i},3,5)
 
-! TradeName: all bytes after 10th in TradeDic. The Chinese Name of a trade.
-#TradeName{i}=X,43,L
-T(1,#TradeDic{i},11,54)
+! TradeName: all bytes after 8th in TradeDic. The Chinese Name of a trade.
+#TradeName{i}=X,36,L
+T(1,#TradeDic{i},9,47)
 
 ##end
 
@@ -376,7 +371,6 @@ T(3,@BtnAllShell0,　)
 #BtnShell{i}
 #TradeName{i}
 #TradeCode{i}
-#TradeNTX{i}
 ##end
 </sub>
 

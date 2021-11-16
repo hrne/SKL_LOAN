@@ -267,6 +267,10 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@TotalAmt,#L8r44TotalAmt),$)
 C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,S,$)
+
+#CDate=D,7,S
+T(1,#SYSCDATE,2,7)
+
 !簽約完成日期
 #SignDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -275,7 +279,7 @@ C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,S,$)
 D(8)
 @V(7)A(DATE,0,#SignDate)
-
+IF(#SignDate > #CDate ,V(P,簽約完成日不可大於資料報送日),$)
 !首期應繳日
 #FirstPayDate=D,7,I
 C(5,#TranKey_Tmp,5,s,$)
@@ -284,7 +288,7 @@ C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,S,$)
 D(8)
 @V(7)A(DATE,0,#FirstPayDate)
-IF(#FirstPayDate > #SignDate ,$,V(P,首期應繳日需大於簽約完成日))
+IF(#FirstPayDate >= #SignDate ,$,V(P,首期應繳日需大於或等於簽約完成日))
 
 !期數
 #Period=A,3,I

@@ -1,6 +1,10 @@
 package com.st1.itx.trade.L9;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -10,9 +14,9 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.buffer.TxBuffer;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.service.springjpa.cm.L9705ServiceImpl;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.http.WebClient;
 
 /**
  * L9705p
@@ -23,13 +27,12 @@ import com.st1.itx.util.http.WebClient;
 @Service("L9705p")
 @Scope("prototype")
 public class L9705p extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L9705p.class);
+
+	@Autowired
+	private L9705ServiceImpl l9705ServiceImpl;
 
 	@Autowired
 	L9705Report l9705Report;
-
-	@Autowired
-	WebClient webClient;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -44,11 +47,16 @@ public class L9705p extends TradeBuffer {
 		String parentTranCode = titaVo.getTxcd();
 
 		l9705Report.setParentTranCode(parentTranCode);
+		List<Map<String, String>> l9705List = null;
+		try {
+			l9705List = l9705ServiceImpl.findAll(titaVo);
+		} catch (Exception e) {
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error("l9705ServiceImpl.findAll error = " + errors.toString());
+		}
+		l9705Report.exec(l9705List, titaVo, txbuffer);
 
-		l9705Report.exec(titaVo, txbuffer);
-
-		webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-				titaVo.getParam("TLRNO"), "L9705放款本息攤還表暨繳息通知單已完成", titaVo);
 
 		this.addList(this.totaVo);
 		return this.sendList();

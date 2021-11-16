@@ -1,0 +1,299 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+![一段式/二段式/三段式]
+#RELCD=_,_,S
+E(0,1)
+
+#ACTFG=_,_,S
+C(2,#FKEY,E(0,1),$)
+
+#TXCD
+T(3,L5501)
+</sub>
+
+<sub type="PREDC" name="PreDC">
+
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5501" layout="cols=3;screen.width=[180,350,180,350];printer.width=[20,80];order=1">
+[
+["[L5501]                                 介紹人業績案件維護"],
+["#<->#,#FdFunCode+功能選項",#FunCodeX],
+["#<->#,#FdCustNo+借款人戶號",#CustNo,"-",#FacmNo],
+["#<->#,#FdCustNm+戶名",#CustNm],
+["#<->#,#FdIntroducer+介紹人",#Introducer,#IntroducerName],
+["#<->#,#FdBsOfficer+房貸專員",#BsOfficer,#BsOfficerName],
+["#<->#,#FdUtilBal+已用額度",#UtilBal],
+["#<->#,#FdTitle+調整後（額度）","@"],
+["#<->#,#FdPerfEqAmt+換算業績",#AdjPerfEqAmt],
+["#<->#,#FdPerfReward+業務報酬",#AdjPerfReward],
+["#<->#,#FdPerfAmt+業績金額",#AdjPerfAmt],
+["#<->#,#FdCntingCode+是否計件",#AdjCntingCode],
+[#FdAdjRange+調整範圍",#AdjRange,"@(1:調整本月@2:調整本月及季累計)"],
+[#FdWorkMonth+工作月",#WorkMonth],
+]
+![#<->#,"#FdPerfDate+業績日期",#PerfDate],
+!["介紹人",#Introducer,#IntroducerName],["調整後介紹人",#AdjIntroducer,#BtnEmpno,#AdjIntroducerName],
+! ["件數",#PerfCnt],["調整後件數",#AdjPerfCnt],
+
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!不可重新交易
+#AGAIN=X,1,S
+E(0,1)ASGN(AGAIN$)
+
+
+![Buttom資料查詢]
+!#BtnEmpno=X,15,I,ui:button;value:介紹人資料查詢;enable:1;tabbable:0;title:L5022 協辦人員等級明細資料查詢;
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN==0,V(P,本交易為連動交易，請由L5051連動進入),$)
+
+#NTXBUF=X,30,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FunCode,#NTXBUF,1,1)
+T(1,@CustNo,#NTXBUF,2,7)
+T(1,@FacmNo,#NTXBUF,9,3)
+T(1,@WorkMonth,#NTXBUF,12,5)
+
+#FdWorkMonth=X,2,L
+#FdTitle=X,2,L
+#FdFunCode=X,2,L
+#FdCustNo=X,2,L
+#FdCustNm=X,2,L
+#FdIntroducer=X,2,L
+#FdBsOfficer=X,2,L
+#FdUtilBal=X,2,L
+#FdPerfDate=X,2,L
+#FdPerfEqAmt=X,2,L
+C(3,#FunCode,2,T(3,*),T(3, ))
+#FdPerfReward=X,2,L
+C(3,#FunCode,2,T(3,*),T(3, ))
+#FdPerfAmt=X,2,L
+C(3,#FunCode,2,T(3,*),T(3, ))
+#FdCntingCode=X,2,L
+C(3,#FunCode,2,T(3,*),T(3, ))
+#FdAdjRange=X,2,L
+C(3,#FunCode,2,T(3,*),T(3, ))
+
+#CntingCodeH=X,10,S
+T(3,Y:是;N:否)
+
+!#BufEmpNo=X,7,S
+!T(3,      Y)
+!#BindEmpNo=X,1,S
+!BIND(#BtnEmpno,click, {cmd=CHAIN; ntxcd=L5022; ntxbuf=#BufEmpNo;ntxbuf5=type<-1:TempAdjIntroducer<-OOEmpNo:AdjIntroducer<-OOEmpNo:AdjIntroducerName<-OOFullname:L5r28FullName<-OOFullname})
+
+!FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
+#CODEFuncCode1=x,20,S                  
+T(3,CdCode.FuncCode1)                  
+#FuncCode1Help=x,50,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode1)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode1Help,#HelpDesc1)
+
+! FuncCode1(1:新增;2:修改;4:刪除;5:查詢)
+#FunCode=A,1,S
+C(2,#CHAIN,$,s)
+HELP(#FuncCode1Help)
+@V(H,#FuncCode1Help)
+
+![維護記號名稱]
+#FunCodeX=X,4,L
+!C(3,#FunCode,5,T(3,查詢),T(H,#FunCode,#FuncCode1Help))
+T(H,#FunCode,#FuncCode1Help)
+K(MODIFYBUTTON,#FunCodeX)
+C(3,#FunCode,5,K(NOBUTTON,CLOSEY),$)
+
+! [調Rim相關]
+! 定義Rom欄位名稱、型態、長度
+<include src="ROM.icf::L5R27.dec"/>
+#RimCustNo=A,7,S
+#RimFacmNo=A,3,S
+#RimBormNo=A,3,S
+#RimPerfDate=D,7,S
+
+#AdjLogNo=A,8,S
+
+#Tf=x,1,S
+C(3,#FunCode,4,$,S)
+T(F,@AdjPerfEqAmt,0)
+T(F,@AdjPerfReward,0)
+T(F,@AdjPerfAmt,0)
+T(F,@AdjCntingCode,0)
+T(F,@AdjRange,0)
+
+#RimL5r27=X,1,S
+IF(#CHAIN==1,$,S)
+RESET_RIM(#RimL5r27,L5R27)
+S(L5R27,1,#CustNo,#FacmNo,#WorkMonth)
+R(1,L5R27)
+E(0,@CustNo,#L5r27CustNo)
+E(0,@FacmNo,#L5r27FacmNo)
+T(2,@CustNm,#L5r27CustNm)
+T(2,@BsOfficer,#L5r27BsOfficer)
+T(2,@BsOfficerName,#L5r27BsOfficerName)
+T(2,@Introducer,#L5r27Introducer)
+T(2,@IntroducerName,#L5r27IntroducerName)
+E(0,@UtilBal,#L5r27UtilBal)
+E(0,@AdjPerfEqAmt,#L5r27AdjPerfEqAmt)
+E(0,@AdjPerfReward,#L5r27AdjPerfReward)
+E(0,@AdjPerfAmt,#L5r27AdjPerfAmt)
+T(2,@AdjCntingCode,#L5r27AdjCntingCode)
+T(2,@AdjRange,#L5r27AdjRange)
+E(0,@AdjLogNo,#L5r27AdjLogNo)
+
+! 借款人戶號
+#CustNo=A,7,L
+! 額度編號
+#FacmNo=A,3,L
+! 撥款序號
+#BormNo=A,3,S
+
+!工作月
+#WorkMonth=X,5,L
+
+#MRKEY=_,_,S
+T(2,#CustNo+-+#FacmNo)
+
+! 戶名
+#CustNm=X,2.100,L
+! 房貸專員NM
+#BsOfficer=X,6,L
+#BsOfficerName=X,50,L
+! C(2,#FUNCTIONCD,S,$,s,s,s,s)
+!已用額度
+#UtilBal=+m,15,L
+! 業績日期
+#PerfDate=D,7,L
+! 介紹人
+#Introducer=X,6,L
+#IntroducerName=X,50,L
+!! 調整後介紹人NM
+!#AdjIntroducer=X,6,S
+!@IF(#AdjIntroducer=="",T(2,@AdjIntroducerName,) T(2,@L5r28FullName,),$)
+
+#TempAdjIntroducer=X,6,S
+
+!<include src="ROM.icf::L5R28.dec"/>
+!#RimEmployeeNo=X,6,S
+!#RimErrorSkip=X,1,S
+
+!#SendL5r28Introducer=X,1,S
+!IF(#TempAdjIntroducer!="" && #TempAdjIntroducer==#AdjIntroducer,S,$)
+!C(4,#AdjIntroducer,S,$)
+!T(2,@RimEmployeeNo,#AdjIntroducer)
+!T(2,@RimErrorSkip,Y)
+!RESET_RIM(#SendL5r28Introducer,L5R28)
+!S(L5R28,1,#RimErrorSkip,#RimEmployeeNo)
+!R(1,L5R28)
+
+!#AdjIntroducerName=X,50,S
+!T(2,@AdjIntroducerName,#L5r28FullName)
+
+!#CheckIsEmp=X,1,S
+!IF(#AdjIntroducer!="" ,$,S)
+!IF(#AdjIntroducerName=="" ,$,S)
+!V(P,此員工編號不存在)
+
+! 件數
+#PerfCnt=+m,2.1,S
+! 調整後件數
+#AdjPerfCnt=+m,2.1,S
+
+! 換算業績
+#PerfEqAmt=+m,15,L
+
+! 調整後換算業績
+#AdjPerfEqAmt=+m,15,I
+C(3,#FunCode,4,s,$)
+
+! 業務報酬
+#PerfReward=+m,15,L
+
+! 調整後業務報酬
+#AdjPerfReward=+m,15,I
+C(3,#FunCode,4,s,$)
+
+#FgPerfReward=X,1,L
+IF(#AdjPerfReward==#PerfReward,T(3,),T(3,X))
+
+! 業績金額
+#PerfAmt=+m,15,L
+
+! 調整後業績金額
+#AdjPerfAmt=+m,15,I
+C(3,#FunCode,4,s,$)
+
+! 是否計件
+#CntingCode=X,1,L
+
+#AdjCntingCode=X,1,I
+C(3,#FunCode,4,s,$)
+HELP(#CntingCodeH)
+@
+V(H,#CntingCodeH)
+
+#AdjRange=A,1,I
+C(3,#FunCode,4,s,$)
+@
+V(1,1,2)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5501 -----------
+<sub type="FORM" name="L5501">
+</sub>
+
+!------ 上行電文 TEXT ------這邊別亂動關係到放行
+<sub type="TIM">
+#FunCode
+#CustNo
+#FacmNo
+#WorkMonth
+#AdjLogNo
+#AdjPerfEqAmt
+#AdjPerfReward
+#AdjPerfAmt
+#AdjCntingCode
+#AdjRange
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L5501
+^
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L5R27.tom"/>
+<include src="ROM.icf::L5R28.tom"/>
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+
+

@@ -514,8 +514,8 @@ public class LM036ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      , LM.\"Total\" AS \"LastMonthTotal\" ";
 		sql += "      , CASE ";
 		sql += "          WHEN NVL(LM.\"Total\",0) > 0 ";
-		sql += "          THEN ROUND(TM.\"Total\" / LM.\"Total\",4) * 100 ";
-		sql += "        ELSE 100 END AS \"RollingRate\" ";
+		sql += "          THEN ROUND(TM.\"Total\" / LM.\"Total\",4)";
+		sql += "        ELSE 1 END AS \"RollingRate\" ";
 		sql += " FROM \"MonthlyTurnedData\" TM ";
 		sql += " LEFT JOIN \"MonthlyData\" LM ON LM.\"YearMonth\" = \"Fn_GetLastMonth\"(TM.\"YearMonth\") ";
 		sql += "                           AND LM.\"Type\" = TM.\"Type\" - 1 ";

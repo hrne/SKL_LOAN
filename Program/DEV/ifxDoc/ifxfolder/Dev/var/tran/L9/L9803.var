@@ -1,0 +1,558 @@
+----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,L9803)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,0)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[147,850];printer.width=[20,80];">
+
+[
+["[L9803]                                 月報"],
+["#R1+@會計日期",#ACCTDATE],
+
+
+["#grid#,{id:1,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
+["@放款服務課月報",[#BtnAllShell1,"@全選"],[#BtnExpShell1,"@",#ExpText1]],"",
+], 
+
+["#grid#,{id:2,expand:false,loop:35,row_height:0}","","",
+[],[#BtnShell1,#TradeCode1,#TradeName1],
+], 
+
+["#grid#,{id:3,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
+["@放款管理課月報",[#BtnAllShell2,"@全選"],[#BtnExpShell2,"@",#ExpText2]],"",
+],
+
+["#grid#,{id:4,expand:true,loop:32,row_height:1}","","",
+[],[#BtnShell36,#TradeCode36,#TradeName36],
+], 
+
+["#grid#,{id:5,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
+["@放款審查課月報",[#BtnAllShell3,"@全選"],[#BtnExpShell3,"@",#ExpText3]],"",
+],
+
+["#grid#,{id:6,expand:true,loop:6,row_height:1}","","",
+[],[#BtnShell68,#TradeCode68,#TradeName68],
+], 
+
+["#grid#,{id:7,expand:true,loop:0,row_height:1,s_cols:[150,100,120], p_cols:[16,8,8]}","","",
+["@放款推展課月報",[#BtnAllShell4,"@全選"],[#BtnExpShell4,"@",#ExpText4]],"",
+],
+
+["#grid#,{id:8,expand:true,loop:5,row_height:1}","","",
+[],[#BtnShell74,#TradeCode74,#TradeName74],
+], 
+
+["@"],
+]
+
+!---------- 要新增交易時 -----------
+! 有小工具可以比較方便完成
+! 請參考 NAS\SKL\雜項文件\xiangwei\小工具\定期報表產表介面修改說明.txt
+
+! 或是 ...
+! 1. 交易畫面修改
+
+! 2. 在 TRADE DICTIONARY 中依據格式新增交易
+
+! 3. 在這份檔案裡搜尋:
+!
+!    修改這裡
+!
+!    這四個字, 就能夠找到所有需要修改的 loop times 數字; 可能會相隔幾行
+!    將這些 times 值修改為對應的正確數字, 通常是交易總數或是分類總數
+
+! 4. 這裡的 TotalItem 與 TotalCat 作修改
+
+! 總項目數 78
+#TotalItem=N,3,S
+E(0,78)
+
+! 總分類數 4
+#TotalCat=N,1,S
+E(0,4)
+
+!---------- PREMADE VARIABLES ----------
+
+! This makes the trades possible to execute on DEV,SIT,UAT
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除;5: 查詢)
+#FUNCIND=_,_,S
+E(0,5)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+! for later loop use
+#tmpTargetCat=X,1,S
+
+#tmpLineCounter=N,3,S
+
+! 必輸出欄位
+! legacy from old version.
+##loop{times:1,i:1}
+#R{i}=X,1,L
+INVOKEJS(SHOW,#R{i},0)
+K(LIGHT,#R{i},TXTRED,0)
+##end
+
+! 會計日期
+! legacy from old version.
+#DT1=D,8,S
+T(4,DATE$)
+
+#DT2=D,7,S
+T(1,#DT1,2,7)
+
+#ACCTDATE=D,7,L
+T(2,#DT2)
+@V(7)A(DATE,0,#ACCTDATE)
+V(5,0,#DT2)
+
+!---------- TRADE DICTIONARY -----------
+! TradeDic: The trade that button points to. Notice it's raw data for input only.
+! format is [tradeCat]/[tradeCode]/[tradeName] without brackets.
+
+! 這裡的編號順序要跟畫面輸出一樣
+! 並且每種種類依序放在一起
+! 也不可以跳號
+
+#TradeDic1=X,26,S
+T(3,1/LM001/公會無自用住宅統計)
+#TradeDic2=X,20,S
+T(3,1/LM002/房貸專案放款)
+#TradeDic3=X,32,S
+T(3,1/LM003/撥款／還款金額比較月報表)
+#TradeDic4=X,30,S
+T(3,1/LM004/長中短期放款到期明細表)
+#TradeDic5=X,26,S
+T(3,1/LM007/放款利息收入成長表)
+#TradeDic6=X,22,S
+T(3,1/LM008/應收利息明細表)
+#TradeDic7=X,28,S
+T(3,1/LM009/應收利息總表（核心）)
+#TradeDic8=X,28,S
+T(3,1/LM011/表外放款承諾資料產出)
+#TradeDic9=X,22,S
+T(3,1/LM012/放款利率分佈表)
+#TradeDic10=X,30,S
+T(3,1/LM013/金檢報表（放款種類表）)
+#TradeDic11=X,22,S
+T(3,1/LM014/平均利率月報表)
+#TradeDic12=X,24,S
+T(3,1/LM015/信用曝險分佈報表)
+#TradeDic13=X,24,S
+T(3,1/LM016/寬限條件控管繳息)
+#TradeDic14=X,40,S
+T(3,1/LM017/金融機構承作購置高價住宅貸款統計)
+#TradeDic15=X,30,S
+T(3,1/LM018/專案放款餘額及利息收入)
+#TradeDic16=X,32,S
+T(3,1/LM019/利息收入明細表（印花稅）)
+#TradeDic17=X,31,S
+T(3,1/LM022/中央銀行業務局921補貼息)
+#TradeDic18=X,16,S
+T(3,1/LM023/利息收入)
+#TradeDic19=X,32,S
+T(3,1/LM025/減損系統有效利率資料查核)
+#TradeDic20=X,22,S
+T(3,1/LM027/轉銷呆帳備忘錄)
+#TradeDic21=X,20,S
+T(3,1/LM028/預估現金流量)
+#TradeDic22=X,22,S
+T(3,1/LM030/轉催收明細總表)
+#TradeDic23=X,30,S
+T(3,1/LP001/工作月區域中心業績累計)
+#TradeDic24=X,24,S
+T(3,1/LM073/央行報送明細資料)
+#TradeDic25=X,54,S
+T(3,1/LM074/B040金融機構承作「公司法人購置住宅貸款」統計表)
+#TradeDic26=X,52,S
+T(3,1/LM075/B041金融機構承作「自然人購置住宅貸款」統計表)
+#TradeDic27=X,42,S
+T(3,1/LM076/B042金融機構承作「購地貸款」統計表)
+#TradeDic28=X,42,S
+T(3,1/LM077/B043金融機構承作「餘屋貸款」統計表)
+#TradeDic29=X,72,S
+T(3,1/LM078/B044「借款戶向金融機構申請並經錄案」之不動產抵押貸款案件辦理情形)
+#TradeDic30=X,56,S
+T(3,1/LM079/B045金融機構承作「工業區閒置土地抵押貸款」統計表)
+#TradeDic31=X,82,S
+T(3,1/LM080/B046金融機構承作「公司法人購置住宅貸款」統計表（110.3.19（含）起辦理案件）)
+#TradeDic32=X,76,S
+T(3,1/LM081/B047金融機構承作「自然人購屋貸款」統計表（110.3.19（含）起辦理案件）)
+#TradeDic33=X,84,S
+T(3,1/LM082/B048金融機構承作「自然人購置高價住宅貸款」統計表（110.3.19（含）起辦理案件）)
+#TradeDic34=X,19,S
+T(3,1/LM083/ICS放款資料)
+#TradeDic35=X,28,S
+T(3,1/LM084/應收利息之帳齡分析表)
+#TradeDic36=X,22,S
+T(3,2/LM029/放款餘額明細表)
+#TradeDic37=X,18,S
+T(3,2/LM031/企業動用率)
+#TradeDic38=X,26,S
+T(3,2/LM032/逾期案件滾動率明細)
+#TradeDic39=X,20,S
+T(3,2/LM033/新撥案件明細)
+#TradeDic40=X,24,S
+T(3,2/LM034/新增逾放案件明細)
+#TradeDic41=X,18,S
+T(3,2/LM035/地區逾放比)
+#TradeDic42=X,24,S
+T(3,2/LM036/第一類各項統計表)
+#TradeDic43=X,24,S
+T(3,2/LM037/地區別催收總金額)
+#TradeDic44=X,20,S
+T(3,2/LM038/逾期案件明細)
+#TradeDic45=X,20,S
+T(3,2/LM039/催收案件明細)
+#TradeDic46=X,24,S
+T(3,2/LM040/地區別正常戶金額)
+#TradeDic47=X,32,S
+T(3,2/LM041/催收及呆帳戶暫收款明細表)
+#TradeDic48=X,20,S
+T(3,2/LM042/RBC表_會計部)
+#TradeDic49=X,27,S
+T(3,2/LM043/地區放款數_內部控管)
+#TradeDic50=X,48,S
+T(3,2/LM044/地區／區域中心逾比及分級管理逾放比明細表)
+#TradeDic51=X,39,S
+T(3,2/LM045/年度催收逾放總額明細表_內部控管)
+#TradeDic52=X,41,S
+T(3,2/LM046/年度擔保放款信用風險分析_內部控管)
+#TradeDic53=X,37,S
+T(3,2/LM047/放款分期協議案件明細_內部控管)
+#TradeDic54=X,47,S
+T(3,2/LM048/放款企業放款風險承擔限額控管表_限額控管)
+#TradeDic55=X,53,S
+T(3,2/LM049/放款金控法第44條利害關係人放款餘額表_限額控管)
+#TradeDic56=X,52,S
+T(3,2/LM050/放款保險法第3條利害關係人放款餘額表_限額控管)
+#TradeDic57=X,39,S
+T(3,2/LM051/放款資產分類案件明細表_內部控管)
+#TradeDic58=X,35,S
+T(3,2/LM052/放款資產分類-會計部備呆計提)
+#TradeDic59=X,33,S
+T(3,2/LM053/法務分配款明細表_內部控管)
+#TradeDic60=X,56,S
+T(3,2/LM054/A041重要放款餘額明細表（大額、逾期、催收、國外）)
+#TradeDic61=X,26,S
+T(3,2/LM055/A042放款餘額彙總表)
+#TradeDic62=X,31,S
+T(3,2/LM056/表14-5 xls_會計部申報表)
+#TradeDic63=X,31,S
+T(3,2/LM057/表14-6 xls_會計部申報表)
+#TradeDic64=X,26,S
+T(3,2/LM058/表A19_會計部申報表)
+#TradeDic65=X,26,S
+T(3,2/LM059/表F22_會計部申報表)
+#TradeDic66=X,33,S
+T(3,2/LM060/暫付款金額調節表_內部控管)
+#TradeDic67=X,43,S
+T(3,2/LM061/逾清償期二年案件追蹤控管表_內部控管)
+#TradeDic68=X,37,S
+T(3,3/LM062/覆審案件資料表-個金3000萬以上)
+#TradeDic69=X,37,S
+T(3,3/LM063/覆審案件資料表-企金3000萬以上)
+#TradeDic70=X,47,S
+T(3,3/LM064/覆審案件資料表-個金2000萬以上小於3000萬)
+#TradeDic71=X,46,S
+T(3,3/LM065/覆審案件資料表-個金100萬以上小於2000萬)
+#TradeDic72=X,37,S
+T(3,3/LM066/覆審案件資料表-企金未達3000萬)
+#TradeDic73=X,22,S
+T(3,3/LM067/土地貸款覆審表)
+#TradeDic74=X,30,S
+T(3,4/LM070/介紹人加碼獎勵津貼明細)
+#TradeDic75=X,24,S
+T(3,4/LM071/退休員工利率名單)
+#TradeDic76=X,40,S
+T(3,4/LP002/三階（部室、區部、通訊處）累計表)
+#TradeDic77=X,28,S
+T(3,4/LP003/部專暨房專業績累計表)
+#TradeDic78=X,24,S
+T(3,4/LP004/內網業績統計報表)
+
+
+
+!---------- TRADE DICTIONARY SPLIT AND ASSIGN -----------
+
+! 修改這裡的 loop times
+##loop{times:78,i:1}
+
+! TradeCat: 1st byte of TradeDic. Trade's category.
+#TradeCat{i}=X,1,S
+T(1,#TradeDic{i},1,1)
+
+! TradeCode: 3-7 th bytes of TradeDic. The TXCD of a trade.
+#TradeCode{i}=X,5,L
+T(1,#TradeDic{i},3,5)
+
+! TradeName: all bytes after 8th in TradeDic. The Chinese Name of a trade.
+#TradeName{i}=X,84,L
+T(1,#TradeDic{i},9,95)
+
+##end
+
+!---------- TRADE DICTIONARY ENDS -----------
+
+
+!---------- TRADE ----------
+
+!---------- BUTTON MAKING -----------
+! How many trades are there, how many buttons should be made.
+
+! 修改這裡的 loop times
+##loop{times:78,i:1}
+
+
+!---------- BUTTON VISUAL -----------
+
+! BtnShell: Creates visual of button.
+#BtnShell{i}=X,2,I,ui:button;value:　;enable:1;tabbable:0
+
+!---------- BUTTON BINDER -----------
+
+! BtnBind: Bind button to its state machine processor.
+#BtnBind{i}=X,1,S
+BIND(#BtnShell{i},click,{cmd=CALLSEND;DOCODE=Btn{i}FSMP})
+
+!---------- BUTTON STATE MACHINE PROCESSOR -----------
+
+! BtnFSMP: Button Finite-State Machine Processor
+
+! What happens when Button is Clicked?
+! Button State, GoTo, State Visual
+
+! 1, 0, V, also makes its category's Select All go to state 0.
+! 0, 1, empty
+#Btn{i}FSMP=@,1,S
+C(5,#BtnShell{i},V,T(3,@BtnShell{i},　)T(1,@tmpTargetCat,#TradeCat{i},1,1)CALL(#FuncClearSelectAll),T(3,@BtnShell{i},V))
+
+!---------- TRADE ENDS ----------
+
+##end
+
+
+!---------- CATEGORY ----------
+
+!---------- BUTTON MAKING ----------
+!---------- Everything Button -----------
+
+! BtnAllShell0: Visual of SELECT EVERYTHING button.
+#BtnAllShell0=X,2,S,ui:button;value:　;enable:1;tabbable:0
+
+! BtnAllBind: Bind button to its state machine processor.
+#BtnAllBind0=X,1,S
+BIND(#BtnAllShell0,click,{cmd=CALLSEND;DOCODE=BtnAll0FSMP})
+
+! BtnFSMP: Button Finite-State Machine Processor
+
+! What happens when Button is Clicked?
+! Button State, GoTo, State Visual, Description
+
+! 1, 0, V, makes all trade FSMPs go to state 0; makes all SELECT ALL button go to state 0.
+! 0, 1, empty, makes all trade FSMPs go to state 1; makes all SELECT ALL button go to state 1.
+#BtnAll0FSMP=@,1,S
+C(5,#BtnAllShell0,V,T(3,@BtnAllShell0,　),T(3,@BtnAllShell0,V))
+CALL(#FuncSelectEverything)
+
+
+!---------- Category loops -----------
+! How many categories are there, how many buttons should be made.
+
+! 修改這裡的 loop times
+##loop{times:4,i:1}
+
+!---------- EXPAND/FOLD TEXT ----------
+
+! System default is expanded, but FuncInit will be called to make them all folded. 
+#ExpText{i}=X,6,L
+T(3,　收縮)
+
+!---------- BUTTON SHELL ----------
+
+! BtnAllShell: Visual of SELECT ALL button.
+#BtnAllShell{i}=X,2,I,ui:button;value:　;enable:1;tabbable:0
+
+! BtnExpShell: Visual of EXPAND button.
+#BtnExpShell{i}=X,2,S,ui:button;value:　;enable:1;tabbable:0
+
+! Everything is opened at default.
+#BtnExpShellDef{i}=X,1,S
+T(3,#BtnExpShell{i},－)
+
+!---------- BUTTON BINDER -----------
+
+! BtnAllBind: Bind button to its state machine processor.
+#BtnAllBind{i}=X,1,S
+BIND(#BtnAllShell{i},click,{cmd=CALLSEND;DOCODE=BtnAll{i}FSMP})
+
+! BtnExpBind: Bind button to its state machine processor.
+#BtnExpBind{i}=X,1,S
+BIND(#BtnExpShell{i},click,{cmd=CALLSEND;DOCODE=BtnExp{i}FSMP})
+
+!---------- BUTTON STATE MACHINE PROCESSOR -----------
+
+! BtnFSMP: Button Finite-State Machine Processor
+
+! What happens when Button is Clicked?
+! Button State, GoTo, State Visual, Description
+
+! 1, 0, V, also makes all trade FSMPs under this category go to state 0. also changes BtnAllSelect0.
+! 0, 1, empty, also makes all trade FSMPs under this category go to state 1.
+#BtnAll{i}FSMP=@,1,S
+T(3,@tmpTargetCat,{i})
+C(5,#BtnAllShell{i},V,T(3,@BtnAllShell{i},　),T(3,@BtnAllShell{i},V))
+C(5,#BtnAllShell{i},V,CALL(#FuncSelectCat),CALL(#FuncUnselectCat)CALL(#FuncClearSelectEverything))
+
+! 1, 0, -, folds the category. also changes ExpandText.
+! 0, 1, +, expands the category. also changes ExpandText.
+#BtnExp{i}FSMP=@,1,S
+T(3,@tmpTargetCat,{i})
+C(5,#BtnExpShell{i},－,T(3,@BtnExpShell{i},＋),T(3,@BtnExpShell{i},－))
+C(5,#ExpText{i},　收縮,T(3,@ExpText{i},　展開),T(3,@ExpText{i},　收縮))
+C(5,#BtnExpShell{i},＋,CALL(#FuncFoldCat),CALL(#FuncExpandCat))
+
+
+!---------- SELECT ALL AND UNSELECT ALL -----------
+
+##end
+
+!---------- CATEGORY ENDS ----------
+
+
+!---------- Functions ----------
+
+! Select Everything
+
+! 修改這裡的 2 個 loop times
+#FuncSelectEverything=@,1,S
+##loop{times:78,i:1}
+C(5,#BtnAllShell0,V,T(3,@BtnShell{i},V),T(3,@BtnShell{i},　),$)
+##end
+##loop{times:4,i:1}
+C(5,#BtnAllShell0,V,T(3,@BtnAllShell{i},V),T(3,@BtnAllShell{i},　))
+##end
+
+! Category Functions
+
+! Select All in a category
+
+! 修改這裡的 loop times
+#FuncSelectCat=@,1,S
+##loop{times:78,k:1}
+C(5,#TradeCat{k},#tmpTargetCat,T(3,@BtnShell{k},V),$)
+##end
+
+! Unselect All in a category
+
+! 修改這裡的 loop times
+#FuncUnselectCat=@,1,S
+##loop{times:78,i:1}
+C(5,#TradeCat{i},#tmpTargetCat,T(3,@BtnShell{i},　),$)
+##end
+
+#tmpGrd=x,3,S
+T(3,grd)
+
+#tmpGrdId=x,4,S
+
+! Expand (show all in category)
+! Trade grid id = Category * 2
+#FuncExpandCat=@,1,S
+E(0,@tmpTargetCat,#tmpTargetCat*2)
+T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
+INVOKEJS(SHOW,#tmpGrdId,1)
+
+! Fold (hide all in category)
+#FuncFoldCat=@,1,S
+E(0,@tmpTargetCat,#tmpTargetCat*2)
+T(2,@tmpGrdId,#tmpGrd+#tmpTargetCat)
+INVOKEJS(SHOW,#tmpGrdId,0)
+
+! Clearing the SELECT ALL button, for unselecting a single trade
+! 修改這裡的 loop times
+#FuncClearSelectAll=@,1,S
+##loop{times:4,i:1}
+C(5,#tmpTargetCat,{i},T(3,@BtnAllShell{i},　)T(3,@BtnAllShell0,　),$)
+##end
+
+! Clearing the SELECT EVERYTHING button, for unselecting a whole category
+#FuncClearSelectEverything=@,1,S
+T(3,@BtnAllShell0,　)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+
+!---------- TXFORM = L9803 ----------
+<sub type="FORM" name="L9803">
+
+</sub>
+
+
+!------ 上行電文 ------
+! 修改這裡的 loop times
+<sub type="TIM">
+#TotalItem
+##loop{times:78,i:1}
+#BtnShell{i}
+#TradeName{i}
+#TradeCode{i}
+##end
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L9803^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+<sub type="PART" name="L9803" layout="cols=3;screen.width=[130,800];printer.width=[15,80];order=1">
+[
+["[L9803]                                 月報"], 
+]
+</sub>
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

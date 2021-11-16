@@ -112,7 +112,7 @@ public class BankDeductDtl implements Serializable {
   private String postCode;
 
   // 媒體碼
-  /* NA:未產Y:已產N:已產，扣款金額為0 */
+  /* NA:未產Y:已產N:已產，檢核不正常(扣款金額為0，AML…) */
   @Column(name = "`MediaCode`", length = 1)
   private String mediaCode;
 
@@ -176,7 +176,7 @@ public class BankDeductDtl implements Serializable {
   private String amlRsp;
 
   // 回應代碼
-  /* 空白:未回 00:扣款成功 &amp;gt;00 :扣款失敗失敗原因 : ref. CdCode ProcCode 處理說明 ACH  : 002 + ReturnCode(2) 郵局 : 003 + ReturnCode(2) */
+  /* 空白:未回, 00:扣款成功, &amp;gt;00 :扣款失敗失敗原因 : ref. CdCode ProcCode 處理說明 ACH  : 002 + ReturnCode(2) 郵局 : 003 + ReturnCode(2) */
   @Column(name = "`ReturnCode`", length = 2)
   private String returnCode;
 
@@ -562,7 +562,7 @@ G: 劃撥 P: 存簿
 	* 媒體碼<br>
 	* NA:未產
 Y:已產
-N:已產，扣款金額為0
+N:已產，檢核不正常(扣款金額為0，AML…)
 	* @return String
 	*/
   public String getMediaCode() {
@@ -573,7 +573,7 @@ N:已產，扣款金額為0
 	* 媒體碼<br>
 	* NA:未產
 Y:已產
-N:已產，扣款金額為0
+N:已產，檢核不正常(扣款金額為0，AML…)
   *
   * @param mediaCode 媒體碼
 	*/
@@ -823,7 +823,7 @@ CdCode:RelationCode
 
 /**
 	* 回應代碼<br>
-	* 空白:未回 00:扣款成功 &amp;gt;00 :扣款失敗
+	* 空白:未回, 00:扣款成功, &amp;gt;00 :扣款失敗
 失敗原因 : ref. CdCode ProcCode 處理說明
  ACH  : 002 + ReturnCode(2)
  郵局 : 003 + ReturnCode(2)
@@ -835,7 +835,7 @@ CdCode:RelationCode
 
 /**
 	* 回應代碼<br>
-	* 空白:未回 00:扣款成功 &amp;gt;00 :扣款失敗
+	* 空白:未回, 00:扣款成功, &amp;gt;00 :扣款失敗
 失敗原因 : ref. CdCode ProcCode 處理說明
  ACH  : 002 + ReturnCode(2)
  郵局 : 003 + ReturnCode(2)

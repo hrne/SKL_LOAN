@@ -41,10 +41,9 @@ public class L5908 extends TradeBuffer {
 		this.info("active L5908 ");
 		this.totaVo.init(titaVo);
 		// 處理tita日期為西元並加上日期
-		String iYyyMmFm = titaVo.getParam("YyyMmFm");
-		int xYyyMmFm = Integer.valueOf(iYyyMmFm) + 191100;
-		String iYyyMmTo = titaVo.getParam("YyyMmTo");
-		int xYyyMmTo = Integer.valueOf(iYyyMmTo) + 191100;
+		int WorkMonth1 = Integer.valueOf(titaVo.getParam("YyyMmFm")) + 191100;
+		int WorkMonth2 = Integer.valueOf(titaVo.getParam("YyyMmTo")) + 191100;
+
 		List<Map<String, String>> iL5908SqlReturn = new ArrayList<Map<String, String>>();
 
 		/*
@@ -53,17 +52,17 @@ public class L5908 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		/* 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬 */
-		this.limit = 40;
+		this.limit = Integer.MAX_VALUE;
 
 		try {
-			iL5908SqlReturn = iL5908ServiceImpl.FindData(this.index, this.limit, xYyyMmFm, xYyyMmTo, titaVo);
+			iL5908SqlReturn = iL5908ServiceImpl.FindData(this.index, this.limit, WorkMonth1, WorkMonth2, titaVo);
 		} catch (Exception e) {
 			// E5004 讀取DB語法發生問題
 			this.info("L5908 ErrorForSql=" + e);
 			throw new LogicException(titaVo, "E5004", "");
 		}
 		if (iL5908SqlReturn.isEmpty()) {
-			throw new LogicException(titaVo, "E0001", iYyyMmFm + "到" + iYyyMmTo + "期間內查無資料");
+			throw new LogicException(titaVo, "E0001", "");
 		} else {
 
 			if (iL5908SqlReturn != null && iL5908SqlReturn.size() >= this.limit) {
@@ -79,12 +78,12 @@ public class L5908 extends TradeBuffer {
 //					continue;
 //				}
 
-				occursList.putParam("OOPerfDate", Integer.valueOf(r5908SqlReturn.get("F0")) - 191100);
-				occursList.putParam("OODeptCode", r5908SqlReturn.get("F2"));
-				occursList.putParam("OODeptCodeX", r5908SqlReturn.get("F3"));
-				occursList.putParam("OOBsOfficer", r5908SqlReturn.get("F1"));
-				occursList.putParam("OOBsOfficerX", r5908SqlReturn.get("F4"));
-				occursList.putParam("OOTotal", r5908SqlReturn.get("F5"));
+				occursList.putParam("OOPerfDate", Integer.valueOf(r5908SqlReturn.get("WorkMonth")) - 191100);
+				occursList.putParam("OODeptCode", r5908SqlReturn.get("DeptCode"));
+				occursList.putParam("OODeptCodeX", r5908SqlReturn.get("UnitItem"));
+				occursList.putParam("OOBsOfficer", r5908SqlReturn.get("BsOfficer"));
+				occursList.putParam("OOBsOfficerX", r5908SqlReturn.get("Fullname"));
+				occursList.putParam("OOTotal", Integer.valueOf(r5908SqlReturn.get("Total").toString()));
 				this.totaVo.addOccursList(occursList);
 			}
 		}

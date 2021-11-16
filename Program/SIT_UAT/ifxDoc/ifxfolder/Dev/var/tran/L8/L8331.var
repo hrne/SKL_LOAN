@@ -255,12 +255,13 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 @V(7)
+
+
+#MaxMainCodeX=X,80,L
 T(2,@RimJcicBankCode,#MaxMainCode)
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
 T(2,@MaxMainCodeX,#L8r01JcicBankName)
-
-#MaxMainCodeX=X,80,L
 
 !單獨全數受清償原因
 #PayOffResult=X,1,I
@@ -274,6 +275,8 @@ HELP(#PayOffResultHelp)
 #PayOffResultX=X,80,L
 T(H,#PayOffResult,#PayOffResultHelp)
 
+#CDate=D,7,S
+T(1,#SYSCDATE,2,7)
 
 !單獨全數受清償日期
 #PayOffDate=D,7,I
@@ -281,7 +284,8 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,s,$)
 D(8)
-@A(DATE,0,#PayOffDate)
+@V(7)A(DATE,0,#PayOffDate)
+IF(#PayOffDate > #CDate ,V(P,單獨全數受清償日期不可大於資料報送日),$)
 
 !轉JCIC文字檔日期
 #OutJcicTxtDate=D,7,L

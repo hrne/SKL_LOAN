@@ -1,0 +1,288 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L5959)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,52)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,136)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L5959" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L5959]                                 房貸獎勵保費檢核結果查詢"],
+["#FdKind+類別",#Kind,#KindX],
+["#FdCustNo+戶號",#CustNo,"-",#FacmNo],
+]
+
+#button=x,100,S
+K(MODIFYBUTTON,查詢)
+
+#FdKind=X,2,L
+T(3,*)
+
+#FdCustNo=X,2,L
+T(3,*)
+
+!---------- AP TEXT AREA Variables ----------
+! ["查詢方式",#FunctionCd,#FunctionCdX],
+
+
+!查詢方式
+#KindH=X,200,S
+T(3,0:換算業績、業務報酬;1:介紹獎金、協辦獎金;2:介紹人加碼獎勵津貼)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,24,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@Kind,#NTXBUF,1,1)
+T(1,@CustNo,#NTXBUF,2,7)
+T(1,@FacmNo,#NTXBUF,9,3)
+
+#Kind=A,1,I
+C(3,#CHAIN,1,s,$)
+HELP(#KindH)
+@
+V(H,#KindH)
+
+#KindX=X,20,L
+T(H,#Kind,#KindH)
+
+#CustNo=A,7,I
+@
+V(2,0)
+
+#FacmNo=A,3,I
+@
+V(2,0)
+
+![顯示方式]
+#RPTFG=A,1,S
+E(0,1)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L5959 -----------
+<sub type="FORM" name="L5959">
+
+#SCRTIL=_,_,S
+T(3,[L5959] 房貸獎勵保費檢核結果查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+! eLoan案件編號  
+#oCreditSysNo=A,7,L
+
+! 借款人身份證字號
+#oCustId=X,10,L
+
+! 借款書申請日
+#oApplDate=D,7,L
+
+! 承保日 
+#oInsDate=D,7,L
+
+! 保單號碼    
+#oInsNo=X,15,L
+
+! 檢核結果
+#oCheckResult=X,1,L
+
+! 檢核工作月 
+#oCheckWorkMonth=A,5,L
+
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+
+! 保單號碼
+#oPolicyNo=X,12,S
+
+! 承保日
+#oApplicationDate=D,7,S
+
+! 狀況 
+#oPoStatusCode=x,1,S
+
+! 要保人 
+#oNamesO=x,20,S
+
+! 始期 
+#oIssueDate=D,7,S
+
+! 保額
+#oFaceAmt=m,12,S
+ 
+! 已貸金額
+#oHighestLoan=m,12,S
+ 
+! 可貸金額 
+#oLoanBal=m,12,S
+
+! 匯率
+#oExchageVal=m,3.4,S
+
+! 年繳化保費(NTD) 
+#oModePremYear=m,12,S
+
+! 保險型態 
+#oInsuranceType=x,1,S
+
+! 帳戶價值 
+#oRvlValues=m,12,S
+
+! 幣別 
+#oCurrency=x,3,S
+
+! 被保人
+#oNamesI=x,20,S
+
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#Kind
+#CustNo
+#FacmNo
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L5959
+#oCreditSysNo
+#oCustId
+#oApplDate
+#oInsDate
+#oInsNo
+#oCheckResult
+#oCheckWorkMonth
+#oPolicyNo
+#oApplicationDate
+#oPoStatusCode
+#oNamesO
+#oIssueDate
+#oFaceAmt
+#oHighestLoan
+#oLoanBal
+#oExchageVal
+#oModePremYear
+#oInsuranceType
+#oRvlValues
+#oCurrency
+#oNamesI
+^
+</sub>
+
+
+<sub type="PART" name="L5959" layout="cols=3;screen.width=[150,350,150,350];printer.width=[15,30,15,30];order=1">
+[
+["[L5959]                                 房貸獎勵保費檢核結果查詢"],
+["eLoan案件編號",#oCreditSysNo],
+["借款人身份證字號",#oCustId],
+["借款書申請日",#oApplDate],
+["承保日",#oInsDate],
+["檢核結果",#oCheckResult],
+["檢核工作月",#oCheckWorkMonth],
+]
+</sub>
+![#<->#,"保單號碼",#oInsNo],
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=1,QUERY.GRID,L5959
+#any={detail:true, header:'L5959.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+! 保單號碼
+#oPolicyNo=保單號碼
+{width:100,align:'center'}
+
+! 承保日
+#oApplicationDate=承保日
+{width:80,align:'center'}
+
+! 狀況 
+#oPoStatusCode=狀況
+{width:45,align:'center'}
+
+! 要保人 
+#oNamesO=要保人
+{width:120,align:'center'}
+
+! 始期 
+#oIssueDate=始期 
+{width:80,align:'center'}
+
+! 保額
+#oFaceAmt=保額
+{width:100,align:'right'}
+
+! 已貸金額
+#oHighestLoan=已貸金額
+{width:100,align:'right'}
+
+! 可貸金額 
+#oLoanBal=可貸金額
+{width:100,align:'right'}
+
+! 匯率
+#oExchageVal=匯率
+{width:60,align:'right'}
+
+! 年繳化保費(NTD) 
+#oModePremYear=年繳化保費(NTD)
+{width:150,align:'right'}
+
+! 保險型態 
+#oInsuranceType=保險型態
+{width:80,align:'center'}
+
+! 帳戶價值 
+#oRvlValues=帳戶價值
+{width:120,align:'right'}
+
+! 幣別 
+#oCurrency=幣別
+{width:50,align:'center'}
+
+! 被保人
+#oNamesI=被保人
+{width:120,align:'center'}
+
+^
+</sub>

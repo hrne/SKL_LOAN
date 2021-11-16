@@ -1,0 +1,17 @@
+OBonusNo=9,8
+OBonusDate=9,7
+OBonusType=9,1
+OPerfDate=9,7
+OCustNo=X,7
+OFacmNo=X,3
+OBormNo=X,3
+OEmployeeNo=X,6
+OFullname=X,40
+OBonus=+9,14.2
+OAdjustBonus=+9,14.2
+OAdjustBonusDate=9,7
+OWorkMonth=X,5
+OWorkSeason=X,4
+OMediaFg=9,1
+OMediaDate=9,7
+OManualFg=9,1

@@ -124,11 +124,11 @@ T(3,CdCode.ClStatCode)
 
 #ClStatHelp=X,1024,S
 
-!StockCode
+!ClTypeCode
 #CDDEF05=x,20,S
-T(3,CdCode.StockCode)
+T(3,CdCode.ClTypeCode)
 
-#StockCodeHelp=x,1024,S 
+#ClTypeCodeHelp=x,1024,S 
 
 #HelpRim=X,1,S
 RESET_RIM(#HelpRim,XXR99)
@@ -139,7 +139,7 @@ T(2,@ClCode1Help,#HelpDesc1)
 T(2,@ClMainTypeHelp,#HelpDesc2)
 T(2,@SettingStatHelp,#HelpDesc3)
 T(2,@ClStatHelp,#HelpDesc4)
-T(2,@StockCodeHelp,#HelpDesc5)
+T(2,@ClTypeCodeHelp,#HelpDesc5)
 !調RIM縣市 ST
 <include src="ROM.icf::L6R03.dec"/>
 
@@ -727,6 +727,9 @@ T(2,#OOClCode1+#Dash+#OOClCode2+#Dash+#OOClNo)
 
 #OOClTypeCode=X,20,L
 
+#ClTypeCodeX=X,200,L
+T(H,#OOClTypeCode,#ClTypeCodeHelp)
+
 !#OOOwnerId=X,10,L
 
 !#OOOwnerIdLB=X,11,L
@@ -972,6 +975,9 @@ TXFORM=L2038
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
+
 #Amt=設定金額
 {width:100,align:'right'}
 
@@ -1003,6 +1009,9 @@ TXFORM=L2038
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
+
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
 
 #Amt=設定金額
 {width:100,align:'right'}
@@ -1040,6 +1049,9 @@ TXFORM=L2038
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
+
 #Amt=設定金額
 {width:100,align:'right'}
 
@@ -1074,6 +1086,9 @@ TXFORM=L2038
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
+
 #Amt=設定金額
 {width:100,align:'right'}
 
@@ -1086,7 +1101,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther=土地座落
+#OOOther1=土地座落
 {width:400,align:'left'}
 ^
 
@@ -1106,6 +1121,9 @@ TXFORM=L2038
 
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
+
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
 
 #Amt=設定金額
 {width:100,align:'right'}
@@ -1140,6 +1158,9 @@ TXFORM=L2038
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
+
 #Amt=設定金額
 {width:100,align:'right'}
 
@@ -1167,6 +1188,9 @@ TXFORM=L2038
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
+
 #Amt=設定金額
 {width:100,align:'right'}
 
@@ -1189,6 +1213,9 @@ TXFORM=L2038
 #OOClNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
+
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
 
 #Amt=設定金額
 {width:120,align:'right'}
@@ -1219,6 +1246,9 @@ TXFORM=L2038
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
+
 #Amt=設定金額
 {width:100,align:'right'}
 
@@ -1244,6 +1274,9 @@ TXFORM=L2038
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
 
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
+
 #Amt=設定金額
 {width:100,align:'right'}
 
@@ -1256,7 +1289,7 @@ TXFORM=L2038
 #Amt1=可分配金額
 {width:120,align:'right'}
 
-#OOOther=土地座落
+#OOOther1=土地座落
 {width:400,align:'left'}
 ^
 
@@ -1268,6 +1301,9 @@ TXFORM=L2038
 #OOClNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
+
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
 
 #Amt=設定金額
 {width:100,align:'right'}
@@ -1293,6 +1329,9 @@ TXFORM=L2038
 #OOClNo
 #OOClNoX=擔保品編號
 {width:120,align:'center'}
+
+#ClTypeCodeX=擔保品類別
+{width:200,align:'left'}
 
 #Amt=設定金額
 {width:100,align:'right'}

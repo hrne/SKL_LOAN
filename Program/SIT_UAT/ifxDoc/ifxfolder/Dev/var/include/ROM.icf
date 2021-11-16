@@ -80,6 +80,7 @@
 !    L1R11 : 調報表代號名稱
 !    L1R12 : 組地址
 !    L5R38 : 依工作年月找起訖日
+!    L5R48 : 找檔案借閱檔
 !    L6R01 : 尋找行庫資料檔資料
 !    L6R02 : 尋找營業單位對照檔資料
 !    L6R03 : 取得縣市別/行政區/地段/路名的下拉選單資料
@@ -3613,6 +3614,16 @@ TXFORM=L2R59
 ^
 </L2R59.tom>
 
+<L2R60.dec>
+#L2r60Help1=X,2000,S
+</L2R60.dec>
+
+<L2R60.tom>
+TXFORM=L2R60
+#L2r60Help1
+^
+</L2R60.tom>
+
 ------------------------------------------------------------
 <L3Rim.dec>
 #RimChequeAcct=A,9,S
@@ -5929,6 +5940,7 @@ TXFORM=L5R26
 #L5r27AdjPerfAmt=+m,15,S
 #L5r27AdjCntingCode=X,1,S
 #L5r27AdjRange=A,1,S
+#L5r27AdjLogNo=A,8,S
 </L5R27.dec>
 
 <L5R27.tom>
@@ -5946,6 +5958,7 @@ TXFORM=L5R27
 #L5r27AdjPerfAmt
 #L5r27AdjCntingCode
 #L5r27AdjRange
+#L5r27AdjLogNo
 ^
 </L5R27.tom>
 
@@ -5973,6 +5986,7 @@ TXFORM=L5R28
 #L5r29AdjPerfCnt=m,3.1,S
 #L5r29AdjPerfAmtSign=X,1,S
 #L5r29AdjPerfAmt=m,15,S
+#L5r29AdjLogNo=A,8,S
 </L5R29.dec>
 
 <L5R29.tom>
@@ -5990,6 +6004,7 @@ TXFORM=L5R29
 #L5r29AdjPerfCnt
 #L5r29AdjPerfAmtSign
 #L5r29AdjPerfAmt
+#L5r29AdjLogNo
 ^
 </L5R29.tom>
 
@@ -6541,7 +6556,7 @@ TXFORM=L8R13
 #L8r14SubmitKey=X,3,S
 #L8r14RcDate=D,7,S
 #L8r14MaxMainCode=X,10,S
-#L8r14Account=X,50,S
+#L8r14Account=x,50,S
 #L8r14CollateralType=X,2,S
 #L8r14OriginLoanAmt=M,12,S
 #L8r14CreditBalance=M,12,S
@@ -9138,3 +9153,35 @@ TXFORM=L5R47
 #L5R47Remark
 ^
 </L5R47.tom>
+
+<L5R48.dec>
+##loop {times:25,i:1}
+#L5r48OPTA{i}=9,2,S
+#L5r48AMTA{i}=9,2,S
+##end
+##loop {times:25,i:1}
+#L5r48OPTB{i}=9,2,S
+#L5r48AMTB{i}=9,2,S
+##end
+##loop {times:25,i:1}
+#L5r48OPTC{i}=9,2,S
+#L5r48AMTC{i}=9,2,S
+##end
+</L5R48.dec>
+
+<L5R48.tom>
+TXFORM=L5R48
+##loop {times:25,i:1}
+#L5r48OPTA{i}
+#L5r48AMTA{i}
+##end
+##loop {times:25,i:1}
+#L5r48OPTB{i}
+#L5r48AMTB{i}
+##end
+##loop {times:25,i:1}
+#L5r48OPTC{i}
+#L5r48AMTC{i}
+##end
+^
+</L5R48.tom>
