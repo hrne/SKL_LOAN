@@ -28,7 +28,7 @@ public interface JobMainRepositoryMon extends JpaRepository<JobMain, JobMainId> 
 
   // (日終批次)維護 CollList 法催紀錄清單檔
   @Procedure(value = "\"Usp_L5_CollList_Upd\"")
-  public void uspL5ColllistUpd(int tbsdyf,  String empNo, int l6bsdyf, int l7bsdyf);
+  public void uspL5ColllistUpd(int tbsdyf,  String empNo,String txtNo, int l6bsdyf, int l7bsdyf);
 
   // (日終批次)維護 InnReCheck 覆審案件明細檔 
   @Procedure(value = "\"Usp_L5_InnReCheck_Upd\"")

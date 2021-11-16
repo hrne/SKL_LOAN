@@ -39,7 +39,6 @@ public class L5CollListUpd extends BatchBase implements Tasklet, InitializingBea
 
 	@Override
 	public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-		// logger = LoggerFactory.getLogger(L5CollListUpd.class);
 
 		// 第二個參數
 		// D=日批
@@ -55,6 +54,8 @@ public class L5CollListUpd extends BatchBase implements Tasklet, InitializingBea
 
 		String empNo = titaVo.getTlrNo();
 
+		String txtNo = titaVo.getTxtNo();
+
 		// 此為日終維護,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);
 
@@ -68,7 +69,8 @@ public class L5CollListUpd extends BatchBase implements Tasklet, InitializingBea
 		int l7bsdyf = dateUtil.getbussDate(tbsdyf, -7);
 		this.info("L5CollListUpd l7bsdyf = " + l7bsdyf);
 
-		sJobMainService.Usp_L5_CollList_Upd(tbsdyf, empNo, l6bsdyf, l7bsdyf, titaVo);
+		// 2021-11-16 Wei 修改:增加參數傳入交易序號
+		sJobMainService.Usp_L5_CollList_Upd(tbsdyf, empNo, txtNo, l6bsdyf, l7bsdyf, titaVo);
 	}
 
 }

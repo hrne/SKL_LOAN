@@ -16,14 +16,13 @@ import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.util.parse.Parse;
 
-
 @Service
 @Repository
 public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean {
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -56,9 +55,9 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // 介紹人姓名
 		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // 處經理姓名(介紹人)
 		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // 區經理姓名(介紹人)
-		sql += "       ,IGroup.\"PerfEqAmt\""; // 換算業績
+		sql += "       ,IGroup.\"PerfEqAmt\"";  // 換算業績 - 注意這裡使用 IGroup: 參考樣張輸出, 同額度的業績金額為 Group By FacmNo
 		sql += "       ,IGroup.\"PerfReward\""; // 業務報酬
-		sql += "       ,IGroup.\"PerfAmt\""; // 業績金額
+		sql += "       ,IGroup.\"PerfAmt\"";    // 業績金額
 		sql += " FROM \"PfItDetail\" I";
 		sql += " LEFT JOIN \"PfBsDetail\" B ON B.\"PerfDate\" = I.\"PerfDate\""; // 取房貸專員
 		sql += "                           AND B.\"CustNo\"   = I.\"CustNo\"";
@@ -73,25 +72,33 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"UnitCode\""; // 取單位中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = I.\"DeptCode\""; // 取部室中文(介紹人)
 		sql += " LEFT JOIN \"CdBcm\" B3 ON B3.\"UnitCode\" = I.\"DistCode\""; // 取區部中文(介紹人)
-		sql += " LEFT JOIN ( SELECT \"CustNo\" ";
-		sql += "                   ,\"FacmNo\" ";
-		sql += "                   ,\"WorkMonth\" ";
-		sql += "                   ,SUM(\"PerfEqAmt\") \"PerfEqAmt\" ";
-		sql += "                   ,SUM(\"PerfReward\") \"PerfReward\" ";
-		sql += "                   ,SUM(\"PerfAmt\") \"PerfAmt\" ";
-		sql += "             FROM \"PfItDetail\" ";
-		sql += "             GROUP BY \"CustNo\" ";
-		sql += "                     ,\"FacmNo\" ";
-		sql += "                     ,\"WorkMonth\" ";
+		sql += " LEFT JOIN ( SELECT PID.\"CustNo\" ";
+		sql += "                   ,PID.\"FacmNo\" ";
+		sql += "                   ,PID.\"WorkMonth\" ";
+		sql += "                   ,SUM(NVL(PID.\"PerfEqAmt\", PIDA.\"AdjPerfEqAmt\")) \"PerfEqAmt\" ";
+		sql += "                   ,SUM(NVL(PID.\"PerfReward\", PIDA.\"AdjPerfReward\")) \"PerfReward\" ";
+		sql += "                   ,SUM(NVL(PID.\"PerfAmt\", PIDA.\"AdjPerfAmt\")) \"PerfAmt\" ";
+		sql += "             FROM \"PfItDetail\" PID";
+		sql += "             LEFT JOIN \"PfItDetailAdjust\" PIDA ON PIDA.\"CustNo\"    = PID.\"CustNo\"     ";
+		sql += "                                                AND PIDA.\"FacmNo\"    = PID.\"FacmNo\"     ";
+		sql += "                                                AND PIDA.\"WorkMonth\" = PID.\"WorkMonth\"  ";
+		sql += "             GROUP BY PID.\"CustNo\" ";
+		sql += "                     ,PID.\"FacmNo\" ";
+		sql += "                     ,PID.\"WorkMonth\" ";
 		sql += "           ) IGroup ON IGroup.\"CustNo\" = I.\"CustNo\" ";
 		sql += "                   AND IGroup.\"FacmNo\" = I.\"FacmNo\" ";
 		sql += "                   AND IGroup.\"WorkMonth\" = I.\"WorkMonth\" ";
 		sql += " WHERE I.\"WorkMonth\" >= (:inputYearStart || :inputMonthStart)";
 		sql += "   AND I.\"WorkMonth\" <= (:inputYearEnd || :inputMonthEnd)";
-		sql += "   AND B0.\"UnitItem\" IS NOT NULL ";
 		sql += "   AND I.\"DrawdownAmt\" >= 0 ";
-		sql += "   AND (I.\"DeptCode\" IS NOT NULL OR I.\"Introducer\" IS NOT NULL) ";
-		sql += " ORDER BY B.\"BsOfficer\", I.\"UnitManager\", I.\"CustNo\", I.\"FacmNo\", I.\"BormNo\"";
+		sql += "   AND NVL(B0.\"UnitItem\", ' ') != ' ' "; // PfDetailCom 取 FacMain.BusinessOfficer, 此欄位不一定會填入房貸專員的員編, 串得到部室中文才是房貸專員
+		sql += "   AND NVL(I.\"Introducer\", ' ') != ' ' "; // PfItDetail 存在介紹人為 Null 的資料
+		sql += " ORDER BY NLSSORT(I.\"DeptCode\", 'NLS_SORT=FRENCH') ";
+		sql += "         ,NLSSORT(I.\"DistCode\", 'NLS_SORT=FRENCH') ";
+		sql += "         ,NLSSORT(I.\"UnitCode\", 'NLS_SORT=FRENCH') "; // 原表排序用到這三個欄位, 但原環境會將英文排在數字前面;
+		sql += "         ,I.\"CustNo\" ";                               // 這裡利用 NLSSORT 取法語環境排序方式, 確保排序順序上英文先於數字
+		sql += "         ,I.\"FacmNo\" ";
+		sql += "         ,I.\"BormNo\" ";
 		this.info("sql=" + sql);
 		Query query;
 

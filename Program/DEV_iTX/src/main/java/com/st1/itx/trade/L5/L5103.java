@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.dataVO.TxCom;
@@ -63,7 +64,7 @@ public class L5103 extends TradeBuffer {
 
 	private InnDocRecord tInnDocRecord = new InnDocRecord();
 	private InnDocRecordId tInnDocRecordId = new InnDocRecordId();
-	
+	private TempVo tTempVo = new TempVo();
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 
@@ -283,7 +284,9 @@ public class L5103 extends TradeBuffer {
 			nInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			nInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			nInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
+			
 
+		
 			try {
 				innDocRecordService.update(nInnDocRecord);
 			} catch (DBException e) {
@@ -304,7 +307,29 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
-
+			
+			for(int i =1; i<=25 ; i++) {
+				if(Integer.parseInt(titaVo.getParam("OPTA"+i))!=0) {
+					tTempVo.putParam("OPTA"+i, titaVo.getParam("OPTA"+i));
+					tTempVo.putParam("AMTA"+i, titaVo.getParam("AMTA"+i));
+				}
+			}
+			
+			for(int i =1; i<=25 ; i++) {
+				if(Integer.parseInt(titaVo.getParam("OPTB"+i))!=0) {
+					tTempVo.putParam("OPTB"+i, titaVo.getParam("OPTB"+i));
+					tTempVo.putParam("AMTB"+i, titaVo.getParam("AMTB"+i));
+				}
+			}
+			
+			for(int i =1; i<=25 ; i++) {
+				if(Integer.parseInt(titaVo.getParam("OPTC"+i))!=0) {
+					tTempVo.putParam("OPTC"+i, titaVo.getParam("OPTC"+i));
+					tTempVo.putParam("AMTC"+i, titaVo.getParam("AMTC"+i));
+				}
+			}
+			tInnDocRecord.setJsonFields(tTempVo.getJsonString());
+			
 			try {
 				innDocRecordService.insert(tInnDocRecord,titaVo);
 			} catch (DBException e) {
@@ -335,6 +360,29 @@ public class L5103 extends TradeBuffer {
 			tInnDocRecord.setReturnEmpNo(titaVo.getParam("ReturnEmpNo"));
 			tInnDocRecord.setRemark(titaVo.getParam("Remark"));
 			tInnDocRecord.setApplObj(titaVo.getParam("ApplObj"));
+			
+			for(int i =0; i<=25 ; i++) {
+				if(Integer.parseInt(titaVo.getParam("OPTA"+i))!=0) {
+					tTempVo.putParam("OPTA"+i, titaVo.getParam("OPTA"+i));
+					tTempVo.putParam("AMTA"+i, titaVo.getParam("AMTA"+i));
+				}
+			}
+			
+			for(int i =0; i<=25 ; i++) {
+				if(Integer.parseInt(titaVo.getParam("OPTB"+i))!=0) {
+					tTempVo.putParam("OPTB"+i, titaVo.getParam("OPTB"+i));
+					tTempVo.putParam("AMTB"+i, titaVo.getParam("AMTB"+i));
+				}
+			}
+			
+			for(int i =0; i<=25 ; i++) {
+				if(Integer.parseInt(titaVo.getParam("OPTC"+i))!=0) {
+					tTempVo.putParam("OPTC"+i, titaVo.getParam("OPTC"+i));
+					tTempVo.putParam("AMTC"+i, titaVo.getParam("AMTC"+i));
+				}
+			}
+			tInnDocRecord.setJsonFields(tTempVo.getJsonString());
+			
 			try {
 				innDocRecordService.update(tInnDocRecord,titaVo);
 			} catch (DBException e) {

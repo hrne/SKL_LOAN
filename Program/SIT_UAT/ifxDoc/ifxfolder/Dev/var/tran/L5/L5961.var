@@ -205,15 +205,15 @@ T(2, )
 #OOTelExt=X,5,O
 @C(4,#OOTelExt,S,V(9))
 
-#DASH1=X,1,S
-T(2,-)
-
 ! 聯絡電話
+#DASH1=X,1,L
+C(4,#OOTelArea,T(3,),T(3,-))
+#DASH2=X,1,L
+C(4,#OOTelExt,T(3,),T(3,-))
+
 #OOTelPhone=X,24,O
 IF(#OOTelNo=="",S,$)
-IF(#OOTelArea=="",
-   IF(#OOTelExt=="",T(2,#OOTelNo),T(2,#OOTelNo+#DASH1+ +#OOTelExt)),
-   IF(#OOTelExt=="",T(2,#OOTelArea+#DASH1+ +#OOTelNo),T(2,#OOTelArea+#DASH1+ +#OOTelNo+#DASH1+ +#OOTelExt)))
+T(B,#OOTelArea+#DASH1+#OOTelNo+#DASH2+#OOTelExt)
 
 ! 通話結果
 #OOResultCode=A,1,O

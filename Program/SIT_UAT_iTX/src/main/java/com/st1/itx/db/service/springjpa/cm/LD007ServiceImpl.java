@@ -22,7 +22,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
-	
+
 	@Autowired
 	Parse parse;
 
@@ -35,7 +35,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("lD007.findAll ");
 
 		String sql = "";
-		sql += "               SELECT DISTINCT ";
+		sql += "               SELECT ";
 		sql += "                      E0.\"DepItem\" F0 ";
 		sql += "                     ,E0.\"Fullname\" F1 ";
 		sql += "                     ,C.\"CustName\" F2 ";
@@ -61,6 +61,7 @@ public class LD007ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = B.\"CustNo\" ";
 		sql += "               LEFT JOIN \"PfBsOfficer\" E0 ON E0.\"EmpNo\" = B.\"BsOfficer\" ";
 		sql += "                                           AND E0.\"DeptCode\" = B.\"DeptCode\" ";
+		sql += "                                           AND E0.\"WorkMonth\" = B.\"WorkMonth\" ";
 		sql += "               LEFT JOIN \"CdEmp\" E1 ON E1.\"EmployeeNo\" = I.\"Introducer\" ";
 		sql += "               LEFT JOIN \"CdBcm\" B1 ON B1.\"UnitCode\" = I.\"DeptCode\" ";
 		sql += "               LEFT JOIN \"CdBcm\" B2 ON B2.\"UnitCode\" = I.\"DistCode\"  ";

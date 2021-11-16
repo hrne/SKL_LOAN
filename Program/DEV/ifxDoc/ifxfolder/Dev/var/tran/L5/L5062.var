@@ -123,24 +123,27 @@ T(3,1)ASGN(LOOP$)
 #OOAccCollPsnCombine=X,150,L
 T(2,#OOAccCollPsn+ +#OOAccCollPsnX)
 
-#DASH1=X,1,S
-T(2,-)
+#DASH1=X,1,L
+C(4,#OOAccTelArea,T(3,),T(3,-))
+#DASH2=X,1,L
+C(4,#OOAccTelExt,T(3,),T(3,-))
 
 #OOAccTelCombine=X,24,L
 IF(#OOAccTelNo=="",S,$)
-IF(#OOAccTelArea=="",
-   IF(#OOAccTelExt=="",T(2,#OOAccTelNo),T(2,#OOAccTelNo+#DASH1+ +#OOAccTelExt)),
-   IF(#OOAccTelExt=="",T(2,#OOAccTelArea+#DASH1+ +#OOAccTelNo),T(2,#OOAccTelArea+#DASH1+ +#OOAccTelNo+#DASH1+ +#OOAccTelExt)))
+T(B,#OOAccTelArea+#DASH1+#OOAccTelNo+#DASH2+#OOAccTelExt)
 
 
 #OOLegalPsnCombine=X,150,L
 T(2,#OOLegalPsn+ +#OOLegalPsnX)
 
+#DASH3=X,1,L
+C(4,#OOLegalArea,T(3,),T(3,-))
+#DASH4=X,1,L
+C(4,#OOLegalExt,T(3,),T(3,-))
+
 #OOLegalCombine=X,24,L
 IF(#OOLegalNo=="",S,$)
-IF(#OOLegalArea=="",
-   IF(#OOLegalExt=="",T(2,#OOLegalNo),T(2,#OOLegalNo+#DASH1+ +#OOLegalExt)),
-   IF(#OOLegalExt=="",T(2,#OOLegalArea+#DASH1+ +#OOLegalNo),T(2,#OOLegalArea+#DASH1+ +#OOLegalNo+#DASH1+ +#OOLegalExt)))
+T(B,#OOLegalArea+#DASH3+#OOLegalNo+#DASH4+#OOLegalExt)
 
 ! 修改的按鈕
 #OOFunc2=A,1,S

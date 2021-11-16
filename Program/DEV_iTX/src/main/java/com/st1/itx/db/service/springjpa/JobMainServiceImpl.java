@@ -345,19 +345,19 @@ em = null;
   }
 
   @Override
-  public void Usp_L5_CollList_Upd(int tbsdyf,  String empNo, int l6bsdyf, int l7bsdyf, TitaVo... titaVo) {
+  public void Usp_L5_CollList_Upd(int tbsdyf,  String empNo,String txtNo, int l6bsdyf, int l7bsdyf, TitaVo... titaVo) {
     String dbName = "";
     
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     if (dbName.equals(ContentName.onDay))
-      jobMainReposDay.uspL5ColllistUpd(tbsdyf,  empNo, l6bsdyf, l7bsdyf);
+      jobMainReposDay.uspL5ColllistUpd(tbsdyf,  empNo,txtNo, l6bsdyf, l7bsdyf);
     else if (dbName.equals(ContentName.onMon))
-      jobMainReposMon.uspL5ColllistUpd(tbsdyf,  empNo, l6bsdyf, l7bsdyf);
+      jobMainReposMon.uspL5ColllistUpd(tbsdyf,  empNo,txtNo, l6bsdyf, l7bsdyf);
     else if (dbName.equals(ContentName.onHist))
-      jobMainReposHist.uspL5ColllistUpd(tbsdyf,  empNo, l6bsdyf, l7bsdyf);
+      jobMainReposHist.uspL5ColllistUpd(tbsdyf,  empNo,txtNo, l6bsdyf, l7bsdyf);
    else
-      jobMainRepos.uspL5ColllistUpd(tbsdyf,  empNo, l6bsdyf, l7bsdyf);
+      jobMainRepos.uspL5ColllistUpd(tbsdyf,  empNo,txtNo, l6bsdyf, l7bsdyf);
   }
 
   @Override

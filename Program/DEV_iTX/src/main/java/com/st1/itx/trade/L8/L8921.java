@@ -34,7 +34,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L8921 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8921.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -80,11 +79,12 @@ public class L8921 extends TradeBuffer {
 			CustMain tCustMain = new CustMain();
 			tCustMain = sCustMainService.custNoFirst(tMlaundryChkDtl.getCustNo(), tMlaundryChkDtl.getCustNo(), titaVo);
 			if (tCustMain == null) {
-				throw new LogicException(titaVo, "E0001", "客戶資料主檔"); // 查無資料
+				occursList.putParam("OOCustName", ""); // 戶名
+			} else {
+				occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
 			}
-			occursList.putParam("OOCustName", tCustMain.getCustName()); // 戶名
-
 			
+
 			occursList.putParam("OOFactor", tMlaundryChkDtl.getFactor()); // 交易樣態
 			occursList.putParam("OOEntryDate", tMlaundryChkDtl.getEntryDate()); // 入帳日期
 			occursList.putParam("OOCustNo", tMlaundryChkDtl.getCustNo()); // 戶號
@@ -94,13 +94,12 @@ public class L8921 extends TradeBuffer {
 			occursList.putParam("OOTotalAmt", tMlaundryChkDtl.getTotalAmt()); // 累計金額
 			occursList.putParam("OOTotalCnt", tMlaundryChkDtl.getTotalCnt()); // 累計筆數
 			occursList.putParam("OOStartEntryDate", tMlaundryChkDtl.getStartEntryDate()); // 統計期間起日
-			
-			
+
 			DateTime = this.parse.timeStampToString(tMlaundryChkDtl.getCreateDate()); // 產製日期
 			this.info("L8921 DateTime : " + DateTime);
 			Date = FormatUtil.left(DateTime, 9);
 			occursList.putParam("OOCreateDate", Date);
-			
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}

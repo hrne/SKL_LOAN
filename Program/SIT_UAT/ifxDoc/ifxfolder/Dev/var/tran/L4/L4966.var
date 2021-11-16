@@ -45,11 +45,11 @@ E(0,0)
 <sub type="DC" name="L4966" layout="cols=1;screen.width=[130,1100];printer.width=[20,20];">
 [
 ["[L4966]                                 火險佣金資料查詢"],
-["#FdMain+查詢條件","@(借款人統編、借款人戶號、業務員統編、業務員原編，需擇一輸入)"],
+["#FdMain+查詢條件","@(借款人統編、借款人戶號、業務員統編、業務員員編，需擇一輸入)"],
 ["#FdCustId+借款人統編",#CustId],
 ["#FdCustNo+借款人戶號",#CustNo],
 ["#FdEmpId+業務員統編",#EmpId],
-["#FdFireOfficer+業務員原編",#FireOfficer],
+["#FdFireOfficer+業務員員編",#FireOfficer],
 ]
 
 #FdMain=X,2,L
@@ -74,6 +74,7 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 
 #CustId=X,10,I
+@A(ID_UNINO,0,#CustId)
 
 #CustNo=A,7,I
 C(4,#CustId,$,S)
@@ -81,6 +82,7 @@ C(4,#CustId,$,S)
 #EmpId=X,10,I
 C(4,#CustId,$,S)
 C(3,#CustNo,0,$,S)
+@A(ID_UNINO,0,#EmpId)
 
 #FireOfficer=X,6,I
 C(4,#CustId,$,S)

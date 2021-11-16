@@ -226,13 +226,13 @@ public class L560AReport extends MakeReport {
 					throw new LogicException(titaVo, "E0001", "地區別代碼檔"); // 查無資料
 				}
 				if (!iCdCity.getAccTelArea().trim().isEmpty() || !iCdCity.getAccTelArea().equals("")) {
-					iAccTel = iCdCity.getAccTelArea().trim() + "-";
+					iAccTel = "(" + iCdCity.getAccTelArea().trim() + ") ";
 				}
 				if (!iCdCity.getAccTelNo().trim().isEmpty() || !iCdCity.getAccTelNo().equals("")) {
 					iAccTel = iAccTel + iCdCity.getAccTelNo().trim();
 				}
 				if (!iCdCity.getAccTelExt().trim().isEmpty() || !iCdCity.getAccTelExt().equals("")) {
-					iAccTel = iAccTel + "-" + iCdCity.getAccTelExt().trim();
+					iAccTel = iAccTel + " 分機" + iCdCity.getAccTelExt().trim();
 				}
 
 				iCdEmp = iCdEmpService.findById(iAccCollPsn, titaVo);
@@ -288,8 +288,8 @@ public class L560AReport extends MakeReport {
 			printCm(3, 19, "順　頌");
 			setFont(1, 13);
 			printCm(7, 20, "新光人壽保險股份有限公司 放款部");
-			printCm(7, 21, "承辦人員：邱怡婷");
-			printCm(7, 22, "電　　話：(02) 2389-5858 分機 7076");
+			printCm(7, 21, "承辦人員："+iAccCollPsnX);
+			printCm(7, 22, "電　　話："+iAccTel);
 			setFont(1, 15);
 			printCm(10,27,"中　　華　　民　　國　"+iCalyy+"　年　"+iCalMm+"　月　"+iCalDd+"　日","C");
 			sno = close();

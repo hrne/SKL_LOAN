@@ -771,6 +771,9 @@ HIDE(#BTN1,#FuncCode)
 T(F,@CustNo,0)
 T(F,@FacmNo,0)
 
+#init=X,1,S
+HIDE(#what)
+
 #NTXBUF=X,18,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
@@ -1087,6 +1090,12 @@ R(1,L4R22)
 #SetValue=A,1,S
 C(3,#RepayCode,02,$,S)
 E(0,@BeforeAcctCheckFlag,#L4r22CheckCode)
+C(3,#BeforeAcctCheckFlag,7,SHOW(#RepayAcctMsg),HIDE(#RepayAcctMsg))
+C(3,#BeforeAcctCheckFlag,7,T(3,@RepayAcctMsg,扣款帳號已提出授權待授權銀行回覆，不可變更)K(LIGHT,#RepayAcctMsg,TXTRED,0,1),s)
+T(F,@RepayCode,0)
+T(F,@RepayBank,0)
+T(F,@RepayAcctNo,0)
+T(F,@PostCode,0)
 
 
 #RcvL2r05B=X,1,S
@@ -2545,6 +2554,7 @@ T(H,@RelationGenderX,#RelationGender,#SexHelp)
 #FdRepayCode=X,2,L
 #RepayCode=A,2,I
 C(3,#UpdateCode,1,$,s)
+C(3,#BeforeAcctCheckFlag,7,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 HELP(#RepayCodeHelp)
 @
@@ -2642,6 +2652,7 @@ HIDE(#LbRepayBank,#LbRepayAcctNo,#LbPostCode)
 C(3,#UpdateCode,1,$,s)
 C(3,#RepayCode,2,$,S)
 IF(#FuncCode==2,$,s)
+C(3,#BeforeAcctCheckFlag,7,s,$)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 HELP(#BankDeductCdHelp)
 @V(H,#BankDeductCdHelp)
@@ -2690,12 +2701,14 @@ C(5,#RepayBank,700,T(2,@FdPostCode,#WkStar),T(3,@FdPostCode, ))
 C(3,#UpdateCode,1,$,s)
 C(3,#RepayCode,2,$,S)
 IF(#FuncCode==2,$,s)
+C(3,#BeforeAcctCheckFlag,7,s,$)
 C(3,#RepayCode,2,C(4,#L2r53Help1,$,HELP(#L2r53Help1)),S)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 @
 IF(#RepayAcctNo!=#OldAcctNo,C(3,#BeforeAcctCheckFlag,7,V(P,扣款帳號已提出授權待授權銀行回覆，不可變更),$),$)
 V(2,0)
 
+#RepayAcctMsg=x,50,L
 
 #LbRepayAcctNo=A,14,L
 C(3,#RepayCode,2,$,S)
@@ -2718,6 +2731,7 @@ C(3,#RepayCode,2,$,S)
 C(3,#UpdateCode,1,$,s)
 C(3,#RepayCode,2,$,S)
 IF(#FuncCode==2 ,$,s)
+C(3,#BeforeAcctCheckFlag,7,s,$)
 C(5,#RepayBank,700,$,S)
 C(3,#Hide5Fg,0,CALL(#HideP5),$)
 HELP(#PostCodeHelp)
@@ -2859,6 +2873,12 @@ HELP(#SexHelp)
 #RelationGenderX=X,2,L
 C(3,#RelationCode,0,S,$)
 T(H,#RelationGender,#SexHelp)
+
+#what=X,1,I
+C(3,#BeforeAcctCheckFlag,7,$,S)
+C(3,#Hide5Fg,0,CALL(#HideP5),$)
+@T(3,)
+
 
 !---- P6 專員
 #INVK6=X,1,S
@@ -3596,13 +3616,13 @@ C(3,#CheckCode,0,$,S)
 ["<font color=red>@扣款帳號"],
 ["#FdRepayCode+繳款方式",#RepayCode,#RepayCodeX],
 ["#FdRepayBank+扣款銀行",#RepayBank,#LbRepayBank,#RepayBankX],
-["#FdRepayAcctNo+扣款帳號",#RepayAcctNo,#LbRepayAcctNo],
+["#FdRepayAcctNo+扣款帳號",#RepayAcctNo,#LbRepayAcctNo,#RepayAcctMsg],
 ["#FdPostCode+郵局存款別",#PostCode,#LbPostCode,#PostCodeX],
 ["#FdRelationCode+與借款人關係",#RelationCode,#RelationCodeX],
 [#<->#,"#FdRelationName+帳戶戶名",#RelationName,#LbRelationName],
 [#<->#,"#FdRelationId+身份證字號",#RelationId,#LbRelationId],
 [#<->#,"#FdRelationBirthday+出生日期",#RelationBirthday,#LbRelationBirthday],
-[#<->#,"#FdRelationGender+性別",#RelationGender,#RelationGenderX],
+[#<->#,"#FdRelationGender+性別",#RelationGender,#RelationGenderX,#what],
 ]
 </sub>
 

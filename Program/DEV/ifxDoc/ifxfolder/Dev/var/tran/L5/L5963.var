@@ -192,7 +192,7 @@ T(H,#OOMailTypeCode,#MailTypeCodeHelp)
 #OOMailDate=D,7,O
 ! 發函對象
 #OOMailObj=A,1,O
-#OOMailObjX=X,6,O
+#OOMailObjX=X,14,O
 C(1,#OOMailObj,S,S,$)
 T(H,#OOMailObj,#MailObjHelp)
 
@@ -206,7 +206,7 @@ T(H,#OODelvrYet,#DelvrYetHelp)
 
 ! 送達方式
 #OODelvrCode=A,1,O
-#OODelvrCodeX=X,14,O
+#OODelvrCodeX=X,16,O
 C(1,#OODelvrCode,S,S,$)
 T(H,#OODelvrCode,#DelvrCodeHelp)
 

@@ -124,12 +124,13 @@ public interface JobMainService {
    * (日終批次)維護 CollList 法催紀錄清單檔
    * @param  tbsdyf int
    * @param  empNo String
+   * @param  txtNo String
    * @param  l6bsdyf int
    * @param  l7bsdyf int
    * @param titaVo Variable-Length Argument
    *
    */
-  public void Usp_L5_CollList_Upd(int tbsdyf,  String empNo, int l6bsdyf, int l7bsdyf, TitaVo... titaVo);
+  public void Usp_L5_CollList_Upd(int tbsdyf,  String empNo,String txtNo, int l6bsdyf, int l7bsdyf, TitaVo... titaVo);
 
   /**
    * Stored Procedure<br>

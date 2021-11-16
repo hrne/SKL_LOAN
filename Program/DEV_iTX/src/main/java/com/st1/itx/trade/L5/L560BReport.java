@@ -219,7 +219,7 @@ public class L560BReport extends MakeReport {
 			printRectCm(1.5, 10, 65, 4, 20, "二、台端倘未能於" + iYyy + "年" + iMm + "月25日前繳足應繳款項，即視為毀諾，請  台端確實依約履行。");
 			printRectCm(1.5, 12, 65, 20, "三、台端應繳款項請存入本行協商專戶如下：");
 			printRectCm(2.2, 13, 63, 20, "（一）收款銀行：新光銀行城內分行");
-			printRectCm(2.2, 14, 63, 20, "（二）收款帳號：	9510500 " + StringUtils.leftPad(iCustNo, 7, "0"));
+			printRectCm(2.2, 14, 63, 20, "（二）收款帳號：	9510500-" + StringUtils.leftPad(iCustNo, 7, "0"));
 			printRectCm(2.2, 15, 63, 20, "（三）收款人戶名：新光人壽保險股份有限公司");
 			printRectCm(2, 16, 63, 20, "四、台端倘於收到本通知函時已完成繳款，上述事項請免予處理。");
 			printCm(2.5, 18, "謹 此");
