@@ -250,14 +250,14 @@ BIND(#BTN1,click, {cmd=CHAIN; ntxcd=L1101; ntxbuf=#BUF1})
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,X,S,$)
-@V(7)V(8,0,38)
+@V(7)V(8,0,38)V(NL)
 
 !債務人通訊地之郵遞區號及地址 只能存38個全形中文字
 #CustComAddr=C,114,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,X,S,$)
-@V(7)V(8,0,38)
+@V(7)V(8,0,38)V(NL)
 
 !債務人戶籍電話
 #CustRegTelNo=X,16,I

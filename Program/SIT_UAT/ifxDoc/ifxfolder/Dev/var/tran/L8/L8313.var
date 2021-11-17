@@ -38,19 +38,20 @@ E(0,0)
 </sub>
 
 !---------- 交易畫面及個別交易變數宣告 ----------
-<sub type="DC" name="p1" layout="cols=3;screen.width=[400,100,300,200];printer.width=[20,20,20,20];order=1;">
+<sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,250,250];printer.width=[20,20,20,20];order=1;">
 [
-["[L8313]                                 (52)前置協商相關資料報送例外處理"],
+["[L8313]                                 (52)前置協商相關資料報送例外處理檔案"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 [#<->#,"#FdRcDate+協商申請日",#RcDate],
-[#<->#,"#FdBankCode1+同意報送債權機構代號1",#BankCode1,#BankCodeX1],[#<->#,"#FdDataCode1+同意報送檔案格式資料別1",#DataCode1,#DataCodeX1],
-[#<->#,"#FdBankCode2+同意報送債權機構代號2",#BankCode2,#BankCodeX2],[#<->#,"#FdDataCode2+同意報送檔案格式資料別2",#DataCode2,#DataCodeX2],
-[#<->#,"#FdBankCode3+同意報送債權機構代號3",#BankCode3,#BankCodeX3],[#<->#,"#FdDataCode3+同意報送檔案格式資料別3",#DataCode3,#DataCodeX3],
-[#<->#,"#FdBankCode4+同意報送債權機構代號4",#BankCode4,#BankCodeX4],[#<->#,"#FdDataCode4+同意報送檔案格式資料別4",#DataCode4,#DataCodeX4],
-[#<->#,"#FdBankCode5+同意報送債權機構代號5",#BankCode5,#BankCodeX5],[#<->#,"#FdDataCode5+同意報送檔案格式資料別5",#DataCode5,#DataCodeX5],
-[#<->#,"#FdChangePayDate+申請變更還款條件日",#ChangePayDate],[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
+["#FdBankCode1+同意報送債權機構代號1",#BankCode1,#BankCodeX1],["#FdDataCode1+同意報送檔案格式資料別1",#DataCode1,#DataCodeX1],
+["#FdBankCode2+同意報送債權機構代號2",#BankCode2,#BankCodeX2],["#FdDataCode2+同意報送檔案格式資料別2",#DataCode2,#DataCodeX2],
+["#FdBankCode3+同意報送債權機構代號3",#BankCode3,#BankCodeX3],["#FdDataCode3+同意報送檔案格式資料別3",#DataCode3,#DataCodeX3],
+["#FdBankCode4+同意報送債權機構代號4",#BankCode4,#BankCodeX4],["#FdDataCode4+同意報送檔案格式資料別4",#DataCode4,#DataCodeX4],
+["#FdBankCode5+同意報送債權機構代號5",#BankCode5,#BankCodeX5],["#FdDataCode5+同意報送檔案格式資料別5",#DataCode5,#DataCodeX5],
+[#<->#,"#FdChangePayDate+申請變更還款條件日",#ChangePayDate],
+[#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 
 #FdTranKey=X,2,L
@@ -196,15 +197,25 @@ T(2,@CustId,#L8r24CustId)
 T(2,@SubmitKey,#L8r24SubmitKey)
 E(0,@RcDate,#L8r24RcDate)
 T(2,@BankCode1,#L8r24BankCode1)
+T(2,@BankCodeX1,#L8r24BankCodeX1)
 T(2,@DataCode1,#L8r24DataCode1)
+T(H,@DataCodeX1,#DataCode1,#DataCodeHelp)
 T(2,@BankCode2,#L8r24BankCode2)
+T(2,@BankCodeX2,#L8r24BankCodeX2)
 T(2,@DataCode2,#L8r24DataCode2)
+T(H,@DataCodeX2,#DataCode2,#DataCodeHelp)
 T(2,@BankCode3,#L8r24BankCode3)
+T(2,@BankCodeX3,#L8r24BankCodeX3)
 T(2,@DataCode3,#L8r24DataCode3)
+T(H,@DataCodeX3,#DataCode3,#DataCodeHelp)
 T(2,@BankCode4,#L8r24BankCode4)
+T(2,@BankCodeX4,#L8r24BankCodeX4)
 T(2,@DataCode4,#L8r24DataCode4)
+T(H,@DataCodeX4,#DataCode4,#DataCodeHelp)
 T(2,@BankCode5,#L8r24BankCode5)
+T(2,@BankCodeX5,#L8r24BankCodeX5)
 T(2,@DataCode5,#L8r24DataCode5)
+T(H,@DataCodeX5,#DataCode5,#DataCodeHelp)
 E(0,@ChangePayDate,#L8r24ChangePayDate)
 E(0,@OutJcicTxtDate,#L8r24OutJcicTxtDate)
 ![下拉選單的值]
@@ -244,7 +255,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey_Tmp,2,s,$)
 @V(7)
-#SubmitKeyX=X,80,L
+#SubmitKeyX=X,40,L
 T(2,@RimJcicBankCode,#SubmitKey)
 RESET_RIM(#RimL8r01,L8R01)
 S(L8R01,1,#RimJcicBankCode)
@@ -270,6 +281,7 @@ C(5,#TranKey_Tmp,4,s,$)
 
 #RimL8r01{i}=X,1,S
 IF(#BankCode{i}=="",S,$)
+C(5,#TranKey_Tmp,4,S,$)
 T(2,@RimJcicBankCode,#BankCode{i})
 S(L8R01,1,#RimJcicBankCode)
 R(1,L8R01)
@@ -280,7 +292,7 @@ IF(#BankCode{i}!="",S,$)
 T(2,@BankCodeX{i},)
 
 ! 同意報送債權機構代號,債協機構中文名稱
-#BankCodeX{i}=X,80,L
+#BankCodeX{i}=X,40,L
 !IF(#BankCode{i}=="",S,$)
 
 ! 同意報送檔案格式資料別

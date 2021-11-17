@@ -3,8 +3,6 @@ package com.st1.itx.trade.L8;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -37,7 +35,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L8922 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8922.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -52,7 +49,7 @@ public class L8922 extends TradeBuffer {
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L8922 ");
+		this.info("active L8922 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料
@@ -65,8 +62,8 @@ public class L8922 extends TradeBuffer {
 		int iFAcDateStart = iAcDateStart + 19110000;
 		int iFAcDateEnd = iAcDateEnd + 19110000;
 		int iLevel = this.txBuffer.getTxCom().getTlrLevel();
-		logger.info("L8922 iFAcDate : " + iFAcDateStart + "~" + iFAcDateEnd);
-		logger.info("L8922 iLevel : " + iLevel);
+		this.info("L8922 iFAcDate : " + iFAcDateStart + "~" + iFAcDateEnd);
+		this.info("L8922 iLevel : " + iLevel);
 
 		int retxdate = 0;
 
@@ -106,7 +103,7 @@ public class L8922 extends TradeBuffer {
 
 				if (tMlaundryDetail.getManagerDate() != 0) {
 					retxdate = dateUtil.getbussDate(tMlaundryDetail.getManagerDate(), -4);
-					logger.info("延期交易日=" + retxdate);
+					this.info("延期交易日=" + retxdate);
 					// 延遲交易確認=依據[主管同意日期] >=入帳日＋4營業日
 					if (!(retxdate >= tMlaundryDetail.getEntryDate())) {
 						continue;
@@ -120,9 +117,9 @@ public class L8922 extends TradeBuffer {
 			case 1:
 				// 主管
 				// 經辦未輸入合理性,主管查不出來
-				logger.info("L8922 Rational" + tMlaundryDetail.getRational());
+				this.info("L8922 Rational" + tMlaundryDetail.getRational());
 				if (("").equals(tMlaundryDetail.getRational().trim())) {
-					logger.info("Rational 空白");
+					this.info("Rational 空白");
 					continue;
 				}
 				break;
@@ -160,7 +157,7 @@ public class L8922 extends TradeBuffer {
 			}
 
 			DateTime = this.parse.timeStampToString(tMlaundryDetail.getLastUpdate()); // 異動日期
-			logger.info("L8922 DateTime : " + DateTime);
+			this.info("L8922 DateTime : " + DateTime);
 			Date = FormatUtil.left(DateTime, 9);
 			occursList.putParam("OOUpdate", Date);
 

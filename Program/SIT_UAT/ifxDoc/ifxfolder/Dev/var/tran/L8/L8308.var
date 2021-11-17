@@ -40,7 +40,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,350,150];printer.width=[20,20,20,20];order=1;">
 [
-["[L8308]                                 (47)金融機構無擔保債務協議資料檔案"],
+["[L8308]                                 (47)金融機構無擔保債務協議資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
@@ -435,7 +435,7 @@ C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@LimitDate,#L8r18LimitDate),$)
 C(5,#TranKey,D,s,$)
 D(8)
-@A(DATE,0,#LimitDate)
+@V(7)A(DATE,0,#LimitDate)
 
 ![簽約完成日期]
 #SignDate=D,7,I
@@ -513,12 +513,12 @@ C(5,#GradeType,1,S,$)
 
 
 ![繳款帳號]
-#PayAccount=X,20,I
+#PayAccount=x,20,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@PayAccount,#L8r18PayAccount),$)
 C(5,#TranKey,D,s,$)
-@V(7)V(8,0,20)
+@V(7)V(8,0,20)V(NL)
 
 ![最大債權金融機構聲請狀送達地址]-可存入38個全形中文字
 #PostAddr=C,76,I
@@ -526,7 +526,7 @@ C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 C(5,#TranKey,D,T(2,@PostAddr,#L8r18PostAddr),$)
 C(5,#TranKey,D,s,$)
-@V(7)V(8,0,38)
+@V(7)V(8,0,38)V(NL)
 
 ![轉JCIC文字檔日期]
 #OutJcicTxtDate=D,7,L

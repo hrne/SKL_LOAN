@@ -25,6 +25,9 @@ public interface CdBuildingCostRepositoryHist extends JpaRepository<CdBuildingCo
   // CityCode = ,AND FloorLowerLimit <= 
   public Slice<CdBuildingCost> findAllByCityCodeIsAndFloorLowerLimitLessThanEqualOrderByFloorLowerLimitDesc(String cityCode_0, int floorLowerLimit_1, Pageable pageable);
 
+  // CityCode =
+  public Slice<CdBuildingCost> findAllByCityCodeIsOrderByFloorLowerLimitDesc(String cityCode_0, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

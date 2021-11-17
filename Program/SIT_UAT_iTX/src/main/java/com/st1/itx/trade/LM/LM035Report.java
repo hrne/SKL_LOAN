@@ -33,6 +33,7 @@ public class LM035Report extends MakeReport {
 	Parse parse;
 	
 	private static final BigDecimal million = new BigDecimal(1000000);
+	private static final BigDecimal hundred = new BigDecimal(100);
 
 	@Override
 	public void printTitle() {
@@ -156,7 +157,7 @@ public class LM035Report extends MakeReport {
 		int count = 1;
 		
 		for (Map<String, String> tLDVo : LDList) {
-			makeExcel.setValue(row, col, getBigDecimal(tLDVo.get("F5")), "0.00%", "C");
+			makeExcel.setValue(row, col, getBigDecimal(tLDVo.get("F5")).multiply(hundred).setScale(2) + "%", "C");
 			if (timesLeft == 0) {
 				// 最後一次輸出 (產表當年月份的資料)
 				makeExcel.setValue(row, col + 1, computeDivide(getBigDecimal(tLDVo.get("F2")), million, 2), "#,##0.00", "R");
@@ -179,7 +180,7 @@ public class LM035Report extends MakeReport {
 		
 		if (timesLeft == 0) {
 			// 最後一欄輸出 (產表當年月份時)
-			makeExcel.setValue(row, col + 1, formatAmt(total, 4, 6), "#,##0", "R");
+			makeExcel.setValue(row, col + 1, computeDivide(total, million, 2), "#,##0.00", "R");
 		}
 	}
 

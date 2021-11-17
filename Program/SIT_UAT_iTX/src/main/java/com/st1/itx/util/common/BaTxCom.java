@@ -85,6 +85,9 @@ public class BaTxCom extends TradeBuffer {
 // isAcLoanInt 是否利息提存
 	private boolean isAcLoanInt = false;
 
+// isEmptyLoanBaTxVo 是否放未計息餘額
+	private boolean isEmptyLoanBaTxVo = false;
+
 // 總數資料
 	private BigDecimal shortfall = BigDecimal.ZERO; // 累短收
 	private BigDecimal shortfallInterest = BigDecimal.ZERO; // 累短收 - 利息
@@ -218,6 +221,9 @@ public class BaTxCom extends TradeBuffer {
 		// isTermAdvance 是否為含未到期期款 ->含
 		this.isTermAdvance = true;
 
+		// isEmptyLoanBaTxVo 是否放未計息餘額
+		this.isEmptyLoanBaTxVo = false;
+
 		// 還款類別:02 與約定還本日期相同
 		if (iRepayType == 2) {
 			this.extraRepayAmt = iTxAmt; // 部分還款金額
@@ -337,6 +343,9 @@ public class BaTxCom extends TradeBuffer {
 
 		// isTermAdvance 是否含提前繳期款 ->不含(依會計日及批次預收期數計算)
 		this.isTermAdvance = false;
+
+		// isEmptyLoanBaTxVo 是否放未計息餘額
+		this.isEmptyLoanBaTxVo = true;
 
 		// 還款類別:02 大於等於約定還本金額
 		if (iRepayType == 2) {
@@ -461,6 +470,9 @@ public class BaTxCom extends TradeBuffer {
 		// isTermAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
 
+		// isEmptyLoanBaTxVo 是否放未計息餘額
+		this.isEmptyLoanBaTxVo = true;
+
 		// 未到期火險費用條件 ==> 1.續約保單起日 > 入帳月
 		isUnOpenfireFee = 1;
 
@@ -504,6 +516,9 @@ public class BaTxCom extends TradeBuffer {
 		// isTermAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
 
+		// isEmptyLoanBaTxVo 是否放未計息餘額
+		this.isEmptyLoanBaTxVo = false;
+
 		// 計算放款本息
 		repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, 01, BigDecimal.ZERO, iTerms, titaVo);
 
@@ -532,6 +547,9 @@ public class BaTxCom extends TradeBuffer {
 
 		// isTermAdvance 是否含提前繳期款
 		this.isTermAdvance = true;
+
+		// isEmptyLoanBaTxVo 是否放未計息餘額
+		this.isEmptyLoanBaTxVo = false;
 
 		//
 		repayLoan(iEntryDate, 0, iCustNo, iFacmNo, iBormNo, 01, BigDecimal.ZERO, 0, titaVo);
@@ -649,33 +667,34 @@ public class BaTxCom extends TradeBuffer {
 				switch (iRepayType) {
 				case 1: // 01-期款
 					if (iTerms == 0) {
-						// 應繳日
-						if (wkPayIntDate <= ln.getPrevPayIntDate() || wkPayIntDate <= ln.getDrawdownDate()) {
-							continue;
-						}
 						int wkPrevTermNo = 0;
 						int wkRepayTermNo = 0;
-						// 計算至上次繳息日之期數
-						if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
-							wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
-									ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
-						}
-						// 是否含提前繳期款
-						if (this.isTermAdvance) {
-							// 可回收期數 = 計算至入帳日/應繳日的應繳期數
-							wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
-									ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-									wkPayIntDate);
-
+						// 應繳日
+						if (wkPayIntDate <= ln.getPrevPayIntDate() || wkPayIntDate <= ln.getDrawdownDate()) {
+							wkTerms = 0;
 						} else {
-							// 可回收期數 = 可回收期數 + 批次預收期數
-							wkRepayTermNo = loanCom.getTermNo(
-									this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2,
-									ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
-									this.txBuffer.getTxCom().getTbsdy())
-									+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
+							// 計算至上次繳息日之期數
+							if (ln.getPrevPayIntDate() > ln.getDrawdownDate()) {
+								wkPrevTermNo = loanCom.getTermNo(2, ln.getFreqBase(), ln.getPayIntFreq(),
+										ln.getSpecificDate(), ln.getSpecificDd(), ln.getPrevPayIntDate());
+							}
+							// 是否含提前繳期款
+							if (this.isTermAdvance) {
+								// 可回收期數 = 計算至入帳日/應繳日的應繳期數
+								wkRepayTermNo = loanCom.getTermNo(wkPayIntDate >= ln.getMaturityDate() ? 1 : 2,
+										ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+										wkPayIntDate);
+
+							} else {
+								// 可回收期數 = 可回收期數 + 批次預收期數
+								wkRepayTermNo = loanCom.getTermNo(
+										this.txBuffer.getTxCom().getTbsdy() >= ln.getMaturityDate() ? 1 : 2,
+										ln.getFreqBase(), ln.getPayIntFreq(), ln.getSpecificDate(), ln.getSpecificDd(),
+										this.txBuffer.getTxCom().getTbsdy())
+										+ this.txBuffer.getSystemParas().getPreRepayTermsBatch();
+							}
+							wkTerms = wkRepayTermNo - wkPrevTermNo;
 						}
-						wkTerms = wkRepayTermNo - wkPrevTermNo;
 					} else {
 						wkTerms = iTerms;
 					}
@@ -683,8 +702,8 @@ public class BaTxCom extends TradeBuffer {
 					// 計息參數
 					loanCalcRepayIntCom = loanSetRepayIntCom.setRepayInt(ln, 1, 0, 0, iEntryDate, titaVo);
 
-					// 無可計息
-					if (wkTerms == 0) {
+					// 無可計息， isEmptyLoanBaTxVo 是否放未計息餘額
+					if (wkTerms == 0 && isEmptyLoanBaTxVo) {
 						emptyLoanBaTxVo(iEntryDate, iRepayType, iCustNo, ln);
 						break;
 					}
@@ -846,7 +865,6 @@ public class BaTxCom extends TradeBuffer {
 
 		baTxVo.setUnPaidAmt(
 				baTxVo.getPrincipal().add(baTxVo.getInterest()).add(baTxVo.getDelayInt()).add(baTxVo.getBreachAmt())); // 未收金額
-		baTxVo.setAcctCode(loanCom.setIntAcctCode(loanCalcRepayIntCom.getAcctCode())); // 業務科目
 		baTxVo.setDbCr("C"); // 借貸別
 		baTxVo.setAcctAmt(BigDecimal.ZERO); // 出帳金額
 		baTxVo.setLoanBal(this.loanBal); // 放款餘額(還款前、只放第一期)
@@ -878,6 +896,7 @@ public class BaTxCom extends TradeBuffer {
 	}
 
 	private void emptyLoanBaTxVo(int iEntryDate, int iRepayType, int iCustNo, LoanBorMain ln) {
+		this.info("BaTxCom EmptyLoanBaTxVo ...");
 		baTxVo = new BaTxVo();
 		baTxVo.setDataKind(2); // 2.本金利息
 		baTxVo.setRepayType(iRepayType); // 還款類別
@@ -886,9 +905,10 @@ public class BaTxCom extends TradeBuffer {
 		baTxVo.setFacmNo(ln.getFacmNo()); // 額度編號
 		baTxVo.setBormNo(ln.getBormNo()); // 撥款序號
 		baTxVo.setRvNo(" "); // 銷帳編號
-		baTxVo.setAcctCode(loanCom.setIntAcctCode(loanCalcRepayIntCom.getAcctCode())); // 業務科目
+		baTxVo.setAcctCode(loanCalcRepayIntCom.getAcctCode()); // 業務科目
 		baTxVo.setLoanBal(this.loanBal); // 放款餘額(還款前、只放第一期)
 		this.loanBal = BigDecimal.ZERO;
+		this.baTxList.add(baTxVo);
 	}
 
 	/* 設定費用還款順序 */
@@ -1108,7 +1128,9 @@ public class BaTxCom extends TradeBuffer {
 		// F10 帳管費
 		// TMI 火險保費
 		// F29 契變手續費
-
+		// F10 帳管費/手續費
+		// F12 聯貸件
+		// F27 聯貸管理費
 // 銷帳科目記號ReceivableFlag = 4-短繳期金
 		// Z10 短期擔保放款 310 短期擔保放款
 		// Z20 中期擔保放款 320 中期擔保放款
@@ -1199,8 +1221,8 @@ public class BaTxCom extends TradeBuffer {
 							} else {
 								switch (rv.getAcctCode()) {
 								case "F10": // 帳管費/手續費
-								case "F12": // 帳管費/手續費 F10 F12 F27
-								case "F27": // 帳管費/手續費 F10 F12 F27
+								case "F12": // 聯貸件
+								case "F27": // 聯貸管理費
 									baTxVo.setRepayType(4); // 04-帳管費/手續費
 									baTxVo.setDataKind(1); // 1.應收費用+未收費用+短繳期金
 									this.acctFee = this.acctFee.add(rv.getRvBal());

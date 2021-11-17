@@ -2,8 +2,6 @@ package com.st1.itx.trade.L8;
 
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -34,7 +32,6 @@ import com.st1.itx.util.data.DataLog;
  * @version 1.0.0
  */
 public class L8201 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8201.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -57,7 +54,7 @@ public class L8201 extends TradeBuffer {
 		// 取得輸入資料
 		int iFuncCode = this.parse.stringToInteger(titaVo.getParam("FuncCode"));
 		String iBusinessType = titaVo.getParam("BusinessType");
-		logger.info("L8201 iBusinessType : " + iBusinessType);
+		this.info("L8201 iBusinessType : " + iBusinessType);
 
 		// 檢查輸入資料
 		if (!(iFuncCode >= 1 && iFuncCode <= 5)) {

@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -39,7 +37,6 @@ import com.st1.itx.util.parse.Parse;
  */
 
 public class L8923 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L8923.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -57,7 +54,7 @@ public class L8923 extends TradeBuffer {
 	
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
-		logger.info("active L8923 ");
+		this.info("active L8923 ");
 		this.totaVo.init(titaVo);
 
 		// 取得輸入資料

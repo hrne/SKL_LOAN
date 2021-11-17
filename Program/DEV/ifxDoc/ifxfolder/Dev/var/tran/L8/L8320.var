@@ -363,7 +363,7 @@ D(8)
 IF(#ChaRepayFirstDate>=#ChaRepayEndDate,$,V(P,變更還款條件首期應繳款日需大於或等於變更還款條件簽約完成日期))
 
 !繳款帳號-20字元
-#PayAccount=X,40,I
+#PayAccount=x,40,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
 @V(7)V(8,0,20)
@@ -372,7 +372,7 @@ C(5,#TranKey_Tmp,4,s,$)
 #PostAddr=X,76,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
-@V(8,0,38)
+@V(8,0,38)V(NL)
 
 !月付金
 #MonthPayAmt=M,9,I

@@ -97,12 +97,13 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             WHERE ML.\"LoanBal\" > 0 ";
 		sql += "             GROUP BY FAC.\"CustNo\" ";
 		sql += "           ) CUSTFAC ON CUSTFAC.\"CustNo\" = CM.\"CustNo\" ";
-		sql += " LEFT JOIN ( SELECT CRD.\"RelId\" ";
-		sql += "                  , CRM.\"CustRelName\" || '關係企業' AS \"GroupName\" ";
-		sql += "                  , ROUND(GP.\"GroupLineAmt\" / CDV.\"Totalequity\" , 8) ";
+		sql += " LEFT JOIN ( SELECT RM.\"CustNo\" ";
+		sql += "                  , CRM.\"CustName\" || '關係企業' AS \"GroupName\" ";
+		sql += "                  , ROUND((FAC.\"LineAmt\" + GP.\"GroupLineAmt\") / CDV.\"Totalequity\" , 8) ";
 		sql += "                                                   AS \"GroupPercentage\" ";
-		sql += "             FROM \"CustRelMain\" CRM ";
-		sql += "             LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
+		sql += "             FROM \"ReltMain\" RM ";
+		sql += "             LEFT JOIN \"CustMain\" CRM ON CRM.\"CustNo\" = RM.\"CustNo\" ";
+		sql += "             LEFT JOIN \"CustMain\" CRD ON CRD.\"CustUKey\" = RM.\"ReltUKey\" ";
 		sql += "             LEFT JOIN \"CdVarValue\" CDV ON CDV.\"YearMonth\" = :inputYearMonth ";
 		sql += "             LEFT JOIN ( SELECT CM.\"CustId\" ";
 		sql += "                               , SUM(FAC.\"LineAmt\") AS \"LineAmt\" ";
@@ -121,12 +122,13 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                         WHERE TRUNC(FAC.\"FirstDrawdownDate\" / 100) <= :inputYearMonth ";
 		sql += "                           AND ML.\"LoanBal\" > 0 ";
 		sql += "                         GROUP BY CM.\"CustId\" ";
-		sql += "                       ) FAC ON FAC.\"CustId\" = CRD.\"RelId\" ";
+		sql += "                       ) FAC ON FAC.\"CustId\" = CRM.\"CustId\" ";
 		sql += "             LEFT JOIN ( "; // -- 計算整組餘額
-		sql += "                         SELECT CRM.\"Ukey\" ";
+		sql += "                         SELECT RM.\"CustNo\" ";
 		sql += "                              , SUM(NVL(FAC.\"LineAmt\",0)) AS \"GroupLineAmt\" "; // -- 放款餘額
-		sql += "                         FROM \"CustRelMain\" CRM ";
-		sql += "                         LEFT JOIN \"CustRelDetail\" CRD ON CRD.\"CustRelMainUKey\" = CRM.\"Ukey\" ";
+		sql += "                         FROM \"ReltMain\" RM ";
+		sql += "                         LEFT JOIN \"CustMain\" CRM ON CRM.\"CustNo\" = RM.\"CustNo\" ";
+		sql += "                         LEFT JOIN \"CustMain\" CRD ON CRD.\"CustUKey\" = RM.\"ReltUKey\" ";
 		sql += "                         LEFT JOIN ( SELECT CM.\"CustId\" ";
 		sql += "                                          , SUM(FAC.\"LineAmt\") AS \"LineAmt\" ";
 		sql += "                                     FROM \"FacMain\" FAC  ";
@@ -144,16 +146,16 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                                     WHERE TRUNC(FAC.\"FirstDrawdownDate\" / 100) <= :inputYearMonth ";
 		sql += "                                       AND ML.\"LoanBal\" > 0 ";
 		sql += "                                     GROUP BY CM.\"CustId\" ";
-		sql += "                                   ) FAC ON FAC.\"CustId\" = CRD.\"RelId\" ";
-		sql += "                         WHERE LENGTHB(CRM.\"CustRelId\") = 8 "; // -- 篩選關係企業
-		sql += "                           AND LENGTHB(CRD.\"RelId\") = 8 "; // -- 篩選關係企業
-		sql += "                         GROUP BY CRM.\"Ukey\" ";
-		sql += "                       ) GP ON GP.\"Ukey\" = CRM.\"Ukey\" ";
-		sql += "             WHERE LENGTHB(CRM.\"CustRelId\") = 8 "; // -- 篩選關係企業
-		sql += "               AND LENGTHB(CRD.\"RelId\") = 8 "; // -- 篩選關係企業
+		sql += "                                   ) FAC ON FAC.\"CustId\" = CRD.\"CustId\" ";
+		sql += "                         WHERE LENGTHB(CRM.\"CustId\") = 8 "; // -- 篩選關係企業
+		sql += "                           AND LENGTHB(CRD.\"CustId\") = 8 "; // -- 篩選關係企業
+		sql += "                         GROUP BY RM.\"CustNo\" ";
+		sql += "                       ) GP ON GP.\"CustNo\" = RM.\"CustNo\" ";
+		sql += "             WHERE LENGTHB(CRM.\"CustId\") = 8 "; // -- 篩選關係企業
+		sql += "               AND LENGTHB(CRD.\"CustId\") = 8 "; // -- 篩選關係企業
 		sql += "               AND NVL(FAC.\"LineAmt\",0) > 0 ";
-		sql += "               AND GP.\"GroupLineAmt\" > NVL(FAC.\"LineAmt\",0) "; // -- 兩筆以上才進表
-		sql += "           ) GP ON GP.\"RelId\" = CM.\"CustId\" ";
+		sql += "               AND NVL(GP.\"GroupLineAmt\",0) + NVL(FAC.\"LineAmt\",0)> NVL(FAC.\"LineAmt\",0) "; // -- 兩筆以上才進表
+		sql += "           ) GP ON GP.\"CustNo\" = CM.\"CustNo\" ";
 		sql += " WHERE CM.\"EntCode\" = '1' "; // -- 企金別為1
 		sql += "   AND ML.\"LoanBal\" > 0 "; // -- 當月底有放款餘額
 		sql += " ORDER BY Rating ";
@@ -172,7 +174,7 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("inputYearMonth", inputYearMonth);
 		query.setParameter("entLoanBalLimit", entLoanBalLimit);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> queryLoanBal(int inputYearMonth, TitaVo titaVo) {
@@ -209,7 +211,7 @@ public class LM048ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query = em.createNativeQuery(sql);
 		query.setParameter("inputYearMonth", inputYearMonth);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 }

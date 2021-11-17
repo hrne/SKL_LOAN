@@ -162,6 +162,10 @@ public class BS401 extends TradeBuffer {
 					break;
 
 				case 1: // 1:刪除
+					if ("5".equals(tDetail.getProcStsCode()) || "6".equals(tDetail.getProcStsCode())
+							|| "7".equals(tDetail.getProcStsCode())) {
+						throw new LogicException(titaVo, "E0007", "BS401 update batxDetail 已入帳 ");
+					}
 					ProcessCnt++;
 					tTempVo = tTempVo.getVo(tDetail.getProcNote());
 					tTempVo.putParam("StsCode", tDetail.getProcStsCode());

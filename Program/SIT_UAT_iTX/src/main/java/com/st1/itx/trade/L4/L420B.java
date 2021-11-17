@@ -41,12 +41,16 @@ public class L420B extends TradeBuffer {
 		this.info("active L420B ");
 		this.totaVo.init(titaVo);
 
-		// 處理代碼 0:入帳 1:刪除 2:訂正 
+		// 處理代碼 0:入帳 1:刪除 2:訂正
 		int functionCode = parse.stringToInteger(titaVo.getParam("FunctionCode"));
 
 		// 會計日期、批號
 		int iAcDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		String iBatchNo = titaVo.getParam("BatchNo");
+		String iReconCode = "";
+		if (titaVo.get("ReconCode") != null) {
+			iReconCode = titaVo.getParam("ReconCode").trim();
+		}
 
 		// 檢查作業狀態
 		checkHead(functionCode, iAcDate, iBatchNo, titaVo);
@@ -80,23 +84,12 @@ public class L420B extends TradeBuffer {
 
 		String batxExeCode = tBatxHead.getBatxExeCode();
 
-		if (functionCode == 0) {
-			if ("1".equals(batxExeCode) || "4".equals(batxExeCode) || "8".equals(batxExeCode)) {
-				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
-			}
-		}
-		if (functionCode == 1) {
-			if ("4".equals(batxExeCode) || "8".equals(batxExeCode)) {
-				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
-			}
-		}
-		if (functionCode == 2) {
-			if ("8".equals(batxExeCode)) {
-				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
-			}
-		}
 		if (functionCode == 4) {
 			if (!"8".equals(batxExeCode)) {
+				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
+			}
+		} else {
+			if ("8".equals(batxExeCode)) {
 				throw new LogicException("E0010", "作業狀態不符"); // E0010 功能選擇錯誤
 			}
 		}

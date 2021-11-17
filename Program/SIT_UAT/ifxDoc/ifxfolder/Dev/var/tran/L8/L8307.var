@@ -40,7 +40,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[350,150,350,150];printer.width=[20,20,20,20];order=1;">
 [
-["[L8307]                                 (46)結案通知資料檔案格式"],
+["[L8307]                                 (46)結案通知資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
@@ -262,7 +262,7 @@ T(H,#CloseCode,#CloseCodeHelp)
 
 ! 會計日(民國年)
 #SDate=D,7,S
-T(1,#SYSDATE,2,8)
+T(1,#SYSCDATE,2,7)
 
 !結案日期
 #CloseDate=D,7,I

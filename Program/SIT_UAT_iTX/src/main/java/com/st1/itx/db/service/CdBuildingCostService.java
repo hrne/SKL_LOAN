@@ -48,6 +48,17 @@ public interface CdBuildingCostService {
   public Slice<CdBuildingCost> getCost(String cityCode_0, int floorLowerLimit_1, int index, int limit, TitaVo... titaVo);
 
   /**
+   * CityCode =
+   *
+   * @param cityCode_0 cityCode_0
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice CdBuildingCost CdBuildingCost of List
+   */
+  public Slice<CdBuildingCost> findCityCode(String cityCode_0, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By CdBuildingCost
    * 
    * @param cdBuildingCostId key

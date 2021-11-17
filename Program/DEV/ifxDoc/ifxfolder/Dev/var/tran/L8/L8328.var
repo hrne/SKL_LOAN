@@ -40,7 +40,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=3;screen.width=[250,250,300,200];printer.width=[20,20,20,20];order=1;">
 [
-["[L8328]                                 (448)前置調解無擔保債務分配表資料"],
+["[L8328]                                 (448)前置調解無擔保債務還款分配資料"],
 [#<->#,"#FdTranKey+交易代碼",#TranKey,#TranKeyX],
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],

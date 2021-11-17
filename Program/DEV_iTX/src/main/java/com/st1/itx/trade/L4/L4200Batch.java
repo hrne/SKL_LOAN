@@ -1781,13 +1781,13 @@ public class L4200Batch extends TradeBuffer {
 		tBatxHead.setBatxStsCode("0");
 		tBatxHead.setTitaTlrNo(titaVo.getTlrNo());
 		tBatxHead.setTitaTxCd(titaVo.getTxcd());
-
+		this.info("Insert BatxHead !!!");
 		try {
-			this.info("Insert BatxHead !!!");
 			batxHeadService.update(tBatxHead, titaVo);
 		} catch (DBException e) {
 			throw new LogicException("E0007", "L4200Batch BatxHead update " + e.getErrorMsg());
 		}
+		this.info("Insert BatxHead end !!!");
 		sendMsg = "批號: " + iBatchNo + "上傳處理完成，總筆數=" + totCnt + ", 總金額 =" + totAmt + "。";
 
 		// 檢核今日、前兩日，筆數、金額

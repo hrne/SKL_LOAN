@@ -47,7 +47,7 @@ E(0,0)
 ["#FdApplyDate+申請日期",#ApplyDate],["#FdCloseDate+結案日期",#CloseDate],
 [#<->#,"#FdCloseMark+結案原因",#CloseMark,#CloseMarkX],
 [#<->#,"#FdPhoneNo+通訊電話",#PhoneNo],
-[#<->#,"#FdTranKey","室內電話與行動電話請擇一填報。室內電話建議格式：02－28225252","＃1688。行動電話建議","格式：0951－123456"],
+[#<->#,"#FdTranKey","室內電話與行動電話請擇一填報。<font color=red>室內電話建議格式：02－28225252","＃1688。行動電話建議","格式：0951－123456"],
 [#<->#,"#FdOutJcicTxtDate+轉JCIC文字檔日期",#OutJcicTxtDate],
 ]
 !---------- AP Button AREA ----------

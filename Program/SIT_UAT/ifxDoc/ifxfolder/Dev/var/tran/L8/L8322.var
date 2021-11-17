@@ -157,12 +157,11 @@ C(5,#TranKey_Tmp,2,$,S)
 T(1,@Ukey,#NTXBUF,3,32)
 K(MODIFYBUTTON,異動)
 T(H,@TranKeyX,#TranKey,#TranKeyHelp)
-T(F,@AgreeDate,1)T(F,@StartDate,1)T(F,@RemindDate,1)T(F,@ApplyType,1)T(F,@ReportYn,1)
+T(F,@AgreeDate,1)T(F,@StartDate,1)T(F,@RemindDate,1)T(F,@ReportYn,1)
 T(F,@NotBankId1,1)T(F,@NotBankId2,1)T(F,@NotBankId3,1)T(F,@NotBankId4,1)T(F,@NotBankId5,1)T(F,@NotBankId6,1)
 T(2,@FdAgreeDate,*)
 T(2,@FdStartDate,*)
 T(2,@FdRemindDate,*)
-T(2,@FdApplyType,*)
 T(2,@FdReportYn,*)
 
 ! 查詢進入
@@ -288,6 +287,7 @@ IF(#CDate >= #ApplyDate ,$, V(P,調解申請日不得大於資料報送日))
 #ApplyType=X,1,I
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)
+C(5,#TranKey_Tmp,2,s,$)
 HELP(#ApplyTypeHelp)
 @V(H,#ApplyTypeHelp)
 

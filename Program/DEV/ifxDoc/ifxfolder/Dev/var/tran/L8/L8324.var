@@ -46,8 +46,8 @@ E(0,0)
 [#<->#,"#FdCustId+債務人IDN",#CustId,#CustIdX],
 [#<->#,"#FdApplyDate+調解申請日",#ApplyDate],
 [#<->#,"#FdCourtCode+受理調解機構代號",#CourtCode,#CourtCodeX],
-[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
 [#<->#,"#FdIsMaxMain+是否為最大債權金融機構報送",#IsMaxMain,#IsMaxMainX],
+[#<->#,"#FdMaxMainCode+最大債權金融機構代號",#MaxMainCode,#MaxMainCodeX],
 [#<->#,"#FdAccount+帳號",#Account],
 [#<->#,"#FdGuarantyType+擔保品類別",#GuarantyType,#GuarantyTypeX],
 [#<->#,"#FdLoanAmt+原借款金額",#LoanAmt],
@@ -307,21 +307,6 @@ HELP(#CourtCodeHelp)
 #CourtCodeX=X,80,L
 T(H,#CourtCode,#CourtCodeHelp)
 
-!最大債權金融機構代號
-#MaxMainCode=X,3,I
-C(5,#TranKey_Tmp,2,s,$)
-C(5,#TranKey_Tmp,5,s,$)
-C(5,#TranKey_Tmp,4,s,$)
-@V(7)
-
-#MaxMainCodeX=X,50,L
-T(2,@RimJcicBankCode,#MaxMainCode)
-RESET_RIM(#RimL8r01,L8R01)
-S(L8R01,1,#RimJcicBankCode)
-R(1,L8R01)
-T(2,@MaxMainCodeX,#L8r01JcicBankName)
-
-
 !是否為最大債權金融機構報送
 #IsMaxMain=X,1,I
 C(5,#TranKey_Tmp,2,s,$)
@@ -333,12 +318,29 @@ C(5,#TranKey,D,s,$)
 C(5,#TranKey,X,s,$)
 HELP(#YesNoHelp)
 @V(H,#YesNoHelp)
-
+C(5,#IsMaxMain,Y,T(2,@FdMaxMainCode, )T(F,@MaxMainCode,0),T(2,@FdMaxMainCode,*)T(F,@MaxMainCode,1))
 #IsMaxMainX=X,2,L
 T(H,@IsMaxMainX,#IsMaxMain,#YesNoHelp)
 
+!最大債權金融機構代號
+#MaxMainCode=X,3,I
+C(5,#TranKey_Tmp,2,s,$)
+C(5,#TranKey_Tmp,5,s,$)
+C(5,#TranKey_Tmp,4,s,$)
+C(5,#IsMaxMain,Y,T(2,@MaxMainCode,458),$)
+C(5,#IsMaxMain,Y,s,$)
+@V(7)
+
+#MaxMainCodeX=X,50,L
+T(2,@RimJcicBankCode,#MaxMainCode)
+RESET_RIM(#RimL8r01,L8R01)
+S(L8R01,1,#RimJcicBankCode)
+R(1,L8R01)
+T(2,@MaxMainCodeX,#L8r01JcicBankName)
+
+
 !帳號
-#Account=X,60,I
+#Account=x,60,I
 C(5,#TranKey_Tmp,2,s,$)
 C(5,#TranKey_Tmp,5,s,$)
 C(5,#TranKey_Tmp,4,s,$)

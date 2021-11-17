@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:batch="http://www.springframework.org/schema/batch"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:jdbc="http://www.springframework.org/schema/jdbc" xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/batch http://www.springframework.org/schema/batch/spring-batch.xsd
+		http://www.springframework.org/schema/jdbc http://www.springframework.org/schema/jdbc/spring-jdbc-4.3.xsd
+		http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.3.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<context:property-placeholder location="classpath:spring/batch/batch.properties" />
+
+	<!-- 第一次运行打开下面的注释,即可自动创建spring-batch相关表 <jdbc:initialize-database data-source="dataSource"> <jdbc:script location="${batch.schema_drop.script}" /> <jdbc:script location="${batch.schema.script}" /> </jdbc:initialize-database> 
+		<batch:job-repository id="jobRepository" data-source="dataSource" transaction-manager="transactionManagerBatch" isolation-level-for-create="SERIALIZABLE" table-prefix="ITX_BATCH_" /> <task:executor id="taskExecutor" 
+		pool-size="50" /> <bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher"> <property name="jobRepository" ref="jobRepository" /> </bean> -->
+
+	
+	<batch:job-repository id="jobRepository" data-source="dataSource" transaction-manager="transactionManager" isolation-level-for-create="DEFAULT" table-prefix="ITX_BATCH_" />
+
+	<bean id="jobLauncher" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+	</bean>
+
+	<bean id="jobLauncherAsync" class="org.springframework.batch.core.launch.support.SimpleJobLauncher">
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="taskExecutor" ref="taskExecutor" />
+	</bean>
+	
+	<bean id="jobRegistry" class="org.springframework.batch.core.configuration.support.MapJobRegistry" />
+	
+	<bean class="org.springframework.batch.core.configuration.support.JobRegistryBeanPostProcessor">
+		<property name="jobRegistry" ref="jobRegistry" />
+	</bean>
+
+	<bean id="jobExplorer" class="org.springframework.batch.core.explore.support.JobExplorerFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<bean id="jobOperator" class="org.springframework.batch.core.launch.support.SimpleJobOperator">
+		<property name="jobExplorer" ref="jobExplorer">
+		</property>
+		<property name="jobRepository" ref="jobRepository" />
+		<property name="jobRegistry" ref="jobRegistry" />
+		<property name="jobLauncher" ref="jobLauncher" />
+	</bean>
+	
+	<task:executor id="taskExecutor"  keep-alive="3600" pool-size="25-50" queue-capacity="10" />
+
+  <!--
+  <tx:annotation-driven transaction-manager="transactionManagerb" proxy-target-class="true" />
+	<bean id="jobExecListener" class="com.st1.itx.batch.listener.JobExecListener" /> 
+	-->
+	<batch:step id="parentStep" abstract="true">
+		<batch:listeners>
+			<batch:listener ref="chunkExecListener" />
+			<batch:listener ref="stepExecListener" />
+		</batch:listeners>
+	</batch:step>
+
+	<batch:job id="parentJob" restartable="true" abstract="true">
+		<batch:listeners>
+			<batch:listener ref="jobExecListener" />
+		</batch:listeners>
+	</batch:job>
+
+   <!--
+	 <import resource="file:${itx_Config}/spring/batch/jobFlow.xml" />
+	 -->
+	 
+   <!-- 連線環境用  -->
+   <import resource="file:${itx_Config}/spring/batch/eodFlow.xml" />
+   <import resource="file:${itx_Config}/spring/batch/eomFlow.xml" />
+   <import resource="file:${itx_Config}/spring/batch/eoyFlow.xml" />
+   <import resource="file:${itx_Config}/spring/batch/batchRpt.xml" />
+   <import resource="file:${itx_Config}/spring/batch/batchJcic.xml" />
+   <import resource="file:${itx_Config}/spring/batch/jcicFlow.xml" />
+  
+   <!-- 本機測試用  -->
+   <!--
+   <import resource="classpath:spring/batch/eodFlow.xml" />
+   <import resource="classpath:spring/batch/eomFlow.xml" />
+   <import resource="classpath:spring/batch/eoyFlow.xml" />
+   <import resource="classpath:spring/batch/batchRpt.xml" />
+   <import resource="classpath:spring/batch/batchJcic.xml" />
+   -->
+
+</beans>
