@@ -2,7 +2,6 @@ package com.st1.itx.trade.LM;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,7 @@ public class LM070Report extends MakeReport {
 		this.info("LM070Report exec");
 
 		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM070", "介紹人加碼獎勵津貼明細", "LM070介紹人加碼獎勵津貼明細",
-				"介紹人加碼獎勵津貼明細.xlsx", "Q2573_13");
+				"LM070_底稿_介紹人加碼獎勵津貼明細.xlsx", "Q2573_13");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
@@ -78,11 +77,11 @@ public class LM070Report extends MakeReport {
 						break;
 					default:
 						// 戶號(數字右靠)
-						if (tLDVo.get(fdnm).equals("")) {
-							makeExcel.setValue(row, i + 1, 0);
-						} else {
-							makeExcel.setValue(row, i + 1, new BigDecimal(tLDVo.get(fdnm)));
-						}
+//						if (tLDVo.get(fdnm).equals("")) {
+//							makeExcel.setValue(row, i + 1, 0);
+//						} else {
+						makeExcel.setValue(row, i + 1, tLDVo.get(fdnm));
+//						}
 						break;
 					}
 				}

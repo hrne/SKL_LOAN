@@ -255,7 +255,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql +=  "                ) TMP" ; 
 			sql +=  "           WHERE TMP.\"Seq\" <= 1" ; 
 			sql +=  "          ) CTN ON CTN.\"CustUKey\" = CM.\"CustUKey\"" ; 
-			sql +=  "  WHERE NVL(BKD.\"ReturnCode\",'00') != '00'" ; 
+			sql +=  "  WHERE NVL(BKD.\"ReturnCode\",' ') != ' '" ; 
 			sql +=  "  AND BKD.\"EntryDate\" = :inputEntryDate" ; 
 			sql +=  "  ORDER BY BKD.\"RepayBank\"    " ; 
 			sql +=  "       , BKD.\"AcctCode\"     " ; 
@@ -276,7 +276,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql +=  "     SELECT COUNT(1) AS \"Counts\"" ; 
 			sql +=  "          , SUM(BKD.\"RepayAmt\") AS \"Total\"" ; 
 			sql +=  "     FROM \"BankDeductDtl\" BKD" ; 
-			sql +=  "     WHERE NVL(BKD.\"ReturnCode\",'00') != '00'" ; 
+			sql +=  "     WHERE NVL(BKD.\"ReturnCode\",' ') != ' '" ; 
 			sql +=  "       AND BKD.\"EntryDate\" = :inputEntryDate" ; 
 			sql +=  "  )" ; 
 			sql +=  "  , BKDCustNo AS (" ; 

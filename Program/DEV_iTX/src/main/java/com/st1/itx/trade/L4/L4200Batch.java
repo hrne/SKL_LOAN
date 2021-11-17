@@ -1366,12 +1366,10 @@ public class L4200Batch extends TradeBuffer {
 						procStsCode = "1";
 					} else {
 						procCode = "00000";
-						chequeSuccCnt = chequeSuccCnt + 1;
-						chequeSuccAmt = chequeSuccAmt.add(chequeAmt);
 						// update LoanCheque
 						LoanCheque t2LoanCheque = loanChequeService.holdById(tLoanCheque.getLoanChequeId(), titaVo);
 						t2LoanCheque.setStatusCode("4");
-						t2LoanCheque.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")) + 19110000);
+						t2LoanCheque.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")));
 						try {
 							loanChequeService.update(t2LoanCheque, titaVo);
 						} catch (DBException e) {
@@ -1413,7 +1411,7 @@ public class L4200Batch extends TradeBuffer {
 //						04.支票兌現
 						tBatxDetail.setRepayCode(4);
 						tBatxDetail.setFileName(filePath4.substring(filePath4.indexOf("mortgage")));
-						tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")) + 19110000);
+						tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")));
 						tBatxDetail.setCustNo(tLoanCheque.getCustNo());
 						tBatxDetail.setFacmNo(tAcReceivable.getFacmNo());
 						tBatxDetail.setRvNo(rvno);
@@ -1456,7 +1454,7 @@ public class L4200Batch extends TradeBuffer {
 //					04.支票兌現
 					tBatxDetail.setRepayCode(4);
 					tBatxDetail.setFileName(filePath4.substring(filePath4.indexOf("mortgage")));
-					tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")) + 19110000);
+					tBatxDetail.setEntryDate(parse.stringToInteger(tempOccursList.get("EntryDate")));
 					if (tLoanCheque != null) {
 						tBatxDetail.setCustNo(tLoanCheque.getCustNo());
 						tBatxDetail.setRepayType(parse.stringToInteger(tLoanCheque.getUsageCode()));
@@ -1555,6 +1553,28 @@ public class L4200Batch extends TradeBuffer {
 				}
 				BankDeductDtl tBankDeductDtl = bankDeductDtlService.holdById(tB, titaVo);
 				tBankDeductDtl.setReturnCode(returnCode);
+				// 火險單
+				if (tBankDeductDtl.getRepayType() == 5) {
+					TempVo fTempVo = new TempVo();
+					fTempVo = fTempVo.getVo(tBankDeductDtl.getJsonFields());
+					if (fTempVo.getParam("InsuDate") == null) {
+						sAcReceivable = acReceivableService.useL2062Eq("F09", tBankDeductDtl.getCustNo(),
+								tBankDeductDtl.getFacmNo(), tBankDeductDtl.getFacmNo(), 0, 0, 0, Integer.MAX_VALUE,
+								titaVo);
+						if (sAcReceivable == null) {
+							sAcReceivable = acReceivableService.useL2062Eq("TMI", tBankDeductDtl.getCustNo(),
+									tBankDeductDtl.getFacmNo(), tBankDeductDtl.getFacmNo(), 0, 0, 0, Integer.MAX_VALUE,
+									titaVo);
+						}
+						lAcReceivable = sAcReceivable == null ? null : sAcReceivable.getContent();
+						if (lAcReceivable != null) {
+							fTempVo.putParam("InsuDate", lAcReceivable.get(0).getOpenAcDate());
+							fTempVo.putParam("InsuNo", lAcReceivable.get(0).getRvNo());
+							tBankDeductDtl.setJsonFields(fTempVo.getJsonString());
+						}
+					}
+				}
+
 				try {
 					bankDeductDtlService.update(tBankDeductDtl, titaVo);
 				} catch (DBException e) {
@@ -1708,7 +1728,7 @@ public class L4200Batch extends TradeBuffer {
 				checkFlag = false;
 				break;
 			}
-			if ((Rmtfkind +bankDeductKind + empDeductKind + mortgageKind) > 1) {
+			if ((Rmtfkind + bankDeductKind + empDeductKind + mortgageKind) > 1) {
 				sendMsg = sendMsg + "，需按來源(匯款轉帳，銀行扣款、員工扣薪、支票兌現)，分開上傳。";
 				checkFlag = false;
 			}
@@ -1729,7 +1749,8 @@ public class L4200Batch extends TradeBuffer {
 					if ("8".equals(tBatxHead.getBatxExeCode())) {
 						checkFlag = true;
 					} else {
-						sendMsg = sendMsg + removeDot(filename) + "，相同檔名已存在，需先刪除此批號 : " + lBatxDetail.get(0).getBatchNo();
+						sendMsg = sendMsg + removeDot(filename) + "，相同檔名已存在，需先刪除此批號 : "
+								+ lBatxDetail.get(0).getBatchNo();
 						checkFlag = false;
 						break;
 					}
@@ -1803,7 +1824,8 @@ public class L4200Batch extends TradeBuffer {
 	private void checkMedia(BatxHead tBatxHead, TitaVo titaVo) throws LogicException {
 		int deductMediaCnt = 0;
 		BigDecimal deductMediaAmt = BigDecimal.ZERO;
-		this.info("meadiaDateAch1="+ meadiaDateAch1 + ", meadiaDateAch2=" + meadiaDateAch2 + ", meadiaDatePost=" +meadiaDatePost);
+		this.info("meadiaDateAch1=" + meadiaDateAch1 + ", meadiaDateAch2=" + meadiaDateAch2 + ", meadiaDatePost="
+				+ meadiaDatePost);
 		if (meadiaDateAch1 + meadiaDateAch2 + meadiaDatePost == 0) {
 			return;
 		}
@@ -1829,8 +1851,8 @@ public class L4200Batch extends TradeBuffer {
 		}
 
 		if (meadiaDatePost > 0) {
-			Slice<PostDeductMedia> slPostDeductMedia = postDeductMediaService.mediaDateEq(meadiaDatePost + 19110000, 
-					0, Integer.MAX_VALUE, titaVo);
+			Slice<PostDeductMedia> slPostDeductMedia = postDeductMediaService.mediaDateEq(meadiaDatePost + 19110000, 0,
+					Integer.MAX_VALUE, titaVo);
 			if (slPostDeductMedia != null) {
 				for (PostDeductMedia post : slPostDeductMedia.getContent()) {
 					deductMediaCnt++;

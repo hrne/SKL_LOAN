@@ -55,14 +55,17 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "       ,NVL(E1.\"Fullname\", ' ') AS \"ItName\""; // 介紹人姓名
 		sql += "       ,NVL(E2.\"Fullname\", ' ') AS \"ItUnitManager\""; // 處經理姓名(介紹人)
 		sql += "       ,NVL(E3.\"Fullname\", ' ') AS \"ItDistManager\""; // 區經理姓名(介紹人)
-		sql += "       ,IGroup.\"PerfEqAmt\"";  // 換算業績 - 注意這裡使用 IGroup: 參考樣張輸出, 同額度的業績金額為 Group By FacmNo
-		sql += "       ,IGroup.\"PerfReward\""; // 業務報酬
-		sql += "       ,IGroup.\"PerfAmt\"";    // 業績金額
+		sql += "       ,NVL(PIDA.\"AdjPerfEqAmt\", IGroup.\"PerfEqAmt\") AS \"PerfEqAmt\" ";   // 換算業績 - 參考樣張輸出, 同額度的三項業績金額為 Group By FacmNo
+		sql += "       ,NVL(PIDA.\"AdjPerfReward\", IGroup.\"PerfReward\") AS \"PerfReward\" "; // 業務報酬   因此 IGroup 以 FacmNo 作 Group
+		sql += "       ,NVL(PIDA.\"AdjPerfAmt\", IGroup.\"PerfAmt\") AS \"PerfAmt\" ";       // 業績金額   PIDA 只到額度層
 		sql += " FROM \"PfItDetail\" I";
-		sql += " LEFT JOIN \"PfBsDetail\" B ON B.\"PerfDate\" = I.\"PerfDate\""; // 取房貸專員
-		sql += "                           AND B.\"CustNo\"   = I.\"CustNo\"";
-		sql += "                           AND B.\"FacmNo\"   = I.\"FacmNo\"";
-		sql += "                           AND B.\"BormNo\"   = I.\"BormNo\"";
+		sql += " LEFT JOIN \"PfBsDetail\" B ON B.\"PerfDate\"    = I.\"PerfDate\""; // 取房貸專員
+		sql += "                           AND B.\"CustNo\"      = I.\"CustNo\"";
+		sql += "                           AND B.\"FacmNo\"      = I.\"FacmNo\"";
+		sql += "                           AND B.\"BormNo\"      = I.\"BormNo\"";
+		sql += "                           AND B.\"PieceCode\"   = I.\"PieceCode\"";
+		sql += "                           AND B.\"DrawdownAmt\" = I.\"DrawdownAmt\"";
+		sql += "                           AND B.\"RepayType\"   = I.\"RepayType\" ";
 		sql += " LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = I.\"CustNo\"";
 		sql += " LEFT JOIN \"CdEmp\" E0 ON E0.\"EmployeeNo\" = B.\"BsOfficer\""; // 取房貸專員姓名
 		sql += " LEFT JOIN \"CdEmp\" E1 ON E1.\"EmployeeNo\" = I.\"Introducer\""; // 取介紹人姓名
@@ -75,23 +78,23 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " LEFT JOIN ( SELECT PID.\"CustNo\" ";
 		sql += "                   ,PID.\"FacmNo\" ";
 		sql += "                   ,PID.\"WorkMonth\" ";
-		sql += "                   ,SUM(NVL(PID.\"PerfEqAmt\", PIDA.\"AdjPerfEqAmt\")) \"PerfEqAmt\" ";
-		sql += "                   ,SUM(NVL(PID.\"PerfReward\", PIDA.\"AdjPerfReward\")) \"PerfReward\" ";
-		sql += "                   ,SUM(NVL(PID.\"PerfAmt\", PIDA.\"AdjPerfAmt\")) \"PerfAmt\" ";
+		sql += "                   ,SUM(PID.\"PerfEqAmt\") \"PerfEqAmt\" ";
+		sql += "                   ,SUM(PID.\"PerfReward\") \"PerfReward\" ";
+		sql += "                   ,SUM(PID.\"PerfAmt\") \"PerfAmt\" ";
 		sql += "             FROM \"PfItDetail\" PID";
-		sql += "             LEFT JOIN \"PfItDetailAdjust\" PIDA ON PIDA.\"CustNo\"    = PID.\"CustNo\"     ";
-		sql += "                                                AND PIDA.\"FacmNo\"    = PID.\"FacmNo\"     ";
-		sql += "                                                AND PIDA.\"WorkMonth\" = PID.\"WorkMonth\"  ";
 		sql += "             GROUP BY PID.\"CustNo\" ";
 		sql += "                     ,PID.\"FacmNo\" ";
 		sql += "                     ,PID.\"WorkMonth\" ";
 		sql += "           ) IGroup ON IGroup.\"CustNo\" = I.\"CustNo\" ";
 		sql += "                   AND IGroup.\"FacmNo\" = I.\"FacmNo\" ";
 		sql += "                   AND IGroup.\"WorkMonth\" = I.\"WorkMonth\" ";
-		sql += " WHERE I.\"WorkMonth\" >= (:inputYearStart || :inputMonthStart)";
-		sql += "   AND I.\"WorkMonth\" <= (:inputYearEnd || :inputMonthEnd)";
-		sql += "   AND I.\"DrawdownAmt\" >= 0 ";
-		sql += "   AND NVL(B0.\"UnitItem\", ' ') != ' ' "; // PfDetailCom 取 FacMain.BusinessOfficer, 此欄位不一定會填入房貸專員的員編, 串得到部室中文才是房貸專員
+		sql += " LEFT JOIN \"PfItDetailAdjust\" PIDA ON PIDA.\"CustNo\"    = I.\"CustNo\"     ";
+		sql += "                                    AND PIDA.\"FacmNo\"    = I.\"FacmNo\"     ";
+		sql += "                                    AND PIDA.\"WorkMonth\" = I.\"WorkMonth\"  ";
+		sql += " WHERE I.\"WorkMonth\" BETWEEN :workMonthStart AND :workMonthEnd";
+		sql += "   AND I.\"DrawdownAmt\" > 0 ";
+		//		sql += "   AND NVL(B0.\"UnitItem\", ' ') != ' ' "; PfDetailCom 取 FacMain.BusinessOfficer, 此欄位不一定會填入房貸專員的員編, 串得到部室中文才是房貸專員
+		//                                                         20211117 依eric指示先disable
 		sql += "   AND NVL(I.\"Introducer\", ' ') != ' ' "; // PfItDetail 存在介紹人為 Null 的資料
 		sql += " ORDER BY NLSSORT(I.\"DeptCode\", 'NLS_SORT=FRENCH') ";
 		sql += "         ,NLSSORT(I.\"DistCode\", 'NLS_SORT=FRENCH') ";
@@ -105,10 +108,8 @@ public class LD006ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 
-		query.setParameter("inputYearStart", parse.stringToInteger(titaVo.getParam("inputYearStart")) + 1911);
-		query.setParameter("inputYearEnd", parse.stringToInteger(titaVo.getParam("inputYearEnd")) + 1911);
-		query.setParameter("inputMonthStart", titaVo.getParam("inputMonthStart"));
-		query.setParameter("inputMonthEnd", titaVo.getParam("inputMonthEnd"));
+		query.setParameter("workMonthStart", parse.stringToInteger(titaVo.getParam("workMonthStart")) + 191100);
+		query.setParameter("workMonthEnd", parse.stringToInteger(titaVo.getParam("workMonthEnd")) + 191100);
 
 		return this.convertToMap(query);
 	}

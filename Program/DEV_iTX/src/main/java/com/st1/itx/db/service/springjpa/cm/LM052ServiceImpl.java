@@ -31,6 +31,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo, int formNum) throws Exception {
+		this.info("lM052.findAll");
 
 		// 取得會計日(同頁面上會計日)
 		// 年月日
@@ -40,6 +41,12 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 月
 		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
+		// 格式
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+		// 當前日期
+		int nowDate = Integer.valueOf(iEntdy);
+
 		Calendar calendar = Calendar.getInstance();
 
 		// 設當年月底日
@@ -48,20 +55,26 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		calendar.set(Calendar.MONTH, iMonth - 1);
 		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
 
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int day = calendar.get(Calendar.DAY_OF_WEEK);
-		// 月底日有卡在六日，需往前推日期
-		int diff = -(day == 1 ? 2 : (day == 6 ? 1 : 0));
-		calendar.add(Calendar.DATE, diff);
-
-		// 格式
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-
-		// 當前日期
-		int nowDate = Integer.valueOf(iEntdy);
 		// 以當前月份取得月底日期 並格式化處理
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
+		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
+
+		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
+		// 星期 X (排除六日用) 代號 0~6對應 日到六
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		this.info("day = " + dayItem[day - 1]);
+		int diff = 0;
+		if (day == 1) {
+			diff = -2;
+		} else if (day == 6) {
+			diff = 1;
+		}
+		this.info("diff=" + diff);
+		calendar.add(Calendar.DATE, diff);
+		//矯正月底日
+		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
 		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
 
@@ -71,13 +84,13 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-		int yymm = (iYear * 100) + iMonth;
+		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 
 		calendar.set(iYear, iMonth - 1, 0);
 
-		int lyymm = Integer.valueOf(dateFormat.format(calendar.getTime())) / 100;
+		String lyymm = String.valueOf(Integer.valueOf(dateFormat.format(calendar.getTime())) / 100);
 
-		this.info("lM052.findAll yymm=" + yymm + ",lyymm=" + lyymm);
+		this.info("yymm=" + iYearMonth + ",lyymm=" + lyymm);
 
 		String sql = " ";
 		if (formNum == 1) {
@@ -92,7 +105,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		} else if (formNum == 2) {
 
 			// 此年月為上個月
-			yymm = lyymm;
+			iYearMonth = lyymm;
 
 			sql += "	SELECT DECODE(\"AssetClassNo\",'11','1','12','1',\"AssetClassNo\") AS \"AssetClassNo\"";
 			sql += "          ,SUM(\"LoanBal\") AS \"LoanBal\"";
@@ -134,7 +147,7 @@ public class LM052ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", yymm);
+		query.setParameter("yymm", iYearMonth);
 		return this.convertToMap(query);
 	}
 

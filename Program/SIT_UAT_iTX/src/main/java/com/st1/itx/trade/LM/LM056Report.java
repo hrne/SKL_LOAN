@@ -37,21 +37,52 @@ public class LM056Report extends MakeReport {
 
 		this.info("LM056Report exec");
 
+		// 取得會計日(同頁面上會計日)
+		// 年月日
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		// 月
 		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
+		// 格式
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-		// 當日
+
+		// 當前日期
 		int nowDate = Integer.valueOf(iEntdy);
-		Calendar calMonthDate = Calendar.getInstance();
-		// 設當年月底日 0是月底
-		calMonthDate.set(iYear, iMonth, 0);
 
-		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calMonthDate.getTime()));
+		Calendar calendar = Calendar.getInstance();
 
+		// 設當年月底日
+		// calendar.set(iYear, iMonth, 0);
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth - 1);
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+
+		// 以當前月份取得月底日期 並格式化處理
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+
+		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
+
+		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
+		// 星期 X (排除六日用) 代號 0~6對應 日到六
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		this.info("day = " + dayItem[day - 1]);
+		int diff = 0;
+		if (day == 1) {
+			diff = -2;
+		} else if (day == 6) {
+			diff = 1;
+		}
+		this.info("diff=" + diff);
+		calendar.add(Calendar.DATE, diff);
+		// 矯正月底日
+		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
+		// 確認是否為1月
 		boolean isMonthZero = iMonth - 1 == 0;
 
+		// 當前日期 比 當月底日期 前面 就取上個月底日
 		if (nowDate < thisMonthEndDate) {
 			iYear = isMonthZero ? (iYear - 1) : iYear;
 			iMonth = isMonthZero ? 12 : iMonth - 1;
@@ -116,7 +147,7 @@ public class LM056Report extends MakeReport {
 				// 身分證
 				makeExcel.setValue(row, 3, lM056Vo.get("F2"));
 
-				tempAmt =  lM056Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F3"));
+				tempAmt = lM056Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F3"));
 
 				// 放款額逾
 				makeExcel.setValue(row, 4, tempAmt, "#,##0");
@@ -128,10 +159,9 @@ public class LM056Report extends MakeReport {
 				makeExcel.setValue(row, 6, lM056Vo.get("F4"), "L");
 			}
 
-			
 			makeExcel.formulaCaculate(1, 3);
 			makeExcel.formulaCaculate(1, 4);
-			
+
 		} else {
 
 			makeExcel.setValue(2, 1, "本日無資料");
@@ -155,7 +185,7 @@ public class LM056Report extends MakeReport {
 
 				row++;
 
-				tempAmt =  lM056Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F3"));
+				tempAmt = lM056Vo.get("F3").equals("0") ? BigDecimal.ZERO : new BigDecimal(lM056Vo.get("F3"));
 
 				// 放款額逾
 				makeExcel.setValue(row, 19, tempAmt, "#,##0");
@@ -176,7 +206,6 @@ public class LM056Report extends MakeReport {
 		int row = 0;
 		int col = 0;
 		BigDecimal tempAmt = BigDecimal.ZERO;
-		
 
 		// 參考 LM057的表14-5
 		for (Map<String, String> lM056Vo : listData) {
@@ -200,7 +229,7 @@ public class LM056Report extends MakeReport {
 
 			} else if (lM056Vo.get("F0").equals("TOTAL")) {
 				row = 37;
-				col = 8;			
+				col = 8;
 
 			}
 

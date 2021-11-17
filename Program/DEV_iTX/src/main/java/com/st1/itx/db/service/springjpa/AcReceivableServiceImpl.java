@@ -357,13 +357,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("useL2062Eq " + dbName + " : " + "acctCode_0 : " + acctCode_0 + " custNo_1 : " +  custNo_1 + " facmNo_2 : " +  facmNo_2 + " facmNo_3 : " +  facmNo_3 + " clsFlag_4 : " +  clsFlag_4 + " clsFlag_5 : " +  clsFlag_5);
     if (dbName.equals(ContentName.onDay))
-      slice = acReceivableReposDay.findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqual(acctCode_0, custNo_1, facmNo_2, facmNo_3, clsFlag_4, clsFlag_5, pageable);
+      slice = acReceivableReposDay.findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqualOrderByOpenAcDateAsc(acctCode_0, custNo_1, facmNo_2, facmNo_3, clsFlag_4, clsFlag_5, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = acReceivableReposMon.findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqual(acctCode_0, custNo_1, facmNo_2, facmNo_3, clsFlag_4, clsFlag_5, pageable);
+      slice = acReceivableReposMon.findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqualOrderByOpenAcDateAsc(acctCode_0, custNo_1, facmNo_2, facmNo_3, clsFlag_4, clsFlag_5, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = acReceivableReposHist.findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqual(acctCode_0, custNo_1, facmNo_2, facmNo_3, clsFlag_4, clsFlag_5, pageable);
+      slice = acReceivableReposHist.findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqualOrderByOpenAcDateAsc(acctCode_0, custNo_1, facmNo_2, facmNo_3, clsFlag_4, clsFlag_5, pageable);
     else 
-      slice = acReceivableRepos.findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqual(acctCode_0, custNo_1, facmNo_2, facmNo_3, clsFlag_4, clsFlag_5, pageable);
+      slice = acReceivableRepos.findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqualOrderByOpenAcDateAsc(acctCode_0, custNo_1, facmNo_2, facmNo_3, clsFlag_4, clsFlag_5, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

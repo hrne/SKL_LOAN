@@ -165,8 +165,7 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("OOCaseNo", tFacMain.getCreditSysNo()); // 案件編號
 				occursList.putParam("OOApplNo", tFacMain.getApplNo()); // 核准號碼
 				occursList.putParam("OOFacmNo", tTxToDoDetail.getFacmNo()); // 額度號碼
-				occursList.putParam("OOBormNo",
-						tTxToDoDetail.getStatus() == 2 ? tTempVo.get("BormNo") : tTxToDoDetail.getBormNo()); // 預約序號
+				occursList.putParam("OOBormNo", tTxToDoDetail.getBormNo()); // 預約序號
 				occursList.putParam("OOCurrencyCode", tLoanBorMain.getCurrencyCode()); // 幣別
 				occursList.putParam("OODrawdownAmt", tLoanBorMain.getDrawdownAmt()); // 撥款金額
 				occursList.putParam("OORelNo", tTxToDoDetail.getTitaKinbr() + tTxToDoDetail.getTitaTlrNo()
@@ -239,6 +238,7 @@ public class L6984 extends TradeBuffer {
 				occursList.putParam("NOTE1", "");
 				occursList.putParam("TITFCD", 1);
 				occursList.putParam("RpRvno1", "");
+				occursList.putParam("OORvBormNo", tTempVo.get("BormNo"));
 
 				cnt++;
 				this.totaVo.addOccursList(occursList);

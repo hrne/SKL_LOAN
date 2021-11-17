@@ -283,9 +283,15 @@ C(2,#FunctionCd,S,$,$,s,s,s)
 ! ---------調RIM
 ! 擔保品編號1
 #BINDG=X,1,S
-BIND(#BTNG,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUFG;ntxbuf5=type<-1:ClCode1<-OOClCode1:ClCode2<-OOClCode2:ClNo<-OOClNo:ClX<-})
+BIND(#BTNG,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUFG;ntxbuf5=type<-1:ClCode1<-OOClCode1:ClCode2<-OOClCode2:ClNo<-OOClNo:ClX1<-ClTypeCodeX:ClX2<-})
 #BINDX=X,1,S
-BIND(#BTNX,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUFX;ntxbuf5=type<-1:ClCode1<-OOClCode1:ClCode2<-OOClCode2:ClNo<-OOClNo:ClX<-OOOther})
+BIND(#BTNX,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUFX;ntxbuf5=type<-1:ClCode1<-OOClCode1:ClCode2<-OOClCode2:ClNo<-OOClNo:ClX1<-OOOther:ClX2<-OOOther1})
+
+! 門牌號碼
+#ClX1=x,100,S
+!土地座落
+#ClX2=x,100,S
+
 #ClCode1=A,1,I
 C(2,#FunctionCd,S,$,s,$,s,s)
 @V(2,0)
@@ -298,9 +304,11 @@ C(2,#FunctionCd,S,$,s,$,s,s)
 C(2,#FunctionCd,S,$,s,$,s,s)
 @V(2,0)
 
-! 門牌號碼
-#ClX=x,100,L
 
+! 門牌號碼-土地座落
+#ClX=x,100,L
+C(2,#FunctionCd,S,$,s,$,s,s)
+C(4,#ClX1,T(2,@ClX,#ClX2),T(2,@ClX,#ClX1))
 ! 記錄日期
 #RecordDateX=X,8,S
 T(4,#SYSCDATE)

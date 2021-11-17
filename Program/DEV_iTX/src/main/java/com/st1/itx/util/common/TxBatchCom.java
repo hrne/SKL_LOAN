@@ -449,10 +449,10 @@ public class TxBatchCom extends TradeBuffer {
 		// 檢核正常
 		if ("0".equals(this.procStsCode)) {
 			this.procStsCode = "4"; // 4.檢核正常
-			// 設定還款類別
-			if (this.repayType > 0 && tDetail.getRepayType() == 0) {
-				tDetail.setRepayType(this.repayType);
-			}
+		}
+		// 設定還款類別
+		if ("4".equals(this.procStsCode) && this.repayType > 0 && tDetail.getRepayType() == 0) {
+			tDetail.setRepayType(this.repayType);
 		}
 		// 設定處理說明
 		settingProcNote(tDetail, titaVo);
@@ -1404,7 +1404,9 @@ public class TxBatchCom extends TradeBuffer {
 		if (t.get("VirtualAcctNo") != null)
 			this.tTempVo.putParam("VirtualAcctNo", t.get("VirtualAcctNo")); // 虛擬帳號
 		if (t.get("PayIntDate") != null)
-			this.tTempVo.putParam("PayIntDate", t.get("PayIntDate"));
+			this.tTempVo.putParam("PayIntDate", t.get("PayIntDate")); // 銀扣期款應繳日
+		if (t.get("RepayBank") != null)
+			this.tTempVo.putParam("RepayBank", t.get("RepayBank")); // 扣款銀行
 		if (t.get("ReturnMsg") != null)
 			this.tTempVo.putParam("ReturnMsg", t.get("ReturnMsg")); // 回應訊息
 		if (t.get("Remark") != null)
@@ -1599,20 +1601,20 @@ public class TxBatchCom extends TradeBuffer {
 						this.unPayLoan = this.unPayLoan.add(baTxVo.getUnPaidAmt());
 					}
 					this.loanBal = loanBal.add(baTxVo.getLoanBal());
+					// 結案記號 1.正常結案 2.提前結案
+					if (baTxVo.getCloseFg() > this.closeFg) {
+						this.closeFg = baTxVo.getCloseFg();
+					}
+					// 有未結案
+					if (baTxVo.getCloseFg() == 0) {
+						isCloseFg = false;
+					}
 					if (baTxVo.getAcctAmt().compareTo(BigDecimal.ZERO) > 0) {
 						this.repayLoan = this.repayLoan.add(baTxVo.getAcctAmt());
 						this.principal = this.principal.add(baTxVo.getPrincipal());
 						this.interest = this.principal.add(baTxVo.getInterest());
 						this.delayInt = this.delayInt.add(baTxVo.getDelayInt());
 						this.breachAmt = this.breachAmt.add(baTxVo.getBreachAmt());
-						// 結案記號 1.正常結案 2.提前結案
-						if (baTxVo.getCloseFg() > this.closeFg) {
-							this.closeFg = baTxVo.getCloseFg();
-						}
-						// 有未結案
-						if (baTxVo.getCloseFg() == 0) {
-							isCloseFg = false;
-						}
 					}
 					// 提前還款金額 extraAmt = BigDecimal.ZERO; // 提前還款金額
 					if (baTxVo.getExtraAmt().compareTo(BigDecimal.ZERO) > 0) {

@@ -10,12 +10,21 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.ClBuilding;
 import com.st1.itx.db.domain.ClBuildingId;
+import com.st1.itx.db.domain.ClLand;
+import com.st1.itx.db.domain.ClLandId;
+import com.st1.itx.db.domain.ClMain;
+import com.st1.itx.db.domain.ClMainId;
 import com.st1.itx.db.domain.CollLaw;
 import com.st1.itx.db.domain.CollLawId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.ClBuildingService;
+import com.st1.itx.db.service.ClLandService;
+import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.CollLawService;
 import com.st1.itx.db.service.CollListService;
 import com.st1.itx.db.service.CustMainService;
@@ -51,6 +60,15 @@ public class L5R21 extends TradeBuffer {
 	@Autowired
 	public ClBuildingService iClBuildingService;
 
+	@Autowired
+	public ClLandService iClLandService;
+
+	@Autowired
+	public ClMainService iClMainService;
+
+	@Autowired
+	public CdCodeService iCdCodeService;
+
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		// L5401交易內調RIM用,資料來源為CdBcm表
@@ -85,21 +103,56 @@ public class L5R21 extends TradeBuffer {
 			totaVo.putParam("L5R21ClNo", iCollLaw.getClNo());
 			totaVo.putParam("L5R21EditEmpNo", iCollLaw.getLastUpdateEmpNo());
 			String tU = iCollLaw.getLastUpdate().toString();
-			String uDate = StringUtils.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
-			String uTime = tU.substring(11,13) + tU.substring(14,16);
+			String uDate = StringUtils
+					.leftPad(String.valueOf(Integer.valueOf(tU.substring(0, 10).replace("-", "")) - 19110000), 7, '0');
+			String uTime = tU.substring(11, 13) + tU.substring(14, 16);
 			totaVo.putParam("L5R21EditDate", uDate);
 			totaVo.putParam("L5R21EditTime", uTime);
-			ClBuildingId iClBuildingId = new ClBuildingId();
-			ClBuilding iClBuilding = new ClBuilding();
-			iClBuildingId.setClCode1(iCollLaw.getClCode1());
-			iClBuildingId.setClCode2(iCollLaw.getClCode2());
-			iClBuildingId.setClNo(iCollLaw.getClNo());
-			iClBuilding = iClBuildingService.findById(iClBuildingId, titaVo);
-			if (iClBuilding == null) {
-				totaVo.putParam("L5R21Other", "");
-			}else {
-				totaVo.putParam("L5R21Other", iClBuilding.getBdLocation() + "，建號" + iClBuilding.getBdNo1() + "-" + iClBuilding.getBdNo2());
+			String tOther = "";
+			if (iCollLaw.getClCode1() == 1) {// 房地-建物門牌
+				ClBuildingId iClBuildingId = new ClBuildingId();
+				ClBuilding iClBuilding = new ClBuilding();
+				iClBuildingId.setClCode1(iCollLaw.getClCode1());
+				iClBuildingId.setClCode2(iCollLaw.getClCode2());
+				iClBuildingId.setClNo(iCollLaw.getClNo());
+				iClBuilding = iClBuildingService.findById(iClBuildingId, titaVo);
+				if (iClBuilding != null) {
+					tOther = iClBuilding.getBdLocation() + "，建號" + iClBuilding.getBdNo1() + "-"
+							+ iClBuilding.getBdNo2();
+				}
+			} else if (iCollLaw.getClCode1() == 2) {// 土地-土地座落
+				ClLandId clLandId = new ClLandId();
+				clLandId.setClCode1(iCollLaw.getClCode1());
+				clLandId.setClCode2(iCollLaw.getClCode2());
+				clLandId.setClNo(iCollLaw.getClNo());
+				clLandId.setLandSeq(0);
+				ClLand tClLand = new ClLand();
+				tClLand = iClLandService.findById(clLandId, titaVo);
+				if (tClLand != null) {
+					tOther = tClLand.getLandLocation();
+				}
+			} else {// 擔保品類別代碼
+				ClMainId iClMainId = new ClMainId();
+				ClMain iClMain = new ClMain();
+				iClMainId.setClCode1(iCollLaw.getClCode1());
+				iClMainId.setClCode2(iCollLaw.getClCode2());
+				iClMainId.setClNo(iCollLaw.getClNo());
+				iClMain = iClMainService.findById(iClMainId, titaVo);
+				if (iClMain != null) {
+					String tClTypeCode = iClMain.getClTypeCode();
+					if (!tClTypeCode.equals("")) {
+						CdCodeId iCdCodeId = new CdCodeId();
+						CdCode iCdCode = new CdCode();
+						iCdCodeId.setDefCode("ClTypeCode");
+						iCdCodeId.setCode(tClTypeCode);
+						iCdCode = iCdCodeService.findById(iCdCodeId, titaVo);
+						if (iCdCode != null) {
+							tOther = iCdCode.getItem();
+						}
+					}
+				}
 			}
+			totaVo.putParam("L5R21Other", tOther);
 		} else {
 			throw new LogicException(titaVo, "E0001", ""); // 查無資料錯誤
 		}

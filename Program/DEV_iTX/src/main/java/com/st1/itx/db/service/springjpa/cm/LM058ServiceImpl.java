@@ -1,13 +1,13 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -21,7 +21,6 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM058ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
@@ -34,18 +33,67 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-		String iYEAR = iENTDY.substring(0, 4);
-		String iMM = iENTDY.substring(4, 6);
-		String iYYMM = iENTDY.substring(0, 6);
-		String iLYYMM = "";
-		if (iMM.equals("1")) {
-			iLYYMM = String.valueOf(Integer.valueOf(iYEAR) - 1) + "12";
-		} else {
-			iLYYMM = iYEAR + String.format("%02d", Integer.valueOf(iMM) - 1);
+		// 取得會計日(同頁面上會計日)
+		// 年月日
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		// 年
+		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
+		// 月
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
+
+		// 格式
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+		// 當前日期
+		int nowDate = Integer.valueOf(iEntdy);
+
+		Calendar calendar = Calendar.getInstance();
+
+		// 設當年月底日
+		// calendar.set(iYear, iMonth, 0);
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth - 1);
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+
+		// 以當前月份取得月底日期 並格式化處理
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+
+		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
+
+		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
+		// 星期 X (排除六日用) 代號 0~6對應 日到六
+		int day = calendar.get(Calendar.DAY_OF_WEEK);
+		this.info("day = " + dayItem[day - 1]);
+		int diff = 0;
+		if (day == 1) {
+			diff = -2;
+		} else if (day == 6) {
+			diff = 1;
+		}
+		this.info("diff=" + diff);
+		calendar.add(Calendar.DATE, diff);
+		// 矯正月底日
+		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
+		// 確認是否為1月
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		// 當前日期 比 當月底日期 前面 就取上個月底日
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-		logger.info("lM058.findAll YYMM=" + iYYMM + ",LYYMM=" + iLYYMM);
+		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
+
+		// 上個月底
+		calendar.set(iYear, iMonth - 1, 0);
+
+		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+
+		String iLYearMonth = String.valueOf(lastMonthEndDate / 100);
+
+		this.info("lM058.findAll YYMM=" + iYearMonth + ",LYYMM=" + iLYearMonth);
 
 		String sql = "SELECT D.\"CustNo\" AS F0";
 		sql += "			,C.\"CustName\" AS F1";
@@ -75,11 +123,6 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "					  ,SUM(D.\"LoanBalance\") \"LoanBal\"";
 		sql += "				FROM \"DailyLoanBal\" D";
 		sql += "	  			LEFT JOIN(SELECT \"CustNo\"";
-		sql += "							    ,MAX(\"DataDate\") \"DataDate\"";
-		sql += "						  FROM \"DailyLoanBal\"";
-		sql += "						  GROUP BY \"CustNo\") DD";
-		sql += "	 			ON DD.\"CustNo\" = D.\"CustNo\" AND DD.\"DataDate\" = D.\"DataDate\"";
-		sql += "	  			LEFT JOIN(SELECT \"CustNo\"";
 		sql += "							    ,MAX(\"LoanBalance\") \"LoanBalance\"";
 		sql += "						  FROM(SELECT \"CustNo\"";
 		sql += "									 ,TRUNC(\"DataDate\" / 100)";
@@ -90,21 +133,20 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "						  GROUP BY \"CustNo\") DDD";
 		sql += "	 			ON DDD.\"CustNo\" = D.\"CustNo\"";
 		sql += "				WHERE TRUNC(D.\"DataDate\" / 100) = :yymm";
-		sql += "				AND DD.\"DataDate\" IS NOT NULL";
 		sql += "				GROUP BY D.\"CustNo\", D.\"DataDate\", D.\"MonthEndYm\",DDD.\"LoanBalance\")D )D";
 		sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = D.\"CustNo\"";
 		sql += "	  LEFT JOIN \"RelsMain\" R ON R.\"RelsId\" = C.\"CustId\"";
 		sql += " 	  WHERE D.\"SEQ\" <= 20";
 		sql += "	  ORDER BY D.\"SEQ\"";
-		logger.info("sql=" + sql);
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yymm", iYYMM);
+		query.setParameter("yymm", iYearMonth);
 //		query.setParameter("lyymm", iLYYMM);
 
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 	}
 
 //	String sql = "SELECT D.\"CustNo\" AS F0";

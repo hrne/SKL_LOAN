@@ -136,7 +136,7 @@ public class L4920 extends TradeBuffer {
 				occursList.putParam("OOProcCode", result.get("F11"));
 
 				String procNote = "";
-				String fileSeq = "";
+				String fileSeq = result.get("F0");
 
 				if (result.get("F12") != null) {
 

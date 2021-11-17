@@ -52,9 +52,9 @@ T(4,CHAIN$)
 
 !日曆日
 #CDATE=D,8,S
-T(4,CDATE$)
-#CDATEX=D,7,S
-T(1,#CDATE,2,7)
+!T(4,CDATE$)
+!T(1,#CDATE,2,7)
+E(0,#SYSDATE)
 
 #FdFunCode=X,2,L
 T(3,*)
@@ -98,11 +98,6 @@ T(H,@AgentTlrnoNa2,#AgentTlrno2,#tlrnoH)
 T(H,@AgentTlrnoNa3,#AgentTlrno3,#tlrnoH)
 T(H,@AgentTlrnoNa4,#AgentTlrno4,#tlrnoH)
 T(H,@AgentTlrnoNa5,#AgentTlrno5,#tlrnoH)
-C(3,#FunCode,1,$,s)
-T(1,@BeginTimeh,#BeginTime,1,2)
-T(1,@BeginTimem,#BeginTime,3,2)
-T(1,@EndTimeh,#EndTime,1,2)
-T(1,@EndTimem,#EndTime,3,2)
 
 #Status=A,1,L
 C(2,#FunCode,$,T(3,1),T(3,0),$)
@@ -124,7 +119,6 @@ T(H,#AgentTlrno1,#tlrnoH)
 
 #AgentTlrno2=X,6,I
 C(3,#FunCode,1,$,s)
-C(4,#AgentTlrno1,s,$)
 HELP(#tlrnoH,cols:3)
 @
 C(4,#AgentTlrno2,S,$)
@@ -138,7 +132,6 @@ T(H,#AgentTlrno2,#tlrnoH)
 
 #AgentTlrno3=X,6,I
 C(3,#FunCode,1,$,s)
-C(4,#AgentTlrno2,s,$)
 HELP(#tlrnoH,cols:3)
 @
 C(4,#AgentTlrno3,S,$)
@@ -153,7 +146,6 @@ T(H,#AgentTlrno3,#tlrnoH)
 
 #AgentTlrno4=X,6,I
 C(3,#FunCode,1,$,s)
-C(4,#AgentTlrno3,s,$)
 HELP(#tlrnoH,cols:3)
 @
 C(4,#AgentTlrno4,S,$)
@@ -169,7 +161,6 @@ T(H,#AgentTlrno4,#tlrnoH)
 
 #AgentTlrno5=X,6,I
 C(3,#FunCode,1,$,s)
-C(4,#AgentTlrno4,s,$)
 HELP(#tlrnoH,cols:3)
 @
 C(4,#AgentTlrno5,S,$)
@@ -187,7 +178,7 @@ T(H,#AgentTlrno5,#tlrnoH)
 #BeginDate=D,7,I
 C(3,#FunCode,1,$,s)
 @V(7)A(DATE,0,#BeginDate)
-IF(#BeginDate<#CDATEX,V(P,開始日期不可小於日曆日),$)
+IF(#BeginDate<#CDATE,V(P,開始日期不可小於會計日),$)
 
 #BeginTime=A,4,S
 
@@ -195,12 +186,13 @@ IF(#BeginDate<#CDATEX,V(P,開始日期不可小於日曆日),$)
 T(1,#BeginTime,1,2)
 C(3,#FunCode,1,$,s)
 @
-C(3,#BeginTimeh,0,$,V(5,0,23))
+C(3,#BeginTimeh,0,$,V(5,1,24))
 
 
 #BeginTimem=A,2,I
 T(1,#BeginTime,3,2)
 C(3,#FunCode,1,$,s)
+C(3,#BeginTimeh,24,s,$)
 @
 C(3,#BeginTimem,0,$,V(5,0,59))
 T(2,@BeginTime,#BeginTimeh+#BeginTimem)
@@ -211,8 +203,7 @@ T(2,@BeginTime,#BeginTimeh+#BeginTimem)
 C(3,#FunCode,1,$,s)
 @V(7)A(DATE,0,#EndDate)
 V(5,#BeginDate,9991231)
-C(3,#BeginTimeh,24,C(3,#BeginDate,#EndDate,V(P,結束日期不可等於開始日期),$),$)
-IF(#EndDate<#BeginDate,V(P,結束日期不可小於開始日期),$)
+IF(#EndDate<#CDATE,V(P,結束日期不可小於會計日),$)
 
 #EndTime=A,4,S
 
@@ -220,12 +211,13 @@ IF(#EndDate<#BeginDate,V(P,結束日期不可小於開始日期),$)
 T(1,#EndTime,1,2)
 C(3,#FunCode,1,$,s)
 @
-V(5,0,23)
+C(3,#EndTimeh,0,$,V(5,1,24))
 C(3,#BeginDate,#EndDate,V(5,#BeginTimeh,23),$)
 
 #EndTimem=A,2,I
 T(1,#EndTime,3,2)
 C(3,#FunCode,1,$,s)
+C(3,#EndTimeh,24,s,$)
 @
 C(3,#EndTimem,0,$,V(5,0,59))
 C(3,#BeginDate,#EndDate,V(5,#BeginTimem,59),$)
@@ -269,6 +261,7 @@ T(3,[L6104] 代理人設定)
 #Status
 #END
 </sub>
+
 
 !------ 下行電文TOM ------
 <sub type="TOM">

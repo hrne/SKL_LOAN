@@ -1,0 +1,126 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD=_,_,S
+T(3,LD007)
+
+</sub>
+<sub type="PREDC" name="PreDC">
+<include src="COM.icf::TITLE-RUN.pre"/>
+</sub>
+
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+
+
+</sub>
+
+
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=3;screen.width=[140,850];printer.width=[20,80];order=1;">
+[
+["[LD007]                                  LD007放款專員明細統計"],
+["#FdWorkMonth+工作月區間",#workMonthStart," ~ ",#workMonthEnd],
+]
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+! #NTXBUF=X,3,S
+! C(3,#CHAIN,1,T(4,NTXBUF$),S)
+! T(1,@FUNCD,#NTXBUF,1,1)
+! T(1,@TLR,#NTXBUF,2,2)
+! T(2,@FKEY,7)
+
+
+!-----------------------------------------------------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#FdWorkMonth=X,2,L
+T(3,*)
+
+! 工作月
+#workMonthStart=A,5,I
+C(3,#workMonthStart,0,T(1,@workMonthStart,#SYSDATE,2,5),$)
+@
+C(3,#workMonthStart,0,S,A(YM13,1,#workMonthStart))
+
+#workMonthEnd=A,5,I
+C(3,#workMonthStart,0,S,C(3,#workMonthEnd,0,E(0,#workMonthStart),$))
+@
+A(YM13,1,#workMonthEnd)
+IF(#workMonthEnd<#workMonthStart,V(P,工作月訖起不得小於工作月起),$)
+
+<include src="ROM.icf::L0Rim.dec"/>
+<include src="ROM.icf::L6R34.dec"/>
+
+</sub>
+
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+
+#PRTSC_RFG=X,1,S
+C(3,#HCODE,1,S,$)
+C(5,#TXFORM,LD007,$,S)
+C(3,#FKEY,2,E(0,0),E(0,1))
+
+</sub>
+
+
+!---------- TXFORM = C5100 ----------
+<sub type="FORM" name="LD007">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,C5100,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LD007] LD007放款專員明細統計)
+
+</sub>
+
+!---------- TXFORM = LD007 ----------
+<sub type="FORM" name="LD007">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,LD007,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LD007] LD007放款專員明細統計)
+
+
+#OEMPNOS=X,6,S
+IF(#KINBR=="0009"||#KINBR=="0008",T(2,#KINBR+#TlrNoNO),T(2,#EMPNOS))
+
+</sub>
+
+
+!------ 上行電文TIM：BASIC LABEL + AP TEXT AREA + AP TEXT ------
+<sub type="TIM">
+#workMonthStart
+#workMonthEnd
+#END
+</sub>
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+<include src="ROM.icf::L6R34.tom"/>
+
+TXFORM=LD007
+^
+
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>
+

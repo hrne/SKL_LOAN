@@ -51,7 +51,7 @@ public interface AcReceivableRepositoryHist extends JpaRepository<AcReceivable, 
   public Optional<AcReceivable> findTopByAcctCodeIsAndCustNoIsAndFacmNoIsAndOpenAcDateIsOrderByRvNoDesc(String acctCode_0, int custNo_1, int facmNo_2, int openAcDate_3);
 
   // AcctCode = ,AND CustNo = ,AND FacmNo >= ,AND FacmNo <= ,AND ClsFlag >= ,AND ClsFlag <=
-  public Slice<AcReceivable> findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqual(String acctCode_0, int custNo_1, int facmNo_2, int facmNo_3, int clsFlag_4, int clsFlag_5, Pageable pageable);
+  public Slice<AcReceivable> findAllByAcctCodeIsAndCustNoIsAndFacmNoGreaterThanEqualAndFacmNoLessThanEqualAndClsFlagGreaterThanEqualAndClsFlagLessThanEqualOrderByOpenAcDateAsc(String acctCode_0, int custNo_1, int facmNo_2, int facmNo_3, int clsFlag_4, int clsFlag_5, Pageable pageable);
 
   // ClsFlag = ,AND AcBookCode = ,AND AcSubBookCode %,AND BranchNo = ,AND CurrencyCode = ,AND AcNoCode = ,AND AcSubCode = ,AND AcDtlCode = ,AND CustNo >= ,AND CustNo <= 
   public Slice<AcReceivable> findAllByClsFlagIsAndAcBookCodeIsAndAcSubBookCodeLikeAndBranchNoIsAndCurrencyCodeIsAndAcNoCodeIsAndAcSubCodeIsAndAcDtlCodeIsAndCustNoGreaterThanEqualAndCustNoLessThanEqualOrderByCustNoAscFacmNoAsc(int clsFlag_0, String acBookCode_1, String acSubBookCode_2, String branchNo_3, String currencyCode_4, String acNoCode_5, String acSubCode_6, String acDtlCode_7, int custNo_8, int custNo_9, Pageable pageable);

@@ -30,18 +30,17 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
-		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
-		String iYEAR = iENTDY.substring(0, 4);
-
-		this.info("lM070.findAll wkyear=" + iYEAR + ",iday=" + iENTDY);
+//		String iENTDY = String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000);
+//		String iYEAR = iENTDY.substring(0, 4);
+//		this.info("lM070.findAll wkyear=" + iYEAR + ",iday=" + iENTDY);
 
 		String sql = " ";
 		sql += "	SELECT I.\"CustNo\"";
 		sql += "	      ,I.\"FacmNo\"";
 		sql += "		  ,LO.\"thisAmt\"";
-		sql += "	      ,NVL(PDA.\"AdjCntingCode\",I.\"PieceCode\") AS \"PieceCode\"";
-		sql += "	      ,NVL(I.\"CntingCode\", 'N') AS \"CntingCode\"";
-		sql += "	      ,L.\"totalDrawdownAmt\"";
+		sql += "	      ,I.\"PieceCode\" AS \"PieceCode\"";
+		sql += "	      ,NVL(PDA.\"AdjCntingCode\",I.\"CntingCode\") AS \"CntingCode\"";
+		sql += "	      ,NVL(L.\"totalDrawdownAmt\",'0') AS \"DrawAmt\"";
 		sql += "	      ,NVL(I.\"Introducer\", C.\"Introducer\") AS \"Introducer\"";
 		sql += "	      ,C.\"CustId\"";
 		sql += "	      ,NVL(I.\"DeptCode\", E4.\"CenterCode2\") AS \"DeptCode\"";
@@ -56,14 +55,14 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += " 	      ,NVL(PDA.\"AdjPerfReward\",I.\"PerfReward\") AS \"PerfReward\"";
 		sql += " 	      ,NVL(E2.\"AgentId\", E5.\"AgentId\") AS \"UnitAgentId\"";
 		sql += "	      ,NVL(E3.\"AgentId\", E6.\"AgentId\") AS \"DistAgentId\"";
-		sql += "	      ,NVL(PDA.\"AdjPerfAmt\",R.\"IntroducerAddBonus\") AS \"IntroducerAddBonus\"";
+		sql += "	      ,NVL(PDA.\"AdjPerfAmt\",R.\"IntroducerAddBonus\") AS \"IntroAddBonus\"";
 		sql += "	FROM(SELECT I.\"CustNo\"";
 		sql += " 	           ,I.\"FacmNo\"";
 		sql += "			   ,SUM(I.\"DrawdownAmt\") AS \"DrawdownAmt\"";
 		sql += "	           ,SUM(I.\"PerfEqAmt\")";
 		sql += "	           ,SUM(I.\"PerfReward\")";
 		sql += "	    FROM \"PfItDetail\" I";
-		sql += "		WHERE I.\"WorkMonth\" = ( :inputYear * 100 + :inputMonth )";
+		sql += "		WHERE I.\"WorkMonth\" = :inputYear * 100 + :inputMonth ";
 		sql += "	      AND I.\"PieceCode\" IN ('A','1')";
 		sql += "	      AND I.\"DistCode\" IS NOT NULL";
 		sql += "	    GROUP BY I.\"CustNo\"";
@@ -74,7 +73,7 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	        	        ORDER BY";
 		sql += "	                    I.\"DrawdownDate\" ASC ) AS \"SEQ\"";
 		sql += " 	          FROM \"PfItDetail\" I";
-		sql += "			  WHERE I.\"WorkMonth\" = ( :inputYear * 100 + :inputMonth )";
+		sql += "			  WHERE I.\"WorkMonth\" = :inputYear * 100 + :inputMonth ";
 		sql += " 	     		 AND I.\"PieceCode\" IN ('A','1')";
 		sql += " 	     		 AND I.\"DistCode\" IS NOT NULL ) I ";
 		sql += "	 ON I.\"CustNo\" = IM.\"CustNo\"";
@@ -102,18 +101,29 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	                      AND B4.\"DeptCode\" = E4.\"CenterCode2\"";
 		sql += "	LEFT JOIN \"CdEmp\" E5 ON E5.\"EmployeeNo\" = B4.\"UnitManager\"";
 		sql += "	LEFT JOIN \"CdEmp\" E6 ON E6.\"EmployeeNo\" = B4.\"DistManager\"";
-		sql += "	LEFT JOIN \"CdWorkMonth\" M ON M.\"Year\" <= :inputYear ";
-		sql += "	                           AND M.\"Month\" >= :inputMonth ";
+		sql += "	LEFT JOIN \"CdWorkMonth\" M ON M.\"Year\" = :inputYear ";
+		sql += "	                           AND M.\"Month\" = :inputMonth ";
 		sql += "	LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = I.\"CustNo\"";
 		sql += "	                       AND F.\"FacmNo\" = I.\"FacmNo\"";
-		sql += "	LEFT JOIN \"PfReward\" R ON R.\"CustNo\" = I.\"CustNo\"";
-		sql += "	                        AND R.\"FacmNo\" = I.\"FacmNo\"";
-		sql += "	                        AND R.\"BormNo\" = I.\"BormNo\"";
-		sql += "	                        AND R.\"Introducer\" = I.\"Introducer\"";
-		sql += "	                        AND R.\"WorkMonth\" = (M.\"Year\" * 100) + M.\"Month\"";
-		sql += "	LEFT JOIN \"PfItDetailAdjust\" PDA ON R.\"CustNo\" = I.\"CustNo\"";
-		sql += "	                        	      AND R.\"FacmNo\" = I.\"FacmNo\"";
-		sql += "	                                  AND R.\"WorkMonth\" = (M.\"Year\" * 100) + M.\"Month\"";
+		sql += "	LEFT JOIN ( SELECT  \"CustNo\"";
+		sql += "					  , \"FacmNo\"";
+		sql += "					  , \"Introducer\"";
+		sql += "	  	 			  , SUM(\"IntroducerAddBonus\") AS \"IntroducerAddBonus\"";
+		sql += "	            FROM \"PfReward\"";
+		sql += "	        	WHERE \"WorkMonth\" = :inputYear * 100  + :inputMonth ";
+		sql += "	        	GROUP BY \"CustNo\"";
+		sql += "						,\"FacmNo\"";
+		sql += "						,\"Introducer\") R";
+		sql += "	 ON R.\"CustNo\" = I.\"CustNo\" AND R.\"FacmNo\" = I.\"FacmNo\"";
+		sql += "									AND R.\"Introducer\" = I.\"Introducer\"";
+//		sql += "	LEFT JOIN \"PfReward\" R ON R.\"CustNo\" = I.\"CustNo\"";
+//		sql += "	                        AND R.\"FacmNo\" = I.\"FacmNo\"";
+//		sql += "	                        AND R.\"BormNo\" = I.\"BormNo\"";
+//		sql += "	                        AND R.\"Introducer\" = I.\"Introducer\"";
+//		sql += "	                        AND R.\"WorkMonth\" = M.\"Year\" * 100 + M.\"Month\"";
+		sql += "	LEFT JOIN \"PfItDetailAdjust\" PDA ON PDA.\"CustNo\" = I.\"CustNo\"";
+		sql += "	                        	      AND PDA.\"FacmNo\" = I.\"FacmNo\"";
+		sql += "	                                  AND PDA.\"WorkMonth\" = M.\"Year\" * 100 + M.\"Month\"";
 		sql += "	LEFT JOIN ( SELECT  L.\"CustNo\"";
 		sql += "					  , L.\"FacmNo\"";
 		sql += "	  	 			  , SUM(L.\"TxAmt\") AS \"thisAmt\"";
@@ -129,18 +139,15 @@ public class LM070ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "	ORDER BY I.\"CustNo\", I.\"FacmNo\"";
 
 		this.info("sql=" + sql);
-		this.info("workYear" + (Integer.valueOf(titaVo.getParam("inputYear")) + 1911));
-		this.info("workMonth" + Integer.valueOf(titaVo.getParam("inputMonth")));
+		this.info("lM070.findAll");
+		this.info("workYear= " + (Integer.valueOf(titaVo.getParam("inputYear")) + 1911));
+		this.info("workMonth= " + Integer.valueOf(titaVo.getParam("inputMonth")));
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-
-//		query.setParameter("iday", iENTDY);
-		
-		query.setParameter("inputYear", Integer.valueOf(titaVo.getParam("inputYear")) + 1911);
-		query.setParameter("inputMonth", Integer.valueOf(titaVo.getParam("inputMonth")));
-//		query.setParameter("inputMonthStart", titaVo.getParam("inputMonthStart"));
-//		query.setParameter("inputMonthEnd", titaVo.getParam("inputMonthEnd"));
+//		WorkMonth
+		query.setParameter("inputYear", Integer.toString(Integer.valueOf(titaVo.getParam("inputYear")) + 1911));
+		query.setParameter("inputMonth", Integer.toString(Integer.valueOf(titaVo.getParam("inputMonth"))));
 
 		return this.convertToMap(query);
 	}
