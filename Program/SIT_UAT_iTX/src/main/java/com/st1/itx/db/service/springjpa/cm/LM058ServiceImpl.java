@@ -128,7 +128,7 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "									 ,TRUNC(\"DataDate\" / 100)";
 		sql += "									 ,SUM(\"LoanBalance\") \"LoanBalance\"";
 		sql += "							   FROM \"DailyLoanBal\"";
-		sql += "							   WHERE TRUNC(\"DataDate\" / 100) = :yymm";
+		sql += "							   WHERE TRUNC(\"DataDate\" / 10000) = :year";
 		sql += "						  	   GROUP BY \"CustNo\",TRUNC(\"DataDate\" / 100) )";
 		sql += "						  GROUP BY \"CustNo\") DDD";
 		sql += "	 			ON DDD.\"CustNo\" = D.\"CustNo\"";
@@ -143,53 +143,10 @@ public class LM058ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
+		query.setParameter("year", iYear);
 		query.setParameter("yymm", iYearMonth);
-//		query.setParameter("lyymm", iLYYMM);
 
 		return this.convertToMap(query);
 	}
-
-//	String sql = "SELECT D.\"CustNo\" AS F0";
-//	sql += "			,C.\"CustName\" AS F1";
-//	sql += "			,C.\"CustId\" AS F2";
-//	sql += "			,CASE";
-//	sql += "			   WHEN R.\"RelsCode\" = '99' THEN 'F'";
-//	sql += "			   WHEN R.\"RelsCode\" IS null THEN 'F'";
-//	sql += "			ELSE '*' END AS F3";
-//	sql += "			,'2' AS F4";
-//	sql += "			,'新光人壽' AS F5";
-//	sql += "			,'2' AS F6";
-//	sql += "			,D.\"LoanBal\" AS F7";
-//	sql += "			,D.\"MLoanBal\" AS F8";
-//	sql += "			,D.\"LoanBal\" - D.\"LLoanBal\" AS F9";
-//	sql += "			,D.\"LLoanBal\" AS F10";
-//	sql += "			,D.\"SEQ\" AS F11";
-//	sql += "	  FROM(SELECT D.\"CustNo\"";
-//	sql += "				 ,MAX(D.\"LoanBal\") \"LoanBal\"";
-//	sql += "				 ,MAX(D.\"LLoanBal\") \"LLoanBal\"";
-//	sql += "				 ,SUM(DECODE(D.\"MonthEndYm\",:yymm, D.\"LoanBal\", 0)) \"MLoanBal\"";
-//	sql += "				 ,ROW_NUMBER() OVER(ORDER BY MAX(D.\"LoanBal\") DESC) AS SEQ";
-//	sql += "		   FROM(SELECT D.\"CustNo\"";
-//	sql += "					  ,D.\"DataDate\"";
-//	sql += "					  ,D.\"MonthEndYm\"";
-//	sql += "					  ,SUM(D.\"LoanBalance\") \"LoanBal\"";
-//	sql += "					  ,0 \"LLoanBal\"";
-//	sql += "				FROM \"DailyLoanBal\" D";
-//	sql += "				WHERE TRUNC(D.\"DataDate\" / 100) = :yymm";
-//	sql += "				GROUP BY D.\"CustNo\", D.\"DataDate\", D.\"MonthEndYm\"";
-//	sql += "				UNION ALL";
-//	sql += "				SELECT D.\"CustNo\"";
-//	sql += "					  ,D.\"DataDate\"";
-//	sql += "					  ,D.\"MonthEndYm\"";
-//	sql += "					  ,0 \"LoanBal\"";
-//	sql += "					  ,SUM(D.\"LoanBalance\") \"LLoanBal\"";
-//	sql += "				FROM \"DailyLoanBal\" D";
-//	sql += "				WHERE TRUNC(D.\"DataDate\" / 100) = :lyymm";
-//	sql += "				GROUP BY D.\"CustNo\", D.\"DataDate\", D.\"MonthEndYm\") D";
-//	sql += "		   GROUP BY D.\"CustNo\") D";
-//	sql += "	  LEFT JOIN \"CustMain\" C ON C.\"CustNo\" = D.\"CustNo\"";
-//	sql += "	  LEFT JOIN \"RelsMain\" R ON R.\"RelsId\" = C.\"CustId\"";
-//	sql += " 	  WHERE D.\"SEQ\" <= 20";
-//	sql += "	  ORDER BY D.\"SEQ\"";
 
 }

@@ -40,7 +40,10 @@ public class LM043ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "            ,SUM(M.\"Cnt\") AS \"Cnt\"";
 		sql += "            ,SUM(M.\"PrinBalance\") AS \"PrinBalance\"";
 		sql += "      FROM (SELECT DECODE(M.\"EntCode\", '1', 1, 0) AS \"EntCode\"";
-		sql += "                  ,TO_NUMBER(NVL(M.\"CityCode\", 0)) AS \"CityCode\"";
+		sql += "                  ,CASE WHEN M.\"ClCode1\" IN (3,4) ";
+		sql += "                        THEN 0 "; // 股票
+		sql += "                   ELSE TO_NUMBER(NVL(M.\"CityCode\", 0)) ";
+		sql += "                   END AS \"CityCode\"";
 		sql += "                  ,1 AS \"Cnt\"";
 		sql += "                  ,M.\"PrinBalance\"";
 		sql += "            FROM \"MonthlyFacBal\" M";

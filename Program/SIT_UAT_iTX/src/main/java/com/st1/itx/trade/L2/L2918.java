@@ -3,8 +3,6 @@ package com.st1.itx.trade.L2;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -14,7 +12,15 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.CdLandOffice;
+import com.st1.itx.db.domain.CdLandOfficeId;
 import com.st1.itx.db.domain.ClOtherRights;
+import com.st1.itx.db.service.CdCityService;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdLandOfficeService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.date.DateUtil;
@@ -29,11 +35,16 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2918 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L2918.class);
 
 	/* DB服務注入 */
 	@Autowired
 	public ClOtherRightsService sClOtherRightsService;
+	@Autowired
+	public CdCodeService cdCodeService;
+	@Autowired
+	public CdCityService cdCityService;
+	@Autowired
+	public CdLandOfficeService cdLandOfficeService;
 
 	/* 日期工具 */
 	@Autowired
@@ -96,22 +107,54 @@ public class L2918 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();
 		}
 
-		for (ClOtherRights tClOtherRights : lClOtherRights) {
+		for (ClOtherRights t : lClOtherRights) {
+			// wk
+			String wkCityItem = "";
+			String wkLandOfficeItem = "";
+			String wkRecWordItem = "";
 
 			// new occurs
 			OccursList occurslist = new OccursList();
 
-			occurslist.putParam("OOClCode1", tClOtherRights.getClCode1());
-			occurslist.putParam("OOClCode2", tClOtherRights.getClCode2());
-			occurslist.putParam("OOClNo", tClOtherRights.getClNo());
-			occurslist.putParam("OOClSeq", tClOtherRights.getSeq());
-			occurslist.putParam("OOCity", tClOtherRights.getCity());
-			occurslist.putParam("OOLandAdm", tClOtherRights.getLandAdm());
-			occurslist.putParam("OORecYear", tClOtherRights.getRecYear());
-			occurslist.putParam("OORecWord", tClOtherRights.getRecWord());
-			occurslist.putParam("OORecNumber", tClOtherRights.getRecNumber());
-			occurslist.putParam("OORightsNote", tClOtherRights.getRightsNote());
-			occurslist.putParam("OOSecuredTotal", tClOtherRights.getSecuredTotal());
+			occurslist.putParam("OOClCode1", t.getClCode1());
+			occurslist.putParam("OOClCode2", t.getClCode2());
+			occurslist.putParam("OOClNo", t.getClNo());
+			occurslist.putParam("OOClSeq", t.getSeq());
+			// 找縣市名稱
+			if ("".equals(t.getOtherCity())) {
+				CdCity tCdCity = cdCityService.findById(t.getCity(), titaVo);
+				if (tCdCity != null) {
+					wkCityItem = tCdCity.getCityItem();
+				}
+			} else {
+				wkCityItem = t.getOtherCity();
+			}
+			occurslist.putParam("OOCityItem", wkCityItem);
+			// 找地政所名稱
+			if ("".equals(t.getOtherLandAdm())) {
+				CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", t.getLandAdm()), titaVo);
+				if (tCdCode != null) {
+					wkLandOfficeItem = tCdCode.getItem();
+				}
+			} else {
+				wkLandOfficeItem = t.getOtherLandAdm();
+			}
+			occurslist.putParam("OOLandAdmItem", wkLandOfficeItem);
+			occurslist.putParam("OORecYear", t.getRecYear());
+			// 找 地政所名稱
+			if ("".equals(t.getOtherRecWord())) {
+				CdLandOffice tCdLandOffice = cdLandOfficeService
+						.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);
+				if (tCdLandOffice != null) {
+					wkRecWordItem = tCdLandOffice.getRecWordItem();
+				}
+			} else {
+				wkRecWordItem = t.getOtherRecWord();
+			}
+			occurslist.putParam("OORecWordItem", wkRecWordItem);
+			occurslist.putParam("OORecNumber", t.getRecNumber());
+			occurslist.putParam("OORightsNote", t.getRightsNote());
+			occurslist.putParam("OOSecuredTotal", t.getSecuredTotal());
 
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occurslist);

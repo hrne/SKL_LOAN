@@ -15,7 +15,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,83)ASGN(INQLEN$)
+E(0,123)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -184,13 +184,13 @@ T(3,1)ASGN(LOOP$)
 T(2,#OOClCode1+-+#OOClCode2+-+#OOClNo)
 #OOClSeq=X,8,S
 !縣市
-#OOCity=X,6,L
+#OOCityItem=x,20,L
 !地政
-#OOLandAdm=X,6,L
+#OOLandAdmItem=x,10,L
 !收件年
 #OORecYear=A,3,L
 !收件字
-#OORecWord=X,8,L
+#OORecWordItem=x,18,L
 !收件號
 #OORecNumber=X,6,L
 !權利價值說明
@@ -248,10 +248,10 @@ TXFORM=L2918
 #OOClCode2
 #OOClNo
 #OOClSeq
-#OOCity
-#OOLandAdm
+#OOCityItem
+#OOLandAdmItem
 #OORecYear
-#OORecWord
+#OORecWordItem
 #OORecNumber
 #OORightsNote
 #OOSecuredTotal
@@ -287,13 +287,13 @@ TXFORM=L2918
 {width:100,align:'center'}
 #OOClSeq=他項權利序號
 {width:120,align:'center'}
-#OOCity=縣市
+#OOCityItem=縣市
 {width:80,align:'center'}
-#OOLandAdm=地政
+#OOLandAdmItem=地政
 {width:80,align:'center'}
 #OORecYear=收件年
 {width:80,align:'center'}
-#OORecWord=收件字
+#OORecWordItem=收件字
 {width:80,align:'center'}
 #OORecNumber=收件號
 {width:80,align:'center'}
@@ -307,6 +307,6 @@ TXFORM=L2918
 
 <include src="PRT.icf::INQ01.sel" map="i=L2918;cpi=15"/>
 
-#OOCl#OOClSeq#OOCity#OOLandAdm#OORecYear#OORecWord#OORecNumber#OORightsNote#OOSecuredTotalX
+#OOCl#OOClSeq#OOCityItem#OOLandAdmItem#OORecYear#OORecWordItem#OORecNumber#OORightsNote#OOSecuredTotalX
 <include src="PRT.icf::INQ01.sel"/>
 </sub>

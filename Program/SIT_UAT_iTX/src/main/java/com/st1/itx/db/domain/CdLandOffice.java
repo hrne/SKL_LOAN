@@ -7,11 +7,11 @@ import javax.persistence.EntityListeners;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
-import javax.persistence.Id;
+import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
 
 /**
- * CdLandOffice 地政事務所轄區代碼檔<br>
+ * CdLandOffice 地政收件字檔<br>
  * Gen By Tool
  * 
  * @author AdamPan
@@ -22,251 +22,191 @@ import javax.persistence.Column;
 @Table(name = "`CdLandOffice`")
 public class CdLandOffice implements Serializable {
 
-	/**
+
+  /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6480627899554143872L;
+	private static final long serialVersionUID = 1144159664727043154L;
 
-// 所區碼
-	@Id
-	@Column(name = "`LandOfficeCode`", length = 4)
-	private String landOfficeCode = " ";
+@EmbeddedId
+  private CdLandOfficeId cdLandOfficeId;
 
-	// 事務所名稱
-	@Column(name = "`LandOfficeItem`", length = 8)
-	private String landOfficeItem;
+  // 地政所代碼
+  @Column(name = "`LandOfficeCode`", length = 2, insertable = false, updatable = false)
+  private String landOfficeCode;
 
-	// 縣市名稱
-	@Column(name = "`City`", length = 6)
-	private String city;
+  // 收件字代碼
+  @Column(name = "`RecWord`", length = 3, insertable = false, updatable = false)
+  private String recWord;
 
-	// 行政區名稱
-	@Column(name = "`Town`", length = 8)
-	private String town;
+  // 收件字說明
+  @Column(name = "`RecWordItem`", length = 30)
+  private String recWordItem;
 
-	// 地區別
-	/* 地區別與鄉鎮區對照檔CdArea */
-	@Column(name = "`CityCode`", length = 2)
-	private String cityCode;
+  // 建檔日期時間
+  @CreatedDate
+  @Column(name = "`CreateDate`")
+  private java.sql.Timestamp createDate;
 
-	// 鄉鎮區
-	/* 地區別與鄉鎮區對照檔CdArea */
-	@Column(name = "`AreaCode`", length = 3)
-	private String areaCode;
+  // 建檔人員
+  @Column(name = "`CreateEmpNo`", length = 6)
+  private String createEmpNo;
 
-	// 建檔日期時間
-	@CreatedDate
-	@Column(name = "`CreateDate`")
-	private java.sql.Timestamp createDate;
+  // 最後更新日期時間
+  @LastModifiedDate
+  @Column(name = "`LastUpdate`")
+  private java.sql.Timestamp lastUpdate;
 
-	// 建檔人員
-	@Column(name = "`CreateEmpNo`", length = 6)
-	private String createEmpNo;
+  // 最後更新人員
+  @Column(name = "`LastUpdateEmpNo`", length = 6)
+  private String lastUpdateEmpNo;
 
-	// 最後更新日期時間
-	@LastModifiedDate
-	@Column(name = "`LastUpdate`")
-	private java.sql.Timestamp lastUpdate;
 
-	// 最後更新人員
-	@Column(name = "`LastUpdateEmpNo`", length = 6)
-	private String lastUpdateEmpNo;
+  public CdLandOfficeId getCdLandOfficeId() {
+    return this.cdLandOfficeId;
+  }
 
-	/**
-	 * 所區碼<br>
-	 * 
-	 * @return String
-	 */
-	public String getLandOfficeCode() {
-		return this.landOfficeCode == null ? "" : this.landOfficeCode;
-	}
+  public void setCdLandOfficeId(CdLandOfficeId cdLandOfficeId) {
+    this.cdLandOfficeId = cdLandOfficeId;
+  }
 
-	/**
-	 * 所區碼<br>
-	 * 
-	 *
-	 * @param landOfficeCode 所區碼
-	 */
-	public void setLandOfficeCode(String landOfficeCode) {
-		this.landOfficeCode = landOfficeCode;
-	}
+/**
+	* 地政所代碼<br>
+	* 
+	* @return String
+	*/
+  public String getLandOfficeCode() {
+    return this.landOfficeCode == null ? "" : this.landOfficeCode;
+  }
 
-	/**
-	 * 事務所名稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getLandOfficeItem() {
-		return this.landOfficeItem == null ? "" : this.landOfficeItem;
-	}
+/**
+	* 地政所代碼<br>
+	* 
+  *
+  * @param landOfficeCode 地政所代碼
+	*/
+  public void setLandOfficeCode(String landOfficeCode) {
+    this.landOfficeCode = landOfficeCode;
+  }
 
-	/**
-	 * 事務所名稱<br>
-	 * 
-	 *
-	 * @param landOfficeItem 事務所名稱
-	 */
-	public void setLandOfficeItem(String landOfficeItem) {
-		this.landOfficeItem = landOfficeItem;
-	}
+/**
+	* 收件字代碼<br>
+	* 
+	* @return String
+	*/
+  public String getRecWord() {
+    return this.recWord == null ? "" : this.recWord;
+  }
 
-	/**
-	 * 縣市名稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getCity() {
-		return this.city == null ? "" : this.city;
-	}
+/**
+	* 收件字代碼<br>
+	* 
+  *
+  * @param recWord 收件字代碼
+	*/
+  public void setRecWord(String recWord) {
+    this.recWord = recWord;
+  }
 
-	/**
-	 * 縣市名稱<br>
-	 * 
-	 *
-	 * @param city 縣市名稱
-	 */
-	public void setCity(String city) {
-		this.city = city;
-	}
+/**
+	* 收件字說明<br>
+	* 
+	* @return String
+	*/
+  public String getRecWordItem() {
+    return this.recWordItem == null ? "" : this.recWordItem;
+  }
 
-	/**
-	 * 行政區名稱<br>
-	 * 
-	 * @return String
-	 */
-	public String getTown() {
-		return this.town == null ? "" : this.town;
-	}
+/**
+	* 收件字說明<br>
+	* 
+  *
+  * @param recWordItem 收件字說明
+	*/
+  public void setRecWordItem(String recWordItem) {
+    this.recWordItem = recWordItem;
+  }
 
-	/**
-	 * 行政區名稱<br>
-	 * 
-	 *
-	 * @param town 行政區名稱
-	 */
-	public void setTown(String town) {
-		this.town = town;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getCreateDate() {
+    return this.createDate;
+  }
 
-	/**
-	 * 地區別<br>
-	 * 地區別與鄉鎮區對照檔CdArea
-	 * 
-	 * @return String
-	 */
-	public String getCityCode() {
-		return this.cityCode == null ? "" : this.cityCode;
-	}
+/**
+	* 建檔日期時間<br>
+	* 
+  *
+  * @param createDate 建檔日期時間
+	*/
+  public void setCreateDate(java.sql.Timestamp createDate) {
+    this.createDate = createDate;
+  }
 
-	/**
-	 * 地區別<br>
-	 * 地區別與鄉鎮區對照檔CdArea
-	 *
-	 * @param cityCode 地區別
-	 */
-	public void setCityCode(String cityCode) {
-		this.cityCode = cityCode;
-	}
+/**
+	* 建檔人員<br>
+	* 
+	* @return String
+	*/
+  public String getCreateEmpNo() {
+    return this.createEmpNo == null ? "" : this.createEmpNo;
+  }
 
-	/**
-	 * 鄉鎮區<br>
-	 * 地區別與鄉鎮區對照檔CdArea
-	 * 
-	 * @return String
-	 */
-	public String getAreaCode() {
-		return this.areaCode == null ? "" : this.areaCode;
-	}
+/**
+	* 建檔人員<br>
+	* 
+  *
+  * @param createEmpNo 建檔人員
+	*/
+  public void setCreateEmpNo(String createEmpNo) {
+    this.createEmpNo = createEmpNo;
+  }
 
-	/**
-	 * 鄉鎮區<br>
-	 * 地區別與鄉鎮區對照檔CdArea
-	 *
-	 * @param areaCode 鄉鎮區
-	 */
-	public void setAreaCode(String areaCode) {
-		this.areaCode = areaCode;
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+	* @return java.sql.Timestamp
+	*/
+  public java.sql.Timestamp getLastUpdate() {
+    return this.lastUpdate;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getCreateDate() {
-		return this.createDate;
-	}
+/**
+	* 最後更新日期時間<br>
+	* 
+  *
+  * @param lastUpdate 最後更新日期時間
+	*/
+  public void setLastUpdate(java.sql.Timestamp lastUpdate) {
+    this.lastUpdate = lastUpdate;
+  }
 
-	/**
-	 * 建檔日期時間<br>
-	 * 
-	 *
-	 * @param createDate 建檔日期時間
-	 */
-	public void setCreateDate(java.sql.Timestamp createDate) {
-		this.createDate = createDate;
-	}
+/**
+	* 最後更新人員<br>
+	* 
+	* @return String
+	*/
+  public String getLastUpdateEmpNo() {
+    return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getCreateEmpNo() {
-		return this.createEmpNo == null ? "" : this.createEmpNo;
-	}
+/**
+	* 最後更新人員<br>
+	* 
+  *
+  * @param lastUpdateEmpNo 最後更新人員
+	*/
+  public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
+    this.lastUpdateEmpNo = lastUpdateEmpNo;
+  }
 
-	/**
-	 * 建檔人員<br>
-	 * 
-	 *
-	 * @param createEmpNo 建檔人員
-	 */
-	public void setCreateEmpNo(String createEmpNo) {
-		this.createEmpNo = createEmpNo;
-	}
 
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 * @return java.sql.Timestamp
-	 */
-	public java.sql.Timestamp getLastUpdate() {
-		return this.lastUpdate;
-	}
-
-	/**
-	 * 最後更新日期時間<br>
-	 * 
-	 *
-	 * @param lastUpdate 最後更新日期時間
-	 */
-	public void setLastUpdate(java.sql.Timestamp lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
-
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 * @return String
-	 */
-	public String getLastUpdateEmpNo() {
-		return this.lastUpdateEmpNo == null ? "" : this.lastUpdateEmpNo;
-	}
-
-	/**
-	 * 最後更新人員<br>
-	 * 
-	 *
-	 * @param lastUpdateEmpNo 最後更新人員
-	 */
-	public void setLastUpdateEmpNo(String lastUpdateEmpNo) {
-		this.lastUpdateEmpNo = lastUpdateEmpNo;
-	}
-
-	@Override
-	public String toString() {
-		return "CdLandOffice [landOfficeCode=" + landOfficeCode + ", landOfficeItem=" + landOfficeItem + ", city=" + city + ", town=" + town + ", cityCode=" + cityCode + ", areaCode=" + areaCode
-				+ ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
-	}
+  @Override
+  public String toString() {
+    return "CdLandOffice [cdLandOfficeId=" + cdLandOfficeId + ", recWordItem=" + recWordItem + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate
+           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+  }
 }

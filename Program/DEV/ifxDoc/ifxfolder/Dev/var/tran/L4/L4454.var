@@ -157,6 +157,7 @@ E(0,1)
 #L4454PRT=A,1,S
 C(4,#FlagA,E(0,0),E(0,1))
 C(5,#TXFORM,L4454,E(0,1),E(0,0))
+C(3,#FunctionCode,3,E(0,2),$)
 ![資料表頭(HEADER)長度]
 #L4454HD=n,3,S
 C(4,#FlagA,S,$)E(0,6)ASGN(INQHD$)
@@ -225,6 +226,20 @@ TXFORM=L4454
 <sub type="SELECT">
 <include src="PRT.icf::UPD01.sel"/>
 #L4454PRT=1,L4454,NA,,D,15
+%
+#ReportACustNo
+#ReportAFacmNo
+#ReportACustName
+#ReportAIntStartDate
+#ReportAIntEndDate
+#ReportARepayAmt
+#ReportARepayBank
+#ReportARepayAcctNo
+@
+#ReportACnt
+^
+
+#L4454PRT=2,L4454A,NA,,D,15
 %
 #ReportACustNo
 #ReportAFacmNo

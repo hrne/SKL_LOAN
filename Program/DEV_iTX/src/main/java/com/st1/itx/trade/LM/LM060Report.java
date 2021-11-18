@@ -104,11 +104,12 @@ public class LM060Report extends MakeReport {
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
+		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime())) - 19110000;
 
 		// 上個月底
 		calendar.set(iYear, iMonth - 1, 0);
 
-		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime())) - 19110000;
 		
 	
 

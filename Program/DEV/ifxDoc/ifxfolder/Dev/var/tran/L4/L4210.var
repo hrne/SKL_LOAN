@@ -40,10 +40,12 @@ T(3,*)
 #FdRepayId=X,2,L
 T(3,*)
 #FdRepayName=X,2,L
+T(3,*)
 #FdCustNo=X,2,L
+T(3,*)
 #FdCustNm=X,2,L
 #FdRvNo=X,2,L
-T(3,*)
+!T(3,*)
 #FdNote=X,2,L
 #FdBatchNo=X,2,L
 #FdRepayType=X,2,L
@@ -138,7 +140,9 @@ C(2,#FunctionCode,T(3, ),T(3,*),T(3,*),T(3,*),T(3, ),T(3, ))
 T(2,@FdRepayCode,#ShowFd)     
 T(2,@FdEntryDate,#ShowFd)
 T(2,@FdRepayId,#ShowFd)
-T(2,@FdRvNo,#ShowFd)
+T(2,@FdRepayName,#ShowFd)
+T(2,@FdCustNo,#ShowFd)
+!T(2,@FdRvNo,#ShowFd)
 T(2,@FdRepayType,#ShowFd)
 T(2,@FdRepayAmt,#ShowFd)
 
@@ -199,6 +203,7 @@ T(1,@AcNoCode,#L4r09AcNo,1,11)
 T(1,@AcSubCode,#L4r09AcNo,12,5)
 T(1,@AcDtlCode,#L4r09AcNo,17,2)
 E(3,@RepayAmt,#L4r09RepayAmt)
+T(2,@EntryDate,#L4r09EntryDate)
 T(2,@RepayId,#L4r09RepayId)
 T(2,@RepayName,#L4r09RepayName)
 E(0,@CustNo,#L4r09CustNo)
@@ -213,6 +218,9 @@ C(3,#FunctionCode,4,s,$)
 C(3,#FunctionCode,5,s,$)
 HELP(#RepayCodeHelp)
 @V(H,#RepayCodeHelp)
+
+
+#Check=X,1,S
 C(3,#RepayCode,11,
 HIDE(#AcNoCode,#DashA,#AcSubCode,#DashB,#AcDtlCode,#BTNA,#AcNoX)SHOW(#ReConCode),
 SHOW(#AcNoCode,#DashA,#AcSubCode,#DashB,#AcDtlCode,#BTNA,#AcNoX)HIDE(#ReConCode))
@@ -309,7 +317,7 @@ C(4,#AcNoCode,C(4,#ReConCode,V(P,請點選瀏覽選取會計科目),$),$)
 #EntryDate=D,7,I
 C(3,#FunctionCode,4,s,$)
 C(3,#FunctionCode,5,s,$)
-E(0,@EntryDate,#SYSDATE)
+C(3,#FunctionCode,1,E(0,@EntryDate,#SYSDATE),$)
 @V(7)A(DATE,0,#EntryDate)
 IF(#EntryDate<=#AcDate,$,V(P,輸入範圍需<=會計日))
 

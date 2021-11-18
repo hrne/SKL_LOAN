@@ -22,7 +22,6 @@ import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.CustNoticeCom;
 import com.st1.itx.util.common.MakeReport;
 import com.st1.itx.util.date.DateUtil;
-import com.st1.itx.util.format.FormatUtil;
 import com.st1.itx.util.parse.Parse;
 
 @Component("L4455Report")
@@ -82,7 +81,7 @@ public class L4455Report extends MakeReport {
 	private BigDecimal totTempDr = new BigDecimal("0");
 	private BigDecimal totTempCr = new BigDecimal("0");
 	private BigDecimal totShortfall = new BigDecimal("0");
-				
+	private BigDecimal totFee = new BigDecimal("0");			
 	//  業務科目 合計
 				
 	private BigDecimal RepayAmt = new BigDecimal("0");
@@ -94,7 +93,8 @@ public class L4455Report extends MakeReport {
 	private BigDecimal TempDr = new BigDecimal("0");
 	private BigDecimal TempCr = new BigDecimal("0");
 	private BigDecimal Shortfall = new BigDecimal("0");
-				
+	private BigDecimal Fee = new BigDecimal("0");	
+	
 	private List<CdCode> lCdCode = null;
 	private List<CdCode> lCdCode2 = null;
     // 每頁筆數
@@ -160,8 +160,8 @@ public class L4455Report extends MakeReport {
 			}
 		}
 		this.print(-6, 35, "扣款銀行：" + repaybank + "  " + bank);
-		this.print(-8, 1, "戶號              戶名           扣款金額         作帳金額             計息起迄日         本金         利息         暫付款         違約金         暫收借         暫收貸         短繳");
-		this.print(-9, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+		this.print(-8, 1, "戶號              戶名           扣款金額    作帳金額        計息起迄日         本金         利息       暫付款       違約金       暫收借       暫收貸         短繳         帳管費及其他");
+		this.print(-9, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 	}
 	
 	public void exec(TitaVo titaVo) throws LogicException {
@@ -207,76 +207,81 @@ public class L4455Report extends MakeReport {
 
 //				1.每筆先印出明細
 				this.print(1, 1,"                                                                                                                                                                               ");
-				this.print(0, 1, FormatUtil.pad9(L4455List.get(i).get("CustNo"), 7));// 戶號
-				this.print(0, 9, "-");
-				this.print(0, 10, FormatUtil.pad9(L4455List.get(i).get("FacmNo"), 3));// 額度
-				this.print(0, 13, "-");
-				this.print(0, 14, FormatUtil.pad9(L4455List.get(i).get("FacmNo"), 3));// 撥款
+				this.print(0, 1, L4455List.get(i).get("CustNo"));// 戶號
 				
-				this.print(0, 19, limitLength(L4455List.get(i).get("CustName"),20));// 戶名
-				
-				if(parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-					this.print(0, 47, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt"))), "R");// 扣款金額					
+				if(parse.stringToInteger(L4455List.get(i).get("NameSeq")) == 1) {
+					this.print(0, 19, limitLength(L4455List.get(i).get("CustName"),20));// 戶名					
 				}
 				
+				if(parse.stringToInteger(L4455List.get(i).get("TxSeq")) == 1) {
+				  if(parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
+					this.print(0, 47, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt"))), "R");// 扣款金額					
+				  }
+				}
 				if(parse.stringToBigDecimal(L4455List.get(i).get("AcctAmt")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-				  this.print(0, 66, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("AcctAmt"))), "R");// 作帳金額
+				  this.print(0, 61, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("AcctAmt"))), "R");// 作帳金額
 				}
 				
 				if(parse.stringToInteger(L4455List.get(i).get("IntStartDate")) != 0) {
 					String IntStartDate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("IntStartDate")) -19110000);
 					
 					if(String.valueOf(IntStartDate).length() == 7) {
-						this.print(0, 70, IntStartDate.substring(0, 3) + "/" + IntStartDate.substring(3, 5) + "/" + IntStartDate.substring(5, 7));// 計息起訖日					
+						this.print(0, 63, IntStartDate.substring(0, 3) + "/" + IntStartDate.substring(3, 5) + "/" + IntStartDate.substring(5, 7));// 計息起訖日					
 					} else {
-						this.print(0, 70, IntStartDate.substring(0, 2) + "/" + IntStartDate.substring(2, 4) + "/" + IntStartDate.substring(4, 6));// 計息起訖日					
+						this.print(0, 63, IntStartDate.substring(0, 2) + "/" + IntStartDate.substring(2, 4) + "/" + IntStartDate.substring(4, 6));// 計息起訖日					
 					}
 					
 				} 
 				
-				this.print(0, 80, "-");// 計息起訖日
+				this.print(0, 73, "-");// 計息起訖日
 				
 				if(parse.stringToInteger(L4455List.get(i).get("IntEndDate")) != 0) {
 					
 					String IntEndDate = String.valueOf(parse.stringToInteger(L4455List.get(i).get("IntEndDate")) -19110000);
 					
 					if(String.valueOf(IntEndDate).length() == 7) {
-						this.print(0, 82, IntEndDate.substring(0, 3) + "/" + IntEndDate.substring(3, 5) + "/" + IntEndDate.substring(5, 7));// 計息起訖日					
+						this.print(0, 75, IntEndDate.substring(0, 3) + "/" + IntEndDate.substring(3, 5) + "/" + IntEndDate.substring(5, 7));// 計息起訖日					
 					} else {
-						this.print(0, 82, IntEndDate.substring(0, 2) + "/" + IntEndDate.substring(2, 4) + "/" + IntEndDate.substring(4, 6));// 計息起訖日					
+						this.print(0, 75, IntEndDate.substring(0, 2) + "/" + IntEndDate.substring(2, 4) + "/" + IntEndDate.substring(4, 6));// 計息起訖日					
 					}
 					
 				}
 				
 				if(parse.stringToBigDecimal(L4455List.get(i).get("Principal")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-				  this.print(0, 107, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("Principal"))), "R");// 本金
+				  this.print(0, 96, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("Principal"))), "R");// 本金
 				}
 				
 				if(parse.stringToBigDecimal(L4455List.get(i).get("Interest")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-				  this.print(0, 121, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("Interest"))), "R");// 利息
+				  this.print(0, 110, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("Interest"))), "R");// 利息
 				} 
 				
 				if(parse.stringToBigDecimal(L4455List.get(i).get("TempPayAmt")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-				  this.print(0, 138, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("TempPayAmt"))), "R");// 暫付款
+				  this.print(0, 125, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("TempPayAmt"))), "R");// 暫付款
 				}
 				
 				if(parse.stringToBigDecimal(L4455List.get(i).get("BreachAmt")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-				  this.print(0, 155, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("BreachAmt"))), "R");// 違約金
+				  this.print(0, 139, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("BreachAmt"))), "R");// 違約金
 				}
 				
 				if(parse.stringToBigDecimal(L4455List.get(i).get("TempDr")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-				  this.print(0, 172, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("TempDr"))), "R");// 暫收借
+				  this.print(0, 154, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("TempDr"))), "R");// 暫收借
 				}
 				
 				if(parse.stringToBigDecimal(L4455List.get(i).get("TempCr")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-				  this.print(0, 188, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("TempCr"))), "R");// 暫收貸		
+				  this.print(0, 169, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("TempCr"))), "R");// 暫收貸		
 				}
 				
 				if(parse.stringToBigDecimal(L4455List.get(i).get("Shortfall")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-				  this.print(0, 203, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("Shortfall"))), "R");// 短繳		
+				  this.print(0, 183, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("Shortfall"))), "R");// 短繳		
 				}
 				
-				RepayAmt = RepayAmt.add(parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt")));
+				if(parse.stringToBigDecimal(L4455List.get(i).get("Fee")).compareTo(new BigDecimal("0")) != 0) { // 0不顯示
+				  this.print(0, 207, df1.format(parse.stringToBigDecimal(L4455List.get(i).get("Fee"))), "R");// 帳管費及其他		
+				}
+				
+				if(parse.stringToInteger(L4455List.get(i).get("TxSeq")) == 1) {
+				  RepayAmt = RepayAmt.add(parse.stringToBigDecimal(L4455List.get(i).get("RepayAmt")));
+				}
 				AcctAmt = AcctAmt.add(parse.stringToBigDecimal(L4455List.get(i).get("AcctAmt")));
 				Principal = Principal.add(parse.stringToBigDecimal(L4455List.get(i).get("Principal")));
 				Interest = Interest.add(parse.stringToBigDecimal(L4455List.get(i).get("Interest")));
@@ -285,7 +290,7 @@ public class L4455Report extends MakeReport {
 				TempDr = TempDr.add(parse.stringToBigDecimal(L4455List.get(i).get("TempDr")));
 				TempCr = TempCr.add(parse.stringToBigDecimal(L4455List.get(i).get("TempCr")));
 				Shortfall = Shortfall.add(parse.stringToBigDecimal(L4455List.get(i).get("Shortfall")));
-				
+				Fee = Fee.add(parse.stringToBigDecimal(L4455List.get(i).get("Fee")));
 				
 				if (j != L4455List.size()) {
 //					批次號碼/扣款日期/扣款銀行 不同則跳頁，並且累計歸零
@@ -299,7 +304,7 @@ public class L4455Report extends MakeReport {
 						!L4455List.get(i).get("RepayBank").equals(repaybank) ) {
 						this.info("Not Match...");
 						// 換頁科目合計		
-						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 1,"                                                                                                                                                                               ");
 						for(CdCode tCdCode :lCdCode2) {
 							if(L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
@@ -326,7 +331,7 @@ public class L4455Report extends MakeReport {
 					
 					
 					if(!L4455List.get(i).get("AcctCode").equals(acctcode)) {   // 科目不同 科目合計
-						this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 						this.print(1, 1,"                                                                                                                                                                               ");
 						for(CdCode tCdCode :lCdCode2) {
 							if(L4455List.get(i).get("AcctCode").equals(tCdCode.getCode())) {
@@ -338,7 +343,7 @@ public class L4455Report extends MakeReport {
 						
 						amt();
 						
-						this.print(2, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+						this.print(2, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 						pageCnt = pageCnt + 4;
 						
 						amttototal(); // 業務科目金額to總和		
@@ -357,7 +362,7 @@ public class L4455Report extends MakeReport {
 				} else {
 //				3.若為最後一筆，則固定產出小計、總計、報表合計
 //					扣除總計合計的行數 +1 
-					this.print(1, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+					this.print(1, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					this.print(1, 1,"                                                                                                                                                                               ");
 					for(CdCode tCdCode :lCdCode2) {
 						if(acctcode.equals(tCdCode.getCode())) {
@@ -372,7 +377,7 @@ public class L4455Report extends MakeReport {
 					amttototal(); // 業務科目金額to總和		
 					init(); // 業務科目金額歸0
 					
-					this.print(2, 1, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+					this.print(2, 1, "----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 					this.print(1, 1, "合計");
 					
 					totalamt();
@@ -429,6 +434,7 @@ public class L4455Report extends MakeReport {
 		TempDr = new BigDecimal("0");
 		TempCr = new BigDecimal("0");
 		Shortfall = new BigDecimal("0");
+		Fee = new BigDecimal("0");
 	}
 	
 	private void amt() {
@@ -436,40 +442,45 @@ public class L4455Report extends MakeReport {
 		DecimalFormat df1 = new DecimalFormat("#,##0");
 		
 		if(RepayAmt.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-			this.print(0, 47, df1.format(RepayAmt), "R");// 扣款金額					
+		  this.print(0, 47, df1.format(RepayAmt), "R");// 扣款金額					
 		}
 		
 		if(AcctAmt.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 66, df1.format(AcctAmt), "R");// 作帳金額
+		  this.print(0, 61, df1.format(AcctAmt), "R");// 作帳金額
 		}
 		
 		if(Principal.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 107, df1.format(Principal), "R");// 本金
+		  this.print(0, 96, df1.format(Principal), "R");// 本金
 		}
 			
 		if(Interest.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 121, df1.format(Interest), "R");// 利息
+		  this.print(0, 110, df1.format(Interest), "R");// 利息
 		} 
 			
 		if(TempPayAmt.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 138, df1.format(TempPayAmt), "R");// 暫付款
+		  this.print(0, 125, df1.format(TempPayAmt), "R");// 暫付款
 		}
 			
 		if(BreachAmt.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 155, df1.format(BreachAmt), "R");// 違約金
+		  this.print(0, 139, df1.format(BreachAmt), "R");// 違約金
 		}
 			
 		if(TempDr.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 172, df1.format(TempDr), "R");// 暫收借
+		  this.print(0, 154, df1.format(TempDr), "R");// 暫收借
 		}
 			
 		if(TempCr.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 188, df1.format(TempCr), "R");// 暫收貸		
+		  this.print(0, 169, df1.format(TempCr), "R");// 暫收貸		
 		}
 			
 		if(Shortfall.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 203, df1.format(Shortfall), "R");// 短繳		
+		  this.print(0, 183, df1.format(Shortfall), "R");// 短繳		
 		}
+		
+		if(Fee.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
+		  this.print(0, 207, df1.format(Fee), "R");// 帳管費及其他		
+		}
+		
 	}
 	
 	
@@ -482,36 +493,41 @@ public class L4455Report extends MakeReport {
 		}
 		
 		if(totAcctAmt.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 66, df1.format(totAcctAmt), "R");// 作帳金額
+		  this.print(0, 61, df1.format(totAcctAmt), "R");// 作帳金額
 		}
 		
 		if(totPrincipal.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 107, df1.format(totPrincipal), "R");// 本金
+		  this.print(0, 97, df1.format(totPrincipal), "R");// 本金
 		}
 			
 		if(totInterest.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 121, df1.format(totInterest), "R");// 利息
+		  this.print(0, 110, df1.format(totInterest), "R");// 利息
 		} 
 			
 		if(totTempPayAmt.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 138, df1.format(totTempPayAmt), "R");// 暫付款
+		  this.print(0, 125, df1.format(totTempPayAmt), "R");// 暫付款
 		}
 			
 		if(totBreachAmt.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 155, df1.format(totBreachAmt), "R");// 違約金
+		  this.print(0, 139, df1.format(totBreachAmt), "R");// 違約金
 		}
 			
 		if(totTempDr.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 172, df1.format(totTempDr), "R");// 暫收借
+		  this.print(0, 154, df1.format(totTempDr), "R");// 暫收借
 		}
 			
 		if(totTempCr.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 188, df1.format(totTempCr), "R");// 暫收貸		
+		  this.print(0, 170, df1.format(totTempCr), "R");// 暫收貸		
 		}
 			
 		if(totShortfall.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
-		  this.print(0, 203, df1.format(totShortfall), "R");// 短繳		
+		  this.print(0, 183, df1.format(totShortfall), "R");// 短繳		
 		}
+		
+		if(totFee.compareTo(new BigDecimal("0")) != 0) { // 0不顯示
+		  this.print(0, 207, df1.format(totFee), "R");// 帳管費及其他		
+		}
+		
 	}
 
 	private void amttototal() {
@@ -525,5 +541,6 @@ public class L4455Report extends MakeReport {
 		totTempDr = totTempDr.add(TempDr);
 		totTempCr = totTempCr.add(TempCr);
 		totShortfall = totShortfall.add(Shortfall);
+		totFee = totFee.add(Fee);
 	}
 }

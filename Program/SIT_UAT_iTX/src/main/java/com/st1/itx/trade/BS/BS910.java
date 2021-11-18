@@ -230,7 +230,7 @@ public class BS910 extends TradeBuffer {
 		TxToDoDetailReserveId tTxToDoDetailReserveId = new TxToDoDetailReserveId();
 		tTxToDoDetailReserveId.setItemCode(tTxToDoDetail.getItemCode());
 		tTxToDoDetailReserveId.setDtlValue(tTxToDoDetail.getDtlValue());
-		tTxToDoDetailReserve.setTxToDoDetailReserveId(tTxToDoDetailReserveId);
+//		tTxToDoDetailReserve.setTxToDoDetailReserveId(tTxToDoDetailReserveId);
 		tTxToDoDetailReserve.setDataDate(iAcDate);
 		tTxToDoDetailReserve.setProcessNote(tTxToDoDetail.getProcessNote());
 		lTxToDoDetailReserve.add(tTxToDoDetailReserve);

@@ -81,7 +81,7 @@ public class LM030Report extends MakeReport {
 				case 5:
 				case 10:
 				case 11:
-					makeExcel.setValue(row, col, value == null ? " " : this.showRocDate(value, 3));
+					makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
 					break;
 				case 6:
 				case 7:
@@ -95,10 +95,10 @@ public class LM030Report extends MakeReport {
 					makeExcel.setValue(row, col, getBigDecimal(value), "#,##0.0000");
 					break;
 				case 9:
-					makeExcel.setValue(row, col, this.showRocDate(value, 3));
+					makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(this.showRocDate(value, 3)) : value);
 					break;
 				default:
-					makeExcel.setValue(row, col, value == null ? " " : value);
+					makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToBigDecimal(value) : value);
 					break;
 				}
 			} // for

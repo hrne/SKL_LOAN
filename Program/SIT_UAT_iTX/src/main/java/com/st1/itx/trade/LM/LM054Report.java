@@ -158,13 +158,15 @@ public class LM054Report extends MakeReport {
 			// 擔保品設定順位
 			makeExcel.setValue(row, 15, lM054Vo.get("F13"), "C");
 			// 擔保品估計總值
-			int templineAmt = 0;
-			if (templineAmt == Integer.valueOf(lM054Vo.get("F14"))) {
-				templineAmt = 0;
+			BigDecimal templineAmt = BigDecimal.ZERO;
+			BigDecimal f14 = new BigDecimal(lM054Vo.get("F14").toString());
+			//decimal 等於0表示相同 
+			if (templineAmt.compareTo(f14) == 0) {
+				templineAmt = BigDecimal.ZERO;
 			} else {
-				templineAmt = Integer.valueOf(lM054Vo.get("F14"));
+				templineAmt = f14;
 			}
-			makeExcel.setValue(row, 16, new BigDecimal(templineAmt), "#,##0");
+			makeExcel.setValue(row, 16, templineAmt, "#,##0");
 			// 擔保品核貸金額
 			makeExcel.setValue(row, 17, new BigDecimal(lM054Vo.get("F15")), "#,##0");
 			// 轉催收日期

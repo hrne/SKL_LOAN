@@ -933,6 +933,7 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	private void deletePostAuthLog(String authApplCode, String authCode, TitaVo titaVo) throws LogicException {
+		this.info("deletePostAuthLog ... ");
 		PostAuthLog tPostAuthLog = postAuthLogService.repayAcctFirst(iCustNo, iPostDepCode, iRepayAcct, authCode,
 				titaVo);
 		if (tPostAuthLog == null) {
@@ -953,6 +954,7 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	private void deleteAchAuthLog(String createFlag, TitaVo titaVo) throws LogicException {
+		this.info("deleteAchAuthLog ... ");
 		AchAuthLog tAchAuthLog = achAuthLogService.repayAcctFirst(iCustNo, iRepayBank, iRepayAcct, titaVo);
 		if (tAchAuthLog == null) {
 			throw new LogicException("E0015", "此筆授權資料找不到"); // 檢查錯誤
@@ -999,6 +1001,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 	//
 	private void deleteBankAuthAct(BankAuthActId tBankAuthActId, TitaVo titaVo) throws LogicException {
+		this.info("deleteBankAuthAct ...");
 		BankAuthAct tBankAuthAct = bankAuthActService.holdById(tBankAuthActId, titaVo);
 
 		try {
@@ -1060,6 +1063,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 	// 新增郵局授權記錄歷史檔
 	private void insertPostHistory(PostAuthLog t, String authApplCode, TitaVo titaVo) throws LogicException {
+		this.info("insertPostHistory ...");
 		PostAuthLogHistory tPostAuthLogHistory = new PostAuthLogHistory();
 		tPostAuthLogHistory.setCustNo(t.getCustNo());
 		tPostAuthLogHistory.setFacmNo(t.getFacmNo());
@@ -1096,6 +1100,7 @@ public class BankAuthActCom extends TradeBuffer {
 //	 * @param iStatus 1:停止使用 0:授權成功
 	// 新增ACH授權記錄歷史檔
 	private void insertAchHistory(AchAuthLog t, String createFlag, TitaVo titaVo) throws LogicException {
+		this.info("insertAchHistory ...");
 		AchAuthLogHistory tAchAuthLogHistory = new AchAuthLogHistory();
 		tAchAuthLogHistory.setCustNo(t.getCustNo());
 		tAchAuthLogHistory.setFacmNo(t.getFacmNo());
@@ -1148,6 +1153,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 	// 刪除還款帳號變更(含還款方式)紀錄檔
 	private void addRepayActChangeLogDelete(TitaVo titaVo) throws LogicException {
+		this.info("addRepayActChangeLogDelete ...");
 		RepayActChangeLog tRepayActChangeLog = repayActChangeLogService.findRelTxseqFirst(
 				this.txBuffer.getTxCom().getReldy() + 19110000, this.txBuffer.getTxCom().getRelNo(), titaVo);
 		if (tRepayActChangeLog == null) {
@@ -1163,6 +1169,7 @@ public class BankAuthActCom extends TradeBuffer {
 
 	// 新增還款帳號變更(含還款方式)紀錄檔
 	private void insertRepayActChangeLog(BankAuthAct t, TitaVo titaVo) throws LogicException {
+		this.info("insertRepayActChangeLog ...");
 		if (t.getAuthType().equals("02")) {
 			return;
 		}
@@ -1184,6 +1191,7 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	private void setVarValue(TitaVo titaVo) throws LogicException {
+		this.info("setVarValue ...");
 		if ("L2".equals(titaVo.getTxcd().substring(0, 2))) {
 			iPostDepCode = titaVo.get("PostCode");
 			iRepayAcct = titaVo.get("RepayAcctNo");
@@ -1237,6 +1245,7 @@ public class BankAuthActCom extends TradeBuffer {
 	}
 
 	private void showLog() throws LogicException {
+		this.info("showLog ...");
 		this.info("iFuncCode : " + iFuncCode);
 		this.info("iCreateFlag : " + iCreateFlag);
 		this.info("iCustId : " + iCustId);

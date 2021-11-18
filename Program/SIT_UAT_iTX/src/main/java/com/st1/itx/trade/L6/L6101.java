@@ -181,14 +181,25 @@ public class L6101 extends TradeBuffer {
 		case "09": // 09-放款
 			// MsgCode=01 撥款匯款作業未完成
 			String batchNo = "LN" + titaVo.getParam("BatNo") + "  ";
-			Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(this.txBuffer.getTxCom().getTbsdyf(), batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
-					titaVo);
-			if (slBankRemit!=null) {
+			Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(this.txBuffer.getTxCom().getTbsdyf(), batchNo,
+					00, 99, 0, 0, 0, Integer.MAX_VALUE, titaVo);
+			if (slBankRemit != null) {
 				cMsgCode = cMsgCode + 1;
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOMsgCode", "錯誤");
-				occursList.putParam("OOMessage", "撥款匯款作業未完成");
-				this.totaVo.addOccursList(occursList);				
+				occursList.putParam("OOMessage", "撥款退款作業(撥款)未完成");
+				this.totaVo.addOccursList(occursList);
+			}
+			slBankRemit = null;
+			batchNo = "RT" + titaVo.getParam("BatNo") + "  ";
+			slBankRemit = bankRemitService.findL4901B(this.txBuffer.getTxCom().getTbsdyf(), batchNo, 00, 99, 0, 0, 0,
+					Integer.MAX_VALUE, titaVo);
+			if (slBankRemit != null) {
+				cMsgCode = cMsgCode + 1;
+				OccursList occursList = new OccursList();
+				occursList.putParam("OOMsgCode", "錯誤");
+				occursList.putParam("OOMessage", "撥款退款作業(退款)未完成");
+				this.totaVo.addOccursList(occursList);
 			}
 			// MsgCode=02 檢查支票繳款業務必須先關帳
 			if (cClsFg == 1) {
@@ -292,7 +303,8 @@ public class L6101 extends TradeBuffer {
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOMsgCode", "錯誤");
-				occursList.putParam("OOMessage", "應處理清單，" + tTxToDoMain.getItemDesc() + "，未處理筆數：" + tTxToDoMain.getUnProcessCnt());
+				occursList.putParam("OOMessage",
+						"應處理清單，" + tTxToDoMain.getItemDesc() + "，未處理筆數：" + tTxToDoMain.getUnProcessCnt());
 				this.totaVo.addOccursList(occursList);
 
 				fUnProcessCnt = fUnProcessCnt + tTxToDoMain.getUnProcessCnt();
@@ -324,7 +336,8 @@ public class L6101 extends TradeBuffer {
 
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOMsgCode", "錯誤");
-				occursList.putParam("OOMessage", "整批入帳未完成，批號：" + tBatxHead.getBatchNo() + "，筆數：" + tBatxHead.getUnfinishCnt());
+				occursList.putParam("OOMessage",
+						"整批入帳未完成，批號：" + tBatxHead.getBatchNo() + "，筆數：" + tBatxHead.getUnfinishCnt());
 				this.totaVo.addOccursList(occursList);
 
 				fBatxTotCnt = fBatxTotCnt + tBatxHead.getUnfinishCnt();
@@ -340,7 +353,8 @@ public class L6101 extends TradeBuffer {
 	private int findTxFlow(String fSecNo, int fTxFlowCnt, TitaVo titaVo) throws LogicException {
 
 		Slice<TxFlow> slTxFlow;
-		slTxFlow = sTxFlowService.findBySecNo(this.txBuffer.getTxCom().getTbsdy() + 19110000, fSecNo, this.index, Integer.MAX_VALUE);
+		slTxFlow = sTxFlowService.findBySecNo(this.txBuffer.getTxCom().getTbsdy() + 19110000, fSecNo, this.index,
+				Integer.MAX_VALUE);
 		List<TxFlow> lTxFlow = slTxFlow == null ? null : slTxFlow.getContent();
 
 		if (lTxFlow == null || lTxFlow.size() == 0) {
@@ -351,8 +365,8 @@ public class L6101 extends TradeBuffer {
 				// 0.已放行 1.待放行 2.待審核 3.待提交 9.已訂正
 				if (tTxFlow.getFlowMode() == 1 || tTxFlow.getFlowMode() == 3) {
 					OccursList occursList = new OccursList();
-					
-					if(tTxFlow.getAcCnt()==0) {//帳務筆數
+
+					if (tTxFlow.getAcCnt() == 0) {// 帳務筆數
 						occursList.putParam("OOMsgCode", "警告");
 						fTxFlowCnt = 0;
 					} else {
@@ -361,7 +375,7 @@ public class L6101 extends TradeBuffer {
 					}
 					occursList.putParam("OOMessage", "有未放行交易：" + tTxFlow.getTranNo() + "，交易序號：" + tTxFlow.getFlowNo());
 					this.totaVo.addOccursList(occursList);
-					
+
 				}
 			}
 		}
@@ -542,13 +556,16 @@ public class L6101 extends TradeBuffer {
 		}
 		// 終止日期 >= 本營業日 && 終止日期 < 下營業日
 
-		if (tCdWorkMonth.getEndDate() >= this.txBuffer.getTxBizDate().getTbsDy() && tCdWorkMonth.getEndDate() < this.txBuffer.getTxBizDate().getNbsDy()) {
+		if (tCdWorkMonth.getEndDate() >= this.txBuffer.getTxBizDate().getTbsDy()
+				&& tCdWorkMonth.getEndDate() < this.txBuffer.getTxBizDate().getNbsDy()) {
 			txToDoCom.setTxBuffer(this.txBuffer);
 			TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 			tTxToDoDetail.setItemCode("PFCL00"); // 業績工作月結算啟動通知
 			TempVo tTempVo = new TempVo();
-			tTempVo.putParam("Note", parse.IntegerToString(tCdWorkMonth.getYear() - 1911, 3) + "-" + parse.IntegerToString(tCdWorkMonth.getMonth(), 2) + "工作月結束 " + tCdWorkMonth.getStartDate() + "~"
-					+ tCdWorkMonth.getEndDate() + "，請啟動業績工作月結算作業");
+			tTempVo.putParam("Note",
+					parse.IntegerToString(tCdWorkMonth.getYear() - 1911, 3) + "-"
+							+ parse.IntegerToString(tCdWorkMonth.getMonth(), 2) + "工作月結束 " + tCdWorkMonth.getStartDate()
+							+ "~" + tCdWorkMonth.getEndDate() + "，請啟動業績工作月結算作業");
 			tTxToDoDetail.setProcessNote(tTempVo.getJsonString());
 			txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo); // DupSkip = true ->重複跳過
 		}

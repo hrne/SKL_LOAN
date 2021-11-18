@@ -41,7 +41,10 @@ public class LM040ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = " ";
 		sql += " SELECT DECODE(M.\"EntCode\", 1, 1, 0) AS F0";
-		sql += "       ,NVL(M.\"CityCode\", '0') AS F1";
+		sql += "       ,CASE WHEN M.\"ClCode1\" IN (3,4) ";
+		sql += "             THEN '0' "; // 股票
+		sql += "        ELSE NVL(M.\"CityCode\", '0') ";
+		sql += "        END AS F1";
 		sql += "       ,SUM(M.\"PrinBalance\")  AS F2";
 		sql += " FROM \"MonthlyFacBal\" M";
 		sql += " LEFT JOIN \"FacMain\" F ON F.\"CustNo\" = M.\"CustNo\"";
@@ -51,7 +54,10 @@ public class LM040ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "   AND M.\"PrinBalance\" > 0";
 		sql += "   AND F.\"FirstDrawdownDate\" <= :inputDate";
 		sql += " GROUP BY DECODE(M.\"EntCode\", 1, 1, 0)";
-		sql += "         ,NVL(M.\"CityCode\", '0') ";
+		sql += "         ,CASE WHEN M.\"ClCode1\" IN (3,4) ";
+		sql += "               THEN '0' ";
+		sql += "          ELSE NVL(M.\"CityCode\", '0') ";
+		sql += "          END";
 		sql += " ORDER BY F0";
 		sql += "         ,F1";
 		this.info("sql=" + sql);

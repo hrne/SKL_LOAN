@@ -157,30 +157,34 @@ public class LM035Report extends MakeReport {
 		int count = 1;
 		
 		for (Map<String, String> tLDVo : LDList) {
+
+			// 原本的做法是用 excel format "0.00%", 但實際輸出時不會穩定輸出百分比格式
+			// 這邊改成完整用字串組好後輸出, 實際輸出後 excel grids 不會跳綠箭頭
+
 			makeExcel.setValue(row, col, getBigDecimal(tLDVo.get("F5")).multiply(hundred).setScale(2) + "%", "C");
 			if (timesLeft == 0) {
 				// 最後一次輸出 (產表當年月份的資料)
 				makeExcel.setValue(row, col + 1, computeDivide(getBigDecimal(tLDVo.get("F2")), million, 2), "#,##0.00", "R");
 			}
 			total = total.add(getBigDecimal(tLDVo.get("F2")));
-			ovduBal = ovduBal.add(getBigDecimal(tLDVo.get("F3")).add(getBigDecimal(tLDVo.get("F4"))));
+			ovduBal = ovduBal.add(getBigDecimal(tLDVo.get("F3"))).add(getBigDecimal(tLDVo.get("F4")));
 			row++;
 			if (count == LDList.size()) {
 				if (total.compareTo(BigDecimal.ZERO) > 0) {
 					BigDecimal division = computeDivide(ovduBal, total, 4);
-					this.info( "Print Avg !!!" + "    row = " + row + "    col = " + col + "    value = " + division);
-					makeExcel.setValue(row, col, division, "0.00%", "C");
+					this.info("Print Avg !!!" +  "    row = " + row + "    col = " + col + "    value = " + division);
+					makeExcel.setValue(row, col, division.multiply(hundred).setScale(2) + "%", "C");
 				} else {
 					this.info("Print Avg0 !!!" + "    row = " + row + "    col = " + col + "    value = " + BigDecimal.ZERO);
-					makeExcel.setValue(row, col, BigDecimal.ZERO, "0.00%", "C");
+					makeExcel.setValue(row, col, BigDecimal.ZERO.setScale(2) + "%", "C");
 				}
 			}
 			count++;
 		}
 		
 		if (timesLeft == 0) {
-			// 最後一欄輸出 (產表當年月份時)
-			makeExcel.setValue(row, col + 1, computeDivide(total, million, 2), "#,##0.00", "R");
+			// 最後的最後, 輸出放款餘額的地區平均
+			makeExcel.setValue(row, col + 1, computeDivide(computeDivide(total, million, 5), new BigDecimal(LDList.size()), 2), "#,##0.00", "R");
 		}
 	}
 

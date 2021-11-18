@@ -1,5 +1,6 @@
 package com.st1.itx.db.repository.hist;
 
+
 import java.util.Optional;
 
 import javax.persistence.LockModeType;
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.st1.itx.db.domain.CdLandOffice;
+import com.st1.itx.db.domain.CdLandOfficeId;
 
 /**
  * Gen By Tool
@@ -18,23 +20,15 @@ import com.st1.itx.db.domain.CdLandOffice;
  * @author AdamPan
  * @version 1.0.0
  */
-public interface CdLandOfficeRepositoryHist extends JpaRepository<CdLandOffice, String> {
+public interface CdLandOfficeRepositoryHist extends JpaRepository<CdLandOffice, CdLandOfficeId> {
 
-	// City =
-	public Slice<CdLandOffice> findAllByCityIsOrderByLandOfficeCodeAsc(String city_0, Pageable pageable);
+  // LandOfficeCode =
+  public Slice<CdLandOffice> findAllByLandOfficeCodeIsOrderByRecWordAsc(String landOfficeCode_0, Pageable pageable);
 
-	// Town =
-	public Slice<CdLandOffice> findAllByTownIsOrderByLandOfficeCodeAsc(String town_0, Pageable pageable);
-
-	// CityCode =
-	public Slice<CdLandOffice> findAllByCityCodeIsOrderByLandOfficeCodeAsc(String cityCode_0, Pageable pageable);
-
-	// CityCode = ,AND AreaCode =
-	public Slice<CdLandOffice> findAllByCityCodeIsAndAreaCodeIsOrderByLandOfficeCodeAsc(String cityCode_0, String areaCode_1, Pageable pageable);
-
-	// Hold
-	@Lock(value = LockModeType.PESSIMISTIC_READ)
-	@Transactional(readOnly = false)
-	public Optional<CdLandOffice> findByLandOfficeCode(String landOfficeCode);
+  // Hold
+  @Lock(value = LockModeType.PESSIMISTIC_READ)
+  @Transactional(readOnly = false)
+  public Optional<CdLandOffice> findByCdLandOfficeId(CdLandOfficeId cdLandOfficeId);
 
 }
+

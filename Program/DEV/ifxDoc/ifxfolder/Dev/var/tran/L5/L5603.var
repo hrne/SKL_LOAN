@@ -378,7 +378,7 @@ T(H,#DelvrYet,#DelvrYetHelp)
 C(2,#FunctionCd,S,$,$,$,s,s)
 HELP(#DelvrCodeHelp)
 @V(H,#DelvrCodeHelp)
-#DelvrCodeX=X,14,L
+#DelvrCodeX=X,16,L
 T(H,#DelvrCode,#DelvrCodeHelp)
 
 ! 寄送地點選項

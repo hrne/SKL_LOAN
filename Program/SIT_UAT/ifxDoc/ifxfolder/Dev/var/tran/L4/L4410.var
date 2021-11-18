@@ -47,6 +47,8 @@ E(0,0)
 #FdRelAcctGender=X,2,L
 #FdMediaCodeX=X,2,L
 
+#RepayCode=A,2,S
+E(0,2)
 
 
 #CHAIN=A,1,S
@@ -563,6 +565,7 @@ C(4,#RelAcctGender,T(2,),T(H,#RelAcctGender,#SexHelp))
 #RelAcctGender
 #AuthStatus
 #END
+#RepayCode
 </sub>
 
 !------ 下行電文TOM ------

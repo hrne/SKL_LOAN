@@ -54,6 +54,8 @@ T(3,*)
 #FdAmlRspX=X,2,L
 #FdStampFinishDateX=X,2,L
 
+#RepayCode=A,2,S
+E(0,2)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -648,6 +650,7 @@ C(3,#RelationCode,0,C(4,#RelAcctGenderP,T(2,),T(H,#RelAcctGenderP,#SexHelp)),C(4
 #AuthCreateDate
 #AuthErrorCode
 #END
+#RepayCode
 </sub>
 
 !------ 下行電文TOM ------

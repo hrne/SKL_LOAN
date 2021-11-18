@@ -1,0 +1,306 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4921)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,338)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,40)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+
+#button=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L4210; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW1$)
+K(MODIFYBUTTON,1,新增來源建檔)
+K(MODIFYBUTTON,查詢)
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4921" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4921]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@其他還款來源建檔查詢"],
+[#<->#,"#FdAcDate+會計日期",#AcDate],
+[#<->#,"#FdBatchNo+處理批號",#BatchNo,"空白:全部"],
+[#<->#,"#FdRepayCode+還款來源",#RepayCode,#RepayCodeX],
+[#<->#,"#FdCreateEmpNo+建檔經辦",#CreateEmpNo,"空白:全部"],
+]
+
+#FdAcDate=X,2,L
+T(3,*)
+#FdBatchNo=X,2,L
+#FdRepayCode=X,2,L
+T(3,*)
+#FdCreateEmpNo=X,2,L
+
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![還款來源]
+#CDDEF01=x,26,S
+T(3,CdCode.RepayType)
+
+#RepayTypeHelp=x,1024,S
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@RepayTypeHelp,#HelpDesc1)
+
+!本交易限05,06,07,09,11,99
+#RepayCodeHelp=x,100,S
+T(3,05:法院扣薪;06:理賠金;09:其他;11:大額匯款手工增入入帳;99:全部)
+
+
+#BuffCreate=X,1,S
+T(2,1)
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+! 會計日期
+#AcDate=D,7,I
+E(0,#SYSDATE)
+@
+V(7)A(DATE,0,#AcDate)
+
+! 處理批號
+#BatchNo=X,6,I
+T(2,BATX01)
+
+! 還款來源
+#RepayCode=A,2,I
+E(0,99)
+C(3,#CHAIN,0,$,s)
+HELP(#RepayCodeHelp)
+@V(H,#RepayCodeHelp)
+!HELP(05:法院扣薪;
+!     06:理賠金;
+!     07:代收款-債權協商;
+!     09:其他;
+!     11:匯款轉帳預先作業;
+!     99:全部)
+!@V(1,05,06,07,09,11,99)
+
+! 還款來源中文
+#RepayCodeX=X,16,L
+C(3,#CHAIN,0,$,s)  
+T(3,)T(H,#RepayCode,#RepayCodeHelp)
+!SWITCH(#RepayCode,05,T(3,法院扣薪),
+!              06,T(3,理賠金),
+!              07,T(3,代收款-債權協商),
+!              09,T(3,其他),
+!              11,T(3,匯款轉帳預先作業),
+!              99,T(3,全部))
+
+! 交易序號-經辦代號
+#CreateEmpNo=X,6,I
+T(2,#TLRNO)
+
+! 系統參數-查詢
+#RPTFG=A,1,S
+E(0,0)
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4921 -----------
+<sub type="FORM" name="L4921">
+#SCRTIL=_,_,S
+T(3,[L4921] 其他還款來源建檔)
+
+#LOOP=X,1,S
+E(0,1)ASGN(LOOP$)
+! 交易序號22 = 會計日期 + 批號 + 明細序號
+! 會計日期
+#OOAcDate=D,7,O
+
+! 批號
+#OOBatchNo=X,6,O
+
+! 明細序號
+#OODetailSeq=A,6,O
+
+! 來源
+#OORepayCode=A,2,O
+#OORepayCodeX=X,16,O
+T(3,)T(H,#OORepayCode,#RepayCodeHelp)
+!SWITCH(#OORepayCode,05,T(3,法院扣薪),
+!                06,T(3,理賠金),
+!                07,T(3,代收款-債權協商),
+!                11,T(3,匯款轉帳預先作業),
+!                09,T(3,其他))
+
+! 會科
+#OOAcNo=X,20,O
+
+! 來源統編
+#OORepayId=X,10,O
+
+! 來源戶名
+#OORepayName=X,100,O
+
+! 銷帳碼
+#OORvNo=x,12,O
+
+! 還款類別
+#OORepayType=A,2,O
+#OORepayTypeX=X,10,O
+T(3,)T(H,#OORepayType,#RepayTypeHelp)
+!SWITCH(#OORepayType,01,T(3,期款),
+!                    02,T(3,部分償還),
+!                    03,T(3,結案),
+!                    04,T(3,帳管費),
+!                    05,T(3,火險費),
+!                    06,T(3,契變手續費),
+!                    07,T(3,法務費),
+!                    09,T(3,其他),
+!                    11,T(3,債協匯入款),
+!                   T(3, ))
+! 金額
+#OORepayAmt=m,14,O
+! 借款人戶號
+#OOCustNo=A,7,O
+! 戶名
+#OOCustNm=X,100,O
+! 摘要
+#OORemark=X,60,O
+! 按鈕顯示註記 1顯示，0不顯示
+#OOBtnFlag=A,1,O
+
+#OOBUF_EDIT=X,20,S
+T(2,2+#OOAcDate+#OOBatchNo+#OODetailSeq)
+#OOBUF_DELETE=X,20,S
+T(2,4+#OOAcDate+#OOBatchNo+#OODetailSeq)
+
+#OOBTN_Edit=A,2,O
+C(3,#OOBtnFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4210; ntxbuf=#OOBUF_EDIT}))
+#OOBTN_Delete=A,2,O
+C(3,#OOBtnFlag,0,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L4210; ntxbuf=#OOBUF_DELETE}))
+
+
+
+
+
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#AcDate#BatchNo#RepayCode#CreateEmpNo
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4921
+#OOAcDate
+#OOBatchNo
+#OODetailSeq
+#OORepayType
+#OOAcNo
+#OORepayId
+#OORepayName
+#OORvNo
+#OORepayCode
+#OORepayAmt
+#OOCustNo
+#OOCustNm
+#OORemark
+#OOBtnFlag
+^
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+
+<sub type="PART" prompt='{{#SCRTIL}} world' name="L4921" layout="cols=1;screen.width=[100,900];order=1;">
+[
+["[L4921]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@其他還款來源建檔查詢"],
+[""],
+]
+</sub>
+
+<sub type="SELECT">
+
+
+#RPTFG=0,QUERY.GRID
+#any={detail:true, header:'L4921.part',caption:'', width:1080, rowNum:20, rowList:[20,40,60]}
+
+#OOBTN_Edit=
+{search:false,formatter:'cust:bind-button:修改',align:'center',canExport:false,width:65}
+#OOBTN_Delete=
+{search:false,formatter:'cust:bind-button:刪除',align:'center',canExport:false,width:65}
+#OOAcDate=會計日期
+{width:80,align:'center'}
+#OOBatchNo=批號
+{width:65,align:'center'}
+#OORepayCodeX=來源
+{width:130,align:'center'}
+#OOAcNo=會科
+{width:85,align:'center'}
+#OORepayId=來源統編
+{width:100,align:'center'}
+#OORepayName=來源戶名
+{width:85,align:'center'}
+#OORvNo=銷帳碼
+{width:100,align:'center'}
+#OORepayTypeX=還款類別
+{width:130,align:'center'}
+#OORepayAmt=金額
+{width:95,align:'right'}
+#OOCustNo=借款人戶號
+{width:100,align:'center'}
+#OOCustNm=戶名
+{width:85,align:'center'}
+#OORemark=摘要
+{width:125,align:'center'}
+
+^
+<include src="PRT.icf::INQ04.sel" map="i=L4921;cpi=15"/>
+%
+#OOAcDate
+#OOBatchNo
+#OODetailSeq
+#OORepayType
+#OOAcNo
+#OORepayId
+#OORepayName
+#OORvNo
+#OORepayCode
+#OORepayAmt
+#OOCustNo
+#OOCustNm
+#OORemark@^
+</sub>

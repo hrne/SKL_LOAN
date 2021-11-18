@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.DBException;
@@ -30,7 +29,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2418 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2418.class);
 
 	@Autowired
 	public ClOtherRightsService sClOtherRightsService;
@@ -67,7 +65,7 @@ public class L2418 extends TradeBuffer {
 		if (titaVo.isEloan() || "ELTEST".equals(titaVo.getTlrNo())) {
 			this.isEloan = true;
 		}
-		
+
 		// 功能
 		iFunCd = parse.stringToInteger(titaVo.getParam("FUNCIND"));
 		// 擔保品代號1
@@ -81,8 +79,7 @@ public class L2418 extends TradeBuffer {
 
 		ClMainId ClMainId = new ClMainId();
 		ClMain tClMain = new ClMain();
-		Slice<ClOtherRights> slClOtherRights = null;
-		ArrayList<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
+		new ArrayList<ClOtherRights>();
 
 		ClMainId.setClCode1(iClCode1);
 		ClMainId.setClCode2(iClCode2);
@@ -104,22 +101,15 @@ public class L2418 extends TradeBuffer {
 		if (isEloan && iFunCd == 1 && tClOtherRights != null) {
 			iFunCd = 2;
 		}
-		
+
 		if (tClOtherRights == null) {
 			if (iFunCd == 1) {
 				tClOtherRights = new ClOtherRights();
 				tClOtherRights.setClOtherRightsId(tClOtherRightsId);
-				
-//				tClOtherRights.setCity(titaVo.getParam("City"));
-//				tClOtherRights.setLandAdm(titaVo.getParam("LandAdm"));
-//				tClOtherRights.setRecYear(parse.stringToInteger(titaVo.getParam("RecYear")));
-//				tClOtherRights.setRecWord(titaVo.getParam("RecWord"));
-//				tClOtherRights.setRecNumber(titaVo.getParam("RecNumber"));
-//				tClOtherRights.setRightsNote(titaVo.getParam("RightsNote"));
-//				tClOtherRights.setSecuredTotal(parse.stringToBigDecimal(titaVo.getParam("TimSecuredTotal")));
+
 
 				setClOtherRights(titaVo);
-				
+
 				try {
 					sClOtherRightsService.insert(tClOtherRights, titaVo);
 				} catch (DBException e) {
@@ -134,21 +124,13 @@ public class L2418 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0002", "擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 新增資料已存在
 			} else if (iFunCd == 2) { // 修改
 
-//				tClOtherRights = sClOtherRightsService.holdById(tClOtherRightsId, titaVo);
 
 				// 變更前
 				ClOtherRights beforeClOtherRights = (ClOtherRights) dataLog.clone(tClOtherRights);
 
-//				tClOtherRights.setCity(titaVo.getParam("City"));
-//				tClOtherRights.setLandAdm(titaVo.getParam("LandAdm"));
-//				tClOtherRights.setRecYear(parse.stringToInteger(titaVo.getParam("RecYear")));
-//				tClOtherRights.setRecWord(titaVo.getParam("RecWord"));
-//				tClOtherRights.setRecNumber(titaVo.getParam("RecNumber"));
-//				tClOtherRights.setRightsNote(titaVo.getParam("RightsNote"));
-//				tClOtherRights.setSecuredTotal(parse.stringToBigDecimal(titaVo.getParam("TimSecuredTotal")));
 
 				setClOtherRights(titaVo);
-				
+
 				try {
 					tClOtherRights = sClOtherRightsService.update2(tClOtherRights, titaVo);
 				} catch (DBException e) {
@@ -176,15 +158,18 @@ public class L2418 extends TradeBuffer {
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
-	
+
 	private void setClOtherRights(TitaVo titaVo) throws LogicException {
 		tClOtherRights.setCity(titaVo.getParam("City"));
+		tClOtherRights.setOtherCity(titaVo.getParam("InCityX"));
 		tClOtherRights.setLandAdm(titaVo.getParam("LandAdm"));
+		tClOtherRights.setOtherLandAdm(titaVo.getParam("InLandAdmX"));
 		tClOtherRights.setRecYear(parse.stringToInteger(titaVo.getParam("RecYear")));
 		tClOtherRights.setRecWord(titaVo.getParam("RecWord"));
+		tClOtherRights.setOtherRecWord(titaVo.getParam("InRecWordX"));
 		tClOtherRights.setRecNumber(titaVo.getParam("RecNumber"));
 		tClOtherRights.setRightsNote(titaVo.getParam("RightsNote"));
 		tClOtherRights.setSecuredTotal(parse.stringToBigDecimal(titaVo.getParam("TimSecuredTotal")));
-		
+
 	}
 }

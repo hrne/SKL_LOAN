@@ -4792,6 +4792,7 @@ TXFORM=L4R08
 #L4r09RepayCode=A,2,S
 #L4r09AcNo=X,18,S
 #L4r09RepayAmt=m,14.2,S
+#L4r09EntryDate=D,7,S
 #L4r09RepayId=X,10,S
 #L4r09RepayName=c,100,S
 #L4r09CustNo=A,7,S
@@ -4807,6 +4808,7 @@ TXFORM=L4R09
 #L4r09RepayCode
 #L4r09AcNo
 #L4r09RepayAmt
+#L4r09EntryDate
 #L4r09RepayId
 #L4r09RepayName
 #L4r09CustNo
@@ -5176,6 +5178,23 @@ TXFORM=L4R27
 #L4r27BatchNo
 ^
 </L4R27.tom>
+
+
+<L4R28.dec>
+##loop{times:50,i:1}
+#L4r28FloorLowerLimit{i}=A,3,S
+#L4r28Cost{i}=m,14.2,S
+##end
+</L4R28.dec>
+
+<L4R28.tom>
+TXFORM=L4R28
+##loop{times:50,i:1}
+#L4r28FloorLowerLimit{i}
+#L4r28Cost{i}
+##end
+^
+</L4R28.tom>
 
 <L5R01.dec>
 #L5r01CustId=X,10,S

@@ -82,7 +82,7 @@ public class LM031Report extends MakeReport {
 
 					switch (col) {
 					case 1:
-						makeExcel.setValue(row, col, value, "R");
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(value) : value, "R");
 						if (lastCustNo.equals(value)) {
 							set1 = 1;
 						} else {
@@ -91,7 +91,7 @@ public class LM031Report extends MakeReport {
 						lastCustNo = value;
 						break;
 					case 2:
-						makeExcel.setValue(row, col, value, "R");
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(value) : value, "R");
 						if (lastFacmNo.equals(value)) {
 							set2 = 1;
 						} else {
@@ -99,6 +99,8 @@ public class LM031Report extends MakeReport {
 						}
 						lastFacmNo = value;
 						break;
+					case 3:
+						makeExcel.setValue(row, col, value, "L");
 					case 5:
 						if (set1 == 0 || set2 == 0) {
 							BigDecimal bd = getBigDecimal(value);
@@ -113,13 +115,13 @@ public class LM031Report extends MakeReport {
 						totalUtilBal = totalUtilBal.add(bd);
 						break;
 					case 7:
-						makeExcel.setValue(row, col, value, "L");
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(value) : value, "L");
 						break;
 					case 9:
-						makeExcel.setValue(row, col, value, "C");
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(value) : value, "C");
 						break;
 					default:
-						makeExcel.setValue(row, col, value, "R");
+						makeExcel.setValue(row, col, parse.isNumeric(value) ? parse.stringToInteger(value) : value, "R");
 						break;
 					}
 				} // for

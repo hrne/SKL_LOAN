@@ -175,10 +175,10 @@ public class BS020 extends TradeBuffer {
 			// 期款款試算
 			ArrayList<BaTxVo> listBaTxVo = new ArrayList<>();
 			int custNo = parse.stringToInteger(result.get("F0"));
-			int repayType = parse.stringToInteger(result.get("F2"));  
+			int repayType = parse.stringToInteger(result.get("F2"));
 			int repayCode = parse.stringToInteger(result.get("F3"));
 			// 銀扣檔產生只處理還款來源 02.銀行扣款
-			if ("L4450".equals(txCode) && repayCode == 0 ) {
+			if ("L4450".equals(txCode) && repayCode == 0) {
 				continue;
 			}
 			try {
@@ -200,8 +200,8 @@ public class BS020 extends TradeBuffer {
 			// 暫收抵繳
 			if (listBaTxVo != null && listBaTxVo.size() != 0) {
 				for (BaTxVo ba : listBaTxVo) {
-					// 費用
-					if (ba.getRepayType() >= 4 && ba.getAcctAmt().compareTo(BigDecimal.ZERO) >= 0) {
+					// 累溢收 > 費用
+					if (ba.getRepayType() >= 4 && baTxCom.getExcessive().compareTo(ba.getUnPaidAmt()) >= 0) {
 						isRecvPay = true;
 					}
 					// 期款
@@ -211,11 +211,11 @@ public class BS020 extends TradeBuffer {
 					// 短繳
 					if (ba.getDataKind() == 4) {
 						if ("D".equals(ba.getDbCr()) && ba.getUnPaidAmt().compareTo(BigDecimal.ZERO) > 0)
-							isShortAmt = true;
+							isTermPay = false;
 					}
 				}
 			}
-			if (isTermPay && !isShortAmt) {
+			if (isTermPay) {
 				addDetail(custNo, 1, titaVo);
 			} else {
 				if (isRecvPay) {
@@ -235,6 +235,8 @@ public class BS020 extends TradeBuffer {
 			insertfg = true;
 			tBatxHead = new BatxHead();
 			tBatxHead.setBatxHeadId(tBatxHeadId);
+			tBatxHead.setAcDate(this.tbsdyf);
+			tBatxHead.setBatchNo(this.batchNo);
 		}
 		tBatxHead.setBatxTotAmt(BigDecimal.ZERO);
 		tBatxHead.setBatxTotCnt(this.lBatxDetail.size());

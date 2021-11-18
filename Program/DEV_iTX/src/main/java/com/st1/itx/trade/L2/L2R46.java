@@ -4,7 +4,6 @@ import java.util.ArrayList;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
@@ -29,7 +28,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2R46 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2R46.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -58,9 +56,8 @@ public class L2R46 extends TradeBuffer {
 		// WK
 		ClMain tClMain = new ClMain();
 		ClMainId ClMainId = new ClMainId();
-		Slice<ClOtherRights> slClOtherRights = null;
-		ArrayList<ClOtherRights> lClOtherRights = new ArrayList<ClOtherRights>();
-		ClOtherRights tmpClOtherRights = new ClOtherRights();
+		new ArrayList<ClOtherRights>();
+		new ClOtherRights();
 		ClOtherRights tClOtherRights = new ClOtherRights();
 
 		if (!(iFunCd == 1 || iFunCd == 2 || iFunCd == 4 || iFunCd == 5)) {
@@ -87,9 +84,12 @@ public class L2R46 extends TradeBuffer {
 		if (tClOtherRights == null) {
 			if (iFunCd == 1) {
 				this.totaVo.putParam("L2r46City", "");
+				this.totaVo.putParam("L2r46OtherCity", "");
 				this.totaVo.putParam("L2r46LandAdm", "");
+				this.totaVo.putParam("L2r46OtherLandAdm", "");
 				this.totaVo.putParam("L2r46RecYear", 0);
 				this.totaVo.putParam("L2r46RecWord", "");
+				this.totaVo.putParam("L2r46OtherRecWord", "");
 				this.totaVo.putParam("L2r46RecNumber", "");
 				this.totaVo.putParam("L2r46RightsNote", "");
 				this.totaVo.putParam("L2r46SecuredTotal", 0);
@@ -102,10 +102,18 @@ public class L2R46 extends TradeBuffer {
 				throw new LogicException(titaVo, "E0002",
 						"擔保品他項權利檔   擔保品編號" + iClCode1 + "-" + iClCode2 + "-" + iClNo + "  他項權利序號:" + iClSeq); // 新增資料已存在
 			} else {
-				this.totaVo.putParam("L2r46City", tClOtherRights.getCity());
-				this.totaVo.putParam("L2r46LandAdm", tClOtherRights.getLandAdm());
+				this.totaVo.putParam("L2r46City", tClOtherRights.getCity() == null ? "" : tClOtherRights.getCity());
+				this.totaVo.putParam("L2r46OtherCity",
+						tClOtherRights.getOtherCity() == null ? "" : tClOtherRights.getOtherCity());
+				this.totaVo.putParam("L2r46LandAdm",
+						tClOtherRights.getLandAdm() == null ? "" : tClOtherRights.getLandAdm());
+				this.totaVo.putParam("L2r46OtherLandAdm",
+						tClOtherRights.getOtherLandAdm() == null ? "" : tClOtherRights.getOtherLandAdm());
 				this.totaVo.putParam("L2r46RecYear", tClOtherRights.getRecYear());
-				this.totaVo.putParam("L2r46RecWord", tClOtherRights.getRecWord());
+				this.totaVo.putParam("L2r46RecWord",
+						tClOtherRights.getRecWord() == null ? "" : tClOtherRights.getRecWord());
+				this.totaVo.putParam("L2r46OtherRecWord",
+						tClOtherRights.getOtherRecWord() == null ? "" : tClOtherRights.getOtherRecWord());
 				this.totaVo.putParam("L2r46RecNumber", tClOtherRights.getRecNumber());
 				this.totaVo.putParam("L2r46RightsNote", tClOtherRights.getRightsNote());
 				this.totaVo.putParam("L2r46SecuredTotal", tClOtherRights.getSecuredTotal());
