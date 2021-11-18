@@ -40,7 +40,7 @@ public class L9705Report extends MakeReport {
 
 	@Autowired
 	private L4702ServiceImpl l4702ServiceImpl;
-	
+
 	@Autowired
 	private BaTxCom dBaTxCom;
 
@@ -74,7 +74,8 @@ public class L9705Report extends MakeReport {
 		 * ["#R6+@企金別",#CORP_IND,#CORP_INDX], ["#R7+@業務科目",#APNO,#APNOX],
 		 */
 
-		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L9705", "放款本息攤還表暨繳息通知單", "密", "8.5,12", "P");
+		this.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(),
+				titaVo.getTxCode().isEmpty() ? "L9705" : titaVo.getTxCode(), "放款本息攤還表暨繳息通知單", "密", "8.5,12", "P");
 
 		String entdy = titaVo.getEntDy();
 
@@ -108,7 +109,7 @@ public class L9705Report extends MakeReport {
 
 				int custNo = 0;
 				int facmNo = 0;
-				int entryDate =  parse.stringToInteger(titaVo.getParam("ENTDY"));
+				int entryDate = parse.stringToInteger(titaVo.getParam("ENTDY"));
 				String repayCode = "";
 				String custName = "";
 
@@ -125,7 +126,7 @@ public class L9705Report extends MakeReport {
 				if (tL9Vo.get("CustName") != null) {
 					custName = tL9Vo.get("CustName");
 				}
-				
+
 				try {
 					listBaTxVo = dBaTxCom.termsPay(entryDate, custNo, facmNo, 0, 6, titaVo);
 				} catch (LogicException e) {
@@ -154,12 +155,11 @@ public class L9705Report extends MakeReport {
 					// 合計 = 未收本息 + 違約金 - 溢短繳
 					// 未還本金餘額
 //				金額欄位 同下繳日的加總
-					for (BaTxVo ba :listBaTxVo ) {
+					for (BaTxVo ba : listBaTxVo) {
 						if (ba.getDataKind() == 2) {
 							payIntDate = ba.getPayIntDate();
 							if (principal.containsKey(payIntDate)) {
-								principal.put(payIntDate,
-										principal.get(payIntDate).add(ba.getPrincipal()));
+								principal.put(payIntDate, principal.get(payIntDate).add(ba.getPrincipal()));
 							} else {
 								principal.put(payIntDate, ba.getPrincipal());
 							}
@@ -171,8 +171,7 @@ public class L9705Report extends MakeReport {
 							}
 
 							if (breachAmt.containsKey(payIntDate)) {
-								breachAmt.put(payIntDate,
-										breachAmt.get(payIntDate).add(ba.getBreachAmt()));
+								breachAmt.put(payIntDate, breachAmt.get(payIntDate).add(ba.getBreachAmt()));
 							} else {
 								breachAmt.put(payIntDate, ba.getBreachAmt());
 							}
@@ -235,7 +234,7 @@ public class L9705Report extends MakeReport {
 					this.print(1, 10, "應繳日　　違約金　　　　　本金　　　　　　利息　　　應繳合計　　　本金餘額　　所得稅　　　應繳淨額");
 					this.print(1, 7, "－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－－");
 
-					for (BaTxVo ba :listBaTxVo) {
+					for (BaTxVo ba : listBaTxVo) {
 						// 本金、利息
 						if (ba.getDataKind() != 2) {
 							continue;

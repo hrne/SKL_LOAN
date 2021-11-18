@@ -370,7 +370,7 @@ C(5,#TXFORM,FM101,$,S)E(0,210)ASGN(INQHD$)
 
 ![每筆明細(OCCURS)長度]
 #FM101LN=n,3,S
-C(5,#TXFORM,FM101,$,S)E(0,119)ASGN(INQLEN$)
+C(5,#TXFORM,FM101,$,S)E(0,139)ASGN(INQLEN$)
 
 ![每張印錄單列印的筆數]
 #FM101QPRT=n,2,S
@@ -460,7 +460,7 @@ E(0,1)ASGN(LOOP$)
 #FM101_SumNo=X,3,O
 ![彙總別]
 #FM101_SumNoX=X,20,O
-T(A,#FM101_SumNo,L6DEF,RepayCodeDef,RepayCode,SumNoX)
+!T(A,#FM101_SumNo,L6DEF,RepayCodeDef,RepayCode,SumNoX)
 
 ![科子細目]
 #FM101_AcNoCode=X,17,O
@@ -508,6 +508,7 @@ TXFORM=FM101
 #FM101_FacmNo
 #FM101_BormNo
 #FM101_SumNo
+#FM101_SumNoX
 #FM101_AcNoCode
 #FM101_AcDtlCode
 #FM101_AcNoCodeX

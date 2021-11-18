@@ -15,6 +15,7 @@ import com.st1.itx.db.domain.AcDetail;
 import com.st1.itx.db.domain.CdAcCode;
 import com.st1.itx.db.domain.CdAcCodeId;
 import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
 import com.st1.itx.db.domain.TxTranCode;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.CdAcCodeService;
@@ -36,8 +37,6 @@ import com.st1.itx.util.parse.Parse;
 @Component("acTxFormCom")
 @Scope("prototype")
 public class AcTxFormCom extends TradeBuffer {
-
-	private TitaVo titaVo;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -62,7 +61,6 @@ public class AcTxFormCom extends TradeBuffer {
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 
-		this.titaVo = titaVo;
 		this.totaVo.init(titaVo);
 		List<AcDetail> acDetailList = new ArrayList<AcDetail>();
 
@@ -162,10 +160,18 @@ public class AcTxFormCom extends TradeBuffer {
 						this.info("acBookCodeX = " + acSubBookCodeX);
 					}
 				}
-
+				String SumNoX = "";
+				
+				CdCode tCdCode = cdCodeService.findById(new CdCodeId("SumNo",tAcDetail.getSumNo()), titaVo);
+				if(tCdCode!=null) {
+					SumNoX = tCdCode.getItem();
+				}
+					
 				OccursList occursList = new OccursList();
 //				彙總別
 				occursList.putParam("FM101_SumNo", tAcDetail.getSumNo());
+				occursList.putParam("FM101_SumNoX", SumNoX);
+				
 //				戶號-額度-撥款
 				occursList.putParam("FM101_CustNo", tAcDetail.getCustNo());
 				occursList.putParam("FM101_FacmNo", tAcDetail.getFacmNo());

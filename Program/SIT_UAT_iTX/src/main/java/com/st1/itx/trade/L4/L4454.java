@@ -12,15 +12,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.DBException;
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.BankDeductDtl;
-import com.st1.itx.db.domain.BankDeductDtlId;
 import com.st1.itx.db.domain.TxToDoDetail;
+import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.domain.TxToDoDetailReserve;
 import com.st1.itx.db.service.BankDeductDtlService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.springjpa.cm.L4454ServiceImpl;
@@ -110,9 +110,15 @@ public class L4454 extends TradeBuffer {
 	private int repayType = 0;
 	private int prevIntDate = 0;
 	private int payIntDate = 0;
+	private int cntEmail = 0;
+	private int cntText = 0;
+	private int cntUnsend = 0;
+	private int cntL9705 = 0;
+	private int cntL4454 = 0;
 	private BigDecimal repayAmt = BigDecimal.ZERO;
 	private int functionCode = 0;
 	String iRepayBank = "";
+	private List<TxToDoDetailReserve> lTxToDoDetailReserve = new ArrayList<TxToDoDetailReserve>();
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -128,38 +134,61 @@ public class L4454 extends TradeBuffer {
 
 		txToDoCom.setTxBuffer(this.getTxBuffer());
 		iRepayBank = titaVo.getParam("RepayBank");
-		try {
-			fnAllList = l4454ServiceImpl.findAll(functionCode, titaVo);
-		} catch (Exception e) {
-			StringWriter errors = new StringWriter();
-			e.printStackTrace(new PrintWriter(errors));
-			this.info("l4454R3ServiceImpl.findAll error = " + errors.toString());
-		}
 
-		if (fnAllList == null || fnAllList.size() == 0) {
-			throw new LogicException(titaVo, "E0001", ""); // 無資料
-		}
-
-		switch (functionCode) {
-
-		case 1: // 個別列印
-			for (Map<String, String> t : fnAllList) {
-				exec("", t, titaVo);
-			}
-			if (titaVo.isHcodeNormal()) {
-				if (reportACnt > 0) {
-					reportB(titaVo); // 繳息還本通知單
+		// 訂正交易處理 (刪除應處理明細)
+		if (titaVo.isHcodeErase()) {
+			String msg = "L4454產生銀扣失敗通知 訂正完畢。";
+			cntText = txToDoCom.delDetailByTxNo("TEXT00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
+					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntEmail = txToDoCom.delDetailByTxNo("MAIL00", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
+					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntL9705 = txToDoCom.delReserveByTxNo("NOTI01", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
+					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			cntL4454 = txToDoCom.delReserveByTxNo("NOTI02", titaVo.getOrgEntdyI(), titaVo.getOrgKin(),
+					titaVo.getOrgTlr(), titaVo.getOrgTno(), titaVo);
+			if (functionCode == 1 || functionCode == 2) {
+				msg += ", 刪除簡訊+eMail筆數：" + (cntText + cntEmail);
+				if (cntL4454 > 0) {
+					msg += ", 勿寄送明信片份數" + cntL4454;
 				}
 			}
+			msg += ", 勿寄送繳息還本通知單份數：" + cntL9705;
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", msg, titaVo);
+		}
 
-			break;
+		// 正常交易處理
+		if (titaVo.isHcodeNormal()) {
 
-		case 2: // 整批列印
-			for (Map<String, String> t : fnAllList) {
-				exec(iRepayBank, t, titaVo);
+			try {
+				fnAllList = l4454ServiceImpl.findAll(functionCode, titaVo);
+			} catch (Exception e) {
+				StringWriter errors = new StringWriter();
+				e.printStackTrace(new PrintWriter(errors));
+				this.info("l4454R3ServiceImpl.findAll error = " + errors.toString());
 			}
 
-			if (titaVo.isHcodeNormal()) {
+			if (fnAllList == null || fnAllList.size() == 0) {
+				throw new LogicException(titaVo, "E0001", ""); // 無資料
+			}
+
+			switch (functionCode) {
+
+			case 1: // 個別列印
+				for (Map<String, String> t : fnAllList) {
+					exec("", t, titaVo);
+				}
+				if (titaVo.isHcodeNormal()) {
+					if (reportACnt > 0) {
+						reportB(titaVo); // 繳息還本通知單
+					}
+				}
+				break;
+
+			case 2: // 整批列印
+				for (Map<String, String> t : fnAllList) {
+					exec(iRepayBank, t, titaVo);
+				}
+
 				reportB(titaVo); // 繳息還本通知單
 
 				reportC(titaVo); // 列印明信片
@@ -167,30 +196,41 @@ public class L4454 extends TradeBuffer {
 				excelA(titaVo); // 扣款失敗5萬元以上+地區別，統計到額度
 
 				excelB(titaVo); // 新貸戶1年內扣款失敗，到額度(首撥日抓額度)
-			}
-			break;
+				txToDoCom.updDetailStatus(2, new TxToDoDetailId("L4454", 0, 0, 0, " "), titaVo);
+				break;
 
-		case 3: // 連續扣款失敗明細＆通知
-			for (Map<String, String> t : fnAllList) {
-				exec("", t, titaVo);
-			}
-			if (titaVo.isHcodeNormal()) {
+			case 3: // 連續扣款失敗明細＆通知
+				for (Map<String, String> t : fnAllList) {
+					exec("", t, titaVo);
+				}
 				if (reportACnt > 0) {
 					reportB(titaVo);// 二扣繳息還本通知單
 				}
+				break;
 			}
-			break;
-		}
-		String msg = "L4454產生銀扣失敗通知 處理完畢，簡訊+eMail筆數：" + (custLoanFlag.size() + custFireFlag.size());
-		this.totaVo.putParam("ReportACnt", reportACnt);
-		if (titaVo.isHcodeNormal()) {
-			if (reportACnt > 0) {
+
+			// 應處理明細留存檔(銀扣失敗書面通知單)
+			if (titaVo.isHcodeNormal()) {
+				txToDoCom.addReserve(lTxToDoDetailReserve, titaVo);
+			}
+
+			String msg = "L4454產生銀扣失敗通知 處理完畢。";
+			if (functionCode == 1 || functionCode == 2) {
+				msg += ", 簡訊+eMail筆數：" + (cntText + cntEmail);
+				if (cntUnsend > 0) {
+					msg += "(未送：" + cntUnsend + ")";
+				}
+				msg += ", 明信片份數：" + l4454List.size();
+			}
+			msg += ", 繳息還本通知單份數：" + l9705List.size();
+			if (l4454List.size() > 0) {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009",
 						titaVo.getTlrNo(), msg, titaVo);
 			} else {
 				webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "", "", "", msg, titaVo);
 			}
 		}
+		this.totaVo.putParam("ReportACnt", reportACnt);
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -205,7 +245,7 @@ public class L4454 extends TradeBuffer {
 		repayAmt = parse.stringToBigDecimal(t.get("RepayType"));
 		prevIntDate = parse.stringToInteger(t.get("PrevIntDate"));
 		tTempVo = tTempVo.getVo(t.get("JsonFields"));
-
+		this.info(t.toString());
 //		抓取火險到期年月 = 火險應繳日前5碼
 		int insuMon = 0;
 		if (repayType == 5) {
@@ -213,9 +253,6 @@ public class L4454 extends TradeBuffer {
 		}
 
 //		1.不成功簡訊通知(ALL)	
-
-		unSuccText(iRepayBank, t, insuMon, titaVo);
-
 //		2.火險成功期款失敗通知(一扣) = reportA(tBatxDetail);
 //		3.列印明信片並寄發(二扣) = reportB(titaVo);
 
@@ -226,6 +263,7 @@ public class L4454 extends TradeBuffer {
 			case 1: // 個別列印
 			case 2: // 整批列印
 				int iType = 0;
+				unSuccText(iRepayBank, t, insuMon, titaVo); // 不成功簡訊通知
 				iType = check(titaVo);
 				if (iType == 1) {
 					if ("5".equals(t.get("FireFeeSuccess")) && repayType == 1) {
@@ -233,7 +271,7 @@ public class L4454 extends TradeBuffer {
 						if ("1".equals(t.get("RowNumber"))) {
 							l9705List.add(t); // 繳息還本通知單 ，同戶號、額度只印一份
 						}
-						failNoticeDateUpdate(titaVo); // 更新失敗通知日期
+						failNoticeDateUpdate("一扣火險成功期款失敗通知", titaVo); // 失敗通知日期
 					}
 				}
 				if (iType == 2) {
@@ -242,45 +280,33 @@ public class L4454 extends TradeBuffer {
 							l4454List.add(t); // 列印明信片，同戶號、額度只印一份
 						}
 					}
-					failNoticeDateUpdate(titaVo); // 更新失敗通知日期
+					failNoticeDateUpdate("期款二扣失敗明信片", titaVo); // 失敗通知日期
 				}
 				break;
 			case 3: // 連續扣款失敗明細＆通知
+				putTotaA(t, titaVo); // 列印清單
 				if ("1".equals(t.get("RowNumber"))) {
 					l9705List.add(t); // 繳息還本通知單，同戶號、額度只印一份
 				}
-				failNoticeDateUpdate(titaVo); // 更新失敗通知日期
+				failNoticeDateUpdate("連續扣款失敗通知", titaVo); // 失敗通知日期
 				break;
 			}
 		}
 	}
 
-	// 更新失敗通知日期
-	private void failNoticeDateUpdate(TitaVo titaVo) throws LogicException {
-		BankDeductDtl tBankDeductDtl = bankDeductDtlService.holdById(new BankDeductDtlId(entryDate + 19110000, custNo,
-				facmNo, bormNo, repayType, payIntDate == 0 ? 0 : payIntDate + 19110000), titaVo);
-		if (tBankDeductDtl == null) {
-			throw new LogicException("E0006", "BankDeductDtl"); // E0006 鎖定資料時，發生錯誤
-		}
-
-		// 失敗通知日期
-		if (titaVo.isHcodeErase()) {
-			tTempVo.remove("FailNoticeDate");
-		} else {
-			tTempVo.putParam("FailNoticeDate", titaVo.getCalDy());
-		}
-
-		tBankDeductDtl.setJsonFields(tTempVo.getJsonString());
-		try {
-			bankDeductDtlService.update(tBankDeductDtl, titaVo);
-		} catch (DBException e) {
-			throw new LogicException(titaVo, "E0007", "BankDeductDtl" + e.getErrorMsg()); // 更新資料時，發生錯誤
-		}
-
+	// 應處理明細留存檔(銀扣失敗書面通知單)
+	private void failNoticeDateUpdate(String note, TitaVo titaVo) throws LogicException {
+		TxToDoDetailReserve tDetail = new TxToDoDetailReserve();
+		tDetail.setItemCode("NOTI01"); // 銀扣失敗書面通知單
+		tDetail.setCustNo(custNo);
+		tDetail.setFacmNo(facmNo);
+		tDetail.setBormNo(bormNo);
+		tDetail.setDtlValue(note);
+		lTxToDoDetailReserve.add(tDetail);
 	}
 
 	private void unSuccText(String repayBank, Map<String, String> t, int insuM, TitaVo titaVo) throws LogicException {
-
+		boolean isSend = false;
 		TempVo tempVo = new TempVo();
 		tempVo = custNoticeCom.getCustNotice("L4454", custNo, facmNo, titaVo);
 
@@ -291,18 +317,25 @@ public class L4454 extends TradeBuffer {
 //		若為皆1則傳簡訊
 //		若為皆0則傳簡訊
 
-		if (!"".equals(phoneNo)) {
+		if ("Y".equals(tempVo.getParam("isMessage"))) {
 			sendText(repayBank, t, phoneNo, insuM, titaVo);
-		} else if (!"".equals(emailAd)) {
+			isSend = true;
+		}
+		if ("Y".equals(tempVo.getParam("isEmail"))) {
 			sendEmail(repayBank, t, emailAd, insuM, titaVo);
+			isSend = true;
+		}
+		if (!isSend) {
+			cntUnsend++;
 		}
 	}
 
 	private void sendText(String repayBank, Map<String, String> t, String phoneNo, int insuM, TitaVo titaVo)
 			throws LogicException {
-		if (repayType == 1 || repayType == 3) {
+		if (repayType == 1) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
+				cntText++;
 				String dataLines = "";
 				dataLines = "\"H1\",\"" + t.get("CustId") + "\",\"" + phoneNo + "\",\"親愛的客戶，繳款通知；新光人壽關心您。”,\""
 						+ this.getTxBuffer().getTxCom().getTbsdy() + "\"";
@@ -315,6 +348,10 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setTitaEntdy(titaVo.getEntDyI());
+				tTxToDoDetail.setTitaKinbr(titaVo.getKinbr());
+				tTxToDoDetail.setTitaTlrNo(titaVo.getTlrNo());
+				tTxToDoDetail.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
 				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 
 //				目前為同一戶號僅寄一封簡訊，後續要改依狀況寄送需改key
@@ -325,6 +362,7 @@ public class L4454 extends TradeBuffer {
 		} else if (repayType == 5) {
 			this.info("RepayType() == 5...");
 			if (!custFireFlag.containsKey(custNo)) {
+				cntText++;
 //				轉全形
 				String sInsuAmt = toFullWidth("" + repayAmt);
 				String sInsuMonth = FormatUtil.pad9(toFullWidth("" + insuM), 5).substring(3, 5);
@@ -345,7 +383,10 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setItemCode("TEXT00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
-
+				tTxToDoDetail.setTitaEntdy(titaVo.getEntDyI());
+				tTxToDoDetail.setTitaKinbr(titaVo.getKinbr());
+				tTxToDoDetail.setTitaTlrNo(titaVo.getTlrNo());
+				tTxToDoDetail.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
 				txToDoCom.addDetail(true, 0, tTxToDoDetail, titaVo);
 
 //				目前為同一戶號僅寄一封簡訊，後續要改依狀況寄送需改key
@@ -365,6 +406,7 @@ public class L4454 extends TradeBuffer {
 		if (repayType == 1 || repayType == 3) {
 			this.info("RepayType() == 1...");
 			if (!custLoanFlag.containsKey(custNo)) {
+				cntEmail++;
 				String dataLines = "";
 				dataLines = "親愛的客戶，繳款通知；新光人壽關心您。";
 				// Step3. send L6001
@@ -376,6 +418,10 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setTitaEntdy(titaVo.getEntDyI());
+				tTxToDoDetail.setTitaKinbr(titaVo.getKinbr());
+				tTxToDoDetail.setTitaTlrNo(titaVo.getTlrNo());
+				tTxToDoDetail.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
 
 				txToDoCom.addDetail(true, titaVo.getHCodeI(), tTxToDoDetail, titaVo);
 
@@ -387,6 +433,7 @@ public class L4454 extends TradeBuffer {
 		} else if (repayType == 5) {
 			this.info("RepayType() == 5...");
 			if (!custFireFlag.containsKey(custNo)) {
+				cntEmail++;
 //				轉全形
 //				轉全形
 				String sInsuAmt = toFullWidth("" + repayAmt);
@@ -406,6 +453,10 @@ public class L4454 extends TradeBuffer {
 				tTxToDoDetail.setItemCode("MAIL00");
 				tTxToDoDetail.setStatus(0);
 				tTxToDoDetail.setProcessNote(dataLines);
+				tTxToDoDetail.setTitaEntdy(titaVo.getEntDyI());
+				tTxToDoDetail.setTitaKinbr(titaVo.getKinbr());
+				tTxToDoDetail.setTitaTlrNo(titaVo.getTlrNo());
+				tTxToDoDetail.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
 
 				txToDoCom.addDetail(true, titaVo.getHCodeI(), tTxToDoDetail, titaVo);
 

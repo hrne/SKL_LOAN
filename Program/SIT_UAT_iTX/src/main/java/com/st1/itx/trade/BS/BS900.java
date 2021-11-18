@@ -22,7 +22,6 @@ import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailReserve;
-import com.st1.itx.db.domain.TxToDoDetailReserveId;
 import com.st1.itx.db.service.AcLoanIntService;
 import com.st1.itx.db.service.LoanBorMainService;
 import com.st1.itx.db.service.TxToDoDetailReserveService;
@@ -278,10 +277,8 @@ public class BS900 extends TradeBuffer {
 
 		// 應處理明細留存檔
 		TxToDoDetailReserve tTxToDoDetailReserve = new TxToDoDetailReserve();
-		TxToDoDetailReserveId tTxToDoDetailReserveId = new TxToDoDetailReserveId();
-		tTxToDoDetailReserveId.setItemCode(tTxToDoDetail.getItemCode());
-		tTxToDoDetailReserveId.setDtlValue(tTxToDoDetail.getDtlValue());
-//		tTxToDoDetailReserve.setTxToDoDetailReserveId(tTxToDoDetailReserveId);
+		tTxToDoDetailReserve.setItemCode(tTxToDoDetail.getItemCode());
+		tTxToDoDetailReserve.setDtlValue(tTxToDoDetail.getDtlValue());
 		tTxToDoDetailReserve.setDataDate(iAcDate);
 		tTxToDoDetailReserve.setProcessNote(tTxToDoDetail.getProcessNote());
 		lTxToDoDetailReserve.add(tTxToDoDetailReserve);

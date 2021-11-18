@@ -6,8 +6,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -22,7 +20,6 @@ import com.st1.itx.util.parse.Parse;
 @Repository
 /* 逾期放款明細 */
 public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LC001ServiceImpl.class);
 
 	@Autowired
 	Parse parse;
@@ -34,8 +31,7 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public void afterPropertiesSet() throws Exception {
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Map<String, String>> findAll(TitaVo titaVo,int index,int limit) throws Exception {
+	public List<Map<String, String>> findAll(TitaVo titaVo, int index, int limit) throws Exception {
 
 		int iEntday = Integer.valueOf(titaVo.get("iEntdy").trim()) + 19110000;
 		String iBrNo = titaVo.get("iBrNo").trim();
@@ -75,15 +71,17 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		if (!"".equals(iTranNo)) {
 			sql += "   and A.\"TranNo\" like :tranNo";
 		}
-		
-        sql += " OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
-        
-		logger.info("LC001ServiceImpl sql=" + sql);
+
+		sql += " order by A.\"CreateDate\" DESC";
+
+		sql += " OFFSET :ThisIndex * :ThisLimit ROWS FETCH NEXT :ThisLimit ROW ONLY ";
+
+		this.info("LC001ServiceImpl sql=" + sql);
 		Query query;
 
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		
+
 		query.setParameter("entdy", iEntday);
 		query.setParameter("brno", iBrNo);
 		query.setParameter("txresult", 'S');
@@ -91,17 +89,16 @@ public class LC001ServiceImpl extends ASpringJpaParm implements InitializingBean
 		query.setParameter("actionfg", 0);
 		query.setParameter("hcode", 1);
 		if (!"".equals(iTlrNo)) {
-			query.setParameter("tlrno", iTlrNo+"%");
+			query.setParameter("tlrno", iTlrNo + "%");
 		}
 		if (!"".equals(iTranNo)) {
-			query.setParameter("tranNo", iTranNo+"%");
+			query.setParameter("tranNo", iTranNo + "%");
 		}
-		
+
 		query.setParameter("ThisIndex", index);
 		query.setParameter("ThisLimit", limit);
-		
-		return this.convertToMap(query.getResultList());
-	}
 
+		return this.convertToMap(query);
+	}
 
 }

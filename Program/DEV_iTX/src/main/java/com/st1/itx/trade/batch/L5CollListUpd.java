@@ -54,7 +54,15 @@ public class L5CollListUpd extends BatchBase implements Tasklet, InitializingBea
 
 		String empNo = titaVo.getTlrNo();
 
+		this.info("L5CollListUpd empNo = " + empNo);
+
 		String txtNo = titaVo.getTxtNo();
+
+		if (txtNo == null || txtNo.isEmpty()) {
+			txtNo = "99999999";
+		}
+
+		this.info("L5CollListUpd txtNo = " + txtNo);
 
 		// 此為日終維護,讀onlineDB
 //		this.titaVo.putParam(ContentName.dataBase, ContentName.onLine);

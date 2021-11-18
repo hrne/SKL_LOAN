@@ -20,7 +20,6 @@ import com.st1.itx.db.domain.Ias39LoanCommit;
 import com.st1.itx.db.domain.TxBizDate;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailReserve;
-import com.st1.itx.db.domain.TxToDoDetailReserveId;
 import com.st1.itx.db.service.Ias39LoanCommitService;
 import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
@@ -44,7 +43,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class BS910 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(BS910.class);
 	@Autowired
 	public Parse parse;
 
@@ -85,8 +83,7 @@ public class BS910 extends TradeBuffer {
 		iAcDateReverse = tTxBizDate.getMfbsDy();
 
 		// 1.刪除處理清單 ACCL03-放款承諾提存入帳 //
-		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL03", 0, 3, this.index,
-				Integer.MAX_VALUE);
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.detailStatusRange("ACCL03", 0, 3, this.index, Integer.MAX_VALUE);
 		lTxToDoDetail = slTxToDoDetail == null ? null : slTxToDoDetail.getContent();
 		if (lTxToDoDetail != null) {
 			txToDoCom.delByDetailList(lTxToDoDetail, titaVo);
@@ -94,8 +91,7 @@ public class BS910 extends TradeBuffer {
 
 		// 2.刪除處理清單留存檔 ACCL03 //
 		this.info("3.bs910 delete Reserve ACCL03");
-		Slice<TxToDoDetailReserve> slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL03", 0, 3,
-				iAcDate + 19110000, iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
+		Slice<TxToDoDetailReserve> slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL03", 0, 3, iAcDate + 19110000, iAcDate + 19110000, this.index, Integer.MAX_VALUE, titaVo);
 		lTxToDoDetailReserve = slTxToDoDetailReserve == null ? null : slTxToDoDetailReserve.getContent();
 		if (lTxToDoDetailReserve != null) {
 			try {
@@ -109,8 +105,7 @@ public class BS910 extends TradeBuffer {
 		lTxToDoDetailReserve = new ArrayList<TxToDoDetailReserve>();
 		// 3.迴轉上月
 		this.info("3.bs900 last month ACCL03");
-		slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL03", 0, 3, iAcDateReverse + 19110000,
-				iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
+		slTxToDoDetailReserve = txToDoDetailReserveService.DataDateRange("ACCL03", 0, 3, iAcDateReverse + 19110000, iAcDateReverse + 19110000, this.index, Integer.MAX_VALUE, titaVo);
 		lTxToDoDetailReserve = slTxToDoDetailReserve == null ? null : slTxToDoDetailReserve.getContent();
 		if (lTxToDoDetailReserve != null) {
 			for (TxToDoDetailReserve t2 : lTxToDoDetailReserve) {
@@ -128,7 +123,7 @@ public class BS910 extends TradeBuffer {
 				tTempVo.putParam("AcctCode", t2TempVo.getParam("AcctCode"));
 				tTempVo.putParam("AcBookCode", t2TempVo.getParam("AcBookCode"));
 				tTempVo.putParam("AcSubBookCode", t2TempVo.getParam("AcSubBookCode"));
-			    tTempVo.putParam("SlipNote", t2TempVo.getParam("SlipNote"));
+				tTempVo.putParam("SlipNote", t2TempVo.getParam("SlipNote"));
 				tTempVo.putParam("CrAcctCode1", t2TempVo.getParam("DbAcctCode1"));
 				tTempVo.putParam("CrRvNo1", t2TempVo.getParam("DbRvNo1"));
 				tTempVo.putParam("CrTxAmt1", t2TempVo.getParam("DbTxAmt1"));
@@ -172,8 +167,7 @@ public class BS910 extends TradeBuffer {
 	/* 寫入應處理清單 ACCL03-各項提存作業，寫入新提存 */
 	private void procTxToDo(int yearMonth, TitaVo titaVo) throws LogicException {
 		HashMap<String, BigDecimal> map = new HashMap<>();
-		Slice<Ias39LoanCommit> slIas39LoanCommit = ias39LoanCommitService.findDataYmEq(yearMonth, this.index,
-				Integer.MAX_VALUE);
+		Slice<Ias39LoanCommit> slIas39LoanCommit = ias39LoanCommitService.findDataYmEq(yearMonth, this.index, Integer.MAX_VALUE);
 		List<Ias39LoanCommit> lIas39LoanCommit = slIas39LoanCommit == null ? null : slIas39LoanCommit.getContent();
 
 		if (lIas39LoanCommit != null) {
@@ -193,15 +187,11 @@ public class BS910 extends TradeBuffer {
 		}
 	}
 
-	private void addTxToDo(String acBookCode, String acSubBookCode, BigDecimal intAmt, TitaVo titaVo)
-			throws LogicException {
+	private void addTxToDo(String acBookCode, String acSubBookCode, BigDecimal intAmt, TitaVo titaVo) throws LogicException {
 		// 借：不可撤銷放款承諾 貸：待抵銷不可撤銷放款承諾
 		// 銷帳編號：AC+民國年後兩碼+流水號六碼
-		String rvNo = "AC"
-				+ parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
-				+ parse.IntegerToString(
-						gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo),
-						6);
+		String rvNo = "AC" + parse.IntegerToString(this.getTxBuffer().getMgBizDate().getTbsDyf() / 10000, 4).substring(2, 4)
+				+ parse.IntegerToString(gSeqCom.getSeqNo(this.getTxBuffer().getMgBizDate().getTbsDy(), 1, "L6", "RvNo", 999999, titaVo), 6);
 		TxToDoDetail tTxToDoDetail = new TxToDoDetail();
 		tTxToDoDetail.setItemCode("ACCL03");
 		tTxToDoDetail.setDtlValue(rvNo);
@@ -225,10 +215,8 @@ public class BS910 extends TradeBuffer {
 
 		// 應處理明細留存檔
 		TxToDoDetailReserve tTxToDoDetailReserve = new TxToDoDetailReserve();
-		TxToDoDetailReserveId tTxToDoDetailReserveId = new TxToDoDetailReserveId();
-		tTxToDoDetailReserveId.setItemCode(tTxToDoDetail.getItemCode());
-		tTxToDoDetailReserveId.setDtlValue(tTxToDoDetail.getDtlValue());
-//		tTxToDoDetailReserve.setTxToDoDetailReserveId(tTxToDoDetailReserveId);
+		tTxToDoDetailReserve.setItemCode(tTxToDoDetail.getItemCode());
+		tTxToDoDetailReserve.setDtlValue(tTxToDoDetail.getDtlValue());
 		tTxToDoDetailReserve.setDataDate(iAcDate);
 		tTxToDoDetailReserve.setProcessNote(tTxToDoDetail.getProcessNote());
 		lTxToDoDetailReserve.add(tTxToDoDetailReserve);

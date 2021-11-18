@@ -101,6 +101,7 @@ public class LM031Report extends MakeReport {
 						break;
 					case 3:
 						makeExcel.setValue(row, col, value, "L");
+						break;
 					case 5:
 						if (set1 == 0 || set2 == 0) {
 							BigDecimal bd = getBigDecimal(value);

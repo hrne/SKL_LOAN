@@ -5954,7 +5954,9 @@ TXFORM=L5R26
 <L5R27.dec>
 #L5r27CustNo=A,7,S
 #L5r27FacmNo=A,3,S
+#L5r27BormNo=A,3,S
 #L5r27CustNm=X,200,S
+#L5r27WorkMonth=A,5,S
 #L5r27BsOfficer=X,6,S
 #L5r27BsOfficerName=X,50,S
 #L5r27Introducer=X,6,S
@@ -5972,7 +5974,9 @@ TXFORM=L5R26
 TXFORM=L5R27
 #L5r27CustNo
 #L5r27FacmNo
+#L5r27BormNo
 #L5r27CustNm
+#L5r27WorkMonth
 #L5r27BsOfficer
 #L5r27BsOfficerName
 #L5r27Introducer
@@ -9172,6 +9176,21 @@ TXFORM=L6R45
 #L6R45AcctCode
 ^
 </L6R45.tom>
+
+ 
+<L6R46.dec>
+#L6R46AcNoCode=X,11,S
+#L6R46AcSubCode=x,5,S
+#L6R46AcDtlCode=X,2,S
+</L6R46.dec>
+
+<L6R46.tom>
+TXFORM=L6R46
+#L6R46AcNoCode
+#L6R46AcSubCode
+#L6R46AcDtlCode
+^
+</L6R46.tom>
 
 <L5R47.dec>
 #L5R47CustName=x,100,S

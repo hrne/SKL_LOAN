@@ -16,6 +16,8 @@ import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.TxToDoMain;
 import com.st1.itx.db.domain.TxToDoDetail;
 import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.domain.TxToDoDetailReserve;
+import com.st1.itx.db.service.TxToDoDetailReserveService;
 import com.st1.itx.db.service.TxToDoDetailService;
 import com.st1.itx.db.service.TxToDoMainService;
 import com.st1.itx.tradeService.TradeBuffer;
@@ -87,6 +89,9 @@ public class TxToDoCom extends TradeBuffer {
 
 	@Autowired
 	public TxToDoMainService txToDoMainService;
+
+	@Autowired
+	private TxToDoDetailReserveService txToDoDetailReserveService;
 
 	@Autowired
 	Parse parse;
@@ -168,7 +173,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param HCode   0.新增 1.刪除
 	 * @param tDetail 應處理明細檔
 	 * @param titaVo  TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException
 	 */
 	public void addDetail(boolean dupSkip, int HCode, TxToDoDetail tDetail, TitaVo titaVo) throws LogicException {
 		this.info("TxToDoCom ... addByDetail HCode =" + HCode);
@@ -219,6 +224,9 @@ public class TxToDoCom extends TradeBuffer {
 			this.info("***  ");
 			tMain = new TxToDoMain();
 			mntMainFixValue(tMain, tDetail.getItemCode(), titaVo);
+			if ("R".equals(tMain.getYdReserveFg())) {
+				throw new LogicException(titaVo, "E0013", "寫入應處理明細留存檔");
+			}
 			if (HCode == 0) {
 				addMainCntValue(tMain, tDetail, titaVo);
 			} else {
@@ -284,7 +292,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param HCode      0.新增 1.刪除
 	 * @param detailList 應處理明細檔List
 	 * @param titaVo     TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException
 	 */
 	public void addByDetailList(boolean dupSkip, int HCode, List<TxToDoDetail> detailList, TitaVo titaVo)
 			throws LogicException {
@@ -305,7 +313,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param status    資料狀態 0.未處理1.已保留2.已處理3.已刪除
 	 * @param tDetailId TxToDoDetailId
 	 * @param titaVo    TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException
 	 */
 	public void updDetailStatus(int status, TxToDoDetailId tDetailId, TitaVo titaVo) throws LogicException {
 
@@ -354,7 +362,7 @@ public class TxToDoCom extends TradeBuffer {
 
 					// 已處理交易序號
 					if (status == 2 || status == 3) {
-						tDetail.setTitaEntdy(this.txBuffer.getTxBizDate().getTbsDy());
+						tDetail.setTitaEntdy(titaVo.getEntDyI());
 						tDetail.setTitaKinbr(titaVo.getKinbr());
 						tDetail.setTitaTlrNo(titaVo.getTlrNo());
 						tDetail.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
@@ -376,7 +384,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * 
 	 * @param detailList List of TxToDoDetail
 	 * @param titaVo     TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException
 	 */
 	public void updByDetailList(List<TxToDoDetail> detailList, TitaVo titaVo) throws LogicException {
 		this.info("TxToDoCom ... updByDetailList ...");
@@ -403,7 +411,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * 
 	 * @param detailList List of TxToDoDetail
 	 * @param titaVo     TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException
 	 */
 	public void delByDetailList(List<TxToDoDetail> detailList, TitaVo titaVo) throws LogicException {
 
@@ -437,7 +445,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * 
 	 * @param tDetail TxToDoDetail
 	 * @param titaVo  TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException
 	 */
 	public void delByDetail(TxToDoDetail tDetail, TitaVo titaVo) throws LogicException {
 		List<TxToDoDetail> detailList = new ArrayList<TxToDoDetail>();
@@ -445,6 +453,31 @@ public class TxToDoCom extends TradeBuffer {
 		delByDetailList(detailList, titaVo);
 
 		return;
+	}
+
+	/**
+	 * 刪除應處理明細檔BY交易序號
+	 * 
+	 * @param ItemCode  項目
+	 * @param TitaEntdy ..
+	 * @param TitaKinbr ..
+	 * @param TitaTlrNo ..
+	 * @param TitaTxtNo ..
+	 * @param titaVo    ..
+	 * @return 刪除筆數
+	 * @throws LogicException
+	 */
+	public int delDetailByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo,
+			TitaVo titaVo) throws LogicException {
+		int size = 0;
+		this.info("TxToDoCom ... delByDetailList ...");
+		Slice<TxToDoDetail> slTxToDoDetail = txToDoDetailService.findTxNoEq(ItemCode, TitaEntdy + 19110000, TitaKinbr,
+				TitaTlrNo, parse.stringToInteger(TitaTxtNo), this.index, Integer.MAX_VALUE, titaVo);
+		if (slTxToDoDetail != null) {
+			size = slTxToDoDetail.getContent().size();
+			delByDetailList(slTxToDoDetail.getContent(), titaVo);
+		}
+		return size;
 	}
 
 	/**
@@ -478,10 +511,77 @@ public class TxToDoCom extends TradeBuffer {
 	}
 
 	/**
+	 * 新增應處理明細留存檔
+	 * 
+	 * @param detailList List＜TxToDoDetail＞
+	 * @param titaVo     ..
+	 * @throws LogicException
+	 */
+	public void addReserve(List<TxToDoDetailReserve> detailList, TitaVo titaVo) throws LogicException {
+		this.info("TxToDoCom ... updByDetailList ...");
+		// 放行時執行
+		if (detailList == null || detailList.size() == 0) {
+			return;
+		}
+
+		mntMainFixValue(tMain, detailList.get(0).getItemCode(), titaVo);
+		if (!"R".equals(tMain.getYdReserveFg())) {
+			throw new LogicException(titaVo, "E0013", "寫入應處理明細留存檔");
+		}
+		for (TxToDoDetailReserve tTxToDoDetailReserve : detailList) {
+			tTxToDoDetailReserve.setDataDate(this.txBuffer.getMgBizDate().getTbsDy());
+			tTxToDoDetailReserve.setStatus(2); // 2.已處理
+			tTxToDoDetailReserve.setTitaEntdy(titaVo.getEntDyI());
+			tTxToDoDetailReserve.setTitaKinbr(titaVo.getKinbr());
+			tTxToDoDetailReserve.setTitaTlrNo(titaVo.getTlrNo());
+			tTxToDoDetailReserve.setTitaTxtNo(parse.stringToInteger(titaVo.getTxtNo()));
+		}
+		try {
+			txToDoDetailReserveService.insertAll(detailList, titaVo);
+		} catch (DBException e) {
+			e.printStackTrace();
+			throw new LogicException(titaVo, "E0005", "TxToDoDetailReserve insertAll " + e.getErrorMsg());
+		}
+		return;
+	}
+
+	/**
+	 * 刪除應處理明細留存檔BY交易序號
+	 * 
+	 * @param ItemCode  項目
+	 * @param TitaEntdy ..
+	 * @param TitaKinbr ..
+	 * @param TitaTlrNo ..
+	 * @param TitaTxtNo ..
+	 * @param titaVo    ..
+	 * @return 刪除筆數
+	 * @throws LogicException
+	 */
+	public int delReserveByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo,
+			TitaVo titaVo) throws LogicException {
+		int size = 0;
+
+		this.info("TxToDoCom ... delByDetailList ...");
+		Slice<TxToDoDetailReserve> slTxToDoDetailReserve = txToDoDetailReserveService.findTxNoEq(ItemCode,
+				TitaEntdy + 19110000, TitaKinbr, TitaTlrNo, parse.stringToInteger(TitaTxtNo), this.index,
+				Integer.MAX_VALUE, titaVo);
+		if (slTxToDoDetailReserve != null) {
+			size = slTxToDoDetailReserve.getContent().size();
+			try {
+				txToDoDetailReserveService.deleteAll(slTxToDoDetailReserve.getContent(), titaVo);
+			} catch (DBException e) {
+				e.printStackTrace();
+				throw new LogicException(titaVo, "E0008", "TxToDoDetailReserve deleteAll " + e.getErrorMsg());
+			}
+		}
+		return size;
+	}
+
+	/**
 	 * daily House Keeping
 	 * 
 	 * @param titaVo TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException
 	 */
 	public void dailyHouseKeeping(TitaVo titaVo) throws LogicException {
 
@@ -602,7 +702,7 @@ public class TxToDoCom extends TradeBuffer {
 //      1    2        3       4        5        6       7            8           9        A       B
 // 2.昨日留存
 //   Y-留存未處理資料
-//
+//   R-寫入'應處理明細留存檔'
 //		
 // 3.處理功能 
 //   Y-有自動處理功能，由該交易程式將明細檔狀態更改為已處理
@@ -670,6 +770,9 @@ public class TxToDoCom extends TradeBuffer {
 		case "MAIL00":
 			settingValue = "MAIL00;Y;Y;Y;Y;-;L698A;     ;L4711;-;電子郵件";
 			break;
+		case "DOCU00":
+			settingValue = "DOCU00;Y;Y;Y;Y;-;L698A;     ;     ;-;書面通知";
+			break;
 		case "L45101":
 			settingValue = "L45101;-;Y;-;-;Y;L698A;L4510;L4511;-;產出15日薪員工扣薪檔";
 			break;
@@ -692,7 +795,7 @@ public class TxToDoCom extends TradeBuffer {
 			settingValue = "L4703 ;Y;C;Y;-;-;L698A;L4703;L4703;-;滯繳通知單產生作業";
 			break;
 		case "L4454":
-			settingValue = "L4454 ;Y;C;Y;-;-;L698A;L4454;L4454;-;銀扣失敗通知產生作業";
+			settingValue = "L4454 ;Y;Y;Y;-;-;L698A;L4454;L4454;-;銀扣失敗通知產生作業";
 			break;
 		case "L9710":
 			settingValue = "L9710 ;-;C;-;-;-;L698A;L9710;L9710;-;產生寬限到期明細表";
@@ -702,6 +805,12 @@ public class TxToDoCom extends TradeBuffer {
 			break;
 		case "PFCL00":
 			settingValue = "PFCL00;-;M;-;-;-;L698A;     ;     ;-;業績工作月結算啟動通知";
+			break;
+		case "NOTI01":
+			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;     ;-;銀扣失敗繳息還本通知單";
+			break;
+		case "NOTI02":
+			settingValue = "NOTI01;R;-;Y;-;-;     ;     ;     ;-;銀扣二扣失敗明信片";
 			break;
 		default:
 			throw new LogicException(titaVo, "E0013", "項目代號有誤" + itemCode);

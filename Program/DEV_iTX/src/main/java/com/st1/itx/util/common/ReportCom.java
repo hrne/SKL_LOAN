@@ -1,5 +1,8 @@
 package com.st1.itx.util.common;
 
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Scope;
@@ -49,42 +52,75 @@ public class ReportCom extends CommBuffer {
 		}
 	}
 
-	public void executeReports(TitaVo titaVo, String txcd) throws LogicException {
-		this.info("ReportCom: active " + txcd);
+	private class NeedInputJob {
+		String code = "";
+		String name = "";
 
-		String job = "";
+		public NeedInputJob(String code, String name) {
+			this.code = code;
+			this.name = name;
+		}
+	}
+
+	/**
+	 * 批量執行報表程式<BR>
+	 * 參考：L9801, L9802, L9803, L9804, L9805, L9806
+	 * 
+	 * @param titaVo titaVo
+	 * @param txcd   呼叫此函數的報表代號（顯示用）
+	 * @throws LogicException
+	 */
+	public void executeReports(TitaVo titaVo, String txcd) throws LogicException {
+		this.info("ReportCom: activated by " + txcd);
+
+		Queue<String> backgroundJobs = new LinkedList<String>();
+		Queue<NeedInputJob> needInputJobs = new LinkedList<NeedInputJob>();
+
 		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
 
 		for (int i = 1; i <= totalItem; i++) {
 
-			// if it's checked
+			// Put jobs into related job queue
 			if (titaVo.getParam("BtnShell" + i).equals("V")) {
 				String tradeCode = titaVo.getParam("TradeCode" + i);
 				String tradeName = titaVo.getParam("TradeName" + i);
 
 				if (needInput(tradeCode)) {
 					// send notice through website
-					webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", tradeCode,
-							titaVo.getParam("TLRNO"), tradeCode + tradeName + "須填寫查詢條件", titaVo);
+					this.info("ReportCom: adding NeedInputJob " + tradeCode + "(" + txcd + ")");
+					needInputJobs.add(new NeedInputJob(tradeCode, tradeName));
 				} else {
 					// add into batch job
-					this.info(txcd + " adds job j" + tradeCode);
-
-					job += ";j" + tradeCode;
+					// batchJob format: j[BEANNAME];j[BEANNAME];...;j[BEANNAME]
+					this.info("ReportCom: adding BatchJob j" + tradeCode + "(" + txcd + ")");
+					backgroundJobs.add("j" + tradeCode);
 
 				}
 			}
 		}
 
 		// run batchJob
-		if (!job.equals("")) {
-			titaVo.setBatchJobId(job.substring(1));
+		if (backgroundJobs.size() > 0) {
+			this.info("ReportCom: executing BatchJobs (" + txcd + ")");
 
-			// ;jL1111;jL2222...
-			// hence 7
+			titaVo.setBatchJobId(String.join(";", backgroundJobs));
+
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), job.length() / 7 + " 支報表正在背景產製，完成後可於＂報表及製檔＂存取", titaVo);
+					titaVo.getParam("TLRNO"), backgroundJobs.size() + " 支報表正在背景產製，完成後可於＂報表及製檔＂存取", titaVo);
 		}
+
+		if (needInputJobs.size() > 0) {
+			this.info("ReportCom: sending popups about NeedInputJobs (" + txcd + ")");
+
+			// send popup about reports that need further input
+			// after batchJob to make sure that users click through jobs that need inputs first
+			for (NeedInputJob j : needInputJobs) {
+				webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", j.code,
+						titaVo.getParam("TLRNO"), j.code + j.name + "須填寫查詢條件", titaVo);
+			}
+		}
+
+		this.info("ReportCom: we're done here! (" + txcd + ")");
 	}
 
 	@Override

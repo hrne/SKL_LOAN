@@ -992,15 +992,21 @@ public class L2154 extends TradeBuffer {
 	}
 
 	private void bankAuthActRoutine() throws LogicException {
+
+		this.info("titaVo.getParam(RepayCode)" + titaVo.getParam("RepayCode"));
+		this.info("titaVo.getParam(OldRepayCode)" + titaVo.getParam("OldRepayCode"));
+		this.info("titaVo.getParam(PostCode)" + titaVo.getParam("PostCode"));
+		this.info("titaVo.getParam(OldPostCode)" + titaVo.getParam("OldPostCode"));
+		this.info("titaVo.getParam(RepayAcctNo)" + titaVo.getParam("RepayAcctNo"));
+		this.info("titaVo.getParam(OldRepayAcctNo)" + titaVo.getParam("OldAcctNo"));
+		this.info("titaVo.getParam(RepayBank)" + titaVo.getParam("RepayBank"));
+		this.info("titaVo.getParam(OldRepayBank)" + titaVo.getParam("OldRepayBank"));
+
 		if (titaVo.getParam("RepayCode").equals(titaVo.getParam("OldRepayCode"))
+				&& titaVo.getParam("RepayBank").equals(titaVo.getParam("OldRepayBank"))
 				&& titaVo.getParam("PostCode").equals(titaVo.getParam("OldPostCode"))
-				&& titaVo.getParam("RepayAcctNo").equals(titaVo.getParam("OldAcctNo"))
-				&& titaVo.getParam("RelationCode").equals(titaVo.getParam("OldRelationCode"))
-				&& titaVo.getParam("RelationName").equals(titaVo.getParam("OldRelationName"))
-				&& titaVo.getParam("RelationBirthday").equals(titaVo.getParam("OldRelationBirthday"))
-				&& titaVo.getParam("RelationGender").equals(titaVo.getParam("OldRelationGender"))
-				&& titaVo.getParam("RelationId").equals(titaVo.getParam("OldRelationId"))
-				&& titaVo.getParam("RepayBank").equals(titaVo.getParam("OldRepayBank"))) {
+				&& titaVo.getParam("RepayAcctNo").equals(titaVo.getParam("OldAcctNo"))) {
+
 			return;
 		}
 
@@ -1028,7 +1034,7 @@ public class L2154 extends TradeBuffer {
 		// 新還款帳號(含還款方式)刪除
 		if ("02".equals(titaVo.getParam("RepayCode"))) {
 			bankAuthActCom.add("A", titaVo);
-		}else {
+		} else {
 			txtitaVo = new TitaVo();
 			txtitaVo = (TitaVo) titaVo.clone();
 			txtitaVo.putParam("RepayCode", titaVo.getParam("OldRepayCode"));

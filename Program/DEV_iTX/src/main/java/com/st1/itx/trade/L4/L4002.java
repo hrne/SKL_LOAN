@@ -518,10 +518,10 @@ public class L4002 extends TradeBuffer {
 				occursList.putParam("OOReconCode", tempL4002Vo.getReconCode());
 				occursList.putParam("OOFileName", tempL4002Vo.getFileName());
 				occursList.putParam("OOFileCnt", fileCnt.get(tempL4002Vo));
-				occursList.putParam("OODntCnt", dntCnt.get(tempL4002Vo));
-				occursList.putParam("OOAlrCnt", alrCnt.get(tempL4002Vo));
-				occursList.putParam("OOWatCnt", watCnt.get(tempL4002Vo));
-				occursList.putParam("OOVirCnt", virCnt.get(tempL4002Vo));
+				occursList.putParam("OODntCnt", dntCnt.get(tempL4002Vo)); // 失敗
+				occursList.putParam("OOAlrCnt", alrCnt.get(tempL4002Vo)); // 已入帳
+				occursList.putParam("OOWatCnt", watCnt.get(tempL4002Vo)); // 待處理
+				occursList.putParam("OOVirCnt", virCnt.get(tempL4002Vo)); // 轉暫收
 				occursList.putParam("OOTotalRepayAmt", totalAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOToDoRepayAmt", toDoAmtSum.get(tempL4002Vo));
 				occursList.putParam("OOUnDoRepayAmt", unDoAmtSum.get(tempL4002Vo));

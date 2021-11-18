@@ -41,7 +41,7 @@ K(NOBUTTON,CLOSEY)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="p1" layout="cols=1;screen.width=[200,800];printer.width=[20,20];">
 [
-["[L8034]                                 消債條列JCIC報送資料歷程查詢(43)"],
+["[L8034]                                 消債條列JCIC報送資料歷程查詢(043)"],
 ["#FdCustId+身分證字號",#CustId,#CustIdX],
 ["#FdSubmitKey+報送單位代號",#SubmitKey,#SubmitKeyX],
 ["#FdRcDate+協商申請日",#RcDate],

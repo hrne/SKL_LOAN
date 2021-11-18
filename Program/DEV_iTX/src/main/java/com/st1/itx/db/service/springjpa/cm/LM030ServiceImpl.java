@@ -38,7 +38,7 @@ public class LM030ServiceImpl extends ASpringJpaParm implements InitializingBean
 		
 		String sql = "";
 		sql += " SELECT CITY.\"CityItem\" ";
-		sql += "       ,\"Fn_GetEmpName\"(F.\"AccCollPsn\", 1) ";
+		sql += "       ,\"Fn_GetEmpName\"(F.\"AccCollPsn\", 1) \"AccCollPsn\" ";
 		sql += "       ,D.\"CustNo\" ";
 		sql += "       ,D.\"FacmNo\" ";
 		sql += "       ,C.\"CustName\" ";

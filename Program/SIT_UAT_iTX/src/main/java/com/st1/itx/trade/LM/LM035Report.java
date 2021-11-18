@@ -183,8 +183,8 @@ public class LM035Report extends MakeReport {
 		}
 		
 		if (timesLeft == 0) {
-			// 最後的最後, 輸出放款餘額的地區平均
-			makeExcel.setValue(row, col + 1, computeDivide(computeDivide(total, million, 5), new BigDecimal(LDList.size()), 2), "#,##0.00", "R");
+			// 最後的最後, 輸出放款餘額的累積
+			makeExcel.setValue(row, col + 1, computeDivide(total, million, 0),"#,##0", "R");
 		}
 	}
 

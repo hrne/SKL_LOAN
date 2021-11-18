@@ -148,9 +148,10 @@ T(2,@FdRepayAmt,#ShowFd)
 
 !刪除時關閉框線
 #WKTF=X,1,S
-IF (#FunctionCode==4 || #FunctionCode==5,T(F,@AcDate,0)T(F,@BatchNo,0)T(F,@RepayCode,0)T(F,@RepayType,0)T(F,@RepayAmt,0)T
-(F,@EntryDate,0)T(F,@RepayId,0)T(F,@RepayName,0)T(F,@CustNo,0)T(F,@FacmNo,0)T(F,@CustNm,0)T(F,@RvNo,0)T(F,@Note,0)   
-										,$)
+IF (#FunctionCode==4 || #FunctionCode==5,T(F,@AcDate,0)T(F,@BatchNo,0)T(F,@RepayCode,0)T(F,@RepayType,0)T(F,@RepayAmt,0)
+                                         T(F,@EntryDate,0)T(F,@RepayId,0)T(F,@RepayName,0)T(F,@CustNo,0)T(F,@FacmNo,0)
+										 T(F,@CustNm,0)T(F,@RvNo,0)T(F,@Note,0)   
+										 ,$)
             
 ! 會計日期
 #AcDate=D,7,L
@@ -224,11 +225,23 @@ HELP(#RepayCodeHelp)
 C(3,#RepayCode,11,
 HIDE(#AcNoCode,#DashA,#AcSubCode,#DashB,#AcDtlCode,#BTNA,#AcNoX)SHOW(#ReConCode),
 SHOW(#AcNoCode,#DashA,#AcSubCode,#DashB,#AcDtlCode,#BTNA,#AcNoX)HIDE(#ReConCode))
-C(3,#RepayCode,5,T(2,@ReConCode,)T(2,@AcNoCode,20211021)T(2,@AcSubCode,)T(2,@AcNoX,其他應付款-法扣內部憑單),$)
-C(3,#RepayCode,6,T(2,@ReConCode,)T(2,@AcNoCode,20232060)T(2,@AcSubCode,)T(2,@AcNoX,暫收及待結轉帳項-理賠抵繳房貸),$)
-! C(3,#RepayCode,7,T(2,@ReConCode,T10)T(2,@AcNoCode,20232180)T(2,@AcDtlCode,03),$)
-! C(3,#RepayCode,9,T(2,@ReConCode,)T(2,@AcNoCode,)T(2,@AcSubCode,)T(2,@AcNoX,),$)
-C(3,#RepayCode,11,T(2,@ReConCode,P03)T(2,@AcNoCode,10121000)T(2,@AcSubCode,04007)T(2,@AcNoX,),$)
+IF(#FunctionCode == 4 || #FunctionCode == 5,T(F,@AcNoCode,0)T(F,@AcSubCode,0)T(F,@AcDtlCode,0)HIDE(#BTNA),$)
+
+
+#RimRepayCode=A,2,S
+
+<include src="ROM.icf::L6R46.dec"/>
+#RimL6r46=X,1,S
+E(0,@RimRepayCode,#RepayCode)
+RESET_RIM(#RimL6r46,L6R46)
+S(L6R46,1,#RimRepayCode)
+R(1,L6R46)
+
+
+#RecevL6r46=X,1,S
+C(3,#RepayCode,5,T(2,@ReConCode,)T(2,@AcNoCode,#L6R46AcNoCode)T(2,@AcSubCode,)T(2,@AcNoX,其他應付款-法扣內部憑單),$)
+C(3,#RepayCode,6,T(2,@ReConCode,)T(2,@AcNoCode,#L6R46AcNoCode)T(2,@AcSubCode,)T(2,@AcNoX,暫收及待結轉帳項-理賠抵繳房貸),$)
+C(3,#RepayCode,11,T(2,@ReConCode,P03)T(2,@AcNoCode,#L6R46AcNoCode)T(2,@AcSubCode,#L6R46AcSubCode)T(2,@AcNoX,),$)
 
 ![來源中文]
 #RepayCodeX=X,16,L
@@ -276,13 +289,16 @@ AcNoX<-OOAcctItem})
 ![會科] 來源RepayCode為09-其他需點選會計科目，其他自動帶入 待提供???
 #AcNoCode=X,11,I
 C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
 C(3,#RepayCode,09,$,s)
 @C(4,#AcNoCode,V(P,請輸入會計科目),$)
 #AcSubCode=X,5,I
 C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
 C(3,#RepayCode,09,$,s)
 #AcDtlCode=X,2,I
 C(3,#FunctionCode,4,s,$)
+C(3,#FunctionCode,5,s,$)
 C(3,#RepayCode,09,$,s)
 
 #ReConCode=X,3,L
@@ -447,6 +463,7 @@ TXFORM=L4210
 <include src="ROM.icf::L4R09.tom"/>
 <include src="ROM.icf::L4R10.tom"/>
 <include src="ROM.icf::L4R19.tom"/>
+<include src="ROM.icf::L6R46.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
 </sub>
 

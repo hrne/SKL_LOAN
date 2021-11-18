@@ -1,0 +1,13 @@
+FM101_CustNo=9,7
+FM101_FacmNo=9,3
+FM101_BormNo=9,3
+FM101_SumNo=X,3
+FM101_SumNoX=X,20
+FM101_AcNoCode=X,17
+FM101_AcDtlCode=X,2
+FM101_AcNoCodeX=X,40
+FM101_AcSubBookCode=X,3
+FM101_AcSubBookCodeX=X,10
+FM101_CurrencyCode=X,3
+FM101_DbAmt=9,14
+FM101_CrAmt=9,14
