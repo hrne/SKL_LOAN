@@ -173,7 +173,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param HCode   0.新增 1.刪除
 	 * @param tDetail 應處理明細檔
 	 * @param titaVo  TitaVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void addDetail(boolean dupSkip, int HCode, TxToDoDetail tDetail, TitaVo titaVo) throws LogicException {
 		this.info("TxToDoCom ... addByDetail HCode =" + HCode);
@@ -292,7 +292,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param HCode      0.新增 1.刪除
 	 * @param detailList 應處理明細檔List
 	 * @param titaVo     TitaVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void addByDetailList(boolean dupSkip, int HCode, List<TxToDoDetail> detailList, TitaVo titaVo)
 			throws LogicException {
@@ -313,7 +313,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param status    資料狀態 0.未處理1.已保留2.已處理3.已刪除
 	 * @param tDetailId TxToDoDetailId
 	 * @param titaVo    TitaVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void updDetailStatus(int status, TxToDoDetailId tDetailId, TitaVo titaVo) throws LogicException {
 
@@ -384,7 +384,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * 
 	 * @param detailList List of TxToDoDetail
 	 * @param titaVo     TitaVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void updByDetailList(List<TxToDoDetail> detailList, TitaVo titaVo) throws LogicException {
 		this.info("TxToDoCom ... updByDetailList ...");
@@ -411,7 +411,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * 
 	 * @param detailList List of TxToDoDetail
 	 * @param titaVo     TitaVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void delByDetailList(List<TxToDoDetail> detailList, TitaVo titaVo) throws LogicException {
 
@@ -445,7 +445,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * 
 	 * @param tDetail TxToDoDetail
 	 * @param titaVo  TitaVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void delByDetail(TxToDoDetail tDetail, TitaVo titaVo) throws LogicException {
 		List<TxToDoDetail> detailList = new ArrayList<TxToDoDetail>();
@@ -465,7 +465,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param TitaTxtNo ..
 	 * @param titaVo    ..
 	 * @return 刪除筆數
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public int delDetailByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo,
 			TitaVo titaVo) throws LogicException {
@@ -485,7 +485,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * 
 	 * @param itemCode
 	 * @param titaVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void delByItemCode(String itemCode, TitaVo titaVo) throws LogicException {
 		this.info("TxToDoCom delByItemCode" + itemCode);
@@ -515,7 +515,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * 
 	 * @param detailList List＜TxToDoDetail＞
 	 * @param titaVo     ..
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void addReserve(List<TxToDoDetailReserve> detailList, TitaVo titaVo) throws LogicException {
 		this.info("TxToDoCom ... updByDetailList ...");
@@ -555,7 +555,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * @param TitaTxtNo ..
 	 * @param titaVo    ..
 	 * @return 刪除筆數
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public int delReserveByTxNo(String ItemCode, int TitaEntdy, String TitaKinbr, String TitaTlrNo, String TitaTxtNo,
 			TitaVo titaVo) throws LogicException {
@@ -581,7 +581,7 @@ public class TxToDoCom extends TradeBuffer {
 	 * daily House Keeping
 	 * 
 	 * @param titaVo TitaVo
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public void dailyHouseKeeping(TitaVo titaVo) throws LogicException {
 

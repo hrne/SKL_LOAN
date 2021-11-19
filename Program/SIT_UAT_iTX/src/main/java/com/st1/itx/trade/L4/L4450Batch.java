@@ -147,7 +147,6 @@ public class L4450Batch extends TradeBuffer {
 
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 	private List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
-
 	private BigDecimal limitAmt = BigDecimal.ZERO;
 
 //	由L4R11計算
@@ -777,7 +776,7 @@ public class L4450Batch extends TradeBuffer {
 
 //				NA:未產 Y:已產 N:已產
 				if (!"".equals(tBankDeductDtl.getMediaCode())) {
-					checkMsg = "已產生媒體";
+					checkMsg = "已產生媒體，須執行'L4452-重製媒體碼'";
 					checkFlag = false;
 					break;
 				}

@@ -213,7 +213,7 @@ public class AcMainCom extends TradeBuffer {
 	 * @param acDate   會計日期
 	 * @param acList   List of AcMain
 	 * @param titaVo   TitaVo
-	 * @throws LogicException
+	 * @throws LogicException LogicException
 	 */
 	public void changeDate(int LbizDate, int acDate, List<AcMain> acList, TitaVo titaVo) throws LogicException {
 		for (AcMain ac : acList) {

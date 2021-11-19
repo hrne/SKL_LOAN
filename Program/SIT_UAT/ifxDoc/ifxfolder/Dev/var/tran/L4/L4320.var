@@ -80,7 +80,7 @@ T(3,*)
 #FdDrawDownDate=X,2,L
 #FdPrevPayIntDate=X,2,L
 #FdCityCode=X,2,L
-#FdAdjustDateX=X,2,L
+#FdAdjustDate=X,2,L
 #FdGroupId=X,2,L
 
 ! Help
@@ -791,14 +791,17 @@ IF(#TxKind==4||#TxKind==5,$,S)
 IF(#TxKind==4||#TxKind==5,$,S)
 @A(DATE,0,#DrawDownDateE)V(5,#DrawDownDateS,9991231)
 
+#PrevPayIntDateHelp=X,20,S
+T(3,1:>=;2:<=)
+
 #PrevPayIntDateC=A,1,I
 IF(#TxKind==4||#TxKind==5,$,S)
 E(0,1)
-@V(1,1,2)
+HELP(#PrevPayIntDateHelp)
+@V(H,#PrevPayIntDateHelp)
 
 #PrevPayIntDateCX=X,2,L
-C(3,#PrevPayIntDateC,1,T(2,>=),T(2,<=))
-
+T(H,#PrevPayIntDateC,#PrevPayIntDateHelp)
 
 #PrevPayIntDate=D,7,I
 IF(#TxKind==4||#TxKind==5,$,S)
@@ -813,16 +816,24 @@ IF(#TxKind==5,$,S)
 IF(#TxKind==5,$,S)
 @V(5,#CityCodeS,99)
 
-#AdjustDateX=D,7,I
+#AdjustDateD=D,7,I
 IF(#TxKind==4||#TxKind==5,$,S)
+@A(DATE,0,#AdjustDateD)
+
+#AdjustDateHelp= X,40,L
+T(3,1:起未調整過利率者;2:起已調整過利率者)
 
 #AdjustDateC=A,1,I
 IF(#TxKind==4||#TxKind==5,$,S)
+C(4,#AdjustDateD,S,$)
 E(0,1)
-@V(1,1,2)
+HELP(#AdjustDateHelp)
+@V(H,#AdjustDateHelp)
 
 #AdjustDateCX=X,20,L
-C(3,#AdjustDateC,1,T(2,起未調整過利率者),T(2,起已調整過利率者))
+C(4,#AdjustDateD,S,$)
+T(H,#AdjustDateC,#AdjustDateHelp)
+
 
 #GroupId=X,10,I
 IF(#TxKind==5,$,S)
@@ -844,7 +855,7 @@ A(ID_UNINO,0,#GroupId)
 [#<->#,"#FdDrawDownDate+撥款日期",#DrawDownDateS," TO",#DrawDownDateE],
 [#<->#,"#FdPrevPayIntDate+繳息迄日",#PrevPayIntDateC,#PrevPayIntDateCX,#PrevPayIntDate],
 [#<->#,"#FdCityCode+地區別",#CityCodeS,"-",#CityCodeE],
-[#<->#,"#FdAdjustDateX+並且@@@@@＞＝",#AdjustDateX,"@",#AdjustDateC,#AdjustDateCX],
+[#<->#,"#FdAdjustDate+並且@@@@@＞＝",#AdjustDateD,"@",#AdjustDateC,#AdjustDateCX],
 [#<->#,"#FdGroupId+團體戶",#GroupId],
 ]
 </sub>
@@ -890,7 +901,7 @@ A(ID_UNINO,0,#GroupId)
 #PrevPayIntDate
 #CityCodeS
 #CityCodeE
-#AdjustDateX
+#AdjustDateD
 #AdjustDateC
 #GroupId
 </sub>

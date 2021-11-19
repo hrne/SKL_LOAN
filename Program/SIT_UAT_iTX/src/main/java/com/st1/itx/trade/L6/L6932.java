@@ -49,6 +49,7 @@ public class L6932 extends TradeBuffer {
 	@Autowired
 	Parse parse;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L6932 ");
@@ -58,10 +59,7 @@ public class L6932 extends TradeBuffer {
 		this.index = titaVo.getReturnIndex();
 
 		// 設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 20; // 593 * 20 = 11,860
-
-		String iTlrItem = "";
-		String iTranItem = "";
+		this.limit = 20; // 793 * 20 = 11,860
 
 		int sdt = Integer.parseInt(titaVo.getParam("ST_DT").toString()) + 19110000;
 		int edt = Integer.parseInt(titaVo.getParam("ED_DT").toString()) + 19110000;
@@ -97,7 +95,7 @@ public class L6932 extends TradeBuffer {
 		if (lTxDataLog == null) {
 			throw new LogicException(titaVo, "E0001", "");
 		}
-		this.info("lTxDataLog=="+lTxDataLog.size());
+		this.info("lTxDataLog==" + lTxDataLog.size());
 		for (TxDataLog txDataLog : lTxDataLog) {
 //			if (!iTxtNo.isEmpty() && iTxtNo.equals(txDataLog.getTxSeq())) {
 //				continue;
@@ -111,21 +109,24 @@ public class L6932 extends TradeBuffer {
 			}
 			boolean first = true;
 			for (HashMap<String, Object> map : listMap) {
-				String fld = map.get("f").toString();
+				String fld = "";
+				if(map.get("f") !=null) {
+					fld = map.get("f").toString();
+				}
 				String oval = map.get("o").toString();
 				String nval = map.get("n").toString();
 				if ("最後更新人員".equals(fld) || "交易進行記號".equals(fld) || "上次櫃員編號".equals(fld) || "上次交易序號".equals(fld) || "已編BorTx流水號".equals(fld) || "最後更新日期時間".equals(fld)) {
 					continue;
 				}
-				this.info("iChainFlag="+iChainFlag+",TranNo=="+TranNo);
-				if(iChainFlag==1 && ("L5701").equals(TranNo)) { //L5701 喘息期歷程特殊需求
-					if("延期繳款年月(起)".equals(fld) || "延期繳款年月(訖)".equals(fld)){
-						
+				this.info("iChainFlag=" + iChainFlag + ",TranNo==" + TranNo);
+				if (iChainFlag == 1 && ("L5701").equals(TranNo)) { // L5701 喘息期歷程特殊需求
+					if ("延期繳款年月(起)".equals(fld) || "延期繳款年月(訖)".equals(fld)) {
+
 					} else {
 						continue;
 					}
 				}
-					
+
 				if (first) {
 					this.info("L6932 getReason = " + txDataLog.getReason().trim());
 					if (!"".equals(txDataLog.getReason().trim())) {

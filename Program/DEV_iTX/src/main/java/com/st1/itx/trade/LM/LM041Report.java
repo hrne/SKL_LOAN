@@ -69,7 +69,7 @@ public class LM041Report extends MakeReport {
 				int col = i + 1;
 
 				switch (i) {
-				case 7:
+				case 6:
 					BigDecimal bd = getBigDecimal(value);
 					total = total.add(bd);
 					makeExcel.setValue(row, col, bd, "#,##0", "R");

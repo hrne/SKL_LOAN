@@ -45,6 +45,7 @@ AUTHNO=X,6
 AGENT=X,6
 ORGEMPNM=X,8
 CityCode=X,2
+Final=9,3
 Cost1=9,14.2
 Cost2=9,14.2
 Cost3=9,14.2

@@ -1,5 +1,6 @@
 package com.st1.itx.db.service.springjpa.cm;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 
@@ -16,6 +17,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.util.parse.Parse;
 
 @Service("l4320ServiceImpl")
 @Repository
@@ -27,6 +29,9 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	@Autowired
 	private LoanBorMainRepository loanBorMainRepos;
+
+	@Autowired
+	public Parse parse;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -48,6 +53,50 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iEffectDateS = iEffectDate;
 			iEffectDateE = iEffectDate;
 		}
+
+		// 業務科目 ..... 999 + TO 999 + 4-員工利率調整 5.按商品別調整
+		int iAcctCodeS = parse.stringToInteger(titaVo.getParam("AcctCodeS")); // 業務科目 from, 可為 0
+		int iAcctCodeE = parse.stringToInteger(titaVo.getParam("AcctCodeE")); // 業務科目 to, , >= from
+
+		// 員工年資＞＝ . 99 月 , 4-員工利率調整
+		int iEmploeeMonth = parse.stringToInteger(titaVo.getParam("EmploeeMonth")); // 可為 0
+
+		// 利率 ......... 99.9999 % TO 99.9999 % 4-員工利率調整 5.按商品別調整
+		BigDecimal iFitRateS = parse.stringToBigDecimal(titaVo.getParam("FitRateS")); // 可為 0
+		BigDecimal iFitRateE = parse.stringToBigDecimal(titaVo.getParam("FitRateE")); // >= from
+
+		// 撥款日期 ..... 9999999999 TO 9999999999 4-員工利率調整 5.按商品別調整
+		int iDrawDownDateS = parse.stringToInteger(titaVo.getParam("DrawDownDateS")); // 可為 0
+		if (iDrawDownDateS > 0) {
+			iDrawDownDateS = iDrawDownDateS + 19110000;
+		}
+		int iDrawDownDateE = parse.stringToInteger(titaVo.getParam("DrawDownDateE")); // >= from
+		if (iDrawDownDateE > 0) {
+			iDrawDownDateE = iDrawDownDateE + 19110000;
+		}
+
+		// 繳息迄日 ..... 9 9999999999 ( 1. ＞＝ , 2. ＜＝ ) 4-員工利率調整 5.按商品別調整
+		int iPrevPayIntDateC = parse.stringToInteger(titaVo.getParam("PrevPayIntDateC")); // 限 1,2 預設 1
+		int iPrevPayIntDate = parse.stringToInteger(titaVo.getParam("PrevPayIntDate")); // 1-可為 0, 2-需 > 0
+		if (iPrevPayIntDate > 0) {
+			iPrevPayIntDate = iPrevPayIntDate + 19110000;
+		}
+
+		// 地區別 ....... 99 - 99 ( 區間 ) 4-員工利率調整 5.按商品別調整
+		String iCityCodeS = titaVo.getParam("CityCodeS"); // 可為 0
+		String iCityCodeE = titaVo.getParam("CityCodeE"); // >= from
+
+		// 並且＞＝ ..... 9999999999 9 ( 1. 起未調整過利率者 2. 起已調整過利率者 ) 4-員工利率調整 5.按商品別調整
+		int iAdjustDate = parse.stringToInteger(titaVo.getParam("AdjustDateD")); // 限 1,2 預設 1
+		if (iAdjustDate > 0) {
+			iAdjustDate = iAdjustDate + 19110000;
+		}
+		int iAdjustDateC = parse.stringToInteger(titaVo.getParam("AdjustDateC")); // 可為 0
+
+		// 團體戶 ....... 9999999999 + => 團體戶統編 , 5.按商品別調整
+		String iGroupId = titaVo.getParam("GroupId"); // 可為空白
+
+		// 超過 2 年調為 99.9999 % ??????
 
 		int iBaseRateCode = Integer.parseInt(titaVo.getParam("BaseRateCode"));
 
@@ -131,6 +180,9 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       and  r2.seq = 1                          ";
 		sql += " left join \"FacProd\"  p on  p.\"ProdNo\" = r.\"ProdNo\"      ";
 		sql += " left join \"CustMain\" c on  c.\"CustNo\" = b.\"CustNo\"      ";
+		if (iTxKind == 4) {
+			sql += " left join \"CdEmp\" e on  e.\"EmployeeNo\" = c.\"EmpNo\"  ";
+		}
 		sql += " left join \"FacMain\"  f on  f.\"CustNo\" = b.\"CustNo\"      ";
 		sql += "                       and  f.\"FacmNo\" = b.\"FacmNo\"        ";
 		sql += " left join \"ClFac\"   cf on cf.\"CustNo\" = b.\"CustNo\"      ";
@@ -140,14 +192,16 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                       and cm.\"ClCode2\" = cf.\"ClCode2\"     ";
 		sql += "                       and cm.\"ClNo\" = cf.\"ClNo\"           ";
 		sql += " left join \"CdCity\" cc  on cc.\"CityCode\" = cm.\"CityCode\" ";
-		sql += " where b.\"Status\" = 0                                             ";
-		sql += "   and b.\"MaturityDate\" > b.\"NextAdjRateDate\"                   ";
+		sql += " where b.\"Status\" = 0                                        ";
+		sql += "   and b.\"MaturityDate\" > b.\"NextAdjRateDate\"              ";
+		sql += "   and b.\"MaturityDate\" > " + iEffectDateE;
 		sql += "   and c.\"EntCode\" >= " + iEntCode1;
 		sql += "   and c.\"EntCode\" <= " + iEntCode2;
 		sql += "   and case " + iTxKind;
 //  1.定期機動調整 ==>  1.撥款主檔的利率區分=3.定期機動，下次利率調整日為調整月份
 //	                    2.借戶利率檔的的利率區分=3.定期機動，指標利率種類=該指標利率種類抓，生效日期 <= 調整月份 
-		sql += "      when 1  then case when b.\"RateCode\" = '3' " + "    and  b.\"NextAdjRateDate\" >= " + iEffectDateS;
+		sql += "      when 1  then case when b.\"RateCode\" = '3' " + "    and  b.\"NextAdjRateDate\" >= "
+				+ iEffectDateS;
 		sql += "       and  b.\"NextAdjRateDate\" <= " + iEffectDateE;
 		sql += "                         and r.\"BaseRateCode\" = " + iBaseRateCode;
 		sql += "                         and r.\"RateCode\" = '3'                  ";
@@ -164,7 +218,8 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 // 3.機動利率調整 ==> 1.撥款主檔的利率區分=1.機動
 //                    2.借戶利率檔的利率區分=1.機動,指標利率種類=99，生效日期 = 調整月份，商品<>員工利率
 		sql += "      when 3  then case when b.\"RateCode\" = '1' and  p.\"EmpFlag\" <> 'Y' ";
-		sql += "                         and r.\"RateCode\" = '1' and r.\"BaseRateCode\" = 99 and  r.\"EffectDate\" >= " + iEffectDateS;
+		sql += "                         and r.\"RateCode\" = '1' and r.\"BaseRateCode\" = 99 and  r.\"EffectDate\" >= "
+				+ iEffectDateS;
 		sql += "	 	                 and r.\"EffectDate\" <= " + iEffectDateE;
 		sql += "                        then 1                                     ";
 		sql += "                        else 0                                     ";
@@ -180,12 +235,52 @@ public class L4320ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "      else 0                                                       ";
 		sql += "      end = 1                                                      ";
 
+		// 商品代碼
 		String prodNoString = getProdNoString(titaVo);
-
 		if (!"".equals(prodNoString)) {
 			sql += "   and p.\"ProdNo\" in ( " + prodNoString + " ) ";
 		}
 
+		// 業務科目 ..... 999 + TO 999 + 4-員工利率調整 5.按商品別調整
+		if (iAcctCodeE > 0) {
+			sql += "   and f.\"AcctCode\" between '" + iAcctCodeS + "' and '" + iAcctCodeE + "'";
+		}
+
+		// 員工年資＞＝ . 99 月 , 4-員工利率調整
+		if (iEmploeeMonth > 0 && iTxKind == 4) {
+			sql += "   and (NVL(e.\"SeniorityYY\",0) * 12 + NVL(e.\"SeniorityMM\",0)) > " + iEmploeeMonth;
+		}
+
+		// 利率 ......... 99.9999 % TO 99.9999 % 4-員工利率調整 5.按商品別調整
+		if (iFitRateE.compareTo(BigDecimal.ZERO) > 0) {
+			sql += "   and r.\"FitRate\" between " + iFitRateS + " and " + iFitRateE;
+		}
+
+		// 撥款日期 ..... 9999999999 TO 9999999999 4-員工利率調整 5.按商品別調整
+		if (iDrawDownDateE > 0) {
+			sql += "   and f.\"FirstDrawdownDate\" between " + iDrawDownDateS + " and " + iDrawDownDateE;
+		}
+
+		// 繳息迄日 ..... 9 9999999999 ( 1. ＞＝ , 2. ＜＝ ) 4-員工利率調整 5.按商品別調整
+		if (iPrevPayIntDateC == 1 && iPrevPayIntDate > 0) {
+			sql += "   and b.\"PrevPayIntDate\" >= " + iPrevPayIntDate;
+		}
+		if (iPrevPayIntDateC == 2 && iPrevPayIntDate > 0) {
+			sql += "   and b.\"PrevPayIntDate\" <= " + iPrevPayIntDate;
+		}
+
+		// 地區別 ....... 99 - 99 ( 區間 ) 4-員工利率調整 5.按商品別調整 int iCityCodeS =
+		if (parse.stringToInteger(iCityCodeE) > 0) {
+			sql += "   and NVL(cm.\"CityCode\", -1)  between " + iCityCodeS + " and " + iCityCodeE;
+		}
+		
+		// 並且＞＝ ..... 9999999999 9 ( 1. 起未調整過利率者 2. 起已調整過利率者 ) 4-員工利率調整 5.按商品別調整 int
+		if (iAdjustDate > 0 && iAdjustDateC == 1 ) {
+			sql += "   and r.\"EffectDate\"  < " + iAdjustDate;			
+		}			
+		if (iAdjustDate > 0 && iAdjustDateC == 2 ) {
+			sql += "   and r.\"EffectDate\"  >= " + iAdjustDate;			
+		}		
 		this.info("sql=" + sql);
 
 		Query query;

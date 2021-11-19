@@ -42,6 +42,31 @@ public class StringCut {
 
 		return cutString;
 	}
+	
+	/**
+	 * String Mask
+	 * 
+	 * @param value String
+	 * @return String
+	 */
+	public static String stringMask(String value) {
+		if (value == null || value.trim().isEmpty())
+			return "";
+
+		char[] c = value.toCharArray();
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 1; i <= c.length; i++) {
+			if (i % 2 == 0) {
+				if (isChinese(c[i - 1]) || !IsPrintableAsciiChar(c[i - 1]))
+					sb.append("＊");
+				else
+					sb.append("*");
+			} else
+				sb.append(c[i - 1]);
+		}
+		return sb.toString();
+	}
 
 	/**
 	 * String Count Length<br>

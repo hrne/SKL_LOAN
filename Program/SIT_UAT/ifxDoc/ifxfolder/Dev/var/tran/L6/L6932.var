@@ -41,8 +41,8 @@ E(0,0)
 <sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
 [
 ["[L6932]                                 資料變更交易查詢"],
-["#FdSearch+查詢條件","(交易序號、交易代號、戶號，需擇一輸入"],
 ["#FD_ST_DT+會計日期",#ST_DT,"~",#ED_DT],
+["#FdSearch+查詢條件","交易序號、交易代號、戶號，需擇一輸入"],
 ["#FdTxtNo+．交易序號",#TxtNo],
 ["#FD_TRN_CODE+．交易代號",#TRN_CODE],
 ["#FD_CUST_NO+．戶號",#CUST_NO,"-",#FACM_NO,"-",#BORM_SEQ],

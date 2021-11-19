@@ -40,7 +40,14 @@ public class ThreadVariable {
 			return false;
 		return (boolean) threadLocal.get().get(ContentName.loggerFg);
 	}
-	
+
+	public static String getEmpNot() {
+		if (threadLocal.get() == null || threadLocal.get().get(ContentName.empnot) == null)
+			return "";
+		else
+			return (String) threadLocal.get().get(ContentName.empnot);
+	}
+
 	public static void clearThreadLocal() {
 		threadLocal.remove();
 	}

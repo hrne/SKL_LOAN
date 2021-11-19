@@ -352,7 +352,7 @@ public class TxBatchCom extends TradeBuffer {
 	 * @param tDetail    整批入帳明細檔
 	 * @param titaVo     TitaVo
 	 * @return 整批入帳明細檔
-	 * @throws LogicException LogicException
+	 * @throws LogicException ... LogicException
 	 */
 	public BatxDetail txCheck(int iRepayType, BatxDetail tDetail, TitaVo titaVo) throws LogicException {
 		this.info("TxBatchCom txCheck .... checkBatxDetail" + tDetail.toString());
@@ -476,7 +476,7 @@ public class TxBatchCom extends TradeBuffer {
 	 * @param tDetail      整批入帳明細檔
 	 * @param titaVo       TitaVo
 	 * @return TitaVo
-	 * @throws LogicException LogicException
+	 * @throws LogicException ... LogicException
 	 */
 	public TitaVo txTita(int functionCode, BatxDetail tDetail, TitaVo titaVo) throws LogicException {
 		this.info("TxBatchCom txTita .... functionCode=" + functionCode + tDetail.toString());

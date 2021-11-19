@@ -129,6 +129,7 @@ public class MainProcess extends SysLogger {
 			this.titaVo.putParam(ContentName.orgDataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.dataBase, this.titaVo.getDataBase());
 			ThreadVariable.setObject(ContentName.loggerFg, tTxTeller.getLoggerFg() == 1 ? true : false);
+			ThreadVariable.setObject(ContentName.empnot, this.titaVo.getEmpNot());
 
 			txBuffer.init(titaVo);
 			txTeller = tTxTeller;

@@ -161,9 +161,8 @@ public class PfDetailCom extends TradeBuffer {
 	 * 
 	 * @param iPf    PfDetailVo
 	 * @param titaVo ..
-	 * @return 
-	 * @throws LogicException 
-	 * @throws LogicException ..
+	 * @return PfDetailVo List
+	 * @throws LogicException ...
 	 */
 	public ArrayList<PfDetail> addDetail(PfDetailVo iPf, TitaVo titaVo) throws LogicException {
 		this.info("PfDetailCom addDetail ....." + iPf.toString());
@@ -702,16 +701,16 @@ public class PfDetailCom extends TradeBuffer {
 //6           0.1    1.0         100,000          0 
 //7           0      0           0
 //8           1.0    1.0         600,000          1.0		
-// 介紹單位及房貸專員件數，同一eLoan 案件編號累積以1件為限
+// 房貸專員件數，同一撥款工作月、同一eLoan 案件編號累積以1件為限
 		// 取得額度累計計算金額(房貸專員件數)
 		pf.setComputeBsAmtFac(getComputeAmtFac(pf, true));
 
 		// 累計業績件數
 		BigDecimal bsPerfCntFac = BigDecimal.ZERO;
 		for (PfDetail it : lPfDetail) {
-			if (it.getWorkMonth() == workMonthDrawdown && isComputeFac(pf, it) ) {
-					bsPerfCntFac = bsPerfCntFac.add(it.getBsPerfCnt());
-				}
+			if (it.getWorkMonth() == workMonthDrawdown && isComputeFac(pf, it)) {
+				bsPerfCntFac = bsPerfCntFac.add(it.getBsPerfCnt());
+			}
 		}
 
 // 房貸專員件數(有門檻或基底,以整個額度計算)				
@@ -726,23 +725,12 @@ public class PfDetailCom extends TradeBuffer {
 
 		// 計件金額門檻額不為0者
 		if (tCd.getBsOffrAmtCond().compareTo(BigDecimal.ZERO) > 0) {
+			if (bsPerfCntFac.compareTo(bsCntLimit) > 0) {
+				bsPerfCntFac = bsCntLimit;
+			}
 			pf.setBsPerfCnt((pf.getComputeBsAmtFac().divide(tCd.getBsOffrAmtCond(), 0, RoundingMode.DOWN))
 					.multiply(tCd.getBsOffrCnt()).min(bsCntLimit).subtract(bsPerfCntFac));
 		}
-
-		// 代碼(2&B)之是寫入(代碼1&A)
-		if ("2".equals(pf.getPieceCode()) || "B".equals(pf.getPieceCode())) {
-			if (pf.getRepayType() == 0 && pf.getItPerfCnt().compareTo(BigDecimal.ZERO) > 0) {
-				for (PfDetail it : lPfDetail) {
-					if (it.getWorkMonth() == workMonthDrawdown && it.getItPerfCnt().compareTo(BigDecimal.ZERO) == 0
-							&& pf.getCreditSysNo() > 0 && it.getCreditSysNo() == pf.getCreditSysNo()
-							&& it.getPieceCode().equals(pf.getPieceCodeCombine())) {
-						lPfDetailCntingCode.add(it);
-					}
-				}
-			}
-		}
-		
 		// 房貸專員業績計算金額 = 撥款金額、追回差額
 		if (pf.getRepayType() == 0) {
 			pf.setComputeBsAmt(pf.getDrawdownAmt());
@@ -765,23 +753,23 @@ public class PfDetailCom extends TradeBuffer {
 	 * @param pf        PfDetail
 	 * @param neverPaid 未曾繳款 true/flase
 	 * @return 額度累計計算金額
-	 * @throws LogicException ..
+	 * @throws LogicException ...
 	 */
 	private BigDecimal getComputeAmtFac(PfDetail pf, boolean neverPaid) throws LogicException {
 		BigDecimal drawDownAmtFac = BigDecimal.ZERO;
 		BigDecimal precloseAmtFac = BigDecimal.ZERO;
 		BigDecimal preRepayAmtFac = BigDecimal.ZERO;
 		for (PfDetail it : lPfDetail) {
-			if (it.getWorkMonth() == workMonthDrawdown && isComputeFac(pf, it) ) {
+			if (it.getWorkMonth() == workMonthDrawdown && isComputeFac(pf, it)) {
 				if (it.getRepayType() == 0) {
-						drawDownAmtFac = drawDownAmtFac.add(it.getDrawdownAmt());
-					} else {
-						if ((it.getRepaidPeriod() == 0 && neverPaid) || !neverPaid) {
-							if (it.getRepayType() == 2) {
-								precloseAmtFac = precloseAmtFac.add(it.getDrawdownAmt());
-							} else {
-								preRepayAmtFac = preRepayAmtFac.add(it.getDrawdownAmt());
-							}
+					drawDownAmtFac = drawDownAmtFac.add(it.getDrawdownAmt());
+				} else {
+					if ((it.getRepaidPeriod() == 0 && neverPaid) || !neverPaid) {
+						if (it.getRepayType() == 2) {
+							precloseAmtFac = precloseAmtFac.add(it.getDrawdownAmt());
+						} else {
+							preRepayAmtFac = preRepayAmtFac.add(it.getDrawdownAmt());
+						}
 					}
 				}
 			}
@@ -801,10 +789,11 @@ public class PfDetailCom extends TradeBuffer {
 
 	/**
 	 * 額度累計計算時是否計入
+	 * 
 	 * @param pf (PfDetail
 	 * @param it PfDetail
 	 * @return true/false
-	 * @throws LogicException ..
+	 * @throws LogicException ...
 	 */
 	private boolean isComputeFac(PfDetail pf, PfDetail it) throws LogicException {
 		// 同額度、同一計件代碼 or 同案件編號、連同計件代碼
@@ -814,7 +803,7 @@ public class PfDetailCom extends TradeBuffer {
 						&& it.getPieceCode().equals(pf.getPieceCodeCombine()))
 				|| (pf.getCreditSysNo() > 0 && it.getCreditSysNo() == pf.getCreditSysNo()
 						&& it.getPieceCodeCombine().equals(pf.getPieceCode()))) {
-			isComputeFac  = true;
+			isComputeFac = true;
 		}
 		return isComputeFac;
 	}
@@ -826,7 +815,7 @@ public class PfDetailCom extends TradeBuffer {
 	 * @param pf        PfDetail
 	 * @param neverPaid 未曾繳款 true/flase
 	 * @return 追回業績計算金額
-	 * @throws LogicException ..
+	 * @throws LogicException ...
 	 */
 	private BigDecimal getComputeAmtRepay(PfDetail pf, boolean neverPaid) throws LogicException {
 		// 同一額度、同一撥款工作月、同一計件代碼，累計計算金額
@@ -1332,7 +1321,7 @@ public class PfDetailCom extends TradeBuffer {
 		// 件數、業績金額
 		if (!"Y".equals(pf.getIsProdExclude1()) && !"Y".equals(pf.getIsDeptExclude1())
 				&& !("Y".equals(pf.getIsDay15Exclude1()) && "Y".equals(pf.getIsIntroducerDay15()))) {
-			tPfItDetail.setPerfCnt(tPfItDetail.getPerfCnt().add(pf.getItPerfCnt()));
+			tPfItDetail.setPerfCnt(pf.getItPerfCnt());
 			tPfItDetail.setPerfAmt(tPfItDetail.getPerfAmt().add(pf.getItPerfAmt()));
 		}
 		// 是否計件
@@ -1461,9 +1450,6 @@ public class PfDetailCom extends TradeBuffer {
 		tPfReward.setCoorgnizer(pf.getCoorgnizer()); // 協辦人員編
 		tPfReward.setInterviewerA(pf.getInterviewerA()); // 晤談一員編
 		tPfReward.setInterviewerB(pf.getInterviewerB()); // 晤談二員編
-		tPfReward.setIntroducerBonus(BigDecimal.ZERO); // 介紹人介紹獎金
-		tPfReward.setIntroducerAddBonus(BigDecimal.ZERO); // 介紹人加碼獎勵津貼
-		tPfReward.setCoorgnizerBonus(BigDecimal.ZERO); // 協辦人員協辦獎金
 		tPfReward.setIntroducer(pf.getIntroducer()); // 介紹人
 		// 3.介紹獎金
 		if (!"Y".equals(pf.getIsProdExclude3()) && !"Y".equals(pf.getIsDeptExclude3())

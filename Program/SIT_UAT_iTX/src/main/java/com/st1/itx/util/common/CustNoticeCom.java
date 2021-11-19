@@ -115,7 +115,7 @@ public class CustNoticeCom extends TradeBuffer {
 	 *         EmailAddress 電郵地址 <br>
 	 *         LetterAddress 書信地址 <br>
 	 * 
-	 * @throws LogicException
+	 * @throws LogicException ...
 	 */
 	public TempVo getCustNotice(String formNo, int custNo, int facmNo, TitaVo titaVo) throws LogicException {
 		TempVo tempVo = new TempVo();
@@ -449,28 +449,23 @@ public class CustNoticeCom extends TradeBuffer {
 //	2.本人優先
 
 		if (tCustMain != null) {
-			Slice<CustTelNo> slCustTelNo = custTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index,
-					Integer.MAX_VALUE, titaVo);
+			Slice<CustTelNo> slCustTelNo = custTelNoService.findCustUKey(tCustMain.getCustUKey(), this.index, Integer.MAX_VALUE, titaVo);
 			if (slCustTelNo != null) {
 				for (CustTelNo tCustTelNo : slCustTelNo.getContent()) {
 					if ("00".equals(tCustTelNo.getRelationCode())) {
-						if (messPhone.isEmpty() && "05".equals(tCustTelNo.getTelTypeCode())
-								&& "Y".equals(tCustTelNo.getEnable())) {
+						if (messPhone.isEmpty() && "05".equals(tCustTelNo.getTelTypeCode()) && "Y".equals(tCustTelNo.getEnable())) {
 							messPhone = tCustTelNo.getTelNo();
 						}
-						if (cellPhone.isEmpty() && "03".equals(tCustTelNo.getTelTypeCode())
-								&& "Y".equals(tCustTelNo.getEnable())) {
+						if (cellPhone.isEmpty() && "03".equals(tCustTelNo.getTelTypeCode()) && "Y".equals(tCustTelNo.getEnable())) {
 							cellPhone = tCustTelNo.getTelNo();
 						}
 					}
 				}
 				for (CustTelNo tCustTelNo : slCustTelNo.getContent()) {
-					if (messPhone.isEmpty() && "05".equals(tCustTelNo.getTelTypeCode())
-							&& "Y".equals(tCustTelNo.getEnable())) {
+					if (messPhone.isEmpty() && "05".equals(tCustTelNo.getTelTypeCode()) && "Y".equals(tCustTelNo.getEnable())) {
 						messPhone = tCustTelNo.getTelNo();
 					}
-					if (cellPhone.isEmpty() && "03".equals(tCustTelNo.getTelTypeCode())
-							&& "Y".equals(tCustTelNo.getEnable())) {
+					if (cellPhone.isEmpty() && "03".equals(tCustTelNo.getTelTypeCode()) && "Y".equals(tCustTelNo.getEnable())) {
 						cellPhone = tCustTelNo.getTelNo();
 					}
 				}
@@ -498,12 +493,10 @@ public class CustNoticeCom extends TradeBuffer {
 		List<CustNotice> lCustNotice0 = new ArrayList<CustNotice>();
 		List<CustNotice> lCustNoticeX = new ArrayList<CustNotice>();
 
-		Slice<CustNotice> slCustNotice0 = custNoticeService.facmNoEq(custNo, 0, 0, this.index, Integer.MAX_VALUE,
-				titaVo);
+		Slice<CustNotice> slCustNotice0 = custNoticeService.facmNoEq(custNo, 0, 0, this.index, Integer.MAX_VALUE, titaVo);
 		lCustNotice0 = slCustNotice0 == null ? null : slCustNotice0.getContent();
 		if (facmNo != 0) {
-			Slice<CustNotice> slCustNoticeX = custNoticeService.facmNoEq(custNo, facmNo, facmNo, this.index,
-					Integer.MAX_VALUE, titaVo);
+			Slice<CustNotice> slCustNoticeX = custNoticeService.facmNoEq(custNo, facmNo, facmNo, this.index, Integer.MAX_VALUE, titaVo);
 			lCustNoticeX = slCustNoticeX == null ? null : slCustNoticeX.getContent();
 		}
 
@@ -518,15 +511,9 @@ public class CustNoticeCom extends TradeBuffer {
 			for (CustNotice tCustNotice : lCustNoticeX) {
 				if (formNo.equals(tCustNotice.getFormNo())) {
 
-					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
-							+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s PaperNotice : "
-							+ tCustNotice.getPaperNotice());
-					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
-							+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s MsgNotice : "
-							+ tCustNotice.getMsgNotice());
-					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
-							+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s EmailNotice : "
-							+ tCustNotice.getEmailNotice());
+					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s PaperNotice : " + tCustNotice.getPaperNotice());
+					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s MsgNotice : " + tCustNotice.getMsgNotice());
+					this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s EmailNotice : " + tCustNotice.getEmailNotice());
 
 					if (tCustNotice.getFacmNo() == facmNo) {
 						if ("N".equals(tCustNotice.getPaperNotice())) {
@@ -550,15 +537,9 @@ public class CustNoticeCom extends TradeBuffer {
 		} else if (lCustNotice0 != null && lCustNotice0.size() != 0) {
 			for (CustNotice tCustNotice : lCustNotice0) {
 
-				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
-						+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s PaperNotice : "
-						+ tCustNotice.getPaperNotice());
-				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
-						+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s MsgNotice : "
-						+ tCustNotice.getMsgNotice());
-				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-"
-						+ parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s EmailNotice : "
-						+ tCustNotice.getEmailNotice());
+				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s PaperNotice : " + tCustNotice.getPaperNotice());
+				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s MsgNotice : " + tCustNotice.getMsgNotice());
+				this.info(parse.IntegerToString(tCustNotice.getCustNo(), 7) + "-" + parse.IntegerToString(tCustNotice.getFacmNo(), 3) + "'s EmailNotice : " + tCustNotice.getEmailNotice());
 
 				if ("N".equals(tCustNotice.getPaperNotice())) {
 					docuNoticeCheck.put(tmp, 4);
@@ -615,10 +596,6 @@ public class CustNoticeCom extends TradeBuffer {
 		public tmpFacm(int custNo, int facmNo) {
 			this.setCustNo(custNo);
 			this.setFacmNo(facmNo);
-		}
-
-		public int getCustNo() {
-			return custNo;
 		}
 
 		public void setCustNo(int custNo) {

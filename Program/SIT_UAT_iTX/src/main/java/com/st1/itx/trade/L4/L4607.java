@@ -40,13 +40,14 @@ public class L4607 extends TradeBuffer {
 		this.limit = 100;
 		
 		String CityCode = titaVo.getParam("CityCode");
+		int iFinal = parse.stringToInteger(titaVo.getParam("Final"));
 		
 		for(int i = 1 ; i <= 50; i++) {
 			CdBuildingCost tCdBuildingCost = new CdBuildingCost();
 			CdBuildingCostId tCdBuildingCostId = new CdBuildingCostId();
 			BigDecimal Cost = parse.stringToBigDecimal(titaVo.getParam("Cost" + i));
 			
-			if(Cost.compareTo(new BigDecimal("0"))  == 0) {
+			if(iFinal < i) {
 				break;
 			} else {
 				tCdBuildingCostId.setCityCode(CityCode);
@@ -56,27 +57,40 @@ public class L4607 extends TradeBuffer {
 				
 				if(tCdBuildingCost == null) { // 新增
 					
-					tCdBuildingCost = new CdBuildingCost();
-					tCdBuildingCost.setCdBuildingCostId(tCdBuildingCostId);
-					tCdBuildingCost.setCityCode(CityCode);
-					tCdBuildingCost.setFloorLowerLimit(i);
-					tCdBuildingCost.setCost(Cost);
+					if(Cost.compareTo(new BigDecimal("0")) != 0) {  // 原本沒有  有金額才insert
+					  tCdBuildingCost = new CdBuildingCost();
+					  tCdBuildingCost.setCdBuildingCostId(tCdBuildingCostId);
+					  tCdBuildingCost.setCityCode(CityCode);
+					  tCdBuildingCost.setFloorLowerLimit(i);
+					  tCdBuildingCost.setCost(Cost);
 					
-					try {
+					  try {
 						cdBuildingCostService.insert(tCdBuildingCost, titaVo);
-					} catch (DBException e) {
+					  } catch (DBException e) {
 						throw new LogicException("E0005", "建築造價參考檔" + e.getErrorMsg());
+					  }
 					}
-				} else { // 更新
-					tCdBuildingCost.setCityCode(CityCode);
-					tCdBuildingCost.setFloorLowerLimit(i);
-					tCdBuildingCost.setCost(Cost);
+				} else { // 原本就有的 cost = 0 刪除 或 更新金額
 					
-					try {
-						cdBuildingCostService.update(tCdBuildingCost, titaVo);
-					} catch (DBException e) {
-						throw new LogicException("E0007", "建築造價參考檔" + e.getErrorMsg());
+					
+					if(Cost.compareTo(new BigDecimal("0")) == 0) { // 刪除舊的
+						try {
+							cdBuildingCostService.delete(tCdBuildingCost, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0008", "建築造價參考檔" + e.getErrorMsg());
+						}
+					} else { // 更新
+						tCdBuildingCost.setCityCode(CityCode);
+						tCdBuildingCost.setFloorLowerLimit(i);
+						tCdBuildingCost.setCost(Cost);
+						
+						try {
+							cdBuildingCostService.update(tCdBuildingCost, titaVo);
+						} catch (DBException e) {
+							throw new LogicException("E0007", "建築造價參考檔" + e.getErrorMsg());
+						}
 					}
+					
 				}
 			}
 		} // for
