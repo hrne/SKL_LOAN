@@ -77,7 +77,7 @@ public class Manufacture extends CommBuffer {
 				this.setShowmode(2);
 				makeExcel.toExcel(fileno, this.getFilename());
 				this.setSavename(tTxFile.getFileOutput());
-			} else if (filetype == 3) {
+			} else if (filetype >= 3 && filetype <= 5) {
 				this.setShowmode(3);
 				makeFile.toFile(fileno, this.getFilename());
 				this.setSavename(tTxFile.getFileOutput());
