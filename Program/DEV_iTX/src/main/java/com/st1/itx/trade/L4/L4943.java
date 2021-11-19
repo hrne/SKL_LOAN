@@ -134,7 +134,6 @@ public class L4943 extends TradeBuffer {
 					occursList.putParam("OOEntryDate", entryDate);
 					occursList.putParam("OOCustNo", result.get("F1"));
 					occursList.putParam("OOFacmNo", result.get("F2"));
-					occursList.putParam("OOBormNo", result.get("F3"));
 					occursList.putParam("OOPrevIntDate", prevIntDate);
 					occursList.putParam("OOPayIntDate", payIntDate);
 					occursList.putParam("OORepayType", result.get("F6"));

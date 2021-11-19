@@ -29,7 +29,7 @@ public class BankDeductDtl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -5223139807856758461L;
+	private static final long serialVersionUID = 6324592265166395278L;
 
 @EmbeddedId
   private BankDeductDtlId bankDeductDtlId;
@@ -45,10 +45,6 @@ public class BankDeductDtl implements Serializable {
   // 額度
   @Column(name = "`FacmNo`", insertable = false, updatable = false)
   private int facmNo = 0;
-
-  // 撥款
-  @Column(name = "`BormNo`", insertable = false, updatable = false)
-  private int bormNo = 0;
 
   // 還款類別
   /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
@@ -266,25 +262,6 @@ public class BankDeductDtl implements Serializable {
 	*/
   public void setFacmNo(int facmNo) {
     this.facmNo = facmNo;
-  }
-
-/**
-	* 撥款<br>
-	* 
-	* @return Integer
-	*/
-  public int getBormNo() {
-    return this.bormNo;
-  }
-
-/**
-	* 撥款<br>
-	* 
-  *
-  * @param bormNo 撥款
-	*/
-  public void setBormNo(int bormNo) {
-    this.bormNo = bormNo;
   }
 
 /**
@@ -944,12 +921,11 @@ CdCode:RelationCode
 
   @Override
   public String toString() {
-    return "BankDeductDtl [bankDeductDtlId=" + bankDeductDtlId
-           + ", prevIntDate=" + prevIntDate + ", acctCode=" + acctCode + ", repayBank=" + repayBank + ", repayAcctNo=" + repayAcctNo + ", repayAcctSeq=" + repayAcctSeq + ", unpaidAmt=" + unpaidAmt
-           + ", tempAmt=" + tempAmt + ", repayAmt=" + repayAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", postCode=" + postCode + ", mediaCode=" + mediaCode
-           + ", relationCode=" + relationCode + ", relCustName=" + relCustName + ", relCustId=" + relCustId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", mediaDate=" + mediaDate
-           + ", mediaKind=" + mediaKind + ", mediaSeq=" + mediaSeq + ", acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", amlRsp=" + amlRsp
-           + ", returnCode=" + returnCode + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
-           + "]";
+    return "BankDeductDtl [bankDeductDtlId=" + bankDeductDtlId + ", prevIntDate=" + prevIntDate
+           + ", acctCode=" + acctCode + ", repayBank=" + repayBank + ", repayAcctNo=" + repayAcctNo + ", repayAcctSeq=" + repayAcctSeq + ", unpaidAmt=" + unpaidAmt + ", tempAmt=" + tempAmt
+           + ", repayAmt=" + repayAmt + ", intStartDate=" + intStartDate + ", intEndDate=" + intEndDate + ", postCode=" + postCode + ", mediaCode=" + mediaCode + ", relationCode=" + relationCode
+           + ", relCustName=" + relCustName + ", relCustId=" + relCustId + ", relAcctBirthday=" + relAcctBirthday + ", relAcctGender=" + relAcctGender + ", mediaDate=" + mediaDate + ", mediaKind=" + mediaKind
+           + ", mediaSeq=" + mediaSeq + ", acDate=" + acDate + ", titaTlrNo=" + titaTlrNo + ", titaTxtNo=" + titaTxtNo + ", amlRsp=" + amlRsp + ", returnCode=" + returnCode
+           + ", jsonFields=" + jsonFields + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

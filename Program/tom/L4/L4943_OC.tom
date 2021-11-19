@@ -1,0 +1,13 @@
+OOEntryDate=9,7
+OOCustNo=9,7
+OOFacmNo=9,3
+OOPrevIntDate=9,7
+OOPayIntDate=9,7
+OORepayType=9,2
+OOUnpaidAmt=9,14
+OOTempAmt=9,14
+OORepayAmt=9,14
+OOMediaCode=X,1
+OOAcDate=9,7
+OOAmlRsp=X,1
+OOProcNote=X,300

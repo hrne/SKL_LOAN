@@ -74,6 +74,15 @@ T(3,*)
 #FdProdNo1=X,2,L
 T(3,*)
 
+#FdAcctCode=X,2,L
+#FdFitRate=X,2,L
+#FdEmploeeMonth=X,2,L
+#FdDrawDownDate=X,2,L
+#FdPrevPayIntDate=X,2,L
+#FdCityCode=X,2,L
+#FdAdjustDateX=X,2,L
+#FdGroupId=X,2,L
+
 ! Help
 <include src="HELPRIM.icf::HELPRIM.rtn"/>
 
@@ -121,6 +130,9 @@ T(2,@RimTxCode,#TXCD)
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 ! T(1,@BaseRateCode,#NTXBUF,1,1)
 
+#Init=X,1,S
+INVOKEJS(SHOW,p2,0)
+
 #PreCol=A,1,S
 INVOKEJS(SHOW,L4320,2,18,0)
 
@@ -164,6 +176,9 @@ INVOKEJS(SHOW,L4320,4,6,1)
 INVOKEJS(SHOW,L4320_9,1)
 HIDE(#LableB,#BaseRate,#LableC)
 )
+IF(#TxKind==4 || #TxKind==5,INVOKEJS(SHOW,p2,1),INVOKEJS(SHOW,p2,0))
+IF(#TxKind==4,INVOKEJS(SHOW,p2,6,6,0)INVOKEJS(SHOW,p2,8,8,0),INVOKEJS(SHOW,p2,6,6,1)INVOKEJS(SHOW,p2,8,8,1))
+IF(#TxKind==5,INVOKEJS(SHOW,p2,3,3,0),INVOKEJS(SHOW,p2,3,3,1))
 
 #TxKindX=x,20,L
 T(3,)T(H,#TxKind,#TxKindHelp)
@@ -174,6 +189,8 @@ T(3,)T(H,#TxKind,#TxKindHelp)
 !4,T(3,員工利率調整),
 !5,T(3,按商品別調整),
 !  T(3,))
+
+
 
 #LableA=x,8,L
 T(2,生效日期)
@@ -747,9 +764,89 @@ IF(#TxKind==5,$,s)
 C(5,#IncrFlag10,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo10X=X,20,L
 
+#AcctCodeS=A,3,I
+IF(#TxKind==4||#TxKind==5,$,S)
+
+#AcctCodeE=A,3,I
+IF(#TxKind==4||#TxKind==5,$,S)
+C(3,#AcctCodeS,0,s,$)
+@V(5,#AcctCodeS,999)
+
+#FitRateS=m,2.4,I
+IF(#TxKind==4||#TxKind==5,$,S)
+
+#FitRateE=m,2.4,I
+IF(#TxKind==4||#TxKind==5,$,S)
+!E(0,#FitRateS)
+@V(5,#FitRateS,99.9999)
+
+#EmploeeMonth=A,2,I
+IF(#TxKind==4,$,S)
+
+#DrawDownDateS=D,7,I
+IF(#TxKind==4||#TxKind==5,$,S)
+@C(3,#DrawDownDateS,0,s,A(DATE,0,#DrawDownDateS))
+
+#DrawDownDateE=D,7,I
+IF(#TxKind==4||#TxKind==5,$,S)
+@A(DATE,0,#DrawDownDateE)V(5,#DrawDownDateS,9991231)
+
+#PrevPayIntDateC=A,1,I
+IF(#TxKind==4||#TxKind==5,$,S)
+E(0,1)
+@V(1,1,2)
+
+#PrevPayIntDateCX=X,2,L
+C(3,#PrevPayIntDateC,1,T(2,>=),T(2,<=))
+
+
+#PrevPayIntDate=D,7,I
+IF(#TxKind==4||#TxKind==5,$,S)
+@
+C(3,#PrevPayIntDateC,1,$,V(7))
+A(DATE,0,#PrevPayIntDate)
+
+#CityCodeS=A,2,I
+IF(#TxKind==5,$,S)
+
+#CityCodeE=A,2,I
+IF(#TxKind==5,$,S)
+@V(5,#CityCodeS,99)
+
+#AdjustDateX=D,7,I
+IF(#TxKind==4||#TxKind==5,$,S)
+
+#AdjustDateC=A,1,I
+IF(#TxKind==4||#TxKind==5,$,S)
+E(0,1)
+@V(1,1,2)
+
+#AdjustDateCX=X,20,L
+C(3,#AdjustDateC,1,T(2,起未調整過利率者),T(2,起已調整過利率者))
+
+#GroupId=X,10,I
+IF(#TxKind==5,$,S)
+@
+A(ID_UNINO,0,#GroupId)
+
+
 <include src="ROM.icf::L4R12.dec"/>
 <include src="ROM.icf::L2R01.dec"/>
 
+</sub>
+
+<sub type="DC" name="p2" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+[""],
+[#<->#,"#FdAcctCode+業務科目",#AcctCodeS," TO",#AcctCodeE],
+[#<->#,"#FdFitRate+利率",#FitRateS," TO",#FitRateE],
+[#<->#,"#FdEmploeeMonth+員工年資@＞＝",#EmploeeMonth," 月"],
+[#<->#,"#FdDrawDownDate+撥款日期",#DrawDownDateS," TO",#DrawDownDateE],
+[#<->#,"#FdPrevPayIntDate+繳息迄日",#PrevPayIntDateC,#PrevPayIntDateCX,#PrevPayIntDate],
+[#<->#,"#FdCityCode+地區別",#CityCodeS,"-",#CityCodeE],
+[#<->#,"#FdAdjustDateX+並且@@@@@＞＝",#AdjustDateX,"@",#AdjustDateC,#AdjustDateCX],
+[#<->#,"#FdGroupId+團體戶",#GroupId],
+]
 </sub>
 
 !---------- 輸出共用變數宣告區 ----------
@@ -782,7 +879,20 @@ C(5,#IncrFlag10,Y,V(P,此商品不適用按商品別調整),$)
 #ProdNo8
 #ProdNo9
 #ProdNo10
-#END
+#AcctCodeS
+#AcctCodeE
+#FitRateS
+#FitRateE
+#EmploeeMonth
+#DrawDownDateS
+#DrawDownDateE
+#PrevPayIntDateC
+#PrevPayIntDate
+#CityCodeS
+#CityCodeE
+#AdjustDateX
+#AdjustDateC
+#GroupId
 </sub>
 
 !------ 下行電文TOM ------

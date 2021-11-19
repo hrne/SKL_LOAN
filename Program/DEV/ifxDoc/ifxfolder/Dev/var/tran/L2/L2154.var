@@ -760,6 +760,19 @@ T(2,@CurrPrecisionHelp,#HelpDesc8)
 T(2,@BankDeductCdHelp,#HelpDesc9)
 T(2,@ApprovedLevelHelp,#HelpDesc10)
 
+!ClTypeCode 
+#CDDEF31=x,25,S
+T(3,CdCode.ClTypeCode)
+
+#ClTypeCodeHelp=x,1024,S 
+
+#HelpRim4=X,1,S
+RESET_RIM(#HelpRim4,XXR99)
+S(XXR99,01,#CDDEF31)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@ClTypeCodeHelp,#HelpDesc1)
+
 #FuncCodeHelp=x,40,S
 T(3,1:新增;2:修改;4:刪除;5:查詢)
 
@@ -3482,12 +3495,11 @@ T(2,#L2r11ClKey{n})
 #ClApplNo{n}=A,7,L
 E(0,#L2r11ApplNo{n})
 
-#ClCustNo{n}=A,7,L
-E(0,#L2r11CustNo{n})
+#ClClTypeCode{n}=X,3,S
+E(0,#L2r11ClTypeCode{n})
 
-
-#ClFacmNo{n}=A,3,L
-E(0,#L2r11FacmNo{n})
+#ClClTypeCodeX{n}=X,2.50,L
+T(H,#ClClTypeCode{n},#ClTypeCodeHelp)
 
 #ClMainFlag{n}=X,1,L
 T(2,#L2r11MainFlag{n})
@@ -3499,10 +3511,13 @@ E(0,#L2r11EvaAmt{n})
 CALL2(#ADJUSTDOT,#Precision,#EvaAmt{n},#EvaAmtX{n})
 P(R,#EvaAmtX{n})
 
+#ClBdLocation{n}=X,2.50,L
+T(2,#L2r11BdLocation{n})
+
 #HIDECLSTEP{n}=X,1,S
 ! C(3,{n},1,S,$)
-C(4,#ClKey{n},HIDE(#ClKey{n},#ClApplNo{n},#ClCustNo{n},#ClFacmNo{n},#ClMainFlag{n},#EvaAmtX{n}),
-              SHOW(#ClKey{n},#ClApplNo{n},#ClCustNo{n},#ClFacmNo{n},#ClMainFlag{n},#EvaAmtX{n}))
+C(4,#ClKey{n},HIDE(#ClKey{n},#ClApplNo{n},#ClClTypeCodeX{n},#ClMainFlag{n},#EvaAmtX{n},#ClBdLocation{n}),
+              SHOW(#ClKey{n},#ClApplNo{n},#ClClTypeCodeX{n},#ClMainFlag{n},#EvaAmtX{n},#ClBdLocation{n}))
 C(4,#ClKey{n},INVOKEJS(SHOW,grd5_{n},0),
               INVOKEJS(SHOW,grd5_{n},1))
 
@@ -3661,12 +3676,12 @@ C(3,#CheckCode,0,$,S)
 ]
 </sub>
 
-<sub type="DC" name="p9" layout="cols=2;screen.width=[200,300,200,300];printer.width=[15,30];order=1;">
+<sub type="DC" name="p9" layout="cols=2;screen.width=[1000];printer.width=[15,30];order=1;">
 [
 ["<font color=red>@擔保品　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　 "],
-["#grid#,{id:5,expand:true,loop:20,row_height:1,s_cols:[700,700,700,700,700,700,700], p_cols:[30,30,30,30,30,30],align:'center'}","","",
-["@@擔保品編號@@","@@核准號碼@@","@@戶號@@","　　額度編號　　","主要擔保品記號","@@鑑價總值@@"],
-[#ClKey1,#ClApplNo1,#ClCustNo1,#ClFacmNo1,[#ClMainFlag1],#EvaAmtX1],
+["#grid#,{id:5,expand:true,loop:20,row_height:1,s_cols:[700,700,700,700,700,700], p_cols:[30,30,30,30,30,30],align:'center'}","","",
+["@@擔保品編號@@","@@核准號碼@@","@@擔保品類別@@","主要擔保品記號","@@鑑價總值@@","@@門牌/坐落@@"],
+[#ClKey1,#ClApplNo1,#ClClTypeCodeX1,#ClMainFlag1,#EvaAmtX1,#ClBdLocation1],
 ],
 ]
 </sub>

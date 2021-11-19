@@ -13,8 +13,8 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
-import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
+import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
@@ -35,7 +35,6 @@ import com.st1.itx.db.service.PostAuthLogService;
 import com.st1.itx.db.service.PostDeductMediaService;
 import com.st1.itx.db.service.springjpa.cm.L4450ServiceImpl;
 import com.st1.itx.trade.BS.BS020;
-import com.st1.itx.trade.L4.L4450Report;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.AuthLogCom;
 import com.st1.itx.util.common.BaTxCom;
@@ -378,7 +377,7 @@ public class L4450Batch extends TradeBuffer {
 		}
 
 		if (listBaTxVo != null && listBaTxVo.size() != 0) {
-//			batxvo sort by CustNo, FacmNo, BormNo, 法務費, 暫收款, RepayType(大至小)PayIntDate(小至大) 
+//			batxvo sort by CustNo, FacmNo, 法務費, 暫收款, RepayType(大至小)PayIntDate(小至大) 
 			listBaTxVo.sort((c1, c2) -> {
 				int result = 0;
 				if (c1.getCustNo() - c2.getCustNo() != 0) {
@@ -415,7 +414,6 @@ public class L4450Batch extends TradeBuffer {
 				this.info("L4450 Test's Log Start");
 				this.info("CustNo : " + tmp.getCustNo());
 				this.info("FacmNo : " + tmp.getFacmNo());
-				this.info("BormNo : " + tmp.getBormNo());
 				this.info("DataKind : " + tBaTxVo.getDataKind());
 				this.info("RepayType : " + tBaTxVo.getRepayType());
 				this.info("PayIntDate : " + tBaTxVo.getPayIntDate());
@@ -644,7 +642,6 @@ public class L4450Batch extends TradeBuffer {
 			tBankDeductDtlId.setEntryDate(iEntryDate);
 			tBankDeductDtlId.setCustNo(tmp.getCustNo());
 			tBankDeductDtlId.setFacmNo(tmp.getFacmNo());
-			tBankDeductDtlId.setBormNo(tmp.getBormNo());
 			tBankDeductDtlId.setPayIntDate(tmp.getPayIntDate());
 			tBankDeductDtlId.setRepayType(tmp.getRepayType());
 
@@ -652,7 +649,6 @@ public class L4450Batch extends TradeBuffer {
 			tBankDeductDtl.setEntryDate(iEntryDate);
 			tBankDeductDtl.setCustNo(tmp.getCustNo());
 			tBankDeductDtl.setFacmNo(tmp.getFacmNo());
-			tBankDeductDtl.setBormNo(tmp.getBormNo());
 			tBankDeductDtl.setPayIntDate(tmp.getPayIntDate());
 			tBankDeductDtl.setRepayType(tmp.getRepayType());
 
@@ -803,10 +799,10 @@ public class L4450Batch extends TradeBuffer {
 		BankDeductDtl tBankDeductDtl = null;
 		if (tmp.getRepayType() <= 3) {
 			tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(tmp.getCustNo(), tmp.getFacmNo(),
-					tmp.getBormNo(), prevIntDate + 19110000, titaVo);
+					 prevIntDate + 19110000, titaVo);
 		} else {
 			tBankDeductDtl = bankDeductDtlService.findL4450EntryDateFirst(tmp.getCustNo(), tmp.getFacmNo(),
-					tmp.getBormNo(), tmp.getRepayType(), titaVo);
+					 tmp.getRepayType(), titaVo);
 		}
 
 		if (tBankDeductDtl != null) {
@@ -988,9 +984,6 @@ public class L4450Batch extends TradeBuffer {
 			this.facmNo = facmNo;
 		}
 
-		private int getBormNo() {
-			return bormNo;
-		}
 
 		private void setBormNo(int bormNo) {
 			this.bormNo = bormNo;

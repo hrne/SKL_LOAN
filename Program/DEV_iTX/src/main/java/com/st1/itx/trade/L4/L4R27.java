@@ -36,7 +36,6 @@ public class L4R27 extends TradeBuffer {
 
 		int iCustNo = parse.stringToInteger(titaVo.getParam("RimCustNo"));
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("RimFacmNo"));
-		int iBormNo = parse.stringToInteger(titaVo.getParam("RimBormNo"));
 		int iEntryDate = parse.stringToInteger(titaVo.getParam("RimEntryDate"));
 		int iPayIntDate = parse.stringToInteger(titaVo.getParam("RimPayIntDate"));
 		int RepayType = parse.stringToInteger(titaVo.getParam("RimRepayType"));
@@ -45,7 +44,6 @@ public class L4R27 extends TradeBuffer {
 		BankDeductDtlId tBankDeductDtlId = new BankDeductDtlId();
 		tBankDeductDtlId.setCustNo(iCustNo);
 		tBankDeductDtlId.setFacmNo(iFacmNo);
-		tBankDeductDtlId.setBormNo(iBormNo);
 		tBankDeductDtlId.setEntryDate(iEntryDate);
 		tBankDeductDtlId.setPayIntDate(iPayIntDate);
 		tBankDeductDtlId.setRepayType(RepayType);

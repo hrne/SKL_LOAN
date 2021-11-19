@@ -92,6 +92,11 @@ K(MODIFYBUTTON,1,新增記錄)
 K(MODIFYBUTTON,查詢)
 
 
+
+#button1=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L8205; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,產生疑似洗錢報表)
+
 !日曆日
 #CDATE=D,8,S
 T(4,CDATE$)
@@ -114,23 +119,15 @@ C(4,#RecordDateStart,S,V(5,0010101,#CDATEX))
 C(4,#RecordDateStart,S,$)
 E(0,#RecordDateStart)
 D(8)
-!INVOKEJS(SHOW,p1,1,1,1)
 @A(DATE,0,#RecordDateEnd)
 V(5,#RecordDateStart,#CDATEX)
 
-!#Check=X,1,S
-!C(3,#RecordDateEnd,0,S,$)
-!C(3,#RecordDateStart,0,$,S)
-!V(P,訪談日期起日不可為空白)
 
-#WKBTN1=X,1,S
-!IF(#RecordDateStart>0 || #RecordDateEnd>0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,1,1,0))
 
 !還款日期  起止
 #ActualRepayDateStart=D,7,I
 T(1,#DATE,2,7)
 D(8)
-!INVOKEJS(SHOW,p1,2,2,1)
 C(3,#RecordDateStart,0,$,S)
 C(3,#RecordDateEnd,0,$,S)
 @V(7)A(DATE,0,#ActualRepayDateStart)
@@ -139,14 +136,11 @@ V(5,0010101,#CDATEX)
 #ActualRepayDateEnd=D,7,I
 E(0,#ActualRepayDateStart)
 D(8)
-!INVOKEJS(SHOW,p1,2,2,1)
 C(3,#RecordDateStart,0,$,S)
 C(3,#RecordDateEnd,0,$,S)
 @V(7)A(DATE,0,#ActualRepayDateEnd)
 V(5,#ActualRepayDateStart,#CDATEX)
 
-#WKBTN2=X,2,S
-!IF(#ActualRepayDateStart==0 & #ActualRepayDateEnd==0,INVOKEJS(SHOW,p1,2,2,0),INVOKEJS(SHOW,p1,2,2,1))
 
 #CustNo=A,7,I
 #CustName=X,50,I

@@ -106,10 +106,8 @@ public class L4454 extends TradeBuffer {
 	private int entryDate = 0;
 	private int custNo = 0;
 	private int facmNo = 0;
-	private int bormNo = 0;
 	private int repayType = 0;
 	private int prevIntDate = 0;
-	private int payIntDate = 0;
 	private int cntEmail = 0;
 	private int cntText = 0;
 	private int cntUnsend = 0;
@@ -239,9 +237,7 @@ public class L4454 extends TradeBuffer {
 		entryDate = parse.stringToInteger(t.get("EntryDate"));
 		custNo = parse.stringToInteger(t.get("CustNo"));
 		facmNo = parse.stringToInteger(t.get("FacmNo"));
-		bormNo = parse.stringToInteger(t.get("BormNo"));
 		repayType = parse.stringToInteger(t.get("RepayType"));
-		payIntDate = parse.stringToInteger(t.get("PayIntDate"));
 		repayAmt = parse.stringToBigDecimal(t.get("RepayType"));
 		prevIntDate = parse.stringToInteger(t.get("PrevIntDate"));
 		tTempVo = tTempVo.getVo(t.get("JsonFields"));
@@ -300,7 +296,6 @@ public class L4454 extends TradeBuffer {
 		tDetail.setItemCode("NOTI01"); // 銀扣失敗書面通知單
 		tDetail.setCustNo(custNo);
 		tDetail.setFacmNo(facmNo);
-		tDetail.setBormNo(bormNo);
 		tDetail.setDtlValue(note);
 		lTxToDoDetailReserve.add(tDetail);
 	}
@@ -471,7 +466,7 @@ public class L4454 extends TradeBuffer {
 	private int check(TitaVo titaVo) throws LogicException {
 		int result = 1;
 		// 銀扣檔有相同繳息迄日的期款扣款失敗資料
-		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo, 0,
+		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo, 
 				prevIntDate + 19110000, titaVo);
 		if (tBankDeductDtl != null) {
 			if ((tBankDeductDtl.getEntryDate() < entryDate && tBankDeductDtl.getRepayType() == 1)) {

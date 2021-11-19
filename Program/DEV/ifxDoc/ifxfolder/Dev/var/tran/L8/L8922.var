@@ -91,6 +91,11 @@ T(4,CHAIN$)
 #NTXBUF=X,4,S
 C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
+
+#button1=x,100,S
+T(2,{cmd=CHAIN; ntxcd=L8205; ntxbuf=1; ntxbuf5=type})ASGN(BTN_NEW2$)
+K(MODIFYBUTTON,2,產生疑似洗錢報表)
+
 #Submit=A,1,S
 K(MODIFYBUTTON,查詢)
 

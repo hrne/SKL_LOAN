@@ -1203,7 +1203,6 @@ public class L4452Batch extends TradeBuffer {
 		occursList.putParam("OORepayBank", tBankDeductDtl.getRepayBank());
 		occursList.putParam("OOCustNo", custno);
 		occursList.putParam("OOFacmNo", tBankDeductDtl.getFacmNo());
-		occursList.putParam("OOBormNo", tBankDeductDtl.getBormNo());
 		occursList.putParam("OOCustName", custname);
 		occursList.putParam("OORepayType", repayType);
 		occursList.putParam("OORepayAmt", tBankDeductDtl.getRepayAmt());

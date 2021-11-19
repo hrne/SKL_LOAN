@@ -164,7 +164,7 @@ public class L4451 extends TradeBuffer {
 			tBankDeductDtlId.setEntryDate(entryDate);
 			tBankDeductDtlId.setCustNo(custNo);
 			tBankDeductDtlId.setFacmNo(facmNo);
-			tBankDeductDtlId.setBormNo(bormNo);
+//			tBankDeductDtlId.setBormNo(bormNo);
 			tBankDeductDtlId.setPayIntDate(payIntDate);
 			tBankDeductDtlId.setRepayType(repayType);
 
@@ -239,7 +239,7 @@ public class L4451 extends TradeBuffer {
 			tBankDeductDtlId.setEntryDate(entryDate);
 			tBankDeductDtlId.setCustNo(custNo);
 			tBankDeductDtlId.setFacmNo(facmNo);
-			tBankDeductDtlId.setBormNo(bormNo);
+//			tBankDeductDtlId.setBormNo(bormNo);
 			tBankDeductDtlId.setPayIntDate(payIntDate);
 			tBankDeductDtlId.setRepayType(repayType);
 			totaVo.putParam("OWarningMsg", "");

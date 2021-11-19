@@ -21,7 +21,7 @@ public class BankDeductDtlId implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = -6543499970752575138L;
+	private static final long serialVersionUID = 780943149063866288L;
 
 // 入帳日期
   @Column(name = "`EntryDate`")
@@ -35,10 +35,6 @@ public class BankDeductDtlId implements Serializable {
   @Column(name = "`FacmNo`")
   private int facmNo = 0;
 
-  // 撥款
-  @Column(name = "`BormNo`")
-  private int bormNo = 0;
-
   // 還款類別
   /* CdCode:RepayType1.期款2.部分償還3.結案4.帳管費5.火險費6.契變手續費7.法務費9.其他 */
   @Column(name = "`RepayType`")
@@ -51,11 +47,10 @@ public class BankDeductDtlId implements Serializable {
   public BankDeductDtlId() {
   }
 
-  public BankDeductDtlId(int entryDate, int custNo, int facmNo, int bormNo, int repayType, int payIntDate) {
+  public BankDeductDtlId(int entryDate, int custNo, int facmNo, int repayType, int payIntDate) {
     this.entryDate = entryDate;
     this.custNo = custNo;
     this.facmNo = facmNo;
-    this.bormNo = bormNo;
     this.repayType = repayType;
     this.payIntDate = payIntDate;
   }
@@ -118,25 +113,6 @@ public class BankDeductDtlId implements Serializable {
   }
 
 /**
-	* 撥款<br>
-	* 
-	* @return Integer
-	*/
-  public int getBormNo() {
-    return this.bormNo;
-  }
-
-/**
-	* 撥款<br>
-	* 
-  *
-  * @param bormNo 撥款
-	*/
-  public void setBormNo(int bormNo) {
-    this.bormNo = bormNo;
-  }
-
-/**
 	* 還款類別<br>
 	* CdCode:RepayType
 1.期款
@@ -193,7 +169,7 @@ public class BankDeductDtlId implements Serializable {
 
   @Override
   public int hashCode() {
-    return Objects.hash(entryDate, custNo, facmNo, bormNo, repayType, payIntDate);
+    return Objects.hash(entryDate, custNo, facmNo, repayType, payIntDate);
   }
 
   @Override
@@ -203,11 +179,11 @@ public class BankDeductDtlId implements Serializable {
     if(obj == null || getClass() != obj.getClass())
       return false;
     BankDeductDtlId bankDeductDtlId = (BankDeductDtlId) obj;
-    return entryDate == bankDeductDtlId.entryDate && custNo == bankDeductDtlId.custNo && facmNo == bankDeductDtlId.facmNo && bormNo == bankDeductDtlId.bormNo && repayType == bankDeductDtlId.repayType && payIntDate == bankDeductDtlId.payIntDate;
+    return entryDate == bankDeductDtlId.entryDate && custNo == bankDeductDtlId.custNo && facmNo == bankDeductDtlId.facmNo && repayType == bankDeductDtlId.repayType && payIntDate == bankDeductDtlId.payIntDate;
   }
 
   @Override
   public String toString() {
-    return "BankDeductDtlId [entryDate=" + entryDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", repayType=" + repayType + ", payIntDate=" + payIntDate + "]";
+    return "BankDeductDtlId [entryDate=" + entryDate + ", custNo=" + custNo + ", facmNo=" + facmNo + ", repayType=" + repayType + ", payIntDate=" + payIntDate + "]";
   }
 }

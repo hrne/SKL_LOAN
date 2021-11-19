@@ -1,0 +1,277 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+#TXCD
+T(3,L7202)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[130,870];printer.width=[20,20];">
+[
+["[L7202]                                 違約損失率登錄"],
+["@功能",#FuncCodeX],
+["#grid#,{id:1,expand:true,loop:100,row_height:1,s_cols:[], p_cols:[]}","","","","",
+["生效日期","類別","類別型態","違約損失率％","啟用記號"],
+[
+  [#Date1],[#Type1],[#TypeDesc1],[#LGDPercent1],[#Enable1],[#EnableX1]
+],
+],
+]
+!---------- AP Button AREA ----------
+![Buttom資料查詢]
+!#BTN1=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN2=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+!#BTN3=X,15,I,ui:button;value:瀏覽;enable:0;tabbable:0
+#BUF1=X,42,S
+!ENABLE(#BTN1)
+!ENABLE(#BTN2)
+!ENABLE(#BTN3)
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+#CDCODEFuncCode2=x,20,S
+T(3,CdCode.FuncCode2)
+
+#FuncCode2HelpRim=X,1,S
+RESET_RIM(#FuncCode2HelpRim,XXR99)
+S(XXR99,01,#CDCODEFuncCode2)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+
+#FuncCode2Help=x,300,S
+
+!啟用記號
+#EnableHelp=x,100,S
+T(3,Y:啟用;N:未啟用)
+
+#INIT=X,1,S
+##loop {times:100,i:4}
+INVOKEJS(SHOW,grd1_{i},0)
+##end
+
+#INIT1=X,1,S
+##loop {times:100,i:1}
+T(F,@EnableX{i},0)
+##end
+
+#CHAIN=X,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L7022進入),$)
+
+!做完交易自動更新原畫面
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+#NTXBUF=X,38,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+
+#CHAIN_FuncCode=X,1,S
+T(1,#NTXBUF,1,1)
+
+#CHAIN_Date=X,7,S
+T(1,#NTXBUF,2,7)
+
+#CHAIN_Type=X,2,S
+T(1,#NTXBUF,9,2)
+
+#CHAIN_TypeDesc=X,20,S
+T(1,#NTXBUF,11,20)
+
+#CHAIN_LGDPercent_1=X,2,S
+T(1,#NTXBUF,31,2)
+
+#CHAIN_LGDPercent_2=X,5,S
+T(1,#NTXBUF,33,5)
+
+#CHAIN_LGDPercent=X,8,S
+T(2,#CHAIN_LGDPercent_1+.+#CHAIN_LGDPercent_2)
+
+#CHAIN_Enable=X,1,S
+T(1,#NTXBUF,38,1)
+
+#CHAINSET=X,1,S
+C(3,#CHAIN,1,$,S)
+T(2,@FuncCode,#CHAIN_FuncCode)
+C(3,#FuncCode,1,S,$)
+E(0,@Date1,#CHAIN_Date)
+T(2,@Type1,#CHAIN_Type)
+T(2,@TypeDesc1,#CHAIN_TypeDesc)
+E(0,@LGDPercent1,#CHAIN_LGDPercent)
+T(2,@Enable1,#CHAIN_Enable)
+
+#EnableTmp1=X,6,S
+T(H,#Enable1,#EnableHelp)
+!SWITCH(#Enable1,Y,T(3,啟用),
+!                N,T(3,未啟用), ,T(3, ))
+T(2,@EnableX1,#EnableTmp1)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCode2Help)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+!刪除隱藏重新交易按鈕
+#AGAIN=X,1,S
+C(3,#FuncCode,1,S,$)
+E(0,1)ASGN(AGAIN$)
+
+#FUNCIND=_,_,S
+E(0,#FuncCode)
+<include src="COM.icf::CheckAuth.rtn"/>
+
+!FuncCode=1,2 顯示框線
+#WKTF=X,1,S
+##loop {times:100,i:1}
+IF (#FuncCode==1 || #FuncCode==2 ,T(F,#TypeDesc{i},1)T(F,#LGDPercent{i},1)T(F,#Enable{i},1),
+                                  T(F,#TypeDesc{i},0)T(F,#LGDPercent{i},0)T(F,#Enable{i},0))
+IF (#FuncCode==1 ,T(F,#Date{i},1)T(F,#Type{i},1),
+                  T(F,#Date{i},0)T(F,#Type{i},0))
+##end
+
+
+! 生效日期
+#Date1=D,7,I
+C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+D(8)
+@V(7)A(DATE,0,#Date1)
+
+! 類別
+#Type1=A,2,I
+!C(3,#CHAIN,1,C(3,#FuncCode,1,$,s),$)
+C(3,#FuncCode,1,$,s)
+@V(2,0)
+
+! 類別型態
+#TypeDesc1=x,20,I
+C(3,#FuncCode,4,s)
+@V(7)
+
+! 違約損失率％
+#LGDPercent1=N,2.5,I
+C(3,#FuncCode,4,s)
+@V(2,0)
+
+! 啟用記號
+#Enable1=X,1,I
+C(3,#FuncCode,4,s)
+HELP(#EnableHelp)
+@V(H,#EnableHelp)
+
+#EnableX1=X,6,S
+T(H,#Enable1,#EnableHelp)
+
+##loop{times:99,i:2,j:1,k:5,l:4}
+
+! 生效日期
+#Date{i}=D,7,I
+C(4,#Date{j},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Date{j},S,$)
+C(3,#CHAIN,1,C(2,#FuncCode,$,$,s,$,s,s),$)
+D(8)
+@A(DATE,0,#Date{i})
+@C(4,#Date{i},INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
+
+! 類別
+#Type{i}=A,2,I
+C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Date{i},S,$)
+C(3,#FuncCode,4,s)
+@V(7)
+
+! 類別型態
+#TypeDesc{i}=x,20,I
+C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Date{i},S,$)
+C(3,#FuncCode,4,s)
+@V(7)
+
+! 違約損失率％
+#LGDPercent{i}=m,2.5,I
+C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Date{i},S,$)
+C(3,#FuncCode,4,s)
+@V(2,0)
+
+! 啟用記號
+#Enable{i}=X,1,I
+C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Date{i},S,$)
+C(3,#FuncCode,4,s)
+HELP(#EnableHelp)
+@V(H,#EnableHelp)
+
+#EnableX{i}=X,12,O
+C(4,#Date{i},INVOKEJS(SHOW,grd1_{l},0),INVOKEJS(SHOW,grd1_{l},1))
+C(4,#Date{i},S,$)
+T(H,#Enable{i},#EnableHelp)
+
+##end
+
+#RPTFG=A,1,S
+E(0,0)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L7202 ----------
+<sub type="FORM" name="L7202">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L7202,$,S)
+
+#SCRTIL=_,_,S
+T(3,[L7202] 違約損失率登錄)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#FuncCode
+##loop{times:100,i:1}
+#Date{i}
+#Type{i}
+#TypeDesc{i}
+#LGDPercent{i}
+#Enable{i}
+##end
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=L7202^
+
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

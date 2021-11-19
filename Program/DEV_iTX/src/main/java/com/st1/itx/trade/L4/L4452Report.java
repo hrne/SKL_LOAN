@@ -97,19 +97,18 @@ public class L4452Report extends MakeReport {
 				this.print(0, 1, FormatUtil.pad9(occursList.get(i).get("OOCustNo"), 7));// 戶號
 				this.print(0, 8, "-");
 				this.print(0, 9, FormatUtil.pad9(occursList.get(i).get("OOFacmNo"), 3));// 額度
-				this.print(0, 12, "-");
-				this.print(0, 13, FormatUtil.pad9(occursList.get(i).get("OOBormNo"), 3));// 撥款
+//				this.print(0, 12, "-");
+//				this.print(0, 13, FormatUtil.pad9(occursList.get(i).get("OOBormNo"), 3));// 撥款
 				this.print(0, 20, limitLength(occursList.get(i).get("OOCustName"),20));// 戶名
 				this.print(0, 40, occursList.get(i).get("OORepayType"));// 還款類別
 				this.print(0, 70, df1.format(parse.stringToBigDecimal(occursList.get(i).get("OORepayAmt"))), "R");// 還款金額
 				this.print(0, 75, occursList.get(i).get("OONote"));// 摘要
-
 				
 				if (j != occursList.size()) {
 //					年月不同則跳頁，並且累計歸零
-					if (!occursList.get(i).get("OORepayBank").equals(occursList.get(j).get("OORepayBank"))) {
+					repayBank = occursList.get(j).get("OORepayBank");
+					if (!occursList.get(i).get("OORepayBank").equals(repayBank)) {
 						this.info("RepayBank Not Match...");
-
 						pageCnt = 0;
 						this.newPage();
 						continue;
@@ -153,8 +152,6 @@ public class L4452Report extends MakeReport {
 						result = Integer.valueOf(c1.get("OOCustNo").compareTo(c2.get("OOCustNo")));
 					} else if (c1.get("OOFacmNo") != c2.get("OOFacmNo")) {
 						result = Integer.valueOf(c1.get("OOFacmNo").compareTo(c2.get("OOFacmNo")));
-					} else if (c1.get("OOBormNo") != c2.get("OOBormNo")) {
-						result = Integer.valueOf(c1.get("OOBormNo").compareTo(c2.get("OOBormNo")));
 					} else {
 						result = 0;
 					}

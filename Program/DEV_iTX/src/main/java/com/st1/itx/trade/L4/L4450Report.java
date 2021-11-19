@@ -95,9 +95,6 @@ public class L4450Report extends MakeReport {
 			} else if (c1.getFacmNo() - c2.getFacmNo() != 0) {
 				result = c1.getFacmNo() - c2.getFacmNo();
 				
-			} else if (c1.getBormNo() - c2.getBormNo() != 0) {
-				result = c1.getBormNo() - c2.getBormNo();
-				
 			} else if (c1.getPayIntDate() - c2.getPayIntDate() != 0) {
 				result = c1.getPayIntDate() - c2.getPayIntDate();
 				

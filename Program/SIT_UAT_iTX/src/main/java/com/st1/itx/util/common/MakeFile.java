@@ -9,6 +9,7 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.tradeService.CommBuffer;
+import com.st1.itx.util.filter.SafeClose;
 import com.st1.itx.db.domain.TxFile;
 import com.st1.itx.db.service.TxFileService;
 import com.st1.itx.eum.ContentName;
@@ -73,7 +74,8 @@ public class MakeFile extends CommBuffer {
 	 * @param format   輸出檔案格式 1.UTF8 2.BIG5
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName, int format) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName,
+			int format) throws LogicException {
 
 		this.titaVo = titaVo;
 		this.init(date, brno, fileCode, fileItem, fileName, format);
@@ -93,13 +95,15 @@ public class MakeFile extends CommBuffer {
 	 * @param fileName 輸出檔案名稱
 	 * @throws LogicException LogicException
 	 */
-	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName) throws LogicException {
+	public void open(TitaVo titaVo, int date, String brno, String fileCode, String fileItem, String fileName)
+			throws LogicException {
 
 		this.titaVo = titaVo;
 		this.init(date, brno, fileCode, fileItem, fileName, 1);
 	}
 
-	private void init(int date, String brno, String fileCode, String fileItem, String fileName, int format) throws LogicException {
+	private void init(int date, String brno, String fileCode, String fileItem, String fileName, int format)
+			throws LogicException {
 		if ("".equals(brno)) {
 			throw new LogicException("EC007", "(MakeFile)取檔單位不可為空白");
 		}
@@ -290,7 +294,27 @@ public class MakeFile extends CommBuffer {
 		tTxFile.setFileItem(this.fileItem);
 		tTxFile.setFileFormat(this.fileFormat);
 		tTxFile.setFileOutput(this.fileName);
-		tTxFile.setFileType(3);
+
+		int fileType = 3;
+		if (this.fileName.lastIndexOf(".") > 0) {
+			String subFileName = this.fileName.substring(this.fileName.lastIndexOf(".") + 1).toUpperCase();
+
+			switch (subFileName) {
+			case "TXT":
+				fileType = 3;
+				break;
+			case "DBF":
+				fileType = 4;
+				break;
+			case "CSV":
+				fileType = 5;
+				break;
+			default:
+				fileType = 3;
+				break;
+			}
+		}
+		tTxFile.setFileType(fileType); // 根據副檔名判斷 3:TXT 、 4:DBF 或 5:CSV (若無副檔名時預設3:TXT)
 		try {
 			ObjectMapper mapper = new ObjectMapper();
 			tTxFile.setFileData(mapper.writeValueAsString(listMap));
@@ -374,18 +398,28 @@ public class MakeFile extends CommBuffer {
 		}
 
 		// 產製新檔
+		FileOutputStream fo = null;
+		OutputStreamWriter osw = null;
+		BufferedWriter fw = null;
 		try {
 			this.info("MakeFile.toFile outfile=" + outfile + "/" + charsetName);
-			BufferedWriter fw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outfile, true), charsetName));
+			fo = new FileOutputStream(outfile, true);
+			osw = new OutputStreamWriter(fo, charsetName);
+			fw = new BufferedWriter(osw);
 			this.info("MakeFile.toFile opened");
-			for (HashMap<String, Object> map : listMap) {
+
+			for (HashMap<String, Object> map : listMap)
 				fw.write(map.get("d").toString() + "\r\n");
-			}
+
 			this.info("MakeFile.toFile listmap");
 			fw.flush();
 			this.info("MakeFile.toFile flush");
 		} catch (IOException e) {
 			throw new LogicException("EC009", "(MakeFile)輸出檔(TxFile)序號:" + fileno + ",產檔失敗");
+		} finally {
+			SafeClose.close(fw);
+			SafeClose.close(osw);
+			SafeClose.close(fo);
 		}
 
 //		if (this.listMap != null) {

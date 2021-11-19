@@ -32,7 +32,6 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		org.junit.Assert.assertNotNull(loanBorMainRepos);
 	}
 
-	private int entdy = 0;
 
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
@@ -59,7 +58,6 @@ public class L4454R2ServiceImpl extends ASpringJpaParm implements InitializingBe
 		sql += "   from \"BankDeductDtl\" bd                                                    ";
 		sql += "   left join \"LoanBorMain\" lbm   on lbm.\"CustNo\"    = bd.\"CustNo\"     ";
 		sql += "                                and lbm.\"FacmNo\"    = bd.\"FacmNo\"       ";
-		sql += "                                and lbm.\"BormNo\"    = bd.\"BormNo\"       ";
 		sql += "   left join \"FacMain\" fm        on fm.\"CustNo\"     = bd.\"CustNo\"      ";
 		sql += "                                and fm.\"FacmNo\"     = bd.\"FacmNo\"        ";
 		sql += "   left join \"ClFac\" cf          on cf.\"CustNo\"     = fm.\"CustNo\"      ";

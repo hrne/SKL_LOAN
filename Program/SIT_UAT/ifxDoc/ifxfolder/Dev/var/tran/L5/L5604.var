@@ -26,7 +26,7 @@ E(0,0)
 ["#FdPrevIntDate+繳息迄日",#PrevIntDate],["#FdLoanBal+放款餘額",#LoanBal],
 ["#FdNextIntDate+下次應繳日",#NextIntDate],
 [#<->#,"@",#BTNA,#BTNB,#BTNC,#BTND,#BTNE,#BTNN],
-[#<->#,"@",#BTNX,#BTNG],
+[#<->#,"@",#BTNX,#BTNG,#BTNH],
 [#<->#,"#FdClCode+擔保品編號",#ClCode1,"-",#ClCode2,"-",#ClNo,#ClX],
 [#<->#,"#FdRecordDate+記錄日期",#RecordDate],
 [#<->#,"#FdLegalProg+法務進度",#LegalProg,#LegalProgX],
@@ -44,7 +44,8 @@ E(0,0)
 #BTNE=X,1,I,ui:button;value:提醒查詢;enable:1;tabbable:0
 #BTNN=X,1,I,ui:button;value:提醒登錄;enable:1;tabbable:0
 #BTNX=X,1,I,ui:button;value:擔保品不動產資料查詢;enable:1;tabbable:0
-#BTNG=X,1,I,ui:button;value:擔保品全部資料查詢;enable:1;tabbable:0
+#BTNG=X,1,I,ui:button;value:其他擔保品資料查詢;enable:1;tabbable:0
+#BTNH=X,1,I,ui:button;value:擔保品明細資料查詢;enable:1;tabbable:0
 #CHAIN=A,1,S
 T(4,CHAIN$) 
 IF(#CHAIN!=1,V(P,此為連動交易，請從L5060進入),$)
@@ -249,7 +250,7 @@ BIND(#BTNE,click, {cmd=CHAIN; ntxcd=L5965; ntxbuf=#BUFE})
 T(2,1+#CaseCode+#CustNo+#FacmNo+1)
 #BINDN=X,1,S
 BIND(#BTNN,click, {cmd=CHAIN; ntxcd=L5605; ntxbuf=#BUFN})
-! <擔保品明細資料查詢>
+! <擔保品資料查詢>
 #BUFX=X,38,S
 T(2,1 000000000+#FacmNo+0000000+          +#CustNo)
 #BUFG=X,38,S
@@ -281,7 +282,6 @@ C(2,#FunctionCd,S,$,$,s,s,s)
 ! 下次繳息日
 #NextIntDate=D,7,L
 ! ---------調RIM
-! 擔保品編號1
 #BINDG=X,1,S
 BIND(#BTNG,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUFG;ntxbuf5=type<-1:ClCode1<-OOClCode1:ClCode2<-OOClCode2:ClNo<-OOClNo:ClX1<-ClTypeCodeX:ClX2<-})
 #BINDX=X,1,S
@@ -292,6 +292,7 @@ BIND(#BTNX,click, {cmd=CHAIN; ntxcd=L2038; ntxbuf=#BUFX;ntxbuf5=type<-1:ClCode1<
 !土地座落
 #ClX2=x,100,S
 
+! 擔保品編號1
 #ClCode1=A,1,I
 C(2,#FunctionCd,S,$,s,$,s,s)
 @V(2,0)
@@ -304,6 +305,21 @@ C(2,#FunctionCd,S,$,s,$,s,s)
 C(2,#FunctionCd,S,$,s,$,s,s)
 @V(2,0)
 
+!擔保品明細資料查詢
+#BUFH=X,17,S
+IF(#ClCode1 > 0 && #ClCode2 > 0 && #ClNo > 0,$,S)
+T(2,#ClCode1+#ClCode2+#ClNo+0000000)
+
+#COL_TXCD=X,5,S
+SWITCH(#ClCode1,1,T(3,L2911),
+                  2,T(3,L2911),
+                  3,T(3,L2913),
+                  4,T(3,L2913),
+                  5,T(3,L2914),
+                  9,T(3,L2912),
+                  )
+#BINDH=X,1,S
+BIND(#BTNH,click, {cmd=CHAIN; ntxcd=#COL_TXCD; ntxbuf=#BUFH})
 
 ! 門牌號碼-土地座落
 #ClX=x,100,L

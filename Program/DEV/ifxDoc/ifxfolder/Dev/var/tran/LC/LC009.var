@@ -1,0 +1,262 @@
+﻿----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+!#TXCD
+!T(3,LC009)
+
+![資料表頭(HEADER)長度]
+#INQHD=n,3,S
+E(0,0)ASGN(INQHD$)
+
+![每筆資料明細(OCCURS)長度]
+#INQLEN=n,3,S
+E(0,280)ASGN(INQLEN$)
+
+![多筆查詢之一個畫面有N筆資料]
+#INQREC=n,2,S
+E(0,20)ASGN(INQREC$)
+
+![畫面顯示的明細間的高度]
+#LOOPH=n,3,S
+E(0,1)ASGN(LOOPHEIGHT$)
+
+![每張印錄單列印的筆數]
+#INQPRT=n,2,S
+E(0,40)ASGN(INQPRT$)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[150,850];printer.width=[20,20];">
+[
+["[LC009]                                 報表及檔案查詢"],
+["@使用單位",#iBrNo],
+["*會計日期",#iEntdyStart,#iEntdyEnd],
+["@製作日期",#createDateStart,#createDateEnd,"@（清空可查全部）"],
+["@經@@@@辦",#iTlrNo],
+["@代@@@@碼",#iCode,"@（報表代號或檔案代號）"],
+["@說@@@@明",#iItem,"@（關鍵字）"],
+]
+!---------- AP Button AREA ----------
+
+
+!---------- AP TEXT AREA Variables ----------
+#CHAIN=A,1,S
+T(4,CHAIN$)
+
+#NTXBUF=X,40,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@iTlrNo,#NTXBUF,1,6)
+T(1,@iCode,#NTXBUF,7,20)
+T(1,@iItem,#NTXBUF,27,40)
+
+!顯示框線
+#ShowFrame=A,1,S
+C(3,#CHAIN,1,T(3,0),T(3,1))
+T(F,@iEntdy,#ShowFrame)
+T(F,@iTlrNo,#ShowFrame)
+T(F,@iCode,#ShowFrame)
+T(F,@iItem,#ShowFrame)
+
+#iBrNo=X,4,L
+T(2,#KINBR) 
+
+
+! 2021-04-15 Wei修改
+! 目的:修改日期為範圍
+![會計日期起日]
+#iEntdyStart=D,7,I
+E(0,#SYSDATE)
+C(3,#CHAIN,0,$,s)
+D(8)
+@V(7)A(DATE,0,#iEntdyStart)
+V(5,0010101,#SYSDATE)
+
+![會計日期迄日]
+#iEntdyEnd=D,7,I
+E(0,#iEntdyStart)
+C(3,#CHAIN,0,$,s)
+D(8)
+@V(7)A(DATE,0,#iEntdyEnd)
+V(5,#iEntdyStart,#SYSDATE)
+
+! 2021-01-26 Wei新增
+! 目的:開發時測試使用
+! 功能: 1.非必輸
+!       2.清空可查全部
+!       3.預設為今天日曆日 (#SYSCDATE)
+!       4.若有輸入必須小於等於今天
+![製作日期起日]
+#createDateStart=D,7,I
+E(0,#SYSCDATE)
+C(3,#CHAIN,0,$,S)
+D(8)
+@C(4,#createDateStart,S,$)
+V(7)A(DATE,0,#createDateStart)
+V(5,0010101,#SYSCDATE)
+
+! 2021-04-15 Wei新增
+! 目的:修改日期為範圍
+![製作日期迄日]
+#createDateEnd=D,7,I
+C(4,#createDateStart,S,$)
+E(0,#createDateStart)
+C(3,#CHAIN,0,$,S)
+D(8)
+@C(4,#createDateEnd,S,$)
+V(7)A(DATE,0,#createDateEnd)
+V(5,#createDateStart,#SYSCDATE)
+
+!上行電文使用的欄位
+#iCreateDateStart=X,7,S
+C(3,#createDateStart,0,S,$)
+T(2,#createDateStart)
+
+!上行電文使用的欄位
+#iCreateDateEnd=X,7,S
+C(3,#createDateEnd,0,S,$)
+T(2,#createDateEnd)
+
+#iTlrNo=X,6,I
+C(3,#CHAIN,0,$,s)
+T(2,#TLRNO)
+
+!代碼
+#iCode=X,20,I
+C(3,#CHAIN,0,$,s)
+
+!說明
+#iItem=X,40,I
+C(3,#CHAIN,0,$,s)
+
+#RPTFG=A,1,S
+E(0,0)
+
+#TXMT=A,1,S
+C(3,#CHAIN,0,$,E(0,@CHAIN,0)XMT())
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = LC009 ----------
+<sub type="FORM" name="LC009">
+
+!#SCRPRT=_,_,S
+!C(5,#TXFORM,LC009,$,S)
+
+#SCRTIL=_,_,S
+T(3,[LC009] 報表及檔案查詢)
+
+!------ TOM(HEAD)   Variables (FOR OUTPUT SCREEN) ------
+!------ TOM(OCCURS) Variables (FOR OUTPUT SCREEN) ------
+#LOOP=X,1,S
+T(3,1)ASGN(LOOP$)
+
+#Ymd=D,7,S
+#Code=X,80,S
+#Item=X,160,S
+#TlrNo=X,6,S
+#CalDate=X,9,S
+#CalTime=X,8,S
+#Sno=9,8,S
+#Type=9,1,S
+#TypeX=X,6,S
+C(2,#Type,$,T(3,PDF),T(3,EXCEL),T(3,TXT),T(3,DBF),T(3,CSV),$)
+#SignCode=9,1,S
+
+#BTN=X,1,S
+BIND(grid,{cmd=viewPdf;sno=#Sno;fileType=#Type;item=#Item})
+
+! 簽核按鈕
+
+#BUF2=X,255,S
+T(2,#Sno+#Code+#Item+#Ymd)
+
+#BTN2=X,4,S
+C(3,#SignCode,1,BIND(grid,{cmd=CHAIN;ntxcd=LC109;text=簽核;ntxbuf=#BUF2}),BIND(grid,cancel))
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#iEntdyStart
+#iEntdyEnd
+#iBrNo
+#iTlrNo
+#iCode
+#iItem
+#iCreateDateStart
+#iCreateDateEnd
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+TXFORM=LC009
+#Ymd
+#Code
+#Item
+#TlrNo
+#CalDate
+#CalTime
+#Sno
+#Type
+#SignCode
+^
+<include src="COM.icf::TRCTL.tom"/>
+</sub>
+
+!--------- OUTPUT畫面 --------
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+
+#RPTFG=0,QUERY.GRID,LC009
+#any={detail:true, header:'LC009.part', caption:'', width:1000, rowNum:20, rowList:[20,40,60]}
+
+#BTN=
+{width:40,search:false,formatter:'cust:bind-button:開啟',canExport:false,align:'center'}
+
+#BTN2=
+{width:65,search:false,formatter:'cust:bind-button:#BTN2',align:'center',canExport:false}
+
+#Sno=序號
+{width:80,align:'center'}
+
+#Ymd=會計日期
+{width:80,align:'center'}
+
+#Code=代碼
+{width:150,align:'lefg'}
+
+#Item=說明
+{width:400,align:'left'}
+
+#TlrNo=經辦
+{width:60,align:'center'}
+
+#TypeX=格式
+{width:60,align:'center'}
+
+#CalDate=製作日期
+{width:80,align:'center'}
+
+#CalTime=製作時間
+{width:100,align:'center'}
+
+^
+
+</sub>

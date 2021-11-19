@@ -927,7 +927,7 @@ public class MakeReport extends CommBuffer {
 			}
 		}
 
-		tTxFile.setFileType(1);
+		tTxFile.setFileType(1); // 固定1:PDF
 		tTxFile.setFileFormat(1);
 		tTxFile.setFileCode(this.rptCode);
 		tTxFile.setFileItem(this.rptItem);
@@ -2303,7 +2303,7 @@ public class MakeReport extends CommBuffer {
 
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
 				map2.put("Action", 4);
-				map2.put("Font", font);
+				map2.put("Font", "微軟正黑體");
 				map2.put("FontSize", fontsize);
 				map2.put("FontWeight", "normal");
 				map2.put("FontStyle", "normal");
@@ -2318,14 +2318,14 @@ public class MakeReport extends CommBuffer {
 				int x = Integer.parseInt(map.get("x").toString());
 				int y = Integer.parseInt(map.get("y").toString());
 
-				double xx = x * 2.54 / 720;
-				double yy = y * 2.54 / 720;
+				double xx = x * 2.54 / 72 * 10;
+				double yy = y * 2.54 / 72 * 10;
 
 				String text = map.get("txt").toString();
 				String align = map.get("align").toString();
 
 				HashMap<String, Object> map2 = new HashMap<String, Object>();
-				map2.put("Action", 4);
+				map2.put("Action", 5);
 				map2.put("Unit", "mm");
 				map2.put("X", xx);
 				map2.put("Y", yy);
@@ -2335,15 +2335,23 @@ public class MakeReport extends CommBuffer {
 			}
 		}
 
+		if (pMap.size() > 0) {
+			HashMap<String, Object> map2 = new HashMap<String, Object>();
+			map2.put("Action", 9);
+
+			pMap.add(map2);
+		}
+
 		HashMap<String, Object> rmap = new HashMap<String, Object>();
 
 		rmap.put("morePage", morePage);
-		try {
-			ObjectMapper mapper = new ObjectMapper();
-			rmap.put("printJson", mapper.writeValueAsString(pMap));
-		} catch (IOException e) {
-			throw new LogicException("EC009", "(MakeReport)資料格式 " + e.getMessage());
-		}
+		rmap.put("printJson", pMap);
+//		try {
+//			ObjectMapper mapper = new ObjectMapper();
+//			rmap.put("printJson", mapper.writeValueAsString(pMap));
+//		} catch (IOException e) {
+//			throw new LogicException("EC009", "(MakeReport)資料格式 " + e.getMessage());
+//		}
 
 		return rmap;
 	}

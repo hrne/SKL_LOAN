@@ -12,8 +12,11 @@ import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.CdBranch;
+import com.st1.itx.db.domain.CdBranchGroup;
+import com.st1.itx.db.domain.CdBranchGroupId;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.TxTeller;
+import com.st1.itx.db.service.CdBranchGroupService;
 import com.st1.itx.db.service.CdBranchService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.TxTellerService;
@@ -39,6 +42,8 @@ public class LC100 extends TradeBuffer {
 	public CdEmpService tCdEmpService;
 	@Autowired
 	public CdBranchService sCdBranchService;
+	@Autowired
+	public CdBranchGroupService sCdBranchGroupService;
 
 	@Autowired
 	DateUtil dDateUtil;
@@ -69,41 +74,15 @@ public class LC100 extends TradeBuffer {
 				if (tCdBranch == null) {
 					throw new LogicException("EC001", "營業單位:" + tTxTeller.getBrNo());
 				}
-				String s = "";
-				switch (tTxTeller.getGroupNo()) {
-				case "1":
-					s = tCdBranch.getGroup1();
-					break;
-				case "2":
-					s = tCdBranch.getGroup2();
-					break;
-				case "3":
-					s = tCdBranch.getGroup3();
-					break;
-				case "4":
-					s = tCdBranch.getGroup4();
-					break;
-				case "5":
-					s = tCdBranch.getGroup5();
-					break;
-				case "6":
-					s = tCdBranch.getGroup6();
-					break;
-				case "7":
-					s = tCdBranch.getGroup6();
-					break;
-				case "8":
-					s = tCdBranch.getGroup8();
-					break;
-				case "9":
-					s = tCdBranch.getGroup9();
-					break;
-				case "A":
-					s = tCdBranch.getGroup10();
-					break;
-				default:
-					s = "";
+				
+				CdBranchGroup tCdBranchGroup = sCdBranchGroupService.findById(new CdBranchGroupId(tTxTeller.getBrNo(),tTxTeller.getGroupNo()), titaVo);
+				if (tCdBranchGroup == null) {
+					throw new LogicException("EC001", "營業單位課組別檔:" + tTxTeller.getGroupNo());
 				}
+				
+				String s = "";
+				s = tCdBranchGroup.getGroupItem();
+				
 				s = s.trim();
 				this.totaVo.putParam("BRNAME", tCdBranch.getBranchItem());
 				this.totaVo.putParam("BANKNO", "");

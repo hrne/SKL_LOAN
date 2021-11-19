@@ -2073,10 +2073,10 @@ TXFORM=L2R10
 ##loop {times:20,i:1}
 #L2r11ClKey{i}=X,12,S
 #L2r11ApplNo{i}=A,7,S
-#L2r11CustNo{i}=A,7,S
-#L2r11FacmNo{i}=A,3,S
+#L2r11ClTypeCode{i}=X,3,S
 #L2r11MainFlag{i}=X,1,S
 #L2r11EvaAmt{i}=m,14.2,S
+#L2r11BdLocation{i}=X,100,S
 ##end
 </L2R11.dec>
 
@@ -2085,10 +2085,10 @@ TXFORM=L2R11
 ##loop {times:20,i:1}
 #L2r11ClKey{i}
 #L2r11ApplNo{i}
-#L2r11CustNo{i}
-#L2r11FacmNo{i}
+#L2r11ClTypeCode{i}
 #L2r11MainFlag{i}
 #L2r11EvaAmt{i}
+#L2r11BdLocation{i}
 ##end
 ^
 </L2R11.tom>

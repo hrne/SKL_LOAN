@@ -183,6 +183,18 @@ public interface PfBsDetailService {
   public Slice<PfBsDetail> findBormNoEq(int custNo_0, int facmNo_1, int bormNo_2, int index, int limit, TitaVo... titaVo);
 
   /**
+   * DrawdownDate &gt;= ,AND DrawdownDate &lt;=
+   *
+   * @param drawdownDate_0 drawdownDate_0
+   * @param drawdownDate_1 drawdownDate_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice PfBsDetail PfBsDetail of List
+   */
+  public Slice<PfBsDetail> findDrawdownBetween(int drawdownDate_0, int drawdownDate_1, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By PfBsDetail
    * 
    * @param logNo key

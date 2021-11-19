@@ -90,7 +90,6 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "  BDD.\"EntryDate\"   AS F0                               ";
 			sql += " ,BDD.\"CustNo\"      AS F1                               ";
 			sql += " ,BDD.\"FacmNo\"      AS F2                               ";
-			sql += " ,BDD.\"BormNo\"      AS F3                               ";
 			sql += " ,BDD.\"PrevIntDate\" AS F4                               ";
 			sql += " ,BDD.\"PayIntDate\"  AS F5                               ";
 			sql += " ,BDD.\"RepayType\"   AS F6                               ";

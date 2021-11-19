@@ -87,22 +87,20 @@ T(1,@FunctionCode,#NTXBUF,1,1)
 T(1,@EntryDate,#NTXBUF,2,7)
 T(1,@CustNo,#NTXBUF,9,7)
 T(1,@FacmNo,#NTXBUF,16,3)
-T(1,@BormNo,#NTXBUF,19,3)
-T(1,@PrevIntDate,#NTXBUF,22,7)
-T(1,@PayIntDate,#NTXBUF,29,7)
-T(1,@RepayType,#NTXBUF,36,2)
+T(1,@PrevIntDate,#NTXBUF,19,7)
+T(1,@PayIntDate,#NTXBUF,26,7)
+T(1,@RepayType,#NTXBUF,33,2)
 
 T(1,@EntryDateL,#NTXBUF,2,7)
 T(1,@CustNoL,#NTXBUF,9,7)
 T(1,@FacmNoL,#NTXBUF,16,3)
-T(1,@BormNoL,#NTXBUF,19,3)
-T(1,@PrevIntDateL,#NTXBUF,22,7)
-T(1,@PayIntDateL,#NTXBUF,29,7)
+T(1,@PrevIntDateL,#NTXBUF,19,7)
+T(1,@PayIntDateL,#NTXBUF,26,7)
 
-T(1,@AcDate,#NTXBUF,38,7)
-T(1,@PRE_UnpaidAmt,#NTXBUF,45,20)
-T(1,@PRE_TempAmt,#NTXBUF,65,20)
-T(1,@Reason,#NTXBUF,85,300)
+T(1,@AcDate,#NTXBUF,35,7)
+T(1,@PRE_UnpaidAmt,#NTXBUF,42,20)
+T(1,@PRE_TempAmt,#NTXBUF,62,20)
+T(1,@Reason,#NTXBUF,82,300)
 
 #PRE_UnpaidAmt=m,20,S
 E(0,@UnpaidAmt,#PRE_UnpaidAmt)
@@ -115,7 +113,6 @@ T(2,@LabelA,     繳息迄日)
 #RimCustId=X,10,S
 #RimCustNo=A,7,S
 #RimFacmNo=A,3,S
-#RimBormNo=A,3,S
 #RimEntryDate=D,7,S
 #RimPayIntDate=D,7,S
 #RimRepayType=A,2,S
@@ -126,12 +123,11 @@ T(2,@LabelA,     繳息迄日)
 C(3,#FunctionCode,1,s,$)
 E(0,@RimCustNo,#CustNo)
 E(0,@RimFacmNo,#FacmNo)
-E(0,@RimBormNo,#BormNo)
 E(0,@RimEntryDate,#EntryDate)
 E(0,@RimPayIntDate,#PayIntDate)
 E(0,@RimRepayType,#RepayType)
 RESET_RIM(#RimL4r27,L4R27)
-S(L4R27,1,#RimCustNo,#RimFacmNo,#RimBormNo,#RimEntryDate,#RimPayIntDate,#RimRepayType)
+S(L4R27,1,#RimCustNo,#RimFacmNo,#RimEntryDate,#RimPayIntDate,#RimRepayType)
 R(1,L4R27)
 
 #checkL4r27=X,1,S
@@ -147,14 +143,14 @@ T(2,@BatchNo,#L4r27BatchNo)
 ! 新增為輸入欄位
 #PreCol_Chain_0=A,1,S
 C(3,#FunctionCode,0,s,$)
-SHOW(#EntryDate,#CustNo,#FacmNo,#BormNo,#PrevIntDate,#PayIntDate,#RepayType)
-HIDE(#EntryDateL,#CustNoL,#FacmNoL,#BormNoL,#PrevIntDateL,#PayIntDateL)
+SHOW(#EntryDate,#CustNo,#FacmNo,#PrevIntDate,#PayIntDate,#RepayType)
+HIDE(#EntryDateL,#CustNoL,#FacmNoL,#PrevIntDateL,#PayIntDateL)
 
 ! 修改刪除為顯示欄位
 #PreCol_Chain_1=A,1,S
 C(3,#FunctionCode,1,s,$)
-SHOW(#EntryDateL,#CustNoL,#FacmNoL,#BormNoL,#PrevIntDateL,#PayIntDateL)
-HIDE(#EntryDate,#CustNo,#FacmNo,#BormNo,#PrevIntDate,#PayIntDate,#RepayType)
+SHOW(#EntryDateL,#CustNoL,#FacmNoL,#PrevIntDateL,#PayIntDateL)
+HIDE(#EntryDate,#CustNo,#FacmNo,#PrevIntDate,#PayIntDate,#RepayType)
 
 #PRE_RepayTypeX=X,10,L
 SWITCH(#RepayType,01,T(3,@RepayTypeX,期款),
@@ -255,11 +251,6 @@ C(3,#FunctionCode,1,$,s)
 #FacmNo=A,3,I
 C(3,#FunctionCode,1,$,s)
 @V(2,0)
-
-! 撥款
-#BormNoL=A,3,L
-#BormNo=A,3,L
-C(3,#FunctionCode,1,$,s)
 
 <include src="ROM.icf::L1R09.dec"/>
 #RimL1r09=X,1,S
@@ -374,7 +365,6 @@ E(0,1)ASGN(LOOP$)
 #EntryDate
 #CustNo
 #FacmNo
-#BormNo
 #PrevIntDate
 #PayIntDate
 #RepayType

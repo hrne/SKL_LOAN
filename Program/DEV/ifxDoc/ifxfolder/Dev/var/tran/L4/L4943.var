@@ -288,8 +288,6 @@ E(0,1)ASGN(LOOP$)
 #OOCustNo=A,7,O
 ! 額度
 #OOFacmNo=A,3,O
-! 撥款
-#OOBormNo=A,3,O
 ! 繳息迄日
 #OOPrevIntDate=D,7,O
 ! 應繳日
@@ -336,17 +334,17 @@ IF(#OOAcDate=="0000000",T(2,),T(2,#OOAcDateA+/+#OOAcDateB+/+#OOAcDateC))
 ! 整批入帳後回寫會計日，已入帳者不可修改、刪除
 ! <修改> 6+7+7+3+7+1+16+7=54
 #OOBUF_A=X,390,S
-T(2,2+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
+T(2,2+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
 #OOBTN_A=A,2,O
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_A}),BIND(grid,cancel))
 
 ! <刪除> 6+7+7+3+7+1+16+7=54
 #OOBUF_B=X,390,S
-T(2,4+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
+T(2,4+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
 
 ! <查詢> 6+7+7+3+7+1+16+7=54
 #OOBUF_C=X,390,S
-T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOBormNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
+T(2,5+#OOEntryDate+#OOCustNo+#OOFacmNo+#OOPrevIntDate+#OOPayIntDate+#OORepayType+#OOAcDate+#OOUnpaidAmtX+#OOTempAmtX+#OOProcNote)
 #OOBTN_B=A,2,O
 IF(#OOAcDate=="0000000",BIND(grid,{ cmd=CHAIN; ntxcd=L4451; ntxbuf=#OOBUF_B}),BIND(grid,cancel))
 
@@ -391,11 +389,9 @@ TXFORM=L4943
 #OTotalUnpaidAmt
 #OTotalTempAmt
 #OTotalRepayAmt
-
 #OOEntryDate
 #OOCustNo
 #OOFacmNo
-#OOBormNo
 #OOPrevIntDate
 #OOPayIntDate
 #OORepayType
@@ -438,8 +434,6 @@ TXFORM=L4943
 {width:95}
 #OOFacmNo=額度
 {width:95}
-! #OOBormNo=撥款
-! {width:95}
 #OOPrevIntDate=繳息迄日
 {width:95}
 #OOPayIntDate=應繳日
@@ -471,7 +465,7 @@ TXFORM=L4943
 #PostLimitAmt
 #SingleLimit
 %
-#OOEntryDate#OOCustNo#OOFacmNo#OOBormNo#OOPrevIntDate
+#OOEntryDate#OOCustNo#OOFacmNo#OOPrevIntDate
 #OORepayType#OORepayAmt#OOMediaCode#OOAcDate
 @^
 </sub>

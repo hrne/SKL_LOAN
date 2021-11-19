@@ -1,0 +1,170 @@
+----- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+
+![一段式/二段式/三段式]
+!#RELCD=_,_,S
+!E(0,1)
+
+!#ACTFG=_,_,S
+!E(0,1)
+
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD2.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="p1" layout="cols=1;screen.width=[180,950];printer.width=[20,150];">
+[
+["[L7210]                                 商品分類資料維護"],
+["#FdFuncCode+功能",#FuncCodeX],
+["#FdProdNo+商品代碼",#ProdNo,#ProdName],
+["#FdStartDate+商品生效日期",#StartDate],
+["#FdEndDate+商品截止日期",#EndDate],
+["#FdIfrsStepProdCode+IFRS階梯商品別",#IfrsStepProdCode,#IfrsStepProdCodeX],
+["#FdIfrsProdCode+IFRS產品別",#IfrsProdCode,#IfrsProdCodeX],
+]
+!---------- AP Button AREA ----------
+! 永遠為必輸欄位
+#FdFuncCode=X,2,L
+T(3, )
+#FdProdNo=X,2,L
+T(3, )
+#FdStartDate=X,2,L
+T(3, )
+#FdEndDate=X,2,L
+T(3, )
+#FdIfrsStepProdCode=X,2,L
+T(3, )
+#FdIfrsProdCode=X,2,L
+T(3,*)
+
+
+!---------- AP TEXT AREA Variables ----------
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+!FuncCode2(1:新增;2:修改;4:刪除)
+#CODEFuncCode2=x,20,S                  
+T(3,CdCode.FuncCode2)                  
+#FuncCode2Help=x,50,S 
+
+#CODEIFRSCODE=x,20,S                  
+T(3,CdCode.IfrsProdCode)                  
+#IfrsProdCode2Help=x,300,S 
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CODEFuncCode2,#CODEIFRSCODE)
+R(1,XXR99)
+CALL(#HelpProc)
+T(2,@FuncCode2Help,#HelpDesc1)
+T(2,@IfrsProdCode2Help,#HelpDesc2)
+
+#CHAIN=A,1,S
+T(4,CHAIN$)
+IF(#CHAIN!=1,V(P,此為連動交易，請從交易:L7903進入),$)
+
+!做完交易自動更新原畫面
+#AutoReFresh=A,1,S
+C(3,#CHAIN,1,$,S)
+E(0,1)
+ASGN(CAUTO$)
+
+#NTXBUF=X,143,S
+
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@FuncCode,#NTXBUF,1,1)
+T(1,@ProdNo,#NTXBUF,2,6)
+T(1,@ProdName,#NTXBUF,7,120)
+T(1,@StartDate,#NTXBUF,127,7)
+T(1,@EndDate,#NTXBUF,134,7)
+T(1,@IfrsStepProdCode,#NTXBUF,141,1)
+T(1,@IfrsProdCode,#NTXBUF,142,2)
+
+! 功能 必須輸入(1: 新增;2: 修改;4: 刪除)
+#FuncCode=A,1,S
+T(F,@FuncCode,0)
+C(3,#CHAIN,1,s,$)
+HELP(#FuncCode2Help)
+@V(H,#FuncCode2Help)
+
+#FuncCodeX=X,12,L
+T(H,#FuncCode,#FuncCode2Help)
+C(2,#FuncCode,$,K(MODIFYBUTTON,新增),K(MODIFYBUTTON,修改),$,K(MODIFYBUTTON,刪除))
+
+! IFRS階梯商品別下拉選單
+#IfrsStepProdCodeHelp=X,50,S
+T(3, :非階梯式;A:固定階梯;B:浮動階梯)
+
+! 商品代碼
+#ProdNo=X,5,L
+! 商品中文
+#ProdName=X,120,L
+! 商品生效日期
+#StartDate=D,7,L
+! 商品截止日期
+#EndDate=D,7,L
+! IFRS階梯商品別
+#IfrsStepProdCode=X,1,I
+HELP(#IfrsStepProdCodeHelp)
+@V(H,#IfrsStepProdCodeHelp)
+! IFRS階梯商品別中文
+#IfrsStepProdCodeX=X,10,L
+T(H,#IfrsStepProdCode,#IfrsStepProdCodeHelp)
+! IFRS產品別
+#IfrsProdCode=X,2,I
+HELP(#IfrsProdCode2Help)
+@V(H,#IfrsProdCode2Help)
+! IFRS產品別中文
+#IfrsProdCodeX=X,20,L
+T(H,#IfrsProdCode,#IfrsProdCode2Help)
+
+#RPTFG=A,1,S
+E(0,0)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!---------- TXFORM = L7210 ----------
+<sub type="FORM" name="L7210">
+
+#SCRPRT=_,_,S
+C(5,#TXFORM,L7210,$,S)
+
+</sub>
+
+
+!------ 上行電文 ------
+<sub type="TIM">
+#ProdNo#IfrsStepProdCode#IfrsProdCode
+#END
+</sub>
+
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+
+TXFORM=L7210
+
+^
+
+<include src="COM.icf::TRCTL.tom"/>
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

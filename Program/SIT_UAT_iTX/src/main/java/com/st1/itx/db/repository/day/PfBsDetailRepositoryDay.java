@@ -57,6 +57,9 @@ public interface PfBsDetailRepositoryDay extends JpaRepository<PfBsDetail, Long>
   // CustNo = ,AND FacmNo = ,AND BormNo = 
   public Slice<PfBsDetail> findAllByCustNoIsAndFacmNoIsAndBormNoIsOrderByPerfDateAsc(int custNo_0, int facmNo_1, int bormNo_2, Pageable pageable);
 
+  // DrawdownDate >= ,AND DrawdownDate <=
+  public Slice<PfBsDetail> findAllByDrawdownDateGreaterThanEqualAndDrawdownDateLessThanEqualOrderByDrawdownDateAsc(int drawdownDate_0, int drawdownDate_1, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)
