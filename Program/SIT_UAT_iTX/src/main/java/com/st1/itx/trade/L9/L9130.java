@@ -119,7 +119,15 @@ public class L9130 extends TradeBuffer {
 
 		tranL9132.run(titaVo);
 
-		String doL9133 = titaVo.containsKey("DoL9133") ? "N" : titaVo.getParam("DoL9133");
+		String doL9133 = "N";
+		
+	    if (titaVo.containsKey("DoL9133")){
+			this.info("titaVo.containsKey : DoL9133 , value = " + titaVo.getParam("DoL9133"));
+			doL9133 = titaVo.getParam("DoL9133");
+		}
+
+		this.info("doL9133 = " + doL9133);
+
 		if (doL9133.equals("Y")) {
 			tranL9133.run(titaVo);
 		}

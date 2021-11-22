@@ -3490,33 +3490,35 @@ C(3,#UpdateCode,1,RESET_RIM(#SendL2r11,L2R11),$)
 E(0,@RimApplNo,#L2r05ApplNo)
 S(L2R11,1,#RimTxCode,#RimApplNo)
 R(1,L2R11)
+##loop{times:20,n:1}
+T(2,@ClKey{n},#L2r11ClKey{n})
+E(0,@ClApplNo{n},#L2r11ApplNo{n})
+E(0,@ClClTypeCode{n},#L2r11ClTypeCode{n})
+T(2,@ClMainFlag{n},#L2r11MainFlag{n})
+E(0,@EvaAmt{n},#L2r11EvaAmt{n})
+T(2,@ClBdLocation{n},#L2r11BdLocation{n})
+##end
 
 ##loop{times:20,n:1}
 
 #ClKey{n}=X,12,L
-T(2,#L2r11ClKey{n})
 
 #ClApplNo{n}=A,7,L
-E(0,#L2r11ApplNo{n})
 
 #ClClTypeCode{n}=X,3,S
-E(0,#L2r11ClTypeCode{n})
 
 #ClClTypeCodeX{n}=X,2.50,L
 T(H,#ClClTypeCode{n},#ClTypeCodeHelp)
 
 #ClMainFlag{n}=X,1,L
-T(2,#L2r11MainFlag{n})
 
-#EvaAmt{n}=m,14.2,S
-E(0,#L2r11EvaAmt{n})
+#EvaAmt{n}=m,14.2,L
 
 #EvaAmtX{n}=X,22,L
 CALL2(#ADJUSTDOT,#Precision,#EvaAmt{n},#EvaAmtX{n})
 P(R,#EvaAmtX{n})
 
 #ClBdLocation{n}=X,2.50,L
-T(2,#L2r11BdLocation{n})
 
 #HIDECLSTEP{n}=X,1,S
 ! C(3,{n},1,S,$)

@@ -1,7 +1,10 @@
 package com.st1.itx.db.service.springjpa;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.math.BigDecimal;
+
 import javax.persistence.EntityManager;
 
 import org.springframework.beans.factory.InitializingBean;
@@ -355,6 +358,34 @@ em = null;
       slice = txDataLogReposHist.findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInAndCustNoIsAndFacmNoIsAndBormNoIsOrderByCreateDateDesc(txDate_0, txDate_1, tranNo_2, custNo_3, facmNo_4, bormNo_5, pageable);
     else 
       slice = txDataLogRepos.findAllByTxDateGreaterThanEqualAndTxDateLessThanEqualAndTranNoInAndCustNoIsAndFacmNoIsAndBormNoIsOrderByCreateDateDesc(txDate_0, txDate_1, tranNo_2, custNo_3, facmNo_4, bormNo_5, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
+  public Slice<TxDataLog> findByTranNo(String tranNo_0, String mrKey_1, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<TxDataLog> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("findByTranNo " + dbName + " : " + "tranNo_0 : " + tranNo_0 + " mrKey_1 : " +  mrKey_1);
+    if (dbName.equals(ContentName.onDay))
+      slice = txDataLogReposDay.findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(tranNo_0, mrKey_1, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = txDataLogReposMon.findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(tranNo_0, mrKey_1, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = txDataLogReposHist.findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(tranNo_0, mrKey_1, pageable);
+    else 
+      slice = txDataLogRepos.findAllByTranNoIsAndMrKeyIsOrderByCreateDateDesc(tranNo_0, mrKey_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);

@@ -1,4 +1,4 @@
-﻿----- BASIC LABEL Variables ----------
+﻿\----- BASIC LABEL Variables ----------
 <sub type="SYS">
 </sub>
 
@@ -53,6 +53,7 @@ K(MODIFYBUTTON,1,新增續保)
 ["#FdClCode1+擔保品代號１",#ClCode1,#ClCode1X],
 ["#FdClCode2+擔保品代號２",#ClCode2,#ClCode2X],
 ["#FdClNo+擔保品號碼",#ClNo],
+["#FdState+期間",#State,#StateX],
 ]
 
 #FdClCode1=X,2,L
@@ -60,6 +61,8 @@ T(3,*)
 #FdClCode2=X,2,L
 T(3,*)
 #FdClNo=X,2,L
+T(3,*)
+#FdState=X,2,L
 T(3,*)
 
 !---------- AP Button AREA ----------
@@ -111,6 +114,9 @@ T(3,0:新保;1:自保;2:續保)
 
 #ClCode1Help=x,1024,S
 T(3,1:房地;2:土地)
+
+#StateHelp=x,1024,S
+T(3,0:近三個月;9:全部)
 
 #CHAIN=A,1,S
 T(4,CHAIN$)
@@ -192,6 +198,13 @@ C(3,#CHAIN,0,$,s)
 ! 額度
 #FacmNo=A,3,S
 
+#State=A,1,I
+HELP(#StateHelp)
+@
+V(H,#StateHelp)
+
+#StateX=X,15,L
+T(H,#State,#StateHelp)
 
 #RPTFG=A,1,S
 
@@ -296,10 +309,7 @@ T(2,1+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
 T(2,6+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
  
 #OOBUFB_C=x,200,S
-T(2,2+#ClCode1+#ClCode2+#ClNo+3+#OOPrevInsuNo+#OONowInsuNo
-     +#OOInsuCompany+#OOInsuTypeCode+#OOFireInsuCovrgX
-     +#OOEthqInsuCovrgX+#OOFireInsuPremX+#OOEthqInsuPremX
-     +#OOInsuStartDate+#OOInsuEndDate+#OOEndoInsuNo)
+T(2,2+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo)
 
 #OOBUFB_M=x,50,S
 T(2,2+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
@@ -349,10 +359,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4610; ntxbuf=#OOBUFB_C}),
 BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUFB_M}))
 
 #OOBUF_DELETE_C=x,200,S
-T(2,4+#ClCode1+#ClCode2+#ClNo+3+#OOPrevInsuNo+#OONowInsuNo
-     +#OOInsuCompany+#OOInsuTypeCode+#OOFireInsuCovrgX
-     +#OOEthqInsuCovrgX+#OOFireInsuPremX+#OOEthqInsuPremX
-     +#OOInsuStartDate+#OOInsuEndDate+#OOEndoInsuNo)
+T(2,4+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo)
 
 #OOBUF_DELETE_M=x,50,S
 T(2,4+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
@@ -372,10 +379,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUF_DELETE_M})
 
 
 #OOBUF_C=x,200,S
-T(2,5+#ClCode1+#ClCode2+#ClNo+3+#OOPrevInsuNo+#OONowInsuNo
-     +#OOInsuCompany+#OOInsuTypeCode+#OOFireInsuCovrgX
-     +#OOEthqInsuCovrgX+#OOFireInsuPremX+#OOEthqInsuPremX
-     +#OOInsuStartDate+#OOInsuEndDate+#OOEndoInsuNo)
+T(2,5+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo)
 	
 #OOBUF_M=x,50,S
 T(2,5+#ClCode1+#ClCode2+#ClNo+#OOPrevInsuNo+#OOEndoInsuNo+#OOSelfInsuCode)
@@ -397,6 +401,7 @@ BIND(grid,{ cmd=CHAIN; ntxcd=L4611; ntxbuf=#OOBUF_M})
 #ClNo
 #CustNo
 #FacmNo
+#State
 #END
 </sub>
 

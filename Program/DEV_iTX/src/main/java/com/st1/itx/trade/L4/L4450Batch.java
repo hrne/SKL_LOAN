@@ -119,6 +119,8 @@ public class L4450Batch extends TradeBuffer {
 	private HashMap<tmpBorm, Integer> relAcctBirthday = new HashMap<>();
 	private HashMap<tmpBorm, String> relAcctGender = new HashMap<>();
 	private HashMap<tmpBorm, String> repayAcctSeq = new HashMap<>();
+	private HashMap<tmpBorm, String> status = new HashMap<>();
+	private HashMap<tmpBorm, BigDecimal> limitAmt = new HashMap<>();
 
 //	皆取最小的
 	private HashMap<tmpBorm, BigDecimal> repAmtFacMap = new HashMap<>();
@@ -147,7 +149,6 @@ public class L4450Batch extends TradeBuffer {
 
 	private List<Map<String, String>> fnAllList = new ArrayList<>();
 	private List<BankDeductDtl> lBankDeductDtl = new ArrayList<BankDeductDtl>();
-	private BigDecimal limitAmt = BigDecimal.ZERO;
 
 //	由L4R11計算
 //	入帳日：預設值為會計日之下下營業日
@@ -240,8 +241,8 @@ public class L4450Batch extends TradeBuffer {
 						setFacmValue(fnAllList, i);
 
 						// 還款試算
-						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("F0")),
-								parse.stringToInteger(fnAllList.get(i).get("F1")), 1, titaVo); // 期款
+						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("CustNo")),
+								parse.stringToInteger(fnAllList.get(i).get("FacmNo")), 1, titaVo); // 期款
 
 						if (i % commitCnt == 0) {
 							this.batchTransaction.commit();
@@ -302,8 +303,8 @@ public class L4450Batch extends TradeBuffer {
 						setFacmValue(fnAllList, i);
 
 						// 還款試算
-						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("F0")),
-								parse.stringToInteger(fnAllList.get(i).get("F1")), iRepayType, titaVo); // 還款類別
+						doBatxCom(iEntryDate, parse.stringToInteger(fnAllList.get(i).get("CustNo")),
+								parse.stringToInteger(fnAllList.get(i).get("FacmNo")), iRepayType, titaVo); // 還款類別
 
 					}
 				}
@@ -691,12 +692,12 @@ public class L4450Batch extends TradeBuffer {
 			tBankDeductDtl.setAmlRsp(amlRsp);
 //			tmp.getPayIntDate() 需放入tempVo給AML檢核用
 
-			String failFlag = checkAcctAuth(tmp2, titaVo);
+			String failFlag = status.get(tmp2);
 
 			this.info("amlRsp ... " + amlRsp);
 			this.info("failFlag ... " + failFlag);
 			this.info("repAmtMap.get(tmp) ... " + repAmtMap.get(tmp));
-			this.info("limitAmt ... " + limitAmt);
+			this.info("limitAmt ... " + limitAmt.get(tmp2));
 
 			TempVo tTempVo = new TempVo();
 //			帳號授權檢核未過
@@ -710,7 +711,7 @@ public class L4450Batch extends TradeBuffer {
 			}
 //			扣款金額(by 額度)超過帳號設定限額(限額為零不檢查)
 			this.info("repAmtFacMap ..." + repAmtFacMap.get(tmp2));
-			if (limitAmt.compareTo(BigDecimal.ZERO) > 0 && repAmtFacMap.get(tmp2).compareTo(limitAmt) > 0) {
+			if (limitAmt.get(tmp2).compareTo(BigDecimal.ZERO) > 0 && repAmtFacMap.get(tmp2).compareTo(limitAmt.get(tmp2)) > 0) {
 				tTempVo.putParam("Deduct", "超過帳戶限額");
 			}
 			// 火險單
@@ -839,31 +840,35 @@ public class L4450Batch extends TradeBuffer {
 
 //	設定變數值
 	private void setFacmValue(List<Map<String, String>> fnAllList, int i) throws LogicException {
-		int custNo = parse.stringToInteger(fnAllList.get(i).get("F0"));
-		int facmNo = parse.stringToInteger(fnAllList.get(i).get("F1"));
+		int custNo = parse.stringToInteger(fnAllList.get(i).get("CustNo"));
+		int facmNo = parse.stringToInteger(fnAllList.get(i).get("FacmNo"));
 
 		tmpBorm tmp2 = new tmpBorm(custNo, facmNo, 0, 0, 0);
 
 		if (!acctCode.containsKey(tmp2))
-			acctCode.put(tmp2, fnAllList.get(i).get("F3"));
+			acctCode.put(tmp2, fnAllList.get(i).get("AcctCode"));
 		if (!repayBank.containsKey(tmp2))
-			repayBank.put(tmp2, fnAllList.get(i).get("F4"));
+			repayBank.put(tmp2, fnAllList.get(i).get("RepayBank"));
 		if (!repayAcct.containsKey(tmp2))
-			repayAcct.put(tmp2, fnAllList.get(i).get("F5"));
+			repayAcct.put(tmp2, fnAllList.get(i).get("RepayAcct"));
 		if (!postCode.containsKey(tmp2))
-			postCode.put(tmp2, fnAllList.get(i).get("F6"));
+			postCode.put(tmp2, fnAllList.get(i).get("PostDepCode"));
 		if (!relationCode.containsKey(tmp2))
-			relationCode.put(tmp2, fnAllList.get(i).get("F7"));
+			relationCode.put(tmp2, fnAllList.get(i).get("RelationCode"));
 		if (!relationName.containsKey(tmp2))
-			relationName.put(tmp2, fnAllList.get(i).get("F8"));
+			relationName.put(tmp2, fnAllList.get(i).get("RelAcctName"));
 		if (!relationId.containsKey(tmp2))
-			relationId.put(tmp2, fnAllList.get(i).get("F9"));
+			relationId.put(tmp2, fnAllList.get(i).get("RelationId"));
 		if (!relAcctBirthday.containsKey(tmp2))
-			relAcctBirthday.put(tmp2, parse.stringToInteger(fnAllList.get(i).get("F10")));
+			relAcctBirthday.put(tmp2, parse.stringToInteger(fnAllList.get(i).get("RelAcctBirthday")));
 		if (!relAcctGender.containsKey(tmp2))
-			relAcctGender.put(tmp2, fnAllList.get(i).get("F11"));
+			relAcctGender.put(tmp2, fnAllList.get(i).get("RelAcctGender"));
 		if (!repayAcctSeq.containsKey(tmp2))
-			repayAcctSeq.put(tmp2, fnAllList.get(i).get("F12"));
+			repayAcctSeq.put(tmp2, fnAllList.get(i).get("AcctSeq"));
+		if (!status.containsKey(tmp2))
+			status.put(tmp2, fnAllList.get(i).get("Status"));
+		if (!limitAmt.containsKey(tmp2))
+			limitAmt.put(tmp2, parse.stringToBigDecimal(fnAllList.get(i).get("LimitAmt")));
 	}
 
 	// 未到期約定還本金額
@@ -881,31 +886,6 @@ public class L4450Batch extends TradeBuffer {
 		}
 
 		return bookAmt;
-	}
-
-	private String checkAcctAuth(tmpBorm tmp2, TitaVo titaVo) {
-		String failFlag = " ";
-		limitAmt = BigDecimal.ZERO;
-		BankAuthAct tBankAuthAct = new BankAuthAct();
-		BankAuthActId tBankAuthActId = new BankAuthActId();
-
-		tBankAuthActId.setCustNo(tmp2.getCustNo());
-		tBankAuthActId.setFacmNo(tmp2.getFacmNo());
-
-		if ("700".equals(repayBank.get(tmp2))) {
-			tBankAuthActId.setAuthType("01");
-		} else {
-			tBankAuthActId.setAuthType("00");
-		}
-
-		tBankAuthAct = bankAuthActService.findById(tBankAuthActId, titaVo);
-
-		if (tBankAuthAct != null) {
-			failFlag = tBankAuthAct.getStatus();
-			limitAmt = tBankAuthAct.getLimitAmt();
-		}
-
-		return failFlag;
 	}
 
 //	暫時紀錄戶號額度

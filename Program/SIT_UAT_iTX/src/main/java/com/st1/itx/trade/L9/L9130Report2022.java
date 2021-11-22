@@ -10,8 +10,6 @@ import java.util.Map;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -44,7 +42,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Component("L9130Report2022")
 @Scope("prototype")
 public class L9130Report2022 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L9130Report2022.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -184,22 +181,21 @@ public class L9130Report2022 extends MakeReport {
 		// no 檔案編號
 		String no = "L9130";
 		// desc 檔案說明
-		String desc = "核心傳票媒體檔";
+		String desc = "總帳傳票媒體檔";
 
 		// 檔名編碼方式
 		// 固定值 核心傳票媒體上傳序號
 		// jori 999
 
 		// name 輸出檔案名稱
-		String name = "jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
+		String name = "總帳傳票媒體檔_jori" + FormatUtil.pad9("" + iMediaSeq, 3) + ".csv";
 
 		// format 輸出檔案格式 1.UTF8 2.BIG5
 		int format = 2;
 
 		makeFile.open(titaVo, date, brno, no, desc, name, format);
 
-		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo,
-				iMediaSeq, 0, Integer.MAX_VALUE, titaVo);
+		Slice<SlipMedia2022> sSlipMedia2022 = sSlipMedia2022Service.findMediaSeq(iAcDate + 19110000, iBatchNo, iMediaSeq, 0, Integer.MAX_VALUE, titaVo);
 
 		if (sSlipMedia2022 != null && !sSlipMedia2022.isEmpty()) {
 			// 若已存在,將該筆舊傳票刪除

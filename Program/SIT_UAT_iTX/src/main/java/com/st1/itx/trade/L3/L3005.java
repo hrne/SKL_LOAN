@@ -81,6 +81,8 @@ public class L3005 extends TradeBuffer {
 		int iEntryDate = this.parse.stringToInteger(titaVo.getParam("EntryDate"));
 		int iTitaHCode = this.parse.stringToInteger(titaVo.getParam("TitaHCode"));
 
+		int iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
+		
 		// work area
 		int wkFacmNoStart = 0;
 		int wkFacmNoEnd = 999;
@@ -159,6 +161,11 @@ public class L3005 extends TradeBuffer {
 		this.totaVo.putParam("OShortfall", baTxCom.getShortfall());
 		this.totaVo.putParam("OCurrencyCode", wkCurrencyCode);
 
+		
+		if(iCustDataCtrl == 1) {
+			this.totaVo.putParam("OCustNo", "");
+		}
+		
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 

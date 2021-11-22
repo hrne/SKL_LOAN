@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -28,12 +30,7 @@ import com.st1.itx.Exception.LogicException;
 public class PostAuthLogHistory implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 3330579967690334568L;
-
-// 序號
+  // 序號
   @Id
   @Column(name = "`LogNo`")
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "`PostAuthLogHistory_SEQ`")

@@ -89,8 +89,8 @@ public class DataLog extends CommBuffer {
 		HashMap<String, String> columnMap = new HashMap<String, String>();
 
 		try {
-			List<HashMap<String, String>> lTableColumnVo = tableColumnServiceImpl.findAll(objectName);
-			for (HashMap<String, String> tVo : lTableColumnVo) {
+			List<Map<String, String>> lTableColumnVo = tableColumnServiceImpl.findAll(objectName);
+			for (Map<String, String> tVo : lTableColumnVo) {
 //				this.info("Vo = " + tVo.get("F0") + "/" + tVo.get("F1") + "/" + tVo.get("F2"));
 				columnMap.put(tVo.get("F1").toLowerCase(), tVo.get("F2"));
 			}
@@ -140,6 +140,8 @@ public class DataLog extends CommBuffer {
 
 		}
 		txDataLog.setBormNo(BormNo);
+
+		txDataLog.setMrKey(this.titaVo.get("MRKEY").trim());
 
 		List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
 
@@ -273,8 +275,8 @@ public class DataLog extends CommBuffer {
 						if (oldValue instanceof BigDecimal && (((BigDecimal) oldValue).compareTo((BigDecimal) newValue) == 0))
 							continue;
 
-						valueMap.put("oldValue", oldValue);
-						valueMap.put("newValue", newValue);
+						valueMap.put("oldValue", oldValue.toString());
+						valueMap.put("newValue", newValue.toString());
 
 						map.put(name, valueMap);
 
@@ -282,7 +284,9 @@ public class DataLog extends CommBuffer {
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			StringWriter errors = new StringWriter();
+			e.printStackTrace(new PrintWriter(errors));
+			this.error(errors.toString());
 		}
 
 		return map;

@@ -77,21 +77,21 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 //		20210412 b.NextPayIntDate <= nextPayIntDate edited
 
-		String sql = "  select                                                          ";
-		sql += "  b.\"CustNo\"                                               AS F0       ";
-		sql += " ,b.\"FacmNo\"                                               AS F1       ";
-		sql += " ,b.\"BormNo\"                                               AS F2       ";
-		sql += " ,NVL(f.\"AcctCode\",' ')                                    AS F3       ";
-		sql += " ,NVL(ba.\"RepayBank\",' ')                                  AS F4       ";
-		sql += " ,NVL(ba.\"RepayAcct\",' ')                                  AS F5       ";
-		sql += " ,NVL(ba.\"PostDepCode\",' ')                                AS F6       ";
-		sql += " ,NVL(p.\"RelationCode\",NVL(a.\"RelationCode\",' '))        AS F7       ";
-		sql += " ,NVL(p.\"RelAcctName\",NVL(a.\"RelAcctName\",' '))          AS F8       ";
-		sql += " ,NVL(p.\"RelationId\",NVL(a.\"RelationId\",' '))            AS F9       ";
-		sql += " ,NVL(p.\"RelAcctBirthday\",NVL(a.\"RelAcctBirthday\", 0))   AS F10      ";
-		sql += " ,NVL(p.\"RelAcctGender\",NVL(a.\"RelAcctGender\",' '))      AS F11      ";
-		sql += " ,NVL(ba.\"AcctSeq\",' ')                                    AS F12      ";
-		sql += " ,NVL(ba.\"Status\",' ')                                     AS F13      ";
+		String sql = "  select                                                           ";
+		sql += "  b.\"CustNo\"                                               AS \"CustNo\"          ";
+		sql += " ,b.\"FacmNo\"                                               AS \"FacmNo\"          ";
+		sql += " ,b.\"BormNo\"                                               AS \"BormNo\"          ";
+		sql += " ,NVL(f.\"AcctCode\",' ')                                    AS \"AcctCode\"        ";
+		sql += " ,NVL(ba.\"RepayBank\",' ')                                  AS \"RepayBank\"       ";
+		sql += " ,NVL(ba.\"RepayAcct\",' ')                                  AS \"RepayAcct\"       ";
+		sql += " ,NVL(ba.\"PostDepCode\",' ')                                AS \"PostDepCode\"     ";
+		sql += " ,NVL(p.\"RelationCode\",NVL(a.\"RelationCode\",' '))        AS \"RelationCode\"    ";
+		sql += " ,NVL(p.\"RelAcctName\",NVL(a.\"RelAcctName\",' '))          AS \"RelAcctName\"     ";
+		sql += " ,NVL(p.\"RelationId\",NVL(a.\"RelationId\",' '))            AS \"RelationId\"      ";
+		sql += " ,NVL(p.\"RelAcctBirthday\",NVL(a.\"RelAcctBirthday\", 0))   AS \"RelAcctBirthday\" ";
+		sql += " ,NVL(p.\"RelAcctGender\",NVL(a.\"RelAcctGender\",' '))      AS \"RelAcctGender\"   ";
+		sql += " ,NVL(ba.\"AcctSeq\",' ')                                    AS \"AcctSeq\"         ";
+		sql += " ,NVL(ba.\"Status\",' ')                                     AS \"Status\"          ";
 		sql += "  from \"LoanBorMain\" b                                                 ";
 		sql += "  left join \"FacMain\" f on f.\"CustNo\" = b.\"CustNo\"                 ";
 		sql += "                      and f.\"FacmNo\" = b.\"FacmNo\"                    ";
@@ -101,8 +101,8 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "  left join (                                                            ";
 		sql += "   select                                                                ";
 		sql += "    \"CustNo\"                                                           ";
-		sql += "   ,\"AuthCode\"                                                           ";
-		sql += "   ,\"PostDepCode\"                                                        ";
+		sql += "   ,\"AuthCode\"                                                         ";
+		sql += "   ,\"PostDepCode\"                                                      ";
 		sql += "   ,\"RepayAcct\"                                                        ";
 		sql += "   ,\"RelationCode\"                                                     ";
 		sql += "   ,\"RelAcctName\"                                                      ";
@@ -133,9 +133,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "                            and  a.\"RepayAcct\"    = ba.\"RepayAcct\"   ";
 		sql += "                            and  a.seq = 1                 ";
 		sql += "  where b.\"Status\"= 0                                    ";
-// 未到期按應繳日，已到期按到期日
-		sql += "    and (   (b.\"MaturityDate\" >  " + nextPayIntDate + " and  b.\"NextPayIntDate\" <= "  + nextPayIntDate + ")" ;
-		sql += "         or (b.\"MaturityDate\" <= " + nextPayIntDate + " and  b.\"MaturityDate\"   <= "  + nextPayIntDate + ") )" ;
+		sql += "    and b.\"NextPayIntDate\" <= " + nextPayIntDate;
 //		追加逾期
 		sql += "    and b.\"NextPayIntDate\" >= " + iDeductDate;
 		sql += "    and f.\"RepayCode\" = 2                                ";
@@ -159,14 +157,17 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    and case                                               ";
 		sql += "         when ba.\"RepayBank\" = 700                      ";
 		sql += "           then case                                        ";
-		sql += "                 when substr(b.\"NextPayIntDate\",-2,2) IN ( '" + iPostSpecificDd + "' , '" + iPostSecondSpecificDd + "') ";
+		sql += "                 when substr(b.\"NextPayIntDate\",-2,2) IN ( '" + iPostSpecificDd + "' , '"
+				+ iPostSecondSpecificDd + "') ";
 		sql += "                 then 1                                    ";
 		sql += "                    else 0                                 ";
 		sql += "               end                                         ";
 		sql += "         else case                                          ";
-		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSpecificDdFrom + " and " + iAchSpecificDdTo;
+		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSpecificDdFrom + " and "
+				+ iAchSpecificDdTo;
 		sql += "               then 1                                      ";
-		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSecondSpecificDdFrom + " and " + iAchSecondSpecificDdTo;
+		sql += "               when substr(b.\"NextPayIntDate\",-2,2) between " + iAchSecondSpecificDdFrom + " and "
+				+ iAchSecondSpecificDdTo;
 		sql += "               then 1                                      ";
 		sql += "                  else 0                                   ";
 		sql += "             end                                           ";
@@ -183,24 +184,24 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findSingle(TitaVo titaVo) throws Exception {
 		int custNo = Integer.parseInt(titaVo.getParam("CustNo").trim());
 		int facmNo = Integer.parseInt(titaVo.getParam("FacmNo").trim());
-		int bormNo = Integer.parseInt(titaVo.getParam("BormNo").trim());
 		int entryDate = Integer.parseInt(titaVo.getParam("EntryDate")) + 19110000;
 		int repayType = Integer.parseInt(titaVo.getParam("RepayType")); // 還款類別
 		String sql = "  select                                                          ";
-		sql += "  b.\"CustNo\"                                               AS F0       ";
-		sql += " ,b.\"FacmNo\"                                               AS F1       ";
-		sql += " ,b.\"BormNo\"                                               AS F2       ";
-		sql += " ,NVL(f.\"AcctCode\",' ')                                    AS F3       ";
-		sql += " ,NVL(ba.\"RepayBank\",' ')                                  AS F4       ";
-		sql += " ,NVL(ba.\"RepayAcct\",' ')                                  AS F5       ";
-		sql += " ,NVL(ba.\"PostDepCode\",' ')                                AS F6       ";
-		sql += " ,NVL(p.\"RelationCode\",NVL(a.\"RelationCode\",' '))        AS F7       ";
-		sql += " ,NVL(p.\"RelAcctName\",NVL(a.\"RelAcctName\",' '))          AS F8       ";
-		sql += " ,NVL(p.\"RelationId\",NVL(a.\"RelationId\",' '))            AS F9       ";
-		sql += " ,NVL(p.\"RelAcctBirthday\",NVL(a.\"RelAcctBirthday\", 0))   AS F10      ";
-		sql += " ,NVL(p.\"RelAcctGender\",NVL(a.\"RelAcctGender\",' '))      AS F11      ";
-		sql += " ,NVL(ba.\"AcctSeq\",' ')                                    AS F12      ";
-		sql += " ,NVL(ba.\"Status\",' ')                                     AS F13      ";
+		sql += "  b.\"CustNo\"                                               AS \"CustNo\"          ";
+		sql += " ,b.\"FacmNo\"                                               AS \"FacmNo\"          ";
+		sql += " ,b.\"BormNo\"                                               AS \"BormNo\"          ";
+		sql += " ,NVL(f.\"AcctCode\",' ')                                    AS \"AcctCode\"        ";
+		sql += " ,NVL(ba.\"RepayBank\",' ')                                  AS \"RepayBank\"       ";
+		sql += " ,NVL(ba.\"RepayAcct\",' ')                                  AS \"RepayAcct\"       ";
+		sql += " ,NVL(ba.\"PostDepCode\",' ')                                AS \"PostDepCode\"     ";
+		sql += " ,NVL(p.\"RelationCode\",NVL(a.\"RelationCode\",' '))        AS \"RelationCode\"    ";
+		sql += " ,NVL(p.\"RelAcctName\",NVL(a.\"RelAcctName\",' '))          AS \"RelAcctName\"     ";
+		sql += " ,NVL(p.\"RelationId\",NVL(a.\"RelationId\",' '))            AS \"RelationId\"      ";
+		sql += " ,NVL(p.\"RelAcctBirthday\",NVL(a.\"RelAcctBirthday\", 0))   AS \"RelAcctBirthday\" ";
+		sql += " ,NVL(p.\"RelAcctGender\",NVL(a.\"RelAcctGender\",' '))      AS \"RelAcctGender\"   ";
+		sql += " ,NVL(ba.\"AcctSeq\",' ')                                    AS \"AcctSeq\"         ";
+		sql += " ,NVL(ba.\"Status\",' ')                                     AS \"Status\"          ";
+		sql += " ,NVL(ba.\"LimitAmt\",0)                                     AS \"LimitAmt\"        ";
 		sql += "  from \"LoanBorMain\" b                                                 ";
 		sql += "  left join \"FacMain\" f on f.\"CustNo\" = b.\"CustNo\"                 ";
 		sql += "                      and f.\"FacmNo\" = b.\"FacmNo\"                    ";
@@ -248,10 +249,6 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "    and b.\"FacmNo\"= " + facmNo;
 		}
 
-		if (bormNo > 0) {
-			sql += "    and b.\"BormNo\"= " + bormNo;
-		}
-
 		if (repayType == 1) {
 			sql += "    and b.\"Status\"= 0                                    ";
 			sql += "    and b.\"NextPayIntDate\" <= " + entryDate;
@@ -267,7 +264,7 @@ public class L4450ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "        end = 1                                            ";
 		}
 
-		sql += "   order by \"F4\",\"F3\",\"F0\",\"F1\",\"F2\"                              ";
+		sql += "   order by \"RepayBank\",\"AcctCode\",\"CustNo\",\"FacmNo\",\"BormNo\"    ";
 
 		this.info("sql=" + sql);
 

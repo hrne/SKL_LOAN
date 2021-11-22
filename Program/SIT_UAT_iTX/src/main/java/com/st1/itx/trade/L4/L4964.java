@@ -78,7 +78,8 @@ public class L4964 extends TradeBuffer {
 		int clCode1 = parse.stringToInteger(titaVo.getParam("ClCode1"));
 		int clCode2 = parse.stringToInteger(titaVo.getParam("ClCode2"));
 		int clNo = parse.stringToInteger(titaVo.getParam("ClNo"));
-
+		int State = parse.stringToInteger(titaVo.getParam("State"));
+		
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
@@ -148,47 +149,94 @@ public class L4964 extends TradeBuffer {
 
 				// 自保、修改、刪除
 				this.info("tInsuRenew.getInsuEndDate : " + tInsuRenew.getInsuEndDate());
-				if (tInsuRenew.getInsuEndDate() >= threeMonthsB4Date && tInsuRenew.getAcDate() != 0) {
-					OccursList occursList = new OccursList();
+				
+				if(State == 9) {
+					if (tInsuRenew.getAcDate() != 0) {
+					  OccursList occursList = new OccursList();
 
-					occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
-					occursList.putParam("OOEndoInsuNo", tInsuRenew.getEndoInsuNo());
-					occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
-					occursList.putParam("OOSelfInsuCode", selfInsuCode);
-					occursList.putParam("OOBdLocation", bdLocation);
-					occursList.putParam("OOInsuCompany", tInsuRenew.getInsuCompany());
-					occursList.putParam("OOInsuStartDate", tInsuRenew.getInsuStartDate());
-					occursList.putParam("OOInsuEndDate", tInsuRenew.getInsuEndDate());
-					occursList.putParam("OOInsuTypeCode", tInsuRenew.getInsuTypeCode());
-					occursList.putParam("OOFireInsuCovrg", tInsuRenew.getFireInsuCovrg());
-					occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());
-					occursList.putParam("OOFireInsuPrem", tInsuRenew.getFireInsuPrem());
-					occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
-					occursList.putParam("OOInsuYearMonth", InsuYearMonth);
-					occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
-					/* 將每筆資料放入Tota的OcList */
-					this.totaVo.addOccursList(occursList);
-				} else if (tInsuRenew.getAcDate() == 0) {
-					OccursList occursList = new OccursList();
+					  occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
+					  occursList.putParam("OOEndoInsuNo", tInsuRenew.getEndoInsuNo());
+					  occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
+					  occursList.putParam("OOSelfInsuCode", selfInsuCode);
+					  occursList.putParam("OOBdLocation", bdLocation);
+					  occursList.putParam("OOInsuCompany", tInsuRenew.getInsuCompany());
+					  occursList.putParam("OOInsuStartDate", tInsuRenew.getInsuStartDate());
+					  occursList.putParam("OOInsuEndDate", tInsuRenew.getInsuEndDate());
+					  occursList.putParam("OOInsuTypeCode", tInsuRenew.getInsuTypeCode());
+					  occursList.putParam("OOFireInsuCovrg", tInsuRenew.getFireInsuCovrg());
+					  occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());
+					  occursList.putParam("OOFireInsuPrem", tInsuRenew.getFireInsuPrem());
+					  occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
+					  occursList.putParam("OOInsuYearMonth", InsuYearMonth);
+					  occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));	
+					  
+					  /* 將每筆資料放入Tota的OcList */
+					  this.totaVo.addOccursList(occursList);
+					} else if (tInsuRenew.getAcDate() == 0) {
+						OccursList occursList = new OccursList();
 
-					occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
-					occursList.putParam("OOEndoInsuNo", tInsuRenew.getEndoInsuNo());
-					occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
-					occursList.putParam("OOSelfInsuCode", selfInsuCode);
-					occursList.putParam("OOBdLocation", bdLocation);
-					occursList.putParam("OOInsuCompany", tInsuRenew.getInsuCompany());
-					occursList.putParam("OOInsuStartDate", tInsuRenew.getInsuStartDate());
-					occursList.putParam("OOInsuEndDate", tInsuRenew.getInsuEndDate());
-					occursList.putParam("OOInsuTypeCode", tInsuRenew.getInsuTypeCode());
-					occursList.putParam("OOFireInsuCovrg", tInsuRenew.getFireInsuCovrg());
-					occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());
-					occursList.putParam("OOFireInsuPrem", tInsuRenew.getFireInsuPrem());
-					occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
-					occursList.putParam("OOInsuYearMonth", InsuYearMonth);
-					occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
-					/* 將每筆資料放入Tota的OcList */
-					this.totaVo.addOccursList(occursList);
-				}
+						occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
+						occursList.putParam("OOEndoInsuNo", tInsuRenew.getEndoInsuNo());
+						occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
+						occursList.putParam("OOSelfInsuCode", selfInsuCode);
+						occursList.putParam("OOBdLocation", bdLocation);
+						occursList.putParam("OOInsuCompany", tInsuRenew.getInsuCompany());
+						occursList.putParam("OOInsuStartDate", tInsuRenew.getInsuStartDate());
+						occursList.putParam("OOInsuEndDate", tInsuRenew.getInsuEndDate());
+						occursList.putParam("OOInsuTypeCode", tInsuRenew.getInsuTypeCode());
+						occursList.putParam("OOFireInsuCovrg", tInsuRenew.getFireInsuCovrg());
+						occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());
+						occursList.putParam("OOFireInsuPrem", tInsuRenew.getFireInsuPrem());
+						occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
+						occursList.putParam("OOInsuYearMonth", InsuYearMonth);
+						occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
+						/* 將每筆資料放入Tota的OcList */
+						this.totaVo.addOccursList(occursList);
+					}
+				} else { // 近三個月
+					if (tInsuRenew.getInsuEndDate() >= threeMonthsB4Date && tInsuRenew.getAcDate() != 0) {
+						OccursList occursList = new OccursList();
+
+						occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
+						occursList.putParam("OOEndoInsuNo", tInsuRenew.getEndoInsuNo());
+						occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
+						occursList.putParam("OOSelfInsuCode", selfInsuCode);
+						occursList.putParam("OOBdLocation", bdLocation);
+						occursList.putParam("OOInsuCompany", tInsuRenew.getInsuCompany());
+						occursList.putParam("OOInsuStartDate", tInsuRenew.getInsuStartDate());
+						occursList.putParam("OOInsuEndDate", tInsuRenew.getInsuEndDate());
+						occursList.putParam("OOInsuTypeCode", tInsuRenew.getInsuTypeCode());
+						occursList.putParam("OOFireInsuCovrg", tInsuRenew.getFireInsuCovrg());
+						occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());
+						occursList.putParam("OOFireInsuPrem", tInsuRenew.getFireInsuPrem());
+						occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
+						occursList.putParam("OOInsuYearMonth", InsuYearMonth);
+						occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
+						/* 將每筆資料放入Tota的OcList */
+						this.totaVo.addOccursList(occursList);
+					} else if (tInsuRenew.getAcDate() == 0) {
+						OccursList occursList = new OccursList();
+
+						occursList.putParam("OOPrevInsuNo", tInsuRenew.getPrevInsuNo());
+						occursList.putParam("OOEndoInsuNo", tInsuRenew.getEndoInsuNo());
+						occursList.putParam("OONowInsuNo", tInsuRenew.getNowInsuNo());
+						occursList.putParam("OOSelfInsuCode", selfInsuCode);
+						occursList.putParam("OOBdLocation", bdLocation);
+						occursList.putParam("OOInsuCompany", tInsuRenew.getInsuCompany());
+						occursList.putParam("OOInsuStartDate", tInsuRenew.getInsuStartDate());
+						occursList.putParam("OOInsuEndDate", tInsuRenew.getInsuEndDate());
+						occursList.putParam("OOInsuTypeCode", tInsuRenew.getInsuTypeCode());
+						occursList.putParam("OOFireInsuCovrg", tInsuRenew.getFireInsuCovrg());
+						occursList.putParam("OOEthqInsuCovrg", tInsuRenew.getEthqInsuCovrg());
+						occursList.putParam("OOFireInsuPrem", tInsuRenew.getFireInsuPrem());
+						occursList.putParam("OOEthqInsuPrem", tInsuRenew.getEthqInsuPrem());
+						occursList.putParam("OOInsuYearMonth", InsuYearMonth);
+						occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
+						/* 將每筆資料放入Tota的OcList */
+						this.totaVo.addOccursList(occursList);
+					}
+				} // else 
+				
 			}
 		}
 		if (lInsuOrignal != null && lInsuOrignal.size() != 0) {
@@ -309,16 +357,8 @@ public class L4964 extends TradeBuffer {
 			this.setInsuCompany(insuCompany);
 		}
 
-		private String getOrignalInsuNo() {
-			return orignalInsuNo;
-		}
-
 		private void setOrignalInsuNo(String orignalInsuNo) {
 			this.orignalInsuNo = orignalInsuNo;
-		}
-
-		private String getInsuCompany() {
-			return insuCompany;
 		}
 
 		private void setInsuCompany(String insuCompany) {

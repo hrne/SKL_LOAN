@@ -1,6 +1,8 @@
 package com.st1.itx.db.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -25,12 +27,7 @@ import com.st1.itx.Exception.LogicException;
 public class TxDataLog implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 1402561364798157438L;
-
-@EmbeddedId
+  @EmbeddedId
   private TxDataLogId txDataLogId;
 
   // 會計日期
@@ -44,6 +41,10 @@ public class TxDataLog implements Serializable {
   // 明細序號
   @Column(name = "`TxSno`", insertable = false, updatable = false)
   private int txSno = 0;
+
+  // 交易編號/帳號
+  @Column(name = "`MrKey`", length = 20)
+  private String mrKey;
 
   // 交易人員
   @Column(name = "`TlrNo`", length = 6)
@@ -155,6 +156,25 @@ public class TxDataLog implements Serializable {
 	*/
   public void setTxSno(int txSno) {
     this.txSno = txSno;
+  }
+
+/**
+	* 交易編號/帳號<br>
+	* 
+	* @return String
+	*/
+  public String getMrKey() {
+    return this.mrKey == null ? "" : this.mrKey;
+  }
+
+/**
+	* 交易編號/帳號<br>
+	* 
+  *
+  * @param mrKey 交易編號/帳號
+	*/
+  public void setMrKey(String mrKey) {
+    this.mrKey = mrKey;
   }
 
 /**
@@ -369,8 +389,8 @@ public class TxDataLog implements Serializable {
 
   @Override
   public String toString() {
-    return "TxDataLog [txDataLogId=" + txDataLogId + ", tlrNo=" + tlrNo + ", tranNo=" + tranNo + ", custNo=" + custNo
-           + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", reason=" + reason + ", content=" + content + ", createEmpNo=" + createEmpNo + ", createDate=" + createDate
-           + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
+    return "TxDataLog [txDataLogId=" + txDataLogId + ", mrKey=" + mrKey + ", tlrNo=" + tlrNo + ", tranNo=" + tranNo
+           + ", custNo=" + custNo + ", facmNo=" + facmNo + ", bormNo=" + bormNo + ", reason=" + reason + ", content=" + content + ", createEmpNo=" + createEmpNo
+           + ", createDate=" + createDate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + ", lastUpdate=" + lastUpdate + "]";
   }
 }

@@ -2,6 +2,8 @@ package com.st1.itx.db.service;
 
 import java.util.List;
 
+import java.math.BigDecimal;
+
 import com.st1.itx.Exception.DBException;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.domain.TxDataLog;
@@ -163,6 +165,18 @@ public interface TxDataLogService {
    * @return Slice TxDataLog TxDataLog of List
    */
   public Slice<TxDataLog> findByCustNo7(int txDate_0, int txDate_1, List<String> tranNo_2, int custNo_3, int facmNo_4, int bormNo_5, int index, int limit, TitaVo... titaVo);
+
+  /**
+   * TranNo = ,AND MrKey = 
+   *
+   * @param tranNo_0 tranNo_0
+   * @param mrKey_1 mrKey_1
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice TxDataLog TxDataLog of List
+   */
+  public Slice<TxDataLog> findByTranNo(String tranNo_0, String mrKey_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By TxDataLog

@@ -2,6 +2,7 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.sql.Time;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.EntityListeners;
@@ -10,6 +11,8 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Column;
+import com.st1.itx.util.StaticTool;
+import com.st1.itx.Exception.LogicException;
 
 /**
  * CdBuildingCost 建築造價參考檔<br>
@@ -24,12 +27,7 @@ import javax.persistence.Column;
 public class CdBuildingCost implements Serializable {
 
 
-  /**
-	 * 
-	 */
-	private static final long serialVersionUID = 4332862392657527239L;
-
-@EmbeddedId
+  @EmbeddedId
   private CdBuildingCostId cdBuildingCostId;
 
   // 縣市代碼(地區別)
