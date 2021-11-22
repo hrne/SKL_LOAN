@@ -16,6 +16,7 @@ import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.repository.online.LoanBorMainRepository;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.eum.ContentName;
 import com.st1.itx.util.parse.Parse;
 
 @Service("L4943ServiceImpl")
@@ -87,27 +88,27 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 //		flag 0.Part 1.All
 		if (flag == 0) {
 			sql += " select                                                   ";
-			sql += "  BDD.\"EntryDate\"   AS F0                               ";
-			sql += " ,BDD.\"CustNo\"      AS F1                               ";
-			sql += " ,BDD.\"FacmNo\"      AS F2                               ";
-			sql += " ,BDD.\"PrevIntDate\" AS F4                               ";
-			sql += " ,BDD.\"PayIntDate\"  AS F5                               ";
-			sql += " ,BDD.\"RepayType\"   AS F6                               ";
-			sql += " ,BDD.\"UnpaidAmt\"   AS F7                               ";
-			sql += " ,BDD.\"TempAmt\"     AS F8                               ";
-			sql += " ,BDD.\"RepayAmt\"    AS F9                               ";
-			sql += " ,BDD.\"MediaCode\"   AS F10                              ";
-			sql += " ,BDD.\"AcDate\"      AS F11                              ";
-			sql += " ,BDD.\"JsonFields\"  AS F12                              ";
-			sql += " ,BDD.\"ReturnCode\"  AS F13                              ";
-			sql += " ,BDD.\"MediaKind\"   AS F14                              ";
-			sql += " ,BDD.\"AmlRsp\"      AS F15                              ";
+			sql += "  BDD.\"EntryDate\"   AS \"EntryDate\"                    ";
+			sql += " ,BDD.\"CustNo\"      AS \"CustNo\"                       ";
+			sql += " ,BDD.\"FacmNo\"      AS \"FacmNo\"                       ";
+			sql += " ,BDD.\"PrevIntDate\" AS \"PrevIntDate\"                  ";
+			sql += " ,BDD.\"PayIntDate\"  AS \"PayIntDate\"                   ";
+			sql += " ,BDD.\"RepayType\"   AS \"RepayType\"                    ";
+			sql += " ,BDD.\"UnpaidAmt\"   AS \"UnpaidAmt\"                    ";
+			sql += " ,BDD.\"TempAmt\"     AS \"TempAmt\"                      ";
+			sql += " ,BDD.\"RepayAmt\"    AS \"RepayAmt\"                     ";
+			sql += " ,BDD.\"MediaCode\"   AS \"MediaCode\"                    ";
+			sql += " ,BDD.\"AcDate\"      AS \"AcDate\"                       ";
+			sql += " ,BDD.\"JsonFields\"  AS \"JsonFields\"                   ";
+			sql += " ,BDD.\"ReturnCode\"  AS \"ReturnCode\"                   ";
+			sql += " ,BDD.\"MediaKind\"   AS \"MediaKind\"                    ";
+			sql += " ,BDD.\"AmlRsp\"      AS \"AmlRsp\"                       ";
 			sql += " from \"BankDeductDtl\" BDD                               ";
 		} else {
 			sql += " select                                                   ";
-			sql += "  SUM(BDD.\"UnpaidAmt\")   AS F0                          ";
-			sql += " ,SUM(BDD.\"TempAmt\")     AS F1                          ";
-			sql += " ,SUM(BDD.\"RepayAmt\")    AS F2                          ";
+			sql += "  SUM(BDD.\"UnpaidAmt\")   AS \"UnpaidAmt\"               ";
+			sql += " ,SUM(BDD.\"TempAmt\")     AS \"TempAmt\"                 ";
+			sql += " ,SUM(BDD.\"RepayAmt\")    AS \"RepayAmt\"                ";
 			sql += " from \"BankDeductDtl\" BDD                               ";
 		}
 		if (functionCode == 2) {
@@ -117,14 +118,14 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "     ,SUM(\"RepayAmt\") as \"RepayAmt\"                   ";
 			sql += "     from \"BankDeductDtl\"                               ";
 			sql += "     where \"RepayBank\" = 700                            ";
-			sql += "       and \"EntryDate\" >= " + entryDateFm;
-			sql += "       and \"EntryDate\" <= " + entryDateTo;
+			sql += "       and \"EntryDate\" >= :entryDateFm" ;
+			sql += "       and \"EntryDate\" <= :entryDateTo" ;
 			sql += "     group by \"CustNo\"                                  ";
 			sql += "     ) postLimit on postLimit.\"CustNo\" = BDD.\"CustNo\" ";
 
 		}
-		sql += " where BDD.\"EntryDate\" >= " + entryDateFm;
-		sql += "   and BDD.\"EntryDate\" <= " + entryDateTo;
+		sql += " where BDD.\"EntryDate\" >= :entryDateFm" ;
+		sql += "   and BDD.\"EntryDate\" <= :entryDateTo" ;
 		switch (repayBank) {
 		case "": // none
 			break;
@@ -134,7 +135,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql += "   and BDD.\"RepayBank\" <> 700 ";
 			break;
 		default:
-			sql += "   and BDD.\"RepayBank\" = " + repayBank;
+			sql += "   and BDD.\"RepayBank\" = :repayBank";
 			break;
 		}
 
@@ -154,19 +155,19 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		case 99:
 			break;
 		default:
-			sql += "   and BDD.\"RepayType\" = " + repayType;
+			sql += "   and BDD.\"RepayType\" = :repayType";
 			break;
 		}
 		switch (functionCode) {
 		case 1: // 戶號
-			sql += "   and BDD.\"CustNo\" = " + custNo;
+			sql += "   and BDD.\"CustNo\" = :custNo";
 			break;
 		case 2: // 上限金額
-			sql += "   and (postLimit.\"RepayAmt\" >= " + postLimitAmt;
-			sql += "        or BDD.\"RepayAmt\" >= " + singleLimitAmt + " )      ";
+			sql += "   and (postLimit.\"RepayAmt\" >= :postLimitAmt";
+			sql += "        or BDD.\"RepayAmt\" >= :singleLimitAmt" + " )      ";
 			break;
 		case 3: // 下限金額-
-			sql += "   and BDD.\"RepayAmt\" <= " + lowLimitAmt;
+			sql += "   and BDD.\"RepayAmt\" <= :lowLimitAmt";
 			break;
 		case 4: // 檢核不正常
 			sql += "   and case when BDD.\"AmlRsp\" in ('1','2') then 1 ";
@@ -197,9 +198,28 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
-
+		
+		query.setParameter("entryDateFm", entryDateFm);
+		query.setParameter("entryDateTo", entryDateTo);
+		if(!"".equals(repayBank) && !"999".equals(repayBank) && !"998".equals(repayBank)) {
+			query.setParameter("repayBank", repayBank);
+		}
+		
+		if(repayType != 0 && repayType != 99) {
+			query.setParameter("repayType", repayType);
+		}
+		
+		if(functionCode == 1) {
+			query.setParameter("custNo", custNo);
+		} else if(functionCode == 2) {
+			query.setParameter("postLimitAmt", postLimitAmt);
+			query.setParameter("singleLimitAmt", singleLimitAmt);
+		} else if(functionCode == 3) {
+			query.setParameter("lowLimitAmt", lowLimitAmt);
+		}
+		
 		cnt = query.getResultList().size();
 		this.info("Total cnt ..." + cnt);
 
@@ -218,7 +238,7 @@ public class L4943ServiceImpl extends ASpringJpaParm implements InitializingBean
 		size = result.size();
 		this.info("Total size ..." + size);
 
-		return this.convertToMap(result);
+		return this.convertToMap(query);
 	}
 
 	public List<Map<String, String>> findAll(int flag, int index, int limit, TitaVo titaVo) throws Exception {

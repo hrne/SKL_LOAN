@@ -316,10 +316,8 @@ public class L3100 extends TradeBuffer {
 
 		// 更新放款主檔
 		try {
-			tLoanBorMain.setLastUpdate(
-					parse.IntegerToSqlDateO(dDateUtil.getNowIntegerForBC(), dDateUtil.getNowIntegerTime()));
-			tLoanBorMain.setLastUpdateEmpNo(titaVo.getTlrNo());
-			loanBorMainService.update(tLoanBorMain);
+
+			loanBorMainService.update(tLoanBorMain,titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "撥款主檔 " + e.getErrorMsg()); // 更新資料時，發生錯誤
 		}
@@ -401,16 +399,16 @@ public class L3100 extends TradeBuffer {
 			tTxTemp.setText(tTempVo.getJsonString());
 
 			try {
-				txTempService.insert(tTxTemp);
+				txTempService.insert(tTxTemp,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
 			}
 			titaVo.putParam("BormNo", wkBormNo);
 			// 更新額度資料
-			if (tFacMain.getFirstDrawdownDate() == 0) {
+			if (tFacMain.getFirstDrawdownDate() == 0 || wkBormNo == 1) {
 				tFacMain.setFirstDrawdownDate(iDrawdownDate);
 			}
-			if (tFacMain.getMaturityDate() == 0) {
+			if (tFacMain.getMaturityDate() == 0 || wkBormNo == 1) {
 				tFacMain.setMaturityDate(iMaturityDate);
 			}
 		}
@@ -464,7 +462,7 @@ public class L3100 extends TradeBuffer {
 			tTxTemp.setText(tTempVo.getJsonString());
 			this.info("test 5 =" + tFacMain.getCompensateFlag());
 			try {
-				txTempService.insert(tTxTemp);
+				txTempService.insert(tTxTemp,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "交易暫存檔"); // 更新資料時，發生錯誤
 			}
@@ -472,10 +470,10 @@ public class L3100 extends TradeBuffer {
 			tFacMain.setUtilAmt(tFacMain.getUtilAmt().add(iDrawdownAmt));
 			tFacMain.setUtilBal(tFacMain.getUtilBal().add(iDrawdownAmt));
 
-			if (tFacMain.getFirstDrawdownDate() == 0) {
+			if (tFacMain.getFirstDrawdownDate() == 0 || wkBormNo == 1) {
 				tFacMain.setFirstDrawdownDate(iDrawdownDate);
 			}
-			if (tFacMain.getMaturityDate() == 0) {
+			if (tFacMain.getMaturityDate() == 0 || wkBormNo == 1) {
 				tFacMain.setMaturityDate(iMaturityDate);
 			}
 		}
@@ -486,7 +484,7 @@ public class L3100 extends TradeBuffer {
 
 		// 更新額度檔
 		try {
-			facMainService.update(tFacMain);
+			facMainService.update(tFacMain,titaVo);
 		} catch (DBException e) {
 			throw new LogicException(titaVo, "E0007", "額度主檔"); // 更新資料時，發生錯誤
 		}
@@ -502,7 +500,7 @@ public class L3100 extends TradeBuffer {
 			tLoanBorMain = new LoanBorMain();
 			moveLoanBorMain();
 			try {
-				loanBorMainService.insert(tLoanBorMain);
+				loanBorMainService.insert(tLoanBorMain,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E3009", "撥款檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
@@ -539,7 +537,7 @@ public class L3100 extends TradeBuffer {
 			tLoanBorMain = new LoanBorMain();
 			moveLoanBorMain();
 			try {
-				loanBorMainService.update(tLoanBorMain);
+				loanBorMainService.update(tLoanBorMain,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "撥款檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
@@ -566,7 +564,7 @@ public class L3100 extends TradeBuffer {
 			tTempVo.putParam("LastTxtNo", tLoanBorMain.getLastTxtNo());
 			tTxTemp.setText(tTempVo.getJsonString());
 			try {
-				txTempService.insert(tTxTemp);
+				txTempService.insert(tTxTemp,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "交易暫存檔 Key = " + tTxTempId); // 新增資料時，發生錯誤
 			}
@@ -577,7 +575,7 @@ public class L3100 extends TradeBuffer {
 			tLoanBorMain.setLastTlrNo(titaVo.getTlrNo());
 			tLoanBorMain.setLastTxtNo(titaVo.getTxtNo());
 			try {
-				loanBorMainService.update(tLoanBorMain);
+				loanBorMainService.update(tLoanBorMain,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", "撥款主檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
@@ -606,7 +604,7 @@ public class L3100 extends TradeBuffer {
 			tLoanBorMain.setLastTlrNo(tTempVo.get("LastTlrNo"));
 			tLoanBorMain.setLastTxtNo(tTempVo.get("LastTxtNo"));
 			try {
-				loanBorMainService.update(tLoanBorMain);
+				loanBorMainService.update(tLoanBorMain,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008",
 						"撥款主檔 戶號 = " + iCustNo + "額度編號 = " + iFacmNo + "撥款序號 = " + wkBormNo + e.getErrorMsg()); // 新增資料時，發生錯誤
@@ -686,7 +684,7 @@ public class L3100 extends TradeBuffer {
 			tLoanRateChangeId.setEffectDate(iDrawdownDate);
 			SetLoanRateChange1();
 			try {
-				loanRateChangeService.insert(tLoanRateChange);
+				loanRateChangeService.insert(tLoanRateChange,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "放款利率變動檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
@@ -726,13 +724,13 @@ public class L3100 extends TradeBuffer {
 				LoanRateChange t1LoanRateChange = loanRateChangeService.holdById(tLoanRateChangeId, titaVo);
 				if (t1LoanRateChange == null) {
 					try {
-						loanRateChangeService.insert(tLoanRateChange);
+						loanRateChangeService.insert(tLoanRateChange,titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0005", "放款利率變動檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
 				} else {
 					try {
-						loanRateChangeService.update(tLoanRateChange);
+						loanRateChangeService.update(tLoanRateChange,titaVo);
 					} catch (DBException e) {
 						throw new LogicException(titaVo, "E0007", "放款利率變動檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 					}
@@ -784,7 +782,7 @@ public class L3100 extends TradeBuffer {
 
 			moveLoanBorTx();
 			try {
-				loanBorTxService.insert(tLoanBorTx);
+				loanBorTxService.insert(tLoanBorTx,titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0005", "放款交易內容檔 " + e.getErrorMsg()); // 新增資料時，發生錯誤
 			}
@@ -829,7 +827,7 @@ public class L3100 extends TradeBuffer {
 			tAcReceivable.setAcctCode("F10"); // F10 帳管費
 			tAcReceivable.setCustNo(iCustNo);
 			tAcReceivable.setFacmNo(iFacmNo);
-			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3) + "-1");
+			tAcReceivable.setRvNo(FormatUtil.pad9(String.valueOf(wkBormNo), 3) );
 			tAcReceivable.setRvAmt(iAcctFee);
 			lAcReceivable.add(tAcReceivable);
 			acReceivableCom.setTxBuffer(this.getTxBuffer());

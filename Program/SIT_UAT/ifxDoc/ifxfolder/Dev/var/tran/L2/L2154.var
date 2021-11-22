@@ -1773,7 +1773,9 @@ C(3,#Precision,0,E(0,#TwApplAmt),E(0,#UsApplAmt))
 #AcctCode=A,3,I
 C(3,#UpdateCode,1,$,s)
 HELP(#FacmAcctCodeHelp)
-@V(H,#FacmAcctCodeHelp)
+@
+C(4,#L2r05AcctCode,$,C(5,#AcctCode,#L2r05AcctCode,s,$))
+V(H,#FacmAcctCodeHelp)
 C(3,#AcctCode,#L2r05AcctCode,$,C(3,#L2r05UtilAmt,0,$,V(P,尚有放款餘額，不可變更業務科目)))
 
 #AcctCodeX=X,20,L
@@ -1832,7 +1834,9 @@ C(3,#UpdateCode,1,$,s)
 C(3,#L2r01AmortizedCode,9,$,s)
 C(3,#Hide2Fg,0,CALL(#HideP2),$)
 HELP(#AmortizedCodeHelp)
-@V(H,#AmortizedCodeHelp)
+@
+C(4,#L2r05AmortizedCode,$,C(5,#AmortizedCode,#L2r05AmortizedCode,s,$))
+V(H,#AmortizedCodeHelp)
 C(3,#AcctCode,330,V(2,1),$)
 C(3,#AcctCode,340,V(2,1),$)
 !利率為0,攤還方式不可為本息平均法

@@ -71,7 +71,7 @@ public class L5R29 extends TradeBuffer {
 		boolean first = true;
 		BigDecimal perfAmt = new BigDecimal("0");
 		
-		if (lPfBsDetail != null || lPfBsDetail.size() > 0) {
+		if (lPfBsDetail != null && lPfBsDetail.size() > 0) {
 			for (PfBsDetail pfBsDetail : lPfBsDetail) {
 				if (pfBsDetail.getDrawdownAmt().compareTo(bigZero) <= 0) {
 					continue;

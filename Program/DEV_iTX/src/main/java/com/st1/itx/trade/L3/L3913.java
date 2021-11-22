@@ -50,6 +50,7 @@ public class L3913 extends TradeBuffer {
 		String iTellerNo = titaVo.getParam("TellerNo");
 		String iTxtNo = titaVo.getParam("TxtNo");
 
+		int iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
 		// 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 
@@ -77,6 +78,11 @@ public class L3913 extends TradeBuffer {
 
 		}
 
+		if(iCustDataCtrl == 1) {
+			this.totaVo.putParam("OCustNo", "");
+			this.totaVo.putParam("OCustName", "");
+		}
+		
 		for (LoanIntDetail tLoanIntDetail : lLoanIntDetail) {
 
 			OccursList occursList = new OccursList();

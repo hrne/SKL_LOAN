@@ -89,9 +89,9 @@ public class L4943 extends TradeBuffer {
 			throw new LogicException("E0013", e.getMessage());
 		}
 		if (resulAlltList != null && resulAlltList.size() > 0) {
-			totUnpaidAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("F0"));
-			totTempAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("F1"));
-			totRepayAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("F2"));
+			totUnpaidAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("UnpaidAmt"));
+			totTempAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("TempAmt"));
+			totRepayAmt = parse.stringToBigDecimal(resulAlltList.get(0).get("RepayAmt"));
 		}
 
 		if (functionCode == 6) {
@@ -111,10 +111,10 @@ public class L4943 extends TradeBuffer {
 			if (resulParttList != null && resulParttList.size() > 0) {
 
 				for (Map<String, String> result : resulParttList) {
-					int entryDate = parse.stringToInteger(result.get("F0"));
-					int prevIntDate = parse.stringToInteger(result.get("F4"));
-					int payIntDate = parse.stringToInteger(result.get("F5"));
-					int acDate = parse.stringToInteger(result.get("F11"));
+					int entryDate = parse.stringToInteger(result.get("EntryDate"));
+					int prevIntDate = parse.stringToInteger(result.get("PrevIntDate"));
+					int payIntDate = parse.stringToInteger(result.get("PayIntDate"));
+					int acDate = parse.stringToInteger(result.get("AcDate"));
 
 					if (entryDate > 19110000) {
 						entryDate = entryDate - 19110000;
@@ -132,22 +132,22 @@ public class L4943 extends TradeBuffer {
 					OccursList occursList = new OccursList();
 
 					occursList.putParam("OOEntryDate", entryDate);
-					occursList.putParam("OOCustNo", result.get("F1"));
-					occursList.putParam("OOFacmNo", result.get("F2"));
+					occursList.putParam("OOCustNo", result.get("CustNo"));
+					occursList.putParam("OOFacmNo", result.get("FacmNo"));
 					occursList.putParam("OOPrevIntDate", prevIntDate);
 					occursList.putParam("OOPayIntDate", payIntDate);
-					occursList.putParam("OORepayType", result.get("F6"));
-					occursList.putParam("OOUnpaidAmt", result.get("F7"));
-					occursList.putParam("OOTempAmt", result.get("F8"));
-					occursList.putParam("OORepayAmt", result.get("F9"));
-					occursList.putParam("OOMediaCode", result.get("F10"));
+					occursList.putParam("OORepayType", result.get("RepayType"));
+					occursList.putParam("OOUnpaidAmt", result.get("UnpaidAmt"));
+					occursList.putParam("OOTempAmt", result.get("TempAmt"));
+					occursList.putParam("OORepayAmt", result.get("RepayAmt"));
+					occursList.putParam("OOMediaCode", result.get("MediaCode"));
 					occursList.putParam("OOAcDate", acDate);
 					String procNote = "";
 					TempVo tempVo = new TempVo();
-					tempVo = tempVo.getVo(result.get("F12"));
-					String returnCode = result.get("F13");
-					String mediaKind = result.get("F14");
-					String amlRsp  = result.get("F15");
+					tempVo = tempVo.getVo(result.get("JsonFields"));
+					String returnCode = result.get("ReturnCode");
+					String mediaKind = result.get("MediaKind");
+					String amlRsp  = result.get("AmlRsp");
 					if (acDate > 0) {
 						if (tempVo.get("ProcStsCode") != null && tempVo.get("ProcStsCode").length() > 0) {
 							procNote = procStsCodeX(tempVo.get("ProcStsCode"), titaVo);

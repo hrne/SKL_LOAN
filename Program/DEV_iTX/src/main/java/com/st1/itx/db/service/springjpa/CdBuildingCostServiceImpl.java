@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.CdBuildingCostRepositoryHist;
 import com.st1.itx.db.service.CdBuildingCostService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -151,13 +152,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findCityCode " + dbName + " : " + "cityCode_0 : " + cityCode_0);
     if (dbName.equals(ContentName.onDay))
-      slice = cdBuildingCostReposDay.findAllByCityCodeIsOrderByFloorLowerLimitDesc(cityCode_0, pageable);
+      slice = cdBuildingCostReposDay.findAllByCityCodeIsOrderByFloorLowerLimitAsc(cityCode_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = cdBuildingCostReposMon.findAllByCityCodeIsOrderByFloorLowerLimitDesc(cityCode_0, pageable);
+      slice = cdBuildingCostReposMon.findAllByCityCodeIsOrderByFloorLowerLimitAsc(cityCode_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = cdBuildingCostReposHist.findAllByCityCodeIsOrderByFloorLowerLimitDesc(cityCode_0, pageable);
+      slice = cdBuildingCostReposHist.findAllByCityCodeIsOrderByFloorLowerLimitAsc(cityCode_0, pageable);
     else 
-      slice = cdBuildingCostRepos.findAllByCityCodeIsOrderByFloorLowerLimitDesc(cityCode_0, pageable);
+      slice = cdBuildingCostRepos.findAllByCityCodeIsOrderByFloorLowerLimitAsc(cityCode_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -209,7 +210,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + cdBuildingCost.getCdBuildingCostId());
     if (this.findById(cdBuildingCost.getCdBuildingCostId()) != null)
       throw new DBException(2);
@@ -238,7 +241,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + cdBuildingCost.getCdBuildingCostId());
     if (!empNot.isEmpty())
       cdBuildingCost.setLastUpdateEmpNo(empNot);
@@ -261,7 +266,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + cdBuildingCost.getCdBuildingCostId());
     if (!empNot.isEmpty())
       cdBuildingCost.setLastUpdateEmpNo(empNot);
@@ -311,7 +318,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdBuildingCost t : cdBuildingCost){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -345,7 +355,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (cdBuildingCost == null || cdBuildingCost.size() == 0)
       throw new DBException(6);

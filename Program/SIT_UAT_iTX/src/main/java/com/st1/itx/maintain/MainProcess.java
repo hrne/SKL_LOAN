@@ -510,22 +510,35 @@ public class MainProcess extends SysLogger {
 			}
 		}
 
-		if (tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && titaVo.getEmpNos().trim().isEmpty())
-			if (titaVo.getMrKey().trim().length() >= 7 && parse.isNumeric(titaVo.getMrKey().trim().substring(0, 7))) {
-				CustDataCtrl tCustDataCtrl = sCustDataCtrlService.findById(parse.stringToInteger(titaVo.getMrKey().trim().substring(0, 7)));
-				if (tCustDataCtrl != null && "Y".equals(tCustDataCtrl.getEnable()))
-					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "結清客戶個人資料控管戶");
-
+		if (txCom.isTxTypeInq() && tTxTranCode != null && tTxTranCode.getCustDataCtrlFg() == 1 && this.titaVo.getReason().isEmpty()) {
+			CustDataCtrl tCustDataCtrl = null;
+			if (titaVo.getMrKey().length() >= 7 && parse.isNumeric(titaVo.getMrKey().substring(0, 7))) {
+				tCustDataCtrl = sCustDataCtrlService.findById(parse.stringToInteger(titaVo.getMrKey().substring(0, 7)));
+//				if (tCustDataCtrl != null && "Y".equals(tCustDataCtrl.getEnable()))
+//					sendRsp.addvReason(this.txBuffer, titaVo, "0004", "結清客戶個人資料控管戶");
+//
 			} else {
 				if (titaVo.get("CustId") != null) {
 					CustMain custMain = custMainService.custIdFirst(titaVo.get("CustId").trim(), titaVo);
 					if (custMain != null) {
-						CustDataCtrl tCustDataCtrl = sCustDataCtrlService.findById(custMain.getCustNo());
-						if (tCustDataCtrl != null && "Y".equals(tCustDataCtrl.getEnable()))
-							sendRsp.addvReason(this.txBuffer, titaVo, "0004", "結清客戶個人資料控管戶");
+						tCustDataCtrl = sCustDataCtrlService.findById(custMain.getCustNo());
+//						if (tCustDataCtrl != null && "Y".equals(tCustDataCtrl.getEnable()))
+//							sendRsp.addvReason(this.txBuffer, titaVo, "0004", "結清客戶個人資料控管戶");
 					}
 				}
 			}
+			if (tCustDataCtrl != null) {
+				if (tCustDataCtrl.getApplMark() == 2) {
+					throw new LogicException("EC998", "查詢結清滿五年客戶資料");
+				} else if (tCustDataCtrl.getApplMark() == 1) {
+					if ("L3".equals(this.titaVo.getTxcd().substring(0, 2))) {
+						txCom.setCustDataCtrl(1);
+					} else {
+						throw new LogicException("E0015", "結清客戶已申請資料控管");
+					}
+				}
+			}
+		}
 
 		/*  */
 		if (titaVo.isHcodeErase() && txCom.getCanCancel() == 0) {

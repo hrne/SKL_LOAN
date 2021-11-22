@@ -23,6 +23,7 @@ import com.st1.itx.db.repository.hist.CustDataCtrlRepositoryHist;
 import com.st1.itx.db.service.CustDataCtrlService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -109,7 +110,7 @@ em = null;
   }
 
   @Override
-  public Slice<CustDataCtrl> findCustNo(int custNo_0, String enable_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<CustDataCtrl> findCustNo(int custNo_0, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<CustDataCtrl> slice = null;
     if (titaVo.length != 0)
@@ -120,15 +121,15 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0 + " enable_1 : " +  enable_1);
+    this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = custDataCtrlReposDay.findAllByCustNoIsAndEnableIs(custNo_0, enable_1, pageable);
+      slice = custDataCtrlReposDay.findAllByCustNoIs(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = custDataCtrlReposMon.findAllByCustNoIsAndEnableIs(custNo_0, enable_1, pageable);
+      slice = custDataCtrlReposMon.findAllByCustNoIs(custNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = custDataCtrlReposHist.findAllByCustNoIsAndEnableIs(custNo_0, enable_1, pageable);
+      slice = custDataCtrlReposHist.findAllByCustNoIs(custNo_0, pageable);
     else 
-      slice = custDataCtrlRepos.findAllByCustNoIsAndEnableIs(custNo_0, enable_1, pageable);
+      slice = custDataCtrlRepos.findAllByCustNoIs(custNo_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -208,7 +209,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + custDataCtrl.getCustNo());
     if (this.findById(custDataCtrl.getCustNo()) != null)
       throw new DBException(2);
@@ -237,7 +240,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + custDataCtrl.getCustNo());
     if (!empNot.isEmpty())
       custDataCtrl.setLastUpdateEmpNo(empNot);
@@ -260,7 +265,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + custDataCtrl.getCustNo());
     if (!empNot.isEmpty())
       custDataCtrl.setLastUpdateEmpNo(empNot);
@@ -310,7 +317,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CustDataCtrl t : custDataCtrl){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -344,7 +354,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (custDataCtrl == null || custDataCtrl.size() == 0)
       throw new DBException(6);

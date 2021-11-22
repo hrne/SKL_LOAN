@@ -82,6 +82,9 @@ public interface PostAuthLogHistoryRepositoryHist extends JpaRepository<PostAuth
   // AuthCreateDate = ,AND AuthApplCode = ,AND CustNo = ,AND PostDepCode = ,AND RepayAcct = ,AND AuthCode = 
   public Optional<PostAuthLogHistory> findTopByAuthCreateDateIsAndAuthApplCodeIsAndCustNoIsAndPostDepCodeIsAndRepayAcctIsAndAuthCodeIsOrderByLogNoDesc(int authCreateDate_0, String authApplCode_1, int custNo_2, String postDepCode_3, String repayAcct_4, String authCode_5);
 
+  // CustNo = ,AND FacmNo = ,AND AuthCode = 
+  public Slice<PostAuthLogHistory> findAllByCustNoIsAndFacmNoIsAndAuthCodeIs(int custNo_0, int facmNo_1, String authCode_2, Pageable pageable);
+
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
   @Transactional(readOnly = false)

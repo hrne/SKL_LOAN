@@ -1,9 +1,11 @@
 package com.st1.itx.util.common;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -120,7 +122,7 @@ public class CheckAuth extends CommBuffer {
 		txTellerAuthId.setAuthNo(authNo);
 
 		TxTellerAuth txTellerAuth = txTellerAuthService.findById(txTellerAuthId, titaVo);
-		
+
 		if (txTellerAuth == null) {
 			return checkAuthVo;
 		}
@@ -254,6 +256,33 @@ public class CheckAuth extends CommBuffer {
 		return false;
 	}
 
+	/**
+	 * 回覆交易可執行清單
+	 * @param txcd 交易代號
+	 * @return 有權限櫃員清單
+	 */
+	public List<Map<String, String>> canDoList(String txcd) throws LogicException {
+		
+		List<HashMap<String, Object>> listMap = new ArrayList<HashMap<String, Object>>();
+		
+		List<Map<String, String>> rList = null;
+
+		try {
+			rList = checkAuthServiceImpl.findCanDoList(txcd);
+		} catch (Exception e) {
+			// E5004 讀取DB時發生問題
+			this.info("CheckAuth ErrorForDB=" + e);
+			throw new LogicException(titaVo, "E0005", "");
+		}
+		
+//		if (rList != null && rList.size() > 0) {
+//			for (Map<String, String> d : rList) {
+//				this.info("CheckAuth.canDoList TlrNo = " + d.get("TlrNo") + " , AuthFg = " + d.get("AuthFg"));
+//			}			
+//		}
+		return rList;
+	}
+	
 	// TitaVo:ACTFG,FUNCIND
 
 	/**
@@ -287,8 +316,8 @@ public class CheckAuth extends CommBuffer {
 		checkAuthVo.setCanInquiry(false);
 
 		try {
-			List<HashMap<String, String>> lCheckAuthVo = checkAuthServiceImpl.findAll(tlrno, tranno);
-			for (HashMap<String, String> tVo : lCheckAuthVo) {
+			List<Map<String, String>> lCheckAuthVo = checkAuthServiceImpl.findAll(tlrno, tranno);
+			for (Map<String, String> tVo : lCheckAuthVo) {
 //				F0:"TlrNo\",F1:\"LevelFg\",F2:\"AuthNo\",F3:\"AuthFg\",F4:\"BeginDate\",F5:\"BeginTime\",f6:\"EndDate\",F7:\"EndTime\"
 				this.info("Vo = " + tVo.get("F0") + "/" + tVo.get("F1") + "/" + tVo.get("F2") + "/" + tVo.get("F3") + "/" + tVo.get("F4") + "/" + tVo.get("F5"));
 				if (actfg == 0) {

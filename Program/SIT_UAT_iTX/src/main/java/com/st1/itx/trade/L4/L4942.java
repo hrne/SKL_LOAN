@@ -60,14 +60,18 @@ public class L4942 extends TradeBuffer {
 
 		int custNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
+		String iAuthType = titaVo.getParam("AuthType");
 
 		// wk
 		String wkUser = "";
 
 		Slice<PostAuthLogHistory> sPostAuthLogHistory = null;
-
-		sPostAuthLogHistory = postAuthLogHistoryService.facmNoEq(custNo, facmNo, index, limit, titaVo);
-
+		if ("".equals(iAuthType)) {
+			sPostAuthLogHistory = postAuthLogHistoryService.facmNoEq(custNo, facmNo, index, limit, titaVo);
+		} else {
+			sPostAuthLogHistory = postAuthLogHistoryService.facmNoAuthCodeEq(custNo, facmNo, iAuthType, index, limit,
+					titaVo);
+		}
 		lPostAuthLogHistory = sPostAuthLogHistory == null ? null : sPostAuthLogHistory.getContent();
 
 		if (lPostAuthLogHistory != null && lPostAuthLogHistory.size() != 0) {
@@ -75,14 +79,14 @@ public class L4942 extends TradeBuffer {
 			for (PostAuthLogHistory tPostAuthLogHistory : lPostAuthLogHistory) {
 
 				String wkCreateFlag = tPostAuthLogHistory.getAuthApplCode();
-//				if (tPostAuthLogHistory.getDeleteDate() > 0) {
-////					1申請 2終止 9暫停
-//					if ("00".equals(tPostAuthLogHistory.getAuthErrorCode())) {
-//						wkCreateFlag = "9";
-//					} else {
-//						wkCreateFlag = "2";
-//					}
-//				}
+				if (tPostAuthLogHistory.getDeleteDate() > 0) {
+//					1申請 2終止 9暫停
+					if ("00".equals(tPostAuthLogHistory.getAuthErrorCode())) {
+						wkCreateFlag = "9";
+					} else {
+						wkCreateFlag = "2";
+					}
+				}
 				wkUser = tPostAuthLogHistory.getLastUpdateEmpNo();
 				CdEmp tCdEmp = cdEmpService.findById(wkUser, titaVo);
 				if (tCdEmp != null) {
@@ -96,7 +100,8 @@ public class L4942 extends TradeBuffer {
 					DateFormat sdftime = new SimpleDateFormat("HHmmss");
 
 					updateTime = sdftime.format(ts);
-					updateTime = updateTime.substring(0,2)+":"+updateTime.substring(2,4)+":"+updateTime.substring(4,6);
+					updateTime = updateTime.substring(0, 2) + ":" + updateTime.substring(2, 4) + ":"
+							+ updateTime.substring(4, 6);
 
 				}
 				this.info("updateTime = " + updateTime);

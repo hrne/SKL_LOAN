@@ -272,6 +272,19 @@ public interface PostAuthLogHistoryService {
   public PostAuthLogHistory authLogFirst(int authCreateDate_0, String authApplCode_1, int custNo_2, String postDepCode_3, String repayAcct_4, String authCode_5, TitaVo... titaVo);
 
   /**
+   * CustNo = ,AND FacmNo = ,AND AuthCode = 
+   *
+   * @param custNo_0 custNo_0
+   * @param facmNo_1 facmNo_1
+   * @param authCode_2 authCode_2
+   * @param index Page Index
+   * @param limit Page Data Limit
+   * @param titaVo Variable-Length Argument
+   * @return Slice PostAuthLogHistory PostAuthLogHistory of List
+   */
+  public Slice<PostAuthLogHistory> facmNoAuthCodeEq(int custNo_0, int facmNo_1, String authCode_2, int index, int limit, TitaVo... titaVo);
+
+  /**
    * hold By PostAuthLogHistory
    * 
    * @param logNo key

@@ -23,6 +23,7 @@ import com.st1.itx.db.repository.hist.PostAuthLogHistoryRepositoryHist;
 import com.st1.itx.db.service.PostAuthLogHistoryService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -606,6 +607,34 @@ em = null;
   }
 
   @Override
+  public Slice<PostAuthLogHistory> facmNoAuthCodeEq(int custNo_0, int facmNo_1, String authCode_2, int index, int limit, TitaVo... titaVo) {
+    String dbName = "";
+    Slice<PostAuthLogHistory> slice = null;
+    if (titaVo.length != 0)
+      dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
+     Pageable pageable = null;
+
+    if(limit == Integer.MAX_VALUE)
+			pageable = Pageable.unpaged();
+    else
+         pageable = PageRequest.of(index, limit);
+    this.info("facmNoAuthCodeEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " facmNo_1 : " +  facmNo_1 + " authCode_2 : " +  authCode_2);
+    if (dbName.equals(ContentName.onDay))
+      slice = postAuthLogHistoryReposDay.findAllByCustNoIsAndFacmNoIsAndAuthCodeIs(custNo_0, facmNo_1, authCode_2, pageable);
+    else if (dbName.equals(ContentName.onMon))
+      slice = postAuthLogHistoryReposMon.findAllByCustNoIsAndFacmNoIsAndAuthCodeIs(custNo_0, facmNo_1, authCode_2, pageable);
+    else if (dbName.equals(ContentName.onHist))
+      slice = postAuthLogHistoryReposHist.findAllByCustNoIsAndFacmNoIsAndAuthCodeIs(custNo_0, facmNo_1, authCode_2, pageable);
+    else 
+      slice = postAuthLogHistoryRepos.findAllByCustNoIsAndFacmNoIsAndAuthCodeIs(custNo_0, facmNo_1, authCode_2, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
+    return slice != null && !slice.isEmpty() ? slice : null;
+  }
+
+  @Override
   public PostAuthLogHistory holdById(Long logNo, TitaVo... titaVo) {
     String dbName = "";
     if (titaVo.length != 0)
@@ -649,7 +678,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + postAuthLogHistory.getLogNo());
     if (this.findById(postAuthLogHistory.getLogNo()) != null)
       throw new DBException(2);
@@ -678,7 +709,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + postAuthLogHistory.getLogNo());
     if (!empNot.isEmpty())
       postAuthLogHistory.setLastUpdateEmpNo(empNot);
@@ -701,7 +734,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + postAuthLogHistory.getLogNo());
     if (!empNot.isEmpty())
       postAuthLogHistory.setLastUpdateEmpNo(empNot);
@@ -751,7 +786,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (PostAuthLogHistory t : postAuthLogHistory){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -785,7 +823,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (postAuthLogHistory == null || postAuthLogHistory.size() == 0)
       throw new DBException(6);

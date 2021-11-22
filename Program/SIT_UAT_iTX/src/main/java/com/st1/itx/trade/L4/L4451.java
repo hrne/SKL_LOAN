@@ -122,7 +122,7 @@ public class L4451 extends TradeBuffer {
 		int entryDate = 0;
 		int custNo = 0;
 		int facmNo = 0;
-		int bormNo = 0;
+//		int bormNo = 0;
 		int payIntDate = 0;
 		int repayType = 0;
 
@@ -135,9 +135,9 @@ public class L4451 extends TradeBuffer {
 		if (titaVo.getParam("FacmNo") != null) {
 			facmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		}
-		if (titaVo.getParam("BormNo") != null) {
-			bormNo = parse.stringToInteger(titaVo.getParam("BormNo"));
-		}
+//		if (titaVo.getParam("BormNo") != null) {
+//			bormNo = parse.stringToInteger(titaVo.getParam("BormNo"));
+//		}
 		if (titaVo.getParam("PayIntDate") != null && parse.stringToInteger(titaVo.getParam("PayIntDate")) != 0) {
 			payIntDate = parse.stringToInteger(titaVo.getParam("PayIntDate")) + 19110000;
 		}
@@ -148,7 +148,7 @@ public class L4451 extends TradeBuffer {
 		this.info("EntryDate ..." + entryDate);
 		this.info("CustNo ..." + custNo);
 		this.info("FacmNo ..." + facmNo);
-		this.info("BormNo ..." + bormNo);
+//		this.info("BormNo ..." + bormNo);
 		this.info("PayIntDate ..." + payIntDate);
 		this.info("RepayType ..." + repayType);
 		// 新增

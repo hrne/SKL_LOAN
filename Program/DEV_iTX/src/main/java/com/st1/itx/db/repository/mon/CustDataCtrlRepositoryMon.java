@@ -21,8 +21,8 @@ import com.st1.itx.db.domain.CustDataCtrl;
  */
 public interface CustDataCtrlRepositoryMon extends JpaRepository<CustDataCtrl, Integer> {
 
-  // CustNo = ,AND Enable=
-  public Slice<CustDataCtrl> findAllByCustNoIsAndEnableIs(int custNo_0, String enable_1, Pageable pageable);
+  // CustNo = 
+  public Slice<CustDataCtrl> findAllByCustNoIs(int custNo_0, Pageable pageable);
 
   // CustUKey = 
   public Slice<CustDataCtrl> findAllByCustUKeyIs(String custUKey_0, Pageable pageable);

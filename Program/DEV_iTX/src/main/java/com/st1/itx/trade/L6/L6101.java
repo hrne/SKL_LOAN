@@ -55,32 +55,43 @@ public class L6101 extends TradeBuffer {
 
 	/* DB服務注入 */
 	@Autowired
-	public AcCloseService sAcCloseService;
+	AcCloseService sAcCloseService;
+	
 	@Autowired
-	public TxToDoMainService sTxToDoMainService;
+	TxToDoMainService sTxToDoMainService;
+	
 	@Autowired
-	public BatxHeadService sBatxHeadService;
+	BatxHeadService sBatxHeadService;
+	
 	@Autowired
-	public TxFlowService sTxFlowService;
+	TxFlowService sTxFlowService;
+	
 	@Autowired
 	CdWorkMonthService sCdWorkMonthService;
+	
 	@Autowired
-	public BankRemitService bankRemitService;
+	BankRemitService bankRemitService;
+	
 	@Autowired
 	DateUtil dDateUtil;
+	
 	@Autowired
 	Parse parse;
+	
 	@Autowired
-	public L9130 tranL9130;
+	L9130 tranL9130;
+	
 	@Autowired
-	public L9131 tranL9131;
+	L9131 tranL9131;
+	
 	@Autowired
-	public L9132 tranL9132;
+	L9132 tranL9132;
+	
 	@Autowired
-	public L9133 tranL9133;
+	L9133 tranL9133;
 
 	@Autowired
-	public TxToDoCom txToDoCom;
+	TxToDoCom txToDoCom;
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -511,39 +522,15 @@ public class L6101 extends TradeBuffer {
 			titaVo.putParam("BatchNo", uClsNo); // 傳票批號 , 09:放款時為業務關帳之次數
 		}
 		titaVo.putParam("MediaSeq", tAcClose.getCoreSeqNo()); // 核心傳票
-
-		tranL9130.run(titaVo);
-//		MySpring.newTask("L9130", this.txBuffer, titaVo);
-
-		// 啟動 L9131核心日結單代傳票列印
-		titaVo.putParam("AcDate", this.txBuffer.getTxCom().getTbsdy()); // 會計日期
-		if ("02".equals(uSecNo)) {
-			titaVo.putParam("BatchNo", 11); // 傳票批號 , 02:支票繳款時固定為11
-		} else {
-			titaVo.putParam("BatchNo", uClsNo); // 傳票批號 , 09:放款時為業務關帳之次數
-		}
-
-		tranL9131.run(titaVo);
-//		MySpring.newTask("L9131", this.txBuffer, titaVo);
-
-		// 啟動 L9132傳票媒體明細表(核心)
-		titaVo.putParam("AcDate", this.txBuffer.getTxCom().getTbsdy()); // 會計日期
-		if ("02".equals(uSecNo)) {
-			titaVo.putParam("BatchNo", 11); // 傳票批號 , 02:支票繳款時固定為11
-		} else {
-			titaVo.putParam("BatchNo", uClsNo); // 傳票批號 , 09:放款時為業務關帳之次數
-		}
 		titaVo.putParam("MediaType", tAcClose.getCoreSeqNo()); // 核心傳票
-
-		tranL9132.run(titaVo);
-//		MySpring.newTask("L9132", this.txBuffer, titaVo);
-
-		// 啟動 L9133會計與主檔餘額檢核表
 		if ("09".equals(uSecNo)) {
-			titaVo.putParam("AcDate", this.txBuffer.getTxCom().getTbsdy()); // 會計日期
-			tranL9133.run(titaVo);
-//		MySpring.newTask("L9133", this.txBuffer, titaVo);
+			// uSecNo = 09 時，才執行L9133
+			titaVo.putParam("DoL9133", "Y");
+		} else {
+			titaVo.putParam("DoL9133", "N");
 		}
+		// 2021-10-05 智偉修改: 透過L9130控制 L9130、L9131、L9132、L9133
+		MySpring.newTask("L9130", this.txBuffer, titaVo);
 	}
 
 	// 寫入應處理清單-業績工作月結算啟動通知(工作月結束，放款關帳)

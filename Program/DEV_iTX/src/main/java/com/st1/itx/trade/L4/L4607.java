@@ -46,12 +46,13 @@ public class L4607 extends TradeBuffer {
 			CdBuildingCost tCdBuildingCost = new CdBuildingCost();
 			CdBuildingCostId tCdBuildingCostId = new CdBuildingCostId();
 			BigDecimal Cost = parse.stringToBigDecimal(titaVo.getParam("Cost" + i));
+			int FloorLowerLimit = parse.stringToInteger(titaVo.getParam("FloorLowerLimit" + i));
 			
 			if(iFinal < i) {
 				break;
 			} else {
 				tCdBuildingCostId.setCityCode(CityCode);
-				tCdBuildingCostId.setFloorLowerLimit(i);
+				tCdBuildingCostId.setFloorLowerLimit(FloorLowerLimit);
 				
 				tCdBuildingCost = cdBuildingCostService.findById(tCdBuildingCostId, titaVo);
 				
@@ -61,7 +62,7 @@ public class L4607 extends TradeBuffer {
 					  tCdBuildingCost = new CdBuildingCost();
 					  tCdBuildingCost.setCdBuildingCostId(tCdBuildingCostId);
 					  tCdBuildingCost.setCityCode(CityCode);
-					  tCdBuildingCost.setFloorLowerLimit(i);
+					  tCdBuildingCost.setFloorLowerLimit(FloorLowerLimit);
 					  tCdBuildingCost.setCost(Cost);
 					
 					  try {
@@ -81,7 +82,7 @@ public class L4607 extends TradeBuffer {
 						}
 					} else { // 更新
 						tCdBuildingCost.setCityCode(CityCode);
-						tCdBuildingCost.setFloorLowerLimit(i);
+						tCdBuildingCost.setFloorLowerLimit(FloorLowerLimit);
 						tCdBuildingCost.setCost(Cost);
 						
 						try {

@@ -38,7 +38,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3932")
 @Scope("prototype")
 public class L3932 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L3932.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -63,6 +62,8 @@ public class L3932 extends TradeBuffer {
 		int iFacmNo = this.parse.stringToInteger(titaVo.getParam("FacmNo"));
 		int iBormNo = this.parse.stringToInteger(titaVo.getParam("BormNo"));
 
+		int iCustDataCtrl = this.getTxBuffer().getTxCom().getCustDataCtrl();
+		
 		// work area
 		int wkFacmNoStart = 1;
 		int wkFacmNoEnd = 999;
@@ -90,25 +91,21 @@ public class L3932 extends TradeBuffer {
 		int effectPaidDate = 0;
 		int effectBatchDate = 0;
 
-		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd,
-				wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
-		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null
-				: new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
+		Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(iCustNo, wkFacmNoStart, wkFacmNoEnd, wkBormNoStart, wkBormNoEnd, 0, Integer.MAX_VALUE, titaVo);
+		List<LoanBorMain> lLoanBorMain = slLoanBorMain == null ? null : new ArrayList<LoanBorMain>(slLoanBorMain.getContent());
 		if (lLoanBorMain == null || lLoanBorMain.size() == 0) {
 			throw new LogicException(titaVo, "E0001", "放款主檔"); // 查詢資料不存在
 		}
 
 		// 上次繳息日
-		effectPaidDate = lLoanBorMain.get(0).getPrevPayIntDate() == 0 ? lLoanBorMain.get(0).getDrawdownDate()
-				: lLoanBorMain.get(0).getPrevPayIntDate(); // 繳息日前的一筆
+		effectPaidDate = lLoanBorMain.get(0).getPrevPayIntDate() == 0 ? lLoanBorMain.get(0).getDrawdownDate() : lLoanBorMain.get(0).getPrevPayIntDate(); // 繳息日前的一筆
 
 		for (LoanBorMain ln : lLoanBorMain) {
 			if (ln.getPrevPayIntDate() > effectPaidDate) {
 				effectPaidDate = ln.getPrevPayIntDate();
 			}
 			// 查詢放款利率變動檔
-			Slice<LoanRateChange> slLoanRateChange = loanRateChangeService.rateChangeFacmNoRange(iCustNo,
-					ln.getFacmNo(), ln.getFacmNo(), ln.getBormNo(), ln.getBormNo(), 0, 99991231, this.index,
+			Slice<LoanRateChange> slLoanRateChange = loanRateChangeService.rateChangeFacmNoRange(iCustNo, ln.getFacmNo(), ln.getFacmNo(), ln.getBormNo(), ln.getBormNo(), 0, 99991231, this.index,
 					Integer.MAX_VALUE, titaVo);
 			lLoanRateChange = slLoanRateChange == null ? null : slLoanRateChange.getContent();
 			if (lLoanRateChange == null || lLoanRateChange.size() == 0) {
@@ -126,8 +123,7 @@ public class L3932 extends TradeBuffer {
 					effectAdjDate = r.getEffectDate();
 				}
 				// 已生效利率日期 ==> 整批調整 or 小於繳息日 or 利率日期 <=本月
-				if (r.getStatus() == 1 || r.getEffectDate() < ln.getPrevPayIntDate()
-						|| r.getEffectDate() / 100 <= this.txBuffer.getTxCom().getTbsdy() / 100) {
+				if (r.getStatus() == 1 || r.getEffectDate() < ln.getPrevPayIntDate() || r.getEffectDate() / 100 <= this.txBuffer.getTxCom().getTbsdy() / 100) {
 					effectBatchDate = r.getEffectDate();
 				}
 			}
@@ -155,8 +151,7 @@ public class L3932 extends TradeBuffer {
 				if ("99".equals(r.getBaseRateCode()) || r.getEffectDate() > effectBatchDate) {
 					wkBaseRate = BigDecimal.ZERO;
 				} else {
-					wkBaseRate = r.getFitRate()
-							.subtract(r.getIncrFlag().equals("Y") ? r.getRateIncr() : r.getIndividualIncr());
+					wkBaseRate = r.getFitRate().subtract(r.getIncrFlag().equals("Y") ? r.getRateIncr() : r.getIndividualIncr());
 				}
 
 				// 未生效利率
@@ -168,6 +163,10 @@ public class L3932 extends TradeBuffer {
 				}
 				OccursList occursList = new OccursList();
 				occursList.putParam("OOCustNo", r.getCustNo());
+				
+				if(iCustDataCtrl == 1) {
+					occursList.putParam("OOCustNo", "");
+				}
 				occursList.putParam("OOFacmNo", r.getFacmNo());
 				occursList.putParam("OOBormNo", r.getBormNo());
 				occursList.putParam("OOEffectDate", r.getEffectDate());

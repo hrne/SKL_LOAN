@@ -45,16 +45,16 @@ public class L4R28 extends TradeBuffer {
 		
 		
 		for (int i = 1; i <= 50; i++) {
-			this.totaVo.putParam("L4r28FloorLowerLimit" + i, i);
+			this.totaVo.putParam("L4r28FloorLowerLimit" + i, 0);
 			this.totaVo.putParam("L4r28Cost" + i, "");
 		}
 		
 		if(lCdBuildingCost != null) {
 			int m = 1;
 			for(CdBuildingCost tCdBuildingCost: lCdBuildingCost) {
-				m = tCdBuildingCost.getFloorLowerLimit();
 				this.totaVo.putParam("L4r28FloorLowerLimit" + m, tCdBuildingCost.getFloorLowerLimit());
 				this.totaVo.putParam("L4r28Cost" + m, tCdBuildingCost.getCost());
+				m++;
 		    }
 		}
 

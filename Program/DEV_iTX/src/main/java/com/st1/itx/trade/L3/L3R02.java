@@ -14,8 +14,10 @@ import com.st1.itx.db.domain.FacMain;
 import com.st1.itx.db.domain.FacMainId;
 import com.st1.itx.db.domain.LoanBorMain;
 import com.st1.itx.db.domain.LoanBorMainId;
+import com.st1.itx.db.domain.LoanRateChange;
 import com.st1.itx.db.service.FacMainService;
 import com.st1.itx.db.service.LoanBorMainService;
+import com.st1.itx.db.service.LoanRateChangeService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.parse.Parse;
 
@@ -46,6 +48,9 @@ public class L3R02 extends TradeBuffer {
 	@Autowired
 	public FacMainService sFacMainService;
 
+	@Autowired
+	public LoanRateChangeService loanRateChangeService;
+	
 	@Autowired
 	Parse parse;
 
@@ -91,6 +96,13 @@ public class L3R02 extends TradeBuffer {
 		if (tLoanBorMain.getActFg() == 1 && iFKey == 0) {
 			throw new LogicException(titaVo, "E0021", "L3R02 放款主檔 戶號 = " + iCustNo + " 額度編號 =  " + iFacmNo + " 撥款序號 = " + iBormNo); // 該筆資料待放行中
 		}
+		
+		LoanRateChange tLoanRateChange = loanRateChangeService.rateChangeEffectDateDescFirst(iCustNo, iFacmNo, iBormNo,
+				titaVo.getEntDyI() + 19110000, titaVo);
+		if (tLoanRateChange == null) {
+			throw new LogicException(titaVo, "E0001", "放款利率變動檔  借款人戶號 = " + iCustNo + "-" + iFacmNo + "-" + iBormNo); // 查詢資料不存在
+		}
+		
 		wkPrevPayIntDate = tLoanBorMain.getPrevPayIntDate();
 		wkPrevRepaidDate = tLoanBorMain.getPrevRepaidDate();
 		if (wkPrevPayIntDate == 0) {
@@ -146,7 +158,7 @@ public class L3R02 extends TradeBuffer {
 		this.totaVo.putParam("ORateIncr", tLoanBorMain.getRateIncr());
 		this.totaVo.putParam("OIndividualIncr", tLoanBorMain.getIndividualIncr());
 		this.totaVo.putParam("OApproveRate", tLoanBorMain.getApproveRate());
-		this.totaVo.putParam("OStoreRate", tLoanBorMain.getStoreRate());
+		this.totaVo.putParam("OStoreRate", tLoanRateChange.getFitRate());
 		this.totaVo.putParam("ORateCode", tLoanBorMain.getRateCode());
 		this.totaVo.putParam("ORateAdjFreq", tLoanBorMain.getRateAdjFreq());
 		this.totaVo.putParam("ODrawdownCode", tLoanBorMain.getDrawdownCode());

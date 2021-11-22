@@ -120,7 +120,6 @@ public class L2703 extends TradeBuffer {
 			tCustDataCtrl = new CustDataCtrl();
 			tCustDataCtrl.setCustNo(custNo);
 			tCustDataCtrl.setCustUKey(custUKet);
-			tCustDataCtrl.setEnable("Y");
 			tCustDataCtrl.setApplMark(1);
 			tCustDataCtrl.setCreateEmpNo(titaVo.getParam("CreateEmpNo"));
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));

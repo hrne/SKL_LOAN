@@ -61,6 +61,9 @@ public class TxCom {
 	/* 本／次日帳務記號 0. 本日帳 1. 次日帳 */
 	private int accDyFg = 0;
 
+	// 查詢結清滿五年客戶資料記號 0.客戶申請 1.結清滿五年
+
+	private int custDataCtrl = 0;
 	/*
 	 * -----------------------------------------------------------------------------
 	 * ----------------------------
@@ -1182,16 +1185,24 @@ public class TxCom {
 		this.custRmkFg = custRmkFg;
 	}
 
+	public int getCustDataCtrl() {
+		return custDataCtrl;
+	}
+
+	public void setCustDataCtrl(int custDataCtrl) {
+		this.custDataCtrl = custDataCtrl;
+	}
+
 	@Override
 	public String toString() {
 		return "TxCom [FlowEntday=" + FlowEntday + ", FlowNo=" + FlowNo + ", ConfirmBrNo=" + ConfirmBrNo + ", ConfirmGroupNo=" + ConfirmGroupNo + ", CanCancel=" + CanCancel + ", CanModify="
 				+ CanModify + ", SubmitFg=" + SubmitFg + ", dateCtl=" + dateCtl + ", relKin=" + relKin + ", relTlr=" + relTlr + ", relTno=" + relTno + ", relNo=" + relNo + ", txType=" + txType
 				+ ", todayAcc=" + todayAcc + ", bCurcd=" + bCurcd + ", tlrLevel=" + tlrLevel + ", AuthNo=" + AuthNo + ", conFirm=" + conFirm + ", tlrDept=" + tlrDept + ", accDyFg=" + accDyFg
-				+ ", bookAc=" + bookAc + ", bookAcHcode=" + bookAcHcode + ", AcCnt=" + AcCnt + ", tbsdy=" + tbsdy + ", nbsdy=" + nbsdy + ", nnbsdy=" + nnbsdy + ", lbsdy=" + lbsdy + ", lmndy=" + lmndy
-				+ ", tmndy=" + tmndy + ", mfbsdy=" + mfbsdy + ", tbsdyf=" + tbsdyf + ", nbsdyf=" + nbsdyf + ", nnbsdyf=" + nnbsdyf + ", lbsdyf=" + lbsdyf + ", lmndyf=" + lmndyf + ", tmndyf=" + tmndyf
-				+ ", mfbsdyf=" + mfbsdyf + ", reldy=" + reldy + ", orgEntdy=" + orgEntdy + ", orgTxSeq=" + orgTxSeq + ", orgKin=" + orgKin + ", orgTlr=" + orgTlr + ", orgTno=" + orgTno + ", scanCd="
-				+ scanCd + ", oTxSeq=" + oTxSeq + ", orgCalDy=" + orgCalDy + ", orgCalTm=" + orgCalTm + ", txRsut=" + txRsut + ", msgId=" + msgId + ", errorMsg=" + errorMsg + ", txHcode=" + txHcode
-				+ ", txModifyFg=" + txModifyFg + ", custRmkFg=" + custRmkFg + "]";
+				+ ", custDataCtrl=" + custDataCtrl + ", bookAc=" + bookAc + ", bookAcHcode=" + bookAcHcode + ", AcCnt=" + AcCnt + ", tbsdy=" + tbsdy + ", nbsdy=" + nbsdy + ", nnbsdy=" + nnbsdy
+				+ ", lbsdy=" + lbsdy + ", lmndy=" + lmndy + ", tmndy=" + tmndy + ", mfbsdy=" + mfbsdy + ", tbsdyf=" + tbsdyf + ", nbsdyf=" + nbsdyf + ", nnbsdyf=" + nnbsdyf + ", lbsdyf=" + lbsdyf
+				+ ", lmndyf=" + lmndyf + ", tmndyf=" + tmndyf + ", mfbsdyf=" + mfbsdyf + ", reldy=" + reldy + ", orgEntdy=" + orgEntdy + ", orgTxSeq=" + orgTxSeq + ", orgKin=" + orgKin + ", orgTlr="
+				+ orgTlr + ", orgTno=" + orgTno + ", scanCd=" + scanCd + ", oTxSeq=" + oTxSeq + ", orgCalDy=" + orgCalDy + ", orgCalTm=" + orgCalTm + ", txRsut=" + txRsut + ", msgId=" + msgId
+				+ ", errorMsg=" + errorMsg + ", txHcode=" + txHcode + ", txModifyFg=" + txModifyFg + ", custRmkFg=" + custRmkFg + "]";
 	}
 
 }

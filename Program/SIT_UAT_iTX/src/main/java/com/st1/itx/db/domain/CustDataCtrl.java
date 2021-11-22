@@ -26,7 +26,7 @@ public class CustDataCtrl implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3093429932534726152L;
+	private static final long serialVersionUID = -7557696199710592432L;
 
 // 借款人戶號
   @Id
@@ -37,13 +37,8 @@ public class CustDataCtrl implements Serializable {
   @Column(name = "`CustUKey`", length = 32)
   private String custUKey;
 
-  // 啟用記號
-  /* Y:是N:否 */
-  @Column(name = "`Enable`", length = 1)
-  private String enable;
-
   // 申請記號
-  /* 0:客戶申請1:滿五年自動寫入2:解除 */
+  /* 1:客戶申請(案件申請時丟錯誤訊息)2:滿五年自動寫入(案件申請自動刪除)3:解除 */
   @Column(name = "`ApplMark`")
   private int applMark = 0;
 
@@ -109,31 +104,10 @@ public class CustDataCtrl implements Serializable {
   }
 
 /**
-	* 啟用記號<br>
-	* Y:是
-N:否
-	* @return String
-	*/
-  public String getEnable() {
-    return this.enable == null ? "" : this.enable;
-  }
-
-/**
-	* 啟用記號<br>
-	* Y:是
-N:否
-  *
-  * @param enable 啟用記號
-	*/
-  public void setEnable(String enable) {
-    this.enable = enable;
-  }
-
-/**
 	* 申請記號<br>
-	* 0:客戶申請
-1:滿五年自動寫入
-2:解除
+	* 1:客戶申請(案件申請時丟錯誤訊息)
+2:滿五年自動寫入(案件申請自動刪除)
+3:解除
 	* @return Integer
 	*/
   public int getApplMark() {
@@ -142,9 +116,9 @@ N:否
 
 /**
 	* 申請記號<br>
-	* 0:客戶申請
-1:滿五年自動寫入
-2:解除
+	* 1:客戶申請(案件申請時丟錯誤訊息)
+2:滿五年自動寫入(案件申請自動刪除)
+3:解除
   *
   * @param applMark 申請記號
 	*/
@@ -250,7 +224,7 @@ N:否
 
   @Override
   public String toString() {
-    return "CustDataCtrl [custNo=" + custNo + ", custUKey=" + custUKey + ", enable=" + enable + ", applMark=" + applMark + ", reason=" + reason + ", createDate=" + createDate
-           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "CustDataCtrl [custNo=" + custNo + ", custUKey=" + custUKey + ", applMark=" + applMark + ", reason=" + reason + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
+           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

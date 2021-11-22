@@ -93,7 +93,7 @@ public class L2510 extends TradeBuffer {
 			tCustDataCtrl = new CustDataCtrl();
 			tCustDataCtrl.setCustNo(custNo);
 			tCustDataCtrl.setCustUKey(custUKet);
-			tCustDataCtrl.setEnable("Y");
+//			tCustDataCtrl.setEnable("Y");
 			tCustDataCtrl.setCreateEmpNo(titaVo.getParam("CreateEmpNo"));
 			tCustDataCtrl.setLastUpdateEmpNo(titaVo.getParam("CreateEmpNo"));
 

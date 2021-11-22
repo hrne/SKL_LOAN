@@ -93,11 +93,11 @@ public class L2073 extends TradeBuffer {
 		if (!iCustId.isEmpty()) {
 			tCustMain = sCustMainService.custIdFirst(iCustId, titaVo);
 			iCustNo = tCustMain.getCustNo();
-			slCustDateCtrl = sCustDataCtrlService.findCustNo(iCustNo, "Y", this.index, this.limit, titaVo);
+			slCustDateCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);
 			lCustDateCtrl = slCustDateCtrl == null ? null : slCustDateCtrl.getContent();
 			// 統編沒輸入
 		} else if (iCustNo > 0) {
-			slCustDateCtrl = sCustDataCtrlService.findCustNo(iCustNo, "Y", this.index, this.limit, titaVo);
+			slCustDateCtrl = sCustDataCtrlService.findCustNo(iCustNo, this.index, this.limit, titaVo);
 
 			lCustDateCtrl = slCustDateCtrl == null ? null : slCustDateCtrl.getContent();
 		} else {

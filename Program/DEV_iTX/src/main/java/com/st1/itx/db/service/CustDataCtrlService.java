@@ -35,16 +35,15 @@ public interface CustDataCtrlService {
   public Slice<CustDataCtrl> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo = ,AND Enable=
+   * CustNo = 
    *
    * @param custNo_0 custNo_0
-   * @param enable_1 enable_1
    * @param index Page Index
    * @param limit Page Data Limit
    * @param titaVo Variable-Length Argument
    * @return Slice CustDataCtrl CustDataCtrl of List
    */
-  public Slice<CustDataCtrl> findCustNo(int custNo_0, String enable_1, int index, int limit, TitaVo... titaVo);
+  public Slice<CustDataCtrl> findCustNo(int custNo_0, int index, int limit, TitaVo... titaVo);
 
   /**
    * CustUKey = 

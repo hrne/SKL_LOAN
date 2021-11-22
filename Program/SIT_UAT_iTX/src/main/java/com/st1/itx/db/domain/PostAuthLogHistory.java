@@ -59,7 +59,7 @@ public class PostAuthLogHistory implements Serializable {
   private int authCreateDate = 0;
 
   // 申請代號，狀態碼
-  /* CdCode:AuthApplCode1.申請2.終止3.郵局終止4.誤終止9.暫停授權(DeleteDate &amp;gt; 0時，顯示用) */
+  /* CdCode:AuthApplCode1.申請2.終止3.郵局終止4.誤終止8.恢復授權9.暫停授權 */
   @Column(name = "`AuthApplCode`", length = 1)
   private String authApplCode;
 
@@ -279,7 +279,8 @@ public class PostAuthLogHistory implements Serializable {
 2.終止
 3.郵局終止
 4.誤終止
-9.暫停授權(DeleteDate &amp;gt; 0時，顯示用)
+8.恢復授權
+9.暫停授權
 	* @return String
 	*/
   public String getAuthApplCode() {
@@ -293,7 +294,8 @@ public class PostAuthLogHistory implements Serializable {
 2.終止
 3.郵局終止
 4.誤終止
-9.暫停授權(DeleteDate &amp;gt; 0時，顯示用)
+8.恢復授權
+9.暫停授權
   *
   * @param authApplCode 申請代號，狀態碼
 	*/
