@@ -361,6 +361,8 @@ public class PfDetailCom extends TradeBuffer {
 			this.info("iPf skip workMonthDrawdown == 0" + iPf.toString());
 			return null;
 		}
+		
+		this.info("iPf workMonthDrawdown =" + workMonthDrawdown);
 
 		// Load 業績特殊參數設定檔
 		Slice<CdPfParms> slCdPfParms = cdPfParmsService.findAll(0, Integer.MAX_VALUE, titaVo);
@@ -578,11 +580,12 @@ public class PfDetailCom extends TradeBuffer {
 		// 設定業績明細欄位值
 		pf = setPfDetail(pf);
 
+		// add to List
+		lPfDetail.add(pf);
+		
 		// 逐筆計算業績並更新業績明細檔
 		pf = procCompute(pf);
 
-		// add to List
-		lPfDetail.add(pf);
 
 		// add to ListProcess
 		lPfDetailProcess.add(pf);

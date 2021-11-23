@@ -65,7 +65,7 @@ public class L8701Batch extends TradeBuffer {
 	public AcDetailService acDetailService;
 	@Autowired
 	public WebClient webClient;
-	
+
 	@Autowired
 	public MakeExcel makeExcel;
 	@Autowired
@@ -84,6 +84,7 @@ public class L8701Batch extends TradeBuffer {
 	private String acctCode;
 	private BigDecimal loanBal;
 	private int bCount;
+	private String sign = "+";
 	private ArrayList<String> Data = new ArrayList<String>();
 
 	@Override
@@ -92,69 +93,65 @@ public class L8701Batch extends TradeBuffer {
 		iTbsdy = titaVo.getEntDyI();
 		iTbsdyf = iTbsdy + 19110000;
 
-		boolean Zero=true;
-		//查詢機管編碼2+公司編碼3+資料產生日8+類別代碼固定B1+序號從01編碼
-		String filename = "01"+"458"+iTbsdyf+"B1"+"01"+".txt"; //輸出檔TXT名
+		boolean Zero = true;
+		// 查詢機管編碼2+公司編碼3+資料產生日8+類別代碼固定B1+序號從01編碼
+		// 查詢機管編碼 抓 資料交換序號第9碼開始取兩位
+		String filename = "01" + "458" + iTbsdyf + "B1" + "01" + ".txt"; // 輸出檔TXT名
 		String FilePath = inFolder + dDateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
-				
-		//讀取CSV資料
+
+		// 讀取CSV資料
 		makeExcel.openCsv(FilePath, ",");
 		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), "公務人員報送", filename, 2);
-		
-		int iExcelline = 1 ;  
-		
+
+		int iExcelline = 1;
+
 		for (Map<String, Object> map : makeExcel.getListMap()) {
-			this.info("Map Data = "+ map);
-			
-			if(iExcelline == 1) {//第一行 資料交換序號
+			this.info("Map Data = " + map);
+
+			if (iExcelline == 1) {// 第一行 資料交換序號
 				Data.add((String) map.get("f1"));
 			}
-			
-			if(iExcelline == 2) {//第二行 空白
+
+			if (iExcelline == 2) {// 第二行 空白
 				Data.add("");
 			}
-			
-			if(("@").equals(map.get("f1"))){//結束記號
+
+			if (("@").equals(map.get("f1"))) {// 結束記號
 				break;
-				
+
 			}
-			if(iExcelline>=4 && map.get("f2")!=null) {
-				iCustId = (String) map.get("f2");//統編 A123456789
+			if (iExcelline >= 4 && map.get("f2") != null) {
+				iCustId = (String) map.get("f2");// 統編 A123456789
 				iDataDatef = (String) map.get("f5");// 資料基準日 => 上傳csv資料E欄<索取日迄日>
-				iDataDate = Integer.parseInt(iDataDatef)-19110000;
-				this.info("iDataDatef=="+iDataDatef);
+				iDataDate = Integer.parseInt(iDataDatef) - 19110000;
+				this.info("iDataDatef==" + iDataDatef);
 				getDataRoutine(titaVo);
 			}
-			
-			
+
 			iExcelline++;
-			
+
 		}
-		
-		
-		
-		for(String iData :Data) {
-			this.info("iData=="+iData);
-			
-			if(Zero) {
+
+		for (String iData : Data) {
+			this.info("iData==" + iData);
+
+			if (Zero) {
 				String aCount = makeFile.fillStringL(String.valueOf(bCount), 9, '0');
-				makeFile.put(iData+aCount);//資料交換序號+筆數
+				makeFile.put(iData + aCount);// 資料交換序號+筆數
 				Zero = false;
 			} else {
 				makeFile.put(iData);
 			}
-			
+
 		}
-		
-		makeFile.put("@");//結束記號
-		
+
+		makeFile.put("@");// 結束記號
 
 		long sno = makeFile.close();
 		makeFile.toFile(sno);
 
-		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
-				"L8701公務人員報送資料完成", titaVo);
-		
+		webClient.sendPost(dDateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(), "L8701公務人員報送資料完成", titaVo);
+
 		this.info(" BS996 END");
 		// end
 		return null;
@@ -187,6 +184,10 @@ public class L8701Batch extends TradeBuffer {
 				continue;
 			}
 
+			if(ln.getCustNo()!=tCustMain.getCustNo()) {
+				continue;
+			}
+			
 			acctCode = "";
 			loanBal = BigDecimal.ZERO;
 
@@ -260,8 +261,8 @@ public class L8701Batch extends TradeBuffer {
 
 	private void outputRoutine(LoanBorMain ln, TitaVo titaVo) throws LogicException {
 		this.info("outputRoutine ...");
-		String strField ="";
-		bCount++; //計算筆數
+		String strField = "";
+		bCount++; // 計算筆數
 		tFacMain = facMainService.findById(new FacMainId(ln.getCustNo(), ln.getFacmNo()), titaVo);
 		if (tFacMain == null) {
 			throw new LogicException(titaVo, "E3011", "額度主檔  " + ln.getCustNo() + "- " + ln.getCustNo()); // 鎖定資料時，發生錯誤
@@ -290,25 +291,28 @@ public class L8701Batch extends TradeBuffer {
 			oUsageItem = "週轉金";
 		else
 			oUsageItem = "購置不動產";
+		// 正負號
+		if(loanBal.compareTo(BigDecimal.ZERO)<0) {
+			sign = "-";
+		} 
 		
-		
-		strField += makeFile.fillStringR(iCustId, 10,' ');//債務人統編 10碼
-		strField += makeFile.fillStringR(tCustMain.getCustName(), 60);//債務人名稱 60
-		strField += "4580000";//機構代碼 7碼
-		strField += "B";//放款種類 1碼
-		//授信帳號 50
+		strField += makeFile.fillStringR(iCustId, 10, ' ');// 債務人統編 10碼
+		strField += makeFile.fillStringR(tCustMain.getCustName(), 60);// 債務人名稱 60
+		strField += "4580000";// 機構代碼 7碼
+		strField += "B";// 放款種類 1碼
+		// 授信帳號 50
 		strField += makeFile.fillStringR(parse.IntegerToString(ln.getCustNo(), 7) + parse.IntegerToString(ln.getFacmNo(), 3) + parse.IntegerToString(ln.getBormNo(), 3), 50);
-		strField += makeFile.fillStringR(oAcctItem, 20);//放款科目20碼
-		strField += makeFile.fillStringR(iDataDatef, 8);//資料基準日8碼
-		strField += parse.IntegerToString(tFacMain.getFirstDrawdownDate() + 19110000, 8);//初貸日期 8碼
-		strField += parse.IntegerToString(ln.getDrawdownDate() + 19110000, 8);//契約起始日期 8碼
-		strField += parse.IntegerToString(ln.getMaturityDate() + 19110000, 8);//契約終止日期 8碼
-		strField += "+";//基準日放款餘額 1碼 ( + OR - )
-		strField += makeFile.fillStringL(String.valueOf(loanBal), 13, '0')+"00";//基準日放款餘額 15碼
-		strField += makeFile.fillStringR(oUsageItem, 60,' ');//借款用途 60碼
-		strField += makeFile.fillStringR("", 120,' ');//備註 120碼		
+		strField += makeFile.fillStringR(oAcctItem, 20);// 放款科目20碼
+		strField += makeFile.fillStringR(iDataDatef, 8);// 資料基準日8碼
+		strField += parse.IntegerToString(tFacMain.getFirstDrawdownDate() + 19110000, 8);// 初貸日期 8碼
+		strField += parse.IntegerToString(ln.getDrawdownDate() + 19110000, 8);// 契約起始日期 8碼
+		strField += parse.IntegerToString(ln.getMaturityDate() + 19110000, 8);// 契約終止日期 8碼
+		strField += sign;// 基準日放款餘額 1碼 ( + OR - )
+		strField += makeFile.fillStringL(String.valueOf(loanBal), 13, '0') + "00";// 基準日放款餘額 15碼
+		strField += makeFile.fillStringR(oUsageItem, 60, ' ');// 借款用途 60碼
+		strField += makeFile.fillStringR("", 120, ' ');// 備註 120碼
 		Data.add(strField);
-		
+
 		this.info("債務人統編 :" + iCustId);
 		this.info("債務人名稱 :" + tCustMain.getCustName());
 		this.info("金融機構代碼 :" + "4580000");

@@ -42,7 +42,7 @@ E(0,0)
 !---------- 交易畫面及個別交易變數宣告 ----------
 <sub type="DC" name="L4607" layout="cols=1;screen.width=[200,700];printer.width=[20,20];">
 [
-["[L4607]                                 建築造價參考作業"],
+["[L4607]                                 建築造價參考資料維護"],
 ["#FdCityCode+縣市代碼",#CityCode,#CityCodeX],
 ]
 
@@ -62,8 +62,8 @@ C(3,#CHAIN,1,T(4,NTXBUF$),S)
 
 #CALLGRID=X,1,S
 INVOKEJS(SHOW,p1,0)
-##loop{times:50,n:1,k:2}
-C(3,#Cost{n},0,INVOKEJS(SHOW,grd1_{k},0),INVOKEJS(SHOW,grd1_{k},1))
+##loop{times:50,n:1}
+C(3,#Cost{n},0,INVOKEJS(SHOW,grd1_{n},0),INVOKEJS(SHOW,grd1_{n},1))
 ##end
 INVOKEJS(SHOW,p1,1)INVOKEJS(SHOW,grd1_2,1)
 
@@ -108,16 +108,31 @@ R(1,L4R28)
 #Final=A,3,S
 E(0,0)
 
-#recvL4r28=X,1,S
-##loop{times:50,i:1,j:2}
-E(0,@FloorLowerLimit{i},#L4r28FloorLowerLimit{i})
-E(0,@Cost{i},#L4r28Cost{i})
-IF(#Cost{i} >0,E(0,@Final,{i}),$)
+
+#Clear=X,1,S
+##loop{times:50,i:1}
+E(0,@FloorLowerLimit{i},0)
+E(0,@Cost{i},0)
 ##end
 
-##loop{times:50,n:1,k:2}
-IF(#Final >= {n},INVOKEJS(SHOW,grd1_{k},1),INVOKEJS(SHOW,grd1_{k},0))
+
+#recvL4r28=X,1,S
+##loop{times:50,i:1,j:2}
+C(3,#L4r28FloorLowerLimit{i},0,S,$)
+E(0,@FloorLowerLimit{i},#L4r28FloorLowerLimit{i})
+E(0,@Cost{i},#L4r28Cost{i})
+E(0,@Final,{i})
 ##end
+
+#TF=A,2,S
+E(0,#Final)
+
+#show=X,1,S
+##loop{times:50,n:1}
+IF(#Final >= {n},INVOKEJS(SHOW,grd1_{n},1),INVOKEJS(SHOW,grd1_{n},0))
+IF(#TF >= {n},T(F,#FloorLowerLimit{n},0),T(F,#FloorLowerLimit{n},1))
+##end
+IF(#Final == 0,INVOKEJS(SHOW,grd1_1,1),$)
 
 
 #FloorLowerLimit0=X,1,S
@@ -125,11 +140,6 @@ T(3,X)
 
 #Cost0=X,1,S
 T(3,X)
-
-##loop{times:50,i:1}
-#FloorLowerLimit{i}=A,3,L
-E(0,{i})
-##end
 
 
 ##loop{times:50,i:1,j:0,rowSeq:2}
@@ -140,13 +150,21 @@ C(3,#Cost{i},0,INVOKEJS(SHOW,grd1_{rowSeq},0),INVOKEJS(SHOW,grd1_{rowSeq},1))
 #SHOW_ROW_{i}=@,1,S
 INVOKEJS(SHOW,grd1_{rowSeq},1)
 
-#Cost{i}=m,14.2,I
-IF(#Final >= {j},CALL(#SHOW_ROW_{i}),CALL(#HIDE_ROW_{i}))
-IF(#Final >= {j},$,S)
+#FloorLowerLimit{i}=A,3,I
+IF(#TF >= {i},s,$)
+IF(#FloorLowerLimit{j} == 0,S,$)
+@
+IF(#FloorLowerLimit{i} == 0,S,$)
 
+#Cost{i}=m,14,I
+IF(#FloorLowerLimit{i} == 0,S,$)
+IF(#Final > {j},CALL(#SHOW_ROW_{i}),IF(#Final == {j},$,CALL(#HIDE_ROW_{i})))
+IF(#Final < {j},S,$)
+@IF(#TF >= {i},$,V(2,0))
 
 #Check{i}=X,1,S
-IF(#Cost{i} != 0 && #Final == {j} ,E(0,@Final,{i}),$)
+IF(#FloorLowerLimit{i} == 0,S,$)
+IF(#Cost{i} != 0 && #Final == {j} ,E(0,@Final,{i})CALL(#SHOW_ROW_{i}),$)
 
 
 ##end
@@ -154,12 +172,11 @@ IF(#Cost{i} != 0 && #Final == {j} ,E(0,@Final,{i}),$)
 
 
 #RPTFG=A,1,S
-
 </sub>
 <sub type="DC" name="p1" layout="cols=1;screen.width=[300];printer.width=[15,30];order=1;">
 [
 [],
-["#grid#,{id:1,expand:true,loop:50,row_height:1}"," ","","",
+["#grid#,{id:1,expand:true,loop:50,row_height:1,s_cols:[150,150]}","","",
 ["總樓層數","建築造價"],
 [#FloorLowerLimit1,#Cost1]
 ],
@@ -189,7 +206,9 @@ E(0,1)ASGN(LOOP$)
 !------ 上行電文 ------
 <sub type="TIM">
 #CityCode
+#Final
 ##loop {times:50,i:1}
+#FloorLowerLimit{i}
 #Cost{i}
 ##end
 </sub>
@@ -206,7 +225,7 @@ TXFORM=L4607
 
 <sub type="PART" prompt='{{#SCRTIL}} world' name="L4607" layout="cols=3;screen.width=[100,900];order=1;">
 [
-["[L4607                                  建築造價參考作業"],
+["[L4607                                  建築造價參考資料維護"],
 [""],
 ]
 </sub>

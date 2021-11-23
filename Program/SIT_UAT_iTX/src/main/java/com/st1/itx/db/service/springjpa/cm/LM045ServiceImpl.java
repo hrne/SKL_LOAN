@@ -43,9 +43,9 @@ public class LM045ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		String sql = "SELECT NVL(E.\"Fullname\", d.\"AccCollPsn\") F0 "; // 串不到姓名時顯示員編
 		sql += "            ,D.\"YearMonth\" F1 ";
-		sql += "            ,NVL(SUM(M.\"OverBal\"), 0) \"OverBal\"";
-		sql += "            ,NVL(SUM(M.\"BadBal\"), 0) \"BadBal\"";
-		sql += "            ,NVL(SUM(M.\"OverBal\" + M.\"BadBal\"), 0) \"TotBal\"";
+		sql += "            ,NVL(SUM(M.\"BadBal\"), 0) \"BadBal\""; // 超過清償三個月
+		sql += "            ,NVL(SUM(M.\"OverBal\"), 0) \"OverBal\""; // 催收款
+		sql += "            ,NVL(SUM(M.\"OverBal\" + M.\"BadBal\"), 0) \"TotBal\""; // 催收餘額
 		sql += "      FROM (SELECT C.\"CityCode\"";
 		sql += "                  ,C.\"AccCollPsn\"";
 		sql += "                  ,W.\"YearMonth\"";

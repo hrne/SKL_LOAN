@@ -18,8 +18,6 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TempVo;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
-import com.st1.itx.db.domain.BankAuthAct;
-import com.st1.itx.db.domain.BankAuthActId;
 import com.st1.itx.db.domain.BankDeductDtl;
 import com.st1.itx.db.domain.BankDeductDtlId;
 import com.st1.itx.db.domain.BatxHead;

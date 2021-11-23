@@ -315,6 +315,7 @@ public class L4455ServiceImpl extends ASpringJpaParm implements InitializingBean
 			sql +=  "          SELECT \"CustNo\"" ; 
 			sql +=  "          FROM \"BankDeductDtl\" BKD" ; 
 			sql +=  "          WHERE BKD.\"EntryDate\" = :inputEntryDate" ; 
+			sql +=  "          AND BKD.\"MediaCode\" = 'Y' ";
 			sql +=  "          GROUP BY \"CustNo\"" ; 
 			sql +=  "     )" ; 
 			sql +=  "  )" ; 

@@ -2,8 +2,6 @@ package com.st1.itx.db.domain;
 
 import java.io.Serializable;
 import java.util.Objects;
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import com.st1.itx.util.StaticTool;
@@ -20,7 +18,12 @@ import com.st1.itx.Exception.LogicException;
 public class TxDataLogId implements Serializable {
 
 
-  // 會計日期
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 3136794105028268337L;
+
+// 會計日期
   @Column(name = "`TxDate`")
   private int txDate = 0;
 

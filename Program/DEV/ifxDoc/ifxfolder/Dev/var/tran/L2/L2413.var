@@ -751,7 +751,6 @@ T(H,#EvaStandard,#EvaStandardHelp)
 #NetWorth=n,14.2,I
 IF(#FunCd==4,s,$)
 @
-V(9)
 IF(#EvaStandard=="01",V(2,0),$)
 
 

@@ -27,9 +27,9 @@ import com.st1.itx.Exception.LogicException;
 @Component("parse")
 @Scope("singleton")
 public class Parse {
-	private static final Logger logger = LoggerFactory.getLogger(Parse.class);
-	
-	private  Pattern pattern = Pattern.compile("-?[0-9]+(\\.[0-9]+)?");
+	private final Logger logger = LoggerFactory.getLogger(Parse.class);
+
+	private Pattern pattern = Pattern.compile("-?[0-9]+(\\.[0-9]+)?");
 
 	/**
 	 * Integer to String
@@ -160,7 +160,11 @@ public class Parse {
 	 */
 	public Timestamp StringToSqlDateO(String date, String time) {
 		String dateS = date + time;
-		SimpleDateFormat sp = new SimpleDateFormat("yyyyMMddHHmmss");
+		SimpleDateFormat sp = null;
+		if (date.indexOf("-") != -1)
+			sp = new SimpleDateFormat("yyyy-MM-ddHH:mm:ss");
+		else
+			sp = new SimpleDateFormat("yyyyMMddHHmmss");
 		try {
 			Date dateU = sp.parse(dateS.trim());
 			Timestamp dateT = new Timestamp(dateU.getTime());
@@ -239,8 +243,23 @@ public class Parse {
 			return "";
 		}
 	}
-	
+
 	public String stringToStringDate(String value) {
+		if (value == null || value.trim().isEmpty())
+			return "";
+
+		String p[] = value.split(" ");
+
+		Timestamp t = null;
+		if (p.length > 1)
+			t = this.StringToSqlDateO(p[0], p[1]);
+		else
+			t = this.StringToSqlDateO(value, "");
+
+		return this.timeStampToStringDate(t);
+	}
+
+	public String stringToStringTime(String value) {
 		if (value == null || value.trim().isEmpty())
 			return "";
 
@@ -251,8 +270,21 @@ public class Parse {
 		else
 			t = this.StringToSqlDateO(value, "");
 
-		return this.timeStampToStringDate(t);
+		return this.timeStampToStringTime(t);
+	}
 
+	public String stringToStringDateTime(String value) {
+		if (value == null || value.trim().isEmpty())
+			return "";
+
+		String p[] = value.split(" ");
+		Timestamp t = null;
+		if (p.length > 1)
+			t = this.StringToSqlDateO(p[0], p[1]);
+		else
+			t = this.StringToSqlDateO(value, "");
+
+		return this.timeStampToString(t);
 	}
 
 	/**
@@ -266,15 +298,10 @@ public class Parse {
 			return false;
 		}
 		/*
-		int sz = str.length();
-		for (int i = 0; i < sz; i++) {
-			if (Character.isDigit(str.charAt(i)) == false) {
-				return false;
-			}
-		}
-		return true;
-		*/
+		 * int sz = str.length(); for (int i = 0; i < sz; i++) { if
+		 * (Character.isDigit(str.charAt(i)) == false) { return false; } } return true;
+		 */
 		Matcher m = pattern.matcher(str);
-        return m.matches();
+		return m.matches();
 	}
 }

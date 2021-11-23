@@ -75,7 +75,7 @@ public class LM046ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "    SELECT COUNT(*) AS \"LoanCnt\" "; // 總件數
 		sql += "          ,SUM(MFB.\"PrinBalance\") AS \"LoanBal\" "; // 總金額
 		sql += "          ,COUNT(CASE WHEN MFB.\"Status\" = '0' ";
-		sql += "                       AND MFB.\"OvduTerm\" >= 3 ";
+		sql += "                       AND MFB.\"OvduTerm\" BETWEEN 3 AND 5 ";
 		sql += "                       AND MFB.\"AcctCode\" != '990' ";
 		sql += "                      THEN 1 END) AS \"OvduCnt\" "; // 逾期:戶況正常, 逾期數>=3, 非990
 		sql += "          ,SUM(CASE WHEN MFB.\"Status\" = '0' ";
@@ -85,9 +85,7 @@ public class LM046ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "               ELSE 0 END) AS \"OvduBal\" "; // 逾期的金額
 		sql += "          ,COUNT(CASE WHEN MFB.\"Status\" IN ('2','6') ";
 		sql += "                       AND MFB.\"OvduTerm\" >= 6 ";
-		sql += "                      THEN 1 ";
-		sql += "                      WHEN MFB.\"AcctCode\" = '990' ";
-		sql += "                      THEN 1 END) AS \"BadDebtCnt\" "; // 催收:戶況2或6; 逾期數>=6 或 為990 (目前資料庫990的逾期期數會登錄為0)
+		sql += "                      THEN 1 END) AS \"BadDebtCnt\" "; // 催收:戶況2或6; 逾期數>=6
 		sql += "          ,SUM(CASE WHEN MFB.\"Status\" IN ('2','6') ";
 		sql += "                     AND MFB.\"OvduTerm\" >= 6 ";
 		sql += "                    THEN MFB.\"PrinBalance\" ";
@@ -111,19 +109,19 @@ public class LM046ServiceImpl extends ASpringJpaParm implements InitializingBean
 		// 每個都做NVL
 		sql += " SELECT CASE WHEN SUBSTR(mons.\"YearMonth\", 5, 2) NOT IN ('03','06','09','12') ";
 		sql += "             THEN (SUBSTR(mons.\"YearMonth\", 1, 4) - 1911) || '年' || SUBSTR(mons.\"YearMonth\", 5, 2) ";
-		sql += "        ELSE SUBSTR(mons.\"YearMonth\", 1, 4) - 1911 || '年Q' || SUBSTR(\"Fn_GetWorkSeason\"(mons.\"YearMonth\", 2), 5, 1) END AS F0 "; // 輸出格式的年月份
-		sql += "       ,NVL(Ent.\"LoanCnt\", 0) F1 ";
-		sql += "       ,NVL(Ent.\"LoanBal\", 0) F2 ";
-		sql += "       ,NVL(Ent.\"OvduCnt\", 0) F3 ";
-		sql += "       ,NVL(Ent.\"OvduBal\", 0) F4 ";
-		sql += "       ,NVL(Ent.\"BadDebtCnt\", 0) F5 ";
-		sql += "       ,NVL(Ent.\"BadDebtBal\", 0) F6 ";
-		sql += "       ,NVL(Nat.\"LoanCnt\", 0) F7 ";
-		sql += "       ,NVL(Nat.\"LoanBal\", 0) F8 ";
-		sql += "       ,NVL(Nat.\"OvduCnt\", 0) F9 ";
-		sql += "       ,NVL(Nat.\"OvduBal\", 0) F10 ";
-		sql += "       ,NVL(Nat.\"BadDebtCnt\", 0) F11 ";
-		sql += "       ,NVL(Nat.\"BadDebtBal\", 0) F12 ";
+		sql += "        ELSE SUBSTR(mons.\"YearMonth\", 1, 4) - 1911 || '年Q' || SUBSTR(\"Fn_GetWorkSeason\"(mons.\"YearMonth\", 2), 5, 1) END AS \"YearMonth\" "; // 輸出格式的年月份
+		sql += "       ,NVL(Ent.\"LoanCnt\", 0) \"LoanCntEnt\" ";
+		sql += "       ,NVL(Ent.\"LoanBal\", 0) \"LoanBalEnt\" ";
+		sql += "       ,NVL(Ent.\"OvduCnt\", 0) \"OvduCntEnt\" ";
+		sql += "       ,NVL(Ent.\"OvduBal\", 0) \"OvduBalEnt\" ";
+		sql += "       ,NVL(Ent.\"BadDebtCnt\", 0) \"BadDebtCntEnt\" ";
+		sql += "       ,NVL(Ent.\"BadDebtBal\", 0) \"BadDebtBalEnt\" ";
+		sql += "       ,NVL(Nat.\"LoanCnt\", 0) \"LoanCntNat\" ";
+		sql += "       ,NVL(Nat.\"LoanBal\", 0) \"LoanBalNat\" ";
+		sql += "       ,NVL(Nat.\"OvduCnt\", 0) \"OvduCntNat\" ";
+		sql += "       ,NVL(Nat.\"OvduBal\", 0) \"OvduBalNat\" ";
+		sql += "       ,NVL(Nat.\"BadDebtCnt\", 0) \"BadDebtCntNat\" ";
+		sql += "       ,NVL(Nat.\"BadDebtBal\", 0) \"BadDebtBalNat\" ";
 		sql += " FROM ( SELECT AllMonthOrSeasons.* ";
 		sql += "              ,ROW_NUMBER() OVER (ORDER BY \"YearMonth\" DESC) seq ";
 		sql += "        FROM AllMonthOrSeasons ) mons ";

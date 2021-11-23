@@ -156,7 +156,7 @@ IF(#FloorLowerLimit{j} == 0,S,$)
 @
 IF(#FloorLowerLimit{i} == 0,S,$)
 
-#Cost{i}=m,14.2,I
+#Cost{i}=m,14,I
 IF(#FloorLowerLimit{i} == 0,S,$)
 IF(#Final > {j},CALL(#SHOW_ROW_{i}),IF(#Final == {j},$,CALL(#HIDE_ROW_{i})))
 IF(#Final < {j},S,$)
