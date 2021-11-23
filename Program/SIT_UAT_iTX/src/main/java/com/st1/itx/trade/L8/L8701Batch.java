@@ -92,16 +92,14 @@ public class L8701Batch extends TradeBuffer {
 		this.info("active BS996 ......");
 		iTbsdy = titaVo.getEntDyI();
 		iTbsdyf = iTbsdy + 19110000;
-
+		String iCode = "";
 		boolean Zero = true;
-		// 查詢機管編碼2+公司編碼3+資料產生日8+類別代碼固定B1+序號從01編碼
-		// 查詢機管編碼 抓 資料交換序號第9碼開始取兩位
-		String filename = "01" + "458" + iTbsdyf + "B1" + "01" + ".txt"; // 輸出檔TXT名
+		
 		String FilePath = inFolder + dDateUtil.getNowStringBc() + File.separatorChar + titaVo.getTlrNo() + File.separatorChar + titaVo.getParam("FILENA").trim();
 
 		// 讀取CSV資料
 		makeExcel.openCsv(FilePath, ",");
-		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), "公務人員報送", filename, 2);
+		
 
 		int iExcelline = 1;
 
@@ -110,6 +108,7 @@ public class L8701Batch extends TradeBuffer {
 
 			if (iExcelline == 1) {// 第一行 資料交換序號
 				Data.add((String) map.get("f1"));
+				iCode = (String) map.get("f1");
 			}
 
 			if (iExcelline == 2) {// 第二行 空白
@@ -131,7 +130,17 @@ public class L8701Batch extends TradeBuffer {
 			iExcelline++;
 
 		}
-
+		// 查詢機管編碼2+公司編碼3+資料產生日8+類別代碼固定B1+序號從01編碼
+		// 查詢機管編碼 抓 資料交換序號第9碼開始取兩位
+		if(iCode.length()>=10) {
+			iCode = iCode.substring(8, 10);
+		} else {
+			iCode = "01";
+		}
+		String filename = iCode + "458" + iTbsdyf + "B1" + "01" + ".txt"; // 輸出檔TXT名
+				
+		makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), titaVo.getTxCode(), "公務人員報送", filename, 2);
+		
 		for (String iData : Data) {
 			this.info("iData==" + iData);
 
@@ -307,6 +316,8 @@ public class L8701Batch extends TradeBuffer {
 		strField += parse.IntegerToString(tFacMain.getFirstDrawdownDate() + 19110000, 8);// 初貸日期 8碼
 		strField += parse.IntegerToString(ln.getDrawdownDate() + 19110000, 8);// 契約起始日期 8碼
 		strField += parse.IntegerToString(ln.getMaturityDate() + 19110000, 8);// 契約終止日期 8碼
+		strField += "TWD"; // 幣別
+		strField += "0000000001000000"; // 匯率
 		strField += sign;// 基準日放款餘額 1碼 ( + OR - )
 		strField += makeFile.fillStringL(String.valueOf(loanBal), 13, '0') + "00";// 基準日放款餘額 15碼
 		strField += makeFile.fillStringR(oUsageItem, 60, ' ');// 借款用途 60碼

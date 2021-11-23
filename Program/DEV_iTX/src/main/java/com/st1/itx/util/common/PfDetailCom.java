@@ -1127,8 +1127,10 @@ public class PfDetailCom extends TradeBuffer {
 		boolean isAddBonus = false;
 		for (CdBonus cd : lCdBonus) {
 			if (cd.getConditionCode() == 1) {
-				if (pieceCode.equals(cd.getCondition()))
+				if (pieceCode.equals(cd.getCondition())) {
 					piceInclude = true;
+					break;
+				}
 			}
 		}
 		if (piceInclude) {
@@ -1141,9 +1143,18 @@ public class PfDetailCom extends TradeBuffer {
 	private PfDetail procCoBonus(PfDetail pf) throws LogicException {
 		this.info("PfDetailCom compCoBonus ");
 		// 生效日期<=撥款日<停效日期
+		if ("".equals(pf.getCoorgnizer())) {
+			this.info("PfDetailCom PfCoOfficer space skip ");
+			return pf;			
+		}
 		PfCoOfficer tPfCoOfficer = pfCoOfficerService.effectiveDateFirst(pf.getCoorgnizer(), 0,
 				pf.getDrawdownDate() + 19110000, titaVo);
-		if (tPfCoOfficer == null || pf.getDrawdownDate() >= tPfCoOfficer.getIneffectiveDate()) {
+		if (tPfCoOfficer == null) {
+			this.info("PfDetailCom PfCoOfficer null skip ");
+			return pf;
+		}		
+		if (tPfCoOfficer.getIneffectiveDate() > 0 &&  pf.getDrawdownDate() >= tPfCoOfficer.getIneffectiveDate()) {
+			this.info("PfDetailCom PfCoOfficer IneffectiveDate skip " + tPfCoOfficer.toString());
 			return pf;
 		}
 		// CdBonusCo 協辦獎金標準設定
@@ -1158,6 +1169,7 @@ public class PfDetailCom extends TradeBuffer {
 		List<CdBonusCo> lCdBonusCo = slCdBonusCo == null ? null : slCdBonusCo.getContent();
 		// 計件代碼，不計入
 		if (lCdBonusCo == null || !isCoBonus(pf.getPieceCode(), lCdBonusCo)) {
+			this.info("PfDetailCom CdBonusCo not include ");
 			return pf;
 		}
 
@@ -1248,8 +1260,10 @@ public class PfDetailCom extends TradeBuffer {
 		for (CdBonusCo cd : lCdBonusCo) {
 			if (cd.getConditionCode() == 1 && pieceCode.equals(cd.getCondition())) {
 				piceInclude = true;
+				break;
 			}
 		}
+		this.info("pieceCode " + pieceCode + "," + piceInclude);
 		return piceInclude;
 	}
 
