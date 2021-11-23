@@ -30,8 +30,8 @@
 		<!-- <Spring-Integration-Ver>5.1.5.RELEASE</Spring-Integration-Ver> <Spring-Framework-Ver>5.1.7.RELEASE</Spring-Framework-Ver> <Spring-Security-Ver>5.1.5.RELEASE</Spring-Security-Ver> <Spring-Batch-Ver>4.1.1.RELEASE</Spring-Batch-Ver> 
 			<Spring-Data-Ver>2.1.8.RELEASE</Spring-Data-Ver> -->
 
-		<SLF4J-Ver>1.7.26</SLF4J-Ver>
-		<Logback-Ver>1.2.3</Logback-Ver>
+		<SLF4J-Ver>1.7.32</SLF4J-Ver>
+		<Logback-Ver>1.2.6</Logback-Ver>
 
 		<AspectJ-Runtime-Ver>1.9.3</AspectJ-Runtime-Ver>
 		<EclipseLink-JPA-Ver>2.6.5</EclipseLink-JPA-Ver>
@@ -59,18 +59,6 @@
 	</properties>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>com.st1.itx</groupId>
-			<artifactId>iTX-Core</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.AStar</groupId>
-			<artifactId>TBConvert</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
 		<dependency>
