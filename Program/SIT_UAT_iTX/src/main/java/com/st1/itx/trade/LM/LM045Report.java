@@ -104,7 +104,7 @@ public class LM045Report extends MakeReport {
 						ymOutput += i;
 					}
 					
-					makeExcel.setValue(3 + collPsnCount * 5, 3 + i, ymOutput);
+					makeExcel.setValue(3 + collPsnCount * 5, 3 + i, ymOutput, "#");
 				}
 
 				// 輸出 "與yyy年底相較"
@@ -139,6 +139,11 @@ public class LM045Report extends MakeReport {
 			makeExcel.setValue(4 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, getBigDecimal(tLDVo.get("F2")), "#,##0");
 			makeExcel.setValue(5 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, getBigDecimal(tLDVo.get("F3")), "#,##0");
 			makeExcel.setValue(6 + collPsnCount * 5, colShift == 100 ? 3 : 15 - colShift, getBigDecimal(tLDVo.get("F4")), "#,##0");
+			
+			// 測試時發現MakeExcel會把每個大行（per AccCollPsn）的底部框線吃掉
+			// 暫時用這個方法解決，但會造成範圍內每格都有四邊框線的現象
+			// 可能要問MakeExcel
+			makeExcel.setAddRengionBorder("A", 3 + collPsnCount * 5, "P", 6 + collPsnCount * 5, 2);
 
 			// 登錄 lastYearAmounts, thisYearAmounts
 
@@ -154,7 +159,7 @@ public class LM045Report extends MakeReport {
 					thisMonthAmounts[i - 2] = getBigDecimal(tLDVo.get("F" + i));
 				}
 
-				// 因為 query ordered by "YearMonth", 到這裡已經輸出完所有友資料的月份了
+				// 因為 query ordered by "YearMonth", 到這裡已經輸出完所有有資料的月份了
 				// 直接算最底下的 " 與yyy年相較 " 的金額
 
 				for (int i = 0; i < 3; i++) {

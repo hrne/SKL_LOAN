@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,7 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L2632 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L2632.class);
+	private static final Logger logger = LoggerFactory.getLogger(L2632.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -45,6 +47,7 @@ public class L2632 extends TradeBuffer {
 	/* DB服務注入 */
 	@Autowired
 	public CustMainService sCustMainService;
+	
 	@Autowired
 	AcReceivableCom acReceivableCom;
 
@@ -73,7 +76,7 @@ public class L2632 extends TradeBuffer {
 		// 額度編號
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 		// 清償金額
-		BigDecimal iCloseAmt = parse.stringToBigDecimal(titaVo.getParam("TIM_PAYOFF_AMT"));
+		BigDecimal iCloseAmt = parse.stringToBigDecimal(titaVo.getParam("TimCloseAmt"));
 		// 作業項目
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode"));
 		
@@ -93,10 +96,13 @@ public class L2632 extends TradeBuffer {
 			// 變更前
 			FacClose beforeFacClose = (FacClose) dataLog.clone(tFacClose);
 
-			tFacClose.setActFlag(parse.stringToInteger(titaVo.getParam("ACTFG")));
+
 			tFacClose.setFacmNo(parse.stringToInteger(titaVo.getParam("FacmNo")));
+			tFacClose.setEntryDate(parse.stringToInteger(titaVo.getParam("EntryDate")));
+			tFacClose.setCloseInd(titaVo.getParam("CloseInd"));
+			tFacClose.setCollectFlag(titaVo.getParam("CollectFlag"));
 			tFacClose.setCloseReasonCode(titaVo.getParam("CloseReasonCode"));
-			tFacClose.setCloseAmt(parse.stringToBigDecimal(titaVo.getParam("TIM_PAYOFF_AMT")));
+			tFacClose.setCloseAmt(parse.stringToBigDecimal(titaVo.getParam("TimCloseAmt")));
 			tFacClose.setCollectWayCode(titaVo.getParam("CollectWayCode"));
 			tFacClose.setReceiveDate(parse.stringToInteger(titaVo.getParam("ReceiveDate")));
 			tFacClose.setAgreeNo(titaVo.getParam("AgreeNo"));
@@ -104,6 +110,8 @@ public class L2632 extends TradeBuffer {
 			tFacClose.setClsNo(titaVo.getParam("ClsNo"));
 			tFacClose.setTelNo1(titaVo.getParam("TelNo1"));
 			tFacClose.setTelNo2(titaVo.getParam("TelNo2"));
+			tFacClose.setTelNo3(titaVo.getParam("TelNo3"));
+			tFacClose.setRmk(titaVo.getParam("Rmk"));
 
 			try {
 				// 修改
@@ -111,26 +119,26 @@ public class L2632 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", e.getErrorMsg());
 			}
-
+			
 			// 紀錄變更前變更後
 			dataLog.setEnv(titaVo, beforeFacClose, tFacClose);
 			dataLog.exec();
 			// 刪除
 		} else if (iFunCd == 4) {
-
+			
 			FacClose tFacClose4 = sFacCloseService.holdById(FacCloseId);
-			this.info(" L2632 tFacClose4" + tFacClose4);
+			logger.info(" L2632 tFacClose4" + tFacClose4);
 			if (tFacClose4 == null) {
 				throw new LogicException(titaVo, "E0004", "戶號= " + iCustNo + " 清償序號 =" + iCloseNo); // 刪除資料不存在
 			}
 			try {
-
+				
 				sFacCloseService.delete(tFacClose4);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}
 			if (iItemCode == 2) {
-
+				
 				// 銷帳
 				AcReceivable acReceivable = new AcReceivable();
 				List<AcReceivable> acReceivableList = new ArrayList<AcReceivable>();
@@ -143,13 +151,13 @@ public class L2632 extends TradeBuffer {
 				acReceivableList.add(acReceivable);
 				acReceivableCom.setTxBuffer(this.getTxBuffer());
 				acReceivableCom.mnt(2, acReceivableList, titaVo); // 0-起帳 1-銷帳 2-起帳刪除
-
+				
 			}
-
+			
 		} else if (iFunCd == 5) {
-
+			
 		}
-
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

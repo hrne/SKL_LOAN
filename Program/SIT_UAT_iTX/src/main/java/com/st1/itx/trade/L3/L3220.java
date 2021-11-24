@@ -399,6 +399,7 @@ public class L3220 extends TradeBuffer {
 		tLoanBorTx = new LoanBorTx();
 		tLoanBorTxId = new LoanBorTxId();
 		wkBorxNo = loanCom.setFacmBorTx(tLoanBorTx, tLoanBorTxId, iCustNo, iFacmNo, titaVo);
+		tLoanBorTx.setTxAmt(BigDecimal.ZERO.subtract(iTempAmt));
 		tLoanBorTx.setDesc("暫收款退還");
 		//
 		tLoanBorTx.setDisplayflag("A"); // A:帳務

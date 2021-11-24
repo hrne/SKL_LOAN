@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
@@ -35,7 +33,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R26 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6R26.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -81,7 +78,7 @@ public class L6R26 extends TradeBuffer {
 		}
 
 		// 查詢帳冊別金額設定檔
-		CdAcBook tCdAcBook = CdAcBookService.findById(new CdAcBookId(iRimAcBookCode,iRimAcSubBookCode), titaVo);
+		CdAcBook tCdAcBook = CdAcBookService.findById(new CdAcBookId(iRimAcBookCode, iRimAcSubBookCode), titaVo);
 
 		/* 如有找到資料 */
 		if (tCdAcBook != null) {
@@ -92,6 +89,7 @@ public class L6R26 extends TradeBuffer {
 			} else {
 				/* 將資料放入Tota */
 				this.totaVo.putParam("L6R26AcBookCode", tCdAcBook.getAcBookCode());
+				this.totaVo.putParam("L6R26AcSubBookCode", tCdAcBook.getAcSubBookCode());
 				this.totaVo.putParam("L6R26CurrencyCode", tCdAcBook.getCurrencyCode());
 				this.totaVo.putParam("L6R26TargetAmt", tCdAcBook.getTargetAmt());
 				this.totaVo.putParam("L6R26AssignSeq", tCdAcBook.getAssignSeq());
@@ -101,6 +99,7 @@ public class L6R26 extends TradeBuffer {
 			if (iRimTxCode.equals("L6709") && iRimFuncCode == 1) {
 				/* 初值放入Tota */
 				this.totaVo.putParam("L6R26AcBookCode", iRimAcBookCode);
+				this.totaVo.putParam("L6R26AcSubBookCode", iRimAcSubBookCode);
 				this.totaVo.putParam("L6R26CurrencyCode", "");
 				this.totaVo.putParam("L6R26TargetAmt", 0);
 				this.totaVo.putParam("L6R26AssignSeq", 0);

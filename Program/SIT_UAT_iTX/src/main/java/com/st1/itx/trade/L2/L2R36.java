@@ -62,24 +62,36 @@ public class L2R36 extends TradeBuffer {
 			throw new LogicException(titaVo, "E2003", "查無清償作業檔資料"); // 查無資料
 		}
 		// 建檔日期
-		int CreateDate = parse.stringToInteger((String.valueOf(tFacClose.getCreateDate().toString().substring(0, 4)
-				+ tFacClose.getCreateDate().toString().substring(5, 7)
-				+ tFacClose.getCreateDate().toString().substring(8, 10)))) - 19110000;
+		int CreateDate = 0;
+		if (tFacClose.getCreateDate() != null) {
+			CreateDate = parse.stringToInteger((String.valueOf(tFacClose.getCreateDate().toString().substring(0, 4)
+					+ tFacClose.getCreateDate().toString().substring(5, 7)
+					+ tFacClose.getCreateDate().toString().substring(8, 10)))) - 19110000;
+		}
 
+		this.totaVo.putParam("L2r36CustNo", tFacClose.getCustNo());
+		this.totaVo.putParam("L2r36CloseNo", tFacClose.getCloseNo());
 		this.totaVo.putParam("L2r36FacmNo", tFacClose.getFacmNo());
+		this.totaVo.putParam("L2r36FunCode", tFacClose.getFunCode());
+		this.totaVo.putParam("L2r36CarLoan", tFacClose.getCarLoan());
+		this.totaVo.putParam("L2r36ApplDate", tFacClose.getApplDate());
+		this.totaVo.putParam("L2r36CloseInd", tFacClose.getCloseInd());
 		this.totaVo.putParam("L2r36CloseReasonCode", tFacClose.getCloseReasonCode());
 		this.totaVo.putParam("L2r36CloseAmt", tFacClose.getCloseAmt());
+		this.totaVo.putParam("L2r36CollectFlag", tFacClose.getCollectFlag());
 		this.totaVo.putParam("L2r36CollectWayCode", tFacClose.getCollectWayCode());
 		this.totaVo.putParam("L2r36ReceiveDate", tFacClose.getReceiveDate());
 		this.totaVo.putParam("L2r36AgreeNo", tFacClose.getAgreeNo());
 		this.totaVo.putParam("L2r36DocNo", tFacClose.getDocNo());
 		this.totaVo.putParam("L2r36ClsNo", tFacClose.getClsNo());
+		this.totaVo.putParam("L2r36Rmk", tFacClose.getRmk());
 		this.totaVo.putParam("L2r36CloseDate", tFacClose.getCloseDate());
 		this.totaVo.putParam("L2r36TelNo1", tFacClose.getTelNo1());
 		this.totaVo.putParam("L2r36TelNo2", tFacClose.getTelNo2());
+		this.totaVo.putParam("L2r36TelNo3", tFacClose.getTelNo3());
+		this.totaVo.putParam("L2r36EntryDate", tFacClose.getEntryDate());
+		this.totaVo.putParam("L2r36AgreeNo", tFacClose.getAgreeNo());
 		this.totaVo.putParam("L2r36CreateDate", CreateDate);
-		this.totaVo.putParam("L2r36FunCd", tFacClose.getFunCode());
-		
 
 		this.addList(this.totaVo);
 		return this.sendList();

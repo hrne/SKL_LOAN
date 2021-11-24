@@ -29,7 +29,7 @@ public class FacClose implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3457872587356049124L;
+	private static final long serialVersionUID = 7681528373660544349L;
 
 @EmbeddedId
   private FacCloseId facCloseId;
@@ -71,6 +71,11 @@ public class FacClose implements Serializable {
   @Column(name = "`CloseDate`")
   private int closeDate = 0;
 
+  // 結案區分
+  /* 共用代碼檔:CaseCloseCode */
+  @Column(name = "`CloseInd`", length = 1)
+  private String closeInd;
+
   // 清償原因
   /* 00:無01:買賣02:自行還清03:軍功教勞工貸款轉貸04:利率過高轉貸05:增貸不准轉貸06:額度內動支不准轉貸07:內部代償08:借新還舊09:其他10:買回11:綁約期還款 */
   @Column(name = "`CloseReasonCode`", length = 2)
@@ -100,9 +105,9 @@ public class FacClose implements Serializable {
   @Column(name = "`TelNo2`", length = 15)
   private String telNo2;
 
-  // 傳真機號碼
-  @Column(name = "`FaxNum`", length = 15)
-  private String faxNum;
+  // 連絡電話3
+  @Column(name = "`TelNo3`", length = 15)
+  private String telNo3;
 
   // 入帳日期
   @Column(name = "`EntryDate`")
@@ -333,6 +338,25 @@ public class FacClose implements Serializable {
   }
 
 /**
+	* 結案區分<br>
+	* 共用代碼檔:CaseCloseCode
+	* @return String
+	*/
+  public String getCloseInd() {
+    return this.closeInd == null ? "" : this.closeInd;
+  }
+
+/**
+	* 結案區分<br>
+	* 共用代碼檔:CaseCloseCode
+  *
+  * @param closeInd 結案區分
+	*/
+  public void setCloseInd(String closeInd) {
+    this.closeInd = closeInd;
+  }
+
+/**
 	* 清償原因<br>
 	* 00:無
 01:買賣
@@ -488,22 +512,22 @@ public class FacClose implements Serializable {
   }
 
 /**
-	* 傳真機號碼<br>
+	* 連絡電話3<br>
 	* 
 	* @return String
 	*/
-  public String getFaxNum() {
-    return this.faxNum == null ? "" : this.faxNum;
+  public String getTelNo3() {
+    return this.telNo3 == null ? "" : this.telNo3;
   }
 
 /**
-	* 傳真機號碼<br>
+	* 連絡電話3<br>
 	* 
   *
-  * @param faxNum 傳真機號碼
+  * @param telNo3 連絡電話3
 	*/
-  public void setFaxNum(String faxNum) {
-    this.faxNum = faxNum;
+  public void setTelNo3(String telNo3) {
+    this.telNo3 = telNo3;
   }
 
 /**
@@ -759,9 +783,10 @@ public class FacClose implements Serializable {
   @Override
   public String toString() {
     return "FacClose [facCloseId=" + facCloseId + ", facmNo=" + facmNo + ", actFlag=" + actFlag + ", funCode=" + funCode + ", carLoan=" + carLoan
-           + ", applDate=" + applDate + ", closeDate=" + closeDate + ", closeReasonCode=" + closeReasonCode + ", closeAmt=" + closeAmt + ", collectFlag=" + collectFlag + ", collectWayCode=" + collectWayCode
-           + ", receiveDate=" + receiveDate + ", telNo1=" + telNo1 + ", telNo2=" + telNo2 + ", faxNum=" + faxNum + ", entryDate=" + entryDate + ", agreeNo=" + agreeNo
-           + ", docNo=" + docNo + ", clsNo=" + clsNo + ", rmk=" + rmk + ", clCode1=" + clCode1 + ", clCode2=" + clCode2 + ", clNo=" + clNo
-           + ", receiveFg=" + receiveFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+           + ", applDate=" + applDate + ", closeDate=" + closeDate + ", closeInd=" + closeInd + ", closeReasonCode=" + closeReasonCode + ", closeAmt=" + closeAmt + ", collectFlag=" + collectFlag
+           + ", collectWayCode=" + collectWayCode + ", receiveDate=" + receiveDate + ", telNo1=" + telNo1 + ", telNo2=" + telNo2 + ", telNo3=" + telNo3 + ", entryDate=" + entryDate
+           + ", agreeNo=" + agreeNo + ", docNo=" + docNo + ", clsNo=" + clsNo + ", rmk=" + rmk + ", clCode1=" + clCode1 + ", clCode2=" + clCode2
+           + ", clNo=" + clNo + ", receiveFg=" + receiveFg + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo
+           + "]";
   }
 }

@@ -181,7 +181,7 @@ public class LB085Report extends MakeReport {
 
 		try {
 			String strContent = "";
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".085.csv"; // 458+月日+序號(1)+.085.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".085.CSV"; // 458+月日+序號(1)+.085.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B085", "帳號轉換資料檔", strFileName, 2);
@@ -247,10 +247,12 @@ public class LB085Report extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
+						if (j != tLBVo.size()) {
+							strContent = strContent + ",";
+						}
 					}
 					makeFile.put(strContent);
 				}
-
 			}
 
 			makeFile.close();

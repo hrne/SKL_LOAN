@@ -241,8 +241,10 @@ public class LBRelReport extends MakeReport {
 							strField = "";
 							break;
 						}
-
 						strContent = strContent + strField;
+						if (j != tLBVo.size()) {
+							strContent = strContent + ",";
+						}
 					}
 					makeFile.put(strContent);
 				}

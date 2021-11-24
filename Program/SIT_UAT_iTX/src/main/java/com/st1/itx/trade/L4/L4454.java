@@ -258,11 +258,11 @@ public class L4454 extends TradeBuffer {
 			switch (functionCode) {
 			case 1: // 個別列印
 			case 2: // 整批列印
-				int iType = 0;
+				int fistDeduct = 0;
 				unSuccText(iRepayBank, t, insuMon, titaVo); // 不成功簡訊通知
-				iType = check(titaVo);
-				if (iType == 1) {
-					if ("5".equals(t.get("FireFeeSuccess")) && repayType == 1) {
+				fistDeduct = fistDeductCheck(titaVo);
+				if (fistDeduct == 1) {
+					if ("Y".equals(t.get("FireFeeSuccess")) && repayType == 1) {
 						putTotaA(t, titaVo); // 列印清單
 						if ("1".equals(t.get("RowNumber"))) {
 							l9705List.add(t); // 繳息還本通知單 ，同戶號、額度只印一份
@@ -270,7 +270,7 @@ public class L4454 extends TradeBuffer {
 						failNoticeDateUpdate("一扣火險成功期款失敗通知", titaVo); // 失敗通知日期
 					}
 				}
-				if (iType == 2) {
+				if (fistDeduct == 2) {
 					if (titaVo.isHcodeNormal()) {
 						if ("1".equals(t.get("RowNumber"))) {
 							l4454List.add(t); // 列印明信片，同戶號、額度只印一份
@@ -463,7 +463,7 @@ public class L4454 extends TradeBuffer {
 		}
 	}
 
-	private int check(TitaVo titaVo) throws LogicException {
+	private int fistDeductCheck(TitaVo titaVo) throws LogicException {
 		int result = 1;
 		// 銀扣檔有相同繳息迄日的期款扣款失敗資料
 		BankDeductDtl tBankDeductDtl = bankDeductDtlService.findL4450PrevIntDateFirst(custNo, facmNo, 
@@ -477,6 +477,7 @@ public class L4454 extends TradeBuffer {
 				}
 			}
 		}
+		this.info("fistDeductCheck="+ result );
 		return result;
 	}
 

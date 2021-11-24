@@ -171,7 +171,7 @@ public class LB090Report extends MakeReport {
 
 		try {
 			String strContent = "";
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".090.CSV"; // 458+月日+序號(1).090
+			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".090.CSV"; // 458+月日+序號(1).090.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B090", "擔保品關聯檔資料檔", strFileName, 2);
@@ -228,6 +228,9 @@ public class LB090Report extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
+						if (j != tLBVo.size()) {
+							strContent = strContent + ",";
+						}
 					}
 					makeFile.put(strContent);
 				}

@@ -652,6 +652,9 @@ ifxBatch:{
 #OOBormNo=預約序號
 {width:100,align:'center'}
 
+#OORvBormNo=撥款序號
+{width:100,align:'center'}
+
 #OOCurrencyCode=幣別
 {width:100,align:'left'}
 

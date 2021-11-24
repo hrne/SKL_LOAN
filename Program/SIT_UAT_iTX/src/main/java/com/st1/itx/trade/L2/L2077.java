@@ -117,7 +117,17 @@ public class L2077 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();
 		}
 
+		this.info("Size =" + lFacClose.size());
+		int i = 1;
 		for (FacClose tmpFacClose : lFacClose) {
+			
+//			只找同戶號額度最後一筆序號
+			if (i < lFacClose.size() && tmpFacClose.getCustNo() == lFacClose.get(i).getCustNo()
+					&& tmpFacClose.getFacmNo() == lFacClose.get(i).getFacmNo()) {
+				i++;
+				continue;
+			}
+			i++;
 			// new occurs
 			OccursList occursList = new OccursList();
 			// 宣告
@@ -187,6 +197,7 @@ public class L2077 extends TradeBuffer {
 				}
 
 			}
+
 			occursList.putParam("OOTranDate", tmpFacClose.getEntryDate());
 			occursList.putParam("OOFunCode", tmpFacClose.getFunCode());
 			occursList.putParam("OOCustNo", tmpFacClose.getCustNo());

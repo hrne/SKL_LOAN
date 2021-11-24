@@ -277,6 +277,7 @@ T(2,#FUNC4+#OOCloseDate+#OOCloseNo+#OOCustNo+#OOFacmNo+#OOCloseReasonCode+#OOClo
 BIND(grid,{ cmd=CHAIN; ntxcd=L2632; ntxbuf=#OOBUF4})
 C(3,#OOReceiveFg,1,BIND(grid,cancel),$)
 C(3,#OOFunCode,3,BIND(grid,cancel),$)
+C(3,#OOFunCode,0,C(5,#CloseDateFg,Y,BIND(grid,cancel),$),BIND(grid,cancel))
 
 !查詢
 #OOBUF5=X,60,S
@@ -295,12 +296,12 @@ E(0,1)
 C(3,#OOFunCode,0,C(3,#OOCollectWayCode,01,E(0,2),$),$)
 C(3,#OOFunCode,0,C(3,#OOCollectWayCode,20,E(0,2),$),$)
 C(3,#OOFunCode,1,E(0,3),$)
-C(3,#OOFunCode,2,E(0,3),$)
+C(3,#OOFunCode,2,E(0,2),$)
 C(3,#OOFunCode,3,E(0,3),$)
 
 #OOBUF6=X,60,S
 T(2,#FUNC6+#OOCustNo+#OOFacmNo)
-C(3,#FUNC6,2,T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo),$)
+C(3,#FUNC6,2,IF(#OORepayFg=="Y",$,T(2,#OOCustNo+#OOCloseNo+#FUNC6+#OOTranDate+#OOFacmNo)),$)
 
 #BTNNAME=X,1,S
 T(3,@OOBTN6,領取清償證明)

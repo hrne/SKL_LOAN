@@ -30,6 +30,7 @@ import com.st1.itx.util.common.AcReceivableCom;
 import com.st1.itx.util.common.BaTxCom;
 import com.st1.itx.util.common.GSeqCom;
 import com.st1.itx.util.date.DateUtil;
+import com.st1.itx.util.http.WebClient;
 import com.st1.itx.util.parse.Parse;
 
 /**
@@ -73,6 +74,8 @@ public class L2631 extends TradeBuffer {
 
 	@Autowired
 	GSeqCom gGSeqCom;
+	@Autowired
+	public WebClient webClient;
 
 	@Autowired
 	AcReceivableCom acReceivableCom;
@@ -116,7 +119,7 @@ public class L2631 extends TradeBuffer {
 		int iTranDate = parse.stringToInteger(titaVo.getParam("TranDate"));
 		// 申請日期
 		int iApplDate = parse.stringToInteger(titaVo.getParam("ApplDate"));
-		parse.stringToInteger(titaVo.getParam("CloseInd"));
+		String iCloseInd = titaVo.getParam("CloseInd");
 		// 額度編號
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
 
@@ -144,6 +147,7 @@ public class L2631 extends TradeBuffer {
 		tFacClose.setActFlag(iActFg);
 		tFacClose.setFunCode(titaVo.getParam("FunCode"));
 		tFacClose.setApplDate(iApplDate);
+		tFacClose.setCloseInd(iCloseInd);
 
 		// 入帳日期L2632
 		tFacClose.setCloseDate(0);
@@ -151,7 +155,7 @@ public class L2631 extends TradeBuffer {
 		tFacClose.setCloseAmt(iCloseAmt);
 		tFacClose.setTelNo1(titaVo.getParam("TelNo1"));
 		tFacClose.setTelNo2(titaVo.getParam("TelNo2"));
-		tFacClose.setFaxNum(titaVo.getParam("FaxNum"));
+		tFacClose.setTelNo3(titaVo.getParam("TelNo3"));
 		tFacClose.setCloseReasonCode(titaVo.getParam("CloseReasonCode"));
 		tFacClose.setCollectWayCode(titaVo.getParam("CollectWayCode"));
 		tFacClose.setReceiveDate(parse.stringToInteger(titaVo.getParam("ReceiveDate")));
@@ -201,24 +205,27 @@ public class L2631 extends TradeBuffer {
 				wkFacmNoEd = iFacmNo;
 			}
 			// 擔保品與額度關聯檔
-			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0, Integer.MAX_VALUE, titaVo);
+			Slice<ClFac> slClFac = clFacService.selectForL2017CustNo(iCustNo, wkFacmNoSt, wkFacmNoEd, 0,
+					Integer.MAX_VALUE, titaVo);
 			lClFac = slClFac == null ? null : slClFac.getContent();
 			// 全部結案
 			boolean isAllClose = true;
 			for (ClFac c : lClFac) {
-				if ((c.getCustNo() == iCustNo && iFacmNo == 0) || (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
+				if ((c.getCustNo() == iCustNo && iFacmNo == 0)
+						|| (c.getCustNo() == iCustNo && c.getFacmNo() == iFacmNo)) {
 
 					// 撥款主檔
-					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(), c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
+					Slice<LoanBorMain> slLoanBorMain = loanBorMainService.bormCustNoEq(c.getCustNo(), c.getFacmNo(),
+							c.getFacmNo(), 1, 900, 0, Integer.MAX_VALUE, titaVo);
 					if (slLoanBorMain != null) {
 						for (LoanBorMain t : slLoanBorMain.getContent()) {
 							// 戶況 0: 正常戶1:展期2: 催收戶3: 結案戶4: 逾期戶5: 催收結案戶6: 呆帳戶7: 部分轉呆戶8: 債權轉讓戶9: 呆帳結案戶
-							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6 || t.getStatus() == 8) {
+							if (t.getStatus() == 0 || t.getStatus() == 2 || t.getStatus() == 4 || t.getStatus() == 6
+									|| t.getStatus() == 8) {
 								isAllClose = false;
 								break;
 							}
 						}
-
 					}
 				}
 			}
@@ -235,9 +242,10 @@ public class L2631 extends TradeBuffer {
 
 			this.info("BeforeFacClose = " + BeforeFacClose);
 			String docNo = titaVo.getCalDy().substring(0, 3) + finalDocNo;
-			tFacClose.setFunCode(titaVo.getParam("FunCode"));
+			tFacClose.setFunCode("3"); //列印後固定為3補發
 			tFacClose.setActFlag(BeforeFacClose.getActFlag());
 			tFacClose.setApplDate(BeforeFacClose.getApplDate());
+			tFacClose.setCloseInd(BeforeFacClose.getCloseInd());
 			tFacClose.setCloseDate(BeforeFacClose.getCloseDate());
 			tFacClose.setCloseAmt(BeforeFacClose.getCloseAmt());
 			tFacClose.setAgreeNo(BeforeFacClose.getAgreeNo());
@@ -267,6 +275,12 @@ public class L2631 extends TradeBuffer {
 			} catch (DBException e) {
 				throw new LogicException("E0005", "清償作業檔");
 			}
+
+			String checkMsg = "抵押權塗銷同意書已完成。";
+
+			webClient.sendPost(dateUtil.getNowStringBc(), "2300", titaVo.getTlrNo(), "Y", "LC009", titaVo.getTlrNo(),
+					checkMsg, titaVo);
+
 		}
 
 		// 更新領取記號

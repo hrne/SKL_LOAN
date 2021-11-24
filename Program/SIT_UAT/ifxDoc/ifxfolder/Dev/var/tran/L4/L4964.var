@@ -128,7 +128,7 @@ T(1,@ClCode2,#NTXBUF,2,2)
 T(1,@ClNo,#NTXBUF,4,7)
 T(1,@CustNo,#NTXBUF,11,7)
 T(1,@FacmNo,#NTXBUF,18,3)
-
+E(0,@State,9)
 
 
 !擔保品代號１
@@ -199,6 +199,7 @@ C(3,#CHAIN,0,$,s)
 #FacmNo=A,3,S
 
 #State=A,1,I
+C(3,#CHAIN,1,s,$)
 HELP(#StateHelp)
 @
 V(H,#StateHelp)

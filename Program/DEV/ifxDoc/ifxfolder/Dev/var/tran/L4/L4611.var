@@ -447,6 +447,7 @@ IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 !檢查 地震險保險金額 + 火災險保險金額 > 0
 #CHECK_AMT=m,14.2,S
 E(2,#NewFireInsuCovrg+#NewEthqInsuCovrg)
+IF(#FunctionCode == 1,$,s)
 @
 IF(#CHECK_AMT==0,V(P,保險金額不可皆為0),$)
 
@@ -462,6 +463,7 @@ IF(#FunctionCode==1 || #FunctionCode==2 || #FunctionCode==6,$,s)
 !檢查 地震險保費 + 火災險保費 > 0
 #CHECK_FEE=m,14,S
 E(2,@TotalPrem,#NewFireInsuPrem+#NewEthqInsuPrem)
+IF(#FunctionCode == 1,$,s)
 @
 IF(#TotalPrem==0,V(P,保費不可皆為0),$)
 

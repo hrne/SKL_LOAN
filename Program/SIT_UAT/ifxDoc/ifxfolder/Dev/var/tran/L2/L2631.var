@@ -46,7 +46,7 @@
 [#<->#,"#FdCollectFlag+是否領取清償證明",#CollectFlag,#CollectFlagX],
 [#<->#,"#FdCloseAmt+清償金額",#CloseAmt],
 ["#FdTelNo1+連絡電話１",#TelNo1],["#FdTelNo2+連絡電話２",#TelNo2],
-["#FdTelNo3+連絡電話３",#FaxNum],["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
+["#FdTelNo3+連絡電話３",#TelNo3],["#FdCloseReasonCode+清償原因",#CloseReasonCode,#CloseReasonCodeX],
 ["#FdCollectWayCode+領取地點",#CollectWayCode,#CollectWayCodeX],["#FdReceiveDate+領取日期",#ReceiveDate],
 [#<->#,"#FdRmk1+備註欄",#Rmk1],
 ]
@@ -405,12 +405,9 @@ C(4,#CollectFlag,T(3,@CollectFlagX,),$)
 V(H,#YNHelp)
 C(5,#CollectFlag,"N",T(3,@CollectWayCode,01),T(3,@CollectWayCode,))
 
-
-
 #CollectFlagX=x,2,L
 T(H,#CollectFlag,#YNHelp)
-#RimTranDate=D,7,S
-#RimCollectFlag=X,1,S
+
 #RimEntryDate=D,7,S
 #RimCaseCloseCode=A,1,S
 
@@ -464,7 +461,7 @@ T(2,@CloseReasonCode,#L3r11CloseReasonCode)
 #TelNo2=x,15,I
 
 !傳真機號碼
-#FaxNum=x,15,I
+#TelNo3=x,15,I
 
 !清償原因
 #CloseReasonCode=X,2,I
@@ -584,7 +581,7 @@ K(LIGHT,#CloseNo,TXTRED,0,1)
 #CloseAmt
 #TelNo1
 #TelNo2
-#FaxNum
+#TelNo3
 #CloseReasonCode
 #CollectWayCode
 #ReceiveDate

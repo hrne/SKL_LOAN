@@ -39,7 +39,7 @@ E(0,0)
 <sub type="DC" name="L4931" layout="cols=3;screen.width=[130,870];printer.width=[20,80];order=1">
 [
 ["[L4931]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@個別利率調整作業"],
-[#<->#,"@@@@@@@@@戶別",#CustType,#CustTypeX],
+[#<->#,"@@@@@@@@@個金/企金",#CustType,#CustTypeX],
 [#<->#,"@@@@@作業項目",#TxKind,#TxKindX],
 [#<->#,"@@@@@@@@@註記",#AdjCode,#AdjCodeX],
 [#<->#,"@@@@@@@@@狀態",#InqCode,#InqCodeX],

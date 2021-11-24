@@ -1,0 +1,126 @@
+﻿!---------- BASIC LABEL Variables ----------
+<sub type="SYS">
+</sub>
+
+<sub type="SYS" name="label">
+!#TXCD
+!T(3,L4721)
+</sub>
+
+<sub type="DC" name="BFHEAD">
+<include src="COM.icf::BFHEAD.dec"/>
+!起始交易記號  0:起始交易,1:非起始交易
+#ORGFG=_,_,S
+E(0,0)
+</sub>
+
+!---------- 交易畫面及個別交易變數宣告 ----------
+<sub type="DC" name="L4721" layout="cols=1;screen.width=[130,870];printer.width=[20,80];order=1">
+[
+["[L4721]                                 整批批次產出利率變動對帳單"],
+[#<->#,"#FdAdjDate+利率調整日",#AdjDate],
+[#<->#,"#FdTxKind+利率種類",#TxKind,#TxKindX],
+[#<->#,"#FdCustType+個金/企金",#CustType,#CustTypeX]
+]
+
+#FdAdjDate=X,2,L
+#FdTxKind=X,2,L
+T(3,*)
+#FdCustType=X,2,L
+T(3,*)
+! Help
+<include src="HELPRIM.icf::HELPRIM.rtn"/>
+
+![戶別]
+#CDDEF01=x,26,S
+T(3,CdCode.EntCode2)
+
+#EntCodeHelp=x,1024,S 
+
+![利率種類]
+#CDDEF02=x,50,S
+T(3,CdCode.TxKind)
+
+#BaseRateHelp=x,1024,S 
+
+
+#HelpRim=X,1,S
+RESET_RIM(#HelpRim,XXR99)
+S(XXR99,01,#CDDEF01,#CDDEF02)
+R(1,XXR99)
+CALL(#HelpProc) 
+T(2,@EntCodeHelp,#HelpDesc1)
+T(2,@BaseRateHelp,#HelpDesc2)  
+! T(B,@BaseRateHelp,#HelpDesc2+;98:員工利率;99:自訂利率)  
+
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=X,14,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+! T(1,@FunctionCode,#NTXBUF,1,1)
+
+#AdjDate=D,7,L
+E(0,#SYSDATE)
+
+#TxKind=A,1,I
+HELP(#BaseRateHelp)
+@V(H,#BaseRateHelp)
+
+#TxKindX=X,16,L
+T(3,)T(H,#TxKind,#BaseRateHelp)
+!SWITCH(#TxKind
+!,01,T(2,保單分紅利率)
+!,02,T(2,郵政儲金利率)
+!,98,T(2,員工利率)
+!,99,T(2,自訂利率)
+!,T(2,))
+
+! 戶別
+#CustType=A,1,I
+E(0,1)
+HELP(#EntCodeHelp)
+@V(H,#EntCodeHelp)
+!HELP(1:個金;2:企金（含企金自然人）)
+!@V(1,1,2)     
+
+#CustTypeX=X,30,L
+T(3,)T(H,#CustType,#EntCodeHelp)
+!SWITCH(#CustType,1,T(3,個金),2,T(3,企金（含企金自然人）),T(3,))
+
+
+! #CHAINXMT=X,1,S
+! C(3,#CHAIN,1,E(0,@CHAIN,0)XMT(),$)
+
+</sub>
+
+!---------- 輸出共用變數宣告區 ----------
+<sub type="RTN" name="AFXMT">
+<include src="PRT.icf::PRTHEAD.rtn"/>
+</sub>
+
+!------------ TXFORM = L4721 -----------
+<sub type="FORM" name="L4721">
+</sub>
+
+!------ 上行電文 TEXT ------
+<sub type="TIM">
+#AdjDate
+#TxKind
+#CustType
+#END
+</sub>
+
+!------ 下行電文TOM ------
+<sub type="TOM">
+<include src="COM.icf::TRCTL.tom"/>
+TXFORM=L4721
+^
+<include src="HELPRIM.icf::HELPRIM.tom"/>
+</sub>
+
+
+!---------- 單據輸出組合 ----------
+<sub type="SELECT">
+<include src="PRT.icf::UPD01.sel"/>
+</sub>

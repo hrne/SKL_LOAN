@@ -513,12 +513,12 @@ public class L4450Batch extends TradeBuffer {
 					continue;
 				}
 
-				if (minIntStartDate.containsKey(tmp)) {
-					if (tBaTxVo.getIntStartDate() < minIntStartDate.get(tmp)) {
-						minIntStartDate.put(tmp, tBaTxVo.getIntStartDate());
+				if (minIntStartDate.containsKey(tmp2)) {
+					if (tBaTxVo.getIntStartDate() < minIntStartDate.get(tmp2)) {
+						minIntStartDate.put(tmp2, tBaTxVo.getIntStartDate());
 					}
 				} else {
-					minIntStartDate.put(tmp, tBaTxVo.getIntStartDate());
+					minIntStartDate.put(tmp2, tBaTxVo.getIntStartDate());
 				}
 
 //				 // 1.已送出媒體未回或未製成媒體 2.期款二扣
@@ -658,7 +658,7 @@ public class L4450Batch extends TradeBuffer {
 			}
 
 			tBankDeductDtl.setAcctCode(sAcctCode);
-			tBankDeductDtl.setPrevIntDate(minIntStartDate.get(tmp));
+			tBankDeductDtl.setPrevIntDate(minIntStartDate.get(tmp2));
 			this.info("1RepayType : " + tmp.getRepayType());
 			this.info("1shPayAmtMap : " + shPayAmtMap.get(tmp));
 			this.info("1repAmtMap : " + repAmtMap.get(tmp));

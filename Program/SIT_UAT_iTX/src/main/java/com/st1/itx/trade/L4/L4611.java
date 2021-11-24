@@ -265,7 +265,7 @@ public class L4611 extends TradeBuffer {
 			tInsuRenew.setTotInsuPrem(totPrem);
 
 			try {
-				insuRenewService.update(tInsuRenew);
+				insuRenewService.update(tInsuRenew, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0007", "L4611 InsuRenew update " + e.getErrorMsg());
 			}
@@ -290,7 +290,7 @@ public class L4611 extends TradeBuffer {
 			}
 
 			try {
-				insuRenewService.delete(tInsuRenew);
+				insuRenewService.delete(tInsuRenew, titaVo);
 			} catch (DBException e) {
 				throw new LogicException(titaVo, "E0008", e.getErrorMsg());
 			}

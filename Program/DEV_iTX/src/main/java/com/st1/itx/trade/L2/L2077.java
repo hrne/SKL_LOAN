@@ -117,7 +117,17 @@ public class L2077 extends TradeBuffer {
 			this.totaVo.setMsgEndToEnter();
 		}
 
+		this.info("Size =" + lFacClose.size());
+		int i = 1;
 		for (FacClose tmpFacClose : lFacClose) {
+			
+//			只找同戶號額度最後一筆序號
+			if (i < lFacClose.size() && tmpFacClose.getCustNo() == lFacClose.get(i).getCustNo()
+					&& tmpFacClose.getFacmNo() == lFacClose.get(i).getFacmNo()) {
+				i++;
+				continue;
+			}
+			i++;
 			// new occurs
 			OccursList occursList = new OccursList();
 			// 宣告
@@ -143,7 +153,7 @@ public class L2077 extends TradeBuffer {
 					BigDecimal.ZERO, titaVo);
 			logger.info("CloseBreach = " + baTxCom.getShortCloseBreach());
 			logger.info("FunCode = " + tmpFacClose.getFunCode());
-			if ("2".equals(tmpFacClose.getFunCode()) || "3".equals(tmpFacClose.getFunCode())
+			if (("2".equals(tmpFacClose.getFunCode()) || "3".equals(tmpFacClose.getFunCode()))
 					&& baTxCom.getShortCloseBreach().compareTo(BigDecimal.ZERO) == 0) {
 				logger.info("wkRepayFg = \"Y\"");
 				wkRepayFg = "Y";
@@ -187,6 +197,7 @@ public class L2077 extends TradeBuffer {
 				}
 
 			}
+
 			occursList.putParam("OOTranDate", tmpFacClose.getEntryDate());
 			occursList.putParam("OOFunCode", tmpFacClose.getFunCode());
 			occursList.putParam("OOCustNo", tmpFacClose.getCustNo());

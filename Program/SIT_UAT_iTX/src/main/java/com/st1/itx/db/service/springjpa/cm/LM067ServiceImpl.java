@@ -30,7 +30,6 @@ public class LM067ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
@@ -120,7 +119,7 @@ public class LM067ServiceImpl extends ASpringJpaParm implements InitializingBean
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
 		query.setParameter("yyyymm", iYear + String.format("%02d", iMonth));
-		return this.convertToMap(query.getResultList());
+		return this.convertToMap(query);
 
 	}
 

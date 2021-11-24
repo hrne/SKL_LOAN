@@ -24,6 +24,7 @@ import com.st1.itx.db.repository.hist.FacCloseRepositoryHist;
 import com.st1.itx.db.service.FacCloseService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -123,13 +124,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findCustNo " + dbName + " : " + "custNo_0 : " + custNo_0);
     if (dbName.equals(ContentName.onDay))
-      slice = facCloseReposDay.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, pageable);
+      slice = facCloseReposDay.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = facCloseReposMon.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, pageable);
+      slice = facCloseReposMon.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(custNo_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = facCloseReposHist.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, pageable);
+      slice = facCloseReposHist.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(custNo_0, pageable);
     else 
-      slice = facCloseRepos.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(custNo_0, pageable);
+      slice = facCloseRepos.findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(custNo_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -226,13 +227,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findEntryDate " + dbName + " : " + "entryDate_0 : " + entryDate_0);
     if (dbName.equals(ContentName.onDay))
-      slice = facCloseReposDay.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseDateAsc(entryDate_0, pageable);
+      slice = facCloseReposDay.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(entryDate_0, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = facCloseReposMon.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseDateAsc(entryDate_0, pageable);
+      slice = facCloseReposMon.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(entryDate_0, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = facCloseReposHist.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseDateAsc(entryDate_0, pageable);
+      slice = facCloseReposHist.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(entryDate_0, pageable);
     else 
-      slice = facCloseRepos.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseDateAsc(entryDate_0, pageable);
+      slice = facCloseRepos.findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(entryDate_0, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -301,13 +302,13 @@ em = null;
          pageable = PageRequest.of(index, limit);
     this.info("findApplDateEq " + dbName + " : " + "applDate_0 : " + applDate_0 + " applDate_1 : " +  applDate_1);
     if (dbName.equals(ContentName.onDay))
-      slice = facCloseReposDay.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAsc(applDate_0, applDate_1, pageable);
+      slice = facCloseReposDay.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(applDate_0, applDate_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = facCloseReposMon.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAsc(applDate_0, applDate_1, pageable);
+      slice = facCloseReposMon.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(applDate_0, applDate_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = facCloseReposHist.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAsc(applDate_0, applDate_1, pageable);
+      slice = facCloseReposHist.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(applDate_0, applDate_1, pageable);
     else 
-      slice = facCloseRepos.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAsc(applDate_0, applDate_1, pageable);
+      slice = facCloseRepos.findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(applDate_0, applDate_1, pageable);
 
 		if (slice != null) 
 			this.baseEntityManager.clearEntityManager(dbName);
@@ -359,7 +360,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Insert..." + dbName + " " + facClose.getFacCloseId());
     if (this.findById(facClose.getFacCloseId()) != null)
       throw new DBException(2);
@@ -388,7 +391,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + facClose.getFacCloseId());
     if (!empNot.isEmpty())
       facClose.setLastUpdateEmpNo(empNot);
@@ -411,7 +416,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("Update..." + dbName + " " + facClose.getFacCloseId());
     if (!empNot.isEmpty())
       facClose.setLastUpdateEmpNo(empNot);
@@ -461,7 +468,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    this.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (FacClose t : facClose){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -495,7 +505,9 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
     this.info("UpdateAll...");
     if (facClose == null || facClose.size() == 0)
       throw new DBException(6);

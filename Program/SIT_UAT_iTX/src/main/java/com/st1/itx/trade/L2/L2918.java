@@ -141,7 +141,7 @@ public class L2918 extends TradeBuffer {
 			}
 			occurslist.putParam("OOLandAdmItem", wkLandOfficeItem);
 			occurslist.putParam("OORecYear", t.getRecYear());
-			// 找 地政所名稱
+			// 找 收件字名稱
 			if ("".equals(t.getOtherRecWord())) {
 				CdLandOffice tCdLandOffice = cdLandOfficeService
 						.findById(new CdLandOfficeId(t.getLandAdm(), t.getRecWord()), titaVo);

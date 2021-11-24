@@ -143,7 +143,7 @@ public class LB087Report extends MakeReport {
 
 		try {
 			String strContent = "";
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".087.csv"; // 458+月日+序號(1)+.087.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".087.CSV"; // 458+月日+序號(1)+.087.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B087", "聯貸案首次動撥後６個月內發生違約之實際主導金融機構註記檔",
@@ -174,6 +174,9 @@ public class LB087Report extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
+						if (j != tLBVo.size()) {
+							strContent = strContent + ",";
+						}
 					}
 					makeFile.put(strContent);
 				}

@@ -92,7 +92,7 @@ R(1,L6R03)
 #L6r03ResultCity=x,50000,S
 T(2,:自行輸入;+#L6r03Result)
 
-! 銀行下拉選單
+! 權利價值說明下拉選單
 #CDDEF001=x,50,S
 T(3,CdCode.ClRightsNote)
 

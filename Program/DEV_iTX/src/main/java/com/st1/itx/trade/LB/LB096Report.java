@@ -306,6 +306,9 @@ public class LB096Report extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
+						if (j != tLBVo.size()) {
+							strContent = strContent + ",";
+						}
 					}
 					makeFile.put(strContent);
 				}

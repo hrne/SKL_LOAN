@@ -12,12 +12,20 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.CdLandOffice;
+import com.st1.itx.db.domain.CdLandOfficeId;
 import com.st1.itx.db.domain.ClFac;
 import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.domain.CustMain;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.FacCloseId;
 import com.st1.itx.db.domain.LoanBorMain;
+import com.st1.itx.db.service.CdCityService;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdLandOfficeService;
 import com.st1.itx.db.service.ClFacService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.db.service.CustMainService;
@@ -49,6 +57,13 @@ public class L2076 extends TradeBuffer {
 	public ClFacService clFacService;
 	@Autowired
 	public LoanBorMainService loanBorMainService;
+
+	@Autowired
+	public CdCodeService cdCodeService;
+	@Autowired
+	public CdCityService cdCityService;
+	@Autowired
+	public CdLandOfficeService cdLandOfficeService;
 
 	@Autowired
 	public DateUtil dateUtil;
@@ -210,16 +225,48 @@ public class L2076 extends TradeBuffer {
 				if (lClOtherRights != null) {
 					for (ClOtherRights tClOtherRights : lClOtherRights) {
 
+						// wk
+						String wkCityItem = "";
+						String wkLandOfficeItem = "";
+						String wkRecWordItem = "";
 						occursList = new OccursList();
 
 						occursList.putParam("OOClCode1", tClOtherRights.getClCode1());
 						occursList.putParam("OOClCode2", tClOtherRights.getClCode2());
 						occursList.putParam("OOClNo", tClOtherRights.getClNo());
 						occursList.putParam("OOSeq", tClOtherRights.getSeq());
-						occursList.putParam("OOCity", tClOtherRights.getCity());
-						occursList.putParam("OOLandAdm", tClOtherRights.getLandAdm());
+						// 找縣市名稱
+						if ("".equals(tClOtherRights.getOtherCity())) {
+							CdCity tCdCity = cdCityService.findById(tClOtherRights.getCity(), titaVo);
+							if (tCdCity != null) {
+								wkCityItem = tCdCity.getCityItem();
+							}
+						} else {
+							wkCityItem = tClOtherRights.getOtherCity();
+						}
+						occursList.putParam("OOCity", wkCityItem);
+						// 找地政所名稱
+						if ("".equals(tClOtherRights.getOtherLandAdm())) {
+							CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()), titaVo);
+							if (tCdCode != null) {
+								wkLandOfficeItem = tCdCode.getItem();
+							}
+						} else {
+							wkLandOfficeItem = tClOtherRights.getOtherLandAdm();
+						}
+						occursList.putParam("OOLandAdm", wkLandOfficeItem);
 						occursList.putParam("OORecYear", tClOtherRights.getRecYear());
-						occursList.putParam("OORecWord", tClOtherRights.getRecWord());
+						// 找 收件字名稱
+						if ("".equals(tClOtherRights.getOtherRecWord())) {
+							CdLandOffice tCdLandOffice = cdLandOfficeService
+									.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
+							if (tCdLandOffice != null) {
+								wkRecWordItem = tCdLandOffice.getRecWordItem();
+							}
+						} else {
+							wkRecWordItem = tClOtherRights.getOtherRecWord();
+						}
+						occursList.putParam("OORecWord", wkRecWordItem);
 						occursList.putParam("OORecNumber", tClOtherRights.getRecNumber());
 						occursList.putParam("OORightsNote", tClOtherRights.getRightsNote());
 						occursList.putParam("OOSecuredTotal", tClOtherRights.getSecuredTotal());

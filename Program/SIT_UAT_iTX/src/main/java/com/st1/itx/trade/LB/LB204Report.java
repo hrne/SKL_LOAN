@@ -213,7 +213,7 @@ public class LB204Report extends MakeReport {
 			int sumDrawdownAmt = 0; // 授信／清償金額總金額
 			String strContent = "";
 			DecimalFormat formatter = new DecimalFormat("0");
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".204.csv"; // 458+月日+序號(1)+.204.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".204.CSV"; // 458+月日+序號(1)+.204.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B204", "聯徵授信餘額日報檔", strFileName, 2);

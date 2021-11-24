@@ -11,10 +11,18 @@ import org.springframework.stereotype.Component;
 
 import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.TitaVo;
+import com.st1.itx.db.domain.CdCity;
+import com.st1.itx.db.domain.CdCode;
+import com.st1.itx.db.domain.CdCodeId;
+import com.st1.itx.db.domain.CdLandOffice;
+import com.st1.itx.db.domain.CdLandOfficeId;
 import com.st1.itx.db.domain.ClOtherRights;
 import com.st1.itx.db.domain.ClOtherRightsId;
 import com.st1.itx.db.domain.FacClose;
 import com.st1.itx.db.domain.FacCloseId;
+import com.st1.itx.db.service.CdCityService;
+import com.st1.itx.db.service.CdCodeService;
+import com.st1.itx.db.service.CdLandOfficeService;
 import com.st1.itx.db.service.ClOtherRightsService;
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.FacCloseService;
@@ -29,6 +37,12 @@ public class L2076Report extends MakeReport {
 
 	@Autowired
 	public ClOtherRightsService sClOtherRightsService;
+	@Autowired
+	public CdCityService cdCityService;
+	@Autowired
+	public CdCodeService cdCodeService;
+	@Autowired
+	public CdLandOfficeService cdLandOfficeService;
 	@Autowired
 	public CustMainService sCustMainService;
 	@Autowired
@@ -123,7 +137,8 @@ public class L2076Report extends MakeReport {
 		FacCloseId FacCloseId = new FacCloseId();
 		FacCloseId.setCustNo(iCustNo);
 		FacCloseId.setCloseNo(iCloseNo);
-		ClOtherRights tClOtherRights = sClOtherRightsService.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
+		ClOtherRights tClOtherRights = sClOtherRightsService
+				.findById(new ClOtherRightsId(iClCode1, iClCode2, iClNo, iSeq), titaVo);
 //		FacClose tFacClose = sFacCloseService.findById(FacCloseId, titaVo);
 		int DocNo = tFacClose.getDocNo();
 		String DocNoyy = parse.IntegerToString(DocNo, 7).substring(0, 3);
@@ -133,22 +148,48 @@ public class L2076Report extends MakeReport {
 		String funCdString = tFacClose.getFunCode();
 		// 縣市
 		String wkCity = "";
-		wkCity = tClOtherRights.getCity();
+		if ("".equals(tClOtherRights.getOtherCity())) {
+			CdCity tCdCity = cdCityService.findById(tClOtherRights.getCity(), titaVo);
+			if (tCdCity != null) {
+				wkCity = tCdCity.getCityItem();
+			}
+		} else {
+			wkCity = tClOtherRights.getOtherCity();
+		}
 		// 地政
 		String wkLandAdm = "";
-		wkLandAdm = tClOtherRights.getLandAdm();
+		if ("".equals(tClOtherRights.getOtherLandAdm())) {
+			CdCode tCdCode = cdCodeService.findById(new CdCodeId("LandOfficeCode", tClOtherRights.getLandAdm()),
+					titaVo);
+			if (tCdCode != null) {
+				wkLandAdm = tCdCode.getItem();
+			}
+		} else {
+			wkLandAdm = tClOtherRights.getOtherLandAdm();
+		}
 		// 收件年
 		String wkRecYear = "";
 		wkRecYear = "" + tClOtherRights.getRecYear();
 		// 收件字
 		String wkRecWord = "";
-		wkRecWord = tClOtherRights.getRecWord();
+		if ("".equals(tClOtherRights.getOtherRecWord())) {
+			CdLandOffice tCdLandOffice = cdLandOfficeService
+					.findById(new CdLandOfficeId(tClOtherRights.getLandAdm(), tClOtherRights.getRecWord()), titaVo);
+			if (tCdLandOffice != null) {
+				wkRecWord = tCdLandOffice.getRecWordItem();
+			}
+		} else {
+			wkRecWord = tClOtherRights.getOtherRecWord();
+		}
 		// 收件號
 		String wkRecNumber = "";
 		wkRecNumber = tClOtherRights.getRecNumber();
 		// 權利價值說明
 		String wkRightsNote = "";
-		wkRightsNote = tClOtherRights.getRightsNote();
+		CdCode tCdCode = cdCodeService.findById(new CdCodeId("ClRightsNote", tClOtherRights.getRightsNote()), titaVo);
+		if (tCdCode != null) {
+			wkRightsNote = tCdCode.getItem();
+		}
 		// 擔保債權總金額
 		BigDecimal wkSecuredTotal = BigDecimal.ZERO;
 		wkSecuredTotal = tClOtherRights.getSecuredTotal();
@@ -225,8 +266,16 @@ public class L2076Report extends MakeReport {
 
 		this.print(1, 10, "茲因                債務清償，同意       縣(市)      地政事務所");
 		this.print(0, 14, CustName);
-		this.print(0, 44, wkCity);
-		this.print(0, 57, wkLandAdm);
+		if (wkCity.length() > 3) {
+			this.print(0, 44, wkCity.substring(0, 3));
+		} else {
+			this.print(0, 44, wkCity);
+		}
+		if (wkLandAdm.length() > 3) {
+			this.print(0, 57, wkLandAdm.substring(0, 3));
+		} else {
+			this.print(0, 57, wkLandAdm);
+		}
 		this.print(1, 1, " ");
 		this.print(1, 1, " ");
 
@@ -234,7 +283,11 @@ public class L2076Report extends MakeReport {
 		this.print(0, 18, wkRecYear);
 		this.print(0, 25, "  ");
 		this.print(0, 30, "  ");
-		this.print(0, 45, wkRecWord);
+		if (wkRecWord.length() > 6) {
+			this.print(0, 41, wkRecWord.substring(0, 6));
+		} else {
+			this.print(0, 41, wkRecWord);
+		}
 		this.print(0, 60, wkRecNumber);
 		this.print(1, 1, " ");
 		this.print(1, 1, " ");

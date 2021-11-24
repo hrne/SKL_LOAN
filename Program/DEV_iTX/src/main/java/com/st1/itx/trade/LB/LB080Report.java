@@ -228,7 +228,7 @@ public class LB080Report extends MakeReport {
 		try {
 			int sumDrawdownAmt = 0; // 本階訂約金額(台幣)(78~87)
 			String strContent = "";
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".080.csv"; // 458+月日+序號(1)+.080.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".080.CSV"; // 458+月日+序號(1)+.080.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B080", "授信額度資料檔", strFileName, 2);
@@ -330,6 +330,9 @@ public class LB080Report extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
+						if (j != tLBVo.size()) {
+							strContent = strContent + ",";
+						}
 					}
 					makeFile.put(strContent);
 				}

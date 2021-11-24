@@ -8,8 +8,6 @@ import java.util.Map;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -23,17 +21,15 @@ import com.st1.itx.db.transaction.BaseEntityManager;
 @Repository
 /* 逾期放款明細 */
 public class LM065ServiceImpl extends ASpringJpaParm implements InitializingBean {
-	private static final Logger logger = LoggerFactory.getLogger(LM065ServiceImpl.class);
 
 	@Autowired
 	private BaseEntityManager baseEntityManager;
- 
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
- 
+
 	}
 
-	@SuppressWarnings({ "unchecked" })
 	public List<Map<String, String>> findAll(TitaVo titaVo) throws Exception {
 
 		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
@@ -56,8 +52,8 @@ public class LM065ServiceImpl extends ASpringJpaParm implements InitializingBean
 			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-		logger.info("lM065.findAll iYear=" + iYear + ",iMonth=" + iMonth);
-		
+		this.info("lM065.findAll iYear=" + iYear + ",iMonth=" + iMonth);
+
 		String sql = "SELECT DISTINCT(S1.\"CustNo\") AS F0";
 		sql += "			,S1.\"FacmNo\" AS F1";
 		sql += "			,S1.\"CustName\" AS F2";
@@ -123,14 +119,14 @@ public class LM065ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 GROUP BY \"CustNo\") R2";
 		sql += "	    ON R2.\"CustNo\" = S1.\"CustNo\" ";
 		sql += "	  ORDER BY S1.\"CustNo\", S1.\"FacmNo\"";
-	
-		logger.info("sql=" + sql);
+
+		this.info("sql=" + sql);
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sql);
-		query.setParameter("yyyymm", iYear+String.format("%02d",iMonth));
-		return this.convertToMap(query.getResultList());
+		query.setParameter("yyyymm", iYear + String.format("%02d", iMonth));
+		return this.convertToMap(query);
 	}
 
 }

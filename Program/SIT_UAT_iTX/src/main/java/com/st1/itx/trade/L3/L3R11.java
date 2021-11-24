@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -50,7 +48,6 @@ import com.st1.itx.util.parse.Parse;
 @Service("L3R11")
 @Scope("prototype")
 public class L3R11 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L3R11.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -107,7 +104,7 @@ public class L3R11 extends TradeBuffer {
 		iEntryDate = this.parse.stringToInteger(titaVo.getParam("RimEntryDate"));
 		iCaseCloseCode = this.parse.stringToInteger(titaVo.getParam("RimCaseCloseCode"));
 		// 清償作業
-		if ("L2631".equals(iTxCode)) {
+		if ("L2631".equals(iTxCode) || "L2632".equals(iTxCode)) {
 			this.wkCollectFlag = titaVo.getParam("CollectFlag");
 		}
 
@@ -263,7 +260,8 @@ public class L3R11 extends TradeBuffer {
 		//
 		if (iCaseCloseCode == 0 || iCaseCloseCode == 4 || iCaseCloseCode == 5 || iCaseCloseCode == 6) {
 			// 是否清償
-			if (!"L2631".equals(iTxCode)) {
+			if (!("L2631".equals(iTxCode) || "L2632".equals(iTxCode))) {
+				this.info("iTxCode = " + iTxCode);
 				facCloseCheck(titaVo);
 			}
 			// 計算清償違約金
@@ -299,15 +297,13 @@ public class L3R11 extends TradeBuffer {
 		this.totaVo.putParam("OCollFireFee", baTxCom.getCollFireFee());
 		this.totaVo.putParam("OCloseBreachAmt", oCloseBreachAmt);
 
-		oCloseAmt = oCloseAmt.add(oPrincipal).add(oInterest).add(oDelayInt).add(oBreachAmt)
-				.add(baTxCom.getShortfall())
-				.add(baTxCom.getAcctFee()).add(baTxCom.getModifyFee())
-				.add(baTxCom.getFireFee()).add(baTxCom.getCollFireFee())
-				.add(baTxCom.getLawFee()).add(baTxCom.getCollLawFee())
+		oCloseAmt = oCloseAmt.add(oPrincipal).add(oInterest).add(oDelayInt).add(oBreachAmt).add(baTxCom.getShortfall())
+				.add(baTxCom.getAcctFee()).add(baTxCom.getModifyFee()).add(baTxCom.getFireFee())
+				.add(baTxCom.getCollFireFee()).add(baTxCom.getLawFee()).add(baTxCom.getCollLawFee())
 				.add(oCloseBreachAmt);
-		
+
 		// 清償要扣除未到期火險費、溢收款
-		if ("L2631".equals(iTxCode)) {
+		if ("L2631".equals(iTxCode) || "L2632".equals(iTxCode)) {
 			oCloseAmt = oCloseAmt.subtract(baTxCom.getUnOpenfireFee()).subtract(baTxCom.getExcessive());
 		}
 		this.totaVo.putParam("OCloseAmt", oCloseAmt);

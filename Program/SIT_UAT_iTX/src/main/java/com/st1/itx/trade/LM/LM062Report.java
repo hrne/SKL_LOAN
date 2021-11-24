@@ -3,7 +3,9 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 
@@ -36,21 +38,63 @@ public class LM062Report extends MakeReport {
 	public void exec(TitaVo titaVo) throws LogicException {
 
 		this.info("LM062Report exec");
-
-		// 會計日年月
+		// 取得會計日(同頁面上會計日)
+		// 年月日
+		int iEntdy = Integer.valueOf(titaVo.get("ENTDY")) + 19110000;
+		// 年
 		int iYear = (Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 10000;
-		int iMonth = Integer.valueOf(String.valueOf(Integer.valueOf(titaVo.get("ENTDY")) + 19110000).substring(4, 6));
+		// 月
+		int iMonth = ((Integer.valueOf(titaVo.get("ENTDY")) + 19110000) / 100) % 100;
 
-		if (iMonth == 1) {
-			iYear = iYear - 1;
-			iMonth = 12;
-		} else {
-			iMonth = iMonth - 1;
+		// 格式
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+		// 當前日期
+		int nowDate = Integer.valueOf(iEntdy);
+
+		Calendar calendar = Calendar.getInstance();
+
+		// 設當年月底日
+		// calendar.set(iYear, iMonth, 0);
+		calendar.set(Calendar.YEAR, iYear);
+		calendar.set(Calendar.MONTH, iMonth - 1);
+		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+
+		// 以當前月份取得月底日期 並格式化處理
+		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+
+		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
+
+		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
+		// 星期 X (排除六日用) 代號 0~6對應 日到六
+		int wDay = calendar.get(Calendar.DAY_OF_WEEK);
+		this.info("day = " + dayItem[wDay - 1]);
+		int diff = 0;
+		if (wDay == 1) {
+			diff = -2;
+		} else if (wDay == 6) {
+			diff = 1;
+		}
+		this.info("diff=" + diff);
+		calendar.add(Calendar.DATE, diff);
+		// 矯正月底日
+		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
+		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
+		// 確認是否為1月
+		boolean isMonthZero = iMonth - 1 == 0;
+
+		// 當前日期 比 當月底日期 前面 就取上個月底日
+		if (nowDate < thisMonthEndDate) {
+			iYear = isMonthZero ? (iYear - 1) : iYear;
+			iMonth = isMonthZero ? 12 : iMonth - 1;
 		}
 
-		String yymmRoc = (iYear - 1911) + String.format("%02d", iMonth);
+		String iYearMonth = String.valueOf(((iYear - 1911) * 100) + iMonth);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM062", "01-個金3000萬以上-" + yymmRoc, "LM062_01-個金3000萬以上-" + yymmRoc, "LM062_底稿_個金3000萬以上.xls", "簡表");
+		this.info("yymm=" + iYearMonth);
+
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM062", "01-個金3000萬以上-" + iYearMonth,
+				"LM062_01-個金3000萬以上-" + iYearMonth, "LM062_底稿_個金3000萬以上.xls", "簡表");
 
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);
@@ -117,7 +161,10 @@ public class LM062Report extends MakeReport {
 						if (!tempNo.equals(tLDVo.get(fdnm))) {
 
 							tempNo = tLDVo.get(fdnm);
-							makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.valueOf(tLDVo.get(fdnm)), "R");
+							makeExcel.setValue(row, i,
+									tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+											: Integer.valueOf(tLDVo.get(fdnm)),
+									"R");
 
 						} else {
 
@@ -126,22 +173,28 @@ public class LM062Report extends MakeReport {
 						break;
 					case 3:
 						// C欄 額度
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.valueOf(tLDVo.get(fdnm)), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: Integer.valueOf(tLDVo.get(fdnm)),
+								"C");
 						break;
 					case 4:
 						// D欄 戶名
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
 						break;
 					case 5:
 						// E欄 覆審月份
-						day = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0 : Integer.valueOf(tLDVo.get(fdnm));
+						day = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
+								: Integer.valueOf(tLDVo.get(fdnm));
 						day = day % 100;
 
 						makeExcel.setValue(row, i, day, "C");
 						break;
 					case 6:
 						// F欄 撥款日期
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0 : Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "R");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
+								: Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "R");
 
 						// 與前一筆是否相同
 						if (!date.equals(tLDVo.get(fdnm))) {
@@ -160,7 +213,10 @@ public class LM062Report extends MakeReport {
 					case 7:
 						// G欄 放款餘額
 
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "#,##0", "R");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: new BigDecimal(tLDVo.get(fdnm)),
+								"#,##0", "R");
 
 						// 所有金額總計
 						tot = tot.add(new BigDecimal(tLDVo.get(fdnm)));
@@ -168,19 +224,27 @@ public class LM062Report extends MakeReport {
 						break;
 					case 8:
 						// H欄 全戶餘額
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "#,##0", "R");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
+										: new BigDecimal(tLDVo.get(fdnm)),
+								"#,##0", "R");
 						break;
 					case 9:
 						// I欄 展期記號
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 					case 10:
 						// J欄 應覆審案件
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 					case 11:
 						// K欄 評等
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm) == "0" ? "" : tLDVo.get(fdnm).equals("0") ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i,
+								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 || tLDVo.get(fdnm) == "0" ? ""
+										: tLDVo.get(fdnm).equals("0") ? "" : tLDVo.get(fdnm),
+								"C");
 						break;
 					default:
 

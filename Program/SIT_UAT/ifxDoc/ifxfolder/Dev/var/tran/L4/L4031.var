@@ -40,7 +40,7 @@ E(0,0)
 [
 ["[L4031]@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@利率調整清單"],
 [#<->#,"#FdRateChangeDate+調整日期",#RateChangeDate],
-[#<->#,"#FdCustType+戶別種類",#CustType,#CustTypeX]
+[#<->#,"#FdCustType+個金/企金",#CustType,#CustTypeX]
 ]
 
 #FdRateChangeDate=X,2,L

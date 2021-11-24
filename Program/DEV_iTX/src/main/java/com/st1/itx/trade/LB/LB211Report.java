@@ -220,7 +220,7 @@ public class LB211Report extends MakeReport {
 			int sumLoanBal = 0; // 本筆撥款／還款後餘額
 			String strContent = "";
 
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".211.csv"; // 458+月日+序號(1)+.211.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".211.CSV"; // 458+月日+序號(1)+.211.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B211", "聯徵每日授信餘額變動資料檔", strFileName, 2);

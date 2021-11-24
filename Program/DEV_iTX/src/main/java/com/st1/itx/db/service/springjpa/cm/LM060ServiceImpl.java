@@ -50,39 +50,12 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		Calendar calendar = Calendar.getInstance();
 
 		// 設當年月底日
-		// calendar.set(iYear, iMonth, 0);
-		calendar.set(Calendar.YEAR, iYear);
-		calendar.set(Calendar.MONTH, iMonth - 1);
-		calendar.set(Calendar.DATE, calendar.getActualMaximum(Calendar.DATE));
+		calendar.set(iYear, iMonth, 0);
 
 		// 以當前月份取得月底日期 並格式化處理
 		int thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
-		this.info("1.thisMonthEndDate=" + thisMonthEndDate);
-
-		String[] dayItem = { "日", "一", "二", "三", "四", "五", "六" };
-		// 星期 X (排除六日用) 代號 0~6對應 日到六
-		int day = calendar.get(Calendar.DAY_OF_WEEK);
-		this.info("day = " + dayItem[day - 1]);
-		int diff = 0;
-		if (day == 1) {
-			diff = -2;
-		} else if (day == 6) {
-			diff = 1;
-		}
-		this.info("diff=" + diff);
-		calendar.add(Calendar.DATE, diff);
-		// 矯正月底日
-		thisMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
-		this.info("2.thisMonthEndDate=" + thisMonthEndDate);
-		// 確認是否為1月
-		boolean isMonthZero = iMonth - 1 == 0;
-
-		// 當前日期 比 當月底日期 前面 就取上個月底日
-		if (nowDate < thisMonthEndDate) {
-			iYear = isMonthZero ? (iYear - 1) : iYear;
-			iMonth = isMonthZero ? 12 : iMonth - 1;
-		}
+		this.info("thisMonthEndDate=" + thisMonthEndDate);
 
 		String iYearMonth = String.valueOf((iYear * 100) + iMonth);
 		
@@ -91,14 +64,8 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 
 		int lastMonthEndDate = Integer.valueOf(dateFormat.format(calendar.getTime()));
 
-//		String iLYYMM = "";
-//		
-//		if (String.valueOf(iMonth).equals("1")) {
-//			iLYYMM = String.valueOf(iYear - 1) + "12";
-//		} else {
-//			iLYYMM = iYear + String.format("%02d", iMonth - 1);
-//		}
-
+		this.info("lastMonthEndDate=" + lastMonthEndDate);
+		
 		this.info("lM060.findAll YYMM=" +iYearMonth + ",LYYMM=" + lastMonthEndDate / 100
 				+ ",lday" + lastMonthEndDate);
 
@@ -117,11 +84,11 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,SUM(\"F2\") AS F2";
 		sql += "			,SUM(\"F3\") AS F3";
 		sql += "			,SUM(\"F4\") AS F4";
-		sql += "			,SUM(\"F5\") AS F5";
+		sql += "			,SUM(\"F0\") + SUM(\"F1\") + SUM(\"F2\") - SUM(\"F3\") - SUM(\"F4\") AS F5";
 		sql += "			,SUM(\"F6\") AS F6";
 		sql += "			,SUM(\"F7\") AS F7";
-		sql += "			,SUM(\"F8\") AS F8";
-		sql += "	  FROM(SELECT DECODE(A.\"MonthEndYm\",:lyymm,A.\"TdBal\",0) F0";
+		sql += "			,SUM(\"F6\") + SUM(\"F7\") AS F8";
+		sql += "	  FROM(SELECT A.\"TdBal\" - A.\"YdBal\" AS F0";
 		sql += "				 ,0 F1";
 		sql += "				 ,0 F2";
 		sql += "				 ,0 F3";
@@ -140,10 +107,9 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 ,DECODE(A.\"AcctCode\",'F24',A.\"DbAmt\" + A.\"CoreDbAmt\",0) F2";
 		sql += "				 ,DECODE(A.\"AcctCode\",'F07',A.\"CrAmt\" + A.\"CoreCrAmt\",0) F3";
 		sql += "				 ,DECODE(A.\"AcctCode\",'F24',A.\"CrAmt\" + A.\"CoreCrAmt\",0) F4";
-		sql += "				 ,DECODE(A.\"MonthEndYm\",:yymm,A.\"TdBal\",0) F5";
+		sql += "				 ,0 F5";
 		sql += "				 ,0 F6";
 		sql += "				 ,0 F7";
-		sql += "				 ,0 F8";
 		sql += "		   FROM \"AcMain\" A";
 		sql += "		   WHERE TRUNC(A.\"AcDate\" / 100) = :yymm";
 		sql += "		     AND A.\"AcctCode\" IN('F07','F24')";
@@ -156,7 +122,6 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 ,0 F5";
 		sql += "				 ,0 F6";
 		sql += "				 ,0 F7";
-		sql += "				 ,0 F8";
 		sql += "		   FROM \"ForeclosureFee\" FO";
 		sql += "		   WHERE TRUNC(FO.\"OpenAcDate\" / 100) = :yymm ";
 		sql += "			 AND FO.\"FeeCode\" NOT IN ('11','15')";
@@ -167,10 +132,14 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 ,0 F3";
 		sql += "				 ,0 F4";
 		sql += "				 ,0 F5";
-		sql += "				 ,DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,DECODE(TRUNC(F.\"OpenAcDate\" / 100),:yymm,F.\"Fee\",0),0),0) F6";
-		sql += "				 ,DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,0,F.\"Fee\"),0) F7";
-		sql += "				 ,DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,DECODE(TRUNC(F.\"OpenAcDate\" / 100),:yymm,F.\"Fee\",0),0),0)";
-		sql += "				 + DECODE(F.\"CloseDate\",0,DECODE(F.\"OverdueDate\",0,0,F.\"Fee\"),0) F8";
+		sql += "				 ,CASE";
+		sql += "				    WHEN F.\"CloseDate\" = 0 AND F.\"OverdueDate\" = 0 ";
+		sql += "				    THEN F.\"Fee\"";
+		sql += "				   ELSE 0 END  AS F6";
+		sql += "				 ,CASE";
+		sql += "				    WHEN F.\"CloseDate\" = 0 AND F.\"OverdueDate\" > 0 ";
+		sql += "				    THEN F.\"Fee\"";
+		sql += "				   ELSE 0 END  AS F7";
 		sql += "		   FROM \"ForeclosureFee\" F)";
 
 		this.info("sql=" + sql);

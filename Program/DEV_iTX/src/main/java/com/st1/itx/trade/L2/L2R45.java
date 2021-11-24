@@ -57,8 +57,7 @@ public class L2R45 extends TradeBuffer {
 		iFacmNo = parse.stringToInteger(titaVo.getParam("RimFacmNo"));
 		iFunCode = titaVo.getParam("RimFunCode");
 
-		// 作業項目=1.2請領時查詢清償(0)最後一筆,作業項目=3時查詢請領(1)最後一筆
-		if ("1".equals(iFunCode) || "2".equals(iFunCode)) {
+		if ("1".equals(iFunCode)) {
 			lfunCode.add("0");
 		} else {
 			lfunCode.add("2");
@@ -70,7 +69,7 @@ public class L2R45 extends TradeBuffer {
 		if (tFacClose == null) {
 			throw new LogicException(titaVo, "E2003", "查無清償作業檔資料"); // 查無資料
 		}
-		if (!("3".equals(iFunCode))) {
+		if (!("3".equals(iFunCode)||"2".equals(iFunCode))) {
 			if (!(tFacClose.getCloseDate() > 0)) {
 				throw new LogicException(titaVo, "E0010", "(需做結案登錄)"); // 查無資料
 			}
@@ -92,7 +91,7 @@ public class L2R45 extends TradeBuffer {
 		this.totaVo.putParam("L2r45ReceiveDate", tFacClose.getReceiveDate());
 		this.totaVo.putParam("L2r45TelNo1", tFacClose.getTelNo1());
 		this.totaVo.putParam("L2r45TelNo2", tFacClose.getTelNo2());
-		this.totaVo.putParam("L2r45FaxNum", tFacClose.getFaxNum());
+		this.totaVo.putParam("L2r45TelNo3", tFacClose.getTelNo3());
 		this.totaVo.putParam("L2r45EntryDate", tFacClose.getEntryDate());
 		this.totaVo.putParam("L2r45AgreeNo", tFacClose.getAgreeNo());
 		this.totaVo.putParam("L2r45DocNo", tFacClose.getDocNo());

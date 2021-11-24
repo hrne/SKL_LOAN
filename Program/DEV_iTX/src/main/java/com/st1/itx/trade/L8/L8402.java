@@ -17,7 +17,6 @@ import com.st1.itx.tradeService.TradeBuffer;
  * @version 1.0.0
  */
 public class L8402 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L8402.class);
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -59,7 +58,7 @@ public class L8402 extends TradeBuffer {
 		if (titaVo.get("MONTHLY5").equals("Y")) {
 			this.info("L8402 active LB087 ");
 //			MySpring.newTask("LB087", this.txBuffer, titaVo);
-			job+=";jLB087";
+			job += ";jLB087";
 		}
 
 		// B090 擔保品關聯檔資料檔
@@ -109,6 +108,12 @@ public class L8402 extends TradeBuffer {
 			this.info("L8402 active LB680 ");
 //			MySpring.newTask("LB680", this.txBuffer, titaVo);
 			job += ";jLB680";
+		}
+
+		// Rel聯徵授信「同一關係企業及集團企業」資料報送檔
+		if (titaVo.get("MONTHLY13").equals("Y")) {
+			this.info("L8402 active LBRel ");
+			job += ";jLBRel";
 		}
 
 		if (!job.equals("")) {

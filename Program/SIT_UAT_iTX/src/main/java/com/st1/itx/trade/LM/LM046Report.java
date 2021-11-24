@@ -3,7 +3,6 @@ package com.st1.itx.trade.LM;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
 
@@ -149,13 +148,13 @@ public class LM046Report extends MakeReport {
 			makeExcel.setValue(19 + count * 3 + 2, 3, totals[0], "#,##0");
 			makeExcel.setValue(19 + count * 3 + 2, 4, computeDivide(totals[1], thousand, 0));
 			makeExcel.setValue(19 + count * 3 + 2, 5, totals[2], "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 6, computeDivide(totals[2], totals[0], 5).multiply(hundred).setScale(2, RoundingMode.HALF_UP) + "%");
+			makeExcel.setValue(19 + count * 3 + 2, 6, computeDivide(totals[2], totals[0], 5), "0.00%");
 			makeExcel.setValue(19 + count * 3 + 2, 7, computeDivide(totals[3], thousand, 0), "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 8, computeDivide(totals[3], totals[1], 5).multiply(hundred).setScale(2, RoundingMode.HALF_UP) + "%");
+			makeExcel.setValue(19 + count * 3 + 2, 8, computeDivide(totals[3], totals[1], 5), "0.00%");
 			makeExcel.setValue(19 + count * 3 + 2, 9, totals[4], "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 10, computeDivide(totals[4], totals[0], 5).multiply(hundred).setScale(2, RoundingMode.HALF_UP) + "%");
+			makeExcel.setValue(19 + count * 3 + 2, 10, computeDivide(totals[4], totals[0], 5), "0.00%");
 			makeExcel.setValue(19 + count * 3 + 2, 11, computeDivide(totals[5], thousand, 0), "#,##0");
-			makeExcel.setValue(19 + count * 3 + 2, 12, computeDivide(totals[5], totals[1], 5).multiply(hundred).setScale(2, RoundingMode.HALF_UP) + "%");
+			makeExcel.setValue(19 + count * 3 + 2, 12, computeDivide(totals[5], totals[1], 5), "0.00%");
 
 			// 結束
 			count++;

@@ -23,7 +23,6 @@ import com.st1.itx.util.common.MakeReport;
 @Scope("prototype")
 
 public class LM066Report extends MakeReport {
-	// private static final Logger logger = LoggerFactory.getLogger(LM066Report.class);
 
 	@Autowired
 	LM066ServiceImpl lm066ServiceImpl;
@@ -52,7 +51,7 @@ public class LM066Report extends MakeReport {
 		calMonthLastDate.set(iYear, iMonth, 0);
 
 		int monthLastDate = Integer.valueOf(dateFormat.format(calMonthLastDate.getTime()));
- 
+
 		boolean isMonthZero = iMonth - 1 == 0;
 
 		if (nowDate < monthLastDate) {
@@ -61,8 +60,7 @@ public class LM066Report extends MakeReport {
 		}
 		String yymmRoc = (iYear - 1911) + String.format("%02d", iMonth);
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM066", "05-企金未達3000萬-" + yymmRoc,
-				"LM066_05-企金未達3000萬-" + yymmRoc, "LM066_底稿_企金未達3000萬.xls", "簡表");
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "LM066", "05-企金未達3000萬-" + yymmRoc, "LM066_05-企金未達3000萬-" + yymmRoc, "LM066_底稿_企金未達3000萬.xls", "簡表");
 
 		// 設定欄寬
 		makeExcel.setWidth(2, 12);
@@ -81,22 +79,22 @@ public class LM066Report extends MakeReport {
 
 		// 粗體
 		makeExcel.setIBU("B");
-		
+
 		// 機密等級及基準日期
 		makeExcel.setValue(1, 13, "機密等級：機密\n" + (iYear - 1911) + "." + String.format("%02d", iMonth), "R");
 
 		List<Map<String, String>> fnAllList = new ArrayList<>();
 
 		try {
-			
+
 			fnAllList = lm066ServiceImpl.findAll(titaVo);
-			
+
 		} catch (Exception e) {
-			
+
 			StringWriter errors = new StringWriter();
 			e.printStackTrace(new PrintWriter(errors));
 			this.info("LM066ServiceImpl.findAll error = " + errors.toString());
-			
+
 		}
 
 		// 資料比數是否大於0筆
@@ -109,8 +107,8 @@ public class LM066Report extends MakeReport {
 
 			// 總計
 			BigDecimal tot = new BigDecimal("0");
-			
-			//撥款日期
+
+			// 撥款日期
 			int day = 0;
 			int lday = 0;
 			String date = "";
@@ -124,7 +122,7 @@ public class LM066Report extends MakeReport {
 				for (int col = 0; col < tLDVo.size(); col++) {
 
 					fdnm = "F" + String.valueOf(col);
-					
+
 					// 實際EXCEL 欄位分配
 					int i = col + 2;
 					switch (i) {
@@ -134,10 +132,7 @@ public class LM066Report extends MakeReport {
 						if (!tempNo.equals(tLDVo.get(fdnm))) {
 							tempNo = tLDVo.get(fdnm);
 
-							makeExcel.setValue(row, i,
-									tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
-											: Integer.valueOf(tLDVo.get(fdnm)),
-									"R");
+							makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.valueOf(tLDVo.get(fdnm)), "R");
 						} else {
 							makeExcel.setValue(row, i, "", "R");
 						}
@@ -146,28 +141,21 @@ public class LM066Report extends MakeReport {
 					case 3:
 						// C欄 額度
 						makeExcel.setIBU("B");
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
-										: Integer.valueOf(tLDVo.get(fdnm)),
-								"C");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.valueOf(tLDVo.get(fdnm)), "C");
 						break;
 					case 4:
 						// D欄 戶名
 
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "L");
 						break;
 					case 5:
 						// E欄 區域中心名稱
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "(空白)" : tLDVo.get(fdnm),
-								"L");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "(空白)" : tLDVo.get(fdnm), "L");
 						break;
 					case 6:
 
 						// F欄 覆審月份
-						day = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0
-								: Integer.valueOf(tLDVo.get(fdnm));
+						day = tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? 0 : Integer.valueOf(tLDVo.get(fdnm));
 						day = day % 100;
 
 						makeExcel.setValue(row, i, day, "C");
@@ -175,10 +163,7 @@ public class LM066Report extends MakeReport {
 
 					case 7:
 						// G欄 撥款日期
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
-										: Integer.parseInt(tLDVo.get(fdnm)) - 19110000,
-								"R");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : Integer.parseInt(tLDVo.get(fdnm)) - 19110000, "R");
 
 						// 與前一筆是否相同
 						if (!date.equals(tLDVo.get(fdnm))) {
@@ -196,36 +181,27 @@ public class LM066Report extends MakeReport {
 					case 8:
 						// H欄 放款餘額
 
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
-										: new BigDecimal(tLDVo.get(fdnm)),
-								"#,##0", "R");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "#,##0", "R");
 						// 所有金額總計
 						tot = tot.add(new BigDecimal(tLDVo.get(fdnm)));
 						break;
 					case 9:
 						// I欄 全戶餘額
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO
-										: new BigDecimal(tLDVo.get(fdnm)),
-								"#,##0", "R");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? BigDecimal.ZERO : new BigDecimal(tLDVo.get(fdnm)), "#,##0", "R");
 						break;
 					case 10:
 						// J欄 展期記號
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 
 					case 11:
 						// K欄 應覆審案件
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 					/** 如何判斷舊件 **/
 					case 12:
 						// L欄 已覆審
-						makeExcel.setValue(row, i,
-								tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm), "C");
 						break;
 					case 13:
 						// M欄 已覆審日
@@ -234,17 +210,16 @@ public class LM066Report extends MakeReport {
 							// 202011
 							yymm = Integer.parseInt(xyymm) - 191100;
 							xyymm = String.valueOf(yymm).substring(0, 3) + "." + String.valueOf(yymm).substring(3, 5);
-						} else if(xyymm.length() == 1){
-							
-						} else{
+						} else if (xyymm.length() == 1) {
+
+						} else {
 							// 20209-19110=1099
 							yymm = Integer.parseInt(xyymm) - 19110;
 							if (String.valueOf(yymm).substring(3, 4).equals("0")) {
 								xyymm = "";
 							} else {
 
-								xyymm = String.valueOf(yymm).substring(0, 3) + "."
-										+ String.valueOf(yymm).substring(3, 4);
+								xyymm = String.valueOf(yymm).substring(0, 3) + "." + String.valueOf(yymm).substring(3, 4);
 							}
 						}
 
@@ -253,8 +228,7 @@ public class LM066Report extends MakeReport {
 						break;
 					case 14:
 						// N欄 評等
-						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? ""
-								: tLDVo.get(fdnm).equals("0") ? "" : tLDVo.get(fdnm), "C");
+						makeExcel.setValue(row, i, tLDVo.get(fdnm) == null || tLDVo.get(fdnm).length() == 0 ? "" : tLDVo.get(fdnm).equals("0") ? "" : tLDVo.get(fdnm), "C");
 						break;
 					default:
 
@@ -266,12 +240,11 @@ public class LM066Report extends MakeReport {
 			makeExcel.setValue(row + 1, 2, "總計", "L");
 			makeExcel.setValue(row + 1, 7, lday - 19110000, "R");
 			makeExcel.setValue(row + 1, 8, tot, "#,##0", "R");
-			
+
 			// 畫框線
 //			makeExcel.setAddRengionBorder("B", 3, "L", row + 1, 1);
 			makeExcel.setColor("RED");
-			makeExcel.setMergedRegionValue(row + 2, row + 2, 2, 14,
-					"◎ 展期件當年度免辦理覆審，惟若第二年餘額超過1500萬（含）以上，須列為（展期後第二年度）必要覆審案件。", "L");
+			makeExcel.setMergedRegionValue(row + 2, row + 2, 2, 14, "◎ 展期件當年度免辦理覆審，惟若第二年餘額超過1500萬（含）以上，須列為（展期後第二年度）必要覆審案件。", "L");
 		} else {
 
 			makeExcel.setValue(3, 2, "本日無資料");

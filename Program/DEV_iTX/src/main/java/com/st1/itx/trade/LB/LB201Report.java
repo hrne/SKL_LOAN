@@ -517,7 +517,7 @@ public class LB201Report extends MakeReport {
 			String strContent = "";
 			DecimalFormat formatter = new DecimalFormat("0");
 
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".201.csv"; // 458+月日+序號(1)+.201.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".201.CSV"; // 458+月日+序號(1)+.201.CSV
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B201", "聯徵授信餘額月報檔", strFileName, 2);
 			// 標題列
 			strContent = inf;

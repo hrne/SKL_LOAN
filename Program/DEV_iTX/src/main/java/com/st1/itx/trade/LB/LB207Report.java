@@ -249,7 +249,7 @@ public class LB207Report extends MakeReport {
 
 		try {
 			String strContent = "";
-			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".207.csv"; // 458+月日+序號(1)+.207.CSV
+			String strFileName = "458" + strTodayMM + strTodaydd + "1" + ".207.CSV"; // 458+月日+序號(1)+.207.CSV
 			this.info("------------titaVo.getEntDyI()=" + titaVo.getEntDyI());
 			this.info("------------titaVo.getKinbr()=" + titaVo.getKinbr());
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B207", "授信戶基本資料檔", strFileName, 2);
@@ -374,6 +374,9 @@ public class LB207Report extends MakeReport {
 							break;
 						}
 						strContent = strContent + strField;
+						if (j != tLBVo.size()) {
+							strContent = strContent + ",";
+						}
 					}
 					makeFile.put(strContent);
 				}

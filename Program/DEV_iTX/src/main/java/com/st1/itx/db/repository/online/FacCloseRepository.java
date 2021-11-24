@@ -24,7 +24,7 @@ import com.st1.itx.db.domain.FacCloseId;
 public interface FacCloseRepository extends JpaRepository<FacClose, FacCloseId> {
 
   // CustNo = 
-  public Slice<FacClose> findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(int custNo_0, Pageable pageable);
+  public Slice<FacClose> findAllByCustNoIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int custNo_0, Pageable pageable);
 
   // CustNo = ,AND FacmNo = 
   public Slice<FacClose> findAllByCustNoIsAndFacmNoIsOrderByCustNoAscFacmNoAscCloseDateAsc(int custNo_0, int facmNo_1, Pageable pageable);
@@ -36,7 +36,7 @@ public interface FacCloseRepository extends JpaRepository<FacClose, FacCloseId> 
   public Optional<FacClose> findTopByCustNoIsOrderByCloseNoDesc(int custNo_0);
 
   // EntryDate =
-  public Slice<FacClose> findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseDateAsc(int entryDate_0, Pageable pageable);
+  public Slice<FacClose> findAllByEntryDateIsOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int entryDate_0, Pageable pageable);
 
   // CloseDate = ,AND CloseNo >= ,AND CloseNo <= ,AND CarLoan >= ,AND CarLoan <=
   public Slice<FacClose> findAllByCloseDateIsAndCloseNoGreaterThanEqualAndCloseNoLessThanEqualAndCarLoanGreaterThanEqualAndCarLoanLessThanEqualOrderByCustNoAscFacmNoAscCloseDateAsc(int closeDate_0, int closeNo_1, int closeNo_2, int carLoan_3, int carLoan_4, Pageable pageable);
@@ -45,7 +45,7 @@ public interface FacCloseRepository extends JpaRepository<FacClose, FacCloseId> 
   public Optional<FacClose> findTopByCustNoIsAndFacmNoIsAndFunCodeInOrderByCloseNoDesc(int custNo_0, int facmNo_1, List<String> funCode_2);
 
   // ApplDate >= ,AND ApplDate <=
-  public Slice<FacClose> findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAsc(int applDate_0, int applDate_1, Pageable pageable);
+  public Slice<FacClose> findAllByApplDateGreaterThanEqualAndApplDateLessThanEqualOrderByCustNoAscFacmNoAscCloseNoAscCloseDateAsc(int applDate_0, int applDate_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)
