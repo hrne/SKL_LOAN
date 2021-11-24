@@ -88,7 +88,7 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "			,SUM(\"F6\") AS F6";
 		sql += "			,SUM(\"F7\") AS F7";
 		sql += "			,SUM(\"F6\") + SUM(\"F7\") AS F8";
-		sql += "	  FROM(SELECT A.\"TdBal\" - A.\"YdBal\" AS F0";
+		sql += "	  FROM(SELECT A.\"TdBal\" AS F0";
 		sql += "				 ,0 F1";
 		sql += "				 ,0 F2";
 		sql += "				 ,0 F3";

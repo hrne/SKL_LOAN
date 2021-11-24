@@ -93,7 +93,7 @@ public class LB211Report extends MakeReport {
 			makeFile.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "B211", "聯徵每日授信餘額變動資料檔", strFileName, 2);
 
 			// 首筆
-			strContent = "JCIC-DAT-B211-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－王薏涵", 20, ' ')
+			strContent = "JCIC-DAT-B211-V01-458" + StringUtils.repeat(" ", 5) + strToday + "01" + StringUtils.repeat(" ", 10) + makeFile.fillStringR("審查聯絡人－李秋燕", 20, ' ')
 					+ makeFile.fillStringR("02-23895858#7067", 16, ' ') + makeFile.fillStringR(" ", 20, ' ') + makeFile.fillStringR(" ", 16, ' ') + StringUtils.repeat(" ", 80)
 					+ StringUtils.repeat(" ", 43);
 			makeFile.put(strContent);

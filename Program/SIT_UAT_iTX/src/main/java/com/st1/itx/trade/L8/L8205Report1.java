@@ -139,6 +139,7 @@ public class L8205Report1 extends MakeReport {
 					check = "同意";
 				}
 				print(1, 4, "主管覆核: "+check);
+				print(1, 4, "");
 				
 				// 檢查列數
 				checkRow(stEntryDate, edEntryDate);
@@ -180,7 +181,7 @@ public class L8205Report1 extends MakeReport {
 	 * @param edEntryDate 日期 區間-止
 	 */
 	private void checkRow(String stEntryDate, String edEntryDate) {
-		if (this.NowRow >= 58) {
+		if (this.NowRow >= 60) {
 
 			newPage();
 			this.print(-7, 40, stEntryDate + "－" + edEntryDate);

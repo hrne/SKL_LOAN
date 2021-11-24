@@ -8541,6 +8541,7 @@ TXFORM=L6R18
 #L6R19Month{i}=N,2,S
 #L6R19StartDate{i}=N,7,S
 #L6R19EndDate{i}=N,7,S
+#L6R19BonusDate{i}=N,7,S
 ##end
 </L6R19.dec>
 
@@ -8551,6 +8552,7 @@ TXFORM=L6R19
 #L6R19Month{i}
 #L6R19StartDate{i}
 #L6R19EndDate{i}
+#L6R19BonusDate{i}
 ##end
 ^
 </L6R19.tom>

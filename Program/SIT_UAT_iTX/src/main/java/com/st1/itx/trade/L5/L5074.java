@@ -74,9 +74,9 @@ public class L5074 extends TradeBuffer {
 	String ColB[] = { "", "前日匯入", "本日匯入", "撥入筆數", "檢核成功", "檢核失敗" };
 	String ColC[] = { "", "未入帳", "待處理", "本日入帳", "放款暫收" };
 	String ColD[] = { "", "撥付金額", "放款攤分", "保單攤分", "結清退還款" };
-	String ColE[] = { "", "本月入帳", "本月放款", "本月保單", "累計未退還餘額" ,"暫收解入"};
+	String ColE[] = { "", "本月入帳", "本月放款", "本月保單", "累計未退還餘額", "暫收解入" };
 	String ColDetail[] = { "債協", "調解", "更生", "清算" };
-	String Issue[] = { "", "入帳還款", "撥付製檔", "撥付出帳", "撥付提兌" ,"暫收解入"};// 製檔日,傳票日,提兌日
+	String Issue[] = { "", "入帳還款", "撥付製檔", "撥付出帳", "撥付提兌", "暫收解入" };// 製檔日,傳票日,提兌日
 
 	@Override
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
@@ -132,7 +132,7 @@ public class L5074 extends TradeBuffer {
 
 			int IsMainFin = 0;// 最大債權 0否 1是
 			int State = 0;// 01:前日匯入,02:未入帳,03:待處理,04:已入帳,05:本月入帳,06:放款攤分,07:保單攤分,08:結清退還,09:本月放款,10:本月保單,
-							//11:累計未退還餘額,12:本日匯入,13:撥入筆數,14:檢核成功,15:檢核失敗,16:放款暫收,17:本月放款,18:暫收解入
+							// 11:累計未退還餘額,12:本日匯入,13:撥入筆數,14:檢核成功,15:檢核失敗,16:放款暫收,17:本月放款,18:暫收解入
 			int Detail = 0;// 00:無,01:債協,02:調解,03:更生,04:清算
 			int ExportDateYN = 0;// 0:無(左側),1:已製檔,2:未製檔
 			int IsBtn = 0;
@@ -155,8 +155,10 @@ public class L5074 extends TradeBuffer {
 						throw new LogicException(titaVo, "E5004", "");
 					}
 					// 前日匯入(總筆數)-(未入帳,待處理)
-					TodayWorkCnt = Data[0];// 筆數
-					TodayWorkAmt = Data[1];// 金額
+					//TodayWorkCnt = Data[0];// 筆數
+					//TodayWorkAmt = Data[1];// 金額
+					TodayWorkCnt = "0";// 筆數
+					TodayWorkAmt = "0";// 金額
 
 					BufToday = BufValue(IsMainFin, State, Detail, ExportDateYN, IsBtn);
 				} else if (i == 2) {
@@ -645,7 +647,8 @@ public class L5074 extends TradeBuffer {
 	}
 
 	public String HadDo(int IntAcDate, String BtnCode, TitaVo titaVo) throws LogicException {
-		// 處理事項是否顯示 0不顯示 1:導入L597A 2:撥付產檔日(L5707) 3:撥付傳票日(L5708) 4:撥付提兌日(L5709) 5:暫收解入(L5712)
+		// 處理事項是否顯示 0不顯示 1:導入L597A 2:撥付產檔日(L5707) 3:撥付傳票日(L5708) 4:撥付提兌日(L5709)
+		// 5:暫收解入(L5712)
 		Boolean TF = false;
 		Slice<NegTrans> slNegTrans = null;
 		this.info("HadDo BtnCode=[" + BtnCode + "]");

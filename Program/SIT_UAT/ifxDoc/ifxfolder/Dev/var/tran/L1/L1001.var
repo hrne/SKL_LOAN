@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,231)ASGN(INQLEN$)
+E(0,232)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -284,7 +284,8 @@ T(3,1)ASGN(LOOP$)
 #OOCustCrossBTNFg=A,1,S
 !顧客電話
 #OOCustTelNoBTNFg=A,1,S
-
+! 寬限條件控管
+#OOGraceConditionFg=A,1,S
 #OOCustId=X,10,L
 #OOCustNo=A,7,L
 #OOCustTypeCode=A,2,S
@@ -401,6 +402,15 @@ C(2,#OOCustTelNoBTNFg,BIND(grid,{ cmd=CHAIN; ntxcd=L1905; text=未設定; ntxbuf
 BIND(grid,{ cmd=CHAIN; ntxcd=L1905;text=已設定; ntxbuf=#OOBUF14}),
 BIND(grid,cancel))
 
+!寬限控管
+#OOBUF15=X,7,S
+T(2,#OOCustNo)
+
+#OOBTN15=X,1,S
+C(2,#OOGraceConditionFg,BIND(grid,{ cmd=CHAIN; ntxcd=L5906; text=未設定; ntxbuf=#OOBUF15}),
+BIND(grid,{ cmd=CHAIN; ntxcd=L5906;text=已設定; ntxbuf=#OOBUF15}),
+BIND(grid,cancel))
+
 !變更修改
 
 #OOBUF13=X,11,S
@@ -444,6 +454,7 @@ TXFORM=L1001
 #OOCustRelBTNFg
 #OOCustCrossBTNFg
 #OOCustTelNoBTNFg
+#OOGraceConditionFg
 #OOCustId
 #OOCustNo
 #OOCustTypeCode
@@ -500,6 +511,9 @@ TXFORM=L1001
 
 #OOBTN14=客戶</br>電話
 {width:60,search:false,formatter:'cust:bind-button:#OOBTN14',align:'center',canExport:false}
+
+#OOBTN15=寬限</br>控管
+{width:60,search:false,formatter:'cust:bind-button:#OOBTN15',align:'center',canExport:false}
 
 #OOBTN13=基本</br>資料
 {width:50,search:false,formatter:'cust:bind-button:#OOBTN13',align:'center',canExport:false}

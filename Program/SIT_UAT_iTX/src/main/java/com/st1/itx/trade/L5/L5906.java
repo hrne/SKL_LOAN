@@ -50,7 +50,7 @@ public class L5906 extends TradeBuffer {
 		if (iCustNoS == 0 && iCustNoE == 0) {
 			iGraceCondition = iGraceConditionService.findAll(this.index, this.limit, titaVo);
 		} else {
-			iGraceCondition = iGraceConditionService.CustNoEq(iCustNoE, iCustNoS, this.index, this.limit, titaVo);
+			iGraceCondition = iGraceConditionService.custNoEq(iCustNoE, iCustNoS, this.index, this.limit, titaVo);
 		}
 		if (iGraceCondition != null && iGraceCondition.hasNext()) {
 			/* 如果有下一分頁 會回true 並且將分頁設為下一頁 如需折返如下 不須折返 直接再次查詢即可 */

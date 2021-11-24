@@ -33,7 +33,6 @@ import com.st1.itx.util.data.DataLog;
  */
 
 public class L6752 extends TradeBuffer {
-	// private static final Logger logger = LoggerFactory.getLogger(L6752.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -70,6 +69,7 @@ public class L6752 extends TradeBuffer {
 				int iMonth = this.parse.stringToInteger(titaVo.getParam("Month" + i));
 				int iStartDate = this.parse.stringToInteger(titaVo.getParam("StartDate" + i));
 				int iEndDate = this.parse.stringToInteger(titaVo.getParam("EndDate" + i));
+				int iBonusDate = this.parse.stringToInteger(titaVo.getParam("BonusDate" + i)); 
 
 				// 若該筆無資料就離開迴圈
 				if (iMonth == 0) {
@@ -86,7 +86,7 @@ public class L6752 extends TradeBuffer {
 				tCdWorkMonth.setMonth(iMonth);
 				tCdWorkMonth.setStartDate(iStartDate);
 				tCdWorkMonth.setEndDate(iEndDate);
-
+				tCdWorkMonth.setBonusDate(iBonusDate);
 				tCdWorkMonth.setCreateDate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 				tCdWorkMonth.setCreateEmpNo(titaVo.getTlrNo());
 				tCdWorkMonth.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
@@ -110,7 +110,7 @@ public class L6752 extends TradeBuffer {
 				int iMonth = this.parse.stringToInteger(titaVo.getParam("Month" + i));
 				int iStartDate = this.parse.stringToInteger(titaVo.getParam("StartDate" + i));
 				int iEndDate = this.parse.stringToInteger(titaVo.getParam("EndDate" + i));
-
+				int iBonusDate = this.parse.stringToInteger(titaVo.getParam("BonusDate" + i));
 				// 若該筆無資料就離開迴圈
 				if (iMonth == 0) {
 					break;
@@ -126,6 +126,7 @@ public class L6752 extends TradeBuffer {
 				try {
 					tCdWorkMonth.setStartDate(iStartDate);
 					tCdWorkMonth.setEndDate(iEndDate);
+					tCdWorkMonth.setBonusDate(iBonusDate);
 					tCdWorkMonth.setLastUpdate(parse.IntegerToSqlDateO(dateUtil.getNowIntegerForBC(), dateUtil.getNowIntegerTime()));
 					tCdWorkMonth.setLastUpdateEmpNo(titaVo.getTlrNo());
 

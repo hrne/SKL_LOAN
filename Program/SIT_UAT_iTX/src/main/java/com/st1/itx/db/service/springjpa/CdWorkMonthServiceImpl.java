@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.CdWorkMonthRepositoryHist;
 import com.st1.itx.db.service.CdWorkMonthService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("cdWorkMonthService")
 @Repository
-public class CdWorkMonthServiceImpl implements CdWorkMonthService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(CdWorkMonthServiceImpl.class);
-
+public class CdWorkMonthServiceImpl extends ASpringJpaParm implements CdWorkMonthService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class CdWorkMonthServiceImpl implements CdWorkMonthService, InitializingB
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + cdWorkMonthId);
+    this.info("findById " + dbName + " " + cdWorkMonthId);
     Optional<CdWorkMonth> cdWorkMonth = null;
     if (dbName.equals(ContentName.onDay))
       cdWorkMonth = cdWorkMonthReposDay.findById(cdWorkMonthId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "Year", "Month"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "Year", "Month"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = cdWorkMonthReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -106,6 +103,9 @@ em = null;
       slice = cdWorkMonthReposHist.findAll(pageable);
     else 
       slice = cdWorkMonthRepos.findAll(pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -122,7 +122,7 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("findYearMonth " + dbName + " : " + "year_0 : " + year_0 + " year_1 : " +  year_1 + " month_2 : " +  month_2 + " month_3 : " +  month_3);
+    this.info("findYearMonth " + dbName + " : " + "year_0 : " + year_0 + " year_1 : " +  year_1 + " month_2 : " +  month_2 + " month_3 : " +  month_3);
     if (dbName.equals(ContentName.onDay))
       slice = cdWorkMonthReposDay.findAllByYearGreaterThanEqualAndYearLessThanEqualAndMonthGreaterThanEqualAndMonthLessThanEqualOrderByYearAscMonthAsc(year_0, year_1, month_2, month_3, pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -132,6 +132,9 @@ em = null;
     else 
       slice = cdWorkMonthRepos.findAllByYearGreaterThanEqualAndYearLessThanEqualAndMonthGreaterThanEqualAndMonthLessThanEqualOrderByYearAscMonthAsc(year_0, year_1, month_2, month_3, pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findDateFirst " + dbName + " : " + "startDate_0 : " + startDate_0 + " endDate_1 : " +  endDate_1);
+    this.info("findDateFirst " + dbName + " : " + "startDate_0 : " + startDate_0 + " endDate_1 : " +  endDate_1);
     Optional<CdWorkMonth> cdWorkMonthT = null;
     if (dbName.equals(ContentName.onDay))
       cdWorkMonthT = cdWorkMonthReposDay.findTopByStartDateLessThanEqualAndEndDateGreaterThanEqual(startDate_0, endDate_1);
@@ -150,6 +153,7 @@ em = null;
       cdWorkMonthT = cdWorkMonthReposHist.findTopByStartDateLessThanEqualAndEndDateGreaterThanEqual(startDate_0, endDate_1);
     else 
       cdWorkMonthT = cdWorkMonthRepos.findTopByStartDateLessThanEqualAndEndDateGreaterThanEqual(startDate_0, endDate_1);
+
     return cdWorkMonthT.isPresent() ? cdWorkMonthT.get() : null;
   }
 
@@ -158,7 +162,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdWorkMonthId);
+    this.info("Hold " + dbName + " " + cdWorkMonthId);
     Optional<CdWorkMonth> cdWorkMonth = null;
     if (dbName.equals(ContentName.onDay))
       cdWorkMonth = cdWorkMonthReposDay.findByCdWorkMonthId(cdWorkMonthId);
@@ -176,7 +180,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + cdWorkMonth.getCdWorkMonthId());
+    this.info("Hold " + dbName + " " + cdWorkMonth.getCdWorkMonthId());
     Optional<CdWorkMonth> cdWorkMonthT = null;
     if (dbName.equals(ContentName.onDay))
       cdWorkMonthT = cdWorkMonthReposDay.findByCdWorkMonthId(cdWorkMonth.getCdWorkMonthId());
@@ -197,8 +201,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + cdWorkMonth.getCdWorkMonthId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + cdWorkMonth.getCdWorkMonthId());
     if (this.findById(cdWorkMonth.getCdWorkMonthId()) != null)
       throw new DBException(2);
 
@@ -226,8 +232,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdWorkMonth.getCdWorkMonthId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdWorkMonth.getCdWorkMonthId());
     if (!empNot.isEmpty())
       cdWorkMonth.setLastUpdateEmpNo(empNot);
 
@@ -249,8 +257,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + cdWorkMonth.getCdWorkMonthId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + cdWorkMonth.getCdWorkMonthId());
     if (!empNot.isEmpty())
       cdWorkMonth.setLastUpdateEmpNo(empNot);
 
@@ -270,7 +280,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + cdWorkMonth.getCdWorkMonthId());
+    this.info("Delete..." + dbName + " " + cdWorkMonth.getCdWorkMonthId());
     if (dbName.equals(ContentName.onDay)) {
       cdWorkMonthReposDay.delete(cdWorkMonth);	
       cdWorkMonthReposDay.flush();
@@ -299,7 +309,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (CdWorkMonth t : cdWorkMonth){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -333,8 +346,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (cdWorkMonth == null || cdWorkMonth.size() == 0)
       throw new DBException(6);
 
@@ -363,7 +378,7 @@ em = null;
 
   @Override
   public void deleteAll(List<CdWorkMonth> cdWorkMonth, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

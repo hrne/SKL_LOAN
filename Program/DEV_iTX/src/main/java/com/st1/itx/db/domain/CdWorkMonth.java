@@ -28,7 +28,7 @@ public class CdWorkMonth implements Serializable {
   /**
 	 * 
 	 */
-	private static final long serialVersionUID = 3627312442567085734L;
+	private static final long serialVersionUID = 5148936569655338550L;
 
 @EmbeddedId
   private CdWorkMonthId cdWorkMonthId;
@@ -49,6 +49,11 @@ public class CdWorkMonth implements Serializable {
   // 終止日期
   @Column(name = "`EndDate`")
   private int endDate = 0;
+
+  // 獎金發放日
+  /* 11/24 by 智誠 */
+  @Column(name = "`BonusDate`")
+  private int bonusDate = 0;
 
   // 建檔日期時間
   @CreatedDate
@@ -154,6 +159,25 @@ public class CdWorkMonth implements Serializable {
   }
 
 /**
+	* 獎金發放日<br>
+	* 11/24 by 智誠
+	* @return Integer
+	*/
+  public int getBonusDate() {
+    return StaticTool.bcToRoc(this.bonusDate);
+  }
+
+/**
+	* 獎金發放日<br>
+	* 11/24 by 智誠
+  *
+  * @param bonusDate 獎金發放日
+  * @throws LogicException when Date Is Warn	*/
+  public void setBonusDate(int bonusDate) throws LogicException {
+    this.bonusDate = StaticTool.rocToBc(bonusDate);
+  }
+
+/**
 	* 建檔日期時間<br>
 	* 
 	* @return java.sql.Timestamp
@@ -232,7 +256,7 @@ public class CdWorkMonth implements Serializable {
 
   @Override
   public String toString() {
-    return "CdWorkMonth [cdWorkMonthId=" + cdWorkMonthId + ", startDate=" + startDate + ", endDate=" + endDate + ", createDate=" + createDate + ", createEmpNo=" + createEmpNo
-           + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
+    return "CdWorkMonth [cdWorkMonthId=" + cdWorkMonthId + ", startDate=" + startDate + ", endDate=" + endDate + ", bonusDate=" + bonusDate + ", createDate=" + createDate
+           + ", createEmpNo=" + createEmpNo + ", lastUpdate=" + lastUpdate + ", lastUpdateEmpNo=" + lastUpdateEmpNo + "]";
   }
 }

@@ -163,6 +163,7 @@ C(5,#AuthStatus,0,
     C(5,#CreateFlag,D,T(2,取消授權扣款),
         C(5,#CreateFlag,A,T(2,成功新增),C(5,#CreateFlag,Z,T(2,暫停授權),T(2,)))),
     T(H,#AuthStatus,#AuthStatusHelp))
+C(3,#FuncCode,5,C(5,#CreateFlag,Y,T(2,恢復授權),$))
 #MediaCodeX=X,10,L
 T(3,)T(H,#MediaCode,#MediaCodeHelp)
 #AmlRspX=X,30,L
@@ -233,6 +234,7 @@ C(3,#FuncCode,1,$,s)
 ! 4R24 檢核刪除/修改AchAuthLog存在與否
 #SendL4R24A=X,1,S
 C(3,#FuncCode,1,s,$)
+C(3,#FuncCode,5,S,$)
 E(0,@RimFuncCode,#FuncCode)
 E(0,@RimAuthCreateDate,#AuthCreateDate)
 E(0,@RimCustNo,#CustNo)
@@ -381,6 +383,7 @@ C(4,#L4r22NewCreateFlag,T(2,A),T(2,#L4r22NewCreateFlag))
 #CreateFlagX=X,8,L
 C(4,#CreateFlag,S,$)
 T(H,#CreateFlag,#CreateFlagHelp)
+C(3,#FuncCode,5,C(5,#CreateFlag,Y,T(2,恢復授權),$))
 
 #Submit=A,1,S
 IF(#FuncCode==2,$,S)

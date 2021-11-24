@@ -3,8 +3,6 @@ package com.st1.itx.trade.L6;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Slice;
@@ -32,7 +30,6 @@ import com.st1.itx.util.parse.Parse;
  * @version 1.0.0
  */
 public class L6R19 extends TradeBuffer {
-	private static final Logger logger = LoggerFactory.getLogger(L6R19.class);
 
 	/* DB服務注入 */
 	@Autowired
@@ -74,6 +71,7 @@ public class L6R19 extends TradeBuffer {
 					this.totaVo.putParam("L6R19Month" + i, 0);
 					this.totaVo.putParam("L6R19StartDate" + i, 0);
 					this.totaVo.putParam("L6R19EndDate" + i, 0);
+					this.totaVo.putParam("L6R19BonusDate" + i, 0);
 				}
 				this.addList(this.totaVo);
 				return this.sendList();
@@ -96,6 +94,7 @@ public class L6R19 extends TradeBuffer {
 			this.totaVo.putParam("L6R19Month" + tCdWorkMonth.getMonth(), tCdWorkMonth.getMonth());
 			this.totaVo.putParam("L6R19StartDate" + tCdWorkMonth.getMonth(), tCdWorkMonth.getStartDate());
 			this.totaVo.putParam("L6R19EndDate" + tCdWorkMonth.getMonth(), tCdWorkMonth.getEndDate());
+			this.totaVo.putParam("L6R19BonusDate" + tCdWorkMonth.getMonth(), tCdWorkMonth.getBonusDate());
 
 			this.info("L6R19 Month : " + tCdWorkMonth.getMonth() + " SD : " + tCdWorkMonth.getStartDate());
 		}

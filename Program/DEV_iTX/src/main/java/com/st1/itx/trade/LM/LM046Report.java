@@ -85,7 +85,7 @@ public class LM046Report extends MakeReport {
 			for (int i = 1; i <= 12; i++)
 			{
 				bd[i] = getBigDecimal(tLDVo.get("F" + i));
-				sb.append("F" + i + ": " + bd.toString() + "; ");
+				sb.append("F" + i + ": " + bd[i].toString() + "; ");
 			}
 			
 			this.info("LM046 result check: ");

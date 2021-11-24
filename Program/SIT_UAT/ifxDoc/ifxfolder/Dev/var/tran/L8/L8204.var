@@ -148,8 +148,8 @@ C(2,#FuncCode,S,T(3,*),T(3,*),S,S,S)
 #WKNAME=X,1,S
 T(2,@FdRecordDate,#WKSTAR1)
 T(2,@FdCustNo,#WKSTAR1)
-T(2,@FdRepayDate,#WKPSC)
-T(2,@FdRepayAmt,#WKPSC)
+T(2,@FdRepayDate,#WKSTAR2)
+T(2,@FdRepayAmt,#WKSTAR2)
 T(2,@FdCareer,#WKPSC)
 T(2,@FdIncome,#WKPSC)
 T(2,@FdRepaySource,#WKSTAR2)
@@ -222,7 +222,7 @@ T(H,#RepaySourceX,#RepaySource,#ApHelp)
 C(3,#FuncCode,4,s)
 C(3,#CHAIN,1,$,T(1,#DATE,2,7))
 D(8)
-@A(DATE,0,#RepayDate)
+@V(7)A(DATE,0,#RepayDate)
 
 !約定還款金額
 #RepayAmt=m,14,I

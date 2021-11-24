@@ -36,7 +36,7 @@ public interface GraceConditionService {
   public Slice<GraceCondition> findAll(int index, int limit, TitaVo... titaVo);
 
   /**
-   * CustNo&lt;= ,AND CustNo&gt;= 
+   * CustNo &lt;= ,AND CustNo &gt;= 
    *
    * @param custNo_0 custNo_0
    * @param custNo_1 custNo_1
@@ -45,7 +45,7 @@ public interface GraceConditionService {
    * @param titaVo Variable-Length Argument
    * @return Slice GraceCondition GraceCondition of List
    */
-  public Slice<GraceCondition> CustNoEq(int custNo_0, int custNo_1, int index, int limit, TitaVo... titaVo);
+  public Slice<GraceCondition> custNoEq(int custNo_0, int custNo_1, int index, int limit, TitaVo... titaVo);
 
   /**
    * hold By GraceCondition

@@ -52,56 +52,95 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		String sqlL4965 = "";
 
 		String searchStr = "";
+		String searchStr1 = "";
 		String searchInsuNo1 = "";
 		String searchInsuNo2 = "";
 		switch (iSearchFlag) {
 		case 1:
-			searchStr += "  where o.\"ClCode1\" = " + iClCode1 + " and o.\"ClCode2\" = " + iClCode2 + " and  o.\"ClNo\" = " + iClNo + "  ";
-			sqlL4965 = makeSql1(searchStr, "", "");
+			searchStr += "  where o.\"ClCode1\" = :iClCode1" + " and o.\"ClCode2\" = :iClCode2" + " and  o.\"ClNo\" = :iClNo ";
+			sqlL4965 = makeSql1(searchStr, "", "","");
 			break;
 		case 2:
 			if (iFacmNo == 0) {
-				searchStr += "  where c.\"CustNo\" = " + iCustNo + "  ";
+				searchStr += "  where c.\"CustNo\" = :iCustNo";
+				searchStr1 += " and o.\"CustNo\" = :iCustNo";
+				
 			} else {
-				searchStr += "  where c.\"CustNo\" = " + iCustNo + " and c.\"FacmNo\" = " + iFacmNo + "  ";
+				searchStr += "  where c.\"CustNo\" = :iCustNo" + " and c.\"FacmNo\" = :iFacmNo";
+				searchStr1 += " and o.\"CustNo\" = :iCustNo" +  " and o.\"FacmNo\" = :iFacmNo";
 			}
-			sqlL4965 = makeSql2(searchStr,titaVo);
+			sqlL4965 = makeSql2(searchStr,searchStr1,titaVo);
 			break;
 		case 3:
-			searchStr += "  where c.\"ApproveNo\" = " + iApplNo + "  ";
-			sqlL4965 = makeSql2(searchStr,titaVo);
+			searchStr += "  where c.\"ApproveNo\" =  :iApplNo";
+			sqlL4965 = makeSql2(searchStr,searchStr1,titaVo);
 			break;
 		case 4:
-			searchInsuNo1 += "  where o.\"OrigInsuNo\" = '" + iNowInsuNo + "'   ";
-			searchInsuNo2 += "  and ( o.\"PrevInsuNo\" = '" + iNowInsuNo + "' or  o.\"NowInsuNo\" = '" + iNowInsuNo + "')   ";
-			sqlL4965 = makeSql1(searchStr, searchInsuNo1, searchInsuNo2);
+			searchInsuNo1 += "  where o.\"OrigInsuNo\" = :iNowInsuNo" ;
+			searchInsuNo2 += "  and ( o.\"PrevInsuNo\" = :iNowInsuNo" +  " or  o.\"NowInsuNo\" = :iNowInsuNo" + ")   ";
+			searchStr1 += " and i.\"NowInsuNo\" = :iNowInsuNo" ;
+			sqlL4965 = makeSql1(searchStr, searchInsuNo1,searchInsuNo2, searchStr1);
 			break;
 		case 5:
-			searchStr += "  where o.\"InsuCompany\" = '" + iInsuCompany + "'   ";
-			sqlL4965 = makeSql1(searchStr, "", "");
+			searchStr += "  where o.\"InsuCompany\" = :iInsuCompany" ;
+			sqlL4965 = makeSql1(searchStr, "", "","");
 			break;
 		case 6:
-			searchStr += "  where o.\"InsuTypeCode\" = '" + iInsuTypeCode + "'   ";
-			sqlL4965 = makeSql1(searchStr, "", "");
+			searchStr += "  where o.\"InsuTypeCode\" = :iInsuTypeCode";
+			sqlL4965 = makeSql1(searchStr, "", "","");
 			break;
 		}
 
 		if (iEffectiveCode == 0) {
-			searchStr += "  and o.\"InsuEndDate\" >= " + iInsuEndDateFrom + " and o.\"InsuEndDate\" <= " + iInsuEndDateTo + "  ";
-			sqlL4965 = makeSql1(searchStr, "", "");
+			searchStr += "  and o.\"InsuEndDate\" >=  :iInsuEndDateFrom" + " and o.\"InsuEndDate\" <=  :iInsuEndDateTo";
+			sqlL4965 = makeSql1(searchStr, "", "","");
 		}
 
 		Query query;
 		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
 		query = em.createNativeQuery(sqlL4965);
 
+		
+		switch (iSearchFlag) {
+		case 1:
+			query.setParameter("iClCode1", iClCode1);
+			query.setParameter("iClCode2", iClCode2);
+			query.setParameter("iClNo", iClNo);
+			break;
+		case 2:
+			if (iFacmNo == 0) {
+				query.setParameter("iCustNo", iCustNo);
+			} else {
+				query.setParameter("iCustNo", iCustNo);
+				query.setParameter("iFacmNo", iFacmNo);
+			}
+			break;
+		case 3:
+			query.setParameter("iApplNo", iApplNo);
+			break;
+		case 4:
+			query.setParameter("iNowInsuNo", iNowInsuNo);
+			break;
+		case 5:
+			query.setParameter("iInsuCompany", iInsuCompany);
+			break;
+		case 6:
+			query.setParameter("iInsuTypeCode", iInsuTypeCode);
+			break;
+		}
+
+		if (iEffectiveCode == 0) {
+			query.setParameter("iInsuEndDateFrom", iInsuEndDateFrom);
+			query.setParameter("iInsuEndDateTo", iInsuEndDateTo);
+		}
+		
 		this.info("L5959.sqlL4965=" + sqlL4965);
 
 		return findItem(this.convertToMap(query));
 
 	}
 
-	private String makeSql1(String searchStr, String searchInsuNo1, String searchInsuNo2) throws LogicException {
+	private String makeSql1(String searchStr, String searchInsuNo1, String searchInsuNo2,String searchStr1) throws LogicException {
 		String sqlL4965 = "";
 		sqlL4965 += "  select i.\"CustNo\"            as  F0";
 		sqlL4965 += "      ,c.\"CustName\"          as  F1";
@@ -178,6 +217,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sqlL4965 += "     ) i";
 		sqlL4965 += "  left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"";
 		sqlL4965 += "  where i.\"RowNo\" = 1";
+		sqlL4965 += searchStr1;
 		sqlL4965 += "  order by i.\"InsuEndDate\" desc";
 		sqlL4965 += "        ,i.\"ClCode1\"";
 		sqlL4965 += "        ,i.\"ClCode2\"";
@@ -185,7 +225,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		return sqlL4965;
 	}
 
-	private String makeSql2(String searchStr,TitaVo titaVo) throws LogicException {
+	private String makeSql2(String searchStr,String searchStr1,TitaVo titaVo) throws LogicException {
 		
 		int iCustNo = parse.stringToInteger(titaVo.getParam("CustNo"));
 		int iFacmNo = parse.stringToInteger(titaVo.getParam("FacmNo"));
@@ -262,6 +302,7 @@ public class L4965ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 		
 		sqlL4965 += searchStr;
+		sqlL4965 += searchStr1;
 		sqlL4965 += "     ) i";
 		sqlL4965 += "  left join \"CustMain\" c on c.\"CustNo\" = i.\"CustNo\"";
 		sqlL4965 += "  order by i.\"InsuEndDate\" desc";

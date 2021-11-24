@@ -22,8 +22,8 @@ import com.st1.itx.db.domain.GraceConditionId;
  */
 public interface GraceConditionRepositoryHist extends JpaRepository<GraceCondition, GraceConditionId> {
 
-  // CustNo<= ,AND CustNo>= 
-  public Slice<GraceCondition> findAllByCustNoLessThanEqualAndCustNoGreaterThanEqualOrderByCustNoAscFacmNoAscActUseAsc(int custNo_0, int custNo_1, Pageable pageable);
+  // CustNo <= ,AND CustNo >= 
+  public Slice<GraceCondition> findAllByCustNoLessThanEqualAndCustNoGreaterThanEqual(int custNo_0, int custNo_1, Pageable pageable);
 
   // Hold
   @Lock(value = LockModeType.PESSIMISTIC_READ)

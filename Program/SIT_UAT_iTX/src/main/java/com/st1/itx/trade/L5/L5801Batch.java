@@ -58,6 +58,8 @@ public class L5801Batch extends TradeBuffer {
 		thisMonth += 191100;
 		lastMonth += 191100;
 
+		this.info("L5801 thisMonth = " + thisMonth);
+		this.info("L5801 lastMonth = " + lastMonth);
 		this.info("L5801 titaVo.getTxcd() = " + titaVo.getTxcd());
 		String parentTranCode = titaVo.getTxcd();
 

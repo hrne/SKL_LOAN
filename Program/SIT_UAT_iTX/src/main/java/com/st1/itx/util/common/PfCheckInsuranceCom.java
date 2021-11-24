@@ -133,6 +133,9 @@ public class PfCheckInsuranceCom extends TradeBuffer {
 			}
 		}
 		// 檢核結果放入房貸獎勵保費檢核檔
+		tPfInsCheck.setKind(iKind);
+		tPfInsCheck.setCustNo(iCustNo);
+		tPfInsCheck.setFacmNo(iFacmNo);
 		tPfInsCheck.setInsDate(insDate);// 承保日
 		tPfInsCheck.setInsNo(insNo);// 保單號碼
 		tPfInsCheck.setCheckResult(checkResult); // 檢核結果(Y/N)

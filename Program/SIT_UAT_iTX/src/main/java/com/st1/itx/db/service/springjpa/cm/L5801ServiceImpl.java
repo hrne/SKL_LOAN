@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.db.service.springjpa.ASpringJpaParm;
 import com.st1.itx.db.transaction.BaseEntityManager;
+import com.st1.itx.eum.ContentName;
 
 @Service
 @Repository
@@ -32,6 +33,8 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 	public List<Map<String, String>> findAll(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
 		this.info("L5801ServiceImpl.findAll ");
 
+		this.info("thisMonth =" + thisMonth);
+		this.info("lastMonth =" + lastMonth);
 		if (thisMonth == 0) {
 			this.error("L5801ServiceImpl.findAll thisMonth = 0");
 			return null;
@@ -119,7 +122,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("lastMonth", lastMonth);
 		query.setParameter("thisMonth", thisMonth);
@@ -130,7 +133,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// 補貼息結清名冊/終止名冊工作檔
 
 	public List<Map<String, String>> findAll2(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
-		this.info("L5801ServiceImpl.findAll ");
+		this.info("L5801ServiceImpl2.findAll ");
 
 		if (thisMonth == 0) {
 			this.error("L5801ServiceImpl.findAll thisMonth = 0");
@@ -148,7 +151,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             WHEN N.\"LoanBalance\" = 0";
 		sql += "                  THEN '結清名冊'";
 		sql += "             ELSE      '終止名冊'";
-		sql += "        END                                                              "; // -- F0 種類
+		sql += "        END   AS \"F0\"                                                  "; // -- F0 種類
 		sql += "      , N.\"CustNo\"                                                     "; // -- F1 戶號
 		sql += "      , N.\"FacmNo\"                                                     "; // -- F2 額度
 		sql += "      , N.\"ProdNo\"                                                     "; // -- F3 商品代碼
@@ -163,7 +166,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "             WHEN N.\"LoanBalance\" = 0";
 		sql += "                  THEN '正常'";
 		sql += "             ELSE      ''";
-		sql += "        END                                                              "; // -- F9 註記
+		sql += "        END     AS \"F9\"                                                         "; // -- F9 註記
 
 		sql += "      FROM (";
 		sql += "      SELECT T.\"CustNo\"                           AS \"CustNo\"";
@@ -223,7 +226,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
 		query.setParameter("lastMonth", lastMonth);
@@ -234,7 +237,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// 補貼息核撥清單工作檔
 
 	public List<Map<String, String>> findAll3(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
-		this.info("L5801ServiceImpl.findAll ");
+		this.info("L5801ServiceImpl3.findAll ");
 
 		if (thisMonth == 0) {
 			this.error("L5801ServiceImpl.findAll thisMonth = 0");
@@ -247,13 +250,13 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		}
 
 		String sql = " ";
-		sql += " SELECT N.\"ProjectKind\"                                                "; // -- F0 專案融資種類
-		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)          "; // -- F1 補貼息"
-		sql += "      , N.\"LastMonthBal\"                                               "; // -- F2 A.上月貸款餘額
-		sql += "      , N.\"OpenAmount\"                                                 "; // -- F3 B.本月貸出數
-		sql += "      , N.\"CloseAmount\"                                                "; // -- F4 C1.本月收回數" --還款+結清+轉催收
-		sql += "      , N.\"MaturityAmount\"                                             "; // -- F5 C2.屆期不再申撥補貼息" --超過到期日
-		sql += "      , N.\"ThisMonthBal\"                                               "; // -- F6 D.本月貸款餘額
+		sql += " SELECT N.\"ProjectKind\"                                                   "; // -- F0 專案融資種類
+		sql += "      , ROUND(N.\"ThisMonthBal\" * N.\"SubsidyRate\" / 1200, 0)  AS \"F1\"        "; // -- F1 補貼息"
+		sql += "      , N.\"LastMonthBal\"                                                  "; // -- F2 A.上月貸款餘額
+		sql += "      , N.\"OpenAmount\"                                                    "; // -- F3 B.本月貸出數
+		sql += "      , N.\"CloseAmount\"                                                   "; // -- F4 C1.本月收回數" --還款+結清+轉催收
+		sql += "      , N.\"MaturityAmount\"                                                "; // -- F5 C2.屆期不再申撥補貼息" --超過到期日
+		sql += "      , N.\"ThisMonthBal\"                                                  "; // -- F6 D.本月貸款餘額
 
 		sql += "      FROM (SELECT MAX(CASE T.\"ProdNo\"";
 		sql += "                            WHEN 'IA' THEN 1";
@@ -354,7 +357,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
 		query.setParameter("lastMonth", lastMonth);
@@ -365,7 +368,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 	// 補貼息核撥清單明細檔
 
 	public List<Map<String, String>> findAll4(int thisMonth, int lastMonth, TitaVo titaVo) throws Exception {
-		this.info("L5801ServiceImpl.findAll ");
+		this.info("L5801ServiceImpl4.findAll ");
 
 		if (thisMonth == 0) {
 			this.error("L5801ServiceImpl.findAll thisMonth = 0");
@@ -487,7 +490,7 @@ public class L5801ServiceImpl extends ASpringJpaParm implements InitializingBean
 		this.info("sql=" + sql);
 		Query query;
 
-		EntityManager em = this.baseEntityManager.getCurrentEntityManager(titaVo);
+		EntityManager em = this.baseEntityManager.getCurrentEntityManager(ContentName.onLine);
 		query = em.createNativeQuery(sql);
 		query.setParameter("thisMonth", thisMonth);
 		query.setParameter("lastMonth", lastMonth);

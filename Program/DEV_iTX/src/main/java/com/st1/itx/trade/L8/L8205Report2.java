@@ -101,10 +101,10 @@ public class L8205Report2 extends MakeReport {
 				print(0, 6, tL8205Vo.get("F1") == "0" || tL8205Vo.get("F1") == null || tL8205Vo.get("F1").length() == 0 || tL8205Vo.get("F1").equals(" ") ? " " : showDate(tL8205Vo.get("F1"), 1));
 
 				// 戶號
-				print(0, 18, padStart(tL8205Vo.get("F2"), 7, "0"));
+				print(0, 17, padStart(tL8205Vo.get("F2"), 7, "0"));
 
 				//戶名
-				print(0, 26, tL8205Vo.get("F3"));
+				print(0, 25, tL8205Vo.get("F3"));
 								
 				// 累積金額
 				BigDecimal f4 = tL8205Vo.get("F4") == "0" || tL8205Vo.get("F4") == null || tL8205Vo.get("F4").length() == 0 || tL8205Vo.get("F4").equals(" ") ? BigDecimal.ZERO
@@ -130,12 +130,14 @@ public class L8205Report2 extends MakeReport {
 				}
 				print(1, 4, "經辦說明:"+EmpNoDesc);
 				print(1, 4,"");
+				
 				//主管覆核
 				String check = tL8205Vo.get("F9");
 				if(("Y").equals(check)) {
 					check = "同意";
 				}
 				print(1, 4, "主管覆核: "+check);
+				print(1, 4, "");
 				
 				// 檢查列數
 				checkRow(stEntryDate, edEntryDate);
@@ -149,7 +151,7 @@ public class L8205Report2 extends MakeReport {
 
 		}
 
-		this.print(-64, 50, "===== 報　表　結　束 =====", "C");
+		this.print(-65, 50, "===== 報　表　結　束 =====", "C");
 		long sno = this.close();
 		this.toPdf(sno);
 
@@ -177,8 +179,9 @@ public class L8205Report2 extends MakeReport {
 	 * @param edEntryDate 日期 區間-止
 	 */
 	private void checkRow(String stEntryDate, String edEntryDate) {
-		if (this.NowRow >= 58) {
-
+		this.info("NowRow=="+this.NowRow);
+		if (this.NowRow >= 61) {
+			this.info("into NowRow");
 			newPage();
 			this.print(-7, 40, stEntryDate + "－" + edEntryDate);
 			this.print(-9, 3, "樣態 入帳日 　　戶號　　戶名　　　　　累積金額　　　　經辦　　　合理性　　　　異動日");

@@ -9,6 +9,7 @@ OOFacShareApplBTNFg=9,1
 OOCustRelBTNFg=9,1
 OOCustCrossBTNFg=9,1
 OOCustTelNoBTNFg=9,1
+OOGraceConditionFg=9,1
 OOCustId=X,10
 OOCustNo=9,7
 OOCustTypeCode=9,2

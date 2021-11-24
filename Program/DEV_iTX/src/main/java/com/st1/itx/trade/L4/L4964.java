@@ -118,7 +118,9 @@ public class L4964 extends TradeBuffer {
 //		查詢條件
 //		1.原始保單及續保檔(查詢3個月前、且AcDate有)
 //		2.尚未繳款(Renew無AcDate)
-
+		
+		Boolean occursflg = true;
+		
 		if (lInsuRenew != null && lInsuRenew.size() != 0) {
 			for (InsuRenew tInsuRenew : lInsuRenew) {
 
@@ -173,6 +175,7 @@ public class L4964 extends TradeBuffer {
 					  
 					  /* 將每筆資料放入Tota的OcList */
 					  this.totaVo.addOccursList(occursList);
+					  occursflg = false;
 					} 
 				} else { // 近三個月
 					if (tInsuRenew.getInsuEndDate() >= threeMonthsB4Date ) {
@@ -195,6 +198,7 @@ public class L4964 extends TradeBuffer {
 						occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursList);
+						occursflg = false;
 					} 
 				} // else 
 				
@@ -247,6 +251,7 @@ public class L4964 extends TradeBuffer {
 					occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
 					/* 將每筆資料放入Tota的OcList */
 					this.totaVo.addOccursList(occursList);
+					occursflg = false;
 				} else {
 					if (tInsuOrignal.getInsuEndDate() >= threeMonthsB4Date) {
 						OccursList occursList = new OccursList();
@@ -285,10 +290,7 @@ public class L4964 extends TradeBuffer {
 						occursList.putParam("OOBtnFlag", btnShowFlag.get(tmp));
 						/* 將每筆資料放入Tota的OcList */
 						this.totaVo.addOccursList(occursList);
-				  } else {
-					  if(lInsuRenew == null) {
-						  throw new LogicException(titaVo, "E0001", "L4964  查無資料");
-					  }
+						occursflg = false;
 				  }
 				  
 				} // else 
@@ -297,6 +299,10 @@ public class L4964 extends TradeBuffer {
 			throw new LogicException(titaVo, "E0001", "L4964  查無資料");
 		}
 
+		if(occursflg) {
+			throw new LogicException(titaVo, "E0001", "L4964  查無資料");
+		}
+		
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

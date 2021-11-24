@@ -5,8 +5,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -22,7 +20,6 @@ import com.st1.itx.util.format.FormatUtil;
 @Component("L5801Report4")
 @Scope("prototype")
 public class L5801Report4 extends MakeReport {
-	private static final Logger logger = LoggerFactory.getLogger(L5801Report4.class);
 
 	@Autowired
 	L5801ServiceImpl l5801ServiceImpl;
@@ -31,7 +28,6 @@ public class L5801Report4 extends MakeReport {
 	MakeExcel makeExcel;
 
 	ExcelFontStyleVo fontStyleVo;
-
 
 	public void exec(int thisMonth, int lastMonth, TitaVo titaVo) throws LogicException {
 		List<Map<String, String>> listL5801 = null;
@@ -54,8 +50,8 @@ public class L5801Report4 extends MakeReport {
 //		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5801", "補貼息申貸名冊工作檔", "L5801補貼息申貸名冊工作檔",
 //				"L5801_底稿_催收款明細表.xlsx", "工作表1", this.showRocDate(thisMonth * 100 + 1, 5));
 
-		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5801", "補貼息核撥清單明細檔", "L5801補貼息核撥清單明細檔" + thisMonth, "補貼息核撥清單明細檔"+ thisMonth);
-		
+		makeExcel.open(titaVo, titaVo.getEntDyI(), titaVo.getKinbr(), "L5801", "補貼息核撥清單明細檔", "L5801補貼息核撥清單明細檔" + thisMonth, "補貼息核撥清單明細檔" + thisMonth);
+
 		fontStyleVo = new ExcelFontStyleVo();
 
 		fontStyleVo.setFont((short) 1); // 字體 : 標楷體
@@ -73,7 +69,7 @@ public class L5801Report4 extends MakeReport {
 		makeExcel.setValue(1, 9, "本月收回數", fontStyleVo);
 		makeExcel.setValue(1, 10, "屆期不再申撥補貼息", fontStyleVo);
 		makeExcel.setValue(1, 11, "本月貸款餘額", fontStyleVo);
-		
+
 		int printRow = 2; // 從第二行開始印
 
 		if (listL5801 == null || listL5801.isEmpty()) {
@@ -82,16 +78,14 @@ public class L5801Report4 extends MakeReport {
 
 		} else {
 
-
 			for (Map<String, String> mapL5801 : listL5801) {
-
 
 				// F0 戶號
 				String custNo = FormatUtil.pad9(mapL5801.get("F0"), 7);
 				// F1 額度
 				String facmNo = FormatUtil.pad9(mapL5801.get("F1"), 3);
 
-   			    makeExcel.setValue(printRow, 1, custNo + "-" + facmNo, fontStyleVo);
+				makeExcel.setValue(printRow, 1, custNo + "-" + facmNo, fontStyleVo);
 
 				// F2 商品代碼
 				String ProdNo = mapL5801.get("F2");
@@ -131,24 +125,23 @@ public class L5801Report4 extends MakeReport {
 				// F9 C1.本月收回數
 				String CloseAmount = mapL5801.get("F9");
 
-				makeExcel.setValue(printRow, 12, CloseAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 9, CloseAmount, fontStyleVo);
 
 				// F10 C2.屆期不再申撥補貼息
 				String MaturityAmount = mapL5801.get("F10");
 
-				makeExcel.setValue(printRow, 13, MaturityAmount, fontStyleVo);
+				makeExcel.setValue(printRow, 10, MaturityAmount, fontStyleVo);
 
 				// F11 D.本月貸款餘額
 				String ThisMonthBal = mapL5801.get("F11");
 
-				makeExcel.setValue(printRow, 15, ThisMonthBal, fontStyleVo);
+				makeExcel.setValue(printRow, 11, ThisMonthBal, fontStyleVo);
 
-				
 			}
-		// 畫框線
-		makeExcel.setAddRengionBorder("A", 1, "P", printRow, 1);
+			// 畫框線
+			makeExcel.setAddRengionBorder("A", 1, "P", printRow, 1);
 
-	  }
+		}
 		long sno = makeExcel.close();
 		makeExcel.toExcel(sno);
 

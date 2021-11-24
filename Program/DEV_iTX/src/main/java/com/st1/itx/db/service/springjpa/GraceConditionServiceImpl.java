@@ -4,8 +4,6 @@ import java.util.List;
 import java.util.Optional;
 import javax.persistence.EntityManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -26,6 +24,7 @@ import com.st1.itx.db.repository.hist.GraceConditionRepositoryHist;
 import com.st1.itx.db.service.GraceConditionService;
 import com.st1.itx.db.transaction.BaseEntityManager;
 import com.st1.itx.eum.ContentName;
+import com.st1.itx.eum.ThreadVariable;
 
 /**
  * Gen By Tool
@@ -35,9 +34,7 @@ import com.st1.itx.eum.ContentName;
  */
 @Service("graceConditionService")
 @Repository
-public class GraceConditionServiceImpl implements GraceConditionService, InitializingBean {
-  private static final Logger logger = LoggerFactory.getLogger(GraceConditionServiceImpl.class);
-
+public class GraceConditionServiceImpl extends ASpringJpaParm implements GraceConditionService, InitializingBean {
   @Autowired
   private BaseEntityManager baseEntityManager;
 
@@ -67,7 +64,7 @@ public class GraceConditionServiceImpl implements GraceConditionService, Initial
 
     if (titaVo.length != 0)
     dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("findById " + dbName + " " + graceConditionId);
+    this.info("findById " + dbName + " " + graceConditionId);
     Optional<GraceCondition> graceCondition = null;
     if (dbName.equals(ContentName.onDay))
       graceCondition = graceConditionReposDay.findById(graceConditionId);
@@ -94,10 +91,10 @@ em = null;
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
     Pageable pageable = null;
     if(limit == Integer.MAX_VALUE)
-			pageable = Pageable.unpaged();
+         pageable = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo"));
     else
          pageable = PageRequest.of(index, limit, Sort.by(Sort.Direction.ASC, "CustNo", "FacmNo"));
-    logger.info("findAll " + dbName);
+    this.info("findAll " + dbName);
     if (dbName.equals(ContentName.onDay))
       slice = graceConditionReposDay.findAll(pageable);
     else if (dbName.equals(ContentName.onMon))
@@ -107,11 +104,14 @@ em = null;
     else 
       slice = graceConditionRepos.findAll(pageable);
 
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
+
     return slice != null && !slice.isEmpty() ? slice : null;
   }
 
   @Override
-  public Slice<GraceCondition> CustNoEq(int custNo_0, int custNo_1, int index, int limit, TitaVo... titaVo) {
+  public Slice<GraceCondition> custNoEq(int custNo_0, int custNo_1, int index, int limit, TitaVo... titaVo) {
     String dbName = "";
     Slice<GraceCondition> slice = null;
     if (titaVo.length != 0)
@@ -122,15 +122,18 @@ em = null;
 			pageable = Pageable.unpaged();
     else
          pageable = PageRequest.of(index, limit);
-    logger.info("CustNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1);
+    this.info("custNoEq " + dbName + " : " + "custNo_0 : " + custNo_0 + " custNo_1 : " +  custNo_1);
     if (dbName.equals(ContentName.onDay))
-      slice = graceConditionReposDay.findAllByCustNoLessThanEqualAndCustNoGreaterThanEqualOrderByCustNoAscFacmNoAscActUseAsc(custNo_0, custNo_1, pageable);
+      slice = graceConditionReposDay.findAllByCustNoLessThanEqualAndCustNoGreaterThanEqual(custNo_0, custNo_1, pageable);
     else if (dbName.equals(ContentName.onMon))
-      slice = graceConditionReposMon.findAllByCustNoLessThanEqualAndCustNoGreaterThanEqualOrderByCustNoAscFacmNoAscActUseAsc(custNo_0, custNo_1, pageable);
+      slice = graceConditionReposMon.findAllByCustNoLessThanEqualAndCustNoGreaterThanEqual(custNo_0, custNo_1, pageable);
     else if (dbName.equals(ContentName.onHist))
-      slice = graceConditionReposHist.findAllByCustNoLessThanEqualAndCustNoGreaterThanEqualOrderByCustNoAscFacmNoAscActUseAsc(custNo_0, custNo_1, pageable);
+      slice = graceConditionReposHist.findAllByCustNoLessThanEqualAndCustNoGreaterThanEqual(custNo_0, custNo_1, pageable);
     else 
-      slice = graceConditionRepos.findAllByCustNoLessThanEqualAndCustNoGreaterThanEqualOrderByCustNoAscFacmNoAscActUseAsc(custNo_0, custNo_1, pageable);
+      slice = graceConditionRepos.findAllByCustNoLessThanEqualAndCustNoGreaterThanEqual(custNo_0, custNo_1, pageable);
+
+		if (slice != null) 
+			this.baseEntityManager.clearEntityManager(dbName);
 
     return slice != null && !slice.isEmpty() ? slice : null;
   }
@@ -140,7 +143,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + graceConditionId);
+    this.info("Hold " + dbName + " " + graceConditionId);
     Optional<GraceCondition> graceCondition = null;
     if (dbName.equals(ContentName.onDay))
       graceCondition = graceConditionReposDay.findByGraceConditionId(graceConditionId);
@@ -158,7 +161,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Hold " + dbName + " " + graceCondition.getGraceConditionId());
+    this.info("Hold " + dbName + " " + graceCondition.getGraceConditionId());
     Optional<GraceCondition> graceConditionT = null;
     if (dbName.equals(ContentName.onDay))
       graceConditionT = graceConditionReposDay.findByGraceConditionId(graceCondition.getGraceConditionId());
@@ -179,8 +182,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}
-    logger.info("Insert..." + dbName + " " + graceCondition.getGraceConditionId());
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Insert..." + dbName + " " + graceCondition.getGraceConditionId());
     if (this.findById(graceCondition.getGraceConditionId()) != null)
       throw new DBException(2);
 
@@ -208,8 +213,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + graceCondition.getGraceConditionId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + graceCondition.getGraceConditionId());
     if (!empNot.isEmpty())
       graceCondition.setLastUpdateEmpNo(empNot);
 
@@ -231,8 +238,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("Update..." + dbName + " " + graceCondition.getGraceConditionId());
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("Update..." + dbName + " " + graceCondition.getGraceConditionId());
     if (!empNot.isEmpty())
       graceCondition.setLastUpdateEmpNo(empNot);
 
@@ -252,7 +261,7 @@ em = null;
     String dbName = "";
     if (titaVo.length != 0)
       dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
-    logger.info("Delete..." + dbName + " " + graceCondition.getGraceConditionId());
+    this.info("Delete..." + dbName + " " + graceCondition.getGraceConditionId());
     if (dbName.equals(ContentName.onDay)) {
       graceConditionReposDay.delete(graceCondition);	
       graceConditionReposDay.flush();
@@ -281,7 +290,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-         empNot = empNot.isEmpty() ? "System" : empNot;		}    logger.info("InsertAll...");
+         empNot = empNot.isEmpty() ? "System" : empNot;		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("InsertAll...");
     for (GraceCondition t : graceCondition){ 
       if (!empNot.isEmpty())
         t.setCreateEmpNo(empNot);
@@ -315,8 +327,10 @@ em = null;
 		if (titaVo.length != 0) {
 			dbName = titaVo[0].getDataBase() != null ? titaVo[0].getDataBase() : ContentName.onLine;
 			empNot = titaVo[0].getEmpNot() != null ? titaVo[0].getEmpNot() : "";
-		}
-    logger.info("UpdateAll...");
+		} else
+       empNot = ThreadVariable.getEmpNot();
+
+    this.info("UpdateAll...");
     if (graceCondition == null || graceCondition.size() == 0)
       throw new DBException(6);
 
@@ -345,7 +359,7 @@ em = null;
 
   @Override
   public void deleteAll(List<GraceCondition> graceCondition, TitaVo... titaVo) throws DBException {
-    logger.info("DeleteAll...");
+    this.info("DeleteAll...");
     String dbName = "";
     
     if (titaVo.length != 0)

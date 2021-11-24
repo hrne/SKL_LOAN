@@ -39,7 +39,7 @@ T(3,*)
 T(3,*)
 
 #TypeHelp=x,100,S
-T(3,1:洗錢樣態3合理性報表;2:洗錢合理性報表;3:洗錢訪談報表)
+T(3,1:洗錢樣態3合理性報表;2:洗錢合理性報表;3:洗錢樣態3延遲交易報表;4:洗錢延遲交易報表;5:洗錢訪談報表)
 
 !---------- AP TEXT AREA Variables ----------
 #CHAIN=A,1,S
@@ -80,7 +80,7 @@ INVOKEJS(SHOW,p1,2,2,1)
 T(H,#Type,#TypeHelp)
 
 #DateItem=X,8,L
-C(3,#Type,3,T(2,訪談日期),T(2,入帳日期))
+C(3,#Type,5,T(2,訪談日期),T(2,入帳日期))
 
 
 
@@ -88,14 +88,18 @@ C(3,#Type,3,T(2,訪談日期),T(2,入帳日期))
 #DateStart=D,7,I
 T(1,#DATE,2,7)
 D(8)
-@A(DATE,0,#DateStart)
+@
+V(7)
+A(DATE,0,#DateStart)
 C(4,#DateStart,S,V(5,0010101,#CDATEX))
 
 #DateEnd=D,7,I
 C(4,#DateStart,S,$)
 E(0,#DateStart)
 D(8)
-@A(DATE,0,#DateEnd)
+@
+V(7)
+A(DATE,0,#DateEnd)
 V(5,#DateStart,#CDATEX)
 
 

@@ -32,7 +32,9 @@ import com.st1.itx.db.service.ClMainService;
 import com.st1.itx.db.service.CustCrossService;
 //import com.st1.itx.db.service.CustFinService;
 import com.st1.itx.db.domain.FinReportDebt;
+import com.st1.itx.db.domain.GraceCondition;
 import com.st1.itx.db.service.FinReportDebtService;
+import com.st1.itx.db.service.GraceConditionService;
 /* DB服務 */
 import com.st1.itx.db.service.CustMainService;
 import com.st1.itx.db.service.CustTelNoService;
@@ -108,6 +110,9 @@ public class L1001 extends TradeBuffer {
 
 	@Autowired
 	public CustDataCtrlService custDataCtrlService;
+	
+	@Autowired
+	public GraceConditionService iGraceConditionService;
 
 	/* 轉型共用工具 */
 	@Autowired
@@ -334,7 +339,10 @@ public class L1001 extends TradeBuffer {
 		int CustCrossBTNFg = 0;
 		// 客戶電話
 		int CustTleNoBTNFg = 0;
-
+		// 寬限控管
+		int iGraceCondition = 0;
+		// 開放查詢
+		int iAllowInquire = 0;
 		boolean custDataControl = false;
 
 		boolean allowInquiry = true;
@@ -487,6 +495,21 @@ public class L1001 extends TradeBuffer {
 		} else {
 			CustTleNoBTNFg = 2;
 		}
+		
+		//寬限條件控管 0:未設定; 1:已設定
+		if (!custDataControl) {
+			Slice<GraceCondition> sGraceConditon = iGraceConditionService.custNoEq(aCustMain.getCustNo(),aCustMain.getCustNo(), 0, Integer.MAX_VALUE, titaVo);
+			if (sGraceConditon != null) {
+				iGraceCondition = 1;
+			}
+		}
+		
+		//開放查詢  1:不開放;2:開放
+		if (!custDataControl) {
+			if (!aCustMain.getAllowInquire().isEmpty()){
+				iAllowInquire = Integer.valueOf(aCustMain.getAllowInquire());
+			}
+		}
 
 		// 顧客
 		occursList.putParam("OOCustMainBTNFg", CustMainBTNFg);
@@ -510,6 +533,8 @@ public class L1001 extends TradeBuffer {
 		occursList.putParam("OOCustCrossBTNFg", CustCrossBTNFg);
 		// 電話
 		occursList.putParam("OOCustTelNoBTNFg", CustTleNoBTNFg);
+		// 寬限控管
+		occursList.putParam("OOGraceConditionFg", iGraceCondition);
 		occursList.putParam("OOCustId", aCustMain.getCustId());
 		occursList.putParam("OOCustNo", aCustMain.getCustNo());
 		occursList.putParam("OOCustTypeCode", aCustMain.getCustTypeCode());
@@ -519,6 +544,7 @@ public class L1001 extends TradeBuffer {
 		} else {
 			occursList.putParam("OODataStatus", aCustMain.getDataStatus());
 		}
+		occursList.putParam("OOAllowInquire", iAllowInquire);
 		this.totaVo.addOccursList(occursList);
 
 	}
