@@ -52,8 +52,18 @@ T(2,*)
 T(2,*)
 K(MODIFYBUTTON,修改)
 
+#CHAIN=A,1,S
+T(4,CHAIN$) 
+
+#NTXBUF=x,10,S
+C(3,#CHAIN,1,T(4,NTXBUF$),S)
+T(1,@CustId,#NTXBUF,1,10)
+
+#Space=X,1,S
+C(3,#CHAIN,1,T(2,@FdId, )T(F,@CustId,0),$)
 ! 修改前統一編號
 #CustId=X,10,I
+C(3,#CHAIN,1,s,$)
 @V(7)
 A(ID_UNINO,0,#CustId)
 

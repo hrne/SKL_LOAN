@@ -1901,11 +1901,11 @@ public class MakeReport extends CommBuffer {
 	public String formatAmt(BigDecimal amt, int n, int unitPow) {
 		if (unitPow <= 1) {
 			// do nothing
-		} else if (formatAmtTemplates.containsKey(n)) {
-			amt = computeDivide(amt, formatAmtTemplates.get(n), 0);
+		} else if (formatAmtTemplates.containsKey(unitPow)) {
+			amt = computeDivide(amt, formatAmtTemplates.get(unitPow), n);
 		} else {
 			// Math.Pow(a,b) -> a 的 b 次方
-			amt = computeDivide(amt, new BigDecimal(Math.pow(10, unitPow)), 0);
+			amt = computeDivide(amt, new BigDecimal(Math.pow(10, unitPow)), n);
 		}
 
 		return formatAmt(amt, n);

@@ -222,8 +222,8 @@ A(DATE,0,#AuthStartDay)
 
 !授權迄日
 #AuthEndDay=D,7,I
-C(4,#AuthEndDay,$,A(DATE,0,#AuthEndDay))
-@C(4,#AuthEndDay,$,IF(#AuthEndDay>#AuthStartDay,$,V(P,迄日需大於起日)))
+@C(4,#AuthEndDay,$,A(DATE,0,#AuthEndDay))
+C(4,#AuthEndDay,$,IF(#AuthEndDay>#AuthStartDay,$,V(P,迄日需大於起日)))
 
 !起日授權主管中文代號
 #AuthMgrIdS=X,6,I

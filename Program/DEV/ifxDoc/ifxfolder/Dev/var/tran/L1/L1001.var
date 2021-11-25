@@ -13,7 +13,7 @@ E(0,0)ASGN(INQHD$)
 
 ![每筆資料明細(OCCURS)長度]
 #INQLEN=n,3,S
-E(0,232)ASGN(INQLEN$)
+E(0,233)ASGN(INQLEN$)
 
 ![多筆查詢之一個畫面有N筆資料]
 #INQREC=n,2,S
@@ -293,7 +293,7 @@ T(3,1)ASGN(LOOP$)
 T(H,#OOCustTypeCode,#CustTypeCodeHelp)
 #OOCustName=x,200,L
 
-#OODataStatus=X,1,S
+#OODataStatus=A,1,S
 
 #custidlen=X,2,S
 P(1,#OOCustId)
@@ -303,6 +303,8 @@ IF(#custidlen==8,T(3,L1102),T(3,L1101))
 
 #CUSTCHANGE=X,5,S
 IF(#custidlen==8,C(5,#OODataStatus,1,T(3,L1102),T(3,L1104)),C(5,#OODataStatus,1,T(3,L1101),T(3,L1103)))
+
+#OOAllowInquire=X,1,S
 
 !顧客
 #OO_FUNCD=X,1,S
@@ -420,6 +422,19 @@ T(2,1+#OOCustId)
 C(5,#OODataStatus,X,BIND(grid,cancel),
 C(5,#OODataStatus,1,BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; text=補建; ntxbuf=#OOBUF13}),BIND(grid,{ cmd=CHAIN; ntxcd=#CUSTCHANGE; text=修改; ntxbuf=#OOBUF13})))
 
+! 開放查詢
+#OOBUF16=X,10,S
+T(2,#OOCustId)
+
+#OOBTN16=X,1,S
+C(2,#OOAllowInquire,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L1110; text=不開放; ntxbuf=#OOBUF16}),BIND(grid,{ cmd=CHAIN; ntxcd=L1110; text=開放; ntxbuf=#OOBUF16}))
+
+!統一編號變更
+#OOBUF17=X,10,S
+T(2,#OOCustId)
+
+#OOBTN17=X,1,S
+C(4,#OOCustId,BIND(grid,cancel),BIND(grid,{ cmd=CHAIN; ntxcd=L1111;text=變更; ntxbuf=#OOBUF17}))
 
 </sub>
 
@@ -460,6 +475,7 @@ TXFORM=L1001
 #OOCustTypeCode
 #OOCustName
 #OODataStatus
+#OOAllowInquire
 ^
 <include src="ROM.icf::L6R06.tom"/>
 <include src="HELPRIM.icf::HELPRIM.tom"/>
@@ -526,6 +542,12 @@ TXFORM=L1001
 
 #OOCustName=戶名
 {width:400,align:'left'}
+
+#OOBTN16=開放</br>查詢
+{width:50,search:false,formatter:'cust:bind-button:#OOBTN16',align:'center',canExport:false}
+
+#OOBTN17=統一編號</br>變更
+{width:70,search:false,formatter:'cust:bind-button:#OOBTN17',align:'center',canExport:false}
 
 ^
 

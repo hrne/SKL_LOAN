@@ -53,10 +53,10 @@ public class L4965 extends TradeBuffer {
 
 	@Autowired
 	public Parse parse;
-	
+
 	@Autowired
 	public InsuRenewService insuRenewService;
-	
+
 	@Autowired
 	public InsuOrignalService insuOrignalService;
 
@@ -68,7 +68,7 @@ public class L4965 extends TradeBuffer {
 //		 設定第幾分頁 titaVo.getReturnIndex() 第一次會是0，如果需折返最後會塞值
 		this.index = titaVo.getReturnIndex();
 //		設定每筆分頁的資料筆數 預設500筆 總長不可超過六萬
-		this.limit = 500;
+		this.limit = 100;
 
 		List<String[]> dataL4965 = l4965ServiceImpl.findData(this.index, this.limit, titaVo);
 
@@ -93,29 +93,29 @@ public class L4965 extends TradeBuffer {
 			occursList.putParam("OOClCode2", data[5]);
 			occursList.putParam("OOClNo", data[6]);
 			occursList.putParam("OONowInsuNo", data[7]);
-			occursList.putParam("OOEndoInsuNo", data[8]); 
-			occursList.putParam("OOInsuCompany", data[9]); 
+			occursList.putParam("OOEndoInsuNo", data[8]);
+			occursList.putParam("OOInsuCompany", data[9]);
 			occursList.putParam("OOFireInsuCovrg", data[10]);
 			occursList.putParam("OOFireInsuPrem", data[11]);
 			occursList.putParam("OOEthqInsuCovrg", data[12]);
 			occursList.putParam("OOEthqInsuPrem", data[13]);
 			occursList.putParam("OOInsuStartDate", data[14]);
 			occursList.putParam("OOInsuEndDate", data[15]);
-			
+
 			occursList.putParam("OOPrevInsuNo", "");
 			occursList.putParam("OOBtnFlag", 0);
-			
+
 			int ClCode1 = parse.stringToInteger(data[4]);
 			int ClCode2 = parse.stringToInteger(data[5]);
 			int ClNo = parse.stringToInteger(data[6]);
 			String OrigInsuNo = data[7];
 			String EndoInsuNo = data[8];
 			String PrevInsuNo = "";
-			if(data[16] != null) {
+			if (data[16] != null) {
 				PrevInsuNo = data[16];
 				occursList.putParam("OOPrevInsuNo", data[16]);
-			} 
-			
+			}
+
 			// 新保
 			InsuOrignal tInsuOrignal = new InsuOrignal();
 			InsuOrignalId tInsuOrignalId = new InsuOrignalId();
@@ -124,18 +124,17 @@ public class L4965 extends TradeBuffer {
 			tInsuOrignalId.setClNo(ClNo);
 			tInsuOrignalId.setOrigInsuNo(OrigInsuNo);
 			tInsuOrignalId.setEndoInsuNo(EndoInsuNo);
-						
+
 			tInsuOrignal = insuOrignalService.findById(tInsuOrignalId, titaVo);
-						
-			if(tInsuOrignal != null) {
+
+			if (tInsuOrignal != null) {
 				occursList.putParam("OOBtnFlag", 1);
 			}
-			
-			
+
 			// 續保
-			if(data[16] != null) {
+			if (data[16] != null) {
 				PrevInsuNo = data[16];
-				
+
 				InsuRenew tInsuRenew = new InsuRenew();
 				InsuRenewId tInsuRenewId = new InsuRenewId();
 				tInsuRenewId.setClCode1(ClCode1);
@@ -143,19 +142,18 @@ public class L4965 extends TradeBuffer {
 				tInsuRenewId.setClNo(ClNo);
 				tInsuRenewId.setPrevInsuNo(PrevInsuNo);
 				tInsuRenewId.setEndoInsuNo(EndoInsuNo);
-				
-				
+
 				tInsuRenew = insuRenewService.findById(tInsuRenewId, titaVo);
-				
-				if(tInsuRenew != null) {
+
+				if (tInsuRenew != null) {
 					occursList.putParam("OOBtnFlag", 2);
 				}
-			} 
-			
+			}
+
 			/* 將每筆資料放入Tota的OcList */
 			this.totaVo.addOccursList(occursList);
 		}
-		
+
 		this.addList(this.totaVo);
 		return this.sendList();
 	}

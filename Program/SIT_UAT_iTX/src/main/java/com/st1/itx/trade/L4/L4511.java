@@ -11,11 +11,15 @@ import com.st1.itx.Exception.LogicException;
 import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
+import com.st1.itx.db.domain.CdCode;
 import com.st1.itx.db.domain.CdEmp;
 import com.st1.itx.db.domain.EmpDeductMedia;
+import com.st1.itx.db.domain.EmpDeductSchedule;
 import com.st1.itx.db.domain.TxToDoDetailId;
+import com.st1.itx.db.service.CdCodeService;
 import com.st1.itx.db.service.CdEmpService;
 import com.st1.itx.db.service.EmpDeductMediaService;
+import com.st1.itx.db.service.EmpDeductScheduleService;
 import com.st1.itx.tradeService.TradeBuffer;
 import com.st1.itx.util.common.MakeFile;
 import com.st1.itx.util.common.TxToDoCom;
@@ -51,6 +55,12 @@ public class L4511 extends TradeBuffer {
 
 	@Autowired
 	public CdEmpService cdEmpService;
+	
+	@Autowired
+	public EmpDeductScheduleService empDeductScheduleService;
+
+	@Autowired
+	public CdCodeService cdCodeService;
 
 	@Autowired
 	public WebClient webClient;
@@ -85,6 +95,31 @@ public class L4511 extends TradeBuffer {
 		cntN = 0;
 		sendMsg = "";
 		int mediaDate = parse.stringToInteger(titaVo.getParam("MediaDate")) + 19110000;
+//		根據輸入之入帳日查詢BORM(ACDATE)->FACM(REPAYCODE:03)寫入empdtl
+		mediaDate = parse.stringToInteger(titaVo.get("MediaDate")) + 19110000;
+		boolean  isMediaDate = false;
+
+//		抓取媒體日為今日者
+		Slice<EmpDeductSchedule> slEmpDeductSchedule = empDeductScheduleService.mediaDateRange(mediaDate, mediaDate,
+				this.index, this.limit, titaVo);
+		if (slEmpDeductSchedule != null) {
+			for (EmpDeductSchedule tEmpDeductSchedule : slEmpDeductSchedule.getContent()) {
+				CdCode tCdCode = cdCodeService.getItemFirst(4, "EmpDeductType", tEmpDeductSchedule.getAgType1(),
+						titaVo);
+//				1.15日薪 2.非15日薪
+				if (iOpItem == 1 && "1".equals(tCdCode.getItem().substring(0, 1))) {
+					isMediaDate = true;
+				}
+				if (iOpItem == 2 && "2".equals(tCdCode.getItem().substring(0, 1))) {
+					isMediaDate = true;
+				}
+			}
+		}
+
+		if (!isMediaDate) {			
+			throw new LogicException(titaVo, "E0010", "非設定媒體日"); // 功能選擇錯誤
+		}
+
 //		------------is15------------
 		if (iOpItem == 1) {
 

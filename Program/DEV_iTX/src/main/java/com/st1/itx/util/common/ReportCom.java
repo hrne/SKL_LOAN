@@ -102,14 +102,14 @@ public class ReportCom extends CommBuffer {
 		// run batchJob
 		if (backgroundJobs.length() > 0) {
 			this.info("ReportCom: executing BatchJobs (" + txcd + ")");
-
-			titaVo.setBatchJobId(backgroundJobs.toString()); // java's String.Split skips trailing empty results.
-
+			
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
 					titaVo.getParam("TLRNO"), backgroundJobs.length()/7 + " 支報表正在背景產製，完成後可於＂報表及製檔＂存取", titaVo);
-			
 			// jL0001;jL0002;jL0003...
 			// each job is 7 chars long, hence /7
+			
+			backgroundJobs.setLength(backgroundJobs.length() - 1); // delete out the last ; symbol.
+			titaVo.setBatchJobId(backgroundJobs.toString());
 		}
 
 		if (needInputJobs.size() > 0) {

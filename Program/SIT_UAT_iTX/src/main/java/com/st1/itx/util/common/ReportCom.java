@@ -73,7 +73,7 @@ public class ReportCom extends CommBuffer {
 	public void executeReports(TitaVo titaVo, String txcd) throws LogicException {
 		this.info("ReportCom: activated by " + txcd);
 
-		Queue<String> backgroundJobs = new LinkedList<String>();
+		StringBuilder backgroundJobs = new StringBuilder();
 		Queue<NeedInputJob> needInputJobs = new LinkedList<NeedInputJob>();
 
 		int totalItem = Integer.parseInt(titaVo.getParam("TotalItem"));
@@ -93,20 +93,23 @@ public class ReportCom extends CommBuffer {
 					// add into batch job
 					// batchJob format: j[BEANNAME];j[BEANNAME];...;j[BEANNAME]
 					this.info("ReportCom: adding BatchJob j" + tradeCode + "(" + txcd + ")");
-					backgroundJobs.add("j" + tradeCode);
+					backgroundJobs.append("j" + tradeCode + ";");
 
 				}
 			}
 		}
 
 		// run batchJob
-		if (backgroundJobs.size() > 0) {
+		if (backgroundJobs.length() > 0) {
 			this.info("ReportCom: executing BatchJobs (" + txcd + ")");
-
-			titaVo.setBatchJobId(String.join(";", backgroundJobs));
-
+			
 			webClient.sendPost(dDateUtil.getNowStringBc(), "1800", titaVo.getParam("TLRNO"), "Y", "LC009",
-					titaVo.getParam("TLRNO"), backgroundJobs.size() + " 支報表正在背景產製，完成後可於＂報表及製檔＂存取", titaVo);
+					titaVo.getParam("TLRNO"), backgroundJobs.length()/7 + " 支報表正在背景產製，完成後可於＂報表及製檔＂存取", titaVo);
+			// jL0001;jL0002;jL0003...
+			// each job is 7 chars long, hence /7
+			
+			backgroundJobs.setLength(backgroundJobs.length() - 1); // delete out the last ; symbol.
+			titaVo.setBatchJobId(backgroundJobs.toString());
 		}
 
 		if (needInputJobs.size() > 0) {

@@ -69,11 +69,7 @@ public class L3911 extends TradeBuffer {
 		int iEntryStartDate = this.parse.stringToInteger(titaVo.getParam("EntryStartDate"));
 		int iEntryEndDate = this.parse.stringToInteger(titaVo.getParam("EntryEndDate"));
 
-		boolean iFacmFg = false;
-		boolean loopFg = true;
-		if (iBormNo == 0) { // 撥款序號不打 顯示額度加總
-			iFacmFg = true;
-		}
+		boolean firstFg = true;
 
 		// work area
 		int wkFacmNoStart = 1;
@@ -196,167 +192,79 @@ public class L3911 extends TradeBuffer {
 
 			/* 暫存的額度編號 撥款序號 入帳日 計息起日 計息迄日 */
 			this.info("LoanBorTx" + ln);
-			if (iFacmFg) { // 撥款序號不打 顯示額度加總
 
-				if (loopFg) {// 先存第一筆資料
+			if (firstFg) {// 先存第一筆資料
 
-					TempFacmNo = ln.getFacmNo();
-					TempBormNo = ln.getBormNo();
-					TempEntryDate = ln.getEntryDate();
-					TempIntStartDate = ln.getIntStartDate();
-					TempIntEndDate = ln.getIntEndDate();
-					TempCurrencyCode = ln.getTitaCurCd();
-					TempTxAmt = TempTxAmt.add(ln.getTxAmt());
-					TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
-					TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt());
+				TempFacmNo = ln.getFacmNo();
+				TempEntryDate = ln.getEntryDate();
+				TempIntStartDate = ln.getIntStartDate();
+				TempIntEndDate = ln.getIntEndDate();
+				TempCurrencyCode = ln.getTitaCurCd();
+				firstFg = false;
 
-					TempVo tTempVo = new TempVo();
-					TempRepayCode = tTempVo.getVo(ln.getOtherFields()).getParam("RepayCode");
+			}
 
-//					/*抓OtherFields中的JSON資料*/
-//					JSONObject jsonObject = null;
-//					try {
-//						jsonObject = new JSONObject(ln.getOtherFields());
-//						for(int i = 0 ; i <jsonObject.length();i++) {
-//							if(jsonObject.has("RepayCode")) {
-//								TempRepayCode = jsonObject.get("RepayCode");
-//							}
-//						}
-//					} catch (JSONException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
+			if (TempFacmNo == ln.getFacmNo() && TempEntryDate == ln.getEntryDate()
+					&& TempIntStartDate == ln.getIntStartDate() && TempIntEndDate == ln.getIntEndDate()) { // 資料都相同
+																											// 資金加總
 
-					TempAcDate = ln.getAcDate();
-					TempTitaTlrNo = ln.getTitaTlrNo();
-					TempTitaTxtNo = ln.getTitaTxtNo();
+				TempTxAmt = TempTxAmt.add(ln.getTxAmt());
+				TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
+				TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt());
 
-					loopFg = false;
+			} else { // 資料不同 先拿temp資料塞occurs再更新temp資料
 
-				} else {
+				/* 資料不同 先拿temp資料塞occurs */
+				occursList.putParam("OOFacmNo", TempFacmNo);
+				occursList.putParam("OOBormNo", 0);
+				occursList.putParam("OOEntryDate", TempEntryDate);
+				occursList.putParam("OOIntStartDate", TempIntStartDate);
+				occursList.putParam("OOIntEndDate", TempIntEndDate);
+				occursList.putParam("OOCurrencyCode", TempCurrencyCode);
 
-					if (TempFacmNo == ln.getFacmNo() && TempBormNo == ln.getBormNo()
-							&& TempEntryDate == ln.getEntryDate() && TempIntStartDate == ln.getIntStartDate()
-							&& TempIntEndDate == ln.getIntEndDate()) { // 資料都相同 資金加總
-
-						TempTxAmt = TempTxAmt.add(ln.getTxAmt());
-						TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
-						TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt());
-
-					} else { // 資料不同 先拿temp資料塞occurs再更新temp資料
-
-						/* 資料不同 先拿temp資料塞occurs */
-						occursList.putParam("OOFacmNo", TempFacmNo);
-						occursList.putParam("OOBormNo", TempBormNo);
-						occursList.putParam("OOEntryDate", TempEntryDate);
-						occursList.putParam("OOIntStartDate", TempIntStartDate);
-						occursList.putParam("OOIntEndDate", TempIntEndDate);
-						occursList.putParam("OOCurrencyCode", TempCurrencyCode);
-
-						occursList.putParam("OOTxAmt", TempTxAmt);
-						occursList.putParam("OOShortFall", TempShortFall);
-						occursList.putParam("OOBreachAmt", TempBreachAmt);
-
-						if (TempRepayCode.toString().length() == 2) {
-							occursList.putParam("OORepayCode", TempRepayCode);
-						} else {
-							occursList.putParam("OORepayCode", "");
-						}
-						occursList.putParam("OOAcDate", TempAcDate);
-						occursList.putParam("OOTellerNo", TempTitaTlrNo);
-						occursList.putParam("OOTxtNo", TempTitaTxtNo);
-
-						/* 更新temp資料 */
-						TempFacmNo = ln.getFacmNo();
-						TempBormNo = ln.getBormNo();
-						TempEntryDate = ln.getEntryDate();
-						TempIntStartDate = ln.getIntStartDate();
-						TempIntEndDate = ln.getIntEndDate();
-						TempCurrencyCode = ln.getTitaCurCd();
-
-						TempTxAmt = new BigDecimal("0");
-						TempShortFall = new BigDecimal("0");
-						TempBreachAmt = new BigDecimal("0");
-
-						TempTxAmt = TempTxAmt.add(ln.getTxAmt());
-						TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
-						TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt());
-
-						TempVo tTempVo = new TempVo();
-						TempRepayCode = tTempVo.getVo(ln.getOtherFields()).getParam("RepayCode");
-
-//						/*抓OtherFields中的JSON資料*/
-//						JSONObject jsonObject = null;
-//						try {
-//							jsonObject = new JSONObject(ln.getOtherFields());
-//							for(int i = 0 ; i <jsonObject.length();i++) {
-//								if(jsonObject.has("RepayCode")) {
-//									TempRepayCode = jsonObject.get("RepayCode");
-//								}
-//							}
-//						} catch (JSONException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-
-						TempAcDate = ln.getAcDate();
-						TempTitaTlrNo = ln.getTitaTlrNo();
-						TempTitaTxtNo = ln.getTitaTxtNo();
-
-						this.totaVo.addOccursList(occursList);
-						occursList = new OccursList();
-					} // else
-
-				} // else
-
-			} else { // 有打撥款序號的情形
-
-				occursList.putParam("OOFacmNo", ln.getFacmNo());
-				occursList.putParam("OOBormNo", ln.getBormNo());
-				occursList.putParam("OOEntryDate", ln.getEntryDate());
-				occursList.putParam("OOIntStartDate", ln.getIntStartDate());
-				occursList.putParam("OOIntEndDate", ln.getIntEndDate());
-				occursList.putParam("OOCurrencyCode", ln.getTitaCurCd());
-
-				occursList.putParam("OOTxAmt", ln.getTxAmt());
-				occursList.putParam("OOShortFall", ln.getOverflow().subtract(ln.getShortfall()));
-				occursList.putParam("OOBreachAmt", ln.getBreachAmt());
-
-				TempVo tTempVo = new TempVo();
-				TempRepayCode = tTempVo.getVo(ln.getOtherFields()).getParam("RepayCode");
-
-//				/*抓OtherFields中的JSON資料*/
-//				JSONObject jsonObject = null;
-//				Object RepayCode = "";
-//				try {
-//					jsonObject = new JSONObject(ln.getOtherFields());
-//					for(int i = 0 ; i <jsonObject.length();i++) {
-//						if(jsonObject.has("RepayCode")) {
-//							RepayCode = jsonObject.get("RepayCode");
-//						}
-//					}
-//				} catch (JSONException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
+				occursList.putParam("OOTxAmt", TempTxAmt);
+				occursList.putParam("OOShortFall", TempShortFall);
+				occursList.putParam("OOBreachAmt", TempBreachAmt);
 
 				if (TempRepayCode.toString().length() == 2) {
 					occursList.putParam("OORepayCode", TempRepayCode);
 				} else {
 					occursList.putParam("OORepayCode", "");
 				}
-				occursList.putParam("OOAcDate", ln.getAcDate());
-				occursList.putParam("OOTellerNo", ln.getTitaTlrNo());
-				occursList.putParam("OOTxtNo", ln.getTitaTxtNo());
+				occursList.putParam("OOAcDate", TempAcDate);
+				occursList.putParam("OOTellerNo", TempTitaTlrNo);
+				occursList.putParam("OOTxtNo", TempTitaTxtNo);
 
-				// 將每筆資料放入Tota的OcList
+				/* 更新temp資料 */
+				TempFacmNo = ln.getFacmNo();
+				TempBormNo = ln.getBormNo();
+				TempEntryDate = ln.getEntryDate();
+				TempIntStartDate = ln.getIntStartDate();
+				TempIntEndDate = ln.getIntEndDate();
+				TempCurrencyCode = ln.getTitaCurCd();
+
+				TempTxAmt = new BigDecimal("0");
+				TempShortFall = new BigDecimal("0");
+				TempBreachAmt = new BigDecimal("0");
+
+				TempTxAmt = TempTxAmt.add(ln.getTxAmt());
+				TempShortFall = TempShortFall.add(ln.getOverflow().subtract(ln.getShortfall()));
+				TempBreachAmt = TempBreachAmt.add(ln.getBreachAmt());
+
+				TempVo tTempVo = new TempVo();
+				TempRepayCode = tTempVo.getVo(ln.getOtherFields()).getParam("RepayCode");
+
+				TempAcDate = ln.getAcDate();
+				TempTitaTlrNo = ln.getTitaTlrNo();
+				TempTitaTxtNo = ln.getTitaTxtNo();
+
 				this.totaVo.addOccursList(occursList);
 				occursList = new OccursList();
 			}
 
-		} // for
+		}
 
-		if (!loopFg) { // 只有一筆資料 或是 最後一筆
+		if (!firstFg) { // 只有一筆資料 或是 最後一筆
 			occursList.putParam("OOFacmNo", TempFacmNo);
 			occursList.putParam("OOBormNo", TempBormNo);
 			occursList.putParam("OOEntryDate", TempEntryDate);

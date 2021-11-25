@@ -10,11 +10,14 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import com.st1.itx.Exception.LogicException;
+import com.st1.itx.dataVO.OccursList;
 import com.st1.itx.dataVO.TitaVo;
 import com.st1.itx.dataVO.TotaVo;
 import com.st1.itx.db.domain.AcClose;
 import com.st1.itx.db.domain.AcCloseId;
 import com.st1.itx.db.domain.BankRemit;
+import com.st1.itx.db.domain.CdBank;
+import com.st1.itx.db.domain.CdBankId;
 import com.st1.itx.db.service.AcCloseService;
 import com.st1.itx.db.service.AcDetailService;
 import com.st1.itx.db.service.BankRemitService;
@@ -61,10 +64,10 @@ public class L4101 extends TradeBuffer {
 	public FileCom fileCom;
 
 	@Autowired
-	public TotaVo totaA;
+	public TotaVo totaA; // wang
 
 	@Autowired
-	public TotaVo totaB;
+	public TotaVo totaB; // 未放行清單
 
 	@Autowired
 	public BankRemitService bankRemitService;
@@ -113,12 +116,14 @@ public class L4101 extends TradeBuffer {
 	public ArrayList<TotaVo> run(TitaVo titaVo) throws LogicException {
 		this.info("active L4101 ");
 		this.totaVo.init(titaVo);
+		totaB.putParam("MSGID", "L410B");
 
 		acDate = parse.stringToInteger(titaVo.getParam("AcDate")) + 19110000;
 		int iItemCode = parse.stringToInteger(titaVo.getParam("ItemCode")); // 1.撥款 2.退款
 		batchNo = FormatUtil.padX(this.getBatchNo(iItemCode, titaVo), 6);
 
 		List<BankRemit> lBankRemit = new ArrayList<BankRemit>();
+		List<BankRemit> unReleaselBankRemit = new ArrayList<BankRemit>();
 		Slice<BankRemit> slBankRemit = bankRemitService.findL4901B(acDate, batchNo, 00, 99, 0, 0, 0, Integer.MAX_VALUE,
 				titaVo);
 		if (slBankRemit == null) {
@@ -143,13 +148,9 @@ public class L4101 extends TradeBuffer {
 
 			if (t.getActFg() == 1) {
 				unReleaseCnt++;
+				unReleaselBankRemit.add(t);
 			} else {
 				lBankRemit.add(t);
-			}
-		}
-		if ("Y".equals(titaVo.get("ReleaseCheck"))) {
-			if (unReleaseCnt > 0) {
-				throw new LogicException(titaVo, "E0015", "未放行筆數：" + unReleaseCnt + " , 已放行筆數：" + lBankRemit.size()); // 檢查錯誤
 			}
 		}
 		if (lBankRemit.size() == 0) {
@@ -163,7 +164,25 @@ public class L4101 extends TradeBuffer {
 		this.info("titaVo = " + titaVo.toString());
 		MySpring.newTask("L4101Batch", this.txBuffer, titaVo);
 
+		if (unReleaselBankRemit != null) {
+
+			// tota 未放行清單
+			for (BankRemit t : unReleaselBankRemit) {
+				setTota(t, titaVo);
+			}
+
+			this.addList(totaB);
+		}
+
+//		[是否檢核未放行]為Y時 , 若有未放行資料，則提示訊息
+		if ("Y".equals(titaVo.get("ReleaseCheck"))) {
+			if (unReleaseCnt > 0) {
+				this.totaA.setWarnMsg("有未放行資料不產生媒體檔");
+				this.addList(totaA);
+			}
+		}
 		totaVo.put("OBatchNo", newBatchNo);
+		this.info("totaB = " + totaB.toString());
 		this.addList(this.totaVo);
 		return this.sendList();
 	}
@@ -201,6 +220,44 @@ public class L4101 extends TradeBuffer {
 		batchNo = batchNo.trim() + parse.IntegerToString(tAcClose.getBatNo(), 2);
 
 		return batchNo;
+	}
+
+	// tota 未放行清單
+	private void setTota(BankRemit t, TitaVo titaVo) throws LogicException {
+
+		OccursList occursList = new OccursList();
+
+		occursList.putParam("OOAcDate", t.getAcDate());
+		occursList.putParam("OOBatchNo", t.getBatchNo());
+		occursList.putParam("OODrawdownCode", t.getDrawdownCode());
+		occursList.putParam("OOStatusCode", t.getStatusCode());
+		occursList.putParam("OORemitBank", t.getRemitBank());
+		occursList.putParam("OORemitBranch", t.getRemitBranch());
+
+		CdBank tCdBank = new CdBank();
+		if (!t.getRemitBranch().isEmpty()) {
+			tCdBank = cdBankService.findById(new CdBankId(t.getRemitBank(), t.getRemitBranch()), titaVo);
+		}
+		String ckItem = "";
+		String brItem = "";
+
+		if (tCdBank != null) {
+			ckItem = tCdBank.getBankItem();
+			brItem = tCdBank.getBranchItem();
+		}
+
+		occursList.putParam("OORemitBankX", ckItem);
+		occursList.putParam("OORemitBranchX", brItem);
+		occursList.putParam("RemitAcctNo", t.getRemitAcctNo());
+		occursList.putParam("OOCustNo", t.getCustNo());
+		occursList.putParam("OOFacmNo", t.getFacmNo());
+		occursList.putParam("OOBormNo", t.getBormNo());
+		occursList.putParam("OOCustName", FormatUtil.padX("" + t.getCustName(), 20));
+		occursList.putParam("OORemaker", t.getRemark());
+		occursList.putParam("OOCurrencyCode", t.getCurrencyCode());
+		occursList.putParam("OORemitAmt", t.getRemitAmt());
+
+		totaB.addOccursList(occursList);
 	}
 
 }

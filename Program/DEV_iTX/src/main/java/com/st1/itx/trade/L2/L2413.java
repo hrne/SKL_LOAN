@@ -168,9 +168,7 @@ public class L2413 extends TradeBuffer {
 			// 可分配金額=鑑估總值*貸放成數(四捨五入至個位數)
 			// 同一擔保品在ClFac擔保品關聯檔的分配金額加總需小於ClMain擔保品主檔的可分配金額
 			shareTotal = evaAmt.multiply(loanToValue).divide(new BigDecimal(100)).setScale(0, BigDecimal.ROUND_HALF_UP);
-			if (parse.stringToBigDecimal(titaVo.getParam("SettingBalance")).compareTo(shareTotal) < 0) {
-				shareTotal = parse.stringToBigDecimal(titaVo.getParam("SettingBalance"));
-			}
+			
 			this.info("L2411 shareTotal = " + shareTotal.toString());
 
 			tClMain.setShareTotal(shareTotal);

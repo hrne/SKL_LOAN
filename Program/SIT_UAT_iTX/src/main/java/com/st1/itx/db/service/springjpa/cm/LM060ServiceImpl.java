@@ -96,7 +96,6 @@ public class LM060ServiceImpl extends ASpringJpaParm implements InitializingBean
 		sql += "				 ,0 F5";
 		sql += "				 ,0 F6";
 		sql += "				 ,0 F7";
-		sql += "				 ,0 F8";
 		sql += "		   FROM \"AcMain\" A";
 		sql += "		   WHERE A.\"AcDate\" = :lday";
 		sql += "		     AND A.\"MonthEndYm\" = :lyymm";
